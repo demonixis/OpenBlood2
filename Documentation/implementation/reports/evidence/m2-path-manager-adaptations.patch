@@ -1,0 +1,1092 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index f2019b0..0dc0f76 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -227,3 +227,10 @@ Preserve source branch priority, server-camera/script early returns, B2_LITE's
+ 1..3 variants, chance draw ordering and class/gender shared voice lifetime.
+ Fire/show_weapon/extra remain unavailable; diagnostic probes are not registered
+ world AI. CivilianAI, CultistAI, Gideon, ExitTrigger and the actual M2 gate stay open.
++
++The latest [AI path-manager evidence](../Documentation/Implementation/M2_PATH_MANAGER.md) connects original PathMgr selection
++and owned snapshots to shell lifetime and in-game inspection. Read [contracts](docs/PATH_MANAGER_CONTRACTS.md).
++Preserve active-only GetNextObject, included SMELL points, unconsumed source objects,
++prefix-plus-first-digit matching, reverse enumeration and preflight/no-match output
++semantics. Returned paths own their data; source handles are inspection-only.
++AI following/actions, remaining classes/services and the M2 gate stay open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7c4f63b..40bb035 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -27,6 +27,7 @@ add_library(blood2_game STATIC
+     src/game/original/Key.cpp
+     src/game/original/GameStartPoint.cpp
+     src/game/original/PathPoint.cpp
++    src/game/original/PathMgr.cpp
+     src/game/original/trigger_helpers.cpp
+     src/game/original/session_load.cpp
+     src/game/session.cpp
+@@ -48,13 +49,13 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
++add_executable(blood2_app src/app/path_manager_smoke.cpp src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+ target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+ if(BLOOD2_INSPECTOR)
+-    target_sources(blood2_app PRIVATE src/app/inspector_skeleton.cpp src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_cinematics.cpp src/app/inspector_random_sounds.cpp src/app/inspector_scene_explosions.cpp src/app/inspector_sprites.cpp src/app/inspector_world_sounds.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
++    target_sources(blood2_app PRIVATE src/app/inspector_paths.cpp src/app/inspector_skeleton.cpp src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_cinematics.cpp src/app/inspector_random_sounds.cpp src/app/inspector_scene_explosions.cpp src/app/inspector_sprites.cpp src/app/inspector_world_sounds.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
+     target_link_libraries(blood2_app PRIVATE imgui)
+ endif()
+ 
+diff --git a/README.md b/README.md
+index d82cf93..af3bed7 100644
+--- a/README.md
++++ b/README.md
+@@ -258,3 +258,13 @@ rules. Fire/extra actions and complete NPC behavior remain unavailable; the
+ The AI model-key increment passed 300/300 tests in Debug and inspector-free
+ Release, plus 277/277 sequential headless checks with Clang ASan/UBSan/leak
+ detection on Linux. The diagnostic GPU probe preserves actual NPC model keys.
++
++Latest M2 continuation: [original AI path selection](../Documentation/Implementation/M2_PATH_MANAGER.md)
++connects PathMgr, owned route data, active enumeration and Session inspection.
++SubwayA's seven points select in the original reverse enumeration order. AI
++following/action delivery and the unchanged M2 exit gate remain incomplete.
++
++The AI path-manager increment passed 307/307 tests in both Debug and inspector-free
++Release, plus 284/284 sequential headless checks with Clang ASan/UBSan/leak
++detection on Linux. Seven real SubwayA points are checked across hidden inspection
++and reload; AI path following remains unavailable.
+diff --git a/docs/M2_PATH_MANAGER_SOURCES.json b/docs/M2_PATH_MANAGER_SOURCES.json
+new file mode 100644
+index 0000000..8095547
+--- /dev/null
++++ b/docs/M2_PATH_MANAGER_SOURCES.json
+@@ -0,0 +1,114 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "951708a90568cad0bfcc6795168a9b77cb211b3d",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/PathMgr.cpp",
++      "sha256": "8118b71bc1a0063f0b12af2d02260cfb74ac9676057c070c1575465db204ba09",
++      "selected_lines": [
++        [
++          25,
++          61
++        ],
++        [
++          66,
++          131
++        ],
++        [
++          151,
++          182
++        ]
++      ],
++      "use": "Build/GetPath and effective reverse enumeration from null sentinel"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PathMgr.h",
++      "sha256": "ec0972b4e66d94767e9461e74fd53ec2097442167e5c806b370e0476589ef78e",
++      "selected_lines": [
++        [
++          18,
++          51
++        ]
++      ],
++      "use": "Original ownership and clear interface"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PathListData.cpp",
++      "sha256": "8bcd8c9baa9afda9dd915e14fb4acb9d7af7c224bc6b9f15722a388689050182",
++      "selected_lines": [
++        [
++          22,
++          80
++        ]
++      ],
++      "use": "Original copied position/name/action ownership"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PathList.h",
++      "sha256": "8df80ab80a3ceaaa2ad5fb0fed657b85d06ce1767f9c1ae852a4a35072f0966b",
++      "selected_lines": [
++        [
++          17,
++          203
++        ]
++      ],
++      "use": "Original owned-manager versus borrowed-result container; replaced with value vectors"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/dlink.h",
++      "sha256": "ae2525b9e0bbf6a893660420c040eb30e1bceea2ec15ba086c005f40617362cd",
++      "selected_lines": [
++        [
++          84,
++          114
++        ]
++      ],
++      "use": "Sentinel initialization and insertion confirm reverse order; reference only"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/server_de.h",
++      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "selected_lines": [
++        [
++          654,
++          663
++        ]
++      ],
++      "use": "Separate active and inactive enumeration interfaces"
++    },
++    {
++      "path": "sources/lithtech/runtime/server/src/serverde_impl.cpp",
++      "sha256": "5e1973f36bea781f23f99d7e0bb32ddb474ebf83c142c6877b15c157ba2fd53f",
++      "selected_lines": [
++        [
++          2531,
++          2588
++        ]
++      ],
++      "use": "Later engine confirms active GetNextObject boundary; no code import"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
++      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
++      "selected_lines": [
++        [
++          576,
++          589
++        ]
++      ],
++      "use": "Original PostStartWorld manager invocation"
++    }
++  ],
++  "adaptations": [
++    "Owned strings/optional actions and value vectors replace HSTRING and borrowed PathList pointers",
++    "Checked typed source lifetime and inspection-only source identity",
++    "Bounded 100-byte prefix and 4096-point atomic snapshot",
++    "ASCII case folding, source reverse enumeration and output-clearing semantics",
++    "Active-only GetNextObject correction; editor enumeration unchanged"
++  ],
++  "not_implemented": [
++    "AI script following, path action delivery, navigation and states",
++    "PathList save/load and GetNextInactiveObject",
++    "Remaining required classes/services and complete M2"
++  ]
++}
+diff --git a/docs/OBJECT_CONTRACTS.md b/docs/OBJECT_CONTRACTS.md
+index 3b60640..eea86e0 100644
+--- a/docs/OBJECT_CONTRACTS.md
++++ b/docs/OBJECT_CONTRACTS.md
+@@ -76,3 +76,7 @@ an object. `create_props` preserves the supplied position/rotation and nonempty
+ unless the string explicitly overrides them (only for schema-declared properties).
+ This is needed by the original SpawnObject helper; see [pickup contracts](PICKUP_CONTRACTS.md).
+ Unknown/duplicate properties still reject; world-file creation defaults are unchanged.
++
++The [AI path-manager continuation](PATH_MANAGER_CONTRACTS.md) corrects GetNextObject
++to enumerate only active Alive objects. Editor snapshots remain inclusive; pending
++and stale handles are excluded. Stable slot order is not claimed retail-equivalent.
+diff --git a/docs/PATH_MANAGER_CONTRACTS.md b/docs/PATH_MANAGER_CONTRACTS.md
+new file mode 100644
+index 0000000..7548c2f
+--- /dev/null
++++ b/docs/PATH_MANAGER_CONTRACTS.md
+@@ -0,0 +1,103 @@
++# Original AI path snapshots and selection
++
++M2 remains incomplete. Selected PathMgr::BuildPathList/GetPath and
++PathListData::Copy now replace the shell's earlier ad hoc snapshot. They provide
++original path selection for future AI callers, not path following, navigation or
++AI states. See [source ledger](M2_PATH_MANAGER_SOURCES.json),
++[execution evidence](../../Documentation/Implementation/M2_PATH_MANAGER.md),
++[object contracts](OBJECT_CONTRACTS.md) and [shell contracts](PLAYER_CONTRACTS.md).
++
++## Preserved rules
++
++PostStartWorld builds the path snapshot after world object initialization.
++PreStartWorld/unload clears it. Every enumerated PathPoint descendant is copied:
++name, position, optional action target and optional action message. The source's
++comments mention skipping SMELL points and removing PathPoints, but neither action
++is executed. SMELL points are included if present at build time; they may later
++expire independently. Building paths never removes or renames source objects.
++Later movement, rename, expiry or removal does not update copied values. Rebuilding
++explicitly replaces the snapshot.
++
++GetPath matches an ASCII case-insensitive prefix followed immediately by a digit.
++It only checks that first suffix character: route2suffix matches route, while
++route, routeX1 and route-1 do not. Duplicate names remain distinct entries. There
++is no numeric parsing, deduplication, whole-suffix validation or invented alias.
++
++Despite its name, original AddToSortedList does **not sort**. It begins at the
++list sentinel, whose data is null, breaks immediately and inserts after that
++sentinel. The resulting query order is the reverse of enumeration. The port
++iterates the stored array backwards to preserve that behavior without allocating
++an intermediate linked list. Original DLink initialization/insertion was checked
++to establish this result; the misleading sorting comment is not the specification.
++The engine's stable slot enumeration is not claimed to reproduce retail load order.
++
++Invalid/empty prefix and an empty manager preserve the caller's previous result,
++as in the source's preflight returns. With a nonempty manager and valid prefix,
++the previous result is cleared even if nothing matches. Success returns owned
++copies in source order. Error text distinguishes invalid input, empty snapshot
++and no match. Querying has no object, message, audio or scheduling side effects.
++
++## Active enumeration and safe ownership
++
++GetNextObject now skips inactive objects as well as pending/destroying objects.
++The original SDK exposes a separate GetNextInactiveObject; later engine source
++confirms the active-list boundary. Only this active filter is adopted, without
++importing the later engine. Existing editor snapshots continue to include hidden,
++inactive and pending records. GetNextInactiveObject itself remains unavailable.
++Hidden active PathPoints are included. An already copied point remains in the
++snapshot if it later becomes inactive. This corrects the previous adapter's
++all-alive enumeration; it is not an AI-driven activity/deactivation system.
++
++PathListData replaces HSTRING ownership with strings and optional strings. A null
++action and a present empty action remain distinct. Copy validates a live typed
++PathPoint and readable strings, and replaces its output only after success.
++Invalid/stale/wrong-class copies preserve the previous value. No new string-pool
++reference, object link or ownership of the source is acquired. The source handle
++is retained solely for checked inspection, never for executing an action.
++
++PathList is an ordinary vector of owned values instead of the original array of
++borrowed pointers. Returned results survive manager rebuild/clear and source
++removal safely. Future gameplay callers must still discard their current route
++on level transitions; owned values do not imply a current live-world binding.
++Copying a result and modifying it cannot change the manager. Prefix text may
++alias an output entry: it is saved before clearing that output.
++
++Prefixes are bounded to 100 bytes and reject embedded NUL. Snapshots allow at most
++4096 PathPoints; exceeding this bound fails, clears the old snapshot and publishes
++no partial new list. The shell remains not-started on failure and load errors
++retain the manager diagnostic before rollback. This replaces the source's partial
++allocation/failure behavior. Existing engine object/property bounds apply. No
++unchecked linked-list ownership, persistent pointers to vector elements or manual
++DLL layout is introduced. Save/load and path action delivery are not implemented.
++
++## Inspection and validation
++
++The Session panel exposes a prefix query, selected order, copied positions/actions
++and all copied entries. A source is separately shown as hidden, inactive, missing
++its model or removed, and may be selected only while alive. These are snapshots,
++not a moving AI route. Queries are rebuilt from current manager state when drawn,
++so unload/reload cannot retain a borrowed entry or stale engine selection.
++
++Synthetic tests cover typed copy and string ownership, case/suffix/duplicate rules,
++reverse order, preflight versus no-match output behavior, aliased prefixes, removal,
++SMELL expiry, rebuild/unload, active/inactive enumeration and the exact 4096/4097
++boundary. The private test performs two SubwayA entry/unload cycles, checking the
++seven real points and these exact selected orders:
++
++| Prefix | Selected names |
++| --- | --- |
++| spank | spank1, spank0 |
++| dog | dog3, dog2, dog1, dog0 |
++| cat | cat1 |
++
++All seven have absent action targets/messages in the supplied installation.
++The existing player GPU scenarios on SubwayA check copied values and path queries
++while the inspector is hidden, then compare fresh source identities and unchanged
++snapshot values after reload. No extra runtime object or authored class is added.
++Debug and inspector-free builds execute the same checks.
++
++SubwayA remains 187 live-created source entries, 4 transferred sounds, 372 editor-only,
++17 unsupported and zero failed, plus 7 SelfTriggers. AI state/perception/movement,
++script FOLLOWPATH/action delivery, ExitTrigger, attachments and required FX/services
++keep M2 incomplete and --start-game blocked with exit 6. No retail executable,
++other-platform or XR parity is claimed.
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index bacdc92..0baf161 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -38,7 +38,9 @@ movement, combat reactions, audio and autosave still prevent a playable session.
+ 2. `CBloodServerShell::PreStartWorld` resets the entry subset. After original
+    world objects exist, `PostStartWorld` copies PathPoint positions, names and
+    actions using the original PathMgr/PathListData traversal. The snapshot owns
+-   its strings; AI path selection, sorting and save methods are not provided.
++   its strings. The [path-manager continuation](PATH_MANAGER_CONTRACTS.md) now
++   provides original prefix selection and reverse enumeration order; AI following
++   and save methods remain unavailable.
+ 3. Explicit player entry preloads Caleb's ABC and requires an indexed default
+    skin. `OnClientEnterWorld` calls `CreatePlayer`, which creates a registered
+    `CPlayerObj` through the existing original virtual callbacks. Its ancestry is
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 2400c92..2422637 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -435,3 +435,8 @@ AI model-key continuation: [source ledger](M2_AI_MODEL_KEY_SOURCES.json),
+ [contracts](AI_MODEL_KEY_CONTRACTS.md). Selected AI_Mgr dispatch preserves source
+ camera/script gates, branch priority, shared voice semantics and the supplied
+ B2_LITE variant cap. No full AI class or guessed attack behavior is registered.
++
++AI path-manager continuation: [source ledger](M2_PATH_MANAGER_SOURCES.json),
++[contracts](PATH_MANAGER_CONTRACTS.md). Original snapshot/prefix/reverse-order rules
++are retained with owned values. Later engine code confirms active enumeration only;
++no donor container or backend is imported. AI following and action delivery remain open.
+diff --git a/docs/WORLD_CONTRACTS.md b/docs/WORLD_CONTRACTS.md
+index 66c8935..2b875ec 100644
+--- a/docs/WORLD_CONTRACTS.md
++++ b/docs/WORLD_CONTRACTS.md
+@@ -54,7 +54,7 @@ The inspection harness parses the selected world, applies game settings, then cr
+ 
+ New original imports are `GameStartPoint`, `PathPoint` and the two named-trigger helpers. `GameStartPoint` preserves the source name internally, renames its engine object to `Blood2StartPoint`, reads team/rotation/trigger data and releases its strings. `PathPoint` preserves its original path-model/skin requests, dimensions and SMELL timeout/removal behavior. Named-trigger dispatch and REMOVE use the original helper flow and M1 message/list/lifetime services. Model/skin requests are indexed or reported missing, not silently described as loaded.
+ 
+-`SetObjectDims` stores validated finite nonnegative half-dimensions; it does not implement collision. `GetNextObject` enumerates live objects in stable slot order without allocating a snapshot for each step; a dead predecessor returns null. `SetObjectUserFlags` stores the original user flags. Object simulation and teardown run independently of the inspector. All original instances are destroyed while the adapter/string storage still exists. Generation-checked selection cannot refer to an object from a previous load.
++`SetObjectDims` stores validated finite nonnegative half-dimensions; it does not implement collision. `GetNextObject` enumerates active live objects in stable slot order without allocating a snapshot for each step; inactive entries are skipped and a dead predecessor returns null. See [path-manager contracts](PATH_MANAGER_CONTRACTS.md) for the active-list correction. `SetObjectUserFlags` stores the original user flags. Object simulation and teardown run independently of the inspector. All original instances are destroyed while the adapter/string storage still exists. Generation-checked selection cannot refer to an object from a previous load.
+ 
+ `SessionState` is `Empty`, `Inspection` or `Blocked`; there is deliberately no reachable `Running` state. `run_world` fails explicitly because the full shells, required classes, player association, collision and animation are absent. Loading an inspection world is not starting the game. `--inspect-world` returns 0 for successful inspection, `--start-game` returns 6 for the missing runtime services; parser/resource failures return 5. Existing M0/M1 exit codes remain unchanged.
+ 
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index c096c16..629f9d8 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -920,8 +920,8 @@ namespace OpenBlood2
+     {
+         ImGui::TextUnformatted("Original shell and CPlayerObj entry subset");
+         ImGui::TextWrapped(
+-            "Inspect the original entry/lifetime code. Beretta/knife inspection is in Weapons. Movement, full combat "
+-            "reactions, audio and autosave remain unported; this is not a playable session.");
++            "Original shell/player state and copied AI paths. Complete AI behavior, remaining combat/FX, audio "
++            "callers and save support are still unavailable.");
+         auto* player = game.server_shell.Player(game.local_client);
+         if (!player)
+         {
+@@ -949,6 +949,7 @@ namespace OpenBlood2
+                     game.client_shell.m_bInWorld ? "yes" : "no",
+                     static_cast<unsigned long long>(game.client_shell.messages),
+                     static_cast<unsigned long long>(game.client_shell.updates));
++        draw_paths(game, selection);
+         if (player)
+         {
+             const auto* record = game.objects.get(player->m_hObject);
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index fcedbaa..ff9706f 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -85,6 +85,8 @@ namespace OpenBlood2
+         void draw_resources(const GameSession&);
+         void draw_models(GameSession&);
+         void draw_services(const GameSession&);
++        char path_prefix[101]{};
++        void draw_paths(GameSession&, ObjectSelection&);
+         void draw_session(GameSession&, ObjectSelection&);
+         void draw_weapons(GameSession&, ObjectSelection&);
+         void draw_movement(GameSession&, ObjectSelection&);
+diff --git a/src/app/inspector_paths.cpp b/src/app/inspector_paths.cpp
+new file mode 100644
+index 0000000..6972c51
+--- /dev/null
++++ b/src/app/inspector_paths.cpp
+@@ -0,0 +1,73 @@
++#include "inspector.h"
++#include <cstdio>
++#include <imgui.h>
++namespace OpenBlood2
++{
++    void Inspector::draw_paths(GameSession& game, ObjectSelection& selection)
++    {
++        const auto& paths = game.server_shell.paths;
++        if (!ImGui::CollapsingHeader("Original AI path selection", ImGuiTreeNodeFlags_DefaultOpen))
++            return;
++        if (!paths.error().empty())
++            ImGui::TextWrapped("Snapshot failed: %s", paths.error().c_str());
++        if (!path_prefix[0] && paths.size())
++        {
++            const auto& name = paths.entries().front().name;
++            const auto digit = name.find_first_of("0123456789");
++            if (digit != name.npos && digit > 0)
++                std::snprintf(path_prefix, sizeof(path_prefix), "%.*s", int(digit), name.c_str());
++        }
++        ImGui::InputText("Path prefix", path_prefix, sizeof(path_prefix));
++        ImGui::TextWrapped("Case-insensitive prefix + next digit. Source order reverses enumeration; no numeric sort. "
++                           "Copied positions/actions, not live AI traversal.");
++        PathList matches;
++        std::string error;
++        const bool found = paths.GetPath(path_prefix, matches, error);
++        ImGui::Text("%zu copied points | %zu selected", paths.size(), matches.size());
++        if (!found)
++            ImGui::TextWrapped("%s", error.c_str());
++        auto rows = [&](const PathList& list, const char* table)
++        {
++            if (!ImGui::BeginTable(table, 4, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable))
++                return;
++            for (const char* name : {"Order / source", "Snapshot position", "Action target", "Action message"})
++                ImGui::TableSetupColumn(name);
++            ImGui::TableHeadersRow();
++            for (std::size_t i = 0; i < list.size(); ++i)
++            {
++                const auto& p = list[i];
++                const auto* source = game.objects.get(p.source);
++                const bool alive = source && source->life == Life::Alive;
++                ImGui::TableNextRow();
++                ImGui::TableNextColumn();
++                ImGui::PushID(int(i));
++                const auto label = std::to_string(i + 1) + ". " + p.name;
++                if (ImGui::Selectable(label.c_str(), alive && selection.id == source->id) && alive)
++                    selection.id = source->id;
++                ImGui::PopID();
++                if (!alive)
++                    ImGui::TextUnformatted("source removed");
++                else if (!source->model)
++                    ImGui::TextUnformatted("source model unavailable");
++                else if (source->activity != OBJSTATE_ACTIVE)
++                    ImGui::TextUnformatted("source inactive");
++                else if (!(source->state.m_Flags & FLAG_VISIBLE))
++                    ImGui::TextUnformatted("source hidden");
++                ImGui::TableNextColumn();
++                ImGui::Text("%.1f %.1f %.1f", p.position.x, p.position.y, p.position.z);
++                ImGui::TableNextColumn();
++                ImGui::TextWrapped("%s", p.action_target ? p.action_target->c_str() : "<absent>");
++                ImGui::TableNextColumn();
++                ImGui::TextWrapped("%s", p.action_message ? p.action_message->c_str() : "<absent>");
++            }
++            ImGui::EndTable();
++        };
++        if (found)
++            rows(matches, "Selected AI path");
++        if (ImGui::TreeNode("All copied PathPoints"))
++        {
++            rows(paths.entries(), "AI path snapshot");
++            ImGui::TreePop();
++        }
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index ec004c0..f5b5598 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -14,6 +14,7 @@
+ #include "keyframe_smoke.h"
+ #include "light_smoke.h"
+ #include "objectives_smoke.h"
++#include "path_manager_smoke.h"
+ #include "pickup_smoke.h"
+ #include "random_sound_smoke.h"
+ #include "scene_explosion_smoke.h"
+@@ -243,6 +244,11 @@ namespace
+         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
+             return 4;
+         const auto original_ai_key = smoke_ai_key;
++        const bool path_smoke = options.player_smoke && game.world_path == "worlds/01_subwaya.dat";
++        PathList smoke_paths;
++        bool paths_hidden = false;
++        if (path_smoke && !OpenBlood2::prepare_path_manager_smoke(game, smoke_paths))
++            return 4;
+         bool interaction_hidden = false;
+         const auto original_selection = selection.id;
+         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
+@@ -780,6 +786,8 @@ namespace
+                     hidden_model_time = game.preview_animation.time;
+                 if (options.world_smoke && frames == show_frame)
+                     model_advanced_hidden = game.preview_model && game.preview_animation.time > hidden_model_time;
++                if (path_smoke && frames == show_frame - 1)
++                    paths_hidden = OpenBlood2::check_path_manager_smoke(game, smoke_paths, false);
+                 if (options.player_smoke && frames == hide_frame)
+                     hidden_player_updates = game.server_shell.Player(game.local_client)->updates;
+                 if (options.player_smoke && frames == show_frame)
+@@ -913,10 +921,14 @@ namespace
+                              character_audio_hidden, character_audio_reentered, player ? player->sound_starts : 0,
+                              player ? int(player->m_eLastSurface) : -1, game.server.audio.submitted_frames);
+             }
++            const bool paths_reentered = !path_smoke || OpenBlood2::check_path_manager_smoke(game, smoke_paths, true);
++            if (path_smoke)
++                spdlog::info("AI paths: hidden={}, reentered={}, copied points={}", paths_hidden, paths_reentered,
++                             smoke_paths.size());
+             const bool ui_ok =
+                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
+             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
+-                !selection_cleared ||
++                !selection_cleared || (path_smoke && (!paths_hidden || !paths_reentered)) ||
+                 (options.skeleton_smoke &&
+                  (!character_audio_hidden || !character_audio_reentered || !character_motion_hidden ||
+                   !character_motion_reentered || !ai_key_hidden || !ai_key_reentered)) ||
+diff --git a/src/app/path_manager_smoke.cpp b/src/app/path_manager_smoke.cpp
+new file mode 100644
+index 0000000..5074503
+--- /dev/null
++++ b/src/app/path_manager_smoke.cpp
+@@ -0,0 +1,39 @@
++#include "path_manager_smoke.h"
++namespace OpenBlood2
++{
++    bool prepare_path_manager_smoke(GameSession& g, PathList& snapshot)
++    {
++        if (g.server_shell.paths.size() != 7)
++            return false;
++        snapshot = g.server_shell.paths.entries();
++        return check_path_manager_smoke(g, snapshot, false);
++    }
++    bool check_path_manager_smoke(GameSession& g, const PathList& snapshot, bool reloaded)
++    {
++        if (snapshot.size() != 7 || g.server_shell.paths.size() != 7)
++            return false;
++        for (std::size_t i = 0; i < snapshot.size(); ++i)
++        {
++            const auto& old = snapshot[i];
++            const auto& now = g.server_shell.paths.entries()[i];
++            if (now.name != old.name || now.position.x != old.position.x || now.position.y != old.position.y ||
++                now.position.z != old.position.z || now.action_target != old.action_target ||
++                now.action_message != old.action_message || !g.server.IsObjectAlive(now.source) ||
++                (reloaded && (now.source == old.source || g.objects.get(old.source))))
++                return false;
++        }
++        const auto& name = snapshot.front().name;
++        const auto digit = name.find_first_of("0123456789");
++        if (digit == name.npos || digit == 0)
++            return false;
++        const auto prefix = name.substr(0, digit);
++        PathList path;
++        std::string error;
++        if (!g.server_shell.paths.GetPath(prefix, path, error) || path.empty())
++            return false;
++        for (std::size_t i = 1; i < path.size(); ++i)
++            if (g.objects.get(path[i - 1].source)->id.slot <= g.objects.get(path[i].source)->id.slot)
++                return false;
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/path_manager_smoke.h b/src/app/path_manager_smoke.h
+new file mode 100644
+index 0000000..1f2c1ff
+--- /dev/null
++++ b/src/app/path_manager_smoke.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool prepare_path_manager_smoke(GameSession&, PathList&);
++    bool check_path_manager_smoke(GameSession&, const PathList&, bool reloaded);
++} // namespace OpenBlood2
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index 3a88a30..84a1788 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -2,13 +2,12 @@
+ // original call ordering is retained; source-level adaptations replace raw
+ // client data / packet reads with checked handles and owned typed values.
+ #include "BloodShells.h"
+-#include "PathPoint.h"
+ #include "game/game_settings.h"
+ #include <cmath>
+ 
+ void CBloodServerShell::PreStartWorld()
+ {
+-    paths.clear();
++    paths.ClearPathList();
+     world_started = false;
+     updates = 0;
+     // Team setup, active cinematics, voice and multiplayer state are outside
+@@ -16,26 +15,9 @@ void CBloodServerShell::PreStartWorld()
+ }
+ bool CBloodServerShell::PostStartWorld()
+ {
+-    paths.clear();
+-    // Original PathMgr::BuildPathList / PathListData::Copy, with value-owned
+-    // strings. No AI GetPath/sorting/save support is implied by this snapshot.
+-    for (HOBJECT object = server_.GetNextObject(nullptr); object; object = server_.GetNextObject(object))
+-    {
+-        if (!server_.IsKindOf(server_.GetObjectClass(object), server_.GetClass("PathPoint")))
+-            continue;
+-        auto* point = dynamic_cast<PathPoint*>(server_.HandleToObject(object));
+-        if (!point)
+-            return false;
+-        PathEntry entry;
+-        server_.GetObjectPos(object, &entry.position);
+-        if (const char* value = server_.GetObjectName(object))
+-            entry.name = value;
+-        if (const char* value = server_.GetStringData(point->GetActionTarget()))
+-            entry.action_target = value;
+-        if (const char* value = server_.GetStringData(point->GetActionMessage()))
+-            entry.action_message = value;
+-        paths.push_back(std::move(entry));
+-    }
++    world_started = false;
++    if (!paths.BuildPathList())
++        return false;
+     world_started = true;
+     return true;
+ }
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index a26a02a..a485a23 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -1,5 +1,6 @@
+ #pragma once
+ #include "MoveMgr.h"
++#include "PathMgr.h"
+ #include "PlayerObj.h"
+ #include "ViewWeapon.h"
+ #include "game/session.h"
+@@ -9,7 +10,7 @@
+ class CBloodServerShell
+ {
+   public:
+-    explicit CBloodServerShell(ServerDE& server) : server_(server) {}
++    explicit CBloodServerShell(ServerDE& server) : paths(server), server_(server) {}
+     void PreStartWorld();
+     bool PostStartWorld();
+     CPlayerObj* OnClientEnterWorld(HCLIENT);
+@@ -21,12 +22,7 @@ class CBloodServerShell
+     bool OnMessage(HCLIENT, const OpenBlood2::PlayerUse&);
+     void Update(float);
+     CPlayerObj* Player(HCLIENT);
+-    struct PathEntry
+-    {
+-        DVector position;
+-        std::string name, action_target, action_message;
+-    };
+-    std::vector<PathEntry> paths;
++    PathMgr paths;
+     bool world_started = false;
+     std::uint64_t updates = 0;
+ 
+diff --git a/src/game/original/PathMgr.cpp b/src/game/original/PathMgr.cpp
+new file mode 100644
+index 0000000..90ef6e2
+--- /dev/null
++++ b/src/game/original/PathMgr.cpp
+@@ -0,0 +1,116 @@
++// Original PathMgr.cpp and PathListData.cpp (Monolith, 1998).
++// See docs/PATH_MANAGER_CONTRACTS.md for preserved ordering and ownership adaptations.
++#include "PathMgr.h"
++#include "PathPoint.h"
++#include <algorithm>
++#include <utility>
++namespace
++{
++    unsigned char lower(unsigned char c)
++    {
++        return c >= 'A' && c <= 'Z' ? c + ('a' - 'A') : c;
++    }
++} // namespace
++bool PathListData::Copy(ServerDE& server, HOBJECT object, std::string& error)
++{
++    error.clear();
++    auto* point = server.IsObjectAlive(object) ? dynamic_cast<PathPoint*>(server.HandleToObject(object)) : nullptr;
++    if (!point)
++    {
++        error = "PathPoint is missing, pending or has the wrong class";
++        return false;
++    }
++    const char* object_name = server.GetObjectName(object);
++    if (!object_name)
++    {
++        error = "PathPoint name is unavailable";
++        return false;
++    }
++    PathListData value;
++    value.source = object;
++    value.name = object_name;
++    server.GetObjectPos(object, &value.position);
++    auto copy = [&](HSTRING handle, std::optional<std::string>& target)
++    {
++        if (!handle)
++            return true;
++        const auto* text = server.GetStringData(handle);
++        if (!text)
++            return false;
++        target = text;
++        return true;
++    };
++    if (!copy(point->GetActionTarget(), value.action_target) || !copy(point->GetActionMessage(), value.action_message))
++    {
++        error = "PathPoint action string is unavailable";
++        return false;
++    }
++    *this = std::move(value);
++    return true;
++}
++void PathMgr::ClearPathList()
++{
++    paths_.clear();
++    error_.clear();
++}
++bool PathMgr::BuildPathList()
++{
++    ClearPathList();
++    const auto type = server_.GetClass("PathPoint");
++    if (!type)
++    {
++        error_ = "PathPoint class is unavailable";
++        return false;
++    }
++    PathList snapshot;
++    for (auto h = server_.GetNextObject(nullptr); h; h = server_.GetNextObject(h))
++    {
++        if (!server_.IsKindOf(server_.GetObjectClass(h), type))
++            continue;
++        if (snapshot.size() == max_points)
++        {
++            error_ = "PathPoint snapshot exceeds the 4096-point limit";
++            return false;
++        }
++        PathListData entry;
++        if (!entry.Copy(server_, h, error_))
++            return false;
++        snapshot.push_back(std::move(entry));
++        // Source comment mentions SMELL filtering/removal, but neither is executed.
++    }
++    paths_ = std::move(snapshot); // Failed builds publish no partial world snapshot.
++    return true;
++}
++bool PathMgr::GetPath(std::string_view base, PathList& output, std::string& error) const
++{
++    error.clear();
++    if (base.empty() || base.size() > 100 || base.find('\0') != base.npos)
++    {
++        error = "Path prefix is empty, contains NUL or exceeds 100 bytes";
++        return false; // Source preflight failures preserve the caller's old list.
++    }
++    if (paths_.empty())
++    {
++        error = "PathPoint snapshot is empty";
++        return false;
++    }
++    // Copy the prefix before clearing output: callers may supply output[0].name.
++    const std::string prefix(base);
++    output.clear();
++    // AddToSortedList starts at the null-data sentinel and always inserts after it.
++    // The observed source algorithm reverses enumeration; it never compares names.
++    for (auto i = paths_.rbegin(); i != paths_.rend(); ++i)
++    {
++        if (i->name.size() <= prefix.size() || i->name[prefix.size()] < '0' || i->name[prefix.size()] > '9')
++            continue;
++        if (std::equal(prefix.begin(), prefix.end(), i->name.begin(),
++                       [](unsigned char a, unsigned char b) { return lower(a) == lower(b); }))
++            output.push_back(*i); // Owned copies replace the source's borrowed PathListData pointers.
++    }
++    if (output.empty())
++    {
++        error = "No PathPoint matches this prefix followed by a digit";
++        return false;
++    }
++    return true;
++}
+diff --git a/src/game/original/PathMgr.h b/src/game/original/PathMgr.h
+new file mode 100644
+index 0000000..a01d41e
+--- /dev/null
++++ b/src/game/original/PathMgr.h
+@@ -0,0 +1,45 @@
++#pragma once
++#include "cpp_server_de.h"
++#include <optional>
++#include <string>
++#include <string_view>
++#include <vector>
++
++// Original PathListData::Copy, adapted to owned values instead of string handles.
++struct PathListData
++{
++    bool Copy(ServerDE&, HOBJECT, std::string& error);
++    DVector position{};
++    std::string name;
++    std::optional<std::string> action_target, action_message;
++    HOBJECT source = nullptr; // Inspection identity only, never used to execute a path.
++};
++using PathList = std::vector<PathListData>;
++
++// Selected original PathMgr rules. Save/load and AI path traversal remain unavailable.
++class PathMgr
++{
++  public:
++    static constexpr std::size_t max_points = 4096;
++    explicit PathMgr(ServerDE& server) : server_(server) {}
++    bool BuildPathList();
++    void ClearPathList();
++    bool GetPath(std::string_view base, PathList& output, std::string& error) const;
++    const PathList& entries() const
++    {
++        return paths_;
++    }
++    std::size_t size() const
++    {
++        return paths_.size();
++    }
++    const std::string& error() const
++    {
++        return error_;
++    }
++
++  private:
++    ServerDE& server_;
++    PathList paths_;
++    std::string error_;
++};
+diff --git a/src/game/server_adapter.cpp b/src/game/server_adapter.cpp
+index 00549f9..9666399 100644
+--- a/src/game/server_adapter.cpp
++++ b/src/game/server_adapter.cpp
+@@ -120,7 +120,13 @@ namespace OpenBlood2
+         GetNextObject = [](HOBJECT previous) -> HOBJECT
+         {
+             active().trace_service("GetNextObject");
+-            return active().objects_.next_alive(previous);
++            auto& objects = active().objects_;
++            auto next = objects.next_alive(previous);
++            // The original SDK has a separate inactive enumeration. Preserve the
++            // active-only GetNextObject contract without changing editor snapshots.
++            while (next && objects.get(next)->activity != OBJSTATE_ACTIVE)
++                next = objects.next_alive(next);
++            return next;
+         };
+         SetObjectDims = [](HOBJECT h, DVector* dims) -> DRESULT
+         {
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 682c6ce..d5f244a 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -130,7 +130,7 @@ namespace OpenBlood2
+         objects.finish_frame();
+         if (!server_shell.PostStartWorld())
+         {
+-            error = "Original shell path snapshot failed";
++            error = "Original shell path snapshot failed: " + server_shell.paths.error();
+             server.trace_enabled = false;
+             unload_world();
+             return false;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index b2f45eb..b84ba57 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -532,3 +532,15 @@ if(BLOOD2_TEST_DATA_DIR)
+         set_tests_properties(ai_keys.${case} PROPERTIES LABELS "headless;private;ai_keys" TIMEOUT 90)
+     endforeach()
+ endif()
++
++add_executable(path_manager_tests path_manager_tests.cpp)
++target_link_libraries(path_manager_tests PRIVATE blood2_game)
++blood2_project_options(path_manager_tests)
++foreach(case IN ITEMS copy selection failure lifetime enumeration limits)
++    add_test(NAME paths.${case} COMMAND path_manager_tests "${case}")
++    set_tests_properties(paths.${case} PROPERTIES LABELS "headless;paths" TIMEOUT 60)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME paths.catalog COMMAND path_manager_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(paths.catalog PROPERTIES LABELS "headless;private;paths" TIMEOUT 90)
++endif()
+diff --git a/tests/path_manager_tests.cpp b/tests/path_manager_tests.cpp
+new file mode 100644
+index 0000000..626cbcf
+--- /dev/null
++++ b/tests/path_manager_tests.cpp
+@@ -0,0 +1,213 @@
++#include "game/original/PathPoint.h"
++#include "game/server_adapter.h"
++#include <functional>
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    HOBJECT point(GameSession& g, const char* name, DVector pos = {}, Properties props = {})
++    {
++        ObjectCreateStruct s;
++        SAFE_STRCPY(s.m_Name, name);
++        s.m_Pos = pos;
++        props["Name"] = std::string(name);
++        props["Pos"] = pos;
++        return g.objects.create(g.objects.find_class("PathPoint"), s, Creation::World, props);
++    }
++    bool copy()
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        const auto h = point(g, "route1", {2, 3, 4},
++                             {{"ActionTarget", std::string("door")}, {"ActionMessage", std::string("TRIGGER")}});
++        CHECK(h);
++        PathListData data;
++        std::string error;
++        const auto strings = g.server.string_count();
++        CHECK(data.Copy(g.server, h, error) && error.empty());
++        CHECK(data.name == "route1" && data.position.y == 3 && data.source == h);
++        CHECK(data.action_target == "door" && data.action_message == "TRIGGER" && g.server.string_count() == strings);
++        CHECK(g.objects.remove(h));
++        CHECK(!data.Copy(g.server, h, error) && data.name == "route1" && !error.empty());
++        CHECK(g.objects.finish_frame() && g.server.string_count() == 0 && data.action_message == "TRIGGER");
++        CHECK(!data.Copy(g.server, h, error));
++        auto other = g.objects.create(g.objects.find_class("BaseClass"), {});
++        CHECK(!data.Copy(g.server, other, error));
++        const auto blank = point(g, "", {}, {{"ActionMessage", std::string("ON")}});
++        CHECK(blank && data.Copy(g.server, blank, error) && data.name.empty() && !data.action_target &&
++              data.action_message == "ON");
++        return true;
++    }
++    bool selection()
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        for (auto name :
++             {"route1", "ROUTE10", "route2suffix", "route", "routeX1", "route-1", "other1", "route01", "route1"})
++            CHECK(point(g, name));
++        CHECK(g.server_shell.PostStartWorld());
++        PathList out;
++        std::string error;
++        CHECK(g.server_shell.paths.GetPath("RoUtE", out, error) && error.empty());
++        const std::vector<std::string> expected{"route1", "route01", "route2suffix", "ROUTE10", "route1"};
++        CHECK(out.size() == expected.size());
++        for (size_t i = 0; i < out.size(); ++i)
++            CHECK(out[i].name == expected[i]);
++        CHECK(out.front().source != out.back().source);
++        CHECK(g.server_shell.paths.GetPath("route1", out, error) && out.size() == 1 && out[0].name == "ROUTE10");
++        return true;
++    }
++    bool failure()
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        PathList out(1);
++        out[0].name = "old";
++        std::string error;
++        CHECK(!g.server_shell.paths.GetPath("route", out, error) && out[0].name == "old");
++        CHECK(point(g, "route1") && g.server_shell.PostStartWorld());
++        for (const auto& bad : std::vector<std::string>{"", std::string(101, 'x'), std::string("r\0oute", 6)})
++            CHECK(!g.server_shell.paths.GetPath(bad, out, error) && out[0].name == "old" && !error.empty());
++        CHECK(!g.server_shell.paths.GetPath("missing", out, error) && out.empty());
++        out.resize(1);
++        out[0].name = "route";
++        CHECK(g.server_shell.paths.GetPath(out[0].name, out, error) && out.size() == 1 && out[0].name == "route1");
++        out[0].name = "caller changed";
++        CHECK(g.server_shell.paths.entries()[0].name == "route1");
++        CHECK(g.server_shell.paths.GetPath("route", out, error) && error.empty());
++        return true;
++    }
++    bool lifetime()
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto one = point(g, "route1", {1, 2, 3}, {{"ActionMessage", std::string("ON")}});
++        auto smell = point(g, "SMELL1");
++        CHECK(one && smell);
++        CHECK(g.server_shell.PostStartWorld() && g.server_shell.paths.size() == 2);
++        PathList saved;
++        std::string error;
++        CHECK(g.server_shell.paths.GetPath("route", saved, error));
++        g.objects.get(one)->state.m_Pos = {9, 9, 9};
++        SAFE_STRCPY(g.objects.get(one)->state.m_Name, "changed2");
++        CHECK(g.server_shell.paths.entries()[0].position.x == 1 && g.server_shell.paths.entries()[0].name == "route1");
++        CHECK(g.objects.remove(one) && g.objects.finish_frame());
++        CHECK(g.objects.advance(20) && !g.objects.get(smell));
++        CHECK(g.server_shell.paths.size() == 2 && saved[0].action_message == "ON");
++        CHECK(g.server_shell.PostStartWorld() && g.server_shell.paths.size() == 0);
++        CHECK(!g.server_shell.paths.GetPath("route", saved, error) && saved.size() == 1);
++        CHECK(g.unload_world() && g.server.string_count() == 0 && saved[0].name == "route1");
++        CHECK(!g.server_shell.world_started);
++        CHECK(point(g, "route1") && g.server_shell.PostStartWorld());
++        CHECK(g.server_shell.paths.GetPath("route", saved, error) && saved[0].source != one);
++        return true;
++    }
++    bool enumeration()
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto hidden = point(g, "hidden1"), inactive = point(g, "inactive1"), pending = point(g, "pending1");
++        CHECK(hidden && inactive && pending);
++        g.objects.get(inactive)->activity = OBJSTATE_INACTIVE;
++        CHECK(g.objects.remove(pending));
++        CHECK(g.server_shell.PostStartWorld() && g.server_shell.paths.size() == 1);
++        CHECK(g.objects.get(hidden) && g.objects.get(inactive)); // Build never consumes PathPoints.
++        CHECK(g.objects.finish_frame() && !g.objects.get(pending));
++        CHECK(g.server_shell.paths.entries()[0].source == hidden);
++        return true;
++    }
++    bool limits()
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        HOBJECT last = nullptr;
++        for (size_t i = 0; i < PathMgr::max_points; ++i)
++        {
++            last = point(g, "p1");
++            CHECK(last);
++        }
++        CHECK(g.server_shell.PostStartWorld() && g.server_shell.paths.size() == PathMgr::max_points);
++        last = point(g, "p1");
++        CHECK(last);
++        CHECK(!g.server_shell.PostStartWorld() && !g.server_shell.world_started && g.server_shell.paths.size() == 0);
++        CHECK(g.server_shell.paths.error().find("4096") != std::string::npos);
++        CHECK(g.objects.remove(last) && g.objects.finish_frame());
++        CHECK(g.server_shell.PostStartWorld() && g.server_shell.paths.size() == PathMgr::max_points);
++        PathList out;
++        std::string error;
++        CHECK(g.server_shell.paths.GetPath("p", out, error) && out.size() == PathMgr::max_points);
++        CHECK(g.unload_world() && g.server_shell.paths.size() == 0 && g.server.string_count() == 0);
++        return true;
++    }
++    bool catalog(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.server_shell.paths.size() == 7);
++            PathList retained;
++            for (const auto& p : g.server_shell.paths.entries())
++            {
++                std::cout << p.name << " pos=" << p.position.x << ',' << p.position.y << ',' << p.position.z
++                          << " target=" << p.action_target.value_or("<absent>")
++                          << " message=" << p.action_message.value_or("<absent>") << '\n';
++                auto digit = p.name.find_first_of("0123456789");
++                CHECK(digit != p.name.npos && digit > 0);
++                CHECK(g.server_shell.paths.GetPath(p.name.substr(0, digit), retained, error));
++                CHECK(!retained.empty());
++                for (size_t j = 1; j < retained.size(); ++j)
++                    CHECK(g.objects.get(retained[j - 1].source)->id.slot > g.objects.get(retained[j].source)->id.slot);
++            }
++            for (const auto& [prefix, expected] : std::map<std::string, std::vector<std::string>>{
++                     {"spank", {"spank1", "spank0"}}, {"dog", {"dog3", "dog2", "dog1", "dog0"}}, {"cat", {"cat1"}}})
++            {
++                PathList selected;
++                CHECK(g.server_shell.paths.GetPath(prefix, selected, error) && selected.size() == expected.size());
++                std::cout << "Selected " << prefix << ':';
++                for (size_t i = 0; i < expected.size(); ++i)
++                {
++                    CHECK(selected[i].name == expected[i] && !selected[i].action_target && !selected[i].action_message);
++                    std::cout << ' ' << selected[i].name;
++                }
++                std::cout << '\n';
++            }
++            CHECK(g.enter_player(error));
++            CHECK(g.step(.1));
++            CHECK(g.server_shell.paths.size() == 7 && g.server_shell.paths.entries()[0].source);
++            for (const auto& p : g.server_shell.paths.entries())
++                CHECK(g.server.IsObjectAlive(p.source));
++            const auto old = retained.front().source;
++            const auto name = retained.front().name;
++            CHECK(g.unload_world() && g.server_shell.paths.size() == 0 && g.server.string_count() == 0 &&
++                  g.server.message_count() == 0);
++            CHECK(!g.objects.get(old) && retained.front().name == name);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    if (std::string_view(argv[1]) == "catalog")
++        return argc == 3 && catalog(argv[2]) ? 0 : 1;
++    const std::map<std::string, std::function<bool()>> tests{
++        {"copy", copy},         {"selection", selection},     {"failure", failure},
++        {"lifetime", lifetime}, {"enumeration", enumeration}, {"limits", limits}};
++    auto i = tests.find(argv[1]);
++    return i != tests.end() && i->second() ? 0 : 1;
++}

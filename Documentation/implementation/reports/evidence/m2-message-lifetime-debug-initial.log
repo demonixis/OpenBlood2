@@ -1,0 +1,148 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start  49: cli.world_modes
+    Start 932: train_session.private_30
+1/3 Test  #49: cli.world_modes ..................***Failed    1.46 sec
+CMake Error at /home/yann/projects/lithtech/Blood2/tests/world_cli_test.cmake:14 (message):
+  Missing services must fail startup: 6: [info] External data:
+  /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+
+  [info] BLOOD2.REZ: detected, 267758913 bytes
+
+  [info] SOUND.REZ: detected, 204633068 bytes
+
+  [info] BLOOD2P.REZ: detected, 24133434 bytes
+
+  [info] BLOOD2P2.REZ: detected, 2337176 bytes
+
+  [info] BLOOD2NM.REZ: detected, 108939094 bytes
+
+  [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+
+  [info] World worlds/01_subwaya.dat from BLOOD2P.REZ (1 overrides)
+
+  [info] 7446 resources in 4 mounts; DAT v56: 580 objects, 227 original
+  instances, 116 BSP models
+
+  [info] CClientExplosionSFX / Original instance: 9
+
+  [info] CDestructableBrush / Original instance: 103
+
+  [info] CameraObj / Original instance: 2
+
+  [info] CinematicTrigger / Original instance: 4
+
+  [info] CivilianAI / Original instance: 5
+
+  [info] Conveyor / Original instance: 1
+
+  [info] CultistAI / Original instance: 10
+
+  [info] Damage / Original instance: 4
+
+  [info] DetailSprite / Original instance: 12
+
+  [info] DirLight / Preprocessor only: 261
+
+  [info] Door / Original instance: 7
+
+  [info] ExitTrigger / Original instance: 1
+
+  [info] GameStartPoint / Original instance: 1
+
+  [info] Gideon / Original instance: 1
+
+  [info] GlowingLight / Original instance: 12
+
+  [info] Key / Original instance: 9
+
+  [info] KeyFramer / Original instance: 4
+
+  [info] Light / Preprocessor only: 110
+
+  [info] ObjectivesTrigger / Original instance: 1
+
+  [info] OutsideDef / Preprocessor only: 1
+
+  [info] PathPoint / Original instance: 7
+
+  [info] RandomSoundFX / Original instance: 2
+
+  [info] Sound / World-owned sound: 4
+
+  [info] Trigger / Original instance: 8
+
+  [info] WorldProperties / Original instance: 1
+
+  [error] RunWorld acceptance gate not passed: 0 uninstantiated required
+  objects.  Inspect Services for bounded implementation/trace coverage;
+  remaining required paths must pass M2 acceptance.
+
+
+
+
+    Start 933: train_session.private_60
+2/3 Test #933: train_session.private_60 .........   Passed   24.60 sec
+3/3 Test #932: train_session.private_30 .........***Failed   36.64 sec
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walk t=0 pos=-32,170.001,-3224 HP=100 ammo=50 target=none
+Walk t=2 pos=-32,170.001,-2681.51 HP=100 ammo=50 target=none
+Walk t=4 pos=-30.8339,170.001,-2175.55 HP=100 ammo=44 target=none
+Walk t=6 pos=-30.5801,170.001,-1721.66 HP=100 ammo=41 target=noname
+Walk t=8 pos=-41.4442,170.001,-1443.05 HP=120.993 ammo=35 target=noname
+Walk t=10 pos=-25.6665,170.001,-1266.48 HP=116.986 ammo=29 target=noname
+Walk t=12 pos=-34.9978,170.001,-1059.98 HP=116.986 ammo=25 target=none
+Walk t=14 pos=-34.9998,170.001,-632.001 HP=116.986 ammo=25 target=none
+Walk t=16 pos=-34.4129,170.001,-304.17 HP=116.986 ammo=22 target=herm
+Walk t=18 pos=-56.7345,170.001,198.172 HP=116.986 ammo=16 target=pete
+Walk t=20 pos=-75.999,170.001,344.937 HP=116.986 ammo=10 target=pete
+Walk t=22 pos=-75.999,170.001,344.937 HP=116.986 ammo=4 target=pete
+Walk t=24 pos=-37.9161,170.001,593.29 HP=116.986 ammo=0 target=none
+Walk t=26 pos=-31.7809,170.001,961.6 HP=116.986 ammo=0 target=noname
+Walk t=28 pos=-32.756,170.001,1224.1 HP=112.981 ammo=0 target=noname
+Walk t=30 pos=-35.3017,170.001,1642.91 HP=100.957 ammo=0 target=noname
+Walk t=32 pos=-45.292,170.001,1802.92 HP=121.948 ammo=0 target=noname
+Walk t=34 pos=-83.6427,170.001,2040 HP=146.948 ammo=0 target=none
+Walk t=36 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=38 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=40 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=42 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=44 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=46 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=48 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=50 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=52 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=54 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=56 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=58 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=60 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=62 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=64 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=66 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=68 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=70 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=72 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=74 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=76 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=78 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=80 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=82 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=84 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=86 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=88 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+279: damaged.size() >= 4 && dead.size() >= 4 && ammo_pickup && health_pickup | 
+
+
+33% tests passed, 2 tests failed out of 3
+
+Label Time Summary:
+headless         =  62.70 sec*proc (3 tests)
+private          =  62.70 sec*proc (3 tests)
+train_session    =  61.24 sec*proc (2 tests)
+world            =   1.46 sec*proc (1 test)
+
+Total Test time (real) =  36.66 sec
+
+The following tests FAILED:
+	 49 - cli.world_modes (Failed)                          headless private world
+	932 - train_session.private_30 (Failed)                 headless private train_session
+Errors while running CTest

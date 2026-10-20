@@ -1,0 +1,57 @@
+472/472 Testing: corpses.catalog
+472/472 Test: corpses.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.catalog" start time: Oct 16 16:56 CEST
+Output:
+----------------------------------------------------------
+Death clip 32 duration 900
+Death clip 33 duration 7000
+Death clip 34 duration 1700
+Death clip 35 duration 2100
+Death clip 36 duration 1900
+Death clip 37 duration 1900
+Death clip 38 duration 1500
+Death clip 39 duration 1600
+Death clip 40 duration 6000
+Death clip 41 duration 2000
+Death clip 42 duration 5500
+Death clip 43 duration 7000
+CultistAI cycle 0: source removed; corpse clip 33, sound starts 1, pool request 1
+CivilianAI cycle 0: source removed; corpse clip 34, sound starts 1, pool request 1
+CultistAI cycle 1: source removed; corpse clip 32, sound starts 1, pool request 1
+CivilianAI cycle 1: source removed; corpse clip 34, sound starts 1, pool request 1
+<end of output>
+Test time =   0.87 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.catalog" end time: Oct 16 16:56 CEST
+"corpses.catalog" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 16:56 CEST
+
+ai_hit =   0.89 sec*proc
+
+ai_runtime =  28.45 sec*proc
+
+attachments =   5.24 sec*proc
+
+corpses =   1.11 sec*proc
+
+headless = 216.53 sec*proc
+
+objects =   0.24 sec*proc
+
+pickups =  14.38 sec*proc
+
+player =  11.08 sec*proc
+
+private = 213.07 sec*proc
+
+services =  10.55 sec*proc
+
+weapon_drops =   0.83 sec*proc
+
+weapons = 143.76 sec*proc
+

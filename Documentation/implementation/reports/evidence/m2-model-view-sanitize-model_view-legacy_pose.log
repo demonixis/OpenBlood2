@@ -1,0 +1,14 @@
+322/323 Testing: model_view.legacy_pose
+322/323 Test: model_view.legacy_pose
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/model_view_tests" "legacy_pose"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"model_view.legacy_pose" start time: Oct 16 10:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"model_view.legacy_pose" end time: Oct 16 10:04 CEST
+"model_view.legacy_pose" time elapsed: 00:00:00
+----------------------------------------------------------

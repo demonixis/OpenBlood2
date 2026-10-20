@@ -1,0 +1,18 @@
+[0/2] Re-checking globbed directories...
+[0/4] Performing build step for 'blood2_launcher'
+[0/2] Re-checking globbed directories...
+[1/6] Scanning /home/yann/projects/lithtech/Blood2/src/launcher/main.cpp for CXX dependencies
+[2/6] Generating CXX dyndep file src/launcher/CMakeFiles/blood2_launcher.dir/CXX.dd
+[3/5] Building CXX object src/launcher/CMakeFiles/blood2_launcher.dir/main.cpp.o
+[4/5] Linking CXX executable blood2-launcher
+[1/4] Performing install step for 'blood2_launcher'
+-- Installing: /home/yann/projects/lithtech/Blood2/build/debug/./blood2-launcher
+-- Up-to-date: /home/yann/projects/lithtech/Blood2/build/debug/./licenses
+-- Up-to-date: /home/yann/projects/lithtech/Blood2/build/debug/./licenses/launcher-notices.txt
+-- Up-to-date: /home/yann/projects/lithtech/Blood2/build/debug/./licenses/DroidSans-Apache-2.0.txt
+-- Up-to-date: /home/yann/projects/lithtech/Blood2/build/debug/./licenses/curl.txt
+-- Up-to-date: /home/yann/projects/lithtech/Blood2/build/debug/./licenses/miniz.txt
+-- Up-to-date: /home/yann/projects/lithtech/Blood2/build/debug/./licenses/imgui.txt
+-- Up-to-date: /home/yann/projects/lithtech/Blood2/build/debug/./licenses/SDL.txt
+-- Up-to-date: /home/yann/projects/lithtech/Blood2/build/debug/./licenses/spdlog.txt
+[3/4] Completed 'blood2_launcher'

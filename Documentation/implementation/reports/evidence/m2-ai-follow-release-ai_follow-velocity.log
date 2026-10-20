@@ -1,0 +1,14 @@
+403/413 Testing: ai_follow.velocity
+403/413 Test: ai_follow.velocity
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_follow_tests" "velocity"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_follow.velocity" start time: Oct 16 13:00 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.velocity" end time: Oct 16 13:00 CEST
+"ai_follow.velocity" time elapsed: 00:00:00
+----------------------------------------------------------

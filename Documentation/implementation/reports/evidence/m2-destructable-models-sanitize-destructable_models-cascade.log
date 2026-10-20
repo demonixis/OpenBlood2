@@ -1,0 +1,14 @@
+653/659 Testing: destructable_models.cascade
+653/659 Test: destructable_models.cascade
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable_model_tests" "cascade" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable-model-cascade"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"destructable_models.cascade" start time: Oct 17 05:14 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_models.cascade" end time: Oct 17 05:14 CEST
+"destructable_models.cascade" time elapsed: 00:00:00
+----------------------------------------------------------

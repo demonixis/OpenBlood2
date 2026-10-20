@@ -1,0 +1,23 @@
+{
+  "binary_sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "synthetic_cases": 800,
+  "fnv64": 9953174249627237157,
+  "sha256": "1b74b20d16fb13fadd3904d07b4e8bb8a4750edc8378ccc6ee51252a6b9ee7a9",
+  "private_section_choices": 156,
+  "rvas": {
+    "section_assignment": [
+      "0xb37c",
+      "0xb6af"
+    ],
+    "style_prepend": [
+      "0xe93f",
+      "0xe967"
+    ],
+    "section_fallback": [
+      "0xb749",
+      "0xb791"
+    ],
+    "style_default_getter": "0xd9eb"
+  },
+  "limits": "Isolated loaded-band selection; band decoder previously verified; allocation, constructor, refcounts, critical sections and band read are intercepted. No MIDI or collection playback; absent-style GM construction excluded."
+}

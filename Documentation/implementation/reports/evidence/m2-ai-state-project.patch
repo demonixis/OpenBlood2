@@ -1,0 +1,1592 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 816604b..2d31b5c 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -269,3 +269,5 @@ The [DTX world-texture continuation](../Documentation/Implementation/M2_TEXTURES
+ The [animated model continuation](../Documentation/Implementation/M2_MODEL_VIEW.md) renders checked existing ABC/held/view models with original view offsets and shared world depth. Read [contracts](docs/MODEL_VIEW_CONTRACTS.md) before extending presentation or poses. Preserve read-only clocks, deferred lifetime, hidden/missing inspection, cache revisions and explicit close-view limits. Absent ABC TransformInfo now conjugates normalized node rotations; explicit zero remains direct. Rendering/head queries/attachments share that correction and the file -Z to engine +Z basis conversion; all spatial model fields are normalized once. Lighting/FX, NPCs, ExitTrigger and the actual M2 gate remain open.
+ 
+ The [AI perception continuation](../Documentation/Implementation/M2_AI_PERCEPTION.md) connects original faction lists, FindObjectInRadius, ComputeStimuli, opportunity selection and ExitHint. Read [contracts](docs/AI_PERCEPTION_CONTRACTS.md) before extending NPC acquisition/state updates. Preserve player membership in both factions, source list/priority/boundary rules, dead-target behavior and checked deferred lifetime. Required query failure is -1, never a usable stimulus. Attacker memory is a checked non-owning identity; timed-power storage does not implement pickups/timers. No production NPC is registered; states, attacks, required FX and ExitTrigger keep M2 open.
++
++The [AI state/action continuation](../Documentation/Implementation/M2_AI_STATES.md) adds original transitions, Cultist/Civilian decisions and stationary idle/talk/special commands. Read [contracts](docs/AI_STATE_CONTRACTS.md). Preserve strict idle deadline, last-state exclusions, idle/talk command sharing, special-action random draws and failed-perception guards. Animation resize uses the documented atomic foot-anchored replacement. Diagnostic dispatch is not AI_Update; production NPCs, combat/navigation/death, required FX and ExitTrigger remain unavailable. M2 stays open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1f8d7ad..9a5653c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -40,7 +40,10 @@ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original
+ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+-target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIPerception.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
++target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIPerception.cpp
++    src/game/original/AIState.cpp
++    src/game/original/CivilianAI.cpp
++    src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+     src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+diff --git a/README.md b/README.md
+index 82f37de..6be4a9f 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,10 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++Latest gameplay continuation: [original AI state decisions/actions](../Documentation/Implementation/M2_AI_STATES.md) adds
++transitions, civilian/cultist decisions and stationary animation commands with
++inspection and explicit failure. Full AI_Update, production NPC actions, required
++FX, ExitTrigger and the actual M2 gate remain open.
++
+ Latest gameplay continuation: [original AI perception](../Documentation/Implementation/M2_AI_PERCEPTION.md) adds faction membership,
+ radius/FOV/visibility selection, stimulus priorities and ExitHint. These commands
+ run against the real player in diagnostic probes; original NPC states/actions,
+@@ -324,3 +329,8 @@ Debug and inspector-free Release checks, including 27 GPU cases, and all 334
+ headless ASan/UBSan/leak cases. Player membership, candidate/stimulus rules and
+ checked attacker lifetime are exercised; required original NPC states and the
+ complete M2 gate remain open.
++
++The [AI state/action continuation](docs/AI_STATE_CONTRACTS.md) passes 372/372 Debug
++and inspector-free Release checks (27 GPU cases), and 115 targeted headless
++ASan/UBSan/leak checks. Stationary action completion, state decisions, failure and
++lifetime are tested; production NPCs and the complete M2 gate remain open.
+diff --git a/docs/AI_MODEL_KEY_CONTRACTS.md b/docs/AI_MODEL_KEY_CONTRACTS.md
+index d2017b0..6068395 100644
+--- a/docs/AI_MODEL_KEY_CONTRACTS.md
++++ b/docs/AI_MODEL_KEY_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI animation keys
+ 
++> Extended by [AI state/action contracts](AI_STATE_CONTRACTS.md): selected original
++> state decisions, transitions and stationary animation commands now execute.
++> Full AI_Update and production NPCs remain unavailable; M2 is still open.
++
+ M2 remains incomplete. This selectively ports AI_Mgr::InitStatics and OnStringKey,
+ using the existing [character audio](CHARACTER_AUDIO_CONTRACTS.md),
+ [motion keys](CHARACTER_MOTION_CONTRACTS.md), [camera](CAMERA_CONTRACTS.md) and
+diff --git a/docs/AI_PERCEPTION_CONTRACTS.md b/docs/AI_PERCEPTION_CONTRACTS.md
+index a610899..aa422ab 100644
+--- a/docs/AI_PERCEPTION_CONTRACTS.md
++++ b/docs/AI_PERCEPTION_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI perception and candidate lists
+ 
++> Extended by [AI state/action contracts](AI_STATE_CONTRACTS.md): selected original
++> state decisions, transitions and stationary animation commands now execute.
++> Full AI_Update and production NPCs remain unavailable; M2 is still open.
++
+ M2 remains incomplete. Selected original `AI_Mgr::FindObjectInRadius`,
+ `ComputeStimuli`, `ChooseOpportunityTarget`, faction membership and `ExitHint`
+ now execute. There is still no production CivilianAI/CultistAI/Gideon registration
+diff --git a/docs/AI_STATE_CONTRACTS.md b/docs/AI_STATE_CONTRACTS.md
+new file mode 100644
+index 0000000..24701d4
+--- /dev/null
++++ b/docs/AI_STATE_CONTRACTS.md
+@@ -0,0 +1,132 @@
++# Original AI state decisions and stationary actions
++
++M2 remains incomplete. This ports selected AI_Mgr, CivilianAI and CultistAI
++methods from [these source ranges](M2_AI_STATE_SOURCES.json). It builds on
++[perception](AI_PERCEPTION_CONTRACTS.md), [targets](AI_TARGET_CONTRACTS.md),
++[animation tables](CHARACTER_ANIMATION_CONTRACTS.md) and
++[object lifetime](OBJECT_CONTRACTS.md). Execution evidence is
++[here](../../Documentation/Implementation/M2_AI_STATES.md).
++
++No production NPC class is registered. The two new subclass types contain state
++rules, not complete original constructors, properties or initialization. Their
++world entries remain unsupported. The diagnostic scheduler calls DispatchState
++explicitly; it is **not AI_Update**. Automatic deactivation, target retention,
++tracked objects, death processing, support/standing flags, navigation, fleeing,
++combat, damage reactions and scripts remain absent. Selecting AttackFar or
++EscapeRun succeeds as a decision; executing either returns an explicit failure.
++
++## Transitions and decisions
++
++State IDs retain original numeric values. StateStrToInt performs bounded ASCII
++case folding without mutating its input, preserves prefix matching and the
++source's four-character SEARCH comparison (SEAR). SPECIAL10 consequently matches
++SPECIAL1. There is no whitespace trimming. Unknown/empty strings select Inactive;
++embedded NUL and more than 31 bytes reject rather than overflow the original
++32-byte array. SetNewState rejects undefined numeric IDs.
++
++SetNewState remembers the old state except while leaving the six source transient
++obstacle/search states. It resets Metacmd to 1, current command to 999 and the
++animating flag even when the requested state equals the current state. A targeted
++actor requesting Idle enters SearchVisual until time is **strictly greater** than
++its saved deadline. Other requests set that deadline to current server time +120s.
++The targeted bit is not automatically set by explicit target assignment: the
++missing AI_Update owns that source operation. Inspection exposes it as stored
++state, never proof that retention is implemented.
++
++StopVelocity preserves Y and zeroes X/Z; the source Move(MATH_EPSILON) trapped
++branch instead zeroes all axes. It changes velocity only, with no second physics
++integration. The port validates owner/time and performs this fallible service
++before committing state fields, so a failed transition retains the previous
++state. It does not clear acceleration or animation playback: the next action
++selects the clip, as in the source.
++
++Cultist ComputeState preserves health thresholds (<.25 escape, <.5 far), the
++inclusive sight <=.5 far branch, target-height test, last-Guard behavior and
++FindAmmo/FindHealth restoration. EscapeRun's no-stimulus branch performs its first
++Idle transition and then falls through: the subsequent decision observes the
++changed last state and deadline. Current checked position replaces MoveObj's
++cached position; target position remains the previously stored sample.
++
++Civilian ComputeState returns to its authored state without a stimulus. With a
++stimulus it preserves EscapeHide, otherwise latches scared and chooses EscapeRun
++if already scared or health strength <1. Healthy calm actors return to their
++authored state. These choices do not implement escape actions.
++
++The optional -1 input means recompute, matching the original method signature.
++Every recomputation checks the perception result before using it; a -1 failure
++never becomes a positive stimulus or a second recomputation request. Explicit
++values outside 0..4 and nonfinite decision inputs reject. Callers receiving
++ComputeStimuli's failure must check it before passing a value to ComputeState.
++
++## Animation commands and dimensions
++
++SetAnimation validates the actual model/clip before mutation. The same cached
++clip resets playback; a different clip reads original user dimensions, scales
++them per axis and selects the clip. The source's fallback to cached dimensions
++when the user-dimension query fails remains. The initial cached clip is 999 and
++dimensions are (1,1,1). Animation ownership remains exclusive to the actor; callers
++replacing a model must rebuild its shared table and reset the cached animation.
++
++The old SetObjectDims2 is replaced explicitly by the existing **atomic,
++foot-anchored ResizeObject**. This checks primary geometry/live solids and returns
++Blocked/Invalid/Unavailable without changing shape, position or clip. It does not
++recreate the old engine's partial resize/pushing behavior. A repeated cached clip
++only resets and performs no clearance query. This replacement is shared with the
++current player shape policy; retail NPC physics parity is not established.
++
++MC_Idle draws 0..3 and MC_Talk draws 0..4 only when starting. Both use original
++command ID MC_IDLE (0), so switching from one to the other during playback keeps
++the current clip until completion. MC_Special uses ID 25 and indices 0..8;
++while it is already active, a newly supplied index is ignored, as in the source.
++A new invalid index or missing clip fails explicitly, without substituting clip
++zero. All three start nonlooping playback. MS_PLAYDONE clears animating and advances
++Metacmd once; counter overflow fails before changing those fields. Animation
++advancement and model-key callbacks remain in the normal session clock. These
++commands never advance time themselves or duplicate character audio/motion keys.
++
++Base Idle retains smell-first selection and .001s stimulus / .1s idle scheduling.
++Base Passive checks attacker memory without ordinary perception, uses .1s and
++resets Metacmd at step 3. Their Cabal MC_BestWeapon branch is explicitly unavailable;
++no successful inventory placeholder is inserted. Base ComputeState and subclass
++special handlers without implementations also fail. DispatchState implements
++Idle, Passive, the eight special slots, and Inactive; other actions fail instead
++of silently invoking Idle. It preserves the source Metacmd<=0 repair. Direct
++handlers require a live owner. A caller must stop/retry on false; only diagnostic
++drivers currently arm these callbacks, and they disable scheduling on failure.
++
++Civilian Idle skips perception while calm until its animation completes; a scared
++civilian checks stimuli before the action. Special1 faces the stored target and
++cancels the face command increment before MC_Talk. Special2..8 retain typing,
++hand-warming, sleeping, study, right-hand subway, left-hand subway and fetal
++animation indices. Special3 and Special6 draw their index on **every** step-1
++update, even when MC_Special continues its current clip. The portable seeded RNG
++preserves ranges/order, not the retail CRT sequence. Hide/beg movement, Special9,
++recoil and remaining state actions are unavailable.
++
++## Inspection and lifetime
++
++The Skeleton panel shows state/request/last dispatch, authored state, both command
++indices, idle deadline/targeted bit, trapped status, requested/cached clip,
++selection, starts/finishes, cached dimensions/scale and recorded failures. This
++works without a model and reads state only. Production worlds gain no test object.
++
++The GPU character scenario adds a clearly labelled, hidden diagnostic female
++civilian outside the playable geometry. An actual SPECIAL4 sleeping clip runs,
++finishes and restarts with ImGui hidden; reload invalidates the old identity and
++repeats the sequence. It uses unchanged external assets and the original state
++methods, with a small explicit test scheduler. It does not claim an authored NPC,
++AI_Update, source class initialization, target perception or navigation.
++
++Synthetic tests cover deadline equality, last-state exclusions, trapped velocity,
++source decision boundaries/fallthrough, shared idle/talk IDs, random draw ordering,
++blocked/invalid shape changes, missing services, stale/pending ownership,
++inactivity/reactivation, repeated unload and removal inside the first model key
++(skipping the following key and destroying once). Private tests exercise all 240
++clips across six NPC models and 19 available special slots, plus two 16-second
++SubwayA diagnostic action cycles. Missing special slots remain failures.
++
++SubwayA stays 187 created, 4 transferred sounds, 372 editor-only, 17 unsupported,
++0 failed, plus 7 owned SelfTriggers. The unsupported entries are five CivilianAI,
++ten CultistAI, Gideon and ExitTrigger. Required client FX and the complete session
++also remain open. --start-game continues to return 6. Other platforms, XR and
++retail behavior are not validated by these Linux tests.
+diff --git a/docs/CHARACTER_ANIMATION_CONTRACTS.md b/docs/CHARACTER_ANIMATION_CONTRACTS.md
+index 6482991..b7e484e 100644
+--- a/docs/CHARACTER_ANIMATION_CONTRACTS.md
++++ b/docs/CHARACTER_ANIMATION_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original character animations and node queries
+ 
++> Extended by [AI state/action contracts](AI_STATE_CONTRACTS.md): selected original
++> state decisions, transitions and stationary animation commands now execute.
++> Full AI_Update and production NPCs remain unavailable; M2 is still open.
++
+ > Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
+ > voice helpers, player sound keys and material/liquid footsteps now execute.
+ > Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
+diff --git a/docs/M2_AI_STATE_SOURCES.json b/docs/M2_AI_STATE_SOURCES.json
+new file mode 100644
+index 0000000..624052b
+--- /dev/null
++++ b/docs/M2_AI_STATE_SOURCES.json
+@@ -0,0 +1,116 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "2b2096495668d166a27981d5cccf9e5fdf506dee",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          94,
++          238
++        ],
++        [
++          291,
++          369
++        ],
++        [
++          1907,
++          1981
++        ],
++        [
++          2257,
++          2298
++        ],
++        [
++          3139,
++          3157
++        ],
++        [
++          3965,
++          4020
++        ],
++        [
++          5527,
++          5551
++        ],
++        [
++          6358,
++          6420
++        ]
++      ],
++      "use": "State parsing/transitions, Move stop branch, animation selection, idle/talk/special commands and idle/passive handlers; selected dispatch only"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
++      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
++      "selected_lines": [
++        [
++          34,
++          113
++        ],
++        [
++          175,
++          175
++        ],
++        [
++          374,
++          380
++        ]
++      ],
++      "use": "State/command numbers, idle wait and StopVelocity"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
++      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
++      "selected_lines": [
++        [
++          339,
++          366
++        ],
++        [
++          493,
++          639
++        ]
++      ],
++      "use": "Civilian state decisions, idle and Special1..8 actions"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CultistAI.cpp",
++      "sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
++      "selected_lines": [
++        [
++          269,
++          332
++        ]
++      ],
++      "use": "Cultist state decisions, including EscapeRun fallthrough"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/server_de.h",
++      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "selected_lines": [
++        [
++          727,
++          731
++        ]
++      ],
++      "use": "Original obsolete dimension-service declarations; not an implementation of the retail solver"
++    }
++  ],
++  "adaptations": [
++    "Boolean failure and checked identities; no production NPC registration",
++    "Bounded ASCII state parsing and explicit unsupported state actions",
++    "Current checked body position replaces MoveObj cached transform",
++    "Existing foot-anchored atomic ResizeObject replaces old SetObjectDims2; not retail parity",
++    "Stop velocity validated before state-field commit; failed perception cannot select a state",
++    "Eight original Civilian special virtual functions consolidated into one indexed override",
++    "Diagnostic scheduler is separate from missing original AI_Update"
++  ],
++  "not_implemented": [
++    "Complete NPC initialization/properties/AI_Update, deactivation and retention",
++    "MC_BestWeapon, navigation, escape/hide, recoil/death, combat, scripts and hearing",
++    "Required FX and ExitTrigger; complete M2 gate",
++    "Retail, other-platform and XR parity"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 7baa38e..edbb030 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -527,3 +527,12 @@ AI attacker memory adapts the original damage identity branch to safe tokens;
+ local damage/limb behavior and timed-power activation remain incomplete. See
+ [source ranges/hashes](M2_AI_PERCEPTION_SOURCES.json) and
+ [contracts and explicit source-UB corrections](AI_PERCEPTION_CONTRACTS.md).
++
++## M2 AI state decisions and stationary actions
++
++Selected original AI_Mgr state parsing, transitions, animation commands, Idle and
++Passive handlers, CivilianAI decisions/Idle/Special1..8 and CultistAI decisions
++are imported with explicit failure and checked ownership. The diagnostic driver
++does not implement AI_Update or register partial NPCs. See
++[source ranges and hashes](M2_AI_STATE_SOURCES.json) and
++[contracts and dimension-service adaptation](AI_STATE_CONTRACTS.md).
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index 26e551d..421d968 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -1,10 +1,66 @@
+ #include "ai_model_key_smoke.h"
+ #include "engine/collision.h"
+ #include "game/original/AI_Mgr.h"
++#include "game/original/CivilianAI.h"
+ #include <cmath>
+ #include <limits>
+ namespace OpenBlood2
+ {
++    namespace
++    {
++        // Explicit state-action driver for this smoke only. It does not implement
++        // the missing AI_Update (deactivation, retention, navigation, death, etc.).
++        class AIStateProbe : public CivilianAI
++        {
++            DDWORD EngineMessageFn(DDWORD message, void* data, DFLOAT value) override
++            {
++                if (message == MID_UPDATE)
++                {
++                    GetServerDE()->SetNextUpdate(m_hObject, .001f);
++                    if (!DispatchState())
++                        GetServerDE()->SetNextUpdate(m_hObject, 0);
++                }
++                return AI_Mgr::EngineMessageFn(message, data, value);
++            }
++        };
++    } // namespace
++    bool prepare_ai_state_smoke(GameSession& g, ObjectId& id)
++    {
++        static const ClassInfo type{"AIStateProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AIStateProbe>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return false;
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_MODEL;
++        // Isolated diagnostic placement, not an authored NPC or a navigable actor.
++        state.m_Pos = {0, 10000, 0};
++        state.m_Flags = FLAG_MODELKEYS;
++        SAFE_STRCPY(state.m_Name, "Civilian action probe (no full AI_Update)");
++        SAFE_STRCPY(state.m_Filename, "models/enemies/f_civilian1.abc");
++        auto h = g.objects.create(&type, state);
++        auto* r = g.objects.get(h);
++        auto* ai = r ? dynamic_cast<AIStateProbe*>(r->game.get()) : nullptr;
++        if (!ai || !r->model)
++            return false;
++        auto table = std::make_shared<CAnim_Sound>();
++        if (!table->SetAnimationIndexes(h) || !table->SetSoundRoot("sounds/enemies/f_civ") || !ai->InitStatics(table))
++            return false;
++        ai->m_szAIState = "SPECIAL4";
++        if (!ai->ComputeState(0))
++            return false;
++        g.server.SetNextUpdate(h, .001f);
++        id = r->id;
++        return true;
++    }
++    bool check_ai_state_smoke(GameSession& g, ObjectId id)
++    {
++        const auto* r = g.objects.get(id);
++        const auto* ai = r ? dynamic_cast<const AIStateProbe*>(r->game.get()) : nullptr;
++        return ai && ai->state_dispatches > 1 && ai->animation_starts > 1 && ai->animation_finishes > 0 &&
++               ai->state_changes > 1 && ai->state_failures == 0 && ai->m_nState == AI_Mgr::StateSpecial4;
++    }
+     bool prepare_ai_model_key_smoke(GameSession& g, ObjectId& id)
+     {
+         // Diagnostic registration only: never satisfies a required world AI class.
+diff --git a/src/app/ai_model_key_smoke.h b/src/app/ai_model_key_smoke.h
+index fe8ef41..0204a85 100644
+--- a/src/app/ai_model_key_smoke.h
++++ b/src/app/ai_model_key_smoke.h
+@@ -2,6 +2,8 @@
+ #include "game/server_adapter.h"
+ namespace OpenBlood2
+ {
++    bool prepare_ai_state_smoke(GameSession&, ObjectId&);
++    bool check_ai_state_smoke(GameSession&, ObjectId);
+     bool prepare_ai_model_key_smoke(GameSession&, ObjectId&);
+     bool check_ai_model_key_smoke(GameSession&, ObjectId, std::uint64_t minimum_keys);
+     bool check_ai_target_smoke(GameSession&, ObjectId);
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index c4182c8..74a3ede 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -58,6 +58,27 @@ namespace OpenBlood2
+         ImGui::TableNextColumn();
+         const auto* r = game.objects.get(skeleton_selection);
+         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
++        if (target_ai && ImGui::CollapsingHeader("Original AI state actions", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            const auto& ai = *target_ai;
++            ImGui::TextWrapped("Selected original decisions and stationary actions. Full AI_Update, navigation, "
++                               "combat/death and production NPC registration remain unavailable.");
++            ImGui::Text("State %d | last %d | requested %d | dispatched %d", ai.m_nState, ai.m_nLastState,
++                        ai.requested_state, ai.dispatched_state);
++            ImGui::Text("Authored %s | metacmd %d / current %d | animating %s", ai.m_szAIState.c_str(), ai.Metacmd,
++                        ai.m_nCurMetacmd, ai.m_bAnimating ? "yes" : "no");
++            ImGui::Text("Transitions %llu | dispatches %llu | failures %llu", (unsigned long long)ai.state_changes,
++                        (unsigned long long)ai.state_dispatches, (unsigned long long)ai.state_failures);
++            ImGui::Text("Idle deadline %.2f | has targeted %s | trapped %d", ai.m_fWaitForIdleTime,
++                        ai.m_bHasTargeted ? "yes" : "no", ai.m_nTrapped);
++            ImGui::Text("Clip %u / requested %u | choice %d | starts %llu / finishes %llu", ai.m_nCurAnimation,
++                        ai.requested_animation, ai.animation_choice, (unsigned long long)ai.animation_starts,
++                        (unsigned long long)ai.animation_finishes);
++            ImGui::Text("Cached half extents %.2f %.2f %.2f | scale %.2f %.2f %.2f", ai.m_vDims.x, ai.m_vDims.y,
++                        ai.m_vDims.z, ai.m_vScale.x, ai.m_vScale.y, ai.m_vScale.z);
++            if (!ai.state_error.empty())
++                ImGui::TextWrapped("Unavailable/failed: %s", ai.state_error.c_str());
++        }
+         if (target_ai && ImGui::CollapsingHeader("Original AI perception", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& ai = *target_ai;
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index ff8bbfa..f9c737a 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -246,6 +246,11 @@ namespace
+         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
+             return 4;
+         const auto original_ai_key = smoke_ai_key;
++        OpenBlood2::ObjectId smoke_ai_state{};
++        bool ai_state_hidden = false;
++        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_state_smoke(game, smoke_ai_state))
++            return 4;
++        const auto original_ai_state = smoke_ai_state;
+         bool ai_sight_hidden = false;
+         bool ai_target_hidden = false;
+         bool hand_hidden = false;
+@@ -301,7 +306,7 @@ namespace
+         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
+         inspector.select_skeleton = options.skeleton_smoke;
+         if (options.skeleton_smoke)
+-            inspector.skeleton_selection = smoke_ai_key;
++            inspector.skeleton_selection = smoke_ai_state;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
+         inspector.select_pickups = options.pickups_smoke;
+@@ -521,6 +526,8 @@ namespace
+                     old_hand =
+                         game.server_shell.Player(game.local_client)->m_InventoryMgr.CurrentWeapon()->m_hHandAttachment;
+             }
++            if (options.skeleton_smoke && !inspector_visible)
++                ai_state_hidden |= OpenBlood2::check_ai_state_smoke(game, smoke_ai_state);
+             if (options.skeleton_smoke && !inspector_visible)
+                 ai_target_hidden |= OpenBlood2::check_ai_target_smoke(game, smoke_ai_key);
+             if (options.skeleton_smoke && !inspector_visible)
+@@ -1040,6 +1047,20 @@ namespace
+                 spdlog::info("AI sight probe: hidden={}, reentered={}, old handle invalidated={}", ai_sight_hidden,
+                              ai_sight_reentered, !game.objects.get(original_ai_key));
+             }
++            bool ai_state_reentered = !options.skeleton_smoke;
++            if (options.skeleton_smoke)
++            {
++                if (game.objects.get(original_ai_state) || !OpenBlood2::prepare_ai_state_smoke(game, smoke_ai_state))
++                    return 4;
++                for (int i = 0; i < 360 && !ai_state_reentered; ++i)
++                {
++                    if (!game.step(1.0 / 60))
++                        return 4;
++                    ai_state_reentered = OpenBlood2::check_ai_state_smoke(game, smoke_ai_state);
++                }
++                spdlog::info("AI state probe: hidden={}, reentered={}, old handle invalidated={}", ai_state_hidden,
++                             ai_state_reentered, !game.objects.get(original_ai_state));
++            }
+             bool hand_reentered = !options.skeleton_smoke;
+             if (options.skeleton_smoke)
+             {
+@@ -1101,8 +1122,8 @@ namespace
+                 (options.skeleton_smoke &&
+                  (!character_audio_hidden || !character_audio_reentered || !character_motion_hidden ||
+                   !character_motion_reentered || !ai_key_hidden || !ai_key_reentered || !ai_sight_hidden ||
+-                  !ai_sight_reentered || !ai_target_hidden || !ai_target_reentered || !hand_hidden ||
+-                  !hand_reentered)) ||
++                  !ai_sight_reentered || !ai_state_hidden || !ai_state_reentered || !ai_target_hidden ||
++                  !ai_target_reentered || !hand_hidden || !hand_reentered)) ||
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+diff --git a/src/game/original/AIState.cpp b/src/game/original/AIState.cpp
+new file mode 100644
+index 0000000..793dcf1
+--- /dev/null
++++ b/src/game/original/AIState.cpp
+@@ -0,0 +1,260 @@
++// Original AI_Mgr state/animation selections. See AI_STATE_CONTRACTS.md.
++#include "AI_Mgr.h"
++#include <cmath>
++#include <limits>
++
++bool AI_Mgr::StateFailure(const char* error)
++{
++    ++state_failures;
++    state_error = error;
++    return false;
++}
++bool AI_Mgr::StateStrToInt(std::string_view input, int& state)
++{
++    if (input.size() > 31 || input.find('\0') != input.npos)
++        return false;
++    std::string name(input);
++    for (auto& c : name)
++        if (c >= 'a' && c <= 'z')
++            c -= 'a' - 'A';
++    state = StateInactive;
++    // Source compares only FOUR characters for SEARCH and accepts suffixes.
++    constexpr std::pair<std::string_view, int> names[]{
++        {"INACTIVE", StateInactive}, {"IDLE", StateIdle},         {"SEAR", StateSearchVisual},
++        {"ATTACK", StateAttackFar},  {"HIDE", StateEscapeHide},   {"GUARD", StateGuard},
++        {"SCRIPT", StateScript},     {"SPECIAL1", StateSpecial1}, {"SPECIAL2", StateSpecial2},
++        {"SPECIAL3", StateSpecial3}, {"SPECIAL4", StateSpecial4}, {"SPECIAL5", StateSpecial5},
++        {"SPECIAL6", StateSpecial6}, {"SPECIAL7", StateSpecial7}, {"SPECIAL8", StateSpecial8},
++        {"SPECIAL9", StateSpecial9}, {"PASSIVE", StatePassive}};
++    for (const auto& [prefix, value] : names)
++        if (name.starts_with(prefix))
++        {
++            state = value;
++            break;
++        }
++    return true;
++}
++bool AI_Mgr::StopVelocity()
++{
++    auto* server = GetServerDE();
++    DVector velocity;
++    if (!server || !server->IsObjectAlive(m_hObject) || server->GetVelocity(m_hObject, &velocity) != DE_OK)
++        return StateFailure("StopVelocity requires a live owner and velocity");
++    velocity.x = velocity.z = 0;
++    if (m_nTrapped)
++        velocity = {}; // Original Move(vVel, MATH_EPSILON) trapped branch.
++    if (server->SetVelocity(m_hObject, &velocity) != DE_OK)
++        return StateFailure("StopVelocity service rejected the request");
++    return true;
++}
++bool AI_Mgr::SetNewState(int state)
++{
++    state_error.clear();
++    requested_state = state;
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject) ||
++        !((state >= 0 && state <= 24) || (state >= 100 && state <= 108) || state == StateInactive))
++        return StateFailure("Invalid AI state or owner");
++    const auto time = server->GetTime();
++    if (!std::isfinite(time) || !std::isfinite(m_fWaitForIdleTime) || !std::isfinite(time + 120.f))
++        return StateFailure("Invalid AI idle deadline");
++    // Preflight the only fallible mutation before committing state bookkeeping.
++    if (!StopVelocity())
++        return false;
++    if (m_nState != StateWalkAround && m_nState != StateRunAround && m_nState != StateJumpOver &&
++        m_nState != StateCrawlUnder && m_nState != StateSearchVisual && m_nState != StateSearchSmell)
++        m_nLastState = m_nState;
++    if (state == StateIdle && m_bHasTargeted)
++        m_nState = time > m_fWaitForIdleTime ? StateIdle : StateSearchVisual;
++    else
++    {
++        m_nState = state;
++        m_fWaitForIdleTime = time + 120.f;
++    }
++    Metacmd = 1;
++    m_nCurMetacmd = 999;
++    m_bAnimating = false;
++    ++state_changes;
++    return true;
++}
++bool AI_Mgr::SetAnimation(DDWORD clip)
++{
++    using OpenBlood2::ResizeResult;
++    state_error.clear();
++    requested_animation = clip;
++    auto* server = GetServerDE();
++    std::string name;
++    if (!server || !server->IsObjectAlive(m_hObject) || !server->GetModelAnimationName(m_hObject, clip, name))
++        return StateFailure("AI animation model/clip unavailable");
++    if (clip == m_nCurAnimation)
++    {
++        if (server->ResetModelAnimation(m_hObject) != DE_OK)
++            return StateFailure("AI animation reset failed");
++    }
++    else
++    {
++        DVector dimensions = m_vDims;
++        DVector authored;
++        if (server->GetModelAnimUserDims(m_hObject, &authored, clip) == DE_OK)
++            dimensions = {authored.x * m_vScale.x, authored.y * m_vScale.y, authored.z * m_vScale.z};
++        // Explicit replacement for the old SetObjectDims2: existing atomic,
++        // foot-anchored clearance, no partial pushing or fabricated successful resize.
++        const auto result = server->ResizeObject(m_hObject, dimensions);
++        if (result != ResizeResult::Resized)
++            return StateFailure(result == ResizeResult::Blocked ? "AI animation resize blocked"
++                                                                : "AI animation resize unavailable or invalid");
++        server->SetModelAnimation(m_hObject, clip); // Validated above, no callbacks.
++        m_vDims = dimensions;
++        m_nCurAnimation = clip;
++    }
++    ++animation_starts;
++    return true;
++}
++bool AI_Mgr::AnimationCommand(DDWORD clip, int command)
++{
++    auto* server = GetServerDE();
++    state_error.clear();
++    if (!server || !server->IsObjectAlive(m_hObject))
++        return StateFailure("AI animation command requires a live owner");
++    if (!m_bAnimating || m_nCurMetacmd != command)
++    {
++        if (!SetAnimation(clip))
++            return false;
++        server->SetModelLooping(m_hObject, DFALSE);
++        m_bAnimating = true;
++        m_nCurMetacmd = command;
++    }
++    else
++    {
++        std::string name;
++        if (!server->GetModelAnimationName(m_hObject, server->GetModelAnimation(m_hObject), name))
++            return StateFailure("AI animation playback unavailable");
++        if (server->GetModelPlaybackState(m_hObject) & MS_PLAYDONE)
++        {
++            if (Metacmd == std::numeric_limits<int>::max())
++                return StateFailure("AI Metacmd overflow");
++            m_bAnimating = false;
++            ++Metacmd;
++            ++animation_finishes;
++        }
++    }
++    return true;
++}
++bool AI_Mgr::MC_Idle()
++{
++    DDWORD clip = 0;
++    if (!m_bAnimating || m_nCurMetacmd != 0)
++    {
++        auto* server = GetServerDE();
++        if (!server || !server->IsObjectAlive(m_hObject) || !m_pAnim_Sound ||
++            !server->RandomInt(0, 3, animation_choice))
++            return StateFailure("AI idle table/owner/random service unavailable");
++        clip = m_pAnim_Sound->m_nAnim_IDLE[animation_choice];
++    }
++    return AnimationCommand(clip, 0);
++}
++bool AI_Mgr::MC_Talk()
++{
++    DDWORD clip = 0;
++    if (!m_bAnimating || m_nCurMetacmd != 0)
++    {
++        auto* server = GetServerDE();
++        if (!server || !server->IsObjectAlive(m_hObject) || !m_pAnim_Sound ||
++            !server->RandomInt(0, 4, animation_choice))
++            return StateFailure("AI talk table/owner/random service unavailable");
++        clip = m_pAnim_Sound->m_nAnim_TALK[animation_choice];
++    }
++    // Original Talk deliberately shares MC_IDLE, including cross-command continuation.
++    return AnimationCommand(clip, 0);
++}
++bool AI_Mgr::MC_Special(int index)
++{
++    DDWORD clip = 0;
++    if (!m_bAnimating || m_nCurMetacmd != 25)
++    {
++        if (!m_pAnim_Sound || index < 0 || index >= 9)
++            return StateFailure("AI special animation table/index unavailable");
++        animation_choice = index;
++        clip = m_pAnim_Sound->m_nAnim_SPECIAL[index];
++    }
++    return AnimationCommand(clip, 25);
++}
++bool AI_Mgr::ComputeState(int)
++{
++    return StateFailure("Subclass ComputeState is not integrated");
++}
++bool AI_Mgr::AI_STATE_Special(int)
++{
++    return StateFailure("Subclass special action is not integrated");
++}
++bool AI_Mgr::AI_STATE_Idle()
++{
++    const int stim = ComputeStimuli();
++    if (stim < 0)
++        return StateFailure("Idle perception failed; no state selected");
++    if (stim == 3)
++        return SetNewState(StateSearchSmell);
++    if (stim > 0)
++    {
++        GetServerDE()->SetNextUpdate(m_hObject, .001f);
++        return ComputeState(stim);
++    }
++    GetServerDE()->SetNextUpdate(m_hObject, .1f);
++    switch (Metacmd)
++    {
++        case 1:
++            if (m_bCabal)
++                return StateFailure("Original MC_BestWeapon is not integrated");
++            ++Metacmd;
++            return true;
++        case 2:
++            return MC_Idle();
++        case 3:
++            return ComputeState();
++        default:
++            return true; // Source switch has no default action.
++    }
++}
++bool AI_Mgr::AI_STATE_Passive()
++{
++    if (!GetServerDE() || !GetServerDE()->IsObjectAlive(m_hObject))
++        return StateFailure("AI state owner unavailable");
++    if (m_damage.GetLastDamager())
++        return ComputeState();
++    GetServerDE()->SetNextUpdate(m_hObject, .1f);
++    switch (Metacmd)
++    {
++        case 1:
++            if (m_bCabal)
++                return StateFailure("Original MC_BestWeapon is not integrated");
++            ++Metacmd;
++            return true;
++        case 2:
++            return MC_Idle();
++        case 3:
++            Metacmd = 1;
++            return true;
++        default:
++            return true;
++    }
++}
++bool AI_Mgr::DispatchState()
++{
++    state_error.clear();
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject))
++        return StateFailure("AI state owner unavailable");
++    ++state_dispatches;
++    dispatched_state = m_nState;
++    if (Metacmd <= 0)
++        Metacmd = 1;
++    if (m_nState == StateIdle)
++        return AI_STATE_Idle();
++    if (m_nState == StatePassive)
++        return AI_STATE_Passive();
++    if (m_nState >= StateSpecial1 && m_nState <= StateSpecial8)
++        return AI_STATE_Special(m_nState - StateSpecial1 + 1);
++    if (m_nState == StateInactive)
++        return true;
++    return StateFailure("Selected AI action is not integrated");
++}
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 94bc043..f7699ad 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -66,7 +66,7 @@ namespace OpenBlood2
+ } // namespace OpenBlood2
+ 
+ // Selective original AI_Mgr::InitStatics/OnStringKey port. No production AI class
+-// registration, state machine, Fire or MC_Extra implementation yet.
++// registration or complete AI_Update, Fire or MC_Extra implementation yet.
+ // Perception commands: AI_PERCEPTION_CONTRACTS.md; no automatic AI update loop.
+ // Selected CanSee and explicit target/facing commands are documented in
+ // AI_SIGHT_CONTRACTS.md and AI_TARGET_CONTRACTS.md.
+@@ -92,7 +92,70 @@ class AI_Mgr : public CBaseCharacter
+     int stimulus = 0;
+     bool from_damage = false;
+     std::string perception_error;
+-    static constexpr int StateIdle = 5, StateScript = 101;
++    // Original numeric state IDs. Selection does not imply an implemented action.
++    enum State : int
++    {
++        StateAttackClose = 0,
++        StateAttackFar = 1,
++        StateSearchVisual = 2,
++        StateEscapeHide = 3,
++        StateEscapeRun = 4,
++        StateIdle = 5,
++        StateGuard = 6,
++        StateFindHealth = 7,
++        StateFindAmmo = 8,
++        StateHide = 9,
++        StateDodge = 10,
++        StateTeleport = 11,
++        StateEnemyAttach = 12,
++        StateAssistAlly = 13,
++        StateSearchSmell = 14,
++        StateSpecial1 = 15,
++        StateSpecial2 = 16,
++        StateSpecial3 = 17,
++        StateSpecial4 = 18,
++        StateSpecial5 = 19,
++        StateSpecial6 = 20,
++        StateSpecial7 = 21,
++        StateSpecial8 = 22,
++        StateSpecial9 = 23,
++        StatePassive = 24,
++        StateDying = 100,
++        StateScript = 101,
++        StateRecoil = 102,
++        StateJumpOver = 103,
++        StateCrawlUnder = 104,
++        StateWalkAround = 105,
++        StateRunAround = 106,
++        StateWalkTo = 107,
++        StateRunTo = 108,
++        StateInactive = 999
++    };
++    static bool StateStrToInt(std::string_view, int&);
++    bool SetNewState(int);
++    bool StopVelocity();
++    bool SetAnimation(DDWORD);
++    bool MC_Idle();
++    bool MC_Talk();
++    bool MC_Special(int);
++    // Only the original state-dispatch portion, not AI_Update/deactivation/retention.
++    bool DispatchState();
++    virtual bool ComputeState(int stimulus = -1);
++    virtual bool AI_STATE_Idle();
++    bool AI_STATE_Passive();
++    virtual bool AI_STATE_Special(int); // Consolidates the eight original virtual handlers.
++    int m_nLastState = StateIdle, m_nCurMetacmd = 1, m_nTrapped = 0;
++    DDWORD m_nCurAnimation = 999;
++    bool m_bAnimating = false, m_bHasTargeted = false;
++    float m_fWaitForIdleTime = 0;
++    DVector m_vDims{1, 1, 1}, m_vScale{1, 1, 1};
++    std::string m_szAIState = "IDLE";
++    std::uint64_t state_changes = 0, state_dispatches = 0, state_failures = 0;
++    std::uint64_t animation_starts = 0, animation_finishes = 0;
++    int requested_state = StateIdle, dispatched_state = StateIdle, animation_choice = -1;
++    DDWORD requested_animation = UINT32_MAX;
++    std::string state_error;
++
+     bool InitStatics(std::shared_ptr<CAnim_Sound>);
+     bool CanSee(HOBJECT);
+     OpenBlood2::AISight sight;
+@@ -127,6 +190,8 @@ class AI_Mgr : public CBaseCharacter
+     std::string ai_key, ai_key_error, ai_sound_resource;
+ 
+   protected:
++    bool StateFailure(const char*);
++    bool AnimationCommand(DDWORD clip, int command);
+     bool OnStringKey(ArgList*) override;
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+ 
+diff --git a/src/game/original/CivilianAI.cpp b/src/game/original/CivilianAI.cpp
+new file mode 100644
+index 0000000..215c2b5
+--- /dev/null
++++ b/src/game/original/CivilianAI.cpp
+@@ -0,0 +1,74 @@
++// Original CivilianAI.cpp:339-366,493-639; see AI_STATE_CONTRACTS.md.
++#include "CivilianAI.h"
++#include <cmath>
++
++bool CivilianAI::ComputeState(int value)
++{
++    const int stim = value == -1 ? ComputeStimuli() : value;
++    if (stim < 0 || stim > 4 || !std::isfinite(m_fStimuli[5]))
++        return StateFailure("Civilian state stimulus unavailable or invalid");
++    if (stim && m_nState == StateEscapeHide)
++        return SetNewState(StateEscapeHide);
++    if (stim && (m_bScared || m_fStimuli[5] < 1.f))
++    {
++        if (!SetNewState(StateEscapeRun))
++            return false;
++        m_bScared = true;
++        return true;
++    }
++    int state;
++    if (!StateStrToInt(m_szAIState, state))
++        return StateFailure("Invalid civilian authored state");
++    return SetNewState(state);
++}
++bool CivilianAI::AI_STATE_Idle()
++{
++    if (!GetServerDE() || !GetServerDE()->IsObjectAlive(m_hObject))
++        return StateFailure("AI state owner unavailable");
++    if (m_bScared)
++    {
++        const int stim = ComputeStimuli();
++        if (stim < 0)
++            return StateFailure("Civilian idle perception failed");
++        if (stim > 0)
++        {
++            GetServerDE()->SetNextUpdate(m_hObject, .001f);
++            return ComputeState(stim);
++        }
++    }
++    GetServerDE()->SetNextUpdate(m_hObject, .1f);
++    switch (Metacmd)
++    {
++        case 1:
++            return MC_Idle();
++        case 2:
++            return ComputeState();
++        default:
++            return true;
++    }
++}
++bool CivilianAI::AI_STATE_Special(int special)
++{
++    if (!GetServerDE() || !GetServerDE()->IsObjectAlive(m_hObject))
++        return StateFailure("AI state owner unavailable");
++    if (special < 1 || special > 8)
++        return StateFailure("Civilian special state unavailable");
++    if (special == 1)
++    {
++        if (!MC_FaceTarget())
++            return StateFailure("Civilian talk target facing failed");
++        --Metacmd;
++    }
++    if (Metacmd == 2)
++        return ComputeState();
++    if (Metacmd != 1)
++        return true;
++    if (special == 1)
++        return MC_Talk();
++    constexpr int clips[]{0, 0, 0, 1, 3, 4, 5, 7, 8};
++    int index = clips[special];
++    // Source draws on EVERY Metacmd-1 tick, even while MC_Special keeps playing.
++    if ((special == 3 || special == 6) && !GetServerDE()->RandomInt(index, index + 1, index))
++        return StateFailure("Civilian special random service unavailable");
++    return MC_Special(index);
++}
+diff --git a/src/game/original/CivilianAI.h b/src/game/original/CivilianAI.h
+new file mode 100644
+index 0000000..31b0d1a
+--- /dev/null
++++ b/src/game/original/CivilianAI.h
+@@ -0,0 +1,12 @@
++#pragma once
++#include "AI_Mgr.h"
++// Selected original state rules only. Not registered for world creation:
++// full initialization, fleeing, damage/trigger handling and AI_Update remain open.
++class CivilianAI : public AI_Mgr
++{
++  public:
++    bool m_bScared = false;
++    bool ComputeState(int stimulus = -1) override;
++    bool AI_STATE_Idle() override;
++    bool AI_STATE_Special(int) override;
++};
+diff --git a/src/game/original/CultistAI.cpp b/src/game/original/CultistAI.cpp
+new file mode 100644
+index 0000000..e07fb9e
+--- /dev/null
++++ b/src/game/original/CultistAI.cpp
+@@ -0,0 +1,45 @@
++// Original CultistAI.cpp:269-332; see AI_STATE_CONTRACTS.md.
++#include "CultistAI.h"
++#include <cmath>
++
++bool CultistAI::ComputeState(int value)
++{
++    const int stim = value == -1 ? ComputeStimuli() : value;
++    DVector position;
++    auto* server = GetServerDE();
++    if (stim < 0 || stim > 4 || !server || !server->IsObjectAlive(m_hObject) ||
++        server->GetObjectPos(m_hObject, &position) != DE_OK || !std::isfinite(m_fStimuli[0]) ||
++        !std::isfinite(m_fStimuli[5]) || !std::isfinite(m_vDims.y) || m_vDims.y <= 0)
++        return StateFailure("Cultist state stimulus or body unavailable");
++    const double height = std::abs(double(m_vTargetPos.y) - position.y);
++    if (!std::isfinite(height))
++        return StateFailure("Cultist target height invalid");
++    if (!stim)
++    {
++        switch (m_nState)
++        {
++            case StateIdle:
++            case StateSearchVisual:
++            case StateSearchSmell:
++                return SetNewState(StateIdle);
++            case StateFindAmmo:
++            case StateFindHealth:
++                return SetNewState(m_nLastState);
++            case StateEscapeRun:
++                if (!SetNewState(StateIdle))
++                    return false;
++                [[fallthrough]]; // Source continues with the changed last state.
++            default:
++                if (m_nLastState == StateGuard)
++                    return SetNewState(StateGuard);
++                if (height <= m_vDims.y && m_fStimuli[5] >= .5f)
++                    return SetNewState(StateSearchVisual);
++                return SetNewState(StateIdle);
++        }
++    }
++    if (m_fStimuli[5] < .25f)
++        return SetNewState(StateEscapeRun);
++    if (m_fStimuli[5] < .5f || m_fStimuli[0] <= .5f || height > m_vDims.y)
++        return SetNewState(StateAttackFar);
++    return SetNewState(StateAttackClose);
++}
+diff --git a/src/game/original/CultistAI.h b/src/game/original/CultistAI.h
+new file mode 100644
+index 0000000..a7c4466
+--- /dev/null
++++ b/src/game/original/CultistAI.h
+@@ -0,0 +1,9 @@
++#pragma once
++#include "AI_Mgr.h"
++// Original decision rules only. Initialization and combat actions are not yet
++// integrated; this class has no production registry/factory entry.
++class CultistAI : public AI_Mgr
++{
++  public:
++    bool ComputeState(int stimulus = -1) override;
++};
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 93f9203..605df06 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -660,3 +660,17 @@ if(BLOOD2_TEST_DATA_DIR)
+         set_tests_properties(ai_perception.${case} PROPERTIES LABELS "headless;private;ai_perception" TIMEOUT 90)
+     endforeach()
+ endif()
++
++add_executable(ai_state_tests ai_state_tests.cpp)
++target_link_libraries(ai_state_tests PRIVATE blood2_game)
++blood2_project_options(ai_state_tests)
++foreach(case symbols transitions commands resize decisions civilian dispatch failures lifetime)
++    add_test(NAME ai_state.${case} COMMAND ai_state_tests "${case}")
++    set_tests_properties(ai_state.${case} PROPERTIES LABELS "headless;ai_state" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case catalog subway)
++        add_test(NAME ai_state.${case} COMMAND ai_state_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(ai_state.${case} PROPERTIES LABELS "headless;private;ai_state" TIMEOUT 90)
++    endforeach()
++endif()
+diff --git a/tests/ai_state_tests.cpp b/tests/ai_state_tests.cpp
+new file mode 100644
+index 0000000..da7a75a
+--- /dev/null
++++ b/tests/ai_state_tests.cpp
+@@ -0,0 +1,489 @@
++#include "brush_fixture.h"
++#include "game/original/CivilianAI.h"
++#include "game/original/CultistAI.h"
++#include "game/server_adapter.h"
++#include "model_fixture.h"
++#include <cmath>
++#include <functional>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .001f;
++    }
++    bool setup(GameSession& g)
++    {
++        if (!g.objects.find_class("BaseClass"))
++            CHECK(g.initialize());
++        auto floor = test_brush::box("floor", {-10000, -20, -10000}, {10000, -10, 10000});
++        for (auto& s : floor.surfaces)
++            s.flags = 1;
++        std::string error;
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        return true;
++    }
++    struct ScheduledCivilian : CivilianAI
++    {
++        bool running = true;
++        DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
++        {
++            if (m == MID_UPDATE && running)
++            {
++                GetServerDE()->SetNextUpdate(m_hObject, .001f);
++                running = DispatchState();
++                if (!running)
++                    GetServerDE()->SetNextUpdate(m_hObject, 0);
++            }
++            return AI_Mgr::EngineMessageFn(m, d, f);
++        }
++    };
++    struct RemovingCivilian : ScheduledCivilian
++    {
++        inline static unsigned destroyed = 0, removed_keys = 0;
++        ~RemovingCivilian() override
++        {
++            ++destroyed;
++        }
++        bool OnStringKey(ArgList* args) override
++        {
++            if (args && args->argc && std::string_view(args->argv[0]) == "remove")
++            {
++                ++removed_keys;
++                GetServerDE()->RemoveObject(m_hObject);
++                // Destruction is deferred until the callback/animation batch ends.
++                return destroyed == 0;
++            }
++            return AI_Mgr::OnStringKey(args);
++        }
++    };
++    template <class T = AI_Mgr> T* actor(GameSession& g, const char* name = "AIStateProbe", DVector pos = {0, 5, 0})
++    {
++        if (!g.objects.find_class(name))
++        {
++            static const ClassInfo type{name,
++                                        g.objects.find_class("CBaseCharacter"),
++                                        []() -> std::unique_ptr<BaseClass> { return std::make_unique<T>(); },
++                                        {}};
++            if (!g.objects.register_class(type))
++                return nullptr;
++        }
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Pos = pos;
++        s.m_Flags = FLAG_MODELKEYS;
++        SAFE_STRCPY(s.m_Name, "state/action diagnostic (not production NPC)");
++        auto h = g.objects.create(g.objects.find_class(name), s);
++        auto* r = g.objects.get(h);
++        auto* ai = r ? dynamic_cast<T*>(r->game.get()) : nullptr;
++        if (!ai)
++            return nullptr;
++        auto model = std::make_shared<Model>();
++        std::string error;
++        if (!read_model(test_model::abc().b, *model, error))
++            return nullptr;
++        const auto clip = model->animations.front();
++        model->animations.clear();
++        for (unsigned i = 0; i < 18; ++i)
++        {
++            model->animations.push_back(clip);
++            auto& a = model->animations.back();
++            a.name = "clip" + std::to_string(i);
++            a.dimensions = {2, 4, 2};
++            a.keys.clear();
++        }
++        r->model = model;
++        r->dimensions = {1, 1, 1};
++        auto table = std::make_shared<CAnim_Sound>();
++        for (unsigned i = 0; i < 4; ++i)
++            table->m_nAnim_IDLE[i] = i;
++        for (unsigned i = 0; i < 5; ++i)
++            table->m_nAnim_TALK[i] = 4 + i;
++        for (unsigned i = 0; i < 9; ++i)
++            table->m_nAnim_SPECIAL[i] = 9 + i;
++        ai->InitStatics(table);
++        ai->m_damage.Init(h);
++        ai->m_damage.m_fHitPoints = ai->m_damage.m_fMaxHitPoints = 100;
++        return ai;
++    }
++    bool symbols(const char*)
++    {
++        int state = -50;
++        CHECK(AI_Mgr::StateStrToInt("idle_extra", state) && state == AI_Mgr::StateIdle);
++        CHECK(AI_Mgr::StateStrToInt("sEaR-anything", state) && state == AI_Mgr::StateSearchVisual);
++        CHECK(AI_Mgr::StateStrToInt("SPECIAL10", state) && state == AI_Mgr::StateSpecial1);
++        CHECK(AI_Mgr::StateStrToInt(" passIVE", state) && state == AI_Mgr::StateInactive);
++        CHECK(AI_Mgr::StateStrToInt("", state) && state == AI_Mgr::StateInactive);
++        CHECK(!AI_Mgr::StateStrToInt(std::string(33, 'a'), state) && state == AI_Mgr::StateInactive);
++        CHECK(!AI_Mgr::StateStrToInt(std::string_view("IDLE\0", 5), state));
++        return true;
++    }
++    bool transitions(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        r->velocity = {4, 8, 9};
++        a->m_nState = AI_Mgr::StateAttackClose;
++        a->Metacmd = 7;
++        a->m_bAnimating = true;
++        CHECK(a->SetNewState(AI_Mgr::StateGuard));
++        CHECK(a->m_nLastState == AI_Mgr::StateAttackClose && a->Metacmd == 1 && !a->m_bAnimating &&
++              a->m_nCurMetacmd == 999);
++        CHECK(r->velocity.x == 0 && r->velocity.z == 0 && r->velocity.y == 8 && near(a->m_fWaitForIdleTime, 120));
++        a->m_bHasTargeted = true;
++        CHECK(a->SetNewState(AI_Mgr::StateIdle) && a->m_nState == AI_Mgr::StateSearchVisual &&
++              a->m_nLastState == AI_Mgr::StateGuard);
++        CHECK(g.objects.advance(60) && g.objects.advance(60));
++        CHECK(a->SetNewState(AI_Mgr::StateIdle) && a->m_nState == AI_Mgr::StateSearchVisual);
++        CHECK(g.objects.advance(.01));
++        CHECK(a->SetNewState(AI_Mgr::StateIdle) && a->m_nState == AI_Mgr::StateIdle &&
++              a->m_nLastState == AI_Mgr::StateGuard);
++        for (int state : {AI_Mgr::StateWalkAround, AI_Mgr::StateRunAround, AI_Mgr::StateJumpOver,
++                          AI_Mgr::StateCrawlUnder, AI_Mgr::StateSearchVisual, AI_Mgr::StateSearchSmell})
++        {
++            a->m_nState = state;
++            a->m_nLastState = AI_Mgr::StateAttackFar;
++            CHECK(a->SetNewState(AI_Mgr::StateGuard) && a->m_nLastState == AI_Mgr::StateAttackFar);
++        }
++        a->m_nTrapped = 1;
++        r->velocity = {1, 2, 3};
++        CHECK(a->SetNewState(AI_Mgr::StateGuard));
++        CHECK(r->velocity.x == 0 && r->velocity.y == 0 && r->velocity.z == 0);
++        CHECK(a->state_changes == 11);
++        return true;
++    }
++    bool commands(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        CHECK(a->MC_Idle() && a->m_bAnimating && a->m_nCurMetacmd == 0 && !r->animation.looping &&
++              a->animation_choice < 4);
++        g.server.trace_enabled = true;
++        const auto clip = r->animation.animation;
++        const auto revision = r->animation.revision;
++        CHECK(a->MC_Talk() && r->animation.animation == clip && r->animation.revision == revision); // shared MC_IDLE
++        CHECK(g.server.service_calls["RandomInt"] == 0);
++        CHECK(g.server.advance_models(1) && a->MC_Talk() && !a->m_bAnimating && a->Metacmd == 2);
++        CHECK(a->MC_Talk() && r->animation.animation >= 4 && r->animation.animation <= 8);
++        CHECK(a->MC_Special(8) && r->animation.animation == 17 && a->m_nCurMetacmd == 25);
++        const auto special_revision = r->animation.revision;
++        CHECK(a->MC_Special(-99) && r->animation.revision == special_revision); // ignored during continuation
++        CHECK(g.server.advance_models(1) && a->MC_Special(0) && a->Metacmd == 3);
++        CHECK(a->animation_starts == 3 && a->animation_finishes == 2);
++        CHECK(!a->MC_Special(-1) && !a->MC_Special(9));
++        CHECK(a->MC_Idle());
++        CHECK(g.server.advance_models(1));
++        a->Metacmd = std::numeric_limits<int>::max();
++        CHECK(!a->MC_Idle() && a->m_bAnimating);
++        return true;
++    }
++    bool resize(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        a->m_vScale = {2, 2, 2};
++        CHECK(a->SetAnimation(1));
++        CHECK(near(r->dimensions.y, 8) && near(r->state.m_Pos.y, 12) && near(a->m_vDims.y, 8));
++        CHECK(g.server.advance_models(.2));
++        const auto rev = r->animation.revision;
++        g.server.collision_ready = false;
++        CHECK(a->SetAnimation(1) && r->animation.revision > rev && r->animation.time == 0); // reset needs no resize
++        CHECK(!a->SetAnimation(2) && r->animation.animation == 1 && a->m_nCurAnimation == 1);
++        g.server.collision_ready = true;
++        auto ceiling = test_brush::box("ceiling", {-100, 20, -100}, {100, 25, 100});
++        for (auto& s : ceiling.surfaces)
++            s.flags = 1;
++        std::string error;
++        CHECK(g.collision.build(ceiling, error));
++        a->m_vScale = {3, 3, 3};
++        const auto before = r->state.m_Pos;
++        CHECK(!a->SetAnimation(2) && r->animation.animation == 1 && r->state.m_Pos.y == before.y &&
++              r->dimensions.y == 8);
++        a->m_vScale = {-1, 1, 1};
++        CHECK(!a->SetAnimation(2));
++        CHECK(!a->SetAnimation(UINT32_MAX) && a->m_nCurAnimation == 1);
++        return true;
++    }
++    bool decisions(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor<CultistAI>(g, "CultistDecisionProbe");
++        CHECK(a);
++        a->m_vDims = {2, 4, 2};
++        a->m_vTargetPos = {0, 5, 100};
++        struct Row
++        {
++            float health, sight, height;
++            int expected;
++        };
++        for (auto row : {Row{.249f, .9f, 0, 4}, Row{.25f, .9f, 0, 1}, Row{.5f, .5f, 0, 1}, Row{.5f, .501f, 4, 0},
++                         Row{1, .9f, 4.01f, 1}})
++        {
++            a->m_fStimuli[5] = row.health;
++            a->m_fStimuli[0] = row.sight;
++            a->m_vTargetPos.y = 5 + row.height;
++            CHECK(a->ComputeState(1) && a->m_nState == row.expected);
++        }
++        a->m_nState = AI_Mgr::StateFindAmmo;
++        a->m_nLastState = AI_Mgr::StateGuard;
++        CHECK(a->ComputeState(0) && a->m_nState == AI_Mgr::StateGuard && a->m_nLastState == AI_Mgr::StateFindAmmo);
++        a->m_nState = AI_Mgr::StateEscapeRun;
++        a->m_nLastState = AI_Mgr::StateGuard;
++        a->m_fStimuli[5] = 1;
++        a->m_vTargetPos.y = 5;
++        const auto changes = a->state_changes;
++        CHECK(a->ComputeState(0) && a->m_nState == AI_Mgr::StateSearchVisual && a->state_changes == changes + 2);
++        CHECK(a->m_nLastState == AI_Mgr::StateIdle); // fallthrough observes first transition
++        a->m_fSeeingDist = std::numeric_limits<float>::quiet_NaN();
++        const auto state = a->m_nState;
++        CHECK(!a->ComputeState() && a->m_nState == state);
++        CHECK(!a->ComputeState(-2) && !a->ComputeState(5));
++        return true;
++    }
++    bool civilian(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor<CivilianAI>(g, "CivilianDecisionProbe");
++        CHECK(a);
++        a->m_szAIState = "SPECIAL6";
++        a->m_fStimuli[5] = 1;
++        CHECK(a->ComputeState(1) && a->m_nState == AI_Mgr::StateSpecial6 && !a->m_bScared);
++        a->m_fStimuli[5] = .99f;
++        CHECK(a->ComputeState(1) && a->m_nState == AI_Mgr::StateEscapeRun && a->m_bScared);
++        CHECK(!a->DispatchState()); // No successful placeholder for fleeing.
++        a->m_nState = AI_Mgr::StateEscapeHide;
++        CHECK(a->ComputeState(1) && a->m_nState == AI_Mgr::StateEscapeHide);
++        CHECK(a->ComputeState(0) && a->m_nState == AI_Mgr::StateSpecial6);
++        for (int special = 2; special <= 8; ++special)
++        {
++            CHECK(a->SetNewState(AI_Mgr::StateSpecial1 + special - 1) && a->DispatchState());
++            const auto clip = g.objects.get(a->m_hObject)->animation.animation;
++            const int expected[]{0, 0, 9, 10, 12, 13, 14, 16, 17};
++            CHECK(clip == unsigned(expected[special]) ||
++                  ((special == 3 || special == 6) && clip == unsigned(expected[special] + 1)));
++            const auto revision = g.objects.get(a->m_hObject)->animation.revision;
++            g.server.trace_enabled = true;
++            const auto draws = g.server.service_calls["RandomInt"];
++            CHECK(a->DispatchState() && g.objects.get(a->m_hObject)->animation.revision == revision);
++            CHECK(g.server.service_calls["RandomInt"] == draws + ((special == 3 || special == 6) ? 1 : 0));
++            CHECK(g.server.advance_models(1) && a->DispatchState() && a->Metacmd == 2);
++        }
++        ObjectCreateStruct s;
++        s.m_Pos = {50, 5, 0};
++        const auto target = g.objects.create(g.objects.find_class("BaseClass"), s);
++        CHECK(a->SetNewTarget(target) && a->RefreshTargetPosition() && a->SetNewState(AI_Mgr::StateSpecial1));
++        CHECK(a->DispatchState() && a->Metacmd == 1 && a->m_nCurMetacmd == 0);
++        CHECK(a->face_commands == 1);
++        return true;
++    }
++    bool dispatch(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor<ScheduledCivilian>(g, "ScheduledCivilianProbe");
++        CHECK(a);
++        a->m_bScared = false;
++        g.server.SetNextUpdate(a->m_hObject, .001f);
++        CHECK(g.step(.01) && a->state_dispatches == 1 && a->animation_starts == 1 && a->perception_calls == 0);
++        CHECK(g.step(.05) && a->state_dispatches == 1);
++        CHECK(g.step(.06) && a->state_dispatches == 2);
++        for (int i = 0; i < 30; ++i)
++            CHECK(g.step(.1));
++        CHECK(a->animation_finishes >= 2 && a->state_changes >= 2 && a->running);
++        CHECK(a->SetNewState(AI_Mgr::StateAttackFar));
++        CHECK(g.step(.2) && !a->running && a->state_failures == 1);
++        const auto calls = a->state_dispatches;
++        CHECK(g.step(1) && a->state_dispatches == calls);
++        auto* base = actor(g);
++        CHECK(base);
++        base->m_bCabal = false;
++        base->Metacmd = -4;
++        base->m_nState = AI_Mgr::StatePassive;
++        CHECK(base->DispatchState() && base->Metacmd == 2 && base->perception_calls == 0);
++        CHECK(base->DispatchState() && g.server.advance_models(1) && base->DispatchState() && base->Metacmd == 3);
++        CHECK(base->DispatchState() && base->Metacmd == 1);
++        base->m_bCabal = true;
++        CHECK(!base->DispatchState() && base->state_error.find("BestWeapon") != std::string::npos);
++        base->m_nState = AI_Mgr::StateInactive;
++        CHECK(base->DispatchState());
++        return true;
++    }
++    bool failures(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor<CivilianAI>(g, "CivilianFailureProbe");
++        CHECK(a);
++        const auto original = a->m_nState;
++        CHECK(!a->SetNewState(-1) && a->m_nState == original);
++        auto* r = g.objects.get(a->m_hObject);
++        r->velocity.y = std::numeric_limits<float>::infinity();
++        CHECK(!a->SetNewState(AI_Mgr::StateGuard) && a->state_changes == 0);
++        r->velocity = {};
++        a->m_fWaitForIdleTime = std::numeric_limits<float>::quiet_NaN();
++        CHECK(!a->SetNewState(AI_Mgr::StateGuard));
++        a->m_fWaitForIdleTime = 0;
++        a->m_szAIState = std::string(33, 'a');
++        CHECK(!a->ComputeState(0));
++        a->m_bScared = true;
++        a->m_fSeeingDist = std::numeric_limits<float>::quiet_NaN();
++        CHECK(!a->DispatchState() && a->animation_starts == 0 && a->m_nState == original);
++        r->model.reset();
++        CHECK(!a->MC_Idle());
++        CHECK(g.objects.remove(a->m_hObject));
++        CHECK(!a->SetNewState(AI_Mgr::StateIdle) && !a->AI_STATE_Idle() && !a->AI_STATE_Passive() &&
++              !a->AI_STATE_Special(3) && !a->MC_Special(0) && !a->DispatchState());
++        CHECK(g.objects.finish_frame());
++        return true;
++    }
++    bool lifetime(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        HOBJECT old = nullptr;
++        for (int cycle = 0; cycle < 4; ++cycle)
++        {
++            CHECK(setup(g));
++            auto* a = actor<ScheduledCivilian>(g, "ScheduledCivilianProbe");
++            CHECK(a && !g.objects.get(old));
++            auto* r = g.objects.get(a->m_hObject);
++            g.server.SetNextUpdate(a->m_hObject, .001f);
++            CHECK(g.step(.1));
++            const auto time = r->animation.time;
++            const auto calls = a->state_dispatches;
++            g.server.SetObjectState(a->m_hObject, OBJSTATE_INACTIVE);
++            CHECK(g.step(.5));
++            CHECK(r->animation.time == time && a->state_dispatches == calls);
++            g.server.SetObjectState(a->m_hObject, OBJSTATE_ACTIVE);
++            CHECK(g.step(.1) && a->state_dispatches > calls);
++            old = a->m_hObject;
++            CHECK(g.objects.remove(old));
++            CHECK(!a->DispatchState());
++            CHECK(g.objects.finish_frame() && !g.objects.get(old));
++            CHECK(g.unload_world() && g.server.string_count() == 0);
++        }
++        CHECK(setup(g));
++        auto* a = actor<RemovingCivilian>(g, "RemovingCivilianProbe");
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        auto model = std::make_shared<Model>(*r->model);
++        for (auto& clip : model->animations)
++            clip.keys = {{0, {}, {}, "remove"}, {1, {}, {}, "remove"}};
++        r->model = model;
++        auto h = a->m_hObject;
++        g.server.SetNextUpdate(h, .001f);
++        CHECK(g.step(.1) && !g.objects.get(h));
++        CHECK(RemovingCivilian::destroyed == 1 && RemovingCivilian::removed_keys == 1);
++        return true;
++    }
++    bool catalog(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        auto* a = actor(g);
++        CHECK(a);
++        unsigned clips = 0, tables = 0;
++        for (const char* name : {"m_civilian1", "f_civilian1", "labtech", "m_cultist1", "f_cultist1", "gideon"})
++        {
++            auto* r = g.objects.get(a->m_hObject);
++            CHECK(g.models.load("models/enemies/" + std::string(name) + ".abc", r->model, error));
++            a->m_nCurAnimation = 999;
++            r->animation = {};
++            auto table = std::make_shared<CAnim_Sound>();
++            CHECK(table->SetAnimationIndexes(a->m_hObject) && a->InitStatics(table));
++            for (unsigned clip = 0; clip < r->model->animations.size(); ++clip)
++            {
++                CHECK(a->SetAnimation(clip));
++                const auto rev = r->animation.revision;
++                CHECK(g.server.advance_models(.05));
++                CHECK(a->SetAnimation(clip) && r->animation.time == 0 && r->animation.revision > rev);
++                ++clips;
++            }
++            for (unsigned i = 0; i < 9; ++i)
++            {
++                a->m_bAnimating = false;
++                const bool present = table->m_nAnim_SPECIAL[i] < r->model->animations.size();
++                CHECK(a->MC_Special(i) == present);
++                if (present)
++                {
++                    ++tables;
++                    std::cout << name << " special" << i + 1
++                              << " duration=" << r->model->animations[r->animation.animation].duration << "\n";
++                }
++            }
++        }
++        std::cout << "Private NPC animation changes/resets=" << clips << "; available special slots=" << tables << "\n";
++        return true;
++    }
++    bool subway(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        HOBJECT old = nullptr;
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            CHECK(!g.objects.find_class("CivilianAI") && !g.objects.find_class("CultistAI"));
++            auto* a = actor<ScheduledCivilian>(g, "ScheduledCivilianProbe", {0, 10000, 0});
++            CHECK(a && !g.objects.get(old));
++            auto* r = g.objects.get(a->m_hObject);
++            CHECK(g.models.load("models/enemies/m_civilian1.abc", r->model, error));
++            auto table = std::make_shared<CAnim_Sound>();
++            CHECK(table->SetAnimationIndexes(a->m_hObject));
++            CHECK(table->SetSoundRoot("sounds/enemies/civilian") && a->InitStatics(table));
++            a->m_szAIState = "SPECIAL6";
++            CHECK(a->ComputeState(0));
++            g.server.SetNextUpdate(a->m_hObject, .001f);
++            for (int i = 0; i < 960; ++i)
++                CHECK(g.step(1. / 60));
++            CHECK(a->running && a->state_failures == 0 && a->animation_finishes > 0 && a->animation_starts > 1);
++            std::cout << "Subway diagnostic cycle=" << cycle << " starts=" << a->animation_starts
++                      << " finishes=" << a->animation_finishes << " dispatches=" << a->state_dispatches << "\n";
++            old = a->m_hObject;
++            CHECK(g.unload_world() && !g.objects.get(old) && g.server.string_count() == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::map<std::string, std::function<bool(const char*)>> tests{
++        {"symbols", symbols},     {"transitions", transitions}, {"commands", commands}, {"resize", resize},
++        {"decisions", decisions}, {"civilian", civilian},       {"dispatch", dispatch}, {"failures", failures},
++        {"lifetime", lifetime},   {"catalog", catalog},         {"subway", subway}};
++    auto t = tests.find(argv[1]);
++    return t != tests.end() && t->second(argc > 2 ? argv[2] : "") ? 0 : 1;
++}

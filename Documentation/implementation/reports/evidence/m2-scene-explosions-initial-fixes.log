@@ -1,0 +1,18 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start  47: services.private
+1/3 Test  #47: services.private .................   Passed    2.46 sec
+    Start  53: player.private
+2/3 Test  #53: player.private ...................   Passed    1.90 sec
+    Start 245: sound.subway
+3/3 Test #245: sound.subway .....................   Passed    0.53 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+headless    =   4.89 sec*proc (3 tests)
+player      =   1.90 sec*proc (1 test)
+private     =   4.89 sec*proc (3 tests)
+services    =   2.46 sec*proc (1 test)
+sound       =   0.53 sec*proc (1 test)
+
+Total Test time (real) =   4.89 sec

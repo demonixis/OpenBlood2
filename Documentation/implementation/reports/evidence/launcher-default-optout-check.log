@@ -1,0 +1,1 @@
+Fresh game-only configure: BLOOD2_BUILD_LAUNCHER=OFF, SDL_DIALOG=OFF; game target present, launcher/HTTP targets absent.

@@ -1,0 +1,37 @@
+[0/2] Re-checking globbed directories...
+[1/100] Scanning /home/yann/projects/lithtech/Blood2/src/engine/dls_bank.cpp for CXX dependencies
+[2/100] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[3/73] Scanning /home/yann/projects/lithtech/Blood2/tests/object_contract_tests.cpp for CXX dependencies
+[4/73] Scanning /home/yann/projects/lithtech/Blood2/src/app/world_sound_smoke.cpp for CXX dependencies
+[5/73] Scanning /home/yann/projects/lithtech/Blood2/tests/world_tests.cpp for CXX dependencies
+[6/73] Scanning /home/yann/projects/lithtech/Blood2/tests/sound_tests.cpp for CXX dependencies
+[7/73] Scanning /home/yann/projects/lithtech/Blood2/tests/service_coverage_tests.cpp for CXX dependencies
+[8/73] Scanning /home/yann/projects/lithtech/Blood2/tests/train_session_tests.cpp for CXX dependencies
+[9/73] Scanning /home/yann/projects/lithtech/Blood2/tests/dls_bank_tests.cpp for CXX dependencies
+[10/73] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[11/39] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[12/39] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[13/38] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[14/38] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[15/38] Generating CXX dyndep file tests/CMakeFiles/sound_tests.dir/CXX.dd
+[16/38] Generating CXX dyndep file tests/CMakeFiles/service_coverage_tests.dir/CXX.dd
+[17/38] Generating CXX dyndep file tests/CMakeFiles/train_session_tests.dir/CXX.dd
+[18/38] Generating CXX dyndep file tests/CMakeFiles/dls_bank_tests.dir/CXX.dd
+[19/37] Building CXX object CMakeFiles/engine.dir/src/engine/dls_bank.cpp.o
+[20/37] Linking CXX static library libengine.a
+[21/37] Building CXX object CMakeFiles/blood2_app.dir/src/app/world_sound_smoke.cpp.o
+[22/37] Building CXX object tests/CMakeFiles/object_contract_tests.dir/object_contract_tests.cpp.o
+[23/37] Building CXX object tests/CMakeFiles/world_tests.dir/world_tests.cpp.o
+[24/37] Building CXX object tests/CMakeFiles/sound_tests.dir/sound_tests.cpp.o
+[25/37] Building CXX object tests/CMakeFiles/service_coverage_tests.dir/service_coverage_tests.cpp.o
+[26/37] Building CXX object tests/CMakeFiles/train_session_tests.dir/__/src/app/model_scene.cpp.o
+[27/37] Building CXX object tests/CMakeFiles/train_session_tests.dir/train_session_tests.cpp.o
+[28/37] Linking CXX executable tests/config_tests
+[29/37] Linking CXX executable tests/object_contract_tests
+[30/37] Linking CXX executable blood2
+[31/37] Linking CXX executable tests/world_tests
+[32/37] Linking CXX executable tests/sound_tests
+[33/37] Linking CXX executable tests/service_coverage_tests
+[34/37] Linking CXX executable tests/dls_bank_tests
+[35/37] Linking CXX executable tests/train_session_tests
+[36/37] Linking CXX executable tests/music_asset_tests

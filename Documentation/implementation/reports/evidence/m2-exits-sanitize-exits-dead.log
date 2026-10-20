@@ -1,0 +1,14 @@
+477/480 Testing: exits.dead
+477/480 Test: exits.dead
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit_tests" "dead" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit-fixtures/dead"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"exits.dead" start time: Oct 16 17:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"exits.dead" end time: Oct 16 17:25 CEST
+"exits.dead" time elapsed: 00:00:00
+----------------------------------------------------------

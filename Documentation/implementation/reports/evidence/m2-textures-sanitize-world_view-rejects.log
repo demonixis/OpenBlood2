@@ -1,0 +1,14 @@
+311/318 Testing: world_view.rejects
+311/318 Test: world_view.rejects
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_view_tests" "rejects"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world_view.rejects" start time: Oct 16 09:17 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.rejects" end time: Oct 16 09:17 CEST
+"world_view.rejects" time elapsed: 00:00:00
+----------------------------------------------------------

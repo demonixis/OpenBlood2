@@ -1,0 +1,42 @@
+SubwayA created=204 unknown=0 failed=0 npcs=16 objects=227
+Entered objects=230
+Brush material=50 destructable=1
+Filtered result=2 target=1
+VIS t=0.0166667 from=camera1 pos=-64,256,2560 target=-32,191.854,2112 result=2 blocker=nglass1 flags=8413449 polygon=4294967295 fraction=0.794643 point=-38.5714,205.027,2204
+First tick objects=232 attachments=11
+Brush material=50 destructable=1
+Filtered result=2 target=1
+VIS t=1.01667 from=camera1 pos=-50.2857,251.429,2528 target=-32,191.854,2112 result=2 blocker=nglass1 flags=8413449 polygon=4294967295 fraction=0.778846 point=-36.044,205.029,2204
+Brush material=50 destructable=1
+Filtered result=2 target=1
+VIS t=2.01667 from=camera1 pos=-36.5714,246.857,2496 target=-32,191.854,2112 result=2 blocker=nglass1 flags=8413449 polygon=4294967295 fraction=0.760417 point=-33.0952,205.032,2204
+Brush material=50 destructable=1
+Filtered result=2 target=1
+VIS t=3.01667 from=camera1 pos=-22.8572,242.286,2464 target=-32,191.854,2112 result=2 blocker=nglass1 flags=8413449 polygon=4294967295 fraction=0.738636 point=-29.6104,205.035,2204
+Brush material=50 destructable=1
+Filtered result=2 target=1
+VIS t=4.01667 from=camera1 pos=-9.1429,237.714,2432 target=-32,191.854,2112 result=2 blocker=nglass1 flags=8413449 polygon=4294967295 fraction=0.7125 point=-25.4286,205.039,2204
+Brush material=50 destructable=1
+Filtered result=2 target=1
+VIS t=5.01667 from=camera1 pos=4.57156,233.143,2400 target=-32,191.854,2112 result=2 blocker=nglass1 flags=8413449 polygon=4294967295 fraction=0.680555 point=-20.3174,205.043,2204
+Brush material=50 destructable=1
+Filtered result=2 target=1
+VIS t=6.01667 from=camera1 pos=18.286,228.571,2368 target=-32,191.854,2112 result=2 blocker=nglass1 flags=8413449 polygon=4294967295 fraction=0.640624 point=-13.9284,205.049,2204
+Filtered result=2 target=0
+VIS t=7.01667 from=camera2 pos=-32,160,-2089.07 target=-32,191.854,2112 result=2 blocker=door2 flags=10510601 polygon=4294967295 fraction=0.014536 point=-32,160.463,-2028
+Filtered result=2 target=0
+VIS t=8.01667 from=camera2 pos=-32,160,-2633.07 target=-32,191.854,2112 result=2 blocker=door2 flags=10510601 polygon=4294967295 fraction=0.127515 point=-32,164.062,-2028
+Filtered result=2 target=0
+VIS t=9.01667 from=camera2 pos=-32,160,-3168 target=-32,191.854,2112 result=2 blocker=door2 flags=10510601 polygon=4294967295 fraction=0.215909 point=-32,166.878,-2028
+Boss activity=3 pings=0 animation=19
+Boss updates=2 state=101 health messages=1 error=
+SubwayA created=204 unknown=0 failed=0 npcs=16 objects=227
+Entered objects=230
+First tick objects=232 attachments=11
+Boss activity=3 pings=0 animation=19
+Boss updates=2 state=101 health messages=1 error=
+SubwayA created=204 unknown=0 failed=0 npcs=16 objects=227
+Entered objects=230
+First tick objects=232 attachments=11
+Boss activity=3 pings=0 animation=19
+Boss updates=2 state=101 health messages=1 error=

@@ -1,0 +1,14 @@
+621/624 Testing: player_controls.mouse
+621/624 Test: player_controls.mouse
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/player_controls_tests" "mouse"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"player_controls.mouse" start time: Oct 17 00:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.mouse" end time: Oct 17 00:03 CEST
+"player_controls.mouse" time elapsed: 00:00:00
+----------------------------------------------------------

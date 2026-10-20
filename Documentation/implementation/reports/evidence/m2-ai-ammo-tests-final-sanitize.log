@@ -1,0 +1,204 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start   1: objects.builtin_model
+ 1/94 Test   #1: objects.builtin_model ............   Passed    0.02 sec
+      Start   2: objects.original_objects
+ 2/94 Test   #2: objects.original_objects .........   Passed    0.02 sec
+      Start   3: objects.nested_creation
+ 3/94 Test   #3: objects.nested_creation ..........   Passed    0.02 sec
+      Start   4: objects.reasons_properties
+ 4/94 Test   #4: objects.reasons_properties .......   Passed    0.02 sec
+      Start   5: objects.scheduling
+ 5/94 Test   #5: objects.scheduling ...............   Passed    0.02 sec
+      Start   6: objects.deferred_removal
+ 6/94 Test   #6: objects.deferred_removal .........   Passed    0.02 sec
+      Start   7: objects.aggregate_dispatch
+ 7/94 Test   #7: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   8: objects.handles_selection
+ 8/94 Test   #8: objects.handles_selection ........   Passed    0.02 sec
+      Start   9: objects.links_lists
+ 9/94 Test   #9: objects.links_lists ..............   Passed    0.02 sec
+      Start  10: objects.messages_strings
+10/94 Test  #10: objects.messages_strings .........   Passed    0.04 sec
+      Start  11: objects.unsupported_teardown
+11/94 Test  #11: objects.unsupported_teardown .....   Passed    0.05 sec
+      Start  12: objects.creation_failures
+12/94 Test  #12: objects.creation_failures ........   Passed    0.03 sec
+      Start 171: pickup_audio.rules
+13/94 Test #171: pickup_audio.rules ...............   Passed    0.09 sec
+      Start 172: pickup_audio.failures
+14/94 Test #172: pickup_audio.failures ............   Passed    0.57 sec
+      Start 173: pickup_audio.callbacks
+15/94 Test #173: pickup_audio.callbacks ...........   Passed    0.08 sec
+      Start 174: pickup_audio.private
+16/94 Test #174: pickup_audio.private .............   Passed    2.20 sec
+      Start 175: pickups.defaults
+17/94 Test #175: pickups.defaults .................   Passed    0.10 sec
+      Start 176: pickups.ammunition
+18/94 Test #176: pickups.ammunition ...............   Passed    0.09 sec
+      Start 177: pickups.statistics
+19/94 Test #177: pickups.statistics ...............   Passed    0.09 sec
+      Start 178: pickups.protocol
+20/94 Test #178: pickups.protocol .................   Passed    0.08 sec
+      Start 179: pickups.contact
+21/94 Test #179: pickups.contact ..................   Passed    0.08 sec
+      Start 180: pickups.spawning
+22/94 Test #180: pickups.spawning .................   Passed    0.08 sec
+      Start 181: pickups.rejection
+23/94 Test #181: pickups.rejection ................   Passed    0.09 sec
+      Start 182: pickups.callbacks
+24/94 Test #182: pickups.callbacks ................   Passed    0.08 sec
+      Start 183: pickups.resources
+25/94 Test #183: pickups.resources ................   Passed    0.09 sec
+      Start 184: pickups.catalog
+26/94 Test #184: pickups.catalog ..................   Passed   14.38 sec
+      Start 355: ai_perception.factions
+27/94 Test #355: ai_perception.factions ...........   Passed    0.02 sec
+      Start 356: ai_perception.selection
+28/94 Test #356: ai_perception.selection ..........   Passed    0.02 sec
+      Start 357: ai_perception.visibility
+29/94 Test #357: ai_perception.visibility .........   Passed    0.02 sec
+      Start 358: ai_perception.hints
+30/94 Test #358: ai_perception.hints ..............   Passed    0.02 sec
+      Start 359: ai_perception.stimuli
+31/94 Test #359: ai_perception.stimuli ............   Passed    0.02 sec
+      Start 360: ai_perception.retaliation
+32/94 Test #360: ai_perception.retaliation ........   Passed    0.02 sec
+      Start 361: ai_perception.opportunity
+33/94 Test #361: ai_perception.opportunity ........   Passed    0.02 sec
+      Start 362: ai_perception.failures
+34/94 Test #362: ai_perception.failures ...........   Passed    0.02 sec
+      Start 363: ai_perception.lifetime
+35/94 Test #363: ai_perception.lifetime ...........   Passed    0.02 sec
+      Start 364: ai_perception.catalog
+36/94 Test #364: ai_perception.catalog ............   Passed    0.87 sec
+      Start 365: ai_perception.subway
+37/94 Test #365: ai_perception.subway .............   Passed    3.90 sec
+      Start 377: ai_fire.selection
+38/94 Test #377: ai_fire.selection ................   Passed    0.02 sec
+      Start 378: ai_fire.clearance
+39/94 Test #378: ai_fire.clearance ................   Passed    0.02 sec
+      Start 379: ai_fire.filters
+40/94 Test #379: ai_fire.filters ..................   Passed    0.02 sec
+      Start 380: ai_fire.head
+41/94 Test #380: ai_fire.head .....................   Passed    0.02 sec
+      Start 381: ai_fire.aim
+42/94 Test #381: ai_fire.aim ......................   Passed    0.02 sec
+      Start 382: ai_fire.keys
+43/94 Test #382: ai_fire.keys .....................   Passed    0.02 sec
+      Start 383: ai_fire.cadence
+44/94 Test #383: ai_fire.cadence ..................   Passed    0.02 sec
+      Start 384: ai_fire.recovery
+45/94 Test #384: ai_fire.recovery .................   Passed    0.02 sec
+      Start 385: ai_fire.failures
+46/94 Test #385: ai_fire.failures .................   Passed    0.02 sec
+      Start 386: ai_fire.lifetime
+47/94 Test #386: ai_fire.lifetime .................   Passed    0.02 sec
+      Start 387: ai_fire.script_stand
+48/94 Test #387: ai_fire.script_stand .............   Passed    0.02 sec
+      Start 388: ai_fire.script_moving
+49/94 Test #388: ai_fire.script_moving ............   Passed    0.02 sec
+      Start 389: ai_fire.script_refusal
+50/94 Test #389: ai_fire.script_refusal ...........   Passed    0.02 sec
+      Start 390: ai_fire.script_lifetime
+51/94 Test #390: ai_fire.script_lifetime ..........   Passed    0.03 sec
+      Start 391: ai_fire.script_routes
+52/94 Test #391: ai_fire.script_routes ............   Passed    0.02 sec
+      Start 392: ai_fire.catalog
+53/94 Test #392: ai_fire.catalog ..................   Passed    0.92 sec
+      Start 393: ai_fire.subway
+54/94 Test #393: ai_fire.subway ...................   Passed   11.75 sec
+      Start 394: ai_fire.script_private
+55/94 Test #394: ai_fire.script_private ...........   Passed   15.73 sec
+      Start 448: ai_recovery.jump
+56/94 Test #448: ai_recovery.jump .................   Passed    0.02 sec
+      Start 449: ai_recovery.jump_physics
+57/94 Test #449: ai_recovery.jump_physics .........   Passed    0.02 sec
+      Start 450: ai_recovery.crouch
+58/94 Test #450: ai_recovery.crouch ...............   Passed    0.02 sec
+      Start 451: ai_recovery.crawling
+59/94 Test #451: ai_recovery.crawling .............   Passed    0.02 sec
+      Start 452: ai_recovery.clearance
+60/94 Test #452: ai_recovery.clearance ............   Passed    0.02 sec
+      Start 453: ai_recovery.topos
+61/94 Test #453: ai_recovery.topos ................   Passed    0.02 sec
+      Start 454: ai_recovery.plans
+62/94 Test #454: ai_recovery.plans ................   Passed    0.02 sec
+      Start 455: ai_recovery.around
+63/94 Test #455: ai_recovery.around ...............   Passed    0.02 sec
+      Start 456: ai_recovery.search
+64/94 Test #456: ai_recovery.search ...............   Passed    0.02 sec
+      Start 457: ai_recovery.lifetime
+65/94 Test #457: ai_recovery.lifetime .............   Passed    0.02 sec
+      Start 458: ai_recovery.moving_fire
+66/94 Test #458: ai_recovery.moving_fire ..........   Passed    0.02 sec
+      Start 459: ai_recovery.keys
+67/94 Test #459: ai_recovery.keys .................   Passed    0.02 sec
+      Start 460: ai_recovery.fire_lifetime
+68/94 Test #460: ai_recovery.fire_lifetime ........   Passed    0.02 sec
+      Start 461: ai_recovery.smell_guards
+69/94 Test #461: ai_recovery.smell_guards .........   Passed    0.02 sec
+      Start 462: ai_recovery.smell_route
+70/94 Test #462: ai_recovery.smell_route ..........   Passed    0.02 sec
+      Start 463: ai_recovery.smell_lifetime
+71/94 Test #463: ai_recovery.smell_lifetime .......   Passed    0.02 sec
+      Start 464: ai_recovery.catalog
+72/94 Test #464: ai_recovery.catalog ..............   Passed    0.88 sec
+      Start 476: ai_runtime.ammo_receive
+73/94 Test #476: ai_runtime.ammo_receive ..........   Passed    0.02 sec
+      Start 477: ai_runtime.ammo_search
+74/94 Test #477: ai_runtime.ammo_search ...........   Passed    0.02 sec
+      Start 478: ai_runtime.activation
+75/94 Test #478: ai_runtime.activation ............   Passed    0.02 sec
+      Start 479: ai_runtime.animation_clearance
+76/94 Test #479: ai_runtime.animation_clearance ...   Passed    0.02 sec
+      Start 480: ai_runtime.visibility
+77/94 Test #480: ai_runtime.visibility ............   Passed    0.02 sec
+      Start 481: ai_runtime.visibility_filter
+78/94 Test #481: ai_runtime.visibility_filter .....   Passed    0.02 sec
+      Start 482: ai_runtime.visibility_atomic
+79/94 Test #482: ai_runtime.visibility_atomic .....   Passed    0.02 sec
+      Start 483: ai_runtime.lifetime
+80/94 Test #483: ai_runtime.lifetime ..............   Passed    0.02 sec
+      Start 484: ai_runtime.targets
+81/94 Test #484: ai_runtime.targets ...............   Passed    0.02 sec
+      Start 485: ai_runtime.tracking
+82/94 Test #485: ai_runtime.tracking ..............   Passed    0.02 sec
+      Start 486: ai_runtime.camera
+83/94 Test #486: ai_runtime.camera ................   Passed    0.02 sec
+      Start 487: ai_runtime.spatial
+84/94 Test #487: ai_runtime.spatial ...............   Passed    0.02 sec
+      Start 488: ai_runtime.triggers
+85/94 Test #488: ai_runtime.triggers ..............   Passed    0.02 sec
+      Start 489: ai_runtime.body
+86/94 Test #489: ai_runtime.body ..................   Passed    0.02 sec
+      Start 490: ai_runtime.missing
+87/94 Test #490: ai_runtime.missing ...............   Passed    0.02 sec
+      Start 491: ai_runtime.catalog
+88/94 Test #491: ai_runtime.catalog ...............   Passed    2.20 sec
+      Start 492: ai_runtime.failures
+89/94 Test #492: ai_runtime.failures ..............   Passed    0.28 sec
+      Start 493: ai_runtime.subway
+90/94 Test #493: ai_runtime.subway ................   Passed   21.26 sec
+      Start 494: ai_runtime.arena
+91/94 Test #494: ai_runtime.arena .................   Passed    1.60 sec
+      Start 495: ai_runtime.sparse_weapons
+92/94 Test #495: ai_runtime.sparse_weapons ........   Passed    0.59 sec
+      Start 496: ai_runtime.clearance_private
+93/94 Test #496: ai_runtime.clearance_private .....   Passed   87.09 sec
+      Start 497: ai_runtime.ammo_private
+94/94 Test #497: ai_runtime.ammo_private ..........   Passed    1.33 sec
+
+100% tests passed, 0 tests failed out of 94
+
+Label Time Summary:
+ai_fire          =  28.74 sec*proc (18 tests)
+ai_perception    =   4.94 sec*proc (11 tests)
+ai_recovery      =   1.23 sec*proc (17 tests)
+ai_runtime       = 114.66 sec*proc (22 tests)
+audio            =   2.94 sec*proc (4 tests)
+headless         = 167.95 sec*proc (94 tests)
+objects          =   0.29 sec*proc (12 tests)
+pickups          =  18.09 sec*proc (14 tests)
+private          = 164.99 sec*proc (15 tests)
+
+Total Test time (real) = 167.98 sec

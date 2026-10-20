@@ -1,0 +1,2369 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index d497792..da21f03 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -18,7 +18,7 @@ Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentatio
+ 
+ - Read [docs/WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) before extending inventory, client weapon input/animation, ray fire or damage. Beretta/knife are selective original ports; preserve every FIRE_KEY event (including the two primary knife markers), owned weapon/client models and deferred hit-callback removal. Other weapons, pickups, full combat, audio/FX and muzzle/hand placement are still open. Keep typed shot/damage messages separate from legacy packet ABI; portable seeded randomness is not claimed retail-bit-identical.
+ 
+-- Read [docs/MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) before extending original MoveMgr, player input or support queries. Client-associated players use one shared body and skip generic physics; typed movement must resolve collision exactly once. Keep source rules separate from the documented replacement integrator. Read [docs/LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for current stairs, crouch/animation dimensions, source clip fallbacks and clearance. Selected containers are covered by the contracts below; translating platforms are covered by the door contracts below; rotating transport remains pending.
++- Read [docs/MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) before extending original MoveMgr, player input or support queries. Client-associated players use one shared body and skip generic physics; typed movement must resolve collision exactly once. Keep source rules separate from the documented replacement integrator. Read [docs/LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for current stairs, crouch/animation dimensions, source clip fallbacks and clearance. Selected containers are covered by the contracts below; translating platforms are covered by the door contracts below; bounded rotating transport is covered by the interaction contracts below.
+ 
+ - Follow `.clang-format` and `.editorconfig`. Use `OpenBlood2` for project-owned C++ namespaces; preserve source-global SDK/game classes. Commit code and English documentation after each completed run, in their respective independent repositories.
+ - Locomotion shape changes are atomic and foot-anchored. A blocked standing attempt preserves the short body and camera; this also applies to alive entry resets. Preserve original `CheckAnims` fallback and expose resolved clips. Keep the new stair solver explicitly separate from verified retail behavior.
+@@ -40,12 +40,20 @@ Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentatio
+   door triggers or collision. Translating Door is a selective original port;
+   its atomic pusher/rider solver is replacement engine code. Preserve checked
+   named geometry, actual bounds centers, atomic blocking, one shared player
+-  integration and deferred touch removal. Rotation, crushing, audio/portals and the complete M2 gate remain explicitly pending.
++  integration and deferred touch removal. Rotation is extended by the interaction contracts below; crushing, audio/portals and the complete M2 gate remain explicitly pending.
+ 
+ - Read [docs/TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending
+   Trigger/BigTrigger/ToggleTrigger, door SelfTriggers or key inventory/pickups.
+   Preserve the original active-command guard, player-only lock query, consuming
+   key uses, named-filter order, delayed-toggle behavior and typed message ownership.
+   SelfTriggers are owned, stationary children; pending parents cannot activate them.
+-  Player USE ray/input, generic pickups, audio/localized feedback and save/restore
+-  remain pending. Keep source-entry counts distinct from generated runtime children.
++  Player USE ray/input is extended below; generic pickups, audio/localized feedback
++  and save/restore remain pending. Keep source-entry counts distinct from generated runtime children.
++
++- Read [docs/INTERACTION_CONTRACTS.md](docs/INTERACTION_CONTRACTS.md) before extending
++  player USE, rotating doors or collision. Preserve the 82-unit eye ray and
++  direct-Door exclusion, press-edge input, source double angular increment and
++  StartOpen behavior. Keep the authored shell immutable, transforms/body moves
++  atomic, player push velocity consumed once and contact removal deferred.
++  Conservative bounds/work limits must remain visible; this is not verified
++  retail physics. Other movers, crushing and complete gameplay remain pending.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c4efd4b..ac13154 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -33,14 +33,14 @@ add_library(blood2_game STATIC
+     src/game/registration.cpp
+     src/game/server_adapter.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+-target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
++target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+     src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+ target_link_libraries(blood2_game PUBLIC engine)
+ 
+-add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp)
++add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+diff --git a/README.md b/README.md
+index 2ca0e14..49a8496 100644
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,6 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
+-A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory and KeyPickup are connected; complete player gameplay remains missing. This is not a playable game.
++A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory, KeyPickup, original player USE and RotatingDoor are connected; complete player gameplay remains missing. This is not a playable game.
+ 
+ The three runtime targets remain small: `engine` (resources, world/object runtime, configuration, SDL_GPU), `blood2_game` (original code and typed services) and `blood2_app` (`blood2`, optional Dear ImGui). No previous prototype is a build dependency, and no EnTT/ECS was introduced.
+ 
+@@ -28,7 +28,7 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
+ 
+ The default world is `01_SubwayA`. Its patched DAT supplies 580 source objects and 116 BSP models. **38 source instances** run (`GameStartPoint`, `Key`, `PathPoint`, `WorldProperties`, `Conveyor`, `Damage`, `Door`, `Trigger`), plus **7 door-owned SelfTriggers** (45 runtime instances before player entry); 372 entries are original preprocessor-only objects and **170 required runtime objects remain unported**. Every source entry remains inspectable.
+ 
+-The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look. Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Inspector commands test the message path; the original player USE ray, rotating doors, audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
++The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Inspector commands test the direct message path. Audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
+ 
+ ## Configuration and Modes
+ 
+@@ -47,6 +47,7 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
+ | `--inspect-player` | Headless original shell/player entry inspection, with explicit gameplay blockers |
+ | `--player-smoke` | GPU Session panel, hidden player updates, unload/re-entry checks |
+ | `--weapons-smoke` | GPU Beretta/knife firing while hidden, unload/re-entry; capture at frame 181 |
++| `--interaction-smoke` | GPU SDL E press-edge USE, missing-key denial/unlock, synthetic rotating hinge, hidden motion and reload |
+ | `--triggers-smoke` | GPU missing-key denial, real key pickup, hidden unlock/door movement, resize and reload |
+ | `--doors-smoke` | GPU original Door commands, hidden translation, resize, unload/reload; capture at frame 15 |
+ | `--movement-smoke` | GPU SDL walk/run/jump/crouch, live body pose and hidden stance changes, unload/re-entry; capture at frame 181 |
+@@ -62,7 +63,7 @@ ctest --preset debug
+ ctest --preset debug -L world
+ ```
+ 
+-There are **96 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases 6 door/mover/collision/lifetime cases and 8 trigger/key/ownership/contact cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
++There are **105 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases 6 door/mover/collision/lifetime cases 8 trigger/key/ownership/contact cases and 9 USE/rotation/input/transport cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
+ 
+ Enable installation-specific tests and real GPU windows explicitly:
+ 
+@@ -72,7 +73,7 @@ cmake --build --preset debug --parallel
+ ctest --preset debug
+ ```
+ 
+-The configured installation adds fourteen private headless tests and nine GPU tests, for **119 cases**. GPU captures are `build/debug/tests/gpu.png` , `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png` `doors.png` and `triggers.png`. The ignored local presets enable these options:
++The configured installation adds fifteen private headless tests and ten GPU tests, for **130 cases**. GPU captures are `build/debug/tests/gpu.png` , `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png` `doors.png`, `triggers.png` and `interaction.png`. The ignored local presets enable these options:
+ 
+ ```sh
+ cmake --preset local-debug
+@@ -89,9 +90,9 @@ On Windows use an MSVC Developer PowerShell and the same CMake/Ninja commands, t
+ 
+ ## Contracts and Remaining Work
+ 
+-Read [world/session contracts](docs/WORLD_CONTRACTS.md), [object contracts](docs/OBJECT_CONTRACTS.md), [provenance](docs/PROVENANCE.md) and [M2 results](../Documentation/Implementation/M2.md). The [roadmap's M2 gate](../Documentation/Roadmap/03_MILESTONES.md#m2--connect-world-session-and-gameplay-services) remains open: complete player/gameplay callbacks, required world classes, player USE interaction, rotating world-model collision and remaining original services must still be connected. See the [service continuation](../Documentation/Implementation/M2_SERVICES.md) for the new tested subset. M3 has not started.
++Read [world/session contracts](docs/WORLD_CONTRACTS.md), [object contracts](docs/OBJECT_CONTRACTS.md), [provenance](docs/PROVENANCE.md) and [M2 results](../Documentation/Implementation/M2.md). The [roadmap's M2 gate](../Documentation/Roadmap/03_MILESTONES.md#m2--connect-world-session-and-gameplay-services) remains open: complete player/gameplay callbacks, required world classes, broader mover/physics behavior and remaining original services must still be connected. See the [service continuation](../Documentation/Implementation/M2_SERVICES.md) for the new tested subset. M3 has not started.
+ 
+-The [trigger/key continuation](../Documentation/Implementation/M2_TRIGGERS.md) is the latest evidence; read [TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending activation, keys or SelfTrigger ownership. The [door continuation](../Documentation/Implementation/M2_DOORS.md) records the previous stage; read [DOOR_CONTRACTS.md](docs/DOOR_CONTRACTS.md) before extending world-model motion or door commands. The [specialized volume continuation](../Documentation/Implementation/M2_SPECIALIZED_VOLUMES.md) records the preceding stage (Conveyor, Damage, FreeFall and level-entry damage protection). Read [SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md) before extending these branches. The [container continuation](../Documentation/Implementation/M2_CONTAINERS.md) records the preceding stage. Read [CONTAINER_CONTRACTS.md](docs/CONTAINER_CONTRACTS.md) for original VolumeBrush/MoveMgr/air rules, static shell queries and pending effects. The [locomotion continuation](../Documentation/Implementation/M2_LOCOMOTION.md) records the prior stage. Read [LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for source clip fallbacks, atomic resize and the replacement stair solver. Read [MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) for the original MoveMgr subset, shared body, timing and grounding adaptations, and the subsequent translating platform extension. The [weapon continuation](../Documentation/Implementation/M2_WEAPONS.md) retains the earlier weapon evidence. Read [WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) for ownership, original behavior and deliberate limits. Read [PLAYER_CONTRACTS.md](docs/PLAYER_CONTRACTS.md) before extending the source subsets, typed client messages or player lifetime. Entry inspection succeeds; `--start-game` still fails with missing gameplay services.
++The [USE/rotation continuation](../Documentation/Implementation/M2_INTERACTION.md) is the latest evidence; read [INTERACTION_CONTRACTS.md](docs/INTERACTION_CONTRACTS.md) before extending USE, rotating collision or player door pushes. The [trigger/key continuation](../Documentation/Implementation/M2_TRIGGERS.md) records the preceding stage; read [TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending activation, keys or SelfTrigger ownership. The [door continuation](../Documentation/Implementation/M2_DOORS.md) records the previous stage; read [DOOR_CONTRACTS.md](docs/DOOR_CONTRACTS.md) before extending world-model motion or door commands. The [specialized volume continuation](../Documentation/Implementation/M2_SPECIALIZED_VOLUMES.md) records the preceding stage (Conveyor, Damage, FreeFall and level-entry damage protection). Read [SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md) before extending these branches. The [container continuation](../Documentation/Implementation/M2_CONTAINERS.md) records the preceding stage. Read [CONTAINER_CONTRACTS.md](docs/CONTAINER_CONTRACTS.md) for original VolumeBrush/MoveMgr/air rules, static shell queries and pending effects. The [locomotion continuation](../Documentation/Implementation/M2_LOCOMOTION.md) records the prior stage. Read [LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for source clip fallbacks, atomic resize and the replacement stair solver. Read [MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) for the original MoveMgr subset, shared body, timing and grounding adaptations, and the subsequent translating platform extension. The [weapon continuation](../Documentation/Implementation/M2_WEAPONS.md) retains the earlier weapon evidence. Read [WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) for ownership, original behavior and deliberate limits. Read [PLAYER_CONTRACTS.md](docs/PLAYER_CONTRACTS.md) before extending the source subsets, typed client messages or player lifetime. Entry inspection succeeds; `--start-game` still fails with missing gameplay services.
+ 
+ ## Source conventions
+ 
+diff --git a/docs/DOOR_CONTRACTS.md b/docs/DOOR_CONTRACTS.md
+index d387fb9..7fa8420 100644
+--- a/docs/DOOR_CONTRACTS.md
++++ b/docs/DOOR_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Sliding doors and translating world models
+ 
++> Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
++> are connected with bounded atomic collision. Earlier omissions below describe
++> their previous increments; the full M2 gate remains open.
++
+ > Extended by [TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md): SelfTrigger ownership,
+ > key relay and transported-body sensor contacts are now connected. Earlier
+ > pending statements below describe the sliding-door increment.
+diff --git a/docs/INTERACTION_CONTRACTS.md b/docs/INTERACTION_CONTRACTS.md
+new file mode 100644
+index 0000000..4fa16f1
+--- /dev/null
++++ b/docs/INTERACTION_CONTRACTS.md
+@@ -0,0 +1,142 @@
++# Player USE and rotating doors
++
++This extends [TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md),
++[DOOR_CONTRACTS.md](DOOR_CONTRACTS.md) and
++[MOVEMENT_CONTRACTS.md](MOVEMENT_CONTRACTS.md). M2 remains open.
++[Source selections](M2_INTERACTION_SOURCES.json) separate original game rules
++from replacement engine services; [validation](../../Documentation/Implementation/M2_INTERACTION.md)
++records the exercised scope.
++
++## Original USE branch
++
++`CPlayerObj::OnCommandUse` selects the ordinary `OnCommandOn(COMMAND_USE)`
++branch from PlayerObj.cpp. It casts **82 original units**, from the current
++server position plus the current eye level, in the pitch/yaw forward direction.
++It sends the owned original `TRIGGER` string through `MID_TRIGGER` to the nearest
++hit object **unless that object inherits Door**, including RotatingDoor.
++A SelfTrigger is a separate nonsolid target and can therefore relay USE to its
++parent, including the existing consuming key query. There is no direct-door
++fallback, extended reach, target cycling or bypass of an occluding object.
++
++The typed `PlayerUse` message validates the local client/player association and
++finite bounded angles. The source server-shell command callback is replaced by
++that checked local dispatch. Client `UpdateUse` detects the rising edge; holding
++USE does not repeat. The application binds physical **E**, enabled with **F2**,
++alongside the existing movement/look controls. Focus loss clears keys; text
++editing/disabled controls suppress USE until a held E is released. Keyboard
++repeat cannot revive a held USE key after focus loss. Hiding the inspector with
++F1 does not disable input or simulation. USE runs after the shared MoveMgr body
++and camera update, so it uses this frame's position, stance and look direction.
++
++`SegmentObjects::All` includes nonsolid objects, unlike weapon queries. Container
++and world-model rays use their actual shells; ordinary objects use their AABBs.
++Pending objects are skipped. Equal-distance ties keep the primary world first,
++then the stable object enumeration order. The player is explicitly excluded.
++Enclosing objects do not produce an interior-start USE hit: later LithTech's
++`fullintersectline.cpp` makes these hits opt-in with
++`CHECK_FROM_POINT_INSIDE_OBJECTS`, which the original USE query does not request.
++This source-informed engine adaptation is not a verified retail ray/BSP replica;
++inside-world-model exit-face behavior is not implemented. Weapon ray semantics
++are unchanged.
++
++The original movement-block guard is retained. Multiplayer respawn, slow-death
++rescue, creature use, menus and saved-game restoration remain outside the selected
++session. A blocked or rejected USE does not tear down an otherwise valid client.
++Synchronous callbacks can remove targets or the player; destruction remains at
++the frame boundary and subsequent client work revalidates the association.
++
++## Original RotatingDoor rules
++
++RotatingDoor inherits the existing Door state machine, commands, scheduling,
++SelfTrigger ownership, lock relay, sound-request metadata and desired portal
++state. Its original defaults override BoxPhysics to false and PushPlayerBack to
++true, and add RotationPoint and RotationAngles. Speed/ClosingSpeed are converted
++from degrees to radians. Authored Rotation retains its Euler radians; the three
++RotationAngles components are degree offsets from those closed angles.
++
++The selected source preserves several unusual details:
++
++- `CalcAngle` contains **two identical increments** per update. Both remain,
++  including the possible one-update overshoot and later endpoint clamp.
++- Its asymmetric direction test compares both branches with **positive one
++  degree**; it is not replaced with a symmetric epsilon test.
++- Zero angular span has a defined endpoint instead of source `0/0` arithmetic.
++- Door's `StartOpen` only swaps/translates its positional endpoints. RotatingDoor
++  does not swap its angular endpoints or initially turn through RotationAngles.
++- `DoRotation` computes position as `RotationPoint + rotation *
++  (original_position - RotationPoint)`, using the absolute Euler rotation.
++  Authored initial rotation can consequently request a first-update positional
++  change. The service interpolates that displacement without an unchecked jump.
++- An unsuccessful transform leaves all angles, positions and geometry unchanged;
++  it cannot report an open/closed endpoint. The door retries on later updates.
++
++The new virtual `Door::Move` dispatch replaces the source's Opening/Closing
++virtual methods without changing the shared Door callback/aggregate chain.
++Nonfinite parameters, mismatched current rotation, excessive transforms and
++unsupported restore creation fail explicitly. Nonidentity quaternion-only
++Rotation properties without equivalent stored Euler angles reject at creation;
++retail DAT Euler properties are supported. No property-name alias is guessed.
++
++The original player `ObjectTouch` opening-door branch records a **-500 unit/s
++body-forward velocity** when PushPlayerBack is enabled, once while pending.
++The local equivalent of the source's added-velocity update is applied before
++MoveMgr, then consumed once; it is not another position integration. Live respawn
++clears it. PushPlayerBack does not disable ordinary kinematic body/rider transport.
++The old force-ignore limit and crush notification protocol are not reconstructed;
++typed atomic blocking replaces the unsafe rotate/move/rollback sequence.
++Rejected transactions emit no touch or speculative push impulse.
++
++## Replacement rotation collision
++
++This is new engine code, **not recovered or verified retail physics**.
++
++The checked authored shell and its initial rotation remain immutable. Each pose
++is rebuilt from that basis with `desired * inverse(authored)` rotation and its
++current pivot, avoiding accumulated vertex drift and double rotation. The posed
++shell, triangle BVH, actual bounds center and dimensions commit together. Rays,
++body movement, clearance, support and the inspector read that same pose. Static
++containers continue rejecting runtime transforms.
++
++The service follows the unwrapped Euler path, including multi-axis/large-angle
++requests, rather than choosing a shortest quaternion arc. A vertex-travel bound
++subdivides it into at most 0.5-unit steps. Swept envelopes conservatively detect
++potential contacts; bodies keep axis-aligned dimensions. Riders are identified
++by fresh support, honoring DONTFOLLOWSTANDING and jump detachment. Pure yaw has
++no vertical envelope inflation that would spuriously drag a detached top rider.
++Potentially contacted bodies follow the rigid displacement, with at most eight
++bounded forward separation attempts for AABB corner growth. An unresolved
++contact blocks the entire request.
++
++Each proposed body path is checked against primary geometry and other old scene
++positions; staged body positions are also checked against each other. Other
++world models remain immovable, using conservative bounds. GOTHRUWORLD lets the
++door enter its wall pocket. No chain pushing, crushing damage, mass/impulse
++solver or retail blocking priorities are claimed. Conservative envelopes can
++push slightly early or reject otherwise feasible moves.
++
++Limits are **512 subdivisions, 262,144 triangle-steps and 64 affected bodies**
++per transform. Exceeding geometry/time work limits returns Unavailable; the
++requested angles do not advance. The implementation copies/rebuilds a bounded
++pose/BVH per subdivision; broad-scene performance still needs profiling.
++
++All positions commit before original mover/body touch callbacks. Transported
++bodies sweep nonsolid sensors along their accepted subdivided paths; each sensor
++receives at most one contact per body/transaction. Handles are rechecked after
++callbacks, removal stays deferred, reentrant motion fails. Direct sensor
++crossings by the door mesh itself remain pending. The local player still has
++one MoveMgr integration and one same-frame camera/weapon update.
++
++## Inspection and remaining gate
++
++**Session** shows USE command/message counts, the last ray endpoints, target,
++distance, result, direct-door refusal and pending/consumed door push requests.
++**Doors** includes hidden/inactive RotatingDoor instances, posed geometry, hinge,
++Euler angles, authored angular offsets, angular speeds, subdivision count,
++blocker, push/rider counts and SelfTrigger state. **World** retains every rejected
++source entry and reason. Inspector TRIGGER buttons remain direct diagnostic
++commands; they do not pretend to enforce the player ray's reach/occlusion.
++
++RotatingBrush, trains/path movers, complete AI/player/combat callbacks, generic
++pickups, audio playback, portal visibility, save/restore, world transitions and
++other platform/XR validation remain pending. Successful inspection and this
++interaction subset do not close M2 or make the game playable.
+diff --git a/docs/M2_INTERACTION_SOURCES.json b/docs/M2_INTERACTION_SOURCES.json
+new file mode 100644
+index 0000000..3f07227
+--- /dev/null
++++ b/docs/M2_INTERACTION_SOURCES.json
+@@ -0,0 +1,148 @@
++{
++  "date": "2026-10-15",
++  "status": "M2 incomplete; original player USE and RotatingDoor connected for the bounded inspection session",
++  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "imports": [
++    {
++      "source": "sources/blood2/ObjectDLL/RotatingDoor.cpp",
++      "target": "src/game/original/RotatingDoor.cpp",
++      "source_line_ranges": [
++        [
++          31,
++          89
++        ],
++        [
++          108,
++          458
++        ]
++      ],
++      "selection": "Property reads, radians conversion, initial angles/directions, opening/closing, pivot transform and duplicated CalcAngle; finite guards, zero-span guard and typed atomic transform replace engine rotate/move rollback. No save/load, force-ignore service or audio playback.",
++      "kind": "selective original game port",
++      "source_sha256": "630b6beddb500714bb9f880774f49f273bf1bdf86adb866322bc4e7ae621d28a",
++      "target_sha256": "1754e8b347b36c71a220eee159b3b4466246053a6d34c75a05244465ee60ebe0"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/RotatingDoor.h",
++      "target": "src/game/original/RotatingDoor.h",
++      "source_line_ranges": [
++        [
++          1,
++          59
++        ]
++      ],
++      "selection": "Original Door inheritance and angular/pivot/push state; shared Move(bool) dispatch replaces separate Opening/Closing overrides.",
++      "kind": "selective original game port",
++      "source_sha256": "fdcc674e39668b5e2a29fbfc8cb41095e734d44453fdfd785bfb9ca112a10bc1",
++      "target_sha256": "4ca9ecbc3fb7763ac0d09e298b580480101d274ac12867cadbf9e7e34a346f7c"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/RotatingDoor.cpp",
++      "target": "src/game/registration.cpp",
++      "source_line_ranges": [
++        [
++          20,
++          29
++        ]
++      ],
++      "selection": "RotatingDoor registration overrides and properties; inherited Door defaults retained.",
++      "kind": "selective original game port",
++      "source_sha256": "630b6beddb500714bb9f880774f49f273bf1bdf86adb866322bc4e7ae621d28a",
++      "target_sha256": "4cb8579975601b7de33f7a24e28f79acc1ff212748fa654f6cfd54f5ae781134"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Door.h",
++      "target": "src/game/original/Door.h",
++      "source_line_ranges": [
++        [
++          48,
++          64
++        ]
++      ],
++      "selection": "Expose shared protected state methods and virtual Move dispatch for selected original RotatingDoor rules.",
++      "kind": "selective original game port",
++      "source_sha256": "1d5fdbece8133f3d9656f180eb8e0055cc082cb9fc7f2542efb1c60d61a73611",
++      "target_sha256": "1a5e9667f4cf337e387f701986405fc68624e27a4b15aeb37e24bf5fc49eb437"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "target": "src/game/original/PlayerUse.cpp",
++      "source_line_ranges": [
++        [
++          283,
++          283
++        ],
++        [
++          2388,
++          2419
++        ],
++        [
++          2884,
++          2958
++        ],
++        [
++          6298,
++          6305
++        ]
++      ],
++      "selection": "Ordinary COMMAND_USE eye ray and direct-door exclusion; opening RotatingDoor body-forward -500 velocity request and once-consumed added velocity. No multiplayer respawn, slow death, creature or complete player physics.",
++      "kind": "selective original game port",
++      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "target_sha256": "ff7229fb9cd46560a91475078a8b7891b4fcffc6c2701f2d14a17ee08ecfb597"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "target": "src/game/original/PlayerObj.cpp",
++      "source_line_ranges": [
++        [
++          633,
++          634
++        ]
++      ],
++      "selection": "Alive respawn clears pending door push; engine touch dispatch connects the selected original branch.",
++      "kind": "selective original game port",
++      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "target_sha256": "83df6af9158e36a2f8b6f045577388ef19755a7d5a65956ecff06acc6edee545"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
++      "target": "src/game/original/BloodShells.cpp",
++      "source_line_ranges": [
++        [
++          533,
++          545
++        ]
++      ],
++      "selection": "Original command callback resolves the client player and forwards command-on; adaptation uses checked PlayerUse/rotation values and device-independent rising-edge input.",
++      "kind": "selective original game port",
++      "source_sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
++      "target_sha256": "be768fef6da65f6b8e18c9e166bd73dcaacdf28d176bc405cf430f7ff044eb4d"
++    },
++    {
++      "source": "sources/lithtech/runtime/world/src/fullintersectline.cpp",
++      "target": "src/game/server_weapons.cpp",
++      "source_line_ranges": [
++        [
++          131,
++          230
++        ],
++        [
++          608,
++          650
++        ]
++      ],
++      "selection": "Later-generation non-solid query filtering and optional interior-start box hits inform the USE entry-face ray adaptation; not proof of retail Blood II engine behavior. Existing solid weapon filtering retained.",
++      "kind": "cross-generation engine reference, not imported",
++      "source_sha256": "f199f999a63986325675d9cb1bf2bdede98942e03cf0725dab937f506f6f3409",
++      "target_sha256": "76cfe88ebce166e21dfdc24d767070db0971df4fabae40cfe97f89107ab5be62"
++    }
++  ],
++  "engine_adaptations": [
++    "Typed local USE dispatch, finite angles, nearest non-solid geometry and explicit self/interior-start exclusion",
++    "Physical E press-edge binding with focus/text/disabled suppression; no SDL in game messages",
++    "Immutable authored geometry basis, current posed shell/BVH, typed angular path and atomic geometry/body commit",
++    "Conservative 0.5-unit vertex-travel subdivision, 512 steps, 262144 triangle-steps and 64 affected bodies; not retail CCD/physics",
++    "Replacement body/rider transport, bounded AABB separation, primary/other-world blocking and deferred path sensor contacts",
++    "Original player -500 body-forward request consumed once before shared MoveMgr; no force/crush service replica",
++    "Synthetic GPU hinge fixture uses existing retail player resources; no commercial content copied"
++  ]
++}
+diff --git a/docs/MOVEMENT_CONTRACTS.md b/docs/MOVEMENT_CONTRACTS.md
+index 3fd9999..dcaa1ff 100644
+--- a/docs/MOVEMENT_CONTRACTS.md
++++ b/docs/MOVEMENT_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original MoveMgr Boundary
+ 
++> Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
++> are connected with bounded atomic collision. Earlier omissions below describe
++> their previous increments; the full M2 gate remains open.
++
+ > Extended by [CONTAINER_CONTRACTS.md](CONTAINER_CONTRACTS.md): selected original
+ > liquids/ladders and head/body queries are now connected. Earlier pending
+ > container statements describe the dry-land increment.
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index c7214b3..14faef5 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original Player Entry Boundary
+ 
++> Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
++> are connected with bounded atomic collision. Earlier omissions below describe
++> their previous increments; the full M2 gate remains open.
++
+ > Key inventory, pickup and query messages are extended by
+ > [TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md); prior key/pickup omissions below
+ > describe their earlier increment. General item/combat coverage remains pending.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 66fafec..ee6d78b 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -253,3 +253,15 @@ name fallback, collision extension and remaining USE/feedback/persistence limits
+ Later LithTech timer documentation informs the ResetTime<=0 convention; it is not
+ claimed to establish retail Blood II engine parity. Earlier ledgers stay historical.
+ No prototype dependency, reference source or commercial asset was imported.
++
++
++## M2 original USE and rotating-door continuation
++
++[Source selections](M2_INTERACTION_SOURCES.json) identify the selective original
++RotatingDoor properties/angle/pivot/state code and PlayerObj USE/door-push branches.
++[Contracts](INTERACTION_CONTRACTS.md) distinguish source rules from typed local
++command dispatch, entry-face ray filtering and the bounded replacement rotating
++collision solver. No prototype engine dependency or ECS was imported. The old
++force/crush protocol, full player session and other movers remain outside this
++increment. Source angular quirks and the original direct-door USE exclusion are
++retained; original-executable behavior and other platforms remain unverified.
+diff --git a/docs/TRIGGER_CONTRACTS.md b/docs/TRIGGER_CONTRACTS.md
+index cbc96dd..c80275e 100644
+--- a/docs/TRIGGER_CONTRACTS.md
++++ b/docs/TRIGGER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original triggers, door SelfTrigger and keys
+ 
++> Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
++> are connected with bounded atomic collision. Earlier omissions below describe
++> their previous increments; the full M2 gate remains open.
++
+ This extends [DOOR_CONTRACTS.md](DOOR_CONTRACTS.md),
+ [WEAPON_CONTRACTS.md](WEAPON_CONTRACTS.md) and
+ [OBJECT_CONTRACTS.md](OBJECT_CONTRACTS.md). M2 remains open.
+@@ -138,7 +142,7 @@ and use the live player as sender. An explicitly labeled debug key grant bypasse
+ pickup and is separate from original rules. Simulation also runs without ImGui.
+ 
+ Inspector TRIGGER is a direct test command, not the original 82-unit player USE
+-ray. The latter, ordinary interaction bindings, complete AI, rotating doors,
+-audio/localized feedback, save/restore and full gameplay remain pending.
++ray, now connected alongside RotatingDoor by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md).
++Complete AI, audio/localized feedback, save/restore and full gameplay remain pending.
+ Original B2BaseClass difficulty/game-type filtering now carries an inspection
+ marker so initial-update removals are reported as filtered, not creation failures.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 3c8d66c..0be9d51 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -5,6 +5,7 @@
+ #include "game/original/Door.h"
+ #include "game/original/Key.h"
+ #include "game/original/KeyPickup.h"
++#include "game/original/RotatingDoor.h"
+ #include "game/original/Trigger.h"
+ #include "game/original/VolumeBrush.h"
+ 
+@@ -776,6 +777,19 @@ namespace OpenBlood2
+                         client.position.z, client.rotation.pitch, client.rotation.yaw);
+             ImGui::Text("Camera %.3f %.3f %.3f | Animation %.1f ms", client.camera_position.x, client.camera_position.y,
+                         client.camera_position.z, record->animation.time);
++            ImGui::Text("USE (E with F2 controls): %llu commands / %llu messages | door refused %s",
++                        static_cast<unsigned long long>(player->use_commands),
++                        static_cast<unsigned long long>(player->use_messages), player->use_door_refused ? "yes" : "no");
++            constexpr const char* ray_results[] = {"invalid", "miss", "hit", "unavailable"};
++            const auto* use_target = game.objects.get(player->use_hit.object);
++            ImGui::Text(
++                "Ray %s | target %s | distance %.2f / 82", ray_results[static_cast<unsigned>(player->use_result)],
++                use_target && use_target->life == Life::Alive ? use_target->state.m_Name : "world / none / removed",
++                player->use_hit.fraction * 82);
++            ImGui::Text("Eye %.2f %.2f %.2f -> %.2f %.2f %.2f", player->use_from.x, player->use_from.y,
++                        player->use_from.z, player->use_to.x, player->use_to.y, player->use_to.z);
++            ImGui::Text("Door push requests %llu | pending %s", static_cast<unsigned long long>(player->door_pushes),
++                        player->door_push_pending ? "yes" : "no");
+             ImGui::Text("Health %.0f / %.0f | Armor %.0f | Bullets %.0f", player->m_damage.m_fHitPoints,
+                         player->m_damage.m_fMaxHitPoints, player->m_damage.m_fArmorPoints,
+                         player->m_InventoryMgr.GetAmmoCount(1));
+@@ -1434,7 +1448,7 @@ namespace OpenBlood2
+ {
+     void Inspector::draw_doors(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextWrapped("Original sliding Door rules. Commands use original object messages; translations push "
++        ImGui::TextWrapped("Original Door / RotatingDoor rules. Commands use original object messages; movers push "
+                            "bodies and carry standing players. Failed/unported entries remain in World.");
+         if (!ImGui::BeginTable("Doors", 2, ImGuiTableFlags_Resizable))
+             return;
+@@ -1458,7 +1472,8 @@ namespace OpenBlood2
+         {
+             const auto& shape = *r->world_model;
+             const auto offset = vector_subtract(r->state.m_Pos, shape.origin);
+-            const auto mid = vector_scale(vector_add(d->closed_pos, d->open_pos), .5f);
++            const auto* rotating = dynamic_cast<const RotatingDoor*>(d);
++            const auto mid = rotating ? r->state.m_Pos : vector_scale(vector_add(d->closed_pos, d->open_pos), .5f);
+             const ImVec2 size{std::max(180.0f, ImGui::GetContentRegionAvail().x), 140};
+             ImGui::TextUnformatted("Transformed shell + travel / top view (X/Z)");
+             const auto canvas = ImGui::GetCursorScreenPos();
+@@ -1482,6 +1497,11 @@ namespace OpenBlood2
+                                   project(vector_add(triangle[(i + 1) % 3], offset)), IM_COL32(80, 180, 255, 190));
+             draw->AddLine(project(d->closed_pos), project(d->open_pos), IM_COL32(255, 190, 80, 255), 2);
+             draw->AddCircleFilled(project(r->state.m_Pos), 3, IM_COL32_WHITE);
++            if (rotating)
++            {
++                draw->AddCircle(project(rotating->rotation_point), 5, IM_COL32(255, 100, 160, 255));
++                draw->AddLine(project(rotating->rotation_point), project(r->state.m_Pos), IM_COL32(255, 100, 160, 255));
++            }
+             if (const auto* player = game.objects.get(game.client_shell.player))
+                 draw->AddCircleFilled(project(player->state.m_Pos), 4, IM_COL32(140, 255, 160, 255));
+             draw->PopClipRect();
+@@ -1502,7 +1522,8 @@ namespace OpenBlood2
+                 door_trigger_request = r->id;
+                 door_close_request = true;
+             }
+-            ImGui::Text("Speed %.1f / close %.1f | waveform %u", d->speed, d->closing_speed, d->waveform);
++            ImGui::Text("Speed %.1f / close %.1f %s | wave %u", d->speed, d->closing_speed,
++                        dynamic_cast<const RotatingDoor*>(d) ? "rad/s" : "units/s", d->waveform);
+             ImGui::Text("Distance %.1f | delay %.2f | wait %.2f", d->move_dist, d->open_delay, d->wait_time);
+             ImGui::Text("Pivot %.2f %.2f %.2f", r->state.m_Pos.x, r->state.m_Pos.y, r->state.m_Pos.z);
+             ImGui::Text(
+@@ -1518,6 +1539,18 @@ namespace OpenBlood2
+             }
+             ImGui::Text("Collision: %s | %zu shell triangles", d->box_physics ? "authored box" : "polygon",
+                         r->world_model->triangles.size());
++            if (const auto* rotating = dynamic_cast<const RotatingDoor*>(d))
++            {
++                ImGui::Text("Euler radians %.3f %.3f %.3f | substeps %u", rotating->angles.x, rotating->angles.y,
++                            rotating->angles.z, r->rotation_steps);
++                ImGui::Text("RotationAngles degrees %.1f %.1f %.1f", rotating->rotation_angles.x,
++                            rotating->rotation_angles.y, rotating->rotation_angles.z);
++                ImGui::Text("RotationPoint %.2f %.2f %.2f", rotating->rotation_point.x, rotating->rotation_point.y,
++                            rotating->rotation_point.z);
++                ImGui::Text("PushPlayerBack %s", rotating->push_player_back ? "yes" : "no");
++                ImGui::TextWrapped("Source CalcAngle applies two increments; rotation collision uses a bounded "
++                                   "replacement solver. Speed above is radians/s.");
++            }
+             ImGui::Text("TriggerClosed %s | RemainsOpen %s | StartOpen %s", d->trigger_closed ? "yes" : "no",
+                         d->remains_open ? "yes" : "no", d->start_open ? "yes" : "no");
+             ImGui::Text("FireThrough %s | triggers %llu", d->fire_through ? "yes" : "no",
+diff --git a/src/app/interaction_smoke.cpp b/src/app/interaction_smoke.cpp
+new file mode 100644
+index 0000000..fb1c704
+--- /dev/null
++++ b/src/app/interaction_smoke.cpp
+@@ -0,0 +1,79 @@
++#include "interaction_smoke.h"
++#include "game/original/RotatingDoor.h"
++#include "game/original/Trigger.h"
++#include <spdlog/spdlog.h>
++namespace OpenBlood2
++{
++    bool prepare_interaction_smoke(GameSession& g, ObjectId& id)
++    {
++        auto* player = g.server_shell.Player(g.local_client);
++        if (!player)
++            return false;
++        // Explicit synthetic hinge above the retail level; real Caleb assets and
++        // original player/trigger/key/door code. Retail geometry has separate tests.
++        WorldModel model;
++        model.name = "interaction_smoke_hinge";
++        model.translation = {0, 10050, 0};
++        const std::array<DVector, 8> points{{{0, 10000, -2},
++                                             {40, 10000, -2},
++                                             {40, 10100, -2},
++                                             {0, 10100, -2},
++                                             {0, 10000, 2},
++                                             {40, 10000, 2},
++                                             {40, 10100, 2},
++                                             {0, 10100, 2}}};
++        const std::array<std::array<unsigned, 4>, 6> faces{
++            {{0, 1, 2, 3}, {4, 7, 6, 5}, {0, 3, 7, 4}, {1, 5, 6, 2}, {0, 4, 5, 1}, {3, 2, 6, 7}}};
++        const std::array<DVector, 6> normals{{{0, 0, -1}, {0, 0, 1}, {-1, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 1, 0}}};
++        model.points.assign(points.begin(), points.end());
++        for (unsigned i = 0; i < 6; ++i)
++        {
++            model.planes.push_back({normals[i], vector_dot(normals[i], points[faces[i][0]])});
++            model.surfaces.push_back({});
++            model.surfaces.back().plane = i;
++            Polygon polygon;
++            polygon.surface = i;
++            for (auto index : faces[i])
++                polygon.points.push_back(static_cast<std::uint16_t>(index));
++            model.polygons.push_back(std::move(polygon));
++        }
++        g.world.models.push_back(std::move(model));
++        auto h = g.objects.create(g.objects.find_class("RotatingDoor"), {}, Creation::World,
++                                  {{"Name", std::string("interaction_smoke_hinge")},
++                                   {"Speed", 90.0f},
++                                   {"RotationPoint", DVector{0, 10050, 0}},
++                                   {"RotationAngles", DVector{0, 90, 0}},
++                                   {"TriggerClosed", true},
++                                   {"SelfTrigger", true},
++                                   {"TriggerDims", DVector{45, 100, 4}},
++                                   {"Locked", true},
++                                   {"UnlockKeyName", std::string("smoke_key")}});
++        if (!h)
++            return false;
++        id = g.objects.get(h)->id;
++        DVector position{20, 10050, -60};
++        if (g.server.TeleportObject(player->m_hObject, &position) != DE_OK || !player->TeleportClientToServerPos())
++            return false;
++        g.client_shell.rotation = {};
++        if (!g.server_shell.OnMessage(g.local_client, PlayerUse{}))
++            return false;
++        auto* door = dynamic_cast<RotatingDoor*>(g.objects.get(h)->game.get());
++        auto* trigger = dynamic_cast<Trigger*>(g.objects.get(door->trigger)->game.get());
++        if (player->use_hit.object != door->trigger || !trigger->locked || door->state != Door::Closed)
++            return false;
++        return player->m_InventoryMgr.AddKey({"smoke_key", "Smoke key", "key.pcx", "key_h.pcx", 1}) ==
++               InventoryResult::Ok;
++    }
++    bool check_interaction_smoke(GameSession& g, ObjectId id)
++    {
++        auto* record = g.objects.get(id);
++        auto* door = record ? dynamic_cast<RotatingDoor*>(record->game.get()) : nullptr;
++        auto* player = g.server_shell.Player(g.local_client);
++        const bool ok = door && door->angles.y > 0 && player && player->use_commands == 2 &&
++                        player->use_messages == 2 && player->m_InventoryMgr.keys.empty() && record->mover_moves > 0;
++        if (!ok)
++            spdlog::error("USE/rotation smoke: door angle {}, USE commands {}, messages {}", door ? door->angles.y : -1,
++                          player ? player->use_commands : 0, player ? player->use_messages : 0);
++        return ok;
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/interaction_smoke.h b/src/app/interaction_smoke.h
+new file mode 100644
+index 0000000..46fd805
+--- /dev/null
++++ b/src/app/interaction_smoke.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool prepare_interaction_smoke(GameSession&, ObjectId& door);
++    bool check_interaction_smoke(GameSession&, ObjectId door);
++} // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 2c8ff0a..adaec4b 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -5,6 +5,7 @@
+ #include "engine/runtime.h"
+ #include "game/original/Door.h"
+ #include "game/server_adapter.h"
++#include "interaction_smoke.h"
+ #include "trigger_smoke.h"
+ 
+ #include <SDL3/SDL_main.h>
+@@ -132,6 +133,13 @@ namespace
+             }
+             selection.id = smoke_trigger;
+         }
++        if (options.interaction_smoke)
++        {
++            if (!OpenBlood2::prepare_interaction_smoke(game, smoke_door))
++                return 4;
++            selection.id = smoke_door;
++        }
++        bool interaction_hidden = false;
+         const auto original_selection = selection.id;
+         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
+         bool selection_cleared = false, world_unloaded = false;
+@@ -142,11 +150,12 @@ namespace
+         OpenBlood2::Inspector inspector(runtime);
+         inspector.select_models = options.world_smoke && !options.player_smoke && !options.doors_smoke;
+         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
+-                                   !options.containers_smoke && !options.triggers_smoke;
++                                   !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke;
+         inspector.select_weapons = options.weapons_smoke;
+         inspector.select_movement = options.movement_smoke;
+         inspector.select_containers = options.containers_smoke;
+-        inspector.select_doors = options.doors_smoke;
++        inspector.select_doors = options.doors_smoke || options.interaction_smoke;
++        inspector.keyboard_movement = options.interaction_smoke;
+         inspector.select_triggers = options.triggers_smoke;
+         inspector.trigger_selection = smoke_trigger;
+         inspector.door_selection = smoke_door;
+@@ -174,6 +183,7 @@ namespace
+         bool weapons_fired = false, weapon_advanced_hidden = false;
+         std::uint64_t hidden_weapon_shots = 0;
+         OpenBlood2::MovementControls controls;
++        controls.enabled = options.interaction_smoke;
+         controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
+         DVector hidden_position{};
+         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
+@@ -244,6 +254,10 @@ namespace
+             controls.enabled = inspector.keyboard_movement;
+             text_editing = inspector_visible && ImGui::GetIO().WantTextInput;
+ #endif
++            if (options.interaction_smoke && frames == reload_frame + 1)
++                if (!OpenBlood2::prepare_interaction_smoke(game, smoke_door))
++                    return 4;
++            game.client_shell.use_down = controls.sample_use(text_editing);
+             auto keyboard = controls.sample(text_editing);
+             auto& movement = game.client_shell.movement_input;
+             movement.forward |= keyboard.forward;
+@@ -355,12 +369,13 @@ namespace
+                 return 3;
+             }
+             OpenBlood2::Capture capture;
+-            const bool capture_frame =
+-                swapchain &&
+-                frames >= (extended_smoke                                                                ? 180u
+-                           : (options.containers_smoke || options.doors_smoke || options.triggers_smoke) ? 14u
+-                                                                                                         : 2u) &&
+-                !captured && !options.capture_file.empty();
++            const bool capture_frame = swapchain &&
++                                       frames >= (extended_smoke ? 180u
++                                                  : (options.containers_smoke || options.doors_smoke ||
++                                                     options.triggers_smoke || options.interaction_smoke)
++                                                      ? 14u
++                                                      : 2u) &&
++                                       !captured && !options.capture_file.empty();
+             if (capture_frame &&
+                 !capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
+                                     height))
+@@ -486,6 +501,26 @@ namespace
+                         OpenBlood2::vector_subtract(game.objects.get(smoke_door)->state.m_Pos, hidden_door_position);
+                     door_moved_hidden = OpenBlood2::vector_dot(delta, delta) > .01f;
+                 }
++                if (options.interaction_smoke && (frames == hide_frame || frames == show_frame - 1))
++                {
++                    if (frames == hide_frame)
++                    {
++                        SDL_Event focus{};
++                        focus.type = SDL_EVENT_WINDOW_FOCUS_GAINED;
++                        focus.window.windowID = SDL_GetWindowID(runtime.window);
++                        if (!SDL_PushEvent(&focus))
++                            return 4;
++                    }
++                    SDL_Event use{};
++                    use.type = frames == hide_frame ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
++                    use.key.windowID = SDL_GetWindowID(runtime.window);
++                    use.key.key = SDLK_E;
++                    use.key.scancode = SDL_SCANCODE_E;
++                    use.key.down = frames == hide_frame;
++                    event_ok = SDL_PushEvent(&use);
++                }
++                if (options.interaction_smoke && frames == show_frame)
++                    interaction_hidden = OpenBlood2::check_interaction_smoke(game, smoke_door);
+                 if (conveyor_smoke && frames == hide_frame)
+                     hidden_position = game.client_shell.position;
+                 if (options.containers_smoke && frames == show_frame)
+@@ -591,6 +626,7 @@ namespace
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
++                (options.interaction_smoke && !interaction_hidden) ||
+                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
+                 (options.movement_smoke &&
+                  (!movement_hidden || !movement_jumped || !movement_landed || !game.client_shell.move_mgr.ready() ||
+@@ -617,6 +653,9 @@ namespace
+             if (options.movement_smoke)
+                 spdlog::info("Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, "
+                              "unload/re-entry");
++            if (options.interaction_smoke)
++                spdlog::info("Interaction smoke passed: SDL E press edge, USE key denial/unlock, rotation while "
++                             "hidden, inspection, reload");
+             if (options.triggers_smoke)
+                 spdlog::info("Trigger smoke passed: missing-key denial, real key pickup, consumption/unlock while "
+                              "hidden, door motion, inspector, reload");
+@@ -672,6 +711,7 @@ int main(int argc, char** argv)
+                      "  --player-smoke      GPU shell/player entry, hidden updates and unload/re-entry\n"
+                      "  --weapons-smoke     GPU Beretta/knife firing, hidden simulation and reload\n"
+                      "  --doors-smoke       GPU original sliding door inspection\n"
++                     "  --interaction-smoke GPU original USE and rotating door inspection\n"
+                      "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
+                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
+                      "  --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload\n"
+diff --git a/src/app/movement_controls.h b/src/app/movement_controls.h
+index c67f4ed..2d09876 100644
+--- a/src/app/movement_controls.h
++++ b/src/app/movement_controls.h
+@@ -11,7 +11,7 @@ namespace OpenBlood2
+     struct MovementControls
+     {
+         std::array<bool, SDL_SCANCODE_COUNT> keys{};
+-        bool focused = false, enabled = false;
++        bool focused = false, enabled = false, use_suppressed = false;
+         bool consumes(const SDL_Event& event, bool text_editing) const
+         {
+             if (!focused || !enabled || text_editing ||
+@@ -27,6 +27,7 @@ namespace OpenBlood2
+                 case SDL_SCANCODE_RSHIFT:
+                 case SDL_SCANCODE_LCTRL:
+                 case SDL_SCANCODE_RCTRL:
++                case SDL_SCANCODE_E:
+                 case SDL_SCANCODE_SPACE:
+                 case SDL_SCANCODE_LEFT:
+                 case SDL_SCANCODE_RIGHT:
+@@ -51,6 +52,9 @@ namespace OpenBlood2
+                 if (!focused && event.type == SDL_EVENT_KEY_DOWN)
+                     return;
+                 const int code = event.key.scancode;
++                if (code == SDL_SCANCODE_E && event.type == SDL_EVENT_KEY_DOWN && event.key.repeat &&
++                    !keys[SDL_SCANCODE_E])
++                    return; // A held key after focus loss is not a fresh USE press.
+                 if (code > SDL_SCANCODE_UNKNOWN && code < SDL_SCANCODE_COUNT)
+                     keys[static_cast<unsigned>(code)] = event.type == SDL_EVENT_KEY_DOWN;
+                 if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat && code == SDL_SCANCODE_F2)
+@@ -69,6 +73,17 @@ namespace OpenBlood2
+                     keys[SDL_SCANCODE_SPACE],
+                     keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL]};
+         }
++        bool sample_use(bool text_editing)
++        {
++            if (!keys[SDL_SCANCODE_E])
++                use_suppressed = false;
++            if (!focused || !enabled || text_editing)
++            {
++                use_suppressed = keys[SDL_SCANCODE_E];
++                return false;
++            }
++            return keys[SDL_SCANCODE_E] && !use_suppressed;
++        }
+         void look(PlayerRotation& rotation, double seconds, bool text_editing) const
+         {
+             if (!focused || !enabled || text_editing)
+diff --git a/src/engine/collision.cpp b/src/engine/collision.cpp
+index 62d6bf3..86105bc 100644
+--- a/src/engine/collision.cpp
++++ b/src/engine/collision.cpp
+@@ -5,6 +5,48 @@
+ 
+ namespace OpenBlood2
+ {
++    DVector rotate_vector(DVector v, DRotation q)
++    {
++        const auto cross = [](DVector a, DVector b)
++        { return DVector{a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x}; };
++        return vector_add(v, vector_scale(cross(q.m_Vec, vector_add(cross(q.m_Vec, v), vector_scale(v, q.m_Spin))), 2));
++    }
++    DRotation inverse_rotation(DRotation q)
++    {
++        return {vector_scale(q.m_Vec, -1), q.m_Spin};
++    }
++    DRotation multiply_rotation(DRotation a, DRotation b)
++    {
++        auto x = a.m_Vec, y = b.m_Vec;
++        return {vector_add(vector_add(vector_scale(y, a.m_Spin), vector_scale(x, b.m_Spin)),
++                           {x.y * y.z - x.z * y.y, x.z * y.x - x.x * y.z, x.x * y.y - x.y * y.x}),
++                a.m_Spin * b.m_Spin - vector_dot(x, y)};
++    }
++    bool CollisionWorld::transform(DRotation rotation, DVector origin, DVector destination)
++    {
++        for (auto& triangle : triangles_)
++        {
++            for (auto& point : triangle.points)
++            {
++                point = vector_add(destination, rotate_vector(vector_subtract(point, origin), rotation));
++                if (!physics_vector(point))
++                    return false;
++            }
++            triangle.min = triangle.max = triangle.points[0];
++            for (auto point : triangle.points)
++            {
++                triangle.min = {std::min(triangle.min.x, point.x), std::min(triangle.min.y, point.y),
++                                std::min(triangle.min.z, point.z)};
++                triangle.max = {std::max(triangle.max.x, point.x), std::max(triangle.max.y, point.y),
++                                std::max(triangle.max.z, point.z)};
++            }
++        }
++        nodes_.clear();
++        if (!triangles_.empty())
++            partition(0, static_cast<std::uint32_t>(triangles_.size()));
++        return true;
++    }
++
+     DVector vector_add(DVector a, DVector b)
+     {
+         return {a.x + b.x, a.y + b.y, a.z + b.z};
+diff --git a/src/engine/collision.h b/src/engine/collision.h
+index 969207d..cea1c97 100644
+--- a/src/engine/collision.h
++++ b/src/engine/collision.h
+@@ -25,6 +25,7 @@ namespace OpenBlood2
+     {
+       public:
+         bool build(const WorldModel& model, std::string& error);
++        bool transform(DRotation, DVector origin, DVector destination);
+         void clear()
+         {
+             triangles_.clear();
+@@ -57,6 +58,9 @@ namespace OpenBlood2
+         std::uint32_t partition(std::uint32_t begin, std::uint32_t end);
+         void query(std::uint32_t node, DVector from, DVector to, DVector half, CollisionHit& hit, bool& found) const;
+     };
++    DVector rotate_vector(DVector, DRotation);
++    DRotation multiply_rotation(DRotation, DRotation);
++    DRotation inverse_rotation(DRotation);
+     bool physics_vector(DVector v);
+     CollisionQuery sweep_box(DVector from, DVector to, DVector half, DVector center, DVector other_half,
+                              CollisionHit& hit);
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index ffe5959..5b638a7 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -125,6 +125,10 @@ namespace OpenBlood2
+                 options.player_smoke = true;
+                 options.containers_smoke = true;
+             }
++            else if (arg == "--interaction-smoke")
++            {
++                options.world_smoke = options.player_smoke = options.interaction_smoke = true;
++            }
+             else if (arg == "--triggers-smoke")
+             {
+                 options.world_smoke = options.player_smoke = options.triggers_smoke = true;
+@@ -192,7 +196,7 @@ namespace OpenBlood2
+             return false;
+         }
+         if (int(options.weapons_smoke) + int(options.movement_smoke) + int(options.containers_smoke) +
+-                int(options.doors_smoke) + int(options.triggers_smoke) >
++                int(options.doors_smoke) + int(options.triggers_smoke) + int(options.interaction_smoke) >
+             1)
+         {
+             error = "Choose one player smoke scenario";
+diff --git a/src/engine/config.h b/src/engine/config.h
+index 73565db..8f7f590 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -21,7 +21,8 @@ namespace OpenBlood2
+         bool inspect_player = false;
+         bool player_smoke = false;
+         bool weapons_smoke = false;
+-        bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false;
++        bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
++             interaction_smoke = false;
+         bool start_game = false;
+         bool explicit_config = false;
+         bool help = false;
+diff --git a/src/engine/container.cpp b/src/engine/container.cpp
+index d419379..40e9f0d 100644
+--- a/src/engine/container.cpp
++++ b/src/engine/container.cpp
+@@ -22,6 +22,36 @@ namespace OpenBlood2
+             return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z;
+         }
+     } // namespace
++    bool ContainerShape::transform(DRotation q, DVector destination)
++    {
++        if (triangles.empty() || !physics_vector(destination))
++            return false;
++        for (auto& plane : planes_)
++        {
++            const auto distance = plane.distance - vector_dot(plane.normal, origin);
++            plane.normal = rotate_vector(plane.normal, q);
++            plane.distance = distance + vector_dot(plane.normal, destination);
++        }
++        bool first = true;
++        for (auto& triangle : triangles)
++            for (auto& point : triangle)
++            {
++                point = vector_add(destination, rotate_vector(vector_subtract(point, origin), q));
++                if (!physics_vector(point))
++                    return false;
++                if (first)
++                {
++                    min = max = point;
++                    first = false;
++                }
++                min = {std::min(min.x, point.x), std::min(min.y, point.y), std::min(min.z, point.z)};
++                max = {std::max(max.x, point.x), std::max(max.y, point.y), std::max(max.z, point.z)};
++            }
++        if (!boundary_.transform(q, origin, destination))
++            return false;
++        origin = destination;
++        return true;
++    }
+     bool ContainerShape::build(const WorldModel& source, DRotation rotation, std::string& error)
+     {
+         *this = {};
+diff --git a/src/engine/container.h b/src/engine/container.h
+index 6c6676b..5483baf 100644
+--- a/src/engine/container.h
++++ b/src/engine/container.h
+@@ -8,6 +8,7 @@ namespace OpenBlood2
+     {
+       public:
+         bool build(const WorldModel&, DRotation, std::string& error);
++        bool transform(DRotation, DVector destination);
+         bool contains(DVector point) const;
+         bool overlaps(DVector center, DVector half) const;
+         CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit&) const;
+diff --git a/src/engine/objects.cpp b/src/engine/objects.cpp
+index 4d43db5..c809e84 100644
+--- a/src/engine/objects.cpp
++++ b/src/engine/objects.cpp
+@@ -389,7 +389,11 @@ namespace OpenBlood2
+             if (state.m_ObjectType == OT_CONTAINER)
+                 object->container = std::move(shape);
+             else
++            {
+                 object->world_model = std::move(shape);
++                object->world_model_base = object->world_model;
++                object->world_model_basis = object->state.m_Rotation;
++            }
+         }
+         if (state.m_ObjectType == OT_MODEL && state.m_Filename[0])
+         {
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index 8352319..15d7400 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -98,7 +98,11 @@ namespace OpenBlood2
+         bool client_movement = false; // Local MoveMgr owns integration while associated.
+         std::shared_ptr<const Model> model;
+         std::shared_ptr<const ContainerShape> container;
+-        // Immutable authored shell; state.Pos is its current translation pivot.
++        // Current posed shell plus immutable authored basis for drift-free rotation.
++        std::shared_ptr<const ContainerShape> world_model_base;
++        DRotation world_model_basis;
++        std::uint32_t rotation_steps = 0;
++        // state.Pos is the current translation pivot.
+         std::shared_ptr<const ContainerShape> world_model;
+         std::uint64_t mover_moves = 0, mover_blocks = 0, mover_pushes = 0, mover_riders = 0;
+         HOBJECT mover_blocker = nullptr;
+diff --git a/src/engine/world_model.cpp b/src/engine/world_model.cpp
+index 0567160..8ae1f75 100644
+--- a/src/engine/world_model.cpp
++++ b/src/engine/world_model.cpp
+@@ -4,17 +4,17 @@ namespace OpenBlood2
+ {
+     DVector object_bounds_center(const ObjectRecord& object)
+     {
+-        if (!object.world_model)
++        if (!object.world_model && !object.container)
+             return object.state.m_Pos;
+-        const auto& shape = *object.world_model;
++        const auto& shape = *(object.world_model ? object.world_model : object.container);
+         return vector_add(vector_scale(vector_add(shape.min, shape.max), .5f),
+                           vector_subtract(object.state.m_Pos, shape.origin));
+     }
+     CollisionQuery sweep_object(const ObjectRecord& object, DVector from, DVector to, DVector half, CollisionHit& hit)
+     {
+-        if (!object.world_model || (object.state.m_Flags & FLAG_BOXPHYSICS))
++        if ((!object.world_model && !object.container) || (object.state.m_Flags & FLAG_BOXPHYSICS))
+             return sweep_box(from, to, half, object_bounds_center(object), object.dimensions, hit);
+-        const auto& shape = *object.world_model;
++        const auto& shape = *(object.world_model ? object.world_model : object.container);
+         const auto offset = vector_subtract(object.state.m_Pos, shape.origin);
+         const auto result = shape.sweep(vector_subtract(from, offset), vector_subtract(to, offset), half, hit);
+         if (result == CollisionQuery::Hit)
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index a53da60..9a8b33b 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -31,12 +31,14 @@ class ServerDE : public CSBase
+     virtual DRESULT WriteKeyMessage(HMESSAGEWRITE, const OpenBlood2::KeyMessage&) = 0;
+     virtual bool ReadKeyMessage(HMESSAGEREAD, OpenBlood2::KeyMessage&) = 0;
+     virtual OpenBlood2::MoverResult MoveWorldModel(HOBJECT, DVector destination) = 0;
++    virtual OpenBlood2::MoverResult RotateWorldModel(HOBJECT, const OpenBlood2::RotationMove&) = 0;
+     virtual bool GetContainers(HOBJECT, DVector head, OpenBlood2::ContainerState&) = 0;
+     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
+     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
+     virtual float GetWorldTime() = 0;
+-    virtual OpenBlood2::SegmentResult IntersectSegment(DVector from, DVector to, HOBJECT ignore,
+-                                                       OpenBlood2::SegmentHit&, bool fire_through = false) = 0;
++    virtual OpenBlood2::SegmentResult IntersectSegment(
++        DVector from, DVector to, HOBJECT ignore, OpenBlood2::SegmentHit&, bool fire_through = false,
++        OpenBlood2::SegmentObjects objects = OpenBlood2::SegmentObjects::SolidOnly) = 0;
+     virtual DRESULT WriteDamage(HMESSAGEWRITE, const OpenBlood2::Damage&) = 0;
+     virtual bool ReadDamage(HMESSAGEREAD, OpenBlood2::Damage&) = 0;
+     // Source adaptation: client association is a checked object handle, never a
+diff --git a/src/game/mover_messages.h b/src/game/mover_messages.h
+index 427c2e3..a8d44ed 100644
+--- a/src/game/mover_messages.h
++++ b/src/game/mover_messages.h
+@@ -1,6 +1,11 @@
+ #pragma once
++#include "basedefs_de.h"
+ namespace OpenBlood2
+ {
++    struct RotationMove
++    {
++        DVector from_angles{}, to_angles{}, original_position{}, pivot{};
++    };
+     enum class MoverResult
+     {
+         Moved,
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index 89026c5..a88eb04 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -145,7 +145,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client)
+     physics = {};
+     stats = {};
+     messages = updates = 0;
+-    blocker = "Locomotion/weapon inspection: specialized containers/FX, moving platforms, full combat, audio and "
++    blocker = "Locomotion/weapon inspection: remaining container/FX and mover classes, full combat, audio and "
+               "autosave remain unported";
+     return true;
+ }
+@@ -155,6 +155,7 @@ void CBloodClientShell::OnExitWorld()
+     weapon_input = {};
+     move_mgr.Term();
+     movement_input = {};
++    use_down = use_was_down = false;
+     player = nullptr;
+     client_ = nullptr;
+     m_bInWorld = false;
+@@ -221,8 +222,9 @@ bool CBloodClientShell::Update()
+ bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds, std::string& error)
+ {
+     auto* owner = server.Player(client_);
+-    if (!owner || !move_mgr.Update(server, movement_input, rotation.yaw, seconds, !owner->m_damage.IsDead(),
+-                                   weapon_input.primary || weapon_input.alternate, rotation.pitch))
++    if (!owner || !owner->ApplyDoorPush() ||
++        !move_mgr.Update(server, movement_input, rotation.yaw, seconds, !owner->m_damage.IsDead(),
++                         weapon_input.primary || weapon_input.alternate, rotation.pitch))
+     {
+         error = "Original MoveMgr step failed (invalid association, movement message or collision)";
+         if (owner && !owner->locomotion_error.empty())
+@@ -252,6 +254,24 @@ bool CBloodClientShell::SyncWeapons(OpenBlood2::ModelStore& models, OpenBlood2::
+             weapons[i] = std::move(prepared[i]);
+     return true;
+ }
++bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerUse& command)
++{
++    auto* owner = Player(client);
++    if (!owner || !std::isfinite(command.rotation.pitch) || !std::isfinite(command.rotation.yaw) ||
++        std::abs(command.rotation.pitch) > 1000000 || std::abs(command.rotation.yaw) > 1000000)
++        return false;
++    owner->m_fPitch = command.rotation.pitch;
++    owner->m_fYaw = command.rotation.yaw;
++    return owner->OnCommandUse();
++}
++bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
++{
++    const bool pressed = use_down && !use_was_down;
++    use_was_down = use_down;
++    if (pressed)
++        server.OnMessage(client_, OpenBlood2::PlayerUse{rotation});
++    return true; // A blocked USE command does not terminate a valid session.
++}
+ bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server, double seconds, std::string& error)
+ {
+     const float cp = std::cos(rotation.pitch);
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index 08241f1..d9bdf88 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -18,6 +18,7 @@ class CBloodServerShell
+     FireResult OnMessage(HCLIENT, const OpenBlood2::WeaponFire&);
+     bool OnMessage(HCLIENT, const OpenBlood2::PlayerMove&);
+     bool OnMessage(HCLIENT, const OpenBlood2::PlayerControls&);
++    bool OnMessage(HCLIENT, const OpenBlood2::PlayerUse&);
+     void Update(float);
+     CPlayerObj* Player(HCLIENT);
+     struct PathEntry
+@@ -44,6 +45,8 @@ class CBloodClientShell
+     bool OnMessage(const OpenBlood2::PlayerEvent&, CBloodServerShell&);
+     bool Update();
+     bool UpdateMovement(CBloodServerShell&, double, std::string&);
++    bool UpdateUse(CBloodServerShell&);
++    bool use_down = false, use_was_down = false;
+     CMoveMgr move_mgr;
+     OpenBlood2::MovementInput movement_input;
+     bool SyncWeapons(OpenBlood2::ModelStore&, OpenBlood2::Resources&, CBloodServerShell&, std::string&);
+diff --git a/src/game/original/Door.h b/src/game/original/Door.h
+index ce62ef5..236435f 100644
+--- a/src/game/original/Door.h
++++ b/src/game/original/Door.h
+@@ -38,7 +38,7 @@ class Door : public B2BaseClass
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
+ 
+-  private:
++  protected:
+     bool ReadProp(ObjectCreateStruct&);
+     bool SpawnTrigger();
+     void SetTriggerActive(bool);
+@@ -46,6 +46,6 @@ class Door : public B2BaseClass
+     void SetClosed(bool sound = true);
+     void SetOpening();
+     void SetClosing();
+-    void Move(bool opening);
++    virtual void Move(bool opening);
+     void StartSound(const std::string&, bool loop);
+ };
+diff --git a/src/game/original/PlayerObj.cpp b/src/game/original/PlayerObj.cpp
+index b69db1a..e3834c4 100644
+--- a/src/game/original/PlayerObj.cpp
++++ b/src/game/original/PlayerObj.cpp
+@@ -164,6 +164,8 @@ bool CPlayerObj::Respawn()
+     const DDWORD flags = FLAG_VISIBLE | FLAG_MODELKEYS | FLAG_YROTATION | FLAG_ANIMTRANSITION | FLAG_TOUCH_NOTIFY |
+                          FLAG_SOLID | FLAG_STAIRSTEP | FLAG_SHADOW;
+     server->SetObjectFlags(m_hObject, flags);
++    door_push_pending = false;
++    door_push_velocity = {};
+     DVector velocity{};
+     server->SetVelocity(m_hObject, &velocity);
+     server->SetAcceleration(m_hObject, &velocity);
+@@ -417,6 +419,9 @@ DDWORD CPlayerObj::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
+         case MID_INITIALUPDATE:
+             result = InitialUpdate(static_cast<int>(fData));
+             break;
++        case MID_TOUCHNOTIFY:
++            ObjectTouchDoor(static_cast<HOBJECT>(data));
++            break;
+         case MID_UPDATE:
+             result = Update(static_cast<DVector*>(data));
+             break;
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index 584950a..03a3503 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -103,6 +103,18 @@ class CPlayerObj : public CBaseCharacter
+     float eye_level = 36;
+     std::string locomotion_clip, locomotion_requested_clip, locomotion_error;
+     std::uint64_t animation_changes = 0, blocked_resizes = 0;
++    bool OnCommandUse();
++    bool movement_blocked = false;
++    bool door_push_pending = false;
++    DVector door_push_velocity{};
++    std::uint64_t door_pushes = 0;
++    void ObjectTouchDoor(HOBJECT);
++    bool ApplyDoorPush();
++    DVector use_from{}, use_to{};
++    OpenBlood2::SegmentHit use_hit;
++    OpenBlood2::SegmentResult use_result = OpenBlood2::SegmentResult::Miss;
++    std::uint64_t use_commands = 0, use_messages = 0;
++    bool use_door_refused = false;
+     bool UpdateClientPhysics();
+     bool UpdateStats();
+     bool TeleportClientToServerPos();
+diff --git a/src/game/original/PlayerUse.cpp b/src/game/original/PlayerUse.cpp
+new file mode 100644
+index 0000000..3292108
+--- /dev/null
++++ b/src/game/original/PlayerUse.cpp
+@@ -0,0 +1,69 @@
++#include "Door.h"
++#include "PlayerObj.h"
++#include "RotatingDoor.h"
++#include "engine/collision.h"
++#include <cmath>
++using namespace OpenBlood2;
++
++// PlayerObj.cpp OnCommandOn(COMMAND_USE), ordinary single-player branch.
++// Dead multiplayer respawn / slow-death rescue are outside the accepted session.
++bool CPlayerObj::OnCommandUse()
++{
++    if (!g_pServerDE->IsObjectAlive(m_hObject) || movement_blocked)
++        return false;
++    ++use_commands;
++    use_hit = {};
++    use_door_refused = false;
++    g_pServerDE->GetObjectPos(m_hObject, &use_from);
++    use_from.y += eye_level;
++    const float cp = std::cos(m_fPitch);
++    const DVector forward{std::sin(m_fYaw) * cp, -std::sin(m_fPitch), std::cos(m_fYaw) * cp};
++    use_to = vector_add(use_from, vector_scale(forward, 82));
++    // Self is excluded explicitly: the source ray normally starts inside its
++    // player box and the old engine reports entry faces, not interior starts.
++    use_result = g_pServerDE->IntersectSegment(use_from, use_to, m_hObject, use_hit, false, SegmentObjects::All);
++    if (use_result == SegmentResult::Invalid || use_result == SegmentResult::Unavailable)
++        return false;
++    if (use_result != SegmentResult::Hit || !use_hit.object)
++        return true;
++    use_door_refused =
++        g_pServerDE->IsKindOf(g_pServerDE->GetObjectClass(use_hit.object), g_pServerDE->GetClass("Door"));
++    if (use_door_refused)
++        return true;
++    auto message = g_pServerDE->StartMessageToObject(this, use_hit.object, 1000);
++    if (!message)
++        return false;
++    const auto written = g_pServerDE->WriteToMessageHString(message, m_hstrTrigger);
++    const auto sent = g_pServerDE->EndMessage(message);
++    if (written != DE_OK || sent != DE_OK)
++        return false;
++    ++use_messages;
++    return true;
++}
++
++// PlayerObj.cpp ObjectTouch / UpdateClientPhysics rotating-door push branch.
++void CPlayerObj::ObjectTouchDoor(HOBJECT object)
++{
++    if (door_push_pending || !g_pServerDE->IsObjectAlive(object))
++        return;
++    const auto* door = dynamic_cast<RotatingDoor*>(g_pServerDE->HandleToObject(object));
++    if (!door || door->state != Door::Opening || !door->push_player_back)
++        return;
++    DRotation rotation;
++    g_pServerDE->GetObjectRotation(m_hObject, &rotation);
++    door_push_velocity = rotate_vector({0, 0, -500}, rotation);
++    door_push_pending = true;
++    ++door_pushes;
++}
++bool CPlayerObj::ApplyDoorPush()
++{
++    if (!door_push_pending)
++        return true;
++    DVector velocity;
++    g_pServerDE->GetVelocity(m_hObject, &velocity);
++    velocity = vector_add(velocity, door_push_velocity);
++    if (g_pServerDE->SetVelocity(m_hObject, &velocity) != DE_OK)
++        return false;
++    door_push_pending = false;
++    return true;
++}
+diff --git a/src/game/original/RotatingDoor.cpp b/src/game/original/RotatingDoor.cpp
+new file mode 100644
+index 0000000..7822075
+--- /dev/null
++++ b/src/game/original/RotatingDoor.cpp
+@@ -0,0 +1,111 @@
++#include "RotatingDoor.h"
++#include "engine/collision.h"
++#include "engine/objects.h"
++#include <cmath>
++#include <numbers>
++using namespace OpenBlood2;
++
++DDWORD RotatingDoor::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    constexpr float radians = std::numbers::pi_v<float> / 180;
++    if (message == MID_PRECREATE)
++    {
++        if (!Door::EngineMessageFn(message, data, reason))
++            return 0;
++        g_pServerDE->GetPropVector("RotationAngles", &rotation_angles);
++        g_pServerDE->GetPropVector("RotationPoint", &rotation_point);
++        GenericProp prop;
++        if (g_pServerDE->GetPropGeneric("Rotation", &prop) == DE_OK)
++            angles = prop.m_Vec;
++        const auto expected = rotation_from_euler(angles);
++        const auto actual = static_cast<ObjectCreateStruct*>(data)->m_Rotation;
++        if (std::abs(vector_dot(expected.m_Vec, actual.m_Vec) + expected.m_Spin * actual.m_Spin) < .99999f)
++            return 0;
++        DBOOL push = DTRUE;
++        g_pServerDE->GetPropBool("PushPlayerBack", &push);
++        push_player_back = push != 0;
++        if (!physics_vector(rotation_angles) || !physics_vector(rotation_point) || !physics_vector(angles))
++            return 0;
++        speed *= radians;
++        closing_speed *= radians;
++        return 1;
++    }
++    if (message == MID_INITIALUPDATE)
++    {
++        closed_angles = angles;
++        open_angles = vector_add(angles, vector_scale(rotation_angles, radians));
++        g_pServerDE->GetObjectPos(m_hObject, &original_position);
++        // Retain the source's asymmetric < +1 degree comparison (including zero).
++        const auto direction = [&](float offset) { return offset > radians ? -1.0f : offset < radians ? 1.0f : 0.0f; };
++        open_direction = {direction(closed_angles.x - open_angles.x), direction(closed_angles.y - open_angles.y),
++                          direction(closed_angles.z - open_angles.z)};
++    }
++    return Door::EngineMessageFn(message, data, reason);
++}
++bool RotatingDoor::CalcAngle(float& angle, float initial, float target, int direction, float speed, unsigned wave,
++                             float dt)
++{
++    // Defined zero-span guard for the source's 0/0; retain its duplicated increment
++    // and late endpoint clamp. This can overshoot for one update.
++    if (initial == target)
++    {
++        angle = target;
++        return true;
++    }
++    const float percent = 1 - (target - angle) / (target - initial);
++    const float amount = GetWaveValue(speed, percent, wave) * dt;
++    bool done = direction == 0;
++    for (int pass = 0; pass < 2; ++pass)
++    {
++        if (direction > 0)
++        {
++            if (angle < target)
++                angle += amount;
++            else
++            {
++                angle = target;
++                done = true;
++            }
++        }
++        else if (direction < 0)
++        {
++            if (angle > target)
++                angle -= amount;
++            else
++            {
++                angle = target;
++                done = true;
++            }
++        }
++    }
++    return done;
++}
++void RotatingDoor::Move(bool opening)
++{
++    if (opening && !started_moving)
++    {
++        started_moving = true;
++        StartSound(open_busy, true);
++        portal_open = true;
++    }
++    const auto initial = opening ? closed_angles : open_angles;
++    const auto target = opening ? open_angles : closed_angles;
++    const auto direction = vector_scale(open_direction, opening ? 1.0f : -1.0f);
++    auto next = angles;
++    const auto velocity = opening ? speed : closing_speed;
++    const auto dt = g_pServerDE->GetFrameTime();
++    const bool x = CalcAngle(next.x, initial.x, target.x, static_cast<int>(direction.x), velocity, waveform, dt);
++    const bool y = CalcAngle(next.y, initial.y, target.y, static_cast<int>(direction.y), velocity, waveform, dt);
++    const bool z = CalcAngle(next.z, initial.z, target.z, static_cast<int>(direction.z), velocity, waveform, dt);
++    last_move = g_pServerDE->RotateWorldModel(m_hObject, {angles, next, original_position, rotation_point});
++    if (last_move != MoverResult::Moved)
++        return;
++    angles = next;
++    if (x && y && z)
++    {
++        if (opening)
++            SetOpen();
++        else
++            SetClosed();
++    }
++}
+diff --git a/src/game/original/RotatingDoor.h b/src/game/original/RotatingDoor.h
+new file mode 100644
+index 0000000..d807bed
+--- /dev/null
++++ b/src/game/original/RotatingDoor.h
+@@ -0,0 +1,14 @@
++#pragma once
++#include "Door.h"
++class RotatingDoor : public Door
++{
++  public:
++    DVector rotation_angles{}, rotation_point{}, closed_angles{}, open_angles{}, original_position{}, angles{};
++    DVector open_direction{};
++    bool push_player_back = true;
++    static bool CalcAngle(float&, float initial, float target, int direction, float speed, unsigned wave, float dt);
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    void Move(bool opening) override;
++};
+diff --git a/src/game/player_messages.h b/src/game/player_messages.h
+index 6fe9230..8b053ef 100644
+--- a/src/game/player_messages.h
++++ b/src/game/player_messages.h
+@@ -22,6 +22,10 @@ namespace OpenBlood2
+     {
+         float pitch = 0, yaw = 0;
+     };
++    struct PlayerUse
++    {
++        PlayerRotation rotation;
++    };
+     struct PlayerPosition
+     {
+         DVector position;
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 34f9e75..8fa7116 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -5,6 +5,7 @@
+ #include "game/original/Key.h"
+ #include "game/original/KeyPickup.h"
+ #include "game/original/PathPoint.h"
++#include "game/original/RotatingDoor.h"
+ #include "game/original/SmellHint.h"
+ #include "game/original/Trigger.h"
+ #include "game/original/VolumeBrush.h"
+@@ -257,6 +258,13 @@ namespace OpenBlood2
+                               {"ObjectActivate", false},
+                               {"NamedObjectActivate", false},
+                               {"Locked", false}}};
++        const ClassInfo rotating_door{"RotatingDoor",
++                                      &door,
++                                      construct<RotatingDoor>,
++                                      {{"RotationPoint", DVector{}},
++                                       {"RotationAngles", DVector{}},
++                                       {"BoxPhysics", false},
++                                       {"PushPlayerBack", true}}};
+         const ClassInfo camera{"CameraSpot", &b2base, construct<CameraSpot>, {}};
+         const ClassInfo conveyor{"Conveyor",
+                                  &volume,
+@@ -312,7 +320,8 @@ namespace OpenBlood2
+                objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
+                objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
+                objects.register_class(key_pickup) && objects.register_class(big_trigger) &&
+-               objects.register_class(toggle_trigger) && objects.register_class(door);
++               objects.register_class(toggle_trigger) && objects.register_class(door) &&
++               objects.register_class(rotating_door);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 305ab9f..892e820 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -37,6 +37,7 @@ namespace OpenBlood2
+         DRESULT WriteKeyMessage(HMESSAGEWRITE, const KeyMessage&) override;
+         bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
+         MoverResult MoveWorldModel(HOBJECT, DVector destination) override;
++        MoverResult RotateWorldModel(HOBJECT, const RotationMove&) override;
+         bool GetContainers(HOBJECT, DVector head, ContainerState&) override;
+         bool damage_containers();
+         float GetWorldTime() override
+@@ -50,7 +51,8 @@ namespace OpenBlood2
+         }
+         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
+         bool GetMovementState(HOBJECT, MovementState&) override;
+-        SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false) override;
++        SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false,
++                                       SegmentObjects objects = SegmentObjects::SolidOnly) override;
+         DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
+         bool ReadDamage(HMESSAGEREAD, Damage&) override;
+         HCLIENT connect_client();
+diff --git a/src/game/server_rotation.cpp b/src/game/server_rotation.cpp
+new file mode 100644
+index 0000000..0771701
+--- /dev/null
++++ b/src/game/server_rotation.cpp
+@@ -0,0 +1,226 @@
++#include "engine/world_model.h"
++#include "game/server_adapter.h"
++#include <algorithm>
++#include <cmath>
++
++namespace OpenBlood2
++{
++    MoverResult ServerAdapter::RotateWorldModel(HOBJECT handle, const RotationMove& move)
++    {
++        trace_service("RotateWorldModel");
++        auto* mover = objects_.get(handle);
++        if (!mover || mover->life != Life::Alive || !mover->world_model_base || moving_ ||
++            !physics_vector(move.from_angles) || !physics_vector(move.to_angles) ||
++            !physics_vector(move.original_position) || !physics_vector(move.pivot))
++            return MoverResult::Invalid;
++        if (!collision_ready || !collision || !(mover->state.m_Flags & FLAG_GOTHRUWORLD))
++            return MoverResult::Unavailable;
++        const auto from_rotation = rotation_from_euler(move.from_angles);
++        const auto alignment = std::abs(vector_dot(from_rotation.m_Vec, mover->state.m_Rotation.m_Vec) +
++                                        from_rotation.m_Spin * mover->state.m_Rotation.m_Spin);
++        if (alignment < .99999f)
++            return MoverResult::Invalid;
++        const auto angles = vector_subtract(move.to_angles, move.from_angles);
++        const auto arm = vector_subtract(move.original_position, move.pivot);
++        const auto residual =
++            vector_subtract(mover->state.m_Pos, vector_add(move.pivot, rotate_vector(arm, from_rotation)));
++        auto length = [](DVector v) { return std::sqrt(vector_dot(v, v)); };
++        float radius = 0;
++        const auto& base = *mover->world_model_base;
++        for (const auto& triangle : base.triangles)
++            for (auto point : triangle)
++                radius = std::max(radius, length(vector_subtract(point, base.origin)));
++        // Euler path length bounds every vertex's arc, including multi-turn moves.
++        const float travel =
++            (radius + length(arm)) * (std::abs(angles.x) + std::abs(angles.y) + std::abs(angles.z)) + length(residual);
++        if (!std::isfinite(travel))
++            return MoverResult::Invalid;
++        if (travel == 0)
++            return MoverResult::Moved;
++        if (travel > 256 || base.triangles.size() * std::ceil(travel / .5f) > 262144)
++        {
++            objects_.fail(ObjectError::Limit, "Rotation exceeds 512 steps / 262144 triangle steps; subdivide time");
++            return MoverResult::Unavailable;
++        }
++        const auto count = static_cast<unsigned>(std::max(1.0f, std::ceil(travel / .5f)));
++        mover->rotation_steps = count;
++        const float pad = travel / static_cast<float>(count) + .002f;
++        // Pure yaw cannot move any vertex vertically. Avoid falsely dragging
++        // a body standing above the top face with DONTFOLLOWSTANDING / jumping.
++        const DVector padding{
++            pad, angles.x == 0 && angles.z == 0 ? std::abs(residual.y) / static_cast<float>(count) + .00001f : pad,
++            pad};
++        const auto ids = objects_.snapshot();
++        struct Body
++        {
++            ObjectRecord* object;
++            DVector position;
++            bool rider;
++            bool moved = false;
++            std::vector<DVector> path;
++        };
++        std::vector<Body> bodies;
++        auto blocked = [&](HOBJECT other)
++        {
++            ++mover->mover_blocks;
++            mover->mover_blocker = other;
++            return MoverResult::Blocked;
++        };
++        if (mover->state.m_Flags & FLAG_SOLID)
++            for (auto id : ids)
++            {
++                auto* body = objects_.get(id);
++                if (!body || body->life != Life::Alive || body == mover || !(body->state.m_Flags & FLAG_SOLID))
++                    continue;
++                MovementState support;
++                const bool rider = !body->world_model && !(body->state.m_Flags & FLAG_DONTFOLLOWSTANDING) &&
++                                   GetMovementState(body->handle, support) && support.standing &&
++                                   support.ground_object == handle;
++                bodies.push_back({body, body->state.m_Pos, rider, false, {}});
++            }
++        auto previous = mover->world_model;
++        auto old_position = mover->state.m_Pos;
++        auto old_rotation = mover->state.m_Rotation;
++        std::shared_ptr<ContainerShape> shape;
++        DRotation rotation;
++        DVector position;
++        std::size_t affected = 0;
++        for (unsigned step = 1; step <= count; ++step)
++        {
++            const auto t = static_cast<float>(step) / static_cast<float>(count);
++            rotation = rotation_from_euler(vector_add(move.from_angles, vector_scale(angles, t)));
++            position = vector_add(vector_add(move.pivot, rotate_vector(arm, rotation)), vector_scale(residual, 1 - t));
++            shape = std::make_shared<ContainerShape>(base);
++            if (!shape->transform(multiply_rotation(rotation, inverse_rotation(mover->world_model_basis)), position))
++                return MoverResult::Invalid;
++            const auto delta_rotation = multiply_rotation(rotation, inverse_rotation(old_rotation));
++            for (auto& body : bodies)
++            {
++                auto& record = *body.object;
++                CollisionHit contact;
++                const auto old_offset = vector_subtract(old_position, previous->origin);
++                const auto local = vector_subtract(body.position, old_offset);
++                const auto expanded = vector_add(record.dimensions, padding);
++                const bool box = (mover->state.m_Flags & FLAG_BOXPHYSICS) != 0;
++                const auto old_center = vector_scale(vector_add(previous->min, previous->max), .5f);
++                const auto old_half = vector_scale(vector_subtract(previous->max, previous->min), .5f);
++                const auto query = box ? sweep_box(local, local, expanded, old_center, old_half, contact)
++                                       : previous->sweep(local, local, expanded, contact);
++                if (record.world_model)
++                {
++                    const auto center = vector_add(old_center, old_offset);
++                    if (sweep_object(record, center, center, vector_add(old_half, padding), contact) !=
++                        CollisionQuery::Miss)
++                        return blocked(record.handle);
++                    continue;
++                }
++                if (!body.rider && query == CollisionQuery::Miss)
++                    continue;
++                if (query == CollisionQuery::Invalid ||
++                    (record.state.m_ObjectType != OT_NORMAL && record.state.m_ObjectType != OT_MODEL))
++                    return blocked(record.handle);
++                if (!body.moved && ++affected > 64)
++                    return blocked(record.handle);
++                auto end =
++                    vector_add(position, rotate_vector(vector_subtract(body.position, old_position), delta_rotation));
++                const auto displacement = vector_subtract(end, body.position);
++                const auto distance = length(displacement);
++                auto overlaps = [&](DVector point)
++                {
++                    CollisionHit hit;
++                    if (box)
++                        return sweep_box(point, point, record.dimensions,
++                                         vector_scale(vector_add(shape->min, shape->max), .5f),
++                                         vector_scale(vector_subtract(shape->max, shape->min), .5f),
++                                         hit) != CollisionQuery::Miss;
++                    return shape->sweep(point, point, record.dimensions, hit) != CollisionQuery::Miss;
++                };
++                // AABBs do not rotate with their centers. A bounded forward
++                // separation handles that corner growth; otherwise reject atomically.
++                for (unsigned attempt = 0; overlaps(end) && distance > 1e-6f && attempt < 8; ++attempt)
++                    end = vector_add(end, vector_scale(displacement, pad / distance));
++                if (overlaps(end))
++                    return blocked(record.handle);
++                CollisionHit obstruction;
++                const auto result =
++                    sweep_scene(record.handle, body.position, end, record.dimensions, obstruction, ids, handle);
++                if (result == CollisionQuery::Invalid ||
++                    (result == CollisionQuery::Hit && (obstruction.start_solid || obstruction.fraction < 1 - 1e-6)))
++                    return blocked(result == CollisionQuery::Hit ? obstruction.object : record.handle);
++                if (!body.moved)
++                    body.path.push_back(body.position);
++                body.path.push_back(end);
++                body.moved = true;
++                body.position = end;
++            }
++            // Validate staged bodies against each other, as well as the old
++            // scene above. No partial commit and no speculative callbacks.
++            for (std::size_t i = 0; i < bodies.size(); ++i)
++                if (bodies[i].moved)
++                    for (std::size_t j = i + 1; j < bodies.size(); ++j)
++                        if (!bodies[j].object->world_model)
++                        {
++                            CollisionHit hit;
++                            if (sweep_box(bodies[i].position, bodies[i].position, bodies[i].object->dimensions,
++                                          bodies[j].position, bodies[j].object->dimensions, hit) == CollisionQuery::Hit)
++                                return blocked(bodies[j].object->handle);
++                        }
++            previous = shape;
++            old_rotation = rotation;
++            old_position = position;
++        }
++        moving_ = true;
++        mover->world_model = std::move(shape);
++        mover->dimensions = vector_scale(vector_subtract(mover->world_model->max, mover->world_model->min), .5f);
++        mover->state.m_Pos = position;
++        mover->state.m_Rotation = rotation;
++        ++mover->mover_moves;
++        for (auto& body : bodies)
++            if (body.moved)
++            {
++                body.object->state.m_Pos = body.position;
++                body.object->grounded = false;
++                body.object->contact_object = nullptr;
++                body.object->contact_polygon = UINT32_MAX;
++                body.object->contact_normal = {};
++                ++mover->mover_pushes;
++                mover->mover_riders += body.rider;
++            }
++        for (auto& body : bodies)
++            if (body.moved)
++            {
++                auto& record = *body.object;
++                if (mover->life == Life::Alive && record.life == Life::Alive)
++                    objects_.engine_message(handle, MID_TOUCHNOTIFY, record.handle);
++                if (mover->life == Life::Alive && record.life == Life::Alive &&
++                    (record.state.m_Flags & FLAG_TOUCH_NOTIFY))
++                    objects_.engine_message(record.handle, MID_TOUCHNOTIFY, handle);
++                for (auto id : ids)
++                {
++                    auto* sensor = objects_.get(id);
++                    if (record.life != Life::Alive)
++                        break;
++                    if (!sensor || sensor->life != Life::Alive || sensor == &record || sensor->container ||
++                        sensor->world_model || (sensor->state.m_Flags & FLAG_SOLID) ||
++                        !(sensor->state.m_Flags & FLAG_TOUCH_NOTIFY))
++                        continue;
++                    bool touched = false;
++                    for (std::size_t i = 1; i < body.path.size() && !touched; ++i)
++                    {
++                        CollisionHit hit;
++                        touched = sweep_object(*sensor, body.path[i - 1], body.path[i], record.dimensions, hit) ==
++                                  CollisionQuery::Hit;
++                    }
++                    if (touched)
++                    {
++                        if (record.state.m_Flags & FLAG_TOUCH_NOTIFY)
++                            objects_.engine_message(record.handle, MID_TOUCHNOTIFY, sensor->handle);
++                        if (record.life == Life::Alive && sensor->life == Life::Alive)
++                            objects_.engine_message(sensor->handle, MID_TOUCHNOTIFY, record.handle);
++                    }
++                }
++            }
++        moving_ = false;
++        return MoverResult::Moved;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/server_weapons.cpp b/src/game/server_weapons.cpp
+index f94fab3..4efc3ab 100644
+--- a/src/game/server_weapons.cpp
++++ b/src/game/server_weapons.cpp
+@@ -6,12 +6,13 @@
+ namespace OpenBlood2
+ {
+     SegmentResult ServerAdapter::IntersectSegment(DVector from, DVector to, HOBJECT ignore, SegmentHit& out,
+-                                                  bool fire_through)
++                                                  bool fire_through, SegmentObjects objects)
+     {
+         trace_service("IntersectSegment");
+         out = {};
+         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
+-        if (!physics_vector(from) || !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
++        if ((objects != SegmentObjects::SolidOnly && objects != SegmentObjects::All) || !physics_vector(from) ||
++            !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
+             vector_dot(vector_subtract(to, from), vector_subtract(to, from)) < 1e-12f)
+             return SegmentResult::Invalid;
+         if (!collision || !collision_ready)
+@@ -25,7 +26,7 @@ namespace OpenBlood2
+         {
+             const auto* record = objects_.get(id);
+             if (!record || record->life != Life::Alive || record->handle == ignore ||
+-                !(record->state.m_Flags & FLAG_SOLID))
++                (objects == SegmentObjects::SolidOnly && !(record->state.m_Flags & FLAG_SOLID)))
+                 continue; // Original IGNORE_NONSOLID.
+             const auto* door = dynamic_cast<const Door*>(record->game.get());
+             if (fire_through && door && door->fire_through)
+@@ -34,6 +35,11 @@ namespace OpenBlood2
+             const auto query = sweep_object(*record, from, to, {}, hit);
+             if (query == CollisionQuery::Invalid)
+                 return SegmentResult::Invalid;
++            // USE follows entry-face rays: an enclosing body/sensor must not
++            // mask all interactions. Later LithTech exposes interior hits as an
++            // opt-in flag; ordinary USE does not request it.
++            if (objects == SegmentObjects::All && hit.start_solid)
++                continue;
+             if (query == CollisionQuery::Hit && (!found || hit.fraction < nearest.fraction))
+             {
+                 nearest = hit;
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index db70b08..bfa7bf2 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -305,7 +305,7 @@ namespace OpenBlood2
+         error = "RunWorld blocked: " + std::to_string(missing) +
+                 " uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat "
+                 "reactions, "
+-                "audio, autosave, rotating world-model collision remain unported";
++                "audio, autosave and remaining mover classes remain unported";
+         if (!entry_error.empty())
+             error += "; player entry: " + entry_error;
+         if (trace.empty() || trace.back() != error)
+@@ -362,10 +362,11 @@ namespace OpenBlood2
+             else
+             {
+                 std::string error;
+-                const bool updated =
+-                    pump_player_messages(error) && client_shell.UpdateMovement(server_shell, seconds, error) &&
+-                    client_shell.Update() && client_shell.SyncWeapons(models, resources, server_shell, error) &&
+-                    client_shell.UpdateWeapons(server_shell, seconds, error);
++                const bool updated = pump_player_messages(error) &&
++                                     client_shell.UpdateMovement(server_shell, seconds, error) &&
++                                     client_shell.Update() && client_shell.UpdateUse(server_shell) &&
++                                     client_shell.SyncWeapons(models, resources, server_shell, error) &&
++                                     client_shell.UpdateWeapons(server_shell, seconds, error);
+                 if (!server.GetClientUserData(local_client))
+                     ok = leave_player() && ok;
+                 else if (!updated || !pump_player_messages(error))
+diff --git a/src/game/weapon_messages.h b/src/game/weapon_messages.h
+index d917ed9..4153091 100644
+--- a/src/game/weapon_messages.h
++++ b/src/game/weapon_messages.h
+@@ -36,6 +36,11 @@ namespace OpenBlood2
+         std::uint32_t polygon = UINT32_MAX;
+         double fraction = 1;
+     };
++    enum class SegmentObjects
++    {
++        SolidOnly,
++        All
++    };
+     enum class SegmentResult
+     {
+         Invalid,
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 9228539..35b5ff8 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -206,3 +206,21 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --triggers-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/triggers.png")
+     set_tests_properties(gpu.triggers PROPERTIES LABELS "private;gpu;triggers" TIMEOUT 30 RUN_SERIAL TRUE)
+ endif()
++
++add_executable(interaction_tests interaction_tests.cpp)
++target_link_libraries(interaction_tests PRIVATE blood2_game)
++blood2_project_options(interaction_tests)
++foreach(case IN ITEMS use input keys state geometry transport blocking lifetime player_push)
++    add_test(NAME interaction.${case} COMMAND interaction_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/interaction-fixtures/${case}")
++    set_tests_properties(interaction.${case} PROPERTIES LABELS "headless;interaction" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME interaction.catalog COMMAND interaction_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(interaction.catalog PROPERTIES LABELS "headless;private;interaction" TIMEOUT 90)
++endif()
++
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.interaction COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --interaction-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/interaction.png")
++    set_tests_properties(gpu.interaction PROPERTIES LABELS "private;gpu;interaction" TIMEOUT 30 RUN_SERIAL TRUE)
++endif()
+diff --git a/tests/interaction_tests.cpp b/tests/interaction_tests.cpp
+new file mode 100644
+index 0000000..4ecdea1
+--- /dev/null
++++ b/tests/interaction_tests.cpp
+@@ -0,0 +1,436 @@
++#include "app/movement_controls.h"
++#include "brush_fixture.h"
++#include "engine/world_model.h"
++#include "game/original/RotatingDoor.h"
++#include "game/original/Trigger.h"
++#include "player_fixture.h"
++#include <functional>
++#include <numbers>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ":" << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    constexpr float pi = std::numbers::pi_v<float>;
++    bool near(float a, float b, float e = .01f)
++    {
++        return std::abs(a - b) < e;
++    }
++    HOBJECT door(GameSession& g, Properties props = {}, DVector lo = {0, 20, -2}, DVector hi = {40, 80, 2})
++    {
++        const auto name = "hinge" + std::to_string(g.world.models.size());
++        auto model = test_brush::box(name, lo, hi);
++        model.translation = {0, 50, 0};
++        g.world.models.push_back(model);
++        props["Name"] = name;
++        props.try_emplace("Speed", 90.0f);
++        props.try_emplace("RotationPoint", DVector{0, 50, 0});
++        props.try_emplace("RotationAngles", DVector{0, 90, 0});
++        props.try_emplace("TriggerClosed", true);
++        return g.objects.create(g.objects.find_class("RotatingDoor"), {}, Creation::World, props);
++    }
++    HOBJECT body(GameSession& g, DVector position, DVector dims, DDWORD flags = FLAG_SOLID)
++    {
++        auto h = g.objects.create(g.objects.find_class("BaseClass"), {}, Creation::World,
++                                  {{"Pos", position}, {"Flags", std::int32_t(flags)}});
++        if (h)
++            g.server.SetObjectDims(h, &dims);
++        return h;
++    }
++    bool command(GameSession& g, HOBJECT h, const char* text = "TRIGGER")
++    {
++        auto str = g.server.CreateString(text);
++        auto msg = g.server.StartMessageToObject(nullptr, h, 1000);
++        CHECK(msg && g.server.WriteToMessageHString(msg, str) == DE_OK);
++        CHECK(g.server.EndMessage(msg) == DE_OK);
++        g.server.FreeString(str);
++        return true;
++    }
++    bool steps(GameSession& g, unsigned n, double dt = .02)
++    {
++        for (unsigned i = 0; i < n; ++i)
++            CHECK(g.step(dt));
++        return true;
++    }
++    bool use(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        DVector pos{0, 50, 0};
++        CHECK(g.server.TeleportObject(p->m_hObject, &pos) == DE_OK);
++        auto t = g.objects.create(g.objects.find_class("Trigger"), {}, Creation::World,
++                                  {{"Pos", DVector{0, 86, 60}}, {"Dims", DVector{5, 5, 5}}, {"ResetTime", 0.0f}});
++        CHECK(t);
++        auto* trigger = dynamic_cast<Trigger*>(g.objects.get(t)->game.get());
++        CHECK(g.server_shell.OnMessage(g.local_client, PlayerUse{{0, 0}}));
++        CHECK(p->use_hit.object == t && trigger->activations == 1 && near(p->use_hit.fraction * 82, 55));
++        CHECK(near(p->use_to.z, 82) && near(p->use_from.y, 86));
++        CHECK(g.server_shell.OnMessage(g.local_client, PlayerUse{{0, pi}}));
++        CHECK(p->use_result == SegmentResult::Miss);
++        g.objects.get(t)->state.m_Pos.z = 88;
++        p->m_fYaw = 0;
++        CHECK(p->OnCommandUse());
++        CHECK(p->use_result == SegmentResult::Miss);
++        g.objects.get(t)->state.m_Pos.z = 60;
++        auto enclosing = g.objects.create(g.objects.find_class("Trigger"), {}, Creation::World,
++                                          {{"Pos", DVector{0, 86, 0}}, {"Dims", DVector{10, 10, 10}}});
++        CHECK(enclosing);
++        CHECK(g.server_shell.OnMessage(g.local_client, PlayerUse{}));
++        CHECK(p->use_hit.object == t);
++        auto wall = body(g, {0, 86, 30}, {10, 10, 1});
++        CHECK(wall);
++        CHECK(g.server_shell.OnMessage(g.local_client, PlayerUse{{0, 0}}));
++        CHECK(p->use_hit.object == wall);
++        CHECK(g.objects.remove(wall));
++        CHECK(p->OnCommandUse() && p->use_hit.object == t);
++        p->eye_level = 12;
++        CHECK(p->OnCommandUse() && p->use_result == SegmentResult::Miss && near(p->use_from.y, 62));
++        g.objects.get(t)->state.m_Pos.y = 62;
++        CHECK(p->OnCommandUse() && p->use_hit.object == t);
++        p->movement_blocked = true;
++        auto calls = p->use_commands;
++        CHECK(!p->OnCommandUse() && p->use_commands == calls);
++        p->movement_blocked = false;
++        CHECK(!g.server_shell.OnMessage(g.local_client, PlayerUse{{NAN, 0}}));
++        CHECK(g.objects.remove(p->m_hObject));
++        CHECK(!g.server_shell.OnMessage(g.local_client, PlayerUse{}));
++        CHECK(g.step(0) && !g.local_client);
++        return true;
++    }
++    bool input(const std::filesystem::path& root)
++    {
++        MovementControls controls;
++        controls.focused = controls.enabled = true;
++        SDL_Event e{};
++        e.type = SDL_EVENT_KEY_DOWN;
++        e.key.windowID = 1;
++        e.key.scancode = SDL_SCANCODE_E;
++        CHECK(controls.consumes(e, false));
++        controls.event(e, 1);
++        CHECK(controls.sample_use(false));
++        CHECK(!controls.sample_use(true));
++        CHECK(!controls.sample_use(false));
++        e.type = SDL_EVENT_KEY_UP;
++        controls.event(e, 1);
++        CHECK(!controls.sample_use(false));
++        e.type = SDL_EVENT_KEY_DOWN;
++        controls.event(e, 1);
++        CHECK(controls.sample_use(false));
++        e.type = SDL_EVENT_WINDOW_FOCUS_LOST;
++        e.window.windowID = 1;
++        controls.event(e, 1);
++        CHECK(!controls.sample_use(false));
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        auto& c = g.client_shell;
++        c.use_down = true;
++        CHECK(c.UpdateUse(g.server_shell));
++        auto n = p->use_commands;
++        CHECK(n == 1);
++        CHECK(c.UpdateUse(g.server_shell) && p->use_commands == n);
++        c.use_down = false;
++        CHECK(c.UpdateUse(g.server_shell));
++        c.use_down = true;
++        CHECK(c.UpdateUse(g.server_shell) && p->use_commands == n + 1);
++        CHECK(g.leave_player() && !c.use_down && !c.use_was_down);
++        return true;
++    }
++    bool keys(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        DVector pos{20, 50, -60};
++        CHECK(g.server.TeleportObject(p->m_hObject, &pos) == DE_OK);
++        p->eye_level = 12;
++        auto h = door(g);
++        CHECK(h);
++        CHECK(g.server_shell.OnMessage(g.local_client, PlayerUse{}));
++        CHECK(p->use_hit.object == h && p->use_door_refused);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        h = door(g, {{"SelfTrigger", true},
++                     {"Locked", true},
++                     {"UnlockKeyName", std::string("LabKey")},
++                     {"TriggerDims", DVector{45, 40, 4}}});
++        CHECK(h);
++        auto* d = dynamic_cast<RotatingDoor*>(g.objects.get(h)->game.get());
++        auto* t = dynamic_cast<Trigger*>(g.objects.get(d->trigger)->game.get());
++        CHECK(p->OnCommandUse() && p->use_hit.object == d->trigger && d->state == Door::Closed && t->locked);
++        p->m_InventoryMgr.AddKey({"labkey", "lab", "key.pcx", "key_h.pcx", 1});
++        CHECK(p->OnCommandUse() && d->state == Door::Opening && !t->locked && p->m_InventoryMgr.keys.empty());
++        CHECK(steps(g, 30));
++        CHECK(d->state == Door::Open);
++        CHECK(command(g, h, "TRIGGERCLOSE") && steps(g, 30) && d->state == Door::Closed && t->active);
++        return true;
++    }
++    bool state(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto h = door(g, {{"SelfTrigger", true}});
++        CHECK(h);
++        auto* d = dynamic_cast<RotatingDoor*>(g.objects.get(h)->game.get());
++        CHECK(near(d->speed, pi / 2) && !d->box_physics && d->push_player_back);
++        CHECK(command(g, h) && steps(g, 1));
++        CHECK(near(d->angles.y, .02f * pi, .0001f));
++        CHECK(steps(g, 26) && d->state == Door::Open && near(d->angles.y, pi / 2));
++        CHECK(command(g, h, "TRIGGERCLOSE") && steps(g, 27));
++        CHECK(d->state == Door::Closed && near(d->angles.y, 0));
++        CHECK(g.objects.clear());
++        h = door(g, {{"StartOpen", true}, {"SelfTrigger", true}});
++        CHECK(h);
++        d = dynamic_cast<RotatingDoor*>(g.objects.get(h)->game.get());
++        CHECK(d->state == Door::Closed &&
++              d->angles.y == 0); // Source parent StartOpen changes only translational endpoints.
++        CHECK(command(g, h) && steps(g, 27) && d->state == Door::Open);
++        float a = 0;
++        CHECK(!RotatingDoor::CalcAngle(a, 0, 1, 1, 1, 0, .6f) && near(a, 1.2f));
++        CHECK(RotatingDoor::CalcAngle(a, 0, 1, 1, 1, 0, .6f) && a == 1);
++        a = 0;
++        CHECK(RotatingDoor::CalcAngle(a, 0, 0, 1, 1, 1, .1f) && a == 0);
++        CHECK(g.unload_world());
++        CHECK(g.server.string_count() == 0);
++        return true;
++    }
++    bool geometry(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto h = door(g);
++        CHECK(h);
++        auto* r = g.objects.get(h);
++        SegmentHit hit;
++        CHECK(g.server.IntersectSegment({20, 50, -60}, {20, 50, 60}, nullptr, hit) == SegmentResult::Hit &&
++              hit.object == h);
++        CHECK(g.server.RotateWorldModel(h, {{}, {0, pi / 2, 0}, {0, 50, 0}, {0, 50, 0}}) == MoverResult::Moved);
++        CHECK(near(r->dimensions.x, 2) && near(r->dimensions.z, 20));
++        CHECK(g.server.IntersectSegment({20, 50, -60}, {20, 50, 60}, nullptr, hit) == SegmentResult::Miss);
++        CHECK(g.server.IntersectSegment({-60, 50, -20}, {60, 50, -20}, nullptr, hit) == SegmentResult::Hit &&
++              hit.object == h);
++        CHECK(near(hit.point.x, -2));
++        CHECK(g.server.RotateWorldModel(h, {{0, pi / 2, 0}, {}, {0, 50, 0}, {0, 50, 0}}) == MoverResult::Moved);
++        CHECK(near(r->world_model->min.x, 0) && near(r->world_model->max.x, 40));
++        CHECK(g.server.RotateWorldModel(h, {{}, {0, 1000, 0}, {0, 50, 0}, {0, 50, 0}}) == MoverResult::Unavailable);
++        CHECK(g.server.RotateWorldModel(h, {{NAN, 0, 0}, {}, {}, {}}) == MoverResult::Invalid);
++        CHECK(g.objects.clear());
++        h = door(g, {{"Rotation", EulerAngles{{0, .3f, 0}}}, {"RotationAngles", DVector{90, 0, 45}}});
++        CHECK(h);
++        r = g.objects.get(h);
++        const auto basis = r->world_model_basis;
++        CHECK(g.server.RotateWorldModel(h, {{0, .3f, 0}, {.4f, .3f, .2f}, {0, 50, 0}, {-10, 50, 0}}) ==
++              MoverResult::Moved);
++        auto expected =
++            vector_add(DVector{-10, 50, 0}, rotate_vector({10, 0, 0}, rotation_from_euler({.4f, .3f, .2f})));
++        CHECK(near(r->state.m_Pos.x, expected.x) && near(r->state.m_Pos.z, expected.z));
++        auto vertex = r->world_model_base->triangles[0][0];
++        vertex = vector_add(expected, rotate_vector(vector_subtract(vertex, r->world_model_base->origin),
++                                                    multiply_rotation(r->state.m_Rotation, inverse_rotation(basis))));
++        CHECK(near(vertex.x, r->world_model->triangles[0][0].x) && near(vertex.z, r->world_model->triangles[0][0].z));
++        return true;
++    }
++    bool transport(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto h = door(g);
++        CHECK(h);
++        auto rider = body(g, {20, 82.001f, 0}, {2, 2, 2});
++        CHECK(rider);
++        CHECK(g.server.RotateWorldModel(h, {{}, {0, .5f, 0}, {0, 50, 0}, {0, 50, 0}}) == MoverResult::Moved);
++        auto* r = g.objects.get(rider);
++        CHECK(near(r->state.m_Pos.x, 20 * std::cos(.5f), .03f));
++        CHECK(near(r->state.m_Pos.z, -20 * std::sin(.5f), .03f) && g.objects.get(h)->mover_riders == 1);
++        CHECK(g.objects.clear());
++        h = door(g);
++        CHECK(h);
++        auto detached = body(g, {20, 82.001f, 0}, {2, 2, 2}, FLAG_SOLID | FLAG_DONTFOLLOWSTANDING);
++        CHECK(detached);
++        CHECK(g.server.RotateWorldModel(h, {{}, {0, .5f, 0}, {0, 50, 0}, {0, 50, 0}}) == MoverResult::Moved);
++        CHECK(g.objects.get(detached)->state.m_Pos.x == 20 && g.objects.get(detached)->state.m_Pos.z == 0);
++        CHECK(g.objects.clear());
++        h = door(g);
++        CHECK(h);
++        auto b = body(g, {20, 50, -6}, {2, 2, 2});
++        CHECK(b);
++        CHECK(g.server.RotateWorldModel(h, {{}, {0, .3f, 0}, {0, 50, 0}, {0, 50, 0}}) == MoverResult::Moved);
++        CHECK(g.objects.get(b)->state.m_Pos.z < -6 && g.objects.get(h)->mover_pushes == 1);
++        return true;
++    }
++    bool blocking(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto h = door(g);
++        CHECK(h);
++        auto b = body(g, {20, 50, -6}, {2, 2, 2});
++        CHECK(b);
++        auto wall = test_brush::box("obstruction", {0, 10, -12}, {40, 90, -11});
++        std::string error;
++        for (auto& surface : wall.surfaces)
++            surface.flags = 1;
++        CHECK(g.collision.build(wall, error));
++        auto* r = g.objects.get(h);
++        auto initial = r->world_model;
++        CHECK(g.server.RotateWorldModel(h, {{}, {0, pi / 2, 0}, {0, 50, 0}, {0, 50, 0}}) == MoverResult::Blocked);
++        CHECK(r->world_model == initial && near(r->state.m_Rotation.m_Spin, 1) &&
++              near(g.objects.get(b)->state.m_Pos.z, -6));
++        CHECK(r->mover_pushes == 0 && r->mover_blocks == 1);
++        CHECK(g.objects.remove(h));
++        CHECK(g.server.RotateWorldModel(h, {}) == MoverResult::Invalid);
++        CHECK(g.objects.finish_frame());
++        CHECK(g.objects.snapshot().size() == 2); // start + body
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto h = door(g, {{"SelfTrigger", true}});
++        CHECK(h);
++        auto* d = dynamic_cast<RotatingDoor*>(g.objects.get(h)->game.get());
++        auto child = d->trigger;
++        auto b = body(g, {20, 50, -6}, {2, 2, 2});
++        CHECK(b);
++        auto sensor = g.objects.create(g.objects.find_class("Trigger"), {}, Creation::World,
++                                       {{"Name", std::string("remover")},
++                                        {"Pos", DVector{20, 50, -8}},
++                                        {"Dims", DVector{5, 5, 1}},
++                                        {"TouchActivate", true},
++                                        {"ObjectActivate", true},
++                                        {"TargetName1", std::string(g.objects.get(h)->state.m_Name)},
++                                        {"MessageName1", std::string("REMOVE")}});
++        CHECK(sensor);
++        CHECK(g.server.RotateWorldModel(h, {{}, {0, .3f, 0}, {0, 50, 0}, {0, 50, 0}}) == MoverResult::Moved);
++        CHECK(g.objects.get(h)->life == Life::Pending);
++        CHECK(g.objects.finish_frame() && !g.objects.get(h) && !g.objects.get(child));
++        CHECK(g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++    bool player_push(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        auto* r = g.objects.get(p->m_hObject);
++        auto h = door(g);
++        CHECK(h);
++        CHECK(command(g, h));
++        DVector position{20, 80 + r->dimensions.y + .001f, 0};
++        CHECK(g.server.TeleportObject(p->m_hObject, &position) == DE_OK);
++        CHECK(g.server.RotateWorldModel(h, {{}, {0, .2f, 0}, {0, 50, 0}, {0, 50, 0}}) == MoverResult::Moved);
++        CHECK(p->door_push_pending && p->door_pushes == 1);
++        CHECK(near(std::sqrt(vector_dot(p->door_push_velocity, p->door_push_velocity)), 500, .01f));
++        CHECK(p->ApplyDoorPush() && !p->door_push_pending);
++        auto velocity = r->velocity;
++        CHECK(p->ApplyDoorPush() && r->velocity.x == velocity.x && r->velocity.z == velocity.z);
++        auto* d = dynamic_cast<RotatingDoor*>(g.objects.get(h)->game.get());
++        d->push_player_back = false;
++        CHECK(g.objects.engine_message(p->m_hObject, MID_TOUCHNOTIFY, h));
++        CHECK(!p->door_push_pending);
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        std::string error;
++        CHECK(g.resources.mount_game(Config{root, "private"}, error));
++        unsigned created = 0, rejected = 0, filtered = 0, skipped = 0, children = 0, moved = 0;
++        std::map<std::string, unsigned> failures;
++        for (const auto& [path, resource] : g.resources.index())
++        {
++            (void)resource;
++            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
++                continue;
++            std::vector<std::uint8_t> bytes;
++            CHECK(g.resources.read(path, bytes, error));
++            if (!read_world(bytes, g.world, error))
++            {
++                CHECK(path == "worlds/16_bridge.dat");
++                ++skipped;
++                continue;
++            }
++            CHECK(g.collision.build(g.world.models.front(), error));
++            g.server.collision_ready = true;
++            for (const auto& source : g.world.objects)
++            {
++                if (source.class_name != "RotatingDoor")
++                    continue;
++                Properties props;
++                for (const auto& prop : source.properties)
++                    props.emplace(prop.name, prop.value);
++                auto h = g.objects.create(g.objects.find_class("RotatingDoor"), {}, Creation::World, props);
++                auto* r = g.objects.get(h);
++                if (!r || r->life != Life::Alive)
++                {
++                    if (r && dynamic_cast<B2BaseClass*>(r->game.get())->filtered)
++                        ++filtered;
++                    else
++                    {
++                        ++rejected;
++                        const auto diagnostic = g.objects.diagnostics().back();
++                        if (diagnostic == "RotatingDoor: invalid property TypeAction")
++                            ++failures["schema"];
++                        else if (diagnostic.ends_with(": Missing named world model"))
++                            ++failures["missing"];
++                        else if (diagnostic.ends_with(": Ambiguous named world model"))
++                            ++failures["ambiguous"];
++                        else
++                            CHECK(false);
++                        std::cout << path << " " << property_text(props.at("Name"))
++                                  << " rejected: " << g.objects.diagnostics().back() << "\n";
++                    }
++                }
++                else
++                {
++                    auto* d = dynamic_cast<RotatingDoor*>(r->game.get());
++                    CHECK(d && r->world_model);
++                    ++created;
++                    children += bool(d->trigger);
++                    CHECK(command(g, h) && steps(g, 4));
++                    if (r->mover_moves)
++                        ++moved;
++                    CHECK(g.objects.remove(h));
++                }
++                CHECK(g.objects.finish_frame() && g.objects.snapshot().empty());
++            }
++        }
++        std::cout << "RotatingDoor catalog created=" << created << " rejected=" << rejected << " filtered=" << filtered
++                  << " unreadable=" << skipped << " children=" << children << " moved=" << moved << "\n";
++        for (const auto& [kind, count] : failures)
++            std::cout << kind << "=" << count << "\n";
++        CHECK(created == 223 && rejected == 12 && filtered == 0 && skipped == 1 && children == 155 && moved == 215);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"use", use},           {"input", input},
++        {"keys", keys},         {"state", state},
++        {"geometry", geometry}, {"transport", transport},
++        {"blocking", blocking}, {"catalog", catalog},
++        {"lifetime", lifetime}, {"player_push", player_push}};
++    auto it = cases.find(argv[1]);
++    return it == cases.end() ? 2 : it->second(path_from_utf8(argv[2])) ? 0 : 1;
++}
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index 836728f..3b42dc2 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 170" OR NOT out MATCHES "rotating world-model collision")
++if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 170" OR NOT out MATCHES "remaining mover classes")
+     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside

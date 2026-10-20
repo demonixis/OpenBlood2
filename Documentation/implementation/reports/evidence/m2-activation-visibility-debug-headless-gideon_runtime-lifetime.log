@@ -1,0 +1,14 @@
+698/701 Testing: gideon_runtime.lifetime
+698/701 Test: gideon_runtime.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_runtime_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-runtime-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_runtime.lifetime" start time: Oct 17 04:05 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_runtime.lifetime" end time: Oct 17 04:05 CEST
+"gideon_runtime.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

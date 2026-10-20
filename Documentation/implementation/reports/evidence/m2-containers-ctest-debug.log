@@ -1,0 +1,204 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 92: gpu.containers
+ 1/92 Test #92: gpu.containers ...................   Passed    3.92 sec
+      Start 73: gpu.movement
+ 2/92 Test #73: gpu.movement .....................   Passed   12.66 sec
+      Start 91: containers.private
+      Start 61: weapons.private
+      Start 72: movement.private
+      Start 81: locomotion.private
+ 3/92 Test #81: locomotion.private ...............   Passed    0.31 sec
+      Start 51: player.private
+ 4/92 Test #72: movement.private .................   Passed    0.74 sec
+      Start 37: cli.world_modes
+ 5/92 Test #51: player.private ...................   Passed    0.67 sec
+      Start 35: world.private
+ 6/92 Test #35: world.private ....................   Passed    0.34 sec
+      Start 45: services.private
+ 7/92 Test #37: cli.world_modes ..................   Passed    0.71 sec
+      Start 76: locomotion.limits
+ 8/92 Test #76: locomotion.limits ................   Passed    0.04 sec
+      Start 77: locomotion.crouch
+ 9/92 Test #77: locomotion.crouch ................   Passed    0.03 sec
+      Start 89: containers.ladders
+10/92 Test #89: containers.ladders ...............   Passed    0.02 sec
+      Start 87: containers.swimming
+11/92 Test #87: containers.swimming ..............   Passed    0.01 sec
+      Start 66: movement.world_collision
+12/92 Test #45: services.private .................   Passed    0.23 sec
+      Start 80: locomotion.contacts
+13/92 Test #80: locomotion.contacts ..............   Passed    0.02 sec
+      Start 39: services.model_rejection
+14/92 Test #66: movement.world_collision .........   Passed    0.04 sec
+      Start 69: movement.timing
+15/92 Test #69: movement.timing ..................   Passed    0.03 sec
+      Start 58: weapons.animation
+16/92 Test #39: services.model_rejection .........   Passed    0.07 sec
+      Start 63: movement.walking
+17/92 Test #58: weapons.animation ................   Passed    0.04 sec
+      Start 78: locomotion.animations
+18/92 Test #63: movement.walking .................   Passed    0.03 sec
+      Start 75: locomotion.world_stairs
+19/92 Test #78: locomotion.animations ............   Passed    0.01 sec
+      Start 74: locomotion.stairs
+20/92 Test #74: locomotion.stairs ................   Passed    0.01 sec
+      Start 31: world.mutations
+21/92 Test #75: locomotion.world_stairs ..........   Passed    0.02 sec
+      Start 65: movement.collisions
+22/92 Test #65: movement.collisions ..............   Passed    0.02 sec
+      Start 84: containers.membership
+23/92 Test #84: containers.membership ............   Passed    0.01 sec
+      Start 90: containers.air_damage
+24/92 Test #90: containers.air_damage ............   Passed    0.01 sec
+      Start 88: containers.surface
+25/92 Test #88: containers.surface ...............   Passed    0.00 sec
+      Start 85: containers.lifetime
+26/92 Test #85: containers.lifetime ..............   Passed    0.00 sec
+      Start 67: movement.support
+27/92 Test #31: world.mutations ..................   Passed    0.05 sec
+      Start 64: movement.jumping
+28/92 Test #67: movement.support .................   Passed    0.01 sec
+      Start 79: locomotion.lifetime
+29/92 Test #64: movement.jumping .................   Passed    0.01 sec
+30/92 Test #79: locomotion.lifetime ..............   Passed    0.01 sec
+      Start 86: containers.physics
+      Start 68: movement.boundaries
+31/92 Test #86: containers.physics ...............   Passed    0.00 sec
+      Start 70: movement.lifetime
+32/92 Test #68: movement.boundaries ..............   Passed    0.01 sec
+      Start 59: weapons.lifetime
+33/92 Test #70: movement.lifetime ................   Passed    0.01 sec
+      Start 82: containers.geometry
+34/92 Test #82: containers.geometry ..............   Passed    0.00 sec
+      Start 30: world.world_rejection
+35/92 Test #59: weapons.lifetime .................   Passed    0.01 sec
+      Start 83: containers.concave
+36/92 Test #83: containers.concave ...............   Passed    0.00 sec
+      Start 53: weapons.inventory
+37/92 Test #53: weapons.inventory ................   Passed    0.00 sec
+      Start 48: player.rollback
+38/92 Test #30: world.world_rejection ............   Passed    0.01 sec
+      Start 18: cli.help
+39/92 Test #48: player.rollback ..................   Passed    0.01 sec
+      Start 22: cli.metadata
+40/92 Test #18: cli.help .........................   Passed    0.01 sec
+      Start 21: cli.missing_config
+41/92 Test #22: cli.metadata .....................   Passed    0.01 sec
+      Start 20: cli.missing_data
+42/92 Test #21: cli.missing_config ...............   Passed    0.01 sec
+      Start 60: weapons.rollback
+43/92 Test #60: weapons.rollback .................   Passed    0.00 sec
+      Start 19: cli.unknown
+44/92 Test #20: cli.missing_data .................   Passed    0.01 sec
+      Start 50: player.callbacks
+45/92 Test #50: player.callbacks .................   Passed    0.00 sec
+      Start 49: player.messages
+46/92 Test #19: cli.unknown ......................   Passed    0.01 sec
+      Start 56: weapons.melee
+47/92 Test #49: player.messages ..................   Passed    0.01 sec
+      Start 54: weapons.segments
+48/92 Test #56: weapons.melee ....................   Passed    0.00 sec
+      Start 55: weapons.firing
+49/92 Test #54: weapons.segments .................   Passed    0.00 sec
+      Start 57: weapons.damage
+50/92 Test #55: weapons.firing ...................   Passed    0.00 sec
+      Start 47: player.lifecycle
+51/92 Test #57: weapons.damage ...................   Passed    0.00 sec
+      Start 10: objects.unsupported_teardown
+52/92 Test #47: player.lifecycle .................   Passed    0.01 sec
+      Start 11: objects.creation_failures
+53/92 Test #10: objects.unsupported_teardown .....   Passed    0.01 sec
+      Start  9: objects.messages_strings
+54/92 Test #11: objects.creation_failures ........   Passed    0.01 sec
+      Start 46: player.handles
+55/92 Test  #9: objects.messages_strings .........   Passed    0.01 sec
+      Start 71: movement.controls
+56/92 Test #46: player.handles ...................   Passed    0.00 sec
+      Start 32: world.session_lifecycle
+57/92 Test #71: movement.controls ................   Passed    0.00 sec
+      Start 15: config.invalid_config
+58/92 Test #32: world.session_lifecycle ..........   Passed    0.00 sec
+      Start 44: services.original_services
+59/92 Test #15: config.invalid_config ............   Passed    0.00 sec
+      Start 38: services.model_reader
+60/92 Test #44: services.original_services .......   Passed    0.00 sec
+      Start 40: services.animation_events
+61/92 Test #38: services.model_reader ............   Passed    0.00 sec
+      Start 41: services.model_callbacks
+62/92 Test #40: services.animation_events ........   Passed    0.00 sec
+      Start 43: services.movement_contacts
+63/92 Test #41: services.model_callbacks .........   Passed    0.00 sec
+      Start 27: world.resource_mount
+64/92 Test #43: services.movement_contacts .......   Passed    0.00 sec
+      Start  1: objects.original_objects
+65/92 Test #27: world.resource_mount .............   Passed    0.00 sec
+      Start 26: world.rez_rejection
+66/92 Test  #1: objects.original_objects .........   Passed    0.00 sec
+      Start 34: world.original_trigger
+67/92 Test #26: world.rez_rejection ..............   Passed    0.00 sec
+      Start  8: objects.links_lists
+68/92 Test #34: world.original_trigger ...........   Passed    0.00 sec
+      Start 42: services.collision_queries
+69/92 Test  #8: objects.links_lists ..............   Passed    0.00 sec
+      Start  2: objects.nested_creation
+70/92 Test #42: services.collision_queries .......   Passed    0.00 sec
+      Start 29: world.world_geometry
+71/92 Test  #2: objects.nested_creation ..........   Passed    0.00 sec
+      Start  3: objects.reasons_properties
+72/92 Test #29: world.world_geometry .............   Passed    0.00 sec
+      Start 25: world.rez_structure
+73/92 Test  #3: objects.reasons_properties .......   Passed    0.00 sec
+      Start 23: content.local
+74/92 Test #25: world.rez_structure ..............   Passed    0.00 sec
+      Start  5: objects.deferred_removal
+75/92 Test #23: content.local ....................   Passed    0.00 sec
+      Start  7: objects.handles_selection
+76/92 Test  #5: objects.deferred_removal .........   Passed    0.00 sec
+      Start 28: world.world_properties
+77/92 Test  #7: objects.handles_selection ........   Passed    0.00 sec
+      Start 33: world.session_messages
+78/92 Test #28: world.world_properties ...........   Passed    0.00 sec
+      Start 17: config.case_lookup
+79/92 Test #33: world.session_messages ...........   Passed    0.00 sec
+      Start  6: objects.aggregate_dispatch
+80/92 Test #17: config.case_lookup ...............   Passed    0.00 sec
+      Start 16: config.content_validation
+81/92 Test  #6: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start  4: objects.scheduling
+82/92 Test #16: config.content_validation ........   Passed    0.00 sec
+      Start 13: config.precedence
+83/92 Test  #4: objects.scheduling ...............   Passed    0.00 sec
+      Start 12: config.arguments
+84/92 Test #13: config.precedence ................   Passed    0.00 sec
+      Start 14: config.relative_paths
+85/92 Test #12: config.arguments .................   Passed    0.00 sec
+86/92 Test #14: config.relative_paths ............   Passed    0.00 sec
+87/92 Test #61: weapons.private ..................   Passed    3.02 sec
+88/92 Test #91: containers.private ...............   Passed    3.78 sec
+      Start 62: gpu.weapons
+89/92 Test #62: gpu.weapons ......................   Passed   12.67 sec
+      Start 52: gpu.player
+90/92 Test #52: gpu.player .......................   Passed    1.79 sec
+      Start 36: gpu.world
+91/92 Test #36: gpu.world ........................   Passed    1.70 sec
+      Start 24: gpu.lifecycle
+92/92 Test #24: gpu.lifecycle ....................   Passed    1.53 sec
+
+100% tests passed, 0 tests failed out of 92
+
+Label Time Summary:
+cli           =   0.05 sec*proc (5 tests)
+config        =   0.01 sec*proc (6 tests)
+containers    =   7.75 sec*proc (11 tests)
+gpu           =  34.26 sec*proc (6 tests)
+headless      =  10.49 sec*proc (86 tests)
+locomotion    =   0.45 sec*proc (8 tests)
+movement      =  13.55 sec*proc (11 tests)
+objects       =   0.03 sec*proc (11 tests)
+player        =   2.48 sec*proc (7 tests)
+private       =  42.54 sec*proc (14 tests)
+services      =   0.32 sec*proc (8 tests)
+weapons       =  15.77 sec*proc (10 tests)
+world         =   1.12 sec*proc (12 tests)
+
+Total Test time (real) =  38.05 sec

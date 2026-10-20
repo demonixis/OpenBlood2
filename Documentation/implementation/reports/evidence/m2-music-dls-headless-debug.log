@@ -1,0 +1,140 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 989: dls_bank.private
+      Start 952: coverage.private
+ 1/62 Test #989: dls_bank.private ..................   Passed    1.24 sec
+      Start 954: train_session.private_60
+ 2/62 Test #952: coverage.private ..................   Passed   11.83 sec
+      Start 953: train_session.private_30
+ 3/62 Test #954: train_session.private_60 ..........   Passed   23.27 sec
+      Start  50: world.level_change_private
+ 4/62 Test  #50: world.level_change_private ........   Passed    6.13 sec
+      Start 292: sound.catalog
+ 5/62 Test #953: train_session.private_30 ..........   Passed   21.83 sec
+      Start  12: objects.message_churn
+ 6/62 Test #292: sound.catalog .....................   Passed    4.50 sec
+      Start  51: world.destination_trial_private
+ 7/62 Test  #12: objects.message_churn .............   Passed    1.66 sec
+      Start 986: music_assets.private
+ 8/62 Test #986: music_assets.private ..............   Passed    2.47 sec
+      Start 950: coverage.catalog
+ 9/62 Test #950: coverage.catalog ..................   Passed    0.64 sec
+      Start  52: world.destination_private
+10/62 Test  #51: world.destination_trial_private ...   Passed    6.14 sec
+      Start  33: world.surface_effects
+11/62 Test  #52: world.destination_private .........   Passed    3.05 sec
+      Start 293: sound.subway
+12/62 Test  #33: world.surface_effects .............   Passed    0.38 sec
+      Start  13: objects.message_limit
+13/62 Test  #13: objects.message_limit .............   Passed    0.09 sec
+      Start  53: world.private
+14/62 Test #293: sound.subway ......................   Passed    1.19 sec
+      Start  46: world.mutations
+15/62 Test  #46: world.mutations ...................   Passed    0.05 sec
+      Start  32: world.level_change
+16/62 Test  #32: world.level_change ................   Passed    0.07 sec
+      Start  34: world.destination_trials
+17/62 Test  #34: world.destination_trials ..........   Passed    0.04 sec
+      Start  37: world.destination_lifetime
+18/62 Test  #37: world.destination_lifetime ........   Passed    0.01 sec
+      Start  45: world.world_rejection
+19/62 Test  #45: world.world_rejection .............   Passed    0.01 sec
+      Start  39: world.sound_entries
+20/62 Test  #39: world.sound_entries ...............   Passed    0.01 sec
+      Start  38: world.sprite_entries
+21/62 Test  #38: world.sprite_entries ..............   Passed    0.01 sec
+      Start  47: world.session_lifecycle
+22/62 Test  #47: world.session_lifecycle ...........   Passed    0.00 sec
+      Start  36: world.destination_schema
+23/62 Test  #36: world.destination_schema ..........   Passed    0.00 sec
+      Start  22: config.invalid_config
+24/62 Test  #22: config.invalid_config .............   Passed    0.00 sec
+      Start  35: world.destination_messages
+25/62 Test  #35: world.destination_messages ........   Passed    0.00 sec
+      Start 951: coverage.observations
+26/62 Test #951: coverage.observations .............   Passed    0.00 sec
+      Start 985: music_assets.catalog
+27/62 Test #985: music_assets.catalog ..............   Passed    0.02 sec
+      Start 983: music_assets.reader
+28/62 Test #983: music_assets.reader ...............   Passed    0.01 sec
+      Start 287: sound.loops
+29/62 Test #287: sound.loops .......................   Passed    0.01 sec
+      Start  42: world.resource_mount
+30/62 Test  #42: world.resource_mount ..............   Passed    0.00 sec
+      Start  49: world.original_trigger
+31/62 Test  #49: world.original_trigger ............   Passed    0.00 sec
+      Start  44: world.world_geometry
+32/62 Test  #44: world.world_geometry ..............   Passed    0.00 sec
+      Start  43: world.world_properties
+33/62 Test  #43: world.world_properties ............   Passed    0.00 sec
+      Start  40: world.rez_structure
+34/62 Test  #53: world.private .....................   Passed    1.19 sec
+      Start  41: world.rez_rejection
+35/62 Test  #40: world.rez_structure ...............   Passed    0.00 sec
+      Start  48: world.session_messages
+36/62 Test  #41: world.rez_rejection ...............   Passed    0.00 sec
+      Start  20: config.precedence
+37/62 Test  #48: world.session_messages ............   Passed    0.00 sec
+      Start  23: config.content_validation
+38/62 Test  #20: config.precedence .................   Passed    0.00 sec
+      Start  24: config.case_lookup
+39/62 Test  #23: config.content_validation .........   Passed    0.00 sec
+      Start  19: config.arguments
+40/62 Test  #24: config.case_lookup ................   Passed    0.00 sec
+      Start  21: config.relative_paths
+41/62 Test  #19: config.arguments ..................   Passed    0.00 sec
+      Start 291: sound.metadata
+42/62 Test  #21: config.relative_paths .............   Passed    0.00 sec
+      Start 286: sound.defaults
+43/62 Test #291: sound.metadata ....................   Passed    0.01 sec
+      Start 290: sound.failures
+44/62 Test #286: sound.defaults ....................   Passed    0.01 sec
+      Start 289: sound.lifetime
+45/62 Test #290: sound.failures ....................   Passed    0.01 sec
+      Start 288: sound.resampling
+46/62 Test #289: sound.lifetime ....................   Passed    0.01 sec
+      Start 988: dls_bank.malformed
+47/62 Test #288: sound.resampling ..................   Passed    0.01 sec
+      Start 987: dls_bank.decode
+48/62 Test #988: dls_bank.malformed ................   Passed    0.01 sec
+      Start  14: objects.unsupported_teardown
+49/62 Test #987: dls_bank.decode ...................   Passed    0.00 sec
+      Start   2: objects.builtin_model
+50/62 Test   #2: objects.builtin_model .............   Passed    0.00 sec
+      Start 984: music_assets.plan
+51/62 Test #984: music_assets.plan .................   Passed    0.00 sec
+      Start  15: objects.creation_failures
+52/62 Test  #14: objects.unsupported_teardown ......   Passed    0.01 sec
+      Start  11: objects.messages_strings
+53/62 Test  #15: objects.creation_failures .........   Passed    0.01 sec
+      Start   5: objects.reasons_properties
+54/62 Test   #5: objects.reasons_properties ........   Passed    0.00 sec
+      Start   3: objects.original_objects
+55/62 Test  #11: objects.messages_strings ..........   Passed    0.01 sec
+      Start  10: objects.links_lists
+56/62 Test   #3: objects.original_objects ..........   Passed    0.00 sec
+      Start   7: objects.deferred_removal
+57/62 Test  #10: objects.links_lists ...............   Passed    0.00 sec
+      Start   6: objects.scheduling
+58/62 Test   #7: objects.deferred_removal ..........   Passed    0.00 sec
+      Start   9: objects.handles_selection
+59/62 Test   #6: objects.scheduling ................   Passed    0.00 sec
+      Start   4: objects.nested_creation
+60/62 Test   #9: objects.handles_selection .........   Passed    0.00 sec
+      Start   8: objects.aggregate_dispatch
+61/62 Test   #4: objects.nested_creation ...........   Passed    0.00 sec
+62/62 Test   #8: objects.aggregate_dispatch ........   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 62
+
+Label Time Summary:
+config           =   0.01 sec*proc (6 tests)
+headless         =  86.00 sec*proc (62 tests)
+music_assets     =   3.76 sec*proc (7 tests)
+objects          =   1.81 sec*proc (14 tests)
+private          =  82.85 sec*proc (11 tests)
+services         =  12.47 sec*proc (3 tests)
+sound            =   5.73 sec*proc (8 tests)
+train_session    =  45.10 sec*proc (2 tests)
+world            =  17.13 sec*proc (22 tests)
+
+Total Test time (real) =  43.02 sec

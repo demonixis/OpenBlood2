@@ -1,0 +1,59 @@
+290/290 Testing: character_motion.catalog
+290/290 Test: character_motion.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_motion_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"character_motion.catalog" start time: Oct 16 05:20 CEST
+Output:
+----------------------------------------------------------
+models/characters/caleb.abc clips=86 keys=46 unique=1
+46 play_sound footstep
+models/enemies/m_civilian1.abc clips=48 keys=35 unique=11
+12 [play_sound:death][sound_random:5]
+1 [play_sound:fear][sound_random:4]
+1 [play_sound:idle1]
+12 [play_sound:pain][sound_random:11]
+1 [play_sound:spot10]
+1 [play_sound:spot11]
+1 [play_sound:spot14]
+2 [play_sound:spot5]
+1 [play_sound:spot6]
+1 [play_sound:spot8]
+2 [play_sound:spot9]
+models/enemies/f_civilian1.abc clips=47 keys=33 unique=10
+12 [play_sound:death][sound_random:6]
+1 [play_sound:fear][sound_random:5]
+12 [play_sound:pain][sound_random:11]
+1 [play_sound:spot10]
+1 [play_sound:spot11]
+1 [play_sound:spot2]
+1 [play_sound:spot3]
+1 [play_sound:spot5]
+2 [play_sound:spot6]
+1 [play_sound:spot7]
+models/enemies/labtech.abc clips=17 keys=2 unique=2
+1 [play_sound:death][sound_random:5]
+1 [play_sound:fear][sound_random:4][sound_voice:1]
+models/enemies/m_cultist1.abc clips=48 keys=33 unique=4
+5 [play_sound:anger][sound_random:2][sound_voice:1]
+12 [play_sound:death][sound_random:3]
+4 [play_sound:idle][sound_random:4][sound_voice:1]
+12 [play_sound:pain][sound_random:3]
+models/enemies/f_cultist1.abc clips=48 keys=33 unique=4
+5 [play_sound:anger][sound_random:2][sound_voice:1]
+12 [play_sound:death][sound_random:3]
+4 [play_sound:idle][sound_random:4][sound_voice:1]
+12 [play_sound:pain][sound_random:3]
+models/enemies/gideon.abc clips=32 keys=11 unique=5
+1 [extra_key:powerup]
+2 [fire_key:head]
+1 [fire_key:ll_gun]
+3 [fire_key:rr_gun]
+4 [play_sound:build]
+Actual callbacks: clips=326 keys=193 bracket keys=147 motion keys=0 (AI sound/fire/extra keys remain unavailable)
+<end of output>
+Test time =   0.28 sec
+----------------------------------------------------------
+Test Passed.
+"character_motion.catalog" end time: Oct 16 05:20 CEST
+"character_motion.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

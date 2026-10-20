@@ -1,0 +1,47 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  990: dls_sampler.pcm
+ 1/18 Test  #990: dls_sampler.pcm ..................   Passed    0.00 sec
+      Start  991: dls_sampler.envelopes
+ 2/18 Test  #991: dls_sampler.envelopes ............   Passed    0.01 sec
+      Start  992: dls_sampler.lifetime
+ 3/18 Test  #992: dls_sampler.lifetime .............   Passed    0.09 sec
+      Start  993: dls_sampler.legacy_pan
+ 4/18 Test  #993: dls_sampler.legacy_pan ...........   Passed    0.00 sec
+      Start  994: dls_sampler.routing
+ 5/18 Test  #994: dls_sampler.routing ..............   Passed    0.00 sec
+      Start  995: dls_sampler.controllers
+ 6/18 Test  #995: dls_sampler.controllers ..........   Passed    0.00 sec
+      Start  996: dls_sampler.private
+ 7/18 Test  #996: dls_sampler.private ..............   Passed    0.58 sec
+      Start 1053: dls_sampler.live_controls
+ 8/18 Test #1053: dls_sampler.live_controls ........   Passed    0.01 sec
+      Start 1054: dls_sampler.bend_reference
+ 9/18 Test #1054: dls_sampler.bend_reference .......   Passed    0.00 sec
+      Start 1055: dls_sampler.live_private
+10/18 Test #1055: dls_sampler.live_private .........   Passed    0.57 sec
+      Start 1056: dls_sampler.midi_receiver
+11/18 Test #1056: dls_sampler.midi_receiver ........   Passed    0.04 sec
+      Start 1057: dls_sampler.midi_limits
+12/18 Test #1057: dls_sampler.midi_limits ..........   Passed    0.00 sec
+      Start 1058: dls_sampler.midi_private
+13/18 Test #1058: dls_sampler.midi_private .........   Passed    0.49 sec
+      Start 1059: dls_timing.ordering
+14/18 Test #1059: dls_timing.ordering ..............   Passed    0.00 sec
+      Start 1060: dls_timing.pcm
+15/18 Test #1060: dls_timing.pcm ...................   Passed    0.00 sec
+      Start 1061: dls_timing.limits
+16/18 Test #1061: dls_timing.limits ................   Passed    0.05 sec
+      Start 1062: dls_timing.lifetime
+17/18 Test #1062: dls_timing.lifetime ..............   Passed    0.00 sec
+      Start 1063: dls_timing.private
+18/18 Test #1063: dls_timing.private ...............   Passed    0.53 sec
+
+100% tests passed, 0 tests failed out of 18
+
+Label Time Summary:
+audio           =   1.81 sec*proc (15 tests)
+headless        =   2.39 sec*proc (18 tests)
+music_assets    =   2.39 sec*proc (18 tests)
+private         =   2.17 sec*proc (4 tests)
+
+Total Test time (real) =   2.41 sec

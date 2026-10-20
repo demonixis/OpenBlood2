@@ -1,0 +1,14 @@
+436/447 Testing: ai_recovery.crouch
+436/447 Test: ai_recovery.crouch
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_recovery_tests" "crouch"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_recovery.crouch" start time: Oct 16 14:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.crouch" end time: Oct 16 14:07 CEST
+"ai_recovery.crouch" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+416/422 Testing: ai_script.waiting
+416/422 Test: ai_script.waiting
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests" "waiting" "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-script-waiting"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_script.waiting" start time: Oct 16 13:17 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.waiting" end time: Oct 16 13:17 CEST
+"ai_script.waiting" time elapsed: 00:00:00
+----------------------------------------------------------

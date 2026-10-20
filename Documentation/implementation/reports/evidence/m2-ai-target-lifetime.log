@@ -1,0 +1,14 @@
+328/332 Testing: ai_target.lifetime
+328/332 Test: ai_target.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_target.lifetime" start time: Oct 16 08:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.lifetime" end time: Oct 16 08:07 CEST
+"ai_target.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

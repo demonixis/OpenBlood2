@@ -1,0 +1,2147 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index c9570ec..57d3680 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -124,3 +124,14 @@ audio and CinematicTrigger remain explicitly unavailable. SubwayA has 148 create
+ source entries, 7 SelfTriggers, 372 editor-only and 60 unported; nine Keys are consumed
+ on the first update (155/158 initial instances before/after player, 146/149 afterwards).
+ M2 remains open; these counts do not imply completed cinematic/gameplay services.
++
++The latest [dynamic light evidence](../Documentation/Implementation/M2_LIGHTS.md) connects original ClientLightFX/GlowingLight
++and client CLightFX waveform evaluation. Read [light contracts](docs/LIGHT_CONTRACTS.md) before
++extending lights, SFX publication or their damage/lifetime. Preserve source command
++prefixes, scheduling/NONE-wave quirks, color /511, absolute phase and deferred
++source-bound lifetime. Client records and inspector overlays are real evaluated
++state; world illumination/shadows/fog and audio remain unavailable. DirLight spots
++and the implicit main light are separate. SubwayA now has 160 created source entries,
++7 SelfTriggers, 372 editor-only and 48 unported (167/170 initial runtime instances,
++158/161 after consuming nine Keys). The earlier missing GlowingLight statement is
++superseded for this subset; M2 remains open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e51a603..64a8175 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,6 +32,7 @@ add_library(blood2_game STATIC
+     src/game/session.cpp
+     src/game/registration.cpp
+     src/game/server_adapter.cpp)
++target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/LightFX.cpp src/game/original/ClientLightFX.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+@@ -46,13 +47,13 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp)
++add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+ target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+ if(BLOOD2_INSPECTOR)
+-    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
++    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
+     target_link_libraries(blood2_app PRIVATE imgui)
+ endif()
+ 
+diff --git a/README.md b/README.md
+index 9e569a3..4ba97c6 100644
+--- a/README.md
++++ b/README.md
+@@ -26,7 +26,7 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
+ ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
+ ```
+ 
+-The default world is `01_SubwayA`. Its patched DAT supplies 580 source objects and 116 BSP models. **144 source instances** run (`GameStartPoint`, `Key`, `PathPoint`, `WorldProperties`, `Conveyor`, `Damage`, `Door`, `Trigger`, `CDestructableBrush`, `ObjectivesTrigger`, `CameraObj`), plus **7 door-owned SelfTriggers** (151 runtime instances before player entry); 372 entries are original preprocessor-only objects and **64 required runtime objects remain unported**. Every source entry remains inspectable.
++The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **160 source entries** create, including original KeyFramer and twelve GlowingLight objects, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **48 unported runtime entries**, zero failed. Runtime counts before/after player entry are **167/170**, then **158/161** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_LIGHTS.md) records these counts; earlier increment sections below are historical snapshots.
+ 
+ The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
+ 
+@@ -47,6 +47,7 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
+ | `--inspect-player` | Headless original shell/player entry inspection, with explicit gameplay blockers |
+ | `--player-smoke` | GPU Session panel, hidden player updates, unload/re-entry checks |
+ | `--weapons-smoke` | GPU Beretta/knife firing while hidden, unload/re-entry; capture at frame 181 |
++| `--lights-smoke` | GPU original dynamic-light state/KeyFramer placement while hidden, Lights inspection and reload |
+ | `--cameras-smoke` | GPU original camera tracking, client view/player gates while hidden, inspection and reload |
+ | `--objectives-smoke` | GPU original objective delivery and localized client text while hidden, inspection and reload |
+ | `--pickups-smoke` | GPU original ammo collection while hidden, Ward inspection and reload |
+@@ -110,7 +111,7 @@ The Pickups tab inspects all supported ammo/health/armor objects, including hidd
+ 
+ ## Mission objectives continuation
+ 
+-[Latest evidence](../Documentation/Implementation/M2_OBJECTIVES.md) and
++[Increment evidence](../Documentation/Implementation/M2_OBJECTIVES.md) and
+ [contracts](docs/OBJECTIVES_CONTRACTS.md) cover original ObjectivesTrigger,
+ typed client broadcasts and bounded PE resource-string lookup from external
+ cres.dll. The Objectives tab shows source objects, delivery/resolution state and
+@@ -119,18 +120,18 @@ UI/reload check. Original HUD and audio are pending; M2 remains incomplete.
+ 
+ ## Scripted camera continuation
+ 
+-[Latest evidence](../Documentation/Implementation/M2_CAMERAS.md) and
++[Increment evidence](../Documentation/Implementation/M2_CAMERAS.md) and
+ [contracts](docs/CAMERA_CONTRACTS.md) cover original CameraObj activation/tracking,
+ typed client camera selection and player movement/USE/fire restrictions. Cameras
+ shows both source and published listener flags, target/pose, timers and player
+ restrictions; diagnostic ON/OFF/LINK controls use original messages. Run
+ `./build/debug/blood2 --cameras-smoke` for hidden-UI and reload checks. The selected
+ view, visibility and audio listener are inspection data/requests; cinematic world
+-rendering, KeyFramer/CinematicTrigger and audio remain pending. Latest SubwayA
++rendering, KeyFramer/CinematicTrigger and audio remained pending at this snapshot. Its SubwayA
+ accounting is 144 source instances + 7 SelfTriggers, 154 with player/owned models,
+ 372 editor-only entries, 64 unported and zero failed. M2 is still open.
+ 
+-Latest: [original keyframed paths](../Documentation/Implementation/M2_KEYFRAMERS.md)
++Earlier increment: [original keyframed paths](../Documentation/Implementation/M2_KEYFRAMERS.md)
+ connect KeyFramer/KeyData, camera motion and owned consumed keys. The Keyframes tab
+ shows copied timelines, target transforms/results and unresolved script/sound
+ requests. Run `./build/debug/blood2 --keyframes-smoke` for hidden-UI/reload checks.
+@@ -139,3 +140,15 @@ SubwayA has 148 created source entries + 7 SelfTriggers, 372 editor-only, 60 unp
+ zero failed. Nine Keys disappear after copying: live counts are 155 before player
+ entry, 158 after entry, then 146/149 after initialization. World/container path
+ motion, CinematicTrigger, sound and full M2 acceptance remain pending.
++
++## Original dynamic lights
++
++[Latest evidence](../Documentation/Implementation/M2_LIGHTS.md) and
++[contracts](docs/LIGHT_CONTRACTS.md) cover ClientLightFX, thirteen original presets
++and client CLightFX waves. Lights exposes hidden/off sources, lifecycle/damage,
++parameters/plots, evaluated color/radius/position, an XZ placement overlay and
++queued ON/OFF/TOGGLE/KILL. Twelve authored SubwayA GlowingLight objects now follow
++the original sublight KeyFramer. `./build/debug/blood2 --lights-smoke` checks them
++while UI is hidden and after reload. The computed point-light state does not yet
++illuminate the world; shadows/fog, general SFX/audio, DirLight spots and the implicit
++main light remain pending. M2 stays incomplete.
+diff --git a/docs/LIGHT_CONTRACTS.md b/docs/LIGHT_CONTRACTS.md
+new file mode 100644
+index 0000000..c4ad18e
+--- /dev/null
++++ b/docs/LIGHT_CONTRACTS.md
+@@ -0,0 +1,104 @@
++# Original dynamic light contracts
++
++M2 is incomplete. Read [object contracts](OBJECT_CONTRACTS.md),
++[keyframe contracts](KEYFRAMER_CONTRACTS.md), [shared damage](BRUSH_CONTRACTS.md),
++[pickup/spawn contracts](PICKUP_CONTRACTS.md), [source selections](M2_LIGHT_SOURCES.json)
++and [implementation evidence](../../Documentation/Implementation/M2_LIGHTS.md).
++
++## Original server behavior
++
++ClientLightFX and its thirteen original waveform/compatibility subclasses use the
++original property defaults, CDestructable aggregate, B2BaseClass filtering and
++callback order. CClientSFX ancestry is preserved, but ClientLightFX explicitly
++calls B2BaseClass as the source does, bypassing CClientSFX's FORCECLIENTUPDATE hook.
++World/string creation reads properties; runtime creation retains constructor
++values, including NONE waves, radius minimum 0, frequency 0 and lifetime -1.
++World defaults instead use radius minimum 200, frequency 4 and lifetime 0.
++Restore rejects; save/load/cache and the general SFX manager are not implemented.
++
++Source clamps remain asymmetric: LifeTime and IntensityMin/RadiusMin are at least
++zero, IntensityMax is at most 255. Do not sort min/max or impose a new gameplay
++range. Color divides by **511**, and authored phases convert degrees to radians.
++Frequencies are radians per second; no extra 2*pi multiplier is applied. Initially
++on lights receive visible/saveable user bits and a first server update after
++0.1 seconds plus a world/string-only random offset in [0.01,0.5]. Initially off
++lights receive neither bit and no schedule. Runtime on lights start after 0.1.
++
++Triggers compare case-sensitive **prefixes** TOGGLE, ON and OFF, update the visible
++user bit and source on-state, and do not rearm scheduling or restart lifetime.
++Thus an initially off light turned on later never starts its server lifetime
++schedule. An initially on light turned off continues scheduled lifetime checks.
++Each server update rearms at 0.1; positive lifetime expires at elapsed >= duration.
++Shared damage runs once before checking death/removing the light. KILL uses the
++aggregate's existing case-insensitive whole-token death damage and requires a live
++sender. CanDamage, TriggerDestroyOnly, original death/damage triggers and supported
++SpawnObject behavior remain shared. Lights do not gain invented solid/ray-hit flags.
++
++## Evaluated client state and engine boundary
++
++Original CLightFX wave tables/formulas and update rules evaluate a real owned
++point-light record, bound to a checked source handle. This replaces the SFX packet
++and separate legacy client OT_LIGHT object; it is not a generic packet-ABI port.
++No GPU world illumination service is claimed. CastShadows, SolidLight,
++OnlyLightWorld, DontLightBackfacing and FogLight bits are retained metadata.
++
++Creation evaluates both waves, including NONE (maximum), and begins visible as in
++the source CreateObject. The first normal update applies actual server visibility.
++Every step follows source position even while off. While on, only non-NONE waves
++update: phase is absolute session time * frequency + phase, not time since ON.
++While off, radius becomes the minimum, color holds and off_start_time records the
++current time; that field does not drive waveform evaluation. Consequently NONE
++radius stays at its minimum after OFF/ON. Evaluated radius clamps to [0,10000];
++each color channel clamps 0.5 + normalized source color * intensity to [0,1].
++
++Wave identifiers 0..11, original sample tables, square boundary <= pi, saw ramps,
++strobe and search behavior are preserved. Negative phases are deliberately wrapped
++into [0,2*pi) before table access, preventing the source's undefined negative array
++index. A rounded upper endpoint is wrapped to zero. This safe extension is not
++claimed retail numerical parity. Nonfinite or abs(value)>1,000,000 property values
++reject before source clamps; color/position use existing physics-vector bounds.
++Sound names are owned, limited to 100 bytes and reject embedded NUL. Light flags
++outside 0xf8 and unknown wave IDs reject; no byte-wrapped aliases are invented.
++
++PublishLightEffect accepts one descriptor per live ClientLightFX-derived source,
++up to 4,096 records. Invalid/duplicate publication fails explicitly. The local
++RandomFloat service validates finite ordered bounded inputs and uses a portable
++seeded minstd_rand stream reset on world unload. This reproduces scheduling jitter,
++not the retail CRT/global random sequence. No waveform depends on this jitter.
++
++Client state advances after normal simulation and deferred destruction, independent
++of UI/client entry. Pending sources immediately fail GetLightEffect; destruction
++removes their record and aggregate list membership. World reset clears values and
++random state. Do not retain pointers into the light vector across publish/remove.
++Ramp sound paths are inspectable/indexed only. The original PlayRampSound method
++has no callers in the imported update path; no sound event/playback is invented.
++
++## Inspection and validation
++
++Lights includes hidden/off/inactive/pending sources, class, health/damage gates,
++lifetime/schedule, flags, normalized parameters, waveform plots, evaluated color,
++radius, position, update counts and indexed/missing ramp resources. An XZ plot shows
++all source positions and the selected radius. This is an inspection overlay, not
++world lighting. ON/OFF/TOGGLE/KILL are deferred UI commands through original messages.
++Source-world properties and failed/missing classes remain visible in World.
++
++Eight synthetic cases cover all waveform families/boundaries, negative phases,
++clamps/defaults/aliases, runtime/string differences, command/lifetime quirks,
++damage/chained death/spawns, invalid descriptors/handles, two-target keyframing,
++linked target removal, filtering and repeated teardown. The private catalog loads
++72 lights across 57 readable worlds (two initially off, zero filtered/rejected),
++checks OFF/ON and cleanup; 16_bridge.dat remains a strict parser rejection.
++Two complete SubwayA reloads verify twelve moving GlowingLight targets, current
++client positions, commands, nine consumed Keys and exact live-object counts.
++Their authored intensity/radius ranges are constant; varying waves are verified
++in synthetic cases. The expanded private weapon scenario remains under its unchanged
++90-second timeout when sanitizer tests run sequentially (89.07 seconds in the
++full run); the initial parallel run timed out. Use the documented sequential
++ASan command and retain this narrow timing margin as a known validation limit. GPU smoke checks actual moving state while UI is hidden and
++after reload, also in the build without ImGui.
++
++These are dynamic point lights. Preprocessed Light/DirLight and the implicit main
++directional light are separate: the owner's clarification identifies DirLight as
++spots. World illumination, shadows/fog, general client FX/audio, cinematic/world
++model motion, AI, transitions and other required M2 services remain pending. No
++retail executable, additional platform, mobile or XR validation is claimed.
+diff --git a/docs/M2_LIGHT_SOURCES.json b/docs/M2_LIGHT_SOURCES.json
+new file mode 100644
+index 0000000..6bacca6
+--- /dev/null
++++ b/docs/M2_LIGHT_SOURCES.json
+@@ -0,0 +1,149 @@
++{
++  "date": "2026-10-16",
++  "status": "M2 incomplete; original dynamic point-light rules and evaluated client state, world illumination unavailable",
++  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "imports": [
++    {
++      "source": "sources/blood2/ObjectDLL/ClientLightFX.cpp",
++      "target": "src/game/original/ClientLightFX.cpp",
++      "source_line_ranges": [
++        [
++          153,
++          213
++        ],
++        [
++          223,
++          261
++        ],
++        [
++          275,
++          279
++        ],
++        [
++          290,
++          356
++        ],
++        [
++          368,
++          621
++        ]
++      ],
++      "selection": "Selected constructor, aggregate/callback order, world/string properties, postprop flags, randomized initial scheduling, lifetime, color/phase conversion, case-sensitive prefix triggers, damage/death and SFX descriptor fields. Owned strings/typed publication replace message/string ABI. Restore/cache/save/load omitted; checked finite bounds and invalid-wave rejection are explicit adaptations.",
++      "source_sha256": "223065f6c0cf2ea61fcd8a8c8025a96ba207f236e0b752e3308e65ef44bea860",
++      "target_sha256": "b41a1561e40ee988c28d51928bb81e24c3028d9a3c0d60bc3a0ea7b41362fbfb"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ClientLightFX.cpp",
++      "target": "src/game/registration.cpp",
++      "source_line_ranges": [
++        [
++          24,
++          140
++        ]
++      ],
++      "selection": "Original base properties, CClientSFX ancestry and all thirteen waveform/compatibility presets; shared destructable schema uses existing selected aggregate contract.",
++      "source_sha256": "223065f6c0cf2ea61fcd8a8c8025a96ba207f236e0b752e3308e65ef44bea860",
++      "target_sha256": "dd6a35f0cc9a84f2f6dc3f80c3757a9afef77a17c9f39355a115a13926966bfe"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ClientLightFX.h",
++      "target": "src/game/original/ClientLightFX.h",
++      "source_line_ranges": [
++        [
++          18,
++          146
++        ]
++      ],
++      "selection": "Original class, aggregate and thirteen subclasses, selected state and callbacks with value ownership; save/load/cache declarations omitted.",
++      "source_sha256": "95cfbaf5286c1413baaf3f2d452aad9e0a53b3e0281a334c3e0a68be1473821c",
++      "target_sha256": "a936aea20049eaf359415ae8f4e99589e94800076a0e94c532423e09c34fbaed"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ClientSFX.cpp",
++      "target": "src/game/original/ClientSFX.h",
++      "source_line_ranges": [
++        [
++          25,
++          50
++        ]
++      ],
++      "selection": "Original constructor and PRECREATE FORCECLIENTUPDATE hook; ClientLightFX retains its explicit B2BaseClass forwarding, bypassing this hook.",
++      "source_sha256": "6e3731e0371a886cb02a22ba7aa5145f67b47080ed74805150d09206d41b6d54",
++      "target_sha256": "4f3d387f6593d974c6c0fe8e4d17a8035451fbf83eedaf0bec4e5c0858b35904"
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/LightFX.cpp",
++      "target": "src/game/original/LightFX.cpp",
++      "source_line_ranges": [
++        [
++          32,
++          155
++        ],
++        [
++          168,
++          284
++        ],
++        [
++          299,
++          325
++        ],
++        [
++          369,
++          402
++        ]
++      ],
++      "selection": "Original wave tables/formulas, descriptor initialization, initial evaluation, position following, ON/OFF visibility/radius/color rules and clamping. Negative phases wrap safely before table access. Owned checked source-bound state replaces legacy client OT_LIGHT allocation, not a world illumination implementation. PlayRampSound has no calls in this path and is not fabricated.",
++      "source_sha256": "ad0e75b3f16882b0a1b4fb65ddbfe11b2d8bce0ea84a60bb0c362e936ed887e5",
++      "target_sha256": "8c259862304808bfb93ad422f28dc0a0f53552a12a64b898265374146a1a4e03"
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/LightFX.h",
++      "target": "src/game/original/LightFX.h",
++      "source_line_ranges": [
++        [
++          44,
++          142
++        ]
++      ],
++      "selection": "Selected CLightFX interface and state; omit unused timing/hitpoint fields, generic CSpecialFX inheritance and sound/client object handles. Existing server light descriptor is owned by value.",
++      "source_sha256": "bdeae16d078380ee9286d931081da640196290dd56c07f03a38dbf9e4f5d4297",
++      "target_sha256": "81cb362819bbaaa2b1a8f39386df237acb746037a79d068202271ee62c194069"
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/LightFX.h",
++      "target": "src/game/light_messages.h",
++      "source_line_ranges": [
++        [
++          18,
++          36
++        ]
++      ],
++      "selection": "Original LIGHTCREATESTRUCT field meanings represented as owned typed LightSettings/LightWave, retaining separate flags and sound names.",
++      "source_sha256": "bdeae16d078380ee9286d931081da640196290dd56c07f03a38dbf9e4f5d4297",
++      "target_sha256": "d2eac4713d701daf12dc6ec683b77931111be3512593d9e1fa4f5bd2e1c64297"
++    },
++    {
++      "source": "sources/blood2/Shared/ClientServerShared.h",
++      "target": "src/game/light_messages.h",
++      "source_line_ranges": [
++        [
++          50,
++          63
++        ]
++      ],
++      "selection": "Original wave identifiers NONE through SEARCH, values 0 through 11.",
++      "source_sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
++      "target_sha256": "d2eac4713d701daf12dc6ec683b77931111be3512593d9e1fa4f5bd2e1c64297"
++    }
++  ],
++  "adaptations": [
++    "Owned typed descriptors and source-bound evaluated CLightFX registry replace SFX packets/client object allocation; no generic SFX or GPU world-illumination success is claimed",
++    "Checked finite values, wave 0..11, flags 0xf8, owned names up to 100 bytes, one publication per live derived source, maximum 4096 lights; restore rejects",
++    "Safe negative-phase modulo wrapping fixes undefined original negative table indexing; source sample tables/thresholds otherwise preserved",
++    "Portable local seeded minstd_rand jitter resets on world unload; not the retail CRT/global stream",
++    "Preserve constructor vs world defaults, B2BaseClass callback bypass, asymmetric clamps, color /511, absolute-time phases, prefix commands and OFF/ON lifetime/NONE-radius quirks",
++    "Existing CDestructable damage/death/spawn contracts reused; pending source invalidates lookup before deferred destruction and paired keyframe links remain safe",
++    "UI-independent state, honest waveform/color/placement inspection and GPU smoke; source ramp sound names retained, unused PlayRampSound not invented",
++    "Exactly twelve GlowingLight entries increase SubwayA creation/runtime count assertions; no unsupported service, parser bound or startup gate relaxed"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 63fbe3d..ea98c69 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -342,3 +342,14 @@ record the target-offset removal fix, bounded discovery and reentrant command gu
+ The typed engine interpolation/motion helpers and UI are new implementation code.
+ Sound/BPrint requests, world/container movers, CinematicTrigger and full M2 remain
+ unimplemented; these diagnostics are not successful audio/physics service stubs.
++
++## M2 dynamic lights
++
++[Source selections](M2_LIGHT_SOURCES.json) record ClientLightFX callbacks/properties,
++CClientSFX ancestry, all thirteen presets and original client CLightFX wave tables,
++conversion and update rules. Owned typed records replace SFX packet/client object
++allocation. [Contracts](LIGHT_CONTRACTS.md) identify safe negative-phase wrapping,
++bounded descriptors, local portable jitter and retained source quirks. Registry,
++UI/placement plots and test harnesses are new project code. No world-lighting,
++shadow/fog, audio or generic SFX-manager service is claimed. Earlier omissions of
++GlowingLight are superseded only for this selected server/client subset.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index a8568a2..9e05564 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -2,6 +2,7 @@
+ #include "build_info.h"
+ #include "engine/container.h"
+ #include "engine/world_model.h"
++#include "game/original/ClientLightFX.h"
+ #include "game/original/Door.h"
+ #include "game/original/Key.h"
+ #include "game/original/KeyPickup.h"
+@@ -77,6 +78,22 @@ namespace OpenBlood2
+ 
+     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
+     {
++        if (light_request)
++        {
++            if (const auto* r = game.objects.get(light_request);
++                r && r->life == Life::Alive && dynamic_cast<const ClientLightFX*>(r->game.get()))
++            {
++                auto text = game.server.CreateString(light_command.c_str());
++                auto message = game.server.StartMessageToObject(r->game.get(), r->handle, 1000);
++                if (message)
++                {
++                    game.server.WriteToMessageHString(message, text);
++                    game.server.EndMessage(message);
++                }
++                game.server.FreeString(text);
++            }
++            light_request = {};
++        }
+         if (camera_request)
+         {
+             if (const auto* r = game.objects.get(camera_request);
+@@ -514,6 +531,12 @@ namespace OpenBlood2
+                     draw_triggers(game, selection);
+                     ImGui::EndTabItem();
+                 }
++                if (ImGui::BeginTabItem("Lights", nullptr, select_lights ? ImGuiTabItemFlags_SetSelected : 0))
++                {
++                    select_lights = false;
++                    draw_lights(game, selection);
++                    ImGui::EndTabItem();
++                }
+                 if (ImGui::BeginTabItem("Keyframes", nullptr, select_keyframes ? ImGuiTabItemFlags_SetSelected : 0))
+                 {
+                     select_keyframes = false;
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 7e48e59..613dadd 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -21,6 +21,10 @@ namespace OpenBlood2
+         ObjectId trigger_selection{}, trigger_request{};
+         std::string trigger_command;
+         bool grant_key_request = false;
++        bool select_lights = false;
++        ObjectId light_selection{}, light_request{};
++        std::string light_command;
++        void draw_lights(GameSession&, ObjectSelection&);
+         bool select_keyframes = false;
+         ObjectId keyframe_selection{};
+         void draw_keyframes(GameSession&, ObjectSelection&);
+diff --git a/src/app/inspector_lights.cpp b/src/app/inspector_lights.cpp
+new file mode 100644
+index 0000000..c2ed886
+--- /dev/null
++++ b/src/app/inspector_lights.cpp
+@@ -0,0 +1,123 @@
++#include "app/inspector.h"
++#include "game/original/ClientLightFX.h"
++#include <algorithm>
++#include <imgui.h>
++namespace OpenBlood2
++{
++    void Inspector::draw_lights(GameSession& game, ObjectSelection& selection)
++    {
++        ImGui::TextWrapped("Original ClientLightFX / CLightFX state. Dynamic point lights follow their source objects; "
++                           "world illumination, shadows and fog rendering remain unavailable. DirLight spots and the "
++                           "implicit main light are separate pending systems.");
++        ImGui::Text("%zu evaluated client lights / session time %.3f", game.server.light_effects.size(),
++                    game.server.GetTime());
++        if (!ImGui::BeginTable("Light inspection", 2, ImGuiTableFlags_Resizable))
++            return;
++        ImGui::TableSetupColumn("Sources", ImGuiTableColumnFlags_WidthFixed, 245);
++        ImGui::TableSetupColumn("Evaluated state");
++        ImGui::TableNextColumn();
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* r = game.objects.get(id);
++            const auto* l = r ? dynamic_cast<const ClientLightFX*>(r->game.get()) : nullptr;
++            if (!l)
++                continue;
++            if (!game.objects.get(light_selection))
++                light_selection = id;
++            std::string label = std::string(r->state.m_Name) + (l->on ? " [on]" : " [off]");
++            if (r->life != Life::Alive)
++                label += " [pending removal]";
++            if (!(r->state.m_Flags & FLAG_VISIBLE))
++                label += " [hidden]";
++            if (r->activity != OBJSTATE_ACTIVE)
++                label += " [inactive]";
++            ImGui::PushID(static_cast<int>(id.slot));
++            if (ImGui::Selectable(label.c_str(), light_selection == id))
++                light_selection = selection.id = id;
++            ImGui::PopID();
++        }
++        ImGui::TableNextColumn();
++        if (const auto* r = game.objects.get(light_selection))
++            if (const auto* l = dynamic_cast<const ClientLightFX*>(r->game.get()))
++            {
++                ImGui::Text("%s / HP %.2f / damage allowed %d", r->type->name.c_str(), l->damage.m_fHitPoints,
++                            l->damage.can_damage);
++                ImGui::Text("Lifetime %.3f / start %.3f / scheduled %d", l->lifetime, l->start_time, r->scheduled);
++                ImGui::Text("Initial delay %.3f / dynamic %d / flags 0x%02x", l->initial_delay, l->dynamic,
++                            l->settings.flags);
++                for (const char* cmd : {"ON", "OFF", "TOGGLE", "KILL"})
++                {
++                    if (ImGui::Button(cmd))
++                    {
++                        light_request = light_selection;
++                        light_command = cmd;
++                    }
++                    ImGui::SameLine();
++                }
++                ImGui::NewLine();
++                ImGui::Text("Last command: %s", l->last_command.c_str());
++                if (const auto* fx = game.server.GetLightEffect(r->handle))
++                {
++                    ImGui::Text("Client visible %d / radius %.2f / updates %llu", fx->visible, fx->radius,
++                                (unsigned long long)fx->updates);
++                    ImGui::Text("Position %.2f %.2f %.2f", fx->position.x, fx->position.y, fx->position.z);
++                    ImGui::Text("RGB %.4f %.4f %.4f", fx->color.x, fx->color.y, fx->color.z);
++                    ImGui::ColorButton("Evaluated RGB", ImVec4(fx->color.x, fx->color.y, fx->color.z, 1),
++                                       ImGuiColorEditFlags_NoTooltip, ImVec2(80, 20));
++                    ImGui::TextUnformatted("XZ source placement (selected radius outline; no world lighting)");
++                    const auto origin = ImGui::GetCursorScreenPos();
++                    const auto available = ImGui::GetContentRegionAvail();
++                    const ImVec2 size(std::max(100.0f, available.x), std::clamp(available.y - 28, 80.0f, 140.0f));
++                    DVector low = fx->position, high = low;
++                    for (const auto& v : game.server.light_effects)
++                    {
++                        low.x = std::min(low.x, v.position.x);
++                        low.z = std::min(low.z, v.position.z);
++                        high.x = std::max(high.x, v.position.x);
++                        high.z = std::max(high.z, v.position.z);
++                    }
++                    float scale = std::min((size.x - 20) / std::max(1.0f, high.x - low.x),
++                                           (size.y - 20) / std::max(1.0f, high.z - low.z));
++                    auto point = [&](DVector v)
++                    { return ImVec2(origin.x + 10 + (v.x - low.x) * scale, origin.y + 10 + (v.z - low.z) * scale); };
++                    auto* draw = ImGui::GetWindowDrawList();
++                    draw->PushClipRect(origin, ImVec2(origin.x + size.x, origin.y + size.y), true);
++                    draw->AddRectFilled(origin, ImVec2(origin.x + size.x, origin.y + size.y),
++                                        IM_COL32(20, 24, 30, 255));
++                    for (const auto& v : game.server.light_effects)
++                        draw->AddCircleFilled(
++                            point(v.position), v.source == fx->source ? 5 : 3,
++                            v.visible ? ImGui::ColorConvertFloat4ToU32(ImVec4(v.color.x, v.color.y, v.color.z, 1))
++                                      : IM_COL32(90, 90, 90, 255));
++                    draw->AddCircle(point(fx->position), std::max(1.0f, fx->radius * scale),
++                                    IM_COL32(240, 180, 40, 255));
++                    draw->PopClipRect();
++                    ImGui::Dummy(size);
++                }
++                else
++                    ImGui::TextUnformatted("No live client light state.");
++                if (ImGui::CollapsingHeader("Wave parameters and ramp resources"))
++                {
++                    auto wave = [](const char* name, const LightWave& w)
++                    {
++                        ImGui::Text("%s: wave %u / range %.2f .. %.2f", name, w.kind, w.min, w.max);
++                        ImGui::Text("Frequency %.3f rad/s / phase %.3f rad", w.frequency, w.phase);
++                        float values[96]{};
++                        for (int i = 0; i < 96; ++i)
++                            light_wave_value(w.kind, w.min, w.max, 6.283185307f * i / 95, values[i]);
++                        ImGui::PushID(name);
++                        ImGui::PlotLines("One phase cycle", values, 96, 0, nullptr, std::min(w.min, w.max) - .01f,
++                                         std::max(w.min, w.max) + .01f, ImVec2(0, 40));
++                        ImGui::PopID();
++                    };
++                    wave("Intensity", l->settings.intensity);
++                    wave("Radius", l->settings.radius);
++                    for (const auto* sound : {&l->settings.ramp_up_sound, &l->settings.ramp_down_sound})
++                        if (!sound->empty())
++                            ImGui::TextWrapped("Ramp resource: %s [%s; not played]", sound->c_str(),
++                                               game.resources.find(*sound) ? "indexed" : "missing");
++                }
++            }
++        ImGui::EndTable();
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/light_smoke.cpp b/src/app/light_smoke.cpp
+new file mode 100644
+index 0000000..fab3b55
+--- /dev/null
++++ b/src/app/light_smoke.cpp
+@@ -0,0 +1,51 @@
++#include "light_smoke.h"
++#include "game/original/ClientLightFX.h"
++#include "game/original/KeyFramer.h"
++#include <cmath>
++namespace OpenBlood2
++{
++    bool prepare_light_smoke(GameSession& g, ObjectId& selected)
++    {
++        for (auto id : g.objects.snapshot())
++            if (const auto* r = g.objects.get(id); r && std::string_view(r->state.m_Name) == "sublight" &&
++                                                   dynamic_cast<const ClientLightFX*>(r->game.get()))
++            {
++                selected = id;
++                return true;
++            }
++        return false;
++    }
++    bool check_light_smoke(GameSession& g, ObjectId selected)
++    {
++        const auto* r = g.objects.get(selected);
++        if (!r)
++            return false;
++        const auto* fx = g.server.GetLightEffect(r->handle);
++        if (!fx || !fx->visible || fx->updates < 2 || g.server.light_effects.size() != 12)
++            return false;
++        const KeyFramer* path = nullptr;
++        for (auto id : g.objects.snapshot())
++            if (const auto* f = dynamic_cast<const KeyFramer*>(g.objects.get(id)->game.get());
++                f && f->object_name == "sublight")
++                path = f;
++        if (!path || !path->initialized || !path->active || path->keys.size() != 2 || path->targets.size() != 12)
++            return false;
++        for (const auto& t : path->targets)
++            if (t.object == r->handle)
++            {
++                if (!t.moves || t.result != MoverResult::Moved)
++                    return false;
++                const auto& a = path->keys[0];
++                const auto& b = path->keys[1];
++                auto expected = vector_add(
++                    t.offset, vector_add(a.position, vector_scale(vector_subtract(b.position, a.position),
++                                                                  (path->time - a.time) / (b.time - a.time))));
++                auto d = vector_subtract(expected, fx->position),
++                     actual = vector_subtract(r->state.m_Pos, fx->position);
++                // Authored SubwayA minima/maxima are equal; do not claim visible pulsing here.
++                return vector_dot(d, d) < .0001f && vector_dot(actual, actual) < .0001f &&
++                       std::abs(fx->radius - 200) < .001f && std::abs(fx->color.x - .858121f) < .001f;
++            }
++        return false;
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/light_smoke.h b/src/app/light_smoke.h
+new file mode 100644
+index 0000000..e44da74
+--- /dev/null
++++ b/src/app/light_smoke.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool prepare_light_smoke(GameSession&, ObjectId&);
++    bool check_light_smoke(GameSession&, ObjectId);
++} // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index e39d887..9f9b8e9 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -9,6 +9,7 @@
+ #include "game/server_adapter.h"
+ #include "interaction_smoke.h"
+ #include "keyframe_smoke.h"
++#include "light_smoke.h"
+ #include "objectives_smoke.h"
+ #include "pickup_smoke.h"
+ #include "trigger_smoke.h"
+@@ -174,6 +175,14 @@ namespace
+                 return 4;
+             selection.id = smoke_camera;
+         }
++        OpenBlood2::ObjectId smoke_light{};
++        bool light_hidden = false;
++        if (options.lights_smoke)
++        {
++            if (!OpenBlood2::prepare_light_smoke(game, smoke_light))
++                return 4;
++            selection.id = smoke_light;
++        }
+         OpenBlood2::ObjectId smoke_keyframe{};
+         bool keyframe_hidden = false;
+         if (options.keyframes_smoke)
+@@ -200,7 +209,7 @@ namespace
+         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
+                                    !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke &&
+                                    !options.pickups_smoke && !options.objectives_smoke && !options.cameras_smoke &&
+-                                   !options.keyframes_smoke;
++                                   !options.keyframes_smoke && !options.lights_smoke;
+         inspector.select_weapons = options.weapons_smoke;
+         inspector.select_movement = options.movement_smoke;
+         inspector.select_containers = options.containers_smoke;
+@@ -208,6 +217,8 @@ namespace
+         inspector.select_pickups = options.pickups_smoke;
+         inspector.select_objectives = options.objectives_smoke;
+         inspector.select_cameras = options.cameras_smoke;
++        inspector.select_lights = options.lights_smoke;
++        inspector.light_selection = smoke_light;
+         inspector.select_keyframes = options.keyframes_smoke;
+         inspector.keyframe_selection = smoke_keyframe;
+         inspector.brush_selection = smoke_body;
+@@ -321,6 +332,9 @@ namespace
+             if (options.brushes_smoke && frames == reload_frame + 1)
+                 if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
+                     return 4;
++            if (options.lights_smoke && frames == reload_frame + 1 &&
++                !OpenBlood2::prepare_light_smoke(game, smoke_light))
++                return 4;
+             if (options.keyframes_smoke && frames == reload_frame + 1 &&
+                 !OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe))
+                 return 4;
+@@ -449,7 +463,8 @@ namespace
+                 frames >= (extended_smoke ? 180u
+                            : (options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
+                               options.interaction_smoke || options.brushes_smoke || options.pickups_smoke ||
+-                              options.objectives_smoke || options.cameras_smoke || options.keyframes_smoke)
++                              options.objectives_smoke || options.cameras_smoke || options.keyframes_smoke ||
++                              options.lights_smoke)
+                                ? 14u
+                                : 2u) &&
+                 !captured && !options.capture_file.empty();
+@@ -596,6 +611,8 @@ namespace
+                     use.key.down = frames == hide_frame;
+                     event_ok = SDL_PushEvent(&use);
+                 }
++                if (options.lights_smoke && frames == show_frame - 1)
++                    light_hidden = OpenBlood2::check_light_smoke(game, smoke_light);
+                 if (options.keyframes_smoke && frames == show_frame - 1)
+                     keyframe_hidden = OpenBlood2::check_keyframe_smoke(game, smoke_keyframe);
+                 if (options.cameras_smoke && frames == show_frame - 1)
+@@ -725,6 +742,7 @@ namespace
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
++                (options.lights_smoke && (!light_hidden || !OpenBlood2::check_light_smoke(game, smoke_light))) ||
+                 (options.keyframes_smoke &&
+                  (!keyframe_hidden || !OpenBlood2::check_keyframe_smoke(game, smoke_keyframe))) ||
+                 (options.cameras_smoke && (!camera_hidden || !OpenBlood2::check_camera_smoke(game, smoke_camera))) ||
+@@ -750,6 +768,9 @@ namespace
+             if (options.world_smoke)
+                 spdlog::info("World smoke passed: unload/reload, original instance/string counts restored, "
+                              "collision/model resources restored, preview animation advanced while hidden");
++            if (options.lights_smoke)
++                spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
++                             "and after reload; evaluated radius/color checked; world illumination unavailable");
+             if (options.keyframes_smoke)
+                 spdlog::info("KEYFRAMES smoke: authored camera path and owned key lifetime checked while UI hidden and "
+                              "after reload; missing Gideon message exposed");
+@@ -832,6 +853,7 @@ int main(int argc, char** argv)
+                      "  --interaction-smoke GPU original USE and rotating door inspection\n"
+                      "  --pickups-smoke   GPU original ammo pickup, hidden collection and reload\n"
+                      "  --objectives-smoke GPU original objectives and localized text, hidden delivery/reload\n"
++                     "  --lights-smoke      GPU original light state, keyframe placement and reload\n"
+                      "  --keyframes-smoke   GPU original camera key path, key lifetime and reload\n"
+                      "  --cameras-smoke     GPU original camera tracking, player gates and reload\n"
+                      "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index d1e2ff0..c257894 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -125,6 +125,10 @@ namespace OpenBlood2
+                 options.player_smoke = true;
+                 options.containers_smoke = true;
+             }
++            else if (arg == "--lights-smoke")
++            {
++                options.world_smoke = options.player_smoke = options.lights_smoke = true;
++            }
+             else if (arg == "--keyframes-smoke")
+             {
+                 options.world_smoke = options.player_smoke = options.keyframes_smoke = true;
+@@ -218,7 +222,7 @@ namespace OpenBlood2
+         if (int(options.weapons_smoke) + int(options.movement_smoke) + int(options.containers_smoke) +
+                 int(options.doors_smoke) + int(options.triggers_smoke) + int(options.interaction_smoke) +
+                 int(options.brushes_smoke) + int(options.pickups_smoke) + int(options.objectives_smoke) +
+-                int(options.cameras_smoke) + int(options.keyframes_smoke) >
++                int(options.cameras_smoke) + int(options.keyframes_smoke) + int(options.lights_smoke) >
+             1)
+         {
+             error = "Choose one player smoke scenario";
+diff --git a/src/engine/config.h b/src/engine/config.h
+index 282a4ac..ea1fe8b 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -23,7 +23,7 @@ namespace OpenBlood2
+         bool weapons_smoke = false;
+         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
+              interaction_smoke = false, brushes_smoke = false, pickups_smoke = false, objectives_smoke = false,
+-             cameras_smoke = false, keyframes_smoke = false;
++             cameras_smoke = false, keyframes_smoke = false, lights_smoke = false;
+         bool start_game = false;
+         bool explicit_config = false;
+         bool help = false;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 9b08702..0a6bbb5 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -4,6 +4,7 @@
+ #include "game/camera_messages.h"
+ #include "game/container_messages.h"
+ #include "game/key_messages.h"
++#include "game/light_messages.h"
+ #include "game/mover_messages.h"
+ #include "game/pickup_messages.h"
+ #include "game/player_messages.h"
+@@ -58,6 +59,9 @@ class ServerDE : public CSBase
+     // raw C++ pointer whose lifetime can outlive its object.
+     virtual HOBJECT GetClientUserData(HCLIENT) = 0;
+     virtual DRESULT SetClientUserData(HCLIENT, HOBJECT) = 0;
++    virtual bool RandomFloat(float, float, float&) = 0;
++    virtual bool PublishLightEffect(HOBJECT, const OpenBlood2::LightSettings&) = 0;
++    virtual void RemoveLightEffect(HOBJECT) = 0;
+     virtual bool PublishCameraEffect(HOBJECT, const OpenBlood2::CameraSettings&) = 0;
+     virtual void RemoveCameraEffect(HOBJECT) = 0;
+     virtual OpenBlood2::CameraView GetCameraView() = 0;
+diff --git a/src/game/light_messages.h b/src/game/light_messages.h
+new file mode 100644
+index 0000000..93d0591
+--- /dev/null
++++ b/src/game/light_messages.h
+@@ -0,0 +1,35 @@
++#pragma once
++#include "basedefs_de.h"
++#include <string>
++namespace OpenBlood2
++{
++    // Original Shared/ClientServerShared.h numeric wave identifiers.
++    enum WaveTypes : DBYTE
++    {
++        WAVE_NONE,
++        WAVE_SQUARE,
++        WAVE_SAW,
++        WAVE_RAMPUP,
++        WAVE_RAMPDOWN,
++        WAVE_SINE,
++        WAVE_FLICKER1,
++        WAVE_FLICKER2,
++        WAVE_FLICKER3,
++        WAVE_FLICKER4,
++        WAVE_STROBE,
++        WAVE_SEARCH
++    };
++    struct LightWave
++    {
++        float min = 0, max = 0, frequency = 0, phase = 0;
++        DBYTE kind = WAVE_NONE;
++    };
++    struct LightSettings
++    {
++        DVector color{255, 255, 255};
++        DDWORD flags = 0;
++        LightWave intensity{.5f, 1, 4, 0, WAVE_NONE}, radius{0, 500, 0, 4, WAVE_NONE};
++        std::string ramp_up_sound, ramp_down_sound;
++    };
++    bool valid_light_settings(const LightSettings&);
++} // namespace OpenBlood2
+diff --git a/src/game/original/ClientLightFX.cpp b/src/game/original/ClientLightFX.cpp
+new file mode 100644
+index 0000000..6dc0819
+--- /dev/null
++++ b/src/game/original/ClientLightFX.cpp
+@@ -0,0 +1,154 @@
++// Selected original ObjectDLL/ClientLightFX.cpp. See LIGHT_CONTRACTS.md.
++#include "ClientLightFX.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++using namespace OpenBlood2;
++ClientLightFX::ClientLightFX()
++{
++    AddAggregate(&damage);
++}
++ClientLightFX::~ClientLightFX()
++{
++    if (g_pServerDE)
++        g_pServerDE->RemoveLightEffect(m_hObject);
++}
++bool ClientLightFX::ReadProp()
++{
++    GenericProp p;
++    auto real = [&](const char* name, float& value)
++    {
++        if (g_pServerDE->GetPropGeneric(name, &p) == DE_OK)
++            value = p.m_Float;
++    };
++    real("HitPoints", hit_points);
++    real("LifeTime", lifetime);
++    if (g_pServerDE->GetPropGeneric("LightSwitch", &p) == DE_OK)
++        on = p.m_Bool;
++    if (g_pServerDE->GetPropGeneric("Color", &p) == DE_OK)
++        settings.color = p.m_Color;
++    auto wave = [&](const char* prefix, LightWave& w)
++    {
++        std::string name = prefix;
++        real((name + "Min").c_str(), w.min);
++        real((name + "Max").c_str(), w.max);
++        real((name + "Freq").c_str(), w.frequency);
++        real((name + "Phase").c_str(), w.phase);
++        if (g_pServerDE->GetPropGeneric((name + "Waveform").c_str(), &p) == DE_OK)
++        {
++            if (p.m_Long < 0 || p.m_Long > WAVE_SEARCH)
++                return false;
++            w.kind = static_cast<DBYTE>(p.m_Long);
++        }
++        return true;
++    };
++    if (!wave("Intensity", settings.intensity) || !wave("Radius", settings.radius))
++        return false;
++    if (!std::isfinite(lifetime) || !std::isfinite(hit_points) || std::abs(lifetime) > 1e6f ||
++        std::abs(hit_points) > 1e6f || !valid_light_settings(settings))
++        return false;
++    lifetime = std::max(lifetime, 0.0f);
++    settings.intensity.min = std::max(settings.intensity.min, 0.0f);
++    settings.intensity.max = std::min(settings.intensity.max, 255.0f);
++    settings.radius.min = std::max(settings.radius.min, 0.0f);
++    if (g_pServerDE->GetPropGeneric("RampUpSound", &p) == DE_OK)
++        settings.ramp_up_sound = p.m_String;
++    if (g_pServerDE->GetPropGeneric("RampDownSound", &p) == DE_OK)
++        settings.ramp_down_sound = p.m_String;
++    const char* names[] = {"CastShadowsFlag", "SolidLightFlag", "OnlyLightWorldFlag", "DontLightBackfacingFlag",
++                           "FogLightFlag"};
++    for (unsigned i = 0; i < 5; ++i)
++        if (g_pServerDE->GetPropGeneric(names[i], &p) == DE_OK && p.m_Bool)
++            settings.flags |= 1u << (i + 3);
++    return valid_light_settings(settings);
++}
++bool ClientLightFX::InitialUpdate()
++{
++    if (!damage.Init(m_hObject))
++        return false;
++    damage.m_fMaxHitPoints = hit_points;
++    damage.SetHitPoints(hit_points);
++    float offset = 0;
++    if (!dynamic && !g_pServerDE->RandomFloat(.01f, .5f, offset))
++        return false;
++    initial_delay = .1f + offset;
++    if (on)
++        g_pServerDE->SetNextUpdate(m_hObject, initial_delay);
++    settings.color = vector_scale(settings.color, 1.0f / 511);
++    start_time = g_pServerDE->GetTime();
++    settings.intensity.phase *= 3.14159265358979323846f / 180;
++    settings.radius.phase *= 3.14159265358979323846f / 180;
++    if (on)
++        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | 1u | 8u);
++    return g_pServerDE->PublishLightEffect(m_hObject, settings);
++}
++DDWORD ClientLightFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE)
++    {
++        if (!data || reason == 3 || !B2BaseClass::EngineMessageFn(message, data, reason))
++            return 0;
++        if (reason == 1 || reason == 2)
++        {
++            dynamic = false;
++            if (!ReadProp())
++                return 0;
++        }
++        if (!damage.spawn_valid)
++            return 0;
++        auto& c = *static_cast<ObjectCreateStruct*>(data);
++        if (on)
++        {
++            c.m_NextUpdate = .01f;
++            c.m_Flags = FLAG_VISIBLE;
++        }
++        else
++            c.m_NextUpdate = 0;
++        c.m_Flags |= FLAG_GOTHRUWORLD;
++        return 1;
++    }
++    if (message == MID_INITIALUPDATE)
++    {
++        if (!InitialUpdate())
++            g_pServerDE->RemoveObject(m_hObject);
++    }
++    else if (message == MID_UPDATE)
++    {
++        g_pServerDE->SetNextUpdate(m_hObject, .1f);
++        if (lifetime > 0 && g_pServerDE->GetTime() - start_time >= lifetime)
++            g_pServerDE->RemoveObject(m_hObject);
++    }
++    return B2BaseClass::EngineMessageFn(message, data, reason);
++}
++DDWORD ClientLightFX::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    if (message == 1000)
++    {
++        auto h = g_pServerDE->ReadFromMessageHString(read);
++        const auto* text = g_pServerDE->GetStringData(h);
++        last_command = text ? text : "";
++        g_pServerDE->FreeString(h);
++        auto flags = g_pServerDE->GetObjectUserFlags(m_hObject);
++        // Source compares case-sensitive prefixes, not whole command tokens.
++        if (last_command.starts_with("TOGGLE"))
++        {
++            flags ^= 1u;
++            on = !on;
++        }
++        else if (last_command.starts_with("ON"))
++        {
++            flags |= 1u;
++            on = true;
++        }
++        else if (last_command.starts_with("OFF"))
++        {
++            flags &= ~1u;
++            on = false;
++        }
++        g_pServerDE->SetObjectUserFlags(m_hObject, flags);
++    }
++    const auto result = B2BaseClass::ObjectMessageFn(sender, message, read);
++    if (message == damage_message && damage.IsDead())
++        g_pServerDE->RemoveObject(m_hObject);
++    return result;
++}
+diff --git a/src/game/original/ClientLightFX.h b/src/game/original/ClientLightFX.h
+new file mode 100644
+index 0000000..7a325cb
+--- /dev/null
++++ b/src/game/original/ClientLightFX.h
+@@ -0,0 +1,62 @@
++#pragma once
++#include "ClientSFX.h"
++#include "Destructable.h"
++#include "game/light_messages.h"
++class ClientLightFX : public CClientSFX
++{
++  public:
++    ClientLightFX();
++    ~ClientLightFX() override;
++    bool on = true, dynamic = true;
++    float lifetime = -1, start_time = 0, initial_delay = 0, hit_points = 1;
++    OpenBlood2::LightSettings settings;
++    CDestructable damage;
++    std::string last_command;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++
++  private:
++    bool ReadProp();
++    bool InitialUpdate();
++};
++class SquareWaveLightFX : public ClientLightFX
++{
++};
++class SawWaveLightFX : public ClientLightFX
++{
++};
++class RampUpWaveLightFX : public ClientLightFX
++{
++};
++class RampDownWaveLightFX : public ClientLightFX
++{
++};
++class SineWaveLightFX : public ClientLightFX
++{
++};
++class Flicker1WaveLightFX : public ClientLightFX
++{
++};
++class Flicker2WaveLightFX : public ClientLightFX
++{
++};
++class Flicker3WaveLightFX : public ClientLightFX
++{
++};
++class Flicker4WaveLightFX : public ClientLightFX
++{
++};
++class StrobeWaveLightFX : public ClientLightFX
++{
++};
++class SearchWaveLightFX : public ClientLightFX
++{
++};
++class FlickerLight : public ClientLightFX
++{
++};
++class GlowingLight : public ClientLightFX
++{
++};
+diff --git a/src/game/original/ClientSFX.h b/src/game/original/ClientSFX.h
+new file mode 100644
+index 0000000..32673c8
+--- /dev/null
++++ b/src/game/original/ClientSFX.h
+@@ -0,0 +1,16 @@
++#pragma once
++#include "B2BaseClass.h"
++// Original CClientSFX callback. ClientLightFX explicitly calls B2BaseClass instead.
++class CClientSFX : public B2BaseClass
++{
++  public:
++    explicit CClientSFX(DBYTE type = OT_NORMAL) : B2BaseClass(type) {}
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD message, void* data, DFLOAT reason) override
++    {
++        if (message == MID_PRECREATE && data)
++            static_cast<ObjectCreateStruct*>(data)->m_Flags |= FLAG_FORCECLIENTUPDATE;
++        return B2BaseClass::EngineMessageFn(message, data, reason);
++    }
++};
+diff --git a/src/game/original/LightFX.cpp b/src/game/original/LightFX.cpp
+new file mode 100644
+index 0000000..add6cc8
+--- /dev/null
++++ b/src/game/original/LightFX.cpp
+@@ -0,0 +1,215 @@
++// Selected ClientShellDLL/LightFX.cpp wave tables/evaluation and update rules.
++#include "LightFX.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++using namespace OpenBlood2;
++namespace
++{
++    constexpr float PI = 3.14159265358979323846f, PIx2 = 2 * PI;
++    static constexpr char flicker1[] = {
++        0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1,
++        0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1,
++    };
++
++    // organic flicker -- good for torches
++    static constexpr DFLOAT flicker2[] = {
++        1, 2, 4, 2, 3, 4, 3, 2, 0, 0, 1, 2, 4, 3, 2, 0, 2, 1, 0, 1, 0, 2, 3, 4, 3, 2, 1, 1, 2, 0, 0, 1,
++        1, 2, 3, 4, 4, 3, 2, 1, 2, 3, 4, 4, 2, 1, 0, 1, 0, 0, 0, 0, 1, 2, 3, 4, 3, 2, 1, 2, 3, 4, 3, 2,
++    };
++
++    // mostly on flicker -- good for flaky fluourescents
++    static constexpr DFLOAT flicker3[] = {
++        4, 4, 4, 4, 3, 4, 4, 4, 4, 4, 4, 2, 4, 3, 4, 4, 4, 4, 2, 1, 3, 3, 3, 4, 3, 4, 4, 4, 4, 4, 2, 4,
++        4, 4, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 1, 0, 1, 0, 1, 0, 1, 0, 2, 3, 4, 4, 4, 4, 4, 4, 4, 3, 4,
++    };
++
++    // mostly off flicker -- good for really flaky fluourescents
++    static constexpr DFLOAT flicker4[] = {
++        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 3, 0, 1, 0, 1, 0, 4, 4, 4, 4, 4, 2, 0,
++        0, 0, 0, 4, 4, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 1, 2, 1, 2, 1, 2, 1, 4, 3, 2,
++        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++    };
++
++    static constexpr DFLOAT strobe[] = {
++        64, 64, 64, 48, 36, 27, 20, 15, 11, 9, 6, 5, 4, 3, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++        0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++    };
++
++    // static int GetWaveValue( int nWave, int theta, int amplitude )
++    static DFLOAT GetWaveValue(DBYTE nWaveform, DFLOAT fMin, DFLOAT fMax, DFLOAT fTheta)
++    {
++        DFLOAT fReturn = fMax;
++
++        fTheta = (DFLOAT)fmod(fTheta, PIx2);
++        // Original negative table indexes are undefined. Wrap negative phases safely.
++        if (fTheta < 0)
++            fTheta += PIx2;
++        if (fTheta >= PIx2)
++            fTheta = 0;
++
++        switch (nWaveform)
++        {
++            case WAVE_SQUARE:
++                fReturn = (fTheta <= PI) ? fMin : fMax;
++                break;
++
++            case WAVE_SAW:
++            {
++                if (fTheta < PI)
++                    fReturn = fMin + (fMax - fMin) * fTheta / PI;
++                else
++                    fReturn = fMin + (fMax - fMin) * (PIx2 - fTheta) / PI;
++                break;
++            }
++
++            case WAVE_RAMPUP:
++                fReturn = fMin + (fMax - fMin) * fTheta / (PIx2);
++                break;
++
++            case WAVE_RAMPDOWN:
++                fReturn = fMin + (fMax - fMin) * (PIx2 - fTheta) / (PIx2);
++                break;
++
++            case WAVE_SINE:
++                fReturn = fMin + (fMax - fMin) * ((DFLOAT)sin(fTheta) / 2.0f + 0.5f);
++                break;
++
++            case WAVE_FLICKER1:
++            {
++                int index = (int)((fTheta / (PIx2)) * 63);
++                fReturn = fMin + (fMax - fMin) * (flicker1[index]);
++                break;
++            }
++
++            case WAVE_FLICKER2:
++            {
++                int index = (int)((fTheta / (PIx2)) * 63);
++                fReturn = fMin + (fMax - fMin) * (flicker2[index] / 4.0f);
++                break;
++            }
++
++            case WAVE_FLICKER3:
++            {
++                int index = (int)((fTheta / (PIx2)) * 63);
++                fReturn = fMin + (fMax - fMin) * (flicker3[index] / 4.0f);
++                break;
++            }
++
++            case WAVE_FLICKER4:
++            {
++                int index = (int)((fTheta / (PIx2)) * 127);
++                fReturn = fMin + (fMax - fMin) * (flicker4[index] / 4.0f);
++                break;
++            }
++
++            case WAVE_STROBE:
++            {
++                int index = (int)((fTheta / (PIx2)) * 63);
++                fReturn = fMin + (fMax - fMin) * (strobe[index] / 64.0f);
++                break;
++            }
++
++            case WAVE_SEARCH:
++            {
++                fTheta *= 2.0f;
++                if (fTheta > PIx2)
++                    fReturn = fMin;
++                else
++                    fReturn = fMin + (fMax - fMin) * ((DFLOAT)-cos(fTheta) / 2.0f + 0.5f);
++                break;
++            }
++        }
++
++        return fReturn;
++    };
++
++    float radius_value(float value)
++    {
++        return std::clamp(value, 0.0f, 10000.0f);
++    }
++    DVector color_value(DVector color, float intensity)
++    {
++        return {std::clamp(.5f + color.x * intensity, 0.0f, 1.0f), std::clamp(.5f + color.y * intensity, 0.0f, 1.0f),
++                std::clamp(.5f + color.z * intensity, 0.0f, 1.0f)};
++    }
++} // namespace
++namespace OpenBlood2
++{
++    bool valid_light_settings(const LightSettings& s)
++    {
++        auto wave = [](const LightWave& w)
++        {
++            return w.kind <= WAVE_SEARCH && std::isfinite(w.min) && std::abs(w.min) <= 1e6f && std::isfinite(w.max) &&
++                   std::abs(w.max) <= 1e6f && std::isfinite(w.frequency) && std::abs(w.frequency) <= 1e6f &&
++                   std::isfinite(w.phase) && std::abs(w.phase) <= 1e6f;
++        };
++        return physics_vector(s.color) && wave(s.intensity) && wave(s.radius) && !(s.flags & ~0xf8u) &&
++               s.ramp_up_sound.size() <= 100 && s.ramp_down_sound.size() <= 100 &&
++               s.ramp_up_sound.find('\0') == std::string::npos && s.ramp_down_sound.find('\0') == std::string::npos;
++    }
++    bool light_wave_value(DBYTE wave, float min, float max, float theta, float& output)
++    {
++        if (wave > WAVE_SEARCH || !std::isfinite(min) || !std::isfinite(max) || !std::isfinite(theta) ||
++            std::abs(min) > 1e6f || std::abs(max) > 1e6f)
++            return false;
++        output = GetWaveValue(wave, min, max, theta);
++        return std::isfinite(output);
++    }
++} // namespace OpenBlood2
++bool CLightFX::Init(HOBJECT object, const LightSettings& value, float time, DVector pos)
++{
++    if (!object || !valid_light_settings(value) || !std::isfinite(time) || !physics_vector(pos))
++        return false;
++    source = object;
++    settings = value;
++    position = pos;
++    updates = 0;
++    visible = true;
++    off_start_time = 0;
++    float intensity = 0, r = 0;
++    if (!light_wave_value(settings.intensity.kind, settings.intensity.min, settings.intensity.max,
++                          time * settings.intensity.frequency + settings.intensity.phase, intensity) ||
++        !light_wave_value(settings.radius.kind, settings.radius.min, settings.radius.max,
++                          time * settings.radius.frequency + settings.radius.phase, r))
++        return false;
++    radius = radius_value(r);
++    color = color_value(settings.color, intensity);
++    return true;
++}
++bool CLightFX::Update(float time, DVector pos, bool on)
++{
++    if (!std::isfinite(time) || !physics_vector(pos))
++        return false;
++    auto next_color = color;
++    float next_radius = radius, value = 0;
++    if (on)
++    {
++        if (settings.intensity.kind != WAVE_NONE)
++        {
++            if (!light_wave_value(settings.intensity.kind, settings.intensity.min, settings.intensity.max,
++                                  time * settings.intensity.frequency + settings.intensity.phase, value))
++                return false;
++            next_color = color_value(settings.color, value);
++        }
++        if (settings.radius.kind != WAVE_NONE)
++        {
++            if (!light_wave_value(settings.radius.kind, settings.radius.min, settings.radius.max,
++                                  time * settings.radius.frequency + settings.radius.phase, value))
++                return false;
++            next_radius = radius_value(value);
++        }
++    }
++    else
++    {
++        off_start_time = time;
++        next_radius = radius_value(settings.radius.min);
++    }
++    position = pos;
++    visible = on;
++    color = next_color;
++    radius = next_radius;
++    ++updates;
++    return true;
++}
+diff --git a/src/game/original/LightFX.h b/src/game/original/LightFX.h
+new file mode 100644
+index 0000000..ad7f473
+--- /dev/null
++++ b/src/game/original/LightFX.h
+@@ -0,0 +1,20 @@
++#pragma once
++#include "game/light_messages.h"
++// Selected original client CLightFX: real evaluated state, no generic SFX/packet ABI.
++class CLightFX
++{
++  public:
++    bool Init(HOBJECT, const OpenBlood2::LightSettings&, float time, DVector position);
++    bool Update(float time, DVector position, bool on);
++    HOBJECT source = nullptr;
++    OpenBlood2::LightSettings settings;
++    DVector position{}, color{};
++    float radius = 0, off_start_time = 0;
++    bool visible = true;
++    std::uint64_t updates = 0;
++};
++namespace OpenBlood2
++{
++    // Checked source waveform, including original sample tables and phase thresholds.
++    bool light_wave_value(DBYTE wave, float min, float max, float theta, float& output);
++} // namespace OpenBlood2
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 6562a0e..83248fb 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -2,6 +2,7 @@
+ #include "game/original/B2BaseClass.h"
+ #include "game/original/CameraObj.h"
+ #include "game/original/CameraSpot.h"
++#include "game/original/ClientLightFX.h"
+ #include "game/original/Door.h"
+ #include "game/original/GameStartPoint.h"
+ #include "game/original/Key.h"
+@@ -84,6 +85,100 @@ namespace OpenBlood2
+                                    {"BaseKeyName", std::string{}},
+                                    {"StartActive", false},
+                                    {"Looping", false}}};
++        const ClassInfo client_sfx{"CClientSFX", &b2base, construct<CClientSFX>, {}};
++        const ClassInfo client_light{"ClientLightFX", &client_sfx, construct<ClientLightFX>, []
++                                     {
++                                         std::vector<PropertySpec> p{{"HitPoints", 1.0f},
++                                                                     {"LightSwitch", true},
++                                                                     {"LifeTime", 0.0f},
++                                                                     {"Color", DVector{255, 255, 255}},
++                                                                     {"IntensityMin", .5f},
++                                                                     {"IntensityMax", 1.0f},
++                                                                     {"IntensityWaveform", std::int32_t(0)},
++                                                                     {"IntensityFreq", 4.0f},
++                                                                     {"IntensityPhase", 0.0f},
++                                                                     {"RadiusMin", 200.0f},
++                                                                     {"RadiusMax", 500.0f},
++                                                                     {"RadiusWaveform", std::int32_t(0)},
++                                                                     {"RadiusFreq", 4.0f},
++                                                                     {"RadiusPhase", 0.0f},
++                                                                     {"TriggerDestroyOnly", false},
++                                                                     {"CanDamage", true},
++                                                                     {"SpawnObjectVel", DVector{}}};
++                                         for (auto name : {"RampUpSound", "RampDownSound", "DamageTriggerTarget",
++                                                           "DamageTriggerMessage", "DeathTriggerTarget",
++                                                           "DeathTriggerMessage", "SpawnObject"})
++                                             p.push_back({name, std::string{}});
++                                         for (auto name : {"CastShadowsFlag", "SolidLightFlag", "OnlyLightWorldFlag",
++                                                           "DontLightBackfacingFlag", "FogLightFlag"})
++                                             p.push_back({name, false});
++                                         return p;
++                                     }()};
++        const ClassInfo light_SquareWaveLightFX{
++            "SquareWaveLightFX",
++            &client_light,
++            construct<SquareWaveLightFX>,
++            {{"IntensityWaveform", std::int32_t(1)}, {"RadiusWaveform", std::int32_t(1)}}};
++        const ClassInfo light_SawWaveLightFX{
++            "SawWaveLightFX",
++            &client_light,
++            construct<SawWaveLightFX>,
++            {{"IntensityWaveform", std::int32_t(2)}, {"RadiusWaveform", std::int32_t(2)}}};
++        const ClassInfo light_RampUpWaveLightFX{
++            "RampUpWaveLightFX",
++            &client_light,
++            construct<RampUpWaveLightFX>,
++            {{"IntensityWaveform", std::int32_t(3)}, {"RadiusWaveform", std::int32_t(3)}}};
++        const ClassInfo light_RampDownWaveLightFX{
++            "RampDownWaveLightFX",
++            &client_light,
++            construct<RampDownWaveLightFX>,
++            {{"IntensityWaveform", std::int32_t(4)}, {"RadiusWaveform", std::int32_t(4)}}};
++        const ClassInfo light_SineWaveLightFX{
++            "SineWaveLightFX",
++            &client_light,
++            construct<SineWaveLightFX>,
++            {{"IntensityWaveform", std::int32_t(5)}, {"RadiusWaveform", std::int32_t(5)}}};
++        const ClassInfo light_Flicker1WaveLightFX{
++            "Flicker1WaveLightFX",
++            &client_light,
++            construct<Flicker1WaveLightFX>,
++            {{"IntensityWaveform", std::int32_t(6)}, {"RadiusWaveform", std::int32_t(6)}}};
++        const ClassInfo light_Flicker2WaveLightFX{
++            "Flicker2WaveLightFX",
++            &client_light,
++            construct<Flicker2WaveLightFX>,
++            {{"IntensityWaveform", std::int32_t(7)}, {"RadiusWaveform", std::int32_t(7)}}};
++        const ClassInfo light_Flicker3WaveLightFX{
++            "Flicker3WaveLightFX",
++            &client_light,
++            construct<Flicker3WaveLightFX>,
++            {{"IntensityWaveform", std::int32_t(8)}, {"RadiusWaveform", std::int32_t(8)}}};
++        const ClassInfo light_Flicker4WaveLightFX{
++            "Flicker4WaveLightFX",
++            &client_light,
++            construct<Flicker4WaveLightFX>,
++            {{"IntensityWaveform", std::int32_t(9)}, {"RadiusWaveform", std::int32_t(9)}}};
++        const ClassInfo light_StrobeWaveLightFX{
++            "StrobeWaveLightFX",
++            &client_light,
++            construct<StrobeWaveLightFX>,
++            {{"IntensityWaveform", std::int32_t(10)}, {"RadiusWaveform", std::int32_t(10)}}};
++        const ClassInfo light_SearchWaveLightFX{
++            "SearchWaveLightFX",
++            &client_light,
++            construct<SearchWaveLightFX>,
++            {{"IntensityWaveform", std::int32_t(11)}, {"RadiusWaveform", std::int32_t(11)}}};
++        const ClassInfo light_FlickerLight{
++            "FlickerLight",
++            &client_light,
++            construct<FlickerLight>,
++            {{"IntensityWaveform", std::int32_t(7)}, {"RadiusWaveform", std::int32_t(7)}}};
++        const ClassInfo light_GlowingLight{
++            "GlowingLight",
++            &client_light,
++            construct<GlowingLight>,
++            {{"IntensityWaveform", std::int32_t(5)}, {"RadiusWaveform", std::int32_t(5)}}};
+         const ClassInfo start{"StartPoint", &base, construct<StartPoint>, {}};
+         const ClassInfo game_start{"GameStartPoint",
+                                    &start,
+@@ -414,13 +509,21 @@ namespace OpenBlood2
+     bool register_original_classes(Objects& objects)
+     {
+         return objects.register_class(base) && objects.register_class(b2base) && objects.register_class(camera) &&
+-               objects.register_class(camera_object) && objects.register_class(keyframer) &&
+-               objects.register_class(key) && objects.register_class(start) && objects.register_class(game_start) &&
+-               objects.register_class(path) && objects.register_class(world_properties) &&
+-               objects.register_class(smell) && objects.register_class(character) && objects.register_class(player) &&
+-               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
+-               objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
+-               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
++               objects.register_class(client_sfx) && objects.register_class(client_light) &&
++               objects.register_class(light_SquareWaveLightFX) && objects.register_class(light_SawWaveLightFX) &&
++               objects.register_class(light_RampUpWaveLightFX) && objects.register_class(light_RampDownWaveLightFX) &&
++               objects.register_class(light_SineWaveLightFX) && objects.register_class(light_Flicker1WaveLightFX) &&
++               objects.register_class(light_Flicker2WaveLightFX) && objects.register_class(light_Flicker3WaveLightFX) &&
++               objects.register_class(light_Flicker4WaveLightFX) && objects.register_class(light_StrobeWaveLightFX) &&
++               objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
++               objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
++               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
++               objects.register_class(game_start) && objects.register_class(path) &&
++               objects.register_class(world_properties) && objects.register_class(smell) &&
++               objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
++               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
++               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
++               objects.register_class(freefall) && objects.register_class(trigger) &&
+                objects.register_class(key_pickup) && objects.register_class(pickup) &&
+                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+                objects.register_class(health_base) && objects.register_class(armor_base) &&
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 5d155a6..fb81971 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -4,9 +4,11 @@
+ #include "engine/objects.h"
+ #include "engine/string_resources.h"
+ #include "game/original/BloodShells.h"
++#include "game/original/LightFX.h"
+ #include "game/session.h"
+ #include <array>
+ #include <optional>
++#include <random>
+ #include <unordered_set>
+ 
+ struct StringHandle
+@@ -70,6 +72,8 @@ namespace OpenBlood2
+             spawn_reports.clear();
+             pickup_reports.clear();
+             camera_effects.clear();
++            light_effects.clear();
++            random_.seed(1);
+             variables_.erase("GAME_WORLDNAME");
+             client_strings = {};
+             client_strings_error.clear();
+@@ -94,6 +98,12 @@ namespace OpenBlood2
+         StringResources client_strings;
+         std::string client_strings_error;
+         bool client_strings_attempted = false;
++        std::vector<CLightFX> light_effects;
++        bool RandomFloat(float, float, float&) override;
++        bool PublishLightEffect(HOBJECT, const LightSettings&) override;
++        void RemoveLightEffect(HOBJECT) override;
++        const CLightFX* GetLightEffect(HOBJECT) const;
++        bool advance_lights();
+         std::vector<CameraView> camera_effects;
+         bool PublishCameraEffect(HOBJECT, const CameraSettings&) override;
+         void RemoveCameraEffect(HOBJECT) override;
+@@ -161,6 +171,7 @@ namespace OpenBlood2
+         DVector gravity{0, -2000, 0};
+ 
+       private:
++        std::minstd_rand random_{1};
+         double world_time_origin_ = 0;
+         struct String
+         {
+diff --git a/src/game/server_lights.cpp b/src/game/server_lights.cpp
+new file mode 100644
+index 0000000..064c5a3
+--- /dev/null
++++ b/src/game/server_lights.cpp
+@@ -0,0 +1,55 @@
++#include "game/original/ClientLightFX.h"
++#include "game/server_adapter.h"
++#include <algorithm>
++#include <cmath>
++namespace OpenBlood2
++{
++    bool ServerAdapter::RandomFloat(float low, float high, float& value)
++    {
++        trace_service("RandomFloat");
++        if (!std::isfinite(low) || !std::isfinite(high) || low > high || std::abs(low) > 1e6f || std::abs(high) > 1e6f)
++            return false;
++        value = low + (high - low) * static_cast<float>(random_() - random_.min()) /
++                          static_cast<float>(random_.max() - random_.min());
++        return true;
++    }
++    bool ServerAdapter::PublishLightEffect(HOBJECT h, const LightSettings& settings)
++    {
++        trace_service("PublishLightEffect");
++        if (!IsObjectAlive(h) || !dynamic_cast<ClientLightFX*>(objects_.get(h)->game.get()) ||
++            light_effects.size() >= 4096 ||
++            std::any_of(light_effects.begin(), light_effects.end(), [h](const auto& l) { return l.source == h; }))
++            return objects_.fail(ObjectError::Unsupported, "Invalid/duplicate light source or light limit exceeded");
++        CLightFX effect;
++        if (!effect.Init(h, settings, GetTime(), objects_.get(h)->state.m_Pos))
++            return objects_.fail(ObjectError::InvalidProperty, "Invalid light descriptor/pose");
++        light_effects.push_back(std::move(effect));
++        return true;
++    }
++    void ServerAdapter::RemoveLightEffect(HOBJECT h)
++    {
++        trace_service("RemoveLightEffect");
++        std::erase_if(light_effects, [h](const auto& l) { return l.source == h; });
++    }
++    const CLightFX* ServerAdapter::GetLightEffect(HOBJECT h) const
++    {
++        const auto* r = objects_.get(h);
++        if (!r || r->life != Life::Alive)
++            return nullptr;
++        for (const auto& l : light_effects)
++            if (l.source == h)
++                return &l;
++        return nullptr;
++    }
++    bool ServerAdapter::advance_lights()
++    {
++        std::erase_if(light_effects, [this](const auto& l) { return !IsObjectAlive(l.source); });
++        for (auto& l : light_effects)
++        {
++            const auto* r = objects_.get(l.source);
++            if (!l.Update(GetTime(), r->state.m_Pos, (r->user_flags & 1) != 0))
++                return objects_.fail(ObjectError::InvalidProperty, "Light update produced invalid state");
++        }
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 40d6a29..4e619cc 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -376,6 +376,7 @@ namespace OpenBlood2
+         if (seconds > 0)
+             ok = server.damage_containers() && ok;
+         ok = objects.finish_frame() && ok;
++        ok = server.advance_lights() && ok;
+         if (ok && preview_model && preview_playing &&
+             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
+             preview_playing = false;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 89fe452..015d079 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -333,3 +333,21 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --keyframes-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/keyframes.png")
+     set_tests_properties(gpu.keyframes PROPERTIES LABELS "private;gpu;keyframes" TIMEOUT 30 RUN_SERIAL TRUE)
+ endif()
++
++add_executable(light_tests light_tests.cpp)
++target_link_libraries(light_tests PRIVATE blood2_game)
++blood2_project_options(light_tests)
++foreach(case IN ITEMS defaults waves commands lifetime damage validation motion teardown)
++    add_test(NAME lights.${case} COMMAND light_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/light-fixtures/${case}")
++    set_tests_properties(lights.${case} PROPERTIES LABELS "headless;lights" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME lights.catalog COMMAND light_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(lights.catalog PROPERTIES LABELS "headless;private;lights" TIMEOUT 120)
++endif()
++
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.lights COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --lights-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/lights.png")
++    set_tests_properties(gpu.lights PROPERTIES LABELS "private;gpu;lights" TIMEOUT 30 RUN_SERIAL TRUE)
++endif()
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index 33f1eff..ce5bc87 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -393,9 +393,9 @@ namespace
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+             ++entries[e.state];
+-        CHECK(entries[EntryState::Created] == 148 && entries[EntryState::EditorOnly] == 372 &&
+-              entries[EntryState::Unsupported] == 60 && entries[EntryState::Failed] == 0 &&
+-              g.objects.snapshot().size() == 155);
++        CHECK(entries[EntryState::Created] == 160 && entries[EntryState::EditorOnly] == 372 &&
++              entries[EntryState::Unsupported] == 48 && entries[EntryState::Failed] == 0 &&
++              g.objects.snapshot().size() == 167);
+         std::cout << "Subway instances=" << g.objects.snapshot().size() << "\n";
+         for (auto [state, n] : entries)
+             std::cout << "state=" << int(state) << " count=" << n << '\n';
+diff --git a/tests/camera_tests.cpp b/tests/camera_tests.cpp
+index 19b9136..f636d95 100644
+--- a/tests/camera_tests.cpp
++++ b/tests/camera_tests.cpp
+@@ -291,7 +291,7 @@ namespace
+         CHECK(worlds == 57 && entries == 61 && created == 61 && rejected == 0);
+         CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+         CHECK(CameraObj::m_dwNumCameras == 2 && g.server.camera_effects.size() == 2 &&
+-              g.objects.snapshot().size() == 158);
++              g.objects.snapshot().size() == 170);
+         CHECK(test_camera::complete_subway_intro(g));
+         for (auto id : g.objects.snapshot())
+             if (auto* r = g.objects.get(id); r && dynamic_cast<CameraObj*>(r->game.get()))
+diff --git a/tests/keyframer_tests.cpp b/tests/keyframer_tests.cpp
+index b163289..54b710f 100644
+--- a/tests/keyframer_tests.cpp
++++ b/tests/keyframer_tests.cpp
+@@ -361,14 +361,14 @@ namespace
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+             const float entered = g.server.GetTime();
+-            CHECK(g.objects.snapshot().size() == 158);
++            CHECK(g.objects.snapshot().size() == 170);
+             auto* list = g.server.FindNamedObjects("tracking1");
+             CHECK(list && list->m_pFirstLink);
+             auto h = list->m_pFirstLink->m_hObject;
+             g.server.RelinquishList(list);
+             auto* f = framer(g, h);
+             CHECK(g.step(1.0 / 60) && f->keys.size() == 2 && f->targets.size() == 1 && f->active && f->time == 0);
+-            CHECK(g.objects.snapshot().size() == 149);
++            CHECK(g.objects.snapshot().size() == 161);
+             auto camera = f->targets[0].object;
+             auto start = g.objects.get(camera)->state.m_Pos;
+             CHECK(g.step(1.0 / 60) && f->targets[0].moves == 1 && f->processed == 1 && f->unresolved_messages == 1);
+diff --git a/tests/light_tests.cpp b/tests/light_tests.cpp
+new file mode 100644
+index 0000000..77a1b17
+--- /dev/null
++++ b/tests/light_tests.cpp
+@@ -0,0 +1,390 @@
++#include "game/game_settings.h"
++#include "game/original/ClientLightFX.h"
++#include "game/original/KeyFramer.h"
++#include "player_fixture.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    constexpr float pi = 3.14159265358979323846f;
++    bool close(float a, float b)
++    {
++        return std::abs(a - b) < .001f;
++    }
++    bool close(DVector a, DVector b)
++    {
++        return close(a.x, b.x) && close(a.y, b.y) && close(a.z, b.z);
++    }
++    HOBJECT create(GameSession& g, const char* type = "ClientLightFX", Properties p = {})
++    {
++        return g.objects.create(g.objects.find_class(type), {}, Creation::World, p);
++    }
++    ClientLightFX* light(GameSession& g, HOBJECT h)
++    {
++        return dynamic_cast<ClientLightFX*>(g.server.HandleToObject(h));
++    }
++    bool command(GameSession& g, HOBJECT h, const char* value)
++    {
++        auto text = g.server.CreateString(value);
++        auto m = g.server.StartMessageToObject(g.server.HandleToObject(h), h, 1000);
++        auto written = g.server.WriteToMessageHString(m, text);
++        auto sent = g.server.EndMessage(m);
++        g.server.FreeString(text);
++        return written == DE_OK && sent == DE_OK;
++    }
++    bool hit(GameSession& g, HOBJECT h, float amount)
++    {
++        auto m = g.server.StartMessageToObject(g.server.HandleToObject(h), h, damage_message);
++        Damage d{{}, {}, amount, DamageType::Normal, h};
++        return m && g.server.WriteDamage(m, d) == DE_OK && g.server.EndMessage(m) == DE_OK;
++    }
++    bool defaults(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto h = create(g);
++        auto* s = light(g, h);
++        auto* c = g.server.GetLightEffect(h);
++        CHECK(s && c && !s->dynamic && s->on && s->lifetime == 0 && s->damage.m_fHitPoints == 1);
++        CHECK(s->initial_delay >= .11f && s->initial_delay <= .6f && g.objects.get(h)->scheduled);
++        CHECK(s->settings.radius.min == 200 && s->settings.radius.max == 500 && s->settings.radius.frequency == 4);
++        CHECK(close(s->settings.color.x, 255.0f / 511) && close(c->color.x, .5f + 255.0f / 511) && c->radius == 500);
++        CHECK((g.objects.get(h)->user_flags & 9) == 9 && !(g.objects.get(h)->state.m_Flags & FLAG_FORCECLIENTUPDATE));
++        CHECK(!g.server.string_count());
++        const char* names[] = {"SquareWaveLightFX",   "SawWaveLightFX",      "RampUpWaveLightFX",
++                               "RampDownWaveLightFX", "SineWaveLightFX",     "Flicker1WaveLightFX",
++                               "Flicker2WaveLightFX", "Flicker3WaveLightFX", "Flicker4WaveLightFX",
++                               "StrobeWaveLightFX",   "SearchWaveLightFX",   "FlickerLight",
++                               "GlowingLight"};
++        for (unsigned i = 0; i < 13; ++i)
++        {
++            auto a = create(g, names[i]);
++            CHECK(a);
++            auto expected = i < 11 ? i + 1 : i == 11 ? 7 : 5;
++            CHECK(light(g, a)->settings.intensity.kind == expected && light(g, a)->settings.radius.kind == expected);
++        }
++        auto runtime = g.objects.create(g.objects.find_class("GlowingLight"), {}, Creation::Runtime);
++        CHECK(runtime);
++        CHECK(light(g, runtime)->dynamic && light(g, runtime)->lifetime == -1 &&
++              light(g, runtime)->initial_delay == .1f && light(g, runtime)->settings.radius.kind == WAVE_NONE &&
++              light(g, runtime)->settings.radius.min == 0 && light(g, runtime)->settings.radius.frequency == 0);
++        auto str = g.objects.create_props(g.objects.find_class("GlowingLight"), {},
++                                          "IntensityPhase 90; RadiusPhase -90; RampUpSound sounds/a.wav; HitPoints 4");
++        CHECK(str);
++        CHECK(close(light(g, str)->settings.intensity.phase, pi / 2) &&
++              close(light(g, str)->settings.radius.phase, -pi / 2) && light(g, str)->damage.m_fHitPoints == 4);
++        CHECK(g.server.GetLightEffect(str)->settings.ramp_up_sound == "sounds/a.wav" && !g.server.string_count());
++        CHECK(!g.objects.create(g.objects.find_class("ClientLightFX"), {}, Creation::Restore));
++        CHECK(g.unload_world() && g.server.light_effects.empty() && !CDestructable::m_dwNumDestructables);
++        return true;
++    }
++    bool waves(const std::filesystem::path&)
++    {
++        float v = 99;
++        auto sample = [&](DBYTE w, float angle, float expected)
++        { return light_wave_value(w, 10, 50, angle, v) && close(v, expected); };
++        CHECK(sample(WAVE_NONE, 0, 50) && sample(WAVE_SQUARE, pi, 10) && sample(WAVE_SQUARE, pi + .01f, 50));
++        CHECK(sample(WAVE_SAW, pi / 2, 30) && sample(WAVE_SAW, pi, 50) && sample(WAVE_SAW, 3 * pi / 2, 30));
++        CHECK(sample(WAVE_RAMPUP, pi, 30) && sample(WAVE_RAMPDOWN, pi / 2, 40));
++        CHECK(sample(WAVE_SINE, 0, 30) && sample(WAVE_SINE, pi / 2, 50) && sample(WAVE_SINE, 3 * pi / 2, 10));
++        CHECK(sample(WAVE_FLICKER1, 0, 10) && sample(WAVE_FLICKER1, 2 * pi * 2.5f / 63, 50));
++        CHECK(sample(WAVE_FLICKER2, 0, 20) && sample(WAVE_FLICKER2, 2 * pi * 2.5f / 63, 50));
++        CHECK(sample(WAVE_FLICKER3, 2 * pi * 4.5f / 63, 40) && sample(WAVE_FLICKER4, 2 * pi * 16.5f / 127, 50));
++        CHECK(sample(WAVE_STROBE, 0, 50) && sample(WAVE_STROBE, 2 * pi * 3.5f / 63, 40));
++        CHECK(sample(WAVE_SEARCH, pi / 2, 50) && sample(WAVE_SEARCH, 3 * pi / 2, 10));
++        for (DBYTE w = 0; w <= WAVE_SEARCH; ++w)
++        {
++            CHECK(light_wave_value(w, 10, 50, -pi / 2, v));
++            float pos = 0;
++            CHECK(light_wave_value(w, 10, 50, 3 * pi / 2, pos) && close(pos, v));
++            CHECK(light_wave_value(w, 10, 50, -1e-30f, v) && std::isfinite(v));
++        }
++        v = 99;
++        CHECK(!light_wave_value(12, 0, 1, 0, v) && v == 99);
++        CHECK(!light_wave_value(WAVE_SINE, 0, 1, std::numeric_limits<float>::infinity(), v) && v == 99);
++        GameSession g;
++        CHECK(g.initialize());
++        auto h = create(g, "ClientLightFX",
++                        {{"Color", DVector{511, -511, 0}},
++                         {"IntensityMin", -10.0f},
++                         {"IntensityMax", 300.0f},
++                         {"RadiusMin", -4.0f},
++                         {"RadiusMax", 20000.0f},
++                         {"LifeTime", -1.0f}});
++        CHECK(h && light(g, h)->settings.intensity.min == 0 && light(g, h)->settings.intensity.max == 255 &&
++              light(g, h)->settings.radius.min == 0 && light(g, h)->lifetime == 0);
++        CHECK(close(g.server.GetLightEffect(h)->color, {1, 0, .5f}) && g.server.GetLightEffect(h)->radius == 10000);
++        return true;
++    }
++    bool commands(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto h = create(g);
++        CHECK(h && command(g, h, "off") && light(g, h)->on);
++        CHECK(command(g, h, "OFFsuffix") && !light(g, h)->on && g.step(.1));
++        auto* c = g.server.GetLightEffect(h);
++        CHECK(c && !c->visible && c->radius == 200 && close(c->off_start_time, .1f));
++        auto color = c->color;
++        CHECK(command(g, h, "ONanything") && g.step(.1));
++        c = g.server.GetLightEffect(h);
++        CHECK(c->visible && c->radius == 200 && close(c->color, color)); // NONE does not restore max radius.
++        CHECK(command(g, h, "TOGGLE extra") && !light(g, h)->on && command(g, h, "TOGGLE") && light(g, h)->on);
++        auto wave = create(g, "GlowingLight", {{"RadiusMin", 0.0f}, {"RadiusMax", 100.0f}, {"RadiusFreq", 1.0f}});
++        CHECK(wave);
++        CHECK(command(g, wave, "OFF") && g.step(.5) && command(g, wave, "ON") && g.step(.1));
++        CHECK(close(g.server.GetLightEffect(wave)->radius,
++                    50 * (1 + std::sin(.8f)))); // Absolute session time, not time since ON.
++        CHECK(!g.server.string_count() && !g.server.message_count());
++        return true;
++    }
++    bool lifetime(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto runtime = g.objects.create(g.objects.find_class("ClientLightFX"), {}, Creation::Runtime);
++        CHECK(runtime);
++        light(g, runtime)->lifetime = .1f;
++        CHECK(g.step(.099) && g.objects.get(runtime));
++        CHECK(g.step(.0011) && !g.objects.get(runtime) && g.server.light_effects.empty());
++        auto a = create(g, "ClientLightFX", {{"LifeTime", .2f}});
++        auto b = create(g, "ClientLightFX", {{"LifeTime", .2f}, {"LightSwitch", false}});
++        CHECK(a && b);
++        CHECK(!g.objects.get(b)->scheduled && !(g.objects.get(b)->user_flags & 9));
++        CHECK(command(g, a, "OFF") && command(g, b, "ON") && !g.objects.get(b)->scheduled);
++        CHECK(g.step(.6) && !g.objects.get(a) && g.objects.get(b) && g.server.GetLightEffect(b)->visible);
++        CHECK(g.step(.6) && g.objects.get(b));
++        return true;
++    }
++    bool damage(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false, true, true));
++        auto other = create(g, "ClientLightFX", {{"Name", std::string("other")}});
++        auto h = create(g, "ClientLightFX",
++                        {{"HitPoints", 5.0f},
++                         {"DeathTriggerTarget", std::string("other")},
++                         {"DeathTriggerMessage", std::string("KILL")},
++                         {"SpawnObject", std::string("HealthPU")},
++                         {"SpawnObjectVel", DVector{1, 2, 3}}});
++        CHECK(h && other);
++        CHECK(hit(g, h, 2) && light(g, h)->damage.m_fHitPoints == 3 && !light(g, h)->damage.IsDead());
++        CHECK(hit(g, h, 3) && g.objects.get(h)->life == Life::Pending && g.objects.get(other)->life == Life::Pending);
++        CHECK(!g.server.GetLightEffect(h) && !g.server.GetLightEffect(other));
++        CHECK(g.objects.finish_frame() && g.server.light_effects.empty());
++        unsigned pickups = 0;
++        for (auto id : g.objects.snapshot())
++            if (g.objects.get(id)->type->name == "HealthPU")
++            {
++                ++pickups;
++                CHECK(close(g.objects.get(id)->velocity, {1, 2, 3}));
++            }
++        CHECK(pickups == 1);
++        auto immune = create(g, "ClientLightFX", {{"CanDamage", false}});
++        auto trigger = create(g, "ClientLightFX", {{"TriggerDestroyOnly", true}});
++        CHECK(immune && trigger);
++        CHECK(hit(g, immune, 10) && command(g, immune, "KILL") && g.objects.get(immune)->life == Life::Alive);
++        CHECK(hit(g, trigger, 10) && g.objects.get(trigger)->life == Life::Alive && command(g, trigger, "kill") &&
++              g.objects.get(trigger)->life == Life::Pending);
++        CHECK(g.unload_world() && !CDestructable::m_dwNumDestructables && g.server.light_effects.empty() &&
++              !g.server.string_count() && !g.server.message_count());
++        return true;
++    }
++    bool validation(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto other = create(g, "BaseClass");
++        LightSettings s;
++        CHECK(!g.server.PublishLightEffect(other, s));
++        for (const char* name : {"HitPoints", "LifeTime", "RadiusMin", "RadiusMax", "RadiusFreq", "RadiusPhase",
++                                 "IntensityMin", "IntensityMax", "IntensityFreq", "IntensityPhase"})
++            CHECK(!create(g, "ClientLightFX", {{name, std::numeric_limits<float>::quiet_NaN()}}));
++        CHECK(!create(g, "ClientLightFX", {{"RadiusWaveform", std::int32_t(-1)}}));
++        CHECK(!create(g, "ClientLightFX", {{"IntensityWaveform", std::int32_t(12)}}));
++        CHECK(!create(g, "ClientLightFX", {{"SpawnObject", std::string("Unported")}}));
++        auto h = create(g, "ClientLightFX",
++                        {{"CastShadowsFlag", true},
++                         {"SolidLightFlag", true},
++                         {"OnlyLightWorldFlag", true},
++                         {"DontLightBackfacingFlag", true},
++                         {"FogLightFlag", true}});
++        CHECK(h && light(g, h)->settings.flags == 0xf8);
++        CHECK(!g.server.PublishLightEffect(h, s) && g.server.light_effects.size() == 1);
++        float v = 4;
++        CHECK(!g.server.RandomFloat(2, 1, v) && v == 4);
++        CHECK(!g.server.RandomFloat(0, std::numeric_limits<float>::infinity(), v) && v == 4);
++        CHECK(g.server.RandomFloat(2, 2, v) && v == 2);
++        auto before = *g.server.GetLightEffect(h);
++        CHECK(!before.Update(std::numeric_limits<float>::infinity(), {}, true) && before.updates == 0);
++        s.flags = 1;
++        CHECK(!valid_light_settings(s));
++        s.flags = 0;
++        s.ramp_up_sound = std::string("a\0b", 3);
++        CHECK(!valid_light_settings(s));
++        CHECK(g.objects.remove(h) && !g.server.GetLightEffect(h) && !g.server.PublishLightEffect(h, {}));
++        CHECK(g.objects.finish_frame() && g.server.light_effects.empty() && !CDestructable::m_dwNumDestructables);
++        return true;
++    }
++    bool motion(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto a = create(g, "GlowingLight", {{"Name", std::string("lights")}, {"Pos", DVector{10, 100, 0}}});
++        auto b = create(g, "GlowingLight", {{"Name", std::string("lights")}, {"Pos", DVector{20, 100, 0}}});
++        CHECK(a && b);
++        CHECK(create(g, "Key", {{"Name", std::string("k0")}, {"Pos", DVector{0, 100, 0}}}));
++        CHECK(create(g, "Key", {{"Name", std::string("k1")}, {"Pos", DVector{100, 100, 0}}, {"TimeStamp", 1.0f}}));
++        auto f =
++            create(g, "KeyFramer",
++                   {{"ObjectName", std::string("lights")}, {"BaseKeyName", std::string("k")}, {"StartActive", true}});
++        CHECK(f && g.step(.01) && g.step(.25));
++        CHECK(close(g.server.GetLightEffect(a)->position, {35, 100, 0}) &&
++              close(g.server.GetLightEffect(b)->position, {45, 100, 0}));
++        CHECK(command(g, a, "KILL") && !g.server.GetLightEffect(a) && g.step(.25));
++        CHECK(close(g.server.GetLightEffect(b)->position, {70, 100, 0}) && g.server.light_effects.size() == 1);
++        auto* k = dynamic_cast<KeyFramer*>(g.server.HandleToObject(f));
++        CHECK(k && k->targets.size() == 1 && k->targets[0].object == b);
++        return true;
++    }
++    bool teardown(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        float delay = 0;
++        for (int cycle = 0; cycle < 4; ++cycle)
++        {
++            auto a = create(g);
++            CHECK(a);
++            if (!cycle)
++                delay = light(g, a)->initial_delay;
++            else
++                CHECK(delay == light(g, a)->initial_delay);
++            auto b = create(g, "GlowingLight", {{"TypeSingle", false}});
++            CHECK(b && g.objects.get(b)->life == Life::Pending && !g.server.GetLightEffect(b));
++            CHECK(g.step(.01) && !g.objects.get(b) && g.server.light_effects.size() == 1 &&
++                  CDestructable::m_dwNumDestructables == 1);
++            CHECK(g.unload_world() && g.server.light_effects.empty() && !CDestructable::m_dwNumDestructables &&
++                  !g.server.string_count() && !g.server.message_count() && !g.server.list_count());
++        }
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        unsigned worlds = 0, count = 0, off = 0, filtered = 0;
++        std::map<std::string, unsigned> classes;
++        for (const auto& [path, resource] : g.resources.index())
++        {
++            (void)resource;
++            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
++                continue;
++            std::vector<std::uint8_t> bytes;
++            World world;
++            CHECK(g.resources.read(path, bytes, error));
++            if (!read_world(bytes, world, error))
++            {
++                CHECK(path == "worlds/16_bridge.dat");
++                continue;
++            }
++            ++worlds;
++            for (const auto& o : world.objects)
++            {
++                auto* cls = g.objects.find_class(o.class_name);
++                if (!cls)
++                    continue;
++                bool matches = false;
++                for (auto* c = cls; c; c = c->parent)
++                    matches |= c->name == "ClientLightFX";
++                if (!matches)
++                    continue;
++                Properties props;
++                for (const auto& p : o.properties)
++                    props.emplace(p.name, p.value);
++                auto h = create(g, o.class_name.c_str(), props);
++                if (!h)
++                    std::cerr << path << ' ' << o.class_name << ": " << g.objects.diagnostics().back() << '\n';
++                CHECK(h);
++                ++count;
++                ++classes[o.class_name];
++                off += !light(g, h)->on;
++                filtered += g.objects.get(h)->life != Life::Alive;
++            }
++            CHECK(g.step(.01));
++            for (auto id : g.objects.snapshot())
++                if (auto h = g.objects.get(id)->handle; light(g, h))
++                {
++                    CHECK(g.server.GetLightEffect(h) && command(g, h, "OFF"));
++                }
++            CHECK(g.step(.02));
++            for (auto id : g.objects.snapshot())
++                if (auto h = g.objects.get(id)->handle; light(g, h))
++                {
++                    CHECK(!g.server.GetLightEffect(h)->visible && command(g, h, "ON"));
++                }
++            CHECK(g.step(.02) && g.objects.clear() && g.server.light_effects.empty() &&
++                  !CDestructable::m_dwNumDestructables && !g.server.string_count());
++        }
++        std::cout << "worlds=" << worlds << " lights=" << count << " initially_off=" << off << " filtered=" << filtered
++                  << '\n';
++        for (const auto& [c, n] : classes)
++            std::cout << c << '=' << n << '\n';
++        CHECK(worlds == 57 && count == 72 && off == 2 && !filtered && classes["ClientLightFX"] == 16 &&
++              classes["Flicker3WaveLightFX"] == 1 && classes["Flicker4WaveLightFX"] == 3 &&
++              classes["FlickerLight"] == 9 && classes["GlowingLight"] == 42 && classes["StrobeWaveLightFX"] == 1);
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            CHECK(g.objects.snapshot().size() == 170 && g.server.light_effects.size() == 12);
++            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 161);
++            KeyFramer* path = nullptr;
++            for (auto id : g.objects.snapshot())
++                if (auto* f = dynamic_cast<KeyFramer*>(g.objects.get(id)->game.get());
++                    f && f->object_name == "sublight")
++                    path = f;
++            CHECK(path && path->active && path->targets.size() == 12);
++            auto h = path->targets[0].object;
++            auto pos = g.server.GetLightEffect(h)->position;
++            auto c0 = g.server.GetLightEffect(h)->color;
++            auto r0 = g.server.GetLightEffect(h)->radius;
++            CHECK(g.step(.1));
++            auto* fx = g.server.GetLightEffect(h);
++            CHECK(fx && fx->visible && fx->updates >= 2 && !close(pos, fx->position) &&
++                  close(fx->position, g.objects.get(h)->state.m_Pos));
++            std::cout << "Subway cycle=" << cycle << " targets=" << path->targets.size() << " radius=" << r0 << "->"
++                      << fx->radius << " color=" << c0.x << "->" << fx->color.x << " moved=" << path->targets[0].moves
++                      << '\n';
++            CHECK(command(g, h, "OFF") && g.step(.1) && !g.server.GetLightEffect(h)->visible);
++            CHECK(command(g, h, "ON") && g.step(.1) && g.server.GetLightEffect(h)->visible);
++            CHECK(g.unload_world() && g.server.light_effects.empty() && !CDestructable::m_dwNumDestructables &&
++                  !g.server.string_count() && !g.server.message_count() && !g.server.list_count());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests = {
++        {"defaults", defaults}, {"waves", waves},       {"commands", commands},
++        {"lifetime", lifetime}, {"damage", damage},     {"validation", validation},
++        {"motion", motion},     {"teardown", teardown}, {"catalog", catalog}};
++    auto it = tests.find(argv[1]);
++    return it != tests.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index d9edd72..012c62c 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -204,14 +204,14 @@ namespace
+             CHECK(player);
+             CHECK(game.objects.get(player->m_hObject)->model->animations.size() == 86);
+             CHECK(game.objects.snapshot().size() ==
+-                  158); // 148 source instances + 7 door children + player + muzzle light + scent.
++                  170); // 160 source instances + 7 door children + player + muzzle light + scent.
+             CHECK(game.client_shell.position.x == -32 && game.client_shell.position.z == -3224);
+             CHECK(std::abs(game.client_shell.position.y - 170) < .01f);
+             for (int frame = 0; frame < 120; ++frame)
+                 CHECK(game.step(1.0 / 60.0));
+             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
+             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
+-            CHECK(!game.run_world(error) && error.find("60 uninstantiated") != std::string::npos);
++            CHECK(!game.run_world(error) && error.find("48 uninstantiated") != std::string::npos);
+             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
+                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
+                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index 4bae5db..3d4fe1a 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -1,6 +1,6 @@
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 155 original instances, 116 BSP models")
++if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 167 original instances, 116 BSP models")
+     message(FATAL_ERROR "World inspection: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-player
+@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 60" OR NOT out MATCHES "remaining mover classes")
++if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 48" OR NOT out MATCHES "remaining mover classes")
+     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 036ced2..7569659 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -538,7 +538,7 @@ namespace
+         CHECK(game.world.version == 56);
+         CHECK(game.world.objects.size() == 580);
+         CHECK(game.world.models.size() == 116);
+-        CHECK(game.objects.snapshot().size() == 155);
++        CHECK(game.objects.snapshot().size() == 167);
+         CHECK(game.world.models[0].points.size() == 4996);
+         CHECK(game.world.models[0].polygons.size() == 3367);
+         CHECK(game.resources.find(game.world_path)->overrides == 1);

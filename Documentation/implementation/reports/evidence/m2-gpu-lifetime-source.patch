@@ -1,0 +1,243 @@
+commit bfa0f75a8ff2dd6ab66a7ad5883acd59dd57a7b5
+Author:     Yannick <comte.yannick@gmail.com>
+AuthorDate: Sun Oct 18 09:24:27 2026 +0200
+Commit:     Yannick <comte.yannick@gmail.com>
+CommitDate: Sun Oct 18 09:24:27 2026 +0200
+
+    Add isolated SDL lifetime probes for GPU sanitizer attribution
+
+diff --git a/AGENTS.md b/AGENTS.md
+index 9a5f309..90a8069 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -715,3 +715,5 @@ The [live MUSIC continuation](../Documentation/Implementation/m2_music_messages.
+ The [session-cost audit](../Documentation/Implementation/m2_session_cost.md) removes temporary trace-name allocations and zero-depth audio modulation work. Read [contracts](docs/contracts/session_cost_contracts.md); preserve owned counters, exact scalar PCM/cursor progression and all existing session/test deadlines. The full M2 acceptance review and runtime-start guard remain open.
+ 
+ The [checked startup continuation](../Documentation/Implementation/m2_session_start.md) replaces the historical unconditional RunWorld refusal with validated original entry. Read [contracts](docs/contracts/session_start_contracts.md); preserve callback/binding guards, complete source accounting, strict shared resource checks, player ownership and truthful snapshot status. Failed fresh entry is player cleanup, not world rollback. M2 acceptance remains open.
++
++The [GPU lifetime investigation](../Documentation/Implementation/m2_gpu_lifetime.md) reproduces the retained NVIDIA LeakSanitizer report in SDL-only and standalone Vulkan programs. Read [contracts](docs/contracts/gpu_lifetime_contracts.md); preserve ordinary teardown, leak detection and raw failures. Module attribution is resolved for fresh probes, but the GPU sanitizer failure is not fixed or suppressed. M2 acceptance remains open.
+diff --git a/docs/contracts/gpu_lifetime_contracts.md b/docs/contracts/gpu_lifetime_contracts.md
+new file mode 100644
+index 0000000..bbd44e4
+--- /dev/null
++++ b/docs/contracts/gpu_lifetime_contracts.md
+@@ -0,0 +1,42 @@
++# Platform lifetime diagnostics
++
++`platform_lifetime_tests` isolates the SDL/platform boundary from the engine and
++original game. It links only the pinned SDL target. No game, renderer, asset,
++ImGui, audio mixer or engine object is constructed.
++
++The `video`, `window` and `gpu` modes perform one or three complete lifetimes.
++All initialize the same video/gamepad subsystems as `Runtime`; the latter two
++create a window, and `gpu` creates a debug SDL_GPU device, claims the window,
++submits an empty command buffer and waits. Cleanup waits for the GPU, releases
++the window claim, destroys the device and window, then calls `SDL_Quit`.
++Partial initialization failures take the same explicit cleanup path. No device
++or connection is deliberately kept alive to change the leak detector's roots.
++
++The executable prints the actual video driver/device and reports whether SDL's
++own allocation tracker is available. An unavailable tracker is not zero leaks.
++Only LeakSanitizer measures leaked host allocations in these experiments; this
++test makes no claim about total GPU memory or vendor-internal allocation counts.
++
++With `BLOOD2_GPU_TESTS=ON`, CTest registers `gpu.platform_video`,
++`gpu.platform_window` and `gpu.platform_gpu`, each using three cycles, a real
++display, serial execution and the unchanged 30-second ceiling. The executable
++is also built when GPU tests are not registered, allowing explicit sanitizer
++probes. All modes use normal process exit and retain sanitizer failures.
++
++## Current Linux result
++
++The NVIDIA 615.78.08 Vulkan stack reports leaks after GPU destruction in this
++baseline and in the full train route. Video/window-only sanitizer probes pass.
++A separate system-Vulkan reproducer without SDL also reports the same allocation
++families. Loader maps identify all formerly unknown frames in NVIDIA glcore/glsi;
++D-Bus allocations are kept separately. This localizes the reproducible failure
++outside the game, but does not prove that every possible application path is clean
++or turn the failing GPU sanitizer processes into passes.
++
++Do not add leak suppressions, disable leak detection, retain unloaded libraries,
++or set `SDL_SHUTDOWN_DBUS_ON_QUIT` in production to hide this result. The pinned
++SDL header explicitly reserves that hint for debugging because other libraries
++can still use D-Bus. An isolated hint experiment did not resolve the report.
++No new platform-specific production dependency or driver workaround is introduced.
++
++See [measurements and exact commands](../../../Documentation/Implementation/m2_gpu_lifetime.md).
+diff --git a/docs/contracts/readme.md b/docs/contracts/readme.md
+index 4ea051d..fad24d8 100644
+--- a/docs/contracts/readme.md
++++ b/docs/contracts/readme.md
+@@ -213,3 +213,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
+ - [Repeating music transport](music_transport_contracts.md): bounded continuous audio, fractional clocks, cancellation and remaining live-MUSIC limits.
+ 
+ - [Checked session startup](session_start_contracts.md): original entry, strict resource/service checks, failure ownership and the finite CLI harness.
++
++- [Platform lifetime diagnostics](gpu_lifetime_contracts.md): isolated SDL controls, explicit sanitizer failures and NVIDIA module attribution.
+diff --git a/docs/implementation/readme.md b/docs/implementation/readme.md
+index dcfbf7b..e2c84e9 100644
+--- a/docs/implementation/readme.md
++++ b/docs/implementation/readme.md
+@@ -80,3 +80,5 @@ the original log or patch.
+ The [session-cost audit](../../../Documentation/Implementation/m2_session_cost.md) removes temporary trace-name allocations and zero-depth audio modulation work. Read [contracts](../contracts/session_cost_contracts.md); preserve owned counters, exact scalar PCM/cursor progression and all existing session/test deadlines. The full M2 acceptance review and runtime-start guard remain open.
+ 
+ - [Checked session startup](../../../Documentation/Implementation/m2_session_start.md): actual admission/refusal checks, shared NEW_LEVEL resource validation and startup inspection; M2 remains incomplete.
++
++- [GPU lifetime attribution](../../../Documentation/Implementation/m2_gpu_lifetime.md): SDL-only and standalone Vulkan controls for the retained NVIDIA LeakSanitizer failure.
+diff --git a/docs/implementation/sources/m2_gpu_lifetime_sources.json b/docs/implementation/sources/m2_gpu_lifetime_sources.json
+new file mode 100644
+index 0000000..bfd183d
+--- /dev/null
++++ b/docs/implementation/sources/m2_gpu_lifetime_sources.json
+@@ -0,0 +1,32 @@
++{
++  "date": "2026-10-18",
++  "implementation_parent": "c1004fc1e98e0644f98b9df04dcd947c5090b8c0",
++  "original_imports": [],
++  "changes": [
++    "Add SDL-only diagnostic lifetime executable and three optional display-dependent CTest cases.",
++    "Retain standalone system-Vulkan reproduction as evidence, not an engine dependency."
++  ],
++  "production_changes": false,
++  "dependencies_changed": false,
++  "references": [
++    {
++      "path": "src/engine/runtime.cpp",
++      "sha256": "9187b9dfb29c0afd7621b6d97a9a4e0dbb9b462663fa3cbd902703796de67883",
++      "use": "Match explicit GPU idle, release-window, device/window destroy and SDL_Quit ownership order."
++    },
++    {
++      "path": "build/sanitize/_deps/sdl3-src/include/SDL3/SDL_hints.h",
++      "sha256": "33d92747f3ad3067dacd68f9448ad0f61623639022249bce9ad7efe344a5c30c",
++      "use": "Pinned SDL debug-only shutdown hint contract; not enabled in production."
++    },
++    {
++      "path": "build/sanitize/_deps/sdl3-src/src/core/linux/SDL_dbus.c",
++      "sha256": "266c7044bc97f1bf251f7e9f8b58b471a816e8969f3c2693250c5e7586154247",
++      "use": "Pinned SDL connection cleanup and process-global shutdown policy."
++    }
++  ],
++  "frozen_sources": {
++    "tests/platform_lifetime_tests.cpp": "5d5fda23d94320fb5885519aafa5228bee981568a576b37cbb250f429ebb9e3d",
++    "tests/CMakeLists.txt": "1f0475d855427e8025b3b31955b4010688ee7674404d35e0352f9ca2033758d9"
++  }
++}
+diff --git a/docs/implementation/sources/readme.md b/docs/implementation/sources/readme.md
+index 55e14ab..ef82c75 100644
+--- a/docs/implementation/sources/readme.md
++++ b/docs/implementation/sources/readme.md
+@@ -28,3 +28,5 @@ Runtime test logs and measurements belong in the
+ - [Session cost](m2_session_cost_sources.json): project scalar baseline, transparent trace lookup and exact differential checks; no new original-code import.
+ 
+ - [Session startup source ledger](m2_session_start_sources.json): engine validation extraction and unchanged original shell/player call paths.
++
++- [GPU lifetime diagnostic sources](m2_gpu_lifetime_sources.json): project teardown baseline, pinned SDL APIs and system Vulkan probe; no original-game import.
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 32b78d6..6da7d15 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -4,6 +4,16 @@ blood2_project_options(sdl_properties_tests)
+ add_test(NAME platform.destroyed_properties COMMAND sdl_properties_tests)
+ set_tests_properties(platform.destroyed_properties PROPERTIES LABELS "headless;platform" TIMEOUT 10)
+ 
++add_executable(platform_lifetime_tests platform_lifetime_tests.cpp)
++target_link_libraries(platform_lifetime_tests PRIVATE SDL3::SDL3)
++blood2_project_options(platform_lifetime_tests)
++if(BLOOD2_GPU_TESTS)
++    foreach(mode IN ITEMS video window gpu)
++        add_test(NAME gpu.platform_${mode} COMMAND platform_lifetime_tests ${mode} 3)
++        set_tests_properties(gpu.platform_${mode} PROPERTIES LABELS "gpu;platform" TIMEOUT 30 RUN_SERIAL TRUE)
++    endforeach()
++endif()
++
+ add_executable(object_contract_tests object_contract_tests.cpp)
+ target_link_libraries(object_contract_tests PRIVATE blood2_game)
+ blood2_project_options(object_contract_tests)
+diff --git a/tests/platform_lifetime_tests.cpp b/tests/platform_lifetime_tests.cpp
+new file mode 100644
+index 0000000..59442ab
+--- /dev/null
++++ b/tests/platform_lifetime_tests.cpp
+@@ -0,0 +1,82 @@
++#include <SDL3/SDL.h>
++#include <iostream>
++#include <string_view>
++
++namespace
++{
++    bool cycle(std::string_view mode)
++    {
++        if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD))
++        {
++            std::cerr << SDL_GetError() << '\n';
++            SDL_Quit();
++            return false;
++        }
++        std::cout << "Video driver: " << SDL_GetCurrentVideoDriver() << '\n';
++        SDL_Window* window = nullptr;
++        SDL_GPUDevice* gpu = nullptr;
++        bool claimed = false, ok = true;
++        if (mode != "video")
++        {
++            window = SDL_CreateWindow("SDL lifetime baseline", 640, 420, SDL_WINDOW_RESIZABLE);
++            ok = window != nullptr;
++        }
++        if (ok && mode == "gpu")
++        {
++            gpu = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_MSL, true, nullptr);
++            ok = gpu != nullptr;
++            if (ok)
++            {
++                std::cout << "GPU device: "
++                          << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(gpu), SDL_PROP_GPU_DEVICE_NAME_STRING,
++                                                   "unreported")
++                          << '\n';
++                claimed = SDL_ClaimWindowForGPUDevice(gpu, window);
++                ok = claimed;
++            }
++        }
++        if (ok && gpu)
++        {
++            auto* command = SDL_AcquireGPUCommandBuffer(gpu);
++            ok = command && SDL_SubmitGPUCommandBuffer(command) && SDL_WaitForGPUIdle(gpu);
++        }
++        SDL_Event event{};
++        while (SDL_PollEvent(&event))
++        {
++        }
++        if (!ok)
++            std::cerr << SDL_GetError() << '\n';
++        if (gpu)
++        {
++            ok = SDL_WaitForGPUIdle(gpu) && ok;
++            if (claimed)
++                SDL_ReleaseWindowFromGPUDevice(gpu, window);
++            SDL_DestroyGPUDevice(gpu);
++        }
++        if (window)
++            SDL_DestroyWindow(window);
++        SDL_Quit();
++        const auto allocations = SDL_GetNumAllocations();
++        std::cout << "SDL teardown complete; allocation tracking: ";
++        if (allocations < 0)
++            std::cout << "unavailable\n";
++        else
++            std::cout << allocations << '\n';
++        return ok;
++    }
++} // namespace
++
++int main(int argc, char** argv)
++{
++    const std::string_view mode = argc > 1 ? argv[1] : "";
++    if (argc != 3 || (mode != "video" && mode != "window" && mode != "gpu") ||
++        (std::string_view(argv[2]) != "1" && std::string_view(argv[2]) != "3"))
++        return 2;
++    // Deliberately links only SDL: no engine, game, assets, renderer or ImGui.
++    // No suppression, custom leak root or process-global D-Bus shutdown here.
++    const unsigned cycles = argv[2][0] - '0';
++    for (unsigned i = 0; i < cycles; ++i)
++        if (!cycle(mode))
++            return 1;
++    return 0;
++}

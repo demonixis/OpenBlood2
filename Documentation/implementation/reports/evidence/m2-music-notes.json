@@ -1,0 +1,142 @@
+{
+  "date": "2026-10-18",
+  "status": "M2 incomplete; original MUSIC remains unsupported",
+  "implementation_parent": "980c842858f493b2312cba08374c21d08434d9a1",
+  "runs": [
+    {
+      "configuration": "debug",
+      "tests": 71,
+      "passed": 71,
+      "wall_seconds": 14.78
+    },
+    {
+      "configuration": "release",
+      "tests": 71,
+      "passed": 71,
+      "wall_seconds": 1.38
+    },
+    {
+      "configuration": "sanitize",
+      "tests": 71,
+      "passed": 71,
+      "wall_seconds": 62.49
+    },
+    {
+      "configuration": "debug NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 11.66
+    },
+    {
+      "configuration": "release NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 5.33
+    }
+  ],
+  "original_reader_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "entry_rva": "0x8d5f",
+    "reader_core_bytes": 18,
+    "synthetic_cases": 3,
+    "note_chunks": 2836,
+    "notes": 7030,
+    "decoded_sha256": "23d6f84dff7cdd029ced2daf540b80af2205c1e15d216bec874653c5718db4e3",
+    "notes_by_bank": {
+      "A1": 2661,
+      "Bloat": 894,
+      "Cabal": 3049,
+      "Crudux": 237,
+      "Track1": 189
+    },
+    "scope": "Original loader order and exact field preservation only; no sequencer or native DLL execution"
+  },
+  "private_results": {
+    "styles": 39,
+    "patterns": 131,
+    "grids": 7166,
+    "notes": 7030,
+    "note_chunks": 2836,
+    "opaque_curve_chunks": 42,
+    "original_decoded_note_sha256": "23d6f84dff7cdd029ced2daf540b80af2205c1e15d216bec874653c5718db4e3"
+  },
+  "gpu_environment": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+    "SDL_AUDIODRIVER": "dummy"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1"
+  },
+  "commands": [
+    "python3 m2-music-notes-validation.py <debug|release|sanitize>",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/<debug|release> -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit <result.xml>",
+    "<tool-venv>/bin/python m2-music-notes-probe.py <external-content-root>",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror <eight changed C++ files>"
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "limitations": [
+    "No sequencing, original MUSIC success, audible soundtrack or retail musical comparison",
+    "No native Metal/Windows/mobile execution; NVIDIA Vulkan only",
+    "Visual capture reviewed for status/lifetime text; nested pattern note rows not captured",
+    "No claim of complete world/dead-player restoration or M2 acceptance"
+  ],
+  "artifacts": {
+    "Documentation/Implementation/evidence/m2-music-notes-debug-build-final.log": "3d2f327ec25a828518c3853537db8187abb2c9b5efa2647f6b7ecb51cda0371e",
+    "Documentation/Implementation/evidence/m2-music-notes-debug-gpu.log": "6885033b9efed17717a31ffff99390c922d92d6d2f33d32ee27a682023a354bb",
+    "Documentation/Implementation/evidence/m2-music-notes-debug-gpu.xml": "d5ec447117540ba4e397fec089ed5e0ad2d64398fd2b89aa4372a2118f445977",
+    "Documentation/Implementation/evidence/m2-music-notes-debug-tests.log": "09fc453bfd90000eeb4e3da4403ca12afd5bf72af8593044457e3a9744a1b26b",
+    "Documentation/Implementation/evidence/m2-music-notes-debug-tests.xml": "95dffca13960afe389e7fa8f3315b228fff436704105540890a3a2cc12cdb23e",
+    "Documentation/Implementation/evidence/m2-music-notes-integrity.json": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+    "Documentation/Implementation/evidence/m2-music-notes-links.log": "721a9a6a888c3d9621fbe8971976d84fdb4e4091d9f20079a60e2d6769807eed",
+    "Documentation/Implementation/evidence/m2-music-notes-probe.json": "6dc8683ea309c0f63ed03a2a50c63cf460aaef5594973b25cfb5605a27c3b1d7",
+    "Documentation/Implementation/evidence/m2-music-notes-probe.py": "9d8b7361dd983bfdf7ef1dfb946794f22316f7e92fea17f8f8f00236b1e49165",
+    "Documentation/Implementation/evidence/m2-music-notes-release-build-final.log": "e34de1eb2fef8fd9207182219587c09523c0190ef4fd6a9331ac014269284417",
+    "Documentation/Implementation/evidence/m2-music-notes-release-gpu.log": "680ce60118014bc188f404ea96234c02e944801f330da3a375dfddf917e8f86a",
+    "Documentation/Implementation/evidence/m2-music-notes-release-gpu.xml": "aafcddb4836c2add383f11c3d1c6c8960d6c9b0cabc7e19b17946311b2d854e8",
+    "Documentation/Implementation/evidence/m2-music-notes-release-tests.log": "e6a64f630e699364ee52688a96bd0238a77fdef45804897cdc6d2fff68b91cad",
+    "Documentation/Implementation/evidence/m2-music-notes-release-tests.xml": "ba6dbae087f80e77cd4890254ea96a3326e37467e87a923df63164316b1ec135",
+    "Documentation/Implementation/evidence/m2-music-notes-sanitize-build-final.log": "58ee74da52c78a5cb36ab39bd6cf43f9a8bd5c44018dff4135f74ff6c06ca839",
+    "Documentation/Implementation/evidence/m2-music-notes-sanitize-tests.log": "47da7ffb7a6f03e349a6dd0afbb18209bae920fa7beb46a7eda75d5d60988192",
+    "Documentation/Implementation/evidence/m2-music-notes-sanitize-tests.xml": "40cd0008ecc92c8c1439e3e1e3713e4f5e32f350860bcfed14b5763d8bee358a",
+    "Documentation/Implementation/evidence/m2-music-notes-validation.py": "0a2dbb3a2d6efd29b1c93fe67785d432e54e3e08554d2a5571bcb8e14ebb8669"
+  },
+  "implementation_commit": "43246c39bc5e9b592ff142316050c250f8e2ee07"
+}

@@ -1,0 +1,14 @@
+432/433 Testing: ai_locomotion.attacks
+432/433 Test: ai_locomotion.attacks
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_locomotion_tests" "attacks"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_locomotion.attacks" start time: Oct 16 13:45 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.attacks" end time: Oct 16 13:45 CEST
+"ai_locomotion.attacks" time elapsed: 00:00:00
+----------------------------------------------------------

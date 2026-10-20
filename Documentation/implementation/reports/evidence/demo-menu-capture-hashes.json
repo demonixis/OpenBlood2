@@ -1,0 +1,18 @@
+{
+  "scope": "Ignored local rendered Release captures; no commercial artwork is committed.",
+  "sha256": {
+    "Blood2/build/release/tests/demo-menu-10.png": "900fd73d3bebe43fc2da552cf4fce9edcaa24bed0ec3b4886b86142a397540f5",
+    "Blood2/build/release/tests/demo-menu-15.png": "475637a6629354db7f865afa20397c94b6784740e172455de2b5a3207598a7e4",
+    "Blood2/build/release/tests/demo-menu-19.png": "d714567d30aa1ccd42b68d049a9094e4d83a13c53334402bca5798655e7bbdd8",
+    "Blood2/build/release/tests/demo-menu-2.png": "0e589e6a72f68b9306db0c84f787638abd3df5cf86fe6e06231a678befb97678",
+    "Blood2/build/release/tests/demo-menu-23.png": "233357a387f3c5fb62f091e8f94b9e4cd0ada5661d8abc5378c2eb90b1802dbd",
+    "Blood2/build/release/tests/demo-menu-234.png": "5debcd837507a272a6339c88c51b00001e48918334e1e574625c43a6be5b1a53",
+    "Blood2/build/release/tests/demo-menu-241.png": "233357a387f3c5fb62f091e8f94b9e4cd0ada5661d8abc5378c2eb90b1802dbd",
+    "Blood2/build/release/tests/demo-menu-243.png": "0e589e6a72f68b9306db0c84f787638abd3df5cf86fe6e06231a678befb97678",
+    "Blood2/build/release/tests/demo-menu-250.png": "233357a387f3c5fb62f091e8f94b9e4cd0ada5661d8abc5378c2eb90b1802dbd",
+    "Blood2/build/release/tests/demo-menu-27.png": "5510ff0b3624a3894cc99adc30ed69dccf0000c71f5e835c81b3ccee06d92bce",
+    "Blood2/build/release/tests/demo-menu-32.png": "3bdb0d3a9ffdeb72442c92a2311fc1546fd3ccbab6a01ecc431f4ef6d853d0df",
+    "Blood2/build/release/tests/demo-menu-4.png": "4f8d1c0a3008fa9fbac58e1b118bdcfb057c54f042ba3247989130e756a04527",
+    "Blood2/build/release/tests/demo-menu-40.png": "0e589e6a72f68b9306db0c84f787638abd3df5cf86fe6e06231a678befb97678"
+  }
+}

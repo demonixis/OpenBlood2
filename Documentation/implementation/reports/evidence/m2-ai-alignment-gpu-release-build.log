@@ -1,0 +1,7 @@
+[0/2] Re-checking globbed directories...
+[1/7] Scanning /home/yann/projects/lithtech/Blood2/tests/level_change_gpu_tests.cpp for CXX dependencies
+[2/7] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[3/7] Generating CXX dyndep file tests/CMakeFiles/level_change_gpu_tests.dir/CXX.dd
+[4/7] Building CXX object tests/CMakeFiles/level_change_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[5/7] Building CXX object tests/CMakeFiles/level_change_gpu_tests.dir/level_change_gpu_tests.cpp.o
+[6/7] Linking CXX executable tests/level_change_gpu_tests

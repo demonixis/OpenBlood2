@@ -1,0 +1,15 @@
+481/701 Testing: ai_runtime.arena
+481/701 Test: ai_runtime.arena
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_runtime_tests" "arena" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_runtime.arena" start time: Oct 17 04:03 CEST
+Output:
+----------------------------------------------------------
+Arena state=2 phase=1 updates=522 shots=25 error= player HP=0
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.arena" end time: Oct 17 04:03 CEST
+"ai_runtime.arena" time elapsed: 00:00:00
+----------------------------------------------------------

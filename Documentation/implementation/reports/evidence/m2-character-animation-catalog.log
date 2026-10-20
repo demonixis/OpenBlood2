@@ -1,0 +1,21 @@
+271/273 Testing: character.catalog
+271/273 Test: character.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_animation_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"character.catalog" start time: Oct 16 04:11 CEST
+Output:
+----------------------------------------------------------
+models/characters/caleb.abc clips=86 nodes=20 queries=1720 missing_bindings=56 found_standard_nodes=16 head_radius=2.32597 missing_nodes=l_ankle,r_ankle,
+models/enemies/m_civilian1.abc clips=48 nodes=19 queries=912 missing_bindings=153 found_standard_nodes=16 head_radius=1.0906 missing_nodes=l_ankle,r_ankle,
+models/enemies/f_civilian1.abc clips=47 nodes=19 queries=893 missing_bindings=156 found_standard_nodes=16 head_radius=2.4427 missing_nodes=l_ankle,r_ankle,
+models/enemies/labtech.abc clips=17 nodes=21 queries=357 missing_bindings=171 found_standard_nodes=16 head_radius=1.77636 missing_nodes=l_ankle,r_ankle,
+models/enemies/m_cultist1.abc clips=48 nodes=19 queries=912 missing_bindings=105 found_standard_nodes=16 head_radius=1.85149 missing_nodes=l_ankle,r_ankle,
+models/enemies/f_cultist1.abc clips=48 nodes=19 queries=912 missing_bindings=105 found_standard_nodes=16 head_radius=2.4435 missing_nodes=l_ankle,r_ankle,
+models/enemies/gideon.abc clips=32 nodes=22 queries=704 missing_bindings=174 found_standard_nodes=14 head_radius=3.25963 missing_nodes=ru_arm,lu_arm,l_ankle,r_ankle,
+<end of output>
+Test time =   0.28 sec
+----------------------------------------------------------
+Test Passed.
+"character.catalog" end time: Oct 16 04:11 CEST
+"character.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

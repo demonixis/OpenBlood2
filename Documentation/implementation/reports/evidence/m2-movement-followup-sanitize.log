@@ -1,0 +1,30 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 59: movement.walking
+ 1/10 Test #59: movement.walking .................   Passed    0.15 sec
+      Start 60: movement.jumping
+ 2/10 Test #60: movement.jumping .................   Passed    0.05 sec
+      Start 61: movement.collisions
+ 3/10 Test #61: movement.collisions ..............   Passed    0.11 sec
+      Start 62: movement.world_collision
+ 4/10 Test #62: movement.world_collision .........   Passed    0.18 sec
+      Start 63: movement.support
+ 5/10 Test #63: movement.support .................   Passed    0.06 sec
+      Start 64: movement.boundaries
+ 6/10 Test #64: movement.boundaries ..............   Passed    0.04 sec
+      Start 65: movement.timing
+ 7/10 Test #65: movement.timing ..................   Passed    0.13 sec
+      Start 66: movement.lifetime
+ 8/10 Test #66: movement.lifetime ................   Passed    0.03 sec
+      Start 67: movement.controls
+ 9/10 Test #67: movement.controls ................   Passed    0.01 sec
+      Start 68: movement.private
+10/10 Test #68: movement.private .................   Passed    3.66 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+headless    =   4.41 sec*proc (10 tests)
+movement    =   4.41 sec*proc (10 tests)
+private     =   3.66 sec*proc (1 test)
+
+Total Test time (real) =   4.41 sec

@@ -1,0 +1,17 @@
+617/619 Testing: weapon_sprites.private
+617/619 Test: weapon_sprites.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_sprite_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapon_sprites.private" start time: Oct 16 23:50 CEST
+Output:
+----------------------------------------------------------
+Private cycle 0: 32 original diagnostic wood recipes, 64 actual SPR/DTX quads; source removal and unload passed
+Private cycle 1: 32 original diagnostic wood recipes, 64 actual SPR/DTX quads; source removal and unload passed
+Private cycle 2: 32 original diagnostic wood recipes, 64 actual SPR/DTX quads; source removal and unload passed
+<end of output>
+Test time =   5.16 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_sprites.private" end time: Oct 16 23:50 CEST
+"weapon_sprites.private" time elapsed: 00:00:05
+----------------------------------------------------------

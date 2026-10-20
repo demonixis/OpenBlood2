@@ -1,0 +1,15 @@
+651/655 Testing: wind.recipe
+651/655 Test: wind.recipe
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/wind_tests" "recipe" "/home/yann/projects/lithtech/Blood2/build/release/tests/wind-recipe"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"wind.recipe" start time: Oct 17 01:43 CEST
+Output:
+----------------------------------------------------------
+Miss keeps raw downward normal; source model 200->1500/sqrt, alpha.5, rotation.05; white light400->100; detached lifetimes verified.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"wind.recipe" end time: Oct 17 01:43 CEST
+"wind.recipe" time elapsed: 00:00:00
+----------------------------------------------------------

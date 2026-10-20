@@ -1,0 +1,22 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 513: destructable_state.roundtrip
+1/6 Test #513: destructable_state.roundtrip .....   Passed    0.01 sec
+    Start 514: destructable_state.behavior
+2/6 Test #514: destructable_state.behavior ......   Passed    0.00 sec
+    Start 515: destructable_state.sentinel
+3/6 Test #515: destructable_state.sentinel ......   Passed    0.00 sec
+    Start 516: destructable_state.failures
+4/6 Test #516: destructable_state.failures ......   Passed    0.01 sec
+    Start 517: destructable_state.capture
+5/6 Test #517: destructable_state.capture .......   Passed    0.01 sec
+    Start 518: destructable_state.private
+6/6 Test #518: destructable_state.private .......   Passed    1.19 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+destructable_state    =   1.21 sec*proc (6 tests)
+headless              =   1.21 sec*proc (6 tests)
+private               =   1.19 sec*proc (1 test)
+
+Total Test time (real) =   1.22 sec

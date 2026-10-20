@@ -1,0 +1,14 @@
+328/334 Testing: ai_perception.stimuli
+328/334 Test: ai_perception.stimuli
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_perception_tests" "stimuli"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_perception.stimuli" start time: Oct 16 10:37 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.stimuli" end time: Oct 16 10:37 CEST
+"ai_perception.stimuli" time elapsed: 00:00:00
+----------------------------------------------------------

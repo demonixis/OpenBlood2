@@ -1,0 +1,254 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+        Start 954: train_session.private_60
+        Start 958: screen_fade.private
+  1/113 Test #958: screen_fade.private ..............   Passed    4.34 sec
+        Start 953: train_session.private_30
+  2/113 Test #954: train_session.private_60 .........   Passed    4.95 sec
+        Start  73: player.smell_private
+  3/113 Test  #73: player.smell_private .............   Passed    0.86 sec
+        Start 227: cameras.catalog
+  4/113 Test #227: cameras.catalog ..................   Passed    0.60 sec
+        Start 614: player_keepalive.private
+  5/113 Test #614: player_keepalive.private .........   Passed    0.47 sec
+        Start 965: player_voice.private
+  6/113 Test #965: player_voice.private .............   Passed    0.49 sec
+        Start 966: player_voice.combat_private
+  7/113 Test #966: player_voice.combat_private ......   Passed    0.44 sec
+        Start 846: conversation.catalog
+  8/113 Test #846: conversation.catalog .............   Passed    0.25 sec
+        Start 845: conversation.private
+  9/113 Test #845: conversation.private .............   Passed    0.22 sec
+        Start  74: player.private
+ 10/113 Test  #74: player.private ...................   Passed    0.28 sec
+        Start  50: world.level_change_private
+ 11/113 Test #953: train_session.private_30 .........   Passed    4.27 sec
+        Start 600: player_state.private
+ 12/113 Test #600: player_state.private .............   Passed    0.14 sec
+        Start 588: inventory_state.private
+ 13/113 Test #588: inventory_state.private ..........   Passed    0.18 sec
+        Start  12: objects.message_churn
+ 14/113 Test  #12: objects.message_churn ............   Passed    0.12 sec
+        Start 915: death_effects.gibs
+ 15/113 Test  #50: world.level_change_private .......   Passed    0.58 sec
+        Start 201: pickup_audio.private
+ 16/113 Test #915: death_effects.gibs ...............   Passed    0.09 sec
+        Start 963: player_voice.pickup
+ 17/113 Test #963: player_voice.pickup ..............   Passed    0.06 sec
+        Start 919: death_effects.lifetime
+ 18/113 Test #201: pickup_audio.private .............   Passed    0.08 sec
+        Start 914: death_effects.burn
+ 19/113 Test #919: death_effects.lifetime ...........   Passed    0.05 sec
+        Start 567: weapon_drops.catalog
+ 20/113 Test #914: death_effects.burn ...............   Passed    0.04 sec
+        Start 199: pickup_audio.failures
+ 21/113 Test #567: weapon_drops.catalog .............   Passed    0.03 sec
+        Start  13: objects.message_limit
+ 22/113 Test #199: pickup_audio.failures ............   Passed    0.03 sec
+        Start 609: player_restore.private
+ 23/113 Test  #13: objects.message_limit ............   Passed    0.03 sec
+        Start 916: death_effects.limbs
+ 24/113 Test #916: death_effects.limbs ..............   Passed    0.02 sec
+        Start 917: death_effects.damage
+ 25/113 Test #917: death_effects.damage .............   Passed    0.02 sec
+        Start 918: death_effects.particles
+ 26/113 Test #918: death_effects.particles ..........   Passed    0.02 sec
+        Start 612: player_keepalive.fallback
+ 27/113 Test #612: player_keepalive.fallback ........   Passed    0.01 sec
+        Start  32: world.level_change
+ 28/113 Test  #32: world.level_change ...............   Passed    0.01 sec
+        Start 225: cameras.player
+ 29/113 Test #225: cameras.player ...................   Passed    0.01 sec
+        Start 844: conversation.lifetime
+ 30/113 Test #844: conversation.lifetime ............   Passed    0.00 sec
+        Start 613: player_keepalive.failures
+ 31/113 Test #613: player_keepalive.failures ........   Passed    0.00 sec
+        Start 962: player_voice.messages
+ 32/113 Test #962: player_voice.messages ............   Passed    0.00 sec
+        Start 964: player_voice.damage
+ 33/113 Test #964: player_voice.damage ..............   Passed    0.00 sec
+        Start 961: player_voice.timing
+ 34/113 Test #961: player_voice.timing ..............   Passed    0.00 sec
+        Start 561: weapon_drops.falling
+ 35/113 Test #561: weapon_drops.falling .............   Passed    0.00 sec
+        Start 840: conversation.sequence
+ 36/113 Test #840: conversation.sequence ............   Passed    0.00 sec
+        Start 960: player_voice.groups
+ 37/113 Test #960: player_voice.groups ..............   Passed    0.00 sec
+        Start 957: screen_fade.session
+ 38/113 Test #957: screen_fade.session ..............   Passed    0.00 sec
+        Start 843: conversation.clock
+ 39/113 Test #843: conversation.clock ...............   Passed    0.00 sec
+        Start 198: pickup_audio.rules
+ 40/113 Test #198: pickup_audio.rules ...............   Passed    0.01 sec
+        Start 842: conversation.transport
+ 41/113 Test #842: conversation.transport ...........   Passed    0.00 sec
+        Start 611: player_keepalive.named
+ 42/113 Test #611: player_keepalive.named ...........   Passed    0.00 sec
+        Start 841: conversation.delayed
+ 43/113 Test #841: conversation.delayed .............   Passed    0.00 sec
+        Start 587: inventory_state.capture
+ 44/113 Test #587: inventory_state.capture ..........   Passed    0.00 sec
+        Start 200: pickup_audio.callbacks
+ 45/113 Test #200: pickup_audio.callbacks ...........   Passed    0.00 sec
+        Start 598: player_state.failures
+ 46/113 Test #598: player_state.failures ............   Passed    0.00 sec
+        Start  72: player.smell
+ 47/113 Test #609: player_restore.private ...........   Passed    0.17 sec
+ 48/113 Test  #72: player.smell .....................   Passed    0.00 sec
+        Start 566: weapon_drops.missing_pickup
+        Start 565: weapon_drops.callback
+ 49/113 Test #566: weapon_drops.missing_pickup ......   Passed    0.00 sec
+        Start 558: weapon_drops.collect
+ 50/113 Test #565: weapon_drops.callback ............   Passed    0.00 sec
+        Start 584: inventory_state.roundtrip
+ 51/113 Test #558: weapon_drops.collect .............   Passed    0.00 sec
+        Start 560: weapon_drops.drop
+ 52/113 Test #584: inventory_state.roundtrip ........   Passed    0.00 sec
+        Start 596: player_state.clocks
+ 53/113 Test #560: weapon_drops.drop ................   Passed    0.00 sec
+        Start 599: player_state.capture
+ 54/113 Test #596: player_state.clocks ..............   Passed    0.00 sec
+        Start 563: weapon_drops.failures
+ 55/113 Test #599: player_state.capture .............   Passed    0.00 sec
+        Start 562: weapon_drops.guards
+ 56/113 Test #563: weapon_drops.failures ............   Passed    0.00 sec
+        Start 564: weapon_drops.nosliding
+ 57/113 Test #562: weapon_drops.guards ..............   Passed    0.00 sec
+        Start 559: weapon_drops.protocol
+ 58/113 Test #564: weapon_drops.nosliding ...........   Passed    0.00 sec
+        Start 597: player_state.initialization
+ 59/113 Test #559: weapon_drops.protocol ............   Passed    0.00 sec
+        Start 595: player_state.roundtrip
+ 60/113 Test #597: player_state.initialization ......   Passed    0.00 sec
+        Start 585: inventory_state.malformed
+ 61/113 Test #595: player_state.roundtrip ...........   Passed    0.00 sec
+        Start 586: inventory_state.rollback
+ 62/113 Test #585: inventory_state.malformed ........   Passed    0.00 sec
+        Start  47: world.session_lifecycle
+ 63/113 Test #586: inventory_state.rollback .........   Passed    0.00 sec
+        Start  68: player.lifecycle
+ 64/113 Test  #47: world.session_lifecycle ..........   Passed    0.00 sec
+        Start  69: player.rollback
+ 65/113 Test  #68: player.lifecycle .................   Passed    0.00 sec
+        Start 839: conversation.mapping
+ 66/113 Test  #69: player.rollback ..................   Passed    0.00 sec
+        Start  70: player.messages
+ 67/113 Test #839: conversation.mapping .............   Passed    0.00 sec
+        Start 221: cameras.defaults
+ 68/113 Test  #70: player.messages ..................   Passed    0.00 sec
+        Start  71: player.callbacks
+ 69/113 Test #221: cameras.defaults .................   Passed    0.00 sec
+        Start 223: cameras.links
+ 70/113 Test  #71: player.callbacks .................   Passed    0.00 sec
+        Start 575: corpses.catalog
+ 71/113 Test #223: cameras.links ....................   Passed    0.00 sec
+        Start 226: cameras.validation
+ 72/113 Test #226: cameras.validation ...............   Passed    0.00 sec
+        Start 222: cameras.timing
+ 73/113 Test #222: cameras.timing ...................   Passed    0.00 sec
+        Start 224: cameras.selection
+ 74/113 Test #224: cameras.selection ................   Passed    0.00 sec
+        Start  67: player.handles
+ 75/113 Test  #67: player.handles ...................   Passed    0.00 sec
+        Start  48: world.session_messages
+ 76/113 Test  #48: world.session_messages ...........   Passed    0.00 sec
+        Start 557: ai_hit.catalog
+ 77/113 Test #575: corpses.catalog ..................   Passed    0.04 sec
+        Start 956: screen_fade.values
+ 78/113 Test #956: screen_fade.values ...............   Passed    0.00 sec
+        Start 607: player_restore.failures
+ 79/113 Test #607: player_restore.failures ..........   Passed    0.00 sec
+        Start 608: player_restore.lifetime
+ 80/113 Test #608: player_restore.lifetime ..........   Passed    0.00 sec
+        Start   2: objects.builtin_model
+ 81/113 Test   #2: objects.builtin_model ............   Passed    0.00 sec
+        Start 606: player_restore.roundtrip
+ 82/113 Test #606: player_restore.roundtrip .........   Passed    0.00 sec
+        Start  14: objects.unsupported_teardown
+ 83/113 Test  #14: objects.unsupported_teardown .....   Passed    0.00 sec
+        Start 568: corpses.mappings
+ 84/113 Test #568: corpses.mappings .................   Passed    0.00 sec
+        Start 548: ai_hit.geometry
+ 85/113 Test #557: ai_hit.catalog ...................   Passed    0.05 sec
+        Start  15: objects.creation_failures
+ 86/113 Test #548: ai_hit.geometry ..................   Passed    0.00 sec
+        Start  11: objects.messages_strings
+ 87/113 Test  #15: objects.creation_failures ........   Passed    0.00 sec
+        Start 571: corpses.lifetime
+ 88/113 Test  #11: objects.messages_strings .........   Passed    0.00 sec
+        Start 550: ai_hit.modifiers
+ 89/113 Test #571: corpses.lifetime .................   Passed    0.00 sec
+        Start 556: ai_hit.hidden
+ 90/113 Test #550: ai_hit.modifiers .................   Passed    0.00 sec
+        Start 574: corpses.accumulation
+ 91/113 Test #556: ai_hit.hidden ....................   Passed    0.00 sec
+        Start 572: corpses.sounds
+ 92/113 Test #574: corpses.accumulation .............   Passed    0.00 sec
+        Start 569: corpses.transfer
+ 93/113 Test #572: corpses.sounds ...................   Passed    0.00 sec
+        Start 549: ai_hit.query
+ 94/113 Test #569: corpses.transfer .................   Passed    0.00 sec
+        Start   5: objects.reasons_properties
+ 95/113 Test #549: ai_hit.query .....................   Passed    0.00 sec
+        Start   3: objects.original_objects
+ 96/113 Test   #5: objects.reasons_properties .......   Passed    0.00 sec
+        Start 570: corpses.failures
+ 97/113 Test   #3: objects.original_objects .........   Passed    0.00 sec
+        Start 555: ai_hit.lifetime
+ 98/113 Test #570: corpses.failures .................   Passed    0.00 sec
+        Start 573: corpses.gates
+ 99/113 Test #555: ai_hit.lifetime ..................   Passed    0.00 sec
+        Start   9: objects.handles_selection
+100/113 Test #573: corpses.gates ....................   Passed    0.00 sec
+        Start   8: objects.aggregate_dispatch
+101/113 Test   #9: objects.handles_selection ........   Passed    0.00 sec
+        Start 551: ai_hit.reactions
+102/113 Test   #8: objects.aggregate_dispatch .......   Passed    0.00 sec
+        Start   4: objects.nested_creation
+103/113 Test #551: ai_hit.reactions .................   Passed    0.00 sec
+        Start   6: objects.scheduling
+104/113 Test   #4: objects.nested_creation ..........   Passed    0.00 sec
+        Start   7: objects.deferred_removal
+105/113 Test   #6: objects.scheduling ...............   Passed    0.00 sec
+        Start  10: objects.links_lists
+106/113 Test   #7: objects.deferred_removal .........   Passed    0.00 sec
+        Start 553: ai_hit.guards
+107/113 Test  #10: objects.links_lists ..............   Passed    0.00 sec
+        Start 554: ai_hit.sides
+108/113 Test #553: ai_hit.guards ....................   Passed    0.00 sec
+        Start 552: ai_hit.recoil
+109/113 Test #554: ai_hit.sides .....................   Passed    0.00 sec
+        Start 967: player_death.camera
+110/113 Test #552: ai_hit.recoil ....................   Passed    0.00 sec
+        Start 968: player_death.guards
+111/113 Test #967: player_death.camera ..............   Passed    0.00 sec
+        Start 969: player_death.private
+112/113 Test #968: player_death.guards ..............   Passed    0.00 sec
+113/113 Test #969: player_death.private .............   Passed    0.09 sec
+
+100% tests passed, 0 tests failed out of 113
+
+Label Time Summary:
+ai_hit              =   0.07 sec*proc (10 tests)
+audio               =   1.13 sec*proc (11 tests)
+cameras             =   0.62 sec*proc (7 tests)
+conversation        =   0.49 sec*proc (8 tests)
+corpses             =   0.05 sec*proc (8 tests)
+death_effects       =   0.24 sec*proc (6 tests)
+headless            =  19.24 sec*proc (113 tests)
+inventory_state     =   0.19 sec*proc (5 tests)
+objects             =   0.18 sec*proc (14 tests)
+pickups             =   0.12 sec*proc (4 tests)
+player              =   1.15 sec*proc (8 tests)
+player_death        =   0.10 sec*proc (3 tests)
+player_keepalive    =   0.48 sec*proc (4 tests)
+player_restore      =   0.18 sec*proc (4 tests)
+player_state        =   0.16 sec*proc (6 tests)
+player_voice        =   1.01 sec*proc (7 tests)
+private             =  18.75 sec*proc (26 tests)
+screen_fade         =   4.34 sec*proc (3 tests)
+train_session       =   9.22 sec*proc (2 tests)
+weapon_drops        =   0.05 sec*proc (10 tests)
+world               =   0.59 sec*proc (4 tests)
+
+Total Test time (real) =   9.70 sec

@@ -1,0 +1,99 @@
+683/699 Testing: gpu.gideon_teleport_private
+683/699 Test: gpu.gideon_teleport_private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_teleport_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-teleport-private-gpu" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.gideon_teleport_private" start time: Oct 17 03:48 CEST
+Output:
+----------------------------------------------------------
+Production Gideon: real initialization, scheduled AI_Update, no-audience health, read-only GPU and deferred removal verified.
+External Gideon: 286 visible pixels; original 16-step fade reaches empty frame; reappearance exact; repeated reads do not advance clocks. Dodge motion integrates once and finishes at one second.
+<end of output>
+Test time =   0.55 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.gideon_teleport_private" end time: Oct 17 03:48 CEST
+"gpu.gideon_teleport_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 03:48 CEST
+
+brushes =   2.46 sec*proc
+
+cameras =   2.71 sec*proc
+
+character =  20.03 sec*proc
+
+cinematics =   2.70 sec*proc
+
+containers =   6.66 sec*proc
+
+doors =   2.36 sec*proc
+
+energy =   0.87 sec*proc
+
+explosion_flames =   1.74 sec*proc
+
+explosion_fragments =   0.88 sec*proc
+
+explosion_models =   0.90 sec*proc
+
+explosion_rings =   0.90 sec*proc
+
+gideon_teleport =   0.96 sec*proc
+
+gpu = 182.64 sec*proc
+
+interaction =   7.92 sec*proc
+
+keyframes =   2.65 sec*proc
+
+lights =   2.70 sec*proc
+
+model_view =   1.44 sec*proc
+
+movement =  18.80 sec*proc
+
+naga =   0.90 sec*proc
+
+object_particles =   0.87 sec*proc
+
+objectives =   4.94 sec*proc
+
+pickups =   2.71 sec*proc
+
+player =   2.70 sec*proc
+
+player_controls =   5.89 sec*proc
+
+player_keepalive =   4.51 sec*proc
+
+player_restore =   3.10 sec*proc
+
+private = 173.17 sec*proc
+
+randomsound =  13.58 sec*proc
+
+sceneexplosion =   2.69 sec*proc
+
+session_playback =   1.53 sec*proc
+
+shield =   0.87 sec*proc
+
+sound =   2.76 sec*proc
+
+sprite_view =   1.41 sec*proc
+
+sprites =   2.66 sec*proc
+
+triggers =   2.80 sec*proc
+
+weapon_sprites =   2.17 sec*proc
+
+weapons =  19.19 sec*proc
+
+wind =   1.25 sec*proc
+
+world_view =  21.26 sec*proc
+
+worldpaths =   2.65 sec*proc
+

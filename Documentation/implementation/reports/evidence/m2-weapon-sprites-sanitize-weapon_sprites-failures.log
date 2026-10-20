@@ -1,0 +1,14 @@
+572/576 Testing: weapon_sprites.failures
+572/576 Test: weapon_sprites.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_sprite_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-sprites-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_sprites.failures" start time: Oct 16 23:52 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_sprites.failures" end time: Oct 16 23:52 CEST
+"weapon_sprites.failures" time elapsed: 00:00:00
+----------------------------------------------------------

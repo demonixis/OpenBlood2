@@ -1,0 +1,13 @@
+{
+  "binary": "IMUSIC25.DLL",
+  "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "cases": 500,
+  "terminal_notes": 7930,
+  "decisions_sha256": "d1d49036ab8d54f39d59fdfac8a787d5cac2723c3d1e9499b8a6746d07c8b8d0",
+  "unicorn": "2.1.4",
+  "rvas": [
+    "0x17996..0x179c2",
+    "0x4e49..0x4f0f"
+  ],
+  "scope": "Original finite-section termination and off-message construction. Synthetic active lists; sink/free intercepted; no playlist, OS or audio executed."
+}

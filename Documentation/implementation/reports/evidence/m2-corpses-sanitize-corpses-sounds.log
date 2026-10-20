@@ -1,0 +1,14 @@
+469/472 Testing: corpses.sounds
+469/472 Test: corpses.sounds
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "sounds" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/sounds"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.sounds" start time: Oct 16 16:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.sounds" end time: Oct 16 16:56 CEST
+"corpses.sounds" time elapsed: 00:00:00
+----------------------------------------------------------

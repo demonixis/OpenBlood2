@@ -1,0 +1,29 @@
+223/225 Testing: cinematics.catalog
+223/225 Test: cinematics.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"cinematics.catalog" start time: Oct 16 01:32 CEST
+Output:
+----------------------------------------------------------
+SUBWAY cinexit1
+  0 sounds\enemies\gideon\laf1_gid.wav speaker=player message=door12:TRIGGER
+SUBWAY cinhi5
+  0 sounds\events\metalcrush5a.wav speaker=player message=:
+  0 sounds\events\traincrash1.wav speaker=player message=:
+SUBWAY cintrig1
+  0 sounds\chosen\caleb\e1m4_1_cal.wav speaker=player message=:
+SUBWAY cintrig2
+  0 sounds\enemies\gideon\1agid1.wav speaker=player message=:
+  0 sounds\chosen\caleb\1acaleb1.wav speaker=player message=:
+worlds/02_cityhubb.dat sound=sounds\chosen\caleb\msc12cal.wav error=Missing or oversized sound resource
+worlds/03_museum.dat sound=sounds\chosen\caleb\laugh1_calb.wav error=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sound=sounds\chosen\caleb\kill\laugh1_cal.wav error=Missing or oversized sound resource
+worlds=57 controllers=79 cues=201 missing=3 invalid=0
+encoding=1 cues=198
+<end of output>
+Test time =   3.88 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.catalog" end time: Oct 16 01:32 CEST
+"cinematics.catalog" time elapsed: 00:00:03
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+373/384 Testing: ai_fire.selection
+373/384 Test: ai_fire.selection
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests" "selection"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_fire.selection" start time: Oct 16 11:27 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_fire.selection" end time: Oct 16 11:27 CEST
+"ai_fire.selection" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+358/366 Testing: ai_trigger.hearing
+358/366 Test: ai_trigger.hearing
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_trigger_tests" "hearing" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-trigger-hearing"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_trigger.hearing" start time: Oct 16 12:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_trigger.hearing" end time: Oct 16 12:07 CEST
+"ai_trigger.hearing" time elapsed: 00:00:00
+----------------------------------------------------------

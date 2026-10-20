@@ -1,0 +1,14 @@
+473/480 Testing: exits.defaults
+473/480 Test: exits.defaults
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit_tests" "defaults" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit-fixtures/defaults"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"exits.defaults" start time: Oct 16 17:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"exits.defaults" end time: Oct 16 17:25 CEST
+"exits.defaults" time elapsed: 00:00:00
+----------------------------------------------------------

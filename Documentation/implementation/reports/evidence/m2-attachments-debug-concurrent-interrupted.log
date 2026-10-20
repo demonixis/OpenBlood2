@@ -1,0 +1,51 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+        Start 273: gpu.character
+  1/323 Test #273: gpu.character .....................   Passed   18.60 sec
+        Start 237: gpu.randomsound
+  2/323 Test #237: gpu.randomsound ...................   Passed   13.09 sec
+        Start  75: gpu.movement
+  3/323 Test  #75: gpu.movement ......................***Failed   18.99 sec
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 194 original instances, 116 BSP models
+[info] Movement: hidden distance=295.31055, jumps=1, landings=2, ground=true, forward frames=55, jump frames=10
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/movement.png
+[error] GPU smoke timed out before completing its frames/events
+
+        Start  64: gpu.weapons
+  4/323 Test  #64: gpu.weapons .......................***Failed   19.00 sec
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 194 original instances, 116 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/weapons.png
+[error] GPU smoke timed out before completing its frames/events
+
+        Start  63: weapons.private
+        Start 196: keyframes.catalog
+        Start 140: brushes.catalog
+        Start 108: doors.catalog
+  5/323 Test #196: keyframes.catalog .................***Failed    6.76 sec
+worlds=57 controllers=94 source_keys=383 copied=375 empty_paths=0 missing_targets=44 malformed=0
+catalog:371: g.objects.snapshot().size() == 188
+
+        Start 120: triggers.catalog
+  6/323 Test #108: doors.catalog .....................   Passed   10.31 sec
+        Start 131: interaction.catalog
+  7/323 Test #140: brushes.catalog ...................   Passed   12.82 sec
+        Start 185: cameras.catalog
+  8/323 Test #120: triggers.catalog ..................   Passed   10.30 sec
+        Start 253: sprites.catalog

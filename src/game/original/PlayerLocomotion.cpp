@@ -1,6 +1,6 @@
 #include "CharacterProfiles.h"
 // Selected CPlayerObj::UpdateAnim/Do*Anim/SetAnimation and CAnim_Sound mappings.
-// See docs/contracts/locomotion_contracts.md for source evidence and engine adaptations.
+// See Documentation/contracts/locomotion_contracts.md for source evidence and engine adaptations.
 #include "PlayerObj.h"
 #include <cmath>
 

@@ -1,0 +1,9 @@
+[0/2] Re-checking globbed directories...
+[1/9] Scanning <workspace>/Blood2/tests/ai_state_tests.cpp for CXX dependencies
+[2/9] Scanning <workspace>/Blood2/tests/ai_runtime_tests.cpp for CXX dependencies
+[3/9] Generating CXX dyndep file tests/CMakeFiles/ai_state_tests.dir/CXX.dd
+[4/9] Generating CXX dyndep file tests/CMakeFiles/ai_runtime_tests.dir/CXX.dd
+[5/9] Building CXX object tests/CMakeFiles/ai_state_tests.dir/ai_state_tests.cpp.o
+[6/9] Building CXX object tests/CMakeFiles/ai_runtime_tests.dir/ai_runtime_tests.cpp.o
+[7/9] Linking CXX executable tests/ai_state_tests
+[8/9] Linking CXX executable tests/ai_runtime_tests

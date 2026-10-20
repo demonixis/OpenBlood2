@@ -1,0 +1,17 @@
+[0/2] Re-checking globbed directories...
+[1/19] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[2/19] Scanning /home/yann/projects/lithtech/Blood2/tests/level_change_gpu_tests.cpp for CXX dependencies
+[3/19] Scanning /home/yann/projects/lithtech/Blood2/tests/screen_fade_gpu_tests.cpp for CXX dependencies
+[4/19] Scanning /home/yann/projects/lithtech/Blood2/src/app/hud.cpp for CXX dependencies
+[5/19] Generating CXX dyndep file tests/CMakeFiles/level_change_gpu_tests.dir/CXX.dd
+[6/19] Generating CXX dyndep file tests/CMakeFiles/screen_fade_gpu_tests.dir/CXX.dd
+[7/18] Scanning /home/yann/projects/lithtech/Blood2/tests/train_session_tests.cpp for CXX dependencies
+[8/18] Generating CXX dyndep file tests/CMakeFiles/train_session_tests.dir/CXX.dd
+[9/17] Building CXX object tests/CMakeFiles/level_change_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[10/17] Building CXX object tests/CMakeFiles/level_change_gpu_tests.dir/level_change_gpu_tests.cpp.o
+[11/17] Building CXX object tests/CMakeFiles/screen_fade_gpu_tests.dir/screen_fade_gpu_tests.cpp.o
+[12/17] Building CXX object tests/CMakeFiles/screen_fade_gpu_tests.dir/__/src/app/hud.cpp.o
+[13/17] Linking CXX executable tests/level_change_gpu_tests
+[14/17] Linking CXX executable tests/screen_fade_gpu_tests
+[15/17] Building CXX object tests/CMakeFiles/train_session_tests.dir/train_session_tests.cpp.o
+[16/17] Linking CXX executable tests/train_session_tests

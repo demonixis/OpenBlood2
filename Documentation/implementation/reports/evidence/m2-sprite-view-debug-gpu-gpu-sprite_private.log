@@ -1,0 +1,73 @@
+545/545 Testing: gpu.sprite_private
+545/545 Test: gpu.sprite_private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.sprite_private" start time: Oct 16 20:00 CEST
+Output:
+----------------------------------------------------------
+Pixels: zero/partial/opaque/opaque-black DTX alpha, overlap sort, world occlusion, no depth writes, resize and reupload passed
+Private authored sprite pose/scale: 1556 non-background pixels, 118444 clear; unload emptied CPU/GPU geometry
+<end of output>
+Test time =   0.91 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sprite_private" end time: Oct 16 20:00 CEST
+"gpu.sprite_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 20:00 CEST
+
+brushes =   2.41 sec*proc
+
+cameras =   2.77 sec*proc
+
+character =  19.80 sec*proc
+
+cinematics =   2.65 sec*proc
+
+containers =   6.00 sec*proc
+
+doors =   2.41 sec*proc
+
+gpu = 156.22 sec*proc
+
+interaction =   8.04 sec*proc
+
+keyframes =   2.58 sec*proc
+
+lights =   2.60 sec*proc
+
+model_view =   1.43 sec*proc
+
+movement =  18.60 sec*proc
+
+objectives =   3.45 sec*proc
+
+pickups =   2.55 sec*proc
+
+player =   2.61 sec*proc
+
+player_keepalive =   3.91 sec*proc
+
+player_restore =   2.97 sec*proc
+
+private = 151.54 sec*proc
+
+randomsound =  13.49 sec*proc
+
+sceneexplosion =   2.66 sec*proc
+
+sound =   2.71 sec*proc
+
+sprite_view =   1.39 sec*proc
+
+sprites =   2.58 sec*proc
+
+triggers =   2.69 sec*proc
+
+weapons =  18.74 sec*proc
+
+world_view =  19.09 sec*proc
+
+worldpaths =   2.55 sec*proc
+

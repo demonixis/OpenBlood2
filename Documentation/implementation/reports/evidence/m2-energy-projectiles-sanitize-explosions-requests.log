@@ -1,0 +1,14 @@
+138/596 Testing: explosions.requests
+138/596 Test: explosions.requests
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_tests" "requests" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-fixtures/requests"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosions.requests" start time: Oct 17 01:22 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"explosions.requests" end time: Oct 17 01:22 CEST
+"explosions.requests" time elapsed: 00:00:00
+----------------------------------------------------------

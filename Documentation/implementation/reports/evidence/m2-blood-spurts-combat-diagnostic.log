@@ -1,0 +1,47 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/release/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 659
+    Start 659: player_controls.corpse_clearance
+
+659: Test command: <workspace>/Blood2/build/release/tests/player_controls_tests "clearance" "<external-data-root>"
+659: Working Directory: <workspace>/Blood2/build/release/tests
+659: Test timeout computed to be: 240
+659: Original SubwayA camera intro expired after 12.0167 simulation seconds
+659: Approached encounter at z=-2338.28
+659: Combat final: damaged=1 dead=0 attributed=1 target=1 corpse=0 shots=50 ammo=0 fragments=0
+659: NPC HP=0.84485 state=10 body=0 death=
+659: combat:352: damaged && dead && player_attributed && !g.objects.get(target) && corpse
+1/2 Test #659: player_controls.corpse_clearance ...***Failed    1.37 sec
+test 660
+    Start 660: player_controls.private
+
+660: Test command: <workspace>/Blood2/build/release/tests/player_controls_tests "private" "<external-data-root>"
+660: Working Directory: <workspace>/Blood2/build/release/tests
+660: Test timeout computed to be: 120
+660: Original SubwayA camera intro expired after 12.0167 simulation seconds
+660: Alternate input: hp=100 dead=0 ammo=38 shots=12 before=5
+660: private_input:525: corrected_corpses > 0
+2/2 Test #660: player_controls.private ............***Failed    0.64 sec
+
+0% tests passed, 2 tests failed out of 2
+
+Label Time Summary:
+headless           =   2.01 sec*proc (2 tests)
+player_controls    =   2.01 sec*proc (2 tests)
+private            =   2.01 sec*proc (2 tests)
+
+Total Test time (real) =   2.03 sec
+
+The following tests FAILED:
+	659 - player_controls.corpse_clearance (Failed)         headless player_controls private
+	660 - player_controls.private (Failed)                  headless player_controls private
+Errors while running CTest
+Output from these tests are in: <workspace>/Blood2/build/release/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

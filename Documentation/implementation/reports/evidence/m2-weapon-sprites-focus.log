@@ -1,0 +1,24 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 611: weapon_sprites.formulas
+1/7 Test #611: weapon_sprites.formulas ..........   Passed    0.00 sec
+    Start 612: weapon_sprites.delay
+2/7 Test #612: weapon_sprites.delay .............   Passed    0.00 sec
+    Start 613: weapon_sprites.failures
+3/7 Test #613: weapon_sprites.failures ..........   Passed    0.01 sec
+    Start 614: weapon_sprites.selection
+4/7 Test #614: weapon_sprites.selection .........   Passed    0.01 sec
+    Start 615: weapon_sprites.containers
+5/7 Test #615: weapon_sprites.containers ........   Passed    0.01 sec
+    Start 616: weapon_sprites.session
+6/7 Test #616: weapon_sprites.session ...........   Passed    0.01 sec
+    Start 617: weapon_sprites.private
+7/7 Test #617: weapon_sprites.private ...........   Passed    1.29 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+headless          =   1.32 sec*proc (7 tests)
+private           =   1.29 sec*proc (1 test)
+weapon_sprites    =   1.32 sec*proc (7 tests)
+
+Total Test time (real) =   1.33 sec

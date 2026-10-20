@@ -1,0 +1,14 @@
+478/480 Testing: exits.queue
+478/480 Test: exits.queue
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit_tests" "queue" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit-fixtures/queue"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"exits.queue" start time: Oct 16 17:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"exits.queue" end time: Oct 16 17:25 CEST
+"exits.queue" time elapsed: 00:00:00
+----------------------------------------------------------

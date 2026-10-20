@@ -1,0 +1,25 @@
+{
+  "name": "abc_cycle_build",
+  "command": [
+    "c++",
+    "-std=c++17",
+    "-O0",
+    "-I",
+    "OpenBlood2/OpenLithTech/src/formats",
+    "-I",
+    "OpenBlood2/OpenLithTech/include",
+    "-I",
+    "/tmp/lithtech-audit-2bVxTF/openblood2/_deps/glm-src",
+    "Documentation/Audit/probes/abc_cycle_probe.cpp",
+    "OpenBlood2/OpenLithTech/src/formats/abc_parser.cpp",
+    "OpenBlood2/OpenLithTech/src/BinaryReader.cpp",
+    "-o",
+    "/tmp/lithtech-audit-2bVxTF/abc_cycle_probe"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:20:49.873748+00:00",
+  "elapsed_seconds": 2.142,
+  "timeout_seconds": 60,
+  "exit_code": 0,
+  "log": "abc_cycle_build.log"
+}

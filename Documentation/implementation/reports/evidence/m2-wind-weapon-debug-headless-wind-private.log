@@ -1,0 +1,17 @@
+653/655 Testing: wind.private
+653/655 Test: wind.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/wind_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"wind.private" start time: Oct 17 01:44 CEST
+Output:
+----------------------------------------------------------
+Private loop 0: actual windfire/explode WAV, 168 model triangles, deliveries 17, rehearsal retains shooter/projectile.
+Private loop 1: actual windfire/explode WAV, 168 model triangles, deliveries 17, rehearsal retains shooter/projectile.
+Private loop 2: actual windfire/explode WAV, 168 model triangles, deliveries 17, rehearsal retains shooter/projectile.
+<end of output>
+Test time =   2.68 sec
+----------------------------------------------------------
+Test Passed.
+"wind.private" end time: Oct 17 01:44 CEST
+"wind.private" time elapsed: 00:00:02
+----------------------------------------------------------

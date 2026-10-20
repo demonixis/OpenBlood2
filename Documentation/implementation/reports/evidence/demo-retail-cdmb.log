@@ -1,0 +1,19 @@
+Command: ['build/release/blood2', '--view-world', '--world', '05_CDMB', '--data-dir', '/home/yann/.steam/steam/steamapps/common/Blood II', '--frames', '120', '--log-dir', '/tmp/blood2-demo-normal-logs', '--capture', '/tmp/blood2-retail-cdmb-verified.png']
+[info] Log session: /tmp/blood2-demo-normal-logs/session-1792406101881098060-0
+[info] OpenBlood2 0.3.0 / 3a9466f-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-3a9466f (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=05_CDMB; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=120
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 05_CDMB (direct entry)
+[info] World ready: worlds/05_cdmb.dat
+[info] Frontend complete: 120 frames, world worlds/05_cdmb.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+Exit code: 0

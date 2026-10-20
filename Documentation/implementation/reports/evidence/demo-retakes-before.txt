@@ -1,0 +1,10 @@
+Pre-fix diagnostic: real Demo_01 Spawner at the reported position, TRIGGER delivery, explicit upward MoveObject.
+This intentionally fails on the baseline; it is not a full human walkthrough.
+
+Spawner / spawn101 at -1888 2144 -2384 dims 0 0 0
+Spawner / spawn101 at 272 2400 -632 dims 0 0 0
+Matching object Spawner / spawn101
+Spawn request Fanatic
+Child at -1888 2144 -2384 dims 19 38.134 19 velocity 0 500 0
+Overlap polygon 9174 depth 3
+overlap_probe:197: g.server.MoveObject(child->handle, &to) == DE_OK | 

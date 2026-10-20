@@ -1,0 +1,14 @@
+631/634 Testing: gideon_attack.far
+631/634 Test: gideon_attack.far
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_attack_tests" "far" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-attack-far"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_attack.far" start time: Oct 17 03:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_attack.far" end time: Oct 17 03:03 CEST
+"gideon_attack.far" time elapsed: 00:00:00
+----------------------------------------------------------

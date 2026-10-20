@@ -1,0 +1,14 @@
+359/366 Testing: ai_trigger.gunfire
+359/366 Test: ai_trigger.gunfire
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_trigger_tests" "gunfire" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-trigger-gunfire"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_trigger.gunfire" start time: Oct 16 12:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ai_trigger.gunfire" end time: Oct 16 12:07 CEST
+"ai_trigger.gunfire" time elapsed: 00:00:00
+----------------------------------------------------------

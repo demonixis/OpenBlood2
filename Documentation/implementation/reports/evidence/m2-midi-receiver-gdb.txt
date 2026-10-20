@@ -1,0 +1,14 @@
+set pagination off
+set print thread-events off
+break /home/yann/projects/lithtech/Blood2/src/app/world_sound_smoke.cpp:226
+run
+print note_error
+print sampler.midi_received
+print sampler.midi_rejected
+print sampler.midi_released
+print sampler.midi_choked
+print sampler.voices_.size()
+print sampler.voices_
+print sampler.midi_channels_[4]
+print routed_region.options
+quit

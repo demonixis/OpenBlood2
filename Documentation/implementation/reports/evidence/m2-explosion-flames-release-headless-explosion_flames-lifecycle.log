@@ -1,0 +1,14 @@
+586/591 Testing: explosion_flames.lifecycle
+586/591 Test: explosion_flames.lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_flame_tests" "lifecycle" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-flames-lifecycle"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"explosion_flames.lifecycle" start time: Oct 16 22:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_flames.lifecycle" end time: Oct 16 22:03 CEST
+"explosion_flames.lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------

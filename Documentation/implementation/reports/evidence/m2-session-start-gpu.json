@@ -1,0 +1,86 @@
+[
+  {
+    "name": "release-01_SubwayA",
+    "command": [
+      "build/release/blood2",
+      "--config",
+      "build/release/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II/",
+      "--view-world",
+      "--world",
+      "01_SubwayA",
+      "--frames",
+      "12",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/release/tests/session-start-01_SubwayA.png"
+    ],
+    "code": 0,
+    "verified": true,
+    "seconds": 1.3165797269903123,
+    "capture": "/home/yann/projects/lithtech/Blood2/build/release/tests/session-start-01_SubwayA.png"
+  },
+  {
+    "name": "release-02_CityHub",
+    "command": [
+      "build/release/blood2",
+      "--config",
+      "build/release/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II/",
+      "--view-world",
+      "--world",
+      "02_CityHub",
+      "--frames",
+      "12",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/release/tests/session-start-02_CityHub.png"
+    ],
+    "code": 0,
+    "verified": true,
+    "seconds": 1.5166877049778122,
+    "capture": "/home/yann/projects/lithtech/Blood2/build/release/tests/session-start-02_CityHub.png"
+  },
+  {
+    "name": "debug-01_SubwayA",
+    "command": [
+      "build/debug/blood2",
+      "--config",
+      "build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II/",
+      "--view-world",
+      "--world",
+      "01_SubwayA",
+      "--frames",
+      "12",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/session-start-01_SubwayA.png"
+    ],
+    "code": 0,
+    "verified": true,
+    "seconds": 2.2182950289861765,
+    "capture": "/home/yann/projects/lithtech/Blood2/build/debug/tests/session-start-01_SubwayA.png"
+  },
+  {
+    "name": "debug-02_CityHub",
+    "command": [
+      "build/debug/blood2",
+      "--config",
+      "build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II/",
+      "--view-world",
+      "--world",
+      "02_CityHub",
+      "--frames",
+      "12",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/session-start-02_CityHub.png"
+    ],
+    "code": 0,
+    "verified": true,
+    "seconds": 6.2252308079914656,
+    "capture": "/home/yann/projects/lithtech/Blood2/build/debug/tests/session-start-02_CityHub.png"
+  }
+]

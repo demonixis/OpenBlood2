@@ -1,0 +1,14 @@
+369/375 Testing: ai_navigation.rays
+369/375 Test: ai_navigation.rays
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_navigation_tests" "rays"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_navigation.rays" start time: Oct 16 12:33 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_navigation.rays" end time: Oct 16 12:33 CEST
+"ai_navigation.rays" time elapsed: 00:00:00
+----------------------------------------------------------

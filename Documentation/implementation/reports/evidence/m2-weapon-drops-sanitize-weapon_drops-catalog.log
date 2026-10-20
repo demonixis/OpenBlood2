@@ -1,0 +1,41 @@
+464/464 Testing: weapon_drops.catalog
+464/464 Test: weapon_drops.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_drop_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_drops.catalog" start time: Oct 16 16:12 CEST
+Output:
+----------------------------------------------------------
+Retail Cultist lethal drop cycle 0: detached Beretta -> original pickup (death remains unavailable)
+Retail Cultist lethal drop cycle 1: detached Beretta -> original pickup (death remains unavailable)
+<end of output>
+Test time =   0.51 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_drops.catalog" end time: Oct 16 16:12 CEST
+"weapon_drops.catalog" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 16:12 CEST
+
+ai_hit =   0.97 sec*proc
+
+ai_runtime =  30.86 sec*proc
+
+attachments =   5.75 sec*proc
+
+headless = 222.84 sec*proc
+
+objects =   0.23 sec*proc
+
+pickups =  15.73 sec*proc
+
+player =  10.61 sec*proc
+
+private = 219.56 sec*proc
+
+services =  10.42 sec*proc
+
+weapon_drops =   0.86 sec*proc
+
+weapons = 147.42 sec*proc
+

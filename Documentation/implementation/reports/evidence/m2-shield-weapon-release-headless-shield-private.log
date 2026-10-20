@@ -1,0 +1,176 @@
+662/664 Testing: shield.private
+662/664 Test: shield.private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/shield_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"shield.private" start time: Oct 17 02:03 CEST
+Output:
+----------------------------------------------------------
+Private loop 0: actual shield WAV, 42 decoded shield/powerup quads, source preserved across destination rehearsal; exact independent expiry.
+Private loop 1: actual shield WAV, 42 decoded shield/powerup quads, source preserved across destination rehearsal; exact independent expiry.
+Private loop 2: actual shield WAV, 42 decoded shield/powerup quads, source preserved across destination rehearsal; exact independent expiry.
+<end of output>
+Test time =   0.21 sec
+----------------------------------------------------------
+Test Passed.
+"shield.private" end time: Oct 17 02:03 CEST
+"shield.private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 02:03 CEST
+
+ai_escape =   0.06 sec*proc
+
+ai_fire =   0.46 sec*proc
+
+ai_follow =   0.20 sec*proc
+
+ai_hit =   0.05 sec*proc
+
+ai_keys =   1.45 sec*proc
+
+ai_locomotion =   0.06 sec*proc
+
+ai_navigation =   0.13 sec*proc
+
+ai_perception =   0.16 sec*proc
+
+ai_recovery =   0.07 sec*proc
+
+ai_runtime =   0.99 sec*proc
+
+ai_script =   0.09 sec*proc
+
+ai_sight =   0.14 sec*proc
+
+ai_state =   2.09 sec*proc
+
+ai_target =   0.17 sec*proc
+
+ai_trigger =   0.14 sec*proc
+
+attachments =   0.20 sec*proc
+
+brushes =   1.08 sec*proc
+
+cameras =   0.72 sec*proc
+
+character =   1.05 sec*proc
+
+character_audio =   1.87 sec*proc
+
+character_motion =   0.05 sec*proc
+
+character_nodes =   0.20 sec*proc
+
+cinematics =   0.69 sec*proc
+
+cli =   0.05 sec*proc
+
+config =   0.02 sec*proc
+
+containers =   1.16 sec*proc
+
+corpses =   0.05 sec*proc
+
+destructable_state =   0.18 sec*proc
+
+doors =   0.95 sec*proc
+
+energy =   0.30 sec*proc
+
+exits =   0.64 sec*proc
+
+explosion_flames =   0.49 sec*proc
+
+explosion_fragments =   1.54 sec*proc
+
+explosion_lights =   0.49 sec*proc
+
+explosion_models =   0.21 sec*proc
+
+explosion_rings =   0.71 sec*proc
+
+explosion_sprites =   0.20 sec*proc
+
+explosions =   0.02 sec*proc
+
+headless =  51.38 sec*proc
+
+interaction =   0.77 sec*proc
+
+inventory_state =   0.17 sec*proc
+
+keyframes =   1.92 sec*proc
+
+lights =   0.60 sec*proc
+
+locomotion =   0.76 sec*proc
+
+model_view =   0.15 sec*proc
+
+movement =   2.83 sec*proc
+
+naga =   0.29 sec*proc
+
+object_particles =   1.73 sec*proc
+
+objectives =   0.39 sec*proc
+
+objects =   0.03 sec*proc
+
+paths =   0.17 sec*proc
+
+pickups =   0.42 sec*proc
+
+player =   0.41 sec*proc
+
+player_controls =   1.25 sec*proc
+
+player_keepalive =   0.33 sec*proc
+
+player_restore =   0.21 sec*proc
+
+player_state =   0.19 sec*proc
+
+private =  49.61 sec*proc
+
+pushables =   0.03 sec*proc
+
+randomsound =   0.65 sec*proc
+
+sceneexplosion =   0.56 sec*proc
+
+services =   0.40 sec*proc
+
+session_playback =   2.64 sec*proc
+
+shield =   0.23 sec*proc
+
+sound =   0.56 sec*proc
+
+sprite_view =   0.18 sec*proc
+
+sprites =   0.69 sec*proc
+
+texture =   0.17 sec*proc
+
+triggers =   0.86 sec*proc
+
+weapon_audio =   0.18 sec*proc
+
+weapon_drops =   0.05 sec*proc
+
+weapon_impacts =   2.56 sec*proc
+
+weapon_sprites =   0.44 sec*proc
+
+weapons =   7.04 sec*proc
+
+wind =   0.45 sec*proc
+
+world =   1.30 sec*proc
+
+world_view =   0.16 sec*proc
+
+worldpaths =   0.46 sec*proc
+

@@ -1,0 +1,14 @@
+451/454 Testing: ai_hit.guards
+451/454 Test: ai_hit.guards
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "guards"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.guards" start time: Oct 16 15:38 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.guards" end time: Oct 16 15:38 CEST
+"ai_hit.guards" time elapsed: 00:00:00
+----------------------------------------------------------

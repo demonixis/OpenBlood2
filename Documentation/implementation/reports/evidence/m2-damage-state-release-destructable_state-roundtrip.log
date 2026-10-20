@@ -1,0 +1,14 @@
+513/518 Testing: destructable_state.roundtrip
+513/518 Test: destructable_state.roundtrip
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/destructable_state_tests" "roundtrip" "/home/yann/projects/lithtech/Blood2/build/release/tests/destructable-state-fixtures/roundtrip"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"destructable_state.roundtrip" start time: Oct 16 18:13 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_state.roundtrip" end time: Oct 16 18:13 CEST
+"destructable_state.roundtrip" time elapsed: 00:00:00
+----------------------------------------------------------

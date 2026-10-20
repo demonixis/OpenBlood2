@@ -1,0 +1,14 @@
+639/642 Testing: gideon_runtime.lifetime
+639/642 Test: gideon_runtime.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_runtime_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-runtime-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_runtime.lifetime" start time: Oct 17 03:43 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_runtime.lifetime" end time: Oct 17 03:43 CEST
+"gideon_runtime.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

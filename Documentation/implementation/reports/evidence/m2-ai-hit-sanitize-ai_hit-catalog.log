@@ -1,0 +1,65 @@
+454/454 Testing: ai_hit.catalog
+454/454 Test: ai_hit.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.catalog" start time: Oct 16 15:38 CEST
+Output:
+----------------------------------------------------------
+recoil private error= phase=2 finishes=1 updates=20 clip=21 time=300
+CultistAI male=1 hit=2 missing=2 reactions=1 recoil=1 hp=30
+recoil private error= phase=2 finishes=1 updates=20 clip=21 time=300
+CultistAI male=0 hit=2 missing=2 reactions=1 recoil=1 hp=30
+CivilianAI male=1 hit=2 missing=2 reactions=1 recoil=0 hp=30
+CivilianAI male=0 hit=2 missing=2 reactions=1 recoil=0 hp=30
+<end of output>
+Test time =   0.75 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.catalog" end time: Oct 16 15:38 CEST
+"ai_hit.catalog" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 15:38 CEST
+
+ai_escape =   1.08 sec*proc
+
+ai_fire =  14.52 sec*proc
+
+ai_follow =   4.86 sec*proc
+
+ai_hit =   0.91 sec*proc
+
+ai_locomotion =   1.07 sec*proc
+
+ai_navigation =   3.63 sec*proc
+
+ai_perception =   4.74 sec*proc
+
+ai_recovery =   1.13 sec*proc
+
+ai_runtime =  30.18 sec*proc
+
+ai_script =   2.66 sec*proc
+
+ai_state =  46.98 sec*proc
+
+ai_target =   4.55 sec*proc
+
+ai_trigger =   3.62 sec*proc
+
+character_motion =   1.16 sec*proc
+
+headless = 308.17 sec*proc
+
+objects =   0.24 sec*proc
+
+paths =   5.08 sec*proc
+
+player =  11.52 sec*proc
+
+private = 302.76 sec*proc
+
+services =  10.79 sec*proc
+
+weapons = 159.43 sec*proc
+

@@ -1,0 +1,407 @@
+138/139 Testing: brushes.catalog
+138/139 Test: brushes.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"brushes.catalog" start time: Oct 15 21:27 CEST
+Output:
+----------------------------------------------------------
+worlds/02_cityhub.dat CDestructableBrush shack: Rejected precreate: CDestructableBrush
+worlds/02_cityhub.dat CDestructableBrush startfences: startfences: Open or non-manifold container shell: 4 edges / balance 0 at -3360 1216 32 -> -3360 1344 32
+worlds/02_cityhub.dat CDestructableBrush fallengrills: fallengrills: Missing named world model
+worlds/02_cityhub.dat CDestructableBrush startcrate: Rejected precreate: CDestructableBrush
+worlds/02_cityhub.dat CDestructableBrush rangecrate1: Rejected precreate: CDestructableBrush
+worlds/02_cityhub.dat CDestructableBrush rangecrate2: Rejected precreate: CDestructableBrush
+worlds/02_cityhubb.dat CDestructableBrush shack: Rejected precreate: CDestructableBrush
+worlds/02_cityhubb.dat CDestructableBrush startfences: startfences: Open or non-manifold container shell: 4 edges / balance 0 at -3360 1216 32 -> -3360 1344 32
+worlds/02_cityhubb.dat CDestructableBrush fallengrills: fallengrills: Missing named world model
+worlds/02_cityhubb.dat CDestructableBrush startcrate: Rejected precreate: CDestructableBrush
+worlds/02_cityhubb.dat CDestructableBrush rangecrate1: Rejected precreate: CDestructableBrush
+worlds/02_cityhubb.dat CDestructableBrush rangecrate2: Rejected precreate: CDestructableBrush
+worlds/02_cityhubb.dat CDestructableBrush smallcrate1: Rejected precreate: CDestructableBrush
+worlds/02_cityhubb.dat CDestructableBrush smallcrate2: Rejected precreate: CDestructableBrush
+worlds/02_cityhubb.dat CDestructableBrush smallcrate3: Rejected precreate: CDestructableBrush
+worlds/02_cityhubb.dat CDestructableBrush smallcrate6: Rejected precreate: CDestructableBrush
+worlds/02_cityhubb.dat CDestructableBrush smallcrate5: Rejected precreate: CDestructableBrush
+worlds/02_cityhubb.dat CDestructableBrush smallcrate4: Rejected precreate: CDestructableBrush
+worlds/02_cityhubc.dat CDestructableBrush shack: Rejected precreate: CDestructableBrush
+worlds/02_cityhubc.dat CDestructableBrush startfences: startfences: Open or non-manifold container shell: 4 edges / balance 0 at -3360 1216 32 -> -3360 1344 32
+worlds/02_cityhubc.dat CDestructableBrush fallengrills: fallengrills: Missing named world model
+worlds/02_cityhubc.dat CDestructableBrush startcrate: Rejected precreate: CDestructableBrush
+worlds/02_cityhubc.dat CDestructableBrush rangecrate1: Rejected precreate: CDestructableBrush
+worlds/02_cityhubc.dat CDestructableBrush rangecrate2: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush SL25: SL25: Ambiguous named world model
+worlds/03_museum.dat CDestructableBrush SL25: SL25: Ambiguous named world model
+worlds/03_museum.dat CDestructableBrush Vent2: Vent2: Missing named world model
+worlds/03_museum.dat CDestructableBrush wallhole1: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush tchernofloor: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush extwall1: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush extwall2: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush extwall3: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush extvent1: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush extvent2: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush extvent3: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush bathwall: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush bigcrate1: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush bigcrate2: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush bigcrate3: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate1: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate2: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate3: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate4: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate5: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate6: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate7: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate20: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate22: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate23: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate22: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate25: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate24: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate28: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate27: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate42: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate40: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate41: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush bigcrate40: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush bigcrate41: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate46: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate44: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate45: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate51: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate50: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate70: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate71: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush smallcrate72: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush endwallexplode: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush floorhole1: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush speaker1: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush srgfgfdg: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush eeryery: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush gkjghj: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush rtyrtyr: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush rthrhgr: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush ryuyt: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush speaker2: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush speaker3: Rejected precreate: CDestructableBrush
+worlds/03_museum.dat CDestructableBrush speaker4: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush bookcase2: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush bookcase1: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush table1: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush table2: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate1: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate2: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate3: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate4: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate1b: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate2b: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate3b: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate1c: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate2c: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate3c: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate2d: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate2e: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate2f: Rejected precreate: CDestructableBrush
+worlds/04_steamtunnels.dat CDestructableBrush smallcrate2g: Rejected precreate: CDestructableBrush
+worlds/05_cdm.dat CDestructableBrush SecScreen: SecScreen: Missing named world model
+worlds/05_cdm.dat CDestructableBrush explodewallblah: Rejected precreate: CDestructableBrush
+worlds/05_cdmb.dat CDestructableBrush CDestructableBrush1: CDestructableBrush1: Missing named world model
+worlds/06_airship1.dat CDestructableBrush crate1: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate3: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate4gg: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate5gg: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate6: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate7gg: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate8: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate10: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate11: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate12: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate13hh: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate13: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate14: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate14gg: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate15: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate16gg: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate17gg: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate7: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate16: Rejected precreate: CDestructableBrush
+worlds/06_airship1.dat CDestructableBrush crate2gg: Rejected precreate: CDestructableBrush
+worlds/06_airship2.dat CDestructableBrush wallblow1: Rejected precreate: CDestructableBrush
+worlds/07_cathedral.dat CDestructableBrush gabbywall: Rejected precreate: CDestructableBrush
+worlds/08_subwayb.dat CDestructableBrush sign229: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush mailboxes: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush table2: table2: Missing named world model
+worlds/09_abandoned_buildings.dat CDestructableBrush helloyou3: helloyou3: Container face is not on its plane
+worlds/09_abandoned_buildings.dat CDestructableBrush crate1: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush crate11: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush crate8: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush crate3: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush crate7: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush crate5: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush crate4: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush crate6: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush crate10: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush crate9: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratemetal1: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush crate2: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratemetal2: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratemetal3: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratemetal4: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratemetal5: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratesm1: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratesm2: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratesm3: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratesm4: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratesm5: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratesm6: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratesm7: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratesm8: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush cratesm9: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush CDestructableBrush13: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush CDestructableBrush31: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush CDestructableBrush33: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush CDestructableBrush34: Rejected precreate: CDestructableBrush
+worlds/09_abandoned_buildings.dat CDestructableBrush CDestructableBrush13FF: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush tubeglass1: tubeglass1: Ambiguous named world model
+worlds/11_slaughter_house.dat CDestructableBrush tubeglass1: tubeglass1: Ambiguous named world model
+worlds/11_slaughter_house.dat CDestructableBrush filingcaginetexplode2: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush1: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush1zz: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush1zzzz: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush1zzzzz: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush1zza: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush2z: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush3zz: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush3zzz: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush3zzzz: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush3zzzzz: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush3zzzzzzz: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush91: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush91a: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush91aa: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush91aaaa: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush911aaaa: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush911aaaaff: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush911aaaazz: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush CDestructableBrush911aaaazzxx: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush itsabox1: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush anotherbox1: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush anotherbox4: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush itsabox3: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush itsabox5aaf: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush anotherbox5: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush anotherbox51: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush anotherbox512: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush anotherbox5134aa: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush itsabox5aafaadr: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush itsabox5aafaadr445sdf: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush itsabox5aafaadr445sdfghyu: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush itsabox5aafaadr12: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush itsabox5aafaadr121: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush itsabox5aafaadr1211: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush itsabox5aafaadr12111: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush itsabox5aafaadr1211111: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush hibox1: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush hibox2: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush hibox3: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush hibox4: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush hibox5: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush hibox6: Rejected precreate: CDestructableBrush
+worlds/11_slaughter_house.dat CDestructableBrush hibox7: Rejected precreate: CDestructableBrush
+worlds/12_train_station.dat CDestructableBrush oven1: Rejected precreate: CDestructableBrush
+worlds/12_train_stationb.dat CDestructableBrush subsign1: subsign1: Ambiguous named world model
+worlds/12_train_stationb.dat CDestructableBrush subsign1: subsign1: Ambiguous named world model
+worlds/12_train_stationb.dat CDestructableBrush bench6: bench6: Ambiguous named world model
+worlds/12_train_stationb.dat CDestructableBrush bench6: bench6: Ambiguous named world model
+worlds/12_train_stationb.dat CDestructableBrush CDestructableBrush89A: CDestructableBrush89A: Ambiguous named world model
+worlds/12_train_stationb.dat CDestructableBrush CDestructableBrush89A: CDestructableBrush89A: Ambiguous named world model
+worlds/14_subwayc.dat CDestructableBrush glass26: glass26: Ambiguous named world model
+worlds/14_subwayc.dat CDestructableBrush glass26: glass26: Ambiguous named world model
+worlds/14_subwayc.dat CDestructableBrush sign227: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush barb3: barb3: Container face is not on its plane
+worlds/17_entrance.dat CDestructableBrush armed: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush armed2: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush comp01: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush comp02: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush comp10: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush comp11: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush comp12: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush comp13: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush comp14: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush comp20: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush comp09: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush comp30: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush armed3: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush comp201: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush FASTDESK: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush box03: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush box04: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush box05: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush box06: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush box07: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush box10: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush box11: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush box12: box12: Missing named world model
+worlds/17_entrance.dat CDestructableBrush radar: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush blowup01: Rejected precreate: CDestructableBrush
+worlds/17_entrance.dat CDestructableBrush bigbang03: Rejected precreate: CDestructableBrush
+worlds/19_lobby.dat CDestructableBrush screen: screen: Missing named world model
+worlds/19_lobby.dat CDestructableBrush break12: break12: Missing named world model
+worlds/19_lobby.dat CDestructableBrush endglass: endglass: Missing named world model
+worlds/19_lobby.dat CDestructableBrush endglass2: endglass2: Missing named world model
+worlds/19_lobby.dat CDestructableBrush PAINTING1: PAINTING1: Ambiguous named world model
+worlds/19_lobby.dat CDestructableBrush PAINTING2: PAINTING2: Ambiguous named world model
+worlds/19_lobby.dat CDestructableBrush CDestructableBrush33: Rejected precreate: CDestructableBrush
+worlds/19_lobby.dat CDestructableBrush painting1: painting1: Ambiguous named world model
+worlds/19_lobby.dat CDestructableBrush painting2: painting2: Ambiguous named world model
+worlds/19_lobbyb.dat CDestructableBrush endglass: endglass: Missing named world model
+worlds/19_lobbyb.dat CDestructableBrush endglass2: endglass2: Missing named world model
+worlds/19_lobbyc.dat CDestructableBrush COKE: COKE: Missing named world model
+worlds/19_lobbyc.dat CDestructableBrush JERKOFF: JERKOFF: Missing named world model
+worlds/19_lobbyc.dat CDestructableBrush JERKOFF: JERKOFF: Missing named world model
+worlds/19_lobbyc.dat CDestructableBrush endglass: endglass: Missing named world model
+worlds/19_lobbyc.dat CDestructableBrush endglass2: endglass2: Missing named world model
+worlds/20_powerstation.dat CDestructableBrush broke: Rejected precreate: CDestructableBrush
+worlds/20_powerstation.dat CDestructableBrush grill: grill: Missing named world model
+worlds/20_powerstation.dat CDestructableBrush point05: point05: Ambiguous named world model
+worlds/20_powerstation.dat CDestructableBrush point05: point05: Ambiguous named world model
+worlds/20_powerstation.dat CDestructableBrush 01fence: 01fence: Ambiguous named world model
+worlds/20_powerstation.dat CDestructableBrush 01fence: 01fence: Ambiguous named world model
+worlds/21_laboratory.dat CDestructableBrush w1: w1: Missing named world model
+worlds/21_laboratory.dat CDestructableBrush noname: noname: Missing named world model
+worlds/21_laboratory.dat CDestructableBrush w6: w6: Missing named world model
+worlds/21_laboratory.dat CDestructableBrush w3: w3: Missing named world model
+worlds/21_laboratory.dat CDestructableBrush w5: w5: Missing named world model
+worlds/21_laboratory.dat CDestructableBrush guts: guts: Ambiguous named world model
+worlds/21_laboratory.dat CDestructableBrush guts: guts: Ambiguous named world model
+worlds/22_office.dat CDestructableBrush kitchen3: Rejected precreate: CDestructableBrush
+worlds/22_office.dat CDestructableBrush kitchen4: Rejected precreate: CDestructableBrush
+worlds/22_office.dat CDestructableBrush filecabinet8: Rejected precreate: CDestructableBrush
+worlds/22_office.dat CDestructableBrush 92303: 92303: Ambiguous named world model
+worlds/22_office.dat CDestructableBrush 92304: 92304: Ambiguous named world model
+worlds/22_office.dat CDestructableBrush 92303: 92303: Ambiguous named world model
+worlds/22_office.dat CDestructableBrush 92304: 92304: Ambiguous named world model
+worlds/22_office.dat CDestructableBrush 2415: Rejected precreate: CDestructableBrush
+worlds/22_office.dat CDestructableBrush tv01: Rejected precreate: CDestructableBrush
+worlds/22_office.dat CDestructableBrush blame33: blame33: Ambiguous named world model
+worlds/22_office.dat CDestructableBrush blame33: blame33: Ambiguous named world model
+worlds/22_office.dat CDestructableBrush boom: Rejected precreate: CDestructableBrush
+worlds/22_office.dat CDestructableBrush boombrush2: boombrush2: Missing named world model
+worlds/22_office.dat CDestructableBrush boombrush3: boombrush3: Missing named world model
+worlds/22_office.dat CDestructableBrush boombrush4: boombrush4: Missing named world model
+worlds/22_office.dat CDestructableBrush boombrush6: boombrush6: Missing named world model
+worlds/22_office.dat CDestructableBrush boomdoor: Rejected precreate: CDestructableBrush
+worlds/22_office.dat CDestructableBrush boombrush6: boombrush6: Missing named world model
+worlds/22_office.dat CDestructableBrush boombrush1: Rejected precreate: CDestructableBrush
+worlds/multi/bb_bloodarena.dat RotatingBrush hand1: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat RotatingBrush hand2: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat RotatingBrush hand3: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat RotatingBrush hand4: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat RotatingBrush hand5: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat RotatingBrush hand6: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat RotatingBrush hand7: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat RotatingBrush hand8: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bodies.dat RotatingBrush rotate01: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bodies.dat RotatingBrush rotate02: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bodies.dat RotatingBrush rotate03: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bodies.dat RotatingBrush rotate04: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bodies.dat RotatingBrush rotate05: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bodies.dat RotatingBrush rotate06: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bodies.dat RotatingBrush rotate07: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bodies.dat RotatingBrush rotate08: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush bars: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush crate: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush crate2: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush 800: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush barb2: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush ala: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush fence5: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush fence6: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush fence7: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush cabalsign1: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush POSTER: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush POSTER2: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush POSTER3: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush SMOKES: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush CDestructableBrush0: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush payday: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush sushi: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush tanya: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush Brush11: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush Brush111: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush 2fence: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush fence102: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush fence103: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush bob2: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush grill01: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush grill02: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush bob3: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n01: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n02: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n03: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n04: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n05: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n06: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n07: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n08: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n10: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n09: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n12: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n11: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n13: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n15: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n14: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n17: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush pr0n16: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush bob69: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush whgrate: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush whgrate2: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush Brush25: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush Brush27: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush bob4: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat CDestructableBrush bob68: CDestructableBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat RotatingBrush rotate01: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat RotatingBrush rotate02: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat RotatingBrush rotate03: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat RotatingBrush rotate04: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat RotatingBrush rotate05: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat RotatingBrush rotate06: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat RotatingBrush rotate07: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat RotatingBrush rotate08: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat RotatingBrush rotate09: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat RotatingBrush rotate10: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat RotatingBrush rotate11: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat RotatingBrush rotate12: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_bridge.dat RotatingBrush rotate13: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_midgard.dat RotatingBrush rotate01: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_midgard.dat RotatingBrush rotate02: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_midgard.dat RotatingBrush rotate03: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_midgard.dat RotatingBrush rotate04: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_midgard.dat RotatingBrush rotate05: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_midgard.dat RotatingBrush rotate06: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_midgard.dat RotatingBrush rotate07: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_midgard.dat RotatingBrush rotate08: RotatingBrush: invalid property TypeAction
+worlds/multi/bb_midgard.dat RotatingBrush rotate01: RotatingBrush: invalid property TypeAction
+worlds/multi/ctf_dmx.dat CDestructableBrush Brush42: Brush42: Ambiguous named world model
+worlds/multi/ctf_dmx.dat CDestructableBrush Brush42: Brush42: Ambiguous named world model
+CDestructableBrush created=2115 rejected=340 filtered=0 moved=0
+RotatingBrush created=98 rejected=38 filtered=0 moved=98
+CDestructableBrush/ambiguous=30
+CDestructableBrush/exploding=48
+CDestructableBrush/missing=30
+CDestructableBrush/pushable/gravity=138
+CDestructableBrush/schema=51
+CDestructableBrush/shell=5
+CDestructableBrush/spawn=38
+RotatingBrush/schema=38
+Subway instances=148
+state=0 count=141
+state=1 count=372
+state=2 count=67
+state=4 count=0
+<end of output>
+Test time =   7.06 sec
+----------------------------------------------------------
+Test Passed.
+"brushes.catalog" end time: Oct 15 21:27 CEST
+"brushes.catalog" time elapsed: 00:00:07
+----------------------------------------------------------

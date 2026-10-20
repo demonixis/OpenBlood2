@@ -1,0 +1,28 @@
+[0/2] Re-checking globbed directories...
+[1/40] Scanning /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp for CXX dependencies
+[2/40] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[3/28] Building CXX object CMakeFiles/engine.dir/src/engine/objects.cpp.o
+[4/28] Linking CXX static library libengine.a
+[5/28] Linking CXX executable tests/config_tests
+[6/28] Linking CXX executable tests/object_contract_tests
+[7/28] Linking CXX executable tests/world_tests
+[8/28] Linking CXX executable blood2
+[9/28] Linking CXX executable tests/services_tests
+[10/28] Linking CXX executable tests/player_tests
+[11/28] Linking CXX executable tests/weapon_tests
+[12/28] Linking CXX executable tests/movement_tests
+[13/28] Linking CXX executable tests/locomotion_tests
+[14/28] Linking CXX executable tests/container_tests
+[15/28] Linking CXX executable tests/door_tests
+[16/28] Linking CXX executable tests/trigger_tests
+[17/28] Linking CXX executable tests/interaction_tests
+[18/28] Linking CXX executable tests/explosion_tests
+[19/28] Linking CXX executable tests/pushable_tests
+[20/28] Linking CXX executable tests/brush_tests
+[21/28] Linking CXX executable tests/pickup_tests
+[22/28] Linking CXX executable tests/objectives_tests
+[23/28] Linking CXX executable tests/camera_tests
+[24/28] Linking CXX executable tests/keyframer_tests
+[25/28] Linking CXX executable tests/light_tests
+[26/28] Linking CXX executable tests/cinematic_tests
+[27/28] Linking CXX executable tests/worldpath_tests

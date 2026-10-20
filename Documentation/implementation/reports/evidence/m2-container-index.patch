@@ -1,0 +1,870 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index e2f1cb0..1b2e0a7 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -594,3 +594,5 @@ The [compact HUD continuation](../Documentation/Implementation/M2_HUD.md) displa
+ The [original pickup-audio continuation](../Documentation/Implementation/M2_PICKUP_AUDIO.md) connects collection WAVs and durable results, including keys. Read [contracts](docs/PICKUP_AUDIO_CONTRACTS.md). Preserve accepted-ack-only playback, original 30/300 radii, inventory1.wav for keys, sound-before-trigger order, failure-independent collection and detached lifetime. Severe post-transition stutter, idle Cultists/durability and missing CityHub water remain user-reported follow-ups. M2 stays incomplete.
+ 
+ The [collision traversal continuation](../Documentation/Implementation/M2_COLLISION_TRAVERSAL.md) addresses measured post-transition activation spikes with conservative BVH/triangle interval rejection. Read [contracts](docs/COLLISION_TRAVERSAL_CONTRACTS.md); preserve exact SAT results, equal-time ordering, placement and original AI cadence. Services exposes bounded work counters. CPU model preparation and other frame costs remain; M2 stays open.
++
++The [bound-container index](../Documentation/Implementation/M2_CONTAINER_INDEX.md) reduces repeated post-transition object scans while retaining fresh checked snapshots, original volume order and deferred destruction. Read [contracts](docs/CONTAINER_INDEX_CONTRACTS.md); never mutate a bound shape outside Objects. Container inspection includes the index count. CPU model preparation and other playtest reports remain; M2 stays incomplete.
+diff --git a/README.md b/README.md
+index 49f5aa9..3e137cf 100644
+--- a/README.md
++++ b/README.md
+@@ -636,3 +636,5 @@ The [compact HUD continuation](../Documentation/Implementation/M2_HUD.md) displa
+ The [original pickup-audio continuation](../Documentation/Implementation/M2_PICKUP_AUDIO.md) connects collection WAVs and durable results, including keys. Read [contracts](docs/PICKUP_AUDIO_CONTRACTS.md). Preserve accepted-ack-only playback, original 30/300 radii, inventory1.wav for keys, sound-before-trigger order, failure-independent collection and detached lifetime. Severe post-transition stutter, idle Cultists/durability and missing CityHub water remain user-reported follow-ups. M2 stays incomplete.
+ 
+ The [collision traversal continuation](../Documentation/Implementation/M2_COLLISION_TRAVERSAL.md) addresses measured post-transition activation spikes with conservative BVH/triangle interval rejection. Read [contracts](docs/COLLISION_TRAVERSAL_CONTRACTS.md); preserve exact SAT results, equal-time ordering, placement and original AI cadence. Services exposes bounded work counters. CPU model preparation and other frame costs remain; M2 stays open.
++
++The [bound-container index](../Documentation/Implementation/M2_CONTAINER_INDEX.md) reduces repeated post-transition object scans while retaining fresh checked snapshots, original volume order and deferred destruction. Read [contracts](docs/CONTAINER_INDEX_CONTRACTS.md); never mutate a bound shape outside Objects. Container inspection includes the index count. CPU model preparation and other playtest reports remain; M2 stays incomplete.
+diff --git a/docs/CONTAINER_CONTRACTS.md b/docs/CONTAINER_CONTRACTS.md
+index 1636cb3..e60dece 100644
+--- a/docs/CONTAINER_CONTRACTS.md
++++ b/docs/CONTAINER_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Container, liquid and ladder boundary
+ 
++The [bound-container index](CONTAINER_INDEX_CONTRACTS.md) now avoids full object-slot scans while preserving fresh owned snapshots, slot order and deferred lifetime.
++
+ > [Compound-shell validation](COMPOUND_SHELL_CONTRACTS.md) now accepts independently closed components sharing edges; ambiguous/non-manifold components still fail. Geometry and authored BoxPhysics are unchanged.
+ 
+ > Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
+diff --git a/docs/CONTAINER_INDEX_CONTRACTS.md b/docs/CONTAINER_INDEX_CONTRACTS.md
+new file mode 100644
+index 0000000..d54d899
+--- /dev/null
++++ b/docs/CONTAINER_INDEX_CONTRACTS.md
+@@ -0,0 +1,44 @@
++# Bound-container enumeration
++
++This extends [container contracts](CONTAINER_CONTRACTS.md) and supersedes the
++full object-slot scan described in the scene-explosion hot-query adjustment.
++See [evidence](../../Documentation/Implementation/M2_CONTAINER_INDEX.md).
++This is replacement engine bookkeeping; original VolumeBrush, MoveMgr and
++specialized volume rules are unchanged. M2 remains incomplete.
++
++`Objects` maintains a vector of checked `ObjectId` values for successfully bound
++container shapes. Insert in ascending slot order after geometry validation and
++before `MID_INITIALUPDATE`. A reused low slot must precede older higher slots.
++Retain the full generation; never substitute a raw index or instance pointer.
++Rejected precreate and missing/invalid named geometry add no entry.
++
++Shape ownership is private to `Objects`; `ObjectRecord::container()` exposes a
++read-only shared pointer to immutable geometry. Binding and index insertion must
++stay together. Runtime motion, shape replacement and direct external assignment
++remain unsupported. The index holds no shared ownership of shapes or objects.
++
++Pending and destroying records remain indexed until their original destructor
++returns. Erase by checked identity immediately before record reclamation. Do not
++retain vector iterators across callbacks or destructors, which can create/remove
++other objects. Clear/unload follows ordinary destruction; do not clear this index
++early, reset generations or allow stale identities into a replacement world.
++
++`container_snapshot()` returns a fresh owned copy on every call. Query loops still
++resolve each identity and check current `Life::Alive`, shape, flags and properties.
++A callback-created volume appears in subsequent snapshots; it cannot extend an
++already running traversal. A callback-removed volume is skipped immediately even
++though it remains in that traversal's snapshot until deferred reclamation.
++No point contents, body overlap, hidden flag, gravity, current or damage result
++is cached. Head/body separation, hidden-first precedence, four body records and
++original physics/damage cadence are unchanged.
++
++Enumeration costs O(bound containers), independent of unrelated model/FX slots;
++creation and reclamation are O(bound containers). The existing object/handle
++limit bounds storage. A snapshot still allocates its owned vector; this change
++claims neither allocation-free queries nor parallel simulation support.
++
++The Containers inspector displays the bound-index count (including pending
++reclamation) and enumerates current live supported brushes from the same index.
++Hidden brushes remain listed; rejected source entries remain in World. Reading
++this state performs no geometry query and advances no clock. Count alone does
++not establish correct behavior or a completed M2 session.
+diff --git a/docs/M2_CONTAINER_INDEX_SOURCES.json b/docs/M2_CONTAINER_INDEX_SOURCES.json
+new file mode 100644
+index 0000000..3ff4bda
+--- /dev/null
++++ b/docs/M2_CONTAINER_INDEX_SOURCES.json
+@@ -0,0 +1,22 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "d1ddceb972fa0052b93abe27eaed2f786c1531df",
++  "status": "M2 incomplete; replacement engine enumeration optimization, no original rule change",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/VolumeBrush.cpp",
++      "sha256": "ef2392f8e42f9f8185e94d0712a91c96c3a1dc89f5615ef00ff4f31bcfb6a94f",
++      "purpose": "Original volume callbacks and physical/damage behavior; unchanged."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/MoveMgr.cpp",
++      "sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a",
++      "purpose": "Original bounded head/body membership consumers; unchanged."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/server_de.h",
++      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "purpose": "Original container-query boundary; no retail traversal order claimed."
++    }
++  ]
++}
+diff --git a/docs/OBJECT_CONTRACTS.md b/docs/OBJECT_CONTRACTS.md
+index 2f9eb83..6733250 100644
+--- a/docs/OBJECT_CONTRACTS.md
++++ b/docs/OBJECT_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # M1 Object Boundary
+ 
++The [bound-container index](CONTAINER_INDEX_CONTRACTS.md) now avoids full object-slot scans while preserving fresh owned snapshots, slot order and deferred lifetime.
++
+ The [CityHub entry continuation](CITYHUB_ENTRY_CONTRACTS.md) supersedes earlier
+ missing-named-world-model and CityHub refusal statements: absent named BSPs are
+ explicitly omitted before initial update, with no runtime instance. All other
+diff --git a/docs/SCENE_EXPLOSION_CONTRACTS.md b/docs/SCENE_EXPLOSION_CONTRACTS.md
+index 618ccb3..586930a 100644
+--- a/docs/SCENE_EXPLOSION_CONTRACTS.md
++++ b/docs/SCENE_EXPLOSION_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original scene explosion emitters
+ 
++The [bound-container index](CONTAINER_INDEX_CONTRACTS.md) now avoids full object-slot scans while preserving fresh owned snapshots, slot order and deferred lifetime.
++
+ Continuation: [explosion point lights](EXPLOSION_LIGHT_CONTRACTS.md) now evaluate
+ selected original transient colors/radii with independent lifetime. Earlier light
+ omissions are superseded only for that state; surface illumination stays unavailable.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 550babb..630f259 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -215,7 +215,7 @@ namespace OpenBlood2
+         if (container_toggle_request)
+         {
+             if (auto* record = game.objects.get(container_toggle_request);
+-                record && record->container && record->life == Life::Alive)
++                record && record->container() && record->life == Life::Alive)
+             {
+                 auto text = game.server.CreateString("TOGGLE");
+                 auto message = game.server.StartMessageToObject(nullptr, record->handle, 1000);
+@@ -690,7 +690,7 @@ namespace OpenBlood2
+                             ImGui::Text("Model additive RGB (lighting pending) %.3f %.3f %.3f | alpha %.3f",
+                                         object->color.x, object->color.y, object->color.z, object->alpha);
+                         if (const auto* shape =
+-                                object->world_model ? object->world_model.get() : object->container.get())
++                                object->world_model ? object->world_model.get() : object->container().get())
+                             ImGui::Text("Geometry: %zu closed components | %zu shared edges | %zu triangles",
+                                         shape->closed_components, shape->shared_edges, shape->triangles.size());
+                         if (const auto* sound = dynamic_cast<const SoundFX*>(object->game.get()))
+@@ -2254,14 +2254,16 @@ namespace OpenBlood2
+         }
+         else if (ImGui::Button("Enter original player"))
+             enter_player_request = true;
++        ImGui::Text("Bound container index: %zu (slot ordered; includes pending destruction)",
++                    game.objects.bound_container_count());
+         if (!ImGui::BeginTable("Volumes", 2, ImGuiTableFlags_Resizable))
+             return;
+         ImGui::TableNextColumn();
+         unsigned count = 0;
+-        for (auto id : game.objects.snapshot())
++        for (auto id : game.objects.container_snapshot())
+         {
+             const auto* r = game.objects.get(id);
+-            if (!r || !r->container || r->life != Life::Alive)
++            if (!r || !r->container() || r->life != Life::Alive)
+                 continue;
+             const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get());
+             if (!brush)
+@@ -2284,9 +2286,9 @@ namespace OpenBlood2
+                                "and missing classes remain listed in World.");
+         const auto* r = game.objects.get(container_selection);
+         const auto* brush = r ? dynamic_cast<const VolumeBrush*>(r->game.get()) : nullptr;
+-        if (r && brush && r->container)
++        if (r && brush && r->container())
+         {
+-            const auto& shape = *r->container;
++            const auto& shape = *r->container();
+             ImGui::TextUnformatted("Volume + player body / front (+Y up)");
+             const auto origin = ImGui::GetCursorScreenPos();
+             const ImVec2 size{std::max(160.0f, ImGui::GetContentRegionAvail().x), 100};
+@@ -2320,9 +2322,9 @@ namespace OpenBlood2
+             draw->PopClipRect();
+         }
+         ImGui::TableNextColumn();
+-        if (r && brush && r->container)
++        if (r && brush && r->container())
+         {
+-            const auto& shape = *r->container;
++            const auto& shape = *r->container();
+             ImGui::Text("%s | code %u | %s", r->state.m_Name, unsigned(brush->info.code),
+                         brush->info.hidden ? "hidden" : "active");
+             if (ImGui::Button("Trigger ON / OFF"))
+diff --git a/src/engine/attachments.cpp b/src/engine/attachments.cpp
+index 4d375c6..9e66de6 100644
+--- a/src/engine/attachments.cpp
++++ b/src/engine/attachments.cpp
+@@ -17,7 +17,7 @@ namespace OpenBlood2
+         if (!std::isfinite(norm) || norm < 1e-6f)
+             return DE_INVALIDPARAMS;
+         // Bounded visual children only. Do not silently replace physics or permit cycles/chains.
+-        if (p->attachment || c->attachment || c->container || c->world_model || c->client_movement || c->model_body ||
++        if (p->attachment || c->attachment || c->container() || c->world_model || c->client_movement || c->model_body ||
+             (c->state.m_ObjectType != OT_MODEL && c->state.m_ObjectType != OT_NORMAL &&
+              c->state.m_ObjectType != OT_SPRITE) ||
+             (c->state.m_Flags & (FLAG_SOLID | FLAG_GRAVITY | FLAG_RAYHIT | FLAG_TOUCH_NOTIFY)) ||
+diff --git a/src/engine/objects.cpp b/src/engine/objects.cpp
+index a950ae7..64adeb1 100644
+--- a/src/engine/objects.cpp
++++ b/src/engine/objects.cpp
+@@ -409,7 +409,12 @@ namespace OpenBlood2
+             object->state.m_Pos = shape->origin;
+             object->dimensions = vector_scale(vector_subtract(shape->max, shape->min), .5f);
+             if (state.m_ObjectType == OT_CONTAINER)
+-                object->container = std::move(shape);
++            {
++                object->container_ = std::move(shape);
++                const auto at = std::lower_bound(containers_.begin(), containers_.end(), object->id.slot,
++                                                 [](ObjectId id, std::uint32_t slot) { return id.slot < slot; });
++                containers_.insert(at, object->id); // Visible to nested initial-update callbacks.
++            }
+             else
+             {
+                 object->world_model = std::move(shape);
+@@ -583,14 +588,9 @@ namespace OpenBlood2
+     }
+     std::vector<ObjectId> Objects::container_snapshot() const
+     {
+-        // Same checked identities and slot order as snapshot(), freshly gathered
+-        // for each query. Unrelated effects need no copied ID or subsequent lookup.
+-        std::vector<ObjectId> ids;
+-        ids.reserve(std::min<std::size_t>(8, slots_.size()));
+-        for (const auto& slot : slots_)
+-            if (slot.object && slot.object->container)
+-                ids.push_back(slot.object->id);
+-        return ids;
++        // Copy current bound identities before callbacks. Callers still check live
++        // state/geometry; no membership, hidden flag or physics result is cached.
++        return containers_;
+     }
+     HOBJECT Objects::next_alive(HOBJECT previous) const
+     {
+@@ -719,6 +719,10 @@ namespace OpenBlood2
+             ++callback_depth_;
+             record->game.reset();
+             --callback_depth_;
++            // The original destructor can query volumes or create another object.
++            // Keep this binding visible until it returns; do not retain an iterator.
++            if (record->container_)
++                std::erase(containers_, id);
+             identities_.erase(h);
+             slots_[id.slot].object.reset();
+             ++slots_[id.slot].generation;
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index 2e3e05b..48c4df5 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -140,7 +140,10 @@ namespace OpenBlood2
+         std::shared_ptr<const Model> model;
+         std::shared_ptr<const Sprite> sprite;
+         SpriteTrack sprite_track;
+-        std::shared_ptr<const ContainerShape> container;
++        const std::shared_ptr<const ContainerShape>& container() const
++        {
++            return container_;
++        }
+         // Current posed shell plus immutable authored basis for drift-free rotation.
+         std::shared_ptr<const ContainerShape> world_model_base;
+         DRotation world_model_basis;
+@@ -161,6 +164,10 @@ namespace OpenBlood2
+         double due = 0;
+         bool scheduled = false;
+         std::uint64_t updates = 0;
++
++      private:
++        friend class Objects;
++        std::shared_ptr<const ContainerShape> container_; // Binding and index membership change together.
+     };
+ 
+     class Objects
+@@ -200,6 +207,10 @@ namespace OpenBlood2
+         HOBJECT handle_of(const BaseClass* instance) const;
+         std::vector<ObjectId> snapshot() const;
+         std::vector<ObjectId> container_snapshot() const;
++        std::size_t bound_container_count() const
++        {
++            return containers_.size();
++        }
+         HOBJECT next_alive(HOBJECT previous) const;
+         const PropertyValue* property(std::string_view name) const;
+         DRESULT attach(HOBJECT, HOBJECT, const char*, const DVector*, const DRotation*, HATTACHMENT*);
+@@ -242,6 +253,7 @@ namespace OpenBlood2
+         HATTACHMENT next_attachment_ = 1;
+         std::map<std::string, HCLASS, CaseLess> classes_;
+         std::vector<Slot> slots_;
++        std::vector<ObjectId> containers_; // Bound shapes, in slot order, including deferred destruction.
+         std::vector<std::unique_ptr<DObject>> handles_;
+         std::unordered_map<HOBJECT, ObjectId> identities_;
+         std::vector<const Properties*> contexts_;
+diff --git a/src/engine/world_model.cpp b/src/engine/world_model.cpp
+index 8ae1f75..4b359ef 100644
+--- a/src/engine/world_model.cpp
++++ b/src/engine/world_model.cpp
+@@ -4,17 +4,17 @@ namespace OpenBlood2
+ {
+     DVector object_bounds_center(const ObjectRecord& object)
+     {
+-        if (!object.world_model && !object.container)
++        if (!object.world_model && !object.container())
+             return object.state.m_Pos;
+-        const auto& shape = *(object.world_model ? object.world_model : object.container);
++        const auto& shape = *(object.world_model ? object.world_model : object.container());
+         return vector_add(vector_scale(vector_add(shape.min, shape.max), .5f),
+                           vector_subtract(object.state.m_Pos, shape.origin));
+     }
+     CollisionQuery sweep_object(const ObjectRecord& object, DVector from, DVector to, DVector half, CollisionHit& hit)
+     {
+-        if ((!object.world_model && !object.container) || (object.state.m_Flags & FLAG_BOXPHYSICS))
++        if ((!object.world_model && !object.container()) || (object.state.m_Flags & FLAG_BOXPHYSICS))
+             return sweep_box(from, to, half, object_bounds_center(object), object.dimensions, hit);
+-        const auto& shape = *(object.world_model ? object.world_model : object.container);
++        const auto& shape = *(object.world_model ? object.world_model : object.container());
+         const auto offset = vector_subtract(object.state.m_Pos, shape.origin);
+         const auto result = shape.sweep(vector_subtract(from, offset), vector_subtract(to, offset), half, hit);
+         if (result == CollisionQuery::Hit)
+diff --git a/src/game/server_adapter.cpp b/src/game/server_adapter.cpp
+index 5ebbcbb..9e2aaf1 100644
+--- a/src/game/server_adapter.cpp
++++ b/src/game/server_adapter.cpp
+@@ -125,7 +125,7 @@ namespace OpenBlood2
+                     active().objects_.fail(ObjectError::Unsupported, "Physical attached children are unsupported");
+                     return;
+                 }
+-                if (r->container && (flags & (FLAG_SOLID | FLAG_GRAVITY)))
++                if (r->container() && (flags & (FLAG_SOLID | FLAG_GRAVITY)))
+                 {
+                     active().objects_.fail(ObjectError::Unsupported, "Container solid/gravity flags are unsupported");
+                     return;
+@@ -167,7 +167,7 @@ namespace OpenBlood2
+             active().trace_service("SetObjectDims");
+             auto& o = active().objects_;
+             auto* r = o.get(h);
+-            if (!r || r->life != Life::Alive || (r->container || r->world_model) || !dims || !physics_vector(*dims) ||
++            if (!r || r->life != Life::Alive || (r->container() || r->world_model) || !dims || !physics_vector(*dims) ||
+                 dims->x < 0 || dims->y < 0 || dims->z < 0)
+             {
+                 o.fail(ObjectError::InvalidProperty, "Invalid object dimensions");
+diff --git a/src/game/server_clients.cpp b/src/game/server_clients.cpp
+index 88b77be..35a2c84 100644
+--- a/src/game/server_clients.cpp
++++ b/src/game/server_clients.cpp
+@@ -157,7 +157,7 @@ namespace OpenBlood2
+     {
+         trace_service("SetObjectRotation");
+         auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || r->attachment || (r->container || r->world_model) || !rotation ||
++        if (!r || r->life != Life::Alive || r->attachment || (r->container() || r->world_model) || !rotation ||
+             !physics_vector(rotation->m_Vec) || !std::isfinite(rotation->m_Spin))
+             return DE_INVALIDPARAMS;
+         const auto& v = rotation->m_Vec;
+diff --git a/src/game/server_containers.cpp b/src/game/server_containers.cpp
+index ca74152..7714131 100644
+--- a/src/game/server_containers.cpp
++++ b/src/game/server_containers.cpp
+@@ -14,7 +14,7 @@ namespace OpenBlood2
+         for (auto id : objects_.container_snapshot())
+         {
+             const auto* r = objects_.get(id);
+-            if (!r || r->life != Life::Alive || !r->container || !r->container->contains(point))
++            if (!r || r->life != Life::Alive || !r->container() || !r->container()->contains(point))
+                 continue;
+             if (const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get()))
+             {
+@@ -37,12 +37,12 @@ namespace OpenBlood2
+         for (auto id : objects_.container_snapshot())
+         {
+             const auto* r = objects_.get(id);
+-            if (!r || r->life != Life::Alive || !r->container)
++            if (!r || r->life != Life::Alive || !r->container())
+                 continue;
+             const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get());
+             if (!brush)
+                 continue;
+-            if (r->container->overlaps(object_bounds_center(*body), body->dimensions))
++            if (r->container()->overlaps(object_bounds_center(*body), body->dimensions))
+             {
+                 ++state.total;
+                 if (state.count < state.body.size())
+@@ -50,7 +50,7 @@ namespace OpenBlood2
+             }
+             // Original camera asks for one point container, then checks Hidden.
+             // Stable object-slot order replaces the unavailable retail BSP ordering.
+-            if (!head_found && r->container->contains(head))
++            if (!head_found && r->container()->contains(head))
+             {
+                 head_found = true;
+                 state.head = brush->info;
+@@ -68,8 +68,8 @@ namespace OpenBlood2
+         for (auto id : objects_.container_snapshot())
+         {
+             auto* r = objects_.get(id);
+-            if (!r || r->life != Life::Alive || !r->container ||
+-                !r->container->overlaps(object_bounds_center(*body), body->dimensions))
++            if (!r || r->life != Life::Alive || !r->container() ||
++                !r->container()->overlaps(object_bounds_center(*body), body->dimensions))
+                 continue;
+             if (!objects_.engine_message(r->handle, MID_AFFECTPHYSICS, &physics))
+                 return false;
+@@ -85,7 +85,7 @@ namespace OpenBlood2
+         for (auto id : objects_.snapshot())
+         {
+             const auto* r = objects_.get(id);
+-            if (!r || r->life != Life::Alive || r->container || r->activity != OBJSTATE_ACTIVE ||
++            if (!r || r->life != Life::Alive || r->container() || r->activity != OBJSTATE_ACTIVE ||
+                 (!r->world_body && r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
+                 continue;
+             ContainerPhysics physics;
+diff --git a/src/game/server_keyframes.cpp b/src/game/server_keyframes.cpp
+index 2d39e25..e4cc23d 100644
+--- a/src/game/server_keyframes.cpp
++++ b/src/game/server_keyframes.cpp
+@@ -49,7 +49,7 @@ namespace OpenBlood2
+         DRotation q = rotation ? *rotation : DRotation{};
+         if (!record || record->life != Life::Alive || !physics_vector(position) || (rotation && !normalize(q)))
+             return MoverResult::Invalid;
+-        if (record->attachment || record->container || record->client_movement)
++        if (record->attachment || record->container() || record->client_movement)
+             return MoverResult::Unavailable;
+         if (record->world_model)
+         {
+diff --git a/src/game/server_movers.cpp b/src/game/server_movers.cpp
+index f5e85a0..58880ec 100644
+--- a/src/game/server_movers.cpp
++++ b/src/game/server_movers.cpp
+@@ -137,7 +137,7 @@ namespace OpenBlood2
+                 auto& body = *push.body;
+                 if (body.life != Life::Alive)
+                     break;
+-                if (!sensor || sensor->life != Life::Alive || sensor->handle == body.handle || sensor->container ||
++                if (!sensor || sensor->life != Life::Alive || sensor->handle == body.handle || sensor->container() ||
+                     sensor->world_model || (sensor->state.m_Flags & FLAG_SOLID) ||
+                     !(sensor->state.m_Flags & FLAG_TOUCH_NOTIFY))
+                     continue;
+diff --git a/src/game/server_physics.cpp b/src/game/server_physics.cpp
+index 07dc9e1..a859946 100644
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -37,7 +37,7 @@ namespace OpenBlood2
+     {
+         trace_service("ResizeObject");
+         auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || r->attachment || (r->container || r->world_model) ||
++        if (!r || r->life != Life::Alive || r->attachment || (r->container() || r->world_model) ||
+             !physics_vector(dimensions) || dimensions.x <= 0 || dimensions.y <= 0 || dimensions.z <= 0 ||
+             !physics_vector(r->state.m_Pos) || moving_)
+             return ResizeResult::Invalid;
+@@ -67,7 +67,7 @@ namespace OpenBlood2
+         report.requested = report.candidate = requested;
+         report.result = BodyPlacementResult::Invalid;
+         auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || moving_ || r->attachment || r->container || r->world_model ||
++        if (!r || r->life != Life::Alive || moving_ || r->attachment || r->container() || r->world_model ||
+             r->state.m_ObjectType != OT_MODEL || !r->character_body || (r->state.m_Flags & FLAG_SOLID))
+             return false;
+         if (!collision || !collision_ready)
+@@ -137,7 +137,7 @@ namespace OpenBlood2
+             auto& a = active();
+             a.trace_service("TeleportObject");
+             auto* r = a.objects_.get(h);
+-            if (!r || r->life != Life::Alive || r->attachment || (r->container || r->world_model) || !position ||
++            if (!r || r->life != Life::Alive || r->attachment || (r->container() || r->world_model) || !position ||
+                 !physics_vector(*position))
+                 return DE_INVALIDPARAMS;
+             r->state.m_Pos = *position;
+@@ -163,8 +163,8 @@ namespace OpenBlood2
+     {
+         trace_service("SetVelocity");
+         auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || r->attachment || r->container || (r->world_model && !r->world_body) || !v ||
+-            !physics_vector(*v))
++        if (!r || r->life != Life::Alive || r->attachment || r->container() || (r->world_model && !r->world_body) ||
++            !v || !physics_vector(*v))
+             return DE_INVALIDPARAMS;
+         r->velocity = *v;
+         return DE_OK;
+@@ -184,8 +184,8 @@ namespace OpenBlood2
+     {
+         trace_service("SetAcceleration");
+         auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || r->attachment || r->container || (r->world_model && !r->world_body) || !v ||
+-            !physics_vector(*v))
++        if (!r || r->life != Life::Alive || r->attachment || r->container() || (r->world_model && !r->world_body) ||
++            !v || !physics_vector(*v))
+             return DE_INVALIDPARAMS;
+         r->acceleration = *v;
+         return DE_OK;
+@@ -282,7 +282,7 @@ namespace OpenBlood2
+                     {
+                         const auto* other = objects_.get(id);
+                         CollisionHit hit;
+-                        if (other && other->life == Life::Alive && other->handle != h && !other->container &&
++                        if (other && other->life == Life::Alive && other->handle != h && !other->container() &&
+                             ((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY) &&
+                             sweep_object(*other, position, actor_end, r->dimensions, hit) == CollisionQuery::Hit)
+                             touch(other->handle);
+@@ -318,7 +318,7 @@ namespace OpenBlood2
+                     {
+                         const auto* other = objects_.get(id);
+                         if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+-                            other->container || !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
++                            other->container() || !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
+                             continue;
+                         if (sweep_object(*other, position, up, r->dimensions, probe) == CollisionQuery::Hit ||
+                             sweep_object(*other, up, across, r->dimensions, probe) == CollisionQuery::Hit ||
+@@ -345,7 +345,7 @@ namespace OpenBlood2
+             {
+                 const auto* other = objects_.get(id);
+                 if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+-                    other->container || !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
++                    other->container() || !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
+                     continue;
+                 CollisionHit hit;
+                 if (sweep_object(*other, position, reached, r->dimensions, hit) == CollisionQuery::Hit)
+@@ -436,7 +436,7 @@ namespace OpenBlood2
+         {
+             auto* r = objects_.get(id);
+             if (!r || r->life != Life::Alive || r->attachment || r->activity != OBJSTATE_ACTIVE || r->client_movement ||
+-                r->container || dynamic_cast<CProjectile*>(r->game.get()) || (r->world_model && !r->world_body) ||
++                r->container() || dynamic_cast<CProjectile*>(r->game.get()) || (r->world_model && !r->world_body) ||
+                 (!r->world_body && r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
+                 continue;
+             ContainerState containers;
+diff --git a/src/game/server_rotation.cpp b/src/game/server_rotation.cpp
+index 9f81d31..6a97d70 100644
+--- a/src/game/server_rotation.cpp
++++ b/src/game/server_rotation.cpp
+@@ -224,7 +224,7 @@ namespace OpenBlood2
+                     auto* sensor = objects_.get(id);
+                     if (record.life != Life::Alive)
+                         break;
+-                    if (!sensor || sensor->life != Life::Alive || sensor == &record || sensor->container ||
++                    if (!sensor || sensor->life != Life::Alive || sensor == &record || sensor->container() ||
+                         sensor->world_model || (sensor->state.m_Flags & FLAG_SOLID) ||
+                         !(sensor->state.m_Flags & FLAG_TOUCH_NOTIFY))
+                         continue;
+diff --git a/src/game/server_world_bodies.cpp b/src/game/server_world_bodies.cpp
+index 1cf29f9..13d928f 100644
+--- a/src/game/server_world_bodies.cpp
++++ b/src/game/server_world_bodies.cpp
+@@ -8,7 +8,7 @@ namespace OpenBlood2
+     {
+         trace_service("ConfigureWorldBody");
+         auto* r = objects_.get(handle);
+-        if (!r || r->life != Life::Alive || !r->world_model || r->container || r->world_body ||
++        if (!r || r->life != Life::Alive || !r->world_model || r->container() || r->world_body ||
+             (!properties.rotating_debris && !(r->state.m_Flags & FLAG_BOXPHYSICS)) ||
+             (r->state.m_Flags & FLAG_GOTHRUWORLD) || !std::isfinite(properties.mass) || properties.mass < 0 ||
+             properties.mass > 1e6f || !std::isfinite(properties.friction) || properties.friction < 0 ||
+@@ -23,7 +23,7 @@ namespace OpenBlood2
+         trace_service("ConfigureModelBody");
+         auto* r = objects_.get(handle);
+         if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL || !r->model || r->attachment ||
+-            r->client_movement || r->world_model || r->container || r->world_body || r->character_body ||
++            r->client_movement || r->world_model || r->container() || r->world_body || r->character_body ||
+             r->model_body || properties.rotating_debris || (r->state.m_Flags & FLAG_GOTHRUWORLD) ||
+             !physics_vector(r->dimensions) || r->dimensions.x < 0 || r->dimensions.y < 0 || r->dimensions.z < 0 ||
+             !std::isfinite(properties.mass) || properties.mass < 0 || properties.mass > 1e6f ||
+@@ -205,8 +205,8 @@ namespace OpenBlood2
+                 auto* other = objects_.get(id);
+                 if (body.life != Life::Alive)
+                     break;
+-                if (!other || other == &body || other->life != Life::Alive || other->container || other == plan.body ||
+-                    other->handle == plan.initiator ||
++                if (!other || other == &body || other->life != Life::Alive || other->container() ||
++                    other == plan.body || other->handle == plan.initiator ||
+                     !((other->state.m_Flags | body.state.m_Flags) & FLAG_TOUCH_NOTIFY))
+                     continue;
+                 if (mover &&
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 316676d..87aea0a 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -184,7 +184,7 @@ if(BLOOD2_TEST_DATA_DIR)
+         set_tests_properties(gpu.compound_shell PROPERTIES LABELS "private;gpu;containers" TIMEOUT 90 RUN_SERIAL TRUE)
+     endif()
+ endif()
+-foreach(case IN ITEMS geometry concave membership lifetime physics swimming surface ladders air_damage
++foreach(case IN ITEMS geometry concave membership lifetime index_lifetime index_callbacks physics swimming surface ladders air_damage
+         specialized_defaults conveyor_motion conveyor_bodies specialized_damage freefall_motion)
+     add_test(NAME containers.${case} COMMAND container_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/container-fixtures/${case}")
+     set_tests_properties(containers.${case} PROPERTIES LABELS "headless;containers" TIMEOUT 30)
+diff --git a/tests/container_tests.cpp b/tests/container_tests.cpp
+index 11d7a29..99db6ed 100644
+--- a/tests/container_tests.cpp
++++ b/tests/container_tests.cpp
+@@ -170,7 +170,7 @@ namespace
+         CHECK(game.objects.finish_frame());
+         auto h = volume(game, "Ladder", "ladder", {0, 0, 0}, {10, 200, 10});
+         CHECK(h);
+-        auto shape = game.objects.get(h)->container;
++        auto shape = game.objects.get(h)->container();
+         DVector pos{100, 100, 100};
+         DRotation rot;
+         CHECK(game.server.ResizeObject(h, {10, 10, 10}) == ResizeResult::Invalid);
+@@ -190,6 +190,154 @@ namespace
+         CHECK(game.server.message_count() == 0);
+         return true;
+     }
++    struct IndexHooks
++    {
++        bool reject = false;
++        std::function<void(HOBJECT)> initial, destroy, physics;
++    };
++    IndexHooks* index_hooks = nullptr;
++    struct IndexHookScope
++    {
++        explicit IndexHookScope(IndexHooks& hooks)
++        {
++            index_hooks = &hooks;
++        }
++        ~IndexHookScope()
++        {
++            index_hooks = nullptr;
++        }
++    };
++    class IndexVolume : public VolumeBrush
++    {
++      public:
++        ~IndexVolume() override
++        {
++            if (index_hooks && index_hooks->destroy)
++                index_hooks->destroy(m_hObject);
++        }
++        void UpdatePhysics(ContainerPhysics& physics) override
++        {
++            VolumeBrush::UpdatePhysics(physics);
++            if (index_hooks && index_hooks->physics)
++                index_hooks->physics(m_hObject);
++        }
++
++      protected:
++        DDWORD EngineMessageFn(DDWORD id, void* data, DFLOAT reason) override
++        {
++            const auto result = VolumeBrush::EngineMessageFn(id, data, reason);
++            if (id == MID_PRECREATE && index_hooks && index_hooks->reject)
++                return 0;
++            if (id == MID_INITIALUPDATE && index_hooks && index_hooks->initial)
++                index_hooks->initial(m_hObject);
++            return result;
++        }
++    };
++    bool index_matches(const Objects& objects)
++    {
++        std::vector<ObjectId> slow;
++        for (auto id : objects.snapshot())
++            if (const auto* r = objects.get(id); r && r->container())
++                slow.push_back(id);
++        return objects.container_snapshot() == slow && objects.bound_container_count() == slow.size();
++    }
++    bool register_index_volume(GameSession& game)
++    {
++        static ClassInfo type{
++            "IndexVolume", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<IndexVolume>(); }, {}};
++        type.parent = game.objects.find_class("VolumeBrush");
++        return game.objects.register_class(type);
++    }
++    bool index_lifetime(const std::filesystem::path& root)
++    {
++        IndexHooks hooks;
++        GameSession game;
++        IndexHookScope scope(hooks); // Disable captured callbacks before implicit teardown on CHECK failure.
++        CHECK(test_player::setup(game, root, false) && register_index_volume(game));
++        auto ordinary = game.objects.create(game.objects.find_class("BaseClass"));
++        auto a = volume(game, "Water", "a", {-10, -10, -10}, {10, 10, 10});
++        auto b = volume(game, "Water", "b", {-10, -10, -10}, {10, 10, 10});
++        CHECK(ordinary && a && b && index_matches(game.objects));
++        const auto old = game.objects.get(a)->id;
++        const auto held = game.objects.container_snapshot();
++        CHECK(game.objects.remove(a) && index_matches(game.objects));
++        CHECK(game.objects.container_snapshot() == held); // Pending records remain indexed, queries exclude them.
++        CHECK(game.objects.finish_frame() && index_matches(game.objects));
++        auto reused = volume(game, "Water", "reused", {-10, -10, -10}, {10, 10, 10});
++        CHECK(reused && game.objects.get(reused)->id.slot == old.slot && !game.objects.get(old));
++        CHECK(game.objects.container_snapshot().front() == game.objects.get(reused)->id && index_matches(game.objects));
++        CHECK(held.front() == old); // Already returned snapshots remain owned and unchanged.
++        hooks.reject = true;
++        CHECK(!volume(game, "IndexVolume", "rejected", {-10, -10, -10}, {10, 10, 10}));
++        hooks.reject = false;
++        CHECK(!game.objects.create(game.objects.find_class("Water"), {}, Creation::World,
++                                   {{"Name", std::string("missing")}}));
++        game.world.models.push_back(box("invalid", {-10, -10, -10}, {10, 10, 10}));
++        game.world.models.back().polygons.pop_back();
++        CHECK(!game.objects.create(game.objects.find_class("Water"), {}, Creation::World,
++                                   {{"Name", std::string("invalid")}}));
++        CHECK(index_matches(game.objects) && game.objects.bound_container_count() == 2);
++        CHECK(game.objects.finish_frame());
++        HOBJECT nested = nullptr, from_destructor = nullptr;
++        bool initial_ok = false, destructor_ok = false;
++        hooks.initial = [&](HOBJECT h)
++        {
++            initial_ok = game.objects.get(h)->container() && index_matches(game.objects);
++            nested = volume(game, "Water", "nested", {-10, -10, -10}, {10, 10, 10});
++            initial_ok = initial_ok && nested && game.objects.remove(h) && index_matches(game.objects);
++        };
++        auto pending = volume(game, "IndexVolume", "pending", {-10, -10, -10}, {10, 10, 10});
++        CHECK(pending && initial_ok && game.objects.bound_container_count() == 4);
++        hooks.destroy = [&](HOBJECT h)
++        {
++            destructor_ok = game.objects.get(h)->life == Life::Destroying && index_matches(game.objects);
++            from_destructor = volume(game, "Water", "destructor_child", {-10, -10, -10}, {10, 10, 10});
++            destructor_ok =
++                destructor_ok && from_destructor && game.objects.remove(nested) && index_matches(game.objects);
++        };
++        CHECK(game.objects.finish_frame() && destructor_ok && index_matches(game.objects));
++        CHECK(!game.objects.get(pending) && !game.objects.get(nested) && game.objects.get(from_destructor));
++        CHECK(game.objects.bound_container_count() == 3);
++        hooks = {};
++        CHECK(game.unload_world() && index_matches(game.objects) && !game.objects.bound_container_count());
++        for (unsigned i = 0; i < 3; ++i)
++        {
++            game.objects.world = &game.world;
++            CHECK(volume(game, "Water", "reload" + std::to_string(i), {-10, -10, -10}, {10, 10, 10}));
++            CHECK(index_matches(game.objects) && game.objects.bound_container_count() == 1);
++            CHECK(game.unload_world() && index_matches(game.objects) && !game.objects.bound_container_count());
++        }
++        return true;
++    }
++    bool index_callbacks(const std::filesystem::path& root)
++    {
++        IndexHooks hooks;
++        GameSession game;
++        IndexHookScope scope(hooks);
++        CHECK(test_player::setup(game, root, false) && register_index_volume(game));
++        auto first = volume(game, "IndexVolume", "first", {-10, -10, -10}, {10, 10, 10});
++        auto removed = volume(game, "Water", "removed", {-10, -10, -10}, {10, 10, 10});
++        auto body = game.objects.create(game.objects.find_class("BaseClass"));
++        CHECK(first && removed && body);
++        HOBJECT spawned = nullptr;
++        bool callback_ok = false;
++        hooks.physics = [&](HOBJECT)
++        {
++            if (spawned)
++                return;
++            spawned = volume(game, "Water", "spawned", {-10, -10, -10}, {10, 10, 10});
++            callback_ok = spawned && game.objects.remove(removed) && index_matches(game.objects);
++        };
++        CHECK(game.server.damage_containers() && callback_ok);
++        auto* skipped = dynamic_cast<VolumeBrush*>(game.objects.get(removed)->game.get());
++        auto* fresh = dynamic_cast<VolumeBrush*>(game.objects.get(spawned)->game.get());
++        CHECK(skipped && fresh && !skipped->physics_calls && !fresh->physics_calls);
++        CHECK(game.server.damage_containers() && fresh->physics_calls == 1);
++        CHECK(game.objects.finish_frame() && !game.objects.get(removed) && index_matches(game.objects));
++        hooks = {};
++        CHECK(game.unload_world() && !game.objects.bound_container_count());
++        return true;
++    }
+     bool physics(const std::filesystem::path& root)
+     {
+         GameSession game;
+@@ -575,10 +723,10 @@ namespace
+                     for (const auto& diagnostic : game.objects.diagnostics())
+                         std::cerr << diagnostic << "\n";
+                 }
+-                CHECK(r && r->life == Life::Alive && r->container);
++                CHECK(r && r->life == Life::Alive && r->container());
+                 const auto* brush = dynamic_cast<VolumeBrush*>(r->game.get());
+                 CHECK(brush);
+-                const auto& s = *r->container;
++                const auto& s = *r->container();
+                 std::cout << path << " " << source.class_name << " " << r->state.m_Name << " bounds " << s.min.x << ","
+                           << s.min.y << "," << s.min.z << " / " << s.max.x << "," << s.max.y << "," << s.max.z
+                           << " current " << brush->info.current.x << "," << brush->info.current.y << ","
+@@ -631,7 +779,7 @@ namespace
+             {
+                 DVector candidate{-32, y + .001f, 0};
+                 CollisionHit hit;
+-                if (!game.objects.get(belt)->container->overlaps(candidate, dims) ||
++                if (!game.objects.get(belt)->container()->overlaps(candidate, dims) ||
+                     game.collision.sweep(candidate, candidate, dims, hit) != CollisionQuery::Miss)
+                     continue;
+                 CHECK(place(game, candidate));
+@@ -713,7 +861,7 @@ namespace
+         CHECK(game.request_world("02_CityHub", error));
+         unsigned created = 0;
+         for (auto id : game.objects.snapshot())
+-            if (game.objects.get(id)->container)
++            if (game.objects.get(id)->container())
+                 ++created;
+         if (created != 11)
+         {
+@@ -724,7 +872,7 @@ namespace
+             for (auto& d : game.objects.diagnostics())
+                 std::cerr << d << "\n";
+         }
+-        CHECK(created == 11);
++        CHECK(created == 11 && index_matches(game.objects));
+         CHECK(game.enter_player(error));
+         CHECK(place(game, {0, 80, 0}));
+         CHECK(game.server_shell.Player(game.local_client)->containers.head.code == CC_WATER);
+@@ -734,7 +882,7 @@ namespace
+         for (auto id : game.objects.snapshot())
+         {
+             const auto* record = game.objects.get(id);
+-            if (record->container && std::string_view(record->state.m_Name) == "Ladder1")
++            if (record->container() && std::string_view(record->state.m_Name) == "Ladder1")
+                 ladder = record;
+         }
+         CHECK(ladder);
+@@ -746,7 +894,7 @@ namespace
+         {
+             DVector candidate{x, 700, -1536};
+             CollisionHit hit;
+-            if (ladder->container->overlaps(candidate, dimensions) &&
++            if (ladder->container()->overlaps(candidate, dimensions) &&
+                 game.collision.sweep(candidate, candidate, dimensions, hit) == CollisionQuery::Miss)
+             {
+                 found = true;
+@@ -776,6 +924,8 @@ int main(int argc, char** argv)
+         {"concave", concave},
+         {"membership", membership},
+         {"lifetime", lifetime},
++        {"index_lifetime", index_lifetime},
++        {"index_callbacks", index_callbacks},
+         {"physics", physics},
+         {"swimming", swimming},
+         {"surface", surface},
+diff --git a/tests/door_tests.cpp b/tests/door_tests.cpp
+index 3b4349e..3874a05 100644
+--- a/tests/door_tests.cpp
++++ b/tests/door_tests.cpp
+@@ -139,7 +139,7 @@ namespace
+         auto h = door(g, {{"BoxPhysics", false}});
+         CHECK(h);
+         auto* r = g.objects.get(h);
+-        CHECK(r->state.m_ObjectType == OT_WORLDMODEL && r->world_model && !r->container);
++        CHECK(r->state.m_ObjectType == OT_WORLDMODEL && r->world_model && !r->container());
+         SegmentHit hit;
+         CHECK(g.server.IntersectSegment({-100, 20, 0}, {100, 20, 0}, nullptr, hit) == SegmentResult::Hit);
+         CHECK(hit.object == h && std::abs(hit.point.x + 10) < .001f);
+diff --git a/tests/keyframer_tests.cpp b/tests/keyframer_tests.cpp
+index bbafcf9..12430f0 100644
+--- a/tests/keyframer_tests.cpp
++++ b/tests/keyframer_tests.cpp
+@@ -1,3 +1,4 @@
++#include "brush_fixture.h"
+ #include "camera_fixture.h"
+ #include "engine/container.h"
+ #include "game/game_settings.h"
+@@ -212,9 +213,12 @@ namespace
+         const auto pos = r->state.m_Pos;
+         CHECK(g.server.MoveKeyframedObject(h, {1, 2, 3}, &DRotationZero) == MoverResult::Invalid);
+         CHECK(close(r->state.m_Pos, pos));
+-        r->container = std::make_shared<ContainerShape>();
+-        CHECK(g.server.MoveKeyframedObject(h, {1, 2, 3}, &b) == MoverResult::Unavailable && close(r->state.m_Pos, pos));
+-        r->container.reset();
++        g.world.models.push_back(test_brush::box("static_water", {-10, -10, -10}, {10, 10, 10}));
++        auto water = create(g, "Water", {{"Name", std::string("static_water")}});
++        CHECK(water && g.objects.get(water)->container());
++        const auto water_position = g.objects.get(water)->state.m_Pos;
++        CHECK(g.server.MoveKeyframedObject(water, {1, 2, 3}, &b) == MoverResult::Unavailable &&
++              close(g.objects.get(water)->state.m_Pos, water_position));
+         r->world_model = std::make_shared<ContainerShape>();
+         CHECK(g.server.MoveKeyframedObject(h, {1, 2, 3}, &b) == MoverResult::Unavailable && close(r->state.m_Pos, pos));
+         r->world_model.reset();

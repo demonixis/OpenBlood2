@@ -1,0 +1,1056 @@
+Start testing: Oct 17 08:32 CEST
+----------------------------------------------------------
+531/730 Testing: player_keepalive.private
+531/730 Test: player_keepalive.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_keepalive_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_keepalive.private" start time: Oct 17 08:32 CEST
+Output:
+----------------------------------------------------------
+Destination failure: CDestructableBrush: fallengrills: Missing named world model
+cycle=0 CityHub named entry at 704,-85.999,2368; HP=73 bullets=17 keys=0 respawns=0 Caleb triangles=941
+Original instance=435 World-owned sound=31 Preprocessor only=541 Class not ported=18 Creation failed=1 
+CClientParticleStreamSFX=8 CDestructableBrush=1 DemoSkyWorldModel=1 FlashlightPU=1 ProximitiesPU=2 RemotesPU=2 SkyPointer=4 
+cycle=1 CityHub named entry at 704,-85.999,2368; HP=73 bullets=17 keys=0 respawns=0 Caleb triangles=941
+Original instance=435 World-owned sound=31 Preprocessor only=541 Class not ported=18 Creation failed=1 
+CClientParticleStreamSFX=8 CDestructableBrush=1 DemoSkyWorldModel=1 FlashlightPU=1 ProximitiesPU=2 RemotesPU=2 SkyPointer=4 
+cycle=2 CityHub named entry at 704,-85.999,2368; HP=73 bullets=17 keys=0 respawns=0 Caleb triangles=941
+Original instance=435 World-owned sound=31 Preprocessor only=541 Class not ported=18 Creation failed=1 
+CClientParticleStreamSFX=8 CDestructableBrush=1 DemoSkyWorldModel=1 FlashlightPU=1 ProximitiesPU=2 RemotesPU=2 SkyPointer=4 
+<end of output>
+Test time =  28.77 sec
+----------------------------------------------------------
+Test Passed.
+"player_keepalive.private" end time: Oct 17 08:33 CEST
+"player_keepalive.private" time elapsed: 00:00:28
+----------------------------------------------------------
+
+594/730 Testing: player_controls.private
+594/730 Test: player_controls.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_controls_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_controls.private" start time: Oct 17 08:32 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Alternate input: hp=100 dead=0 ammo=38 shots=12 before=5
+Corpse placement: placed with clearance correction corrections=2 distance=28.8523 requested=-73.1721,133.002,-2412.32 fitted=-59.999,133.002,-2428
+Original FIRE_KEY: shots=12 ammo=38 voices=12 mouse=0
+<end of output>
+Test time =  35.79 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.private" end time: Oct 17 08:33 CEST
+"player_controls.private" time elapsed: 00:00:35
+----------------------------------------------------------
+
+527/730 Testing: player_restore.private
+527/730 Test: player_restore.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_restore_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_restore.private" start time: Oct 17 08:33 CEST
+Output:
+----------------------------------------------------------
+cycle=0 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+cycle=1 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+cycle=2 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+<end of output>
+Test time =   9.36 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.private" end time: Oct 17 08:33 CEST
+"player_restore.private" time elapsed: 00:00:09
+----------------------------------------------------------
+
+506/730 Testing: inventory_state.private
+506/730 Test: inventory_state.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory_state_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"inventory_state.private" start time: Oct 17 08:33 CEST
+Output:
+----------------------------------------------------------
+cycle 0: detached inventory restored; raw bullets 123.5; keys 0; both retail hand models loaded
+cycle 1: detached inventory restored; raw bullets 124.5; keys 0; both retail hand models loaded
+cycle 2: detached inventory restored; raw bullets 125.5; keys 0; both retail hand models loaded
+<end of output>
+Test time =   9.72 sec
+----------------------------------------------------------
+Test Passed.
+"inventory_state.private" end time: Oct 17 08:33 CEST
+"inventory_state.private" time elapsed: 00:00:09
+----------------------------------------------------------
+
+223/730 Testing: cinematics.subway
+223/730 Test: cinematics.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.subway" start time: Oct 17 08:33 CEST
+Output:
+----------------------------------------------------------
+cycle=0 cue=sounds\chosen\caleb\e1m4_1_cal.wav rate=22050 frames=53872 duration=2.44317
+cycle=1 cue=sounds\chosen\caleb\e1m4_1_cal.wav rate=22050 frames=53872 duration=2.44317
+two authored crash cues completed; 2 full session reloads clean
+<end of output>
+Test time =   6.57 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.subway" end time: Oct 17 08:33 CEST
+"cinematics.subway" time elapsed: 00:00:06
+----------------------------------------------------------
+
+222/730 Testing: cinematics.catalog
+222/730 Test: cinematics.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.catalog" start time: Oct 17 08:33 CEST
+Output:
+----------------------------------------------------------
+SUBWAY cinexit1
+  0 sounds\enemies\gideon\laf1_gid.wav speaker=player message=door12:TRIGGER
+SUBWAY cinhi5
+  0 sounds\events\metalcrush5a.wav speaker=player message=:
+  0 sounds\events\traincrash1.wav speaker=player message=:
+SUBWAY cintrig1
+  0 sounds\chosen\caleb\e1m4_1_cal.wav speaker=player message=:
+SUBWAY cintrig2
+  0 sounds\enemies\gideon\1agid1.wav speaker=player message=:
+  0 sounds\chosen\caleb\1acaleb1.wav speaker=player message=:
+worlds/02_cityhubb.dat sound=sounds\chosen\caleb\msc12cal.wav error=Missing or oversized sound resource
+worlds/03_museum.dat sound=sounds\chosen\caleb\laugh1_calb.wav error=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sound=sounds\chosen\caleb\kill\laugh1_cal.wav error=Missing or oversized sound resource
+worlds=57 controllers=79 cues=201 missing=3 invalid=0
+encoding=1 cues=198
+<end of output>
+Test time =  21.16 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.catalog" end time: Oct 17 08:33 CEST
+"cinematics.catalog" time elapsed: 00:00:21
+----------------------------------------------------------
+
+60/730 Testing: player.private
+60/730 Test: player.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player.private" start time: Oct 17 08:33 CEST
+Output:
+----------------------------------------------------------
+Cycle 0: CPlayerObj at -32,170.001,-3224; 120 updates; 101 client messages; 7 paths
+Cycle 1: CPlayerObj at -32,170.001,-3224; 120 updates; 101 client messages; 7 paths
+Cycle 2: CPlayerObj at -32,170.001,-3224; 120 updates; 101 client messages; 7 paths
+<end of output>
+Test time =  15.96 sec
+----------------------------------------------------------
+Test Passed.
+"player.private" end time: Oct 17 08:34 CEST
+"player.private" time elapsed: 00:00:15
+----------------------------------------------------------
+
+529/730 Testing: player_keepalive.fallback
+529/730 Test: player_keepalive.fallback
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_keepalive_tests" "fallback" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-keepalive-fixtures/fallback"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_keepalive.fallback" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.15 sec
+----------------------------------------------------------
+Test Passed.
+"player_keepalive.fallback" end time: Oct 17 08:34 CEST
+"player_keepalive.fallback" time elapsed: 00:00:00
+----------------------------------------------------------
+
+525/730 Testing: player_restore.failures
+525/730 Test: player_restore.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_restore_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-restore-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_restore.failures" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.failures" end time: Oct 17 08:34 CEST
+"player_restore.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+526/730 Testing: player_restore.lifetime
+526/730 Test: player_restore.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_restore_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-restore-fixtures/lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_restore.lifetime" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.lifetime" end time: Oct 17 08:34 CEST
+"player_restore.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+530/730 Testing: player_keepalive.failures
+530/730 Test: player_keepalive.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_keepalive_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-keepalive-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_keepalive.failures" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"player_keepalive.failures" end time: Oct 17 08:34 CEST
+"player_keepalive.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+524/730 Testing: player_restore.roundtrip
+524/730 Test: player_restore.roundtrip
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_restore_tests" "roundtrip" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-restore-fixtures/roundtrip"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_restore.roundtrip" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.roundtrip" end time: Oct 17 08:34 CEST
+"player_restore.roundtrip" time elapsed: 00:00:00
+----------------------------------------------------------
+
+528/730 Testing: player_keepalive.named
+528/730 Test: player_keepalive.named
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_keepalive_tests" "named" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-keepalive-fixtures/named"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_keepalive.named" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"player_keepalive.named" end time: Oct 17 08:34 CEST
+"player_keepalive.named" time elapsed: 00:00:00
+----------------------------------------------------------
+
+221/730 Testing: cinematics.device
+221/730 Test: cinematics.device
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "device" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/device"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.device" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.device" end time: Oct 17 08:34 CEST
+"cinematics.device" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1/730 Testing: objects.builtin_model
+1/730 Test: objects.builtin_model
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "builtin_model"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.builtin_model" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+PASS builtin_model
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.builtin_model" end time: Oct 17 08:34 CEST
+"objects.builtin_model" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/730 Testing: objects.unsupported_teardown
+11/730 Test: objects.unsupported_teardown
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "unsupported_teardown"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.unsupported_teardown" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+PASS unsupported_teardown
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"objects.unsupported_teardown" end time: Oct 17 08:34 CEST
+"objects.unsupported_teardown" time elapsed: 00:00:00
+----------------------------------------------------------
+
+505/730 Testing: inventory_state.capture
+505/730 Test: inventory_state.capture
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory_state_tests" "capture" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory-state-fixtures/capture"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"inventory_state.capture" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"inventory_state.capture" end time: Oct 17 08:34 CEST
+"inventory_state.capture" time elapsed: 00:00:00
+----------------------------------------------------------
+
+502/730 Testing: inventory_state.roundtrip
+502/730 Test: inventory_state.roundtrip
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory_state_tests" "roundtrip" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory-state-fixtures/roundtrip"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"inventory_state.roundtrip" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"inventory_state.roundtrip" end time: Oct 17 08:34 CEST
+"inventory_state.roundtrip" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/730 Testing: objects.messages_strings
+10/730 Test: objects.messages_strings
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "messages_strings"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.messages_strings" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+PASS messages_strings
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"objects.messages_strings" end time: Oct 17 08:34 CEST
+"objects.messages_strings" time elapsed: 00:00:00
+----------------------------------------------------------
+
+503/730 Testing: inventory_state.malformed
+503/730 Test: inventory_state.malformed
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory_state_tests" "malformed" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory-state-fixtures/malformed"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"inventory_state.malformed" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"inventory_state.malformed" end time: Oct 17 08:34 CEST
+"inventory_state.malformed" time elapsed: 00:00:00
+----------------------------------------------------------
+
+504/730 Testing: inventory_state.rollback
+504/730 Test: inventory_state.rollback
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory_state_tests" "rollback" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory-state-fixtures/rollback"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"inventory_state.rollback" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"inventory_state.rollback" end time: Oct 17 08:34 CEST
+"inventory_state.rollback" time elapsed: 00:00:00
+----------------------------------------------------------
+
+592/730 Testing: player_controls.mouse
+592/730 Test: player_controls.mouse
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_controls_tests" "mouse"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_controls.mouse" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.mouse" end time: Oct 17 08:34 CEST
+"player_controls.mouse" time elapsed: 00:00:00
+----------------------------------------------------------
+
+219/730 Testing: cinematics.lifetime
+219/730 Test: cinematics.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.lifetime" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.lifetime" end time: Oct 17 08:34 CEST
+"cinematics.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+591/730 Testing: player_controls.keys
+591/730 Test: player_controls.keys
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_controls_tests" "keys"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_controls.keys" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.keys" end time: Oct 17 08:34 CEST
+"player_controls.keys" time elapsed: 00:00:00
+----------------------------------------------------------
+
+593/730 Testing: player_controls.gates
+593/730 Test: player_controls.gates
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_controls_tests" "gates"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_controls.gates" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.gates" end time: Oct 17 08:34 CEST
+"player_controls.gates" time elapsed: 00:00:00
+----------------------------------------------------------
+
+216/730 Testing: cinematics.mixer
+216/730 Test: cinematics.mixer
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "mixer" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/mixer"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.mixer" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.mixer" end time: Oct 17 08:34 CEST
+"cinematics.mixer" time elapsed: 00:00:00
+----------------------------------------------------------
+
+220/730 Testing: cinematics.failures
+220/730 Test: cinematics.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.failures" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.failures" end time: Oct 17 08:34 CEST
+"cinematics.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+217/730 Testing: cinematics.spatial
+217/730 Test: cinematics.spatial
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "spatial" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/spatial"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.spatial" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.spatial" end time: Oct 17 08:34 CEST
+"cinematics.spatial" time elapsed: 00:00:00
+----------------------------------------------------------
+
+218/730 Testing: cinematics.sequence
+218/730 Test: cinematics.sequence
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "sequence" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/sequence"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.sequence" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.sequence" end time: Oct 17 08:34 CEST
+"cinematics.sequence" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/730 Testing: objects.creation_failures
+12/730 Test: objects.creation_failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "creation_failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.creation_failures" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+PASS creation_failures
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.creation_failures" end time: Oct 17 08:34 CEST
+"objects.creation_failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+163/730 Testing: pickups.defaults
+163/730 Test: pickups.defaults
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup_tests" "defaults" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup-fixtures/defaults"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"pickups.defaults" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.11 sec
+----------------------------------------------------------
+Test Passed.
+"pickups.defaults" end time: Oct 17 08:34 CEST
+"pickups.defaults" time elapsed: 00:00:00
+----------------------------------------------------------
+
+164/730 Testing: pickups.ammunition
+164/730 Test: pickups.ammunition
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup_tests" "ammunition" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup-fixtures/ammunition"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"pickups.ammunition" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"pickups.ammunition" end time: Oct 17 08:34 CEST
+"pickups.ammunition" time elapsed: 00:00:00
+----------------------------------------------------------
+
+165/730 Testing: pickups.statistics
+165/730 Test: pickups.statistics
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup_tests" "statistics" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup-fixtures/statistics"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"pickups.statistics" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"pickups.statistics" end time: Oct 17 08:34 CEST
+"pickups.statistics" time elapsed: 00:00:00
+----------------------------------------------------------
+
+171/730 Testing: pickups.resources
+171/730 Test: pickups.resources
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup_tests" "resources" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup-fixtures/resources"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"pickups.resources" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"pickups.resources" end time: Oct 17 08:34 CEST
+"pickups.resources" time elapsed: 00:00:00
+----------------------------------------------------------
+
+169/730 Testing: pickups.rejection
+169/730 Test: pickups.rejection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup_tests" "rejection" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup-fixtures/rejection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"pickups.rejection" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"pickups.rejection" end time: Oct 17 08:34 CEST
+"pickups.rejection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+168/730 Testing: pickups.spawning
+168/730 Test: pickups.spawning
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup_tests" "spawning" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup-fixtures/spawning"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"pickups.spawning" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"pickups.spawning" end time: Oct 17 08:34 CEST
+"pickups.spawning" time elapsed: 00:00:00
+----------------------------------------------------------
+
+215/730 Testing: cinematics.decode
+215/730 Test: cinematics.decode
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "decode" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/decode"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.decode" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.decode" end time: Oct 17 08:34 CEST
+"cinematics.decode" time elapsed: 00:00:00
+----------------------------------------------------------
+
+170/730 Testing: pickups.callbacks
+170/730 Test: pickups.callbacks
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup_tests" "callbacks" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup-fixtures/callbacks"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"pickups.callbacks" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"pickups.callbacks" end time: Oct 17 08:34 CEST
+"pickups.callbacks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/730 Testing: objects.reasons_properties
+4/730 Test: objects.reasons_properties
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "reasons_properties"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.reasons_properties" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+PASS reasons_properties
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.reasons_properties" end time: Oct 17 08:34 CEST
+"objects.reasons_properties" time elapsed: 00:00:00
+----------------------------------------------------------
+
+167/730 Testing: pickups.contact
+167/730 Test: pickups.contact
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup_tests" "contact" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup-fixtures/contact"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"pickups.contact" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"pickups.contact" end time: Oct 17 08:34 CEST
+"pickups.contact" time elapsed: 00:00:00
+----------------------------------------------------------
+
+166/730 Testing: pickups.protocol
+166/730 Test: pickups.protocol
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup_tests" "protocol" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup-fixtures/protocol"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"pickups.protocol" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"pickups.protocol" end time: Oct 17 08:34 CEST
+"pickups.protocol" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/730 Testing: objects.original_objects
+2/730 Test: objects.original_objects
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "original_objects"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.original_objects" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+PASS original_objects
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.original_objects" end time: Oct 17 08:34 CEST
+"objects.original_objects" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/730 Testing: objects.links_lists
+9/730 Test: objects.links_lists
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "links_lists"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.links_lists" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+PASS links_lists
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.links_lists" end time: Oct 17 08:34 CEST
+"objects.links_lists" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/730 Testing: objects.deferred_removal
+6/730 Test: objects.deferred_removal
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "deferred_removal"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.deferred_removal" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+PASS deferred_removal
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.deferred_removal" end time: Oct 17 08:34 CEST
+"objects.deferred_removal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/730 Testing: objects.handles_selection
+8/730 Test: objects.handles_selection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "handles_selection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.handles_selection" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+PASS handles_selection
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.handles_selection" end time: Oct 17 08:34 CEST
+"objects.handles_selection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/730 Testing: objects.nested_creation
+3/730 Test: objects.nested_creation
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "nested_creation"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.nested_creation" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+PASS nested_creation
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.nested_creation" end time: Oct 17 08:34 CEST
+"objects.nested_creation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/730 Testing: objects.scheduling
+5/730 Test: objects.scheduling
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "scheduling"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.scheduling" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+PASS scheduling
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.scheduling" end time: Oct 17 08:34 CEST
+"objects.scheduling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/730 Testing: objects.aggregate_dispatch
+7/730 Test: objects.aggregate_dispatch
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "aggregate_dispatch"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.aggregate_dispatch" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+PASS aggregate_dispatch
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.aggregate_dispatch" end time: Oct 17 08:34 CEST
+"objects.aggregate_dispatch" time elapsed: 00:00:00
+----------------------------------------------------------
+
+56/730 Testing: player.lifecycle
+56/730 Test: player.lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_tests" "lifecycle" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-fixtures/lifecycle"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player.lifecycle" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"player.lifecycle" end time: Oct 17 08:34 CEST
+"player.lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------
+
+57/730 Testing: player.rollback
+57/730 Test: player.rollback
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_tests" "rollback" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-fixtures/rollback"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player.rollback" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"player.rollback" end time: Oct 17 08:34 CEST
+"player.rollback" time elapsed: 00:00:00
+----------------------------------------------------------
+
+58/730 Testing: player.messages
+58/730 Test: player.messages
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_tests" "messages" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-fixtures/messages"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player.messages" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"player.messages" end time: Oct 17 08:34 CEST
+"player.messages" time elapsed: 00:00:00
+----------------------------------------------------------
+
+59/730 Testing: player.callbacks
+59/730 Test: player.callbacks
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_tests" "callbacks" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-fixtures/callbacks"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player.callbacks" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"player.callbacks" end time: Oct 17 08:34 CEST
+"player.callbacks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+55/730 Testing: player.handles
+55/730 Test: player.handles
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_tests" "handles" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-fixtures/handles"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player.handles" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"player.handles" end time: Oct 17 08:34 CEST
+"player.handles" time elapsed: 00:00:00
+----------------------------------------------------------
+
+723/730 Testing: medkit.rules
+723/730 Test: medkit.rules
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit_tests" "rules" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit-fixtures/rules"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"medkit.rules" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"medkit.rules" end time: Oct 17 08:34 CEST
+"medkit.rules" time elapsed: 00:00:00
+----------------------------------------------------------
+
+724/730 Testing: medkit.pickup
+724/730 Test: medkit.pickup
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit_tests" "pickup" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit-fixtures/pickup"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"medkit.pickup" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"medkit.pickup" end time: Oct 17 08:34 CEST
+"medkit.pickup" time elapsed: 00:00:00
+----------------------------------------------------------
+
+725/730 Testing: medkit.commands
+725/730 Test: medkit.commands
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit_tests" "commands" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit-fixtures/commands"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"medkit.commands" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"medkit.commands" end time: Oct 17 08:34 CEST
+"medkit.commands" time elapsed: 00:00:00
+----------------------------------------------------------
+
+726/730 Testing: medkit.transport
+726/730 Test: medkit.transport
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit_tests" "transport" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit-fixtures/transport"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"medkit.transport" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"medkit.transport" end time: Oct 17 08:34 CEST
+"medkit.transport" time elapsed: 00:00:00
+----------------------------------------------------------
+
+727/730 Testing: medkit.restore
+727/730 Test: medkit.restore
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit_tests" "restore" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit-fixtures/restore"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"medkit.restore" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.10 sec
+----------------------------------------------------------
+Test Passed.
+"medkit.restore" end time: Oct 17 08:34 CEST
+"medkit.restore" time elapsed: 00:00:00
+----------------------------------------------------------
+
+728/730 Testing: medkit.lifetime
+728/730 Test: medkit.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit-fixtures/lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"medkit.lifetime" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"medkit.lifetime" end time: Oct 17 08:34 CEST
+"medkit.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+729/730 Testing: medkit.input
+729/730 Test: medkit.input
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit_tests" "input" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit-fixtures/input"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"medkit.input" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"medkit.input" end time: Oct 17 08:34 CEST
+"medkit.input" time elapsed: 00:00:00
+----------------------------------------------------------
+
+172/730 Testing: pickups.catalog
+172/730 Test: pickups.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/pickup_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"pickups.catalog" start time: Oct 17 08:33 CEST
+Output:
+----------------------------------------------------------
+Authored SubMachineGunPU: worlds/02_cityhub.dat
+Authored AssaultRiflePU: worlds/02_cityhub.dat
+Authored SubMachineGunPU: worlds/02_cityhubb.dat
+Authored SubMachineGunPU: worlds/02_cityhubc.dat
+Authored BerettaPU: worlds/05_cdm.dat
+Authored AssaultRiflePU: worlds/06_airship2.dat
+Authored FlareGunPU: worlds/06_airship2.dat
+Authored AssaultRiflePU: worlds/10_sewagetreatmentplant.dat
+Authored FlareGunPU: worlds/11_slaughter_house.dat
+Authored AssaultRiflePU: worlds/14_subwayc.dat
+Authored SubMachineGunPU: worlds/20_powerstation.dat
+Authored AssaultRiflePU: worlds/25_ancientone.dat
+AssaultRiflePU=5
+BMGAmmoPU=76
+BatteryAmmoPU=150
+BerettaPU=1
+BulletAmmoPU=243
+DieBugDieAmmoPU=105
+FlareAmmoPU=117
+FlareGunPU=2
+FuelAmmoPU=108
+HealthPU=209
+HowitzerAmmoPU=100
+MedKitPU=22
+MegaHealthPU=49
+NecroWardPU=33
+ShellAmmoPU=186
+SubMachineGunPU=4
+WardPU=58
+rejected BMGAmmoPU: invalid property TypeAction=8
+rejected BatteryAmmoPU: invalid property TypeAction=17
+rejected BulletAmmoPU: invalid property TypeAction=35
+rejected DieBugDieAmmoPU: invalid property TypeAction=12
+rejected FlareAmmoPU: invalid property TypeAction=17
+rejected FuelAmmoPU: invalid property TypeAction=17
+rejected HealthPU: invalid property TypeAction=21
+rejected HowitzerAmmoPU: invalid property TypeAction=12
+rejected MedKitPU: invalid property TypeAction=2
+rejected MegaHealthPU: invalid property TypeAction=4
+rejected NecroWardPU: invalid property TypeAction=3
+rejected ShellAmmoPU: invalid property TypeAction=24
+rejected WardPU: invalid property TypeAction=6
+worlds=57 created=1290 missing=0 supported_spawns=60
+<end of output>
+Test time =  17.55 sec
+----------------------------------------------------------
+Test Passed.
+"pickups.catalog" end time: Oct 17 08:34 CEST
+"pickups.catalog" time elapsed: 00:00:17
+----------------------------------------------------------
+
+730/730 Testing: medkit.private
+730/730 Test: medkit.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/medkit_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"medkit.private" start time: Oct 17 08:34 CEST
+Output:
+----------------------------------------------------------
+CityHub MedKitPU model=Models/Powerups/Medkit_pu.abc
+Medkit cycle=0 charges=45 frames=45312 peak=0.339641
+CityHub MedKitPU model=Models/Powerups/Medkit_pu.abc
+Medkit cycle=1 charges=45 frames=45312 peak=0.339641
+<end of output>
+Test time =   7.37 sec
+----------------------------------------------------------
+Test Passed.
+"medkit.private" end time: Oct 17 08:34 CEST
+"medkit.private" time elapsed: 00:00:07
+----------------------------------------------------------
+
+End testing: Oct 17 08:34 CEST
+
+cinematics =  28.04 sec*proc
+
+headless = 155.02 sec*proc
+
+inventory_state =   9.86 sec*proc
+
+medkit =   7.88 sec*proc
+
+objects =   0.28 sec*proc
+
+pickups =  18.33 sec*proc
+
+player =  16.18 sec*proc
+
+player_controls =  35.83 sec*proc
+
+player_keepalive =  29.04 sec*proc
+
+player_restore =   9.58 sec*proc
+
+private = 152.26 sec*proc
+

@@ -1,0 +1,14 @@
+340/343 Testing: texture.decode
+340/343 Test: texture.decode
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/texture_tests" "decode"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"texture.decode" start time: Oct 16 09:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"texture.decode" end time: Oct 16 09:15 CEST
+"texture.decode" time elapsed: 00:00:00
+----------------------------------------------------------

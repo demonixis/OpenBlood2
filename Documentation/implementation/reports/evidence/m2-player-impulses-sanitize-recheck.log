@@ -1,0 +1,83 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/sanitize/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/sanitize/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 516
+    Start 516: ai_runtime.clearance_private
+
+516: Test command: /home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_runtime_tests "clearance_private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+516: Working Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+516: Test timeout computed to be: 90
+516: SubwayA relocation cycle 0: 8 blocked resizes, 93 original AI shots; no suspended Cultist
+516: SubwayA relocation cycle 1: 8 blocked resizes, 93 original AI shots; no suspended Cultist
+1/6 Test #516: ai_runtime.clearance_private .....   Passed   86.90 sec
+test 876
+    Start 876: player_death.private
+
+876: Test command: /home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_death_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+876: Working Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+876: Test timeout computed to be: 120
+876: death type=0 position 0,42.001,-1.59882 -> 0,42.001,-22.0597 controls=0
+876: death type=1 position 0,42.001,-1.59882 -> 0,42.001,-22.0597 controls=0
+876: death type=4 position 0,42.001,-1.59882 -> 0,42.001,-22.0597 controls=0
+876: death type=8 position 0,42.001,-1.59882 -> 0,42.001,-22.0597 controls=0
+876: death type=7 position 0,42.001,0 -> 0,42.001,0 controls=0
+876: Original player death: 1 ordinary corpse / 3 gib paths / freefall omission / five live-checkpoint re-associations
+2/6 Test #876: player_death.private .............   Passed    4.01 sec
+test 886
+    Start 886: player_impulse.rules
+
+886: Test command: /home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_impulse_tests "rules" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-impulse-fixtures/rules"
+886: Working Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+886: Test timeout computed to be: 30
+3/6 Test #886: player_impulse.rules .............   Passed    0.10 sec
+test 887
+    Start 887: player_impulse.motion
+
+887: Test command: /home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_impulse_tests "motion" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-impulse-fixtures/motion"
+887: Working Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+887: Test timeout computed to be: 30
+887: 30 Hz: displacement=6.24472,0,3.12236 velocity=0,0,0
+887: 60 Hz: displacement=6.24472,0,3.12236 velocity=0,0,0
+887: 120 Hz: displacement=6.24472,0,3.12236 velocity=0,0,0
+4/6 Test #887: player_impulse.motion ............   Passed    0.42 sec
+test 888
+    Start 888: player_impulse.restore
+
+888: Test command: /home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_impulse_tests "restore" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-impulse-fixtures/restore"
+888: Working Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+888: Test timeout computed to be: 30
+5/6 Test #888: player_impulse.restore ...........   Passed    0.11 sec
+test 889
+    Start 889: player_impulse.private
+
+889: Test command: /home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_impulse_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+889: Working Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+889: Test timeout computed to be: 120
+889: Original Cultist shots=25 impulses=25 player HP=0 position=-2.55707,42.001,262.132
+6/6 Test #889: player_impulse.private ...........   Passed    1.74 sec
+
+The following tests passed:
+	ai_runtime.clearance_private
+	player_death.private
+	player_impulse.rules
+	player_impulse.motion
+	player_impulse.restore
+	player_impulse.private
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+ai_runtime        =  86.90 sec*proc (1 test)
+headless          =  93.28 sec*proc (6 tests)
+physics           =   2.37 sec*proc (4 tests)
+player_death      =   4.01 sec*proc (1 test)
+player_impulse    =   2.37 sec*proc (4 tests)
+private           =  92.65 sec*proc (3 tests)
+
+Total Test time (real) =  93.29 sec

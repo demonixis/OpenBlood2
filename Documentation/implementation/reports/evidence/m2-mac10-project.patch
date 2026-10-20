@@ -1,0 +1,1311 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index b498eb1..1cb09cd 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -524,3 +524,5 @@ The [destructible-model continuation](../Documentation/Implementation/M2_DESTRUC
+ The [SoundFX continuation](../Documentation/Implementation/M2_SOUND_FX.md) connects original nonstreaming state/command rules and retained audio. Read [contracts](docs/SOUND_FX_CONTRACTS.md). Preserve startup deadline cancellation, ambient-only looping, whole-string commands, ramp interruption/restart and stale deadlines. Owned strings fix duplicate release; source filtering remains after startup. Historical VoiceType schemas and FileStream/TIMESYNC remain failures, including all five CityHub entries. No class-count increase certifies playback. Safe NEW_LEVEL and M2 remain open.
+ 
+ The [PCM streaming continuation](../Documentation/Implementation/M2_AUDIO_STREAM.md) supplies real disk-backed Sound/SoundFX playback. Read [contracts](docs/AUDIO_STREAM_CONTRACTS.md). Preserve REZ slice bounds, two fixed sample windows, local sample clocks, failed-read diagnostics and world/source voice ownership. VoiceType=0 is explicit unused historical metadata only; nonzero values and TypeAction remain rejected. Compressed streams, reverb/priority arbitration and late network synchronization remain unavailable. CityHub has 418 created / 31 transferred sounds / 32 unsupported / four failed; safe NEW_LEVEL and M2 remain open.
++
++The [Mac-10 continuation](../Documentation/Implementation/M2_MAC10.md) connects original weapon ID 2, both-hand firing, pickups, NPC drops and autonomous Cultist use. Read [contracts](docs/MAC10_CONTRACTS.md). Preserve marker-driven cadence, complete primary-sequence fallback when alt_fire is absent, typed pickup acknowledgements and checked detached-hand lifetime. Chrome/multiplayer boost and view-key audio remain unavailable. CityHub has 419 created / 31 transferred sounds / 31 unsupported / four failed; safe NEW_LEVEL and M2 remain open.
+diff --git a/README.md b/README.md
+index e74e56a..e80368d 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [Mac-10 continuation](../Documentation/Implementation/M2_MAC10.md) connects original automatic fire, dual inventory, pickup/NPC drop and autonomous Cultist use. Actual left-view assets exercise the restored original alternate-animation fallback. CityHub now has 419 created objects, 31 transferred sounds, 31 unsupported and four failed entries; earlier counts below are historical. Chrome, remaining required services and safe NEW_LEVEL keep M2 incomplete.
++
+ The [audio-stream continuation](../Documentation/Implementation/M2_AUDIO_STREAM.md) connects real bounded PCM reads from REZ and retains observed VoiceType=0 metadata. CityHub now has 418 created objects, 31 transferred sounds, 32 unsupported and four failed entries; its five SoundFX create, four start initially, and 35 streamed voices share 384 KiB of buffers. Compressed streams, TypeAction schemas, required remaining services and safe NEW_LEVEL keep M2 incomplete.
+ 
+ The [SoundFX continuation](../Documentation/Implementation/M2_SOUND_FX.md) connects original nonstreaming ramp/ON/OFF rules to real audio and inspection. The private catalog exposes unresolved historical schemas on all 124 authored emitters (121 VoiceType / three TypeAction). CityHub remains 413 created; its five SoundFX entries are now explicit schema failures (32 unsupported / 40 failed), not successful playback. Streaming, safe NEW_LEVEL and M2 remain incomplete.
+diff --git a/docs/AI_FIRE_CONTRACTS.md b/docs/AI_FIRE_CONTRACTS.md
+index 9759ec6..846971c 100644
+--- a/docs/AI_FIRE_CONTRACTS.md
++++ b/docs/AI_FIRE_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original AI weapon choice and standing fire
+ 
++The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.
++
+ > [Destructible model contracts](DESTRUCTABLE_MODEL_CONTRACTS.md) now implement
+ > the CDestructableModel-only IGNORE_DESTRUCTABLE branch in CheckClearShot.
+ > Earlier absence statements below are historical; CanSee keeps its own filter.
+diff --git a/docs/INVENTORY_STATE_CONTRACTS.md b/docs/INVENTORY_STATE_CONTRACTS.md
+index 0ca2f8f..6aeef62 100644
+--- a/docs/INVENTORY_STATE_CONTRACTS.md
++++ b/docs/INVENTORY_STATE_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original inventory Save/Load subset
+ 
++The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.
++
+ > Continued by [named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md): supported
+ > captured players can enter an already loaded different world at a named start.
+ > Automatic NEW_LEVEL still refuses; staged cleanup is not world rollback.
+diff --git a/docs/M2_MAC10_SOURCES.json b/docs/M2_MAC10_SOURCES.json
+new file mode 100644
+index 0000000..16a91a3
+--- /dev/null
++++ b/docs/M2_MAC10_SOURCES.json
+@@ -0,0 +1,73 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "669d1064e1098e3c56da5dbd2ad49b77bf3b7f8d",
++  "status": "M2 incomplete; original Mac-10 weapon, pickup, NPC use/drop and view-animation fallback",
++  "references": [
++    {
++      "source": "sources/blood2/Shared/WeaponDefs.cpp",
++      "source_sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
++      "purpose": "Complete original Mac-10 WeaponData fields, primary/alternate loop flags, spreads and resources."
++    },
++    {
++      "source": "sources/blood2/Shared/SharedDefs.h",
++      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "purpose": "Original weapon identifier 2."
++    },
++    {
++      "source": "sources/blood2/Shared/ClientRes.h",
++      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
++      "purpose": "Original resource identifier 354."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameWeapons.h",
++      "source_sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19",
++      "purpose": "CSubMachineGun uses generic CWeapon firing; chrome and multiplayer boost remain outside supported scope."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "purpose": "ObtainWeapon type selection, dual inventory and original acquisition/drop rules."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/WeaponPickups.cpp",
++      "source_sha256": "116eac417209ee2cc523044e02ff615406b597164df9df5d5f2e0be80cfbc1d4",
++      "purpose": "SubMachineGunPU constructor and SpawnWeaponPickup case."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/HandWeaponModel.cpp",
++      "source_sha256": "480adb2a0ad140120bb9ddb160cf8f8112508abdf70e218067213e0f04c8ed96",
++      "purpose": "Original detached hand support-to-pickup transfer."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "purpose": "SUBMA prefix parsing and generic standing fire/aiming paths."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
++      "source_sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
++      "purpose": "SetupViewModel absent-idle and absent-alternate fallback; original animation/FIRE_KEY loop."
++    }
++  ],
++  "implementation": [
++    "src/game/original/WeaponDefs.cpp",
++    "src/game/original/Weapon.h",
++    "src/game/original/InventoryMgr.cpp",
++    "src/game/original/WeaponPickups.cpp",
++    "src/game/original/HandWeaponModel.cpp",
++    "src/game/original/AIRuntime.cpp",
++    "src/game/original/AIFire.cpp",
++    "src/game/original/ViewWeapon.cpp"
++  ],
++  "adaptations": [
++    "Typed original weapon/pickup services; explicit class registration",
++    "Existing checked callback/attachment ownership and deferred removals",
++    "No new mutable game global, dependency or commercial/reference asset modification"
++  ],
++  "unsupported": [
++    "Chrome/environment mapping, muzzle-flash presentation, recoil and casing ejection",
++    "View-model SOUND_KEY stock-folding audio remains indexed, not played",
++    "Multiplayer damage boost and player-initiated dropping",
++    "Other weapons, required services and safe NEW_LEVEL; M2 remains incomplete"
++  ]
++}
+diff --git a/docs/MAC10_CONTRACTS.md b/docs/MAC10_CONTRACTS.md
+new file mode 100644
+index 0000000..2de30a3
+--- /dev/null
++++ b/docs/MAC10_CONTRACTS.md
+@@ -0,0 +1,75 @@
++# Original Ingram Mac-10
++
++Read the [source ledger](M2_MAC10_SOURCES.json), [weapon](WEAPON_CONTRACTS.md),
++[fire audio](WEAPON_AUDIO_CONTRACTS.md), [impact](WEAPON_IMPACT_CONTRACTS.md),
++[drop](WEAPON_DROP_CONTRACTS.md), [inventory-state](INVENTORY_STATE_CONTRACTS.md)
++and [AI fire](AI_FIRE_CONTRACTS.md) contracts. This extends their supported weapon
++set; it does not replace their lifetime, damage or original-code boundaries.
++
++## Original rules and animation
++
++Weapon ID 2 uses the complete original Mac-10 WeaponData, pistol animation column,
++bullet pool, one round/vector per shot, 8–12 damage, range 3500, primary spread
++200/100 and alternate spread 75/25. Both fire animations loop. The .1/.5-second
++reload fields govern entry into the source firing state; they do not impose an
++invented per-marker rate limiter. FIRE_KEY events drive each client shot, so the
++actual animation duration governs sustained firing. NPCs retain their original
++standing-fire cadence and aiming, including the case-sensitive SUBMA prefix.
++
++CSubMachineGun uses the existing generic CWeapon vector/impact/damage/hearing/audio
++services. Four retained fire-sound slots, ammo acceptance, active-Fire guards and
++deferred callback removal stay unchanged. No new global or dependency is added.
++
++Original CViewWeapon::SetupViewModel maps absent idle to static_model. If alt_fire
++is absent, all three alternate indices copy the corresponding primary indices.
++The port now includes these previously omitted source rules for every supported
++view weapon. The installed left Mac-10 has only static_model, draw and fire;
++its right model also has start_alt_fire, alt_fire and end_alt_fire. Do not invent
++an alternate clip or suppress the test: the real left alternate action must emit
++primary-animation FIRE_KEY events with the alternate weapon parameters/audio.
++
++## Acquisition, ownership and restore
++
++SubMachineGunPU retains the original WeaponPickup ancestry, Mac10_pu ABC/DTX,
++resource ID 354, display name and 20 bullet value. MID_ADDWEAPON accepts supported
++weapon IDs 1 and 2 only. The first acquisition adds a right weapon, the second
++adds a left weapon; later pickups require accepted ammo. Full dual inventories
++with full ammo refuse collection, and zero-ammo duplicates remain in the world.
++Existing dead-player gates and single-owner acknowledgement apply unchanged.
++
++NPC DropCurrentWeapon detaches a Mac-10 hand with the existing checked ownership
++transfer, original velocity, first-update wait and support check. It survives
++owner deletion, then creates the actual SubMachineGunPU with 20 bullets and only
++then removes the hand. The helper's no-ammo variant stays zero. Spawn history
++records the actual pickup class. Player drops, string-spawn bounce and arbitrary
++SpawnObject weapon aliases remain unavailable. The ordinary box solver remains
++replacement physics, not a retail-equivalence claim.
++
++Typed inventory snapshots accept ID 2 in both hands and rebuild owned weapons and
++inventory back-pointers; no transient shot state or raw pointer is serialized.
++Unchanged negative tests now use unsupported Flaregun ID 3 instead of supported
++ID 2. Other unsupported IDs still fail. World preparation and isolated destination
++rehearsal see the new class without granting permission for a live transition.
++
++## Inspection, evidence and limits
++
++Weapons shows the real definition, primary/alternate loop and reload values,
++current ABC clip, fallback, FIRE_KEY/shot/ammo/audio state and original resource
++paths. The explicit diagnostic grant can acquire a second Mac-10; authored pickup
++collection remains separate. Existing pickup, attachment, NPC and spawn panels
++expose hidden, removed and failed objects. Rendering never advances gameplay.
++
++Tests cover real private ABC/DTX/WAV resources, both hands and firing modes,
++release/dry fire, health damage, reentrant shooter removal, pickups/full pools,
++independent dropped-hand lifetime, restore and autonomous Cultist attacks in a
++labelled synthetic arena. The GPU test renders both actual textured view models,
++checks pixels on both sides, and unloads/reloads with no inspector dependency.
++Private generated captures stay in ignored build directories.
++
++Chrome/environment mapping from CSubMachineGun's original constructor is not
++rendered; the multiplayer-only damage boost is not implemented because multiplayer
++is unavailable. Muzzle flashes/illumination, recoil, casing ejection and stock-fold
++SOUND_KEY playback remain unimplemented (the latter is only indexed). Actual fire
++and selected impact WAVs use existing playback. No full encounter, complete
++CityHub gameplay, retail timing parity or additional platform support is claimed.
++Required remaining services and safe NEW_LEVEL keep M2 incomplete.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index c6a4b2b..47b80b7 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -907,3 +907,12 @@ retail implementation. Sound/SoundFX preserve observed VoiceType=0 as documented
+ unused metadata; no voice-category behavior is invented. Nonzero values and
+ TypeAction still reject. See [ledger](M2_AUDIO_STREAM_SOURCES.json) and
+ [contracts](AUDIO_STREAM_CONTRACTS.md). No new dependency or mutable global is added.
++
++## Original Ingram Mac-10
++
++The original WeaponData, CSubMachineGun selection, SubMachineGunPU, SUBMA parser
++and generic NPC/vector fire paths now use existing typed services. Original
++SetupViewModel fallback restores missing alternate/idle animation handling, including
++the actual left Mac-10. See [ledger](M2_MAC10_SOURCES.json) and
++[contracts](MAC10_CONTRACTS.md). Chrome, multiplayer boost and view-key audio remain
++explicitly unavailable. No source asset, dependency or mutable game global is added.
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index 805e4ee..646188f 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original Inventory and Vector Weapon Boundary
+ 
++The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.
++
+ > Extended by [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md): original multi-hit
+ > material rules, selected impact audio and automatic impact hearing now execute.
+ > Earlier impact-audio omissions are historical; visuals and the M2 gate remain open.
+diff --git a/docs/WEAPON_DROP_CONTRACTS.md b/docs/WEAPON_DROP_CONTRACTS.md
+index afb7404..a015897 100644
+--- a/docs/WEAPON_DROP_CONTRACTS.md
++++ b/docs/WEAPON_DROP_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original NPC weapon drops and Beretta pickups
+ 
++The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.
++
+ > Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
+ > transfer ordinary deaths. Earlier blanket corpse omissions are historical;
+ > fire/gibs, corpse damage, required FX and complete M2 remain unavailable.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 5a53e62..8c6e034 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -373,6 +373,8 @@ namespace OpenBlood2
+         {
+             if (add_beretta_request)
+                 player->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA);
++            if (add_mac10_request)
++                player->m_InventoryMgr.ObtainWeapon(WEAP_SUBMACHINEGUN);
+             if (add_ammo_request)
+                 player->m_InventoryMgr.AddAmmo(AMMO_BULLET, 50);
+             if (weapon_input_request)
+@@ -382,7 +384,7 @@ namespace OpenBlood2
+             if (movement_input_request)
+                 game.client_shell.movement_input = *movement_input_request;
+         }
+-        add_beretta_request = add_ammo_request = false;
++        add_beretta_request = add_mac10_request = add_ammo_request = false;
+         weapon_input_request.reset();
+         weapon_aim_request.reset();
+         movement_input_request.reset();
+@@ -1360,9 +1362,10 @@ namespace OpenBlood2
+                         player->m_damage.IsDead(), player->m_damage.m_bNighInvulnerable);
+             ImGui::TextWrapped("Model: %s | Skin: %s (decode status in 3D view)", record->state.m_Filename,
+                                record->state.m_SkinName);
+-            ImGui::TextWrapped("Requested slot 1: %u. Current slot: %u. Original inventory owns the Beretta/knife; "
+-                               "inspect their use in Weapons. Muzzle light exists but is not rendered.",
+-                               player->m_InventoryMgr.requested_weapons[0], player->m_InventoryMgr.m_nCurWeaponSlot);
++            ImGui::TextWrapped(
++                "Requested slot 1: %u. Current slot: %u. Original inventory owns supported original weapons; "
++                "inspect their use in Weapons. Muzzle light exists but is not rendered.",
++                player->m_InventoryMgr.requested_weapons[0], player->m_InventoryMgr.m_nCurWeaponSlot);
+             if (!player->pending_model_commands.empty())
+             {
+                 ImGui::TextUnformatted("Unhandled character model commands:");
+@@ -1787,7 +1790,7 @@ namespace OpenBlood2
+     }
+     void Inspector::draw_weapons(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextUnformatted("Original inventory / Beretta 92F / Chosen Knife");
++        ImGui::TextUnformatted("Original inventory / Beretta 92F / Ingram Mac-10 / Chosen Knife");
+         auto* player = game.server_shell.Player(game.local_client);
+         if (!player)
+         {
+@@ -1855,7 +1858,10 @@ namespace OpenBlood2
+             ImGui::SameLine();
+             if (ImGui::Button("Obtain second Beretta (inspection)"))
+                 add_beretta_request = true;
+-            ImGui::TextWrapped("These call the inventory directly; world pickup classes are not yet connected.");
++            if (ImGui::Button("Obtain Mac-10 (inspection)"))
++                add_mac10_request = true;
++            ImGui::TextWrapped("These diagnostic grants call inventory directly. Beretta/Mac-10 world pickups also use "
++                               "original collection rules; chrome and muzzle flashes remain unavailable.");
+         }
+         auto aim = game.client_shell.rotation;
+         if (ImGui::SliderAngle("Inspection yaw", &aim.yaw, -180, 180) |
+@@ -1887,6 +1893,11 @@ namespace OpenBlood2
+         ImGui::TextWrapped("State %u | FIRE_KEY events %llu | Client shots %llu", static_cast<unsigned>(view.state),
+                            static_cast<unsigned long long>(view.fire_keys),
+                            static_cast<unsigned long long>(view.shots));
++        ImGui::Text("Reload %.2f / %.2f s | Loop primary %s / alternate %s", definition.m_fReloadTime,
++                    definition.m_fAltReloadTime, definition.m_bLoopAnim ? "yes" : "no",
++                    definition.m_bAltLoopAnim ? "yes" : "no");
++        if (view.model && animation_index(*view.model, "alt_fire") == no_animation)
++            ImGui::TextUnformatted("Original alternate animation fallback: primary start/fire/end clips.");
+         draw_weapon_sound(*weapon, game);
+         if (view.model && view.animation.animation < view.model->animations.size())
+         {
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index bc71192..e09820e 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -81,7 +81,7 @@ namespace OpenBlood2
+         ObjectId container_selection{}, container_toggle_request{};
+         std::optional<DVector> player_position_request;
+         std::optional<MovementInput> movement_input_request;
+-        bool select_weapons = false, add_beretta_request = false, add_ammo_request = false;
++        bool select_weapons = false, add_beretta_request = false, add_mac10_request = false, add_ammo_request = false;
+         int weapon_slot_request = -1;
+         bool weapon_left = false;
+         std::optional<WeaponInput> weapon_input_request;
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 903babd..34aefba 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -81,8 +81,8 @@ namespace OpenBlood2
+         const auto trial_before = g.destination_trial.attempts;
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+-            !g.destination_trial.player_entered || g.destination_trial.created != 418 ||
+-            g.destination_trial.unknown != 32 || g.destination_trial.failed != 4 ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 419 ||
++            g.destination_trial.unknown != 31 || g.destination_trial.failed != 4 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+@@ -100,8 +100,8 @@ namespace OpenBlood2
+                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
+                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+                g.destination_inspection.source_revision == old_revision &&
+-               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 453 &&
+-               g.destination_inspection.unknown == 32 && g.destination_inspection.invalid == 0 &&
++               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 454 &&
++               g.destination_inspection.unknown == 31 && g.destination_inspection.invalid == 0 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/game/original/AIFire.cpp b/src/game/original/AIFire.cpp
+index 35b80bd..6eea6fc 100644
+--- a/src/game/original/AIFire.cpp
++++ b/src/game/original/AIFire.cpp
+@@ -122,9 +122,10 @@ bool AI_Mgr::Fire(bool alternate)
+     auto* weapon = m_InventoryMgr.CurrentWeapon();
+     if (!weapon)
+         return fail(FireResult::Unavailable, "AI has no current weapon");
+-    if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_MELEE &&
+-        weapon->data.m_nType != WEAP_NAGA_EYEBEAM && weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST &&
+-        weapon->data.m_nType != WEAP_GIDEON_WIND && weapon->data.m_nType != WEAP_GIDEON_SHIELD)
++    if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_SUBMACHINEGUN &&
++        weapon->data.m_nType != WEAP_MELEE && weapon->data.m_nType != WEAP_NAGA_EYEBEAM &&
++        weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST && weapon->data.m_nType != WEAP_GIDEON_WIND &&
++        weapon->data.m_nType != WEAP_GIDEON_SHIELD)
+         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
+     DRotation rotation;
+     const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM;
+diff --git a/src/game/original/AIRuntime.cpp b/src/game/original/AIRuntime.cpp
+index 6f21908..3f296d3 100644
+--- a/src/game/original/AIRuntime.cpp
++++ b/src/game/original/AIRuntime.cpp
+@@ -24,6 +24,8 @@ namespace
+             id = WEAP_GIDEON_WIND;
+         else if (name.starts_with("NAGA_BLAST"))
+             id = WEAP_NAGA_EYEBEAM;
++        else if (name.starts_with("SUBMA"))
++            id = WEAP_SUBMACHINEGUN;
+         else if (name.starts_with("MELEE"))
+             id = WEAP_MELEE;
+         else
+diff --git a/src/game/original/HandWeaponModel.cpp b/src/game/original/HandWeaponModel.cpp
+index dfec2b3..f4c9ce4 100644
+--- a/src/game/original/HandWeaponModel.cpp
++++ b/src/game/original/HandWeaponModel.cpp
+@@ -12,8 +12,8 @@ bool CHandWeaponModel::Drop(HATTACHMENT attachment)
+     HATTACHMENT actual = 0;
+     DVector position, dims;
+     DRotation rotation;
+-    if (!s || dropped || type != WEAP_BERETTA || !s->IsObjectAlive(owner) || !s->IsObjectAlive(m_hObject) ||
+-        s->FindAttachment(owner, m_hObject, &actual) != DE_OK || actual != attachment ||
++    if (!s || dropped || (type != WEAP_BERETTA && type != WEAP_SUBMACHINEGUN) || !s->IsObjectAlive(owner) ||
++        !s->IsObjectAlive(m_hObject) || s->FindAttachment(owner, m_hObject, &actual) != DE_OK || actual != attachment ||
+         s->GetObjectPos(owner, &position) != DE_OK || s->GetObjectRotation(owner, &rotation) != DE_OK ||
+         s->GetModelAnimUserDims(m_hObject, &dims, s->GetModelAnimation(m_hObject)) != DE_OK || !physics_vector(dims) ||
+         dims.x <= 0 || dims.y <= 0 || dims.z <= 0)
+@@ -82,7 +82,7 @@ DDWORD CHandWeaponModel::EngineMessageFn(DDWORD message, void* data, DFLOAT reas
+                 {
+                     pickup = SpawnWeaponPickup(type, m_hObject, position, rotation, !player_owned);
+                     server->RecordSpawn({"CHandWeaponModel",
+-                                         "BerettaPU",
++                                         type == WEAP_BERETTA ? "BerettaPU" : "SubMachineGunPU",
+                                          pickup ? "Dropped weapon transferred" : "Dropped weapon pickup failed",
+                                          pickup,
+                                          position,
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index 8a1d29c..91127d0 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -170,6 +170,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
+     std::unique_ptr<CWeapon> weapon;
+     if (type == WEAP_BERETTA)
+         weapon = std::make_unique<CBeretta>();
++    else if (type == WEAP_SUBMACHINEGUN)
++        weapon = std::make_unique<CSubMachineGun>();
+     else if (type == WEAP_MELEE)
+         weapon = std::make_unique<CMelee>();
+     else if (type == WEAP_NAGA_EYEBEAM)
+diff --git a/src/game/original/ViewWeapon.cpp b/src/game/original/ViewWeapon.cpp
+index 1eec2a8..23704c2 100644
+--- a/src/game/original/ViewWeapon.cpp
++++ b/src/game/original/ViewWeapon.cpp
+@@ -47,6 +47,15 @@ bool CViewWeapon::Create(DBYTE weapon, bool left_hand, ModelStore& models, Resou
+     start_ = {index("start_fire"), index("start_alt_fire")};
+     fire_ = {index("fire"), index("alt_fire")};
+     stop_ = {index("end_fire"), index("end_alt_fire")};
++    // Original SetupViewModel: absent alternate clips reuse the complete primary sequence.
++    if (idle_ == no_animation)
++        idle_ = rest_;
++    if (fire_[1] == no_animation)
++    {
++        start_[1] = start_[0];
++        fire_[1] = fire_[0];
++        stop_[1] = stop_[0];
++    }
+     animation.animation = no_animation;
+     animation.looping = false;
+     state = WS_DRAW;
+diff --git a/src/game/original/Weapon.h b/src/game/original/Weapon.h
+index e4d8b98..45350a2 100644
+--- a/src/game/original/Weapon.h
++++ b/src/game/original/Weapon.h
+@@ -138,6 +138,11 @@ class CBeretta final : public CWeapon
+   public:
+     CBeretta() : CWeapon(WEAP_BERETTA) {}
+ };
++class CSubMachineGun final : public CWeapon
++{
++  public:
++    CSubMachineGun() : CWeapon(WEAP_SUBMACHINEGUN) {}
++};
+ class CMelee final : public CWeapon
+ {
+   public:
+diff --git a/src/game/original/WeaponDefs.cpp b/src/game/original/WeaponDefs.cpp
+index 40047b3..6a3bf32 100644
+--- a/src/game/original/WeaponDefs.cpp
++++ b/src/game/original/WeaponDefs.cpp
+@@ -2,6 +2,66 @@
+ namespace
+ {
+     constexpr WeaponData definitions[] = {
++        // Ingram Mac-10 Sub-machine Gun
++        {
++            "Models\\Weapons\\Mac10_pv.abc",              // Model
++            "Models\\Weapons\\lh_Mac10_pv.abc",           // Model
++            "Skins\\Weapons\\C_Mac10_pv_t.dtx",           // Skin
++            "Models\\Powerups\\Mac10_pu.abc",             // 3rd person model
++            "Skins\\Powerups\\Mac10_pu.dtx",              // 3rd person skin
++            WEAP_SUBMACHINEGUN,                           // Type
++            TYPE_PISTOL,                                  // Fire type
++            AMMO_BULLET,                                  // Ammo type
++            1,                                            // Ammo Use
++            1,                                            // Alt Ammo Use
++            8.0f,                                         // Min Damage
++            12.0f,                                        // Max Damage
++            8.0f,                                         // Min Alt damage
++            12.0f,                                        // Max Alt damage
++            0.1f,                                         // Reload time
++            0.5f,                                         // Alt reload time
++            {200.0f, 100.0f},                             // Spread
++            {75.0f, 25.0f},                               // Alt Spread
++            0.0f,                                         // Projectile Velocity
++            0.0f,                                         // Alt Projectile Velocity
++            3500.0f,                                      // Range
++            3500.0f,                                      // Alt Range
++            1,                                            // Shots per fire
++            1,                                            // Alt Shots per fire
++            2,                                            // Strength or Magic required
++            3,                                            // Two-handed Strength or Magic required
++            0,                                            // Damage Radius (projectiles)
++            0,                                            // Alt Damage Radius (projectiles)
++            DFALSE,                                       // Alt fire zoom
++            DFALSE,                                       // Semi-auto
++            "Sounds\\weapons\\mac10\\fire.wav",           // Fire sound
++            "Sounds\\weapons\\mac10\\alt.wav",            // Alt Fire sound
++            "",                                           // Empty weapon sound
++            "",                                           // Alt Empty weapon sound
++            NULL,                                         // Projectile class
++            NULL,                                         // Alt Projectile class
++            100,                                          // Muzzle Flash radius
++            {1.0f, 0.68f, 0.35f},                         // Muzzle Flash color
++            "Ingram Mac-10",                              // Name
++            IDS_WEAPON_MAC10,                             // Name ID (resource)
++            "Sprites\\mac10flare.spr",                    // flash sprite name
++            "Sprites\\mac10flare.spr",                    // alt flash Sprite name
++            0.01f,                                        // Flash duration
++            0.11f,                                        // Flash scale
++            {0.0f, 0.0f, 0.0f},                           // 3rd person gun offset
++            {0.8f, -0.7f, 2.0f},                          // Gun Offset
++            {1.0f, 0.0f, 1.0f},                           // Muzzle Offset
++            {0.03f, 0.03f, 0.15f},                        // Recoil
++            {8.0f, -5.75f, 28.0f},                        // Flash position
++            0.625f,                                       // Eject interval
++            0.0f,                                         // View kick
++            DFALSE,                                       // View kick is Cumulative
++            DTRUE,                                        // Animation looping
++            DTRUE,                                        // Alt anim looping
++            "interface\\statusbar\\weapons\\mac10.pcx",   // Icon for status bar
++            "interface\\statusbar\\weapons\\mac10_h.pcx", // Highlighted icon for status bar
++        },
++
+         // Beretta (Pistol)
+         {
+             "Models\\Weapons\\Beretta_pv.abc",    // View Model
+diff --git a/src/game/original/WeaponDefs.h b/src/game/original/WeaponDefs.h
+index 56e5146..b8ef9db 100644
+--- a/src/game/original/WeaponDefs.h
++++ b/src/game/original/WeaponDefs.h
+@@ -1,11 +1,12 @@
+ #pragma once
+ #include "basedefs_de.h"
+ // Selected original definitions; complete source fields, base-game weapon numbering.
+-inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38, WEAP_ZEALOT_ENERGYBLAST = 27,
+-                       WEAP_SOUL_HOOK = 23, WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42;
++inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38,
++                       WEAP_ZEALOT_ENERGYBLAST = 27, WEAP_SOUL_HOOK = 23, WEAP_GIDEON_SHIELD = 41,
++                       WEAP_GIDEON_WIND = 42;
+ inline constexpr DBYTE TYPE_RIFLE = 0, TYPE_PISTOL = 2, TYPE_MELEE = 4, TYPE_MAGIC = 8, AMMO_NONE = 0, AMMO_BULLET = 1,
+                        AMMO_SHELL = 2, AMMO_BMG = 3;
+-inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_KNIFE = 366;
++inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_MAC10 = 354, IDS_WEAPON_KNIFE = 366;
+ // Weapon spread structure
+ typedef struct Spread_t
+ {
+diff --git a/src/game/original/WeaponPickups.cpp b/src/game/original/WeaponPickups.cpp
+index 625e48a..1da7c93 100644
+--- a/src/game/original/WeaponPickups.cpp
++++ b/src/game/original/WeaponPickups.cpp
+@@ -8,6 +8,13 @@ BerettaPU::BerettaPU()
+     display_name = "Beretta";
+     resource_id = 350;
+ }
++SubMachineGunPU::SubMachineGunPU()
++{
++    value = {OpenBlood2::PickupKind::Weapon, WEAP_SUBMACHINEGUN, 20};
++    file = "Mac10_pu";
++    display_name = "Sub-machine Gun";
++    resource_id = IDS_WEAPON_MAC10;
++}
+ DDWORD WeaponPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+ {
+     // The source string-spawn path bounces by default; that path is not imported.
+@@ -27,14 +34,15 @@ DDWORD WeaponPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+ HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector position, DRotation rotation, bool include_ammo)
+ {
+     auto* server = BaseClass::GetServerDE();
+-    if (!server || !server->IsObjectAlive(source) || type != WEAP_BERETTA)
++    if (!server || !server->IsObjectAlive(source) || (type != WEAP_BERETTA && type != WEAP_SUBMACHINEGUN))
+         return nullptr;
+     ObjectCreateStruct state;
+     state.m_Pos = position;
+     state.m_Rotation = rotation;
+     state.m_Flags = FLAG_VISIBLE | FLAG_TOUCH_NOTIFY;
+-    SAFE_STRCPY(state.m_Name, "Dropped Beretta pickup");
+-    auto* pickup = dynamic_cast<WeaponPickup*>(server->CreateObject(server->GetClass("BerettaPU"), &state));
++    SAFE_STRCPY(state.m_Name, type == WEAP_BERETTA ? "Dropped Beretta pickup" : "Dropped Mac-10 pickup");
++    auto* pickup = dynamic_cast<WeaponPickup*>(
++        server->CreateObject(server->GetClass(type == WEAP_BERETTA ? "BerettaPU" : "SubMachineGunPU"), &state));
+     if (!pickup)
+         return nullptr;
+     if (!server->IsObjectAlive(pickup->m_hObject) || !pickup->error.empty())
+diff --git a/src/game/original/WeaponPickups.h b/src/game/original/WeaponPickups.h
+index 3e2d5e7..f9d8774 100644
+--- a/src/game/original/WeaponPickups.h
++++ b/src/game/original/WeaponPickups.h
+@@ -17,4 +17,9 @@ class BerettaPU : public WeaponPickup
+   public:
+     BerettaPU();
+ };
++class SubMachineGunPU : public WeaponPickup
++{
++  public:
++    SubMachineGunPU();
++};
+ HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector, DRotation, bool include_ammo);
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 704da0b..47ee450 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -449,6 +449,7 @@ namespace OpenBlood2
+                                {{"PickupTriggerTarget", std::string{}}, {"PickupTriggerMessage", std::string{}}}};
+         const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}};
+         const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
++        const ClassInfo mac10_pickup{"SubMachineGunPU", &weapon_pickup, construct<SubMachineGunPU>, {}};
+         const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}};
+         const ClassInfo powerup_pickup{"PowerupPickup", &pickup, construct<PowerupPickup>, {}};
+         const ClassInfo health_base{"HealthBase", &powerup_pickup, construct<HealthBase>, {}};
+@@ -739,21 +740,21 @@ namespace OpenBlood2
+                objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
+                objects.register_class(key_pickup) && objects.register_class(pickup) &&
+                objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
+-               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+-               objects.register_class(health_base) && objects.register_class(armor_base) &&
+-               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
+-               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
+-               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
+-               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
+-               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
+-               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
+-               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
+-               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+-               objects.register_class(door) && objects.register_class(rotating_door) &&
+-               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
+-               objects.register_class(rotating_brush) && objects.register_class(hand_model) &&
+-               objects.register_class(corpse) && objects.register_class(energy_projectile) &&
+-               objects.register_class(shockwave_projectile);
++               objects.register_class(mac10_pickup) && objects.register_class(ammo_pickup) &&
++               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
++               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
++               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
++               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
++               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
++               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
++               objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
++               objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
++               objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
++               objects.register_class(toggle_trigger) && objects.register_class(door) &&
++               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
++               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
++               objects.register_class(hand_model) && objects.register_class(corpse) &&
++               objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_pickups.cpp b/src/game/server_pickups.cpp
+index edb5408..626116b 100644
+--- a/src/game/server_pickups.cpp
++++ b/src/game/server_pickups.cpp
+@@ -57,7 +57,7 @@ namespace OpenBlood2
+         auto* m = writable(h);
+         if (!m)
+             return DE_INVALIDPARAMS;
+-        const auto limit = value.kind == PickupKind::Ammo ? 8 : value.kind == PickupKind::Weapon ? 1 : 4;
++        const auto limit = value.kind == PickupKind::Ammo ? 8 : value.kind == PickupKind::Weapon ? 2 : 4;
+         const auto request = value.kind == PickupKind::Ammo     ? add_ammo_message
+                              : value.kind == PickupKind::Weapon ? add_weapon_message
+                                                                 : add_powerup_message;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 12479b6..7e60c3d 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1387,3 +1387,32 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME audio_stream.city COMMAND audio_stream_tests city "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(audio_stream.city PROPERTIES LABELS "headless;private;audio_stream" TIMEOUT 90)
+ endif()
++
++add_executable(mac10_tests mac10_tests.cpp)
++target_link_libraries(mac10_tests PRIVATE blood2_game)
++blood2_project_options(mac10_tests)
++foreach(case collect automatic damage restore drop)
++    add_test(NAME mac10.${case} COMMAND mac10_tests ${case} "${CMAKE_CURRENT_BINARY_DIR}/mac10-fixtures/${case}")
++    set_tests_properties(mac10.${case} PROPERTIES LABELS "headless;mac10" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME mac10.private COMMAND mac10_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(mac10.private PROPERTIES LABELS "headless;private;mac10" TIMEOUT 90)
++    if(BLOOD2_SANITIZERS)
++        # Two full original intro/automatic-fire cycles exceed 90s under ASan/UBSan.
++        # Keep every simulation frame, both reloads and all lifetime assertions.
++        set_tests_properties(mac10.private PROPERTIES TIMEOUT 240)
++    endif()
++endif()
++
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME mac10.ai COMMAND mac10_tests ai "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(mac10.ai PROPERTIES LABELS "headless;private;mac10" TIMEOUT 90)
++endif()
++if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
++    add_executable(mac10_gpu_tests mac10_gpu_tests.cpp ../src/app/model_scene.cpp)
++    target_link_libraries(mac10_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(mac10_gpu_tests)
++    add_test(NAME gpu.mac10 COMMAND mac10_gpu_tests "${BLOOD2_TEST_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/mac10-")
++    set_tests_properties(gpu.mac10 PROPERTIES LABELS "gpu;private;mac10" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++endif()
+diff --git a/tests/audio_stream_tests.cpp b/tests/audio_stream_tests.cpp
+index 2e9062b..d75a440 100644
+--- a/tests/audio_stream_tests.cpp
++++ b/tests/audio_stream_tests.cpp
+@@ -295,7 +295,7 @@ namespace
+             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
+                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
+                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
+-            CHECK(created == 418 && transferred == 31 && unknown == 32 && failed == 4 && fx == 5 && fx_voices == 4);
++            CHECK(created == 419 && transferred == 31 && unknown == 31 && failed == 4 && fx == 5 && fx_voices == 4);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_bytes());
+         }
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+index dd6953b..9d1a704 100644
+--- a/tests/destructable_model_tests.cpp
++++ b/tests/destructable_model_tests.cpp
+@@ -311,7 +311,7 @@ namespace
+                 ids.push_back(r->id);
+             }
+             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
+-            CHECK(created == 418 && unknown == 32 && failed == 4);
++            CHECK(created == 419 && unknown == 31 && failed == 4);
+             CHECK(update_model_scene(g, scene, error));
+             unsigned skin_failures = 0, triangles = 0;
+             for (auto id : ids)
+diff --git a/tests/inventory_state_tests.cpp b/tests/inventory_state_tests.cpp
+index f1b3f79..aa775bd 100644
+--- a/tests/inventory_state_tests.cpp
++++ b/tests/inventory_state_tests.cpp
+@@ -97,7 +97,7 @@ namespace
+             [](auto& s) { s.strength = 0; },
+             [](auto& s) { s.magic = 7; },
+             [](auto& s) { s.current_slot = 10; },
+-            [](auto& s) { s.right[2] = 2; },
++            [](auto& s) { s.right[2] = 3; },
+             [](auto& s) { s.left[2] = WEAP_BERETTA; },
+             [](auto& s) { s.left[0] = WEAP_MELEE; },
+             [](auto& s) { s.left[7] = WEAP_MELEE; },
+diff --git a/tests/mac10_fixture.h b/tests/mac10_fixture.h
+new file mode 100644
+index 0000000..b571124
+--- /dev/null
++++ b/tests/mac10_fixture.h
+@@ -0,0 +1,106 @@
++#pragma once
++#include "audio_fixture.h"
++#include "camera_fixture.h"
++#include "game/original/HandWeaponModel.h"
++#include "game/original/WeaponPickups.h"
++#include <algorithm>
++namespace test_mac10
++{
++    using namespace OpenBlood2;
++    inline bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        if (!test_player::setup(g, root))
++            return false;
++        test_player::Directory dir;
++        for (auto name : {"mac10_pv.abc", "lh_mac10_pv.abc"})
++        {
++            auto bytes = test_model::abc(true).b;
++            if (std::string_view(name).starts_with("lh_"))
++            {
++                // Length-prefixed alt_fire name, distinct from start_alt_fire/end_alt_fire.
++                const std::string needle("\x08\0alt_fire", 10), replacement("\x08\0no__fire", 10);
++                auto it = std::search(bytes.begin(), bytes.end(), needle.begin(), needle.end());
++                if (it == bytes.end())
++                    return false;
++                std::copy(replacement.begin(), replacement.end(), it);
++            }
++            dir.children["models"].children["weapons"].files[name] = std::move(bytes);
++        }
++        dir.children["skins"].children["weapons"].files["c_mac10_pv_t.dtx"] = {1, 2, 3};
++        dir.children["models"].children["powerups"].files["mac10_pu.abc"] = test_model::abc(true).b;
++        dir.children["skins"].children["powerups"].files["mac10_pu.dtx"] = {1, 2, 3};
++        for (auto name : {"fire.wav", "alt.wav"})
++            dir.children["sounds"].children["weapons"].children["mac10"].files[name] = test_audio::wave();
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        const auto [offset, size] = test_player::write_dir(w, dir);
++        w.patch(131, offset);
++        w.patch(135, size);
++        const auto path = root / "mac10.rez";
++        std::ofstream f(path, std::ios::binary);
++        f.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        f.close();
++        std::string error;
++        return g.resources.mount(path, error) && g.enter_player(error);
++    }
++    inline bool equip(GameSession& g, bool dual = true)
++    {
++        auto* p = g.server_shell.Player(g.local_client);
++        if (!p)
++            return false;
++        auto& inv = p->m_InventoryMgr;
++        std::string error;
++        if (inv.ObtainWeapon(WEAP_SUBMACHINEGUN, 2) != InventoryResult::Ok ||
++            (dual && inv.ObtainWeapon(WEAP_SUBMACHINEGUN, 2) != InventoryResult::Ok))
++            return false;
++        inv.SetAmmoCount(AMMO_BULLET, 200);
++        return g.select_weapon(2, error);
++    }
++    inline bool fire_modes(GameSession& g)
++    {
++        auto* p = g.server_shell.Player(g.local_client);
++        if (!p)
++            return false;
++        auto& inv = p->m_InventoryMgr;
++        for (bool left : {false, true})
++            for (bool alt : {false, true})
++            {
++                g.client_shell.weapon_input = {};
++                for (unsigned i = 0; i < 100; ++i)
++                    if (!g.step(.01))
++                        return false;
++                auto* w = inv.CurrentWeapon(left);
++                if (!w)
++                    return false;
++                const auto before = w->shots, keys = g.client_shell.weapons[left ? 1 : 0].fire_keys;
++                const auto ammo = inv.GetAmmoCount(1);
++                g.client_shell.weapon_input = {!alt, alt, left};
++                for (unsigned i = 0; i < 180; ++i)
++                    if (!g.step(.01))
++                        return false;
++                const auto delta = w->shots - before;
++                std::cout << "Mac10 " << (left ? "left" : "right") << ' ' << (alt ? "alternate" : "primary")
++                          << " shots=" << delta << " keys=" << g.client_shell.weapons[left ? 1 : 0].fire_keys - keys
++                          << " HP=" << p->m_damage.m_fHitPoints << " dead=" << p->m_damage.m_bDead
++                          << " state=" << g.client_shell.weapons[left ? 1 : 0].state << '\n';
++                if (delta < 2 || delta != g.client_shell.weapons[left ? 1 : 0].fire_keys - keys ||
++                    inv.GetAmmoCount(1) != ammo - delta || w->sounds_played != w->shots || w->sound_failures)
++                    return false;
++                if (w->last_shot.request.alternate != alt || w->last_shot.request.left != left)
++                    return false;
++            }
++        g.client_shell.weapon_input = {};
++        for (unsigned i = 0; i < 100; ++i)
++            if (!g.step(.01))
++                return false;
++        const auto right = inv.CurrentWeapon()->shots, left = inv.CurrentWeapon(true)->shots;
++        for (unsigned i = 0; i < 100; ++i)
++            if (!g.step(.01))
++                return false;
++        return inv.CurrentWeapon()->shots == right && inv.CurrentWeapon(true)->shots == left;
++    }
++} // namespace test_mac10
+diff --git a/tests/mac10_gpu_tests.cpp b/tests/mac10_gpu_tests.cpp
+new file mode 100644
+index 0000000..12f9bbe
+--- /dev/null
++++ b/tests/mac10_gpu_tests.cpp
+@@ -0,0 +1,85 @@
++#include "app/model_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "mac10_fixture.h"
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x " " << error << " " << SDL_GetError() << '\n';                            \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string error;
++    Runtime runtime;
++    CHECK(runtime.initialize(true, error));
++    GameSession g;
++    CHECK(g.initialize());
++    Config cfg;
++    cfg.data_dir = argv[1];
++    CHECK(g.resources.mount_game(cfg, error));
++    WorldRenderer renderer(runtime.gpu);
++    ModelView scene;
++    for (unsigned cycle = 0; cycle < 2; ++cycle)
++    {
++        CHECK(g.request_world("01_subwaya", error) && g.enter_player(error) && test_camera::complete_subway_intro(g));
++        CHECK(test_mac10::equip(g) && test_mac10::fire_modes(g));
++        CHECK(update_model_scene(g, scene, error) && scene.close_draws.size() == 2);
++        unsigned close = 0;
++        for (const auto& e : scene.entries)
++            if (e.close)
++            {
++                CHECK(e.visible && e.triangles > 0 && e.error.empty() && e.skin.find("Mac10") != std::string::npos);
++                ++close;
++            }
++        CHECK(close == 2);
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480));
++        CHECK(
++            renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480, error, true));
++        const auto& view = g.client_shell.view;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(commands && renderer.draw(commands, capture.texture, scene.mesh, scene.close_draws, view.position,
++                                        view.rotation, false, error));
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        CHECK(copy);
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 640;
++        region.h = 480;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 640;
++        target.rows_per_layer = 480;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        CHECK(SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(runtime.gpu));
++        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        unsigned left = 0, right = 0;
++        for (unsigned y = 0; y < 480; ++y)
++            for (unsigned x = 0; x < 640; ++x)
++            {
++                const auto* p = pixels + (y * 640 + x) * 4;
++                if (p[0] != pixels[0] || p[1] != pixels[1] || p[2] != pixels[2])
++                    (x < 320 ? left : right)++;
++            }
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        std::cout << "Mac10 GPU cycle=" << cycle << " left pixels=" << left << " right pixels=" << right << '\n';
++        CHECK(left > 100 && right > 100);
++        CHECK(capture.save((std::string(argv[2]) + std::to_string(cycle) + ".png").c_str()));
++        CHECK(g.unload_world() && update_model_scene(g, scene, error) && scene.close_draws.empty() &&
++              scene.entries.empty());
++        renderer.clear_geometry();
++        scene.clear();
++        CHECK(g.server.audio.voices().empty() && g.objects.attachments().empty());
++    }
++}
+diff --git a/tests/mac10_tests.cpp b/tests/mac10_tests.cpp
+new file mode 100644
+index 0000000..efc777e
+--- /dev/null
++++ b/tests/mac10_tests.cpp
+@@ -0,0 +1,284 @@
++#include "brush_fixture.h"
++#include "game/original/CultistAI.h"
++#include "mac10_fixture.h"
++#include <cmath>
++#include <functional>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool collect(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_mac10::setup(g, root));
++        auto& inv = g.server_shell.Player(g.local_client)->m_InventoryMgr;
++        inv.SetAmmoCount(1, 0);
++        for (unsigned n = 0; n < 3; ++n)
++        {
++            auto h = SpawnWeaponPickup(WEAP_SUBMACHINEGUN, g.client_shell.player, {300, 100, 300}, {}, true);
++            auto* p = dynamic_cast<SubMachineGunPU*>(g.server.HandleToObject(h));
++            CHECK(p && p->value.amount == 20 && p->resource_id == 354 && g.objects.get(h)->model);
++            if (n == 2)
++                inv.SetAmmoCount(1, inv.MaxAmmo(1));
++            CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player));
++            CHECK(p->picked_up == (n < 2));
++            if (n < 2)
++                CHECK(inv.GetAmmoCount(1) == 20 * (n + 1));
++            else
++            {
++                inv.SetAmmoCount(1, inv.MaxAmmo(1) - 1);
++                CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player) && p->picked_up &&
++                      inv.GetAmmoCount(1) == inv.MaxAmmo(1));
++            }
++            CHECK(g.objects.finish_frame() && !g.objects.get(h));
++        }
++        CHECK(inv.GetWeapon(2) && inv.GetWeapon(2, true));
++        auto h = SpawnWeaponPickup(2, g.client_shell.player, {300, 100, 300}, {}, false);
++        auto* p = dynamic_cast<WeaponPickup*>(g.server.HandleToObject(h));
++        CHECK(p && p->value.amount == 0 && g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player) &&
++              !p->picked_up);
++        CHECK(g.server.pickup_reports.size() == 3 && g.server.message_count() == 0);
++        CHECK(g.unload_world() && g.server.string_count() == 0);
++        return true;
++    }
++    bool automatic(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_mac10::setup(g, root) && test_mac10::equip(g) && test_mac10::fire_modes(g));
++        auto* w = g.server_shell.Player(g.local_client)->m_InventoryMgr.CurrentWeapon();
++        CHECK(w->data.m_bLoopAnim && w->data.m_bAltLoopAnim && !w->data.m_bSemiAuto);
++        CHECK(g.leave_player() && g.server.audio.voices().empty());
++        return true;
++    }
++    struct Victim : BaseClass
++    {
++        CDestructable damage;
++        bool remove = false;
++        Victim()
++        {
++            AddAggregate(&damage);
++        }
++        DDWORD EngineMessageFn(DDWORD m, void* p, float v) override
++        {
++            if (m == MID_INITIALUPDATE)
++            {
++                damage.Init(m_hObject, nullptr);
++                damage.SetHitPoints(1000);
++                damage.m_fMaxHitPoints = 1000;
++            }
++            return BaseClass::EngineMessageFn(m, p, v);
++        }
++        DDWORD ObjectMessageFn(HOBJECT sender, DDWORD m, HMESSAGEREAD r) override
++        {
++            auto result = BaseClass::ObjectMessageFn(sender, m, r);
++            if (remove && m == damage_message)
++            {
++                g_pServerDE->RemoveObject(sender);
++                g_pServerDE->RemoveObject(m_hObject);
++            }
++            return result;
++        }
++    };
++    bool damage(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_mac10::setup(g, root) && test_mac10::equip(g));
++        ClassInfo type{"Mac10Victim",
++                       g.objects.find_class("BaseClass"),
++                       []() -> std::unique_ptr<BaseClass> { return std::make_unique<Victim>(); },
++                       {}};
++        CHECK(g.objects.register_class(type));
++        DVector eye;
++        g.server.GetObjectPos(g.client_shell.player, &eye);
++        eye.y += g.server_shell.Player(g.local_client)->eye_level;
++        ObjectCreateStruct state;
++        state.m_Pos = vector_add(eye, {0, 0, 200});
++        state.m_Flags = FLAG_SOLID;
++        auto h = g.objects.create(&type, state);
++        CHECK(h);
++        DVector dims{100, 100, 20};
++        CHECK(g.server.SetObjectDims(h, &dims) == DE_OK);
++        auto* target = dynamic_cast<Victim*>(g.server.HandleToObject(h));
++        auto& inv = g.server_shell.Player(g.local_client)->m_InventoryMgr;
++        WeaponFire shot{eye, {0, 0, 1}, 42, WEAP_SUBMACHINEGUN, false, false};
++        for (bool alt : {false, true})
++        {
++            shot.alternate = alt;
++            const auto hp = target->damage.m_fHitPoints, ammo = inv.GetAmmoCount(1);
++            CHECK(g.server_shell.OnMessage(g.local_client, shot) == FireResult::Fired);
++            auto* w = inv.CurrentWeapon();
++            CHECK(w->last_shot.damage >= 8 && w->last_shot.damage <= 12 && w->last_shot.hit.object == h &&
++                  w->last_shot.damage_delivered);
++            CHECK(target->damage.m_fHitPoints < hp && inv.GetAmmoCount(1) == ammo - 1 && w->sounds_played == w->shots);
++        }
++        inv.SetAmmoCount(1, 0);
++        CHECK(g.server_shell.OnMessage(g.local_client, shot) == FireResult::Dry);
++        inv.SetAmmoCount(1, 2);
++        target->remove = true;
++        const auto owner = g.client_shell.player;
++        CHECK(g.server_shell.OnMessage(g.local_client, shot) == FireResult::Fired);
++        CHECK(g.objects.finish_frame() && !g.objects.get(owner) && !g.objects.get(h) && !g.server.message_count());
++        CHECK(g.unload_world() && g.server.audio.voices().empty());
++        return true;
++    }
++    bool restore(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_mac10::setup(g, root) && test_mac10::equip(g));
++        auto& inv = g.server_shell.Player(g.local_client)->m_InventoryMgr;
++        inv.SetAmmoCount(1, 73);
++        InventoryState snapshot;
++        std::string error;
++        CHECK(inv.Save(snapshot, error) && snapshot.right[2] == 2 && snapshot.left[2] == 2);
++        auto h = g.objects.create(g.objects.find_class("CPlayerObj"));
++        auto* detached = dynamic_cast<CPlayerObj*>(g.server.HandleToObject(h));
++        CHECK(detached);
++        CHECK(detached->m_InventoryMgr.Load(snapshot, InventoryLoadType::KeepAlive, error));
++        auto& loaded = detached->m_InventoryMgr;
++        CHECK(loaded.CurrentWeapon()->data.m_nType == 2 && loaded.CurrentWeapon(true) && loaded.GetAmmoCount(1) == 73);
++        CHECK(loaded.CurrentWeapon()->m_pInventoryMgr == &loaded && loaded.CurrentWeapon()->shots == 0);
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool drop(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_mac10::setup(g, root));
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_MODEL;
++        state.m_Pos = {300, 100, 300};
++        SAFE_STRCPY(state.m_Filename, "Models/Characters/Caleb.abc");
++        auto h = g.objects.create(g.objects.find_class("CBaseCharacter"), state);
++        auto* c = dynamic_cast<CBaseCharacter*>(g.server.HandleToObject(h));
++        CHECK(c);
++        auto& inv = c->m_InventoryMgr;
++        CHECK(inv.Init(h, nullptr) && inv.ObtainWeapon(2, 1) == InventoryResult::Ok &&
++              inv.ChangeWeaponSlot(1) == InventoryResult::Ok);
++        CHECK(inv.CurrentWeapon()->ShowHandModel(true));
++        const auto hand = inv.CurrentWeapon()->m_hHandModel;
++        CHECK(inv.DropCurrentWeapon() == InventoryResult::Ok && g.objects.get(hand) &&
++              g.objects.get(hand)->attachment == 0);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame() && g.objects.get(hand));
++        HOBJECT pickup = nullptr;
++        for (unsigned i = 0; i < 400 && !pickup; ++i)
++        {
++            CHECK(g.step(.01));
++            for (auto id : g.objects.snapshot())
++                if (dynamic_cast<SubMachineGunPU*>(g.server.HandleToObject(g.objects.get(id)->handle)))
++                    pickup = g.objects.get(id)->handle;
++        }
++        CHECK(pickup && !g.objects.get(hand));
++        auto* p = dynamic_cast<SubMachineGunPU*>(g.server.HandleToObject(pickup));
++        CHECK(p->value.amount == 20 && g.server.spawn_reports.back().request == "SubMachineGunPU");
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool ai(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config cfg;
++        cfg.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(cfg, error));
++        auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
++        for (auto& surface : floor.surfaces)
++            surface.flags = 1;
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        g.world_path = "synthetic Mac10 NPC arena with original resources";
++        g.state = SessionState::Inspection;
++        CHECK(g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
++                               {{"Name", std::string("START")}, {"Pos", DVector{0, 100, 200}}}));
++        auto h = g.objects.create(g.objects.find_class("CultistAI"), {}, Creation::World,
++                                  {{"Pos", DVector{0, 100, 0}}, {"AIWeapon1", std::string("SUBMACHINEGUN")}});
++        auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(h));
++        CHECK(a && a->RuntimeReady());
++        g.server_shell.PreStartWorld();
++        CHECK(g.server_shell.PostStartWorld() && g.enter_player(error));
++        auto* player = g.server_shell.Player(g.local_client);
++        for (unsigned tick = 0; tick < 600; ++tick)
++            CHECK(g.step(1.0 / 60));
++        auto* w = a->m_InventoryMgr.CurrentWeapon();
++        std::cout << "Mac10 NPC updates=" << a->runtime_updates << " shots=" << a->fire_shots
++                  << " HP=" << player->m_damage.m_fHitPoints << " error=" << a->runtime_error << '\n';
++        CHECK(a->RuntimeReady() && a->attack_updates > 0 && a->fire_shots > 0 && w &&
++              w->data.m_nType == WEAP_SUBMACHINEGUN && w->sounds_played == w->shots && !w->sound_failures &&
++              player->m_damage.m_fHitPoints < 100 && w->m_hHandModel);
++        CHECK(g.unload_world() && AI_Mgr::m_dwNumCabal == 0 && g.objects.attachments().empty());
++        return true;
++    }
++    bool private_game(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config cfg;
++        cfg.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(cfg, error));
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_subwaya", error) && g.enter_player(error) &&
++                  test_camera::complete_subway_intro(g));
++            CHECK(test_mac10::equip(g));
++            for (auto& view : g.client_shell.weapons)
++            {
++                std::cout << "View left=" << view.left << '\n';
++                if (view.model)
++                    for (auto& a : view.model->animations)
++                    {
++                        std::cout << a.name << " duration=" << a.duration;
++                        for (auto& k : a.keys)
++                            if (!k.text.empty())
++                                std::cout << " key@" << k.time << ':' << k.text;
++                        std::cout << '\n';
++                    }
++            }
++            CHECK(test_mac10::fire_modes(g));
++            auto& inv = g.server_shell.Player(g.local_client)->m_InventoryMgr;
++            CHECK(inv.CurrentWeapon()->m_hHandModel && inv.CurrentWeapon(true)->m_hHandModel);
++            CHECK(g.unload_world() && g.server.audio.voices().empty() && g.objects.attachments().empty());
++        }
++        CHECK(g.request_world("02_cityhub", error));
++        unsigned created = 0, unknown = 0, failed = 0, mac = 0;
++        for (std::size_t i = 0; i < g.entries.size(); ++i)
++        {
++            const auto& e = g.entries[i];
++            created += e.state == EntryState::Created;
++            unknown += e.state == EntryState::Unsupported;
++            failed += e.state == EntryState::Failed;
++            if (g.world.objects[i].class_name == "SubMachineGunPU")
++            {
++                ++mac;
++                CHECK(e.state == EntryState::Created);
++            }
++        }
++        std::cout << "CityHub created=" << created << " unknown=" << unknown << " failed=" << failed << " Mac10=" << mac
++                  << '\n';
++        CHECK(mac == 1 && created == 419 && unknown == 31 && failed == 4);
++        for (auto id : g.objects.snapshot())
++            if (auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(g.objects.get(id)->handle));
++                a && a->runtime_failed)
++                std::cout << "NPC failure " << a->runtime_error << '\n';
++        CHECK(g.unload_world());
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"collect", collect}, {"automatic", automatic},  {"damage", damage}, {"restore", restore},
++        {"drop", drop},       {"private", private_game}, {"ai", ai}};
++    auto it = cases.find(argv[1]);
++    return it != cases.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/pickup_tests.cpp b/tests/pickup_tests.cpp
+index 56d9843..79b0b1b 100644
+--- a/tests/pickup_tests.cpp
++++ b/tests/pickup_tests.cpp
+@@ -382,6 +382,13 @@ namespace
+                               gun->value.amount == 12);
+                         std::cout << "Authored BerettaPU: " << path << '\n';
+                     }
++                    if (source.class_name == "SubMachineGunPU")
++                    {
++                        auto* gun = dynamic_cast<PickupObject*>(g.objects.get(h)->game.get());
++                        CHECK(gun && gun->value.kind == PickupKind::Weapon && gun->value.type == WEAP_SUBMACHINEGUN &&
++                              gun->value.amount == 20 && gun->resource_id == IDS_WEAPON_MAC10);
++                        std::cout << "Authored SubMachineGunPU: " << path << '\n';
++                    }
+                     missing += !g.objects.get(h)->model;
+                 }
+                 CHECK(g.objects.clear() && AmmoPickup::m_dwNumPickups == 0);
+@@ -412,8 +419,8 @@ namespace
+             CHECK(reason.ends_with("invalid property TypeAction"));
+             rejected += n;
+         }
+-        CHECK(counts["BerettaPU"] == 1);
+-        CHECK(worlds == 57 && created == 1259 && missing == 0 && rejected == 176 && spawns == 60);
++        CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4);
++        CHECK(worlds == 57 && created == 1263 && missing == 0 && rejected == 176 && spawns == 60);
+         return true;
+     }
+ } // namespace
+diff --git a/tests/weapon_drop_tests.cpp b/tests/weapon_drop_tests.cpp
+index 79c89c3..6f2fda7 100644
+--- a/tests/weapon_drop_tests.cpp
++++ b/tests/weapon_drop_tests.cpp
+@@ -84,7 +84,7 @@ namespace
+         auto* player = g.server_shell.Player(g.local_client);
+         const auto initial = player->m_InventoryMgr.GetAmmoCount(1);
+         for (auto value : {PickupMessage{PickupKind::Weapon, 0, 12},
+-                           {PickupKind::Weapon, 2, 12},
++                           {PickupKind::Weapon, 3, 12},
+                            {PickupKind::Weapon, 1, -1},
+                            {PickupKind::Weapon, 1, std::numeric_limits<float>::infinity()}})
+         {
+diff --git a/tests/weapon_tests.cpp b/tests/weapon_tests.cpp
+index 4eacd87..81ce957 100644
+--- a/tests/weapon_tests.cpp
++++ b/tests/weapon_tests.cpp
+@@ -104,7 +104,7 @@ namespace
+         CHECK(inv.ObtainWeapon(WEAP_BERETTA) == InventoryResult::Ok && inv.GetWeapon(1, true));
+         CHECK(inv.ObtainWeapon(WEAP_BERETTA) == InventoryResult::AlreadyHave);
+         CHECK(inv.ObtainWeapon(WEAP_MELEE) == InventoryResult::AlreadyHave);
+-        CHECK(inv.ObtainWeapon(2) == InventoryResult::NotAvailable &&
++        CHECK(inv.ObtainWeapon(3) == InventoryResult::NotAvailable &&
+               inv.ObtainWeapon(1, 99) == InventoryResult::Invalid);
+         CHECK(inv.ChangeWeaponSlot(99) == InventoryResult::NotAvailable && inv.m_nCurWeaponSlot == 1);
+         std::string error;
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 0373472..286f56c 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -923,8 +923,8 @@ namespace
+                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
+                 else
+                 {
+-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 453 && d.editor_only == 541 &&
+-                          d.unknown == 32 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
++                    CHECK(d.entries.size() == 1026 && d.schema_checked == 454 && d.editor_only == 541 &&
++                          d.unknown == 31 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                     for (const auto& e : d.entries)
+                         if (e.state == DestinationEntryState::InvalidProperties)
+                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+@@ -1168,7 +1168,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 418 && d.unknown == 32 && d.failed == 4);
++                        CHECK(d.created == 419 && d.unknown == 31 && d.failed == 4);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

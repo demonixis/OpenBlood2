@@ -1,0 +1,15 @@
+360/361 Testing: ai_perception.catalog
+360/361 Test: ai_perception.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_perception.catalog" start time: Oct 16 10:21 CEST
+Output:
+----------------------------------------------------------
+Private NPC head-origin acquisition samples=240; no animation advancement
+<end of output>
+Test time =   0.23 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.catalog" end time: Oct 16 10:21 CEST
+"ai_perception.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

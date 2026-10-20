@@ -1,0 +1,14 @@
+487/491 Testing: weapon_drops.failures
+487/491 Test: weapon_drops.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon_drop_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon-drop-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"weapon_drops.failures" start time: Oct 16 16:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_drops.failures" end time: Oct 16 16:07 CEST
+"weapon_drops.failures" time elapsed: 00:00:00
+----------------------------------------------------------

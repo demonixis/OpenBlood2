@@ -1,0 +1,3 @@
+Malformed destination refusal 0: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 0: Destination world texture sprites/motelhell.spr: DTX: truncated or oversized palette image
+level_change_private:1369: result == LevelChangeResult::Committed && error.empty() && game.get() != owner

@@ -1,0 +1,1178 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 7a4499e..c54dfcf 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -465,3 +465,8 @@ Read [contracts](docs/EXPLOSION_FLAME_CONTRACTS.md). Preserve immediate bursts,
+ initial alpha 1 for fades, final emission and unused normal/ramp fields. Bulk sampling
+ is a documented later-engine policy, not retail RNG parity. Keep bounded failures,
+ detached lifetime and read-only rendering; illumination, safe NEW_LEVEL and M2 remain open.
++
++The [destination preparation continuation](../Documentation/Implementation/M2_DESTINATION.md) adds CPU-only DAT/collision/schema inspection while retaining the active world/player.
++Read [contracts](docs/DESTINATION_CONTRACTS.md). Preserve separate syntax/execution policy, const schema checks, one final-request scan per pump,
++owned report lifetime and callback refusal. Schema success never implies callback/resource readiness or authorizes teardown.
++Automatic NEW_LEVEL, required remaining services and M2 remain incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4dc22b8..0d9a925 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index e18b139..6508b50 100644
+--- a/README.md
++++ b/README.md
+@@ -515,3 +515,6 @@ independent falling Beretta, original pickup and player collection. Corpse/gib
+ services, player drop controls and the full M2 exit gate remain open.
+ 
+ The [original explosion flame continuation](../Documentation/Implementation/M2_EXPLOSION_FLAMES.md) adds selected Tesla particles with actual texture/color/alpha rendering and in-game inspection. M2 remains incomplete.
++
++The [destination preparation continuation](../Documentation/Implementation/M2_DESTINATION.md) inspects destination DAT geometry, primary collision and property schemas without leaving the current session.
++Original callbacks/resources/start triggers are still unverified; this prerequisite does not enable automatic NEW_LEVEL or close M2.
+diff --git a/docs/DESTINATION_CONTRACTS.md b/docs/DESTINATION_CONTRACTS.md
+new file mode 100644
+index 0000000..21e2af8
+--- /dev/null
++++ b/docs/DESTINATION_CONTRACTS.md
+@@ -0,0 +1,78 @@
++# Read-only destination preparation
++
++This is a prerequisite for safe original NEW_LEVEL transfer, not an implementation
++of that transfer. [Named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md) still
++requires an explicitly loaded destination. The active world/player is never replaced
++by inspection, including when all schemas pass. No new original class is registered.
++
++## Parsing, preparation and validation
++
++`parse_world_request` decodes the existing original CMSG_LOADWORLD field order and
++normalizes a bounded single-player NEW_GAME or NEW_LEVEL path. It rejects malformed,
++trailing, NUL-containing or traversing paths, unsupported modes and difficulty >3.
++This is syntax validation only. `decode_world_request` remains the execution-policy
++gate: NEW_LEVEL fails with the KeepAliveSave/KeepAliveLoad diagnostic. No caller
++gets fresh-game entry as a substitute for saved player transfer.
++
++`prepare_world` takes a normalized request and const mounted Resources, reads the
++existing bounded DAT format, and builds a separate primary CollisionWorld. Both
++outputs publish together only after successful parsing and collision preparation;
++failure leaves the output empty. Fresh NEW_GAME loading uses this same helper before
++teardown. Original creation/initial-update failures after fresh-game teardown retain
++the existing inspection semantics; this does not add general rollback.
++
++`Objects::validate_properties` is const and shares creation's existing inherited,
++case-insensitive property schema checks: exact variant types, the accepted Euler
++rotation override, finite values, per-field string limits and no embedded NUL.
++It returns an explicit status/error without factories, callbacks, engine diagnostics
++or object allocation. It does not validate dynamic resource requests, gameplay
++meaning, difficulty filtering or model dimensions. Creation still reports failures
++through the ordinary object diagnostics and runs original callbacks normally.
++
++## Inspection lifetime
++
++`GameSession::inspect_destination` rejects reentrant object callbacks without
++replacing its previous report. Otherwise it publishes one owned last-attempt record:
++source world/revision, normalized destination, bounded requested start name, model
++and primary-collision counts, every source entry's class/name/position, and one of
++schema-checked, preprocessor-only, unknown-class or invalid-properties. Read/parse
++failure replaces old rows with a failed report, never stale successful data. These
++reports own strings/values and no live handles; they survive unload and explicitly
++show the old source revision alongside the current one.
++
++A completed scan is not a ready destination. Source properties are checked without
++running constructors, precreate, initial update, StartPoint triggers, NPC clocks,
++movement or render resource loads. Class-specific resource failures, mover binding,
++player clearance, start selection/fallback, filtering and scripted side effects
++remain unverified. This keeps the current player, client, NPC state, resources,
++world revision, audio and simulation clocks intact. The DAT/collision temporaries
++are released after inspection; the report is not a reusable staged world or a
++content-authenticity guarantee if external files change.
++
++The player message pump still processes every original exit and capture/refusal,
++then inspects only the final owned request once when the queue drains. A 256-event
++queue therefore does not perform 256 world reads. Server start-name ownership keeps
++its original copy-before-broadcast behavior, including failed broadcasts; the report
++shows that current server value. Dead/invalid exits do not manufacture a request.
++No later frame repeats a scan without a new request. All existing queue/round bounds
++and deferred callback rules remain unchanged.
++
++The Session tab offers **Inspect destination without leaving**, available with an
++active player. Session and Objectives show the owned report, explicit unchecked
++runtime work, source entries and failure details. Drawing never performs a scan.
++Automatic blocked exits also produce the report with UI hidden or compiled out.
++
++## Evidence and remaining gate
++
++`world.destination_messages/schema/lifetime/private` covers malformed requests,
++shared schema checks, structural and collision failures, output clearing, callback
++refusal, no construction, queue coalescing, owned report lifetime and private repeated
++SubwayA/CityHub scans. `gpu.objectives` checks the authored delayed exit request with
++UI hidden and after reload, preserving the original player/world while inspecting
++CityHub. Full existing creation, loading, exit, restore and rendering tests remain.
++
++See [implementation evidence](../../Documentation/Implementation/M2_DESTINATION.md)
++and [source ledger](M2_DESTINATION_SOURCES.json). Safe NEW_LEVEL still needs protection
++against destination original initialization/start-trigger failures while preserving
++the current world, and must resolve required classes/services. Reloading the old DAT
++would lose current NPC/world state and does not count as rollback. M2 remains open.
+diff --git a/docs/EXIT_CONTRACTS.md b/docs/EXIT_CONTRACTS.md
+index f6ce1bc..98ca6bb 100644
+--- a/docs/EXIT_CONTRACTS.md
++++ b/docs/EXIT_CONTRACTS.md
+@@ -103,3 +103,7 @@ runs with the UI hidden and after reload, preserving player, inventory and world
+ revision. This isolates the exit dispatch; it does not claim the upstream level
+ completion chain or a real transfer. Diagnostic rearming is labelled, not an
+ original reset rule. See [evidence](../../Documentation/Implementation/M2_EXITS.md).
++
++The [destination preparation continuation](DESTINATION_CONTRACTS.md) shares const property validation and structural CPU preparation with fresh loading.
++Blocked exits now perform read-only destination lookup after refusing transfer; earlier blanket resource-lookup omissions are historical.
++No destination callbacks run and no active session is discarded; safe automatic NEW_LEVEL and M2 remain incomplete.
+diff --git a/docs/M2_DESTINATION_SOURCES.json b/docs/M2_DESTINATION_SOURCES.json
+new file mode 100644
+index 0000000..7bce1f8
+--- /dev/null
++++ b/docs/M2_DESTINATION_SOURCES.json
+@@ -0,0 +1,50 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "36cccd3dd6d764e18ece5403932255a751882168",
++  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
++      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
++      "selected_lines": [
++        [
++          828,
++          1000
++        ]
++      ],
++      "use": "Original request order and KeepAliveSave -> LoadWorld -> KeepAliveLoad -> RunWorld dependencies; commented revisit save stays inactive"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "selected_lines": [
++        [
++          6222,
++          6330
++        ]
++      ],
++      "use": "Original exit NEW_LEVEL request and message order retained"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/engineobjects.c",
++      "sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
++      "selected_lines": [
++        [
++          447,
++          561
++        ]
++      ],
++      "use": "Existing selected CF_NORUNTIME class classification retained"
++    }
++  ],
++  "adaptations": [
++    "New CPU-only destination preparation and owned read-only inspection; no new original methods or reference-engine code imported",
++    "Separate request syntax from unchanged NEW_LEVEL execution refusal",
++    "Share exact creation property checks without constructing original instances",
++    "One last-request scan per drained message pump; no live-world mutation"
++  ],
++  "remaining": [
++    "Original destination callback/resource/player clearance validation and safe transaction",
++    "Gideon, required services/FX and actual M2 acceptance"
++  ]
++}
+diff --git a/docs/OBJECT_CONTRACTS.md b/docs/OBJECT_CONTRACTS.md
+index ad616f6..8a80d4a 100644
+--- a/docs/OBJECT_CONTRACTS.md
++++ b/docs/OBJECT_CONTRACTS.md
+@@ -94,3 +94,7 @@ The [explicit target/facing continuation](AI_TARGET_CONTRACTS.md) adds original
+ AI_Mgr named target/link commands and deferred target clearing. GetObjectPos now
+ returns a typed status; target sampling and CanSee reject unresolved poses.
+ Autonomous acquisition/retention and full AI behavior remain unavailable.
++
++The [destination preparation continuation](DESTINATION_CONTRACTS.md) shares const property validation and structural CPU preparation with fresh loading.
++Blocked exits now perform read-only destination lookup after refusing transfer; earlier blanket resource-lookup omissions are historical.
++No destination callbacks run and no active session is discarded; safe automatic NEW_LEVEL and M2 remain incomplete.
+diff --git a/docs/PLAYER_KEEPALIVE_CONTRACTS.md b/docs/PLAYER_KEEPALIVE_CONTRACTS.md
+index 13fe5ac..215cedc 100644
+--- a/docs/PLAYER_KEEPALIVE_CONTRACTS.md
++++ b/docs/PLAYER_KEEPALIVE_CONTRACTS.md
+@@ -65,3 +65,7 @@ and [source ledger](M2_PLAYER_KEEPALIVE_SOURCES.json).
+ Full client state (objectives/cinematics/music), missing player powers/death state,
+ automatic safe transfer, remaining world classes and required FX/services still
+ keep M2 incomplete. CityHub inspection does not imply all of its classes work.
++
++The [destination preparation continuation](DESTINATION_CONTRACTS.md) shares const property validation and structural CPU preparation with fresh loading.
++Blocked exits now perform read-only destination lookup after refusing transfer; earlier blanket resource-lookup omissions are historical.
++No destination callbacks run and no active session is discarded; safe automatic NEW_LEVEL and M2 remain incomplete.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 318a57a..3d84354 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -785,3 +785,9 @@ See [source selections and hashes](M2_EXPLOSION_FLAME_SOURCES.json) and
+ three-zone bursts, clocks/fades and unused ramps, with the high-detail Tesla recipe.
+ Owned typed state, explicit bounds, later-engine six-sample bulk service and existing
+ particle rendering are documented adaptations, not a retail engine/RNG parity claim.
++
++## Destination preparation
++
++The [source ledger](M2_DESTINATION_SOURCES.json) records the original shell ordering and selected preprocessor-only classes.
++The [read-only preparation](DESTINATION_CONTRACTS.md) is new engine code using existing DAT/collision readers and exact property schemas;
++no new original method, reference engine dependency or commercial asset is imported. Original NEW_LEVEL execution remains refused.
+diff --git a/docs/WORLD_CONTRACTS.md b/docs/WORLD_CONTRACTS.md
+index 14810eb..3ecdc7d 100644
+--- a/docs/WORLD_CONTRACTS.md
++++ b/docs/WORLD_CONTRACTS.md
+@@ -96,3 +96,7 @@ rasterization: existing player/scripted cameras now drive depth-tested geometry
+ letterbox presentation. Materials, lighting, models/FX and complete M2 remain open.
+ 
+ The [DTX continuation](TEXTURE_CONTRACTS.md) supersedes the absence of world textures: opaque unlit base colors now render, with named rejection diagnostics and bounded cache ownership. World vertices are now 32 bytes; the three-million-vertex payload limit is 96 MB. Earlier geometry limits, current transforms and the M2 gate remain unchanged.
++
++The [destination preparation continuation](DESTINATION_CONTRACTS.md) shares const property validation and structural CPU preparation with fresh loading.
++Blocked exits now perform read-only destination lookup after refusing transfer; earlier blanket resource-lookup omissions are historical.
++No destination callbacks run and no active session is discarded; safe automatic NEW_LEVEL and M2 remain incomplete.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 4401d88..67f7352 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -317,6 +317,15 @@ namespace OpenBlood2
+             }
+             capture_player_request = false;
+         }
++        if (inspect_destination_request)
++        {
++            WorldMessage message;
++            if (original_world_request(keep_world_name, 0, LOADTYPE_NEW_LEVEL, 0, message))
++                game.inspect_destination(message, keep_start_name, world_error);
++            else
++                world_error = "Invalid destination request";
++            inspect_destination_request = false;
++        }
+         if (keep_world_request)
+         {
+             if (!game.local_client)
+@@ -1053,6 +1062,9 @@ namespace OpenBlood2
+             restore_player_request = true;
+         ImGui::EndDisabled();
+         ImGui::InputText("Destination world", keep_world_name, sizeof(keep_world_name));
++        if (ImGui::Button("Inspect destination without leaving"))
++            inspect_destination_request = true;
++        draw_destination(game);
+         ImGui::BeginDisabled(player);
+         if (ImGui::Button("Load destination for inspection"))
+             keep_world_request = true;
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 8c8e53d..3e6678d 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -88,7 +88,8 @@ namespace OpenBlood2
+         bool capture_player_request = false, restore_player_request = false, keep_player_request = false;
+         char keep_start_name[101]{};
+         char keep_world_name[256]{"02_cityhub"};
+-        bool keep_world_request = false;
++        bool keep_world_request = false, inspect_destination_request = false;
++        void draw_destination(const GameSession&);
+         ObjectId remove_request{};
+         std::string spawn_request;
+         std::string world_error, reload_world_name = "01_SubwayA";
+diff --git a/src/app/inspector_objectives.cpp b/src/app/inspector_objectives.cpp
+index 9ae416d..07b7088 100644
+--- a/src/app/inspector_objectives.cpp
++++ b/src/app/inspector_objectives.cpp
+@@ -15,6 +15,54 @@ namespace OpenBlood2
+             ImGui::TextWrapped("%s", display.c_str());
+         }
+     } // namespace
++    void Inspector::draw_destination(const GameSession& game)
++    {
++        const auto& d = game.destination_inspection;
++        if (!d.attempts)
++            return;
++        if (!ImGui::TreeNodeEx("Destination preflight (read-only)", ImGuiTreeNodeFlags_DefaultOpen))
++            return;
++        ImGui::TextWrapped("%s -> %s | requested start: %s | attempt %llu", d.source_world.c_str(),
++                           d.destination.c_str(), d.requested_start.c_str(), (unsigned long long)d.attempts);
++        ImGui::Text("Source revision %llu / current %llu", (unsigned long long)d.source_revision,
++                    (unsigned long long)game.world_revision);
++        if (!d.error.empty())
++            ImGui::TextWrapped("Scan failed: %s", d.error.c_str());
++        if (d.scan_complete)
++        {
++            ImGui::Text("Parsed %zu models / primary collision %zu triangles / %zu nodes", d.models, d.triangles,
++                        d.collision_nodes);
++            ImGui::Text("%zu schema checked / %zu editor-only / %zu unknown / %zu invalid properties", d.schema_checked,
++                        d.editor_only, d.unknown, d.invalid);
++            ImGui::TextWrapped("No destination objects were created. Resources requested by original callbacks, "
++                               "difficulty filtering, movers, start triggers and player clearance remain unverified. "
++                               "This is not a ready or completed transfer.");
++            if (ImGui::TreeNode("Destination source entries"))
++            {
++                ImGuiListClipper clip;
++                clip.Begin((int)d.entries.size());
++                while (clip.Step())
++                    for (int i = clip.DisplayStart; i < clip.DisplayEnd; ++i)
++                    {
++                        const auto& e = d.entries[i];
++                        ImGui::Text("%d: %s / %s / %s", i, e.class_name.c_str(), e.name.c_str(),
++                                    destination_entry_state_name(e.state));
++                        if (ImGui::IsItemHovered())
++                        {
++                            ImGui::BeginTooltip();
++                            if (e.has_position)
++                                ImGui::Text("Authored position %.2f %.2f %.2f", e.position.x, e.position.y,
++                                            e.position.z);
++                            if (!e.detail.empty())
++                                ImGui::TextWrapped("%s", e.detail.c_str());
++                            ImGui::EndTooltip();
++                        }
++                    }
++                ImGui::TreePop();
++            }
++        }
++        ImGui::TreePop();
++    }
+     void Inspector::draw_objectives(GameSession& game, ObjectSelection& selection)
+     {
+         if (ImGui::CollapsingHeader("Original level exits", ImGuiTreeNodeFlags_DefaultOpen))
+@@ -24,8 +72,9 @@ namespace OpenBlood2
+                         (unsigned long long)exit.ignored_dead, (unsigned long long)exit.blocked);
+             ImGui::TextWrapped("Requested world: %s / type %u / server start: %s", exit.request.next_world.c_str(),
+                                static_cast<unsigned>(exit.request.type), game.server_shell.start_point_name.c_str());
+-            ImGui::TextWrapped("%s", exit.error.empty() ? "No transfer attempted; KeepAliveSave/Load unavailable."
++            ImGui::TextWrapped("%s", exit.error.empty() ? "No transfer attempted; safe NEW_LEVEL transfer unavailable."
+                                                         : exit.error.c_str());
++            draw_destination(game);
+             const auto& fields = game.server_shell.player_capture;
+             ImGui::Text("Player fields: %llu / %llu captures; %s", (unsigned long long)fields.captures,
+                         (unsigned long long)fields.attempts, fields.valid ? "owned subset" : "unavailable");
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index cdeca8d..104a5a7 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -1473,8 +1473,10 @@ namespace
+                 spdlog::info("CAMERAS smoke: original camera tracks player while UI hidden; selected view, movement "
+                              "gate and reload checked");
+             if (options.objectives_smoke)
+-                spdlog::info("OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
+-                             "ExitTrigger NEW_LEVEL refusal preserves player/inventory; unload/reload checked");
++                spdlog::info(
++                    "OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
++                    "ExitTrigger NEW_LEVEL refusal preserves player/inventory; read-only CityHub preparation "
++                    "checks 1026 entries (247 schemas / 541 editor / 207 unknown / 31 invalid); unload/reload checked");
+             if (options.pickups_smoke)
+                 spdlog::info("PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked");
+             if (options.weapons_smoke)
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 9de3d84..4b90881 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -43,6 +43,7 @@ namespace OpenBlood2
+         const auto old_bullets = player->m_InventoryMgr.GetAmmoCount(1);
+         const auto received = g.client_shell.world_exit.received;
+         const auto blocked = g.client_shell.world_exit.blocked;
++        const auto scans = g.destination_inspection.attempts;
+         const auto captures = g.server_shell.inventory_capture.captures;
+         const auto field_captures = g.server_shell.player_capture.captures;
+         const auto damage_captures = g.server_shell.damage_capture.captures;
+@@ -88,6 +89,12 @@ namespace OpenBlood2
+                g.server_shell.player_capture.state.air == player->m_fAirLevel &&
+                g.server_shell.player_capture.state.name == std::optional<std::string>("") &&
+                g.client_shell.world_exit.error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos &&
++               g.destination_inspection.scan_complete && g.destination_inspection.attempts == scans + 1 &&
++               g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
++               g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
++               g.destination_inspection.source_revision == old_revision &&
++               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 247 &&
++               g.destination_inspection.unknown == 207 && g.destination_inspection.invalid == 31 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/engine/objects.cpp b/src/engine/objects.cpp
+index 1b92b4c..67dfcc1 100644
+--- a/src/engine/objects.cpp
++++ b/src/engine/objects.cpp
+@@ -289,6 +289,28 @@ namespace OpenBlood2
+         --callback_depth_;
+         return result;
+     }
++    ObjectError Objects::validate_properties(HCLASS type, const Properties& properties, std::string& error) const
++    {
++        error.clear();
++        if (!knows(type))
++        {
++            error = "Create: unregistered class";
++            return ObjectError::UnknownClass;
++        }
++        for (const auto& [name, value] : properties)
++        {
++            const auto* def = spec(type, name);
++            if (!def ||
++                (def->value.index() != value.index() &&
++                 !(std::holds_alternative<DRotation>(def->value) && std::holds_alternative<EulerAngles>(value))) ||
++                !valid(value, def->max_string))
++            {
++                error = type->name + ": invalid property " + name;
++                return ObjectError::InvalidProperty;
++            }
++        }
++        return ObjectError::None;
++    }
+     HOBJECT Objects::create(HCLASS type, ObjectCreateStruct state, Creation reason, const Properties& properties)
+     {
+         if (!knows(type))
+@@ -303,19 +325,15 @@ namespace OpenBlood2
+         }
+         auto record = std::make_unique<ObjectRecord>();
+         defaults(type, record->properties);
+-        for (const auto& [name, value] : properties)
++        std::string property_error;
++        const auto checked = validate_properties(type, properties, property_error);
++        if (checked != ObjectError::None)
+         {
+-            const auto* def = spec(type, name);
+-            if (!def ||
+-                (def->value.index() != value.index() &&
+-                 !(std::holds_alternative<DRotation>(def->value) && std::holds_alternative<EulerAngles>(value))) ||
+-                !valid(value, def->max_string))
+-            {
+-                fail(ObjectError::InvalidProperty, type->name + ": invalid property " + name);
+-                return nullptr;
+-            }
+-            record->properties.insert_or_assign(def->name, value);
++            fail(checked, std::move(property_error));
++            return nullptr;
+         }
++        for (const auto& [name, value] : properties)
++            record->properties.insert_or_assign(spec(type, name)->name, value);
+         if (!valid_state(state) || static_cast<unsigned>(reason) > 3)
+         {
+             fail(ObjectError::InvalidProperty, "Invalid creation structure/reason");
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index 8c8b6ed..3eafdc3 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -155,6 +155,7 @@ namespace OpenBlood2
+         static bool is_kind_of(HCLASS type, HCLASS parent);
+         HOBJECT create(HCLASS type, ObjectCreateStruct state = {}, Creation reason = Creation::Runtime,
+                        const Properties& properties = {});
++        ObjectError validate_properties(HCLASS, const Properties&, std::string&) const;
+         bool parse_properties(HCLASS, std::string_view, Properties&);
+         HOBJECT create_props(HCLASS type, ObjectCreateStruct state, std::string_view text);
+         bool remove(HOBJECT handle);
+diff --git a/src/game/original/session_load.cpp b/src/game/original/session_load.cpp
+index 890d046..8066678 100644
+--- a/src/game/original/session_load.cpp
++++ b/src/game/original/session_load.cpp
+@@ -34,7 +34,7 @@ namespace OpenBlood2
+         message.WriteToMessageByte(nDifficulty); // Difficulty level
+         return true;
+     }
+-    bool decode_world_request(const WorldMessage& message, WorldRequest& request, std::string& error)
++    bool parse_world_request(const WorldMessage& message, WorldRequest& request, std::string& error)
+     {
+         request = {};
+         Reader reader(message.bytes);
+@@ -49,14 +49,10 @@ namespace OpenBlood2
+             error = "Malformed CMSG_LOADWORLD";
+             return false;
+         }
+-        if (next.game_type == 0 && next.load_type == LOADTYPE_NEW_LEVEL && next.difficulty <= 3)
+-        {
+-            error = "LOADTYPE_NEW_LEVEL requires original KeepAliveSave/KeepAliveLoad; player transfer is unavailable";
+-            return false;
+-        }
+-        if (next.game_type != 0 || next.load_type != LOADTYPE_NEW_GAME || next.difficulty > 3)
++        if (next.game_type != 0 || (next.load_type != LOADTYPE_NEW_GAME && next.load_type != LOADTYPE_NEW_LEVEL) ||
++            next.difficulty > 3)
+         {
+-            error = "Only a fresh single-player world request is supported; saves/multiplayer are unimplemented";
++            error = "Only single-player NEW_GAME/NEW_LEVEL syntax is supported; saves/multiplayer are unimplemented";
+             return false;
+         }
+         // Keep the original Worlds prefix, but reject traversal instead of stripping
+@@ -76,4 +72,19 @@ namespace OpenBlood2
+         error.clear();
+         return true;
+     }
++    bool decode_world_request(const WorldMessage& message, WorldRequest& request, std::string& error)
++    {
++        request = {};
++        WorldRequest next;
++        if (!parse_world_request(message, next, error))
++            return false;
++        if (next.load_type == LOADTYPE_NEW_LEVEL)
++        {
++            error = "LOADTYPE_NEW_LEVEL requires original KeepAliveSave/KeepAliveLoad; safe player/world transfer is "
++                    "unavailable";
++            return false;
++        }
++        request = std::move(next);
++        return true;
++    }
+ } // namespace OpenBlood2
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index a4bb490..e43018a 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -13,6 +13,7 @@
+ #include "game/original/LightFX.h"
+ #include "game/player_restore.h"
+ #include "game/session.h"
++#include "game/world_preparation.h"
+ #include <array>
+ #include <optional>
+ #include <random>
+@@ -346,6 +347,8 @@ namespace OpenBlood2
+         {
+             unload_world();
+         }
++        DestinationInspection destination_inspection;
++        bool inspect_destination(const WorldMessage&, std::string_view start, std::string& error);
+         bool load_world(const WorldMessage& message, std::string& error);
+         bool request_world(std::string_view name, std::string& error);
+         bool run_world(std::string& error);
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 190bd36..0fe2ca1 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -45,25 +45,20 @@ namespace OpenBlood2
+             return objects.fail(ObjectError::Busy, error);
+         }
+         WorldRequest request;
+-        World next;
+-        CollisionWorld next_collision;
+-        std::vector<std::uint8_t> bytes;
+-        // Validate everything before replacing the current inspectable world.
+-        if (!decode_world_request(message, request, error) || !resources.read(request.filename, bytes, error) ||
+-            !read_world(bytes, next, error))
+-            return false;
+-        if (next.models.empty() || !next_collision.build(next.models.front(), error))
++        PreparedWorld next;
++        // Structural CPU preparation is shared with read-only destination inspection.
++        if (!decode_world_request(message, request, error) || !prepare_world(request, resources, next, error))
+             return false;
+         if (!unload_world())
+         {
+             error = "World replacement during a callback is forbidden";
+             return false;
+         }
+-        collision = std::move(next_collision);
++        collision = std::move(next.collision);
+         server.collision_ready = true;
+         server.service_calls.clear();
+         server.trace_enabled = true;
+-        world = std::move(next);
++        world = std::move(next.world);
+         world_path = request.filename;
+         server.SetGameConVar("GAME_WORLDNAME", world_path.c_str());
+         server_shell.PreStartWorld();
+@@ -79,9 +74,7 @@ namespace OpenBlood2
+             WorldEntry entry;
+             // CF_NORUNTIME in original AppHeaders/engineobjects.c: these feed the
+             // preprocessor and are not runtime classes missing from the adapter.
+-            if (source.class_name == "DirLight" || source.class_name == "Light" || source.class_name == "OutsideDef" ||
+-                source.class_name == "ObjectLight" || source.class_name == "LightAnimator" ||
+-                source.class_name == "GlobalDirLight")
++            if (editor_only_world_class(source.class_name))
+             {
+                 entry.state = EntryState::EditorOnly;
+                 entry.detail = "Original CF_NORUNTIME; source properties retained";
+@@ -179,6 +172,7 @@ namespace OpenBlood2
+             error = "Player message pump during object callback rejected";
+             return false;
+         }
++        bool inspect_exit = false;
+         for (unsigned pass = 0; pass < 8; ++pass)
+         {
+             std::vector<PlayerEvent> events;
+@@ -188,7 +182,20 @@ namespace OpenBlood2
+                 return false;
+             }
+             if (events.empty())
++            {
++                if (inspect_exit)
++                {
++                    // At most one bounded destination scan per pump: inspect the final
++                    // owned request, while preserving each source exit/capture/refusal.
++                    auto& exit = client_shell.world_exit;
++                    std::string diagnostic;
++                    if (!inspect_destination(exit.load, server_shell.start_point_name, diagnostic))
++                        exit.error += "; destination scan: " + diagnostic;
++                    else
++                        exit.error += "; destination scan completed without running original creation/start callbacks";
++                }
+                 return true;
++            }
+             for (const auto& event : events)
+             {
+                 if (!client_shell.OnMessage(event, server_shell))
+@@ -207,7 +214,10 @@ namespace OpenBlood2
+                     // selected fields/aggregates are not complete KeepAliveSave/Load.
+                     WorldRequest request;
+                     if (!decode_world_request(exit.load, request, exit.error))
++                    {
+                         ++exit.blocked;
++                        inspect_exit = true;
++                    }
+                     else
+                         return objects.fail(ObjectError::Unsupported, "World exit transfer is unavailable");
+                 }
+diff --git a/src/game/session.h b/src/game/session.h
+index 04932b7..0d64b1a 100644
+--- a/src/game/session.h
++++ b/src/game/session.h
+@@ -53,5 +53,7 @@ namespace OpenBlood2
+     // complete client shell. See original/session_load.cpp and the provenance ledger.
+     bool original_world_request(const char* world, DBYTE game_type, DBYTE load_type, DBYTE difficulty,
+                                 WorldMessage& message);
++    // Parses NEW_GAME/NEW_LEVEL syntax only; this never authorizes a world replacement.
++    bool parse_world_request(const WorldMessage& message, WorldRequest& request, std::string& error);
+     bool decode_world_request(const WorldMessage& message, WorldRequest& request, std::string& error);
+ } // namespace OpenBlood2
+diff --git a/src/game/world_preparation.cpp b/src/game/world_preparation.cpp
+new file mode 100644
+index 0000000..93b94e2
+--- /dev/null
++++ b/src/game/world_preparation.cpp
+@@ -0,0 +1,134 @@
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool editor_only_world_class(std::string_view name)
++    {
++        return name == "DirLight" || name == "Light" || name == "OutsideDef" || name == "ObjectLight" ||
++               name == "LightAnimator" || name == "GlobalDirLight";
++    }
++    bool prepare_world(const WorldRequest& request, const Resources& resources, PreparedWorld& output,
++                       std::string& error)
++    {
++        output = {};
++        error.clear();
++        std::string normalized;
++        if (request.game_type != 0 || request.difficulty > 3 ||
++            (request.load_type != LOADTYPE_NEW_GAME && request.load_type != LOADTYPE_NEW_LEVEL) ||
++            !resource_path(request.filename, normalized) || normalized != request.filename ||
++            !normalized.starts_with("worlds/") || !normalized.ends_with(".dat"))
++        {
++            error = "World preparation requires a normalized single-player request";
++            return false;
++        }
++        PreparedWorld next;
++        std::vector<std::uint8_t> bytes;
++        if (!resources.read(request.filename, bytes, error) || !read_world(bytes, next.world, error))
++            return false;
++        if (next.world.models.empty())
++        {
++            error = "World has no primary collision model";
++            return false;
++        }
++        if (!next.collision.build(next.world.models.front(), error))
++            return false;
++        output = std::move(next);
++        return true;
++    }
++    const char* destination_entry_state_name(DestinationEntryState state)
++    {
++        switch (state)
++        {
++            case DestinationEntryState::SchemaChecked:
++                return "Schema checked; runtime unverified";
++            case DestinationEntryState::EditorOnly:
++                return "Preprocessor only";
++            case DestinationEntryState::UnknownClass:
++                return "Class not registered";
++            case DestinationEntryState::InvalidProperties:
++                return "Invalid registered properties";
++        }
++        return "Unknown";
++    }
++    bool GameSession::inspect_destination(const WorldMessage& message, std::string_view start, std::string& error)
++    {
++        error.clear();
++        // A reentrant inspector must not overwrite the outer result or touch world state.
++        if (objects.busy())
++        {
++            error = "Destination inspection during a callback rejected";
++            return false;
++        }
++        DestinationInspection next;
++        next.attempts = destination_inspection.attempts + 1;
++        next.source_revision = world_revision;
++        next.source_world = world_path;
++        const auto failed = [&]
++        {
++            next.error = error;
++            destination_inspection = std::move(next);
++            return false;
++        };
++        if (start.size() > 100 || start.find('\0') != std::string_view::npos)
++        {
++            error = "Invalid destination start-point name";
++            return failed();
++        }
++        next.requested_start = start;
++        WorldRequest request;
++        if (!parse_world_request(message, request, error))
++            return failed();
++        next.destination = request.filename;
++        PreparedWorld prepared;
++        if (!prepare_world(request, resources, prepared, error))
++            return failed();
++        next.models = prepared.world.models.size();
++        next.triangles = prepared.collision.triangles();
++        next.collision_nodes = prepared.collision.nodes();
++        next.entries.reserve(prepared.world.objects.size());
++        for (const auto& source : prepared.world.objects)
++        {
++            DestinationEntry entry;
++            entry.class_name = source.class_name;
++            if (const auto* v = source.find("Name"))
++                if (const auto* name = std::get_if<std::string>(v))
++                    entry.name = *name;
++            if (const auto* v = source.find("Pos"))
++                if (const auto* pos = std::get_if<DVector>(v))
++                {
++                    entry.position = *pos;
++                    entry.has_position = true;
++                }
++            if (editor_only_world_class(source.class_name))
++            {
++                entry.state = DestinationEntryState::EditorOnly;
++                ++next.editor_only;
++            }
++            else if (const auto type = objects.find_class(source.class_name))
++            {
++                Properties properties;
++                for (const auto& property : source.properties)
++                    properties.emplace(property.name, property.value);
++                if (objects.validate_properties(type, properties, entry.detail) == ObjectError::None)
++                {
++                    entry.state = DestinationEntryState::SchemaChecked;
++                    ++next.schema_checked;
++                }
++                else
++                {
++                    entry.state = DestinationEntryState::InvalidProperties;
++                    ++next.invalid;
++                }
++            }
++            else
++            {
++                ++next.unknown;
++                entry.detail = "Required original class is not registered";
++            }
++            next.entries.push_back(std::move(entry));
++        }
++        next.scan_complete = true;
++        destination_inspection = std::move(next);
++        // True means the read-only scan completed, never that a transfer is ready.
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/world_preparation.h b/src/game/world_preparation.h
+new file mode 100644
+index 0000000..e030ce1
+--- /dev/null
++++ b/src/game/world_preparation.h
+@@ -0,0 +1,38 @@
++#pragma once
++#include "engine/collision.h"
++#include "game/session.h"
++namespace OpenBlood2
++{
++    // Owned CPU data only, with no session handles, callbacks, clocks or live resources.
++    struct PreparedWorld
++    {
++        World world;
++        CollisionWorld collision;
++    };
++    bool prepare_world(const WorldRequest&, const Resources&, PreparedWorld&, std::string&);
++    bool editor_only_world_class(std::string_view);
++    enum class DestinationEntryState
++    {
++        SchemaChecked,
++        EditorOnly,
++        UnknownClass,
++        InvalidProperties
++    };
++    const char* destination_entry_state_name(DestinationEntryState);
++    struct DestinationEntry
++    {
++        std::string class_name, name, detail;
++        DestinationEntryState state = DestinationEntryState::UnknownClass;
++        DVector position{};
++        bool has_position = false;
++    };
++    struct DestinationInspection
++    {
++        std::uint64_t attempts = 0, source_revision = 0;
++        std::string source_world, destination, requested_start, error;
++        bool scan_complete = false;
++        std::size_t models = 0, triangles = 0, collision_nodes = 0, schema_checked = 0, editor_only = 0, unknown = 0,
++                    invalid = 0;
++        std::vector<DestinationEntry> entries;
++    };
++} // namespace OpenBlood2
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index d5a3758..1f01f4c 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -47,12 +47,14 @@ endif()
+ add_executable(world_tests world_tests.cpp)
+ target_link_libraries(world_tests PRIVATE blood2_game)
+ blood2_project_options(world_tests)
+-foreach(case IN ITEMS sprite_entries sound_entries rez_structure rez_rejection resource_mount world_properties world_geometry
++foreach(case IN ITEMS destination_messages destination_schema destination_lifetime sprite_entries sound_entries rez_structure rez_rejection resource_mount world_properties world_geometry
+         world_rejection mutations session_lifecycle session_messages original_trigger)
+     add_test(NAME world.${case} COMMAND world_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/world-fixtures/${case}")
+     set_tests_properties(world.${case} PROPERTIES LABELS "headless;world" TIMEOUT 20)
+ endforeach()
+ if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME world.destination_private COMMAND world_tests destination_private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(world.destination_private PROPERTIES LABELS "private;headless;world" TIMEOUT 60)
+     add_test(NAME world.private COMMAND world_tests private "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(world.private PROPERTIES LABELS "private;headless;world" TIMEOUT 30)
+     if(BLOOD2_GPU_TESTS)
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 7d6cc68..e4968db 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -103,7 +103,7 @@ namespace
+         out.append(v);
+         return out;
+     }
+-    Writer dat(bool gameplay = false, bool sounds = false, bool sprites = false)
++    Writer dat(bool gameplay = false, bool sounds = false, bool sprites = false, bool destination = false)
+     {
+         Writer w;
+         w.u32(56);
+@@ -122,8 +122,16 @@ namespace
+         value.real(1.5);
+         Writer yes;
+         yes.byte(1);
+-        w.u32(sprites ? 6 : gameplay || sounds ? 4 : 1);
+-        if (sprites)
++        w.u32(destination ? 5 : sprites ? 6 : gameplay || sounds ? 4 : 1);
++        if (destination)
++        {
++            w.append(object("DestinationProbe", {string_prop("Name", "owned"), prop("Pos", 1, pos)}));
++            w.append(object("DirLight", {string_prop("Name", "spot")}));
++            w.append(object("NotPorted", {string_prop("Name", "unknown")}));
++            w.append(object("Sound", {prop("VoiceType", 6, integer)}));
++            w.append(object("GameStartPoint", {string_prop("Name", "arrival"), prop("Pos", 1, pos)}));
++        }
++        else if (sprites)
+         {
+             Writer no;
+             no.byte(0);
+@@ -185,7 +193,7 @@ namespace
+         w.zero(8); // Surface packed payload may contain NaN bits.
+         w.u16(0);
+         w.u32(0);
+-        w.u32(0);
++        w.u32(destination ? 1 : 0);
+         w.u32(0);
+         w.byte(0);
+         w.u16(20); // Serialized material flags, independent of surface flags.
+@@ -637,6 +645,271 @@ namespace
+         CHECK(game.server.string_count() == 0);
+         return true;
+     }
++
++    bool destination_messages()
++    {
++        WorldMessage message;
++        WorldRequest request;
++        std::string error;
++        CHECK(original_world_request("Worlds\\02_CityHub.DAT", 0, LOADTYPE_NEW_LEVEL, 3, message));
++        CHECK(parse_world_request(message, request, error) && error.empty());
++        CHECK(request.filename == "worlds/02_cityhub.dat" && request.difficulty == 3 &&
++              request.load_type == LOADTYPE_NEW_LEVEL);
++        CHECK(!decode_world_request(message, request, error) && request.filename.empty());
++        CHECK(error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos);
++        for (std::size_t n = 0; n < message.bytes.size(); ++n)
++        {
++            auto truncated = message;
++            truncated.bytes.resize(n);
++            CHECK(!parse_world_request(truncated, request, error) && request.filename.empty());
++        }
++        auto bad = message;
++        bad.id = 0;
++        CHECK(!parse_world_request(bad, request, error));
++        bad = message;
++        bad.bytes.push_back(0);
++        CHECK(!parse_world_request(bad, request, error));
++        bad = message;
++        bad.bytes[3] = 0;
++        CHECK(!parse_world_request(bad, request, error));
++        for (auto name : {"../next", "worlds/../next", "/next"})
++        {
++            CHECK(original_world_request(name, 0, LOADTYPE_NEW_LEVEL, 1, bad));
++            CHECK(!parse_world_request(bad, request, error));
++        }
++        for (unsigned field = 0; field < 3; ++field)
++        {
++            bad = message;
++            bad.bytes[bad.bytes.size() - 3 + field] = 255;
++            CHECK(!parse_world_request(bad, request, error));
++        }
++        CHECK(original_world_request("next", 0, LOADTYPE_NEW_GAME, 0, message));
++        CHECK(parse_world_request(message, request, error) && decode_world_request(message, request, error));
++        return true;
++    }
++    unsigned destination_constructed = 0;
++    GameSession* destination_session = nullptr;
++    bool rejected_reentrant = false;
++    struct DestinationProbe : BaseClass
++    {
++        DestinationProbe()
++        {
++            ++destination_constructed;
++        }
++        DDWORD EngineMessageFn(DDWORD id, void*, float) override
++        {
++            if (id == MID_UPDATE && destination_session)
++            {
++                WorldMessage message;
++                std::string error;
++                original_world_request("destination", 0, LOADTYPE_NEW_LEVEL, 0, message);
++                const auto before = destination_session->destination_inspection.attempts;
++                rejected_reentrant = !destination_session->inspect_destination(message, "arrival", error) &&
++                                     error.find("callback") != std::string::npos &&
++                                     destination_session->destination_inspection.attempts == before;
++            }
++            return 1;
++        }
++    };
++    ClassInfo destination_type{"DestinationProbe",
++                               nullptr,
++                               []() -> std::unique_ptr<BaseClass> { return std::make_unique<DestinationProbe>(); },
++                               {{"Bounded", std::string{}, true, 4}}};
++    bool destination_schema()
++    {
++        GameSession game;
++        CHECK(game.initialize());
++        destination_type.parent = game.objects.find_class("BaseClass");
++        CHECK(game.objects.register_class(destination_type));
++        const auto type = &destination_type;
++        const auto diagnostic = game.objects.diagnostics();
++        const auto last_error = game.objects.error();
++        const auto before = destination_constructed;
++        std::string error;
++        CHECK(game.objects.validate_properties(type,
++                                               {{"name", std::string("inherited")},
++                                                {"Rotation", EulerAngles{{1, 2, 3}}},
++                                                {"Bounded", std::string("four")}},
++                                               error) == ObjectError::None);
++        CHECK(error.empty());
++        for (const auto& props : std::vector<Properties>{{{"Absent", true}},
++                                                         {{"Name", 1.f}},
++                                                         {{"Bounded", std::string("longer")}},
++                                                         {{"Bounded", std::string("a\0b", 3)}},
++                                                         {{"Pos", DVector{NAN, 0, 0}}},
++                                                         {{"Rotation", EulerAngles{{0, INFINITY, 0}}}}})
++            CHECK(game.objects.validate_properties(type, props, error) == ObjectError::InvalidProperty &&
++                  !error.empty());
++        const ClassInfo unknown{"NotRegistered", nullptr, nullptr, {}};
++        CHECK(game.objects.validate_properties(&unknown, {}, error) == ObjectError::UnknownClass);
++        CHECK(game.objects.validate_properties(nullptr, {}, error) == ObjectError::UnknownClass);
++        CHECK(destination_constructed == before && game.objects.snapshot().empty());
++        CHECK(game.objects.error() == last_error && game.objects.diagnostics() == diagnostic);
++        CHECK(!game.objects.create(type, {}, Creation::World, {{"Bounded", std::string("longer")}}));
++        CHECK(game.objects.error() == ObjectError::InvalidProperty && destination_constructed == before);
++        auto handle = game.objects.create(type, {}, Creation::World, {{"Bounded", std::string("four")}});
++        CHECK(handle && destination_constructed == before + 1 && game.objects.get(handle));
++        return true;
++    }
++    bool destination_lifetime(const std::filesystem::path& root)
++    {
++        GameSession game;
++        CHECK(test_player::setup(game, root));
++        std::string error;
++        CHECK(game.enter_player(error));
++        destination_type.parent = game.objects.find_class("BaseClass");
++        CHECK(game.objects.register_class(destination_type));
++        test_player::Directory dir;
++        dir.children["worlds"].files["destination.dat"] = dat(false, false, false, true).data;
++        dir.children["worlds"].files["broken.dat"] = {56, 0, 0, 0};
++        auto invalid_collision = dat(false, false, false, true);
++        invalid_collision.patch(invalid_collision.data.size() - 64, std::bit_cast<std::uint32_t>(1e8f));
++        dir.children["worlds"].files["collision.dat"] = invalid_collision.data;
++        test_model::Writer archive;
++        archive.b.resize(168);
++        archive.b[0] = archive.b[62] = archive.b[124] = 13;
++        archive.b[1] = archive.b[63] = archive.b[125] = 10;
++        archive.b[126] = 26;
++        archive.patch(127, 1);
++        const auto [offset, size] = test_player::write_dir(archive, dir);
++        archive.patch(131, offset);
++        archive.patch(135, size);
++        CHECK(save(root / "destination.rez", archive.b));
++        CHECK(game.resources.mount(root / "destination.rez", error));
++        auto* player = game.server_shell.Player(game.local_client);
++        CHECK(player);
++        player->m_damage.m_fHitPoints = 73;
++        const auto ids = game.objects.snapshot();
++        const auto client = game.local_client;
++        const auto revision = game.world_revision;
++        const auto path = game.world_path;
++        const auto clock = game.objects.time();
++        const auto calls = game.server.service_calls;
++        const auto string_count = game.server.string_count();
++        const auto bullets = player->m_InventoryMgr.GetAmmoCount(1);
++        const auto construction = destination_constructed;
++        WorldMessage message;
++        CHECK(original_world_request("destination", 0, LOADTYPE_NEW_LEVEL, 0, message));
++        CHECK(game.inspect_destination(message, "arrival", error));
++        const auto& d = game.destination_inspection;
++        CHECK(d.scan_complete && d.attempts == 1 && d.entries.size() == 5);
++        CHECK(d.schema_checked == 2 && d.editor_only == 1 && d.unknown == 1 && d.invalid == 1);
++        CHECK(d.models == 1 && d.triangles == 1 && d.collision_nodes == 1);
++        CHECK(d.source_world == path && d.source_revision == revision && d.requested_start == "arrival");
++        CHECK(d.entries[0].has_position && d.entries[0].position.x == 5 && d.entries[0].name == "owned");
++        CHECK(d.entries[3].detail.find("VoiceType") != std::string::npos);
++        CHECK(destination_constructed == construction && game.server.service_calls == calls);
++        CHECK(game.objects.snapshot() == ids && game.local_client == client && game.world_revision == revision);
++        CHECK(game.objects.time() == clock && game.world_path == path && game.server.string_count() == string_count);
++        CHECK(player->m_damage.m_fHitPoints == 73 && player->m_InventoryMgr.GetAmmoCount(1) == bullets);
++        WorldRequest request;
++        PreparedWorld prepared;
++        CHECK(parse_world_request(message, request, error) && prepare_world(request, game.resources, prepared, error));
++        CHECK(prepared.world.objects.size() == 5 && prepared.collision.triangles() == 1);
++        request.filename = "worlds/collision.dat";
++        CHECK(!prepare_world(request, game.resources, prepared, error));
++        CHECK(error.find("primary collision") != std::string::npos);
++        CHECK(prepared.world.models.empty() && prepared.collision.triangles() == 0);
++        request.filename = "worlds/destination.dat";
++        CHECK(prepare_world(request, game.resources, prepared, error));
++        request.filename = "worlds/broken.dat";
++        CHECK(!prepare_world(request, game.resources, prepared, error));
++        CHECK(prepared.world.objects.empty() && prepared.world.models.empty() && prepared.collision.triangles() == 0);
++        CHECK(original_world_request("broken", 0, LOADTYPE_NEW_GAME, 0, message));
++        CHECK(!game.load_world(message, error) && game.objects.snapshot() == ids && game.local_client == client);
++        CHECK(!game.inspect_destination(message, "arrival", error) && !d.scan_complete && d.entries.empty());
++        CHECK(!game.inspect_destination(message, std::string("x\0y", 3), error));
++        CHECK(!game.inspect_destination(message, std::string(101, 'x'), error));
++        const auto attempts = d.attempts;
++        for (unsigned i = 0; i < 256; ++i)
++            CHECK(game.server.SendWorldExit({i == 255 ? "destination" : "broken"}, "arrival") == DE_OK);
++        CHECK(game.pump_player_messages(error));
++        CHECK(game.client_shell.world_exit.blocked == 256 && game.client_shell.world_exit.received == 256);
++        CHECK(d.attempts == attempts + 1 && d.scan_complete && d.destination == "worlds/destination.dat");
++        CHECK(game.pump_player_messages(error) && d.attempts == attempts + 1);
++        CHECK(game.objects.snapshot() == ids && game.client_shell.player == player->m_hObject);
++        auto handle = game.objects.create(&destination_type);
++        CHECK(handle);
++        destination_session = &game;
++        CHECK(game.objects.engine_message(handle, MID_UPDATE, nullptr));
++        destination_session = nullptr;
++        CHECK(rejected_reentrant && d.attempts == attempts + 1 && d.entries.size() == 5);
++        CHECK(game.unload_world() && game.objects.snapshot().empty());
++        CHECK(game.server.string_count() == 0 && game.server.client_count() == 0);
++        CHECK(d.scan_complete && d.source_revision != game.world_revision && d.entries[0].name == "owned");
++        return true;
++    }
++    bool destination_private(const std::filesystem::path& root)
++    {
++        GameSession game;
++        CHECK(game.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(game.resources.mount_game(config, error));
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error));
++            CHECK(game.step(.016));
++            auto* player = game.server_shell.Player(game.local_client);
++            CHECK(player);
++            const auto ids = game.objects.snapshot();
++            const auto revision = game.world_revision;
++            const auto time = game.objects.time();
++            const auto path = game.world_path;
++            const auto client = game.local_client;
++            const auto calls = game.server.service_calls;
++            const auto voices = game.server.audio.voices().size();
++            const auto strings = game.server.string_count();
++            const auto ammo = player->m_InventoryMgr.GetAmmoCount(1);
++            const auto hp = player->m_damage.m_fHitPoints;
++            std::vector<std::pair<HOBJECT, std::uint64_t>> updates;
++            for (auto id : ids)
++                updates.emplace_back(game.objects.get(id)->handle, game.objects.get(id)->updates);
++            for (auto destination : {"01_SubwayA", "02_CityHub"})
++            {
++                WorldMessage message;
++                CHECK(original_world_request(destination, 0, LOADTYPE_NEW_LEVEL, 0, message));
++                CHECK(game.inspect_destination(message, "01_egressa", error));
++                const auto& d = game.destination_inspection;
++                std::cout << "Cycle " << cycle << ": " << d.destination << ": " << d.entries.size() << " entries / "
++                          << d.schema_checked << " schema / " << d.editor_only << " editor / " << d.unknown
++                          << " unknown / " << d.invalid << " invalid / " << d.models << " models / " << d.triangles
++                          << " triangles / " << d.collision_nodes << " collision nodes\n";
++                CHECK(d.scan_complete && d.source_world == path && d.source_revision == revision);
++                if (d.destination == "worlds/01_subwaya.dat")
++                    CHECK(d.entries.size() == 580 && d.schema_checked == 207 && d.editor_only == 372 &&
++                          d.unknown == 1 && d.invalid == 0 && d.models == 116);
++                else
++                {
++                    CHECK(d.entries.size() == 1026 && d.schema_checked == 247 && d.editor_only == 541 &&
++                          d.unknown == 207 && d.invalid == 31 && d.models == 100 && d.triangles == 39724);
++                    for (const auto& e : d.entries)
++                        if (e.state == DestinationEntryState::InvalidProperties)
++                            std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
++                                      << '\n';
++                }
++                CHECK(game.objects.snapshot() == ids && game.world_revision == revision && game.local_client == client);
++                CHECK(game.objects.time() == time && game.world_path == path && game.server.service_calls == calls);
++                CHECK(game.server.audio.voices().size() == voices && game.server.string_count() == strings);
++                CHECK(game.client_shell.player == player->m_hObject && player->m_damage.m_fHitPoints == hp &&
++                      player->m_InventoryMgr.GetAmmoCount(1) == ammo);
++                for (const auto& [handle, count] : updates)
++                    CHECK(game.objects.get(handle) && game.objects.get(handle)->updates == count);
++                CHECK(!game.load_world(message, error) &&
++                      error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos);
++            }
++            WorldMessage broken;
++            CHECK(original_world_request("16_bridge", 0, LOADTYPE_NEW_LEVEL, 0, broken));
++            CHECK(!game.inspect_destination(broken, "start", error));
++            CHECK(game.objects.snapshot() == ids && game.world_revision == revision && game.objects.time() == time);
++            CHECK(!game.destination_inspection.scan_complete && game.destination_inspection.entries.empty());
++            std::cout << "Malformed destination preserves source: " << error << '\n';
++            CHECK(!game.run_world(error));
++            CHECK(game.unload_world() && game.server.client_count() == 0 && game.server.string_count() == 0);
++        }
++        return true;
++    }
+     bool private_world(const std::filesystem::path& root)
+     {
+         GameSession game;
+@@ -698,6 +971,8 @@ int main(int argc, char** argv)
+     std::filesystem::path root = argc > 2 ? path_from_utf8(argv[2]) : std::filesystem::path{};
+     if (name == "private")
+         ok = private_world(root);
++    else if (name == "destination_private")
++        ok = destination_private(root);
+     else
+     {
+         std::error_code ec;
+@@ -705,7 +980,13 @@ int main(int argc, char** argv)
+             std::filesystem::create_directories(root, ec);
+         if (ec)
+             return 2;
+-        if (name == "rez_structure")
++        if (name == "destination_messages")
++            ok = destination_messages();
++        else if (name == "destination_schema")
++            ok = destination_schema();
++        else if (name == "destination_lifetime")
++            ok = destination_lifetime(root);
++        else if (name == "rez_structure")
+             ok = rez_structure();
+         else if (name == "rez_rejection")
+             ok = rez_rejection();

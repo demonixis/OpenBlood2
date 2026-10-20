@@ -1,0 +1,75 @@
+556/556 Testing: gpu.explosion_model_private
+556/556 Test: gpu.explosion_model_private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_model_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-model-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.explosion_model_private" start time: Oct 16 20:40 CEST
+Output:
+----------------------------------------------------------
+Original model opacity: 1510 covered pixels, half-opacity linear blend verified
+Original exp_sphere/Explosion_1: 168 triangles, 2323 pixels, alpha 0.375
+<end of output>
+Test time =   0.43 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_model_private" end time: Oct 16 20:40 CEST
+"gpu.explosion_model_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 20:40 CEST
+
+brushes =   1.63 sec*proc
+
+cameras =   1.76 sec*proc
+
+character =  13.30 sec*proc
+
+cinematics =   1.71 sec*proc
+
+containers =   3.63 sec*proc
+
+doors =   1.61 sec*proc
+
+explosion_models =   0.84 sec*proc
+
+gpu = 108.06 sec*proc
+
+interaction =   2.34 sec*proc
+
+keyframes =   1.74 sec*proc
+
+lights =   1.75 sec*proc
+
+model_view =   0.96 sec*proc
+
+movement =  13.35 sec*proc
+
+objectives =   1.69 sec*proc
+
+pickups =   1.73 sec*proc
+
+player =   2.00 sec*proc
+
+player_keepalive =   1.90 sec*proc
+
+player_restore =   1.67 sec*proc
+
+private = 102.68 sec*proc
+
+randomsound =  12.55 sec*proc
+
+sceneexplosion =   1.68 sec*proc
+
+sound =   1.74 sec*proc
+
+sprite_view =   0.96 sec*proc
+
+sprites =   1.60 sec*proc
+
+triggers =   1.73 sec*proc
+
+weapons =  13.31 sec*proc
+
+world_view =  13.47 sec*proc
+
+worldpaths =   1.75 sec*proc
+

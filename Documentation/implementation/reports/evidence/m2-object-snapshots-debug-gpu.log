@@ -1,0 +1,23 @@
+Test project <workspace>/Blood2/build/debug
+    Start  31: gpu.lifecycle
+1/5 Test  #31: gpu.lifecycle ....................   Passed    2.24 sec
+    Start  96: gpu.movement
+2/5 Test  #96: gpu.movement .....................   Passed   11.49 sec
+    Start 129: gpu.containers
+3/5 Test #129: gpu.containers ...................   Passed    5.91 sec
+    Start 862: gpu.level_change
+4/5 Test #862: gpu.level_change .................   Passed    6.66 sec
+    Start 955: gpu.train_session
+5/5 Test #955: gpu.train_session ................   Passed   28.55 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+containers       =   5.91 sec*proc (1 test)
+gpu              =  54.85 sec*proc (5 tests)
+movement         =  11.49 sec*proc (1 test)
+private          =  52.61 sec*proc (4 tests)
+train_session    =  28.55 sec*proc (1 test)
+world            =   6.66 sec*proc (1 test)
+
+Total Test time (real) =  54.86 sec

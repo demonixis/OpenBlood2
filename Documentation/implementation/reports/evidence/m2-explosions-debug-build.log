@@ -1,0 +1,58 @@
+[0/2] Re-checking globbed directories...
+[1/128] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[2/116] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/RotatingBrush.cpp for CXX dependencies
+[3/116] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/DestructableBrush.cpp for CXX dependencies
+[4/116] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_weapons.cpp for CXX dependencies
+[5/116] Scanning /home/yann/projects/lithtech/Blood2/src/game/registration.cpp for CXX dependencies
+[6/116] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[7/109] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Debris.cpp for CXX dependencies
+[8/109] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/radius_damage.cpp for CXX dependencies
+[9/109] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_effects.cpp for CXX dependencies
+[10/109] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[11/73] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[12/73] Scanning /home/yann/projects/lithtech/Blood2/src/app/brush_smoke.cpp for CXX dependencies
+[13/73] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector.cpp for CXX dependencies
+[14/73] Scanning /home/yann/projects/lithtech/Blood2/tests/brush_tests.cpp for CXX dependencies
+[15/73] Scanning /home/yann/projects/lithtech/Blood2/tests/explosion_tests.cpp for CXX dependencies
+[16/73] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/RotatingBrush.cpp.o
+[17/73] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/DestructableBrush.cpp.o
+[18/73] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Debris.cpp.o
+[19/73] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_weapons.cpp.o
+[20/73] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[21/71] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[22/70] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[23/68] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[24/67] Generating CXX dyndep file tests/CMakeFiles/services_tests.dir/CXX.dd
+[25/66] Generating CXX dyndep file tests/CMakeFiles/player_tests.dir/CXX.dd
+[26/65] Generating CXX dyndep file tests/CMakeFiles/weapon_tests.dir/CXX.dd
+[27/64] Generating CXX dyndep file tests/CMakeFiles/movement_tests.dir/CXX.dd
+[28/63] Generating CXX dyndep file tests/CMakeFiles/locomotion_tests.dir/CXX.dd
+[29/62] Generating CXX dyndep file tests/CMakeFiles/container_tests.dir/CXX.dd
+[30/61] Generating CXX dyndep file tests/CMakeFiles/door_tests.dir/CXX.dd
+[31/60] Generating CXX dyndep file tests/CMakeFiles/trigger_tests.dir/CXX.dd
+[32/59] Generating CXX dyndep file tests/CMakeFiles/interaction_tests.dir/CXX.dd
+[33/58] Generating CXX dyndep file tests/CMakeFiles/brush_tests.dir/CXX.dd
+[34/58] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/radius_damage.cpp.o
+[35/58] Generating CXX dyndep file tests/CMakeFiles/explosion_tests.dir/CXX.dd
+[36/58] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_effects.cpp.o
+[37/58] Building CXX object CMakeFiles/blood2_game.dir/src/game/registration.cpp.o
+[38/58] Linking CXX static library libblood2_game.a
+[39/58] Building CXX object CMakeFiles/blood2_app.dir/src/app/brush_smoke.cpp.o
+[40/58] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[41/58] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o
+[42/58] Linking CXX executable tests/object_contract_tests
+[43/58] Linking CXX executable tests/world_tests
+[44/58] Linking CXX executable blood2
+[45/58] Linking CXX executable tests/services_tests
+[46/58] Linking CXX executable tests/player_tests
+[47/58] Linking CXX executable tests/weapon_tests
+[48/58] Linking CXX executable tests/movement_tests
+[49/58] Linking CXX executable tests/locomotion_tests
+[50/58] Linking CXX executable tests/container_tests
+[51/58] Linking CXX executable tests/door_tests
+[52/58] Building CXX object tests/CMakeFiles/explosion_tests.dir/explosion_tests.cpp.o
+[53/58] Building CXX object tests/CMakeFiles/brush_tests.dir/brush_tests.cpp.o
+[54/58] Linking CXX executable tests/trigger_tests
+[55/58] Linking CXX executable tests/interaction_tests
+[56/58] Linking CXX executable tests/explosion_tests
+[57/58] Linking CXX executable tests/brush_tests

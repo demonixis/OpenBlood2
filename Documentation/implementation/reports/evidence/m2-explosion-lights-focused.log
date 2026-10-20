@@ -1,0 +1,29 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 549: explosion_sprites.private
+    Start 547: explosion_sprites.failures
+1/9 Test #547: explosion_sprites.failures .......   Passed    0.01 sec
+    Start 546: explosion_sprites.formulas
+2/9 Test #546: explosion_sprites.formulas .......   Passed    0.00 sec
+    Start 548: explosion_sprites.session
+3/9 Test #548: explosion_sprites.session ........   Passed    0.00 sec
+    Start 557: explosion_lights.lifecycle
+4/9 Test #557: explosion_lights.lifecycle .......   Passed    0.00 sec
+    Start 558: explosion_lights.recipes
+5/9 Test #558: explosion_lights.recipes .........   Passed    0.00 sec
+    Start 559: explosion_lights.failures
+6/9 Test #559: explosion_lights.failures ........   Passed    0.00 sec
+    Start 560: explosion_lights.session
+7/9 Test #560: explosion_lights.session .........   Passed    0.00 sec
+    Start 561: explosion_lights.private
+8/9 Test #549: explosion_sprites.private ........   Passed    1.54 sec
+9/9 Test #561: explosion_lights.private .........   Passed    2.74 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Label Time Summary:
+explosion_lights     =   2.75 sec*proc (5 tests)
+explosion_sprites    =   1.55 sec*proc (4 tests)
+headless             =   4.30 sec*proc (9 tests)
+private              =   4.27 sec*proc (2 tests)
+
+Total Test time (real) =   2.78 sec

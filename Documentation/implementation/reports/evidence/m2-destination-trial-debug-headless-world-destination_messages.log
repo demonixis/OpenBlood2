@@ -1,0 +1,15 @@
+26/597 Testing: world.destination_messages
+26/597 Test: world.destination_messages
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests" "destination_messages" "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/destination_messages"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"world.destination_messages" start time: Oct 16 22:41 CEST
+Output:
+----------------------------------------------------------
+PASS destination_messages
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_messages" end time: Oct 16 22:41 CEST
+"world.destination_messages" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+587/589 Testing: naga.lifetime
+587/589 Test: naga.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/naga_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/naga-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"naga.lifetime" start time: Oct 17 00:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"naga.lifetime" end time: Oct 17 00:57 CEST
+"naga.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

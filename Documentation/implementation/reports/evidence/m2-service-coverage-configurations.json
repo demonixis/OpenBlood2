@@ -1,0 +1,20 @@
+{
+  "debug": {
+    "BLOOD2_INSPECTOR": "TRUE",
+    "BLOOD2_SANITIZERS": "OFF",
+    "CMAKE_BUILD_TYPE": "Debug",
+    "CMAKE_CXX_COMPILER": "/usr/bin/c++"
+  },
+  "release": {
+    "BLOOD2_INSPECTOR": "FALSE",
+    "BLOOD2_SANITIZERS": "OFF",
+    "CMAKE_BUILD_TYPE": "Release",
+    "CMAKE_CXX_COMPILER": "/usr/bin/c++"
+  },
+  "sanitize": {
+    "BLOOD2_INSPECTOR": "OFF",
+    "BLOOD2_SANITIZERS": "ON",
+    "CMAKE_BUILD_TYPE": "Debug",
+    "CMAKE_CXX_COMPILER": "clang++"
+  }
+}

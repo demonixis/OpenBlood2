@@ -1,0 +1,7 @@
+[0/2] Re-checking globbed directories...
+[1/27] Scanning /home/yann/projects/lithtech/Blood2/tests/weapon_audio_tests.cpp for CXX dependencies
+[2/27] Generating CXX dyndep file tests/CMakeFiles/weapon_audio_tests.dir/CXX.dd
+[3/25] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[4/25] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[5/7] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[6/7] Linking CXX executable blood2

@@ -1,0 +1,14 @@
+715/718 Testing: destructable_models.audio
+715/718 Test: destructable_models.audio
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable_model_tests" "audio" "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable-model-audio"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"destructable_models.audio" start time: Oct 17 05:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_models.audio" end time: Oct 17 05:15 CEST
+"destructable_models.audio" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,437 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "d7b744394b6a9fde0969362b3b6374bd52981f8e",
+  "m2_complete": false,
+  "validation": {
+    "debug": {
+      "passed": 51,
+      "failed": 0,
+      "private": 14,
+      "seconds": 18.19
+    },
+    "release": {
+      "passed": 51,
+      "failed": 0,
+      "private": 14,
+      "seconds": 2.71
+    },
+    "sanitize": {
+      "passed": 51,
+      "failed": 0,
+      "private": 14,
+      "seconds": 105.55
+    },
+    "debug-gpu": {
+      "passed": 6,
+      "failed": 0,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "seconds": 64.75
+    },
+    "debug-final-gpu": {
+      "passed": 4,
+      "failed": 0,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "seconds": 11.99
+    },
+    "debug-device-gpu": {
+      "passed": 2,
+      "failed": 0,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "seconds": 3.9
+    },
+    "release-gpu": {
+      "passed": 8,
+      "failed": 0,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "seconds": 15.83
+    }
+  },
+  "artifacts": [
+    {
+      "file": "m2-blood-splats-build-debug.log",
+      "sha256": "77dd521ed9dc8dc7ba762022007fddf6b1827ee9a45c017f8d75688560573e68",
+      "raw_capture_sha256": "a6a68b5fffc1bc128ccf05f6d708b1826ca2dc46b25a19ddbfda01c03b3b8bde",
+      "bytes": 31308
+    },
+    {
+      "file": "m2-blood-splats-build-debug2.log",
+      "sha256": "3bf3a6fdd92a510817e63c724ce3dffbfce4d4e664e9016f1562f4a975a4a689",
+      "raw_capture_sha256": "5ac85c7a83a088414e61500c0cbe0283add0ca2a5ba4a6d0ca9347a68e4f31db",
+      "bytes": 28210
+    },
+    {
+      "file": "m2-blood-splats-build-debug3.log",
+      "sha256": "07487571672feae041aebc019548d881b7357746cef85262ac98769f242d795c",
+      "raw_capture_sha256": "9b7bed7f9e6953860d1d319174256889a908666178b85ec0824b0e32c524bf3e",
+      "bytes": 22010
+    },
+    {
+      "file": "m2-blood-splats-build-release.log",
+      "sha256": "80d8e6908ad800f193d4d8fdd6bbd3264e9b862ba92f372f7867749b70c587c2",
+      "raw_capture_sha256": "abcf2fbfc152b4d1fbcfadd8ef76c5d8fec753bd512eaa4a922abac6359fd912",
+      "bytes": 46261
+    },
+    {
+      "file": "m2-blood-splats-build-sanitize.log",
+      "sha256": "3173a38b90b434c874c0b3fe59466f77926784de39f8fe4e93e431fc03778687",
+      "raw_capture_sha256": "db0e8d74d0749a02bd7fa21cc427fdf47992009544d9923dd35e396d67a6051d",
+      "bytes": 42228
+    },
+    {
+      "file": "m2-blood-splats-debug-device-build.log",
+      "sha256": "2d7b214195a9c005d4eaf64b5185c59f1b351c0334051352012c0da16d9f236d",
+      "raw_capture_sha256": "e5257744874a15bc57d98a160f8cf22a27583d9a11a55089bf7dff5f38c3020f",
+      "bytes": 365
+    },
+    {
+      "file": "m2-blood-splats-debug-device-gpu.log",
+      "sha256": "9e0b40105cb09692c7d16fba2de3315178065d4c2b4708835d33643c47da2a1d",
+      "raw_capture_sha256": "2a90dbc3e34456eb6c79c16e96797e3f72b522dbd272f3537a211c935905ac68",
+      "bytes": 2436
+    },
+    {
+      "file": "m2-blood-splats-debug-final-build.log",
+      "sha256": "c00890242e1a9aaddd2c293ca9ab3fec5b7615a8d92f16d4a3329f71ca25fbb1",
+      "raw_capture_sha256": "c00890242e1a9aaddd2c293ca9ab3fec5b7615a8d92f16d4a3329f71ca25fbb1",
+      "bytes": 134
+    },
+    {
+      "file": "m2-blood-splats-debug-final-gpu.log",
+      "sha256": "5c6cb199d6d4cfe7fb710588291f6a6a9bd7f78bf66221e3b25e8288575879a7",
+      "raw_capture_sha256": "ab4e40a4f54b0fe506e9abf976d87259cbfb9f43541a84eecf35eb8ddd7a9ce1",
+      "bytes": 4305
+    },
+    {
+      "file": "m2-blood-splats-debug-final-headless.log",
+      "sha256": "89d964e702ec4eaadf0e4557f908fc28b2b47ac64ed9a3955dd1fa8948851020",
+      "raw_capture_sha256": "adad86b316581f0027a9a88f330c05b143b11eb2db802d1ecef27d922afe18da",
+      "bytes": 27416
+    },
+    {
+      "file": "m2-blood-splats-debug-gpu.log",
+      "sha256": "bccfa24bad2a9fc057b48c0b9e15cf9c24e565963eae4caf76c2f87b2e554b51",
+      "raw_capture_sha256": "5ad28c6c038cb5f1ff16f608c4adec9a8ec049a3731900de0b894e2b5fe5537f",
+      "bytes": 11054
+    },
+    {
+      "file": "m2-blood-splats-debug-head-final-build.log",
+      "sha256": "c2f2effa87db031c6e57893eff13ce3bb61032a44d98aaf78163f1d0adefb584",
+      "raw_capture_sha256": "c2f2effa87db031c6e57893eff13ce3bb61032a44d98aaf78163f1d0adefb584",
+      "bytes": 255
+    },
+    {
+      "file": "m2-blood-splats-debug-head-final-tests.log",
+      "sha256": "d4b96b33059fbf229a6f2f70d58ca173e919b6f8dff5ba6a7d5e2e034a08cfaf",
+      "raw_capture_sha256": "170c5470e87b4a71c1d3ca641d4ddb53b0d8d3015c1a53cbecabc0733129c2d1",
+      "bytes": 27416
+    },
+    {
+      "file": "m2-blood-splats-debug-headless.log",
+      "sha256": "03513f84322bafa71ff82d9df9e481caa9a08b3a357bd19ef1b17e3f24651bfa",
+      "raw_capture_sha256": "1f8a172fc7026d403284392ac3a57fd4750ba8f1e2212112c7e33a6da126c6a0",
+      "bytes": 14583
+    },
+    {
+      "file": "m2-blood-splats-debug-recheck-build.log",
+      "sha256": "113c15976ea59f0cb6844256ea835b5def5cf614ef95745278980eb1589999ab",
+      "raw_capture_sha256": "e2342e100114e9f2889ac2846d362160f7f96ec3a71489277e4a51e8f0c4edef",
+      "bytes": 2488
+    },
+    {
+      "file": "m2-blood-splats-release-final-build.log",
+      "sha256": "41b2e00c96ddde198aea698f7b5b63b518e21ca34a71f4c46d73a714bfa9f8ef",
+      "raw_capture_sha256": "ad82b2db783d7439e496064e9565ed7e2fdf41c366aeb4b1a48936807cf0cd2b",
+      "bytes": 2807
+    },
+    {
+      "file": "m2-blood-splats-release-gpu-build.log",
+      "sha256": "2d7b214195a9c005d4eaf64b5185c59f1b351c0334051352012c0da16d9f236d",
+      "raw_capture_sha256": "e5257744874a15bc57d98a160f8cf22a27583d9a11a55089bf7dff5f38c3020f",
+      "bytes": 365
+    },
+    {
+      "file": "m2-blood-splats-release-gpu.log",
+      "sha256": "91acd205eb28dda2512c69bba021a3e30197c33a2f4fc1acbdd7d3c5da6178fc",
+      "raw_capture_sha256": "27080567706640898034512447e7f2da23f091c41d1d48f4bd718eb5b86d0fc4",
+      "bytes": 13305
+    },
+    {
+      "file": "m2-blood-splats-release-headless.log",
+      "sha256": "71f84430fe68b2a7fa33d24c9a4227139a3da1e7d0888140cfa17d19b8f90612",
+      "raw_capture_sha256": "375d0a1ade97ac9600c5523fcef0113fdf6738ced0443cb18e3c417a2d9a98f0",
+      "bytes": 27658
+    },
+    {
+      "file": "m2-blood-splats-sanitize-final-build.log",
+      "sha256": "7e5bf7959c7107f1690d51982488e8980f417cd5447358fb39b966c9eedaf804",
+      "raw_capture_sha256": "046fc5415780ce5983e06427ea2e677e6ae26a5c6d2a3835025592d94a06e73d",
+      "bytes": 1489
+    },
+    {
+      "file": "m2-blood-splats-sanitize-headless.log",
+      "sha256": "1f29fe5fc0a1105c1d692d97e04fd8d7ea3200d0ad4d2693ad7c62726258b15b",
+      "raw_capture_sha256": "9f04307bc7eab2d88debab5b4785d2459571f005686e9e996dcd72cc0448cf37",
+      "bytes": 27779
+    },
+    {
+      "file": "m2-blood-splats-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    }
+  ],
+  "gpu_distinct_scenarios_per_configuration": 8,
+  "private_scenarios": {
+    "corpse_pool_cycles": 3,
+    "original_Cultist_and_corpse": true,
+    "diagnostic_floor": true,
+    "resource_variants": 3,
+    "unload_checks": true,
+    "gpu_per_variant_cycles": 3,
+    "exact_synthetic_blend_texels": 20000
+  },
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "captures": [
+    {
+      "local_path": "build/debug/tests/blood-splat-private/splat-tint-alpha.png",
+      "sha256": "121a58461c7eab89586eb928e7ed4f548b8728a0e4bc6b2771b6bea8087fcacd",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/blood-splat-private/private-blood1.png",
+      "sha256": "3715f35071de10522f732a37769c8388be911d0f2f70776ec5b32beee1b9a05c",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/blood-splat-private/private-blood2.png",
+      "sha256": "792301fe088f30a6ae38015770981242a693e3eb7a42032bbe6fd7fcdef6cbfc",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/blood-splat-private/private-blood3.png",
+      "sha256": "23d674fef43247ceedf3137d11148d01254494ce9f0b6dd1c083bee6383eb235",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/blood-splat-private/splat-tint-alpha.png",
+      "sha256": "121a58461c7eab89586eb928e7ed4f548b8728a0e4bc6b2771b6bea8087fcacd",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/blood-splat-private/private-blood1.png",
+      "sha256": "3715f35071de10522f732a37769c8388be911d0f2f70776ec5b32beee1b9a05c",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/blood-splat-private/private-blood2.png",
+      "sha256": "792301fe088f30a6ae38015770981242a693e3eb7a42032bbe6fd7fcdef6cbfc",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/blood-splat-private/private-blood3.png",
+      "sha256": "23d674fef43247ceedf3137d11148d01254494ce9f0b6dd1c083bee6383eb235",
+      "committed": false
+    }
+  ],
+  "commands": [
+    "cmake --build build/<debug|release> --target blood_splat_tests corpse_tests death_effect_tests ai_navigation_tests object_contract_tests world_tests player_controls_tests blood2_app blood_splat_gpu_tests level_change_gpu_tests death_effect_gpu_tests -j3",
+    "cmake --build build/sanitize --target blood_splat_tests corpse_tests death_effect_tests ai_navigation_tests object_contract_tests world_tests player_controls_tests -j3",
+    "ctest --test-dir build/<debug|release> -R '^(blood_splats|corpses|death_effects|ai_navigation|objects)\\.|^world\\.(level_change.*|destination_.*)$|^player_controls.corpse_clearance$' -V -j2",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^(blood_splats|corpses|death_effects|ai_navigation|objects)\\.|^world\\.(level_change.*|destination_.*)$|^player_controls.corpse_clearance$' -V -j2",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/release -R '^gpu\\.(blood_splat_alpha|blood_splat_private|character|lifecycle|corpse_clearance|mouse_combat|level_change|death_effects)$' -V"
+  ],
+  "development_findings": [
+    "Initial compile caught ordinary quaternion field names; code now uses actual DRotation m_Vec/m_Spin.",
+    "Early formulas fixture supplied 100 seconds to one update, exceeding the unchanged shared SPR limit. It now tests the same 100-second persistence with two valid 50-second updates; effect limit explicitly matches 60 seconds.",
+    "Original nearest-prefix fixture now positions a later closer sprite to verify early stopping; first ties and the strict squared-distance boundary remain checked.",
+    "Additional GPU rechecks print actual device name directly in both new test paths.",
+    "No acceptance assertion, production physics bound or test timeout relaxed."
+  ],
+  "limitations": [
+    "Diagnostic floor and private effect captures do not prove full authored encounter/campaign parity.",
+    "Blood spurts, gib impact callers, shared SFX-list eviction and full save/restore remain unavailable.",
+    "Source-alignment fallback, portable RNG and existing fullbright sprite rasterization are documented adaptations.",
+    "No native Metal execution this increment; no dependency/shader/reference/asset changes."
+  ],
+  "implementation_patch_sha256": "379117ed62d9d71010691e787eb4b7454af2d8f9c1f608bbd388785453d3485e",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "e6e3c283b2720e803b9f17fdba3d6ef22c002acb92c7919fb25f27d1a16baec1"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "1897ca4398da005409a7364ea31dd0c658144ac6544d528f0fb4aab50a84eae5"
+    },
+    {
+      "path": "README.md",
+      "sha256": "9c854e535faaed9402fdd381d383d0a68945324098268ad287367efdccc0cd7f"
+    },
+    {
+      "path": "docs/BLOOD_SPLAT_CONTRACTS.md",
+      "sha256": "7c982f51f6feb3a2b0fd245779747caa8a7298a58adbf743bb34e8c58a55e438"
+    },
+    {
+      "path": "docs/CORPSE_CONTRACTS.md",
+      "sha256": "e9d66e756f14df9856ec40f4f21a04b20cc7bc97749e04dd6817beb54d141c78"
+    },
+    {
+      "path": "docs/DEATH_EFFECT_CONTRACTS.md",
+      "sha256": "d5bca68255ce7785e56295b740f8995c9ba42553ef2973cb45aebfe1296afbb5"
+    },
+    {
+      "path": "docs/M2_BLOOD_SPLAT_SOURCES.json",
+      "sha256": "7c1b9ab50176078b419080a032a489240abf38f7b994d12f9bf6e0d6d6513da2"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "50389d66bc0810f2410ef2a8fc8ade6f72a4c1c2784cb84b75284ab90782b4ad"
+    },
+    {
+      "path": "docs/SPRITE_VIEW_CONTRACTS.md",
+      "sha256": "24ae7a7edcdcf9c5c4550afe4331752c87d2171fb1f66405d2b80459b86fec51"
+    },
+    {
+      "path": "src/app/inspector.h",
+      "sha256": "5552452376b3082093f6b90d1b9f4a1ffda4a9d0512fa6ded6eb7a48c55807f9"
+    },
+    {
+      "path": "src/app/inspector_skeleton.cpp",
+      "sha256": "26b2c22d1ae96ee8ffd456601b147c150ca8e45378a8128b35a6a6cb734dd0b9"
+    },
+    {
+      "path": "src/app/inspector_sprites.cpp",
+      "sha256": "146dbf6cae7cfe092f4a4d7e9bca5bdb68956bc11448cd28d8d5f5c081ca7bfe"
+    },
+    {
+      "path": "src/app/sprite_scene.cpp",
+      "sha256": "13dd546e6d08d41d8edace8e8893915b3574e008bf798931638fcef223e9186a"
+    },
+    {
+      "path": "src/engine/object_pose.cpp",
+      "sha256": "1c5331e06ec581a577e011cd28003a9702289283d1a31b39fcb5b2ffeff0410c"
+    },
+    {
+      "path": "src/engine/objects.h",
+      "sha256": "4fc7a2b873dee2821e6661d62a3658c4198d5fc1ae2c3094bdd66e9894cb4c4d"
+    },
+    {
+      "path": "src/engine/sprite_view.h",
+      "sha256": "8611caf1baf5376b0627596079870c005228013d9b42fbc193aa431e8651e788"
+    },
+    {
+      "path": "src/game/blood_splats.cpp",
+      "sha256": "16c86149fd976e7ba0af853d878cefbd84e8d95a0510282df4a899221612c525"
+    },
+    {
+      "path": "src/game/blood_splats.h",
+      "sha256": "e854311cb9b44d894fc1d60343354655aa80ac749cf83ba569a0f3a29381b4ae"
+    },
+    {
+      "path": "src/game/legacy/server_de.h",
+      "sha256": "cdb5af0eec5b71768dc04b269444981fdf80fed98f1a87a5bb63076b1478cadf"
+    },
+    {
+      "path": "src/game/original/BloodSplatFX.cpp",
+      "sha256": "3906edbb21e38a11d9227b849702b04aae1d9d95a58606e29fb82004c5d7a66f"
+    },
+    {
+      "path": "src/game/original/BloodSplatFX.h",
+      "sha256": "d8a42231eb0e527c0fb87c32894db227cdab333f33770ae2136044516c6082bd"
+    },
+    {
+      "path": "src/game/original/ClientSplatFX.cpp",
+      "sha256": "c3a5c36fc07b6853bcb4a39843f6f010c3bd768e5fba4da06f57c31cad9b5f08"
+    },
+    {
+      "path": "src/game/original/ClientSplatFX.h",
+      "sha256": "9d8ee74bf2843ee9e29b290c570f98eb1d0808cd828c06d43c1b10fb4d965db3"
+    },
+    {
+      "path": "src/game/original/Corpse.cpp",
+      "sha256": "3ad7261e3e2f4c708b81941c987ac8bc7ddf943cfabfc63e0185cd4e03e11369"
+    },
+    {
+      "path": "src/game/original/Corpse.h",
+      "sha256": "125f5cf2403c3e797e0da59db11bd40e93a125b38ba47c2a685a9abb5c90166b"
+    },
+    {
+      "path": "src/game/original/Movement.cpp",
+      "sha256": "36e447d4ecbc2c5da98697dbd310286e560a7bdd9cefa7034047db2608ed6034"
+    },
+    {
+      "path": "src/game/registration.cpp",
+      "sha256": "8001e1933a6d3eb1be8424c7060d47177ba47278a6c63840cd9228f7c0b641b9"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "c5d8f876ff49fd9531458a6f1f26ced9668f3f236cce812d0de4e84930c397a5"
+    },
+    {
+      "path": "src/game/server_effects.cpp",
+      "sha256": "535c97e004c085191138d4f5ca9f90bc095b2d71a4502a199e5b43814a5714fc"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "a951a7d4b606e6218fd1fdd3e9c49ce20bd1007b5aa4c69e7b272db867f12032"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "5c1b2e4a37ff088890de93fa972af263256d6ec0868d623c0e49af2d44015872"
+    },
+    {
+      "path": "tests/blood_splat_fixture.h",
+      "sha256": "583dab1a056327dd3232dae0912e8153af2304fdd4c32a09124586fb8d081db7"
+    },
+    {
+      "path": "tests/blood_splat_gpu_tests.cpp",
+      "sha256": "567bdf1f598a8d8b02e53aef9b35d873c4d997074d09f814b78e1b8091cf2cb2"
+    },
+    {
+      "path": "tests/blood_splat_tests.cpp",
+      "sha256": "4b1b7088054f11404d491d01952825ceaabe5ce0a5d6a959fee54b64a688a9ac"
+    }
+  ],
+  "implementation_commit": "933a422252e4a9eb39c23aa6267535171c173670",
+  "documentation_checks": {
+    "local_links": 3405,
+    "formatted_cpp_files": 24
+  }
+}

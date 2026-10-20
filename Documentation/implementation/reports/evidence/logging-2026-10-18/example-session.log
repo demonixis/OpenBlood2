@@ -1,0 +1,16 @@
+[2026-10-18T12:09:27.916Z] [info] [pid 2475365] [thread 2475365] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792325367916873523-0
+[2026-10-18T12:09:27.917Z] [info] [pid 2475365] [thread 2475365] OpenBlood2 0.3.0 / 53a5967-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-53a5967 (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[2026-10-18T12:09:27.917Z] [info] [pid 2475365] [thread 2475365] Requested world=01_SubwayA; config=blood2.local.ini; inspector=false; view=false; bench=false; headless=false; frames=0
+[2026-10-18T12:09:27.917Z] [info] [pid 2475365] [thread 2475365] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[2026-10-18T12:09:27.917Z] [info] [pid 2475365] [thread 2475365] BLOOD2.REZ: detected, 267758913 bytes
+[2026-10-18T12:09:27.917Z] [info] [pid 2475365] [thread 2475365] SOUND.REZ: detected, 204633068 bytes
+[2026-10-18T12:09:27.917Z] [info] [pid 2475365] [thread 2475365] BLOOD2P.REZ: detected, 24133434 bytes
+[2026-10-18T12:09:27.917Z] [info] [pid 2475365] [thread 2475365] BLOOD2P2.REZ: detected, 2337176 bytes
+[2026-10-18T12:09:27.917Z] [info] [pid 2475365] [thread 2475365] BLOOD2NM.REZ: detected, 108939094 bytes
+[2026-10-18T12:09:27.917Z] [info] [pid 2475365] [thread 2475365] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[2026-10-18T12:09:28.196Z] [info] [pid 2475365] [thread 2475365] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[2026-10-18T12:09:28.400Z] [info] [pid 2475365] [thread 2475365] New game requested: world=01_SubwayA; character=0; difficulty=1
+[2026-10-18T12:09:28.457Z] [info] [pid 2475365] [thread 2475365] World ready: worlds/01_subwaya.dat
+[2026-10-18T12:09:39.335Z] [info] [pid 2475365] [thread 2475365] Menu traversal passed: startup, pause snapshots, independent audio, options, resize, inspector, resume and quit
+[2026-10-18T12:09:39.335Z] [info] [pid 2475365] [thread 2475365] Frontend complete: 216 frames, world worlds/01_subwaya.dat, menu audio starts 24/failures 0
+[2026-10-18T12:09:39.552Z] [info] [pid 2475365] [thread 2475365] Session finished: exit_code=0

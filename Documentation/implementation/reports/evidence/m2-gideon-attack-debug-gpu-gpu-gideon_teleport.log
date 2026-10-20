@@ -1,0 +1,15 @@
+682/691 Testing: gpu.gideon_teleport
+682/691 Test: gpu.gideon_teleport
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_teleport_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-teleport-gpu"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.gideon_teleport" start time: Oct 17 03:08 CEST
+Output:
+----------------------------------------------------------
+Synthetic triangle: 1261 visible pixels; original 16-step fade reaches empty frame; reappearance exact; repeated reads do not advance clocks. Dodge motion integrates once and finishes at one second.
+<end of output>
+Test time =   0.42 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.gideon_teleport" end time: Oct 17 03:09 CEST
+"gpu.gideon_teleport" time elapsed: 00:00:00
+----------------------------------------------------------

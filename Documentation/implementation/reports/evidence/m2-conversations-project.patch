@@ -1,0 +1,1471 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 6270f38..0bf5cb9 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -534,3 +534,5 @@ The [Flare Gun continuation](../Documentation/Implementation/M2_FLARES.md) conne
+ The [world-model debris continuation](../Documentation/Implementation/M2_WORLD_DEBRIS.md) connects original named-fragment activation, gravity, rotation and independent lifetime, with rendered geometry and inspection. CityHub now has 432 created / 31 transferred sounds / 21 unsupported / one failed entry. Conservative moving bounds are replacement physics; missing geometry, required services and safe NEW_LEVEL keep M2 incomplete. Read [contracts](docs/WORLD_DEBRIS_CONTRACTS.md). Preserve contiguous name traversal, flag replacement, subclass/aggregate ordering, retained acceleration and deferred independent lifetime.
+ 
+ The [M16 continuation](../Documentation/Implementation/M2_ASSAULT.md) connects original primary fire, alternate grenade charges, pickup/drop, independent grenade lifetime and inspection. CityHub has 433 created / 31 transferred sounds / 20 unsupported / one failed. Finite inverted ABC key bounds remain visible metadata warnings. The original Cultist lacks rifle animations; direct AI firing is tested separately from unavailable autonomous M16 combat. Replacement grenade physics, required services and safe NEW_LEVEL keep M2 open. Read [contracts](docs/ASSAULT_CONTRACTS.md). Preserve distinct ammo pools, source sequential explosion passes, deferred lifetime, one model-projectile integrator and explicit missing clips.
++
++The [conversation continuation](../Documentation/Implementation/M2_CONVERSATIONS.md) connects original ConversationTrigger sequencing, typed client delivery and CCommLink timing/real WAV playback, with inspection. CityHub has 434 created / 31 transferred sounds / 541 editor-only / 19 unsupported / one failed. All seven authored conversation cues in the base-world catalog remain unmapped and missing; separately labelled diagnostics verify actual audio without altering them. Original communication HUD/VoiceMgr arbitration, required services and safe NEW_LEVEL keep M2 incomplete. Read [contracts](docs/CONVERSATION_CONTRACTS.md). Preserve first-empty waves, backslash-only mapping, repeat precedence, busy drops, text-derived strict deadlines and independent queued/voice lifetime. Never fabricate dialogue for an unmapped authored reference.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 19522dd..096ad74 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -37,7 +37,7 @@ add_library(blood2_game STATIC src/game/original/Grenade.cpp src/game/original/F
+ target_sources(blood2_game PRIVATE src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp src/game/original/SoundFX.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/LightFX.cpp src/game/original/ClientLightFX.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
+-target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
++target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/original/ConversationTrigger.cpp src/game/original/ConversationStrings.cpp src/game/original/CommLink.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/WeaponPickups.cpp src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+diff --git a/README.md b/README.md
+index f6a2762..5802304 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [conversation continuation](../Documentation/Implementation/M2_CONVERSATIONS.md) connects original ConversationTrigger sequencing, typed client delivery and CCommLink timing/real WAV playback, with inspection. CityHub has 434 created / 31 transferred sounds / 541 editor-only / 19 unsupported / one failed. All seven authored conversation cues in the base-world catalog remain unmapped and missing; separately labelled diagnostics verify actual audio without altering them. Original communication HUD/VoiceMgr arbitration, required services and safe NEW_LEVEL keep M2 incomplete.
++
+ The [M16 continuation](../Documentation/Implementation/M2_ASSAULT.md) connects original primary fire, alternate grenade charges, pickup/drop, independent grenade lifetime and inspection. CityHub has 433 created / 31 transferred sounds / 20 unsupported / one failed. Finite inverted ABC key bounds remain visible metadata warnings. The original Cultist lacks rifle animations; direct AI firing is tested separately from unavailable autonomous M16 combat. Replacement grenade physics, required services and safe NEW_LEVEL keep M2 open.
+ 
+ The [world-model debris continuation](../Documentation/Implementation/M2_WORLD_DEBRIS.md) connects original named-fragment activation, gravity, rotation and independent lifetime, with rendered geometry and inspection. CityHub now has 432 created / 31 transferred sounds / 21 unsupported / one failed entry. Conservative moving bounds are replacement physics; missing geometry, required services and safe NEW_LEVEL keep M2 incomplete.
+diff --git a/docs/CONVERSATION_CONTRACTS.md b/docs/CONVERSATION_CONTRACTS.md
+new file mode 100644
+index 0000000..774f482
+--- /dev/null
++++ b/docs/CONVERSATION_CONTRACTS.md
+@@ -0,0 +1,82 @@
++# Original conversation triggers and client communication
++
++M2 remains incomplete. See [execution evidence](../../Documentation/Implementation/M2_CONVERSATIONS.md)
++and [source selections](M2_CONVERSATION_SOURCES.json). This extends
++[trigger](TRIGGER_CONTRACTS.md), [player](PLAYER_CONTRACTS.md),
++[objective transport](OBJECTIVES_CONTRACTS.md) and [cinematic audio](CINEMATIC_CONTRACTS.md) contracts.
++
++## Original server rules
++
++`ConversationTrigger` derives from the original Trigger subset. It retains eight
++WaveFile properties, CharacterType's low eight bits, RepeatLastMessage and
++LoopToFirstMessage. Property loading precedes the base precreate callback and
++only runs for world/string creation. The first empty wave ends the sequence;
++subsequent properties are ignored. The source's count increment after a failed
++property lookup is retained. Trigger filters, locks, activation counts, delays,
++reset and deferred lifetime remain shared. Default touch/AI/object/relay activation
++is false; player activation is true.
++
++The immutable original filename/text table is imported completely. Lookup strips
++only backslashes, compares case-insensitively and returns the first match. Forward
++slashes deliberately do not behave as filename separators here. Resource lookup
++still uses the engine's existing normalized paths. Unknown filenames, including
++`default.wav`, produce an inspected failure without advancing the source index.
++No new dialogue, guessed alias or resource substitution is supplied.
++
++An accepted send copies file, text and character into the bounded local-client
++queue. The source advances after the attempt even when that queue is full or no
++client is available. RepeatLastMessage takes precedence over LoopToFirstMessage;
++without either, exhaustion stops future sends. Delayed virtual SendMessage ignores
++its target/slot argument and invokes this same sequence method, as in the source.
++Owned values replace HSTRING/wire ownership. Files must be nonempty and shorter
++than 200 bytes, text shorter than 500, with no embedded NULs. Queue capacity remains
++256. This is single-player local delivery, not networking or save compatibility.
++
++## Original client rules and actual audio
++
++The SMSG_CONVERSATION branch invokes the numeric-character `CCommLink` path. A busy
++communication discards the incoming message without replacing the current one;
++the server does not rewind. Character 0–4 selects the original Caleb, Ophelia,
++Ishmael, Gabriella and voice portrait path; other bytes select the unknown portrait.
++Paths are metadata; the original PCX/font HUD is not rendered.
++
++The tab uses strict `> 0.2` second entry/exit transitions. Its stopped duration is
++`max(2.5, text_bytes / 15)`, with the original separate text scroll/hold phases.
++Voice playback starts once, on completion of entry. Exact lowercase `default.wav`
++suppresses playback. Other files use real buffered local WAV playback, original
++misc-high priority intent, no loop and no reverb. The actual original helper call
++has bHandle/bTime true and bStream false; a nearby source comment does not turn
++this caller into streaming. Failed playback is inspected and is not retried.
++
++The text-derived deadline kills the retained sound even if it is longer; a short
++sound completing does not shorten that deadline. Voice handles are released on
++replacement, exit or world unload. Trigger removal cannot destroy the owned queued
++message or its later player-owned voice. Player removal and client exit clear all
++communication state. No new mutable game global or shared table owner is added.
++
++Timing moved from the source Draw method into the client simulation update so it
++continues with Dear ImGui hidden or compiled out. This is an explicit adaptation.
++The source's client VoiceMgr StopAll/SetNextPlayTime service is still unavailable:
++inspection counts stop requests and retains the requested delay, without stopping
++unrelated server voices or reporting successful arbitration. Original HUD drawing,
++VoiceMgr arbitration, complete save/restore and safe NEW_LEVEL remain pending.
++
++## Inspection and external-data evidence
++
++The Cinematics tab shows client text/file/portrait, busy drops, phase ratios,
++text duration, real voice attempts/failures and unavailable VoiceMgr requests.
++It lists every conversation controller, including hidden/inactive ones, its
++sequence/options, all eight resource/mapping slots and errors. TRIGGER queues
++through the existing frame-boundary command path with the player as sender.
++Reading inspection does not advance any timer or sound.
++
++All seven authored ConversationTrigger entries in the 57 parseable base worlds
++create, but all seven first cues are unmapped and absent from the installed
++resource index (four default.wav placeholders and three historical names).
++The existing malformed `16_bridge.dat` stays rejected. CityHub's authored
++placeholder is preserved and tested as silent; creation does not certify dialogue.
++A separately labelled diagnostic invokes original callbacks with the real installed
++1ACaleb1 voice for playback/lifetime/GPU verification. It never patches world data.
++CityHub is 434 created / 31 transferred sounds / 541 editor-only / 19 unsupported /
++one failed, with 466 structurally checked / 19 unknown / zero invalid entries.
++Required remaining services and missing fallengrills geometry keep M2 open.
+diff --git a/docs/M2_CONVERSATION_SOURCES.json b/docs/M2_CONVERSATION_SOURCES.json
+new file mode 100644
+index 0000000..37b75f5
+--- /dev/null
++++ b/docs/M2_CONVERSATION_SOURCES.json
+@@ -0,0 +1,59 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "18752f58a367073030dc9dbed916f9862bbb9743",
++  "status": "M2 incomplete; original ConversationTrigger and bounded CCommLink timing/audio",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/ConversationTrigger.cpp",
++      "source_sha256": "37db64a11c634bb7b1b91e06782db30adefa71b73c3304ed4e1e04bafb175ce3",
++      "purpose": "Original registration/defaults, precreate order, wave sequence and typed broadcast selection; save/load omitted explicitly."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ConversationTrigger.h",
++      "source_sha256": "9061ade6236bb36ebe0946d76b9c4f619e9eb97fd7b40576e26b0212478bbe59",
++      "purpose": "Trigger inheritance and delayed SendMessage forwarding."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ConversationStrings.h",
++      "source_sha256": "f165040474094b206d4e4d10f9c6ed5afa3dba61b2cdffa3a68cf1884946521f",
++      "purpose": "Complete immutable filename/text table and backslash-only first-match lookup."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Trigger.cpp",
++      "source_sha256": "373658121f86b4d792eeb986a0e093291af3e1205b831385f142cf2ea445198c",
++      "purpose": "Inherited activation/filter/reset/delayed callback rules."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/CommLink.cpp",
++      "source_sha256": "d870df0e5486ea70ee88c6f9829bb8257dbe8566c26905f1c56734ae50300e92",
++      "purpose": "Numeric-character StartCommunication and original tab/text timing and sound lifecycle from Draw."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/CommLink.h",
++      "source_sha256": "d6dea2ec6fff1abeb7f4ca0f63c851f4bb468bbc4b615f21cc7fcbd3a740f702",
++      "purpose": "Character constants, buffer bounds and scroll duration."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "purpose": "SMSG_CONVERSATION dispatch and ignored COMM_BUSY."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
++      "source_sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
++      "purpose": "PlaySoundLocal argument order: retained timed buffered local audio, not streaming."
++    },
++    {
++      "source": "sources/blood2/Shared/SoundTypes.h",
++      "source_sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
++      "purpose": "SOUNDPRIORITY_MISC_HIGH intent."
++    }
++  ],
++  "adaptations": [
++    "Owned bounded strings/events replace HSTRING and old wire serialization.",
++    "Client timing runs in simulation instead of Draw, including inspector-free builds.",
++    "Original immutable table uses ASCII case-insensitive comparisons and retains backslash-only basename lookup.",
++    "Unmapped authored paths stay failures; real playback probes are separately labelled diagnostics.",
++    "Original portrait/font rendering and VoiceMgr stop/delay arbitration are explicitly unavailable."
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index b3e040a..dc43aed 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -935,3 +935,16 @@ explosion repetition is retained with reentrant guards. Finite inverted unused A
+ key bounds are preserved and diagnosed, following read-only donor analysis rather
+ than changing private content. See [ledger](M2_ASSAULT_SOURCES.json),
+ [contracts](ASSAULT_CONTRACTS.md) and [evidence](../../Documentation/Implementation/M2_ASSAULT.md).
++
++## Original conversation sequencing and communication
++
++ConversationTrigger properties/precreate/SendMessages and all 119 filename/text
++pairs come from the original ObjectDLL sources. The numeric-character CCommLink
++StartCommunication and tab/text/sound portions of Draw come from ClientShellDLL,
++with its original SMSG_CONVERSATION dispatch and PlaySoundLocal argument semantics.
++Owned bounded events replace HSTRING/wire storage; timing runs in client simulation
++so inspection visibility cannot freeze it. HUD drawing and VoiceMgr arbitration
++remain explicitly unavailable. No authored missing cue is remapped or synthesized.
++See [ledger](M2_CONVERSATION_SOURCES.json), [contracts](CONVERSATION_CONTRACTS.md)
++and [evidence](../../Documentation/Implementation/M2_CONVERSATIONS.md). No dependency,
++mutable game global, reference edit or commercial asset import is introduced.
+diff --git a/docs/TRIGGER_CONTRACTS.md b/docs/TRIGGER_CONTRACTS.md
+index 90ac9b0..4687d12 100644
+--- a/docs/TRIGGER_CONTRACTS.md
++++ b/docs/TRIGGER_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original triggers, door SelfTrigger and keys
+ 
++> Extended by [conversation contracts](CONVERSATION_CONTRACTS.md): original dialogue sequencing and typed client communication are connected; authored missing mappings remain failures.
++
+ > Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and
+ > shell exit/load messages now execute. NEW_LEVEL still explicitly refuses missing
+ > keep-alive transfer before teardown; this is not a completed level transition.
+diff --git a/src/app/cinematic_smoke.cpp b/src/app/cinematic_smoke.cpp
+index 7412c2e..30c043a 100644
+--- a/src/app/cinematic_smoke.cpp
++++ b/src/app/cinematic_smoke.cpp
+@@ -1,5 +1,7 @@
+ #include "cinematic_smoke.h"
+ #include "game/original/CinematicTrigger.h"
++#include "game/original/ConversationTrigger.h"
++#include <algorithm>
+ namespace OpenBlood2
+ {
+     bool prepare_cinematic_smoke(GameSession& g, ObjectId& selected)
+@@ -17,11 +19,56 @@ namespace OpenBlood2
+             g.server.FreeString(text);
+             return ok;
+         }
+-        return false;
++        // CityHub's authored ConversationTrigger has no mapped text. Keep it intact;
++        // exercise playback with an explicitly named diagnostic and a real installed WAV.
++        bool authored = false;
++        for (auto id : g.objects.snapshot())
++            authored |= dynamic_cast<const ConversationTrigger*>(g.objects.get(id)->game.get()) != nullptr;
++        if (!authored)
++            return false;
++        std::string file, error;
++        for (const auto& [path, resource] : g.resources.index())
++        {
++            (void)resource;
++            if (path.ends_with("/1acaleb1.wav"))
++            {
++                file = path;
++                break;
++            }
++        }
++        if (file.empty())
++            return false;
++        std::replace(file.begin(), file.end(), '/', '\\');
++        if (!g.client_shell.m_bInWorld)
++            return false;
++        auto h = g.objects.create(g.objects.find_class("ConversationTrigger"), {}, Creation::World,
++                                  {{"Name", std::string("Diagnostic conversation (retail WAV)")}, {"WaveFile", file}});
++        if (!h)
++            return false;
++        selected = g.objects.get(h)->id;
++        auto text = g.server.CreateString("TRIGGER");
++        auto msg = g.server.StartMessageToObject(g.server.HandleToObject(g.client_shell.player), h, 1000);
++        bool ok = msg && g.server.WriteToMessageHString(msg, text) == DE_OK && g.server.EndMessage(msg) == DE_OK;
++        g.server.FreeString(text);
++        if (!ok || !g.pump_player_messages(error) || !g.objects.advance(.25))
++            return false;
++        g.client_shell.communication.Update(g.server, g.client_shell.player);
++        return g.client_shell.communication.voice != 0;
+     }
+     bool check_cinematic_smoke(GameSession& g, ObjectId selected)
+     {
+         const auto* r = g.objects.get(selected);
++        if (const auto* conversation = r ? dynamic_cast<const ConversationTrigger*>(r->game.get()) : nullptr)
++        {
++            const auto& comm = g.client_shell.communication;
++            const auto* voice = g.server.audio.get(comm.voice);
++            return conversation->queued == 1 && conversation->current == 1 && !conversation->unmapped &&
++                   comm.received == 1 && comm.started == 1 && !comm.busy && !comm.sound_failures &&
++                   comm.message.text == "Bring it on!" && voice && voice->cursor > 0 &&
++                   voice->request.space == SoundSpace::Local && !voice->request.streaming &&
++                   g.server.audio.has_output() && g.server.audio.submitted_frames > 0 &&
++                   g.server.audio.output_error.empty();
++        }
+         const auto* c = r ? dynamic_cast<const CinematicTrigger*>(r->game.get()) : nullptr;
+         const auto* v = c ? g.server.audio.get(c->sound) : nullptr;
+         return c && c->starts == 1 && !c->failures && c->current == 0 && v && !v->done && v->cursor > 0 &&
+diff --git a/src/app/inspector_cinematics.cpp b/src/app/inspector_cinematics.cpp
+index 9fbcace..3edb14e 100644
+--- a/src/app/inspector_cinematics.cpp
++++ b/src/app/inspector_cinematics.cpp
+@@ -1,4 +1,5 @@
+ #include "game/original/CinematicTrigger.h"
++#include "game/original/ConversationTrigger.h"
+ #include "inspector.h"
+ #include <imgui.h>
+ namespace OpenBlood2
+@@ -24,6 +25,56 @@ namespace OpenBlood2
+             ImGui::PlotLines("Left PCM", audio.mixed.data(), int(audio.mixed.size() / 2), 0, nullptr, -1, 1,
+                              ImVec2(0, 40), 2 * sizeof(float));
+         ImGui::Separator();
++        const auto& comm = game.client_shell.communication;
++        ImGui::Text("Conversation client: tab %u / text %u / received %llu / started %llu / busy drops %llu",
++                    comm.level, comm.text_level, (unsigned long long)comm.received, (unsigned long long)comm.started,
++                    (unsigned long long)comm.busy);
++        ImGui::TextWrapped("%s", comm.message.text.c_str());
++        ImGui::TextWrapped("WAV: %s | portrait: %s", comm.message.file.c_str(), comm.portrait.c_str());
++        ImGui::Text("Voice %llu / attempts %llu / failures %llu / text-based duration %.3f s",
++                    (unsigned long long)comm.voice, (unsigned long long)comm.sound_attempts,
++                    (unsigned long long)comm.sound_failures, comm.length);
++        ImGui::Text("Scroll tab/text %.3f / %.3f | VoiceMgr requests %llu / requested delay %.3f", comm.ratio,
++                    comm.text_ratio, (unsigned long long)comm.voice_manager_requests, comm.voice_manager_delay);
++        ImGui::TextWrapped("Original portrait/font HUD and client VoiceMgr stop/delay arbitration are unavailable. "
++                           "These are inspected requests, not successful services.");
++        if (!comm.error.empty())
++            ImGui::TextWrapped("Conversation audio: %s", comm.error.c_str());
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* record = game.objects.get(id);
++            const auto* conversation = dynamic_cast<const ConversationTrigger*>(record->game.get());
++            if (!conversation)
++                continue;
++            ImGui::PushID(int(id.slot));
++            if (ImGui::TreeNode(record->state.m_Name))
++            {
++                ImGui::Text("Current %u / count %u / character %u / active %s / repeat %s / loop %s",
++                            conversation->current, conversation->count, conversation->character,
++                            conversation->active ? "yes" : "no", conversation->repeat_last ? "yes" : "no",
++                            conversation->loop ? "yes" : "no");
++                ImGui::Text("Attempts %llu / queued %llu / unmapped %llu / last result %d",
++                            (unsigned long long)conversation->attempts, (unsigned long long)conversation->queued,
++                            (unsigned long long)conversation->unmapped, int(conversation->last_delivery));
++                if (ImGui::Button("Send conversation TRIGGER"))
++                {
++                    trigger_request = id;
++                    trigger_command = "TRIGGER";
++                }
++                if (!conversation->error.empty())
++                    ImGui::TextWrapped("%s", conversation->error.c_str());
++                for (unsigned n = 0; n < conversation->waves.size(); ++n)
++                {
++                    const auto& file = conversation->waves[n];
++                    const auto* text = conversation_text(file);
++                    ImGui::TextWrapped("%u: %s [%s] %s", n + 1, file.c_str(),
++                                       game.resources.find(file) ? "indexed" : "absent", text ? text : "[unmapped]");
++                }
++                ImGui::TreePop();
++            }
++            ImGui::PopID();
++        }
++        ImGui::Separator();
+         for (auto id : game.objects.snapshot())
+         {
+             const auto* r = game.objects.get(id);
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index cb56ade..dc56d76 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -81,8 +81,8 @@ namespace OpenBlood2
+         const auto trial_before = g.destination_trial.attempts;
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+-            !g.destination_trial.player_entered || g.destination_trial.created != 433 ||
+-            g.destination_trial.unknown != 20 || g.destination_trial.failed != 1 ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 434 ||
++            g.destination_trial.unknown != 19 || g.destination_trial.failed != 1 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+@@ -100,8 +100,8 @@ namespace OpenBlood2
+                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
+                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+                g.destination_inspection.source_revision == old_revision &&
+-               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 465 &&
+-               g.destination_inspection.unknown == 20 && g.destination_inspection.invalid == 0 &&
++               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 466 &&
++               g.destination_inspection.unknown == 19 && g.destination_inspection.invalid == 0 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 44bcd69..e6f1883 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -122,6 +122,7 @@ class ServerDE : public CSBase
+     virtual DDWORD GetObjectUserFlags(HOBJECT) = 0;
+     virtual DRESULT SendWorldExit(const OpenBlood2::WorldExit&, const std::string& start_point) = 0;
+     virtual DRESULT SendBossHealth(const OpenBlood2::BossHealth&) = 0;
++    virtual DRESULT SendConversation(const OpenBlood2::Conversation&) = 0;
+     virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
+     virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;
+     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index 64ea523..50fd6ae 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -235,6 +235,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
+     boss_health = {};
+     boss_health_messages = 0;
+     boss_health_visible = false;
++    communication.Reset(server_);
+     objectives = {};
+     objectives_error.clear();
+     objective_messages = 0;
+@@ -270,6 +271,7 @@ void CBloodClientShell::OnExitWorld()
+     boss_health = {};
+     boss_health_messages = 0;
+     boss_health_visible = false;
++    communication.Reset(server_);
+     objectives = {};
+     objectives_error.clear();
+     objective_messages = 0;
+@@ -343,6 +345,10 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
+         // Original SMSG_BOSSHEALTH hides the bar at full health or zero.
+         boss_health_visible = value->fraction > 0 && value->fraction < 1;
+     }
++    else if (const auto* value = std::get_if<OpenBlood2::Conversation>(&event))
++    {
++        communication.Start(server_, *value); // Original ignores COMM_BUSY.
++    }
+     else if (const auto* value = std::get_if<OpenBlood2::MissionObjectives>(&event))
+     {
+         // SMSG_OBJECTIVES: single/custom only; resource IDs override authored strings.
+@@ -370,6 +376,7 @@ bool CBloodClientShell::Update()
+     if (!m_bInWorld || server_.GetClientUserData(client_) != player)
+         return false;
+     ++updates;
++    communication.Update(server_, player);
+     server_.GetObjectPos(player, &position);
+     const auto* owner = dynamic_cast<CPlayerObj*>(server_.HandleToObject(player));
+     if (!owner)
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index 5ac941c..252e831 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -1,4 +1,5 @@
+ #pragma once
++#include "CommLink.h"
+ #include "MoveMgr.h"
+ #include "PathMgr.h"
+ #include "PlayerObj.h"
+@@ -103,6 +104,7 @@ class CBloodClientShell
+     OpenBlood2::BossHealth boss_health;
+     std::uint64_t boss_health_messages = 0;
+     bool boss_health_visible = false;
++    CCommLink communication;
+     OpenBlood2::MissionObjectives objectives;
+     std::string objectives_error;
+     std::uint64_t objective_messages = 0;
+diff --git a/src/game/original/CommLink.cpp b/src/game/original/CommLink.cpp
+new file mode 100644
+index 0000000..d820ca8
+--- /dev/null
++++ b/src/game/original/CommLink.cpp
+@@ -0,0 +1,126 @@
++#include "CommLink.h"
++#include <algorithm>
++void CCommLink::Reset(ServerDE& server)
++{
++    if (voice)
++        server.KillSound(voice);
++    *this = {};
++}
++bool CCommLink::Start(ServerDE& server, const OpenBlood2::Conversation& value)
++{
++    ++received;
++    ++voice_manager_requests; // Original shell StopAll; VoiceMgr is explicitly unavailable.
++    if (level)
++    {
++        ++busy;
++        return false;
++    }
++    if (voice)
++        server.KillSound(voice);
++    voice = 0;
++    message = value;
++    length = std::max(2.5f, static_cast<float>(message.text.size()) / 15.f);
++    text_length = length / 1.5f;
++    text_scroll = (length - text_length) / 2.f;
++    play_voice = message.file != "default.wav";
++    start = server.GetTime();
++    level = 1;
++    static constexpr const char* portraits[] = {"c_comm.pcx", "o_comm.pcx", "i_comm.pcx", "g_comm.pcx", "v_comm.pcx"};
++    portrait =
++        std::string("interface/commlink/") + (message.character < 5 ? portraits[message.character] : "u_comm.pcx");
++    error.clear();
++    ++started;
++    return true;
++}
++void CCommLink::Update(ServerDE& server, HOBJECT player)
++{
++    if (!level)
++        return;
++    const auto time = server.GetTime();
++    switch (level)
++    {
++        case 1:
++            if (time - start > .2f)
++            {
++                ratio = 1;
++                level = 2;
++                start = time;
++                text_level = 1;
++                text_start = time;
++                if (play_voice)
++                {
++                    ++voice_manager_requests;
++                    if (voice)
++                        server.KillSound(voice);
++                    OpenBlood2::SoundRequest r;
++                    r.resource = message.file;
++                    r.space = OpenBlood2::SoundSpace::Local;
++                    r.streaming = false;
++                    r.priority = 2;
++                    r.reverb_requested = false;
++                    ++sound_attempts;
++                    voice = server.PlayCinematicSound(player, r, error);
++                    if (!voice)
++                        ++sound_failures;
++                    else
++                    {
++                        float duration = 3;
++                        server.GetSoundDuration(voice, duration);
++                        voice_manager_delay = duration + .5f; // Requested only; no invented VoiceMgr arbitration.
++                    }
++                }
++            }
++            else
++                ratio = (time - start) / .2f;
++            break;
++        case 2:
++            // Original uses text-derived time, even if the voice is longer or already done.
++            if (time - start > length)
++            {
++                level = 3;
++                start = time;
++                if (voice)
++                    server.KillSound(voice);
++                voice = 0;
++            }
++            break;
++        case 3:
++            if (time - start > .2f)
++            {
++                ratio = 0;
++                level = 0;
++                start = time;
++            }
++            else
++                ratio = 1 - (time - start) / .2f;
++            break;
++    }
++    switch (text_level)
++    {
++        case 1:
++            if (time - text_start > text_scroll)
++            {
++                text_level = 2;
++                text_start = time;
++            }
++            else
++                text_ratio = (time - text_start) / text_scroll;
++            break;
++        case 2:
++            if (time - text_start > text_length)
++            {
++                text_level = 3;
++                text_start = time;
++            }
++            break;
++        case 3:
++            if (time - text_start > text_scroll)
++            {
++                text_level = 0;
++                text_start = time;
++            }
++            else
++                text_ratio = (time - text_start) / text_scroll;
++            break;
++    }
++}
+diff --git a/src/game/original/CommLink.h b/src/game/original/CommLink.h
+new file mode 100644
+index 0000000..ac2ef5f
+--- /dev/null
++++ b/src/game/original/CommLink.h
+@@ -0,0 +1,19 @@
++#pragma once
++#include "server_de.h"
++// Original ClientShellDLL/CommLink numeric-character path. Clock work is outside drawing.
++class CCommLink
++{
++  public:
++    OpenBlood2::Conversation message;
++    unsigned level = 0, text_level = 0;
++    float start = 0, text_start = 0, length = 0, text_length = 0, text_scroll = 0, ratio = 0, text_ratio = 0;
++    OpenBlood2::SoundId voice = 0;
++    std::uint64_t received = 0, started = 0, busy = 0, sound_attempts = 0, sound_failures = 0,
++                  voice_manager_requests = 0;
++    float voice_manager_delay = 0;
++    bool play_voice = false;
++    std::string portrait, error;
++    void Reset(ServerDE&);
++    bool Start(ServerDE&, const OpenBlood2::Conversation&);
++    void Update(ServerDE&, HOBJECT player);
++};
+diff --git a/src/game/original/ConversationStrings.cpp b/src/game/original/ConversationStrings.cpp
+new file mode 100644
+index 0000000..d0f474d
+--- /dev/null
++++ b/src/game/original/ConversationStrings.cpp
+@@ -0,0 +1,168 @@
++// Original ObjectDLL/ConversationStrings.h table; first-match, backslash-only basename lookup.
++#include "ConversationTrigger.h"
++#include "engine/objects.h"
++namespace OpenBlood2
++{
++    namespace
++    {
++        struct ConversationEntry
++        {
++            const char* szFile;
++            const char* szText;
++        };
++        static constexpr ConversationEntry entries[] = {
++            //	szFile				// szText
++            {"4Prophet1.wav", "I'm staying."},
++            {"1ACaleb1.wav", "Bring it on!"},
++            {"1ACaleb2.wav", "End of the line."},
++            {"2Caleb1.wav", "You just made your second mistake.  You stuck around."},
++            {"2Caleb2.wav", "Letting me live."},
++            {"3Caleb1.wav", "...Gabriel?"},
++            {"3Caleb2.wav", "Save it for someone who cares."},
++            {"3Caleb3.wav", "Things have changed.  But I don't need to tell you that."},
++            {"3Caleb4.wav", "You're not my type."},
++            {"4Caleb1.wav", "The choice is yours.  Walk now and live.  Stay, and die."},
++            {"4Caleb2.wav", "Then you're dying."},
++            {"Bmpr1Caleb1.wav", "I hate to fly."},
++            {"5Caleb1.wav", "This could be bad."},
++            {"6Caleb1.wav", "These aren't Cabal."},
++            {"6Caleb2.wav", "Something else."},
++            {"6Caleb3.wav", "I've got a train to catch.  See you around."},
++            {"8Caleb1.wav", "You've gotta be kidding."},
++            {"7Caleb1.wav", "You have no idea."},
++            {"7Caleb2.wav", "You bet, I'm just getting warmed up."},
++            {"7Caleb3.wav", "I am denial.  I'll face nothing."},
++            {"7Caleb4.wav", "I don't need babysitting."},
++            {"8Caleb1.wav", "Easy big fella!"},
++            {"9Caleb1.wav", "Oh, I'll do more than that."},
++            {"9Caleb2.wav", "Groovy."},
++            {"9Caleb3.wav", "Let it burn.  I never liked this place anyway."},
++            {"9Caleb4.wav", "Pizza."},
++            {"9Caleb5.wav", "Stripagram."},
++            {"11Caleb1.wav", "I've been dreaming of you all tied up like that."},
++            {"11Caleb2.wav", "Gimme some sugar, baby."},
++            {"11Caleb3.wav", "Oh, you again. How about coming back in about 2 minutes."},
++            {"11Caleb4.wav", "Ophelia! Okay, that's it.  It's time you die!"},
++            {"13Caleb1.wav", "The rest of your life's gonna be measured in seconds, chump."},
++            {"14Caleb1.wav", "Then I'll just have to keep on kicking your ass."},
++            {"14Caleb2.wav", "Never said I was smart."},
++            {"15Caleb1.wav", "Go ahead. I'll watch."},
++            {"15Caleb2.wav", "Let's boogie, boogie man."},
++            {"16Caleb1.wav", "When you get to hell, tell them I sent you.  You'll get a discount."},
++            {"16Caleb2.wav", "Relax, you're dead."},
++            {"16Caleb3.wav", "Too late, you're already dead."},
++            {"16Caleb4.wav", "Life's not fair, but either is death.  Get use to it."},
++            {"16Caleb5.wav", "Thank you, and goodnight."},
++            {"17Caleb1.wav", "Nah."},
++            {"17Caleb2.wav", "You're gonna hurt my feelings."},
++            {"17Caleb3.wav", "Well?"},
++            {"17Caleb4.wav", "Enough talk.  Let's fight."},
++            {"19Caleb1.wav", "Well, hello, Mr. Fancypants.  Forgive me if I don't shake hands."},
++            {"20Caleb1.wav", "I don't know nothing about that kind of stuff."},
++            {"20Caleb2.wav", "What are gonna do, spank me?"},
++            {"20Caleb3.wav", "Okay, just shut up, I need to focus. "},
++            {"20Caleb4.wav", "Kinda like a spiritual enema.  In a good way."},
++            {"3Gab1.wav", "What the hell is this?"},
++            {"3Gab2.wav", "Caleb?"},
++            {"3Gab3.wav", "Gabriella.  It's a long story."},
++            {"3Gab4.wav", "Is that any way to greet an old friend?"},
++            {"3Gab5.wav", "I need to go with you.  Find out what's going on."},
++            {"3Gab6.wav", "Looked in the mirror lately?  You're no catch yourself."},
++            {"6Gab1.wav",
++             "These things are everywhere.  The Cabal must be pretty desperate to be creating such creatures."},
++            {"6Gab2.wav", "Then what are they?"},
++            {"6Gab4.wav", "What are you doing?"},
++            {"6Gab5.wav", "Don't worry, little man.  We'll meet again."},
++            {"14Gab1.wav", "We have to go after him.  Who knows what's waiting for him."},
++            {"17Gab1.wav", "Insect, we are the Ancient One.  Bow down before us."},
++            {"17Gab2.wav", "You are all that stands between us and dominion?  Pathetic."},
++            {"17Gab3.wav",
++             "All that is will no longer be.  All that was has never been.  All that was to come... um..."},
++            {"17Gab4.wav", "All that was to come will never... happen."},
++            {"20Gab1.wav", "I'm gonna kill you both if you don't shut up."},
++            {"1AGid1.wav",
++             "This is Gideon, your guest conductor!  Hold on tight, the ride might get a little... bloody!"},
++            {"1AGid2.wav",
++             "I know you're here, Caleb.  I look forward to ripping out your spleen and wearing it as a hat."},
++            {"2Gid1.wav", "Don't have much luck with trains, do you?"},
++            {"2Gid2.wav", "Oh really?  What was my first mistake?"},
++            {"3Gid1.wav", "Time to die, Chosen One."},
++            {"7Gid1.wav", "This better work this time."},
++            {"7Gid2.wav", "Ishmael?"},
++            {"7Gid3.wav", "You were lucky this time Betrayer.  In a few hours, everything will fall back into order "
++                          "and I'll be rid of you forever.  For now, I must take my leave.  Don't worry, though-my "
++                          "troops will keep you company.  Play nice."},
++            {"10Gid1.wav", "Sounds like home."},
++            {"10Gid2.wav", "Get out of my frikkin' way!"},
++            {"11Gid1.wav", "I thought you might come here."},
++            {"11Gid2.wav", "Sorry to break up this lovely reunion Betrayer, but I need to keep you motivated."},
++            {"14Gid1.wav", "It's not over!  You will never truly defeat me!"},
++            {"15Gid1.wav", "Ah, Caleb.  I've been expecting you, you predictable oaf.  I won't be a minute.  I'm "
++                           "just... changING..."},
++            {"15Gid2.wav", "...into something ...Unpleasant."},
++            {"15Gid3.wav", "What do you think of my new look?  You have no idea how exquisite pain can feel.  Allow me "
++                           "to demonstrate."},
++            {"15Gid4.wav", "I mean on you!"},
++            {"16Gid1.wav", "No!  It's not fair!  I'll kill you!"},
++            {"7Ish1.wav", "This is a surprising development."},
++            {"7Ish2.wav", "Having a bad day?"},
++            {"7Ish3.wav", "Do you understand how much damage your doing?"},
++            {"7Ish4.wav",
++             "That's not what I mean.  You are the One That Binds.  Sooner or later you'll have to face that."},
++            {"7Ish5.wav", "Then know this, we are the Chosen.  We're here for you whether you like it or not."},
++            {"7Ish6.wav", "Yes, Ophelia too.  She was the first to come through."},
++            {"7Ish7.wav", "I wouldn't miss this for the world.  Then again, you just might end up destroying it."},
++            {"9Ish1.wav", "You're thinking about Ophelia.  Touching."},
++            {"9Ish2.wav", "There is a permanent rift in Gideon's temple.  It is a focus for all the damage that is "
++                          "being done.  An epicenter, so to speak.  You will find Ophelia there."},
++            {"9Ish3.wav",
++             "Tchernobog's destruction opened many doors between the worlds.  They can only be sealed by the One That "
++             "Binds.  That power lies within you.  This reality will perish unless you restore it."},
++            {"9Ish4.wav", "There is another reality forcing its way through the rifts, ancient and ravenous.  It is "
++                          "neither good nor evil, it merely is.  But it will devour us all."},
++            {"14Ish1.wav", "You're not going after him, are you?"},
++            {"14Ish2.wav", "I'm speculating that it's something very unpleasant."},
++            {"17Ish1.wav", "Insect, we are the Ancient One.  Bow down before us."},
++            {"17Ish2.wav", "You are all that stands between us and dominion?  Pathetic."},
++            {"17Ish3.wav",
++             "All that is will no longer be.  All that was has never been.  All that was to come... um..."},
++            {"17Ish4.wav", "All that was to come will never... happen."},
++            {"20Ish1.wav", "It is not over, Caleb.  You must seal the rifts.  You must rebind the fabric of this "
++                           "reality before it tears itself apart."},
++            {"20Ish2.wav", "The power is within you.  It is time you used it."},
++            {"3MadSci1.wav", "That's unexpected.  Hmmm, I guess I'll need to recalibrate the singularity settings."},
++            {"7MadSci1.wav", "Trust me, my calculations are perfect this time."},
++            {"10MadSci1.wav", "Sir, I have to advise you to reconsider.  My calculations are still inconclusive.  The "
++                              "rifts may be a source of unlimited power, as you suggest, but they might also be deadly "
++                              "pitfalls in the fabric of the space-time continuum.  They might lead you to a realm of "
++                              "pure chaos and evil where you will be completely and utterly annihilated."},
++            {"10MadSci2.wav", "But sir!"},
++            {"10MadSci3.wav", "No! ...I never got a chance... to tell you... how much I love you..."},
++            {"12MadSci1.wav",
++             "Hello, hello, hello.  Welcome to Research and Development, or, as I like to call it... R&D. You may call "
++             "me... doctor.  I've had some rather interesting subjects lately with all the fluctuations in the cosmic "
++             "substrate, but I must say I'm especially looking forward to your... dissection.  Please proceed to the "
++             "main lab and we'll begin the experiment..."},
++            {"11Oph1.wav", "Prince Charming, I presume."},
++            {"11Oph2.wav", "Cut me lose and I'll give you a whole vanilla pie."},
++            {"14Oph1.wav", "He wants you to follow him, you dumb bastard."},
++            {"14Oph2.wav", "What are we waiting for?"},
++            {"17Oph1.wav", "Insect, we are the Ancient One.  Bow down before us."},
++            {"17Oph2.wav", "You are all that stands between us and dominion?  Pathetic."},
++            {"17Oph3.wav",
++             "All that is will no longer be.  All that was has never been.  All that was to come... um..."},
++            {"17Oph4.wav", "All that was to come will never... happen."},
++            {"20Oph1.wav", "You have no choice.  Listen to Ishmael you idiot."},
++            {"20Oph2.wav", "I'll spank you if you spank me."}};
++
++    } // namespace
++    const char* conversation_text(std::string_view path)
++    {
++        const auto at = path.find_last_of('\\');
++        const auto file = path.substr(at == std::string_view::npos ? 0 : at + 1);
++        for (const auto& entry : entries)
++            if (same_name(file, entry.szFile))
++                return entry.szText;
++        return nullptr;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/original/ConversationTrigger.cpp b/src/game/original/ConversationTrigger.cpp
+new file mode 100644
+index 0000000..6fc8abf
+--- /dev/null
++++ b/src/game/original/ConversationTrigger.cpp
+@@ -0,0 +1,58 @@
++// Original ObjectDLL/ConversationTrigger.cpp; owned values and typed broadcast.
++#include "ConversationTrigger.h"
++DDWORD ConversationTrigger::EngineMessageFn(DDWORD m, void* data, DFLOAT reason)
++{
++    if (m == MID_PRECREATE && (reason == 1 || reason == 2))
++    {
++        for (unsigned i = 0; i < waves.size(); ++i)
++        {
++            GenericProp p;
++            const auto name = std::string("WaveFile") + (i ? std::to_string(i + 1) : "");
++            if (g_pServerDE->GetPropGeneric(name.c_str(), &p) == DE_OK)
++            {
++                if (!p.m_String[0])
++                    break;
++                waves[i] = p.m_String;
++            }
++            ++count; // Original increments even when property lookup fails.
++        }
++        DBOOL value = 0;
++        if (g_pServerDE->GetPropBool("RepeatLastMessage", &value) == DE_OK)
++            repeat_last = value != 0;
++        if (g_pServerDE->GetPropBool("LoopToFirstMessage", &value) == DE_OK)
++            loop = value != 0;
++        GenericProp p;
++        if (g_pServerDE->GetPropGeneric("CharacterType", &p) == DE_OK)
++            character = static_cast<DBYTE>(static_cast<std::uint32_t>(p.m_Long));
++    }
++    return Trigger::EngineMessageFn(m, data, reason);
++}
++void ConversationTrigger::SendMessages()
++{
++    if (current >= count)
++        return;
++    ++attempts;
++    const char* text = OpenBlood2::conversation_text(waves[current]);
++    if (!text)
++    {
++        ++unmapped;
++        error = "Conversation filename has no original text mapping";
++        return;
++    }
++    last_delivery = g_pServerDE->SendConversation({waves[current], text, character});
++    if (last_delivery == DE_OK)
++    {
++        ++queued;
++        error.clear();
++    }
++    else
++        error = "Conversation broadcast unavailable or queue full";
++    // Source advances after the send attempt, independently of client busy/playback.
++    if (++current == count)
++    {
++        if (repeat_last)
++            --current;
++        else if (loop)
++            current = 0;
++    }
++}
+diff --git a/src/game/original/ConversationTrigger.h b/src/game/original/ConversationTrigger.h
+new file mode 100644
+index 0000000..5eb034d
+--- /dev/null
++++ b/src/game/original/ConversationTrigger.h
+@@ -0,0 +1,26 @@
++#pragma once
++#include "Trigger.h"
++#include <string_view>
++namespace OpenBlood2
++{
++    const char* conversation_text(std::string_view);
++}
++class ConversationTrigger final : public Trigger
++{
++  public:
++    std::array<std::string, 8> waves;
++    unsigned count = 0, current = 0;
++    DBYTE character = 0;
++    bool repeat_last = false, loop = false;
++    std::uint64_t attempts = 0, queued = 0, unmapped = 0;
++    DRESULT last_delivery = DE_NOTFOUND;
++    std::string error;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    void SendMessages() override;
++    void SendMessage(unsigned, const std::string&) override
++    {
++        SendMessages();
++    }
++};
+diff --git a/src/game/player_messages.h b/src/game/player_messages.h
+index 08d6760..f0de956 100644
+--- a/src/game/player_messages.h
++++ b/src/game/player_messages.h
+@@ -80,6 +80,11 @@ namespace OpenBlood2
+     {
+         float fraction = 0;
+     };
++    struct Conversation
++    {
++        std::string file, text;
++        DBYTE character = 0;
++    };
+     struct MissionObjectives
+     {
+         std::uint32_t resource = 0;
+@@ -97,5 +102,5 @@ namespace OpenBlood2
+         WorldExitType type = WorldExitType::World;
+     };
+     using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
+-                                     MissionObjectives, WorldExit, BossHealth>;
++                                     MissionObjectives, WorldExit, BossHealth, Conversation>;
+ } // namespace OpenBlood2
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 0941884..d82a6dc 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -7,6 +7,7 @@
+ #include "game/original/CivilianAI.h"
+ #include "game/original/ClientExplosionSFX.h"
+ #include "game/original/ClientLightFX.h"
++#include "game/original/ConversationTrigger.h"
+ #include "game/original/Corpse.h"
+ #include "game/original/CultistAI.h"
+ #include "game/original/DestructableModel.h"
+@@ -539,6 +540,18 @@ namespace OpenBlood2
+              {"TouchActivate", false},
+              {"AIActivate", false},
+              {"TriggerRelayActivate", false}}};
++        const ClassInfo conversation_trigger{
++            "ConversationTrigger", &trigger, construct<ConversationTrigger>, []
++            {
++                std::vector<PropertySpec> p{
++                    {"CharacterType", std::int32_t(0)}, {"RepeatLastMessage", false}, {"LoopToFirstMessage", false},
++                    {"TouchActivate", false},           {"AIActivate", false},        {"ObjectActivate", false},
++                    {"TriggerRelayActivate", false}};
++                for (unsigned i = 0; i < 8; ++i)
++                    p.push_back({std::string("WaveFile") + (i ? std::to_string(i + 1) : ""),
++                                 std::string(i ? "" : "default.wav"), true, 199});
++                return p;
++            }()};
+         const ClassInfo big_trigger{"BigTrigger", &trigger, construct<BigTrigger>, {}};
+         const ClassInfo toggle_trigger{"ToggleTrigger", &trigger, construct<ToggleTrigger>, []
+                                        {
+@@ -772,15 +785,15 @@ namespace OpenBlood2
+                objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
+                objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
+                objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
+-               objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
+-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
+-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+-               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
+-               objects.register_class(world_debris) && objects.register_class(hand_model) &&
+-               objects.register_class(corpse) && objects.register_class(grenade) &&
+-               objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
+-               objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
+-               objects.register_class(shockwave_projectile);
++               objects.register_class(objectives_trigger) && objects.register_class(conversation_trigger) &&
++               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
++               objects.register_class(door) && objects.register_class(rotating_door) &&
++               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
++               objects.register_class(rotating_brush) && objects.register_class(world_debris) &&
++               objects.register_class(hand_model) && objects.register_class(corpse) &&
++               objects.register_class(grenade) && objects.register_class(flare_projectile) &&
++               objects.register_class(flare_alt) && objects.register_class(flare_burst) &&
++               objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 362fe1b..1871977 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -193,6 +193,7 @@ namespace OpenBlood2
+         CBloodServerShell* session_shell = nullptr;
+         DRESULT SendWorldExit(const WorldExit&, const std::string&) override;
+         DRESULT SendBossHealth(const BossHealth&) override;
++        DRESULT SendConversation(const Conversation&) override;
+         DRESULT SendObjectives(const MissionObjectives&) override;
+         bool GetClientResourceString(std::uint32_t, std::string&) override;
+         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
+diff --git a/src/game/server_clients.cpp b/src/game/server_clients.cpp
+index afba370..c8e9e92 100644
+--- a/src/game/server_clients.cpp
++++ b/src/game/server_clients.cpp
+@@ -85,6 +85,9 @@ namespace OpenBlood2
+                 else if constexpr (std::is_same_v<T, WorldExit>)
+                     return value.next_world.size() <= 100 && value.next_world.find('\0') == std::string::npos &&
+                            static_cast<DBYTE>(value.type) <= static_cast<DBYTE>(WorldExitType::Episode);
++                else if constexpr (std::is_same_v<T, Conversation>)
++                    return !value.file.empty() && value.file.size() < 200 && value.text.size() < 500 &&
++                           value.file.find('\0') == std::string::npos && value.text.find('\0') == std::string::npos;
+                 else if constexpr (std::is_same_v<T, MissionObjectives>)
+                     return value.resource <= 65535 - 6000 + 1 && value.title.size() <= MAX_GP_STRING_LEN &&
+                            value.text.size() <= MAX_GP_STRING_LEN && value.title.find('\0') == std::string::npos &&
+diff --git a/src/game/server_objectives.cpp b/src/game/server_objectives.cpp
+index b0fb64d..89e3895 100644
+--- a/src/game/server_objectives.cpp
++++ b/src/game/server_objectives.cpp
+@@ -1,6 +1,17 @@
+ #include "game/server_adapter.h"
+ namespace OpenBlood2
+ {
++    DRESULT ServerAdapter::SendConversation(const Conversation& value)
++    {
++        trace_service("SendConversation");
++        for (const auto& [client, state] : clients_)
++        {
++            (void)state;
++            if (GetClientUserData(client))
++                return SendToClient(client, value);
++        }
++        return DE_NOTFOUND;
++    }
+     DRESULT ServerAdapter::SendObjectives(const MissionObjectives& value)
+     {
+         trace_service("SendObjectives");
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 16f4842..f886922 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1509,3 +1509,26 @@ if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+     add_test(NAME gpu.assault_private COMMAND assault_gpu_tests "${BLOOD2_TEST_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/assault-")
+     set_tests_properties(gpu.assault_private PROPERTIES LABELS "gpu;private;assault" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+ endif()
++
++add_executable(conversation_tests conversation_tests.cpp)
++target_link_libraries(conversation_tests PRIVATE blood2_game)
++blood2_project_options(conversation_tests)
++foreach(case mapping sequence delayed transport clock lifetime)
++    add_test(NAME conversation.${case} COMMAND conversation_tests ${case} "${CMAKE_CURRENT_BINARY_DIR}/conversation-fixtures/${case}")
++    set_tests_properties(conversation.${case} PROPERTIES LABELS "headless;conversation" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME conversation.private COMMAND conversation_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(conversation.private PROPERTIES LABELS "headless;private;conversation" TIMEOUT 180)
++endif()
++
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME conversation.catalog COMMAND conversation_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(conversation.catalog PROPERTIES LABELS "headless;private;conversation" TIMEOUT 90)
++endif()
++
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.conversation_private COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --world 02_cityhub --cinematics-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/conversations.png")
++    set_tests_properties(gpu.conversation_private PROPERTIES LABELS "private;gpu;conversation" TIMEOUT 90 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy" FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++endif()
+diff --git a/tests/assault_tests.cpp b/tests/assault_tests.cpp
+index ec16624..aa2ed8f 100644
+--- a/tests/assault_tests.cpp
++++ b/tests/assault_tests.cpp
+@@ -446,7 +446,7 @@ bool private_game(const std::filesystem::path& root)
+         }
+         std::cout << "CityHub M16=" << assault << " created=" << created << " unknown=" << unknown
+                   << " failed=" << failed << '\n';
+-        CHECK(assault == 1 && created == 433 && unknown == 20 && failed == 1);
++        CHECK(assault == 1 && created == 434 && unknown == 19 && failed == 1);
+         CHECK(g.unload_world());
+         // Labelled arena uses actual private models/audio, with controlled geometry.
+         auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
+diff --git a/tests/audio_stream_tests.cpp b/tests/audio_stream_tests.cpp
+index 82eb9b4..d3ec5d4 100644
+--- a/tests/audio_stream_tests.cpp
++++ b/tests/audio_stream_tests.cpp
+@@ -295,7 +295,7 @@ namespace
+             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
+                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
+                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
+-            CHECK(created == 433 && transferred == 31 && unknown == 20 && failed == 1 && fx == 5 && fx_voices == 4);
++            CHECK(created == 434 && transferred == 31 && unknown == 19 && failed == 1 && fx == 5 && fx_voices == 4);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_bytes());
+         }
+diff --git a/tests/compound_shell_tests.cpp b/tests/compound_shell_tests.cpp
+index b444d96..92d3290 100644
+--- a/tests/compound_shell_tests.cpp
++++ b/tests/compound_shell_tests.cpp
+@@ -229,7 +229,7 @@ namespace
+             }
+             std::cout << "CityHub: " << created << " created / " << transferred << " sounds / " << unknown
+                       << " unsupported / " << failed << " failed\n";
+-            CHECK(created == 433 && transferred == 31 && unknown == 20 && failed == 1);
++            CHECK(created == 434 && transferred == 31 && unknown == 19 && failed == 1);
+             WorldMesh mesh;
+             CHECK(mesh.build(g.world, error, &g.resources));
+             if (gpu)
+diff --git a/tests/conversation_tests.cpp b/tests/conversation_tests.cpp
+new file mode 100644
+index 0000000..406bbdb
+--- /dev/null
++++ b/tests/conversation_tests.cpp
+@@ -0,0 +1,312 @@
++#include "audio_fixture.h"
++#include "game/original/ConversationTrigger.h"
++#include <algorithm>
++#include <functional>
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        CHECK(test_audio::setup(g, root));
++        CHECK(g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
++                               {{"Name", std::string("START")}, {"Pos", DVector{0, 100, 0}}}));
++        std::string error;
++        CHECK(g.enter_player(error));
++        return true;
++    }
++    ConversationTrigger* create(GameSession& g, Properties props = {})
++    {
++        auto h = g.objects.create(g.objects.find_class("ConversationTrigger"), {}, Creation::World, props);
++        return dynamic_cast<ConversationTrigger*>(g.server.HandleToObject(h));
++    }
++    bool send(GameSession& g, ConversationTrigger* c)
++    {
++        auto text = g.server.CreateString("TRIGGER");
++        auto message =
++            g.server.StartMessageToObject(g.server.HandleToObject(g.client_shell.player), c->m_hObject, 1000);
++        bool ok =
++            message && g.server.WriteToMessageHString(message, text) == DE_OK && g.server.EndMessage(message) == DE_OK;
++        g.server.FreeString(text);
++        return ok;
++    }
++    bool mapping(const std::filesystem::path&)
++    {
++        CHECK(std::string(conversation_text("SOUNDS\\VOICES\\1acaleb1.WAV")) == "Bring it on!");
++        CHECK(!conversation_text("sounds/1ACaleb1.wav") && !conversation_text("default.wav") && !conversation_text(""));
++        CHECK(std::string(conversation_text("2Caleb2.wav")) == "Letting me live.");
++        return true;
++    }
++    bool sequence(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        for (unsigned flags = 0; flags < 4; ++flags)
++        {
++            auto* c = create(g, {{"WaveFile", std::string("1ACaleb1.wav")},
++                                 {"WaveFile2", std::string("2Caleb2.wav")},
++                                 {"WaveFile4", std::string("ignored.wav")},
++                                 {"RepeatLastMessage", bool(flags & 1)},
++                                 {"LoopToFirstMessage", bool(flags & 2)},
++                                 {"CharacterType", std::int32_t(-1)}});
++            CHECK(c && c->count == 2 && c->waves[3].empty() && c->character == 255);
++            CHECK(!c->touch_activate && !c->ai_activate && !c->relay_activate && c->player_activate);
++            for (unsigned i = 0; i < 4; ++i)
++            {
++                c->SetActive(true);
++                CHECK(send(g, c));
++            }
++            CHECK(c->queued == (flags ? 4u : 2u));
++            CHECK(c->current == (flags & 1 ? 1u : flags & 2 ? 0u : 2u));
++            std::vector<PlayerEvent> events;
++            CHECK(g.server.take_client_events(g.local_client, events) && events.size() == c->queued);
++            CHECK(std::get<Conversation>(events[0]).text == "Bring it on!");
++            CHECK(g.objects.remove(c->m_hObject) && g.objects.finish_frame());
++        }
++        auto* c = create(g, {{"WaveFile", std::string("missing.wav")}});
++        CHECK(c && send(g, c));
++        CHECK(c->current == 0 && c->unmapped == 1 && !c->error.empty() && !c->queued);
++        CHECK(!create(g, {{"WaveFile", std::string(200, 'x')}}));
++        CHECK(g.unload_world() && !g.server.message_count() && !g.server.string_count());
++        return true;
++    }
++    bool delayed(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* c = create(g, {{"WaveFile", std::string("1ACaleb1.wav")},
++                             {"LoopToFirstMessage", true},
++                             {"MessageDelay", .1f},
++                             {"MessageDelay2", .2f}});
++        CHECK(c && send(g, c) && !c->queued);
++        CHECK(g.objects.advance(.11) && c->queued == 1); // Delayed virtual SendMessage ignores empty target slots.
++        CHECK(g.objects.advance(.11) && c->queued == 2);
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool transport(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        Conversation v{"cue.wav", "short text", 0};
++        for (unsigned i = 0; i < 256; ++i)
++            CHECK(g.server.SendConversation(v) == DE_OK);
++        auto* c = create(g, {{"WaveFile", std::string("1ACaleb1.wav")}});
++        CHECK(c && send(g, c) && c->current == 1 && !c->queued && c->last_delivery == DE_ERROR);
++        std::vector<PlayerEvent> events;
++        CHECK(g.server.take_client_events(g.local_client, events) && events.size() == 256);
++        v.file = std::string(200, 'x');
++        CHECK(g.server.SendConversation(v) == DE_INVALIDPARAMS);
++        v.file = "cue.wav";
++        v.text = std::string(500, 'x');
++        CHECK(g.server.SendConversation(v) == DE_INVALIDPARAMS);
++        v.text = std::string("x\0y", 3);
++        CHECK(g.server.SendConversation(v) == DE_INVALIDPARAMS);
++        v.text = "valid";
++        CHECK(g.server.SendConversation(v) == DE_OK);
++        CHECK(g.objects.remove(g.client_shell.player) && g.objects.finish_frame());
++        CHECK(g.server.SendConversation(v) == DE_NOTFOUND);
++        CHECK(g.unload_world() && !g.server.message_count());
++        return true;
++    }
++    bool timing(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto& c = g.client_shell.communication;
++        CHECK(c.Start(g.server, {"cue.wav", "short", 2}) && c.portrait == "interface/commlink/i_comm.pcx");
++        CHECK(!c.Start(g.server, {"other.wav", "replacement", 0}) && c.busy == 1 && c.message.file == "cue.wav");
++        CHECK(g.objects.advance(.2f));
++        c.Update(g.server, g.client_shell.player);
++        CHECK(c.level == 1 && !c.voice);
++        CHECK(g.objects.advance(.25 - g.objects.time()));
++        c.Update(g.server, g.client_shell.player);
++        CHECK(c.level == 2 && c.text_level == 1 && c.voice && c.voice_manager_requests == 3);
++        const auto id = c.voice;
++        const auto* voice = g.server.audio.get(id);
++        CHECK(voice && voice->request.space == SoundSpace::Local && !voice->request.streaming &&
++              !voice->request.reverb_requested && voice->request.priority == 2);
++        CHECK(g.server.advance_audio(.1, {}, {}));
++        CHECK(g.server.audio.get(id)->done);
++        CHECK(g.objects.advance(2.5));
++        c.Update(g.server, g.client_shell.player);
++        CHECK(c.level == 2 && c.voice == id);
++        CHECK(g.objects.advance(.01));
++        c.Update(g.server, g.client_shell.player);
++        CHECK(c.level == 3 && !c.voice && !g.server.audio.get(id));
++        CHECK(g.objects.advance(.21));
++        c.Update(g.server, g.client_shell.player);
++        CHECK(!c.level);
++        CHECK(c.Start(g.server, {"default.wav", "no voice", 99}));
++        CHECK(g.objects.advance(.21));
++        c.Update(g.server, g.client_shell.player);
++        CHECK(!c.voice && !c.play_voice && c.portrait == "interface/commlink/u_comm.pcx");
++        CHECK(g.unload_world() && !c.level && !c.received);
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        auto* c = create(g, {{"WaveFile", std::string("1ACaleb1.wav")}});
++        CHECK(c && send(g, c));
++        CHECK(g.objects.remove(c->m_hObject) && g.objects.finish_frame());
++        CHECK(g.pump_player_messages(error) && g.client_shell.communication.received == 1);
++        CHECK(g.step(.25));
++        auto& comm = g.client_shell.communication;
++        CHECK(comm.level == 2 && !comm.voice && comm.sound_failures == 1 && !comm.error.empty());
++        CHECK(g.step(.25) && comm.sound_attempts == 1); // No fabricated retries after missing file.
++        comm.Reset(g.server);
++        CHECK(g.server.SendConversation({"long.wav", "voice", 0}) == DE_OK && g.pump_player_messages(error));
++        CHECK(g.step(.25) && comm.voice);
++        auto id = comm.voice;
++        CHECK(g.objects.remove(g.client_shell.player) && g.objects.finish_frame());
++        CHECK(g.step(.01) && !g.server.audio.get(id) && !comm.level);
++        CHECK(g.unload_world() && g.server.audio.voices().empty());
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config cfg;
++        cfg.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(cfg, error));
++        unsigned worlds = 0, entries = 0, rejected = 0, cues = 0, mapped = 0, decoded = 0;
++        for (const auto& [path, resource] : g.resources.index())
++        {
++            (void)resource;
++            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
++                continue;
++            std::vector<std::uint8_t> bytes;
++            World world;
++            CHECK(g.resources.read(path, bytes, error));
++            if (!read_world(bytes, world, error))
++            {
++                CHECK(path == "worlds/16_bridge.dat");
++                continue;
++            }
++            ++worlds;
++            for (const auto& source : world.objects)
++            {
++                if (source.class_name != "ConversationTrigger")
++                    continue;
++                ++entries;
++                Properties props;
++                for (const auto& property : source.properties)
++                    props.emplace(property.name, property.value);
++                auto* c = create(g, props);
++                if (!c)
++                {
++                    ++rejected;
++                    std::cout << "reject " << path << " " << g.objects.diagnostics().back() << '\n';
++                    continue;
++                }
++                for (unsigned i = 0; i < c->count; ++i)
++                {
++                    ++cues;
++                    auto* text = conversation_text(c->waves[i]);
++                    mapped += bool(text);
++                    CHECK(!g.resources.find(c->waves[i])); // Observed absent authored resources, not decoder failures.
++                    std::shared_ptr<const AudioClip> clip;
++                    bool valid = g.server.audio.load(g.resources, c->waves[i], clip, error);
++                    decoded += valid;
++                    std::cout << path << " " << source.class_name << " " << c->waves[i] << " mapped=" << bool(text)
++                              << " decoded=" << valid << '\n';
++                }
++                CHECK(g.objects.remove(c->m_hObject) && g.objects.finish_frame());
++            }
++        }
++        std::cout << "Conversation catalog worlds=" << worlds << " entries=" << entries << " rejected=" << rejected
++                  << " cues=" << cues << " mapped=" << mapped << " decoded=" << decoded << '\n';
++        CHECK(worlds == 57 && entries == 7 && rejected == 0 && cues == 7 && mapped == 0 && decoded == 0);
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool private_game(const std::filesystem::path& root)
++    {
++        GameSession g;
++        g.server.audio.inspect_pcm = true;
++        CHECK(g.initialize());
++        std::string error;
++        Config cfg;
++        cfg.data_dir = root;
++        CHECK(g.resources.mount_game(cfg, error));
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_cityhub", error));
++            unsigned created = 0, unknown = 0, failed = 0;
++            ConversationTrigger* conversation = nullptr;
++            for (const auto& e : g.entries)
++            {
++                created += e.state == EntryState::Created;
++                unknown += e.state == EntryState::Unsupported;
++                failed += e.state == EntryState::Failed;
++            }
++            for (auto id : g.objects.snapshot())
++                if (auto* c = dynamic_cast<ConversationTrigger*>(g.objects.get(id)->game.get()))
++                    conversation = c;
++            CHECK(created == 434 && unknown == 19 && failed == 1 && conversation);
++            std::cout << "CityHub conversation count=" << conversation->count << " file=" << conversation->waves[0]
++                      << " mapped=" << bool(conversation_text(conversation->waves[0])) << '\n';
++            g.server_shell.start_point_name = "01_egressa";
++            CHECK(g.enter_player(error));
++            conversation->SetActive(true);
++            CHECK(send(g, conversation));
++            CHECK(g.pump_player_messages(error));
++            std::cout << "queued=" << conversation->queued << " unmapped=" << conversation->unmapped
++                      << " error=" << conversation->error << '\n';
++            CHECK(conversation->count == 1 && conversation->waves[0] == "default.wav" && conversation->queued == 0 &&
++                  conversation->unmapped == 1 && conversation->current == 0 &&
++                  g.client_shell.communication.received == 0);
++            // Diagnostic original callback using a real installed voice; authored placeholder stays unchanged.
++            std::string file;
++            for (const auto& [path, resource] : g.resources.index())
++            {
++                (void)resource;
++                if (path.ends_with("/1acaleb1.wav"))
++                {
++                    file = path;
++                    break;
++                }
++            }
++            CHECK(!file.empty());
++            std::replace(file.begin(), file.end(), '/', '\\');
++            auto* probe = create(g, {{"WaveFile", file}});
++            CHECK(probe && send(g, probe) && probe->queued == 1);
++            CHECK(g.pump_player_messages(error) && g.objects.advance(.25));
++            g.client_shell.communication.Update(g.server, g.client_shell.player);
++            auto id = g.client_shell.communication.voice;
++            CHECK(id && g.server.audio.get(id)->clip->frames() == 25930);
++            const auto& samples = g.server.audio.get(id)->clip->samples;
++            CHECK(std::any_of(samples.begin(), samples.end(), [](float v) { return std::abs(v) > .1f; }));
++            CHECK(g.server.audio.advance(.25, {}, {}) && g.server.audio.peak > 0);
++            CHECK(g.objects.remove(probe->m_hObject) && g.objects.finish_frame() && g.server.audio.get(id));
++            std::cout << "Diagnostic real voice " << file << " frames=" << g.server.audio.get(id)->clip->frames()
++                      << " peak=" << g.server.audio.peak << '\n';
++            CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.message_count());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests = {
++        {"mapping", mapping}, {"sequence", sequence}, {"delayed", delayed},      {"transport", transport},
++        {"clock", timing},    {"lifetime", lifetime}, {"private", private_game}, {"catalog", catalog}};
++    auto it = tests.find(argv[1]);
++    return it != tests.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+index e6cfc1c..274e7c6 100644
+--- a/tests/destructable_model_tests.cpp
++++ b/tests/destructable_model_tests.cpp
+@@ -313,7 +313,7 @@ namespace
+             std::cout << "CityHub model initialization: " << count << " models / " << pushable << " pushable / "
+                       << gravity << " gravity / " << ground_misses << " ground misses\n";
+             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
+-            CHECK(created == 433 && unknown == 20 && failed == 1);
++            CHECK(created == 434 && unknown == 19 && failed == 1);
+             CHECK(update_model_scene(g, scene, error));
+             unsigned skin_failures = 0, triangles = 0;
+             for (auto id : ids)
+diff --git a/tests/flare_tests.cpp b/tests/flare_tests.cpp
+index 2801623..ae75e30 100644
+--- a/tests/flare_tests.cpp
++++ b/tests/flare_tests.cpp
+@@ -413,7 +413,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unsupported=" << unknown << " failed=" << failed
+                   << " flare NPCs=" << flare << '\n';
+-        CHECK(created == 433 && unknown == 20 && failed == 1 && flare == 1);
++        CHECK(created == 434 && unknown == 19 && failed == 1 && flare == 1);
+         CHECK(g.unload_world());
+         return true;
+     }
+diff --git a/tests/mac10_tests.cpp b/tests/mac10_tests.cpp
+index c951a7f..cc75d8e 100644
+--- a/tests/mac10_tests.cpp
++++ b/tests/mac10_tests.cpp
+@@ -263,7 +263,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unknown=" << unknown << " failed=" << failed << " Mac10=" << mac
+                   << '\n';
+-        CHECK(mac == 1 && created == 433 && unknown == 20 && failed == 1);
++        CHECK(mac == 1 && created == 434 && unknown == 19 && failed == 1);
+         for (auto id : g.objects.snapshot())
+             if (auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(g.objects.get(id)->handle));
+                 a && a->runtime_failed)
+diff --git a/tests/world_debris_tests.cpp b/tests/world_debris_tests.cpp
+index 7cd0c2f..8500466 100644
+--- a/tests/world_debris_tests.cpp
++++ b/tests/world_debris_tests.cpp
+@@ -246,7 +246,7 @@ namespace
+                 failed += e.state == EntryState::Failed;
+             }
+             std::cout << "Created=" << created << " unsupported=" << unknown << " failed=" << failed << '\n';
+-            CHECK(created == 433 && unknown == 20 && failed == 1);
++            CHECK(created == 434 && unknown == 19 && failed == 1);
+             // Exercise original destruction/name activation, not direct fragment creation.
+             auto* list = g.server.FindNamedObjects("billboard");
+             CHECK(list && list->m_pFirstLink);
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 869f013..15770e4 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -923,8 +923,8 @@ namespace
+                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
+                 else
+                 {
+-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 465 && d.editor_only == 541 &&
+-                          d.unknown == 20 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
++                    CHECK(d.entries.size() == 1026 && d.schema_checked == 466 && d.editor_only == 541 &&
++                          d.unknown == 19 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                     for (const auto& e : d.entries)
+                         if (e.state == DestinationEntryState::InvalidProperties)
+                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+@@ -1168,7 +1168,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 433 && d.unknown == 20 && d.failed == 1);
++                        CHECK(d.created == 434 && d.unknown == 19 && d.failed == 1);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

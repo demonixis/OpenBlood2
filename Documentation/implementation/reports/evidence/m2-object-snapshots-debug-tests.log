@@ -1,0 +1,198 @@
+Test project <workspace>/Blood2/build/debug
+      Start 954: train_session.private_60
+      Start 953: train_session.private_30
+ 1/91 Test #953: train_session.private_30 ..........   Passed   21.88 sec
+      Start 952: coverage.private
+ 2/91 Test #954: train_session.private_60 ..........   Passed   22.51 sec
+      Start  95: movement.private
+ 3/91 Test  #95: movement.private ..................   Passed    6.85 sec
+      Start 546: ai_runtime.clearance_private
+ 4/91 Test #952: coverage.private ..................   Passed   11.84 sec
+      Start 950: coverage.catalog
+ 5/91 Test #950: coverage.catalog ..................   Passed    0.66 sec
+      Start 547: ai_runtime.ammo_private
+ 6/91 Test #547: ai_runtime.ammo_private ...........   Passed    0.41 sec
+      Start  12: objects.message_churn
+ 7/91 Test  #12: objects.message_churn .............   Passed    1.78 sec
+      Start 543: ai_runtime.subway
+ 8/91 Test #543: ai_runtime.subway .................   Passed    4.07 sec
+      Start 127: containers.specialized_private
+ 9/91 Test #546: ai_runtime.clearance_private ......   Passed   15.12 sec
+      Start 128: containers.private
+10/91 Test #127: containers.specialized_private ....   Passed    6.31 sec
+      Start  89: movement.world_collision
+11/91 Test  #89: movement.world_collision ..........   Passed    0.06 sec
+      Start  66: services.private
+12/91 Test  #66: services.private ..................   Passed    1.74 sec
+      Start  92: movement.timing
+13/91 Test  #92: movement.timing ...................   Passed    0.04 sec
+      Start  86: movement.walking
+14/91 Test  #86: movement.walking ..................   Passed    0.04 sec
+      Start  18: object_snapshots.churn
+15/91 Test  #18: object_snapshots.churn ............   Passed    0.04 sec
+      Start 371: attachments.subway
+16/91 Test #371: attachments.subway ................   Passed    1.15 sec
+      Start  88: movement.collisions
+17/91 Test  #88: movement.collisions ...............   Passed    0.04 sec
+      Start 541: ai_runtime.catalog
+18/91 Test #128: containers.private ................   Passed    5.98 sec
+      Start  90: movement.support
+19/91 Test  #90: movement.support ..................   Passed    0.02 sec
+      Start  87: movement.jumping
+20/91 Test  #87: movement.jumping ..................   Passed    0.02 sec
+      Start 544: ai_runtime.arena
+21/91 Test #541: ai_runtime.catalog ................   Passed    0.66 sec
+      Start  13: objects.message_limit
+22/91 Test  #13: objects.message_limit .............   Passed    0.10 sec
+      Start 545: ai_runtime.sparse_weapons
+23/91 Test #544: ai_runtime.arena ..................   Passed    0.40 sec
+      Start  91: movement.boundaries
+24/91 Test  #91: movement.boundaries ...............   Passed    0.01 sec
+      Start  93: movement.lifetime
+25/91 Test  #93: movement.lifetime .................   Passed    0.01 sec
+      Start 370: attachments.catalog
+26/91 Test #545: ai_runtime.sparse_weapons .........   Passed    0.18 sec
+      Start  61: services.collision_traversal
+27/91 Test  #61: services.collision_traversal ......   Passed    0.02 sec
+      Start 115: containers.index_lifetime
+28/91 Test #115: containers.index_lifetime .........   Passed    0.01 sec
+      Start 116: containers.index_callbacks
+29/91 Test #116: containers.index_callbacks ........   Passed    0.01 sec
+      Start 542: ai_runtime.failures
+30/91 Test #542: ai_runtime.failures ...............   Passed    0.09 sec
+      Start 951: coverage.observations
+31/91 Test #951: coverage.observations .............   Passed    0.00 sec
+      Start  16: object_snapshots.membership
+32/91 Test  #16: object_snapshots.membership .......   Passed    0.00 sec
+      Start  94: movement.controls
+33/91 Test  #94: movement.controls .................   Passed    0.00 sec
+      Start 366: attachments.rejects
+34/91 Test #370: attachments.catalog ...............   Passed    0.31 sec
+      Start  17: object_snapshots.callbacks
+35/91 Test  #17: object_snapshots.callbacks ........   Passed    0.00 sec
+      Start 529: ai_runtime.animation_clearance
+36/91 Test #366: attachments.rejects ...............   Passed    0.08 sec
+      Start  57: services.model_rejection
+37/91 Test #529: ai_runtime.animation_clearance ....   Passed    0.01 sec
+      Start 527: ai_runtime.ammo_search
+38/91 Test #527: ai_runtime.ammo_search ............   Passed    0.00 sec
+      Start 526: ai_runtime.ammo_receive
+39/91 Test #526: ai_runtime.ammo_receive ...........   Passed    0.00 sec
+      Start 120: containers.ladders
+40/91 Test #120: containers.ladders ................   Passed    0.03 sec
+      Start 118: containers.swimming
+41/91 Test #118: containers.swimming ...............   Passed    0.02 sec
+      Start 126: containers.freefall_motion
+42/91 Test  #57: services.model_rejection ..........   Passed    0.08 sec
+      Start 123: containers.conveyor_motion
+43/91 Test #126: containers.freefall_motion ........   Passed    0.02 sec
+      Start 368: attachments.held
+44/91 Test #123: containers.conveyor_motion ........   Passed    0.01 sec
+      Start 531: ai_runtime.visibility_filter
+45/91 Test #368: attachments.held ..................   Passed    0.01 sec
+      Start  63: services.placement_queries
+46/91 Test #531: ai_runtime.visibility_filter ......   Passed    0.00 sec
+      Start 369: attachments.missing
+47/91 Test  #63: services.placement_queries ........   Passed    0.00 sec
+      Start 113: containers.membership
+48/91 Test #369: attachments.missing ...............   Passed    0.01 sec
+      Start 122: containers.specialized_defaults
+49/91 Test #113: containers.membership .............   Passed    0.01 sec
+      Start 119: containers.surface
+50/91 Test #122: containers.specialized_defaults ...   Passed    0.01 sec
+      Start  64: services.placement_service
+51/91 Test #119: containers.surface ................   Passed    0.01 sec
+      Start 532: ai_runtime.visibility_atomic
+52/91 Test  #64: services.placement_service ........   Passed    0.00 sec
+      Start 125: containers.specialized_damage
+53/91 Test #532: ai_runtime.visibility_atomic ......   Passed    0.00 sec
+      Start 121: containers.air_damage
+54/91 Test #125: containers.specialized_damage .....   Passed    0.01 sec
+      Start 114: containers.lifetime
+55/91 Test #121: containers.air_damage .............   Passed    0.01 sec
+      Start 124: containers.conveyor_bodies
+56/91 Test #124: containers.conveyor_bodies ........   Passed    0.01 sec
+      Start 117: containers.physics
+57/91 Test #114: containers.lifetime ...............   Passed    0.01 sec
+      Start 533: ai_runtime.lifetime
+58/91 Test #533: ai_runtime.lifetime ...............   Passed    0.00 sec
+      Start 540: ai_runtime.missing
+59/91 Test #117: containers.physics ................   Passed    0.01 sec
+      Start 539: ai_runtime.body
+60/91 Test #540: ai_runtime.missing ................   Passed    0.00 sec
+      Start 538: ai_runtime.triggers
+61/91 Test #539: ai_runtime.body ...................   Passed    0.00 sec
+      Start 534: ai_runtime.targets
+62/91 Test #538: ai_runtime.triggers ...............   Passed    0.00 sec
+      Start 528: ai_runtime.activation
+63/91 Test #534: ai_runtime.targets ................   Passed    0.00 sec
+      Start 536: ai_runtime.camera
+64/91 Test #528: ai_runtime.activation .............   Passed    0.00 sec
+      Start 537: ai_runtime.spatial
+65/91 Test #536: ai_runtime.camera .................   Passed    0.00 sec
+      Start 530: ai_runtime.visibility
+66/91 Test #537: ai_runtime.spatial ................   Passed    0.00 sec
+      Start 535: ai_runtime.tracking
+67/91 Test #530: ai_runtime.visibility .............   Passed    0.00 sec
+      Start 364: attachments.root
+68/91 Test #535: ai_runtime.tracking ...............   Passed    0.00 sec
+      Start 365: attachments.nodes
+69/91 Test #364: attachments.root ..................   Passed    0.00 sec
+      Start 367: attachments.lifetime
+70/91 Test #365: attachments.nodes .................   Passed    0.00 sec
+      Start 111: containers.geometry
+71/91 Test #367: attachments.lifetime ..............   Passed    0.00 sec
+      Start 112: containers.concave
+72/91 Test #111: containers.geometry ...............   Passed    0.00 sec
+      Start  65: services.original_services
+73/91 Test #112: containers.concave ................   Passed    0.00 sec
+      Start  62: services.movement_contacts
+74/91 Test  #65: services.original_services ........   Passed    0.00 sec
+      Start  14: objects.unsupported_teardown
+75/91 Test  #62: services.movement_contacts ........   Passed    0.00 sec
+      Start  58: services.animation_events
+76/91 Test  #58: services.animation_events .........   Passed    0.00 sec
+      Start  59: services.model_callbacks
+77/91 Test  #59: services.model_callbacks ..........   Passed    0.00 sec
+      Start  56: services.model_reader
+78/91 Test  #56: services.model_reader .............   Passed    0.00 sec
+      Start   2: objects.builtin_model
+79/91 Test   #2: objects.builtin_model .............   Passed    0.00 sec
+      Start  60: services.collision_queries
+80/91 Test  #14: objects.unsupported_teardown ......   Passed    0.01 sec
+      Start  15: objects.creation_failures
+81/91 Test  #60: services.collision_queries ........   Passed    0.00 sec
+      Start  11: objects.messages_strings
+82/91 Test  #15: objects.creation_failures .........   Passed    0.01 sec
+      Start   5: objects.reasons_properties
+83/91 Test  #11: objects.messages_strings ..........   Passed    0.01 sec
+      Start   6: objects.scheduling
+84/91 Test   #5: objects.reasons_properties ........   Passed    0.00 sec
+      Start   7: objects.deferred_removal
+85/91 Test   #6: objects.scheduling ................   Passed    0.00 sec
+      Start   3: objects.original_objects
+86/91 Test   #7: objects.deferred_removal ..........   Passed    0.00 sec
+      Start   9: objects.handles_selection
+87/91 Test   #3: objects.original_objects ..........   Passed    0.00 sec
+      Start  10: objects.links_lists
+88/91 Test   #9: objects.handles_selection .........   Passed    0.00 sec
+      Start   4: objects.nested_creation
+89/91 Test  #10: objects.links_lists ...............   Passed    0.00 sec
+      Start   8: objects.aggregate_dispatch
+90/91 Test   #4: objects.nested_creation ...........   Passed    0.00 sec
+91/91 Test   #8: objects.aggregate_dispatch ........   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 91
+
+Label Time Summary:
+ai_runtime       =  20.98 sec*proc (22 tests)
+attachments      =   1.57 sec*proc (8 tests)
+containers       =  12.46 sec*proc (18 tests)
+headless         = 102.85 sec*proc (91 tests)
+movement         =   7.10 sec*proc (10 tests)
+objects          =   1.99 sec*proc (17 tests)
+private          =  99.49 sec*proc (16 tests)
+services         =  14.36 sec*proc (14 tests)
+train_session    =  44.38 sec*proc (2 tests)
+
+Total Test time (real) =  51.45 sec

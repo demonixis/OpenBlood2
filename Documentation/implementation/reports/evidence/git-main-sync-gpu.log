@@ -1,0 +1,15 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1183: gpu.menu_traversal
+1/2 Test #1183: gpu.menu_traversal ...............   Passed    5.80 sec
+    Start 1222: gpu.demo_menu
+2/2 Test #1222: gpu.demo_menu ....................   Passed    4.47 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+demo_menu    =   4.47 sec*proc (1 test)
+gpu          =  10.27 sec*proc (2 tests)
+menus        =   5.80 sec*proc (1 test)
+private      =  10.27 sec*proc (2 tests)
+
+Total Test time (real) =  10.29 sec

@@ -1,0 +1,115 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 63
+      Start 63: movement.walking
+
+63: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests "walking" "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/walking"
+63: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+63: Test timeout computed to be: 30
+ 1/11 Test #63: movement.walking .................   Passed    0.02 sec
+test 64
+      Start 64: movement.jumping
+
+64: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests "jumping" "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/jumping"
+64: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+64: Test timeout computed to be: 30
+ 2/11 Test #64: movement.jumping .................   Passed    0.01 sec
+test 65
+      Start 65: movement.collisions
+
+65: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests "collisions" "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/collisions"
+65: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+65: Test timeout computed to be: 30
+ 3/11 Test #65: movement.collisions ..............   Passed    0.01 sec
+test 66
+      Start 66: movement.world_collision
+
+66: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests "world_collision" "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/world_collision"
+66: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+66: Test timeout computed to be: 30
+ 4/11 Test #66: movement.world_collision .........   Passed    0.02 sec
+test 67
+      Start 67: movement.support
+
+67: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests "support" "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/support"
+67: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+67: Test timeout computed to be: 30
+ 5/11 Test #67: movement.support .................   Passed    0.01 sec
+test 68
+      Start 68: movement.boundaries
+
+68: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests "boundaries" "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/boundaries"
+68: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+68: Test timeout computed to be: 30
+ 6/11 Test #68: movement.boundaries ..............   Passed    0.01 sec
+test 69
+      Start 69: movement.timing
+
+69: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests "timing" "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/timing"
+69: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+69: Test timeout computed to be: 30
+ 7/11 Test #69: movement.timing ..................   Passed    0.02 sec
+test 70
+      Start 70: movement.lifetime
+
+70: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests "lifetime" "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/lifetime"
+70: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+70: Test timeout computed to be: 30
+ 8/11 Test #70: movement.lifetime ................   Passed    0.00 sec
+test 71
+      Start 71: movement.controls
+
+71: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests "controls" "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/controls"
+71: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+71: Test timeout computed to be: 30
+ 9/11 Test #71: movement.controls ................   Passed    0.00 sec
+test 72
+      Start 72: movement.private
+
+72: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+72: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+72: Test timeout computed to be: 30
+72: cycle 0: distance 186.661; rise 57.9285; jumps 1; landings 2; ground 1; messages 320
+72: cycle 1: distance 186.661; rise 57.9285; jumps 1; landings 2; ground 1; messages 320
+72: cycle 2: distance 186.661; rise 57.9285; jumps 1; landings 2; ground 1; messages 320
+10/11 Test #72: movement.private .................   Passed    0.62 sec
+test 73
+      Start 73: gpu.movement
+
+73: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--movement-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement.png"
+73: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+73: Test timeout computed to be: 30
+73: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+73: [info] BLOOD2.REZ: detected, 267758913 bytes
+73: [info] SOUND.REZ: detected, 204633068 bytes
+73: [info] BLOOD2P.REZ: detected, 24133434 bytes
+73: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+73: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+73: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+73: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+73: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+73: [info] DAT v56: 580 source objects, 18 original instances, 116 BSP models
+73: [info] Movement: hidden distance=256.65918, jumps=1, landings=2, ground=true, forward frames=55, jump frames=10
+73: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/movement.png
+73: [info] Shutdown: frames=240, UI frames=120, hidden frames=120, toggles=2, resize=true, quit=true
+73: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+73: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+73: [info] Movement smoke passed: SDL commands, hidden walking/jump/landing, unload/re-entry
+73: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+11/11 Test #73: gpu.movement .....................   Passed    4.27 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Label Time Summary:
+gpu         =   4.27 sec*proc (1 test)
+headless    =   0.72 sec*proc (10 tests)
+movement    =   4.99 sec*proc (11 tests)
+private     =   4.89 sec*proc (2 tests)
+
+Total Test time (real) =   5.00 sec

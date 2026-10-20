@@ -1,0 +1,14 @@
+324/334 Testing: ai_perception.factions
+324/334 Test: ai_perception.factions
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_perception_tests" "factions"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_perception.factions" start time: Oct 16 10:37 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.factions" end time: Oct 16 10:37 CEST
+"ai_perception.factions" time elapsed: 00:00:00
+----------------------------------------------------------

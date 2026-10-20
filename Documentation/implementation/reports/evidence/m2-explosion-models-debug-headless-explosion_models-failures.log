@@ -1,0 +1,14 @@
+552/556 Testing: explosion_models.failures
+552/556 Test: explosion_models.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_model_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-models-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"explosion_models.failures" start time: Oct 16 20:39 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_models.failures" end time: Oct 16 20:39 CEST
+"explosion_models.failures" time elapsed: 00:00:00
+----------------------------------------------------------

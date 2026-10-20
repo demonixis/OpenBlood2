@@ -1,0 +1,9 @@
+OpenBlood2 0.3.0
+Build (configure-time): 53a5967-dirty
+Configuration: Release
+Compiler: GNU 16.2.1
+Platform: Linux
+SDL pinned: 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1
+SDL runtime: SDL-3.5.0-53a5967
+Log timestamps: UTC
+No finished.txt means running or interrupted, not proof of a crash.

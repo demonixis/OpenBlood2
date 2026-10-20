@@ -1,0 +1,133 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  40: world.destination_trial_private
+      Start 451: ai_runtime.subway
+ 1/59 Test  #40: world.destination_trial_private ...   Passed   28.52 sec
+      Start 364: ai_fire.subway
+ 2/59 Test #451: ai_runtime.subway .................   Passed   37.04 sec
+      Start 283: ai_keys.subway
+ 3/59 Test #364: ai_fire.subway ....................   Passed   17.66 sec
+      Start 449: ai_runtime.catalog
+ 4/59 Test #449: ai_runtime.catalog ................   Passed    2.76 sec
+      Start 452: ai_runtime.arena
+ 5/59 Test #452: ai_runtime.arena ..................   Passed    1.94 sec
+      Start 618: gideon_combat.private
+ 6/59 Test #618: gideon_combat.private .............   Passed    0.99 sec
+      Start 453: ai_runtime.sparse_weapons
+ 7/59 Test #453: ai_runtime.sparse_weapons .........   Passed    0.96 sec
+      Start 363: ai_fire.catalog
+ 8/59 Test #363: ai_fire.catalog ...................   Passed    1.36 sec
+      Start 450: ai_runtime.failures
+ 9/59 Test #450: ai_runtime.failures ...............   Passed    0.35 sec
+      Start  24: world.destination_trials
+10/59 Test  #24: world.destination_trials ..........   Passed    0.18 sec
+      Start 282: ai_keys.catalog
+11/59 Test #282: ai_keys.catalog ...................   Passed    1.18 sec
+      Start  27: world.destination_lifetime
+12/59 Test  #27: world.destination_lifetime ........   Passed    0.07 sec
+      Start 613: gideon_combat.choices
+13/59 Test #613: gideon_combat.choices .............   Passed    0.03 sec
+      Start 614: gideon_combat.aim
+14/59 Test #614: gideon_combat.aim .................   Passed    0.03 sec
+      Start 615: gideon_combat.keys
+15/59 Test #615: gideon_combat.keys ................   Passed    0.03 sec
+      Start 611: gideon_combat.decisions
+16/59 Test #611: gideon_combat.decisions ...........   Passed    0.03 sec
+      Start 616: gideon_combat.failures
+17/59 Test #616: gideon_combat.failures ............   Passed    0.03 sec
+      Start 612: gideon_combat.shield
+18/59 Test #612: gideon_combat.shield ..............   Passed    0.03 sec
+      Start 617: gideon_combat.lifetime
+19/59 Test #617: gideon_combat.lifetime ............   Passed    0.03 sec
+      Start 441: ai_runtime.lifetime
+20/59 Test #441: ai_runtime.lifetime ...............   Passed    0.03 sec
+      Start 448: ai_runtime.missing
+21/59 Test #448: ai_runtime.missing ................   Passed    0.02 sec
+      Start 447: ai_runtime.body
+22/59 Test #447: ai_runtime.body ...................   Passed    0.02 sec
+      Start 439: ai_runtime.activation
+23/59 Test #439: ai_runtime.activation .............   Passed    0.02 sec
+      Start 446: ai_runtime.triggers
+24/59 Test #446: ai_runtime.triggers ...............   Passed    0.02 sec
+      Start 442: ai_runtime.targets
+25/59 Test #442: ai_runtime.targets ................   Passed    0.02 sec
+      Start 443: ai_runtime.tracking
+26/59 Test #443: ai_runtime.tracking ...............   Passed    0.02 sec
+      Start 445: ai_runtime.spatial
+27/59 Test #445: ai_runtime.spatial ................   Passed    0.02 sec
+      Start 444: ai_runtime.camera
+28/59 Test #444: ai_runtime.camera .................   Passed    0.02 sec
+      Start 362: ai_fire.lifetime
+29/59 Test #362: ai_fire.lifetime ..................   Passed    0.03 sec
+      Start 440: ai_runtime.visibility
+30/59 Test #440: ai_runtime.visibility .............   Passed    0.02 sec
+      Start 356: ai_fire.head
+31/59 Test #356: ai_fire.head ......................   Passed    0.02 sec
+      Start 354: ai_fire.clearance
+32/59 Test #354: ai_fire.clearance .................   Passed    0.02 sec
+      Start 360: ai_fire.recovery
+33/59 Test #360: ai_fire.recovery ..................   Passed    0.02 sec
+      Start 357: ai_fire.aim
+34/59 Test #357: ai_fire.aim .......................   Passed    0.02 sec
+      Start 361: ai_fire.failures
+35/59 Test #361: ai_fire.failures ..................   Passed    0.02 sec
+      Start 358: ai_fire.keys
+36/59 Test #358: ai_fire.keys ......................   Passed    0.02 sec
+      Start 359: ai_fire.cadence
+37/59 Test #359: ai_fire.cadence ...................   Passed    0.02 sec
+      Start 353: ai_fire.selection
+38/59 Test #353: ai_fire.selection .................   Passed    0.02 sec
+      Start 355: ai_fire.filters
+39/59 Test #355: ai_fire.filters ...................   Passed    0.03 sec
+      Start  10: objects.unsupported_teardown
+40/59 Test  #10: objects.unsupported_teardown ......   Passed    0.06 sec
+      Start 277: ai_keys.random
+41/59 Test #277: ai_keys.random ....................   Passed    0.05 sec
+      Start 276: ai_keys.gates
+42/59 Test #276: ai_keys.gates .....................   Passed    0.05 sec
+      Start 280: ai_keys.callbacks
+43/59 Test #280: ai_keys.callbacks .................   Passed    0.08 sec
+      Start 279: ai_keys.rejection
+44/59 Test #279: ai_keys.rejection .................   Passed    0.05 sec
+      Start 281: ai_keys.lifetime
+45/59 Test #281: ai_keys.lifetime ..................   Passed    0.06 sec
+      Start 274: ai_keys.sound
+46/59 Test #274: ai_keys.sound .....................   Passed    0.06 sec
+      Start 278: ai_keys.shared
+47/59 Test #278: ai_keys.shared ....................   Passed    0.05 sec
+      Start 275: ai_keys.priority
+48/59 Test #275: ai_keys.priority ..................   Passed    0.05 sec
+      Start   9: objects.messages_strings
+49/59 Test   #9: objects.messages_strings ..........   Passed    0.04 sec
+      Start  11: objects.creation_failures
+50/59 Test  #11: objects.creation_failures .........   Passed    0.04 sec
+      Start   3: objects.reasons_properties
+51/59 Test   #3: objects.reasons_properties ........   Passed    0.02 sec
+      Start   8: objects.links_lists
+52/59 Test   #8: objects.links_lists ...............   Passed    0.02 sec
+      Start   1: objects.original_objects
+53/59 Test   #1: objects.original_objects ..........   Passed    0.02 sec
+      Start   7: objects.handles_selection
+54/59 Test   #7: objects.handles_selection .........   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+55/59 Test   #5: objects.deferred_removal ..........   Passed    0.02 sec
+      Start   4: objects.scheduling
+56/59 Test   #4: objects.scheduling ................   Passed    0.02 sec
+      Start   2: objects.nested_creation
+57/59 Test   #2: objects.nested_creation ...........   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+58/59 Test   #6: objects.aggregate_dispatch ........   Passed    0.02 sec
+59/59 Test #283: ai_keys.subway ....................   Passed   38.95 sec
+
+100% tests passed, 0 tests failed out of 59
+
+Label Time Summary:
+ai_fire          =  19.26 sec*proc (12 tests)
+ai_keys          =  40.58 sec*proc (10 tests)
+ai_runtime       =  43.27 sec*proc (15 tests)
+gideon_combat    =   1.17 sec*proc (8 tests)
+headless         = 133.33 sec*proc (59 tests)
+objects          =   0.29 sec*proc (11 tests)
+private          = 131.71 sec*proc (11 tests)
+world            =  28.77 sec*proc (3 tests)
+
+Total Test time (real) =  76.01 sec

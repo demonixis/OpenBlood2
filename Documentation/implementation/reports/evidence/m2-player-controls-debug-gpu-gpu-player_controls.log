@@ -1,0 +1,87 @@
+624/624 Testing: gpu.player_controls
+624/624 Test: gpu.player_controls
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_controls_tests" "gpu" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.player_controls" start time: Oct 17 00:07 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Original FIRE_KEY: shots=17 ammo=33 voices=17 mouse=1
+<end of output>
+Test time =   5.71 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.player_controls" end time: Oct 17 00:08 CEST
+"gpu.player_controls" time elapsed: 00:00:05
+----------------------------------------------------------
+
+End testing: Oct 17 00:08 CEST
+
+brushes =   2.51 sec*proc
+
+cameras =   2.62 sec*proc
+
+character =  20.31 sec*proc
+
+cinematics =   2.76 sec*proc
+
+containers =   6.50 sec*proc
+
+doors =   2.41 sec*proc
+
+explosion_flames =   1.68 sec*proc
+
+explosion_fragments =   0.89 sec*proc
+
+explosion_models =   0.92 sec*proc
+
+explosion_rings =   0.91 sec*proc
+
+gpu = 176.39 sec*proc
+
+interaction =   7.91 sec*proc
+
+keyframes =   2.68 sec*proc
+
+lights =   2.65 sec*proc
+
+model_view =   1.40 sec*proc
+
+movement =  19.01 sec*proc
+
+object_particles =   0.91 sec*proc
+
+objectives =   4.84 sec*proc
+
+pickups =   2.57 sec*proc
+
+player =   2.71 sec*proc
+
+player_controls =   5.71 sec*proc
+
+player_keepalive =   4.26 sec*proc
+
+player_restore =   3.01 sec*proc
+
+private = 169.34 sec*proc
+
+randomsound =  13.62 sec*proc
+
+sceneexplosion =   2.75 sec*proc
+
+sound =   2.77 sec*proc
+
+sprite_view =   1.39 sec*proc
+
+sprites =   2.71 sec*proc
+
+triggers =   2.76 sec*proc
+
+weapon_sprites =   2.07 sec*proc
+
+weapons =  21.54 sec*proc
+
+world_view =  19.33 sec*proc
+
+worldpaths =   2.70 sec*proc
+

@@ -1,0 +1,92 @@
+{
+  "binary": "IMUSIC25.DLL",
+  "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "header_cases": [
+    {
+      "tempo": 120,
+      "fraction": 0,
+      "microseconds": 500000
+    },
+    {
+      "tempo": 120,
+      "fraction": 65535,
+      "microseconds": 495931
+    },
+    {
+      "tempo": 1,
+      "fraction": 0,
+      "microseconds": 60000000
+    },
+    {
+      "tempo": 32767,
+      "fraction": 65535,
+      "microseconds": 1831
+    }
+  ],
+  "command_measure_cases": [
+    {
+      "ticks_per_measure": 768,
+      "time": -769,
+      "measure": -1
+    },
+    {
+      "ticks_per_measure": 768,
+      "time": -767,
+      "measure": 0
+    },
+    {
+      "ticks_per_measure": 768,
+      "time": 25165824,
+      "measure": -32768
+    },
+    {
+      "ticks_per_measure": 1,
+      "time": -2147483648,
+      "measure": 0
+    },
+    {
+      "ticks_per_measure": 1,
+      "time": 2147483647,
+      "measure": -1
+    }
+  ],
+  "header_rvas": [
+    "0xb5d3..0xb644",
+    "0xb65c..0xb66a",
+    "0x18ced..0x18d10"
+  ],
+  "entries": {
+    "cmnd": "0xba4b",
+    "mute": "0xbb79",
+    "chrd": "0xb899"
+  },
+  "synthetic_cases": 31,
+  "sections": 156,
+  "records": {
+    "cmnd": 156,
+    "mute": 3290,
+    "chrd": 156
+  },
+  "mapped_sha256": "83bcfc3be48726603f525385a18b7e433137a85750fd17427f35d7601636ef72",
+  "mapped_fnv64": 17214005195151465368,
+  "tempo_integers": [
+    74,
+    98,
+    110,
+    120,
+    150,
+    176
+  ],
+  "duration_ticks": [
+    768,
+    1152,
+    1536,
+    1728,
+    2304,
+    3072,
+    3456,
+    4608,
+    6144
+  ],
+  "scope": "Original reader order and mapped fields; chord name conversion intercepted, no personality or sequencer execution"
+}

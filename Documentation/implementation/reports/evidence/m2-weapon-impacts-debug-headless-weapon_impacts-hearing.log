@@ -1,0 +1,14 @@
+608/610 Testing: weapon_impacts.hearing
+608/610 Test: weapon_impacts.hearing
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_impact_tests" "hearing" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-impacts-hearing"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapon_impacts.hearing" start time: Oct 16 23:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_impacts.hearing" end time: Oct 16 23:30 CEST
+"weapon_impacts.hearing" time elapsed: 00:00:00
+----------------------------------------------------------

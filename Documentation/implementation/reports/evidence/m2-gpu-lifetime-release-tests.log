@@ -1,0 +1,15 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 2: gpu.platform_video
+1/3 Test #2: gpu.platform_video ...............   Passed    0.16 sec
+    Start 3: gpu.platform_window
+2/3 Test #3: gpu.platform_window ..............   Passed    0.16 sec
+    Start 4: gpu.platform_gpu
+3/3 Test #4: gpu.platform_gpu .................   Passed    1.02 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+gpu         =   1.35 sec*proc (3 tests)
+platform    =   1.35 sec*proc (3 tests)
+
+Total Test time (real) =   1.36 sec

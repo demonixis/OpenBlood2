@@ -1,0 +1,14 @@
+58/642 Testing: weapons.inventory
+58/642 Test: weapons.inventory
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_tests" "inventory" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-fixtures/inventory"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapons.inventory" start time: Oct 17 03:43 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"weapons.inventory" end time: Oct 17 03:43 CEST
+"weapons.inventory" time elapsed: 00:00:00
+----------------------------------------------------------

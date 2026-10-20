@@ -1,0 +1,14 @@
+619/626 Testing: gideon_teleport.colors
+619/626 Test: gideon_teleport.colors
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_teleport_tests" "colors" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-teleport-colors"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_teleport.colors" start time: Oct 17 02:45 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_teleport.colors" end time: Oct 17 02:45 CEST
+"gideon_teleport.colors" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,1067 @@
+-- The C compiler identification is GNU 16.2.1
+-- The CXX compiler identification is GNU 16.2.1
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- ========================================
+-- OpenBlood2 Build Configuration
+-- ========================================
+-- Build Type: Debug
+-- C++ Standard: 17
+-- System: Linux
+-- Compiler: GNU
+-- ========================================
+-- Fetching dependencies...
+-- Found PkgConfig: /usr/bin/pkg-config (found version "2.5.1")
+-- Detecting Target CPU Architecture
+-- Detecting Target CPU Architecture - X64
+-- Performing Test HAVE_GCC_WALL
+-- Performing Test HAVE_GCC_WALL - Success
+-- Performing Test HAVE_GCC_WUNDEF
+-- Performing Test HAVE_GCC_WUNDEF - Success
+-- Performing Test HAVE_GCC_WFLOAT_CONVERSION
+-- Performing Test HAVE_GCC_WFLOAT_CONVERSION - Success
+-- Performing Test HAVE_GCC_NO_STRICT_ALIASING
+-- Performing Test HAVE_GCC_NO_STRICT_ALIASING - Success
+-- Performing Test HAVE_GCC_WDOCUMENTATION
+-- Performing Test HAVE_GCC_WDOCUMENTATION - Failed
+-- Performing Test HAVE_GCC_WDOCUMENTATION_UNKNOWN_COMMAND
+-- Performing Test HAVE_GCC_WDOCUMENTATION_UNKNOWN_COMMAND - Failed
+-- Performing Test HAVE_GCC_COMMENT_BLOCK_COMMANDS
+-- Performing Test HAVE_GCC_COMMENT_BLOCK_COMMANDS - Failed
+-- Performing Test HAVE_CLANG_COMMENT_BLOCK_COMMANDS
+-- Performing Test HAVE_CLANG_COMMENT_BLOCK_COMMANDS - Failed
+-- Performing Test HAVE_GCC_WSHADOW
+-- Performing Test HAVE_GCC_WSHADOW - Success
+-- Performing Test HAVE_GCC_WUNUSED_LOCAL_TYPEDEFS
+-- Performing Test HAVE_GCC_WUNUSED_LOCAL_TYPEDEFS - Success
+-- Performing Test HAVE_GCC_WIMPLICIT_FALLTHROUGH
+-- Performing Test HAVE_GCC_WIMPLICIT_FALLTHROUGH - Success
+-- Performing Test COMPILER_SUPPORTS_FDIAGNOSTICS_COLOR_ALWAYS
+-- Performing Test COMPILER_SUPPORTS_FDIAGNOSTICS_COLOR_ALWAYS - Success
+-- Looking for __GLIBC__
+-- Looking for __GLIBC__ - found
+-- Performing Test HAVE_WL_VERSION_SCRIPT
+-- Performing Test HAVE_WL_VERSION_SCRIPT - Success
+-- Performing Test COMPILER_SUPPORTS_GCC_ATOMICS
+-- Performing Test COMPILER_SUPPORTS_GCC_ATOMICS - Success
+-- Performing Test HAVE_GCC_FVISIBILITY
+-- Performing Test HAVE_GCC_FVISIBILITY - Success
+-- Performing Test LINKER_SUPPORTS_WL_NO_UNDEFINED
+-- Performing Test LINKER_SUPPORTS_WL_NO_UNDEFINED - Success
+-- Performing Test COMPILER_SUPPORTS_MMX
+-- Performing Test COMPILER_SUPPORTS_MMX - Success
+-- Performing Test COMPILER_SUPPORTS_SSE
+-- Performing Test COMPILER_SUPPORTS_SSE - Success
+-- Performing Test COMPILER_SUPPORTS_SSE2
+-- Performing Test COMPILER_SUPPORTS_SSE2 - Success
+-- Performing Test COMPILER_SUPPORTS_SSE3
+-- Performing Test COMPILER_SUPPORTS_SSE3 - Success
+-- Performing Test COMPILER_SUPPORTS_SSE4_1
+-- Performing Test COMPILER_SUPPORTS_SSE4_1 - Success
+-- Performing Test COMPILER_SUPPORTS_SSE4_2
+-- Performing Test COMPILER_SUPPORTS_SSE4_2 - Success
+-- Performing Test COMPILER_SUPPORTS_AVX
+-- Performing Test COMPILER_SUPPORTS_AVX - Success
+-- Performing Test COMPILER_SUPPORTS_AVX2
+-- Performing Test COMPILER_SUPPORTS_AVX2 - Success
+-- Performing Test COMPILER_SUPPORTS_AVX512F
+-- Performing Test COMPILER_SUPPORTS_AVX512F - Success
+-- Looking for alloca.h
+-- Looking for alloca.h - found
+-- Looking for float.h
+-- Looking for float.h - found
+-- Looking for iconv.h
+-- Looking for iconv.h - found
+-- Looking for inttypes.h
+-- Looking for inttypes.h - found
+-- Looking for limits.h
+-- Looking for limits.h - found
+-- Looking for malloc.h
+-- Looking for malloc.h - found
+-- Looking for math.h
+-- Looking for math.h - found
+-- Looking for memory.h
+-- Looking for memory.h - found
+-- Looking for signal.h
+-- Looking for signal.h - found
+-- Looking for stdarg.h
+-- Looking for stdarg.h - found
+-- Looking for stdbool.h
+-- Looking for stdbool.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stdio.h
+-- Looking for stdio.h - found
+-- Looking for stdlib.h
+-- Looking for stdlib.h - found
+-- Looking for string.h
+-- Looking for string.h - found
+-- Looking for strings.h
+-- Looking for strings.h - found
+-- Looking for sys/types.h
+-- Looking for sys/types.h - found
+-- Looking for time.h
+-- Looking for time.h - found
+-- Looking for wchar.h
+-- Looking for wchar.h - found
+-- Looking for pow in m
+-- Looking for pow in m - found
+-- Looking for abs
+-- Looking for abs - found
+-- Looking for acos
+-- Looking for acos - found
+-- Looking for acosf
+-- Looking for acosf - found
+-- Looking for asin
+-- Looking for asin - found
+-- Looking for asinf
+-- Looking for asinf - found
+-- Looking for atan
+-- Looking for atan - found
+-- Looking for atan2
+-- Looking for atan2 - found
+-- Looking for atan2f
+-- Looking for atan2f - found
+-- Looking for atanf
+-- Looking for atanf - found
+-- Looking for atof
+-- Looking for atof - found
+-- Looking for atoi
+-- Looking for atoi - found
+-- Looking for bcopy
+-- Looking for bcopy - found
+-- Looking for ceil
+-- Looking for ceil - found
+-- Looking for ceilf
+-- Looking for ceilf - found
+-- Looking for copysign
+-- Looking for copysign - found
+-- Looking for copysignf
+-- Looking for copysignf - found
+-- Looking for cos
+-- Looking for cos - found
+-- Looking for cosf
+-- Looking for cosf - found
+-- Looking for _Exit
+-- Looking for _Exit - found
+-- Looking for exp
+-- Looking for exp - found
+-- Looking for expf
+-- Looking for expf - found
+-- Looking for fabs
+-- Looking for fabs - found
+-- Looking for fabsf
+-- Looking for fabsf - found
+-- Looking for floor
+-- Looking for floor - found
+-- Looking for floorf
+-- Looking for floorf - found
+-- Looking for fmod
+-- Looking for fmod - found
+-- Looking for fmodf
+-- Looking for fmodf - found
+-- Looking for fopen64
+-- Looking for fopen64 - found
+-- Looking for fseeko
+-- Looking for fseeko - found
+-- Looking for fseeko64
+-- Looking for fseeko64 - found
+-- Looking for getenv
+-- Looking for getenv - found
+-- Looking for _i64toa
+-- Looking for _i64toa - not found
+-- Looking for index
+-- Looking for index - found
+-- Looking for itoa
+-- Looking for itoa - not found
+-- Looking for log
+-- Looking for log - found
+-- Looking for log10
+-- Looking for log10 - found
+-- Looking for log10f
+-- Looking for log10f - found
+-- Looking for logf
+-- Looking for logf - found
+-- Looking for lround
+-- Looking for lround - found
+-- Looking for lroundf
+-- Looking for lroundf - found
+-- Looking for _ltoa
+-- Looking for _ltoa - not found
+-- Looking for malloc
+-- Looking for malloc - found
+-- Looking for memcmp
+-- Looking for memcmp - found
+-- Looking for memcpy
+-- Looking for memcpy - found
+-- Looking for memmove
+-- Looking for memmove - found
+-- Looking for memset
+-- Looking for memset - found
+-- Looking for modf
+-- Looking for modf - found
+-- Looking for modff
+-- Looking for modff - found
+-- Looking for pow
+-- Looking for pow - found
+-- Looking for powf
+-- Looking for powf - found
+-- Looking for putenv
+-- Looking for putenv - found
+-- Looking for rindex
+-- Looking for rindex - found
+-- Looking for round
+-- Looking for round - found
+-- Looking for roundf
+-- Looking for roundf - found
+-- Looking for scalbn
+-- Looking for scalbn - found
+-- Looking for scalbnf
+-- Looking for scalbnf - found
+-- Looking for setenv
+-- Looking for setenv - found
+-- Looking for sin
+-- Looking for sin - found
+-- Looking for sinf
+-- Looking for sinf - found
+-- Looking for sqr
+-- Looking for sqr - not found
+-- Looking for sqrt
+-- Looking for sqrt - found
+-- Looking for sqrtf
+-- Looking for sqrtf - found
+-- Looking for sscanf
+-- Looking for sscanf - found
+-- Looking for strchr
+-- Looking for strchr - found
+-- Looking for strcmp
+-- Looking for strcmp - found
+-- Looking for strlcat
+-- Looking for strlcat - found
+-- Looking for strlcpy
+-- Looking for strlcpy - found
+-- Looking for strlen
+-- Looking for strlen - found
+-- Looking for strncmp
+-- Looking for strncmp - found
+-- Looking for strnlen
+-- Looking for strnlen - found
+-- Looking for strpbrk
+-- Looking for strpbrk - found
+-- Looking for strrchr
+-- Looking for strrchr - found
+-- Looking for strstr
+-- Looking for strstr - found
+-- Looking for strnstr
+-- Looking for strnstr - not found
+-- Looking for strtod
+-- Looking for strtod - found
+-- Looking for strtok_r
+-- Looking for strtok_r - found
+-- Looking for strtol
+-- Looking for strtol - found
+-- Looking for strtoll
+-- Looking for strtoll - found
+-- Looking for strtoul
+-- Looking for strtoul - found
+-- Looking for strtoull
+-- Looking for strtoull - found
+-- Looking for tan
+-- Looking for tan - found
+-- Looking for tanf
+-- Looking for tanf - found
+-- Looking for trunc
+-- Looking for trunc - found
+-- Looking for truncf
+-- Looking for truncf - found
+-- Looking for unsetenv
+-- Looking for unsetenv - found
+-- Looking for vsnprintf
+-- Looking for vsnprintf - found
+-- Looking for vsscanf
+-- Looking for vsscanf - found
+-- Looking for wcsnlen
+-- Looking for wcsnlen - found
+-- Looking for wcscmp
+-- Looking for wcscmp - found
+-- Looking for wcsdup
+-- Looking for wcsdup - found
+-- Looking for wcslcat
+-- Looking for wcslcat - found
+-- Looking for wcslcpy
+-- Looking for wcslcpy - found
+-- Looking for wcslen
+-- Looking for wcslen - found
+-- Looking for wcsncmp
+-- Looking for wcsncmp - found
+-- Looking for wcsstr
+-- Looking for wcsstr - found
+-- Looking for wcstol
+-- Looking for wcstol - found
+-- Looking for wcstoll
+-- Looking for wcstoll - found
+-- Looking for wcstoul
+-- Looking for wcstoul - found
+-- Looking for wcstoull
+-- Looking for wcstoull - found
+-- Looking for strcasestr
+-- Looking for strcasestr - found
+-- Performing Test LIBC_HAS_ISINF
+-- Performing Test LIBC_HAS_ISINF - Success
+-- Performing Test LIBC_ISINF_HANDLES_FLOAT
+-- Performing Test LIBC_ISINF_HANDLES_FLOAT - Success
+-- Performing Test LIBC_HAS_ISINFF
+-- Performing Test LIBC_HAS_ISINFF - Success
+-- Performing Test LIBC_HAS_ISNAN
+-- Performing Test LIBC_HAS_ISNAN - Success
+-- Performing Test LIBC_ISNAN_HANDLES_FLOAT
+-- Performing Test LIBC_ISNAN_HANDLES_FLOAT - Success
+-- Performing Test LIBC_HAS_ISNANF
+-- Performing Test LIBC_HAS_ISNANF - Success
+-- Looking for fdatasync
+-- Looking for fdatasync - found
+-- Looking for getexecpath
+-- Looking for getexecpath - not found
+-- Looking for gethostname
+-- Looking for gethostname - found
+-- Looking for getpagesize
+-- Looking for getpagesize - found
+-- Looking for getresgid
+-- Looking for getresgid - found
+-- Looking for getresuid
+-- Looking for getresuid - found
+-- Looking for sigaction
+-- Looking for sigaction - found
+-- Looking for sigtimedwait
+-- Looking for sigtimedwait - found
+-- Looking for setjmp
+-- Looking for setjmp - found
+-- Looking for nanosleep
+-- Looking for nanosleep - found
+-- Looking for gmtime_r
+-- Looking for gmtime_r - found
+-- Looking for localtime_r
+-- Looking for localtime_r - found
+-- Looking for nl_langinfo
+-- Looking for nl_langinfo - found
+-- Looking for sysconf
+-- Looking for sysconf - found
+-- Looking for sysctlbyname
+-- Looking for sysctlbyname - not found
+-- Looking for getauxval
+-- Looking for getauxval - found
+-- Looking for elf_aux_info
+-- Looking for elf_aux_info - not found
+-- Looking for ppoll
+-- Looking for ppoll - found
+-- Looking for memfd_create
+-- Looking for memfd_create - found
+-- Looking for posix_fallocate
+-- Looking for posix_fallocate - found
+-- Looking for posix_spawn_file_actions_addchdir
+-- Looking for posix_spawn_file_actions_addchdir - not found
+-- Looking for posix_spawn_file_actions_addchdir_np
+-- Looking for posix_spawn_file_actions_addchdir_np - found
+-- Performing Test ICONV_IN_LIBC
+-- Performing Test ICONV_IN_LIBC - Success
+-- Performing Test ICONV_IN_LIBICONV
+-- Performing Test ICONV_IN_LIBICONV - Failed
+-- Performing Test HAVE_SA_SIGACTION
+-- Performing Test HAVE_SA_SIGACTION - Success
+-- Performing Test HAVE_ST_MTIM
+-- Performing Test HAVE_ST_MTIM - Success
+-- Looking for dlopen
+-- Looking for dlopen - found
+-- Performing Test HAVE_O_CLOEXEC
+-- Performing Test HAVE_O_CLOEXEC - Success
+-- Performing Test COMPILER_SUPPORTS_ELFNOTES
+-- Performing Test COMPILER_SUPPORTS_ELFNOTES - Success
+-- Found ALSA: /usr/lib64/libasound.so (found version "1.2.16.1")
+-- dynamic libasound -> libasound.so.2
+-- Checking for module 'jack'
+--   Found jack, version 3.1609.0
+-- dynamic libjack -> libjack.so.0
+-- Checking for module 'libpipewire-0.3>=0.3.44'
+--   Found libpipewire-0.3, version 1.6.9
+-- dynamic libpipewire-0.3 -> libpipewire-0.3.so.0
+-- Checking for module 'libpulse>=0.9.15'
+--   Found libpulse, version 17.0
+-- dynamic libpulse -> libpulse.so.0
+-- Checking for module 'sndio'
+--   Package 'sndio' not found
+-- Found X11: /usr/include
+-- Looking for XOpenDisplay in /usr/lib64/libX11.so;/usr/lib64/libXext.so
+-- Looking for XOpenDisplay in /usr/lib64/libX11.so;/usr/lib64/libXext.so - found
+-- Looking for gethostbyname
+-- Looking for gethostbyname - found
+-- Looking for connect
+-- Looking for connect - found
+-- Looking for remove
+-- Looking for remove - found
+-- Looking for shmat
+-- Looking for shmat - found
+-- dynamic libX11 -> libX11.so.6
+-- dynamic libXext -> libXext.so.6
+-- dynamic libXcursor -> libXcursor.so.1
+-- dynamic libXi -> libXi.so.6
+-- dynamic libXfixes -> libXfixes.so.3
+-- dynamic libXrandr -> libXrandr.so.2
+-- dynamic libXrender -> libXrender.so.1
+-- dynamic libXss -> libXss.so.1
+-- dynamic libXtst -> libXtst.so.6
+-- Looking for shmat
+-- Looking for shmat - found
+-- Performing Test HAVE_XGENERICEVENT
+-- Performing Test HAVE_XGENERICEVENT - Success
+-- Looking for X11/XKBlib.h
+-- Looking for X11/XKBlib.h - found
+-- Performing Test HAVE_XINPUT2_SCROLLINFO
+-- Performing Test HAVE_XINPUT2_SCROLLINFO - Success
+-- Performing Test HAVE_XINPUT2_MULTITOUCH
+-- Performing Test HAVE_XINPUT2_MULTITOUCH - Success
+-- Performing Test HAVE_XINPUT2_GESTURE
+-- Performing Test HAVE_XINPUT2_GESTURE - Success
+-- Performing Test HAVE_XFIXES_H
+-- Performing Test HAVE_XFIXES_H - Success
+-- Checking for module 'fribidi'
+--   Found fribidi, version 1.0.16
+-- dynamic libfribidi -> libfribidi.so.0
+-- Checking for module 'libthai'
+--   Found libthai, version 0.1.30
+-- dynamic libthai -> libthai.so.0
+-- Found OpenGL: /usr/lib64/libOpenGL.so
+-- Performing Test HAVE_OPENGL_EGL
+-- Performing Test HAVE_OPENGL_EGL - Success
+-- Checking for module 'libdrm'
+--   Found libdrm, version 2.4.134
+-- Checking for module 'gbm'
+--   Found gbm, version 26.2.4
+-- dynamic libdrm -> libdrm.so.2
+-- dynamic libgbm -> libgbm.so.1
+-- Performing Test HAVE_OPENGL_GLX
+-- Performing Test HAVE_OPENGL_GLX - Success
+-- Performing Test HAVE_OPENGL
+-- Performing Test HAVE_OPENGL - Success
+-- Performing Test HAVE_OPENGLES_V1
+-- Performing Test HAVE_OPENGLES_V1 - Success
+-- Performing Test HAVE_OPENGLES_V2
+-- Performing Test HAVE_OPENGLES_V2 - Success
+-- Checking for modules 'wayland-client>=1.18;wayland-egl;wayland-cursor;egl;xkbcommon>=0.5.0'
+--   Found wayland-client, version 1.26.0
+--   Found wayland-egl, version 18.1.0
+--   Found wayland-cursor, version 1.26.0
+--   Found egl, version 1.5
+--   Found xkbcommon, version 1.13.1
+-- dynamic libwayland-client -> libwayland-client.so.0
+-- dynamic libwayland-egl -> libwayland-egl.so.1
+-- dynamic libwayland-cursor -> libwayland-cursor.so.0
+-- dynamic libxkbcommon -> libxkbcommon.so.0
+-- Checking for module 'libdecor-0'
+--   Found libdecor-0, version 0.2.5
+-- dynamic libdecor-0 -> libdecor-0.so.0
+-- Performing Test HAVE_LINUX_INPUT_H
+-- Performing Test HAVE_LINUX_INPUT_H - Success
+-- Performing Test HAVE_INPUT_KD
+-- Performing Test HAVE_INPUT_KD - Success
+-- Performing Test HAVE_LINUX_VIDEODEV2_H
+-- Performing Test HAVE_LINUX_VIDEODEV2_H - Success
+-- Looking for libudev.h
+-- Looking for libudev.h - found
+-- dynamic libudev -> libudev.so.1
+-- Looking for sys/inotify.h
+-- Looking for sys/inotify.h - found
+-- Looking for inotify_init
+-- Looking for inotify_init - found
+-- Looking for inotify_init1
+-- Looking for inotify_init1 - found
+-- Checking for one of the modules 'dbus-1;dbus'
+-- Checking for one of the modules 'ibus-1.0;ibus'
+-- Checking for one of the modules 'liburing-ffi'
+-- Performing Test LIBC_HAS_WORKING_LIBUNWIND
+-- Performing Test LIBC_HAS_WORKING_LIBUNWIND - Failed
+-- Performing Test LIBUNWIND_HAS_WORKINGLIBUNWIND
+-- Performing Test LIBUNWIND_HAS_WORKINGLIBUNWIND - Failed
+-- Checking for modules 'libunwind;libunwind-generic'
+--   Package 'libunwind' not found
+--   Package 'libunwind-generic' not found
+-- Checking for module 'libusb-1.0>=1.0.16'
+--   Found libusb-1.0, version 1.0.30
+-- Found LibUSB: /usr/lib64/libusb-1.0.so (found version "1.0.30")
+-- Performing Test HAVE_LIBUSB_H
+-- Performing Test HAVE_LIBUSB_H - Success
+-- Performing Test HAVE_PTHREADS
+-- Performing Test HAVE_PTHREADS - Success
+-- Performing Test HAVE_RECURSIVE_MUTEXES
+-- Performing Test HAVE_RECURSIVE_MUTEXES - Success
+-- Performing Test HAVE_PTHREADS_SEM
+-- Performing Test HAVE_PTHREADS_SEM - Success
+-- Performing Test COMPILER_HAS_SEM_TIMEDWAIT
+-- Performing Test COMPILER_HAS_SEM_TIMEDWAIT - Success
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Looking for pthread_np.h
+-- Looking for pthread_np.h - not found
+-- Performing Test HAVE_PTHREAD_SETNAME_NP
+-- Performing Test HAVE_PTHREAD_SETNAME_NP - Success
+-- Looking for clock_gettime in c
+-- Looking for clock_gettime in c - found
+-- Performing Test HAVE_POSIX_SPAWN
+-- Performing Test HAVE_POSIX_SPAWN - Success
+-- Looking for vfork
+-- Looking for vfork - found
+-- 
+-- SDL3 was configured with the following options:
+-- 
+-- Platform: Linux-7.2.10-200.fc44.x86_64
+-- 64-bit:   TRUE
+-- Compiler: /usr/bin/cc
+-- Revision: SDL-3.5.0-HEAD-HASH-NOTFOUND
+-- Vendor:   
+-- 
+-- Subsystems:
+--   Audio:        ON
+--   Video:        ON
+--   GPU:          ON
+--   Render:       ON
+--   Camera:       ON
+--   Joystick:     ON
+--   Haptic:       ON
+--   Hidapi:       ON
+--   Power:        ON
+--   Sensor:       ON
+--   Dialog:       ON
+--   Tray:         ON
+--   Notification: ON
+-- 
+-- Options:
+--   SDL_ALSA                    (Wanted: ON): ON
+--   SDL_ALSA_SHARED             (Wanted: ON): ON
+--   SDL_ALTIVEC                 (Wanted: OFF): OFF
+--   SDL_ARMNEON                 (Wanted: OFF): OFF
+--   SDL_ARMSVE2                 (Wanted: OFF): OFF
+--   SDL_ASAN                    (Wanted: OFF): OFF
+--   SDL_ASSEMBLY                (Wanted: ON): ON
+--   SDL_ASSERTIONS              (Wanted: auto): auto
+--   SDL_AVX                     (Wanted: ON): ON
+--   SDL_AVX2                    (Wanted: ON): ON
+--   SDL_AVX512F                 (Wanted: ON): ON
+--   SDL_BACKGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_CCACHE                  (Wanted: OFF): OFF
+--   SDL_CLANG_TIDY              (Wanted: OFF): OFF
+--   SDL_CLOCK_GETTIME           (Wanted: ON): ON
+--   SDL_COCOA                   (Wanted: OFF): OFF
+--   SDL_DBUS                    (Wanted: ON): ON
+--   SDL_DEPS_SHARED             (Wanted: ON): OFF
+--   SDL_DIRECTX                 (Wanted: OFF): OFF
+--   SDL_DISKAUDIO               (Wanted: ON): ON
+--   SDL_DLOPEN_NOTES            (Wanted: ON): ON
+--   SDL_DUMMYAUDIO              (Wanted: ON): ON
+--   SDL_DUMMYCAMERA             (Wanted: ON): ON
+--   SDL_DUMMYVIDEO              (Wanted: ON): ON
+--   SDL_EXAMPLES                (Wanted: OFF): OFF
+--   SDL_EXAMPLES_LINK_SHARED    (Wanted: OFF): OFF
+--   SDL_FOREGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_FRIBIDI                 (Wanted: ON): ON
+--   SDL_FRIBIDI_SHARED          (Wanted: ON): ON
+--   SDL_GCC_ATOMICS             (Wanted: ON): ON
+--   SDL_GPU_OPENXR              (Wanted: ON): ON
+--   SDL_HIDAPI                  (Wanted: ON): ON
+--   SDL_HIDAPI_JOYSTICK         (Wanted: ON): ON
+--   SDL_HIDAPI_LIBUSB           (Wanted: ON): ON
+--   SDL_HIDAPI_LIBUSB_SHARED    (Wanted: ON): ON
+--   SDL_IBUS                    (Wanted: ON): ON
+--   SDL_INSTALL                 (Wanted: OFF): OFF
+--   SDL_INSTALL_TESTS           (Wanted: OFF): OFF
+--   SDL_JACK                    (Wanted: ON): ON
+--   SDL_JACK_SHARED             (Wanted: ON): ON
+--   SDL_KMSDRM                  (Wanted: ON): ON
+--   SDL_KMSDRM_SHARED           (Wanted: ON): ON
+--   SDL_LASX                    (Wanted: OFF): OFF
+--   SDL_LEAN_AND_MEAN           (Wanted: OFF): OFF
+--   SDL_LIBC                    (Wanted: ON): ON
+--   SDL_LIBICONV                (Wanted: OFF): OFF
+--   SDL_LIBTHAI                 (Wanted: ON): ON
+--   SDL_LIBTHAI_SHARED          (Wanted: ON): ON
+--   SDL_LIBUDEV                 (Wanted: ON): ON
+--   SDL_LIBUDEV_SHARED          (Wanted: ON): ON
+--   SDL_LIBURING                (Wanted: ON): OFF
+--   SDL_LSX                     (Wanted: OFF): OFF
+--   SDL_METAL                   (Wanted: OFF): OFF
+--   SDL_MMX                     (Wanted: ON): ON
+--   SDL_OFFSCREEN               (Wanted: ON): ON
+--   SDL_OPENGL                  (Wanted: ON): ON
+--   SDL_OPENGLES                (Wanted: ON): ON
+--   SDL_OPENVR                  (Wanted: OFF): OFF
+--   SDL_OSS                     (Wanted: OFF): OFF
+--   SDL_PIPEWIRE                (Wanted: ON): ON
+--   SDL_PIPEWIRE_SHARED         (Wanted: ON): ON
+--   SDL_PTHREADS                (Wanted: ON): ON
+--   SDL_PTHREADS_SEM            (Wanted: ON): ON
+--   SDL_PULSEAUDIO              (Wanted: ON): ON
+--   SDL_PULSEAUDIO_SHARED       (Wanted: ON): ON
+--   SDL_RENDER_D3D              (Wanted: OFF): OFF
+--   SDL_RENDER_D3D11            (Wanted: OFF): OFF
+--   SDL_RENDER_D3D12            (Wanted: OFF): OFF
+--   SDL_RENDER_GPU              (Wanted: ON): ON
+--   SDL_RENDER_METAL            (Wanted: OFF): OFF
+--   SDL_RENDER_VULKAN           (Wanted: ON): ON
+--   SDL_ROCKCHIP                (Wanted: OFF): OFF
+--   SDL_RPATH                   (Wanted: ON): OFF
+--   SDL_RPI                     (Wanted: OFF): OFF
+--   SDL_SNDIO                   (Wanted: ON): OFF
+--   SDL_SNDIO_SHARED            (Wanted: ON): OFF
+--   SDL_SSE                     (Wanted: ON): ON
+--   SDL_SSE2                    (Wanted: ON): ON
+--   SDL_SSE3                    (Wanted: ON): ON
+--   SDL_SSE4_1                  (Wanted: ON): ON
+--   SDL_SSE4_2                  (Wanted: ON): ON
+--   SDL_SYSTEM_ICONV            (Wanted: ON): ON
+--   SDL_TESTS                   (Wanted: OFF): OFF
+--   SDL_TESTS_LINK_SHARED       (Wanted: OFF): OFF
+--   SDL_UNINSTALL               (Wanted: OFF): OFF
+--   SDL_VIRTUAL_JOYSTICK        (Wanted: ON): ON
+--   SDL_VIVANTE                 (Wanted: OFF): OFF
+--   SDL_VULKAN                  (Wanted: ON): ON
+--   SDL_WASAPI                  (Wanted: OFF): OFF
+--   SDL_WAYLAND                 (Wanted: ON): ON
+--   SDL_WAYLAND_LIBDECOR        (Wanted: ON): ON
+--   SDL_WAYLAND_LIBDECOR_SHARED (Wanted: ON): ON
+--   SDL_WAYLAND_SHARED          (Wanted: ON): ON
+--   SDL_X11                     (Wanted: ON): ON
+--   SDL_X11_SHARED              (Wanted: ON): ON
+--   SDL_X11_XCURSOR             (Wanted: ON): ON
+--   SDL_X11_XDBE                (Wanted: ON): ON
+--   SDL_X11_XFIXES              (Wanted: ON): ON
+--   SDL_X11_XINPUT              (Wanted: ON): ON
+--   SDL_X11_XRANDR              (Wanted: ON): ON
+--   SDL_X11_XSCRNSAVER          (Wanted: OFF): OFF
+--   SDL_X11_XSHAPE              (Wanted: ON): ON
+--   SDL_X11_XSYNC               (Wanted: ON): ON
+--   SDL_X11_XTEST               (Wanted: OFF): OFF
+--   SDL_XINPUT                  (Wanted: OFF): OFF
+-- 
+--  Build Shared Library: OFF
+--  Build Static Library: ON
+-- 
+-- Enabled backends:
+--   Video drivers: dummy kmsdrm(dynamic) offscreen wayland(dynamic) x11(dynamic)
+--   X11 libraries: xcursor xdbe xfixes xinput2 xrandr xshape xsync
+--   Render drivers: gpu ogl ogl_es ogl_es2 vulkan
+--   GPU drivers: openxr vulkan
+--   Audio drivers: alsa(dynamic) disk dummy jack(dynamic) pipewire(dynamic) pulseaudio(dynamic)
+--   Joystick drivers: hidapi linux virtual
+--   Camera drivers: dummy pipewire(dynamic) v4l2
+-- 
+-- If something was not detected, although the libraries
+-- were installed, then make sure you have set the
+-- CMAKE_C_FLAGS and CMAKE_PREFIX_PATH CMake variables correctly.
+-- 
+-- Configuring SDL3_mixer 3.3.0
+-- Performing Test LINKER_SUPPORTS_VERSION_SCRIPT
+-- Performing Test LINKER_SUPPORTS_VERSION_SCRIPT - Success
+-- Using vendored libogg
+-- Configuring libogg 1.3.5
+-- Looking for include file inttypes.h
+-- Looking for include file inttypes.h - found
+-- Looking for include file stdint.h
+-- Looking for include file stdint.h - found
+-- Looking for include file sys/types.h
+-- Looking for include file sys/types.h - found
+-- Looking for sys/types.h
+-- Looking for sys/types.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of int16_t
+-- Check size of int16_t - done
+-- Check size of uint16_t
+-- Check size of uint16_t - done
+-- Check size of u_int16_t
+-- Check size of u_int16_t - done
+-- Check size of int32_t
+-- Check size of int32_t - done
+-- Check size of uint32_t
+-- Check size of uint32_t - done
+-- Check size of u_int32_t
+-- Check size of u_int32_t - done
+-- Check size of int64_t
+-- Check size of int64_t - done
+-- Check size of short
+-- Check size of short - done
+-- Check size of int
+-- Check size of int - done
+-- Check size of long
+-- Check size of long - done
+-- Check size of long long
+-- Check size of long long - done
+-- Using vendored opus
+-- Found Git: /usr/bin/git (found version "2.56.0")
+-- Opus package version from git repo: 1.4-15-gac9f053e
+-- Opus project version: 1.4
+-- Performing Test VLA_SUPPORTED
+-- Performing Test VLA_SUPPORTED -- success
+-- Looking for alloca
+-- Looking for alloca - found
+-- Looking for lrintf
+-- Looking for lrintf - found
+-- Looking for lrint
+-- Looking for lrint - found
+-- Performing Test CPU_INFO_BY_ASM_SUPPORTED
+-- Performing Test CPU_INFO_BY_ASM_SUPPORTED -- success
+-- Looking for cpuid.h
+-- Looking for cpuid.h - found
+-- Performing Test CPU_INFO_BY_C_SUPPORTED
+-- Performing Test CPU_INFO_BY_C_SUPPORTED -- success
+-- Check SIMD support by compiler
+-- Looking for xmmintrin.h
+-- Looking for xmmintrin.h - found
+-- Performing Test SSE1_SUPPORTED
+-- Performing Test SSE1_SUPPORTED - Success
+-- Looking for emmintrin.h
+-- Looking for emmintrin.h - found
+-- Performing Test SSE2_SUPPORTED
+-- Performing Test SSE2_SUPPORTED - Success
+-- Looking for smmintrin.h
+-- Looking for smmintrin.h - found
+-- Performing Test SSE4_1_SUPPORTED
+-- Performing Test SSE4_1_SUPPORTED - Success
+-- Looking for immintrin.h
+-- Looking for immintrin.h - found
+-- Performing Test AVX_SUPPORTED
+-- Performing Test AVX_SUPPORTED - Success
+-- Performing Test FAST_MATH_SUPPORTED
+-- Performing Test FAST_MATH_SUPPORTED - Success
+-- Performing Test STACK_PROTECTOR_SUPPORTED
+-- Performing Test STACK_PROTECTOR_SUPPORTED - Success
+-- Performing Test HIDDEN_VISIBILITY_SUPPORTED
+-- Performing Test HIDDEN_VISIBILITY_SUPPORTED - Success
+-- Performing Test Wall_SUPPORTED
+-- Performing Test Wall_SUPPORTED - Success
+-- Performing Test W_SUPPORTED
+-- Performing Test W_SUPPORTED - Success
+-- Performing Test Wstrictprototypes_SUPPORTED
+-- Performing Test Wstrictprototypes_SUPPORTED - Success
+-- Performing Test Wextra_SUPPORTED
+-- Performing Test Wextra_SUPPORTED - Success
+-- Performing Test Wcastalign_SUPPORTED
+-- Performing Test Wcastalign_SUPPORTED - Success
+-- Performing Test Wnestedexterns_SUPPORTED
+-- Performing Test Wnestedexterns_SUPPORTED - Success
+-- Performing Test Wshadow_SUPPORTED
+-- Performing Test Wshadow_SUPPORTED - Success
+-- The following features have been enabled:
+
+ * OPUS_BUILD_SHARED_LIBRARY, build shared library.
+ * OPUS_ENABLE_FLOAT_API, compile with the floating point API (for machines with float library).
+ * OPUS_HARDENING, run-time checks that are cheap and safe for use in production.
+ * OPUS_INSTALL_PKG_CONFIG_MODULE, install pkg-config module.
+ * OPUS_INSTALL_CMAKE_CONFIG_MODULE, install CMake package config module.
+ * OPUS_VAR_ARRAYS, use variable length arrays for stack arrays.
+ * OPUS_STACK_PROTECTOR, use stack protection.
+ * OPUS_FORTIFY_SOURCE, add protection against buffer overflows.
+ * OPUS_X86_MAY_HAVE_SSE, does runtime check for SSE1 support.
+ * OPUS_X86_MAY_HAVE_SSE2, does runtime check for SSE2 support.
+ * OPUS_X86_MAY_HAVE_SSE4_1, does runtime check for SSE4.1 support.
+ * OPUS_X86_MAY_HAVE_AVX, does runtime check for AVX support.
+ * OPUS_X86_PRESUME_SSE, assume target CPU has SSE1 support (override runtime check).
+ * OPUS_X86_PRESUME_SSE2, assume target CPU has SSE2 support (override runtime check).
+
+-- The following OPTIONAL packages have been found:
+
+ * ALSA
+ * X11
+ * OpenGL
+ * LibUSB
+ * Git
+
+-- The following features have been disabled:
+
+ * OPUS_BUILD_TESTING, build tests.
+ * OPUS_CUSTOM_MODES, enable non-Opus modes, e.g. 44.1 kHz & 2^n frames.
+ * OPUS_BUILD_PROGRAMS, build programs.
+ * OPUS_DISABLE_INTRINSICS, disable all intrinsics optimizations.
+ * OPUS_FIXED_POINT, compile as fixed-point (for machines without a fast enough FPU).
+ * OPUS_FLOAT_APPROX, enable floating point approximations (Ensure your platform supports IEEE 754 before enabling).
+ * OPUS_ASSERTIONS, additional software error checking.
+ * OPUS_FUZZING, causes the encoder to make random decisions (do not use in production).
+ * OPUS_CHECK_ASM, enable bit-exactness checks between optimized and c implementations.
+ * OPUS_FIXED_POINT_DEBUG, debug fixed-point implementation.
+ * OPUS_USE_ALLOCA, use alloca for stack arrays (on non-C99 compilers).
+ * OPUS_NONTHREADSAFE_PSEUDOSTACK, use a non threadsafe pseudostack when neither variable length arrays or alloca is supported.
+ * OPUS_FAST_MATH, enable fast math (unsupported and discouraged use, as code is not well tested with this build option).
+ * OPUS_X86_PRESUME_SSE4_1, assume target CPU has SSE4.1 support (override runtime check).
+ * OPUS_X86_PRESUME_AVX, assume target CPU has AVX support (override runtime check).
+
+-- Using vendored opusfile
+-- Opus package version from git repo: 0.12-73-g9e5322c
+-- Opus project version: 0.12
+-- Looking for lrintf in m
+-- Looking for lrintf in m - found
+-- Looking for lrintf
+-- Looking for lrintf - found
+-- Dynamic opus (opusfile): $<TARGET_SONAME_FILE_NAME:opusfile>
+-- Using vendored libgme
+-- VGM/GYM: Nuked OPN2 emulator will be used
+-- Zlib-Compressed formats excluded
+-- Performing Test LINKER_SUPPORTS_NO_UNDEFINED
+-- Performing Test LINKER_SUPPORTS_NO_UNDEFINED - Success
+-- Performing Test LIBM_NOT_NEEDED
+-- Performing Test LIBM_NOT_NEEDED - Success
+-- Dynamic libgme: $<TARGET_SONAME_FILE_NAME:gme_shared>
+-- Using vendored libxmp
+-- Check for working linker: /usr/bin/ld
+-- Linker identification: GNU ld version 2.46.1-1.fc44
+-- Performing Test HAVE_W_ALL
+-- Performing Test HAVE_W_ALL - Success
+-- Performing Test HAVE_W_EXTRA
+-- Performing Test HAVE_W_EXTRA - Success
+-- Performing Test HAVE_W_WRITE_STRINGS
+-- Performing Test HAVE_W_WRITE_STRINGS - Success
+-- Performing Test HAVE_W_DECLARATION_AFTER_STATEMENT
+-- Performing Test HAVE_W_DECLARATION_AFTER_STATEMENT - Success
+-- Performing Test HAVE_W_MISSING_PROTOTYPES
+-- Performing Test HAVE_W_MISSING_PROTOTYPES - Success
+-- Performing Test HAVE_W_STRICT_PROTOTYPES
+-- Performing Test HAVE_W_STRICT_PROTOTYPES - Success
+-- Performing Test HAVE_W_WUNDEF
+-- Performing Test HAVE_W_WUNDEF - Success
+-- Performing Test HAVE_W_NO_UNKNOWN_WARNING
+-- Performing Test HAVE_W_NO_UNKNOWN_WARNING - Failed
+-- Performing Test HAVE_W_NO_UNUSED_PARAMETER
+-- Performing Test HAVE_W_NO_UNUSED_PARAMETER - Success
+-- Performing Test HAVE_W_NO_SIGN_COMPARE
+-- Performing Test HAVE_W_NO_SIGN_COMPARE - Success
+-- Looking for powf
+-- Looking for powf - found
+-- Looking for powf
+-- Looking for powf - found
+-- Looking for popen
+-- Looking for popen - found
+-- Looking for popen
+-- Looking for popen - found
+-- Looking for fnmatch
+-- Looking for fnmatch - found
+-- Looking for fnmatch
+-- Looking for fnmatch - found
+-- Looking for umask
+-- Looking for umask - found
+-- Looking for umask
+-- Looking for umask - found
+-- Looking for mkstemp
+-- Looking for mkstemp - found
+-- Looking for mkstemp
+-- Looking for mkstemp - found
+-- Looking for unistd.h
+-- Looking for unistd.h - found
+-- Looking for sys/wait.h
+-- Looking for sys/wait.h - found
+-- Performing Test HAVE_PIPE
+-- Performing Test HAVE_PIPE - Success
+-- Performing Test HAVE_WAIT
+-- Performing Test HAVE_WAIT - Success
+-- Performing Test HAVE_FORK
+-- Performing Test HAVE_FORK - Success
+-- Performing Test HAVE_EXECVP
+-- Performing Test HAVE_EXECVP - Success
+-- Performing Test HAVE_DUP2
+-- Performing Test HAVE_DUP2 - Success
+-- Looking for opendir
+-- Looking for opendir - found
+-- Looking for opendir
+-- Looking for opendir - found
+-- Looking for readdir
+-- Looking for readdir - found
+-- Performing Test HAVE_VISIBILITY
+-- Performing Test HAVE_VISIBILITY - Success
+-- Performing Test HAVE_EXTERNAL_VISIBILITY
+-- Performing Test HAVE_EXTERNAL_VISIBILITY - Success
+-- Performing Test HAVE_ATTRIBUTE_SYMVER
+-- Performing Test HAVE_ATTRIBUTE_SYMVER - Success
+-- Performing Test HAVE_NO_UNDEFINED
+-- Performing Test HAVE_NO_UNDEFINED - Success
+-- Versioned symbols: ENABLED.
+-- Manpage generation disabled: rst2man not found
+-- HTML doc generation disabled: rst2html not found
+-- PDF doc generation disabled: rst2pdf not found
+-- Dynamic libxmp: $<TARGET_SONAME_FILE_NAME:xmp_shared>
+-- Using vendored WavPack
+-- Looking for a ASM compiler
+-- Looking for a ASM compiler - /usr/bin/cc
+-- The ASM compiler identification is GNU
+-- Found assembler: /usr/bin/cc
+-- Looking for a ASM-ATT compiler
+-- Looking for a ASM-ATT compiler - /usr/bin/as
+-- The ASM-ATT compiler identification is GNU
+-- Found assembler: /usr/bin/as
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Performing Test HAVE___BUILTIN_CLZ
+-- Performing Test HAVE___BUILTIN_CLZ - Success
+-- Checking large files support...
+-- Checking size of off_t without any definitions:
+-- Check size of off_t
+-- Check size of off_t - done
+-- Checking of off_t without any definitions: 8
+-- Result of checking large files support: supported
+-- Looking for fseeko
+-- Looking for fseeko - found
+-- Detecting Target CPU Architecture
+-- Detecting Target CPU Architecture - X64
+-- Performing Test COMPILER_SUPPORTS_SYMBOL_MAPS
+-- Performing Test COMPILER_SUPPORTS_SYMBOL_MAPS - Success
+-- The following features have been enabled:
+
+ * OPUS_BUILD_SHARED_LIBRARY, build shared library.
+ * OPUS_ENABLE_FLOAT_API, compile with the floating point API (for machines with float library).
+ * OPUS_HARDENING, run-time checks that are cheap and safe for use in production.
+ * OPUS_INSTALL_PKG_CONFIG_MODULE, install pkg-config module.
+ * OPUS_INSTALL_CMAKE_CONFIG_MODULE, install CMake package config module.
+ * OPUS_VAR_ARRAYS, use variable length arrays for stack arrays.
+ * OPUS_STACK_PROTECTOR, use stack protection.
+ * OPUS_FORTIFY_SOURCE, add protection against buffer overflows.
+ * OPUS_X86_MAY_HAVE_SSE, does runtime check for SSE1 support.
+ * OPUS_X86_MAY_HAVE_SSE2, does runtime check for SSE2 support.
+ * OPUS_X86_MAY_HAVE_SSE4_1, does runtime check for SSE4.1 support.
+ * OPUS_X86_MAY_HAVE_AVX, does runtime check for AVX support.
+ * OPUS_X86_PRESUME_SSE, assume target CPU has SSE1 support (override runtime check).
+ * OPUS_X86_PRESUME_SSE2, assume target CPU has SSE2 support (override runtime check).
+ * BUILD_SHARED_LIBS, Build shared library.
+ * WAVPACK_ENABLE_DSD, Enable support for WavPack DSD files.
+ * WAVPACK_ENABLE_ASM, Enable assembly optimizations.
+
+-- The following OPTIONAL packages have been found:
+
+ * ALSA
+ * X11
+ * OpenGL
+ * LibUSB
+ * Threads, Threads library
+   Required to build tests, optional for library.
+
+-- The following REQUIRED packages have been found:
+
+ * Git, fast, scalable, distributed revision control system, <https://git-scm.com/>
+   required to set up package version
+
+-- The following features have been disabled:
+
+ * OPUS_BUILD_TESTING, build tests.
+ * OPUS_CUSTOM_MODES, enable non-Opus modes, e.g. 44.1 kHz & 2^n frames.
+ * OPUS_BUILD_PROGRAMS, build programs.
+ * OPUS_DISABLE_INTRINSICS, disable all intrinsics optimizations.
+ * OPUS_FIXED_POINT, compile as fixed-point (for machines without a fast enough FPU).
+ * OPUS_FLOAT_APPROX, enable floating point approximations (Ensure your platform supports IEEE 754 before enabling).
+ * OPUS_ASSERTIONS, additional software error checking.
+ * OPUS_FUZZING, causes the encoder to make random decisions (do not use in production).
+ * OPUS_CHECK_ASM, enable bit-exactness checks between optimized and c implementations.
+ * OPUS_FIXED_POINT_DEBUG, debug fixed-point implementation.
+ * OPUS_USE_ALLOCA, use alloca for stack arrays (on non-C99 compilers).
+ * OPUS_NONTHREADSAFE_PSEUDOSTACK, use a non threadsafe pseudostack when neither variable length arrays or alloca is supported.
+ * OPUS_FAST_MATH, enable fast math (unsupported and discouraged use, as code is not well tested with this build option).
+ * OPUS_X86_PRESUME_SSE4_1, assume target CPU has SSE4.1 support (override runtime check).
+ * OPUS_X86_PRESUME_AVX, assume target CPU has AVX support (override runtime check).
+ * BUILD_TESTING, Build tests.
+ * WAVPACK_ENABLE_LEGACY, Decode legacy (< 4.0) WavPack files.
+ * WAVPACK_ENABLE_THREADS, Enable support for threading in libwavpack.
+ * WAVPACK_INSTALL_CMAKE_MODULE, Generate and install CMake package configuration module.
+ * WAVPACK_BUILD_PROGRAMS, Build programs.
+ * WAVPACK_BUILD_COOLEDIT_PLUGIN, Build CoolEdit plugin.
+ * WAVPACK_BUILD_WINAMP_PLUGIN, Build WinAmp plugin.
+ * WAVPACK_INSTALL_DOCS, Install documentation.
+ * WAVPACK_INSTALL_PKGCONFIG_MODULE, Generate and install wavpack.pc.
+
+-- Dynamic WavPack: $<TARGET_SONAME_FILE_NAME:wavpack>
+-- SDL3_mixer backends:
+-- - enabled:  opus vorbis_stb flac_drflac gme mod_xmp mp3_drmp3 midi_timidity wave aiff voc au wavpack
+-- - disabled: vorbis_tremor vorbis_vorbisfile flac_libflac mp3_mpg123 midi_fluidsynth
+CMake Deprecation Warning at /tmp/lithtech-audit-2bVxTF/openblood2/_deps/glm-src/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+CMake Deprecation Warning at /tmp/lithtech-audit-2bVxTF/openblood2/_deps/glm-src/CMakeLists.txt:2 (cmake_policy):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- GLM: Version 1.0.1
+-- GLM: Build with C++17 features
+-- Using the multi-header code from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/nlohmann_json-src/include/
+CMake Warning (dev) at /usr/share/cmake/Modules/FetchContent.cmake:1966 (message):
+  Calling FetchContent_Populate(imgui) is deprecated, call
+  FetchContent_MakeAvailable(imgui) instead.  Policy CMP0169 can be set to
+  OLD to allow FetchContent_Populate(imgui) to be called directly for now,
+  but the ability to call it with declared details will be removed completely
+  in a future version.
+Call Stack (most recent call first):
+  CMakeLists.txt:125 (FetchContent_Populate)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at /usr/share/cmake/Modules/FetchContent.cmake:1966 (message):
+  Calling FetchContent_Populate(imguizmo) is deprecated, call
+  FetchContent_MakeAvailable(imguizmo) instead.  Policy CMP0169 can be set to
+  OLD to allow FetchContent_Populate(imguizmo) to be called directly for now,
+  but the ability to call it with declared details will be removed completely
+  in a future version.
+Call Stack (most recent call first):
+  CMakeLists.txt:131 (FetchContent_Populate)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- SDL3 configured successfully
+-- SDL3_mixer configured successfully
+-- GLM configured successfully
+-- ImGui downloaded successfully
+-- GLAD configured successfully
+-- spdlog not found, fetching from GitHub...
+-- Build spdlog: 1.12.0
+-- Build type: Debug
+-- VR support disabled by user
+-- OpenLithTech configuration:
+--   C++ Standard: 20
+--   Build Type: Debug
+-- Blood2 game code will be built
+-- Blood2 configuration:
+--   Client sources:  files
+--   Object sources:  files
+--   Total sources: /home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/BaseLineSystemFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/BaseParticleSystemFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/BloodClientShell.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/BloodSplatFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/BloodTrailFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/BloodTrailSegmentFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/CastLineFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ClientUtilities.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/CommLink.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/Credits.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ExplosionFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/FlashlightFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/FragInfo.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/GameStates.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/GameWeapons.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/IKChainFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/LaserBeamFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/LaserFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/LightFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/LightningFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/LightningSegmentFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/LoadScreenData.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MainMenus.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MarkSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/Menu.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuBase.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuBloodBath.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuCharacter.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuCharacterFiles.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuCharacterSelect.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuControls.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuCustomLevel.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuDifficulty.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuDisplay.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuJoystick.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuJoystickAxis.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuKeyboard.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuLoadGame.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuMain.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuMouse.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuOptions.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuSaveGame.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuSinglePlayer.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuSound.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MessageBoxHandler.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MessageMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MoveMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/Music.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/NetInfo.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/NetStartStubs.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/NewStatusBar.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ObjectFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ParticleExplosionFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ParticleStreamFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ParticleSystemFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/PickupObjectFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/PlayerCamera.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/PolyGridFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/RainFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/RippleFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SFXMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SharedResourceMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ShellCasingFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SmokeFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SmokeImpactFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SmokePuffFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SmokeTrailFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SmokeTrailSegmentFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SparksFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SpecialFXList.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/Splash.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SplashFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/StatusBar.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SurfaceFragmentFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/TheVoice.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/TracerFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/TripLaserFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ViewWeapon.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/VoiceMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/WarpGateFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/WeaponFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/WeaponPowerupFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/WinUtil.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/client_physics.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/debugline.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/gibfx.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/plasma1.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/viewcreature.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/AI_Mgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/AI_Shared.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/AmmoPickups.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/AncientOne.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/AncientOneTentacle.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Anim_Sound.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/B2BaseClass.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/BaseCharacter.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/BirdAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/BloodServerShell.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/BulletImpactSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/CalebAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/CameraObj.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/CameraSpot.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/CinematicTrigger.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/CivilianAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientCastLineSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientExplosionSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientGibFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientLaserBeamSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientLaserFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientLightFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientLightningSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientMarkSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientParticleStreamSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientSmokeTrail.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientSparksSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientSplashSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientSplatFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientTracer.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientWarpGateSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientWeaponSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ConversationTrigger.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/CultistAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DeathShroud.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Debris.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DefenseGlobeAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DefenseGlobeLegs.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Destructable.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DestructableBrush.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DestructableModel.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DetailSprite.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Door.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DrudgeLord.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/EnhancedGideon.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ExitHint.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ExitTrigger.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Explosion.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Fanatic.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/FireFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/FlagObjects.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GabriellaAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GabriellaREV.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GameInvItems.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GameProjectiles.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GameStartPoint.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GameWeapons.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Gib.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Gideon.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GooSplat.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Gremlin.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/HandWeaponModel.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Impacts.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/InvItem.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/InventoryMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/IshmaelAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/IshmaelREV.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ItemPickups.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Key.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/KeyData.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/KeyFramer.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/LightFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/MadScientistAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ModelObject.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Naga.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/NagaCeilingDebris.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ObjectUtilities.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ObjectivesTrigger.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/OpheliaAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/OpheliaREV.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ParticleSystem.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/PathListData.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/PathMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/PickupObject.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/PlayerObj.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/PolyGrid.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/PowerupPickups.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Projectile.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Rain.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/RandomSoundFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/RatAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Rotating.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/RotatingBrush.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/RotatingDoor.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/RotatingModel.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/RotatingSprite.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Script.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SeeingEye.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ShellCasing.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ShikariAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SmellHint.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SoccerObjects.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SoulDrudge.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SoundFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Sparam.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SparksObj.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Spawner.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SpellPickups.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Tchernotronic.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/TheHandAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Trigger.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/TripLaser.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/UndeadGideon.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ViewWeaponModel.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/VolumeBrush.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/VolumeBrushTypes.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Weapon.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/WeaponPickups.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/WorldModelDebris.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/WorldProperties.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/WreckingBall.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ZealotAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/behemoth.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/boneleech.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/bug.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/clientbloodtrail.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/clientdebugline.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/corpse.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/drudgepriest.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/movement.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/nightmare.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/pathpoint.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/prophet.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/thief.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/wurmAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Shared/TeamMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Shared/WeaponDefs.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Misc/BareList.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Misc/Blood2Stubs.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Misc/CoolFont.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Misc/LTGUICommandHandler.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Misc/LTGUICtrl.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Misc/LTGUIFont.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp
+-- OpenBlood2 game executable will be built
+-- OpenBlood2 game executable configured
+-- ========================================
+-- Configuration Summary:
+--   OpenLithTech: ENABLED
+--   Blood2 Game: ON
+--   Tools: OFF
+--   Install Prefix: /usr/local
+-- ========================================
+-- Configuring done (101.0s)
+CMake Error at CMakeLists.txt:162 (add_library):
+  Cannot find source file:
+
+    /tmp/lithtech-audit-2bVxTF/openblood2/_deps/imguizmo-src/ImGuizmo.cpp
+
+
+CMake Error at CMakeLists.txt:162 (add_library):
+  No SOURCES given to target: imgui
+
+
+CMake Generate step failed.  Build files cannot be regenerated correctly.

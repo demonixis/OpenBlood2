@@ -1,0 +1,1304 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 808f0a4..a33a47a 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -394,3 +394,10 @@ smell clocks, nullable strings, raw attributes, separate player death and zeroed
+ stat caches. Restore initialization grants no fresh stats/scent/scheduling. Active
+ powers refuse missing timer preservation. These are partial fields, not full player
+ or client/engine restoration; NEW_LEVEL and M2 remain open.
++
++The [node visibility/Load-tail continuation](../Documentation/Implementation/M2_CHARACTER_NODES.md) connects original named resets,
++per-instance rendering/hit masks and selected player model/flags/velocity restoration.
++Read [contracts](docs/CHARACTER_NODE_CONTRACTS.md). Preserve contiguous extras, missing-name retained status,
++sparse node IDs, source random fallback and Load's absent SHADOW flag. Tail failures
++may leave partial setup: discard staged owners, never claim active-player rollback.
++Engine/client restoration, safe destination entry, required FX and M2 remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3a905b9..0e24635 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -46,7 +46,7 @@ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/origin
+     src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AIDeath.cpp src/game/original/Corpse.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+-target_sources(blood2_game PRIVATE src/game/server_exits.cpp src/game/original/ExitTrigger.cpp src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/PlayerSave.cpp src/game/original/BloodShells.cpp)
++target_sources(blood2_game PRIVATE src/game/server_exits.cpp src/game/original/ExitTrigger.cpp src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/PlayerSave.cpp src/game/original/CharacterNodes.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+     src/game/original/InventoryMgr.cpp src/game/original/InventorySave.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+ target_link_libraries(blood2_game PUBLIC engine)
+diff --git a/README.md b/README.md
+index f9a9e0a..50b3f73 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,10 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++Latest restoration continuation: [character node visibility and selected player Load tail](../Documentation/Implementation/M2_CHARACTER_NODES.md)
++connects original named resets to real rendering/hit state and restores model/flags/
++velocity without fresh player grants. Full engine/client restoration and safe level
++transfer remain unavailable; **M2 stays open**.
++
+ Latest player-preservation continuation: [selected original player fields](../Documentation/Implementation/M2_PLAYER_STATE.md)
+ adds owned strings, raw attributes/air/movement values and relative clock rebasing,
+ plus the original restore-initialization early return. Full player/client/engine
+diff --git a/docs/AI_HIT_CONTRACTS.md b/docs/AI_HIT_CONTRACTS.md
+index bbfbbf6..4db981e 100644
+--- a/docs/AI_HIT_CONTRACTS.md
++++ b/docs/AI_HIT_CONTRACTS.md
+@@ -1,5 +1,11 @@
+ # Original NPC hit localization and recoil
+ 
++> Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
++> original named resets now affect rendering/hit candidates, and the selected Load
++> model/flags/velocity tail is available before client association. Earlier blanket
++> node-hide/Load-tail omissions are historical. Full engine/client restore, limb/gib
++> behavior and the M2 transfer gate remain incomplete.
++
+ > Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
+ > transfer ordinary deaths. Earlier blanket corpse omissions are historical;
+ > fire/gibs, corpse damage, required FX and complete M2 remain unavailable.
+diff --git a/docs/CHARACTER_ANIMATION_CONTRACTS.md b/docs/CHARACTER_ANIMATION_CONTRACTS.md
+index 9a80ae2..ee0e3e0 100644
+--- a/docs/CHARACTER_ANIMATION_CONTRACTS.md
++++ b/docs/CHARACTER_ANIMATION_CONTRACTS.md
+@@ -1,5 +1,11 @@
+ # Original character animations and node queries
+ 
++> Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
++> original named resets now affect rendering/hit candidates, and the selected Load
++> model/flags/velocity tail is available before client association. Earlier blanket
++> node-hide/Load-tail omissions are historical. Full engine/client restore, limb/gib
++> behavior and the M2 transfer gate remain incomplete.
++
+ > Extended by [NPC hit/recoil contracts](AI_HIT_CONTRACTS.md): original visible-node
+ > localization, region damage and nonlethal reactions now execute for initialized
+ > Cultist/Civilian NPCs. Earlier blanket localization/recoil omissions are historical;
+diff --git a/docs/CHARACTER_NODE_CONTRACTS.md b/docs/CHARACTER_NODE_CONTRACTS.md
+new file mode 100644
+index 0000000..f347c72
+--- /dev/null
++++ b/docs/CHARACTER_NODE_CONTRACTS.md
+@@ -0,0 +1,88 @@
++# Character node visibility and selected player Load tail
++
++The original named-node reset now has real engine state consumed by model rendering
++and NPC hit localization. `CPlayerObj::RestoreModelState` applies the supported
++model/flags/velocity portion of Load to an unassociated savegame owner; it does not
++complete a player checkpoint or level transfer. See [source ledger](M2_CHARACTER_NODES_SOURCES.json)
++and [validation](../../Documentation/Implementation/M2_CHARACTER_NODES.md).
++
++## Source rules and engine boundary
++
++`AI_Shared::HideNodeAndSubNodes` addresses a standard name from the existing 21-name
++table, then `_extra1`, `_extra2`, etc. A missing base still allows its extras; the
++first missing numbered name stops traversal. This is **not skeletal descendant
++recursion**. ResetNodes applies that sequence to all 21 names. Unrelated names and
++extras after a numbering gap retain their state. The port selects these functions
++as `hide_character_node/reset_character_nodes` without importing the unrelated
++AI_Shared class, limb spawning or FX. Lookup preflight, negative-index checks,
++a 257-extra lookup bound and explicit non-missing failures are safety adaptations.
++The decoded model limit is 256 nodes. Missing names are normal; an invalid model,
++ambiguous name or stale owner never becomes successful reset.
++
++The typed original-named Get/SetModelNodeHideStatus services return DE_NOTFOUND
++for missing names, DE_ERROR for ambiguous names, and DE_INVALIDPARAMS for invalid
++owners/arguments/masks. Query failure leaves output unchanged. Names match ASCII
++case-insensitively, consistent with existing pose queries. Assignments are idempotent
++DE_OK, allowing consecutive extras to be visited even when already in the desired
++state. All nodes start visible. An empty per-object byte vector represents that
++state; first hiding allocates one byte per node, bounded to 256. It does not use
++OpenBlood2's 64-bit mask or truncate later nodes. Inactive live objects are valid;
++pending/stale objects are not. The mask belongs to the instance, never its shared
++model. A successful different-model assignment clears it along with the animation
++track; same-resource assignment preserves both. Failed replacement preserves both.
++
++SDL_GPU geometry omits a triangle when **any of its vertices belongs to a hidden
++node**. Vertex node IDs are mapped to node preorder slots, including sparse IDs;
++they are not assumed equal to array offsets. This conservative triangle rule is
++replacement rendering policy, not verified retail rasterization parity. No parent
++inheritance, attachment hiding, physics-body resize or collision holes are implied.
++Hidden triangles/nodes remain listed in ModelView; an entirely hidden model has
++an inspection entry and no draw. Dynamic hide/unhide does not reload skin textures
++or advance animation, and works without ImGui.
++
++Original CDestructable localization skips hidden standard nodes before querying
++their poses. A missing hide-status name retains the previous status, as in the
++source; a missing later visible pose retains the previous available pose. If no
++prior visible pose exists, a missing pose fails instead of using uninitialized
++memory. Unavailable/ambiguous queries fail before damage mutation. All-hidden
++models still reach the source's normal-damage random fallback; hiding is not
++immunity. The existing body ray can still hit the object. Node transforms and
++attachments remain queryable regardless of node visibility.
++
++## Player model restoration
++
++RestoreModelState requires live initialized savegame creation, successfully loaded
++selected fields, no associated client, no active unsupported powers or damage/fire
++callback. It calls original SetCharacter, named ResetNodes, writes the exact Load
++flags (VISIBLE/MODELKEYS/YROTATION/ANIMTRANSITION/TOUCH_NOTIFY/SOLID/STAIRSTEP, **no
++SHADOW**) and sets velocity to zero. Fresh/live Respawn now also calls ResetNodes
++at the original location, while retaining its distinct SHADOW flag and reset rules.
++The existing SetCharacter animation-table/sound-root/sphere measurement behavior
++is unchanged; missing first hit nodes remain diagnostic rather than fatal there.
++
++This operation does not call Respawn, ValidateAttributes, GoToStartPoint or a fresh
++client profile, and grants no HP, armor or ammunition. It does not change raw
++attributes, air, acceleration, dimensions, scheduling or an unchanged model's
++animation clock. A different model still resets its track through the existing
++SetModelFilenames service. Source Load's zoom reset is not claimed because zoom
++is unported. Failures clear the completion flag and expose the error. This selected
++tail is **not transactional across model setup and subsequent operations**; a future
++whole-player restore must discard the failed staged owner. Do not use it as rollback
++for an active player. LoadFields invalidates its preceding completion record.
++
++The Skeleton panel shows actual hidden-node counts/status and selected tail success
++or failure. Gray diagnostic nodes remain visible in the skeleton projection so
++missing/hidden parts can be inspected. Rendering statistics expose removed triangles.
++GPU smoke checks hide/reset while the inspector is hidden and after unload/re-entry;
++separate SDL_GPU pixel assertions check two visible groups, one hidden, all hidden
++and restored. Private restore checks use a separate unassociated player, not a
++completed destination session.
++
++## Remaining gate
++
++Engine body/animation/schedule capture, remaining player fields, client saved data
++and restored association, and failure-safe named destination entry still block
++KeepAliveLoad and NEW_LEVEL. The three existing exit captures remain separate partial
++records. General saves, dismemberment/limb spawning, gibs, corpse visibility transfer,
++required FX and Gideon remain unavailable. M2 stays incomplete; source-class counts
++and normal runtime-instance accounting are unchanged.
+diff --git a/docs/M2_CHARACTER_NODES_SOURCES.json b/docs/M2_CHARACTER_NODES_SOURCES.json
+new file mode 100644
+index 0000000..05c3966
+--- /dev/null
++++ b/docs/M2_CHARACTER_NODES_SOURCES.json
+@@ -0,0 +1,76 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "cbec6ee3d24cee2ee5dcee9b1393ad3cdc976203",
++  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Shared.CPP",
++      "sha256": "a9ebccf2ae68c1b6256e699991658e6a9aab54714fda3ad7748f9de7c4aa955f",
++      "selected_lines": [
++        [
++          1749,
++          1786
++        ]
++      ],
++      "use": "Selected named base/consecutive extra visibility and ResetNodes loops"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "selected_lines": [
++        [
++          2077,
++          2095
++        ],
++        [
++          6838,
++          6865
++        ]
++      ],
++      "use": "Respawn reset and selected Load model/flag/velocity tail; zoom and full restore remain absent"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
++      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
++      "selected_lines": [
++        [
++          764,
++          843
++        ]
++      ],
++      "use": "Persistent hide-status and visible-node hit candidate selection"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/server_de.h",
++      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "selected_lines": [
++        [
++          785,
++          789
++        ]
++      ],
++      "use": "Original node-hide API/default visibility contract"
++    },
++    {
++      "path": "OpenBlood2/OpenLithTech/src/core/game_interface.cpp",
++      "sha256": "c31ab8f6157bb1b9d4be90de2c7b615af0affd716b8af6db4bf835d6d67a9dbe",
++      "selected_lines": [
++        [
++          741,
++          781
++        ]
++      ],
++      "use": "Read-only comparison of 64-bit prototype mask; not imported"
++    }
++  ],
++  "adaptations": [
++    "Typed checked name/status API; bounded per-instance mask and preflight",
++    "Sparse node-ID mapping and conservative any-hidden-vertex triangle omission (replacement rendering)",
++    "Explicit selected Load tail before client association; no whole-player restore claim"
++  ],
++  "remaining": [
++    "Engine/client restoration and safe level transfer",
++    "Limb/gib/corpse visibility transfer and required FX",
++    "Gideon and actual M2 acceptance"
++  ]
++}
+diff --git a/docs/MODEL_VIEW_CONTRACTS.md b/docs/MODEL_VIEW_CONTRACTS.md
+index 62e5c11..c28e7d9 100644
+--- a/docs/MODEL_VIEW_CONTRACTS.md
++++ b/docs/MODEL_VIEW_CONTRACTS.md
+@@ -1,5 +1,11 @@
+ # Animated model presentation
+ 
++> Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
++> original named resets now affect rendering/hit candidates, and the selected Load
++> model/flags/velocity tail is available before client association. Earlier blanket
++> node-hide/Load-tail omissions are historical. Full engine/client restore, limb/gib
++> behavior and the M2 transfer gate remain incomplete.
++
+ This M2 continuation renders existing ABC objects, held attachments and first-person
+ Beretta/knife tracks through SDL_GPU. It adds no NPC class, AI behavior or successful
+ missing service. The 17 unsupported SubwayA entries and M2 gate remain unchanged.
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index 294a143..20ce50a 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -1,5 +1,11 @@
+ # Original Player Entry Boundary
+ 
++> Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
++> original named resets now affect rendering/hit candidates, and the selected Load
++> model/flags/velocity tail is available before client association. Earlier blanket
++> node-hide/Load-tail omissions are historical. Full engine/client restore, limb/gib
++> behavior and the M2 transfer gate remain incomplete.
++
+ > Continued by [player state contracts](PLAYER_STATE_CONTRACTS.md): selected player
+ > values and the original savegame initialization early return now execute.
+ > Earlier blanket player-field/initialization omissions are historical; full
+diff --git a/docs/PLAYER_STATE_CONTRACTS.md b/docs/PLAYER_STATE_CONTRACTS.md
+index 141c9e0..f1f9fa8 100644
+--- a/docs/PLAYER_STATE_CONTRACTS.md
++++ b/docs/PLAYER_STATE_CONTRACTS.md
+@@ -1,5 +1,11 @@
+ # Selected original player fields and restore initialization
+ 
++> Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
++> original named resets now affect rendering/hit candidates, and the selected Load
++> model/flags/velocity tail is available before client association. Earlier blanket
++> node-hide/Load-tail omissions are historical. Full engine/client restore, limb/gib
++> behavior and the M2 transfer gate remain incomplete.
++
+ `CPlayerObj::SaveFields/LoadFields` now preserve the implemented part of the
+ original Save/Load value block. `INITIALUPDATE_SAVEGAME` binds the original
+ aggregates/faction lists and takes the original early return. These are
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 5a7761c..6e9562e 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1,5 +1,15 @@
+ # Source and Dependency Provenance
+ 
++## Character node visibility and player Load model setup
++
++Selected AI_Shared named/extra reset loops, Destructable hide filtering and PlayerObj
++Load/Respawn reset sites are connected through checked typed services. Engine mask,
++sparse-ID triangle filtering and inspection are new code; any-hidden-vertex omission
++is a replacement presentation rule, not retail parity. OpenBlood2's 64-bit storage
++was consulted but not imported. Full player transfer remains unavailable. See
++[ledger](M2_CHARACTER_NODES_SOURCES.json), [contracts](CHARACTER_NODE_CONTRACTS.md)
++and [validation](../../Documentation/Implementation/M2_CHARACTER_NODES.md).
++
+ ## Original player fields and restore initialization
+ 
+ Selected PlayerObj Save/Load values retain raw fields, relative smell time,
+diff --git a/src/app/character_motion_smoke.cpp b/src/app/character_motion_smoke.cpp
+index 874e6a9..9d759d6 100644
+--- a/src/app/character_motion_smoke.cpp
++++ b/src/app/character_motion_smoke.cpp
+@@ -1,4 +1,5 @@
+ #include "character_motion_smoke.h"
++#include "game/original/CharacterNodes.h"
+ namespace OpenBlood2
+ {
+     bool prepare_character_motion_smoke(GameSession& g, ObjectId& id)
+@@ -29,7 +30,16 @@ namespace OpenBlood2
+     {
+         const auto* r = g.objects.get(id);
+         const auto* c = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
+-        return c && c->motion_keys > 0 && c->motion_actions == c->motion_keys * 4 && c->motion_applied == 51 &&
++        if (!c)
++            return false;
++        std::string error;
++        DBOOL hidden = false;
++        if (!hide_character_node(r->handle, 0, true, error) ||
++            g.server.GetModelNodeHideStatus(r->handle, "head", &hidden) != DE_OK || !hidden ||
++            !reset_character_nodes(r->handle, error) ||
++            g.server.GetModelNodeHideStatus(r->handle, "head", &hidden) != DE_OK || hidden)
++            return false;
++        return c->motion_keys > 0 && c->motion_actions == c->motion_keys * 4 && c->motion_applied == 51 &&
+                c->motion_failures == 0 && c->motion_error.empty() && r->dimensions.y == 3 &&
+                r->state.m_Pos.x > 100000 && r->state.m_Pos.y == 100000;
+     }
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index bd8b448..f9fcdc9 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -439,10 +439,11 @@ namespace OpenBlood2
+                         if (ImGui::TreeNode("Model visibility and skin diagnostics"))
+                         {
+                             for (const auto& entry : model_view->entries)
+-                                ImGui::TextWrapped("%s: %s, %zu triangles, skin %s%s%s", entry.label.c_str(),
+-                                                   entry.visible ? "visible" : "hidden", entry.triangles,
+-                                                   entry.skin.c_str(), entry.error.empty() ? "" : " / ",
+-                                                   entry.error.c_str());
++                                ImGui::TextWrapped(
++                                    "%s: %s, %zu triangles / %zu hidden triangles / %zu hidden nodes, skin %s%s%s",
++                                    entry.label.c_str(), entry.visible ? "visible" : "hidden", entry.triangles,
++                                    entry.hidden_triangles, entry.hidden_nodes, entry.skin.c_str(),
++                                    entry.error.empty() ? "" : " / ", entry.error.c_str());
+                             ImGui::TreePop();
+                         }
+                     }
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index bfa07ab..5d1da2a 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -59,6 +59,13 @@ namespace OpenBlood2
+         }
+         ImGui::TableNextColumn();
+         const auto* r = game.objects.get(skeleton_selection);
++        if (r && r->model)
++        {
++            const auto hidden =
++                std::count_if(r->hidden_nodes.begin(), r->hidden_nodes.end(), [](auto value) { return value != 0; });
++            ImGui::Text("Model nodes: %zu total / %zu hidden (geometry and hit candidates)", r->model->nodes.size(),
++                        static_cast<std::size_t>(hidden));
++        }
+         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
+         if (const auto* corpse = r ? dynamic_cast<const CCorpse*>(r->game.get()) : nullptr)
+@@ -85,11 +92,14 @@ namespace OpenBlood2
+         {
+             ImGui::Text("Player restore initialization %d / selected fields loaded %d / associated %d",
+                         player->restore_initialization, player->restore_fields_loaded, player->GetClient() != nullptr);
++            ImGui::Text("Load model/flags/velocity tail: %s", player->restore_model_loaded ? "applied" : "not applied");
++            if (!player->restore_model_error.empty())
++                ImGui::TextWrapped("%s", player->restore_model_error.c_str());
+             ImGui::Text("Air %.2f | smell timestamp %.3f / delay %.3f", player->m_fAirLevel, player->m_fSmellTime,
+                         player->m_fSmellDelay);
+             if (player->restore_initialization)
+                 ImGui::TextWrapped(
+-                    "Restore initialization and value fields only; this is not a completed player restore.");
++                    "Selected restore operations only; body, scheduling and client restoration remain incomplete.");
+         }
+         if (target_ai && ImGui::CollapsingHeader("Original NPC death"))
+         {
+@@ -630,7 +640,9 @@ namespace OpenBlood2
+                     const auto parent = model.nodes[i].parent;
+                     if (parent >= 0)
+                         draw->AddLine(point, project(pose[parent].position), IM_COL32(130, 200, 220, 255));
+-                    draw->AddCircleFilled(point, 2, IM_COL32(200, 235, 255, 255));
++                    const bool hidden = r->hidden_nodes.size() == model.nodes.size() && r->hidden_nodes[i];
++                    draw->AddCircleFilled(point, 2,
++                                          hidden ? IM_COL32(130, 130, 130, 255) : IM_COL32(200, 235, 255, 255));
+                     if (anim && anim->hit_spheres_valid)
+                         for (unsigned j = 0; j < NUM_STD_NODES; ++j)
+                             if (anim->hit_nodes_found[j] && model.nodes[i].name == szNodes[j])
+@@ -638,13 +650,14 @@ namespace OpenBlood2
+                 }
+                 draw->PopClipRect();
+             }
+-            ImGui::TextWrapped(
+-                "Local front projection. Orange radii are initialization measurements, not collision geometry.");
++            ImGui::TextWrapped("Local front projection includes hidden nodes (gray). Orange radii are initialization "
++                               "measurements, not collision geometry.");
+             if (ImGui::CollapsingHeader("World node positions and rotations", ImGuiTreeNodeFlags_DefaultOpen))
+             {
+-                if (ImGui::BeginTable("Nodes", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_ScrollY, ImVec2(0, 135)))
++                if (ImGui::BeginTable("Nodes", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_ScrollY, ImVec2(0, 135)))
+                 {
+                     ImGui::TableSetupColumn("Node");
++                    ImGui::TableSetupColumn("Visibility");
+                     ImGui::TableSetupColumn("World position");
+                     ImGui::TableSetupColumn("Quaternion x y z w");
+                     ImGui::TableHeadersRow();
+@@ -657,6 +670,11 @@ namespace OpenBlood2
+                         ImGui::TableNextColumn();
+                         ImGui::TextUnformatted(node.name.c_str());
+                         ImGui::TableNextColumn();
++                        DBOOL hidden = DFALSE;
++                        const auto visibility =
++                            game.server.GetModelNodeHideStatus(r->handle, node.name.c_str(), &hidden);
++                        ImGui::TextUnformatted(visibility == DE_OK ? (hidden ? "hidden" : "visible") : "unavailable");
++                        ImGui::TableNextColumn();
+                         if (found)
+                             ImGui::Text("%.2f %.2f %.2f", p.x, p.y, p.z);
+                         else
+diff --git a/src/app/model_scene.cpp b/src/app/model_scene.cpp
+index c3e255d..c56cd42 100644
+--- a/src/app/model_scene.cpp
++++ b/src/app/model_scene.cpp
+@@ -32,7 +32,7 @@ namespace OpenBlood2
+             }
+             if (!scene.add(record->model.get(), record->animation, record->state.m_SkinName,
+                            {record->state.m_Pos, record->state.m_Rotation}, record->state.m_Scale, visible, false, id,
+-                           record->state.m_Filename, game.resources, error))
++                           record->state.m_Filename, game.resources, error, record->hidden_nodes))
+                 return false;
+             if (unresolved)
+                 scene.entries.back().error = "Unresolved attachment pose";
+diff --git a/src/engine/model_view.cpp b/src/engine/model_view.cpp
+index 3cf4d9c..af2bbfe 100644
+--- a/src/engine/model_view.cpp
++++ b/src/engine/model_view.cpp
+@@ -23,7 +23,7 @@ namespace OpenBlood2
+     }
+     bool ModelView::add(const Model* model, const AnimationTrack& track, std::string_view skin, NodePose pose,
+                         DVector scale, bool visible, bool close, ObjectId object, std::string_view label,
+-                        const Resources& resources, std::string& error)
++                        const Resources& resources, std::string& error, std::span<const std::uint8_t> hidden_nodes)
+     {
+         error.clear();
+         auto fail = [&](const char* reason)
+@@ -43,6 +43,10 @@ namespace OpenBlood2
+             entry.error = "Model is missing or not decoded";
+             return true;
+         }
++        if (!hidden_nodes.empty() && hidden_nodes.size() != model->nodes.size())
++            return fail("Invalid model node visibility mask");
++        for (auto hidden : hidden_nodes)
++            entry.hidden_nodes += hidden != 0;
+         std::uint32_t material = 0;
+         std::string key;
+         if (!resource_path(skin, key))
+@@ -86,6 +90,17 @@ namespace OpenBlood2
+         {
+             return fail("Invalid model presentation transform");
+         }
++        std::array<int, 256> node_slots;
++        node_slots.fill(-1);
++        if (model->nodes.size() > 256)
++            return fail("Invalid model node count");
++        for (std::size_t i = 0; i < model->nodes.size(); ++i)
++        {
++            const auto index = model->nodes[i].index;
++            if (index >= node_slots.size() || node_slots[index] != -1)
++                return fail("Invalid model node index");
++            node_slots[index] = static_cast<int>(i);
++        }
+         if (!sample_vertices(*model, track.animation, track.time, sampled_))
+         {
+             entry.error = "Model animation pose is unavailable";
+@@ -96,6 +111,19 @@ namespace OpenBlood2
+         range.name = entry.label;
+         const DVector color = material ? DVector{1, 1, 1} : DVector{1, 0, 1};
+         for (const auto& face : model->faces)
++        {
++            bool hidden = false;
++            for (auto vertex : face.vertices)
++            {
++                if (vertex >= model->vertices.size() || node_slots[model->vertices[vertex].node] < 0)
++                    return fail("Invalid model face node index");
++                hidden |= !hidden_nodes.empty() && hidden_nodes[node_slots[model->vertices[vertex].node]] != 0;
++            }
++            if (hidden)
++            {
++                ++entry.hidden_triangles;
++                continue;
++            }
+             for (unsigned corner = 0; corner < 3; ++corner)
+             {
+                 if (face.vertices[corner] >= sampled_.size())
+@@ -112,9 +140,12 @@ namespace OpenBlood2
+                 }
+                 mesh.vertices.push_back({scaled, color, uv});
+             }
++        }
+         range.count = static_cast<std::uint32_t>(mesh.vertices.size()) - range.first;
+         range.batches.push_back({range.first, range.count, material});
+         entry.triangles = range.count / 3;
++        if (!range.count)
++            return true;
+         entry.range = draw.range;
+         mesh.ranges.push_back(std::move(range));
+         (close ? close_draws : world_draws).push_back(draw);
+diff --git a/src/engine/model_view.h b/src/engine/model_view.h
+index 31ef18a..2f09763 100644
+--- a/src/engine/model_view.h
++++ b/src/engine/model_view.h
+@@ -8,6 +8,7 @@ namespace OpenBlood2
+         std::string label, skin, error;
+         bool visible = false, close = false;
+         std::size_t triangles = 0;
++        std::size_t hidden_nodes = 0, hidden_triangles = 0;
+         std::uint32_t range = UINT32_MAX;
+     };
+     // Presentation-only snapshot. No original object pointer survives add().
+@@ -21,7 +22,8 @@ namespace OpenBlood2
+         void clear();
+         void begin_frame();
+         bool add(const Model*, const AnimationTrack&, std::string_view skin, NodePose, DVector scale, bool visible,
+-                 bool close, ObjectId, std::string_view label, const Resources&, std::string&);
++                 bool close, ObjectId, std::string_view label, const Resources&, std::string&,
++                 std::span<const std::uint8_t> hidden_nodes = {});
+         WorldMesh mesh;
+         std::vector<WorldDraw> world_draws, close_draws;
+         std::vector<ModelViewEntry> entries;
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index dce25af..29ecd7c 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -126,6 +126,7 @@ namespace OpenBlood2
+         std::uint64_t mover_moves = 0, mover_blocks = 0, mover_pushes = 0, mover_riders = 0;
+         HOBJECT mover_blocker = nullptr;
+         AnimationTrack animation;
++        std::vector<std::uint8_t> hidden_nodes; // Empty means all visible; otherwise one byte per model node.
+         std::string model_error;
+         DDWORD user_flags = 0;
+         DDWORD activity = OBJSTATE_ACTIVE;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index b04d2a0..a3bbd31 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -102,6 +102,8 @@ class ServerDE : public CSBase
+     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;
+     virtual bool GetModelFilenames(HOBJECT, std::string&, std::string&) = 0;
+     virtual DRESULT SetModelFilenames(HOBJECT, const char*, const char*) = 0;
++    virtual DRESULT GetModelNodeHideStatus(HOBJECT, const char*, DBOOL*) = 0;
++    virtual DRESULT SetModelNodeHideStatus(HOBJECT, const char*, DBOOL) = 0;
+     virtual DRESULT GetObjectDims(HOBJECT, DVector*) = 0;
+     virtual DRESULT SetObjectRotation(HOBJECT, const DRotation*) = 0;
+     virtual DRESULT MoveObjectToGround(HOBJECT) = 0;
+diff --git a/src/game/original/AIHitReaction.cpp b/src/game/original/AIHitReaction.cpp
+index 9d15956..33ffff0 100644
+--- a/src/game/original/AIHitReaction.cpp
++++ b/src/game/original/AIHitReaction.cpp
+@@ -57,16 +57,23 @@ bool CDestructable::LocalizeHit(const OpenBlood2::Damage& damage, const CAnim_So
+         return fail("NPC hit segment invalid");
+     DVector node{};
+     DRotation node_rotation;
++    DBOOL hidden = DFALSE; // Source retains this value when a name is absent.
++    bool have_pose = false;
+     for (unsigned i = 0; i < NUM_STD_NODES; ++i)
+     {
+         if (!std::isfinite(table.m_fHitSpheres[i]) || table.m_fHitSpheres[i] < 0)
+             return fail("NPC hit sphere invalid");
+-        // No limb hiding is implemented; current actors render all model nodes.
++        const auto visibility = s->GetModelNodeHideStatus(m_hObject, szNodes[i], &hidden);
++        if (visibility != DE_OK && visibility != DE_NOTFOUND)
++            return fail("NPC hit node visibility unavailable");
++        if (hidden)
++            continue;
+         // Missing later names preserve the preceding transform, as the source's
+         // ignored GetModelNodeTransform result does. Pose errors never do.
+         const auto result = s->QueryModelNodeTransform(m_hObject, szNodes[i], &node, &node_rotation);
+-        if (result == ServerDE::NodeQuery::Unavailable || (i == 0 && result != ServerDE::NodeQuery::Found))
++        if (result == ServerDE::NodeQuery::Unavailable || (!have_pose && result != ServerDE::NodeQuery::Found))
+             return fail("NPC hit node pose unavailable");
++        have_pose = true;
+         hit.missing_nodes += result == ServerDE::NodeQuery::Missing;
+         if (squared == 0)
+             continue; // Source zero/tied direction yields NaN: no candidate.
+diff --git a/src/game/original/CharacterNodes.cpp b/src/game/original/CharacterNodes.cpp
+new file mode 100644
+index 0000000..ba431c8
+--- /dev/null
++++ b/src/game/original/CharacterNodes.cpp
+@@ -0,0 +1,61 @@
++#include "CharacterNodes.h"
++namespace OpenBlood2
++{
++    namespace
++    {
++        bool collect(HOBJECT object, int node, std::vector<std::string>& names, std::string& error)
++        {
++            auto* server = BaseClass::GetServerDE();
++            if (!server || !server->IsObjectAlive(object) || node < 0 || node >= int(NUM_ALL_NODES))
++            {
++                error = "Invalid character node owner/index";
++                return false;
++            }
++            // Source ignores a missing base but still visits consecutive _extraN names.
++            const std::string base = szNodes[node];
++            for (unsigned extra = 0; extra <= 257; ++extra)
++            {
++                auto name = base + (extra ? "_extra" + std::to_string(extra) : "");
++                DBOOL hidden = DFALSE;
++                const auto result = server->GetModelNodeHideStatus(object, name.c_str(), &hidden);
++                if (result == DE_OK)
++                    names.push_back(std::move(name));
++                else if (result != DE_NOTFOUND)
++                {
++                    error = "Character node visibility unavailable: " + name;
++                    return false;
++                }
++                else if (extra)
++                    return true;
++            }
++            error = "Character extra-node limit exceeded";
++            return false;
++        }
++        bool apply(HOBJECT object, const std::vector<std::string>& names, bool hidden, std::string& error)
++        {
++            for (const auto& name : names)
++                if (BaseClass::GetServerDE()->SetModelNodeHideStatus(object, name.c_str(), hidden) != DE_OK)
++                {
++                    error = "Character node visibility assignment failed: " + name;
++                    return false;
++                }
++            return true;
++        }
++    } // namespace
++    bool hide_character_node(HOBJECT object, int node, bool hidden, std::string& error)
++    {
++        error.clear();
++        std::vector<std::string> names;
++        return collect(object, node, names, error) && apply(object, names, hidden, error);
++    }
++    bool reset_character_nodes(HOBJECT object, std::string& error)
++    {
++        error.clear();
++        std::vector<std::string> names;
++        // Preflight all lookups before mutation; missing standard nodes are normal.
++        for (unsigned i = 0; i < NUM_ALL_NODES; ++i)
++            if (!collect(object, i, names, error))
++                return false;
++        return apply(object, names, false, error);
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/original/CharacterNodes.h b/src/game/original/CharacterNodes.h
+new file mode 100644
+index 0000000..2372d62
+--- /dev/null
++++ b/src/game/original/CharacterNodes.h
+@@ -0,0 +1,8 @@
++#pragma once
++#include "Anim_Sound.h"
++namespace OpenBlood2
++{
++    // Selected AI_Shared::HideNodeAndSubNodes/ResetNodes, without unrelated limb/FX code.
++    bool hide_character_node(HOBJECT, int node, bool hidden, std::string& error);
++    bool reset_character_nodes(HOBJECT, std::string& error);
++} // namespace OpenBlood2
+diff --git a/src/game/original/PlayerObj.cpp b/src/game/original/PlayerObj.cpp
+index 4be2687..836ed88 100644
+--- a/src/game/original/PlayerObj.cpp
++++ b/src/game/original/PlayerObj.cpp
+@@ -4,6 +4,7 @@
+ #include "PlayerObj.h"
+ #include "AI_Mgr.h"
+ #include "CameraObj.h"
++#include "CharacterNodes.h"
+ #include "GameStartPoint.h"
+ #include <algorithm>
+ #include <cmath>
+@@ -133,6 +134,8 @@ bool CPlayerObj::Respawn()
+     }
+     if (!SetCharacter(m_nCharacter))
+         return false;
++    if (!OpenBlood2::reset_character_nodes(m_hObject, entry_error))
++        return false;
+     const DDWORD flags = FLAG_VISIBLE | FLAG_MODELKEYS | FLAG_YROTATION | FLAG_ANIMTRANSITION | FLAG_TOUCH_NOTIFY |
+                          FLAG_SOLID | FLAG_STAIRSTEP | FLAG_SHADOW;
+     server->SetObjectFlags(m_hObject, flags);
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index f0d9f32..2c6533a 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -77,6 +77,9 @@ class CPlayerObj : public CBaseCharacter
+     bool Respawn();
+     bool SaveFields(OpenBlood2::PlayerState&, std::string&) const;
+     bool LoadFields(const OpenBlood2::PlayerState&, std::string&);
++    bool RestoreModelState(std::string&);
++    bool restore_model_loaded = false;
++    std::string restore_model_error;
+     bool restore_initialization = false, restore_fields_loaded = false;
+     bool GoToStartPoint(HSTRING start_name);
+     bool SetCharacter(DBYTE);
+diff --git a/src/game/original/PlayerSave.cpp b/src/game/original/PlayerSave.cpp
+index df0a154..ee253c8 100644
+--- a/src/game/original/PlayerSave.cpp
++++ b/src/game/original/PlayerSave.cpp
+@@ -1,5 +1,6 @@
+-// Selected value assignments from PlayerObj.cpp:6541-6865. The engine/model,
+-// client-data and unported gameplay sections are deliberately not claimed here.
++// Selected PlayerObj.cpp:6541-6865 values and model/flag/velocity Load tail.
++// Complete engine, client-data and unported gameplay restoration remain unavailable.
++#include "CharacterNodes.h"
+ #include "PlayerObj.h"
+ #include <algorithm>
+ #include <cmath>
+@@ -163,6 +164,47 @@ bool CPlayerObj::LoadFields(const OpenBlood2::PlayerState& state, std::string& e
+     move_state = static_cast<MoveState>(state.move_state);
+     last_sent_stats_ = {0, 0, 0}; // Source invalidates its last-sent stat caches without changing actual stats.
+     restore_fields_loaded = true;
++    restore_model_loaded = false;
++    restore_model_error.clear();
+     // No Respawn, ValidateAttributes, initialization payload or aggregate load here.
+     return true;
+ }
++
++// Selected original Load tail (PlayerObj.cpp:6838-6857). Separate from value
++// restoration: failure can leave a partially configured, unassociated owner.
++bool CPlayerObj::RestoreModelState(std::string& error)
++{
++    error.clear();
++    restore_model_loaded = false;
++    auto fail = [&](const char* why)
++    {
++        error = restore_model_error = why;
++        return false;
++    };
++    if (!available(*this, error))
++    {
++        restore_model_error = error;
++        return false;
++    }
++    if (!restore_initialization || !restore_fields_loaded || m_hClient || m_InventoryMgr.m_hClient)
++        return fail("Player model restore requires loaded fields and an unassociated savegame owner");
++    if (!SetCharacter(m_nCharacter))
++        return fail("Saved player character model/animation setup failed");
++    if (!OpenBlood2::reset_character_nodes(m_hObject, error))
++    {
++        restore_model_error = error;
++        return false;
++    }
++    auto* server = GetServerDE();
++    const DDWORD flags = FLAG_VISIBLE | FLAG_MODELKEYS | FLAG_YROTATION | FLAG_ANIMTRANSITION | FLAG_TOUCH_NOTIFY |
++                         FLAG_SOLID | FLAG_STAIRSTEP; // Source Load does not add SHADOW.
++    server->SetObjectFlags(m_hObject, flags);
++    DVector velocity{};
++    if (server->SetVelocity(m_hObject, &velocity) != DE_OK)
++        return fail("Saved player velocity reset failed");
++    restore_model_loaded = true;
++    restore_model_error.clear();
++    // Source resets zoom next; zoom is not implemented. No Respawn, teleport,
++    // dimension/animation-clock reconstruction, scheduling or client association.
++    return true;
++}
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 65063db..1b27eb7 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -151,6 +151,8 @@ namespace OpenBlood2
+         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
+         bool GetModelFilenames(HOBJECT, std::string&, std::string&) override;
+         DRESULT SetModelFilenames(HOBJECT, const char*, const char*) override;
++        DRESULT GetModelNodeHideStatus(HOBJECT, const char*, DBOOL*) override;
++        DRESULT SetModelNodeHideStatus(HOBJECT, const char*, DBOOL) override;
+         DRESULT GetObjectDims(HOBJECT, DVector*) override;
+         DRESULT SetObjectRotation(HOBJECT, const DRotation*) override;
+         DRESULT MoveObjectToGround(HOBJECT) override;
+diff --git a/src/game/server_clients.cpp b/src/game/server_clients.cpp
+index bef1a5c..e8d6806 100644
+--- a/src/game/server_clients.cpp
++++ b/src/game/server_clients.cpp
+@@ -173,6 +173,7 @@ namespace OpenBlood2
+         if (r->model != next)
+         {
+             r->model = std::move(next);
++            r->hidden_nodes.clear();
+             r->animation.animation = 0;
+             r->animation.reset();
+         }
+diff --git a/src/game/server_models.cpp b/src/game/server_models.cpp
+index 216bc8f..525b819 100644
+--- a/src/game/server_models.cpp
++++ b/src/game/server_models.cpp
+@@ -4,6 +4,51 @@
+ 
+ namespace OpenBlood2
+ {
++    namespace
++    {
++        DRESULT node_index(const ObjectRecord* r, const char* name, std::size_t& index)
++        {
++            if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL || !r->model || !name || !*name ||
++                r->model->nodes.size() > 256 ||
++                (!r->hidden_nodes.empty() && r->hidden_nodes.size() != r->model->nodes.size()))
++                return DE_INVALIDPARAMS;
++            index = r->model->nodes.size();
++            for (std::size_t i = 0; i < r->model->nodes.size(); ++i)
++                if (!CaseLess{}(name, r->model->nodes[i].name) && !CaseLess{}(r->model->nodes[i].name, name))
++                {
++                    if (index != r->model->nodes.size())
++                        return DE_ERROR;
++                    index = i;
++                }
++            return index == r->model->nodes.size() ? DE_NOTFOUND : DE_OK;
++        }
++    } // namespace
++    DRESULT ServerAdapter::GetModelNodeHideStatus(HOBJECT h, const char* name, DBOOL* hidden)
++    {
++        trace_service("GetModelNodeHideStatus");
++        if (!hidden)
++            return DE_INVALIDPARAMS;
++        const auto* r = objects_.get(h);
++        std::size_t index;
++        auto result = node_index(r, name, index);
++        if (result == DE_OK)
++            *hidden = !r->hidden_nodes.empty() && r->hidden_nodes[index] != 0;
++        return result;
++    }
++    DRESULT ServerAdapter::SetModelNodeHideStatus(HOBJECT h, const char* name, DBOOL hidden)
++    {
++        trace_service("SetModelNodeHideStatus");
++        auto* r = objects_.get(h);
++        std::size_t index;
++        auto result = node_index(r, name, index);
++        if (result != DE_OK)
++            return result;
++        if (r->hidden_nodes.empty() && hidden)
++            r->hidden_nodes.resize(r->model->nodes.size());
++        if (!r->hidden_nodes.empty())
++            r->hidden_nodes[index] = hidden != 0;
++        return DE_OK; // Idempotent assignments still allow original _extra traversal.
++    }
+     void ServerAdapter::initialize_model_services()
+     {
+         GetAnimIndex = [](HOBJECT h, const char* name) -> HMODELANIM
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 520e84c..c3c9f23 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -798,7 +798,7 @@ endif()
+ add_executable(ai_hit_tests ai_hit_tests.cpp)
+ target_link_libraries(ai_hit_tests PRIVATE blood2_game)
+ blood2_project_options(ai_hit_tests)
+-foreach(case IN ITEMS geometry query modifiers reactions recoil guards sides lifetime)
++foreach(case IN ITEMS geometry query modifiers reactions recoil guards sides lifetime hidden)
+     add_test(NAME ai_hit.${case} COMMAND ai_hit_tests "${case}")
+     set_tests_properties(ai_hit.${case} PROPERTIES LABELS "headless;ai_hit" TIMEOUT 30)
+ endforeach()
+@@ -878,3 +878,15 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME player_state.private COMMAND player_state_tests private "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(player_state.private PROPERTIES LABELS "headless;private;player_state" TIMEOUT 120)
+ endif()
++
++add_executable(character_nodes_tests character_nodes_tests.cpp ../src/app/model_scene.cpp)
++target_link_libraries(character_nodes_tests PRIVATE blood2_game)
++blood2_project_options(character_nodes_tests)
++foreach(case IN ITEMS services names rendering restore)
++    add_test(NAME character_nodes.${case} COMMAND character_nodes_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/character-node-fixtures/${case}")
++    set_tests_properties(character_nodes.${case} PROPERTIES LABELS "headless;character_nodes" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME character_nodes.private COMMAND character_nodes_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(character_nodes.private PROPERTIES LABELS "headless;private;character_nodes" TIMEOUT 120)
++endif()
+diff --git a/tests/ai_hit_tests.cpp b/tests/ai_hit_tests.cpp
+index 913a318..8981e2e 100644
+--- a/tests/ai_hit_tests.cpp
++++ b/tests/ai_hit_tests.cpp
+@@ -161,6 +161,39 @@ namespace
+         CHECK(!a->m_damage.LocalizeHit(d, *a->AnimSound()) && !a->m_damage.hit.valid);
+         return true;
+     }
++    bool hidden(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        std::shared_ptr<Model> m;
++        auto* a = actor(g, m);
++        CHECK(a);
++        auto h = a->m_hObject;
++        auto packet = shot(sender(g), 0);
++        CHECK(a->m_damage.LocalizeHit(packet, *a->AnimSound()) && !a->m_damage.hit.random_fallback);
++        CHECK(g.server.SetModelNodeHideStatus(h, "head", true) == DE_OK);
++        CHECK(a->m_damage.LocalizeHit(packet, *a->AnimSound()) && a->m_damage.hit.random_fallback);
++        CHECK(g.server.SetModelNodeHideStatus(h, "head", false) == DE_OK);
++        CHECK(a->m_damage.LocalizeHit(packet, *a->AnimSound()) && a->m_damage.hit.raw_node == 0 &&
++              !a->m_damage.hit.random_fallback);
++        // Missing later names retain preceding hide status, just as they retain pose.
++        CHECK(g.server.SetModelNodeHideStatus(h, "ll_leg", true) == DE_OK);
++        m->nodes[12].name = "absent_ankle";
++        CHECK(a->m_damage.LocalizeHit(shot(packet.attacker, 11), *a->AnimSound()) &&
++              a->m_damage.hit.missing_nodes == 0);
++        CHECK(g.server.SetModelNodeHideStatus(h, "ll_leg", false) == DE_OK);
++        CHECK(a->m_damage.LocalizeHit(shot(packet.attacker, 11), *a->AnimSound()) &&
++              a->m_damage.hit.missing_nodes == 1);
++        // All hidden still reaches original random fallback, not artificial immunity.
++        for (const auto& n : m->nodes)
++            CHECK(g.server.SetModelNodeHideStatus(h, n.name.c_str(), true) == DE_OK);
++        CHECK(a->m_damage.LocalizeHit(packet, *a->AnimSound()) && a->m_damage.hit.random_fallback);
++        m->nodes[1].name = "HEAD";
++        CHECK(!a->m_damage.LocalizeHit(packet, *a->AnimSound()) && !a->m_damage.hit.valid);
++        const auto hp = a->m_damage.m_fHitPoints;
++        CHECK(send(g, h, packet) && a->m_damage.m_fHitPoints == hp && a->m_damage.accepted_damage == 0);
++        return true;
++    }
+     bool query(const char*)
+     {
+         GameSession g;
+@@ -447,9 +480,9 @@ namespace
+ int main(int argc, char** argv)
+ {
+     const std::map<std::string, std::function<bool(const char*)>> tests{
+-        {"geometry", geometry},   {"query", query},   {"modifiers", modifiers},
+-        {"reactions", reactions}, {"recoil", recoil}, {"guards", guards},
+-        {"lifetime", lifetime},   {"sides", sides},   {"catalog", catalog}};
++        {"hidden", hidden},       {"geometry", geometry}, {"query", query},   {"modifiers", modifiers},
++        {"reactions", reactions}, {"recoil", recoil},     {"guards", guards}, {"lifetime", lifetime},
++        {"sides", sides},         {"catalog", catalog}};
+     if (argc < 2)
+         return 2;
+     auto t = tests.find(argv[1]);
+diff --git a/tests/character_nodes_tests.cpp b/tests/character_nodes_tests.cpp
+new file mode 100644
+index 0000000..b277e77
+--- /dev/null
++++ b/tests/character_nodes_tests.cpp
+@@ -0,0 +1,256 @@
++#include "app/model_scene.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/CharacterNodes.h"
++#include "player_fixture.h"
++#include <functional>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    HOBJECT model_object(GameSession& g, std::shared_ptr<Model>& m)
++    {
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_MODEL;
++        state.m_Flags = FLAG_VISIBLE;
++        auto h = g.objects.create(g.objects.find_class("BaseClass"), state);
++        m = std::make_shared<Model>();
++        for (const char* name :
++             {"head", "head_extra1", "head_extra2", "head_extra4", "other", "neck_extra1", "neck_extra2"})
++        {
++            ModelNode n;
++            n.name = name;
++            n.index = m->nodes.size();
++            n.parent = n.index ? 0 : -1; // Hierarchy must NOT imply visibility inheritance.
++            m->nodes.push_back(n);
++        }
++        g.objects.get(h)->model = m;
++        return h;
++    }
++    bool services(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        std::shared_ptr<Model> m;
++        auto h = model_object(g, m);
++        DBOOL hidden = 99;
++        CHECK(g.server.GetModelNodeHideStatus(h, "HEAD", &hidden) == DE_OK && !hidden);
++        CHECK(g.objects.get(h)->hidden_nodes.empty());
++        CHECK(g.server.SetModelNodeHideStatus(h, "head", true) == DE_OK);
++        CHECK(g.server.SetModelNodeHideStatus(h, "HEAD", true) == DE_OK); // Idempotent success.
++        CHECK(g.server.GetModelNodeHideStatus(h, "head", &hidden) == DE_OK && hidden);
++        CHECK(g.server.GetModelNodeHideStatus(h, "other", &hidden) == DE_OK && !hidden);
++        hidden = 99;
++        auto before = g.objects.get(h)->hidden_nodes;
++        CHECK(g.server.GetModelNodeHideStatus(h, "absent", &hidden) == DE_NOTFOUND && hidden == 99);
++        CHECK(g.server.SetModelNodeHideStatus(h, "absent", true) == DE_NOTFOUND &&
++              before == g.objects.get(h)->hidden_nodes);
++        CHECK(g.server.GetModelNodeHideStatus(h, "", &hidden) != DE_OK && hidden == 99);
++        CHECK(g.server.GetModelNodeHideStatus(h, "head", nullptr) != DE_OK);
++        m->nodes[4].name = "HEAD";
++        CHECK(g.server.GetModelNodeHideStatus(h, "head", &hidden) == DE_ERROR && hidden == 99);
++        CHECK(g.server.SetModelNodeHideStatus(h, "head", false) == DE_ERROR &&
++              before == g.objects.get(h)->hidden_nodes);
++        m->nodes[4].name = "other";
++        g.server.SetObjectState(h, OBJSTATE_INACTIVE);
++        CHECK(g.server.GetModelNodeHideStatus(h, "head", &hidden) == DE_OK && hidden);
++        CHECK(g.objects.remove(h));
++        hidden = 99;
++        CHECK(g.server.GetModelNodeHideStatus(h, "head", &hidden) != DE_OK && hidden == 99);
++        CHECK(g.objects.finish_frame());
++        CHECK(g.server.SetModelNodeHideStatus(h, "head", false) != DE_OK);
++        // No 64-bit shift limit: final node of the reader's full 256-node budget.
++        h = model_object(g, m);
++        m->nodes.resize(256);
++        m->nodes[255].name = "last";
++        CHECK(g.server.SetModelNodeHideStatus(h, "last", true) == DE_OK);
++        CHECK(g.server.GetModelNodeHideStatus(h, "last", &hidden) == DE_OK && hidden);
++        CHECK(g.objects.get(h)->hidden_nodes.size() == 256);
++        m->nodes.resize(257);
++        CHECK(g.server.SetModelNodeHideStatus(h, "last", false) != DE_OK);
++        return true;
++    }
++    bool names(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        std::shared_ptr<Model> m;
++        auto h = model_object(g, m);
++        std::string e;
++        CHECK(hide_character_node(h, 0, true, e));
++        auto& mask = g.objects.get(h)->hidden_nodes;
++        CHECK(mask == std::vector<std::uint8_t>({1, 1, 1, 0, 0, 0, 0}));
++        CHECK(hide_character_node(h, 1, true, e)); // Missing base neck; extras still visited.
++        CHECK(mask == std::vector<std::uint8_t>({1, 1, 1, 0, 0, 1, 1}));
++        CHECK(g.server.SetModelNodeHideStatus(h, "head_extra4", true) == DE_OK);
++        CHECK(g.server.SetModelNodeHideStatus(h, "other", true) == DE_OK);
++        CHECK(reset_character_nodes(h, e));
++        CHECK(mask == std::vector<std::uint8_t>({0, 0, 0, 1, 1, 0, 0})); // Gap and nonstandard names preserved.
++        CHECK(hide_character_node(h, 0, true, e));
++        auto before = mask;
++        m->nodes[4].name = "HEAD";
++        CHECK(!reset_character_nodes(h, e) && !e.empty() && mask == before);
++        CHECK(!hide_character_node(h, -1, false, e) && !hide_character_node(h, 21, false, e));
++        CHECK(g.objects.clear());
++        return true;
++    }
++    bool rendering(const char*)
++    {
++        Model m;
++        std::string e;
++        CHECK(read_model(test_model::abc().b, m, e));
++        Resources resources;
++        ModelView scene;
++        AnimationTrack track;
++        auto add = [&](std::span<const std::uint8_t> mask)
++        {
++            scene.begin_frame();
++            return scene.add(&m, track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "probe", resources, e, mask);
++        };
++        CHECK(add({}) && scene.mesh.vertices.size() == 3);
++        auto revision = scene.revision;
++        CHECK(add(std::array<std::uint8_t, 2>{1, 0})); // Mixed-node face removed if any corner is hidden.
++        CHECK(scene.mesh.vertices.empty() && scene.world_draws.empty() && scene.entries.size() == 1);
++        CHECK(scene.entries[0].hidden_nodes == 1 && scene.entries[0].hidden_triangles == 1);
++        CHECK(scene.revision == revision && track.time == 0 && track.first);
++        CHECK(add(std::array<std::uint8_t, 2>{0, 0}) && scene.mesh.vertices.size() == 3);
++        CHECK(!add(std::array<std::uint8_t, 1>{1}) && scene.entries.empty());
++        // Vertex node IDs are not preorder indices. Sparse/permuted IDs must map correctly.
++        m.nodes[0].index = 250;
++        for (auto& v : m.vertices)
++            if (!v.node)
++                v.node = 250;
++        CHECK(add(std::array<std::uint8_t, 2>{1, 0}) && scene.mesh.vertices.empty());
++        CHECK(add({}) && scene.mesh.vertices.size() == 3);
++        m.vertices[0].node = 249;
++        CHECK(!add({}) && scene.entries.empty());
++        return true;
++    }
++    bool restore(const char* root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto h = g.objects.create(g.objects.find_class("CPlayerObj"), {}, Creation::Restore);
++        auto* p = dynamic_cast<CPlayerObj*>(g.server.HandleToObject(h));
++        CHECK(p && p->initialized);
++        std::string e;
++        CHECK(!p->RestoreModelState(e));
++        PlayerState fields;
++        fields.air = 42;
++        fields.strength = 6;
++        CHECK(p->LoadFields(fields, e));
++        auto* r = g.objects.get(h);
++        r->velocity = {1, 2, 3};
++        r->acceleration = {4, 5, 6};
++        r->state.m_Flags = FLAG_SHADOW;
++        r->animation.time = 17;
++        r->dimensions = {9, 10, 11};
++        p->m_damage.SetHitPoints(37);
++        p->m_InventoryMgr.SetAmmoCount(1, 17);
++        const auto children = g.objects.snapshot().size();
++        CHECK(g.server.SetModelNodeHideStatus(h, "root", true) == DE_OK);
++        CHECK(p->RestoreModelState(e) && p->restore_model_loaded && p->restore_model_error.empty());
++        const DDWORD flags = FLAG_VISIBLE | FLAG_MODELKEYS | FLAG_YROTATION | FLAG_ANIMTRANSITION | FLAG_TOUCH_NOTIFY |
++                             FLAG_SOLID | FLAG_STAIRSTEP;
++        CHECK(r->state.m_Flags == flags && vector_dot(r->velocity, r->velocity) == 0 && r->acceleration.y == 5);
++        CHECK(r->dimensions.y == 10 && r->animation.time == 17 && !r->scheduled);
++        CHECK(p->m_damage.m_fHitPoints == 37 && p->m_InventoryMgr.GetAmmoCount(1) == 17 && p->m_nAttribStrength == 6);
++        CHECK(p->m_fAirLevel == 42 && p->respawns == 0 && !p->GetClient() && !p->attributes_received);
++        CHECK(g.objects.snapshot().size() == children && p->m_Anim_Sound.GetSoundRoot() == "sounds\\chosen\\caleb");
++        DBOOL hidden = false;
++        CHECK(g.server.GetModelNodeHideStatus(h, "root", &hidden) == DE_OK &&
++              hidden); // Source ResetNodes is named, not global.
++        // Same resource retains visibility/clock; successful model replacement resets both.
++        CHECK(g.server.SetModelFilenames(h, "missing.abc", "missing.dtx") != DE_OK && r->hidden_nodes[0]);
++        CHECK(g.server.SetModelFilenames(h, "models/weapons/beretta_pv.abc", "skin.dtx") == DE_OK);
++        CHECK(r->hidden_nodes.empty() && r->animation.time == 0);
++        CHECK(g.server.SetModelNodeHideStatus(h, "root", true) == DE_OK);
++        CHECK(p->RestoreModelState(e) && r->hidden_nodes.empty());
++        auto client = g.server.connect_client();
++        p->SetClient(client);
++        r->velocity = {1, 2, 3};
++        CHECK(!p->RestoreModelState(e) && !p->restore_model_loaded && r->velocity.y == 2);
++        p->SetClient(nullptr);
++        CHECK(g.server.disconnect_client(client));
++        p->m_bPowerupActivated[0] = true;
++        CHECK(!p->RestoreModelState(e));
++        p->m_bPowerupActivated[0] = false;
++        // Model failure is reported, not converted to a completed tail.
++        r->animation.animation = UINT32_MAX;
++        CHECK(!p->RestoreModelState(e) && !p->restore_model_error.empty() && r->velocity.y == 2);
++        CHECK(g.unload_world() && g.server.string_count() == 0 && CDestructable::m_dwNumDestructables == 0);
++        return true;
++    }
++    bool private_restore(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string e;
++        CHECK(g.resources.mount_game(config, e));
++        ModelView scene;
++        for (int cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", e) && g.enter_player(e) && g.step(1. / 60));
++            auto* source = g.server_shell.Player(g.local_client);
++            CHECK(source);
++            PlayerState fields;
++            InventoryState inventory;
++            DestructableState damage;
++            CHECK(source->SaveFields(fields, e) && source->m_InventoryMgr.Save(inventory, e) &&
++                  source->m_damage.Save(damage, e));
++            const auto before = g.objects.snapshot().size();
++            auto h = g.objects.create(g.objects.find_class("CPlayerObj"), {}, Creation::Restore);
++            auto* p = dynamic_cast<CPlayerObj*>(g.server.HandleToObject(h));
++            CHECK(p && p->LoadFields(fields, e) && p->m_InventoryMgr.Load(inventory, InventoryLoadType::KeepAlive, e) &&
++                  p->m_damage.Load(damage, e));
++            auto* r = g.objects.get(h);
++            CHECK(r->model && hide_character_node(h, 0, true, e));
++            r->state.m_Flags = FLAG_VISIBLE;
++            auto triangles = [&]() -> std::size_t
++            {
++                for (const auto& entry : scene.entries)
++                    if (entry.object == r->id)
++                        return entry.triangles;
++                return 0;
++            };
++            CHECK(update_model_scene(g, scene, e));
++            const auto hidden_triangles = triangles();
++            CHECK(hidden_triangles > 0 && hidden_triangles < r->model->faces.size());
++            r->velocity = {3, 4, 5};
++            CHECK(p->RestoreModelState(e) && update_model_scene(g, scene, e));
++            CHECK(triangles() == r->model->faces.size() && r->model->faces.size() == 941);
++            CHECK(p->m_Anim_Sound.hit_spheres_valid && !p->GetClient() && !r->scheduled && r->dimensions.y == 0);
++            CHECK(p->m_damage.m_fHitPoints == damage.health && p->m_InventoryMgr.GetAmmoCount(1) == inventory.ammo[1]);
++            CHECK(p->m_InventoryMgr.UpdateHandModels());
++            CHECK(g.objects.remove(h) && g.objects.finish_frame());
++            CHECK(g.objects.snapshot().size() == before && !g.objects.get(h));
++            std::cout << "cycle=" << cycle << " Caleb triangles hidden=" << hidden_triangles
++                      << " reset=941; isolated Load tail, no restored client\n";
++            CHECK(g.unload_world() && g.server.string_count() == 0 && g.objects.attachments().empty());
++            CHECK(CDestructable::m_dwNumDestructables == 0 && AI_Mgr::m_dwNumCabal == 0 && AI_Mgr::m_dwNumMonster == 0);
++            scene.clear();
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    const std::map<std::string, std::function<bool(const char*)>> cases{{"services", services},
++                                                                        {"names", names},
++                                                                        {"rendering", rendering},
++                                                                        {"restore", restore},
++                                                                        {"private", private_restore}};
++    if (argc < 2)
++        return 2;
++    auto test = cases.find(argv[1]);
++    return test != cases.end() && test->second(argc > 2 ? argv[2] : "") ? 0 : 1;
++}
+diff --git a/tests/model_gpu_tests.cpp b/tests/model_gpu_tests.cpp
+index f26b959..206ba67 100644
+--- a/tests/model_gpu_tests.cpp
++++ b/tests/model_gpu_tests.cpp
+@@ -75,6 +75,86 @@ int main(int argc, char** argv)
+             CHECK(capture.save(argv[1]));
+         CHECK(correct);
+     }
++    // Render two rigid node groups through ModelView, then hide each and restore.
++    // Pixels, not only counters, prove the visibility mask reaches SDL_GPU.
++    {
++        Model model;
++        ModelAnimation animation;
++        animation.duration = 100;
++        animation.keys.resize(2);
++        animation.keys[1].time = 100;
++        for (unsigned side = 0; side < 2; ++side)
++        {
++            ModelNode node;
++            node.name = side ? "right" : "left";
++            node.index = side;
++            model.nodes.push_back(node);
++            NodeAnimation track;
++            track.frames.resize(2);
++            animation.nodes.push_back(track);
++            auto mesh = quad(3, .75f, {1, 1, 1}, side ? 1.5f : -1.5f);
++            for (const auto& v : mesh.vertices)
++            {
++                ModelVertex vertex;
++                vertex.position = v.position;
++                vertex.node = side;
++                model.vertices.push_back(vertex);
++            }
++            for (unsigned triangle = 0; triangle < 2; ++triangle)
++            {
++                ModelFace face;
++                for (unsigned c = 0; c < 3; ++c)
++                    face.vertices[c] = side * 6 + triangle * 3 + c;
++                model.faces.push_back(face);
++            }
++        }
++        model.animations.push_back(animation);
++        Resources resources;
++        ModelView scene;
++        models.clear_geometry();
++        for (unsigned frame = 0; frame < 4; ++frame)
++        {
++            const std::array<std::uint8_t, 2> hidden{std::uint8_t(frame == 1 || frame == 2), std::uint8_t(frame == 2)};
++            scene.begin_frame();
++            CHECK(scene.add(&model, {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "node pixel probe", resources,
++                            error, hidden));
++            CHECK(scene.entries[0].hidden_triangles == (frame == 1 ? 2 : frame == 2 ? 4 : 0));
++            Capture capture;
++            CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240));
++            CHECK(models.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error,
++                                 true));
++            auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++            CHECK(commands &&
++                  models.draw(commands, capture.texture, scene.mesh, scene.world_draws, {}, {}, false, error));
++            auto* copy = SDL_BeginGPUCopyPass(commands);
++            CHECK(copy);
++            SDL_GPUTextureRegion region{};
++            region.texture = capture.texture;
++            region.w = 320;
++            region.h = 240;
++            region.d = 1;
++            SDL_GPUTextureTransferInfo target{};
++            target.transfer_buffer = capture.transfer;
++            target.pixels_per_row = 320;
++            target.rows_per_layer = 240;
++            SDL_DownloadFromGPUTexture(copy, &region, &target);
++            SDL_EndGPUCopyPass(copy);
++            CHECK(SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(runtime.gpu));
++            auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++            CHECK(pixels);
++            bool valid = true;
++            for (unsigned side = 0; side < 2; ++side)
++            {
++                const auto* pixel = pixels + (120 * 320 + (side ? 240 : 80)) * 4;
++                valid &= hidden[side] ? pixel[0] == 6 && pixel[1] == 9 && pixel[2] == 13
++                                      : pixel[0] == 255 && pixel[1] == 0 && pixel[2] == 255;
++            }
++            SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++            CHECK(valid);
++        }
++        std::cout << "Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without "
++                     "texture revision\n";
++    }
+     if (argc == 3)
+     {
+         GameSession game;

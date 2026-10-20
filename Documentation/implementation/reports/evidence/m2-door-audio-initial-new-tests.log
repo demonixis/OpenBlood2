@@ -1,0 +1,52 @@
+Test project <workspace>/Blood2/build/debug
+      Start 569: exits.catalog
+      Start 563: exits.delayed
+ 1/12 Test #563: exits.delayed ....................   Passed    0.01 sec
+      Start 567: exits.queue
+ 2/12 Test #567: exits.queue ......................   Passed    0.01 sec
+      Start 568: exits.lifetime
+ 3/12 Test #568: exits.lifetime ...................   Passed    0.01 sec
+      Start 562: exits.defaults
+ 4/12 Test #562: exits.defaults ...................   Passed    0.01 sec
+      Start 565: exits.blocked
+ 5/12 Test #565: exits.blocked ....................   Passed    0.01 sec
+      Start 566: exits.dead
+ 6/12 Test #566: exits.dead .......................   Passed    0.01 sec
+      Start 564: exits.broadcast
+ 7/12 Test #564: exits.broadcast ..................   Passed    0.01 sec
+      Start 137: door_audio.states
+ 8/12 Test #137: door_audio.states ................***Failed    0.01 sec
+states:76: d && !d->sound_requests && !d->last_voice
+
+      Start 138: door_audio.replacement
+ 9/12 Test #138: door_audio.replacement ...........***Failed    0.01 sec
+replacement:101: d && send(g, h, "TRIGGER") && step(g, 2) && voice(g, *d, true)
+
+      Start 139: door_audio.lifetime
+10/12 Test #139: door_audio.lifetime ..............***Failed    0.01 sec
+lifetime:124: d && send(g, h, "TRIGGER") && step(g, 2)
+
+      Start 140: door_audio.private
+11/12 Test #569: exits.catalog ....................***Failed    1.43 sec
+Authored exit2 -> 02_cityhub / start 01_egressa
+catalog:236: player && player->smell_drops == 1 && player->smell_error.empty()
+
+12/12 Test #140: door_audio.private ...............   Passed    2.32 sec
+
+67% tests passed, 4 tests failed out of 12
+
+Label Time Summary:
+audio       =   2.34 sec*proc (4 tests)
+doors       =   2.34 sec*proc (4 tests)
+exits       =   1.50 sec*proc (8 tests)
+headless    =   3.83 sec*proc (12 tests)
+private     =   3.74 sec*proc (2 tests)
+
+Total Test time (real) =   2.43 sec
+
+The following tests FAILED:
+	137 - door_audio.states (Failed)                        audio doors headless
+	138 - door_audio.replacement (Failed)                   audio doors headless
+	139 - door_audio.lifetime (Failed)                      audio doors headless
+	569 - exits.catalog (Failed)                            exits headless private
+Errors while running CTest

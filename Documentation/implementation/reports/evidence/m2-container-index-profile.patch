@@ -1,0 +1,84 @@
+--- a/src/game/server_containers.cpp
++++ b/src/game/server_containers.cpp
+@@ -1,3 +1,4 @@
++#include "b2-cost-profile.h"
+ #include "engine/container.h"
+ #include "engine/world_model.h"
+ #include "game/original/VolumeBrush.h"
+@@ -28,6 +29,7 @@
+     }
+     bool ServerAdapter::GetContainers(HOBJECT object, DVector head, ContainerState& state)
+     {
++        B2CostTimer b2_timer{0};
+         trace_service("GetContainers");
+         state = {};
+         const auto* body = objects_.get(object);
+@@ -62,6 +64,7 @@
+     }
+     bool ServerAdapter::affect_containers(HOBJECT object, ContainerPhysics& physics)
+     {
++        B2CostTimer b2_timer{1};
+         auto* body = objects_.get(object);
+         if (!body || body->life != Life::Alive)
+             return false;
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -1,3 +1,4 @@
++#include "b2-cost-profile.h"
+ #include "engine/world_model.h"
+ #include "game/original/Projectile.h"
+ #include "game/server_adapter.h"
+@@ -89,6 +90,7 @@
+     }
+     bool ServerAdapter::GetMovementState(HOBJECT h, MovementState& state)
+     {
++        B2CostTimer b2_timer{2};
+         trace_service("GetMovementState");
+         state = {};
+         const auto* r = objects_.get(h);
+@@ -192,6 +194,7 @@
+     }
+     DRESULT ServerAdapter::MoveObject(HOBJECT h, DVector* destination)
+     {
++        B2CostTimer b2_timer{3};
+         trace_service("MoveObject");
+         auto* r = objects_.get(h);
+         if (!r || r->life != Life::Alive || r->attachment || !destination || !physics_vector(*destination) ||
+--- a/src/engine/container.cpp
++++ b/src/engine/container.cpp
+@@ -1,3 +1,4 @@
++#include "b2-cost-profile.h"
+ #include "engine/container.h"
+ #include <algorithm>
+ #include <cmath>
+@@ -252,6 +253,7 @@
+     }
+     bool ContainerShape::contains(DVector point) const
+     {
++        B2CostTimer b2_timer{4};
+         if (triangles.empty() || !physics_vector(point) || point.x < min.x - .001f || point.x > max.x + .001f ||
+             point.y < min.y - .001f || point.y > max.y + .001f || point.z < min.z - .001f || point.z > max.z + .001f)
+             return false;
+@@ -291,6 +293,7 @@
+     }
+     bool ContainerShape::overlaps(DVector center, DVector half) const
+     {
++        B2CostTimer b2_timer{5};
+         if (!physics_vector(center) || !physics_vector(half) || half.x < 0 || half.y < 0 || half.z < 0 ||
+             center.x + half.x < min.x || center.x - half.x > max.x || center.y + half.y < min.y ||
+             center.y - half.y > max.y || center.z + half.z < min.z || center.z - half.z > max.z)
+--- a/src/engine/objects.cpp
++++ b/src/engine/objects.cpp
+@@ -1,3 +1,4 @@
++#include "b2-cost-profile.h"
+ #include "engine/objects.h"
+ #include "engine/container.h"
+ #include "engine/model_store.h"
+@@ -583,6 +584,7 @@
+     }
+     std::vector<ObjectId> Objects::container_snapshot() const
+     {
++        B2CostTimer b2_timer{6};
+         // Same checked identities and slot order as snapshot(), freshly gathered
+         // for each query. Unrelated effects need no copied ID or subsequent lookup.
+         std::vector<ObjectId> ids;

@@ -1,0 +1,17 @@
+646/647 Testing: gpu.energy
+646/647 Test: gpu.energy
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/energy_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/energy-gpu"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.energy" start time: Oct 17 01:26 CEST
+Output:
+----------------------------------------------------------
+Stage 0: scale 0, z 20, changed pixels 0
+Stage 1: scale 0.25, z 20, changed pixels 96
+Stage 2: scale 0.25, z 30, changed pixels 48
+<end of output>
+Test time =   0.40 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.energy" end time: Oct 17 01:26 CEST
+"gpu.energy" time elapsed: 00:00:00
+----------------------------------------------------------

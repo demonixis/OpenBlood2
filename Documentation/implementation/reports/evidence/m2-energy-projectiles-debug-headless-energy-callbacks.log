@@ -1,0 +1,15 @@
+642/647 Testing: energy.callbacks
+642/647 Test: energy.callbacks
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/energy_tests" "callbacks" "/home/yann/projects/lithtech/Blood2/build/debug/tests/energy-callbacks"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"energy.callbacks" start time: Oct 17 01:23 CEST
+Output:
+----------------------------------------------------------
+Damage callback removes projectile safely, hit removal breaks link, HP5 destruction explodes on update.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"energy.callbacks" end time: Oct 17 01:23 CEST
+"energy.callbacks" time elapsed: 00:00:00
+----------------------------------------------------------

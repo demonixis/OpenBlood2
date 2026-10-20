@@ -1,0 +1,14 @@
+523/524 Testing: player_state.capture
+523/524 Test: player_state.capture
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_state_tests" "capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-state-fixtures/capture"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"player_state.capture" start time: Oct 16 18:29 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.capture" end time: Oct 16 18:29 CEST
+"player_state.capture" time elapsed: 00:00:00
+----------------------------------------------------------

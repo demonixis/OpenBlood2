@@ -1,0 +1,256 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+        Start 954: train_session.private_60
+        Start 953: train_session.private_30
+  1/115 Test #953: train_session.private_30 ..........   Passed    4.44 sec
+        Start  95: movement.private
+  2/115 Test #954: train_session.private_60 ..........   Passed    5.15 sec
+        Start 331: character_audio.subway
+  3/115 Test  #95: movement.private ..................   Passed    1.46 sec
+        Start  73: player.smell_private
+  4/115 Test #331: character_audio.subway ............   Passed    1.03 sec
+        Start 227: cameras.catalog
+  5/115 Test #227: cameras.catalog ...................   Passed    0.63 sec
+        Start 614: player_keepalive.private
+  6/115 Test  #73: player.smell_private ..............   Passed    0.93 sec
+        Start 104: locomotion.private
+  7/115 Test #614: player_keepalive.private ..........   Passed    0.45 sec
+        Start 965: player_voice.private
+  8/115 Test #104: locomotion.private ................   Passed    0.50 sec
+        Start 966: player_voice.combat_private
+  9/115 Test #965: player_voice.private ..............   Passed    0.51 sec
+        Start  74: player.private
+ 10/115 Test #966: player_voice.combat_private .......   Passed    0.45 sec
+        Start  50: world.level_change_private
+ 11/115 Test  #74: player.private ....................   Passed    0.29 sec
+        Start 600: player_state.private
+ 12/115 Test #600: player_state.private ..............   Passed    0.15 sec
+        Start 588: inventory_state.private
+ 13/115 Test  #50: world.level_change_private ........   Passed    0.56 sec
+        Start  12: objects.message_churn
+ 14/115 Test #588: inventory_state.private ...........   Passed    0.14 sec
+        Start 969: player_death.private
+ 15/115 Test  #12: objects.message_churn .............   Passed    0.10 sec
+        Start 330: character_audio.catalog
+ 16/115 Test #969: player_death.private ..............   Passed    0.10 sec
+        Start 963: player_voice.pickup
+ 17/115 Test #963: player_voice.pickup ...............   Passed    0.05 sec
+        Start 609: player_restore.private
+ 18/115 Test #330: character_audio.catalog ...........   Passed    0.07 sec
+        Start  13: objects.message_limit
+ 19/115 Test  #13: objects.message_limit .............   Passed    0.02 sec
+        Start 128: containers.private
+ 20/115 Test #609: player_restore.private ............   Passed    0.16 sec
+        Start 127: containers.specialized_private
+ 21/115 Test #128: containers.private ................   Passed    0.53 sec
+        Start  99: locomotion.limits
+ 22/115 Test  #99: locomotion.limits .................   Passed    0.01 sec
+        Start 612: player_keepalive.fallback
+ 23/115 Test #612: player_keepalive.fallback .........   Passed    0.01 sec
+        Start  89: movement.world_collision
+ 24/115 Test #127: containers.specialized_private ....   Passed    0.42 sec
+        Start  92: movement.timing
+ 25/115 Test  #89: movement.world_collision ..........   Passed    0.01 sec
+        Start  32: world.level_change
+ 26/115 Test  #92: movement.timing ...................   Passed    0.01 sec
+        Start 100: locomotion.crouch
+ 27/115 Test #100: locomotion.crouch .................   Passed    0.01 sec
+        Start  86: movement.walking
+ 28/115 Test  #32: world.level_change ................   Passed    0.01 sec
+        Start 225: cameras.player
+ 29/115 Test  #86: movement.walking ..................   Passed    0.01 sec
+ 30/115 Test #225: cameras.player ....................   Passed    0.01 sec
+        Start  88: movement.collisions
+        Start 103: locomotion.contacts
+ 31/115 Test #103: locomotion.contacts ...............   Passed    0.00 sec
+        Start  98: locomotion.world_stairs
+ 32/115 Test  #88: movement.collisions ...............   Passed    0.01 sec
+        Start  97: locomotion.stairs
+ 33/115 Test  #98: locomotion.world_stairs ...........   Passed    0.00 sec
+        Start 101: locomotion.animations
+ 34/115 Test  #97: locomotion.stairs .................   Passed    0.00 sec
+        Start 613: player_keepalive.failures
+ 35/115 Test #613: player_keepalive.failures .........   Passed    0.00 sec
+        Start 962: player_voice.messages
+ 36/115 Test #101: locomotion.animations .............   Passed    0.01 sec
+        Start 964: player_voice.damage
+ 37/115 Test #962: player_voice.messages .............   Passed    0.00 sec
+        Start 961: player_voice.timing
+ 38/115 Test #964: player_voice.damage ...............   Passed    0.00 sec
+        Start  90: movement.support
+ 39/115 Test #961: player_voice.timing ...............   Passed    0.00 sec
+        Start 960: player_voice.groups
+ 40/115 Test  #90: movement.support ..................   Passed    0.00 sec
+        Start 328: character_audio.footsteps
+ 41/115 Test #960: player_voice.groups ...............   Passed    0.00 sec
+        Start  87: movement.jumping
+ 42/115 Test #328: character_audio.footsteps .........   Passed    0.00 sec
+        Start 611: player_keepalive.named
+ 43/115 Test #611: player_keepalive.named ............   Passed    0.00 sec
+        Start 327: character_audio.callbacks
+ 44/115 Test  #87: movement.jumping ..................   Passed    0.00 sec
+        Start 326: character_audio.player
+ 45/115 Test #327: character_audio.callbacks .........   Passed    0.00 sec
+        Start 329: character_audio.surfaces
+ 46/115 Test #326: character_audio.player ............   Passed    0.00 sec
+        Start 587: inventory_state.capture
+ 47/115 Test #329: character_audio.surfaces ..........   Passed    0.00 sec
+        Start 324: character_audio.lifetime
+ 48/115 Test #587: inventory_state.capture ...........   Passed    0.00 sec
+        Start 598: player_state.failures
+ 49/115 Test #324: character_audio.lifetime ..........   Passed    0.00 sec
+        Start  72: player.smell
+ 50/115 Test #598: player_state.failures .............   Passed    0.00 sec
+        Start 325: character_audio.rejection
+ 51/115 Test  #72: player.smell ......................   Passed    0.00 sec
+        Start 584: inventory_state.roundtrip
+ 52/115 Test #325: character_audio.rejection .........   Passed    0.00 sec
+        Start 596: player_state.clocks
+ 53/115 Test #584: inventory_state.roundtrip .........   Passed    0.00 sec
+        Start 599: player_state.capture
+ 54/115 Test #596: player_state.clocks ...............   Passed    0.00 sec
+        Start 323: character_audio.voices
+ 55/115 Test #599: player_state.capture ..............   Passed    0.00 sec
+        Start 597: player_state.initialization
+ 56/115 Test #323: character_audio.voices ............   Passed    0.00 sec
+        Start 595: player_state.roundtrip
+ 57/115 Test #597: player_state.initialization .......   Passed    0.00 sec
+        Start 585: inventory_state.malformed
+ 58/115 Test #595: player_state.roundtrip ............   Passed    0.00 sec
+        Start  91: movement.boundaries
+ 59/115 Test #585: inventory_state.malformed .........   Passed    0.00 sec
+        Start 586: inventory_state.rollback
+ 60/115 Test  #91: movement.boundaries ...............   Passed    0.00 sec
+        Start  93: movement.lifetime
+ 61/115 Test #586: inventory_state.rollback ..........   Passed    0.00 sec
+        Start 102: locomotion.lifetime
+ 62/115 Test  #93: movement.lifetime .................   Passed    0.00 sec
+        Start  47: world.session_lifecycle
+ 63/115 Test #102: locomotion.lifetime ...............   Passed    0.00 sec
+        Start  68: player.lifecycle
+ 64/115 Test  #47: world.session_lifecycle ...........   Passed    0.00 sec
+        Start  69: player.rollback
+ 65/115 Test  #68: player.lifecycle ..................   Passed    0.00 sec
+        Start  70: player.messages
+ 66/115 Test  #69: player.rollback ...................   Passed    0.00 sec
+        Start 221: cameras.defaults
+ 67/115 Test  #70: player.messages ...................   Passed    0.00 sec
+        Start  71: player.callbacks
+ 68/115 Test #221: cameras.defaults ..................   Passed    0.00 sec
+        Start 223: cameras.links
+ 69/115 Test  #71: player.callbacks ..................   Passed    0.00 sec
+        Start 226: cameras.validation
+ 70/115 Test #223: cameras.links .....................   Passed    0.00 sec
+        Start 222: cameras.timing
+ 71/115 Test #226: cameras.validation ................   Passed    0.00 sec
+        Start 224: cameras.selection
+ 72/115 Test #222: cameras.timing ....................   Passed    0.00 sec
+        Start 322: character_audio.paths
+ 73/115 Test #224: cameras.selection .................   Passed    0.00 sec
+        Start 115: containers.index_lifetime
+ 74/115 Test #322: character_audio.paths .............   Passed    0.00 sec
+        Start  67: player.handles
+ 75/115 Test #115: containers.index_lifetime .........   Passed    0.00 sec
+        Start 967: player_death.camera
+ 76/115 Test  #67: player.handles ....................   Passed    0.00 sec
+        Start 968: player_death.guards
+ 77/115 Test #967: player_death.camera ...............   Passed    0.00 sec
+        Start  48: world.session_messages
+ 78/115 Test #968: player_death.guards ...............   Passed    0.00 sec
+        Start 116: containers.index_callbacks
+ 79/115 Test  #48: world.session_messages ............   Passed    0.00 sec
+        Start  94: movement.controls
+ 80/115 Test #116: containers.index_callbacks ........   Passed    0.00 sec
+        Start 607: player_restore.failures
+ 81/115 Test  #94: movement.controls .................   Passed    0.00 sec
+        Start 608: player_restore.lifetime
+ 82/115 Test #607: player_restore.failures ...........   Passed    0.00 sec
+        Start   2: objects.builtin_model
+ 83/115 Test #608: player_restore.lifetime ...........   Passed    0.00 sec
+        Start 606: player_restore.roundtrip
+ 84/115 Test   #2: objects.builtin_model .............   Passed    0.00 sec
+        Start  14: objects.unsupported_teardown
+ 85/115 Test #606: player_restore.roundtrip ..........   Passed    0.00 sec
+        Start  15: objects.creation_failures
+ 86/115 Test  #14: objects.unsupported_teardown ......   Passed    0.00 sec
+        Start  11: objects.messages_strings
+ 87/115 Test  #15: objects.creation_failures .........   Passed    0.00 sec
+        Start   5: objects.reasons_properties
+ 88/115 Test  #11: objects.messages_strings ..........   Passed    0.00 sec
+        Start   3: objects.original_objects
+ 89/115 Test   #5: objects.reasons_properties ........   Passed    0.00 sec
+        Start   9: objects.handles_selection
+ 90/115 Test   #3: objects.original_objects ..........   Passed    0.00 sec
+        Start   8: objects.aggregate_dispatch
+ 91/115 Test   #9: objects.handles_selection .........   Passed    0.00 sec
+        Start   4: objects.nested_creation
+ 92/115 Test   #8: objects.aggregate_dispatch ........   Passed    0.00 sec
+        Start   6: objects.scheduling
+ 93/115 Test   #4: objects.nested_creation ...........   Passed    0.00 sec
+        Start 120: containers.ladders
+ 94/115 Test   #6: objects.scheduling ................   Passed    0.00 sec
+        Start   7: objects.deferred_removal
+ 95/115 Test   #7: objects.deferred_removal ..........   Passed    0.00 sec
+        Start  10: objects.links_lists
+ 96/115 Test  #10: objects.links_lists ...............   Passed    0.00 sec
+        Start 118: containers.swimming
+ 97/115 Test #120: containers.ladders ................   Passed    0.01 sec
+        Start 126: containers.freefall_motion
+ 98/115 Test #118: containers.swimming ...............   Passed    0.00 sec
+        Start 123: containers.conveyor_motion
+ 99/115 Test #126: containers.freefall_motion ........   Passed    0.00 sec
+        Start 119: containers.surface
+100/115 Test #123: containers.conveyor_motion ........   Passed    0.00 sec
+        Start 125: containers.specialized_damage
+101/115 Test #119: containers.surface ................   Passed    0.00 sec
+        Start 122: containers.specialized_defaults
+102/115 Test #125: containers.specialized_damage .....   Passed    0.00 sec
+        Start 113: containers.membership
+103/115 Test #122: containers.specialized_defaults ...   Passed    0.00 sec
+        Start 114: containers.lifetime
+104/115 Test #113: containers.membership .............   Passed    0.00 sec
+        Start 121: containers.air_damage
+105/115 Test #114: containers.lifetime ...............   Passed    0.00 sec
+        Start 124: containers.conveyor_bodies
+106/115 Test #121: containers.air_damage .............   Passed    0.00 sec
+        Start 117: containers.physics
+107/115 Test #124: containers.conveyor_bodies ........   Passed    0.00 sec
+        Start 112: containers.concave
+108/115 Test #117: containers.physics ................   Passed    0.00 sec
+        Start 111: containers.geometry
+109/115 Test #112: containers.concave ................   Passed    0.00 sec
+        Start 970: movement_audio.rules
+110/115 Test #111: containers.geometry ...............   Passed    0.00 sec
+        Start 971: movement_audio.jumps
+111/115 Test #970: movement_audio.rules ..............   Passed    0.00 sec
+        Start 972: movement_audio.contexts
+112/115 Test #971: movement_audio.jumps ..............   Passed    0.01 sec
+        Start 973: movement_audio.failures
+113/115 Test #973: movement_audio.failures ...........   Passed    0.00 sec
+        Start 974: movement_audio.private
+114/115 Test #972: movement_audio.contexts ...........   Passed    0.02 sec
+115/115 Test #974: movement_audio.private ............   Passed    0.06 sec
+
+100% tests passed, 0 tests failed out of 115
+
+Label Time Summary:
+audio               =   1.12 sec*proc (12 tests)
+cameras             =   0.64 sec*proc (7 tests)
+character_audio     =   1.12 sec*proc (10 tests)
+containers          =   1.01 sec*proc (18 tests)
+headless            =  18.54 sec*proc (115 tests)
+inventory_state     =   0.15 sec*proc (5 tests)
+locomotion          =   0.54 sec*proc (8 tests)
+movement            =   1.51 sec*proc (10 tests)
+movement_audio      =   0.10 sec*proc (5 tests)
+objects             =   0.15 sec*proc (14 tests)
+player              =   1.23 sec*proc (8 tests)
+player_death        =   0.11 sec*proc (3 tests)
+player_keepalive    =   0.46 sec*proc (4 tests)
+player_restore      =   0.17 sec*proc (4 tests)
+player_state        =   0.16 sec*proc (6 tests)
+player_voice        =   1.03 sec*proc (7 tests)
+private             =  18.04 sec*proc (20 tests)
+train_session       =   9.60 sec*proc (2 tests)
+world               =   0.57 sec*proc (4 tests)
+
+Total Test time (real) =   9.32 sec

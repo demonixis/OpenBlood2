@@ -1,0 +1,19 @@
+[0/2] Re-checking globbed directories...
+[1/47] Scanning /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp for CXX dependencies
+[2/47] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[3/19] Scanning /home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp for CXX dependencies
+[4/19] Generating CXX dyndep file tests/CMakeFiles/dls_sampler_tests.dir/CXX.dd
+[5/19] Building CXX object CMakeFiles/engine.dir/src/engine/dls_sampler.cpp.o
+[6/19] Linking CXX static library libengine.a
+[7/19] Linking CXX executable tests/object_contract_tests
+[8/19] Building CXX object tests/CMakeFiles/dls_sampler_tests.dir/dls_sampler_tests.cpp.o
+[9/19] Linking CXX executable tests/config_tests
+[10/19] Linking CXX executable tests/world_tests
+[11/19] Linking CXX executable tests/random_sound_tests
+[12/19] Linking CXX executable tests/audio_stream_tests
+[13/19] Linking CXX executable tests/sound_tests
+[14/19] Linking CXX executable tests/train_session_tests
+[15/19] Linking CXX executable tests/service_coverage_tests
+[16/19] Linking CXX executable tests/dls_bank_tests
+[17/19] Linking CXX executable tests/music_asset_tests
+[18/19] Linking CXX executable tests/dls_sampler_tests

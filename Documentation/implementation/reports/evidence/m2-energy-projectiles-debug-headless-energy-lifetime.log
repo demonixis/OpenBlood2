@@ -1,0 +1,15 @@
+641/647 Testing: energy.lifetime
+641/647 Test: energy.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/energy_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/debug/tests/energy-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"energy.lifetime" start time: Oct 17 01:23 CEST
+Output:
+----------------------------------------------------------
+Shooter unlink retains unattributed damage; strict lifetime expiry and complete unload release verified.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"energy.lifetime" end time: Oct 17 01:23 CEST
+"energy.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

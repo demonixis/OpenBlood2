@@ -1,0 +1,22 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 24: gpu.lifecycle
+1/5 Test #24: gpu.lifecycle ....................   Passed    2.60 sec
+    Start 36: gpu.world
+2/5 Test #36: gpu.world ........................   Passed    1.02 sec
+    Start 52: gpu.player
+3/5 Test #52: gpu.player .......................   Passed    1.02 sec
+    Start 62: gpu.weapons
+4/5 Test #62: gpu.weapons ......................   Passed    2.45 sec
+    Start 73: gpu.movement
+5/5 Test #73: gpu.movement .....................   Passed    2.46 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+gpu         =   9.55 sec*proc (5 tests)
+movement    =   2.46 sec*proc (1 test)
+player      =   1.02 sec*proc (1 test)
+private     =   6.95 sec*proc (4 tests)
+weapons     =   2.45 sec*proc (1 test)
+
+Total Test time (real) =   9.55 sec

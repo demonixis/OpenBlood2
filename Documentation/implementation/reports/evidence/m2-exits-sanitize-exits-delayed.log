@@ -1,0 +1,14 @@
+474/480 Testing: exits.delayed
+474/480 Test: exits.delayed
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit_tests" "delayed" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit-fixtures/delayed"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"exits.delayed" start time: Oct 16 17:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"exits.delayed" end time: Oct 16 17:25 CEST
+"exits.delayed" time elapsed: 00:00:00
+----------------------------------------------------------

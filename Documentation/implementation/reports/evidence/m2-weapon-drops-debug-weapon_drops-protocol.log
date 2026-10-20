@@ -1,0 +1,14 @@
+483/491 Testing: weapon_drops.protocol
+483/491 Test: weapon_drops.protocol
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests" "protocol" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-drop-fixtures/protocol"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapon_drops.protocol" start time: Oct 16 16:00 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_drops.protocol" end time: Oct 16 16:00 CEST
+"weapon_drops.protocol" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+334/343 Testing: world_view.rejects
+334/343 Test: world_view.rejects
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_view_tests" "rejects"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"world_view.rejects" start time: Oct 16 09:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.rejects" end time: Oct 16 09:15 CEST
+"world_view.rejects" time elapsed: 00:00:00
+----------------------------------------------------------

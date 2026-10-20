@@ -1,0 +1,1 @@
+Reviewed actual GPU PNGs: SubwayA floor/seat/sign texture alignment and colors; synthetic repeating colored quadrants; inspector decoded/failed/bytes/batches versus zero GPU uploads before player entry. Transparent faces retain the documented opaque diagnostic marker. No retail screenshot/lighting/alpha parity claim.

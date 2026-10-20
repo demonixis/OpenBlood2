@@ -1,0 +1,136 @@
+{
+  "date": "2026-10-18",
+  "status": "M2 incomplete; explicit grid traversal, MUSIC unsupported",
+  "implementation_parent": "90ed46370d12dee326e9fbc12dcef2f0fc9e74e5",
+  "runs": [
+    {
+      "configuration": "debug",
+      "tests": 106,
+      "passed": 106,
+      "wall_seconds": 18.24
+    },
+    {
+      "configuration": "release",
+      "tests": 106,
+      "passed": 106,
+      "wall_seconds": 1.48
+    },
+    {
+      "configuration": "sanitize",
+      "tests": 106,
+      "passed": 106,
+      "wall_seconds": 70.29
+    },
+    {
+      "configuration": "debug NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 10.87
+    },
+    {
+      "configuration": "release NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 3.71
+    }
+  ],
+  "original_cursor_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "rva": "0x16908",
+    "generated": {
+      "sections": 128,
+      "steps": 2799,
+      "sha256": "166dcfdb0cff0dae19dcb2afe496e68b1749aa89591d0accf350226734b8cab0",
+      "fnv64": 10075978454587385952
+    },
+    "private": {
+      "sections": 132,
+      "steps": 8174,
+      "sha256": "43a59ca5b55ef2f482a2ad74bbf1d2e2f565a66a328ed34ddf7c946d40765ea9",
+      "fnv64": 14793402716944126194
+    },
+    "scope": "Original normal-mode grid/chord/mute/pattern/variation/note-admission decisions and end reset. Prepared inputs come from previously verified readers/helpers. Section event list and active notes empty; notifications, metronome, MIDI emission, playlist lookahead/repeats/transitions explicitly intercepted. This is not a full tick/audio equivalence claim."
+  },
+  "gpu_environment": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+    "SDL_AUDIODRIVER": "dummy"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1"
+  },
+  "commands": [
+    "python3 m2-music-cursor-validation.py <debug|release|sanitize>",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/<debug|release> -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit <result.xml>",
+    "build/debug/tests/ima_cursor_tests export <transient-fixture-file> <external-content-root>",
+    "<tool-venv>/bin/python m2-music-cursor-probe.py <external-content-root> <transient-fixture-file>",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror <seven changed C++ files>"
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "limitations": [
+    "Explicit single-section traversal only; seeds/draws are diagnostic, not original playlist initialization",
+    "Original emulation excludes section events, notifications, MIDI emission, active notes, repeats and playlist transitions",
+    "24 installed Track1 sections retain missing-style failures",
+    "GPU capture reviews sound inspector summary; nested manual cursor buttons not visually exercised",
+    "Dummy audio; no soundtrack listening parity or native Metal/Windows/mobile verification",
+    "Required services, MUSIC and M2 acceptance remain open"
+  ],
+  "artifacts": {
+    "Documentation/Implementation/evidence/m2-music-cursor-debug-build-final.log": "7e900f88592e5db82626f083fef63fb14f6d45ce40582b6799aa00f74b1b4032",
+    "Documentation/Implementation/evidence/m2-music-cursor-debug-gpu.log": "4dbff9534b1508adfc68876938fb11ec27dc0a63ec2852b0fd0783099739a6d4",
+    "Documentation/Implementation/evidence/m2-music-cursor-debug-gpu.xml": "a74febb1b21c33146bef947d0f172cd7c12156ba6291cfe7c6c14bda026e34fe",
+    "Documentation/Implementation/evidence/m2-music-cursor-debug-tests.log": "7d9052bc8825f9a4943e836b5f42723eb1452c2c308259dab863bbda2a17d116",
+    "Documentation/Implementation/evidence/m2-music-cursor-debug-tests.xml": "36606b34e94978bf4263456d81cfbc8672915a93b6ac8bd29f2ddb7269a6fa30",
+    "Documentation/Implementation/evidence/m2-music-cursor-integrity.json": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+    "Documentation/Implementation/evidence/m2-music-cursor-links.log": "1e56009c5fd13c4d478e3f949a234da4b6e065d5a19e610af640880f56eeef46",
+    "Documentation/Implementation/evidence/m2-music-cursor-probe.json": "0d701142cb874f49e1df677186d926e93d4678822e5ac66c95d3018ed091a217",
+    "Documentation/Implementation/evidence/m2-music-cursor-probe.py": "e6a48344d01d1ba1ef70f837f337b80b74878e964d7b682972c994777d31916e",
+    "Documentation/Implementation/evidence/m2-music-cursor-release-build-final.log": "eb77d0d9b31302c04cda590d84399949d03b487e915aec6c1c3867f9d47053e4",
+    "Documentation/Implementation/evidence/m2-music-cursor-release-gpu.log": "08576ca8522ea9375d06b02d142ce3afdccb08f286e85efafdc7f97c434a4cbc",
+    "Documentation/Implementation/evidence/m2-music-cursor-release-gpu.xml": "44ddb9a2484783db99d9b1db5ab43bec8cf43a5faa2002182a88e139c35a3c34",
+    "Documentation/Implementation/evidence/m2-music-cursor-release-tests.log": "d2873283bd9f217a3490a1431e3a84767015e2a831de076af0dabe064c5767da",
+    "Documentation/Implementation/evidence/m2-music-cursor-release-tests.xml": "64372f01993bab6a9a17e4562d3fbac34699c6bf6a3f5625e4827de1609ccfe0",
+    "Documentation/Implementation/evidence/m2-music-cursor-sanitize-build-final.log": "c87a13ddd302c69baa4f2ac2e518d37fa36975e27df33a70f5e10838d3239e48",
+    "Documentation/Implementation/evidence/m2-music-cursor-sanitize-tests.log": "fc885b60c00c76da25a74089d2ff184372a1c961eaa858052ed1687a04dd79c7",
+    "Documentation/Implementation/evidence/m2-music-cursor-sanitize-tests.xml": "2a1cc20883a39c7c178d9534ccd69a0c44a273b79efcc052f67b4d9f76c6e887",
+    "Documentation/Implementation/evidence/m2-music-cursor-validation.py": "a524c5455341c052555fde0297dc68af0c6dd160708b97bc9c106c2a6bf8a3f8"
+  },
+  "implementation_commit": "2b9f1901115a7040baa102a082a2006dd0fd70b8"
+}

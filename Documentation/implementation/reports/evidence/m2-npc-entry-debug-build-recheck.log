@@ -1,0 +1,31 @@
+[0/2] Re-checking globbed directories...
+[1/14] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_lights.cpp.o
+[2/14] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_keyframes.cpp.o
+[3/14] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o
+FAILED: [code=1] CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o 
+/usr/bin/c++ -DBLOOD2_INSPECTOR=1 -DSPDLOG_COMPILED_LIB -I/home/yann/projects/lithtech/Blood2/build/debug/generated -I/home/yann/projects/lithtech/Blood2/src -I/home/yann/projects/lithtech/Blood2/src/game/legacy -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/sdl3-build/include-revision -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/sdl3-src/include -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/spdlog-src/include -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/imgui_source-src -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/imgui_source-src/backends -g -std=c++20 -Wall -Wextra -Wpedantic -MD -MT CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o -MF CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o.d -fmodules-ts -fmodule-mapper=CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o -c /home/yann/projects/lithtech/Blood2/src/app/inspector.cpp
+/home/yann/projects/lithtech/Blood2/src/app/inspector.cpp: In member function ‘void OpenBlood2::Inspector::draw_session(OpenBlood2::GameSession&, OpenBlood2::ObjectSelection&)’:
+/home/yann/projects/lithtech/Blood2/src/app/inspector.cpp:1065:49: error: ISO C++ forbids declaration of ‘type name’ with no type [-fpermissive]
+ 1065 |             const auto* ai = dynamic_cast<const AI_Mgr*>(r->game.get());
+      |                                                 ^~~~~~
+/home/yann/projects/lithtech/Blood2/src/app/inspector.cpp:1065:49: error: expected ‘>’ before ‘AI_Mgr’
+/home/yann/projects/lithtech/Blood2/src/app/inspector.cpp:1065:30: error: cannot ‘dynamic_cast’ ‘r->OpenBlood2::ObjectRecord::game.std::unique_ptr<BaseClass>::get()’ (of type ‘using std::unique_ptr<BaseClass>::pointer = using std::__uniq_ptr_impl<BaseClass, std::default_delete<BaseClass> >::pointer = using std::__uniq_ptr_impl<BaseClass, std::default_delete<BaseClass> >::_Ptr<BaseClass, std::default_delete<BaseClass>, void>::type = class BaseClass*’ {aka ‘class BaseClass*’}) to type ‘const int’ (target is not pointer or reference)
+ 1065 |             const auto* ai = dynamic_cast<const AI_Mgr*>(r->game.get());
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/yann/projects/lithtech/Blood2/src/app/inspector.cpp:1066:40: error: ‘AI_Mgr’ has not been declared
+ 1066 |             if (!ai || ai->npc_type == AI_Mgr::NPCType::Diagnostic)
+      |                                        ^~~~~~
+/home/yann/projects/lithtech/Blood2/src/app/inspector.cpp: In member function ‘void OpenBlood2::Inspector::draw_weapons(OpenBlood2::GameSession&, OpenBlood2::ObjectSelection&)’:
+/home/yann/projects/lithtech/Blood2/src/app/inspector.cpp:1618:49: error: ISO C++ forbids declaration of ‘type name’ with no type [-fpermissive]
+ 1618 |             const auto* ai = dynamic_cast<const AI_Mgr*>(r->game.get());
+      |                                                 ^~~~~~
+/home/yann/projects/lithtech/Blood2/src/app/inspector.cpp:1618:49: error: expected ‘>’ before ‘AI_Mgr’
+/home/yann/projects/lithtech/Blood2/src/app/inspector.cpp:1618:30: error: cannot ‘dynamic_cast’ ‘r->OpenBlood2::ObjectRecord::game.std::unique_ptr<BaseClass>::get()’ (of type ‘using std::unique_ptr<BaseClass>::pointer = using std::__uniq_ptr_impl<BaseClass, std::default_delete<BaseClass> >::pointer = using std::__uniq_ptr_impl<BaseClass, std::default_delete<BaseClass> >::_Ptr<BaseClass, std::default_delete<BaseClass>, void>::type = class BaseClass*’ {aka ‘class BaseClass*’}) to type ‘const int’ (target is not pointer or reference)
+ 1618 |             const auto* ai = dynamic_cast<const AI_Mgr*>(r->game.get());
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/yann/projects/lithtech/Blood2/src/app/inspector.cpp:1619:40: error: ‘AI_Mgr’ has not been declared
+ 1619 |             if (!ai || ai->npc_type == AI_Mgr::NPCType::Diagnostic)
+      |                                        ^~~~~~
+[4/14] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_cinematics.cpp.o
+[5/14] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_random_sounds.cpp.o
+ninja: build stopped: subcommand failed.

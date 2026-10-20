@@ -1,0 +1,145 @@
+{
+  "date": "2026-10-18",
+  "status": "M2 incomplete; original MUSIC remains unsupported",
+  "implementation_parent": "43246c39bc5e9b592ff142316050c250f8e2ee07",
+  "runs": [
+    {
+      "configuration": "debug",
+      "tests": 75,
+      "passed": 75,
+      "wall_seconds": 15.11
+    },
+    {
+      "configuration": "release",
+      "tests": 75,
+      "passed": 75,
+      "wall_seconds": 1.36
+    },
+    {
+      "configuration": "sanitize",
+      "tests": 75,
+      "passed": 75,
+      "wall_seconds": 63.43
+    },
+    {
+      "configuration": "debug NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 11.39
+    },
+    {
+      "configuration": "release NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 5.36
+    }
+  ],
+  "original_band_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "load_arithmetic_rvas": [
+      "0x16c2",
+      "0x17d3"
+    ],
+    "apply_rva": "0x1e9d",
+    "synthetic_cases": 8,
+    "bands": 195,
+    "bands_by_kind": {
+      ".sec": 156,
+      ".sty": 39
+    },
+    "setup_events": 15600,
+    "event_sha256": "82ae83ed9de76b60b4c5546385d71041b71e58dc6e8952bc472e856b45ceb9da",
+    "event_fnv64": 7277285548350807734,
+    "scope": "Original channel records and ordered volume/pan/bank/program messages only; strings, collection loading, selection and playback not emulated"
+  },
+  "private_results": {
+    "synthetic_cases": 8,
+    "bands": 195,
+    "bands_by_kind": {
+      ".sec": 156,
+      ".sty": 39
+    },
+    "setup_events": 15600,
+    "event_sha256": "82ae83ed9de76b60b4c5546385d71041b71e58dc6e8952bc472e856b45ceb9da",
+    "event_fnv64": 7277285548350807734
+  },
+  "gpu_environment": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+    "SDL_AUDIODRIVER": "dummy"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1"
+  },
+  "commands": [
+    "python3 m2-music-bands-validation.py <debug|release|sanitize>",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/<debug|release> -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit <result.xml>",
+    "<tool-venv>/bin/python m2-music-bands-probe.py <external-content-root>",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror <eight changed C++ files>"
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "limitations": [
+    "No effective band selection, collection resolution, sequencing, original MUSIC success or retail musical comparison",
+    "No native Metal/Windows/mobile execution; NVIDIA Vulkan only",
+    "Visual capture reviewed for status/lifetime text; nested band/channel rows not captured",
+    "No claim of complete world/dead-player restoration or M2 acceptance"
+  ],
+  "artifacts": {
+    "Documentation/Implementation/evidence/m2-music-bands-debug-build-final.log": "9635d212e3f66e59eabc2e3d1d1f5c6bcce8d0ace47167aa6579e189732b848a",
+    "Documentation/Implementation/evidence/m2-music-bands-debug-gpu.log": "a84bc796827cd9e4a778779af9cc8de3b0531e0e9ee70e873a988ed6f1fa8472",
+    "Documentation/Implementation/evidence/m2-music-bands-debug-gpu.xml": "73bbd928307b2a0741f12b00388e096cb464cdd33c72260da5cdfacadbc4ad32",
+    "Documentation/Implementation/evidence/m2-music-bands-debug-tests.log": "444488213638e9fe74ff171b8b201427c1d431f5944b2e54a7c9ea4b37181bfa",
+    "Documentation/Implementation/evidence/m2-music-bands-debug-tests.xml": "4d23ce2a9fd67e12886bb5022561c97513b60a8e4b7baefd82196fcb95094fca",
+    "Documentation/Implementation/evidence/m2-music-bands-integrity.json": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+    "Documentation/Implementation/evidence/m2-music-bands-links.log": "67aeb390290a48918bf693ec325dbb7ae6ba1624faf3f35c3b031a55323fd828",
+    "Documentation/Implementation/evidence/m2-music-bands-probe.json": "b7ceae04651abe5ed0fc43f06741972bf938b069f09ddc97bf31d5ee247c18eb",
+    "Documentation/Implementation/evidence/m2-music-bands-probe.py": "ed13924ab2ac99bd1bef9d305db590273825738a84636fa763c75b40dbf30b66",
+    "Documentation/Implementation/evidence/m2-music-bands-release-build-final.log": "f612f4e831827c4972df5d497c22f44b961701122339f39da6c4a13ee367f39b",
+    "Documentation/Implementation/evidence/m2-music-bands-release-gpu.log": "4b61831884ab7e5113c9c75a3d22d742dd3fc33ee76406f4490fad7f9fc060db",
+    "Documentation/Implementation/evidence/m2-music-bands-release-gpu.xml": "708814bc0c6e5fd924ae261893b9363f1eb0c11403f10bf870b408543aba6942",
+    "Documentation/Implementation/evidence/m2-music-bands-release-tests.log": "3993e2a5ff6472335e33fada13b56d8c0c31607854d3c9ada45999d197679c19",
+    "Documentation/Implementation/evidence/m2-music-bands-release-tests.xml": "ab26c346b6a1a60413dd53c051509916554b700d7252d1bc761efc4b5f11a39d",
+    "Documentation/Implementation/evidence/m2-music-bands-sanitize-build-final.log": "6173dc6b28eead6c3653b9a276027373952932bf04decb34677b287c79a451a4",
+    "Documentation/Implementation/evidence/m2-music-bands-sanitize-tests.log": "acce2fbf7c89b276642b311aef9ccdd581085475fcd8a28ebe22ad02320d4924",
+    "Documentation/Implementation/evidence/m2-music-bands-sanitize-tests.xml": "1ed5e448b156a790ad73d1db27bc768df264b85e7d174c4077e641e3cd250488",
+    "Documentation/Implementation/evidence/m2-music-bands-validation.py": "b573e6481a816d76908aef2518f83e93c5f31158f84ca916c91986e671b16286"
+  },
+  "implementation_commit": "b7c6c53976e4651d13b64f1e4d6fdbd9a23dfae6"
+}

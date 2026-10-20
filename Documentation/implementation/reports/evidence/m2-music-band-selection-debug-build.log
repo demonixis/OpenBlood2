@@ -1,0 +1,54 @@
+[0/2] Re-checking globbed directories...
+[1/59] Scanning /home/yann/projects/lithtech/Blood2/tests/object_contract_tests.cpp for CXX dependencies
+[2/59] Scanning /home/yann/projects/lithtech/Blood2/tests/world_tests.cpp for CXX dependencies
+[3/59] Scanning /home/yann/projects/lithtech/Blood2/tests/sound_tests.cpp for CXX dependencies
+[4/59] Scanning /home/yann/projects/lithtech/Blood2/tests/audio_stream_tests.cpp for CXX dependencies
+[5/59] Scanning /home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp for CXX dependencies
+[6/59] Scanning /home/yann/projects/lithtech/Blood2/tests/ima_band_tests.cpp for CXX dependencies
+[7/59] Scanning /home/yann/projects/lithtech/Blood2/tests/ima_cursor_tests.cpp for CXX dependencies
+[8/59] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[9/59] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[10/58] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[11/58] Generating CXX dyndep file tests/CMakeFiles/sound_tests.dir/CXX.dd
+[12/58] Generating CXX dyndep file tests/CMakeFiles/audio_stream_tests.dir/CXX.dd
+[13/58] Generating CXX dyndep file tests/CMakeFiles/dls_bank_tests.dir/CXX.dd
+[14/57] Generating CXX dyndep file tests/CMakeFiles/dls_sampler_tests.dir/CXX.dd
+[15/57] Generating CXX dyndep file tests/CMakeFiles/ima_style_tests.dir/CXX.dd
+[16/56] Generating CXX dyndep file tests/CMakeFiles/ima_band_tests.dir/CXX.dd
+[17/56] Generating CXX dyndep file tests/CMakeFiles/ima_section_tests.dir/CXX.dd
+[18/55] Generating CXX dyndep file tests/CMakeFiles/ima_timeline_tests.dir/CXX.dd
+[19/54] Generating CXX dyndep file tests/CMakeFiles/ima_variation_tests.dir/CXX.dd
+[20/53] Generating CXX dyndep file tests/CMakeFiles/ima_note_event_tests.dir/CXX.dd
+[21/52] Generating CXX dyndep file tests/CMakeFiles/ima_note_pitch_tests.dir/CXX.dd
+[22/51] Generating CXX dyndep file tests/CMakeFiles/ima_harmony_tests.dir/CXX.dd
+[23/50] Generating CXX dyndep file tests/CMakeFiles/ima_selection_tests.dir/CXX.dd
+[24/49] Generating CXX dyndep file tests/CMakeFiles/ima_cursor_tests.dir/CXX.dd
+[25/49] Building CXX object tests/CMakeFiles/object_contract_tests.dir/object_contract_tests.cpp.o
+[26/49] Building CXX object tests/CMakeFiles/world_tests.dir/world_tests.cpp.o
+[27/49] Building CXX object tests/CMakeFiles/sound_tests.dir/sound_tests.cpp.o
+[28/49] Building CXX object tests/CMakeFiles/audio_stream_tests.dir/audio_stream_tests.cpp.o
+[29/49] Building CXX object tests/CMakeFiles/dls_sampler_tests.dir/dls_sampler_tests.cpp.o
+[30/49] Building CXX object tests/CMakeFiles/ima_band_tests.dir/ima_band_tests.cpp.o
+[31/49] Building CXX object tests/CMakeFiles/ima_cursor_tests.dir/ima_cursor_tests.cpp.o
+[32/49] Linking CXX executable tests/object_contract_tests
+[33/49] Linking CXX executable tests/config_tests
+[34/49] Linking CXX executable tests/world_tests
+[35/49] Linking CXX executable tests/sound_tests
+[36/49] Linking CXX executable tests/audio_stream_tests
+[37/49] Linking CXX executable tests/dls_bank_tests
+[38/49] Linking CXX executable tests/dls_sampler_tests
+[39/49] Linking CXX executable tests/ima_style_tests
+[40/49] Linking CXX executable tests/ima_band_tests
+[41/49] Linking CXX executable tests/ima_section_tests
+[42/49] Linking CXX executable tests/ima_timeline_tests
+[43/49] Linking CXX executable tests/ima_variation_tests
+[44/49] Linking CXX executable tests/ima_note_event_tests
+[45/49] Linking CXX executable tests/ima_note_pitch_tests
+[46/49] Linking CXX executable tests/ima_harmony_tests
+[47/49] Linking CXX executable tests/ima_selection_tests
+[48/49] Linking CXX executable tests/ima_cursor_tests
+[0/2] Re-checking globbed directories...
+[1/39] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_world_sounds.cpp for CXX dependencies
+[2/39] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[3/5] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_world_sounds.cpp.o
+[4/5] Linking CXX executable blood2

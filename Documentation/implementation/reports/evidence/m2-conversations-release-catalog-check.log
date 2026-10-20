@@ -1,0 +1,8 @@
+worlds/02_cityhub.dat ConversationTrigger default.wav mapped=0 decoded=0
+worlds/02_cityhubb.dat ConversationTrigger default.wav mapped=0 decoded=0
+worlds/02_cityhubc.dat ConversationTrigger default.wav mapped=0 decoded=0
+worlds/08_subwayb.dat ConversationTrigger sounds\chosen\caleb\C_e1m8_1.wav mapped=0 decoded=0
+worlds/11_slaughter_house.dat ConversationTrigger sounds\chosen\caleb\e1m2c3.wav mapped=0 decoded=0
+worlds/11_slaughter_house.dat ConversationTrigger sounds\chosen\caleb\e1m2c6.wav mapped=0 decoded=0
+worlds/17_entrance.dat ConversationTrigger default.wav mapped=0 decoded=0
+Conversation catalog worlds=57 entries=7 rejected=0 cues=7 mapped=0 decoded=0

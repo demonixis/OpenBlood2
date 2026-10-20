@@ -1,0 +1,14 @@
+508/512 Testing: inventory_state.roundtrip
+508/512 Test: inventory_state.roundtrip
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/inventory_state_tests" "roundtrip" "/home/yann/projects/lithtech/Blood2/build/release/tests/inventory-state-fixtures/roundtrip"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"inventory_state.roundtrip" start time: Oct 16 17:47 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"inventory_state.roundtrip" end time: Oct 16 17:47 CEST
+"inventory_state.roundtrip" time elapsed: 00:00:00
+----------------------------------------------------------

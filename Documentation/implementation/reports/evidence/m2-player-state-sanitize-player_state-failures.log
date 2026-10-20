@@ -1,0 +1,14 @@
+495/497 Testing: player_state.failures
+495/497 Test: player_state.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_state_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-state-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_state.failures" start time: Oct 16 18:33 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.failures" end time: Oct 16 18:33 CEST
+"player_state.failures" time elapsed: 00:00:00
+----------------------------------------------------------

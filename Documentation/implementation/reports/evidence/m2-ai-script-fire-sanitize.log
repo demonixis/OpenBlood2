@@ -1,0 +1,155 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 382: ai_fire.subway
+      Start 354: ai_perception.subway
+ 1/70 Test #354: ai_perception.subway .............   Passed    4.45 sec
+      Start 381: ai_fire.catalog
+ 2/70 Test #381: ai_fire.catalog ..................   Passed    0.93 sec
+      Start 423: ai_script.catalog
+ 3/70 Test #423: ai_script.catalog ................   Passed    2.89 sec
+      Start 414: ai_follow.subway
+ 4/70 Test #414: ai_follow.subway .................   Passed    4.11 sec
+      Start 353: ai_perception.catalog
+ 5/70 Test #353: ai_perception.catalog ............   Passed    0.92 sec
+      Start 326: ai_target.subway
+ 6/70 Test #382: ai_fire.subway ...................   Passed   15.09 sec
+      Start 413: ai_follow.catalog
+ 7/70 Test #413: ai_follow.catalog ................   Passed    0.93 sec
+      Start 325: ai_target.catalog
+ 8/70 Test #325: ai_target.catalog ................   Passed    0.94 sec
+      Start   1: objects.builtin_model
+ 9/70 Test   #1: objects.builtin_model ............   Passed    0.02 sec
+      Start  11: objects.unsupported_teardown
+10/70 Test  #11: objects.unsupported_teardown .....   Passed    0.05 sec
+      Start  10: objects.messages_strings
+11/70 Test  #10: objects.messages_strings .........   Passed    0.04 sec
+      Start 375: ai_fire.lifetime
+12/70 Test #375: ai_fire.lifetime .................   Passed    0.02 sec
+      Start 373: ai_fire.recovery
+13/70 Test #373: ai_fire.recovery .................   Passed    0.02 sec
+      Start  12: objects.creation_failures
+14/70 Test  #12: objects.creation_failures ........   Passed    0.03 sec
+      Start 369: ai_fire.head
+15/70 Test #369: ai_fire.head .....................   Passed    0.02 sec
+      Start 367: ai_fire.clearance
+16/70 Test #367: ai_fire.clearance ................   Passed    0.02 sec
+      Start 370: ai_fire.aim
+17/70 Test #370: ai_fire.aim ......................   Passed    0.02 sec
+      Start 372: ai_fire.cadence
+18/70 Test #372: ai_fire.cadence ..................   Passed    0.02 sec
+      Start 371: ai_fire.keys
+19/70 Test #371: ai_fire.keys .....................   Passed    0.02 sec
+      Start 374: ai_fire.failures
+20/70 Test #374: ai_fire.failures .................   Passed    0.02 sec
+      Start 366: ai_fire.selection
+21/70 Test #366: ai_fire.selection ................   Passed    0.02 sec
+      Start 368: ai_fire.filters
+22/70 Test #368: ai_fire.filters ..................   Passed    0.02 sec
+      Start 422: ai_script.audio
+23/70 Test #422: ai_script.audio ..................   Passed    0.04 sec
+      Start   4: objects.reasons_properties
+24/70 Test   #4: objects.reasons_properties .......   Passed    0.02 sec
+      Start   9: objects.links_lists
+25/70 Test   #9: objects.links_lists ..............   Passed    0.02 sec
+      Start   2: objects.original_objects
+26/70 Test   #2: objects.original_objects .........   Passed    0.02 sec
+      Start   3: objects.nested_creation
+27/70 Test   #3: objects.nested_creation ..........   Passed    0.02 sec
+      Start   6: objects.deferred_removal
+28/70 Test   #6: objects.deferred_removal .........   Passed    0.02 sec
+      Start   8: objects.handles_selection
+29/70 Test   #8: objects.handles_selection ........   Passed    0.02 sec
+      Start   7: objects.aggregate_dispatch
+30/70 Test   #7: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   5: objects.scheduling
+31/70 Test   #5: objects.scheduling ...............   Passed    0.02 sec
+      Start 421: ai_script.lifetime
+32/70 Test #421: ai_script.lifetime ...............   Passed    0.02 sec
+      Start 417: ai_script.waiting
+33/70 Test #326: ai_target.subway .................   Passed    4.23 sec
+      Start 420: ai_script.movement
+34/70 Test #417: ai_script.waiting ................   Passed    0.02 sec
+      Start 416: ai_script.sequencing
+35/70 Test #420: ai_script.movement ...............   Passed    0.02 sec
+      Start 352: ai_perception.lifetime
+36/70 Test #416: ai_script.sequencing .............   Passed    0.02 sec
+      Start 347: ai_perception.hints
+37/70 Test #352: ai_perception.lifetime ...........   Passed    0.03 sec
+      Start 344: ai_perception.factions
+38/70 Test #347: ai_perception.hints ..............   Passed    0.03 sec
+      Start 415: ai_script.parsing
+39/70 Test #344: ai_perception.factions ...........   Passed    0.02 sec
+      Start 346: ai_perception.visibility
+40/70 Test #415: ai_script.parsing ................   Passed    0.02 sec
+      Start 348: ai_perception.stimuli
+41/70 Test #346: ai_perception.visibility .........   Passed    0.02 sec
+      Start 351: ai_perception.failures
+42/70 Test #348: ai_perception.stimuli ............   Passed    0.02 sec
+      Start 349: ai_perception.retaliation
+43/70 Test #351: ai_perception.failures ...........   Passed    0.02 sec
+      Start 350: ai_perception.opportunity
+44/70 Test #349: ai_perception.retaliation ........   Passed    0.02 sec
+      Start 419: ai_script.state_target
+45/70 Test #350: ai_perception.opportunity ........   Passed    0.02 sec
+      Start 418: ai_script.animations
+46/70 Test #419: ai_script.state_target ...........   Passed    0.02 sec
+      Start 345: ai_perception.selection
+47/70 Test #418: ai_script.animations .............   Passed    0.02 sec
+      Start 412: ai_follow.physics
+48/70 Test #345: ai_perception.selection ..........   Passed    0.02 sec
+      Start 410: ai_follow.lifetime
+49/70 Test #410: ai_follow.lifetime ...............   Passed    0.03 sec
+      Start 406: ai_follow.follow
+50/70 Test #412: ai_follow.physics ................   Passed    0.04 sec
+      Start 411: ai_follow.failures
+51/70 Test #406: ai_follow.follow .................   Passed    0.02 sec
+      Start 405: ai_follow.locomotion
+52/70 Test #411: ai_follow.failures ...............   Passed    0.02 sec
+      Start 409: ai_follow.actions
+53/70 Test #405: ai_follow.locomotion .............   Passed    0.02 sec
+      Start 408: ai_follow.moveto
+54/70 Test #409: ai_follow.actions ................   Passed    0.02 sec
+      Start 404: ai_follow.velocity
+55/70 Test #408: ai_follow.moveto .................   Passed    0.02 sec
+      Start 407: ai_follow.cached
+56/70 Test #404: ai_follow.velocity ...............   Passed    0.02 sec
+      Start 324: ai_target.services
+57/70 Test #407: ai_follow.cached .................   Passed    0.02 sec
+      Start 322: ai_target.lifetime
+58/70 Test #324: ai_target.services ...............   Passed    0.02 sec
+      Start 318: ai_target.named
+59/70 Test #322: ai_target.lifetime ...............   Passed    0.02 sec
+      Start 321: ai_target.failures
+60/70 Test #318: ai_target.named ..................   Passed    0.02 sec
+      Start 323: ai_target.callbacks
+61/70 Test #321: ai_target.failures ...............   Passed    0.02 sec
+      Start 319: ai_target.cached
+62/70 Test #323: ai_target.callbacks ..............   Passed    0.02 sec
+      Start 320: ai_target.facing
+63/70 Test #319: ai_target.cached .................   Passed    0.02 sec
+      Start 376: ai_fire.script_stand
+64/70 Test #320: ai_target.facing .................   Passed    0.02 sec
+      Start 377: ai_fire.script_moving
+65/70 Test #376: ai_fire.script_stand .............   Passed    0.02 sec
+      Start 378: ai_fire.script_refusal
+66/70 Test #377: ai_fire.script_moving ............   Passed    0.02 sec
+      Start 379: ai_fire.script_lifetime
+67/70 Test #378: ai_fire.script_refusal ...........   Passed    0.02 sec
+      Start 380: ai_fire.script_routes
+68/70 Test #379: ai_fire.script_lifetime ..........   Passed    0.03 sec
+      Start 383: ai_fire.script_private
+69/70 Test #380: ai_fire.script_routes ............   Passed    0.02 sec
+70/70 Test #383: ai_fire.script_private ...........   Passed   19.35 sec
+
+100% tests passed, 0 tests failed out of 70
+
+Label Time Summary:
+ai_fire          =  35.69 sec*proc (18 tests)
+ai_follow        =   5.25 sec*proc (11 tests)
+ai_perception    =   5.56 sec*proc (11 tests)
+ai_script        =   3.08 sec*proc (9 tests)
+ai_target        =   5.30 sec*proc (9 tests)
+headless         =  55.17 sec*proc (70 tests)
+objects          =   0.29 sec*proc (12 tests)
+private          =  53.85 sec*proc (10 tests)
+
+Total Test time (real) =  37.27 sec

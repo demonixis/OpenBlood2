@@ -1,0 +1,14 @@
+501/507 Testing: exits.delayed
+501/507 Test: exits.delayed
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/exit_tests" "delayed" "/home/yann/projects/lithtech/Blood2/build/release/tests/exit-fixtures/delayed"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"exits.delayed" start time: Oct 16 17:26 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"exits.delayed" end time: Oct 16 17:26 CEST
+"exits.delayed" time elapsed: 00:00:00
+----------------------------------------------------------

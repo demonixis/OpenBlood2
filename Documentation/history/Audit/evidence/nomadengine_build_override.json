@@ -1,0 +1,16 @@
+{
+  "name": "nomadengine_build_override",
+  "command": [
+    "cmake",
+    "--build",
+    "/tmp/lithtech-audit-2bVxTF/nomadengine",
+    "--parallel",
+    "4"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:17:01.612288+00:00",
+  "elapsed_seconds": 124.042,
+  "timeout_seconds": 180,
+  "exit_code": 1,
+  "log": "nomadengine_build_override.log"
+}

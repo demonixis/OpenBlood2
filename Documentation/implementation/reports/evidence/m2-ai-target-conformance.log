@@ -1,0 +1,219 @@
+sources/blood2/ObjectDLL/AI_Mgr.cpp 05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7
+lines 145-145:
+    Metacmd				= 1;
+lines 716-722:
+		case MID_LINKBROKEN:
+		{
+			HOBJECT hObj = (HOBJECT)pData;
+			if (hObj == m_hTarget)
+			{
+				m_hTarget = DNULL;
+			}
+lines 1269-1314:
+// ----------------------------------------------------------------------- //
+
+void AI_Mgr::SetTarget(char* pTargetName)
+{
+	ObjectList*	pList = m_pServerDE->FindNamedObjects(pTargetName);
+	if (!pList) return;
+
+	ObjectLink* pLink = pList->m_pFirstLink;
+	if (pLink)
+	{
+		SetNewTarget(pLink->m_hObject);
+
+		m_pServerDE->GetObjectPos(m_hTarget, &m_vTargetPos);
+		MC_FaceTarget();
+		Metacmd--;
+	}
+
+	m_pServerDE->RelinquishList(pList);
+}
+
+// ----------------------------------------------------------------------- //
+// ROUTINE		: AI_Mgr::SetNewTarget
+// DESCRIPTION	: 
+// RETURN TYPE	: void 
+// PARAMS		: HOBJECT hNewTarget
+// ----------------------------------------------------------------------- //
+
+void AI_Mgr::SetNewTarget(HOBJECT hNewTarget)
+{
+	if (m_hTarget != hNewTarget)
+	{
+		if (m_hTarget)
+		{
+			m_pServerDE->BreakInterObjectLink(m_hObject, m_hTarget);
+		}
+
+		m_hTarget = hNewTarget;
+
+		if (m_hTarget)
+		{
+			m_pServerDE->CreateInterObjectLink(m_hObject, m_hTarget);
+		}
+	}
+}
+
+// ----------------------------------------------------------------------- //
+lines 2200-2200:
+		m_pServerDE->GetObjectPos(m_hTarget,&m_vTargetPos);
+lines 5556-5608:
+void AI_Mgr::MC_FaceTarget()
+{
+	if(m_hTarget)
+		MC_FacePos(m_vTargetPos);
+	else
+		Metacmd++;
+
+	return;
+}
+
+// ----------------------------------------------------------------------- //
+// ROUTINE		: AI_Mgr::MC_FaceTrackObj
+// DESCRIPTION	: Turn and face m_hTrackObj
+// RETURN TYPE	: void 
+// ----------------------------------------------------------------------- //
+
+void AI_Mgr::MC_FaceTrackObj()
+{
+	MC_FacePos(m_vTrackObjPos);
+
+	return;
+}
+
+// ----------------------------------------------------------------------- //
+// ROUTINE		: AI_Mgr::MC_FacePos
+// DESCRIPTION	: Turn and face vPos
+// RETURN TYPE	: void 
+// ----------------------------------------------------------------------- //
+
+void AI_Mgr::MC_FacePos(DVector vPos)
+{
+	DVector vDir;
+
+	VEC_SUB(vDir, vPos, m_MoveObj.GetPos());
+	VEC_NORM(vDir);
+
+	DFLOAT fAmount = (DFLOAT) atan2(vDir.x, vDir.z);
+	DFLOAT fAmount2 = (DFLOAT) atan2(m_MoveObj.GetForwardVector().x, m_MoveObj.GetForwardVector().z);
+    
+	DRotation rRot;
+	ROT_COPY(rRot, m_MoveObj.GetRotation());
+
+	m_pServerDE->RotateAroundAxis(&rRot, &m_MoveObj.GetUpVector(), -(fAmount2 - fAmount));
+	m_pServerDE->SetObjectRotation(m_hObject, &rRot);
+
+	Metacmd++;
+
+	return;
+}
+
+// ----------------------------------------------------------------------- //
+// ROUTINE		: AI_Mgr::MC_BestWeapon
+// DESCRIPTION	: Choose best weapon for attacking
+sources/blood2/ObjectDLL/AI_Mgr.h fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350
+lines 353-430:
+	void			ProceedToAttach()							{ m_bProceedAttach = DTRUE; }
+
+	void			SetCacheDirectory(char* sDir);
+	void			CacheSoundFileRange(char* sBase, int nFirst, int nLast);
+	void			CacheSoundFile(char* sBase);
+
+	HOBJECT			GetTarget()									{ return m_hTarget; }
+protected :
+
+	DDWORD			EngineMessageFn(DDWORD messageID, void *pData, DFLOAT lData);
+	DDWORD			ObjectMessageFn(HOBJECT hSender, DDWORD messageID, HMESSAGEREAD hRead);
+					
+	DBOOL			ReadProp(ObjectCreateStruct *pStruct);
+	void			OnStringKey(ArgList* pArgList);
+	DBOOL			HandleTrigger( HOBJECT hSender, HMESSAGEREAD hRead );
+	virtual DBOOL	HandleDamage();
+	void			HandleTouch(HOBJECT hObj);
+
+	virtual	void	SetNewState(int nState);
+    DBOOL			SetAnimation(DDWORD nAni);
+
+	void			StopVelocity()
+					{
+						DVector vVel;
+						m_pServerDE->GetVelocity(m_hObject, &vVel);
+						vVel.x = vVel.z = 0.0f;
+						Move(vVel, MATH_EPSILON);
+					}
+
+	//Scripting functions
+    void			PlayAnimation(char* pAniName);
+    void			SetTarget(char* pTargetName);
+    void			SetNewTarget(HOBJECT hNewTarget);
+    // Scripting Stuff
+    void			UpdateScriptCommand();
+    void			SetSetMovementCmd();
+    void			SetFollowPathCmd();
+    void			UpdateFollowPathCmd();
+    void			SetMoveToObjectCmd();
+    void			UpdateMoveToObjectCmd();
+    void			SetPlaysoundCmd();
+    void			SetSetStateCmd();
+    void			SetTargetCmd();
+    void			SetWaitCmd();
+    void			UpdateWaitCmd();
+    void			SetPlayAnimationCmd(DBOOL bLooping = DFALSE);
+    void			UpdatePlayAnimationCmd();
+    // Utility stuff
+    void			FacePos(DVector vTargetPos);
+    void			FaceObject(HOBJECT hObj);
+
+	void			InsertMe();
+               
+  	virtual void	InitialUpdate(int nData);
+	virtual	DBOOL	AI_Update();
+
+	//State computations
+	int				ComputeStimuli();
+	DFLOAT			ComputeThreat();
+	virtual void	ComputeState(int nStimType = -1)		{ }
+
+	DBOOL			ChooseOpportunityTarget();
+
+	//Helper functions
+	DBOOL			CheckObstructed(DVector vDir, DFLOAT fSpeed);
+	int				CalculateObstruction(IntersectInfo* IInfo = DNULL);
+	DFLOAT			CalculateTurn(IntersectInfo* IInfo = DNULL);
+	DBOOL			NavigateObstacle();
+	HOBJECT			FindObjectInRadius(HCLASS hObjectTest, DFLOAT fRange, DDWORD dwFlags = 0);
+	DBOOL			CanSee( HOBJECT hTarget );
+	DBOOL			Move(DVector &vDir, DFLOAT fSpeed);
+	DBOOL			Jump(DFLOAT m_fYSpeed, DFLOAT m_fZSpeed);
+	virtual DBOOL	Fire(DBOOL bAltFire = DFALSE);
+	DBOOL			CheckClearShot(DVector &vPos, DRotation &rRot, DBOOL bAltFire, DDWORD dwFlags = 0);
+	DBOOL			IsClearXZ(DVector vDir, DFLOAT fDist);
+	int				CalculateDodge(DVector vPos);
+	DBOOL			IsLedge(DVector vDir);
+	DBOOL			CreateBloodSpurt(int nNodeHit);
+sources/lithtech/runtime/shared/src/mathlt_impl.cpp d629bcbede04219aa9d9486491aa37f2233ba714b674517a6cc9d6c57a874564
+lines 114-121:
+
+LTRESULT CLTMath::EulerRotateY(LTRotation &rRot, float amount)
+{
+    LTVector vecs[3];
+
+    gr_GetRotationVectors(&rRot, &vecs[0], &vecs[1], &vecs[2]);
+    return RotateAroundAxis(rRot, vecs[1], amount);
+}
+lines 131-144:
+LTRESULT CLTMath::RotateAroundAxis(LTRotation &rRot, LTVector &vAxis, float amount)
+{
+    LTMatrix rotation, mat;
+
+    // Get the quaternion.
+    RotationToMatrix(&rRot, &mat);
+
+    // Setup a rotation matrix and apply it.
+    gr_SetupRotationAroundVector(&rotation, vAxis, amount);
+    mat = rotation * mat;
+    
+    MatrixToRotation(&mat, &rRot);
+    return LT_OK;
+}

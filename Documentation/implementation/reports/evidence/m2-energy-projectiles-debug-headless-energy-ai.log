@@ -1,0 +1,14 @@
+644/647 Testing: energy.ai
+644/647 Test: energy.ai
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/energy_tests" "ai" "/home/yann/projects/lithtech/Blood2/build/debug/tests/energy-ai"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"energy.ai" start time: Oct 17 01:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"energy.ai" end time: Oct 17 01:23 CEST
+"energy.ai" time elapsed: 00:00:00
+----------------------------------------------------------

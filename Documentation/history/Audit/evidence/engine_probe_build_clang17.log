@@ -1,0 +1,41 @@
+In file included from OpenBlood2/OpenLithTech/src/core/engine.cpp:15:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/spdlog.h:12:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/common.h:50:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/fmt.h:27:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:3321:
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:4168:27: warning: identifier '_a' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 4168 | constexpr auto operator"" _a(const char* s, size_t) -> detail::udl_arg<char> {
+      |                ~~~~~~~~~~~^~
+      |                operator""_a
+1 warning generated.
+In file included from OpenBlood2/OpenLithTech/src/core/class_manager.cpp:17:
+In file included from OpenBlood2/OpenLithTech/include/lithtech/logging.h:13:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/spdlog.h:12:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/common.h:50:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/fmt.h:27:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:3321:
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:4168:27: warning: identifier '_a' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 4168 | constexpr auto operator"" _a(const char* s, size_t) -> detail::udl_arg<char> {
+      |                ~~~~~~~~~~~^~
+      |                operator""_a
+OpenBlood2/OpenLithTech/src/core/class_manager.cpp:244:41: warning: format specifies type 'unsigned long' but the argument has type 'DDWORD' (aka 'unsigned int') [-Wformat]
+  243 |         fprintf(stderr, "[ClassManager::CallObjectMessageFn] hClass=%p pObject=%p messageID=%lu\n",
+      |                                                                                             ~~~
+      |                                                                                             %u
+  244 |                 (void*)hClass, pObject, messageID);
+      |                                         ^~~~~~~~~
+OpenBlood2/OpenLithTech/src/core/class_manager.cpp:265:87: warning: format specifies type 'unsigned long' but the argument has type 'DDWORD' (aka 'unsigned int') [-Wformat]
+  265 |                 fprintf(stderr, "[ClassManager::CallObjectMessageFn] Returned %lu\n", result);
+      |                                                                               ~~~     ^~~~~~
+      |                                                                               %u
+3 warnings generated.
+In file included from OpenBlood2/OpenLithTech/src/core/baseclass.cpp:14:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/spdlog.h:12:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/common.h:50:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/fmt.h:27:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:3321:
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:4168:27: warning: identifier '_a' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 4168 | constexpr auto operator"" _a(const char* s, size_t) -> detail::udl_arg<char> {
+      |                ~~~~~~~~~~~^~
+      |                operator""_a
+1 warning generated.

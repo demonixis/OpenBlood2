@@ -1,0 +1,20 @@
+458/458 Testing: ai_escape.catalog
+458/458 Test: ai_escape.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_escape.catalog" start time: Oct 16 14:25 CEST
+Output:
+----------------------------------------------------------
+m_cultist1 TAUNT[6]=47 available=1 duration=5000
+f_cultist1 TAUNT[6]=47 available=1 duration=5000
+m_civilian1 TAUNT[6]=5 available=1 duration=5000
+f_civilian1 TAUNT[6]=5 available=1 duration=4067
+labtech TAUNT[6]=5 available=1 duration=5000
+gideon TAUNT[6]=4294967295 available=0 duration=0
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.catalog" end time: Oct 16 14:25 CEST
+"ai_escape.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

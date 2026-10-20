@@ -1,0 +1,14 @@
+585/591 Testing: explosion_flames.zones
+585/591 Test: explosion_flames.zones
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_flame_tests" "zones" "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-flames-zones"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"explosion_flames.zones" start time: Oct 16 22:02 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_flames.zones" end time: Oct 16 22:02 CEST
+"explosion_flames.zones" time elapsed: 00:00:00
+----------------------------------------------------------

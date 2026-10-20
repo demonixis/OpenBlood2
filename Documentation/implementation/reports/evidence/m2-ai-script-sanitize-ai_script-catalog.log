@@ -1,0 +1,56 @@
+395/395 Testing: ai_script.catalog
+395/395 Test: ai_script.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_script_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_script.catalog" start time: Oct 16 13:16 CEST
+Output:
+----------------------------------------------------------
+Key.MessageName parsed=1 commands=2 error=
+Trigger.MessageName7 parsed=1 commands=2 error=
+Trigger.MessageName1 parsed=1 commands=3 error=
+Trigger.MessageName2 parsed=1 commands=3 error=
+Trigger.MessageName3 parsed=1 commands=1 error=
+Trigger.MessageName4 parsed=1 commands=1 error=
+SubwayA authored scripts=6 rejected=0 parsed instructions=12
+m_cultist1 clip=idle1 completed=1
+f_cultist1 clip=idle1 completed=1
+m_civilian1 clip=idle1 completed=1
+f_civilian1 clip=idle1 completed=1
+labtech clip=idle1 completed=1
+gideon clip=run_knife1 completed=1
+<end of output>
+Test time =   2.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.catalog" end time: Oct 16 13:17 CEST
+"ai_script.catalog" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 16 13:17 CEST
+
+ai_follow =   3.58 sec*proc
+
+ai_navigation =   2.96 sec*proc
+
+ai_script =   2.19 sec*proc
+
+ai_state =  25.91 sec*proc
+
+ai_target =   3.61 sec*proc
+
+ai_trigger =   2.57 sec*proc
+
+character_motion =   1.12 sec*proc
+
+headless =  61.40 sec*proc
+
+objects =   0.22 sec*proc
+
+paths =   3.92 sec*proc
+
+player =   7.70 sec*proc
+
+private =  58.00 sec*proc
+
+services =   7.63 sec*proc
+

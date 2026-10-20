@@ -1,0 +1,14 @@
+275/618 Testing: ai_keys.priority
+275/618 Test: ai_keys.priority
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_model_key_tests" "priority" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-key-fixtures/priority"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_keys.priority" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"ai_keys.priority" end time: Oct 17 02:23 CEST
+"ai_keys.priority" time elapsed: 00:00:00
+----------------------------------------------------------

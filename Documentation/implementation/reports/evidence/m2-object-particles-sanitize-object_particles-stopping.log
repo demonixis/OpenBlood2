@@ -1,0 +1,14 @@
+542/545 Testing: object_particles.stopping
+542/545 Test: object_particles.stopping
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_particle_tests" "stopping" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object-particles-stopping"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"object_particles.stopping" start time: Oct 16 21:44 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"object_particles.stopping" end time: Oct 16 21:44 CEST
+"object_particles.stopping" time elapsed: 00:00:00
+----------------------------------------------------------

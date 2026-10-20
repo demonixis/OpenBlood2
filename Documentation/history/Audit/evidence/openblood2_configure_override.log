@@ -1,0 +1,390 @@
+-- ========================================
+-- OpenBlood2 Build Configuration
+-- ========================================
+-- Build Type: Debug
+-- C++ Standard: 17
+-- System: Linux
+-- Compiler: GNU
+-- ========================================
+-- Fetching dependencies...
+-- dynamic libasound -> libasound.so.2
+-- dynamic libjack -> libjack.so.0
+-- dynamic libpipewire-0.3 -> libpipewire-0.3.so.0
+-- dynamic libpulse -> libpulse.so.0
+-- Checking for module 'sndio'
+--   Package 'sndio' not found
+-- dynamic libX11 -> libX11.so.6
+-- dynamic libXext -> libXext.so.6
+-- dynamic libXcursor -> libXcursor.so.1
+-- dynamic libXi -> libXi.so.6
+-- dynamic libXfixes -> libXfixes.so.3
+-- dynamic libXrandr -> libXrandr.so.2
+-- dynamic libXrender -> libXrender.so.1
+-- dynamic libXss -> libXss.so.1
+-- dynamic libXtst -> libXtst.so.6
+-- dynamic libfribidi -> libfribidi.so.0
+-- dynamic libthai -> libthai.so.0
+-- dynamic libdrm -> libdrm.so.2
+-- dynamic libgbm -> libgbm.so.1
+-- dynamic libwayland-client -> libwayland-client.so.0
+-- dynamic libwayland-egl -> libwayland-egl.so.1
+-- dynamic libwayland-cursor -> libwayland-cursor.so.0
+-- dynamic libxkbcommon -> libxkbcommon.so.0
+-- dynamic libdecor-0 -> libdecor-0.so.0
+-- dynamic libudev -> libudev.so.1
+-- Checking for one of the modules 'liburing-ffi'
+-- Checking for modules 'libunwind;libunwind-generic'
+--   Package 'libunwind' not found
+--   Package 'libunwind-generic' not found
+-- 
+-- SDL3 was configured with the following options:
+-- 
+-- Platform: Linux-7.2.10-200.fc44.x86_64
+-- 64-bit:   TRUE
+-- Compiler: /usr/bin/cc
+-- Revision: SDL-3.5.0-HEAD-HASH-NOTFOUND
+-- Vendor:   
+-- 
+-- Subsystems:
+--   Audio:        ON
+--   Video:        ON
+--   GPU:          ON
+--   Render:       ON
+--   Camera:       ON
+--   Joystick:     ON
+--   Haptic:       ON
+--   Hidapi:       ON
+--   Power:        ON
+--   Sensor:       ON
+--   Dialog:       ON
+--   Tray:         ON
+--   Notification: ON
+-- 
+-- Options:
+--   SDL_ALSA                    (Wanted: ON): ON
+--   SDL_ALSA_SHARED             (Wanted: ON): ON
+--   SDL_ALTIVEC                 (Wanted: OFF): OFF
+--   SDL_ARMNEON                 (Wanted: OFF): OFF
+--   SDL_ARMSVE2                 (Wanted: OFF): OFF
+--   SDL_ASAN                    (Wanted: OFF): OFF
+--   SDL_ASSEMBLY                (Wanted: ON): ON
+--   SDL_ASSERTIONS              (Wanted: auto): auto
+--   SDL_AVX                     (Wanted: ON): ON
+--   SDL_AVX2                    (Wanted: ON): ON
+--   SDL_AVX512F                 (Wanted: ON): ON
+--   SDL_BACKGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_CCACHE                  (Wanted: OFF): OFF
+--   SDL_CLANG_TIDY              (Wanted: OFF): OFF
+--   SDL_CLOCK_GETTIME           (Wanted: ON): ON
+--   SDL_COCOA                   (Wanted: OFF): OFF
+--   SDL_DBUS                    (Wanted: ON): ON
+--   SDL_DEPS_SHARED             (Wanted: ON): OFF
+--   SDL_DIRECTX                 (Wanted: OFF): OFF
+--   SDL_DISKAUDIO               (Wanted: ON): ON
+--   SDL_DLOPEN_NOTES            (Wanted: ON): ON
+--   SDL_DUMMYAUDIO              (Wanted: ON): ON
+--   SDL_DUMMYCAMERA             (Wanted: ON): ON
+--   SDL_DUMMYVIDEO              (Wanted: ON): ON
+--   SDL_EXAMPLES                (Wanted: OFF): OFF
+--   SDL_EXAMPLES_LINK_SHARED    (Wanted: OFF): OFF
+--   SDL_FOREGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_FRIBIDI                 (Wanted: ON): ON
+--   SDL_FRIBIDI_SHARED          (Wanted: ON): ON
+--   SDL_GCC_ATOMICS             (Wanted: ON): ON
+--   SDL_GPU_OPENXR              (Wanted: ON): ON
+--   SDL_HIDAPI                  (Wanted: ON): ON
+--   SDL_HIDAPI_JOYSTICK         (Wanted: ON): ON
+--   SDL_HIDAPI_LIBUSB           (Wanted: ON): ON
+--   SDL_HIDAPI_LIBUSB_SHARED    (Wanted: ON): ON
+--   SDL_IBUS                    (Wanted: ON): ON
+--   SDL_INSTALL                 (Wanted: OFF): OFF
+--   SDL_INSTALL_TESTS           (Wanted: OFF): OFF
+--   SDL_JACK                    (Wanted: ON): ON
+--   SDL_JACK_SHARED             (Wanted: ON): ON
+--   SDL_KMSDRM                  (Wanted: ON): ON
+--   SDL_KMSDRM_SHARED           (Wanted: ON): ON
+--   SDL_LASX                    (Wanted: OFF): OFF
+--   SDL_LEAN_AND_MEAN           (Wanted: OFF): OFF
+--   SDL_LIBC                    (Wanted: ON): ON
+--   SDL_LIBICONV                (Wanted: OFF): OFF
+--   SDL_LIBTHAI                 (Wanted: ON): ON
+--   SDL_LIBTHAI_SHARED          (Wanted: ON): ON
+--   SDL_LIBUDEV                 (Wanted: ON): ON
+--   SDL_LIBUDEV_SHARED          (Wanted: ON): ON
+--   SDL_LIBURING                (Wanted: ON): OFF
+--   SDL_LSX                     (Wanted: OFF): OFF
+--   SDL_METAL                   (Wanted: OFF): OFF
+--   SDL_MMX                     (Wanted: ON): ON
+--   SDL_OFFSCREEN               (Wanted: ON): ON
+--   SDL_OPENGL                  (Wanted: ON): ON
+--   SDL_OPENGLES                (Wanted: ON): ON
+--   SDL_OPENVR                  (Wanted: OFF): OFF
+--   SDL_OSS                     (Wanted: OFF): OFF
+--   SDL_PIPEWIRE                (Wanted: ON): ON
+--   SDL_PIPEWIRE_SHARED         (Wanted: ON): ON
+--   SDL_PTHREADS                (Wanted: ON): ON
+--   SDL_PTHREADS_SEM            (Wanted: ON): ON
+--   SDL_PULSEAUDIO              (Wanted: ON): ON
+--   SDL_PULSEAUDIO_SHARED       (Wanted: ON): ON
+--   SDL_RENDER_D3D              (Wanted: OFF): OFF
+--   SDL_RENDER_D3D11            (Wanted: OFF): OFF
+--   SDL_RENDER_D3D12            (Wanted: OFF): OFF
+--   SDL_RENDER_GPU              (Wanted: ON): ON
+--   SDL_RENDER_METAL            (Wanted: OFF): OFF
+--   SDL_RENDER_VULKAN           (Wanted: ON): ON
+--   SDL_ROCKCHIP                (Wanted: OFF): OFF
+--   SDL_RPATH                   (Wanted: ON): OFF
+--   SDL_RPI                     (Wanted: OFF): OFF
+--   SDL_SNDIO                   (Wanted: ON): OFF
+--   SDL_SNDIO_SHARED            (Wanted: ON): OFF
+--   SDL_SSE                     (Wanted: ON): ON
+--   SDL_SSE2                    (Wanted: ON): ON
+--   SDL_SSE3                    (Wanted: ON): ON
+--   SDL_SSE4_1                  (Wanted: ON): ON
+--   SDL_SSE4_2                  (Wanted: ON): ON
+--   SDL_SYSTEM_ICONV            (Wanted: ON): ON
+--   SDL_TESTS                   (Wanted: OFF): OFF
+--   SDL_TESTS_LINK_SHARED       (Wanted: OFF): OFF
+--   SDL_UNINSTALL               (Wanted: OFF): OFF
+--   SDL_VIRTUAL_JOYSTICK        (Wanted: ON): ON
+--   SDL_VIVANTE                 (Wanted: OFF): OFF
+--   SDL_VULKAN                  (Wanted: ON): ON
+--   SDL_WASAPI                  (Wanted: OFF): OFF
+--   SDL_WAYLAND                 (Wanted: ON): ON
+--   SDL_WAYLAND_LIBDECOR        (Wanted: ON): ON
+--   SDL_WAYLAND_LIBDECOR_SHARED (Wanted: ON): ON
+--   SDL_WAYLAND_SHARED          (Wanted: ON): ON
+--   SDL_X11                     (Wanted: ON): ON
+--   SDL_X11_SHARED              (Wanted: ON): ON
+--   SDL_X11_XCURSOR             (Wanted: ON): ON
+--   SDL_X11_XDBE                (Wanted: ON): ON
+--   SDL_X11_XFIXES              (Wanted: ON): ON
+--   SDL_X11_XINPUT              (Wanted: ON): ON
+--   SDL_X11_XRANDR              (Wanted: ON): ON
+--   SDL_X11_XSCRNSAVER          (Wanted: OFF): OFF
+--   SDL_X11_XSHAPE              (Wanted: ON): ON
+--   SDL_X11_XSYNC               (Wanted: ON): ON
+--   SDL_X11_XTEST               (Wanted: OFF): OFF
+--   SDL_XINPUT                  (Wanted: OFF): OFF
+-- 
+--  Build Shared Library: OFF
+--  Build Static Library: ON
+-- 
+-- Enabled backends:
+--   Video drivers: dummy kmsdrm(dynamic) offscreen wayland(dynamic) x11(dynamic)
+--   X11 libraries: xcursor xdbe xfixes xinput2 xrandr xshape xsync
+--   Render drivers: gpu ogl ogl_es ogl_es2 vulkan
+--   GPU drivers: openxr vulkan
+--   Audio drivers: alsa(dynamic) disk dummy jack(dynamic) pipewire(dynamic) pulseaudio(dynamic)
+--   Joystick drivers: hidapi linux virtual
+--   Camera drivers: dummy pipewire(dynamic) v4l2
+-- 
+-- If something was not detected, although the libraries
+-- were installed, then make sure you have set the
+-- CMAKE_C_FLAGS and CMAKE_PREFIX_PATH CMake variables correctly.
+-- 
+-- Configuring SDL3_mixer 3.3.0
+-- Using vendored libogg
+-- Configuring libogg 1.3.5
+-- Using vendored opus
+-- Opus package version from git repo: 1.4-15-gac9f053e
+-- Opus project version: 1.4
+-- Performing Test VLA_SUPPORTED -- success
+-- Performing Test CPU_INFO_BY_ASM_SUPPORTED -- success
+-- Performing Test CPU_INFO_BY_C_SUPPORTED -- success
+-- Check SIMD support by compiler
+-- The following features have been enabled:
+
+ * OPUS_BUILD_SHARED_LIBRARY, build shared library.
+ * OPUS_ENABLE_FLOAT_API, compile with the floating point API (for machines with float library).
+ * OPUS_HARDENING, run-time checks that are cheap and safe for use in production.
+ * OPUS_INSTALL_PKG_CONFIG_MODULE, install pkg-config module.
+ * OPUS_INSTALL_CMAKE_CONFIG_MODULE, install CMake package config module.
+ * OPUS_VAR_ARRAYS, use variable length arrays for stack arrays.
+ * OPUS_STACK_PROTECTOR, use stack protection.
+ * OPUS_FORTIFY_SOURCE, add protection against buffer overflows.
+ * OPUS_X86_MAY_HAVE_SSE, does runtime check for SSE1 support.
+ * OPUS_X86_MAY_HAVE_SSE2, does runtime check for SSE2 support.
+ * OPUS_X86_MAY_HAVE_SSE4_1, does runtime check for SSE4.1 support.
+ * OPUS_X86_MAY_HAVE_AVX, does runtime check for AVX support.
+ * OPUS_X86_PRESUME_SSE, assume target CPU has SSE1 support (override runtime check).
+ * OPUS_X86_PRESUME_SSE2, assume target CPU has SSE2 support (override runtime check).
+
+-- The following OPTIONAL packages have been found:
+
+ * ALSA
+ * X11
+ * OpenGL
+ * LibUSB
+ * Git
+
+-- The following features have been disabled:
+
+ * OPUS_BUILD_TESTING, build tests.
+ * OPUS_CUSTOM_MODES, enable non-Opus modes, e.g. 44.1 kHz & 2^n frames.
+ * OPUS_BUILD_PROGRAMS, build programs.
+ * OPUS_DISABLE_INTRINSICS, disable all intrinsics optimizations.
+ * OPUS_FIXED_POINT, compile as fixed-point (for machines without a fast enough FPU).
+ * OPUS_FLOAT_APPROX, enable floating point approximations (Ensure your platform supports IEEE 754 before enabling).
+ * OPUS_ASSERTIONS, additional software error checking.
+ * OPUS_FUZZING, causes the encoder to make random decisions (do not use in production).
+ * OPUS_CHECK_ASM, enable bit-exactness checks between optimized and c implementations.
+ * OPUS_FIXED_POINT_DEBUG, debug fixed-point implementation.
+ * OPUS_USE_ALLOCA, use alloca for stack arrays (on non-C99 compilers).
+ * OPUS_NONTHREADSAFE_PSEUDOSTACK, use a non threadsafe pseudostack when neither variable length arrays or alloca is supported.
+ * OPUS_FAST_MATH, enable fast math (unsupported and discouraged use, as code is not well tested with this build option).
+ * OPUS_X86_PRESUME_SSE4_1, assume target CPU has SSE4.1 support (override runtime check).
+ * OPUS_X86_PRESUME_AVX, assume target CPU has AVX support (override runtime check).
+
+-- Using vendored opusfile
+-- Opus package version from git repo: 0.12-73-g9e5322c
+-- Opus project version: 0.12
+-- Dynamic opus (opusfile): $<TARGET_SONAME_FILE_NAME:opusfile>
+-- Using vendored libgme
+-- VGM/GYM: Nuked OPN2 emulator will be used
+-- Zlib-Compressed formats excluded
+-- Dynamic libgme: $<TARGET_SONAME_FILE_NAME:gme_shared>
+-- Using vendored libxmp
+-- Check for working linker: /usr/bin/ld
+-- Linker identification: GNU ld version 2.46.1-1.fc44
+-- Versioned symbols: ENABLED.
+-- Manpage generation disabled: rst2man not found
+-- HTML doc generation disabled: rst2html not found
+-- PDF doc generation disabled: rst2pdf not found
+-- Dynamic libxmp: $<TARGET_SONAME_FILE_NAME:xmp_shared>
+-- Using vendored WavPack
+-- The following features have been enabled:
+
+ * OPUS_BUILD_SHARED_LIBRARY, build shared library.
+ * OPUS_ENABLE_FLOAT_API, compile with the floating point API (for machines with float library).
+ * OPUS_HARDENING, run-time checks that are cheap and safe for use in production.
+ * OPUS_INSTALL_PKG_CONFIG_MODULE, install pkg-config module.
+ * OPUS_INSTALL_CMAKE_CONFIG_MODULE, install CMake package config module.
+ * OPUS_VAR_ARRAYS, use variable length arrays for stack arrays.
+ * OPUS_STACK_PROTECTOR, use stack protection.
+ * OPUS_FORTIFY_SOURCE, add protection against buffer overflows.
+ * OPUS_X86_MAY_HAVE_SSE, does runtime check for SSE1 support.
+ * OPUS_X86_MAY_HAVE_SSE2, does runtime check for SSE2 support.
+ * OPUS_X86_MAY_HAVE_SSE4_1, does runtime check for SSE4.1 support.
+ * OPUS_X86_MAY_HAVE_AVX, does runtime check for AVX support.
+ * OPUS_X86_PRESUME_SSE, assume target CPU has SSE1 support (override runtime check).
+ * OPUS_X86_PRESUME_SSE2, assume target CPU has SSE2 support (override runtime check).
+ * BUILD_SHARED_LIBS, Build shared library.
+ * WAVPACK_ENABLE_DSD, Enable support for WavPack DSD files.
+ * WAVPACK_ENABLE_ASM, Enable assembly optimizations.
+
+-- The following OPTIONAL packages have been found:
+
+ * ALSA
+ * X11
+ * OpenGL
+ * LibUSB
+ * Threads, Threads library
+   Required to build tests, optional for library.
+
+-- The following REQUIRED packages have been found:
+
+ * Git, fast, scalable, distributed revision control system, <https://git-scm.com/>
+   required to set up package version
+
+-- The following features have been disabled:
+
+ * OPUS_BUILD_TESTING, build tests.
+ * OPUS_CUSTOM_MODES, enable non-Opus modes, e.g. 44.1 kHz & 2^n frames.
+ * OPUS_BUILD_PROGRAMS, build programs.
+ * OPUS_DISABLE_INTRINSICS, disable all intrinsics optimizations.
+ * OPUS_FIXED_POINT, compile as fixed-point (for machines without a fast enough FPU).
+ * OPUS_FLOAT_APPROX, enable floating point approximations (Ensure your platform supports IEEE 754 before enabling).
+ * OPUS_ASSERTIONS, additional software error checking.
+ * OPUS_FUZZING, causes the encoder to make random decisions (do not use in production).
+ * OPUS_CHECK_ASM, enable bit-exactness checks between optimized and c implementations.
+ * OPUS_FIXED_POINT_DEBUG, debug fixed-point implementation.
+ * OPUS_USE_ALLOCA, use alloca for stack arrays (on non-C99 compilers).
+ * OPUS_NONTHREADSAFE_PSEUDOSTACK, use a non threadsafe pseudostack when neither variable length arrays or alloca is supported.
+ * OPUS_FAST_MATH, enable fast math (unsupported and discouraged use, as code is not well tested with this build option).
+ * OPUS_X86_PRESUME_SSE4_1, assume target CPU has SSE4.1 support (override runtime check).
+ * OPUS_X86_PRESUME_AVX, assume target CPU has AVX support (override runtime check).
+ * BUILD_TESTING, Build tests.
+ * WAVPACK_ENABLE_LEGACY, Decode legacy (< 4.0) WavPack files.
+ * WAVPACK_ENABLE_THREADS, Enable support for threading in libwavpack.
+ * WAVPACK_INSTALL_CMAKE_MODULE, Generate and install CMake package configuration module.
+ * WAVPACK_BUILD_PROGRAMS, Build programs.
+ * WAVPACK_BUILD_COOLEDIT_PLUGIN, Build CoolEdit plugin.
+ * WAVPACK_BUILD_WINAMP_PLUGIN, Build WinAmp plugin.
+ * WAVPACK_INSTALL_DOCS, Install documentation.
+ * WAVPACK_INSTALL_PKGCONFIG_MODULE, Generate and install wavpack.pc.
+
+-- Dynamic WavPack: $<TARGET_SONAME_FILE_NAME:wavpack>
+-- SDL3_mixer backends:
+-- - enabled:  opus vorbis_stb flac_drflac gme mod_xmp mp3_drmp3 midi_timidity wave aiff voc au wavpack
+-- - disabled: vorbis_tremor vorbis_vorbisfile flac_libflac mp3_mpg123 midi_fluidsynth
+CMake Deprecation Warning at /tmp/lithtech-audit-2bVxTF/openblood2/_deps/glm-src/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+CMake Deprecation Warning at /tmp/lithtech-audit-2bVxTF/openblood2/_deps/glm-src/CMakeLists.txt:2 (cmake_policy):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- GLM: Version 1.0.1
+-- GLM: Build with C++17 features
+-- Using the multi-header code from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/nlohmann_json-src/include/
+CMake Warning (dev) at /usr/share/cmake/Modules/FetchContent.cmake:1966 (message):
+  Calling FetchContent_Populate(imgui) is deprecated, call
+  FetchContent_MakeAvailable(imgui) instead.  Policy CMP0169 can be set to
+  OLD to allow FetchContent_Populate(imgui) to be called directly for now,
+  but the ability to call it with declared details will be removed completely
+  in a future version.
+Call Stack (most recent call first):
+  CMakeLists.txt:125 (FetchContent_Populate)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at /usr/share/cmake/Modules/FetchContent.cmake:1966 (message):
+  Calling FetchContent_Populate(imguizmo) is deprecated, call
+  FetchContent_MakeAvailable(imguizmo) instead.  Policy CMP0169 can be set to
+  OLD to allow FetchContent_Populate(imguizmo) to be called directly for now,
+  but the ability to call it with declared details will be removed completely
+  in a future version.
+Call Stack (most recent call first):
+  CMakeLists.txt:131 (FetchContent_Populate)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- SDL3 configured successfully
+-- SDL3_mixer configured successfully
+-- GLM configured successfully
+-- ImGui downloaded successfully
+-- GLAD configured successfully
+-- spdlog not found, fetching from GitHub...
+-- Build spdlog: 1.12.0
+-- Build type: Debug
+-- VR support disabled by user
+-- OpenLithTech configuration:
+--   C++ Standard: 20
+--   Build Type: Debug
+-- Blood2 game code will be built
+-- Blood2 configuration:
+--   Client sources:  files
+--   Object sources:  files
+--   Total sources: /home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/BaseLineSystemFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/BaseParticleSystemFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/BloodClientShell.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/BloodSplatFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/BloodTrailFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/BloodTrailSegmentFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/CastLineFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ClientUtilities.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/CommLink.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/Credits.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ExplosionFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/FlashlightFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/FragInfo.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/GameStates.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/GameWeapons.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/IKChainFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/LaserBeamFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/LaserFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/LightFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/LightningFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/LightningSegmentFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/LoadScreenData.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MainMenus.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MarkSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/Menu.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuBase.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuBloodBath.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuCharacter.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuCharacterFiles.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuCharacterSelect.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuControls.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuCustomLevel.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuDifficulty.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuDisplay.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuJoystick.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuJoystickAxis.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuKeyboard.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuLoadGame.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuMain.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuMouse.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuOptions.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuSaveGame.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuSinglePlayer.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MenuSound.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MessageBoxHandler.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MessageMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/MoveMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/Music.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/NetInfo.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/NetStartStubs.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/NewStatusBar.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ObjectFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ParticleExplosionFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ParticleStreamFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ParticleSystemFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/PickupObjectFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/PlayerCamera.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/PolyGridFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/RainFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/RippleFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SFXMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SharedResourceMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ShellCasingFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SmokeFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SmokeImpactFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SmokePuffFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SmokeTrailFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SmokeTrailSegmentFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SparksFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SpecialFXList.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/Splash.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SplashFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/StatusBar.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/SurfaceFragmentFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/TheVoice.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/TracerFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/TripLaserFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/ViewWeapon.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/VoiceMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/WarpGateFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/WeaponFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/WeaponPowerupFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/WinUtil.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/client_physics.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/debugline.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/gibfx.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/plasma1.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ClientShellDLL/viewcreature.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/AI_Mgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/AI_Shared.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/AmmoPickups.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/AncientOne.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/AncientOneTentacle.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Anim_Sound.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/B2BaseClass.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/BaseCharacter.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/BirdAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/BloodServerShell.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/BulletImpactSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/CalebAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/CameraObj.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/CameraSpot.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/CinematicTrigger.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/CivilianAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientCastLineSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientExplosionSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientGibFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientLaserBeamSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientLaserFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientLightFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientLightningSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientMarkSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientParticleStreamSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientSmokeTrail.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientSparksSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientSplashSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientSplatFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientTracer.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientWarpGateSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ClientWeaponSFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ConversationTrigger.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/CultistAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DeathShroud.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Debris.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DefenseGlobeAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DefenseGlobeLegs.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Destructable.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DestructableBrush.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DestructableModel.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DetailSprite.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Door.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/DrudgeLord.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/EnhancedGideon.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ExitHint.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ExitTrigger.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Explosion.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Fanatic.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/FireFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/FlagObjects.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GabriellaAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GabriellaREV.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GameInvItems.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GameProjectiles.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GameStartPoint.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GameWeapons.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Gib.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Gideon.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/GooSplat.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Gremlin.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/HandWeaponModel.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Impacts.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/InvItem.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/InventoryMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/IshmaelAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/IshmaelREV.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ItemPickups.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Key.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/KeyData.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/KeyFramer.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/LightFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/MadScientistAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ModelObject.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Naga.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/NagaCeilingDebris.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ObjectUtilities.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ObjectivesTrigger.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/OpheliaAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/OpheliaREV.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ParticleSystem.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/PathListData.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/PathMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/PickupObject.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/PlayerObj.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/PolyGrid.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/PowerupPickups.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Projectile.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Rain.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/RandomSoundFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/RatAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Rotating.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/RotatingBrush.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/RotatingDoor.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/RotatingModel.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/RotatingSprite.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Script.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SeeingEye.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ShellCasing.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ShikariAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SmellHint.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SoccerObjects.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SoulDrudge.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SoundFX.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Sparam.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SparksObj.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Spawner.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/SpellPickups.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Tchernotronic.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/TheHandAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Trigger.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/TripLaser.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/UndeadGideon.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ViewWeaponModel.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/VolumeBrush.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/VolumeBrushTypes.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/Weapon.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/WeaponPickups.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/WorldModelDebris.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/WorldProperties.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/WreckingBall.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/ZealotAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/behemoth.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/boneleech.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/bug.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/clientbloodtrail.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/clientdebugline.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/corpse.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/drudgepriest.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/movement.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/nightmare.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/pathpoint.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/prophet.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/thief.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/ObjectDLL/wurmAI.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Shared/TeamMgr.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Shared/WeaponDefs.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Misc/BareList.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Misc/Blood2Stubs.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Misc/CoolFont.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Misc/LTGUICommandHandler.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Misc/LTGUICtrl.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/Misc/LTGUIFont.cpp;/home/yann/projects/lithtech/OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp
+-- OpenBlood2 game executable will be built
+-- OpenBlood2 game executable configured
+-- ========================================
+-- Configuration Summary:
+--   OpenLithTech: ENABLED
+--   Blood2 Game: ON
+--   Tools: OFF
+--   Install Prefix: /usr/local
+-- ========================================
+-- Configuring done (2.4s)
+-- Generating done (0.1s)
+-- Build files have been written to: /tmp/lithtech-audit-2bVxTF/openblood2

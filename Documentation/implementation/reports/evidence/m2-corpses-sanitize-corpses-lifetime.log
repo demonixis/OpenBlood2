@@ -1,0 +1,14 @@
+468/472 Testing: corpses.lifetime
+468/472 Test: corpses.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.lifetime" start time: Oct 16 16:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.lifetime" end time: Oct 16 16:56 CEST
+"corpses.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

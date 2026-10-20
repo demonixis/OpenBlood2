@@ -1,0 +1,14 @@
+342/345 Testing: ai_state.failures
+342/345 Test: ai_state.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_state_tests" "failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_state.failures" start time: Oct 16 11:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.failures" end time: Oct 16 11:04 CEST
+"ai_state.failures" time elapsed: 00:00:00
+----------------------------------------------------------

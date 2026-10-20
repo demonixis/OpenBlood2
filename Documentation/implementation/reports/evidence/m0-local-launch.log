@@ -1,0 +1,12 @@
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II/ (blood2.local.ini)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] Metadata only; no archives mounted, no game objects or resources loaded
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Captured GPU frame to .cache/local-inspector.png
+[info] Shutdown: frames=3, UI frames=3, hidden frames=0, toggles=0, resize=false, quit=false

@@ -1,0 +1,1504 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index cde1928..b498eb1 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -522,3 +522,5 @@ The [built-in Model continuation](../Documentation/Implementation/M2_BUILTIN_MOD
+ The [destructible-model continuation](../Documentation/Implementation/M2_DESTRUCTABLE_MODELS.md) connects original CDestructableModel rules and 122 CityHub objects. Read [contracts](docs/DESTRUCTABLE_MODEL_CONTRACTS.md). Preserve authored versus automatic dimensions, replacement non-rotation, cascade/base callback order, exact destroyed flags and deferred destruction. Models reuse the bounded atomic box solver; no contact forces or depenetration are invented. Unnamed ABC clips remain unnamed. CheckClearShot's destructible filter is separate from CanSee. Chrome/save/partial destroy pairs remain explicit failures. CityHub is 413 created / 37 unsupported / 35 failed; safe NEW_LEVEL and M2 stay open.
+ 
+ The [SoundFX continuation](../Documentation/Implementation/M2_SOUND_FX.md) connects original nonstreaming state/command rules and retained audio. Read [contracts](docs/SOUND_FX_CONTRACTS.md). Preserve startup deadline cancellation, ambient-only looping, whole-string commands, ramp interruption/restart and stale deadlines. Owned strings fix duplicate release; source filtering remains after startup. Historical VoiceType schemas and FileStream/TIMESYNC remain failures, including all five CityHub entries. No class-count increase certifies playback. Safe NEW_LEVEL and M2 remain open.
++
++The [PCM streaming continuation](../Documentation/Implementation/M2_AUDIO_STREAM.md) supplies real disk-backed Sound/SoundFX playback. Read [contracts](docs/AUDIO_STREAM_CONTRACTS.md). Preserve REZ slice bounds, two fixed sample windows, local sample clocks, failed-read diagnostics and world/source voice ownership. VoiceType=0 is explicit unused historical metadata only; nonzero values and TypeAction remain rejected. Compressed streams, reverb/priority arbitration and late network synchronization remain unavailable. CityHub has 418 created / 31 transferred sounds / 32 unsupported / four failed; safe NEW_LEVEL and M2 remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 674a25f..421bed1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -15,7 +15,7 @@ include(cmake/Dependencies.cmake)
+ configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+ 
+ add_library(engine STATIC src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+-target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
++target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/audio_stream.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
+ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+diff --git a/README.md b/README.md
+index 736bf34..e74e56a 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [audio-stream continuation](../Documentation/Implementation/M2_AUDIO_STREAM.md) connects real bounded PCM reads from REZ and retains observed VoiceType=0 metadata. CityHub now has 418 created objects, 31 transferred sounds, 32 unsupported and four failed entries; its five SoundFX create, four start initially, and 35 streamed voices share 384 KiB of buffers. Compressed streams, TypeAction schemas, required remaining services and safe NEW_LEVEL keep M2 incomplete.
++
+ The [SoundFX continuation](../Documentation/Implementation/M2_SOUND_FX.md) connects original nonstreaming ramp/ON/OFF rules to real audio and inspection. The private catalog exposes unresolved historical schemas on all 124 authored emitters (121 VoiceType / three TypeAction). CityHub remains 413 created; its five SoundFX entries are now explicit schema failures (32 unsupported / 40 failed), not successful playback. Streaming, safe NEW_LEVEL and M2 remain incomplete.
+ 
+ The [original destructible-model continuation](../Documentation/Implementation/M2_DESTRUCTABLE_MODELS.md) connects 122 CityHub objects to original damage, model replacement, fading and bounded box physics. CityHub now has 413 created, 37 unsupported and 35 failed entries; earlier counts below are historical. Contact-force sliding audio, required remaining services, safe NEW_LEVEL and M2 remain incomplete.
+diff --git a/docs/AUDIO_STREAM_CONTRACTS.md b/docs/AUDIO_STREAM_CONTRACTS.md
+new file mode 100644
+index 0000000..7f77b33
+--- /dev/null
++++ b/docs/AUDIO_STREAM_CONTRACTS.md
+@@ -0,0 +1,93 @@
++# Disk-backed PCM audio and historical audio metadata
++
++This extends [SoundFX](SOUND_FX_CONTRACTS.md) and [world Sound](WORLD_SOUND_CONTRACTS.md).
++Read [source selections](M2_AUDIO_STREAM_SOURCES.json) and
++[implementation evidence](../../Documentation/Implementation/M2_AUDIO_STREAM.md).
++M2 remains incomplete. This is replacement engine code implementing the source
++FILESTREAM contract; it is not recovered retail mixer code.
++
++## Real resource streaming
++
++Original Sound and SoundFX FileStream requests now select an actual disk-backed
++PCM reader. They do not use the full-file resource read, SDL_LoadWAV, or a whole
++float clip. The reader owns one open archive descriptor and a copied indexed REZ
++resource slice. Every read checks both the slice and current archive extent.
++No lookup by basename or extraction to loose commercial files is introduced.
++The lifetime is independent of later resource-index remounts; unload clears the
++cache after original objects release their voices.
++
++Preflight reads only RIFF/chunk headers, the first 16 bytes of PCM format and
++optional LIST type. Payload ranges are validated without reading their contents.
++At most 1024 chunks / 128 MiB per resource are accepted. PCM8/16, one or two
++channels, 8–96 kHz, exact block/rate/data alignment and the existing bounded final
++odd-data padding exceptions are supported. Missing/duplicate fmt/data, malformed
++padding/ranges, and compressed streams fail. MS/IMA ADPCM retain buffered support,
++but are not silently decoded wholesale for a streaming request.
++
++Samples come from two 4096-frame windows, at most **32 KiB per cached stream**.
++A refill reads only its aligned PCM block. Two windows preserve interpolation
++across block and loop seams. Conversion is unsigned PCM8 / signed little-endian
++PCM16 to float; tests compare against the existing SDL buffered decoder.
++Resources shared by voices share immutable format metadata and this simulation-
++thread-only read cache; each voice still has an independent cursor/loop count.
++Inspection exposes actual bytes read and refill counts. Offline clocks need not
++read inaudible/unrendered samples; they still validate archive extent each advance.
++
++Buffered and streamed forms are distinct cache entries. Their combined limit is
++128 entries / 256 MiB (streams reserve their actual fixed windows), with the
++existing maximum 128 voices. No worker thread, background prefetch or dependency
++is added. Reads occur synchronously in bounded windows on the simulation thread;
++slow storage can still stall that thread. This is not a latency guarantee.
++
++## Clocks, errors and lifetime
++
++Both paths use the same sample clock, fractional carry, resampling, attenuation,
++panning, loop count and 250 ms output-work limit. Source TIME/TIMESYNC requests
++start on the same local simulation timeline as their voice: local direct delivery
++has no network delay. Late network-client synchronization and streaming compressed
++codecs are not implemented. No separate guessed duration or wall-clock completion
++is used; duration is the validated PCM frame count divided by sample rate.
++
++A failed read latches an inspectable stream/voice error. The failing voice does
++not advance its cursor, IsSoundDone refuses to report successful completion, the
++mix buffer is discarded and no partial output is submitted. Other voices already
++visited may have advanced: an error is not a transactional rewind. The failure
++persists until its voice/cache is removed; callers must not retry the same step as
++if it had been rolled back. World unload clears the prior output diagnostic; a
++new SDL queue-clear failure replaces it with that actual failure. Archive checks detect absence/truncation/read failures,
++not arbitrary same-size byte edits. Resources must remain stable during playback.
++
++Original ownership remains unchanged: built-in Sound transfers its loop to the
++world and removes the source; SoundFX retains its checked voice until replacement
++or destruction. Stream resources are cached until unload like buffered clips.
++Source-independent sounds, shared caches and temporary destination rehearsals do
++not retain raw references into another session. No new mutable game global is
++introduced. Reverb, priority arbitration and region-loop metadata remain unsupported.
++
++## Historical VoiceType policy
++
++Available Blood II Sound/SoundFX sources and PlaySoundInfo do not declare/read
++VoiceType. The private catalog contains 905 such properties, all integer zero;
++11 audio entries lack it. The later-engine property lookup and Shogo AdvSound are
++read-only corroboration (AdvSound reads/saves the field but does not pass it to
++PlaySound). Their generation is not claimed retail Blood II parity.
++
++Only Sound and SoundFX accept the observed integer **VoiceType=0** as explicitly
++retained, unused historical metadata. No guessed voice category, priority mapping
++or audio behavior is attached to it. Nonzero values reject precreate; wrong types
++and unrelated unknown properties remain schema failures. This bounded compatibility
++choice follows the available original code, not a claim about the older binary's
++meaning. The three TypeAction SoundFX entries still reject; no speculative alias
++to TypeActionMode is introduced. Properties remain visible in the inspector.
++
++## Verification scope
++
++Tests cover actual read budgets, PCM sample equality at window boundaries and
++random seeks, mono/stereo, 8/16-bit, malformed ranges/headers/padding, loop seams,
++shared caches with independent clocks, delayed output, source removal, stale IDs,
++archive truncation after playback, cache cleanup and original CityHub emitters.
++Catalog tests retain authored properties; they do not strip streaming flags or
++rewrite commercial data. Private sampled PCM is compared with SDL decoding.
++GPU Sound uses real streamed SubwayA PCM through original SoundFX, with hidden UI,
++unload/reload and inspector-free Release. Full level playthrough, audible listening,
++retail mixing parity, safe NEW_LEVEL and actual M2 acceptance remain open.
+diff --git a/docs/CINEMATIC_CONTRACTS.md b/docs/CINEMATIC_CONTRACTS.md
+index 374425a..a3b7713 100644
+--- a/docs/CINEMATIC_CONTRACTS.md
++++ b/docs/CINEMATIC_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original cinematic cues and bounded audio
+ 
++> The later [PCM streaming contracts](AUDIO_STREAM_CONTRACTS.md) supersede blanket FileStream and VoiceType=0 omissions below for Sound/SoundFX only. Compressed streams, nonzero historical metadata, TypeAction and M2 remain open.
++
+ > Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
+ > voice helpers, player sound keys and material/liquid footsteps now execute.
+ > Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
+diff --git a/docs/M2_AUDIO_STREAM_SOURCES.json b/docs/M2_AUDIO_STREAM_SOURCES.json
+new file mode 100644
+index 0000000..d245617
+--- /dev/null
++++ b/docs/M2_AUDIO_STREAM_SOURCES.json
+@@ -0,0 +1,49 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "70070b764bb71153033f3b281b54b47659aa806f",
++  "status": "M2 incomplete; local PCM streaming and explicit zero historical audio metadata",
++  "references": [
++    {
++      "source": "sources/blood2/AppHeaders/basedefs_de.h",
++      "source_sha256": "10f543764aa94339f2e48edcba384dda3cdce2d738f0be2731dcff3a1117fb72",
++      "purpose": "Original FILESTREAM disk-read contract, local TIME/TIMESYNC semantics and current PlaySoundInfo without VoiceType."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/engineobjects.c",
++      "source_sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
++      "purpose": "Original Sound flags/properties and world-owned lifetime; no VoiceType read."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/SoundFX.cpp",
++      "source_sha256": "0e9115b1a3d8fc3ff85298dd99c9d3c09c12d1a5fa8ed8aa9d231cfe766bf5ce",
++      "purpose": "Original conditional streaming/TIMESYNC request and retained source state rules; no VoiceType read."
++    },
++    {
++      "source": "sources/lithtech/runtime/server/src/serverde_impl.cpp",
++      "source_sha256": "5e1973f36bea781f23f99d7e0bb32ddb474ebf83c142c6877b15c157ba2fd53f",
++      "purpose": "Later-generation read-only property lookup corroboration, not imported or asserted Blood II binary compatibility."
++    },
++    {
++      "source": "sources/Shogo_Aegis/ObjectDLL/AdvSound.cpp",
++      "source_sha256": "bc211d2bb7384057a5270e2f70045c05a2735132baac7e2b4014308338f8580f",
++      "purpose": "Modified Shogo read-only corroboration: retains VoiceType but omits it from PlaySoundInfo. Not an original Blood II behavior authority."
++    }
++  ],
++  "implementation": [
++    "src/engine/audio_stream.cpp",
++    "src/engine/audio_stream.h",
++    "src/engine/audio.cpp",
++    "src/game/server_audio.cpp"
++  ],
++  "adaptations": [
++    "New bounded synchronous REZ-slice PCM windows, no whole-file decode for streams",
++    "Keep existing local sample clocks; no late-network TIMESYNC claim",
++    "Only Sound/SoundFX retain observed integer VoiceType=0 as unused metadata; nonzero rejects",
++    "No reference/commercial asset change or new mutable game global"
++  ],
++  "unsupported": [
++    "Compressed streaming, region loops, late network client synchronization",
++    "TypeAction historical schema, nonzero VoiceType semantics",
++    "Reverb/priority arbitration, complete M2 and safe NEW_LEVEL"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index ccdcb5f..c6a4b2b 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -898,3 +898,12 @@ See [ledger](M2_SOUND_FX_SOURCES.json) and [contracts](SOUND_FX_CONTRACTS.md).
+ Owned strings fix the original duplicate destructor release; null commands are
+ checked. FileStream/TIMESYNC, historical VoiceType, reverb and save remain explicit
+ limits. No reference source, mutable game global or new dependency is introduced.
++
++## PCM streaming and historical audio metadata
++
++The original FILESTREAM request now uses a new bounded REZ-slice PCM window reader
++with the existing local sound clock. This is replacement engine code, not imported
++retail implementation. Sound/SoundFX preserve observed VoiceType=0 as documented
++unused metadata; no voice-category behavior is invented. Nonzero values and
++TypeAction still reject. See [ledger](M2_AUDIO_STREAM_SOURCES.json) and
++[contracts](AUDIO_STREAM_CONTRACTS.md). No new dependency or mutable global is added.
+diff --git a/docs/SOUND_FX_CONTRACTS.md b/docs/SOUND_FX_CONTRACTS.md
+index 8b8a90c..7567337 100644
+--- a/docs/SOUND_FX_CONTRACTS.md
++++ b/docs/SOUND_FX_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original SoundFX controllers
+ 
++> The later [PCM streaming contracts](AUDIO_STREAM_CONTRACTS.md) supersede blanket FileStream and VoiceType=0 omissions below for Sound/SoundFX only. Compressed streams, nonzero historical metadata, TypeAction and M2 remain open.
++
+ This is the original ObjectDLL `SoundFX`, distinct from built-in `Sound` and
+ `RandomSoundFX`. Read [audio ownership](WORLD_SOUND_CONTRACTS.md),
+ [object lifetime](OBJECT_CONTRACTS.md), [source ledger](M2_SOUND_FX_SOURCES.json)
+diff --git a/docs/WORLD_SOUND_CONTRACTS.md b/docs/WORLD_SOUND_CONTRACTS.md
+index f14d794..f710859 100644
+--- a/docs/WORLD_SOUND_CONTRACTS.md
++++ b/docs/WORLD_SOUND_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original world-owned Sound loops
+ 
++> The later [PCM streaming contracts](AUDIO_STREAM_CONTRACTS.md) supersede blanket FileStream and VoiceType=0 omissions below for Sound/SoundFX only. Compressed streams, nonzero historical metadata, TypeAction and M2 remain open.
++
+ M2 remains incomplete. Read [object lifetime](OBJECT_CONTRACTS.md),
+ [world loading](WORLD_CONTRACTS.md), [cinematic audio](CINEMATIC_CONTRACTS.md),
+ [random emitters](RANDOM_SOUND_CONTRACTS.md), [source selections](M2_WORLD_SOUND_SOURCES.json)
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index e039c81..5a53e62 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -1,5 +1,6 @@
+ #include "app/inspector.h"
+ #include "build_info.h"
++#include "engine/audio_stream.h"
+ #include "engine/container.h"
+ #include "engine/world_model.h"
+ #include "game/original/AI_Mgr.h"
+@@ -602,7 +603,7 @@ namespace OpenBlood2
+                             ImGui::SeparatorText("Original SoundFX");
+                             ImGui::Text("State %s | startup %s | %s | streaming requested %s", sound->state_name(),
+                                         sound->start_on ? "on" : "off", sound->ambient ? "ambient" : "spatial",
+-                                        sound->file_stream ? "yes (unsupported)" : "no");
++                                        sound->file_stream ? "yes (PCM windows)" : "no");
+                             ImGui::TextWrapped("Ramp up: %s | Main: %s | Ramp down: %s", sound->ramp_up.c_str(),
+                                                sound->sound_path.c_str(), sound->ramp_down.c_str());
+                             ImGui::Text("Radii %.1f / %.1f | volume byte %u | priority %u", sound->inner_radius,
+@@ -611,18 +612,30 @@ namespace OpenBlood2
+                                         (unsigned long long)sound->commands, (unsigned long long)sound->attempts,
+                                         (unsigned long long)sound->failures);
+                             if (const auto* voice = game.server.audio.get(sound->sound))
++                            {
+                                 ImGui::Text("Voice %llu | %s | loop %s | %.3f / %.3f s | fixed %.1f %.1f %.1f",
+-                                            (unsigned long long)voice->id, voice->done ? "finished" : "playing",
++                                            (unsigned long long)voice->id,
++                                            !voice->error.empty() ? "failed"
++                                            : voice->done         ? "finished"
++                                                                  : "playing",
+                                             voice->request.loop ? "yes" : "no", voice->cursor / voice->clip->rate,
+                                             voice->clip->duration(), voice->position.x, voice->position.y,
+                                             voice->position.z);
++                                if (const auto& stream = voice->clip->stream)
++                                    ImGui::Text("Disk buffers %zu KiB | read %llu bytes / %llu refills",
++                                                PcmStream::buffer_bytes / 1024, (unsigned long long)stream->bytes_read,
++                                                (unsigned long long)stream->refills);
++                                if (!voice->error.empty())
++                                    ImGui::TextWrapped("Stream failure: %s", voice->error.c_str());
++                            }
+                             else
+                                 ImGui::TextUnformatted("No live voice.");
+                             if (!sound->error.empty())
+                                 ImGui::TextWrapped("Playback failure: %s", sound->error.c_str());
+                             ImGui::TextWrapped(
+-                                "Only ambient ON loops. Reverb/streaming/save are unavailable. "
+-                                "Hidden/inactive objects remain listed; failed source schemas are in World.");
++                                "Only ambient ON loops. Reverb/compressed streaming/save are unavailable. "
++                                "VoiceType=0 is retained unused historical metadata. Failed source schemas remain in "
++                                "World.");
+                         }
+                         if (const auto* model = dynamic_cast<const CDestructableModel*>(object->game.get()))
+                         {
+diff --git a/src/app/inspector_world_sounds.cpp b/src/app/inspector_world_sounds.cpp
+index 68a82cb..127eec3 100644
+--- a/src/app/inspector_world_sounds.cpp
++++ b/src/app/inspector_world_sounds.cpp
+@@ -1,3 +1,4 @@
++#include "engine/audio_stream.h"
+ #include "inspector.h"
+ #include <imgui.h>
+ namespace OpenBlood2
+@@ -40,19 +41,31 @@ namespace OpenBlood2
+             const auto id = voice.id;
+             const auto& r = voice.request;
+             ImGui::Text("Voice %llu | %s | %s | wraps %llu", (unsigned long long)id,
+-                        r.space == SoundSpace::Ambient ? "ambient" : "spatial", voice.done ? "finished" : "looping",
++                        r.space == SoundSpace::Ambient ? "ambient" : "spatial",
++                        !voice.error.empty() ? "failed"
++                        : voice.done         ? "finished"
++                                             : "looping",
+                         (unsigned long long)voice.loops);
+             ImGui::TextWrapped("%s | %.3f / %.3f s | %u Hz / %u channels", r.resource.c_str(),
+                                voice.cursor / voice.clip->rate, voice.clip->duration(), voice.clip->rate,
+                                voice.clip->channels);
++            if (const auto& stream = voice.clip->stream)
++                ImGui::Text("Disk PCM | buffers %zu KiB | read %llu bytes / %llu refills",
++                            PcmStream::buffer_bytes / 1024, (unsigned long long)stream->bytes_read,
++                            (unsigned long long)stream->refills);
++            else
++                ImGui::TextUnformatted("Decoded whole clip");
++            if (!voice.error.empty())
++                ImGui::TextWrapped("Playback failure: %s", voice.error.c_str());
+             ImGui::Text("Position %.1f %.1f %.1f | radii %.1f / %.1f | volume %.0f%%", voice.position.x,
+                         voice.position.y, voice.position.z, r.inner_radius, r.outer_radius, r.volume * 100);
+             ImGui::Text("Gains %.3f / %.3f | priority request %u (arbitration unavailable)", voice.left, voice.right,
+                         unsigned(r.priority));
+         }
+         ImGui::TextWrapped(
+-            "Whole-clip decoded playback only. FileStream/TIMESYNC and region-loop metadata reject playback. "
+-            "Unknown VoiceType schemas remain failures. Authored properties and missing resources remain in World. "
++            "PCM FileStream reads bounded REZ windows on the local simulation clock. Compressed streams and region "
++            "loops reject. "
++            "VoiceType=0 is retained historical metadata unused by the available original code; other values reject. "
+             "Dry mixing, without reverb/Doppler/occlusion. M2 remains incomplete.");
+     }
+ } // namespace OpenBlood2
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 9337486..903babd 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -81,8 +81,8 @@ namespace OpenBlood2
+         const auto trial_before = g.destination_trial.attempts;
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+-            !g.destination_trial.player_entered || g.destination_trial.created != 413 ||
+-            g.destination_trial.unknown != 32 || g.destination_trial.failed != 40 ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 418 ||
++            g.destination_trial.unknown != 32 || g.destination_trial.failed != 4 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+@@ -100,8 +100,8 @@ namespace OpenBlood2
+                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
+                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+                g.destination_inspection.source_revision == old_revision &&
+-               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 417 &&
+-               g.destination_inspection.unknown == 32 && g.destination_inspection.invalid == 36 &&
++               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 453 &&
++               g.destination_inspection.unknown == 32 && g.destination_inspection.invalid == 0 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/app/world_sound_smoke.cpp b/src/app/world_sound_smoke.cpp
+index 3eed40b..e66e640 100644
+--- a/src/app/world_sound_smoke.cpp
++++ b/src/app/world_sound_smoke.cpp
+@@ -1,4 +1,5 @@
+ #include "world_sound_smoke.h"
++#include "engine/audio_stream.h"
+ #include "game/original/SoundFX.h"
+ namespace OpenBlood2
+ {
+@@ -26,9 +27,11 @@ namespace OpenBlood2
+                 resource = g.server.audio.get(entry.sound)->request.resource;
+                 break;
+             }
+-        auto h =
+-            g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::World,
+-                             {{"Name", std::string("diagnostic_soundfx")}, {"StartOn", false}, {"Sound", resource}});
++        auto h = g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::World,
++                                  {{"Name", std::string("diagnostic_soundfx")},
++                                   {"StartOn", false},
++                                   {"Sound", resource},
++                                   {"FileStream", true}});
+         auto* sound = dynamic_cast<SoundFX*>(g.server.HandleToObject(h));
+         if (!sound)
+             return false;
+@@ -47,8 +50,9 @@ namespace OpenBlood2
+         const auto submitted = g.server.audio.submitted_frames;
+         if (!g.server.advance_audio(.02, {}, {}) || g.server.audio.submitted_frames <= submitted ||
+             !g.server.audio.get(voice) || g.server.audio.get(voice)->cursor <= 0 ||
+-            !g.server.audio.get(voice)->request.loop || !command("OFF") || sound->state != SoundFX::Off ||
+-            g.server.audio.get(voice) || !g.objects.remove(h))
++            !g.server.audio.get(voice)->request.loop || !g.server.audio.get(voice)->clip->stream ||
++            !g.server.audio.get(voice)->clip->stream->refills || !g.server.audio.get(voice)->clip->samples.empty() ||
++            !command("OFF") || sound->state != SoundFX::Off || g.server.audio.get(voice) || !g.objects.remove(h))
+             return false;
+         g.objects.finish_frame();
+         return !g.objects.get(h) && g.server.audio.output_error.empty();
+diff --git a/src/engine/audio.cpp b/src/engine/audio.cpp
+index b02a034..2c64225 100644
+--- a/src/engine/audio.cpp
++++ b/src/engine/audio.cpp
+@@ -1,4 +1,5 @@
+ #include "engine/audio.h"
++#include "engine/audio_stream.h"
+ #include "engine/collision.h"
+ #include <SDL3/SDL.h>
+ #include <algorithm>
+@@ -176,7 +177,7 @@ namespace OpenBlood2
+             error = "Missing or oversized sound resource";
+             return false;
+         }
+-        if (clips_.size() >= 128)
++        if (cached_clips() >= 128)
+         {
+             error = "Sound cache exceeds 128 clips";
+             return false;
+@@ -196,6 +197,48 @@ namespace OpenBlood2
+         out = std::move(clip);
+         return true;
+     }
++    bool AudioMixer::load_stream(const Resources& resources, std::string_view path,
++                                 std::shared_ptr<const AudioClip>& out, std::string& error)
++    {
++        std::string name;
++        if (!resource_path(path, name))
++        {
++            error = "Invalid streaming sound resource path";
++            return false;
++        }
++        if (auto it = streams_.find(name); it != streams_.end())
++        {
++            if (!it->second->stream->validate(error))
++                return false;
++            out = it->second;
++            return true;
++        }
++        const auto* resource = resources.find(name);
++        if (!resource)
++        {
++            error = "Missing streaming sound resource";
++            return false;
++        }
++        if (cached_clips() >= 128 || PcmStream::buffer_bytes > 256 * 1024 * 1024 - cached_bytes_)
++        {
++            error = "Streaming sound cache budget exceeded";
++            return false;
++        }
++        auto stream = PcmStream::open(*resource, error);
++        if (!stream)
++            return false;
++        auto clip = std::make_shared<AudioClip>();
++        clip->rate = stream->rate;
++        clip->channels = stream->channels;
++        clip->encoding = 1;
++        clip->stream_frames = stream->frames;
++        clip->loop_metadata = stream->loop_metadata;
++        clip->stream = std::move(stream);
++        streams_.emplace(name, clip);
++        cached_bytes_ += PcmStream::buffer_bytes;
++        out = std::move(clip);
++        return true;
++    }
+     SoundId AudioMixer::play(const Resources& resources, HOBJECT owner, const SoundRequest& request, DVector position,
+                              std::string& error)
+     {
+@@ -212,7 +255,8 @@ namespace OpenBlood2
+             return 0;
+         }
+         std::shared_ptr<const AudioClip> clip;
+-        if (!load(resources, request.resource, clip, error))
++        if (!(request.streaming ? load_stream(resources, request.resource, clip, error)
++                                : load(resources, request.resource, clip, error)))
+             return 0;
+         if (request.loop && clip->loop_metadata)
+         {
+@@ -220,7 +264,13 @@ namespace OpenBlood2
+             return 0;
+         }
+         const auto id = next_sound++;
+-        voices_.emplace(id, AudioVoice{id, owner, request, std::move(clip), position});
++        AudioVoice voice;
++        voice.id = id;
++        voice.owner = owner;
++        voice.request = request;
++        voice.clip = std::move(clip);
++        voice.position = position;
++        voices_.emplace(id, std::move(voice));
+         return id;
+     }
+     const AudioVoice* AudioMixer::get(SoundId id) const
+@@ -254,11 +304,22 @@ namespace OpenBlood2
+         mixed.assign(count * 2, 0);
+         peak = 0;
+         const auto right = rotate_vector({1, 0, 0}, rotation);
++        bool stream_failed = false;
+         for (auto& [id, v] : voices_)
+         {
+             (void)id;
++            if (!v.error.empty())
++            {
++                stream_failed = true;
++                continue;
++            }
+             if (v.done)
+                 continue;
++            if (v.clip->stream && !v.clip->stream->validate(v.error))
++            {
++                stream_failed = true;
++                continue;
++            }
+             float gain = v.request.volume, pan = 0;
+             if (v.request.space != SoundSpace::Local)
+             {
+@@ -284,14 +345,30 @@ namespace OpenBlood2
+                 const auto a = std::size_t(cursor);
+                 const auto b = v.request.loop ? (a + 1) % clip.frames() : std::min(a + 1, clip.frames() - 1);
+                 const float blend = float(cursor - a);
+-                auto sample = [&](unsigned channel)
++                float x[2]{}, y[2]{};
++                bool ok = true;
++                for (unsigned channel = 0; channel < clip.channels; ++channel)
++                {
++                    if (clip.stream)
++                        ok = ok && clip.stream->sample(a, channel, x[channel], v.error) &&
++                             clip.stream->sample(b, channel, y[channel], v.error);
++                    else
++                    {
++                        x[channel] = clip.samples[a * clip.channels + channel];
++                        y[channel] = clip.samples[b * clip.channels + channel];
++                    }
++                }
++                if (!ok)
+                 {
+-                    auto x = clip.samples[a * clip.channels + channel], y = clip.samples[b * clip.channels + channel];
+-                    return x + (y - x) * blend;
+-                };
+-                mixed[frame * 2] += sample(0) * v.left;
+-                mixed[frame * 2 + 1] += sample(clip.channels - 1) * v.right;
++                    stream_failed = true;
++                    break;
++                }
++                mixed[frame * 2] += (x[0] + (y[0] - x[0]) * blend) * v.left;
++                auto channel = clip.channels - 1;
++                mixed[frame * 2 + 1] += (x[channel] + (y[channel] - x[channel]) * blend) * v.right;
+             }
++            if (!v.error.empty())
++                continue;
+             const auto advanced = v.cursor + frames * increment;
+             if (v.request.loop)
+             {
+@@ -305,6 +382,13 @@ namespace OpenBlood2
+                 v.done = v.cursor >= clip.frames();
+             }
+         }
++        if (stream_failed)
++        {
++            mixed.clear();
++            peak = 0;
++            output_error = "Streaming audio resource read failed; inspect voice errors";
++            return false;
++        } // Never submit a partial failed read.
+         for (auto& value : mixed)
+         {
+             value = std::clamp(value, -1.0f, 1.0f);
+@@ -366,11 +450,13 @@ namespace OpenBlood2
+     {
+         voices_.clear();
+         clips_.clear();
++        streams_.clear();
+         cached_bytes_ = 0;
+         mixed.clear();
+         remainder_ = 0;
+         peak = 0;
+         mixed_frames = submitted_frames = dropped_frames = 0;
++        output_error.clear();
+         if (output_ && !SDL_ClearAudioStream(output_))
+             output_error = SDL_GetError();
+     }
+diff --git a/src/engine/audio.h b/src/engine/audio.h
+index 236b5a4..2263737 100644
+--- a/src/engine/audio.h
++++ b/src/engine/audio.h
+@@ -5,15 +5,18 @@
+ #include <memory>
+ namespace OpenBlood2
+ {
++    class PcmStream;
+     using SoundId = std::uint64_t;
+     struct AudioClip
+     {
+         unsigned rate = 0, channels = 0, encoding = 0;
+         bool loop_metadata = false; // Region loops require a separate validated reader; never silently ignore them.
+         std::vector<float> samples;
++        std::shared_ptr<PcmStream> stream;
++        std::size_t stream_frames = 0;
+         std::size_t frames() const
+         {
+-            return channels ? samples.size() / channels : 0;
++            return stream ? stream_frames : (channels ? samples.size() / channels : 0);
+         }
+         double duration() const
+         {
+@@ -34,6 +37,7 @@ namespace OpenBlood2
+         SoundSpace space = SoundSpace::Spatial;
+         float inner_radius = 250, outer_radius = 1000, volume = 1;
+         bool loop = false;
++        bool streaming = false;       // Bounded disk-backed PCM, using the same local simulation clock.
+         DBYTE priority = 0;           // Authored intent; priority arbitration is unavailable.
+         bool reverb_requested = true; // Original cinematic flag; dry output currently only.
+     };
+@@ -50,6 +54,7 @@ namespace OpenBlood2
+         bool world_owned = false; // Owner is provenance only for transferred, unattached sounds.
+         bool auto_remove = false; // Fire-and-forget one-shots release their voice on completion.
+         std::uint64_t loops = 0;
++        std::string error; // A failed stream is not successful sound completion.
+     };
+     class AudioMixer
+     {
+@@ -75,7 +80,7 @@ namespace OpenBlood2
+         }
+         std::size_t cached_clips() const
+         {
+-            return clips_.size();
++            return clips_.size() + streams_.size();
+         }
+         std::size_t cached_bytes() const
+         {
+@@ -91,6 +96,8 @@ namespace OpenBlood2
+ 
+       private:
+         std::map<std::string, std::shared_ptr<const AudioClip>> clips_;
++        std::map<std::string, std::shared_ptr<const AudioClip>> streams_;
++        bool load_stream(const Resources&, std::string_view, std::shared_ptr<const AudioClip>&, std::string&);
+         std::map<SoundId, AudioVoice> voices_;
+         std::size_t cached_bytes_ = 0;
+         double remainder_ = 0;
+diff --git a/src/engine/audio_stream.cpp b/src/engine/audio_stream.cpp
+new file mode 100644
+index 0000000..82dd201
+--- /dev/null
++++ b/src/engine/audio_stream.cpp
+@@ -0,0 +1,190 @@
++#include "engine/audio_stream.h"
++#include <algorithm>
++#include <cstring>
++namespace OpenBlood2
++{
++    namespace
++    {
++        unsigned u16(std::span<const std::uint8_t> b, unsigned at)
++        {
++            return b[at] | (unsigned(b[at + 1]) << 8);
++        }
++        std::uint32_t u32(std::span<const std::uint8_t> b, unsigned at)
++        {
++            return u16(b, at) | (std::uint32_t(u16(b, at + 2)) << 16);
++        }
++    } // namespace
++    std::shared_ptr<PcmStream> PcmStream::open(const Resource& resource, std::string& error)
++    {
++        error.clear();
++        auto stream = std::make_shared<PcmStream>();
++        stream->source_ = resource;
++        if (resource.size < 12 || resource.size > 128 * 1024 * 1024)
++        {
++            error = "Streaming WAVE envelope exceeds 128 MiB or is truncated";
++            return {};
++        }
++        stream->file_.open(resource.archive, std::ios::binary);
++        if (!stream->file_ || !stream->validate(error))
++        {
++            if (error.empty())
++                error = "Cannot open streaming resource archive";
++            return {};
++        }
++        if (!stream->header(error))
++            return {};
++        return stream;
++    }
++    bool PcmStream::validate(std::string& out)
++    {
++        if (!error.empty())
++        {
++            out = error;
++            return false;
++        }
++        std::error_code ec;
++        auto size = std::filesystem::file_size(source_.archive, ec);
++        if (ec || source_.offset > size || source_.size > size - source_.offset)
++        {
++            out = error = "Streaming resource archive changed/truncated";
++            return false;
++        }
++        return true;
++    }
++    bool PcmStream::read(std::uint64_t offset, std::span<std::uint8_t> bytes, std::string& out)
++    {
++        if (!validate(out))
++            return false;
++        if (offset > source_.size || bytes.size() > source_.size - offset)
++        {
++            out = error = "Streaming read exceeds resource slice";
++            return false;
++        }
++        file_.clear();
++        file_.seekg(std::uint64_t(source_.offset) + offset);
++        if (!file_ || !file_.read(reinterpret_cast<char*>(bytes.data()), std::streamsize(bytes.size())))
++        {
++            out = error = "Streaming resource read failed";
++            return false;
++        }
++        bytes_read += bytes.size();
++        ++reads;
++        return true;
++    }
++    bool PcmStream::header(std::string& error)
++    {
++        auto fail = [&](const char* message)
++        {
++            error = message;
++            return false;
++        };
++        std::array<std::uint8_t, 16> bytes{};
++        if (!read(0, std::span(bytes).first(12), error))
++            return false;
++        if (std::memcmp(bytes.data(), "RIFF", 4) || std::memcmp(bytes.data() + 8, "WAVE", 4))
++            return fail("Invalid streaming RIFF WAVE signature");
++        const auto riff_end = std::uint64_t(u32(bytes, 4)) + 8;
++        if (riff_end != source_.size && riff_end + 1 != source_.size)
++            return fail("Invalid streaming RIFF envelope");
++        bool seen_fmt = false, seen_data = false, final_odd_data = false;
++        std::uint32_t data_size = 0;
++        unsigned chunks = 0;
++        for (std::uint64_t pos = 12; pos < source_.size;)
++        {
++            if (++chunks > 1024 || source_.size - pos < 8)
++                return fail("Invalid streaming WAVE chunk list");
++            if (!read(pos, std::span(bytes).first(8), error))
++                return false;
++            const auto n = u32(bytes, 4);
++            const bool data = !std::memcmp(bytes.data(), "data", 4), fmt = !std::memcmp(bytes.data(), "fmt ", 4);
++            const bool list = !std::memcmp(bytes.data(), "LIST", 4);
++            loop_metadata |= !std::memcmp(bytes.data(), "cue ", 4) || !std::memcmp(bytes.data(), "smpl", 4);
++            const auto payload_end = pos + 8 + n;
++            final_odd_data = data && (n & 1) && (payload_end == source_.size || payload_end + 1 == source_.size);
++            const auto end = payload_end + ((final_odd_data && payload_end == source_.size) ? 0 : (n & 1));
++            if (end > source_.size)
++                return fail("Truncated streaming WAVE chunk/padding");
++            if (list && n >= 4)
++            {
++                if (!read(pos + 8, std::span(bytes).first(4), error))
++                    return false;
++                loop_metadata |= !std::memcmp(bytes.data(), "adtl", 4);
++            }
++            if (fmt)
++            {
++                if (seen_fmt || n < 16)
++                    return fail("Duplicate/truncated streaming WAVE format");
++                seen_fmt = true;
++                if (!read(pos + 8, bytes, error))
++                    return false;
++                channels = u16(bytes, 2);
++                rate = u32(bytes, 4);
++                block_ = u16(bytes, 12);
++                bits = u16(bytes, 14);
++                if (u16(bytes, 0) != 1)
++                    return fail("Streaming supports PCM8/16 only; compressed streaming is unavailable");
++                if (channels < 1 || channels > 2 || rate < 8000 || rate > 96000 || (bits != 8 && bits != 16) ||
++                    block_ != channels * (bits / 8) || u32(bytes, 8) != rate * block_)
++                    return fail("Invalid streaming PCM layout");
++            }
++            if (data)
++            {
++                if (seen_data || !n)
++                    return fail("Duplicate/empty streaming WAVE data");
++                seen_data = true;
++                data_offset_ = std::uint32_t(pos + 8);
++                data_size = n;
++            }
++            pos = end;
++        }
++        if (riff_end != source_.size && !final_odd_data)
++            return fail("Streaming RIFF length differs outside terminal odd data padding");
++        if (!seen_fmt || !seen_data || data_size % block_)
++            return fail("Missing/unaligned streaming PCM data");
++        frames = data_size / block_;
++        return frames != 0;
++    }
++    bool PcmStream::sample(std::size_t frame, unsigned channel, float& value, std::string& out)
++    {
++        if (frame >= frames || channel >= channels)
++        {
++            out = "Streaming sample out of range";
++            return false;
++        }
++        if (!error.empty())
++        {
++            out = error;
++            return false;
++        }
++        Window* window = nullptr;
++        for (auto& w : windows_)
++            if (frame >= w.begin && frame - w.begin < w.count)
++            {
++                window = &w;
++                break;
++            }
++        if (!window)
++        {
++            auto& w = windows_[next_window_];
++            next_window_ ^= 1;
++            w.begin = (frame / window_frames) * window_frames;
++            w.count = 0;
++            const auto count = std::min(window_frames, frames - w.begin);
++            if (!read(std::uint64_t(data_offset_) + w.begin * block_, std::span(w.bytes).first(count * block_), out))
++                return false;
++            w.count = count;
++            ++refills;
++            window = &w;
++        }
++        auto at = (frame - window->begin) * block_ + channel * (bits / 8);
++        if (bits == 8)
++            value = (int(window->bytes[at]) - 128) / 128.0f;
++        else
++        {
++            const auto raw = u16(window->bytes, unsigned(at));
++            const int signed_sample = raw < 32768 ? int(raw) : int(raw) - 65536;
++            value = signed_sample / 32768.0f;
++        }
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/audio_stream.h b/src/engine/audio_stream.h
+new file mode 100644
+index 0000000..5600f80
+--- /dev/null
++++ b/src/engine/audio_stream.h
+@@ -0,0 +1,37 @@
++#pragma once
++#include "engine/resources.h"
++#include <array>
++#include <fstream>
++#include <memory>
++
++namespace OpenBlood2
++{
++    // PCM-only REZ slice reader. No resource payload or decoded clip is retained.
++    class PcmStream
++    {
++      public:
++        static constexpr std::size_t window_frames = 4096, buffer_bytes = window_frames * 4 * 2;
++        static std::shared_ptr<PcmStream> open(const Resource&, std::string&);
++        bool sample(std::size_t frame, unsigned channel, float&, std::string&);
++        bool validate(std::string&);
++        unsigned rate = 0, channels = 0, bits = 0;
++        std::size_t frames = 0;
++        bool loop_metadata = false;
++        std::uint64_t bytes_read = 0, reads = 0, refills = 0;
++        std::string error;
++
++      private:
++        Resource source_;
++        std::ifstream file_;
++        std::uint32_t data_offset_ = 0;
++        unsigned block_ = 0, next_window_ = 0;
++        struct Window
++        {
++            std::array<std::uint8_t, window_frames * 4> bytes{};
++            std::size_t begin = 0, count = 0;
++        };
++        std::array<Window, 2> windows_;
++        bool read(std::uint64_t offset, std::span<std::uint8_t>, std::string&);
++        bool header(std::string&);
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/original/Sound.cpp b/src/game/original/Sound.cpp
+index c242c45..3c2df7c 100644
+--- a/src/game/original/Sound.cpp
++++ b/src/game/original/Sound.cpp
+@@ -15,6 +15,10 @@ DDWORD Sound::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+     {
+         if (!data || reason == 3)
+             return 0; // Save/restore is unavailable; runtime filename is safely empty.
++        // Observed historical metadata is retained, not mapped to a guessed audio behavior.
++        GenericProp legacy_voice;
++        if (g_pServerDE->GetPropGeneric("VoiceType", &legacy_voice) == DE_OK && legacy_voice.m_Long != 0)
++            return 0;
+         static_cast<ObjectCreateStruct*>(data)->m_ObjectType = OT_NORMAL;
+         if (reason != 0)
+         {
+diff --git a/src/game/original/SoundFX.cpp b/src/game/original/SoundFX.cpp
+index 7a38f03..3a1e5f2 100644
+--- a/src/game/original/SoundFX.cpp
++++ b/src/game/original/SoundFX.cpp
+@@ -56,6 +56,10 @@ DDWORD SoundFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+     {
+         if (!data || reason == 3)
+             return 0; // Save/restore is unavailable.
++        // Observed historical metadata is retained, not mapped to a guessed audio behavior.
++        GenericProp legacy_voice;
++        if (g_pServerDE->GetPropGeneric("VoiceType", &legacy_voice) == DE_OK && legacy_voice.m_Long != 0)
++            return 0;
+         const auto result = B2BaseClass::EngineMessageFn(message, data, reason);
+         if (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP)
+             ReadProp();
+@@ -163,9 +167,8 @@ void SoundFX::UpdateSound()
+     request.space = ambient ? SoundSpace::Ambient : SoundSpace::Spatial;
+     request.loop = state == On && ambient;
+     request.reverb_requested = !ambient;
+-    if (file_stream)
+-        error = "SoundFX FileStream/TIMESYNC playback is not implemented";
+-    else if (g_pServerDE->GetObjectPos(m_hObject, &last_position) != DE_OK)
++    request.streaming = file_stream;
++    if (g_pServerDE->GetObjectPos(m_hObject, &last_position) != DE_OK)
+         error = "SoundFX source position unavailable";
+     else
+         sound = g_pServerDE->PlaySoundAt(m_hObject, request, last_position, error);
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 2711bb8..704da0b 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -124,6 +124,7 @@ namespace OpenBlood2
+                               construct<Sound>,
+                               {{"Filename", std::string{}},
+                                {"Priority", std::int32_t(0)},
++                               {"VoiceType", std::int32_t(0)},
+                                {"OuterRadius", 100.0f},
+                                {"InnerRadius", 10.0f},
+                                {"Volume", std::int32_t(100)},
+@@ -137,6 +138,7 @@ namespace OpenBlood2
+                                   {"RampDownSound", std::string{}},
+                                   {"Sound", std::string{}},
+                                   {"Priority", std::int32_t(0)},
++                                  {"VoiceType", std::int32_t(0)},
+                                   {"OuterRadius", 500.0f},
+                                   {"InnerRadius", 100.0f},
+                                   {"Volume", std::int32_t(100)},
+diff --git a/src/game/server_audio.cpp b/src/game/server_audio.cpp
+index 27e0bc3..7451b6d 100644
+--- a/src/game/server_audio.cpp
++++ b/src/game/server_audio.cpp
+@@ -80,14 +80,12 @@ namespace OpenBlood2
+             error = "World sound requires a live source and an unattached ambient/spatial loop";
+             return 0;
+         }
+-        if (file_stream)
+-        {
+-            error = "FileStream/TIMESYNC playback is not implemented";
+-            return 0;
+-        }
++
+         DVector position{};
+         GetObjectPos(source, &position);
+-        const auto id = audio.play(*client_resources, source, request, position, error);
++        auto actual = request;
++        actual.streaming = file_stream;
++        const auto id = audio.play(*client_resources, source, actual, position, error);
+         if (auto* voice = audio.get(id))
+             voice->world_owned = true;
+         return id;
+@@ -104,7 +102,7 @@ namespace OpenBlood2
+     {
+         trace_service("IsSoundDone");
+         const auto* voice = audio.get(id);
+-        if (!voice)
++        if (!voice || !voice->error.empty())
+             return false;
+         done = voice->done;
+         return true;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index b163892..12479b6 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1375,3 +1375,15 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME soundfx.catalog COMMAND sound_fx_tests catalog "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(soundfx.catalog PROPERTIES LABELS "headless;private;soundfx" TIMEOUT 90)
+ endif()
++
++add_executable(audio_stream_tests audio_stream_tests.cpp)
++target_link_libraries(audio_stream_tests PRIVATE blood2_game)
++blood2_project_options(audio_stream_tests)
++foreach(case pcm malformed mixer seams truncation)
++    add_test(NAME audio_stream.${case} COMMAND audio_stream_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/audio-stream-${case}")
++    set_tests_properties(audio_stream.${case} PROPERTIES LABELS "headless;audio_stream" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME audio_stream.city COMMAND audio_stream_tests city "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(audio_stream.city PROPERTIES LABELS "headless;private;audio_stream" TIMEOUT 90)
++endif()
+diff --git a/tests/audio_stream_tests.cpp b/tests/audio_stream_tests.cpp
+new file mode 100644
+index 0000000..2e9062b
+--- /dev/null
++++ b/tests/audio_stream_tests.cpp
+@@ -0,0 +1,314 @@
++#include "audio_fixture.h"
++#include "engine/audio_stream.h"
++#include "game/original/Sound.h"
++#include "game/original/SoundFX.h"
++#include <cmath>
++#include <functional>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    Resource file(const std::filesystem::path& root, const std::vector<std::uint8_t>& b)
++    {
++        std::error_code ec;
++        std::filesystem::create_directories(root, ec);
++        auto path = root / "slice.bin";
++        std::ofstream f(path, std::ios::binary);
++        std::array<char, 123> prefix{};
++        f.write(prefix.data(), prefix.size());
++        f.write(reinterpret_cast<const char*>(b.data()), b.size());
++        f.write(prefix.data(), prefix.size());
++        f.close();
++        return {"test.wav", path, 123, std::uint32_t(b.size()), 0};
++    }
++    bool pcm(const std::filesystem::path& root)
++    {
++        for (unsigned channels : {1u, 2u})
++            for (unsigned bits : {8u, 16u})
++            {
++                auto bytes = test_audio::wave(channels, bits, 44100, 20001);
++                for (size_t i = 44; i < bytes.size(); ++i)
++                    bytes[i] = std::uint8_t(i * 37 + 3);
++                auto resource = file(root, bytes);
++                std::string error;
++                auto stream = PcmStream::open(resource, error);
++                CHECK(stream && stream->frames == 20001 && stream->reads == 4);
++                CHECK(stream->bytes_read == 44 && !stream->refills); // Metadata only, never whole payload preload.
++                AudioClip full;
++                CHECK(read_wave(bytes, full, error));
++                for (auto frame : {4095u, 4096u, 20000u, 0u, 8191u, 8192u, 12505u})
++                    for (unsigned ch = 0; ch < channels; ++ch)
++                    {
++                        float value = 9;
++                        CHECK(stream->sample(frame, ch, value, error));
++                        CHECK(std::abs(value - full.samples[frame * channels + ch]) < 1e-6f);
++                    }
++                CHECK(stream->refills <= 7 &&
++                      stream->bytes_read <= 44 + 7 * PcmStream::window_frames * channels * (bits / 8));
++                float untouched = 42;
++                CHECK(!stream->sample(20001, 0, untouched, error) && untouched == 42);
++                CHECK(!stream->sample(0, channels, untouched, error));
++            }
++        return true;
++    }
++    bool malformed(const std::filesystem::path& root)
++    {
++        std::string error;
++        auto valid = test_audio::wave(1, 8, 8000, 3);
++        for (unsigned kind = 0; kind < 11; ++kind)
++        {
++            auto b = valid;
++            auto patch = [&](size_t at, unsigned n)
++            {
++                for (unsigned i = 0; i < 4; ++i)
++                    b[at + i] = std::uint8_t(n >> (8 * i));
++            };
++            if (kind == 0)
++                b[0] = 'X';
++            if (kind == 1)
++                patch(4, b.size() - 10);
++            if (kind == 2)
++                patch(40, 100);
++            if (kind == 3)
++                b[20] = 17;
++            if (kind == 4)
++                b[22] = 3;
++            if (kind == 5)
++                b[32] = 2;
++            if (kind == 6)
++                b[34] = 24;
++            if (kind == 7)
++                patch(24, 1);
++            if (kind == 8)
++                patch(28, 9);
++            if (kind == 9)
++            {
++                b.resize(12);
++                patch(4, 4);
++            }
++            if (kind == 10)
++            {
++                b.insert(b.end(), {'d', 'a', 't', 'a', 0, 0, 0, 0});
++                patch(4, b.size() - 8);
++            }
++            CHECK(!PcmStream::open(file(root, b), error) && !error.empty());
++        }
++        // Same bounded terminal odd-data exceptions as the existing buffered decoder.
++        for (unsigned kind = 0; kind < 3; ++kind)
++        {
++            auto b = valid;
++            if (kind)
++            {
++                b.push_back(0);
++                if (kind == 2)
++                    b[4]++;
++            }
++            auto stream = PcmStream::open(file(root, b), error);
++            AudioClip full;
++            CHECK(stream && read_wave(b, full, error) && stream->frames == full.frames());
++        }
++        auto many = test_audio::wave();
++        for (unsigned i = 0; i < 1023; ++i)
++            many.insert(many.end(), {'J', 'U', 'N', 'K', 0, 0, 0, 0});
++        for (unsigned i = 0; i < 4; ++i)
++            many[4 + i] = std::uint8_t((many.size() - 8) >> (8 * i));
++        CHECK(!PcmStream::open(file(root, many), error) && error.find("chunk list") != std::string::npos);
++        auto bad = file(root, valid);
++        bad.offset += 1000;
++        CHECK(!PcmStream::open(bad, error));
++        bad = file(root, valid);
++        bad.size = 129 * 1024 * 1024;
++        CHECK(!PcmStream::open(bad, error));
++        return true;
++    }
++    bool mixer(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto owner = g.objects.create(g.objects.find_class("BaseClass"), {}, Creation::Runtime);
++        CHECK(owner);
++        SoundRequest request;
++        request.resource = "long.wav";
++        request.loop = true;
++        request.space = SoundSpace::Ambient;
++        std::string error;
++        auto a = g.server.PlaySoundAt(owner, request, {}, error);
++        request.streaming = true;
++        auto b = g.server.PlaySoundAt(owner, request, {}, error);
++        CHECK(a && b);
++        auto* buffered = g.server.audio.get(a);
++        auto* streamed = g.server.audio.get(b);
++        CHECK(!buffered->clip->stream && streamed->clip->stream && streamed->clip->samples.empty());
++        CHECK(streamed->clip->frames() == 8000 && streamed->clip->duration() == 1);
++        CHECK(g.server.audio.cached_clips() == 2 &&
++              g.server.audio.cached_bytes() == 8000 * 4 + PcmStream::buffer_bytes);
++        g.server.audio.inspect_pcm = true;
++        for (auto dt : {.25, .25, .25, .25, .03, 1.2, 60.0})
++        {
++            CHECK(g.server.advance_audio(dt, {}, {}));
++            CHECK(buffered->cursor == streamed->cursor && buffered->loops == streamed->loops && !streamed->done);
++            for (auto v : g.server.audio.mixed)
++                CHECK(std::abs(v - 1) < 1e-6f); // Two equal half-scale sources at every seam.
++        }
++        std::weak_ptr<PcmStream> lifetime = streamed->clip->stream;
++        CHECK(streamed->clip->stream->refills == 2); // Both windows retain this whole short fixture.
++        request.loop = false;
++        auto c = g.server.PlaySoundAt(owner, request, {}, error);
++        CHECK(c);
++        CHECK(g.server.audio.get(c)->clip == streamed->clip);
++        g.server.audio.inspect_pcm = false;
++        CHECK(g.server.advance_audio(1.1, {}, {}));
++        bool done = false;
++        CHECK(g.server.IsSoundDone(c, done) && done);
++        CHECK(g.objects.remove(owner) && g.server.advance_audio(0, {}, {}));
++        g.objects.finish_frame();
++        CHECK(g.server.audio.voices().empty() && !lifetime.expired() && g.unload_world() &&
++              !g.server.audio.cached_bytes() && lifetime.expired());
++        return true;
++    }
++    bool seams(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        std::string error;
++        for (unsigned channels : {1u, 2u})
++            for (unsigned bits : {8u, 16u})
++            {
++                auto bytes = test_audio::wave(channels, bits, 22050, 12289);
++                for (size_t i = 44; i < bytes.size(); ++i)
++                    bytes[i] = std::uint8_t(i * 37 + 3);
++                test_player::Directory dir;
++                dir.files["varied.wav"] = bytes;
++                test_model::Writer w;
++                w.b.resize(168);
++                w.b[0] = w.b[62] = w.b[124] = 13;
++                w.b[1] = w.b[63] = w.b[125] = 10;
++                w.b[126] = 26;
++                w.patch(127, 1);
++                auto [off, size] = test_player::write_dir(w, dir);
++                w.patch(131, off);
++                w.patch(135, size);
++                const auto path = root / (std::to_string(channels) + "-" + std::to_string(bits) + ".rez");
++                std::ofstream f(path, std::ios::binary);
++                f.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++                f.close();
++                CHECK(g.resources.mount(path, error));
++                AudioMixer buffered, streamed;
++                buffered.inspect_pcm = streamed.inspect_pcm = true;
++                SoundRequest request;
++                request.resource = "varied.wav";
++                request.loop = true;
++                request.space = SoundSpace::Ambient;
++                auto a = buffered.play(g.resources, nullptr, request, {}, error);
++                request.streaming = true;
++                auto b = streamed.play(g.resources, nullptr, request, {}, error);
++                CHECK(a && b);
++                for (double dt : {.18, .18, .18, .02, .17, .25, .003, 60.0, .25})
++                {
++                    CHECK(buffered.advance(dt, {}, {}) && streamed.advance(dt, {}, {}));
++                    CHECK(buffered.mixed.size() == streamed.mixed.size());
++                    for (size_t i = 0; i < buffered.mixed.size(); ++i)
++                        CHECK(std::abs(buffered.mixed[i] - streamed.mixed[i]) < 1e-6f);
++                    CHECK(buffered.get(a)->cursor == streamed.get(b)->cursor &&
++                          buffered.get(a)->loops == streamed.get(b)->loops);
++                }
++                CHECK(streamed.get(b)->clip->stream->refills > 4 && streamed.cached_bytes() == PcmStream::buffer_bytes);
++            }
++        return true;
++    }
++    bool truncation(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto owner = g.objects.create(g.objects.find_class("BaseClass"), {}, Creation::Runtime);
++        CHECK(owner);
++        SoundRequest request;
++        request.resource = "long.wav";
++        request.streaming = true;
++        request.loop = true;
++        std::string error;
++        auto id = g.server.PlaySoundAt(owner, request, {}, error);
++        CHECK(id);
++        g.server.audio.inspect_pcm = true;
++        CHECK(g.server.advance_audio(.02, {}, {}));
++        auto* v = g.server.audio.get(id);
++        auto cursor = v->cursor;
++        std::error_code ec;
++        std::filesystem::resize_file(root / "sound.rez", 0, ec);
++        CHECK(!ec);
++        CHECK(!g.server.advance_audio(.02, {}, {}));
++        CHECK(v->cursor == cursor && !v->error.empty() && !v->done && g.server.audio.mixed.empty() &&
++              !g.server.audio.output_error.empty());
++        bool done = true;
++        CHECK(!g.server.IsSoundDone(id, done) && done);
++        CHECK(!g.server.PlaySoundAt(owner, request, {}, error));
++        CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips() &&
++              g.server.audio.output_error.empty());
++        CHECK(g.server.advance_audio(.02, {}, {}) && g.server.audio.output_error.empty());
++        return true;
++    }
++    bool city(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_cityhub", error));
++            unsigned created = 0, transferred = 0, failed = 0, unknown = 0, fx = 0, fx_voices = 0, streams = 0;
++            for (const auto& e : g.entries)
++            {
++                created += e.state == EntryState::Created;
++                transferred += e.state == EntryState::WorldSound;
++                failed += e.state == EntryState::Failed;
++                unknown += e.state == EntryState::Unsupported;
++            }
++            for (auto id : g.objects.snapshot())
++                if (auto* c = dynamic_cast<SoundFX*>(g.objects.get(id)->game.get()))
++                {
++                    ++fx;
++                    CHECK(c->failures == 0 && c->file_stream);
++                    fx_voices += c->sound != 0;
++                }
++            for (auto& [id, v] : g.server.audio.voices())
++                if (v.request.streaming)
++                {
++                    ++streams;
++                    CHECK(v.clip->stream && v.clip->samples.empty());
++                }
++            g.server.audio.inspect_pcm = true;
++            CHECK(g.server.advance_audio(.2, {}, {}));
++            for (auto& [id, v] : g.server.audio.voices())
++                if (v.request.streaming)
++                    CHECK(v.clip->stream->refills > 0 && v.error.empty());
++            std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
++                      << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
++                      << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
++            CHECK(created == 418 && transferred == 31 && unknown == 32 && failed == 4 && fx == 5 && fx_voices == 4);
++            CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
++                  !g.server.audio.cached_bytes());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"pcm", pcm},     {"malformed", malformed},   {"mixer", mixer},
++        {"seams", seams}, {"truncation", truncation}, {"city", city}};
++    auto it = cases.find(argv[1]);
++    return it != cases.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+index b011dec..dd6953b 100644
+--- a/tests/destructable_model_tests.cpp
++++ b/tests/destructable_model_tests.cpp
+@@ -311,7 +311,7 @@ namespace
+                 ids.push_back(r->id);
+             }
+             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
+-            CHECK(created == 413 && unknown == 32 && failed == 40);
++            CHECK(created == 418 && unknown == 32 && failed == 4);
+             CHECK(update_model_scene(g, scene, error));
+             unsigned skin_failures = 0, triangles = 0;
+             for (auto id : ids)
+diff --git a/tests/sound_fx_tests.cpp b/tests/sound_fx_tests.cpp
+index d7b6d62..f61d3f9 100644
+--- a/tests/sound_fx_tests.cpp
++++ b/tests/sound_fx_tests.cpp
+@@ -156,7 +156,7 @@ namespace
+         GameSession g;
+         CHECK(test_audio::setup(g, root));
+         CHECK(!g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::Restore));
+-        CHECK(!make(g, {{"VoiceType", std::int32_t(0)}})); // Do not silently discard unknown historical properties.
++        CHECK(!make(g, {{"VoiceType", std::int32_t(1)}})); // Nonzero historical behavior is not guessed.
+         auto p = props();
+         p["RampUpSound"] = std::string("missing.wav");
+         auto h = make(g, p);
+@@ -170,9 +170,11 @@ namespace
+         h = make(g, p);
+         CHECK(h);
+         s = get(g, h);
+-        CHECK(trigger(g, h, "ON") && s->state == SoundFX::On && !s->sound &&
+-              s->error.find("TIMESYNC") != std::string::npos);
+-        CHECK(!g.objects.get(h)->scheduled && s->failures == 1);
++        CHECK(trigger(g, h, "ON") && s->state == SoundFX::On && s->sound && s->error.empty());
++        CHECK(g.server.audio.get(s->sound)->request.streaming && g.server.audio.get(s->sound)->clip->samples.empty());
++        CHECK(g.objects.get(h)->scheduled && s->failures == 0);
++        CHECK(trigger(g, h, "OFF")); // Ramp-down stream still owns a retained voice.
++        CHECK(g.step(.101) && !s->sound);
+         p = props();
+         p["StartOn"] = true;
+         p["OuterRadius"] = -1.0f;
+@@ -300,8 +302,8 @@ namespace
+                   << " rejected=" << rejected << " starts=" << attempts << " failures=" << failures
+                   << " references=" << references << " unreadable=" << missing << " city=" << city
+                   << " VoiceType=" << voice_schema << " TypeAction=" << action_schema << '\n';
+-        CHECK(worlds == 57 && entries == 124 && rejected == 124 && created == 0 && attempts == 0 && failures == 0 &&
+-              references == 124 && missing == 1 && voice_schema == 121 && action_schema == 3 && city == 5 &&
++        CHECK(worlds == 57 && entries == 124 && rejected == 3 && created == 121 && attempts == 100 && failures == 0 &&
++              references == 124 && missing == 1 && voice_schema == 0 && action_schema == 3 && city == 5 &&
+               !g.server.string_count());
+         return true;
+     }
+diff --git a/tests/sound_tests.cpp b/tests/sound_tests.cpp
+index c555407..8fe2da3 100644
+--- a/tests/sound_tests.cpp
++++ b/tests/sound_tests.cpp
+@@ -1,4 +1,5 @@
+ #include "audio_fixture.h"
++#include "engine/audio_stream.h"
+ #include "game/original/Sound.h"
+ #include <cmath>
+ #include <functional>
+@@ -164,7 +165,6 @@ namespace
+         GameSession g;
+         CHECK(test_audio::setup(g, root));
+         for (const auto& p : std::vector<Properties>{{{"Filename", std::string("absent.wav")}},
+-                                                     {{"Filename", std::string("cue.wav")}, {"FileStream", true}},
+                                                      {{"Filename", std::string("cue.wav")}, {"InnerRadius", 100.0f}},
+                                                      {{"Filename", std::string("cue.wav")}, {"OuterRadius", -1.0f}}})
+         {
+@@ -173,7 +173,7 @@ namespace
+             CHECK(c && !c->sound && !c->error.empty());
+             CHECK(g.objects.finish_frame() && !g.objects.get(h) && g.server.audio.voices().empty());
+         }
+-        CHECK(!make(g, {{"VoiceType", std::int32_t(0)}})); // Unknown historical schema remains explicit.
++        CHECK(!make(g, {{"VoiceType", std::int32_t(1)}})); // Nonzero historical behavior is not guessed.
+         CHECK(g.objects.finish_frame());
+         auto owner = g.objects.create(g.objects.find_class("BaseClass"), {}, Creation::Runtime);
+         CHECK(owner);
+@@ -233,8 +233,11 @@ namespace
+             r.resource = "region.wav";
+             r.loop = true;
+             CHECK(!g.server.PlayWorldSound(h, r, false, error) && error.find("region-loop") != std::string::npos);
++            CHECK(!g.server.PlayWorldSound(h, r, true, error) && error.find("region-loop") != std::string::npos);
+             r.loop = false;
+             CHECK(g.server.PlaySoundAt(h, r, {}, error));
++            r.streaming = true;
++            CHECK(g.server.PlaySoundAt(h, r, {}, error));
+             w.b.pop_back();
+             AudioClip untouched;
+             untouched.rate = 123;
+@@ -304,6 +307,19 @@ namespace
+                     {
+                         ++started;
+                         CHECK(g.server.audio.get(c->sound)->world_owned);
++                        const auto* voice = g.server.audio.get(c->sound);
++                        CHECK(voice->request.streaming == stream && voice->clip->frames() == clip->frames());
++                        if (stream)
++                        {
++                            CHECK(voice->clip->stream && voice->clip->samples.empty());
++                            for (auto frame : {std::size_t(0), clip->frames() / 2, clip->frames() - 1})
++                                for (unsigned ch = 0; ch < clip->channels; ++ch)
++                                {
++                                    float sample = 0;
++                                    CHECK(voice->clip->stream->sample(frame, ch, sample, error));
++                                    CHECK(std::abs(sample - clip->samples[frame * clip->channels + ch]) < 1e-6f);
++                                }
++                        }
+                         if (path == "worlds/01_subwaya.dat")
+                             std::cout << path << ' ' << file << " world loop=" << c->sound
+                                       << " frames=" << clip->frames() << " rate=" << clip->rate << '\n';
+@@ -316,7 +332,7 @@ namespace
+                   << " invalid=" << invalid << " metadata=" << metadata << " started=" << started
+                   << " rejected=" << rejected << " failed=" << failed << '\n';
+         CHECK(worlds == 57 && sounds == 792 && streams == 302 && missing == 15 && !invalid && !metadata);
+-        CHECK(started == 7 && rejected == 781 && failed == 4);
++        CHECK(started == 696 && rejected == 0 && failed == 96);
+         return true;
+     }
+     bool subway(const std::filesystem::path& root)
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 5cf043d..0373472 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -148,7 +148,7 @@ namespace
+             w.append(object("DestinationProbe", {string_prop("Name", "owned"), prop("Pos", 1, pos)}));
+             w.append(object("DirLight", {string_prop("Name", "spot")}));
+             w.append(object("NotPorted", {string_prop("Name", "unknown")}));
+-            w.append(object("Sound", {prop("VoiceType", 6, integer)}));
++            w.append(object("Sound", {prop("TypeAction", 6, integer)}));
+             w.append(object("GameStartPoint", {string_prop("Name", "arrival"), prop("Pos", 1, pos)}));
+         }
+         else if (sprites)
+@@ -576,15 +576,22 @@ namespace
+             const auto* voice = game.server.audio.get(id);
+             CHECK(voice && voice->world_owned && voice->position.x == 5 && voice->position.y == 6 &&
+                   voice->position.z == 7);
+-            for (unsigned i = 1; i < 4; ++i)
++            for (unsigned i : {1u, 3u})
+                 CHECK(game.entries[i].state == EntryState::Failed && !game.entries[i].sound &&
+                       !game.entries[i].detail.empty());
+             CHECK(game.entries[1].detail.find("Missing") != std::string::npos);
+-            CHECK(game.entries[2].detail.find("FileStream") != std::string::npos);
+-            CHECK(game.entries[3].detail.find("VoiceType") != std::string::npos);
+-            CHECK(game.server.audio.voices().size() == 1 && game.step(.25));
++            CHECK(game.entries[3].detail.find("Rejected precreate") != std::string::npos);
++            CHECK(game.entries[2].state == EntryState::WorldSound && !game.entries[2].object);
++            const auto streamed = game.entries[2].sound;
++            const auto* stream_voice = game.server.audio.get(streamed);
++            CHECK(stream_voice && stream_voice->world_owned && stream_voice->clip->stream &&
++                  stream_voice->clip->samples.empty());
++            std::weak_ptr<const AudioClip> clip = stream_voice->clip;
++            CHECK(game.server.audio.voices().size() == 2 && game.step(.25));
+             CHECK(game.server.audio.get(id)->loops == 2);
++            CHECK(game.server.audio.get(streamed)->loops == 2);
+             CHECK(game.unload_world() && game.entries.empty() && !game.server.audio.get(id));
++            CHECK(!game.server.audio.get(streamed) && clip.expired() && game.server.audio.cached_bytes() == 0);
+         }
+         return true;
+     }
+@@ -831,7 +838,7 @@ namespace
+         CHECK(d.models == 1 && d.triangles == 1 && d.collision_nodes == 1);
+         CHECK(d.source_world == path && d.source_revision == revision && d.requested_start == "arrival");
+         CHECK(d.entries[0].has_position && d.entries[0].position.x == 5 && d.entries[0].name == "owned");
+-        CHECK(d.entries[3].detail.find("VoiceType") != std::string::npos);
++        CHECK(d.entries[3].detail.find("TypeAction") != std::string::npos);
+         CHECK(destination_constructed == construction && game.server.service_calls == calls);
+         CHECK(game.objects.snapshot() == ids && game.local_client == client && game.world_revision == revision);
+         CHECK(game.objects.time() == clock && game.world_path == path && game.server.string_count() == string_count);
+@@ -916,8 +923,8 @@ namespace
+                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
+                 else
+                 {
+-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 417 && d.editor_only == 541 &&
+-                          d.unknown == 32 && d.invalid == 36 && d.models == 100 && d.triangles == 39724);
++                    CHECK(d.entries.size() == 1026 && d.schema_checked == 453 && d.editor_only == 541 &&
++                          d.unknown == 32 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                     for (const auto& e : d.entries)
+                         if (e.state == DestinationEntryState::InvalidProperties)
+                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+@@ -1161,7 +1168,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 413 && d.unknown == 32 && d.failed == 40);
++                        CHECK(d.created == 418 && d.unknown == 32 && d.failed == 4);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

@@ -1,0 +1,31 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 223: cinematics.catalog
+      Start 222: cinematics.device
+      Start 221: cinematics.failures
+      Start 219: cinematics.sequence
+ 1/10 Test #219: cinematics.sequence ..............   Passed    0.01 sec
+      Start 220: cinematics.lifetime
+ 2/10 Test #221: cinematics.failures ..............   Passed    0.01 sec
+      Start 217: cinematics.mixer
+ 3/10 Test #220: cinematics.lifetime ..............   Passed    0.01 sec
+      Start 218: cinematics.spatial
+ 4/10 Test #217: cinematics.mixer .................   Passed    0.01 sec
+      Start 216: cinematics.decode
+ 5/10 Test #216: cinematics.decode ................   Passed    0.00 sec
+      Start 224: cinematics.subway
+ 6/10 Test #218: cinematics.spatial ...............   Passed    0.01 sec
+ 7/10 Test #222: cinematics.device ................   Passed    0.06 sec
+ 8/10 Test #224: cinematics.subway ................   Passed    0.63 sec
+ 9/10 Test #223: cinematics.catalog ...............   Passed    3.56 sec
+      Start 225: gpu.cinematics
+10/10 Test #225: gpu.cinematics ...................   Passed    3.88 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+cinematics    =   8.17 sec*proc (10 tests)
+gpu           =   3.88 sec*proc (1 test)
+headless      =   4.29 sec*proc (9 tests)
+private       =   8.07 sec*proc (3 tests)
+
+Total Test time (real) =   7.45 sec

@@ -1,0 +1,169 @@
+Start testing: Oct 17 02:24 CEST
+----------------------------------------------------------
+667/673 Testing: gideon_combat.shield
+667/673 Test: gideon_combat.shield
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_combat_tests" "shield" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-combat-shield"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_combat.shield" start time: Oct 17 02:24 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.shield" end time: Oct 17 02:24 CEST
+"gideon_combat.shield" time elapsed: 00:00:00
+----------------------------------------------------------
+
+670/673 Testing: gideon_combat.keys
+670/673 Test: gideon_combat.keys
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_combat_tests" "keys" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-combat-keys"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_combat.keys" start time: Oct 17 02:24 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.keys" end time: Oct 17 02:24 CEST
+"gideon_combat.keys" time elapsed: 00:00:00
+----------------------------------------------------------
+
+668/673 Testing: gideon_combat.choices
+668/673 Test: gideon_combat.choices
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_combat_tests" "choices" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-combat-choices"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_combat.choices" start time: Oct 17 02:24 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.choices" end time: Oct 17 02:24 CEST
+"gideon_combat.choices" time elapsed: 00:00:00
+----------------------------------------------------------
+
+672/673 Testing: gideon_combat.lifetime
+672/673 Test: gideon_combat.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_combat_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-combat-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_combat.lifetime" start time: Oct 17 02:24 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.lifetime" end time: Oct 17 02:24 CEST
+"gideon_combat.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+666/673 Testing: gideon_combat.decisions
+666/673 Test: gideon_combat.decisions
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_combat_tests" "decisions" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-combat-decisions"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_combat.decisions" start time: Oct 17 02:24 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.decisions" end time: Oct 17 02:24 CEST
+"gideon_combat.decisions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+669/673 Testing: gideon_combat.aim
+669/673 Test: gideon_combat.aim
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_combat_tests" "aim" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-combat-aim"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_combat.aim" start time: Oct 17 02:24 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.aim" end time: Oct 17 02:24 CEST
+"gideon_combat.aim" time elapsed: 00:00:00
+----------------------------------------------------------
+
+671/673 Testing: gideon_combat.failures
+671/673 Test: gideon_combat.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_combat_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-combat-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_combat.failures" start time: Oct 17 02:24 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.failures" end time: Oct 17 02:24 CEST
+"gideon_combat.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+673/673 Testing: gideon_combat.private
+673/673 Test: gideon_combat.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_combat_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_combat.private" start time: Oct 17 02:24 CEST
+Output:
+----------------------------------------------------------
+shield-key=[play_sound:build]
+shield-key=[extra_key:powerup]
+shield-key=[fire_key:head]
+cycle=0 shield_clip=6 keys=3 shots=1 armor=100 duration_ms=3333 animating=0 key_failures=0 key_error=
+magic-key=[play_sound:build]
+magic-key=[fire_key:rr_gun]
+magic-key=[fire_key:ll_gun]
+magic-key=[fire_key:rr_gun]
+magic_clip=7 shots=3 expected=3 last_node=rr_gun failures=0 key_error=
+weapon=41 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=27 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=38 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=42 node=rr_gun origin=44.4828,121.577,11.6681
+shield-key=[play_sound:build]
+shield-key=[extra_key:powerup]
+shield-key=[fire_key:head]
+cycle=1 shield_clip=6 keys=3 shots=1 armor=100 duration_ms=3333 animating=0 key_failures=0 key_error=
+magic-key=[play_sound:build]
+magic-key=[fire_key:rr_gun]
+magic-key=[fire_key:ll_gun]
+magic-key=[fire_key:rr_gun]
+magic_clip=7 shots=3 expected=3 last_node=rr_gun failures=0 key_error=
+weapon=41 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=27 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=38 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=42 node=rr_gun origin=44.4828,121.577,11.6681
+shield-key=[play_sound:build]
+shield-key=[extra_key:powerup]
+shield-key=[fire_key:head]
+cycle=2 shield_clip=6 keys=3 shots=1 armor=100 duration_ms=3333 animating=0 key_failures=0 key_error=
+magic-key=[play_sound:build]
+magic-key=[fire_key:rr_gun]
+magic-key=[fire_key:ll_gun]
+magic-key=[fire_key:rr_gun]
+magic_clip=7 shots=3 expected=3 last_node=rr_gun failures=0 key_error=
+weapon=41 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=27 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=38 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=42 node=rr_gun origin=44.4828,121.577,11.6681
+<end of output>
+Test time =   0.21 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.private" end time: Oct 17 02:24 CEST
+"gideon_combat.private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 02:24 CEST
+
+gideon_combat =   0.23 sec*proc
+
+headless =   0.23 sec*proc
+
+private =   0.21 sec*proc
+

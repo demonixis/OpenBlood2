@@ -1,0 +1,15 @@
+1/707 Testing: objects.builtin_model
+1/707 Test: objects.builtin_model
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_contract_tests" "builtin_model"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"objects.builtin_model" start time: Oct 17 04:46 CEST
+Output:
+----------------------------------------------------------
+PASS builtin_model
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.builtin_model" end time: Oct 17 04:46 CEST
+"objects.builtin_model" time elapsed: 00:00:00
+----------------------------------------------------------

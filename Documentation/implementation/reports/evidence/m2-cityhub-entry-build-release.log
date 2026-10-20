@@ -1,0 +1,887 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- dynamic libasound -> libasound.so.2
+-- dynamic libjack -> libjack.so.0
+-- dynamic libpipewire-0.3 -> libpipewire-0.3.so.0
+-- dynamic libpulse -> libpulse.so.0
+-- Checking for module 'sndio'
+--   Package 'sndio' not found
+-- dynamic libX11 -> libX11.so.6
+-- dynamic libXext -> libXext.so.6
+-- dynamic libXcursor -> libXcursor.so.1
+-- dynamic libXi -> libXi.so.6
+-- dynamic libXfixes -> libXfixes.so.3
+-- dynamic libXrandr -> libXrandr.so.2
+-- dynamic libXrender -> libXrender.so.1
+-- dynamic libXss -> libXss.so.1
+-- dynamic libXtst -> libXtst.so.6
+-- dynamic libfribidi -> libfribidi.so.0
+-- dynamic libthai -> libthai.so.0
+-- dynamic libdrm -> libdrm.so.2
+-- dynamic libgbm -> libgbm.so.1
+-- dynamic libwayland-client -> libwayland-client.so.0
+-- dynamic libwayland-egl -> libwayland-egl.so.1
+-- dynamic libwayland-cursor -> libwayland-cursor.so.0
+-- dynamic libxkbcommon -> libxkbcommon.so.0
+-- dynamic libdecor-0 -> libdecor-0.so.0
+-- dynamic libudev -> libudev.so.1
+-- Checking for one of the modules 'liburing-ffi'
+--
+-- SDL3 was configured with the following options:
+--
+-- Platform: Linux-7.2.10-200.fc44.x86_64
+-- 64-bit:   TRUE
+-- Compiler: /usr/bin/cc
+-- Revision: SDL-3.5.0-d9a83f0
+-- Vendor:
+--
+-- Subsystems:
+--   Audio:        ON
+--   Video:        ON
+--   GPU:          ON
+--   Render:       ON
+--   Camera:       ON
+--   Joystick:     ON
+--   Haptic:       ON
+--   Hidapi:       ON
+--   Power:        ON
+--   Sensor:       ON
+--   Dialog:       ON
+--   Tray:         ON
+--   Notification: ON
+--
+-- Options:
+--   SDL_ALSA                    (Wanted: ON): ON
+--   SDL_ALSA_SHARED             (Wanted: ON): ON
+--   SDL_ALTIVEC                 (Wanted: OFF): OFF
+--   SDL_ARMNEON                 (Wanted: OFF): OFF
+--   SDL_ARMSVE2                 (Wanted: OFF): OFF
+--   SDL_ASAN                    (Wanted: OFF): OFF
+--   SDL_ASSEMBLY                (Wanted: ON): ON
+--   SDL_ASSERTIONS              (Wanted: auto): auto
+--   SDL_AVX                     (Wanted: ON): ON
+--   SDL_AVX2                    (Wanted: ON): ON
+--   SDL_AVX512F                 (Wanted: ON): ON
+--   SDL_BACKGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_CCACHE                  (Wanted: OFF): OFF
+--   SDL_CLANG_TIDY              (Wanted: OFF): OFF
+--   SDL_CLOCK_GETTIME           (Wanted: ON): ON
+--   SDL_COCOA                   (Wanted: OFF): OFF
+--   SDL_DBUS                    (Wanted: ON): ON
+--   SDL_DEPS_SHARED             (Wanted: ON): OFF
+--   SDL_DIRECTX                 (Wanted: OFF): OFF
+--   SDL_DISKAUDIO               (Wanted: ON): ON
+--   SDL_DLOPEN_NOTES            (Wanted: ON): ON
+--   SDL_DUMMYAUDIO              (Wanted: ON): ON
+--   SDL_DUMMYCAMERA             (Wanted: ON): ON
+--   SDL_DUMMYVIDEO              (Wanted: ON): ON
+--   SDL_EXAMPLES                (Wanted: OFF): OFF
+--   SDL_EXAMPLES_LINK_SHARED    (Wanted: OFF): OFF
+--   SDL_FOREGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_FRIBIDI                 (Wanted: ON): ON
+--   SDL_FRIBIDI_SHARED          (Wanted: ON): ON
+--   SDL_GCC_ATOMICS             (Wanted: ON): ON
+--   SDL_GPU_OPENXR              (Wanted: ON): ON
+--   SDL_HIDAPI                  (Wanted: ON): ON
+--   SDL_HIDAPI_JOYSTICK         (Wanted: ON): ON
+--   SDL_HIDAPI_LIBUSB           (Wanted: ON): ON
+--   SDL_HIDAPI_LIBUSB_SHARED    (Wanted: ON): ON
+--   SDL_IBUS                    (Wanted: ON): ON
+--   SDL_INSTALL                 (Wanted: OFF): OFF
+--   SDL_INSTALL_TESTS           (Wanted: OFF): OFF
+--   SDL_JACK                    (Wanted: ON): ON
+--   SDL_JACK_SHARED             (Wanted: ON): ON
+--   SDL_KMSDRM                  (Wanted: ON): ON
+--   SDL_KMSDRM_SHARED           (Wanted: ON): ON
+--   SDL_LASX                    (Wanted: OFF): OFF
+--   SDL_LEAN_AND_MEAN           (Wanted: OFF): OFF
+--   SDL_LIBC                    (Wanted: ON): ON
+--   SDL_LIBICONV                (Wanted: OFF): OFF
+--   SDL_LIBTHAI                 (Wanted: ON): ON
+--   SDL_LIBTHAI_SHARED          (Wanted: ON): ON
+--   SDL_LIBUDEV                 (Wanted: ON): ON
+--   SDL_LIBUDEV_SHARED          (Wanted: ON): ON
+--   SDL_LIBURING                (Wanted: ON): OFF
+--   SDL_LSX                     (Wanted: OFF): OFF
+--   SDL_METAL                   (Wanted: OFF): OFF
+--   SDL_MMX                     (Wanted: ON): ON
+--   SDL_OFFSCREEN               (Wanted: ON): ON
+--   SDL_OPENGL                  (Wanted: ON): ON
+--   SDL_OPENGLES                (Wanted: ON): ON
+--   SDL_OPENVR                  (Wanted: OFF): OFF
+--   SDL_OSS                     (Wanted: OFF): OFF
+--   SDL_PIPEWIRE                (Wanted: ON): ON
+--   SDL_PIPEWIRE_SHARED         (Wanted: ON): ON
+--   SDL_PTHREADS                (Wanted: ON): ON
+--   SDL_PTHREADS_SEM            (Wanted: ON): ON
+--   SDL_PULSEAUDIO              (Wanted: ON): ON
+--   SDL_PULSEAUDIO_SHARED       (Wanted: ON): ON
+--   SDL_RENDER_D3D              (Wanted: OFF): OFF
+--   SDL_RENDER_D3D11            (Wanted: OFF): OFF
+--   SDL_RENDER_D3D12            (Wanted: OFF): OFF
+--   SDL_RENDER_GPU              (Wanted: ON): ON
+--   SDL_RENDER_METAL            (Wanted: OFF): OFF
+--   SDL_RENDER_VULKAN           (Wanted: ON): ON
+--   SDL_ROCKCHIP                (Wanted: OFF): OFF
+--   SDL_RPATH                   (Wanted: ON): OFF
+--   SDL_RPI                     (Wanted: OFF): OFF
+--   SDL_SNDIO                   (Wanted: ON): OFF
+--   SDL_SNDIO_SHARED            (Wanted: ON): OFF
+--   SDL_SSE                     (Wanted: ON): ON
+--   SDL_SSE2                    (Wanted: ON): ON
+--   SDL_SSE3                    (Wanted: ON): ON
+--   SDL_SSE4_1                  (Wanted: ON): ON
+--   SDL_SSE4_2                  (Wanted: ON): ON
+--   SDL_SYSTEM_ICONV            (Wanted: ON): ON
+--   SDL_TESTS                   (Wanted: OFF): OFF
+--   SDL_TESTS_LINK_SHARED       (Wanted: OFF): OFF
+--   SDL_UNINSTALL               (Wanted: OFF): OFF
+--   SDL_VIRTUAL_JOYSTICK        (Wanted: ON): ON
+--   SDL_VIVANTE                 (Wanted: OFF): OFF
+--   SDL_VULKAN                  (Wanted: ON): ON
+--   SDL_WASAPI                  (Wanted: OFF): OFF
+--   SDL_WAYLAND                 (Wanted: ON): ON
+--   SDL_WAYLAND_LIBDECOR        (Wanted: ON): ON
+--   SDL_WAYLAND_LIBDECOR_SHARED (Wanted: ON): ON
+--   SDL_WAYLAND_SHARED          (Wanted: ON): ON
+--   SDL_X11                     (Wanted: ON): ON
+--   SDL_X11_SHARED              (Wanted: ON): ON
+--   SDL_X11_XCURSOR             (Wanted: ON): ON
+--   SDL_X11_XDBE                (Wanted: ON): ON
+--   SDL_X11_XFIXES              (Wanted: ON): ON
+--   SDL_X11_XINPUT              (Wanted: ON): ON
+--   SDL_X11_XRANDR              (Wanted: ON): ON
+--   SDL_X11_XSCRNSAVER          (Wanted: ON): ON
+--   SDL_X11_XSHAPE              (Wanted: ON): ON
+--   SDL_X11_XSYNC               (Wanted: ON): ON
+--   SDL_X11_XTEST               (Wanted: ON): ON
+--   SDL_XINPUT                  (Wanted: OFF): OFF
+--
+--  Build Shared Library: OFF
+--  Build Static Library: ON
+--
+-- Enabled backends:
+--   Video drivers: dummy kmsdrm(dynamic) offscreen wayland(dynamic) x11(dynamic)
+--   X11 libraries: xcursor xdbe xfixes xinput2 xrandr xscrnsaver xshape xsync xtest
+--   Render drivers: gpu ogl ogl_es ogl_es2 vulkan
+--   GPU drivers: openxr vulkan
+--   Audio drivers: alsa(dynamic) disk dummy jack(dynamic) pipewire(dynamic) pulseaudio(dynamic)
+--   Joystick drivers: hidapi linux virtual
+--   Camera drivers: dummy pipewire(dynamic) v4l2
+--
+-- If something was not detected, although the libraries
+-- were installed, then make sure you have set the
+-- CMAKE_C_FLAGS and CMAKE_PREFIX_PATH CMake variables correctly.
+--
+-- Build spdlog: 1.15.3
+-- Build type: Release
+-- Configuring done (0.7s)
+-- Generating done (0.3s)
+-- Build files have been written to: /home/yann/projects/lithtech/Blood2/build/release
+[0/4] Re-checking globbed directories...
+[1/836] Scanning /home/yann/projects/lithtech/Blood2/src/engine/sprite_view.cpp for CXX dependencies
+[2/836] Scanning /home/yann/projects/lithtech/Blood2/src/engine/sky.cpp for CXX dependencies
+[3/836] Scanning /home/yann/projects/lithtech/Blood2/src/engine/model_view.cpp for CXX dependencies
+[4/836] Scanning /home/yann/projects/lithtech/Blood2/src/engine/world_renderer.cpp for CXX dependencies
+[5/836] Scanning /home/yann/projects/lithtech/Blood2/src/engine/world_view.cpp for CXX dependencies
+[6/836] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[7/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_sky.cpp for CXX dependencies
+[8/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/SkyObjects.cpp for CXX dependencies
+[9/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_projectiles.cpp for CXX dependencies
+[10/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/destination_trial.cpp for CXX dependencies
+[11/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/level_change.cpp for CXX dependencies
+[12/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/world_preparation.cpp for CXX dependencies
+[13/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/session.cpp for CXX dependencies
+[14/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_attachments.cpp for CXX dependencies
+[15/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/registration.cpp for CXX dependencies
+[16/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/player_restore.cpp for CXX dependencies
+[17/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_adapter.cpp for CXX dependencies
+[18/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_sprites.cpp for CXX dependencies
+[19/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_lights.cpp for CXX dependencies
+[20/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_audio.cpp for CXX dependencies
+[21/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_keyframes.cpp for CXX dependencies
+[22/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_cameras.cpp for CXX dependencies
+[23/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_objectives.cpp for CXX dependencies
+[24/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_models.cpp for CXX dependencies
+[25/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_pickups.cpp for CXX dependencies
+[26/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_movers.cpp for CXX dependencies
+[27/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp for CXX dependencies
+[28/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_rotation.cpp for CXX dependencies
+[29/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_keys.cpp for CXX dependencies
+[30/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_containers.cpp for CXX dependencies
+[31/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_activation.cpp for CXX dependencies
+[32/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_exits.cpp for CXX dependencies
+[33/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_weapons.cpp for CXX dependencies
+[34/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_clients.cpp for CXX dependencies
+[35/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_effects.cpp for CXX dependencies
+[36/816] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_world_bodies.cpp for CXX dependencies
+[37/816] Building CXX object CMakeFiles/engine.dir/src/engine/sky.cpp.o
+[38/816] Building CXX object CMakeFiles/engine.dir/src/engine/model_view.cpp.o
+[39/816] Building CXX object CMakeFiles/engine.dir/src/engine/sprite_view.cpp.o
+[40/816] Building CXX object CMakeFiles/engine.dir/src/engine/world_renderer.cpp.o
+[41/816] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[42/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/path_manager_smoke.cpp for CXX dependencies
+[43/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/ai_model_key_smoke.cpp for CXX dependencies
+[44/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/character_motion_smoke.cpp for CXX dependencies
+[45/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[46/710] Building CXX object CMakeFiles/engine.dir/src/engine/world_view.cpp.o
+[47/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[48/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[49/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/interaction_smoke.cpp for CXX dependencies
+[50/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/trigger_smoke.cpp for CXX dependencies
+[51/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/brush_smoke.cpp for CXX dependencies
+[52/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/pickup_smoke.cpp for CXX dependencies
+[53/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/camera_smoke.cpp for CXX dependencies
+[54/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/objectives_smoke.cpp for CXX dependencies
+[55/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/keyframe_smoke.cpp for CXX dependencies
+[56/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/light_smoke.cpp for CXX dependencies
+[57/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/cinematic_smoke.cpp for CXX dependencies
+[58/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/random_sound_smoke.cpp for CXX dependencies
+[59/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_smoke.cpp for CXX dependencies
+[60/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/world_sound_smoke.cpp for CXX dependencies
+[61/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/scene_explosion_smoke.cpp for CXX dependencies
+[62/710] Scanning /home/yann/projects/lithtech/Blood2/tests/object_contract_tests.cpp for CXX dependencies
+[63/710] Scanning /home/yann/projects/lithtech/Blood2/tests/world_tests.cpp for CXX dependencies
+[64/710] Scanning /home/yann/projects/lithtech/Blood2/tests/player_tests.cpp for CXX dependencies
+[65/710] Scanning /home/yann/projects/lithtech/Blood2/tests/services_tests.cpp for CXX dependencies
+[66/710] Scanning /home/yann/projects/lithtech/Blood2/tests/weapon_tests.cpp for CXX dependencies
+[67/710] Scanning /home/yann/projects/lithtech/Blood2/tests/movement_tests.cpp for CXX dependencies
+[68/710] Scanning /home/yann/projects/lithtech/Blood2/tests/container_tests.cpp for CXX dependencies
+[69/710] Scanning /home/yann/projects/lithtech/Blood2/tests/locomotion_tests.cpp for CXX dependencies
+[70/710] Scanning /home/yann/projects/lithtech/Blood2/tests/compound_shell_tests.cpp for CXX dependencies
+[71/710] Scanning /home/yann/projects/lithtech/Blood2/tests/door_tests.cpp for CXX dependencies
+[72/710] Scanning /home/yann/projects/lithtech/Blood2/tests/trigger_tests.cpp for CXX dependencies
+[73/710] Scanning /home/yann/projects/lithtech/Blood2/tests/brush_tests.cpp for CXX dependencies
+[74/710] Scanning /home/yann/projects/lithtech/Blood2/tests/interaction_tests.cpp for CXX dependencies
+[75/710] Scanning /home/yann/projects/lithtech/Blood2/tests/explosion_tests.cpp for CXX dependencies
+[76/710] Scanning /home/yann/projects/lithtech/Blood2/tests/pushable_tests.cpp for CXX dependencies
+[77/710] Scanning /home/yann/projects/lithtech/Blood2/tests/objectives_tests.cpp for CXX dependencies
+[78/710] Scanning /home/yann/projects/lithtech/Blood2/tests/pickup_tests.cpp for CXX dependencies
+[79/710] Scanning /home/yann/projects/lithtech/Blood2/tests/camera_tests.cpp for CXX dependencies
+[80/710] Scanning /home/yann/projects/lithtech/Blood2/tests/keyframer_tests.cpp for CXX dependencies
+[81/710] Scanning /home/yann/projects/lithtech/Blood2/tests/light_tests.cpp for CXX dependencies
+[82/710] Scanning /home/yann/projects/lithtech/Blood2/tests/cinematic_tests.cpp for CXX dependencies
+[83/710] Scanning /home/yann/projects/lithtech/Blood2/tests/worldpath_tests.cpp for CXX dependencies
+[84/710] Scanning /home/yann/projects/lithtech/Blood2/tests/random_sound_tests.cpp for CXX dependencies
+[85/710] Scanning /home/yann/projects/lithtech/Blood2/tests/sound_tests.cpp for CXX dependencies
+[86/710] Scanning /home/yann/projects/lithtech/Blood2/tests/scene_explosion_tests.cpp for CXX dependencies
+[87/710] Scanning /home/yann/projects/lithtech/Blood2/tests/sprite_tests.cpp for CXX dependencies
+[88/710] Scanning /home/yann/projects/lithtech/Blood2/tests/character_animation_tests.cpp for CXX dependencies
+[89/710] Scanning /home/yann/projects/lithtech/Blood2/tests/character_audio_tests.cpp for CXX dependencies
+[90/710] Scanning /home/yann/projects/lithtech/Blood2/tests/character_motion_tests.cpp for CXX dependencies
+[91/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_model_key_tests.cpp for CXX dependencies
+[92/710] Scanning /home/yann/projects/lithtech/Blood2/tests/path_manager_tests.cpp for CXX dependencies
+[93/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_sight_tests.cpp for CXX dependencies
+[94/710] Scanning /home/yann/projects/lithtech/Blood2/tests/attachment_tests.cpp for CXX dependencies
+[95/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_target_tests.cpp for CXX dependencies
+[96/710] Scanning /home/yann/projects/lithtech/Blood2/tests/world_view_tests.cpp for CXX dependencies
+[97/710] Scanning /home/yann/projects/lithtech/Blood2/tests/world_gpu_tests.cpp for CXX dependencies
+[98/710] Scanning /home/yann/projects/lithtech/Blood2/tests/texture_tests.cpp for CXX dependencies
+[99/710] Scanning /home/yann/projects/lithtech/Blood2/tests/model_view_tests.cpp for CXX dependencies
+[100/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[101/710] Scanning /home/yann/projects/lithtech/Blood2/tests/model_gpu_tests.cpp for CXX dependencies
+[102/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[103/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_perception_tests.cpp for CXX dependencies
+[104/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_state_tests.cpp for CXX dependencies
+[105/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_trigger_tests.cpp for CXX dependencies
+[106/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_fire_tests.cpp for CXX dependencies
+[107/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_follow_tests.cpp for CXX dependencies
+[108/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_navigation_tests.cpp for CXX dependencies
+[109/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_script_tests.cpp for CXX dependencies
+[110/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_locomotion_tests.cpp for CXX dependencies
+[111/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_recovery_tests.cpp for CXX dependencies
+[112/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_escape_tests.cpp for CXX dependencies
+[113/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_runtime_tests.cpp for CXX dependencies
+[114/710] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_hit_tests.cpp for CXX dependencies
+[115/710] Scanning /home/yann/projects/lithtech/Blood2/tests/weapon_drop_tests.cpp for CXX dependencies
+[116/710] Scanning /home/yann/projects/lithtech/Blood2/tests/corpse_tests.cpp for CXX dependencies
+[117/710] Scanning /home/yann/projects/lithtech/Blood2/tests/exit_tests.cpp for CXX dependencies
+[118/710] Scanning /home/yann/projects/lithtech/Blood2/tests/inventory_state_tests.cpp for CXX dependencies
+[119/710] Scanning /home/yann/projects/lithtech/Blood2/tests/destructable_state_tests.cpp for CXX dependencies
+[120/710] Scanning /home/yann/projects/lithtech/Blood2/tests/player_state_tests.cpp for CXX dependencies
+[121/710] Scanning /home/yann/projects/lithtech/Blood2/tests/character_nodes_tests.cpp for CXX dependencies
+[122/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[123/710] Scanning /home/yann/projects/lithtech/Blood2/tests/player_restore_tests.cpp for CXX dependencies
+[124/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[125/710] Scanning /home/yann/projects/lithtech/Blood2/tests/player_keepalive_tests.cpp for CXX dependencies
+[126/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[127/710] Scanning /home/yann/projects/lithtech/Blood2/tests/sprite_view_tests.cpp for CXX dependencies
+[128/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[129/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[130/710] Scanning /home/yann/projects/lithtech/Blood2/tests/sprite_gpu_tests.cpp for CXX dependencies
+[131/710] Scanning /home/yann/projects/lithtech/Blood2/tests/explosion_sprite_tests.cpp for CXX dependencies
+[132/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[133/710] Scanning /home/yann/projects/lithtech/Blood2/tests/explosion_model_tests.cpp for CXX dependencies
+[134/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[135/710] Scanning /home/yann/projects/lithtech/Blood2/tests/explosion_light_tests.cpp for CXX dependencies
+[136/710] Scanning /home/yann/projects/lithtech/Blood2/tests/explosion_model_gpu_tests.cpp for CXX dependencies
+[137/710] Scanning /home/yann/projects/lithtech/Blood2/tests/explosion_ring_tests.cpp for CXX dependencies
+[138/710] Scanning /home/yann/projects/lithtech/Blood2/tests/explosion_ring_gpu_tests.cpp for CXX dependencies
+[139/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[140/710] Scanning /home/yann/projects/lithtech/Blood2/tests/explosion_fragment_tests.cpp for CXX dependencies
+[141/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[142/710] Scanning /home/yann/projects/lithtech/Blood2/tests/explosion_fragment_gpu_tests.cpp for CXX dependencies
+[143/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[144/710] Scanning /home/yann/projects/lithtech/Blood2/tests/object_particle_tests.cpp for CXX dependencies
+[145/710] Scanning /home/yann/projects/lithtech/Blood2/tests/object_particle_gpu_tests.cpp for CXX dependencies
+[146/710] Scanning /home/yann/projects/lithtech/Blood2/tests/explosion_flame_tests.cpp for CXX dependencies
+[147/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[148/710] Scanning /home/yann/projects/lithtech/Blood2/tests/weapon_audio_tests.cpp for CXX dependencies
+[149/710] Scanning /home/yann/projects/lithtech/Blood2/tests/explosion_flame_gpu_tests.cpp for CXX dependencies
+[150/710] Scanning /home/yann/projects/lithtech/Blood2/tests/weapon_impact_tests.cpp for CXX dependencies
+[151/710] Scanning /home/yann/projects/lithtech/Blood2/tests/weapon_sprite_tests.cpp for CXX dependencies
+[152/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[153/710] Scanning /home/yann/projects/lithtech/Blood2/tests/weapon_sprite_gpu_tests.cpp for CXX dependencies
+[154/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[155/710] Scanning /home/yann/projects/lithtech/Blood2/tests/player_controls_tests.cpp for CXX dependencies
+[156/710] Scanning /home/yann/projects/lithtech/Blood2/tests/world_alpha_gpu_tests.cpp for CXX dependencies
+[157/710] Scanning /home/yann/projects/lithtech/Blood2/tests/session_playback_tests.cpp for CXX dependencies
+[158/710] Scanning /home/yann/projects/lithtech/Blood2/tests/naga_tests.cpp for CXX dependencies
+[159/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[160/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[161/710] Scanning /home/yann/projects/lithtech/Blood2/tests/naga_gpu_tests.cpp for CXX dependencies
+[162/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[163/710] Scanning /home/yann/projects/lithtech/Blood2/tests/energy_tests.cpp for CXX dependencies
+[164/710] Scanning /home/yann/projects/lithtech/Blood2/tests/energy_gpu_tests.cpp for CXX dependencies
+[165/710] Scanning /home/yann/projects/lithtech/Blood2/tests/wind_tests.cpp for CXX dependencies
+[166/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[167/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[168/710] Scanning /home/yann/projects/lithtech/Blood2/tests/wind_gpu_tests.cpp for CXX dependencies
+[169/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[170/710] Scanning /home/yann/projects/lithtech/Blood2/tests/shield_tests.cpp for CXX dependencies
+[171/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[172/710] Scanning /home/yann/projects/lithtech/Blood2/tests/shield_gpu_tests.cpp for CXX dependencies
+[173/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[174/710] Scanning /home/yann/projects/lithtech/Blood2/tests/gideon_combat_tests.cpp for CXX dependencies
+[175/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[176/710] Scanning /home/yann/projects/lithtech/Blood2/tests/gideon_teleport_tests.cpp for CXX dependencies
+[177/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[178/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[179/710] Scanning /home/yann/projects/lithtech/Blood2/tests/gideon_teleport_gpu_tests.cpp for CXX dependencies
+[180/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[181/710] Scanning /home/yann/projects/lithtech/Blood2/tests/gideon_attack_tests.cpp for CXX dependencies
+[182/710] Scanning /home/yann/projects/lithtech/Blood2/tests/gideon_runtime_tests.cpp for CXX dependencies
+[183/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[184/710] Scanning /home/yann/projects/lithtech/Blood2/tests/destructable_model_tests.cpp for CXX dependencies
+[185/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[186/710] Scanning /home/yann/projects/lithtech/Blood2/tests/sound_fx_tests.cpp for CXX dependencies
+[187/710] Scanning /home/yann/projects/lithtech/Blood2/tests/audio_stream_tests.cpp for CXX dependencies
+[188/710] Scanning /home/yann/projects/lithtech/Blood2/tests/mac10_tests.cpp for CXX dependencies
+[189/710] Scanning /home/yann/projects/lithtech/Blood2/tests/mac10_gpu_tests.cpp for CXX dependencies
+[190/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[191/710] Scanning /home/yann/projects/lithtech/Blood2/tests/flare_tests.cpp for CXX dependencies
+[192/710] Scanning /home/yann/projects/lithtech/Blood2/tests/flare_gpu_tests.cpp for CXX dependencies
+[193/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[194/710] Scanning /home/yann/projects/lithtech/Blood2/tests/flare_view_gpu_tests.cpp for CXX dependencies
+[195/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[196/710] Scanning /home/yann/projects/lithtech/Blood2/tests/world_debris_tests.cpp for CXX dependencies
+[197/710] Scanning /home/yann/projects/lithtech/Blood2/tests/world_debris_gpu_tests.cpp for CXX dependencies
+[198/710] Scanning /home/yann/projects/lithtech/Blood2/tests/assault_tests.cpp for CXX dependencies
+[199/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[200/710] Scanning /home/yann/projects/lithtech/Blood2/tests/assault_gpu_tests.cpp for CXX dependencies
+[201/710] Scanning /home/yann/projects/lithtech/Blood2/tests/conversation_tests.cpp for CXX dependencies
+[202/710] Scanning /home/yann/projects/lithtech/Blood2/tests/medkit_tests.cpp for CXX dependencies
+[203/710] Scanning /home/yann/projects/lithtech/Blood2/tests/surface_effect_tests.cpp for CXX dependencies
+[204/710] Scanning /home/yann/projects/lithtech/Blood2/tests/world_shader_tests.cpp for CXX dependencies
+[205/710] Scanning /home/yann/projects/lithtech/Blood2/tests/surface_effect_gpu_tests.cpp for CXX dependencies
+[206/710] Scanning /home/yann/projects/lithtech/Blood2/tests/level_change_gpu_tests.cpp for CXX dependencies
+[207/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[208/710] Scanning /home/yann/projects/lithtech/Blood2/tests/particle_stream_tests.cpp for CXX dependencies
+[209/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[210/710] Scanning /home/yann/projects/lithtech/Blood2/tests/particle_stream_gpu_tests.cpp for CXX dependencies
+[211/710] Scanning /home/yann/projects/lithtech/Blood2/tests/sky_tests.cpp for CXX dependencies
+[212/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[213/710] Scanning /home/yann/projects/lithtech/Blood2/tests/sky_gpu_tests.cpp for CXX dependencies
+[214/710] Scanning /home/yann/projects/lithtech/Blood2/tests/proximity_tests.cpp for CXX dependencies
+[215/710] Scanning /home/yann/projects/lithtech/Blood2/tests/proximity_gpu_tests.cpp for CXX dependencies
+[216/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[217/710] Scanning /home/yann/projects/lithtech/Blood2/tests/remote_tests.cpp for CXX dependencies
+[218/710] Scanning /home/yann/projects/lithtech/Blood2/tests/remote_gpu_tests.cpp for CXX dependencies
+[219/710] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[220/710] Scanning /home/yann/projects/lithtech/Blood2/tests/flashlight_tests.cpp for CXX dependencies
+[221/710] Scanning /home/yann/projects/lithtech/Blood2/tests/flashlight_gpu_tests.cpp for CXX dependencies
+[222/710] Linking CXX static library libengine.a
+[223/710] Scanning /home/yann/projects/lithtech/Blood2/tests/world_sprite_gpu_tests.cpp for CXX dependencies
+[224/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SkyObjects.cpp.o
+[225/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_sky.cpp.o
+[226/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_projectiles.cpp.o
+[227/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/destination_trial.cpp.o
+[228/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/world_preparation.cpp.o
+[229/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/level_change.cpp.o
+[230/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_attachments.cpp.o
+[231/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/player_restore.cpp.o
+[232/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/session.cpp.o
+[233/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_adapter.cpp.o
+[234/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_sprites.cpp.o
+[235/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/registration.cpp.o
+[236/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_audio.cpp.o
+[237/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_lights.cpp.o
+[238/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_keyframes.cpp.o
+[239/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_cameras.cpp.o
+[240/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_objectives.cpp.o
+[241/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_pickups.cpp.o
+[242/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_models.cpp.o
+[243/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_movers.cpp.o
+[244/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_physics.cpp.o
+[245/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_rotation.cpp.o
+[246/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_keys.cpp.o
+[247/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_containers.cpp.o
+[248/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_activation.cpp.o
+[249/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Movement.cpp.o
+[250/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIHitReaction.cpp.o
+[251/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIDeath.cpp.o
+[252/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Corpse.cpp.o
+[253/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AISound.cpp.o
+[254/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AITrigger.cpp.o
+[255/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AITarget.cpp.o
+[256/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Gideon.cpp.o
+[257/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CharacterMotion.cpp.o
+[258/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_exits.cpp.o
+[259/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_clients.cpp.o
+[260/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_weapons.cpp.o
+[261/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/BloodShells.cpp.o
+[262/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Weapon.cpp.o
+[263/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponVector.cpp.o
+[264/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponFX.cpp.o
+[265/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ViewWeapon.cpp.o
+[266/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Destructable.cpp.o
+[267/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/DestructableSave.cpp.o
+[268/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/DestructableBrush.cpp.o
+[269/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Rotating.cpp.o
+[270/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/DestructableModel.cpp.o
+[271/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Debris.cpp.o
+[272/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WorldModelDebris.cpp.o
+[273/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/radius_damage.cpp.o
+[274/710] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_effects.cpp.o
+[275/710] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[276/710] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[277/710] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[278/709] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[279/709] Generating CXX dyndep file tests/CMakeFiles/services_tests.dir/CXX.dd
+[280/709] Generating CXX dyndep file tests/CMakeFiles/player_tests.dir/CXX.dd
+[281/709] Generating CXX dyndep file tests/CMakeFiles/weapon_tests.dir/CXX.dd
+[282/709] Generating CXX dyndep file tests/CMakeFiles/movement_tests.dir/CXX.dd
+[283/709] Generating CXX dyndep file tests/CMakeFiles/locomotion_tests.dir/CXX.dd
+[284/709] Generating CXX dyndep file tests/CMakeFiles/container_tests.dir/CXX.dd
+[285/709] Generating CXX dyndep file tests/CMakeFiles/compound_shell_tests.dir/CXX.dd
+[286/709] Generating CXX dyndep file tests/CMakeFiles/door_tests.dir/CXX.dd
+[287/709] Generating CXX dyndep file tests/CMakeFiles/trigger_tests.dir/CXX.dd
+[288/709] Generating CXX dyndep file tests/CMakeFiles/interaction_tests.dir/CXX.dd
+[289/709] Generating CXX dyndep file tests/CMakeFiles/brush_tests.dir/CXX.dd
+[290/709] Generating CXX dyndep file tests/CMakeFiles/explosion_tests.dir/CXX.dd
+[291/709] Generating CXX dyndep file tests/CMakeFiles/pushable_tests.dir/CXX.dd
+[292/709] Generating CXX dyndep file tests/CMakeFiles/pickup_tests.dir/CXX.dd
+[293/709] Generating CXX dyndep file tests/CMakeFiles/objectives_tests.dir/CXX.dd
+[294/709] Generating CXX dyndep file tests/CMakeFiles/camera_tests.dir/CXX.dd
+[295/709] Generating CXX dyndep file tests/CMakeFiles/keyframer_tests.dir/CXX.dd
+[296/709] Generating CXX dyndep file tests/CMakeFiles/light_tests.dir/CXX.dd
+[297/709] Generating CXX dyndep file tests/CMakeFiles/worldpath_tests.dir/CXX.dd
+[298/709] Generating CXX dyndep file tests/CMakeFiles/cinematic_tests.dir/CXX.dd
+[299/709] Generating CXX dyndep file tests/CMakeFiles/random_sound_tests.dir/CXX.dd
+[300/709] Generating CXX dyndep file tests/CMakeFiles/sound_tests.dir/CXX.dd
+[301/709] Generating CXX dyndep file tests/CMakeFiles/sprite_tests.dir/CXX.dd
+[302/709] Generating CXX dyndep file tests/CMakeFiles/scene_explosion_tests.dir/CXX.dd
+[303/709] Generating CXX dyndep file tests/CMakeFiles/character_animation_tests.dir/CXX.dd
+[304/709] Generating CXX dyndep file tests/CMakeFiles/character_audio_tests.dir/CXX.dd
+[305/709] Generating CXX dyndep file tests/CMakeFiles/character_motion_tests.dir/CXX.dd
+[306/709] Generating CXX dyndep file tests/CMakeFiles/ai_model_key_tests.dir/CXX.dd
+[307/709] Generating CXX dyndep file tests/CMakeFiles/path_manager_tests.dir/CXX.dd
+[308/709] Generating CXX dyndep file tests/CMakeFiles/ai_sight_tests.dir/CXX.dd
+[309/709] Generating CXX dyndep file tests/CMakeFiles/attachment_tests.dir/CXX.dd
+[310/709] Generating CXX dyndep file tests/CMakeFiles/ai_target_tests.dir/CXX.dd
+[311/709] Generating CXX dyndep file tests/CMakeFiles/world_view_tests.dir/CXX.dd
+[312/709] Generating CXX dyndep file tests/CMakeFiles/world_gpu_tests.dir/CXX.dd
+[313/709] Generating CXX dyndep file tests/CMakeFiles/texture_tests.dir/CXX.dd
+[314/709] Generating CXX dyndep file tests/CMakeFiles/model_view_tests.dir/CXX.dd
+[315/709] Generating CXX dyndep file tests/CMakeFiles/model_gpu_tests.dir/CXX.dd
+[316/709] Generating CXX dyndep file tests/CMakeFiles/ai_perception_tests.dir/CXX.dd
+[317/709] Generating CXX dyndep file tests/CMakeFiles/ai_state_tests.dir/CXX.dd
+[318/709] Generating CXX dyndep file tests/CMakeFiles/ai_fire_tests.dir/CXX.dd
+[319/709] Generating CXX dyndep file tests/CMakeFiles/ai_trigger_tests.dir/CXX.dd
+[320/709] Generating CXX dyndep file tests/CMakeFiles/ai_navigation_tests.dir/CXX.dd
+[321/709] Generating CXX dyndep file tests/CMakeFiles/ai_follow_tests.dir/CXX.dd
+[322/709] Generating CXX dyndep file tests/CMakeFiles/ai_script_tests.dir/CXX.dd
+[323/709] Generating CXX dyndep file tests/CMakeFiles/ai_locomotion_tests.dir/CXX.dd
+[324/709] Generating CXX dyndep file tests/CMakeFiles/ai_recovery_tests.dir/CXX.dd
+[325/709] Generating CXX dyndep file tests/CMakeFiles/ai_escape_tests.dir/CXX.dd
+[326/709] Generating CXX dyndep file tests/CMakeFiles/ai_runtime_tests.dir/CXX.dd
+[327/709] Generating CXX dyndep file tests/CMakeFiles/ai_hit_tests.dir/CXX.dd
+[328/709] Generating CXX dyndep file tests/CMakeFiles/weapon_drop_tests.dir/CXX.dd
+[329/709] Generating CXX dyndep file tests/CMakeFiles/corpse_tests.dir/CXX.dd
+[330/709] Generating CXX dyndep file tests/CMakeFiles/exit_tests.dir/CXX.dd
+[331/709] Generating CXX dyndep file tests/CMakeFiles/inventory_state_tests.dir/CXX.dd
+[332/709] Generating CXX dyndep file tests/CMakeFiles/destructable_state_tests.dir/CXX.dd
+[333/709] Generating CXX dyndep file tests/CMakeFiles/player_state_tests.dir/CXX.dd
+[334/709] Generating CXX dyndep file tests/CMakeFiles/character_nodes_tests.dir/CXX.dd
+[335/709] Generating CXX dyndep file tests/CMakeFiles/player_restore_tests.dir/CXX.dd
+[336/709] Generating CXX dyndep file tests/CMakeFiles/player_keepalive_tests.dir/CXX.dd
+[337/709] Generating CXX dyndep file tests/CMakeFiles/sprite_view_tests.dir/CXX.dd
+[338/709] Generating CXX dyndep file tests/CMakeFiles/sprite_gpu_tests.dir/CXX.dd
+[339/709] Generating CXX dyndep file tests/CMakeFiles/explosion_sprite_tests.dir/CXX.dd
+[340/709] Generating CXX dyndep file tests/CMakeFiles/explosion_model_tests.dir/CXX.dd
+[341/709] Generating CXX dyndep file tests/CMakeFiles/explosion_model_gpu_tests.dir/CXX.dd
+[342/709] Generating CXX dyndep file tests/CMakeFiles/explosion_light_tests.dir/CXX.dd
+[343/709] Generating CXX dyndep file tests/CMakeFiles/explosion_ring_tests.dir/CXX.dd
+[344/709] Generating CXX dyndep file tests/CMakeFiles/explosion_ring_gpu_tests.dir/CXX.dd
+[345/709] Generating CXX dyndep file tests/CMakeFiles/explosion_fragment_tests.dir/CXX.dd
+[346/709] Generating CXX dyndep file tests/CMakeFiles/explosion_fragment_gpu_tests.dir/CXX.dd
+[347/709] Generating CXX dyndep file tests/CMakeFiles/object_particle_tests.dir/CXX.dd
+[348/709] Generating CXX dyndep file tests/CMakeFiles/object_particle_gpu_tests.dir/CXX.dd
+[349/709] Generating CXX dyndep file tests/CMakeFiles/explosion_flame_tests.dir/CXX.dd
+[350/709] Generating CXX dyndep file tests/CMakeFiles/explosion_flame_gpu_tests.dir/CXX.dd
+[351/709] Generating CXX dyndep file tests/CMakeFiles/weapon_audio_tests.dir/CXX.dd
+[352/709] Generating CXX dyndep file tests/CMakeFiles/weapon_impact_tests.dir/CXX.dd
+[353/709] Generating CXX dyndep file tests/CMakeFiles/weapon_sprite_tests.dir/CXX.dd
+[354/709] Generating CXX dyndep file tests/CMakeFiles/weapon_sprite_gpu_tests.dir/CXX.dd
+[355/709] Generating CXX dyndep file tests/CMakeFiles/player_controls_tests.dir/CXX.dd
+[356/709] Generating CXX dyndep file tests/CMakeFiles/session_playback_tests.dir/CXX.dd
+[357/709] Generating CXX dyndep file tests/CMakeFiles/world_alpha_gpu_tests.dir/CXX.dd
+[358/709] Generating CXX dyndep file tests/CMakeFiles/naga_tests.dir/CXX.dd
+[359/709] Generating CXX dyndep file tests/CMakeFiles/naga_gpu_tests.dir/CXX.dd
+[360/709] Generating CXX dyndep file tests/CMakeFiles/energy_tests.dir/CXX.dd
+[361/709] Generating CXX dyndep file tests/CMakeFiles/energy_gpu_tests.dir/CXX.dd
+[362/709] Generating CXX dyndep file tests/CMakeFiles/wind_tests.dir/CXX.dd
+[363/709] Generating CXX dyndep file tests/CMakeFiles/wind_gpu_tests.dir/CXX.dd
+[364/709] Generating CXX dyndep file tests/CMakeFiles/shield_tests.dir/CXX.dd
+[365/709] Generating CXX dyndep file tests/CMakeFiles/shield_gpu_tests.dir/CXX.dd
+[366/709] Generating CXX dyndep file tests/CMakeFiles/gideon_combat_tests.dir/CXX.dd
+[367/709] Generating CXX dyndep file tests/CMakeFiles/gideon_teleport_tests.dir/CXX.dd
+[368/709] Generating CXX dyndep file tests/CMakeFiles/gideon_teleport_gpu_tests.dir/CXX.dd
+[369/709] Generating CXX dyndep file tests/CMakeFiles/gideon_attack_tests.dir/CXX.dd
+[370/709] Generating CXX dyndep file tests/CMakeFiles/gideon_runtime_tests.dir/CXX.dd
+[371/709] Generating CXX dyndep file tests/CMakeFiles/destructable_model_tests.dir/CXX.dd
+[372/709] Generating CXX dyndep file tests/CMakeFiles/sound_fx_tests.dir/CXX.dd
+[373/709] Generating CXX dyndep file tests/CMakeFiles/audio_stream_tests.dir/CXX.dd
+[374/709] Generating CXX dyndep file tests/CMakeFiles/mac10_tests.dir/CXX.dd
+[375/709] Generating CXX dyndep file tests/CMakeFiles/mac10_gpu_tests.dir/CXX.dd
+[376/709] Generating CXX dyndep file tests/CMakeFiles/flare_tests.dir/CXX.dd
+[377/709] Generating CXX dyndep file tests/CMakeFiles/flare_gpu_tests.dir/CXX.dd
+[378/709] Generating CXX dyndep file tests/CMakeFiles/flare_view_gpu_tests.dir/CXX.dd
+[379/709] Generating CXX dyndep file tests/CMakeFiles/world_debris_tests.dir/CXX.dd
+[380/709] Generating CXX dyndep file tests/CMakeFiles/world_debris_gpu_tests.dir/CXX.dd
+[381/709] Generating CXX dyndep file tests/CMakeFiles/assault_tests.dir/CXX.dd
+[382/709] Generating CXX dyndep file tests/CMakeFiles/assault_gpu_tests.dir/CXX.dd
+[383/709] Generating CXX dyndep file tests/CMakeFiles/conversation_tests.dir/CXX.dd
+[384/709] Generating CXX dyndep file tests/CMakeFiles/medkit_tests.dir/CXX.dd
+[385/709] Generating CXX dyndep file tests/CMakeFiles/surface_effect_tests.dir/CXX.dd
+[386/709] Generating CXX dyndep file tests/CMakeFiles/surface_effect_gpu_tests.dir/CXX.dd
+[387/709] Generating CXX dyndep file tests/CMakeFiles/world_shader_tests.dir/CXX.dd
+[388/709] Generating CXX dyndep file tests/CMakeFiles/level_change_gpu_tests.dir/CXX.dd
+[389/709] Generating CXX dyndep file tests/CMakeFiles/particle_stream_tests.dir/CXX.dd
+[390/709] Generating CXX dyndep file tests/CMakeFiles/particle_stream_gpu_tests.dir/CXX.dd
+[391/709] Generating CXX dyndep file tests/CMakeFiles/sky_tests.dir/CXX.dd
+[392/709] Generating CXX dyndep file tests/CMakeFiles/sky_gpu_tests.dir/CXX.dd
+[393/709] Generating CXX dyndep file tests/CMakeFiles/proximity_tests.dir/CXX.dd
+[394/709] Generating CXX dyndep file tests/CMakeFiles/proximity_gpu_tests.dir/CXX.dd
+[395/709] Generating CXX dyndep file tests/CMakeFiles/remote_tests.dir/CXX.dd
+[396/709] Generating CXX dyndep file tests/CMakeFiles/remote_gpu_tests.dir/CXX.dd
+[397/709] Generating CXX dyndep file tests/CMakeFiles/flashlight_tests.dir/CXX.dd
+[398/709] Generating CXX dyndep file tests/CMakeFiles/flashlight_gpu_tests.dir/CXX.dd
+[399/709] Generating CXX dyndep file tests/CMakeFiles/world_sprite_gpu_tests.dir/CXX.dd
+[400/709] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_world_bodies.cpp.o
+[401/709] Linking CXX static library libblood2_game.a
+[402/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/path_manager_smoke.cpp.o
+[403/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/character_motion_smoke.cpp.o
+[404/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/ai_model_key_smoke.cpp.o
+[405/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/model_scene.cpp.o
+[406/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/sprite_scene.cpp.o
+[407/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/trigger_smoke.cpp.o
+[408/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/interaction_smoke.cpp.o
+[409/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[410/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/brush_smoke.cpp.o
+[411/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/pickup_smoke.cpp.o
+[412/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/camera_smoke.cpp.o
+[413/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/objectives_smoke.cpp.o
+[414/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/keyframe_smoke.cpp.o
+[415/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/light_smoke.cpp.o
+[416/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/cinematic_smoke.cpp.o
+[417/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/random_sound_smoke.cpp.o
+[418/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/world_sound_smoke.cpp.o
+[419/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/sprite_smoke.cpp.o
+[420/709] Building CXX object CMakeFiles/blood2_app.dir/src/app/scene_explosion_smoke.cpp.o
+[421/709] Building CXX object tests/CMakeFiles/object_contract_tests.dir/object_contract_tests.cpp.o
+[422/709] Building CXX object tests/CMakeFiles/world_tests.dir/world_tests.cpp.o
+[423/709] Building CXX object tests/CMakeFiles/services_tests.dir/services_tests.cpp.o
+[424/709] Building CXX object tests/CMakeFiles/player_tests.dir/player_tests.cpp.o
+[425/709] Building CXX object tests/CMakeFiles/weapon_tests.dir/weapon_tests.cpp.o
+[426/709] Building CXX object tests/CMakeFiles/movement_tests.dir/movement_tests.cpp.o
+[427/709] Building CXX object tests/CMakeFiles/locomotion_tests.dir/locomotion_tests.cpp.o
+[428/709] Building CXX object tests/CMakeFiles/container_tests.dir/container_tests.cpp.o
+[429/709] Building CXX object tests/CMakeFiles/compound_shell_tests.dir/compound_shell_tests.cpp.o
+[430/709] Building CXX object tests/CMakeFiles/door_tests.dir/door_tests.cpp.o
+[431/709] Building CXX object tests/CMakeFiles/trigger_tests.dir/trigger_tests.cpp.o
+[432/709] Building CXX object tests/CMakeFiles/interaction_tests.dir/interaction_tests.cpp.o
+[433/709] Building CXX object tests/CMakeFiles/brush_tests.dir/brush_tests.cpp.o
+[434/709] Building CXX object tests/CMakeFiles/explosion_tests.dir/explosion_tests.cpp.o
+[435/709] Building CXX object tests/CMakeFiles/pushable_tests.dir/pushable_tests.cpp.o
+[436/709] Building CXX object tests/CMakeFiles/objectives_tests.dir/objectives_tests.cpp.o
+[437/709] Building CXX object tests/CMakeFiles/pickup_tests.dir/pickup_tests.cpp.o
+[438/709] Building CXX object tests/CMakeFiles/keyframer_tests.dir/keyframer_tests.cpp.o
+[439/709] Building CXX object tests/CMakeFiles/camera_tests.dir/camera_tests.cpp.o
+[440/709] Building CXX object tests/CMakeFiles/light_tests.dir/light_tests.cpp.o
+[441/709] Building CXX object tests/CMakeFiles/worldpath_tests.dir/worldpath_tests.cpp.o
+[442/709] Building CXX object tests/CMakeFiles/cinematic_tests.dir/cinematic_tests.cpp.o
+[443/709] Building CXX object tests/CMakeFiles/random_sound_tests.dir/random_sound_tests.cpp.o
+[444/709] Building CXX object tests/CMakeFiles/sound_tests.dir/sound_tests.cpp.o
+[445/709] Building CXX object tests/CMakeFiles/sprite_tests.dir/sprite_tests.cpp.o
+[446/709] Building CXX object tests/CMakeFiles/character_animation_tests.dir/character_animation_tests.cpp.o
+[447/709] Building CXX object tests/CMakeFiles/scene_explosion_tests.dir/scene_explosion_tests.cpp.o
+[448/709] Building CXX object tests/CMakeFiles/character_motion_tests.dir/character_motion_tests.cpp.o
+[449/709] Building CXX object tests/CMakeFiles/character_audio_tests.dir/character_audio_tests.cpp.o
+[450/709] Building CXX object tests/CMakeFiles/path_manager_tests.dir/path_manager_tests.cpp.o
+[451/709] Building CXX object tests/CMakeFiles/ai_model_key_tests.dir/ai_model_key_tests.cpp.o
+[452/709] Building CXX object tests/CMakeFiles/ai_sight_tests.dir/ai_sight_tests.cpp.o
+[453/709] Building CXX object tests/CMakeFiles/attachment_tests.dir/attachment_tests.cpp.o
+[454/709] Building CXX object tests/CMakeFiles/world_view_tests.dir/world_view_tests.cpp.o
+[455/709] Building CXX object tests/CMakeFiles/ai_target_tests.dir/ai_target_tests.cpp.o
+[456/709] Building CXX object tests/CMakeFiles/world_gpu_tests.dir/world_gpu_tests.cpp.o
+[457/709] Building CXX object tests/CMakeFiles/texture_tests.dir/texture_tests.cpp.o
+[458/709] Building CXX object tests/CMakeFiles/model_view_tests.dir/__/src/app/model_scene.cpp.o
+[459/709] Building CXX object tests/CMakeFiles/model_view_tests.dir/model_view_tests.cpp.o
+[460/709] Building CXX object tests/CMakeFiles/model_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[461/709] Building CXX object tests/CMakeFiles/model_gpu_tests.dir/model_gpu_tests.cpp.o
+[462/709] Building CXX object tests/CMakeFiles/ai_perception_tests.dir/ai_perception_tests.cpp.o
+[463/709] Building CXX object tests/CMakeFiles/ai_state_tests.dir/ai_state_tests.cpp.o
+[464/709] Building CXX object tests/CMakeFiles/ai_fire_tests.dir/ai_fire_tests.cpp.o
+[465/709] Building CXX object tests/CMakeFiles/ai_trigger_tests.dir/ai_trigger_tests.cpp.o
+[466/709] Building CXX object tests/CMakeFiles/ai_navigation_tests.dir/ai_navigation_tests.cpp.o
+[467/709] Building CXX object tests/CMakeFiles/ai_follow_tests.dir/ai_follow_tests.cpp.o
+[468/709] Building CXX object tests/CMakeFiles/ai_script_tests.dir/ai_script_tests.cpp.o
+[469/709] Building CXX object tests/CMakeFiles/ai_locomotion_tests.dir/ai_locomotion_tests.cpp.o
+[470/709] Building CXX object tests/CMakeFiles/ai_recovery_tests.dir/ai_recovery_tests.cpp.o
+[471/709] Building CXX object tests/CMakeFiles/ai_escape_tests.dir/ai_escape_tests.cpp.o
+[472/709] Building CXX object tests/CMakeFiles/ai_hit_tests.dir/ai_hit_tests.cpp.o
+[473/709] Building CXX object tests/CMakeFiles/ai_runtime_tests.dir/ai_runtime_tests.cpp.o
+[474/709] Building CXX object tests/CMakeFiles/weapon_drop_tests.dir/weapon_drop_tests.cpp.o
+[475/709] Building CXX object tests/CMakeFiles/corpse_tests.dir/corpse_tests.cpp.o
+[476/709] Building CXX object tests/CMakeFiles/exit_tests.dir/exit_tests.cpp.o
+[477/709] Building CXX object tests/CMakeFiles/inventory_state_tests.dir/inventory_state_tests.cpp.o
+[478/709] Building CXX object tests/CMakeFiles/destructable_state_tests.dir/destructable_state_tests.cpp.o
+[479/709] Building CXX object tests/CMakeFiles/player_state_tests.dir/player_state_tests.cpp.o
+[480/709] Building CXX object tests/CMakeFiles/character_nodes_tests.dir/__/src/app/model_scene.cpp.o
+[481/709] Building CXX object tests/CMakeFiles/character_nodes_tests.dir/character_nodes_tests.cpp.o
+[482/709] Building CXX object tests/CMakeFiles/player_restore_tests.dir/__/src/app/model_scene.cpp.o
+[483/709] Building CXX object tests/CMakeFiles/player_restore_tests.dir/player_restore_tests.cpp.o
+[484/709] Building CXX object tests/CMakeFiles/player_keepalive_tests.dir/__/src/app/model_scene.cpp.o
+[485/709] Building CXX object tests/CMakeFiles/player_keepalive_tests.dir/player_keepalive_tests.cpp.o
+[486/709] Building CXX object tests/CMakeFiles/sprite_view_tests.dir/sprite_view_tests.cpp.o
+[487/709] Building CXX object tests/CMakeFiles/sprite_view_tests.dir/__/src/app/sprite_scene.cpp.o
+[488/709] Building CXX object tests/CMakeFiles/sprite_gpu_tests.dir/__/src/app/sprite_scene.cpp.o
+[489/709] Building CXX object tests/CMakeFiles/sprite_gpu_tests.dir/sprite_gpu_tests.cpp.o
+[490/709] Building CXX object tests/CMakeFiles/explosion_sprite_tests.dir/__/src/app/sprite_scene.cpp.o
+[491/709] Building CXX object tests/CMakeFiles/explosion_sprite_tests.dir/explosion_sprite_tests.cpp.o
+[492/709] Building CXX object tests/CMakeFiles/explosion_model_tests.dir/__/src/app/model_scene.cpp.o
+[493/709] Building CXX object tests/CMakeFiles/explosion_model_tests.dir/explosion_model_tests.cpp.o
+[494/709] Building CXX object tests/CMakeFiles/explosion_light_tests.dir/explosion_light_tests.cpp.o
+[495/709] Building CXX object tests/CMakeFiles/explosion_model_gpu_tests.dir/explosion_model_gpu_tests.cpp.o
+[496/709] Building CXX object tests/CMakeFiles/explosion_ring_tests.dir/__/src/app/sprite_scene.cpp.o
+[497/709] Building CXX object tests/CMakeFiles/explosion_ring_tests.dir/explosion_ring_tests.cpp.o
+[498/709] Building CXX object tests/CMakeFiles/explosion_ring_gpu_tests.dir/explosion_ring_gpu_tests.cpp.o
+[499/709] Building CXX object tests/CMakeFiles/explosion_fragment_tests.dir/__/src/app/model_scene.cpp.o
+[500/709] Building CXX object tests/CMakeFiles/explosion_fragment_tests.dir/explosion_fragment_tests.cpp.o
+[501/709] Building CXX object tests/CMakeFiles/explosion_fragment_gpu_tests.dir/explosion_fragment_gpu_tests.cpp.o
+[502/709] Building CXX object tests/CMakeFiles/object_particle_tests.dir/__/src/app/sprite_scene.cpp.o
+[503/709] Building CXX object tests/CMakeFiles/object_particle_tests.dir/object_particle_tests.cpp.o
+[504/709] Building CXX object tests/CMakeFiles/object_particle_gpu_tests.dir/object_particle_gpu_tests.cpp.o
+[505/709] Building CXX object tests/CMakeFiles/explosion_flame_tests.dir/__/src/app/sprite_scene.cpp.o
+[506/709] Building CXX object tests/CMakeFiles/explosion_flame_tests.dir/explosion_flame_tests.cpp.o
+[507/709] Building CXX object tests/CMakeFiles/explosion_flame_gpu_tests.dir/explosion_flame_gpu_tests.cpp.o
+[508/709] Building CXX object tests/CMakeFiles/weapon_audio_tests.dir/weapon_audio_tests.cpp.o
+[509/709] Building CXX object tests/CMakeFiles/weapon_impact_tests.dir/weapon_impact_tests.cpp.o
+[510/709] Building CXX object tests/CMakeFiles/weapon_sprite_tests.dir/__/src/app/sprite_scene.cpp.o
+[511/709] Building CXX object tests/CMakeFiles/weapon_sprite_tests.dir/weapon_sprite_tests.cpp.o
+[512/709] Building CXX object tests/CMakeFiles/weapon_sprite_gpu_tests.dir/__/src/app/sprite_scene.cpp.o
+[513/709] Building CXX object tests/CMakeFiles/weapon_sprite_gpu_tests.dir/weapon_sprite_gpu_tests.cpp.o
+[514/709] Building CXX object tests/CMakeFiles/player_controls_tests.dir/player_controls_tests.cpp.o
+[515/709] Building CXX object tests/CMakeFiles/session_playback_tests.dir/session_playback_tests.cpp.o
+[516/709] Building CXX object tests/CMakeFiles/world_alpha_gpu_tests.dir/world_alpha_gpu_tests.cpp.o
+[517/709] Building CXX object tests/CMakeFiles/naga_tests.dir/__/src/app/model_scene.cpp.o
+[518/709] Building CXX object tests/CMakeFiles/naga_tests.dir/naga_tests.cpp.o
+[519/709] Building CXX object tests/CMakeFiles/naga_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[520/709] Building CXX object tests/CMakeFiles/naga_gpu_tests.dir/naga_gpu_tests.cpp.o
+[521/709] Building CXX object tests/CMakeFiles/energy_tests.dir/__/src/app/sprite_scene.cpp.o
+[522/709] Building CXX object tests/CMakeFiles/energy_tests.dir/energy_tests.cpp.o
+[523/709] Building CXX object tests/CMakeFiles/energy_gpu_tests.dir/energy_gpu_tests.cpp.o
+[524/709] Building CXX object tests/CMakeFiles/energy_gpu_tests.dir/__/src/app/sprite_scene.cpp.o
+[525/709] Building CXX object tests/CMakeFiles/wind_tests.dir/__/src/app/model_scene.cpp.o
+[526/709] Building CXX object tests/CMakeFiles/wind_tests.dir/wind_tests.cpp.o
+[527/709] Building CXX object tests/CMakeFiles/wind_gpu_tests.dir/wind_gpu_tests.cpp.o
+[528/709] Building CXX object tests/CMakeFiles/wind_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[529/709] Building CXX object tests/CMakeFiles/shield_tests.dir/__/src/app/sprite_scene.cpp.o
+[530/709] Building CXX object tests/CMakeFiles/shield_tests.dir/shield_tests.cpp.o
+[531/709] Building CXX object tests/CMakeFiles/shield_gpu_tests.dir/shield_gpu_tests.cpp.o
+[532/709] Building CXX object tests/CMakeFiles/shield_gpu_tests.dir/__/src/app/sprite_scene.cpp.o
+[533/709] Building CXX object tests/CMakeFiles/gideon_combat_tests.dir/__/src/app/model_scene.cpp.o
+[534/709] Building CXX object tests/CMakeFiles/gideon_combat_tests.dir/__/src/app/sprite_scene.cpp.o
+[535/709] Building CXX object tests/CMakeFiles/gideon_combat_tests.dir/gideon_combat_tests.cpp.o
+[536/709] Building CXX object tests/CMakeFiles/gideon_teleport_tests.dir/__/src/app/model_scene.cpp.o
+[537/709] Building CXX object tests/CMakeFiles/gideon_teleport_tests.dir/gideon_teleport_tests.cpp.o
+[538/709] Building CXX object tests/CMakeFiles/gideon_teleport_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[539/709] Building CXX object tests/CMakeFiles/gideon_teleport_gpu_tests.dir/gideon_teleport_gpu_tests.cpp.o
+[540/709] Building CXX object tests/CMakeFiles/gideon_attack_tests.dir/__/src/app/model_scene.cpp.o
+[541/709] Building CXX object tests/CMakeFiles/gideon_attack_tests.dir/gideon_attack_tests.cpp.o
+[542/709] Building CXX object tests/CMakeFiles/gideon_runtime_tests.dir/gideon_runtime_tests.cpp.o
+[543/709] Building CXX object tests/CMakeFiles/destructable_model_tests.dir/__/src/app/model_scene.cpp.o
+[544/709] Building CXX object tests/CMakeFiles/destructable_model_tests.dir/destructable_model_tests.cpp.o
+[545/709] Building CXX object tests/CMakeFiles/audio_stream_tests.dir/audio_stream_tests.cpp.o
+[546/709] Building CXX object tests/CMakeFiles/sound_fx_tests.dir/sound_fx_tests.cpp.o
+[547/709] Building CXX object tests/CMakeFiles/mac10_gpu_tests.dir/mac10_gpu_tests.cpp.o
+[548/709] Building CXX object tests/CMakeFiles/mac10_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[549/709] Building CXX object tests/CMakeFiles/mac10_tests.dir/mac10_tests.cpp.o
+[550/709] Building CXX object tests/CMakeFiles/flare_gpu_tests.dir/flare_gpu_tests.cpp.o
+[551/709] Building CXX object tests/CMakeFiles/flare_tests.dir/flare_tests.cpp.o
+[552/709] Building CXX object tests/CMakeFiles/flare_gpu_tests.dir/__/src/app/sprite_scene.cpp.o
+[553/709] Building CXX object tests/CMakeFiles/flare_view_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[554/709] Building CXX object tests/CMakeFiles/flare_view_gpu_tests.dir/flare_view_gpu_tests.cpp.o
+[555/709] Building CXX object tests/CMakeFiles/world_debris_gpu_tests.dir/world_debris_gpu_tests.cpp.o
+[556/709] Building CXX object tests/CMakeFiles/world_debris_tests.dir/world_debris_tests.cpp.o
+[557/709] Building CXX object tests/CMakeFiles/assault_gpu_tests.dir/assault_gpu_tests.cpp.o
+[558/709] Building CXX object tests/CMakeFiles/assault_tests.dir/assault_tests.cpp.o
+[559/709] Building CXX object tests/CMakeFiles/assault_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[560/709] Building CXX object tests/CMakeFiles/conversation_tests.dir/conversation_tests.cpp.o
+[561/709] Building CXX object tests/CMakeFiles/medkit_tests.dir/medkit_tests.cpp.o
+[562/709] Building CXX object tests/CMakeFiles/surface_effect_tests.dir/surface_effect_tests.cpp.o
+[563/709] Building CXX object tests/CMakeFiles/world_shader_tests.dir/world_shader_tests.cpp.o
+[564/709] Building CXX object tests/CMakeFiles/surface_effect_gpu_tests.dir/surface_effect_gpu_tests.cpp.o
+[565/709] Building CXX object tests/CMakeFiles/level_change_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[566/709] Building CXX object tests/CMakeFiles/level_change_gpu_tests.dir/level_change_gpu_tests.cpp.o
+[567/709] Building CXX object tests/CMakeFiles/particle_stream_tests.dir/__/src/app/sprite_scene.cpp.o
+[568/709] Building CXX object tests/CMakeFiles/particle_stream_tests.dir/particle_stream_tests.cpp.o
+[569/709] Building CXX object tests/CMakeFiles/particle_stream_gpu_tests.dir/particle_stream_gpu_tests.cpp.o
+[570/709] Building CXX object tests/CMakeFiles/particle_stream_gpu_tests.dir/__/src/app/sprite_scene.cpp.o
+[571/709] Building CXX object tests/CMakeFiles/sky_gpu_tests.dir/sky_gpu_tests.cpp.o
+[572/709] Building CXX object tests/CMakeFiles/sky_tests.dir/sky_tests.cpp.o
+[573/709] Building CXX object tests/CMakeFiles/proximity_gpu_tests.dir/proximity_gpu_tests.cpp.o
+[574/709] Building CXX object tests/CMakeFiles/proximity_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[575/709] Building CXX object tests/CMakeFiles/proximity_tests.dir/proximity_tests.cpp.o
+[576/709] Building CXX object tests/CMakeFiles/remote_gpu_tests.dir/remote_gpu_tests.cpp.o
+[577/709] Building CXX object tests/CMakeFiles/remote_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[578/709] Building CXX object tests/CMakeFiles/remote_tests.dir/remote_tests.cpp.o
+[579/709] Building CXX object tests/CMakeFiles/flashlight_gpu_tests.dir/flashlight_gpu_tests.cpp.o
+[580/709] Building CXX object tests/CMakeFiles/world_sprite_gpu_tests.dir/world_sprite_gpu_tests.cpp.o
+[581/709] Linking CXX executable blood2
+[582/709] Linking CXX executable tests/object_contract_tests
+[583/709] Linking CXX executable tests/config_tests
+[584/709] Linking CXX executable tests/world_tests
+[585/709] Linking CXX executable tests/services_tests
+[586/709] Linking CXX executable tests/player_tests
+[587/709] Linking CXX executable tests/weapon_tests
+[588/709] Building CXX object tests/CMakeFiles/flashlight_tests.dir/flashlight_tests.cpp.o
+[589/709] Linking CXX executable tests/movement_tests
+[590/709] Linking CXX executable tests/locomotion_tests
+[591/709] Linking CXX executable tests/container_tests
+[592/709] Linking CXX executable tests/compound_shell_tests
+[593/709] Linking CXX executable tests/door_tests
+[594/709] Linking CXX executable tests/trigger_tests
+[595/709] Linking CXX executable tests/interaction_tests
+[596/709] Linking CXX executable tests/brush_tests
+[597/709] Linking CXX executable tests/explosion_tests
+[598/709] Linking CXX executable tests/pushable_tests
+[599/709] Linking CXX executable tests/pickup_tests
+[600/709] Linking CXX executable tests/objectives_tests
+[601/709] Linking CXX executable tests/camera_tests
+[602/709] Linking CXX executable tests/keyframer_tests
+[603/709] Linking CXX executable tests/light_tests
+[604/709] Linking CXX executable tests/worldpath_tests
+[605/709] Linking CXX executable tests/cinematic_tests
+[606/709] Linking CXX executable tests/random_sound_tests
+[607/709] Linking CXX executable tests/sound_tests
+[608/709] Linking CXX executable tests/sprite_tests
+[609/709] Linking CXX executable tests/scene_explosion_tests
+[610/709] Linking CXX executable tests/character_animation_tests
+[611/709] Linking CXX executable tests/character_audio_tests
+[612/709] Linking CXX executable tests/character_motion_tests
+[613/709] Linking CXX executable tests/ai_model_key_tests
+[614/709] Linking CXX executable tests/path_manager_tests
+[615/709] Linking CXX executable tests/ai_sight_tests
+[616/709] Linking CXX executable tests/attachment_tests
+[617/709] Linking CXX executable tests/ai_target_tests
+[618/709] Linking CXX executable tests/world_view_tests
+[619/709] Linking CXX executable tests/world_gpu_tests
+[620/709] Linking CXX executable tests/texture_tests
+[621/709] Linking CXX executable tests/model_view_tests
+[622/709] Linking CXX executable tests/model_gpu_tests
+[623/709] Linking CXX executable tests/ai_perception_tests
+[624/709] Linking CXX executable tests/ai_state_tests
+[625/709] Linking CXX executable tests/ai_fire_tests
+[626/709] Linking CXX executable tests/ai_trigger_tests
+[627/709] Linking CXX executable tests/ai_navigation_tests
+[628/709] Linking CXX executable tests/ai_follow_tests
+[629/709] Linking CXX executable tests/ai_script_tests
+[630/709] Linking CXX executable tests/ai_locomotion_tests
+[631/709] Linking CXX executable tests/ai_recovery_tests
+[632/709] Linking CXX executable tests/ai_escape_tests
+[633/709] Linking CXX executable tests/ai_runtime_tests
+[634/709] Linking CXX executable tests/ai_hit_tests
+[635/709] Linking CXX executable tests/weapon_drop_tests
+[636/709] Linking CXX executable tests/corpse_tests
+[637/709] Linking CXX executable tests/exit_tests
+[638/709] Linking CXX executable tests/inventory_state_tests
+[639/709] Linking CXX executable tests/destructable_state_tests
+[640/709] Linking CXX executable tests/player_state_tests
+[641/709] Linking CXX executable tests/character_nodes_tests
+[642/709] Linking CXX executable tests/player_restore_tests
+[643/709] Linking CXX executable tests/player_keepalive_tests
+[644/709] Linking CXX executable tests/sprite_view_tests
+[645/709] Linking CXX executable tests/sprite_gpu_tests
+[646/709] Linking CXX executable tests/explosion_sprite_tests
+[647/709] Linking CXX executable tests/explosion_model_tests
+[648/709] Linking CXX executable tests/explosion_model_gpu_tests
+[649/709] Linking CXX executable tests/explosion_light_tests
+[650/709] Linking CXX executable tests/explosion_ring_tests
+[651/709] Linking CXX executable tests/explosion_ring_gpu_tests
+[652/709] Linking CXX executable tests/explosion_fragment_tests
+[653/709] Linking CXX executable tests/explosion_fragment_gpu_tests
+[654/709] Linking CXX executable tests/object_particle_tests
+[655/709] Linking CXX executable tests/object_particle_gpu_tests
+[656/709] Linking CXX executable tests/explosion_flame_tests
+[657/709] Linking CXX executable tests/explosion_flame_gpu_tests
+[658/709] Linking CXX executable tests/weapon_audio_tests
+[659/709] Linking CXX executable tests/weapon_impact_tests
+[660/709] Linking CXX executable tests/weapon_sprite_tests
+[661/709] Linking CXX executable tests/weapon_sprite_gpu_tests
+[662/709] Linking CXX executable tests/player_controls_tests
+[663/709] Linking CXX executable tests/session_playback_tests
+[664/709] Linking CXX executable tests/world_alpha_gpu_tests
+[665/709] Linking CXX executable tests/naga_tests
+[666/709] Linking CXX executable tests/naga_gpu_tests
+[667/709] Linking CXX executable tests/energy_tests
+[668/709] Linking CXX executable tests/energy_gpu_tests
+[669/709] Linking CXX executable tests/wind_tests
+[670/709] Linking CXX executable tests/wind_gpu_tests
+[671/709] Linking CXX executable tests/shield_tests
+[672/709] Linking CXX executable tests/shield_gpu_tests
+[673/709] Linking CXX executable tests/gideon_combat_tests
+[674/709] Linking CXX executable tests/gideon_teleport_tests
+[675/709] Linking CXX executable tests/gideon_teleport_gpu_tests
+[676/709] Linking CXX executable tests/gideon_attack_tests
+[677/709] Linking CXX executable tests/gideon_runtime_tests
+[678/709] Linking CXX executable tests/destructable_model_tests
+[679/709] Linking CXX executable tests/sound_fx_tests
+[680/709] Linking CXX executable tests/audio_stream_tests
+[681/709] Linking CXX executable tests/mac10_tests
+[682/709] Linking CXX executable tests/mac10_gpu_tests
+[683/709] Linking CXX executable tests/flare_tests
+[684/709] Linking CXX executable tests/flare_gpu_tests
+[685/709] Linking CXX executable tests/flare_view_gpu_tests
+[686/709] Linking CXX executable tests/world_debris_tests
+[687/709] Linking CXX executable tests/world_debris_gpu_tests
+[688/709] Linking CXX executable tests/assault_tests
+[689/709] Linking CXX executable tests/assault_gpu_tests
+[690/709] Linking CXX executable tests/conversation_tests
+[691/709] Linking CXX executable tests/medkit_tests
+[692/709] Linking CXX executable tests/surface_effect_tests
+[693/709] Linking CXX executable tests/surface_effect_gpu_tests
+[694/709] Linking CXX executable tests/world_shader_tests
+[695/709] Linking CXX executable tests/level_change_gpu_tests
+[696/709] Linking CXX executable tests/particle_stream_tests
+[697/709] Linking CXX executable tests/particle_stream_gpu_tests
+[698/709] Linking CXX executable tests/sky_tests
+[699/709] Linking CXX executable tests/sky_gpu_tests
+[700/709] Linking CXX executable tests/proximity_tests
+[701/709] Linking CXX executable tests/proximity_gpu_tests
+[702/709] Linking CXX executable tests/remote_tests
+[703/709] Linking CXX executable tests/remote_gpu_tests
+[704/709] Linking CXX executable tests/flashlight_tests
+[705/709] Linking CXX executable tests/flashlight_gpu_tests
+[706/709] Linking CXX executable tests/world_sprite_gpu_tests

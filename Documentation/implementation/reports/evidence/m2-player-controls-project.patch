@@ -1,0 +1,800 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index e541141..bdc95cf 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -488,3 +488,7 @@ Keep the 64-contact bound, explicit partial failures, checked callback lifetime
+ The [weapon impact sprite continuation](../Documentation/Implementation/M2_WEAPON_SPRITES.md) connects original wood/stone flashes and smoke with tint, detached lifetime and in-game inspection.
+ Read [contracts](docs/WEAPON_SPRITE_CONTRACTS.md). Preserve first-update/delay quirks, per-callback motion, first-container visibility and independent sibling failures.
+ Other impact components remain unavailable. User playtest fixes (mouse look/fire, non-attacking NPCs, train glass) take priority over more FX; M2 stays open.
++
++The [keyboard/mouse control fix](../Documentation/Implementation/M2_PLAYER_CONTROLS.md) connects F/G and captured mouse firing plus relative mouse look to existing original gameplay.
++Read [contracts](docs/PLAYER_CONTROL_CONTRACTS.md). Preserve UI-only uncaptured clicks, one-time delta consumption, focus/player-change resets and original FIRE_KEY/camera gates.
++F3 captures, Escape releases; --view-world requests capture initially. Next priorities are non-attacking NPCs and train glass, before further cosmetic FX. M2 remains open.
+diff --git a/README.md b/README.md
+index 353edaa..9cd8e8a 100644
+--- a/README.md
++++ b/README.md
+@@ -78,8 +78,11 @@ The inspector is now **collapsible and resizable**: click the title arrow to fol
+ or unfold it, drag its borders to resize, or use F1 to hide/show it. After entering
+ the player in Session, keyboard movement is enabled by default: **WASD/ZQSD**,
+ **Shift** run, **Space** jump, **Ctrl** crouch, **arrows** look, **E** USE. **F2** toggles
+-keyboard controls. SubwayA's original intro temporarily blocks movement; wait for
+-it to end. See [input/UI evidence](../Documentation/Implementation/M2_CONTROLS.md).
++game controls. **F/G** fire primary/alternate; **F3** captures the mouse and hides inspection;
++**mouse** looks and **left/right buttons** fire. **Escape** releases the cursor for the inspector.
++SubwayA's original intro temporarily blocks movement/fire; wait for it to end.
++See [input/UI evidence](../Documentation/Implementation/M2_CONTROLS.md) and
++[keyboard/mouse evidence](../Documentation/Implementation/M2_PLAYER_CONTROLS.md).
+ 
+ Previous death prerequisite: [original NPC weapon drops](../Documentation/Implementation/M2_WEAPON_DROPS.md)
+ connects detached Beretta physics, original pickups and player collection. Corpses/gibs,
+@@ -101,7 +104,7 @@ The three runtime targets remain small: `engine` (resources, world/object runtim
+ 
+ The [diagnostic 3D view](docs/WORLD_VIEW_CONTRACTS.md) now renders actual level
+ geometry and current moving brushes through SDL_GPU. Run `./build/debug/blood2 --view-world` to enter the original player/cameras with
+-keyboard controls enabled. F1 opens inspection. [Original DTX textures](docs/TEXTURE_CONTRACTS.md) now appear as unlit opaque materials. [Existing models and first-person weapons](docs/MODEL_VIEW_CONTRACTS.md) now render too;
++keyboard controls enabled and mouse capture requested. F1/Escape release the cursor for inspection. [Original DTX textures](docs/TEXTURE_CONTRACTS.md) now appear as unlit opaque materials. [Existing models and first-person weapons](docs/MODEL_VIEW_CONTRACTS.md) now render too;
+ full combat and M2 completion remain pending. The world shader currently requires
+ Vulkan/SPIR-V; other backend artifacts remain unimplemented.
+ 
+@@ -530,3 +533,6 @@ Earlier impact-audio omissions are superseded for Beretta/knife; impact visuals,
+ 
+ The [weapon impact sprite continuation](../Documentation/Implementation/M2_WEAPON_SPRITES.md) connects original wood/stone flashes and smoke with tint, detached lifetime and in-game inspection.
+ Other impact components remain unavailable. User playtest fixes (mouse look/fire, non-attacking NPCs, train glass) take priority over more FX; M2 stays open.
++
++The [keyboard/mouse continuation](../Documentation/Implementation/M2_PLAYER_CONTROLS.md) adds F/G primary/alternate fire, F3 mouse capture, mouse look and left/right button fire. Escape releases the cursor for inspection.
++NPC attack and train-glass reports remain unresolved; M2 is still incomplete.
+diff --git a/docs/M2_PLAYER_CONTROL_SOURCES.json b/docs/M2_PLAYER_CONTROL_SOURCES.json
+new file mode 100644
+index 0000000..71642a8
+--- /dev/null
++++ b/docs/M2_PLAYER_CONTROL_SOURCES.json
+@@ -0,0 +1,27 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "8a1f4f0bbeeb85a8bc3cb0b01835946dc4787d28",
++  "source_files": [
++    {
++      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "use": "CalculateCameraRotation and original client input context; not imported as a new mouse implementation"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
++      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
++      "use": "Existing CViewWeapon firing state and animation key path retained"
++    }
++  ],
++  "adaptations": [
++    "Application-only SDL event mapping and cursor ownership; no newly imported game method.",
++    "Explicit new key bindings and relative mouse sensitivity, not retail input configuration.",
++    "Existing typed CViewWeapon/FIRE_KEY/server fire and MoveMgr paths unchanged."
++  ],
++  "remaining": [
++    "NPC attack playtest issue",
++    "train-window material issue",
++    "complete input devices/rebinding",
++    "safe NEW_LEVEL and M2"
++  ]
++}
+diff --git a/docs/PLAYER_CONTROL_CONTRACTS.md b/docs/PLAYER_CONTROL_CONTRACTS.md
+new file mode 100644
+index 0000000..e5ca08f
+--- /dev/null
++++ b/docs/PLAYER_CONTROL_CONTRACTS.md
+@@ -0,0 +1,58 @@
++# Keyboard fire and relative mouse controls
++
++This application adapter connects existing typed movement, USE, view rotation and
++weapon input. The original weapon animation/FIRE_KEY, damage, ammunition, camera
++restrictions and MoveMgr remain responsible for gameplay. No game rules or new
++integrator are introduced. See [evidence](../../Documentation/Implementation/M2_PLAYER_CONTROLS.md)
++and [provenance](M2_PLAYER_CONTROL_SOURCES.json). **M2 remains incomplete.**
++
++## Bindings and inspector
++
++Physical WASD/ZQSD, Shift, Space, Ctrl, arrows and E retain walk/run/jump/crouch/look/USE.
++F fires primary; G fires alternate. F2 enables/disables these game controls.
++F3 toggles SDL relative mouse mode for an entered player; success hides the inspector.
++Mouse motion changes yaw/pitch, left button fires primary and right fires alternate.
++Uncaptured mouse buttons belong to the UI and never fire. Escape releases a captured
++mouse without quitting; release restores the inspector in development builds. F1 opens
++inspection and releases the mouse if captured. Otherwise its existing hide/show action
++preserves keyboard controls. Native title-arrow folding and resizing remain available.
++`--view-world` initially requests capture; Session entry offers F3 after the player enters.
++The inspector displays bindings, actual capture state and SDL capture failures.
++
++Relative motion accumulates per frame and is consumed once, independent of frame
++seconds. The explicit replacement device policy is .0025 radians per SDL relative unit,
++wrapped mouse yaw and pitch limited to [-1.48,1.48]. Finite deltas are bounded to 10,000
++units per accumulated axis; nonfinite events are ignored. Suppressed frames discard
++motion instead of replaying it. These bindings/sensitivity are not recovered retail
++configuration; rebinding, controller/touch/VR input and sensitivity UI remain pending.
++
++Only events belonging to the app window change the state. Focus loss clears keys and
++mouse state; capture does not automatically return on focus gain. Disabled controls,
++text editing and absent player release capture. A held firing key suppressed during
++text editing or disabled input must be released before it can fire again. Repeat-only
++USE/fire presses following focus loss are ignored. Player identity changes clear
++latched input and capture, including unload/reload or replacement between frames.
++A failed SDL mode change is reported, never represented as a successful capture.
++
++## Original dispatch and verification boundary
++
++At each frame boundary, the app clears its prior weapon input, applies queued inspector
++commands, then merges keyboard/mouse primary/alternate buttons. It updates the existing
++client rotation before normal session stepping. Mouse/keyboard input never calls a
++weapon Fire method or mutates ammunition directly. The source CViewWeapon state machine
++and crossed FIRE_KEY markers still generate server requests. Releasing a button may
++finish an attack already committed by the original animation; it does not cancel it.
++Camera restrictions remain in the original shell; the SubwayA intro is not skipped in
++normal use. Tests explicitly advance it before their firing scenarios.
++
++The existing GPU weapon smoke now injects SDL F/G events through the production app
++loop instead of assigning WeaponInput directly. A separate real-window private test
++checks successful SDL relative mode, once-consumed mouse motion reaching client camera
++orientation, both mouse firing buttons, Escape, uncaptured clicks, focus loss/recovery,
++actual source FIRE_KEY, ammunition and fire voices. It is an event-driven harness, not
++a human playthrough. Pure tests cover foreign windows, repeat keys, focus/text/control
++gates, finite mouse bounds and player-change reset. Existing collapse/movement/UI-free
++Release paths remain checked. No reference source, commercial asset or dependency changed.
++
++Non-attacking NPCs and the missing train-window material remain next playtest priorities.
++This input fix does not prove NPC combat, all required services, safe NEW_LEVEL or M2.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 813779d..3d9dddf 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -821,3 +821,10 @@ with typed owned settings, bounded detached lifetime and existing SDL_GPU sprite
+ See [ledger](M2_WEAPON_SPRITE_SOURCES.json) and [contracts](WEAPON_SPRITE_CONTRACTS.md).
+ Per-callback motion, first-update/delay quirks and wood tint are retained; absent
+ composite branches and portable RNG/raster differences stay explicit.
++
++## Keyboard fire and relative mouse
++
++The [application controls](PLAYER_CONTROL_CONTRACTS.md) are new SDL mapping/cursor
++ownership code. They feed the already ported original weapon state machine, FIRE_KEY
++and player rotation; no new game method or reference engine is imported.
++See [ledger](M2_PLAYER_CONTROL_SOURCES.json).
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 100d585..3616ec3 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -415,11 +415,19 @@ namespace OpenBlood2
+                                game.world_path.empty() ? "ORIGINAL OBJECT DIAGNOSTICS" : "M2  /  WORLD INSPECTION");
+             ImGui::TextWrapped("Original objects, ABC animation and primary-world collision. Full original player "
+                                "session remains blocked.");
+-            ImGui::TextDisabled("Title arrow: fold/unfold | Drag borders: resize | F1: hide/show | Escape: quit");
+-            ImGui::Checkbox("Keyboard movement (F2)", &keyboard_movement);
++            ImGui::PushTextWrapPos(0);
++            ImGui::TextDisabled("Title arrow: fold/unfold | Drag borders: resize | F1: inspector | F3: mouse capture | "
++                                "Esc: release/quit");
++            ImGui::PopTextWrapPos();
++            ImGui::Checkbox("Game controls (F2)", &keyboard_movement);
+             ImGui::TextWrapped("WASD / ZQSD: walk | Shift: run | Space: jump | Ctrl: crouch | Arrows: look | E: use");
++            ImGui::TextWrapped(
++                "F3: capture mouse and hide inspector | Mouse: look | Left/F: fire | Right/G: alternate fire");
++            ImGui::Text("Mouse: %s", mouse_captured ? "captured" : "released for UI");
++            if (!mouse_error.empty())
++                ImGui::TextWrapped("Mouse capture failed: %s", mouse_error.c_str());
+             if (!game.client_shell.m_bInWorld)
+-                ImGui::TextDisabled("Enter the player in Session to use the keyboard.");
++                ImGui::TextDisabled("Enter the player in Session to use game controls.");
+             else if (game.client_shell.view.object && !game.client_shell.view.settings.player_movement)
+                 ImGui::TextDisabled("The original cinematic currently blocks movement. Controls return when it ends.");
+             ImGui::Separator();
+@@ -1541,8 +1549,8 @@ namespace OpenBlood2
+                 }
+                 ImGui::PopID();
+             }
+-            ImGui::TextWrapped("Ordered historical contacts; resolve handles before inspection. Impact visuals, decals "
+-                               "and reverb remain unavailable.");
++            ImGui::TextWrapped("Ordered historical contacts; resolve handles before inspection. Wood/stone flash and "
++                               "smoke are connected; remaining impact FX, decals and reverb are unavailable.");
+             ImGui::TreePop();
+         }
+         if (!ImGui::TreeNodeEx("Original weapon fire audio", ImGuiTreeNodeFlags_DefaultOpen))
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 1bc0df5..723cad0 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -27,7 +27,8 @@ namespace OpenBlood2
+         ObjectId skeleton_selection{};
+         void draw_skeleton(GameSession&, ObjectSelection&);
+         bool select_session = false;
+-        bool select_movement = false, keyboard_movement = true;
++        bool select_movement = false, keyboard_movement = true, mouse_captured = false;
++        std::string mouse_error;
+         bool collapsed = false;
+         bool select_containers = false;
+         bool select_triggers = false;
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 5564d46..de3c5e8 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -433,6 +433,10 @@ namespace
+         std::uint64_t hidden_weapon_shots = 0;
+         OpenBlood2::MovementControls controls;
+         controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
++        controls.mouse_requested = options.view_world && !smoke;
++        std::string mouse_error;
++        auto* initial_controlled = game.objects.get(game.client_shell.player);
++        auto controlled_player = initial_controlled ? initial_controlled->id : OpenBlood2::ObjectId{};
+         DVector hidden_position{};
+         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
+         unsigned forward_frames = 0, jump_frames = 0, crouch_frames = 0, run_frames = 0;
+@@ -453,6 +457,9 @@ namespace
+             SDL_Event event{};
+             while (SDL_PollEvent(&event))
+             {
++                const bool escape_releases_mouse =
++                    event.type == SDL_EVENT_KEY_DOWN && event.key.windowID == SDL_GetWindowID(runtime.window) &&
++                    event.key.scancode == SDL_SCANCODE_ESCAPE && (controls.mouse_requested || controls.mouse_captured);
+                 controls.event(event, SDL_GetWindowID(runtime.window));
+                 if (options.movement_smoke &&
+                     (event.type == SDL_EVENT_WINDOW_FOCUS_LOST || event.type == SDL_EVENT_WINDOW_FOCUS_GAINED))
+@@ -474,7 +481,8 @@ namespace
+                 }
+                 if (event.type == SDL_EVENT_WINDOW_RESIZED && event.window.windowID == SDL_GetWindowID(runtime.window))
+                     resized = true;
+-                if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat)
++                if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat &&
++                    event.key.windowID == SDL_GetWindowID(runtime.window))
+                 {
+ #if BLOOD2_INSPECTOR
+                     if (event.key.key == SDLK_F1)
+@@ -482,10 +490,10 @@ namespace
+                         inspector_visible = !inspector_visible;
+                         ++toggles;
+                     }
+-                    if (event.key.key == SDLK_ESCAPE && !ImGui::GetIO().WantCaptureKeyboard)
++                    if (event.key.key == SDLK_ESCAPE && !escape_releases_mouse && !ImGui::GetIO().WantCaptureKeyboard)
+                         done = true;
+ #else
+-                    if (event.key.key == SDLK_ESCAPE)
++                    if (event.key.key == SDLK_ESCAPE && !escape_releases_mouse)
+                         done = true;
+ #endif
+                 }
+@@ -503,6 +511,7 @@ namespace
+             const double delta = smoke ? 1.0 / 60.0 : static_cast<double>(tick - previous_tick) / 1e9;
+             previous_tick = tick;
+             game.client_shell.movement_input = {};
++            game.client_shell.weapon_input = {};
+             bool text_editing = false;
+ #if BLOOD2_INSPECTOR
+             inspector.apply_commands(game, selection);
+@@ -545,6 +554,30 @@ namespace
+             if (options.pickups_smoke && frames == reload_frame + 1)
+                 if (!OpenBlood2::prepare_pickup_smoke(game, smoke_pickup))
+                     return 4;
++            const auto* controlled = game.objects.get(game.client_shell.player);
++            const auto current_player = controlled ? controlled->id : OpenBlood2::ObjectId{};
++            if (current_player != controlled_player)
++            {
++                controls.player_changed();
++                controlled_player = current_player;
++                game.client_shell.weapon_input = {};
++            }
++            const bool was_captured = controls.mouse_captured;
++            if (!controls.sync_mouse(runtime.window, game.client_shell.m_bInWorld, text_editing, mouse_error))
++                spdlog::error("Mouse capture: {}", mouse_error);
++#if BLOOD2_INSPECTOR
++            inspector.mouse_captured = controls.mouse_captured;
++            inspector.mouse_error = mouse_error;
++            if (was_captured != controls.mouse_captured)
++                inspector_visible = !controls.mouse_captured;
++#else
++            (void)was_captured;
++#endif
++            const auto fire_buttons = controls.sample_fire(text_editing);
++            game.client_shell.weapon_input.primary |= fire_buttons.primary;
++            game.client_shell.weapon_input.alternate |= fire_buttons.alternate;
++            if (!controls.focused && !smoke)
++                game.client_shell.weapon_input = {};
+             game.client_shell.use_down = controls.sample_use(text_editing);
+             auto keyboard = controls.sample(text_editing);
+             auto& movement = game.client_shell.movement_input;
+@@ -576,7 +609,7 @@ namespace
+                     spdlog::error("{}", error);
+                     return 6;
+                 }
+-                game.client_shell.weapon_input = {frames < 120, frames >= 120, false};
++                // Fire controls arrive via SDL events below, through the normal input adapter.
+             }
+             if (options.containers_smoke && frames == 2)
+             {
+@@ -964,6 +997,29 @@ namespace
+             if (smoke)
+             {
+                 bool event_ok = true;
++                if (options.weapons_smoke)
++                {
++                    auto key = [&](SDL_Scancode code, bool down)
++                    {
++                        SDL_Event e{};
++                        e.type = down ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
++                        e.key.windowID = SDL_GetWindowID(runtime.window);
++                        e.key.scancode = code;
++                        e.key.down = down;
++                        return SDL_PushEvent(&e);
++                    };
++                    if (frames == 2 || frames == reload_frame + 1)
++                    {
++                        SDL_Event focus{};
++                        focus.type = SDL_EVENT_WINDOW_FOCUS_GAINED;
++                        focus.window.windowID = SDL_GetWindowID(runtime.window);
++                        event_ok = SDL_PushEvent(&focus) && key(SDL_SCANCODE_F, true);
++                    }
++                    if (frames == 119)
++                        event_ok = key(SDL_SCANCODE_F, false) && key(SDL_SCANCODE_G, true);
++                    if (frames == unload_frame - 1)
++                        event_ok = key(SDL_SCANCODE_G, false);
++                }
+                 if (options.movement_smoke)
+                 {
+                     auto key_event = [&](SDL_Scancode code, bool down)
+@@ -1346,6 +1402,7 @@ namespace
+                                                     game.server.audio.output_error.empty();
+                 }
+                 game.client_shell.movement_input = {};
++                game.client_shell.weapon_input = {};
+                 spdlog::info("Character audio: hidden={}, reentered={}, starts={}, surface={}, submitted={}",
+                              character_audio_hidden, character_audio_reentered, player ? player->sound_starts : 0,
+                              player ? int(player->m_eLastSurface) : -1, game.server.audio.submitted_frames);
+diff --git a/src/app/movement_controls.h b/src/app/movement_controls.h
+index 9ec04cc..1686da4 100644
+--- a/src/app/movement_controls.h
++++ b/src/app/movement_controls.h
+@@ -1,8 +1,13 @@
+ #pragma once
+ #include "game/player_messages.h"
++#include <SDL3/SDL_error.h>
+ #include <SDL3/SDL_events.h>
++#include <SDL3/SDL_mouse.h>
+ #include <algorithm>
+ #include <array>
++#include <cmath>
++#include <string>
++#include <utility>
+ 
+ namespace OpenBlood2
+ {
+@@ -12,8 +17,49 @@ namespace OpenBlood2
+     {
+         std::array<bool, SDL_SCANCODE_COUNT> keys{};
+         bool focused = false, enabled = true, use_suppressed = false;
++        bool mouse_requested = false, mouse_captured = false;
++        std::array<bool, 2> mouse_buttons{}, fire_suppressed{};
++        float mouse_x = 0, mouse_y = 0;
++        struct FireButtons
++        {
++            bool primary = false, alternate = false;
++        };
++        void release_mouse()
++        {
++            mouse_requested = false;
++            mouse_buttons = {};
++            mouse_x = mouse_y = 0;
++            fire_suppressed = {keys[SDL_SCANCODE_F], keys[SDL_SCANCODE_G]};
++        }
++        void player_changed()
++        {
++            keys = {};
++            use_suppressed = false;
++            release_mouse();
++        }
++        bool sync_mouse(SDL_Window* window, bool player_ready, bool text_editing, std::string& error)
++        {
++            if (!focused || !enabled || !player_ready || text_editing)
++                release_mouse();
++            if (mouse_requested == mouse_captured)
++                return true;
++            if (!SDL_SetWindowRelativeMouseMode(window, mouse_requested))
++            {
++                error = SDL_GetError();
++                release_mouse();
++                return false;
++            }
++            mouse_captured = mouse_requested;
++            mouse_buttons = {};
++            mouse_x = mouse_y = 0;
++            error.clear();
++            return true;
++        }
+         bool consumes(const SDL_Event& event, bool text_editing) const
+         {
++            if (mouse_captured && (event.type == SDL_EVENT_MOUSE_MOTION || event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
++                                   event.type == SDL_EVENT_MOUSE_BUTTON_UP))
++                return true;
+             if (!focused || !enabled || text_editing ||
+                 (event.type != SDL_EVENT_KEY_DOWN && event.type != SDL_EVENT_KEY_UP))
+                 return false;
+@@ -27,6 +73,8 @@ namespace OpenBlood2
+                 case SDL_SCANCODE_RSHIFT:
+                 case SDL_SCANCODE_LCTRL:
+                 case SDL_SCANCODE_RCTRL:
++                case SDL_SCANCODE_F:
++                case SDL_SCANCODE_G:
+                 case SDL_SCANCODE_E:
+                 case SDL_SCANCODE_SPACE:
+                 case SDL_SCANCODE_LEFT:
+@@ -44,21 +92,51 @@ namespace OpenBlood2
+             {
+                 focused = false;
+                 keys = {};
++                release_mouse();
+             }
+             if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED && event.window.windowID == window)
+                 focused = true;
++            if (focused && enabled && mouse_captured)
++            {
++                if (event.type == SDL_EVENT_MOUSE_MOTION && event.motion.windowID == window &&
++                    std::isfinite(event.motion.xrel) && std::isfinite(event.motion.yrel))
++                {
++                    mouse_x = std::clamp(mouse_x + event.motion.xrel, -10000.f, 10000.f);
++                    mouse_y = std::clamp(mouse_y + event.motion.yrel, -10000.f, 10000.f);
++                }
++                if ((event.type == SDL_EVENT_MOUSE_BUTTON_DOWN || event.type == SDL_EVENT_MOUSE_BUTTON_UP) &&
++                    event.button.windowID == window)
++                {
++                    if (event.button.button == SDL_BUTTON_LEFT)
++                        mouse_buttons[0] = event.type == SDL_EVENT_MOUSE_BUTTON_DOWN;
++                    if (event.button.button == SDL_BUTTON_RIGHT)
++                        mouse_buttons[1] = event.type == SDL_EVENT_MOUSE_BUTTON_DOWN;
++                }
++            }
+             if ((event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP) && event.key.windowID == window)
+             {
+                 if (!focused && event.type == SDL_EVENT_KEY_DOWN)
+                     return;
+                 const int code = event.key.scancode;
+-                if (code == SDL_SCANCODE_E && event.type == SDL_EVENT_KEY_DOWN && event.key.repeat &&
+-                    !keys[SDL_SCANCODE_E])
++                if ((code == SDL_SCANCODE_E || code == SDL_SCANCODE_F || code == SDL_SCANCODE_G) &&
++                    event.type == SDL_EVENT_KEY_DOWN && event.key.repeat && !keys[static_cast<unsigned>(code)])
+                     return; // A held key after focus loss is not a fresh USE press.
+                 if (code > SDL_SCANCODE_UNKNOWN && code < SDL_SCANCODE_COUNT)
+                     keys[static_cast<unsigned>(code)] = event.type == SDL_EVENT_KEY_DOWN;
+-                if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat && code == SDL_SCANCODE_F2)
+-                    enabled = !enabled;
++                if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat)
++                {
++                    if (code == SDL_SCANCODE_F2)
++                        enabled = !enabled;
++                    if (code == SDL_SCANCODE_F3)
++                    {
++                        if (mouse_requested)
++                            release_mouse();
++                        else
++                            mouse_requested = true;
++                    }
++                    if (code == SDL_SCANCODE_ESCAPE || (code == SDL_SCANCODE_F1 && (mouse_requested || mouse_captured)))
++                        release_mouse();
++                }
+             }
+         }
+         MovementInput sample(bool text_editing) const
+@@ -84,11 +162,34 @@ namespace OpenBlood2
+             }
+             return keys[SDL_SCANCODE_E] && !use_suppressed;
+         }
+-        void look(PlayerRotation& rotation, double seconds, bool text_editing) const
++        FireButtons sample_fire(bool text_editing)
+         {
++            const std::array<bool, 2> held{keys[SDL_SCANCODE_F] || (mouse_captured && mouse_buttons[0]),
++                                           keys[SDL_SCANCODE_G] || (mouse_captured && mouse_buttons[1])};
++            std::array<bool, 2> result{};
++            for (unsigned i = 0; i < 2; ++i)
++            {
++                if (!held[i])
++                    fire_suppressed[i] = false;
++                if (!focused || !enabled || text_editing)
++                    fire_suppressed[i] = held[i];
++                else
++                    result[i] = held[i] && !fire_suppressed[i];
++            }
++            return {result[0], result[1]};
++        }
++        void look(PlayerRotation& rotation, double seconds, bool text_editing)
++        {
++            const float dx = std::exchange(mouse_x, 0), dy = std::exchange(mouse_y, 0);
+             if (!focused || !enabled || text_editing)
+                 return;
+             const auto dt = static_cast<float>(std::clamp(seconds, 0.0, 0.1));
++            // Device mapping policy: radians per relative mouse unit, independent of frame duration.
++            if (mouse_captured)
++            {
++                rotation.yaw = std::remainder(rotation.yaw + dx * .0025f, 6.28318530718f);
++                rotation.pitch += dy * .0025f;
++            }
+             rotation.yaw += (int(keys[SDL_SCANCODE_RIGHT]) - int(keys[SDL_SCANCODE_LEFT])) * 2 * dt;
+             rotation.pitch = std::clamp(
+                 rotation.pitch + (int(keys[SDL_SCANCODE_DOWN]) - int(keys[SDL_SCANCODE_UP])) * dt, -1.48f, 1.48f);
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 6f83b55..f6f314d 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1142,3 +1142,19 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.weapon_sprite_private PROPERTIES LABELS "gpu;private;weapon_sprites" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+     endif()
+ endif()
++
++add_executable(player_controls_tests player_controls_tests.cpp)
++target_link_libraries(player_controls_tests PRIVATE blood2_game)
++blood2_project_options(player_controls_tests)
++foreach(case IN ITEMS keys mouse gates)
++    add_test(NAME player_controls.${case} COMMAND player_controls_tests "${case}")
++    set_tests_properties(player_controls.${case} PROPERTIES LABELS "headless;player_controls" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME player_controls.private COMMAND player_controls_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(player_controls.private PROPERTIES LABELS "headless;private;player_controls" TIMEOUT 120)
++    if(BLOOD2_GPU_TESTS)
++        add_test(NAME gpu.player_controls COMMAND player_controls_tests gpu "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.player_controls PROPERTIES LABELS "gpu;private;player_controls" TIMEOUT 120 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    endif()
++endif()
+diff --git a/tests/player_controls_tests.cpp b/tests/player_controls_tests.cpp
+new file mode 100644
+index 0000000..6d4170e
+--- /dev/null
++++ b/tests/player_controls_tests.cpp
+@@ -0,0 +1,257 @@
++#include "app/movement_controls.h"
++#include "camera_fixture.h"
++#include "engine/runtime.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    constexpr SDL_WindowID window = 8;
++    SDL_Event key(SDL_Scancode code, bool down, SDL_WindowID id = window, bool repeat = false)
++    {
++        SDL_Event e{};
++        e.type = down ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
++        e.key.windowID = id;
++        e.key.scancode = code;
++        e.key.down = down;
++        e.key.repeat = repeat;
++        return e;
++    }
++    SDL_Event button(Uint8 code, bool down, SDL_WindowID id = window)
++    {
++        SDL_Event e{};
++        e.type = down ? SDL_EVENT_MOUSE_BUTTON_DOWN : SDL_EVENT_MOUSE_BUTTON_UP;
++        e.button.windowID = id;
++        e.button.button = code;
++        e.button.down = down;
++        return e;
++    }
++    SDL_Event motion(float x, float y, SDL_WindowID id = window)
++    {
++        SDL_Event e{};
++        e.type = SDL_EVENT_MOUSE_MOTION;
++        e.motion.windowID = id;
++        e.motion.xrel = x;
++        e.motion.yrel = y;
++        return e;
++    }
++    SDL_Event focus(bool active, SDL_WindowID id = window)
++    {
++        SDL_Event e{};
++        e.type = active ? SDL_EVENT_WINDOW_FOCUS_GAINED : SDL_EVENT_WINDOW_FOCUS_LOST;
++        e.window.windowID = id;
++        return e;
++    }
++    bool keys()
++    {
++        MovementControls c;
++        c.event(focus(true), window);
++        c.event(key(SDL_SCANCODE_F, true), window);
++        CHECK(c.sample_fire(false).primary && !c.sample_fire(false).alternate);
++        CHECK(c.consumes(key(SDL_SCANCODE_F, true), false) && !c.consumes(key(SDL_SCANCODE_F, true), true));
++        c.event(key(SDL_SCANCODE_G, true), window);
++        CHECK(c.sample_fire(false).primary && c.sample_fire(false).alternate);
++        c.event(key(SDL_SCANCODE_F, false, 99), window);
++        CHECK(c.sample_fire(false).primary);
++        c.event(key(SDL_SCANCODE_F, false), window);
++        CHECK(!c.sample_fire(false).primary && c.sample_fire(false).alternate);
++        c.event(key(SDL_SCANCODE_G, false), window);
++        CHECK(!c.sample_fire(false).alternate);
++        c.event(key(SDL_SCANCODE_F3, true, 99), window);
++        CHECK(!c.mouse_requested);
++        c.event(key(SDL_SCANCODE_F3, true), window);
++        CHECK(c.mouse_requested);
++        c.event(key(SDL_SCANCODE_F3, true, window, true), window);
++        CHECK(c.mouse_requested);
++        c.event(key(SDL_SCANCODE_F3, false), window);
++        c.event(key(SDL_SCANCODE_F3, true), window);
++        CHECK(!c.mouse_requested);
++        return true;
++    }
++    bool mouse()
++    {
++        MovementControls c;
++        c.event(focus(true), window);
++        c.event(button(SDL_BUTTON_LEFT, true), window);
++        c.event(motion(40, 20), window);
++        PlayerRotation r;
++        c.look(r, .01, false);
++        CHECK(r.yaw == 0 && !c.sample_fire(false).primary);
++        c.mouse_requested = c.mouse_captured = true; // Pure mapping test; real capture is tested with SDL below.
++        c.event(motion(40, 20, 99), window);
++        c.look(r, .01, false);
++        CHECK(r.yaw == 0);
++        c.event(motion(20, 10), window);
++        c.event(motion(20, 10), window);
++        c.look(r, .001, false);
++        CHECK(std::abs(r.yaw - .1f) < .0001f && std::abs(r.pitch - .05f) < .0001f);
++        c.look(r, .1, false);
++        CHECK(std::abs(r.yaw - .1f) < .0001f); // One consumption, no delta replay.
++        c.event(motion(NAN, 2), window);
++        c.look(r, .1, false);
++        CHECK(std::abs(r.yaw - .1f) < .0001f);
++        c.event(motion(0, 10000), window);
++        c.look(r, .1, false);
++        CHECK(r.pitch == 1.48f);
++        c.event(motion(0, -10000), window);
++        c.look(r, .1, false);
++        CHECK(r.pitch == -1.48f);
++        c.event(button(SDL_BUTTON_LEFT, true), window);
++        c.event(button(SDL_BUTTON_RIGHT, true), window);
++        CHECK(c.sample_fire(false).primary && c.sample_fire(false).alternate && c.consumes(motion(1, 1), false));
++        c.event(button(SDL_BUTTON_LEFT, false), window);
++        CHECK(!c.sample_fire(false).primary && c.sample_fire(false).alternate);
++        c.event(button(SDL_BUTTON_RIGHT, false), window);
++        CHECK(!c.sample_fire(false).alternate);
++        return true;
++    }
++    bool gates()
++    {
++        MovementControls c;
++        c.event(focus(true), window);
++        c.event(key(SDL_SCANCODE_F, true), window);
++        CHECK(!c.sample_fire(true).primary && !c.sample_fire(false).primary); // Typing may not become a held trigger.
++        c.event(key(SDL_SCANCODE_F, false), window);
++        CHECK(!c.sample_fire(false).primary);
++        c.event(key(SDL_SCANCODE_F, true), window);
++        CHECK(c.sample_fire(false).primary);
++        c.enabled = false;
++        CHECK(!c.sample_fire(false).primary);
++        c.enabled = true;
++        CHECK(!c.sample_fire(false).primary);
++        c.event(focus(false), window);
++        c.event(focus(true), window);
++        c.event(key(SDL_SCANCODE_F, true, window, true), window);
++        CHECK(!c.sample_fire(false).primary);
++        c.event(key(SDL_SCANCODE_F, true), window);
++        CHECK(c.sample_fire(false).primary);
++        c.mouse_captured = c.mouse_requested = true;
++        c.event(motion(40, 30), window);
++        c.event(key(SDL_SCANCODE_ESCAPE, true), window);
++        CHECK(!c.mouse_requested && c.mouse_x == 0 && !c.sample_fire(false).primary);
++        c.mouse_requested = true;
++        c.event(key(SDL_SCANCODE_F1, true), window);
++        CHECK(!c.mouse_requested);
++        c.event(motion(20, 20), window);
++        PlayerRotation r;
++        c.look(r, .1, true);
++        c.look(r, .1, false);
++        CHECK(r.yaw == 0 && r.pitch == 0);
++        c.event(key(SDL_SCANCODE_F, true), window);
++        c.mouse_requested = true;
++        c.player_changed();
++        CHECK(!c.mouse_requested && !c.sample_fire(false).primary && !c.sample_use(false));
++        return true;
++    }
++    bool private_input(const std::filesystem::path& root, bool gpu)
++    {
++        Runtime runtime;
++        std::string error;
++        if (gpu)
++            CHECK(runtime.initialize(true, error));
++        GameSession g;
++        Config config;
++        config.data_dir = root;
++        CHECK(g.initialize() && g.resources.mount_game(config, error) && g.request_world("01_SubwayA", error) &&
++              g.enter_player(error));
++        CHECK(test_camera::complete_subway_intro(g));
++        auto* p = g.server_shell.Player(g.local_client);
++        auto* w = p->m_InventoryMgr.GetWeapon(1);
++        MovementControls controls;
++        const auto id = gpu ? SDL_GetWindowID(runtime.window) : window;
++        auto event = [&](SDL_Event e)
++        {
++            if (gpu)
++                return SDL_PushEvent(&e);
++            controls.event(e, id);
++            return true;
++        };
++        auto pump = [&]()
++        {
++            if (gpu)
++            {
++                SDL_Event e{};
++                while (SDL_PollEvent(&e))
++                    controls.event(e, id);
++                if (!controls.sync_mouse(runtime.window, g.client_shell.m_bInWorld, false, error))
++                    return false;
++            }
++            controls.look(g.client_shell.rotation, 1. / 60, false);
++            const auto fire = controls.sample_fire(false);
++            g.client_shell.weapon_input = {fire.primary, fire.alternate, false};
++            return g.step(1. / 60);
++        };
++        auto steps = [&](unsigned count)
++        {
++            for (unsigned i = 0; i < count; ++i)
++                if (!pump())
++                    return false;
++            return true;
++        };
++        CHECK(event(focus(true, id)) && steps(60));
++        const auto ammo = p->m_InventoryMgr.GetAmmoCount(1);
++        CHECK(event(key(SDL_SCANCODE_F, true, id)) && steps(90) && w->shots > 0 &&
++              p->m_InventoryMgr.GetAmmoCount(1) < ammo);
++        CHECK(event(key(SDL_SCANCODE_F, false, id)) && steps(60));
++        if (gpu)
++        {
++            CHECK(event(key(SDL_SCANCODE_F3, true, id)) && pump() && controls.mouse_captured &&
++                  SDL_GetWindowRelativeMouseMode(runtime.window));
++            const auto rotation = g.client_shell.rotation;
++            CHECK(event(motion(40, 20, id)) && pump());
++            CHECK(std::abs(std::remainder(g.client_shell.rotation.yaw - rotation.yaw, 6.28318530718f) - .1f) < .0001f &&
++                  std::abs(g.client_shell.rotation.pitch - rotation.pitch - .05f) < .0001f);
++            const auto look = g.client_shell.view.rotation;
++            CHECK(std::abs(rotate_vector(look, {0, 0, 1}).y + std::sin(g.client_shell.rotation.pitch)) < .0001f);
++            const auto before = w->shots;
++            CHECK(event(button(SDL_BUTTON_LEFT, true, id)) && steps(90) && w->shots > before);
++            CHECK(event(button(SDL_BUTTON_LEFT, false, id)) && steps(60));
++            const auto alt = w->shots;
++            CHECK(event(button(SDL_BUTTON_RIGHT, true, id)) && steps(90) && w->shots > alt);
++            CHECK(event(button(SDL_BUTTON_RIGHT, false, id)) && steps(60));
++            CHECK(event(key(SDL_SCANCODE_ESCAPE, true, id)) && pump() && !controls.mouse_captured &&
++                  !SDL_GetWindowRelativeMouseMode(runtime.window));
++            CHECK(event(button(SDL_BUTTON_LEFT, true, id)) && pump() && !g.client_shell.weapon_input.primary);
++            CHECK(event(key(SDL_SCANCODE_F3, false, id)) && event(key(SDL_SCANCODE_F3, true, id)) && pump() &&
++                  controls.mouse_captured);
++            CHECK(event(focus(false, id)) && pump() && !controls.mouse_captured &&
++                  !SDL_GetWindowRelativeMouseMode(runtime.window));
++            CHECK(event(focus(true, id)) && pump() && !controls.mouse_captured && !g.client_shell.weapon_input.primary);
++        }
++        else
++        {
++            const auto before = w->shots;
++            CHECK(event(key(SDL_SCANCODE_G, true, id)) && steps(90) && w->shots > before);
++            CHECK(event(key(SDL_SCANCODE_G, false, id)) && steps(60));
++        }
++        CHECK(w->sounds_played == w->shots && !w->sound_failures);
++        CHECK(g.client_shell.weapons.front().fire_keys > 0);
++        std::cout << "Original FIRE_KEY: shots=" << w->shots << " ammo=" << p->m_InventoryMgr.GetAmmoCount(1)
++                  << " voices=" << w->sounds_played << " mouse=" << gpu << "\n";
++        CHECK(g.leave_player() && g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    const std::string mode = argv[1];
++    if (mode == "keys")
++        return keys() ? 0 : 1;
++    if (mode == "mouse")
++        return mouse() ? 0 : 1;
++    if (mode == "gates")
++        return gates() ? 0 : 1;
++    if (argc == 3 && (mode == "private" || mode == "gpu"))
++        return private_input(argv[2], mode == "gpu") ? 0 : 1;
++    return 2;
++}

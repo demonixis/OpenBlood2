@@ -1,0 +1,14 @@
+499/503 Testing: character_nodes.services
+499/503 Test: character_nodes.services
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/character_nodes_tests" "services" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/character-node-fixtures/services"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"character_nodes.services" start time: Oct 16 18:54 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"character_nodes.services" end time: Oct 16 18:54 CEST
+"character_nodes.services" time elapsed: 00:00:00
+----------------------------------------------------------

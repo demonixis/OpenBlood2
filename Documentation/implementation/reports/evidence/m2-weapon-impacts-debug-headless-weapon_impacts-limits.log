@@ -1,0 +1,14 @@
+609/610 Testing: weapon_impacts.limits
+609/610 Test: weapon_impacts.limits
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_impact_tests" "limits" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-impacts-limits"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapon_impacts.limits" start time: Oct 16 23:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_impacts.limits" end time: Oct 16 23:30 CEST
+"weapon_impacts.limits" time elapsed: 00:00:00
+----------------------------------------------------------

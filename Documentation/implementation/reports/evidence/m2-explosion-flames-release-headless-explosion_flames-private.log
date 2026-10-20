@@ -1,0 +1,161 @@
+589/591 Testing: explosion_flames.private
+589/591 Test: explosion_flames.private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_flame_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"explosion_flames.private" start time: Oct 16 22:03 CEST
+Output:
+----------------------------------------------------------
+SubwayA diagnostic Tesla cycle 0: peak 79, eight bursts observed, complete expiry
+SubwayA diagnostic Tesla cycle 1: peak 81, eight bursts observed, complete expiry
+SubwayA diagnostic Tesla cycle 2: peak 80, eight bursts observed, complete expiry
+Authored Cathedral Tesla: lightningexplosion1, 24 initial particles
+Authored Cathedral Tesla: lightningexplosion2, 24 initial particles
+Authored Cathedral Tesla: lightningexplosion3, 24 initial particles
+<end of output>
+Test time =   0.38 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_flames.private" end time: Oct 16 22:03 CEST
+"explosion_flames.private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 22:03 CEST
+
+ai_escape =   0.06 sec*proc
+
+ai_fire =   0.38 sec*proc
+
+ai_follow =   0.17 sec*proc
+
+ai_hit =   0.05 sec*proc
+
+ai_keys =   0.80 sec*proc
+
+ai_locomotion =   0.06 sec*proc
+
+ai_navigation =   0.12 sec*proc
+
+ai_perception =   0.15 sec*proc
+
+ai_recovery =   0.06 sec*proc
+
+ai_runtime =   0.76 sec*proc
+
+ai_script =   0.09 sec*proc
+
+ai_sight =   0.14 sec*proc
+
+ai_state =   1.08 sec*proc
+
+ai_target =   0.18 sec*proc
+
+ai_trigger =   0.18 sec*proc
+
+attachments =   0.20 sec*proc
+
+brushes =   0.72 sec*proc
+
+cameras =   0.60 sec*proc
+
+character =   0.79 sec*proc
+
+character_audio =   1.06 sec*proc
+
+character_motion =   0.05 sec*proc
+
+character_nodes =   0.16 sec*proc
+
+cinematics =   0.54 sec*proc
+
+cli =   0.06 sec*proc
+
+config =   0.02 sec*proc
+
+containers =   0.78 sec*proc
+
+corpses =   0.05 sec*proc
+
+destructable_state =   0.15 sec*proc
+
+doors =   0.71 sec*proc
+
+exits =   0.28 sec*proc
+
+explosion_flames =   0.39 sec*proc
+
+explosion_fragments =   0.75 sec*proc
+
+explosion_lights =   0.37 sec*proc
+
+explosion_models =   0.16 sec*proc
+
+explosion_rings =   0.45 sec*proc
+
+explosion_sprites =   0.17 sec*proc
+
+explosions =   0.02 sec*proc
+
+headless =  27.29 sec*proc
+
+interaction =   0.54 sec*proc
+
+inventory_state =   0.16 sec*proc
+
+keyframes =   0.98 sec*proc
+
+lights =   0.33 sec*proc
+
+locomotion =   0.54 sec*proc
+
+model_view =   0.15 sec*proc
+
+movement =   1.38 sec*proc
+
+object_particles =   0.90 sec*proc
+
+objectives =   0.29 sec*proc
+
+objects =   0.03 sec*proc
+
+paths =   0.17 sec*proc
+
+pickups =   0.33 sec*proc
+
+player =   0.30 sec*proc
+
+player_keepalive =   0.29 sec*proc
+
+player_restore =   0.17 sec*proc
+
+player_state =   0.15 sec*proc
+
+private =  25.74 sec*proc
+
+pushables =   0.03 sec*proc
+
+randomsound =   0.41 sec*proc
+
+sceneexplosion =   0.38 sec*proc
+
+services =   0.40 sec*proc
+
+sound =   0.43 sec*proc
+
+sprite_view =   0.15 sec*proc
+
+sprites =   0.61 sec*proc
+
+texture =   0.16 sec*proc
+
+triggers =   0.73 sec*proc
+
+weapon_drops =   0.05 sec*proc
+
+weapons =   3.57 sec*proc
+
+world =   0.39 sec*proc
+
+world_view =   0.17 sec*proc
+
+worldpaths =   0.37 sec*proc
+

@@ -1,0 +1,164 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 1179: menus.profiles
+      Start 1030: hud.private
+      Start 1178: menus.session
+      Start 1206: demo_menu.assets
+ 1/35 Test #1206: demo_menu.assets .................   Passed    0.56 sec
+      Start   88: cli.world_modes
+ 2/35 Test #1178: menus.session ....................   Passed    1.80 sec
+      Start 1176: menus.artwork
+ 3/35 Test #1030: hud.private ......................   Passed    2.05 sec
+      Start  310: cinematics.failures
+ 4/35 Test  #310: cinematics.failures ..............   Passed    0.01 sec
+      Start  309: cinematics.lifetime
+ 5/35 Test  #309: cinematics.lifetime ..............   Passed    0.01 sec
+      Start  306: cinematics.mixer
+ 6/35 Test  #306: cinematics.mixer .................   Passed    0.01 sec
+      Start  307: cinematics.spatial
+ 7/35 Test  #307: cinematics.spatial ...............   Passed    0.01 sec
+      Start  308: cinematics.sequence
+ 8/35 Test  #308: cinematics.sequence ..............   Passed    0.01 sec
+      Start    1: platform.destroyed_properties
+ 9/35 Test    #1: platform.destroyed_properties ....   Passed    0.00 sec
+      Start  305: cinematics.decode
+10/35 Test  #305: cinematics.decode ................   Passed    0.00 sec
+      Start 1029: hud.session
+11/35 Test #1029: hud.session ......................   Passed    0.01 sec
+      Start 1204: demo_menu.manifest
+12/35 Test #1204: demo_menu.manifest ...............   Passed    0.00 sec
+      Start 1205: demo_menu.flow
+13/35 Test #1205: demo_menu.flow ...................   Passed    0.00 sec
+      Start 1180: menus.preferences
+14/35 Test #1180: menus.preferences ................   Passed    0.01 sec
+      Start  311: cinematics.device
+15/35 Test #1176: menus.artwork ....................   Passed    0.34 sec
+      Start 1026: hud.bitmaps
+16/35 Test #1026: hud.bitmaps ......................   Passed    0.00 sec
+      Start   29: config.demo
+17/35 Test   #29: config.demo ......................   Passed    0.00 sec
+      Start 1175: menus.state
+18/35 Test #1175: menus.state ......................   Passed    0.00 sec
+      Start 1027: hud.values
+19/35 Test #1027: hud.values .......................   Passed    0.00 sec
+      Start 1028: hud.input
+20/35 Test #1028: hud.input ........................   Passed    0.00 sec
+      Start   56: cli.missing_data
+21/35 Test   #56: cli.missing_data .................   Passed    0.03 sec
+      Start   58: cli.metadata
+22/35 Test  #311: cinematics.device ................   Passed    0.08 sec
+      Start   55: cli.unknown
+23/35 Test   #58: cli.metadata .....................   Passed    0.03 sec
+      Start   57: cli.missing_config
+24/35 Test   #55: cli.unknown ......................   Passed    0.03 sec
+      Start   54: cli.help
+25/35 Test   #57: cli.missing_config ...............   Passed    0.03 sec
+      Start   24: config.precedence
+26/35 Test   #24: config.precedence ................   Passed    0.00 sec
+      Start   26: config.invalid_config
+27/35 Test   #26: config.invalid_config ............   Passed    0.01 sec
+      Start   25: config.relative_paths
+28/35 Test   #25: config.relative_paths ............   Passed    0.00 sec
+      Start   27: config.content_validation
+29/35 Test   #27: config.content_validation ........   Passed    0.00 sec
+      Start   28: config.case_lookup
+30/35 Test   #54: cli.help .........................***Failed    0.03 sec
+CMake Error at /home/yann/projects/lithtech/Blood2/tests/cli_test.cmake:25 (message):
+  Expected exit 0 and 'Blood II reconstruction', got 0:
+
+  [info] Log session:
+  /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792408058759694451-0
+
+  [info] OpenBlood2 0.3.0 / 39c3af6-dirty / Debug / GNU 16.2.1;
+  platform=Linux; SDL=SDL-3.5.0-39c3af6 (pinned
+  6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+
+  [info] Crash capture ready: all-thread stacks and core dump in the log
+  session directory
+
+  [info] Requested world=01_SubwayA; demo=false; config=blood2.local.ini;
+  inspector=true; view=false; bench=false; headless=false; frames=0
+
+  Open Blood II 0.3.0 (M2 in progress)
+
+    --config FILE       Configuration file (default: blood2.local.ini in working directory)
+    --log-dir DIR       Log root (default: SDL user directory / logs)
+    --log-level LEVEL   trace, debug, info (default), warn or error
+    --no-crash-capture  Leave crash handling entirely to the OS/debugger
+    --data-dir DIR      External Blood II directory; overrides BLOOD2_DATA_DIR and config
+    --demo              The data directory is the original 1998 demo (B2Demo.rez); normal launch opens its menu, first world Demo_01
+    --check-data        Check file metadata without opening a window or parsing archives
+    --world NAME        World resource (default: 01_SubwayA, Demo_01 with --demo)
+    --inspect-world     Parse/mount/create original subset headlessly; does not run a game
+    --inspect-player    Exercise original shell/player entry headlessly; not playable
+    --view-world        Start directly in the original world; F10 inspector, Esc pause; 1..9/0 weapon slots, original HUD
+    --viewport-smoke    GPU 3D depth view, movement and unload/reload checks
+    --start-game        Validate original entry and one headless update; exits after checks
+    --no-inspector      Disable normal F10 inspection (smokes retain their explicit policy)
+    --frames N          Exit after N presented frames (bench: measured frames, default 600)
+    --bench             Headless offscreen timing of --world presentation; no window
+    --bench-size WxH    Bench render size (default 1920x1080); implies --bench
+    --bench-sweep       Bench with a presentation-only 360-degree yaw sweep
+    --no-model-shadows  Disable FLAG_SHADOW model shadows (original low/medium detail)
+    --pixel-lighting    Light models per pixel (menu: Options > Display)
+    --capture FILE.png  Save the third GPU frame after UI layout has settled (bench: last frame)
+    --menu-smoke        Selected-edition menu SDL traversal, isolated preferences/pause checks
+    --demo-smoke        Menu-free demo SDL pause, authored exits and ending diagnostic
+    --gpu-smoke         Exercise GPU presentation, inspector toggle, resize and quit
+    --world-smoke       GPU lifecycle with real world unload/reload assertions
+    --keepalive-smoke   GPU SubwayA capture / CityHub named entry, hidden updates and reload
+    --restore-smoke     GPU saved-player entry, hidden updates and restore after reload
+    --player-smoke      GPU shell/player entry, hidden updates and unload/re-entry
+    --weapons-smoke     GPU Beretta/knife firing, hidden simulation and reload
+    --doors-smoke       GPU original sliding door inspection
+    --brushes-smoke GPU original rotating brush inspection
+    --interaction-smoke GPU original USE and rotating door inspection
+    --pickups-smoke   GPU original ammo pickup, hidden collection and reload
+    --objectives-smoke GPU original objectives and localized text, hidden delivery/reload
+    --scene-explosions-smoke  GPU original emitter, detached audio and reload
+    --sprites-smoke    GPU original sprite placement, SPR clocks and reload
+    --random-sounds-smoke  GPU original random sound, PCM output and reload
+    --cinematics-smoke  GPU original cue, WAV mixing, SDL output and reload
+    --lights-smoke      GPU original light state, keyframe placement and reload
+    --worldpaths-smoke  GPU original translating train path, collision and reload
+    --keyframes-smoke   GPU original camera key path, key lifetime and reload
+    --cameras-smoke     GPU original camera tracking, player gates and reload
+    --triggers-smoke    GPU Trigger, SelfTrigger and key inspection
+    --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub
+    --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload
+    --skeleton-smoke    Same lifecycle with original animation/node inspection
+    --help              Show this help
+
+  [info] Session finished: exit_code=0
+
+
+
+
+
+
+      Start   23: config.arguments
+31/35 Test   #28: config.case_lookup ...............   Passed    0.00 sec
+      Start    2: platform.sdl_properties_patch
+32/35 Test   #23: config.arguments .................   Passed    0.00 sec
+33/35 Test    #2: platform.sdl_properties_patch ....   Passed    0.10 sec
+34/35 Test   #88: cli.world_modes ..................   Passed    2.51 sec
+35/35 Test #1179: menus.profiles ...................   Passed   15.25 sec
+
+97% tests passed, 1 tests failed out of 35
+
+Label Time Summary:
+cinematics    =   0.12 sec*proc (7 tests)
+cli           =   0.15 sec*proc (5 tests)
+config        =   0.02 sec*proc (7 tests)
+demo_menu     =   0.57 sec*proc (3 tests)
+headless      =  22.94 sec*proc (35 tests)
+hud           =   2.07 sec*proc (5 tests)
+menus         =  17.40 sec*proc (5 tests)
+platform      =   0.10 sec*proc (2 tests)
+private       =  22.51 sec*proc (6 tests)
+world         =   2.51 sec*proc (1 test)
+
+Total Test time (real) =  15.27 sec
+
+The following tests FAILED:
+	 54 - cli.help (Failed)                                 cli headless
+Errors while running CTest

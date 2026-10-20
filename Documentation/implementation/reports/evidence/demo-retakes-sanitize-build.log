@@ -1,0 +1,961 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- dynamic libasound -> libasound.so.2
+-- dynamic libjack -> libjack.so.0
+-- dynamic libpipewire-0.3 -> libpipewire-0.3.so.0
+-- dynamic libpulse -> libpulse.so.0
+-- Checking for module 'sndio'
+--   Package 'sndio' not found
+-- dynamic libX11 -> libX11.so.6
+-- dynamic libXext -> libXext.so.6
+-- dynamic libXcursor -> libXcursor.so.1
+-- dynamic libXi -> libXi.so.6
+-- dynamic libXfixes -> libXfixes.so.3
+-- dynamic libXrandr -> libXrandr.so.2
+-- dynamic libXrender -> libXrender.so.1
+-- dynamic libXss -> libXss.so.1
+-- dynamic libXtst -> libXtst.so.6
+-- dynamic libfribidi -> libfribidi.so.0
+-- dynamic libthai -> libthai.so.0
+-- dynamic libdrm -> libdrm.so.2
+-- dynamic libgbm -> libgbm.so.1
+-- dynamic libwayland-client -> libwayland-client.so.0
+-- dynamic libwayland-egl -> libwayland-egl.so.1
+-- dynamic libwayland-cursor -> libwayland-cursor.so.0
+-- dynamic libxkbcommon -> libxkbcommon.so.0
+-- dynamic libdecor-0 -> libdecor-0.so.0
+-- dynamic libudev -> libudev.so.1
+-- Checking for one of the modules 'liburing-ffi'
+-- 
+-- SDL3 was configured with the following options:
+-- 
+-- Platform: Linux-7.2.10-200.fc44.x86_64
+-- 64-bit:   TRUE
+-- Compiler: /usr/bin/clang
+-- Revision: SDL-3.5.0-9e8a02d
+-- Vendor:   
+-- 
+-- Subsystems:
+--   Audio:        ON
+--   Video:        ON
+--   GPU:          ON
+--   Render:       OFF
+--   Camera:       OFF
+--   Joystick:     ON
+--   Haptic:       ON
+--   Hidapi:       ON
+--   Power:        ON
+--   Sensor:       ON
+--   Dialog:       OFF
+--   Tray:         OFF
+--   Notification: OFF
+-- 
+-- Options:
+--   SDL_ALSA                    (Wanted: ON): ON
+--   SDL_ALSA_SHARED             (Wanted: ON): ON
+--   SDL_ALTIVEC                 (Wanted: OFF): OFF
+--   SDL_ARMNEON                 (Wanted: OFF): OFF
+--   SDL_ARMSVE2                 (Wanted: OFF): OFF
+--   SDL_ASAN                    (Wanted: OFF): OFF
+--   SDL_ASSEMBLY                (Wanted: ON): ON
+--   SDL_ASSERTIONS              (Wanted: auto): auto
+--   SDL_AVX                     (Wanted: ON): ON
+--   SDL_AVX2                    (Wanted: ON): ON
+--   SDL_AVX512F                 (Wanted: ON): ON
+--   SDL_BACKGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_CCACHE                  (Wanted: OFF): OFF
+--   SDL_CLANG_TIDY              (Wanted: OFF): OFF
+--   SDL_CLOCK_GETTIME           (Wanted: ON): ON
+--   SDL_COCOA                   (Wanted: OFF): OFF
+--   SDL_DBUS                    (Wanted: ON): ON
+--   SDL_DEPS_SHARED             (Wanted: ON): OFF
+--   SDL_DIRECTX                 (Wanted: OFF): OFF
+--   SDL_DISKAUDIO               (Wanted: OFF): OFF
+--   SDL_DLOPEN_NOTES            (Wanted: ON): ON
+--   SDL_DUMMYAUDIO              (Wanted: ON): ON
+--   SDL_DUMMYCAMERA             (Wanted: OFF): OFF
+--   SDL_DUMMYVIDEO              (Wanted: ON): ON
+--   SDL_EXAMPLES                (Wanted: OFF): OFF
+--   SDL_EXAMPLES_LINK_SHARED    (Wanted: OFF): OFF
+--   SDL_FOREGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_FRIBIDI                 (Wanted: ON): ON
+--   SDL_FRIBIDI_SHARED          (Wanted: ON): ON
+--   SDL_GCC_ATOMICS             (Wanted: ON): ON
+--   SDL_GPU_OPENXR              (Wanted: ON): ON
+--   SDL_HIDAPI                  (Wanted: ON): ON
+--   SDL_HIDAPI_JOYSTICK         (Wanted: ON): ON
+--   SDL_HIDAPI_LIBUSB           (Wanted: ON): ON
+--   SDL_HIDAPI_LIBUSB_SHARED    (Wanted: ON): ON
+--   SDL_IBUS                    (Wanted: ON): ON
+--   SDL_INSTALL                 (Wanted: OFF): OFF
+--   SDL_INSTALL_TESTS           (Wanted: OFF): OFF
+--   SDL_JACK                    (Wanted: ON): ON
+--   SDL_JACK_SHARED             (Wanted: ON): ON
+--   SDL_KMSDRM                  (Wanted: ON): ON
+--   SDL_KMSDRM_SHARED           (Wanted: ON): ON
+--   SDL_LASX                    (Wanted: OFF): OFF
+--   SDL_LEAN_AND_MEAN           (Wanted: OFF): OFF
+--   SDL_LIBC                    (Wanted: ON): ON
+--   SDL_LIBICONV                (Wanted: OFF): OFF
+--   SDL_LIBTHAI                 (Wanted: ON): ON
+--   SDL_LIBTHAI_SHARED          (Wanted: ON): ON
+--   SDL_LIBUDEV                 (Wanted: ON): ON
+--   SDL_LIBUDEV_SHARED          (Wanted: ON): ON
+--   SDL_LIBURING                (Wanted: ON): OFF
+--   SDL_LSX                     (Wanted: OFF): OFF
+--   SDL_METAL                   (Wanted: OFF): OFF
+--   SDL_MMX                     (Wanted: ON): ON
+--   SDL_OFFSCREEN               (Wanted: ON): ON
+--   SDL_OPENGL                  (Wanted: ON): ON
+--   SDL_OPENGLES                (Wanted: ON): ON
+--   SDL_OPENVR                  (Wanted: OFF): OFF
+--   SDL_OSS                     (Wanted: OFF): OFF
+--   SDL_PIPEWIRE                (Wanted: ON): ON
+--   SDL_PIPEWIRE_SHARED         (Wanted: ON): ON
+--   SDL_PTHREADS                (Wanted: ON): ON
+--   SDL_PTHREADS_SEM            (Wanted: ON): ON
+--   SDL_PULSEAUDIO              (Wanted: ON): ON
+--   SDL_PULSEAUDIO_SHARED       (Wanted: ON): ON
+--   SDL_RENDER_D3D              (Wanted: OFF): OFF
+--   SDL_RENDER_D3D11            (Wanted: OFF): OFF
+--   SDL_RENDER_D3D12            (Wanted: OFF): OFF
+--   SDL_RENDER_GPU              (Wanted: OFF): OFF
+--   SDL_RENDER_METAL            (Wanted: OFF): OFF
+--   SDL_RENDER_VULKAN           (Wanted: OFF): OFF
+--   SDL_ROCKCHIP                (Wanted: OFF): OFF
+--   SDL_RPATH                   (Wanted: ON): OFF
+--   SDL_RPI                     (Wanted: OFF): OFF
+--   SDL_SNDIO                   (Wanted: ON): OFF
+--   SDL_SNDIO_SHARED            (Wanted: ON): OFF
+--   SDL_SSE                     (Wanted: ON): ON
+--   SDL_SSE2                    (Wanted: ON): ON
+--   SDL_SSE3                    (Wanted: ON): ON
+--   SDL_SSE4_1                  (Wanted: ON): ON
+--   SDL_SSE4_2                  (Wanted: ON): ON
+--   SDL_SYSTEM_ICONV            (Wanted: ON): ON
+--   SDL_TESTS                   (Wanted: OFF): OFF
+--   SDL_TESTS_LINK_SHARED       (Wanted: OFF): OFF
+--   SDL_UNINSTALL               (Wanted: OFF): OFF
+--   SDL_VIRTUAL_JOYSTICK        (Wanted: ON): ON
+--   SDL_VIVANTE                 (Wanted: OFF): OFF
+--   SDL_VULKAN                  (Wanted: ON): ON
+--   SDL_WASAPI                  (Wanted: OFF): OFF
+--   SDL_WAYLAND                 (Wanted: ON): ON
+--   SDL_WAYLAND_LIBDECOR        (Wanted: ON): ON
+--   SDL_WAYLAND_LIBDECOR_SHARED (Wanted: ON): ON
+--   SDL_WAYLAND_SHARED          (Wanted: ON): ON
+--   SDL_X11                     (Wanted: ON): ON
+--   SDL_X11_SHARED              (Wanted: ON): ON
+--   SDL_X11_XCURSOR             (Wanted: ON): ON
+--   SDL_X11_XDBE                (Wanted: ON): ON
+--   SDL_X11_XFIXES              (Wanted: ON): ON
+--   SDL_X11_XINPUT              (Wanted: ON): ON
+--   SDL_X11_XRANDR              (Wanted: ON): ON
+--   SDL_X11_XSCRNSAVER          (Wanted: ON): ON
+--   SDL_X11_XSHAPE              (Wanted: ON): ON
+--   SDL_X11_XSYNC               (Wanted: ON): ON
+--   SDL_X11_XTEST               (Wanted: ON): ON
+--   SDL_XINPUT                  (Wanted: OFF): OFF
+-- 
+--  Build Shared Library: OFF
+--  Build Static Library: ON
+-- 
+-- Enabled backends:
+--   Video drivers: dummy kmsdrm(dynamic) offscreen wayland(dynamic) x11(dynamic)
+--   X11 libraries: xcursor xdbe xfixes xinput2 xrandr xscrnsaver xshape xsync xtest
+--   Render drivers: ogl ogl_es ogl_es2
+--   GPU drivers: openxr vulkan
+--   Audio drivers: alsa(dynamic) dummy jack(dynamic) pipewire(dynamic) pulseaudio(dynamic)
+--   Joystick drivers: hidapi linux virtual
+--   Camera drivers: dummy pipewire(dynamic)
+-- 
+-- If something was not detected, although the libraries
+-- were installed, then make sure you have set the
+-- CMAKE_C_FLAGS and CMAKE_PREFIX_PATH CMake variables correctly.
+-- 
+-- Build spdlog: 1.15.3
+-- Build type: Debug
+-- Configuring done (1.1s)
+-- Generating done (0.5s)
+-- Build files have been written to: /home/yann/projects/lithtech/Blood2/build/sanitize
+[0/4] Re-checking globbed directories...
+[1/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/world_shade.cpp for CXX dependencies
+[2/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/world_lights.cpp for CXX dependencies
+[3/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/gpu_registry.cpp for CXX dependencies
+[4/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/model_renderer.cpp for CXX dependencies
+[5/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/polygrid_view.cpp for CXX dependencies
+[6/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/sky.cpp for CXX dependencies
+[7/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/particles.cpp for CXX dependencies
+[8/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/sprite_view.cpp for CXX dependencies
+[9/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/model_view.cpp for CXX dependencies
+[10/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/world_view.cpp for CXX dependencies
+[11/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/world_renderer.cpp for CXX dependencies
+[12/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/attachments.cpp for CXX dependencies
+[13/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/object_pose.cpp for CXX dependencies
+[14/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp for CXX dependencies
+[15/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/world.cpp for CXX dependencies
+[16/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/audio.cpp for CXX dependencies
+[17/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp for CXX dependencies
+[18/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/container.cpp for CXX dependencies
+[19/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/world_model.cpp for CXX dependencies
+[20/814] Scanning /home/yann/projects/lithtech/Blood2/src/engine/logging.cpp for CXX dependencies
+[21/814] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[22/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/polygrids.cpp for CXX dependencies
+[23/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PolyGrid.cpp for CXX dependencies
+[24/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PolyGridFX.cpp for CXX dependencies
+[25/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/SparksFX.cpp for CXX dependencies
+[26/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/blood_spurts.cpp for CXX dependencies
+[27/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/cmake_pch.h.pch
+[28/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ParticleExplosionFX.cpp for CXX dependencies
+[29/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/blood_splats.cpp for CXX dependencies
+[30/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/BloodSplatFX.cpp for CXX dependencies
+[31/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ClientSplatFX.cpp for CXX dependencies
+[32/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/RemoteBomb.cpp for CXX dependencies
+[33/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerRemoteBombs.cpp for CXX dependencies
+[34/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/BombExplosion.cpp for CXX dependencies
+[35/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ProximityBomb.cpp for CXX dependencies
+[36/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_sky.cpp for CXX dependencies
+[37/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/SkyObjects.cpp for CXX dependencies
+[38/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/particle_streams.cpp for CXX dependencies
+[39/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ParticleStreamFX.cpp for CXX dependencies
+[40/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ClientParticleStreamSFX.cpp for CXX dependencies
+[41/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Grenade.cpp for CXX dependencies
+[42/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/FlareProjectile.cpp for CXX dependencies
+[43/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/GideonShield.cpp for CXX dependencies
+[44/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Shockwave.cpp for CXX dependencies
+[45/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/object_particles.cpp for CXX dependencies
+[46/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/WeaponProjectile.cpp for CXX dependencies
+[47/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Projectile.cpp for CXX dependencies
+[48/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/EnergyBlast.cpp for CXX dependencies
+[49/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_projectiles.cpp for CXX dependencies
+[50/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/NagaEyes.cpp for CXX dependencies
+[51/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/LaserBeamFX.cpp for CXX dependencies
+[52/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/SmokeImpactFX.cpp for CXX dependencies
+[53/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/destination_trial.cpp for CXX dependencies
+[54/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/level_change.cpp for CXX dependencies
+[55/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/world_preparation.cpp for CXX dependencies
+[56/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/explosion_flames.cpp for CXX dependencies
+[57/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ExplosionFlameFX.cpp for CXX dependencies
+[58/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ObjectParticleFX.cpp for CXX dependencies
+[59/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ExplosionFragFX.cpp for CXX dependencies
+[60/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/explosion_fragments.cpp for CXX dependencies
+[61/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ExplosionRingFX.cpp for CXX dependencies
+[62/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/explosion_rings.cpp for CXX dependencies
+[63/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/explosion_lights.cpp for CXX dependencies
+[64/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ExplosionLightFX.cpp for CXX dependencies
+[65/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ExplosionModelFX.cpp for CXX dependencies
+[66/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/explosion_models.cpp for CXX dependencies
+[67/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ExplosionSpriteFX.cpp for CXX dependencies
+[68/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/explosion_sprites.cpp for CXX dependencies
+[69/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/HandWeaponModel.cpp for CXX dependencies
+[70/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_attachments.cpp for CXX dependencies
+[71/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/WeaponHand.cpp for CXX dependencies
+[72/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/engineobjects.cpp for CXX dependencies
+[73/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/B2BaseClass.cpp for CXX dependencies
+[74/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CameraSpot.cpp for CXX dependencies
+[75/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Key.cpp for CXX dependencies
+[76/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/GameStartPoint.cpp for CXX dependencies
+[77/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PathPoint.cpp for CXX dependencies
+[78/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PathMgr.cpp for CXX dependencies
+[79/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/trigger_helpers.cpp for CXX dependencies
+[80/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/session_load.cpp for CXX dependencies
+[81/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/session.cpp for CXX dependencies
+[82/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/world_validation.cpp for CXX dependencies
+[83/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/player_restore.cpp for CXX dependencies
+[84/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/registration.cpp for CXX dependencies
+[85/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_adapter.cpp for CXX dependencies
+[86/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ClientExplosionSFX.cpp for CXX dependencies
+[87/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_sprites.cpp for CXX dependencies
+[88/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/DetailSprite.cpp for CXX dependencies
+[89/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_audio.cpp for CXX dependencies
+[90/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CinematicTrigger.cpp for CXX dependencies
+[91/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/RandomSoundFX.cpp for CXX dependencies
+[92/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Sound.cpp for CXX dependencies
+[93/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/SoundFX.cpp for CXX dependencies
+[94/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerLanding.cpp for CXX dependencies
+[95/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerDeath.cpp for CXX dependencies
+[96/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerDeathCamera.cpp for CXX dependencies
+[97/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_lights.cpp for CXX dependencies
+[98/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/LightFX.cpp for CXX dependencies
+[99/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ClientLightFX.cpp for CXX dependencies
+[100/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_keyframes.cpp for CXX dependencies
+[101/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/KeyData.cpp for CXX dependencies
+[102/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/KeyFramer.cpp for CXX dependencies
+[103/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_cameras.cpp for CXX dependencies
+[104/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CameraObj.cpp for CXX dependencies
+[105/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ObjectivesTrigger.cpp for CXX dependencies
+[106/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_objectives.cpp for CXX dependencies
+[107/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ConversationTrigger.cpp for CXX dependencies
+[108/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ConversationStrings.cpp for CXX dependencies
+[109/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CommLink.cpp for CXX dependencies
+[110/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/VoiceMgr.cpp for CXX dependencies
+[111/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp for CXX dependencies
+[112/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_models.cpp for CXX dependencies
+[113/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/WorldProperties.cpp for CXX dependencies
+[114/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/SmellHint.cpp for CXX dependencies
+[115/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/WeaponPickups.cpp for CXX dependencies
+[116/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_pickups.cpp for CXX dependencies
+[117/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PickupObject.cpp for CXX dependencies
+[118/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp for CXX dependencies
+[119/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/GameInvItems.cpp for CXX dependencies
+[120/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Flashlight.cpp for CXX dependencies
+[121/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AmmoPickups.cpp for CXX dependencies
+[122/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PowerupPickups.cpp for CXX dependencies
+[123/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/spawn_object.cpp for CXX dependencies
+[124/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Spawner.cpp for CXX dependencies
+[125/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/TripLaser.cpp for CXX dependencies
+[126/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/SoulDrudge.cpp for CXX dependencies
+[127/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ShikariAI.cpp for CXX dependencies
+[128/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/MadScientistAI.cpp for CXX dependencies
+[129/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Tchernotronic.cpp for CXX dependencies
+[130/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/SingularityProjectile.cpp for CXX dependencies
+[131/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Fanatic.cpp for CXX dependencies
+[132/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Prophet.cpp for CXX dependencies
+[133/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CabalAttack.cpp for CXX dependencies
+[134/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/HowitzerShell.cpp for CXX dependencies
+[135/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/TeslaProjectile.cpp for CXX dependencies
+[136/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp for CXX dependencies
+[137/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_movers.cpp for CXX dependencies
+[138/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_rotation.cpp for CXX dependencies
+[139/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/RotatingDoor.cpp for CXX dependencies
+[140/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerUse.cpp for CXX dependencies
+[141/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Door.cpp for CXX dependencies
+[142/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Trigger.cpp for CXX dependencies
+[143/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/KeyPickup.cpp for CXX dependencies
+[144/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_keys.cpp for CXX dependencies
+[145/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_containers.cpp for CXX dependencies
+[146/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/VolumeBrush.cpp for CXX dependencies
+[147/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp for CXX dependencies
+[148/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerPowers.cpp for CXX dependencies
+[149/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/MoveMgr.cpp for CXX dependencies
+[150/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerLocomotion.cpp for CXX dependencies
+[151/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Anim_Sound.cpp for CXX dependencies
+[152/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CharacterSound.cpp for CXX dependencies
+[153/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AI_Mgr.cpp for CXX dependencies
+[154/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AISight.cpp for CXX dependencies
+[155/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIFire.cpp for CXX dependencies
+[156/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIPerception.cpp for CXX dependencies
+[157/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_activation.cpp for CXX dependencies
+[158/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIRuntime.cpp for CXX dependencies
+[159/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIAmmo.cpp for CXX dependencies
+[160/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AISmell.cpp for CXX dependencies
+[161/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIEscape.cpp for CXX dependencies
+[162/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AINavigationStates.cpp for CXX dependencies
+[163/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AILocomotion.cpp for CXX dependencies
+[164/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CultistAttack.cpp for CXX dependencies
+[165/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIScript.cpp for CXX dependencies
+[166/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIDodge.cpp for CXX dependencies
+[167/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIScriptMovement.cpp for CXX dependencies
+[168/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIScriptFire.cpp for CXX dependencies
+[169/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Movement.cpp for CXX dependencies
+[170/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIState.cpp for CXX dependencies
+[171/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIHitReaction.cpp for CXX dependencies
+[172/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIDeath.cpp for CXX dependencies
+[173/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Gib.cpp for CXX dependencies
+[174/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/flesh_gibs.cpp for CXX dependencies
+[175/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Corpse.cpp for CXX dependencies
+[176/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AITrigger.cpp for CXX dependencies
+[177/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AISound.cpp for CXX dependencies
+[178/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CivilianAI.cpp for CXX dependencies
+[179/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CultistAI.cpp for CXX dependencies
+[180/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Gideon.cpp for CXX dependencies
+[181/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ExitHint.cpp for CXX dependencies
+[182/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AITarget.cpp for CXX dependencies
+[183/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CharacterMotion.cpp for CXX dependencies
+[184/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ExitTrigger.cpp for CXX dependencies
+[185/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_exits.cpp for CXX dependencies
+[186/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerObj.cpp for CXX dependencies
+[187/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_clients.cpp for CXX dependencies
+[188/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CharacterNodes.cpp for CXX dependencies
+[189/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerSave.cpp for CXX dependencies
+[190/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/BloodShells.cpp for CXX dependencies
+[191/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_weapons.cpp for CXX dependencies
+[192/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/InventoryMgr.cpp for CXX dependencies
+[193/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/InventorySave.cpp for CXX dependencies
+[194/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Weapon.cpp for CXX dependencies
+[195/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Voodoo.cpp for CXX dependencies
+[196/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/WeaponSound.cpp for CXX dependencies
+[197/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/WeaponVector.cpp for CXX dependencies
+[198/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/WeaponFX.cpp for CXX dependencies
+[199/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ViewWeapon.cpp for CXX dependencies
+[200/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/new_game.cpp for CXX dependencies
+[201/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Destructable.cpp for CXX dependencies
+[202/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/DestructableSave.cpp for CXX dependencies
+[203/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/DestructableBrush.cpp for CXX dependencies
+[204/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/DestructableModel.cpp for CXX dependencies
+[205/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Rotating.cpp for CXX dependencies
+[206/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/RotatingBrush.cpp for CXX dependencies
+[207/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/WorldModelDebris.cpp for CXX dependencies
+[208/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Debris.cpp for CXX dependencies
+[209/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/radius_damage.cpp for CXX dependencies
+[210/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_effects.cpp for CXX dependencies
+[211/781] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_world_bodies.cpp for CXX dependencies
+[212/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_assert.c.o
+[213/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL.c.o
+[214/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_error.c.o
+[215/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_guid.c.o
+[216/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_hashtable.c.o
+[217/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_hints.c.o
+[218/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_list.c.o
+[219/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_log.c.o
+[220/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_utils.c.o
+[221/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_properties.c.o
+[222/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/atomic/SDL_atomic.c.o
+[223/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/atomic/SDL_spinlock.c.o
+[224/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audiocvt.c.o
+[225/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audio.c.o
+[226/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audiodev.c.o
+[227/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audioqueue.c.o
+[228/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audioresample.c.o
+[229/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audiotypecvt.c.o
+[230/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_mixer.c.o
+[231/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_wave.c.o
+[232/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/SDL_core_unsupported.c.o
+[233/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/camera/SDL_camera.c.o
+[234/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/cpuinfo/SDL_cpuinfo.c.o
+[235/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_categories.c.o
+[236/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_clipboardevents.c.o
+[237/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_displayevents.c.o
+[238/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_dropevents.c.o
+[239/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_events.c.o
+[240/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_eventwatch.c.o
+[241/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_keyboard.c.o
+[242/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_keymap.c.o
+[243/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_keysym_to_keycode.c.o
+[244/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_keysym_to_scancode.c.o
+[245/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_mouse.c.o
+[246/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_notificationevents.c.o
+[247/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dynapi/SDL_dynapi.c.o
+[248/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_pen.c.o
+[249/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_quit.c.o
+[250/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_scancode_tables.c.o
+[251/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_touch.c.o
+[252/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_windowevents.c.o
+[253/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/imKStoUCS.c.o
+[254/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/filesystem/SDL_filesystem.c.o
+[255/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/gpu/xr/SDL_gpu_openxr.c.o
+[256/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/gpu/xr/SDL_openxrdyn.c.o
+[257/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/gpu/SDL_gpu.c.o
+[258/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/haptic/SDL_haptic.c.o
+[259/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/io/SDL_asyncio.c.o
+[260/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/io/SDL_iostream.c.o
+[261/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/hidapi/SDL_hidapi.c.o
+[262/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/io/generic/SDL_asyncio_generic.c.o
+[263/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/SDL_joystick.c.o
+[264/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/SDL_gamepad.c.o
+[265/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/SDL_steam_virtual_gamepad.c.o
+[266/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/controller_type.c.o
+[267/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/locale/SDL_locale.c.o
+[268/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/main/SDL_runapp.c.o
+[269/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/main/SDL_main_callbacks.c.o
+[270/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/misc/SDL_libusb.c.o
+[271/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/misc/SDL_url.c.o
+[272/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/power/SDL_power.c.o
+[273/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/notification/SDL_notification.c.o
+[274/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/SDL_render_unsupported.c.o
+[275/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/SDL_yuv_sw.c.o
+[276/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d/SDL_render_d3d.c.o
+[277/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d/SDL_shaders_d3d.c.o
+[278/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d11/SDL_render_d3d11.c.o
+[279/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d11/SDL_shaders_d3d11.c.o
+[280/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d12/SDL_render_d3d12.c.o
+[281/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d12/SDL_shaders_d3d12.c.o
+[282/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/gpu/SDL_pipeline_gpu.c.o
+[283/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/gpu/SDL_render_gpu.c.o
+[284/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/gpu/SDL_shaders_gpu.c.o
+[285/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/SDL_render.c.o
+[286/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/ngage/SDL_render_ngage.c.o
+[287/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengl/SDL_render_gl.c.o
+[288/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengl/SDL_shaders_gl.c.o
+[289/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengles2/SDL_render_gles2.c.o
+[290/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengles2/SDL_shaders_gles2.c.o
+[291/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/ps2/SDL_render_ps2.c.o
+[292/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengles/SDL_render_gles.c.o
+[293/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/psp/SDL_render_psp.c.o
+[294/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_blendfillrect.c.o
+[295/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_blendline.c.o
+[296/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_blendpoint.c.o
+[297/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_drawline.c.o
+[298/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_drawpoint.c.o
+[299/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_render_sw.c.o
+[300/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_triangle.c.o
+[301/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vitagxm/SDL_render_vita_gxm.c.o
+[302/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vitagxm/SDL_render_vita_gxm_memory.c.o
+[303/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vitagxm/SDL_render_vita_gxm_tools.c.o
+[304/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vulkan/SDL_shaders_vulkan.c.o
+[305/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vulkan/SDL_render_vulkan.c.o
+[306/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_crc16.c.o
+[307/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/sensor/SDL_sensor.c.o
+[308/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_crc32.c.o
+[309/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_getenv.c.o
+[310/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_iconv.c.o
+[311/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_malloc.c.o
+[312/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_memcpy.c.o
+[313/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_memset.c.o
+[314/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_memmove.c.o
+[315/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_mslibc.c.o
+[316/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_murmur3.c.o
+[317/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_qsort.c.o
+[318/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_random.c.o
+[319/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_stdlib.c.o
+[320/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_strtokr.c.o
+[321/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/storage/SDL_storage.c.o
+[322/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_string.c.o
+[323/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/time/SDL_time.c.o
+[324/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/SDL_thread.c.o
+[325/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/timer/SDL_timer.c.o
+[326/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit.c.o
+[327/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_RLEaccel.c.o
+[328/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_0.c.o
+[329/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_1.c.o
+[330/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_N.c.o
+[331/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_A.c.o
+[332/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_copy.c.o
+[333/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_slow.c.o
+[334/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_bmp.c.o
+[335/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_clipboard.c.o
+[336/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_egl.c.o
+[337/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_fillrect.c.o
+[338/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_pixels.c.o
+[339/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_rect.c.o
+[340/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_auto.c.o
+[341/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_rotate.c.o
+[342/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_stretch.c.o
+[343/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_surface.c.o
+[344/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_stb.c.o
+[345/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_video_unsupported.c.o
+[346/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_vulkan_utils.c.o
+[347/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_video.c.o
+[348/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/yuv2rgb/yuv_rgb_lsx.c.o
+[349/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_yuv.c.o
+[350/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/yuv2rgb/yuv_rgb_std.c.o
+[351/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_atan2.c.o
+[352/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_exp.c.o
+[353/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_fmod.c.o
+[354/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_log.c.o
+[355/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_log10.c.o
+[356/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_pow.c.o
+[357/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_rem_pio2.c.o
+[358/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_sqrt.c.o
+[359/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/k_cos.c.o
+[360/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/k_rem_pio2.c.o
+[361/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/k_sin.c.o
+[362/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/k_tan.c.o
+[363/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_atan.c.o
+[364/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_copysign.c.o
+[365/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_cos.c.o
+[366/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_fabs.c.o
+[367/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_floor.c.o
+[368/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_isinf.c.o
+[369/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_isinff.c.o
+[370/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_isnan.c.o
+[371/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/yuv2rgb/yuv_rgb_sse.c.o
+[372/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_isnanf.c.o
+[373/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_modf.c.o
+[374/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_scalbn.c.o
+[375/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_sin.c.o
+[376/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_tan.c.o
+[377/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/dummy/SDL_dummyaudio.c.o
+[378/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/loadso/dlopen/SDL_sysloadso.c.o
+[379/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/virtual/SDL_virtualjoystick.c.o
+[380/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/dummy/SDL_nullevents.c.o
+[381/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/dummy/SDL_nullframebuffer.c.o
+[382/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/dummy/SDL_nullvideo.c.o
+[383/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/jack/SDL_jackaudio.c.o
+[384/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/alsa/SDL_alsa_audio.c.o
+[385/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/camera/pipewire/SDL_camera_pipewire.c.o
+[386/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/pulseaudio/SDL_pulseaudio.c.o
+[387/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/pipewire/SDL_pipewire.c.o
+[388/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11dyn.c.o
+[389/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11clipboard.c.o
+[390/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11framebuffer.c.o
+[391/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11events.c.o
+[392/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11keyboard.c.o
+[393/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11messagebox.c.o
+[394/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11mouse.c.o
+[395/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11modes.c.o
+[396/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11opengles.c.o
+[397/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11opengl.c.o
+[398/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11settings.c.o
+[399/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11pen.c.o
+[400/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11shape.c.o
+[401/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11toolkit.c.o
+[402/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11touch.c.o
+[403/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11video.c.o
+[404/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11vulkan.c.o
+[405/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11window.c.o
+[406/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11xfixes.c.o
+[407/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11xinput2.c.o
+[408/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11xsync.c.o
+[409/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/edid-parse.c.o
+[410/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11xtest.c.o
+[411/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmdyn.c.o
+[412/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/xsettings-client.c.o
+[413/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmevents.c.o
+[414/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmmouse.c.o
+[415/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmopengles.c.o
+[416/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmvideo.c.o
+[417/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmvulkan.c.o
+[418/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandclipboard.c.o
+[419/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandcolor.c.o
+[420/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylanddatamanager.c.o
+[421/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylanddyn.c.o
+[422/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandeventthread.c.o
+[423/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandkeyboard.c.o
+[424/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandmessagebox.c.o
+[425/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandevents.c.o
+[426/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandopengles.c.o
+[427/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandshmbuffer.c.o
+[428/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandmouse.c.o
+[429/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandutil.c.o
+[430/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandvulkan.c.o
+[431/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandvideo.c.o
+[432/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/alpha-modifier-v1-protocol.c.o
+[433/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/color-management-v1-protocol.c.o
+[434/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/cursor-shape-v1-protocol.c.o
+[435/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/fractional-scale-v1-protocol.c.o
+[436/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/frog-color-management-v1-protocol.c.o
+[437/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandwindow.c.o
+[438/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/idle-inhibit-unstable-v1-protocol.c.o
+[439/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/keyboard-shortcuts-inhibit-unstable-v1-protocol.c.o
+[440/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/input-timestamps-unstable-v1-protocol.c.o
+[441/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/pointer-constraints-unstable-v1-protocol.c.o
+[442/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/pointer-gestures-unstable-v1-protocol.c.o
+[443/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/pointer-warp-v1-protocol.c.o
+[444/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/primary-selection-unstable-v1-protocol.c.o
+[445/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/relative-pointer-unstable-v1-protocol.c.o
+[446/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/single-pixel-buffer-v1-protocol.c.o
+[447/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/tablet-v2-protocol.c.o
+[448/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/text-input-unstable-v3-protocol.c.o
+[449/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/viewporter-protocol.c.o
+[450/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/wayland-protocol.c.o
+[451/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-activation-v1-protocol.c.o
+[452/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-decoration-unstable-v1-protocol.c.o
+[453/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-dialog-v1-protocol.c.o
+[454/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-foreign-unstable-v2-protocol.c.o
+[455/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-output-unstable-v1-protocol.c.o
+[456/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-session-management-v1-protocol.c.o
+[457/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-shell-protocol.c.o
+[458/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-toplevel-icon-v1-protocol.c.o
+[459/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-toplevel-tag-v1-protocol.c.o
+[460/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/unix/SDL_appid.c.o
+[461/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/unix/SDL_fribidi.c.o
+[462/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/unix/SDL_libthai.c.o
+[463/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/unix/SDL_poll.c.o
+[464/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/haptic/linux/SDL_syshaptic.c.o
+[465/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_dbus.c.o
+[466/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_system_theme.c.o
+[467/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_progressbar.c.o
+[468/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_ime.c.o
+[469/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_fcitx.c.o
+[470/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_udev.c.o
+[471/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_ibus.c.o
+[472/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_evdev_kbd.c.o
+[473/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_evdev.c.o
+[474/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_evdev_capabilities.c.o
+[475/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_threadprio.c.o
+[476/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_ubuntu_touch.c.o
+[477/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_combined.c.o
+[478/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_8bitdo.c.o
+[479/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_flydigi.c.o
+[480/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_gamecube.c.o
+[481/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_gamesir.c.o
+[482/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_lg4ff.c.o
+[483/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_luna.c.o
+[484/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_gip.c.o
+[485/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_ps3.c.o
+[486/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_ps4.c.o
+[487/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_rumble.c.o
+[488/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_ps5.c.o
+[489/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_shield.c.o
+[490/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_sinput.c.o
+[491/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_stadia.c.o
+[492/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_steam.c.o
+[493/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_steam_hori.c.o
+[494/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_steam_triton.c.o
+[495/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_steamdeck.c.o
+[496/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_switch2.c.o
+[497/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_wii.c.o
+[498/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_switch.c.o
+[499/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_xbox360.c.o
+[500/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_xbox360bb.c.o
+[501/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_xbox360w.c.o
+[502/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_xboxone.c.o
+[503/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_zuiki.c.o
+[504/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapijoystick.c.o
+[505/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_report_descriptor.c.o
+[506/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/haptic/hidapi/SDL_hidapihaptic.c.o
+[507/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/haptic/hidapi/SDL_hidapihaptic_lg4ff.c.o
+[508/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_systhread.c.o
+[509/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_sysmutex.c.o
+[510/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_syscond.c.o
+[511/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/linux/SDL_sysjoystick.c.o
+[512/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_sysrwlock.c.o
+[513/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_systls.c.o
+[514/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_syssem.c.o
+[515/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/misc/unix/SDL_sysurl.c.o
+[516/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/power/linux/SDL_syspower.c.o
+[517/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/locale/unix/SDL_syslocale.c.o
+[518/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/storage/generic/SDL_genericstorage.c.o
+[519/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/filesystem/unix/SDL_sysfilesystem.c.o
+[520/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/storage/steam/SDL_steamstorage.c.o
+[521/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/filesystem/posix/SDL_sysfsops.c.o
+[522/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/time/unix/SDL_systime.c.o
+[523/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/SDL_dialog.c.o
+[524/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/timer/unix/SDL_systimer.c.o
+[525/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/unix/SDL_zenitymessagebox.c.o
+[526/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/process/SDL_process.c.o
+[527/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenevents.c.o
+[528/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenframebuffer.c.o
+[529/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/process/posix/SDL_posixprocess.c.o
+[530/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenopengles.c.o
+[531/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenvideo.c.o
+[532/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenwindow.c.o
+[533/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenvulkan.c.o
+[534/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/tray/SDL_tray_utils.c.o
+[535/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/sensor/dummy/SDL_dummysensor.c.o
+[536/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/dummy/SDL_dummydialog.c.o
+[537/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/tray/dummy/SDL_tray.c.o
+[538/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/camera/dummy/SDL_camera_dummy.c.o
+[539/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/notification/dummy/SDL_dummynotification.c.o
+[540/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/main/generic/SDL_sysmain_callbacks.c.o
+[541/781] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/gpu/vulkan/SDL_gpu_vulkan.c.o
+[542/781] Building CXX object CMakeFiles/engine.dir/src/engine/world_lights.cpp.o
+[543/781] Building CXX object CMakeFiles/engine.dir/src/engine/world_shade.cpp.o
+[544/781] Building CXX object CMakeFiles/engine.dir/src/engine/gpu_registry.cpp.o
+[545/781] Building CXX object CMakeFiles/engine.dir/src/engine/model_renderer.cpp.o
+[546/781] Building CXX object CMakeFiles/engine.dir/src/engine/sky.cpp.o
+[547/781] Building CXX object CMakeFiles/engine.dir/src/engine/polygrid_view.cpp.o
+[548/781] Building CXX object CMakeFiles/engine.dir/src/engine/particles.cpp.o
+[549/781] Building CXX object CMakeFiles/engine.dir/src/engine/sprite_view.cpp.o
+[550/781] Building CXX object CMakeFiles/engine.dir/src/engine/model_view.cpp.o
+[551/781] Building CXX object CMakeFiles/engine.dir/src/engine/world_view.cpp.o
+[552/781] Building CXX object CMakeFiles/engine.dir/src/engine/world_renderer.cpp.o
+[553/781] Building CXX object CMakeFiles/engine.dir/src/engine/attachments.cpp.o
+[554/781] Building CXX object CMakeFiles/engine.dir/src/engine/object_pose.cpp.o
+[555/781] Building CXX object CMakeFiles/engine.dir/src/engine/objects.cpp.o
+[556/781] Building CXX object CMakeFiles/engine.dir/src/engine/world.cpp.o
+[557/781] Building CXX object CMakeFiles/engine.dir/src/engine/audio.cpp.o
+[558/781] Building CXX object CMakeFiles/engine.dir/src/engine/collision.cpp.o
+[559/781] Building CXX object CMakeFiles/engine.dir/src/engine/world_model.cpp.o
+[560/781] Building CXX object CMakeFiles/engine.dir/src/engine/container.cpp.o
+[561/781] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[562/765] Linking C static library _deps/sdl3-build/libSDL3.a
+[563/765] Scanning /home/yann/projects/lithtech/Blood2/tests/services_tests.cpp for CXX dependencies
+[564/765] Scanning /home/yann/projects/lithtech/Blood2/tests/demo_tests.cpp for CXX dependencies
+[565/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/polygrids.cpp.o
+[566/765] Building CXX object CMakeFiles/engine.dir/src/engine/logging.cpp.o
+[567/765] Linking CXX static library libengine.a
+[568/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PolyGrid.cpp.o
+[569/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PolyGridFX.cpp.o
+[570/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SparksFX.cpp.o
+[571/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/blood_spurts.cpp.o
+[572/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ParticleExplosionFX.cpp.o
+[573/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/blood_splats.cpp.o
+[574/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/BloodSplatFX.cpp.o
+[575/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ClientSplatFX.cpp.o
+[576/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/RemoteBomb.cpp.o
+[577/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerRemoteBombs.cpp.o
+[578/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/BombExplosion.cpp.o
+[579/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ProximityBomb.cpp.o
+[580/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_sky.cpp.o
+[581/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SkyObjects.cpp.o
+[582/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/particle_streams.cpp.o
+[583/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ParticleStreamFX.cpp.o
+[584/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ClientParticleStreamSFX.cpp.o
+[585/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Grenade.cpp.o
+[586/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/FlareProjectile.cpp.o
+[587/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/GideonShield.cpp.o
+[588/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/object_particles.cpp.o
+[589/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Shockwave.cpp.o
+[590/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponProjectile.cpp.o
+[591/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Projectile.cpp.o
+[592/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/EnergyBlast.cpp.o
+[593/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/NagaEyes.cpp.o
+[594/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_projectiles.cpp.o
+[595/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/LaserBeamFX.cpp.o
+[596/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SmokeImpactFX.cpp.o
+[597/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/destination_trial.cpp.o
+[598/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/level_change.cpp.o
+[599/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_flames.cpp.o
+[600/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/world_preparation.cpp.o
+[601/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionFlameFX.cpp.o
+[602/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ObjectParticleFX.cpp.o
+[603/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionFragFX.cpp.o
+[604/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_fragments.cpp.o
+[605/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_rings.cpp.o
+[606/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionRingFX.cpp.o
+[607/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionLightFX.cpp.o
+[608/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_lights.cpp.o
+[609/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionModelFX.cpp.o
+[610/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_models.cpp.o
+[611/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionSpriteFX.cpp.o
+[612/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_sprites.cpp.o
+[613/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/HandWeaponModel.cpp.o
+[614/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_attachments.cpp.o
+[615/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponHand.cpp.o
+[616/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/engineobjects.cpp.o
+[617/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/B2BaseClass.cpp.o
+[618/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CameraSpot.cpp.o
+[619/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Key.cpp.o
+[620/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/GameStartPoint.cpp.o
+[621/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PathPoint.cpp.o
+[622/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PathMgr.cpp.o
+[623/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/trigger_helpers.cpp.o
+[624/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/session_load.cpp.o
+[625/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/world_validation.cpp.o
+[626/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/session.cpp.o
+[627/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/player_restore.cpp.o
+[628/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_adapter.cpp.o
+[629/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ClientExplosionSFX.cpp.o
+[630/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/registration.cpp.o
+[631/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/DetailSprite.cpp.o
+[632/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_sprites.cpp.o
+[633/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CinematicTrigger.cpp.o
+[634/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_audio.cpp.o
+[635/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/RandomSoundFX.cpp.o
+[636/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Sound.cpp.o
+[637/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SoundFX.cpp.o
+[638/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerLanding.cpp.o
+[639/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerDeath.cpp.o
+[640/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerDeathCamera.cpp.o
+[641/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/LightFX.cpp.o
+[642/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_lights.cpp.o
+[643/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ClientLightFX.cpp.o
+[644/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_keyframes.cpp.o
+[645/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/KeyData.cpp.o
+[646/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/KeyFramer.cpp.o
+[647/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_cameras.cpp.o
+[648/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CameraObj.cpp.o
+[649/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ObjectivesTrigger.cpp.o
+[650/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_objectives.cpp.o
+[651/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ConversationTrigger.cpp.o
+[652/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ConversationStrings.cpp.o
+[653/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CommLink.cpp.o
+[654/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/VoiceMgr.cpp.o
+[655/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerVoice.cpp.o
+/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]
+   11 |     if (single_player_only && server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE)
+      |                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^  ~~~~~~~~~~~~~~~
+/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]
+   23 |     if (server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE)
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^  ~~~~~~~~~~~~~~~
+/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]
+   35 |     if (server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE)
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^  ~~~~~~~~~~~~~~~
+3 warnings generated.
+[656/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WorldProperties.cpp.o
+[657/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_models.cpp.o
+[658/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SmellHint.cpp.o
+[659/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponPickups.cpp.o
+[660/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PickupObject.cpp.o
+[661/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_pickups.cpp.o
+[662/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ItemPickups.cpp.o
+/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]
+    9 |          g_pServerDE->GetVarValueFloat(g_pServerDE->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE))
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^  ~~~~~~~~~~~~~~~
+1 warning generated.
+[663/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/GameInvItems.cpp.o
+[664/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AmmoPickups.cpp.o
+[665/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Flashlight.cpp.o
+[666/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PowerupPickups.cpp.o
+[667/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/spawn_object.cpp.o
+[668/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Spawner.cpp.o
+[669/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/TripLaser.cpp.o
+[670/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SoulDrudge.cpp.o
+[671/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ShikariAI.cpp.o
+[672/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/MadScientistAI.cpp.o
+[673/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Tchernotronic.cpp.o
+[674/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SingularityProjectile.cpp.o
+[675/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Fanatic.cpp.o
+[676/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Prophet.cpp.o
+[677/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CabalAttack.cpp.o
+[678/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/HowitzerShell.cpp.o
+[679/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/TeslaProjectile.cpp.o
+[680/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_physics.cpp.o
+[681/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_movers.cpp.o
+[682/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/RotatingDoor.cpp.o
+[683/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_rotation.cpp.o
+[684/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerUse.cpp.o
+[685/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Door.cpp.o
+[686/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Trigger.cpp.o
+[687/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/KeyPickup.cpp.o
+[688/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_keys.cpp.o
+[689/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_containers.cpp.o
+[690/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/VolumeBrush.cpp.o
+[691/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerContainers.cpp.o
+/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:37:78: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]
+   37 |         if (server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE ||
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^  ~~~~~~~~~~~~~~~
+1 warning generated.
+[692/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerPowers.cpp.o
+[693/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/MoveMgr.cpp.o
+[694/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerLocomotion.cpp.o
+[695/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Anim_Sound.cpp.o
+[696/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CharacterSound.cpp.o
+[697/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AI_Mgr.cpp.o
+[698/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AISight.cpp.o
+[699/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIFire.cpp.o
+[700/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIPerception.cpp.o
+[701/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_activation.cpp.o
+[702/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIRuntime.cpp.o
+[703/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIAmmo.cpp.o
+[704/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AISmell.cpp.o
+[705/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIEscape.cpp.o
+[706/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AINavigationStates.cpp.o
+[707/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AILocomotion.cpp.o
+[708/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CultistAttack.cpp.o
+[709/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIDodge.cpp.o
+[710/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIScript.cpp.o
+[711/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIScriptMovement.cpp.o
+[712/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIScriptFire.cpp.o
+[713/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Movement.cpp.o
+[714/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIState.cpp.o
+[715/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIHitReaction.cpp.o
+[716/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIDeath.cpp.o
+[717/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Gib.cpp.o
+[718/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/flesh_gibs.cpp.o
+[719/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Corpse.cpp.o
+[720/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AITrigger.cpp.o
+[721/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CivilianAI.cpp.o
+[722/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AISound.cpp.o
+[723/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CultistAI.cpp.o
+[724/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Gideon.cpp.o
+[725/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExitHint.cpp.o
+[726/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AITarget.cpp.o
+[727/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CharacterMotion.cpp.o
+[728/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExitTrigger.cpp.o
+[729/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_exits.cpp.o
+[730/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerObj.cpp.o
+[731/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_clients.cpp.o
+[732/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerSave.cpp.o
+[733/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CharacterNodes.cpp.o
+[734/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/BloodShells.cpp.o
+[735/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_weapons.cpp.o
+[736/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/InventorySave.cpp.o
+[737/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/InventoryMgr.cpp.o
+[738/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Weapon.cpp.o
+[739/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Voodoo.cpp.o
+[740/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponSound.cpp.o
+[741/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponVector.cpp.o
+[742/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponFX.cpp.o
+[743/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ViewWeapon.cpp.o
+[744/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Destructable.cpp.o
+[745/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/new_game.cpp.o
+[746/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/DestructableSave.cpp.o
+[747/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/DestructableBrush.cpp.o
+[748/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Rotating.cpp.o
+[749/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/DestructableModel.cpp.o
+[750/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/RotatingBrush.cpp.o
+[751/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WorldModelDebris.cpp.o
+[752/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Debris.cpp.o
+[753/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/radius_damage.cpp.o
+[754/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_effects.cpp.o
+[755/765] Generating CXX dyndep file tests/CMakeFiles/services_tests.dir/CXX.dd
+[756/765] Generating CXX dyndep file tests/CMakeFiles/demo_tests.dir/CXX.dd
+[757/765] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_world_bodies.cpp.o
+[758/765] Linking CXX static library libblood2_game.a
+[759/765] Building CXX object tests/CMakeFiles/services_tests.dir/services_tests.cpp.o
+[760/765] Building CXX object tests/CMakeFiles/demo_tests.dir/demo_tests.cpp.o
+[761/765] Linking CXX executable tests/services_tests
+[762/765] Linking CXX executable tests/demo_tests

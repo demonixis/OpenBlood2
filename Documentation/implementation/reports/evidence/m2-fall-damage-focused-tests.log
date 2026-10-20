@@ -1,0 +1,95 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 169: interaction.catalog
+      Start 609: player_restore.private
+      Start 974: movement_audio.private
+ 1/39 Test #974: movement_audio.private ...........   Passed    0.45 sec
+      Start  95: movement.private
+ 2/39 Test #609: player_restore.private ...........   Passed    1.51 sec
+      Start 972: movement_audio.contexts
+ 3/39 Test #972: movement_audio.contexts ..........   Passed    0.14 sec
+      Start 600: player_state.private
+ 4/39 Test #600: player_state.private .............   Passed    1.39 sec
+      Start 162: interaction.keys
+ 5/39 Test #162: interaction.keys .................   Passed    0.02 sec
+      Start 163: interaction.state
+ 6/39 Test #163: interaction.state ................   Passed    0.01 sec
+      Start 164: interaction.geometry
+ 7/39 Test #164: interaction.geometry .............   Passed    0.01 sec
+      Start 973: movement_audio.failures
+ 8/39 Test #973: movement_audio.failures ..........   Passed    0.02 sec
+      Start 165: interaction.transport
+ 9/39 Test #165: interaction.transport ............   Passed    0.01 sec
+      Start 971: movement_audio.jumps
+10/39 Test #971: movement_audio.jumps .............   Passed    0.04 sec
+      Start 160: interaction.use
+11/39 Test #160: interaction.use ..................   Passed    0.01 sec
+      Start 168: interaction.player_push
+12/39 Test #168: interaction.player_push ..........   Passed    0.01 sec
+      Start 161: interaction.input
+13/39 Test #161: interaction.input ................   Passed    0.01 sec
+      Start 167: interaction.lifetime
+14/39 Test #167: interaction.lifetime .............   Passed    0.01 sec
+      Start 166: interaction.blocking
+15/39 Test #166: interaction.blocking .............   Passed    0.00 sec
+      Start 970: movement_audio.rules
+16/39 Test #970: movement_audio.rules .............   Passed    0.02 sec
+      Start 607: player_restore.failures
+17/39 Test #607: player_restore.failures ..........   Passed    0.02 sec
+      Start 608: player_restore.lifetime
+18/39 Test #608: player_restore.lifetime ..........   Passed    0.02 sec
+      Start 606: player_restore.roundtrip
+19/39 Test #606: player_restore.roundtrip .........   Passed    0.01 sec
+      Start  89: movement.world_collision
+20/39 Test  #89: movement.world_collision .........   Passed    0.06 sec
+      Start  86: movement.walking
+21/39 Test  #86: movement.walking .................   Passed    0.04 sec
+      Start  92: movement.timing
+22/39 Test  #92: movement.timing ..................   Passed    0.04 sec
+      Start  88: movement.collisions
+23/39 Test  #88: movement.collisions ..............   Passed    0.03 sec
+      Start  90: movement.support
+24/39 Test  #90: movement.support .................   Passed    0.02 sec
+      Start  87: movement.jumping
+25/39 Test  #87: movement.jumping .................   Passed    0.02 sec
+      Start 598: player_state.failures
+26/39 Test #598: player_state.failures ............   Passed    0.01 sec
+      Start 599: player_state.capture
+27/39 Test #599: player_state.capture .............   Passed    0.01 sec
+      Start 597: player_state.initialization
+28/39 Test #597: player_state.initialization ......   Passed    0.01 sec
+      Start 595: player_state.roundtrip
+29/39 Test #595: player_state.roundtrip ...........   Passed    0.01 sec
+      Start  91: movement.boundaries
+30/39 Test  #91: movement.boundaries ..............   Passed    0.01 sec
+      Start 596: player_state.clocks
+31/39 Test #596: player_state.clocks ..............   Passed    0.01 sec
+      Start  93: movement.lifetime
+32/39 Test  #93: movement.lifetime ................   Passed    0.01 sec
+      Start  94: movement.controls
+33/39 Test  #94: movement.controls ................   Passed    0.00 sec
+      Start 975: fall_damage.rules
+34/39 Test #975: fall_damage.rules ................   Passed    0.02 sec
+      Start 976: fall_damage.physics
+35/39 Test #976: fall_damage.physics ..............   Passed    0.01 sec
+      Start 977: fall_damage.player
+36/39 Test #977: fall_damage.player ...............   Passed    0.03 sec
+      Start 978: fall_damage.private
+37/39 Test #978: fall_damage.private ..............   Passed    0.53 sec
+38/39 Test #169: interaction.catalog ..............   Passed    6.09 sec
+39/39 Test  #95: movement.private .................   Passed    7.08 sec
+
+100% tests passed, 0 tests failed out of 39
+
+Label Time Summary:
+audio             =   0.67 sec*proc (5 tests)
+fall_damage       =   0.59 sec*proc (4 tests)
+headless          =  17.71 sec*proc (39 tests)
+interaction       =   6.17 sec*proc (10 tests)
+movement          =   7.31 sec*proc (10 tests)
+movement_audio    =   0.67 sec*proc (5 tests)
+physics           =   0.59 sec*proc (4 tests)
+player_restore    =   1.56 sec*proc (4 tests)
+player_state      =   1.42 sec*proc (6 tests)
+private           =  17.04 sec*proc (6 tests)
+
+Total Test time (real) =   7.55 sec

@@ -1,0 +1,30 @@
+FRAME flat 0 pos 1100,691.723,-2860 vy 566.667 ground 0
+FRAME flat 5 pos 1100,732.001,-2860 vy 400 ground 0
+FRAME flat 10 pos 1100,758.39,-2860 vy 233.333 ground 0
+FRAME flat 15 pos 1100,770.89,-2860 vy 66.6667 ground 0
+FRAME flat 20 pos 1100,769.712,-2860 vy -87.7564 ground 0
+FRAME flat 25 pos 1100,756.757,-2860 vy -223.173 ground 0
+FRAME flat 30 pos 1100,732.517,-2860 vy -358.59 ground 0
+FRAME flat 35 pos 1100,696.992,-2860 vy -494.006 ground 0
+FRAME flat 40 pos 1100,682.001,-2860 vy 0 ground 1
+CASE flat start 1100,682.001,-2860 max_feet_rise 90 end 1100,682.001,-2860 jumps 1 crouched 0 gravity -2000
+FRAME rim_to_dumpster96 0 pos 1000,723.723,-2688.85 vy 566.667 ground 0
+FRAME rim_to_dumpster96 5 pos 1000,764.001,-2708 vy 400 ground 0
+FRAME rim_to_dumpster96 10 pos 1000,790.39,-2708 vy 233.333 ground 0
+FRAME rim_to_dumpster96 15 pos 1000,802.89,-2708 vy 66.6667 ground 0
+FRAME rim_to_dumpster96 20 pos 1000,801.712,-2708 vy -87.7564 ground 0
+FRAME rim_to_dumpster96 25 pos 1000,788.757,-2708 vy -223.173 ground 0
+FRAME rim_to_dumpster96 30 pos 1000,764.517,-2708 vy -358.59 ground 0
+FRAME rim_to_dumpster96 35 pos 1000,728.992,-2708 vy -494.006 ground 0
+FRAME rim_to_dumpster96 40 pos 1000,682.182,-2708 vy -629.423 ground 0
+CASE rim_to_dumpster96 start 1000,714.001,-2688 max_feet_rise 90 end 1000,682.001,-2708 jumps 1 crouched 0 gravity -2000
+FRAME dumpster_to_fence64 0 pos 1060,819.723,-2750.85 vy 566.667 ground 0
+FRAME dumpster_to_fence64 5 pos 1060,860.001,-2771.04 vy 400 ground 0
+FRAME dumpster_to_fence64 10 pos 1060,886.39,-2802.14 vy 233.333 ground 0
+FRAME dumpster_to_fence64 15 pos 1063.28,888.398,-2836.12 vy -82.2632 ground 0
+FRAME dumpster_to_fence64 20 pos 1064.55,875.9,-2870.85 vy -217.68 ground 0
+FRAME dumpster_to_fence64 25 pos 1064.88,852.118,-2905.78 vy -353.096 ground 0
+FRAME dumpster_to_fence64 30 pos 1064.97,817.051,-2940.76 vy -488.513 ground 0
+FRAME dumpster_to_fence64 35 pos 1064.99,770.699,-2975.75 vy -623.93 ground 0
+FRAME dumpster_to_fence64 40 pos 1065,713.063,-2996 vy -759.347 ground 0
+CASE dumpster_to_fence64 start 1060,810.001,-2750 max_feet_rise 80.3872 end 1054.28,685.3,-2990.67 jumps 1 crouched 0 gravity -2000

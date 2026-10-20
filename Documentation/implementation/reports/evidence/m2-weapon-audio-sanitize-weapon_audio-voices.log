@@ -1,0 +1,14 @@
+557/562 Testing: weapon_audio.voices
+557/562 Test: weapon_audio.voices
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_audio_tests" "voices" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-audio-voices"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_audio.voices" start time: Oct 16 23:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_audio.voices" end time: Oct 16 23:04 CEST
+"weapon_audio.voices" time elapsed: 00:00:00
+----------------------------------------------------------

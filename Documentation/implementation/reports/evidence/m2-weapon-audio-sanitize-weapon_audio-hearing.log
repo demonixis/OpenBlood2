@@ -1,0 +1,14 @@
+558/562 Testing: weapon_audio.hearing
+558/562 Test: weapon_audio.hearing
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_audio_tests" "hearing" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-audio-hearing"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_audio.hearing" start time: Oct 16 23:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_audio.hearing" end time: Oct 16 23:04 CEST
+"weapon_audio.hearing" time elapsed: 00:00:00
+----------------------------------------------------------

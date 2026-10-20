@@ -1,0 +1,14 @@
+506/703 Testing: corpses.transfer
+506/703 Test: corpses.transfer
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/corpse_tests" "transfer" "/home/yann/projects/lithtech/Blood2/build/release/tests/corpse-fixtures/transfer"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"corpses.transfer" start time: Oct 17 04:28 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.transfer" end time: Oct 17 04:28 CEST
+"corpses.transfer" time elapsed: 00:00:00
+----------------------------------------------------------

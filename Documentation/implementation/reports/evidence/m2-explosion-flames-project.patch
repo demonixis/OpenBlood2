@@ -1,0 +1,1526 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 58ba22c..7a4499e 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -459,3 +459,9 @@ Read [contracts](docs/OBJECT_PARTICLE_CONTRACTS.md). Preserve first-update retur
+ unused authored alpha/count, fixed origin, strict stopped-tail lifetime and parent removal.
+ Zero-count division is skipped without emission/RNG draws. Keep bounded failures and
+ replacement-engine limits explicit; other ObjectFX modes and M2 remain open.
++
++The [explosion flame continuation](../Documentation/Implementation/M2_EXPLOSION_FLAMES.md) connects original three-zone particle emission and the selected Tesla recipe.
++Read [contracts](docs/EXPLOSION_FLAME_CONTRACTS.md). Preserve immediate bursts, one overdue emission per callback, additive deadlines,
++initial alpha 1 for fades, final emission and unused normal/ramp fields. Bulk sampling
++is a documented later-engine policy, not retail RNG parity. Keep bounded failures,
++detached lifetime and read-only rendering; illumination, safe NEW_LEVEL and M2 remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3d8de4f..4dc22b8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index e232a7c..e18b139 100644
+--- a/README.md
++++ b/README.md
+@@ -513,3 +513,5 @@ nonlethal production recoil and the remaining death/M2 boundary.
+ The [NPC weapon-drop continuation](../Documentation/Implementation/M2_WEAPON_DROPS.md) connects the original Cabal drop,
+ independent falling Beretta, original pickup and player collection. Corpse/gib
+ services, player drop controls and the full M2 exit gate remain open.
++
++The [original explosion flame continuation](../Documentation/Implementation/M2_EXPLOSION_FLAMES.md) adds selected Tesla particles with actual texture/color/alpha rendering and in-game inspection. M2 remains incomplete.
+diff --git a/docs/EXPLOSION_FLAME_CONTRACTS.md b/docs/EXPLOSION_FLAME_CONTRACTS.md
+new file mode 100644
+index 0000000..2c43da9
+--- /dev/null
++++ b/docs/EXPLOSION_FLAME_CONTRACTS.md
+@@ -0,0 +1,110 @@
++# Original explosion flame contracts
++
++Selected CExplosionFlameFX Init/CreateObject/Update/AddParticles and the high-detail
++EXP_TESLA_ALT (8) recipe now emit actual particles. This extends
++[scene explosions](SCENE_EXPLOSION_CONTRACTS.md), [rings](EXPLOSION_RING_CONTRACTS.md)
++and [sprite presentation](SPRITE_VIEW_CONTRACTS.md). See the
++[source ledger](M2_EXPLOSION_FLAME_SOURCES.json) and
++[evidence](../../Documentation/Implementation/M2_EXPLOSION_FLAMES.md).
++**M2 remains incomplete.** Surface illumination, other recipes/callers and safe
++NEW_LEVEL remain unavailable.
++
++## Original behavior
++
++Init copies three colors, lifetimes/offsets, ramp-up/duration/ramp-down, count,
++radius, position radius, gravity, velocity, delay, alpha and flags. The original
++normal, ramp times and ramp flags are stored but never used by these methods.
++In particular, the Tesla recipe's EXP_FLAME_RAMP_VEL does not ramp velocity.
++Do not invent an implementation for those unused authored fields.
++
++Creation uses the default SpriteTextures/drop32_1.dtx only for a null resource;
++an empty or absent indexed path fails. It creates one immediate burst and sets
++next-add to delay. Fade zero sets authored alpha; every nonzero fade starts at
++engine-default alpha 1 until its first effect update. This differs from ring
++creation and is intentional. The system retains identity rotation and a fixed
++origin; the normal does not orient its particles. Typed zero origins are valid,
++avoiding BaseParticleSystemFX's indeterminate local zero-position fallback.
++
++A burst contains three groups, in order: N / 2N / 3N particles in independent XYZ
++boxes with half extents position_radius/3, twice that value, and position_radius.
++They are boxes, not spherical shells. Each group uses its own constant RGB and
++lifetime interval [base-offset,base+offset]. Every component of velocity spans
++[-velocity,+velocity]. Original 0..255 colors are normalized once in the recipe.
++
++On each due effect callback, if elapsed >= next-add, emit **one** burst and add
++delay to the prior next-add. There is no catch-up loop and no reset to now+delay.
++An overdue deadline can thus emit on successive callbacks; zero delay emits on
++every callback. The existing 1 ms effect cadence is retained. All five source
++fade formulas run after emission. Update returns elapsed < duration, so even the
++terminal update can emit a burst before the manager removes the entire system,
++including particles whose individual lifetimes have not ended. Ramp-up/down are
++not added to duration. Overshoot is not clamped into a different source rule.
++
++The selected type 8 recipe offsets origin 30 along normalized normal; colors are
++white, (200,200,255), (150,150,255); lifetimes .75/.875/1 with .25 offsets; ramp-up
++.5, duration 2.5, ramp-down 0; N=4 (24 per burst); radius 4000, position radius 0,
++gravity 0, speed 125, delay .33, alpha .85, fade 1, ramp flags 1 and
++SpriteTextures/teslaprime_3.dtx. Types 0/1/2/3/6 accept an empty flame branch;
++other recipe IDs fail. No generic explosion switch or new gameplay damage is added.
++
++## Replacement services and bounds
++
++The replacement bulk particle sampler follows the examined **later LithTech**
++ps_AddParticles: six uniform draws per particle, XYZ offset from draws 0..2,
++XYZ velocity from 3..5 and lifetime from draw 3. Consequently velocity.x and
++lifetime are correlated. Constant colors need no separate random draw. Draws still
++occur for zero-width ranges. A separate deterministic minstd_rand stream preserves
++this local sampling order, not the unavailable retail engine/global RNG sequence.
++
++Particle integration reuses the existing strict lifetime<0 removal, old-velocity
++position update before gravity, and checked finite bounds. It runs every session
++step, outside the 1 ms effect cadence. Particle motion, billboard sizing and alpha
++rasterization remain explicitly replacement policies, not verified retail parity.
++
++Settings require finite bounded positions/normals, radius [0,640000], position
++radius and speed [0,10000], gravity [-10000,10000], alpha/RGB [0,1], duration
++[.001,600], ramp times/delay [0,600], N in [1,256], fade 0..5 and known ramp bits
++0..7. Lifetime endpoints must be ordered, nonnegative and at most 600. Resource
++names have at most 1000 bytes and no embedded NUL. Unused normals may be zero at
++the component boundary; the composite recipe requires a nonzero normal to offset
++its origin. Nonfinite/backward clocks fail before mutation.
++
++There are at most 64 systems, 2048 live particles per system and 4096 across flames.
++All three groups are preflighted as one burst before particle allocation or RNG
++consumption. A capacity failure leaves that burst absent, removes the failing
++system on update and propagates failure from the session. Already integrated
++particles and successful siblings are not rolled back. Sequential updates account
++for current live particles; they do not assume future systems will expire.
++Creation/indexing failures and retained update errors remain visible in reports.
++
++Events/visual IDs are independent and never reused, including unload. Reports
++retain the last 64 deliveries, owned source names and errors. Source deletion
++leaves the detached system alive. World unload clears systems/reports/counters/RNG.
++No original object pointer is retained. Null-damager suppression, source scheduling,
++other effects and sound calls remain unchanged. Success does not set the complete
++composite flag while illumination is missing.
++
++## Presentation, inspection and checks
++
++Flames share the existing depth-tested, no-depth-write sprite alpha pass and stable
++center-depth order. Radius/640 is their quad half extent. Actual DTX alpha, per-zone
++RGB and system alpha multiply; there is no added per-particle fade, additive mode,
++lighting or fallback texture. A separate flame_system identity prevents confusing
++flames with rings/trails. Draw/inspection calls cannot emit or advance particles.
++The existing 16384-entry renderer budget is unchanged.
++
++The inspector exposes active/live/start/expiry/failure totals, IDs, elapsed time,
++next-add, bursts/emitted counts, alpha, origin, texture, prepared quads and unused
++ramps, plus individual position/velocity/lifetime/color and retained failures.
++Synthetic tests cover group geometry/color/sampling, unused fields, immediate and
++late emissions, zero delay, all fades, terminal emission, budgets, missing assets,
++checked detached lifetime and read-only scene building. Private tests use three
++SubwayA/player reload cycles with an explicitly diagnostic Tesla emitter, and the
++three actual type-8 property records from 07_cathedral. They do not claim a full
++Cathedral session. GPU readback checks actual alpha/color and external Tesla
++texture rendering with no inspector and after reload.
++
++SubwayA's nine authored emitters are type 3, not Tesla. Source accounting remains
++203 created / four transferred sounds / 372 editor-only / one unsupported Gideon /
++zero failures. Remaining required services, illumination and safe automatic
++NEW_LEVEL keep the observable M2 exit gate open.
+diff --git a/docs/EXPLOSION_RING_CONTRACTS.md b/docs/EXPLOSION_RING_CONTRACTS.md
+index 32d09c5..cb38df9 100644
+--- a/docs/EXPLOSION_RING_CONTRACTS.md
++++ b/docs/EXPLOSION_RING_CONTRACTS.md
+@@ -116,3 +116,7 @@ Continuation: [original fragment smoke trails](OBJECT_PARTICLE_CONTRACTS.md) sup
+ selected high-detail OBJFX_SMOKETRAIL_1 behavior. Earlier trail omissions and the
+ 4096 sprite-entry limit are historical; the shared renderer now holds 16384 entries.
+ Other ObjectFX modes, required effects and the actual M2 gate remain open.
++
++Continuation: [original explosion flame particles](EXPLOSION_FLAME_CONTRACTS.md)
++now implements the selected Tesla component. Earlier blanket flame omissions are
++historical for that recipe; surface illumination and the actual M2 gate remain open.
+diff --git a/docs/EXPLOSION_SPRITE_CONTRACTS.md b/docs/EXPLOSION_SPRITE_CONTRACTS.md
+index 63e4848..9acf219 100644
+--- a/docs/EXPLOSION_SPRITE_CONTRACTS.md
++++ b/docs/EXPLOSION_SPRITE_CONTRACTS.md
+@@ -102,3 +102,7 @@ required FX/services and the actual M2 acceptance criteria remain open.
+ Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
+ selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
+ are historical; fragments/flames, illumination and the full M2 gate remain open.
++
++Continuation: [original explosion flame particles](EXPLOSION_FLAME_CONTRACTS.md)
++now implements the selected Tesla component. Earlier blanket flame omissions are
++historical for that recipe; surface illumination and the actual M2 gate remain open.
+diff --git a/docs/M2_EXPLOSION_FLAME_SOURCES.json b/docs/M2_EXPLOSION_FLAME_SOURCES.json
+new file mode 100644
+index 0000000..46b9d5b
+--- /dev/null
++++ b/docs/M2_EXPLOSION_FLAME_SOURCES.json
+@@ -0,0 +1,104 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "61f4fb14735eeb222149eb85f7bdf359cc444e93",
++  "source_files": [
++    {
++      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
++      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
++      "selected_lines": [
++        [
++          520,
++          664
++        ],
++        [
++          2141,
++          2234
++        ]
++      ],
++      "use": "Original flame lifecycle, three bulk emissions, unused ramps and selected high-detail Tesla recipe."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ExplosionFX.h",
++      "sha256": "2bc5a35f4da4929bdb0f10652d9014a56fdf9fe561d7ad320bf1dcf0f042dc18",
++      "selected_lines": [
++        [
++          103,
++          139
++        ],
++        [
++          375,
++          446
++        ]
++      ],
++      "use": "Zeroed original descriptor, ramp flags and member declarations."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
++      "sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13",
++      "selected_lines": [
++        [
++          22,
++          111
++        ]
++      ],
++      "use": "Particle origin/identity rotation, flags and radius/640 setup."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
++      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
++      "selected_lines": [
++        [
++          1435,
++          1463
++        ]
++      ],
++      "use": "Original minimum-cadence update and terminal removal."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/SpecialFX.h",
++      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
++      "selected_lines": [
++        [
++          32,
++          56
++        ]
++      ],
++      "use": "One millisecond default effect interval."
++    },
++    {
++      "path": "sources/blood2/Shared/SFXMsgIds.h",
++      "sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f",
++      "selected_lines": [
++        [
++          129,
++          140
++        ]
++      ],
++      "use": "EXP_TESLA_ALT numeric ID 8."
++    },
++    {
++      "path": "sources/lithtech/runtime/client/src/particlesystem.cpp",
++      "sha256": "1efc6713379529f2a840cb15243ca4b8bdf846092ac5e7c67427df0ecbcf0d44",
++      "selected_lines": [
++        [
++          87,
++          124
++        ]
++      ],
++      "use": "Later-engine reference only: six uniform samples, velocity/lifetime correlation and bulk calls."
++    }
++  ],
++  "adaptations": [
++    "Typed owned settings and bounded detached particle systems; no legacy pointer ABI",
++    "Finite descriptor/clock and atomic burst capacity validation",
++    "Original three bulk calls implemented with later LithTech six-sample policy; deterministic independent RNG, not retail parity",
++    "Normalized color and existing radius/640 particle sprite renderer",
++    "Zero-origin initialization avoids original indeterminate fallback"
++  ],
++  "omitted": [
++    "Other flame/composite recipes and weapon/brush callers",
++    "Retail engine/RNG/raster parity, surface lighting, shadows and complete FX service",
++    "Safe automatic NEW_LEVEL and complete M2 acceptance"
++  ],
++  "status": "M2 incomplete; selected original explosion flame lifecycle and Tesla recipe"
++}
+diff --git a/docs/OBJECT_PARTICLE_CONTRACTS.md b/docs/OBJECT_PARTICLE_CONTRACTS.md
+index 6a1d672..543eb18 100644
+--- a/docs/OBJECT_PARTICLE_CONTRACTS.md
++++ b/docs/OBJECT_PARTICLE_CONTRACTS.md
+@@ -103,3 +103,7 @@ against known synthetic texels and actual external smoke64_2 alpha quads.
+ SubwayA accounting stays 203 created / four transferred sounds / 372 editor-only /
+ one unsupported Gideon / zero failures. Remaining flames, illumination, safe
+ NEW_LEVEL and other required services keep the observable M2 exit gate open.
++
++Continuation: [original explosion flame particles](EXPLOSION_FLAME_CONTRACTS.md)
++now implements the selected Tesla component. Earlier blanket flame omissions are
++historical for that recipe; surface illumination and the actual M2 gate remain open.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index d75a6cd..318a57a 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -777,3 +777,11 @@ from sources/blood2/ClientShellDLL/ExplosionFX.cpp/.h. The [source ledger](M2_EX
+ [contracts](EXPLOSION_LIGHT_CONTRACTS.md) distinguish source delay/radius quirks
+ from explicit initialization, bounded values and owned client-light adaptations.
+ No reference file, external asset, dependency revision or renderer was modified.
++
++## Original explosion flame particles
++
++See [source selections and hashes](M2_EXPLOSION_FLAME_SOURCES.json) and
++[contracts](EXPLOSION_FLAME_CONTRACTS.md). CExplosionFlameFX preserves original
++three-zone bursts, clocks/fades and unused ramps, with the high-detail Tesla recipe.
++Owned typed state, explicit bounds, later-engine six-sample bulk service and existing
++particle rendering are documented adaptations, not a retail engine/RNG parity claim.
+diff --git a/docs/SCENE_EXPLOSION_CONTRACTS.md b/docs/SCENE_EXPLOSION_CONTRACTS.md
+index e972ea7..618ccb3 100644
+--- a/docs/SCENE_EXPLOSION_CONTRACTS.md
++++ b/docs/SCENE_EXPLOSION_CONTRACTS.md
+@@ -119,3 +119,7 @@ the full sanitizer suite must pass without increasing the timeout.
+ Continuation: [original metal fragments](EXPLOSION_FRAGMENT_CONTRACTS.md) now supplies
+ selected grenade fragment motion/collision and rendering. Earlier blanket fragment
+ omissions are historical; smoke trails, other required services and M2 remain open.
++
++Continuation: [original explosion flame particles](EXPLOSION_FLAME_CONTRACTS.md)
++now implements the selected Tesla component. Earlier blanket flame omissions are
++historical for that recipe; surface illumination and the actual M2 gate remain open.
+diff --git a/docs/SPRITE_VIEW_CONTRACTS.md b/docs/SPRITE_VIEW_CONTRACTS.md
+index c95b85b..c2c6e58 100644
+--- a/docs/SPRITE_VIEW_CONTRACTS.md
++++ b/docs/SPRITE_VIEW_CONTRACTS.md
+@@ -81,3 +81,7 @@ Continuation: [original fragment smoke trails](OBJECT_PARTICLE_CONTRACTS.md) sup
+ selected high-detail OBJFX_SMOKETRAIL_1 behavior. Earlier trail omissions and the
+ 4096 sprite-entry limit are historical; the shared renderer now holds 16384 entries.
+ Other ObjectFX modes, required effects and the actual M2 gate remain open.
++
++Continuation: [original explosion flame particles](EXPLOSION_FLAME_CONTRACTS.md)
++now implements the selected Tesla component. Earlier blanket flame omissions are
++historical for that recipe; surface illumination and the actual M2 gate remain open.
+diff --git a/src/app/inspector_scene_explosions.cpp b/src/app/inspector_scene_explosions.cpp
+index f1d4017..91031f2 100644
+--- a/src/app/inspector_scene_explosions.cpp
++++ b/src/app/inspector_scene_explosions.cpp
+@@ -8,7 +8,7 @@ namespace OpenBlood2
+         ImGui::TextWrapped(
+             "Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
+             "Spatial WAV playback and selected original sprite/model components are implemented. Composite "
+-            "particle flames and surface illumination remain unavailable. Fragment/ring/light state "
++            "surface illumination remains unavailable. Fragment/ring/flame/light state "
+             "is shown "
+             "below.");
+         ImGui::Text("Audio: %s | active voices %zu | submitted frames %llu",
+@@ -131,6 +131,48 @@ namespace OpenBlood2
+             }
+             ImGui::PopID();
+         }
++        const auto& flames = game.server.explosion_flames;
++        ImGui::Text("Explosion flames: %zu systems / %zu particles / %llu started / %llu expired / %llu failed",
++                    flames.active.size(), flames.live_particles(), (unsigned long long)flames.started,
++                    (unsigned long long)flames.expired, (unsigned long long)flames.failed);
++        if (!flames.update_error.empty())
++            ImGui::TextWrapped("%s", flames.update_error.c_str());
++        for (const auto& fx : flames.active)
++        {
++            ImGui::Text("Flame %llu / event %llu: elapsed %.3f / next burst %.3f / alpha %.3f",
++                        (unsigned long long)fx.id, (unsigned long long)fx.event, fx.last_time - fx.start_time,
++                        fx.add_time, fx.alpha);
++            ImGui::Text("%zu live / %llu bursts / %llu emitted / origin %.1f %.1f %.1f", fx.particles.size(),
++                        (unsigned long long)fx.bursts, (unsigned long long)fx.emitted, fx.settings.position.x,
++                        fx.settings.position.y, fx.settings.position.z);
++            ImGui::TextWrapped("%s | half-size %.3f | gravity %.2f | stored, unused ramps %.2f / %.2f, flags %u",
++                               fx.texture.c_str(), fx.settings.radius / 640.f, fx.settings.gravity, fx.settings.ramp_up,
++                               fx.settings.ramp_down, fx.settings.ramp_flags);
++            unsigned prepared = 0;
++            if (sprite_view)
++                for (const auto& e : sprite_view->entries)
++                    if (e.flame_system == fx.id)
++                    {
++                        prepared += e.range != UINT32_MAX && e.error.empty();
++                        if (!e.error.empty())
++                            ImGui::TextWrapped("%s", e.error.c_str());
++                    }
++            ImGui::Text("Prepared quads %u", prepared);
++            ImGui::PushID((int)fx.id);
++            if (ImGui::TreeNode("Flame particles"))
++            {
++                for (const auto& p : fx.particles)
++                    ImGui::Text("Local %.2f %.2f %.2f / velocity %.2f %.2f %.2f / life %.3f / RGB %.3f %.3f %.3f",
++                                p.position.x, p.position.y, p.position.z, p.velocity.x, p.velocity.y, p.velocity.z,
++                                p.lifetime, p.color.x, p.color.y, p.color.z);
++                ImGui::TreePop();
++            }
++            ImGui::PopID();
++        }
++        if (ImGui::CollapsingHeader("Last 64 flame deliveries / failures"))
++            for (const auto& r : flames.reports)
++                ImGui::TextWrapped("Event %llu / type %u / %zu flames / %s", (unsigned long long)r.id, r.type,
++                                   r.flames.size(), r.error.empty() ? "accepted" : r.error.c_str());
+         const auto& rings = game.server.explosion_rings;
+         ImGui::Text("Explosion rings: %zu active / %zu reserved particles / %llu started / %llu expired / %llu failed",
+                     rings.active.size(), rings.reserved_particles(), (unsigned long long)rings.started,
+@@ -282,6 +324,9 @@ namespace OpenBlood2
+                 ImGui::Text("Fragment event %llu", (unsigned long long)r.fragment_event);
+                 if (!r.fragment_error.empty())
+                     ImGui::TextWrapped("%s", r.fragment_error.c_str());
++                ImGui::Text("Flame event %llu", (unsigned long long)r.flame_event);
++                if (!r.flame_error.empty())
++                    ImGui::TextWrapped("%s", r.flame_error.c_str());
+                 ImGui::Text("Ring event %llu", (unsigned long long)r.ring_event);
+                 if (!r.ring_error.empty())
+                     ImGui::TextWrapped("%s", r.ring_error.c_str());
+diff --git a/src/app/sprite_scene.cpp b/src/app/sprite_scene.cpp
+index b0d9327..1f28df8 100644
+--- a/src/app/sprite_scene.cpp
++++ b/src/app/sprite_scene.cpp
+@@ -42,6 +42,16 @@ namespace OpenBlood2
+                 scene.entries.back().particle_system = 0;
+                 scene.entries.back().trail_system = trail.id;
+             }
++        for (const auto& fx : game.server.explosion_flames.active)
++            for (unsigned i = 0; i < fx.particles.size(); ++i)
++            {
++                const auto& p = fx.particles[i];
++                if (!scene.add_particle(fx.texture, vector_add(fx.settings.position, p.position),
++                                        fx.settings.radius / 640.f, p.color, fx.alpha, fx.id, i, game.resources, error))
++                    return false;
++                scene.entries.back().particle_system = 0;
++                scene.entries.back().flame_system = fx.id;
++            }
+         scene.sort();
+         return true;
+     }
+diff --git a/src/engine/sprite_view.h b/src/engine/sprite_view.h
+index eb23018..19be2de 100644
+--- a/src/engine/sprite_view.h
++++ b/src/engine/sprite_view.h
+@@ -12,7 +12,7 @@ namespace OpenBlood2
+         bool visible = false, rotatable = false;
+         std::uint32_t range = UINT32_MAX;
+         float alpha = 1;
+-        std::uint64_t client_effect = 0, particle_system = 0, trail_system = 0;
++        std::uint64_t client_effect = 0, particle_system = 0, trail_system = 0, flame_system = 0;
+         unsigned particle_index = 0;
+     };
+     // Read-only presentation snapshot: owned textures/values, never a retained game pointer.
+diff --git a/src/game/brush_messages.h b/src/game/brush_messages.h
+index 870a995..8df2760 100644
+--- a/src/game/brush_messages.h
++++ b/src/game/brush_messages.h
+@@ -27,6 +27,8 @@ namespace OpenBlood2
+         std::uint64_t voice = 0;
+         std::uint64_t fragment_event = 0;
+         std::string fragment_error;
++        std::uint64_t flame_event = 0;
++        std::string flame_error;
+         std::uint64_t ring_event = 0;
+         std::string ring_error;
+         std::uint64_t light_event = 0;
+diff --git a/src/game/explosion_flames.cpp b/src/game/explosion_flames.cpp
+new file mode 100644
+index 0000000..0b41bf8
+--- /dev/null
++++ b/src/game/explosion_flames.cpp
+@@ -0,0 +1,134 @@
++#include "game/explosion_flames.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++namespace OpenBlood2
++{
++    bool original_explosion_flames(DDWORD type, DVector pos, DVector normal, std::vector<ExplosionFlameSettings>& out,
++                                   std::string& error)
++    {
++        out.clear();
++        error.clear();
++        if (!physics_vector(pos) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f)
++        {
++            error = "Explosion requires a finite position and nonzero normal";
++            return false;
++        }
++        if (type <= 3 || type == 6)
++            return true;
++        if (type != 8)
++        {
++            error = "Explosion flame recipe unavailable";
++            return false;
++        }
++        const float length = std::sqrt(vector_dot(normal, normal));
++        normal = {normal.x / length, normal.y / length, normal.z / length};
++        ExplosionFlameSettings s;
++        s.position = vector_add(pos, {30 * normal.x, 30 * normal.y, 30 * normal.z});
++        s.normal = normal;
++        s.colors = {{{1, 1, 1}, {200.f / 255, 200.f / 255, 1}, {150.f / 255, 150.f / 255, 1}}};
++        s.lifetimes = {.75f, .875f, 1};
++        s.life_offsets = {.25f, .25f, .25f};
++        s.ramp_up = .5f;
++        s.duration = 2.5f;
++        s.ramp_down = 0;
++        s.count = 4;
++        s.radius = 4000;
++        s.position_radius = 0;
++        s.gravity = 0;
++        s.velocity = 125;
++        s.delay = .33f;
++        s.alpha = .85f;
++        s.fade = 1;
++        s.ramp_flags = 1;
++        s.texture = "SpriteTextures\\teslaprime_3.dtx";
++        out.push_back(s);
++        return true;
++    }
++    std::size_t ExplosionFlames::live_particles() const
++    {
++        std::size_t count = 0;
++        for (const auto& fx : active)
++            count += fx.particles.size();
++        return count;
++    }
++    std::uint64_t ExplosionFlames::publish(DDWORD type, DVector pos, DVector normal, std::string_view source,
++                                           const Resources& resources, double now, std::string& error)
++    {
++        error.clear();
++        if (source.size() > 100 || source.find('\0') != std::string_view::npos || next_event_ == UINT64_MAX)
++        {
++            error = "Invalid explosion flame source/event";
++            return 0;
++        }
++        ExplosionFlameReport report{next_event_++, type, std::string(source), {}, {}};
++        std::vector<ExplosionFlameSettings> settings;
++        if (original_explosion_flames(type, pos, normal, settings, report.error))
++            for (const auto& setting : settings)
++            {
++                CExplosionFlameFX fx;
++                std::string failure;
++                const auto live = live_particles();
++                if (active.size() >= 64 || live >= 4096 || next_id_ == UINT64_MAX)
++                    failure = "Explosion flame capacity exhausted";
++                else if (fx.Init(setting, failure) && fx.CreateObject(resources, now, random_, failure, 4096 - live))
++                {
++                    fx.id = next_id_++;
++                    fx.event = report.id;
++                    report.flames.push_back(fx.id);
++                    active.push_back(std::move(fx));
++                    ++started;
++                }
++                if (!failure.empty())
++                {
++                    ++failed;
++                    report.error = failure;
++                }
++            }
++        else
++            ++failed;
++        error = report.error;
++        const auto id = report.id;
++        if (reports.size() == 64)
++            reports.erase(reports.begin());
++        reports.push_back(std::move(report));
++        return id;
++    }
++    bool ExplosionFlames::advance(double now)
++    {
++        bool valid = true;
++        // Iterate explicitly: compacting with erase_if would invalidate total-count accounting.
++        std::size_t live = live_particles();
++        for (auto it = active.begin(); it != active.end();)
++        {
++            live -= it->particles.size();
++            if (it->Update(now, random_, live < 4096 ? 4096 - live : 0))
++            {
++                live += it->particles.size();
++                ++it;
++                continue;
++            }
++            if (it->error.empty())
++                ++expired;
++            else
++            {
++                ++failed;
++                valid = false;
++                update_error = it->error;
++                for (auto& report : reports)
++                    if (report.id == it->event)
++                        report.error = it->error;
++            }
++            it = active.erase(it);
++        }
++        return valid;
++    }
++    void ExplosionFlames::clear()
++    {
++        active.clear();
++        reports.clear();
++        update_error.clear();
++        started = expired = failed = 0;
++        random_.seed(1); // IDs intentionally survive unload.
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/explosion_flames.h b/src/game/explosion_flames.h
+new file mode 100644
+index 0000000..c793dda
+--- /dev/null
++++ b/src/game/explosion_flames.h
+@@ -0,0 +1,30 @@
++#pragma once
++#include "game/original/ExplosionFlameFX.h"
++#include <string_view>
++namespace OpenBlood2
++{
++    bool original_explosion_flames(DDWORD, DVector, DVector, std::vector<ExplosionFlameSettings>&, std::string&);
++    struct ExplosionFlameReport
++    {
++        std::uint64_t id = 0;
++        DDWORD type = 0;
++        std::string source, error;
++        std::vector<std::uint64_t> flames;
++    };
++    class ExplosionFlames
++    {
++      public:
++        std::uint64_t publish(DDWORD, DVector, DVector, std::string_view, const Resources&, double, std::string&);
++        bool advance(double);
++        void clear();
++        std::size_t live_particles() const;
++        std::vector<CExplosionFlameFX> active;
++        std::vector<ExplosionFlameReport> reports;
++        std::string update_error;
++        std::uint64_t started = 0, expired = 0, failed = 0;
++
++      private:
++        std::minstd_rand random_{1};
++        std::uint64_t next_id_ = 1, next_event_ = 1;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/explosion_sprites.cpp b/src/game/explosion_sprites.cpp
+index 62bfce1..2c9de8c 100644
+--- a/src/game/explosion_sprites.cpp
++++ b/src/game/explosion_sprites.cpp
+@@ -44,7 +44,7 @@ namespace OpenBlood2
+                 : type == 1 ? 2.f
+                             : 2.5f,
+                 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
+-            unavailable = type == 3 ? "light illumination" : "light illumination";
++            unavailable = "light illumination";
+         }
+         else if (type == 6)
+         {
+@@ -55,7 +55,7 @@ namespace OpenBlood2
+         else if (type == 8)
+         {
+             add(30, .1f, .75f, 3, .75f, 0, 0, "Sprites\\TesAltLoop.spr");
+-            unavailable = "particle flame, light illumination";
++            unavailable = "light illumination";
+         }
+         else
+         {
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index a62070d..6a9d42d 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -64,6 +64,7 @@ class ServerDE : public CSBase
+     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
+     virtual std::uint64_t PublishExplosionFragments(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
++    virtual std::uint64_t PublishExplosionFlames(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionRings(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionLights(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionModels(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+diff --git a/src/game/original/ClientExplosionSFX.cpp b/src/game/original/ClientExplosionSFX.cpp
+index b8fb2d6..df622a8 100644
+--- a/src/game/original/ClientExplosionSFX.cpp
++++ b/src/game/original/ClientExplosionSFX.cpp
+@@ -76,6 +76,7 @@ void CClientExplosionSFX::SetupFX()
+     report.ring_event = g_pServerDE->PublishExplosionRings(m_hObject, type, position, normal, report.ring_error);
+     report.fragment_event =
+         g_pServerDE->PublishExplosionFragments(m_hObject, type, position, normal, report.fragment_error);
++    report.flame_event = g_pServerDE->PublishExplosionFlames(m_hObject, type, position, normal, report.flame_error);
+     report.light_event = g_pServerDE->PublishExplosionLights(m_hObject, type, position, normal, report.light_error);
+     // IMPORTANT: the source passes NULL, so DamageObject's null-damager guard
+     // suppresses every delivery. Do not silently "repair" this gameplay behavior.
+diff --git a/src/game/original/ExplosionFlameFX.cpp b/src/game/original/ExplosionFlameFX.cpp
+new file mode 100644
+index 0000000..3c78a9b
+--- /dev/null
++++ b/src/game/original/ExplosionFlameFX.cpp
+@@ -0,0 +1,134 @@
++#include "ExplosionFlameFX.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++using namespace OpenBlood2;
++bool CExplosionFlameFX::Init(const ExplosionFlameSettings& s, std::string& failure)
++{
++    failure.clear();
++    *this = {};
++    auto bounded = [](float v, float lo, float hi) { return std::isfinite(v) && v >= lo && v <= hi; };
++    bool valid = physics_vector(s.position) && physics_vector(s.normal) && bounded(s.radius, 0, 640000) &&
++                 bounded(s.position_radius, 0, 10000) && bounded(s.gravity, -10000, 10000) &&
++                 bounded(s.velocity, 0, 10000) && bounded(s.delay, 0, 600) && bounded(s.duration, .001f, 600) &&
++                 bounded(s.ramp_up, 0, 600) && bounded(s.ramp_down, 0, 600) && bounded(s.alpha, 0, 1) && s.count > 0 &&
++                 s.count <= 256 && s.fade <= 5 && s.ramp_flags <= 7 &&
++                 (!s.texture || (s.texture->size() <= 1000 && s.texture->find('\0') == std::string::npos));
++    for (unsigned i = 0; i < 3; ++i)
++        valid = valid && bounded(s.colors[i].x, 0, 1) && bounded(s.colors[i].y, 0, 1) && bounded(s.colors[i].z, 0, 1) &&
++                bounded(s.life_offsets[i], 0, 600) && bounded(s.lifetimes[i], 0, 600) &&
++                s.lifetimes[i] >= s.life_offsets[i] && s.lifetimes[i] + s.life_offsets[i] <= 600;
++    if (!valid)
++    {
++        failure = "Invalid explosion flame descriptor";
++        return false;
++    }
++    settings = s;
++    initialized_ = true;
++    return true;
++}
++bool CExplosionFlameFX::AddParticles(std::minstd_rand& random, std::size_t budget, std::string& failure)
++{
++    // Original three AddParticles calls are preflighted as one bounded burst.
++    const auto count = std::size_t(settings.count) * 6;
++    budget = std::min(budget, std::size_t(2048));
++    if (particles.size() > budget || count > budget - particles.size())
++    {
++        failure = "Explosion flame particle capacity exhausted";
++        return false;
++    }
++    auto draw = [&]
++    { return float(random() - std::minstd_rand::min()) / float(std::minstd_rand::max() - std::minstd_rand::min()); };
++    const float third = settings.position_radius / 3;
++    const float radii[]{third, third * 2, settings.position_radius};
++    for (unsigned zone = 0; zone < 3; ++zone)
++        for (unsigned i = 0; i < settings.count * (zone + 1); ++i)
++        {
++            // Replacement bulk service follows later LithTech's six draws, including
++            // its shared velocity.x/lifetime sample; no retail RNG parity is claimed.
++            std::array<float, 6> t;
++            for (auto& v : t)
++                v = draw();
++            const auto offset = [&](unsigned n) { return -radii[zone] + 2 * radii[zone] * t[n]; };
++            const auto speed = [&](unsigned n) { return -settings.velocity + 2 * settings.velocity * t[n]; };
++            particles.push_back(
++                {{offset(0), offset(1), offset(2)},
++                 {speed(3), speed(4), speed(5)},
++                 settings.lifetimes[zone] - settings.life_offsets[zone] + 2 * settings.life_offsets[zone] * t[3],
++                 settings.colors[zone]});
++        }
++    ++bursts;
++    emitted += count;
++    return true;
++}
++bool CExplosionFlameFX::CreateObject(const Resources& resources, double now, std::minstd_rand& random,
++                                     std::string& failure, std::size_t budget)
++{
++    failure.clear();
++    if (!initialized_ || created_ || !std::isfinite(now) || now < 0)
++    {
++        failure = "Invalid explosion flame creation state/time";
++        return false;
++    }
++    texture = settings.texture.value_or("SpriteTextures\\drop32_1.dtx");
++    if (!resources.find(texture))
++    {
++        failure = "Explosion flame texture is not indexed: " + texture;
++        return false;
++    }
++    if (!AddParticles(random, budget, failure))
++        return false;
++    alpha = settings.fade ? 1 : settings.alpha;
++    add_time = settings.delay;
++    start_time = last_time = now;
++    created_ = true;
++    return true;
++}
++bool CExplosionFlameFX::Update(double now, std::minstd_rand& random, std::size_t budget)
++{
++    error.clear();
++    if (!created_ || !std::isfinite(now) || now < last_time)
++    {
++        error = "Invalid explosion flame clock/state";
++        return false;
++    }
++    if (!advance_particles(particles, settings.gravity, now - last_time, error))
++        return false;
++    last_time = now;
++    if (now < next_update)
++        return true;
++    ++updates;
++    next_update = now + .001;
++    const float time = static_cast<float>(now - start_time), ratio = time / settings.duration;
++    if (!std::isfinite(ratio))
++    {
++        error = "Explosion flame time overflow";
++        return false;
++    }
++    if (time >= add_time)
++    {
++        if (!AddParticles(random, budget, error))
++            return false;
++        add_time += settings.delay; // One burst, not a catch-up loop or now+delay.
++    }
++    switch (settings.fade)
++    {
++        case 1:
++            alpha = settings.alpha * (1 - ratio);
++            break;
++        case 2:
++            alpha = 1 - (1 - settings.alpha) * ratio;
++            break;
++        case 3:
++            alpha = settings.alpha * ratio;
++            break;
++        case 4:
++            alpha = settings.alpha + (1 - settings.alpha) * ratio;
++            break;
++        case 5:
++            alpha = time < settings.duration / 2 ? settings.alpha * ratio * 2 : settings.alpha * 2 * (1 - ratio);
++            break;
++    }
++    // Original normal, ramp times and flags are stored but unused in these methods.
++    return time < settings.duration;
++}
+diff --git a/src/game/original/ExplosionFlameFX.h b/src/game/original/ExplosionFlameFX.h
+new file mode 100644
+index 0000000..f8a98c8
+--- /dev/null
++++ b/src/game/original/ExplosionFlameFX.h
+@@ -0,0 +1,37 @@
++#pragma once
++#include "engine/particles.h"
++#include "engine/resources.h"
++#include <array>
++#include <optional>
++#include <random>
++namespace OpenBlood2
++{
++    struct ExplosionFlameSettings
++    {
++        DVector position{}, normal{0, 1, 0};
++        std::array<DVector, 3> colors{{{1, 1, 0}, {1, .75f, 0}, {1, 0, 0}}};
++        std::array<float, 3> lifetimes{.5f, 1, 1.5f}, life_offsets{};
++        float ramp_up = 1, duration = 3, ramp_down = 1;
++        float radius = 100, position_radius = 0, gravity = 0, velocity = 0, delay = .25f, alpha = 1;
++        unsigned count = 20;
++        DBYTE fade = 0, ramp_flags = 0;
++        std::optional<std::string> texture;
++    };
++} // namespace OpenBlood2
++class CExplosionFlameFX
++{
++  public:
++    bool Init(const OpenBlood2::ExplosionFlameSettings&, std::string&);
++    bool CreateObject(const OpenBlood2::Resources&, double, std::minstd_rand&, std::string&, std::size_t budget = 2048);
++    bool Update(double, std::minstd_rand&, std::size_t budget = 2048);
++    OpenBlood2::ExplosionFlameSettings settings;
++    std::vector<OpenBlood2::Particle> particles;
++    std::string texture, error;
++    float alpha = 1, add_time = 0;
++    double start_time = 0, last_time = 0, next_update = 0;
++    std::uint64_t id = 0, event = 0, updates = 0, bursts = 0, emitted = 0;
++
++  private:
++    bool AddParticles(std::minstd_rand&, std::size_t budget, std::string&);
++    bool initialized_ = false, created_ = false;
++};
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 4f2edef..a4bb490 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -3,6 +3,7 @@
+ #include "engine/model_store.h"
+ #include "engine/objects.h"
+ #include "engine/string_resources.h"
++#include "game/explosion_flames.h"
+ #include "game/explosion_fragments.h"
+ #include "game/explosion_lights.h"
+ #include "game/explosion_models.h"
+@@ -83,6 +84,8 @@ namespace OpenBlood2
+         ExplosionModels explosion_models;
+         ExplosionLights explosion_lights;
+         ExplosionRings explosion_rings;
++        ExplosionFlames explosion_flames;
++        std::uint64_t PublishExplosionFlames(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         ExplosionFragments explosion_fragments;
+         std::uint64_t PublishExplosionFragments(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         std::uint64_t PublishExplosionRings(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+@@ -118,6 +121,7 @@ namespace OpenBlood2
+             explosion_models.clear();
+             explosion_lights.clear();
+             explosion_rings.clear();
++            explosion_flames.clear();
+             explosion_fragments.clear();
+             spawn_reports.clear();
+             pickup_reports.clear();
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index 4fe4b6a..5af9e37 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -16,6 +16,18 @@ namespace OpenBlood2
+         return explosion_fragments.publish(type, pos, normal, GetObjectName(source), *objects_.models,
+                                            *client_resources, objects_.time(), error);
+     }
++    std::uint64_t ServerAdapter::PublishExplosionFlames(HOBJECT source, DDWORD type, DVector position, DVector normal,
++                                                        std::string& error)
++    {
++        trace_service("PublishExplosionFlames (selected original three-zone particles)");
++        if (!IsObjectAlive(source) || !client_resources)
++        {
++            error = "Explosion flame source/resources unavailable";
++            return 0;
++        }
++        return explosion_flames.publish(type, position, normal, GetObjectName(source), *client_resources,
++                                        objects_.time(), error);
++    }
+     std::uint64_t ServerAdapter::PublishExplosionRings(HOBJECT source, DDWORD type, DVector position, DVector normal,
+                                                        std::string& error)
+     {
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 2cf1cb8..190bd36 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -438,6 +438,7 @@ namespace OpenBlood2
+         ok = server.explosion_models.advance(objects.time()) && ok;
+         ok = server.explosion_lights.advance(objects.time()) && ok;
+         ok = server.explosion_rings.advance(objects.time()) && ok;
++        ok = server.explosion_flames.advance(objects.time()) && ok;
+         ok = server.explosion_fragments.advance(objects.time(), server) && ok;
+         if (ok && preview_model && preview_playing &&
+             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 97dea68..d5a3758 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1067,3 +1067,26 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.object_particle_private PROPERTIES LABELS "gpu;private;object_particles" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+     endif()
+ endif()
++
++add_executable(explosion_flame_tests explosion_flame_tests.cpp ../src/app/sprite_scene.cpp)
++target_link_libraries(explosion_flame_tests PRIVATE blood2_game)
++blood2_project_options(explosion_flame_tests)
++foreach(case zones lifecycle failures session)
++    add_test(NAME explosion_flames.${case} COMMAND explosion_flame_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/explosion-flames-${case}")
++    set_tests_properties(explosion_flames.${case} PROPERTIES LABELS "headless;explosion_flames" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME explosion_flames.private COMMAND explosion_flame_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(explosion_flames.private PROPERTIES LABELS "headless;private;explosion_flames" TIMEOUT 180)
++endif()
++if(BLOOD2_GPU_TESTS)
++    add_executable(explosion_flame_gpu_tests explosion_flame_gpu_tests.cpp)
++    target_link_libraries(explosion_flame_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(explosion_flame_gpu_tests)
++    add_test(NAME gpu.explosion_flame_alpha COMMAND explosion_flame_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/explosion-flame-alpha")
++    set_tests_properties(gpu.explosion_flame_alpha PROPERTIES LABELS "gpu;explosion_flames" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.explosion_flame_private COMMAND explosion_flame_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/explosion-flame-private" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.explosion_flame_private PROPERTIES LABELS "gpu;private;explosion_flames" TIMEOUT 60 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    endif()
++endif()
+diff --git a/tests/explosion_flame_fixture.h b/tests/explosion_flame_fixture.h
+new file mode 100644
+index 0000000..bce7d7d
+--- /dev/null
++++ b/tests/explosion_flame_fixture.h
+@@ -0,0 +1,46 @@
++#pragma once
++#include "explosion_ring_fixture.h"
++namespace test_explosion_flame
++{
++    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error)
++    {
++        if (!test_explosion_ring::mount(resources, root, error))
++            return false;
++        std::vector<std::uint8_t> skin;
++        if (!resources.read("alpha.dtx", skin, error))
++            return false;
++        test_player::Directory dir;
++        dir.children["spritetextures"].files["teslaprime_3.dtx"] = skin;
++        dir.children["spritetextures"].files["drop32_1.dtx"] = skin;
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, dir);
++        w.patch(131, off);
++        w.patch(135, size);
++        auto file = root / "explosion-flames.rez";
++        std::ofstream out(file, std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        return resources.mount(file, error);
++    }
++    inline HOBJECT create(OpenBlood2::GameSession& g)
++    {
++        return g.objects.create(g.objects.find_class("CClientExplosionSFX"), {}, OpenBlood2::Creation::World,
++                                {{"Name", std::string("diagnostic Tesla")},
++                                 {"Pos", DVector{0, -30, 60}},
++                                 {"Direction", DVector{0, 2, 0}},
++                                 {"ExplosionType", 8}});
++    }
++    inline bool trigger(OpenBlood2::GameSession& g, HOBJECT h)
++    {
++        auto s = g.server.CreateString("TRIGGER");
++        auto m = g.server.StartMessageToObject(nullptr, h, 1000);
++        bool ok = m && g.server.WriteToMessageHString(m, s) == DE_OK && g.server.EndMessage(m) == DE_OK;
++        g.server.FreeString(s);
++        return ok;
++    }
++} // namespace test_explosion_flame
+diff --git a/tests/explosion_flame_gpu_tests.cpp b/tests/explosion_flame_gpu_tests.cpp
+new file mode 100644
+index 0000000..eb3e96a
+--- /dev/null
++++ b/tests/explosion_flame_gpu_tests.cpp
+@@ -0,0 +1,150 @@
++#include "app/sprite_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "explosion_flame_fixture.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << " " << error << " " << SDL_GetError() << "\n";                         \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool render(Runtime& runtime, WorldRenderer& renderer, SpriteView& scene, DVector eye, DRotation camera,
++                Capture& capture, std::vector<std::uint8_t>& pixels, std::string& error)
++    {
++        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300)) ||
++            !renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true))
++            return false;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        if (!commands)
++            return false;
++        if (!renderer.draw(commands, capture.texture, scene.mesh, scene.draws, eye, camera, false, error))
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 300;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 300;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
++            return false;
++        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        if (!data)
++            return false;
++        pixels.assign(data, data + 400 * 300 * 4);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    Runtime runtime;
++    std::string error;
++    CHECK(runtime.initialize(true, error));
++    WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
++    Capture capture;
++    SpriteView scene;
++    Resources resources;
++    CHECK(test_explosion_flame::mount(resources, argv[1], error));
++    std::vector<ExplosionFlameSettings> recipe;
++    CHECK(original_explosion_flames(8, {0, -30, 20}, {0, 1, 0}, recipe, error));
++    CExplosionFlameFX fx;
++    std::minstd_rand random(1);
++    CHECK(fx.Init(recipe[0], error) && fx.CreateObject(resources, 0, random, error) && fx.Update(.1, random));
++    const auto& p = fx.particles.back();
++    CHECK(p.color.x == 150.f / 255 && fx.alpha < 1);
++    std::vector<std::uint8_t> white, tinted;
++    for (bool tint : {false, true})
++    {
++        CHECK(scene.begin_frame({}, {}, error) &&
++              scene.add_particle(fx.texture, {0, 0, 20}, fx.settings.radius / 640, tint ? p.color : DVector{1, 1, 1},
++                                 tint ? fx.alpha : 1, fx.id, 0, resources, error));
++        CHECK(scene.entries.back().error.empty());
++        CHECK(render(runtime, renderer, scene, {}, {}, capture, tint ? tinted : white, error));
++    }
++    unsigned verified = 0;
++    for (unsigned i = 0; i < 400 * 300; ++i)
++    {
++        const auto k = i * 4;
++        if (white[k] == 255 && white[k + 1] == 0 && white[k + 2] == 0)
++        {
++            CHECK(std::abs(int(tinted[k]) - (255 * p.color.x * fx.alpha + 6 * (1 - fx.alpha))) <= 2);
++            CHECK(std::abs(int(tinted[k + 1]) - 9 * (1 - fx.alpha)) <= 2 &&
++                  std::abs(int(tinted[k + 2]) - 13 * (1 - fx.alpha)) <= 2);
++            ++verified;
++        }
++    }
++    CHECK(verified > 100);
++    CHECK(capture.save((std::filesystem::path(argv[1]) / "flame-tint-alpha.png").c_str()));
++    std::cout << "Flame RGB and system alpha: " << verified << " exact opaque-texel blend checks\n";
++    if (argc == 3)
++    {
++        GameSession g;
++        Config c;
++        c.data_dir = argv[2];
++        CHECK(g.initialize() && g.resources.mount_game(c, error));
++        std::uint64_t previous = 0;
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            auto h = test_explosion_flame::create(g);
++            CHECK(h && test_explosion_flame::trigger(g, h) && g.step(.35));
++            CHECK(!g.objects.get(h) && g.server.explosion_flames.active.size() == 1);
++            const auto& active = g.server.explosion_flames.active[0];
++            CHECK(active.id > previous);
++            previous = active.id;
++            const auto updates = active.updates;
++            // Render the live session's checked flame entries without an inspector.
++            scene.clear();
++            renderer.clear_geometry();
++            CHECK(scene.begin_frame({}, {}, error));
++            for (unsigned i = 0; i < active.particles.size(); ++i)
++            {
++                const auto& v = active.particles[i];
++                CHECK(scene.add_particle(active.texture, vector_add(active.settings.position, v.position),
++                                         active.settings.radius / 640, v.color, active.alpha, active.id, i, g.resources,
++                                         error) &&
++                      scene.entries.back().error.empty());
++            }
++            CHECK(scene.entries.size() == 48 && scene.entries[0].partial_alpha > 0);
++            scene.sort();
++            CHECK(render(runtime, renderer, scene, {}, {}, capture, tinted, error) && active.updates == updates);
++            unsigned ink = 0;
++            for (unsigned i = 0; i < 400 * 300; ++i)
++                if (tinted[i * 4] != 6 || tinted[i * 4 + 1] != 9 || tinted[i * 4 + 2] != 13)
++                    ++ink;
++            CHECK(ink > 100 && ink < 100000);
++            CHECK(capture.save((std::filesystem::path(argv[1]) / "original-tesla-particles.png").c_str()));
++            std::cout << "Private diagnostic Tesla GPU cycle " << cycle << ": " << ink << " covered pixels, "
++                      << scene.entries[0].partial_alpha << " partial-alpha texels\n";
++            CHECK(g.unload_world() && g.server.explosion_flames.active.empty());
++            scene.clear();
++            renderer.clear_geometry();
++            CHECK(scene.draws.empty());
++        }
++    }
++    return 0;
++}
+diff --git a/tests/explosion_flame_tests.cpp b/tests/explosion_flame_tests.cpp
+new file mode 100644
+index 0000000..504f938
+--- /dev/null
++++ b/tests/explosion_flame_tests.cpp
+@@ -0,0 +1,354 @@
++#include "app/sprite_scene.h"
++#include "explosion_flame_fixture.h"
++#include "game/original/ClientExplosionSFX.h"
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ":" << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .0001f;
++    }
++    bool zones(const std::filesystem::path& root)
++    {
++        Resources r;
++        std::string error;
++        CHECK(test_explosion_flame::mount(r, root, error));
++        ExplosionFlameSettings s;
++        s.count = 2;
++        s.position_radius = 9;
++        s.velocity = 10;
++        s.lifetimes = {1, 2, 3};
++        s.life_offsets = {.1f, .2f, .3f};
++        s.colors = {{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}};
++        CExplosionFlameFX fx;
++        std::minstd_rand random(17), expected(17);
++        CHECK(fx.Init(s, error) && fx.CreateObject(r, 4, random, error));
++        CHECK(fx.particles.size() == 12 && fx.bursts == 1 && fx.emitted == 12 && fx.add_time == s.delay);
++        unsigned k = 0;
++        for (unsigned zone = 0; zone < 3; ++zone)
++            for (unsigned i = 0; i < 2 * (zone + 1); ++i)
++            {
++                float t[6];
++                for (auto& v : t)
++                    v = float(expected() - std::minstd_rand::min()) /
++                        float(std::minstd_rand::max() - std::minstd_rand::min());
++                const auto& v = fx.particles[k++];
++                float radius = 3 * (zone + 1);
++                CHECK(near(v.position.x, -radius + 2 * radius * t[0]) &&
++                      near(v.position.y, -radius + 2 * radius * t[1]) &&
++                      near(v.position.z, -radius + 2 * radius * t[2]));
++                CHECK(near(v.velocity.x, -10 + 20 * t[3]) && near(v.velocity.y, -10 + 20 * t[4]) &&
++                      near(v.velocity.z, -10 + 20 * t[5]));
++                CHECK(near(v.lifetime, s.lifetimes[zone] - s.life_offsets[zone] + 2 * s.life_offsets[zone] * t[3]));
++                CHECK(v.color.x == s.colors[zone].x && v.color.y == s.colors[zone].y && v.color.z == s.colors[zone].z);
++            }
++        CHECK(random() == expected());
++        // Authored normal/ramps do not change emission, speed or lifetime.
++        s.normal = {1, 0, 0};
++        s.ramp_up = 500;
++        s.ramp_down = 400;
++        s.ramp_flags = 7;
++        CExplosionFlameFX other;
++        std::minstd_rand same(17);
++        CHECK(other.Init(s, error) && other.CreateObject(r, 4, same, error));
++        for (unsigned i = 0; i < 12; ++i)
++            CHECK(near(fx.particles[i].velocity.x, other.particles[i].velocity.x) &&
++                  near(fx.particles[i].position.y, other.particles[i].position.y) &&
++                  near(fx.particles[i].lifetime, other.particles[i].lifetime));
++        return true;
++    }
++    bool lifecycle(const std::filesystem::path& root)
++    {
++        Resources r;
++        std::string error;
++        CHECK(test_explosion_flame::mount(r, root, error));
++        ExplosionFlameSettings s;
++        s.count = 1;
++        s.delay = .25f;
++        s.duration = 2;
++        s.alpha = .4f;
++        s.lifetimes = {10, 10, 10};
++        s.gravity = 10;
++        std::minstd_rand random(1);
++        CExplosionFlameFX fx;
++        const float fades[]{.4f, .3f, .85f, .1f, .55f, .2f};
++        for (unsigned mode = 0; mode <= 5; ++mode)
++        {
++            s.fade = mode;
++            CHECK(fx.Init(s, error) && fx.CreateObject(r, 10, random, error));
++            CHECK(fx.alpha == (mode ? 1 : s.alpha) && fx.particles.size() == 6);
++            CHECK(fx.Update(10.5, random) && near(fx.alpha, fades[mode]) && fx.bursts == 2 && fx.add_time == .5f);
++            CHECK(fx.particles[0].position.y == 0 && fx.particles[0].velocity.y == 5 &&
++                  fx.particles[0].lifetime == 9.5f);
++            CHECK(fx.particles.back().lifetime == 10 && fx.particles.back().velocity.y == 0);
++            CHECK(fx.Update(10.5005, random) && fx.bursts == 2 && fx.updates == 1); // particle clocks still run.
++            CHECK(fx.particles[0].lifetime < 9.5f);
++            CHECK(fx.Update(10.502, random) && fx.bursts == 3 &&
++                  fx.add_time == .75f); // backlog one burst per callback.
++            CHECK(fx.Update(11.5, random) && fx.bursts == 4 && fx.add_time == 1);
++            if (mode == 5)
++                CHECK(near(fx.alpha, .2f));
++            CHECK(!fx.Update(12, random) && fx.error.empty() && fx.bursts == 5 &&
++                  fx.particles.size() == 30); // add before expiry.
++        }
++        s.delay = 0;
++        s.fade = 0;
++        CHECK(fx.Init(s, error) && fx.CreateObject(r, 0, random, error) && fx.Update(0, random) && fx.bursts == 2);
++        CHECK(fx.Update(.0005, random) && fx.bursts == 2);
++        CHECK(fx.Update(.001, random) && fx.bursts == 3 && fx.add_time == 0);
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        Resources r;
++        std::string error;
++        CHECK(test_explosion_flame::mount(r, root, error));
++        CExplosionFlameFX fx;
++        std::minstd_rand random(1), untouched(1);
++        CHECK(!fx.CreateObject(r, 0, random, error) && !fx.Update(0, random));
++        for (unsigned i = 0; i < 16; ++i)
++        {
++            ExplosionFlameSettings s;
++            switch (i)
++            {
++                case 0:
++                    s.count = 0;
++                    break;
++                case 1:
++                    s.count = 257;
++                    break;
++                case 2:
++                    s.duration = 0;
++                    break;
++                case 3:
++                    s.delay = -1;
++                    break;
++                case 4:
++                    s.fade = 6;
++                    break;
++                case 5:
++                    s.ramp_flags = 8;
++                    break;
++                case 6:
++                    s.colors[1].z = 1.1f;
++                    break;
++                case 7:
++                    s.life_offsets[0] = 1;
++                    break;
++                case 8:
++                    s.lifetimes[2] = std::numeric_limits<float>::infinity();
++                    break;
++                case 9:
++                    s.velocity = -1;
++                    break;
++                case 10:
++                    s.position_radius = 10001;
++                    break;
++                case 11:
++                    s.alpha = -1;
++                    break;
++                case 12:
++                    s.gravity = 10001;
++                    break;
++                case 13:
++                    s.radius = -1;
++                    break;
++                case 14:
++                    s.texture = std::string("a\0b", 3);
++                    break;
++                case 15:
++                    s.normal.x = std::numeric_limits<float>::quiet_NaN();
++                    break;
++            }
++            CHECK(!fx.Init(s, error) && !error.empty());
++        }
++        ExplosionFlameSettings s;
++        s.count = 1;
++        s.delay = 0;
++        s.lifetimes = {10, 10, 10};
++        CHECK(fx.Init(s, error) && !fx.CreateObject(r, -1, random, error));
++        CHECK(!fx.CreateObject(r, 0, random, error, 5) && fx.particles.empty() && random == untouched);
++        CHECK(fx.CreateObject(r, 0, random, error, 6));
++        untouched = random;
++        CHECK(!fx.Update(.1, random, 11) && !fx.error.empty() && fx.particles.size() == 6 && fx.bursts == 1 &&
++              random == untouched);
++        CHECK(!fx.Update(-1, random) && !fx.Update(std::numeric_limits<double>::infinity(), random));
++        s.texture = "missing.dtx";
++        CHECK(fx.Init(s, error) && !fx.CreateObject(r, 0, random, error));
++        ExplosionFlames fs;
++        std::vector<ExplosionFlameSettings> out;
++        for (unsigned type : {0u, 1u, 2u, 3u, 6u})
++            CHECK(original_explosion_flames(type, {}, {0, 1, 0}, out, error) && out.empty());
++        CHECK(!original_explosion_flames(8, {}, {}, out, error) && out.empty());
++        CHECK(!original_explosion_flames(99, {}, {0, 1, 0}, out, error) && out.empty());
++        CHECK(original_explosion_flames(8, {10, 20, 30}, {0, 2, 0}, out, error) && out.size() == 1);
++        CHECK(out[0].position.y == 50 && out[0].count == 4 && out[0].velocity == 125 && out[0].ramp_flags == 1 &&
++              out[0].duration == 2.5f);
++        for (unsigned i = 0; i < 64; ++i)
++            CHECK(fs.publish(8, {}, {0, 1, 0}, "burst", r, 0, error) && error.empty());
++        CHECK(fs.live_particles() == 1536);
++        CHECK(fs.publish(8, {}, {0, 1, 0}, "full", r, 0, error) && !error.empty() && fs.active.size() == 64 &&
++              fs.reports.size() == 64);
++        CHECK(fs.advance(.33) && fs.live_particles() == 3072);
++        CHECK(!fs.advance(.66) && fs.failed > 1 && !fs.update_error.empty() && fs.live_particles() <= 4096);
++        bool retained = false;
++        for (const auto& report : fs.reports)
++            retained |= !report.error.empty();
++        CHECK(retained);
++        auto id = fs.active.back().id, event = fs.reports.back().id;
++        fs.clear();
++        CHECK(fs.publish(8, {}, {0, 1, 0}, "new", r, 1, error) && error.empty() && fs.active.front().id > id &&
++              fs.reports.front().id > event);
++        CHECK(!fs.advance(0) && fs.active.empty() && fs.failed == 1);
++        fs.clear();
++        CHECK(fs.reports.empty() && fs.update_error.empty() && !fs.failed);
++        return true;
++    }
++    bool session(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string error;
++        CHECK(g.initialize() && test_explosion_flame::mount(g.resources, root, error));
++        auto h = test_explosion_flame::create(g);
++        CHECK(h);
++        DVector moved{100, 200, 300};
++        CHECK(g.server.TeleportObject(h, &moved) == DE_OK);
++        CHECK(test_explosion_flame::trigger(g, h) && test_explosion_flame::trigger(g, h));
++        auto& fs = g.server.explosion_flames;
++        CHECK(fs.active.size() == 2 && fs.live_particles() == 48 && !fs.failed);
++        CHECK(fs.active[0].settings.position.x == 0 && fs.active[0].settings.position.y == 0 &&
++              fs.active[0].settings.position.z == 60);
++        const auto& report = g.server.scene_explosions.back();
++        CHECK(report.flame_event && report.flame_error.empty() && !report.model_error.empty() &&
++              !report.client_fx_available && report.targets.null_damager && !report.targets.delivered);
++        CHECK(g.step(.11) && !g.objects.get(h) && fs.active.size() == 2);
++        SpriteView scene;
++        CHECK(update_sprite_scene(g, scene, error));
++        unsigned drawn = 0;
++        for (const auto& e : scene.entries)
++            if (e.flame_system)
++            {
++                CHECK(e.error.empty() && e.range != UINT32_MAX && e.alpha < 1);
++                ++drawn;
++            }
++        CHECK(drawn == 48);
++        const auto updates = fs.active[0].updates;
++        CHECK(update_sprite_scene(g, scene, error) && fs.active[0].updates == updates);
++        CHECK(!g.server.PublishExplosionFlames(h, 8, {}, {0, 1, 0}, error) && !error.empty());
++        CHECK(g.step(3) && fs.active.empty() && fs.expired == 2);
++        CHECK(g.unload_world() && fs.reports.empty() && !g.server.string_count() && !g.server.message_count());
++        return true;
++    }
++    bool private_world(const std::filesystem::path& root)
++    {
++        GameSession g;
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.initialize() && g.resources.mount_game(c, error));
++        std::uint64_t previous = 0;
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            // Explicit probe: this preset is not among SubwayA's nine grenade emitters.
++            auto h = test_explosion_flame::create(g);
++            CHECK(h && test_explosion_flame::trigger(g, h));
++            auto& fs = g.server.explosion_flames;
++            CHECK(fs.active.size() == 1 && fs.active[0].id > previous);
++            previous = fs.active[0].id;
++            const auto& report = g.server.scene_explosions.back();
++            CHECK(report.flame_error.empty() && report.sprite_error.empty() && report.model_error.empty() &&
++                  report.light_error.empty());
++            CHECK(g.server.explosion_sprites.reports.back().unavailable == "light illumination");
++            unsigned peak = 0;
++            std::uint64_t bursts = 0;
++            double dt = cycle == 0 ? .02 : cycle == 1 ? 1. / 60 : .05;
++            for (unsigned frame = 0; frame < static_cast<unsigned>(3 / dt); ++frame)
++            {
++                CHECK(g.step(dt));
++                SpriteView scene;
++                CHECK(update_sprite_scene(g, scene, error));
++                unsigned drawn = 0;
++                for (const auto& e : scene.entries)
++                    if (e.flame_system)
++                    {
++                        CHECK(e.error.empty() && e.range != UINT32_MAX &&
++                              e.frame_path == "SpriteTextures\\teslaprime_3.dtx");
++                        ++drawn;
++                    }
++                CHECK(drawn == fs.live_particles());
++                peak = std::max(peak, drawn);
++                if (!fs.active.empty())
++                    bursts = fs.active[0].bursts;
++            }
++            CHECK(fs.active.empty() && fs.expired == 1 && !fs.failed && peak > 24 && bursts == 8);
++            std::cout << "SubwayA diagnostic Tesla cycle " << cycle << ": peak " << peak
++                      << ", eight bursts observed, complete expiry\n";
++            CHECK(g.unload_world() && fs.reports.empty() && g.objects.snapshot().empty());
++            CHECK(!g.server.string_count() && !g.server.message_count());
++        }
++        std::vector<std::uint8_t> bytes;
++        World cathedral;
++        CHECK(g.resources.read("worlds/07_cathedral.dat", bytes, error) && read_world(bytes, cathedral, error));
++        unsigned authored = 0;
++        for (const auto& o : cathedral.objects)
++            if (o.class_name == "CClientExplosionSFX")
++            {
++                Properties props;
++                for (const auto& v : o.properties)
++                    props.emplace(v.name, v.value);
++                auto h = g.objects.create(g.objects.find_class(o.class_name), {}, Creation::World, props);
++                CHECK(h);
++                auto* emitter = dynamic_cast<CClientExplosionSFX*>(g.server.HandleToObject(h));
++                CHECK(emitter);
++                if (emitter->type == 8)
++                {
++                    ++authored;
++                    CHECK(test_explosion_flame::trigger(g, h));
++                    const auto& f = g.server.explosion_flames.active.back();
++                    CHECK(near(f.settings.position.y, emitter->position.y + 30) && f.particles.size() == 24);
++                    CHECK(g.server.scene_explosions.back().flame_error.empty());
++                    std::cout << "Authored Cathedral Tesla: " << g.server.GetObjectName(h)
++                              << ", 24 initial particles\n";
++                }
++                CHECK(g.objects.remove(h) && g.objects.finish_frame());
++            }
++        CHECK(authored == 3 && g.server.explosion_flames.active.size() == 3 && g.step(.35));
++        SpriteView scene;
++        CHECK(update_sprite_scene(g, scene, error));
++        unsigned drawn = 0;
++        for (const auto& e : scene.entries)
++            if (e.flame_system)
++            {
++                CHECK(e.error.empty() && e.range != UINT32_MAX);
++                ++drawn;
++            }
++        CHECK(drawn == 144 && g.step(3) && g.server.explosion_flames.active.empty());
++        CHECK(g.unload_world() && g.server.explosion_flames.reports.empty());
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string mode = argv[1];
++    return (mode == "zones"       ? zones(argv[2])
++            : mode == "lifecycle" ? lifecycle(argv[2])
++            : mode == "failures"  ? failures(argv[2])
++            : mode == "session"   ? session(argv[2])
++                                  : mode == "private" && private_world(argv[2]))
++               ? 0
++               : 1;
++}

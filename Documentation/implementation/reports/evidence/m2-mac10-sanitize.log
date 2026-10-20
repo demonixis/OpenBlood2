@@ -1,0 +1,253 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+        Start 578: weapon_impacts.private
+        Start 458: ai_runtime.subway
+  1/114 Test #458: ai_runtime.subway .................   Passed   54.76 sec
+        Start  41: world.destination_trial_private
+  2/114 Test  #41: world.destination_trial_private ...   Passed   37.21 sec
+        Start  69: weapons.private
+  3/114 Test #578: weapon_impacts.private ............   Passed  104.98 sec
+        Start  42: world.destination_private
+  4/114 Test  #42: world.destination_private .........   Passed   20.89 sec
+        Start 369: ai_fire.subway
+  5/114 Test #369: ai_fire.subway ....................   Passed   28.49 sec
+        Start 571: weapon_audio.private
+  6/114 Test #571: weapon_audio.private ..............   Passed    9.04 sec
+        Start 456: ai_runtime.catalog
+  7/114 Test #456: ai_runtime.catalog ................   Passed    5.59 sec
+        Start  54: services.private
+  8/114 Test  #54: services.private ..................   Passed   20.23 sec
+        Start 459: ai_runtime.arena
+  9/114 Test #459: ai_runtime.arena ..................   Passed    1.80 sec
+        Start  43: world.private
+ 10/114 Test  #43: world.private .....................   Passed    3.88 sec
+        Start 501: inventory_state.private
+ 11/114 Test #501: inventory_state.private ...........   Passed    5.81 sec
+        Start 460: ai_runtime.sparse_weapons
+ 12/114 Test #460: ai_runtime.sparse_weapons .........   Passed    0.60 sec
+        Start 368: ai_fire.catalog
+ 13/114 Test #368: ai_fire.catalog ...................   Passed    0.88 sec
+        Start 480: weapon_drops.catalog
+ 14/114 Test #480: weapon_drops.catalog ..............   Passed    0.53 sec
+        Start 457: ai_runtime.failures
+ 15/114 Test #457: ai_runtime.failures ...............   Passed    0.28 sec
+        Start 576: weapon_impacts.hearing
+ 16/114 Test #576: weapon_impacts.hearing ............   Passed    0.20 sec
+        Start 577: weapon_impacts.limits
+ 17/114 Test #577: weapon_impacts.limits .............   Passed    0.15 sec
+        Start  25: world.destination_trials
+ 18/114 Test  #25: world.destination_trials ..........   Passed    0.15 sec
+        Start 574: weapon_impacts.brushes
+ 19/114 Test #574: weapon_impacts.brushes ............   Passed    0.14 sec
+        Start 569: weapon_audio.callbacks
+ 20/114 Test #569: weapon_audio.callbacks ............   Passed    0.09 sec
+        Start 575: weapon_impacts.volumes
+ 21/114 Test #575: weapon_impacts.volumes ............   Passed    0.06 sec
+        Start 573: weapon_impacts.world
+ 22/114 Test #573: weapon_impacts.world ..............   Passed    0.06 sec
+        Start  28: world.destination_lifetime
+ 23/114 Test  #28: world.destination_lifetime ........   Passed    0.05 sec
+        Start 566: weapon_audio.voices
+ 24/114 Test #566: weapon_audio.voices ...............   Passed    0.05 sec
+        Start  37: world.mutations
+ 25/114 Test  #37: world.mutations ...................   Passed    0.20 sec
+        Start  46: services.model_rejection
+ 26/114 Test  #46: services.model_rejection ..........   Passed    0.30 sec
+        Start 567: weapon_audio.hearing
+ 27/114 Test #567: weapon_audio.hearing ..............   Passed    0.04 sec
+        Start 570: weapon_audio.lifetime
+ 28/114 Test #570: weapon_audio.lifetime .............   Passed    0.04 sec
+        Start 568: weapon_audio.failures
+ 29/114 Test #568: weapon_audio.failures .............   Passed    0.04 sec
+        Start  66: weapons.animation
+ 30/114 Test  #66: weapons.animation .................   Passed    0.28 sec
+        Start 474: weapon_drops.falling
+ 31/114 Test #474: weapon_drops.falling ..............   Passed    0.05 sec
+        Start 471: weapon_drops.collect
+ 32/114 Test #471: weapon_drops.collect ..............   Passed    0.04 sec
+        Start  30: world.sound_entries
+ 33/114 Test  #30: world.sound_entries ...............   Passed    0.04 sec
+        Start 446: ai_runtime.visibility_filter
+ 34/114 Test #446: ai_runtime.visibility_filter ......   Passed    0.02 sec
+        Start  29: world.sprite_entries
+ 35/114 Test  #29: world.sprite_entries ..............   Passed    0.04 sec
+        Start 475: weapon_drops.guards
+ 36/114 Test #475: weapon_drops.guards ...............   Passed    0.04 sec
+        Start 478: weapon_drops.callback
+ 37/114 Test #478: weapon_drops.callback .............   Passed    0.04 sec
+        Start 479: weapon_drops.missing_pickup
+ 38/114 Test #479: weapon_drops.missing_pickup .......   Passed    0.04 sec
+        Start   1: objects.builtin_model
+ 39/114 Test   #1: objects.builtin_model .............   Passed    0.03 sec
+        Start 472: weapon_drops.protocol
+ 40/114 Test #472: weapon_drops.protocol .............   Passed    0.04 sec
+        Start 473: weapon_drops.drop
+ 41/114 Test #473: weapon_drops.drop .................   Passed    0.04 sec
+        Start 476: weapon_drops.failures
+ 42/114 Test #476: weapon_drops.failures .............   Passed    0.04 sec
+        Start 477: weapon_drops.nosliding
+ 43/114 Test #477: weapon_drops.nosliding ............   Passed    0.04 sec
+        Start 572: weapon_impacts.selection
+ 44/114 Test #572: weapon_impacts.selection ..........   Passed    0.02 sec
+        Start 447: ai_runtime.visibility_atomic
+ 45/114 Test #447: ai_runtime.visibility_atomic ......   Passed    0.02 sec
+        Start 448: ai_runtime.lifetime
+ 46/114 Test #448: ai_runtime.lifetime ...............   Passed    0.02 sec
+        Start  52: services.placement_service
+ 47/114 Test  #52: services.placement_service ........   Passed    0.02 sec
+        Start  51: services.placement_queries
+ 48/114 Test  #51: services.placement_queries ........   Passed    0.02 sec
+        Start 455: ai_runtime.missing
+ 49/114 Test #455: ai_runtime.missing ................   Passed    0.02 sec
+        Start 454: ai_runtime.body
+ 50/114 Test #454: ai_runtime.body ...................   Passed    0.02 sec
+        Start  27: world.destination_schema
+ 51/114 Test  #27: world.destination_schema ..........   Passed    0.02 sec
+        Start 444: ai_runtime.activation
+ 52/114 Test #444: ai_runtime.activation .............   Passed    0.02 sec
+        Start 453: ai_runtime.triggers
+ 53/114 Test #453: ai_runtime.triggers ...............   Passed    0.02 sec
+        Start 449: ai_runtime.targets
+ 54/114 Test #449: ai_runtime.targets ................   Passed    0.02 sec
+        Start 452: ai_runtime.spatial
+ 55/114 Test #452: ai_runtime.spatial ................   Passed    0.02 sec
+        Start  26: world.destination_messages
+ 56/114 Test  #26: world.destination_messages ........   Passed    0.02 sec
+        Start 450: ai_runtime.tracking
+ 57/114 Test #450: ai_runtime.tracking ...............   Passed    0.02 sec
+        Start 451: ai_runtime.camera
+ 58/114 Test #451: ai_runtime.camera .................   Passed    0.02 sec
+        Start 367: ai_fire.lifetime
+ 59/114 Test #367: ai_fire.lifetime ..................   Passed    0.02 sec
+        Start 445: ai_runtime.visibility
+ 60/114 Test #445: ai_runtime.visibility .............   Passed    0.02 sec
+        Start  11: objects.unsupported_teardown
+ 61/114 Test  #11: objects.unsupported_teardown ......   Passed    0.04 sec
+        Start  36: world.world_rejection
+ 62/114 Test  #36: world.world_rejection .............   Passed    0.05 sec
+        Start 365: ai_fire.recovery
+ 63/114 Test #365: ai_fire.recovery ..................   Passed    0.02 sec
+        Start 361: ai_fire.head
+ 64/114 Test #361: ai_fire.head ......................   Passed    0.02 sec
+        Start 359: ai_fire.clearance
+ 65/114 Test #359: ai_fire.clearance .................   Passed    0.02 sec
+        Start 362: ai_fire.aim
+ 66/114 Test #362: ai_fire.aim .......................   Passed    0.02 sec
+        Start 364: ai_fire.cadence
+ 67/114 Test #364: ai_fire.cadence ...................   Passed    0.02 sec
+        Start 363: ai_fire.keys
+ 68/114 Test #363: ai_fire.keys ......................   Passed    0.02 sec
+        Start 366: ai_fire.failures
+ 69/114 Test #366: ai_fire.failures ..................   Passed    0.02 sec
+        Start 358: ai_fire.selection
+ 70/114 Test #358: ai_fire.selection .................   Passed    0.02 sec
+        Start 360: ai_fire.filters
+ 71/114 Test #360: ai_fire.filters ...................   Passed    0.02 sec
+        Start  10: objects.messages_strings
+ 72/114 Test  #10: objects.messages_strings ..........   Passed    0.04 sec
+        Start  12: objects.creation_failures
+ 73/114 Test  #12: objects.creation_failures .........   Passed    0.03 sec
+        Start  67: weapons.lifetime
+ 74/114 Test  #67: weapons.lifetime ..................   Passed    0.06 sec
+        Start 500: inventory_state.capture
+ 75/114 Test #500: inventory_state.capture ...........   Passed    0.04 sec
+        Start  38: world.session_lifecycle
+ 76/114 Test  #38: world.session_lifecycle ...........   Passed    0.02 sec
+        Start   4: objects.reasons_properties
+ 77/114 Test   #4: objects.reasons_properties ........   Passed    0.02 sec
+        Start 497: inventory_state.roundtrip
+ 78/114 Test #497: inventory_state.roundtrip .........   Passed    0.03 sec
+        Start   2: objects.original_objects
+ 79/114 Test   #2: objects.original_objects ..........   Passed    0.02 sec
+        Start   9: objects.links_lists
+ 80/114 Test   #9: objects.links_lists ...............   Passed    0.02 sec
+        Start   6: objects.deferred_removal
+ 81/114 Test   #6: objects.deferred_removal ..........   Passed    0.02 sec
+        Start   8: objects.handles_selection
+ 82/114 Test   #8: objects.handles_selection .........   Passed    0.02 sec
+        Start   3: objects.nested_creation
+ 83/114 Test   #3: objects.nested_creation ...........   Passed    0.02 sec
+        Start   5: objects.scheduling
+ 84/114 Test   #5: objects.scheduling ................   Passed    0.02 sec
+        Start  40: world.original_trigger
+ 85/114 Test  #40: world.original_trigger ............   Passed    0.02 sec
+        Start   7: objects.aggregate_dispatch
+ 86/114 Test   #7: objects.aggregate_dispatch ........   Passed    0.02 sec
+        Start  61: weapons.inventory
+ 87/114 Test  #61: weapons.inventory .................   Passed    0.04 sec
+        Start 498: inventory_state.malformed
+ 88/114 Test #498: inventory_state.malformed .........   Passed    0.03 sec
+        Start  64: weapons.melee
+ 89/114 Test  #64: weapons.melee .....................   Passed    0.04 sec
+        Start  68: weapons.rollback
+ 90/114 Test  #68: weapons.rollback ..................   Passed    0.04 sec
+        Start 499: inventory_state.rollback
+ 91/114 Test #499: inventory_state.rollback ..........   Passed    0.03 sec
+        Start  63: weapons.firing
+ 92/114 Test  #63: weapons.firing ....................   Passed    0.04 sec
+        Start  65: weapons.damage
+ 93/114 Test  #65: weapons.damage ....................   Passed    0.04 sec
+        Start  62: weapons.segments
+ 94/114 Test  #62: weapons.segments ..................   Passed    0.04 sec
+        Start  33: world.resource_mount
+ 95/114 Test  #33: world.resource_mount ..............   Passed    0.02 sec
+        Start  34: world.world_properties
+ 96/114 Test  #34: world.world_properties ............   Passed    0.02 sec
+        Start  35: world.world_geometry
+ 97/114 Test  #35: world.world_geometry ..............   Passed    0.02 sec
+        Start  32: world.rez_rejection
+ 98/114 Test  #32: world.rez_rejection ...............   Passed    0.02 sec
+        Start  31: world.rez_structure
+ 99/114 Test  #31: world.rez_structure ...............   Passed    0.02 sec
+        Start  39: world.session_messages
+100/114 Test  #39: world.session_messages ............   Passed    0.01 sec
+        Start  48: services.model_callbacks
+101/114 Test  #48: services.model_callbacks ..........   Passed    0.02 sec
+        Start  53: services.original_services
+102/114 Test  #53: services.original_services ........   Passed    0.02 sec
+        Start  47: services.animation_events
+103/114 Test  #47: services.animation_events .........   Passed    0.02 sec
+        Start  45: services.model_reader
+104/114 Test  #45: services.model_reader .............   Passed    0.02 sec
+        Start  50: services.movement_contacts
+105/114 Test  #50: services.movement_contacts ........   Passed    0.02 sec
+        Start  49: services.collision_queries
+106/114 Test  #49: services.collision_queries ........   Passed    0.01 sec
+        Start 673: mac10.collect
+107/114 Test #673: mac10.collect .....................   Passed    0.06 sec
+        Start 674: mac10.automatic
+108/114 Test #674: mac10.automatic ...................   Passed    0.94 sec
+        Start 675: mac10.damage
+109/114 Test #675: mac10.damage ......................   Passed    0.05 sec
+        Start 676: mac10.restore
+110/114 Test #676: mac10.restore .....................   Passed    0.05 sec
+        Start 677: mac10.drop
+111/114 Test #677: mac10.drop ........................   Passed    0.12 sec
+        Start 678: mac10.private
+112/114 Test #678: mac10.private .....................***Timeout  90.13 sec
+
+        Start 679: mac10.ai
+113/114 Test #679: mac10.ai ..........................   Passed    1.94 sec
+114/114 Test  #69: weapons.private ...................   Passed  212.96 sec
+
+99% tests passed, 1 tests failed out of 114
+
+Label Time Summary:
+ai_fire            =  29.56 sec*proc (12 tests)
+ai_runtime         =  63.25 sec*proc (17 tests)
+headless           = 604.98 sec*proc (114 tests)
+inventory_state    =   5.94 sec*proc (5 tests)
+mac10              =  93.27 sec*proc (7 tests)
+objects            =   0.27 sec*proc (12 tests)
+private            = 599.98 sec*proc (18 tests)
+services           =  20.66 sec*proc (10 tests)
+weapon_audio       =   9.31 sec*proc (6 tests)
+weapon_drops       =   0.88 sec*proc (10 tests)
+weapon_impacts     = 105.60 sec*proc (7 tests)
+weapons            = 213.54 sec*proc (9 tests)
+world              =  62.69 sec*proc (19 tests)
+
+Total Test time (real) = 304.95 sec
+
+The following tests FAILED:
+	678 - mac10.private (Timeout)                           headless mac10 private
+Errors while running CTest

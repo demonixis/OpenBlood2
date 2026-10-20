@@ -1,0 +1,23 @@
+[0/2] Re-checking globbed directories...
+[1/145] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[2/138] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[3/125] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[4/114] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[5/59] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[6/57] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[7/55] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[8/53] Generating CXX dyndep file tests/CMakeFiles/services_tests.dir/CXX.dd
+[9/51] Generating CXX dyndep file tests/CMakeFiles/player_tests.dir/CXX.dd
+[10/49] Generating CXX dyndep file tests/CMakeFiles/weapon_tests.dir/CXX.dd
+[11/47] Generating CXX dyndep file tests/CMakeFiles/movement_tests.dir/CXX.dd
+[12/45] Generating CXX dyndep file tests/CMakeFiles/locomotion_tests.dir/CXX.dd
+[13/43] Generating CXX dyndep file tests/CMakeFiles/door_tests.dir/CXX.dd
+[14/41] Generating CXX dyndep file tests/CMakeFiles/container_tests.dir/CXX.dd
+[15/39] Generating CXX dyndep file tests/CMakeFiles/trigger_tests.dir/CXX.dd
+[16/37] Generating CXX dyndep file tests/CMakeFiles/interaction_tests.dir/CXX.dd
+[17/35] Generating CXX dyndep file tests/CMakeFiles/explosion_tests.dir/CXX.dd
+[18/33] Generating CXX dyndep file tests/CMakeFiles/brush_tests.dir/CXX.dd
+[19/31] Generating CXX dyndep file tests/CMakeFiles/pushable_tests.dir/CXX.dd
+[20/29] Generating CXX dyndep file tests/CMakeFiles/pickup_tests.dir/CXX.dd
+[21/27] Generating CXX dyndep file tests/CMakeFiles/objectives_tests.dir/CXX.dd
+[22/25] Generating CXX dyndep file tests/CMakeFiles/camera_tests.dir/CXX.dd

@@ -1,0 +1,14 @@
+573/577 Testing: explosion_fragments.failures
+573/577 Test: explosion_fragments.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_fragment_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-fragments-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"explosion_fragments.failures" start time: Oct 16 21:32 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_fragments.failures" end time: Oct 16 21:32 CEST
+"explosion_fragments.failures" time elapsed: 00:00:00
+----------------------------------------------------------

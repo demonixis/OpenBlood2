@@ -1,0 +1,14 @@
+601/603 Testing: weapon_audio.callbacks
+601/603 Test: weapon_audio.callbacks
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon_audio_tests" "callbacks" "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon-audio-callbacks"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"weapon_audio.callbacks" start time: Oct 16 23:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_audio.callbacks" end time: Oct 16 23:03 CEST
+"weapon_audio.callbacks" time elapsed: 00:00:00
+----------------------------------------------------------

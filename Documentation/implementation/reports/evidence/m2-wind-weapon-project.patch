@@ -1,0 +1,1485 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index f12a067..6405e44 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -500,3 +500,5 @@ The [train-window correction](../Documentation/Implementation/M2_WORLD_ALPHA.md)
+ The [Naga weapon continuation](../Documentation/Implementation/M2_NAGA_WEAPON.md) adds the original eye weapon and red-small model beam. Read [contracts](docs/NAGA_WEAPON_CONTRACTS.md). Preserve different visual/damage filters, no-ammo semantics, silent alt, head_gun failure and null held models. Beam lifetime begins on first update and survives source removal; publication failures stay visible. The eye-impact composite and Gideon remain unavailable; M2 stays open.
+ 
+ The [energy projectile continuation](../Documentation/Implementation/M2_ENERGY_PROJECTILES.md) connects original CEnergyBlast and non-Zealot projectile flight, contacts and delayed damage. Read [contracts](docs/ENERGY_PROJECTILE_CONTRACTS.md). Preserve separate projectile sender/shooter attribution, null responsibility after unlink, strict expiry, direct-direction mutation and original contact exclusions. Point flight is replacement physics; trail/Tesla-primary composite and Gideon remain unavailable. Keep missing services explicit and M2 open.
++
++The [wind weapon continuation](../Documentation/Implementation/M2_WIND_WEAPON.md) connects original Gideon Wind and CBehemothShockwaveProjectile. Read [contracts](docs/WIND_WEAPON_CONTRACTS.md). Preserve the one-shot override, current-shooter ground query, center-distance450/full damage, owner exclusion/self inclusion, raw damage vectors/target positions and no AREAEFFECT flag. The uninitialized source ray endpoint is repaired explicitly; entry-face collision is replacement policy. Keep callback snapshots/reentrancy guards, independent FX/audio and truthful terminal history. Gideon/shield/powerup, safe NEW_LEVEL and M2 remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3593b35..78d9e14 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index 620599d..8669b66 100644
+--- a/README.md
++++ b/README.md
+@@ -544,3 +544,5 @@ NPC attack and train-glass reports remain unresolved; M2 is still incomplete.
+ The [Naga weapon continuation](../Documentation/Implementation/M2_NAGA_WEAPON.md) connects original eye-beam damage, AI fire-key aiming and the real red beam model as a prerequisite for Gideon. Its impact composite, Gideon itself and the actual M2 exit gate remain incomplete.
+ 
+ The [energy projectile continuation](../Documentation/Implementation/M2_ENERGY_PROJECTILES.md) adds original moving flare projectiles, deferred explosion damage, checked shooter attribution and real sprite/WAV presentation. This is a Gideon prerequisite; its remaining weapons/state lifecycle, missing FX and safe NEW_LEVEL keep M2 incomplete.
++
++The [wind weapon continuation](../Documentation/Implementation/M2_WIND_WEAPON.md) connects the original one-shot shockwave, full-radius damage and actual model/WAV presentation. The repaired ground query and checked callback lifetime are explicit. Gideon state/shield integration, required services and safe NEW_LEVEL keep M2 incomplete.
+diff --git a/docs/AI_RUNTIME_CONTRACTS.md b/docs/AI_RUNTIME_CONTRACTS.md
+index e637dff..5f7d054 100644
+--- a/docs/AI_RUNTIME_CONTRACTS.md
++++ b/docs/AI_RUNTIME_CONTRACTS.md
+@@ -131,3 +131,5 @@ Ordinary second-session binding remains forbidden; no automatic transfer or comp
+ The [interactive entry correction](SESSION_PLAYBACK_CONTRACTS.md) now holds application simulation until player entry, preventing the reproduced pre-player NPC suspension. Raw diagnostic stepping retains that boundary; broader combat and M2 remain incomplete.
+ 
+ The [Naga weapon continuation](NAGA_WEAPON_CONTRACTS.md) extends the supported NPC weapon subset with original eye-beam damage, head_gun aiming and red-small beam presentation. Gideon and the eye impact composite remain unavailable; earlier blanket weapon omissions are superseded only for this subset.
++
++The [wind/shockwave continuation](WIND_WEAPON_CONTRACTS.md) extends the runtime-only projectile subset with OT_NORMAL scale metadata and the original type20 model/light recipe. Earlier type/resource restrictions are superseded only for this bounded subset; production Gideon and M2 remain incomplete.
+diff --git a/docs/ENERGY_PROJECTILE_CONTRACTS.md b/docs/ENERGY_PROJECTILE_CONTRACTS.md
+index 6c2e66a..9cd1966 100644
+--- a/docs/ENERGY_PROJECTILE_CONTRACTS.md
++++ b/docs/ENERGY_PROJECTILE_CONTRACTS.md
+@@ -110,3 +110,5 @@ retains terminal histories, and Scene explosions retains component/audio reports
+ These clocks/history survive hidden UI. Rendering is read-only. Unload clears
+ objects, voices and histories. No mutable process-global state was added; isolated
+ destination rehearsal preserves the source projectile and aggregate lists.
++
++The [wind/shockwave continuation](WIND_WEAPON_CONTRACTS.md) extends the runtime-only projectile subset with OT_NORMAL scale metadata and the original type20 model/light recipe. Earlier type/resource restrictions are superseded only for this bounded subset; production Gideon and M2 remain incomplete.
+diff --git a/docs/EXPLOSION_LIGHT_CONTRACTS.md b/docs/EXPLOSION_LIGHT_CONTRACTS.md
+index 5470be2..226fbc6 100644
+--- a/docs/EXPLOSION_LIGHT_CONTRACTS.md
++++ b/docs/EXPLOSION_LIGHT_CONTRACTS.md
+@@ -96,3 +96,5 @@ illumination, safe automatic NEW_LEVEL and required services remain open.
+ Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
+ selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
+ are historical; fragments/flames, illumination and the full M2 gate remain open.
++
++The [wind/shockwave continuation](WIND_WEAPON_CONTRACTS.md) extends the runtime-only projectile subset with OT_NORMAL scale metadata and the original type20 model/light recipe. Earlier type/resource restrictions are superseded only for this bounded subset; production Gideon and M2 remain incomplete.
+diff --git a/docs/EXPLOSION_MODEL_CONTRACTS.md b/docs/EXPLOSION_MODEL_CONTRACTS.md
+index f43f979..5693cff 100644
+--- a/docs/EXPLOSION_MODEL_CONTRACTS.md
++++ b/docs/EXPLOSION_MODEL_CONTRACTS.md
+@@ -118,3 +118,5 @@ are historical; fragments/flames, illumination and the full M2 gate remain open.
+ Continuation: [original metal fragments](EXPLOSION_FRAGMENT_CONTRACTS.md) now supplies
+ selected grenade fragment motion/collision and rendering. Earlier blanket fragment
+ omissions are historical; smoke trails, other required services and M2 remain open.
++
++The [wind/shockwave continuation](WIND_WEAPON_CONTRACTS.md) extends the runtime-only projectile subset with OT_NORMAL scale metadata and the original type20 model/light recipe. Earlier type/resource restrictions are superseded only for this bounded subset; production Gideon and M2 remain incomplete.
+diff --git a/docs/M2_WIND_WEAPON_SOURCES.json b/docs/M2_WIND_WEAPON_SOURCES.json
+new file mode 100644
+index 0000000..ce2078f
+--- /dev/null
++++ b/docs/M2_WIND_WEAPON_SOURCES.json
+@@ -0,0 +1,90 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "64b5f6110211aeaddc67f1e4824aedddc7070ba7",
++  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/GameProjectiles.cpp",
++      "sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f",
++      "use": "CBehemothShockwaveProjectile constructor and Update, lines5055-5165"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/GameProjectiles.h",
++      "sha256": "9acd38645c28d90b508a0a55a02760bcea5c6c40318b6266635711d2ba1f1bc0",
++      "use": "Shockwave class and LIFELEECH_PUSH_RADIUS450"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Projectile.cpp",
++      "sha256": "52b805c67775579b5703e0ad1099a8ea44d76b245349c8f6d1fac0a1b3b74ef2",
++      "use": "Base lifecycle, Setup and default unused resource strings"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
++      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
++      "use": "Base projectile creation/setup branch"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/GameWeapons.cpp",
++      "sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd",
++      "use": "CGideonWind Fire and dormant vector-push branch analysis"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "use": "GIDEON_WIND name and generic firing branch"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
++      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
++      "use": "Dependency review only; no production boss integration"
++    },
++    {
++      "path": "sources/blood2/Shared/WeaponDefs.cpp",
++      "sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
++      "use": "Complete Gideon Wind WeaponData entry"
++    },
++    {
++      "path": "sources/blood2/Shared/SharedDefs.h",
++      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "use": "Base-game ID42 and TYPE_RIFLE0"
++    },
++    {
++      "path": "sources/blood2/Shared/SFXMsgIds.h",
++      "sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f",
++      "use": "EXP_SHOCKBALL_LARGE20"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
++      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
++      "use": "Original high-detail shockball model/light recipe3157-3207"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/basedefs_de.h",
++      "sha256": "10f543764aa94339f2e48edcba384dda3cdce2d738f0be2731dcff3a1117fb72",
++      "use": "IntersectQuery constructor leaves endpoints uninitialized"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/DVector.h",
++      "sha256": "00dbaaa87923d403af84be40850813a6d8ae0f0f24a107557f299249f3f922ae",
++      "use": "Empty default vector constructor confirms undefined ground endpoint"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
++      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
++      "use": "DamageObject preserves raw direction, target position, type byte and separate attacker identity"
++    }
++  ],
++  "adaptations": [
++    "Defined downward endpoint replaces original uninitialized read",
++    "Existing replacement solid entry-face ray skips enclosing bodies; retail parity unverified",
++    "Checked snapshot list traversal, reentrancy latch and deferred removal",
++    "Runtime-only normal projectile; finite scale metadata without render geometry",
++    "Owned high-detail model/light/audio and terminal inspection, no new mutable globals"
++  ],
++  "remaining": [
++    "Production Gideon initialization/states/rr_gun/shield/powerup",
++    "Dormant wind vector-push branch, other projectile families and save/restore",
++    "Surface illumination and complete retail presentation/physics parity",
++    "Safe NEW_LEVEL and actual M2 gate"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 92809ff..fcde38d 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -850,3 +850,7 @@ Original CNagaEyes, complete Naga Eye Beam definition, AI name/head-node branche
+ ## Energy projectile dependency
+ 
+ Selected original CEnergyBlast/CProjectile/CEnergyBlastProjectile methods and complete Energy Blast definition are integrated with typed checked transport and replacement point flight. See [ledger](M2_ENERGY_PROJECTILE_SOURCES.json) and [contracts](ENERGY_PROJECTILE_CONTRACTS.md). Zealot variants, trail/Tesla-primary composite and Gideon remain unavailable.
++
++## Original Gideon wind and shockwave
++
++Selected original Gideon Wind definition, projectile Update and high-detail model/light recipe are integrated. See [ledger](M2_WIND_WEAPON_SOURCES.json) and [contracts](WIND_WEAPON_CONTRACTS.md). The undefined ray endpoint is repaired, typed callback/lifetime checks are explicit, and production Gideon remains unported.
+diff --git a/docs/WIND_WEAPON_CONTRACTS.md b/docs/WIND_WEAPON_CONTRACTS.md
+new file mode 100644
+index 0000000..6c97156
+--- /dev/null
++++ b/docs/WIND_WEAPON_CONTRACTS.md
+@@ -0,0 +1,88 @@
++# Original Gideon wind and one-shot shockwave boundary
++
++Read [projectile lifetime](ENERGY_PROJECTILE_CONTRACTS.md),
++[damage](WEAPON_CONTRACTS.md), [AI firing](AI_FIRE_CONTRACTS.md),
++[model presentation](EXPLOSION_MODEL_CONTRACTS.md),
++[evaluated lights](EXPLOSION_LIGHT_CONTRACTS.md),
++[source ledger](M2_WIND_WEAPON_SOURCES.json) and
++[validation](../../Documentation/Implementation/M2_WIND_WEAPON.md).
++M2 is incomplete. This dependency does not register Gideon or Behemoth.
++
++## Original weapon route
++
++Both modes of the complete original Gideon Wind definition use weapon ID 42,
++TYPE_RIFLE **0**, AMMO_NONE, damage 10–20, zero projectile velocity/radius,
++range 75, one shot, reload 1/0 seconds, windfire.wav in all four sound slots,
++null held-model paths and CBehemothShockwaveProjectile. The source display name
++is oddly `Gideon_Shield`; it is retained. Player acquisition remains refused.
++
++The original projectile branch takes precedence over CGideonWind::FireVector's
++1200-unit velocity push. That dormant vector branch is **not** implemented and
++explicitly refuses direct calls; there is no invented push in ordinary wind fire.
++Existing CWeapon preflight, damage multiplier, retained audio/hearing, no-ammo
++semantics and checked Setup are reused. Energy now shares the original base
++FireProjectile creation/setup path; its sound override and behavior remain intact.
++GIDEON_WIND name selection and the generic AI r_gun/body-forward branch execute.
++Gideon's distinct rr_gun/extra/state overrides remain unported.
++
++The runtime-only shockwave is OT_NORMAL, has the original damage aggregate (HP5),
++source flags, dimensions, scale, and 0.001-second update schedule. Original fallback
++Grenade filename/skin strings are retained but OT_NORMAL binds no model or sprite.
++ScaleObject now retains finite nonnegative scale on OT_NORMAL; this metadata does
++not produce geometry. No projectile flight phase runs for this stationary one-shot.
++Its first Update overrides ordinary projectile contact/death/expiry processing.
++It samples the shooter's **current** position, publishes FX/audio, traverses the
++original destructible list and returns false for deferred removal.
++
++## Defined ground query and damage
++
++The reference reads uninitialized `iq.m_To` while adding `(0,-1000,0)`.
++The port explicitly uses `from + (0,-1000,0)`. This is a necessary defined-behavior
++repair, not a claim about the undefined retail result. The checked solid-only
++ray uses the existing entry-face/SkipInterior policy, includes other solid objects
++and primary geometry, and has no owner/class filter. Skipping enclosing bodies
++is a replacement-engine policy, not verified retail physics parity. On hit,
++position/normal come from the hit. On miss, the original shooter position and raw
++normal `(0,-1000,0)` remain. Unavailable/invalid collision fails before effects or
++damage; losing the shooter before Update fails instead of reading an invalid pose.
++
++Damage snapshots original CDestructable list order before callbacks. A null source
++object terminates that snapshot; stale/removed targets are skipped. The shooter
++is excluded. Every other destructible whose **center** is at distance <=450 receives
++the full selected damage, including the projectile itself. There is no visibility
++filter, dimension expansion, distance falloff or solid-object requirement.
++The raw direction is target position minus blast center. Damage position is the
++**target position**, type EXPLODE, with no AREAEFFECT flag. The projectile sends the
++message while the shooter remains the responsible attacker. This is deliberately
++separate from DamageObjectsInRadius's different falloff/flags/origin rules.
++
++Checked identities survive callbacks; removal of projectile/shooter cancels remaining
++work, target removal skips later delivery, and callback-created objects are not added
++to the snapshot. A latch prevents nested MID_UPDATE from duplicating or prematurely
++finishing the one-shot. Destruction remains deferred. Delivery totals do not imply
++health changes, and interrupted partial traversals remain visible.
++
++## Presentation, lifetime and inspection
++
++The original high-detail EXP_SHOCKBALL_LARGE (20) recipe uses exp_sphere.abc and
++bmothball.dtx, scales 200→1500 with sqrt(time/duration), duration 0.5 s, alpha 0.5
++with linear fade, per-update local-up rotation 0.05, and no random orientation or
++recipe RNG draw. It has no position offset. The white evaluated light lasts 1 s,
++radius 400→100, and uses `position + raw_normal * 15`; the unusual -15000 Y offset
++on a ground-ray miss is retained. This light is inspection state, not illumination.
++The actual time/explode.wav is detached, inner/outer radii 100/1000, misc-medium
++priority. Model, light and sound are independent of source removal and each other;
++missing resources remain reported and do not suppress original damage.
++
++Existing Scene explosions inspection shows model/skin/geometry, clocks, alpha,
++light state and audio failures. Objects show the pending original projectile;
++weapon inspection resolves its checked child handle. The bounded terminal history
++retains ground-ray endpoints/result, blast center/normal, candidates, in-radius
++count, deliveries, interruption and failures after the one-shot disappears.
++Rendering is read-only; no extra player integration or mutable process global is
++introduced. Destination rehearsal retains source projectile/owner identity and
++cleans its temporary original lists. Unload clears reports, voices, models and lights.
++
++High-detail visual recipes, unlit alpha rendering and the replacement ray policy
++are not retail renderer/physics parity. Gideon initialization/states/shield/powerup,
++remaining required FX/services, safe NEW_LEVEL and the actual M2 gate remain open.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index da69ec8..5590de9 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -607,7 +607,7 @@ namespace OpenBlood2
+                                     object->contact_normal.y, object->contact_normal.z, object->contact_polygon);
+                         if (const auto* projectile = dynamic_cast<const CProjectile*>(object->game.get()))
+                         {
+-                            ImGui::Text("Original energy projectile | configured %s | contact %s | steps %llu",
++                            ImGui::Text("Original projectile | configured %s | contact %s | steps %llu",
+                                         projectile->configured ? "yes" : "no", projectile->m_bExplode ? "yes" : "no",
+                                         (unsigned long long)projectile->flight_steps);
+                             ImGui::Text("Damage %.2f / radius %d / HP %.2f / start %.3f / lifetime %.2f",
+@@ -722,6 +722,18 @@ namespace OpenBlood2
+                             ImGui::Text("%.3f %s: %s at %.2f %.2f %.2f / delivered %u", report.time,
+                                         report.source.c_str(), report.outcome.c_str(), report.position.x,
+                                         report.position.y, report.position.z, report.delivered);
++                            if (report.shockwave)
++                            {
++                                ImGui::Text("Shockwave ground query %d: %.1f %.1f %.1f -> %.1f %.1f %.1f",
++                                            int(report.query), report.query_from.x, report.query_from.y,
++                                            report.query_from.z, report.query_to.x, report.query_to.y,
++                                            report.query_to.z);
++                                ImGui::Text("Blast %.1f %.1f %.1f / normal %.1f %.1f %.1f / candidates %u / in radius "
++                                            "%u / interrupted %s",
++                                            report.blast_position.x, report.blast_position.y, report.blast_position.z,
++                                            report.blast_normal.x, report.blast_normal.y, report.blast_normal.z,
++                                            report.candidates, report.in_radius, report.cancelled ? "yes" : "no");
++                            }
+                             if (!report.error.empty())
+                                 ImGui::TextWrapped("Failure: %s", report.error.c_str());
+                         }
+@@ -1560,12 +1572,12 @@ namespace OpenBlood2
+ {
+     void Inspector::draw_weapon_sound(const CWeapon& weapon, const GameSession& game)
+     {
+-        if (const auto* energy = dynamic_cast<const CEnergyBlast*>(&weapon))
++        if (weapon.data.m_szProjectileClass)
+         {
+-            ImGui::Text("Energy projectile alive: %s",
+-                        BaseClass::GetServerDE()->IsObjectAlive(energy->projectile) ? "yes" : "no");
+-            if (!energy->projectile_error.empty())
+-                ImGui::TextWrapped("Projectile: %s", energy->projectile_error.c_str());
++            ImGui::Text("Original projectile alive: %s",
++                        BaseClass::GetServerDE()->IsObjectAlive(weapon.projectile) ? "yes" : "no");
++            if (!weapon.projectile_error.empty())
++                ImGui::TextWrapped("Projectile: %s", weapon.projectile_error.c_str());
+         }
+         if (const auto* naga = dynamic_cast<const CNagaEyes*>(&weapon))
+         {
+diff --git a/src/game/explosion_lights.cpp b/src/game/explosion_lights.cpp
+index 03bf7dc..f1f2df9 100644
+--- a/src/game/explosion_lights.cpp
++++ b/src/game/explosion_lights.cpp
+@@ -14,6 +14,17 @@ namespace OpenBlood2
+             error = "Explosion requires a finite position and nonzero normal";
+             return false;
+         }
++        if (type == 20)
++        {
++            ExplosionLightSettings s;
++            s.position = vector_add(position, vector_scale(normal, 15)); // Raw source normal, even on a ray miss.
++            s.color1 = s.color2 = {1, 1, 1};
++            s.duration = 1;
++            s.radius1 = 400;
++            s.radius2 = 100;
++            out.push_back(s);
++            return true;
++        }
+         if (type > 3 && type != 6 && type != 8)
+         {
+             error = "Explosion light recipe is unavailable";
+diff --git a/src/game/explosion_models.cpp b/src/game/explosion_models.cpp
+index 89e5974..4b01856 100644
+--- a/src/game/explosion_models.cpp
++++ b/src/game/explosion_models.cpp
+@@ -14,6 +14,24 @@ namespace OpenBlood2
+             error = "Explosion requires a finite position and nonzero normal";
+             return false;
+         }
++        if (type == 20)
++        {
++            ExplosionModelSettings s;
++            s.position = position;
++            s.normal = normal;
++            s.scale1 = {200, 200, 200};
++            s.scale2 = {1500, 1500, 1500};
++            s.rotations = {.05f, 0, 0};
++            s.duration = .5f;
++            s.alpha = .5f;
++            s.waveform = 1;
++            s.fade = 1;
++            s.random_rotation = 0;
++            s.model = "Models\\Explosions\\exp_sphere.abc";
++            s.skin = "Skins\\Explosions\\bmothball.dtx";
++            output = std::move(s);
++            return true;
++        }
+         if (type == 6)
+             return true; // Original napalm fireball has no model component.
+         if (type > 3 && type != 8)
+diff --git a/src/game/original/AIFire.cpp b/src/game/original/AIFire.cpp
+index d8a18de..60c1fd1 100644
+--- a/src/game/original/AIFire.cpp
++++ b/src/game/original/AIFire.cpp
+@@ -1,5 +1,5 @@
+ // Selected original AI_Mgr.cpp:3204-3539,4469-4528,5612-5670.
+-// See AI_FIRE_CONTRACTS.md: supported vector weapons only; no full AI_Update.
++// See AI_FIRE_CONTRACTS.md and the Naga/energy/wind continuations for supported aiming branches.
+ #include "AI_Mgr.h"
+ #include "engine/collision.h"
+ #include <cmath>
+@@ -124,7 +124,8 @@ bool AI_Mgr::Fire(bool alternate)
+     if (!weapon)
+         return fail(FireResult::Unavailable, "AI has no current weapon");
+     if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_MELEE &&
+-        weapon->data.m_nType != WEAP_NAGA_EYEBEAM && weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST)
++        weapon->data.m_nType != WEAP_NAGA_EYEBEAM && weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST &&
++        weapon->data.m_nType != WEAP_GIDEON_WIND)
+         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
+     DRotation rotation;
+     const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM;
+diff --git a/src/game/original/AIRuntime.cpp b/src/game/original/AIRuntime.cpp
+index 50b3996..0aea60d 100644
+--- a/src/game/original/AIRuntime.cpp
++++ b/src/game/original/AIRuntime.cpp
+@@ -17,6 +17,8 @@ namespace
+             id = WEAP_BERETTA;
+         else if (name.starts_with("ENERGY_BLAST"))
+             id = WEAP_ZEALOT_ENERGYBLAST;
++        else if (name.starts_with("GIDEON_WIND"))
++            id = WEAP_GIDEON_WIND;
+         else if (name.starts_with("NAGA_BLAST"))
+             id = WEAP_NAGA_EYEBEAM;
+         else if (name.starts_with("MELEE"))
+diff --git a/src/game/original/EnergyBlast.cpp b/src/game/original/EnergyBlast.cpp
+index e0ea3ca..4d1c9e4 100644
+--- a/src/game/original/EnergyBlast.cpp
++++ b/src/game/original/EnergyBlast.cpp
+@@ -14,31 +14,3 @@ const char* CEnergyBlast::FireSound(bool alternate) const
+                 return "sounds\\enemies\\gideon\\distfire.wav";
+     return CWeapon::FireSound(alternate);
+ }
+-FireResult CEnergyBlast::FireProjectile()
+-{
+-    projectile = nullptr;
+-    projectile_error.clear();
+-    auto* server = BaseClass::GetServerDE();
+-    if (!server || !firing || !server->IsObjectAlive(m_hOwner))
+-        return last_shot.result = FireResult::Invalid;
+-    ObjectCreateStruct state;
+-    state.m_Pos = last_shot.request.position;
+-    legacy_copy(state.m_Name, "EnergyBlastProjectile");
+-    auto* instance =
+-        dynamic_cast<CEnergyBlastProjectile*>(server->CreateObject(server->GetClass("CEnergyBlastProjectile"), &state));
+-    if (!instance)
+-    {
+-        projectile_error = "Original energy projectile creation/resource binding failed";
+-        return last_shot.result = FireResult::Unavailable;
+-    }
+-    const bool alt = last_shot.request.alternate;
+-    if (!instance->Setup(last_shot.direction, data.m_nType, last_shot.damage * m_pInventoryMgr->damage_multiplier,
+-                         alt ? data.m_fAltProjVelocity : data.m_fProjVelocity,
+-                         alt ? data.m_nAltDamageRadius : data.m_nDamageRadius, m_hOwner))
+-    {
+-        projectile_error = instance->error;
+-        return last_shot.result = FireResult::Unavailable;
+-    }
+-    projectile = instance->m_hObject;
+-    return last_shot.result = FireResult::Fired;
+-}
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index 7d286e7..baf9a0d 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -122,7 +122,7 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
+         return InventoryResult::NotAvailable;
+     if (!m_hOwner || !BaseClass::GetServerDE()->HandleToObject(m_hOwner) || slot < -1 || slot >= 10)
+         return InventoryResult::Invalid;
+-    if ((type == WEAP_NAGA_EYEBEAM || type == WEAP_ZEALOT_ENERGYBLAST) &&
++    if ((type == WEAP_NAGA_EYEBEAM || type == WEAP_ZEALOT_ENERGYBLAST || type == WEAP_GIDEON_WIND) &&
+         dynamic_cast<CPlayerObj*>(BaseClass::GetServerDE()->HandleToObject(m_hOwner)))
+         return InventoryResult::NotAvailable; // Player view/save support is a separate contract.
+     int empty = -1;
+@@ -172,6 +172,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
+         weapon = std::make_unique<CNagaEyes>();
+     else if (type == WEAP_ZEALOT_ENERGYBLAST)
+         weapon = std::make_unique<CEnergyBlast>();
++    else if (type == WEAP_GIDEON_WIND)
++        weapon = std::make_unique<CGideonWind>();
+     else
+         return InventoryResult::NotAvailable;
+     weapon->Init(m_hOwner, this, left);
+diff --git a/src/game/original/Projectile.cpp b/src/game/original/Projectile.cpp
+index 54a70bc..34d9d8c 100644
+--- a/src/game/original/Projectile.cpp
++++ b/src/game/original/Projectile.cpp
+@@ -6,7 +6,7 @@
+ #include "radius_damage.h"
+ #include <cmath>
+ using namespace OpenBlood2;
+-CProjectile::CProjectile() : BaseClass(OT_SPRITE)
++CProjectile::CProjectile(DBYTE type) : BaseClass(type)
+ {
+     AddAggregate(&m_damage);
+ }
+@@ -21,8 +21,21 @@ void CProjectile::Finish(const char* outcome)
+ {
+     DVector position;
+     g_pServerDE->GetObjectPos(m_hObject, &position);
+-    g_pServerDE->RecordProjectile(
+-        {g_pServerDE->GetObjectName(m_hObject), outcome, error, position, g_pServerDE->GetTime(), targets.delivered});
++    ProjectileReport report{
++        g_pServerDE->GetObjectName(m_hObject), outcome, error, position, g_pServerDE->GetTime(), targets.delivered};
++    report.cancelled = targets.cancelled;
++    report.candidates = targets.candidates;
++    report.in_radius = targets.in_radius;
++    if (const auto* wave = dynamic_cast<const CBehemothShockwaveProjectile*>(this))
++    {
++        report.shockwave = true;
++        report.query_from = wave->ground_from;
++        report.query_to = wave->ground_to;
++        report.query = wave->ground_result;
++        report.blast_position = wave->blast_position;
++        report.blast_normal = wave->blast_normal;
++    }
++    g_pServerDE->RecordProjectile(report);
+     g_pServerDE->RemoveObject(m_hObject); // Destruction stays deferred through all callbacks.
+ }
+ DDWORD CProjectile::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+@@ -34,14 +47,14 @@ DDWORD CProjectile::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+             return 0;
+         const auto result = BaseClass::EngineMessageFn(message, data, reason);
+         auto& state = *static_cast<ObjectCreateStruct*>(data);
+-        legacy_copy(state.m_Filename, "Sprites\\yellowflare2.spr");
+-        legacy_copy(state.m_SkinName, "Skins\\Ammo\\Grenade.dtx"); // Source fallback, unused for a sprite.
++        legacy_copy(state.m_Filename, filename ? filename : "");
++        legacy_copy(state.m_SkinName, skin ? skin : "");
+         state.m_NextUpdate = .001f;
+         return result;
+     }
+     if (message == MID_INITIALUPDATE && !InitialUpdate())
+         Fail("Projectile initialization failed");
+-    else if (message == MID_UPDATE && !Update() && !failed)
++    else if (message == MID_UPDATE && g_pServerDE->IsObjectAlive(m_hObject) && !Update() && !failed)
+         Finish(exploded ? "exploded" : "expired");
+     else if (message == MID_LINKBROKEN)
+     {
+diff --git a/src/game/original/Projectile.h b/src/game/original/Projectile.h
+index fc58d6a..b4e7ac8 100644
+--- a/src/game/original/Projectile.h
++++ b/src/game/original/Projectile.h
+@@ -7,9 +7,9 @@
+ class CProjectile : public BaseClass
+ {
+   public:
+-    CProjectile();
++    explicit CProjectile(DBYTE type = OT_SPRITE);
+     bool Setup(DVector, DBYTE, float damage, float speed, int radius, HOBJECT);
+-    bool AdvanceFlight(double seconds);
++    virtual bool AdvanceFlight(double seconds);
+     void HandleContact(const OpenBlood2::SegmentHit&);
+     void Explode();
+     CDestructable m_damage;
+@@ -28,6 +28,8 @@ class CProjectile : public BaseClass
+ 
+   protected:
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    const char* filename = "Models\\Ammo\\Grenade.abc";
++    const char* skin = "Skins\\Ammo\\Grenade.dtx";
+     virtual bool InitialUpdate();
+     virtual bool Update();
+     virtual void AddExplosion(DVector, DVector) = 0;
+@@ -36,8 +38,32 @@ class CProjectile : public BaseClass
+ };
+ class CEnergyBlastProjectile final : public CProjectile
+ {
++  public:
++    CEnergyBlastProjectile()
++    {
++        filename = "Sprites\\yellowflare2.spr";
++        skin = "Skins\\Ammo\\Grenade.dtx";
++    }
++
+   protected:
+     bool InitialUpdate() override;
+     bool Update() override;
+     void AddExplosion(DVector, DVector) override;
+ };
++
++class CBehemothShockwaveProjectile final : public CProjectile
++{
++  public:
++    CBehemothShockwaveProjectile() : CProjectile(OT_NORMAL) {}
++    DVector ground_from{}, ground_to{}, blast_position{}, blast_normal{};
++    OpenBlood2::SegmentResult ground_result = OpenBlood2::SegmentResult::Unavailable;
++    OpenBlood2::SegmentHit ground_hit;
++    OpenBlood2::SceneExplosionReport effect;
++    bool AdvanceFlight(double) override
++    {
++        return !failed;
++    } // One update at the shooter's current position.
++  protected:
++    bool Update() override;
++    void AddExplosion(DVector, DVector) override;
++};
+diff --git a/src/game/original/Shockwave.cpp b/src/game/original/Shockwave.cpp
+new file mode 100644
+index 0000000..25cfa28
+--- /dev/null
++++ b/src/game/original/Shockwave.cpp
+@@ -0,0 +1,112 @@
++// Selected original GameProjectiles.cpp:5055-5165. See WIND_WEAPON_CONTRACTS.md.
++#include "Projectile.h"
++#include "engine/collision.h"
++#include <cmath>
++#include <vector>
++using namespace OpenBlood2;
++void CBehemothShockwaveProjectile::AddExplosion(DVector position, DVector normal)
++{
++    auto& report = effect;
++    report = {};
++    report.source = g_pServerDE->GetObjectName(m_hObject);
++    report.position = position;
++    report.normal = normal;
++    report.type = 20; // EXP_SHOCKBALL_LARGE: original high-detail model and one evaluated light.
++    report.damage = m_fDamage;
++    report.radius = 450;
++    report.model_event = g_pServerDE->PublishExplosionModels(m_hObject, 20, position, normal, report.model_error);
++    report.light_event = g_pServerDE->PublishExplosionLights(m_hObject, 20, position, normal, report.light_error);
++    SoundRequest request;
++    report.sound = request.resource = "Sounds\\Weapons\\time\\explode.wav";
++    request.inner_radius = 100;
++    request.outer_radius = 1000;
++    request.priority = 1;
++    report.voice = g_pServerDE->PlayDetachedSound(m_hObject, request, position, report.sound_error);
++    // FX/audio precede damage, independently of their success. The owned report
++    // is recorded after traversal so inspection contains the real delivery counts.
++}
++bool CBehemothShockwaveProjectile::Update()
++{
++    if (exploded)
++        return true; // A nested update cannot finish/remove the outer callback.
++    if (failed)
++        return false;
++    if (!configured || !g_pServerDE->IsObjectAlive(m_hFiredFrom))
++        return Fail("Shockwave requires a configured live shooter at its first update");
++    // Latch before callbacks: a damage receiver must not re-enter this one-shot.
++    exploded = true;
++    DVector position, normal{0, -1000, 0};
++    if (g_pServerDE->GetObjectPos(m_hFiredFrom, &position) != DE_OK)
++        return Fail("Shockwave shooter position unavailable");
++    ground_from = position;
++    // Original iq.m_To += normal reads uninitialized storage. Define the intended
++    // downward segment explicitly. Skip enclosing bodies, as for existing entry-face rays.
++    ground_to = vector_add(position, normal);
++    ground_result =
++        g_pServerDE->IntersectSegment(ground_from, ground_to, nullptr, ground_hit, false, SegmentObjects::SolidOnly,
++                                      SegmentFilter::None, SegmentStart::SkipInterior);
++    if (ground_result != SegmentResult::Hit && ground_result != SegmentResult::Miss)
++        return Fail("Shockwave ground query unavailable/invalid");
++    if (ground_result == SegmentResult::Hit)
++    {
++        position = ground_hit.point;
++        normal = ground_hit.normal;
++    }
++    blast_position = position;
++    blast_normal = normal;
++    AddExplosion(position, normal);
++    // Preserve original destructible-list order and center-distance cutoff. This
++    // deliberately is NOT DamageObjectsInRadius: no falloff, dimensions or LOS.
++    std::vector<HOBJECT> snapshot;
++    snapshot.reserve(CDestructable::m_dwNumDestructables);
++    auto& head = CDestructable::m_DestructableHead;
++    for (auto* link = head.m_pNext; link && link != &head; link = link->m_pNext)
++    {
++        auto target = static_cast<CDestructable*>(link->m_pData)->m_hObject;
++        if (!target)
++            break; // Original null-object terminates traversal.
++        snapshot.push_back(target);
++    }
++    targets.candidates = static_cast<unsigned>(snapshot.size());
++    const auto shooter = m_hFiredFrom;
++    for (auto target : snapshot)
++    {
++        if (!g_pServerDE->IsObjectAlive(m_hObject) || !g_pServerDE->IsObjectAlive(shooter))
++        {
++            targets.cancelled = true;
++            break;
++        }
++        if (target == shooter || !g_pServerDE->IsObjectAlive(target))
++            continue;
++        DVector point;
++        if (g_pServerDE->GetObjectPos(target, &point) != DE_OK)
++        {
++            targets.cancelled = true;
++            break;
++        }
++        const auto direction = vector_subtract(point, position);
++        if (std::sqrt(vector_dot(direction, direction)) > 450.f)
++            continue;
++        ++targets.in_radius;
++        auto message = g_pServerDE->StartMessageToObject(this, target, damage_message);
++        if (!message)
++        {
++            targets.cancelled = true;
++            break;
++        }
++        const auto written =
++            g_pServerDE->WriteDamage(message, {direction, point, m_fDamage, DamageType::Explode, shooter});
++        const auto delivered = g_pServerDE->EndMessage(message);
++        if (written != DE_OK || delivered != DE_OK)
++        {
++            targets.cancelled = true;
++            break;
++        }
++        ++targets.delivered;
++    }
++    if (targets.cancelled)
++        error = "Shockwave damage traversal interrupted or unavailable";
++    effect.targets = targets;
++    g_pServerDE->RecordSceneExplosion(effect);
++    return false; // Original Update returns DFALSE: parent removes after the callback.
++}
+diff --git a/src/game/original/Weapon.cpp b/src/game/original/Weapon.cpp
+index 7b15634..67a5a90 100644
+--- a/src/game/original/Weapon.cpp
++++ b/src/game/original/Weapon.cpp
+@@ -6,10 +6,6 @@
+ #include <random>
+ 
+ using namespace OpenBlood2;
+-FireResult CWeapon::FireProjectile()
+-{
+-    return last_shot.result = FireResult::Unavailable;
+-}
+ float CWeapon::CheckAmmo() const
+ {
+     return data.m_nAmmoType == AMMO_NONE ? 1.0f
+diff --git a/src/game/original/Weapon.h b/src/game/original/Weapon.h
+index ad03a38..417e8f3 100644
+--- a/src/game/original/Weapon.h
++++ b/src/game/original/Weapon.h
+@@ -79,6 +79,8 @@ class CWeapon
+     FireResult Fire(const OpenBlood2::WeaponFire&);
+     virtual const char* FireSound(bool alternate) const;
+     virtual FireResult FireProjectile();
++    HOBJECT projectile = nullptr; // Checked independent runtime child, never owning.
++    std::string projectile_error;
+     virtual FireResult FireVector();
+     std::vector<WeaponImpact> impacts; // Latest validated shot attempt, bounded to 64 contacts.
+     std::string impact_error;
+@@ -111,9 +113,17 @@ class CEnergyBlast final : public CWeapon
+   public:
+     CEnergyBlast() : CWeapon(WEAP_ZEALOT_ENERGYBLAST) {}
+     const char* FireSound(bool alternate) const override;
+-    FireResult FireProjectile() override;
+-    HOBJECT projectile = nullptr; // Checked, independent runtime child.
+-    std::string projectile_error;
++};
++class CGideonWind final : public CWeapon
++{
++  public:
++    CGideonWind() : CWeapon(WEAP_GIDEON_WIND) {}
++    FireResult FireVector() override
++    {
++        // Both original definitions select the shockwave projectile. The unused
++        // 1200-unit vector push branch is not part of this integration.
++        return last_shot.result = FireResult::Unavailable;
++    }
+ };
+ class CBeretta final : public CWeapon
+ {
+diff --git a/src/game/original/WeaponDefs.cpp b/src/game/original/WeaponDefs.cpp
+index be52a51..8499508 100644
+--- a/src/game/original/WeaponDefs.cpp
++++ b/src/game/original/WeaponDefs.cpp
+@@ -241,6 +241,65 @@ namespace
+             nullptr,                               // Icon for status bar
+             nullptr,                               // Highlighted icon for status bar
+         },
++
++        {
++            "Models\\Weapons\\knifec_pv.abc",        // Model
++            "Models\\Weapons\\knifec_pv.abc",        // Model
++            "Skins\\Weapons\\knifec_pv_t.dtx",       // Skin
++            nullptr,                                 // Model
++            nullptr,                                 // Skin
++            WEAP_GIDEON_WIND,                        // Type
++            TYPE_RIFLE,                              // Fire type
++            AMMO_NONE,                               // Ammo type
++            1,                                       // Ammo Use
++            1,                                       // Alt Ammo Use
++            10.0f,                                   // Min Damage
++            20.0f,                                   // Max Damage
++            10.0f,                                   // Min Alt damage
++            20.0f,                                   // Max Alt damage
++            1.00f,                                   // Reload time
++            0.0f,                                    // Alt reload time
++            {0.0f, 0.0f},                            // Spread
++            {0.0f, 0.0f},                            // Alt Spread
++            0.0f,                                    // Projectile Velocity
++            0.0f,                                    // Alt Projectile Velocity
++            75.0f,                                   // Range
++            75.0f,                                   // Alt Range
++            1,                                       // Shots per fire
++            1,                                       // Alt Shots per fire
++            1,                                       // Strength or Magic required
++            0,                                       // Two-handed Strength or Magic required
++            0,                                       // Damage Radius (projectiles)
++            0,                                       // Alt Damage Radius (projectiles)
++            DFALSE,                                  // Alt fire zoom
++            DFALSE,                                  // Semi-auto
++            "Sounds\\Enemies\\Gideon\\windfire.wav", // Fire sound
++            "Sounds\\Enemies\\Gideon\\windfire.wav", // Alt Fire sound
++            "Sounds\\Enemies\\Gideon\\windfire.wav", // Empty weapon sound
++            "Sounds\\Enemies\\Gideon\\windfire.wav", // Alt Empty weapon sound
++            "CBehemothShockwaveProjectile",          // Projectile class
++            "CBehemothShockwaveProjectile",          // Alt Projectile class
++            0,                                       // Muzzle Flash radius
++            {0.0f, 0.0f, 0.0f},                      // Muzzle Flash color
++            "Gideon_Shield",                         // Name
++            0,                                       // Name ID (resource)
++            "",                                      // flash sprite name
++            "",                                      // alt flash Sprite name
++            0.25f,                                   // Flash duration
++            0.10f,                                   // Flash scale
++            {0.0f, 0.0f, 0.0f},                      // 3rd person gun offset
++            {0.0f, -1.4f, 0.3f},                     // 1st person gun Offset
++            {0.0f, 0.0f, 0.0f},                      // Muzzle Offset
++            {0.03f, 0.03f, 0.15f},                   // Recoil
++            {0.0f, 0.0f, 0.1f},                      // Flash position
++            0.625f,                                  // Eject interval
++            0.0f,                                    // View kick
++            DFALSE,                                  // View kick is Cumulative
++            DFALSE,                                  // Animation looping
++            DFALSE,                                  // Alt anim looping
++            nullptr,                                 // Icon for status bar
++            nullptr,                                 // Highlighted icon for status bar
++        },
+     };
+ }
+ const WeaponData* weapon_definition(DBYTE type)
+diff --git a/src/game/original/WeaponDefs.h b/src/game/original/WeaponDefs.h
+index b5c1345..c8b2afb 100644
+--- a/src/game/original/WeaponDefs.h
++++ b/src/game/original/WeaponDefs.h
+@@ -1,8 +1,10 @@
+ #pragma once
+ #include "basedefs_de.h"
+ // Selected original definitions; complete source fields, base-game weapon numbering.
+-inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38, WEAP_ZEALOT_ENERGYBLAST = 27;
+-inline constexpr DBYTE TYPE_PISTOL = 2, TYPE_MELEE = 4, AMMO_NONE = 0, AMMO_BULLET = 1, AMMO_SHELL = 2, AMMO_BMG = 3;
++inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38, WEAP_ZEALOT_ENERGYBLAST = 27,
++                       WEAP_GIDEON_WIND = 42;
++inline constexpr DBYTE TYPE_RIFLE = 0, TYPE_PISTOL = 2, TYPE_MELEE = 4, AMMO_NONE = 0, AMMO_BULLET = 1, AMMO_SHELL = 2,
++                       AMMO_BMG = 3;
+ inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_KNIFE = 366;
+ // Weapon spread structure
+ typedef struct Spread_t
+diff --git a/src/game/original/WeaponProjectile.cpp b/src/game/original/WeaponProjectile.cpp
+new file mode 100644
+index 0000000..b4775c6
+--- /dev/null
++++ b/src/game/original/WeaponProjectile.cpp
+@@ -0,0 +1,34 @@
++#include "InventoryMgr.h"
++#include "Projectile.h"
++#include "Weapon.h"
++using namespace OpenBlood2;
++FireResult CWeapon::FireProjectile()
++{
++    projectile = nullptr;
++    projectile_error.clear();
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !m_pInventoryMgr || !firing || !server->IsObjectAlive(m_hOwner))
++        return last_shot.result = FireResult::Invalid;
++    const bool alt = last_shot.request.alternate;
++    const auto* name = alt ? data.m_szAltProjectileClass : data.m_szProjectileClass;
++    if (!name)
++        return last_shot.result = FireResult::Unavailable;
++    ObjectCreateStruct state;
++    state.m_Pos = last_shot.request.position;
++    legacy_copy(state.m_Name, name);
++    auto* instance = dynamic_cast<CProjectile*>(server->CreateObject(server->GetClass(name), &state));
++    if (!instance)
++    {
++        projectile_error = "Original projectile creation/resource binding failed";
++        return last_shot.result = FireResult::Unavailable;
++    }
++    if (!instance->Setup(last_shot.direction, data.m_nType, last_shot.damage * m_pInventoryMgr->damage_multiplier,
++                         alt ? data.m_fAltProjVelocity : data.m_fProjVelocity,
++                         alt ? data.m_nAltDamageRadius : data.m_nDamageRadius, m_hOwner))
++    {
++        projectile_error = instance->error;
++        return last_shot.result = FireResult::Unavailable;
++    }
++    projectile = instance->m_hObject;
++    return last_shot.result = FireResult::Fired;
++}
+diff --git a/src/game/projectile_report.h b/src/game/projectile_report.h
+index cef604f..63164e8 100644
+--- a/src/game/projectile_report.h
++++ b/src/game/projectile_report.h
+@@ -9,5 +9,9 @@ namespace OpenBlood2
+         DVector position{};
+         double time = 0;
+         unsigned delivered = 0;
++        bool shockwave = false, cancelled = false;
++        DVector query_from{}, query_to{}, blast_position{}, blast_normal{};
++        SegmentResult query = SegmentResult::Unavailable;
++        unsigned candidates = 0, in_radius = 0;
+     };
+ } // namespace OpenBlood2
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index d1c66ce..7d9653f 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -64,6 +64,8 @@ namespace OpenBlood2
+                               {"Gravity", false, false},
+                               {"TouchNotify", false, false},
+                               {"Rayhit", false, false}}};
++        const ClassInfo shockwave_projectile{
++            "CBehemothShockwaveProjectile", &base, construct<CBehemothShockwaveProjectile>, {}};
+         const ClassInfo energy_projectile{"CEnergyBlastProjectile", &base, construct<CEnergyBlastProjectile>, {}};
+         const ClassInfo hand_model{"CHandWeaponModel", &base, construct<CHandWeaponModel>, {}};
+         const ClassInfo b2base{
+@@ -680,7 +682,7 @@ namespace OpenBlood2
+                objects.register_class(door) && objects.register_class(rotating_door) &&
+                objects.register_class(destructable_brush) && objects.register_class(rotating_brush) &&
+                objects.register_class(hand_model) && objects.register_class(corpse) &&
+-               objects.register_class(energy_projectile);
++               objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_activation.cpp b/src/game/server_activation.cpp
+index 4b04ef8..e76e006 100644
+--- a/src/game/server_activation.cpp
++++ b/src/game/server_activation.cpp
+@@ -20,8 +20,9 @@ namespace OpenBlood2
+         trace_service("ScaleObject");
+         auto* r = objects_.get(h);
+         if (!r || r->life != Life::Alive || r->attachment ||
+-            (r->state.m_ObjectType != OT_MODEL && r->state.m_ObjectType != OT_SPRITE) || !physics_vector(scale) ||
+-            scale.x < 0 || scale.y < 0 || scale.z < 0 ||
++            (r->state.m_ObjectType != OT_MODEL && r->state.m_ObjectType != OT_SPRITE &&
++             r->state.m_ObjectType != OT_NORMAL) ||
++            !physics_vector(scale) || scale.x < 0 || scale.y < 0 || scale.z < 0 ||
+             (r->state.m_ObjectType == OT_MODEL && (scale.x == 0 || scale.y == 0 || scale.z == 0)))
+             return false;
+         r->state.m_Scale = scale;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index ebc3f35..b576055 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1232,3 +1232,27 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.energy_private PROPERTIES LABELS "gpu;private;energy" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+     endif()
+ endif()
++
++add_executable(wind_tests wind_tests.cpp ../src/app/model_scene.cpp)
++target_link_libraries(wind_tests PRIVATE blood2_game)
++blood2_project_options(wind_tests)
++foreach(case weapon failure callbacks recipe ai)
++    add_test(NAME wind.${case} COMMAND wind_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/wind-${case}")
++    set_tests_properties(wind.${case} PROPERTIES LABELS "headless;wind" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME wind.private COMMAND wind_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(wind.private PROPERTIES LABELS "headless;private;wind" TIMEOUT 90)
++endif()
++
++if(BLOOD2_GPU_TESTS)
++    add_executable(wind_gpu_tests wind_gpu_tests.cpp ../src/app/model_scene.cpp)
++    target_link_libraries(wind_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(wind_gpu_tests)
++    add_test(NAME gpu.wind COMMAND wind_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/wind-gpu")
++    set_tests_properties(gpu.wind PROPERTIES LABELS "gpu;wind" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.wind_private COMMAND wind_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/wind-private-gpu" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.wind_private PROPERTIES LABELS "gpu;private;wind" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    endif()
++endif()
+diff --git a/tests/ai_runtime_tests.cpp b/tests/ai_runtime_tests.cpp
+index e1c6343..59a24f0 100644
+--- a/tests/ai_runtime_tests.cpp
++++ b/tests/ai_runtime_tests.cpp
+@@ -276,7 +276,11 @@ namespace
+         CHECK(g.server.ScaleObject(h, {2, 3, 4}) && g.objects.get(h)->state.m_Scale.y == 3);
+         CHECK(!g.server.ScaleObject(h, {0, 1, 1}) && !g.server.ScaleObject(h, {1, INFINITY, 1}));
+         auto normal = object(g);
+-        CHECK(normal && !g.server.ScaleObject(normal, {1, 1, 1}));
++        CHECK(normal && g.server.ScaleObject(normal, {2, 3, 4})); // Original OT_NORMAL projectile metadata.
++        CHECK(g.objects.get(normal)->state.m_Scale.x == 2 && g.objects.get(normal)->state.m_Scale.y == 3 &&
++              g.objects.get(normal)->state.m_Scale.z == 4 && !g.objects.get(normal)->model &&
++              !g.objects.get(normal)->sprite);
++        CHECK(!g.server.ScaleObject(normal, {-1, 1, 1}));
+         g.world.min = {-100, -100, -100};
+         g.world.max = {100, 100, 100};
+         g.world.models.emplace_back();
+diff --git a/tests/wind_fixture.h b/tests/wind_fixture.h
+new file mode 100644
+index 0000000..eb3f6d3
+--- /dev/null
++++ b/tests/wind_fixture.h
+@@ -0,0 +1,45 @@
++#pragma once
++#include "energy_fixture.h"
++#include "explosion_model_fixture.h"
++namespace test_wind
++{
++    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error)
++    {
++        if (!test_energy::mount(resources, root, error) || !test_explosion_model::mount(resources, root, error))
++            return false;
++        test_player::Directory dir;
++        std::vector<std::uint8_t> skin;
++        if (!resources.read("alpha.dtx", skin, error))
++            return false;
++        dir.children["skins"].children["explosions"].files["bmothball.dtx"] = skin;
++        dir.children["sounds"].children["enemies"].children["gideon"].files["windfire.wav"] = test_audio::wave();
++        dir.children["sounds"].children["weapons"].children["time"].files["explode.wav"] = test_audio::wave();
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [offset, size] = test_player::write_dir(w, dir);
++        w.patch(131, offset);
++        w.patch(135, size);
++        auto file = root / "wind.rez";
++        std::ofstream out(file, std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        return resources.mount(file, error);
++    }
++    inline CGideonWind* equip(test_energy::Actor* actor)
++    {
++        if (!actor || !actor->inventory.Init(actor->m_hObject, nullptr) ||
++            actor->inventory.ObtainWeapon(WEAP_GIDEON_WIND, 0) != InventoryResult::Ok)
++            return nullptr;
++        return dynamic_cast<CGideonWind*>(actor->inventory.CurrentWeapon());
++    }
++    inline CBehemothShockwaveProjectile* fire(OpenBlood2::GameSession& g, CGideonWind* weapon, bool alt = false)
++    {
++        if (!weapon || weapon->Fire({{0, 50, 0}, {0, 0, 1}, 42, WEAP_GIDEON_WIND, alt, false}) != FireResult::Fired)
++            return nullptr;
++        return dynamic_cast<CBehemothShockwaveProjectile*>(g.server.HandleToObject(weapon->projectile));
++    }
++} // namespace test_wind
+diff --git a/tests/wind_gpu_tests.cpp b/tests/wind_gpu_tests.cpp
+new file mode 100644
+index 0000000..3d2581b
+--- /dev/null
++++ b/tests/wind_gpu_tests.cpp
+@@ -0,0 +1,126 @@
++#include "app/model_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "wind_fixture.h"
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x " " << error << " " << SDL_GetError() << "\n";                            \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool render(Runtime& runtime, WorldRenderer& renderer, ModelView& scene, DVector eye, DRotation camera,
++                Capture& capture, std::vector<std::uint8_t>& pixels, std::string& error)
++    {
++        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300)) ||
++            !renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true))
++            return false;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        if (!commands)
++            return false;
++        if (!renderer.draw(commands, capture.texture, scene.mesh, scene.world_draws, eye, camera, false, error))
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 300;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 300;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
++            return false;
++        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        if (!data)
++            return false;
++        pixels.assign(data, data + 400 * 300 * 4);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    Runtime runtime;
++    std::string error;
++    CHECK(runtime.initialize(true, error));
++    WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
++    GameSession g;
++    if (argc == 3)
++    {
++        Config config;
++        config.data_dir = argv[2];
++        CHECK(g.initialize() && g.resources.mount_game(config, error));
++        CHECK(g.request_world("01_SubwayA", error));
++    }
++    else
++    {
++        CHECK(test_player::setup(g, argv[1]) && test_wind::mount(g.resources, argv[1], error));
++    }
++    auto* owner = test_energy::actor(g, {0, 50, 0});
++    auto* weapon = test_wind::equip(owner);
++    auto* projectile = test_wind::fire(g, weapon);
++    CHECK(projectile);
++    CHECK(g.objects.engine_message(projectile->m_hObject, MID_UPDATE, nullptr));
++    CHECK(g.server.explosion_models.active.size() == 1 && g.objects.finish_frame());
++    const auto start = g.server.explosion_models.active[0].start_time;
++    CHECK(g.server.explosion_models.advance(start + .125));
++    const auto& fx = g.server.explosion_models.active[0];
++    CHECK(fx.scale.x == 850 && fx.alpha == .375f);
++    // Isolate the actual model/skin/pose; translation only centers the diagnostic camera.
++    ModelView scene;
++    CHECK(scene.add(fx.model.get(), fx.animation, fx.skin_path, {{}, fx.rotation}, fx.scale, true, false, {},
++                    "wind shockwave", g.resources, error, {}, fx.alpha, true));
++    CHECK(scene.world_draws.size() == 1 && scene.entries[0].error.empty());
++    std::error_code directory_error;
++    std::filesystem::create_directories(argv[1], directory_error);
++    CHECK(!directory_error);
++    DVector eye{0, 0, -3000};
++    DRotation camera;
++    if (argc == 2)
++    {
++        const auto a = scene.mesh.vertices[0].position, b = scene.mesh.vertices[1].position,
++                   c = scene.mesh.vertices[2].position;
++        const auto ab = vector_subtract(b, a), ac = vector_subtract(c, a);
++        DVector normal{ab.y * ac.z - ab.z * ac.y, ab.z * ac.x - ab.x * ac.z, ab.x * ac.y - ab.y * ac.x};
++        normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
++        CHECK(align_rotation(normal, camera));
++        eye = vector_subtract(vector_scale(vector_add(vector_add(a, b), c), 1.f / 3), vector_scale(normal, 3000));
++    }
++    Capture capture;
++    std::vector<std::uint8_t> pixels;
++    CHECK(render(runtime, renderer, scene, eye, camera, capture, pixels, error));
++    unsigned ink = 0;
++    for (unsigned i = 0; i < 400 * 300; ++i)
++        if (pixels[i * 4] != 6 || pixels[i * 4 + 1] != 9 || pixels[i * 4 + 2] != 13)
++            ++ink;
++    CHECK(ink > 50 && ink < 100000);
++    CHECK(capture.save((std::filesystem::path(argv[1]) / "wind-shockwave.png").c_str()));
++    std::cout << "Original shockwave scale850 alpha.375: " << scene.entries[0].triangles << " triangles, " << ink
++              << " changed pixels\n";
++    CHECK(g.server.explosion_models.advance(start + .5) && g.server.explosion_models.active.empty());
++    scene.clear();
++    renderer.clear_geometry();
++    CHECK(g.unload_world() && g.server.explosion_lights.active.empty() && g.server.audio.voices().empty());
++    CHECK(scene.world_draws.empty() && CDestructable::m_dwNumDestructables == 0);
++    return 0;
++}
+diff --git a/tests/wind_tests.cpp b/tests/wind_tests.cpp
+new file mode 100644
+index 0000000..eeb111d
+--- /dev/null
++++ b/tests/wind_tests.cpp
+@@ -0,0 +1,320 @@
++#include "app/model_scene.h"
++#include "game/original/AI_Mgr.h"
++#include "wind_fixture.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .001f;
++    }
++    bool setup(GameSession& g, const std::filesystem::path& root, bool assets = true)
++    {
++        CHECK(test_player::setup(g, root));
++        std::string error;
++        CHECK(!assets || test_wind::mount(g.resources, root, error));
++        return true;
++    }
++    bool weapon(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* owner = test_energy::actor(g, {100, 50, 100});
++        auto* w = test_wind::equip(owner);
++        CHECK(w && w->data.m_nType == 42 && w->data.m_nFireType == 0 && w->CheckAmmo() == 1);
++        CHECK(w->data.m_fProjVelocity == 0 && w->data.m_nDamageRadius == 0 && w->data.m_fRange == 75);
++        CHECK(w->data.m_fReloadTime == 1 && w->data.m_fAltReloadTime == 0 && w->ShowHandModel(true) &&
++              !w->m_hHandModel);
++        auto* target = test_energy::actor(g, {100, 0, 550}); // Exact 450, from projected ground point.
++        auto* outside = test_energy::actor(g, {100, 0, 550.1f});
++        auto* inside = test_energy::actor(g, {110, 0, 100});
++        CHECK(target && outside && inside);
++        ObjectCreateStruct wall;
++        wall.m_Pos = {100, 50, 300};
++        wall.m_Flags = FLAG_SOLID;
++        auto obstacle = g.objects.create(g.objects.find_class("BaseClass"), wall);
++        CHECK(obstacle);
++        g.objects.get(obstacle)->dimensions = {50, 100, 10}; // Occlusion does not suppress source shockwave damage.
++        auto* p = test_wind::fire(g, w);
++        CHECK(p && p->m_fDamage >= 10 && p->m_fDamage <= 20 && p->m_fVelocity == 0);
++        auto h = p->m_hObject;
++        CHECK(g.objects.get(h)->state.m_ObjectType == OT_NORMAL && !g.objects.get(h)->model &&
++              !g.objects.get(h)->sprite);
++        CHECK(target->damage.m_fHitPoints == 1000 && w->sounds_played == 1 && !w->last_shot.damage_delivered);
++        CHECK(g.objects.advance(.0005) && g.objects.get(h) && target->damage.m_fHitPoints == 1000);
++        CHECK(g.objects.advance(.0015) && !g.objects.get(h));
++        CHECK(near(target->damage.m_fHitPoints, 1000 - w->last_shot.damage));
++        CHECK(near(inside->damage.m_fHitPoints, target->damage.m_fHitPoints) && outside->damage.m_fHitPoints == 1000);
++        CHECK(owner->damage.m_fHitPoints == 1000); // Three deliveries below include the projectile itself.
++        CHECK(target->damage.last_damage.type == DamageType::Explode && !target->damage.last_damage.area_effect);
++        CHECK(target->last_sender == h && target->damage.last_damage.attacker == owner->m_hObject);
++        CHECK(near(target->damage.last_damage.direction.z, 450) && near(target->damage.last_damage.position.z, 550));
++        auto report = g.server.projectile_reports.back();
++        CHECK(report.shockwave && report.outcome == "exploded" && report.delivered == 3 && report.in_radius == 3);
++        CHECK(report.query == SegmentResult::Hit && near(report.query_from.x, 100) && near(report.query_to.y, -950));
++        CHECK(near(report.blast_position.y, 0) && near(report.blast_normal.y, 1));
++        CHECK(g.server.scene_explosions.back().voice && g.server.scene_explosions.back().type == 20 &&
++              g.server.scene_explosions.back().targets.delivered == report.delivered);
++        CHECK(g.server.explosion_models.active.size() == 1 && g.server.explosion_lights.active.size() == 1);
++        CHECK(g.objects.finish_frame() && !g.objects.get(h));
++        auto* alt = test_wind::fire(g, w, true);
++        CHECK(alt && w->sounds_played == 2 && w->FireVector() == FireResult::Unavailable);
++        std::string error;
++        CHECK(g.enter_player(error));
++        CHECK(g.server_shell.Player(g.local_client)->m_InventoryMgr.ObtainWeapon(42) == InventoryResult::NotAvailable);
++        std::cout << "Original ID42 both modes, no ammo/held model, first-update source-centered 450-unit full damage, "
++                     "owner exclusion/self inclusion verified.\n";
++        return true;
++    }
++    bool failure(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root, false));
++        auto* owner = test_energy::actor(g, {0, 50, 0});
++        auto* w = test_wind::equip(owner);
++        CHECK(w);
++        auto* target = test_energy::actor(g, {0, 0, 100});
++        CHECK(target);
++        auto* p = test_wind::fire(g, w);
++        CHECK(p);
++        auto h = p->m_hObject;
++        CHECK(g.objects.advance(.002) && target->damage.m_fHitPoints < 1000);
++        CHECK(!g.server.scene_explosions.back().model_error.empty() &&
++              !g.server.scene_explosions.back().sound_error.empty());
++        CHECK(g.server.explosion_lights.active.size() == 1 &&
++              g.objects.finish_frame()); // Missing presentation does not suppress damage.
++        p = test_wind::fire(g, w);
++        CHECK(p);
++        h = p->m_hObject;
++        g.server.collision_ready = false;
++        CHECK(g.objects.advance(.002) && g.server.projectile_reports.back().outcome == "failed");
++        CHECK(g.server.projectile_reports.back().delivered == 0 && g.objects.finish_frame() && !g.objects.get(h));
++        g.server.collision_ready = true;
++        p = test_wind::fire(g, w);
++        CHECK(p);
++        h = p->m_hObject;
++        CHECK(g.objects.remove(owner->m_hObject) && g.objects.finish_frame() && !p->m_hFiredFrom);
++        CHECK(g.objects.advance(.002) && g.server.projectile_reports.back().outcome == "failed");
++        CHECK(g.objects.finish_frame() && !g.objects.get(h));
++        CHECK(g.objects.create(g.objects.find_class("CBehemothShockwaveProjectile"), {}, Creation::World) == nullptr);
++        auto raw = g.objects.create(g.objects.find_class("CBehemothShockwaveProjectile"));
++        CHECK(raw);
++        CHECK(g.objects.advance(.002) && g.objects.finish_frame() && !g.objects.get(raw));
++        std::cout << "Missing presentation preserves damage; missing shooter/setup/collision fails without blast; "
++                     "authored creation rejected.\n";
++        return true;
++    }
++    struct Receiver : test_energy::Actor
++    {
++        Objects* objects = nullptr;
++        HOBJECT wave = nullptr, remove = nullptr;
++        unsigned received = 0;
++        bool spawn_on_damage = false;
++        HOBJECT spawned = nullptr;
++        DDWORD ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD data) override
++        {
++            auto result = Actor::ObjectMessageFn(sender, message, data);
++            if (message == damage_message)
++            {
++                ++received;
++                if (wave)
++                    objects->engine_message(wave, MID_UPDATE, nullptr);
++                if (remove)
++                    GetServerDE()->RemoveObject(remove);
++                if (spawn_on_damage)
++                {
++                    ObjectCreateStruct state;
++                    state.m_Pos = {0, 0, 150};
++                    if (auto* child = GetServerDE()->CreateObject(GetServerDE()->GetClass("WindReceiver"), &state))
++                        spawned = child->m_hObject;
++                }
++            }
++            return result;
++        }
++    };
++    bool callbacks(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        ClassInfo type{"WindReceiver",
++                       g.objects.find_class("BaseClass"),
++                       []() -> std::unique_ptr<BaseClass> { return std::make_unique<Receiver>(); },
++                       {}};
++        CHECK(g.objects.register_class(type));
++        for (unsigned mode = 0; mode < 4; ++mode)
++        {
++            auto* owner = test_energy::actor(g, {0, 50, 0});
++            auto* w = test_wind::equip(owner);
++            CHECK(w);
++            const auto owner_handle = owner->m_hObject;
++            auto* later = mode == 3 ? test_energy::actor(g, {0, 0, 200}) : nullptr;
++            const auto later_handle = later ? later->m_hObject : nullptr;
++            ObjectCreateStruct state;
++            state.m_Pos = {0, 0, 100};
++            auto h = g.objects.create(&type, state);
++            auto* r = dynamic_cast<Receiver*>(g.server.HandleToObject(h));
++            CHECK(r);
++            auto* p = test_wind::fire(g, w);
++            CHECK(p);
++            auto shot = p->m_hObject;
++            r->objects = &g.objects;
++            r->wave = shot;
++            r->remove = mode == 0 ? nullptr : mode == 1 ? shot : mode == 2 ? owner_handle : later_handle;
++            r->spawn_on_damage = mode == 3;
++            auto before = g.server.scene_explosions.size();
++            CHECK(g.objects.advance(.002) && r->received == 1 && g.server.scene_explosions.size() == before + 1);
++            CHECK(g.server.projectile_reports.back().delivered >= 1);
++            CHECK(g.server.projectile_reports.back().cancelled == (mode == 1 || mode == 2));
++            if (mode == 3)
++            {
++                CHECK(!g.objects.get(later_handle) && g.server.IsObjectAlive(r->spawned));
++                auto* child = dynamic_cast<Receiver*>(g.server.HandleToObject(r->spawned));
++                CHECK(child && child->received == 0 && child->damage.m_fHitPoints == 1000);
++                CHECK(g.objects.remove(r->spawned));
++            }
++            CHECK(g.objects.finish_frame() && !g.objects.get(shot) && g.server.message_count() == 0);
++            CHECK(g.objects.remove(h));
++            if (g.server.IsObjectAlive(owner_handle))
++                CHECK(g.objects.remove(owner_handle));
++            CHECK(g.objects.finish_frame());
++        }
++        CHECK(g.unload_world() && CDestructable::m_dwNumDestructables == 0 && g.server.audio.voices().empty());
++        std::cout << "Nested update cannot duplicate shockwave; receiver removes projectile/shooter safely, no "
++                     "dangling messages or global-list entries.\n";
++        return true;
++    }
++    bool recipe(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* owner = test_energy::actor(g, {2000, 50, 2000});
++        auto* w = test_wind::equip(owner);
++        CHECK(w);
++        auto* p = test_wind::fire(g, w);
++        CHECK(p);
++        CHECK(g.objects.advance(.002) && g.server.projectile_reports.back().query == SegmentResult::Miss);
++        CHECK(near(g.server.projectile_reports.back().blast_normal.y, -1000));
++        CHECK(g.server.explosion_models.active.size() == 1 && g.server.explosion_lights.active.size() == 1);
++        const auto& model = g.server.explosion_models.active[0];
++        const auto& light = g.server.explosion_lights.active[0];
++        CHECK(near(model.settings.position.x, 2000) && near(model.settings.position.y, 50));
++        CHECK(model.settings.scale1.x == 200 && model.settings.scale2.x == 1500 && model.settings.rotations.x == .05f);
++        CHECK(model.settings.alpha == .5f && model.settings.waveform == 1 && model.settings.fade == 1 &&
++              model.settings.random_rotation == 0);
++        CHECK(light.settings.position.y == -14950 && light.settings.radius1 == 400 && light.settings.radius2 == 100);
++        std::minstd_rand random(1), unchanged(1);
++        std::optional<ExplosionModelSettings> settings;
++        std::string error;
++        CHECK(original_explosion_model(20, {}, {0, 1, 0}, random, settings, error) && random == unchanged);
++        const auto start = model.start_time;
++        CHECK(g.server.explosion_models.advance(start + .125) &&
++              near(g.server.explosion_models.active[0].scale.x, 850));
++        CHECK(near(g.server.explosion_models.active[0].alpha, .375f));
++        auto count = g.server.audio.voices().size();
++        CHECK(count == 2);
++        CHECK(g.objects.remove(owner->m_hObject) && g.objects.finish_frame());
++        CHECK(g.server.audio.voices().size() == count - 1 && g.server.explosion_models.active.size() == 1);
++        CHECK(g.server.explosion_models.advance(start + .5) && g.server.explosion_models.active.empty());
++        CHECK(g.server.explosion_lights.advance(start + 1) && g.server.explosion_lights.active.empty());
++        std::cout << "Miss keeps raw downward normal; source model 200->1500/sqrt, alpha.5, rotation.05; white "
++                     "light400->100; detached lifetimes verified.\n";
++        return true;
++    }
++    bool ai(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* target = test_energy::actor(g, {0, 50, 100});
++        CHECK(target);
++        auto h = g.objects.create(g.objects.find_class("AI_Mgr"));
++        auto* a = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h));
++        CHECK(a);
++        CHECK(a->m_InventoryMgr.Init(h, nullptr) && a->m_InventoryMgr.ObtainWeapon(42, 0) == InventoryResult::Ok);
++        auto model = std::make_shared<Model>();
++        std::string error;
++        CHECK(read_model(test_model::abc().b, *model, error));
++        model->nodes[1].name = "r_gun";
++        auto* r = g.objects.get(h);
++        r->model = model;
++        r->state.m_ObjectType = OT_MODEL;
++        r->state.m_Pos = {0, 50, 0};
++        a->m_vTargetPos = {0, 50, 100};
++        for (auto& animation : model->animations)
++            for (auto& key : animation.keys)
++                key.text.clear();
++        model->animations[0].keys = {{0, {}, {}, "[fire_key:1]"}, {100, {}, {}, ""}};
++        r->state.m_Flags |= FLAG_MODELKEYS;
++        g.server.SetModelAnimation(h, 0);
++        CHECK(a->SetNewTarget(target->m_hObject));
++        CHECK(g.server.advance_models(.01) && a->fire_shots == 1 && a->clear_shot.rays == 1);
++        CHECK(target->damage.m_fHitPoints == 1000); // FIRE_KEY creates flight; no immediate vector damage.
++        const auto* weapon = a->m_InventoryMgr.CurrentWeapon();
++        CHECK(weapon && dynamic_cast<CBehemothShockwaveProjectile*>(g.server.HandleToObject(weapon->projectile)));
++        std::cout << "Original generic r_gun FIRE_KEY creates a shockwave with no immediate vector damage.\n";
++        return true;
++    }
++    bool private_data(const std::filesystem::path& root)
++    {
++        GameSession g;
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.initialize() && g.resources.mount_game(config, error));
++        for (unsigned i = 0; i < 3; ++i)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            auto* owner = test_energy::actor(g, {0, 170, -2400});
++            auto* w = test_wind::equip(owner);
++            CHECK(w);
++            auto* p = test_wind::fire(g, w);
++            CHECK(p && w->sounds_played == 1);
++            auto h = p->m_hObject;
++            WorldMessage message;
++            CHECK(original_world_request("01_SubwayA", 0, 1, 1, message));
++            CHECK(g.rehearse_destination(message, "", error) && g.objects.get(h) &&
++                  p->m_hFiredFrom == owner->m_hObject);
++            CHECK(g.objects.engine_message(h, MID_UPDATE,
++                                           nullptr)); // Isolated original callback, not forced production boss AI.
++            CHECK(g.server.explosion_models.active.size() == 1 && g.server.explosion_lights.active.size() == 1);
++            CHECK(g.server.scene_explosions.back().voice && g.server.scene_explosions.back().model_error.empty());
++            const auto& fx = g.server.explosion_models.active[0];
++            ModelView view;
++            CHECK(view.add(fx.model.get(), fx.animation, fx.skin_path, {fx.settings.position, fx.rotation}, fx.scale,
++                           true, false, {}, "shockwave", g.resources, error, {}, fx.alpha, true));
++            CHECK(view.entries.size() == 1 && view.entries[0].error.empty() && !view.world_draws.empty());
++            std::cout << "Private loop " << i << ": actual windfire/explode WAV, " << view.mesh.vertices.size() / 3
++                      << " model triangles, deliveries " << p->targets.delivered
++                      << ", rehearsal retains shooter/projectile.\n";
++            CHECK(g.unload_world() && CDestructable::m_dwNumDestructables == 0 && g.server.audio.voices().empty());
++            CHECK(g.server.explosion_models.active.empty() && g.server.explosion_lights.active.empty() &&
++                  g.server.projectile_reports.empty());
++            CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string name = argv[1];
++    return (name == "weapon"      ? weapon(argv[2])
++            : name == "failure"   ? failure(argv[2])
++            : name == "callbacks" ? callbacks(argv[2])
++            : name == "recipe"    ? recipe(argv[2])
++            : name == "ai"        ? ai(argv[2])
++            : name == "private"   ? private_data(argv[2])
++                                  : false)
++               ? 0
++               : 1;
++}

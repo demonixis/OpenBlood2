@@ -1,0 +1,15 @@
+Authored exit2 -> 02_cityhub / start 01_egressa
+Filters: player=0 relay=0 named=0 name= object=1 ai=0 touch=0 locked=0 active=1 delay=2 count=1
+slot 0 delay=2 target= message=
+slot 1 delay=0 target= message=
+slot 2 delay=0 target= message=
+slot 3 delay=0 target= message=
+slot 4 delay=0 target= message=
+slot 5 delay=0 target= message=
+slot 6 delay=0 target= message=
+slot 7 delay=0 target= message=
+slot 8 delay=0 target= message=
+slot 9 delay=0 target= message=
+Referrer Trigger field=TargetName10 value=exit2
+Referrer ExitTrigger field=Name value=exit2
+catalog:228: send(g, t->m_hObject, g.client_shell.player) && t->deliveries == 1

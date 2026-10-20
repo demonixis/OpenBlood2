@@ -1,0 +1,14 @@
+578/580 Testing: player_controls.mouse
+578/580 Test: player_controls.mouse
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_controls_tests" "mouse"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_controls.mouse" start time: Oct 17 00:05 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.mouse" end time: Oct 17 00:05 CEST
+"player_controls.mouse" time elapsed: 00:00:00
+----------------------------------------------------------

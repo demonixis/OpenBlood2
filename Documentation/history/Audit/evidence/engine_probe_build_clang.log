@@ -1,0 +1,264 @@
+In file included from OpenBlood2/OpenLithTech/src/core/engine.cpp:15:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/spdlog.h:12:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/common.h:50:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/fmt.h:27:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:3321:
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:4168:27: warning: identifier '_a' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 4168 | constexpr auto operator"" _a(const char* s, size_t) -> detail::udl_arg<char> {
+      |                ~~~~~~~~~~~^~
+      |                operator""_a
+In file included from OpenBlood2/OpenLithTech/src/core/engine.cpp:15:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/spdlog.h:13:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/details/registry.h:122:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/details/registry-inl.h:12:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/logger.h:426:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/logger-inl.h:12:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/pattern_formatter.h:127:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/pattern_formatter-inl.h:10:
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/details/fmt_helper.h:105:54: error: call to consteval function 'fmt::basic_format_string<char, int &>::basic_format_string<FMT_COMPILE_STRING, 0>' is not a constant expression
+  105 |         fmt_lib::format_to(std::back_inserter(dest), SPDLOG_FMT_STRING("{:02}"), n);
+      |                                                      ^
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/common.h:54:46: note: expanded from macro 'SPDLOG_FMT_STRING'
+   54 | #    define SPDLOG_FMT_STRING(format_string) FMT_STRING(format_string)
+      |                                              ^
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:1772:23: note: expanded from macro 'FMT_STRING'
+ 1772 | #define FMT_STRING(s) FMT_STRING_IMPL(s, fmt::detail::compile_string, )
+      |                       ^
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:1749:3: note: expanded from macro 'FMT_STRING_IMPL'
+ 1749 |   [] {                                                                        \
+      |   ^
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:2982:51: note: subexpression not valid in a constant expression
+ 2982 |     context_.advance_to(context_.begin() + (begin - &*context_.begin()));
+      |                                             ~~~~~~^~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:2663:15: note: in call to 'handler.on_format_specs(0, &"{:02}"[2], &"{:02}"[5])'
+ 2663 |       begin = handler.on_format_specs(adapter.arg_id, begin + 1, end);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:2688:21: note: in call to 'parse_replacement_field<char, fmt::detail::format_string_checker<char, fmt::detail::error_handler, int> &>(&"{:02}"[1], &"{:02}"[5], checker(s, {}))'
+ 2688 |         begin = p = parse_replacement_field(p - 1, end, handler);
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:3159:7: note: in call to 'parse_format_string<true, char, fmt::detail::format_string_checker<char, fmt::detail::error_handler, int>>({&"{:02}"[0], 5}, checker(s, {}))'
+ 3159 |       detail::parse_format_string<true>(str_, checker(s, {}));
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/details/fmt_helper.h:105:54: note: in call to 'basic_format_string<FMT_COMPILE_STRING, 0>([] {
+    struct FMT_COMPILE_STRING : fmt::detail::compile_string {
+        using char_type [[maybe_unused]] = fmt::remove_cvref_t<decltype("{:02}"[0])>;
+        [[maybe_unused]] constexpr operator basic_string_view<char_type>() const {
+            return fmt::detail_exported::compile_string_to_view<char_type>("{:02}");
+        }
+    };
+    return FMT_COMPILE_STRING();
+}())'
+  105 |         fmt_lib::format_to(std::back_inserter(dest), SPDLOG_FMT_STRING("{:02}"), n);
+      |                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/common.h:54:46: note: expanded from macro 'SPDLOG_FMT_STRING'
+   54 | #    define SPDLOG_FMT_STRING(format_string) FMT_STRING(format_string)
+      |                                              ^~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:1772:23: note: expanded from macro 'FMT_STRING'
+ 1772 | #define FMT_STRING(s) FMT_STRING_IMPL(s, fmt::detail::compile_string, )
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:1749:3: note: expanded from macro 'FMT_STRING_IMPL'
+ 1749 |   [] {                                                                        \
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1750 |     /* Use the hidden visibility as a workaround for a GCC bug (#1973). */    \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1751 |     /* Use a macro-like name to avoid shadowing warnings. */                  \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1752 |     struct FMT_GCC_VISIBILITY_HIDDEN FMT_COMPILE_STRING : base {              \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1753 |       using char_type FMT_MAYBE_UNUSED = fmt::remove_cvref_t<decltype(s[0])>; \
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1754 |       FMT_MAYBE_UNUSED FMT_CONSTEXPR explicit                                 \
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1755 |       operator fmt::basic_string_view<char_type>() const {                    \
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1756 |         return fmt::detail_exported::compile_string_to_view<char_type>(s);    \
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1757 |       }                                                                       \
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1758 |     };                                                                        \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1759 |     return FMT_COMPILE_STRING();                                              \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1760 |   }()
+      |   ~~~
+1 warning and 1 error generated.
+In file included from OpenBlood2/OpenLithTech/src/core/class_manager.cpp:17:
+In file included from OpenBlood2/OpenLithTech/include/lithtech/logging.h:13:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/spdlog.h:12:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/common.h:50:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/fmt.h:27:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:3321:
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:4168:27: warning: identifier '_a' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 4168 | constexpr auto operator"" _a(const char* s, size_t) -> detail::udl_arg<char> {
+      |                ~~~~~~~~~~~^~
+      |                operator""_a
+In file included from OpenBlood2/OpenLithTech/src/core/class_manager.cpp:17:
+In file included from OpenBlood2/OpenLithTech/include/lithtech/logging.h:13:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/spdlog.h:13:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/details/registry.h:122:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/details/registry-inl.h:12:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/logger.h:426:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/logger-inl.h:12:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/pattern_formatter.h:127:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/pattern_formatter-inl.h:10:
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/details/fmt_helper.h:105:54: error: call to consteval function 'fmt::basic_format_string<char, int &>::basic_format_string<FMT_COMPILE_STRING, 0>' is not a constant expression
+  105 |         fmt_lib::format_to(std::back_inserter(dest), SPDLOG_FMT_STRING("{:02}"), n);
+      |                                                      ^
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/common.h:54:46: note: expanded from macro 'SPDLOG_FMT_STRING'
+   54 | #    define SPDLOG_FMT_STRING(format_string) FMT_STRING(format_string)
+      |                                              ^
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:1772:23: note: expanded from macro 'FMT_STRING'
+ 1772 | #define FMT_STRING(s) FMT_STRING_IMPL(s, fmt::detail::compile_string, )
+      |                       ^
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:1749:3: note: expanded from macro 'FMT_STRING_IMPL'
+ 1749 |   [] {                                                                        \
+      |   ^
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:2982:51: note: subexpression not valid in a constant expression
+ 2982 |     context_.advance_to(context_.begin() + (begin - &*context_.begin()));
+      |                                             ~~~~~~^~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:2663:15: note: in call to 'handler.on_format_specs(0, &"{:02}"[2], &"{:02}"[5])'
+ 2663 |       begin = handler.on_format_specs(adapter.arg_id, begin + 1, end);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:2688:21: note: in call to 'parse_replacement_field<char, fmt::detail::format_string_checker<char, fmt::detail::error_handler, int> &>(&"{:02}"[1], &"{:02}"[5], checker(s, {}))'
+ 2688 |         begin = p = parse_replacement_field(p - 1, end, handler);
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:3159:7: note: in call to 'parse_format_string<true, char, fmt::detail::format_string_checker<char, fmt::detail::error_handler, int>>({&"{:02}"[0], 5}, checker(s, {}))'
+ 3159 |       detail::parse_format_string<true>(str_, checker(s, {}));
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/details/fmt_helper.h:105:54: note: in call to 'basic_format_string<FMT_COMPILE_STRING, 0>([] {
+    struct FMT_COMPILE_STRING : fmt::detail::compile_string {
+        using char_type [[maybe_unused]] = fmt::remove_cvref_t<decltype("{:02}"[0])>;
+        [[maybe_unused]] constexpr operator basic_string_view<char_type>() const {
+            return fmt::detail_exported::compile_string_to_view<char_type>("{:02}");
+        }
+    };
+    return FMT_COMPILE_STRING();
+}())'
+  105 |         fmt_lib::format_to(std::back_inserter(dest), SPDLOG_FMT_STRING("{:02}"), n);
+      |                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/common.h:54:46: note: expanded from macro 'SPDLOG_FMT_STRING'
+   54 | #    define SPDLOG_FMT_STRING(format_string) FMT_STRING(format_string)
+      |                                              ^~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:1772:23: note: expanded from macro 'FMT_STRING'
+ 1772 | #define FMT_STRING(s) FMT_STRING_IMPL(s, fmt::detail::compile_string, )
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:1749:3: note: expanded from macro 'FMT_STRING_IMPL'
+ 1749 |   [] {                                                                        \
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1750 |     /* Use the hidden visibility as a workaround for a GCC bug (#1973). */    \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1751 |     /* Use a macro-like name to avoid shadowing warnings. */                  \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1752 |     struct FMT_GCC_VISIBILITY_HIDDEN FMT_COMPILE_STRING : base {              \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1753 |       using char_type FMT_MAYBE_UNUSED = fmt::remove_cvref_t<decltype(s[0])>; \
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1754 |       FMT_MAYBE_UNUSED FMT_CONSTEXPR explicit                                 \
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1755 |       operator fmt::basic_string_view<char_type>() const {                    \
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1756 |         return fmt::detail_exported::compile_string_to_view<char_type>(s);    \
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1757 |       }                                                                       \
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1758 |     };                                                                        \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1759 |     return FMT_COMPILE_STRING();                                              \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1760 |   }()
+      |   ~~~
+OpenBlood2/OpenLithTech/src/core/class_manager.cpp:244:41: warning: format specifies type 'unsigned long' but the argument has type 'DDWORD' (aka 'unsigned int') [-Wformat]
+  243 |         fprintf(stderr, "[ClassManager::CallObjectMessageFn] hClass=%p pObject=%p messageID=%lu\n",
+      |                                                                                             ~~~
+      |                                                                                             %u
+  244 |                 (void*)hClass, pObject, messageID);
+      |                                         ^~~~~~~~~
+OpenBlood2/OpenLithTech/src/core/class_manager.cpp:265:87: warning: format specifies type 'unsigned long' but the argument has type 'DDWORD' (aka 'unsigned int') [-Wformat]
+  265 |                 fprintf(stderr, "[ClassManager::CallObjectMessageFn] Returned %lu\n", result);
+      |                                                                               ~~~     ^~~~~~
+      |                                                                               %u
+3 warnings and 1 error generated.
+In file included from OpenBlood2/OpenLithTech/src/core/baseclass.cpp:14:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/spdlog.h:12:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/common.h:50:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/fmt.h:27:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:3321:
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:4168:27: warning: identifier '_a' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 4168 | constexpr auto operator"" _a(const char* s, size_t) -> detail::udl_arg<char> {
+      |                ~~~~~~~~~~~^~
+      |                operator""_a
+In file included from OpenBlood2/OpenLithTech/src/core/baseclass.cpp:14:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/spdlog.h:13:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/details/registry.h:122:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/details/registry-inl.h:12:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/logger.h:426:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/logger-inl.h:12:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/pattern_formatter.h:127:
+In file included from /tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/pattern_formatter-inl.h:10:
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/details/fmt_helper.h:105:54: error: call to consteval function 'fmt::basic_format_string<char, int &>::basic_format_string<FMT_COMPILE_STRING, 0>' is not a constant expression
+  105 |         fmt_lib::format_to(std::back_inserter(dest), SPDLOG_FMT_STRING("{:02}"), n);
+      |                                                      ^
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/common.h:54:46: note: expanded from macro 'SPDLOG_FMT_STRING'
+   54 | #    define SPDLOG_FMT_STRING(format_string) FMT_STRING(format_string)
+      |                                              ^
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:1772:23: note: expanded from macro 'FMT_STRING'
+ 1772 | #define FMT_STRING(s) FMT_STRING_IMPL(s, fmt::detail::compile_string, )
+      |                       ^
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:1749:3: note: expanded from macro 'FMT_STRING_IMPL'
+ 1749 |   [] {                                                                        \
+      |   ^
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:2982:51: note: subexpression not valid in a constant expression
+ 2982 |     context_.advance_to(context_.begin() + (begin - &*context_.begin()));
+      |                                             ~~~~~~^~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:2663:15: note: in call to 'handler.on_format_specs(0, &"{:02}"[2], &"{:02}"[5])'
+ 2663 |       begin = handler.on_format_specs(adapter.arg_id, begin + 1, end);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:2688:21: note: in call to 'parse_replacement_field<char, fmt::detail::format_string_checker<char, fmt::detail::error_handler, int> &>(&"{:02}"[1], &"{:02}"[5], checker(s, {}))'
+ 2688 |         begin = p = parse_replacement_field(p - 1, end, handler);
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/core.h:3159:7: note: in call to 'parse_format_string<true, char, fmt::detail::format_string_checker<char, fmt::detail::error_handler, int>>({&"{:02}"[0], 5}, checker(s, {}))'
+ 3159 |       detail::parse_format_string<true>(str_, checker(s, {}));
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/details/fmt_helper.h:105:54: note: in call to 'basic_format_string<FMT_COMPILE_STRING, 0>([] {
+    struct FMT_COMPILE_STRING : fmt::detail::compile_string {
+        using char_type [[maybe_unused]] = fmt::remove_cvref_t<decltype("{:02}"[0])>;
+        [[maybe_unused]] constexpr operator basic_string_view<char_type>() const {
+            return fmt::detail_exported::compile_string_to_view<char_type>("{:02}");
+        }
+    };
+    return FMT_COMPILE_STRING();
+}())'
+  105 |         fmt_lib::format_to(std::back_inserter(dest), SPDLOG_FMT_STRING("{:02}"), n);
+      |                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/common.h:54:46: note: expanded from macro 'SPDLOG_FMT_STRING'
+   54 | #    define SPDLOG_FMT_STRING(format_string) FMT_STRING(format_string)
+      |                                              ^~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:1772:23: note: expanded from macro 'FMT_STRING'
+ 1772 | #define FMT_STRING(s) FMT_STRING_IMPL(s, fmt::detail::compile_string, )
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include/spdlog/fmt/bundled/format.h:1749:3: note: expanded from macro 'FMT_STRING_IMPL'
+ 1749 |   [] {                                                                        \
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1750 |     /* Use the hidden visibility as a workaround for a GCC bug (#1973). */    \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1751 |     /* Use a macro-like name to avoid shadowing warnings. */                  \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1752 |     struct FMT_GCC_VISIBILITY_HIDDEN FMT_COMPILE_STRING : base {              \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1753 |       using char_type FMT_MAYBE_UNUSED = fmt::remove_cvref_t<decltype(s[0])>; \
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1754 |       FMT_MAYBE_UNUSED FMT_CONSTEXPR explicit                                 \
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1755 |       operator fmt::basic_string_view<char_type>() const {                    \
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1756 |         return fmt::detail_exported::compile_string_to_view<char_type>(s);    \
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1757 |       }                                                                       \
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1758 |     };                                                                        \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1759 |     return FMT_COMPILE_STRING();                                              \
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1760 |   }()
+      |   ~~~
+1 warning and 1 error generated.

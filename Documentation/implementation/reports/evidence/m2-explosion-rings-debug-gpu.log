@@ -1,0 +1,106 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  24: gpu.lifecycle
+ 1/35 Test  #24: gpu.lifecycle ....................   Passed    0.96 sec
+      Start  38: gpu.world
+ 2/35 Test  #38: gpu.world ........................   Passed    2.01 sec
+      Start  54: gpu.player
+ 3/35 Test  #54: gpu.player .......................   Passed    2.75 sec
+      Start  64: gpu.weapons
+ 4/35 Test  #64: gpu.weapons ......................   Passed   15.36 sec
+      Start  75: gpu.movement
+ 5/35 Test  #75: gpu.movement .....................   Passed   14.47 sec
+      Start 100: gpu.containers
+ 6/35 Test #100: gpu.containers ...................   Passed    4.17 sec
+      Start 101: gpu.conveyor
+ 7/35 Test #101: gpu.conveyor .....................   Passed    2.51 sec
+      Start 110: gpu.doors
+ 8/35 Test #110: gpu.doors ........................   Passed    1.79 sec
+      Start 121: gpu.triggers
+ 9/35 Test #121: gpu.triggers .....................   Passed    2.57 sec
+      Start 132: gpu.interaction
+10/35 Test #132: gpu.interaction ..................   Passed    8.34 sec
+      Start 141: gpu.brushes
+11/35 Test #141: gpu.brushes ......................   Passed    2.01 sec
+      Start 170: gpu.pickups
+12/35 Test #170: gpu.pickups ......................   Passed    2.40 sec
+      Start 178: gpu.objectives
+13/35 Test #178: gpu.objectives ...................   Passed    3.28 sec
+      Start 186: gpu.cameras
+14/35 Test #186: gpu.cameras ......................   Passed    2.39 sec
+      Start 197: gpu.keyframes
+15/35 Test #197: gpu.keyframes ....................   Passed    2.35 sec
+      Start 207: gpu.lights
+16/35 Test #207: gpu.lights .......................   Passed    2.44 sec
+      Start 217: gpu.worldpaths
+17/35 Test #217: gpu.worldpaths ...................   Passed    2.71 sec
+      Start 227: gpu.cinematics
+18/35 Test #227: gpu.cinematics ...................   Passed    2.53 sec
+      Start 237: gpu.randomsound
+19/35 Test #237: gpu.randomsound ..................   Passed    8.20 sec
+      Start 246: gpu.sound
+20/35 Test #246: gpu.sound ........................   Passed    2.61 sec
+      Start 255: gpu.sprites
+21/35 Test #255: gpu.sprites ......................   Passed    2.38 sec
+      Start 264: gpu.sceneexplosion
+22/35 Test #264: gpu.sceneexplosion ...............   Passed    2.46 sec
+      Start 273: gpu.character
+23/35 Test #273: gpu.character ....................   Passed   15.93 sec
+      Start 338: gpu.world_depth
+24/35 Test #338: gpu.world_depth ..................   Passed    0.67 sec
+      Start 339: gpu.viewport
+25/35 Test #339: gpu.viewport .....................   Passed   14.36 sec
+      Start 349: gpu.model_depth
+26/35 Test #349: gpu.model_depth ..................   Passed    0.63 sec
+      Start 350: gpu.model_private
+27/35 Test #350: gpu.model_private ................   Passed    1.03 sec
+      Start 535: gpu.player_restore
+28/35 Test #535: gpu.player_restore ...............   Passed    2.86 sec
+      Start 540: gpu.player_keepalive
+29/35 Test #540: gpu.player_keepalive .............   Passed    4.66 sec
+      Start 544: gpu.sprite_alpha
+30/35 Test #544: gpu.sprite_alpha .................   Passed    0.60 sec
+      Start 545: gpu.sprite_private
+31/35 Test #545: gpu.sprite_private ...............   Passed    0.99 sec
+      Start 555: gpu.explosion_model_alpha
+32/35 Test #555: gpu.explosion_model_alpha ........   Passed    0.48 sec
+      Start 556: gpu.explosion_model_private
+33/35 Test #556: gpu.explosion_model_private ......   Passed    0.55 sec
+      Start 568: gpu.explosion_ring_alpha
+34/35 Test #568: gpu.explosion_ring_alpha .........   Passed    0.48 sec
+      Start 569: gpu.explosion_ring_private
+35/35 Test #569: gpu.explosion_ring_private .......   Passed    0.55 sec
+
+100% tests passed, 0 tests failed out of 35
+
+Label Time Summary:
+brushes             =   2.01 sec*proc (1 test)
+cameras             =   2.39 sec*proc (1 test)
+character           =  15.93 sec*proc (1 test)
+cinematics          =   2.53 sec*proc (1 test)
+containers          =   6.68 sec*proc (2 tests)
+doors               =   1.79 sec*proc (1 test)
+explosion_models    =   1.02 sec*proc (2 tests)
+explosion_rings     =   1.03 sec*proc (2 tests)
+gpu                 = 134.46 sec*proc (35 tests)
+interaction         =   8.34 sec*proc (1 test)
+keyframes           =   2.35 sec*proc (1 test)
+lights              =   2.44 sec*proc (1 test)
+model_view          =   1.66 sec*proc (2 tests)
+movement            =  14.47 sec*proc (1 test)
+objectives          =   3.28 sec*proc (1 test)
+pickups             =   2.40 sec*proc (1 test)
+player              =   2.75 sec*proc (1 test)
+player_keepalive    =   4.66 sec*proc (1 test)
+player_restore      =   2.86 sec*proc (1 test)
+private             = 130.65 sec*proc (29 tests)
+randomsound         =   8.20 sec*proc (1 test)
+sceneexplosion      =   2.46 sec*proc (1 test)
+sound               =   2.61 sec*proc (1 test)
+sprite_view         =   1.59 sec*proc (2 tests)
+sprites             =   2.38 sec*proc (1 test)
+triggers            =   2.57 sec*proc (1 test)
+weapons             =  15.36 sec*proc (1 test)
+world_view          =  15.03 sec*proc (2 tests)
+worldpaths          =   2.71 sec*proc (1 test)
+
+Total Test time (real) = 134.48 sec

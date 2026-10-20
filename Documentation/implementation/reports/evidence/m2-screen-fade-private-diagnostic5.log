@@ -1,0 +1,13 @@
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Relay reached at 2052.82 activations=1
+Exit update failure after 6.8s, stepped=0 HP=15.9025
+FX errors: Invalid particle step/budget |  |  |  | 
+Client StartNewWorld load-command excerpt -> CMSG_LOADWORLD (108)
+Server LoadWorld read-order excerpt -> fresh single-player settings
+REZ exact-path resolution -> DAT v56 structural validation
+World properties -> original MID_PRECREATE / MID_INITIALUPDATE
+Server PreStartWorld / PostStartWorld entry subset: path data copied; player entry available separately
+Server OnClientEnterWorld -> CreatePlayer -> CPlayerObj InitialUpdate/Respawn -> GoToStartPoint
+Client OnEnterWorld -> PLAYERINIT_SINGLEPLAYER -> SINGLEPLAYER_INIT -> original attribute/respawn subset
+M2 acceptance remains open: see Services for bounded implementation/trace coverage. Whole-world saves and unexercised gameplay paths are not validated.
+private_exit:149: stepped && !p->m_damage.IsDead()

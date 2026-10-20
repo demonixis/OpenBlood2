@@ -1,0 +1,198 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  120: weapons.private
+      Start  706: object_particles.private
+      Start  595: ai_runtime.clearance_private
+ 1/88 Test  #706: object_particles.private .........   Passed    5.99 sec
+      Start 1179: menus.profiles
+ 2/88 Test  #595: ai_runtime.clearance_private .....   Passed   14.90 sec
+      Start  637: inventory_state.private
+ 3/88 Test  #637: inventory_state.private ..........   Passed    1.87 sec
+      Start 1198: fanatic_prophet.world
+ 4/88 Test #1198: fanatic_prophet.world ............   Passed    0.56 sec
+      Start 1058: player_death.private
+ 5/88 Test  #120: weapons.private ..................   Passed   18.02 sec
+      Start 1178: menus.session
+ 6/88 Test #1058: player_death.private .............   Passed    0.95 sec
+      Start 1195: fanatic_prophet.catalog
+ 7/88 Test #1195: fanatic_prophet.catalog ..........   Passed    0.40 sec
+      Start  596: ai_runtime.ammo_private
+ 8/88 Test  #596: ai_runtime.ammo_private ..........   Passed    0.40 sec
+      Start  592: ai_runtime.subway
+ 9/88 Test #1178: menus.session ....................   Passed    1.69 sec
+      Start 1196: fanatic_prophet.kamikaze
+10/88 Test #1196: fanatic_prophet.kamikaze .........   Passed    0.30 sec
+      Start  102: services.elevator_entry
+11/88 Test  #102: services.elevator_entry ..........   Passed    0.47 sec
+      Start 1030: hud.private
+12/88 Test #1179: menus.profiles ...................   Passed   16.05 sec
+      Start 1197: fanatic_prophet.actions
+13/88 Test #1197: fanatic_prophet.actions ..........   Passed    0.20 sec
+      Start  632: exits.catalog
+14/88 Test #1030: hud.private ......................   Passed    2.04 sec
+      Start  590: ai_runtime.catalog
+15/88 Test  #590: ai_runtime.catalog ...............   Passed    0.62 sec
+      Start 1176: menus.artwork
+16/88 Test  #592: ai_runtime.subway ................   Passed    4.09 sec
+      Start  117: weapons.animation
+17/88 Test  #117: weapons.animation ................   Passed    0.06 sec
+      Start  250: pickups.catalog
+18/88 Test #1176: menus.artwork ....................   Passed    0.33 sec
+      Start  593: ai_runtime.arena
+19/88 Test  #593: ai_runtime.arena .................   Passed    0.40 sec
+      Start  594: ai_runtime.sparse_weapons
+20/88 Test  #594: ai_runtime.sparse_weapons ........   Passed    0.17 sec
+      Start  118: weapons.lifetime
+21/88 Test  #118: weapons.lifetime .................   Passed    0.01 sec
+      Start  950: remote.demo
+22/88 Test  #950: remote.demo ......................   Passed    0.01 sec
+      Start  636: inventory_state.capture
+23/88 Test  #636: inventory_state.capture ..........   Passed    0.01 sec
+      Start  591: ai_runtime.failures
+24/88 Test  #591: ai_runtime.failures ..............   Passed    0.12 sec
+      Start  112: weapons.inventory
+25/88 Test  #112: weapons.inventory ................   Passed    0.01 sec
+      Start  119: weapons.rollback
+26/88 Test  #119: weapons.rollback .................   Passed    0.01 sec
+      Start  633: inventory_state.roundtrip
+27/88 Test  #633: inventory_state.roundtrip ........   Passed    0.01 sec
+      Start  115: weapons.melee
+28/88 Test  #115: weapons.melee ....................   Passed    0.01 sec
+      Start  114: weapons.firing
+29/88 Test  #114: weapons.firing ...................   Passed    0.01 sec
+      Start  113: weapons.segments
+30/88 Test  #113: weapons.segments .................   Passed    0.01 sec
+      Start  116: weapons.damage
+31/88 Test  #116: weapons.damage ...................   Passed    0.01 sec
+      Start  634: inventory_state.malformed
+32/88 Test  #634: inventory_state.malformed ........   Passed    0.01 sec
+      Start  635: inventory_state.rollback
+33/88 Test  #635: inventory_state.rollback .........   Passed    0.01 sec
+      Start  705: object_particles.session
+34/88 Test  #705: object_particles.session .........   Passed    0.00 sec
+      Start  704: object_particles.failures
+35/88 Test  #704: object_particles.failures ........   Passed    0.00 sec
+      Start  703: object_particles.stopping
+36/88 Test  #703: object_particles.stopping ........   Passed    0.00 sec
+      Start  702: object_particles.emission
+37/88 Test  #702: object_particles.emission ........   Passed    0.00 sec
+      Start 1057: player_death.guards
+38/88 Test #1057: player_death.guards ..............   Passed    0.01 sec
+      Start 1056: player_death.camera
+39/88 Test #1056: player_death.camera ..............   Passed    0.01 sec
+      Start 1193: fanatic_prophet.decisions
+40/88 Test #1193: fanatic_prophet.decisions ........   Passed    0.00 sec
+      Start  578: ai_runtime.animation_clearance
+41/88 Test  #578: ai_runtime.animation_clearance ...   Passed    0.00 sec
+      Start 1194: fanatic_prophet.howitzer
+42/88 Test #1194: fanatic_prophet.howitzer .........   Passed    0.00 sec
+      Start 1192: fanatic_prophet.weapons
+43/88 Test #1192: fanatic_prophet.weapons ..........   Passed    0.00 sec
+      Start  576: ai_runtime.ammo_search
+44/88 Test  #576: ai_runtime.ammo_search ...........   Passed    0.00 sec
+      Start  575: ai_runtime.ammo_receive
+45/88 Test  #575: ai_runtime.ammo_receive ..........   Passed    0.00 sec
+      Start 1180: menus.preferences
+46/88 Test #1180: menus.preferences ................   Passed    0.00 sec
+      Start 1029: hud.session
+47/88 Test #1029: hud.session ......................   Passed    0.01 sec
+      Start  241: pickups.defaults
+48/88 Test  #241: pickups.defaults .................   Passed    0.03 sec
+      Start  242: pickups.ammunition
+49/88 Test  #242: pickups.ammunition ...............   Passed    0.02 sec
+      Start  247: pickups.rejection
+50/88 Test  #247: pickups.rejection ................   Passed    0.02 sec
+      Start  249: pickups.resources
+51/88 Test  #249: pickups.resources ................   Passed    0.02 sec
+      Start  243: pickups.statistics
+52/88 Test  #243: pickups.statistics ...............   Passed    0.02 sec
+      Start  580: ai_runtime.visibility_filter
+53/88 Test  #580: ai_runtime.visibility_filter .....   Passed    0.00 sec
+      Start  248: pickups.callbacks
+54/88 Test  #248: pickups.callbacks ................   Passed    0.02 sec
+      Start  246: pickups.spawning
+55/88 Test  #246: pickups.spawning .................   Passed    0.02 sec
+      Start  245: pickups.contact
+56/88 Test  #245: pickups.contact ..................   Passed    0.02 sec
+      Start  244: pickups.protocol
+57/88 Test  #244: pickups.protocol .................   Passed    0.02 sec
+      Start 1026: hud.bitmaps
+58/88 Test #1026: hud.bitmaps ......................   Passed    0.00 sec
+      Start  581: ai_runtime.visibility_atomic
+59/88 Test  #581: ai_runtime.visibility_atomic .....   Passed    0.00 sec
+      Start   29: config.demo
+60/88 Test   #29: config.demo ......................   Passed    0.00 sec
+      Start 1175: menus.state
+61/88 Test #1175: menus.state ......................   Passed    0.00 sec
+      Start  630: exits.queue
+62/88 Test  #630: exits.queue ......................   Passed    0.01 sec
+      Start  582: ai_runtime.lifetime
+63/88 Test  #582: ai_runtime.lifetime ..............   Passed    0.00 sec
+      Start  589: ai_runtime.missing
+64/88 Test  #589: ai_runtime.missing ...............   Passed    0.00 sec
+      Start  588: ai_runtime.body
+65/88 Test  #588: ai_runtime.body ..................   Passed    0.00 sec
+      Start  586: ai_runtime.spatial
+66/88 Test  #586: ai_runtime.spatial ...............   Passed    0.00 sec
+      Start  585: ai_runtime.camera
+67/88 Test  #585: ai_runtime.camera ................   Passed    0.00 sec
+      Start  626: exits.delayed
+68/88 Test  #626: exits.delayed ....................   Passed    0.01 sec
+      Start  587: ai_runtime.triggers
+69/88 Test  #587: ai_runtime.triggers ..............   Passed    0.00 sec
+      Start  583: ai_runtime.targets
+70/88 Test  #583: ai_runtime.targets ...............   Passed    0.00 sec
+      Start  631: exits.lifetime
+71/88 Test  #631: exits.lifetime ...................   Passed    0.01 sec
+      Start  577: ai_runtime.activation
+72/88 Test  #577: ai_runtime.activation ............   Passed    0.00 sec
+      Start 1028: hud.input
+73/88 Test #1028: hud.input ........................   Passed    0.00 sec
+      Start  584: ai_runtime.tracking
+74/88 Test  #584: ai_runtime.tracking ..............   Passed    0.00 sec
+      Start  579: ai_runtime.visibility
+75/88 Test  #579: ai_runtime.visibility ............   Passed    0.00 sec
+      Start 1027: hud.values
+76/88 Test #1027: hud.values .......................   Passed    0.00 sec
+      Start  625: exits.defaults
+77/88 Test  #625: exits.defaults ...................   Passed    0.01 sec
+      Start  628: exits.blocked
+78/88 Test  #628: exits.blocked ....................   Passed    0.01 sec
+      Start  629: exits.dead
+79/88 Test  #629: exits.dead .......................   Passed    0.01 sec
+      Start  627: exits.broadcast
+80/88 Test  #627: exits.broadcast ..................   Passed    0.01 sec
+      Start   26: config.invalid_config
+81/88 Test   #26: config.invalid_config ............   Passed    0.00 sec
+      Start   23: config.arguments
+82/88 Test   #23: config.arguments .................   Passed    0.00 sec
+      Start   28: config.case_lookup
+83/88 Test   #28: config.case_lookup ...............   Passed    0.00 sec
+      Start   24: config.precedence
+84/88 Test   #24: config.precedence ................   Passed    0.00 sec
+      Start   27: config.content_validation
+85/88 Test   #27: config.content_validation ........   Passed    0.00 sec
+      Start   25: config.relative_paths
+86/88 Test   #25: config.relative_paths ............   Passed    0.00 sec
+87/88 Test  #632: exits.catalog ....................   Passed    3.85 sec
+88/88 Test  #250: pickups.catalog ..................   Passed    6.64 sec
+
+100% tests passed, 0 tests failed out of 88
+
+Label Time Summary:
+ai_runtime          =  20.76 sec*proc (22 tests)
+config              =   0.01 sec*proc (7 tests)
+exits               =   3.92 sec*proc (8 tests)
+fanatic_prophet     =   1.46 sec*proc (7 tests)
+headless            =  80.61 sec*proc (88 tests)
+hud                 =   2.05 sec*proc (5 tests)
+inventory_state     =   1.90 sec*proc (5 tests)
+menus               =  18.08 sec*proc (5 tests)
+object_particles    =   6.00 sec*proc (5 tests)
+pickups             =   6.83 sec*proc (10 tests)
+player_death        =   0.96 sec*proc (3 tests)
+private             =  80.06 sec*proc (22 tests)
+remote              =   0.01 sec*proc (1 test)
+services            =   0.47 sec*proc (1 test)
+weapons             =  18.15 sec*proc (9 tests)
+
+Total Test time (real) =  29.88 sec

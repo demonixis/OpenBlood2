@@ -1,0 +1,796 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index d041460..bcbcd1d 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -262,7 +262,7 @@ before extending rendering, camera presentation or GPU lifetime. Preserve origin
+ coordinates, base rings, current checked visibility, world revisions and the single
+ player integrator. `--view-world` is navigable inspection, not the M3 playable slice;
+ texture/model/FX rendering and required NPC/ExitTrigger services remain unavailable. Current
+-world shaders support Vulkan/SPIR-V only; M2 stays incomplete.
++world shaders now bundle Vulkan/SPIR-V and Metal/MSL (native Apple validation pending); M2 stays incomplete.
+ 
+ The [DTX world-texture continuation](../Documentation/Implementation/M2_TEXTURES.md) adds bounded version -2 palette decoding, exact-path material caching and opaque SDL_GPU sampling. Read [texture contracts](docs/TEXTURE_CONTRACTS.md) before extending images/materials. Preserve the -2/-5 generation boundary, strict lengths, pre-pivot UVs, world-revision ownership and explicit failed resources. Alpha/sky markers, unlit mip-zero sampling and unsupported version-0 assets remain visible limitations. Models, required original services and the M2 gate remain open.
+ 
+@@ -550,3 +550,5 @@ For GPU validation on this developer machine, select the NVIDIA GPU (for example
+ 
+ 
+ The [surface panning correction](../Documentation/Implementation/M2_SURFACE_EFFECTS.md) connects authored Pan effects and restores the missing tunnel/rail motion cue. Read [contracts](docs/SURFACE_EFFECT_CONTRACTS.md). Preserve original P/Q origin speeds (direction labels convert to zero), independent shared-material rates, session-only clocks, bounded raw metadata and explicit unsupported effects. Do not move happytrain or the collision world to imitate the intro. GPU tests use NVIDIA on this machine; required services and safe NEW_LEVEL keep M2 incomplete.
++
++The [Metal shader continuation](../Documentation/Implementation/M2_METAL.md) packages SDL_shadercross-generated MSL beside SPIR-V. Read [contracts](docs/METAL_SHADER_CONTRACTS.md) before changing shaders or backend selection. Regenerate all six artifacts together, preserve reflected bindings and SDL coordinate conventions, and advertise only bundled formats. Ordinary game builds do not require ShaderCross. Linux NVIDIA checks do not establish native Metal execution; D3D12 and M2 remain incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2c9748b..d32f7bf 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,7 +14,7 @@ include(CTest)
+ include(cmake/Dependencies.cmake)
+ configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+ 
+-add_library(engine STATIC src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
++add_library(engine STATIC src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/world_shaders.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+ target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/audio_stream.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
+ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+diff --git a/README.md b/README.md
+index ff098f3..4e2697f 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [Metal shader continuation](../Documentation/Implementation/M2_METAL.md) removes Vulkan-only world entry by bundling SDL_shadercross-generated MSL for world/model/FX rendering. Shader tools remain optional and offline. Linux NVIDIA validation is recorded; native macOS execution remains pending. M2 stays incomplete.
++
+ The [conversation continuation](../Documentation/Implementation/M2_CONVERSATIONS.md) connects original ConversationTrigger sequencing, typed client delivery and CCommLink timing/real WAV playback, with inspection. CityHub has 434 created / 31 transferred sounds / 541 editor-only / 19 unsupported / one failed. All seven authored conversation cues in the base-world catalog remain unmapped and missing; separately labelled diagnostics verify actual audio without altering them. Original communication HUD/VoiceMgr arbitration, required services and safe NEW_LEVEL keep M2 incomplete.
+ 
+ The [M16 continuation](../Documentation/Implementation/M2_ASSAULT.md) connects original primary fire, alternate grenade charges, pickup/drop, independent grenade lifetime and inspection. CityHub has 433 created / 31 transferred sounds / 20 unsupported / one failed. Finite inverted ABC key bounds remain visible metadata warnings. The original Cultist lacks rifle animations; direct AI firing is tested separately from unavailable autonomous M16 combat. Replacement grenade physics, required services and safe NEW_LEVEL keep M2 open.
+@@ -128,12 +130,13 @@ The three runtime targets remain small: `engine` (resources, world/object runtim
+ The [diagnostic 3D view](docs/WORLD_VIEW_CONTRACTS.md) now renders actual level
+ geometry and current moving brushes through SDL_GPU. Run `./build/debug/blood2 --view-world` to enter the original player/cameras with
+ keyboard controls enabled and mouse capture requested. F1/Escape release the cursor for inspection. [Original DTX textures](docs/TEXTURE_CONTRACTS.md) now appear as unlit opaque materials. [Existing models and first-person weapons](docs/MODEL_VIEW_CONTRACTS.md) now render too;
+-full combat and M2 completion remain pending. The world shader currently requires
+-Vulkan/SPIR-V; other backend artifacts remain unimplemented.
++full combat and M2 completion remain pending. The renderer bundles Vulkan/SPIR-V and Metal/MSL shaders; see
++[Metal setup and regeneration](docs/METAL_SHADER_CONTRACTS.md). Native Metal execution
++remains unverified here; D3D12 artifacts remain unavailable.
+ 
+ ## Build and Run
+ 
+-Requirements: CMake 3.28+, Ninja, a C++20 compiler and SDL's platform development dependencies. Only Linux/Wayland/Vulkan has been tested. Windows/D3D12 and macOS/Metal remain target configurations, not verified platforms.
++Requirements: CMake 3.28+, Ninja, a C++20 compiler and SDL's platform development dependencies. Linux/Wayland/Vulkan is tested. Packaged MSL enables the Metal path on macOS, but native execution still needs validation. Windows currently requires Vulkan; D3D12 artifacts are not supplied.
+ 
+ ```sh
+ cmake --preset debug
+@@ -227,9 +230,9 @@ cmake --build --preset release -j8
+ ctest --preset release
+ ```
+ 
+-Public `release` disables Dear ImGui. It still loads the world and executes original object callbacks but presents a clear background until game rendering is implemented. `BLOOD2_SANITIZERS=ON` instruments project code with ASan/UBSan; [M2 evidence](../Documentation/Implementation/M2.md) gives Clang commands and actual results. Sanitizer checks do not cover a GPU session or its driver.
++Public `release` disables Dear ImGui. It uses the same world/model/FX rendering and original object callbacks as Debug. `BLOOD2_SANITIZERS=ON` instruments project code with ASan/UBSan; [M2 evidence](../Documentation/Implementation/M2.md) gives Clang commands and actual results. Sanitizer checks do not cover a GPU session or its driver.
+ 
+-On Windows use an MSVC Developer PowerShell and the same CMake/Ninja commands, then `build/debug/blood2.exe`; on macOS use Apple Clang. These procedures, mobile and headset builds have not been executed.
++On Windows use an MSVC Developer PowerShell and the same CMake/Ninja commands, then `build/debug/blood2.exe`; on macOS use Apple Clang. The user reported successful macOS compilation/startup before this Metal fix; native world rendering has not been verified by this project. Windows, mobile and headset builds remain unverified. See [Metal launch and validation](docs/METAL_SHADER_CONTRACTS.md).
+ 
+ ## Contracts and Remaining Work
+ 
+diff --git a/cmake/GenerateWorldShaders.cmake b/cmake/GenerateWorldShaders.cmake
+index c5ba8b7..ed3321d 100644
+--- a/cmake/GenerateWorldShaders.cmake
++++ b/cmake/GenerateWorldShaders.cmake
+@@ -1,11 +1,49 @@
+-# Explicit offline regeneration; normal builds use the checked-in SPIR-V headers.
++# Explicit offline regeneration; ordinary builds use the checked-in SPIR-V/MSL.
+ find_program(GLSLANG glslangValidator REQUIRED)
++find_program(SHADERCROSS shadercross REQUIRED)
+ set(shader_dir "${CMAKE_CURRENT_LIST_DIR}/../src/engine/shaders")
+-foreach(stage vert frag)
++if(NOT DEFINED OUTPUT_DIR)
++    set(OUTPUT_DIR "${shader_dir}")
++endif()
++file(MAKE_DIRECTORY "${OUTPUT_DIR}")
++# Temporary binaries/metadata never become distributable game assets.
++set(work "${OUTPUT_DIR}/.generation")
++file(MAKE_DIRECTORY "${work}")
++foreach(shader world_vert world_frag sprite_frag)
++    string(REPLACE "_" "." filename "${shader}")
++    if(shader MATCHES "_vert$")
++        set(stage vertex)
++    else()
++        set(stage fragment)
++    endif()
+     execute_process(COMMAND "${GLSLANG}" -V --target-env vulkan1.0
+-        --vn "world_${stage}" -o "${shader_dir}/world_${stage}.h" "${shader_dir}/world.${stage}"
++        --vn "${shader}" -o "${OUTPUT_DIR}/${shader}.h" "${shader_dir}/${filename}"
+         COMMAND_ERROR_IS_FATAL ANY)
++    execute_process(COMMAND "${GLSLANG}" -V --target-env vulkan1.0
++        -o "${work}/${shader}.spv" "${shader_dir}/${filename}"
++        COMMAND_ERROR_IS_FATAL ANY)
++    execute_process(COMMAND "${SHADERCROSS}" "${work}/${shader}.spv"
++        -s SPIRV -d MSL -t "${stage}" --msl-version 1.2.0 -o "${work}/${shader}.msl"
++        COMMAND_ERROR_IS_FATAL ANY)
++    execute_process(COMMAND "${SHADERCROSS}" "${work}/${shader}.spv"
++        -s SPIRV -d JSON -t "${stage}" -o "${work}/${shader}.json"
++        COMMAND_ERROR_IS_FATAL ANY)
++    file(READ "${work}/${shader}.msl" msl)
++    file(READ "${work}/${shader}.json" metadata)
++    # These shaders use only sampled images and uniform buffers. A new resource
++    # category requires updating the renderer contract, not silently dropping it.
++    foreach(resource storage_buffers storage_textures)
++        string(JSON count GET "${metadata}" "${resource}")
++        if(NOT count EQUAL 0)
++            message(FATAL_ERROR "${shader}: unsupported ${resource}")
++        endif()
++    endforeach()
++    string(JSON samplers GET "${metadata}" samplers)
++    string(JSON uniforms GET "${metadata}" uniform_buffers)
++    if(NOT msl MATCHES "${stage} main0_out main0\\(")
++        message(FATAL_ERROR "${shader}: unexpected MSL entry point; inspect shadercross output")
++    endif()
++    file(WRITE "${OUTPUT_DIR}/${shader}_msl.h"
++        "#pragma once\n// Generated by pinned SDL_shadercross; see tools/shaders and GenerateWorldShaders.cmake.\nstatic constexpr unsigned ${shader}_samplers = ${samplers};\nstatic constexpr unsigned ${shader}_uniforms = ${uniforms};\nstatic const char ${shader}_msl[] = R\"blood2msl(${msl})blood2msl\";\n")
+ endforeach()
+-execute_process(COMMAND "${GLSLANG}" -V --target-env vulkan1.0
+-    --vn "sprite_frag" -o "${shader_dir}/sprite_frag.h" "${shader_dir}/sprite.frag"
+-    COMMAND_ERROR_IS_FATAL ANY)
++file(REMOVE_RECURSE "${work}")
+diff --git a/docs/M2_METAL_SOURCES.json b/docs/M2_METAL_SOURCES.json
+new file mode 100644
+index 0000000..f796968
+--- /dev/null
++++ b/docs/M2_METAL_SOURCES.json
+@@ -0,0 +1,59 @@
++{
++  "date": "2026-10-17",
++  "scope": "Offline MSL generation and bundled SDL GPU shader selection; no original gameplay imports",
++  "tools": {
++    "SDL_shadercross": {
++      "revision": "1ff05bec573988a98ef9e0260b4da44f512b8367",
++      "source": "https://github.com/libsdl-org/SDL_shadercross",
++      "selection": "main resolved 2026-10-17",
++      "archive_sha256": "60aae35ff71bd1d5f85b363e9d077a86bb27dd36333c42685e56c2fd541174d2"
++    },
++    "SPIRV-Cross": {
++      "revision": "1a6169566c73d3da552748fc372fe2bbb856e46e",
++      "source": "https://github.com/KhronosGroup/SPIRV-Cross",
++      "selection": "exact SDL_shadercross external/SPIRV-Cross submodule",
++      "archive_sha256": "0f295b214b164e42a1d21537c8da7b44569806c16220dda9798558edfaacd11e"
++    },
++    "glslangValidator": {
++      "version": "16.2.0",
++      "target": "Vulkan 1.0"
++    },
++    "MSL": {
++      "target": "1.2.0",
++      "entrypoint": "main0"
++    }
++  },
++  "SDL_runtime_revision": "6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1",
++  "inputs": {
++    "src/engine/shaders/world.vert": "13ee9ae709847963c34149501624b6656228c1843329a2938cad4e654946038c",
++    "src/engine/shaders/world.frag": "eb5fd75cfbf50b4422ae3648128c00e7edc5b936555218df44fd1f5aed1e3fa6",
++    "src/engine/shaders/sprite.frag": "bc78f0b35a4dfd000d8f1f81c853222a1d1cfb4079a2f86fd880eb3ac9d084bd"
++  },
++  "generated": {
++    "world_vert.h": {
++      "sha256": "5d8260a372590a0865a32c92de5cb18da62f1cc1603b0b1b3fa3848b98f68abd",
++      "bytes": 8895
++    },
++    "world_frag.h": {
++      "sha256": "ff1638c1aae70c7e00175e9c2c1144454da9cf369e0b284e1150cc47d2090d05",
++      "bytes": 2358
++    },
++    "sprite_frag.h": {
++      "sha256": "a6ad01fead2743a0d3989483003a9cce384ad63820496bf07a583696704d9645",
++      "bytes": 3922
++    },
++    "world_vert_msl.h": {
++      "sha256": "2ef4a2cfe9476ac1ba7eeab495f77ff72298ae98ba3a9219fa554b269fe99771",
++      "bytes": 1395
++    },
++    "world_frag_msl.h": {
++      "sha256": "3e950e7a872d3c389a88e826ed93c85f6b740cbcb787f148ffd77b8fc0384726",
++      "bytes": 751
++    },
++    "sprite_frag_msl.h": {
++      "sha256": "49032f5642dd03d6927dcaff8726f915cd99f280944602f729af346d12d812c3",
++      "bytes": 942
++    }
++  },
++  "native_metal_validation": "Not executed; Linux host has no native Metal driver/compiler"
++}
+diff --git a/docs/METAL_SHADER_CONTRACTS.md b/docs/METAL_SHADER_CONTRACTS.md
+new file mode 100644
+index 0000000..43ed322
+--- /dev/null
++++ b/docs/METAL_SHADER_CONTRACTS.md
+@@ -0,0 +1,92 @@
++# Packaged SPIR-V and Metal shaders
++
++The renderer now bundles both SPIR-V and Metal Shading Language (MSL) for its
++shared world, model, sprite and FX pipelines. This removes the Vulkan-only
++world-entry rejection reported on macOS. M2 remains incomplete. Native Metal
++compilation and presentation have not been executed on this Linux host; see
++[verification](../../Documentation/Implementation/M2_METAL.md).
++
++## Runtime contract
++
++`WorldShaderFormats` advertises only SPIR-V and MSL to SDL_CreateGPUDevice. SDL
++selects a supported backend; Metal receives MSL and Vulkan receives SPIR-V. Do not
++advertise DXIL or metallib until corresponding artifacts actually exist. In
++particular, Windows currently needs SDL's Vulkan path rather than D3D12.
++
++`world_shader_info` supplies static owned code, the correct stage, entry point and
++reflected sampler/uniform counts. SPIR-V exports `main`; ShaderCross-generated MSL
++exports `main0`. Reject missing formats and invalid shader roles with cleared
++output. If both formats are offered, prefer SPIR-V. A failed vertex/fragment or
++pipeline creation returns the SDL error and releases already-created shaders.
++There is no runtime shader-file lookup or translation dependency.
++
++The vertex uniform is eight float4 fields (128 bytes), including the per-batch
++texture offset. Its uniform buffer is slot 0 and vertex attributes are 0/1/2.
++Both fragments sample texture/sampler 0; the alpha fragment additionally uses
++uniform buffer 0. Storage buffers/textures are unused. Keep reflection and all
++packaged artifacts synchronized when GLSL changes. Source texture coordinates,
++SDL GPU depth/orientation conventions, current transforms, alpha policy and
++world-clock panning are identical inputs on both paths; add no backend-only
++axis flip or second animation clock.
++
++MSL is compiled by SDL's Metal backend using the host Metal compiler when each
++pipeline is created. This is distinct from shipping shadercross at runtime.
++Dear ImGui already supplies its own Metal shaders; its backend is unchanged.
++The existing inspector's Renderer field shows SDL's actual selected backend.
++Shader failures remain explicit errors, not successful blank-world presentation.
++
++## Offline regeneration
++
++The optional standalone project [tools/shaders](../tools/shaders/CMakeLists.txt)
++pins SDL_shadercross main and its exact SPIRV-Cross submodule with SHA-256 checked
++archives. [Provenance](M2_METAL_SOURCES.json) records both revisions. Existing
++SDL/ImGui/spdlog pins are unchanged; shader tools reuse the already-built SDL.
++No reference repository or commercial resource is a shader input.
++
++Current GLSL sources remain the source of truth. glslangValidator 16.2.0 creates
++Vulkan 1.0 SPIR-V, then SDL_shadercross emits MSL 1.2 and reflection metadata.
++Retaining these small existing GLSL shaders avoids an unrelated HLSL rewrite.
++Future shader-language changes must preserve the same tested binding contract.
++The generator rejects unsupported storage resources or an unexpected entry name.
++Six headers are checked in, so normal builds require neither generation tools nor
++network access beyond ordinary configured dependency fetching.
++
++From Blood2, with glslangValidator available and SDL already built:
++
++```sh
++cmake -S tools/shaders -B build/shader-tools -G Ninja \
++  -DCMAKE_BUILD_TYPE=Release -DSDL3_DIR="$PWD/build/debug/_deps/sdl3-build"
++cmake --build build/shader-tools -j3 --target regenerate
++```
++
++The optional toolchain uses no DXC and links no shader compiler into the game.
++Its standalone CMake project is not part of ordinary application configuration.
++To compare regeneration without overwriting checked headers:
++
++```sh
++cmake -DSHADERCROSS="$PWD/build/shader-tools/_deps/shadercross-build/shadercross" \
++  -DOUTPUT_DIR="$PWD/build/shader-regeneration" \
++  -P cmake/GenerateWorldShaders.cmake
++```
++
++## Verification boundary
++
++Headless tests exercise both packaged formats, stages, generated entry names,
++resource bindings, static storage, uniform size and unsupported-format failures.
++Byte-for-byte regeneration checks all six artifacts. These checks cannot validate
++Apple's Metal compiler or driver. NVIDIA Vulkan readback covers actual world/model
++occlusion, alpha, sprites, panning, viewport reload and device lifetime.
++
++On macOS, rebuild normally, configure the external content root, then launch:
++
++```sh
++SDL_GPU_DRIVER=metal ./build/debug/blood2 --view-world
++```
++
++`SDL_GPU_DRIVER` is an optional explicit test selection; automatic selection
++should also choose Metal. Check the startup/inspector backend, enter the authored
++intro, then exercise mouse capture, world/model depth, transparent windows, tunnel
++panning, resize and unload/re-entry. With private/GPU tests enabled, run the same
++focused suite documented in the evidence under `SDL_GPU_DRIVER=metal`. Record the
++actual Apple hardware, macOS/SDK and results before claiming native validation.
++iOS, D3D12, full lighting and complete M2 acceptance remain outside this change.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index ee7134b..d934038 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1,5 +1,13 @@
+ # Source and Dependency Provenance
+ 
++## Metal shader packaging
++
++Project-owned GLSL is compiled to SPIR-V and translated offline using pinned
++SDL_shadercross and its exact SPIRV-Cross submodule. The generated MSL and reflected
++bindings are bundled beside SPIR-V; no runtime compiler dependency or game-code
++import is added. See [source/tool ledger](M2_METAL_SOURCES.json) and
++[contracts](METAL_SHADER_CONTRACTS.md). Native Apple execution remains unverified.
++
+ ## Original fragment smoke trails
+ 
+ Selected CObjectParticleFX methods and CObjectGeneralFX's high-detail smoke-trail 1
+diff --git a/docs/TEXTURE_CONTRACTS.md b/docs/TEXTURE_CONTRACTS.md
+index ae62970..da32a57 100644
+--- a/docs/TEXTURE_CONTRACTS.md
++++ b/docs/TEXTURE_CONTRACTS.md
+@@ -59,12 +59,11 @@ cache owns an original object or advances simulation. Sampler/pipeline/depth may
+ persist through unload. The capture blit uses the acquired swapchain dimensions,
+ which can lag a window resize request; readback dimensions remain independent.
+ 
+-The Vulkan/SPIR-V shaders sample mip zero with nearest repeat and output unlit
++The shared packaged shaders sample mip zero with nearest repeat and output unlit
+ opaque RGB. Color-space/retail filtering/lightmap parity is not claimed. Transparent
+ faces and sky retain explicit opaque diagnostic colors; no alpha blending, alpha
+ test, animated material, fullbright pass, lighting, liquid, sprite or model rendering
+-is implied. No implicit sun or DirLight behavior is inferred. Later cross-backend
+-artifacts remain unavailable.
++is implied. No implicit sun or DirLight behavior is inferred. [Metal artifacts](METAL_SHADER_CONTRACTS.md) are now packaged; native Apple execution remains unverified.
+ 
+ ## Inspection and verification
+ 
+diff --git a/docs/WORLD_VIEW_CONTRACTS.md b/docs/WORLD_VIEW_CONTRACTS.md
+index 53f4709..9198dba 100644
+--- a/docs/WORLD_VIEW_CONTRACTS.md
++++ b/docs/WORLD_VIEW_CONTRACTS.md
+@@ -61,18 +61,11 @@ bounded to 8,192 per axis. The world pass precedes a separate ImGui color-load p
+ UI visibility has no effect on rendering or simulation; no-ImGui Release uses the
+ same world path. Presentation without an entered player remains inspection-only.
+ 
+-The current packaged world shaders support Vulkan/SPIR-V. Other SDL backends report
+-an explicit unsupported renderer error when entering this view; D3D12/Metal shader
+-artifacts and platform validation remain M4 work. The pinned SDL/ImGui/spdlog stack is
+-unchanged. GLSL sources and generated SPIR-V word headers are checked in; ordinary
+-builds need no shader compiler or runtime shader-file paths. Regenerate explicitly:
+-
+-```sh
+-cmake -P cmake/GenerateWorldShaders.cmake
+-```
+-
+-The checked headers were produced with glslangValidator 16.2.0, targeting Vulkan 1.0.
+-The shader compiler is an offline tool, not a new runtime dependency.
++The packaged world shaders now support Vulkan/SPIR-V and Metal/MSL. See
++[Metal shader contracts](METAL_SHADER_CONTRACTS.md) for backend selection, generated
++bindings and optional SDL_shadercross regeneration. Both artifacts are checked in;
++ordinary builds need no shader toolchain. Native Metal execution remains pending,
++while Linux Vulkan has actual GPU evidence. D3D12 artifacts remain unavailable.
+ 
+ ## Use and evidence
+ 
+diff --git a/src/engine/runtime.cpp b/src/engine/runtime.cpp
+index dc6677f..7fc13c1 100644
+--- a/src/engine/runtime.cpp
++++ b/src/engine/runtime.cpp
+@@ -1,4 +1,5 @@
+ #include "engine/runtime.h"
++#include "engine/world_shaders.h"
+ 
+ namespace OpenBlood2
+ {
+@@ -19,9 +20,7 @@ namespace OpenBlood2
+             error = SDL_GetError();
+             return false;
+         }
+-        gpu = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_MSL |
+-                                      SDL_GPU_SHADERFORMAT_METALLIB,
+-                                  gpu_debug, nullptr);
++        gpu = SDL_CreateGPUDevice(WorldShaderFormats, gpu_debug, nullptr);
+         if (!gpu || !SDL_ClaimWindowForGPUDevice(gpu, window))
+         {
+             error = SDL_GetError();
+diff --git a/src/engine/shaders/sprite_frag_msl.h b/src/engine/shaders/sprite_frag_msl.h
+new file mode 100644
+index 0000000..8f7753d
+--- /dev/null
++++ b/src/engine/shaders/sprite_frag_msl.h
+@@ -0,0 +1,38 @@
++#pragma once
++// Generated by pinned SDL_shadercross; see tools/shaders and GenerateWorldShaders.cmake.
++static constexpr unsigned sprite_frag_samplers = 1;
++static constexpr unsigned sprite_frag_uniforms = 1;
++static const char sprite_frag_msl[] = R"blood2msl(#include <metal_stdlib>
++#include <simd/simd.h>
++
++using namespace metal;
++
++struct Sprite
++{
++    float4 modulation;
++};
++
++struct main0_out
++{
++    float4 color [[color(0)]];
++};
++
++struct main0_in
++{
++    float3 faceColor [[user(locn0)]];
++    float2 texCoord [[user(locn1)]];
++};
++
++fragment main0_out main0(main0_in in [[stage_in]], constant Sprite& u [[buffer(0)]], texture2d<float> albedo [[texture(0)]], sampler albedoSmplr [[sampler(0)]])
++{
++    main0_out out = {};
++    float4 texel = albedo.sample(albedoSmplr, in.texCoord);
++    if (texel.w == 0.0)
++    {
++        discard_fragment();
++    }
++    out.color = float4(texel.xyz * in.faceColor, texel.w * u.modulation.x);
++    return out;
++}
++
++)blood2msl";
+diff --git a/src/engine/shaders/world_frag_msl.h b/src/engine/shaders/world_frag_msl.h
+new file mode 100644
+index 0000000..472a0d0
+--- /dev/null
++++ b/src/engine/shaders/world_frag_msl.h
+@@ -0,0 +1,28 @@
++#pragma once
++// Generated by pinned SDL_shadercross; see tools/shaders and GenerateWorldShaders.cmake.
++static constexpr unsigned world_frag_samplers = 1;
++static constexpr unsigned world_frag_uniforms = 0;
++static const char world_frag_msl[] = R"blood2msl(#include <metal_stdlib>
++#include <simd/simd.h>
++
++using namespace metal;
++
++struct main0_out
++{
++    float4 color [[color(0)]];
++};
++
++struct main0_in
++{
++    float3 faceColor [[user(locn0)]];
++    float2 texCoord [[user(locn1)]];
++};
++
++fragment main0_out main0(main0_in in [[stage_in]], texture2d<float> albedo [[texture(0)]], sampler albedoSmplr [[sampler(0)]])
++{
++    main0_out out = {};
++    out.color = float4(albedo.sample(albedoSmplr, in.texCoord).xyz * in.faceColor, 1.0);
++    return out;
++}
++
++)blood2msl";
+diff --git a/src/engine/shaders/world_vert_msl.h b/src/engine/shaders/world_vert_msl.h
+new file mode 100644
+index 0000000..21c44dd
+--- /dev/null
++++ b/src/engine/shaders/world_vert_msl.h
+@@ -0,0 +1,49 @@
++#pragma once
++// Generated by pinned SDL_shadercross; see tools/shaders and GenerateWorldShaders.cmake.
++static constexpr unsigned world_vert_samplers = 0;
++static constexpr unsigned world_vert_uniforms = 1;
++static const char world_vert_msl[] = R"blood2msl(#include <metal_stdlib>
++#include <simd/simd.h>
++
++using namespace metal;
++
++struct View
++{
++    float4 eye;
++    float4 right;
++    float4 up;
++    float4 forward;
++    float4 projection;
++    float4 translation;
++    float4 quaternion;
++    float4 _textureOffset;
++};
++
++struct main0_out
++{
++    float3 faceColor [[user(locn0)]];
++    float2 texCoord [[user(locn1)]];
++    float4 gl_Position [[position]];
++};
++
++struct main0_in
++{
++    float3 position [[attribute(0)]];
++    float3 color [[attribute(1)]];
++    float2 uv [[attribute(2)]];
++};
++
++vertex main0_out main0(main0_in in [[stage_in]], constant View& u [[buffer(0)]])
++{
++    main0_out out = {};
++    float3 q = u.quaternion.xyz;
++    float3 world = (in.position + (cross(q, cross(q, in.position) + (in.position * u.quaternion.w)) * 2.0)) + u.translation.xyz;
++    float3 relative = world - u.eye.xyz;
++    float z = dot(relative, u.forward.xyz);
++    out.gl_Position = float4(dot(relative, u.right.xyz) * u.projection.x, dot(relative, u.up.xyz) * u.projection.y, (z * u.projection.z) + u.projection.w, z);
++    out.faceColor = in.color;
++    out.texCoord = in.uv + u._textureOffset.xy;
++    return out;
++}
++
++)blood2msl";
+diff --git a/src/engine/world_renderer.cpp b/src/engine/world_renderer.cpp
+index 845ec0a..e93f231 100644
+--- a/src/engine/world_renderer.cpp
++++ b/src/engine/world_renderer.cpp
+@@ -1,7 +1,5 @@
+ #include "engine/world_renderer.h"
+-#include "engine/shaders/sprite_frag.h"
+-#include "engine/shaders/world_frag.h"
+-#include "engine/shaders/world_vert.h"
++#include "engine/world_shaders.h"
+ #include <cmath>
+ #include <cstring>
+ 
+@@ -52,32 +50,26 @@ namespace OpenBlood2
+         if (selected)
+             return true;
+         const bool alpha = translucent || style_ == DrawStyle::SpriteAlpha;
+-        if (!(SDL_GetGPUShaderFormats(device_) & SDL_GPU_SHADERFORMAT_SPIRV))
++        SDL_GPUShaderCreateInfo vertex_info{}, fragment_info{};
++        const auto formats = SDL_GetGPUShaderFormats(device_);
++        if (!world_shader_info(WorldShader::Vertex, formats, vertex_info) ||
++            !world_shader_info(alpha ? WorldShader::AlphaFragment : WorldShader::OpaqueFragment, formats,
++                               fragment_info))
+         {
+-            error = "Diagnostic world renderer currently requires the Vulkan/SPIR-V backend";
++            error = "No bundled world shader for this GPU backend (SPIR-V or MSL required)";
+             return false;
+         }
+-        SDL_GPUShaderCreateInfo info{};
+-        info.entrypoint = "main";
+-        info.format = SDL_GPU_SHADERFORMAT_SPIRV;
+-        info.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+-        info.code = reinterpret_cast<const Uint8*>(world_vert);
+-        info.code_size = sizeof(world_vert);
+-        info.num_uniform_buffers = 1;
+-        auto* vertex = SDL_CreateGPUShader(device_, &info);
+-        info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+-        info.code = reinterpret_cast<const Uint8*>(alpha ? sprite_frag : world_frag);
+-        info.code_size = alpha ? sizeof(sprite_frag) : sizeof(world_frag);
+-        info.num_uniform_buffers = alpha ? 1 : 0;
+-        info.num_samplers = 1;
+-        auto* fragment = SDL_CreateGPUShader(device_, &info);
+-        if (!vertex || !fragment)
++        auto* vertex = SDL_CreateGPUShader(device_, &vertex_info);
++        if (!vertex)
+         {
+             error = SDL_GetError();
+-            if (vertex)
+-                SDL_ReleaseGPUShader(device_, vertex);
+-            if (fragment)
+-                SDL_ReleaseGPUShader(device_, fragment);
++            return false;
++        }
++        auto* fragment = SDL_CreateGPUShader(device_, &fragment_info);
++        if (!fragment)
++        {
++            error = SDL_GetError();
++            SDL_ReleaseGPUShader(device_, vertex);
+             return false;
+         }
+         SDL_GPUVertexBufferDescription buffer{};
+diff --git a/src/engine/world_shaders.cpp b/src/engine/world_shaders.cpp
+new file mode 100644
+index 0000000..d3b72a1
+--- /dev/null
++++ b/src/engine/world_shaders.cpp
+@@ -0,0 +1,51 @@
++#include "engine/world_shaders.h"
++#include "engine/shaders/sprite_frag.h"
++#include "engine/shaders/sprite_frag_msl.h"
++#include "engine/shaders/world_frag.h"
++#include "engine/shaders/world_frag_msl.h"
++#include "engine/shaders/world_vert.h"
++#include "engine/shaders/world_vert_msl.h"
++
++namespace OpenBlood2
++{
++    bool world_shader_info(WorldShader shader, SDL_GPUShaderFormat available, SDL_GPUShaderCreateInfo& info)
++    {
++        info = {};
++        const bool spirv = (available & SDL_GPU_SHADERFORMAT_SPIRV) != 0;
++        if (!spirv && !(available & SDL_GPU_SHADERFORMAT_MSL))
++            return false;
++        info.format = spirv ? SDL_GPU_SHADERFORMAT_SPIRV : SDL_GPU_SHADERFORMAT_MSL;
++        info.entrypoint = spirv ? "main" : "main0";
++        switch (shader)
++        {
++            case WorldShader::Vertex:
++                info.stage = SDL_GPU_SHADERSTAGE_VERTEX;
++                info.code =
++                    spirv ? reinterpret_cast<const Uint8*>(world_vert) : reinterpret_cast<const Uint8*>(world_vert_msl);
++                info.code_size = spirv ? sizeof(world_vert) : sizeof(world_vert_msl) - 1;
++                info.num_uniform_buffers = world_vert_uniforms;
++                info.num_samplers = world_vert_samplers;
++                break;
++            case WorldShader::OpaqueFragment:
++                info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
++                info.code =
++                    spirv ? reinterpret_cast<const Uint8*>(world_frag) : reinterpret_cast<const Uint8*>(world_frag_msl);
++                info.code_size = spirv ? sizeof(world_frag) : sizeof(world_frag_msl) - 1;
++                info.num_uniform_buffers = world_frag_uniforms;
++                info.num_samplers = world_frag_samplers;
++                break;
++            case WorldShader::AlphaFragment:
++                info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
++                info.code = spirv ? reinterpret_cast<const Uint8*>(sprite_frag)
++                                  : reinterpret_cast<const Uint8*>(sprite_frag_msl);
++                info.code_size = spirv ? sizeof(sprite_frag) : sizeof(sprite_frag_msl) - 1;
++                info.num_uniform_buffers = sprite_frag_uniforms;
++                info.num_samplers = sprite_frag_samplers;
++                break;
++            default:
++                info = {};
++                return false;
++        }
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/world_shaders.h b/src/engine/world_shaders.h
+new file mode 100644
+index 0000000..83c932f
+--- /dev/null
++++ b/src/engine/world_shaders.h
+@@ -0,0 +1,17 @@
++#pragma once
++#include <SDL3/SDL_gpu.h>
++
++namespace OpenBlood2
++{
++    // Only advertise formats actually bundled with the world/model/FX renderer.
++    inline constexpr SDL_GPUShaderFormat WorldShaderFormats = SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_MSL;
++    enum class WorldShader
++    {
++        Vertex,
++        OpaqueFragment,
++        AlphaFragment
++    };
++    // Static owned bytecode/source and reflected resource counts. No device or
++    // filesystem needed; MSL's generated entry point differs from SPIR-V's.
++    bool world_shader_info(WorldShader, SDL_GPUShaderFormat available, SDL_GPUShaderCreateInfo&);
++} // namespace OpenBlood2
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 2840a26..c2f5ec2 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1567,3 +1567,9 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.surface_effect_private PROPERTIES LABELS "gpu;private;world_view;surface_effect" TIMEOUT 90 RUN_SERIAL TRUE)
+     endif()
+ endif()
++
++add_executable(world_shader_tests world_shader_tests.cpp)
++target_link_libraries(world_shader_tests PRIVATE blood2_game)
++blood2_project_options(world_shader_tests)
++add_test(NAME world_shaders.formats COMMAND world_shader_tests)
++set_tests_properties(world_shaders.formats PROPERTIES LABELS "headless;world_view;shaders" TIMEOUT 15)
+diff --git a/tests/world_shader_tests.cpp b/tests/world_shader_tests.cpp
+new file mode 100644
+index 0000000..4937bcf
+--- /dev/null
++++ b/tests/world_shader_tests.cpp
+@@ -0,0 +1,68 @@
++#include "engine/world_shaders.h"
++#include "engine/world_view.h"
++#include <array>
++#include <cstring>
++#include <iostream>
++#include <string_view>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x "\n";                                                                     \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++int main()
++{
++    static_assert(sizeof(WorldViewUniform) == 8 * 16); // std140/Metal float4 uniform layout.
++    CHECK(WorldShaderFormats == (SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_MSL));
++    SDL_GPUShaderCreateInfo info{};
++    for (auto formats : {SDL_GPU_SHADERFORMAT_SPIRV, SDL_GPU_SHADERFORMAT_MSL, WorldShaderFormats})
++        for (auto shader : {WorldShader::Vertex, WorldShader::OpaqueFragment, WorldShader::AlphaFragment})
++        {
++            CHECK(world_shader_info(shader, formats, info));
++            CHECK(info.code && info.code_size > 128 && info.props == 0);
++            CHECK(info.num_storage_buffers == 0 && info.num_storage_textures == 0);
++            CHECK(info.num_samplers == (shader == WorldShader::Vertex ? 0u : 1u));
++            CHECK(info.num_uniform_buffers == (shader == WorldShader::OpaqueFragment ? 0u : 1u));
++            CHECK(info.stage ==
++                  (shader == WorldShader::Vertex ? SDL_GPU_SHADERSTAGE_VERTEX : SDL_GPU_SHADERSTAGE_FRAGMENT));
++            if (formats & SDL_GPU_SHADERFORMAT_SPIRV)
++            {
++                CHECK(info.format == SDL_GPU_SHADERFORMAT_SPIRV && std::strcmp(info.entrypoint, "main") == 0);
++                const unsigned char magic[] = {3, 2, 35, 7};
++                CHECK(std::memcmp(info.code, magic, 4) == 0 && info.code_size % 4 == 0);
++            }
++            else
++            {
++                CHECK(info.format == SDL_GPU_SHADERFORMAT_MSL && std::strcmp(info.entrypoint, "main0") == 0);
++                const std::string_view source(reinterpret_cast<const char*>(info.code), info.code_size);
++                CHECK(source.starts_with("#include <metal_stdlib>"));
++                CHECK(info.code[info.code_size] == 0); // Runtime Metal compilation also gets terminated source.
++                CHECK(source.find(shader == WorldShader::Vertex ? "vertex main0_out main0("
++                                                                : "fragment main0_out main0(") != source.npos);
++                if (info.num_uniform_buffers)
++                    CHECK(source.find("[[buffer(0)]]") != source.npos);
++                if (info.num_samplers)
++                    CHECK(source.find("[[texture(0)]]") != source.npos && source.find("[[sampler(0)]]") != source.npos);
++                if (shader == WorldShader::Vertex)
++                    CHECK(source.find("u._textureOffset.xy") != source.npos);
++            }
++            const auto* owned = info.code;
++            SDL_GPUShaderCreateInfo repeated{};
++            CHECK(world_shader_info(shader, formats, repeated) && repeated.code == owned &&
++                  repeated.code_size == info.code_size);
++        }
++    for (SDL_GPUShaderFormat formats : std::array<SDL_GPUShaderFormat, 3>{
++             SDL_GPU_SHADERFORMAT_INVALID, SDL_GPU_SHADERFORMAT_DXIL, SDL_GPU_SHADERFORMAT_METALLIB})
++    {
++        CHECK(!world_shader_info(WorldShader::Vertex, formats, info));
++        CHECK(!info.code && !info.code_size && !info.entrypoint);
++    }
++    CHECK(!world_shader_info(static_cast<WorldShader>(999), WorldShaderFormats, info) && !info.code);
++    std::cout << "Shader selection: SPIR-V/MSL stages, generated entry points, reflected bindings, static lifetime and "
++                 "unsupported formats pass; native Metal compilation not exercised\n";
++    return 0;
++}
+diff --git a/tools/shaders/CMakeLists.txt b/tools/shaders/CMakeLists.txt
+new file mode 100644
+index 0000000..7468caf
+--- /dev/null
++++ b/tools/shaders/CMakeLists.txt
+@@ -0,0 +1,46 @@
++cmake_minimum_required(VERSION 3.28)
++project(Blood2ShaderTools LANGUAGES C CXX)
++# Optional offline toolchain, never linked into the game. Point SDL3_DIR at the
++# configured game's _deps/sdl3-build directory (build SDL3-static there first).
++find_package(SDL3 3.1.3 REQUIRED CONFIG)
++include(FetchContent)
++get_filename_component(BLOOD2_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLUTE)
++
++# SDL_shadercross main resolved 2026-10-17; SPIRV-Cross is its exact submodule.
++set(BLOOD2_SHADERCROSS_REVISION 1ff05bec573988a98ef9e0260b4da44f512b8367)
++set(BLOOD2_SPIRVCROSS_REVISION 1a6169566c73d3da552748fc372fe2bbb856e46e)
++set(SPIRV_CROSS_CLI OFF CACHE BOOL "" FORCE)
++set(SPIRV_CROSS_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
++# Keep dependency export sets for shadercross's static-library export, even
++# though this project never installs either dependency.
++set(SPIRV_CROSS_SKIP_INSTALL OFF CACHE BOOL "" FORCE)
++set(SPIRV_CROSS_STATIC ON CACHE BOOL "" FORCE)
++set(SPIRV_CROSS_SHARED OFF CACHE BOOL "" FORCE)
++FetchContent_Declare(spirvcross
++    URL https://codeload.github.com/KhronosGroup/SPIRV-Cross/tar.gz/${BLOOD2_SPIRVCROSS_REVISION}
++    URL_HASH SHA256=0f295b214b164e42a1d21537c8da7b44569806c16220dda9798558edfaacd11e
++    DOWNLOAD_NAME SPIRV-Cross-${BLOOD2_SPIRVCROSS_REVISION}.tar.gz
++    DOWNLOAD_DIR "${BLOOD2_ROOT}/.cache/downloads"
++    DOWNLOAD_EXTRACT_TIMESTAMP TRUE SYSTEM EXCLUDE_FROM_ALL)
++FetchContent_MakeAvailable(spirvcross)
++# Upstream's non-vendored find guard uses this spelling, while its link target
++# uses spirv-cross-c. Both refer to the same pinned build; no system fallback.
++add_library(spirv_cross_c ALIAS spirv-cross-c)
++set(SDLSHADERCROSS_DXC OFF CACHE BOOL "" FORCE)
++set(SDLSHADERCROSS_SHARED OFF CACHE BOOL "" FORCE)
++set(SDLSHADERCROSS_STATIC ON CACHE BOOL "" FORCE)
++set(SDLSHADERCROSS_SPIRVCROSS_SHARED OFF CACHE BOOL "" FORCE)
++set(SDLSHADERCROSS_CLI ON CACHE BOOL "" FORCE)
++set(SDLSHADERCROSS_CLI_STATIC ON CACHE BOOL "" FORCE)
++set(SDLSHADERCROSS_INSTALL OFF CACHE BOOL "" FORCE)
++FetchContent_Declare(shadercross
++    URL https://codeload.github.com/libsdl-org/SDL_shadercross/tar.gz/${BLOOD2_SHADERCROSS_REVISION}
++    URL_HASH SHA256=60aae35ff71bd1d5f85b363e9d077a86bb27dd36333c42685e56c2fd541174d2
++    DOWNLOAD_NAME SDL_shadercross-${BLOOD2_SHADERCROSS_REVISION}.tar.gz
++    DOWNLOAD_DIR "${BLOOD2_ROOT}/.cache/downloads"
++    DOWNLOAD_EXTRACT_TIMESTAMP TRUE SYSTEM EXCLUDE_FROM_ALL)
++FetchContent_MakeAvailable(shadercross)
++add_custom_target(regenerate
++    COMMAND "${CMAKE_COMMAND}" "-DSHADERCROSS=$<TARGET_FILE:shadercross>"
++        -P "${BLOOD2_ROOT}/cmake/GenerateWorldShaders.cmake"
++    DEPENDS shadercross VERBATIM)

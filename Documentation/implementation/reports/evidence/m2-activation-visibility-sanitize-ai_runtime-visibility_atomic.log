@@ -1,0 +1,14 @@
+442/644 Testing: ai_runtime.visibility_atomic
+442/644 Test: ai_runtime.visibility_atomic
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_runtime_tests" "visibility_atomic"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_runtime.visibility_atomic" start time: Oct 17 04:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.visibility_atomic" end time: Oct 17 04:04 CEST
+"ai_runtime.visibility_atomic" time elapsed: 00:00:00
+----------------------------------------------------------

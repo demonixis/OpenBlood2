@@ -1,0 +1,67 @@
+539/540 Testing: player_keepalive.private
+539/540 Test: player_keepalive.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_keepalive_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"player_keepalive.private" start time: Oct 16 19:38 CEST
+Output:
+----------------------------------------------------------
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: CDestructableBrush: startfences: Open or non-manifold container shell: 4 edges / balance 0 at -3360 1216 32 -> -3360 1344 32
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: CDestructableBrush: fallengrills: Missing named world model
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Door: Buildings: Open or non-manifold container shell: 4 edges / balance 0 at -1408 -1920 1856 -> -1408 -2048 1856
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: CultistAI: Rejected precreate: CultistAI
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+Destination failure: Sound: Sound: invalid property VoiceType
+cycle=0 CityHub named entry at 704,-85.999,2368; HP=73 bullets=17 keys=0 respawns=0 Caleb triangles=941
+Original instance=243 Preprocessor only=541 Class not ported=207 Creation failed=35 
+AssaultRiflePU=1 CClientParticleStreamSFX=8 CDestructableBrush=2 CDestructableModel=122 ConversationTrigger=1 CultistAI=1 DemoSkyWorldModel=1 Door=1 FlashlightPU=1 Gideon=1 MedKitPU=1 Model=47 ProximitiesPU=2 RemotesPU=2 SkyPointer=4 Sound=31 SoundFX=5 SubMachineGunPU=1 WorldModelDebris=10 
+cycle=1 CityHub named entry at 704,-85.999,2368; HP=73 bullets=17 keys=0 respawns=0 Caleb triangles=941
+Original instance=243 Preprocessor only=541 Class not ported=207 Creation failed=35 
+AssaultRiflePU=1 CClientParticleStreamSFX=8 CDestructableBrush=2 CDestructableModel=122 ConversationTrigger=1 CultistAI=1 DemoSkyWorldModel=1 Door=1 FlashlightPU=1 Gideon=1 MedKitPU=1 Model=47 ProximitiesPU=2 RemotesPU=2 SkyPointer=4 Sound=31 SoundFX=5 SubMachineGunPU=1 WorldModelDebris=10 
+cycle=2 CityHub named entry at 704,-85.999,2368; HP=73 bullets=17 keys=0 respawns=0 Caleb triangles=941
+Original instance=243 Preprocessor only=541 Class not ported=207 Creation failed=35 
+AssaultRiflePU=1 CClientParticleStreamSFX=8 CDestructableBrush=2 CDestructableModel=122 ConversationTrigger=1 CultistAI=1 DemoSkyWorldModel=1 Door=1 FlashlightPU=1 Gideon=1 MedKitPU=1 Model=47 ProximitiesPU=2 RemotesPU=2 SkyPointer=4 Sound=31 SoundFX=5 SubMachineGunPU=1 WorldModelDebris=10 
+<end of output>
+Test time =   3.06 sec
+----------------------------------------------------------
+Test Passed.
+"player_keepalive.private" end time: Oct 16 19:38 CEST
+"player_keepalive.private" time elapsed: 00:00:03
+----------------------------------------------------------
+
+End testing: Oct 16 19:38 CEST
+
+headless =   3.12 sec*proc
+
+player_keepalive =   3.12 sec*proc
+
+private =   3.06 sec*proc
+

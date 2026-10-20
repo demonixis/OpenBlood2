@@ -1,0 +1,15 @@
+544/545 Testing: gpu.sprite_alpha
+544/545 Test: gpu.sprite_alpha
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/sprite_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/sprite-alpha"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.sprite_alpha" start time: Oct 16 20:01 CEST
+Output:
+----------------------------------------------------------
+Pixels: zero/partial/opaque/opaque-black DTX alpha, overlap sort, world occlusion, no depth writes, resize and reupload passed
+<end of output>
+Test time =   0.44 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sprite_alpha" end time: Oct 16 20:02 CEST
+"gpu.sprite_alpha" time elapsed: 00:00:00
+----------------------------------------------------------

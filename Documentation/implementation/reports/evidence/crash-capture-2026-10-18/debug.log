@@ -1,0 +1,115 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  5: objects.builtin_model
+ 1/50 Test  #5: objects.builtin_model ............   Passed    0.00 sec
+      Start  6: objects.original_objects
+ 2/50 Test  #6: objects.original_objects .........   Passed    0.00 sec
+      Start  7: objects.nested_creation
+ 3/50 Test  #7: objects.nested_creation ..........   Passed    0.00 sec
+      Start  8: objects.reasons_properties
+ 4/50 Test  #8: objects.reasons_properties .......   Passed    0.00 sec
+      Start  9: objects.scheduling
+ 5/50 Test  #9: objects.scheduling ...............   Passed    0.00 sec
+      Start 10: objects.deferred_removal
+ 6/50 Test #10: objects.deferred_removal .........   Passed    0.00 sec
+      Start 11: objects.aggregate_dispatch
+ 7/50 Test #11: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start 12: objects.handles_selection
+ 8/50 Test #12: objects.handles_selection ........   Passed    0.00 sec
+      Start 13: objects.links_lists
+ 9/50 Test #13: objects.links_lists ..............   Passed    0.00 sec
+      Start 14: objects.messages_strings
+10/50 Test #14: objects.messages_strings .........   Passed    0.01 sec
+      Start 15: objects.message_churn
+11/50 Test #15: objects.message_churn ............   Passed    1.64 sec
+      Start 16: objects.message_limit
+12/50 Test #16: objects.message_limit ............   Passed    0.09 sec
+      Start 17: objects.unsupported_teardown
+13/50 Test #17: objects.unsupported_teardown .....   Passed    0.01 sec
+      Start 18: objects.creation_failures
+14/50 Test #18: objects.creation_failures ........   Passed    0.01 sec
+      Start 22: config.arguments
+15/50 Test #22: config.arguments .................   Passed    0.00 sec
+      Start 23: config.precedence
+16/50 Test #23: config.precedence ................   Passed    0.00 sec
+      Start 24: config.relative_paths
+17/50 Test #24: config.relative_paths ............   Passed    0.00 sec
+      Start 25: config.invalid_config
+18/50 Test #25: config.invalid_config ............   Passed    0.00 sec
+      Start 26: config.content_validation
+19/50 Test #26: config.content_validation ........   Passed    0.00 sec
+      Start 27: config.case_lookup
+20/50 Test #27: config.case_lookup ...............   Passed    0.00 sec
+      Start 28: logging.basic
+21/50 Test #28: logging.basic ....................   Passed    0.01 sec
+      Start 29: logging.level
+22/50 Test #29: logging.level ....................   Passed    0.01 sec
+      Start 30: logging.rotation
+23/50 Test #30: logging.rotation .................   Passed    0.01 sec
+      Start 31: logging.failure
+24/50 Test #31: logging.failure ..................   Passed    0.01 sec
+      Start 32: logging.write_failure
+25/50 Test #32: logging.write_failure ............   Passed    0.02 sec
+      Start 33: logging.retention
+26/50 Test #33: logging.retention ................   Passed    0.01 sec
+      Start 34: logging.threads
+27/50 Test #34: logging.threads ..................   Passed    0.02 sec
+      Start 35: logging.abrupt
+28/50 Test #35: logging.abrupt ...................   Passed    0.01 sec
+      Start 36: logging.crash
+29/50 Test #36: logging.crash ....................   Passed    0.07 sec
+      Start 37: logging.cli
+30/50 Test #37: logging.cli ......................   Passed    0.07 sec
+      Start 38: crash.missing
+31/50 Test #38: crash.missing ....................   Passed    0.01 sec
+      Start 39: crash.existing
+32/50 Test #39: crash.existing ...................   Passed    0.01 sec
+      Start 40: crash.child_reaper
+33/50 Test #40: crash.child_reaper ...............   Passed    0.01 sec
+      Start 41: crash.lifecycle
+34/50 Test #41: crash.lifecycle ..................   Passed    0.02 sec
+      Start 42: crash.debugger
+35/50 Test #42: crash.debugger ...................   Passed    0.18 sec
+      Start 43: crash.segv
+36/50 Test #43: crash.segv .......................   Passed    0.48 sec
+      Start 44: crash.thread
+37/50 Test #44: crash.thread .....................   Passed    0.57 sec
+      Start 45: crash.abort
+38/50 Test #45: crash.abort ......................   Passed    0.49 sec
+      Start 46: crash.overflow
+39/50 Test #46: crash.overflow ...................   Passed    0.56 sec
+      Start 47: crash.dead_helper
+40/50 Test #47: crash.dead_helper ................   Passed    0.06 sec
+      Start 48: crash.collector_loss
+41/50 Test #48: crash.collector_loss .............   Passed    0.08 sec
+      Start 49: crash.timeout
+42/50 Test #49: crash.timeout ....................   Passed    0.32 sec
+      Start 50: crash.dump_failure
+43/50 Test #50: crash.dump_failure ...............   Passed    0.30 sec
+      Start 51: crash.size_limit
+44/50 Test #51: crash.size_limit .................   Passed    0.29 sec
+      Start 52: cli.help
+45/50 Test #52: cli.help .........................   Passed    0.02 sec
+      Start 53: cli.unknown
+46/50 Test #53: cli.unknown ......................   Passed    0.02 sec
+      Start 54: cli.missing_data
+47/50 Test #54: cli.missing_data .................   Passed    0.02 sec
+      Start 55: cli.missing_config
+48/50 Test #55: cli.missing_config ...............   Passed    0.02 sec
+      Start 56: cli.metadata
+49/50 Test #56: cli.metadata .....................   Passed    0.02 sec
+      Start 86: cli.world_modes
+50/50 Test #86: cli.world_modes ..................   Passed    2.13 sec
+
+100% tests passed, 0 tests failed out of 50
+
+Label Time Summary:
+cli         =   0.19 sec*proc (6 tests)
+config      =   0.01 sec*proc (6 tests)
+crash       =   3.38 sec*proc (14 tests)
+headless    =   7.68 sec*proc (50 tests)
+logging     =   0.25 sec*proc (10 tests)
+objects     =   1.79 sec*proc (14 tests)
+private     =   2.13 sec*proc (1 test)
+world       =   2.13 sec*proc (1 test)
+
+Total Test time (real) =   7.71 sec

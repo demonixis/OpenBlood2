@@ -1,0 +1,14 @@
+69/464 Testing: movement.controls
+69/464 Test: movement.controls
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/movement_tests" "controls" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/movement-fixtures/controls"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"movement.controls" start time: Oct 16 16:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"movement.controls" end time: Oct 16 16:25 CEST
+"movement.controls" time elapsed: 00:00:00
+----------------------------------------------------------

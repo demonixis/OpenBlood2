@@ -1,0 +1,1745 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index eb555b6..c9570ec 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -113,3 +113,14 @@ unlink scheduling and already-started FIRE_KEY handling. Presentation/listener
+ requests are not cinematic rendering/audio. SubwayA now has 144 created source
+ entries, 7 owned SelfTriggers, 372 editor-only and 64 unported entries. KeyFramer,
+ CinematicTrigger, transitions and the actual M2 gate remain open.
++
++The latest [keyframe evidence](../Documentation/Implementation/M2_KEYFRAMERS.md) connects original KeyFramer/KeyData timelines,
++camera/ordinary-object motion and consumed-key ownership. Read [keyframe contracts](docs/KEYFRAMER_CONTRACTS.md)
++before extending scripted paths, linked-camera rotation or controller callbacks.
++Preserve first-update initialization, ignored early ON, component rotation offsets,
++loop overshoot discard and the source's missing final snap. Keep target offsets paired
++through removal and stop reentrant stale updates. World-model/container motion, key
++audio and CinematicTrigger remain explicitly unavailable. SubwayA has 148 created
++source entries, 7 SelfTriggers, 372 editor-only and 60 unported; nine Keys are consumed
++on the first update (155/158 initial instances before/after player, 146/149 afterwards).
++M2 remains open; these counts do not imply completed cinematic/gameplay services.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 85f1204..e51a603 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,6 +32,7 @@ add_library(blood2_game STATIC
+     src/game/session.cpp
+     src/game/registration.cpp
+     src/game/server_adapter.cpp)
++target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+@@ -45,13 +46,13 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp)
++add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+ target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+ if(BLOOD2_INSPECTOR)
+-    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
++    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
+     target_link_libraries(blood2_app PRIVATE imgui)
+ endif()
+ 
+diff --git a/README.md b/README.md
+index 45b0ebd..9e569a3 100644
+--- a/README.md
++++ b/README.md
+@@ -129,3 +129,13 @@ view, visibility and audio listener are inspection data/requests; cinematic worl
+ rendering, KeyFramer/CinematicTrigger and audio remain pending. Latest SubwayA
+ accounting is 144 source instances + 7 SelfTriggers, 154 with player/owned models,
+ 372 editor-only entries, 64 unported and zero failed. M2 is still open.
++
++Latest: [original keyframed paths](../Documentation/Implementation/M2_KEYFRAMERS.md)
++connect KeyFramer/KeyData, camera motion and owned consumed keys. The Keyframes tab
++shows copied timelines, target transforms/results and unresolved script/sound
++requests. Run `./build/debug/blood2 --keyframes-smoke` for hidden-UI/reload checks.
++[Contracts](docs/KEYFRAMER_CONTRACTS.md) preserve original timing/rotation quirks.
++SubwayA has 148 created source entries + 7 SelfTriggers, 372 editor-only, 60 unported,
++zero failed. Nine Keys disappear after copying: live counts are 155 before player
++entry, 158 after entry, then 146/149 after initialization. World/container path
++motion, CinematicTrigger, sound and full M2 acceptance remain pending.
+diff --git a/docs/CAMERA_CONTRACTS.md b/docs/CAMERA_CONTRACTS.md
+index 38e1fde..0730e09 100644
+--- a/docs/CAMERA_CONTRACTS.md
++++ b/docs/CAMERA_CONTRACTS.md
+@@ -105,3 +105,7 @@ application entry keeps the intro. The strict existing `16_bridge.dat` rejection
+ KeyFramer, CinematicTrigger, world transitions, other required classes/services,
+ rendering/audio, save/load and complete M2 acceptance remain open. No retail
+ executable comparison, additional-platform or XR validation is claimed.
++
++The later [keyframe continuation](KEYFRAMER_CONTRACTS.md) supersedes the blanket
++KeyFramer omission above for camera/ordinary-object paths. CinematicTrigger,
++keyframed world/container motion, rendering/audio and the full M2 gate remain open.
+diff --git a/docs/KEYFRAMER_CONTRACTS.md b/docs/KEYFRAMER_CONTRACTS.md
+new file mode 100644
+index 0000000..a12a954
+--- /dev/null
++++ b/docs/KEYFRAMER_CONTRACTS.md
+@@ -0,0 +1,109 @@
++# Original keyframed paths
++
++M2 remains incomplete. Read [object](OBJECT_CONTRACTS.md), [camera](CAMERA_CONTRACTS.md),
++[collision](MODEL_AND_COLLISION_CONTRACTS.md) and [interaction](INTERACTION_CONTRACTS.md)
++contracts with the [source selections](M2_KEYFRAMER_SOURCES.json) and
++[implementation evidence](../../Documentation/Implementation/M2_KEYFRAMERS.md).
++
++## Original sequencing
++
++KeyFramer retains original ObjectName/BaseKeyName/StartActive/Looping defaults,
++world-only property reads, B2BaseClass filtering/callback forwarding, saveable user
++bit and delayed first initialization. Runtime/string-created controllers keep
++source defaults; restore is rejected. Save/load and sound caching remain absent.
++The first update snapshots exact-name targets and collects BaseKeyName0, 1, 2,
++... until the first missing number. It selects the first live Key-derived match,
++skipping same-named objects of other classes. A duplicate or a key after a gap
++is not consumed. Target lookup is one-time: later spawning a previously missing
++class does not silently repair the path.
++
++Original KeyData::Copy values are owned before their source Key objects are removed
++through deferred lifetime. Every copied Key is a position key; nonempty sound,
++paired target/message, and print values retain the source event conditions.
++Timestamps accumulate relative to the previous key, not absolute level time.
++The first initialization update does not advance path time. ON/TRIGGER before
++initialization is ignored; ON while active does not restart. OFF disables updates;
++a later ON restarts time/current key but retains original offsets. Source Pause
++clears active; Resume sets it without rearming an already-disabled schedule.
++
++Active callbacks add the frame delta and process all crossed keys in order.
++One loop at most is processed per update; overshoot is discarded when time resets.
++Nonlooping completion does **not** snap to the last endpoint: the source returns
++before motion after consuming the last key. Position is linear between current
++and next keys. A duration at or below 0.001 uses the next pose. Rotation uses the
++typed InterpolateRotation service. Target position offset and **quaternion component
++difference** are captured relative to the first key and added back; no replacement
++quaternion-composition rule is introduced. A CameraObj with a tracking link keeps
++its tracking rotation while receiving path translation.
++
++## Typed engine services and deliberate adaptations
++
++InterpolateRotation validates finite, nonzero quaternions and t in [0,1], normalizes
++inputs/output and uses shortest-arc slerp (normalized linear interpolation near
++coincident rotations). Invalid input leaves output unchanged. This is replacement
++engine math, not proven retail numerical parity.
++
++MoveKeyframedObject validates the complete requested pose before movement. It
++supports ordinary OT_NORMAL/OT_MODEL objects through existing MoveObject collision,
++followed by normalized SetObjectRotation when requested. Collision may clip the
++position; rotation still follows the source call order. The result distinguishes
++reached, blocked/clipped, invalid/removed and unavailable. Reached counts are not
++rendered-frame counts. Contact removal is checked before rotation; pending objects
++cannot receive SetObjectRotation. Containers, world models, other object types and
++client-controlled shared player bodies explicitly return Unavailable before any
++pose mutation. Combined world-model translation/rotation requires a future atomic
++geometry transaction; the existing door solver is not bypassed. Thus SubwayA's
++happytrain path is inspectable but its brush motion remains unavailable.
++
++Bounded vectors replace linked KEYNODE allocations and parallel legacy offset
++arrays. Each target stores its handle, offsets and result together; MID_LINKBROKEN
++removes that entire record, fixing the source's shifted-offset bug after removal.
++Keys/strings are value-owned, with no legacy HSTRING lifetime beyond their source
++or message dispatch. Discovery is limited to 1,024 contiguous keys and 256 targets;
++self-targets reject. Nonfinite or abs(timestamp/cumulative time)>1,000,000 and sound
++radius outside [0,1,000,000] reject. Finite negative timestamps keep source ordering;
++they are not sorted or clamped. Invalid/over-limit discovery consumes no source keys.
++A command revision guard ends the current callback after a reentrant state change;
++self-removal ends it too. This deliberately prevents continuing a stale path after
++an OFF/ON or deletion delivered by a key/contact callback. No destruction occurs
++inside an object callback, and keys outlive their source objects independently.
++
++Message keys use the existing original named-trigger helper, including REMOVE.
++Inspection counts resolved live names before dispatch, not successful game effects;
++zero matches are exposed. Allocation failure is a diagnostic. Sound keys retain
++name/radius/loop data and count requests per live controlled target, but **do not
++play sound** or fabricate a sound handle. Original replacement/kill timing awaits
++real audio. Print keys retain their text/count for inspection; original broadcast
++BPrint presentation is also unavailable. These requests do not satisfy M2 services.
++
++## Inspection and validation
++
++Keyframes lists hidden/inactive controllers and their initialization, activity,
++time, schedule, next key, copied keys/poses/events, target offsets/actual positions,
++attempt/result counts and unresolved messages. World keeps original source entries
++and correctly shows consumed Keys as no longer live. Source entries created is a
++historical load count, distinct from current live instances. The original camera
++tab still exposes external view/player restrictions separately from world rendering.
++
++Nine synthetic cases cover defaults/filtering, contiguous/duplicate key selection,
++ownership and endpoint behavior, looping/overshoot/Pause/Resume, quaternion offsets
++and linked cameras, target removal, owned messages/requests, reentrant OFF/removal,
++invalid/unsupported poses and finite bounds, plus collision clipping/contact removal.
++The private catalog creates all 94 controllers, 383 Keys and 61 cameras from the 57
++readable installed worlds. It copies 375 Keys, leaves eight unconsumed and reports
++44 controllers without targets in this **camera/key-only catalog**; this is not a
++full-world missing-target count. It has no empty paths or malformed-path rejection.
++The strict `16_bridge.dat` format rejection is unchanged.
++
++Two actual SubwayA reload cycles verify first-update key consumption, numeric camera
++path interpolation reaching the selected client view, missing Gideon script delivery,
++the natural two-camera intro/release, and explicit unsupported train motion with
++unchanged brush pose. `--keyframes-smoke` checks the authored first camera path with
++UI hidden and after reload; the same simulation runs in an inspector-free build.
++GPU lifetime snapshots now run one normal update before their initial count, so
++reload compares the same post-consumption phase without relaxing equality checks.
++
++CinematicTrigger, GlowingLight, Gideon/AI, keyframed world/container physics, sound,
++world transitions, attachment/rendering coverage, persistence and remaining required
++classes/services keep M2 open. No retail executable, other-platform or XR parity is
++claimed. Existing SDL/dependency pins and commercial assets are unchanged.
+diff --git a/docs/M2_KEYFRAMER_SOURCES.json b/docs/M2_KEYFRAMER_SOURCES.json
+new file mode 100644
+index 0000000..0de5973
+--- /dev/null
++++ b/docs/M2_KEYFRAMER_SOURCES.json
+@@ -0,0 +1,86 @@
++{
++  "date": "2026-10-16",
++  "status": "M2 incomplete; original camera/ordinary-object keyframe paths",
++  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "imports": [
++    {
++      "source": "sources/blood2/ObjectDLL/KeyFramer.cpp",
++      "target": "src/game/original/KeyFramer.cpp",
++      "source_line_ranges": [
++        [
++          40,
++          300
++        ],
++        [
++          312,
++          710
++        ]
++      ],
++      "selection": "Selected original initial update, contiguous key collection, relative timestamps, target offsets, ON/OFF/TRIGGER, frame processing, one-cycle looping, no final endpoint snap, component rotation offsets and linked-camera exclusion. Bounded owned vectors replace KEYNODE/CDynArray/list lifetime; target-offset removal fix and reentrant revision guard are deliberate adaptations. Sound and BPrint are inspection requests; save/load/cache omitted. Typed motion explicitly rejects unsupported geometry/body targets.",
++      "source_sha256": "31489c8f6891fdce061548ac4903b80c90c73d94049da14698ec34a559ecbf67",
++      "target_sha256": "c08cb408d3fb776915116884f41b40c535c01064a3731aa980d32dabf7685bc0"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/KeyFramer.cpp",
++      "target": "src/game/registration.cpp",
++      "source_line_ranges": [
++        [
++          24,
++          29
++        ]
++      ],
++      "selection": "Original ObjectName/BaseKeyName/StartActive/Looping defaults and B2BaseClass ancestry.",
++      "source_sha256": "31489c8f6891fdce061548ac4903b80c90c73d94049da14698ec34a559ecbf67",
++      "target_sha256": "9021c1563974c5362d3ed44b23107725f09a8078400617c558a0691d062ec07d"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/KeyFramer.h",
++      "target": "src/game/original/KeyFramer.h",
++      "source_line_ranges": [
++        [
++          29,
++          79
++        ]
++      ],
++      "selection": "Original class callback/state/GoActive/Pause/Resume concepts with vector/string ownership and diagnostics; no linked KEYNODE, dynamic arrays, sound handles or save/load.",
++      "source_sha256": "82fd24e0f762487bd19b97733c500aec5c2966daa854bd293b4b2b03fe5e0038",
++      "target_sha256": "adf451494f8868b9771b4afec99258e37dd0961cf5d84fc74227bd16bdb465ce"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/KeyData.cpp",
++      "target": "src/game/original/KeyData.cpp",
++      "source_line_ranges": [
++        [
++          22,
++          109
++        ]
++      ],
++      "selection": "Original Copy: object pose, relative timestamp, sound radius/loop, optional sound/message/print fields, using owned strings and finite bounds. All copied source keys carry position; optional event fields replace type bits in this restore-free subset.",
++      "source_sha256": "8f0697142fdeed9598d07af420f224cd7ccd6c146e97f6eed003d6505fa4dee7",
++      "target_sha256": "0576e8d770981baf9f3b36932f93288df9ffeb2fdcad692e35c4f055145f22ab"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/KeyData.h",
++      "target": "src/game/original/KeyData.h",
++      "source_line_ranges": [
++        [
++          22,
++          41
++        ]
++      ],
++      "selection": "Selected copied key fields with value ownership; source name retained for inspection. No serialization/cache surface.",
++      "source_sha256": "89609365f826102297e0126dbfc4d83f6546521eaf825c854c234bc0ca3c66b8",
++      "target_sha256": "abe7c30ac0e8ce9a514191f5b314b2e0af53e25b316e5dbf6cf207e30de1e3d6"
++    }
++  ],
++  "adaptations": [
++    "Bounded value-owned copied keys/strings and paired target/offset records; 1024 keys, 256 targets, finite timeline/radius checks; malformed discovery consumes no keys",
++    "Preserve first returned typed name match, contiguous suffix stop, first-update timing, early ON, component quaternion offset, linked-camera rotation exclusion, overshoot discard and missing final snap",
++    "Fix parallel-offset shift after target removal; command revision stops stale reentrant update after state change/removal",
++    "New typed normalized shortest-arc slerp and checked ordinary-object movement; world/container/client-controlled bodies explicitly unavailable before mutation",
++    "Owned original trigger messages execute; missing live targets exposed; sound/BPrint requests are inspection only, not fabricated playback/presentation success",
++    "GPU smoke lifetime counts measured after one normal initialization update; original Key consumption remains observable; no equality assertion relaxed",
++    "Private Door fixture snapshots only Door identities before steps that consume Keys; no motion assertion removed; duplicate fixture obeys existing returned-list order",
++    "Save/load, CinematicTrigger, keyframed geometry, audio, cinematic rendering and full M2 remain open"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 806c4cd..63fbe3d 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -331,3 +331,14 @@ source rules from typed descriptors, checked lifetime, look-direction math and
+ stable client selection. Cinematic rendering and audio remain presentation requests;
+ KeyFramer/CinematicTrigger and full M2 acceptance are not implemented by this port.
+ Earlier ledgers remain historical; no dependency pin or reference tree changed.
++
++## M2 KeyFramer / KeyData continuation
++
++[Selection hashes](M2_KEYFRAMER_SOURCES.json) record original ObjectDLL/KeyFramer
++and KeyData fields/callbacks/timeline/interpolation/message branches. Owned vectors
++and strings replace KEYNODE/CDynArray/HSTRING storage, preserving original component
++rotation offsets and endpoint/loop timing quirks. [Contracts](KEYFRAMER_CONTRACTS.md)
++record the target-offset removal fix, bounded discovery and reentrant command guard.
++The typed engine interpolation/motion helpers and UI are new implementation code.
++Sound/BPrint requests, world/container movers, CinematicTrigger and full M2 remain
++unimplemented; these diagnostics are not successful audio/physics service stubs.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 3f6fe2f..a8568a2 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -514,6 +514,12 @@ namespace OpenBlood2
+                     draw_triggers(game, selection);
+                     ImGui::EndTabItem();
+                 }
++                if (ImGui::BeginTabItem("Keyframes", nullptr, select_keyframes ? ImGuiTabItemFlags_SetSelected : 0))
++                {
++                    select_keyframes = false;
++                    draw_keyframes(game, selection);
++                    ImGui::EndTabItem();
++                }
+                 if (ImGui::BeginTabItem("Cameras", nullptr, select_cameras ? ImGuiTabItemFlags_SetSelected : 0))
+                 {
+                     select_cameras = false;
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 182349e..7e48e59 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -21,6 +21,9 @@ namespace OpenBlood2
+         ObjectId trigger_selection{}, trigger_request{};
+         std::string trigger_command;
+         bool grant_key_request = false;
++        bool select_keyframes = false;
++        ObjectId keyframe_selection{};
++        void draw_keyframes(GameSession&, ObjectSelection&);
+         bool select_cameras = false;
+         ObjectId camera_selection{}, camera_request{};
+         char camera_link_name[96]{};
+diff --git a/src/app/inspector_cameras.cpp b/src/app/inspector_cameras.cpp
+index 843186f..4fae6e5 100644
+--- a/src/app/inspector_cameras.cpp
++++ b/src/app/inspector_cameras.cpp
+@@ -96,7 +96,7 @@ namespace OpenBlood2
+         ImGui::TextWrapped(
+             "Client selection uses the first active camera descriptor; server listener selection follows "
+             "the original camera list. Retail worlds suppress the client IsListener flag. Camera "
+-            "controls are diagnostic; CinematicTrigger and KeyFramer remain pending.");
++            "controls are diagnostic; Keyframes inspects path motion. CinematicTrigger remains pending.");
+         ImGui::EndTable();
+     }
+ } // namespace OpenBlood2
+diff --git a/src/app/inspector_keyframes.cpp b/src/app/inspector_keyframes.cpp
+new file mode 100644
+index 0000000..1c07e87
+--- /dev/null
++++ b/src/app/inspector_keyframes.cpp
+@@ -0,0 +1,92 @@
++#include "app/inspector.h"
++#include "game/original/KeyFramer.h"
++#include <imgui.h>
++namespace OpenBlood2
++{
++    void Inspector::draw_keyframes(GameSession& game, ObjectSelection& selection)
++    {
++        ImGui::TextWrapped(
++            "Original KeyFramer timelines. Keys are copied, then their source objects are removed. "
++            "Camera/ordinary-object paths run; world-model/container motion and key audio remain unavailable.");
++        if (!ImGui::BeginTable("Keyframe inspection", 2, ImGuiTableFlags_Resizable))
++            return;
++        ImGui::TableSetupColumn("Controllers", ImGuiTableColumnFlags_WidthFixed, 270);
++        ImGui::TableSetupColumn("Owned keys and targets");
++        ImGui::TableNextColumn();
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* r = game.objects.get(id);
++            const auto* f = r ? dynamic_cast<const KeyFramer*>(r->game.get()) : nullptr;
++            if (!f)
++                continue;
++            if (!game.objects.get(keyframe_selection))
++                keyframe_selection = id;
++            std::string label = std::string(r->state.m_Name) + (f->active ? " [on]" : " [off]");
++            if (!(r->state.m_Flags & FLAG_VISIBLE))
++                label += " [hidden]";
++            if (r->activity != OBJSTATE_ACTIVE)
++                label += " [inactive]";
++            ImGui::PushID(static_cast<int>(id.slot));
++            if (ImGui::Selectable(label.c_str(), keyframe_selection == id))
++                keyframe_selection = selection.id = id;
++            ImGui::PopID();
++        }
++        ImGui::TableNextColumn();
++        if (const auto* r = game.objects.get(keyframe_selection))
++            if (const auto* f = dynamic_cast<const KeyFramer*>(r->game.get()))
++            {
++                ImGui::Text("Target name: %s / key prefix: %s", f->object_name.c_str(), f->base_key_name.c_str());
++                ImGui::Text("Initialized %d / start %d / loop %d / active %d", f->initialized, f->start_active,
++                            f->looping, f->active);
++                ImGui::Text("Time %.4f / next %zu / processed %llu", f->time, f->next,
++                            (unsigned long long)f->processed);
++                ImGui::Text("Schedule %d / alive %d", r->scheduled, r->life == Life::Alive);
++                if (!f->error.empty())
++                    ImGui::TextWrapped("Diagnostic: %s", f->error.c_str());
++                ImGui::Text("Targets %zu / copied keys %zu", f->targets.size(), f->keys.size());
++                for (const auto& t : f->targets)
++                {
++                    const auto* target = game.objects.get(t.object);
++                    const char* result = !t.attempts                        ? "not attempted"
++                                         : t.result == MoverResult::Moved   ? "reached"
++                                         : t.result == MoverResult::Blocked ? "blocked/clipped"
++                                         : t.result == MoverResult::Invalid ? "invalid/removed"
++                                                                            : "unavailable";
++                    ImGui::TextWrapped("%s (%s): %s / reached %llu", target ? target->state.m_Name : "removed",
++                                       target ? target->type->name.c_str() : "none", result,
++                                       (unsigned long long)t.moves);
++                    if (target)
++                        ImGui::Text("Position %.2f %.2f %.2f / offset %.2f %.2f %.2f", target->state.m_Pos.x,
++                                    target->state.m_Pos.y, target->state.m_Pos.z, t.offset.x, t.offset.y, t.offset.z);
++                }
++                ImGui::Text("Message keys %llu / last matches %zu / unresolved %llu",
++                            (unsigned long long)f->message_keys, f->last_message_matches,
++                            (unsigned long long)f->unresolved_messages);
++                ImGui::TextWrapped("Sound requests %llu (not played): %s", (unsigned long long)f->sound_requests,
++                                   f->last_sound.c_str());
++                ImGui::TextWrapped("Print requests %llu: %s", (unsigned long long)f->print_requests,
++                                   f->last_print.c_str());
++                ImGui::SeparatorText("Owned original key values");
++                ImGui::BeginChild("Copied keys", ImVec2(0, 200));
++                for (const auto& key : f->keys)
++                {
++                    ImGui::PushID(&key);
++                    if (ImGui::TreeNode(key.name.c_str()))
++                    {
++                        ImGui::Text("Relative %.4f / cumulative %.4f", key.timestamp, key.time);
++                        ImGui::Text("Position %.2f %.2f %.2f", key.position.x, key.position.y, key.position.z);
++                        ImGui::Text("Quaternion %.3f %.3f %.3f %.3f", key.rotation.m_Vec.x, key.rotation.m_Vec.y,
++                                    key.rotation.m_Vec.z, key.rotation.m_Spin);
++                        ImGui::TextWrapped("Message %s: %s", key.message_target.c_str(), key.message.c_str());
++                        ImGui::TextWrapped("Sound %s / radius %.1f / loop %d", key.sound.c_str(), key.sound_radius,
++                                           key.loop_sound);
++                        ImGui::TextWrapped("Print: %s", key.print.c_str());
++                        ImGui::TreePop();
++                    }
++                    ImGui::PopID();
++                }
++                ImGui::EndChild();
++            }
++        ImGui::EndTable();
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/keyframe_smoke.cpp b/src/app/keyframe_smoke.cpp
+new file mode 100644
+index 0000000..cea698c
+--- /dev/null
++++ b/src/app/keyframe_smoke.cpp
+@@ -0,0 +1,34 @@
++#include "keyframe_smoke.h"
++#include "game/original/KeyFramer.h"
++namespace OpenBlood2
++{
++    bool prepare_keyframe_smoke(GameSession& game, ObjectId& selected)
++    {
++        for (auto id : game.objects.snapshot())
++            if (const auto* r = game.objects.get(id);
++                r && std::string_view(r->state.m_Name) == "tracking1" && dynamic_cast<const KeyFramer*>(r->game.get()))
++            {
++                selected = id;
++                return true;
++            }
++        return false;
++    }
++    bool check_keyframe_smoke(GameSession& game, ObjectId selected)
++    {
++        const auto* r = game.objects.get(selected);
++        const auto* f = r ? dynamic_cast<const KeyFramer*>(r->game.get()) : nullptr;
++        if (!f || !f->initialized || f->keys.size() != 2 || f->targets.size() != 1 || !f->active ||
++            !f->targets[0].moves || f->targets[0].result != MoverResult::Moved || f->unresolved_messages != 1)
++            return false;
++        const auto* target = game.objects.get(f->targets[0].object);
++        if (!target || game.client_shell.view.object != target->handle)
++            return false;
++        const auto& a = f->keys[0];
++        const auto& b = f->keys[1];
++        const auto expected = vector_add(f->targets[0].offset,
++                                         vector_add(a.position, vector_scale(vector_subtract(b.position, a.position),
++                                                                             (f->time - a.time) / (b.time - a.time))));
++        auto delta = vector_subtract(expected, game.client_shell.view.position);
++        return vector_dot(delta, delta) < .0001f;
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/keyframe_smoke.h b/src/app/keyframe_smoke.h
+new file mode 100644
+index 0000000..b7b570f
+--- /dev/null
++++ b/src/app/keyframe_smoke.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool prepare_keyframe_smoke(GameSession&, ObjectId&);
++    bool check_keyframe_smoke(GameSession&, ObjectId);
++} // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index d909d60..e39d887 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -8,6 +8,7 @@
+ #include "game/original/Door.h"
+ #include "game/server_adapter.h"
+ #include "interaction_smoke.h"
++#include "keyframe_smoke.h"
+ #include "objectives_smoke.h"
+ #include "pickup_smoke.h"
+ #include "trigger_smoke.h"
+@@ -173,6 +174,18 @@ namespace
+                 return 4;
+             selection.id = smoke_camera;
+         }
++        OpenBlood2::ObjectId smoke_keyframe{};
++        bool keyframe_hidden = false;
++        if (options.keyframes_smoke)
++        {
++            if (!OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe))
++                return 4;
++            selection.id = smoke_keyframe;
++        }
++        // Compare reload lifetime at the same phase: original controllers copy
++        // and consume their Key objects on the first normal simulation update.
++        if (options.world_smoke && !game.step(1.0 / 60))
++            return 4;
+         bool interaction_hidden = false;
+         const auto original_selection = selection.id;
+         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
+@@ -186,7 +199,8 @@ namespace
+             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
+         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
+                                    !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke &&
+-                                   !options.pickups_smoke && !options.objectives_smoke && !options.cameras_smoke;
++                                   !options.pickups_smoke && !options.objectives_smoke && !options.cameras_smoke &&
++                                   !options.keyframes_smoke;
+         inspector.select_weapons = options.weapons_smoke;
+         inspector.select_movement = options.movement_smoke;
+         inspector.select_containers = options.containers_smoke;
+@@ -194,6 +208,8 @@ namespace
+         inspector.select_pickups = options.pickups_smoke;
+         inspector.select_objectives = options.objectives_smoke;
+         inspector.select_cameras = options.cameras_smoke;
++        inspector.select_keyframes = options.keyframes_smoke;
++        inspector.keyframe_selection = smoke_keyframe;
+         inspector.brush_selection = smoke_body;
+         inspector.select_doors = options.doors_smoke || options.interaction_smoke;
+         inspector.keyboard_movement = options.interaction_smoke;
+@@ -305,6 +321,9 @@ namespace
+             if (options.brushes_smoke && frames == reload_frame + 1)
+                 if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
+                     return 4;
++            if (options.keyframes_smoke && frames == reload_frame + 1 &&
++                !OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe))
++                return 4;
+             if (options.cameras_smoke && frames == reload_frame + 1 &&
+                 !OpenBlood2::prepare_camera_smoke(game, smoke_camera))
+                 return 4;
+@@ -430,7 +449,7 @@ namespace
+                 frames >= (extended_smoke ? 180u
+                            : (options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
+                               options.interaction_smoke || options.brushes_smoke || options.pickups_smoke ||
+-                              options.objectives_smoke || options.cameras_smoke)
++                              options.objectives_smoke || options.cameras_smoke || options.keyframes_smoke)
+                                ? 14u
+                                : 2u) &&
+                 !captured && !options.capture_file.empty();
+@@ -577,6 +596,8 @@ namespace
+                     use.key.down = frames == hide_frame;
+                     event_ok = SDL_PushEvent(&use);
+                 }
++                if (options.keyframes_smoke && frames == show_frame - 1)
++                    keyframe_hidden = OpenBlood2::check_keyframe_smoke(game, smoke_keyframe);
+                 if (options.cameras_smoke && frames == show_frame - 1)
+                     camera_hidden = OpenBlood2::check_camera_smoke(game, smoke_camera);
+                 if (options.objectives_smoke && frames == show_frame - 1)
+@@ -704,6 +725,8 @@ namespace
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
++                (options.keyframes_smoke &&
++                 (!keyframe_hidden || !OpenBlood2::check_keyframe_smoke(game, smoke_keyframe))) ||
+                 (options.cameras_smoke && (!camera_hidden || !OpenBlood2::check_camera_smoke(game, smoke_camera))) ||
+                 (options.objectives_smoke && !objective_hidden) || (options.pickups_smoke && !pickup_hidden) ||
+                 (options.interaction_smoke && !interaction_hidden) || (options.brushes_smoke && !brush_hidden) ||
+@@ -727,6 +750,9 @@ namespace
+             if (options.world_smoke)
+                 spdlog::info("World smoke passed: unload/reload, original instance/string counts restored, "
+                              "collision/model resources restored, preview animation advanced while hidden");
++            if (options.keyframes_smoke)
++                spdlog::info("KEYFRAMES smoke: authored camera path and owned key lifetime checked while UI hidden and "
++                             "after reload; missing Gideon message exposed");
+             if (options.cameras_smoke)
+                 spdlog::info("CAMERAS smoke: original camera tracks player while UI hidden; selected view, movement "
+                              "gate and reload checked");
+@@ -806,6 +832,7 @@ int main(int argc, char** argv)
+                      "  --interaction-smoke GPU original USE and rotating door inspection\n"
+                      "  --pickups-smoke   GPU original ammo pickup, hidden collection and reload\n"
+                      "  --objectives-smoke GPU original objectives and localized text, hidden delivery/reload\n"
++                     "  --keyframes-smoke   GPU original camera key path, key lifetime and reload\n"
+                      "  --cameras-smoke     GPU original camera tracking, player gates and reload\n"
+                      "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
+                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index c47afc0..d1e2ff0 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -125,6 +125,10 @@ namespace OpenBlood2
+                 options.player_smoke = true;
+                 options.containers_smoke = true;
+             }
++            else if (arg == "--keyframes-smoke")
++            {
++                options.world_smoke = options.player_smoke = options.keyframes_smoke = true;
++            }
+             else if (arg == "--cameras-smoke")
+             {
+                 options.world_smoke = options.player_smoke = options.cameras_smoke = true;
+@@ -214,7 +218,7 @@ namespace OpenBlood2
+         if (int(options.weapons_smoke) + int(options.movement_smoke) + int(options.containers_smoke) +
+                 int(options.doors_smoke) + int(options.triggers_smoke) + int(options.interaction_smoke) +
+                 int(options.brushes_smoke) + int(options.pickups_smoke) + int(options.objectives_smoke) +
+-                int(options.cameras_smoke) >
++                int(options.cameras_smoke) + int(options.keyframes_smoke) >
+             1)
+         {
+             error = "Choose one player smoke scenario";
+diff --git a/src/engine/config.h b/src/engine/config.h
+index 87ba73f..282a4ac 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -23,7 +23,7 @@ namespace OpenBlood2
+         bool weapons_smoke = false;
+         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
+              interaction_smoke = false, brushes_smoke = false, pickups_smoke = false, objectives_smoke = false,
+-             cameras_smoke = false;
++             cameras_smoke = false, keyframes_smoke = false;
+         bool start_game = false;
+         bool explicit_config = false;
+         bool help = false;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 9765bb6..9b08702 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -62,6 +62,8 @@ class ServerDE : public CSBase
+     virtual void RemoveCameraEffect(HOBJECT) = 0;
+     virtual OpenBlood2::CameraView GetCameraView() = 0;
+     virtual DRESULT AlignRotation(DRotation&, DVector forward) = 0; // Selected world-Y-up caller.
++    virtual DRESULT InterpolateRotation(DRotation&, const DRotation&, const DRotation&, float) = 0;
++    virtual OpenBlood2::MoverResult MoveKeyframedObject(HOBJECT, DVector, const DRotation*) = 0;
+     virtual DDWORD GetObjectUserFlags(HOBJECT) = 0;
+     virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
+     virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;
+diff --git a/src/game/original/KeyData.cpp b/src/game/original/KeyData.cpp
+new file mode 100644
+index 0000000..25c6a08
+--- /dev/null
++++ b/src/game/original/KeyData.cpp
+@@ -0,0 +1,27 @@
++#include "KeyData.h"
++#include "engine/collision.h"
++#include <cmath>
++bool KeyData::Copy(const Key& key)
++{
++    auto* server = g_pServerDE;
++    if (!server || !server->IsObjectAlive(key.m_hObject))
++        return false;
++    server->GetObjectPos(key.m_hObject, &position);
++    if (server->GetObjectRotation(key.m_hObject, &rotation) != DE_OK)
++        return false;
++    name = server->GetObjectName(key.m_hObject);
++    timestamp = key.m_fTimeStamp;
++    sound_radius = key.m_fSoundRadius;
++    loop_sound = key.m_bLoopSound;
++    auto copy = [server](HSTRING h)
++    {
++        const auto* s = server->GetStringData(h);
++        return std::string(s ? s : "");
++    };
++    sound = copy(key.m_hstrSoundName);
++    message_target = copy(key.m_hstrMessageTarget);
++    message = copy(key.m_hstrMessageName);
++    print = copy(key.m_hstrBPrintMessage);
++    return OpenBlood2::physics_vector(position) && std::isfinite(timestamp) && std::abs(timestamp) <= 1e6f &&
++           std::isfinite(sound_radius) && sound_radius >= 0 && sound_radius <= 1e6f;
++}
+diff --git a/src/game/original/KeyData.h b/src/game/original/KeyData.h
+new file mode 100644
+index 0000000..64b719f
+--- /dev/null
++++ b/src/game/original/KeyData.h
+@@ -0,0 +1,14 @@
++#pragma once
++#include "Key.h"
++#include <string>
++// Original KeyData::Copy fields, with value-owned strings instead of HSTRINGs.
++class KeyData
++{
++  public:
++    bool Copy(const Key&);
++    DRotation rotation;
++    DVector position;
++    float timestamp = 0, time = 0, sound_radius = 0;
++    bool loop_sound = false;
++    std::string name, sound, message_target, message, print;
++};
+diff --git a/src/game/original/KeyFramer.cpp b/src/game/original/KeyFramer.cpp
+new file mode 100644
+index 0000000..99a9730
+--- /dev/null
++++ b/src/game/original/KeyFramer.cpp
+@@ -0,0 +1,274 @@
++// Selected ObjectDLL/KeyFramer.cpp: original sequencing and interpolation rules.
++#include "KeyFramer.h"
++#include "CameraObj.h"
++#include "engine/collision.h"
++#include "trigger_helpers.h"
++#include <algorithm>
++#include <cmath>
++using namespace OpenBlood2;
++DDWORD KeyFramer::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE)
++    {
++        if (!data || reason == 3)
++            return 0;
++        if (reason == 1)
++        {
++            GenericProp p;
++            if (g_pServerDE->GetPropGeneric("ObjectName", &p) == DE_OK)
++                object_name = p.m_String;
++            if (g_pServerDE->GetPropGeneric("BaseKeyName", &p) == DE_OK)
++                base_key_name = p.m_String;
++            if (g_pServerDE->GetPropGeneric("StartActive", &p) == DE_OK)
++                start_active = p.m_Bool;
++            if (g_pServerDE->GetPropGeneric("Looping", &p) == DE_OK)
++                looping = p.m_Bool;
++            static_cast<ObjectCreateStruct*>(data)->m_NextUpdate = .001f;
++        }
++    }
++    else if (message == MID_INITIALUPDATE)
++    {
++        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3));
++        g_pServerDE->SetNextUpdate(m_hObject, .001f);
++    }
++    else if (message == MID_UPDATE)
++        Update();
++    else if (message == MID_LINKBROKEN)
++        std::erase_if(targets, [data](const auto& t) { return t.object == static_cast<HOBJECT>(data); });
++    return B2BaseClass::EngineMessageFn(message, data, reason);
++}
++bool KeyFramer::BuildKeyList()
++{
++    initialized = true;
++    if (object_name.empty() || base_key_name.empty())
++    {
++        error = "Missing ObjectName or BaseKeyName";
++        return false;
++    }
++    std::vector<HOBJECT> consumed;
++    std::vector<KeyData> copied;
++    // Discover before committing removals: malformed/over-limit paths consume no keys.
++    for (std::size_t i = 0; i <= 1024; ++i)
++    {
++        const auto name = base_key_name + std::to_string(i);
++        auto* list = g_pServerDE->FindNamedObjects(name.c_str());
++        if (!list)
++        {
++            error = "Key snapshot unavailable";
++            return false;
++        }
++        Key* key = nullptr;
++        if (list)
++            for (auto* link = list->m_pFirstLink; link; link = link->m_pNext)
++                if (g_pServerDE->IsObjectAlive(link->m_hObject))
++                    if ((key = dynamic_cast<Key*>(g_pServerDE->HandleToObject(link->m_hObject))))
++                        break;
++        if (list)
++            g_pServerDE->RelinquishList(list);
++        if (!key)
++            break; // Original contiguous decimal suffix search, first typed match.
++        KeyData value;
++        if (i == 1024 || !value.Copy(*key))
++        {
++            error = "Invalid key data or more than 1024 contiguous keys";
++            return false;
++        }
++        value.time = value.timestamp + (copied.empty() ? 0 : copied.back().time);
++        if (!std::isfinite(value.time) || std::abs(value.time) > 1e6f)
++        {
++            error = "Key timeline exceeds finite one-million-second bound";
++            return false;
++        }
++        consumed.push_back(key->m_hObject);
++        copied.push_back(std::move(value));
++    }
++    auto* list = g_pServerDE->FindNamedObjects(object_name.c_str());
++    if (!list)
++    {
++        error = "Target snapshot unavailable";
++        return false;
++    }
++    std::vector<Target> found;
++    for (auto* link = list->m_pFirstLink; link; link = link->m_pNext)
++    {
++        if (!g_pServerDE->IsObjectAlive(link->m_hObject))
++            continue;
++        if (found.size() == 256 || link->m_hObject == m_hObject)
++        {
++            g_pServerDE->RelinquishList(list);
++            error = "Self-target or more than 256 controlled objects";
++            return false;
++        }
++        Target t;
++        t.object = link->m_hObject;
++        if (!copied.empty())
++        {
++            g_pServerDE->GetObjectPos(t.object, &t.offset);
++            t.offset = vector_subtract(t.offset, copied.front().position);
++            g_pServerDE->GetObjectRotation(t.object, &t.rotation_offset);
++            t.rotation_offset.m_Vec = vector_subtract(t.rotation_offset.m_Vec, copied.front().rotation.m_Vec);
++            t.rotation_offset.m_Spin -= copied.front().rotation.m_Spin; // Source component offset, not composition.
++        }
++        found.push_back(t);
++    }
++    g_pServerDE->RelinquishList(list);
++    for (const auto& t : found)
++        if (g_pServerDE->CreateInterObjectLink(m_hObject, t.object) != DE_OK)
++        {
++            for (const auto& linked : found)
++                g_pServerDE->BreakInterObjectLink(m_hObject, linked.object);
++            error = "Cannot retain target lifetime link";
++            return false;
++        }
++    targets = std::move(found);
++    keys = std::move(copied);
++    for (auto h : consumed)
++        g_pServerDE->RemoveObject(h);
++    if (keys.empty())
++        error = "No contiguous keys found";
++    else if (targets.empty())
++        error = "No loaded targets; authored target class/name may be missing";
++    return true;
++}
++void KeyFramer::GoActive()
++{
++    if (active || keys.empty() || !g_pServerDE->IsObjectAlive(m_hObject))
++        return;
++    start_active = active = true;
++    time = 0;
++    next = 0;
++    ++revision;
++    g_pServerDE->SetNextUpdate(m_hObject, .001f);
++}
++DDWORD KeyFramer::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    if (message == 1000)
++    {
++        auto h = g_pServerDE->ReadFromMessageHString(read);
++        auto* value = g_pServerDE->GetStringData(h);
++        last_command = value ? value : "";
++        g_pServerDE->FreeString(h);
++        if (same_name(last_command, "ON") || same_name(last_command, "TRIGGER"))
++            GoActive();
++        else if (same_name(last_command, "OFF"))
++        {
++            active = false;
++            ++revision;
++            g_pServerDE->SetNextUpdate(m_hObject, 0);
++        }
++    }
++    return B2BaseClass::ObjectMessageFn(sender, message, read);
++}
++void KeyFramer::ProcessKey(const KeyData& key)
++{
++    ++processed;
++    if (!key.sound.empty())
++    {
++        last_sound = key.sound;
++        for (const auto& t : targets)
++            if (g_pServerDE->IsObjectAlive(t.object))
++                ++sound_requests;
++        // Original sound replacement/handle playback is unavailable; inspection is a request only.
++    }
++    if (!key.message_target.empty() && !key.message.empty())
++    {
++        ++message_keys;
++        last_message_matches = 0;
++        auto* list = g_pServerDE->FindNamedObjects(key.message_target.c_str());
++        if (list)
++        {
++            for (auto* link = list->m_pFirstLink; link; link = link->m_pNext)
++                if (g_pServerDE->IsObjectAlive(link->m_hObject))
++                    ++last_message_matches;
++            g_pServerDE->RelinquishList(list);
++        }
++        if (!last_message_matches)
++            ++unresolved_messages;
++        auto target = g_pServerDE->CreateString(key.message_target.c_str());
++        auto message = g_pServerDE->CreateString(key.message.c_str());
++        if (target && message)
++            SendTriggerMsgToObjects(this, target, message);
++        else
++            error = "Key message string allocation failed";
++        g_pServerDE->FreeString(target);
++        g_pServerDE->FreeString(message);
++    }
++    if (!key.print.empty())
++    {
++        ++print_requests;
++        last_print = key.print;
++    }
++}
++void KeyFramer::Update()
++{
++    if (!initialized)
++    {
++        if (BuildKeyList() && start_active)
++            GoActive();
++        // Original first update builds keys and returns without advancing time.
++        return;
++    }
++    if (!active)
++    {
++        g_pServerDE->SetNextUpdate(m_hObject, 0);
++        return;
++    }
++    g_pServerDE->SetNextUpdate(m_hObject, .001f);
++    time += g_pServerDE->GetFrameTime();
++    const auto command_revision = revision;
++    while (next < keys.size() && keys[next].time <= time)
++    {
++        position1 = next;
++        position2 = next + 1;
++        have_positions = position2 < keys.size(); // Every original KeyData::Copy sets POSITION_KEY.
++        ProcessKey(keys[next]);
++        if (!g_pServerDE->IsObjectAlive(m_hObject) || revision != command_revision)
++            return;
++        ++next;
++    }
++    if (next == keys.size())
++    {
++        next = 0;
++        time = 0; // Source discards overshoot and processes at most one cycle per update.
++        if (!looping)
++        {
++            active = false;
++            return;
++        } // Source does not snap to final endpoint.
++    }
++    if (!have_positions || time < keys[position1].time)
++        return;
++    const auto& a = keys[position1];
++    const auto& b = keys[position2];
++    const auto duration = b.time - a.time;
++    DVector pos = b.position;
++    DRotation rot = b.rotation;
++    if (duration > .001f)
++    {
++        if (time > b.time)
++            return;
++        const auto t = (time - a.time) / duration;
++        pos = vector_add(a.position, vector_scale(vector_subtract(b.position, a.position), t));
++        if (g_pServerDE->InterpolateRotation(rot, a.rotation, b.rotation, t) != DE_OK)
++        {
++            error = "Invalid key rotation interpolation";
++            return;
++        }
++    }
++    for (auto& target : targets)
++    {
++        if (!g_pServerDE->IsObjectAlive(target.object))
++            continue;
++        auto destination = vector_add(pos, target.offset);
++        DRotation rotation{vector_add(rot.m_Vec, target.rotation_offset.m_Vec),
++                           rot.m_Spin + target.rotation_offset.m_Spin};
++        auto* camera = dynamic_cast<CameraObj*>(g_pServerDE->HandleToObject(target.object));
++        ++target.attempts;
++        target.result = g_pServerDE->MoveKeyframedObject(target.object, destination,
++                                                         camera && camera->GetLinkObject() ? nullptr : &rotation);
++        if (target.result == MoverResult::Moved)
++            ++target.moves;
++        if (!g_pServerDE->IsObjectAlive(m_hObject) || revision != command_revision)
++            return;
++    }
++}
+diff --git a/src/game/original/KeyFramer.h b/src/game/original/KeyFramer.h
+new file mode 100644
+index 0000000..43fdfb2
+--- /dev/null
++++ b/src/game/original/KeyFramer.h
+@@ -0,0 +1,48 @@
++#pragma once
++#include "B2BaseClass.h"
++#include "KeyData.h"
++#include <vector>
++// Selected source rules; bounded storage and diagnostics: KEYFRAMER_CONTRACTS.md.
++class KeyFramer : public B2BaseClass
++{
++  public:
++    struct Target
++    {
++        HOBJECT object = nullptr;
++        DVector offset;
++        DRotation rotation_offset;
++        OpenBlood2::MoverResult result = OpenBlood2::MoverResult::Unavailable;
++        std::uint64_t moves = 0, attempts = 0;
++    };
++    void GoActive();
++    void Pause()
++    {
++        active = false;
++        ++revision;
++    }
++    void Resume()
++    {
++        active = true;
++        ++revision;
++    }
++    std::string object_name, base_key_name, error, last_command, last_print, last_sound;
++    bool start_active = false, looping = false, active = false, initialized = false;
++    float time = 0;
++    std::size_t next = 0;
++    std::vector<KeyData> keys;
++    std::vector<Target> targets;
++    std::uint64_t processed = 0, sound_requests = 0, print_requests = 0, message_keys = 0, unresolved_messages = 0;
++    std::size_t last_message_matches = 0;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++
++  private:
++    bool BuildKeyList();
++    void ProcessKey(const KeyData&);
++    void Update();
++    std::size_t position1 = 0, position2 = 0;
++    std::uint64_t revision = 0;
++    bool have_positions = false;
++};
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index b89c008..6562a0e 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -5,6 +5,7 @@
+ #include "game/original/Door.h"
+ #include "game/original/GameStartPoint.h"
+ #include "game/original/Key.h"
++#include "game/original/KeyFramer.h"
+ #include "game/original/KeyPickup.h"
+ #include "game/original/ObjectivesTrigger.h"
+ #include "game/original/PathPoint.h"
+@@ -76,6 +77,13 @@ namespace OpenBlood2
+                                        {"IsListener", true},
+                                        {"HidePlayer", false},
+                                        {"TypeActionMode", false}}};
++        const ClassInfo keyframer{"KeyFramer",
++                                  &b2base,
++                                  construct<KeyFramer>,
++                                  {{"ObjectName", std::string{}},
++                                   {"BaseKeyName", std::string{}},
++                                   {"StartActive", false},
++                                   {"Looping", false}}};
+         const ClassInfo start{"StartPoint", &base, construct<StartPoint>, {}};
+         const ClassInfo game_start{"GameStartPoint",
+                                    &start,
+@@ -406,13 +414,13 @@ namespace OpenBlood2
+     bool register_original_classes(Objects& objects)
+     {
+         return objects.register_class(base) && objects.register_class(b2base) && objects.register_class(camera) &&
+-               objects.register_class(camera_object) && objects.register_class(key) && objects.register_class(start) &&
+-               objects.register_class(game_start) && objects.register_class(path) &&
+-               objects.register_class(world_properties) && objects.register_class(smell) &&
+-               objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
+-               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
+-               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
+-               objects.register_class(freefall) && objects.register_class(trigger) &&
++               objects.register_class(camera_object) && objects.register_class(keyframer) &&
++               objects.register_class(key) && objects.register_class(start) && objects.register_class(game_start) &&
++               objects.register_class(path) && objects.register_class(world_properties) &&
++               objects.register_class(smell) && objects.register_class(character) && objects.register_class(player) &&
++               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
++               objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
++               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
+                objects.register_class(key_pickup) && objects.register_class(pickup) &&
+                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+                objects.register_class(health_base) && objects.register_class(armor_base) &&
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 7ed5b33..5d155a6 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -98,6 +98,8 @@ namespace OpenBlood2
+         bool PublishCameraEffect(HOBJECT, const CameraSettings&) override;
+         void RemoveCameraEffect(HOBJECT) override;
+         CameraView GetCameraView() override;
++        DRESULT InterpolateRotation(DRotation&, const DRotation&, const DRotation&, float) override;
++        MoverResult MoveKeyframedObject(HOBJECT, DVector, const DRotation*) override;
+         DRESULT AlignRotation(DRotation&, DVector) override;
+         DDWORD GetObjectUserFlags(HOBJECT) override;
+         DRESULT SendObjectives(const MissionObjectives&) override;
+diff --git a/src/game/server_clients.cpp b/src/game/server_clients.cpp
+index 430d2b7..193f601 100644
+--- a/src/game/server_clients.cpp
++++ b/src/game/server_clients.cpp
+@@ -125,8 +125,8 @@ namespace OpenBlood2
+     {
+         trace_service("SetObjectRotation");
+         auto* r = objects_.get(h);
+-        if (!r || (r->container || r->world_model) || !rotation || !physics_vector(rotation->m_Vec) ||
+-            !std::isfinite(rotation->m_Spin))
++        if (!r || r->life != Life::Alive || (r->container || r->world_model) || !rotation ||
++            !physics_vector(rotation->m_Vec) || !std::isfinite(rotation->m_Spin))
+             return DE_INVALIDPARAMS;
+         const auto& v = rotation->m_Vec;
+         const float norm = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z + rotation->m_Spin * rotation->m_Spin);
+diff --git a/src/game/server_keyframes.cpp b/src/game/server_keyframes.cpp
+new file mode 100644
+index 0000000..4e13026
+--- /dev/null
++++ b/src/game/server_keyframes.cpp
+@@ -0,0 +1,68 @@
++#include "game/server_adapter.h"
++#include <algorithm>
++#include <cmath>
++namespace OpenBlood2
++{
++    namespace
++    {
++        bool normalize(DRotation& q)
++        {
++            if (!physics_vector(q.m_Vec) || !std::isfinite(q.m_Spin))
++                return false;
++            const float norm = std::sqrt(vector_dot(q.m_Vec, q.m_Vec) + q.m_Spin * q.m_Spin);
++            if (!std::isfinite(norm) || norm < 1e-6f)
++                return false;
++            q = {vector_scale(q.m_Vec, 1 / norm), q.m_Spin / norm};
++            return true;
++        }
++    } // namespace
++    DRESULT ServerAdapter::InterpolateRotation(DRotation& out, const DRotation& from, const DRotation& to, float t)
++    {
++        trace_service("InterpolateRotation");
++        auto a = from, b = to;
++        if (!std::isfinite(t) || t < 0 || t > 1 || !normalize(a) || !normalize(b))
++            return DE_INVALIDPARAMS;
++        float dot = vector_dot(a.m_Vec, b.m_Vec) + a.m_Spin * b.m_Spin;
++        if (dot < 0)
++        {
++            b = {vector_scale(b.m_Vec, -1), -b.m_Spin};
++            dot = -dot;
++        }
++        dot = std::clamp(dot, 0.0f, 1.0f);
++        float wa = 1 - t, wb = t;
++        if (dot < .9995f)
++        {
++            const float theta = std::acos(dot), sine = std::sin(theta);
++            wa = std::sin((1 - t) * theta) / sine;
++            wb = std::sin(t * theta) / sine;
++        }
++        DRotation q{vector_add(vector_scale(a.m_Vec, wa), vector_scale(b.m_Vec, wb)), a.m_Spin * wa + b.m_Spin * wb};
++        if (!normalize(q))
++            return DE_INVALIDPARAMS;
++        out = q;
++        return DE_OK;
++    }
++    MoverResult ServerAdapter::MoveKeyframedObject(HOBJECT h, DVector position, const DRotation* rotation)
++    {
++        trace_service("MoveKeyframedObject");
++        const auto* record = objects_.get(h);
++        DRotation q = rotation ? *rotation : DRotation{};
++        if (!record || record->life != Life::Alive || !physics_vector(position) || (rotation && !normalize(q)))
++            return MoverResult::Invalid;
++        // Combined world-model rotation/translation and moving containers need an
++        // atomic geometry transaction; never move first and fail rotation afterwards.
++        if (record->container || record->world_model || record->client_movement ||
++            (record->state.m_ObjectType != OT_NORMAL && record->state.m_ObjectType != OT_MODEL))
++            return MoverResult::Unavailable;
++        if (!collision_ready || !collision)
++            return MoverResult::Unavailable;
++        if (MoveObject(h, &position) != DE_OK)
++            return MoverResult::Blocked;
++        if (!IsObjectAlive(h))
++            return MoverResult::Invalid; // A contact may remove the body.
++        if (rotation && SetObjectRotation(h, &q) != DE_OK)
++            return MoverResult::Invalid;
++        const auto delta = vector_subtract(objects_.get(h)->state.m_Pos, position);
++        return vector_dot(delta, delta) < 1e-6f ? MoverResult::Moved : MoverResult::Blocked;
++    }
++} // namespace OpenBlood2
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 177d602..89fe452 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -315,3 +315,21 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --cameras-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/cameras.png")
+     set_tests_properties(gpu.cameras PROPERTIES LABELS "private;gpu;cameras" TIMEOUT 30 RUN_SERIAL TRUE)
+ endif()
++
++add_executable(keyframer_tests keyframer_tests.cpp)
++target_link_libraries(keyframer_tests PRIVATE blood2_game)
++blood2_project_options(keyframer_tests)
++foreach(case IN ITEMS defaults timeline looping rotation events reentrant validation limits collision)
++    add_test(NAME keyframes.${case} COMMAND keyframer_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/keyframe-fixtures/${case}")
++    set_tests_properties(keyframes.${case} PROPERTIES LABELS "headless;keyframes" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME keyframes.catalog COMMAND keyframer_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(keyframes.catalog PROPERTIES LABELS "headless;private;keyframes" TIMEOUT 120)
++endif()
++
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.keyframes COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --keyframes-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/keyframes.png")
++    set_tests_properties(gpu.keyframes PROPERTIES LABELS "private;gpu;keyframes" TIMEOUT 30 RUN_SERIAL TRUE)
++endif()
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index e4d7094..33f1eff 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -393,9 +393,9 @@ namespace
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+             ++entries[e.state];
+-        CHECK(entries[EntryState::Created] == 144 && entries[EntryState::EditorOnly] == 372 &&
+-              entries[EntryState::Unsupported] == 64 && entries[EntryState::Failed] == 0 &&
+-              g.objects.snapshot().size() == 151);
++        CHECK(entries[EntryState::Created] == 148 && entries[EntryState::EditorOnly] == 372 &&
++              entries[EntryState::Unsupported] == 60 && entries[EntryState::Failed] == 0 &&
++              g.objects.snapshot().size() == 155);
+         std::cout << "Subway instances=" << g.objects.snapshot().size() << "\n";
+         for (auto [state, n] : entries)
+             std::cout << "state=" << int(state) << " count=" << n << '\n';
+diff --git a/tests/camera_tests.cpp b/tests/camera_tests.cpp
+index 0d895db..19b9136 100644
+--- a/tests/camera_tests.cpp
++++ b/tests/camera_tests.cpp
+@@ -291,7 +291,7 @@ namespace
+         CHECK(worlds == 57 && entries == 61 && created == 61 && rejected == 0);
+         CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+         CHECK(CameraObj::m_dwNumCameras == 2 && g.server.camera_effects.size() == 2 &&
+-              g.objects.snapshot().size() == 154);
++              g.objects.snapshot().size() == 158);
+         CHECK(test_camera::complete_subway_intro(g));
+         for (auto id : g.objects.snapshot())
+             if (auto* r = g.objects.get(id); r && dynamic_cast<CameraObj*>(r->game.get()))
+diff --git a/tests/door_tests.cpp b/tests/door_tests.cpp
+index 73a4005..1acbe8e 100644
+--- a/tests/door_tests.cpp
++++ b/tests/door_tests.cpp
+@@ -386,10 +386,17 @@ namespace
+             }
+         std::cout << "SubwayA doors: " << count << " created, " << failures << " rejected\n";
+         CHECK(count > 0 && failures == 0);
+-        unsigned moved = 0;
++        // Freeze only the tested doors. Normal updates consume authored Key
++        // objects, so an all-object snapshot cannot be dereferenced across steps.
++        std::vector<ObjectId> doors;
+         for (auto id : g.objects.snapshot())
++            if (auto* r = g.objects.get(id); r && dynamic_cast<Door*>(r->game.get()))
++                doors.push_back(id);
++        unsigned moved = 0;
++        for (auto id : doors)
+         {
+             auto* r = g.objects.get(id);
++            CHECK(r && r->life == Life::Alive);
+             if (auto* d = dynamic_cast<Door*>(r->game.get()); d && d->move_dist > 0 && d->speed > 0)
+             {
+                 const auto pos = r->state.m_Pos;
+diff --git a/tests/keyframer_tests.cpp b/tests/keyframer_tests.cpp
+new file mode 100644
+index 0000000..b163289
+--- /dev/null
++++ b/tests/keyframer_tests.cpp
+@@ -0,0 +1,416 @@
++#include "camera_fixture.h"
++#include "engine/container.h"
++#include "game/game_settings.h"
++#include "game/original/CameraObj.h"
++#include "game/original/KeyFramer.h"
++#include "player_fixture.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool close(DVector a, DVector b)
++    {
++        auto d = vector_subtract(a, b);
++        return vector_dot(d, d) < .0001f;
++    }
++    HOBJECT create(GameSession& g, const char* type, Properties p = {})
++    {
++        return g.objects.create(g.objects.find_class(type), {}, Creation::World, p);
++    }
++    KeyFramer* framer(GameSession& g, HOBJECT h)
++    {
++        return dynamic_cast<KeyFramer*>(g.server.HandleToObject(h));
++    }
++    HOBJECT path(GameSession& g, bool active = true, bool loop = false)
++    {
++        return create(g, "KeyFramer",
++                      {{"Name", std::string("controller")},
++                       {"ObjectName", std::string("target")},
++                       {"BaseKeyName", std::string("k")},
++                       {"StartActive", active},
++                       {"Looping", loop}});
++    }
++    HOBJECT key(GameSession& g, unsigned i, DVector p, float time, Properties props = {})
++    {
++        props.emplace("Name", "k" + std::to_string(i));
++        props.emplace("Pos", p);
++        props.emplace("TimeStamp", time);
++        return create(g, "Key", props);
++    }
++    bool command(GameSession& g, HOBJECT h, const char* value)
++    {
++        auto text = g.server.CreateString(value);
++        auto m = g.server.StartMessageToObject(nullptr, h, 1000);
++        auto written = g.server.WriteToMessageHString(m, text);
++        auto sent = g.server.EndMessage(m);
++        g.server.FreeString(text);
++        return written == DE_OK && sent == DE_OK;
++    }
++    bool defaults(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto h = create(g, "KeyFramer");
++        auto* f = framer(g, h);
++        CHECK(f && !f->active && !f->looping && !f->initialized && g.objects.get(h)->scheduled);
++        CHECK(command(g, h, "ON") && !f->active);
++        CHECK(g.step(.01) && f->initialized && !f->error.empty());
++        CHECK(!g.objects.get(h)->scheduled && f->keys.empty());
++        CHECK(!g.objects.create(g.objects.find_class("KeyFramer"), {}, Creation::Restore));
++        auto string = g.objects.create_props(g.objects.find_class("KeyFramer"), {},
++                                             "ObjectName target; BaseKeyName k; StartActive true");
++        CHECK(string && framer(g, string)->object_name.empty() && !framer(g, string)->start_active);
++        g.server.set_game_settings(1, GAMETYPE_ACTION);
++        auto filtered = create(g, "KeyFramer", {{"TypeActionMode", false}});
++        CHECK(filtered && g.objects.get(filtered)->life == Life::Pending && g.step(.01) && !g.objects.get(filtered));
++        CHECK(g.unload_world() && !g.server.string_count() && !g.server.list_count() && !g.server.message_count());
++        return true;
++    }
++    bool timeline(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto target = create(g, "BaseClass", {{"Name", std::string("target")}, {"Pos", DVector{10, 100, 0}}});
++        auto k0 = key(g, 0, {0, 100, 0}, 0), k1 = key(g, 1, {100, 100, 0}, 1), k3 = key(g, 3, {300, 100, 0}, 1);
++        auto duplicate = key(g, 0, {0, 100, 0}, 0, {{"BPrintMessage", std::string("duplicate")}});
++        auto wrong = create(g, "BaseClass", {{"Name", std::string("k0")}});
++        auto h = path(g);
++        auto* f = framer(g, h);
++        CHECK(g.step(.01) && f->keys.size() == 2 && f->active && f->time == 0 && f->processed == 0);
++        CHECK(g.objects.get(k0) && !g.objects.get(k1) && g.objects.get(k3) && !g.objects.get(duplicate) &&
++              g.objects.get(wrong) && !g.server.string_count() && f->keys[0].print == "duplicate");
++        CHECK(g.step(.25) && close(g.objects.get(target)->state.m_Pos, {35, 100, 0}));
++        CHECK(f->processed == 1 && f->targets[0].moves == 1);
++        CHECK(command(g, h, "TRIGGER") && f->time == .25f); // Already active ON does not restart.
++        CHECK(g.step(.25) && close(g.objects.get(target)->state.m_Pos, {60, 100, 0}));
++        CHECK(g.step(.5) && !f->active && f->processed == 2 && f->time == 0);
++        CHECK(close(g.objects.get(target)->state.m_Pos, {60, 100, 0})); // No final endpoint snap in source.
++        CHECK(g.step(.01) && !g.objects.get(h)->scheduled);
++        CHECK(command(g, h, "on") && g.step(.25) && close(g.objects.get(target)->state.m_Pos, {35, 100, 0}));
++        CHECK(command(g, h, "OFF") && !f->active && !g.objects.get(h)->scheduled);
++        CHECK(g.step(.25) && close(g.objects.get(target)->state.m_Pos, {35, 100, 0}));
++        CHECK(g.unload_world() && !g.server.list_count() && !g.server.string_count());
++        return true;
++    }
++    bool looping(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto target = create(g, "BaseClass", {{"Name", std::string("target")}, {"Pos", DVector{0, 100, 0}}});
++        CHECK(key(g, 0, {0, 100, 0}, 0) && key(g, 1, {100, 100, 0}, 1));
++        auto h = path(g, true, true);
++        auto* f = framer(g, h);
++        CHECK(g.step(.01) && g.step(.25) && close(g.objects.get(target)->state.m_Pos, {25, 100, 0}));
++        CHECK(g.step(3) && f->processed == 2 && f->active && f->time == 0 &&
++              close(g.objects.get(target)->state.m_Pos, {25, 100, 0}));
++        CHECK(g.step(.25) && f->processed == 3 && f->time == .25f);
++        f->Pause();
++        CHECK(g.step(.5) && !g.objects.get(h)->scheduled && f->time == .25f);
++        f->Resume();
++        CHECK(g.step(.5) && f->active && !g.objects.get(h)->scheduled &&
++              f->time == .25f); // Source Resume doesn't rearm.
++        CHECK(command(g, h, "OFF") && command(g, h, "ON") && g.step(.25) && f->time == .25f);
++        return true;
++    }
++    bool rotation(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto a = create(g, "CameraObj", {{"Name", std::string("target")}, {"Pos", DVector{10, 100, 0}}});
++        auto b = create(
++            g, "BaseClass",
++            {{"Name", std::string("target")}, {"Pos", DVector{30, 100, 0}}, {"Rotation", EulerAngles{{0, .3f, 0}}}});
++        auto look = create(g, "BaseClass", {{"Pos", DVector{10, 100, 50}}});
++        CHECK(dynamic_cast<CameraObj*>(g.server.HandleToObject(a))->SetLinkObject(look));
++        CHECK(key(g, 0, {0, 100, 0}, 0) &&
++              key(g, 1, {100, 100, 0}, 1, {{"Rotation", EulerAngles{{0, 1.5707963f, 0}}}}));
++        auto h = path(g);
++        auto* f = framer(g, h);
++        CHECK(g.step(.01) && g.step(.25));
++        CHECK(close(rotate_vector({0, 0, 1}, g.objects.get(a)->state.m_Rotation),
++                    {0, 0, 1})); // Linked camera keeps own rotation.
++        CHECK(g.objects.remove(a) && g.objects.finish_frame() && f->targets.size() == 1 && f->targets[0].object == b);
++        CHECK(g.step(.25) &&
++              close(g.objects.get(b)->state.m_Pos, {80, 100, 0})); // Removal keeps second target's own offset.
++        auto middle = rotation_from_euler({0, .78539815f, 0}), offset = rotation_from_euler({0, .3f, 0});
++        DRotation expected{vector_add(middle.m_Vec, offset.m_Vec), middle.m_Spin + offset.m_Spin - 1};
++        const float norm = std::sqrt(vector_dot(expected.m_Vec, expected.m_Vec) + expected.m_Spin * expected.m_Spin);
++        expected = {vector_scale(expected.m_Vec, 1 / norm), expected.m_Spin / norm};
++        CHECK(close(rotate_vector({0, 0, 1}, g.objects.get(b)->state.m_Rotation), rotate_vector({0, 0, 1}, expected)));
++        CHECK(g.objects.remove(b) && g.objects.finish_frame() && f->targets.empty() && g.step(.1));
++        return true;
++    }
++    bool events(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto camera = create(g, "CameraObj", {{"Name", std::string("target")}});
++        CHECK(key(g, 0, {}, 0,
++                  {{"MessageTarget", std::string("target")},
++                   {"MessageName", std::string("ON")},
++                   {"SoundName", std::string("sound.wav")},
++                   {"SoundRadius", 123.0f},
++                   {"LoopSound", true},
++                   {"BPrintMessage", std::string("hello")}}));
++        CHECK(key(g, 1, {}, 1, {{"MessageTarget", std::string("absent")}, {"MessageName", std::string("ON")}}));
++        auto h = path(g);
++        auto* f = framer(g, h);
++        CHECK(g.step(.01) && g.server.string_count() == 0);
++        CHECK(g.step(.5) && dynamic_cast<CameraObj*>(g.server.HandleToObject(camera))->IsActive());
++        CHECK(f->keys[0].sound_radius == 123 && f->keys[0].loop_sound && f->last_sound == "sound.wav" &&
++              f->sound_requests == 1);
++        CHECK(f->last_print == "hello" && f->print_requests == 1 && f->message_keys == 1 &&
++              f->last_message_matches == 1);
++        CHECK(g.step(.5) && f->unresolved_messages == 1 && f->message_keys == 2 && f->last_message_matches == 0);
++        CHECK(!g.server.string_count() && !g.server.message_count() && !g.server.list_count());
++        return true;
++    }
++    bool reentrant(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto target = create(g, "BaseClass", {{"Name", std::string("target")}});
++        CHECK(key(g, 0, {}, 0, {{"MessageTarget", std::string("controller")}, {"MessageName", std::string("OFF")}}));
++        CHECK(key(g, 1, {100, 0, 0}, 1));
++        auto h = path(g);
++        auto* f = framer(g, h);
++        CHECK(g.step(.01) && g.step(.5) && !f->active && !g.objects.get(h)->scheduled && f->processed == 1);
++        CHECK(close(g.objects.get(target)->state.m_Pos, {}));
++        f->keys[0].message = "REMOVE";
++        CHECK(command(g, h, "ON") && g.step(.5) && !g.objects.get(h));
++        CHECK(g.objects.get(target) && !g.server.string_count() && !g.server.message_count() && !g.server.list_count());
++        return true;
++    }
++    bool validation(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = create(g, "BaseClass");
++        DRotation out;
++        const auto a = rotation_from_euler({0, 0, 0}), b = rotation_from_euler({0, 1.5707963f, 0});
++        CHECK(g.server.InterpolateRotation(out, a, b, .5f) == DE_OK);
++        CHECK(close(rotate_vector({0, 0, 1}, out), {.70710678f, 0, .70710678f}));
++        const DRotation opposite{vector_scale(b.m_Vec, -1), -b.m_Spin};
++        CHECK(g.server.InterpolateRotation(out, b, opposite, .5f) == DE_OK &&
++              close(rotate_vector({0, 0, 1}, out), {1, 0, 0}));
++        const auto saved = out;
++        const DRotation DRotationZero{{}, 0};
++        CHECK(g.server.InterpolateRotation(out, a, b, std::numeric_limits<float>::quiet_NaN()) == DE_INVALIDPARAMS);
++        CHECK(g.server.InterpolateRotation(out, a, {{}, 0}, .5f) == DE_INVALIDPARAMS && out.m_Spin == saved.m_Spin);
++        CHECK(g.server.MoveKeyframedObject(h, {10, 20, 30}, &b) == MoverResult::Moved);
++        auto* r = g.objects.get(h);
++        const auto pos = r->state.m_Pos;
++        CHECK(g.server.MoveKeyframedObject(h, {1, 2, 3}, &DRotationZero) == MoverResult::Invalid);
++        CHECK(close(r->state.m_Pos, pos));
++        r->container = std::make_shared<ContainerShape>();
++        CHECK(g.server.MoveKeyframedObject(h, {1, 2, 3}, &b) == MoverResult::Unavailable && close(r->state.m_Pos, pos));
++        r->container.reset();
++        r->world_model = std::make_shared<ContainerShape>();
++        CHECK(g.server.MoveKeyframedObject(h, {1, 2, 3}, &b) == MoverResult::Unavailable && close(r->state.m_Pos, pos));
++        r->world_model.reset();
++        r->client_movement = true;
++        CHECK(g.server.MoveKeyframedObject(h, {1, 2, 3}, &b) == MoverResult::Unavailable);
++        r->client_movement = false;
++        CHECK(g.objects.remove(h) && g.server.SetObjectRotation(h, &a) == DE_INVALIDPARAMS &&
++              g.server.MoveKeyframedObject(h, {}, &b) == MoverResult::Invalid);
++        CHECK(g.objects.finish_frame() && g.server.MoveKeyframedObject(h, {}, &b) == MoverResult::Invalid);
++        return true;
++    }
++    bool limits(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        for (unsigned i = 0; i < 1025; ++i)
++            CHECK(key(g, i, {}, 0));
++        auto h = path(g);
++        auto* f = framer(g, h);
++        CHECK(g.step(.01) && f->keys.empty() && f->error.find("1024") != std::string::npos &&
++              g.objects.snapshot().size() == 1026);
++        CHECK(g.objects.clear());
++        auto k = key(g, 0, {}, 0, {{"SoundRadius", -1.0f}});
++        h = path(g);
++        f = framer(g, h);
++        CHECK(g.step(.01) && !f->error.empty() && g.objects.get(k));
++        CHECK(g.objects.clear());
++        k = key(g, 0, {}, 0);
++        h = create(g, "KeyFramer",
++                   {{"Name", std::string("target")},
++                    {"ObjectName", std::string("target")},
++                    {"BaseKeyName", std::string("k")}});
++        f = framer(g, h);
++        CHECK(g.step(.01) && f->error.find("Self-target") != std::string::npos && g.objects.get(k));
++        CHECK(g.objects.clear());
++        for (unsigned i = 0; i < 257; ++i)
++            CHECK(create(g, "BaseClass", {{"Name", std::string("target")}}));
++        k = key(g, 0, {}, 0);
++        h = path(g);
++        f = framer(g, h);
++        CHECK(g.step(.01) && f->error.find("256") != std::string::npos && g.objects.get(k));
++        CHECK(g.unload_world() && !g.server.string_count() && !g.server.list_count());
++        return true;
++    }
++    class TouchRemoval : public BaseClass
++    {
++      protected:
++        DDWORD EngineMessageFn(DDWORD message, void* data, DFLOAT reason) override
++        {
++            if (message == MID_TOUCHNOTIFY)
++                g_pServerDE->RemoveObject(m_hObject);
++            return BaseClass::EngineMessageFn(message, data, reason);
++        }
++    };
++    bool collision(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = create(g, "BaseClass", {{"Pos", DVector{0, 10, 0}}, {"Flags", std::int32_t(FLAG_SOLID)}});
++        DVector dims{1, 1, 1};
++        g.server.SetObjectDims(h, &dims);
++        const auto rot = rotation_from_euler({0, .5f, 0});
++        CHECK(g.server.MoveKeyframedObject(h, {0, -10, 0}, &rot) == MoverResult::Blocked);
++        CHECK(std::abs(g.objects.get(h)->state.m_Pos.y - 1.001f) < .01f);
++        CHECK(close(rotate_vector({0, 0, 1}, g.objects.get(h)->state.m_Rotation), rotate_vector({0, 0, 1}, rot)));
++        static ClassInfo probe{"TouchRemoval",
++                               nullptr,
++                               []() -> std::unique_ptr<BaseClass> { return std::make_unique<TouchRemoval>(); },
++                               {}};
++        CHECK(g.objects.register_class(probe));
++        ObjectCreateStruct desc;
++        desc.m_Pos = {0, 100, 0};
++        desc.m_Flags = FLAG_TOUCH_NOTIFY;
++        auto removed = g.objects.create(&probe, desc);
++        g.server.SetObjectDims(removed, &dims);
++        auto target = create(g, "BaseClass", {{"Pos", DVector{10, 100, 0}}, {"Flags", std::int32_t(FLAG_SOLID)}});
++        g.server.SetObjectDims(target, &dims);
++        CHECK(g.server.MoveKeyframedObject(removed, {20, 100, 0}, &rot) == MoverResult::Invalid);
++        CHECK(g.objects.get(removed)->life == Life::Pending && g.objects.get(removed)->state.m_Rotation.m_Spin == 1);
++        CHECK(g.objects.finish_frame() && !g.objects.get(removed));
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        unsigned worlds = 0, controllers = 0, key_count = 0, copied = 0, empty = 0, missing = 0, failed = 0;
++        for (const auto& [path, resource] : g.resources.index())
++        {
++            (void)resource;
++            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
++                continue;
++            std::vector<std::uint8_t> bytes;
++            World world;
++            CHECK(g.resources.read(path, bytes, error));
++            if (!read_world(bytes, world, error))
++            {
++                CHECK(path == "worlds/16_bridge.dat");
++                continue;
++            }
++            ++worlds;
++            for (const auto& o : world.objects)
++                if (o.class_name == "Key" || o.class_name == "KeyFramer" || o.class_name == "CameraObj")
++                {
++                    Properties props;
++                    for (const auto& p : o.properties)
++                        props.emplace(p.name, p.value);
++                    auto h = create(g, o.class_name.c_str(), props);
++                    CHECK(h);
++                    if (o.class_name == "KeyFramer")
++                        ++controllers;
++                    else if (o.class_name == "Key")
++                        ++key_count;
++                }
++            CHECK(g.step(.01));
++            for (auto id : g.objects.snapshot())
++                if (auto* f = dynamic_cast<KeyFramer*>(g.objects.get(id)->game.get()))
++                {
++                    CHECK(f->initialized);
++                    copied += f->keys.size();
++                    if (f->keys.empty())
++                        ++empty;
++                    if (f->targets.empty())
++                        ++missing;
++                    if (!f->error.empty() && f->error.find("No loaded targets") == std::string::npos &&
++                        f->error.find("No contiguous keys") == std::string::npos)
++                    {
++                        ++failed;
++                        std::cout << path << ": " << f->error << '\n';
++                    }
++                }
++            CHECK(g.objects.clear() && !g.server.string_count() && !g.server.list_count());
++        }
++        std::cout << "worlds=" << worlds << " controllers=" << controllers << " source_keys=" << key_count
++                  << " copied=" << copied << " empty_paths=" << empty << " missing_targets=" << missing
++                  << " malformed=" << failed << '\n';
++        CHECK(worlds == 57 && controllers == 94 && key_count == 383 && copied == 375 && !empty && missing == 44 &&
++              !failed);
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            const float entered = g.server.GetTime();
++            CHECK(g.objects.snapshot().size() == 158);
++            auto* list = g.server.FindNamedObjects("tracking1");
++            CHECK(list && list->m_pFirstLink);
++            auto h = list->m_pFirstLink->m_hObject;
++            g.server.RelinquishList(list);
++            auto* f = framer(g, h);
++            CHECK(g.step(1.0 / 60) && f->keys.size() == 2 && f->targets.size() == 1 && f->active && f->time == 0);
++            CHECK(g.objects.snapshot().size() == 149);
++            auto camera = f->targets[0].object;
++            auto start = g.objects.get(camera)->state.m_Pos;
++            CHECK(g.step(1.0 / 60) && f->targets[0].moves == 1 && f->processed == 1 && f->unresolved_messages == 1);
++            CHECK(!close(start, g.objects.get(camera)->state.m_Pos));
++            auto expected =
++                vector_add(f->keys[0].position, vector_scale(vector_subtract(f->keys[1].position, f->keys[0].position),
++                                                             f->time / (f->keys[1].time - f->keys[0].time)));
++            expected = vector_add(expected, f->targets[0].offset);
++            CHECK(close(expected, g.objects.get(camera)->state.m_Pos));
++            CHECK(g.client_shell.view.object == camera && close(expected, g.client_shell.view.position));
++            bool second = false;
++            for (int i = 0; i < 1800 && g.client_shell.view.object; ++i)
++            {
++                const auto* view = g.objects.get(g.client_shell.view.object);
++                second |= view && std::string_view(view->state.m_Name) == "camera2";
++                CHECK(g.step(1.0 / 60));
++            }
++            CHECK(second && !g.client_shell.view.object && g.server.GetTime() - entered > 12 &&
++                  g.server.GetTime() - entered < 12.1f);
++            auto* trains = g.server.FindNamedObjects("htrain1");
++            CHECK(trains && trains->m_pFirstLink);
++            auto train = trains->m_pFirstLink->m_hObject;
++            g.server.RelinquishList(trains);
++            auto* tf = framer(g, train);
++            CHECK(tf && tf->targets.size() == 1);
++            auto original = g.objects.get(tf->targets[0].object)->state.m_Pos;
++            CHECK(command(g, train, "ON") && g.step(.1) && tf->targets[0].attempts &&
++                  tf->targets[0].result == MoverResult::Unavailable);
++            CHECK(close(original, g.objects.get(tf->targets[0].object)->state.m_Pos));
++            CHECK(g.unload_world() && !g.server.string_count() && !g.server.list_count() && !g.server.message_count());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests = {
++        {"defaults", defaults},   {"timeline", timeline},   {"looping", looping},       {"rotation", rotation},
++        {"events", events},       {"reentrant", reentrant}, {"validation", validation}, {"limits", limits},
++        {"collision", collision}, {"catalog", catalog}};
++    auto it = tests.find(argv[1]);
++    return it != tests.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index ca2a6a3..d9edd72 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -204,14 +204,14 @@ namespace
+             CHECK(player);
+             CHECK(game.objects.get(player->m_hObject)->model->animations.size() == 86);
+             CHECK(game.objects.snapshot().size() ==
+-                  154); // 144 source instances + 7 door children + player + muzzle light + scent.
++                  158); // 148 source instances + 7 door children + player + muzzle light + scent.
+             CHECK(game.client_shell.position.x == -32 && game.client_shell.position.z == -3224);
+             CHECK(std::abs(game.client_shell.position.y - 170) < .01f);
+             for (int frame = 0; frame < 120; ++frame)
+                 CHECK(game.step(1.0 / 60.0));
+             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
+             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
+-            CHECK(!game.run_world(error) && error.find("64 uninstantiated") != std::string::npos);
++            CHECK(!game.run_world(error) && error.find("60 uninstantiated") != std::string::npos);
+             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
+                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
+                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index 98eceb2..4bae5db 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -1,6 +1,6 @@
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 151 original instances, 116 BSP models")
++if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 155 original instances, 116 BSP models")
+     message(FATAL_ERROR "World inspection: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-player
+@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 64" OR NOT out MATCHES "remaining mover classes")
++if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 60" OR NOT out MATCHES "remaining mover classes")
+     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 5ce70e6..036ced2 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -538,7 +538,7 @@ namespace
+         CHECK(game.world.version == 56);
+         CHECK(game.world.objects.size() == 580);
+         CHECK(game.world.models.size() == 116);
+-        CHECK(game.objects.snapshot().size() == 151);
++        CHECK(game.objects.snapshot().size() == 155);
+         CHECK(game.world.models[0].points.size() == 4996);
+         CHECK(game.world.models[0].polygons.size() == 3367);
+         CHECK(game.resources.find(game.world_path)->overrides == 1);

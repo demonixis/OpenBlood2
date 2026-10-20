@@ -1,0 +1,902 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5a438bc..158312e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -31,6 +31,7 @@ add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/ScreenFa
+     src/game/original/trigger_helpers.cpp
+     src/game/original/session_load.cpp
+     src/game/session.cpp
++    src/game/world_validation.cpp
+     src/game/player_restore.cpp
+     src/game/registration.cpp
+     src/game/server_adapter.cpp
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index a329354..59ba9ac 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -1165,7 +1165,20 @@ namespace OpenBlood2
+         if (ImGui::Button("Check session startup"))
+             run_request = true;
+         ImGui::SameLine();
+-        ImGui::TextColored(ImVec4(1, .65f, .3f, 1), "Inspection / full gameplay blocked");
++        ImGui::TextUnformatted(game.state == SessionState::Ready     ? "Startup checkpoint passed"
++                               : game.state == SessionState::Blocked ? "Startup check rejected"
++                                                                     : "Inspection");
++        if (game.startup.attempts)
++        {
++            const auto& report = game.startup;
++            ImGui::Text(
++                "Last startup check: %s at %.3f s | %zu decoded images | %zu unknown / %zu failed / %zu omitted",
++                report.accepted ? "passed" : "rejected", report.time, report.checked_textures, report.unknown,
++                report.failed, report.omitted);
++            if (!report.error.empty())
++                ImGui::TextWrapped("%s", report.error.c_str());
++            ImGui::TextDisabled("Snapshot only; future requests and full M2 acceptance are separate.");
++        }
+         if (!world_error.empty())
+             ImGui::TextWrapped("%s", world_error.c_str());
+         ImGui::InputTextWithHint("##class-filter", "Filter class or object name", world_filter, sizeof(world_filter));
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index f7d1f47..0f48690 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -129,11 +129,14 @@ namespace
+                          game->world.objects.size(), game->objects.snapshot().size(), game->world.models.size());
+             if (options.player_smoke || options.view_world)
+             {
+-                if (!game->enter_player(error))
++                if (!(options.view_world ? game->run_world(error) : game->enter_player(error)))
+                 {
+                     spdlog::error("Player entry: {}", error);
+                     return 6;
+                 }
++                if (options.view_world)
++                    spdlog::info("Startup checkpoint passed before first frame: {} decoded images, {} omitted entries",
++                                 game->startup.checked_textures, game->startup.omitted);
+                 if ((options.weapons_smoke || options.movement_smoke || options.interaction_smoke ||
+                      options.pickups_smoke) &&
+                     !OpenBlood2::finish_camera_intro_for_smoke(*game))
+@@ -1875,7 +1878,7 @@ int main(int argc, char** argv)
+                      "  --view-world        Enter diagnostic 3D view with original player/cameras; F1 inspector, F2 "
+                      "controls; 1..9/0 weapon slots, HUD health/armor/ammo\n"
+                      "  --viewport-smoke    GPU 3D depth view, movement and unload/reload checks\n"
+-                     "  --start-game        Check session startup; fails explicitly on missing M2 services\n"
++                     "  --start-game        Validate original entry and one headless update; exits after checks\n"
+                      "  --no-inspector      Start with the inspector hidden\n"
+                      "  --frames N          Exit after N presented frames\n"
+                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled\n"
+@@ -1952,14 +1955,24 @@ int main(int argc, char** argv)
+             spdlog::error("Player entry: {}", error);
+             return 6;
+         }
++        if (options.start_game && !game.run_world(error))
++        {
++            spdlog::error("{}", error);
++            return 6;
++        }
+         if (!game.step(1.0 / 60.0))
+             return 5;
+         if (options.start_game && !game.run_world(error))
+         {
+-            spdlog::error("{}", error);
++            spdlog::error("Startup update: {}", error);
+             return 6;
+         }
+-        if (options.inspect_player)
++        if (options.start_game)
++            spdlog::info(
++                "Original session startup validated: player associated before first update; {} decoded images; "
++                "bounded headless check, not full M2 acceptance",
++                game.startup.checked_textures);
++        else if (options.inspect_player)
+             spdlog::info("Original shell/player entry inspection succeeded: CPlayerObj at {}, {}, {}; full gameplay "
+                          "remains blocked",
+                          game.client_shell.position.x, game.client_shell.position.y, game.client_shell.position.z);
+diff --git a/src/game/level_change.cpp b/src/game/level_change.cpp
+index c904284..05cc8a2 100644
+--- a/src/game/level_change.cpp
++++ b/src/game/level_change.cpp
+@@ -1,136 +1,11 @@
+-#include "engine/world_view.h"
+-#include "game/original/SkyObjects.h"
+ #include "game/original_globals.h"
+ #include "game/server_adapter.h"
++#include "game/world_validation.h"
+ #include <cmath>
+ #include <limits>
+-#include <set>
+ 
+ namespace OpenBlood2
+ {
+-    namespace
+-    {
+-        bool check_destination(GameSession& game, LevelChangeReport& report, std::string& error)
+-        {
+-            // Run normal original callbacks first. A registered class or a successful
+-            // player spawn alone is not permission to discard the old world.
+-            report.entries.clear();
+-            report.unknown = report.failed = report.omitted = 0;
+-            for (std::size_t i = 0; i < game.entries.size(); ++i)
+-            {
+-                const auto& source = game.world.objects[i];
+-                const auto& result = game.entries[i];
+-                DestinationTrialEntry row{source.class_name, {}, result.detail, result.state};
+-                if (const auto* value = source.find("Name"))
+-                    if (const auto* name = std::get_if<std::string>(value))
+-                        row.name = *name;
+-                report.unknown += row.state == EntryState::Unsupported;
+-                report.failed += row.state == EntryState::Failed;
+-                report.omitted += row.state == EntryState::MissingWorldModel;
+-                report.entries.push_back(std::move(row));
+-            }
+-            report.unavailable_services.clear();
+-            for (const auto& [name, count] : game.server.unavailable_services)
+-                if (count)
+-                    report.unavailable_services.push_back(name);
+-            if (report.unknown || report.failed || !report.unavailable_services.empty())
+-            {
+-                error = "Destination initialization rejected: " + std::to_string(report.unknown) +
+-                        " unsupported classes, " + std::to_string(report.failed) + " failed entries, " +
+-                        std::to_string(report.unavailable_services.size()) + " unavailable services";
+-                return false;
+-            }
+-            return true;
+-        }
+-        bool check_presentation(GameSession& game, LevelChangeReport& report, std::string& error)
+-        {
+-            WorldMesh mesh;
+-            if (!mesh.build(game.world, error, &game.resources))
+-                return false;
+-            std::set<std::string> checked;
+-            std::size_t bytes = mesh.texture_bytes;
+-            for (const auto& material : mesh.materials)
+-            {
+-                if (!material.error.empty())
+-                {
+-                    error = "Destination world texture " + material.path + ": " + material.error;
+-                    return false;
+-                }
+-                if (!material.path.empty() && material.frames.empty())
+-                    checked.insert(material.path);
+-            }
+-            auto image = [&](std::string_view path)
+-            {
+-                std::string normalized;
+-                if (!resource_path(path, normalized))
+-                {
+-                    error = "Invalid destination image path";
+-                    return false;
+-                }
+-                if (checked.contains(normalized))
+-                    return true;
+-                Texture texture;
+-                if (!read_texture_resource(game.resources, normalized, texture, error))
+-                {
+-                    error = "Destination image " + normalized + ": " + error;
+-                    return false;
+-                }
+-                if (checked.size() >= 4096 || bytes + texture.rgba.size() > 128 * 1024 * 1024)
+-                {
+-                    error = "Destination presentation resource budget exceeded";
+-                    return false;
+-                }
+-                bytes += texture.rgba.size();
+-                checked.insert(std::move(normalized));
+-                return true;
+-            };
+-            auto pending_sky = game.server.sky;
+-            for (auto id : game.objects.snapshot())
+-            {
+-                const auto& object = *game.objects.get(id);
+-                if (object.life != Life::Alive)
+-                    continue;
+-                if (const auto* pointer = dynamic_cast<const SkyPointer*>(object.game.get()))
+-                {
+-                    // Preflight without consuming the original first update or advancing simulation.
+-                    auto* names = game.server.FindNamedObjects(pointer->target.c_str());
+-                    const auto h = names && names->m_pFirstLink ? names->m_pFirstLink->m_hObject : nullptr;
+-                    const bool valid = pending_sky.add(game.objects, h, unsigned(pointer->index));
+-                    if (!valid)
+-                        error = pending_sky.error;
+-                    if (names)
+-                        game.server.RelinquishList(names);
+-                    if (!valid)
+-                        return false;
+-                }
+-                if (!object.model_error.empty())
+-                {
+-                    error = "Destination object " + std::string(object.state.m_Name) + ": " + object.model_error;
+-                    return false;
+-                }
+-                if (object.model && object.state.m_SkinName[0] && !image(object.state.m_SkinName))
+-                    return false;
+-                if (object.sprite)
+-                    for (const auto& frame : object.sprite->frames)
+-                        if (!image(frame))
+-                            return false;
+-            }
+-            for (const auto& instance : game.server.particle_streams.active)
+-                if (game.server.IsObjectAlive(instance.owner) && !image(instance.effect.texture))
+-                    return false;
+-            // First-person models are client-owned, outside the server object table.
+-            for (const auto& weapon : game.client_shell.weapons)
+-                if (weapon.model)
+-                {
+-                    const auto* definition = weapon_definition(weapon.type);
+-                    if (!definition || !image(definition->m_szViewModelSkin))
+-                        return false;
+-                }
+-            report.checked_textures = checked.size();
+-            return true;
+-        }
+-    } // namespace
+-
+     bool GameSession::queue_level_change(const WorldMessage& message, std::string_view start, std::string& error)
+     {
+         error.clear();
+@@ -223,7 +98,7 @@ namespace OpenBlood2
+             if (!destination->initialize() || !destination->load_world(fresh, error))
+                 return false;
+             report.world_loaded = true;
+-            if (!check_destination(*destination, report, error))
++            if (!check_world_initialization(*destination, report, error))
+                 return false;
+             if (!destination->restore_player(saved, error, PlayerRestoreMode::KeepAlive, pending.start))
+                 return false;
+@@ -242,7 +117,8 @@ namespace OpenBlood2
+                 error = "Destination start trigger requested another level during entry";
+                 return false;
+             }
+-            if (!check_destination(*destination, report, error) || !check_presentation(*destination, report, error))
++            if (!check_world_initialization(*destination, report, error) ||
++                !check_world_presentation(*destination, report, error))
+                 return false;
+             const auto* player = destination->server_shell.Player(destination->local_client);
+             if (!player || player->m_damage.IsDead())
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index be98eff..f2d2a3f 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -439,6 +439,7 @@ namespace OpenBlood2
+         DestinationInspection destination_inspection;
+         DestinationTrial destination_trial;
+         LevelChangeReport level_change;
++        SessionStartReport startup;
+         std::optional<LevelChangeRequest> pending_level_change;
+         bool queue_level_change(const WorldMessage&, std::string_view start, std::string&);
+         // Called only at an owning frame boundary, after all callbacks/step references have returned.
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 31dca96..7e561ff 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -5,6 +5,7 @@
+ #include "game/original/SkyObjects.h"
+ #include "game/original/Sound.h"
+ #include "game/server_adapter.h"
++#include "game/world_validation.h"
+ #include <algorithm>
+ #include <cmath>
+ 
+@@ -335,6 +336,8 @@ namespace OpenBlood2
+             return false;
+         pending_level_change.reset();
+         client_shell.OnExitWorld();
++        if (state == SessionState::Ready)
++            state = SessionState::Inspection;
+         if (local_client)
+         {
+             server_shell.OnClientExitWorld(local_client);
+@@ -397,31 +400,90 @@ namespace OpenBlood2
+     }
+     bool GameSession::run_world(std::string& error)
+     {
+-        if (state == SessionState::Empty)
++        error.clear();
++        if (objects.busy() || ServerAdapter::active_ != &server || g_pServerDE != &server || !server.bound_)
+         {
+-            error = "No world loaded";
+-            return false;
++            error = "RunWorld requires the active session outside callbacks";
++            return false; // Reentrant/foreign calls must not overwrite the last report.
+         }
+-        if (objects.busy())
++        const auto attempts = startup.attempts + 1;
++        startup = {};
++        startup.attempts = attempts;
++        startup.revision = world_revision;
++        startup.time = objects.time();
++        bool entered = false;
++        const auto reject = [&]
+         {
+-            error = "RunWorld during a callback rejected";
++            startup.error = error;
++            // Original start triggers are not transactional. Remove only a player
++            // entered by this attempt; retain world mutations and the explicit report.
++            if (entered && !leave_player())
++                startup.error += "; failed player cleanup";
++            state = world_path.empty() ? SessionState::Empty : SessionState::Blocked;
++            if (trace.empty() || trace.back() != startup.error)
++                trace.push_back(startup.error);
++            error = startup.error;
+             return false;
++        };
++        if (world_path.empty() || !server.collision_ready)
++        {
++            error = "No collision world loaded";
++            return reject();
+         }
+-        std::string entry_error;
++        if (pending_level_change)
++        {
++            error = "RunWorld refused while a level change is pending";
++            return reject();
++        }
++        if (!check_world_initialization(*this, startup, error))
++            return reject();
++        const auto check_actors = [&]
++        {
++            for (auto id : objects.snapshot())
++                if (const auto* record = objects.get(id); record->life == Life::Alive)
++                    if (const auto* ai = dynamic_cast<const AI_Mgr*>(record->game.get()); ai && ai->runtime_failed)
++                    {
++                        error = "Original NPC failure: " + std::string(record->state.m_Name) + ": " + ai->runtime_error;
++                        return reject();
++                    }
++            return true;
++        };
++        if (!check_actors())
++            return false;
+         if (!local_client)
+-            enter_player(entry_error);
+-        state = SessionState::Blocked;
+-        const auto missing =
+-            std::count_if(entries.begin(), entries.end(), [](const auto& e)
+-                          { return e.state == EntryState::Unsupported || e.state == EntryState::Failed; });
+-        error = "RunWorld acceptance gate not passed: " + std::to_string(missing) +
+-                " uninstantiated required objects. Inspect Services for bounded implementation/trace coverage; "
+-                "remaining required paths must pass M2 acceptance.";
+-        if (!entry_error.empty())
+-            error += "; player entry: " + entry_error;
+-        if (trace.empty() || trace.back() != error)
+-            trace.push_back(error);
+-        return false;
++        {
++            if (!enter_player(error))
++            {
++                error = "Player entry: " + error;
++                return reject();
++            }
++            entered = startup.player_entered = true;
++        }
++        const auto* player = server_shell.Player(local_client);
++        if (!client_shell.m_bInWorld || !player || client_shell.player != player->m_hObject ||
++            !server.IsObjectAlive(player->m_hObject) || player->m_bDead || player->m_damage.IsDead())
++        {
++            error = "RunWorld requires a live player associated with the original client";
++            return reject();
++        }
++        if (pending_level_change)
++        {
++            error = "Start trigger requested another level during entry";
++            return reject();
++        }
++        if (!check_world_initialization(*this, startup, error) || !check_world_presentation(*this, startup, error))
++            return reject();
++        if (!check_actors())
++            return false;
++        if (client_shell.music.failures || !server.audio.music_error.empty())
++        {
++            error = "Original client music failed: " + client_shell.music.error + " " + server.audio.music_error;
++            return reject();
++        }
++        state = SessionState::Ready;
++        startup.accepted = true;
++        trace.push_back("Original session startup validated; future simulation/resource requests remain checked");
++        return true;
+     }
+     bool GameSession::unload_world()
+     {
+@@ -459,6 +521,7 @@ namespace OpenBlood2
+         world_path.clear();
+         trace.clear();
+         state = SessionState::Empty;
++        startup = {};
+         return true;
+     }
+     bool GameSession::step(double seconds)
+diff --git a/src/game/session.h b/src/game/session.h
+index 2163cc1..f8ae53f 100644
+--- a/src/game/session.h
++++ b/src/game/session.h
+@@ -37,6 +37,7 @@ namespace OpenBlood2
+     {
+         Empty,
+         Inspection,
++        Ready, // Explicit startup checkpoint passed; not a promise about future requests.
+         Blocked
+     };
+     // Local source-level message transport; deliberately not the retail network ABI.
+diff --git a/src/game/world_preparation.h b/src/game/world_preparation.h
+index 7364a58..3f1c189 100644
+--- a/src/game/world_preparation.h
++++ b/src/game/world_preparation.h
+@@ -62,15 +62,25 @@ namespace OpenBlood2
+         WorldMessage message;
+         std::string start;
+     };
+-    struct LevelChangeReport
++    struct WorldValidation
++    {
++        std::size_t unknown = 0, failed = 0, omitted = 0, checked_textures = 0;
++        std::vector<DestinationTrialEntry> entries;
++        std::vector<std::string> unavailable_services;
++    };
++    struct SessionStartReport : WorldValidation
++    {
++        std::uint64_t attempts = 0, revision = 0;
++        double time = 0;
++        bool accepted = false, player_entered = false;
++        std::string error;
++    };
++    struct LevelChangeReport : WorldValidation
+     {
+         std::uint64_t attempts = 0, committed = 0, rejected = 0, source_revision = 0, destination_revision = 0;
+         std::string source_world, destination, requested_start, selected_start, error;
+         bool player_captured = false, world_loaded = false, player_entered = false, cleanup_complete = false;
+         bool source_retained = true, start_fallback = false;
+-        std::size_t unknown = 0, failed = 0, omitted = 0, checked_textures = 0;
+-        std::vector<DestinationTrialEntry> entries;
+-        std::vector<std::string> unavailable_services;
+         float health = 0, armor = 0, bullets = 0;
+         std::size_t keys = 0;
+     };
+diff --git a/src/game/world_validation.cpp b/src/game/world_validation.cpp
+new file mode 100644
+index 0000000..ee26b25
+--- /dev/null
++++ b/src/game/world_validation.cpp
+@@ -0,0 +1,133 @@
++#include "game/world_validation.h"
++#include "engine/world_view.h"
++#include "game/original/SkyObjects.h"
++#include "game/server_adapter.h"
++#include <set>
++
++namespace OpenBlood2
++{
++    bool check_world_initialization(GameSession& game, WorldValidation& report, std::string& error)
++    {
++        // Run normal original callbacks first. A registered class or a successful
++        // player spawn alone is not permission to discard the old world.
++        report.entries.clear();
++        if (game.entries.size() != game.world.objects.size())
++        {
++            error = "World source-entry accounting is incomplete";
++            return false;
++        }
++        report.unknown = report.failed = report.omitted = 0;
++        for (std::size_t i = 0; i < game.entries.size(); ++i)
++        {
++            const auto& source = game.world.objects[i];
++            const auto& result = game.entries[i];
++            DestinationTrialEntry row{source.class_name, {}, result.detail, result.state};
++            if (const auto* value = source.find("Name"))
++                if (const auto* name = std::get_if<std::string>(value))
++                    row.name = *name;
++            report.unknown += row.state == EntryState::Unsupported;
++            report.failed += row.state == EntryState::Failed;
++            report.omitted += row.state == EntryState::MissingWorldModel;
++            report.entries.push_back(std::move(row));
++        }
++        report.unavailable_services.clear();
++        for (const auto& [name, count] : game.server.unavailable_services)
++            if (count)
++                report.unavailable_services.push_back(name);
++        if (report.unknown || report.failed || !report.unavailable_services.empty())
++        {
++            error = "World initialization rejected: " + std::to_string(report.unknown) + " unsupported classes, " +
++                    std::to_string(report.failed) + " failed entries, " +
++                    std::to_string(report.unavailable_services.size()) + " unavailable services";
++            return false;
++        }
++        return true;
++    }
++    bool check_world_presentation(GameSession& game, WorldValidation& report, std::string& error)
++    {
++        WorldMesh mesh;
++        if (!mesh.build(game.world, error, &game.resources))
++            return false;
++        std::set<std::string> checked;
++        std::size_t bytes = mesh.texture_bytes;
++        for (const auto& material : mesh.materials)
++        {
++            if (!material.error.empty())
++            {
++                error = "World texture " + material.path + ": " + material.error;
++                return false;
++            }
++            if (!material.path.empty() && material.frames.empty())
++                checked.insert(material.path);
++        }
++        auto image = [&](std::string_view path)
++        {
++            std::string normalized;
++            if (!resource_path(path, normalized))
++            {
++                error = "Invalid world image path";
++                return false;
++            }
++            if (checked.contains(normalized))
++                return true;
++            Texture texture;
++            if (!read_texture_resource(game.resources, normalized, texture, error))
++            {
++                error = "World image " + normalized + ": " + error;
++                return false;
++            }
++            if (checked.size() >= 4096 || bytes + texture.rgba.size() > 128 * 1024 * 1024)
++            {
++                error = "World presentation resource budget exceeded";
++                return false;
++            }
++            bytes += texture.rgba.size();
++            checked.insert(std::move(normalized));
++            return true;
++        };
++        auto pending_sky = game.server.sky;
++        for (auto id : game.objects.snapshot())
++        {
++            const auto& object = *game.objects.get(id);
++            if (object.life != Life::Alive)
++                continue;
++            if (const auto* pointer = dynamic_cast<const SkyPointer*>(object.game.get()))
++            {
++                // Preflight without consuming the original first update or advancing simulation.
++                auto* names = game.server.FindNamedObjects(pointer->target.c_str());
++                const auto h = names && names->m_pFirstLink ? names->m_pFirstLink->m_hObject : nullptr;
++                const bool valid = pending_sky.add(game.objects, h, unsigned(pointer->index));
++                if (!valid)
++                    error = pending_sky.error;
++                if (names)
++                    game.server.RelinquishList(names);
++                if (!valid)
++                    return false;
++            }
++            if (!object.model_error.empty())
++            {
++                error = "World object " + std::string(object.state.m_Name) + ": " + object.model_error;
++                return false;
++            }
++            if (object.model && object.state.m_SkinName[0] && !image(object.state.m_SkinName))
++                return false;
++            if (object.sprite)
++                for (const auto& frame : object.sprite->frames)
++                    if (!image(frame))
++                        return false;
++        }
++        for (const auto& instance : game.server.particle_streams.active)
++            if (game.server.IsObjectAlive(instance.owner) && !image(instance.effect.texture))
++                return false;
++        // First-person models are client-owned, outside the server object table.
++        for (const auto& weapon : game.client_shell.weapons)
++            if (weapon.model)
++            {
++                const auto* definition = weapon_definition(weapon.type);
++                if (!definition || !image(definition->m_szViewModelSkin))
++                    return false;
++            }
++        report.checked_textures = checked.size();
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/world_validation.h b/src/game/world_validation.h
+new file mode 100644
+index 0000000..390f01d
+--- /dev/null
++++ b/src/game/world_validation.h
+@@ -0,0 +1,9 @@
++#pragma once
++#include "game/world_preparation.h"
++namespace OpenBlood2
++{
++    class GameSession;
++    // Explicit CPU checks shared by fresh startup and NEW_LEVEL; never advance simulation.
++    bool check_world_initialization(GameSession&, WorldValidation&, std::string&);
++    bool check_world_presentation(GameSession&, WorldValidation&, std::string&);
++} // namespace OpenBlood2
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 8263e50..32b78d6 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -61,12 +61,14 @@ endif()
+ add_executable(world_tests world_tests.cpp)
+ target_link_libraries(world_tests PRIVATE blood2_game)
+ blood2_project_options(world_tests)
+-foreach(case IN ITEMS level_change surface_effects destination_trials destination_messages destination_schema destination_lifetime sprite_entries sound_entries rez_structure rez_rejection resource_mount world_properties world_geometry
++foreach(case IN ITEMS session_start level_change surface_effects destination_trials destination_messages destination_schema destination_lifetime sprite_entries sound_entries rez_structure rez_rejection resource_mount world_properties world_geometry
+         world_rejection mutations session_lifecycle session_messages original_trigger)
+     add_test(NAME world.${case} COMMAND world_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/world-fixtures/${case}")
+     set_tests_properties(world.${case} PROPERTIES LABELS "headless;world" TIMEOUT 20)
+ endforeach()
+ if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME world.session_start_private COMMAND world_tests session_start_private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(world.session_start_private PROPERTIES LABELS "private;headless;world" TIMEOUT 90)
+     add_test(NAME world.level_change_private COMMAND world_tests level_change_private "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(world.level_change_private PROPERTIES LABELS "private;headless;world" TIMEOUT 120)
+     add_test(NAME world.destination_trial_private COMMAND world_tests destination_trial_private "${BLOOD2_TEST_DATA_DIR}")
+diff --git a/tests/exit_tests.cpp b/tests/exit_tests.cpp
+index 25c2abc..893cd84 100644
+--- a/tests/exit_tests.cpp
++++ b/tests/exit_tests.cpp
+@@ -243,7 +243,7 @@ namespace
+             CHECK(g.objects.snapshot().size() == 233 && g.objects.attachments().size() == 11);
+             CHECK(g.client_shell.world_exit.received == 1 && g.client_shell.world_exit.queued == 1);
+             CHECK(g.world_path == "worlds/01_subwaya.dat" && g.client_shell.m_bInWorld);
+-            CHECK(!g.run_world(error) && error.find("0 uninstantiated") != std::string::npos);
++            CHECK(!g.run_world(error) && error.find("level change is pending") != std::string::npos);
+             CHECK(g.unload_world() && g.server.string_count() == 0 && g.objects.snapshot().empty());
+             CHECK(SmellHint::m_dwNumSmells == 0);
+         }
+diff --git a/tests/gideon_runtime_tests.cpp b/tests/gideon_runtime_tests.cpp
+index 168df44..e6f84c1 100644
+--- a/tests/gideon_runtime_tests.cpp
++++ b/tests/gideon_runtime_tests.cpp
+@@ -396,7 +396,7 @@ namespace
+                   boss->CurrentScriptCommand().argument == "PASSIVE" && boss->script_selections == 2 &&
+                   boss->script_failures == 0 && !g_hActiveCamera && !g.client_shell.view.object &&
+                   !g.server_shell.Player(g.local_client)->activation_ping_failures);
+-            CHECK(!g.run_world(error));
++            CHECK(g.run_world(error) && g.state == SessionState::Ready && error.empty());
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.objects.get(previous));
+             CHECK(!AI_Mgr::m_dwNumMonster && !AI_Mgr::m_dwNumCabal && !CDestructable::m_dwNumDestructables);
+         }
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index e34eec5..557a1aa 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -228,9 +228,11 @@ namespace
+         {
+             auto& game = *callback_game;
+             std::string error;
++            const auto attempts = game.startup.attempts;
++            const auto state = game.state;
+             rejected_reentry = !game.leave_player() && !game.unload_world() && !game.enter_player(error) &&
+                                !game.run_world(error) && !game.step(.01) && !game.pump_player_messages(error) &&
+-                               game.local_client;
++                               game.local_client && game.startup.attempts == attempts && game.state == state;
+             if (remove_on_trigger)
+                 game.objects.remove(game.server.GetClientUserData(game.local_client));
+             return BaseClass::ObjectMessageFn(sender, message, read);
+@@ -292,8 +294,7 @@ namespace
+                 CHECK(game.step(1.0 / 60.0));
+             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
+             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
+-            CHECK(!game.run_world(error) && error.find("0 uninstantiated") != std::string::npos &&
+-                  error.find("acceptance gate not passed") != std::string::npos && game.state == SessionState::Blocked);
++            CHECK(game.run_world(error) && error.empty() && game.state == SessionState::Ready);
+             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
+                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
+                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()
+diff --git a/tests/scene_explosion_tests.cpp b/tests/scene_explosion_tests.cpp
+index 6b4ea95..6ac90d0 100644
+--- a/tests/scene_explosion_tests.cpp
++++ b/tests/scene_explosion_tests.cpp
+@@ -334,7 +334,7 @@ namespace
+             CHECK(g.server.scene_explosions.size() == 9 && player->m_damage.m_fHitPoints == health && g.step(.11));
+             for (auto h : emitted)
+                 CHECK(!g.objects.get(h));
+-            CHECK(!g.run_world(error) && error.find("0 uninstantiated") != std::string::npos);
++            CHECK(g.run_world(error) && error.empty() && g.state == SessionState::Ready);
+             CHECK(g.unload_world() && g.server.scene_explosions.empty() && g.server.audio.voices().empty() &&
+                   g.server.string_count() == 0 && g.server.message_count() == 0 && g.server.list_count() == 0);
+             std::cout << "cycle=" << cycle
+diff --git a/tests/sound_tests.cpp b/tests/sound_tests.cpp
+index 8fe2da3..296e4af 100644
+--- a/tests/sound_tests.cpp
++++ b/tests/sound_tests.cpp
+@@ -382,7 +382,7 @@ namespace
+             const auto pos = g.server.audio.get(ids.front())->position;
+             CHECK(g.server.advance_audio(.02, pos, {}) && g.server.audio.peak > 0 &&
+                   g.server.audio.mixed_frames == 960);
+-            CHECK(!g.run_world(error) && error.find("0 uninstantiated") != std::string::npos);
++            CHECK(g.run_world(error) && error.empty() && g.state == SessionState::Ready);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_clips());
+             for (auto id : ids)
+diff --git a/tests/sprite_tests.cpp b/tests/sprite_tests.cpp
+index 2917255..506b904 100644
+--- a/tests/sprite_tests.cpp
++++ b/tests/sprite_tests.cpp
+@@ -391,13 +391,13 @@ namespace
+                 if (r->sprite)
+                     CHECK(r->sprite_track.frame == 0 && std::abs(r->sprite_track.milliseconds - 20) < 1e-6);
+             }
+-            CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11 && !g.run_world(error) &&
+-                  error.find("0 uninstantiated") != std::string::npos);
++            CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11 && g.run_world(error) &&
++                  error.empty() && g.state == SessionState::Ready);
+             CHECK(g.unload_world() && weak.expired() && g.objects.snapshot().empty() && g.server.string_count() == 0 &&
+                   g.server.message_count() == 0 && g.server.list_count() == 0);
+             std::cout << "cycle=" << cycle
+                       << " 12 DetailSprite source instances, exact SPR frame resources, hidden-independent clocks and "
+-                         "unload verified; M2 blocked (17)\n";
++                         "unload verified; full M2 acceptance remains separate\n";
+         }
+         return true;
+     }
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index db17cbc..ae5bd11 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -10,9 +10,9 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld acceptance gate not passed: 0" OR
+-   NOT out MATCHES "remaining required paths must pass M2 acceptance")
+-    message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
++if(NOT status EQUAL 0 OR NOT out MATCHES "Original session startup validated: player associated before first update" OR
++   NOT out MATCHES "bounded headless check, not full M2 acceptance")
++    message(FATAL_ERROR "Checked startup failed: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 763e39b..4e8339e 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -540,7 +540,7 @@ namespace
+         CHECK(!game.objects.get(path));
+         CHECK(!game.run_world(error));
+         CHECK(game.state == SessionState::Blocked);
+-        CHECK(error.find("player entry: Model resource not mounted") != std::string::npos);
++        CHECK(error.find("unsupported classes") != std::string::npos && !game.local_client);
+         CHECK(!game.request_world("../bad", error));
+         CHECK(game.objects.get(old)); // Failed parse doesn't discard current world.
+         CHECK(game.request_world("fixture", error));
+@@ -1014,7 +1014,7 @@ namespace
+             CHECK(game.objects.snapshot() == ids && game.world_revision == revision && game.objects.time() == time);
+             CHECK(!game.destination_inspection.scan_complete && game.destination_inspection.entries.empty());
+             std::cout << "Malformed destination preserves source: " << error << '\n';
+-            CHECK(!game.run_world(error));
++            CHECK(game.run_world(error) && error.empty());
+             CHECK(game.unload_world() && game.server.client_count() == 0 && game.server.string_count() == 0);
+         }
+         return true;
+@@ -1202,6 +1202,109 @@ namespace
+         CHECK(game.resources.mount(root / "images.rez", error));
+         return true;
+     }
++    bool session_start(const std::filesystem::path& root)
++    {
++        GameSession game;
++        CHECK(trial_fixture(game, root));
++        std::string error;
++        CHECK(game.unload_world());
++        CHECK(!game.run_world(error) && game.state == SessionState::Empty &&
++              error.find("No collision world") != error.npos);
++        CHECK(game.request_world("trial5", error));
++        const auto before = game.objects.snapshot();
++        CHECK(!game.run_world(error) && game.startup.unknown == 1 && !game.local_client &&
++              game.objects.snapshot() == before && game.state == SessionState::Blocked);
++        CHECK(game.request_world("trial4", error));
++        CHECK(!game.run_world(error) && game.startup.failed == 1 && !game.local_client);
++        CHECK(game.request_world("trial1", error));
++        game.entries.pop_back(); // Deliberately inconsistent diagnostic state must not index out of bounds.
++        CHECK(!game.run_world(error) && error.find("accounting") != error.npos && !game.local_client);
++        CHECK(transition_images(game, root));
++        CHECK(game.request_world("trial1", error));
++        // Entry works, but the generated fixture deliberately has no music assets.
++        CHECK(!game.run_world(error) && error.find("music failed") != error.npos && game.startup.player_entered &&
++              !game.client_shell.m_bInWorld && !game.local_client && game.server.client_count() == 0 &&
++              game.startup.checked_textures > 0);
++        const auto report = game.startup;
++        {
++            GameSession foreign;
++            CHECK(!foreign.initialize());
++            CHECK(!foreign.run_world(error) && foreign.startup.attempts == 0 &&
++                  game.startup.attempts == report.attempts && game.startup.error == report.error);
++        }
++        CHECK(game.enter_player(error));
++        const auto player = game.client_shell.player;
++        const auto client = game.local_client;
++        const auto ids = game.objects.snapshot();
++        CHECK(!game.run_world(error) && game.local_client == client && game.client_shell.player == player &&
++              game.objects.snapshot() == ids && !game.startup.player_entered);
++        game.server.record_unavailable("synthetic required service failure");
++        CHECK(!game.run_world(error) && game.startup.unavailable_services.size() == 1 &&
++              error.find("unavailable services") != error.npos);
++        CHECK(game.request_world("trial6", error));
++        CHECK(!game.run_world(error) && error.find("another level") != error.npos && !game.local_client &&
++              !game.pending_level_change);
++        CHECK(game.request_world("trial1", error));
++        // The indexed-only skin fixture is malformed; strict startup must decode it.
++        CHECK(game.resources.mount(root / "synthetic.rez", error));
++        CHECK(!game.run_world(error) && error.find("image") != error.npos && !game.local_client &&
++              !game.startup.accepted);
++        CHECK(game.unload_world() && game.startup.attempts == 0 && game.server.string_count() == 0 &&
++              game.server.client_count() == 0 && game.objects.snapshot().empty());
++        std::cout << "Startup rejects unknown/failed entries, incomplete accounting, missing music, unavailable "
++                     "services, recursive exits and malformed images; foreign/report and player ownership preserved\n";
++        return true;
++    }
++    bool session_start_private(const std::filesystem::path& root)
++    {
++        GameSession game;
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(game.initialize() && game.resources.mount_game(config, error));
++        for (const char* world : {"01_SubwayA", "02_CityHub", "01_SubwayA"})
++        {
++            CHECK(game.request_world(world, error));
++            const auto entry_time = game.objects.time();
++            CHECK(game.run_world(error) && game.objects.time() == entry_time);
++            CHECK(error.empty() && game.state == SessionState::Ready && game.startup.accepted &&
++                  game.startup.player_entered && game.startup.checked_textures > 0 && !game.startup.failed &&
++                  !game.startup.unknown && game.startup.unavailable_services.empty());
++            const auto client = game.local_client;
++            const auto player = game.client_shell.player;
++            const auto count = game.objects.snapshot().size();
++            CHECK(game.run_world(error) && game.local_client == client && game.client_shell.player == player &&
++                  game.objects.snapshot().size() == count && game.objects.time() == entry_time &&
++                  !game.startup.player_entered && game.startup.attempts == 2);
++            for (unsigned frame = 0; frame < 60; ++frame)
++                CHECK(game.step(1.0 / 60));
++            CHECK(game.run_world(error));
++            CHECK(game.server_shell.updates == 60 && game.client_shell.m_bInWorld);
++            game.client_shell.player = nullptr; // Controlled association fault; never create a second player.
++            CHECK(!game.run_world(error) && error.find("associated") != error.npos && game.local_client == client);
++            game.client_shell.player = player;
++            AI_Mgr* actor = nullptr;
++            for (auto id : game.objects.snapshot())
++                if (auto* ai = dynamic_cast<AI_Mgr*>(game.objects.get(id)->game.get()); ai && !ai->runtime_failed)
++                {
++                    actor = ai;
++                    break;
++                }
++            CHECK(actor);
++            actor->runtime_failed = true;
++            actor->runtime_error = "controlled startup failure probe";
++            CHECK(!game.run_world(error) && error.find("controlled startup failure probe") != error.npos);
++            actor->runtime_failed = false;
++            actor->runtime_error.clear();
++            CHECK(game.run_world(error));
++            std::cout << world << " startup: " << game.startup.checked_textures << " decoded images, "
++                      << game.startup.omitted << " original missing-BSP omissions; 60 original updates\n";
++            CHECK(game.leave_player() && game.state == SessionState::Inspection && !game.local_client);
++            CHECK(game.unload_world() && game.startup.attempts == 0 && game.state == SessionState::Empty &&
++                  !game.server.string_count() && !game.server.client_count() && game.objects.snapshot().empty());
++        }
++        return true;
++    }
+     bool level_change(const std::filesystem::path& root)
+     {
+         auto game = std::make_unique<GameSession>();
+@@ -1548,7 +1651,7 @@ namespace
+         auto id = game.entries[0].object;
+         CHECK(game.request_world("01_SubwayA", error));
+         CHECK(!game.objects.get(id));
+-        CHECK(!game.run_world(error));
++        CHECK(game.run_world(error) && error.empty());
+         std::cout << error << '\n';
+         game.unload_world();
+         CHECK(game.server.string_count() == 0);
+@@ -1564,6 +1667,8 @@ int main(int argc, char** argv)
+     std::filesystem::path root = argc > 2 ? path_from_utf8(argv[2]) : std::filesystem::path{};
+     if (name == "private")
+         ok = private_world(root);
++    else if (name == "session_start_private")
++        ok = session_start_private(root);
+     else if (name == "level_change_private")
+         ok = level_change_private(root);
+     else if (name == "destination_trial_private")
+@@ -1579,6 +1684,8 @@ int main(int argc, char** argv)
+             return 2;
+         if (name == "surface_effects")
+             ok = surface_effects();
++        else if (name == "session_start")
++            ok = session_start(root);
+         else if (name == "level_change")
+             ok = level_change(root);
+         else if (name == "destination_trials")

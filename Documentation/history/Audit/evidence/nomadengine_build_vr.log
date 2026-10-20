@@ -1,0 +1,406 @@
+[0/2] Re-checking globbed directories...
+[1/78] Creating library symlink _deps/openxr-build/src/loader/libopenxr_loader.so.1 _deps/openxr-build/src/loader/libopenxr_loader.so
+[2/78] Linking C shared library _deps/sdl3_mixer-build/external/wavpack-build/libwavpack.so.1.2.8
+[3/78] Creating library symlink _deps/sdl3_mixer-build/external/wavpack-build/libwavpack.so.1 _deps/sdl3_mixer-build/external/wavpack-build/libwavpack.so
+[4/78] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_opus.c.o
+[5/78] Linking C static library _deps/sdl3_mixer-build/libSDL3_mixer.a
+[6/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/core/components.cpp.o
+[7/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/core/string_table.cpp.o
+[8/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/core/property_manager.cpp.o
+[9/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/core/animation_controller.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/core/animation_controller.cpp: In member function ‘bool LithTech::AnimationController::SetAnimation(uint32_t, bool)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/core/animation_controller.cpp:53:69: warning: unused parameter ‘transition’ [-Wunused-parameter]
+   53 |     bool AnimationController::SetAnimation(uint32_t animIndex, bool transition)
+      |                                                                ~~~~~^~~~~~~~~~
+[10/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/sound_system.cpp.o
+[11/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/trigger_system.cpp.o
+[12/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/door_system.cpp.o
+[13/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/keyframer_system.cpp.o
+[14/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/core/level_manager.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/core/level_manager.cpp: In member function ‘bool LithTech::LevelManager::CreateLevelObjects(LithTech::DATWorld&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/core/level_manager.cpp:131:16: warning: variable ‘lightCount’ set but not used [-Wunused-but-set-variable=]
+  131 |         size_t lightCount = 0;
+      |                ^~~~~~~~~~
+[15/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/hud_system.cpp.o
+[16/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/physics_system.cpp.o
+[17/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/weapon_config.cpp.o
+[18/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/weapon_system.cpp.o
+[19/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/abc_parser.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp: In member function ‘void LithTech::ABCParser::ParseAnimation()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:272:27: warning: variable ‘kfBoundsMin’ set but not used [-Wunused-but-set-variable=]
+  272 |                 glm::vec3 kfBoundsMin = reader_->ReadVector3();
+      |                           ^~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:273:27: warning: variable ‘kfBoundsMax’ set but not used [-Wunused-but-set-variable=]
+  273 |                 glm::vec3 kfBoundsMax = reader_->ReadVector3();
+      |                           ^~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:300:27: warning: variable ‘scale’ set but not used [-Wunused-but-set-variable=]
+  300 |                 glm::vec3 scale = reader_->ReadVector3();
+      |                           ^~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:301:27: warning: variable ‘transform’ set but not used [-Wunused-but-set-variable=]
+  301 |                 glm::vec3 transform = reader_->ReadVector3();
+      |                           ^~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:263:23: warning: variable ‘boundsMin’ set but not used [-Wunused-but-set-variable=]
+  263 |             glm::vec3 boundsMin = reader_->ReadVector3();
+      |                       ^~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:264:23: warning: variable ‘boundsMax’ set but not used [-Wunused-but-set-variable=]
+  264 |             glm::vec3 boundsMax = reader_->ReadVector3();
+      |                       ^~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp: In member function ‘void LithTech::ABCParser::ParseAnimDims()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:312:23: warning: variable ‘dims’ set but not used [-Wunused-but-set-variable=]
+  312 |             glm::vec3 dims = reader_->ReadVector3();
+      |                       ^~~~
+[20/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/physics/physics_debug_renderer.cpp.o
+[21/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/physics/collision_shapes.cpp.o
+[22/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/physics/physics_world.cpp.o
+[23/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/pcx_parser.cpp.o
+[24/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/dtx_parser.cpp.o
+[25/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/fnt_parser.cpp.o
+[26/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/cfg_parser.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/cfg_parser.cpp: In member function ‘void LithTech::CFGParser::ParseLine(const std::string&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/cfg_parser.cpp:183:20: warning: unused variable ‘firstQuote’ [-Wunused-variable]
+  183 |             size_t firstQuote = 0;
+      |                    ^~~~~~~~~~
+[27/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/dat_parser.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp: In member function ‘void LithTech::DATParser::ParseFile()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:142:34: warning: unused variable ‘propFlags’ [-Wunused-variable]
+  142 |                         uint32_t propFlags = reader_->ReadUInt32();
+      |                                  ^~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:86:28: warning: unused variable ‘bytesRemaining’ [-Wunused-variable]
+   86 |                     size_t bytesRemaining = objEnd - propsStart;
+      |                            ^~~~~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp: In member function ‘void LithTech::DATParser::ParseObjectsRaw(uint32_t)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:302:46: warning: unused parameter ‘objPos’ [-Wunused-parameter]
+  302 |     void DATParser::ParseObjectsRaw(uint32_t objPos)
+      |                                     ~~~~~~~~~^~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp: In member function ‘void LithTech::DATParser::ParseBSP(LithTech::DATWorldBSP&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:723:27: warning: variable ‘uv4’ set but not used [-Wunused-but-set-variable=]
+  723 |                 glm::vec3 uv4 = reader_->ReadVector3();
+      |                           ^~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:724:27: warning: variable ‘uv5’ set but not used [-Wunused-but-set-variable=]
+  724 |                 glm::vec3 uv5 = reader_->ReadVector3();
+      |                           ^~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:725:27: warning: variable ‘color’ set but not used [-Wunused-but-set-variable=]
+  725 |                 glm::vec3 color = reader_->ReadVector3();
+      |                           ^~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:639:17: warning: unused variable ‘vertCnt’ [-Wunused-variable]
+  639 |         int32_t vertCnt = reader_->ReadInt32();
+      |                 ^~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:640:17: warning: unused variable ‘visListSize’ [-Wunused-variable]
+  640 |         int32_t visListSize = reader_->ReadInt32();
+      |                 ^~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:641:17: warning: unused variable ‘leafListCnt’ [-Wunused-variable]
+  641 |         int32_t leafListCnt = reader_->ReadInt32();
+      |                 ^~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:646:19: warning: variable ‘minBox’ set but not used [-Wunused-but-set-variable=]
+  646 |         glm::vec3 minBox = reader_->ReadVector3();
+      |                   ^~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:647:19: warning: variable ‘maxBox’ set but not used [-Wunused-but-set-variable=]
+  647 |         glm::vec3 maxBox = reader_->ReadVector3();
+      |                   ^~~~~~
+[28/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/rez_archive_parser.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/rez_archive_parser.cpp: In member function ‘bool LithTech::RezArchiveParser::ParseDirectory(uint32_t, uint32_t, const std::string&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/rez_archive_parser.cpp:176:26: warning: unused variable ‘zero’ [-Wunused-variable]
+  176 |                 uint32_t zero = ReadUInt32(pos);
+      |                          ^~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/rez_archive_parser.cpp:224:26: warning: unused variable ‘timestamp’ [-Wunused-variable]
+  224 |                 uint32_t timestamp = ReadUInt32(pos);
+      |                          ^~~~~~~~~
+[29/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/rez_manager.cpp.o
+[30/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/file_formats.cpp.o
+[31/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/BinaryReader.cpp.o
+[32/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/camera.cpp.o
+[33/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/rez_loader.cpp.o
+[34/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/png_loader.cpp.o
+In file included from /home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/png_loader.cpp:12:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/stb_image.h: In function ‘int stbi__tga_get_comp(int, int, int*)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/stb_image.h:5242:16: warning: this statement may fall through [-Wimplicit-fallthrough=]
+ 5242 |       case 16: if(is_grey) return STBI_grey_alpha;
+      |                ^~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/stb_image.h:5244:7: note: here
+ 5244 |       case 15: if(is_rgb16) *is_rgb16 = 1;
+      |       ^~~~
+[35/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/renderer.cpp.o
+[36/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/shading/light_manager.cpp.o
+[37/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/gl_context.cpp.o
+[38/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/shading/shader_manager.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/shading/shader_manager.cpp: In member function ‘bool ShaderManager::CreateShaders()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/shading/shader_manager.cpp:155:14: warning: unused variable ‘vertexShader’ [-Wunused-variable]
+  155 |     uint32_t vertexShader, fragmentShader;
+      |              ^~~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/shading/shader_manager.cpp:155:28: warning: unused variable ‘fragmentShader’ [-Wunused-variable]
+  155 |     uint32_t vertexShader, fragmentShader;
+      |                            ^~~~~~~~~~~~~~
+[39/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/renderer_3d.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/renderer_3d.cpp: In member function ‘Mesh3D* Renderer3D::LoadWeaponModel(const std::string&, LithTech::RezManager*, const std::string&, const std::string&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/renderer_3d.cpp:291:23: warning: variable ‘sizeTrans’ set but not used [-Wunused-but-set-variable=]
+  291 |             glm::vec3 sizeTrans = nodeMaxTrans[nodeIdx] - nodeMinTrans[nodeIdx];
+      |                       ^~~~~~~~~
+[40/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/forward_plus.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/forward_plus.cpp: In member function ‘bool ForwardPlusRenderer::TileFrustumIntersectsSphere(int, int, const glm::vec3&, float, const glm::mat4&, float, float)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/forward_plus.cpp:321:88: warning: unused parameter ‘nearPlane’ [-Wunused-parameter]
+  321 |                                                       const glm::mat4& viewProj, float nearPlane, float farPlane)
+      |                                                                                  ~~~~~~^~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/forward_plus.cpp:321:105: warning: unused parameter ‘farPlane’ [-Wunused-parameter]
+  321 |                                                       const glm::mat4& viewProj, float nearPlane, float farPlane)
+      |                                                                                                   ~~~~~~^~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/forward_plus.cpp: In member function ‘bool ForwardPlusRenderer::TileFrustumIntersectsCone(int, int, const glm::vec3&, const glm::vec3&, float, float, const glm::mat4&, float, float)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/forward_plus.cpp:348:70: warning: unused parameter ‘direction’ [-Wunused-parameter]
+  348 |                                                     const glm::vec3& direction, float radius, float angle,
+      |                                                     ~~~~~~~~~~~~~~~~~^~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/forward_plus.cpp:348:101: warning: unused parameter ‘angle’ [-Wunused-parameter]
+  348 |                                                     const glm::vec3& direction, float radius, float angle,
+      |                                                                                               ~~~~~~^~~~~
+[41/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/hdr_framebuffer.cpp.o
+[42/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/material_system.cpp.o
+[43/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/postprocessing/bloom_pass.cpp.o
+[44/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/postprocessing/ssao_pass.cpp.o
+[45/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/resource_manager.cpp.o
+[46/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/postprocessing/motion_blur_pass.cpp.o
+[47/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/postprocessing/ssr_pass.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/postprocessing/ssr_pass.cpp: In member function ‘void LithTech::SSRPass::Execute(GLuint, GLuint, GLuint, const glm::mat4&, const glm::mat4&, float, int, float, float)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/postprocessing/ssr_pass.cpp:57:76: warning: unused parameter ‘normalTexture’ [-Wunused-parameter]
+   57 |     void SSRPass::Execute(GLuint sceneTexture, GLuint depthTexture, GLuint normalTexture, const glm::mat4& view,
+      |                                                                     ~~~~~~~^~~~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/postprocessing/ssr_pass.cpp:59:33: warning: unused parameter ‘roughnessThreshold’ [-Wunused-parameter]
+   59 |                           float roughnessThreshold)
+      |                           ~~~~~~^~~~~~~~~~~~~~~~~~
+[48/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/postprocessing/ssgi_pass.cpp.o
+[49/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/postprocessing/post_process_stack.cpp.o
+[50/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/sprite_batch.cpp.o
+[51/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/bitmap_font.cpp.o
+[52/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/audio/audio_manager.cpp.o
+[53/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/xr/xr_swapchain.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp: In constructor ‘nme::XRSwapchain::XRSwapchain(XrSession, uint32_t, uint32_t, int64_t, uint32_t)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:28:71: warning: missing initializer for member ‘XrSwapchainCreateInfo::next’ [-Wmissing-field-initializers]
+   28 |         XrSwapchainCreateInfo createInfo{XR_TYPE_SWAPCHAIN_CREATE_INFO};
+      |                                                                       ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:28:71: warning: missing initializer for member ‘XrSwapchainCreateInfo::createFlags’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:28:71: warning: missing initializer for member ‘XrSwapchainCreateInfo::usageFlags’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:28:71: warning: missing initializer for member ‘XrSwapchainCreateInfo::format’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:28:71: warning: missing initializer for member ‘XrSwapchainCreateInfo::sampleCount’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:28:71: warning: missing initializer for member ‘XrSwapchainCreateInfo::width’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:28:71: warning: missing initializer for member ‘XrSwapchainCreateInfo::height’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:28:71: warning: missing initializer for member ‘XrSwapchainCreateInfo::faceCount’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:28:71: warning: missing initializer for member ‘XrSwapchainCreateInfo::arraySize’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:28:71: warning: missing initializer for member ‘XrSwapchainCreateInfo::mipCount’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp: In member function ‘bool nme::XRSwapchain::Acquire(uint32_t&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:137:85: warning: missing initializer for member ‘XrSwapchainImageAcquireInfo::next’ [-Wmissing-field-initializers]
+  137 |         XrSwapchainImageAcquireInfo acquireInfo{XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO};
+      |                                                                                     ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp: In member function ‘void nme::XRSwapchain::Wait()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:154:76: warning: missing initializer for member ‘XrSwapchainImageWaitInfo::next’ [-Wmissing-field-initializers]
+  154 |         XrSwapchainImageWaitInfo waitInfo{XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO};
+      |                                                                            ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:154:76: warning: missing initializer for member ‘XrSwapchainImageWaitInfo::timeout’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp: In member function ‘void nme::XRSwapchain::Release()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_swapchain.cpp:166:85: warning: missing initializer for member ‘XrSwapchainImageReleaseInfo::next’ [-Wmissing-field-initializers]
+  166 |         XrSwapchainImageReleaseInfo releaseInfo{XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO};
+      |                                                                                     ^
+[54/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/xr/xr_system.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp: In member function ‘bool nme::XRSystem::CreateInstance()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:184:69: warning: missing initializer for member ‘XrInstanceCreateInfo::next’ [-Wmissing-field-initializers]
+  184 |         XrInstanceCreateInfo createInfo{XR_TYPE_INSTANCE_CREATE_INFO};
+      |                                                                     ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:184:69: warning: missing initializer for member ‘XrInstanceCreateInfo::createFlags’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:184:69: warning: missing initializer for member ‘XrInstanceCreateInfo::applicationInfo’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:184:69: warning: missing initializer for member ‘XrInstanceCreateInfo::enabledApiLayerCount’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:184:69: warning: missing initializer for member ‘XrInstanceCreateInfo::enabledApiLayerNames’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:184:69: warning: missing initializer for member ‘XrInstanceCreateInfo::enabledExtensionCount’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:184:69: warning: missing initializer for member ‘XrInstanceCreateInfo::enabledExtensionNames’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:200:71: warning: missing initializer for member ‘XrInstanceProperties::next’ [-Wmissing-field-initializers]
+  200 |         XrInstanceProperties instanceProps{XR_TYPE_INSTANCE_PROPERTIES};
+      |                                                                       ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:200:71: warning: missing initializer for member ‘XrInstanceProperties::runtimeVersion’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:200:71: warning: missing initializer for member ‘XrInstanceProperties::runtimeName’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp: In member function ‘bool nme::XRSystem::GetSystem()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:211:59: warning: missing initializer for member ‘XrSystemGetInfo::next’ [-Wmissing-field-initializers]
+  211 |         XrSystemGetInfo systemInfo{XR_TYPE_SYSTEM_GET_INFO};
+      |                                                           ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:211:59: warning: missing initializer for member ‘XrSystemGetInfo::formFactor’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:221:65: warning: missing initializer for member ‘XrSystemProperties::next’ [-Wmissing-field-initializers]
+  221 |         XrSystemProperties systemProps{XR_TYPE_SYSTEM_PROPERTIES};
+      |                                                                 ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:221:65: warning: missing initializer for member ‘XrSystemProperties::systemId’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:221:65: warning: missing initializer for member ‘XrSystemProperties::vendorId’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:221:65: warning: missing initializer for member ‘XrSystemProperties::systemName’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:221:65: warning: missing initializer for member ‘XrSystemProperties::graphicsProperties’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:221:65: warning: missing initializer for member ‘XrSystemProperties::trackingProperties’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp: In member function ‘bool nme::XRSystem::CreateSession(SDL_Window*)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:265:106: warning: missing initializer for member ‘XrGraphicsRequirementsOpenGLKHR::next’ [-Wmissing-field-initializers]
+  265 |             XrGraphicsRequirementsOpenGLKHR graphicsRequirements{XR_TYPE_GRAPHICS_REQUIREMENTS_OPENGL_KHR};
+      |                                                                                                          ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:265:106: warning: missing initializer for member ‘XrGraphicsRequirementsOpenGLKHR::minApiVersionSupported’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:265:106: warning: missing initializer for member ‘XrGraphicsRequirementsOpenGLKHR::maxApiVersionSupported’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:326:96: warning: missing initializer for member ‘XrGraphicsBindingOpenGLXlibKHR::next’ [-Wmissing-field-initializers]
+  326 |         XrGraphicsBindingOpenGLXlibKHR graphicsBinding{XR_TYPE_GRAPHICS_BINDING_OPENGL_XLIB_KHR};
+      |                                                                                                ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:326:96: warning: missing initializer for member ‘XrGraphicsBindingOpenGLXlibKHR::xDisplay’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:326:96: warning: missing initializer for member ‘XrGraphicsBindingOpenGLXlibKHR::visualid’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:326:96: warning: missing initializer for member ‘XrGraphicsBindingOpenGLXlibKHR::glxFBConfig’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:326:96: warning: missing initializer for member ‘XrGraphicsBindingOpenGLXlibKHR::glxDrawable’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:326:96: warning: missing initializer for member ‘XrGraphicsBindingOpenGLXlibKHR::glxContext’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:334:74: warning: missing initializer for member ‘XrSessionCreateInfo::next’ [-Wmissing-field-initializers]
+  334 |         XrSessionCreateInfo sessionCreateInfo{XR_TYPE_SESSION_CREATE_INFO};
+      |                                                                          ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:334:74: warning: missing initializer for member ‘XrSessionCreateInfo::createFlags’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:334:74: warning: missing initializer for member ‘XrSessionCreateInfo::systemId’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp: In member function ‘bool nme::XRSystem::CreateReferenceSpaces()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:350:87: warning: missing initializer for member ‘XrReferenceSpaceCreateInfo::next’ [-Wmissing-field-initializers]
+  350 |         XrReferenceSpaceCreateInfo spaceCreateInfo{XR_TYPE_REFERENCE_SPACE_CREATE_INFO};
+      |                                                                                       ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:350:87: warning: missing initializer for member ‘XrReferenceSpaceCreateInfo::referenceSpaceType’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:350:87: warning: missing initializer for member ‘XrReferenceSpaceCreateInfo::poseInReferenceSpace’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp: In member function ‘void nme::XRSystem::PollEvents()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:436:62: warning: missing initializer for member ‘XrEventDataBuffer::next’ [-Wmissing-field-initializers]
+  436 |         XrEventDataBuffer eventData{XR_TYPE_EVENT_DATA_BUFFER};
+      |                                                              ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:436:62: warning: missing initializer for member ‘XrEventDataBuffer::varying’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:455:51: warning: missing initializer for member ‘XrEventDataBuffer::next’ [-Wmissing-field-initializers]
+  455 |             eventData = {XR_TYPE_EVENT_DATA_BUFFER};
+      |                                                   ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:455:51: warning: missing initializer for member ‘XrEventDataBuffer::varying’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp: In member function ‘void nme::XRSystem::HandleSessionStateChange(XrSessionState)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:468:72: warning: missing initializer for member ‘XrSessionBeginInfo::next’ [-Wmissing-field-initializers]
+  468 |                 XrSessionBeginInfo beginInfo{XR_TYPE_SESSION_BEGIN_INFO};
+      |                                                                        ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:468:72: warning: missing initializer for member ‘XrSessionBeginInfo::primaryViewConfigurationType’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp: In member function ‘bool nme::XRSystem::BeginFrame(nme::XRFrameState&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:506:57: warning: missing initializer for member ‘XrFrameWaitInfo::next’ [-Wmissing-field-initializers]
+  506 |         XrFrameWaitInfo waitInfo{XR_TYPE_FRAME_WAIT_INFO};
+      |                                                         ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:507:52: warning: missing initializer for member ‘XrFrameState::next’ [-Wmissing-field-initializers]
+  507 |         XrFrameState frameState{XR_TYPE_FRAME_STATE};
+      |                                                    ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:507:52: warning: missing initializer for member ‘XrFrameState::predictedDisplayTime’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:507:52: warning: missing initializer for member ‘XrFrameState::predictedDisplayPeriod’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:507:52: warning: missing initializer for member ‘XrFrameState::shouldRender’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:516:60: warning: missing initializer for member ‘XrFrameBeginInfo::next’ [-Wmissing-field-initializers]
+  516 |         XrFrameBeginInfo beginInfo{XR_TYPE_FRAME_BEGIN_INFO};
+      |                                                            ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:530:69: warning: missing initializer for member ‘XrViewLocateInfo::next’ [-Wmissing-field-initializers]
+  530 |             XrViewLocateInfo viewLocateInfo{XR_TYPE_VIEW_LOCATE_INFO};
+      |                                                                     ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:530:69: warning: missing initializer for member ‘XrViewLocateInfo::viewConfigurationType’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:530:69: warning: missing initializer for member ‘XrViewLocateInfo::displayTime’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:530:69: warning: missing initializer for member ‘XrViewLocateInfo::space’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:535:53: warning: missing initializer for member ‘XrViewState::next’ [-Wmissing-field-initializers]
+  535 |             XrViewState viewState{XR_TYPE_VIEW_STATE};
+      |                                                     ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:535:53: warning: missing initializer for member ‘XrViewState::viewStateFlags’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp: In member function ‘void nme::XRSystem::EndFrame(const nme::XRFrameState&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:613:78: warning: missing initializer for member ‘XrCompositionLayerProjectionView::next’ [-Wmissing-field-initializers]
+  613 |             projectionViews[eye] = {XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW};
+      |                                                                              ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:613:78: warning: missing initializer for member ‘XrCompositionLayerProjectionView::pose’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:613:78: warning: missing initializer for member ‘XrCompositionLayerProjectionView::fov’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:613:78: warning: missing initializer for member ‘XrCompositionLayerProjectionView::subImage’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:623:90: warning: missing initializer for member ‘XrCompositionLayerProjection::next’ [-Wmissing-field-initializers]
+  623 |         XrCompositionLayerProjection projectionLayer{XR_TYPE_COMPOSITION_LAYER_PROJECTION};
+      |                                                                                          ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:623:90: warning: missing initializer for member ‘XrCompositionLayerProjection::layerFlags’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:623:90: warning: missing initializer for member ‘XrCompositionLayerProjection::space’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:623:90: warning: missing initializer for member ‘XrCompositionLayerProjection::viewCount’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:623:90: warning: missing initializer for member ‘XrCompositionLayerProjection::views’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:631:54: warning: missing initializer for member ‘XrFrameEndInfo::next’ [-Wmissing-field-initializers]
+  631 |         XrFrameEndInfo endInfo{XR_TYPE_FRAME_END_INFO};
+      |                                                      ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:631:54: warning: missing initializer for member ‘XrFrameEndInfo::displayTime’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:631:54: warning: missing initializer for member ‘XrFrameEndInfo::environmentBlendMode’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:631:54: warning: missing initializer for member ‘XrFrameEndInfo::layerCount’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_system.cpp:631:54: warning: missing initializer for member ‘XrFrameEndInfo::layers’ [-Wmissing-field-initializers]
+[55/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/xr/xr_input.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp: In member function ‘bool nme::XRInput::CreateActionSet(XrInstance)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:82:75: warning: missing initializer for member ‘XrActionSetCreateInfo::next’ [-Wmissing-field-initializers]
+   82 |         XrActionSetCreateInfo actionSetInfo{XR_TYPE_ACTION_SET_CREATE_INFO};
+      |                                                                           ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:82:75: warning: missing initializer for member ‘XrActionSetCreateInfo::actionSetName’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:82:75: warning: missing initializer for member ‘XrActionSetCreateInfo::localizedActionSetName’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:82:75: warning: missing initializer for member ‘XrActionSetCreateInfo::priority’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp: In member function ‘bool nme::XRInput::CreateActions()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:96:65: warning: missing initializer for member ‘XrActionCreateInfo::next’ [-Wmissing-field-initializers]
+   96 |         XrActionCreateInfo actionInfo{XR_TYPE_ACTION_CREATE_INFO};
+      |                                                                 ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:96:65: warning: missing initializer for member ‘XrActionCreateInfo::actionName’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:96:65: warning: missing initializer for member ‘XrActionCreateInfo::actionType’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:96:65: warning: missing initializer for member ‘XrActionCreateInfo::countSubactionPaths’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:96:65: warning: missing initializer for member ‘XrActionCreateInfo::subactionPaths’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:96:65: warning: missing initializer for member ‘XrActionCreateInfo::localizedActionName’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp: In member function ‘bool nme::XRInput::SuggestBindings(XrInstance)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:183:108: warning: missing initializer for member ‘XrInteractionProfileSuggestedBinding::next’ [-Wmissing-field-initializers]
+  183 |         XrInteractionProfileSuggestedBinding suggestedBinding{XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING};
+      |                                                                                                            ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:183:108: warning: missing initializer for member ‘XrInteractionProfileSuggestedBinding::interactionProfile’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:183:108: warning: missing initializer for member ‘XrInteractionProfileSuggestedBinding::countSuggestedBindings’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:183:108: warning: missing initializer for member ‘XrInteractionProfileSuggestedBinding::suggestedBindings’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp: In member function ‘bool nme::XRInput::AttachActionSet(XrSession)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:213:89: warning: missing initializer for member ‘XrSessionActionSetsAttachInfo::next’ [-Wmissing-field-initializers]
+  213 |         XrSessionActionSetsAttachInfo attachInfo{XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO};
+      |                                                                                         ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:213:89: warning: missing initializer for member ‘XrSessionActionSetsAttachInfo::countActionSets’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:213:89: warning: missing initializer for member ‘XrSessionActionSetsAttachInfo::actionSets’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp: In member function ‘bool nme::XRInput::CreateActionSpaces(XrSession)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:223:75: warning: missing initializer for member ‘XrActionSpaceCreateInfo::next’ [-Wmissing-field-initializers]
+  223 |         XrActionSpaceCreateInfo spaceInfo{XR_TYPE_ACTION_SPACE_CREATE_INFO};
+      |                                                                           ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:223:75: warning: missing initializer for member ‘XrActionSpaceCreateInfo::action’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:223:75: warning: missing initializer for member ‘XrActionSpaceCreateInfo::subactionPath’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:223:75: warning: missing initializer for member ‘XrActionSpaceCreateInfo::poseInActionSpace’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp: In member function ‘void nme::XRInput::SyncActions(XrSpace, XrTime)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:251:61: warning: missing initializer for member ‘XrActionsSyncInfo::next’ [-Wmissing-field-initializers]
+  251 |         XrActionsSyncInfo syncInfo{XR_TYPE_ACTIONS_SYNC_INFO};
+      |                                                             ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:251:61: warning: missing initializer for member ‘XrActionsSyncInfo::countActiveActionSets’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:251:61: warning: missing initializer for member ‘XrActionsSyncInfo::activeActionSets’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:262:65: warning: missing initializer for member ‘XrSpaceLocation::next’ [-Wmissing-field-initializers]
+  262 |             XrSpaceLocation spaceLocation{XR_TYPE_SPACE_LOCATION};
+      |                                                                 ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:262:65: warning: missing initializer for member ‘XrSpaceLocation::locationFlags’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:262:65: warning: missing initializer for member ‘XrSpaceLocation::pose’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:274:69: warning: missing initializer for member ‘XrActionStateFloat::next’ [-Wmissing-field-initializers]
+  274 |             XrActionStateFloat floatState{XR_TYPE_ACTION_STATE_FLOAT};
+      |                                                                     ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:274:69: warning: missing initializer for member ‘XrActionStateFloat::currentState’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:274:69: warning: missing initializer for member ‘XrActionStateFloat::changedSinceLastSync’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:274:69: warning: missing initializer for member ‘XrActionStateFloat::lastChangeTime’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:274:69: warning: missing initializer for member ‘XrActionStateFloat::isActive’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:275:71: warning: missing initializer for member ‘XrActionStateGetInfo::next’ [-Wmissing-field-initializers]
+  275 |             XrActionStateGetInfo getInfo{XR_TYPE_ACTION_STATE_GET_INFO};
+      |                                                                       ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:275:71: warning: missing initializer for member ‘XrActionStateGetInfo::action’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:275:71: warning: missing initializer for member ‘XrActionStateGetInfo::subactionPath’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:288:74: warning: missing initializer for member ‘XrActionStateVector2f::next’ [-Wmissing-field-initializers]
+  288 |             XrActionStateVector2f vec2State{XR_TYPE_ACTION_STATE_VECTOR2F};
+      |                                                                          ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:288:74: warning: missing initializer for member ‘XrActionStateVector2f::currentState’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:288:74: warning: missing initializer for member ‘XrActionStateVector2f::changedSinceLastSync’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:288:74: warning: missing initializer for member ‘XrActionStateVector2f::lastChangeTime’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:288:74: warning: missing initializer for member ‘XrActionStateVector2f::isActive’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:293:72: warning: missing initializer for member ‘XrActionStateBoolean::next’ [-Wmissing-field-initializers]
+  293 |             XrActionStateBoolean boolState{XR_TYPE_ACTION_STATE_BOOLEAN};
+      |                                                                        ^
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:293:72: warning: missing initializer for member ‘XrActionStateBoolean::currentState’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:293:72: warning: missing initializer for member ‘XrActionStateBoolean::changedSinceLastSync’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:293:72: warning: missing initializer for member ‘XrActionStateBoolean::lastChangeTime’ [-Wmissing-field-initializers]
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/xr/xr_input.cpp:293:72: warning: missing initializer for member ‘XrActionStateBoolean::isActive’ [-Wmissing-field-initializers]
+[56/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/vr_ui_renderer.cpp.o
+[57/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/input/input_action_system.cpp.o
+[58/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/game/CliUtils.cpp.o
+[59/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/ui/ImGuiManagerBase.cpp.o
+[60/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/ui/ImGuiManager.cpp.o
+[61/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/ui/MainMenu.cpp.o
+[62/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/ui/DebugOverlay.cpp.o
+[63/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/ui/editor/EditorPanel.cpp.o
+[64/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/ui/editor/GizmoController.cpp.o
+[65/78] Building CXX object openblood2/CMakeFiles/OpenBlood2.dir/src/main.cpp.o
+[66/78] Building CXX object openblood2/CMakeFiles/OpenBlood2.dir/src/Blood2Game.cpp.o
+[67/78] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/game/GameBase.cpp.o
+[68/78] Linking CXX static library nomadengine/libNoMadEngine.a
+[69/78] Building CXX object openblood2/CMakeFiles/OpenBlood2.dir/src/Blood2EntityFactory.cpp.o
+[70/78] Building CXX object openblood2/CMakeFiles/OpenBlood2.dir/src/Blood2HUD.cpp.o
+[71/78] Linking C static library _deps/sdl3-build/libSDL3_test.a
+[72/78] cd /tmp/lithtech-audit-2bVxTF/nomadengine/_deps/openxr-build/src/loader && /usr/bin/cmake -E create_symlink libopenxr_loader.so.1.1.54 libopenxr_loader.so.1.1
+[73/78] Building CXX object openshogo/CMakeFiles/OpenShogo.dir/src/ShogoGame.cpp.o
+[74/78] Linking CXX executable openblood2/OpenBlood2; Symlinking all assets content to build root; Creating symlink to shaders directory; Creating symlink to font file
+[75/78] Building CXX object openshogo/CMakeFiles/OpenShogo.dir/src/main.cpp.o
+[76/78] Building CXX object openshogo/CMakeFiles/OpenShogo.dir/src/ShogoEntityFactory.cpp.o
+[77/78] Linking CXX executable openshogo/OpenShogo; Symlinking all assets content to build root; Creating symlink to shaders directory

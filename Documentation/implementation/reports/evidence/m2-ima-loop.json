@@ -1,0 +1,218 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "a6ca134dd0e2e0e1849f4d2e99ea780db43fdd1b",
+  "status": "M2 incomplete; continuous prepared-playlist repetition; live MUSIC and variation state remain open",
+  "frozen_sources": {
+    "CMakeLists.txt": "52b08ec36acf68ca8ef004a44a6d72e3e2f015b616158a2e36652c86e1ade612",
+    "src/app/inspector_world_sounds.cpp": "ccee96887cd2eaaf76068e3605a1cee1c755cd76ee783cefc6e964bacf2f49cf",
+    "src/app/main.cpp": "f71d2439b52840b3aa82aa9fd46857b87fc34b176a5a618a7f631aa5ffcfe88b",
+    "src/app/world_sound_smoke.cpp": "efb89c3dc8572fdd4fdc0ea18ffdc5bbcaf248947973fe2a0551f99756cbee61",
+    "src/engine/audio.cpp": "8e212bc82c7e384942d90e9985e76d0400c2621953bf930513224d3718ad972d",
+    "src/engine/audio.h": "d6f0f10845e80442b13c932cf6a323bd09c3c72acf30d6109e4253b0eb35f476",
+    "src/engine/ima_clock.cpp": "9314ae53a1890c7bfae05b92cfcf1dcae51e727e60ce1a095ff4b932ed38faca",
+    "src/engine/ima_clock.h": "ee13890fc485ab459a9da755bf7cd58dd78cefb2799498800f62d7b3c8b7fe41",
+    "src/engine/ima_transport.cpp": "3121724e76bfc7f3474dff8a2167882e0fae5b69727c0165bb398a5ce5379fcc",
+    "src/engine/ima_transport.h": "e0d9f9e94559302522012bf2d567e0116bbdffceaefdf8223c02bbe12b120280",
+    "src/game/music_catalog.cpp": "30ba3c17d0c99fa0151e4d6018f8334802548a8daf2516ec7c3c79ca22297211",
+    "src/game/music_catalog.h": "7498d4849f3f99ad32a4a27461bcdfc0cd455b2aca5924274d84dff253167f2c",
+    "tests/CMakeLists.txt": "77b6db53f368d51bd9014abf21cae756780aaa2ca13605b63049c9238ec5ccb1",
+    "tests/ima_transport_tests.cpp": "8c2bffa520d9420e3137f7d47a97e0de3e22c7be9dc2056ae4cbd95a1352cd3d"
+  },
+  "results": {
+    "debug-tests": {
+      "passed": 153,
+      "wall_seconds": 33.93
+    },
+    "release-tests": {
+      "passed": 153,
+      "wall_seconds": 7.8
+    },
+    "sanitize-tests": {
+      "passed": 153,
+      "wall_seconds": 136.31
+    },
+    "debug-gpu": {
+      "passed": 2,
+      "wall_seconds": 52.18
+    },
+    "release-gpu": {
+      "passed": 2,
+      "wall_seconds": 18.64
+    }
+  },
+  "private_playlists": {
+    "debug-tests": "Cabal 4 looping lists / three passes plus 30 minutes of SilenceList; initial notes 2059 / nonzero PCM 6112608 / peak queue 1102",
+    "release-tests": "Cabal 4 looping lists / three passes plus 30 minutes of SilenceList; initial notes 2059 / nonzero PCM 6112608 / peak queue 1102",
+    "sanitize-tests": "Cabal 4 looping lists / three passes plus 30 minutes of SilenceList; initial notes 2059 / nonzero PCM 6112608 / peak queue 1102"
+  },
+  "synthetic": {
+    "debug-tests": [
+      "Repeat clock matched 6113 ticks / 20 cycles; frames 69665..983153",
+      "Repeated PCM equals unrolled reference and 17-frame fragments; nonzero 812352 / peak queue 101"
+    ],
+    "release-tests": [
+      "Repeat clock matched 6113 ticks / 20 cycles; frames 69665..983153",
+      "Repeated PCM equals unrolled reference and 17-frame fragments; nonzero 812352 / peak queue 101"
+    ],
+    "sanitize-tests": [
+      "Repeat clock matched 6113 ticks / 20 cycles; frames 69665..983153",
+      "Repeated PCM equals unrolled reference and 17-frame fragments; nonzero 812352 / peak queue 101"
+    ]
+  },
+  "compiler_warnings": {
+    "debug": [],
+    "release": [
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:36:78: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]"
+    ],
+    "sanitize": [
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:36:78: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]"
+    ]
+  },
+  "commands": [
+    "python3 Documentation/Implementation/evidence/m2-ima-loop-validation.py {debug,release,sanitize} (three -j1 builds; selected CTests at -j2)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/{debug,release} -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit /tmp/b2-ima-loop-{debug,release}-gpu.xml",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror (all changed C++ files)",
+    "python3 /tmp/b2-npc-integrity.py; python3 /tmp/b2-npc-links.py; git diff --check (raw .log/.xml excluded)"
+  ],
+  "limitations": [
+    "Original API documents transition once and ordered list repetition; scheduler is new bounded replacement code",
+    "Repeats prepared variations/seed, not original cross-section regeneration or activation state",
+    "No live game MUSIC success or NEXTSONG request replacement; M2 gate unchanged",
+    "Three complete passes of each private list; thirty-minute headless duration stress only on SilenceList",
+    "Synthetic exact PCM/map comparison against unrolled prepared sequence, not retail listening/PCM parity",
+    "NVIDIA Linux with SDL dummy output; UI controls exercised through backend, no manual clicks or native Metal playback"
+  ],
+  "capture": {
+    "path": "Blood2/build/debug/tests/world-sounds.png",
+    "sha256": "c2a2259eb023279df5a7b1750e8b36674b8be7b17ee18bab52b6e1ee49c6fa1d",
+    "committed": false
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "readme_preserved_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "files": [
+    {
+      "file": "m2-ima-loop-validation.py",
+      "sha256": "884199fb4af335d00ee5a8d01e1ba289a7d99018747b865dedbab09ef91ea959"
+    },
+    {
+      "file": "m2-ima-loop-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-ima-loop-debug-app-final.log",
+      "sha256": "a832370068136c043ad446f218a5907c87a31a8815f83da2863f14f84cc1e996"
+    },
+    {
+      "file": "m2-ima-loop-release-app-final.log",
+      "sha256": "d7849e6283176a5d92b143a50ec4bef25b10b4153b1268a20cc6f60594e91a1b"
+    },
+    {
+      "file": "m2-ima-loop-debug-gpu-initial.log",
+      "sha256": "891885a0ea80d0715cc0ef52ec6636576af005068a2f2454ac859e8258011ea8"
+    },
+    {
+      "file": "m2-ima-loop-debug-tests.log",
+      "sha256": "bba2212d474e1fd220cd40bf789a1e9506b394946e31c7e29f06e16a1dceb519"
+    },
+    {
+      "file": "m2-ima-loop-debug-tests.xml",
+      "sha256": "66e758c1ebddd9f35cebd0c4e14d1fccc691bff7436b9206f4a2da9b9540935f"
+    },
+    {
+      "file": "m2-ima-loop-release-tests.log",
+      "sha256": "e5a694dc82a655190cd5403ff5eab3748012e842c99e98e4f2957ce0ad4808f9"
+    },
+    {
+      "file": "m2-ima-loop-release-tests.xml",
+      "sha256": "526472b59ea79d4d3917f8067c2bc57aa10926ea127865d3c2fa5988a39c7e6b"
+    },
+    {
+      "file": "m2-ima-loop-sanitize-tests.log",
+      "sha256": "75589d31dd199e10dfa812f771a0f0215f496284fee036d9915154a7f7ca6f9f"
+    },
+    {
+      "file": "m2-ima-loop-sanitize-tests.xml",
+      "sha256": "253daf7630ba481341ad0e762261da198a03d092a496f51b3441ab378b85f6ac"
+    },
+    {
+      "file": "m2-ima-loop-debug-gpu.log",
+      "sha256": "d5fdef0a77486349e85ebd8bf5f889cc85d52622ff08f431c20f48f398dbf34a"
+    },
+    {
+      "file": "m2-ima-loop-debug-gpu.xml",
+      "sha256": "9041cfa7f2b9c62d971e8a403846f7c5f0fa03ec1b02b75594d5a0dcdd2545fb"
+    },
+    {
+      "file": "m2-ima-loop-release-gpu.log",
+      "sha256": "bdbbcff496700294bd4f8ee7ee357625fadaa05977eae465239058c366b3faf8"
+    },
+    {
+      "file": "m2-ima-loop-release-gpu.xml",
+      "sha256": "d66d35edb7724f5a8198134563dca3fe488926ce003fb0632d296588ecf60f20"
+    },
+    {
+      "file": "m2-ima-loop-debug-build-final.log",
+      "sha256": "a0aba54ad81ce4438190815e1e6e03aa6c969484dc0b071c9d606553a39df2c0"
+    },
+    {
+      "file": "m2-ima-loop-release-build-final.log",
+      "sha256": "618c0fb024e730f06b2c12ee064b7436bfd49b1dadc498d78b0269b5af4320c3"
+    },
+    {
+      "file": "m2-ima-loop-sanitize-build-final.log",
+      "sha256": "308739750335e4b073eb2add36c12b221b50f60683630c78d29f242f4078d083"
+    },
+    {
+      "file": "m2-ima-loop-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-ima-loop-links.log",
+      "sha256": "9bde722c4511c0b2e0b5aff5983917775e50d098da1f36af572f063769206386"
+    }
+  ],
+  "implementation_commit": "29dc356bac79b43963795aaec995240decea08ac"
+}

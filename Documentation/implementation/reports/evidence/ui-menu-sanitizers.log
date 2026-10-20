@@ -1,0 +1,87 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  567: player_state.roundtrip
+ 1/36 Test  #567: player_state.roundtrip .............   Passed    0.04 sec
+      Start  568: player_state.clocks
+ 2/36 Test  #568: player_state.clocks ................   Passed    0.03 sec
+      Start  569: player_state.initialization
+ 3/36 Test  #569: player_state.initialization ........   Passed    0.04 sec
+      Start  570: player_state.failures
+ 4/36 Test  #570: player_state.failures ..............   Passed    0.04 sec
+      Start  571: player_state.capture
+ 5/36 Test  #571: player_state.capture ...............   Passed    0.04 sec
+      Start  572: player_state.private
+ 6/36 Test  #572: player_state.private ...............   Passed    7.31 sec
+      Start  578: player_restore.roundtrip
+ 7/36 Test  #578: player_restore.roundtrip ...........   Passed    0.05 sec
+      Start  579: player_restore.failures
+ 8/36 Test  #579: player_restore.failures ............   Passed    0.09 sec
+      Start  580: player_restore.lifetime
+ 9/36 Test  #580: player_restore.lifetime ............   Passed    0.09 sec
+      Start  581: player_restore.private
+10/36 Test  #581: player_restore.private .............   Passed    8.14 sec
+      Start  645: player_controls.keys
+11/36 Test  #645: player_controls.keys ...............   Passed    0.02 sec
+      Start  646: player_controls.mouse
+12/36 Test  #646: player_controls.mouse ..............   Passed    0.02 sec
+      Start  647: player_controls.gates
+13/36 Test  #647: player_controls.gates ..............   Passed    0.02 sec
+      Start  648: player_controls.entry
+14/36 Test  #648: player_controls.entry ..............   Passed    0.02 sec
+      Start  649: player_controls.combat
+15/36 Test  #649: player_controls.combat .............   Passed   54.25 sec
+      Start  650: player_controls.corpse_clearance
+16/36 Test  #650: player_controls.corpse_clearance ...   Passed   75.31 sec
+      Start  651: player_controls.private
+17/36 Test  #651: player_controls.private ............   Passed   19.77 sec
+      Start  902: dls_sampler.pcm
+18/36 Test  #902: dls_sampler.pcm ....................   Passed    0.02 sec
+      Start  903: dls_sampler.envelopes
+19/36 Test  #903: dls_sampler.envelopes ..............   Passed    0.04 sec
+      Start  904: dls_sampler.lifetime
+20/36 Test  #904: dls_sampler.lifetime ...............   Passed    0.16 sec
+      Start  905: dls_sampler.legacy_pan
+21/36 Test  #905: dls_sampler.legacy_pan .............   Passed    0.02 sec
+      Start  906: dls_sampler.routing
+22/36 Test  #906: dls_sampler.routing ................   Passed    0.02 sec
+      Start  907: dls_sampler.controllers
+23/36 Test  #907: dls_sampler.controllers ............   Passed    0.02 sec
+      Start  908: dls_sampler.private
+24/36 Test  #908: dls_sampler.private ................   Passed    2.40 sec
+      Start  965: dls_sampler.live_controls
+25/36 Test  #965: dls_sampler.live_controls ..........   Passed    0.03 sec
+      Start  966: dls_sampler.bend_reference
+26/36 Test  #966: dls_sampler.bend_reference .........   Passed    0.02 sec
+      Start  967: dls_sampler.live_private
+27/36 Test  #967: dls_sampler.live_private ...........   Passed    2.39 sec
+      Start  968: dls_sampler.midi_receiver
+28/36 Test  #968: dls_sampler.midi_receiver ..........   Passed    0.09 sec
+      Start  969: dls_sampler.midi_limits
+29/36 Test  #969: dls_sampler.midi_limits ............   Passed    0.02 sec
+      Start  970: dls_sampler.midi_private
+30/36 Test  #970: dls_sampler.midi_private ...........   Passed    1.72 sec
+      Start  996: dls_sampler.scalar_equivalence
+31/36 Test  #996: dls_sampler.scalar_equivalence .....   Passed    0.15 sec
+      Start  997: menus.state
+32/36 Test  #997: menus.state ........................   Passed    0.02 sec
+      Start  998: menus.artwork
+33/36 Test  #998: menus.artwork ......................   Passed    1.38 sec
+      Start  999: menus.session
+34/36 Test  #999: menus.session ......................   Passed    5.81 sec
+      Start 1000: menus.profiles
+35/36 Test #1000: menus.profiles .....................   Passed   76.50 sec
+      Start 1001: menus.preferences
+36/36 Test #1001: menus.preferences ..................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 36
+
+Label Time Summary:
+audio              =   4.65 sec*proc (11 tests)
+headless           = 256.07 sec*proc (36 tests)
+menus              =  83.73 sec*proc (5 tests)
+music_assets       =   7.08 sec*proc (14 tests)
+player_controls    = 149.40 sec*proc (7 tests)
+player_restore     =   8.38 sec*proc (4 tests)
+player_state       =   7.49 sec*proc (6 tests)
+private            = 254.98 sec*proc (11 tests)
+
+Total Test time (real) = 256.09 sec

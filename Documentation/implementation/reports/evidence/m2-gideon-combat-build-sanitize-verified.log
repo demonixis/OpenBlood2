@@ -1,0 +1,10 @@
+[0/2] Re-checking globbed directories...
+[1/7] Scanning /home/yann/projects/lithtech/Blood2/tests/gideon_combat_tests.cpp for CXX dependencies
+[2/7] Generating CXX dyndep file tests/CMakeFiles/gideon_combat_tests.dir/CXX.dd
+[3/5] Building CXX object tests/CMakeFiles/gideon_combat_tests.dir/gideon_combat_tests.cpp.o
+/home/yann/projects/lithtech/Blood2/tests/gideon_combat_tests.cpp:154:26: warning: suggest braces around initialization of subobject [-Wmissing-braces]
+  154 |         DRotation turned{0, .70710678f, 0, .70710678f};
+      |                          ^~~~~~~~~~~~~~~~
+      |                          {               }
+1 warning generated.
+[4/5] Linking CXX executable tests/gideon_combat_tests

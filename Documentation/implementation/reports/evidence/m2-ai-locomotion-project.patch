@@ -1,0 +1,1364 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 28faa49..675c511 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -303,3 +303,11 @@ PLAYANIMATIONLOOPING fallthrough, double DONE decisions and owned callback lifet
+ Production SCRIPT entry still requires its unported forced AI_Update; diagnostics
+ must not count as registered NPCs. Required initialization/update/death, client FX
+ and ExitTrigger/session services keep M2 incomplete. Source counts are unchanged.
++
++The [autonomous locomotion continuation](../Documentation/Implementation/M2_AI_LOCOMOTION.md) adds original obstruction/ledge probes,
++walk/run/moving-fire commands and Cultist close/far attack sequencing. Read
++[contracts](docs/AI_LOCOMOTION_CONTRACTS.md). Preserve first-hit self exclusion, false-on-throttled ledge
++queries, injury/support timing, independent fire/completion increments and cached
++attack thresholds. Missing shade recovery and crawl/jump execution remain explicit
++failures. Diagnostic drivers are not production AI_Update; NPC initialization,
++remaining states, required FX and ExitTrigger keep M2 incomplete. Counts are unchanged.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b16e5af..2713e4d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,7 +41,7 @@ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+-    src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/Movement.cpp
++    src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/Movement.cpp
+     src/game/original/AIState.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+diff --git a/README.md b/README.md
+index 46dd5ea..4765791 100644
+--- a/README.md
++++ b/README.md
+@@ -374,3 +374,15 @@ and ExitTrigger/session services keep M2 incomplete. Source counts are unchanged
+ Script interpreter-state verification: 422/422 Debug and inspector-free Release
+ checks (27 GPU each), plus 97 targeted ASan/UBSan/leak checks.
+ See [evidence](../Documentation/Implementation/M2_AI_SCRIPT.md).
++
++The [autonomous locomotion continuation](../Documentation/Implementation/M2_AI_LOCOMOTION.md) adds original obstruction/ledge probes,
++walk/run/moving-fire commands and Cultist close/far attack sequencing. Read
++[contracts](docs/AI_LOCOMOTION_CONTRACTS.md). Preserve first-hit self exclusion, false-on-throttled ledge
++queries, injury/support timing, independent fire/completion increments and cached
++attack thresholds. Missing shade recovery and crawl/jump execution remain explicit
++failures. Diagnostic drivers are not production AI_Update; NPC initialization,
++remaining states, required FX and ExitTrigger keep M2 incomplete. Counts are unchanged.
++
++Autonomous locomotion/attack verification: 433/433 Debug and inspector-free Release
++checks (27 GPU each), plus 120 targeted ASan/UBSan/leak checks.
++See [evidence](../Documentation/Implementation/M2_AI_LOCOMOTION.md).
+diff --git a/docs/AI_FIRE_CONTRACTS.md b/docs/AI_FIRE_CONTRACTS.md
+index f106035..72bc563 100644
+--- a/docs/AI_FIRE_CONTRACTS.md
++++ b/docs/AI_FIRE_CONTRACTS.md
+@@ -96,3 +96,8 @@ The inspector reads live state and errors, including hidden/inactive/missing
+ models, without advancing actions. Diagnostic drivers in tests and the GPU smoke
+ call this command explicitly; they are not AI_Update. Removal in a damage callback
+ is deferred through the animation batch; no later marker uses the pending actor.
++
++The [autonomous locomotion continuation](AI_LOCOMOTION_CONTRACTS.md) now supplies
++walk/run/moving fire, obstruction/ledge probes and Cultist close/far attack sequencing.
++Earlier blanket omissions are superseded only for this subset. Full initialization,
++AI_Update/deactivation, remaining states and shade recovery stay unavailable.
+diff --git a/docs/AI_LOCOMOTION_CONTRACTS.md b/docs/AI_LOCOMOTION_CONTRACTS.md
+new file mode 100644
+index 0000000..1579af2
+--- /dev/null
++++ b/docs/AI_LOCOMOTION_CONTRACTS.md
+@@ -0,0 +1,99 @@
++# Original autonomous locomotion and Cultist attacks
++
++This increment ports AI_Mgr obstruction/ledge queries, MC_Walk/Run/Fire_Walk/Fire_Run
++and CultistAI close/far attack sequencing. Read [source selections](M2_AI_LOCOMOTION_SOURCES.json),
++[evidence](../../Documentation/Implementation/M2_AI_LOCOMOTION.md),
++[cache/path contracts](AI_NAVIGATION_CONTRACTS.md), [fire contracts](AI_FIRE_CONTRACTS.md),
++[state contracts](AI_STATE_CONTRACTS.md) and [object lifetime](OBJECT_CONTRACTS.md).
++No production NPC is registered and no complete AI_Update is provided. M2 stays open.
++
++## Obstruction and ledges
++
++CheckObstructed ignores its direction argument and unused total displacement, as in
++source. It tests full 3D velocity magnitude strictly below 10% of requested speed,
++and absolute cached vertical displacement <=0.01. Current/previous poses come from
++CMovement; query calls do not sample or integrate the body.
++
++CalculateObstruction casts nine rays in right/center/left, upper/middle/lower order.
++Side offset is (dims.x+dims.z)/2; upper/lower offsets are ±(dims.y-1); forward length
++is 2*(sqrt(dims.x²+dims.z²)+1). Solid-only rays have no filter. The first hit is
++retained even if it is the actor itself: self is excluded from flags *after* the
++query, without recasting. World polygons also set flags. Missing/invalid collision
++returns -1, not zero; partial flags/rays remain diagnostics. No successful avoidance
++may be inferred from an unavailable query.
++
++NavigateObstacle returns to last state with no obstruction; search states restart
++themselves. Upper+CRAWL has priority over lower+JUMP. An enabled upper branch with
++other blocked rows consumes the source else-if chain without selecting recovery.
++The lower branch has the analogous rule. Selecting CrawlUnder/JumpOver is supported;
++executing those state bodies is still unavailable. FindPosAroundObj requires the
++missing GetPointShade service and fails explicitly. The unused, unsafe original
++CalculateTurn is not imported. No guessed recovery point is supplied.
++
++IsLedge tests at most once per 0.05 game seconds; a throttled call returns false,
++not the last sampled result. Its origin is cached position plus the **unnormalized**
++direction times 1.25*sqrt(dims.x²+dims.z²); it casts down 2*dims.y. Any solid hit is
++support, without an owner/character/glass filter. The inspector distinguishes last
++sample, sampled-on-last-call and query failure. A missing service cannot become a
++usable no-ledge result: only a completed hit/miss consumes the throttle interval.
++Failed typed requests retry even in the same tick. This is an explicit safety
++adaptation for errors the original boolean service could not represent. Clock
++and dimensions are checked.
++
++## Four movement commands
++
++Ordinary walk/run select the current fire-type clip, falling back to melee without
++a weapon. Moving fire falls back to pistol. Injured leg nodes 10/14 select their
++original pistol/melee or rifle walk clips when armed. Initial nonfiring walk slows
++any injured leg to one-third speed; a later grounded/gravity continuation restores
++full speed. Airborne or nongravity continuations do not rewrite velocity.
++
++Each command writes cached-forward velocity and enables model looping. Moving fire
++also resets load/time starts to zero, stores weapon reload time and schedules 0.1s.
++There is no extra position integration: existing generic physics integrates NPC
++bodies once, while the player keeps its separate single integration.
++
++Continuation checks obstruction first. A successful obstacle state change does not
++skip the rest of the source callback. Current support is obtained through the
++existing typed standing query; no fabricated world-object handle is needed. A real
++blocked foot-anchored animation resize selects CrawlUnder; missing clips/models or
++services fail instead. This resize/collision solver remains replacement engine code,
++not verified retail physics.
++
++Moving fire uses strict time > last-load+reload. Fire acceptance, including dry fire,
++updates load time. Ordinary blocked/unarmed fire clears animation and increments
++Metacmd. Playback completion independently stops horizontal velocity, clears animation
++and increments it again; both increments may occur in one call. A fire_key may also
++fire, independently of the timed shot. Missing required shot/playback services fail.
++Checked overflow, reentrancy and pending-owner guards prevent continued work after
++a destructive or nested callback; removal remains deferred. State/command diagnostics
++are separate from generic physics and do not claim autonomous initialization.
++
++## Cultist attack sequencing
++
++The original phase 1 faces the cached target, phase 2 chooses a weapon, phase 3 fires
++standing at <=25% (close) or <=75% (far) of seeing distance, while already firing
++standing, or when vertical separation exceeds body height. Phase 4 approaches only
++inside (25%,50%) for close, or above 75% for far. It faces the target, cancels that
++Metacmd increment, then checks ledge before height/current-command guards. Injured
++actors walk; otherwise close runs and far runs firing. Unsafe ledge/height selects
++standing fire. Phase 5 calls the existing original decision function.
++
++Distance is raw cached-position distance and overwrites SIGHT, as in source. Lost
++targets select SearchVisual at matching height, otherwise ComputeState. Query/pose
++failures propagate. Base AI_Mgr attacks remain unsupported; only Cultist overrides
++these states. Full initialization/update, deactivation/visibility pings, target
++retention, other navigation/recoil/death states, required FX and ExitTrigger still
++block production NPC registration and the M2 gate.
++
++## Inspection and verification boundary
++
++The Skeleton inspector reads commands, velocity/vertical thresholds, all nine rays
++and hit identities, ledge timing and Cultist distance/phase diagnostics. Removed
++hits are labelled instead of dereferenced. It performs no simulation work.
++
++The GPU diagnostic explicitly drives one original Cultist close-attack standing
++cycle, then the original moving-fire command. Its isolated placement, explicit
++initialization and scheduler are test fixtures, not authored AI_Update. Hidden
++inspection and world reload use the same game clocks and deferred ownership. Real
++model clip availability is checked without substituting missing civilian fire clips.
+diff --git a/docs/AI_NAVIGATION_CONTRACTS.md b/docs/AI_NAVIGATION_CONTRACTS.md
+index 3d269ef..2fd18fd 100644
+--- a/docs/AI_NAVIGATION_CONTRACTS.md
++++ b/docs/AI_NAVIGATION_CONTRACTS.md
+@@ -108,3 +108,8 @@ FindPosAroundObj remains excluded because its required GetPointShade service is
+ missing. Original debug-line object spawning, save/restore, autonomous following,
+ full AI initialization/update/deactivation, production CivilianAI/CultistAI/Gideon,
+ required FX and ExitTrigger remain open. No authored class counts change.
++
++The [autonomous locomotion continuation](AI_LOCOMOTION_CONTRACTS.md) now supplies
++walk/run/moving fire, obstruction/ledge probes and Cultist close/far attack sequencing.
++Earlier blanket omissions are superseded only for this subset. Full initialization,
++AI_Update/deactivation, remaining states and shade recovery stay unavailable.
+diff --git a/docs/AI_STATE_CONTRACTS.md b/docs/AI_STATE_CONTRACTS.md
+index 8d7b61f..b9fe983 100644
+--- a/docs/AI_STATE_CONTRACTS.md
++++ b/docs/AI_STATE_CONTRACTS.md
+@@ -142,3 +142,8 @@ SubwayA stays 187 created, 4 transferred sounds, 372 editor-only, 17 unsupported
+ ten CultistAI, Gideon and ExitTrigger. Required client FX and the complete session
+ also remain open. --start-game continues to return 6. Other platforms, XR and
+ retail behavior are not validated by these Linux tests.
++
++The [autonomous locomotion continuation](AI_LOCOMOTION_CONTRACTS.md) now supplies
++walk/run/moving fire, obstruction/ledge probes and Cultist close/far attack sequencing.
++Earlier blanket omissions are superseded only for this subset. Full initialization,
++AI_Update/deactivation, remaining states and shade recovery stay unavailable.
+diff --git a/docs/M2_AI_LOCOMOTION_SOURCES.json b/docs/M2_AI_LOCOMOTION_SOURCES.json
+new file mode 100644
+index 0000000..34713fa
+--- /dev/null
++++ b/docs/M2_AI_LOCOMOTION_SOURCES.json
+@@ -0,0 +1,74 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "2ceb37380e263dccb40fe75481852cfb376ede1d",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          2580,
++          2692
++        ],
++        [
++          2858,
++          2920
++        ],
++        [
++          3663,
++          3694
++        ],
++        [
++          4029,
++          4103
++        ],
++        [
++          4179,
++          4234
++        ],
++        [
++          4534,
++          4619
++        ],
++        [
++          4748,
++          4828
++        ]
++      ],
++      "use": "Obstruction/ledge probes, recovery selection and four autonomous movement commands"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CultistAI.cpp",
++      "sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
++      "selected_lines": [
++        [
++          331,
++          454
++        ]
++      ],
++      "use": "Original close/far attack state sequencing"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
++      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
++      "selected_lines": [
++        [
++          47,
++          96
++        ],
++        [
++          110,
++          176
++        ]
++      ],
++      "use": "Original command/state/obstruction flags"
++    }
++  ],
++  "adaptations": [
++    "Consolidated four parallel command bodies with original branch differences retained",
++    "Checked existing typed rays/support and explicit missing shade recovery",
++    "Required service, finite-domain, counter overflow, pending-owner and reentrancy guards",
++    "Diagnostic scheduling only; production initialization/AI_Update/death and registration remain absent",
++    "Failed typed ledge queries do not consume the throttle interval; same-tick retry remains failure until service recovers"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index ec61449..6357335 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -583,3 +583,14 @@ bounded parsing, overflow/lifetime guards and explicit service errors replace
+ legacy unsafe storage/ignored failures. Source quirks are retained and tested.
+ No other repository dependency or commercial asset was imported. See
+ [contracts](AI_SCRIPT_CONTRACTS.md) and [evidence](../../Documentation/Implementation/M2_AI_SCRIPT.md).
++
++## M2 autonomous locomotion and Cultist attack states
++
++Donor: `sources/blood2` at `006b4aabd3fb348f6846cad03799cf8df685ea95`.
++[Selected source ranges/hashes](M2_AI_LOCOMOTION_SOURCES.json) cover AI_Mgr and CultistAI.
++Four parallel command bodies are consolidated with source differences preserved;
++checked existing services, owned diagnostics and callback guards are adaptations.
++Shade-dependent recovery fails explicitly; no production class or complete AI_Update
++is claimed. See [contracts](AI_LOCOMOTION_CONTRACTS.md) and
++[evidence](../../Documentation/Implementation/M2_AI_LOCOMOTION.md). No reference
++repository, dependency revision or commercial asset was changed/imported.
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index 7b7ceb5..e81e51c 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -2,6 +2,7 @@
+ #include "engine/collision.h"
+ #include "game/original/AI_Mgr.h"
+ #include "game/original/CivilianAI.h"
++#include "game/original/CultistAI.h"
+ #include <cmath>
+ #include <limits>
+ namespace OpenBlood2
+@@ -25,7 +26,9 @@ namespace OpenBlood2
+                 return AI_Mgr::EngineMessageFn(m, d, f);
+             }
+         };
+-        class AIFireProbe : public AI_Mgr
++        // Diagnostic sequence: original Cultist close attack through one completed
++        // standing animation, then original moving fire. This is not AI_Update.
++        class AIFireProbe : public CultistAI
+         {
+           public:
+             HOBJECT diagnostic_target = nullptr;
+@@ -36,7 +39,7 @@ namespace OpenBlood2
+                 if (message == MID_UPDATE)
+                 {
+                     GetServerDE()->SetNextUpdate(m_hObject, .001f);
+-                    if (!MC_Fire_Stand())
++                    if (!(animation_finishes ? MC_Fire_Run() : DispatchState()))
+                         GetServerDE()->SetNextUpdate(m_hObject, 0);
+                 }
+                 return AI_Mgr::EngineMessageFn(message, data, value);
+@@ -142,7 +145,7 @@ namespace OpenBlood2
+         state.m_ObjectType = OT_MODEL;
+         state.m_Pos = {1000, 10000, 0};
+         state.m_Flags = FLAG_MODELKEYS;
+-        SAFE_STRCPY(state.m_Name, "AI weapon probe (no full AI_Update)");
++        SAFE_STRCPY(state.m_Name, "Cultist attack/movement probe (no full AI_Update)");
+         SAFE_STRCPY(state.m_Filename, "models/enemies/m_cultist1.abc");
+         auto h = g.objects.create(&type, state);
+         auto* r = g.objects.get(h);
+@@ -171,6 +174,11 @@ namespace OpenBlood2
+         ai->m_fHearingDist = 1000;
+         if (!ai->HandleTrigger(victim, "SOUND_TRIGGER 2"))
+             return false;
++        ai->m_fSeeingDist = 2000;
++        ai->m_fRunSpeed = 10;
++        if (!ai->SetAnimation(table->m_nAnim_FIRE_STAND[TYPE_PISTOL]) || !ai->m_MoveObj.Update() ||
++            !ai->SetNewState(AI_Mgr::StateAttackClose) || ai->CalculateObstruction() < 0)
++            return false;
+         ai->diagnostic_target = victim;
+         g.server.SetNextUpdate(h, .001f);
+         id = r->id;
+@@ -186,8 +194,10 @@ namespace OpenBlood2
+                ai->m_MoveObj.outcome == CMovement::Outcome::Direct && ai->m_MoveObj.path().size() == 1 &&
+                ai->m_MoveObj.failures == 0 && ai->hearing_reactions == 1 && ai->trigger_failures == 0 &&
+                ai->trigger_outcome == AI_Mgr::TriggerOutcome::Heard && ai->fire_shots > 2 &&
+-               ai->animation_finishes > 0 && ai->fire_failures == 0 && ai->state_failures == 0 &&
+-               ai->key_failures == 0 && ai->audio_starts > 0 && target->damage.m_fHitPoints < 10000 &&
++               ai->animation_finishes > 0 && ai->attack_updates > 2 && ai->locomotion_calls > 2 &&
++               ai->locomotion_failures == 0 && ai->obstacle_queries > 0 && ai->obstruction_checks > 0 &&
++               r->state.m_Pos.z > 0 && ai->fire_failures == 0 && ai->state_failures == 0 && ai->key_failures == 0 &&
++               ai->audio_starts > 0 && target->damage.m_fHitPoints < 10000 &&
+                ai->m_InventoryMgr.GetAmmoCount(AMMO_BULLET) < 100;
+     }
+     bool prepare_ai_state_smoke(GameSession& g, ObjectId& id)
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index a2c3244..8bd42a8 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -1,4 +1,5 @@
+ #include "game/original/AI_Mgr.h"
++#include "game/original/CultistAI.h"
+ #include "inspector.h"
+ #include <algorithm>
+ #include <imgui.h>
+@@ -59,6 +60,52 @@ namespace OpenBlood2
+         const auto* r = game.objects.get(skeleton_selection);
+         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
++        if (target_ai && ImGui::CollapsingHeader("Original autonomous locomotion", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            const auto& a = *target_ai;
++            ImGui::TextWrapped("Original walk/run/moving fire and selected Cultist attack sequencing. Full AI_Update, "
++                               "shade recovery and crawl/jump state execution remain unavailable.");
++            ImGui::Text("Command %d | calls %llu | failures %llu", a.locomotion_command,
++                        (unsigned long long)a.locomotion_calls, (unsigned long long)a.locomotion_failures);
++            ImGui::Text("Obstruction %s | speed %.3f | cached vertical change %.4f | checks %llu",
++                        a.obstructed ? "yes" : "no", a.obstruction_velocity, a.obstruction_vertical,
++                        (unsigned long long)a.obstruction_checks);
++            ImGui::Text("Block flags 0x%02x | nine-ray queries %llu", a.block_flags,
++                        (unsigned long long)a.obstacle_queries);
++            auto ray = [&](const char* name, const AI_Mgr::ObstacleRay& q)
++            {
++                const auto* hit = game.objects.get(q.hit.object);
++                const char* status = q.result == SegmentResult::Hit       ? "hit"
++                                     : q.result == SegmentResult::Miss    ? "miss"
++                                     : q.result == SegmentResult::Invalid ? "invalid"
++                                                                          : "unavailable/not queried";
++                ImGui::Text("%s: %s | (%.1f %.1f %.1f) -> (%.1f %.1f %.1f)", name, status, q.from.x, q.from.y, q.from.z,
++                            q.to.x, q.to.y, q.to.z);
++                if (q.result == SegmentResult::Hit)
++                    ImGui::Text("Hit %s | polygon %u",
++                                hit            ? hit->state.m_Name
++                                : q.hit.object ? "removed object"
++                                               : "world",
++                                q.hit.polygon);
++            };
++            const char* names[]{"Right upper",  "Right middle", "Right lower", "Center upper", "Center middle",
++                                "Center lower", "Left upper",   "Left middle", "Left lower"};
++            if (ImGui::TreeNode("Nine obstruction rays"))
++            {
++                for (unsigned i = 0; i < a.obstacle_rays.size(); ++i)
++                    ray(names[i], a.obstacle_rays[i]);
++                ImGui::TreePop();
++            }
++            ImGui::Text("Last ledge %s | sampled on last call %s | time %.3f | queries %llu", a.ledge ? "yes" : "no",
++                        a.ledge_sampled ? "yes" : "no", a.last_ledge_check, (unsigned long long)a.ledge_queries);
++            ray("Ledge", a.ledge_ray);
++            if (const auto* cultist = dynamic_cast<const CultistAI*>(target_ai))
++                ImGui::Text("Cultist attack: updates %llu | distance %.2f / threshold %.2f | height %.2f",
++                            (unsigned long long)cultist->attack_updates, cultist->attack_distance,
++                            cultist->attack_threshold, cultist->attack_height);
++            if (!a.locomotion_error.empty())
++                ImGui::TextWrapped("Last failure: %s", a.locomotion_error.c_str());
++        }
+         if (target_ai && ImGui::CollapsingHeader("Original AI script interpreter", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& a = *target_ai;
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 29dad02..477a0cd 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -326,7 +326,7 @@ namespace
+         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
+         inspector.select_skeleton = options.skeleton_smoke;
+         if (options.skeleton_smoke)
+-            inspector.skeleton_selection = smoke_ai_follow;
++            inspector.skeleton_selection = smoke_ai_fire;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
+         inspector.select_pickups = options.pickups_smoke;
+diff --git a/src/game/original/AILocomotion.cpp b/src/game/original/AILocomotion.cpp
+new file mode 100644
+index 0000000..7c4a691
+--- /dev/null
++++ b/src/game/original/AILocomotion.cpp
+@@ -0,0 +1,252 @@
++// Original AI_Mgr obstruction/ledge queries and MC_Walk/Run/Fire_Walk/Fire_Run.
++// Checked typed boundaries and missing shade recovery: AI_LOCOMOTION_CONTRACTS.md.
++#include "AI_Mgr.h"
++#include "engine/collision.h"
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++namespace
++{
++    struct Busy
++    {
++        bool& flag;
++        explicit Busy(bool& f) : flag(f)
++        {
++            flag = true;
++        }
++        ~Busy()
++        {
++            flag = false;
++        }
++    };
++} // namespace
++bool AI_Mgr::LocomotionFailure(std::string_view why)
++{
++    ++locomotion_failures;
++    locomotion_error = why;
++    return false;
++}
++bool AI_Mgr::LocomotionReady()
++{
++    if (!GetServerDE() || !GetServerDE()->IsObjectAlive(m_hObject) || !m_MoveObj.initialized || !m_MoveObj.sampled ||
++        !physics_vector(m_vDims) || m_vDims.x <= 0 || m_vDims.y <= 0 || m_vDims.z <= 0)
++        return LocomotionFailure("Locomotion requires a live sampled CMovement and positive finite dimensions");
++    return true;
++}
++bool AI_Mgr::CheckObstructed(DVector, float speed, bool& out)
++{
++    out = false;
++    if (!LocomotionReady() || !std::isfinite(speed) || speed < 0 || speed > 1e7f)
++        return LocomotionFailure("Invalid obstruction speed or movement cache");
++    DVector velocity;
++    if (GetServerDE()->GetVelocity(m_hObject, &velocity) != DE_OK || !physics_vector(velocity))
++        return LocomotionFailure("Obstruction velocity unavailable");
++    obstruction_velocity = std::hypot(velocity.x, velocity.y, velocity.z);
++    obstruction_vertical = std::abs(m_MoveObj.GetLastPos().y - m_MoveObj.GetPos().y);
++    ++obstruction_checks;
++    // Source ignores the direction and its computed total displacement.
++    out = obstructed = obstruction_velocity < speed * .1f && obstruction_vertical <= .01f;
++    return true;
++}
++int AI_Mgr::CalculateObstruction()
++{
++    block_flags = 0;
++    obstacle_rays = {};
++    if (!LocomotionReady())
++        return -1;
++    ++obstacle_queries;
++    const auto pos = m_MoveObj.GetPos();
++    const float feeler = (std::hypot(m_vDims.x, m_vDims.z) + 1) * 2;
++    const float side = (m_vDims.x + m_vDims.z) / 2;
++    for (unsigned i = 0; i < obstacle_rays.size(); ++i)
++    {
++        auto& ray = obstacle_rays[i];
++        const float offset = i < 3 ? side : i < 6 ? 0 : -side;
++        ray.from = vector_add(pos, vector_scale(m_MoveObj.GetRightVector(), offset));
++        ray.from.y += i % 3 == 0 ? m_vDims.y - 1 : i % 3 == 2 ? 1 - m_vDims.y : 0;
++        ray.to = vector_add(ray.from, vector_scale(m_MoveObj.GetForwardVector(), feeler));
++        ray.result = GetServerDE()->IntersectSegment(ray.from, ray.to, nullptr, ray.hit, false,
++                                                     SegmentObjects::SolidOnly, SegmentFilter::None);
++        if (ray.result == SegmentResult::Invalid || ray.result == SegmentResult::Unavailable)
++        {
++            LocomotionFailure("Obstruction segment service failed; flags are partial");
++            return -1;
++        }
++        // Source tests self AFTER the first hit, without recasting past it.
++        if (ray.result == SegmentResult::Hit && ray.hit.object != m_hObject)
++            block_flags |= (1u << (i % 3)) | (0x10u << (i / 3));
++    }
++    return static_cast<int>(block_flags);
++}
++bool AI_Mgr::NavigateObstacle()
++{
++    const int flags = CalculateObstruction();
++    if (flags < 0)
++        return false;
++    if (!flags)
++        return SetNewState(m_nLastState) || LocomotionFailure(state_error);
++    if (m_nState == StateSearchVisual || m_nState == StateSearchSmell)
++        return SetNewState(m_nState) || LocomotionFailure(state_error);
++    // Preserve the source else-if structure: an enabled upper/lower branch can
++    // consume the decision even when other rows prevent crawl/jump selection.
++    if ((flags & 1) && (m_dwFlags & 1))
++    {
++        if (!(flags & 6))
++            return SetNewState(StateCrawlUnder) || LocomotionFailure(state_error);
++        return true;
++    }
++    if ((flags & 4) && (m_dwFlags & 2))
++    {
++        if (!(flags & 3))
++            return SetNewState(StateJumpOver) || LocomotionFailure(state_error);
++        return true;
++    }
++    // Source FindPosAroundObj needs the actual GetPointShade service. Do not
++    // substitute a guessed position or successful RunAround state transition.
++    return LocomotionFailure("FindPosAroundObj/GetPointShade obstacle recovery is not integrated");
++}
++bool AI_Mgr::IsLedge(DVector direction, bool& out)
++{
++    out = false;
++    ledge_sampled = false;
++    if (!LocomotionReady() || !physics_vector(direction) || !std::isfinite(last_ledge_check) ||
++        !std::isfinite(GetServerDE()->GetTime()))
++        return LocomotionFailure("Invalid ledge request/cache/clock");
++    // Throttled calls return false, not the previous query result.
++    if (GetServerDE()->GetTime() - last_ledge_check < .05f)
++        return true;
++    const float distance = std::hypot(m_vDims.x, m_vDims.z);
++    ledge_ray = {};
++    ledge_ray.from = vector_add(m_MoveObj.GetPos(), vector_scale(direction, distance * 1.25f));
++    ledge_ray.to = ledge_ray.from;
++    ledge_ray.to.y -= m_vDims.y * 2;
++    ++ledge_queries;
++    ledge_ray.result = GetServerDE()->IntersectSegment(ledge_ray.from, ledge_ray.to, nullptr, ledge_ray.hit, false,
++                                                       SegmentObjects::SolidOnly, SegmentFilter::None);
++    if (ledge_ray.result == SegmentResult::Invalid || ledge_ray.result == SegmentResult::Unavailable)
++        return LocomotionFailure("Ledge segment service failed");
++    // A failed typed query must not turn the next call into a successful
++    // throttled false. Only a completed hit/miss consumes the source interval.
++    last_ledge_check = GetServerDE()->GetTime();
++    out = ledge = ledge_ray.result == SegmentResult::Miss;
++    ledge_sampled = true;
++    return true;
++}
++bool AI_Mgr::Locomotion(bool run, bool fire)
++{
++    ++locomotion_calls;
++    if (locomotion_busy)
++        return LocomotionFailure("Reentrant autonomous locomotion rejected");
++    Busy busy(locomotion_busy);
++    const auto failures = locomotion_failures;
++    locomotion_error.clear();
++    if (!LocomotionReady())
++        return false;
++    auto* server = GetServerDE();
++    const float speed = run ? m_fRunSpeed : m_fWalkSpeed;
++    const float time = server->GetTime();
++    if (!std::isfinite(speed) || speed < 0 || speed > 1e7f || !std::isfinite(time))
++        return LocomotionFailure("Invalid autonomous speed/clock");
++    const int command = fire ? (run ? 9 : 8) : (run ? 2 : 1);
++    locomotion_command = command;
++    if (!m_bAnimating || m_nCurMetacmd != command)
++    {
++        auto* weapon = m_InventoryMgr.CurrentWeapon();
++        const unsigned type = weapon ? weapon->data.m_nFireType : fire ? TYPE_PISTOL : TYPE_MELEE;
++        if (!m_pAnim_Sound || type >= 9)
++            return LocomotionFailure("Locomotion animation table unavailable");
++        DDWORD clip = fire ? (run ? m_pAnim_Sound->m_nAnim_FIRE_RUN[type] : m_pAnim_Sound->m_nAnim_FIRE_WALK[type])
++                           : (run ? m_pAnim_Sound->m_nAnim_RUN[type] : m_pAnim_Sound->m_nAnim_WALK[type]);
++        if (!fire && !run && weapon && (m_nInjuredLeg == 10 || m_nInjuredLeg == 14))
++        {
++            const bool pistol = type == TYPE_PISTOL || type == TYPE_MELEE;
++            clip = m_nInjuredLeg == 10 ? (pistol ? m_pAnim_Sound->m_nAnim_WALK_INJURED_LLEG_PISTOL
++                                                 : m_pAnim_Sound->m_nAnim_WALK_INJURED_LLEG_RIFLE)
++                                       : (pistol ? m_pAnim_Sound->m_nAnim_WALK_INJURED_RLEG_PISTOL
++                                                 : m_pAnim_Sound->m_nAnim_WALK_INJURED_RLEG_RIFLE);
++        }
++        m_fTimeStart = fire ? 0 : time;
++        if (fire)
++        {
++            if (weapon)
++                m_fAttackLoadTime = weapon->data.m_fReloadTime;
++            m_fLoadTimeStart = 0;
++        }
++        if (!SetAnimation(clip))
++        {
++            if (animation_blocked)
++                return SetNewState(StateCrawlUnder) || LocomotionFailure(state_error);
++            return LocomotionFailure(state_error);
++        }
++        server->SetModelLooping(m_hObject, DTRUE);
++        if (!Move(m_MoveObj.GetForwardVector(), !fire && !run && m_nInjuredLeg ? speed / 3 : speed))
++            return LocomotionFailure(script_motion_error);
++        m_bAnimating = true;
++        m_nCurMetacmd = command;
++        if (fire)
++            server->SetNextUpdate(m_hObject, .1f);
++        return true;
++    }
++    bool blocked;
++    if (!CheckObstructed(m_MoveObj.GetForwardVector(), speed, blocked))
++        return false;
++    if (blocked && !NavigateObstacle())
++        return false;
++    MovementState support;
++    if (!server->GetMovementState(m_hObject, support))
++        return LocomotionFailure("Locomotion support query unavailable");
++    if (support.standing && (server->GetObjectFlags(m_hObject) & FLAG_GRAVITY))
++        if (!Move(m_MoveObj.GetForwardVector(), speed))
++            return LocomotionFailure(script_motion_error);
++    if (Metacmd > std::numeric_limits<int>::max() - 2)
++        return LocomotionFailure("Locomotion Metacmd overflow");
++    if (fire)
++    {
++        if (!std::isfinite(m_fLoadTimeStart) || !std::isfinite(m_fAttackLoadTime) || m_fAttackLoadTime < 0)
++            return LocomotionFailure("Moving fire cadence invalid");
++        if (time > m_fLoadTimeStart + m_fAttackLoadTime)
++        {
++            if (Fire())
++                m_fLoadTimeStart = server->GetTime();
++            else if (fire_result == FireResult::Blocked || !m_InventoryMgr.CurrentWeapon())
++            {
++                m_bAnimating = false;
++                ++Metacmd;
++            }
++            else
++                return LocomotionFailure("Moving fire required shot service failed");
++        }
++    }
++    if (!server->IsObjectAlive(m_hObject))
++        return LocomotionFailure("Locomotion owner removed during shot callback");
++    if (locomotion_failures != failures)
++        return false;
++    std::string name;
++    if (!server->GetModelAnimationName(m_hObject, server->GetModelAnimation(m_hObject), name))
++        return LocomotionFailure("Locomotion playback unavailable");
++    if (server->GetModelPlaybackState(m_hObject) & MS_PLAYDONE)
++    {
++        if (!StopVelocity())
++            return LocomotionFailure(state_error);
++        m_bAnimating = false;
++        ++Metacmd;
++        ++animation_finishes;
++    }
++    return true;
++}
++bool AI_Mgr::MC_Walk()
++{
++    return Locomotion(false, false);
++}
++bool AI_Mgr::MC_Run()
++{
++    return Locomotion(true, false);
++}
++bool AI_Mgr::MC_Fire_Walk()
++{
++    return Locomotion(false, true);
++}
++bool AI_Mgr::MC_Fire_Run()
++{
++    return Locomotion(true, true);
++}
+diff --git a/src/game/original/AIState.cpp b/src/game/original/AIState.cpp
+index 013c459..e8116d4 100644
+--- a/src/game/original/AIState.cpp
++++ b/src/game/original/AIState.cpp
+@@ -250,6 +250,10 @@ bool AI_Mgr::DispatchState()
+     dispatched_state = m_nState;
+     if (Metacmd <= 0)
+         Metacmd = 1;
++    if (m_nState == StateAttackClose)
++        return AI_STATE_AttackClose();
++    if (m_nState == StateAttackFar)
++        return AI_STATE_AttackFar();
+     if (m_nState == StateIdle)
+         return AI_STATE_Idle();
+     if (m_nState == StatePassive)
+@@ -260,3 +264,12 @@ bool AI_Mgr::DispatchState()
+         return true;
+     return StateFailure("Selected AI action is not integrated");
+ }
++
++bool AI_Mgr::AI_STATE_AttackClose()
++{
++    return StateFailure("Subclass close attack is not integrated");
++}
++bool AI_Mgr::AI_STATE_AttackFar()
++{
++    return StateFailure("Subclass far attack is not integrated");
++}
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 78192bf..adf9383 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -158,6 +158,31 @@ class AI_Mgr : public CBaseCharacter
+     bool SetNewState(int);
+     bool StopVelocity();
+     bool SetAnimation(DDWORD);
++    bool MC_Walk();
++    bool MC_Run();
++    bool MC_Fire_Walk();
++    bool MC_Fire_Run();
++    bool CheckObstructed(DVector direction, float speed, bool&);
++    int CalculateObstruction(); // Flags, or -1 for a required query failure.
++    bool NavigateObstacle();
++    bool IsLedge(DVector direction, bool&);
++    virtual bool AI_STATE_AttackClose();
++    virtual bool AI_STATE_AttackFar();
++    struct ObstacleRay
++    {
++        DVector from{}, to{};
++        OpenBlood2::SegmentHit hit;
++        OpenBlood2::SegmentResult result = OpenBlood2::SegmentResult::Unavailable;
++    };
++    std::array<ObstacleRay, 9> obstacle_rays;
++    ObstacleRay ledge_ray;
++    unsigned block_flags = 0;
++    float last_ledge_check = 0, obstruction_velocity = 0, obstruction_vertical = 0;
++    bool obstructed = false, ledge = false, ledge_sampled = false;
++    std::uint64_t obstruction_checks = 0, obstacle_queries = 0, ledge_queries = 0;
++    std::uint64_t locomotion_calls = 0, locomotion_failures = 0;
++    int locomotion_command = 0;
++    std::string locomotion_error;
+     bool MC_Idle();
+     bool MC_BestWeapon();
+     bool MC_Fire_Stand();
+@@ -357,6 +382,10 @@ class AI_Mgr : public CBaseCharacter
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+ 
+   private:
++    bool locomotion_busy = false;
++    bool LocomotionReady();
++    bool LocomotionFailure(std::string_view);
++    bool Locomotion(bool run, bool fire);
+     bool script_busy = false;
+     std::vector<ScriptInstruction> script_commands;
+     ScriptInstruction script_current;
+diff --git a/src/game/original/CultistAI.h b/src/game/original/CultistAI.h
+index a7c4466..9cf85fb 100644
+--- a/src/game/original/CultistAI.h
++++ b/src/game/original/CultistAI.h
+@@ -1,9 +1,16 @@
+ #pragma once
+ #include "AI_Mgr.h"
+-// Original decision rules only. Initialization and combat actions are not yet
+-// integrated; this class has no production registry/factory entry.
++// Original decisions and close/far attack sequencing. Complete initialization,
++// AI_Update and remaining actions are missing; no production registration.
+ class CultistAI : public AI_Mgr
+ {
+   public:
+     bool ComputeState(int stimulus = -1) override;
++    bool AI_STATE_AttackClose() override;
++    bool AI_STATE_AttackFar() override;
++    float attack_distance = 0, attack_height = 0, attack_threshold = 0;
++    std::uint64_t attack_updates = 0;
++
++  private:
++    bool Attack(bool far);
+ };
+diff --git a/src/game/original/CultistAttack.cpp b/src/game/original/CultistAttack.cpp
+new file mode 100644
+index 0000000..d13685e
+--- /dev/null
++++ b/src/game/original/CultistAttack.cpp
+@@ -0,0 +1,66 @@
++// Original CultistAI.cpp:331-454; checked existing services, no production AI_Update.
++#include "CultistAI.h"
++#include "engine/collision.h"
++#include <cmath>
++#include <limits>
++bool CultistAI::AI_STATE_AttackClose()
++{
++    return Attack(false);
++}
++bool CultistAI::AI_STATE_AttackFar()
++{
++    return Attack(true);
++}
++bool CultistAI::Attack(bool far)
++{
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject) || !m_MoveObj.initialized || !m_MoveObj.sampled ||
++        !OpenBlood2::physics_vector(m_vTargetPos) || !OpenBlood2::physics_vector(m_vDims) || m_vDims.y <= 0 ||
++        !std::isfinite(m_fSeeingDist) || m_fSeeingDist < 0 || m_fSeeingDist > 1e7f ||
++        Metacmd > std::numeric_limits<int>::max() - 2)
++        return StateFailure("Cultist attack requires live owner, cache and bounded state");
++    ++attack_updates;
++    const auto delta = OpenBlood2::vector_subtract(m_vTargetPos, m_MoveObj.GetPos());
++    attack_height = std::abs(delta.y);
++    attack_threshold = m_fSeeingDist * (far ? .75f : .25f);
++    if (!GetTarget())
++        return attack_height <= m_vDims.y ? SetNewState(StateSearchVisual) : ComputeState();
++    if (!server->IsObjectAlive(GetTarget()))
++        return StateFailure("Cultist target pending removal");
++    attack_distance = m_fStimuli[0] = std::hypot(delta.x, delta.y, delta.z);
++    switch (Metacmd)
++    {
++        case 1:
++            return MC_FaceTarget();
++        case 2:
++            return MC_BestWeapon();
++        case 3:
++            if (attack_distance <= attack_threshold || m_nCurMetacmd == 7 || attack_height > m_vDims.y)
++                return MC_Fire_Stand();
++            ++Metacmd;
++            return true;
++        case 4:
++            if (attack_distance > attack_threshold && (far || attack_distance < m_fSeeingDist * .5f))
++            {
++                if (!MC_FaceTarget())
++                    return false;
++                --Metacmd;
++                bool ledge_found;
++                if (!IsLedge(m_MoveObj.GetForwardVector(), ledge_found))
++                    return StateFailure(locomotion_error.c_str());
++                if (!ledge_found && attack_height <= m_vDims.y && m_nCurMetacmd != 7)
++                {
++                    if (m_nInjuredLeg)
++                        return MC_Walk();
++                    return far ? MC_Fire_Run() : MC_Run();
++                }
++                return MC_Fire_Stand();
++            }
++            ++Metacmd;
++            return true;
++        case 5:
++            return ComputeState();
++        default:
++            return true; // Original switch has no other command action.
++    }
++}
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index c0d1880..35267d3 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -738,3 +738,15 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME ai_script.catalog COMMAND ai_script_tests catalog "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(ai_script.catalog PROPERTIES LABELS "headless;private;ai_script" TIMEOUT 90)
+ endif()
++
++add_executable(ai_locomotion_tests ai_locomotion_tests.cpp)
++target_link_libraries(ai_locomotion_tests PRIVATE blood2_game)
++blood2_project_options(ai_locomotion_tests)
++foreach(case IN ITEMS obstruction rays navigate ledges walking physics moving_fire keys lifetime attacks)
++    add_test(NAME ai_locomotion.${case} COMMAND ai_locomotion_tests "${case}")
++    set_tests_properties(ai_locomotion.${case} PROPERTIES LABELS "headless;ai_locomotion" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME ai_locomotion.catalog COMMAND ai_locomotion_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(ai_locomotion.catalog PROPERTIES LABELS "headless;private;ai_locomotion" TIMEOUT 90)
++endif()
+diff --git a/tests/ai_locomotion_tests.cpp b/tests/ai_locomotion_tests.cpp
+new file mode 100644
+index 0000000..9507900
+--- /dev/null
++++ b/tests/ai_locomotion_tests.cpp
+@@ -0,0 +1,476 @@
++#include "brush_fixture.h"
++#include "game/original/CultistAI.h"
++#include "game/server_adapter.h"
++#include "model_fixture.h"
++#include <cmath>
++#include <functional>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .002f;
++    }
++    bool setup(GameSession& g)
++    {
++        CHECK(g.objects.find_class("BaseClass") || g.initialize());
++        auto floor = test_brush::box("floor", {-1000, -20, -1000}, {1000, -10, 1000});
++        for (auto& s : floor.surfaces)
++            s.flags = 1;
++        std::string error;
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        return true;
++    }
++    CultistAI* actor(GameSession& g, DVector pos = {0, 10, 0})
++    {
++        static const ClassInfo type{"AILocomotionProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<CultistAI>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Pos = pos;
++        s.m_Flags = 0;
++        auto h = g.objects.create(&type, s);
++        auto* r = g.objects.get(h);
++        auto* a = r ? dynamic_cast<CultistAI*>(r->game.get()) : nullptr;
++        if (!a)
++            return nullptr;
++        auto model = std::make_shared<Model>();
++        std::string error;
++        if (!read_model(test_model::abc().b, *model, error))
++            return nullptr;
++        auto clip = model->animations.front();
++        model->animations.clear();
++        for (unsigned i = 0; i < 41; ++i)
++        {
++            model->animations.push_back(clip);
++            auto& c = model->animations.back();
++            c.name = "clip" + std::to_string(i);
++            c.dimensions = {1, 2, 1};
++            c.keys.clear();
++        }
++        for (auto& c : model->animations)
++            for (auto& n : c.nodes)
++                for (auto& f : n.frames)
++                    f.position = {};
++        r->model = model;
++        r->dimensions = {1, 2, 1};
++        auto table = std::make_shared<CAnim_Sound>();
++        for (unsigned i = 0; i < 9; ++i)
++        {
++            table->m_nAnim_WALK[i] = i;
++            table->m_nAnim_RUN[i] = 9 + i;
++            table->m_nAnim_FIRE_WALK[i] = 22 + i;
++            table->m_nAnim_FIRE_RUN[i] = 31 + i;
++            table->m_nAnim_FIRE_STAND[i] = 40;
++        }
++        table->m_nAnim_WALK_INJURED_LLEG_PISTOL = 18;
++        table->m_nAnim_WALK_INJURED_RLEG_PISTOL = 19;
++        table->m_nAnim_WALK_INJURED_LLEG_RIFLE = 20;
++        table->m_nAnim_WALK_INJURED_RLEG_RIFLE = 21;
++        if (!a->InitStatics(table) || !a->m_MoveObj.Init(h))
++            return nullptr;
++        a->m_vDims = r->dimensions;
++        if (!a->m_MoveObj.Update() || !a->m_InventoryMgr.Init(h, nullptr))
++            return nullptr;
++        a->m_damage.Init(h);
++        a->m_damage.m_fHitPoints = a->m_damage.m_fMaxHitPoints = 100;
++        return a;
++    }
++    HOBJECT object(GameSession& g, const char* name, DVector pos, DVector dims = {})
++    {
++        ObjectCreateStruct s;
++        SAFE_STRCPY(s.m_Name, name);
++        s.m_Pos = pos;
++        s.m_Flags = dims.x ? FLAG_SOLID : 0;
++        auto h = g.objects.create(g.objects.find_class("BaseClass"), s);
++        if (h)
++            g.objects.get(h)->dimensions = dims;
++        return h;
++    }
++
++    bool armed(CultistAI* a)
++    {
++        CHECK(a && a->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA, 0) == InventoryResult::Ok);
++        a->m_InventoryMgr.SetAmmoCount(AMMO_BULLET, 100);
++        return true;
++    }
++    bool obstruction(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        bool out;
++        r->velocity = {3, 0, 0};
++        CHECK(a->CheckObstructed({}, 30, out) && !out);
++        r->velocity.x = 2.99f;
++        CHECK(a->CheckObstructed({999, 0, 0}, 30, out) && out);
++        r->velocity = {0, 3, 0};
++        CHECK(a->CheckObstructed({}, 30, out) && !out);
++        r->velocity = {};
++        r->state.m_Pos.y += .02f;
++        CHECK(a->m_MoveObj.Update() && a->CheckObstructed({}, 30, out) && !out);
++        CHECK(a->m_MoveObj.Update() && a->CheckObstructed({}, 30, out) && out);
++        CHECK(!a->CheckObstructed({}, -1, out) && !out);
++        a->m_MoveObj.sampled = false;
++        CHECK(!a->CheckObstructed({}, 30, out));
++        return true;
++    }
++    bool rays(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto block = object(g, "upper right", {1, 11, 3}, {.2f, .2f, .2f});
++        CHECK(block);
++        CHECK(a->CalculateObstruction() == 0x11);
++        CHECK(a->obstacle_rays[0].hit.object == block && a->obstacle_rays[1].result == SegmentResult::Miss);
++        CHECK(near(a->obstacle_rays[0].from.x, 1) && near(a->obstacle_rays[0].from.y, 11));
++        CHECK(near(a->obstacle_rays[8].from.x, -1) && near(a->obstacle_rays[8].from.y, 9));
++        CHECK(near(a->obstacle_rays[4].to.z, (std::sqrt(2.f) + 1) * 2));
++        auto* r = g.objects.get(block);
++        r->state.m_Pos = {0, 10, 3};
++        r->dimensions = {2, 2, .2f};
++        CHECK(a->CalculateObstruction() == 0x77);
++        // A first self hit is discarded; the original does not recast beyond it.
++        g.objects.get(a->m_hObject)->state.m_Flags |= FLAG_SOLID;
++        CHECK(a->CalculateObstruction() == 0 && a->obstacle_rays[4].hit.object == a->m_hObject);
++        g.objects.get(a->m_hObject)->state.m_Flags = 0;
++        CHECK(g.objects.remove(block) && g.objects.finish_frame());
++        auto wall = test_brush::box("world wall", {-4, 6, 3}, {4, 14, 4});
++        for (auto& s : wall.surfaces)
++            s.flags = 1;
++        std::string error;
++        CHECK(g.collision.build(wall, error));
++        CHECK(a->CalculateObstruction() == 0x77 && !a->obstacle_rays[4].hit.object &&
++              a->obstacle_rays[4].hit.polygon != UINT32_MAX);
++        g.server.collision_ready = false;
++        CHECK(a->CalculateObstruction() == -1 && a->obstacle_rays[0].result == SegmentResult::Unavailable);
++        return true;
++    }
++    bool navigate(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto h = object(g, "obstacle", {0, 11, 3}, {2, .2f, .2f});
++        CHECK(h);
++        a->m_dwFlags = 3;
++        CHECK(a->SetNewState(AI_Mgr::StateAttackClose));
++        CHECK(a->NavigateObstacle() && a->m_nState == AI_Mgr::StateCrawlUnder);
++        auto* b = g.objects.get(h);
++        b->state.m_Pos.y = 9;
++        CHECK(a->SetNewState(AI_Mgr::StateAttackClose) && a->NavigateObstacle() &&
++              a->m_nState == AI_Mgr::StateJumpOver);
++        b->state.m_Pos.y = 10;
++        b->dimensions.y = 2;
++        CHECK(a->SetNewState(AI_Mgr::StateAttackClose) && a->NavigateObstacle() &&
++              a->m_nState == AI_Mgr::StateAttackClose);
++        a->m_dwFlags = 0;
++        CHECK(!a->NavigateObstacle() && a->locomotion_error.find("GetPointShade") != std::string::npos);
++        CHECK(a->SetNewState(AI_Mgr::StateSearchVisual));
++        a->Metacmd = 4;
++        CHECK(a->NavigateObstacle() && a->Metacmd == 1 && a->m_nState == AI_Mgr::StateSearchVisual);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        a->m_nLastState = AI_Mgr::StateGuard;
++        CHECK(a->NavigateObstacle() && a->m_nState == AI_Mgr::StateGuard);
++        return true;
++    }
++    bool ledges(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        bool out;
++        CHECK(a->IsLedge({0, 0, 2}, out) && !out && a->ledge_queries == 0);
++        CHECK(g.objects.advance(.05));
++        CHECK(a->IsLedge({0, 0, 2}, out) && out && a->ledge_sampled && a->ledge_queries == 1);
++        CHECK(near(a->ledge_ray.from.z, std::sqrt(2.f) * 2.5f) && near(a->ledge_ray.to.y, 6));
++        CHECK(a->IsLedge({0, 0, 2}, out) && !out && !a->ledge_sampled && a->ledge);
++        CHECK(object(g, "support", {0, 7, 3.535534f}, {1, .5f, 1}));
++        CHECK(g.objects.advance(.051) && a->IsLedge({0, 0, 2}, out) && !out);
++        auto* r = g.objects.get(a->m_hObject);
++        r->state.m_Pos = {0, -8, 0};
++        CHECK(a->m_MoveObj.Update());
++        CHECK(g.objects.advance(.051) && a->IsLedge({0, 0, 1}, out) && !out && !a->ledge_ray.hit.object);
++        g.server.collision_ready = false;
++        CHECK(g.objects.advance(.051) && !a->IsLedge({0, 0, 1}, out) && !a->ledge_sampled);
++        const auto queries = a->ledge_queries;
++        CHECK(!a->IsLedge({0, 0, 1}, out) && !a->ledge_sampled && a->ledge_queries == queries + 1);
++        g.server.collision_ready = true;
++        CHECK(a->IsLedge({0, 0, 1}, out) && !out && a->ledge_sampled && a->ledge_queries == queries + 2);
++        return true;
++    }
++    bool walking(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g, {0, -8, 0});
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        a->m_fWalkSpeed = 30;
++        a->m_fRunSpeed = 60;
++        a->m_nInjuredLeg = 10;
++        a->Metacmd = 7;
++        CHECK(a->MC_Walk() && r->animation.animation == TYPE_MELEE && near(r->velocity.z, 10));
++        CHECK(a->MC_Walk() && near(r->velocity.z, 10)); // no gravity => no support rewrite
++        r->state.m_Flags = FLAG_GRAVITY;
++        CHECK(a->MC_Walk() && near(r->velocity.z, 30));
++        CHECK(armed(a));
++        a->m_bAnimating = false;
++        CHECK(a->MC_Walk() && r->animation.animation == 18 && near(r->velocity.z, 10));
++        a->m_nInjuredLeg = 14;
++        a->m_bAnimating = false;
++        CHECK(a->MC_Walk() && r->animation.animation == 19);
++        CHECK(a->MC_Run() && r->animation.animation == 9 + TYPE_PISTOL && near(r->velocity.z, 60));
++        r->state.m_Flags = 0;
++        g.server.SetModelLooping(a->m_hObject, DFALSE);
++        CHECK(g.server.advance_models(1));
++        CHECK(a->MC_Run() && !a->m_bAnimating && a->Metacmd == 8 && near(r->velocity.z, 0));
++        auto table = std::make_shared<CAnim_Sound>();
++        table->m_nAnim_RUN[TYPE_PISTOL] = 9999;
++        CHECK(a->InitStatics(table) && !a->MC_Run() && !a->animation_blocked);
++        return true;
++    }
++    bool physics(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g, {0, -8, 0});
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        r->state.m_Flags = FLAG_SOLID | FLAG_GRAVITY;
++        a->m_fRunSpeed = 60;
++        CHECK(a->MC_Run());
++        CHECK(g.step(.1) && near(r->state.m_Pos.z, 6)); // one generic integration, no command integration
++        CHECK(a->MC_Run() && near(r->state.m_Pos.z, 6));
++        CHECK(g.step(.1) && near(r->state.m_Pos.z, 12));
++        // Foot-anchored clip growth blocked by an actual ceiling, not a missing clip.
++        r->state.m_Flags = 0;
++        CHECK(object(g, "ceiling", {0, -4, r->state.m_Pos.z}, {10, .5f, 10}));
++        auto model = std::make_shared<Model>(*r->model);
++        model->animations[TYPE_MELEE].dimensions.y = 5;
++        r->model = model;
++        CHECK(a->MC_Walk() && a->animation_blocked && a->m_nState == AI_Mgr::StateCrawlUnder &&
++              near(r->dimensions.y, 2));
++        CHECK(!a->DispatchState()); // selecting recovery does not implement its body
++        return true;
++    }
++    struct Victim : BaseClass
++    {
++        CDestructable damage;
++        bool remove = false, recurse = false, recursive_ok = true;
++        Victim()
++        {
++            AddAggregate(&damage);
++        }
++        DDWORD ObjectMessageFn(HOBJECT sender, DDWORD m, HMESSAGEREAD read) override
++        {
++            const auto result = BaseClass::ObjectMessageFn(sender, m, read);
++            if (m == damage_message)
++            {
++                if (recurse)
++                    recursive_ok = dynamic_cast<CultistAI*>(GetServerDE()->HandleToObject(sender))->MC_Fire_Run();
++                if (remove)
++                {
++                    GetServerDE()->RemoveObject(sender);
++                    GetServerDE()->RemoveObject(m_hObject);
++                }
++            }
++            return result;
++        }
++    };
++    Victim* victim(GameSession& g, CultistAI* a)
++    {
++        static const ClassInfo type{"LocomotionVictim",
++                                    g.objects.find_class("BaseClass"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<Victim>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_Pos = {0, 10, 100};
++        s.m_Flags = FLAG_SOLID;
++        auto h = g.objects.create(&type, s);
++        auto* r = g.objects.get(h);
++        auto* t = r ? dynamic_cast<Victim*>(r->game.get()) : nullptr;
++        if (!t || !a->SetNewTarget(h) || !a->RefreshTargetPosition())
++            return nullptr;
++        r->dimensions = {20, 20, 5};
++        t->damage.Init(h);
++        t->damage.m_fHitPoints = t->damage.m_fMaxHitPoints = 1000;
++        return t;
++    }
++    bool moving_fire(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(armed(a));
++        auto* t = victim(g, a);
++        CHECK(t);
++        auto* r = g.objects.get(a->m_hObject);
++        a->m_fRunSpeed = 60;
++        CHECK(a->MC_Fire_Run() && r->animation.animation == 31 + TYPE_PISTOL && a->m_fLoadTimeStart == 0 &&
++              near(r->velocity.z, 60));
++        CHECK(g.objects.advance(a->m_fAttackLoadTime) && a->MC_Fire_Run() && a->fire_shots == 0);
++        CHECK(g.objects.advance(.001) && a->MC_Fire_Run() && a->fire_shots == 1 && t->damage.m_fHitPoints < 1000);
++        CHECK(a->MC_Fire_Run() && a->fire_shots == 1);
++        const auto meta = a->Metacmd;
++        g.server.SetModelLooping(a->m_hObject, DFALSE);
++        CHECK(g.server.advance_models(1));
++        CHECK(a->MC_Fire_Run() && a->Metacmd == meta + 1 && !a->m_bAnimating && near(r->velocity.z, 0));
++        CHECK(a->MC_Fire_Walk() && a->m_nCurMetacmd == 8 && r->animation.animation == 22 + TYPE_PISTOL);
++        CHECK(object(g, "cover", {0, 10, 20}, {50, 50, 1}));
++        CHECK(g.objects.advance(1));
++        g.server.SetModelLooping(a->m_hObject, DFALSE);
++        CHECK(g.server.advance_models(1));
++        CHECK(a->MC_Fire_Walk() && a->Metacmd == meta + 3 && a->fire_result == FireResult::Blocked);
++        // Unarmed moving fire selects pistol animation, then ordinary refusal advances once.
++        auto* u = actor(g, {100, 10, 0});
++        CHECK(u && u->MC_Fire_Run());
++        CHECK(g.objects.get(u->m_hObject)->animation.animation == 31 + TYPE_PISTOL);
++        CHECK(u->MC_Fire_Run() && !u->m_bAnimating);
++        return true;
++    }
++    bool keys(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(armed(a));
++        CHECK(victim(g, a));
++        auto* r = g.objects.get(a->m_hObject);
++        auto model = std::make_shared<Model>(*r->model);
++        model->animations[31 + TYPE_PISTOL].keys = {{0, {}, {}, ""}, {50, {}, {}, "[fire_key:1]"}, {100, {}, {}, ""}};
++        r->model = model;
++        r->state.m_Flags = FLAG_MODELKEYS;
++        CHECK(a->MC_Fire_Run() && g.objects.advance(1));
++        CHECK(g.server.advance_models(.06) && a->fire_shots == 1 && a->m_fLoadTimeStart == 0);
++        CHECK(a->MC_Fire_Run() && a->fire_shots == 2 && near(a->m_fLoadTimeStart, 1));
++        return true;
++    }
++    bool lifetime(const char*)
++    {
++        for (bool removal : {false, true})
++        {
++            GameSession g;
++            CHECK(setup(g));
++            auto* a = actor(g);
++            CHECK(armed(a));
++            auto* t = victim(g, a);
++            CHECK(t);
++            t->remove = removal;
++            t->recurse = !removal;
++            auto h = a->m_hObject, v = t->m_hObject;
++            CHECK(a->MC_Fire_Run() && g.objects.advance(1));
++            CHECK(!a->MC_Fire_Run() && !a->locomotion_error.empty());
++            if (removal)
++                CHECK(!g.server.IsObjectAlive(h) && !g.server.IsObjectAlive(v) && g.objects.get(h));
++            else
++                CHECK(!t->recursive_ok && a->locomotion_failures == 1);
++            CHECK(g.objects.clear() && g.server.string_count() == 0 && g.server.message_count() == 0);
++        }
++        return true;
++    }
++    bool attacks(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(armed(a));
++        CHECK(victim(g, a));
++        a->m_fSeeingDist = 400;
++        auto phase = [&](int state, int meta, float distance)
++        {
++            return a->SetNewState(state) &&
++                   (a->Metacmd = meta, a->m_vTargetPos = DVector{0, 10, distance}, a->DispatchState());
++        };
++        CHECK(phase(AI_Mgr::StateAttackClose, 3, 100) && a->m_nCurMetacmd == 7);
++        CHECK(phase(AI_Mgr::StateAttackClose, 3, 100.01f) && a->Metacmd == 4 && !a->m_bAnimating);
++        CHECK(phase(AI_Mgr::StateAttackClose, 4, 199.99f) && a->m_nCurMetacmd == 2 && a->Metacmd == 4);
++        CHECK(phase(AI_Mgr::StateAttackClose, 4, 200) && a->Metacmd == 5 && !a->m_bAnimating);
++        CHECK(phase(AI_Mgr::StateAttackFar, 3, 300) && a->m_nCurMetacmd == 7);
++        CHECK(phase(AI_Mgr::StateAttackFar, 4, 300.01f) && a->m_nCurMetacmd == 9 && a->Metacmd == 4);
++        a->m_nInjuredLeg = 10;
++        CHECK(phase(AI_Mgr::StateAttackFar, 4, 301) && a->m_nCurMetacmd == 1);
++        a->m_nInjuredLeg = 0;
++        CHECK(g.objects.advance(.051));
++        CHECK(phase(AI_Mgr::StateAttackFar, 4, 301) && a->m_nCurMetacmd == 7 && a->ledge);
++        // State uses preceding aggregate cache, not a fresh actor pose.
++        g.objects.get(a->m_hObject)->state.m_Pos.z = 1000;
++        CHECK(phase(AI_Mgr::StateAttackClose, 3, 100) && near(a->attack_distance, 100));
++        CHECK(a->SetNewTarget(nullptr));
++        a->m_vTargetPos = {0, 10, 100};
++        CHECK(a->AI_STATE_AttackClose() && a->m_nState == AI_Mgr::StateSearchVisual);
++        a->m_MoveObj.sampled = false;
++        CHECK(!a->AI_STATE_AttackFar());
++        return true;
++    }
++    bool catalog(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        Config c;
++        c.data_dir = root;
++        std::string e;
++        CHECK(g.resources.mount_game(c, e));
++        for (const char* name : {"m_cultist1", "f_cultist1", "m_civilian1", "f_civilian1", "labtech", "gideon"})
++        {
++            auto* a = actor(g);
++            CHECK(a);
++            auto* r = g.objects.get(a->m_hObject);
++            CHECK(g.models.load(std::string("models/enemies/") + name + ".abc", r->model, e));
++            auto table = std::make_shared<CAnim_Sound>();
++            CHECK(table->SetAnimationIndexes(a->m_hObject) && a->InitStatics(table));
++            for (unsigned command = 0; command < 4; ++command)
++            {
++                const auto clip = command == 0   ? table->m_nAnim_WALK[TYPE_MELEE]
++                                  : command == 1 ? table->m_nAnim_RUN[TYPE_MELEE]
++                                  : command == 2 ? table->m_nAnim_FIRE_WALK[TYPE_PISTOL]
++                                                 : table->m_nAnim_FIRE_RUN[TYPE_PISTOL];
++                a->m_bAnimating = false;
++                const bool ok = command == 0   ? a->MC_Walk()
++                                : command == 1 ? a->MC_Run()
++                                : command == 2 ? a->MC_Fire_Walk()
++                                               : a->MC_Fire_Run();
++                CHECK(ok == (clip < r->model->animations.size()));
++                CHECK(!ok || r->animation.animation == clip);
++                std::cout << name << " command=" << command << " clip=" << clip << " available=" << ok << "\n";
++            }
++            CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::map<std::string, std::function<bool(const char*)>> tests{
++        {"obstruction", obstruction}, {"rays", rays},       {"navigate", navigate},       {"ledges", ledges},
++        {"walking", walking},         {"physics", physics}, {"moving_fire", moving_fire}, {"keys", keys},
++        {"lifetime", lifetime},       {"attacks", attacks}, {"catalog", catalog}};
++    auto t = tests.find(argv[1]);
++    return t != tests.end() && t->second(argc > 2 ? argv[2] : "") ? 0 : 1;
++}

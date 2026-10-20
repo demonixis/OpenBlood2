@@ -1,0 +1,249 @@
+{
+  "date": "2026-10-17",
+  "implementation_baseline": "e55601320386d604546367cca6402a69f33d0647",
+  "status": "M2 remains incomplete; CityHub NEW_LEVEL still rejects ten unsupported entries and one failed world model",
+  "validation": {
+    "debug": {
+      "headless_unique_verified": 749,
+      "private_unique": 122,
+      "full_suite_initial": {
+        "passed_percent": 99,
+        "failed": 1,
+        "total": 749,
+        "private": 122,
+        "elapsed_seconds": 133.5
+      },
+      "focused_final": {
+        "passed_percent": 100,
+        "failed": 0,
+        "total": 7,
+        "private": 1,
+        "elapsed_seconds": 30.91
+      },
+      "gpu": {
+        "passed_percent": 100,
+        "failed": 0,
+        "total": 9,
+        "private": 5,
+        "elapsed_seconds": 59.18
+      }
+    },
+    "release": {
+      "headless_unique_verified": 749,
+      "private_unique": 122,
+      "full_suite_initial": {
+        "passed_percent": 99,
+        "failed": 1,
+        "total": 749,
+        "private": 122,
+        "elapsed_seconds": 25.51
+      },
+      "focused_final": {
+        "passed_percent": 100,
+        "failed": 0,
+        "total": 7,
+        "private": 1,
+        "elapsed_seconds": 5.25
+      },
+      "gpu": {
+        "passed_percent": 100,
+        "failed": 0,
+        "total": 9,
+        "private": 5,
+        "elapsed_seconds": 15.87
+      }
+    },
+    "sanitize": {
+      "unique_verified": 34,
+      "private_unique": 5,
+      "initial": {
+        "passed_percent": 97,
+        "failed": 1,
+        "total": 34,
+        "private": 5,
+        "elapsed_seconds": 278.07
+      },
+      "focused_final": {
+        "passed_percent": 100,
+        "failed": 0,
+        "total": 7,
+        "private": 1,
+        "elapsed_seconds": 155.04
+      }
+    }
+  },
+  "gpu_device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+  "commands": [
+    "cmake --build --preset debug -j4",
+    "cmake --build --preset release -j5",
+    "ctest --test-dir build/{debug,release} -L headless --output-on-failure -j4",
+    "ctest --test-dir build/{debug,release} --output-on-failure -j3 -R ^particle_stream\\.",
+    "cmake --build build/sanitize -j3 --target particle_stream_tests object_contract_tests world_tests explosion_flame_tests object_particle_tests",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize --output-on-failure -j2 -R '^(particle_stream\\.|objects\\.|object_particles\\.|explosion_flames\\.|world\\.(level_change|level_change_private|destination_trials|destination_lifetime|destination_trial_private)$)'",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize --output-on-failure -j2 -R '^particle_stream\\.'",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/{debug,release} --output-on-failure -R '^gpu\\.(particle_stream_alpha|particle_stream_private|corpse_clearance|mouse_combat|level_change|objectives|lifecycle|explosion_flame_alpha|world_depth)$'"
+  ],
+  "observed": {
+    "city_created": 443,
+    "city_transferred_sounds": 31,
+    "city_editor_only": 541,
+    "city_unsupported": 10,
+    "city_failed": 1,
+    "authored_streams": 8,
+    "initial_particles": 29,
+    "all_rearmed_particles": 42,
+    "gpu_exact_tint_alpha_pixels": 256,
+    "gpu_authored_quads": [
+      60,
+      67
+    ],
+    "gpu_covered_pixels": [
+      11151,
+      10967
+    ]
+  },
+  "development_findings": [
+    "The added isolated-ramp test initially assumed a small random sample would reach the outer half of its offset range. It now checks the exact expected X draw and each independent ramp flag; production behavior was unchanged. Both complete native suites initially passed 748 cases with only this fixture failing; final focused reruns pass all seven stream cases, establishing 749 unique verified cases per build.",
+    "The first ASan CityHub run timed out after 180 seconds during concurrent builds and tests. Only its instrumentation timeout was increased to 360; all three real-world cycles, frames, rearming and lifetime assertions remain. The final run passes in 155.03 seconds. The other 33 selected sanitizer cases passed initially.",
+    "The existing ItemPickups.cpp float/GameType comparison warning persists; that file is unchanged.",
+    "Debug GPU lifecycle was repeated after adding display of the retained latest stream error.",
+    "The private CityHub particle-only capture was visually inspected; actual world positions/textures are used, with a diagnostic camera and no world geometry in this isolated pass."
+  ],
+  "limits": [
+    "Original sound tail is unread by SFXMgr and intentionally does not play.",
+    "Bounded replacement particle integration/rasterization is not certified retail parity.",
+    "Linux NVIDIA executed locally; no native Apple automated validation in this increment.",
+    "M2 remains open: CityHub sky objects, bomb pickups, FlashlightPU, fallengrills geometry and other required services remain."
+  ],
+  "logs": [
+    {
+      "file": "m2-particle-streams-debug-build.log",
+      "sha256": "bb49962204aa4adcf84977ea83cc60f7bf25dd25e00c87f92b62e14378caa694",
+      "raw_capture_sha256": "f8d06949ae228d65b6cb4930e551583958964bb4da6198f242e92a53169a54ef"
+    },
+    {
+      "file": "m2-particle-streams-release-build.log",
+      "sha256": "57f40b2904509e0904aa6b1c1106cf6902d60bf877f9b4478a115b1eaf987e9c",
+      "raw_capture_sha256": "e9ad7fdc38005d297ac85448247d5da1787aad55ebf1e6917c9ad7a8dab33035"
+    },
+    {
+      "file": "m2-particle-streams-sanitize-build.log",
+      "sha256": "af11271cba3369025e8739fc9692a61479b261cba7cb97cd9215d9e5a18288c4",
+      "raw_capture_sha256": "1bd4cb536be2f27675fcc1fb7bc2405f5b1d834a6e41c8891774bd87885fbfba"
+    },
+    {
+      "file": "m2-particle-streams-debug-headless-initial.log",
+      "sha256": "fac1570b70f54ec7ed6052ad5c928bd544fc899161f08e16a8dbc23702de002c",
+      "raw_capture_sha256": "fac1570b70f54ec7ed6052ad5c928bd544fc899161f08e16a8dbc23702de002c"
+    },
+    {
+      "file": "m2-particle-streams-release-headless-initial.log",
+      "sha256": "01a95948beae3dc00f7ee93c26ffdd9c7aeef23e21a26b9d78b95e40469f14a2",
+      "raw_capture_sha256": "01a95948beae3dc00f7ee93c26ffdd9c7aeef23e21a26b9d78b95e40469f14a2"
+    },
+    {
+      "file": "m2-particle-streams-sanitize-initial.log",
+      "sha256": "dfa4e6b67371a4a6bd1c1b0c23ac4e1e35e228abfe314a1aaa2d818085787132",
+      "raw_capture_sha256": "dfa4e6b67371a4a6bd1c1b0c23ac4e1e35e228abfe314a1aaa2d818085787132"
+    },
+    {
+      "file": "m2-particle-streams-debug-headless-initial-last.log",
+      "sha256": "b977fa65036661f211e3d4ed58dd32a0b00c6a1a9d6cc85ac59a6369a754c69e",
+      "raw_capture_sha256": "005392f71dbfb9b0d30e911d65aa104f21327e170b4a172b34de760f6ab6e5b3"
+    },
+    {
+      "file": "m2-particle-streams-release-headless-initial-last.log",
+      "sha256": "afffa30c541e36b707d6f6beafa10f61b1c4dc5ca0c1dc8dfdc2088ee7299450",
+      "raw_capture_sha256": "0655ceffad37a274704a9f190d0ec6c895d589d9558d7412cdfb8c5837903e95"
+    },
+    {
+      "file": "m2-particle-streams-sanitize-initial-last.log",
+      "sha256": "44f18e4a2eb2e4fb4dca70dabfce7639e581e09b658b82a559c0b360a969c373",
+      "raw_capture_sha256": "3c5b7fd3a4672359d93fa04f4317ea2cea520af87fa0b8f397282b664a99eae9"
+    },
+    {
+      "file": "m2-particle-streams-debug-final.log",
+      "sha256": "0f153c2a095bc3d69482c6184a0e96ec0cb75128c446c7610bcaddf33c0d6dd8",
+      "raw_capture_sha256": "0f153c2a095bc3d69482c6184a0e96ec0cb75128c446c7610bcaddf33c0d6dd8"
+    },
+    {
+      "file": "m2-particle-streams-release-final.log",
+      "sha256": "c9d149a4d4b734c48378e73be6795ffac29fcd9e7d3a2c34816d9463c565bebd",
+      "raw_capture_sha256": "c9d149a4d4b734c48378e73be6795ffac29fcd9e7d3a2c34816d9463c565bebd"
+    },
+    {
+      "file": "m2-particle-streams-sanitize-final.log",
+      "sha256": "1b1e416d0e1baf8a399c2514269091f9c7ec0759836c46fd938bbc19260de839",
+      "raw_capture_sha256": "1b1e416d0e1baf8a399c2514269091f9c7ec0759836c46fd938bbc19260de839"
+    },
+    {
+      "file": "m2-particle-streams-debug-final-last.log",
+      "sha256": "a9b369ae9d0a21545e3be0779d16a570825009833bfa7c9bd782fb00765f801c",
+      "raw_capture_sha256": "a1c17eb63dc512e41f41c0feaf2e25e52f5e784b20a27c627c41fd14f5ced7bb"
+    },
+    {
+      "file": "m2-particle-streams-release-final-last.log",
+      "sha256": "082ff248e365cdda8b3bef9f1f293df867ae14b9fc29559fce1cffa150629e32",
+      "raw_capture_sha256": "c0483da9cee9275215d94a5b859dfb357639530afdedceb41115590f75ba64ad"
+    },
+    {
+      "file": "m2-particle-streams-sanitize-final-last.log",
+      "sha256": "0b7deb803d51bbc0ad87770ee7675e9554758d8e44df0d00f48b519f92a92d7d",
+      "raw_capture_sha256": "292ece51080b92476e8d46ebe03f85610bf86291e67304d3aec5b25b0ee884ef"
+    },
+    {
+      "file": "m2-particle-streams-debug-gpu.log",
+      "sha256": "d6a41c1b1ede5ee62216153293c0b35f28f5985e2d7a4a483aa84eaf98e0a0d2",
+      "raw_capture_sha256": "d6a41c1b1ede5ee62216153293c0b35f28f5985e2d7a4a483aa84eaf98e0a0d2"
+    },
+    {
+      "file": "m2-particle-streams-release-gpu.log",
+      "sha256": "7bf33c7ee8d17beee3c427926040cafafd5315abde0a74b8388526f7b050905b",
+      "raw_capture_sha256": "7bf33c7ee8d17beee3c427926040cafafd5315abde0a74b8388526f7b050905b"
+    },
+    {
+      "file": "m2-particle-streams-debug-gpu-last.log",
+      "sha256": "8559a2994048de49ee13400a0fc2170b6ae5c86f600489fca32a87e840419a84",
+      "raw_capture_sha256": "5e4296140af8e01a530aa74c56fac167ed2fbec2ea8afabe2b85ab022e605c0b"
+    },
+    {
+      "file": "m2-particle-streams-release-gpu-last.log",
+      "sha256": "7a05b998c5bcc70ed070112ff89392b73fc1da8e1f79c86cef2c250199aaf3d5",
+      "raw_capture_sha256": "432dbaf34df38aeae3d53187263d992673aa4314c6c286317c6e7394c2c48253"
+    },
+    {
+      "file": "m2-particle-streams-debug-ui-final.log",
+      "sha256": "956cf14e990bbf8c6ab548534597dd7329081ea369b1337e6313e11838294efa",
+      "raw_capture_sha256": "956cf14e990bbf8c6ab548534597dd7329081ea369b1337e6313e11838294efa"
+    },
+    {
+      "file": "m2-particle-streams-debug-ui-final-last.log",
+      "sha256": "0f990ed7b4527892f3740d072bd2b1f96e93377c802f369e72321a157da8a269",
+      "raw_capture_sha256": "9bdd43dcafd37308a2420dd526c14fb979425ff0cc5c542cfc2055a8f8333ceb"
+    },
+    {
+      "file": "m2-particle-streams-format.log",
+      "sha256": "d32699200ca0b581b2a4e0b9fe5fbc40e9a04af2f062ecd01922bfcbeba9ae51",
+      "raw_capture_sha256": "d32699200ca0b581b2a4e0b9fe5fbc40e9a04af2f062ecd01922bfcbeba9ae51"
+    },
+    {
+      "file": "m2-particle-streams-links.log",
+      "sha256": "ceaff6799614954e630f732faf40ea99cf687446cd5a70d6cae9b51aadc3d156",
+      "raw_capture_sha256": "ceaff6799614954e630f732faf40ea99cf687446cd5a70d6cae9b51aadc3d156"
+    },
+    {
+      "file": "m2-particle-streams-integrity.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "raw_capture_sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6"
+    },
+    {
+      "file": "m2-particle-streams-links-final.log",
+      "sha256": "c4a929e900c55e7a41e2713801a7fa8e0bd9e986504d155aa93e4fe3e7887d32",
+      "raw_capture_sha256": "c4a929e900c55e7a41e2713801a7fa8e0bd9e986504d155aa93e4fe3e7887d32"
+    }
+  ],
+  "implementation_patch_sha256": "dd006cefaaefec02d1a2b4faf5dcf78c16f43a53d227e35fe9e119bdfa1fe28c",
+  "implementation_files": "m2-particle-streams-files.json",
+  "implementation_commit": "724484c5c8f43d333f03386f2de579a6c469a22e",
+  "log_normalization": "Trailing line whitespace and blank EOF lines removed; original capture hashes retained alongside normalized file hashes. The implementation patch remains byte-exact."
+}

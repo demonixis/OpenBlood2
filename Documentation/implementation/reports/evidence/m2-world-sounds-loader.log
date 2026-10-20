@@ -1,0 +1,15 @@
+25/245 Testing: world.sound_entries
+25/245 Test: world.sound_entries
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests" "sound_entries" "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/sound_entries"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"world.sound_entries" start time: Oct 16 02:20 CEST
+Output:
+----------------------------------------------------------
+PASS sound_entries
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"world.sound_entries" end time: Oct 16 02:20 CEST
+"world.sound_entries" time elapsed: 00:00:00
+----------------------------------------------------------

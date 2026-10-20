@@ -1,0 +1,21 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 32: world.session_start
+1/2 Test #32: world.session_start ..............   Passed    0.04 sec
+    Start 51: world.session_start_private
+2/2 Test #51: world.session_start_private ......***Failed    1.78 sec
+01_SubwayA startup: 68 decoded images, 0 original missing-BSP omissions; 60 original updates
+session_start_private:1268: game.objects.time() == 0 && game.run_world(error)
+
+
+50% tests passed, 1 tests failed out of 2
+
+Label Time Summary:
+headless    =   1.82 sec*proc (2 tests)
+private     =   1.78 sec*proc (1 test)
+world       =   1.82 sec*proc (2 tests)
+
+Total Test time (real) =   1.83 sec
+
+The following tests FAILED:
+	 51 - world.session_start_private (Failed)              headless private world
+Errors while running CTest

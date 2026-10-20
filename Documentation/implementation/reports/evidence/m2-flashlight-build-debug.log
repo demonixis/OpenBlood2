@@ -1,0 +1,19 @@
+[0/2] Re-checking globbed directories...
+[1/53] Scanning /home/yann/projects/lithtech/Blood2/tests/world_tests.cpp for CXX dependencies
+[2/53] Scanning /home/yann/projects/lithtech/Blood2/src/app/objectives_smoke.cpp for CXX dependencies
+[3/53] Scanning /home/yann/projects/lithtech/Blood2/tests/pickup_tests.cpp for CXX dependencies
+[4/53] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[5/22] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[6/20] Generating CXX dyndep file tests/CMakeFiles/pickup_tests.dir/CXX.dd
+[7/20] Scanning /home/yann/projects/lithtech/Blood2/tests/level_change_gpu_tests.cpp for CXX dependencies
+[8/20] Generating CXX dyndep file tests/CMakeFiles/level_change_gpu_tests.dir/CXX.dd
+[9/19] Scanning /home/yann/projects/lithtech/Blood2/tests/flashlight_gpu_tests.cpp for CXX dependencies
+[10/19] Generating CXX dyndep file tests/CMakeFiles/flashlight_gpu_tests.dir/CXX.dd
+[11/19] Building CXX object CMakeFiles/blood2_app.dir/src/app/objectives_smoke.cpp.o
+[12/19] Building CXX object tests/CMakeFiles/level_change_gpu_tests.dir/level_change_gpu_tests.cpp.o
+[13/19] Building CXX object tests/CMakeFiles/pickup_tests.dir/pickup_tests.cpp.o
+[14/19] Linking CXX executable blood2
+[15/19] Building CXX object tests/CMakeFiles/flashlight_gpu_tests.dir/flashlight_gpu_tests.cpp.o
+[16/19] Linking CXX executable tests/pickup_tests
+[17/19] Linking CXX executable tests/level_change_gpu_tests
+[18/19] Linking CXX executable tests/flashlight_gpu_tests

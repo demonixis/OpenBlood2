@@ -1,0 +1,38 @@
+433/433 Testing: ai_locomotion.catalog
+433/433 Test: ai_locomotion.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_locomotion_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_locomotion.catalog" start time: Oct 16 13:45 CEST
+Output:
+----------------------------------------------------------
+m_cultist1 command=0 clip=4 available=1
+m_cultist1 command=1 clip=5 available=1
+m_cultist1 command=2 clip=12 available=1
+m_cultist1 command=3 clip=13 available=1
+f_cultist1 command=0 clip=4 available=1
+f_cultist1 command=1 clip=5 available=1
+f_cultist1 command=2 clip=12 available=1
+f_cultist1 command=3 clip=13 available=1
+m_civilian1 command=0 clip=2 available=1
+m_civilian1 command=1 clip=4 available=1
+m_civilian1 command=2 clip=4294967295 available=0
+m_civilian1 command=3 clip=4294967295 available=0
+f_civilian1 command=0 clip=3 available=1
+f_civilian1 command=1 clip=2 available=1
+f_civilian1 command=2 clip=4294967295 available=0
+f_civilian1 command=3 clip=4294967295 available=0
+labtech command=0 clip=2 available=1
+labtech command=1 clip=4 available=1
+labtech command=2 clip=4294967295 available=0
+labtech command=3 clip=4294967295 available=0
+gideon command=0 clip=1 available=1
+gideon command=1 clip=0 available=1
+gideon command=2 clip=4294967295 available=0
+gideon command=3 clip=4294967295 available=0
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.catalog" end time: Oct 16 13:45 CEST
+"ai_locomotion.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

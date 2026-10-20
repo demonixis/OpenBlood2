@@ -1,0 +1,5 @@
+[0/2] Re-checking globbed directories...
+[1/5] Scanning /home/yann/projects/lithtech/Blood2/tests/service_coverage_tests.cpp for CXX dependencies
+[2/5] Generating CXX dyndep file tests/CMakeFiles/service_coverage_tests.dir/CXX.dd
+[3/5] Building CXX object tests/CMakeFiles/service_coverage_tests.dir/service_coverage_tests.cpp.o
+[4/5] Linking CXX executable tests/service_coverage_tests

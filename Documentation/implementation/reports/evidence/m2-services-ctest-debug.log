@@ -1,0 +1,105 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  1: objects.original_objects
+ 1/45 Test  #1: objects.original_objects .........   Passed    0.00 sec
+      Start  2: objects.nested_creation
+ 2/45 Test  #2: objects.nested_creation ..........   Passed    0.00 sec
+      Start  3: objects.reasons_properties
+ 3/45 Test  #3: objects.reasons_properties .......   Passed    0.00 sec
+      Start  4: objects.scheduling
+ 4/45 Test  #4: objects.scheduling ...............   Passed    0.00 sec
+      Start  5: objects.deferred_removal
+ 5/45 Test  #5: objects.deferred_removal .........   Passed    0.00 sec
+      Start  6: objects.aggregate_dispatch
+ 6/45 Test  #6: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start  7: objects.handles_selection
+ 7/45 Test  #7: objects.handles_selection ........   Passed    0.00 sec
+      Start  8: objects.links_lists
+ 8/45 Test  #8: objects.links_lists ..............   Passed    0.00 sec
+      Start  9: objects.messages_strings
+ 9/45 Test  #9: objects.messages_strings .........   Passed    0.00 sec
+      Start 10: objects.unsupported_teardown
+10/45 Test #10: objects.unsupported_teardown .....   Passed    0.01 sec
+      Start 11: objects.creation_failures
+11/45 Test #11: objects.creation_failures ........   Passed    0.01 sec
+      Start 12: config.arguments
+12/45 Test #12: config.arguments .................   Passed    0.00 sec
+      Start 13: config.precedence
+13/45 Test #13: config.precedence ................   Passed    0.00 sec
+      Start 14: config.relative_paths
+14/45 Test #14: config.relative_paths ............   Passed    0.00 sec
+      Start 15: config.invalid_config
+15/45 Test #15: config.invalid_config ............   Passed    0.00 sec
+      Start 16: config.content_validation
+16/45 Test #16: config.content_validation ........   Passed    0.00 sec
+      Start 17: config.case_lookup
+17/45 Test #17: config.case_lookup ...............   Passed    0.00 sec
+      Start 18: cli.help
+18/45 Test #18: cli.help .........................   Passed    0.01 sec
+      Start 19: cli.unknown
+19/45 Test #19: cli.unknown ......................   Passed    0.01 sec
+      Start 20: cli.missing_data
+20/45 Test #20: cli.missing_data .................   Passed    0.01 sec
+      Start 21: cli.missing_config
+21/45 Test #21: cli.missing_config ...............   Passed    0.01 sec
+      Start 22: cli.metadata
+22/45 Test #22: cli.metadata .....................   Passed    0.01 sec
+      Start 23: content.local
+23/45 Test #23: content.local ....................   Passed    0.00 sec
+      Start 24: gpu.lifecycle
+24/45 Test #24: gpu.lifecycle ....................   Passed    0.78 sec
+      Start 25: world.rez_structure
+25/45 Test #25: world.rez_structure ..............   Passed    0.00 sec
+      Start 26: world.rez_rejection
+26/45 Test #26: world.rez_rejection ..............   Passed    0.00 sec
+      Start 27: world.resource_mount
+27/45 Test #27: world.resource_mount .............   Passed    0.00 sec
+      Start 28: world.world_properties
+28/45 Test #28: world.world_properties ...........   Passed    0.00 sec
+      Start 29: world.world_geometry
+29/45 Test #29: world.world_geometry .............   Passed    0.00 sec
+      Start 30: world.world_rejection
+30/45 Test #30: world.world_rejection ............   Passed    0.01 sec
+      Start 31: world.mutations
+31/45 Test #31: world.mutations ..................   Passed    0.05 sec
+      Start 32: world.session_lifecycle
+32/45 Test #32: world.session_lifecycle ..........   Passed    0.00 sec
+      Start 33: world.session_messages
+33/45 Test #33: world.session_messages ...........   Passed    0.00 sec
+      Start 34: world.original_trigger
+34/45 Test #34: world.original_trigger ...........   Passed    0.00 sec
+      Start 35: world.private
+35/45 Test #35: world.private ....................   Passed    0.34 sec
+      Start 36: gpu.world
+36/45 Test #36: gpu.world ........................   Passed    0.96 sec
+      Start 37: cli.world_modes
+37/45 Test #37: cli.world_modes ..................   Passed    0.55 sec
+      Start 38: services.model_reader
+38/45 Test #38: services.model_reader ............   Passed    0.00 sec
+      Start 39: services.model_rejection
+39/45 Test #39: services.model_rejection .........   Passed    0.07 sec
+      Start 40: services.animation_events
+40/45 Test #40: services.animation_events ........   Passed    0.00 sec
+      Start 41: services.model_callbacks
+41/45 Test #41: services.model_callbacks .........   Passed    0.00 sec
+      Start 42: services.collision_queries
+42/45 Test #42: services.collision_queries .......   Passed    0.00 sec
+      Start 43: services.movement_contacts
+43/45 Test #43: services.movement_contacts .......   Passed    0.00 sec
+      Start 44: services.original_services
+44/45 Test #44: services.original_services .......   Passed    0.00 sec
+      Start 45: services.private
+45/45 Test #45: services.private .................   Passed    0.24 sec
+
+100% tests passed, 0 tests failed out of 45
+
+Label Time Summary:
+cli         =   0.05 sec*proc (5 tests)
+config      =   0.01 sec*proc (6 tests)
+gpu         =   1.74 sec*proc (2 tests)
+headless    =   1.38 sec*proc (43 tests)
+objects     =   0.03 sec*proc (11 tests)
+private     =   2.09 sec*proc (5 tests)
+services    =   0.32 sec*proc (8 tests)
+world       =   0.97 sec*proc (12 tests)
+
+Total Test time (real) =   3.13 sec

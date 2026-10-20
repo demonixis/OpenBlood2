@@ -1,0 +1,47 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  69: weapons.private
+      Start  66: weapons.animation
+      Start  67: weapons.lifetime
+ 1/15 Test  #67: weapons.lifetime .................   Passed    0.01 sec
+      Start  61: weapons.inventory
+ 2/15 Test  #61: weapons.inventory ................   Passed    0.01 sec
+      Start  68: weapons.rollback
+ 3/15 Test  #68: weapons.rollback .................   Passed    0.01 sec
+      Start  64: weapons.melee
+ 4/15 Test  #64: weapons.melee ....................   Passed    0.01 sec
+      Start  62: weapons.segments
+ 5/15 Test  #62: weapons.segments .................   Passed    0.01 sec
+      Start  63: weapons.firing
+ 6/15 Test  #63: weapons.firing ...................   Passed    0.01 sec
+      Start  65: weapons.damage
+ 7/15 Test  #66: weapons.animation ................   Passed    0.05 sec
+      Start 598: weapon_audio.voices
+ 8/15 Test  #65: weapons.damage ...................   Passed    0.01 sec
+      Start 599: weapon_audio.hearing
+ 9/15 Test #598: weapon_audio.voices ..............   Passed    0.01 sec
+10/15 Test #599: weapon_audio.hearing .............***Failed    0.01 sec
+hearing:147: g.server.string_count() == 0 && g.server.message_count() == 0
+
+      Start 600: weapon_audio.failures
+      Start 601: weapon_audio.callbacks
+11/15 Test #600: weapon_audio.failures ............   Passed    0.01 sec
+      Start 602: weapon_audio.lifetime
+12/15 Test #601: weapon_audio.callbacks ...........   Passed    0.01 sec
+      Start 603: weapon_audio.private
+13/15 Test #602: weapon_audio.lifetime ............   Passed    0.01 sec
+14/15 Test #603: weapon_audio.private .............   Passed    1.22 sec
+15/15 Test  #69: weapons.private ..................   Passed   25.99 sec
+
+93% tests passed, 1 tests failed out of 15
+
+Label Time Summary:
+headless        =  27.34 sec*proc (15 tests)
+private         =  27.20 sec*proc (2 tests)
+weapon_audio    =   1.26 sec*proc (6 tests)
+weapons         =  26.08 sec*proc (9 tests)
+
+Total Test time (real) =  26.00 sec
+
+The following tests FAILED:
+	599 - weapon_audio.hearing (Failed)                     headless weapon_audio
+Errors while running CTest

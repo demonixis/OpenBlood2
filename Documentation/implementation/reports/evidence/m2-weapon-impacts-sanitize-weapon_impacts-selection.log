@@ -1,0 +1,14 @@
+563/569 Testing: weapon_impacts.selection
+563/569 Test: weapon_impacts.selection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_impact_tests" "selection" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-impacts-selection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_impacts.selection" start time: Oct 16 23:27 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_impacts.selection" end time: Oct 16 23:27 CEST
+"weapon_impacts.selection" time elapsed: 00:00:00
+----------------------------------------------------------

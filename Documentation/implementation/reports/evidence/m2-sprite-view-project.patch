@@ -1,0 +1,1273 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 7853363..e547313 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -414,3 +414,10 @@ Preserve key removal, raw stats, case-insensitive solo marker selection/last fal
+ trigger-before-teleport ordering, checked callback lifetime and one MoveMgr integrator.
+ Failure cleans staged ownership, not destination trigger effects or an unloaded world.
+ Automatic NEW_LEVEL still refuses before teardown; safe transfer and M2 remain open.
++
++The [sprite presentation continuation](../Documentation/Implementation/M2_SPRITE_VIEW.md) draws original DetailSprite frames
++using actual DTX alpha, current authored/camera rotations and shared world depth.
++Read [contracts](docs/SPRITE_VIEW_CONTRACTS.md). Preserve read-only clocks, disabled chromakey, explicit
++unsupported modes, stable depth order and world-revision cache ownership. Missing
++textures emit diagnostics, not guessed quads. Required FX and safe NEW_LEVEL still
++keep M2 incomplete; source-class counts are unchanged.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d118b20..eb67b99 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,7 +14,7 @@ include(CTest)
+ include(cmake/Dependencies.cmake)
+ configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+ 
+-add_library(engine STATIC src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
++add_library(engine STATIC src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+ target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
+ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+@@ -55,7 +55,7 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableSave.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/path_manager_smoke.cpp src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/model_scene.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
++add_executable(blood2_app src/app/path_manager_smoke.cpp src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/model_scene.cpp src/app/sprite_scene.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+diff --git a/README.md b/README.md
+index afe5540..f7780a2 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,10 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [sprite presentation continuation](../Documentation/Implementation/M2_SPRITE_VIEW.md) renders the 12 original SubwayA
++blood splats with decoded alpha and in-game resource/mode diagnostics. Hidden UI,
++world depth and unload/reload are tested. This is a prerequisite for client FX;
++required FX emitters, safe automatic level transfer and M2 remain incomplete.
++
+ The [named keep-alive entry continuation](../Documentation/Implementation/M2_PLAYER_KEEPALIVE.md) preserves supported player stats/weapons into an explicitly loaded destination,
+ discards keys and executes original named start entry. Session exposes its mode,
+ selected marker and fallback. Automatic level transfer and the M2 gate remain open.
+diff --git a/cmake/GenerateWorldShaders.cmake b/cmake/GenerateWorldShaders.cmake
+index d9e44c9..c5ba8b7 100644
+--- a/cmake/GenerateWorldShaders.cmake
++++ b/cmake/GenerateWorldShaders.cmake
+@@ -6,3 +6,6 @@ foreach(stage vert frag)
+         --vn "world_${stage}" -o "${shader_dir}/world_${stage}.h" "${shader_dir}/world.${stage}"
+         COMMAND_ERROR_IS_FATAL ANY)
+ endforeach()
++execute_process(COMMAND "${GLSLANG}" -V --target-env vulkan1.0
++    --vn "sprite_frag" -o "${shader_dir}/sprite_frag.h" "${shader_dir}/sprite.frag"
++    COMMAND_ERROR_IS_FATAL ANY)
+diff --git a/docs/M2_SPRITE_VIEW_SOURCES.json b/docs/M2_SPRITE_VIEW_SOURCES.json
+new file mode 100644
+index 0000000..ffee152
+--- /dev/null
++++ b/docs/M2_SPRITE_VIEW_SOURCES.json
+@@ -0,0 +1,68 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "003d1ea749e8442807c5b14f8ac09586abadce90",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/DetailSprite.cpp",
++      "sha256": "2a98ed394d5a50ae46a216f929c79ec0ad0434f1ad3bfa1c2035689b43da4f7b",
++      "selected_lines": [
++        [
++          17,
++          120
++        ],
++        [
++          195,
++          280
++        ]
++      ],
++      "use": "Existing original placement, scale and rotatable flags remain unchanged; no new game-rule port."
++    },
++    {
++      "path": "sources/blood2/AppHeaders/basetypes_de.h",
++      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
++      "selected_lines": [
++        [
++          285,
++          335
++        ]
++      ],
++      "use": "Original sprite flags, disabled chromakey, glow/bias/no-Z/sky meanings."
++    },
++    {
++      "path": "sources/lithtech/runtime/render_a/src/sys/d3d/drawsprite.cpp",
++      "sha256": "05c4a1982b2c84242d414924c8a1229b102d8584e92b95acee239430f558dea4",
++      "selected_lines": [
++        [
++          256,
++          289
++        ],
++        [
++          377,
++          445
++        ],
++        [
++          509,
++          575
++        ]
++      ],
++      "use": "Read-only later-generation reference for dimension half extents, camera/object bases and UV order; no wholesale import or retail parity claim."
++    },
++    {
++      "path": "sources/lithtech/runtime/client/src/sprite.cpp",
++      "sha256": "3a1d267c831f4c597ba841eb95e5684fb555a75d02aae2e333d027a4b18d29a7",
++      "selected_lines": [
++        [
++          19,
++          64
++        ]
++      ],
++      "use": "SPR metadata reference; metadata remains separate from chosen alpha presentation."
++    }
++  ],
++  "implementation": "New owned presentation and SDL_GPU alpha pass reusing existing original DetailSprite, SPR clock and bounded DTX decoder. No dependencies or game behavior imported.",
++  "limitations": [
++    "Later-generation size convention is not verified Blood II raster parity.",
++    "Unlit actual-alpha policy; glow/bias/no-Z/sky explicitly unsupported.",
++    "M2 remains incomplete."
++  ]
++}
+diff --git a/docs/MODEL_VIEW_CONTRACTS.md b/docs/MODEL_VIEW_CONTRACTS.md
+index c28e7d9..4609342 100644
+--- a/docs/MODEL_VIEW_CONTRACTS.md
++++ b/docs/MODEL_VIEW_CONTRACTS.md
+@@ -98,3 +98,8 @@ without texture reload, resize and close-view depth isolation. CPU tests cover
+ bounds, pose conventions, exact cached paths, source offsets, read-only clocks,
+ hidden/removal state, weapon selection and two unload/re-entry cycles. The normal
+ viewport smoke captures a real first-person model with ImGui absent from the image.
++
++The [sprite presentation continuation](SPRITE_VIEW_CONTRACTS.md) now draws supported
++original sprites with actual DTX alpha and shared world/model depth, before view
++weapons. Earlier blanket sprite-rendering omissions are superseded for this bounded
++subset. World/model opacity policy is unchanged; required FX and M2 remain open.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index d30b956..9be5a36 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -729,3 +729,13 @@ uses KeepAlive type 1 to discard keys. Explicit mode/start ownership, final body
+ clearance and callback-lifetime checks are engine adaptations. No dependency,
+ reference repository or commercial resource is imported. See
+ [contracts](PLAYER_KEEPALIVE_CONTRACTS.md); automatic NEW_LEVEL remains refused.
++
++## Original-sprite presentation
++
++[Source ledger](M2_SPRITE_VIEW_SOURCES.json) records unchanged original DetailSprite
++placement and SDK flags, including disabled chromakey. The later LithTech D3D
++renderer is a read-only geometry/UV reference. New SpriteView and an explicit
++SDL_GPU alpha style reuse existing readers and shaders without importing that
++renderer. Actual DTX alpha, bounded owned caches and stable sorting are replacement
++presentation; retail size/blending parity remains unverified. See
++[contracts](SPRITE_VIEW_CONTRACTS.md). No dependency or commercial asset was added.
+diff --git a/docs/SPRITE_CONTRACTS.md b/docs/SPRITE_CONTRACTS.md
+index b3bb0d2..9b0d918 100644
+--- a/docs/SPRITE_CONTRACTS.md
++++ b/docs/SPRITE_CONTRACTS.md
+@@ -88,3 +88,8 @@ TypeAction schema rejection. The two accepted flush placements hit real Temple
+ entrance geometry. No catalog entry repeats; synthetic tests cover that branch.
+ The known 16_bridge.dat structural rejection remains unchanged. No commercial
+ resource bytes are copied into the repository.
++
++The [sprite presentation continuation](SPRITE_VIEW_CONTRACTS.md) now draws supported
++original sprites with actual DTX alpha and shared world/model depth, before view
++weapons. Earlier blanket sprite-rendering omissions are superseded for this bounded
++subset. World/model opacity policy is unchanged; required FX and M2 remain open.
+diff --git a/docs/SPRITE_VIEW_CONTRACTS.md b/docs/SPRITE_VIEW_CONTRACTS.md
+new file mode 100644
+index 0000000..b202146
+--- /dev/null
++++ b/docs/SPRITE_VIEW_CONTRACTS.md
+@@ -0,0 +1,72 @@
++# Sprite presentation contracts
++
++M2 remains incomplete. This extends [original sprite placement/clocks](SPRITE_CONTRACTS.md)
++and the [DTX decoder](TEXTURE_CONTRACTS.md). See [evidence](../../Documentation/Implementation/M2_SPRITE_VIEW.md).
++
++## Original state and replacement geometry
++
++`update_sprite_scene` reads alive OT_SPRITE records each frame, outside ImGui. Hidden
++objects retain inspection/resource diagnostics but emit no quad; inactive objects
++can still draw. Pending/removed objects disappear immediately from the snapshot.
++No object pointer, original handle, callback, simulation step or sprite clock is
++retained or advanced by presentation. Original DetailSprite flush/repeat rules and
++its unchanged authored rotation remain untouched.
++
++The current SPR frame supplies an exact-path DTX resource. Rotatable sprites use
++the current object quaternion; others use camera right/up. Geometry uses DTX width
++and height multiplied by X/Y scale as **half extents**, following the examined
++later-generation LithTech renderer. That renderer is a reference, not an imported
++engine or verified retail Blood II raster specification. UV top-left is (0,0),
++both windings render, and there is no position/depth bias or guessed flush rotation.
++Zero X/Y scale emits no geometry. Invalid/nonfinite/negative transforms or unsupported
++mode flags remain named diagnostics and emit no geometry.
++
++The Blood II SDK explicitly says FLAG_SPRITECHROMAKEY is disabled. The renderer
++therefore does not remove RGB black (or any guessed key color). SPR transparency,
++translucency and color-key metadata remain inspectable; the current presentation
++policy uses actual decoded DTX alpha for all supported sprites. Glow, view bias,
++no-Z and sky modes are explicitly unavailable; those sprites do not silently render
++with ordinary semantics. Object tint/alpha services, lighting, polygon clipping,
++additive/multiply effects and retail blending parity are not implemented here.
++
++## Cache, alpha and lifetime
++
++A scene owns up to 4,096 entries / 24,576 vertices, 4,096 named materials plus one
++white fallback slot, and 128 MiB decoded RGBA. Existing -2 DTX validation/limits
++apply. Missing/unsupported frames stay visible as named errors; no guessed-size
++magenta quad is substituted. Materials cache successes and failures by normalized
++exact path for the loaded world revision. Frame changes reuse already decoded
++materials; alpha counts are computed once on load. World revision/unload clears
++both CPU and GPU geometry/material caches, even when UI is hidden or reload occurs
++between presented frames. SDL deferred release owns in-flight GPU lifetimes.
++
++`WorldRenderer` has an explicit SpriteAlpha style; the opaque world/model default
++is unchanged. A separate fragment shader discards zero-alpha texels and emits DTX
++RGBA. The pipeline uses straight source-alpha blending, depth LESS against shared
++world/model depth, **no depth writes**, nearest mip-zero sampling and clamp-to-edge.
++Sprites sort stably from far to near by center camera depth. This handles ordinary
++separate quads; intersecting translucent surfaces are not order-independent.
++Sprites draw after world/models and before close-view weapons, with the same camera
++and cinematic letterbox. No-UI Release follows the identical path. Vulkan/SPIR-V
++is the only validated shader/backend combination.
++
++## Inspection and verification
++
++The Sprites tab distinguishes prepared quads from submitted GPU passes/uploads,
++shows decoded dimensions, zero/partial-alpha counts, mode and frame-specific errors,
++and retains source failures/hidden/inactive/repeat placement inspection. Prepared
++geometry is not proof that a quad lies in the camera frustum.
++
++SubwayA has 12 supported DetailSprites sharing 128x128 bloodsplat3.dtx: 14,828
++zero-alpha and 1,556 partial-alpha pixels. They retain source scale .5 and Y=129.
++Source accounting stays 203 created / 4 transferred sounds / 372 editor-only /
++1 unsupported Gideon / 0 failed. Required FX emitters, safe automatic NEW_LEVEL,
++other required services and the observable M2 gate remain open.
++
++CPU checks cover orientation, original half extents, UVs, stable depth sorting,
++frame cache/failures, unsupported flags, budgets, unchanged clocks, inactive/hidden/
++pending lifetime and three actual unload/reloads. GPU readback verifies real zero,
++partial, opaque and opaque-black pixels, overlap order, world occlusion, absence of
++depth writes, resize/reupload and a real private bloodsplat at its authored pose.
++The application smoke additionally requires all 12 quads with hidden UI and after
++reload. These are harness observations, not a retail executable comparison.
+diff --git a/docs/TEXTURE_CONTRACTS.md b/docs/TEXTURE_CONTRACTS.md
+index 6a4794b..57deb3c 100644
+--- a/docs/TEXTURE_CONTRACTS.md
++++ b/docs/TEXTURE_CONTRACTS.md
+@@ -81,3 +81,8 @@ repeat, row orientation, alpha-ignored policy, reload replacement and rejected-u
+ cleanup alongside the existing depth/camera/resize checks. The real-world smoke
+ retains movement, hidden UI and unload/re-entry assertions and now requires at least
+ 50 decoded materials and no rejected material. See [run evidence](../../Documentation/Implementation/M2_TEXTURES.md).
++
++The [sprite presentation continuation](SPRITE_VIEW_CONTRACTS.md) now draws supported
++original sprites with actual DTX alpha and shared world/model depth, before view
++weapons. Earlier blanket sprite-rendering omissions are superseded for this bounded
++subset. World/model opacity policy is unchanged; required FX and M2 remain open.
+diff --git a/docs/WORLD_VIEW_CONTRACTS.md b/docs/WORLD_VIEW_CONTRACTS.md
+index bd48e12..f51ea22 100644
+--- a/docs/WORLD_VIEW_CONTRACTS.md
++++ b/docs/WORLD_VIEW_CONTRACTS.md
+@@ -96,3 +96,8 @@ No pixel-identical retail comparison, optimization or additional platform is cla
+ The [DTX continuation](TEXTURE_CONTRACTS.md) supersedes the absence of world textures: opaque unlit base colors now render, with named rejection diagnostics and bounded cache ownership. World vertices are now 32 bytes; the three-million-vertex payload limit is 96 MB. Earlier geometry limits, current transforms and the M2 gate remain unchanged.
+ 
+ The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.
++
++The [sprite presentation continuation](SPRITE_VIEW_CONTRACTS.md) now draws supported
++original sprites with actual DTX alpha and shared world/model depth, before view
++weapons. Earlier blanket sprite-rendering omissions are superseded for this bounded
++subset. World/model opacity policy is unchanged; required FX and M2 remain open.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 0bbc960..4401d88 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -414,7 +414,7 @@ namespace OpenBlood2
+                         "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
+                         "the player in Session first, or launch --view-world.");
+                     ImGui::TextWrapped(
+-                        "Opaque textures/models are unlit. Lightmaps, sprites, liquid surfaces, "
++                        "World textures/models and alpha sprites are unlit. Lightmaps, liquid surfaces, "
+                         "transparency and sky rendering remain unavailable. Unsupported objects stay in World.");
+                     if (world_mesh && world_render)
+                     {
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index cf93c92..b790059 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -3,6 +3,7 @@
+ #include "engine/config.h"
+ #include "engine/model_view.h"
+ #include "engine/runtime.h"
++#include "engine/sprite_view.h"
+ #include "engine/world_view.h"
+ #include "game/server_adapter.h"
+ 
+@@ -14,6 +15,8 @@ namespace OpenBlood2
+         Runtime& runtime;
+         const WorldMesh* world_mesh = nullptr;
+         const ModelView* model_view = nullptr;
++        const SpriteView* sprite_view = nullptr;
++        const WorldViewStats* sprite_render = nullptr;
+         const WorldViewStats* world_render = nullptr;
+         bool context = false;
+         bool platform = false;
+diff --git a/src/app/inspector_sprites.cpp b/src/app/inspector_sprites.cpp
+index 9586f0a..ffd6c31 100644
+--- a/src/app/inspector_sprites.cpp
++++ b/src/app/inspector_sprites.cpp
+@@ -6,8 +6,14 @@ namespace OpenBlood2
+ {
+     void Inspector::draw_sprites(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextWrapped("Original DetailSprite placement and real SPR frame clock. DTX resources are indexed, "
+-                           "not decoded. Texture rendering and billboard geometry remain unavailable.");
++        ImGui::TextWrapped("Original DetailSprite placement and SPR clock; decoded DTX alpha on world-depth quads. "
++                           "Rotatable sprites use their object pose; others face the camera. Unlit replacement "
++                           "presentation: glow, view bias, no-Z and sky modes remain unavailable.");
++        if (sprite_view && sprite_render)
++            ImGui::Text("Prepared %zu quads / %zu entries | GPU passes %llu / texture uploads %llu | %zu RGBA bytes",
++                        sprite_view->draws.size(), sprite_view->entries.size(),
++                        static_cast<unsigned long long>(sprite_render->frames),
++                        static_cast<unsigned long long>(sprite_render->uploads), sprite_view->mesh.texture_bytes);
+         if (ImGui::CollapsingHeader("Authored sources (including failed / filtered / removed)"))
+             for (size_t i = 0; i < game.entries.size(); ++i)
+                 if (game.world.objects[i].class_name == "DetailSprite")
+@@ -59,8 +65,18 @@ namespace OpenBlood2
+             ImGui::Text("Transparent %d / translucent %d / color key 0x%x", s.transparent, s.translucent, s.color_key);
+             ImGui::TextWrapped("Manifest: %s", r->state.m_Filename);
+             const auto& path = s.frames[r->sprite_track.frame];
+-            ImGui::TextWrapped("Frame: %s [%s; not decoded]", path.c_str(),
+-                               game.resources.find(path) ? "indexed" : "missing");
++            ImGui::TextWrapped("Frame: %s [%s]", path.c_str(), game.resources.find(path) ? "indexed" : "missing");
++            if (sprite_view)
++                for (const auto& entry : sprite_view->entries)
++                    if (entry.object == r->id)
++                    {
++                        ImGui::Text("Decoded %u x %u | zero alpha %zu / partial alpha %zu", entry.width, entry.height,
++                                    entry.zero_alpha, entry.partial_alpha);
++                        ImGui::Text("Presentation: %s / %s", entry.rotatable ? "object rotation" : "camera facing",
++                                    entry.range != UINT32_MAX ? "quad prepared" : "not drawn");
++                        if (!entry.error.empty())
++                            ImGui::TextWrapped("%s", entry.error.c_str());
++                    }
+             if (const auto* d = dynamic_cast<const DetailSprite*>(r->game.get()))
+             {
+                 ImGui::Text("Flush %d / rotatable %d / chromakey %d / repeat %d", d->flush, d->rotatable, d->chromakey,
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 208a1ad..8515cb4 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -1,6 +1,7 @@
+ #include "ai_model_key_smoke.h"
+ #include "app/model_scene.h"
+ #include "app/movement_controls.h"
++#include "app/sprite_scene.h"
+ #include "brush_smoke.h"
+ #include "build_info.h"
+ #include "camera_smoke.h"
+@@ -346,6 +347,9 @@ namespace
+         OpenBlood2::WorldMesh world_mesh;
+         OpenBlood2::WorldRenderer world_renderer(runtime.gpu), model_renderer(runtime.gpu);
+         OpenBlood2::ModelView model_scene;
++        OpenBlood2::SpriteView sprite_scene;
++        OpenBlood2::WorldRenderer sprite_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
++        bool sprites_drawn_hidden = false;
+         bool models_hidden = false, close_weapon_hidden = false;
+         std::uint64_t model_frames = 0;
+         std::vector<OpenBlood2::WorldDraw> world_draws;
+@@ -355,6 +359,8 @@ namespace
+         OpenBlood2::Inspector inspector(runtime);
+         inspector.world_mesh = &world_mesh;
+         inspector.model_view = &model_scene;
++        inspector.sprite_view = &sprite_scene;
++        inspector.sprite_render = &sprite_renderer.stats;
+         inspector.world_render = &world_renderer.stats;
+         if (options.keepalive_smoke)
+             SAFE_STRCPY(inspector.keep_start_name, "01_egressa");
+@@ -678,6 +684,8 @@ namespace
+                 world_renderer.clear_geometry();
+                 model_renderer.clear_geometry();
+                 model_scene.clear();
++                sprite_scene.clear();
++                sprite_renderer.clear_geometry();
+                 world_mesh = {};
+                 world_draws.clear();
+                 if (!game.world_path.empty() && !world_mesh.build(game.world, error, &game.resources))
+@@ -702,6 +710,12 @@ namespace
+                 return 5;
+             }
+ 
++            if (!OpenBlood2::update_sprite_scene(game, sprite_scene, error))
++            {
++                spdlog::error("Sprite presentation: {}", error);
++                return 5;
++            }
++
+             if (options.skeleton_smoke && !inspector_visible)
+                 for (const auto& entry : model_scene.entries)
+                     if (entry.object == smoke_corpse && entry.visible && entry.error.empty() && entry.triangles > 0)
+@@ -789,11 +803,29 @@ namespace
+                         !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
+                                              model_scene.world_draws, view.position, view.rotation,
+                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
+-                                             world_renderer.depth_target()) ||
+-                        (!model_scene.close_draws.empty() &&
+-                         !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
+-                                              model_scene.close_draws, view.position, view.rotation, false, error,
+-                                              OpenBlood2::DrawLoad::ClearDepth)))
++                                             world_renderer.depth_target()))
++                    {
++                        spdlog::error("Model viewport: {}", error);
++                        SDL_SubmitGPUCommandBuffer(commands);
++                        return 3;
++                    }
++                    if (!sprite_renderer.prepare(sprite_scene.mesh, sprite_scene.revision,
++                                                 SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
++                                                 height, error, true) ||
++                        !sprite_renderer.draw(commands, capture_frame ? capture.texture : swapchain, sprite_scene.mesh,
++                                              sprite_scene.draws, view.position, view.rotation,
++                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
++                                              world_renderer.depth_target()))
++                    {
++                        spdlog::error("Sprite viewport: {}", error);
++                        SDL_SubmitGPUCommandBuffer(commands);
++                        return 3;
++                    }
++                    sprites_drawn_hidden |= !inspector_visible && sprite_scene.draws.size() == 12;
++                    if (!model_scene.close_draws.empty() &&
++                        !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
++                                             model_scene.close_draws, view.position, view.rotation, false, error,
++                                             OpenBlood2::DrawLoad::ClearDepth))
+                     {
+                         spdlog::error("Model viewport: {}", error);
+                         SDL_SubmitGPUCommandBuffer(commands);
+@@ -1292,7 +1324,9 @@ namespace
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+                 (options.scene_explosions_smoke &&
+                  (!scene_explosion_hidden || !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
+-                (options.sprites_smoke && (!sprite_hidden || !OpenBlood2::check_sprite_smoke(game))) ||
++                (options.sprites_smoke &&
++                 (!sprite_hidden || !sprites_drawn_hidden || sprite_scene.draws.size() != 12 ||
++                  sprite_renderer.stats.uploads < 2 || !OpenBlood2::check_sprite_smoke(game))) ||
+                 (options.world_sounds_smoke && (!world_sound_hidden || !OpenBlood2::check_world_sound_smoke(game))) ||
+                 (options.random_sounds_smoke &&
+                  (!random_sound_hidden || !OpenBlood2::check_random_sound_smoke(game, smoke_random_sound))) ||
+@@ -1355,7 +1389,7 @@ namespace
+                              "audio verified hidden and after reload; client FX unavailable");
+             if (options.sprites_smoke)
+                 spdlog::info("SPRITES smoke: 12 original DetailSprites, SPR manifests, frame clocks, hidden UI and "
+-                             "unload/reload verified; textures indexed, not rendered");
++                             "unload/reload verified; 12 alpha-textured quads submitted with shared world depth");
+             if (options.world_sounds_smoke)
+                 spdlog::info("WORLD SOUNDS smoke: four authored loops survive consumed Sound objects, advance with "
+                              "hidden UI and reload; SDL PCM submission verified");
+diff --git a/src/app/sprite_scene.cpp b/src/app/sprite_scene.cpp
+new file mode 100644
+index 0000000..c1d8fd4
+--- /dev/null
++++ b/src/app/sprite_scene.cpp
+@@ -0,0 +1,21 @@
++#include "app/sprite_scene.h"
++namespace OpenBlood2
++{
++    bool update_sprite_scene(const GameSession& game, SpriteView& scene, std::string& error)
++    {
++        const auto& view = game.client_shell.view;
++        if (!scene.begin_frame(view.position, view.rotation, error))
++            return false;
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* record = game.objects.get(id);
++            if (!record || record->life != Life::Alive || record->state.m_ObjectType != OT_SPRITE)
++                continue;
++            if (!scene.add(record->sprite.get(), record->sprite_track, {record->state.m_Pos, record->state.m_Rotation},
++                           record->state.m_Scale, record->state.m_Flags, id, game.resources, error))
++                return false;
++        }
++        scene.sort();
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/sprite_scene.h b/src/app/sprite_scene.h
+new file mode 100644
+index 0000000..e1c7986
+--- /dev/null
++++ b/src/app/sprite_scene.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include "engine/sprite_view.h"
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool update_sprite_scene(const GameSession&, SpriteView&, std::string& error);
++}
+diff --git a/src/engine/shaders/sprite.frag b/src/engine/shaders/sprite.frag
+new file mode 100644
+index 0000000..1ca4319
+--- /dev/null
++++ b/src/engine/shaders/sprite.frag
+@@ -0,0 +1,11 @@
++#version 450
++layout(location=0) in vec3 faceColor;
++layout(location=1) in vec2 texCoord;
++layout(location=0) out vec4 color;
++layout(set=2,binding=0) uniform sampler2D albedo;
++// DTX alpha only. The original SDK explicitly disables FLAG_SPRITECHROMAKEY.
++void main() {
++    vec4 texel=texture(albedo,texCoord);
++    if (texel.a == 0.0) discard;
++    color=vec4(texel.rgb*faceColor,texel.a);
++}
+diff --git a/src/engine/shaders/sprite_frag.h b/src/engine/shaders/sprite_frag.h
+new file mode 100644
+index 0000000..9ca614a
+--- /dev/null
++++ b/src/engine/shaders/sprite_frag.h
+@@ -0,0 +1,38 @@
++	// 1116.2.0
++	 #pragma once
++const uint32_t sprite_frag[] = {
++	0x07230203,0x00010000,0x0008000b,0x0000002e,0x00000000,0x00020011,0x00000001,0x0006000b,
++	0x00000001,0x4c534c47,0x6474732e,0x3035342e,0x00000000,0x0003000e,0x00000000,0x00000001,
++	0x0008000f,0x00000004,0x00000004,0x6e69616d,0x00000000,0x00000011,0x00000020,0x00000025,
++	0x00030010,0x00000004,0x00000007,0x00030003,0x00000002,0x000001c2,0x00040005,0x00000004,
++	0x6e69616d,0x00000000,0x00040005,0x00000009,0x65786574,0x0000006c,0x00040005,0x0000000d,
++	0x65626c61,0x00006f64,0x00050005,0x00000011,0x43786574,0x64726f6f,0x00000000,0x00040005,
++	0x00000020,0x6f6c6f63,0x00000072,0x00050005,0x00000025,0x65636166,0x6f6c6f43,0x00000072,
++	0x00040047,0x0000000d,0x00000021,0x00000000,0x00040047,0x0000000d,0x00000022,0x00000002,
++	0x00040047,0x00000011,0x0000001e,0x00000001,0x00040047,0x00000020,0x0000001e,0x00000000,
++	0x00040047,0x00000025,0x0000001e,0x00000000,0x00020013,0x00000002,0x00030021,0x00000003,
++	0x00000002,0x00030016,0x00000006,0x00000020,0x00040017,0x00000007,0x00000006,0x00000004,
++	0x00040020,0x00000008,0x00000007,0x00000007,0x00090019,0x0000000a,0x00000006,0x00000001,
++	0x00000000,0x00000000,0x00000000,0x00000001,0x00000000,0x0003001b,0x0000000b,0x0000000a,
++	0x00040020,0x0000000c,0x00000000,0x0000000b,0x0004003b,0x0000000c,0x0000000d,0x00000000,
++	0x00040017,0x0000000f,0x00000006,0x00000002,0x00040020,0x00000010,0x00000001,0x0000000f,
++	0x0004003b,0x00000010,0x00000011,0x00000001,0x00040015,0x00000014,0x00000020,0x00000000,
++	0x0004002b,0x00000014,0x00000015,0x00000003,0x00040020,0x00000016,0x00000007,0x00000006,
++	0x0004002b,0x00000006,0x00000019,0x00000000,0x00020014,0x0000001a,0x00040020,0x0000001f,
++	0x00000003,0x00000007,0x0004003b,0x0000001f,0x00000020,0x00000003,0x00040017,0x00000021,
++	0x00000006,0x00000003,0x00040020,0x00000024,0x00000001,0x00000021,0x0004003b,0x00000024,
++	0x00000025,0x00000001,0x00050036,0x00000002,0x00000004,0x00000000,0x00000003,0x000200f8,
++	0x00000005,0x0004003b,0x00000008,0x00000009,0x00000007,0x0004003d,0x0000000b,0x0000000e,
++	0x0000000d,0x0004003d,0x0000000f,0x00000012,0x00000011,0x00050057,0x00000007,0x00000013,
++	0x0000000e,0x00000012,0x0003003e,0x00000009,0x00000013,0x00050041,0x00000016,0x00000017,
++	0x00000009,0x00000015,0x0004003d,0x00000006,0x00000018,0x00000017,0x000500b4,0x0000001a,
++	0x0000001b,0x00000018,0x00000019,0x000300f7,0x0000001d,0x00000000,0x000400fa,0x0000001b,
++	0x0000001c,0x0000001d,0x000200f8,0x0000001c,0x000100fc,0x000200f8,0x0000001d,0x0004003d,
++	0x00000007,0x00000022,0x00000009,0x0008004f,0x00000021,0x00000023,0x00000022,0x00000022,
++	0x00000000,0x00000001,0x00000002,0x0004003d,0x00000021,0x00000026,0x00000025,0x00050085,
++	0x00000021,0x00000027,0x00000023,0x00000026,0x00050041,0x00000016,0x00000028,0x00000009,
++	0x00000015,0x0004003d,0x00000006,0x00000029,0x00000028,0x00050051,0x00000006,0x0000002a,
++	0x00000027,0x00000000,0x00050051,0x00000006,0x0000002b,0x00000027,0x00000001,0x00050051,
++	0x00000006,0x0000002c,0x00000027,0x00000002,0x00070050,0x00000007,0x0000002d,0x0000002a,
++	0x0000002b,0x0000002c,0x00000029,0x0003003e,0x00000020,0x0000002d,0x000100fd,0x00010038
++};
+diff --git a/src/engine/sprite_view.cpp b/src/engine/sprite_view.cpp
+new file mode 100644
+index 0000000..4cbda5f
+--- /dev/null
++++ b/src/engine/sprite_view.cpp
+@@ -0,0 +1,155 @@
++#include "engine/sprite_view.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++namespace OpenBlood2
++{
++    void SpriteView::clear()
++    {
++        mesh = {};
++        mesh.materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}});
++        mesh.texture_bytes = 4;
++        materials_.clear();
++        draws.clear();
++        entries.clear();
++        camera_valid_ = false;
++        ++revision;
++    }
++    bool SpriteView::begin_frame(DVector eye, DRotation camera, std::string& error)
++    {
++        error.clear();
++        mesh.vertices.clear();
++        mesh.ranges.clear();
++        draws.clear();
++        entries.clear();
++        WorldViewUniform uniform;
++        camera_valid_ = world_view_uniform(eye, camera, 1, {}, uniform);
++        if (!camera_valid_)
++        {
++            error = "Invalid sprite camera transform";
++            return false;
++        }
++        eye_ = eye;
++        camera_ = camera;
++        forward_ = {uniform.forward[0], uniform.forward[1], uniform.forward[2]};
++        return true;
++    }
++    bool SpriteView::add(const Sprite* sprite, const SpriteTrack& track, NodePose pose, DVector scale, DDWORD flags,
++                         ObjectId object, const Resources& resources, std::string& error)
++    {
++        error.clear();
++        if (!camera_valid_ || entries.size() >= 4096)
++        {
++            mesh.vertices.clear();
++            mesh.ranges.clear();
++            draws.clear();
++            entries.clear();
++            error = "Sprite camera unavailable or instance budget exceeded";
++            return false;
++        }
++        entries.push_back({});
++        auto& entry = entries.back();
++        entry.object = object;
++        entry.frame = track.frame;
++        entry.visible = (flags & FLAG_VISIBLE) != 0;
++        entry.rotatable = (flags & FLAG_ROTATEABLESPRITE) != 0;
++        if (!sprite || track.frame >= sprite->frames.size())
++        {
++            entry.error = "Sprite manifest/current frame unavailable";
++            return true;
++        }
++        entry.frame_path = sprite->frames[track.frame];
++        std::string key;
++        if (!resource_path(entry.frame_path, key))
++        {
++            entry.error = "Invalid sprite frame path";
++            return true;
++        }
++        auto found = materials_.find(key);
++        if (found == materials_.end())
++        {
++            if (mesh.materials.size() >= 4097)
++            {
++                error = "Sprite material count budget exceeded";
++                return false;
++            }
++            WorldMaterial next;
++            next.path = key;
++            read_texture_resource(resources, key, next.image, next.error);
++            if (next.image.rgba.size() > 128 * 1024 * 1024 - mesh.texture_bytes)
++            {
++                error = "Sprite texture memory budget exceeded";
++                return false;
++            }
++            Material material{static_cast<std::uint32_t>(mesh.materials.size())};
++            for (std::size_t i = 3; i < next.image.rgba.size(); i += 4)
++            {
++                material.zero_alpha += next.image.rgba[i] == 0;
++                material.partial_alpha += next.image.rgba[i] > 0 && next.image.rgba[i] < 255;
++            }
++            mesh.texture_bytes += next.image.rgba.size();
++            mesh.materials.push_back(std::move(next));
++            found = materials_.emplace(key, material).first;
++            ++revision;
++        }
++        const auto& material = found->second;
++        const auto& texture = mesh.materials[material.index];
++        entry.error = texture.error;
++        entry.width = texture.image.width;
++        entry.height = texture.image.height;
++        entry.zero_alpha = material.zero_alpha;
++        entry.partial_alpha = material.partial_alpha;
++        if (!entry.error.empty())
++            return true;
++        // Original SDK bits: glow, view bias, no-Z and sky need separate policies.
++        // FLAG_SPRITECHROMAKEY is explicitly disabled in that SDK; do not key RGB.
++        if (flags & ((1u << 5) | (1u << 6) | (1u << 7) | (1u << 12)))
++        {
++            entry.error = "Sprite glow/bias/no-Z/sky presentation unavailable";
++            return true;
++        }
++        WorldDraw draw{static_cast<std::uint32_t>(mesh.ranges.size()), pose.position,
++                       entry.rotatable ? pose.rotation : camera_};
++        WorldViewUniform uniform;
++        if (!world_view_uniform(eye_, camera_, 1, draw, uniform) || !physics_vector(scale) || scale.x < 0 ||
++            scale.y < 0 || scale.z < 0)
++        {
++            entry.error = "Invalid sprite transform/scale";
++            return true;
++        }
++        const float x = float(entry.width) * scale.x, y = float(entry.height) * scale.y;
++        if (!physics_vector({x, y, 0}))
++        {
++            entry.error = "Sprite dimensions exceed presentation limits";
++            return true;
++        }
++        if (!entry.visible || x == 0 || y == 0)
++            return true;
++        // Later LithTech renderer uses texture dimensions as half extents. This is
++        // replacement presentation, not a claim of verified Blood II raster parity.
++        const WorldVertex corners[] = {{{-x, y, 0}, {1, 1, 1}, {0, 0}},
++                                       {{x, y, 0}, {1, 1, 1}, {1, 0}},
++                                       {{x, -y, 0}, {1, 1, 1}, {1, 1}},
++                                       {{-x, -y, 0}, {1, 1, 1}, {0, 1}}};
++        WorldRange range;
++        range.first = static_cast<std::uint32_t>(mesh.vertices.size());
++        range.count = 6;
++        range.name = entry.frame_path;
++        range.batches.push_back({range.first, 6, material.index});
++        for (auto index : {0, 1, 2, 0, 2, 3})
++            mesh.vertices.push_back(corners[index]);
++        entry.range = draw.range;
++        mesh.ranges.push_back(std::move(range));
++        draws.push_back(draw);
++        return true;
++    }
++    void SpriteView::sort()
++    {
++        auto depth = [&](const WorldDraw& draw)
++        {
++            const DVector d{draw.position.x - eye_.x, draw.position.y - eye_.y, draw.position.z - eye_.z};
++            return double(d.x) * forward_.x + double(d.y) * forward_.y + double(d.z) * forward_.z;
++        };
++        std::stable_sort(draws.begin(), draws.end(), [&](const auto& a, const auto& b) { return depth(a) > depth(b); });
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/sprite_view.h b/src/engine/sprite_view.h
+new file mode 100644
+index 0000000..6cc6697
+--- /dev/null
++++ b/src/engine/sprite_view.h
+@@ -0,0 +1,44 @@
++#pragma once
++#include "engine/sprite.h"
++#include "engine/world_view.h"
++namespace OpenBlood2
++{
++    struct SpriteViewEntry
++    {
++        ObjectId object;
++        std::string frame_path, error;
++        unsigned frame = 0, width = 0, height = 0;
++        std::size_t zero_alpha = 0, partial_alpha = 0;
++        bool visible = false, rotatable = false;
++        std::uint32_t range = UINT32_MAX;
++    };
++    // Read-only presentation snapshot: owned textures/values, never a retained game pointer.
++    class SpriteView
++    {
++      public:
++        SpriteView()
++        {
++            clear();
++        }
++        void clear();
++        bool begin_frame(DVector eye, DRotation camera, std::string& error);
++        bool add(const Sprite*, const SpriteTrack&, NodePose, DVector scale, DDWORD flags, ObjectId, const Resources&,
++                 std::string& error);
++        void sort();
++        WorldMesh mesh;
++        std::vector<WorldDraw> draws;
++        std::vector<SpriteViewEntry> entries;
++        std::uint64_t revision = 0;
++
++      private:
++        struct Material
++        {
++            std::uint32_t index = 0;
++            std::size_t zero_alpha = 0, partial_alpha = 0;
++        };
++        std::map<std::string, Material> materials_;
++        DVector eye_{}, forward_{};
++        DRotation camera_;
++        bool camera_valid_ = false;
++    };
++} // namespace OpenBlood2
+diff --git a/src/engine/world_renderer.cpp b/src/engine/world_renderer.cpp
+index bccf5e6..9bc53e1 100644
+--- a/src/engine/world_renderer.cpp
++++ b/src/engine/world_renderer.cpp
+@@ -1,4 +1,5 @@
+ #include "engine/world_renderer.h"
++#include "engine/shaders/sprite_frag.h"
+ #include "engine/shaders/world_frag.h"
+ #include "engine/shaders/world_vert.h"
+ #include <cstring>
+@@ -49,8 +50,8 @@ namespace OpenBlood2
+         info.num_uniform_buffers = 1;
+         auto* vertex = SDL_CreateGPUShader(device_, &info);
+         info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+-        info.code = reinterpret_cast<const Uint8*>(world_frag);
+-        info.code_size = sizeof(world_frag);
++        info.code = reinterpret_cast<const Uint8*>(style_ == DrawStyle::SpriteAlpha ? sprite_frag : world_frag);
++        info.code_size = style_ == DrawStyle::SpriteAlpha ? sizeof(sprite_frag) : sizeof(world_frag);
+         info.num_uniform_buffers = 0;
+         info.num_samplers = 1;
+         auto* fragment = SDL_CreateGPUShader(device_, &info);
+@@ -76,6 +77,16 @@ namespace OpenBlood2
+         attributes[2].offset = offsetof(WorldVertex, uv);
+         SDL_GPUColorTargetDescription target{};
+         target.format = format;
++        if (style_ == DrawStyle::SpriteAlpha)
++        {
++            target.blend_state.enable_blend = true;
++            target.blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
++            target.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
++            target.blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
++            target.blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
++            target.blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
++            target.blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
++        }
+         SDL_GPUGraphicsPipelineCreateInfo create{};
+         create.vertex_shader = vertex;
+         create.fragment_shader = fragment;
+@@ -86,7 +97,7 @@ namespace OpenBlood2
+         create.rasterizer_state.enable_depth_clip = true;
+         create.multisample_state.sample_count = SDL_GPU_SAMPLECOUNT_1;
+         create.depth_stencil_state.enable_depth_test = true;
+-        create.depth_stencil_state.enable_depth_write = true;
++        create.depth_stencil_state.enable_depth_write = style_ == DrawStyle::Opaque;
+         create.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
+         create.target_info.color_target_descriptions = &target;
+         create.target_info.num_color_targets = 1;
+@@ -216,7 +227,9 @@ namespace OpenBlood2
+             SDL_GPUSamplerCreateInfo info{};
+             info.min_filter = info.mag_filter = SDL_GPU_FILTER_NEAREST;
+             info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+-            info.address_mode_u = info.address_mode_v = info.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
++            info.address_mode_u = info.address_mode_v = info.address_mode_w =
++                style_ == DrawStyle::SpriteAlpha ? SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE
++                                                 : SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+             sampler_ = SDL_CreateGPUSampler(device_, &info);
+             if (!sampler_)
+             {
+diff --git a/src/engine/world_renderer.h b/src/engine/world_renderer.h
+index a66b5f8..3ed9776 100644
+--- a/src/engine/world_renderer.h
++++ b/src/engine/world_renderer.h
+@@ -10,10 +10,18 @@ namespace OpenBlood2
+         Load,
+         ClearDepth
+     };
++    enum class DrawStyle
++    {
++        Opaque,
++        SpriteAlpha
++    };
+     class WorldRenderer
+     {
+       public:
+-        explicit WorldRenderer(SDL_GPUDevice* device) : device_(device) {}
++        explicit WorldRenderer(SDL_GPUDevice* device, DrawStyle style = DrawStyle::Opaque)
++            : device_(device), style_(style)
++        {
++        }
+         ~WorldRenderer();
+         WorldRenderer(const WorldRenderer&) = delete;
+         WorldRenderer& operator=(const WorldRenderer&) = delete;
+@@ -39,6 +47,7 @@ namespace OpenBlood2
+ 
+       private:
+         SDL_GPUDevice* device_ = nullptr;
++        DrawStyle style_;
+         SDL_GPUGraphicsPipeline* pipeline_ = nullptr;
+         SDL_GPUBuffer* vertices_ = nullptr;
+         SDL_GPUTransferBuffer* vertex_transfer_ = nullptr;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index e8f6361..eb623db 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -925,3 +925,27 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --keepalive-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/player-keepalive.png")
+     set_tests_properties(gpu.player_keepalive PROPERTIES LABELS "gpu;private;player_keepalive" TIMEOUT 60 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+ endif()
++
++add_executable(sprite_view_tests sprite_view_tests.cpp ../src/app/sprite_scene.cpp)
++target_link_libraries(sprite_view_tests PRIVATE blood2_game)
++blood2_project_options(sprite_view_tests)
++foreach(case geometry failures)
++    add_test(NAME sprite_view.${case} COMMAND sprite_view_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/sprite-view-${case}")
++    set_tests_properties(sprite_view.${case} PROPERTIES LABELS "headless;sprite_view" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME sprite_view.subway COMMAND sprite_view_tests subway "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(sprite_view.subway PROPERTIES LABELS "headless;private;sprite_view" TIMEOUT 90)
++endif()
++
++if(BLOOD2_GPU_TESTS)
++    add_executable(sprite_gpu_tests sprite_gpu_tests.cpp ../src/app/sprite_scene.cpp)
++    target_link_libraries(sprite_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(sprite_gpu_tests)
++    add_test(NAME gpu.sprite_alpha COMMAND sprite_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/sprite-alpha")
++    set_tests_properties(gpu.sprite_alpha PROPERTIES LABELS "gpu;sprite_view" TIMEOUT 30 RUN_SERIAL TRUE)
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.sprite_private COMMAND sprite_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/sprite-private" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.sprite_private PROPERTIES LABELS "gpu;private;sprite_view" TIMEOUT 30 RUN_SERIAL TRUE)
++    endif()
++endif()
+diff --git a/tests/sprite_gpu_tests.cpp b/tests/sprite_gpu_tests.cpp
+new file mode 100644
+index 0000000..26a7d76
+--- /dev/null
++++ b/tests/sprite_gpu_tests.cpp
+@@ -0,0 +1,162 @@
++#include "app/sprite_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "sprite_view_fixture.h"
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << " " << error << " " << SDL_GetError() << "\n";                         \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    WorldMesh quad(float z, DVector color)
++    {
++        WorldMesh mesh;
++        for (auto p : {DVector{-20, 20, z}, DVector{20, 20, z}, DVector{20, -20, z}, DVector{-20, 20, z},
++                       DVector{20, -20, z}, DVector{-20, -20, z}})
++            mesh.vertices.push_back({p, color, {}});
++        mesh.ranges.push_back({0, 6, {}, "solid", {}});
++        return mesh;
++    }
++    bool download(SDL_GPUDevice* gpu, SDL_GPUCommandBuffer* commands, Capture& capture)
++    {
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++            return false;
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = capture.width;
++        region.h = capture.height;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = capture.width;
++        target.rows_per_layer = capture.height;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        return SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(gpu);
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    std::string error;
++    Runtime runtime;
++    CHECK(runtime.initialize(true, error));
++    WorldRenderer world(runtime.gpu), sprites(runtime.gpu, DrawStyle::SpriteAlpha), overlay(runtime.gpu);
++    auto background = quad(4, {0, 0, 1});
++    auto after = quad(2.5f, {1, 1, 0});
++    WorldDraw draw;
++    Resources resources;
++    CHECK(test_sprite_view::mount(resources, argv[1], error));
++    auto sprite = test_sprite_view::manifest();
++    SpriteView scene;
++    for (unsigned frame = 0; frame < 5; ++frame)
++    {
++        const unsigned width = frame == 4 ? 400 : 320, height = frame == 4 ? 300 : 240;
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, width, height));
++        CHECK(scene.begin_frame({}, {}, error));
++        CHECK(scene.add(&sprite, {}, {{0, 0, frame == 1 ? 6.f : 2.f}, {}}, {.25f, .5f, 1},
++                        FLAG_VISIBLE | FLAG_SPRITECHROMAKEY, {}, resources, error));
++        if (frame == 2)
++        {
++            // Deliberately append farther sprite last, scaled to the same screen extent.
++            CHECK(scene.add(&sprite, {}, {{0, 0, 3}, {}}, {.375f, .75f, 1}, FLAG_VISIBLE, {}, resources, error));
++            scene.sort();
++            CHECK(scene.draws[0].position.z == 3);
++        }
++        if (frame == 4)
++            sprites.clear_geometry();
++        CHECK(world.prepare(background, 1, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, width, height, error));
++        CHECK(sprites.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, width, height, error,
++                              true));
++        CHECK(overlay.prepare(after, 1, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, width, height, error));
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(commands);
++        CHECK(world.draw(commands, capture.texture, background, std::span(&draw, 1), {}, {}, false, error));
++        CHECK(sprites.draw(commands, capture.texture, scene.mesh, scene.draws, {}, {}, false, error, DrawLoad::Load,
++                           world.depth_target()));
++        if (frame == 3)
++            CHECK(overlay.draw(commands, capture.texture, after, std::span(&draw, 1), {}, {}, false, error,
++                               DrawLoad::Load, world.depth_target()));
++        CHECK(download(runtime.gpu, commands, capture));
++        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        bool valid = true;
++        for (unsigned col = 0; col < 4; ++col)
++        {
++            const auto* pixel = pixels + (height / 2 * width + width * (5 + 2 * col) / 16) * 4;
++            const int green = frame == 2 ? 199 : 136, blue = frame == 2 ? 56 : 119;
++            const int red = frame == 3 ? 255 : (frame != 1 && col == 2 ? 255 : 0);
++            const int g = frame == 3 ? 255 : (frame != 1 && col == 1 ? green : 0);
++            const int b = frame == 1 || col == 0 ? 255 : (col == 1 ? blue : 0);
++            const int expected_b = frame == 3 ? 0 : b;
++            if (std::abs(int(pixel[0]) - red) > 1 || std::abs(int(pixel[1]) - g) > 1 ||
++                std::abs(int(pixel[2]) - expected_b) > 1 || pixel[3] != 255)
++            {
++                valid = false;
++                std::cerr << "frame " << frame << " column " << col << " RGB " << int(pixel[0]) << "," << int(pixel[1])
++                          << "," << int(pixel[2]) << "\n";
++            }
++        }
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        CHECK(valid);
++        CHECK(sprites.stats.uploads == (frame == 4 ? 2 : 1));
++        CHECK(capture.save((std::filesystem::path(argv[1]) / "alpha.png").c_str()));
++    }
++    std::cout << "Pixels: zero/partial/opaque/opaque-black DTX alpha, overlap sort, world occlusion, no depth writes, "
++                 "resize and reupload passed\n";
++    if (argc == 3)
++    {
++        GameSession game;
++        Config config;
++        config.data_dir = argv[2];
++        CHECK(game.initialize() && game.resources.mount_game(config, error) && game.request_world("01_SubwayA", error));
++        CHECK(update_sprite_scene(game, scene, error) && scene.entries.size() == 12);
++        const auto id = scene.entries.front().object;
++        const auto* record = game.objects.get(id);
++        CHECK(record && record->sprite);
++        const auto original = record->state;
++        auto normal = rotate_vector(original.m_Rotation, {0, 0, 1});
++        const DVector eye{original.m_Pos.x - 200 * normal.x, original.m_Pos.y - 200 * normal.y,
++                          original.m_Pos.z - 200 * normal.z};
++        scene.clear();
++        CHECK(scene.begin_frame(eye, original.m_Rotation, error));
++        CHECK(scene.add(record->sprite.get(), record->sprite_track, {original.m_Pos, original.m_Rotation},
++                        original.m_Scale, original.m_Flags, id, game.resources, error));
++        CHECK(scene.draws.size() == 1 && scene.entries[0].zero_alpha > 0 && scene.entries[0].partial_alpha > 0);
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300));
++        CHECK(sprites.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true));
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(commands);
++        CHECK(sprites.draw(commands, capture.texture, scene.mesh, scene.draws, eye, original.m_Rotation, false, error));
++        CHECK(download(runtime.gpu, commands, capture));
++        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        unsigned ink = 0, clear = 0;
++        for (unsigned i = 0; i < 400 * 300; ++i)
++            if (pixels[i * 4] == 6 && pixels[i * 4 + 1] == 9 && pixels[i * 4 + 2] == 13)
++                ++clear;
++            else
++                ++ink;
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        CHECK(ink > 50 && clear > 100000);
++        CHECK(capture.save((std::filesystem::path(argv[1]) / "bloodsplat.png").c_str()));
++        CHECK(game.unload_world());
++        scene.clear();
++        sprites.clear_geometry();
++        CHECK(update_sprite_scene(game, scene, error) && scene.draws.empty() && scene.entries.empty());
++        std::cout << "Private authored sprite pose/scale: " << ink << " non-background pixels, " << clear
++                  << " clear; unload emptied CPU/GPU geometry\n";
++    }
++    return 0;
++}
+diff --git a/tests/sprite_view_fixture.h b/tests/sprite_view_fixture.h
+new file mode 100644
+index 0000000..6853981
+--- /dev/null
++++ b/tests/sprite_view_fixture.h
+@@ -0,0 +1,50 @@
++#pragma once
++#include "player_fixture.h"
++namespace test_sprite_view
++{
++    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error)
++    {
++        test_model::Writer d;
++        d.u32(0);
++        d.u32(0xfffffffeu);
++        d.u16(4);
++        d.u16(2);
++        d.u16(1);
++        d.u16(0);
++        d.u32(2);
++        d.u32(0);
++        d.b.resize(1068);
++        // Four columns: transparent red, partial green, opaque red, opaque black.
++        const std::uint8_t palette[] = {255, 255, 0, 0, 255, 0, 255, 0, 255, 255, 0, 0, 255, 0, 0, 0};
++        std::copy(std::begin(palette), std::end(palette), d.b.begin() + 44);
++        for (int row = 0; row < 2; ++row)
++            for (int col = 0; col < 4; ++col)
++                d.u8(col);
++        d.b.insert(d.b.end(), {0x08, 0xff, 0x08, 0xff});
++        test_player::Directory dir;
++        dir.files["alpha.dtx"] = d.b;
++        dir.files["bad.dtx"] = {1, 2, 3};
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, dir);
++        w.patch(131, off);
++        w.patch(135, size);
++        std::error_code ec;
++        std::filesystem::create_directories(root, ec);
++        if (ec)
++            return false;
++        const auto path = root / "sprite-view.rez";
++        std::ofstream file(path, std::ios::binary);
++        file.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        file.close();
++        return resources.mount(path, error);
++    }
++    inline OpenBlood2::Sprite manifest()
++    {
++        return {10, true, false, 0, {"alpha.dtx", "bad.dtx", "missing.dtx", "ALPHA.DTX"}};
++    }
++} // namespace test_sprite_view
+diff --git a/tests/sprite_view_tests.cpp b/tests/sprite_view_tests.cpp
+new file mode 100644
+index 0000000..cec239e
+--- /dev/null
++++ b/tests/sprite_view_tests.cpp
+@@ -0,0 +1,140 @@
++#include "app/sprite_scene.h"
++#include "sprite_view_fixture.h"
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << "\n";                                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .001f;
++    }
++    bool geometry(const std::filesystem::path& root)
++    {
++        Resources resources;
++        std::string error;
++        CHECK(test_sprite_view::mount(resources, root, error));
++        auto sprite = test_sprite_view::manifest();
++        SpriteTrack track{35, 0};
++        SpriteView scene;
++        const auto camera = rotation_from_euler({0, .7f, 0});
++        CHECK(scene.begin_frame({1, 2, 3}, camera, error));
++        CHECK(scene.add(&sprite, track, {{4, 5, 6}, {}}, {.5f, 2, 1}, FLAG_VISIBLE, {1, 1}, resources, error));
++        CHECK(scene.draws.size() == 1 && scene.mesh.vertices.size() == 6);
++        CHECK(scene.entries[0].width == 4 && scene.entries[0].height == 2 && scene.entries[0].zero_alpha == 2 &&
++              scene.entries[0].partial_alpha == 2 && scene.entries[0].error.empty());
++        CHECK(near(scene.mesh.vertices[0].position.x, -2) && near(scene.mesh.vertices[0].position.y, 4));
++        CHECK(scene.mesh.vertices[0].uv[0] == 0 && scene.mesh.vertices[0].uv[1] == 0);
++        CHECK(near(scene.draws[0].rotation.m_Vec.y, camera.m_Vec.y));
++        CHECK(track.frame == 0 && track.milliseconds == 35);
++        auto revision = scene.revision;
++        CHECK(scene.add(&sprite, track, {{4, 5, 6}, {}}, {1, 1, 1},
++                        FLAG_VISIBLE | FLAG_ROTATEABLESPRITE | FLAG_SPRITECHROMAKEY, {2, 1}, resources, error));
++        CHECK(near(scene.draws[1].rotation.m_Vec.y, 0) && scene.revision == revision);
++        CHECK(scene.begin_frame({}, {}, error));
++        for (int z : {2, 6, 4, 6})
++            CHECK(scene.add(&sprite, track, {{0, 0, float(z)}, {}}, {1, 1, 1}, FLAG_VISIBLE, {}, resources, error));
++        scene.sort();
++        CHECK(scene.draws[0].range == 1 && scene.draws[1].range == 3 && scene.draws[2].range == 2 &&
++              scene.draws[3].range == 0);
++        CHECK(scene.begin_frame({}, {}, error));
++        CHECK(scene.add(&sprite, {99, 3}, {}, {1, 1, 1}, 0, {}, resources, error));
++        CHECK(scene.draws.empty() && !scene.entries[0].visible && scene.entries[0].error.empty());
++        CHECK(scene.revision == revision && scene.mesh.materials.size() == 2);
++        CHECK(scene.add(&sprite, track, {}, {0, 1, 1}, FLAG_VISIBLE, {}, resources, error) && scene.draws.empty());
++        scene.clear();
++        CHECK(scene.revision > revision && scene.mesh.materials.size() == 1 && scene.entries.empty());
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        Resources resources;
++        std::string error;
++        CHECK(test_sprite_view::mount(resources, root, error));
++        auto sprite = test_sprite_view::manifest();
++        SpriteView scene;
++        CHECK(!scene.add(&sprite, {}, {}, {1, 1, 1}, FLAG_VISIBLE, {}, resources, error));
++        CHECK(scene.begin_frame({}, {}, error));
++        CHECK(scene.add(nullptr, {}, {}, {1, 1, 1}, FLAG_VISIBLE, {}, resources, error));
++        CHECK(!scene.entries.back().error.empty());
++        for (unsigned frame : {1u, 2u, 4u})
++        {
++            CHECK(scene.add(&sprite, {0, frame}, {}, {1, 1, 1}, FLAG_VISIBLE, {}, resources, error));
++            CHECK(!scene.entries.back().error.empty() && scene.draws.empty());
++        }
++        for (unsigned bit : {5u, 6u, 7u, 12u})
++        {
++            CHECK(scene.add(&sprite, {}, {}, {1, 1, 1}, FLAG_VISIBLE | (1u << bit), {}, resources, error));
++            CHECK(!scene.entries.back().error.empty() && scene.draws.empty());
++        }
++        CHECK(scene.add(&sprite, {}, {}, {-1, 1, 1}, FLAG_VISIBLE, {}, resources, error));
++        CHECK(!scene.entries.back().error.empty());
++        const float nan = std::numeric_limits<float>::quiet_NaN();
++        CHECK(scene.add(&sprite, {}, {{nan, 0, 0}, {}}, {1, 1, 1}, FLAG_VISIBLE, {}, resources, error));
++        CHECK(!scene.entries.back().error.empty() && scene.draws.empty());
++        CHECK(!scene.begin_frame({nan, 0, 0}, {}, error) && scene.entries.empty());
++        CHECK(scene.begin_frame({}, {}, error));
++        for (unsigned i = 0; i < 4096; ++i)
++            CHECK(scene.add(&sprite, {}, {}, {1, 1, 1}, 0, {}, resources, error));
++        CHECK(!scene.add(&sprite, {}, {}, {1, 1, 1}, 0, {}, resources, error) && scene.entries.empty() &&
++              scene.draws.empty());
++        return true;
++    }
++    bool subway(const std::filesystem::path& root)
++    {
++        GameSession game;
++        std::string error;
++        Config config;
++        config.data_dir = root;
++        CHECK(game.initialize() && game.resources.mount_game(config, error));
++        SpriteView scene;
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error) && game.step(.02));
++            CHECK(update_sprite_scene(game, scene, error) && scene.entries.size() == 12 && scene.draws.size() == 12);
++            CHECK(scene.mesh.materials.size() == 2 && scene.mesh.vertices.size() == 72);
++            const auto& entry = scene.entries.front();
++            CHECK(entry.error.empty() && entry.rotatable && entry.zero_alpha > 0 && entry.partial_alpha > 0);
++            std::cout << "SubwayA frame=" << entry.frame_path << " " << entry.width << "x" << entry.height
++                      << " zero=" << entry.zero_alpha << " partial=" << entry.partial_alpha << "\n";
++            const auto id = entry.object;
++            auto* record = game.objects.get(id);
++            CHECK(record);
++            const auto milliseconds = record->sprite_track.milliseconds;
++            record->activity = OBJSTATE_INACTIVE;
++            CHECK(update_sprite_scene(game, scene, error) && scene.draws.size() == 12);
++            CHECK(record->sprite_track.milliseconds == milliseconds);
++            record->state.m_Flags &= ~FLAG_VISIBLE;
++            CHECK(update_sprite_scene(game, scene, error) && scene.draws.size() == 11 && scene.entries.size() == 12);
++            CHECK(game.objects.remove(record->handle));
++            CHECK(update_sprite_scene(game, scene, error) && scene.draws.size() == 11 && scene.entries.size() == 11);
++            CHECK(game.objects.finish_frame() && game.unload_world());
++            std::string unsupported;
++            CHECK(!game.run_world(unsupported));
++            scene.clear();
++            CHECK(update_sprite_scene(game, scene, error) && scene.entries.empty() && scene.draws.empty());
++            CHECK(scene.mesh.materials.size() == 1 && game.server.string_count() == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::string name = argv[1];
++    return (name == "geometry"   ? geometry(argv[2])
++            : name == "failures" ? failures(argv[2])
++                                 : name == "subway" && subway(argv[2]))
++               ? 0
++               : 1;
++}

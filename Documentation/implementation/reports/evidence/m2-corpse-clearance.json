@@ -1,0 +1,105 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "ee60428a0091ce450230ab0de4f6daf58eb252db",
+  "status": "M2 incomplete",
+  "scope": "Doorway-end corpse placement with center-side separation plus swept source-box validation; body-aim combat and traversal of first two authored Cultists; inspection",
+  "validation": {
+    "debug-headless": {
+      "passed": 742,
+      "private": 121,
+      "seconds": 139.54
+    },
+    "release-headless": {
+      "passed": 742,
+      "private": 121,
+      "seconds": 22.4
+    },
+    "debug-gpu": {
+      "passed": 7,
+      "private": 5,
+      "seconds": 68.51,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU"
+    },
+    "release-gpu": {
+      "passed": 7,
+      "private": 5,
+      "seconds": 26.81,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU"
+    },
+    "sanitize-final": {
+      "passed": 3,
+      "private": 1,
+      "seconds": 96.53
+    },
+    "sanitizers": {
+      "unique_cases": 80,
+      "private": 15,
+      "initial_passed": 78,
+      "initial_failed": [
+        "services.placement_queries",
+        "player_controls.corpse_clearance"
+      ],
+      "final_retry_passed": 3,
+      "note": "Corrected negative fixture; extended four-encounter test time budget to 240s. All assertions retained. No sanitizer diagnostic."
+    },
+    "format": {
+      "files": 5,
+      "tool": "clang-format 23.1.3"
+    },
+    "reference_integrity": {
+      "files": 10923,
+      "changed": 0,
+      "clean_repositories": 6
+    },
+    "local_markdown_links": 3129
+  },
+  "commands": [
+    "cmake --build build/{debug,release} -j3",
+    "ctest --test-dir build/{debug,release} -L headless -j4 --output-on-failure",
+    "cmake --build build/sanitize -j2 --target services_tests corpse_tests player_controls_tests object_contract_tests ai_hit_tests ai_state_tests ai_runtime_tests world_tests",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -j2 --output-on-failure -R ^(services\\.|corpses\\.|player_controls\\.|objects\\.|ai_hit\\.|ai_state\\.|ai_runtime\\.|world\\.(level_change|level_change_private|destination_trials|destination_lifetime|destination_trial_private)$)",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -j2 --output-on-failure -R ^(services\\.placement_|player_controls\\.corpse_clearance$)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/{debug,release} --output-on-failure -R ^gpu\\.(corpse_clearance|mouse_combat|player_controls|character|lifecycle|level_change|world_depth)$"
+  ],
+  "observed": {
+    "first_enemy": "gak",
+    "first_enemy_shots": 7,
+    "following_enemy": "noname",
+    "following_enemy_shots": 10,
+    "simulation_steps_per_second": [
+      30,
+      60
+    ],
+    "first_corpse_source_sweep": true,
+    "following_corpse_source_sweep": false,
+    "passes_both_corpses": true
+  },
+  "development_findings": [
+    "The exact new combat regression fails when linked against the previous collision translation unit; its retained log identifies blocked corpse placement, not an input failure.",
+    "The initial negative lintel fixture had a short jamb and admitted a valid route above it. The final generated fixture has full-height jambs, retaining the no-sweep rejection assertion. Production solver logic was not weakened.",
+    "The four-encounter sanitizer case exceeded the old 120-second limit. Only this expanded test receives a 240-second budget; all gameplay/lifetime assertions remain.",
+    "Debug/sanitizer full rebuilds expose an existing ItemPickups.cpp float/GameType comparison warning. That source is unchanged."
+  ],
+  "limits": [
+    "A reproduced doorway case and two authored encounters are covered, not every later enemy/pose or complete campaign.",
+    "Fire/gib deaths, corpse damage, retail physics parity and impossible local fits remain unavailable or explicit failures.",
+    "Only Linux/NVIDIA executed locally. User previously confirmed macOS execution, without native automated Apple results.",
+    "Authored CityHub still rejects 18 unsupported and one failed entry. M2 remains open."
+  ],
+  "project_commit": "e55601320386d604546367cca6402a69f33d0647",
+  "project_patch_sha256": "f35c0ebd46d0a2d1bdecef36dee35335251421feb9d37f88ce93eecddee7da79",
+  "project_files": {
+    "AGENTS.md": "5abd74fe608a1c454718e9126ef4b52151df7ed459ab9aa935367675487b700a",
+    "README.md": "4e3b6f6b156b9b2fa8bddd75ac427dcaa4e0173dffa549e97fb8c316819ad840",
+    "docs/CORPSE_CLEARANCE_CONTRACTS.md": "6e9f0e664cfbee8f7cb161d1545c45560e8a7670feafd9e14983e3b5e64fdda0",
+    "docs/CORPSE_PLACEMENT_CONTRACTS.md": "89404517743c8568c36ad9fb42934b6ca629169870be05ff5468ca1e6e9f47c9",
+    "docs/PLAYTEST_INPUT_CONTRACTS.md": "dffc203aa4d04514602f6afa943c678d5e3de43af907be0111715032f3be50f1",
+    "src/app/inspector_skeleton.cpp": "316a70e5dcfbd25be765c97c4e20e29c50856f8d08d30bd6946617dbc6a6e109",
+    "src/engine/body_placement.h": "5ac6629ea57fba1aa66a15483dcf718dd3f3917d036232e801d13eb0d335fb9d",
+    "src/engine/collision.cpp": "91ea191990949f98af1a5a0fdb59f239a9a1b322293ab93ba9d4b78b147b0989",
+    "tests/CMakeLists.txt": "0f86c42e856a915e0c4163501b17d14ad3503633518b87e5b4fa4a33165daba5",
+    "tests/player_controls_tests.cpp": "8643d1339e982aa39b6d9e5b94197adcb1d2f70196f115f3fa338470bb6cf287",
+    "tests/services_tests.cpp": "ad3f399a276a3230b992f08d130b018b910d33eccc2e46a85178287b57e05669"
+  },
+  "before_fix_method": "Compile the final player_controls_tests.cpp against the collision.cpp translation unit from baseline ee60428 and current engine/game archives, then execute clearance with the external game root. The explicit collision unit replaces its archive member. No reference or tracked source is modified."
+}

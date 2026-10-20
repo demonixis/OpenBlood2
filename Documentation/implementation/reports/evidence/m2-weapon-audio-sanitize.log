@@ -1,0 +1,215 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 560: weapon_audio.callbacks
+      Start  40: world.destination_trial_private
+ 1/98 Test #560: weapon_audio.callbacks ............   Passed    0.09 sec
+      Start 450: ai_runtime.subway
+ 2/98 Test  #40: world.destination_trial_private ...   Passed   20.23 sec
+      Start 517: player_keepalive.private
+ 3/98 Test #450: ai_runtime.subway .................   Passed   28.79 sec
+      Start  41: world.destination_private
+ 4/98 Test #517: player_keepalive.private ..........   Passed   13.05 sec
+      Start 513: player_restore.private
+ 5/98 Test #513: player_restore.private ............   Passed    6.22 sec
+      Start  66: weapons.private
+ 6/98 Test  #41: world.destination_private .........   Passed   10.93 sec
+      Start 562: weapon_audio.private
+ 7/98 Test #562: weapon_audio.private ..............   Passed    5.28 sec
+      Start 363: ai_fire.subway
+ 8/98 Test #363: ai_fire.subway ....................   Passed   14.16 sec
+      Start 448: ai_runtime.catalog
+ 9/98 Test #448: ai_runtime.catalog ................   Passed    2.27 sec
+      Start 451: ai_runtime.arena
+10/98 Test #451: ai_runtime.arena ..................   Passed    1.61 sec
+      Start 372: ai_trigger.subway
+11/98 Test #372: ai_trigger.subway .................   Passed    3.63 sec
+      Start  42: world.private
+12/98 Test  #42: world.private .....................   Passed    3.98 sec
+      Start 471: weapon_drops.catalog
+13/98 Test #471: weapon_drops.catalog ..............   Passed    0.54 sec
+      Start 362: ai_fire.catalog
+14/98 Test #362: ai_fire.catalog ...................   Passed    0.89 sec
+      Start  24: world.destination_trials
+15/98 Test  #24: world.destination_trials ..........   Passed    0.15 sec
+      Start 515: player_keepalive.fallback
+16/98 Test #515: player_keepalive.fallback .........   Passed    0.13 sec
+      Start 449: ai_runtime.failures
+17/98 Test #449: ai_runtime.failures ...............   Passed    0.29 sec
+      Start 511: player_restore.failures
+18/98 Test #511: player_restore.failures ...........   Passed    0.08 sec
+      Start 512: player_restore.lifetime
+19/98 Test #512: player_restore.lifetime ...........   Passed    0.07 sec
+      Start 516: player_keepalive.failures
+20/98 Test #516: player_keepalive.failures .........   Passed    0.07 sec
+      Start 557: weapon_audio.voices
+21/98 Test #557: weapon_audio.voices ...............   Passed    0.05 sec
+      Start  27: world.destination_lifetime
+22/98 Test  #27: world.destination_lifetime ........   Passed    0.05 sec
+      Start 558: weapon_audio.hearing
+23/98 Test #558: weapon_audio.hearing ..............   Passed    0.04 sec
+      Start 561: weapon_audio.lifetime
+24/98 Test #561: weapon_audio.lifetime .............   Passed    0.04 sec
+      Start 510: player_restore.roundtrip
+25/98 Test #510: player_restore.roundtrip ..........   Passed    0.05 sec
+      Start 514: player_keepalive.named
+26/98 Test #514: player_keepalive.named ............   Passed    0.05 sec
+      Start 559: weapon_audio.failures
+27/98 Test #559: weapon_audio.failures .............   Passed    0.04 sec
+      Start 465: weapon_drops.falling
+28/98 Test #465: weapon_drops.falling ..............   Passed    0.05 sec
+      Start  36: world.mutations
+29/98 Test  #36: world.mutations ...................   Passed    0.21 sec
+      Start 462: weapon_drops.collect
+30/98 Test #462: weapon_drops.collect ..............   Passed    0.04 sec
+      Start 466: weapon_drops.guards
+31/98 Test #466: weapon_drops.guards ...............   Passed    0.04 sec
+      Start 470: weapon_drops.missing_pickup
+32/98 Test #470: weapon_drops.missing_pickup .......   Passed    0.04 sec
+      Start 463: weapon_drops.protocol
+33/98 Test #463: weapon_drops.protocol .............   Passed    0.04 sec
+      Start 469: weapon_drops.callback
+34/98 Test #469: weapon_drops.callback .............   Passed    0.04 sec
+      Start 467: weapon_drops.failures
+35/98 Test #467: weapon_drops.failures .............   Passed    0.04 sec
+      Start 464: weapon_drops.drop
+36/98 Test #464: weapon_drops.drop .................   Passed    0.04 sec
+      Start 468: weapon_drops.nosliding
+37/98 Test #468: weapon_drops.nosliding ............   Passed    0.04 sec
+      Start  26: world.destination_schema
+38/98 Test  #26: world.destination_schema ..........   Passed    0.02 sec
+      Start  25: world.destination_messages
+39/98 Test  #25: world.destination_messages ........   Passed    0.01 sec
+      Start  28: world.sprite_entries
+40/98 Test  #28: world.sprite_entries ..............   Passed    0.04 sec
+      Start  29: world.sound_entries
+41/98 Test  #29: world.sound_entries ...............   Passed    0.04 sec
+      Start  63: weapons.animation
+42/98 Test  #63: weapons.animation .................   Passed    0.29 sec
+      Start 440: ai_runtime.lifetime
+43/98 Test #440: ai_runtime.lifetime ...............   Passed    0.02 sec
+      Start 446: ai_runtime.body
+44/98 Test #446: ai_runtime.body ...................   Passed    0.02 sec
+      Start 447: ai_runtime.missing
+45/98 Test #447: ai_runtime.missing ................   Passed    0.02 sec
+      Start 438: ai_runtime.activation
+46/98 Test #438: ai_runtime.activation .............   Passed    0.02 sec
+      Start 445: ai_runtime.triggers
+47/98 Test #445: ai_runtime.triggers ...............   Passed    0.02 sec
+      Start 441: ai_runtime.targets
+48/98 Test #441: ai_runtime.targets ................   Passed    0.02 sec
+      Start 444: ai_runtime.spatial
+49/98 Test #444: ai_runtime.spatial ................   Passed    0.02 sec
+      Start 443: ai_runtime.camera
+50/98 Test #443: ai_runtime.camera .................   Passed    0.02 sec
+      Start 442: ai_runtime.tracking
+51/98 Test #442: ai_runtime.tracking ...............   Passed    0.02 sec
+      Start 439: ai_runtime.visibility
+52/98 Test #439: ai_runtime.visibility .............   Passed    0.02 sec
+      Start 371: ai_trigger.audio
+53/98 Test #371: ai_trigger.audio ..................   Passed    0.04 sec
+      Start  35: world.world_rejection
+54/98 Test  #35: world.world_rejection .............   Passed    0.05 sec
+      Start 361: ai_fire.lifetime
+55/98 Test #361: ai_fire.lifetime ..................   Passed    0.02 sec
+      Start 354: ai_fire.filters
+56/98 Test #354: ai_fire.filters ...................   Passed    0.02 sec
+      Start 355: ai_fire.head
+57/98 Test #355: ai_fire.head ......................   Passed    0.02 sec
+      Start 359: ai_fire.recovery
+58/98 Test #359: ai_fire.recovery ..................   Passed    0.02 sec
+      Start 357: ai_fire.keys
+59/98 Test #357: ai_fire.keys ......................   Passed    0.02 sec
+      Start 356: ai_fire.aim
+60/98 Test #356: ai_fire.aim .......................   Passed    0.02 sec
+      Start 353: ai_fire.clearance
+61/98 Test #353: ai_fire.clearance .................   Passed    0.02 sec
+      Start 358: ai_fire.cadence
+62/98 Test #358: ai_fire.cadence ...................   Passed    0.02 sec
+      Start 352: ai_fire.selection
+63/98 Test #352: ai_fire.selection .................   Passed    0.02 sec
+      Start 360: ai_fire.failures
+64/98 Test #360: ai_fire.failures ..................   Passed    0.02 sec
+      Start 370: ai_trigger.lifetime
+65/98 Test #370: ai_trigger.lifetime ...............   Passed    0.02 sec
+      Start 369: ai_trigger.broadcast
+66/98 Test #369: ai_trigger.broadcast ..............   Passed    0.02 sec
+      Start 367: ai_trigger.commands
+67/98 Test #367: ai_trigger.commands ...............   Passed    0.02 sec
+      Start 366: ai_trigger.impact
+68/98 Test #366: ai_trigger.impact .................   Passed    0.02 sec
+      Start  10: objects.unsupported_teardown
+69/98 Test  #10: objects.unsupported_teardown ......   Passed    0.04 sec
+      Start 364: ai_trigger.hearing
+70/98 Test #364: ai_trigger.hearing ................   Passed    0.02 sec
+      Start 368: ai_trigger.relay
+71/98 Test #368: ai_trigger.relay ..................   Passed    0.02 sec
+      Start 365: ai_trigger.gunfire
+72/98 Test #365: ai_trigger.gunfire ................   Passed    0.02 sec
+      Start   9: objects.messages_strings
+73/98 Test   #9: objects.messages_strings ..........   Passed    0.04 sec
+      Start  37: world.session_lifecycle
+74/98 Test  #37: world.session_lifecycle ...........   Passed    0.02 sec
+      Start  64: weapons.lifetime
+75/98 Test  #64: weapons.lifetime ..................   Passed    0.06 sec
+      Start  11: objects.creation_failures
+76/98 Test  #11: objects.creation_failures .........   Passed    0.03 sec
+      Start  39: world.original_trigger
+77/98 Test  #39: world.original_trigger ............   Passed    0.02 sec
+      Start  33: world.world_properties
+78/98 Test  #33: world.world_properties ............   Passed    0.02 sec
+      Start  34: world.world_geometry
+79/98 Test  #34: world.world_geometry ..............   Passed    0.02 sec
+      Start  32: world.resource_mount
+80/98 Test  #32: world.resource_mount ..............   Passed    0.02 sec
+      Start  58: weapons.inventory
+81/98 Test  #58: weapons.inventory .................   Passed    0.04 sec
+      Start  31: world.rez_rejection
+82/98 Test  #31: world.rez_rejection ...............   Passed    0.02 sec
+      Start  61: weapons.melee
+83/98 Test  #61: weapons.melee .....................   Passed    0.04 sec
+      Start  65: weapons.rollback
+84/98 Test  #65: weapons.rollback ..................   Passed    0.04 sec
+      Start  60: weapons.firing
+85/98 Test  #60: weapons.firing ....................   Passed    0.04 sec
+      Start  59: weapons.segments
+86/98 Test  #59: weapons.segments ..................   Passed    0.04 sec
+      Start  30: world.rez_structure
+87/98 Test  #30: world.rez_structure ...............   Passed    0.01 sec
+      Start  38: world.session_messages
+88/98 Test  #38: world.session_messages ............   Passed    0.01 sec
+      Start  62: weapons.damage
+89/98 Test  #62: weapons.damage ....................   Passed    0.04 sec
+      Start   8: objects.links_lists
+90/98 Test   #8: objects.links_lists ...............   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+91/98 Test   #3: objects.reasons_properties ........   Passed    0.02 sec
+      Start   1: objects.original_objects
+92/98 Test   #1: objects.original_objects ..........   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+93/98 Test   #5: objects.deferred_removal ..........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+94/98 Test   #2: objects.nested_creation ...........   Passed    0.02 sec
+      Start   7: objects.handles_selection
+95/98 Test   #7: objects.handles_selection .........   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+96/98 Test   #6: objects.aggregate_dispatch ........   Passed    0.02 sec
+      Start   4: objects.scheduling
+97/98 Test   #4: objects.scheduling ................   Passed    0.02 sec
+98/98 Test  #66: weapons.private ...................   Passed  148.85 sec
+
+100% tests passed, 0 tests failed out of 98
+
+Label Time Summary:
+ai_fire             =  15.24 sec*proc (12 tests)
+ai_runtime          =  33.15 sec*proc (14 tests)
+ai_trigger          =   3.79 sec*proc (9 tests)
+headless            = 263.83 sec*proc (98 tests)
+objects             =   0.24 sec*proc (11 tests)
+player_keepalive    =  13.29 sec*proc (4 tests)
+player_restore      =   6.43 sec*proc (4 tests)
+private             = 260.71 sec*proc (15 tests)
+weapon_audio        =   5.54 sec*proc (6 tests)
+weapon_drops        =   0.89 sec*proc (10 tests)
+weapons             = 149.43 sec*proc (9 tests)
+world               =  35.84 sec*proc (19 tests)
+
+Total Test time (real) = 188.36 sec

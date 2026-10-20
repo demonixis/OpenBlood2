@@ -1,0 +1,14 @@
+632/638 Testing: naga.failures
+632/638 Test: naga.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/naga_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/release/tests/naga-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"naga.failures" start time: Oct 17 00:58 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"naga.failures" end time: Oct 17 00:58 CEST
+"naga.failures" time elapsed: 00:00:00
+----------------------------------------------------------

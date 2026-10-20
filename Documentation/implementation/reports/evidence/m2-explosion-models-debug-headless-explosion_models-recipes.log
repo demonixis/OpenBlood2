@@ -1,0 +1,14 @@
+551/556 Testing: explosion_models.recipes
+551/556 Test: explosion_models.recipes
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_model_tests" "recipes" "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-models-recipes"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"explosion_models.recipes" start time: Oct 16 20:39 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_models.recipes" end time: Oct 16 20:39 CEST
+"explosion_models.recipes" time elapsed: 00:00:00
+----------------------------------------------------------

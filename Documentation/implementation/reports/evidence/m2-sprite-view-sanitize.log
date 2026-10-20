@@ -1,0 +1,104 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start   1: objects.original_objects
+ 1/44 Test   #1: objects.original_objects .........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+ 2/44 Test   #2: objects.nested_creation ..........   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+ 3/44 Test   #3: objects.reasons_properties .......   Passed    0.02 sec
+      Start   4: objects.scheduling
+ 4/44 Test   #4: objects.scheduling ...............   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+ 5/44 Test   #5: objects.deferred_removal .........   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+ 6/44 Test   #6: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   7: objects.handles_selection
+ 7/44 Test   #7: objects.handles_selection ........   Passed    0.02 sec
+      Start   8: objects.links_lists
+ 8/44 Test   #8: objects.links_lists ..............   Passed    0.02 sec
+      Start   9: objects.messages_strings
+ 9/44 Test   #9: objects.messages_strings .........   Passed    0.04 sec
+      Start  10: objects.unsupported_teardown
+10/44 Test  #10: objects.unsupported_teardown .....   Passed    0.04 sec
+      Start  11: objects.creation_failures
+11/44 Test  #11: objects.creation_failures ........   Passed    0.03 sec
+      Start 227: sprites.reader
+12/44 Test #227: sprites.reader ...................   Passed    0.05 sec
+      Start 228: sprites.clock
+13/44 Test #228: sprites.clock ....................   Passed    0.01 sec
+      Start 229: sprites.properties
+14/44 Test #229: sprites.properties ...............   Passed    0.03 sec
+      Start 230: sprites.placement
+15/44 Test #230: sprites.placement ................   Passed    0.03 sec
+      Start 231: sprites.ray
+16/44 Test #231: sprites.ray ......................   Passed    0.03 sec
+      Start 232: sprites.failures
+17/44 Test #232: sprites.failures .................   Passed    0.03 sec
+      Start 233: sprites.catalog
+18/44 Test #233: sprites.catalog ..................   Passed   30.51 sec
+      Start 234: sprites.subway
+19/44 Test #234: sprites.subway ...................   Passed    3.40 sec
+      Start 293: attachments.root
+20/44 Test #293: attachments.root .................   Passed    0.02 sec
+      Start 294: attachments.nodes
+21/44 Test #294: attachments.nodes ................   Passed    0.02 sec
+      Start 295: attachments.rejects
+22/44 Test #295: attachments.rejects ..............   Passed    0.35 sec
+      Start 296: attachments.lifetime
+23/44 Test #296: attachments.lifetime .............   Passed    0.02 sec
+      Start 297: attachments.held
+24/44 Test #297: attachments.held .................   Passed    0.05 sec
+      Start 298: attachments.missing
+25/44 Test #298: attachments.missing ..............   Passed    0.04 sec
+      Start 299: attachments.catalog
+26/44 Test #299: attachments.catalog ..............   Passed    1.03 sec
+      Start 300: attachments.subway
+27/44 Test #300: attachments.subway ...............   Passed    3.80 sec
+      Start 310: world_view.mesh
+28/44 Test #310: world_view.mesh ..................   Passed    0.01 sec
+      Start 311: world_view.rejects
+29/44 Test #311: world_view.rejects ...............   Passed    0.01 sec
+      Start 312: world_view.camera
+30/44 Test #312: world_view.camera ................   Passed    0.01 sec
+      Start 313: world_view.lifetime
+31/44 Test #313: world_view.lifetime ..............   Passed    0.02 sec
+      Start 314: world_view.subway
+32/44 Test #314: world_view.subway ................   Passed    3.73 sec
+      Start 315: texture.decode
+33/44 Test #315: texture.decode ...................   Passed    0.01 sec
+      Start 316: texture.malformed
+34/44 Test #316: texture.malformed ................   Passed    0.02 sec
+      Start 317: texture.mapping
+35/44 Test #317: texture.mapping ..................   Passed    0.02 sec
+      Start 318: texture.corpus
+36/44 Test #318: texture.corpus ...................   Passed    7.58 sec
+      Start 319: model_view.sample
+37/44 Test #319: model_view.sample ................   Passed    0.02 sec
+      Start 320: model_view.rejects
+38/44 Test #320: model_view.rejects ...............   Passed    0.02 sec
+      Start 321: model_view.weapon_pose
+39/44 Test #321: model_view.weapon_pose ...........   Passed    0.01 sec
+      Start 322: model_view.legacy_pose
+40/44 Test #322: model_view.legacy_pose ...........   Passed    0.02 sec
+      Start 323: model_view.subway
+41/44 Test #323: model_view.subway ................   Passed    3.90 sec
+      Start 512: sprite_view.geometry
+42/44 Test #512: sprite_view.geometry .............   Passed    0.02 sec
+      Start 513: sprite_view.failures
+43/44 Test #513: sprite_view.failures .............   Passed    0.05 sec
+      Start 514: sprite_view.subway
+44/44 Test #514: sprite_view.subway ...............   Passed    5.25 sec
+
+100% tests passed, 0 tests failed out of 44
+
+Label Time Summary:
+attachments    =   5.32 sec*proc (8 tests)
+headless       =  60.35 sec*proc (44 tests)
+model_view     =   3.96 sec*proc (5 tests)
+objects        =   0.24 sec*proc (11 tests)
+private        =  59.20 sec*proc (8 tests)
+sprite_view    =   5.32 sec*proc (3 tests)
+sprites        =  34.10 sec*proc (8 tests)
+texture        =   7.62 sec*proc (4 tests)
+world_view     =   3.79 sec*proc (5 tests)
+
+Total Test time (real) =  60.36 sec

@@ -1,0 +1,2957 @@
+Start testing: Oct 17 19:58 CEST
+----------------------------------------------------------
+28/945 Testing: gpu.lifecycle
+28/945 Test: gpu.lifecycle
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--gpu-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/gpu.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.lifecycle" start time: Oct 17 19:58 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/gpu.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+<end of output>
+Test time =   3.17 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.lifecycle" end time: Oct 17 19:58 CEST
+"gpu.lifecycle" time elapsed: 00:00:03
+----------------------------------------------------------
+
+51/945 Testing: gpu.world
+51/945 Test: gpu.world
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--world-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/world.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.world" start time: Oct 17 19:58 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/world.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+<end of output>
+Test time =   2.71 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.world" end time: Oct 17 19:58 CEST
+"gpu.world" time elapsed: 00:00:02
+----------------------------------------------------------
+
+72/945 Testing: gpu.player
+72/945 Test: gpu.player
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--player-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/player.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.player" start time: Oct 17 19:58 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/player.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   2.92 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.player" end time: Oct 17 19:58 CEST
+"gpu.player" time elapsed: 00:00:02
+----------------------------------------------------------
+
+82/945 Testing: gpu.weapons
+82/945 Test: gpu.weapons
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--weapons-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/weapons.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.weapons" start time: Oct 17 19:58 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/weapons.png
+[info] Weapon impacts: contacts=3, sounds=2, failures=0, hidden=true
+[info] Shutdown: frames=240, UI frames=120, hidden frames=120, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=28.033333333333022 npc-ready=16 npc-failed=0 npc-updates=679
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Weapon smoke passed: animation-key shots, bullets consumed, knife strikes, firing while hidden, decoded fire voices submitted to SDL, unload/re-entry
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =  18.03 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.weapons" end time: Oct 17 19:59 CEST
+"gpu.weapons" time elapsed: 00:00:18
+----------------------------------------------------------
+
+93/945 Testing: gpu.movement
+93/945 Test: gpu.movement
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--movement-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/movement.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.movement" start time: Oct 17 19:59 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Movement smoke focus at frame 2: true
+[info] Movement smoke input at 45: enabled=true, focused=true, text=false, W=true, Ctrl=false
+[info] Movement smoke input at 100: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Movement: hidden distance=295.31055, jumps=1, landings=2, ground=true, forward frames=55, jump frames=10
+[info] Movement smoke input at 170: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/movement.png
+[info] Movement smoke input at 185: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Collapsed inspector: live updates=9, original keyboard crouch active
+[info] Inspector title-arrow fold/unfold: restored=true
+[info] Shutdown: frames=240, UI frames=120, hidden frames=120, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=28.033333333333022 npc-ready=16 npc-failed=0 npc-updates=679
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, unload/re-entry
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =  17.63 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.movement" end time: Oct 17 19:59 CEST
+"gpu.movement" time elapsed: 00:00:17
+----------------------------------------------------------
+
+107/945 Testing: gpu.compound_shell
+107/945 Test: gpu.compound_shell
+Command: "<workspace>/Blood2/build/debug/tests/compound_shell_tests" "gpu" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.compound_shell" start time: Oct 17 19:59 CEST
+Output:
+----------------------------------------------------------
+CityHub: 453 created / 31 sounds / 0 unsupported / 0 failed
+compound-startfences-0-visible: 1412 non-background pixels
+compound-startfences-0-absent: 0 non-background pixels
+startfences: 3 closed components / 2 shared edges / 36 triangles
+compound-startfences-0-absent: 0 non-background pixels
+compound-Buildings-0-visible: 3318 non-background pixels
+compound-Buildings-0-absent: 0 non-background pixels
+Buildings: 2 closed components / 2 shared edges / 90 triangles
+compound-Buildings-0-absent: 0 non-background pixels
+CityHub: 453 created / 31 sounds / 0 unsupported / 0 failed
+compound-startfences-1-visible: 1412 non-background pixels
+compound-startfences-1-absent: 0 non-background pixels
+startfences: 3 closed components / 2 shared edges / 36 triangles
+compound-startfences-1-absent: 0 non-background pixels
+compound-Buildings-1-visible: 3318 non-background pixels
+compound-Buildings-1-absent: 0 non-background pixels
+Buildings: 2 closed components / 2 shared edges / 90 triangles
+compound-Buildings-1-absent: 0 non-background pixels
+<end of output>
+Test time =   2.71 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.compound_shell" end time: Oct 17 19:59 CEST
+"gpu.compound_shell" time elapsed: 00:00:02
+----------------------------------------------------------
+
+126/945 Testing: gpu.containers
+126/945 Test: gpu.containers
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--world" "02_CityHub" "--containers-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/containers.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.containers" start time: Oct 17 19:59 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 1026 source objects, 487 original instances, 100 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/containers.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=27 npc-failed=0 npc-updates=27
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Container smoke passed: CityHub canal and air, MoveMgr while hidden, volume inspector, unload/re-entry
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   6.67 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.containers" end time: Oct 17 19:59 CEST
+"gpu.containers" time elapsed: 00:00:06
+----------------------------------------------------------
+
+127/945 Testing: gpu.conveyor
+127/945 Test: gpu.conveyor
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--world" "01_SubwayA" "--containers-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/conveyor.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.conveyor" start time: Oct 17 19:59 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/conveyor.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Container smoke passed: Subway conveyor current and gravity, MoveMgr while hidden, volume inspector, unload/re-entry
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   2.90 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.conveyor" end time: Oct 17 19:59 CEST
+"gpu.conveyor" time elapsed: 00:00:02
+----------------------------------------------------------
+
+136/945 Testing: gpu.doors
+136/945 Test: gpu.doors
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--doors-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/doors.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.doors" start time: Oct 17 19:59 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/doors.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[error] GPU smoke failed: selection=true, crouch/run frames=0/0, skeleton reentry/hidden=false/false, crouched/stood=false/false, locomotion/walk/run/jump=false/false/false/false, objects=228/228, strings=3/3
+<end of output>
+Test time =   2.61 sec
+----------------------------------------------------------
+Test Failed.
+"gpu.doors" end time: Oct 17 19:59 CEST
+"gpu.doors" time elapsed: 00:00:02
+----------------------------------------------------------
+
+151/945 Testing: gpu.triggers
+151/945 Test: gpu.triggers
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--triggers-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/triggers.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.triggers" start time: Oct 17 19:59 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Trigger smoke door: door3 key Key
+[info] Trigger smoke pickup:
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/triggers.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Trigger smoke passed: missing-key denial, real key pickup, consumption/unlock while hidden, door motion, inspector, reload
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   3.10 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.triggers" end time: Oct 17 19:59 CEST
+"gpu.triggers" time elapsed: 00:00:03
+----------------------------------------------------------
+
+162/945 Testing: gpu.interaction
+162/945 Test: gpu.interaction
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--interaction-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/interaction.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.interaction" start time: Oct 17 19:59 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/interaction.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=24.433333333333227 npc-ready=16 npc-failed=0 npc-updates=665
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Interaction smoke passed: SDL E press edge, USE key denial/unlock, rotation while hidden, inspection, reload
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   6.73 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.interaction" end time: Oct 17 19:59 CEST
+"gpu.interaction" time elapsed: 00:00:06
+----------------------------------------------------------
+
+171/945 Testing: gpu.brushes
+171/945 Test: gpu.brushes
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--brushes-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/brushes.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.brushes" start time: Oct 17 19:59 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/brushes.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Brush smoke passed: original ON/OFF ramps, hidden rotation/rider transport and explosive chain, dynamic box gravity/impulse, inspection, reload
+<end of output>
+Test time =   2.67 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.brushes" end time: Oct 17 19:59 CEST
+"gpu.brushes" time elapsed: 00:00:02
+----------------------------------------------------------
+
+204/945 Testing: gpu.pickups
+204/945 Test: gpu.pickups
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--pickups-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/pickups.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.pickups" start time: Oct 17 19:59 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] NPC ammunition smoke: original collection=1, bullets=100
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/pickups.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=24.433333333333227 npc-ready=16 npc-failed=0 npc-updates=665
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] PICKUPS smoke: ammo/weapon/medkit accepted with hidden UI; three original collection WAVs decoded and submitted to SDL after source removal; unload/reload checked
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   7.13 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.pickups" end time: Oct 17 19:59 CEST
+"gpu.pickups" time elapsed: 00:00:07
+----------------------------------------------------------
+
+212/945 Testing: gpu.objectives
+212/945 Test: gpu.objectives
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--objectives-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/objectives.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.objectives" start time: Oct 17 19:59 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] NEW_LEVEL committed: worlds/01_subwaya.dat -> worlds/02_cityhub.dat / start 01_egressa
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/objectives.png
+[info] NEW_LEVEL committed: worlds/01_subwaya.dat -> worlds/02_cityhub.dat / start 01_egressa
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.06666666666666667 npc-ready=27 npc-failed=0 npc-updates=27
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, source paths/progress checked before exit, CityHub creation/resource report verified
+[info] OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; authored ExitTrigger NEW_LEVEL commits CityHub with the retained player; 1026 source entries include one explicit missing-world-model omission; destination entry, cleanup, presentation and reload checked
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =  10.42 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.objectives" end time: Oct 17 20:00 CEST
+"gpu.objectives" time elapsed: 00:00:10
+----------------------------------------------------------
+
+220/945 Testing: gpu.cameras
+220/945 Test: gpu.cameras
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--cameras-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/cameras.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.cameras" start time: Oct 17 20:00 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/cameras.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] CAMERAS smoke: original camera tracks player while UI hidden; selected view, movement gate and reload checked
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   2.90 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.cameras" end time: Oct 17 20:00 CEST
+"gpu.cameras" time elapsed: 00:00:02
+----------------------------------------------------------
+
+231/945 Testing: gpu.keyframes
+231/945 Test: gpu.keyframes
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--keyframes-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/keyframes.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.keyframes" start time: Oct 17 20:00 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/keyframes.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] KEYFRAMES smoke: authored camera path and owned key lifetime checked while UI hidden and after reload; authored Gideon message recipient resolved
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   2.90 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.keyframes" end time: Oct 17 20:00 CEST
+"gpu.keyframes" time elapsed: 00:00:02
+----------------------------------------------------------
+
+241/945 Testing: gpu.lights
+241/945 Test: gpu.lights
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--lights-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/lights.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.lights" start time: Oct 17 20:00 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/lights.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden and after reload; evaluated radius/color checked; world illumination unavailable
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   2.85 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.lights" end time: Oct 17 20:00 CEST
+"gpu.lights" time elapsed: 00:00:02
+----------------------------------------------------------
+
+251/945 Testing: gpu.worldpaths
+251/945 Test: gpu.worldpaths
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--worldpaths-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/worldpaths.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.worldpaths" start time: Oct 17 20:00 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/worldpaths.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.44999999999999996 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] WORLDPATHS smoke: original SubwayA train follows keys, posed collision checked while UI hidden and after reload; angular paths and world rendering remain unavailable
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   2.85 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.worldpaths" end time: Oct 17 20:00 CEST
+"gpu.worldpaths" time elapsed: 00:00:02
+----------------------------------------------------------
+
+261/945 Testing: gpu.cinematics
+261/945 Test: gpu.cinematics
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--cinematics-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/cinematics.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.cinematics" start time: Oct 17 20:00 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/cinematics.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] CINEMATICS smoke: original cue and decoded samples submitted to SDL stream with hidden UI and reload; dry output only
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   2.89 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.cinematics" end time: Oct 17 20:00 CEST
+"gpu.cinematics" time elapsed: 00:00:02
+----------------------------------------------------------
+
+271/945 Testing: gpu.randomsound
+271/945 Test: gpu.randomsound
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--random-sounds-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/random-sounds.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.randomsound" start time: Oct 17 20:00 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/random-sounds.png
+[info] Shutdown: frames=240, UI frames=120, hidden frames=120, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=4.016666666666658 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] RANDOM SOUNDS smoke: authored emitter starts original ON, fixed-position decoded voice and SDL output verified with hidden UI and reload; dry output only
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =  13.84 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.randomsound" end time: Oct 17 20:00 CEST
+"gpu.randomsound" time elapsed: 00:00:13
+----------------------------------------------------------
+
+280/945 Testing: gpu.sound
+280/945 Test: gpu.sound
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--world-sounds-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/world-sounds.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.sound" start time: Oct 17 20:00 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/world-sounds.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] WORLD SOUNDS smoke: four authored loops survive consumed Sound objects, advance with hidden UI and reload; SDL PCM submission verified
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   3.02 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sound" end time: Oct 17 20:00 CEST
+"gpu.sound" time elapsed: 00:00:03
+----------------------------------------------------------
+
+289/945 Testing: gpu.sprites
+289/945 Test: gpu.sprites
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--sprites-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/sprites.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.sprites" start time: Oct 17 20:00 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/sprites.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] SPRITES smoke: 12 original DetailSprites, SPR manifests, frame clocks, hidden UI and unload/reload verified; 12 alpha-textured quads submitted with shared world depth
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   2.84 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sprites" end time: Oct 17 20:00 CEST
+"gpu.sprites" time elapsed: 00:00:02
+----------------------------------------------------------
+
+298/945 Testing: gpu.sceneexplosion
+298/945 Test: gpu.sceneexplosion
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--scene-explosions-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/scene-explosions.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.sceneexplosion" start time: Oct 17 20:00 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/scene-explosions.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.5266666666666667 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL audio plus original explosion models/sprites/rings/fragments/trails and evaluated point lights verified hidden and after reload; illumination/other composite FX unavailable
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   2.92 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sceneexplosion" end time: Oct 17 20:00 CEST
+"gpu.sceneexplosion" time elapsed: 00:00:02
+----------------------------------------------------------
+
+307/945 Testing: gpu.character
+307/945 Test: gpu.character
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--skeleton-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/skeleton.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.character" start time: Oct 17 20:00 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Movement smoke focus at frame 2: true
+[info] Movement smoke input at 45: enabled=true, focused=true, text=false, W=true, Ctrl=false
+[info] Movement smoke input at 100: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Corpse diagnostic: present=true, setup=true, complete=true, sounds=1, updates=9, time=900, error=
+[info] Movement: hidden distance=295.31055, jumps=1, landings=2, ground=true, forward frames=55, jump frames=10
+[info] Movement smoke input at 170: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/skeleton.png
+[info] Movement smoke input at 185: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Shutdown: frames=240, UI frames=120, hidden frames=120, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=28.033333333333022 npc-ready=16 npc-failed=0 npc-updates=679
+[info] Character motion probe: hidden=true, reentered=true, old handle invalidated=true
+[info] AI model-key probe: hidden=true, reentered=true, old handle invalidated=true
+[info] AI target probe: hidden=true, reentered=true, old handle invalidated=true
+[info] AI sight probe: hidden=true, reentered=true, old handle invalidated=true
+[info] AI state probe: hidden=true, reentered=true, old handle invalidated=true
+[info] AI weapon probe: hidden=true, reentered=true, old identity invalidated=true
+[info] AI script interpreter: hidden=true, reentered=true, old identity invalidated=true
+[info] AI navigation: state=999, phase=1, z=51, updates=32, arrivals=1, failures=0, points=0, error=
+[info] Original NPC AI_Update + hit localization: hidden=true, reentered=true, old identity invalidated=true
+[info] Corpse diagnostic: present=true, setup=true, complete=true, sounds=1, updates=9, time=900, error=
+[info] Original corpse: hidden=true, rendered=true, reentered=true, old identity invalidated=true
+[info] AI escape/beg: hidden=true, reentered=true, old identity invalidated=true
+[info] Held attachments: hidden=true, reentered=true, old identity invalidated=true
+[info] Character audio: hidden=true, reentered=true, starts=1, surface=10, submitted=730400
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, unload/re-entry
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =  18.75 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.character" end time: Oct 17 20:01 CEST
+"gpu.character" time elapsed: 00:00:18
+----------------------------------------------------------
+
+373/945 Testing: gpu.world_depth
+373/945 Test: gpu.world_depth
+Command: "<workspace>/Blood2/build/debug/tests/world_gpu_tests" "<workspace>/Blood2/build/debug/tests/world-depth.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.world_depth" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+GPU readback: depth occlusion, opposite winding, near clipping, +X/+Y orientation, camera/object transforms, resize, textured repeat/row orientation/opaque sampling and reupload pass
+<end of output>
+Test time =   0.51 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.world_depth" end time: Oct 17 20:01 CEST
+"gpu.world_depth" time elapsed: 00:00:00
+----------------------------------------------------------
+
+374/945 Testing: gpu.viewport
+374/945 Test: gpu.viewport
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--viewport-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/viewport.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.viewport" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Authored Gideon intro initial: updates=332, pings=13, probes=23, state=24, selections=2, script updates=293, command=PASSIVE, failures=0
+[info] Movement smoke focus at frame 2: true
+[info] Movement smoke input at 45: enabled=true, focused=true, text=false, W=true, Ctrl=false
+[info] Movement smoke input at 100: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Movement: hidden distance=295.31055, jumps=1, landings=2, ground=true, forward frames=55, jump frames=10
+[info] Movement smoke input at 170: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Captured view weapon: clip=static_model, time=1ms, state=0
+[info] World viewport readback: 641877 / 680000 non-background pixels (UI excluded)
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/viewport.png
+[info] Movement smoke input at 185: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Authored Gideon intro reload: updates=332, pings=13, probes=23, state=24, selections=2, script updates=293, command=PASSIVE, failures=0
+[info] Shutdown: frames=240, UI frames=120, hidden frames=120, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=28.033333333333022 npc-ready=16 npc-failed=0 npc-updates=679
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] World viewport: hidden=true, unloaded=true, reloaded=true, uploads=2, frames=230, triangles=7441, draws=111, depth=1000x680
+[info] Model viewport: frames=230, world hidden=true, weapon hidden=true, instances=26, close=1, vertices=40086
+[info] World textures: decoded=52, rejected=0, RGBA bytes=1962244, prepared batches=1554
+[info] World alpha: prepared=31, submitted=31, passes=230
+[info] World Pan: 60 authored effects, 208 opaque / 0 alpha submitted batches, session clock 12.333333333332662
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, unload/re-entry
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =  17.68 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.viewport" end time: Oct 17 20:01 CEST
+"gpu.viewport" time elapsed: 00:00:17
+----------------------------------------------------------
+
+388/945 Testing: gpu.model_depth
+388/945 Test: gpu.model_depth
+Command: "<workspace>/Blood2/build/debug/tests/model_gpu_tests" "<workspace>/Blood2/build/debug/tests/model-depth.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.model_depth" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+<end of output>
+Test time =   0.50 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.model_depth" end time: Oct 17 20:01 CEST
+"gpu.model_depth" time elapsed: 00:00:00
+----------------------------------------------------------
+
+389/945 Testing: gpu.model_private
+389/945 Test: gpu.model_private
+Command: "<workspace>/Blood2/build/debug/tests/model_gpu_tests" "<workspace>/Blood2/build/debug/tests/model-private.png" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.model_private" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+Restored original player/client association before private GPU rendering
+Private isolated Caleb/held Beretta diagnostic: 8271 non-background pixels, 40479 vertices
+Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+<end of output>
+Test time =   1.05 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.model_private" end time: Oct 17 20:01 CEST
+"gpu.model_private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+390/945 Testing: gpu.model_builtin_city
+390/945 Test: gpu.model_builtin_city
+Command: "<workspace>/Blood2/build/debug/tests/model_gpu_tests" "<workspace>/Blood2/build/debug/tests/model-city" "<external-data-root>" "builtin_city"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.model_builtin_city" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+CityHub Model lightbulb1.abc cycle 0: 243 textured pixels, no fallback; hidden/restored checked
+CityHub Model redlight.abc cycle 0: 8158 textured pixels, no fallback; hidden/restored checked
+CityHub Model lightbulb1.abc cycle 1: 243 textured pixels, no fallback; hidden/restored checked
+CityHub Model redlight.abc cycle 1: 8158 textured pixels, no fallback; hidden/restored checked
+Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+<end of output>
+Test time =   2.34 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.model_builtin_city" end time: Oct 17 20:01 CEST
+"gpu.model_builtin_city" time elapsed: 00:00:02
+----------------------------------------------------------
+
+596/945 Testing: gpu.player_restore
+596/945 Test: gpu.player_restore
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--restore-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/player-restore.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.player_restore" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/player-restore.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   3.43 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.player_restore" end time: Oct 17 20:01 CEST
+"gpu.player_restore" time elapsed: 00:00:03
+----------------------------------------------------------
+
+601/945 Testing: gpu.player_keepalive
+601/945 Test: gpu.player_keepalive
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--keepalive-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/player-keepalive.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.player_keepalive" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/player-keepalive.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=27 npc-failed=0 npc-updates=27
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   7.39 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.player_keepalive" end time: Oct 17 20:01 CEST
+"gpu.player_keepalive" time elapsed: 00:00:07
+----------------------------------------------------------
+
+605/945 Testing: gpu.sprite_alpha
+605/945 Test: gpu.sprite_alpha
+Command: "<workspace>/Blood2/build/debug/tests/sprite_gpu_tests" "<workspace>/Blood2/build/debug/tests/sprite-alpha"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.sprite_alpha" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Pixels: zero/partial/opaque/opaque-black DTX alpha, per-instance opacity, overlap sort, world occlusion, no depth writes, resize and reupload passed
+<end of output>
+Test time =   0.51 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sprite_alpha" end time: Oct 17 20:01 CEST
+"gpu.sprite_alpha" time elapsed: 00:00:00
+----------------------------------------------------------
+
+606/945 Testing: gpu.sprite_private
+606/945 Test: gpu.sprite_private
+Command: "<workspace>/Blood2/build/debug/tests/sprite_gpu_tests" "<workspace>/Blood2/build/debug/tests/sprite-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.sprite_private" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Pixels: zero/partial/opaque/opaque-black DTX alpha, per-instance opacity, overlap sort, world occlusion, no depth writes, resize and reupload passed
+Private authored sprite pose/scale: 1556 non-background pixels, 118444 clear; unload emptied CPU/GPU geometry
+<end of output>
+Test time =   1.02 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sprite_private" end time: Oct 17 20:01 CEST
+"gpu.sprite_private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+616/945 Testing: gpu.explosion_model_alpha
+616/945 Test: gpu.explosion_model_alpha
+Command: "<workspace>/Blood2/build/debug/tests/explosion_model_gpu_tests" "<workspace>/Blood2/build/debug/tests/explosion-model-alpha"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.explosion_model_alpha" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Original model opacity: 1510 covered pixels, half-opacity linear blend verified
+<end of output>
+Test time =   0.40 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_model_alpha" end time: Oct 17 20:01 CEST
+"gpu.explosion_model_alpha" time elapsed: 00:00:00
+----------------------------------------------------------
+
+617/945 Testing: gpu.explosion_model_private
+617/945 Test: gpu.explosion_model_private
+Command: "<workspace>/Blood2/build/debug/tests/explosion_model_gpu_tests" "<workspace>/Blood2/build/debug/tests/explosion-model-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.explosion_model_private" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Original model opacity: 1510 covered pixels, half-opacity linear blend verified
+Original exp_sphere/Explosion_1: 168 triangles, 2323 pixels, alpha 0.375
+<end of output>
+Test time =   0.50 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_model_private" end time: Oct 17 20:01 CEST
+"gpu.explosion_model_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+629/945 Testing: gpu.explosion_ring_alpha
+629/945 Test: gpu.explosion_ring_alpha
+Command: "<workspace>/Blood2/build/debug/tests/explosion_ring_gpu_tests" "<workspace>/Blood2/build/debug/tests/explosion-ring-alpha"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.explosion_ring_alpha" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Original ring: 4800 pixels, tint and half-alpha linear blend verified
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_ring_alpha" end time: Oct 17 20:01 CEST
+"gpu.explosion_ring_alpha" time elapsed: 00:00:00
+----------------------------------------------------------
+
+630/945 Testing: gpu.explosion_ring_private
+630/945 Test: gpu.explosion_ring_private
+Command: "<workspace>/Blood2/build/debug/tests/explosion_ring_gpu_tests" "<workspace>/Blood2/build/debug/tests/explosion-ring-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.explosion_ring_private" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Original ring: 4800 pixels, tint and half-alpha linear blend verified
+Original Firepart64/Smoke32 particles: 96 quads, 4573 pixels
+Three original Smoke32 textures after delay: 96 visible quads, 3087 pixels
+<end of output>
+Test time =   0.50 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_ring_private" end time: Oct 17 20:01 CEST
+"gpu.explosion_ring_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+637/945 Testing: gpu.explosion_fragment_alpha
+637/945 Test: gpu.explosion_fragment_alpha
+Command: "<workspace>/Blood2/build/debug/tests/explosion_fragment_gpu_tests" "<workspace>/Blood2/build/debug/tests/explosion-fragment-alpha"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.explosion_fragment_alpha" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Original fragment after collision/rest: 1510 pixels, half-opacity blend verified
+<end of output>
+Test time =   0.42 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_fragment_alpha" end time: Oct 17 20:01 CEST
+"gpu.explosion_fragment_alpha" time elapsed: 00:00:00
+----------------------------------------------------------
+
+638/945 Testing: gpu.explosion_fragment_private
+638/945 Test: gpu.explosion_fragment_private
+Command: "<workspace>/Blood2/build/debug/tests/explosion_fragment_gpu_tests" "<workspace>/Blood2/build/debug/tests/explosion-fragment-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.explosion_fragment_private" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Original fragment after collision/rest: 1510 pixels, half-opacity blend verified
+Original gibmetal2/gibmetal3: 12 triangles, 6830 pixels
+<end of output>
+Test time =   0.49 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_fragment_private" end time: Oct 17 20:01 CEST
+"gpu.explosion_fragment_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+644/945 Testing: gpu.object_particle_tint
+644/945 Test: gpu.object_particle_tint
+Command: "<workspace>/Blood2/build/debug/tests/object_particle_gpu_tests" "<workspace>/Blood2/build/debug/tests/object-particle-tint"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.object_particle_tint" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Original smoke stream: 2914 covered pixels, 992 opaque tint checks; authored alpha remains unused
+<end of output>
+Test time =   0.40 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.object_particle_tint" end time: Oct 17 20:01 CEST
+"gpu.object_particle_tint" time elapsed: 00:00:00
+----------------------------------------------------------
+
+645/945 Testing: gpu.object_particle_private
+645/945 Test: gpu.object_particle_private
+Command: "<workspace>/Blood2/build/debug/tests/object_particle_gpu_tests" "<workspace>/Blood2/build/debug/tests/object-particle-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.object_particle_private" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Original smoke stream: 2914 covered pixels, 992 opaque tint checks; authored alpha remains unused
+Original smoke64_2: five stream quads, 7090 covered pixels, 2769 partial-alpha texels
+<end of output>
+Test time =   0.51 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.object_particle_private" end time: Oct 17 20:01 CEST
+"gpu.object_particle_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+651/945 Testing: gpu.explosion_flame_alpha
+651/945 Test: gpu.explosion_flame_alpha
+Command: "<workspace>/Blood2/build/debug/tests/explosion_flame_gpu_tests" "<workspace>/Blood2/build/debug/tests/explosion-flame-alpha"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.explosion_flame_alpha" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Flame RGB and system alpha: 3875 exact opaque-texel blend checks
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_flame_alpha" end time: Oct 17 20:01 CEST
+"gpu.explosion_flame_alpha" time elapsed: 00:00:00
+----------------------------------------------------------
+
+652/945 Testing: gpu.explosion_flame_private
+652/945 Test: gpu.explosion_flame_private
+Command: "<workspace>/Blood2/build/debug/tests/explosion_flame_gpu_tests" "<workspace>/Blood2/build/debug/tests/explosion-flame-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.explosion_flame_private" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Flame RGB and system alpha: 3875 exact opaque-texel blend checks
+Private diagnostic Tesla GPU cycle 0: 20592 covered pixels, 2000 partial-alpha texels
+Private diagnostic Tesla GPU cycle 1: 20592 covered pixels, 2000 partial-alpha texels
+<end of output>
+Test time =   1.53 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_flame_private" end time: Oct 17 20:01 CEST
+"gpu.explosion_flame_private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+673/945 Testing: gpu.weapon_sprite_alpha
+673/945 Test: gpu.weapon_sprite_alpha
+Command: "<workspace>/Blood2/build/debug/tests/weapon_sprite_gpu_tests" "<workspace>/Blood2/build/debug/tests/weapon-sprite-alpha"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.weapon_sprite_alpha" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Smoke RGB / original fade: 10000 exact opaque-texel blend checks
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.weapon_sprite_alpha" end time: Oct 17 20:01 CEST
+"gpu.weapon_sprite_alpha" time elapsed: 00:00:00
+----------------------------------------------------------
+
+674/945 Testing: gpu.weapon_sprite_private
+674/945 Test: gpu.weapon_sprite_private
+Command: "<workspace>/Blood2/build/debug/tests/weapon_sprite_gpu_tests" "<workspace>/Blood2/build/debug/tests/weapon-sprite-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.weapon_sprite_private" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Smoke RGB / original fade: 10000 exact opaque-texel blend checks
+Private cycle 0 flash SpriteTextures\impact64_1.dtx changed pixels 1282
+Private cycle 0 smoke SpriteTextures\smoke64_2.dtx changed pixels 3607
+Private cycle 1 flash SpriteTextures\impact64_1.dtx changed pixels 1282
+Private cycle 1 smoke SpriteTextures\smoke64_1.dtx changed pixels 3607
+Private cycle 2 flash SpriteTextures\impact64_1.dtx changed pixels 1282
+Private cycle 2 smoke SpriteTextures\smoke64_3.dtx changed pixels 3583
+<end of output>
+Test time =   2.02 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.weapon_sprite_private" end time: Oct 17 20:01 CEST
+"gpu.weapon_sprite_private" time elapsed: 00:00:02
+----------------------------------------------------------
+
+682/945 Testing: gpu.mouse_combat
+682/945 Test: gpu.mouse_combat
+Command: "<workspace>/Blood2/build/debug/tests/player_controls_tests" "gpu_combat" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.mouse_combat" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2192.09
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=8, ammo=42, independent corpse verified, native=1
+Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=0
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2192.09
+Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=13, ammo=37, independent corpse verified, native=1
+Dodge updates=12, corpse candidates=23, zero-margin search=1, swept source clearance=0
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+<end of output>
+Test time =  12.03 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.mouse_combat" end time: Oct 17 20:01 CEST
+"gpu.mouse_combat" time elapsed: 00:00:12
+----------------------------------------------------------
+
+683/945 Testing: gpu.corpse_clearance
+683/945 Test: gpu.corpse_clearance
+Command: "<workspace>/Blood2/build/debug/tests/player_controls_tests" "gpu_clearance" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.corpse_clearance" start time: Oct 17 20:01 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2338.28
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+Post-kill position=-32,170.001,-1854.18 camera=0 yaw=0
+Walked past killed Cultist to z=-1854.18
+Approached encounter at z=-1742.25
+Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+Post-kill position=-32,170.001,-1340.93 camera=0 yaw=-3.72529e-09
+Walked past killed Cultist to z=-1340.93
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2341.42
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+Approached encounter at z=-1745.4
+Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+Post-kill position=-32,170.001,-1344.07 camera=0 yaw=3.72529e-09
+Walked past killed Cultist to z=-1344.07
+<end of output>
+Test time =  14.85 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.corpse_clearance" end time: Oct 17 20:02 CEST
+"gpu.corpse_clearance" time elapsed: 00:00:14
+----------------------------------------------------------
+
+684/945 Testing: gpu.player_controls
+684/945 Test: gpu.player_controls
+Command: "<workspace>/Blood2/build/debug/tests/player_controls_tests" "gpu" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.player_controls" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Original FIRE_KEY: shots=17 ammo=33 voices=17 mouse=1
+<end of output>
+Test time =   4.75 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.player_controls" end time: Oct 17 20:02 CEST
+"gpu.player_controls" time elapsed: 00:00:04
+----------------------------------------------------------
+
+687/945 Testing: gpu.entry_wait
+687/945 Test: gpu.entry_wait
+Command: "/usr/bin/cmake" "-DAPP=<workspace>/Blood2/build/debug/blood2" "-DCONFIG=<workspace>/Blood2/build/debug/tests/empty.ini" "-DDATA_DIR=<external-data-root>" "-DCAPTURE=<workspace>/Blood2/build/debug/tests/entry-wait.png" "-P" "<workspace>/Blood2/tests/entry_wait_test.cmake"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.entry_wait" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/entry-wait.png
+[info] Shutdown: frames=12, UI frames=12, hidden frames=0, toggles=0, resize=false, quit=false
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=12 time=0 npc-ready=16 npc-failed=0 npc-updates=0
+
+<end of output>
+Test time =   1.67 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.entry_wait" end time: Oct 17 20:02 CEST
+"gpu.entry_wait" time elapsed: 00:00:01
+----------------------------------------------------------
+
+688/945 Testing: gpu.world_alpha
+688/945 Test: gpu.world_alpha
+Command: "<workspace>/Blood2/build/debug/tests/world_alpha_gpu_tests" "<workspace>/Blood2/build/debug/tests/world-alpha"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.world_alpha" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+GPU world alpha: zero/partial/full/black texels, far-to-near faces, opaque model occlusion, no depth writes, resize/reupload pass
+<end of output>
+Test time =   0.48 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.world_alpha" end time: Oct 17 20:02 CEST
+"gpu.world_alpha" time elapsed: 00:00:00
+----------------------------------------------------------
+
+689/945 Testing: gpu.world_alpha_private
+689/945 Test: gpu.world_alpha_private
+Command: "<workspace>/Blood2/build/debug/tests/world_alpha_gpu_tests" "<workspace>/Blood2/build/debug/tests/world-alpha-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.world_alpha_private" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+GPU world alpha: zero/partial/full/black texels, far-to-near faces, opaque model occlusion, no depth writes, resize/reupload pass
+glass channel 0 expected=31 actual=31
+glass channel 1 expected=33 actual=33
+glass channel 2 expected=36 actual=36
+Private glass12: changed=11200 pink=0 submitted=1
+glass channel 0 expected=31 actual=31
+glass channel 1 expected=33 actual=33
+glass channel 2 expected=36 actual=36
+Private glass12: changed=11200 pink=0 submitted=1
+<end of output>
+Test time =   1.85 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.world_alpha_private" end time: Oct 17 20:02 CEST
+"gpu.world_alpha_private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+696/945 Testing: gpu.naga_alpha
+696/945 Test: gpu.naga_alpha
+Command: "<workspace>/Blood2/build/debug/tests/naga_gpu_tests" "<workspace>/Blood2/build/debug/tests/naga-gpu"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.naga_alpha" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Whole model pixels 1040; selected face 1040; mismatched channels 0
+Synthetic red beam: 1 triangles, 1040 pixels, source alpha .5 -> .25 verified
+<end of output>
+Test time =   0.47 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.naga_alpha" end time: Oct 17 20:02 CEST
+"gpu.naga_alpha" time elapsed: 00:00:00
+----------------------------------------------------------
+
+697/945 Testing: gpu.naga_private
+697/945 Test: gpu.naga_private
+Command: "<workspace>/Blood2/build/debug/tests/naga_gpu_tests" "<workspace>/Blood2/build/debug/tests/naga-private-gpu" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.naga_private" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Whole model pixels 80074; selected face 5588; mismatched channels 0
+Private red beam: 40 triangles, 5588 pixels, source alpha .5 -> .25 verified
+<end of output>
+Test time =   0.54 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.naga_private" end time: Oct 17 20:02 CEST
+"gpu.naga_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+705/945 Testing: gpu.energy
+705/945 Test: gpu.energy
+Command: "<workspace>/Blood2/build/debug/tests/energy_gpu_tests" "<workspace>/Blood2/build/debug/tests/energy-gpu"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.energy" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Stage 0: scale 0, z 20, changed pixels 0
+Stage 1: scale 0.25, z 20, changed pixels 96
+Stage 2: scale 0.25, z 30, changed pixels 48
+<end of output>
+Test time =   0.42 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.energy" end time: Oct 17 20:02 CEST
+"gpu.energy" time elapsed: 00:00:00
+----------------------------------------------------------
+
+706/945 Testing: gpu.energy_private
+706/945 Test: gpu.energy_private
+Command: "<workspace>/Blood2/build/debug/tests/energy_gpu_tests" "<workspace>/Blood2/build/debug/tests/energy-private-gpu" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.energy_private" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Stage 0: scale 0, z 20, changed pixels 0
+Stage 1: scale 0.25, z 20, changed pixels 8400
+Stage 2: scale 0.25, z 30, changed pixels 3736
+<end of output>
+Test time =   0.52 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.energy_private" end time: Oct 17 20:02 CEST
+"gpu.energy_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+713/945 Testing: gpu.wind
+713/945 Test: gpu.wind
+Command: "<workspace>/Blood2/build/debug/tests/wind_gpu_tests" "<workspace>/Blood2/build/debug/tests/wind-gpu"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.wind" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Original shockwave scale850 alpha.375: 1 triangles, 11665 changed pixels
+<end of output>
+Test time =   0.43 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.wind" end time: Oct 17 20:02 CEST
+"gpu.wind" time elapsed: 00:00:00
+----------------------------------------------------------
+
+714/945 Testing: gpu.wind_private
+714/945 Test: gpu.wind_private
+Command: "<workspace>/Blood2/build/debug/tests/wind_gpu_tests" "<workspace>/Blood2/build/debug/tests/wind-private-gpu" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.wind_private" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Original shockwave scale850 alpha.375: 168 triangles, 2330 changed pixels
+<end of output>
+Test time =   1.03 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.wind_private" end time: Oct 17 20:02 CEST
+"gpu.wind_private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+722/945 Testing: gpu.shield
+722/945 Test: gpu.shield
+Command: "<workspace>/Blood2/build/debug/tests/shield_gpu_tests" "<workspace>/Blood2/build/debug/tests/shield-gpu"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.shield" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Synthetic shield/powerup: 42 textured quads, 1471 changed pixels; repeated readback identical, clocks unchanged.
+<end of output>
+Test time =   0.43 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.shield" end time: Oct 17 20:02 CEST
+"gpu.shield" time elapsed: 00:00:00
+----------------------------------------------------------
+
+723/945 Testing: gpu.shield_private
+723/945 Test: gpu.shield_private
+Command: "<workspace>/Blood2/build/debug/tests/shield_gpu_tests" "<workspace>/Blood2/build/debug/tests/shield-private-gpu" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.shield_private" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Original external shield/powerup: 42 textured quads, 1367 changed pixels; repeated readback identical, clocks unchanged.
+<end of output>
+Test time =   0.53 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.shield_private" end time: Oct 17 20:02 CEST
+"gpu.shield_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+740/945 Testing: gpu.gideon_teleport
+740/945 Test: gpu.gideon_teleport
+Command: "<workspace>/Blood2/build/debug/tests/gideon_teleport_gpu_tests" "<workspace>/Blood2/build/debug/tests/gideon-teleport-gpu"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.gideon_teleport" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Synthetic triangle: 1261 visible pixels; original 16-step fade reaches empty frame; reappearance exact; repeated reads do not advance clocks. Dodge motion integrates once and finishes at one second.
+<end of output>
+Test time =   0.44 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.gideon_teleport" end time: Oct 17 20:02 CEST
+"gpu.gideon_teleport" time elapsed: 00:00:00
+----------------------------------------------------------
+
+741/945 Testing: gpu.gideon_teleport_private
+741/945 Test: gpu.gideon_teleport_private
+Command: "<workspace>/Blood2/build/debug/tests/gideon_teleport_gpu_tests" "<workspace>/Blood2/build/debug/tests/gideon-teleport-private-gpu" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.gideon_teleport_private" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Production Gideon: real initialization, scheduled AI_Update, no-audience health, read-only GPU and deferred removal verified.
+External Gideon: 286 visible pixels; original 16-step fade reaches empty frame; reappearance exact; repeated reads do not advance clocks. Dodge motion integrates once and finishes at one second.
+<end of output>
+Test time =   0.59 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.gideon_teleport_private" end time: Oct 17 20:02 CEST
+"gpu.gideon_teleport_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+768/945 Testing: gpu.destructable_models
+768/945 Test: gpu.destructable_models
+Command: "<workspace>/Blood2/build/debug/tests/model_gpu_tests" "<workspace>/Blood2/build/debug/tests/destructable-model-city" "<external-data-root>" "destructable_city"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.destructable_models" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+CityHub Model garbagecan2.abc cycle 0: 5726 textured pixels, no fallback; hidden/restored checked
+CityHub Model barrel.abc cycle 0: 7052 textured pixels, no fallback; hidden/restored checked
+CityHub Model ceilingfan2.abc cycle 0: 879 textured pixels, no fallback; hidden/restored checked
+CityHub Model garbagecan2.abc cycle 1: 5726 textured pixels, no fallback; hidden/restored checked
+CityHub Model barrel.abc cycle 1: 7052 textured pixels, no fallback; hidden/restored checked
+CityHub Model ceilingfan2.abc cycle 1: 879 textured pixels, no fallback; hidden/restored checked
+Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+<end of output>
+Test time =   2.36 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.destructable_models" end time: Oct 17 20:02 CEST
+"gpu.destructable_models" time elapsed: 00:00:02
+----------------------------------------------------------
+
+789/945 Testing: gpu.mac10
+789/945 Test: gpu.mac10
+Command: "<workspace>/Blood2/build/debug/tests/mac10_gpu_tests" "<external-data-root>" "<workspace>/Blood2/build/debug/tests/mac10-"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.mac10" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Mac10 right primary shots=23 keys=23 HP=100 dead=0 state=5
+Mac10 right alternate shots=7 keys=7 HP=100 dead=0 state=8
+Mac10 left primary shots=23 keys=23 HP=100 dead=0 state=5
+Mac10 left alternate shots=23 keys=23 HP=100 dead=0 state=8
+Mac10 GPU cycle=0 left pixels=25818 right pixels=25776
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Mac10 right primary shots=23 keys=23 HP=100 dead=0 state=5
+Mac10 right alternate shots=7 keys=7 HP=100 dead=0 state=8
+Mac10 left primary shots=23 keys=23 HP=100 dead=0 state=5
+Mac10 left alternate shots=23 keys=23 HP=100 dead=0 state=8
+Mac10 GPU cycle=1 left pixels=25818 right pixels=25776
+<end of output>
+Test time =  13.67 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.mac10" end time: Oct 17 20:02 CEST
+"gpu.mac10" time elapsed: 00:00:13
+----------------------------------------------------------
+
+799/945 Testing: gpu.flare
+799/945 Test: gpu.flare
+Command: "<workspace>/Blood2/build/debug/tests/flare_gpu_tests" "<workspace>/Blood2/build/debug/tests/flare-gpu"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.flare" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Stage 0: scale 0, z 20, red pixels 0, changed pixels 0
+Stage 1: scale 0.25, z 20, red pixels 128, changed pixels 384
+Stage 2: scale 0.25, z 30, red pixels 50, changed pixels 160
+<end of output>
+Test time =   0.48 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.flare" end time: Oct 17 20:02 CEST
+"gpu.flare" time elapsed: 00:00:00
+----------------------------------------------------------
+
+800/945 Testing: gpu.flare_private
+800/945 Test: gpu.flare_private
+Command: "<workspace>/Blood2/build/debug/tests/flare_gpu_tests" "<workspace>/Blood2/build/debug/tests/flare-private-gpu" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.flare_private" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Stage 0: scale 0, z 20, red pixels 0, changed pixels 0
+Stage 1: scale 0.25, z 20, red pixels 39232, changed pixels 39232
+Stage 2: scale 0.25, z 30, red pixels 17492, changed pixels 17492
+<end of output>
+Test time =   0.51 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.flare_private" end time: Oct 17 20:02 CEST
+"gpu.flare_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+801/945 Testing: gpu.flare_views_private
+801/945 Test: gpu.flare_views_private
+Command: "<workspace>/Blood2/build/debug/tests/flare_view_gpu_tests" "<external-data-root>" "<workspace>/Blood2/build/debug/tests/flare-views-"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.flare_views_private" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Flare GPU cycle=0 left pixels=16191 right pixels=16196
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Flare GPU cycle=1 left pixels=16191 right pixels=16196
+<end of output>
+Test time =   6.02 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.flare_views_private" end time: Oct 17 20:02 CEST
+"gpu.flare_views_private" time elapsed: 00:00:06
+----------------------------------------------------------
+
+809/945 Testing: gpu.world_debris
+809/945 Test: gpu.world_debris
+Command: "<workspace>/Blood2/build/debug/tests/world_debris_gpu_tests" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.world_debris" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+world-debris-0-hidden: 0 non-background pixels
+world-debris-0-started: 4008 non-background pixels
+world-debris-0-moved: 4008 non-background pixels
+world-debris-0-removed: 0 non-background pixels
+world-debris-1-hidden: 0 non-background pixels
+world-debris-1-started: 4008 non-background pixels
+world-debris-1-moved: 4008 non-background pixels
+world-debris-1-removed: 0 non-background pixels
+<end of output>
+Test time =   7.85 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.world_debris" end time: Oct 17 20:02 CEST
+"gpu.world_debris" time elapsed: 00:00:07
+----------------------------------------------------------
+
+824/945 Testing: gpu.assault_private
+824/945 Test: gpu.assault_private
+Command: "<workspace>/Blood2/build/debug/tests/assault_gpu_tests" "<external-data-root>" "<workspace>/Blood2/build/debug/tests/assault-"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.assault_private" start time: Oct 17 20:02 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+M16 GPU cycle=0 left pixels=0 right pixels=30030
+Grenade GPU cycle=0 pixels=5936
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+M16 GPU cycle=1 left pixels=0 right pixels=30030
+Grenade GPU cycle=1 pixels=5936
+<end of output>
+Test time =   6.22 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.assault_private" end time: Oct 17 20:03 CEST
+"gpu.assault_private" time elapsed: 00:00:06
+----------------------------------------------------------
+
+833/945 Testing: gpu.conversation_private
+833/945 Test: gpu.conversation_private
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--world" "02_cityhub" "--cinematics-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/conversations.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.conversation_private" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 1026 source objects, 487 original instances, 100 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/conversations.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.9166666666666671 npc-ready=27 npc-failed=0 npc-updates=27
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] CINEMATICS smoke: original cue and decoded samples submitted to SDL stream with hidden UI and reload; dry output only
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   6.87 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.conversation_private" end time: Oct 17 20:03 CEST
+"gpu.conversation_private" time elapsed: 00:00:06
+----------------------------------------------------------
+
+845/945 Testing: gpu.surface_effect
+845/945 Test: gpu.surface_effect
+Command: "<workspace>/Blood2/build/debug/tests/surface_effect_gpu_tests" "<workspace>/Blood2/build/debug/tests/surface-effect"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.surface_effect" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+Pan GPU: independent static/animated shared material, opaque/alpha axes, clock repeat/reset/wrap, invalid draws, resize/reload pass
+<end of output>
+Test time =   0.44 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.surface_effect" end time: Oct 17 20:03 CEST
+"gpu.surface_effect" time elapsed: 00:00:00
+----------------------------------------------------------
+
+846/945 Testing: gpu.surface_effect_private
+846/945 Test: gpu.surface_effect_private
+Command: "<workspace>/Blood2/build/debug/tests/surface_effect_gpu_tests" "<workspace>/Blood2/build/debug/tests/surface-effect-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.surface_effect_private" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+SubwayA intro: 113808 pixels changed by 1/64s Pan advance with identical geometry/camera; reset exact, no extra upload
+SubwayA intro: 113808 pixels changed by 1/64s Pan advance with identical geometry/camera; reset exact, no extra upload
+Pan GPU: independent static/animated shared material, opaque/alpha axes, clock repeat/reset/wrap, invalid draws, resize/reload pass
+<end of output>
+Test time =   2.30 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.surface_effect_private" end time: Oct 17 20:03 CEST
+"gpu.surface_effect_private" time elapsed: 00:00:02
+----------------------------------------------------------
+
+848/945 Testing: gpu.level_change
+848/945 Test: gpu.level_change
+Command: "<workspace>/Blood2/build/debug/tests/level_change_gpu_tests" "<external-data-root>" "<workspace>/Blood2/build/debug/tests/level-change"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.level_change" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+Destination: CityHub /
+Cycle 0: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+World SPR sprites/motelhell.spr: 11 frames / 15 fps
+Destination: SubwayA /
+Cycle 1: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+Destination: CityHub /
+Cycle 2: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+World SPR sprites/motelhell.spr: 11 frames / 15 fps
+Destination: SubwayA /
+Cycle 3: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+<end of output>
+Test time =   7.00 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.level_change" end time: Oct 17 20:03 CEST
+"gpu.level_change" time elapsed: 00:00:06
+----------------------------------------------------------
+
+856/945 Testing: gpu.particle_stream_alpha
+856/945 Test: gpu.particle_stream_alpha
+Command: "<workspace>/Blood2/build/debug/tests/particle_stream_gpu_tests" "<workspace>/Blood2/build/debug/tests/particle-stream-alpha"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.particle_stream_alpha" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+Stream tint/alpha: 256 checked pixels
+<end of output>
+Test time =   0.42 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.particle_stream_alpha" end time: Oct 17 20:03 CEST
+"gpu.particle_stream_alpha" time elapsed: 00:00:00
+----------------------------------------------------------
+
+857/945 Testing: gpu.particle_stream_private
+857/945 Test: gpu.particle_stream_private
+Command: "<workspace>/Blood2/build/debug/tests/particle_stream_gpu_tests" "<workspace>/Blood2/build/debug/tests/particle-stream-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.particle_stream_private" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+Stream tint/alpha: 256 checked pixels
+CityHub stream GPU cycle 0: 60 actual particle quads, 11151 covered pixels
+CityHub stream GPU cycle 1: 67 actual particle quads, 10967 covered pixels
+<end of output>
+Test time =   8.19 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.particle_stream_private" end time: Oct 17 20:03 CEST
+"gpu.particle_stream_private" time elapsed: 00:00:08
+----------------------------------------------------------
+
+863/945 Testing: gpu.sky
+863/945 Test: gpu.sky
+Command: "<workspace>/Blood2/build/debug/tests/sky_gpu_tests" "<workspace>/Blood2/build/debug/tests/sky-gpu"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.sky" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+Sky GPU: index order, alpha, .01 near plane, no depth reads/writes, portal omission, resize/reload passed
+<end of output>
+Test time =   0.46 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sky" end time: Oct 17 20:03 CEST
+"gpu.sky" time elapsed: 00:00:00
+----------------------------------------------------------
+
+864/945 Testing: gpu.sky_private
+864/945 Test: gpu.sky_private
+Command: "<workspace>/Blood2/build/debug/tests/sky_gpu_tests" "<workspace>/Blood2/build/debug/tests/sky-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.sky_private" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+Sky GPU: index order, alpha, .01 near plane, no depth reads/writes, portal omission, resize/reload passed
+City sky cycle=0 view=0 submitted=23 covered=205545
+City sky cycle=0 view=1 submitted=23 covered=205305
+City sky cycle=0 view=2 submitted=23 covered=297567
+City sky cycle=1 view=0 submitted=23 covered=205545
+City sky cycle=1 view=1 submitted=23 covered=205305
+City sky cycle=1 view=2 submitted=23 covered=297567
+<end of output>
+Test time =   3.51 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sky_private" end time: Oct 17 20:03 CEST
+"gpu.sky_private" time elapsed: 00:00:03
+----------------------------------------------------------
+
+865/945 Testing: gpu.sky_app
+865/945 Test: gpu.sky_app
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--view-world" "--world" "02_cityhub" "--no-inspector" "--frames" "20" "--capture" "<workspace>/Blood2/build/debug/tests/sky-app.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.sky_app" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 1026 source objects, 487 original instances, 100 BSP models
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/sky-app.png
+[info] Shutdown: frames=20, UI frames=0, hidden frames=20, toggles=0, resize=false, quit=false
+[info] Interactive clock: limited frames=15, discarded wall seconds=2.8702621689999996
+[info] Session playback: waiting=0 time=1.5916863860000003 npc-ready=27 npc-failed=0 npc-updates=34
+<end of output>
+Test time =   7.91 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sky_app" end time: Oct 17 20:03 CEST
+"gpu.sky_app" time elapsed: 00:00:07
+----------------------------------------------------------
+
+876/945 Testing: gpu.proximity_private
+876/945 Test: gpu.proximity_private
+Command: "<workspace>/Blood2/build/debug/tests/proximity_gpu_tests" "<external-data-root>" "<workspace>/Blood2/build/debug/tests/proximity-"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.proximity_private" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Proximity view GPU cycle=0 left pixels=499 right pixels=11965
+Proximity world GPU cycle=0 pixels=8976
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Proximity view GPU cycle=1 left pixels=499 right pixels=11965
+Proximity world GPU cycle=1 pixels=8976
+<end of output>
+Test time =   6.13 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.proximity_private" end time: Oct 17 20:03 CEST
+"gpu.proximity_private" time elapsed: 00:00:06
+----------------------------------------------------------
+
+887/945 Testing: gpu.remote_private
+887/945 Test: gpu.remote_private
+Command: "<workspace>/Blood2/build/debug/tests/remote_gpu_tests" "<external-data-root>" "<workspace>/Blood2/build/debug/tests/remote-"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.remote_private" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Remote view GPU cycle=0 left pixels=499 right pixels=11965
+Remote world GPU cycle=0 pixels=8976
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Remote view GPU cycle=1 left pixels=499 right pixels=11965
+Remote world GPU cycle=1 pixels=8976
+<end of output>
+Test time =   6.22 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.remote_private" end time: Oct 17 20:03 CEST
+"gpu.remote_private" time elapsed: 00:00:06
+----------------------------------------------------------
+
+897/945 Testing: gpu.flashlight
+897/945 Test: gpu.flashlight
+Command: "<workspace>/Blood2/build/debug/tests/flashlight_gpu_tests" "<workspace>/Blood2/build/debug/tests/flashlight"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.flashlight" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+GPU=NVIDIA GeForce RTX 3060 Laptop GPU backend=vulkan
+Synthetic light cycle=0 mode=0 center=51 outside=51
+Synthetic light cycle=0 mode=1 center=101 outside=51
+Synthetic light cycle=0 mode=2 center=51 outside=51
+Synthetic light cycle=0 mode=3 center=51 outside=51
+Synthetic light cycle=0 mode=4 center=51 outside=51
+Synthetic light cycle=0 mode=5 center=51 outside=51
+Synthetic light cycle=1 mode=0 center=51 outside=51
+Synthetic light cycle=1 mode=1 center=102 outside=51
+Synthetic light cycle=1 mode=2 center=51 outside=51
+Synthetic light cycle=1 mode=3 center=51 outside=51
+Synthetic light cycle=1 mode=4 center=51 outside=51
+Synthetic light cycle=1 mode=5 center=51 outside=51
+Synthetic light cycle=2 mode=0 center=51 outside=51
+Synthetic light cycle=2 mode=1 center=101 outside=51
+Synthetic light cycle=2 mode=2 center=51 outside=51
+Synthetic light cycle=2 mode=3 center=51 outside=51
+Synthetic light cycle=2 mode=4 center=51 outside=51
+Synthetic light cycle=2 mode=5 center=51 outside=51
+<end of output>
+Test time =   0.47 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.flashlight" end time: Oct 17 20:03 CEST
+"gpu.flashlight" time elapsed: 00:00:00
+----------------------------------------------------------
+
+898/945 Testing: gpu.flashlight_private
+898/945 Test: gpu.flashlight_private
+Command: "<workspace>/Blood2/build/debug/tests/flashlight_gpu_tests" "<workspace>/Blood2/build/debug/tests/flashlight-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.flashlight_private" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+GPU=NVIDIA GeForce RTX 3060 Laptop GPU backend=vulkan
+Synthetic light cycle=0 mode=0 center=51 outside=51
+Synthetic light cycle=0 mode=1 center=101 outside=51
+Synthetic light cycle=0 mode=2 center=51 outside=51
+Synthetic light cycle=0 mode=3 center=51 outside=51
+Synthetic light cycle=0 mode=4 center=51 outside=51
+Synthetic light cycle=0 mode=5 center=51 outside=51
+Synthetic light cycle=1 mode=0 center=51 outside=51
+Synthetic light cycle=1 mode=1 center=102 outside=51
+Synthetic light cycle=1 mode=2 center=51 outside=51
+Synthetic light cycle=1 mode=3 center=51 outside=51
+Synthetic light cycle=1 mode=4 center=51 outside=51
+Synthetic light cycle=1 mode=5 center=51 outside=51
+Synthetic light cycle=2 mode=0 center=51 outside=51
+Synthetic light cycle=2 mode=1 center=101 outside=51
+Synthetic light cycle=2 mode=2 center=51 outside=51
+Synthetic light cycle=2 mode=3 center=51 outside=51
+Synthetic light cycle=2 mode=4 center=51 outside=51
+Synthetic light cycle=2 mode=5 center=51 outside=51
+Private original ray cycle=0 distance=42 radius=16.8 brighter channels=37859 darker=0
+Private original ray cycle=1 distance=42 radius=16.8 brighter channels=37859 darker=0
+<end of output>
+Test time =   1.74 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.flashlight_private" end time: Oct 17 20:03 CEST
+"gpu.flashlight_private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+899/945 Testing: gpu.world_sprite
+899/945 Test: gpu.world_sprite
+Command: "<workspace>/Blood2/build/debug/tests/world_sprite_gpu_tests" "<workspace>/Blood2/build/debug/tests/world-sprite"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.world_sprite" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+World SPR: opaque/translucent frame pixels, repeated time, wrap/reset, unload/reload; no per-frame uploads
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.world_sprite" end time: Oct 17 20:03 CEST
+"gpu.world_sprite" time elapsed: 00:00:00
+----------------------------------------------------------
+
+906/945 Testing: gpu.death_effects
+906/945 Test: gpu.death_effects
+Command: "<workspace>/Blood2/build/debug/tests/death_effect_gpu_tests" "<workspace>/Blood2/build/debug/tests/death-effect-gpu" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.death_effects" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+death FX cycle=0 flame pixels=1991 smoke pixels=1441 limb pixels=831 flesh pixels=1682; hidden UI, repeated readback unchanged
+death FX cycle=1 flame pixels=1991 smoke pixels=1441 limb pixels=831 flesh pixels=1682; hidden UI, repeated readback unchanged
+<end of output>
+Test time =   0.79 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.death_effects" end time: Oct 17 20:03 CEST
+"gpu.death_effects" time elapsed: 00:00:00
+----------------------------------------------------------
+
+912/945 Testing: gpu.blood_splat_alpha
+912/945 Test: gpu.blood_splat_alpha
+Command: "<workspace>/Blood2/build/debug/tests/blood_splat_gpu_tests" "<workspace>/Blood2/build/debug/tests/blood-splat-alpha"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.blood_splat_alpha" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+Original blood splat tint/Term alpha: 20000 exact opaque-texel blends
+<end of output>
+Test time =   0.40 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.blood_splat_alpha" end time: Oct 17 20:03 CEST
+"gpu.blood_splat_alpha" time elapsed: 00:00:00
+----------------------------------------------------------
+
+913/945 Testing: gpu.blood_splat_private
+913/945 Test: gpu.blood_splat_private
+Command: "<workspace>/Blood2/build/debug/tests/blood_splat_gpu_tests" "<workspace>/Blood2/build/debug/tests/blood-splat-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.blood_splat_private" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+Original blood splat tint/Term alpha: 20000 exact opaque-texel blends
+Private cycle 0 variant 1 SpriteTextures\blood1.dtx changed pixels 11631
+Private cycle 0 variant 2 SpriteTextures\blood2.dtx changed pixels 13056
+Private cycle 0 variant 3 SpriteTextures\blood3.dtx changed pixels 13942
+Private cycle 1 variant 1 SpriteTextures\blood1.dtx changed pixels 11940
+Private cycle 1 variant 2 SpriteTextures\blood2.dtx changed pixels 12822
+Private cycle 1 variant 3 SpriteTextures\blood3.dtx changed pixels 14186
+Private cycle 2 variant 1 SpriteTextures\blood1.dtx changed pixels 12167
+Private cycle 2 variant 2 SpriteTextures\blood2.dtx changed pixels 12933
+Private cycle 2 variant 3 SpriteTextures\blood3.dtx changed pixels 14013
+<end of output>
+Test time =   2.01 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.blood_splat_private" end time: Oct 17 20:03 CEST
+"gpu.blood_splat_private" time elapsed: 00:00:02
+----------------------------------------------------------
+
+919/945 Testing: gpu.blood_spurt
+919/945 Test: gpu.blood_spurt
+Command: "<workspace>/Blood2/build/debug/tests/blood_spurt_gpu_tests" "<workspace>/Blood2/build/debug/tests/blood-spurt-gpu"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.blood_spurt" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+cycle 0 three drop textures: 6895 changed pixels
+cycle 0 original emitter collision mark: 96 changed pixels
+cycle 1 three drop textures: 6895 changed pixels
+cycle 1 original emitter collision mark: 96 changed pixels
+cycle 2 three drop textures: 6895 changed pixels
+cycle 2 original emitter collision mark: 96 changed pixels
+<end of output>
+Test time =   0.50 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.blood_spurt" end time: Oct 17 20:03 CEST
+"gpu.blood_spurt" time elapsed: 00:00:00
+----------------------------------------------------------
+
+920/945 Testing: gpu.blood_spurt_private
+920/945 Test: gpu.blood_spurt_private
+Command: "<workspace>/Blood2/build/debug/tests/blood_spurt_gpu_tests" "<workspace>/Blood2/build/debug/tests/blood-spurt-private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.blood_spurt_private" start time: Oct 17 20:03 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+cycle 0 three drop textures: 6110 changed pixels
+cycle 0 original emitter collision mark: 1737 changed pixels
+cycle 1 three drop textures: 6110 changed pixels
+cycle 1 original emitter collision mark: 1737 changed pixels
+cycle 2 three drop textures: 6110 changed pixels
+cycle 2 original emitter collision mark: 1737 changed pixels
+<end of output>
+Test time =   1.94 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.blood_spurt_private" end time: Oct 17 20:04 CEST
+"gpu.blood_spurt_private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+925/945 Testing: gpu.sparks_private
+925/945 Test: gpu.sparks_private
+Command: "<workspace>/Blood2/build/debug/tests/spark_gpu_tests" "<workspace>/Blood2/build/debug/tests/sparks-private-gpu" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.sparks_private" start time: Oct 17 20:04 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+cycle 0: 300 source particles, red pixels 1107, yellow pixels 27, expiry clears GPU image
+cycle 1: 300 source particles, red pixels 1107, yellow pixels 27, expiry clears GPU image
+cycle 2: 300 source particles, red pixels 1107, yellow pixels 27, expiry clears GPU image
+<end of output>
+Test time =   1.94 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sparks_private" end time: Oct 17 20:04 CEST
+"gpu.sparks_private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+930/945 Testing: gpu.hud
+930/945 Test: gpu.hud
+Command: "<workspace>/Blood2/build/debug/tests/hud_tests" "gpu" "<workspace>/Blood2/build/debug/tests/hud-gpu"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.hud" start time: Oct 17 20:04 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+cycle 0 frame 0 HUD pixels 107412
+cycle 0 frame 1 HUD pixels 107412
+cycle 0 frame 2 HUD pixels 107412
+cycle 0 frame 3 HUD pixels 0
+cycle 1 frame 0 HUD pixels 29092
+cycle 1 frame 1 HUD pixels 29092
+cycle 1 frame 2 HUD pixels 29092
+cycle 1 frame 3 HUD pixels 0
+cycle 2 frame 0 HUD pixels 15092
+cycle 2 frame 1 HUD pixels 15092
+cycle 2 frame 2 HUD pixels 15092
+cycle 2 frame 3 HUD pixels 0
+<end of output>
+Test time =   0.72 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.hud" end time: Oct 17 20:04 CEST
+"gpu.hud" time elapsed: 00:00:00
+----------------------------------------------------------
+
+935/945 Testing: gpu.polygrid
+935/945 Test: gpu.polygrid
+Command: "<workspace>/Blood2/build/debug/tests/polygrid_gpu_tests" "<workspace>/Blood2/build/debug/tests/polygrid/gpu" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.polygrid" start time: Oct 17 20:04 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+Repeat/alpha scan: red=76 green=74 black=73 clear=75 red runs=2
+CityHub cycle 0 cells 98 changed pixels 120000
+World water contribution 65234 pixels
+CityHub cycle 1 cells 98 changed pixels 120000
+World water contribution 65234 pixels
+<end of output>
+Test time =   4.04 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.polygrid" end time: Oct 17 20:04 CEST
+"gpu.polygrid" time elapsed: 00:00:04
+----------------------------------------------------------
+
+941/945 Testing: gpu.train_session
+941/945 Test: gpu.train_session
+Command: "<workspace>/Blood2/build/debug/tests/train_session_tests" "<external-data-root>" "60" "<workspace>/Blood2/build/debug/tests/train-session-gpu"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.train_session" start time: Oct 17 20:04 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+GPU checkpoint "start.png": 179200 textured pixels, no fallback
+Walk t=0 pos=-32,170.001,-3224 HP=100 ammo=50 target=none
+Walk t=2 pos=-32,170.001,-2681.51 HP=100 ammo=50 target=none
+Walk t=4 pos=-32.5398,170.001,-2121.53 HP=100 ammo=45 target=none
+Walk t=6 pos=-32.0424,170.001,-1742.92 HP=100 ammo=42 target=noname
+Walk t=8 pos=-41.4027,170.001,-1438.17 HP=125 ammo=35 target=noname
+Walk t=10 pos=-10.9157,170.001,-1144.98 HP=125 ammo=28 target=noname
+Walk t=12 pos=-34.2327,170.001,-961.817 HP=125 ammo=24 target=none
+Walk t=14 pos=-34.2491,170.001,-520.001 HP=125 ammo=24 target=none
+Walk t=16 pos=-13.1251,170.001,-25.8379 HP=125 ammo=18 target=noname
+GPU checkpoint "middle.png": 179200 textured pixels, no fallback
+Walk t=18 pos=-75.999,170.001,339.24 HP=125 ammo=23 target=pete
+Walk t=20 pos=-29.333,170.001,611.073 HP=125 ammo=20 target=none
+Walk t=22 pos=-29.3323,170.001,841.327 HP=125 ammo=18 target=noname
+Walk t=24 pos=-30.8271,170.001,1262.49 HP=125 ammo=11 target=noname
+Walk t=26 pos=-42.5627,170.001,1671.51 HP=125 ammo=4 target=noname
+Walk t=28 pos=-33.2759,170.001,1766.19 HP=150 ammo=11 target=none
+Walk t=30 pos=-80.1816,170.001,2140 HP=175 ammo=11 target=none
+Walk t=32 pos=-80.3811,170.001,2140 HP=175 ammo=11 target=none
+Walk t=34 pos=-80.5807,170.001,2140 HP=175 ammo=11 target=none
+Walk t=36 pos=-80.7803,170.001,2140 HP=175 ammo=11 target=none
+Walk t=38 pos=-80.9799,170.001,2140 HP=175 ammo=11 target=none
+Walk t=40 pos=-81.1795,170.001,2140 HP=175 ammo=11 target=none
+Walk t=42 pos=-81.3791,170.001,2140 HP=175 ammo=11 target=none
+Route summary: damaged=10 dead=10 ammoPickup=1 healthPickup=1 relay=1 relayStart=41.2833 fade=1 time=55.2833
+Relay slot player sent=1 pending=0
+Relay slot cinexit1 sent=1 pending=0
+Relay slot htrain1 sent=1 pending=0
+Relay slot cinhi5 sent=1 pending=0
+Relay slot exp1 sent=1 pending=0
+Relay slot exp2 sent=1 pending=0
+Relay slot exp3 sent=1 pending=0
+Relay slot exp4 sent=1 pending=0
+Relay slot exp5 sent=1 pending=0
+Relay slot exit2 sent=1 pending=0
+TRAIN_TRACE	SubwayA	AddObjectToList	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	AddSkyObject	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	AdvanceModelProjectile	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	AlignRotation	Implemented (bounded)	5204
+TRAIN_TRACE	SubwayA	BreakInterObjectLink	Implemented (bounded)	480
+TRAIN_TRACE	SubwayA	CastRay	Implemented (bounded)	131
+TRAIN_TRACE	SubwayA	CastWorldRay	Implemented (bounded)	34
+TRAIN_TRACE	SubwayA	CompareStringsUpper	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	ConfigureCharacterBody	Implemented (bounded)	26
+TRAIN_TRACE	SubwayA	ConfigureModelBody	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ConfigureWorldBody	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	CopyString	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	CreateAttachment	Implemented (bounded)	15
+TRAIN_TRACE	SubwayA	CreateInterObjectLink	Implemented (bounded)	526
+TRAIN_TRACE	SubwayA	CreateObject	Implemented (bounded)	122
+TRAIN_TRACE	SubwayA	CreateObjectList	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	CreateObjectProps	Implemented (bounded)	6
+TRAIN_TRACE	SubwayA	CreateString	Implemented (bounded)	534
+TRAIN_TRACE	SubwayA	EndHMessageRead	Explicitly unsupported	0
+TRAIN_TRACE	SubwayA	EndHMessageWrite	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	EndMessage	Implemented (bounded)	65534
+TRAIN_TRACE	SubwayA	FindAttachment	Implemented (bounded)	5794
+TRAIN_TRACE	SubwayA	FindNamedObjects	Implemented (bounded)	56
+TRAIN_TRACE	SubwayA	FreeString	Implemented (bounded)	1698
+TRAIN_TRACE	SubwayA	GetAcceleration	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	GetAnimIndex	Implemented (bounded)	2851
+TRAIN_TRACE	SubwayA	GetAttachedModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	GetCameraView	Implemented (bounded)	6635
+TRAIN_TRACE	SubwayA	GetClass	Implemented (bounded)	214
+TRAIN_TRACE	SubwayA	GetClientResourceString	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	GetClientUserData	Implemented (bounded)	79062
+TRAIN_TRACE	SubwayA	GetContainers	Implemented (bounded)	293069
+TRAIN_TRACE	SubwayA	GetFrameTime	Implemented (bounded)	7794
+TRAIN_TRACE	SubwayA	GetGameConVar	Implemented (bounded)	482
+TRAIN_TRACE	SubwayA	GetGlobalForce	Implemented (bounded)	4
+TRAIN_TRACE	SubwayA	GetModelAnimUserDims	Implemented (bounded)	3510
+TRAIN_TRACE	SubwayA	GetModelAnimation	Implemented (bounded)	3536
+TRAIN_TRACE	SubwayA	GetModelAnimationName	Implemented (bounded)	7120
+TRAIN_TRACE	SubwayA	GetModelFilenames	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	GetModelLooping	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	GetModelNodeHideStatus	Implemented (bounded)	1162
+TRAIN_TRACE	SubwayA	GetModelNodeTransform	Implemented (bounded)	4757
+TRAIN_TRACE	SubwayA	GetModelPlaybackState	Implemented (bounded)	7085
+TRAIN_TRACE	SubwayA	GetMovementState	Implemented (bounded)	88160
+TRAIN_TRACE	SubwayA	GetNextObject	Implemented (bounded)	227
+TRAIN_TRACE	SubwayA	GetObjectClass	Implemented (bounded)	298
+TRAIN_TRACE	SubwayA	GetObjectColor	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	GetObjectDims	Implemented (bounded)	1310
+TRAIN_TRACE	SubwayA	GetObjectFlags	Implemented (bounded)	64545
+TRAIN_TRACE	SubwayA	GetObjectName	Implemented (bounded)	176
+TRAIN_TRACE	SubwayA	GetObjectPos	Implemented (bounded)	46689
+TRAIN_TRACE	SubwayA	GetObjectRotation	Implemented (bounded)	8145
+TRAIN_TRACE	SubwayA	GetObjectState	Implemented (bounded)	3
+TRAIN_TRACE	SubwayA	GetObjectUserFlags	Implemented (bounded)	162
+TRAIN_TRACE	SubwayA	GetPathManager	Implemented (bounded)	1939
+TRAIN_TRACE	SubwayA	GetPointContainerCode	Implemented (bounded)	79
+TRAIN_TRACE	SubwayA	GetPropBool	Implemented (bounded)	764
+TRAIN_TRACE	SubwayA	GetPropGeneric	Implemented (bounded)	10875
+TRAIN_TRACE	SubwayA	GetPropReal	Implemented (bounded)	764
+TRAIN_TRACE	SubwayA	GetPropString	Implemented (bounded)	72
+TRAIN_TRACE	SubwayA	GetPropVector	Implemented (bounded)	64
+TRAIN_TRACE	SubwayA	GetSoundDuration	Implemented (bounded)	63
+TRAIN_TRACE	SubwayA	GetStringData	Implemented (bounded)	1273
+TRAIN_TRACE	SubwayA	GetTime	Implemented (bounded)	69951
+TRAIN_TRACE	SubwayA	GetVarValueFloat	Implemented (bounded)	480
+TRAIN_TRACE	SubwayA	GetVarValueString	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	GetVelocity	Implemented (bounded)	3917
+TRAIN_TRACE	SubwayA	GetWorldTime	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	HandleToObject	Implemented (bounded)	125276
+TRAIN_TRACE	SubwayA	InterpolateRotation	Implemented (bounded)	4152
+TRAIN_TRACE	SubwayA	IntersectSegment	Implemented (bounded)	7083
+TRAIN_TRACE	SubwayA	IsKindOf	Implemented (bounded)	311
+TRAIN_TRACE	SubwayA	IsObjectAlive	Implemented (bounded)	436340
+TRAIN_TRACE	SubwayA	IsSoundDone	Implemented (bounded)	6981
+TRAIN_TRACE	SubwayA	KillSound	Implemented (bounded)	138
+TRAIN_TRACE	SubwayA	MoveKeyframedObject	Implemented (bounded)	40606
+TRAIN_TRACE	SubwayA	MoveObject	Implemented (bounded)	138887
+TRAIN_TRACE	SubwayA	MoveObjectToGround	Implemented (bounded)	16
+TRAIN_TRACE	SubwayA	MoveWorldModel	Implemented (bounded)	509
+TRAIN_TRACE	SubwayA	ObjectToHandle	Implemented (bounded)	3045
+TRAIN_TRACE	SubwayA	PingObjects	Implemented (bounded)	107
+TRAIN_TRACE	SubwayA	PlaceNonSolidModel	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	PlayCharacterSound	Implemented (bounded)	185
+TRAIN_TRACE	SubwayA	PlayCinematicSound	Implemented (bounded)	6
+TRAIN_TRACE	SubwayA	PlayClientSound	Implemented (bounded)	34
+TRAIN_TRACE	SubwayA	PlayDetachedSound	Implemented (bounded)	75
+TRAIN_TRACE	SubwayA	PlayLocalSound	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PlayObjectLoopSound	Implemented (bounded)	14
+TRAIN_TRACE	SubwayA	PlaySoundAt	Implemented (bounded)	81
+TRAIN_TRACE	SubwayA	PlayWorldSound	Implemented (bounded)	4
+TRAIN_TRACE	SubwayA	PublishBloodSplat	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	PublishBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishCameraEffect	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	PublishClientBloodSplat	Implemented (bounded)	34
+TRAIN_TRACE	SubwayA	PublishClientBloodSpurt	Implemented (bounded)	34
+TRAIN_TRACE	SubwayA	PublishExplosionFlames	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionFragments	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionLights	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionModels	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionRings	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionSprites	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishFleshGibs	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishLaserBeam	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishLightEffect	Implemented (bounded)	12
+TRAIN_TRACE	SubwayA	PublishObjectParticles	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishParticleStream	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishPolyGrid	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishSparks	Implemented (bounded)	60
+TRAIN_TRACE	SubwayA	PublishWeaponSprites	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	QueryModelNodeTransform	Implemented (bounded)	1026
+TRAIN_TRACE	SubwayA	RandomFloat	Implemented (bounded)	81
+TRAIN_TRACE	SubwayA	RandomInt	Implemented (bounded)	187
+TRAIN_TRACE	SubwayA	ReadDamage	Implemented (bounded)	59
+TRAIN_TRACE	SubwayA	ReadFromMessageDWord	Implemented (bounded)	1169
+TRAIN_TRACE	SubwayA	ReadFromMessageHString	Implemented (bounded)	1169
+TRAIN_TRACE	SubwayA	ReadKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ReadPickupMessage	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	RecordBrushDestruction	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RecordDebrisEffect	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RecordExplosionEffect	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RecordPickup	Implemented (bounded)	5
+TRAIN_TRACE	SubwayA	RecordProjectile	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RecordSceneExplosion	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	RecordSpawn	Implemented (bounded)	26
+TRAIN_TRACE	SubwayA	RelinquishList	Implemented (bounded)	56
+TRAIN_TRACE	SubwayA	RemoveAttachment	Implemented (bounded)	13
+TRAIN_TRACE	SubwayA	RemoveCameraEffect	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RemoveLightEffect	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RemoveObject	Implemented (bounded)	117
+TRAIN_TRACE	SubwayA	RemoveObjectFromList	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ReportSkyFailure	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ResetModelAnimation	Implemented (bounded)	83
+TRAIN_TRACE	SubwayA	ResetRead	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ResizeObject	Implemented (bounded)	3375
+TRAIN_TRACE	SubwayA	RestoreObjects	Explicitly unsupported	0
+TRAIN_TRACE	SubwayA	RotateWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	SaveObjects	Explicitly unsupported	0
+TRAIN_TRACE	SubwayA	ScaleObject	Implemented (bounded)	26
+TRAIN_TRACE	SubwayA	SendBossHealth	Implemented (bounded)	331
+TRAIN_TRACE	SubwayA	SendConversation	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	SendObjectives	Implemented (bounded)	1
+TRAIN_TRACE	SubwayA	SendToClient	Implemented (bounded)	415
+TRAIN_TRACE	SubwayA	SendWorldExit	Implemented (bounded)	1
+TRAIN_TRACE	SubwayA	SetAcceleration	Implemented (bounded)	6640
+TRAIN_TRACE	SubwayA	SetBlockingPriority	Implemented (bounded)	6754
+TRAIN_TRACE	SubwayA	SetClientUserData	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	SetDeactivationTime	Implemented (bounded)	16
+TRAIN_TRACE	SubwayA	SetGameConVar	Implemented (bounded)	32
+TRAIN_TRACE	SubwayA	SetGlobalForce	Implemented (bounded)	1
+TRAIN_TRACE	SubwayA	SetModelAnimation	Implemented (bounded)	151
+TRAIN_TRACE	SubwayA	SetModelFilenames	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	SetModelLooping	Implemented (bounded)	135
+TRAIN_TRACE	SubwayA	SetModelNodeHideStatus	Implemented (bounded)	38
+TRAIN_TRACE	SubwayA	SetNextUpdate	Implemented (bounded)	39572
+TRAIN_TRACE	SubwayA	SetObjectColor	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	SetObjectDims	Implemented (bounded)	99
+TRAIN_TRACE	SubwayA	SetObjectFlags	Implemented (bounded)	295
+TRAIN_TRACE	SubwayA	SetObjectRotation	Implemented (bounded)	46364
+TRAIN_TRACE	SubwayA	SetObjectState	Implemented (bounded)	17
+TRAIN_TRACE	SubwayA	SetObjectUserFlags	Implemented (bounded)	235
+TRAIN_TRACE	SubwayA	SetSkyDefinition	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	SetVelocity	Implemented (bounded)	8914
+TRAIN_TRACE	SubwayA	StartHMessageWrite	Implemented (bounded)	65534
+TRAIN_TRACE	SubwayA	StartMessageToObject	Implemented (bounded)	65534
+TRAIN_TRACE	SubwayA	TeleportObject	Implemented (bounded)	11
+TRAIN_TRACE	SubwayA	ValidateSpawnObject	Implemented (bounded)	15
+TRAIN_TRACE	SubwayA	WriteDamage	Implemented (bounded)	929
+TRAIN_TRACE	SubwayA	WriteKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	WritePickupMessage	Implemented (bounded)	64099
+TRAIN_TRACE	SubwayA	WriteToMessageDWord	Implemented (bounded)	506
+TRAIN_TRACE	SubwayA	WriteToMessageHString	Implemented (bounded)	506
+TRAIN_TRACE	SubwayA	ConnectClient	Implemented (bounded)	1
+TRAIN_TRACE	SubwayA	DisconnectClient	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	MID_MODELSTRINGKEY	Implemented (bounded)	132
+TRAIN_DOOR_AUDIO	SubwayA	28 decoded starts, zero failures
+Completed train at 60 Hz: 10 damaged / 10 dead authored Cultists, HP=175 ammo=11
+Message lifetime: 65534 created, 65534 released, peak=3
+Knife FIRE_KEY shots=0
+Reached authored NEW_LEVEL from spawn
+GPU checkpoint "cityhub.png": 179200 textured pixels, no fallback
+TRAIN_TRACE	CityHub	AddObjectToList	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	AddSkyObject	Implemented (bounded)	5
+TRAIN_TRACE	CityHub	AdvanceModelProjectile	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	AlignRotation	Implemented (bounded)	121
+TRAIN_TRACE	CityHub	BreakInterObjectLink	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CastRay	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CastWorldRay	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CompareStringsUpper	Implemented (bounded)	5
+TRAIN_TRACE	CityHub	ConfigureCharacterBody	Implemented (bounded)	27
+TRAIN_TRACE	CityHub	ConfigureModelBody	Implemented (bounded)	122
+TRAIN_TRACE	CityHub	ConfigureWorldBody	Implemented (bounded)	13
+TRAIN_TRACE	CityHub	CopyString	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CreateAttachment	Implemented (bounded)	19
+TRAIN_TRACE	CityHub	CreateInterObjectLink	Implemented (bounded)	36
+TRAIN_TRACE	CityHub	CreateObject	Implemented (bounded)	56
+TRAIN_TRACE	CityHub	CreateObjectList	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CreateObjectProps	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CreateString	Implemented (bounded)	30
+TRAIN_TRACE	CityHub	EndHMessageRead	Explicitly unsupported	0
+TRAIN_TRACE	CityHub	EndHMessageWrite	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	EndMessage	Implemented (bounded)	241
+TRAIN_TRACE	CityHub	FindAttachment	Implemented (bounded)	120
+TRAIN_TRACE	CityHub	FindNamedObjects	Implemented (bounded)	24
+TRAIN_TRACE	CityHub	FreeString	Implemented (bounded)	21
+TRAIN_TRACE	CityHub	GetAcceleration	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetAnimIndex	Implemented (bounded)	3079
+TRAIN_TRACE	CityHub	GetAttachedModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetCameraView	Implemented (bounded)	121
+TRAIN_TRACE	CityHub	GetClass	Implemented (bounded)	3197
+TRAIN_TRACE	CityHub	GetClientResourceString	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetClientUserData	Implemented (bounded)	1411
+TRAIN_TRACE	CityHub	GetContainers	Implemented (bounded)	19351
+TRAIN_TRACE	CityHub	GetFrameTime	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetGameConVar	Implemented (bounded)	895
+TRAIN_TRACE	CityHub	GetGlobalForce	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	GetModelAnimUserDims	Implemented (bounded)	282
+TRAIN_TRACE	CityHub	GetModelAnimation	Implemented (bounded)	56
+TRAIN_TRACE	CityHub	GetModelAnimationName	Implemented (bounded)	115
+TRAIN_TRACE	CityHub	GetModelFilenames	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetModelLooping	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetModelNodeHideStatus	Implemented (bounded)	43
+TRAIN_TRACE	CityHub	GetModelNodeTransform	Implemented (bounded)	311
+TRAIN_TRACE	CityHub	GetModelPlaybackState	Implemented (bounded)	65
+TRAIN_TRACE	CityHub	GetMovementState	Implemented (bounded)	15335
+TRAIN_TRACE	CityHub	GetNextObject	Implemented (bounded)	487
+TRAIN_TRACE	CityHub	GetObjectClass	Implemented (bounded)	1645
+TRAIN_TRACE	CityHub	GetObjectColor	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetObjectDims	Implemented (bounded)	9
+TRAIN_TRACE	CityHub	GetObjectFlags	Implemented (bounded)	940
+TRAIN_TRACE	CityHub	GetObjectName	Implemented (bounded)	143
+TRAIN_TRACE	CityHub	GetObjectPos	Implemented (bounded)	1206
+TRAIN_TRACE	CityHub	GetObjectRotation	Implemented (bounded)	719
+TRAIN_TRACE	CityHub	GetObjectState	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetObjectUserFlags	Implemented (bounded)	932
+TRAIN_TRACE	CityHub	GetPathManager	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetPointContainerCode	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetPropBool	Implemented (bounded)	994
+TRAIN_TRACE	CityHub	GetPropGeneric	Implemented (bounded)	24038
+TRAIN_TRACE	CityHub	GetPropReal	Implemented (bounded)	2061
+TRAIN_TRACE	CityHub	GetPropString	Implemented (bounded)	150
+TRAIN_TRACE	CityHub	GetPropVector	Implemented (bounded)	136
+TRAIN_TRACE	CityHub	GetSoundDuration	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetStringData	Implemented (bounded)	59
+TRAIN_TRACE	CityHub	GetTime	Implemented (bounded)	612
+TRAIN_TRACE	CityHub	GetVarValueFloat	Implemented (bounded)	893
+TRAIN_TRACE	CityHub	GetVarValueString	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	GetVelocity	Implemented (bounded)	60
+TRAIN_TRACE	CityHub	GetWorldTime	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	HandleToObject	Implemented (bounded)	2048
+TRAIN_TRACE	CityHub	InterpolateRotation	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	IntersectSegment	Implemented (bounded)	281
+TRAIN_TRACE	CityHub	IsKindOf	Implemented (bounded)	3626
+TRAIN_TRACE	CityHub	IsObjectAlive	Implemented (bounded)	4847
+TRAIN_TRACE	CityHub	IsSoundDone	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	KillSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	MoveKeyframedObject	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	MoveObject	Implemented (bounded)	14875
+TRAIN_TRACE	CityHub	MoveObjectToGround	Implemented (bounded)	143
+TRAIN_TRACE	CityHub	MoveWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ObjectToHandle	Implemented (bounded)	60
+TRAIN_TRACE	CityHub	PingObjects	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	PlaceNonSolidModel	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayCharacterSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayCinematicSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayClientSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayDetachedSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayLocalSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayObjectLoopSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlaySoundAt	Implemented (bounded)	4
+TRAIN_TRACE	CityHub	PlayWorldSound	Implemented (bounded)	31
+TRAIN_TRACE	CityHub	PublishBloodSplat	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishCameraEffect	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	PublishClientBloodSplat	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishClientBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionFlames	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionFragments	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionLights	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionModels	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionRings	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionSprites	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishFleshGibs	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishLaserBeam	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishLightEffect	Implemented (bounded)	4
+TRAIN_TRACE	CityHub	PublishObjectParticles	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishParticleStream	Implemented (bounded)	8
+TRAIN_TRACE	CityHub	PublishPolyGrid	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	PublishSparks	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishWeaponSprites	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	QueryModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RandomFloat	Implemented (bounded)	59
+TRAIN_TRACE	CityHub	RandomInt	Implemented (bounded)	35
+TRAIN_TRACE	CityHub	ReadDamage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReadFromMessageDWord	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReadFromMessageHString	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReadKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReadPickupMessage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordBrushDestruction	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordDebrisEffect	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordExplosionEffect	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordPickup	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordProjectile	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordSceneExplosion	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordSpawn	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RelinquishList	Implemented (bounded)	24
+TRAIN_TRACE	CityHub	RemoveAttachment	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RemoveCameraEffect	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RemoveLightEffect	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RemoveObject	Implemented (bounded)	50
+TRAIN_TRACE	CityHub	RemoveObjectFromList	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReportSkyFailure	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ResetModelAnimation	Implemented (bounded)	9
+TRAIN_TRACE	CityHub	ResetRead	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ResizeObject	Implemented (bounded)	89
+TRAIN_TRACE	CityHub	RestoreObjects	Explicitly unsupported	0
+TRAIN_TRACE	CityHub	RotateWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	SaveObjects	Explicitly unsupported	0
+TRAIN_TRACE	CityHub	ScaleObject	Implemented (bounded)	149
+TRAIN_TRACE	CityHub	SendBossHealth	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	SendConversation	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	SendObjectives	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	SendToClient	Implemented (bounded)	8
+TRAIN_TRACE	CityHub	SendWorldExit	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	SetAcceleration	Implemented (bounded)	122
+TRAIN_TRACE	CityHub	SetBlockingPriority	Implemented (bounded)	343
+TRAIN_TRACE	CityHub	SetClientUserData	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	SetDeactivationTime	Implemented (bounded)	149
+TRAIN_TRACE	CityHub	SetGameConVar	Implemented (bounded)	32
+TRAIN_TRACE	CityHub	SetGlobalForce	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	SetModelAnimation	Implemented (bounded)	48
+TRAIN_TRACE	CityHub	SetModelFilenames	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	SetModelLooping	Implemented (bounded)	10
+TRAIN_TRACE	CityHub	SetModelNodeHideStatus	Implemented (bounded)	19
+TRAIN_TRACE	CityHub	SetNextUpdate	Implemented (bounded)	1351
+TRAIN_TRACE	CityHub	SetObjectColor	Implemented (bounded)	122
+TRAIN_TRACE	CityHub	SetObjectDims	Implemented (bounded)	277
+TRAIN_TRACE	CityHub	SetObjectFlags	Implemented (bounded)	550
+TRAIN_TRACE	CityHub	SetObjectRotation	Implemented (bounded)	61
+TRAIN_TRACE	CityHub	SetObjectState	Implemented (bounded)	28
+TRAIN_TRACE	CityHub	SetObjectUserFlags	Implemented (bounded)	358
+TRAIN_TRACE	CityHub	SetSkyDefinition	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	SetVelocity	Implemented (bounded)	123
+TRAIN_TRACE	CityHub	StartHMessageWrite	Implemented (bounded)	241
+TRAIN_TRACE	CityHub	StartMessageToObject	Implemented (bounded)	241
+TRAIN_TRACE	CityHub	TeleportObject	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	ValidateSpawnObject	Implemented (bounded)	21
+TRAIN_TRACE	CityHub	WriteDamage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	WriteKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	WritePickupMessage	Implemented (bounded)	240
+TRAIN_TRACE	CityHub	WriteToMessageDWord	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	WriteToMessageHString	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	ConnectClient	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	DisconnectClient	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	MID_MODELSTRINGKEY	Implemented (bounded)	0
+TRAIN_DOOR_AUDIO	CityHub	0 decoded starts, zero failures
+TRAIN_TRACE	teardown	AddObjectToList	Implemented (bounded)	0
+TRAIN_TRACE	teardown	AddSkyObject	Implemented (bounded)	5
+TRAIN_TRACE	teardown	AdvanceModelProjectile	Implemented (bounded)	0
+TRAIN_TRACE	teardown	AlignRotation	Implemented (bounded)	121
+TRAIN_TRACE	teardown	BreakInterObjectLink	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CastRay	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CastWorldRay	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CompareStringsUpper	Implemented (bounded)	5
+TRAIN_TRACE	teardown	ConfigureCharacterBody	Implemented (bounded)	27
+TRAIN_TRACE	teardown	ConfigureModelBody	Implemented (bounded)	122
+TRAIN_TRACE	teardown	ConfigureWorldBody	Implemented (bounded)	13
+TRAIN_TRACE	teardown	CopyString	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CreateAttachment	Implemented (bounded)	19
+TRAIN_TRACE	teardown	CreateInterObjectLink	Implemented (bounded)	36
+TRAIN_TRACE	teardown	CreateObject	Implemented (bounded)	56
+TRAIN_TRACE	teardown	CreateObjectList	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CreateObjectProps	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CreateString	Implemented (bounded)	30
+TRAIN_TRACE	teardown	EndHMessageRead	Explicitly unsupported	0
+TRAIN_TRACE	teardown	EndHMessageWrite	Implemented (bounded)	0
+TRAIN_TRACE	teardown	EndMessage	Implemented (bounded)	241
+TRAIN_TRACE	teardown	FindAttachment	Implemented (bounded)	120
+TRAIN_TRACE	teardown	FindNamedObjects	Implemented (bounded)	24
+TRAIN_TRACE	teardown	FreeString	Implemented (bounded)	30
+TRAIN_TRACE	teardown	GetAcceleration	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetAnimIndex	Implemented (bounded)	3079
+TRAIN_TRACE	teardown	GetAttachedModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetCameraView	Implemented (bounded)	121
+TRAIN_TRACE	teardown	GetClass	Implemented (bounded)	3197
+TRAIN_TRACE	teardown	GetClientResourceString	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetClientUserData	Implemented (bounded)	1413
+TRAIN_TRACE	teardown	GetContainers	Implemented (bounded)	19351
+TRAIN_TRACE	teardown	GetFrameTime	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetGameConVar	Implemented (bounded)	895
+TRAIN_TRACE	teardown	GetGlobalForce	Implemented (bounded)	2
+TRAIN_TRACE	teardown	GetModelAnimUserDims	Implemented (bounded)	282
+TRAIN_TRACE	teardown	GetModelAnimation	Implemented (bounded)	56
+TRAIN_TRACE	teardown	GetModelAnimationName	Implemented (bounded)	115
+TRAIN_TRACE	teardown	GetModelFilenames	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetModelLooping	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetModelNodeHideStatus	Implemented (bounded)	43
+TRAIN_TRACE	teardown	GetModelNodeTransform	Implemented (bounded)	311
+TRAIN_TRACE	teardown	GetModelPlaybackState	Implemented (bounded)	65
+TRAIN_TRACE	teardown	GetMovementState	Implemented (bounded)	15335
+TRAIN_TRACE	teardown	GetNextObject	Implemented (bounded)	487
+TRAIN_TRACE	teardown	GetObjectClass	Implemented (bounded)	1645
+TRAIN_TRACE	teardown	GetObjectColor	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetObjectDims	Implemented (bounded)	9
+TRAIN_TRACE	teardown	GetObjectFlags	Implemented (bounded)	940
+TRAIN_TRACE	teardown	GetObjectName	Implemented (bounded)	143
+TRAIN_TRACE	teardown	GetObjectPos	Implemented (bounded)	1206
+TRAIN_TRACE	teardown	GetObjectRotation	Implemented (bounded)	719
+TRAIN_TRACE	teardown	GetObjectState	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetObjectUserFlags	Implemented (bounded)	934
+TRAIN_TRACE	teardown	GetPathManager	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetPointContainerCode	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetPropBool	Implemented (bounded)	994
+TRAIN_TRACE	teardown	GetPropGeneric	Implemented (bounded)	24038
+TRAIN_TRACE	teardown	GetPropReal	Implemented (bounded)	2061
+TRAIN_TRACE	teardown	GetPropString	Implemented (bounded)	150
+TRAIN_TRACE	teardown	GetPropVector	Implemented (bounded)	136
+TRAIN_TRACE	teardown	GetSoundDuration	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetStringData	Implemented (bounded)	59
+TRAIN_TRACE	teardown	GetTime	Implemented (bounded)	612
+TRAIN_TRACE	teardown	GetVarValueFloat	Implemented (bounded)	893
+TRAIN_TRACE	teardown	GetVarValueString	Implemented (bounded)	2
+TRAIN_TRACE	teardown	GetVelocity	Implemented (bounded)	60
+TRAIN_TRACE	teardown	GetWorldTime	Implemented (bounded)	0
+TRAIN_TRACE	teardown	HandleToObject	Implemented (bounded)	2049
+TRAIN_TRACE	teardown	InterpolateRotation	Implemented (bounded)	0
+TRAIN_TRACE	teardown	IntersectSegment	Implemented (bounded)	281
+TRAIN_TRACE	teardown	IsKindOf	Implemented (bounded)	3626
+TRAIN_TRACE	teardown	IsObjectAlive	Implemented (bounded)	4872
+TRAIN_TRACE	teardown	IsSoundDone	Implemented (bounded)	0
+TRAIN_TRACE	teardown	KillSound	Implemented (bounded)	4
+TRAIN_TRACE	teardown	MoveKeyframedObject	Implemented (bounded)	0
+TRAIN_TRACE	teardown	MoveObject	Implemented (bounded)	14875
+TRAIN_TRACE	teardown	MoveObjectToGround	Implemented (bounded)	143
+TRAIN_TRACE	teardown	MoveWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ObjectToHandle	Implemented (bounded)	60
+TRAIN_TRACE	teardown	PingObjects	Implemented (bounded)	2
+TRAIN_TRACE	teardown	PlaceNonSolidModel	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayCharacterSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayCinematicSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayClientSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayDetachedSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayLocalSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayObjectLoopSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlaySoundAt	Implemented (bounded)	4
+TRAIN_TRACE	teardown	PlayWorldSound	Implemented (bounded)	31
+TRAIN_TRACE	teardown	PublishBloodSplat	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishCameraEffect	Implemented (bounded)	2
+TRAIN_TRACE	teardown	PublishClientBloodSplat	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishClientBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionFlames	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionFragments	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionLights	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionModels	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionRings	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionSprites	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishFleshGibs	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishLaserBeam	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishLightEffect	Implemented (bounded)	4
+TRAIN_TRACE	teardown	PublishObjectParticles	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishParticleStream	Implemented (bounded)	8
+TRAIN_TRACE	teardown	PublishPolyGrid	Implemented (bounded)	2
+TRAIN_TRACE	teardown	PublishSparks	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishWeaponSprites	Implemented (bounded)	0
+TRAIN_TRACE	teardown	QueryModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RandomFloat	Implemented (bounded)	59
+TRAIN_TRACE	teardown	RandomInt	Implemented (bounded)	35
+TRAIN_TRACE	teardown	ReadDamage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReadFromMessageDWord	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReadFromMessageHString	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReadKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReadPickupMessage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordBrushDestruction	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordDebrisEffect	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordExplosionEffect	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordPickup	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordProjectile	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordSceneExplosion	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordSpawn	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RelinquishList	Implemented (bounded)	24
+TRAIN_TRACE	teardown	RemoveAttachment	Implemented (bounded)	19
+TRAIN_TRACE	teardown	RemoveCameraEffect	Implemented (bounded)	2
+TRAIN_TRACE	teardown	RemoveLightEffect	Implemented (bounded)	4
+TRAIN_TRACE	teardown	RemoveObject	Implemented (bounded)	86
+TRAIN_TRACE	teardown	RemoveObjectFromList	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReportSkyFailure	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ResetModelAnimation	Implemented (bounded)	9
+TRAIN_TRACE	teardown	ResetRead	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ResizeObject	Implemented (bounded)	89
+TRAIN_TRACE	teardown	RestoreObjects	Explicitly unsupported	0
+TRAIN_TRACE	teardown	RotateWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	teardown	SaveObjects	Explicitly unsupported	0
+TRAIN_TRACE	teardown	ScaleObject	Implemented (bounded)	149
+TRAIN_TRACE	teardown	SendBossHealth	Implemented (bounded)	1
+TRAIN_TRACE	teardown	SendConversation	Implemented (bounded)	0
+TRAIN_TRACE	teardown	SendObjectives	Implemented (bounded)	0
+TRAIN_TRACE	teardown	SendToClient	Implemented (bounded)	8
+TRAIN_TRACE	teardown	SendWorldExit	Implemented (bounded)	0
+TRAIN_TRACE	teardown	SetAcceleration	Implemented (bounded)	122
+TRAIN_TRACE	teardown	SetBlockingPriority	Implemented (bounded)	343
+TRAIN_TRACE	teardown	SetClientUserData	Implemented (bounded)	2
+TRAIN_TRACE	teardown	SetDeactivationTime	Implemented (bounded)	149
+TRAIN_TRACE	teardown	SetGameConVar	Implemented (bounded)	66
+TRAIN_TRACE	teardown	SetGlobalForce	Implemented (bounded)	1
+TRAIN_TRACE	teardown	SetModelAnimation	Implemented (bounded)	48
+TRAIN_TRACE	teardown	SetModelFilenames	Implemented (bounded)	2
+TRAIN_TRACE	teardown	SetModelLooping	Implemented (bounded)	10
+TRAIN_TRACE	teardown	SetModelNodeHideStatus	Implemented (bounded)	19
+TRAIN_TRACE	teardown	SetNextUpdate	Implemented (bounded)	1353
+TRAIN_TRACE	teardown	SetObjectColor	Implemented (bounded)	122
+TRAIN_TRACE	teardown	SetObjectDims	Implemented (bounded)	277
+TRAIN_TRACE	teardown	SetObjectFlags	Implemented (bounded)	550
+TRAIN_TRACE	teardown	SetObjectRotation	Implemented (bounded)	61
+TRAIN_TRACE	teardown	SetObjectState	Implemented (bounded)	28
+TRAIN_TRACE	teardown	SetObjectUserFlags	Implemented (bounded)	360
+TRAIN_TRACE	teardown	SetSkyDefinition	Implemented (bounded)	1
+TRAIN_TRACE	teardown	SetVelocity	Implemented (bounded)	123
+TRAIN_TRACE	teardown	StartHMessageWrite	Implemented (bounded)	241
+TRAIN_TRACE	teardown	StartMessageToObject	Implemented (bounded)	241
+TRAIN_TRACE	teardown	TeleportObject	Implemented (bounded)	1
+TRAIN_TRACE	teardown	ValidateSpawnObject	Implemented (bounded)	21
+TRAIN_TRACE	teardown	WriteDamage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	WriteKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	WritePickupMessage	Implemented (bounded)	240
+TRAIN_TRACE	teardown	WriteToMessageDWord	Implemented (bounded)	1
+TRAIN_TRACE	teardown	WriteToMessageHString	Implemented (bounded)	1
+TRAIN_TRACE	teardown	ConnectClient	Implemented (bounded)	1
+TRAIN_TRACE	teardown	DisconnectClient	Implemented (bounded)	1
+TRAIN_TRACE	teardown	MID_MODELSTRINGKEY	Implemented (bounded)	0
+TRAIN_DOOR_AUDIO	teardown	0 decoded starts, zero failures
+<end of output>
+Test time =  35.14 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.train_session" end time: Oct 17 20:04 CEST
+"gpu.train_session" time elapsed: 00:00:35
+----------------------------------------------------------
+
+945/945 Testing: gpu.screen_fade
+945/945 Test: gpu.screen_fade
+Command: "<workspace>/Blood2/build/debug/tests/screen_fade_gpu_tests" "<workspace>/Blood2/build/debug/tests/screen-fade-gpu"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.screen_fade" start time: Oct 17 20:04 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+cycle=0 scale=1 expected RGB=204 HUD=89000 inspector=12847
+cycle=0 scale=0.5 expected RGB=102 HUD=89000 inspector=13190
+cycle=0 scale=0 expected RGB=0 HUD=2407 inspector=6728
+cycle=0 scale=1 expected RGB=204 HUD=89000 inspector=13202
+cycle=1 scale=1 expected RGB=204 HUD=56960 inspector=12847
+cycle=1 scale=0.5 expected RGB=102 HUD=56960 inspector=13190
+cycle=1 scale=0 expected RGB=0 HUD=814 inspector=6728
+cycle=1 scale=1 expected RGB=204 HUD=56960 inspector=13202
+<end of output>
+Test time =   0.57 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.screen_fade" end time: Oct 17 20:04 CEST
+"gpu.screen_fade" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 20:04 CEST
+
+assault =   6.22 sec*proc
+
+blood_splats =   2.41 sec*proc
+
+blood_spurts =   2.44 sec*proc
+
+brushes =   2.67 sec*proc
+
+cameras =   2.90 sec*proc
+
+character =  18.75 sec*proc
+
+cinematics =   2.89 sec*proc
+
+containers =  12.27 sec*proc
+
+conversation =   6.87 sec*proc
+
+death_effects =   0.79 sec*proc
+
+destructable_models =   2.36 sec*proc
+
+doors =   2.61 sec*proc
+
+energy =   0.95 sec*proc
+
+explosion_flames =   1.94 sec*proc
+
+explosion_fragments =   0.91 sec*proc
+
+explosion_models =   0.90 sec*proc
+
+explosion_rings =   0.91 sec*proc
+
+flare =   7.00 sec*proc
+
+flashlight =   2.20 sec*proc
+
+gideon_teleport =   1.03 sec*proc
+
+gpu = 365.82 sec*proc
+
+hud =   0.72 sec*proc
+
+interaction =   6.73 sec*proc
+
+keyframes =   2.90 sec*proc
+
+lights =   2.85 sec*proc
+
+mac10 =  13.67 sec*proc
+
+model_view =   3.88 sec*proc
+
+movement =  17.63 sec*proc
+
+naga =   1.01 sec*proc
+
+object_particles =   0.92 sec*proc
+
+objectives =  10.42 sec*proc
+
+particle_stream =   8.62 sec*proc
+
+pickups =   7.13 sec*proc
+
+player =   2.92 sec*proc
+
+player_controls =  31.62 sec*proc
+
+player_keepalive =   7.39 sec*proc
+
+player_restore =   3.43 sec*proc
+
+polygrid =   4.04 sec*proc
+
+private = 351.16 sec*proc
+
+proximity =   6.13 sec*proc
+
+randomsound =  13.84 sec*proc
+
+remote =   6.22 sec*proc
+
+sceneexplosion =   2.92 sec*proc
+
+screen_fade =   0.57 sec*proc
+
+session_playback =   1.67 sec*proc
+
+shield =   0.96 sec*proc
+
+sky =  11.88 sec*proc
+
+sound =   3.02 sec*proc
+
+sparks =   1.94 sec*proc
+
+sprite =   0.41 sec*proc
+
+sprite_view =   1.53 sec*proc
+
+sprites =   2.84 sec*proc
+
+surface_effect =   2.74 sec*proc
+
+train_session =  35.14 sec*proc
+
+triggers =   3.10 sec*proc
+
+weapon_sprites =   2.43 sec*proc
+
+weapons =  18.03 sec*proc
+
+wind =   1.45 sec*proc
+
+world =   7.00 sec*proc
+
+world_debris =   7.85 sec*proc
+
+world_view =  23.66 sec*proc
+
+worldpaths =   2.85 sec*proc

@@ -1,0 +1,1681 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 7ee1490..3dd730e 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -570,3 +570,6 @@ The [remote-bomb continuation](../Documentation/Implementation/M2_REMOTE_BOMBS.m
+ 
+ 
+ The [flashlight continuation](../Documentation/Implementation/M2_FLASHLIGHT.md) connects original FlashlightPU/CInvFlashlight/CFlashlightFX, L toggle, battery, local audio, inactive restoration and visible radial point illumination with inspection. CityHub now has 453 created / 31 transferred sounds / 541 editor-only / zero unsupported / one failed entry. Missing `fallengrills` geometry still rejects CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical. Read [contracts](docs/FLASHLIGHT_CONTRACTS.md). Preserve rounded recharge refusal, body-position/internal-angle following, source shade-failure fallback, active-only discharge and forced inactive Restore/KeepAlive. Keep checked child ownership and expose failed updates. Radial brightening is replacement lighting; sky/FX/view weapons, shadows and general illumination remain separate. Regenerate all six SPIR-V/MSL artifacts together; NVIDIA validation does not certify native Metal execution of this change.
++
++
++The [CityHub entry continuation](../Documentation/Implementation/M2_CITYHUB_ENTRY.md) records `fallengrills` as an explicitly omitted object because its named BSP is absent. The source instance is rejected before initial update, matching the available LithTech loader behavior; no replacement geometry is invented. CityHub now has 453 created / 31 sounds / 541 editor-only / one omitted / zero unsupported / zero failed entries. Safe NEW_LEVEL preserves the supported player and enters at `01_egressa`; required SPR world materials now decode and animate through SDL_GPU. M2 remains incomplete; earlier CityHub refusal/count statements are historical. Read [contracts](docs/CITYHUB_ENTRY_CONTRACTS.md). Keep missing-name rejection typed and world-file omission explicit; runtime creation still fails. Ambiguous/invalid geometry and other preparation failures remain blocking. Do not alias absent models or import reference engine dependencies. Later-engine source evidence is not a verified 1998 executable trace.
+diff --git a/README.md b/README.md
+index 7b92545..5ee0641 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [CityHub entry continuation](../Documentation/Implementation/M2_CITYHUB_ENTRY.md) records `fallengrills` as an explicitly omitted object because its named BSP is absent. The source instance is rejected before initial update, matching the available LithTech loader behavior; no replacement geometry is invented. CityHub now has 453 created / 31 sounds / 541 editor-only / one omitted / zero unsupported / zero failed entries. Safe NEW_LEVEL preserves the supported player and enters at `01_egressa`; required SPR world materials now decode and animate through SDL_GPU. M2 remains incomplete; earlier CityHub refusal/count statements are historical.
++
+ The [flashlight continuation](../Documentation/Implementation/M2_FLASHLIGHT.md) connects original FlashlightPU/CInvFlashlight/CFlashlightFX, L toggle, battery, local audio, inactive restoration and visible radial point illumination with inspection. CityHub now has 453 created / 31 transferred sounds / 541 editor-only / zero unsupported / one failed entry. Missing `fallengrills` geometry still rejects CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical.
+ 
+ The [remote-bomb continuation](../Documentation/Implementation/M2_REMOTE_BOMBS.md) connects original RemotesPU, reserved slot11, charged throws, separate detonation and player-owned charge cleanup, with inspection. CityHub now has 452 created / 31 transferred sounds / 541 editor-only / one unsupported / one failed entry. FlashlightPU and missing `fallengrills` geometry still reject CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical.
+diff --git a/docs/CITYHUB_ENTRY_CONTRACTS.md b/docs/CITYHUB_ENTRY_CONTRACTS.md
+new file mode 100644
+index 0000000..0487bad
+--- /dev/null
++++ b/docs/CITYHUB_ENTRY_CONTRACTS.md
+@@ -0,0 +1,92 @@
++# CityHub entry and missing named world models
++
++`fallengrills` is CityHub source object 413, a CDestructableBrush with Visible/Solid
++set, Destructable/Pushable/Gravity clear, and Pos (192, 160, -1632). Its original
++PostPropRead copies Name to the requested world-model filename. The mounted DAT
++contains 100 models and no matching name; `boilergrill` is a different model.
++No geometry is synthesized, renamed or borrowed.
++
++## Source basis and limits
++
++Blood II's original `de_codes.h` defines DE_MISSINGWORLDMODEL (23). The available
++later LithTech engine has the corresponding LT_MISSINGWORLDMODEL (23):
++
++1. `FindWorldModel` searches case-insensitively; no match returns null.
++2. `se_InitWorldModel` returns that error, without dimensions/geometry setup.
++3. `sm_AddObjectToWorld` cleans the engine object before initial update.
++4. `LoadObjects` frees the original class instance and continues its object loop;
++   an absent named BSP is not a failed world-file read.
++
++This is corroborating engine-generation evidence, not a recovered 1998 executable
++trace. The later preprocessor only emits a model when it gathers brushes; this
++explains how an object row can exist without a model, but the original CityHub
++editor source is unavailable, so the specific authoring cause is unknown. See the
++[source ledger](M2_CITYHUB_ENTRY_SOURCES.json).
++
++## Typed engine boundary
++
++`Objects::create` still returns null when named geometry is absent. It records
++`ObjectError::MissingWorldModel` only with an attached nonempty world, a nonempty
++requested name, no case-insensitive match and no other validation error. Both
++OT_WORLDMODEL and OT_CONTAINER share this engine rule. Original precreate runs;
++initial update never runs. The rejected instance becomes pending and is destroyed
++at the normal safe boundary. Runtime/string/restore callers still get failure.
++
++Only the world-file loader classifies this typed failure as
++`EntryState::MissingWorldModel`, displayed as **Omitted: missing world model**.
++The source row and diagnostic remain; object and sound identities are empty.
++This is neither a created object, difficulty filtering, nor a successful service.
++No class/name/world exception or general 'ignore errors' policy is introduced.
++
++Ambiguous names, invalid/unsupported geometry, absent world context, invalid
++properties, rejected precreate, missing models/images/audio, unknown classes and
++unavailable required services retain their existing failures. The original later
++engine takes the first ambiguous match; this project deliberately retains its
++stricter ambiguity rejection. Binary/parser corruption still rejects preparation.
++
++## Animated world materials revealed by destination preflight
++
++After resolving the omitted object, strict presentation preflight exposed
++`sprites/motelhell.spr` being passed to the DTX decoder. World-material lookup now
++recognizes normalized `.spr` paths, uses the existing bounded SPR reader, decodes
++all referenced DTX images and deduplicates them with ordinary world textures.
++Manifest entries retain frame indices/fps and dimensions, without duplicating
++pixel buffers. No manifest is treated as an image or uploaded as a fake texture.
++
++All frames must have equal dimensions so the existing authored UV/Pan mapping
++remains valid. Missing, malformed, oversized and incompatible frames retain explicit
++resource errors and block NEW_LEVEL. Existing 4,096-material/128 MiB pixel limits
++include frame images; frame references additionally stop at 65,536 per mesh. The
++SPR reader's own 1 MiB/4,096-frame/1..1,000-fps bounds remain unchanged.
++
++Rendering resolves the frame before the pass and binds its already uploaded DTX.
++Opaque and translucent world passes use the same read-only world-time phase, with
++integer `1000/fps` frame periods, wrapping and world-clock reset. Repeated draws at
++the same time cannot advance animation. Visibility/ImGui do not own this clock.
++The later renderer establishes SPR world-material support and tracker selection;
++this common simulation-time phase is an explicit replacement timing policy, not
++retail per-section rendering-clock parity. Manifest alpha/key flags do not override
++the existing authored world-surface alpha rules. No shader artifacts changed.
++
++The material inspector shows manifest path, fps, dimensions, frame count and current
++DTX path, alongside each decoded/failed frame resource. Presentation preflight counts
++decoded DTX images separately from manifests.
++
++## Transition and inspection
++
++The existing [NEW_LEVEL transaction](LEVEL_CHANGE_CONTRACTS.md) admits the explicit
++omission while retaining all other preparation and rollback checks. Reports and
++rehearsals count omissions separately and retain every source row/detail.
++Session's world table and Session/Objectives transition reports expose the outcome;
++drawing never triggers creation or transfer.
++
++CityHub accounts for all 1,026 source entries: 453 created, 31 transferred world
++sounds, 541 editor-only, one omitted named world model, zero unknown and zero
++failed. These are initial source dispositions, not later runtime-object totals.
++Supported KeepAlive player state enters at `01_egressa`, with a new checked client
++association and the existing original start-trigger behavior. Resource paths,
++content bytes and dependency pins are unchanged.
++
++Initialization success does not certify later gameplay, every future resource
++request, full campaign progression, autosave or M2 completion. See
++[implementation evidence](../../Documentation/Implementation/M2_CITYHUB_ENTRY.md).
+diff --git a/docs/DESTINATION_TRIAL_CONTRACTS.md b/docs/DESTINATION_TRIAL_CONTRACTS.md
+index 5b75a9e..dd218f0 100644
+--- a/docs/DESTINATION_TRIAL_CONTRACTS.md
++++ b/docs/DESTINATION_TRIAL_CONTRACTS.md
+@@ -1,5 +1,11 @@
+ # Isolated destination initialization rehearsal
+ 
++The [CityHub entry continuation](CITYHUB_ENTRY_CONTRACTS.md) supersedes earlier
++missing-named-world-model and CityHub refusal statements: absent named BSPs are
++explicitly omitted before initial update, with no runtime instance. All other
++preparation failures retain their checks. Later simulation and the M2 gate remain
++separate from successful NEW_LEVEL initialization.
++
+ > Current continuation: [safe NEW_LEVEL](LEVEL_CHANGE_CONTRACTS.md) promotes a fully prepared
+ > destination with the supported player, or retains the source on failure. Earlier
+ > blanket transfer omissions below are historical; each standalone diagnostic API
+diff --git a/docs/LEVEL_CHANGE_CONTRACTS.md b/docs/LEVEL_CHANGE_CONTRACTS.md
+index 95107ff..40da9f3 100644
+--- a/docs/LEVEL_CHANGE_CONTRACTS.md
++++ b/docs/LEVEL_CHANGE_CONTRACTS.md
+@@ -1,5 +1,11 @@
+ # Safe NEW_LEVEL ownership transfer
+ 
++The [CityHub entry continuation](CITYHUB_ENTRY_CONTRACTS.md) supersedes earlier
++missing-named-world-model and CityHub refusal statements: absent named BSPs are
++explicitly omitted before initial update, with no runtime instance. All other
++preparation failures retain their checks. Later simulation and the M2 gate remain
++separate from successful NEW_LEVEL initialization.
++
+ `GameSession::queue_level_change` and `process_level_change` connect original exit
+ messages to the existing player snapshot and KeepAlive Load paths. This is a
+ replacement engine transaction, not retail Keep.sav serialization. M2 remains open.
+diff --git a/docs/M2_CITYHUB_ENTRY_SOURCES.json b/docs/M2_CITYHUB_ENTRY_SOURCES.json
+new file mode 100644
+index 0000000..31fe816
+--- /dev/null
++++ b/docs/M2_CITYHUB_ENTRY_SOURCES.json
+@@ -0,0 +1,69 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "d9a83f0b7c1b4d79643fc2b70e15b456416cf728",
++  "status": "M2 incomplete; typed original-compatible missing-model omission and CityHub entry",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
++      "source_sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
++      "purpose": "Original Name-to-world-model filename binding and precreate order."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/de_codes.h",
++      "source_sha256": "75c0fda0c3ea746ff91d05354c7d177d97bbdccb95a22b6955c51d6592f9e21e",
++      "purpose": "Original DE_MISSINGWORLDMODEL numeric error 23."
++    },
++    {
++      "source": "sources/lithtech/runtime/world/src/world_shared_bsp.cpp",
++      "source_sha256": "6d1d4b032df974432ef43411dc6cc2e25f943923c7ac82ccbbe32e0c734c07ad",
++      "purpose": "Later engine case-insensitive lookup and no-match failure; not a Blood II runtime trace."
++    },
++    {
++      "source": "sources/lithtech/runtime/server/src/server_extradata.cpp",
++      "source_sha256": "fc31aff280f38aebb61e659d450535a0149534a8668b296fabf4449f56d54ad5",
++      "purpose": "Later engine missing-model rejection before bounds/geometry initialization; shared by containers."
++    },
++    {
++      "source": "sources/lithtech/runtime/server/src/servermgr.cpp",
++      "source_sha256": "021b651f6d93a426ee9b1150bc1c17a2f57987c2f1f9f9c4a69c2abbae413e5f",
++      "purpose": "Later engine extra-data failure cleanup before initial callback."
++    },
++    {
++      "source": "sources/lithtech/runtime/server/src/s_object.cpp",
++      "source_sha256": "32777bcf2a221ae7c6c8cc6890a102f33120b75f2eb3f60ec7578d54f4b65d68",
++      "purpose": "Later engine world loader frees failed original instances and continues the source-object loop."
++    },
++    {
++      "source": "sources/lithtech/sdk/inc/ltcodes.h",
++      "source_sha256": "289c3ba35fabcbb01b512419f52b4124dff6c79f530c226695c650f48df0ed9c",
++      "purpose": "Later engine LT_MISSINGWORLDMODEL numeric error 23."
++    },
++    {
++      "source": "sources/lithtech/tools/PreProcessor/FindWorldModel.cpp",
++      "source_sha256": "36ad9f0ffd600e357537af7ccdc4c942f68f30676bf28d4b5cde79fc276b4dd7",
++      "purpose": "Later preprocessor emits world-model definitions only with gathered brushes; exact CityHub authoring cause remains unknown."
++    },
++    {
++      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/d3d_renderblock.cpp",
++      "source_sha256": "19c72a58ee9792980b0ac178c2c8c7a4b3f29508634e901080c516c753264428",
++      "purpose": "Later engine recognizes .spr world materials and loads their first tracked frame."
++    },
++    {
++      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/d3d_rendershader_base.h",
++      "source_sha256": "78b7a878aaa4581cec94e870f24a9e8d887d8875d8a1e4479e7a04c728985698",
++      "purpose": "Later engine selects tracked texture frames while rendering; our shared simulation-time phase is an explicit adaptation."
++    },
++    {
++      "source": "sources/lithtech/runtime/client/src/sprite.cpp",
++      "source_sha256": "3a1d267c831f4c597ba841eb95e5684fb555a75d02aae2e333d027a4b18d29a7",
++      "purpose": "Later SPR tracker integer frame period and modulo loop; existing sprite service follows this bounded policy."
++    }
++  ],
++  "adaptations": [
++    "No reference code files imported or modified; existing typed lifecycle and safe NEW_LEVEL retained.",
++    "Classify only absent named world/container geometry after original precreate as an explicit omitted source row; runtime creation still fails.",
++    "Preserve stricter ambiguous-name and malformed/unsupported-geometry rejection.",
++    "Engine loading rule is supported by a later LithTech generation and the Blood II SDK error, not a 1998 executable observation.",
++    "World SPR manifests reuse the existing parser and DTX decoder; equal-size frames and a bounded shared image cache select already uploaded textures from read-only world time, without shader changes."
++  ]
++}
+diff --git a/docs/OBJECT_CONTRACTS.md b/docs/OBJECT_CONTRACTS.md
+index 54d1ecc..2f9eb83 100644
+--- a/docs/OBJECT_CONTRACTS.md
++++ b/docs/OBJECT_CONTRACTS.md
+@@ -1,5 +1,11 @@
+ # M1 Object Boundary
+ 
++The [CityHub entry continuation](CITYHUB_ENTRY_CONTRACTS.md) supersedes earlier
++missing-named-world-model and CityHub refusal statements: absent named BSPs are
++explicitly omitted before initial update, with no runtime instance. All other
++preparation failures retain their checks. Later simulation and the M2 gate remain
++separate from successful NEW_LEVEL initialization.
++
+ Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
+ this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
+ The existing action/service limitations remain unless explicitly superseded.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 6c79f88..92aa916 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1,5 +1,17 @@
+ # Source and Dependency Provenance
+ 
++## Missing named world-model creation
++
++Original Blood II brush filename binding and SDK error 23 are cross-checked with
++the later LithTech lookup, extra-data initialization and world-file loader. The
++typed creation failure remains a failure to runtime callers; world loading records
++an explicit omission before initial update. No reference files are imported or
++modified. The same continuation connects SPR world materials using the existing
++manifest/image readers, supported by later renderblock/tracker code; its common
++simulation-time phase is a replacement policy. Later-engine evidence is not a
++verified 1998 executable trace. See
++[source hashes](M2_CITYHUB_ENTRY_SOURCES.json) and [contracts](CITYHUB_ENTRY_CONTRACTS.md).
++
+ ## Original flashlight
+ 
+ Selected original GameInvItems, InvItem, ItemPickups, InventoryMgr, PlayerObj and
+diff --git a/docs/TEXTURE_CONTRACTS.md b/docs/TEXTURE_CONTRACTS.md
+index 042d5e7..b624dbb 100644
+--- a/docs/TEXTURE_CONTRACTS.md
++++ b/docs/TEXTURE_CONTRACTS.md
+@@ -94,3 +94,9 @@ The [sky continuation](SKY_CONTRACTS.md) supersedes blanket sky-rendering omissi
+ for registered world-model skies. Valid visible skies render behind the world and
+ replace bit-4 portal markers; unavailable skies retain diagnostics. No retail
+ lighting, fog or complete M2 acceptance is implied.
++
++The [CityHub entry continuation](CITYHUB_ENTRY_CONTRACTS.md) additionally resolves
++authored SPR world materials, decodes/deduplicates all same-size DTX frames and
++binds frames from the read-only world clock. Manifest/frame errors still block
++NEW_LEVEL. Both world passes share the phase; geometry, alpha rules and shader
++artifacts are unchanged.
+diff --git a/docs/WORLD_CONTRACTS.md b/docs/WORLD_CONTRACTS.md
+index 3ecdc7d..bcd102d 100644
+--- a/docs/WORLD_CONTRACTS.md
++++ b/docs/WORLD_CONTRACTS.md
+@@ -1,5 +1,11 @@
+ # Resource, World and Session Contracts
+ 
++The [CityHub entry continuation](CITYHUB_ENTRY_CONTRACTS.md) supersedes earlier
++missing-named-world-model and CityHub refusal statements: absent named BSPs are
++explicitly omitted before initial update, with no runtime instance. All other
++preparation failures retain their checks. Later simulation and the M2 gate remain
++separate from successful NEW_LEVEL initialization.
++
+ > Continued by [named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md): supported
+ > captured players can enter an already loaded different world at a named start.
+ > Automatic NEW_LEVEL still refuses; staged cleanup is not world rollback.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 8bea1c0..c7d514b 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -625,7 +625,18 @@ namespace OpenBlood2
+                             for (std::size_t i = 1; i < world_mesh->materials.size(); ++i)
+                             {
+                                 const auto& material = world_mesh->materials[i];
+-                                if (material.error.empty())
++                                if (!material.frames.empty() && material.error.empty())
++                                {
++                                    std::uint32_t image = 0;
++                                    const bool valid = world_material_frame(*world_mesh, static_cast<std::uint32_t>(i),
++                                                                            game.server.world_time(), image);
++                                    ImGui::Text("%s: %zu frames / %u fps / %ux%u", material.path.c_str(),
++                                                material.frames.size(), material.fps, material.image.width,
++                                                material.image.height);
++                                    ImGui::Text("Current frame image: %s",
++                                                valid ? world_mesh->materials[image].path.c_str() : "unavailable");
++                                }
++                                else if (material.error.empty())
+                                     ImGui::Text("%s: %ux%u, %u stored mips, flags 0x%x", material.path.c_str(),
+                                                 material.image.width, material.image.height, material.image.mipmaps,
+                                                 material.image.flags);
+diff --git a/src/app/inspector_objectives.cpp b/src/app/inspector_objectives.cpp
+index cdb8fcc..c311c24 100644
+--- a/src/app/inspector_objectives.cpp
++++ b/src/app/inspector_objectives.cpp
+@@ -80,6 +80,7 @@ namespace OpenBlood2
+         ImGui::Text("Captured %d / loaded %d / entered %d / cleanup %d / source retained %d", d.player_captured,
+                     d.world_loaded, d.player_entered, d.cleanup_complete, d.source_retained);
+         ImGui::Text("Unsupported %zu / failed %zu / decoded images %zu", d.unknown, d.failed, d.checked_textures);
++        ImGui::Text("Omitted missing world models: %zu (no runtime instance)", d.omitted);
+         if (d.player_entered)
+             ImGui::Text("Destination HP %.1f / armor %.1f / bullets %.1f / keys %zu", d.health, d.armor, d.bullets,
+                         d.keys);
+@@ -118,6 +119,7 @@ namespace OpenBlood2
+                     d.player_entered ? "yes" : "no", d.cleanup_complete ? "complete" : "not completed");
+         ImGui::Text("%zu created / %zu sounds / %zu editor / %zu filtered / %zu unknown / %zu failed", d.created,
+                     d.sounds, d.editor_only, d.filtered, d.unknown, d.failed);
++        ImGui::Text("Omitted missing world models: %zu (no runtime instance)", d.omitted);
+         if (d.player_entered)
+             ImGui::Text("Restored HP %.1f / armor %.1f / bullets %.1f / keys %zu / active camera %s", d.health, d.armor,
+                         d.bullets, d.keys, d.entry_camera_active ? "yes" : "no");
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 9542192..2af1847 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -330,7 +330,8 @@ namespace
+         };
+         const bool path_smoke = options.player_smoke && game->world_path == "worlds/01_subwaya.dat";
+         PathList smoke_paths;
+-        bool paths_hidden = false;
++        bool paths_hidden = false, objective_paths_reentered = false;
++        const auto path_source_revision = game->world_revision;
+         if (path_smoke && !OpenBlood2::prepare_path_manager_smoke(*game, smoke_paths))
+             return 4;
+         bool interaction_hidden = false;
+@@ -570,8 +571,15 @@ namespace
+             if (options.cameras_smoke && frames == reload_frame + 1 &&
+                 !OpenBlood2::prepare_camera_smoke(*game, smoke_camera))
+                 return 4;
+-            if (options.objectives_smoke && frames == reload_frame + 1 && !OpenBlood2::objective_smoke(*game))
+-                return 4;
++            if (options.objectives_smoke && frames == reload_frame + 1)
++            {
++                // Recheck the reloaded source before its second exit. Handle values
++                // from the discarded session cannot be compared across revisions.
++                objective_paths_reentered = game->world_revision != path_source_revision &&
++                                            OpenBlood2::check_path_manager_smoke(*game, smoke_paths, false);
++                if (!objective_paths_reentered || !OpenBlood2::objective_smoke(*game))
++                    return 4;
++            }
+             if (options.pickups_smoke && frames == reload_frame + 1)
+                 if (!OpenBlood2::prepare_pickup_smoke(*game, smoke_pickup))
+                     return 4;
+@@ -1276,13 +1284,15 @@ namespace
+                 }
+                 if (options.world_smoke && frames == hide_frame)
+                     hidden_model_time = game->preview_animation.time;
+-                if (options.world_smoke && frames == show_frame)
++                // The objective probe queues a real world replacement. Observe
++                // source progress while hidden, before the next frame commits it.
++                if (options.world_smoke && frames == (options.objectives_smoke ? show_frame - 1 : show_frame))
+                     model_advanced_hidden = game->preview_model && game->preview_animation.time > hidden_model_time;
+                 if (path_smoke && frames == show_frame - 1)
+                     paths_hidden = OpenBlood2::check_path_manager_smoke(*game, smoke_paths, false);
+                 if (options.player_smoke && frames == hide_frame)
+                     hidden_player_updates = game->server_shell.Player(game->local_client)->updates;
+-                if (options.player_smoke && frames == show_frame)
++                if (options.player_smoke && frames == (options.objectives_smoke ? show_frame - 1 : show_frame))
+                     player_advanced_hidden =
+                         game->server_shell.Player(game->local_client)->updates > hidden_player_updates;
+                 if (options.weapons_smoke && frames == hide_frame)
+@@ -1334,6 +1344,10 @@ namespace
+                         inspector.unload_request = true;
+                     else
+                     {
++                        // Repeat the authored SubwayA exit after unloading CityHub.
++                        // The interactive Reload button correctly remembers CityHub.
++                        if (options.objectives_smoke)
++                            inspector.reload_world_name = options.world;
+                         inspector.reload_request = true;
+                         inspector.enter_player_request = options.player_smoke && !options.restore_smoke;
+                         inspector.restore_player_request = options.restore_smoke && !options.keepalive_smoke;
+@@ -1547,7 +1561,10 @@ namespace
+                              character_audio_hidden, character_audio_reentered, player ? player->sound_starts : 0,
+                              player ? int(player->m_eLastSurface) : -1, game->server.audio.submitted_frames);
+             }
+-            const bool paths_reentered = !path_smoke || OpenBlood2::check_path_manager_smoke(*game, smoke_paths, true);
++            const bool paths_reentered =
++                !path_smoke ||
++                (options.objectives_smoke ? objective_paths_reentered
++                                          : OpenBlood2::check_path_manager_smoke(*game, smoke_paths, true));
+             if (path_smoke)
+                 spdlog::info("AI paths: hidden={}, reentered={}, copied points={}", paths_hidden, paths_reentered,
+                              smoke_paths.size());
+@@ -1616,8 +1633,13 @@ namespace
+                  (!keyframe_hidden ||
+                   !OpenBlood2::check_keyframe_smoke(*game, smoke_keyframe, options.worldpaths_smoke))) ||
+                 (options.cameras_smoke && (!camera_hidden || !OpenBlood2::check_camera_smoke(*game, smoke_camera))) ||
+-                (options.objectives_smoke && !objective_hidden) || (options.pickups_smoke && !pickup_hidden) ||
+-                (options.interaction_smoke && !interaction_hidden) || (options.brushes_smoke && !brush_hidden) ||
++                (options.objectives_smoke &&
++                 (!objective_hidden || game->world_path != "worlds/02_cityhub.dat" || !game->level_change.committed ||
++                  !game->level_change.cleanup_complete || game->level_change.source_retained ||
++                  game->level_change.omitted != 1 || game->level_change.failed || game->level_change.unknown ||
++                  !game->client_shell.m_bInWorld)) ||
++                (options.pickups_smoke && !pickup_hidden) || (options.interaction_smoke && !interaction_hidden) ||
++                (options.brushes_smoke && !brush_hidden) ||
+                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
+                 (options.movement_smoke &&
+                  (!movement_hidden || !movement_jumped || !movement_landed || !game->client_shell.move_mgr.ready() ||
+@@ -1638,8 +1660,9 @@ namespace
+                 (options.world_smoke &&
+                  (!world_unloaded || !model_advanced_hidden || !game->preview_model || !game->server.collision_ready ||
+                   game->world_path.empty() ||
+-                  game->objects.snapshot().size() != initial_objects - (options.scene_explosions_smoke ? 1 : 0) ||
+-                  game->server.string_count() != initial_strings)))
++                  (!options.objectives_smoke &&
++                   (game->objects.snapshot().size() != initial_objects - (options.scene_explosions_smoke ? 1 : 0) ||
++                    game->server.string_count() != initial_strings)))))
+             {
+                 auto delta = smoke_object_counts();
+                 for (const auto& [key, count] : initial_smoke_objects)
+@@ -1658,8 +1681,11 @@ namespace
+             spdlog::info("GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and "
+                          "selection invalidation");
+             if (options.world_smoke)
+-                spdlog::info("World smoke passed: unload/reload, original instance/string counts restored, "
+-                             "collision/model resources restored, preview animation advanced while hidden");
++                spdlog::info(options.objectives_smoke
++                                 ? "World smoke passed: unload/reload, source paths/progress checked before exit, "
++                                   "CityHub creation/resource report verified"
++                                 : "World smoke passed: unload/reload, original instance/string counts restored, "
++                                   "collision/model resources restored, preview animation advanced while hidden");
+             if (options.lights_smoke)
+                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
+                              "and after reload; evaluated radius/color checked; world illumination unavailable");
+@@ -1694,9 +1720,9 @@ namespace
+                              "gate and reload checked");
+             if (options.objectives_smoke)
+                 spdlog::info("OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
+-                             "ExitTrigger NEW_LEVEL refusal preserves player/inventory; read-only CityHub preparation "
+-                             "checks 1026 entries; temporary CityHub initialization/kept-player entry, cleanup and "
+-                             "source restoration checked");
++                             "authored ExitTrigger NEW_LEVEL commits CityHub with the retained player; 1026 source "
++                             "entries include one explicit missing-world-model omission; destination entry, "
++                             "cleanup, presentation and reload checked");
+             if (options.pickups_smoke)
+                 spdlog::info("PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked");
+             if (options.weapons_smoke)
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 73f1de7..d7f5f99 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -82,7 +82,7 @@ namespace OpenBlood2
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+             !g.destination_trial.player_entered || g.destination_trial.created != 453 ||
+-            g.destination_trial.unknown != 0 || g.destination_trial.failed != 1 ||
++            g.destination_trial.unknown != 0 || g.destination_trial.failed != 0 || g.destination_trial.omitted != 1 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+diff --git a/src/engine/objects.cpp b/src/engine/objects.cpp
+index 3cc9b5c..a950ae7 100644
+--- a/src/engine/objects.cpp
++++ b/src/engine/objects.cpp
+@@ -395,7 +395,11 @@ namespace OpenBlood2
+             {
+                 contexts_.pop_back();
+                 remove(handle);
+-                fail(ObjectError::Unsupported,
++                // The original engine rejects this object before initial update. Its
++                // world-file loader continues after a missing named BSP; ambiguity,
++                // invalid shapes and an unattached world remain hard failures here.
++                const bool absent = world && !world->models.empty() && state.m_Filename[0] && !model && error.empty();
++                fail(absent ? ObjectError::MissingWorldModel : ObjectError::Unsupported,
+                      std::string(state.m_Name) + ": " +
+                          (error.empty() ? (state.m_ObjectType == OT_CONTAINER ? "Missing named container model"
+                                                                               : "Missing named world model")
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index e962b26..0778d36 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -70,7 +70,8 @@ namespace OpenBlood2
+         InvalidTime,
+         Busy,
+         Limit,
+-        Unsupported
++        Unsupported,
++        MissingWorldModel
+     };
+     struct ObjectId
+     {
+diff --git a/src/engine/world_renderer.cpp b/src/engine/world_renderer.cpp
+index e32c61f..59a0db1 100644
+--- a/src/engine/world_renderer.cpp
++++ b/src/engine/world_renderer.cpp
+@@ -267,7 +267,9 @@ namespace OpenBlood2
+         for (std::size_t i = 0; i < count; ++i)
+         {
+             if (!mesh.materials.empty())
+-                images[i] = mesh.materials[i].error.empty() ? &mesh.materials[i].image : nullptr;
++                images[i] = mesh.materials[i].error.empty() && mesh.materials[i].frames.empty()
++                                ? &mesh.materials[i].image
++                                : nullptr;
+             if (const auto* image = images[i])
+             {
+                 if (!image->width || !image->height || image->width > 1024 || image->height > 1024 ||
+@@ -420,8 +422,10 @@ namespace OpenBlood2
+             const auto& r = mesh.ranges[d.range];
+             for (const auto& b : r.batches)
+             {
+-                if (b.material >= textures_.size() || !textures_[b.material] || b.first < r.first ||
+-                    b.first > std::size_t(r.first) + r.count || b.count > std::size_t(r.first) + r.count - b.first ||
++                std::uint32_t image = 0;
++                if (!world_material_frame(mesh, b.material, surface_time, image) || image >= textures_.size() ||
++                    !textures_[image] || b.first < r.first || b.first > std::size_t(r.first) + r.count ||
++                    b.count > std::size_t(r.first) + r.count - b.first ||
+                     !world_texture_offset(b.uv_rate, surface_time, texture_offset))
+                 {
+                     error = "Invalid diagnostic GPU material batch";
+@@ -497,7 +501,9 @@ namespace OpenBlood2
+                     world_texture_offset(rate, surface_time, uniform.texture_offset);
+                     SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
+                     pan_batches += rate[0] != 0 || rate[1] != 0;
+-                    SDL_GPUTextureSamplerBinding texture{textures_[material], sampler_};
++                    std::uint32_t image = material;
++                    world_material_frame(mesh, material, surface_time, image); // Validated before beginning the pass.
++                    SDL_GPUTextureSamplerBinding texture{textures_[image], sampler_};
+                     SDL_BindGPUFragmentSamplers(pass, 0, &texture, 1);
+                     SDL_DrawGPUPrimitives(pass, count, 1, first, 0);
+                 };
+diff --git a/src/engine/world_view.cpp b/src/engine/world_view.cpp
+index d6691ff..b092bd5 100644
+--- a/src/engine/world_view.cpp
++++ b/src/engine/world_view.cpp
+@@ -1,5 +1,6 @@
+ #include "engine/world_view.h"
+ #include "engine/collision.h"
++#include "engine/sprite.h"
+ #include <algorithm>
+ #include <charconv>
+ #include <cmath>
+@@ -106,6 +107,28 @@ namespace OpenBlood2
+         }
+         return true;
+     }
++    bool world_material_frame(const WorldMesh& mesh, std::uint32_t material, double time, std::uint32_t& image)
++    {
++        image = material;
++        if (!std::isfinite(time) || time < 0)
++            return false;
++        if (mesh.materials.empty())
++            return material == 0; // Existing texture-free diagnostic geometry.
++        if (material >= mesh.materials.size() || !mesh.materials[material].error.empty())
++            return false;
++        const auto& entry = mesh.materials[material];
++        if (entry.frames.empty())
++            return entry.fps == 0;
++        if (!entry.fps || entry.fps > 1000 || entry.frames.size() > 4096)
++            return false;
++        const auto period = 1000 / entry.fps;
++        const double duration = period * entry.frames.size();
++        const auto frame = std::min(entry.frames.size() - 1,
++                                    static_cast<std::size_t>(std::fmod(time, duration / 1000.) * 1000 / period));
++        image = entry.frames[frame];
++        return image < mesh.materials.size() && mesh.materials[image].error.empty() &&
++               mesh.materials[image].frames.empty() && mesh.materials[image].fps == 0;
++    }
+     bool WorldMesh::build(const World& world, std::string& error, const Resources* resources)
+     {
+         *this = {};
+@@ -122,7 +145,27 @@ namespace OpenBlood2
+         materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}});
+         texture_bytes = 4;
+         std::map<std::string, std::uint32_t> material_ids;
+-        std::size_t effect_bytes = 0;
++        std::size_t effect_bytes = 0, frame_references = 0;
++        auto add_image = [&](const std::string& key, std::uint32_t& id)
++        {
++            if (auto found = material_ids.find(key); found != material_ids.end())
++            {
++                id = found->second;
++                return true;
++            }
++            if (materials.size() >= 4097)
++                return false;
++            WorldMaterial entry;
++            entry.path = key;
++            read_texture_resource(*resources, key, entry.image, entry.error);
++            if (entry.image.rgba.size() > 128 * 1024 * 1024 - texture_bytes)
++                return false;
++            texture_bytes += entry.image.rgba.size();
++            id = static_cast<std::uint32_t>(materials.size());
++            materials.push_back(std::move(entry));
++            material_ids.emplace(key, id);
++            return true;
++        };
+         for (const auto& model : world.models)
+         {
+             if (model.polygons.size() > 65536 || model.points.size() > 65536 || !physics_vector(model.translation))
+@@ -194,17 +237,63 @@ namespace OpenBlood2
+                     auto found = material_ids.find(key);
+                     if (found == material_ids.end())
+                     {
+-                        if (materials.size() >= 4097)
+-                            return fail("World texture count budget exceeded");
+-                        WorldMaterial entry;
+-                        entry.path = key;
+-                        read_texture_resource(*resources, key, entry.image, entry.error);
+-                        if (entry.image.rgba.size() > 128 * 1024 * 1024 - texture_bytes)
+-                            return fail("World texture memory budget exceeded");
+-                        texture_bytes += entry.image.rgba.size();
+-                        const auto id = static_cast<std::uint32_t>(materials.size());
+-                        materials.push_back(std::move(entry));
+-                        found = material_ids.emplace(key, id).first;
++                        std::uint32_t id = 0;
++                        if (!key.ends_with(".spr"))
++                        {
++                            if (!add_image(key, id))
++                                return fail("World texture count/memory budget exceeded");
++                        }
++                        else
++                        {
++                            WorldMaterial entry;
++                            entry.path = key;
++                            Sprite sprite;
++                            std::vector<std::uint8_t> bytes;
++                            const auto* resource = resources->find(key);
++                            if (!resource || resource->size > 1024 * 1024)
++                                entry.error = "Missing or oversized world SPR: " + key;
++                            else if (resources->read(key, bytes, entry.error) &&
++                                     read_sprite(bytes, sprite, entry.error))
++                            {
++                                if (sprite.frames.size() > 65536 - frame_references)
++                                    return fail("World SPR frame-reference budget exceeded");
++                                frame_references += sprite.frames.size();
++                                for (const auto& path : sprite.frames)
++                                {
++                                    std::string frame_key;
++                                    if (!resource_path(path, frame_key) || !add_image(frame_key, id))
++                                        return fail("World SPR texture budget/path exceeded");
++                                    const auto& frame = materials[id];
++                                    if (!frame.error.empty())
++                                    {
++                                        entry.error = frame.path + ": " + frame.error;
++                                        break;
++                                    }
++                                    if (entry.frames.empty())
++                                    {
++                                        entry.image.width = frame.image.width;
++                                        entry.image.height = frame.image.height;
++                                    }
++                                    if (entry.image.width != frame.image.width ||
++                                        entry.image.height != frame.image.height)
++                                    {
++                                        entry.error = "World SPR frame dimensions differ";
++                                        break;
++                                    }
++                                    entry.frames.push_back(id);
++                                }
++                                if (entry.error.empty())
++                                    entry.fps = sprite.fps;
++                                else
++                                    entry.frames.clear();
++                            }
++                            if (materials.size() >= 4097)
++                                return fail("World texture count budget exceeded");
++                            id = static_cast<std::uint32_t>(materials.size());
++                            materials.push_back(std::move(entry));
++                            material_ids.emplace(key, id);
++                        }
++                        found = material_ids.find(key);
+                     }
+                     if (!(surface.flags & (1u << 4)))
+                     {
+diff --git a/src/engine/world_view.h b/src/engine/world_view.h
+index d54ee45..3ff4901 100644
+--- a/src/engine/world_view.h
++++ b/src/engine/world_view.h
+@@ -16,6 +16,8 @@ namespace OpenBlood2
+     {
+         std::string path, error;
+         Texture image;
++        unsigned fps = 0;
++        std::vector<std::uint32_t> frames{}; // SPR: indices of decoded DTX materials; image holds dimensions only.
+     };
+     struct WorldSurfaceEffect
+     {
+@@ -54,6 +56,7 @@ namespace OpenBlood2
+         std::size_t invisible = 0, degenerate = 0, transparent = 0, sky = 0, blended = 0;
+         bool build(const World&, std::string&, const Resources* = nullptr);
+     };
++    bool world_material_frame(const WorldMesh&, std::uint32_t material, double time, std::uint32_t& image);
+     struct WorldDraw
+     {
+         std::uint32_t range = 0;
+diff --git a/src/game/destination_trial.cpp b/src/game/destination_trial.cpp
+index 912dd3d..ff6eea8 100644
+--- a/src/game/destination_trial.cpp
++++ b/src/game/destination_trial.cpp
+@@ -94,6 +94,9 @@ namespace OpenBlood2
+                     case EntryState::Unsupported:
+                         ++next.unknown;
+                         break;
++                    case EntryState::MissingWorldModel:
++                        ++next.omitted;
++                        break;
+                     case EntryState::Failed:
+                         ++next.failed;
+                         break;
+diff --git a/src/game/level_change.cpp b/src/game/level_change.cpp
+index 820870c..7ac9c7c 100644
+--- a/src/game/level_change.cpp
++++ b/src/game/level_change.cpp
+@@ -15,7 +15,7 @@ namespace OpenBlood2
+             // Run normal original callbacks first. A registered class or a successful
+             // player spawn alone is not permission to discard the old world.
+             report.entries.clear();
+-            report.unknown = report.failed = 0;
++            report.unknown = report.failed = report.omitted = 0;
+             for (std::size_t i = 0; i < game.entries.size(); ++i)
+             {
+                 const auto& source = game.world.objects[i];
+@@ -26,6 +26,7 @@ namespace OpenBlood2
+                         row.name = *name;
+                 report.unknown += row.state == EntryState::Unsupported;
+                 report.failed += row.state == EntryState::Failed;
++                report.omitted += row.state == EntryState::MissingWorldModel;
+                 report.entries.push_back(std::move(row));
+             }
+             report.unavailable_services.clear();
+@@ -55,7 +56,7 @@ namespace OpenBlood2
+                     error = "Destination world texture " + material.path + ": " + material.error;
+                     return false;
+                 }
+-                if (!material.path.empty())
++                if (!material.path.empty() && material.frames.empty())
+                     checked.insert(material.path);
+             }
+             auto image = [&](std::string_view path)
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 163b994..c00414e 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -24,6 +24,8 @@ namespace OpenBlood2
+                 return "Class not ported";
+             case EntryState::Filtered:
+                 return "Original filter";
++            case EntryState::MissingWorldModel:
++                return "Omitted: missing world model";
+             case EntryState::Failed:
+                 return "Creation failed";
+         }
+@@ -139,6 +141,12 @@ namespace OpenBlood2
+                     entry.state = EntryState::Filtered;
+                     entry.detail = "Removed by original initial-update difficulty/game-type rules";
+                 }
++                else if (!h && objects.error() == ObjectError::MissingWorldModel)
++                {
++                    entry.state = EntryState::MissingWorldModel;
++                    entry.detail = objects.diagnostics().back() +
++                                   "; engine rejected creation before initial update; world loading continues";
++                }
+                 else
+                 {
+                     entry.state = EntryState::Failed;
+diff --git a/src/game/session.h b/src/game/session.h
+index 0d64b1a..2163cc1 100644
+--- a/src/game/session.h
++++ b/src/game/session.h
+@@ -17,6 +17,7 @@ namespace OpenBlood2
+         EditorOnly,
+         Unsupported,
+         Filtered,
++        MissingWorldModel, // Engine creation rejected; source row retained, no runtime instance.
+         Failed
+     };
+     const char* entry_state_name(EntryState state);
+diff --git a/src/game/world_preparation.h b/src/game/world_preparation.h
+index 03220cc..7364a58 100644
+--- a/src/game/world_preparation.h
++++ b/src/game/world_preparation.h
+@@ -47,7 +47,7 @@ namespace OpenBlood2
+         bool world_loaded = false, player_entered = false, cleanup_complete = false, entry_camera_active = false;
+         float health = 0, armor = 0, bullets = 0;
+         std::size_t keys = 0;
+-        std::size_t created = 0, sounds = 0, editor_only = 0, filtered = 0, unknown = 0, failed = 0;
++        std::size_t created = 0, sounds = 0, editor_only = 0, filtered = 0, omitted = 0, unknown = 0, failed = 0;
+         std::size_t runtime_objects = 0, attachments = 0, voices = 0;
+         std::vector<DestinationTrialEntry> entries;
+     };
+@@ -68,7 +68,7 @@ namespace OpenBlood2
+         std::string source_world, destination, requested_start, selected_start, error;
+         bool player_captured = false, world_loaded = false, player_entered = false, cleanup_complete = false;
+         bool source_retained = true, start_fallback = false;
+-        std::size_t unknown = 0, failed = 0, checked_textures = 0;
++        std::size_t unknown = 0, failed = 0, omitted = 0, checked_textures = 0;
+         std::vector<DestinationTrialEntry> entries;
+         std::vector<std::string> unavailable_services;
+         float health = 0, armor = 0, bullets = 0;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 069e873..0f0c2e9 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1709,3 +1709,11 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.flashlight_private PROPERTIES LABELS "gpu;private;flashlight" TIMEOUT 90 RUN_SERIAL TRUE)
+     endif()
+ endif()
++
++if(BLOOD2_GPU_TESTS)
++    add_executable(world_sprite_gpu_tests world_sprite_gpu_tests.cpp)
++    target_link_libraries(world_sprite_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(world_sprite_gpu_tests)
++    add_test(NAME gpu.world_sprite COMMAND world_sprite_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/world-sprite")
++    set_tests_properties(gpu.world_sprite PROPERTIES LABELS "gpu;world_view;sprite" TIMEOUT 45 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++endif()
+diff --git a/tests/assault_tests.cpp b/tests/assault_tests.cpp
+index 01a320b..5b2f99b 100644
+--- a/tests/assault_tests.cpp
++++ b/tests/assault_tests.cpp
+@@ -432,12 +432,14 @@ bool private_game(const std::filesystem::path& root)
+     {
+         CHECK(g.request_world("02_cityhub", error));
+         unsigned created = 0, unknown = 0, failed = 0, assault = 0;
++        unsigned omitted = 0;
+         for (std::size_t i = 0; i < g.entries.size(); ++i)
+         {
+             const auto& e = g.entries[i];
+             created += e.state == EntryState::Created;
+             unknown += e.state == EntryState::Unsupported;
+             failed += e.state == EntryState::Failed;
++            omitted += e.state == EntryState::MissingWorldModel;
+             if (g.world.objects[i].class_name == "AssaultRiflePU")
+             {
+                 ++assault;
+@@ -446,7 +448,7 @@ bool private_game(const std::filesystem::path& root)
+         }
+         std::cout << "CityHub M16=" << assault << " created=" << created << " unknown=" << unknown
+                   << " failed=" << failed << '\n';
+-        CHECK(assault == 1 && created == 453 && unknown == 0 && failed == 1);
++        CHECK(assault == 1 && created == 453 && unknown == 0 && failed == 0 && omitted == 1);
+         CHECK(g.unload_world());
+         // Labelled arena uses actual private models/audio, with controlled geometry.
+         auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
+diff --git a/tests/audio_stream_tests.cpp b/tests/audio_stream_tests.cpp
+index 35c56a7..d189185 100644
+--- a/tests/audio_stream_tests.cpp
++++ b/tests/audio_stream_tests.cpp
+@@ -267,11 +267,13 @@ namespace
+         {
+             CHECK(g.request_world("02_cityhub", error));
+             unsigned created = 0, transferred = 0, failed = 0, unknown = 0, fx = 0, fx_voices = 0, streams = 0;
++            unsigned omitted = 0;
+             for (const auto& e : g.entries)
+             {
+                 created += e.state == EntryState::Created;
+                 transferred += e.state == EntryState::WorldSound;
+                 failed += e.state == EntryState::Failed;
++                omitted += e.state == EntryState::MissingWorldModel;
+                 unknown += e.state == EntryState::Unsupported;
+             }
+             for (auto id : g.objects.snapshot())
+@@ -295,7 +297,8 @@ namespace
+             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
+                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
+                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
+-            CHECK(created == 453 && transferred == 31 && unknown == 0 && failed == 1 && fx == 5 && fx_voices == 4);
++            CHECK(created == 453 && transferred == 31 && unknown == 0 && failed == 0 && omitted == 1 && fx == 5 &&
++                  fx_voices == 4);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_bytes());
+         }
+diff --git a/tests/compound_shell_tests.cpp b/tests/compound_shell_tests.cpp
+index 2f3031b..2f531b0 100644
+--- a/tests/compound_shell_tests.cpp
++++ b/tests/compound_shell_tests.cpp
+@@ -220,16 +220,18 @@ namespace
+         {
+             CHECK(g.request_world("02_cityhub", error));
+             unsigned created = 0, unknown = 0, failed = 0, transferred = 0;
++            unsigned omitted = 0;
+             for (auto& e : g.entries)
+             {
+                 created += e.state == EntryState::Created;
+                 unknown += e.state == EntryState::Unsupported;
+                 failed += e.state == EntryState::Failed;
++                omitted += e.state == EntryState::MissingWorldModel;
+                 transferred += e.state == EntryState::WorldSound;
+             }
+             std::cout << "CityHub: " << created << " created / " << transferred << " sounds / " << unknown
+                       << " unsupported / " << failed << " failed\n";
+-            CHECK(created == 453 && transferred == 31 && unknown == 0 && failed == 1);
++            CHECK(created == 453 && transferred == 31 && unknown == 0 && failed == 0 && omitted == 1);
+             WorldMesh mesh;
+             CHECK(mesh.build(g.world, error, &g.resources));
+             if (gpu)
+diff --git a/tests/container_tests.cpp b/tests/container_tests.cpp
+index a00a815..11d7a29 100644
+--- a/tests/container_tests.cpp
++++ b/tests/container_tests.cpp
+@@ -556,7 +556,7 @@ namespace
+                     continue;
+                 }
+                 if (!r && path == "worlds/20_powerstation.dat" && source.class_name == "Damage" &&
+-                    game.objects.error() == ObjectError::Unsupported && !game.objects.diagnostics().empty() &&
++                    game.objects.error() == ObjectError::MissingWorldModel && !game.objects.diagnostics().empty() &&
+                     game.objects.diagnostics().back() == "kkk: Missing named container model")
+                 {
+                     std::cout << path << " Damage: missing kkk model\n";
+diff --git a/tests/conversation_tests.cpp b/tests/conversation_tests.cpp
+index e4dcdb4..7df2b8e 100644
+--- a/tests/conversation_tests.cpp
++++ b/tests/conversation_tests.cpp
+@@ -247,17 +247,19 @@ namespace
+         {
+             CHECK(g.request_world("02_cityhub", error));
+             unsigned created = 0, unknown = 0, failed = 0;
++            unsigned omitted = 0;
+             ConversationTrigger* conversation = nullptr;
+             for (const auto& e : g.entries)
+             {
+                 created += e.state == EntryState::Created;
+                 unknown += e.state == EntryState::Unsupported;
+                 failed += e.state == EntryState::Failed;
++                omitted += e.state == EntryState::MissingWorldModel;
+             }
+             for (auto id : g.objects.snapshot())
+                 if (auto* c = dynamic_cast<ConversationTrigger*>(g.objects.get(id)->game.get()))
+                     conversation = c;
+-            CHECK(created == 453 && unknown == 0 && failed == 1 && conversation);
++            CHECK(created == 453 && unknown == 0 && failed == 0 && omitted == 1 && conversation);
+             std::cout << "CityHub conversation count=" << conversation->count << " file=" << conversation->waves[0]
+                       << " mapped=" << bool(conversation_text(conversation->waves[0])) << '\n';
+             g.server_shell.start_point_name = "01_egressa";
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+index bba081a..7b5bc0a 100644
+--- a/tests/destructable_model_tests.cpp
++++ b/tests/destructable_model_tests.cpp
+@@ -287,6 +287,7 @@ namespace
+         {
+             CHECK(g.request_world("02_CityHub", error));
+             unsigned count = 0, pushable = 0, gravity = 0, failed = 0, unknown = 0, created = 0, ground_misses = 0;
++            unsigned omitted = 0;
+             std::vector<ObjectId> ids;
+             ModelView scene;
+             for (std::size_t i = 0; i < g.entries.size(); ++i)
+@@ -295,6 +296,7 @@ namespace
+                 created += e.state == EntryState::Created;
+                 unknown += e.state == EntryState::Unsupported;
+                 failed += e.state == EntryState::Failed;
++                omitted += e.state == EntryState::MissingWorldModel;
+                 if (g.world.objects[i].class_name != "CDestructableModel")
+                     continue;
+                 auto* r = g.objects.get(e.object);
+@@ -313,7 +315,7 @@ namespace
+             std::cout << "CityHub model initialization: " << count << " models / " << pushable << " pushable / "
+                       << gravity << " gravity / " << ground_misses << " ground misses\n";
+             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
+-            CHECK(created == 453 && unknown == 0 && failed == 1);
++            CHECK(created == 453 && unknown == 0 && failed == 0 && omitted == 1);
+             CHECK(update_model_scene(g, scene, error));
+             unsigned skin_failures = 0, triangles = 0;
+             for (auto id : ids)
+diff --git a/tests/flare_tests.cpp b/tests/flare_tests.cpp
+index af361a8..e2437e3 100644
+--- a/tests/flare_tests.cpp
++++ b/tests/flare_tests.cpp
+@@ -395,12 +395,14 @@ namespace
+         }
+         CHECK(g.request_world("02_cityhub", error));
+         unsigned created = 0, unknown = 0, failed = 0, flare = 0;
++        unsigned omitted = 0;
+         for (std::size_t i = 0; i < g.entries.size(); ++i)
+         {
+             auto& e = g.entries[i];
+             created += e.state == EntryState::Created;
+             unknown += e.state == EntryState::Unsupported;
+             failed += e.state == EntryState::Failed;
++            omitted += e.state == EntryState::MissingWorldModel;
+             if (auto* a =
+                     dynamic_cast<CultistAI*>(g.objects.get(e.object) ? g.objects.get(e.object)->game.get() : nullptr);
+                 a && a->m_InventoryMgr.CurrentWeapon() && a->m_InventoryMgr.CurrentWeapon()->data.m_nType == 3)
+@@ -413,7 +415,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unsupported=" << unknown << " failed=" << failed
+                   << " flare NPCs=" << flare << '\n';
+-        CHECK(created == 453 && unknown == 0 && failed == 1 && flare == 1);
++        CHECK(created == 453 && unknown == 0 && failed == 0 && omitted == 1 && flare == 1);
+         CHECK(g.unload_world());
+         return true;
+     }
+diff --git a/tests/flashlight_tests.cpp b/tests/flashlight_tests.cpp
+index 3146dda..e7a0316 100644
+--- a/tests/flashlight_tests.cpp
++++ b/tests/flashlight_tests.cpp
+@@ -307,14 +307,16 @@ namespace
+             CHECK(g.request_world("02_cityhub", e));
+             g.server_shell.start_point_name = "01_egressa";
+             unsigned made = 0, unknown = 0, failed = 0;
++            unsigned omitted = 0;
+             HOBJECT h = nullptr;
+             for (const auto& entry : g.entries)
+             {
+                 made += entry.state == EntryState::Created;
+                 unknown += entry.state == EntryState::Unsupported;
+                 failed += entry.state == EntryState::Failed;
++                omitted += entry.state == EntryState::MissingWorldModel;
+             }
+-            CHECK(made == 453 && unknown == 0 && failed == 1);
++            CHECK(made == 453 && unknown == 0 && failed == 0 && omitted == 1);
+             for (auto id : g.objects.snapshot())
+                 if (dynamic_cast<FlashlightPU*>(g.objects.get(id)->game.get()))
+                     h = g.objects.get(id)->handle;
+diff --git a/tests/level_change_gpu_tests.cpp b/tests/level_change_gpu_tests.cpp
+index 52c3137..5819c87 100644
+--- a/tests/level_change_gpu_tests.cpp
++++ b/tests/level_change_gpu_tests.cpp
+@@ -35,7 +35,7 @@ int main(int argc, char** argv)
+     ModelView scene;
+     WorldRenderer world(runtime.gpu), models(runtime.gpu);
+     std::uint64_t revision = UINT64_MAX;
+-    for (unsigned cycle = 0; cycle < 3; ++cycle)
++    for (unsigned cycle = 0; cycle < 4; ++cycle)
+     {
+         CHECK(game->step(1. / 60));
+         CHECK(game->server.audio.has_output() && game->server.audio.submitted_frames > 0);
+@@ -46,6 +46,16 @@ int main(int argc, char** argv)
+         scene.clear();
+         CHECK(mesh.build(game->world, error, &game->resources));
+         CHECK(update_model_scene(*game, scene, error));
++        unsigned animated = 0;
++        for (const auto& material : mesh.materials)
++            if (!material.frames.empty())
++            {
++                ++animated;
++                std::cout << "World SPR " << material.path << ": " << material.frames.size() << " frames / "
++                          << material.fps << " fps\n";
++            }
++        if (game->world_path == "worlds/02_cityhub.dat")
++            CHECK(animated > 0);
+         std::vector<WorldDraw> draws;
+         WorldViewStats stats;
+         CHECK(world_draws(mesh, game->objects, draws, stats, error));
+@@ -54,7 +64,7 @@ int main(int argc, char** argv)
+         CHECK(world.prepare(mesh, revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 420, error));
+         CHECK(models.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 420, error, true));
+         const auto view = game->client_shell.view;
+-        CHECK(view.object);
++        CHECK(game->client_shell.player && game->client_shell.m_bInWorld);
+         auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
+         CHECK(cmd);
+         CHECK(world.draw(cmd, capture.texture, mesh, draws, view.position, view.rotation, true, error, DrawLoad::Clear,
+@@ -96,20 +106,31 @@ int main(int argc, char** argv)
+         player->m_InventoryMgr.SetAmmoCount(1, 1234);
+         const auto before = game.get();
+         const auto old_player = player->m_hObject;
+-        CHECK(game->server.SendWorldExit({"02_CityHub"}, "01_egressa") == DE_OK && game->pump_player_messages(error));
++        CHECK(game->server.SendWorldExit({"missing-destination"}, "start") == DE_OK &&
++              game->pump_player_messages(error));
+         CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+         CHECK(game.get() == before && game->client_shell.player == old_player && game->world_revision == revision);
+-        CHECK(game->level_change.unknown == 0 && game->level_change.failed == 1 && game->server.audio.has_output());
+-        CHECK(game->server.SendWorldExit({"01_SubwayA"}, "start") == DE_OK && game->pump_player_messages(error));
+-        CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Committed);
++        CHECK(!error.empty() && game->level_change.source_retained && game->server.audio.has_output());
++        const bool city = cycle % 2 == 0;
++        CHECK(game->server.SendWorldExit({city ? "02_CityHub" : "01_SubwayA"}, city ? "01_egressa" : "start") ==
++                  DE_OK &&
++              game->pump_player_messages(error));
++        const auto changed = GameSession::process_level_change(game, error);
++        std::cout << "Destination: " << (city ? "CityHub" : "SubwayA") << " / " << error << '\n';
++        CHECK(changed == LevelChangeResult::Committed);
++        CHECK(game->level_change.omitted == (city ? 1u : 0u) && game->level_change.failed == 0);
++        // SubwayA has only the authored noname single-player start: requesting
++        // "start" must preserve the original fallback, unlike City's named entry.
++        CHECK(game->level_change.selected_start == (city ? "01_egressa" : "noname"));
++        CHECK(game->level_change.start_fallback == !city);
+         CHECK(game.get() != before && game->client_shell.player != old_player && game->server.audio.has_output());
+         CHECK(game->level_change.cleanup_complete && game->level_change.health == 37 &&
+               game->level_change.armor == 23 && game->level_change.bullets == 1234);
+         CHECK(game->client_shell.world_exit.completed == cycle + 1 &&
+               game->client_shell.world_exit.blocked == cycle + 1);
+-        std::cout
+-            << "Cycle " << cycle << ": " << filled
+-            << " textured pixels, no fallback; CityHub retained source, SubwayA committed, audio output transferred\n";
++        std::cout << "Cycle " << cycle << ": " << filled
++                  << " textured pixels, no fallback; malformed destination retained source, next world committed, "
++                     "audio output transferred\n";
+     }
+     CHECK(game->unload_world() && game->server.string_count() == 0 && game->server.client_count() == 0);
+     return 0;
+diff --git a/tests/mac10_tests.cpp b/tests/mac10_tests.cpp
+index ed985ef..fe9494c 100644
+--- a/tests/mac10_tests.cpp
++++ b/tests/mac10_tests.cpp
+@@ -249,12 +249,14 @@ namespace
+         }
+         CHECK(g.request_world("02_cityhub", error));
+         unsigned created = 0, unknown = 0, failed = 0, mac = 0;
++        unsigned omitted = 0;
+         for (std::size_t i = 0; i < g.entries.size(); ++i)
+         {
+             const auto& e = g.entries[i];
+             created += e.state == EntryState::Created;
+             unknown += e.state == EntryState::Unsupported;
+             failed += e.state == EntryState::Failed;
++            omitted += e.state == EntryState::MissingWorldModel;
+             if (g.world.objects[i].class_name == "SubMachineGunPU")
+             {
+                 ++mac;
+@@ -263,7 +265,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unknown=" << unknown << " failed=" << failed << " Mac10=" << mac
+                   << '\n';
+-        CHECK(mac == 1 && created == 453 && unknown == 0 && failed == 1);
++        CHECK(mac == 1 && created == 453 && unknown == 0 && failed == 0 && omitted == 1);
+         for (auto id : g.objects.snapshot())
+             if (auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(g.objects.get(id)->handle));
+                 a && a->runtime_failed)
+diff --git a/tests/medkit_tests.cpp b/tests/medkit_tests.cpp
+index 3ca7151..cd44593 100644
+--- a/tests/medkit_tests.cpp
++++ b/tests/medkit_tests.cpp
+@@ -284,14 +284,16 @@ namespace
+             CHECK(g.request_world("02_cityhub", e));
+             g.server_shell.start_point_name = "01_egressa";
+             unsigned created = 0, unknown = 0, failed = 0;
++            unsigned omitted = 0;
+             HOBJECT h = nullptr;
+             for (auto& entry : g.entries)
+             {
+                 created += entry.state == EntryState::Created;
+                 unknown += entry.state == EntryState::Unsupported;
+                 failed += entry.state == EntryState::Failed;
++                omitted += entry.state == EntryState::MissingWorldModel;
+             }
+-            CHECK(created == 453 && unknown == 0 && failed == 1);
++            CHECK(created == 453 && unknown == 0 && failed == 0 && omitted == 1);
+             for (auto id : g.objects.snapshot())
+                 if (dynamic_cast<MedKitPU*>(g.objects.get(id)->game.get()))
+                     h = g.objects.get(id)->handle;
+diff --git a/tests/object_contract_tests.cpp b/tests/object_contract_tests.cpp
+index 7d473ce..9f8fbb2 100644
+--- a/tests/object_contract_tests.cpp
++++ b/tests/object_contract_tests.cpp
+@@ -503,6 +503,41 @@ namespace
+                 static_cast<ObjectCreateStruct*>(data)->m_Pos.x = std::numeric_limits<float>::infinity();
+         };
+         CHECK(!probe(s) && s.objects.finish_frame());
++        // Missing BSP rejects construction before initial update, for both world
++        // models and containers. Runtime callers still receive null, never a dummy.
++        s.world.models.resize(1);
++        s.world.models[0].name = "existing";
++        for (const auto kind : {OT_WORLDMODEL, OT_CONTAINER})
++        {
++            HOBJECT rejected = nullptr;
++            context.engine = [&](Probe& p, DDWORD id, void* data, float)
++            {
++                if (id == MID_PRECREATE)
++                {
++                    rejected = p.m_hObject;
++                    auto& state = *static_cast<ObjectCreateStruct*>(data);
++                    state.m_ObjectType = kind;
++                    std::snprintf(state.m_Filename, sizeof(state.m_Filename), "%s", "absent");
++                }
++                if (id == MID_INITIALUPDATE)
++                    ++initial;
++            };
++            CHECK(!probe(s) && s.objects.error() == ObjectError::MissingWorldModel && initial == 0);
++            CHECK(s.objects.get(rejected)->life == Life::Pending);
++            CHECK(s.objects.finish_frame() && !s.objects.get(rejected));
++            // A bound but invalid shape, or ambiguous case-insensitive matches,
++            // is not the original missing-name case and cannot become an omission.
++            s.world.models[0].name = "absent";
++            CHECK(!probe(s) && s.objects.error() == ObjectError::Unsupported && initial == 0);
++            CHECK(s.objects.finish_frame());
++            s.world.models.push_back(s.world.models[0]);
++            s.world.models[1].name = "ABSENT";
++            CHECK(!probe(s) && s.objects.error() == ObjectError::Unsupported && initial == 0);
++            CHECK(s.objects.diagnostics().back().find("Ambiguous") != std::string::npos);
++            CHECK(s.objects.finish_frame());
++            s.world.models.resize(1);
++            s.world.models[0].name = "existing";
++        }
+         // Bound recursive spawning and restore property context at every unwind.
+         int nested = 0;
+         context.engine = [&](Probe&, DDWORD id, void*, float)
+diff --git a/tests/particle_stream_tests.cpp b/tests/particle_stream_tests.cpp
+index 456c447..c6883c0 100644
+--- a/tests/particle_stream_tests.cpp
++++ b/tests/particle_stream_tests.cpp
+@@ -290,13 +290,15 @@ namespace
+         {
+             CHECK(g.request_world("02_cityhub", e));
+             unsigned created = 0, unknown = 0, failed = 0;
++            unsigned omitted = 0;
+             for (auto& entry : g.entries)
+             {
+                 created += entry.state == EntryState::Created;
+                 unknown += entry.state == EntryState::Unsupported;
+                 failed += entry.state == EntryState::Failed;
++                omitted += entry.state == EntryState::MissingWorldModel;
+             }
+-            CHECK(created == 453 && unknown == 0 && failed == 1);
++            CHECK(created == 453 && unknown == 0 && failed == 0 && omitted == 1);
+             auto& streams = g.server.particle_streams;
+             CHECK(streams.active.size() == 8 && !streams.failed);
+             unsigned initial = 0;
+diff --git a/tests/proximity_tests.cpp b/tests/proximity_tests.cpp
+index b6d0414..81bcc41 100644
+--- a/tests/proximity_tests.cpp
++++ b/tests/proximity_tests.cpp
+@@ -292,14 +292,16 @@ namespace
+         {
+             CHECK(g.request_world("02_cityhub", e));
+             unsigned made = 0, unknown = 0, failed = 0, pickups = 0;
++            unsigned omitted = 0;
+             std::vector<HOBJECT> authored;
+             for (const auto& row : g.entries)
+             {
+                 made += row.state == EntryState::Created;
+                 unknown += row.state == EntryState::Unsupported;
+                 failed += row.state == EntryState::Failed;
++                omitted += row.state == EntryState::MissingWorldModel;
+             }
+-            CHECK(made == 453 && unknown == 0 && failed == 1);
++            CHECK(made == 453 && unknown == 0 && failed == 0 && omitted == 1);
+             for (auto id : g.objects.snapshot())
+                 if (auto* pu = dynamic_cast<ProximitiesPU*>(g.objects.get(id)->game.get()))
+                 {
+diff --git a/tests/remote_tests.cpp b/tests/remote_tests.cpp
+index 3857b6a..c99c46a 100644
+--- a/tests/remote_tests.cpp
++++ b/tests/remote_tests.cpp
+@@ -289,14 +289,16 @@ namespace
+         {
+             CHECK(g.request_world("02_cityhub", e));
+             unsigned made = 0, unknown = 0, failed = 0, pickups = 0;
++            unsigned omitted = 0;
+             std::vector<HOBJECT> authored;
+             for (const auto& row : g.entries)
+             {
+                 made += row.state == EntryState::Created;
+                 unknown += row.state == EntryState::Unsupported;
+                 failed += row.state == EntryState::Failed;
++                omitted += row.state == EntryState::MissingWorldModel;
+             }
+-            CHECK(made == 453 && unknown == 0 && failed == 1);
++            CHECK(made == 453 && unknown == 0 && failed == 0 && omitted == 1);
+             for (auto id : g.objects.snapshot())
+                 if (auto* pu = dynamic_cast<RemotesPU*>(g.objects.get(id)->game.get()))
+                 {
+diff --git a/tests/sky_tests.cpp b/tests/sky_tests.cpp
+index 49d21f2..96ac1aa 100644
+--- a/tests/sky_tests.cpp
++++ b/tests/sky_tests.cpp
+@@ -160,13 +160,15 @@ namespace
+         {
+             CHECK(g.request_world("02_cityhub", e));
+             unsigned created = 0, failed = 0, unknown = 0;
++            unsigned omitted = 0;
+             for (const auto& entry : g.entries)
+             {
+                 created += entry.state == EntryState::Created;
+                 failed += entry.state == EntryState::Failed;
++                omitted += entry.state == EntryState::MissingWorldModel;
+                 unknown += entry.state == EntryState::Unsupported;
+             }
+-            CHECK(created == 453 && failed == 1 && unknown == 0);
++            CHECK(created == 453 && failed == 0 && omitted == 1 && unknown == 0);
+             for (const auto& use : g.resource_uses)
+                 CHECK(use.path != "Clouds1Pointer" && use.path != "Moon1Pointer" && use.path != "Star1Pointer" &&
+                       use.path != "BuildingsPointer");
+diff --git a/tests/texture_tests.cpp b/tests/texture_tests.cpp
+index b4bbab2..d08f01b 100644
+--- a/tests/texture_tests.cpp
++++ b/tests/texture_tests.cpp
+@@ -3,6 +3,7 @@
+ #include "engine/world_view.h"
+ #include "player_fixture.h"
+ #include <iostream>
++#include <limits>
+ using namespace OpenBlood2;
+ #define CHECK(x)                                                                                                       \
+     do                                                                                                                 \
+@@ -115,6 +116,49 @@ namespace
+         test_player::Directory directory;
+         directory.files["a.dtx"] = fixture(false);
+         directory.files["bad.dtx"] = {1, 2, 3};
++        directory.files["b.dtx"] = fixture(true);
++        auto spr = [](std::initializer_list<const char*> frames)
++        {
++            test_model::Writer w;
++            w.u32(frames.size());
++            w.u32(8);
++            w.u32(0);
++            w.u32(0);
++            w.u32(0);
++            for (auto frame : frames)
++            {
++                std::string_view path(frame);
++                w.u16(path.size());
++                for (auto c : path)
++                    w.u8(c);
++            }
++            return w.b;
++        };
++        directory.files["animated.spr"] = spr({"A.DTX", "b.dtx", "a.dtx"});
++        directory.files["invalid-frame.spr"] = spr({"a.dtx", "bad.dtx"});
++        directory.files["absent-frame.spr"] = spr({"missing.dtx"});
++        directory.files["truncated.spr"] = {1, 2, 3};
++        auto small = fixture(false);
++        small.resize(1069);
++        u16(small, 8, 1);
++        u16(small, 10, 1);
++        u16(small, 12, 1);
++        directory.files["small.dtx"] = small;
++        directory.files["unequal.spr"] = spr({"a.dtx", "small.dtx"});
++        test_model::Writer repeated;
++        repeated.u32(4096);
++        repeated.u32(8);
++        repeated.u32(0);
++        repeated.u32(0);
++        repeated.u32(0);
++        for (unsigned i = 0; i < 4096; ++i)
++        {
++            repeated.u16(5);
++            for (char c : std::string_view("a.dtx"))
++                repeated.u8(c);
++        }
++        for (unsigned i = 0; i < 17; ++i)
++            directory.files["repeat" + std::to_string(i) + ".spr"] = repeated.b;
+         directory.children["other"].files["missing.dtx"] = fixture(false);
+         test_model::Writer writer;
+         writer.b.resize(168);
+@@ -148,6 +192,38 @@ namespace
+         CHECK(mesh.vertices[0].uv[0] == 2 && mesh.vertices[0].uv[1] == -1);
+         CHECK(mesh.vertices[3].uv == mesh.vertices[0].uv && mesh.vertices[3].position.x == -492);
+         CHECK(mesh.ranges[0].batches.size() == 1 && mesh.ranges[1].batches[0].material == 1);
++        world.models[0].textures[0] = "ANIMATED.SPR";
++        CHECK(mesh.build(world, error, &resources));
++        const auto animation = mesh.ranges[0].batches[0].material;
++        CHECK(mesh.materials.size() == 4 && mesh.texture_bytes == 68);
++        CHECK(mesh.materials[animation].fps == 8 && mesh.materials[animation].frames.size() == 3);
++        CHECK(mesh.materials[animation].image.width == 4 && mesh.materials[animation].image.height == 2);
++        CHECK(mesh.materials[animation].image.rgba.empty()); // No duplicate pixels on the manifest.
++        CHECK(mesh.vertices[0].uv[0] == 2 && mesh.vertices[0].uv[1] == -1);
++        std::uint32_t frame = 0;
++        const auto a = mesh.ranges[1].batches[0].material;
++        CHECK(world_material_frame(mesh, animation, 0, frame) && frame == a);
++        CHECK(world_material_frame(mesh, animation, .124, frame) && frame == a);
++        CHECK(world_material_frame(mesh, animation, .125, frame) && frame != a);
++        CHECK(world_material_frame(mesh, animation, .25, frame) && frame == a);
++        CHECK(world_material_frame(mesh, animation, .375, frame) && frame == a);
++        CHECK(world_material_frame(mesh, animation, 1000000.125, frame));
++        CHECK(!world_material_frame(mesh, animation, -1, frame));
++        CHECK(!world_material_frame(mesh, animation, std::numeric_limits<double>::infinity(), frame));
++        mesh.materials[animation].frames[0] = animation;
++        CHECK(!world_material_frame(mesh, animation, 0, frame));
++        for (auto name : {"invalid-frame.spr", "absent-frame.spr", "truncated.spr", "unequal.spr"})
++        {
++            world.models[0].textures[0] = name;
++            CHECK(mesh.build(world, error, &resources));
++            CHECK(mesh.ranges[0].batches[0].material == 0);
++            bool rejected = false;
++            for (const auto& entry : mesh.materials)
++                if (entry.path == name)
++                    rejected = !entry.error.empty() && entry.frames.empty();
++            CHECK(rejected);
++        }
++        world.models[0].textures[0] = "a.dtx";
+         auto& animated = world.models[0];
+         animated.surfaces.push_back(animated.surfaces[0]);
+         animated.surfaces.back().has_effect = true;
+@@ -196,6 +272,13 @@ namespace
+         world.models[0].textures[0] = "a.dtx";
+         world.models[0].surfaces[0].texture = 1;
+         CHECK(!mesh.build(world, error, &resources) && mesh.ranges.empty());
++        world.models.assign(17, model);
++        for (unsigned i = 0; i < 17; ++i)
++            world.models[i].textures[0] = "repeat" + std::to_string(i) + ".spr";
++        CHECK(!mesh.build(world, error, &resources) && mesh.materials.empty());
++        CHECK(error == "World SPR frame-reference budget exceeded");
++        world.models.pop_back();
++        CHECK(mesh.build(world, error, &resources) && mesh.materials.size() == 18 && mesh.texture_bytes == 36);
+         std::error_code ec;
+         CHECK(std::filesystem::remove(path, ec) && !ec);
+         return true;
+diff --git a/tests/world_debris_tests.cpp b/tests/world_debris_tests.cpp
+index 9dd0d4c..931f72c 100644
+--- a/tests/world_debris_tests.cpp
++++ b/tests/world_debris_tests.cpp
+@@ -239,14 +239,16 @@ namespace
+             std::cout << "CityHub pieces=" << pieces.size() << '\n';
+             CHECK(pieces.size() == 10);
+             unsigned created = 0, unknown = 0, failed = 0;
++            unsigned omitted = 0;
+             for (auto& e : g.entries)
+             {
+                 created += e.state == EntryState::Created;
+                 unknown += e.state == EntryState::Unsupported;
+                 failed += e.state == EntryState::Failed;
++                omitted += e.state == EntryState::MissingWorldModel;
+             }
+             std::cout << "Created=" << created << " unsupported=" << unknown << " failed=" << failed << '\n';
+-            CHECK(created == 453 && unknown == 0 && failed == 1);
++            CHECK(created == 453 && unknown == 0 && failed == 0 && omitted == 1);
+             // Exercise original destruction/name activation, not direct fragment creation.
+             auto* list = g.server.FindNamedObjects("billboard");
+             CHECK(list && list->m_pFirstLink);
+diff --git a/tests/world_sprite_gpu_tests.cpp b/tests/world_sprite_gpu_tests.cpp
+new file mode 100644
+index 0000000..dbda7ed
+--- /dev/null
++++ b/tests/world_sprite_gpu_tests.cpp
+@@ -0,0 +1,103 @@
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "game/server_adapter.h"
++#include <SDL3/SDL.h>
++#include <algorithm>
++#include <cmath>
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x " " << error << " " << SDL_GetError() << '\n';                            \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    void quad(WorldMesh& mesh, float z, float half, std::uint32_t material, bool alpha, DVector color = {1, 1, 1})
++    {
++        const auto first = static_cast<std::uint32_t>(mesh.vertices.size());
++        for (const auto& v : {WorldVertex{{-half, half, z}, color, {0, 0}},
++                              {{half, half, z}, color, {1, 0}},
++                              {{half, -half, z}, color, {1, 1}},
++                              {{-half, half, z}, color, {0, 0}},
++                              {{half, -half, z}, color, {1, 1}},
++                              {{-half, -half, z}, color, {0, 1}}})
++            mesh.vertices.push_back(v);
++        mesh.ranges.push_back({first, 6, {}, "quad", {{first, 6, material, alpha, {0, 0, z}}}});
++    }
++    bool readback(SDL_GPUDevice* gpu, SDL_GPUCommandBuffer* cmd, Capture& c)
++    {
++        auto* copy = SDL_BeginGPUCopyPass(cmd);
++        if (!copy)
++            return false;
++        SDL_GPUTextureRegion region{};
++        region.texture = c.texture;
++        region.w = c.width;
++        region.h = c.height;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = c.transfer;
++        target.pixels_per_row = c.width;
++        target.rows_per_layer = c.height;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        return SDL_SubmitGPUCommandBuffer(cmd) && SDL_WaitForGPUIdle(gpu);
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2)
++        return 2;
++    std::string error;
++    Runtime runtime;
++    CHECK(runtime.initialize(true, error));
++    std::cout << "GPU device: "
++              << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu), SDL_PROP_GPU_DEVICE_NAME_STRING,
++                                       "unreported")
++              << '\n';
++    WorldRenderer renderer(runtime.gpu);
++    WorldMesh mesh;
++    mesh.materials = {{"white", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}},
++                      {"red", "", {1, 1, 1, 0, 0, {255, 0, 0, 255}}},
++                      {"green", "", {1, 1, 1, 0, 0, {0, 255, 0, 255}}},
++                      {"animated.spr", "", {1, 1, 0, 0, 0, {}}, 8, {1, 2}}};
++    quad(mesh, 2, 1, 3, false);
++    WorldDraw draw;
++    for (unsigned cycle = 0; cycle < 2; ++cycle)
++    {
++        mesh.ranges[0].batches[0].translucent = cycle != 0;
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 128, 128));
++        CHECK(renderer.prepare(mesh, cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 128, 128, error));
++        const auto uploads = renderer.stats.uploads;
++        for (double time : {0., .125, .125, .25, 0.})
++        {
++            auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++            CHECK(cmd);
++            CHECK(renderer.draw(cmd, capture.texture, mesh, std::span(&draw, 1), {}, {}, false, error, DrawLoad::Clear,
++                                nullptr, WorldPass::Opaque, time));
++            CHECK(renderer.draw(cmd, capture.texture, mesh, std::span(&draw, 1), {}, {}, false, error, DrawLoad::Load,
++                                nullptr, WorldPass::Translucent, time));
++            CHECK(readback(runtime.gpu, cmd, capture));
++            const auto* pixels =
++                static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++            CHECK(pixels);
++            const auto offset = (64 * 128 + 64) * 4;
++            const auto red = pixels[offset], green = pixels[offset + 1], blue = pixels[offset + 2];
++            SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++            CHECK((time == .125 ? green == 255 && red == 0 : red == 255 && green == 0) && blue == 0);
++            CHECK(renderer.stats.uploads == uploads);
++            CHECK(capture.save(
++                (std::string(argv[1]) + "-" + std::to_string(cycle) + "-" + std::to_string(time) + ".png").c_str()));
++        }
++        renderer.clear_geometry();
++    }
++    std::cout << "World SPR: opaque/translucent frame pixels, repeated time, wrap/reset, unload/reload; no per-frame "
++                 "uploads\n";
++    return 0;
++}
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 205eafb..cbc9d30 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -146,6 +146,9 @@ namespace
+                 w.append(
+                     object("SkyPointer", {string_prop("Name", "sky-reference"),
+                                           string_prop("SkyObjectName", trial == 7 ? "missing-sky" : "entry-camera")}));
++            else if (trial == 9 || trial == 10)
++                w.append(object("CDestructableBrush",
++                                {string_prop("Name", trial == 9 ? "absent-brush" : "SyntheticTriangle")}));
+             else
+                 w.append(object("SmellHint", {string_prop("Name", "scent")}));
+             w.append(object("ExitHint", {string_prop("Name", "exit")}));
+@@ -1061,7 +1064,7 @@ namespace
+     {
+         CHECK(test_player::setup(game, root, true, true, true));
+         test_player::Directory dir;
+-        for (unsigned i = 1; i <= 8; ++i)
++        for (unsigned i = 1; i <= 10; ++i)
+             dir.children["worlds"].files["trial" + std::to_string(i) + ".dat"] =
+                 dat(false, false, false, false, i).data;
+         dir.children["worlds"].files["broken.dat"] = {56, 0, 0, 0};
+@@ -1257,16 +1260,22 @@ namespace
+             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::None);
+         }
+         CHECK(transition_images(*game, root));
+-        for (const auto* name : {"trial7", "trial8"})
++        for (const auto* name : {"trial7", "trial8", "trial10"})
+         {
+             CHECK(original_world_request(name, 0, LOADTYPE_NEW_LEVEL, 0, message));
+             CHECK(game->queue_level_change(message, "arrival", error));
+             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+-            CHECK(error == (std::string_view(name) == "trial7" ? "Invalid sky object/index"
+-                                                               : "Only bound world models are supported in the sky"));
++            if (std::string_view(name) == "trial10")
++                CHECK(game->level_change.failed == 1 && game->level_change.omitted == 0);
++            else
++                CHECK(error == (std::string_view(name) == "trial7"
++                                    ? "Invalid sky object/index"
++                                    : "Only bound world models are supported in the sky"));
+             CHECK(game.get() == owner && game->objects.snapshot() == ids && game->objects.time() == time);
+             CHECK(game->level_change.cleanup_complete && globals.unchanged() && g_pServerDE == &game->server);
+-            CHECK(game->server.list_count() == 0 && game->level_change.unknown == 0 && game->level_change.failed == 0);
++            CHECK(game->server.list_count() == 0 && game->level_change.unknown == 0 &&
++                  game->level_change.failed == (std::string_view(name) == "trial10" ? 1u : 0u) &&
++                  game->level_change.omitted == 0);
+         }
+         CHECK(original_world_request("missing", 0, LOADTYPE_NEW_LEVEL, 0, message));
+         CHECK(game->queue_level_change(message, "unused", error));
+@@ -1282,7 +1291,7 @@ namespace
+             std::cout << "Commit " << cycle << ": " << error << '\n';
+             CHECK(result == LevelChangeResult::Committed && error.empty() && game.get() != owner);
+             CHECK(game->world_revision == before_revision + 1 && game->objects.time() == 0);
+-            CHECK(game->level_change.committed == cycle + 1 && game->level_change.rejected == 10);
++            CHECK(game->level_change.committed == cycle + 1 && game->level_change.rejected == 11);
+             CHECK(game->level_change.cleanup_complete && !game->level_change.source_retained);
+             CHECK(game->level_change.checked_textures >= 5 && game->level_change.selected_start == "arrival");
+             CHECK(g_pServerDE == &game->server && game->client_shell.m_bInWorld);
+@@ -1301,6 +1310,14 @@ namespace
+             CHECK(game->client_shell.view.object && g_hActiveCamera);
+             CHECK(game->step(.016));
+             CHECK(game->server.message_count() == 0 && game->server.list_count() == 0);
++            CHECK(game->level_change.omitted == (cycle == 1 ? 1u : 0u));
++            if (cycle == 1)
++            {
++                const auto& row = game->level_change.entries[3];
++                CHECK(row.name == "absent-brush" && row.state == EntryState::MissingWorldModel);
++                CHECK(!game->entries[3].object && row.detail.find("before initial update") != std::string::npos);
++            }
++            CHECK(original_world_request(cycle == 0 ? "trial9" : "trial1", 0, LOADTYPE_NEW_LEVEL, 0, message));
+             CHECK(game->queue_level_change(message, "arrival", error));
+         }
+         CHECK(game->unload_world() && !game->pending_level_change && !game->server.string_count());
+@@ -1332,28 +1349,43 @@ namespace
+             for (const auto& [id, voice] : game->server.audio.voices())
+                 voices[id] = voice.cursor;
+             WorldMessage message;
+-            CHECK(original_world_request("02_CityHub", 0, LOADTYPE_NEW_LEVEL, 0, message));
+-            CHECK(game->queue_level_change(message, "01_egressa", error));
++            CHECK(original_world_request("16_bridge", 0, LOADTYPE_NEW_LEVEL, 0, message));
++            CHECK(game->queue_level_change(message, "start", error));
+             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+-            std::cout << "CityHub refusal " << cycle << ": " << error << '\n';
++            std::cout << "Malformed destination refusal " << cycle << ": " << error << '\n';
+             CHECK(game.get() == owner && game->objects.snapshot() == ids && globals.unchanged());
+-            CHECK(game->level_change.unknown == 0 && game->level_change.failed == 1);
+             CHECK(game->level_change.cleanup_complete && game->level_change.source_retained);
+             CHECK(game->world_revision == revision && game->objects.time() == time);
+             CHECK(game->server.audio.voices().size() == voices.size());
+             for (const auto& [id, cursor] : voices)
+                 CHECK(game->server.audio.get(id) && game->server.audio.get(id)->cursor == cursor);
+-            CHECK(original_world_request("01_SubwayA", 0, LOADTYPE_NEW_LEVEL, 0, message));
+-            CHECK(game->queue_level_change(message, "start", error));
+-            const auto result = GameSession::process_level_change(game, error);
+-            std::cout << "SubwayA transfer " << cycle << ": " << error << '\n';
+-            CHECK(result == LevelChangeResult::Committed && error.empty() && game.get() != owner);
+-            CHECK(game->level_change.cleanup_complete && game->world_revision == revision + 1);
+-            CHECK(game->level_change.checked_textures > 50 && game->objects.time() == 0);
+-            player = game->server_shell.Player(game->local_client);
+-            CHECK(player && player->m_damage.m_fHitPoints == 37 && player->m_damage.m_fArmorPoints == 23);
+-            CHECK(player->m_InventoryMgr.GetAmmoCount(1) == 1234);
+-            CHECK(game->step(.016) && g_pServerDE == &game->server);
++            for (bool city : {true, false})
++            {
++                owner = game.get();
++                const auto old_client = game->local_client;
++                const auto old_player = game->client_shell.player;
++                CHECK(original_world_request(city ? "02_CityHub" : "01_SubwayA", 0, LOADTYPE_NEW_LEVEL, 0, message));
++                CHECK(game->queue_level_change(message, city ? "01_egressa" : "start", error));
++                const auto result = GameSession::process_level_change(game, error);
++                std::cout << (city ? "CityHub" : "SubwayA") << " transfer " << cycle << ": " << error << '\n';
++                CHECK(result == LevelChangeResult::Committed && error.empty() && game.get() != owner);
++                CHECK(game->level_change.cleanup_complete && game->world_revision == revision + (city ? 1 : 2));
++                CHECK(game->level_change.checked_textures > 50 && game->objects.time() == 0);
++                CHECK(game->level_change.unknown == 0 && game->level_change.failed == 0);
++                CHECK(game->level_change.omitted == (city ? 1u : 0u));
++                CHECK(game->local_client != old_client && game->client_shell.player != old_player);
++                if (city)
++                {
++                    CHECK(game->level_change.selected_start == "01_egressa" && !game->level_change.start_fallback);
++                    const auto& row = game->level_change.entries[413];
++                    CHECK(row.name == "fallengrills" && row.state == EntryState::MissingWorldModel);
++                    CHECK(!game->entries[413].object && !game->entries[413].sound);
++                }
++                player = game->server_shell.Player(game->local_client);
++                CHECK(player && player->m_damage.m_fHitPoints == 37 && player->m_damage.m_fArmorPoints == 23);
++                CHECK(player->m_InventoryMgr.GetAmmoCount(1) == 1234 && player->respawns == 0);
++                CHECK(game->step(.016) && g_pServerDE == &game->server);
++            }
+         }
+         CHECK(game->unload_world() && !game->server.string_count() && !game->server.client_count());
+         return true;
+@@ -1438,7 +1470,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 453 && d.unknown == 0 && d.failed == 1);
++                        CHECK(d.created == 453 && d.unknown == 0 && d.failed == 0 && d.omitted == 1);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

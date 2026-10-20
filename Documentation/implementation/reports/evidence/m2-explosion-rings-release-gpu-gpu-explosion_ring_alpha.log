@@ -1,0 +1,15 @@
+568/569 Testing: gpu.explosion_ring_alpha
+568/569 Test: gpu.explosion_ring_alpha
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_ring_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-ring-alpha"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.explosion_ring_alpha" start time: Oct 16 21:18 CEST
+Output:
+----------------------------------------------------------
+Original ring: 4800 pixels, tint and half-alpha linear blend verified
+<end of output>
+Test time =   0.45 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_ring_alpha" end time: Oct 16 21:18 CEST
+"gpu.explosion_ring_alpha" time elapsed: 00:00:00
+----------------------------------------------------------

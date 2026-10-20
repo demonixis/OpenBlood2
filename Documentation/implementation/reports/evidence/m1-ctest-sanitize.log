@@ -1,0 +1,55 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  1: objects.original_objects
+ 1/22 Test  #1: objects.original_objects .........   Passed    0.01 sec
+      Start  2: objects.nested_creation
+ 2/22 Test  #2: objects.nested_creation ..........   Passed    0.01 sec
+      Start  3: objects.reasons_properties
+ 3/22 Test  #3: objects.reasons_properties .......   Passed    0.01 sec
+      Start  4: objects.scheduling
+ 4/22 Test  #4: objects.scheduling ...............   Passed    0.01 sec
+      Start  5: objects.deferred_removal
+ 5/22 Test  #5: objects.deferred_removal .........   Passed    0.01 sec
+      Start  6: objects.aggregate_dispatch
+ 6/22 Test  #6: objects.aggregate_dispatch .......   Passed    0.01 sec
+      Start  7: objects.handles_selection
+ 7/22 Test  #7: objects.handles_selection ........   Passed    0.01 sec
+      Start  8: objects.links_lists
+ 8/22 Test  #8: objects.links_lists ..............   Passed    0.01 sec
+      Start  9: objects.messages_strings
+ 9/22 Test  #9: objects.messages_strings .........   Passed    0.03 sec
+      Start 10: objects.unsupported_teardown
+10/22 Test #10: objects.unsupported_teardown .....   Passed    0.02 sec
+      Start 11: objects.creation_failures
+11/22 Test #11: objects.creation_failures ........   Passed    0.02 sec
+      Start 12: config.arguments
+12/22 Test #12: config.arguments .................   Passed    0.01 sec
+      Start 13: config.precedence
+13/22 Test #13: config.precedence ................   Passed    0.01 sec
+      Start 14: config.relative_paths
+14/22 Test #14: config.relative_paths ............   Passed    0.01 sec
+      Start 15: config.invalid_config
+15/22 Test #15: config.invalid_config ............   Passed    0.01 sec
+      Start 16: config.content_validation
+16/22 Test #16: config.content_validation ........   Passed    0.01 sec
+      Start 17: config.case_lookup
+17/22 Test #17: config.case_lookup ...............   Passed    0.01 sec
+      Start 18: cli.help
+18/22 Test #18: cli.help .........................   Passed    0.02 sec
+      Start 19: cli.unknown
+19/22 Test #19: cli.unknown ......................   Passed    0.02 sec
+      Start 20: cli.missing_data
+20/22 Test #20: cli.missing_data .................   Passed    0.02 sec
+      Start 21: cli.missing_config
+21/22 Test #21: cli.missing_config ...............   Passed    0.02 sec
+      Start 22: cli.metadata
+22/22 Test #22: cli.metadata .....................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 22
+
+Label Time Summary:
+cli         =   0.09 sec*proc (5 tests)
+config      =   0.06 sec*proc (6 tests)
+headless    =   0.30 sec*proc (22 tests)
+objects     =   0.15 sec*proc (11 tests)
+
+Total Test time (real) =   0.30 sec

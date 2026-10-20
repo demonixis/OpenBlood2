@@ -1,0 +1,49 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 1083: demo.worlds
+      Start   82: services.elevator_entry
+ 1/19 Test   #82: services.elevator_entry ..........   Passed    1.91 sec
+      Start   77: services.contact_overlap
+ 2/19 Test   #77: services.contact_overlap .........   Passed    0.52 sec
+      Start 1084: demo.weapon
+ 3/19 Test #1084: demo.weapon ......................   Passed    0.86 sec
+      Start   81: services.private
+ 4/19 Test   #81: services.private .................   Passed    4.46 sec
+      Start   74: services.start_departure
+ 5/19 Test   #74: services.start_departure .........   Passed    0.02 sec
+      Start   75: services.collision_traversal
+ 6/19 Test   #75: services.collision_traversal .....   Passed    0.13 sec
+      Start 1082: demo.rules
+ 7/19 Test #1082: demo.rules .......................   Passed    0.06 sec
+      Start 1081: demo.flow
+ 8/19 Test #1081: demo.flow ........................   Passed    0.02 sec
+      Start   70: services.model_rejection
+ 9/19 Test   #70: services.model_rejection .........   Passed    0.32 sec
+      Start   78: services.placement_queries
+10/19 Test   #78: services.placement_queries .......   Passed    0.03 sec
+      Start   79: services.placement_service
+11/19 Test   #79: services.placement_service .......   Passed    0.02 sec
+      Start   80: services.original_services
+12/19 Test   #80: services.original_services .......   Passed    0.02 sec
+      Start   72: services.model_callbacks
+13/19 Test   #72: services.model_callbacks .........   Passed    0.02 sec
+      Start   76: services.movement_contacts
+14/19 Test   #76: services.movement_contacts .......   Passed    0.02 sec
+      Start   71: services.animation_events
+15/19 Test   #71: services.animation_events ........   Passed    0.02 sec
+      Start   69: services.model_reader
+16/19 Test   #69: services.model_reader ............   Passed    0.02 sec
+      Start   73: services.collision_queries
+17/19 Test   #73: services.collision_queries .......   Passed    0.02 sec
+      Start 1085: demo.spawned_overlap
+18/19 Test #1085: demo.spawned_overlap .............   Passed   53.01 sec
+19/19 Test #1083: demo.worlds ......................   Passed  114.03 sec
+
+100% tests passed, 0 tests failed out of 19
+
+Label Time Summary:
+demo        = 167.97 sec*proc (5 tests)
+headless    = 175.52 sec*proc (19 tests)
+private     = 174.27 sec*proc (5 tests)
+services    =   7.54 sec*proc (14 tests)
+
+Total Test time (real) = 114.05 sec

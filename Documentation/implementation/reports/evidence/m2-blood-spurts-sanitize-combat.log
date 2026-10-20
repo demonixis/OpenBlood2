@@ -1,0 +1,99 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/sanitize
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 614
+    Start 614: player_controls.corpse_clearance
+
+614: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "clearance" "<external-data-root>"
+614: Working Directory: <workspace>/Blood2/build/sanitize/tests
+614: Test timeout computed to be: 240
+test 613
+    Start 613: player_controls.combat
+
+613: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "combat" "<external-data-root>"
+613: Working Directory: <workspace>/Blood2/build/sanitize/tests
+613: Test timeout computed to be: 120
+614: Original SubwayA camera intro expired after 12.0167 simulation seconds
+614: Approached encounter at z=-2338.28
+614: combat:338: damaged && dead && player_attributed && !g.objects.get(target) && corpse
+1/7 Test #614: player_controls.corpse_clearance ...***Failed   64.46 sec
+test 615
+    Start 615: player_controls.private
+
+615: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "private" "<external-data-root>"
+615: Working Directory: <workspace>/Blood2/build/sanitize/tests
+615: Test timeout computed to be: 120
+613: Original SubwayA camera intro expired after 12.0167 simulation seconds
+613: Approached encounter at z=-2192.09
+613: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=5, ammo=45, independent corpse verified, native=0
+613: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=0
+613: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+613: Walked past killed Cultist to z=-1861.92
+613: Original SubwayA camera intro expired after 12.0167 simulation seconds
+613: Approached encounter at z=-2192.09
+613: Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=12, ammo=38, independent corpse verified, native=0
+613: Dodge updates=12, corpse candidates=23, zero-margin search=1, swept source clearance=0
+613: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+613: Walked past killed Cultist to z=-1861.92
+2/7 Test #613: player_controls.combat .............   Passed   75.45 sec
+test 612
+    Start 612: player_controls.entry
+
+612: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "entry"
+612: Working Directory: <workspace>/Blood2/build/sanitize/tests
+612: Test timeout computed to be: 30
+3/7 Test #612: player_controls.entry ..............   Passed    0.02 sec
+test 610
+    Start 610: player_controls.mouse
+
+610: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "mouse"
+610: Working Directory: <workspace>/Blood2/build/sanitize/tests
+610: Test timeout computed to be: 30
+4/7 Test #610: player_controls.mouse ..............   Passed    0.02 sec
+test 609
+    Start 609: player_controls.keys
+
+609: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "keys"
+609: Working Directory: <workspace>/Blood2/build/sanitize/tests
+609: Test timeout computed to be: 30
+5/7 Test #609: player_controls.keys ...............   Passed    0.02 sec
+test 611
+    Start 611: player_controls.gates
+
+611: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "gates"
+611: Working Directory: <workspace>/Blood2/build/sanitize/tests
+611: Test timeout computed to be: 30
+6/7 Test #611: player_controls.gates ..............   Passed    0.02 sec
+615: Original SubwayA camera intro expired after 12.0167 simulation seconds
+615: Alternate input: hp=100 dead=0 ammo=38 shots=12 before=5
+615: private_input:511: corrected_corpses > 0
+7/7 Test #615: player_controls.private ............***Failed   25.61 sec
+
+The following tests passed:
+	player_controls.combat
+	player_controls.entry
+	player_controls.mouse
+	player_controls.keys
+	player_controls.gates
+
+71% tests passed, 2 tests failed out of 7
+
+Label Time Summary:
+headless           = 165.59 sec*proc (7 tests)
+player_controls    = 165.59 sec*proc (7 tests)
+private            = 165.53 sec*proc (3 tests)
+
+Total Test time (real) =  90.09 sec
+
+The following tests FAILED:
+	614 - player_controls.corpse_clearance (Failed)         headless player_controls private
+	615 - player_controls.private (Failed)                  headless player_controls private
+Errors while running CTest
+Output from these tests are in: <workspace>/Blood2/build/sanitize/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

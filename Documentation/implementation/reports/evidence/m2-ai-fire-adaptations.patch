@@ -1,0 +1,1737 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 2d31b5c..338fd0a 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -271,3 +271,5 @@ The [animated model continuation](../Documentation/Implementation/M2_MODEL_VIEW.
+ The [AI perception continuation](../Documentation/Implementation/M2_AI_PERCEPTION.md) connects original faction lists, FindObjectInRadius, ComputeStimuli, opportunity selection and ExitHint. Read [contracts](docs/AI_PERCEPTION_CONTRACTS.md) before extending NPC acquisition/state updates. Preserve player membership in both factions, source list/priority/boundary rules, dead-target behavior and checked deferred lifetime. Required query failure is -1, never a usable stimulus. Attacker memory is a checked non-owning identity; timed-power storage does not implement pickups/timers. No production NPC is registered; states, attacks, required FX and ExitTrigger keep M2 open.
+ 
+ The [AI state/action continuation](../Documentation/Implementation/M2_AI_STATES.md) adds original transitions, Cultist/Civilian decisions and stationary idle/talk/special commands. Read [contracts](docs/AI_STATE_CONTRACTS.md). Preserve strict idle deadline, last-state exclusions, idle/talk command sharing, special-action random draws and failed-perception guards. Animation resize uses the documented atomic foot-anchored replacement. Diagnostic dispatch is not AI_Update; production NPCs, combat/navigation/death, required FX and ExitTrigger remain unavailable. M2 stays open.
++
++The [AI weapon-action continuation](../Documentation/Implementation/M2_AI_FIRE.md) connects original weapon choice, supported aiming/clearance, standing fire and fire_key delivery. Read [contracts](docs/AI_FIRE_CONTRACTS.md). Preserve raw-ammo selection, strict cadence/range, initial-miss versus head-retry behavior, cached-head writes, dry acceptance and independent completion increments. Player eye alignment must remain player-only. Missing switch columns/services fail; diagnostic firing does not register production NPCs or implement AI_Update. Navigation/death, required FX and ExitTrigger still keep M2 open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9a5653c..ac8a0b6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -40,7 +40,7 @@ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original
+ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+-target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIPerception.cpp
++target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+     src/game/original/AIState.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+diff --git a/README.md b/README.md
+index 6be4a9f..4963ab8 100644
+--- a/README.md
++++ b/README.md
+@@ -1,9 +1,9 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
+-Latest gameplay continuation: [original AI state decisions/actions](../Documentation/Implementation/M2_AI_STATES.md) adds
+-transitions, civilian/cultist decisions and stationary animation commands with
+-inspection and explicit failure. Full AI_Update, production NPC actions, required
+-FX, ExitTrigger and the actual M2 gate remain open.
++Latest gameplay continuation: [original AI weapon actions](../Documentation/Implementation/M2_AI_FIRE.md) connects
++weapon choice, aiming/clearance, standing fire and model-key shots with inspection.
++Full AI_Update and production NPCs, navigation/death, required FX, ExitTrigger and
++the actual M2 gate remain open.
+ 
+ Latest gameplay continuation: [original AI perception](../Documentation/Implementation/M2_AI_PERCEPTION.md) adds faction membership,
+ radius/FOV/visibility selection, stimulus priorities and ExitHint. These commands
+@@ -334,3 +334,8 @@ The [AI state/action continuation](docs/AI_STATE_CONTRACTS.md) passes 372/372 De
+ and inspector-free Release checks (27 GPU cases), and 115 targeted headless
+ ASan/UBSan/leak checks. Stationary action completion, state decisions, failure and
+ lifetime are tested; production NPCs and the complete M2 gate remain open.
++
++The [AI weapon-action continuation](docs/AI_FIRE_CONTRACTS.md) passes 384/384 Debug
++and inspector-free Release checks (27 GPU), plus 136 targeted headless ASan/UBSan/
++leak checks. Selection, clearance, timed/key firing, real damage and deferred removal
++are verified for the bounded path; required production NPCs and M2 remain open.
+diff --git a/docs/AI_FIRE_CONTRACTS.md b/docs/AI_FIRE_CONTRACTS.md
+new file mode 100644
+index 0000000..f106035
+--- /dev/null
++++ b/docs/AI_FIRE_CONTRACTS.md
+@@ -0,0 +1,98 @@
++# Original AI weapon choice and standing fire
++
++This selective source port connects `FindBestWeapon`, type-based `ChangeWeapon`,
++`MC_BestWeapon`, the Beretta/knife default `Fire` aiming branch, `CheckClearShot`,
++`MC_Fire_Stand` and AI `fire_key` dispatch. [Source ranges](M2_AI_FIRE_SOURCES.json)
++and [execution evidence](../../Documentation/Implementation/M2_AI_FIRE.md) record
++its boundary. Read [weapons](WEAPON_CONTRACTS.md), [state actions](AI_STATE_CONTRACTS.md),
++[visibility](AI_SIGHT_CONTRACTS.md) and [object lifetime](OBJECT_CONTRACTS.md).
++
++These are reusable original methods, not a complete NPC. No production NPC is
++registered; authored CivilianAI/CultistAI/Gideon entries remain unsupported.
++Full initialization/AI_Update, attack-state sequencing, navigation, dying/recoil,
++scripts, other weapons, required client FX and ExitTrigger still block M2.
++
++## Weapon choice
++
++FindBestWeapon examines right-hand slots in source order, starting with the current
++weapon. Candidates require strictly `distance < range`, `radius < distance`,
++nonzero raw ammo and either greater integer maximum damage or an empty current
++ammo pool. Ties retain the current candidate. No suitable alternative returns
++null without discarding an unsuitable current weapon. Invalid owner/distance
++returns false separately from a successful no-change result.
++
++The source reads the raw AMMO_NONE pool, which is zero: it does not select the
++knife through this heuristic, although the knife can fire without ammunition.
++MC_BestWeapon may consequently choose FindAmmo with a current knife. This quirk
++is preserved. Choice uses the current checked owner position and cached target
++position instead of MoveObj's old position cache.
++
++MC_BestWeapon preserves the two animation phases and the completion tick that
++clears `m_bAnimating` without advancing Metacmd. Idle/Passive Cabal branches now
++call it. SWITCH_WEAPON has three columns; TYPE_MELEE is four. The source's invalid
++index is rejected explicitly, not mapped to an invented clip. Destination clips
++are checked/selected before committing the inventory change. ChangeWeapon reuses
++the supported slot/owned-hand lifetime; legacy view Holster/muzzle-FX setup are
++not implemented. No null current weapon is dereferenced.
++
++## Aiming, clearance and delivery
++
++The supported default Fire branch samples current `r_gun` position and aims at
++the cached target position. If that node is unavailable it uses body position
++and current forward, not the target direction. Selected directions are normalized
++and checked. Missing weapons, pending/stale endpoints, degenerate vectors and
++required service failures remain observable errors.
++
++CheckClearShot uses normal/alternate weapon range and the existing typed
++SolidOrRayHit/AIVisibility ray path. All VolumeBrush subclasses and destructible
++glass brushes are ignored for clearance. Original IGNORE_DESTRUCTABLE refers to
++CDestructableModel, which remains unported and unregistered; it is not a blanket
++filter for all destructible objects. Actual weapon rays retain their own existing
++filter, so a clear aim through glass may still hit/damage that glass.
++
++An initial miss is clear, unlike CanSee. A target hit is clear. An obstruction
++allows a current target-head retry; that retry must hit the target (a miss fails).
++The source updates the cached target position to the sampled head even when the
++retry fails. Only a successful retry changes the firing direction. Missing head
++poses do not manufacture a second ray. Queries advance neither animation nor
++physics. Collision remains the existing bounded primary/world-model/AABB service,
++not retail hit-limb physics.
++
++The typed inventory shot uses a session RNG byte to seed the existing portable
++weapon generator. This adapts the original server RNG to local owned transport;
++retail CRT bit parity is not claimed. Player eye alignment is now correctly
++restricted to CPlayerObj, as in original FireSpread; NPCs use the actual gun ray.
++A pending weapon owner cannot fire. Damage/ammo/owned-hand cleanup and deferred
++callbacks use the existing weapon/object services.
++
++Original AI Fire discards the inventory return: a dry attempt still returns true.
++Inspection separates attempts, fired shots, dry attempts, blocked shots and service
++failures. Unlike that unchecked source return, an invalid/unavailable shot service
++fails explicitly. Damage delivery is not by itself proof of a health change.
++
++## Commands and model keys
++
++MC_Fire_Stand selects the original fire-type clip, disables looping, stores primary
++reload time and resets load/time starts to zero. Its first update is 0.1 seconds.
++An actual animation-resize block selects CrawlUnder; missing clip/model/collision
++services remain failures. Resize is the already documented atomic foot-anchored
++replacement, not reconstructed retail SetObjectDims2.
++
++While playing, time must be strictly greater than last-load + reload before Fire.
++A source-accepted attempt (including dry) updates last-load time. A blocked shot
++or no weapon clears animation and advances Metacmd; completed playback independently
++advances it again. Both increments can happen in the same tick. Invalid clocks,
++overflow and missing playback reject instead of wrapping or silently waiting.
++No extra cooldown or physics integration is introduced.
++
++The model-key dispatcher retains fire-first priority, no-target early return,
++pending-target failure, and base motion forwarding after an attempted shot. A
++fire_key and timed MC_Fire_Stand call can both fire: the source does not deduplicate
++them. Cultist pistol clips have no fire_key and use the timed path; the catalog
++reports this rather than pretending those shots came from markers. show_weapon's
++uninitialized source parameter and MC_Extra remain explicit unsupported branches.
++
++The inspector reads live state and errors, including hidden/inactive/missing
++models, without advancing actions. Diagnostic drivers in tests and the GPU smoke
++call this command explicitly; they are not AI_Update. Removal in a damage callback
++is deferred through the animation batch; no later marker uses the pending actor.
+diff --git a/docs/AI_MODEL_KEY_CONTRACTS.md b/docs/AI_MODEL_KEY_CONTRACTS.md
+index 6068395..8c01f4e 100644
+--- a/docs/AI_MODEL_KEY_CONTRACTS.md
++++ b/docs/AI_MODEL_KEY_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI animation keys
+ 
++> Extended by [AI weapon-action contracts](AI_FIRE_CONTRACTS.md): supported weapon
++> choice, aiming, clearance, standing fire and AI fire_key now execute. Earlier
++> blanket weapon/fire omissions are historical; full NPCs and M2 remain open.
++
+ > Extended by [AI state/action contracts](AI_STATE_CONTRACTS.md): selected original
+ > state decisions, transitions and stationary animation commands now execute.
+ > Full AI_Update and production NPCs remain unavailable; M2 is still open.
+diff --git a/docs/AI_STATE_CONTRACTS.md b/docs/AI_STATE_CONTRACTS.md
+index 24701d4..2a5f63b 100644
+--- a/docs/AI_STATE_CONTRACTS.md
++++ b/docs/AI_STATE_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI state decisions and stationary actions
+ 
++> Extended by [AI weapon-action contracts](AI_FIRE_CONTRACTS.md): supported weapon
++> choice, aiming, clearance, standing fire and AI fire_key now execute. Earlier
++> blanket weapon/fire omissions are historical; full NPCs and M2 remain open.
++
+ M2 remains incomplete. This ports selected AI_Mgr, CivilianAI and CultistAI
+ methods from [these source ranges](M2_AI_STATE_SOURCES.json). It builds on
+ [perception](AI_PERCEPTION_CONTRACTS.md), [targets](AI_TARGET_CONTRACTS.md),
+diff --git a/docs/M2_AI_FIRE_SOURCES.json b/docs/M2_AI_FIRE_SOURCES.json
+new file mode 100644
+index 0000000..82f70aa
+--- /dev/null
++++ b/docs/M2_AI_FIRE_SOURCES.json
+@@ -0,0 +1,99 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "7f2c1a644716e297fda3904c47d630d1c9079d73",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          880,
++          903
++        ],
++        [
++          3204,
++          3222
++        ],
++        [
++          3437,
++          3539
++        ],
++        [
++          4469,
++          4528
++        ],
++        [
++          5612,
++          5670
++        ]
++      ],
++      "use": "Default supported weapon aim, clear-shot retry, key dispatch, standing fire and best-weapon commands; monster branches excluded"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "selected_lines": [
++        [
++          772,
++          837
++        ],
++        [
++          908,
++          939
++        ]
++      ],
++      "use": "Type selection and original right-slot damage/range/raw-ammo heuristic"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
++      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
++      "selected_lines": [
++        [
++          864,
++          1040
++        ]
++      ],
++      "use": "Existing shot rules; player-only eye alignment"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
++      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
++      "selected_lines": [
++        [
++          412,
++          477
++        ]
++      ],
++      "use": "Original global ray filter categories; CDestructableModel remains unavailable"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
++      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
++      "selected_lines": [
++        [
++          77,
++          113
++        ]
++      ],
++      "use": "Original metacommand IDs"
++    },
++    {
++      "path": "sources/blood2/Shared/SharedDefs.h",
++      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "selected_lines": [
++        [
++          200,
++          232
++        ]
++      ],
++      "use": "Base-game last-player-weapon boundary"
++    }
++  ],
++  "adaptations": [
++    "Checked typed query/shot failures and pending owner/target identities",
++    "Existing atomic foot-anchored resize; blocked recovery distinguished from unavailable service",
++    "Existing owned portable shot RNG with session-selected byte seed, not CRT bit parity",
++    "Bounds check for missing melee SWITCH_WEAPON column; destination animation preflight",
++    "Diagnostic schedulers only; no partial NPC production registrations"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index edbb030..cda6b97 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -536,3 +536,11 @@ are imported with explicit failure and checked ownership. The diagnostic driver
+ does not implement AI_Update or register partial NPCs. See
+ [source ranges and hashes](M2_AI_STATE_SOURCES.json) and
+ [contracts and dimension-service adaptation](AI_STATE_CONTRACTS.md).
++
++## M2 AI weapon actions
++
++Selected original InventoryMgr selection, AI_Mgr default Fire/CheckClearShot,
++MC_Fire_Stand/MC_BestWeapon and key firing are connected with typed failures and
++checked lifetimes. CWeapon's original player-only eye-alignment condition is
++restored. See [source ranges/hashes](M2_AI_FIRE_SOURCES.json) and
++[contracts/adaptations](AI_FIRE_CONTRACTS.md). No production NPC is registered.
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index 6586057..4fdb6b5 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original Inventory and Vector Weapon Boundary
+ 
++> Extended by [AI weapon-action contracts](AI_FIRE_CONTRACTS.md): supported weapon
++> choice, aiming, clearance, standing fire and AI fire_key now execute. Earlier
++> blanket weapon/fire omissions are historical; full NPCs and M2 remain open.
++
+ > Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
+ > candidate lists and stimulus/target selection now execute. Automatic NPC states
+ > and complete M2 remain unavailable; earlier acquisition omissions are historical.
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index 421d968..f0edf21 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -8,6 +8,43 @@ namespace OpenBlood2
+ {
+     namespace
+     {
++        class AIFireProbe : public AI_Mgr
++        {
++          public:
++            HOBJECT diagnostic_target = nullptr;
++
++          private:
++            DDWORD EngineMessageFn(DDWORD message, void* data, DFLOAT value) override
++            {
++                if (message == MID_UPDATE)
++                {
++                    GetServerDE()->SetNextUpdate(m_hObject, .001f);
++                    if (!MC_Fire_Stand())
++                        GetServerDE()->SetNextUpdate(m_hObject, 0);
++                }
++                return AI_Mgr::EngineMessageFn(message, data, value);
++            }
++        };
++        class AIFireTarget : public BaseClass
++        {
++          public:
++            CDestructable damage;
++            AIFireTarget()
++            {
++                AddAggregate(&damage);
++            }
++
++          private:
++            DDWORD EngineMessageFn(DDWORD message, void* data, DFLOAT value) override
++            {
++                if (message == MID_INITIALUPDATE)
++                {
++                    damage.Init(m_hObject);
++                    damage.m_fHitPoints = damage.m_fMaxHitPoints = 10000;
++                }
++                return BaseClass::EngineMessageFn(message, data, value);
++            }
++        };
+         // Explicit state-action driver for this smoke only. It does not implement
+         // the missing AI_Update (deactivation, retention, navigation, death, etc.).
+         class AIStateProbe : public CivilianAI
+@@ -24,6 +61,61 @@ namespace OpenBlood2
+             }
+         };
+     } // namespace
++    bool prepare_ai_fire_smoke(GameSession& g, ObjectId& id)
++    {
++        static const ClassInfo type{"AIFireProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AIFireProbe>(); },
++                                    {}};
++        static const ClassInfo target_type{"AIFireTarget",
++                                           g.objects.find_class("BaseClass"),
++                                           []() -> std::unique_ptr<BaseClass>
++                                           { return std::make_unique<AIFireTarget>(); },
++                                           {}};
++        if ((!g.objects.find_class(type.name) && !g.objects.register_class(type)) ||
++            (!g.objects.find_class(target_type.name) && !g.objects.register_class(target_type)))
++            return false;
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_MODEL;
++        state.m_Pos = {1000, 10000, 0};
++        state.m_Flags = FLAG_MODELKEYS;
++        SAFE_STRCPY(state.m_Name, "AI weapon probe (no full AI_Update)");
++        SAFE_STRCPY(state.m_Filename, "models/enemies/m_cultist1.abc");
++        auto h = g.objects.create(&type, state);
++        auto* r = g.objects.get(h);
++        auto* ai = r ? dynamic_cast<AIFireProbe*>(r->game.get()) : nullptr;
++        if (!ai || !r->model || !ai->m_InventoryMgr.Init(h, nullptr) ||
++            ai->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA, 0) != InventoryResult::Ok)
++            return false;
++        ai->m_InventoryMgr.SetAmmoCount(AMMO_BULLET, 100);
++        auto table = std::make_shared<CAnim_Sound>();
++        if (!table->SetAnimationIndexes(h) || !table->SetSoundRoot("sounds/enemies/m_cultist") ||
++            !ai->InitStatics(table))
++            return false;
++        ObjectCreateStruct target;
++        target.m_Pos = {1000, 10000, 300};
++        target.m_Flags = FLAG_SOLID;
++        SAFE_STRCPY(target.m_Name, "AI weapon damage receiver (diagnostic)");
++        const auto victim = g.objects.create(&target_type, target);
++        DVector dimensions{60, 100, 30};
++        if (!victim || g.server.SetObjectDims(victim, &dimensions) != DE_OK || !ai->SetNewTarget(victim) ||
++            !ai->RefreshTargetPosition())
++            return false;
++        ai->diagnostic_target = victim;
++        g.server.SetNextUpdate(h, .001f);
++        id = r->id;
++        return true;
++    }
++    bool check_ai_fire_smoke(GameSession& g, ObjectId id)
++    {
++        const auto* r = g.objects.get(id);
++        const auto* ai = r ? dynamic_cast<const AIFireProbe*>(r->game.get()) : nullptr;
++        const auto* target =
++            ai ? dynamic_cast<const AIFireTarget*>(g.server.HandleToObject(ai->diagnostic_target)) : nullptr;
++        return ai && target && ai->fire_shots > 2 && ai->animation_finishes > 0 && ai->fire_failures == 0 &&
++               ai->state_failures == 0 && ai->key_failures == 0 && ai->audio_starts > 0 &&
++               target->damage.m_fHitPoints < 10000 && ai->m_InventoryMgr.GetAmmoCount(AMMO_BULLET) < 100;
++    }
+     bool prepare_ai_state_smoke(GameSession& g, ObjectId& id)
+     {
+         static const ClassInfo type{"AIStateProbe",
+diff --git a/src/app/ai_model_key_smoke.h b/src/app/ai_model_key_smoke.h
+index 0204a85..d1a15d7 100644
+--- a/src/app/ai_model_key_smoke.h
++++ b/src/app/ai_model_key_smoke.h
+@@ -2,6 +2,8 @@
+ #include "game/server_adapter.h"
+ namespace OpenBlood2
+ {
++    bool prepare_ai_fire_smoke(GameSession&, ObjectId&);
++    bool check_ai_fire_smoke(GameSession&, ObjectId);
+     bool prepare_ai_state_smoke(GameSession&, ObjectId&);
+     bool check_ai_state_smoke(GameSession&, ObjectId);
+     bool prepare_ai_model_key_smoke(GameSession&, ObjectId&);
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 74a3ede..65db8e4 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -58,11 +58,62 @@ namespace OpenBlood2
+         ImGui::TableNextColumn();
+         const auto* r = game.objects.get(skeleton_selection);
+         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
++        if (target_ai && ImGui::CollapsingHeader("Original AI weapon actions", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            const auto& ai = *target_ai;
++            const auto* weapon = ai.m_InventoryMgr.CurrentWeapon();
++            ImGui::TextWrapped("Original standing fire and weapon choice. Diagnostic driver; full NPC update, attack "
++                               "states, navigation and death remain unavailable.");
++            ImGui::Text("Weapon %u | last selection: alternative %u / distance %.2f", weapon ? weapon->data.m_nType : 0,
++                        ai.best_weapon, ai.weapon_distance);
++            ImGui::Text("Attempts %llu | shots %llu | dry %llu | blocked %llu | failures %llu",
++                        (unsigned long long)ai.fire_calls, (unsigned long long)ai.fire_shots,
++                        (unsigned long long)ai.fire_dry, (unsigned long long)ai.fire_blocked,
++                        (unsigned long long)ai.fire_failures);
++            const char* result = "invalid";
++            switch (ai.fire_result)
++            {
++                case FireResult::Fired:
++                    result = "fired";
++                    break;
++                case FireResult::Dry:
++                    result = "dry (accepted by source AI)";
++                    break;
++                case FireResult::Blocked:
++                    result = "blocked";
++                    break;
++                case FireResult::Unavailable:
++                    result = "unavailable";
++                    break;
++                case FireResult::DeliveryFailed:
++                    result = "damage delivery failed";
++                    break;
++                case FireResult::Invalid:
++                    break;
++            }
++            ImGui::Text("Last attempt: %s", ai.fire_calls ? result : "none");
++            ImGui::Text("Origin %s: %.2f %.2f %.2f | cadence %.3f / last %.3f",
++                        ai.fire_gun_node ? "r_gun" : "body fallback", ai.fire_origin.x, ai.fire_origin.y,
++                        ai.fire_origin.z, ai.m_fAttackLoadTime, ai.m_fLoadTimeStart);
++            ImGui::Text("Clearance: %s | rays %u | head retry %s", ai_clear_outcome_name(ai.clear_shot.outcome),
++                        ai.clear_shot.rays, ai.clear_shot.retried_head ? "yes" : "no");
++            if (weapon)
++            {
++                const auto& shot = weapon->last_shot;
++                ImGui::Text("Ammo %.0f | damage %.2f | shot seed %u",
++                            ai.m_InventoryMgr.GetAmmoCount(weapon->data.m_nAmmoType), shot.damage,
++                            unsigned(shot.request.seed));
++                ImGui::TextWrapped("Damage message: %s",
++                                   shot.damage_delivered ? "delivered (not a health assertion)" : "none");
++            }
++            if (!ai.fire_error.empty())
++                ImGui::TextWrapped("Failed: %s", ai.fire_error.c_str());
++        }
+         if (target_ai && ImGui::CollapsingHeader("Original AI state actions", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& ai = *target_ai;
+             ImGui::TextWrapped("Selected original decisions and stationary actions. Full AI_Update, navigation, "
+-                               "combat/death and production NPC registration remain unavailable.");
++                               "full combat/death and production NPC registration remain unavailable.");
+             ImGui::Text("State %d | last %d | requested %d | dispatched %d", ai.m_nState, ai.m_nLastState,
+                         ai.requested_state, ai.dispatched_state);
+             ImGui::Text("Authored %s | metacmd %d / current %d | animating %s", ai.m_szAIState.c_str(), ai.Metacmd,
+@@ -112,7 +163,7 @@ namespace OpenBlood2
+             if (!ai.perception_error.empty())
+                 ImGui::TextWrapped("%s", ai.perception_error.c_str());
+             ImGui::TextWrapped("Recorded source perception commands. No automatic NPC update/state machine, navigation "
+-                               "or attack yet.");
++                               "or attack-state scheduler yet.");
+         }
+         if (target_ai && ImGui::CollapsingHeader("Original AI target / facing"))
+         {
+@@ -132,8 +183,7 @@ namespace OpenBlood2
+                         (unsigned long long)target_ai->target_failures);
+             if (!target_ai->target_error.empty())
+                 ImGui::TextWrapped("%s", target_ai->target_error.c_str());
+-            ImGui::TextWrapped(
+-                "Original target commands. State-driven updates, tracking and AI states remain unavailable.");
++            ImGui::TextWrapped("Original target commands. Full state-driven updates and tracking remain unavailable.");
+         }
+         if (!r)
+             ImGui::TextUnformatted("No selected model");
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index f9c737a..fe81e53 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -251,6 +251,11 @@ namespace
+         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_state_smoke(game, smoke_ai_state))
+             return 4;
+         const auto original_ai_state = smoke_ai_state;
++        OpenBlood2::ObjectId smoke_ai_fire{};
++        bool ai_fire_hidden = false;
++        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_fire_smoke(game, smoke_ai_fire))
++            return 4;
++        const auto original_ai_fire = smoke_ai_fire;
+         bool ai_sight_hidden = false;
+         bool ai_target_hidden = false;
+         bool hand_hidden = false;
+@@ -306,7 +311,7 @@ namespace
+         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
+         inspector.select_skeleton = options.skeleton_smoke;
+         if (options.skeleton_smoke)
+-            inspector.skeleton_selection = smoke_ai_state;
++            inspector.skeleton_selection = smoke_ai_fire;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
+         inspector.select_pickups = options.pickups_smoke;
+@@ -526,6 +531,8 @@ namespace
+                     old_hand =
+                         game.server_shell.Player(game.local_client)->m_InventoryMgr.CurrentWeapon()->m_hHandAttachment;
+             }
++            if (options.skeleton_smoke && !inspector_visible)
++                ai_fire_hidden |= OpenBlood2::check_ai_fire_smoke(game, smoke_ai_fire);
+             if (options.skeleton_smoke && !inspector_visible)
+                 ai_state_hidden |= OpenBlood2::check_ai_state_smoke(game, smoke_ai_state);
+             if (options.skeleton_smoke && !inspector_visible)
+@@ -1061,6 +1068,22 @@ namespace
+                 spdlog::info("AI state probe: hidden={}, reentered={}, old handle invalidated={}", ai_state_hidden,
+                              ai_state_reentered, !game.objects.get(original_ai_state));
+             }
++            if (options.skeleton_smoke)
++            {
++                if (game.objects.get(original_ai_fire) || !OpenBlood2::prepare_ai_fire_smoke(game, smoke_ai_fire))
++                    return 4;
++                bool reentered = false;
++                for (int i = 0; i < 360 && !reentered; ++i)
++                {
++                    if (!game.step(1.0 / 60))
++                        return 4;
++                    reentered = OpenBlood2::check_ai_fire_smoke(game, smoke_ai_fire);
++                }
++                spdlog::info("AI weapon probe: hidden={}, reentered={}, old identity invalidated={}", ai_fire_hidden,
++                             reentered, !game.objects.get(original_ai_fire));
++                if (!ai_fire_hidden || !reentered)
++                    return 4;
++            }
+             bool hand_reentered = !options.skeleton_smoke;
+             if (options.skeleton_smoke)
+             {
+diff --git a/src/game/original/AIFire.cpp b/src/game/original/AIFire.cpp
+new file mode 100644
+index 0000000..c161e5c
+--- /dev/null
++++ b/src/game/original/AIFire.cpp
+@@ -0,0 +1,294 @@
++// Selected original AI_Mgr.cpp:3204-3539,4469-4528,5612-5670.
++// See AI_FIRE_CONTRACTS.md: supported vector weapons only; no full AI_Update.
++#include "AI_Mgr.h"
++#include "engine/collision.h"
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++namespace
++{
++    bool normalize(DVector& v)
++    {
++        const auto length = std::sqrt(vector_dot(v, v));
++        if (!physics_vector(v) || !std::isfinite(length) || length < 1e-6f)
++            return false;
++        v = vector_scale(v, 1 / length);
++        return true;
++    }
++} // namespace
++const char* OpenBlood2::ai_clear_outcome_name(AIClearOutcome value)
++{
++    switch (value)
++    {
++        case AIClearOutcome::None:
++            return "Not queried";
++        case AIClearOutcome::Clear:
++            return "Clear (initial miss)";
++        case AIClearOutcome::Target:
++            return "Target hit";
++        case AIClearOutcome::Head:
++            return "Head retry hit";
++        case AIClearOutcome::Blocked:
++            return "Blocked";
++        case AIClearOutcome::Invalid:
++            return "Invalid query/identity";
++        case AIClearOutcome::Unavailable:
++            return "Collision unavailable";
++    }
++    return "Unknown";
++}
++bool AI_Mgr::CheckClearShot(DVector origin, DVector& direction, bool alternate)
++{
++    clear_shot = {};
++    clear_shot.origin = origin;
++    auto* server = GetServerDE();
++    auto* weapon = m_InventoryMgr.CurrentWeapon();
++    DVector forward = direction;
++    if (!server || !server->IsObjectAlive(m_hObject) || (m_hTarget && !server->IsObjectAlive(m_hTarget)) || !weapon ||
++        !physics_vector(origin) || !normalize(forward))
++    {
++        clear_shot.outcome = AIClearOutcome::Invalid;
++        return false;
++    }
++    const float range = alternate ? weapon->data.m_fAltRange : weapon->data.m_fRange;
++    auto query = [&](DVector ray, SegmentHit& hit, SegmentResult& result)
++    {
++        ++clear_shot.rays;
++        // Same liquid/glass rules as CanSee. Original IGNORE_DESTRUCTABLE
++        // concerns CDestructableModel, which is not registered in this port.
++        result = server->IntersectSegment(origin, vector_add(origin, vector_scale(ray, range)), m_hObject, hit, false,
++                                          SegmentObjects::SolidOrRayHit, SegmentFilter::AIVisibility);
++        if (result == SegmentResult::Invalid)
++            clear_shot.outcome = AIClearOutcome::Invalid;
++        else if (result == SegmentResult::Unavailable)
++            clear_shot.outcome = AIClearOutcome::Unavailable;
++        else
++            clear_shot.outcome = AIClearOutcome::Blocked;
++        return result == SegmentResult::Hit;
++    };
++    clear_shot.direction = forward;
++    if (!query(forward, clear_shot.first_hit, clear_shot.first_result))
++    {
++        if (clear_shot.first_result != SegmentResult::Miss)
++            return false;
++        clear_shot.outcome = AIClearOutcome::Clear;
++        return true; // Unlike CanSee, an initial miss is clear.
++    }
++    if (m_hTarget && clear_shot.first_hit.object == m_hTarget)
++    {
++        clear_shot.outcome = AIClearOutcome::Target;
++        return true;
++    }
++    DRotation rotation;
++    if (m_hTarget && server->GetModelNodeTransform(m_hTarget, "head", &clear_shot.head, &rotation))
++    {
++        // Original mutates the cached target position even if this retry fails.
++        m_vTargetPos = clear_shot.head;
++        target_position_valid = true;
++        clear_shot.retried_head = true;
++        forward = vector_subtract(m_vTargetPos, origin);
++        if (!normalize(forward))
++        {
++            clear_shot.outcome = AIClearOutcome::Invalid;
++            return false;
++        }
++        if (query(forward, clear_shot.head_hit, clear_shot.head_result) && clear_shot.head_hit.object == m_hTarget)
++        {
++            direction = forward;
++            clear_shot.direction = forward;
++            clear_shot.outcome = AIClearOutcome::Head;
++            return true;
++        }
++    }
++    return false; // A miss on the HEAD retry is not clear.
++}
++bool AI_Mgr::Fire(bool alternate)
++{
++    ++fire_calls;
++    fire_error.clear();
++    fire_result = FireResult::Invalid;
++    clear_shot = {};
++    fire_origin = fire_direction = {};
++    fire_gun_node = false;
++    auto fail = [&](FireResult result, const char* error)
++    {
++        fire_result = result;
++        fire_error = error;
++        ++fire_failures;
++        return false;
++    };
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject) || (m_hTarget && !server->IsObjectAlive(m_hTarget)))
++        return fail(FireResult::Invalid, "AI fire owner/target unavailable");
++    auto* weapon = m_InventoryMgr.CurrentWeapon();
++    if (!weapon)
++        return fail(FireResult::Unavailable, "AI has no current weapon");
++    if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_MELEE)
++        return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
++    DRotation rotation;
++    fire_gun_node = server->GetModelNodeTransform(m_hObject, "r_gun", &fire_origin, &rotation);
++    if (fire_gun_node)
++        fire_direction = vector_subtract(m_vTargetPos, fire_origin);
++    else
++    {
++        if (server->GetObjectPos(m_hObject, &fire_origin) != DE_OK ||
++            server->GetObjectRotation(m_hObject, &rotation) != DE_OK)
++            return fail(FireResult::Unavailable, "AI body/forward fallback unavailable");
++        fire_direction = rotate_vector({0, 0, 1}, rotation);
++    }
++    if (!normalize(fire_direction))
++        return fail(FireResult::Invalid, "AI aim direction is degenerate or invalid");
++    if (!CheckClearShot(fire_origin, fire_direction, alternate))
++    {
++        if (clear_shot.outcome == AIClearOutcome::Invalid || clear_shot.outcome == AIClearOutcome::Unavailable)
++            return fail(FireResult::Unavailable, "AI clearance query failed");
++        ++fire_blocked;
++        fire_result = FireResult::Blocked;
++        return false;
++    }
++    // Adapt the original server RNG to the existing owned typed shot transport.
++    // This is deterministic in this engine, not retail CRT random-bit parity.
++    int seed;
++    if (!server->RandomInt(0, 255, seed))
++        return fail(FireResult::Unavailable, "AI shot randomness unavailable");
++    WeaponFire request;
++    request.position = fire_origin;
++    request.direction = fire_direction;
++    request.weapon = weapon->data.m_nType;
++    request.alternate = alternate;
++    request.seed = static_cast<DBYTE>(seed);
++    fire_result = m_InventoryMgr.FireCurrentWeapon(request);
++    if (fire_result == FireResult::Fired)
++        ++fire_shots;
++    else if (fire_result == FireResult::Dry)
++        ++fire_dry;
++    else
++        return fail(fire_result, "AI weapon shot service failed");
++    // Original Fire discards the inventory return. Keep dry acceptance distinct
++    // from actual shots, but never accept an unavailable/invalid engine service.
++    return true;
++}
++bool AI_Mgr::MC_BestWeapon()
++{
++    state_error.clear();
++    auto* server = GetServerDE();
++    DVector position;
++    if (!server || !server->IsObjectAlive(m_hObject) || server->GetObjectPos(m_hObject, &position) != DE_OK ||
++        !physics_vector(m_vTargetPos))
++        return StateFailure("AI best-weapon position/owner unavailable");
++    weapon_distance =
++        std::sqrt(vector_dot(vector_subtract(position, m_vTargetPos), vector_subtract(position, m_vTargetPos)));
++    CWeapon* candidate = nullptr;
++    if (!m_InventoryMgr.FindBestWeapon(weapon_distance, candidate))
++        return StateFailure("AI best-weapon inventory query failed");
++    best_weapon = candidate ? candidate->data.m_nType : 0;
++    auto animate = [&](CWeapon* weapon)
++    {
++        const auto type = weapon ? weapon->data.m_nFireType : TYPE_PISTOL;
++        // Original table has only THREE columns; TYPE_MELEE is four.
++        if (!m_pAnim_Sound || type >= std::size(m_pAnim_Sound->m_nAnim_SWITCH_WEAPON))
++            return StateFailure("AI weapon-switch animation column unavailable");
++        return SetAnimation(m_pAnim_Sound->m_nAnim_SWITCH_WEAPON[type]);
++    };
++    std::string animation;
++    if (m_bAnimating && !server->GetModelAnimationName(m_hObject, server->GetModelAnimation(m_hObject), animation))
++        return StateFailure("AI weapon-switch playback unavailable");
++    if (!m_bAnimating)
++    {
++        if (!candidate)
++        {
++            auto* current = m_InventoryMgr.CurrentWeapon();
++            if (current && current->data.m_nType <= WEAP_MELEE &&
++                m_InventoryMgr.GetAmmoCount(current->data.m_nAmmoType) <= 0)
++                return SetNewState(StateFindAmmo);
++            if (Metacmd == std::numeric_limits<int>::max())
++                return StateFailure("AI Metacmd overflow");
++            ++Metacmd;
++        }
++        else
++        {
++            if (!animate(m_InventoryMgr.CurrentWeapon()))
++                return false;
++            server->SetModelLooping(m_hObject, DFALSE);
++            m_bAnimating = true;
++        }
++    }
++    else if (server->GetModelPlaybackState(m_hObject) & MS_PLAYDONE)
++    {
++        if (candidate)
++        {
++            // Validate the destination clip before changing the inventory.
++            if (!animate(candidate))
++                return false;
++            if (m_InventoryMgr.ChangeWeapon(candidate->data.m_nType) != InventoryResult::Ok ||
++                !candidate->ShowHandModel(DFALSE))
++                return StateFailure("AI best-weapon selection failed");
++        }
++        else
++            m_bAnimating = false;
++    }
++    return true;
++}
++bool AI_Mgr::MC_Fire_Stand()
++{
++    state_error.clear();
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject))
++        return StateFailure("AI fire command requires a live owner");
++    if (!m_bAnimating || m_nCurMetacmd != 7)
++    {
++        auto* weapon = m_InventoryMgr.CurrentWeapon();
++        const auto type = weapon ? weapon->data.m_nFireType : TYPE_MELEE;
++        if (!m_pAnim_Sound || type >= std::size(m_pAnim_Sound->m_nAnim_FIRE_STAND))
++            return StateFailure("AI standing-fire animation table unavailable");
++        if (weapon)
++            m_fAttackLoadTime = weapon->data.m_fReloadTime;
++        m_fLoadTimeStart = m_fTimeStart = 0;
++        if (!SetAnimation(m_pAnim_Sound->m_nAnim_FIRE_STAND[type]))
++        {
++            // Only actual blocked clearance selects the source crawl recovery.
++            // Missing model/clip/services must stay failures, not valid actions.
++            if (animation_blocked)
++            {
++                if (!SetNewState(StateCrawlUnder))
++                    return false;
++                server->SetNextUpdate(m_hObject, .1f);
++                return true;
++            }
++            return false;
++        }
++        server->SetModelLooping(m_hObject, DFALSE);
++        m_bAnimating = true;
++        m_nCurMetacmd = 7;
++        server->SetNextUpdate(m_hObject, .1f);
++        return true;
++    }
++    if (!std::isfinite(m_fLoadTimeStart) || !std::isfinite(m_fAttackLoadTime) || m_fAttackLoadTime < 0)
++        return StateFailure("AI fire cadence invalid");
++    std::string animation;
++    if (!server->GetModelAnimationName(m_hObject, server->GetModelAnimation(m_hObject), animation))
++        return StateFailure("AI standing-fire playback unavailable");
++    const bool done = (server->GetModelPlaybackState(m_hObject) & MS_PLAYDONE) != 0;
++    // Source can increment twice (blocked fire AND completed clip).
++    if (Metacmd > std::numeric_limits<int>::max() - 2)
++        return StateFailure("AI Metacmd overflow");
++    if (server->GetTime() > m_fLoadTimeStart + m_fAttackLoadTime)
++    {
++        if (Fire())
++            m_fLoadTimeStart = server->GetTime();
++        else if (fire_result == FireResult::Blocked || !m_InventoryMgr.CurrentWeapon())
++        {
++            m_bAnimating = false;
++            ++Metacmd;
++        }
++        else
++            return StateFailure("AI fire command required shot service failed");
++    }
++    if (done)
++    {
++        m_bAnimating = false;
++        ++Metacmd;
++        ++animation_finishes;
++    }
++    return true;
++}
+diff --git a/src/game/original/AIState.cpp b/src/game/original/AIState.cpp
+index 793dcf1..013c459 100644
+--- a/src/game/original/AIState.cpp
++++ b/src/game/original/AIState.cpp
+@@ -82,6 +82,7 @@ bool AI_Mgr::SetAnimation(DDWORD clip)
+     using OpenBlood2::ResizeResult;
+     state_error.clear();
+     requested_animation = clip;
++    animation_blocked = false;
+     auto* server = GetServerDE();
+     std::string name;
+     if (!server || !server->IsObjectAlive(m_hObject) || !server->GetModelAnimationName(m_hObject, clip, name))
+@@ -100,6 +101,7 @@ bool AI_Mgr::SetAnimation(DDWORD clip)
+         // Explicit replacement for the old SetObjectDims2: existing atomic,
+         // foot-anchored clearance, no partial pushing or fabricated successful resize.
+         const auto result = server->ResizeObject(m_hObject, dimensions);
++        animation_blocked = result == ResizeResult::Blocked;
+         if (result != ResizeResult::Resized)
+             return StateFailure(result == ResizeResult::Blocked ? "AI animation resize blocked"
+                                                                 : "AI animation resize unavailable or invalid");
+@@ -204,7 +206,7 @@ bool AI_Mgr::AI_STATE_Idle()
+     {
+         case 1:
+             if (m_bCabal)
+-                return StateFailure("Original MC_BestWeapon is not integrated");
++                return MC_BestWeapon();
+             ++Metacmd;
+             return true;
+         case 2:
+@@ -226,7 +228,7 @@ bool AI_Mgr::AI_STATE_Passive()
+     {
+         case 1:
+             if (m_bCabal)
+-                return StateFailure("Original MC_BestWeapon is not integrated");
++                return MC_BestWeapon();
+             ++Metacmd;
+             return true;
+         case 2:
+diff --git a/src/game/original/AI_Mgr.cpp b/src/game/original/AI_Mgr.cpp
+index de06199..4cb7304 100644
+--- a/src/game/original/AI_Mgr.cpp
++++ b/src/game/original/AI_Mgr.cpp
+@@ -12,6 +12,10 @@ namespace OpenBlood2
+     {
+         switch (value)
+         {
++            case AIKeyOutcome::FireAttempt:
++                return "Weapon attempt (inspect shot result)";
++            case AIKeyOutcome::FireBlocked:
++                return "Fire blocked";
+             case AIKeyOutcome::None:
+                 return "No AI action";
+             case AIKeyOutcome::Played:
+@@ -112,8 +116,15 @@ bool AI_Mgr::OnStringKey(ArgList* args)
+         }
+         if (!server->IsObjectAlive(m_hTarget))
+             return fail(AIKeyOutcome::Invalid, "AI fire target is pending or stale");
+-        ++unavailable_keys;
+-        fail(AIKeyOutcome::Unavailable, "Original AI Fire/aiming is not integrated");
++        if (Fire())
++            key_outcome = AIKeyOutcome::FireAttempt;
++        else if (fire_result == FireResult::Blocked)
++            key_outcome = AIKeyOutcome::FireBlocked;
++        else
++        {
++            ++unavailable_keys;
++            fail(AIKeyOutcome::Unavailable, fire_error.c_str());
++        }
+     }
+     else if (branch == 1 || branch == 2)
+     {
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index f7699ad..072a7f0 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -39,7 +39,9 @@ namespace OpenBlood2
+         NoTarget,
+         Unavailable,
+         Invalid,
+-        PlaybackFailed
++        PlaybackFailed,
++        FireAttempt,
++        FireBlocked
+     };
+     const char* ai_key_outcome_name(AIKeyOutcome);
+     enum class AISightOutcome
+@@ -63,10 +65,30 @@ namespace OpenBlood2
+         bool origin_head = false, retried_head = false;
+         unsigned rays = 0;
+     };
++    enum class AIClearOutcome
++    {
++        None,
++        Clear,
++        Target,
++        Head,
++        Blocked,
++        Invalid,
++        Unavailable
++    };
++    const char* ai_clear_outcome_name(AIClearOutcome);
++    struct AIClearShot
++    {
++        AIClearOutcome outcome = AIClearOutcome::None;
++        DVector origin{}, direction{}, head{};
++        SegmentHit first_hit, head_hit;
++        SegmentResult first_result = SegmentResult::Miss, head_result = SegmentResult::Miss;
++        unsigned rays = 0;
++        bool retried_head = false;
++    };
+ } // namespace OpenBlood2
+ 
+ // Selective original AI_Mgr::InitStatics/OnStringKey port. No production AI class
+-// registration or complete AI_Update, Fire or MC_Extra implementation yet.
++// registration or complete AI_Update or MC_Extra implementation yet.
+ // Perception commands: AI_PERCEPTION_CONTRACTS.md; no automatic AI update loop.
+ // Selected CanSee and explicit target/facing commands are documented in
+ // AI_SIGHT_CONTRACTS.md and AI_TARGET_CONTRACTS.md.
+@@ -136,6 +158,19 @@ class AI_Mgr : public CBaseCharacter
+     bool StopVelocity();
+     bool SetAnimation(DDWORD);
+     bool MC_Idle();
++    bool MC_BestWeapon();
++    bool MC_Fire_Stand();
++    bool CheckClearShot(DVector origin, DVector& direction, bool alternate = false);
++    bool Fire(bool alternate = false); // Source acceptance includes dry attempts; inspect fire_result.
++    OpenBlood2::AIClearShot clear_shot;
++    FireResult fire_result = FireResult::Invalid;
++    DVector fire_origin{}, fire_direction{};
++    bool fire_gun_node = false;
++    std::uint64_t fire_calls = 0, fire_shots = 0, fire_dry = 0, fire_blocked = 0, fire_failures = 0;
++    std::string fire_error;
++    float weapon_distance = 0, m_fAttackLoadTime = 0, m_fLoadTimeStart = 0, m_fTimeStart = 0;
++    DBYTE best_weapon = 0;
++
+     bool MC_Talk();
+     bool MC_Special(int);
+     // Only the original state-dispatch portion, not AI_Update/deactivation/retention.
+@@ -146,7 +181,7 @@ class AI_Mgr : public CBaseCharacter
+     virtual bool AI_STATE_Special(int); // Consolidates the eight original virtual handlers.
+     int m_nLastState = StateIdle, m_nCurMetacmd = 1, m_nTrapped = 0;
+     DDWORD m_nCurAnimation = 999;
+-    bool m_bAnimating = false, m_bHasTargeted = false;
++    bool m_bAnimating = false, m_bHasTargeted = false, animation_blocked = false;
+     float m_fWaitForIdleTime = 0;
+     DVector m_vDims{1, 1, 1}, m_vScale{1, 1, 1};
+     std::string m_szAIState = "IDLE";
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index 06f8be6..4ba3abc 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -231,3 +231,41 @@ bool CInventoryMgr::UpdateHandModels()
+             ok = w->ShowHandModel(!owner->m_damage.IsDead()) && ok;
+     return ok;
+ }
++
++// Original InventoryMgr.cpp:772-837,908-939. Only supported weapon types exist.
++InventoryResult CInventoryMgr::ChangeWeapon(DBYTE type)
++{
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hOwner) || !weapon_definition(type))
++        return InventoryResult::Invalid;
++    if (CurrentWeapon() && CurrentWeapon()->data.m_nType == type)
++        return InventoryResult::Current;
++    for (unsigned i = 0; i < m_Weapons.size(); ++i)
++        if (m_Weapons[i] && m_Weapons[i]->data.m_nType == type)
++            return ChangeWeaponSlot(static_cast<DBYTE>(i));
++    return InventoryResult::NotAvailable;
++}
++bool CInventoryMgr::FindBestWeapon(float distance, CWeapon*& alternative) const
++{
++    alternative = nullptr;
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hOwner) || !std::isfinite(distance) || distance < 0)
++        return false;
++    auto* best = CurrentWeapon();
++    for (const auto& slot : m_Weapons)
++    {
++        auto* candidate = slot.get();
++        if (!candidate)
++            continue;
++        const auto damage = best ? static_cast<DDWORD>(best->data.m_fMaxDamage) : 0;
++        const float ammo = best ? GetAmmoCount(best->data.m_nAmmoType) : 0;
++        // Raw AMMO_NONE pool is deliberately zero here, unlike CheckAmmo().
++        if (distance < candidate->data.m_fRange && candidate->data.m_nDamageRadius < distance &&
++            GetAmmoCount(candidate->data.m_nAmmoType) &&
++            (static_cast<DDWORD>(candidate->data.m_fMaxDamage) > damage || ammo <= 0))
++            best = candidate;
++    }
++    if (best != CurrentWeapon())
++        alternative = best;
++    return true;
++}
+diff --git a/src/game/original/InventoryMgr.h b/src/game/original/InventoryMgr.h
+index cdba9b2..d55dab9 100644
+--- a/src/game/original/InventoryMgr.h
++++ b/src/game/original/InventoryMgr.h
+@@ -39,6 +39,8 @@ class CInventoryMgr : public Aggregate
+     bool UpdateHandModels();
+     InventoryResult ObtainWeapon(DBYTE, int slot = -1);
+     InventoryResult ChangeWeaponSlot(DBYTE);
++    InventoryResult ChangeWeapon(DBYTE);
++    bool FindBestWeapon(float target_distance, CWeapon*& alternative) const;
+     CWeapon* GetWeapon(unsigned slot, bool left = false) const
+     {
+         return slot < 10 ? (left ? m_LWeapons[slot].get() : m_Weapons[slot].get()) : nullptr;
+diff --git a/src/game/original/Weapon.cpp b/src/game/original/Weapon.cpp
+index f450c8c..1247cd6 100644
+--- a/src/game/original/Weapon.cpp
++++ b/src/game/original/Weapon.cpp
+@@ -14,7 +14,7 @@ float CWeapon::CheckAmmo() const
+ FireResult CWeapon::Fire(const WeaponFire& request)
+ {
+     auto* server = BaseClass::GetServerDE();
+-    if (!server || !m_pInventoryMgr || !server->HandleToObject(m_hOwner) || request.weapon != data.m_nType ||
++    if (!server || !m_pInventoryMgr || !server->IsObjectAlive(m_hOwner) || request.weapon != data.m_nType ||
+         request.left != m_bLeftHand || !physics_vector(request.position) || !physics_vector(request.direction))
+         return FireResult::Invalid;
+     const auto length = std::sqrt(vector_dot(request.direction, request.direction));
+@@ -51,33 +51,35 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+     direction = vector_add(direction, vector_scale(up, sample(-spread.v, spread.v) / 2000));
+     direction = vector_scale(direction, 1 / std::sqrt(vector_dot(direction, direction)));
+     const auto range = request.alternate ? data.m_fAltRange : data.m_fRange;
+-    // FireSpread -> AlignFireVector: project from Caleb's current eye, then
+-    // aim the muzzle at that intersection. Player input owns the muzzle origin.
+-    DVector eye;
+-    server->GetObjectPos(m_hOwner, &eye);
+-    const auto* player = dynamic_cast<CPlayerObj*>(server->HandleToObject(m_hOwner));
+-    eye.y += player ? player->eye_level : 36;
+-    auto aim = vector_add(eye, vector_scale(direction, range));
+-    SegmentHit aim_hit;
+-    auto query = server->IntersectSegment(eye, aim, m_hOwner, aim_hit);
+-    if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
+-    {
+-        last_shot.result = FireResult::Unavailable;
+-        return last_shot.result;
+-    }
+-    if (query == SegmentResult::Hit)
+-        aim = aim_hit.point;
+-    direction = vector_subtract(aim, request.position);
+-    const auto aim_length = std::sqrt(vector_dot(direction, direction));
+-    if (aim_length < 1e-6f)
++    // Source FireSpread aligns the eye only for a player. NPCs fire the
++    // spread direction from their actual gun node (or body fallback).
++    if (const auto* player = dynamic_cast<CPlayerObj*>(server->HandleToObject(m_hOwner)))
+     {
+-        last_shot.result = FireResult::Invalid;
+-        return last_shot.result;
++        DVector eye;
++        server->GetObjectPos(m_hOwner, &eye);
++        eye.y += player->eye_level;
++        auto aim = vector_add(eye, vector_scale(direction, range));
++        SegmentHit aim_hit;
++        const auto query = server->IntersectSegment(eye, aim, m_hOwner, aim_hit);
++        if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
++        {
++            last_shot.result = FireResult::Unavailable;
++            return last_shot.result;
++        }
++        if (query == SegmentResult::Hit)
++            aim = aim_hit.point;
++        direction = vector_subtract(aim, request.position);
++        const auto aim_length = std::sqrt(vector_dot(direction, direction));
++        if (aim_length < 1e-6f)
++        {
++            last_shot.result = FireResult::Invalid;
++            return last_shot.result;
++        }
++        direction = vector_scale(direction, 1 / aim_length);
+     }
+-    direction = vector_scale(direction, 1 / aim_length);
+     last_shot.direction = direction;
+     last_shot.end = vector_add(request.position, vector_scale(direction, range));
+-    query = server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, true);
++    const auto query = server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, true);
+     last_shot.collision = query;
+     if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
+     {
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 605df06..37487a4 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -674,3 +674,17 @@ if(BLOOD2_TEST_DATA_DIR)
+         set_tests_properties(ai_state.${case} PROPERTIES LABELS "headless;private;ai_state" TIMEOUT 90)
+     endforeach()
+ endif()
++
++add_executable(ai_fire_tests ai_fire_tests.cpp)
++target_link_libraries(ai_fire_tests PRIVATE blood2_game)
++blood2_project_options(ai_fire_tests)
++foreach(case selection clearance filters head aim keys cadence recovery failures lifetime)
++    add_test(NAME ai_fire.${case} COMMAND ai_fire_tests "${case}")
++    set_tests_properties(ai_fire.${case} PROPERTIES LABELS "headless;ai_fire" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case catalog subway)
++        add_test(NAME ai_fire.${case} COMMAND ai_fire_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(ai_fire.${case} PROPERTIES LABELS "headless;private;ai_fire" TIMEOUT 90)
++    endforeach()
++endif()
+diff --git a/tests/ai_fire_tests.cpp b/tests/ai_fire_tests.cpp
+new file mode 100644
+index 0000000..7fc6142
+--- /dev/null
++++ b/tests/ai_fire_tests.cpp
+@@ -0,0 +1,532 @@
++#include "brush_fixture.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/CameraObj.h"
++#include "game/original/DestructableBrush.h"
++#include "game/server_adapter.h"
++#include "model_fixture.h"
++#include <cmath>
++#include <functional>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .001f;
++    }
++    bool setup(GameSession& g)
++    {
++        CHECK(g.objects.find_class("BaseClass") || g.initialize());
++        auto floor = test_brush::box("floor", {-10000, -20, -10000}, {10000, -10, 10000});
++        for (auto& s : floor.surfaces)
++            s.flags = 1;
++        std::string error;
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        return true;
++    }
++    struct Probe : AI_Mgr
++    {
++        bool scheduled = false;
++        inline static unsigned destroyed = 0;
++        inline static std::uint64_t final_calls = 0, final_shots = 0;
++        ~Probe() override
++        {
++            final_calls = fire_calls;
++            final_shots = fire_shots;
++            ++destroyed;
++        }
++        DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
++        {
++            if (m == MID_UPDATE && scheduled)
++            {
++                GetServerDE()->SetNextUpdate(m_hObject, .001f);
++                if (!MC_Fire_Stand())
++                    GetServerDE()->SetNextUpdate(m_hObject, 0);
++            }
++            return AI_Mgr::EngineMessageFn(m, d, f);
++        }
++    };
++    Probe* actor(GameSession& g)
++    {
++        static const ClassInfo type{"AIFireProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<Probe>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Pos = {0, 10, 0};
++        s.m_Flags = FLAG_MODELKEYS;
++        auto h = g.objects.create(&type, s);
++        auto* r = g.objects.get(h);
++        auto* ai = r ? dynamic_cast<Probe*>(r->game.get()) : nullptr;
++        if (!ai || !ai->m_InventoryMgr.Init(h, nullptr))
++            return nullptr;
++        auto model = std::make_shared<Model>();
++        std::string error;
++        if (!read_model(test_model::abc().b, *model, error))
++            return nullptr;
++        model->nodes[1].name = "r_gun";
++        for (auto& a : model->animations)
++        {
++            for (auto& key : a.keys)
++                key.text.clear();
++            a.dimensions = {1, 1, 1};
++            for (auto& n : a.nodes)
++                for (auto& f : n.frames)
++                    f.position = {};
++        }
++        r->model = model;
++        g.server.SetModelAnimation(h, 0);
++        r->dimensions = {1, 1, 1};
++        auto table = std::make_shared<CAnim_Sound>();
++        ai->InitStatics(table);
++        ai->m_vTargetPos = {0, 10, 100};
++        return ai;
++    }
++    struct Target : BaseClass
++    {
++        CDestructable damage;
++        bool remove = false;
++        Target()
++        {
++            AddAggregate(&damage);
++        }
++        DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
++        {
++            if (m == MID_INITIALUPDATE)
++            {
++                damage.Init(m_hObject);
++                damage.m_fHitPoints = damage.m_fMaxHitPoints = 1000;
++            }
++            return BaseClass::EngineMessageFn(m, d, f);
++        }
++        DDWORD ObjectMessageFn(HOBJECT sender, DDWORD m, HMESSAGEREAD read) override
++        {
++            const auto result = BaseClass::ObjectMessageFn(sender, m, read);
++            if (remove && m == damage_message)
++            {
++                g_pServerDE->RemoveObject(sender);
++                g_pServerDE->RemoveObject(m_hObject);
++            }
++            return result;
++        }
++    };
++    Target* target(GameSession& g, DVector pos = {0, 10, 100}, DVector dims = {5, 10, 5})
++    {
++        static const ClassInfo type{"AIFireTarget",
++                                    g.objects.find_class("BaseClass"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<Target>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_Pos = pos;
++        s.m_Flags = FLAG_SOLID;
++        auto h = g.objects.create(&type, s);
++        g.server.SetObjectDims(h, &dims);
++        return dynamic_cast<Target*>(g.server.HandleToObject(h));
++    }
++    bool armed(Probe* a, DBYTE type = WEAP_BERETTA)
++    {
++        CHECK(a);
++        CHECK(a->m_InventoryMgr.ObtainWeapon(type, 0) == InventoryResult::Ok);
++        a->m_InventoryMgr.SetAmmoCount(AMMO_BULLET, 100);
++        return true;
++    }
++    bool selection(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto& i = a->m_InventoryMgr;
++        CWeapon* w = nullptr;
++        CHECK(i.FindBestWeapon(100, w) && !w);
++        CHECK(i.ObtainWeapon(WEAP_BERETTA, 1) == InventoryResult::Ok);
++        i.SetAmmoCount(AMMO_BULLET, 2);
++        CHECK(i.FindBestWeapon(3500, w) && !w);
++        CHECK(i.FindBestWeapon(0, w) && !w);
++        CHECK(i.FindBestWeapon(3499, w) && w == i.GetWeapon(1));
++        CHECK(!i.FindBestWeapon(-1, w) && !w);
++        CHECK(a->MC_BestWeapon() && a->m_bAnimating && a->Metacmd == 1);
++        CHECK(g.server.advance_models(1) && a->MC_BestWeapon() && i.CurrentWeapon() == i.GetWeapon(1) &&
++              a->m_bAnimating);
++        CHECK(g.server.advance_models(1) && a->MC_BestWeapon() && !a->m_bAnimating && a->Metacmd == 1);
++        CHECK(a->MC_BestWeapon() && a->Metacmd == 2);
++        CHECK(i.FindBestWeapon(8000, w) && !w); // Retains unsuitable current weapon.
++        i.SetAmmoCount(AMMO_BULLET, 0);
++        CHECK(a->MC_BestWeapon() && a->m_nState == AI_Mgr::StateFindAmmo);
++        CHECK(i.ObtainWeapon(WEAP_MELEE, 0) == InventoryResult::Ok);
++        CHECK(i.ChangeWeapon(WEAP_MELEE) == InventoryResult::Ok);
++        CHECK(i.FindBestWeapon(50, w) && !w);
++        CHECK(a->MC_BestWeapon() && a->m_nState == AI_Mgr::StateFindAmmo); // raw NONE pool
++        i.SetAmmoCount(AMMO_BULLET, 5);
++        CHECK(i.FindBestWeapon(100, w) && w == i.GetWeapon(1));
++        CHECK(!a->MC_BestWeapon() && i.CurrentWeapon()->data.m_nType == WEAP_MELEE); // no switch column 4
++        CHECK(i.ChangeWeapon(WEAP_BERETTA) == InventoryResult::Ok &&
++              i.ChangeWeapon(WEAP_BERETTA) == InventoryResult::Current);
++        CHECK(i.ChangeWeapon(255) == InventoryResult::Invalid);
++        return true;
++    }
++    bool clearance(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(armed(a));
++        auto* t = target(g);
++        CHECK(t && a->SetNewTarget(t->m_hObject));
++        DVector dir{0, 0, 1};
++        CHECK(a->CheckClearShot({0, 10, 0}, dir) && a->clear_shot.outcome == AIClearOutcome::Target);
++        g.server.SetObjectFlags(t->m_hObject, 0);
++        CHECK(a->CheckClearShot({0, 10, 0}, dir) && a->clear_shot.outcome == AIClearOutcome::Clear);
++        CHECK(!a->CanSee(t->m_hObject)); // Intentional source difference.
++        g.server.SetObjectFlags(t->m_hObject, FLAG_RAYHIT);
++        CHECK(a->CheckClearShot({0, 10, 0}, dir) && a->clear_shot.outcome == AIClearOutcome::Target);
++        CHECK(target(g, {0, 10, 50}, {10, 20, 2}));
++        CHECK(!a->CheckClearShot({0, 10, 0}, dir) && a->clear_shot.outcome == AIClearOutcome::Blocked);
++        CHECK(!a->Fire() && a->fire_result == FireResult::Blocked && a->fire_blocked == 1 &&
++              a->m_InventoryMgr.GetAmmoCount(1) == 100);
++        g.server.collision_ready = false;
++        CHECK(!a->Fire() && a->fire_result == FireResult::Unavailable && a->fire_failures == 1);
++        return true;
++    }
++    bool filters(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(armed(a));
++        auto* t = target(g);
++        CHECK(t && a->SetNewTarget(t->m_hObject));
++        auto model = test_brush::box("glass", {-20, 0, 45}, {20, 40, 55});
++        g.world.models.push_back(std::move(model));
++        auto h = g.objects.create(g.objects.find_class("CDestructableBrush"), {}, Creation::World,
++                                  {{"Name", std::string("glass")},
++                                   {"Flags", std::int32_t(FLAG_SOLID)},
++                                   {"HitPoints", 100.f},
++                                   {"SurfaceType", std::int32_t(SURFTYPE_GLASS)}});
++        CHECK(h && a->Fire() && a->clear_shot.first_hit.object == t->m_hObject);
++        CHECK(a->m_InventoryMgr.CurrentWeapon()->last_shot.hit.object == h); // Clear aim still damages the glass.
++        auto* brush = dynamic_cast<CDestructableBrush*>(g.objects.get(h)->game.get());
++        CHECK(brush);
++        brush->destructable = false;
++        CHECK(!a->Fire() && a->fire_result == FireResult::Blocked);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        auto volume = test_brush::box("liquid", {-20, 0, 45}, {20, 40, 55});
++        g.world.models.push_back(std::move(volume));
++        h = g.objects.create(g.objects.find_class("Water"), {}, Creation::World, {{"Name", std::string("liquid")}});
++        CHECK(h);
++        g.server.SetObjectFlags(h, FLAG_SOLID);
++        DVector direction{0, 0, 1};
++        CHECK(a->CheckClearShot({0, 10, 0}, direction) && a->clear_shot.first_hit.object == t->m_hObject);
++        CHECK(!g.objects.find_class("CDestructableModel")); // That original filter category remains unported.
++        return true;
++    }
++    bool head(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(armed(a));
++        auto* t = target(g);
++        CHECK(t && a->SetNewTarget(t->m_hObject));
++        auto m = std::make_shared<Model>();
++        std::string e;
++        CHECK(read_model(test_model::abc().b, *m, e));
++        m->nodes[1].name = "head";
++        for (auto& clip : m->animations)
++            for (unsigned n = 0; n < clip.nodes.size(); ++n)
++                for (auto& f : clip.nodes[n].frames)
++                    f.position = {0, n ? 8.f : 0, 0};
++        auto* r = g.objects.get(t->m_hObject);
++        r->model = m;
++        r->state.m_ObjectType = OT_MODEL;
++        CHECK(target(g, {0, 10, 50}, {10, 1, 2}));
++        DVector dir{0, 0, 1};
++        CHECK(a->CheckClearShot({0, 10, 0}, dir) && a->clear_shot.outcome == AIClearOutcome::Head &&
++              a->clear_shot.rays == 2 && dir.y > 0);
++        CHECK(a->m_vTargetPos.y == 18 && a->target_position_valid);
++        g.server.SetObjectFlags(t->m_hObject, 0);
++        dir = {0, 0, 1};
++        a->m_vTargetPos = {};
++        CHECK(!a->CheckClearShot({0, 10, 0}, dir) && a->clear_shot.head_result == SegmentResult::Miss &&
++              a->m_vTargetPos.y == 18 && dir.y == 0);
++        return true;
++    }
++    bool aim(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(armed(a));
++        auto* t = target(g);
++        CHECK(t && a->SetNewTarget(t->m_hObject));
++        const bool fired = a->Fire();
++        CHECK(fired && a->fire_gun_node && a->fire_shots == 1 && a->fire_origin.y == 10 &&
++              t->damage.m_fHitPoints < 1000);
++        auto* w = a->m_InventoryMgr.CurrentWeapon();
++        CHECK(w->last_shot.damage_delivered && w->last_shot.hit.object == t->m_hObject);
++        // A non-player shot remains close to the gun's requested forward, never a fake +36 eye ray.
++        CHECK(std::abs(w->last_shot.direction.y) < .02f);
++        a->m_InventoryMgr.SetAmmoCount(1, 0);
++        CHECK(a->Fire(true) && a->fire_result == FireResult::Dry && a->fire_dry == 1 && a->fire_shots == 1);
++        a->m_InventoryMgr.SetAmmoCount(1, 100);
++        auto* r = g.objects.get(a->m_hObject);
++        auto m = std::make_shared<Model>(*r->model);
++        r->model = m;
++        m->nodes[1].name = "not_gun";
++        a->m_vTargetPos = {500, 80, 100};
++        CHECK(a->Fire() && !a->fire_gun_node && a->fire_direction.x == 0 && a->fire_direction.y == 0 &&
++              a->fire_direction.z == 1);
++        CHECK(a->m_InventoryMgr.ObtainWeapon(WEAP_MELEE, 1) == InventoryResult::Ok &&
++              a->m_InventoryMgr.ChangeWeapon(WEAP_MELEE) == InventoryResult::Ok);
++        g.objects.get(t->m_hObject)->state.m_Pos = {0, 10, 50};
++        CHECK(a->Fire() && a->fire_result == FireResult::Fired && a->m_InventoryMgr.GetAmmoCount(0) == 0);
++        return true;
++    }
++    bool keys(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(armed(a));
++        auto* t = target(g);
++        CHECK(t && a->SetNewTarget(t->m_hObject));
++        auto* r = g.objects.get(a->m_hObject);
++        auto m = std::make_shared<Model>(*r->model);
++        r->model = m;
++        m->animations[0].keys = {{0, {}, {}, "[fire_key:1][UpVel:7]"}, {50, {}, {}, "[fire_key:1]"}, {100, {}, {}, ""}};
++        g.server.SetModelLooping(a->m_hObject, false);
++        CHECK(g.server.advance_models(.2));
++        CHECK(a->fire_shots == 2 && a->model_keys == 2 && a->key_outcome == AIKeyOutcome::FireAttempt &&
++              r->velocity.y == 7);
++        CHECK(g.objects.remove(t->m_hObject));
++        CHECK(g.server.ResetModelAnimation(a->m_hObject) == DE_OK);
++        CHECK(g.server.advance_models(.2) && a->key_outcome == AIKeyOutcome::Invalid && a->fire_shots == 2);
++        CHECK(g.objects.finish_frame() && !a->GetTarget());
++        CHECK(g.server.ResetModelAnimation(a->m_hObject) == DE_OK);
++        r->velocity.y = 0;
++        CHECK(g.server.advance_models(.2) && a->no_target == 2 && r->velocity.y == 0);
++        return true;
++    }
++    bool cadence(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(armed(a));
++        auto* t = target(g);
++        CHECK(t && a->SetNewTarget(t->m_hObject));
++        CHECK(a->MC_Fire_Stand() && a->m_nCurMetacmd == 7 && a->m_bAnimating && a->fire_calls == 0);
++        CHECK(g.objects.advance(a->m_fAttackLoadTime) && a->MC_Fire_Stand() && a->fire_calls == 0); // strict >
++        CHECK(g.objects.advance(.001) && a->MC_Fire_Stand() && a->fire_shots == 1 &&
++              near(a->m_fLoadTimeStart, g.server.GetTime()));
++        CHECK(g.objects.advance(.1) && a->MC_Fire_Stand() && a->fire_shots == 1);
++        CHECK(target(g, {0, 10, 50}, {10, 20, 2}));
++        CHECK(g.objects.advance(1) && g.server.advance_models(1));
++        const auto before = a->Metacmd;
++        CHECK(a->MC_Fire_Stand() && !a->m_bAnimating && a->Metacmd == before + 2); // both branches
++        CHECK(a->MC_Fire_Stand());
++        g.server.collision_ready = false;
++        CHECK(g.objects.advance(1) && !a->MC_Fire_Stand());
++        CHECK(a->state_failures > 0);
++        return true;
++    }
++    bool recovery(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(armed(a));
++        auto* r = g.objects.get(a->m_hObject);
++        auto model = std::make_shared<Model>(*r->model);
++        r->model = model;
++        model->animations[0].dimensions = {1, 5, 1};
++        auto ceiling = test_brush::box("ceiling", {-100, 12, -100}, {100, 20, 100});
++        for (auto& surface : ceiling.surfaces)
++            surface.flags = 1;
++        std::string error;
++        CHECK(g.collision.build(ceiling, error));
++        CHECK(a->MC_Fire_Stand() && a->animation_blocked && a->m_nState == AI_Mgr::StateCrawlUnder);
++        CHECK(!a->m_bAnimating && r->dimensions.y == 1 && r->state.m_Pos.y == 10);
++        CHECK(setup(g));
++        auto table = std::make_shared<CAnim_Sound>();
++        table->m_nAnim_FIRE_STAND[TYPE_PISTOL] = UINT32_MAX;
++        CHECK(a->InitStatics(table));
++        CHECK(!a->MC_Fire_Stand() && !a->animation_blocked && a->m_nState == AI_Mgr::StateCrawlUnder);
++        table->m_nAnim_FIRE_STAND[TYPE_PISTOL] = 0;
++        CHECK(a->MC_Fire_Stand());
++        a->Metacmd = std::numeric_limits<int>::max();
++        CHECK(!a->MC_Fire_Stand() && a->fire_calls == 0);
++        a->Metacmd = 1;
++        a->scheduled = true;
++        g.server.SetNextUpdate(a->m_hObject, .001f);
++        g.server.SetObjectState(a->m_hObject, OBJSTATE_INACTIVE);
++        const auto time = r->animation.time;
++        CHECK(g.step(.5) && r->animation.time == time && a->fire_calls == 0);
++        g.server.SetObjectState(a->m_hObject, OBJSTATE_ACTIVE);
++        CHECK(g.step(.1) && a->fire_calls > 0);
++        r->model.reset();
++        CHECK(!a->MC_Fire_Stand());
++        return true;
++    }
++    bool failures(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a && !a->Fire() && !a->fire_error.empty());
++        CHECK(armed(a));
++        a->m_vTargetPos = {0, 10, 0};
++        CHECK(!a->Fire() && a->fire_result == FireResult::Invalid); // gun target zero length
++        DVector direction{};
++        CHECK(!a->CheckClearShot({0, 10, 0}, direction) && a->clear_shot.outcome == AIClearOutcome::Invalid);
++        a->m_vTargetPos = {0, 10, 100};
++        auto* r = g.objects.get(a->m_hObject);
++        r->model.reset();
++        CHECK(!a->MC_Fire_Stand());
++        CHECK(g.objects.remove(a->m_hObject));
++        CHECK(!a->Fire() && !a->MC_BestWeapon() && !a->MC_Fire_Stand());
++        WeaponFire shot;
++        shot.weapon = 1;
++        shot.position = {0, 10, 0};
++        shot.direction = {0, 0, 1};
++        CHECK(a->m_InventoryMgr.CurrentWeapon()->Fire(shot) == FireResult::Invalid);
++        CHECK(g.objects.finish_frame());
++        return true;
++    }
++    bool lifetime(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        HOBJECT old = nullptr;
++        for (int i = 0; i < 4; ++i)
++        {
++            CHECK(setup(g));
++            auto* a = actor(g);
++            CHECK(armed(a) && !g.objects.get(old));
++            auto* t = target(g);
++            CHECK(t && a->SetNewTarget(t->m_hObject));
++            auto* r = g.objects.get(a->m_hObject);
++            auto m = std::make_shared<Model>(*r->model);
++            r->model = m;
++            m->animations[0].keys = {{0, {}, {}, "[fire_key:1]"}, {50, {}, {}, "[fire_key:1]"}, {100, {}, {}, ""}};
++            t->remove = true;
++            Probe::destroyed = 0;
++            old = a->m_hObject;
++            CHECK(g.server.advance_models(.2));
++            CHECK(Probe::destroyed == 1 && Probe::final_calls == 1 && Probe::final_shots == 1 && !g.objects.get(old));
++            CHECK(g.objects.finish_frame() && Probe::destroyed == 1);
++            CHECK(g.unload_world());
++        }
++        return true;
++    }
++    bool catalog(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        for (const char* name : {"m_cultist1", "f_cultist1", "m_civilian1", "f_civilian1", "labtech", "gideon"})
++        {
++            auto* a = actor(g);
++            CHECK(armed(a));
++            auto* r = g.objects.get(a->m_hObject);
++            r->state.m_Pos = {0, 10000, 0};
++            CHECK(g.models.load(std::string("models/enemies/") + name + ".abc", r->model, error));
++            auto table = std::make_shared<CAnim_Sound>();
++            CHECK(table->SetAnimationIndexes(a->m_hObject) && a->InitStatics(table));
++            const auto clip = table->m_nAnim_FIRE_STAND[TYPE_PISTOL];
++            const bool present = clip < r->model->animations.size();
++            CHECK(a->MC_Fire_Stand() == present);
++            std::cout << name << " pistol clip=" << clip << " available=" << present;
++            if (present)
++            {
++                unsigned keys = 0;
++                for (const auto& k : r->model->animations[clip].keys)
++                    if (k.text.find("fire_key") != k.text.npos)
++                        ++keys;
++                std::cout << " duration=" << r->model->animations[clip].duration << " fire_keys=" << keys;
++            }
++            std::cout << "\n";
++        }
++        return true;
++    }
++    bool subway(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string e;
++        CHECK(g.resources.mount_game(c, e));
++        HOBJECT old = nullptr;
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", e) && g.enter_player(e));
++            CHECK(!g.objects.find_class("CultistAI"));
++            auto* a = actor(g);
++            CHECK(armed(a) && !g.objects.get(old));
++            auto* r = g.objects.get(a->m_hObject);
++            r->state.m_Pos = {0, 10000, 0};
++            CHECK(g.models.load("models/enemies/m_cultist1.abc", r->model, e));
++            auto table = std::make_shared<CAnim_Sound>();
++            CHECK(table->SetAnimationIndexes(a->m_hObject) && table->SetSoundRoot("sounds/enemies/m_cultist") &&
++                  a->InitStatics(table));
++            auto* t = target(g, {0, 10000, 300}, {60, 100, 30});
++            CHECK(t && a->SetNewTarget(t->m_hObject) && a->RefreshTargetPosition());
++            a->scheduled = true;
++            g.server.SetNextUpdate(a->m_hObject, .001f);
++            for (int j = 0; j < 300; ++j)
++                CHECK(g.step(1. / 60));
++            std::cout << "cycle=" << cycle << " shots=" << a->fire_shots << " keys=" << a->model_keys
++                      << " completed=" << a->animation_finishes << " audio=" << a->audio_starts
++                      << " suppressed=" << a->camera_suppressed << " key_error=" << a->ai_key_error
++                      << " fire_error=" << a->fire_error << " key_failures=" << a->key_failures
++                      << " target_hp=" << t->damage.m_fHitPoints << "\n";
++            CHECK(a->fire_shots > 4 && a->animation_finishes > 0 && a->fire_failures == 0 && a->state_failures == 0 &&
++                  a->key_failures == 0 && a->audio_keys > 0 && a->camera_suppressed == a->audio_keys &&
++                  a->audio_starts == 0 && t->damage.m_fHitPoints < 1000);
++            const auto* camera = dynamic_cast<const CameraObj*>(g.server.HandleToObject(g_hActiveCamera));
++            CHECK(camera && !camera->AllowPlayerMovement()); // Authored camera suppresses sounds, not firing.
++            old = a->m_hObject;
++            CHECK(g.unload_world() && !g.objects.get(old) && g.server.string_count() == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::map<std::string, std::function<bool(const char*)>> tests{{"selection", selection},
++                                                                        {"clearance", clearance},
++                                                                        {"filters", filters},
++                                                                        {"head", head},
++                                                                        {"aim", aim},
++                                                                        {"keys", keys},
++                                                                        {"cadence", cadence},
++                                                                        {"recovery", recovery},
++                                                                        {"failures", failures},
++                                                                        {"lifetime", lifetime},
++                                                                        {"catalog", catalog},
++                                                                        {"subway", subway}};
++    auto t = tests.find(argv[1]);
++    return t != tests.end() && t->second(argc > 2 ? argv[2] : "") ? 0 : 1;
++}
+diff --git a/tests/ai_state_tests.cpp b/tests/ai_state_tests.cpp
+index da7a75a..0d67300 100644
+--- a/tests/ai_state_tests.cpp
++++ b/tests/ai_state_tests.cpp
+@@ -326,7 +326,9 @@ namespace
+         CHECK(base->DispatchState() && g.server.advance_models(1) && base->DispatchState() && base->Metacmd == 3);
+         CHECK(base->DispatchState() && base->Metacmd == 1);
+         base->m_bCabal = true;
+-        CHECK(!base->DispatchState() && base->state_error.find("BestWeapon") != std::string::npos);
++        CHECK(!base->DispatchState() && base->state_error.find("inventory query failed") != std::string::npos);
++        CHECK(base->m_InventoryMgr.Init(base->m_hObject, nullptr));
++        CHECK(base->DispatchState() && base->Metacmd == 2); // Connected empty-inventory selection.
+         base->m_nState = AI_Mgr::StateInactive;
+         CHECK(base->DispatchState());
+         return true;

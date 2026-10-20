@@ -1,0 +1,1981 @@
+Breakpoint 1 at 0x43b1f1: file /home/yann/projects/lithtech/Blood2/src/game/session.cpp, line 467.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Breakpoint 1, OpenBlood2::GameSession::step (this=0x7fffffff8480, seconds=0.016666666666666666) at /home/yann/projects/lithtech/Blood2/src/game/session.cpp:467
+467	        if (!std::isfinite(seconds) || seconds < 0 || seconds > 60)
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0xe75b80, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 232, capacity 232 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+SAMPLES 1
+
+Program received signal SIGINT, Interrupt.
+0x00000000005d0e46 in std::min<double> (__a=@0x7fffffff6958: 1, __b=@0x7fffffff6700: 1209.6440342781807) at /usr/include/c++/16/bits/stl_algobase.h:237
+237	      if (__b < __a)
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974df in std::isfinite (__x=169.981003) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7aef63c in sqrtf64 () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7a3d021 in __strlen_avx2 () from /lib64/libc.so.6
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::CollisionWorld::query (this=0x7fffffff8560, index=0, from=..., to=..., half=..., hit=..., found=@0x7fffffff7c3f: true, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:357
+357	            query(n.right, from, to, half, hit, found, anchor, selected);
+
+Program received signal SIGINT, Interrupt.
+0x00000000004a1af2 in std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >::_Rb_tree_iterator (this=0x7fffffff7ad8, __x=0x7fffffff7ae0) at /usr/include/c++/16/bits/stl_tree.h:388
+388	      _Rb_tree_iterator(_Base_ptr __x) _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+0x000000000060643a in OpenBlood2::Objects::advance (this=0x7fffffff85b8, seconds=0.016666666666666666) at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:681
+681	            if (r && r->life == Life::Alive && r->activity == OBJSTATE_ACTIVE && r->auto_deactivate &&
+
+Program received signal SIGINT, Interrupt.
+std::shared_ptr<OpenBlood2::DlsBank const>::operator= (this=0x276df40, __r=...) at /usr/include/c++/16/bits/shared_ptr.h:441
+441	      }
+
+Program received signal SIGINT, Interrupt.
+0x00000000006811c2 in operator() (__closure=0x7fffffff70f0, axis=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:210
+210	                return s.axis(axis, std::min({a, b, c}), std::max({a, b, c}));
+
+Program received signal SIGINT, Interrupt.
+0x00000000006955be in OpenBlood2::sweep_object (object=..., from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/world_model.cpp:18
+18	        const auto offset = vector_subtract(object.state.m_Pos, shape.origin);
+
+Program received signal SIGINT, Interrupt.
+0x000000000068196c in operator() (__closure=0x7fffffff6fe0, origin=-35.885730743408203, speed=3.8857307434082031, low=63.999999000000003, high=72.000000999999997, radius=0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:243
+243	                enter = std::max(enter, first);
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6b928 in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6b856 in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+std::construct_at<std::pair<unsigned int const, OpenBlood2::ServerAdapter::MoveObject(HOBJECT, DVector*)::Contact>, std::piecewise_construct_t const&, std::tuple<unsigned int const&>, std::tuple<OpenBlood2::ServerAdapter::MoveObject(HOBJECT, DVector*)::Contact&&> > (__location=0x40) at /usr/include/c++/16/bits/stl_construct.h:96
+96	    construct_at(_Tp* __location, _Args&&... __args)
+
+Program received signal SIGINT, Interrupt.
+0x00000000006801f7 in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:68
+68	        return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z) && std::abs(v.x) <= 1e7f &&
+
+Program received signal SIGINT, Interrupt.
+0x00000000006801de in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:68
+68	        return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z) && std::abs(v.x) <= 1e7f &&
+
+Program received signal SIGINT, Interrupt.
+0x0000000000612481 in std::get<0ul, OpenBlood2::ObjectRecord*, std::default_delete<OpenBlood2::ObjectRecord> > (__t=std::tuple containing = {...}) at /usr/include/c++/16/tuple:2507
+2507	    get(const tuple<_Elements...>& __t) noexcept
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0xe6c2e0, destination=0x7fffffff7e30) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:378
+378	                    other->container() || !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
+
+Program received signal SIGINT, Interrupt.
+0x00000000005ac1b6 in std::array<DVector, 3ul>::operator[] (this=0x0, __n=0) at /usr/include/c++/16/array:216
+216	      operator[](size_type __n) const noexcept
+
+Program received signal SIGINT, Interrupt.
+0x00000000006177aa in std::_Tuple_impl<0ul, OpenBlood2::ObjectRecord*, std::default_delete<OpenBlood2::ObjectRecord> >::_M_head (__t=...) at /usr/include/c++/16/tuple:294
+294	      _M_head(const _Tuple_impl& __t) noexcept { return _Base::_M_head(__t); }
+
+Program received signal SIGINT, Interrupt.
+std::_Rb_tree_node<std::pair<unsigned int const, OpenBlood2::ServerAdapter::MoveObject(HOBJECT, DVector*)::Contact> >::_M_valptr (this=0x13bdcc0) at /usr/include/c++/16/bits/stl_tree.h:235
+235	      { return _M_storage._M_ptr(); }
+
+Program received signal SIGINT, Interrupt.
+0x000000000068cad7 in OpenBlood2::ContainerShape::contains (this=0x15f2a90, point=...) at /home/yann/projects/lithtech/Blood2/src/engine/container.cpp:255
+255	        if (triangles.empty() || !physics_vector(point) || point.x < min.x - .001f || point.x > max.x + .001f ||
+
+Program received signal SIGINT, Interrupt.
+std::__shared_ptr<OpenBlood2::ContainerShape const, (__gnu_cxx::_Lock_policy)2>::operator bool (this=0x2126608) at /usr/include/c++/16/bits/shared_ptr_base.h:1757
+1757	      { return _M_ptr != nullptr; }
+
+Program received signal SIGINT, Interrupt.
+0x000000000060ca3b in std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::size (this=0x7fffffff8638) at /usr/include/c++/16/bits/stl_vector.h:1109
+1109		ptrdiff_t __dif = this->_M_impl._M_finish - this->_M_impl._M_start;
+
+Program received signal SIGINT, Interrupt.
+std::equal_to<DObject*>::operator() (this=0x7fffffff8698, __x=@0x7fffffff7df0: 0x1cf66c0, __y=@0x1cf66e8: 0x1cf66c0) at /usr/include/c++/16/bits/stl_function.h:378
+378	      { return __x == __y; }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974ad in std::isfinite (__x=12) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x000000000061143c in std::__detail::_Hash_node<std::pair<DObject* const, OpenBlood2::ObjectId>, false>::_M_next (this=0xdd0760) at /usr/include/c++/16/bits/hashtable_policy.h:367
+367	      { return static_cast<_Hash_node*>(this->_M_nxt); }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681797 in OpenBlood2::(anonymous namespace)::broadphase (from=..., to=..., half=..., min=..., max=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:225
+225	            auto lo = vector_subtract(minv(from, to), half), hi = vector_add(maxv(from, to), half);
+
+Program received signal SIGINT, Interrupt.
+0x00000000006817df in OpenBlood2::(anonymous namespace)::broadphase (from=..., to=..., half=..., min=..., max=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:225
+225	            auto lo = vector_subtract(minv(from, to), half), hi = vector_add(maxv(from, to), half);
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::CollisionWorld::query (this=0x7fffffff8560, index=221, from=..., to=..., half=..., hit=..., found=@0x7fffffff7c3f: false, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:357
+357	            query(n.right, from, to, half, hit, found, anchor, selected);
+
+Program received signal SIGINT, Interrupt.
+0x000000000060cd29 in std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::get (this=0x1a90358) at /usr/include/c++/16/bits/unique_ptr.h:491
+491	      { return _M_t._M_ptr(); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974c5 in std::isfinite (__x=0) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000688008 in std::vector<OpenBlood2::CollisionWorld::Node, std::allocator<OpenBlood2::CollisionWorld::Node> >::operator[] (this=0x0, __n=4884153801302343680) at /usr/include/c++/16/bits/stl_vector.h:1270
+1270	      operator[](size_type __n) const _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+0x0000000000412402 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::size (this=0x22f2d60) at /usr/include/c++/16/bits/basic_string.h:1193
+1193	      }
+
+Program received signal SIGINT, Interrupt.
+0x000000000068323d in OpenBlood2::CollisionWorld::query (this=0x7fffffff8560, index=3036, from=..., to=..., half=..., hit=..., found=@0x7fffffff7c7f: false, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:382
+382	    }
+
+Program received signal SIGINT, Interrupt.
+std::__shared_ptr<OpenBlood2::DlsBank const, (__gnu_cxx::_Lock_policy)2>::__shared_ptr (this=0x7fffffff7750, __r=...) at /usr/include/c++/16/bits/shared_ptr_base.h:1619
+1619	      : _M_ptr(__r._M_ptr), _M_refcount()
+
+Program received signal SIGINT, Interrupt.
+std::vector<float, std::allocator<float> >::size (this=0x661afe <std::optional<OpenBlood2::DlsLoop>::operator bool() const+24>) at /usr/include/c++/16/bits/stl_vector.h:1107
+1107	      size() const _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+0x0000000000682f32 in OpenBlood2::CollisionWorld::query (this=0x7fffffff8560, index=266, from=..., to=..., half=..., hit=..., found=@0x7fffffff7c3f: false, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:363
+363	            if (!segment_bounds(from, delta, half, triangles_[i].min, triangles_[i].max, found ? hit.fraction : 1))
+
+Program received signal SIGINT, Interrupt.
+0x000000000060591d in OpenBlood2::Objects::get (this=0x7fffffff85b8, id=...) at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:561
+561	        if (id.slot >= slots_.size() || slots_[id.slot].generation != id.generation)
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680c09 in OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff7550, axis=..., low=-91.888229370117188, high=-68.111770629882812) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:167
+167	                    penetration_normal = vector_scale(axis, static_cast<float>(sign));
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6b7b7 in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x000000000068049d in OpenBlood2::(anonymous namespace)::maxv (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:87
+87	            return {std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z)};
+
+Program received signal SIGINT, Interrupt.
+0x000000000060f2fc in std::__uniq_ptr_impl<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::_M_ptr (this=0xf0) at /usr/include/c++/16/bits/unique_ptr.h:192
+192	      pointer    _M_ptr() const noexcept { return std::get<0>(_M_t); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004d1299 in OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0x1cef670, destination=0x7fffffff7e30) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:377
+377	                if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7973423 in malloc () from /lib64/libc.so.6
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6b91b in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x000000000041a97b in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::max_size (this=0x15ebc10) at /usr/include/c++/16/bits/basic_string.h:1211
+1211	      }
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800df in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6bba6 in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6b92c in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x000000000065fff7 in OpenBlood2::DlsSampler::advance_voices (this=0x7fffffff88f0, frames=800, stereo=std::span of length 0) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:506
+506	                    time >= v.lfo_delay ? std::sin(2 * std::numbers::pi * v.lfo_hz * (time - v.lfo_delay)) : 0;
+
+Program received signal SIGINT, Interrupt.
+0x0000000000688465 in std::vector<OpenBlood2::CollisionWorld::Triangle, std::allocator<OpenBlood2::CollisionWorld::Triangle> >::operator[] (this=0x7fffffff8560, __n=732) at /usr/include/c++/16/bits/stl_vector.h:1270
+1270	      operator[](size_type __n) const _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+0x00000000006817e6 in OpenBlood2::(anonymous namespace)::broadphase (from=..., to=..., half=..., min=..., max=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:225
+225	            auto lo = vector_subtract(minv(from, to), half), hi = vector_add(maxv(from, to), half);
+
+Program received signal SIGINT, Interrupt.
+std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::compare (this=0x2129140, __str="IsObjectAlive") at /usr/include/c++/16/bits/basic_string.h:3522
+3522		int __r = traits_type::compare(_M_data(), __str.data(), __len);
+
+Program received signal SIGINT, Interrupt.
+0x0000000000617fdf in std::__detail::_Hash_code_base<DObject*, std::pair<DObject* const, OpenBlood2::ObjectId>, std::__detail::_Select1st, std::hash<DObject*>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, false>::_M_hash_code (this=0x7fffffff8698, __k=@0xddf268: 0xddf240) at /usr/include/c++/16/bits/hashtable_policy.h:1092
+1092		return _M_hash._M_obj(__k);
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::finished (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:196
+196	            if (v.choke_frame)
+
+Program received signal SIGINT, Interrupt.
+0x00000000004d12b9 in OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0x1cf66c0, destination=0x7fffffff7e30) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:377
+377	                if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000006886bd in std::__min_element<double const*, std::less<void> > (__first=0x7fffffff6698, __last=0x7fffffff66a8, __comp=...) at /usr/include/c++/16/bits/stl_algo.h:5604
+5604	      while (++__first != __last)
+
+Program received signal SIGINT, Interrupt.
+0x000000000060ca74 in std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::operator[] (this=0x7fffffff8638, __n=6) at /usr/include/c++/16/bits/stl_vector.h:1253
+1253		__glibcxx_requires_subscript(__n);
+
+Program received signal SIGINT, Interrupt.
+std::min<double> (__a=@0x7fffffff7520: 1, __b=@0x7fffffff74b0: 8998.1281964424106) at /usr/include/c++/16/bits/stl_algobase.h:237
+237	      if (__b < __a)
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ServerAdapter::trace_service (this=0x7fffffff8750, name=0xa17cb1 "GetClientUserData") at /home/yann/projects/lithtech/Blood2/src/game/server_adapter.h:261
+261	            if (trace_enabled)
+
+Program received signal SIGINT, Interrupt.
+0x000000000042a6d4 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::compare (this=0x1815180, __str="GetContainers") at /usr/include/c++/16/bits/basic_string.h:3522
+3522		int __r = traits_type::compare(_M_data(), __str.data(), __len);
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::size (this=0x7fffffff8638) at /usr/include/c++/16/bits/stl_vector.h:1109
+1109		ptrdiff_t __dif = this->_M_impl._M_finish - this->_M_impl._M_start;
+
+Program received signal SIGINT, Interrupt.
+std::isfinite (__x=-63.9913101) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+std::abs (__x=0) at /usr/include/c++/16/bits/std_abs.h:78
+78	  { return __builtin_fabs(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004ce1db in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0xe75b80, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 232, capacity 232 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:18
+18	        for (auto id : ids)
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6b91b in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x00000000005cd236 in std::span<unsigned char const, 18446744073709551615ul>::operator[] (this=0x7fffffff7ad0, __idx=140737488321223) at /usr/include/c++/16/span:286
+286	      operator[](size_type __idx) const noexcept
+
+Program received signal SIGINT, Interrupt.
+0x00000000004dc4db in __gnu_cxx::__normal_iterator<OpenBlood2::CollisionWorld::Node const*, std::vector<OpenBlood2::CollisionWorld::Node, std::allocator<OpenBlood2::CollisionWorld::Node> > >::__normal_iterator (this=<optimized out>, __i=@0x7fffffff8580: 0x15e1da8) at /usr/include/c++/16/bits/stl_iterator.h:1059
+1059	      : _M_current(__i) { }
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7a3cc2b in __strcmp_avx2 () from /lib64/libc.so.6
+
+Program received signal SIGINT, Interrupt.
+operator() (__closure=0x7fffc5498000, origin=3659318058549248, speed=5.408602553143907e-315, low=51539615904, high=6.9533558061891728e-310, radius=6.9533558061685703e-310) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:234
+234	            auto axis = [&](double origin, double speed, double low, double high, double radius)
+
+Program received signal SIGINT, Interrupt.
+0x00000000006955be in OpenBlood2::sweep_object (object=..., from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/world_model.cpp:18
+18	        const auto offset = vector_subtract(object.state.m_Pos, shape.origin);
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::maxv (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:86
+86	        {
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::operator[] (this=0x7fffffff8638, __n=59) at /usr/include/c++/16/bits/stl_vector.h:1254
+1254		return *(this->_M_impl._M_start + __n);
+
+Program received signal SIGINT, Interrupt.
+std::isfinite (__x=-71.3185806) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x000000000043375e in std::vector<OpenBlood2::ModelNode, std::allocator<OpenBlood2::ModelNode> >::size (this=0xd604e8) at /usr/include/c++/16/bits/stl_vector.h:1109
+1109		ptrdiff_t __dif = this->_M_impl._M_finish - this->_M_impl._M_start;
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0x13cf9a0, destination=0x7fffffff8094) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:377
+377	                if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+0x000000000068007a in OpenBlood2::vector_add (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:53
+53	    }
+
+Program received signal SIGINT, Interrupt.
+0x00000000006804c9 in OpenBlood2::(anonymous namespace)::extents (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:91
+91	            return physics_vector(v) && v.x >= 0 && v.y >= 0 && v.z >= 0;
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680139 in OpenBlood2::vector_scale (a=..., s=-1) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:60
+60	        return {a.x * s, a.y * s, a.z * s};
+
+Program received signal SIGINT, Interrupt.
+std::min<double> (__a=@0x7fffffff69b0: 0.02771301398897838, __b=@0x7fffffff6940: 2139.8489574124628) at /usr/include/c++/16/bits/stl_algobase.h:237
+237	      if (__b < __a)
+
+Program received signal SIGINT, Interrupt.
+0x000000000068848a in std::vector<OpenBlood2::CollisionWorld::Triangle, std::allocator<OpenBlood2::CollisionWorld::Triangle> >::operator[] (this=0x7fffffff8560, __n=5599) at /usr/include/c++/16/bits/stl_vector.h:1272
+1272		__glibcxx_requires_subscript(__n);
+
+Program received signal SIGINT, Interrupt.
+0x000000000068102b in OpenBlood2::(anonymous namespace)::Sweep::finish (this=0x7fffffff67c0, hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:195
+195	                hit.point = vector_add(from, vector_scale(delta, static_cast<float>(hit.fraction)));
+
+Program received signal SIGINT, Interrupt.
+0x0000000000661aea in std::optional<OpenBlood2::DlsLoop>::operator bool (this=0x7fffffff7858) at /usr/include/c++/16/optional:1269
+1269	      constexpr explicit operator bool() const noexcept
+
+Program received signal SIGINT, Interrupt.
+0x00000000004dc4db in __gnu_cxx::__normal_iterator<OpenBlood2::CollisionWorld::Node const*, std::vector<OpenBlood2::CollisionWorld::Node, std::allocator<OpenBlood2::CollisionWorld::Node> > >::__normal_iterator (this=<optimized out>, __i=@0x1763778: 0x11abb68) at /usr/include/c++/16/bits/stl_iterator.h:1059
+1059	      : _M_current(__i) { }
+
+Program received signal SIGINT, Interrupt.
+0x000000000049744f in std::__detail::_Mod_range_hashing::operator() (this=0x7fffffff7a2f, __num=20634896, __den=257) at /usr/include/c++/16/bits/hashtable_policy.h:585
+585	    { return __num % __den; }
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7c1e0f8 in __cxxabiv1::__class_type_info::__do_dyncast(long, __cxxabiv1::__class_type_info::__sub_kind, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info::__dyncast_result&) const () from /lib64/libstdc++.so.6
+
+Program received signal SIGINT, Interrupt.
+0x000000000068057f in OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff6e90, axis=..., low=2504343.75, high=2504343.75) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:116
+116	                const double length = std::sqrt(precise_dot(axis, axis));
+
+Program received signal SIGINT, Interrupt.
+0x000000000041a973 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::max_size (this=0x1886370) at /usr/include/c++/16/bits/basic_string.h:1210
+1210		return (std::min)(__diffmax, __allocmax) - 1;
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::precise_dot (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:75
+75	            return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z;
+
+Program received signal SIGINT, Interrupt.
+0x000000000060cd29 in std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::get (this=0x1a90078) at /usr/include/c++/16/bits/unique_ptr.h:491
+491	      { return _M_t._M_ptr(); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0x13d43e0, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 233, capacity 233 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000006886f2 in std::__max_element<double const*, std::less<void> > (__first=0x7fffffff6da0, __last=0x7fffffff6db8, __comp=...) at /usr/include/c++/16/bits/stl_algo.h:5666
+5666	      _ForwardIterator __result = __first;
+
+Program received signal SIGINT, Interrupt.
+0x000000000065d3d7 in OpenBlood2::(anonymous namespace)::held_level (e=..., time=0.36931249999999999, amplitude=false) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:165
+165	            if (time == 0 && e.attack == 0)
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800df in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::precise_dot (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:75
+75	            return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z;
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+0x0000000000497540 in OpenBlood2::ServerAdapter::trace_service (this=0x0, name=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_adapter.h:259
+259	        void trace_service(const char* name)
+
+Program received signal SIGINT, Interrupt.
+0x0000000000682c8d in OpenBlood2::CollisionWorld::query (this=0x1615678, index=0, from=..., to=..., half=..., hit=..., found=@0x7fffffff7d1f: false, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:348
+348	        if (!broadphase(from, to, half, n.min, n.max) ||
+SAMPLES 101
+
+Program received signal SIGINT, Interrupt.
+0x000000000068006d in OpenBlood2::vector_add (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:52
+52	        return {a.x + b.x, a.y + b.y, a.z + b.z};
+
+Program received signal SIGINT, Interrupt.
+0x00000000004aa057 in std::_Rb_tree_node<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >::_M_valptr (this=0xd) at /usr/include/c++/16/bits/stl_tree.h:234
+234	      _M_valptr() const
+
+Program received signal SIGINT, Interrupt.
+0x0000000000682fc3 in OpenBlood2::CollisionWorld::query (this=0x7fffffff8560, index=668, from=..., to=..., half=..., hit=..., found=@0x7fffffff763f: false, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:363
+363	            if (!segment_bounds(from, delta, half, triangles_[i].min, triangles_[i].max, found ? hit.fraction : 1))
+
+Program received signal SIGINT, Interrupt.
+0x0000000000612e61 in std::__detail::_Node_iterator<std::pair<DObject* const, OpenBlood2::ObjectId>, false, false>::_Node_iterator (this=0x7fffffff8108, __p=0x0) at /usr/include/c++/16/bits/hashtable_policy.h:423
+423	      : __base_type(__p) { }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681a79 in OpenBlood2::(anonymous namespace)::segment_bounds (from=..., delta=..., half=..., min=..., max=..., nearest=0.050343249427917618) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:247
+247	            return axis(from.x, delta.x, min.x, max.x, half.x) && axis(from.y, delta.y, min.y, max.y, half.y) &&
+
+Program received signal SIGINT, Interrupt.
+0x000000000061779b in std::_Tuple_impl<0ul, OpenBlood2::ObjectRecord*, std::default_delete<OpenBlood2::ObjectRecord> >::_M_head (__t=...) at /usr/include/c++/16/tuple:294
+294	      _M_head(const _Tuple_impl& __t) noexcept { return _Base::_M_head(__t); }
+
+Program received signal SIGINT, Interrupt.
+0x000000000068817d in std::swap<double>(double&, double&) requires ((!std::__is_tuple_like<double>::value)&&(is_move_constructible_v<double>))&&(is_move_assignable_v<double>) (__a=@0x7fffffff7338: -0.41131841704577482, __b=@0x7fffffff7330: 0.28758460314068496) at /usr/include/c++/16/bits/move.h:241
+241	    }
+
+Program received signal SIGINT, Interrupt.
+std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::get (this=0x1a8fa88) at /usr/include/c++/16/bits/unique_ptr.h:491
+491	      { return _M_t._M_ptr(); }
+
+Program received signal SIGINT, Interrupt.
+operator() (__closure=0x7fffffff6f90, origin=167.45729064941406, speed=-0.0200042724609375, low=228.54371543066407, high=310.45628456933593, radius=39.456283569335938) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:245
+245	                return enter <= leave + 1e-9;
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::precise_dot (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:75
+75	            return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z;
+
+Program received signal SIGINT, Interrupt.
+0x00000000006606ff in OpenBlood2::DlsSampler::advance_voices (this=0x7fffffff88f0, frames=800, stereo=std::span of length 0) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:500
+500	            for (std::uint64_t f = 0; f < frames && !finished(v); ++f)
+
+Program received signal SIGINT, Interrupt.
+0x0000000000688d7a in std::less<void>::operator()<double const&, double const&> (this=0x7fffffff65ef, __t=@0x7fffffff6698: 16384, __u=@0x7fffffff6690: 16384) at /usr/include/c++/16/bits/stl_function.h:609
+609		    return std::forward<_Tp>(__t) < std::forward<_Up>(__u);
+
+Program received signal SIGINT, Interrupt.
+0x00000000004b5f91 in std::min<float> (__a=@0x7fffffff7438: -1536, __b=@0x7fffffff7428: -1536) at /usr/include/c++/16/bits/stl_algobase.h:237
+237	      if (__b < __a)
+
+Program received signal SIGINT, Interrupt.
+0x0000000000426a54 in std::operator<=><char, std::char_traits<char>, std::allocator<char> > (__lhs="GetObjectUserFlags", __rhs="GetObjectPos") at /usr/include/c++/16/bits/basic_string.h:4138
+4138	    { return __detail::__char_traits_cmp_cat<_Traits>(__lhs.compare(__rhs)); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000006881ce in std::min<double> (__l=std::initializer_list of length 3 = {...}) at /usr/include/c++/16/bits/stl_algo.h:5732
+5732	    }
+
+Program received signal SIGINT, Interrupt.
+0x000000000060593a in OpenBlood2::Objects::get (this=0x7fffffff85b8, id=...) at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:563
+563	        return slots_[id.slot].object.get();
+
+Program received signal SIGINT, Interrupt.
+0x0000000000413f3c in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> > (this=0x7fffffff8060, __s=0xa0193c "HandleToObject", __a=...) at /usr/include/c++/16/bits/basic_string.h:738
+738		_M_construct(__s, __end, forward_iterator_tag());
+
+Program received signal SIGINT, Interrupt.
+0x00000000006058f9 in OpenBlood2::Objects::get (this=0x7fffffff85b8, id=...) at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:561
+561	        if (id.slot >= slots_.size() || slots_[id.slot].generation != id.generation)
+
+Program received signal SIGINT, Interrupt.
+0x00000000004b5f9c in std::min<float> (__a=@0x7fffffff6bf8: -959.121826, __b=@0x7fffffff6be8: -959.121826) at /usr/include/c++/16/bits/stl_algobase.h:237
+237	      if (__b < __a)
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::Objects::get (this=0x7fffffff85b8, id=...) at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:563
+563	        return slots_[id.slot].object.get();
+
+Program received signal SIGINT, Interrupt.
+0x000000000068006d in OpenBlood2::vector_add (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:52
+52	        return {a.x + b.x, a.y + b.y, a.z + b.z};
+
+Program received signal SIGINT, Interrupt.
+std::numeric_limits<double>::infinity () at /usr/include/c++/16/limits:1797
+1797	      infinity() _GLIBCXX_USE_NOEXCEPT { return __builtin_huge_val(); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974ba in std::isfinite (__x=16.8772202) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfe2 in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0xe75b80, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 232, capacity 232 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0xe75b80, destination=0x7fffffff7ff0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:377
+377	                if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000006818e2 in operator() (__closure=0x7fffffff6df0, origin=167.58242797851562, speed=0, low=136.4185895456543, high=215.5814104543457, radius=39.581409454345703) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:239
+239	                    return origin >= low && origin <= high;
+
+Program received signal SIGINT, Interrupt.
+0x0000000000605956 in OpenBlood2::Objects::get (this=0x7fffffff85b8, id=...) at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:564
+564	    }
+
+Program received signal SIGINT, Interrupt.
+0x000000000068867b in std::__min_element<double const*, std::less<void> > (__first=0x7fffffff6690, __last=0x7fffffff66a8, __comp=...) at /usr/include/c++/16/bits/stl_algo.h:5601
+5601	      if (__first == __last)
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cffbf in OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0xe75b80, destination=0x7fffffff7ff0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:278
+278	            auto* obstacle = found ? objects_.get(nearest.object) : nullptr;
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7a39b20 in __memcmp_avx2_movbe () from /lib64/libc.so.6
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974d3 in std::isfinite (__x=22.9054604) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000006954d9 in OpenBlood2::sweep_object (object=..., from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/world_model.cpp:15
+15	        if ((!object.world_model && !object.container()) || (object.state.m_Flags & FLAG_BOXPHYSICS))
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ObjectRecord::container (this=0x1a94350) at /home/yann/projects/lithtech/Blood2/src/engine/objects.h:149
+149	            return container_;
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::CollisionWorld::Triangle, std::allocator<OpenBlood2::CollisionWorld::Triangle> >::size (this=0x7fffffff8560) at /usr/include/c++/16/bits/stl_vector.h:1110
+1110		if (__dif < 0)
+
+Program received signal SIGINT, Interrupt.
+std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_data (this=0x7fffffff7770) at /usr/include/c++/16/bits/basic_string.h:238
+238	      { return _M_dataplus._M_p; }
+
+Program received signal SIGINT, Interrupt.
+0x000000000065d4cc in OpenBlood2::(anonymous namespace)::held_level (e=..., time=1.3200000000000001, amplitude=true) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:172
+172	            return e.decay > 0 ? std::max(e.sustain, 1 - (time - e.attack) / e.decay) : e.sustain;
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7a39e1d in __memcmp_avx2_movbe () from /lib64/libc.so.6
+
+Program received signal SIGINT, Interrupt.
+0x00000000006818e9 in operator() (__closure=0x7fffffff6fe0, origin=-32, speed=0, low=-192.000001, high=-191.999999, radius=0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:239
+239	                    return origin >= low && origin <= high;
+
+Program received signal SIGINT, Interrupt.
+0x00000000004ee6f1 in std::abs (__x=0) at /usr/include/c++/16/bits/std_abs.h:78
+78	  { return __builtin_fabs(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681082 in operator() (__closure=0x7fffffff6ec0, axis=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:209
+209	                const double a = precise_dot(axis, p[0]), b = precise_dot(axis, p[1]), c = precise_dot(axis, p[2]);
+
+Program received signal SIGINT, Interrupt.
+0x0000000000605956 in OpenBlood2::Objects::get (this=0x7fffffff85b8, id=...) at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:564
+564	    }
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0x1cf86f0, destination=0x7fffffff7e30) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:377
+377	                if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+
+Program received signal SIGINT, Interrupt.
+0x000000000042a6f8 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::compare (this=0x20eaee0, __str="MoveKeyframedObject") at /usr/include/c++/16/bits/basic_string.h:3523
+3523		if (!__r)
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974d6 in std::isfinite (__x=12) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x000000000068847b in std::vector<OpenBlood2::CollisionWorld::Triangle, std::allocator<OpenBlood2::CollisionWorld::Triangle> >::operator[] (this=0x7fffffff8560, __n=5286) at /usr/include/c++/16/bits/stl_vector.h:1272
+1272		__glibcxx_requires_subscript(__n);
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974d0 in std::isfinite (__x=22.9054604) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000006952f2 in OpenBlood2::object_bounds_center (object=...) at /home/yann/projects/lithtech/Blood2/src/engine/world_model.cpp:7
+7	        if (!object.world_model && !object.container())
+
+Program received signal SIGINT, Interrupt.
+0x000000000068d3f5 in OpenBlood2::ContainerShape::overlaps (this=0x212c010, center=..., half=...) at /home/yann/projects/lithtech/Blood2/src/engine/container.cpp:294
+294	        if (!physics_vector(center) || !physics_vector(half) || half.x < 0 || half.y < 0 || half.z < 0 ||
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+0x00000000006955be in OpenBlood2::sweep_object (object=..., from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/world_model.cpp:18
+18	        const auto offset = vector_subtract(object.state.m_Pos, shape.origin);
+
+Program received signal SIGINT, Interrupt.
+0x0000000000682c8d in OpenBlood2::CollisionWorld::query (this=0x110d888, index=0, from=..., to=..., half=..., hit=..., found=@0x7fffffff75ff: false, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:348
+348	        if (!broadphase(from, to, half, n.min, n.max) ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000006718e3 in OpenBlood2::(anonymous namespace)::normalize (q=...) at /home/yann/projects/lithtech/Blood2/src/engine/model.cpp:30
+30	            return {mul(q.m_Vec, 1 / length), q.m_Spin / length};
+
+Program received signal SIGINT, Interrupt.
+0x000000000065d4d5 in OpenBlood2::(anonymous namespace)::held_level (e=..., time=0.1145625, amplitude=false) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:172
+172	            return e.decay > 0 ? std::max(e.sustain, 1 - (time - e.attack) / e.decay) : e.sustain;
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680859 in OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff67d0, axis=..., low=18675.19921875, high=18675.19921875) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:132
+132	                axis = {float(axis.x / length), float(axis.y / length), float(axis.z / length)};
+
+Program received signal SIGINT, Interrupt.
+0x000000000068cae6 in OpenBlood2::ContainerShape::contains (this=0x175a070, point=...) at /home/yann/projects/lithtech/Blood2/src/engine/container.cpp:255
+255	        if (triangles.empty() || !physics_vector(point) || point.x < min.x - .001f || point.x > max.x + .001f ||
+
+Program received signal SIGINT, Interrupt.
+0x000000000068008c in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:55
+55	    {
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ObjectRecord::container (this=0x2115688) at /home/yann/projects/lithtech/Blood2/src/engine/objects.h:147
+147	        const std::shared_ptr<const ContainerShape>& container() const
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::segment_bounds (from=..., delta=..., half=..., min=..., max=..., nearest=1) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:229
+229	        {
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6bb47 in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::held_level (e=..., time=0.34714583333333332, amplitude=false) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:167
+167	            if (time < e.attack)
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::vector_add (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:52
+52	        return {a.x + b.x, a.y + b.y, a.z + b.z};
+
+Program received signal SIGINT, Interrupt.
+0x000000000065d60b in OpenBlood2::(anonymous namespace)::level (e=..., time=0.25708333333333333, gate=384307168202282.31, amplitude=false) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:179
+179	        }
+
+Program received signal SIGINT, Interrupt.
+operator() (__closure=0x7fffffff71d0, origin=170.00100708007812, speed=-0.0200042724609375, low=85.999999000000003, high=170.000001, radius=42) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:246
+246	            };
+
+Program received signal SIGINT, Interrupt.
+std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::get (this=0x1a8fe08) at /usr/include/c++/16/bits/unique_ptr.h:491
+491	      { return _M_t._M_ptr(); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974b0 in std::isfinite (__x=44.1432037) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681ab4 in OpenBlood2::(anonymous namespace)::segment_bounds (from=..., delta=..., half=..., min=..., max=..., nearest=1) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:247
+247	            return axis(from.x, delta.x, min.x, max.x, half.x) && axis(from.y, delta.y, min.y, max.y, half.y) &&
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::CollisionWorld::Node, std::allocator<OpenBlood2::CollisionWorld::Node> >::operator[] (this=0x1638fd0, __n=0) at /usr/include/c++/16/bits/stl_vector.h:1274
+1274	      }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004d12ff in OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0x1cf86f0, destination=0x7fffffff7e30) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:378
+378	                    other->container() || !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::finished (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:196
+196	            if (v.choke_frame)
+
+Program received signal SIGINT, Interrupt.
+0x000000000060ca71 in std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::operator[] (this=0x7fffffff8638, __n=58) at /usr/include/c++/16/bits/stl_vector.h:1253
+1253		__glibcxx_requires_subscript(__n);
+
+Program received signal SIGINT, Interrupt.
+0x00000000006801aa in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:67
+67	    {
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::precise_dot (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:74
+74	        {
+
+Program received signal SIGINT, Interrupt.
+0x00000000004db1ea in std::__shared_ptr_access<OpenBlood2::ContainerShape const, (__gnu_cxx::_Lock_policy)2, false, false>::operator* (this=0x1a8f8d8) at /usr/include/c++/16/bits/shared_ptr_base.h:1437
+1437	      operator*() const noexcept
+
+Program received signal SIGINT, Interrupt.
+0x00000000006806ee in OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff7620, axis=..., low=96, high=96) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:125
+125	                const double origin = precise_dot(from, axis) / length, speed = precise_dot(delta, axis) / length;
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0xe75b80, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 229, capacity 229 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681858 in operator() (__closure=0x7fffffff79a0, origin=-5.5911445617675781, speed=0, low=-204.000001, high=140.000001, radius=12) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:234
+234	            auto axis = [&](double origin, double speed, double low, double high, double radius)
+
+Program received signal SIGINT, Interrupt.
+0x000000000065ff60 in OpenBlood2::DlsSampler::advance_voices (this=0x7fffffff88f0, frames=800, stereo=std::span of length 0) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:502
+502	                if (!r.settings.loop && v.cursor >= wave.samples.size())
+
+Program received signal SIGINT, Interrupt.
+std::less<void>::operator()<double const&, double const&> (this=0x7fffffff6d2f, __t=@0x7fffffff6db0: 16384, __u=@0x7fffffff6db8: 16384) at /usr/include/c++/16/bits/stl_function.h:609
+609		    return std::forward<_Tp>(__t) < std::forward<_Up>(__u);
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::finished (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:204
+204	            return v.frames > 0 && v.amplitude.sustain == 0 && time >= v.amplitude.attack + v.amplitude.decay;
+
+Program received signal SIGINT, Interrupt.
+0x000000000060ca74 in std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::operator[] (this=0x7fffffff8638, __n=95) at /usr/include/c++/16/bits/stl_vector.h:1253
+1253		__glibcxx_requires_subscript(__n);
+
+Program received signal SIGINT, Interrupt.
+0x00000000005fb8a6 in OpenBlood2::object_node_transform (input=..., name=0xa0e729 "head", position=0x1aa211c, rotation=0x7fffffff7a30) at /home/yann/projects/lithtech/Blood2/src/engine/object_pose.cpp:81
+81	            !name || !*name || !position || !rotation)
+
+Program received signal SIGINT, Interrupt.
+std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::get (this=0x1a8f738) at /usr/include/c++/16/bits/unique_ptr.h:491
+491	      { return _M_t._M_ptr(); }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000682c22 in OpenBlood2::CollisionWorld::query (this=0x16198b8, index=0, from=..., to=..., half=..., hit=..., found=@0x7fffffff7adf: false, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:343
+343	        const auto& n = nodes_[index];
+
+Program received signal SIGINT, Interrupt.
+0x0000000000605951 in OpenBlood2::Objects::get (this=0x7fffffff85b8, id=...) at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:563
+563	        return slots_[id.slot].object.get();
+
+Program received signal SIGINT, Interrupt.
+0x00000000006632de in OpenBlood2::DlsQueuedMidi::operator= (this=0x27594a0) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.h:64
+64	    struct DlsQueuedMidi
+
+Program received signal SIGINT, Interrupt.
+0x000000000060cd29 in std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::get (this=0x1a90388) at /usr/include/c++/16/bits/unique_ptr.h:491
+491	      { return _M_t._M_ptr(); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004d4dd2 in std::max<double> (__a=@0x7fffffff6fa8: 0, __b=@0x7fffffff6f38: -2.5406717001078922) at /usr/include/c++/16/bits/stl_algobase.h:256
+256	    max(const _Tp& __a, const _Tp& __b)
+
+Program received signal SIGINT, Interrupt.
+std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_data (this=0x15afcd0) at /usr/include/c++/16/bits/basic_string.h:238
+238	      { return _M_dataplus._M_p; }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000683314 in OpenBlood2::CollisionWorld::sweep (this=0x15f5d08, from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:385
+385	        hit = {};
+
+Program received signal SIGINT, Interrupt.
+0x0000000000682e8a in OpenBlood2::CollisionWorld::query (this=0x7fffffff8560, index=1798, from=..., to=..., half=..., hit=..., found=@0x7fffffff7c7f: false, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:357
+357	            query(n.right, from, to, half, hit, found, anchor, selected);
+
+Program received signal SIGINT, Interrupt.
+0x00000000006886bd in std::__min_element<double const*, std::less<void> > (__first=0x7fffffff7008, __last=0x7fffffff7018, __comp=...) at /usr/include/c++/16/bits/stl_algo.h:5604
+5604	      while (++__first != __last)
+
+Program received signal SIGINT, Interrupt.
+0x00000000004275dd in std::__shared_ptr<OpenBlood2::Model const, (__gnu_cxx::_Lock_policy)2>::get (this=0x60cd28 <std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::get() const+24>) at /usr/include/c++/16/bits/shared_ptr_base.h:1752
+1752	      get() const noexcept
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680db8 in OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff69f0, axis=..., low=80, high=80) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:177
+177	                if (first > last)
+
+Program received signal SIGINT, Interrupt.
+0x0000000000671de5 in OpenBlood2::rotate_vector (q=..., v=...) at /home/yann/projects/lithtech/Blood2/src/engine/model.cpp:64
+64	        return add(v, add(mul(t, q.m_Spin), cross(q.m_Vec, t)));
+
+Program received signal SIGINT, Interrupt.
+0x000000000068848a in std::vector<OpenBlood2::CollisionWorld::Triangle, std::allocator<OpenBlood2::CollisionWorld::Triangle> >::operator[] (this=0x7fffffff8560, __n=5971) at /usr/include/c++/16/bits/stl_vector.h:1272
+1272		__glibcxx_requires_subscript(__n);
+
+Program received signal SIGINT, Interrupt.
+0x000000000060593a in OpenBlood2::Objects::get (this=0x7fffffff85b8, id=...) at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:563
+563	        return slots_[id.slot].object.get();
+
+Program received signal SIGINT, Interrupt.
+0x000000000068325c in OpenBlood2::CollisionWorld::sweep (this=0x1768b18, from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:384
+384	    {
+
+Program received signal SIGINT, Interrupt.
+0x0000000000688014 in std::vector<OpenBlood2::CollisionWorld::Node, std::allocator<OpenBlood2::CollisionWorld::Node> >::operator[] (this=0x7fffffff8578, __n=1705) at /usr/include/c++/16/bits/stl_vector.h:1272
+1272		__glibcxx_requires_subscript(__n);
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800df in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> > >::_S_left (__x=0xd14980) at /usr/include/c++/16/bits/stl_tree.h:1423
+1423	      { return __x->_M_left; }
+SAMPLES 201
+
+Program received signal SIGINT, Interrupt.
+0x0000000000605a86 in OpenBlood2::Objects::handle_of (this=0x7fffffff85b8, instance=0x2175650) at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:581
+581	            if (slot.object && slot.object->game.get() == instance)
+
+Program received signal SIGINT, Interrupt.
+std::swap<double>(double&, double&) requires ((!std::__is_tuple_like<double>::value)&&(is_move_constructible_v<double>))&&(is_move_assignable_v<double>) (__a=@0x7fffffff6ce8: 0.050343249427917618, __b=@0x7fffffff6ce0: 0.050343249427917618) at /usr/include/c++/16/bits/move.h:240
+240	      __b = _GLIBCXX_MOVE(__tmp);
+
+Program received signal SIGINT, Interrupt.
+0x0000000000682c15 in OpenBlood2::CollisionWorld::query (this=0x7fffffff8560, index=1788, from=..., to=..., half=..., hit=..., found=@0x7fffffff7b2f: false, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:343
+343	        const auto& n = nodes_[index];
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::Objects::time (this=0x7fffffff85b8) at /home/yann/projects/lithtech/Blood2/src/engine/objects.h:239
+239	        }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000682c8d in OpenBlood2::CollisionWorld::query (this=0x15f7d68, index=0, from=..., to=..., half=..., hit=..., found=@0x7fffffff7adf: false, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:348
+348	        if (!broadphase(from, to, half, n.min, n.max) ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000004db3f8 in std::__shared_ptr_access<OpenBlood2::ContainerShape const, (__gnu_cxx::_Lock_policy)2, false, false>::_M_get (this=0x162abf8) at /usr/include/c++/16/bits/shared_ptr_base.h:1450
+1450	      { return static_cast<const __shared_ptr<_Tp, _Lp>*>(this)->get(); }
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::CollisionWorld::Triangle, std::allocator<OpenBlood2::CollisionWorld::Triangle> >::operator[] (this=0x7fffffff8560, __n=5525) at /usr/include/c++/16/bits/stl_vector.h:1270
+1270	      operator[](size_type __n) const _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::finished (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:200
+200	            const double gate = double(v.gate) / DlsSampler::rate;
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::precise_dot (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:75
+75	            return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z;
+
+Program received signal SIGINT, Interrupt.
+0x000000000060f310 in std::__uniq_ptr_impl<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::_M_ptr (this=0x1a8f8f8) at /usr/include/c++/16/bits/unique_ptr.h:192
+192	      pointer    _M_ptr() const noexcept { return std::get<0>(_M_t); }
+
+Program received signal SIGINT, Interrupt.
+0x000000000041d0a7 in std::unique_ptr<BaseClass, std::default_delete<BaseClass> >::get (this=0x7fffffffd360) at /usr/include/c++/16/bits/unique_ptr.h:490
+490	      get() const noexcept
+
+Program received signal SIGINT, Interrupt.
+0x00000000006805c0 in OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff7620, axis=..., low=-47.6954345703125, high=-16.3045654296875) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:122
+122	                const double radius = (std::abs(double(axis.x)) * half.x + std::abs(double(axis.y)) * half.y +
+
+Program received signal SIGINT, Interrupt.
+0x00000000004db38b in std::__shared_ptr_access<OpenBlood2::ContainerShape const, (__gnu_cxx::_Lock_policy)2, false, false>::operator-> (this=0x1a8ad48) at /usr/include/c++/16/bits/shared_ptr_base.h:1445
+1445	      }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974d3 in std::isfinite (__x=-1206.55786) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000690d02 in operator== (__lhs=..., __rhs=...) at /usr/include/c++/16/bits/stl_iterator.h:1198
+1198	      { return __lhs.base() == __rhs.base(); }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681784 in OpenBlood2::(anonymous namespace)::broadphase (from=..., to=..., half=..., min=..., max=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:225
+225	            auto lo = vector_subtract(minv(from, to), half), hi = vector_add(maxv(from, to), half);
+
+Program received signal SIGINT, Interrupt.
+0x00000000004d12a6 in OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0x1cfa1a0, destination=0x7fffffff7e30) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:377
+377	                if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+
+Program received signal SIGINT, Interrupt.
+std::abs (__x=192) at /usr/include/c++/16/bits/std_abs.h:82
+82	  { return __builtin_fabsf(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000682f3d in OpenBlood2::CollisionWorld::query (this=0x7fffffff8560, index=1804, from=..., to=..., half=..., hit=..., found=@0x7fffffff7d1f: true, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:363
+363	            if (!segment_bounds(from, delta, half, triangles_[i].min, triangles_[i].max, found ? hit.fraction : 1))
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680139 in OpenBlood2::vector_scale (a=..., s=1) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:60
+60	        return {a.x * s, a.y * s, a.z * s};
+
+Program received signal SIGINT, Interrupt.
+0x00000000006819c2 in operator() (__closure=0x7fffffff6e90, origin=-3.5431969165802002, speed=-2.0479476451873779, low=23.999998999999999, high=56.000000999999997, radius=0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:245
+245	                return enter <= leave + 1e-9;
+
+Program received signal SIGINT, Interrupt.
+0x00000000006804c9 in OpenBlood2::(anonymous namespace)::extents (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:91
+91	            return physics_vector(v) && v.x >= 0 && v.y >= 0 && v.z >= 0;
+
+Program received signal SIGINT, Interrupt.
+0x0000000000688d8a in std::less<void>::operator()<double const&, double const&> (this=0x7fffffff6d1f, __t=@0x7fffffff6da0: -11507.19921875, __u=@0x7fffffff6da8: -11507.19921875) at /usr/include/c++/16/bits/stl_function.h:609
+609		    return std::forward<_Tp>(__t) < std::forward<_Up>(__u);
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6bb64 in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0x13d43e0, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 228, capacity 228 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974d0 in std::isfinite (__x=0) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::CollisionWorld::Node, std::allocator<OpenBlood2::CollisionWorld::Node> >::size (this=0x7fffffff72b0) at /usr/include/c++/16/bits/stl_vector.h:1107
+1107	      size() const _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+0x00000000005e989d in OpenBlood2::advance_particles (particles=std::vector of length 32, capacity 32 = {...}, gravity=-150, seconds=0.016666666666665719, error="", capacity=2048) at /home/yann/projects/lithtech/Blood2/src/engine/particles.cpp:23
+23	                v.color.y > 1 || v.color.z < 0 || v.color.z > 1)
+
+Program received signal SIGINT, Interrupt.
+std::abs (__x=-5.59114456) at /usr/include/c++/16/bits/std_abs.h:82
+82	  { return __builtin_fabsf(__x); }
+
+Program received signal SIGINT, Interrupt.
+std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::size (this=0x1815180) at /usr/include/c++/16/bits/basic_string.h:1190
+1190		if (__sz > max_size ())
+
+Program received signal SIGINT, Interrupt.
+0x000000000041a946 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::max_size (this=0x2129140) at /usr/include/c++/16/bits/basic_string.h:1205
+1205	      max_size() const _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::vector_add (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:52
+52	        return {a.x + b.x, a.y + b.y, a.z + b.z};
+
+Program received signal SIGINT, Interrupt.
+0x0000000000412b3b in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_data (this=0x4123f4 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::size() const+36>) at /usr/include/c++/16/bits/basic_string.h:237
+237	      _M_data() const
+
+Program received signal SIGINT, Interrupt.
+0x0000000000683454 in OpenBlood2::CollisionWorld::sweep (this=0x1760518, from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:392
+392	        return found ? CollisionQuery::Hit : CollisionQuery::Miss;
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800df in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0x2844500, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 228, capacity 228 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000004ce01c in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0xe75b80, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 228, capacity 228 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:22
+22	                other->handle == ignore_extra || !(other->state.m_Flags & FLAG_SOLID))
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::finished (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:205
+205	        }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000617bf2 in std::_Hashtable<DObject*, std::pair<DObject* const, OpenBlood2::ObjectId>, std::allocator<std::pair<DObject* const, OpenBlood2::ObjectId> >, std::__detail::_Select1st, std::equal_to<DObject*>, std::hash<DObject*>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<false, false, true> >::_M_find_before_node_tr<DObject*> (this=0x7fffffff8698, __bkt=71, __k=@0x7fffffff80c0: 0x1cef670, __code=30340720) at /usr/include/c++/16/bits/hashtable.h:2257
+2257		if (!__prev_p)
+
+Program received signal SIGINT, Interrupt.
+0x000000000068006d in OpenBlood2::vector_add (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:52
+52	        return {a.x + b.x, a.y + b.y, a.z + b.z};
+
+Program received signal SIGINT, Interrupt.
+0x00000000006955be in OpenBlood2::sweep_object (object=..., from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/world_model.cpp:18
+18	        const auto offset = vector_subtract(object.state.m_Pos, shape.origin);
+
+Program received signal SIGINT, Interrupt.
+0x000000000041a7cc in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator std::basic_string_view<char, std::char_traits<char> > (this=0x1aa3610) at /usr/include/c++/16/bits/basic_string.h:1061
+1061	      { return __sv_type(data(), size()); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000006801af in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:67
+67	    {
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800df in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6bbc5 in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x000000000060ca4f in std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::operator[] (this=0xf0, __n=94) at /usr/include/c++/16/bits/stl_vector.h:1251
+1251	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0xe75b80, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 228, capacity 228 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000006801e2 in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:68
+68	        return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z) && std::abs(v.x) <= 1e7f &&
+
+Program received signal SIGINT, Interrupt.
+0x000000000065fefe in OpenBlood2::DlsSampler::advance_voices (this=0x7fffffff88f0, frames=432, stereo=std::span of length 0) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:502
+502	                if (!r.settings.loop && v.cursor >= wave.samples.size())
+
+Program received signal SIGINT, Interrupt.
+operator() (__closure=0x7fffffff6eb0, axis=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:210
+210	                return s.axis(axis, std::min({a, b, c}), std::max({a, b, c}));
+
+Program received signal SIGINT, Interrupt.
+std::__detail::operator== (__x=..., __y=...) at /usr/include/c++/16/bits/hashtable_policy.h:389
+389	      { return __x._M_cur == __y._M_cur; }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004c4023 in OpenBlood2::ServerAdapter::advance_models (this=0x7fffffff8750, seconds=0.016666666666666666) at /home/yann/projects/lithtech/Blood2/src/game/server_models.cpp:177
+177	            if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE)
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::CollisionWorld::Node, std::allocator<OpenBlood2::CollisionWorld::Node> >::operator[] (this=0x7fffffff8578, __n=1876) at /usr/include/c++/16/bits/stl_vector.h:1272
+1272		__glibcxx_requires_subscript(__n);
+
+Program received signal SIGINT, Interrupt.
+0x000000000068195a in operator() (__closure=0x7fffffff79d0, origin=170.00100708007812, speed=-0.0200042724609375, low=-10.000000999999997, high=442.00003151757812, radius=42) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:243
+243	                enter = std::max(enter, first);
+
+Program received signal SIGINT, Interrupt.
+0x000000000065ff22 in OpenBlood2::DlsSampler::advance_voices (this=0x7fffffff88f0, frames=800, stereo=std::span of length 0) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:502
+502	                if (!r.settings.loop && v.cursor >= wave.samples.size())
+
+Program received signal SIGINT, Interrupt.
+std::__detail::_Hashtable_hash_traits<std::hash<DObject*> >::__small_size_threshold () at /usr/include/c++/16/bits/hashtable_policy.h:282
+282	      { return std::__is_fast_hash<_Hash>::value ? 0 : 20; }
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6b92c in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x0000000000553ec2 in std::__shared_ptr<OpenBlood2::DlsBank const, (__gnu_cxx::_Lock_policy)2>::swap (this=0x7fffffff7750, __other=...) at /usr/include/c++/16/bits/shared_ptr_base.h:1775
+1775	      }
+
+Program received signal SIGINT, Interrupt.
+0x000000000068059f in OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff7130, axis=..., low=2292121.5, high=2292121.5) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:117
+117	                if (length < 1e-8)
+
+Program received signal SIGINT, Interrupt.
+std::abs (__x=16.8772202) at /usr/include/c++/16/bits/std_abs.h:82
+82	  { return __builtin_fabsf(__x); }
+
+Program received signal SIGINT, Interrupt.
+std::array<DVector, 3ul>::operator[] (this=0x7ffff76a2ec0, __n=0) at /usr/include/c++/16/array:222
+222	      }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000605a92 in OpenBlood2::Objects::handle_of (this=0x7fffffff85b8, instance=0x1d47640) at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:581
+581	            if (slot.object && slot.object->game.get() == instance)
+
+Program received signal SIGINT, Interrupt.
+0x00000000005cd28d in OpenBlood2::Reader::u8 (this=0x4366ca <std::__detail::__variant::_Variadic_union<false, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, float, bool, int, DVector, DRotation, OpenBlood2::EulerAngles>::_Variadic_union<>(std::in_place_index_t<0ul>)+24>) at /home/yann/projects/lithtech/Blood2/src/engine/formats/reader.h:49
+49	        std::uint8_t u8()
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff79733fa in malloc () from /lib64/libc.so.6
+
+Program received signal SIGINT, Interrupt.
+0x0000000000685c14 in std::__unguarded_partition<__gnu_cxx::__normal_iterator<OpenBlood2::CollisionWorld::Triangle*, std::vector<OpenBlood2::CollisionWorld::Triangle> >, OpenBlood2::CollisionWorld::partition(uint32_t, uint32_t)::<lambda(const auto:37&, const auto:38&)> >(__gnu_cxx::__normal_iterator<OpenBlood2::CollisionWorld::Triangle*, std::vector<OpenBlood2::CollisionWorld::Triangle, std::allocator<OpenBlood2::CollisionWorld::Triangle> > >, __gnu_cxx::__normal_iterator<OpenBlood2::CollisionWorld::Triangle*, std::vector<OpenBlood2::CollisionWorld::Triangle, std::allocator<OpenBlood2::CollisionWorld::Triangle> > >, __gnu_cxx::__normal_iterator<OpenBlood2::CollisionWorld::Triangle*, std::vector<OpenBlood2::CollisionWorld::Triangle, std::allocator<OpenBlood2::CollisionWorld::Triangle> > >, struct {...}) (__first=..., __last=..., __pivot=..., __comp=...) at /usr/include/c++/16/bits/stl_algo.h:1844
+1844		  if (!(__first < __last))
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::Reader::require (this=0x7fffffff6cb0, condition=true) at /home/yann/projects/lithtech/Blood2/src/engine/formats/reader.h:32
+32	            return good_;
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7971c2a in _int_malloc () from /lib64/libc.so.6
+
+Program received signal SIGINT, Interrupt.
+0x000000000041a7ad in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator std::basic_string_view<char, std::char_traits<char> > (this=0xeda3b0) at /usr/include/c++/16/bits/basic_string.h:1060
+1060	      operator __sv_type() const noexcept
+
+Program received signal SIGINT, Interrupt.
+0x000000000060229c in OpenBlood2::(anonymous namespace)::lower (c=101 'e') at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:17
+17	            return c >= 'A' && c <= 'Z' ? static_cast<char>(c + 'a' - 'A') : c;
+
+Program received signal SIGINT, Interrupt.
+0x00000000005cd220 in std::span<unsigned char const, 18446744073709551615ul>::size (this=0x7fffffff66f0) at /usr/include/c++/16/span:254
+254	      { return this->_M_extent._M_extent(); }
+
+Program received signal SIGINT, Interrupt.
+std::span<unsigned char const, 18446744073709551615ul>::size (this=0x7fffffff63a0) at /usr/include/c++/16/span:254
+254	      { return this->_M_extent._M_extent(); }
+
+Program received signal SIGINT, Interrupt.
+std::vector<DVector, std::allocator<DVector> >::operator[] (this=0x7fffffff6d78, __n=280) at /usr/include/c++/16/bits/stl_vector.h:1254
+1254		return *(this->_M_impl._M_start + __n);
+
+Program received signal SIGINT, Interrupt.
+0x00000000005cd15f in OpenBlood2::Reader::take (this=0x7fffffff63a8, n=1) at /home/yann/projects/lithtech/Blood2/src/engine/formats/reader.h:41
+41	        std::span<const std::uint8_t> take(std::size_t n)
+
+Program received signal SIGINT, Interrupt.
+0x00000000005cd181 in OpenBlood2::Reader::take (this=0x7fffffff66f0, n=1) at /home/yann/projects/lithtech/Blood2/src/engine/formats/reader.h:43
+43	            if (!require(n <= remaining()))
+
+Program received signal SIGINT, Interrupt.
+0x0000000000602986 in operator() (__closure=0x7fffffff730f, x=112 'p', y=112 'p') at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:136
+136	                                            [](char x, char y) { return lower(x) < lower(y); });
+
+Program received signal SIGINT, Interrupt.
+std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::begin (this=0x4c4e5c <std::vector<OpenBlood2::ModelAnimation, std::allocator<OpenBlood2::ModelAnimation> >::operator[](unsigned long) const+28>) at /usr/include/c++/16/bits/basic_string.h:1080
+1080	      begin() const _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> > >::_S_key (__node=...) at /usr/include/c++/16/bits/stl_tree.h:1411
+1411	      { return _KeyOfValue()(*__node._M_valptr()); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000005cd80c in std::span<unsigned char const, 18446744073709551615ul>::span<unsigned char const*> (this=0x7fffffff6040, __first=0x2a998a7 "\005A\n\377\017\"\b_\376\234\374\257\372\222\361|\374\252\v\242", __count=1) at /usr/include/c++/16/span:183
+183		span(_It __first, size_type __count)
+
+Program received signal SIGINT, Interrupt.
+0x00000000005cd5ea in std::span<unsigned char const, 18446744073709551615ul>::subspan (this=0x7fffffff6140, __offset=10492, __count=1) at /usr/include/c++/16/span:444
+444		return span<element_type>(this->data() + __offset, __count);
+
+Program received signal SIGINT, Interrupt.
+std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::size (this=0x7fffffff65c0) at /usr/include/c++/16/bits/basic_string.h:1192
+1192		return __sz;
+
+Program received signal SIGINT, Interrupt.
+0x0000000000429712 in std::__ptr_traits_ptr_to<char const*, char const, false>::pointer_to (__r=@0x7fffffff65d0: 99 'c') at /usr/include/c++/16/bits/ptr_traits.h:134
+134	      pointer_to(element_type& __r) noexcept
+
+Program received signal SIGINT, Interrupt.
+0x000000000041a2b1 in std::basic_string_view<char, std::char_traits<char> >::basic_string_view (this=0x7fffffff79b0, __str=0x1e6d4d0 "Solid", __len=5) at /usr/include/c++/16/string_view:155
+155	      : _M_len{__len}, _M_str{__str}
+
+Program received signal SIGINT, Interrupt.
+std::span<unsigned char const, 18446744073709551615ul>::span<unsigned char const*> (this=0x7fffffff6c90, __first=0x2774873 "5\277J\263g\273_\0045?v'\\=\275G`\276(\320\301\276J\263g;^\0045\277J\263g\273_\0045?", __count=1) at /usr/include/c++/16/span:183
+183		span(_It __first, size_type __count)
+
+Program received signal SIGINT, Interrupt.
+0x0000000000695644 in OpenBlood2::sweep_object (object=..., from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/world_model.cpp:19
+19	        const auto result = shape.sweep(vector_subtract(from, offset), vector_subtract(to, offset), half, hit);
+
+Program received signal SIGINT, Interrupt.
+0x000000000068049d in OpenBlood2::(anonymous namespace)::maxv (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:87
+87	            return {std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z)};
+
+Program received signal SIGINT, Interrupt.
+std::__shared_ptr<OpenBlood2::ContainerShape const, (__gnu_cxx::_Lock_policy)2>::operator bool (this=0x2279868) at /usr/include/c++/16/bits/shared_ptr_base.h:1757
+1757	      { return _M_ptr != nullptr; }
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0x2276450, destination=0x7fffffff7e30) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:377
+377	                if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::ModelNode, std::allocator<OpenBlood2::ModelNode> >::size (this=0xe4b2c8) at /usr/include/c++/16/bits/stl_vector.h:1109
+1109		ptrdiff_t __dif = this->_M_impl._M_finish - this->_M_impl._M_start;
+
+Program received signal SIGINT, Interrupt.
+std::__shared_ptr<OpenBlood2::ContainerShape const, (__gnu_cxx::_Lock_policy)2>::operator bool (this=0x1669308) at /usr/include/c++/16/bits/shared_ptr_base.h:1757
+1757	      { return _M_ptr != nullptr; }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cecb7 in OpenBlood2::ServerAdapter::GetMovementState (this=0x7fffffff8750, h=0x1572660, state=...) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:117
+117	        const auto query = sweep_scene(h, center, to, state.dimensions, nearest, objects_.snapshot());
+
+Program received signal SIGINT, Interrupt.
+0x0000000000688630 in std::initializer_list<double>::begin (this=0x7fffffff6f90) at /usr/include/c++/16/initializer_list:75
+75	      begin() const noexcept { return _M_array; }
+
+Program received signal SIGINT, Interrupt.
+0x000000000065ff30 in OpenBlood2::DlsSampler::advance_voices (this=0x7fffffff88f0, frames=288, stereo=std::span of length 0) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:502
+502	                if (!r.settings.loop && v.cursor >= wave.samples.size())
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0x1572660, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 233, capacity 233 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7a39e0e in __memcmp_avx2_movbe () from /lib64/libc.so.6
+
+Program received signal SIGINT, Interrupt.
+0x00000000004d12a6 in OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0x1572660, destination=0x7fffffff7ff0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:377
+377	                if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000006801a6 in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:67
+67	    {
+
+Program received signal SIGINT, Interrupt.
+0x00000000004e36a8 in OpenBlood2::ServerAdapter::GetContainers (this=0x7fffffff8750, object=0x182b030, head=..., state=...) at /home/yann/projects/lithtech/Blood2/src/game/server_containers.cpp:40
+40	            const auto* r = objects_.get(id);
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800df in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+std::__shared_ptr<OpenBlood2::ContainerShape const, (__gnu_cxx::_Lock_policy)2>::operator bool (this=0x1c475f8) at /usr/include/c++/16/bits/shared_ptr_base.h:1757
+1757	      { return _M_ptr != nullptr; }
+
+Program received signal SIGINT, Interrupt.
+0x00000000006833c7 in OpenBlood2::CollisionWorld::sweep (this=0x7fffffff8560, from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:388
+388	        if (nodes_.empty())
+SAMPLES 301
+
+Program received signal SIGINT, Interrupt.
+0x0000000000662a2d in std::_Optional_payload_base<OpenBlood2::DlsLoop>::_M_get (this=0x293d490) at /usr/include/c++/16/optional:353
+353	      _M_get() const noexcept
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b22b0c in exp2f64 () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x000000000049744f in std::__detail::_Mod_range_hashing::operator() (this=0x7fffffff7c9f, __num=36154256, __den=257) at /usr/include/c++/16/bits/hashtable_policy.h:585
+585	    { return __num % __den; }
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0xeac5c0, destination=0x7fffffff7e30) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:379
+379	                    continue;
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800df in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0xeac5c0, destination=0x7fffffff7e30) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:377
+377	                if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800df in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0x1572660, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 233, capacity 233 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x000000000065ffc6 in OpenBlood2::DlsSampler::advance_voices (this=0x7fffffff88f0, frames=800, stereo=std::span of length 0) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:506
+506	                    time >= v.lfo_delay ? std::sin(2 * std::numbers::pi * v.lfo_hz * (time - v.lfo_delay)) : 0;
+
+Program received signal SIGINT, Interrupt.
+0x00000000006817df in OpenBlood2::(anonymous namespace)::broadphase (from=..., to=..., half=..., min=..., max=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:225
+225	            auto lo = vector_subtract(minv(from, to), half), hi = vector_add(maxv(from, to), half);
+
+Program received signal SIGINT, Interrupt.
+0x00000000006801af in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:67
+67	    {
+
+Program received signal SIGINT, Interrupt.
+0x00000000006818ff in operator() (__closure=0x7fffffff71d0, origin=-32, speed=0, low=-108.00000862939453, high=-75.999999000000003, radius=12) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:239
+239	                    return origin >= low && origin <= high;
+
+Program received signal SIGINT, Interrupt.
+0x000000000066000f in OpenBlood2::DlsSampler::advance_voices (this=0x7fffffff88f0, frames=800, stereo=std::span of length 0) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:506
+506	                    time >= v.lfo_delay ? std::sin(2 * std::numbers::pi * v.lfo_hz * (time - v.lfo_delay)) : 0;
+
+Program received signal SIGINT, Interrupt.
+0x00000000004db1d2 in std::vector<OpenBlood2::CollisionWorld::Node, std::allocator<OpenBlood2::CollisionWorld::Node> >::size (this=0x1a68d00) at /usr/include/c++/16/bits/stl_vector.h:1109
+1109		ptrdiff_t __dif = this->_M_impl._M_finish - this->_M_impl._M_start;
+
+Program received signal SIGINT, Interrupt.
+0x00000000004db19a in std::vector<OpenBlood2::CollisionWorld::Triangle, std::allocator<OpenBlood2::CollisionWorld::Triangle> >::size (this=0x7fffffff8560) at /usr/include/c++/16/bits/stl_vector.h:1109
+1109		ptrdiff_t __dif = this->_M_impl._M_finish - this->_M_impl._M_start;
+
+Program received signal SIGINT, Interrupt.
+0x00000000006801c2 in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:68
+68	        return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z) && std::abs(v.x) <= 1e7f &&
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::precise_dot (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:75
+75	            return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z;
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680139 in OpenBlood2::vector_scale (a=..., s=-1) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:60
+60	        return {a.x * s, a.y * s, a.z * s};
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974d3 in std::isfinite (__x=40) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004ce1c3 in operator== (__lhs=..., __rhs=...) at /usr/include/c++/16/bits/stl_iterator.h:1198
+1198	      { return __lhs.base() == __rhs.base(); }
+
+Program received signal SIGINT, Interrupt.
+0x000000000068001d in OpenBlood2::vector_add (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:51
+51	    {
+
+Program received signal SIGINT, Interrupt.
+std::abs (__x=42.3144379) at /usr/include/c++/16/bits/std_abs.h:82
+82	  { return __builtin_fabsf(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0x1572660, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 233, capacity 233 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000004d12c5 in OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0x1572660, destination=0x7fffffff7ff0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:378
+378	                    other->container() || !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
+
+Program received signal SIGINT, Interrupt.
+0x000000000049d332 in std::__shared_ptr<OpenBlood2::ContainerShape const, (__gnu_cxx::_Lock_policy)2>::operator bool (this=0x1806d88) at /usr/include/c++/16/bits/shared_ptr_base.h:1757
+1757	      { return _M_ptr != nullptr; }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000426a53 in std::operator<=><char, std::char_traits<char>, std::allocator<char> > (__lhs="SetBlockingPriority", __rhs="IsObjectAlive") at /usr/include/c++/16/bits/basic_string.h:4138
+4138	    { return __detail::__char_traits_cmp_cat<_Traits>(__lhs.compare(__rhs)); }
+
+Program received signal SIGINT, Interrupt.
+std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_set_length (this=0x7fffffff7dd0, __n=13) at /usr/include/c++/16/bits/basic_string.h:273
+273	      }
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::size (this=0x7fffffff8638) at /usr/include/c++/16/bits/stl_vector.h:1110
+1110		if (__dif < 0)
+
+Program received signal SIGINT, Interrupt.
+0x0000000000671a9a in OpenBlood2::(anonymous namespace)::compose (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/model.cpp:34
+34	            return normalize({add(add(mul(b.m_Vec, a.m_Spin), mul(a.m_Vec, b.m_Spin)), cross(a.m_Vec, b.m_Vec)),
+
+Program received signal SIGINT, Interrupt.
+0x000000000041205a in std::abs (__x=38.5372887) at /usr/include/c++/16/bits/std_abs.h:82
+82	  { return __builtin_fabsf(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x000000000068323d in OpenBlood2::CollisionWorld::query (this=0x7fffffff8560, index=349, from=..., to=..., half=..., hit=..., found=@0x7fffffff7e6f: true, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:382
+382	    }
+
+Program received signal SIGINT, Interrupt.
+0x000000000068cb08 in OpenBlood2::ContainerShape::contains (this=0x11c7e00, point=...) at /home/yann/projects/lithtech/Blood2/src/engine/container.cpp:255
+255	        if (triangles.empty() || !physics_vector(point) || point.x < min.x - .001f || point.x > max.x + .001f ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000006955be in OpenBlood2::sweep_object (object=..., from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/world_model.cpp:18
+18	        const auto offset = vector_subtract(object.state.m_Pos, shape.origin);
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7c1e2f4 in __dynamic_cast () from /lib64/libstdc++.so.6
+
+Program received signal SIGINT, Interrupt.
+std::__uniq_ptr_impl<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::_M_ptr (this=0x1a8fb98) at /usr/include/c++/16/bits/unique_ptr.h:192
+192	      pointer    _M_ptr() const noexcept { return std::get<0>(_M_t); }
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0x22793d0, destination=0x7fffffff7e30) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:377
+377	                if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+
+Program received signal SIGINT, Interrupt.
+0x000000000068059f in OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff73d0, axis=..., low=-64, high=0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:117
+117	                if (length < 1e-8)
+
+Program received signal SIGINT, Interrupt.
+std::abs (__x=166.5383) at /usr/include/c++/16/bits/std_abs.h:82
+82	  { return __builtin_fabsf(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000006817c8 in OpenBlood2::(anonymous namespace)::broadphase (from=..., to=..., half=..., min=..., max=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:225
+225	            auto lo = vector_subtract(minv(from, to), half), hi = vector_add(maxv(from, to), half);
+
+Program received signal SIGINT, Interrupt.
+0x00000000004db26f in __gnu_cxx::__normal_iterator<std::array<DVector, 3ul> const*, std::vector<std::array<DVector, 3ul>, std::allocator<std::array<DVector, 3ul> > > >::__normal_iterator (this=<optimized out>, __i=@0x14c22c0: 0x14c2610) at /usr/include/c++/16/bits/stl_iterator.h:1059
+1059	      : _M_current(__i) { }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000497483 in OpenBlood2::ObjectRecord::container (this=0x18082b0) at /home/yann/projects/lithtech/Blood2/src/engine/objects.h:147
+147	        const std::shared_ptr<const ContainerShape>& container() const
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::size (this=0x7fffffff8638) at /usr/include/c++/16/bits/stl_vector.h:1110
+1110		if (__dif < 0)
+
+Program received signal SIGINT, Interrupt.
+0x0000000000612496 in std::get<0ul, OpenBlood2::ObjectRecord*, std::default_delete<OpenBlood2::ObjectRecord> > (__t=std::tuple containing = {...}) at /usr/include/c++/16/tuple:2508
+2508	    { return std::__get_helper<__i>(__t); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000006803b0 in OpenBlood2::(anonymous namespace)::minv (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:83
+83	            return {std::min(a.x, b.x), std::min(a.y, b.y), std::min(a.z, b.z)};
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::ObjectId, std::allocator<OpenBlood2::ObjectId> >::~vector (this=0x18480c8) at /usr/include/c++/16/bits/stl_vector.h:790
+790	      ~vector() _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680088 in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:55
+55	    {
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681ded in OpenBlood2::sweep_box (from=..., to=..., half=..., center=..., other_half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:258
+258	        Sweep s{from, vector_subtract(to, from), half};
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681ac1 in OpenBlood2::(anonymous namespace)::segment_bounds (from=..., delta=..., half=..., min=..., max=..., nearest=0.050533943554538517) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:247
+247	            return axis(from.x, delta.x, min.x, max.x, half.x) && axis(from.y, delta.y, min.y, max.y, half.y) &&
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680615 in OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff7aa0, axis=..., low=128.00100708007812, high=208.74615478515625) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:122
+122	                const double radius = (std::abs(double(axis.x)) * half.x + std::abs(double(axis.y)) * half.y +
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800df in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+0x000000000068850c in operator== (__lhs=..., __rhs=...) at /usr/include/c++/16/bits/stl_iterator.h:1198
+1198	      { return __lhs.base() == __rhs.base(); }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680080 in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:55
+55	    {
+
+Program received signal SIGINT, Interrupt.
+0x000000000060ca56 in std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::operator[] (this=0x7fffffff8638, __n=109) at /usr/include/c++/16/bits/stl_vector.h:1251
+1251	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+0x000000000068330d in OpenBlood2::CollisionWorld::sweep (this=0x1a68ce8, from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:385
+385	        hit = {};
+
+Program received signal SIGINT, Interrupt.
+0x00000000006818cd in operator() (__closure=0x7fffffff69a0, origin=-71.776535034179688, speed=-0.0340728759765625, low=-158.51195053918457, high=-129.48804946081543, radius=14.51194953918457) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:238
+238	                if (std::abs(speed) < 1e-10)
+
+Program received signal SIGINT, Interrupt.
+0x00000000004123ec in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::size (this=0x7fffffff7770) at /usr/include/c++/16/bits/basic_string.h:1190
+1190		if (__sz > max_size ())
+
+Program received signal SIGINT, Interrupt.
+0x00000000004ce1b4 in __gnu_cxx::__normal_iterator<OpenBlood2::ObjectId const*, std::vector<OpenBlood2::ObjectId, std::allocator<OpenBlood2::ObjectId> > >::operator++ (this=<optimized out>) at /usr/include/c++/16/bits/stl_iterator.h:1104
+1104		return *this;
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681980 in operator() (__closure=0x7fffffff6a60, origin=171.94363403320312, speed=-0.0200042724609375, low=84.057368232177737, high=443.94266228540039, radius=43.942630767822266) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:244
+244	                leave = std::min(leave, last);
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7c1e290 in operator delete(void*, unsigned long) () from /lib64/libstdc++.so.6
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::CollisionWorld::Node, std::allocator<OpenBlood2::CollisionWorld::Node> >::operator[] (this=0x27c8b10, __n=0) at /usr/include/c++/16/bits/stl_vector.h:1273
+1273		return *(this->_M_impl._M_start + __n);
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680bd7 in OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff7b00, axis=..., low=-106.40017890930176, high=-53.599821090698242) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:164
+164	                if (depth < penetration)
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::CollisionWorld::Node, std::allocator<OpenBlood2::CollisionWorld::Node> >::size (this=0x7fffffff8578) at /usr/include/c++/16/bits/stl_vector.h:1112
+1112		return size_type(__dif);
+
+Program received signal SIGINT, Interrupt.
+0x000000000068049d in OpenBlood2::(anonymous namespace)::maxv (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:87
+87	            return {std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z)};
+
+Program received signal SIGINT, Interrupt.
+0x000000000068345e in OpenBlood2::CollisionWorld::sweep (this=0x11b6f38, from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:393
+393	    }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfbe in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0xca89f0, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 233, capacity 233 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681773 in OpenBlood2::(anonymous namespace)::broadphase (from=..., to=..., half=..., min=..., max=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:225
+225	            auto lo = vector_subtract(minv(from, to), half), hi = vector_add(maxv(from, to), half);
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff7620, axis=..., low=129, high=129) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:138
+138	                double sign = origin < (low + high) / 2 ? -1 : 1;
+
+Program received signal SIGINT, Interrupt.
+std::min<double> (__a=@0x7fffffff6a78: 0, __b=@0x7fffffff6a08: -2399.4363581510297) at /usr/include/c++/16/bits/stl_algobase.h:232
+232	    min(const _Tp& __a, const _Tp& __b)
+
+Program received signal SIGINT, Interrupt.
+0x0000000000688066 in std::vector<OpenBlood2::CollisionWorld::Node, std::allocator<OpenBlood2::CollisionWorld::Node> >::operator[] (this=0x20f8ce0, __n=0) at /usr/include/c++/16/bits/stl_vector.h:1274
+1274	      }
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7a39ea0 in __memcmp_avx2_movbe () from /lib64/libc.so.6
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0xda66c0, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 233, capacity 233 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x000000000061247e in std::get<0ul, OpenBlood2::ObjectRecord*, std::default_delete<OpenBlood2::ObjectRecord> > (__t=std::tuple containing = {...}) at /usr/include/c++/16/tuple:2507
+2507	    get(const tuple<_Elements...>& __t) noexcept
+
+Program received signal SIGINT, Interrupt.
+0x00000000004b5f95 in std::min<float> (__a=@0x7fffffff72e8: -2491.30786, __b=@0x7fffffff72d8: -2491.30786) at /usr/include/c++/16/bits/stl_algobase.h:237
+237	      if (__b < __a)
+
+Program received signal SIGINT, Interrupt.
+0x00000000006606ff in OpenBlood2::DlsSampler::advance_voices (this=0x7fffffff88f0, frames=800, stereo=std::span of length 0) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:500
+500	            for (std::uint64_t f = 0; f < frames && !finished(v); ++f)
+
+Program received signal SIGINT, Interrupt.
+0x0000000000660496 in OpenBlood2::DlsSampler::advance_voices (this=0x7fffffff88f0, frames=800, stereo=std::span of length 0) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:525
+525	                v.cursor += v.base_step * v.bend_step * std::exp2(pitch / 1200);
+
+Program received signal SIGINT, Interrupt.
+0x000000000041d0bf in std::unique_ptr<BaseClass, std::default_delete<BaseClass> >::get (this=0x1845058) at /usr/include/c++/16/bits/unique_ptr.h:491
+491	      { return _M_t._M_ptr(); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004d2df2 in OpenBlood2::ServerAdapter::advance_physics (this=0x7fffffff8750, seconds=0.016666666666666666) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:554
+554	                auto destination = vector_add(r->state.m_Pos, displacement);
+
+Program received signal SIGINT, Interrupt.
+0x00000000004ce01c in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0x1572660, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 233, capacity 233 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:22
+22	                other->handle == ignore_extra || !(other->state.m_Flags & FLAG_SOLID))
+
+Program received signal SIGINT, Interrupt.
+0x00000000004d4dd2 in std::max<double> (__a=@0x7fffffff6ea8: 0, __b=@0x7fffffff6e38: 8.8736399297468385) at /usr/include/c++/16/bits/stl_algobase.h:256
+256	    max(const _Tp& __a, const _Tp& __b)
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681773 in OpenBlood2::(anonymous namespace)::broadphase (from=..., to=..., half=..., min=..., max=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:225
+225	            auto lo = vector_subtract(minv(from, to), half), hi = vector_add(maxv(from, to), half);
+
+Program received signal SIGINT, Interrupt.
+0x00000000006801e2 in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:68
+68	        return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z) && std::abs(v.x) <= 1e7f &&
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681ac1 in OpenBlood2::(anonymous namespace)::segment_bounds (from=..., delta=..., half=..., min=..., max=..., nearest=1) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:247
+247	            return axis(from.x, delta.x, min.x, max.x, half.x) && axis(from.y, delta.y, min.y, max.y, half.y) &&
+
+Program received signal SIGINT, Interrupt.
+0x00000000004123e4 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::size (this=0xe16d70) at /usr/include/c++/16/bits/basic_string.h:1189
+1189		size_type __sz = _M_string_length;
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800df in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+0x000000000068cae3 in OpenBlood2::ContainerShape::contains (this=0x1046930, point=...) at /home/yann/projects/lithtech/Blood2/src/engine/container.cpp:255
+255	        if (triangles.empty() || !physics_vector(point) || point.x < min.x - .001f || point.x > max.x + .001f ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0x13ca5f0, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 232, capacity 232 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000006886a0 in std::__min_element<double const*, std::less<void> > (__first=0x7fffffff66a0, __last=0x7fffffff66a8, __comp=...) at /usr/include/c++/16/bits/stl_algo.h:5605
+5605		if (__comp(*__first, *__result))
+
+Program received signal SIGINT, Interrupt.
+0x00000000006805da in OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff67d0, axis=..., low=-1385.9991455078125, high=19040) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:122
+122	                const double radius = (std::abs(double(axis.x)) * half.x + std::abs(double(axis.y)) * half.y +
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680d71 in OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff7a00, axis=..., low=-2028, high=-2020) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:176
+176	                DVector n = vector_scale(axis, speed > 0 ? -1.0f : 1.0f);
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0x1572660, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 232, capacity 232 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000006804b0 in OpenBlood2::(anonymous namespace)::extents (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:90
+90	        {
+
+Program received signal SIGINT, Interrupt.
+std::min<double> (__a=@0x7fffffff6ea0: 1, __b=@0x7fffffff6e30: 4.083667894812482) at /usr/include/c++/16/bits/stl_algobase.h:237
+237	      if (__b < __a)
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680139 in OpenBlood2::vector_scale (a=..., s=1) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:60
+60	        return {a.x * s, a.y * s, a.z * s};
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0xda66c0, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 232, capacity 232 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x0000000000695477 in OpenBlood2::sweep_object (object=..., from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/world_model.cpp:14
+14	    {
+
+Program received signal SIGINT, Interrupt.
+0x0000000000671921 in OpenBlood2::(anonymous namespace)::normalize (q=...) at /home/yann/projects/lithtech/Blood2/src/engine/model.cpp:30
+30	            return {mul(q.m_Vec, 1 / length), q.m_Spin / length};
+
+Program received signal SIGINT, Interrupt.
+std::_Vector_base<OpenBlood2::ObjectId, std::allocator<OpenBlood2::ObjectId> >::_Vector_impl::_Vector_impl (this=0x7fffffff8120, __a=...) at /usr/include/c++/16/bits/stl_vector.h:154
+154		{ }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680243 in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:70
+70	    }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000617c05 in std::_Hashtable<DObject*, std::pair<DObject* const, OpenBlood2::ObjectId>, std::allocator<std::pair<DObject* const, OpenBlood2::ObjectId> >, std::__detail::_Select1st, std::equal_to<DObject*>, std::hash<DObject*>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<false, false, true> >::_M_find_before_node_tr<DObject*> (this=0x7fffffff8698, __bkt=141, __k=@0x7fffffff7ba0: 0x1808290, __code=25199248) at /usr/include/c++/16/bits/hashtable.h:2260
+2260		for (__node_ptr __p = static_cast<__node_ptr>(__prev_p->_M_nxt);;
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800df in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+SAMPLES 401
+
+Program received signal SIGINT, Interrupt.
+std::isfinite (__x=170) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::finished (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:199
+199	            const double time = double(v.frames) / DlsSampler::rate;
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680236 in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:69
+69	               std::abs(v.y) <= 1e7f && std::abs(v.z) <= 1e7f;
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+0x000000000068103d in operator() (__closure=0x7fffffff6960, axis=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:207
+207	            auto test = [&](DVector axis)
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff67c0, axis=..., low=128, high=128) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:138
+138	                double sign = origin < (low + high) / 2 ? -1 : 1;
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800df in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b531c1 in sqrtf32 () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681a79 in OpenBlood2::(anonymous namespace)::segment_bounds (from=..., delta=..., half=..., min=..., max=..., nearest=0.00010838570037116433) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:247
+247	            return axis(from.x, delta.x, min.x, max.x, half.x) && axis(from.y, delta.y, min.y, max.y, half.y) &&
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0xf9df00, destination=0x7fffffff8094) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:377
+377	                if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+
+Program received signal SIGINT, Interrupt.
+std::_Optional_payload_base<OpenBlood2::DlsLoop>::_M_get (this=0x184280c) at /usr/include/c++/16/optional:354
+354	      { return this->_M_payload._M_value; }
+
+Program received signal SIGINT, Interrupt.
+0x000000000060ca4f in std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::operator[] (this=0xf0, __n=141) at /usr/include/c++/16/bits/stl_vector.h:1251
+1251	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681179 in operator() (__closure=0x7fffffff6eb0, axis=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:210
+210	                return s.axis(axis, std::min({a, b, c}), std::max({a, b, c}));
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6bbaa in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6ba02 in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::vector_add (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:52
+52	        return {a.x + b.x, a.y + b.y, a.z + b.z};
+
+Program received signal SIGINT, Interrupt.
+std::isfinite (__x=-1248) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974db in std::isfinite (__x=-32) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+std::abs (__x=32) at /usr/include/c++/16/bits/std_abs.h:82
+82	  { return __builtin_fabsf(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000688029 in std::vector<OpenBlood2::CollisionWorld::Node, std::allocator<OpenBlood2::CollisionWorld::Node> >::operator[] (this=0x7fffffff8578, __n=1574) at /usr/include/c++/16/bits/stl_vector.h:1272
+1272		__glibcxx_requires_subscript(__n);
+
+Program received signal SIGINT, Interrupt.
+std::abs (__x=3.97471309) at /usr/include/c++/16/bits/std_abs.h:82
+82	  { return __builtin_fabsf(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x000000000060cd29 in std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::get (this=0x1a8fd28) at /usr/include/c++/16/bits/unique_ptr.h:491
+491	      { return _M_t._M_ptr(); }
+
+Program received signal SIGINT, Interrupt.
+0x000000000060ca1d in std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::operator-> (this=0x1a8fbe8) at /usr/include/c++/16/bits/unique_ptr.h:485
+485	      }
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::precise_dot (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:75
+75	            return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z;
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800df in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+0x0000000000533464 in OpenBlood2::ServerAdapter::IntersectSegment (this=0x7fffffff8750, from=..., to=..., ignore=0x13ca5f0, out=..., fire_through=false, objects=OpenBlood2::SegmentObjects::SolidOrRayHit, filter=OpenBlood2::SegmentFilter::AIVisibility, start=OpenBlood2::SegmentStart::IncludeInterior) at /home/yann/projects/lithtech/Blood2/src/game/server_weapons.cpp:47
+47	            if (!record || record->life != Life::Alive || record->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0x17b9520, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 230, capacity 230 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+0x00000000006830b6 in OpenBlood2::CollisionWorld::query (this=0x7fffffff8560, index=1299, from=..., to=..., half=..., hit=..., found=@0x7fffffff7bcf: false, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:370
+370	            if (triangle_hit(triangles_[i].points, from, to, half, candidate, anchor) &&
+
+Program received signal SIGINT, Interrupt.
+std::abs (__x=0.501960814) at /usr/include/c++/16/bits/std_abs.h:82
+82	  { return __builtin_fabsf(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680021 in OpenBlood2::vector_add (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:51
+51	    {
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974c2 in std::isfinite (__x=-1206.55786) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x000000000060590f in OpenBlood2::Objects::get (this=0x7fffffff85b8, id=...) at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:561
+561	        if (id.slot >= slots_.size() || slots_[id.slot].generation != id.generation)
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ServerAdapter::damage_containers (this=0x7fffffff8750) at /home/yann/projects/lithtech/Blood2/src/game/server_containers.cpp:88
+88	            const auto* r = objects_.get(id);
+
+Program received signal SIGINT, Interrupt.
+0x00000000004d1274 in OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0xeac5c0, destination=0x7fffffff7e30) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:376
+376	                const auto* other = objects_.get(id);
+
+Program received signal SIGINT, Interrupt.
+0x00000000006800ec in OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:57
+57	    }
+
+Program received signal SIGINT, Interrupt.
+0x00000000006818e4 in operator() (__closure=0x7fffffff6fa0, origin=-32, speed=0, low=-147.000001, high=-71.999991370605471, radius=12) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:239
+239	                    return origin >= low && origin <= high;
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6b928 in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x000000000066226b in std::_Optional_base<OpenBlood2::DlsLoop, true, true>::_M_get (this=0x17fabac) at /usr/include/c++/16/optional:595
+595	      { return _M_payload._M_get(); }
+
+Program received signal SIGINT, Interrupt.
+std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> > >::_M_end (this=0x7fffffff7588) at /usr/include/c++/16/bits/stl_tree.h:1390
+1390	      _M_end() const _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+std::max<float> (__a=@0x7fffffff78e0: -32, __b=@0x7fffffff78d0: -32) at /usr/include/c++/16/bits/stl_algobase.h:261
+261	      if (__a < __b)
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff7620, axis=..., low=188.02528691291809, high=195.97471308708191) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:147
+147	                                                : std::numeric_limits<double>::infinity();
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::vector_dot (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:65
+65	    }
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::finished (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:196
+196	            if (v.choke_frame)
+
+Program received signal SIGINT, Interrupt.
+0x00000000004a469a in std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> > >::_S_key (__x=0xf67870) at /usr/include/c++/16/bits/stl_tree.h:1415
+1415	      { return _S_key(static_cast<const _Node&>(*__x)); }
+
+Program received signal SIGINT, Interrupt.
+operator()<OpenBlood2::Particle> (__closure=0x7fffffff7f70, v=...) at /home/yann/projects/lithtech/Blood2/src/engine/particles.cpp:43
+43	                          if (v.lifetime < 0)
+
+Program received signal SIGINT, Interrupt.
+0x000000000068049d in OpenBlood2::(anonymous namespace)::maxv (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:87
+87	            return {std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z)};
+
+Program received signal SIGINT, Interrupt.
+std::isfinite (__x=16.8772202) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x00000000006801c2 in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:68
+68	        return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z) && std::abs(v.x) <= 1e7f &&
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0x1808290, destination=0x7fffffff8094) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:377
+377	                if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
+
+Program received signal SIGINT, Interrupt.
+0x000000000065d418 in OpenBlood2::(anonymous namespace)::held_level (e=..., time=0.20431250000000001, amplitude=false) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:167
+167	            if (time < e.attack)
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff7130, axis=..., low=2614528, high=2614528) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:117
+117	                if (length < 1e-8)
+
+Program received signal SIGINT, Interrupt.
+operator() (__closure=0x7fffffff7110, origin=170.00100708007812, speed=-0.0200042724609375, low=357.999999, high=442.00003151757812, radius=42) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:234
+234	            auto axis = [&](double origin, double speed, double low, double high, double radius)
+
+Program received signal SIGINT, Interrupt.
+0x00000000004d1274 in OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0x17b9520, destination=0x7fffffff8094) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:376
+376	                const auto* other = objects_.get(id);
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7c1e3d6 in __dynamic_cast () from /lib64/libstdc++.so.6
+
+Program received signal SIGINT, Interrupt.
+0x0000000000682f5a in OpenBlood2::CollisionWorld::query (this=0x7fffffff8560, index=1553, from=..., to=..., half=..., hit=..., found=@0x7fffffff774f: false, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:363
+363	            if (!segment_bounds(from, delta, half, triangles_[i].min, triangles_[i].max, found ? hit.fraction : 1))
+
+Program received signal SIGINT, Interrupt.
+0x00000000006803fc in OpenBlood2::(anonymous namespace)::minv (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:83
+83	            return {std::min(a.x, b.x), std::min(a.y, b.y), std::min(a.z, b.z)};
+
+Program received signal SIGINT, Interrupt.
+std::isfinite (__x=-5.59114456) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::precise_dot (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:75
+75	            return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z;
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974d3 in std::isfinite (__x=16.8772202) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x000000000060ca6e in std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::operator[] (this=0x7fffffff8638, __n=72) at /usr/include/c++/16/bits/stl_vector.h:1253
+1253		__glibcxx_requires_subscript(__n);
+
+Program received signal SIGINT, Interrupt.
+0x000000000068041f in OpenBlood2::(anonymous namespace)::maxv (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:86
+86	        {
+
+Program received signal SIGINT, Interrupt.
+std::char_traits<char>::compare (__s1=0xcb1400 "\020", <incomplete sequence \313>, __s2=0x7fffffff7e30 "\r", __n=4323740) at /usr/include/c++/16/bits/char_traits.h:371
+371	      compare(const char_type* __s1, const char_type* __s2, size_t __n)
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7a3d000 in __strlen_avx2 () from /lib64/libc.so.6
+
+Program received signal SIGINT, Interrupt.
+0x00000000004db26f in __gnu_cxx::__normal_iterator<std::array<DVector, 3ul> const*, std::vector<std::array<DVector, 3ul>, std::allocator<std::array<DVector, 3ul> > > >::__normal_iterator (this=<optimized out>, __i=@0xfe7c00: 0x1d93710) at /usr/include/c++/16/bits/stl_iterator.h:1059
+1059	      : _M_current(__i) { }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000660487 in OpenBlood2::DlsSampler::advance_voices (this=0x7fffffff88f0, frames=800, stereo=std::span of length 0) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:525
+525	                v.cursor += v.base_step * v.bend_step * std::exp2(pitch / 1200);
+
+Program received signal SIGINT, Interrupt.
+0x000000000042d2b4 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_S_compare (__n1=14, __n2=140737488319216) at /usr/include/c++/16/bits/basic_string.h:555
+555	      _S_compare(size_type __n1, size_type __n2) _GLIBCXX_NOEXCEPT
+
+Program received signal SIGINT, Interrupt.
+0x00000000006955f3 in OpenBlood2::sweep_object (object=..., from=..., to=..., half=..., hit=...) at /home/yann/projects/lithtech/Blood2/src/engine/world_model.cpp:19
+19	        const auto result = shape.sweep(vector_subtract(from, offset), vector_subtract(to, offset), half, hit);
+
+Program received signal SIGINT, Interrupt.
+0x000000000068006d in OpenBlood2::vector_add (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:52
+52	        return {a.x + b.x, a.y + b.y, a.z + b.z};
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7b6b6d2 in __sin_fma () from /lib64/libm.so.6
+
+Program received signal SIGINT, Interrupt.
+0x00000000004ce01c in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0x13ca5f0, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 230, capacity 230 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:22
+22	                other->handle == ignore_extra || !(other->state.m_Flags & FLAG_SOLID))
+
+Program received signal SIGINT, Interrupt.
+operator() (__closure=0x7fffffff6a90, origin=21.863925933837891, speed=-10000022, low=-144.000001, high=-135.999999, radius=0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:244
+244	                leave = std::min(leave, last);
+
+Program received signal SIGINT, Interrupt.
+0x0000000000680236 in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:69
+69	               std::abs(v.y) <= 1e7f && std::abs(v.z) <= 1e7f;
+
+Program received signal SIGINT, Interrupt.
+0x000000000068099c in OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff6e90, axis=..., low=-128, high=-128) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:143
+143	                low -= radius;
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::mul (a=..., b=1) at /home/yann/projects/lithtech/Blood2/src/engine/model.cpp:17
+17	            return {a.x * b, a.y * b, a.z * b};
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::vector_scale (a=..., s=1) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:60
+60	        return {a.x * s, a.y * s, a.z * s};
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff73d0, axis=..., low=-123.51756286621094, high=-100.48243713378906) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:132
+132	                axis = {float(axis.x / length), float(axis.y / length), float(axis.z / length)};
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7a3c87b in __strcmp_avx2 () from /lib64/libc.so.6
+
+Program received signal SIGINT, Interrupt.
+0x0000000000612496 in std::get<0ul, OpenBlood2::ObjectRecord*, std::default_delete<OpenBlood2::ObjectRecord> > (__t=std::tuple containing = {...}) at /usr/include/c++/16/tuple:2508
+2508	    { return std::__get_helper<__i>(__t); }
+
+Program received signal SIGINT, Interrupt.
+0x000000000068188f in operator() (__closure=0x7fffffff6b70, origin=167.45729064941406, speed=2.5437164306640625, low=128, high=184, radius=0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:236
+236	                low -= radius + 1e-6;
+
+Program received signal SIGINT, Interrupt.
+std::min<unsigned long> (__a=@0x7fffffff7728: 13, __b=@0x7fffffff7720: 13) at /usr/include/c++/16/bits/stl_algobase.h:240
+240	    }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000617c05 in std::_Hashtable<DObject*, std::pair<DObject* const, OpenBlood2::ObjectId>, std::allocator<std::pair<DObject* const, OpenBlood2::ObjectId> >, std::__detail::_Select1st, std::equal_to<DObject*>, std::hash<DObject*>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<false, false, true> >::_M_find_before_node_tr<DObject*> (this=0x7fffffff8698, __bkt=82, __k=@0x7fffffff7b90: 0x2242050, __code=35922000) at /usr/include/c++/16/bits/hashtable.h:2260
+2260		for (__node_ptr __p = static_cast<__node_ptr>(__prev_p->_M_nxt);;
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974d6 in std::isfinite (__x=-32) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000681807 in OpenBlood2::(anonymous namespace)::broadphase (from=..., to=..., half=..., min=..., max=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:226
+226	            return lo.x <= max.x && hi.x >= min.x && lo.y <= max.y && hi.y >= min.y && lo.z <= max.z && hi.z >= min.z;
+
+Program received signal SIGINT, Interrupt.
+std::min<float> (__a=@0x7fffffff7220: -32, __b=@0x7fffffff7210: -32) at /usr/include/c++/16/bits/stl_algobase.h:232
+232	    min(const _Tp& __a, const _Tp& __b)
+
+Program received signal SIGINT, Interrupt.
+0x00000000006804f6 in OpenBlood2::(anonymous namespace)::extents (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:91
+91	            return physics_vector(v) && v.x >= 0 && v.y >= 0 && v.z >= 0;
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974c5 in std::isfinite (__x=170.001007) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+0x0000000000682e82 in OpenBlood2::CollisionWorld::query (this=0x7fffffff8560, index=1828, from=..., to=..., half=..., hit=..., found=@0x7fffffff7daf: true, anchor=0x0, selected=0x0) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:357
+357	            query(n.right, from, to, half, hit, found, anchor, selected);
+
+Program received signal SIGINT, Interrupt.
+0x00000000004974ba in std::isfinite (__x=40.5679131) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::vector_dot (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:64
+64	        return a.x * b.x + a.y * b.y + a.z * b.z;
+
+Program received signal SIGINT, Interrupt.
+0x00000000004aa06a in std::_Rb_tree_node<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >::_M_valptr (this=0x1bd6930) at /usr/include/c++/16/bits/stl_tree.h:235
+235	      { return _M_storage._M_ptr(); }
+
+Program received signal SIGINT, Interrupt.
+std::__shared_ptr<OpenBlood2::ContainerShape const, (__gnu_cxx::_Lock_policy)2>::get (this=0x1c8e4c8) at /usr/include/c++/16/bits/shared_ptr_base.h:1753
+1753	      { return _M_ptr; }
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::vector_subtract (a=..., b=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:56
+56	        return {a.x - b.x, a.y - b.y, a.z - b.z};
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cdfce in OpenBlood2::ServerAdapter::sweep_scene (this=0x7fffffff8750, ignore=0x1572660, from=..., to=..., dims=..., nearest=..., ids=std::vector of length 228, capacity 228 = {...}, ignore_extra=0x0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:21
+21	            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
+
+Program received signal SIGINT, Interrupt.
+std::vector<OpenBlood2::ModelNode, std::allocator<OpenBlood2::ModelNode> >::size (this=0xe4b2c8) at /usr/include/c++/16/bits/stl_vector.h:1110
+1110		if (__dif < 0)
+
+Program received signal SIGINT, Interrupt.
+0x000000000065ff16 in OpenBlood2::DlsSampler::advance_voices (this=0x7fffffff88f0, frames=432, stereo=std::span of length 0) at /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp:502
+502	                if (!r.settings.loop && v.cursor >= wave.samples.size())
+
+Program received signal SIGINT, Interrupt.
+0x00000000004cffc1 in OpenBlood2::ServerAdapter::MoveObject (this=0x7fffffff8750, h=0x1572660, destination=0x7fffffff7ff0) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:278
+278	            auto* obstacle = found ? objects_.get(nearest.object) : nullptr;
+
+Program received signal SIGINT, Interrupt.
+0x00000000006801ce in OpenBlood2::physics_vector (v=...) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:68
+68	        return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z) && std::abs(v.x) <= 1e7f &&
+
+Program received signal SIGINT, Interrupt.
+OpenBlood2::(anonymous namespace)::Sweep::axis (this=0x7fffffff7620, axis=..., low=-32, higSubwayA relocation cycle 0: 8 blocked resizes, 93 original AI shots; no suspended Cultist
+SubwayA relocation cycle 1: 8 blocked resizes, 93 original AI shots; no suspended Cultist
+h=-32) at /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp:125
+125	                const double origin = precise_dot(from, axis) / length, speed = precise_dot(delta, axis) / length;
+
+Program received signal SIGINT, Interrupt.
+std::isfinite (__x=0) at /usr/include/c++/16/cmath:1134
+1134	  { return __builtin_isfinite(__x); }
+[Inferior 1 (process 2312036) exited normally]

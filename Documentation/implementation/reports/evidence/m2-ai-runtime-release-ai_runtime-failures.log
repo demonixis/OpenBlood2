@@ -1,0 +1,14 @@
+470/472 Testing: ai_runtime.failures
+470/472 Test: ai_runtime.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_runtime_tests" "failures" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_runtime.failures" start time: Oct 16 15:13 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.failures" end time: Oct 16 15:13 CEST
+"ai_runtime.failures" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,552 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/sanitize
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 614
+      Start 614: player_controls.corpse_clearance
+
+614: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "clearance" "<external-data-root>"
+614: Working Directory: <workspace>/Blood2/build/sanitize/tests
+614: Test timeout computed to be: 240
+test 43
+      Start  43: world.level_change_private
+
+43: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "level_change_private" "<external-data-root>"
+43: Working Directory: <workspace>/Blood2/build/sanitize/tests
+43: Test timeout computed to be: 120
+43: Malformed destination refusal 0: DAT v56: invalid/unsupported typed property near byte 442114
+43: CityHub transfer 0:
+43: SubwayA transfer 0:
+43: Malformed destination refusal 1: DAT v56: invalid/unsupported typed property near byte 442114
+43: CityHub transfer 1:
+43: SubwayA transfer 1:
+43: Malformed destination refusal 2: DAT v56: invalid/unsupported typed property near byte 442114
+43: CityHub transfer 2:
+43: SubwayA transfer 2:
+43: PASS level_change_private
+ 1/51 Test  #43: world.level_change_private .........   Passed   26.35 sec
+test 44
+      Start  44: world.destination_trial_private
+
+44: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "destination_trial_private" "<external-data-root>"
+44: Working Directory: <workspace>/Blood2/build/sanitize/tests
+44: Test timeout computed to be: 60
+44: Cycle 0 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=488 error=
+44: Cycle 0 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+44: Cycle 0 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+44: Cycle 1 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=488 error=
+44: Cycle 1 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+44: Cycle 1 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+44: Cycle 2 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=488 error=
+44: Cycle 2 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+44: Cycle 2 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+44: PASS destination_trial_private
+ 2/51 Test  #44: world.destination_trial_private ....   Passed   23.30 sec
+test 45
+      Start  45: world.destination_private
+
+45: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "destination_private" "<external-data-root>"
+45: Working Directory: <workspace>/Blood2/build/sanitize/tests
+45: Test timeout computed to be: 60
+45: Cycle 0: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+45: Cycle 0: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+45: Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+45: Cycle 1: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+45: Cycle 1: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+45: Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+45: Cycle 2: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+45: Cycle 2: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+45: Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+45: PASS destination_private
+ 3/51 Test  #45: world.destination_private ..........   Passed   12.42 sec
+test 405
+      Start 405: ai_navigation.cityhub_parallel
+
+405: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "cityhub_parallel" "<external-data-root>"
+405: Working Directory: <workspace>/Blood2/build/sanitize/tests
+405: Test timeout computed to be: 90
+405: CityHub parallel contact 0 cycle 0: planned=0 outcome=3 fallback=1 rays=14 reason=No source lateral turn found
+405: CityHub parallel contact 1 cycle 0: planned=0 outcome=3 fallback=1 rays=13 reason=No source lateral turn found
+405: CityHub parallel contact 0 cycle 1: planned=0 outcome=3 fallback=1 rays=14 reason=No source lateral turn found
+405: CityHub parallel contact 1 cycle 1: planned=0 outcome=3 fallback=1 rays=13 reason=No source lateral turn found
+ 4/51 Test #405: ai_navigation.cityhub_parallel .....   Passed    7.03 sec
+test 798
+      Start 798: death_effects.gibs
+
+798: Test command: <workspace>/Blood2/build/sanitize/tests/death_effect_tests "gibs" "<external-data-root>"
+798: Working Directory: <workspace>/Blood2/build/sanitize/tests
+798: Test timeout computed to be: 90
+798: gib cycle=0 count=7 impacts=5 final id=7
+798: gib cycle=1 count=7 impacts=5 final id=14
+798: gib cycle=2 count=7 impacts=5 final id=21
+ 5/51 Test #798: death_effects.gibs .................   Passed    1.73 sec
+test 797
+      Start 797: death_effects.burn
+
+797: Test command: <workspace>/Blood2/build/sanitize/tests/death_effect_tests "burn" "<external-data-root>"
+797: Working Directory: <workspace>/Blood2/build/sanitize/tests
+797: Test timeout computed to be: 90
+797: CultistAI burned: particles=142 smoke start=5.07 independent corpse complete
+797: CivilianAI burned: particles=142 smoke start=5.07 independent corpse complete
+ 6/51 Test #797: death_effects.burn .................   Passed    1.21 sec
+test 802
+      Start 802: death_effects.lifetime
+
+802: Test command: <workspace>/Blood2/build/sanitize/tests/death_effect_tests "lifetime" "<external-data-root>"
+802: Working Directory: <workspace>/Blood2/build/sanitize/tests
+802: Test timeout computed to be: 90
+ 7/51 Test #802: death_effects.lifetime .............   Passed    1.28 sec
+test 511
+      Start 511: corpses.catalog
+
+511: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "catalog" "<external-data-root>"
+511: Working Directory: <workspace>/Blood2/build/sanitize/tests
+511: Test timeout computed to be: 90
+511: Death clip 32 duration 900
+511: Death clip 33 duration 7000
+511: Death clip 34 duration 1700
+511: Death clip 35 duration 2100
+511: Death clip 36 duration 1900
+511: Death clip 37 duration 1900
+511: Death clip 38 duration 1500
+511: Death clip 39 duration 1600
+511: Death clip 40 duration 6000
+511: Death clip 41 duration 2000
+511: Death clip 42 duration 5500
+511: Death clip 43 duration 7000
+511: CultistAI cycle 0: source removed; corpse clip 33, sound starts 1, pool request 1
+511: CivilianAI cycle 0: source removed; corpse clip 34, sound starts 1, pool request 1
+511: CultistAI cycle 1: source removed; corpse clip 32, sound starts 1, pool request 1
+511: CivilianAI cycle 1: source removed; corpse clip 34, sound starts 1, pool request 1
+ 8/51 Test #511: corpses.catalog ....................   Passed    1.03 sec
+test 404
+      Start 404: ai_navigation.subway
+
+404: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "subway" "<external-data-root>"
+404: Working Directory: <workspace>/Blood2/build/sanitize/tests
+404: Test timeout computed to be: 90
+404: cycle=0 real SubwayA local clearance at -32 170 -3224
+404: cycle=1 real SubwayA local clearance at -32 170 -3224
+ 9/51 Test #404: ai_navigation.subway ...............   Passed    4.34 sec
+test 799
+      Start 799: death_effects.limbs
+
+799: Test command: <workspace>/Blood2/build/sanitize/tests/death_effect_tests "limbs" "<external-data-root>"
+799: Working Directory: <workspace>/Blood2/build/sanitize/tests
+799: Test timeout computed to be: 90
+10/51 Test #799: death_effects.limbs ................   Passed    0.48 sec
+test 800
+      Start 800: death_effects.damage
+
+800: Test command: <workspace>/Blood2/build/sanitize/tests/death_effect_tests "damage" "<external-data-root>"
+800: Working Directory: <workspace>/Blood2/build/sanitize/tests
+800: Test timeout computed to be: 90
+11/51 Test #800: death_effects.damage ...............   Passed    0.53 sec
+test 801
+      Start 801: death_effects.particles
+
+801: Test command: <workspace>/Blood2/build/sanitize/tests/death_effect_tests "particles" "<external-data-root>"
+801: Working Directory: <workspace>/Blood2/build/sanitize/tests
+801: Test timeout computed to be: 90
+12/51 Test #801: death_effects.particles ............   Passed    0.53 sec
+test 27
+      Start  27: world.destination_trials
+
+27: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "destination_trials" "<workspace>/Blood2/build/sanitize/tests/world-fixtures/destination_trials"
+27: Working Directory: <workspace>/Blood2/build/sanitize/tests
+27: Test timeout computed to be: 20
+27: trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+27: trial4: loaded=1 entered=1 cleanup=1 failed=1 error=
+27: trial2: loaded=1 entered=0 cleanup=1 failed=0 error=No single-player GameStartPoint
+27: trial3: loaded=1 entered=0 cleanup=1 failed=0 error=Start point has no supported ground collision
+27: broken: loaded=0 entered=0 cleanup=1 failed=0 error=DAT v56: invalid/unsupported section offsets near byte 4
+27: missing: loaded=0 entered=0 cleanup=1 failed=0 error=Resource not found: worlds/missing.dat
+27: trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+27: PASS destination_trials
+13/51 Test  #27: world.destination_trials ...........   Passed    0.31 sec
+test 30
+      Start  30: world.destination_lifetime
+
+30: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "destination_lifetime" "<workspace>/Blood2/build/sanitize/tests/world-fixtures/destination_lifetime"
+30: Working Directory: <workspace>/Blood2/build/sanitize/tests
+30: Test timeout computed to be: 20
+30: PASS destination_lifetime
+14/51 Test  #30: world.destination_lifetime .........   Passed    0.08 sec
+test 25
+      Start  25: world.level_change
+
+25: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "level_change" "<workspace>/Blood2/build/sanitize/tests/world-fixtures/level_change"
+25: Working Directory: <workspace>/Blood2/build/sanitize/tests
+25: Test timeout computed to be: 20
+25: trial1: Destination world texture t.dtx: Missing exact-path resource
+25: trial2: No single-player GameStartPoint
+25: trial3: Start point has no supported ground collision
+25: trial4: Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+25: trial5: Destination initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+25: trial6: Destination start trigger requested another level during entry
+25: broken: DAT v56: invalid/unsupported section offsets near byte 4
+25: missing: Resource not found: worlds/missing.dat
+25: Commit 0:
+25: Commit 1:
+25: Commit 2:
+25: PASS level_change
+15/51 Test  #25: world.level_change .................   Passed    0.35 sec
+test 510
+      Start 510: corpses.accumulation
+
+510: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "accumulation" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/accumulation"
+510: Working Directory: <workspace>/Blood2/build/sanitize/tests
+510: Test timeout computed to be: 30
+16/51 Test #510: corpses.accumulation ...............   Passed    0.04 sec
+test 507
+      Start 507: corpses.lifetime
+
+507: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "lifetime" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/lifetime"
+507: Working Directory: <workspace>/Blood2/build/sanitize/tests
+507: Test timeout computed to be: 30
+17/51 Test #507: corpses.lifetime ...................   Passed    0.04 sec
+test 506
+      Start 506: corpses.failures
+
+506: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "failures" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/failures"
+506: Working Directory: <workspace>/Blood2/build/sanitize/tests
+506: Test timeout computed to be: 30
+18/51 Test #506: corpses.failures ...................   Passed    0.04 sec
+test 505
+      Start 505: corpses.transfer
+
+505: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "transfer" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/transfer"
+505: Working Directory: <workspace>/Blood2/build/sanitize/tests
+505: Test timeout computed to be: 30
+19/51 Test #505: corpses.transfer ...................   Passed    0.04 sec
+test 504
+      Start 504: corpses.mappings
+
+504: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "mappings" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/mappings"
+504: Working Directory: <workspace>/Blood2/build/sanitize/tests
+504: Test timeout computed to be: 30
+20/51 Test #504: corpses.mappings ...................   Passed    0.04 sec
+test 508
+      Start 508: corpses.sounds
+
+508: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "sounds" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/sounds"
+508: Working Directory: <workspace>/Blood2/build/sanitize/tests
+508: Test timeout computed to be: 30
+21/51 Test #508: corpses.sounds .....................   Passed    0.04 sec
+test 509
+      Start 509: corpses.gates
+
+509: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "gates" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/gates"
+509: Working Directory: <workspace>/Blood2/build/sanitize/tests
+509: Test timeout computed to be: 30
+22/51 Test #509: corpses.gates ......................   Passed    0.04 sec
+test 1
+      Start   1: objects.builtin_model
+
+1: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "builtin_model"
+1: Working Directory: <workspace>/Blood2/build/sanitize/tests
+1: Test timeout computed to be: 10
+1: PASS builtin_model
+23/51 Test   #1: objects.builtin_model ..............   Passed    0.02 sec
+test 11
+      Start  11: objects.unsupported_teardown
+
+11: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "unsupported_teardown"
+11: Working Directory: <workspace>/Blood2/build/sanitize/tests
+11: Test timeout computed to be: 10
+11: PASS unsupported_teardown
+24/51 Test  #11: objects.unsupported_teardown .......   Passed    0.05 sec
+test 402
+      Start 402: ai_navigation.limits
+
+402: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "limits"
+402: Working Directory: <workspace>/Blood2/build/sanitize/tests
+402: Test timeout computed to be: 30
+402: bounded search: 8193 ray attempts, 4095 iterations
+25/51 Test #402: ai_navigation.limits ...............   Passed    0.13 sec
+test 29
+      Start  29: world.destination_schema
+
+29: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "destination_schema" "<workspace>/Blood2/build/sanitize/tests/world-fixtures/destination_schema"
+29: Working Directory: <workspace>/Blood2/build/sanitize/tests
+29: Test timeout computed to be: 20
+29: PASS destination_schema
+26/51 Test  #29: world.destination_schema ...........   Passed    0.02 sec
+test 10
+      Start  10: objects.messages_strings
+
+10: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "messages_strings"
+10: Working Directory: <workspace>/Blood2/build/sanitize/tests
+10: Test timeout computed to be: 10
+10: PASS messages_strings
+27/51 Test  #10: objects.messages_strings ...........   Passed    0.04 sec
+test 28
+      Start  28: world.destination_messages
+
+28: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "destination_messages" "<workspace>/Blood2/build/sanitize/tests/world-fixtures/destination_messages"
+28: Working Directory: <workspace>/Blood2/build/sanitize/tests
+28: Test timeout computed to be: 20
+28: PASS destination_messages
+28/51 Test  #28: world.destination_messages .........   Passed    0.02 sec
+test 397
+      Start 397: ai_navigation.parallel_axes
+
+397: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "parallel_axes"
+397: Working Directory: <workspace>/Blood2/build/sanitize/tests
+397: Test timeout computed to be: 30
+29/51 Test #397: ai_navigation.parallel_axes ........   Passed    0.02 sec
+test 12
+      Start  12: objects.creation_failures
+
+12: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "creation_failures"
+12: Working Directory: <workspace>/Blood2/build/sanitize/tests
+12: Test timeout computed to be: 10
+12: PASS creation_failures
+30/51 Test  #12: objects.creation_failures ..........   Passed    0.03 sec
+test 403
+      Start 403: ai_navigation.lifetime
+
+403: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "lifetime"
+403: Working Directory: <workspace>/Blood2/build/sanitize/tests
+403: Test timeout computed to be: 30
+31/51 Test #403: ai_navigation.lifetime .............   Passed    0.07 sec
+test 4
+      Start   4: objects.reasons_properties
+
+4: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "reasons_properties"
+4: Working Directory: <workspace>/Blood2/build/sanitize/tests
+4: Test timeout computed to be: 10
+4: PASS reasons_properties
+32/51 Test   #4: objects.reasons_properties .........   Passed    0.02 sec
+test 9
+      Start   9: objects.links_lists
+
+9: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "links_lists"
+9: Working Directory: <workspace>/Blood2/build/sanitize/tests
+9: Test timeout computed to be: 10
+9: PASS links_lists
+33/51 Test   #9: objects.links_lists ................   Passed    0.02 sec
+test 2
+      Start   2: objects.original_objects
+
+2: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "original_objects"
+2: Working Directory: <workspace>/Blood2/build/sanitize/tests
+2: Test timeout computed to be: 10
+2: PASS original_objects
+34/51 Test   #2: objects.original_objects ...........   Passed    0.02 sec
+test 3
+      Start   3: objects.nested_creation
+
+3: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "nested_creation"
+3: Working Directory: <workspace>/Blood2/build/sanitize/tests
+3: Test timeout computed to be: 10
+3: PASS nested_creation
+35/51 Test   #3: objects.nested_creation ............   Passed    0.02 sec
+test 6
+      Start   6: objects.deferred_removal
+
+6: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "deferred_removal"
+6: Working Directory: <workspace>/Blood2/build/sanitize/tests
+6: Test timeout computed to be: 10
+6: PASS deferred_removal
+36/51 Test   #6: objects.deferred_removal ...........   Passed    0.02 sec
+test 8
+      Start   8: objects.handles_selection
+
+8: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "handles_selection"
+8: Working Directory: <workspace>/Blood2/build/sanitize/tests
+8: Test timeout computed to be: 10
+8: PASS handles_selection
+37/51 Test   #8: objects.handles_selection ..........   Passed    0.02 sec
+test 7
+      Start   7: objects.aggregate_dispatch
+
+7: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "aggregate_dispatch"
+7: Working Directory: <workspace>/Blood2/build/sanitize/tests
+7: Test timeout computed to be: 10
+7: PASS aggregate_dispatch
+38/51 Test   #7: objects.aggregate_dispatch .........   Passed    0.02 sec
+test 5
+      Start   5: objects.scheduling
+
+5: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "scheduling"
+5: Working Directory: <workspace>/Blood2/build/sanitize/tests
+5: Test timeout computed to be: 10
+5: PASS scheduling
+39/51 Test   #5: objects.scheduling .................   Passed    0.02 sec
+test 396
+      Start 396: ai_navigation.clearance
+
+396: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "clearance"
+396: Working Directory: <workspace>/Blood2/build/sanitize/tests
+396: Test timeout computed to be: 30
+40/51 Test #396: ai_navigation.clearance ............   Passed    0.03 sec
+test 400
+      Start 400: ai_navigation.detour
+
+400: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "detour"
+400: Working Directory: <workspace>/Blood2/build/sanitize/tests
+400: Test timeout computed to be: 30
+41/51 Test #400: ai_navigation.detour ...............   Passed    0.02 sec
+test 395
+      Start 395: ai_navigation.sample
+
+395: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "sample"
+395: Working Directory: <workspace>/Blood2/build/sanitize/tests
+395: Test timeout computed to be: 30
+42/51 Test #395: ai_navigation.sample ...............   Passed    0.02 sec
+test 401
+      Start 401: ai_navigation.blocked
+
+401: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "blocked"
+401: Working Directory: <workspace>/Blood2/build/sanitize/tests
+401: Test timeout computed to be: 30
+43/51 Test #401: ai_navigation.blocked ..............   Passed    0.02 sec
+test 398
+      Start 398: ai_navigation.rays
+
+398: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "rays"
+398: Working Directory: <workspace>/Blood2/build/sanitize/tests
+398: Test timeout computed to be: 30
+44/51 Test #398: ai_navigation.rays .................   Passed    0.02 sec
+test 399
+      Start 399: ai_navigation.direct
+
+399: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "direct"
+399: Working Directory: <workspace>/Blood2/build/sanitize/tests
+399: Test timeout computed to be: 30
+45/51 Test #399: ai_navigation.direct ...............   Passed    0.02 sec
+test 803
+      Start 803: blood_splats.formulas
+
+803: Test command: <workspace>/Blood2/build/sanitize/tests/blood_splat_tests "formulas" "<workspace>/Blood2/build/sanitize/tests/blood-splats-formulas"
+803: Working Directory: <workspace>/Blood2/build/sanitize/tests
+803: Test timeout computed to be: 30
+46/51 Test #803: blood_splats.formulas ..............   Passed    0.02 sec
+test 804
+      Start 804: blood_splats.region
+
+804: Test command: <workspace>/Blood2/build/sanitize/tests/blood_splat_tests "region" "<workspace>/Blood2/build/sanitize/tests/blood-splats-region"
+804: Working Directory: <workspace>/Blood2/build/sanitize/tests
+804: Test timeout computed to be: 30
+47/51 Test #804: blood_splats.region ................   Passed    0.02 sec
+test 805
+      Start 805: blood_splats.failures
+
+805: Test command: <workspace>/Blood2/build/sanitize/tests/blood_splat_tests "failures" "<workspace>/Blood2/build/sanitize/tests/blood-splats-failures"
+805: Working Directory: <workspace>/Blood2/build/sanitize/tests
+805: Test timeout computed to be: 30
+48/51 Test #805: blood_splats.failures ..............   Passed    0.05 sec
+test 806
+      Start 806: blood_splats.session
+
+806: Test command: <workspace>/Blood2/build/sanitize/tests/blood_splat_tests "session" "<workspace>/Blood2/build/sanitize/tests/blood-splats-session"
+806: Working Directory: <workspace>/Blood2/build/sanitize/tests
+806: Test timeout computed to be: 30
+49/51 Test #806: blood_splats.session ...............   Passed    0.03 sec
+test 807
+      Start 807: blood_splats.private
+
+807: Test command: <workspace>/Blood2/build/sanitize/tests/blood_splat_tests "private" "<external-data-root>"
+807: Working Directory: <workspace>/Blood2/build/sanitize/tests
+807: Test timeout computed to be: 120
+807: Private cycle 0: original Cultist death -> corpse -> pool, real 3 SPR/DTX variants, source-independent growth and unload
+807: Private cycle 1: original Cultist death -> corpse -> pool, real 3 SPR/DTX variants, source-independent growth and unload
+807: Private cycle 2: original Cultist death -> corpse -> pool, real 3 SPR/DTX variants, source-independent growth and unload
+50/51 Test #807: blood_splats.private ...............   Passed    8.49 sec
+614: Original SubwayA camera intro expired after 12.0167 simulation seconds
+614: Approached encounter at z=-2338.28
+614: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=0
+614: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+614: Post-kill position=-32,170.001,-1854.18 camera=0 yaw=0
+614: Walked past killed Cultist to z=-1854.18
+614: Approached encounter at z=-1742.25
+614: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=0
+614: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+614: Post-kill position=-32,170.001,-1340.93 camera=0 yaw=-3.72529e-09
+614: Walked past killed Cultist to z=-1340.93
+614: Original SubwayA camera intro expired after 12.0167 simulation seconds
+614: Approached encounter at z=-2341.42
+614: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=0
+614: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+614: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+614: Walked past killed Cultist to z=-1861.92
+614: Approached encounter at z=-1745.4
+614: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=0
+614: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+614: Post-kill position=-32,170.001,-1344.07 camera=0 yaw=3.72529e-09
+614: Walked past killed Cultist to z=-1344.07
+51/51 Test #614: player_controls.corpse_clearance ...   Passed  105.54 sec
+
+The following tests passed:
+	world.level_change_private
+	world.destination_trial_private
+	world.destination_private
+	ai_navigation.cityhub_parallel
+	death_effects.gibs
+	death_effects.burn
+	death_effects.lifetime
+	corpses.catalog
+	ai_navigation.subway
+	death_effects.limbs
+	death_effects.damage
+	death_effects.particles
+	world.destination_trials
+	world.destination_lifetime
+	world.level_change
+	corpses.accumulation
+	corpses.lifetime
+	corpses.failures
+	corpses.transfer
+	corpses.mappings
+	corpses.sounds
+	corpses.gates
+	objects.builtin_model
+	objects.unsupported_teardown
+	ai_navigation.limits
+	world.destination_schema
+	objects.messages_strings
+	world.destination_messages
+	ai_navigation.parallel_axes
+	objects.creation_failures
+	ai_navigation.lifetime
+	objects.reasons_properties
+	objects.links_lists
+	objects.original_objects
+	objects.nested_creation
+	objects.deferred_removal
+	objects.handles_selection
+	objects.aggregate_dispatch
+	objects.scheduling
+	ai_navigation.clearance
+	ai_navigation.detour
+	ai_navigation.sample
+	ai_navigation.blocked
+	ai_navigation.rays
+	ai_navigation.direct
+	blood_splats.formulas
+	blood_splats.region
+	blood_splats.failures
+	blood_splats.session
+	blood_splats.private
+	player_controls.corpse_clearance
+
+100% tests passed, 0 tests failed out of 51
+
+Label Time Summary:
+ai_navigation      =  11.71 sec*proc (11 tests)
+blood_splats       =   8.61 sec*proc (5 tests)
+corpses            =   1.31 sec*proc (8 tests)
+death_effects      =   5.77 sec*proc (6 tests)
+headless           = 196.09 sec*proc (51 tests)
+objects            =   0.30 sec*proc (12 tests)
+player_controls    = 105.54 sec*proc (1 test)
+private            = 194.27 sec*proc (14 tests)
+world              =  62.85 sec*proc (8 tests)
+
+Total Test time (real) = 105.55 sec

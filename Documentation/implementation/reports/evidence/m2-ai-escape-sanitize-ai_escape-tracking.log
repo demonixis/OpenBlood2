@@ -1,0 +1,14 @@
+429/431 Testing: ai_escape.tracking
+429/431 Test: ai_escape.tracking
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_escape_tests" "tracking"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_escape.tracking" start time: Oct 16 14:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.tracking" end time: Oct 16 14:25 CEST
+"ai_escape.tracking" time elapsed: 00:00:00
+----------------------------------------------------------

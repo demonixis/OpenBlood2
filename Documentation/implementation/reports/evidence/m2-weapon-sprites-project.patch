@@ -1,0 +1,1504 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 801f132..e541141 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -484,3 +484,7 @@ Reverb/priority arbitration and other required services remain unavailable; safe
+ The [weapon impact continuation](../Documentation/Implementation/M2_WEAPON_IMPACTS.md) connects original vector continuation, selected material WAVs and impact hearing.
+ Read [contracts](docs/WEAPON_IMPACT_CONTRACTS.md). Preserve source branch order, raw versus stopping material, fixed endpoint, one-unit advance and B2_LITE variants.
+ Keep the 64-contact bound, explicit partial failures, checked callback lifetime and detached voices. Impact visuals/decals, safe NEW_LEVEL and M2 remain open.
++
++The [weapon impact sprite continuation](../Documentation/Implementation/M2_WEAPON_SPRITES.md) connects original wood/stone flashes and smoke with tint, detached lifetime and in-game inspection.
++Read [contracts](docs/WEAPON_SPRITE_CONTRACTS.md). Preserve first-update/delay quirks, per-callback motion, first-container visibility and independent sibling failures.
++Other impact components remain unavailable. User playtest fixes (mouse look/fire, non-attacking NPCs, train glass) take priority over more FX; M2 stays open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b9be8ab..f1fd4e4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/destination_trial.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index cf9ff2f..353edaa 100644
+--- a/README.md
++++ b/README.md
+@@ -527,3 +527,6 @@ Earlier fire-audio omissions are superseded for these two weapons; reverb, safe
+ 
+ The [weapon impact continuation](../Documentation/Implementation/M2_WEAPON_IMPACTS.md) connects original glass/FireThrough/liquid vector rules, material WAV playback and impact hearing, with ordered contact inspection.
+ Earlier impact-audio omissions are superseded for Beretta/knife; impact visuals, safe NEW_LEVEL and the actual M2 gate remain open.
++
++The [weapon impact sprite continuation](../Documentation/Implementation/M2_WEAPON_SPRITES.md) connects original wood/stone flashes and smoke with tint, detached lifetime and in-game inspection.
++Other impact components remain unavailable. User playtest fixes (mouse look/fire, non-attacking NPCs, train glass) take priority over more FX; M2 stays open.
+diff --git a/docs/EXPLOSION_SPRITE_CONTRACTS.md b/docs/EXPLOSION_SPRITE_CONTRACTS.md
+index 9acf219..6f9fcdc 100644
+--- a/docs/EXPLOSION_SPRITE_CONTRACTS.md
++++ b/docs/EXPLOSION_SPRITE_CONTRACTS.md
+@@ -106,3 +106,5 @@ are historical; fragments/flames, illumination and the full M2 gate remain open.
+ Continuation: [original explosion flame particles](EXPLOSION_FLAME_CONTRACTS.md)
+ now implements the selected Tesla component. Earlier blanket flame omissions are
+ historical for that recipe; surface illumination and the actual M2 gate remain open.
++
++Continuation: [weapon impact flash/smoke](WEAPON_SPRITE_CONTRACTS.md) supersedes the earlier blanket impact-visual omission for wood/stone bullet sprites only. Other composite components and M2 remain open.
+diff --git a/docs/M2_WEAPON_SPRITE_SOURCES.json b/docs/M2_WEAPON_SPRITE_SOURCES.json
+new file mode 100644
+index 0000000..fc1b578
+--- /dev/null
++++ b/docs/M2_WEAPON_SPRITE_SOURCES.json
+@@ -0,0 +1,57 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "6264522fa95f9fb4e49be8e76988b94a057f2831",
++  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
++      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
++      "use": "UpdateWeaponFX wood/stone ammo selection 580-648; AddImpact normal offset"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/WeaponFX.cpp",
++      "sha256": "95230fcffd888751528e1a9f1d4353844ebfce5dbf5ef0a46cb0cf0a8a1b0e25",
++      "use": "CreateObject normalization/first visible point container and FX order 98-168; CreateFlash 683-705; CreateSmoke 784-831; missing CreateBubbles explicitly retained"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/SmokeImpactFX.cpp",
++      "sha256": "85b54d4bc259e1ee58fd311acb77bf1d4d60f17b373f6b150bf43aa94abc6e4a",
++      "use": "Constructor, Init, CreateObject and Update lifecycle (selected whole file)"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/SmokeImpactFX.h",
++      "sha256": "37044fe547cedb817f7362c734140e0e840e1cea8935d68d319b538f7b84ebb2",
++      "use": "SMOKECREATESTRUCT defaults and original state layout"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/SpecialFX.h",
++      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
++      "use": "Existing default callback scheduling reference"
++    },
++    {
++      "path": "sources/blood2/Shared/SharedDefs.h",
++      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "use": "Unconditional B2_LITE/NRES"
++    },
++    {
++      "path": "sources/blood2/Shared/ContainerCodes.h",
++      "sha256": "e06bd4c2b5a9a4b32c1883f9e3f59bb1ffe419d7eb4232a2a3f6570c400fce64",
++      "use": "IsLiquid including FREEFALL"
++    }
++  ],
++  "adaptations": [
++    "Typed owned bounded sprite state and per-world store; no new globals or dependencies.",
++    "Existing per-weapon portable RNG; no claim of full missing-branch or CRT ordering.",
++    "Existing 1ms FX scheduling, bounded finite durations and transforms; source per-update motion retained.",
++    "Original first-container visibility option; foot query default unchanged.",
++    "Existing diagnostic sprite renderer extended with RGB modulation; no retail raster claim."
++  ],
++  "unavailable": [
++    "bubbles",
++    "marks/decals",
++    "sparks/fragments/muzzle smoke",
++    "complete WeaponFX",
++    "safe NEW_LEVEL",
++    "actual M2 acceptance"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 123838c..813779d 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -813,3 +813,11 @@ BaseCharacter flesh flags are integrated. See [ledger](M2_WEAPON_IMPACT_SOURCES.
+ and [contracts](WEAPON_IMPACT_CONTRACTS.md). Typed bounded continuation, later-engine
+ interior policy, owned client audio RNG/strings and checked callback lifetime are
+ explicit adaptations. Reference sources/assets and dependency pins remain unchanged.
++
++## Original weapon impact sprites
++
++Selected CWeaponFX flash/smoke recipes and CSmokeImpactFX lifecycle are integrated
++with typed owned settings, bounded detached lifetime and existing SDL_GPU sprites.
++See [ledger](M2_WEAPON_SPRITE_SOURCES.json) and [contracts](WEAPON_SPRITE_CONTRACTS.md).
++Per-callback motion, first-update/delay quirks and wood tint are retained; absent
++composite branches and portable RNG/raster differences stay explicit.
+diff --git a/docs/SPRITE_VIEW_CONTRACTS.md b/docs/SPRITE_VIEW_CONTRACTS.md
+index c2c6e58..8e9de9a 100644
+--- a/docs/SPRITE_VIEW_CONTRACTS.md
++++ b/docs/SPRITE_VIEW_CONTRACTS.md
+@@ -85,3 +85,5 @@ Other ObjectFX modes, required effects and the actual M2 gate remain open.
+ Continuation: [original explosion flame particles](EXPLOSION_FLAME_CONTRACTS.md)
+ now implements the selected Tesla component. Earlier blanket flame omissions are
+ historical for that recipe; surface illumination and the actual M2 gate remain open.
++
++Continuation: [weapon impact flash/smoke](WEAPON_SPRITE_CONTRACTS.md) supersedes the earlier blanket impact-visual omission for wood/stone bullet sprites only. Other composite components and M2 remain open.
+diff --git a/docs/WEAPON_IMPACT_CONTRACTS.md b/docs/WEAPON_IMPACT_CONTRACTS.md
+index 9f185c6..846bda8 100644
+--- a/docs/WEAPON_IMPACT_CONTRACTS.md
++++ b/docs/WEAPON_IMPACT_CONTRACTS.md
+@@ -85,3 +85,5 @@ This is selected impact **audio and gameplay**, not complete WeaponFX. Sparks, b
+ smoke, liquid colors/splashes, tracers, decals and their source random ordering remain
+ unavailable. Other weapons, retail parity, required world services, Gideon and safe
+ NEW_LEVEL still keep the actual M2 exit gate open.
++
++Continuation: [weapon impact flash/smoke](WEAPON_SPRITE_CONTRACTS.md) supersedes the earlier blanket impact-visual omission for wood/stone bullet sprites only. Other composite components and M2 remain open.
+diff --git a/docs/WEAPON_SPRITE_CONTRACTS.md b/docs/WEAPON_SPRITE_CONTRACTS.md
+new file mode 100644
+index 0000000..6a4ed6b
+--- /dev/null
++++ b/docs/WEAPON_SPRITE_CONTRACTS.md
+@@ -0,0 +1,82 @@
++# Original weapon impact flash and smoke
++
++Selected original `CWeapon::UpdateWeaponFX`, `CWeaponFX::CreateFlash/CreateSmoke`
++and `CSmokeImpactFX` lifecycle now execute. See [source ledger](M2_WEAPON_SPRITE_SOURCES.json)
++and [evidence](../../Documentation/Implementation/M2_WEAPON_SPRITES.md). This extends
++[vector impacts](WEAPON_IMPACT_CONTRACTS.md), [sprite presentation](SPRITE_VIEW_CONTRACTS.md)
++and [explosion sprites](EXPLOSION_SPRITE_CONTRACTS.md). **M2 remains incomplete.**
++
++## Original selection and recipe
++
++Only bullet/shell/BMG impacts whose raw surface is WOOD or STONE request these
++sprites. BUILDING shares stone audio but not this visual branch. Knife, metal,
++liquid and unknown surfaces do not acquire invented smoke/flash. Selection runs
++before the existing material sound, using the existing owned per-weapon client RNG.
++Missing marks and other original visual branches still consume no draws; complete
++retail RNG ordering is not claimed. Gameplay shot/damage randomness remains separate.
++
++The original client normal is normalized after the server AddImpact offset of
++normal * 1.25. The destination query selects the first overlapping container and
++only uses its code if USRFLG_VISIBLE is present. A hidden first result masks later
++visible overlaps. Stable slot order is the existing replacement for unavailable
++retail BSP ordering. The default footstep query continues to include hidden volumes.
++In liquid (including original FREEFALL classification), the flash is suppressed
++and smoke requests bubbles. That SparkFX service remains explicitly unavailable:
++record a failed report and create neither a flash nor an incorrect underwater smoke.
++
++On dry wood/stone, B2_LITE restricts variants to 1..3. CreateFlash selects
++`Sprites/impact01..03.spr`, adds one normal unit, uses constant XY scale .1,
++alpha 1, duration .15 s, fade/waveform/alignment zero and the already ported
++CExplosionSpriteFX. CreateSmoke adds three normal units, starts at XY scale .1,
++grows to .35 in one second, uses initial alpha .65 and linear fade, and selects
++`Sprites/smokepuff1..3.spr`. It draws vertical gravity .05.. .1 before selecting
++the smoke resource. Wood RGB is (1,.8,.6); stone keeps the created white color.
++Motion is enabled only for normalized normal.y > -.3. Zero/invalid normals fail.
++
++## CSmokeImpactFX lifecycle
++
++Owned typed settings replace legacy client objects and string pointers. Preserve:
++
++- Creation sets position/scale only; actual color is white/opaque until Update.
++- The first active update starts the lifetime, even when creation happened earlier.
++- Start-delay zero is the original sentinel: an update at time zero can rearm it.
++  The tick that finishes a delay still returns hidden; the next callback starts.
++- Scale change tests only X/Y, ignoring the supplied update-scale flag. The rotate
++  flag is stored but unused. Componentwise upper clamps preserve shrinking quirks.
++- Each eligible callback adds deceleration to velocity, then velocity and gravity
++  to position. These are per-callback additions, never multiplied by frame seconds.
++- Fade uses the initial alpha, lower-clamped to zero. Final motion/scale/fade run
++  before the strict lifetime return removes the effect.
++
++The existing 1 ms CSpecialFX scheduling policy wraps those original updates;
++SPR animation advances independently with elapsed time. Nonfinite/reversed clocks
++fail. Positions/velocities/scales obey engine finite bounds; scales are nonnegative,
++color/alpha are [0,1], duration is (0,600], delay [0,600] and resource length <=1000
++without embedded NUL. Nonpositive/infinite original effects are outside this bounded
++subset. Null sprite name uses smokepuff1; an authored empty name fails explicitly.
++
++## Ownership, renderer and inspection
++
++The adapter owns up to 256 combined flashes/smoke and the last 64 reports. Effects
++and reports use non-reused IDs across unload. An event ID means a retained report,
++not successful creation. A failed flash preserves a successfully created smoke and
++vice versa; failures never suppress original weapon damage, audio or hearing.
++Source/weapon removal does not kill detached visuals. Session steps advance them
++outside UI; unload clears them before resource stores. Update failures remain
++inspectable and return failure from the session. No mutable original global is
++introduced; destination rehearsals have their own effect store.
++
++The existing depth-tested straight-alpha sprite pass now accepts per-instance RGB,
++using its existing vertex tint path. It multiplies decoded DTX color and alpha by
++client effect state. No new shader or dependency is needed. Snapshots only read
++clocks and transforms. Missing current DTX frames remain explicit presentation errors,
++even if SPR creation succeeded. Flashes/smoke have their own snapshot ID namespace.
++The Sprites inspector shows current positions, scales, tint/alpha, callback counts,
++first-update/delay state, resource/decoded frame, prepared quads and retained failures.
++Player/AI impact inspection links its report ID to those details.
++
++Marks/decals, sparks, wood fragments, muzzle smoke, bubbles and remaining composite
++components are still unavailable. Current fullbright rasterization is replacement
++presentation, not retail parity. User playtest issues (mouse look/fire, NPC attack
++activation, missing train glass) take priority over additional FX work. Safe
++NEW_LEVEL, Gideon and other required services still keep the M2 gate open.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 223ee22..100d585 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -1527,6 +1527,10 @@ namespace OpenBlood2
+                                              : (impact.effect.sound ? "released" : "no voice"));
+                     if (!impact.effect.error.empty())
+                         ImGui::TextWrapped("Audio failure: %s", impact.effect.error.c_str());
++                    ImGui::Text("Flash/smoke report %llu (details in Sprites)",
++                                (unsigned long long)impact.effect.sprite_event);
++                    if (!impact.effect.sprite_error.empty())
++                        ImGui::TextWrapped("Visual failure: %s", impact.effect.sprite_error.c_str());
+                     ImGui::Text("Impact hearing: %u deliveries / %s", impact.alert.delivered,
+                                 impact.alert.complete ? "complete" : "not completed");
+                     if (!impact.alert.error.empty())
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index ecbf0be..1bc0df5 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -40,6 +40,7 @@ namespace OpenBlood2
+         bool select_sprites = false;
+         ObjectId sprite_selection{};
+         void draw_sprites(GameSession&, ObjectSelection&);
++        void draw_weapon_sprites(const GameSession&);
+         bool select_world_sounds = false;
+         SoundId world_sound_selection = 0;
+         void draw_world_sounds(GameSession&);
+diff --git a/src/app/inspector_sprites.cpp b/src/app/inspector_sprites.cpp
+index ffd6c31..91f74fb 100644
+--- a/src/app/inspector_sprites.cpp
++++ b/src/app/inspector_sprites.cpp
+@@ -9,6 +9,7 @@ namespace OpenBlood2
+         ImGui::TextWrapped("Original DetailSprite placement and SPR clock; decoded DTX alpha on world-depth quads. "
+                            "Rotatable sprites use their object pose; others face the camera. Unlit replacement "
+                            "presentation: glow, view bias, no-Z and sky modes remain unavailable.");
++        draw_weapon_sprites(game);
+         if (sprite_view && sprite_render)
+             ImGui::Text("Prepared %zu quads / %zu entries | GPU passes %llu / texture uploads %llu | %zu RGBA bytes",
+                         sprite_view->draws.size(), sprite_view->entries.size(),
+@@ -136,3 +137,60 @@ namespace OpenBlood2
+         ImGui::EndTable();
+     }
+ } // namespace OpenBlood2
++
++namespace OpenBlood2
++{
++    void Inspector::draw_weapon_sprites(const GameSession& game)
++    {
++        if (!ImGui::CollapsingHeader("Original weapon impact flash / smoke"))
++            return;
++        const auto& effects = game.server.weapon_sprites;
++        ImGui::Text("Active: %zu flashes / %zu smoke | started %llu / expired %llu / failed %llu",
++                    effects.flashes.size(), effects.smoke.size(), (unsigned long long)effects.started,
++                    (unsigned long long)effects.expired, (unsigned long long)effects.failed);
++        ImGui::TextWrapped("Wood/stone bullet impacts only. Bubbles, marks, sparks, fragments and other composite "
++                           "effects remain unavailable.");
++        if (!effects.update_error.empty())
++            ImGui::TextWrapped("Update failure: %s", effects.update_error.c_str());
++        auto presentation = [&](std::uint64_t id)
++        {
++            if (sprite_view)
++                for (const auto& entry : sprite_view->entries)
++                    if (entry.weapon_effect == id)
++                    {
++                        ImGui::TextWrapped("Frame %s | %u x %u | %s", entry.frame_path.c_str(), entry.width,
++                                           entry.height, entry.range == UINT32_MAX ? "not prepared" : "quad prepared");
++                        if (!entry.error.empty())
++                            ImGui::TextWrapped("%s", entry.error.c_str());
++                    }
++        };
++        for (const auto& fx : effects.flashes)
++        {
++            ImGui::Text("Flash %llu / event %llu | age %.3f / %.3f | alpha %.3f", (unsigned long long)fx.id,
++                        (unsigned long long)fx.event, fx.last_time - fx.start_time, fx.settings.duration, fx.alpha);
++            presentation(fx.id);
++        }
++        for (const auto& fx : effects.smoke)
++        {
++            ImGui::Text("Smoke %llu / event %llu | first update %s | delay %.3f | age %.3f / %.3f",
++                        (unsigned long long)fx.id, (unsigned long long)fx.event, fx.first_update ? "pending" : "done",
++                        fx.delay, fx.first_update ? 0 : fx.last_time - fx.start_time, fx.settings.duration);
++            ImGui::Text("Position %.3f %.3f %.3f | scale %.3f %.3f %.3f", fx.position.x, fx.position.y, fx.position.z,
++                        fx.scale.x, fx.scale.y, fx.scale.z);
++            ImGui::Text("RGB %.2f %.2f %.2f | alpha %.3f | moving %s | callbacks %llu", fx.color.x, fx.color.y,
++                        fx.color.z, fx.alpha, fx.settings.move ? "yes" : "no", (unsigned long long)fx.updates);
++            presentation(fx.id);
++        }
++        for (const auto& r : effects.reports)
++        {
++            ImGui::Text("Event %llu / %s | flash %llu / smoke %llu", (unsigned long long)r.id, r.source.c_str(),
++                        (unsigned long long)r.flash, (unsigned long long)r.smoke);
++            if (r.settings.flash)
++                ImGui::TextWrapped("Flash resource: %s", r.settings.flash->resource.value_or("default").c_str());
++            if (r.settings.smoke)
++                ImGui::TextWrapped("Smoke resource: %s", r.settings.smoke->resource.value_or("default").c_str());
++            if (!r.error.empty())
++                ImGui::TextWrapped("%s", r.error.c_str());
++        }
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/sprite_scene.cpp b/src/app/sprite_scene.cpp
+index 1f28df8..70d91d6 100644
+--- a/src/app/sprite_scene.cpp
++++ b/src/app/sprite_scene.cpp
+@@ -22,6 +22,20 @@ namespace OpenBlood2
+                 return false;
+             scene.entries.back().client_effect = fx.id;
+         }
++        for (const auto& fx : game.server.weapon_sprites.flashes)
++        {
++            if (!scene.add(fx.sprite.get(), fx.track, {fx.settings.position, fx.rotation}, fx.scale, fx.flags, {},
++                           game.resources, error, fx.alpha))
++                return false;
++            scene.entries.back().weapon_effect = fx.id;
++        }
++        for (const auto& fx : game.server.weapon_sprites.smoke)
++        {
++            if (!scene.add(fx.sprite.get(), fx.track, {fx.position, {}}, fx.scale, fx.flags, {}, game.resources, error,
++                           fx.alpha, fx.color))
++                return false;
++            scene.entries.back().weapon_effect = fx.id;
++        }
+         for (const auto& fx : game.server.explosion_rings.active)
+             for (unsigned i = 0; i < fx.particles.size(); ++i)
+             {
+diff --git a/src/engine/sprite_view.cpp b/src/engine/sprite_view.cpp
+index ed38eab..513fc83 100644
+--- a/src/engine/sprite_view.cpp
++++ b/src/engine/sprite_view.cpp
+@@ -35,11 +35,11 @@ namespace OpenBlood2
+         return true;
+     }
+     bool SpriteView::add(const Sprite* sprite, const SpriteTrack& track, NodePose pose, DVector scale, DDWORD flags,
+-                         ObjectId object, const Resources& resources, std::string& error, float alpha)
++                         ObjectId object, const Resources& resources, std::string& error, float alpha, DVector color)
+     {
+         const std::string_view path =
+             sprite && track.frame < sprite->frames.size() ? sprite->frames[track.frame] : std::string_view{};
+-        return add_frame(path, track.frame, pose, scale, flags, object, resources, error, alpha, {1, 1, 1}, false);
++        return add_frame(path, track.frame, pose, scale, flags, object, resources, error, alpha, color, false);
+     }
+     bool SpriteView::add_particle(std::string_view path, DVector position, float extent, DVector color, float alpha,
+                                   std::uint64_t system, unsigned index, const Resources& resources, std::string& error)
+@@ -144,7 +144,7 @@ namespace OpenBlood2
+         if (!physics_vector(color) || color.x < 0 || color.x > 1 || color.y < 0 || color.y > 1 || color.z < 0 ||
+             color.z > 1)
+         {
+-            entry.error = "Invalid particle color";
++            entry.error = "Invalid sprite color";
+             return true;
+         }
+         const float x = direct_extent ? scale.x : float(entry.width) * scale.x;
+diff --git a/src/engine/sprite_view.h b/src/engine/sprite_view.h
+index 19be2de..ca564d7 100644
+--- a/src/engine/sprite_view.h
++++ b/src/engine/sprite_view.h
+@@ -12,7 +12,7 @@ namespace OpenBlood2
+         bool visible = false, rotatable = false;
+         std::uint32_t range = UINT32_MAX;
+         float alpha = 1;
+-        std::uint64_t client_effect = 0, particle_system = 0, trail_system = 0, flame_system = 0;
++        std::uint64_t client_effect = 0, particle_system = 0, trail_system = 0, flame_system = 0, weapon_effect = 0;
+         unsigned particle_index = 0;
+     };
+     // Read-only presentation snapshot: owned textures/values, never a retained game pointer.
+@@ -27,7 +27,7 @@ namespace OpenBlood2
+         void clear();
+         bool begin_frame(DVector eye, DRotation camera, std::string& error);
+         bool add(const Sprite*, const SpriteTrack&, NodePose, DVector scale, DDWORD flags, ObjectId, const Resources&,
+-                 std::string& error, float alpha = 1);
++                 std::string& error, float alpha = 1, DVector color = {1, 1, 1});
+         bool add_particle(std::string_view texture, DVector position, float half_extent, DVector color, float alpha,
+                           std::uint64_t system, unsigned index, const Resources&, std::string&);
+         void sort();
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index eb178a4..9dbd571 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -29,6 +29,10 @@ class CSBase
+     virtual void ResetRead(HMESSAGEREAD) = 0;
+ };
+ 
++namespace OpenBlood2
++{
++    struct WeaponSpriteSettings;
++}
+ class PathMgr;
+ class ServerDE : public CSBase
+ {
+@@ -69,6 +73,7 @@ class ServerDE : public CSBase
+     virtual std::uint64_t PublishExplosionRings(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionLights(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionModels(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
++    virtual std::uint64_t PublishWeaponSprites(HOBJECT, const OpenBlood2::WeaponSpriteSettings&, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) = 0;
+     virtual void RecordExplosionEffect(const OpenBlood2::ExplosionEffect&) = 0;
+@@ -76,7 +81,7 @@ class ServerDE : public CSBase
+     virtual bool ReadKeyMessage(HMESSAGEREAD, OpenBlood2::KeyMessage&) = 0;
+     virtual OpenBlood2::MoverResult MoveWorldModel(HOBJECT, DVector destination) = 0;
+     virtual OpenBlood2::MoverResult RotateWorldModel(HOBJECT, const OpenBlood2::RotationMove&) = 0;
+-    virtual bool GetPointContainerCode(DVector, ContainerCode&) = 0;
++    virtual bool GetPointContainerCode(DVector, ContainerCode&, bool visible_only = false) = 0;
+     virtual bool GetContainers(HOBJECT, DVector head, OpenBlood2::ContainerState&) = 0;
+     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
+     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
+diff --git a/src/game/original/SmokeImpactFX.cpp b/src/game/original/SmokeImpactFX.cpp
+new file mode 100644
+index 0000000..49d7242
+--- /dev/null
++++ b/src/game/original/SmokeImpactFX.cpp
+@@ -0,0 +1,103 @@
++#include "SmokeImpactFX.h"
++#include "engine/collision.h"
++#include "engine/objects.h"
++#include <algorithm>
++#include <cmath>
++using namespace OpenBlood2;
++bool CSmokeImpactFX::Init(const SmokeImpactSettings& input, std::string& failure)
++{
++    *this = {};
++    failure.clear();
++    auto scale_ok = [](DVector v) { return physics_vector(v) && v.x >= 0 && v.y >= 0 && v.z >= 0; };
++    if (!physics_vector(input.position) || !physics_vector(input.normal) || !physics_vector(input.velocity) ||
++        !physics_vector(input.deceleration) || !physics_vector(input.gravity) || !scale_ok(input.scale1) ||
++        !scale_ok(input.scale2) || !scale_ok(input.color) || input.color.x > 1 || input.color.y > 1 ||
++        input.color.z > 1 || !std::isfinite(input.offset) || !std::isfinite(input.duration) || input.duration <= 0 ||
++        input.duration > 600 || !std::isfinite(input.delay) || input.delay < 0 || input.delay > 600 ||
++        !std::isfinite(input.alpha) || input.alpha < 0 || input.alpha > 1 ||
++        (input.resource && (input.resource->size() > 1000 || input.resource->find('\0') != std::string::npos)))
++    {
++        failure = "Invalid smoke descriptor (nonpositive/infinite durations unsupported)";
++        return false;
++    }
++    settings = input;
++    position = vector_add(input.position, vector_scale(input.normal, input.offset));
++    if (!physics_vector(position))
++    {
++        failure = "Smoke normal offset exceeds position bounds";
++        return false;
++    }
++    velocity = input.velocity;
++    scale = input.scale1;
++    delay = input.delay;
++    // Original ignores bUpdateScale and compares only X/Y. bRotate is stored but unused.
++    scale_changes = input.scale1.x != input.scale2.x || input.scale1.y != input.scale2.y;
++    initialized_ = true;
++    return true;
++}
++bool CSmokeImpactFX::CreateObject(SpriteStore& store, double now, std::string& failure)
++{
++    failure.clear();
++    if (!initialized_ || sprite || !std::isfinite(now) || now < 0)
++    {
++        failure = "Invalid smoke creation state/time";
++        return false;
++    }
++    if (!store.load(settings.resource.value_or("Sprites\\smokepuff1.spr"), sprite, failure))
++        return false;
++    last_time = now;
++    // Source creation only sets scale; actual color remains white/opaque until Update.
++    return true;
++}
++bool CSmokeImpactFX::Update(double now)
++{
++    error.clear();
++    if (!sprite || !std::isfinite(now) || now < last_time || !advance_sprite(*sprite, track, now - last_time))
++    {
++        error = "Invalid smoke clock/state";
++        return false;
++    }
++    last_time = now;
++    if (now < next_update)
++        return true;
++    next_update = now + .001; // Existing CSpecialFX callback cadence, independent of SPR frame clock.
++    ++updates;
++    if (start_delay == 0)
++        start_delay = now;
++    color = settings.color.x || settings.color.y || settings.color.z ? settings.color : DVector{1, 1, 1};
++    if (delay > 0)
++    {
++        if (delay <= now - start_delay)
++            delay = 0;
++        alpha = 0;
++        return true; // The activation tick still returns without starting the effect.
++    }
++    if (first_update)
++    {
++        first_update = false;
++        start_time = now;
++        scale = settings.scale1;
++        alpha = settings.alpha;
++    }
++    const float ratio = static_cast<float>((now - start_time) / settings.duration);
++    if (scale_changes)
++    {
++        scale = vector_add(settings.scale1, vector_scale(vector_subtract(settings.scale2, settings.scale1), ratio));
++        scale.x = std::min(scale.x, settings.scale2.x);
++        scale.y = std::min(scale.y, settings.scale2.y);
++        scale.z = std::min(scale.z, settings.scale2.z);
++    }
++    if (settings.fade)
++        alpha = std::max(0.f, settings.alpha - ratio * settings.alpha);
++    if (settings.move)
++    {
++        velocity = vector_add(velocity, settings.deceleration);
++        position = vector_add(vector_add(position, velocity), settings.gravity);
++    }
++    if (!physics_vector(position) || !physics_vector(velocity) || !physics_vector(scale) || !std::isfinite(ratio))
++    {
++        error = "Smoke update exceeds finite transform bounds";
++        return false;
++    }
++    return now < start_time + settings.duration; // Final movement/fade happens before expiry.
++}
+diff --git a/src/game/original/SmokeImpactFX.h b/src/game/original/SmokeImpactFX.h
+new file mode 100644
+index 0000000..11f944b
+--- /dev/null
++++ b/src/game/original/SmokeImpactFX.h
+@@ -0,0 +1,33 @@
++#pragma once
++#include "ExplosionSpriteFX.h"
++namespace OpenBlood2
++{
++    struct SmokeImpactSettings
++    {
++        DVector position{}, normal{}, velocity{}, deceleration{}, gravity{}, scale1{}, scale2{}, color{};
++        float offset = 0, duration = .3f, delay = 0, alpha = 0;
++        bool fade = false, rotate = false, move = false, update_scale = true;
++        std::optional<std::string> resource;
++    };
++} // namespace OpenBlood2
++// Selected original SmokeImpactFX.cpp lifecycle; owned sprite replaces client object/string handles.
++class CSmokeImpactFX
++{
++  public:
++    bool Init(const OpenBlood2::SmokeImpactSettings&, std::string&);
++    bool CreateObject(OpenBlood2::SpriteStore&, double, std::string&);
++    bool Update(double);
++    OpenBlood2::SmokeImpactSettings settings;
++    std::shared_ptr<const OpenBlood2::Sprite> sprite;
++    OpenBlood2::SpriteTrack track;
++    DVector position{}, velocity{}, scale{}, color{1, 1, 1};
++    float alpha = 1, delay = 0;
++    double start_delay = 0, start_time = 0, last_time = 0, next_update = 0;
++    bool first_update = true, scale_changes = false;
++    DDWORD flags = FLAG_VISIBLE | FLAG_SPRITECHROMAKEY;
++    std::uint64_t id = 0, event = 0, updates = 0;
++    std::string error;
++
++  private:
++    bool initialized_ = false;
++};
+diff --git a/src/game/original/WeaponFX.cpp b/src/game/original/WeaponFX.cpp
+index af8055e..a1e6f23 100644
+--- a/src/game/original/WeaponFX.cpp
++++ b/src/game/original/WeaponFX.cpp
+@@ -1,6 +1,10 @@
+ // Original WeaponFX.cpp PlayImpactSound (977-992), GetImpactSound (1104-1152).
+ #include "WeaponFX.h"
++#include "engine/collision.h"
++#include "game/original/Weapon.h"
++#include "game/weapon_sprites.h"
+ #include "server_de.h"
++#include <cmath>
+ std::string CWeaponFX::GetImpactSound(std::minstd_rand& random) const
+ {
+     const char* material = nullptr;
+@@ -59,3 +63,50 @@ bool CWeaponFX::PlayImpactSound(ServerDE& server, HOBJECT source, std::minstd_ra
+     sound = server.PlayDetachedSound(source, request, m_vDestPos, error);
+     return sound != 0;
+ }
++
++// Original Weapon::UpdateWeaponFX selection; WeaponFX::CreateObject/CreateFlash/CreateSmoke recipes.
++bool CWeaponFX::CreateSprites(ServerDE& server, HOBJECT source, DVector normal, std::minstd_rand& random)
++{
++    sprite_event = 0;
++    sprite_error.clear();
++    if ((m_nAmmoType != AMMO_BULLET && m_nAmmoType != AMMO_SHELL && m_nAmmoType != AMMO_BMG) ||
++        (m_eSurfaceType != SURFTYPE_WOOD && m_eSurfaceType != SURFTYPE_STONE))
++        return true; // No authored flash/smoke branch; not successful visual creation.
++    ContainerCode code = CC_NOTHING;
++    if (!OpenBlood2::physics_vector(normal) || OpenBlood2::vector_dot(normal, normal) < 1e-12f ||
++        !server.GetPointContainerCode(m_vDestPos, code, true))
++    {
++        sprite_error = "Impact normal/container query unavailable";
++        return false;
++    }
++    normal = OpenBlood2::vector_scale(normal, 1 / std::sqrt(OpenBlood2::vector_dot(normal, normal)));
++    OpenBlood2::WeaponSpriteSettings settings;
++    if (IsLiquid(code))
++        settings.bubbles_unavailable = true; // Flash suppressed; original smoke substitutes SparkFX bubbles.
++    else
++    {
++        auto& flash = settings.flash.emplace();
++        flash.position = OpenBlood2::vector_add(m_vDestPos, normal);
++        flash.normal = normal;
++        flash.scale1 = flash.scale2 = {.1f, .1f, 0};
++        flash.duration = .15f;
++        flash.resource = "Sprites/impact0" + std::to_string(std::uniform_int_distribution<int>(1, 3)(random)) + ".spr";
++        auto& smoke = settings.smoke.emplace();
++        smoke.position = m_vDestPos;
++        smoke.normal = normal;
++        smoke.offset = 3;
++        smoke.gravity.y = std::uniform_real_distribution<float>(.05f, .1f)(random);
++        smoke.duration = 1;
++        smoke.scale1 = {.1f, .1f, 0};
++        smoke.scale2 = {.35f, .35f, 0};
++        smoke.alpha = .65f;
++        smoke.fade = true;
++        smoke.move = normal.y > -.3f;
++        if (m_eSurfaceType == SURFTYPE_WOOD)
++            smoke.color = {1, .8f, .6f};
++        smoke.resource =
++            "Sprites/smokepuff" + std::to_string(std::uniform_int_distribution<int>(0, 2)(random) + 1) + ".spr";
++    }
++    sprite_event = server.PublishWeaponSprites(source, settings, sprite_error);
++    return sprite_event && sprite_error.empty();
++}
+diff --git a/src/game/original/WeaponFX.h b/src/game/original/WeaponFX.h
+index 286d868..c5d0695 100644
+--- a/src/game/original/WeaponFX.h
++++ b/src/game/original/WeaponFX.h
+@@ -3,7 +3,7 @@
+ #include "engine/audio.h"
+ #include <random>
+ class ServerDE;
+-// Selected original CWeaponFX impact audio only. Other weapon visuals remain unavailable.
++// Selected original CWeaponFX impact audio and wood/stone flash/smoke.
+ class CWeaponFX
+ {
+   public:
+@@ -11,7 +11,9 @@ class CWeaponFX
+     SurfaceType m_eSurfaceType = SURFTYPE_UNKNOWN;
+     DVector m_vDestPos{};
+     OpenBlood2::SoundId sound = 0;
+-    std::string resource, error;
++    std::string resource, error, sprite_error;
++    std::uint64_t sprite_event = 0;
++    bool CreateSprites(ServerDE&, HOBJECT, DVector normal, std::minstd_rand&);
+     bool PlayImpactSound(ServerDE&, HOBJECT source, std::minstd_rand&);
+     std::string GetImpactSound(std::minstd_rand&) const;
+ };
+diff --git a/src/game/original/WeaponVector.cpp b/src/game/original/WeaponVector.cpp
+index b17154f..4718eaf 100644
+--- a/src/game/original/WeaponVector.cpp
++++ b/src/game/original/WeaponVector.cpp
+@@ -86,11 +86,12 @@ FireResult CWeapon::FireVector()
+             impact.effect.m_nAmmoType = data.m_nAmmoType;
+             impact.effect.m_eSurfaceType = static_cast<SurfaceType>(static_cast<DBYTE>(impact.surface));
+             impact.effect.m_vDestPos = vector_add(impact.hit.point, vector_scale(impact.hit.normal, 1.25f));
++            impact.effect.CreateSprites(*server, m_hOwner, impact.hit.normal, impact_random);
+             if (!impact.effect.PlayImpactSound(*server, m_hOwner, impact_random))
+                 ++impact_sound_failures;
+             if (impact.effect.sound)
+                 ++impact_sounds;
+-            // Other UpdateWeaponFX/AddImpact visuals and marks remain explicitly unavailable.
++            // Remaining composite visuals/marks are unavailable; creation failures do not cancel damage/audio.
+         }
+         auto alert = [&]
+         {
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 9a2694b..3b76e46 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -13,6 +13,7 @@
+ #include "game/original/LightFX.h"
+ #include "game/player_restore.h"
+ #include "game/session.h"
++#include "game/weapon_sprites.h"
+ #include "game/world_preparation.h"
+ #include <array>
+ #include <optional>
+@@ -83,6 +84,8 @@ namespace OpenBlood2
+         void RecordDebrisEffect(const DebrisEffect&) override;
+         std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         ExplosionSprites explosion_sprites;
++        WeaponSprites weapon_sprites;
++        std::uint64_t PublishWeaponSprites(HOBJECT, const WeaponSpriteSettings&, std::string&) override;
+         ExplosionModels explosion_models;
+         ExplosionLights explosion_lights;
+         ExplosionRings explosion_rings;
+@@ -103,7 +106,7 @@ namespace OpenBlood2
+         bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
+         MoverResult MoveWorldModel(HOBJECT, DVector destination) override;
+         MoverResult RotateWorldModel(HOBJECT, const RotationMove&) override;
+-        bool GetPointContainerCode(DVector, ContainerCode&) override;
++        bool GetPointContainerCode(DVector, ContainerCode&, bool visible_only = false) override;
+         bool GetContainers(HOBJECT, DVector head, ContainerState&) override;
+         bool damage_containers();
+         float GetWorldTime() override
+@@ -120,6 +123,7 @@ namespace OpenBlood2
+             explosion_effects.clear();
+             scene_explosions.clear();
+             explosion_sprites.clear();
++            weapon_sprites.clear();
+             explosion_models.clear();
+             explosion_lights.clear();
+             explosion_rings.clear();
+diff --git a/src/game/server_containers.cpp b/src/game/server_containers.cpp
+index c101a45..ca74152 100644
+--- a/src/game/server_containers.cpp
++++ b/src/game/server_containers.cpp
+@@ -5,7 +5,7 @@
+ 
+ namespace OpenBlood2
+ {
+-    bool ServerAdapter::GetPointContainerCode(DVector point, ContainerCode& code)
++    bool ServerAdapter::GetPointContainerCode(DVector point, ContainerCode& code, bool visible_only)
+     {
+         trace_service("GetPointContainerCode");
+         if (!physics_vector(point))
+@@ -18,7 +18,9 @@ namespace OpenBlood2
+                 continue;
+             if (const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get()))
+             {
+-                code = brush->info.code; // Original foot query does not filter Hidden.
++                // First overlap wins even when hidden; do not search for a later visible volume.
++                if (!visible_only || (r->user_flags & FLAG_VISIBLE))
++                    code = brush->info.code;
+                 return true;
+             }
+         }
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index 5af9e37..fb8c112 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -2,6 +2,18 @@
+ #include <cmath>
+ namespace OpenBlood2
+ {
++    std::uint64_t ServerAdapter::PublishWeaponSprites(HOBJECT source, const WeaponSpriteSettings& settings,
++                                                      std::string& error)
++    {
++        trace_service("PublishWeaponSprites (selected impact flash/smoke)");
++        if (!IsObjectAlive(source) || !objects_.sprites)
++        {
++            error = "Weapon sprite source/store unavailable";
++            return 0;
++        }
++        return weapon_sprites.publish(settings, GetObjectName(source), *objects_.sprites, objects_.time(), error);
++    }
++
+     // These copied, bounded records expose pending client FX/audio. They do not
+     // enqueue gameplay and never retain a pointer into an original object.
+     std::uint64_t ServerAdapter::PublishExplosionFragments(HOBJECT source, DDWORD type, DVector pos, DVector normal,
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 0fe2ca1..b4a7e4b 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -445,6 +445,7 @@ namespace OpenBlood2
+         ok = objects.refresh_attachments() && ok;
+         ok = server.advance_lights() && ok;
+         ok = server.explosion_sprites.advance(objects.time()) && ok;
++        ok = server.weapon_sprites.advance(objects.time()) && ok;
+         ok = server.explosion_models.advance(objects.time()) && ok;
+         ok = server.explosion_lights.advance(objects.time()) && ok;
+         ok = server.explosion_rings.advance(objects.time()) && ok;
+diff --git a/src/game/weapon_sprites.cpp b/src/game/weapon_sprites.cpp
+new file mode 100644
+index 0000000..aa6fbcc
+--- /dev/null
++++ b/src/game/weapon_sprites.cpp
+@@ -0,0 +1,86 @@
++#include "weapon_sprites.h"
++#include <algorithm>
++namespace OpenBlood2
++{
++    std::uint64_t WeaponSprites::publish(const WeaponSpriteSettings& settings, std::string_view source,
++                                         SpriteStore& store, double now, std::string& error)
++    {
++        error.clear();
++        if (source.size() > 100 || source.find('\0') != std::string_view::npos || next_event_ == UINT64_MAX)
++        {
++            error = "Invalid weapon sprite source/event identity";
++            return 0;
++        }
++        WeaponSpriteReport report;
++        report.id = next_event_++;
++        report.settings = settings;
++        report.source = source;
++        auto create = [&](const auto& setting, auto& active, std::uint64_t& id)
++        {
++            if (!setting)
++                return;
++            typename std::decay_t<decltype(active)>::value_type fx;
++            std::string failure;
++            if (flashes.size() + smoke.size() >= 256 || next_id_ == UINT64_MAX)
++                failure = "Weapon sprite capacity exhausted";
++            else if (fx.Init(*setting, failure) && fx.CreateObject(store, now, failure))
++            {
++                fx.id = id = next_id_++;
++                fx.event = report.id;
++                active.push_back(std::move(fx));
++                ++started;
++                return;
++            }
++            ++failed;
++            if (!report.error.empty())
++                report.error += "; ";
++            report.error += setting->resource.value_or("default") + ": " + failure;
++        };
++        create(settings.flash, flashes, report.flash);
++        create(settings.smoke, smoke, report.smoke); // Independent CreateSFX: failed flash never cancels smoke.
++        if (settings.bubbles_unavailable)
++        {
++            ++failed;
++            report.error += "Underwater impact bubbles unavailable";
++        }
++        error = report.error;
++        const auto id = report.id;
++        if (reports.size() == 64)
++            reports.erase(reports.begin());
++        reports.push_back(std::move(report));
++        return id; // Report identity, not success.
++    }
++    bool WeaponSprites::advance(double now)
++    {
++        bool ok = true;
++        auto advance = [&](auto& active)
++        {
++            std::erase_if(active,
++                          [&](auto& fx)
++                          {
++                              if (fx.Update(now))
++                                  return false;
++                              if (fx.error.empty())
++                                  ++expired;
++                              else
++                              {
++                                  ++failed;
++                                  update_error = fx.error;
++                                  ok = false;
++                              }
++                              return true;
++                          });
++        };
++        advance(flashes);
++        advance(smoke);
++        return ok;
++    }
++    void WeaponSprites::clear()
++    {
++        flashes.clear();
++        smoke.clear();
++        reports.clear();
++        update_error.clear();
++        started = expired = failed = 0; // Identities deliberately survive world reload.
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/weapon_sprites.h b/src/game/weapon_sprites.h
+new file mode 100644
+index 0000000..f6f4608
+--- /dev/null
++++ b/src/game/weapon_sprites.h
+@@ -0,0 +1,32 @@
++#pragma once
++#include "game/original/SmokeImpactFX.h"
++namespace OpenBlood2
++{
++    struct WeaponSpriteSettings
++    {
++        std::optional<ExplosionSpriteSettings> flash;
++        std::optional<SmokeImpactSettings> smoke;
++        bool bubbles_unavailable = false;
++    };
++    struct WeaponSpriteReport
++    {
++        std::uint64_t id = 0, flash = 0, smoke = 0;
++        std::string source, error;
++        WeaponSpriteSettings settings;
++    };
++    class WeaponSprites
++    {
++      public:
++        std::uint64_t publish(const WeaponSpriteSettings&, std::string_view, SpriteStore&, double, std::string&);
++        bool advance(double);
++        void clear();
++        std::vector<CExplosionSpriteFX> flashes;
++        std::vector<CSmokeImpactFX> smoke;
++        std::vector<WeaponSpriteReport> reports;
++        std::uint64_t started = 0, expired = 0, failed = 0;
++        std::string update_error;
++
++      private:
++        std::uint64_t next_id_ = 1, next_event_ = 1;
++    };
++} // namespace OpenBlood2
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 3d78d0b..6f83b55 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1118,3 +1118,27 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME weapon_impacts.private COMMAND weapon_impact_tests private "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(weapon_impacts.private PROPERTIES LABELS "headless;private;weapon_impacts" TIMEOUT 180)
+ endif()
++
++add_executable(weapon_sprite_tests weapon_sprite_tests.cpp ../src/app/sprite_scene.cpp)
++target_link_libraries(weapon_sprite_tests PRIVATE blood2_game)
++blood2_project_options(weapon_sprite_tests)
++foreach(case IN ITEMS formulas delay failures selection containers session)
++    add_test(NAME weapon_sprites.${case} COMMAND weapon_sprite_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/weapon-sprites-${case}")
++    set_tests_properties(weapon_sprites.${case} PROPERTIES LABELS "headless;weapon_sprites" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME weapon_sprites.private COMMAND weapon_sprite_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(weapon_sprites.private PROPERTIES LABELS "headless;private;weapon_sprites" TIMEOUT 120)
++endif()
++
++if(BLOOD2_GPU_TESTS)
++    add_executable(weapon_sprite_gpu_tests weapon_sprite_gpu_tests.cpp ../src/app/sprite_scene.cpp)
++    target_link_libraries(weapon_sprite_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(weapon_sprite_gpu_tests)
++    add_test(NAME gpu.weapon_sprite_alpha COMMAND weapon_sprite_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/weapon-sprite-alpha")
++    set_tests_properties(gpu.weapon_sprite_alpha PROPERTIES LABELS "gpu;weapon_sprites" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.weapon_sprite_private COMMAND weapon_sprite_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/weapon-sprite-private" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.weapon_sprite_private PROPERTIES LABELS "gpu;private;weapon_sprites" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    endif()
++endif()
+diff --git a/tests/weapon_sprite_fixture.h b/tests/weapon_sprite_fixture.h
+new file mode 100644
+index 0000000..9fb0457
+--- /dev/null
++++ b/tests/weapon_sprite_fixture.h
+@@ -0,0 +1,45 @@
++#pragma once
++#include "sprite_view_fixture.h"
++namespace test_weapon_sprite
++{
++    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error,
++                      bool flash = true, bool smoke = true)
++    {
++        if (!test_sprite_view::mount(resources, root, error))
++            return false;
++        test_model::Writer spr;
++        spr.u32(2);
++        spr.u32(10);
++        spr.u32(1);
++        spr.u32(0);
++        spr.u32(0);
++        for (int i = 0; i < 2; ++i)
++        {
++            const std::string path = "alpha.dtx";
++            spr.u16(path.size());
++            spr.b.insert(spr.b.end(), path.begin(), path.end());
++        }
++        test_player::Directory dir;
++        for (int i = 1; i <= 3; ++i)
++        {
++            if (flash)
++                dir.children["sprites"].files["impact0" + std::to_string(i) + ".spr"] = spr.b;
++            if (smoke)
++                dir.children["sprites"].files["smokepuff" + std::to_string(i) + ".spr"] = spr.b;
++        }
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, dir);
++        w.patch(131, off);
++        w.patch(135, size);
++        auto file = root / "weapon-sprites.rez";
++        std::ofstream out(file, std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        return resources.mount(file, error);
++    }
++} // namespace test_weapon_sprite
+diff --git a/tests/weapon_sprite_gpu_tests.cpp b/tests/weapon_sprite_gpu_tests.cpp
+new file mode 100644
+index 0000000..9aba996
+--- /dev/null
++++ b/tests/weapon_sprite_gpu_tests.cpp
+@@ -0,0 +1,157 @@
++#include "app/sprite_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "weapon_sprite_fixture.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << " " << error << " " << SDL_GetError() << "\n";                         \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool render(Runtime& runtime, WorldRenderer& renderer, SpriteView& scene, DVector eye, DRotation camera,
++                Capture& capture, std::vector<std::uint8_t>& pixels, std::string& error)
++    {
++        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300)) ||
++            !renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true))
++            return false;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        if (!commands)
++            return false;
++        if (!renderer.draw(commands, capture.texture, scene.mesh, scene.draws, eye, camera, false, error))
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 300;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 300;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
++            return false;
++        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        if (!data)
++            return false;
++        pixels.assign(data, data + 400 * 300 * 4);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    Runtime runtime;
++    std::string error;
++    CHECK(runtime.initialize(true, error));
++    WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
++    Capture capture;
++    SpriteView scene;
++    Resources resources;
++    CHECK(test_weapon_sprite::mount(resources, argv[1], error));
++    SpriteStore store(resources);
++    SmokeImpactSettings settings;
++    settings.position = {0, 0, 2};
++    settings.scale1 = settings.scale2 = {.25f, .5f, 0};
++    settings.duration = 1;
++    settings.alpha = .65f;
++    settings.fade = true;
++    settings.color = {.4f, .8f, .6f};
++    CSmokeImpactFX smoke;
++    CHECK(smoke.Init(settings, error) && smoke.CreateObject(store, 0, error) && smoke.Update(0) && smoke.Update(.5));
++    std::vector<std::uint8_t> white, tinted;
++    for (bool tint : {false, true})
++    {
++        CHECK(scene.begin_frame({}, {}, error) &&
++              scene.add(smoke.sprite.get(), smoke.track, {smoke.position, {}}, smoke.scale, smoke.flags, {}, resources,
++                        error, tint ? smoke.alpha : 1, tint ? smoke.color : DVector{1, 1, 1}));
++        CHECK(scene.entries.back().error.empty() &&
++              render(runtime, renderer, scene, {}, {}, capture, tint ? tinted : white, error));
++    }
++    unsigned verified = 0;
++    for (unsigned i = 0; i < 400 * 300; ++i)
++    {
++        const auto k = i * 4;
++        if (white[k] == 255 && white[k + 1] == 0 && white[k + 2] == 0)
++        {
++            CHECK(std::abs(int(tinted[k]) - (255 * smoke.color.x * smoke.alpha + 6 * (1 - smoke.alpha))) <= 2);
++            CHECK(std::abs(int(tinted[k + 1]) - 9 * (1 - smoke.alpha)) <= 2 &&
++                  std::abs(int(tinted[k + 2]) - 13 * (1 - smoke.alpha)) <= 2);
++            ++verified;
++        }
++    }
++    CHECK(verified > 100 && capture.save((std::filesystem::path(argv[1]) / "smoke-tint-alpha.png").c_str()));
++    std::cout << "Smoke RGB / original fade: " << verified << " exact opaque-texel blend checks\n";
++    if (argc == 3)
++    {
++        GameSession g;
++        Config c;
++        c.data_dir = argv[2];
++        CHECK(g.initialize() && g.resources.mount_game(c, error));
++        std::uint64_t previous = 0;
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            auto h = g.server_shell.Player(g.local_client)->m_hObject;
++            CWeaponFX request;
++            request.m_nAmmoType = AMMO_BULLET;
++            request.m_eSurfaceType = SURFTYPE_WOOD;
++            request.m_vDestPos = {0, 5000, 0};
++            std::minstd_rand random(cycle + 1);
++            CHECK(request.CreateSprites(g.server, h, {0, 0, -1}, random) && g.step(.01));
++            CHECK(g.server.weapon_sprites.flashes.size() == 1 && g.server.weapon_sprites.smoke.size() == 1);
++            CHECK(g.server.weapon_sprites.smoke.front().id > previous);
++            previous = g.server.weapon_sprites.smoke.front().id;
++            for (bool flash : {true, false})
++            {
++                const auto& f = g.server.weapon_sprites.flashes.front();
++                const auto& s = g.server.weapon_sprites.smoke.front();
++                const auto pos = flash ? f.settings.position : s.position;
++                const auto eye = vector_add(pos, {0, 0, -35});
++                CHECK(scene.begin_frame(eye, {}, error));
++                CHECK(scene.add(flash ? f.sprite.get() : s.sprite.get(), flash ? f.track : s.track, {pos, {}},
++                                flash ? f.scale : s.scale, flash ? f.flags : s.flags, {}, g.resources, error,
++                                flash ? f.alpha : s.alpha, flash ? DVector{1, 1, 1} : s.color));
++                CHECK(scene.entries[0].error.empty() && scene.draws.size() == 1);
++                std::vector<std::uint8_t> pixels;
++                CHECK(render(runtime, renderer, scene, eye, {}, capture, pixels, error));
++                unsigned ink = 0;
++                for (unsigned k = 0; k < pixels.size(); k += 4)
++                    if (pixels[k] != 6 || pixels[k + 1] != 9 || pixels[k + 2] != 13)
++                        ++ink;
++                CHECK(ink > 50 && ink < 400 * 300);
++                CHECK(capture.save(
++                    (std::filesystem::path(argv[1]) / (flash ? "private-flash.png" : "private-smoke.png")).c_str()));
++                std::cout << "Private cycle " << cycle << (flash ? " flash " : " smoke ") << scene.entries[0].frame_path
++                          << " changed pixels " << ink << "\n";
++            }
++            CHECK(g.leave_player() && g.step(.2) && g.server.weapon_sprites.flashes.empty() &&
++                  !g.server.weapon_sprites.smoke.empty());
++            CHECK(g.unload_world() && g.server.weapon_sprites.smoke.empty());
++            scene.clear();
++            renderer.clear_geometry();
++            CHECK(update_sprite_scene(g, scene, error) && scene.entries.empty());
++        }
++    }
++    return 0;
++}
+diff --git a/tests/weapon_sprite_tests.cpp b/tests/weapon_sprite_tests.cpp
+new file mode 100644
+index 0000000..f21bece
+--- /dev/null
++++ b/tests/weapon_sprite_tests.cpp
+@@ -0,0 +1,330 @@
++#include "app/sprite_scene.h"
++#include "brush_fixture.h"
++#include "game/original/VolumeBrush.h"
++#include "weapon_sprite_fixture.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .0001f;
++    }
++    SmokeImpactSettings smoke()
++    {
++        SmokeImpactSettings s;
++        s.position = {1, 2, 3};
++        s.normal = {0, 0, 1};
++        s.offset = 3;
++        s.scale1 = {.1f, .1f, 0};
++        s.scale2 = {.35f, .35f, 0};
++        s.duration = 1;
++        s.alpha = .65f;
++        s.fade = true;
++        s.move = true;
++        s.color = {1, .8f, .6f};
++        s.velocity = {1, 0, 0};
++        s.deceleration = {.1f, 0, 0};
++        s.gravity = {0, .1f, 0};
++        return s;
++    }
++    bool formulas(const std::filesystem::path& root)
++    {
++        Resources r;
++        std::string error;
++        CHECK(test_weapon_sprite::mount(r, root, error));
++        SpriteStore store(r);
++        CSmokeImpactFX f;
++        auto s = smoke();
++        CHECK(f.Init(s, error) && f.CreateObject(store, 10, error));
++        CHECK(f.position.z == 6 && f.alpha == 1 && f.color.y == 1 && f.updates == 0);
++        CHECK(f.Update(10.5) && f.start_time == 10.5 && near(f.position.x, 2.1f) && near(f.alpha, .65f));
++        CHECK(near(f.color.y, .8f) && near(f.color.z, .6f) && near(f.position.y, 2.1f));
++        CHECK(f.Update(10.5005) && f.updates == 1 && near(f.position.x, 2.1f));
++        CHECK(f.Update(11) && near(f.scale.x, .225f) && near(f.alpha, .325f) && near(f.position.x, 3.3f));
++        CHECK(!f.Update(11.5) && f.error.empty() && near(f.scale.x, .35f) && f.alpha == 0 && near(f.position.x, 4.6f));
++        s = smoke();
++        s.update_scale = false;
++        s.rotate = true;
++        CHECK(f.Init(s, error) && f.CreateObject(store, 0, error) && f.Update(.1) && f.Update(.6));
++        CHECK(f.scale_changes && near(f.scale.x, .225f) && !(f.flags & FLAG_ROTATEABLESPRITE));
++        s.scale1 = {1, 1, 0};
++        s.scale2 = {1, 1, 5};
++        s.color = {};
++        s.move = false;
++        s.fade = false;
++        CHECK(f.Init(s, error) && f.CreateObject(store, 0, error) && f.Update(.1) && f.Update(.6));
++        CHECK(!f.scale_changes && f.scale.z == 0 && f.color.y == 1 && near(f.alpha, .65f) && f.position.y == 2);
++        s.scale1 = {1, 1, 0};
++        s.scale2 = {.5f, .5f, 0};
++        CHECK(f.Init(s, error) && f.CreateObject(store, 0, error) && f.Update(.1) && f.scale.x == .5f);
++        return true;
++    }
++    bool delay(const std::filesystem::path& root)
++    {
++        Resources r;
++        std::string error;
++        CHECK(test_weapon_sprite::mount(r, root, error));
++        SpriteStore store(r);
++        CSmokeImpactFX f;
++        auto s = smoke();
++        s.delay = .25f;
++        CHECK(f.Init(s, error) && f.CreateObject(store, 0, error) && f.Update(0));
++        CHECK(f.first_update && f.start_delay == 0 && f.alpha == 0 && f.position.x == 1);
++        CHECK(f.Update(.1) && f.start_delay == .1 && f.Update(.36));
++        CHECK(f.delay == 0 && f.first_update && f.alpha == 0); // Zero sentinel rearmed; activation returns early.
++        CHECK(f.Update(.4) && f.start_time == .4 && !f.first_update && near(f.alpha, .65f));
++        CHECK(f.Update(1.39) && !f.Update(1.41) && f.alpha == 0);
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        Resources r;
++        std::string error;
++        CHECK(test_weapon_sprite::mount(r, root, error, false));
++        SpriteStore store(r);
++        CSmokeImpactFX f;
++        auto s = smoke();
++        for (auto value : {0.f, -1.f, 601.f, NAN})
++        {
++            s.duration = value;
++            CHECK(!f.Init(s, error) && !error.empty());
++        }
++        s = smoke();
++        s.alpha = 2;
++        CHECK(!f.Init(s, error));
++        s = smoke();
++        s.color.x = NAN;
++        CHECK(!f.Init(s, error));
++        s = smoke();
++        s.resource = "";
++        CHECK(f.Init(s, error) && !f.CreateObject(store, 0, error));
++        s = smoke();
++        CHECK(f.Init(s, error) && f.CreateObject(store, 1, error) && !f.Update(.5) && !f.error.empty());
++        WeaponSprites effects;
++        WeaponSpriteSettings setting;
++        setting.smoke = smoke();
++        setting.flash.emplace();
++        CHECK(effects.publish(setting, "source", store, 0, error) && !error.empty() && effects.smoke.size() == 1 &&
++              effects.flashes.empty());
++        CHECK(effects.failed == 1 && effects.started == 1 && effects.reports.back().smoke &&
++              !effects.reports.back().flash);
++        CHECK(!effects.advance(-1) && effects.smoke.empty() && effects.failed == 2 && !effects.update_error.empty());
++        effects.clear();
++        setting.flash.reset();
++        for (unsigned i = 0; i < 256; ++i)
++            CHECK(effects.publish(setting, "source", store, 0, error) && error.empty());
++        CHECK(effects.publish(setting, "source", store, 0, error) && !error.empty() && effects.started == 256 &&
++              effects.failed == 1);
++        CHECK(effects.smoke.size() == 256 && effects.reports.size() == 64 && effects.advance(.1) &&
++              effects.advance(1.2));
++        CHECK(effects.expired == 256 && effects.smoke.empty());
++        auto id = effects.reports.back().id;
++        effects.clear();
++        CHECK(effects.publish(setting, "source", store, 0, error) > id && effects.smoke.front().id > 256);
++        return true;
++    }
++    bool selection(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string error;
++        CHECK(test_player::setup(g, root) && test_weapon_sprite::mount(g.resources, root, error));
++        CHECK(g.enter_player(error));
++        auto h = g.server_shell.Player(g.local_client)->m_hObject;
++        CWeaponFX f;
++        f.m_vDestPos = {10, 40, 30};
++        std::minstd_rand rng(9);
++        for (auto type : {AMMO_BULLET, AMMO_SHELL, AMMO_BMG})
++            for (auto material : {SURFTYPE_WOOD, SURFTYPE_STONE})
++            {
++                f.m_nAmmoType = type;
++                f.m_eSurfaceType = material;
++                auto expected = rng;
++                auto flash = std::uniform_int_distribution<int>(1, 3)(expected);
++                auto gravity = std::uniform_real_distribution<float>(.05f, .1f)(expected);
++                auto resource = std::uniform_int_distribution<int>(0, 2)(expected) + 1;
++                CHECK(f.CreateSprites(g.server, h, {0, 0, 2}, rng) && rng == expected);
++                const auto& report = g.server.weapon_sprites.reports.back();
++                CHECK(report.flash && report.smoke &&
++                      report.settings.flash->resource == "Sprites/impact0" + std::to_string(flash) + ".spr");
++                CHECK(report.settings.smoke->resource == "Sprites/smokepuff" + std::to_string(resource) + ".spr");
++                CHECK(report.settings.smoke->gravity.y == gravity && report.settings.smoke->move);
++                CHECK(report.settings.flash->position.z == 31 && g.server.weapon_sprites.smoke.back().position.z == 33);
++                CHECK(report.settings.smoke->color.x == (material == SURFTYPE_WOOD ? 1 : 0));
++            }
++        for (auto material : {SURFTYPE_BUILDING, SURFTYPE_METAL, SURFTYPE_UNKNOWN, SURFTYPE_GLASS, SURFTYPE_LIQUID})
++        {
++            f.m_eSurfaceType = material;
++            auto old = rng;
++            CHECK(f.CreateSprites(g.server, h, {0, 0, 1}, rng) && !f.sprite_event && old == rng);
++        }
++        f.m_eSurfaceType = SURFTYPE_WOOD;
++        f.m_nAmmoType = AMMO_NONE;
++        auto old = rng;
++        CHECK(f.CreateSprites(g.server, h, {0, 0, 1}, rng) && !f.sprite_event && old == rng);
++        f.m_nAmmoType = AMMO_BULLET;
++        CHECK(!f.CreateSprites(g.server, h, {}, rng) && rng == old && !f.sprite_error.empty());
++        CHECK(f.CreateSprites(g.server, h, {0, -1, 0}, rng) && !g.server.weapon_sprites.smoke.back().settings.move);
++        return true;
++    }
++    bool containers(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string error;
++        CHECK(test_player::setup(g, root) && test_weapon_sprite::mount(g.resources, root, error) &&
++              g.enter_player(error));
++        auto h = g.server_shell.Player(g.local_client)->m_hObject;
++        auto a = test_brush::box("A", {-10, 10, -10}, {10, 50, 10});
++        auto b = a;
++        b.name = "B";
++        g.world.models.push_back(a);
++        g.world.models.push_back(b);
++        auto first = g.objects.create(g.objects.find_class("Water"), {}, Creation::World,
++                                      {{"Name", std::string("A")}, {"Hidden", true}});
++        auto second =
++            g.objects.create(g.objects.find_class("Water"), {}, Creation::World, {{"Name", std::string("B")}});
++        CHECK(first && second);
++        CWeaponFX f;
++        f.m_nAmmoType = AMMO_BULLET;
++        f.m_eSurfaceType = SURFTYPE_STONE;
++        f.m_vDestPos = {0, 30, 0};
++        std::minstd_rand rng(1);
++        ContainerCode code;
++        CHECK(g.server.GetPointContainerCode(f.m_vDestPos, code) && code == CC_WATER);
++        CHECK(g.server.GetPointContainerCode(f.m_vDestPos, code, true) && code == CC_NOTHING);
++        CHECK(f.CreateSprites(g.server, h, {0, 1, 0},
++                              rng)); // Hidden first volume masks visible second, source one-result query.
++        g.server.SetObjectUserFlags(first, FLAG_VISIBLE);
++        auto before = rng;
++        CHECK(!f.CreateSprites(g.server, h, {0, 1, 0}, rng) && rng == before &&
++              f.sprite_error.find("bubbles") != std::string::npos);
++        CHECK(g.server.weapon_sprites.reports.back().settings.bubbles_unavailable &&
++              !g.server.weapon_sprites.reports.back().smoke);
++        CHECK(g.objects.remove(first));
++        g.objects.finish_frame();
++        CHECK(!f.CreateSprites(g.server, h, {0, 1, 0}, rng));
++        g.server.SetObjectUserFlags(second, 0);
++        CHECK(f.CreateSprites(g.server, h, {0, 1, 0}, rng));
++        return true;
++    }
++    bool session(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string error;
++        CHECK(test_player::setup(g, root) && test_weapon_sprite::mount(g.resources, root, error) &&
++              g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        auto pos = g.objects.get(p->m_hObject)->state.m_Pos;
++        pos.y += p->eye_level;
++        WorldModel wall;
++        test_brush::face(wall,
++                         {{pos.x - 200, pos.y - 200, pos.z + 40},
++                          {pos.x + 200, pos.y - 200, pos.z + 40},
++                          {pos.x + 200, pos.y + 200, pos.z + 40},
++                          {pos.x - 200, pos.y + 200, pos.z + 40}},
++                         {0, 0, -1});
++        wall.surfaces.back().flags = 1;
++        wall.surfaces.back().texture_flags = SURFTYPE_WOOD;
++        CHECK(g.collision.build(wall, error));
++        CHECK(g.server_shell.OnMessage(g.local_client, WeaponFire{pos, {0, 0, 1}, 42, WEAP_BERETTA, false, false}) ==
++              FireResult::Fired);
++        auto* w = p->m_InventoryMgr.GetWeapon(1);
++        CHECK(w->impacts.size() == 1 && w->impacts[0].effect.sprite_event && w->impacts[0].effect.sprite_error.empty());
++        CHECK(g.server.weapon_sprites.started == 2 && g.server.weapon_sprites.failed == 0);
++        CHECK(near(g.server.weapon_sprites.smoke.front().position.z, pos.z + 40 - 4.25f));
++        CHECK(near(g.server.weapon_sprites.flashes.front().settings.position.z, pos.z + 40 - 2.25f));
++        CHECK(g.step(.1));
++        const auto updates = g.server.weapon_sprites.smoke.front().updates;
++        SpriteView view;
++        for (int i = 0; i < 3; ++i)
++        {
++            CHECK(update_sprite_scene(g, view, error) && view.draws.size() == 2);
++            CHECK(g.server.weapon_sprites.smoke.front().updates == updates);
++        }
++        CHECK(near(view.mesh.vertices.back().color.y, .8f));
++        CHECK(g.leave_player() && g.server.weapon_sprites.smoke.size() == 1 && g.step(.1) &&
++              g.server.weapon_sprites.flashes.empty());
++        CHECK(g.step(.5) && g.step(.5) && g.server.weapon_sprites.smoke.empty() &&
++              g.server.weapon_sprites.expired == 2);
++        CHECK(g.unload_world() && g.server.weapon_sprites.reports.empty() && g.server.string_count() == 0 &&
++              g.server.message_count() == 0);
++        return true;
++    }
++    bool private_world(const std::filesystem::path& root)
++    {
++        GameSession g;
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.initialize() && g.resources.mount_game(c, error));
++        std::uint64_t previous = 0;
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            auto h = g.server_shell.Player(g.local_client)->m_hObject;
++            CWeaponFX fx;
++            fx.m_nAmmoType = AMMO_BULLET;
++            fx.m_eSurfaceType = SURFTYPE_WOOD;
++            fx.m_vDestPos = {0, 5000, 0};
++            std::minstd_rand random(1 + cycle);
++            for (unsigned i = 0; i < 32; ++i)
++                CHECK(fx.CreateSprites(g.server, h, {0, 1, 0}, random));
++            CHECK(g.server.weapon_sprites.started == 64 && g.server.weapon_sprites.failed == 0 && g.step(.05));
++            SpriteView view;
++            CHECK(update_sprite_scene(g, view, error));
++            unsigned count = 0;
++            for (const auto& e : view.entries)
++                if (e.weapon_effect)
++                {
++                    CHECK(e.error.empty() && e.range != UINT32_MAX && e.width > 0);
++                    ++count;
++                }
++            CHECK(count == 64 && g.server.weapon_sprites.smoke.front().id > previous);
++            previous = g.server.weapon_sprites.smoke.back().id;
++            const auto before = g.server.weapon_sprites.smoke.front();
++            const auto time = g.objects.time();
++            WorldMessage destination;
++            CHECK(original_world_request("02_cityhub", 0, LOADTYPE_NEW_LEVEL, 0, destination));
++            CHECK(g.rehearse_destination(destination, "01_egressa", error) && g.destination_trial.cleanup_complete);
++            const auto& after = g.server.weapon_sprites.smoke.front();
++            CHECK(g.objects.time() == time && g.server.weapon_sprites.started == 64 && after.id == before.id &&
++                  after.updates == before.updates && after.track.frame == before.track.frame &&
++                  after.alpha == before.alpha && after.position.y == before.position.y &&
++                  after.sprite == before.sprite);
++            CHECK(g.leave_player() && g.step(.1) && g.step(.1));
++            CHECK(g.server.weapon_sprites.flashes.empty() && g.server.weapon_sprites.smoke.size() == 32);
++            CHECK(g.unload_world() && g.server.weapon_sprites.smoke.empty() && g.server.weapon_sprites.reports.empty());
++            view.clear();
++            CHECK(update_sprite_scene(g, view, error) && view.entries.empty() && g.server.string_count() == 0 &&
++                  g.server.message_count() == 0);
++            std::cout
++                << "Private cycle " << cycle
++                << ": 32 original diagnostic wood recipes, 64 actual SPR/DTX quads; source removal and unload passed\n";
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::string mode = argv[1];
++    return (mode == "formulas"     ? formulas(argv[2])
++            : mode == "delay"      ? delay(argv[2])
++            : mode == "failures"   ? failures(argv[2])
++            : mode == "selection"  ? selection(argv[2])
++            : mode == "containers" ? containers(argv[2])
++            : mode == "session"    ? session(argv[2])
++                                   : mode == "private" && private_world(argv[2]))
++               ? 0
++               : 1;
++}

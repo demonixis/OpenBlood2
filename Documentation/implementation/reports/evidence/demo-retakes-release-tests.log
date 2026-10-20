@@ -1,0 +1,93 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start 1179: menus.profiles
+      Start 1178: menus.session
+ 1/39 Test #1178: menus.session ....................   Passed    0.23 sec
+      Start 1207: demo_menu.assets
+ 2/39 Test #1207: demo_menu.assets .................   Passed    0.04 sec
+      Start 1176: menus.artwork
+ 3/39 Test #1176: menus.artwork ....................   Passed    0.03 sec
+      Start  101: services.private
+ 4/39 Test  #101: services.private .................   Passed    0.12 sec
+      Start 1205: demo_menu.manifest
+ 5/39 Test #1205: demo_menu.manifest ...............   Passed    0.00 sec
+      Start 1180: menus.preferences
+ 6/39 Test #1180: menus.preferences ................   Passed    0.00 sec
+      Start 1206: demo_menu.flow
+ 7/39 Test #1206: demo_menu.flow ...................   Passed    0.00 sec
+      Start 1175: menus.state
+ 8/39 Test #1175: menus.state ......................   Passed    0.00 sec
+      Start   95: services.collision_traversal
+ 9/39 Test   #95: services.collision_traversal .....   Passed    0.00 sec
+      Start   98: services.placement_queries
+10/39 Test   #98: services.placement_queries .......   Passed    0.00 sec
+      Start   99: services.placement_service
+11/39 Test   #99: services.placement_service .......   Passed    0.00 sec
+      Start   90: services.model_rejection
+12/39 Test   #90: services.model_rejection .........   Passed    0.00 sec
+      Start   89: services.model_reader
+13/39 Test   #89: services.model_reader ............   Passed    0.00 sec
+      Start  100: services.original_services
+14/39 Test  #100: services.original_services .......   Passed    0.00 sec
+      Start   92: services.model_callbacks
+15/39 Test   #92: services.model_callbacks .........   Passed    0.00 sec
+      Start   96: services.movement_contacts
+16/39 Test   #96: services.movement_contacts .......   Passed    0.00 sec
+      Start   91: services.animation_events
+17/39 Test   #91: services.animation_events ........   Passed    0.00 sec
+      Start   93: services.collision_queries
+18/39 Test   #93: services.collision_queries .......   Passed    0.00 sec
+      Start   94: services.start_departure
+19/39 Test   #94: services.start_departure .........   Passed    0.00 sec
+      Start   97: services.contact_overlap
+20/39 Test   #97: services.contact_overlap .........   Passed    0.01 sec
+      Start  102: services.elevator_entry
+21/39 Test  #102: services.elevator_entry ..........   Passed    0.05 sec
+      Start 1187: spawner.properties
+22/39 Test #1187: spawner.properties ...............   Passed    0.00 sec
+      Start 1188: spawner.commands
+23/39 Test #1188: spawner.commands .................   Passed    0.00 sec
+      Start 1189: spawner.respawn
+24/39 Test #1189: spawner.respawn ..................   Passed    0.01 sec
+      Start 1190: spawner.spawn
+25/39 Test #1190: spawner.spawn ....................   Passed    0.00 sec
+      Start 1191: spawner.private
+26/39 Test #1191: spawner.private ..................   Passed    0.05 sec
+      Start 1192: fanatic_prophet.weapons
+27/39 Test #1192: fanatic_prophet.weapons ..........   Passed    0.00 sec
+      Start 1193: fanatic_prophet.decisions
+28/39 Test #1193: fanatic_prophet.decisions ........   Passed    0.00 sec
+      Start 1194: fanatic_prophet.howitzer
+29/39 Test #1194: fanatic_prophet.howitzer .........   Passed    0.00 sec
+      Start 1195: fanatic_prophet.catalog
+30/39 Test #1195: fanatic_prophet.catalog ..........   Passed    0.03 sec
+      Start 1196: fanatic_prophet.kamikaze
+31/39 Test #1196: fanatic_prophet.kamikaze .........   Passed    0.04 sec
+      Start 1197: fanatic_prophet.actions
+32/39 Test #1197: fanatic_prophet.actions ..........   Passed    0.02 sec
+      Start 1198: fanatic_prophet.world
+33/39 Test #1198: fanatic_prophet.world ............   Passed    0.06 sec
+      Start 1199: demo.flow
+34/39 Test #1199: demo.flow ........................   Passed    0.00 sec
+      Start 1200: demo.rules
+35/39 Test #1200: demo.rules .......................   Passed    0.00 sec
+      Start 1201: demo.worlds
+36/39 Test #1179: menus.profiles ...................   Passed    2.06 sec
+      Start 1202: demo.weapon
+37/39 Test #1202: demo.weapon ......................   Passed    0.02 sec
+      Start 1203: demo.spawned_overlap
+38/39 Test #1203: demo.spawned_overlap .............   Passed    1.64 sec
+39/39 Test #1201: demo.worlds ......................   Passed    3.36 sec
+
+100% tests passed, 0 tests failed out of 39
+
+Label Time Summary:
+demo               =   5.02 sec*proc (5 tests)
+demo_menu          =   0.04 sec*proc (3 tests)
+fanatic_prophet    =   0.15 sec*proc (7 tests)
+headless           =   7.81 sec*proc (39 tests)
+menus              =   2.33 sec*proc (5 tests)
+private            =   7.74 sec*proc (14 tests)
+services           =   0.21 sec*proc (14 tests)
+spawner            =   0.06 sec*proc (5 tests)
+
+Total Test time (real) =   4.12 sec

@@ -1,0 +1,1804 @@
+In file included from OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:15:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: In function ‘uint32_t bc_EngineMessageFn(BaseClass*, uint32_t, void*, float)’:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:30:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   30 |                                 if( g_pServerDE->GetPropGeneric( "Name", &genProp ) == DE_OK )
+      |                                                                  ^~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:35:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   35 |                                 if( g_pServerDE->GetPropGeneric( "Pos", &genProp ) == DE_OK )
+      |                                                                  ^~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:39:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   39 |                                 if( g_pServerDE->GetPropGeneric( "Rotation", &genProp ) == DE_OK )
+      |                                                                  ^~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:43:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   43 |                                 if( g_pServerDE->GetPropGeneric( "Flags", &genProp ) == DE_OK )
+      |                                                                  ^~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:47:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   47 |                                 if( g_pServerDE->GetPropGeneric( "Visible", &genProp ) == DE_OK )
+      |                                                                  ^~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:54:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   54 |                                 if( g_pServerDE->GetPropGeneric( "Shadow", &genProp ) == DE_OK )
+      |                                                                  ^~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:61:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   61 |                                 if( g_pServerDE->GetPropGeneric( "RotateableSprite", &genProp ) == DE_OK )
+      |                                                                  ^~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:68:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   68 |                                 if( g_pServerDE->GetPropGeneric( "Chromakey", &genProp ) == DE_OK )
+      |                                                                  ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:75:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   75 |                                 if( g_pServerDE->GetPropGeneric( "Solid", &genProp ) == DE_OK )
+      |                                                                  ^~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:82:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   82 |                                 if( g_pServerDE->GetPropGeneric( "Gravity", &genProp ) == DE_OK )
+      |                                                                  ^~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:89:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   89 |                                 if( g_pServerDE->GetPropGeneric( "TouchNotify", &genProp ) == DE_OK )
+      |                                                                  ^~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:96:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   96 |                                 if( g_pServerDE->GetPropGeneric( "Rayhit", &genProp ) == DE_OK )
+      |                                                                  ^~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:103:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  103 |                                 if( g_pServerDE->GetPropGeneric( "Filename", &genProp ) == DE_OK )
+      |                                                                  ^~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:108:66: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  108 |                                 if( g_pServerDE->GetPropGeneric( "Skin", &genProp ) == DE_OK )
+      |                                                                  ^~~~~~
+In file included from OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.h:16,
+                 from OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:11:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: At global scope:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:180:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  180 | BEGIN_CLASS(Model)
+      | ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:180:1: note: in expansion of macro ‘BEGIN_CLASS’
+  180 | BEGIN_CLASS(Model)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:180:1: note: in expansion of macro ‘BEGIN_CLASS’
+  180 | BEGIN_CLASS(Model)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:181:36: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  181 |         ADD_STRINGPROP(Filename, "")
+      |                                    ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:181:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  181 |         ADD_STRINGPROP(Filename, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:181:34: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  181 |         ADD_STRINGPROP(Filename, "")
+      |                                  ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:181:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  181 |         ADD_STRINGPROP(Filename, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:182:32: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  182 |         ADD_STRINGPROP(Skin, "")
+      |                                ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:182:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  182 |         ADD_STRINGPROP(Skin, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:182:30: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  182 |         ADD_STRINGPROP(Skin, "")
+      |                              ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:182:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  182 |         ADD_STRINGPROP(Skin, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:183:44: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  183 |         ADD_LONGINTPROP(Flags, FLAG_VISIBLE)
+      |                                            ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:378:59: note: in definition of macro ‘ADD_LONGINTPROP_FLAG’
+  378 | #define ADD_LONGINTPROP_FLAG(name, val, flags) PropDef_t(#name, PT_LONGINT, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                           ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:183:9: note: in expansion of macro ‘ADD_LONGINTPROP’
+  183 |         ADD_LONGINTPROP(Flags, FLAG_VISIBLE)
+      |         ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:184:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  184 | END_CLASS_DEFAULT_FLAGS(Model, BaseClass, mdl_MessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:184:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  184 | END_CLASS_DEFAULT_FLAGS(Model, BaseClass, mdl_MessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: In function ‘uint32_t wmdl_MessageFn(BaseClass*, uint32_t, void*, float)’:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:206:52: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  206 |                         g_pServerDE->GetPropString("Name", pStruct->m_Filename, MAX_CS_FILENAME_LEN);
+      |                                                    ^~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: At global scope:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:214:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  214 | BEGIN_CLASS(WorldModel)
+      | ^~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:214:1: note: in expansion of macro ‘BEGIN_CLASS’
+  214 | BEGIN_CLASS(WorldModel)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:214:1: note: in expansion of macro ‘BEGIN_CLASS’
+  214 | BEGIN_CLASS(WorldModel)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:215:44: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  215 |         ADD_LONGINTPROP(Flags, FLAG_VISIBLE)
+      |                                            ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:378:59: note: in definition of macro ‘ADD_LONGINTPROP_FLAG’
+  378 | #define ADD_LONGINTPROP_FLAG(name, val, flags) PropDef_t(#name, PT_LONGINT, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                           ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:215:9: note: in expansion of macro ‘ADD_LONGINTPROP’
+  215 |         ADD_LONGINTPROP(Flags, FLAG_VISIBLE)
+      |         ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:216:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  216 | END_CLASS_DEFAULT_FLAGS(WorldModel, BaseClass, wmdl_MessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:216:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  216 | END_CLASS_DEFAULT_FLAGS(WorldModel, BaseClass, wmdl_MessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: In function ‘uint32_t cntr_MessageFn(BaseClass*, uint32_t, void*, float)’:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:241:53: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  241 |                         g_pServerDE->GetPropLongInt("ContainerCode", &code);
+      |                                                     ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:243:52: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  243 |                         g_pServerDE->GetPropString("Name", pStruct->m_Filename, MAX_CS_FILENAME_LEN);
+      |                                                    ^~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: At global scope:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:251:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  251 | BEGIN_CLASS(Container)
+      | ^~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:251:1: note: in expansion of macro ‘BEGIN_CLASS’
+  251 | BEGIN_CLASS(Container)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:251:1: note: in expansion of macro ‘BEGIN_CLASS’
+  251 | BEGIN_CLASS(Container)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:252:44: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  252 |         ADD_LONGINTPROP(Flags, FLAG_VISIBLE)
+      |                                            ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:378:59: note: in definition of macro ‘ADD_LONGINTPROP_FLAG’
+  378 | #define ADD_LONGINTPROP_FLAG(name, val, flags) PropDef_t(#name, PT_LONGINT, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                           ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:252:9: note: in expansion of macro ‘ADD_LONGINTPROP’
+  252 |         ADD_LONGINTPROP(Flags, FLAG_VISIBLE)
+      |         ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:253:41: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  253 |         ADD_LONGINTPROP(ContainerCode, 0)
+      |                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:378:59: note: in definition of macro ‘ADD_LONGINTPROP_FLAG’
+  378 | #define ADD_LONGINTPROP_FLAG(name, val, flags) PropDef_t(#name, PT_LONGINT, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                           ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:253:9: note: in expansion of macro ‘ADD_LONGINTPROP’
+  253 |         ADD_LONGINTPROP(ContainerCode, 0)
+      |         ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:254:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  254 | END_CLASS_DEFAULT_FLAGS(Container, BaseClass, cntr_MessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:254:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  254 | END_CLASS_DEFAULT_FLAGS(Container, BaseClass, cntr_MessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: In function ‘uint32_t spr_MessageFn(BaseClass*, uint32_t, void*, float)’:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:278:53: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  278 |                         g_pServerDE->GetPropGeneric("Color", &prop);
+      |                                                     ^~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:283:53: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  283 |                         g_pServerDE->GetPropGeneric("Scale", &prop);
+      |                                                     ^~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:286:53: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  286 |                         g_pServerDE->GetPropGeneric("Alpha", &prop);
+      |                                                     ^~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: At global scope:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:304:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  304 | BEGIN_CLASS(Sprite)
+      | ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:304:1: note: in expansion of macro ‘BEGIN_CLASS’
+  304 | BEGIN_CLASS(Sprite)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:304:1: note: in expansion of macro ‘BEGIN_CLASS’
+  304 | BEGIN_CLASS(Sprite)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:305:36: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  305 |         ADD_STRINGPROP(Filename, "")
+      |                                    ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:305:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  305 |         ADD_STRINGPROP(Filename, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:305:34: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  305 |         ADD_STRINGPROP(Filename, "")
+      |                                  ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:305:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  305 |         ADD_STRINGPROP(Filename, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:306:44: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  306 |         ADD_LONGINTPROP(Flags, FLAG_VISIBLE)
+      |                                            ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:378:59: note: in definition of macro ‘ADD_LONGINTPROP_FLAG’
+  378 | #define ADD_LONGINTPROP_FLAG(name, val, flags) PropDef_t(#name, PT_LONGINT, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                           ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:306:9: note: in expansion of macro ‘ADD_LONGINTPROP’
+  306 |         ADD_LONGINTPROP(Flags, FLAG_VISIBLE)
+      |         ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:307:42: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  307 |         ADD_VECTORPROP_VAL(Scale, 1, 1, 1)
+      |                                          ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:376:16: note: in definition of macro ‘ADD_VECTORPROP_VAL_FLAG’
+  376 |     PropDef_t(#name, PT_VECTOR, DVector(defX, defY, defZ), 0.0f, (char*)0, flags),
+      |                ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:307:9: note: in expansion of macro ‘ADD_VECTORPROP_VAL’
+  307 |         ADD_VECTORPROP_VAL(Scale, 1, 1, 1)
+      |         ^~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:308:43: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  308 |         ADD_COLORPROP(Color, 255, 255, 255)
+      |                                           ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:385:16: note: in definition of macro ‘ADD_COLORPROP_FLAG’
+  385 |     PropDef_t(#name, PT_COLOR, DVector(valR, valG, valB), 0.0f, (char*)0, flags),
+      |                ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:308:9: note: in expansion of macro ‘ADD_COLORPROP’
+  308 |         ADD_COLORPROP(Color, 255, 255, 255)
+      |         ^~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:309:30: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  309 |         ADD_REALPROP(Alpha, 1)
+      |                              ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:309:9: note: in expansion of macro ‘ADD_REALPROP’
+  309 |         ADD_REALPROP(Alpha, 1)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:309:9: note: in expansion of macro ‘ADD_REALPROP’
+  309 |         ADD_REALPROP(Alpha, 1)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:310:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  310 | END_CLASS_DEFAULT_FLAGS(Sprite, BaseClass, spr_MessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:310:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  310 | END_CLASS_DEFAULT_FLAGS(Sprite, BaseClass, spr_MessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: In function ‘uint32_t as_MessageFn(BaseClass*, uint32_t, void*, float)’:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:352:58: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  352 |                         if( g_pServerDE->GetPropGeneric( "Filename", &genProp ) == DE_OK )
+      |                                                          ^~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:359:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  359 |                         if( g_pServerDE->GetPropGeneric("OuterRadius", &genProp ) == DE_OK )
+      |                                                         ^~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:364:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  364 |                         if( g_pServerDE->GetPropGeneric("InnerRadius", &genProp ) == DE_OK )
+      |                                                         ^~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:369:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 |                         if( g_pServerDE->GetPropGeneric("Volume", &genProp) == DE_OK )
+      |                                                         ^~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:374:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  374 |                         if( g_pServerDE->GetPropGeneric("Priority", &genProp) == DE_OK )
+      |                                                         ^~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:379:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  379 |                         if( g_pServerDE->GetPropGeneric("Ambient", &genProp) == DE_OK )
+      |                                                         ^~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:384:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  384 |                         if( g_pServerDE->GetPropGeneric("FileStream", &genProp) == DE_OK )
+      |                                                         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: At global scope:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:431:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  431 | BEGIN_CLASS(Sound)
+      | ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:431:1: note: in expansion of macro ‘BEGIN_CLASS’
+  431 | BEGIN_CLASS(Sound)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:431:1: note: in expansion of macro ‘BEGIN_CLASS’
+  431 | BEGIN_CLASS(Sound)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:432:36: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  432 |         ADD_STRINGPROP(Filename, "")
+      |                                    ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:432:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  432 |         ADD_STRINGPROP(Filename, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:432:34: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  432 |         ADD_STRINGPROP(Filename, "")
+      |                                  ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:432:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  432 |         ADD_STRINGPROP(Filename, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:433:39: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  433 |         ADD_LONGINTPROP(Priority, 0.0f)
+      |                                       ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:378:59: note: in definition of macro ‘ADD_LONGINTPROP_FLAG’
+  378 | #define ADD_LONGINTPROP_FLAG(name, val, flags) PropDef_t(#name, PT_LONGINT, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                           ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:433:9: note: in expansion of macro ‘ADD_LONGINTPROP’
+  433 |         ADD_LONGINTPROP(Priority, 0.0f)
+      |         ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:434:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  434 |         ADD_REALPROP_FLAG(OuterRadius, 100.0f, PF_RADIUS)
+      |                                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:434:9: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  434 |         ADD_REALPROP_FLAG(OuterRadius, 100.0f, PF_RADIUS)
+      |         ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:435:56: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  435 |         ADD_REALPROP_FLAG(InnerRadius, 10.0f, PF_RADIUS)
+      |                                                        ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:435:9: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  435 |         ADD_REALPROP_FLAG(InnerRadius, 10.0f, PF_RADIUS)
+      |         ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:436:39: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  436 |         ADD_LONGINTPROP(Volume, 100.0f)
+      |                                       ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:378:59: note: in definition of macro ‘ADD_LONGINTPROP_FLAG’
+  378 | #define ADD_LONGINTPROP_FLAG(name, val, flags) PropDef_t(#name, PT_LONGINT, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                           ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:436:9: note: in expansion of macro ‘ADD_LONGINTPROP’
+  436 |         ADD_LONGINTPROP(Volume, 100.0f)
+      |         ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:437:32: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  437 |         ADD_BOOLPROP(Ambient, 1)
+      |                                ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:437:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  437 |         ADD_BOOLPROP(Ambient, 1)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:438:35: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  438 |         ADD_BOOLPROP(FileStream, 0)
+      |                                   ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:438:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  438 |         ADD_BOOLPROP(FileStream, 0)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:439:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  439 | END_CLASS_DEFAULT_FLAGS(Sound, BaseClass, as_MessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:439:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  439 | END_CLASS_DEFAULT_FLAGS(Sound, BaseClass, as_MessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:465:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  465 | BEGIN_CLASS(OutsideDef)
+      | ^~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:465:1: note: in expansion of macro ‘BEGIN_CLASS’
+  465 | BEGIN_CLASS(OutsideDef)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:465:1: note: in expansion of macro ‘BEGIN_CLASS’
+  465 | BEGIN_CLASS(OutsideDef)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:466:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  466 | END_CLASS_DEFAULT_FLAGS(OutsideDef, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME )
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:466:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  466 | END_CLASS_DEFAULT_FLAGS(OutsideDef, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME )
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:478:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  478 | BEGIN_CLASS(FastApproxArea)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:478:1: note: in expansion of macro ‘BEGIN_CLASS’
+  478 | BEGIN_CLASS(FastApproxArea)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:478:1: note: in expansion of macro ‘BEGIN_CLASS’
+  478 | BEGIN_CLASS(FastApproxArea)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:479:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  479 | END_CLASS_DEFAULT_FLAGS(FastApproxArea, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME )
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:479:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  479 | END_CLASS_DEFAULT_FLAGS(FastApproxArea, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME )
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:489:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  489 | BEGIN_CLASS(Light)
+      | ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:489:1: note: in expansion of macro ‘BEGIN_CLASS’
+  489 | BEGIN_CLASS(Light)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:489:1: note: in expansion of macro ‘BEGIN_CLASS’
+  489 | BEGIN_CLASS(Light)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:490:34: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  490 |         ADD_BOOLPROP(ClipLight, 1)
+      |                                  ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:490:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  490 |         ADD_BOOLPROP(ClipLight, 1)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:491:37: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  491 |         ADD_BOOLPROP(LightObjects, 1)
+      |                                     ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:491:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  491 |         ADD_BOOLPROP(LightObjects, 1)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:492:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  492 |         ADD_REALPROP_FLAG(LightRadius, 300.0f, PF_RADIUS)
+      |                                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:492:9: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  492 |         ADD_REALPROP_FLAG(LightRadius, 300.0f, PF_RADIUS)
+      |         ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:493:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  493 |         ADD_COLORPROP(LightColor, 255.0f, 255.0f, 255.0f)
+      |                                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:385:16: note: in definition of macro ‘ADD_COLORPROP_FLAG’
+  385 |     PropDef_t(#name, PT_COLOR, DVector(valR, valG, valB), 0.0f, (char*)0, flags),
+      |                ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:493:9: note: in expansion of macro ‘ADD_COLORPROP’
+  493 |         ADD_COLORPROP(LightColor, 255.0f, 255.0f, 255.0f)
+      |         ^~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:494:51: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  494 |         ADD_COLORPROP(OuterColor, 0.0f, 0.0f, 0.0f)
+      |                                                   ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:385:16: note: in definition of macro ‘ADD_COLORPROP_FLAG’
+  385 |     PropDef_t(#name, PT_COLOR, DVector(valR, valG, valB), 0.0f, (char*)0, flags),
+      |                ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:494:9: note: in expansion of macro ‘ADD_COLORPROP’
+  494 |         ADD_COLORPROP(OuterColor, 0.0f, 0.0f, 0.0f)
+      |         ^~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:495:39: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  495 |         ADD_REALPROP(BrightScale, 1.0f)
+      |                                       ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:495:9: note: in expansion of macro ‘ADD_REALPROP’
+  495 |         ADD_REALPROP(BrightScale, 1.0f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:495:9: note: in expansion of macro ‘ADD_REALPROP’
+  495 |         ADD_REALPROP(BrightScale, 1.0f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:496:32: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  496 |         ADD_REALPROP(Time, 0.0f)
+      |                                ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:496:9: note: in expansion of macro ‘ADD_REALPROP’
+  496 |         ADD_REALPROP(Time, 0.0f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:496:9: note: in expansion of macro ‘ADD_REALPROP’
+  496 |         ADD_REALPROP(Time, 0.0f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:497:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  497 | END_CLASS_DEFAULT_FLAGS(Light, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME )
+      | ^~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:497:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  497 | END_CLASS_DEFAULT_FLAGS(Light, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME )
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:507:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  507 | BEGIN_CLASS(ObjectLight)
+      | ^~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:507:1: note: in expansion of macro ‘BEGIN_CLASS’
+  507 | BEGIN_CLASS(ObjectLight)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:507:1: note: in expansion of macro ‘BEGIN_CLASS’
+  507 | BEGIN_CLASS(ObjectLight)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:508:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  508 |         ADD_REALPROP_FLAG(LightRadius, 300.0f, PF_RADIUS)
+      |                                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:508:9: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  508 |         ADD_REALPROP_FLAG(LightRadius, 300.0f, PF_RADIUS)
+      |         ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:509:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  509 |         ADD_COLORPROP(LightColor, 255.0f, 255.0f, 255.0f)
+      |                                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:385:16: note: in definition of macro ‘ADD_COLORPROP_FLAG’
+  385 |     PropDef_t(#name, PT_COLOR, DVector(valR, valG, valB), 0.0f, (char*)0, flags),
+      |                ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:509:9: note: in expansion of macro ‘ADD_COLORPROP’
+  509 |         ADD_COLORPROP(LightColor, 255.0f, 255.0f, 255.0f)
+      |         ^~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:510:51: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  510 |         ADD_COLORPROP(OuterColor, 0.0f, 0.0f, 0.0f)
+      |                                                   ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:385:16: note: in definition of macro ‘ADD_COLORPROP_FLAG’
+  385 |     PropDef_t(#name, PT_COLOR, DVector(valR, valG, valB), 0.0f, (char*)0, flags),
+      |                ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:510:9: note: in expansion of macro ‘ADD_COLORPROP’
+  510 |         ADD_COLORPROP(OuterColor, 0.0f, 0.0f, 0.0f)
+      |         ^~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:511:39: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  511 |         ADD_REALPROP(BrightScale, 1.0f)
+      |                                       ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:511:9: note: in expansion of macro ‘ADD_REALPROP’
+  511 |         ADD_REALPROP(BrightScale, 1.0f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:511:9: note: in expansion of macro ‘ADD_REALPROP’
+  511 |         ADD_REALPROP(BrightScale, 1.0f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:512:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  512 | END_CLASS_DEFAULT_FLAGS(ObjectLight, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:512:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  512 | END_CLASS_DEFAULT_FLAGS(ObjectLight, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:522:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  522 | BEGIN_CLASS(DirLight)
+      | ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:522:1: note: in expansion of macro ‘BEGIN_CLASS’
+  522 | BEGIN_CLASS(DirLight)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:522:1: note: in expansion of macro ‘BEGIN_CLASS’
+  522 | BEGIN_CLASS(DirLight)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:523:37: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  523 |         ADD_BOOLPROP(LightObjects, 1)
+      |                                     ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:523:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  523 |         ADD_BOOLPROP(LightObjects, 1)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:524:34: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  524 |         ADD_BOOLPROP(ClipLight, 1)
+      |                                  ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:524:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  524 |         ADD_BOOLPROP(ClipLight, 1)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:525:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  525 |         ADD_REALPROP_FLAG(LightRadius, 300.0f, PF_RADIUS)
+      |                                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:525:9: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  525 |         ADD_REALPROP_FLAG(LightRadius, 300.0f, PF_RADIUS)
+      |         ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:526:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  526 |         ADD_COLORPROP(InnerColor, 255.0f, 255.0f, 255.0f)
+      |                                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:385:16: note: in definition of macro ‘ADD_COLORPROP_FLAG’
+  385 |     PropDef_t(#name, PT_COLOR, DVector(valR, valG, valB), 0.0f, (char*)0, flags),
+      |                ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:526:9: note: in expansion of macro ‘ADD_COLORPROP’
+  526 |         ADD_COLORPROP(InnerColor, 255.0f, 255.0f, 255.0f)
+      |         ^~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:527:51: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  527 |         ADD_COLORPROP(OuterColor, 0.0f, 0.0f, 0.0f)
+      |                                                   ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:385:16: note: in definition of macro ‘ADD_COLORPROP_FLAG’
+  385 |     PropDef_t(#name, PT_COLOR, DVector(valR, valG, valB), 0.0f, (char*)0, flags),
+      |                ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:527:9: note: in expansion of macro ‘ADD_COLORPROP’
+  527 |         ADD_COLORPROP(OuterColor, 0.0f, 0.0f, 0.0f)
+      |         ^~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:528:53: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  528 |         ADD_REALPROP_FLAG(FOV, 90.0f, PF_FIELDOFVIEW)
+      |                                                     ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:528:9: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  528 |         ADD_REALPROP_FLAG(FOV, 90.0f, PF_FIELDOFVIEW)
+      |         ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:529:39: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  529 |         ADD_REALPROP(BrightScale, 1.0f)
+      |                                       ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:529:9: note: in expansion of macro ‘ADD_REALPROP’
+  529 |         ADD_REALPROP(BrightScale, 1.0f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:529:9: note: in expansion of macro ‘ADD_REALPROP’
+  529 |         ADD_REALPROP(BrightScale, 1.0f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:530:32: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  530 |         ADD_REALPROP(Time, 0.0f)
+      |                                ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:530:9: note: in expansion of macro ‘ADD_REALPROP’
+  530 |         ADD_REALPROP(Time, 0.0f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:530:9: note: in expansion of macro ‘ADD_REALPROP’
+  530 |         ADD_REALPROP(Time, 0.0f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:531:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  531 | END_CLASS_DEFAULT_FLAGS(DirLight, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:531:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  531 | END_CLASS_DEFAULT_FLAGS(DirLight, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:541:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  541 | BEGIN_CLASS(LightAnimator)
+      | ^~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:541:1: note: in expansion of macro ‘BEGIN_CLASS’
+  541 | BEGIN_CLASS(LightAnimator)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:541:1: note: in expansion of macro ‘BEGIN_CLASS’
+  541 | BEGIN_CLASS(LightAnimator)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:542:46: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  542 |         ADD_STRINGPROP(BaseLightName, "light")
+      |                                              ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:542:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  542 |         ADD_STRINGPROP(BaseLightName, "light")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:542:39: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  542 |         ADD_STRINGPROP(BaseLightName, "light")
+      |                                       ^~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:542:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  542 |         ADD_STRINGPROP(BaseLightName, "light")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:543:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  543 | END_CLASS_DEFAULT_FLAGS(LightAnimator, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:543:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  543 | END_CLASS_DEFAULT_FLAGS(LightAnimator, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:552:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  552 | BEGIN_CLASS(ProjectorSprite)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:552:1: note: in expansion of macro ‘BEGIN_CLASS’
+  552 | BEGIN_CLASS(ProjectorSprite)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:552:1: note: in expansion of macro ‘BEGIN_CLASS’
+  552 | BEGIN_CLASS(ProjectorSprite)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:553:46: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  553 |         ADD_STRINGPROP(Filename, "sprite.spr")
+      |                                              ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:553:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  553 |         ADD_STRINGPROP(Filename, "sprite.spr")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:553:34: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  553 |         ADD_STRINGPROP(Filename, "sprite.spr")
+      |                                  ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:553:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  553 |         ADD_STRINGPROP(Filename, "sprite.spr")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:554:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  554 | END_CLASS_DEFAULT_FLAGS(ProjectorSprite, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:554:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  554 | END_CLASS_DEFAULT_FLAGS(ProjectorSprite, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:564:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  564 | BEGIN_CLASS(GlobalDirLight)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:564:1: note: in expansion of macro ‘BEGIN_CLASS’
+  564 | BEGIN_CLASS(GlobalDirLight)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:564:1: note: in expansion of macro ‘BEGIN_CLASS’
+  564 | BEGIN_CLASS(GlobalDirLight)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:565:80: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  565 |         ADD_VECTORPROP_VAL_FLAG(BigDims, 90.0f, 90.0f, 90.0f, PF_DIMS|PF_HIDDEN)
+      |                                                                                ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:376:16: note: in definition of macro ‘ADD_VECTORPROP_VAL_FLAG’
+  376 |     PropDef_t(#name, PT_VECTOR, DVector(defX, defY, defZ), 0.0f, (char*)0, flags),
+      |                ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:566:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  566 |         ADD_COLORPROP(InnerColor, 255.0f, 255.0f, 255.0f)
+      |                                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:385:16: note: in definition of macro ‘ADD_COLORPROP_FLAG’
+  385 |     PropDef_t(#name, PT_COLOR, DVector(valR, valG, valB), 0.0f, (char*)0, flags),
+      |                ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:566:9: note: in expansion of macro ‘ADD_COLORPROP’
+  566 |         ADD_COLORPROP(InnerColor, 255.0f, 255.0f, 255.0f)
+      |         ^~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:567:51: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  567 |         ADD_COLORPROP(OuterColor, 0.0f, 0.0f, 0.0f)
+      |                                                   ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:385:16: note: in definition of macro ‘ADD_COLORPROP_FLAG’
+  385 |     PropDef_t(#name, PT_COLOR, DVector(valR, valG, valB), 0.0f, (char*)0, flags),
+      |                ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:567:9: note: in expansion of macro ‘ADD_COLORPROP’
+  567 |         ADD_COLORPROP(OuterColor, 0.0f, 0.0f, 0.0f)
+      |         ^~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:568:39: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  568 |         ADD_REALPROP(BrightScale, 1.0f)
+      |                                       ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:568:9: note: in expansion of macro ‘ADD_REALPROP’
+  568 |         ADD_REALPROP(BrightScale, 1.0f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:568:9: note: in expansion of macro ‘ADD_REALPROP’
+  568 |         ADD_REALPROP(BrightScale, 1.0f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:569:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  569 | END_CLASS_DEFAULT_FLAGS(GlobalDirLight, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:569:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  569 | END_CLASS_DEFAULT_FLAGS(GlobalDirLight, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:579:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  579 | BEGIN_CLASS(World)
+      | ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:579:1: note: in expansion of macro ‘BEGIN_CLASS’
+  579 | BEGIN_CLASS(World)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:579:1: note: in expansion of macro ‘BEGIN_CLASS’
+  579 | BEGIN_CLASS(World)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:580:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  580 | END_CLASS_DEFAULT_FLAGS(World, BaseClass, DNULL, DNULL, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:580:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  580 | END_CLASS_DEFAULT_FLAGS(World, BaseClass, DNULL, DNULL, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:592:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  592 | BEGIN_CLASS(Brush)
+      | ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:592:1: note: in expansion of macro ‘BEGIN_CLASS’
+  592 | BEGIN_CLASS(Brush)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:592:1: note: in expansion of macro ‘BEGIN_CLASS’
+  592 | BEGIN_CLASS(Brush)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:593:30: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  593 |         ADD_BOOLPROP(Solid, 1)
+      |                              ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:593:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  593 |         ADD_BOOLPROP(Solid, 1)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:594:36: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  594 |         ADD_BOOLPROP(Nonexistant, 0)
+      |                                    ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:594:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  594 |         ADD_BOOLPROP(Nonexistant, 0)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:595:34: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  595 |         ADD_BOOLPROP(Invisible, 0)
+      |                                  ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:595:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  595 |         ADD_BOOLPROP(Invisible, 0)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:596:36: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  596 |         ADD_BOOLPROP(Translucent, 0)
+      |                                    ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:596:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  596 |         ADD_BOOLPROP(Translucent, 0)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:597:34: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  597 |         ADD_BOOLPROP(SkyPortal, 0)
+      |                                  ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:597:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  597 |         ADD_BOOLPROP(SkyPortal, 0)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:598:36: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  598 |         ADD_BOOLPROP(FullyBright, 0)
+      |                                    ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:598:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  598 |         ADD_BOOLPROP(FullyBright, 0)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:599:34: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  599 |         ADD_BOOLPROP(FlatShade, 0)
+      |                                  ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:599:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  599 |         ADD_BOOLPROP(FlatShade, 0)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:600:37: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  600 |         ADD_BOOLPROP(GouraudShade, 1)
+      |                                     ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:600:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  600 |         ADD_BOOLPROP(GouraudShade, 1)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:601:33: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  601 |         ADD_BOOLPROP(LightMap, 1)
+      |                                 ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:601:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  601 |         ADD_BOOLPROP(LightMap, 1)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:602:34: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  602 |         ADD_BOOLPROP(Subdivide, 1)
+      |                                  ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:602:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  602 |         ADD_BOOLPROP(Subdivide, 1)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:603:34: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  603 |         ADD_BOOLPROP(HullMaker, 0)
+      |                                  ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:603:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  603 |         ADD_BOOLPROP(HullMaker, 0)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:604:39: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  604 |         ADD_BOOLPROP(AlwaysLightMap, 0)
+      |                                       ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:604:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  604 |         ADD_BOOLPROP(AlwaysLightMap, 0)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:605:41: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  605 |         ADD_BOOLPROP(DirectionalLight, 0)
+      |                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:605:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  605 |         ADD_BOOLPROP(DirectionalLight, 0)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:606:31: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  606 |         ADD_BOOLPROP(Portal, 0)
+      |                               ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:606:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  606 |         ADD_BOOLPROP(Portal, 0)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:607:31: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  607 |         ADD_BOOLPROP(NoSnap, 0)
+      |                               ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:607:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  607 |         ADD_BOOLPROP(NoSnap, 0)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:608:31: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  608 |         ADD_BOOLPROP(SkyPan, 0)
+      |                               ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:382:56: note: in definition of macro ‘ADD_BOOLPROP_FLAG’
+  382 | #define ADD_BOOLPROP_FLAG(name, val, flags) PropDef_t(#name, PT_BOOL, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:608:9: note: in expansion of macro ‘ADD_BOOLPROP’
+  608 |         ADD_BOOLPROP(SkyPan, 0)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:610:39: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  610 |         ADD_LONGINTPROP(DetailLevel, 0)
+      |                                       ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:378:59: note: in definition of macro ‘ADD_LONGINTPROP_FLAG’
+  378 | #define ADD_LONGINTPROP_FLAG(name, val, flags) PropDef_t(#name, PT_LONGINT, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                           ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:610:9: note: in expansion of macro ‘ADD_LONGINTPROP’
+  610 |         ADD_LONGINTPROP(DetailLevel, 0)
+      |         ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:611:34: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  611 |         ADD_STRINGPROP(Effect, "")
+      |                                  ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:611:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  611 |         ADD_STRINGPROP(Effect, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:611:32: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  611 |         ADD_STRINGPROP(Effect, "")
+      |                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:611:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  611 |         ADD_STRINGPROP(Effect, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:612:39: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  612 |         ADD_STRINGPROP(EffectParam, "")
+      |                                       ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:612:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  612 |         ADD_STRINGPROP(EffectParam, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:612:37: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  612 |         ADD_STRINGPROP(EffectParam, "")
+      |                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:612:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  612 |         ADD_STRINGPROP(EffectParam, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:613:44: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  613 |         ADD_REALPROP(FrictionCoefficient, 1)
+      |                                            ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:613:9: note: in expansion of macro ‘ADD_REALPROP’
+  613 |         ADD_REALPROP(FrictionCoefficient, 1)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:613:9: note: in expansion of macro ‘ADD_REALPROP’
+  613 |         ADD_REALPROP(FrictionCoefficient, 1)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:614:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  614 | END_CLASS_DEFAULT_FLAGS(Brush, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:614:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  614 | END_CLASS_DEFAULT_FLAGS(Brush, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:628:25: warning: declaration of ‘BaseClass <unnamed struct>::BaseClass’ changes meaning of ‘BaseClass’ [-Wchanges-meaning]
+  628 |         BaseClass       BaseClass;
+      |                         ^~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:628:9: note: used here to mean ‘class BaseClass’
+  628 |         BaseClass       BaseClass;
+      |         ^~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.h:30:7: note: declared here
+   30 | class BaseClass
+      |       ^~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: In function ‘uint32_t DemoSky_EngineMessageFn(BaseClass*, uint32_t, void*, float)’:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:654:60: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  654 |                                 g_pServerDE->GetPropVector("SkyDims", &pModel->SkyDims);
+      |                                                            ^~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:655:60: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  655 |                                 g_pServerDE->GetPropString("Name", pStruct->m_Filename, MAX_CS_FILENAME_LEN);
+      |                                                            ^~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:656:58: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  656 |                                 g_pServerDE->GetPropReal("InnerPercentX", &pModel->InnerPercentX);
+      |                                                          ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:657:58: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  657 |                                 g_pServerDE->GetPropReal("InnerPercentY", &pModel->InnerPercentY);
+      |                                                          ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:658:58: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  658 |                                 g_pServerDE->GetPropReal("InnerPercentZ", &pModel->InnerPercentZ);
+      |                                                          ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:659:61: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  659 |                                 g_pServerDE->GetPropLongInt("Index", &pModel->Index);
+      |                                                             ^~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: At global scope:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:702:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  702 | BEGIN_CLASS(DemoSkyWorldModel)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:702:1: note: in expansion of macro ‘BEGIN_CLASS’
+  702 | BEGIN_CLASS(DemoSkyWorldModel)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:702:1: note: in expansion of macro ‘BEGIN_CLASS’
+  702 | BEGIN_CLASS(DemoSkyWorldModel)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:703:67: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  703 |         ADD_VECTORPROP_VAL_FLAG(SkyDims, 0.0f, 0.0f, 0.0f, PF_DIMS)
+      |                                                                   ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:376:16: note: in definition of macro ‘ADD_VECTORPROP_VAL_FLAG’
+  376 |     PropDef_t(#name, PT_VECTOR, DVector(defX, defY, defZ), 0.0f, (char*)0, flags),
+      |                ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:704:33: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  704 |         ADD_LONGINTPROP(Flags, 1)
+      |                                 ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:378:59: note: in definition of macro ‘ADD_LONGINTPROP_FLAG’
+  378 | #define ADD_LONGINTPROP_FLAG(name, val, flags) PropDef_t(#name, PT_LONGINT, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                           ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:704:9: note: in expansion of macro ‘ADD_LONGINTPROP’
+  704 |         ADD_LONGINTPROP(Flags, 1)
+      |         ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:705:33: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  705 |         ADD_LONGINTPROP(Index, 0)
+      |                                 ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:378:59: note: in definition of macro ‘ADD_LONGINTPROP_FLAG’
+  378 | #define ADD_LONGINTPROP_FLAG(name, val, flags) PropDef_t(#name, PT_LONGINT, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                           ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:705:9: note: in expansion of macro ‘ADD_LONGINTPROP’
+  705 |         ADD_LONGINTPROP(Index, 0)
+      |         ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:706:41: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  706 |         ADD_REALPROP(InnerPercentX, 0.1f)
+      |                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:706:9: note: in expansion of macro ‘ADD_REALPROP’
+  706 |         ADD_REALPROP(InnerPercentX, 0.1f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:706:9: note: in expansion of macro ‘ADD_REALPROP’
+  706 |         ADD_REALPROP(InnerPercentX, 0.1f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:707:41: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  707 |         ADD_REALPROP(InnerPercentY, 0.1f)
+      |                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:707:9: note: in expansion of macro ‘ADD_REALPROP’
+  707 |         ADD_REALPROP(InnerPercentY, 0.1f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:707:9: note: in expansion of macro ‘ADD_REALPROP’
+  707 |         ADD_REALPROP(InnerPercentY, 0.1f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:708:41: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  708 |         ADD_REALPROP(InnerPercentZ, 0.1f)
+      |                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:708:9: note: in expansion of macro ‘ADD_REALPROP’
+  708 |         ADD_REALPROP(InnerPercentZ, 0.1f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:708:9: note: in expansion of macro ‘ADD_REALPROP’
+  708 |         ADD_REALPROP(InnerPercentZ, 0.1f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:709:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  709 | END_CLASS_DEFAULT_FLAGS(DemoSkyWorldModel, BaseClass, DemoSky_EngineMessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:709:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  709 | END_CLASS_DEFAULT_FLAGS(DemoSkyWorldModel, BaseClass, DemoSky_EngineMessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:717:25: warning: declaration of ‘BaseClass <unnamed struct>::BaseClass’ changes meaning of ‘BaseClass’ [-Wchanges-meaning]
+  717 |         BaseClass       BaseClass;
+      |                         ^~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:717:9: note: used here to mean ‘class BaseClass’
+  717 |         BaseClass       BaseClass;
+      |         ^~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.h:30:7: note: declared here
+   30 | class BaseClass
+      |       ^~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: In function ‘uint32_t SkyPointer_EngineMessageFn(BaseClass*, uint32_t, void*, float)’:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:747:60: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  747 |                                 g_pServerDE->GetPropVector("SkyDims", &pModel->SkyDims);
+      |                                                            ^~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:748:60: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  748 |                                 g_pServerDE->GetPropString("Name", pStruct->m_Filename, MAX_CS_FILENAME_LEN);
+      |                                                            ^~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:749:60: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  749 |                                 g_pServerDE->GetPropString("SkyObjectName", pModel->m_ObjectName, sizeof(pModel->m_ObjectName)-1);
+      |                                                            ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:750:58: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  750 |                                 g_pServerDE->GetPropReal("InnerPercentX", &pModel->InnerPercentX);
+      |                                                          ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:751:58: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  751 |                                 g_pServerDE->GetPropReal("InnerPercentY", &pModel->InnerPercentY);
+      |                                                          ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:752:58: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  752 |                                 g_pServerDE->GetPropReal("InnerPercentZ", &pModel->InnerPercentZ);
+      |                                                          ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:753:61: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  753 |                                 g_pServerDE->GetPropLongInt("Index", &pModel->Index);
+      |                                                             ^~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: At global scope:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:811:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  811 | BEGIN_CLASS(SkyPointer)
+      | ^~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:811:1: note: in expansion of macro ‘BEGIN_CLASS’
+  811 | BEGIN_CLASS(SkyPointer)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:811:1: note: in expansion of macro ‘BEGIN_CLASS’
+  811 | BEGIN_CLASS(SkyPointer)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:812:41: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  812 |         ADD_STRINGPROP(SkyObjectName, "")
+      |                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:812:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  812 |         ADD_STRINGPROP(SkyObjectName, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:812:39: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  812 |         ADD_STRINGPROP(SkyObjectName, "")
+      |                                       ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:812:9: note: in expansion of macro ‘ADD_STRINGPROP’
+  812 |         ADD_STRINGPROP(SkyObjectName, "")
+      |         ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:813:67: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  813 |         ADD_VECTORPROP_VAL_FLAG(SkyDims, 0.0f, 0.0f, 0.0f, PF_DIMS)
+      |                                                                   ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:376:16: note: in definition of macro ‘ADD_VECTORPROP_VAL_FLAG’
+  376 |     PropDef_t(#name, PT_VECTOR, DVector(defX, defY, defZ), 0.0f, (char*)0, flags),
+      |                ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:814:33: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  814 |         ADD_LONGINTPROP(Flags, 1)
+      |                                 ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:378:59: note: in definition of macro ‘ADD_LONGINTPROP_FLAG’
+  378 | #define ADD_LONGINTPROP_FLAG(name, val, flags) PropDef_t(#name, PT_LONGINT, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                           ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:814:9: note: in expansion of macro ‘ADD_LONGINTPROP’
+  814 |         ADD_LONGINTPROP(Flags, 1)
+      |         ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:815:33: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  815 |         ADD_LONGINTPROP(Index, 0)
+      |                                 ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:378:59: note: in definition of macro ‘ADD_LONGINTPROP_FLAG’
+  378 | #define ADD_LONGINTPROP_FLAG(name, val, flags) PropDef_t(#name, PT_LONGINT, NOCOLOR, (float)val, (char*)0, flags),
+      |                                                           ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:815:9: note: in expansion of macro ‘ADD_LONGINTPROP’
+  815 |         ADD_LONGINTPROP(Index, 0)
+      |         ^~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:816:41: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  816 |         ADD_REALPROP(InnerPercentX, 0.1f)
+      |                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:816:9: note: in expansion of macro ‘ADD_REALPROP’
+  816 |         ADD_REALPROP(InnerPercentX, 0.1f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:816:9: note: in expansion of macro ‘ADD_REALPROP’
+  816 |         ADD_REALPROP(InnerPercentX, 0.1f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:817:41: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  817 |         ADD_REALPROP(InnerPercentY, 0.1f)
+      |                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:817:9: note: in expansion of macro ‘ADD_REALPROP’
+  817 |         ADD_REALPROP(InnerPercentY, 0.1f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:817:9: note: in expansion of macro ‘ADD_REALPROP’
+  817 |         ADD_REALPROP(InnerPercentY, 0.1f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:818:41: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  818 |         ADD_REALPROP(InnerPercentZ, 0.1f)
+      |                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:818:9: note: in expansion of macro ‘ADD_REALPROP’
+  818 |         ADD_REALPROP(InnerPercentZ, 0.1f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:390:33: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  390 | #define ADD_REALPROP(name, val) ADD_REALPROP_FLAG(name, val, 0)
+      |                                 ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:818:9: note: in expansion of macro ‘ADD_REALPROP’
+  818 |         ADD_REALPROP(InnerPercentZ, 0.1f)
+      |         ^~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:819:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  819 | END_CLASS_DEFAULT_FLAGS(SkyPointer, BaseClass, SkyPointer_EngineMessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:819:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  819 | END_CLASS_DEFAULT_FLAGS(SkyPointer, BaseClass, SkyPointer_EngineMessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: In function ‘uint32_t FogSphere_EngineMessageFn(BaseClass*, uint32_t, void*, float)’:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:846:53: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  846 |                         g_pServerDE->GetPropGeneric("LightRadius", &prop);
+      |                                                     ^~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp: At global scope:
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:861:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  861 | BEGIN_CLASS(FogSphere)
+      | ^~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:861:1: note: in expansion of macro ‘BEGIN_CLASS’
+  861 | BEGIN_CLASS(FogSphere)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:861:1: note: in expansion of macro ‘BEGIN_CLASS’
+  861 | BEGIN_CLASS(FogSphere)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:862:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  862 |         ADD_REALPROP_FLAG(LightRadius, 300.0f, PF_RADIUS)
+      |                                                         ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:56: note: in definition of macro ‘ADD_REALPROP_FLAG’
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                        ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:369:85: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  369 | #define ADD_REALPROP_FLAG(name, val, flags) PropDef_t(#name, PT_REAL, NOCOLOR, val, "", flags),
+      |                                                                                     ^~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:862:9: note: in expansion of macro ‘ADD_REALPROP_FLAG’
+  862 |         ADD_REALPROP_FLAG(LightRadius, 300.0f, PF_RADIUS)
+      |         ^~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:863:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  863 | END_CLASS_DEFAULT_FLAGS(FogSphere, BaseClass, FogSphere_EngineMessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:863:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  863 | END_CLASS_DEFAULT_FLAGS(FogSphere, BaseClass, FogSphere_EngineMessageFn, bc_ObjectMessageFn, CF_ALWAYSLOAD)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:874:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  874 | BEGIN_CLASS(RaySelecter)
+      | ^~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:874:1: note: in expansion of macro ‘BEGIN_CLASS’
+  874 | BEGIN_CLASS(RaySelecter)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:874:1: note: in expansion of macro ‘BEGIN_CLASS’
+  874 | BEGIN_CLASS(RaySelecter)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:875:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  875 | END_CLASS_DEFAULT_FLAGS(RaySelecter, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/engineobjects.cpp:875:1: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  875 | END_CLASS_DEFAULT_FLAGS(RaySelecter, BaseClass, bc_EngineMessageFn, bc_ObjectMessageFn, CF_NORUNTIME)
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:17:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   17 | BEGIN_CLASS(BaseClass)
+      | ^~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:17:1: note: in expansion of macro ‘BEGIN_CLASS’
+   17 | BEGIN_CLASS(BaseClass)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:17:1: note: in expansion of macro ‘BEGIN_CLASS’
+   17 | BEGIN_CLASS(BaseClass)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:18:30: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   18 | ADD_STRINGPROP(Name, "noname")
+      |                              ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:18:1: note: in expansion of macro ‘ADD_STRINGPROP’
+   18 | ADD_STRINGPROP(Name, "noname")
+      | ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:18:22: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   18 | ADD_STRINGPROP(Name, "noname")
+      |                      ^~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:18:1: note: in expansion of macro ‘ADD_STRINGPROP’
+   18 | ADD_STRINGPROP(Name, "noname")
+      | ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:19:19: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   19 | ADD_VECTORPROP(Pos)
+      |                   ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:373:53: note: in definition of macro ‘ADD_VECTORPROP_FLAG’
+  373 | #define ADD_VECTORPROP_FLAG(name, flags) PropDef_t(#name, PT_VECTOR, NOCOLOR, 0.0f, (char*)0, flags),
+      |                                                     ^~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:19:1: note: in expansion of macro ‘ADD_VECTORPROP’
+   19 | ADD_VECTORPROP(Pos)
+      | ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:20:26: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   20 | ADD_ROTATIONPROP(Rotation)
+      |                          ^
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:380:55: note: in definition of macro ‘ADD_ROTATIONPROP_FLAG’
+  380 | #define ADD_ROTATIONPROP_FLAG(name, flags) PropDef_t(#name, PT_ROTATION, NOCOLOR, 0.0f, (char*)0, flags),
+      |                                                       ^~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:20:1: note: in expansion of macro ‘ADD_ROTATIONPROP’
+   20 | ADD_ROTATIONPROP(Rotation)
+      | ^~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:21:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   21 | END_CLASS_DEFAULT_NOPARENT(BaseClass, BaseClass::_EngineMsgFn, BaseClass::_ObjectMsgFn)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:21:1: note: in expansion of macro ‘END_CLASS_DEFAULT_NOPARENT’
+   21 | END_CLASS_DEFAULT_NOPARENT(BaseClass, BaseClass::_EngineMsgFn, BaseClass::_ObjectMsgFn)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:23:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   23 | BEGIN_CLASS(StartPoint)
+      | ^~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:58: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                          ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:23:1: note: in expansion of macro ‘BEGIN_CLASS’
+   23 | BEGIN_CLASS(StartPoint)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:96: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                                                ^~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:371:90: note: in definition of macro ‘ADD_STRINGPROP_FLAG’
+  371 | #define ADD_STRINGPROP_FLAG(name, val, flags) PropDef_t(#name, PT_STRING, NOCOLOR, 0.0f, val, flags),
+      |                                                                                          ^~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:410:65: note: in expansion of macro ‘ADD_STRINGPROP’
+  410 | #define BEGIN_CLASS(name) static PropDef _##name##_Props__[] = {ADD_STRINGPROP("__NOPROP__!!", "")
+      |                                                                 ^~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:23:1: note: in expansion of macro ‘BEGIN_CLASS’
+   23 | BEGIN_CLASS(StartPoint)
+      | ^~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:24:1: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   24 | END_CLASS_DEFAULT(StartPoint, BaseClass, NULL, NULL)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:436:36: note: in definition of macro ‘END_CLASS_SYMBOL’
+  436 |     ClassDef _##name##_Class__ = {#name,                                                                               \
+      |                                    ^~~~
+OpenBlood2/blood2/AppHeaders/serverobj_de.h:471:5: note: in expansion of macro ‘END_CLASS_DEFAULT_FLAGS’
+  471 |     END_CLASS_DEFAULT_FLAGS(name, parent, enginemessage_fn, objectmessage_fn, 0)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp:24:1: note: in expansion of macro ‘END_CLASS_DEFAULT’
+   24 | END_CLASS_DEFAULT(StartPoint, BaseClass, NULL, NULL)
+      | ^~~~~~~~~~~~~~~~~

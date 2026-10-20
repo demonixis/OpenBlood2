@@ -1,0 +1,14 @@
+61/699 Testing: weapons.inventory
+61/699 Test: weapons.inventory
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_tests" "inventory" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-fixtures/inventory"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapons.inventory" start time: Oct 17 03:43 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"weapons.inventory" end time: Oct 17 03:43 CEST
+"weapons.inventory" time elapsed: 00:00:00
+----------------------------------------------------------

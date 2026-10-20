@@ -1,0 +1,36 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 925
+    Start 925: gpu.polygrid
+
+925: Test command: <workspace>/Blood2/build/debug/tests/polygrid_gpu_tests "<workspace>/Blood2/build/debug/tests/polygrid/gpu" "<external-data-root>"
+925: Working Directory: <workspace>/Blood2/build/debug/tests
+925: Environment variables:
+925:  SDL_AUDIODRIVER=dummy
+925: Test timeout computed to be: 120
+925: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+925: Repeat/alpha scan: red=76 green=74 black=73 clear=75 red runs=2
+925: CityHub cycle 0 cells 98 changed pixels 120000
+925: World water contribution 65234 pixels
+925: CityHub cycle 1 cells 98 changed pixels 120000
+925: World water contribution 65234 pixels
+1/1 Test #925: gpu.polygrid .....................   Passed    5.14 sec
+
+The following tests passed:
+	gpu.polygrid
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+gpu         =   5.14 sec*proc (1 test)
+polygrid    =   5.14 sec*proc (1 test)
+private     =   5.14 sec*proc (1 test)
+
+Total Test time (real) =   5.15 sec

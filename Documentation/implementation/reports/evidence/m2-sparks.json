@@ -1,0 +1,334 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "a52344adc5076b6c354f17c20316d6545c0ce582",
+  "m2_complete": false,
+  "validation": {
+    "debug": {
+      "passed": 69,
+      "failed": 0,
+      "private": 18,
+      "seconds": 39.12
+    },
+    "release": {
+      "passed": 69,
+      "failed": 0,
+      "private": 18,
+      "seconds": 5.53
+    },
+    "sanitize": {
+      "passed": 69,
+      "failed": 0,
+      "private": 18,
+      "seconds": 186.92
+    },
+    "debug-gpu": {
+      "passed": 9,
+      "failed": 0,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "seconds": 54.63
+    },
+    "release-gpu": {
+      "passed": 9,
+      "failed": 0,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "seconds": 11.55
+    }
+  },
+  "artifacts": [
+    {
+      "file": "m2-sparks-debug-build.log",
+      "sha256": "efd73d89bcb50b9402b6ae6d3d3087aa4e81efdcc1fdcd8de113d6abb17a04d0",
+      "raw_capture_sha256": "6fc5b17ceddb243471f93e059b1f43669391315bfbcc7b23f5aacf4577b2dee4",
+      "bytes": 47516
+    },
+    {
+      "file": "m2-sparks-debug-final-build.log",
+      "sha256": "ace253113ca495b4dda2cc0f6fa1040888ece4517412979aca4159d70a2b53c5",
+      "raw_capture_sha256": "2824075deb43a6a589930b475ef396bacf8a1c7baa65e9a43726f9d4ad4657b1",
+      "bytes": 3063
+    },
+    {
+      "file": "m2-sparks-debug-final-gpu.log",
+      "sha256": "e6bcb735f2454c2a4f314031c309bb01762061f4b01b9db864424465dc6e098d",
+      "raw_capture_sha256": "874d12790aaf674d7ce05ff357a98ef4473fffb3df6abc8bff22644a176c3d5c",
+      "bytes": 10081
+    },
+    {
+      "file": "m2-sparks-debug-final-headless.log",
+      "sha256": "f84031c2830ddfabf2ab0a939b96b79773f73be6dc10ea6e01c9192ecd861440",
+      "raw_capture_sha256": "44a7afe7efb33b34b1d712b169184bd04a4d17f7f314826e44380d5c9f7b715a",
+      "bytes": 39298
+    },
+    {
+      "file": "m2-sparks-debug-gpu.log",
+      "sha256": "2b1d3591cd20d8a12328bd3facc51271b5569362e15832f5bb0a44e59e35346a",
+      "raw_capture_sha256": "b4936f414863f52e8b48e7d194118bd59f0bf531aea820444dcc3cebd78fe733",
+      "bytes": 10081
+    },
+    {
+      "file": "m2-sparks-debug-headless.log",
+      "sha256": "d427c4fac8dd11b05866ba13772b42be40ae19f76a7eeed81a57f313c885bc41",
+      "raw_capture_sha256": "38b9f21d7929cabe09c93289ace860d6ba22dbf7b67e83afd47f238d58d2418e",
+      "bytes": 39298
+    },
+    {
+      "file": "m2-sparks-debug-new-tests.log",
+      "sha256": "988b9f5b2e151c643dee79ab311e3fd523bef4345b43e640133a22a7f5c080da",
+      "raw_capture_sha256": "6cd44ad697a5e6e7b63b6da54be942daab6f963d5b9ceaf02554b1abea836bfa",
+      "bytes": 2362
+    },
+    {
+      "file": "m2-sparks-debug-tests-build.log",
+      "sha256": "d2534cc93852a7e8519792a9887f969a0a73d5126877f176b9b4ec8a6f88d578",
+      "raw_capture_sha256": "9cfe6cd5e3576808deb85db53000c3a672b27708e331b167414439cc6ced48f8",
+      "bytes": 14046
+    },
+    {
+      "file": "m2-sparks-release-build.log",
+      "sha256": "ccbefa06de09523050889ac618e1bfd681ff4c0b1948944970dcb591356c58b3",
+      "raw_capture_sha256": "01f17be73837c9045e943da523f357c5e7c8a4a815d0e2d2140934c23a94db60",
+      "bytes": 51354
+    },
+    {
+      "file": "m2-sparks-release-final-build.log",
+      "sha256": "5c20afe7c5424ba9d6630fcf0e9243726b7db4942e29f9f57282f83d83fa0e7d",
+      "raw_capture_sha256": "7632985d97b547ea8d49b8f97f26cb8f466768df805dc2932e1706c81f45cc30",
+      "bytes": 3000
+    },
+    {
+      "file": "m2-sparks-release-final-gpu.log",
+      "sha256": "33b0ca634166516af7644662599cb42d6e32d26a04f4cc117e81b1eb48c3fa66",
+      "raw_capture_sha256": "5f920d039ef3631ec81de42381d06fa11bea53040c421cd1d53b5b6ec787599b",
+      "bytes": 10137
+    },
+    {
+      "file": "m2-sparks-release-final-headless.log",
+      "sha256": "c9b6f7053d777d2d38f9ed258ae25dfc20658e0b11faaaee3d908570b8f474cd",
+      "raw_capture_sha256": "363e776cdf834c11fad878b93968c48c49a14798925a1db966a997433e8c2b79",
+      "bytes": 39650
+    },
+    {
+      "file": "m2-sparks-sanitize-build.log",
+      "sha256": "0ff5dfb916dabee8008f7eda3acab5f79ddc64db03572ed34533b217c13e84e6",
+      "raw_capture_sha256": "5b9f25209cc46705c4f5107260dae62d783cd25f191687c572d427b00dc3fbe0",
+      "bytes": 48428
+    },
+    {
+      "file": "m2-sparks-sanitize-final-build.log",
+      "sha256": "0fc29821d14575ddfd0cd200f747818a284fa7a3c77836ab452cdbeea98545da",
+      "raw_capture_sha256": "38c33ec1a3509b8aeb1c35132fa6e499d5995c8b95bf478893c159024698012b",
+      "bytes": 1707
+    },
+    {
+      "file": "m2-sparks-sanitize-final-headless.log",
+      "sha256": "f129ed369d19df7595e75be4ad8f8d36ac5531ea868bac605c892b99d7609631",
+      "raw_capture_sha256": "a2f1047cfd61131f8ee2f4bbda36575eb2a6fa40880967e2042fe3f693923cd0",
+      "bytes": 39826
+    },
+    {
+      "file": "m2-sparks-source-check.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "raw_capture_sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "bytes": 56
+    },
+    {
+      "file": "m2-sparks-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    }
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "captures": [
+    {
+      "local_path": "build/debug/tests/sparks-private-gpu/impact-sparks.png",
+      "sha256": "27b6818702f612cfe57ae28cf3f2ccdc7585849fd748195687ac621a9976f4d3",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/sparks-private-gpu/impact-sparks-moving.png",
+      "sha256": "4e98f1c204197191675594c4cbfbfd952c81273809f13121ec5d63785cf2b446",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/sparks-private-gpu/impact-sparks.png",
+      "sha256": "27b6818702f612cfe57ae28cf3f2ccdc7585849fd748195687ac621a9976f4d3",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/sparks-private-gpu/impact-sparks-moving.png",
+      "sha256": "4e98f1c204197191675594c4cbfbfd952c81273809f13121ec5d63785cf2b446",
+      "committed": false
+    }
+  ],
+  "commands": [
+    "cmake --build build/<debug|release|sanitize> -j3 --target blood2_app spark_tests blood_spurt_tests blood_splat_tests death_effect_tests corpse_tests weapon_impact_tests weapon_sprite_tests object_contract_tests world_tests player_controls_tests",
+    "cmake --build build/<debug|release> -j3 --target spark_gpu_tests blood_spurt_gpu_tests blood_splat_gpu_tests death_effect_gpu_tests level_change_gpu_tests",
+    "ctest --test-dir build/<debug|release> -R '^(sparks|blood_spurts|blood_splats|corpses|death_effects|weapon_impacts|weapon_sprites|objects|player_controls)\\.|^world\\.(level_change.*|destination_.*)$' -V -j2",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^(sparks|blood_spurts|blood_splats|corpses|death_effects|weapon_impacts|weapon_sprites|objects|player_controls)\\.|^world\\.(level_change.*|destination_.*)$' -V -j2",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(sparks_private|blood_spurt|blood_spurt_private|blood_splat_alpha|blood_splat_private|death_effects|level_change|mouse_combat|corpse_clearance)$' -V"
+  ],
+  "development_findings": [
+    "The source retains empty detached spark systems until list eviction. The port reclaims only exhausted invisible systems strictly after duration; class behavior remains directly tested.",
+    "Review reproduced a 30 Hz precision tail: the double clock crosses duration while float particle lifetimes retain sub-microsecond values. Presentation clamps negative alpha to zero; source raw alpha and particle clocks remain inspected/tested.",
+    "Existing authored combat/corpse assertions and timeouts are unchanged."
+  ],
+  "limitations": [
+    "Selected flesh/metal weapon sparks only; underwater bubbles, generic/fade-color callers, shared eviction and other required M2 services remain unavailable.",
+    "Portable cosmetic RNG, later-engine AddParticles interpolation and existing particle rasterization are documented adaptations, not retail parity.",
+    "Diagnostic private floor and assets are not complete campaign traversal.",
+    "No native Metal run, shader/dependency/reference/asset modifications this increment."
+  ],
+  "implementation_patch_sha256": "d4b720bcb01deedca8fc83e5bd74e11b06592643bfc0802bd4f173eb514d115d",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "c164b1c6e59ce652cb104b2d5bfd39a78744c179b66d20705baf3da565ec944f"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "fc7d9653ccf2769e10bd5f9def6bc95e1a5a9ebcf3269b92fde9d008a4ea585f"
+    },
+    {
+      "path": "README.md",
+      "sha256": "f83049a8a544b42216d610c5e976e622f104b3b190130c0cfef907755c60eaeb"
+    },
+    {
+      "path": "docs/BLOOD_SPURT_CONTRACTS.md",
+      "sha256": "8df4d455723dc740b6d894371ef97a7954e00fcf3f15612edabc9eb8dcfadc95"
+    },
+    {
+      "path": "docs/M2_SPARK_SOURCES.json",
+      "sha256": "78af92642c9dd52a2bc81fbb80637ade403438b6614872bedaf1fcaf62617969"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "3635a25ca267cb127521e8b20b83c254b8ac738498920169b04fa0f4061e8d21"
+    },
+    {
+      "path": "docs/SPARK_CONTRACTS.md",
+      "sha256": "a9fefd3ea6f5dbb1ed75771d21307bb21bac8a1edd464bb22a111031e42afe37"
+    },
+    {
+      "path": "docs/SPRITE_VIEW_CONTRACTS.md",
+      "sha256": "593e0be24cc7923055b73b8ce41e9b851561bb447b77395c9ea2d6dea62feaf6"
+    },
+    {
+      "path": "docs/WEAPON_IMPACT_CONTRACTS.md",
+      "sha256": "7062b80e9dcd0b406002582daffb3f85736dcd0f11ca24149dc113497efc0e0a"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "e132c6d535cac317c0469d89dc4391310d5c9371a1014858c1073641e7d631f9"
+    },
+    {
+      "path": "src/app/inspector.h",
+      "sha256": "bff2f32bebeec062aee9af611c3c068126da861778700ffc6be48daeff7e49e1"
+    },
+    {
+      "path": "src/app/inspector_sprites.cpp",
+      "sha256": "b7e03e4a7180df08110cd3827bb287971c6877a8c7d5100231f8109049f64520"
+    },
+    {
+      "path": "src/app/sprite_scene.cpp",
+      "sha256": "f90d420f6c7fa705f1f35484eaac18ed986115e316d1f5d03a863f081c91b9f3"
+    },
+    {
+      "path": "src/engine/sprite_view.h",
+      "sha256": "72d8d725daaeecc798bfd4510a7be69ef72a2d07d22ee1b621a56af4f8d638ff"
+    },
+    {
+      "path": "src/game/legacy/server_de.h",
+      "sha256": "9133364d0e6f9b4deb15a899d24ef1ee6ec007a3fd23256ea0ec7b975bc1f7b0"
+    },
+    {
+      "path": "src/game/original/SparksFX.cpp",
+      "sha256": "2bb0a9843ac9eef99980ea030fb14d059192abd7ead2f6eb00494f9edc36f1d8"
+    },
+    {
+      "path": "src/game/original/SparksFX.h",
+      "sha256": "a1767231fc537d204e688a17f1936d2b569d52b963dfc446df1a6241e0351cf8"
+    },
+    {
+      "path": "src/game/original/WeaponFX.cpp",
+      "sha256": "9c889f03e977b4802452e1893f53ea9623d86cd563654a08b7b23ef8de323d8f"
+    },
+    {
+      "path": "src/game/original/WeaponFX.h",
+      "sha256": "29912aced852634689366186e8461db938251652f17597eec634b7fcc9897b94"
+    },
+    {
+      "path": "src/game/original/WeaponVector.cpp",
+      "sha256": "e612387a1f3b0991b264ffa34826c96f6b5244f2bf531a00292deb413ff12a92"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "d3843867312c485e59317ee4fe0407e5d03253ca655fb053d3d894ce0d9e640c"
+    },
+    {
+      "path": "src/game/server_effects.cpp",
+      "sha256": "18de285f8502a2b0db84f4bcacbfdf163357670d1bcbd5a92fcc257faeb765ba"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "f9e875385265685b48a86e6277d93e76d7a0b041f108b434989f5823fb48c556"
+    },
+    {
+      "path": "src/game/sparks.cpp",
+      "sha256": "24363e8e9445805977e626ac16b4753f24af2cd89a6513dff0850b17772da127"
+    },
+    {
+      "path": "src/game/sparks.h",
+      "sha256": "53606a0acae3bd469519cd6d2dcbf13b3423c58ae7351b83157b5f2d99c0b2d3"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "91fbeb516ab9c8e140f04824ee35f93ff66d54e90eb62c14344c11a84e20f9bb"
+    },
+    {
+      "path": "tests/spark_gpu_tests.cpp",
+      "sha256": "d9a4b3cd6a1fb9a68b3d51523aa67f66d9166c4b71d992d388a843a06dd04738"
+    },
+    {
+      "path": "tests/spark_tests.cpp",
+      "sha256": "6d778fc4f942fe89b5dc425b2eb4c2f35cea3eef8a655a04d8779583d6b56fc0"
+    }
+  ],
+  "unchanged_authored_combat_test_sha256": "8643d1339e982aa39b6d9e5b94197adcb1d2f70196f115f3fa338470bb6cf287",
+  "implementation_commit": "0d987417805a29bb26ed1604afed6225b67b2803"
+}

@@ -1,0 +1,15 @@
+You must install or update .NET to run this application.
+
+App: /tmp/lithtech-audit-2bVxTF/dotnet-tests/bin/Nomad.Tests/debug/Nomad.Tests.dll
+Architecture: x64
+Framework: 'Microsoft.NETCore.App', version '8.0.0' (x64)
+.NET location: /usr/lib64/dotnet/
+
+The following frameworks were found:
+  10.0.12 at [/usr/lib64/dotnet/shared/Microsoft.NETCore.App]
+
+Learn more:
+https://aka.ms/dotnet/app-launch-failed
+
+To install missing framework, download:
+https://aka.ms/dotnet-core-applaunch?framework=Microsoft.NETCore.App&framework_version=8.0.0&arch=x64&rid=fedora.44-x64&os=fedora.44

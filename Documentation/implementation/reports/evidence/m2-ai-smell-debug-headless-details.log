@@ -1,0 +1,2277 @@
+Start testing: Oct 17 14:01 CEST
+----------------------------------------------------------
+88/885 Testing: movement.private
+88/885 Test: movement.private
+Command: "<workspace>/Blood2/build/debug/tests/movement_tests" "private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"movement.private" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+cycle 0: distance 186.661; rise 55.998; jumps 1; landings 2; ground 1; messages 1762
+Original SubwayA camera intro expired after 12.0333 simulation seconds
+cycle 1: distance 186.661; rise 55.998; jumps 1; landings 2; ground 1; messages 1764
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+cycle 2: distance 186.661; rise 55.998; jumps 1; landings 2; ground 1; messages 1762
+<end of output>
+Test time =  14.37 sec
+----------------------------------------------------------
+Test Passed.
+"movement.private" end time: Oct 17 14:01 CEST
+"movement.private" time elapsed: 00:00:14
+----------------------------------------------------------
+
+658/885 Testing: player_controls.combat
+658/885 Test: player_controls.combat
+Command: "<workspace>/Blood2/build/debug/tests/player_controls_tests" "combat" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_controls.combat" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2192.09
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=8, ammo=42, independent corpse verified, native=0
+Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=0
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2192.09
+Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=13, ammo=37, independent corpse verified, native=0
+Dodge updates=12, corpse candidates=23, zero-margin search=1, swept source clearance=0
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+<end of output>
+Test time =  15.22 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.combat" end time: Oct 17 14:01 CEST
+"player_controls.combat" time elapsed: 00:00:15
+----------------------------------------------------------
+
+659/885 Testing: player_controls.corpse_clearance
+659/885 Test: player_controls.corpse_clearance
+Command: "<workspace>/Blood2/build/debug/tests/player_controls_tests" "clearance" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_controls.corpse_clearance" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2338.28
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=0
+Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+Post-kill position=-32,170.001,-1854.18 camera=0 yaw=0
+Walked past killed Cultist to z=-1854.18
+Approached encounter at z=-1742.25
+Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=0
+Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+Post-kill position=-32,170.001,-1340.93 camera=0 yaw=-3.72529e-09
+Walked past killed Cultist to z=-1340.93
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2341.42
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=0
+Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+Approached encounter at z=-1745.4
+Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=0
+Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+Post-kill position=-32,170.001,-1344.07 camera=0 yaw=3.72529e-09
+Walked past killed Cultist to z=-1344.07
+<end of output>
+Test time =  19.05 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.corpse_clearance" end time: Oct 17 14:01 CEST
+"player_controls.corpse_clearance" time elapsed: 00:00:19
+----------------------------------------------------------
+
+396/885 Testing: ai_state.subway
+396/885 Test: ai_state.subway
+Command: "<workspace>/Blood2/build/debug/tests/ai_state_tests" "subway" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_state.subway" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Subway diagnostic cycle=0 starts=3 finishes=2 dispatches=960
+Subway diagnostic cycle=1 starts=3 finishes=2 dispatches=960
+<end of output>
+Test time =   9.84 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.subway" end time: Oct 17 14:01 CEST
+"ai_state.subway" time elapsed: 00:00:09
+----------------------------------------------------------
+
+66/885 Testing: player.smell_private
+66/885 Test: player.smell_private
+Command: "<workspace>/Blood2/build/debug/tests/player_tests" "smell_private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"player.smell_private" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+SubwayA smell cycle 0: original intro, forward movement, 6 drops, 841 checks, 6 live hints
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+SubwayA smell cycle 1: original intro, forward movement, 6 drops, 841 checks, 6 live hints
+<end of output>
+Test time =   9.31 sec
+----------------------------------------------------------
+Test Passed.
+"player.smell_private" end time: Oct 17 14:01 CEST
+"player.smell_private" time elapsed: 00:00:09
+----------------------------------------------------------
+
+510/885 Testing: ai_runtime.subway
+510/885 Test: ai_runtime.subway
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "subway" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.subway" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+SubwayA load=0 created=204 unsupported=0 AI_Update=537 pings=20
+SubwayA load=1 created=204 unsupported=0 AI_Update=537 pings=20
+<end of output>
+Test time =   7.22 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.subway" end time: Oct 17 14:01 CEST
+"ai_runtime.subway" time elapsed: 00:00:07
+----------------------------------------------------------
+
+579/885 Testing: player_keepalive.private
+579/885 Test: player_keepalive.private
+Command: "<workspace>/Blood2/build/debug/tests/player_keepalive_tests" "private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_keepalive.private" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+cycle=0 CityHub named entry at 704,-85.999,2368; HP=73 bullets=17 keys=0 respawns=0 Caleb triangles=941
+Original instance=453 World-owned sound=31 Preprocessor only=541 Omitted: missing world model=1
+
+cycle=1 CityHub named entry at 704,-85.999,2368; HP=73 bullets=17 keys=0 respawns=0 Caleb triangles=941
+Original instance=453 World-owned sound=31 Preprocessor only=541 Omitted: missing world model=1
+
+cycle=2 CityHub named entry at 704,-85.999,2368; HP=73 bullets=17 keys=0 respawns=0 Caleb triangles=941
+Original instance=453 World-owned sound=31 Preprocessor only=541 Omitted: missing world model=1
+
+<end of output>
+Test time =   5.35 sec
+----------------------------------------------------------
+Test Passed.
+"player_keepalive.private" end time: Oct 17 14:01 CEST
+"player_keepalive.private" time elapsed: 00:00:05
+----------------------------------------------------------
+
+44/885 Testing: world.level_change_private
+44/885 Test: world.level_change_private
+Command: "<workspace>/Blood2/build/debug/tests/world_tests" "level_change_private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"world.level_change_private" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Malformed destination refusal 0: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 0:
+SubwayA transfer 0:
+Malformed destination refusal 1: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 1:
+SubwayA transfer 1:
+Malformed destination refusal 2: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 2:
+SubwayA transfer 2:
+PASS level_change_private
+<end of output>
+Test time =   6.83 sec
+----------------------------------------------------------
+Test Passed.
+"world.level_change_private" end time: Oct 17 14:01 CEST
+"world.level_change_private" time elapsed: 00:00:06
+----------------------------------------------------------
+
+45/885 Testing: world.destination_trial_private
+45/885 Test: world.destination_trial_private
+Command: "<workspace>/Blood2/build/debug/tests/world_tests" "destination_trial_private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"world.destination_trial_private" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Cycle 0 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=488 error=
+Cycle 0 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 0 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=488 error=
+Cycle 1 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 1 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=488 error=
+Cycle 2 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 2 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+PASS destination_trial_private
+<end of output>
+Test time =   6.08 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_trial_private" end time: Oct 17 14:01 CEST
+"world.destination_trial_private" time elapsed: 00:00:06
+----------------------------------------------------------
+
+67/885 Testing: player.private
+67/885 Test: player.private
+Command: "<workspace>/Blood2/build/debug/tests/player_tests" "private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"player.private" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Cycle 0: CPlayerObj at -32,170.001,-3224; 120 updates; 101 client messages; 7 paths
+Cycle 1: CPlayerObj at -32,170.001,-3224; 120 updates; 101 client messages; 7 paths
+Cycle 2: CPlayerObj at -32,170.001,-3224; 120 updates; 101 client messages; 7 paths
+<end of output>
+Test time =   3.19 sec
+----------------------------------------------------------
+Test Passed.
+"player.private" end time: Oct 17 14:01 CEST
+"player.private" time elapsed: 00:00:03
+----------------------------------------------------------
+
+46/885 Testing: world.destination_private
+46/885 Test: world.destination_private
+Command: "<workspace>/Blood2/build/debug/tests/world_tests" "destination_private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"world.destination_private" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Cycle 0: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 0: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 1: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 2: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+PASS destination_private
+<end of output>
+Test time =   3.20 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_private" end time: Oct 17 14:01 CEST
+"world.destination_private" time elapsed: 00:00:03
+----------------------------------------------------------
+
+565/885 Testing: player_state.private
+565/885 Test: player_state.private
+Command: "<workspace>/Blood2/build/debug/tests/player_state_tests" "private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_state.private" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+cycle 0: original restore initialization, selected player/aggregate fields and independent model/air; no client/world transfer
+cycle 1: original restore initialization, selected player/aggregate fields and independent model/air; no client/world transfer
+cycle 2: original restore initialization, selected player/aggregate fields and independent model/air; no client/world transfer
+<end of output>
+Test time =   1.67 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.private" end time: Oct 17 14:01 CEST
+"player_state.private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+660/885 Testing: player_controls.private
+660/885 Test: player_controls.private
+Command: "<workspace>/Blood2/build/debug/tests/player_controls_tests" "private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_controls.private" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Alternate input: hp=100 dead=0 ammo=38 shots=12 before=5
+Corpse placement: placed with clearance correction corrections=2 distance=28.8523 requested=-73.1721,133.002,-2412.32 fitted=-59.999,133.002,-2428
+Original FIRE_KEY: shots=12 ammo=38 voices=12 mouse=0
+<end of output>
+Test time =   6.14 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.private" end time: Oct 17 14:01 CEST
+"player_controls.private" time elapsed: 00:00:06
+----------------------------------------------------------
+
+352/885 Testing: ai_target.subway
+352/885 Test: ai_target.subway
+Command: "<workspace>/Blood2/build/debug/tests/ai_target_tests" "subway" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_target.subway" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Subway cycle=0: player leave/reentry clears/rebinds original target link
+Subway cycle=1: player leave/reentry clears/rebinds original target link
+<end of output>
+Test time =   1.19 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.subway" end time: Oct 17 14:01 CEST
+"ai_target.subway" time elapsed: 00:00:01
+----------------------------------------------------------
+
+385/885 Testing: ai_perception.subway
+385/885 Test: ai_perception.subway
+Command: "<workspace>/Blood2/build/debug/tests/ai_perception_tests" "subway" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_perception.subway" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Subway cycle=0: original player enters both factions; acquisition/invisibility/leave/reentry checked
+Subway cycle=1: original player enters both factions; acquisition/invisibility/leave/reentry checked
+<end of output>
+Test time =   1.15 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.subway" end time: Oct 17 14:01 CEST
+"ai_perception.subway" time elapsed: 00:00:01
+----------------------------------------------------------
+
+574/885 Testing: player_restore.private
+574/885 Test: player_restore.private
+Command: "<workspace>/Blood2/build/debug/tests/player_restore_tests" "private" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_restore.private" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+cycle=0 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+cycle=1 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+cycle=2 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+<end of output>
+Test time =   1.89 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.private" end time: Oct 17 14:01 CEST
+"player_restore.private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+511/885 Testing: ai_runtime.arena
+511/885 Test: ai_runtime.arena
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "arena" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.arena" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Arena state=2 phase=1 updates=522 shots=25 error= player HP=0
+<end of output>
+Test time =   0.42 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.arena" end time: Oct 17 14:01 CEST
+"ai_runtime.arena" time elapsed: 00:00:00
+----------------------------------------------------------
+
+495/885 Testing: ai_escape.catalog
+495/885 Test: ai_escape.catalog
+Command: "<workspace>/Blood2/build/debug/tests/ai_escape_tests" "catalog" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_escape.catalog" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+m_cultist1 TAUNT[6]=47 available=1 duration=5000
+f_cultist1 TAUNT[6]=47 available=1 duration=5000
+m_civilian1 TAUNT[6]=5 available=1 duration=5000
+f_civilian1 TAUNT[6]=5 available=1 duration=4067
+labtech TAUNT[6]=5 available=1 duration=5000
+gideon TAUNT[6]=4294967295 available=0 duration=0
+<end of output>
+Test time =   0.29 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.catalog" end time: Oct 17 14:01 CEST
+"ai_escape.catalog" time elapsed: 00:00:00
+----------------------------------------------------------
+
+384/885 Testing: ai_perception.catalog
+384/885 Test: ai_perception.catalog
+Command: "<workspace>/Blood2/build/debug/tests/ai_perception_tests" "catalog" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_perception.catalog" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Private NPC head-origin acquisition samples=240; no animation advancement
+<end of output>
+Test time =   0.29 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.catalog" end time: Oct 17 14:01 CEST
+"ai_perception.catalog" time elapsed: 00:00:00
+----------------------------------------------------------
+
+508/885 Testing: ai_runtime.catalog
+508/885 Test: ai_runtime.catalog
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "catalog" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.catalog" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+CultistAI male=1 difficulty=0 hp=7.75 model=Models/Enemies/m_Cultist1.abc
+CultistAI male=1 difficulty=1 hp=31 model=Models/Enemies/m_Cultist1.abc
+CultistAI male=1 difficulty=2 hp=46.5 model=Models/Enemies/m_Cultist1.abc
+CultistAI male=1 difficulty=3 hp=31 model=Models/Enemies/m_Cultist1.abc
+CultistAI male=0 difficulty=0 hp=7.75 model=Models/Enemies/f_Cultist1.abc
+CultistAI male=0 difficulty=1 hp=31 model=Models/Enemies/f_Cultist1.abc
+CultistAI male=0 difficulty=2 hp=46.5 model=Models/Enemies/f_Cultist1.abc
+CultistAI male=0 difficulty=3 hp=31 model=Models/Enemies/f_Cultist1.abc
+CivilianAI male=1 difficulty=0 hp=7.75 model=Models/Enemies/m_civilian1.abc
+CivilianAI male=1 difficulty=1 hp=31 model=Models/Enemies/m_civilian1.abc
+CivilianAI male=1 difficulty=2 hp=46.5 model=Models/Enemies/m_civilian1.abc
+CivilianAI male=1 difficulty=3 hp=31 model=Models/Enemies/m_civilian1.abc
+CivilianAI male=0 difficulty=0 hp=7.75 model=Models/Enemies/f_civilian1.abc
+CivilianAI male=0 difficulty=1 hp=31 model=Models/Enemies/f_civilian1.abc
+CivilianAI male=0 difficulty=2 hp=46.5 model=Models/Enemies/f_civilian1.abc
+CivilianAI male=0 difficulty=3 hp=31 model=Models/Enemies/f_civilian1.abc
+<end of output>
+Test time =   0.87 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.catalog" end time: Oct 17 14:01 CEST
+"ai_runtime.catalog" time elapsed: 00:00:00
+----------------------------------------------------------
+
+395/885 Testing: ai_state.catalog
+395/885 Test: ai_state.catalog
+Command: "<workspace>/Blood2/build/debug/tests/ai_state_tests" "catalog" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_state.catalog" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+m_civilian1 special1 duration=9166
+m_civilian1 special2 duration=6000
+m_civilian1 special3 duration=6000
+m_civilian1 special4 duration=2866
+m_civilian1 special5 duration=5466
+m_civilian1 special6 duration=4133
+m_civilian1 special7 duration=7533
+m_civilian1 special8 duration=9533
+m_civilian1 special9 duration=5300
+f_civilian1 special1 duration=9166
+f_civilian1 special2 duration=6000
+f_civilian1 special3 duration=6000
+f_civilian1 special4 duration=2033
+f_civilian1 special5 duration=5466
+f_civilian1 special6 duration=4133
+f_civilian1 special7 duration=7533
+f_civilian1 special8 duration=9533
+labtech special1 duration=9166
+labtech special5 duration=5466
+Private NPC animation changes/resets=240; available special slots=19
+<end of output>
+Test time =   0.29 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.catalog" end time: Oct 17 14:01 CEST
+"ai_state.catalog" time elapsed: 00:00:00
+----------------------------------------------------------
+
+509/885 Testing: ai_runtime.failures
+509/885 Test: ai_runtime.failures
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "failures" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.failures" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.10 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.failures" end time: Oct 17 14:01 CEST
+"ai_runtime.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+512/885 Testing: ai_runtime.sparse_weapons
+512/885 Test: ai_runtime.sparse_weapons
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "sparse_weapons" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.sparse_weapons" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Sparse IDs 41/27/38/42 and duplicate fifth slot initialized three times through original NPC lifecycle.
+<end of output>
+Test time =   0.20 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.sparse_weapons" end time: Oct 17 14:01 CEST
+"ai_runtime.sparse_weapons" time elapsed: 00:00:00
+----------------------------------------------------------
+
+351/885 Testing: ai_target.catalog
+351/885 Test: ai_target.catalog
+Command: "<workspace>/Blood2/build/debug/tests/ai_target_tests" "catalog" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_target.catalog" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+Private character facing samples=240; unchanged animation clocks/keys
+<end of output>
+Test time =   0.29 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.catalog" end time: Oct 17 14:01 CEST
+"ai_target.catalog" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/885 Testing: world.destination_trials
+28/885 Test: world.destination_trials
+Command: "<workspace>/Blood2/build/debug/tests/world_tests" "destination_trials" "<workspace>/Blood2/build/debug/tests/world-fixtures/destination_trials"
+Directory: <workspace>/Blood2/build/debug/tests
+"world.destination_trials" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+trial4: loaded=1 entered=1 cleanup=1 failed=1 error=
+trial2: loaded=1 entered=0 cleanup=1 failed=0 error=No single-player GameStartPoint
+trial3: loaded=1 entered=0 cleanup=1 failed=0 error=Start point has no supported ground collision
+broken: loaded=0 entered=0 cleanup=1 failed=0 error=DAT v56: invalid/unsupported section offsets near byte 4
+missing: loaded=0 entered=0 cleanup=1 failed=0 error=Resource not found: worlds/missing.dat
+trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+PASS destination_trials
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_trials" end time: Oct 17 14:01 CEST
+"world.destination_trials" time elapsed: 00:00:00
+----------------------------------------------------------
+
+82/885 Testing: movement.world_collision
+82/885 Test: movement.world_collision
+Command: "<workspace>/Blood2/build/debug/tests/movement_tests" "world_collision" "<workspace>/Blood2/build/debug/tests/movement-fixtures/world_collision"
+Directory: <workspace>/Blood2/build/debug/tests
+"movement.world_collision" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"movement.world_collision" end time: Oct 17 14:01 CEST
+"movement.world_collision" time elapsed: 00:00:00
+----------------------------------------------------------
+
+85/885 Testing: movement.timing
+85/885 Test: movement.timing
+Command: "<workspace>/Blood2/build/debug/tests/movement_tests" "timing" "<workspace>/Blood2/build/debug/tests/movement-fixtures/timing"
+Directory: <workspace>/Blood2/build/debug/tests
+"movement.timing" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"movement.timing" end time: Oct 17 14:01 CEST
+"movement.timing" time elapsed: 00:00:00
+----------------------------------------------------------
+
+577/885 Testing: player_keepalive.fallback
+577/885 Test: player_keepalive.fallback
+Command: "<workspace>/Blood2/build/debug/tests/player_keepalive_tests" "fallback" "<workspace>/Blood2/build/debug/tests/player-keepalive-fixtures/fallback"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_keepalive.fallback" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"player_keepalive.fallback" end time: Oct 17 14:01 CEST
+"player_keepalive.fallback" time elapsed: 00:00:00
+----------------------------------------------------------
+
+81/885 Testing: movement.collisions
+81/885 Test: movement.collisions
+Command: "<workspace>/Blood2/build/debug/tests/movement_tests" "collisions" "<workspace>/Blood2/build/debug/tests/movement-fixtures/collisions"
+Directory: <workspace>/Blood2/build/debug/tests
+"movement.collisions" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"movement.collisions" end time: Oct 17 14:01 CEST
+"movement.collisions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+79/885 Testing: movement.walking
+79/885 Test: movement.walking
+Command: "<workspace>/Blood2/build/debug/tests/movement_tests" "walking" "<workspace>/Blood2/build/debug/tests/movement-fixtures/walking"
+Directory: <workspace>/Blood2/build/debug/tests
+"movement.walking" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"movement.walking" end time: Oct 17 14:01 CEST
+"movement.walking" time elapsed: 00:00:00
+----------------------------------------------------------
+
+578/885 Testing: player_keepalive.failures
+578/885 Test: player_keepalive.failures
+Command: "<workspace>/Blood2/build/debug/tests/player_keepalive_tests" "failures" "<workspace>/Blood2/build/debug/tests/player-keepalive-fixtures/failures"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_keepalive.failures" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"player_keepalive.failures" end time: Oct 17 14:01 CEST
+"player_keepalive.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+80/885 Testing: movement.jumping
+80/885 Test: movement.jumping
+Command: "<workspace>/Blood2/build/debug/tests/movement_tests" "jumping" "<workspace>/Blood2/build/debug/tests/movement-fixtures/jumping"
+Directory: <workspace>/Blood2/build/debug/tests
+"movement.jumping" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"movement.jumping" end time: Oct 17 14:01 CEST
+"movement.jumping" time elapsed: 00:00:00
+----------------------------------------------------------
+
+83/885 Testing: movement.support
+83/885 Test: movement.support
+Command: "<workspace>/Blood2/build/debug/tests/movement_tests" "support" "<workspace>/Blood2/build/debug/tests/movement-fixtures/support"
+Directory: <workspace>/Blood2/build/debug/tests
+"movement.support" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"movement.support" end time: Oct 17 14:01 CEST
+"movement.support" time elapsed: 00:00:00
+----------------------------------------------------------
+
+576/885 Testing: player_keepalive.named
+576/885 Test: player_keepalive.named
+Command: "<workspace>/Blood2/build/debug/tests/player_keepalive_tests" "named" "<workspace>/Blood2/build/debug/tests/player-keepalive-fixtures/named"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_keepalive.named" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player_keepalive.named" end time: Oct 17 14:01 CEST
+"player_keepalive.named" time elapsed: 00:00:00
+----------------------------------------------------------
+
+572/885 Testing: player_restore.failures
+572/885 Test: player_restore.failures
+Command: "<workspace>/Blood2/build/debug/tests/player_restore_tests" "failures" "<workspace>/Blood2/build/debug/tests/player-restore-fixtures/failures"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_restore.failures" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.failures" end time: Oct 17 14:01 CEST
+"player_restore.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+31/885 Testing: world.destination_lifetime
+31/885 Test: world.destination_lifetime
+Command: "<workspace>/Blood2/build/debug/tests/world_tests" "destination_lifetime" "<workspace>/Blood2/build/debug/tests/world-fixtures/destination_lifetime"
+Directory: <workspace>/Blood2/build/debug/tests
+"world.destination_lifetime" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS destination_lifetime
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_lifetime" end time: Oct 17 14:01 CEST
+"world.destination_lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/885 Testing: objects.unsupported_teardown
+11/885 Test: objects.unsupported_teardown
+Command: "<workspace>/Blood2/build/debug/tests/object_contract_tests" "unsupported_teardown"
+Directory: <workspace>/Blood2/build/debug/tests
+"objects.unsupported_teardown" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS unsupported_teardown
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"objects.unsupported_teardown" end time: Oct 17 14:01 CEST
+"objects.unsupported_teardown" time elapsed: 00:00:00
+----------------------------------------------------------
+
+84/885 Testing: movement.boundaries
+84/885 Test: movement.boundaries
+Command: "<workspace>/Blood2/build/debug/tests/movement_tests" "boundaries" "<workspace>/Blood2/build/debug/tests/movement-fixtures/boundaries"
+Directory: <workspace>/Blood2/build/debug/tests
+"movement.boundaries" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"movement.boundaries" end time: Oct 17 14:01 CEST
+"movement.boundaries" time elapsed: 00:00:00
+----------------------------------------------------------
+
+573/885 Testing: player_restore.lifetime
+573/885 Test: player_restore.lifetime
+Command: "<workspace>/Blood2/build/debug/tests/player_restore_tests" "lifetime" "<workspace>/Blood2/build/debug/tests/player-restore-fixtures/lifetime"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_restore.lifetime" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.lifetime" end time: Oct 17 14:01 CEST
+"player_restore.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+86/885 Testing: movement.lifetime
+86/885 Test: movement.lifetime
+Command: "<workspace>/Blood2/build/debug/tests/movement_tests" "lifetime" "<workspace>/Blood2/build/debug/tests/movement-fixtures/lifetime"
+Directory: <workspace>/Blood2/build/debug/tests
+"movement.lifetime" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"movement.lifetime" end time: Oct 17 14:01 CEST
+"movement.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+62/885 Testing: player.rollback
+62/885 Test: player.rollback
+Command: "<workspace>/Blood2/build/debug/tests/player_tests" "rollback" "<workspace>/Blood2/build/debug/tests/player-fixtures/rollback"
+Directory: <workspace>/Blood2/build/debug/tests
+"player.rollback" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player.rollback" end time: Oct 17 14:01 CEST
+"player.rollback" time elapsed: 00:00:00
+----------------------------------------------------------
+
+65/885 Testing: player.smell
+65/885 Test: player.smell
+Command: "<workspace>/Blood2/build/debug/tests/player_tests" "smell" "<workspace>/Blood2/build/debug/tests/player-fixtures/smell"
+Directory: <workspace>/Blood2/build/debug/tests
+"player.smell" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player.smell" end time: Oct 17 14:01 CEST
+"player.smell" time elapsed: 00:00:00
+----------------------------------------------------------
+
+563/885 Testing: player_state.failures
+563/885 Test: player_state.failures
+Command: "<workspace>/Blood2/build/debug/tests/player_state_tests" "failures" "<workspace>/Blood2/build/debug/tests/player-state-fixtures/failures"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_state.failures" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.failures" end time: Oct 17 14:01 CEST
+"player_state.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+61/885 Testing: player.lifecycle
+61/885 Test: player.lifecycle
+Command: "<workspace>/Blood2/build/debug/tests/player_tests" "lifecycle" "<workspace>/Blood2/build/debug/tests/player-fixtures/lifecycle"
+Directory: <workspace>/Blood2/build/debug/tests
+"player.lifecycle" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player.lifecycle" end time: Oct 17 14:01 CEST
+"player.lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------
+
+564/885 Testing: player_state.capture
+564/885 Test: player_state.capture
+Command: "<workspace>/Blood2/build/debug/tests/player_state_tests" "capture" "<workspace>/Blood2/build/debug/tests/player-state-fixtures/capture"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_state.capture" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.capture" end time: Oct 17 14:01 CEST
+"player_state.capture" time elapsed: 00:00:00
+----------------------------------------------------------
+
+63/885 Testing: player.messages
+63/885 Test: player.messages
+Command: "<workspace>/Blood2/build/debug/tests/player_tests" "messages" "<workspace>/Blood2/build/debug/tests/player-fixtures/messages"
+Directory: <workspace>/Blood2/build/debug/tests
+"player.messages" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player.messages" end time: Oct 17 14:01 CEST
+"player.messages" time elapsed: 00:00:00
+----------------------------------------------------------
+
+562/885 Testing: player_state.initialization
+562/885 Test: player_state.initialization
+Command: "<workspace>/Blood2/build/debug/tests/player_state_tests" "initialization" "<workspace>/Blood2/build/debug/tests/player-state-fixtures/initialization"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_state.initialization" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.initialization" end time: Oct 17 14:01 CEST
+"player_state.initialization" time elapsed: 00:00:00
+----------------------------------------------------------
+
+64/885 Testing: player.callbacks
+64/885 Test: player.callbacks
+Command: "<workspace>/Blood2/build/debug/tests/player_tests" "callbacks" "<workspace>/Blood2/build/debug/tests/player-fixtures/callbacks"
+Directory: <workspace>/Blood2/build/debug/tests
+"player.callbacks" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player.callbacks" end time: Oct 17 14:01 CEST
+"player.callbacks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+560/885 Testing: player_state.roundtrip
+560/885 Test: player_state.roundtrip
+Command: "<workspace>/Blood2/build/debug/tests/player_state_tests" "roundtrip" "<workspace>/Blood2/build/debug/tests/player-state-fixtures/roundtrip"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_state.roundtrip" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.roundtrip" end time: Oct 17 14:01 CEST
+"player_state.roundtrip" time elapsed: 00:00:00
+----------------------------------------------------------
+
+561/885 Testing: player_state.clocks
+561/885 Test: player_state.clocks
+Command: "<workspace>/Blood2/build/debug/tests/player_state_tests" "clocks" "<workspace>/Blood2/build/debug/tests/player-state-fixtures/clocks"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_state.clocks" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.clocks" end time: Oct 17 14:01 CEST
+"player_state.clocks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+571/885 Testing: player_restore.roundtrip
+571/885 Test: player_restore.roundtrip
+Command: "<workspace>/Blood2/build/debug/tests/player_restore_tests" "roundtrip" "<workspace>/Blood2/build/debug/tests/player-restore-fixtures/roundtrip"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_restore.roundtrip" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.roundtrip" end time: Oct 17 14:01 CEST
+"player_restore.roundtrip" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/885 Testing: objects.creation_failures
+12/885 Test: objects.creation_failures
+Command: "<workspace>/Blood2/build/debug/tests/object_contract_tests" "creation_failures"
+Directory: <workspace>/Blood2/build/debug/tests
+"objects.creation_failures" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS creation_failures
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"objects.creation_failures" end time: Oct 17 14:01 CEST
+"objects.creation_failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/885 Testing: objects.messages_strings
+10/885 Test: objects.messages_strings
+Command: "<workspace>/Blood2/build/debug/tests/object_contract_tests" "messages_strings"
+Directory: <workspace>/Blood2/build/debug/tests
+"objects.messages_strings" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS messages_strings
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"objects.messages_strings" end time: Oct 17 14:01 CEST
+"objects.messages_strings" time elapsed: 00:00:00
+----------------------------------------------------------
+
+489/885 Testing: ai_escape.perception
+489/885 Test: ai_escape.perception
+Command: "<workspace>/Blood2/build/debug/tests/ai_escape_tests" "perception"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_escape.perception" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+perception:278: !a->DispatchState()
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Failed.
+"ai_escape.perception" end time: Oct 17 14:01 CEST
+"ai_escape.perception" time elapsed: 00:00:00
+----------------------------------------------------------
+
+498/885 Testing: ai_runtime.visibility_filter
+498/885 Test: ai_runtime.visibility_filter
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "visibility_filter"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.visibility_filter" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.visibility_filter" end time: Oct 17 14:01 CEST
+"ai_runtime.visibility_filter" time elapsed: 00:00:00
+----------------------------------------------------------
+
+60/885 Testing: player.handles
+60/885 Test: player.handles
+Command: "<workspace>/Blood2/build/debug/tests/player_tests" "handles" "<workspace>/Blood2/build/debug/tests/player-fixtures/handles"
+Directory: <workspace>/Blood2/build/debug/tests
+"player.handles" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player.handles" end time: Oct 17 14:01 CEST
+"player.handles" time elapsed: 00:00:00
+----------------------------------------------------------
+
+394/885 Testing: ai_state.lifetime
+394/885 Test: ai_state.lifetime
+Command: "<workspace>/Blood2/build/debug/tests/ai_state_tests" "lifetime"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_state.lifetime" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.lifetime" end time: Oct 17 14:01 CEST
+"ai_state.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+488/885 Testing: ai_escape.routes
+488/885 Test: ai_escape.routes
+Command: "<workspace>/Blood2/build/debug/tests/ai_escape_tests" "routes"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_escape.routes" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.routes" end time: Oct 17 14:01 CEST
+"ai_escape.routes" time elapsed: 00:00:00
+----------------------------------------------------------
+
+500/885 Testing: ai_runtime.lifetime
+500/885 Test: ai_runtime.lifetime
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "lifetime"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.lifetime" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.lifetime" end time: Oct 17 14:01 CEST
+"ai_runtime.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+486/885 Testing: ai_escape.selection
+486/885 Test: ai_escape.selection
+Command: "<workspace>/Blood2/build/debug/tests/ai_escape_tests" "selection"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_escape.selection" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.selection" end time: Oct 17 14:01 CEST
+"ai_escape.selection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+473/885 Testing: ai_recovery.topos
+473/885 Test: ai_recovery.topos
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "topos"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.topos" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.topos" end time: Oct 17 14:01 CEST
+"ai_recovery.topos" time elapsed: 00:00:00
+----------------------------------------------------------
+
+507/885 Testing: ai_runtime.missing
+507/885 Test: ai_runtime.missing
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "missing"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.missing" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.missing" end time: Oct 17 14:01 CEST
+"ai_runtime.missing" time elapsed: 00:00:00
+----------------------------------------------------------
+
+480/885 Testing: ai_recovery.fire_lifetime
+480/885 Test: ai_recovery.fire_lifetime
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "fire_lifetime"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.fire_lifetime" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.fire_lifetime" end time: Oct 17 14:01 CEST
+"ai_recovery.fire_lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+494/885 Testing: ai_escape.lifetime
+494/885 Test: ai_escape.lifetime
+Command: "<workspace>/Blood2/build/debug/tests/ai_escape_tests" "lifetime"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_escape.lifetime" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.lifetime" end time: Oct 17 14:01 CEST
+"ai_escape.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+478/885 Testing: ai_recovery.moving_fire
+478/885 Test: ai_recovery.moving_fire
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "moving_fire"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.moving_fire" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.moving_fire" end time: Oct 17 14:01 CEST
+"ai_recovery.moving_fire" time elapsed: 00:00:00
+----------------------------------------------------------
+
+490/885 Testing: ai_escape.hiding
+490/885 Test: ai_escape.hiding
+Command: "<workspace>/Blood2/build/debug/tests/ai_escape_tests" "hiding"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_escape.hiding" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.hiding" end time: Oct 17 14:01 CEST
+"ai_escape.hiding" time elapsed: 00:00:00
+----------------------------------------------------------
+
+477/885 Testing: ai_recovery.lifetime
+477/885 Test: ai_recovery.lifetime
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "lifetime"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.lifetime" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.lifetime" end time: Oct 17 14:01 CEST
+"ai_recovery.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+476/885 Testing: ai_recovery.search
+476/885 Test: ai_recovery.search
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "search"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.search" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.search" end time: Oct 17 14:01 CEST
+"ai_recovery.search" time elapsed: 00:00:00
+----------------------------------------------------------
+
+485/885 Testing: ai_escape.beg
+485/885 Test: ai_escape.beg
+Command: "<workspace>/Blood2/build/debug/tests/ai_escape_tests" "beg"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_escape.beg" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.beg" end time: Oct 17 14:01 CEST
+"ai_escape.beg" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1/885 Testing: objects.builtin_model
+1/885 Test: objects.builtin_model
+Command: "<workspace>/Blood2/build/debug/tests/object_contract_tests" "builtin_model"
+Directory: <workspace>/Blood2/build/debug/tests
+"objects.builtin_model" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS builtin_model
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.builtin_model" end time: Oct 17 14:01 CEST
+"objects.builtin_model" time elapsed: 00:00:00
+----------------------------------------------------------
+
+30/885 Testing: world.destination_schema
+30/885 Test: world.destination_schema
+Command: "<workspace>/Blood2/build/debug/tests/world_tests" "destination_schema" "<workspace>/Blood2/build/debug/tests/world-fixtures/destination_schema"
+Directory: <workspace>/Blood2/build/debug/tests
+"world.destination_schema" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS destination_schema
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_schema" end time: Oct 17 14:01 CEST
+"world.destination_schema" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/885 Testing: world.level_change
+26/885 Test: world.level_change
+Command: "<workspace>/Blood2/build/debug/tests/world_tests" "level_change" "<workspace>/Blood2/build/debug/tests/world-fixtures/level_change"
+Directory: <workspace>/Blood2/build/debug/tests
+"world.level_change" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+trial1: Destination world texture t.dtx: Missing exact-path resource
+trial2: No single-player GameStartPoint
+trial3: Start point has no supported ground collision
+trial4: Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+trial5: Destination initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+trial6: Destination start trigger requested another level during entry
+broken: DAT v56: invalid/unsupported section offsets near byte 4
+missing: Resource not found: worlds/missing.dat
+Commit 0:
+Commit 1:
+Commit 2:
+PASS level_change
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"world.level_change" end time: Oct 17 14:01 CEST
+"world.level_change" time elapsed: 00:00:00
+----------------------------------------------------------
+
+469/885 Testing: ai_recovery.jump_physics
+469/885 Test: ai_recovery.jump_physics
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "jump_physics"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.jump_physics" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.jump_physics" end time: Oct 17 14:01 CEST
+"ai_recovery.jump_physics" time elapsed: 00:00:00
+----------------------------------------------------------
+
+392/885 Testing: ai_state.dispatch
+392/885 Test: ai_state.dispatch
+Command: "<workspace>/Blood2/build/debug/tests/ai_state_tests" "dispatch"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_state.dispatch" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.dispatch" end time: Oct 17 14:01 CEST
+"ai_state.dispatch" time elapsed: 00:00:00
+----------------------------------------------------------
+
+493/885 Testing: ai_escape.tracking
+493/885 Test: ai_escape.tracking
+Command: "<workspace>/Blood2/build/debug/tests/ai_escape_tests" "tracking"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_escape.tracking" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.tracking" end time: Oct 17 14:01 CEST
+"ai_escape.tracking" time elapsed: 00:00:00
+----------------------------------------------------------
+
+383/885 Testing: ai_perception.lifetime
+383/885 Test: ai_perception.lifetime
+Command: "<workspace>/Blood2/build/debug/tests/ai_perception_tests" "lifetime"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_perception.lifetime" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.lifetime" end time: Oct 17 14:01 CEST
+"ai_perception.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+487/885 Testing: ai_escape.facing
+487/885 Test: ai_escape.facing
+Command: "<workspace>/Blood2/build/debug/tests/ai_escape_tests" "facing"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_escape.facing" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.facing" end time: Oct 17 14:01 CEST
+"ai_escape.facing" time elapsed: 00:00:00
+----------------------------------------------------------
+
+344/885 Testing: ai_target.named
+344/885 Test: ai_target.named
+Command: "<workspace>/Blood2/build/debug/tests/ai_target_tests" "named"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_target.named" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+FindNamedObjects=6
+RelinquishList=6
+CreateInterObjectLink=3
+BreakInterObjectLink=2
+GetObjectPos=10
+GetObjectRotation=5
+SetObjectRotation=4
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.named" end time: Oct 17 14:01 CEST
+"ai_target.named" time elapsed: 00:00:00
+----------------------------------------------------------
+
+492/885 Testing: ai_escape.failures
+492/885 Test: ai_escape.failures
+Command: "<workspace>/Blood2/build/debug/tests/ai_escape_tests" "failures"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_escape.failures" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.failures" end time: Oct 17 14:01 CEST
+"ai_escape.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+506/885 Testing: ai_runtime.body
+506/885 Test: ai_runtime.body
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "body"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.body" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.body" end time: Oct 17 14:01 CEST
+"ai_runtime.body" time elapsed: 00:00:00
+----------------------------------------------------------
+
+491/885 Testing: ai_escape.guard
+491/885 Test: ai_escape.guard
+Command: "<workspace>/Blood2/build/debug/tests/ai_escape_tests" "guard"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_escape.guard" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.guard" end time: Oct 17 14:01 CEST
+"ai_escape.guard" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/885 Testing: world.destination_messages
+29/885 Test: world.destination_messages
+Command: "<workspace>/Blood2/build/debug/tests/world_tests" "destination_messages" "<workspace>/Blood2/build/debug/tests/world-fixtures/destination_messages"
+Directory: <workspace>/Blood2/build/debug/tests
+"world.destination_messages" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS destination_messages
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_messages" end time: Oct 17 14:01 CEST
+"world.destination_messages" time elapsed: 00:00:00
+----------------------------------------------------------
+
+472/885 Testing: ai_recovery.clearance
+472/885 Test: ai_recovery.clearance
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "clearance"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.clearance" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.clearance" end time: Oct 17 14:01 CEST
+"ai_recovery.clearance" time elapsed: 00:00:00
+----------------------------------------------------------
+
+479/885 Testing: ai_recovery.keys
+479/885 Test: ai_recovery.keys
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "keys"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.keys" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.keys" end time: Oct 17 14:01 CEST
+"ai_recovery.keys" time elapsed: 00:00:00
+----------------------------------------------------------
+
+496/885 Testing: ai_runtime.activation
+496/885 Test: ai_runtime.activation
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "activation"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.activation" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.activation" end time: Oct 17 14:01 CEST
+"ai_runtime.activation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+501/885 Testing: ai_runtime.targets
+501/885 Test: ai_runtime.targets
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "targets"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.targets" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.targets" end time: Oct 17 14:01 CEST
+"ai_runtime.targets" time elapsed: 00:00:00
+----------------------------------------------------------
+
+468/885 Testing: ai_recovery.jump
+468/885 Test: ai_recovery.jump
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "jump"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.jump" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.jump" end time: Oct 17 14:01 CEST
+"ai_recovery.jump" time elapsed: 00:00:00
+----------------------------------------------------------
+
+471/885 Testing: ai_recovery.crawling
+471/885 Test: ai_recovery.crawling
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "crawling"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.crawling" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.crawling" end time: Oct 17 14:01 CEST
+"ai_recovery.crawling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+504/885 Testing: ai_runtime.spatial
+504/885 Test: ai_runtime.spatial
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "spatial"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.spatial" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.spatial" end time: Oct 17 14:01 CEST
+"ai_runtime.spatial" time elapsed: 00:00:00
+----------------------------------------------------------
+
+505/885 Testing: ai_runtime.triggers
+505/885 Test: ai_runtime.triggers
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "triggers"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.triggers" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.triggers" end time: Oct 17 14:01 CEST
+"ai_runtime.triggers" time elapsed: 00:00:00
+----------------------------------------------------------
+
+470/885 Testing: ai_recovery.crouch
+470/885 Test: ai_recovery.crouch
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "crouch"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.crouch" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.crouch" end time: Oct 17 14:01 CEST
+"ai_recovery.crouch" time elapsed: 00:00:00
+----------------------------------------------------------
+
+375/885 Testing: ai_perception.factions
+375/885 Test: ai_perception.factions
+Command: "<workspace>/Blood2/build/debug/tests/ai_perception_tests" "factions"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_perception.factions" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.factions" end time: Oct 17 14:01 CEST
+"ai_perception.factions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+378/885 Testing: ai_perception.hints
+378/885 Test: ai_perception.hints
+Command: "<workspace>/Blood2/build/debug/tests/ai_perception_tests" "hints"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_perception.hints" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.hints" end time: Oct 17 14:01 CEST
+"ai_perception.hints" time elapsed: 00:00:00
+----------------------------------------------------------
+
+503/885 Testing: ai_runtime.camera
+503/885 Test: ai_runtime.camera
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "camera"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.camera" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.camera" end time: Oct 17 14:01 CEST
+"ai_runtime.camera" time elapsed: 00:00:00
+----------------------------------------------------------
+
+502/885 Testing: ai_runtime.tracking
+502/885 Test: ai_runtime.tracking
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "tracking"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.tracking" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.tracking" end time: Oct 17 14:01 CEST
+"ai_runtime.tracking" time elapsed: 00:00:00
+----------------------------------------------------------
+
+474/885 Testing: ai_recovery.plans
+474/885 Test: ai_recovery.plans
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "plans"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.plans" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.plans" end time: Oct 17 14:01 CEST
+"ai_recovery.plans" time elapsed: 00:00:00
+----------------------------------------------------------
+
+391/885 Testing: ai_state.civilian
+391/885 Test: ai_state.civilian
+Command: "<workspace>/Blood2/build/debug/tests/ai_state_tests" "civilian"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_state.civilian" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.civilian" end time: Oct 17 14:01 CEST
+"ai_state.civilian" time elapsed: 00:00:00
+----------------------------------------------------------
+
+348/885 Testing: ai_target.lifetime
+348/885 Test: ai_target.lifetime
+Command: "<workspace>/Blood2/build/debug/tests/ai_target_tests" "lifetime"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_target.lifetime" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.lifetime" end time: Oct 17 14:01 CEST
+"ai_target.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+388/885 Testing: ai_state.commands
+388/885 Test: ai_state.commands
+Command: "<workspace>/Blood2/build/debug/tests/ai_state_tests" "commands"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_state.commands" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.commands" end time: Oct 17 14:01 CEST
+"ai_state.commands" time elapsed: 00:00:00
+----------------------------------------------------------
+
+379/885 Testing: ai_perception.stimuli
+379/885 Test: ai_perception.stimuli
+Command: "<workspace>/Blood2/build/debug/tests/ai_perception_tests" "stimuli"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_perception.stimuli" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.stimuli" end time: Oct 17 14:01 CEST
+"ai_perception.stimuli" time elapsed: 00:00:00
+----------------------------------------------------------
+
+376/885 Testing: ai_perception.selection
+376/885 Test: ai_perception.selection
+Command: "<workspace>/Blood2/build/debug/tests/ai_perception_tests" "selection"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_perception.selection" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.selection" end time: Oct 17 14:01 CEST
+"ai_perception.selection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+499/885 Testing: ai_runtime.visibility_atomic
+499/885 Test: ai_runtime.visibility_atomic
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "visibility_atomic"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.visibility_atomic" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.visibility_atomic" end time: Oct 17 14:01 CEST
+"ai_runtime.visibility_atomic" time elapsed: 00:00:00
+----------------------------------------------------------
+
+497/885 Testing: ai_runtime.visibility
+497/885 Test: ai_runtime.visibility
+Command: "<workspace>/Blood2/build/debug/tests/ai_runtime_tests" "visibility"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_runtime.visibility" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.visibility" end time: Oct 17 14:01 CEST
+"ai_runtime.visibility" time elapsed: 00:00:00
+----------------------------------------------------------
+
+377/885 Testing: ai_perception.visibility
+377/885 Test: ai_perception.visibility
+Command: "<workspace>/Blood2/build/debug/tests/ai_perception_tests" "visibility"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_perception.visibility" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.visibility" end time: Oct 17 14:01 CEST
+"ai_perception.visibility" time elapsed: 00:00:00
+----------------------------------------------------------
+
+381/885 Testing: ai_perception.opportunity
+381/885 Test: ai_perception.opportunity
+Command: "<workspace>/Blood2/build/debug/tests/ai_perception_tests" "opportunity"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_perception.opportunity" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.opportunity" end time: Oct 17 14:01 CEST
+"ai_perception.opportunity" time elapsed: 00:00:00
+----------------------------------------------------------
+
+387/885 Testing: ai_state.transitions
+387/885 Test: ai_state.transitions
+Command: "<workspace>/Blood2/build/debug/tests/ai_state_tests" "transitions"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_state.transitions" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.transitions" end time: Oct 17 14:01 CEST
+"ai_state.transitions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+380/885 Testing: ai_perception.retaliation
+380/885 Test: ai_perception.retaliation
+Command: "<workspace>/Blood2/build/debug/tests/ai_perception_tests" "retaliation"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_perception.retaliation" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.retaliation" end time: Oct 17 14:01 CEST
+"ai_perception.retaliation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+393/885 Testing: ai_state.failures
+393/885 Test: ai_state.failures
+Command: "<workspace>/Blood2/build/debug/tests/ai_state_tests" "failures"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_state.failures" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.failures" end time: Oct 17 14:01 CEST
+"ai_state.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+382/885 Testing: ai_perception.failures
+382/885 Test: ai_perception.failures
+Command: "<workspace>/Blood2/build/debug/tests/ai_perception_tests" "failures"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_perception.failures" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.failures" end time: Oct 17 14:01 CEST
+"ai_perception.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+350/885 Testing: ai_target.services
+350/885 Test: ai_target.services
+Command: "<workspace>/Blood2/build/debug/tests/ai_target_tests" "services"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_target.services" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.services" end time: Oct 17 14:01 CEST
+"ai_target.services" time elapsed: 00:00:00
+----------------------------------------------------------
+
+389/885 Testing: ai_state.resize
+389/885 Test: ai_state.resize
+Command: "<workspace>/Blood2/build/debug/tests/ai_state_tests" "resize"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_state.resize" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.resize" end time: Oct 17 14:01 CEST
+"ai_state.resize" time elapsed: 00:00:00
+----------------------------------------------------------
+
+390/885 Testing: ai_state.decisions
+390/885 Test: ai_state.decisions
+Command: "<workspace>/Blood2/build/debug/tests/ai_state_tests" "decisions"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_state.decisions" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.decisions" end time: Oct 17 14:01 CEST
+"ai_state.decisions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+347/885 Testing: ai_target.failures
+347/885 Test: ai_target.failures
+Command: "<workspace>/Blood2/build/debug/tests/ai_target_tests" "failures"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_target.failures" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.failures" end time: Oct 17 14:01 CEST
+"ai_target.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+346/885 Testing: ai_target.facing
+346/885 Test: ai_target.facing
+Command: "<workspace>/Blood2/build/debug/tests/ai_target_tests" "facing"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_target.facing" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.facing" end time: Oct 17 14:01 CEST
+"ai_target.facing" time elapsed: 00:00:00
+----------------------------------------------------------
+
+349/885 Testing: ai_target.callbacks
+349/885 Test: ai_target.callbacks
+Command: "<workspace>/Blood2/build/debug/tests/ai_target_tests" "callbacks"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_target.callbacks" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.callbacks" end time: Oct 17 14:01 CEST
+"ai_target.callbacks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+345/885 Testing: ai_target.cached
+345/885 Test: ai_target.cached
+Command: "<workspace>/Blood2/build/debug/tests/ai_target_tests" "cached"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_target.cached" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.cached" end time: Oct 17 14:01 CEST
+"ai_target.cached" time elapsed: 00:00:00
+----------------------------------------------------------
+
+654/885 Testing: player_controls.keys
+654/885 Test: player_controls.keys
+Command: "<workspace>/Blood2/build/debug/tests/player_controls_tests" "keys"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_controls.keys" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.keys" end time: Oct 17 14:01 CEST
+"player_controls.keys" time elapsed: 00:00:00
+----------------------------------------------------------
+
+655/885 Testing: player_controls.mouse
+655/885 Test: player_controls.mouse
+Command: "<workspace>/Blood2/build/debug/tests/player_controls_tests" "mouse"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_controls.mouse" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.mouse" end time: Oct 17 14:01 CEST
+"player_controls.mouse" time elapsed: 00:00:00
+----------------------------------------------------------
+
+386/885 Testing: ai_state.symbols
+386/885 Test: ai_state.symbols
+Command: "<workspace>/Blood2/build/debug/tests/ai_state_tests" "symbols"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_state.symbols" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.symbols" end time: Oct 17 14:01 CEST
+"ai_state.symbols" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/885 Testing: objects.original_objects
+2/885 Test: objects.original_objects
+Command: "<workspace>/Blood2/build/debug/tests/object_contract_tests" "original_objects"
+Directory: <workspace>/Blood2/build/debug/tests
+"objects.original_objects" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS original_objects
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.original_objects" end time: Oct 17 14:01 CEST
+"objects.original_objects" time elapsed: 00:00:00
+----------------------------------------------------------
+
+656/885 Testing: player_controls.gates
+656/885 Test: player_controls.gates
+Command: "<workspace>/Blood2/build/debug/tests/player_controls_tests" "gates"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_controls.gates" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.gates" end time: Oct 17 14:01 CEST
+"player_controls.gates" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/885 Testing: objects.links_lists
+9/885 Test: objects.links_lists
+Command: "<workspace>/Blood2/build/debug/tests/object_contract_tests" "links_lists"
+Directory: <workspace>/Blood2/build/debug/tests
+"objects.links_lists" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS links_lists
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.links_lists" end time: Oct 17 14:01 CEST
+"objects.links_lists" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/885 Testing: objects.reasons_properties
+4/885 Test: objects.reasons_properties
+Command: "<workspace>/Blood2/build/debug/tests/object_contract_tests" "reasons_properties"
+Directory: <workspace>/Blood2/build/debug/tests
+"objects.reasons_properties" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS reasons_properties
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.reasons_properties" end time: Oct 17 14:01 CEST
+"objects.reasons_properties" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/885 Testing: objects.deferred_removal
+6/885 Test: objects.deferred_removal
+Command: "<workspace>/Blood2/build/debug/tests/object_contract_tests" "deferred_removal"
+Directory: <workspace>/Blood2/build/debug/tests
+"objects.deferred_removal" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS deferred_removal
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.deferred_removal" end time: Oct 17 14:01 CEST
+"objects.deferred_removal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/885 Testing: objects.nested_creation
+3/885 Test: objects.nested_creation
+Command: "<workspace>/Blood2/build/debug/tests/object_contract_tests" "nested_creation"
+Directory: <workspace>/Blood2/build/debug/tests
+"objects.nested_creation" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS nested_creation
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.nested_creation" end time: Oct 17 14:01 CEST
+"objects.nested_creation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/885 Testing: objects.aggregate_dispatch
+7/885 Test: objects.aggregate_dispatch
+Command: "<workspace>/Blood2/build/debug/tests/object_contract_tests" "aggregate_dispatch"
+Directory: <workspace>/Blood2/build/debug/tests
+"objects.aggregate_dispatch" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS aggregate_dispatch
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.aggregate_dispatch" end time: Oct 17 14:01 CEST
+"objects.aggregate_dispatch" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/885 Testing: objects.handles_selection
+8/885 Test: objects.handles_selection
+Command: "<workspace>/Blood2/build/debug/tests/object_contract_tests" "handles_selection"
+Directory: <workspace>/Blood2/build/debug/tests
+"objects.handles_selection" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS handles_selection
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.handles_selection" end time: Oct 17 14:01 CEST
+"objects.handles_selection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/885 Testing: objects.scheduling
+5/885 Test: objects.scheduling
+Command: "<workspace>/Blood2/build/debug/tests/object_contract_tests" "scheduling"
+Directory: <workspace>/Blood2/build/debug/tests
+"objects.scheduling" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+PASS scheduling
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.scheduling" end time: Oct 17 14:01 CEST
+"objects.scheduling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+87/885 Testing: movement.controls
+87/885 Test: movement.controls
+Command: "<workspace>/Blood2/build/debug/tests/movement_tests" "controls" "<workspace>/Blood2/build/debug/tests/movement-fixtures/controls"
+Directory: <workspace>/Blood2/build/debug/tests
+"movement.controls" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"movement.controls" end time: Oct 17 14:01 CEST
+"movement.controls" time elapsed: 00:00:00
+----------------------------------------------------------
+
+657/885 Testing: player_controls.entry
+657/885 Test: player_controls.entry
+Command: "<workspace>/Blood2/build/debug/tests/player_controls_tests" "entry"
+Directory: <workspace>/Blood2/build/debug/tests
+"player_controls.entry" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.entry" end time: Oct 17 14:01 CEST
+"player_controls.entry" time elapsed: 00:00:00
+----------------------------------------------------------
+
+482/885 Testing: ai_recovery.smell_route
+482/885 Test: ai_recovery.smell_route
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "smell_route"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.smell_route" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.smell_route" end time: Oct 17 14:01 CEST
+"ai_recovery.smell_route" time elapsed: 00:00:00
+----------------------------------------------------------
+
+481/885 Testing: ai_recovery.smell_guards
+481/885 Test: ai_recovery.smell_guards
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "smell_guards"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.smell_guards" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.smell_guards" end time: Oct 17 14:01 CEST
+"ai_recovery.smell_guards" time elapsed: 00:00:00
+----------------------------------------------------------
+
+483/885 Testing: ai_recovery.smell_lifetime
+483/885 Test: ai_recovery.smell_lifetime
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "smell_lifetime"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.smell_lifetime" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.smell_lifetime" end time: Oct 17 14:01 CEST
+"ai_recovery.smell_lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+475/885 Testing: ai_recovery.around
+475/885 Test: ai_recovery.around
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "around"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.around" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.around" end time: Oct 17 14:01 CEST
+"ai_recovery.around" time elapsed: 00:00:00
+----------------------------------------------------------
+
+484/885 Testing: ai_recovery.catalog
+484/885 Test: ai_recovery.catalog
+Command: "<workspace>/Blood2/build/debug/tests/ai_recovery_tests" "catalog" "<external-data-root>"
+Directory: <workspace>/Blood2/build/debug/tests
+"ai_recovery.catalog" start time: Oct 17 14:01 CEST
+Output:
+----------------------------------------------------------
+m_cultist1 command=0 clip=6 available=1
+m_cultist1 command=1 clip=7 available=1
+m_cultist1 command=2 clip=8 available=1
+m_cultist1 command=3 clip=15 available=1
+f_cultist1 command=0 clip=6 available=1
+f_cultist1 command=1 clip=7 available=1
+f_cultist1 command=2 clip=8 available=1
+f_cultist1 command=3 clip=15 available=1
+m_civilian1 command=0 clip=4294967295 available=0
+m_civilian1 command=1 clip=4294967295 available=0
+m_civilian1 command=2 clip=4294967295 available=0
+m_civilian1 command=3 clip=4294967295 available=0
+f_civilian1 command=0 clip=4294967295 available=0
+f_civilian1 command=1 clip=4294967295 available=0
+f_civilian1 command=2 clip=4294967295 available=0
+f_civilian1 command=3 clip=4294967295 available=0
+labtech command=0 clip=4294967295 available=0
+labtech command=1 clip=4294967295 available=0
+labtech command=2 clip=4294967295 available=0
+labtech command=3 clip=4294967295 available=0
+gideon command=0 clip=4294967295 available=0
+gideon command=1 clip=4294967295 available=0
+gideon command=2 clip=4294967295 available=0
+gideon command=3 clip=4294967295 available=0
+<end of output>
+Test time =   0.27 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.catalog" end time: Oct 17 14:01 CEST
+"ai_recovery.catalog" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 14:01 CEST
+
+ai_escape =   0.33 sec*proc
+
+ai_perception =   1.47 sec*proc
+
+ai_recovery =   0.33 sec*proc
+
+ai_runtime =   8.84 sec*proc
+
+ai_state =  10.16 sec*proc
+
+ai_target =   1.50 sec*proc
+
+headless = 115.62 sec*proc
+
+movement =  14.65 sec*proc
+
+objects =   0.06 sec*proc
+
+player =  12.55 sec*proc
+
+player_controls =  40.42 sec*proc
+
+player_keepalive =   5.41 sec*proc
+
+player_restore =   1.95 sec*proc
+
+player_state =   1.70 sec*proc
+
+private = 114.70 sec*proc
+
+world =  16.25 sec*proc

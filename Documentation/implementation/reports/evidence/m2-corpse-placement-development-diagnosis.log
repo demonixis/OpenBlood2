@@ -1,0 +1,32 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 627
+    Start 627: player_controls.private
+
+627: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/player_controls_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+627: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+627: Test timeout computed to be: 120
+627: Original SubwayA camera intro expired after 12.0167 simulation seconds
+627: Corpse rejected source -73.1721,163.648,-2412.32 cached -73.1721,163.648,-2412.32 old dims 14.5119,35.647,14.5119 body 14.5119,35.647,14.5119 requested -73.1721,133.002,-2412.32 corpse dims 36,5,36
+627: Alternate input: hp=100 dead=0 ammo=38 shots=12 before=5
+627: Original FIRE_KEY: shots=12 ammo=38 voices=12 mouse=0
+1/1 Test #627: player_controls.private ..........   Passed    0.56 sec
+
+The following tests passed:
+	player_controls.private
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+headless           =   0.56 sec*proc (1 test)
+player_controls    =   0.56 sec*proc (1 test)
+private            =   0.56 sec*proc (1 test)
+
+Total Test time (real) =   0.57 sec

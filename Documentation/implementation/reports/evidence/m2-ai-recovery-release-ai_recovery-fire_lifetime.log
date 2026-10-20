@@ -1,0 +1,14 @@
+446/447 Testing: ai_recovery.fire_lifetime
+446/447 Test: ai_recovery.fire_lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_recovery_tests" "fire_lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_recovery.fire_lifetime" start time: Oct 16 14:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.fire_lifetime" end time: Oct 16 14:07 CEST
+"ai_recovery.fire_lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

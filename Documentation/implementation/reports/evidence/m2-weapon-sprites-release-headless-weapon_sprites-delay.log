@@ -1,0 +1,14 @@
+612/619 Testing: weapon_sprites.delay
+612/619 Test: weapon_sprites.delay
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon_sprite_tests" "delay" "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon-sprites-delay"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"weapon_sprites.delay" start time: Oct 16 23:54 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_sprites.delay" end time: Oct 16 23:54 CEST
+"weapon_sprites.delay" time elapsed: 00:00:00
+----------------------------------------------------------

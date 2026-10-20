@@ -1,0 +1,16 @@
+WORLD worlds/01_subwaya.dat mesh_ms=47.8196 objects=230
+DIGEST worlds/01_subwaya.dat 12697327032460833559
+step mean=5.19027 p50=4.31201 p95=6.17389 max=14.0211
+world mean=2.42751 p50=1.9609 p95=3.09388 max=3.27356
+model mean=7.83124 p50=6.19377 p95=10.0248 max=18.2298
+sprite mean=0.114722 p50=0.103703 p95=0.139097 max=0.156465
+fx mean=0.000773343 p50=0.000743 p95=0.001249 max=0.006986
+COUNTS models=36 model_vertices=40479 sprites=72 voices=5
+WORLD worlds/02_cityhub.dat mesh_ms=173.077 objects=488
+DIGEST worlds/02_cityhub.dat 16390435214447318215
+step mean=30.3805 p50=28.626 p95=41.7588 max=73.0778
+world mean=1.05104 p50=1.0291 p95=1.19372 max=2.19689
+model mean=16.4562 p50=16.0511 p95=19.2489 max=37.4687
+sprite mean=0.568278 p50=0.573774 p95=0.701597 max=1.31685
+fx mean=0.000810167 p50=0.000782 p95=0.001127 max=0.001395
+COUNTS models=272 model_vertices=104202 sprites=600 voices=36

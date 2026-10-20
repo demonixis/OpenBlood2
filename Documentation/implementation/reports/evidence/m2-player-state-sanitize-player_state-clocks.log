@@ -1,0 +1,14 @@
+493/497 Testing: player_state.clocks
+493/497 Test: player_state.clocks
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_state_tests" "clocks" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-state-fixtures/clocks"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_state.clocks" start time: Oct 16 18:33 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.clocks" end time: Oct 16 18:33 CEST
+"player_state.clocks" time elapsed: 00:00:00
+----------------------------------------------------------

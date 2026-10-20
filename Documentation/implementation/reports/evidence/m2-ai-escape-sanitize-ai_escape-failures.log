@@ -1,0 +1,14 @@
+428/431 Testing: ai_escape.failures
+428/431 Test: ai_escape.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_escape_tests" "failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_escape.failures" start time: Oct 16 14:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.failures" end time: Oct 16 14:25 CEST
+"ai_escape.failures" time elapsed: 00:00:00
+----------------------------------------------------------

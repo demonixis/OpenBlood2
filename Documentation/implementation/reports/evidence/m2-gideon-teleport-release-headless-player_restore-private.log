@@ -1,0 +1,17 @@
+542/683 Testing: player_restore.private
+542/683 Test: player_restore.private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/player_restore_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"player_restore.private" start time: Oct 17 02:46 CEST
+Output:
+----------------------------------------------------------
+cycle=0 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+cycle=1 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+cycle=2 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+<end of output>
+Test time =   0.26 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.private" end time: Oct 17 02:46 CEST
+"player_restore.private" time elapsed: 00:00:00
+----------------------------------------------------------

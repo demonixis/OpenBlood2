@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-18",
+  "status": "M2 incomplete; explicit harmonic pitch preparation, MUSIC unsupported",
+  "implementation_parent": "37d34f571ce05f974514f16d704a6f1e18e96b9b",
+  "runs": [
+    {
+      "configuration": "debug",
+      "tests": 94,
+      "passed": 94,
+      "wall_seconds": 15.77
+    },
+    {
+      "configuration": "release",
+      "tests": 94,
+      "passed": 94,
+      "wall_seconds": 1.51
+    },
+    {
+      "configuration": "sanitize",
+      "tests": 94,
+      "passed": 94,
+      "wall_seconds": 63.29
+    },
+    {
+      "configuration": "debug NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 11.27
+    },
+    {
+      "configuration": "release NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 5.47
+    }
+  ],
+  "original_pitch_probe": {
+    "fixtures": 33,
+    "generated": {
+      "cases": 2048,
+      "refused_infinite_walks": 25,
+      "fnv64": 15763711143549854140,
+      "sha256": "d3cb6c9ec3f739f791b8dd6788e2c42f5132a937767e330c87aeab492faf6173"
+    },
+    "private": {
+      "cases": 21090,
+      "refused_infinite_walks": 0,
+      "fnv64": 809768487747410926,
+      "sha256": "6bce959137f679868774a0eea2775deb9e59e4ccc6b50d4f7bb84fe499e15b62"
+    }
+  },
+  "gpu_environment": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+    "SDL_AUDIODRIVER": "dummy"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1"
+  },
+  "commands": [
+    "python3 m2-music-pitch-validation.py <debug|release|sanitize>",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/<debug|release> -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit <result.xml>",
+    "<tool-venv>/bin/python m2-music-pitch-probe.py <external-content-root>",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror <five changed C++ files>"
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "limitations": [
+    "All harmonic contexts explicit/synthetic; no authored song pitch claim",
+    "No personality/chord reconciliation or pattern/band selection",
+    "No live MUSIC, MIDI/controller application or scheduler",
+    "Nonterminating original scale-only walks fail instead of hanging",
+    "GPU sound capture reviewed; nested pitch controls not visually captured",
+    "Dummy audio, no listening comparison; no native Metal/Windows/mobile test",
+    "M2 acceptance and other required services remain open"
+  ],
+  "artifacts": {
+    "Documentation/Implementation/evidence/m2-music-pitch-debug-build-final.log": "350e9134a8e5ae74e35b76730652b6dba3faa1d1224e3135a5f7c6c1c80bfd83",
+    "Documentation/Implementation/evidence/m2-music-pitch-debug-gpu.log": "20620c16bd55c28b86ecbc7b6e05372c5f285ef7126bcb1d7711e3e04f3fe845",
+    "Documentation/Implementation/evidence/m2-music-pitch-debug-gpu.xml": "da14036d3b8433de9b7c8e04a8b027adb178a7cbc9574f8442fe6c74d01349d9",
+    "Documentation/Implementation/evidence/m2-music-pitch-debug-tests.log": "376b0b3ffb2694da87ed6fc89ff0c443c7b522ce2a8fc0e9d6904071025836bb",
+    "Documentation/Implementation/evidence/m2-music-pitch-debug-tests.xml": "674b138c074a2622a9628600617200d3af7ca3e156a7977c959872a4cd5e7e8e",
+    "Documentation/Implementation/evidence/m2-music-pitch-integrity.json": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+    "Documentation/Implementation/evidence/m2-music-pitch-links.log": "b680d10c4f80fb45ea42193ac72f74a82efaf36eaeddd43c7bd80c688010f0ff",
+    "Documentation/Implementation/evidence/m2-music-pitch-probe.json": "47e3ff76f4234a58ab6a3afb310bf1930d01089ff8977a430dfaccb3c50bc376",
+    "Documentation/Implementation/evidence/m2-music-pitch-probe.py": "87aa2f5c3c817b3c1eaed6c7808301782217a2e169f86eca7ee42e20733d8810",
+    "Documentation/Implementation/evidence/m2-music-pitch-release-build-final.log": "d3d665c8723dc2dd38b0597dc1f383178ec11e46f1dd9258a79a12ba960a4e16",
+    "Documentation/Implementation/evidence/m2-music-pitch-release-gpu.log": "0ef6fc62cbdac2fc2a8164d6f81958e501549f60a31c9b11d2fc3647afde9a86",
+    "Documentation/Implementation/evidence/m2-music-pitch-release-gpu.xml": "c8c3bf893073bb75cbd9c8e9ad7430e7d76a35434d4db799c3e19291375bdb21",
+    "Documentation/Implementation/evidence/m2-music-pitch-release-tests.log": "a2861d5197fc4fde81f72dfc94b3b23800974545efd0383de969b0d7419e1f46",
+    "Documentation/Implementation/evidence/m2-music-pitch-release-tests.xml": "31e5cb531025b4e68d41b21da11b28016d6b3a45b6c70192245025b235d27bc6",
+    "Documentation/Implementation/evidence/m2-music-pitch-sanitize-build-final.log": "b40416888634b5bd163ac6fe08da1fd39335e02abff97d57142eb55370738d4e",
+    "Documentation/Implementation/evidence/m2-music-pitch-sanitize-tests.log": "952b52b66e4f959b1fe186c6769da9858cb459e7ee4593b8366d32e41b46a100",
+    "Documentation/Implementation/evidence/m2-music-pitch-sanitize-tests.xml": "0e1444e3a8835f84445a4c00da6dbf9a8b376d41dc89e7d0080d11c622572c66",
+    "Documentation/Implementation/evidence/m2-music-pitch-validation.py": "467a19cf180d1b33247fe6343e5491a6751fd3f0bfba0db5436228d56d724cb8"
+  },
+  "implementation_commit": "835668e3afcc2a7ae35b0c0338241317edf9e767"
+}

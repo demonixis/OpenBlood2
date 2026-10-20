@@ -1,0 +1,4 @@
+[0/2] Re-checking globbed directories...
+[1/4] Linking CXX executable tests/demo_menu_tests
+[2/4] Linking CXX executable tests/demo_tests
+[3/4] Linking CXX executable tests/menu_tests

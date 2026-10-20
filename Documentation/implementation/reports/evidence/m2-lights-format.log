@@ -1,0 +1,26 @@
+clang-format 23.1.3: 25 changed/new C++ files pass --dry-run --Werror
+src/app/inspector.cpp
+src/app/inspector.h
+src/app/inspector_lights.cpp
+src/app/light_smoke.cpp
+src/app/light_smoke.h
+src/app/main.cpp
+src/engine/config.cpp
+src/engine/config.h
+src/game/legacy/server_de.h
+src/game/light_messages.h
+src/game/original/ClientLightFX.cpp
+src/game/original/ClientLightFX.h
+src/game/original/ClientSFX.h
+src/game/original/LightFX.cpp
+src/game/original/LightFX.h
+src/game/registration.cpp
+src/game/server_adapter.h
+src/game/server_lights.cpp
+src/game/session.cpp
+tests/brush_tests.cpp
+tests/camera_tests.cpp
+tests/keyframer_tests.cpp
+tests/light_tests.cpp
+tests/player_tests.cpp
+tests/world_tests.cpp

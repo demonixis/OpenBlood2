@@ -1,0 +1,15 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 294: gpu.sound
+1/2 Test #294: gpu.sound ........................   Passed   45.44 sec
+    Start 615: gpu.player_keepalive
+2/2 Test #615: gpu.player_keepalive .............   Passed    6.72 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+gpu                 =  52.16 sec*proc (2 tests)
+player_keepalive    =   6.72 sec*proc (1 test)
+private             =  52.16 sec*proc (2 tests)
+sound               =  45.44 sec*proc (1 test)
+
+Total Test time (real) =  52.18 sec

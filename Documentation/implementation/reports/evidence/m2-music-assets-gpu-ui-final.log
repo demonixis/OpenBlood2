@@ -1,0 +1,12 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 294: gpu.sound
+1/1 Test #294: gpu.sound ........................   Passed    4.46 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+gpu        =   4.46 sec*proc (1 test)
+private    =   4.46 sec*proc (1 test)
+sound      =   4.46 sec*proc (1 test)
+
+Total Test time (real) =   4.47 sec

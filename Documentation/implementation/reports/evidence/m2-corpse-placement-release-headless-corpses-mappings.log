@@ -1,0 +1,14 @@
+505/703 Testing: corpses.mappings
+505/703 Test: corpses.mappings
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/corpse_tests" "mappings" "/home/yann/projects/lithtech/Blood2/build/release/tests/corpse-fixtures/mappings"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"corpses.mappings" start time: Oct 17 04:28 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.mappings" end time: Oct 17 04:28 CEST
+"corpses.mappings" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,27 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1176: menus.artwork
+1/7 Test #1176: menus.artwork ....................   Passed    0.04 sec
+    Start 1181: gpu.menu_traversal
+2/7 Test #1181: gpu.menu_traversal ...............   Passed    4.49 sec
+    Start 1203: gpu.demo
+3/7 Test #1203: gpu.demo .........................   Passed    1.99 sec
+    Start 1204: demo_menu.manifest
+4/7 Test #1204: demo_menu.manifest ...............   Passed    0.00 sec
+    Start 1205: demo_menu.flow
+5/7 Test #1205: demo_menu.flow ...................   Passed    0.00 sec
+    Start 1206: demo_menu.assets
+6/7 Test #1206: demo_menu.assets .................   Passed    0.04 sec
+    Start 1207: gpu.demo_menu
+7/7 Test #1207: gpu.demo_menu ....................   Passed    4.33 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+demo         =   1.99 sec*proc (1 test)
+demo_menu    =   4.37 sec*proc (4 tests)
+gpu          =  10.80 sec*proc (3 tests)
+headless     =   0.08 sec*proc (4 tests)
+menus        =   4.52 sec*proc (2 tests)
+private      =  10.88 sec*proc (5 tests)
+
+Total Test time (real) =  10.90 sec

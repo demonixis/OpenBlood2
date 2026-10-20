@@ -1,0 +1,141 @@
+Start testing: Oct 17 06:56 CEST
+----------------------------------------------------------
+567/757 Testing: gpu.sprite_private
+567/757 Test: gpu.sprite_private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.sprite_private" start time: Oct 17 06:56 CEST
+Output:
+----------------------------------------------------------
+Pixels: zero/partial/opaque/opaque-black DTX alpha, per-instance opacity, overlap sort, world occlusion, no depth writes, resize and reupload passed
+Private authored sprite pose/scale: 1556 non-background pixels, 118444 clear; unload emptied CPU/GPU geometry
+<end of output>
+Test time =   2.82 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sprite_private" end time: Oct 17 06:56 CEST
+"gpu.sprite_private" time elapsed: 00:00:02
+----------------------------------------------------------
+
+661/757 Testing: gpu.energy
+661/757 Test: gpu.energy
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/energy_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/energy-gpu"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.energy" start time: Oct 17 06:56 CEST
+Output:
+----------------------------------------------------------
+Stage 0: scale 0, z 20, changed pixels 0
+Stage 1: scale 0.25, z 20, changed pixels 96
+Stage 2: scale 0.25, z 30, changed pixels 48
+<end of output>
+Test time =   0.49 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.energy" end time: Oct 17 06:56 CEST
+"gpu.energy" time elapsed: 00:00:00
+----------------------------------------------------------
+
+662/757 Testing: gpu.energy_private
+662/757 Test: gpu.energy_private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/energy_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/energy-private-gpu" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.energy_private" start time: Oct 17 06:56 CEST
+Output:
+----------------------------------------------------------
+Stage 0: scale 0, z 20, changed pixels 0
+Stage 1: scale 0.25, z 20, changed pixels 8400
+Stage 2: scale 0.25, z 30, changed pixels 3736
+<end of output>
+Test time =   0.60 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.energy_private" end time: Oct 17 06:56 CEST
+"gpu.energy_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+697/757 Testing: gpu.gideon_teleport_private
+697/757 Test: gpu.gideon_teleport_private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_teleport_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-teleport-private-gpu" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.gideon_teleport_private" start time: Oct 17 06:56 CEST
+Output:
+----------------------------------------------------------
+Production Gideon: real initialization, scheduled AI_Update, no-audience health, read-only GPU and deferred removal verified.
+External Gideon: 286 visible pixels; original 16-step fade reaches empty frame; reappearance exact; repeated reads do not advance clocks. Dodge motion integrates once and finishes at one second.
+<end of output>
+Test time =   0.67 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.gideon_teleport_private" end time: Oct 17 06:56 CEST
+"gpu.gideon_teleport_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+755/757 Testing: gpu.flare
+755/757 Test: gpu.flare
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/flare_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flare-gpu"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.flare" start time: Oct 17 06:56 CEST
+Output:
+----------------------------------------------------------
+Stage 0: scale 0, z 20, changed pixels 0
+Stage 1: scale 0.25, z 20, changed pixels 96
+96: stage == 0 || (changed > 20 && red > 20)  
+<end of output>
+Test time =   0.51 sec
+----------------------------------------------------------
+Test Failed.
+"gpu.flare" end time: Oct 17 06:56 CEST
+"gpu.flare" time elapsed: 00:00:00
+----------------------------------------------------------
+
+756/757 Testing: gpu.flare_private
+756/757 Test: gpu.flare_private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/flare_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flare-private-gpu" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.flare_private" start time: Oct 17 06:56 CEST
+Output:
+----------------------------------------------------------
+Stage 0: scale 0, z 20, changed pixels 0
+Stage 1: scale 0.25, z 20, changed pixels 9808
+Stage 2: scale 0.25, z 30, changed pixels 4332
+<end of output>
+Test time =   0.56 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.flare_private" end time: Oct 17 06:56 CEST
+"gpu.flare_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+757/757 Testing: gpu.flare_views_private
+757/757 Test: gpu.flare_views_private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/flare_view_gpu_tests" "/home/yann/.steam/steam/steamapps/common/Blood II" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flare-views-"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.flare_views_private" start time: Oct 17 06:56 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Flare GPU cycle=0 left pixels=16191 right pixels=16196
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Flare GPU cycle=1 left pixels=16191 right pixels=16196
+<end of output>
+Test time =   9.19 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.flare_views_private" end time: Oct 17 06:57 CEST
+"gpu.flare_views_private" time elapsed: 00:00:09
+----------------------------------------------------------
+
+End testing: Oct 17 06:57 CEST
+
+energy =   1.09 sec*proc
+
+flare =  10.26 sec*proc
+
+gideon_teleport =   0.67 sec*proc
+
+gpu =  14.84 sec*proc
+
+private =  13.84 sec*proc
+
+sprite_view =   2.82 sec*proc
+

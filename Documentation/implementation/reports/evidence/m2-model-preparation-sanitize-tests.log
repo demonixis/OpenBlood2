@@ -1,0 +1,120 @@
+Test project <workspace>/Blood2/build/sanitize
+      Start  48: services.model_reader
+ 1/52 Test  #48: services.model_reader ............   Passed    0.02 sec
+      Start  49: services.model_rejection
+ 2/52 Test  #49: services.model_rejection .........   Passed    0.31 sec
+      Start  50: services.animation_events
+ 3/52 Test  #50: services.animation_events ........   Passed    0.02 sec
+      Start  51: services.model_callbacks
+ 4/52 Test  #51: services.model_callbacks .........   Passed    0.02 sec
+      Start  52: services.collision_queries
+ 5/52 Test  #52: services.collision_queries .......   Passed    0.02 sec
+      Start  53: services.collision_traversal
+ 6/52 Test  #53: services.collision_traversal .....   Passed    0.12 sec
+      Start  54: services.movement_contacts
+ 7/52 Test  #54: services.movement_contacts .......   Passed    0.02 sec
+      Start  55: services.placement_queries
+ 8/52 Test  #55: services.placement_queries .......   Passed    0.03 sec
+      Start  56: services.placement_service
+ 9/52 Test  #56: services.placement_service .......   Passed    0.02 sec
+      Start  57: services.original_services
+10/52 Test  #57: services.original_services .......   Passed    0.02 sec
+      Start  58: services.private
+11/52 Test  #58: services.private .................   Passed    9.37 sec
+      Start 269: character.mappings
+12/52 Test #269: character.mappings ...............   Passed    0.02 sec
+      Start 270: character.humiliation
+13/52 Test #270: character.humiliation ............   Passed    0.02 sec
+      Start 271: character.force
+14/52 Test #271: character.force ..................   Passed    0.02 sec
+      Start 272: character.transforms
+15/52 Test #272: character.transforms .............   Passed    0.02 sec
+      Start 273: character.rejection
+16/52 Test #273: character.rejection ..............   Passed    0.03 sec
+      Start 274: character.spheres
+17/52 Test #274: character.spheres ................   Passed    0.02 sec
+      Start 275: character.catalog
+18/52 Test #275: character.catalog ................   Passed    1.33 sec
+      Start 276: character.player
+19/52 Test #276: character.player .................   Passed   31.72 sec
+      Start 319: attachments.root
+20/52 Test #319: attachments.root .................   Passed    0.02 sec
+      Start 320: attachments.nodes
+21/52 Test #320: attachments.nodes ................   Passed    0.02 sec
+      Start 321: attachments.rejects
+22/52 Test #321: attachments.rejects ..............   Passed    0.40 sec
+      Start 322: attachments.lifetime
+23/52 Test #322: attachments.lifetime .............   Passed    0.02 sec
+      Start 323: attachments.held
+24/52 Test #323: attachments.held .................   Passed    0.06 sec
+      Start 324: attachments.missing
+25/52 Test #324: attachments.missing ..............   Passed    0.05 sec
+      Start 325: attachments.catalog
+26/52 Test #325: attachments.catalog ..............   Passed    1.20 sec
+      Start 326: attachments.subway
+27/52 Test #326: attachments.subway ...............   Passed    4.59 sec
+      Start 346: model_view.builtin_resources
+28/52 Test #346: model_view.builtin_resources .....   Passed    0.03 sec
+      Start 347: model_view.sample
+29/52 Test #347: model_view.sample ................   Passed    0.02 sec
+      Start 348: model_view.rejects
+30/52 Test #348: model_view.rejects ...............   Passed    0.02 sec
+      Start 349: model_view.weapon_pose
+31/52 Test #349: model_view.weapon_pose ...........   Passed    0.02 sec
+      Start 350: model_view.legacy_pose
+32/52 Test #350: model_view.legacy_pose ...........   Passed    0.02 sec
+      Start 351: model_view.prepared_cache
+33/52 Test #351: model_view.prepared_cache ........   Passed    0.02 sec
+      Start 352: model_view.cache_budget
+34/52 Test #352: model_view.cache_budget ..........   Passed    0.71 sec
+      Start 353: model_view.subway
+35/52 Test #353: model_view.subway ................   Passed    4.54 sec
+      Start 354: model_view.builtin_city
+36/52 Test #354: model_view.builtin_city ..........   Passed    7.30 sec
+      Start 546: character_nodes.services
+37/52 Test #546: character_nodes.services .........   Passed    0.02 sec
+      Start 547: character_nodes.names
+38/52 Test #547: character_nodes.names ............   Passed    0.02 sec
+      Start 548: character_nodes.rendering
+39/52 Test #548: character_nodes.rendering ........   Passed    0.02 sec
+      Start 549: character_nodes.restore
+40/52 Test #549: character_nodes.restore ..........   Passed    0.04 sec
+      Start 550: character_nodes.private
+41/52 Test #550: character_nodes.private ..........   Passed    6.68 sec
+      Start 566: explosion_models.formulas
+42/52 Test #566: explosion_models.formulas ........   Passed    0.04 sec
+      Start 567: explosion_models.recipes
+43/52 Test #567: explosion_models.recipes .........   Passed    0.02 sec
+      Start 568: explosion_models.failures
+44/52 Test #568: explosion_models.failures ........   Passed    0.03 sec
+      Start 569: explosion_models.session
+45/52 Test #569: explosion_models.session .........   Passed    0.02 sec
+      Start 570: explosion_models.private
+46/52 Test #570: explosion_models.private .........   Passed    6.28 sec
+      Start 582: explosion_fragments.lifecycle
+47/52 Test #582: explosion_fragments.lifecycle ....   Passed    0.02 sec
+      Start 583: explosion_fragments.collision
+48/52 Test #583: explosion_fragments.collision ....   Passed    0.02 sec
+      Start 584: explosion_fragments.recipes
+49/52 Test #584: explosion_fragments.recipes ......   Passed    0.02 sec
+      Start 585: explosion_fragments.failures
+50/52 Test #585: explosion_fragments.failures .....   Passed    0.04 sec
+      Start 586: explosion_fragments.session
+51/52 Test #586: explosion_fragments.session ......   Passed    0.03 sec
+      Start 587: explosion_fragments.private
+52/52 Test #587: explosion_fragments.private ......   Passed   28.86 sec
+
+100% tests passed, 0 tests failed out of 52
+
+Label Time Summary:
+attachments            =   6.37 sec*proc (8 tests)
+character              =  33.18 sec*proc (8 tests)
+character_nodes        =   6.77 sec*proc (5 tests)
+explosion_fragments    =  29.00 sec*proc (6 tests)
+explosion_models       =   6.38 sec*proc (5 tests)
+headless               = 104.33 sec*proc (52 tests)
+model_view             =  12.67 sec*proc (9 tests)
+private                = 101.87 sec*proc (10 tests)
+services               =   9.96 sec*proc (11 tests)
+
+Total Test time (real) = 104.36 sec

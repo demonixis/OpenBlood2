@@ -1,5 +1,5 @@
 // Selective original menu construction/navigation from ClientShellDLL/Menu*.cpp.
-// See docs/implementation/sources/original_menu_sources.json for provenance.
+// See Documentation/implementation/sources/original_menu_sources.json for provenance.
 #include "MenuIds.h"
 #include "game/menu.h"
 #include <algorithm>

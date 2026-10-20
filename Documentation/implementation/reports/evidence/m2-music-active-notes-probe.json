@@ -1,0 +1,32 @@
+{
+  "binary": "IMUSIC25.DLL",
+  "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "rva": "0x16908",
+  "generated": {
+    "sections": 128,
+    "steps": 2799,
+    "admitted_notes": 7057,
+    "emitted_pairs": 5532,
+    "note_draws": 9938,
+    "due_offs": 4061,
+    "chord_adjustments": 812,
+    "peak_active": 37,
+    "end_tails": 1471,
+    "sha256": "d826b0e0ef6518b35be54816ce95fc2e5789d39df2cbe3c43fa0b072bd78e4a3",
+    "fnv64": 4553459640914638122
+  },
+  "private": {
+    "sections": 132,
+    "steps": 8174,
+    "admitted_notes": 6290,
+    "emitted_pairs": 6290,
+    "note_draws": 12580,
+    "due_offs": 6112,
+    "chord_adjustments": 0,
+    "peak_active": 17,
+    "end_tails": 178,
+    "sha256": "18ffca0fec679d19152037645ccb8ae78ff0156a37ff6b1a0c44b40f6ec65f46",
+    "fnv64": 182961564129265722
+  },
+  "scope": "Original normal-mode grid/chord/mute/pattern/variation, note pitch/events, serial registration, chord-dependent active-note adjustment and off/pending partition order. Prepared inputs come from previously verified readers/helpers. Section event list empty; notifications, metronome, MIDI sink, note allocation and due-off delivery sink, playlist lookahead/repeats/transitions intercepted. Original active lists persist across grid calls and are observed in exact order; MIDI sink and synth timing remain outside the comparison. This is not a full tick/audio equivalence claim."
+}

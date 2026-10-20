@@ -1,0 +1,14 @@
+374/375 Testing: ai_navigation.lifetime
+374/375 Test: ai_navigation.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_navigation_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_navigation.lifetime" start time: Oct 16 12:33 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"ai_navigation.lifetime" end time: Oct 16 12:33 CEST
+"ai_navigation.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

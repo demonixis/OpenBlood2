@@ -1,0 +1,148 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 841: proximity.private_fire
+      Start 187: pickups.catalog
+      Start 566: player_keepalive.private
+      Start 789: assault.private
+ 1/65 Test #789: assault.private ..................   Passed    2.92 sec
+      Start 840: proximity.private
+ 2/65 Test #187: pickups.catalog ..................   Passed    4.48 sec
+      Start 540: inventory_state.private
+ 3/65 Test #840: proximity.private ................   Passed    1.67 sec
+      Start 561: player_restore.private
+ 4/65 Test #566: player_keepalive.private .........   Passed    4.62 sec
+      Start 788: assault.ai
+ 5/65 Test #788: assault.ai .......................   Passed    0.19 sec
+      Start 777: assault.modes
+ 6/65 Test #777: assault.modes ....................   Passed    0.18 sec
+      Start  49: cli.world_modes
+ 7/65 Test #540: inventory_state.private ..........   Passed    1.48 sec
+      Start 564: player_keepalive.fallback
+ 8/65 Test #564: player_keepalive.fallback ........   Passed    0.03 sec
+      Start 785: assault.drop
+ 9/65 Test #785: assault.drop .....................   Passed    0.02 sec
+      Start 178: pickups.defaults
+10/65 Test #178: pickups.defaults .................   Passed    0.02 sec
+      Start 186: pickups.resources
+11/65 Test #186: pickups.resources ................   Passed    0.02 sec
+      Start 179: pickups.ammunition
+12/65 Test #179: pickups.ammunition ...............   Passed    0.02 sec
+      Start 783: assault.lifetime
+13/65 Test #783: assault.lifetime .................   Passed    0.02 sec
+      Start 837: proximity.restore
+14/65 Test #841: proximity.private_fire ...........   Passed    6.10 sec
+      Start 184: pickups.rejection
+15/65 Test #837: proximity.restore ................   Passed    0.02 sec
+      Start 180: pickups.statistics
+16/65 Test #184: pickups.rejection ................   Passed    0.02 sec
+      Start 185: pickups.callbacks
+17/65 Test #180: pickups.statistics ...............   Passed    0.02 sec
+      Start 565: player_keepalive.failures
+18/65 Test #185: pickups.callbacks ................   Passed    0.02 sec
+      Start 183: pickups.spawning
+19/65 Test #565: player_keepalive.failures ........   Passed    0.02 sec
+      Start 836: proximity.inventory
+20/65 Test #183: pickups.spawning .................   Passed    0.02 sec
+      Start 182: pickups.contact
+21/65 Test #836: proximity.inventory ..............   Passed    0.01 sec
+      Start 181: pickups.protocol
+22/65 Test #182: pickups.contact ..................   Passed    0.02 sec
+      Start 833: proximity.contacts
+23/65 Test #181: pickups.protocol .................   Passed    0.02 sec
+      Start 835: proximity.lifetime
+24/65 Test #833: proximity.contacts ...............   Passed    0.01 sec
+      Start 832: proximity.rules
+25/65 Test #835: proximity.lifetime ...............   Passed    0.01 sec
+      Start 838: proximity.ai_delay
+26/65 Test #832: proximity.rules ..................   Passed    0.01 sec
+      Start 834: proximity.motion
+27/65 Test #838: proximity.ai_delay ...............   Passed    0.01 sec
+      Start 559: player_restore.failures
+28/65 Test #834: proximity.motion .................   Passed    0.01 sec
+      Start 781: assault.contacts
+29/65 Test #781: assault.contacts .................   Passed    0.01 sec
+      Start 563: player_keepalive.named
+30/65 Test #559: player_restore.failures ..........   Passed    0.02 sec
+      Start 778: assault.damage
+31/65 Test #563: player_keepalive.named ...........   Passed    0.01 sec
+      Start 786: assault.collect
+32/65 Test #778: assault.damage ...................   Passed    0.01 sec
+      Start 779: assault.motion
+33/65 Test #786: assault.collect ..................   Passed    0.01 sec
+      Start 780: assault.bounce
+34/65 Test #779: assault.motion ...................   Passed    0.01 sec
+      Start 782: assault.rules
+35/65 Test #780: assault.bounce ...................   Passed    0.01 sec
+      Start 784: assault.failure
+36/65 Test #782: assault.rules ....................   Passed    0.01 sec
+      Start  11: objects.unsupported_teardown
+37/65 Test #784: assault.failure ..................   Passed    0.01 sec
+      Start 787: assault.restore
+38/65 Test #561: player_restore.private ...........   Passed    1.67 sec
+      Start 839: proximity.reentrant
+39/65 Test  #11: objects.unsupported_teardown .....   Passed    0.01 sec
+      Start 560: player_restore.lifetime
+40/65 Test #787: assault.restore ..................   Passed    0.01 sec
+      Start 539: inventory_state.capture
+41/65 Test #539: inventory_state.capture ..........   Passed    0.01 sec
+      Start 536: inventory_state.roundtrip
+42/65 Test #839: proximity.reentrant ..............   Passed    0.01 sec
+      Start 537: inventory_state.malformed
+43/65 Test #536: inventory_state.roundtrip ........   Passed    0.01 sec
+      Start 538: inventory_state.rollback
+44/65 Test #537: inventory_state.malformed ........   Passed    0.01 sec
+      Start 558: player_restore.roundtrip
+45/65 Test #560: player_restore.lifetime ..........   Passed    0.02 sec
+      Start  12: objects.creation_failures
+46/65 Test #538: inventory_state.rollback .........   Passed    0.01 sec
+      Start  10: objects.messages_strings
+47/65 Test  #12: objects.creation_failures ........   Passed    0.01 sec
+      Start   1: objects.builtin_model
+48/65 Test #558: player_restore.roundtrip .........   Passed    0.01 sec
+      Start 776: assault.key_bounds
+49/65 Test   #1: objects.builtin_model ............   Passed    0.00 sec
+      Start   2: objects.original_objects
+50/65 Test  #10: objects.messages_strings .........   Passed    0.01 sec
+      Start   9: objects.links_lists
+51/65 Test #776: assault.key_bounds ...............   Passed    0.00 sec
+      Start   4: objects.reasons_properties
+52/65 Test   #2: objects.original_objects .........   Passed    0.00 sec
+      Start   6: objects.deferred_removal
+53/65 Test   #9: objects.links_lists ..............   Passed    0.00 sec
+      Start   3: objects.nested_creation
+54/65 Test   #4: objects.reasons_properties .......   Passed    0.00 sec
+      Start   7: objects.aggregate_dispatch
+55/65 Test   #6: objects.deferred_removal .........   Passed    0.00 sec
+      Start   8: objects.handles_selection
+56/65 Test   #3: objects.nested_creation ..........   Passed    0.00 sec
+      Start   5: objects.scheduling
+57/65 Test   #7: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start  21: cli.missing_data
+58/65 Test   #8: objects.handles_selection ........   Passed    0.00 sec
+      Start  23: cli.metadata
+59/65 Test   #5: objects.scheduling ...............   Passed    0.00 sec
+      Start  22: cli.missing_config
+60/65 Test  #21: cli.missing_data .................   Passed    0.01 sec
+      Start  20: cli.unknown
+61/65 Test  #23: cli.metadata .....................   Passed    0.01 sec
+      Start  19: cli.help
+62/65 Test  #22: cli.missing_config ...............   Passed    0.01 sec
+63/65 Test  #20: cli.unknown ......................   Passed    0.01 sec
+64/65 Test  #19: cli.help .........................   Passed    0.01 sec
+65/65 Test  #49: cli.world_modes ..................   Passed    1.69 sec
+
+100% tests passed, 0 tests failed out of 65
+
+Label Time Summary:
+assault             =   3.41 sec*proc (14 tests)
+cli                 =   0.05 sec*proc (5 tests)
+headless            =  25.63 sec*proc (65 tests)
+inventory_state     =   1.50 sec*proc (5 tests)
+objects             =   0.05 sec*proc (12 tests)
+pickups             =   4.65 sec*proc (10 tests)
+player_keepalive    =   4.68 sec*proc (4 tests)
+player_restore      =   1.72 sec*proc (4 tests)
+private             =  24.83 sec*proc (9 tests)
+proximity           =   7.87 sec*proc (10 tests)
+world               =   1.69 sec*proc (1 test)
+
+Total Test time (real) =   6.71 sec

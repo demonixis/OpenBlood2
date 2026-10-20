@@ -1,0 +1,14 @@
+695/701 Testing: gideon_runtime.health
+695/701 Test: gideon_runtime.health
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_runtime_tests" "health" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-runtime-health"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_runtime.health" start time: Oct 17 04:05 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_runtime.health" end time: Oct 17 04:05 CEST
+"gideon_runtime.health" time elapsed: 00:00:00
+----------------------------------------------------------

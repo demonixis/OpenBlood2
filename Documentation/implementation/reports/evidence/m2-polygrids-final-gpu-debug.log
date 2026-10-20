@@ -1,0 +1,83 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 123
+    Start 123: gpu.containers
+
+123: Test command: <workspace>/Blood2/build/debug/blood2 "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--world" "02_CityHub" "--containers-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/containers.png"
+123: Working Directory: <workspace>/Blood2/build/debug/tests
+123: Test timeout computed to be: 30
+123: [info] External data: <external-data-root> (--data-dir)
+123: [info] BLOOD2.REZ: detected, 267758913 bytes
+123: [info] SOUND.REZ: detected, 204633068 bytes
+123: [info] BLOOD2P.REZ: detected, 24133434 bytes
+123: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+123: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+123: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+123: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+123: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+123: [info] DAT v56: 1026 source objects, 487 original instances, 100 BSP models
+123: [info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/containers.png
+123: [info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+123: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+123: [info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=27 npc-failed=0 npc-updates=27
+123: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+123: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+123: [info] Container smoke passed: CityHub canal and air, MoveMgr while hidden, volume inspector, unload/re-entry
+123: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+1/3 Test #123: gpu.containers ...................   Passed   11.84 sec
+test 838
+    Start 838: gpu.level_change
+
+838: Test command: <workspace>/Blood2/build/debug/tests/level_change_gpu_tests "<external-data-root>" "<workspace>/Blood2/build/debug/tests/level-change"
+838: Working Directory: <workspace>/Blood2/build/debug/tests
+838: Test timeout computed to be: 90
+838: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+838: Destination: CityHub /
+838: Cycle 0: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+838: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+838: Destination: SubwayA /
+838: Cycle 1: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+838: Destination: CityHub /
+838: Cycle 2: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+838: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+838: Destination: SubwayA /
+838: Cycle 3: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+2/3 Test #838: gpu.level_change .................   Passed    9.13 sec
+test 925
+    Start 925: gpu.polygrid
+
+925: Test command: <workspace>/Blood2/build/debug/tests/polygrid_gpu_tests "<workspace>/Blood2/build/debug/tests/polygrid/gpu" "<external-data-root>"
+925: Working Directory: <workspace>/Blood2/build/debug/tests
+925: Environment variables:
+925:  SDL_AUDIODRIVER=dummy
+925: Test timeout computed to be: 120
+925: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+925: Repeat/alpha scan: red=76 green=74 black=73 clear=75 red runs=2
+925: CityHub cycle 0 cells 98 changed pixels 120000
+925: World water contribution 65234 pixels
+925: CityHub cycle 1 cells 98 changed pixels 120000
+925: World water contribution 65234 pixels
+3/3 Test #925: gpu.polygrid .....................   Passed    4.76 sec
+
+The following tests passed:
+	gpu.containers
+	gpu.level_change
+	gpu.polygrid
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+containers    =  11.84 sec*proc (1 test)
+gpu           =  25.74 sec*proc (3 tests)
+polygrid      =   4.76 sec*proc (1 test)
+private       =  25.74 sec*proc (3 tests)
+world         =   9.13 sec*proc (1 test)
+
+Total Test time (real) =  25.76 sec

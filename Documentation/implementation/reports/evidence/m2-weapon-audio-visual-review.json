@@ -1,0 +1,10 @@
+{
+  "capture": "Blood2/build/debug/tests/weapons.png",
+  "sha256": "5aff40fd9f56dfc7556afa8c58157455b8b987375ebc64e88971b7abefc32a45",
+  "dimensions": [
+    1000,
+    680
+  ],
+  "review": "Inspected actual Debug GPU weapons capture: original fire-audio panel precedes pose; wrapped counters show 4 attempts/4 played/0 failed/4 released, original knife fire.wav, six completed hearing deliveries, four empty slots with historical end times. Text remains inside the right column; lower details/pose use existing vertical scroll. Capture is diagnostic presentation, not evidence of audible parity.",
+  "initial_review": "First preview hid the new panel below the pose and long counters overran its column; moved audio before the pose and wrapped long lines."
+}

@@ -1,0 +1,300 @@
+{
+  "date": "2026-10-18",
+  "status": "M2 incomplete; original MUSIC remains unsupported",
+  "implementation_parent": "b7c6c53976e4651d13b64f1e4d6fdbd9a23dfae6",
+  "runs": [
+    {
+      "configuration": "debug",
+      "tests": 79,
+      "passed": 79,
+      "wall_seconds": 17.34
+    },
+    {
+      "configuration": "release",
+      "tests": 79,
+      "passed": 79,
+      "wall_seconds": 1.38
+    },
+    {
+      "configuration": "sanitize",
+      "tests": 79,
+      "passed": 79,
+      "wall_seconds": 62.96
+    },
+    {
+      "configuration": "debug NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 11.42
+    },
+    {
+      "configuration": "release NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 5.28
+    }
+  ],
+  "original_section_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "header_cases": [
+      {
+        "tempo": 120,
+        "fraction": 0,
+        "microseconds": 500000
+      },
+      {
+        "tempo": 120,
+        "fraction": 65535,
+        "microseconds": 495931
+      },
+      {
+        "tempo": 1,
+        "fraction": 0,
+        "microseconds": 60000000
+      },
+      {
+        "tempo": 32767,
+        "fraction": 65535,
+        "microseconds": 1831
+      }
+    ],
+    "command_measure_cases": [
+      {
+        "ticks_per_measure": 768,
+        "time": -769,
+        "measure": -1
+      },
+      {
+        "ticks_per_measure": 768,
+        "time": -767,
+        "measure": 0
+      },
+      {
+        "ticks_per_measure": 768,
+        "time": 25165824,
+        "measure": -32768
+      },
+      {
+        "ticks_per_measure": 1,
+        "time": -2147483648,
+        "measure": 0
+      },
+      {
+        "ticks_per_measure": 1,
+        "time": 2147483647,
+        "measure": -1
+      }
+    ],
+    "header_rvas": [
+      "0xb5d3..0xb644",
+      "0xb65c..0xb66a",
+      "0x18ced..0x18d10"
+    ],
+    "entries": {
+      "cmnd": "0xba4b",
+      "mute": "0xbb79",
+      "chrd": "0xb899"
+    },
+    "synthetic_cases": 31,
+    "sections": 156,
+    "records": {
+      "cmnd": 156,
+      "mute": 3290,
+      "chrd": 156
+    },
+    "mapped_sha256": "83bcfc3be48726603f525385a18b7e433137a85750fd17427f35d7601636ef72",
+    "mapped_fnv64": 17214005195151465368,
+    "tempo_integers": [
+      74,
+      98,
+      110,
+      120,
+      150,
+      176
+    ],
+    "duration_ticks": [
+      768,
+      1152,
+      1536,
+      1728,
+      2304,
+      3072,
+      3456,
+      4608,
+      6144
+    ],
+    "scope": "Original reader order and mapped fields; chord name conversion intercepted, no personality or sequencer execution"
+  },
+  "private_results": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "header_cases": [
+      {
+        "tempo": 120,
+        "fraction": 0,
+        "microseconds": 500000
+      },
+      {
+        "tempo": 120,
+        "fraction": 65535,
+        "microseconds": 495931
+      },
+      {
+        "tempo": 1,
+        "fraction": 0,
+        "microseconds": 60000000
+      },
+      {
+        "tempo": 32767,
+        "fraction": 65535,
+        "microseconds": 1831
+      }
+    ],
+    "command_measure_cases": [
+      {
+        "ticks_per_measure": 768,
+        "time": -769,
+        "measure": -1
+      },
+      {
+        "ticks_per_measure": 768,
+        "time": -767,
+        "measure": 0
+      },
+      {
+        "ticks_per_measure": 768,
+        "time": 25165824,
+        "measure": -32768
+      },
+      {
+        "ticks_per_measure": 1,
+        "time": -2147483648,
+        "measure": 0
+      },
+      {
+        "ticks_per_measure": 1,
+        "time": 2147483647,
+        "measure": -1
+      }
+    ],
+    "header_rvas": [
+      "0xb5d3..0xb644",
+      "0xb65c..0xb66a",
+      "0x18ced..0x18d10"
+    ],
+    "entries": {
+      "cmnd": "0xba4b",
+      "mute": "0xbb79",
+      "chrd": "0xb899"
+    },
+    "synthetic_cases": 31,
+    "sections": 156,
+    "records": {
+      "cmnd": 156,
+      "mute": 3290,
+      "chrd": 156
+    },
+    "mapped_sha256": "83bcfc3be48726603f525385a18b7e433137a85750fd17427f35d7601636ef72",
+    "mapped_fnv64": 17214005195151465368,
+    "tempo_integers": [
+      74,
+      98,
+      110,
+      120,
+      150,
+      176
+    ],
+    "duration_ticks": [
+      768,
+      1152,
+      1536,
+      1728,
+      2304,
+      3072,
+      3456,
+      4608,
+      6144
+    ],
+    "scope": "Original reader order and mapped fields; chord name conversion intercepted, no personality or sequencer execution"
+  },
+  "gpu_environment": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+    "SDL_AUDIODRIVER": "dummy"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1"
+  },
+  "commands": [
+    "python3 m2-music-sections-validation.py <debug|release|sanitize>",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/<debug|release> -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit <result.xml>",
+    "<tool-venv>/bin/python m2-music-sections-probe.py <external-content-root>",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror <eight changed C++ files>"
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "limitations": [
+    "No effective style/band reconciliation, command/mute execution, pitch/personality conversion, sequencing or MUSIC success",
+    "No native Metal/Windows/mobile execution; NVIDIA Vulkan only",
+    "Visual capture reviewed for status/lifetime text; nested section/track rows not captured",
+    "No claim of complete world/dead-player restoration or M2 acceptance"
+  ],
+  "artifacts": {
+    "Documentation/Implementation/evidence/m2-music-sections-debug-build-final.log": "a0ecf714cce1bacb3298ed68b53ed3e40760ec3ae126dc2bb304337dca041cad",
+    "Documentation/Implementation/evidence/m2-music-sections-debug-gpu.log": "754d425e7bb5d7df98cf648576f9593a62b06173e3a6405727a1cb9413f08e6b",
+    "Documentation/Implementation/evidence/m2-music-sections-debug-gpu.xml": "9ed4f3c885d8e81ed90b66e054f0e1bf356425311fc9c8499f1e904fcf8672c4",
+    "Documentation/Implementation/evidence/m2-music-sections-debug-tests.log": "764baf2ccac4c8417f926c7aa6a2973ae06cd08df443d06332f750f280b74533",
+    "Documentation/Implementation/evidence/m2-music-sections-debug-tests.xml": "193f81a11f3fd1d0b0cb2bb7896d28e8f97b36bf0723467e909578e25de10830",
+    "Documentation/Implementation/evidence/m2-music-sections-initial-build.log": "2829fb2c1902611cbdd51b4a21e4e6809073e89dd889e57c9ce41b8a9dc0f6ad",
+    "Documentation/Implementation/evidence/m2-music-sections-integrity.json": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+    "Documentation/Implementation/evidence/m2-music-sections-links.log": "57cc7d848820ffeaf974d672792720443896ff32f0a9dc20951e0aac4059b2de",
+    "Documentation/Implementation/evidence/m2-music-sections-probe.json": "a26e4c2e9185ca3b4831aaf443635bb285fa42af048c77f6ee3d8ed58050ecdf",
+    "Documentation/Implementation/evidence/m2-music-sections-probe.py": "c8977c553599a4145eeeff10e364ffa867f9734f192227f4aa5c33ae1fd80ea1",
+    "Documentation/Implementation/evidence/m2-music-sections-release-build-final.log": "87ea36ad288ff496ed8cdaf604d3dbd2211f8c7082b4e667fbd880a1bca3ad5d",
+    "Documentation/Implementation/evidence/m2-music-sections-release-gpu.log": "63097f7a97e8f64b53315fe72cbc91daf8ff11b5a3c0d40b0e900a961119313e",
+    "Documentation/Implementation/evidence/m2-music-sections-release-gpu.xml": "ee15b07424b577522042098e4dd8198ae391385742af06d1cc38b7e4a5a5a3b5",
+    "Documentation/Implementation/evidence/m2-music-sections-release-tests.log": "2c7cb63683cc3a9f29789511a962775e2c6940d04d1b392e315594a43fad5e35",
+    "Documentation/Implementation/evidence/m2-music-sections-release-tests.xml": "006e89783aefe16861a388ff7582d83150920287718cee72361752a53d1d0f7e",
+    "Documentation/Implementation/evidence/m2-music-sections-sanitize-build-final.log": "2dcc4e0a72a806e4cb1ee5541cbb811b95222875ca1ff0cd857d0c9b438b2193",
+    "Documentation/Implementation/evidence/m2-music-sections-sanitize-tests.log": "d703ae9ae3fb51a28e996ba3e7611bbad011320de613cbf52bfc884ebf513ff0",
+    "Documentation/Implementation/evidence/m2-music-sections-sanitize-tests.xml": "8a169d5665a546b9ff623ebba6b1beb33da7e6d5a43ddd31e5d1e5baf32ad4af",
+    "Documentation/Implementation/evidence/m2-music-sections-validation.py": "c2f57676076e6aef6fefe899f87f367640cfc5a1f23451829af8e5349e9bb673"
+  },
+  "implementation_commit": "f1292b0f94763baa7896182556d6417969399f2b"
+}

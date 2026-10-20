@@ -1,0 +1,100 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/release/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 544
+    Start 544: corpses.mappings
+
+544: Test command: <workspace>/Blood2/build/release/tests/corpse_tests "mappings" "<workspace>/Blood2/build/release/tests/corpse-fixtures/mappings"
+544: Working Directory: <workspace>/Blood2/build/release/tests
+544: Test timeout computed to be: 30
+1/8 Test #544: corpses.mappings .................   Passed    0.01 sec
+test 545
+    Start 545: corpses.transfer
+
+545: Test command: <workspace>/Blood2/build/release/tests/corpse_tests "transfer" "<workspace>/Blood2/build/release/tests/corpse-fixtures/transfer"
+545: Working Directory: <workspace>/Blood2/build/release/tests
+545: Test timeout computed to be: 30
+2/8 Test #545: corpses.transfer .................   Passed    0.00 sec
+test 546
+    Start 546: corpses.failures
+
+546: Test command: <workspace>/Blood2/build/release/tests/corpse_tests "failures" "<workspace>/Blood2/build/release/tests/corpse-fixtures/failures"
+546: Working Directory: <workspace>/Blood2/build/release/tests
+546: Test timeout computed to be: 30
+3/8 Test #546: corpses.failures .................   Passed    0.00 sec
+test 547
+    Start 547: corpses.lifetime
+
+547: Test command: <workspace>/Blood2/build/release/tests/corpse_tests "lifetime" "<workspace>/Blood2/build/release/tests/corpse-fixtures/lifetime"
+547: Working Directory: <workspace>/Blood2/build/release/tests
+547: Test timeout computed to be: 30
+4/8 Test #547: corpses.lifetime .................   Passed    0.00 sec
+test 548
+    Start 548: corpses.sounds
+
+548: Test command: <workspace>/Blood2/build/release/tests/corpse_tests "sounds" "<workspace>/Blood2/build/release/tests/corpse-fixtures/sounds"
+548: Working Directory: <workspace>/Blood2/build/release/tests
+548: Test timeout computed to be: 30
+5/8 Test #548: corpses.sounds ...................   Passed    0.00 sec
+test 549
+    Start 549: corpses.gates
+
+549: Test command: <workspace>/Blood2/build/release/tests/corpse_tests "gates" "<workspace>/Blood2/build/release/tests/corpse-fixtures/gates"
+549: Working Directory: <workspace>/Blood2/build/release/tests
+549: Test timeout computed to be: 30
+6/8 Test #549: corpses.gates ....................   Passed    0.00 sec
+test 550
+    Start 550: corpses.accumulation
+
+550: Test command: <workspace>/Blood2/build/release/tests/corpse_tests "accumulation" "<workspace>/Blood2/build/release/tests/corpse-fixtures/accumulation"
+550: Working Directory: <workspace>/Blood2/build/release/tests
+550: Test timeout computed to be: 30
+7/8 Test #550: corpses.accumulation .............   Passed    0.00 sec
+test 551
+    Start 551: corpses.catalog
+
+551: Test command: <workspace>/Blood2/build/release/tests/corpse_tests "catalog" "<external-data-root>"
+551: Working Directory: <workspace>/Blood2/build/release/tests
+551: Test timeout computed to be: 90
+551: Death clip 32 duration 900
+551: Death clip 33 duration 7000
+551: Death clip 34 duration 1700
+551: Death clip 35 duration 2100
+551: Death clip 36 duration 1900
+551: Death clip 37 duration 1900
+551: Death clip 38 duration 1500
+551: Death clip 39 duration 1600
+551: Death clip 40 duration 6000
+551: Death clip 41 duration 2000
+551: Death clip 42 duration 5500
+551: Death clip 43 duration 7000
+551: CultistAI cycle 0: source removed; corpse clip 33, sound starts 1, pool request 1
+551: CivilianAI cycle 0: source removed; corpse clip 34, sound starts 1, pool request 1
+551: CultistAI cycle 1: source removed; corpse clip 32, sound starts 1, pool request 1
+551: CivilianAI cycle 1: source removed; corpse clip 34, sound starts 1, pool request 1
+8/8 Test #551: corpses.catalog ..................   Passed    0.03 sec
+
+The following tests passed:
+	corpses.mappings
+	corpses.transfer
+	corpses.failures
+	corpses.lifetime
+	corpses.sounds
+	corpses.gates
+	corpses.accumulation
+	corpses.catalog
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+corpses     =   0.05 sec*proc (8 tests)
+headless    =   0.05 sec*proc (8 tests)
+private     =   0.03 sec*proc (1 test)
+
+Total Test time (real) =   0.07 sec

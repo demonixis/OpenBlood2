@@ -1,0 +1,15 @@
+9/602 Testing: objects.messages_strings
+9/602 Test: objects.messages_strings
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "messages_strings"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.messages_strings" start time: Oct 17 01:44 CEST
+Output:
+----------------------------------------------------------
+PASS messages_strings
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"objects.messages_strings" end time: Oct 17 01:44 CEST
+"objects.messages_strings" time elapsed: 00:00:00
+----------------------------------------------------------

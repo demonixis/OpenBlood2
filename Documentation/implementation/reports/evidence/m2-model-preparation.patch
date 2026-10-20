@@ -1,0 +1,851 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 1b2e0a7..edfb702 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -596,3 +596,5 @@ The [original pickup-audio continuation](../Documentation/Implementation/M2_PICK
+ The [collision traversal continuation](../Documentation/Implementation/M2_COLLISION_TRAVERSAL.md) addresses measured post-transition activation spikes with conservative BVH/triangle interval rejection. Read [contracts](docs/COLLISION_TRAVERSAL_CONTRACTS.md); preserve exact SAT results, equal-time ordering, placement and original AI cadence. Services exposes bounded work counters. CPU model preparation and other frame costs remain; M2 stays open.
+ 
+ The [bound-container index](../Documentation/Implementation/M2_CONTAINER_INDEX.md) reduces repeated post-transition object scans while retaining fresh checked snapshots, original volume order and deferred destruction. Read [contracts](docs/CONTAINER_INDEX_CONTRACTS.md); never mutate a bound shape outside Objects. Container inspection includes the index count. CPU model preparation and other playtest reports remain; M2 stays incomplete.
++
++The [model preparation optimization](../Documentation/Implementation/M2_MODEL_PREPARATION.md) reuses exact local geometry for immutable shared ABC assets and removes temporary heap pose scratch. Read [contracts](docs/MODEL_PREPARATION_CONTRACTS.md); preserve weak ownership, current visibility/materials, packed-deformation order and world-revision clearing. Inspection reports actual reuse and retained vertex bytes. Skinning remains on the CPU; remaining frame costs and the M2 exit gate stay open.
+diff --git a/README.md b/README.md
+index 3e137cf..ef0cd46 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,15 @@
++| Milestone | Estimated task completion |
++| --- | ---: |
++| M0 | 100% |
++| M1 | 100% |
++| M2 | ~85% |
++| M3 | ~60% |
++| M4 | ~35% |
++| M5 | ~10% |
++| M6 | ~15% |
++| M7 | 0% |
++| M8 | 0% |
++
+ # Blood II Reconstruction aka OpenBlood2
+ 
+ The [original smell-trail continuation](../Documentation/Implementation/M2_AI_SMELL.md) connects the original periodic player trail and shared AI SearchSmellTarget state, with checked hint lifetime and inspection. Original no-target/no-cursor exits and zero NPC smell ranges are preserved; no automatic trail acquisition is invented. Required remaining services and the actual M2 gate stay open.
+@@ -638,3 +650,5 @@ The [original pickup-audio continuation](../Documentation/Implementation/M2_PICK
+ The [collision traversal continuation](../Documentation/Implementation/M2_COLLISION_TRAVERSAL.md) addresses measured post-transition activation spikes with conservative BVH/triangle interval rejection. Read [contracts](docs/COLLISION_TRAVERSAL_CONTRACTS.md); preserve exact SAT results, equal-time ordering, placement and original AI cadence. Services exposes bounded work counters. CPU model preparation and other frame costs remain; M2 stays open.
+ 
+ The [bound-container index](../Documentation/Implementation/M2_CONTAINER_INDEX.md) reduces repeated post-transition object scans while retaining fresh checked snapshots, original volume order and deferred destruction. Read [contracts](docs/CONTAINER_INDEX_CONTRACTS.md); never mutate a bound shape outside Objects. Container inspection includes the index count. CPU model preparation and other playtest reports remain; M2 stays incomplete.
++
++The [model preparation optimization](../Documentation/Implementation/M2_MODEL_PREPARATION.md) reuses exact local geometry for immutable shared ABC assets and removes temporary heap pose scratch. Read [contracts](docs/MODEL_PREPARATION_CONTRACTS.md); preserve weak ownership, current visibility/materials, packed-deformation order and world-revision clearing. Inspection reports actual reuse and retained vertex bytes. Skinning remains on the CPU; remaining frame costs and the M2 exit gate stay open.
+diff --git a/docs/M2_MODEL_PREPARATION_SOURCES.json b/docs/M2_MODEL_PREPARATION_SOURCES.json
+new file mode 100644
+index 0000000..a677074
+--- /dev/null
++++ b/docs/M2_MODEL_PREPARATION_SOURCES.json
+@@ -0,0 +1,26 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "2c82c1fc2c744bced9847dc66b9c4b7b51f1bd93",
++  "status": "M2 incomplete; CPU preparation optimization, original rules unchanged",
++  "baseline_files": [
++    {
++      "path": "src/engine/model.cpp",
++      "commit": "2c82c1fc2c744bced9847dc66b9c4b7b51f1bd93",
++      "sha256": "d8bc213841f91ada6e4ce74d3877931c668ddca68493c71ac779f7f6fc02a271",
++      "purpose": "Existing implementation is the before/after equivalence control; no reference engine code imported."
++    },
++    {
++      "path": "src/engine/model_view.cpp",
++      "commit": "2c82c1fc2c744bced9847dc66b9c4b7b51f1bd93",
++      "sha256": "13573c102bac7889b4ebaf0c4ec821e7e07ad3b256f71ceaefc8083c802ee20b",
++      "purpose": "Existing implementation is the before/after equivalence control; no reference engine code imported."
++    },
++    {
++      "path": "src/app/model_scene.cpp",
++      "commit": "2c82c1fc2c744bced9847dc66b9c4b7b51f1bd93",
++      "sha256": "0cb8889fd9f7a7242057a1fb34c60d50af6a825c2dd4b5b9280c11fae1f2c184",
++      "purpose": "Existing implementation is the before/after equivalence control; no reference engine code imported."
++    }
++  ],
++  "format_provenance": "M2_MODEL_VIEW_SOURCES.json; no format interpretation changes"
++}
+diff --git a/docs/MODEL_PREPARATION_CONTRACTS.md b/docs/MODEL_PREPARATION_CONTRACTS.md
+new file mode 100644
+index 0000000..e120955
+--- /dev/null
++++ b/docs/MODEL_PREPARATION_CONTRACTS.md
+@@ -0,0 +1,65 @@
++# Prepared ABC geometry and CPU sampling
++
++This extends [model presentation](MODEL_VIEW_CONTRACTS.md) and
++[animation/collision](MODEL_AND_COLLISION_CONTRACTS.md). See
++[evidence](../../Documentation/Implementation/M2_MODEL_PREPARATION.md).
++This is replacement engine optimization, with no original gameplay changes.
++M2 remains incomplete. Skinning and packed vertex deformation still run on the CPU.
++
++## Immutable assets and exact reuse
++
++`ModelView::add(shared_ptr<const Model>, ...)` may reuse a prepared local-space
++triangle stream. The asset must remain immutable for its entire ownership lifetime.
++The borrowed `Model*` overload always samples and validates again; use it for
++mutable diagnostic fixtures. Do not mutate an asset through an earlier mutable
++alias after publishing it to production objects.
++
++The cache holds at most one variant per asset. Its key includes the shared-owner
++identity, animation index, exact sample time, XYZ scale, complete node-hide mask
++and whether the skin uses the explicit magenta fallback. Times after the last key
++compare at that last key's time, which produces exactly the same terminal pose.
++There is no time quantization, animation throttling or approximate pose sharing.
++Different scales or out-of-sync instances can replace the same asset's variant.
++
++Instance position/rotation, alpha, world/close pass, current skin material and
++object identity are applied freshly on every add. They do not change the cached
++local triangle stream. Validate transform, alpha, mask shape and existing frame
++budgets before a possible hit. Missing models, invalid poses and skins remain
++inspectable; `require_skin` still suppresses failed textures. Hidden or pending
++objects never draw from an old cache entry. All-hidden geometry may cache an
++empty stream with its actual hidden-triangle count.
++
++Cache admission is optional: limits cause uncached preparation, never skipped
++geometry or successful missing services. Limits are 256 assets and 1,000,000
++retained vertex slots (32,000,000 bytes, plus bounded metadata). Retained vector
++capacity counts against the vertex budget, including after a smaller pose/mask
++result. Animated misses reuse their storage when it fits. The original independent
++1,000,000 expanded frame-vertex budget still applies even on hits.
++
++Entries keep weak asset ownership, never owning object handles or strong model
++references. Prune expired owners at `begin_frame`; compare ownership control
++blocks on lookup to reject recycled addresses even within a frame. `clear()`
++drops every prepared entry, skin and frame. The application's existing world
++revision boundary clears model/FX views and GPU geometry at NEW_LEVEL/unload.
++A retained inspector snapshot must not prolong source asset or game-object life.
++
++## Sampler and presentation invariants
++
++The CPU sampler computes its key interval once and composes at most 256 node
++poses in fixed local scratch, avoiding temporary heap pose storage. The public
++pose sampler uses the same composition helper and reuses its output capacity.
++Parent order, node IDs and packed deformation bounds fail safely. Repeated packed
++vertex indices retain file write order; quaternion interpolation, basis conversion,
++rigid transform and final deformation arithmetic/order stay unchanged.
++
++Preparation never advances a track, emits a model key, moves an object, resolves
++an attachment, performs physics or invokes an original callback. Node queries,
++hit spheres, attachments and FIRE_KEY delivery retain their existing clocks and
++services. No culling, AI cadence change, GPU skinning or shader revision is added.
++Current expanded vertices still copy into each frame and upload through the
++existing SDL_GPU path. Both bundled Vulkan and Metal shaders are unchanged.
++
++The Model snapshot inspector reports per-frame sampled/reused/uncached instances,
++reused vertices, live cache entries and retained vertex bytes. Entry rows identify
++actual reuse. Counts are not timings, FPS, or a claim that all transition stutter
++is fixed. Hidden/missing entries remain visible, with no sampling side effects.
+diff --git a/docs/MODEL_VIEW_CONTRACTS.md b/docs/MODEL_VIEW_CONTRACTS.md
+index 50e8dce..7662bca 100644
+--- a/docs/MODEL_VIEW_CONTRACTS.md
++++ b/docs/MODEL_VIEW_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Animated model presentation
+ 
++> [Prepared model geometry](MODEL_PREPARATION_CONTRACTS.md) extends the per-frame
++> rebuilding policy below with bounded exact reuse for immutable shared assets.
++> CPU skinning, current visibility and world-revision teardown remain explicit.
++
+ Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supplies
+ selected model components with independent lifetime and alpha rendering. The earlier
+ model omission is superseded only for that subset; complete composite FX remain unavailable.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 630f259..dc90580 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -602,6 +602,11 @@ namespace OpenBlood2
+                         ImGui::Text("Model snapshot: %zu world / %zu close draws / %zu vertices / %zu skin bytes",
+                                     model_view->world_draws.size(), model_view->close_draws.size(),
+                                     model_view->mesh.vertices.size(), model_view->mesh.texture_bytes);
++                        ImGui::Text("CPU preparation: %zu sampled / %zu reused / %zu uncached; %zu reused vertices",
++                                    model_view->preparation.sampled, model_view->preparation.reused,
++                                    model_view->preparation.uncached, model_view->preparation.reused_vertices);
++                        ImGui::Text("Prepared cache: %zu assets / %zu vertex bytes (weak asset ownership)",
++                                    model_view->preparation.cached_assets, model_view->preparation.cached_bytes);
+                         ImGui::TextWrapped(
+                             "Current ABC poses; first-person body/held children follow local camera visibility. "
+                             "View weapons use original offsets with zero bob; no lighting, chrome or muzzle FX.");
+@@ -609,10 +614,11 @@ namespace OpenBlood2
+                         {
+                             for (const auto& entry : model_view->entries)
+                                 ImGui::TextWrapped(
+-                                    "%s: %s, %zu triangles / %zu hidden triangles / %zu hidden nodes, skin %s%s%s",
++                                    "%s: %s, %zu triangles / %zu hidden triangles / %zu hidden nodes, skin %s%s%s%s",
+                                     entry.label.c_str(), entry.visible ? "visible" : "hidden", entry.triangles,
+                                     entry.hidden_triangles, entry.hidden_nodes, entry.skin.c_str(),
+-                                    entry.error.empty() ? "" : " / ", entry.error.c_str());
++                                    entry.error.empty() ? "" : " / ", entry.error.c_str(),
++                                    entry.reused_geometry ? " / reused geometry" : "");
+                             ImGui::TreePop();
+                         }
+                     }
+diff --git a/src/app/model_scene.cpp b/src/app/model_scene.cpp
+index 0884256..4e37acc 100644
+--- a/src/app/model_scene.cpp
++++ b/src/app/model_scene.cpp
+@@ -8,15 +8,15 @@ namespace OpenBlood2
+         for (const auto& fx : game.server.explosion_models.active)
+         {
+             const bool visible = fx.scale.x > 0 && fx.scale.y > 0 && fx.scale.z > 0;
+-            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.settings.position, fx.rotation}, fx.scale,
+-                           visible, false, {}, fx.model_path, game.resources, error, {}, fx.alpha, true))
++            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.settings.position, fx.rotation}, fx.scale, visible,
++                           false, {}, fx.model_path, game.resources, error, {}, fx.alpha, true))
+                 return false;
+             scene.entries.back().client_effect = fx.id;
+         }
+         for (const auto& fx : game.server.explosion_fragments.active)
+         {
+             const auto scale = fx.settings.scale;
+-            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.position, fx.rotation}, scale,
++            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation}, scale,
+                            scale.x > 0 && scale.y > 0 && scale.z > 0, false, {}, fx.model_path, game.resources, error,
+                            {}, fx.alpha, true))
+                 return false;
+@@ -24,14 +24,14 @@ namespace OpenBlood2
+         }
+         for (const auto& fx : game.server.flesh_gibs.active)
+         {
+-            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, true,
+-                           false, {}, fx.model_path, game.resources, error))
++            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, true, false, {},
++                           fx.model_path, game.resources, error))
+                 return false;
+         }
+         for (const auto& fx : game.server.laser_beams.active)
+         {
+-            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale,
+-                           fx.updates != 0, false, {}, "Original red beam", game.resources, error, {}, fx.alpha, true))
++            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, fx.updates != 0,
++                           false, {}, "Original red beam", game.resources, error, {}, fx.alpha, true))
+                 return false;
+             scene.entries.back().laser_effect = fx.id;
+         }
+@@ -75,7 +75,7 @@ namespace OpenBlood2
+                         visible = false;
+                 }
+             }
+-            if (!scene.add(record->model.get(), record->animation, record->state.m_SkinName,
++            if (!scene.add(record->model, record->animation, record->state.m_SkinName,
+                            {record->state.m_Pos, record->state.m_Rotation}, record->state.m_Scale, visible, false, id,
+                            record->state.m_Filename, game.resources, error, record->hidden_nodes, record->alpha))
+                 return false;
+@@ -101,7 +101,7 @@ namespace OpenBlood2
+                 error = "Original view-weapon placement failed";
+                 return false;
+             }
+-            if (!scene.add(weapon.model.get(), weapon.animation, definition->m_szViewModelSkin, pose, {1, 1, 1},
++            if (!scene.add(weapon.model, weapon.animation, definition->m_szViewModelSkin, pose, {1, 1, 1},
+                            owner && !owner->m_damage.IsDead() && client.weapons_visible, true, {},
+                            weapon.left ? "left view weapon" : "right view weapon", game.resources, error))
+                 return false;
+diff --git a/src/engine/model.cpp b/src/engine/model.cpp
+index 4d43543..3d06676 100644
+--- a/src/engine/model.cpp
++++ b/src/engine/model.cpp
+@@ -398,6 +398,24 @@ namespace OpenBlood2
+                                   x.rotation.m_Spin * (1 - t) + y.rotation.m_Spin * t})};
+             return p;
+         }
++        bool fill_pose(const Model& model, const ModelAnimation& a, std::size_t lo, std::size_t hi, float t,
++                       std::span<NodePose> out)
++        {
++            for (std::size_t i = 0; i < model.nodes.size(); ++i)
++            {
++                const auto parent = model.nodes[i].parent;
++                if (a.nodes[i].frames.size() <= hi || (parent >= 0 && static_cast<std::size_t>(parent) >= i))
++                    return false;
++                NodePose p = local_pose(a, i, lo, hi, t);
++                if (parent >= 0)
++                {
++                    p.position = add(out[parent].position, rotate_vector(out[parent].rotation, p.position));
++                    p.rotation = compose(out[parent].rotation, p.rotation);
++                }
++                out[i] = p;
++            }
++            return true;
++        }
+     } // namespace
+     DRotation compose_rotation(DRotation parent, DRotation child)
+     {
+@@ -447,48 +465,43 @@ namespace OpenBlood2
+         float t;
+         if (!pose_interval(model, animation, milliseconds, lo, hi, t))
+             return false;
+-        const auto& a = model.animations[animation];
+-        for (std::size_t i = 0; i < model.nodes.size(); ++i)
++        out.resize(model.nodes.size());
++        if (!fill_pose(model, model.animations[animation], lo, hi, t, out))
+         {
+-            if (a.nodes[i].frames.size() <= hi)
+-            {
+-                out.clear();
+-                return false;
+-            }
+-            NodePose p = local_pose(a, i, lo, hi, t);
+-            auto parent = model.nodes[i].parent;
+-            if (parent >= 0)
+-            {
+-                p.position = add(out[parent].position, rotate_vector(out[parent].rotation, p.position));
+-                p.rotation = compose(out[parent].rotation, p.rotation);
+-            }
+-            out.push_back(p);
++            out.clear();
++            return false;
+         }
+         return true;
+     }
+     bool sample_vertices(const Model& model, std::uint32_t animation, double milliseconds, std::vector<DVector>& out)
+     {
+         out.clear();
+-        std::vector<NodePose> pose;
+-        if (!sample_pose(model, animation, milliseconds, pose))
++        std::size_t lo, hi;
++        float t;
++        if (model.nodes.size() > 256 || !pose_interval(model, animation, milliseconds, lo, hi, t))
+             return false;
+         const auto& a = model.animations[animation];
+-        auto upper = std::upper_bound(a.keys.begin(), a.keys.end(), milliseconds,
+-                                      [](double time, const ModelKey& k) { return time < k.time; });
+-        std::size_t hi = static_cast<std::size_t>(upper - a.keys.begin());
+-        if (hi == a.keys.size())
+-            --hi;
+-        std::size_t lo = hi ? hi - 1 : 0;
+-        float t = a.keys[hi].time > a.keys[lo].time
+-                      ? static_cast<float>(std::clamp(
+-                            (milliseconds - a.keys[lo].time) / (a.keys[hi].time - a.keys[lo].time), 0.0, 1.0))
+-                      : 0;
+-        std::array<std::size_t, 256> nodes{};
++        // The bounded reader permits at most 256 nodes. No per-sample heap scratch or second key search.
++        std::array<NodePose, 256> pose;
++        if (!fill_pose(model, a, lo, hi, t, pose))
++            return false;
++        std::array<int, 256> nodes;
++        nodes.fill(-1);
+         for (std::size_t i = 0; i < model.nodes.size(); ++i)
+-            nodes[model.nodes[i].index] = i;
++        {
++            const auto index = model.nodes[i].index;
++            if (index >= nodes.size() || nodes[index] != -1)
++                return false;
++            nodes[index] = static_cast<int>(i);
++        }
+         out.reserve(model.vertices.size());
+         for (const auto& vertex : model.vertices)
+         {
++            if (nodes[vertex.node] < 0)
++            {
++                out.clear();
++                return false;
++            }
+             const auto& bone = pose[nodes[vertex.node]];
+             out.push_back(add(bone.position, rotate_vector(bone.rotation, vertex.position)));
+         }
+@@ -496,10 +509,20 @@ namespace OpenBlood2
+         {
+             const auto& list = model.nodes[i].deformed_vertices;
+             const auto& data = a.nodes[i];
++            if (!list.empty() && data.deformation.size() / 3 / list.size() <= hi)
++            {
++                out.clear();
++                return false;
++            }
+             // Repeated indices are present in retail data. Preserve the file's
+             // write order instead of merging/deduplicating its animation samples.
+             for (std::size_t v = 0; v < list.size(); ++v)
+             {
++                if (list[v] >= out.size())
++                {
++                    out.clear();
++                    return false;
++                }
+                 auto at = (lo * list.size() + v) * 3, next = (hi * list.size() + v) * 3;
+                 auto component = [&](unsigned axis)
+                 { return data.deformation[at + axis] * (1 - t) + data.deformation[next + axis] * t; };
+diff --git a/src/engine/model_view.cpp b/src/engine/model_view.cpp
+index b5504a4..e9bcc9a 100644
+--- a/src/engine/model_view.cpp
++++ b/src/engine/model_view.cpp
+@@ -1,5 +1,6 @@
+ #include "engine/model_view.h"
+ #include "engine/collision.h"
++#include <algorithm>
+ #include <cmath>
+ namespace OpenBlood2
+ {
+@@ -9,12 +10,27 @@ namespace OpenBlood2
+         mesh.materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}});
+         mesh.texture_bytes = 4;
+         materials_.clear();
++        prepared_.clear();
++        cached_vertices_ = 0;
+         sampled_.clear();
+         begin_frame();
+         ++revision;
+     }
+     void ModelView::begin_frame()
+     {
++        for (auto it = prepared_.begin(); it != prepared_.end();)
++        {
++            if (it->second.owner.expired())
++            {
++                cached_vertices_ -= it->second.vertices.capacity();
++                it = prepared_.erase(it);
++            }
++            else
++                ++it;
++        }
++        preparation = {};
++        preparation.cached_assets = prepared_.size();
++        preparation.cached_bytes = cached_vertices_ * sizeof(WorldVertex);
+         mesh.blended = 0;
+         mesh.vertices.clear();
+         mesh.ranges.clear();
+@@ -26,6 +42,22 @@ namespace OpenBlood2
+                         DVector scale, bool visible, bool close, ObjectId object, std::string_view label,
+                         const Resources& resources, std::string& error, std::span<const std::uint8_t> hidden_nodes,
+                         float alpha, bool require_skin)
++    {
++        return add_impl(model, nullptr, track, skin, pose, scale, visible, close, object, label, resources, error,
++                        hidden_nodes, alpha, require_skin);
++    }
++    bool ModelView::add(const std::shared_ptr<const Model>& model, const AnimationTrack& track, std::string_view skin,
++                        NodePose pose, DVector scale, bool visible, bool close, ObjectId object, std::string_view label,
++                        const Resources& resources, std::string& error, std::span<const std::uint8_t> hidden_nodes,
++                        float alpha, bool require_skin)
++    {
++        return add_impl(model.get(), &model, track, skin, pose, scale, visible, close, object, label, resources, error,
++                        hidden_nodes, alpha, require_skin);
++    }
++    bool ModelView::add_impl(const Model* model, const std::shared_ptr<const Model>* owner, const AnimationTrack& track,
++                             std::string_view skin, NodePose pose, DVector scale, bool visible, bool close,
++                             ObjectId object, std::string_view label, const Resources& resources, std::string& error,
++                             std::span<const std::uint8_t> hidden_nodes, float alpha, bool require_skin)
+     {
+         error.clear();
+         auto fail = [&](const char* reason)
+@@ -95,57 +127,119 @@ namespace OpenBlood2
+         {
+             return fail("Invalid model presentation transform");
+         }
+-        std::array<int, 256> node_slots;
+-        node_slots.fill(-1);
+-        if (model->nodes.size() > 256)
+-            return fail("Invalid model node count");
+-        for (std::size_t i = 0; i < model->nodes.size(); ++i)
++        WorldRange range;
++        range.first = static_cast<std::uint32_t>(mesh.vertices.size());
++        range.name = entry.label;
++        // Clamping only past the final key preserves exactly the sampler's terminal pose.
++        double time = track.time;
++        if (std::isfinite(time) && time >= 0 && track.animation < model->animations.size() &&
++            !model->animations[track.animation].keys.empty())
++            time = std::min(time, double(model->animations[track.animation].keys.back().time));
++        auto found = prepared_.find(model);
++        if (found != prepared_.end() && owner &&
++            (found->second.owner.owner_before(*owner) || owner->owner_before(found->second.owner)))
+         {
+-            const auto index = model->nodes[i].index;
+-            if (index >= node_slots.size() || node_slots[index] != -1)
+-                return fail("Invalid model node index");
+-            node_slots[index] = static_cast<int>(i);
++            cached_vertices_ -= found->second.vertices.capacity();
++            prepared_.erase(found);
++            found = prepared_.end();
++            preparation.cached_assets = prepared_.size();
++            preparation.cached_bytes = cached_vertices_ * sizeof(WorldVertex);
+         }
+-        if (!sample_vertices(*model, track.animation, track.time, sampled_))
++        const auto* cached = found == prepared_.end() ? nullptr : &found->second;
++        const bool reuse = owner && cached && cached->animation == track.animation && cached->time == time &&
++                           cached->scale.x == scale.x && cached->scale.y == scale.y && cached->scale.z == scale.z &&
++                           cached->fallback == (material == 0) &&
++                           std::equal(hidden_nodes.begin(), hidden_nodes.end(), cached->hidden_nodes.begin(),
++                                      cached->hidden_nodes.end());
++        if (reuse)
+         {
+-            entry.error = "Model animation pose is unavailable";
+-            return true;
++            mesh.vertices.insert(mesh.vertices.end(), cached->vertices.begin(), cached->vertices.end());
++            entry.hidden_triangles = cached->hidden_triangles;
++            entry.reused_geometry = true;
++            ++preparation.reused;
++            preparation.reused_vertices += cached->vertices.size();
+         }
+-        WorldRange range;
+-        range.first = static_cast<std::uint32_t>(mesh.vertices.size());
+-        range.name = entry.label;
+-        const DVector color = material ? DVector{1, 1, 1} : DVector{1, 0, 1};
+-        for (const auto& face : model->faces)
++        else
+         {
+-            bool hidden = false;
+-            for (auto vertex : face.vertices)
++            ++preparation.sampled;
++            std::array<int, 256> node_slots;
++            node_slots.fill(-1);
++            if (model->nodes.size() > 256)
++                return fail("Invalid model node count");
++            for (std::size_t i = 0; i < model->nodes.size(); ++i)
+             {
+-                if (vertex >= model->vertices.size() || node_slots[model->vertices[vertex].node] < 0)
+-                    return fail("Invalid model face node index");
+-                hidden |= !hidden_nodes.empty() && hidden_nodes[node_slots[model->vertices[vertex].node]] != 0;
++                const auto index = model->nodes[i].index;
++                if (index >= node_slots.size() || node_slots[index] != -1)
++                    return fail("Invalid model node index");
++                node_slots[index] = static_cast<int>(i);
+             }
+-            if (hidden)
++            for (const auto& vertex : model->vertices)
++                if (node_slots[vertex.node] < 0)
++                    return fail("Invalid model vertex node index");
++            if (!sample_vertices(*model, track.animation, track.time, sampled_))
+             {
+-                ++entry.hidden_triangles;
+-                continue;
++                entry.error = "Model animation pose is unavailable";
++                return true;
+             }
+-            for (unsigned corner = 0; corner < 3; ++corner)
++            const DVector color = material ? DVector{1, 1, 1} : DVector{1, 0, 1};
++            for (const auto& face : model->faces)
+             {
+-                if (face.vertices[corner] >= sampled_.size())
++                bool hidden = false;
++                for (auto vertex : face.vertices)
++                {
++                    if (vertex >= model->vertices.size() || node_slots[model->vertices[vertex].node] < 0)
++                        return fail("Invalid model face node index");
++                    hidden |= !hidden_nodes.empty() && hidden_nodes[node_slots[model->vertices[vertex].node]] != 0;
++                }
++                if (hidden)
+                 {
+-                    return fail("Invalid model face index");
++                    ++entry.hidden_triangles;
++                    continue;
+                 }
+-                const auto p = sampled_[face.vertices[corner]];
+-                const DVector scaled{p.x * scale.x, p.y * scale.y, p.z * scale.z};
+-                const auto uv = face.uv[corner];
+-                if (!physics_vector(scaled) || !std::isfinite(uv[0]) || !std::isfinite(uv[1]) ||
+-                    std::abs(uv[0]) > 1e6f || std::abs(uv[1]) > 1e6f)
++                for (unsigned corner = 0; corner < 3; ++corner)
+                 {
+-                    return fail("Invalid model vertex/UV");
++                    if (face.vertices[corner] >= sampled_.size())
++                    {
++                        return fail("Invalid model face index");
++                    }
++                    const auto p = sampled_[face.vertices[corner]];
++                    const DVector scaled{p.x * scale.x, p.y * scale.y, p.z * scale.z};
++                    const auto uv = face.uv[corner];
++                    if (!physics_vector(scaled) || !std::isfinite(uv[0]) || !std::isfinite(uv[1]) ||
++                        std::abs(uv[0]) > 1e6f || std::abs(uv[1]) > 1e6f)
++                    {
++                        return fail("Invalid model vertex/UV");
++                    }
++                    mesh.vertices.push_back({scaled, color, uv});
+                 }
+-                mesh.vertices.push_back({scaled, color, uv});
+             }
++
++            // Cache admission is optional: exceeding its budget never drops a valid instance.
++            const auto count = mesh.vertices.size() - range.first;
++            const auto previous = cached ? cached->vertices.capacity() : 0;
++            if (owner && (cached || prepared_.size() < cache_asset_limit) &&
++                std::max(count, previous) <= cache_vertex_limit - (cached_vertices_ - previous))
++            {
++                auto& next = prepared_[model];
++                next.owner = *owner;
++                next.animation = track.animation;
++                next.time = time;
++                next.scale = scale;
++                next.fallback = material == 0;
++                next.hidden_nodes.assign(hidden_nodes.begin(), hidden_nodes.end());
++                next.hidden_triangles = entry.hidden_triangles;
++                // Reuse storage for changing poses; avoid geometric capacity growth beyond the cache budget.
++                if (count > next.vertices.capacity())
++                    next.vertices = std::vector<WorldVertex>(mesh.vertices.begin() + range.first, mesh.vertices.end());
++                else
++                    next.vertices.assign(mesh.vertices.begin() + range.first, mesh.vertices.end());
++                cached_vertices_ = cached_vertices_ - previous + next.vertices.capacity();
++            }
++            else
++                ++preparation.uncached;
+         }
++        preparation.cached_assets = prepared_.size();
++        preparation.cached_bytes = cached_vertices_ * sizeof(WorldVertex);
+         range.count = static_cast<std::uint32_t>(mesh.vertices.size()) - range.first;
+         range.batches.push_back({range.first, range.count, material});
+         entry.triangles = range.count / 3;
+diff --git a/src/engine/model_view.h b/src/engine/model_view.h
+index 8d035b5..fcc40dd 100644
+--- a/src/engine/model_view.h
++++ b/src/engine/model_view.h
+@@ -6,7 +6,7 @@ namespace OpenBlood2
+     {
+         ObjectId object;
+         std::string label, skin, error;
+-        bool visible = false, close = false;
++        bool visible = false, close = false, reused_geometry = false;
+         std::size_t triangles = 0;
+         std::size_t hidden_nodes = 0, hidden_triangles = 0;
+         std::uint32_t range = UINT32_MAX;
+@@ -28,12 +28,40 @@ namespace OpenBlood2
+         bool add(const Model*, const AnimationTrack&, std::string_view skin, NodePose, DVector scale, bool visible,
+                  bool close, ObjectId, std::string_view label, const Resources&, std::string&,
+                  std::span<const std::uint8_t> hidden_nodes = {}, float alpha = 1, bool require_skin = false);
++        // Only immutable, shared assets may reuse prepared geometry. Borrowed models are always sampled.
++        bool add(const std::shared_ptr<const Model>&, const AnimationTrack&, std::string_view skin, NodePose,
++                 DVector scale, bool visible, bool close, ObjectId, std::string_view label, const Resources&,
++                 std::string&, std::span<const std::uint8_t> hidden_nodes = {}, float alpha = 1,
++                 bool require_skin = false);
++        struct PreparationStats
++        {
++            std::size_t sampled = 0, reused = 0, uncached = 0, reused_vertices = 0;
++            std::size_t cached_assets = 0, cached_bytes = 0;
++        } preparation;
++        static constexpr std::size_t cache_vertex_limit = 1000000, cache_asset_limit = 256;
+         WorldMesh mesh;
+         std::vector<WorldDraw> world_draws, close_draws;
+         std::vector<ModelViewEntry> entries;
+         std::uint64_t revision = 0;
+ 
+       private:
++        struct Prepared
++        {
++            std::weak_ptr<const Model> owner;
++            std::uint32_t animation = 0;
++            double time = 0;
++            DVector scale{};
++            bool fallback = false;
++            std::vector<std::uint8_t> hidden_nodes;
++            std::size_t hidden_triangles = 0;
++            std::vector<WorldVertex> vertices;
++        };
++        bool add_impl(const Model*, const std::shared_ptr<const Model>*, const AnimationTrack&, std::string_view skin,
++                      NodePose, DVector scale, bool visible, bool close, ObjectId, std::string_view label,
++                      const Resources&, std::string&, std::span<const std::uint8_t> hidden_nodes, float alpha,
++                      bool require_skin);
++        std::map<const Model*, Prepared> prepared_;
++        std::size_t cached_vertices_ = 0;
+         std::map<std::string, std::uint32_t> materials_;
+         std::vector<DVector> sampled_;
+     };
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 87aea0a..63b4c27 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -673,7 +673,7 @@ target_link_libraries(model_view_tests PRIVATE blood2_game)
+ blood2_project_options(model_view_tests)
+ add_test(NAME model_view.builtin_resources COMMAND model_view_tests builtin_resources "${CMAKE_CURRENT_BINARY_DIR}/builtin-model-fixture")
+ set_tests_properties(model_view.builtin_resources PROPERTIES LABELS "headless;model_view" TIMEOUT 30)
+-foreach(case IN ITEMS sample rejects weapon_pose legacy_pose)
++foreach(case IN ITEMS sample rejects weapon_pose legacy_pose prepared_cache cache_budget)
+     add_test(NAME model_view.${case} COMMAND model_view_tests "${case}")
+     set_tests_properties(model_view.${case} PROPERTIES LABELS "headless;model_view" TIMEOUT 30)
+ endforeach()
+diff --git a/tests/model_gpu_tests.cpp b/tests/model_gpu_tests.cpp
+index 3f3cf85..f5e9f78 100644
+--- a/tests/model_gpu_tests.cpp
++++ b/tests/model_gpu_tests.cpp
+@@ -110,15 +110,18 @@ int main(int argc, char** argv)
+             }
+         }
+         model.animations.push_back(animation);
++        const std::shared_ptr<const Model> asset = std::make_shared<Model>(model);
+         Resources resources;
+         ModelView scene;
+         models.clear_geometry();
+-        for (unsigned frame = 0; frame < 4; ++frame)
++        for (unsigned iteration = 0; iteration < 8; ++iteration)
+         {
++            const auto frame = iteration / 2;
+             const std::array<std::uint8_t, 2> hidden{std::uint8_t(frame == 1 || frame == 2), std::uint8_t(frame == 2)};
+             scene.begin_frame();
+-            CHECK(scene.add(&model, {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "node pixel probe", resources,
++            CHECK(scene.add(asset, {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "node pixel probe", resources,
+                             error, hidden));
++            CHECK(scene.entries[0].reused_geometry == (iteration % 2 != 0));
+             CHECK(scene.entries[0].hidden_triangles == (frame == 1 ? 2 : frame == 2 ? 4 : 0));
+             Capture capture;
+             CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240));
+diff --git a/tests/model_view_tests.cpp b/tests/model_view_tests.cpp
+index 47c6402..477bae9 100644
+--- a/tests/model_view_tests.cpp
++++ b/tests/model_view_tests.cpp
+@@ -115,6 +115,140 @@ namespace
+         }
+         return true;
+     }
++    bool same_geometry(const ModelView& a, const ModelView& b)
++    {
++        CHECK(a.mesh.vertices.size() == b.mesh.vertices.size());
++        CHECK(a.world_draws.size() == b.world_draws.size() && a.close_draws.size() == b.close_draws.size());
++        CHECK(a.entries.size() == b.entries.size());
++        for (std::size_t i = 0; i < a.mesh.vertices.size(); ++i)
++        {
++            const auto& x = a.mesh.vertices[i];
++            const auto& y = b.mesh.vertices[i];
++            CHECK(x.position.x == y.position.x && x.position.y == y.position.y && x.position.z == y.position.z);
++            CHECK(x.color.x == y.color.x && x.color.y == y.color.y && x.color.z == y.color.z && x.uv == y.uv);
++        }
++        for (std::size_t i = 0; i < a.entries.size(); ++i)
++        {
++            CHECK(a.entries[i].error == b.entries[i].error && a.entries[i].range == b.entries[i].range);
++            CHECK(a.entries[i].triangles == b.entries[i].triangles &&
++                  a.entries[i].hidden_triangles == b.entries[i].hidden_triangles);
++        }
++        return true;
++    }
++    bool prepared_cache()
++    {
++        Model m;
++        std::string e;
++        CHECK(read_model(test_model::abc(false, false, 2, 2, -1).b, m, e));
++        std::shared_ptr<const Model> model = std::make_shared<Model>(m);
++        Resources resources;
++        ModelView cached, reference;
++        AnimationTrack track;
++        for (const double time : {0., 50., 100., 1000.})
++            for (const DVector scale : {DVector{1, 1, 1}, DVector{2, 3, 4}})
++                for (const auto& mask : {std::vector<std::uint8_t>{}, std::vector<std::uint8_t>{0, 1}})
++                    for (int repeat = 0; repeat < 2; ++repeat)
++                    {
++                        cached.begin_frame();
++                        reference.begin_frame();
++                        track.time = time;
++                        const NodePose pose{{float(repeat * 100), 20, 30}, rotation_from_euler({0, float(repeat), 0})};
++                        const float alpha = repeat ? .25f : 1;
++                        CHECK(cached.add(model, track, "missing.dtx", pose, scale, true, repeat, {}, "cached",
++                                         resources, e, mask, alpha));
++                        CHECK(reference.add(model.get(), track, "missing.dtx", pose, scale, true, repeat, {},
++                                            "reference", resources, e, mask, alpha));
++                        CHECK(same_geometry(cached, reference));
++                        CHECK(cached.preparation.reused == std::size_t(repeat));
++                        CHECK(track.time == time && track.first && track.revision == 0);
++                        if (!cached.close_draws.empty())
++                            CHECK(cached.close_draws[0].alpha == alpha &&
++                                  cached.close_draws[0].position.x == pose.position.x);
++                    }
++        for (const auto animation : {1u, 0u})
++        {
++            cached.begin_frame();
++            reference.begin_frame();
++            track.animation = animation;
++            track.time = 0;
++            CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "clip", resources, e));
++            CHECK(
++                reference.add(model.get(), track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "clip", resources, e));
++            CHECK(!cached.entries[0].reused_geometry && same_geometry(cached, reference));
++        }
++        // A cache hit cannot bypass invalid current transforms/alpha or failed pose selection.
++        cached.begin_frame();
++        CHECK(!cached.add(model, track, "missing.dtx", {}, {0, 1, 1}, true, false, {}, "bad", resources, e));
++        CHECK(cached.entries.empty() && cached.mesh.vertices.empty());
++        track.animation = UINT32_MAX;
++        CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "bad", resources, e));
++        CHECK(cached.entries.back().error == "Model animation pose is unavailable" && cached.mesh.vertices.empty());
++        track.animation = 0;
++        track.time = std::numeric_limits<double>::quiet_NaN();
++        CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "bad", resources, e));
++        CHECK(cached.mesh.vertices.empty());
++        track.time = 50;
++        CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, false, false, {}, "hidden", resources, e));
++        CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "skin required", resources, e, {},
++                         1, true));
++        CHECK(cached.mesh.vertices.empty());
++        // Releasing the last asset owner must work even while the inspector retains prepared geometry.
++        std::weak_ptr<const Model> weak = model;
++        model.reset();
++        CHECK(weak.expired());
++        cached.begin_frame();
++        CHECK(cached.preparation.cached_assets == 0 && cached.preparation.cached_bytes == 0);
++        // Simulate address reuse with a different control block, without a begin_frame prune.
++        auto no_delete = [](const Model*) {};
++        model = std::shared_ptr<const Model>(&m, no_delete);
++        CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "first", resources, e));
++        model.reset();
++        m.faces[0].uv[0][0] += .125f;
++        model = std::shared_ptr<const Model>(&m, no_delete);
++        CHECK(cached.add(model, track, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "replacement", resources, e));
++        CHECK(!cached.entries.back().reused_geometry && cached.mesh.vertices.back().uv == m.faces[0].uv[2]);
++        CHECK(cached.mesh.vertices[3].uv == m.faces[0].uv[0]);
++        cached.clear();
++        CHECK(cached.preparation.cached_assets == 0 && cached.preparation.cached_bytes == 0);
++        return true;
++    }
++    bool cache_budget()
++    {
++        Model m;
++        std::string e;
++        CHECK(read_model(test_model::abc().b, m, e));
++        Resources resources;
++        ModelView scene;
++        std::vector<std::shared_ptr<const Model>> models;
++        for (std::size_t i = 0; i <= ModelView::cache_asset_limit; ++i)
++        {
++            models.push_back(std::make_shared<Model>(m));
++            scene.begin_frame();
++            CHECK(scene.add(models.back(), {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "small", resources, e));
++            CHECK(scene.mesh.vertices.size() == 3);
++        }
++        CHECK(scene.preparation.cached_assets == ModelView::cache_asset_limit && scene.preparation.uncached == 1);
++        models.clear();
++        scene.begin_frame();
++        CHECK(scene.preparation.cached_assets == 0);
++        m.faces.resize(200000, m.faces.front());
++        for (int i = 0; i < 2; ++i)
++        {
++            models.push_back(std::make_shared<Model>(m));
++            scene.begin_frame();
++            CHECK(scene.add(models.back(), {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "large", resources, e));
++            CHECK(scene.mesh.vertices.size() == 600000);
++        }
++        CHECK(scene.preparation.cached_assets == 1 && scene.preparation.uncached == 1);
++        CHECK(scene.preparation.cached_bytes <= ModelView::cache_vertex_limit * sizeof(WorldVertex));
++        CHECK(!scene.add(models.back(), {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "frame overflow", resources,
++                         e));
++        CHECK(scene.mesh.vertices.empty());
++        CHECK(scene.add(models.front(), {}, "missing.dtx", {}, {1, 1, 1}, true, false, {}, "all hidden", resources, e,
++                        std::array<std::uint8_t, 2>{1, 1}));
++        CHECK(scene.mesh.vertices.empty() && scene.preparation.cached_bytes == 600000 * sizeof(WorldVertex));
++        return true;
++    }
+     bool weapon_pose()
+     {
+         CViewWeapon weapon;
+@@ -201,6 +335,21 @@ namespace
+             CHECK(ids.size() == 47 && models.size() == 2);
+             CHECK(g.server.advance_models(.025)); // No NPC tick, exercise engine clocks without UI.
+             CHECK(update_model_scene(g, scene, error));
++            CHECK(scene.preparation.reused > 0);
++            // A changed skin's failure color is geometry state; its material index is draw state.
++            const auto* probe = g.objects.get(ids.front());
++            ModelView skins, uncached;
++            for (const auto* skin : {probe->state.m_SkinName, probe->state.m_SkinName, "missing.dtx", "missing.dtx",
++                                     probe->state.m_SkinName})
++            {
++                skins.begin_frame();
++                uncached.begin_frame();
++                CHECK(skins.add(probe->model, probe->animation, skin, {}, {1, 1, 1}, true, false, {}, "skin",
++                                g.resources, error));
++                CHECK(uncached.add(probe->model.get(), probe->animation, skin, {}, {1, 1, 1}, true, false, {}, "skin",
++                                   g.resources, error));
++                CHECK(same_geometry(skins, uncached));
++            }
+             std::size_t triangles = 0;
+             for (auto id : ids)
+             {
+@@ -336,6 +485,8 @@ int main(int argc, char** argv)
+     return (c == "legacy_pose"                      ? legacy_pose()
+             : c == "builtin_resources" && argc == 3 ? builtin_resources(argv[2])
+             : c == "builtin_city" && argc == 3      ? builtin_city(argv[2])
++            : c == "prepared_cache"                 ? prepared_cache()
++            : c == "cache_budget"                   ? cache_budget()
+             : c == "sample"                         ? sample()
+             : c == "rejects"                        ? rejects()
+             : c == "weapon_pose"                    ? weapon_pose()

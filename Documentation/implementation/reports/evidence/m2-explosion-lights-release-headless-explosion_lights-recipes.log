@@ -1,0 +1,14 @@
+558/561 Testing: explosion_lights.recipes
+558/561 Test: explosion_lights.recipes
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_light_tests" "recipes"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"explosion_lights.recipes" start time: Oct 16 20:55 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_lights.recipes" end time: Oct 16 20:55 CEST
+"explosion_lights.recipes" time elapsed: 00:00:00
+----------------------------------------------------------

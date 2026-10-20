@@ -1,0 +1,1139 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete; music playback remains unavailable",
+  "implementation_parent": "3d15e6ea4b892108ce3da6c8ce90dde157a36c2d",
+  "source_ledger": "Blood2/docs/implementation/sources/m2_music_asset_sources.json",
+  "validation": {
+    "headless-debug": {
+      "passed": 59,
+      "failed": 0,
+      "seconds": 47.56,
+      "cases": [
+        {
+          "name": "objects.builtin_model",
+          "seconds": 0.00360922,
+          "status": "run"
+        },
+        {
+          "name": "objects.original_objects",
+          "seconds": 0.00372263,
+          "status": "run"
+        },
+        {
+          "name": "objects.nested_creation",
+          "seconds": 0.00350591,
+          "status": "run"
+        },
+        {
+          "name": "objects.reasons_properties",
+          "seconds": 0.00369018,
+          "status": "run"
+        },
+        {
+          "name": "objects.scheduling",
+          "seconds": 0.00340928,
+          "status": "run"
+        },
+        {
+          "name": "objects.deferred_removal",
+          "seconds": 0.00362753,
+          "status": "run"
+        },
+        {
+          "name": "objects.aggregate_dispatch",
+          "seconds": 0.00335542,
+          "status": "run"
+        },
+        {
+          "name": "objects.handles_selection",
+          "seconds": 0.00349008,
+          "status": "run"
+        },
+        {
+          "name": "objects.links_lists",
+          "seconds": 0.00363393,
+          "status": "run"
+        },
+        {
+          "name": "objects.messages_strings",
+          "seconds": 0.00757593,
+          "status": "run"
+        },
+        {
+          "name": "objects.message_churn",
+          "seconds": 1.87142,
+          "status": "run"
+        },
+        {
+          "name": "objects.message_limit",
+          "seconds": 0.102972,
+          "status": "run"
+        },
+        {
+          "name": "objects.unsupported_teardown",
+          "seconds": 0.014696,
+          "status": "run"
+        },
+        {
+          "name": "objects.creation_failures",
+          "seconds": 0.00806686,
+          "status": "run"
+        },
+        {
+          "name": "config.arguments",
+          "seconds": 0.0021914,
+          "status": "run"
+        },
+        {
+          "name": "config.precedence",
+          "seconds": 0.00234658,
+          "status": "run"
+        },
+        {
+          "name": "config.relative_paths",
+          "seconds": 0.0022316,
+          "status": "run"
+        },
+        {
+          "name": "config.invalid_config",
+          "seconds": 0.00274145,
+          "status": "run"
+        },
+        {
+          "name": "config.content_validation",
+          "seconds": 0.00232297,
+          "status": "run"
+        },
+        {
+          "name": "config.case_lookup",
+          "seconds": 0.00248482,
+          "status": "run"
+        },
+        {
+          "name": "world.level_change",
+          "seconds": 0.0768292,
+          "status": "run"
+        },
+        {
+          "name": "world.surface_effects",
+          "seconds": 0.424261,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_trials",
+          "seconds": 0.0473946,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_messages",
+          "seconds": 0.00300711,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_schema",
+          "seconds": 0.00320412,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_lifetime",
+          "seconds": 0.0165854,
+          "status": "run"
+        },
+        {
+          "name": "world.sprite_entries",
+          "seconds": 0.00893856,
+          "status": "run"
+        },
+        {
+          "name": "world.sound_entries",
+          "seconds": 0.00931645,
+          "status": "run"
+        },
+        {
+          "name": "world.rez_structure",
+          "seconds": 0.00291246,
+          "status": "run"
+        },
+        {
+          "name": "world.rez_rejection",
+          "seconds": 0.00297374,
+          "status": "run"
+        },
+        {
+          "name": "world.resource_mount",
+          "seconds": 0.00336322,
+          "status": "run"
+        },
+        {
+          "name": "world.world_properties",
+          "seconds": 0.00292859,
+          "status": "run"
+        },
+        {
+          "name": "world.world_geometry",
+          "seconds": 0.00306178,
+          "status": "run"
+        },
+        {
+          "name": "world.world_rejection",
+          "seconds": 0.0142835,
+          "status": "run"
+        },
+        {
+          "name": "world.mutations",
+          "seconds": 0.0608127,
+          "status": "run"
+        },
+        {
+          "name": "world.session_lifecycle",
+          "seconds": 0.00492479,
+          "status": "run"
+        },
+        {
+          "name": "world.session_messages",
+          "seconds": 0.0029202,
+          "status": "run"
+        },
+        {
+          "name": "world.original_trigger",
+          "seconds": 0.00356414,
+          "status": "run"
+        },
+        {
+          "name": "world.level_change_private",
+          "seconds": 5.57932,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_trial_private",
+          "seconds": 6.39649,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_private",
+          "seconds": 3.21187,
+          "status": "run"
+        },
+        {
+          "name": "world.private",
+          "seconds": 1.16259,
+          "status": "run"
+        },
+        {
+          "name": "sound.defaults",
+          "seconds": 0.00740251,
+          "status": "run"
+        },
+        {
+          "name": "sound.loops",
+          "seconds": 0.0106625,
+          "status": "run"
+        },
+        {
+          "name": "sound.resampling",
+          "seconds": 0.00715932,
+          "status": "run"
+        },
+        {
+          "name": "sound.lifetime",
+          "seconds": 0.00723842,
+          "status": "run"
+        },
+        {
+          "name": "sound.failures",
+          "seconds": 0.00749285,
+          "status": "run"
+        },
+        {
+          "name": "sound.metadata",
+          "seconds": 0.00760533,
+          "status": "run"
+        },
+        {
+          "name": "sound.catalog",
+          "seconds": 4.91405,
+          "status": "run"
+        },
+        {
+          "name": "sound.subway",
+          "seconds": 1.18259,
+          "status": "run"
+        },
+        {
+          "name": "coverage.catalog",
+          "seconds": 0.723677,
+          "status": "run"
+        },
+        {
+          "name": "coverage.observations",
+          "seconds": 0.00388335,
+          "status": "run"
+        },
+        {
+          "name": "coverage.private",
+          "seconds": 13.1215,
+          "status": "run"
+        },
+        {
+          "name": "train_session.private_30",
+          "seconds": 24.9354,
+          "status": "run"
+        },
+        {
+          "name": "train_session.private_60",
+          "seconds": 27.8255,
+          "status": "run"
+        },
+        {
+          "name": "music_assets.reader",
+          "seconds": 0.0170743,
+          "status": "run"
+        },
+        {
+          "name": "music_assets.plan",
+          "seconds": 0.00366732,
+          "status": "run"
+        },
+        {
+          "name": "music_assets.catalog",
+          "seconds": 0.0180198,
+          "status": "run"
+        },
+        {
+          "name": "music_assets.private",
+          "seconds": 2.52078,
+          "status": "run"
+        }
+      ]
+    },
+    "headless-release": {
+      "passed": 59,
+      "failed": 0,
+      "seconds": 7.37,
+      "cases": [
+        {
+          "name": "objects.builtin_model",
+          "seconds": 0.00239747,
+          "status": "run"
+        },
+        {
+          "name": "objects.original_objects",
+          "seconds": 0.00186854,
+          "status": "run"
+        },
+        {
+          "name": "objects.nested_creation",
+          "seconds": 0.00173293,
+          "status": "run"
+        },
+        {
+          "name": "objects.reasons_properties",
+          "seconds": 0.00224676,
+          "status": "run"
+        },
+        {
+          "name": "objects.scheduling",
+          "seconds": 0.00168495,
+          "status": "run"
+        },
+        {
+          "name": "objects.deferred_removal",
+          "seconds": 0.00165794,
+          "status": "run"
+        },
+        {
+          "name": "objects.aggregate_dispatch",
+          "seconds": 0.00169003,
+          "status": "run"
+        },
+        {
+          "name": "objects.handles_selection",
+          "seconds": 0.00180621,
+          "status": "run"
+        },
+        {
+          "name": "objects.links_lists",
+          "seconds": 0.00168499,
+          "status": "run"
+        },
+        {
+          "name": "objects.messages_strings",
+          "seconds": 0.00228005,
+          "status": "run"
+        },
+        {
+          "name": "objects.message_churn",
+          "seconds": 0.10095,
+          "status": "run"
+        },
+        {
+          "name": "objects.message_limit",
+          "seconds": 0.0234904,
+          "status": "run"
+        },
+        {
+          "name": "objects.unsupported_teardown",
+          "seconds": 0.0040848,
+          "status": "run"
+        },
+        {
+          "name": "objects.creation_failures",
+          "seconds": 0.00224503,
+          "status": "run"
+        },
+        {
+          "name": "config.arguments",
+          "seconds": 0.00158162,
+          "status": "run"
+        },
+        {
+          "name": "config.precedence",
+          "seconds": 0.00174637,
+          "status": "run"
+        },
+        {
+          "name": "config.relative_paths",
+          "seconds": 0.00173758,
+          "status": "run"
+        },
+        {
+          "name": "config.invalid_config",
+          "seconds": 0.00242995,
+          "status": "run"
+        },
+        {
+          "name": "config.content_validation",
+          "seconds": 0.00189685,
+          "status": "run"
+        },
+        {
+          "name": "config.case_lookup",
+          "seconds": 0.00206639,
+          "status": "run"
+        },
+        {
+          "name": "world.level_change",
+          "seconds": 0.010264,
+          "status": "run"
+        },
+        {
+          "name": "world.surface_effects",
+          "seconds": 0.017968,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_trials",
+          "seconds": 0.00702711,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_messages",
+          "seconds": 0.00179638,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_schema",
+          "seconds": 0.00203367,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_lifetime",
+          "seconds": 0.00349305,
+          "status": "run"
+        },
+        {
+          "name": "world.sprite_entries",
+          "seconds": 0.00305034,
+          "status": "run"
+        },
+        {
+          "name": "world.sound_entries",
+          "seconds": 0.00317627,
+          "status": "run"
+        },
+        {
+          "name": "world.rez_structure",
+          "seconds": 0.00173685,
+          "status": "run"
+        },
+        {
+          "name": "world.rez_rejection",
+          "seconds": 0.00166088,
+          "status": "run"
+        },
+        {
+          "name": "world.resource_mount",
+          "seconds": 0.00228617,
+          "status": "run"
+        },
+        {
+          "name": "world.world_properties",
+          "seconds": 0.00197755,
+          "status": "run"
+        },
+        {
+          "name": "world.world_geometry",
+          "seconds": 0.00185369,
+          "status": "run"
+        },
+        {
+          "name": "world.world_rejection",
+          "seconds": 0.00227207,
+          "status": "run"
+        },
+        {
+          "name": "world.mutations",
+          "seconds": 0.00381112,
+          "status": "run"
+        },
+        {
+          "name": "world.session_lifecycle",
+          "seconds": 0.00253928,
+          "status": "run"
+        },
+        {
+          "name": "world.session_messages",
+          "seconds": 0.00184647,
+          "status": "run"
+        },
+        {
+          "name": "world.original_trigger",
+          "seconds": 0.0020843,
+          "status": "run"
+        },
+        {
+          "name": "world.level_change_private",
+          "seconds": 0.619016,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_trial_private",
+          "seconds": 0.58051,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_private",
+          "seconds": 0.26955,
+          "status": "run"
+        },
+        {
+          "name": "world.private",
+          "seconds": 0.112357,
+          "status": "run"
+        },
+        {
+          "name": "sound.defaults",
+          "seconds": 0.00300781,
+          "status": "run"
+        },
+        {
+          "name": "sound.loops",
+          "seconds": 0.00399403,
+          "status": "run"
+        },
+        {
+          "name": "sound.resampling",
+          "seconds": 0.00297981,
+          "status": "run"
+        },
+        {
+          "name": "sound.lifetime",
+          "seconds": 0.00295441,
+          "status": "run"
+        },
+        {
+          "name": "sound.failures",
+          "seconds": 0.00305832,
+          "status": "run"
+        },
+        {
+          "name": "sound.metadata",
+          "seconds": 0.00315327,
+          "status": "run"
+        },
+        {
+          "name": "sound.catalog",
+          "seconds": 0.332201,
+          "status": "run"
+        },
+        {
+          "name": "sound.subway",
+          "seconds": 0.120876,
+          "status": "run"
+        },
+        {
+          "name": "coverage.catalog",
+          "seconds": 0.0521203,
+          "status": "run"
+        },
+        {
+          "name": "coverage.observations",
+          "seconds": 0.0019921,
+          "status": "run"
+        },
+        {
+          "name": "coverage.private",
+          "seconds": 2.64586,
+          "status": "run"
+        },
+        {
+          "name": "train_session.private_30",
+          "seconds": 4.4314,
+          "status": "run"
+        },
+        {
+          "name": "train_session.private_60",
+          "seconds": 4.90105,
+          "status": "run"
+        },
+        {
+          "name": "music_assets.reader",
+          "seconds": 0.00254471,
+          "status": "run"
+        },
+        {
+          "name": "music_assets.plan",
+          "seconds": 0.00249745,
+          "status": "run"
+        },
+        {
+          "name": "music_assets.catalog",
+          "seconds": 0.00754545,
+          "status": "run"
+        },
+        {
+          "name": "music_assets.private",
+          "seconds": 0.186304,
+          "status": "run"
+        }
+      ]
+    },
+    "headless-sanitize": {
+      "passed": 59,
+      "failed": 0,
+      "seconds": 242.93,
+      "cases": [
+        {
+          "name": "objects.builtin_model",
+          "seconds": 0.0184716,
+          "status": "run"
+        },
+        {
+          "name": "objects.original_objects",
+          "seconds": 0.0186054,
+          "status": "run"
+        },
+        {
+          "name": "objects.nested_creation",
+          "seconds": 0.0180801,
+          "status": "run"
+        },
+        {
+          "name": "objects.reasons_properties",
+          "seconds": 0.0190674,
+          "status": "run"
+        },
+        {
+          "name": "objects.scheduling",
+          "seconds": 0.0178568,
+          "status": "run"
+        },
+        {
+          "name": "objects.deferred_removal",
+          "seconds": 0.0183947,
+          "status": "run"
+        },
+        {
+          "name": "objects.aggregate_dispatch",
+          "seconds": 0.0176231,
+          "status": "run"
+        },
+        {
+          "name": "objects.handles_selection",
+          "seconds": 0.0182424,
+          "status": "run"
+        },
+        {
+          "name": "objects.links_lists",
+          "seconds": 0.018668,
+          "status": "run"
+        },
+        {
+          "name": "objects.messages_strings",
+          "seconds": 0.0367504,
+          "status": "run"
+        },
+        {
+          "name": "objects.message_churn",
+          "seconds": 5.85536,
+          "status": "run"
+        },
+        {
+          "name": "objects.message_limit",
+          "seconds": 0.388864,
+          "status": "run"
+        },
+        {
+          "name": "objects.unsupported_teardown",
+          "seconds": 0.0495627,
+          "status": "run"
+        },
+        {
+          "name": "objects.creation_failures",
+          "seconds": 0.0327237,
+          "status": "run"
+        },
+        {
+          "name": "config.arguments",
+          "seconds": 0.00867155,
+          "status": "run"
+        },
+        {
+          "name": "config.precedence",
+          "seconds": 0.00978477,
+          "status": "run"
+        },
+        {
+          "name": "config.relative_paths",
+          "seconds": 0.0095337,
+          "status": "run"
+        },
+        {
+          "name": "config.invalid_config",
+          "seconds": 0.0123466,
+          "status": "run"
+        },
+        {
+          "name": "config.content_validation",
+          "seconds": 0.00892146,
+          "status": "run"
+        },
+        {
+          "name": "config.case_lookup",
+          "seconds": 0.00898053,
+          "status": "run"
+        },
+        {
+          "name": "world.level_change",
+          "seconds": 0.27004,
+          "status": "run"
+        },
+        {
+          "name": "world.surface_effects",
+          "seconds": 0.878496,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_trials",
+          "seconds": 0.16938,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_messages",
+          "seconds": 0.0165247,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_schema",
+          "seconds": 0.0176791,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_lifetime",
+          "seconds": 0.0654037,
+          "status": "run"
+        },
+        {
+          "name": "world.sprite_entries",
+          "seconds": 0.0391455,
+          "status": "run"
+        },
+        {
+          "name": "world.sound_entries",
+          "seconds": 0.0421005,
+          "status": "run"
+        },
+        {
+          "name": "world.rez_structure",
+          "seconds": 0.0160296,
+          "status": "run"
+        },
+        {
+          "name": "world.rez_rejection",
+          "seconds": 0.0171679,
+          "status": "run"
+        },
+        {
+          "name": "world.resource_mount",
+          "seconds": 0.0175529,
+          "status": "run"
+        },
+        {
+          "name": "world.world_properties",
+          "seconds": 0.0179029,
+          "status": "run"
+        },
+        {
+          "name": "world.world_geometry",
+          "seconds": 0.0177227,
+          "status": "run"
+        },
+        {
+          "name": "world.world_rejection",
+          "seconds": 0.0540805,
+          "status": "run"
+        },
+        {
+          "name": "world.mutations",
+          "seconds": 0.209167,
+          "status": "run"
+        },
+        {
+          "name": "world.session_lifecycle",
+          "seconds": 0.0237438,
+          "status": "run"
+        },
+        {
+          "name": "world.session_messages",
+          "seconds": 0.0160347,
+          "status": "run"
+        },
+        {
+          "name": "world.original_trigger",
+          "seconds": 0.0186501,
+          "status": "run"
+        },
+        {
+          "name": "world.level_change_private",
+          "seconds": 22.1422,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_trial_private",
+          "seconds": 21.4212,
+          "status": "run"
+        },
+        {
+          "name": "world.destination_private",
+          "seconds": 11.7306,
+          "status": "run"
+        },
+        {
+          "name": "world.private",
+          "seconds": 4.00007,
+          "status": "run"
+        },
+        {
+          "name": "sound.defaults",
+          "seconds": 0.034761,
+          "status": "run"
+        },
+        {
+          "name": "sound.loops",
+          "seconds": 0.0412607,
+          "status": "run"
+        },
+        {
+          "name": "sound.resampling",
+          "seconds": 0.03387,
+          "status": "run"
+        },
+        {
+          "name": "sound.lifetime",
+          "seconds": 0.0345514,
+          "status": "run"
+        },
+        {
+          "name": "sound.failures",
+          "seconds": 0.0351948,
+          "status": "run"
+        },
+        {
+          "name": "sound.metadata",
+          "seconds": 0.0357731,
+          "status": "run"
+        },
+        {
+          "name": "sound.catalog",
+          "seconds": 13.4425,
+          "status": "run"
+        },
+        {
+          "name": "sound.subway",
+          "seconds": 4.09272,
+          "status": "run"
+        },
+        {
+          "name": "coverage.catalog",
+          "seconds": 4.31623,
+          "status": "run"
+        },
+        {
+          "name": "coverage.observations",
+          "seconds": 0.0192374,
+          "status": "run"
+        },
+        {
+          "name": "coverage.private",
+          "seconds": 76.8602,
+          "status": "run"
+        },
+        {
+          "name": "train_session.private_30",
+          "seconds": 142.749,
+          "status": "run"
+        },
+        {
+          "name": "train_session.private_60",
+          "seconds": 156.516,
+          "status": "run"
+        },
+        {
+          "name": "music_assets.reader",
+          "seconds": 0.067901,
+          "status": "run"
+        },
+        {
+          "name": "music_assets.plan",
+          "seconds": 0.0177045,
+          "status": "run"
+        },
+        {
+          "name": "music_assets.catalog",
+          "seconds": 0.0675357,
+          "status": "run"
+        },
+        {
+          "name": "music_assets.private",
+          "seconds": 9.85795,
+          "status": "run"
+        }
+      ]
+    },
+    "gpu-debug": {
+      "passed": 3,
+      "failed": 0,
+      "seconds": 45.25,
+      "cases": [
+        {
+          "name": "gpu.sound",
+          "seconds": 4.83229,
+          "status": "run"
+        },
+        {
+          "name": "gpu.player_keepalive",
+          "seconds": 7.64444,
+          "status": "run"
+        },
+        {
+          "name": "gpu.train_session",
+          "seconds": 32.7575,
+          "status": "run"
+        }
+      ]
+    },
+    "gpu-release": {
+      "passed": 3,
+      "failed": 0,
+      "seconds": 11.68,
+      "cases": [
+        {
+          "name": "gpu.sound",
+          "seconds": 3.30431,
+          "status": "run"
+        },
+        {
+          "name": "gpu.player_keepalive",
+          "seconds": 2.06908,
+          "status": "run"
+        },
+        {
+          "name": "gpu.train_session",
+          "seconds": 6.29395,
+          "status": "run"
+        }
+      ]
+    },
+    "gpu-ui-final": {
+      "passed": 1,
+      "failed": 0,
+      "seconds": 4.47,
+      "cases": [
+        {
+          "name": "gpu.sound",
+          "seconds": 4.45742,
+          "status": "run"
+        }
+      ]
+    }
+  },
+  "private_observations": {
+    "sections": 156,
+    "styles": 39,
+    "dls_banks": 5,
+    "riff_chunks": 21513,
+    "riff_bytes": 11986804,
+    "personality_headers_unparsed": {
+      "REPs": 5
+    },
+    "SubwayA_and_CityHub": {
+      "directory": "music/cabal",
+      "original_requests": 52,
+      "unique_files_including_style_dependencies": 45,
+      "bytes_read_per_world": 2004402,
+      "failed_containers": 0
+    }
+  },
+  "commands": {
+    "working_directory": "/home/yann/projects/lithtech/Blood2",
+    "build_targets": "music_asset_tests world_tests object_contract_tests service_coverage_tests train_session_tests sound_tests config_tests",
+    "debug_build": "cmake --build build/debug --target <build_targets> blood2_app -j3",
+    "release_build": "cmake --build build/release --target <build_targets> blood2_app -j2",
+    "sanitize_build": "cmake --build build/sanitize --target <build_targets> -j2",
+    "headless": "ctest --test-dir build/<configuration> -R '^(music_assets\\.|world\\.|objects\\.|coverage\\.|sound\\.|config\\.|train_session\\.)' -j2 --output-on-failure",
+    "sanitizer_environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    },
+    "gpu": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/<debug|release> -R '^gpu\\.(sound|player_keepalive|train_session)$' -j1 --output-on-failure",
+    "final_ui_check": "same NVIDIA environment; ctest --test-dir build/debug -R '^gpu\\.sound$'",
+    "format": " .cache/format-venv/bin/clang-format --dry-run --Werror <12 changed/new C++ files>",
+    "reference_integrity": "python3 /tmp/b2-npc-integrity.py",
+    "links": "python3 /tmp/b2-npc-links.py"
+  },
+  "inspection": {
+    "capture": "Blood2/build/debug/tests/world-sounds.png",
+    "sha256": "4ba1fd9a222c12ad55b01bbd70033f8f7298360df1f55ab83aae5e48dc9a5d02",
+    "visually_checked": true,
+    "adjustment": "Separated size and record counters onto readable lines; repeated GPU sound check after rebuilding inspector.",
+    "commercial_capture_committed": false
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "preserved_user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "limitations": [
+    "Structural RIFF inspection only; musical records and DLS synthesis are not implemented.",
+    "No successful MUSIC/InitMusic/LoadSong/PlayList service claim; continuous route retains the unsupported MUSIC assertion.",
+    "Personality REPs headers observed only; PER semantics are unparsed.",
+    "Sanitizers cover headless cases, not the NVIDIA renderer/driver.",
+    "No native macOS/Windows/mobile tests or human listening in this increment. Existing enum/float build warnings remain."
+  ],
+  "artifacts": {
+    "m2-music-assets-headless-debug.xml": {
+      "sha256": "28a8766406ca1b1ce6ad853143a75bc5c07b96c6d5049b7fd050190ecef04fcc",
+      "bytes": 25146
+    },
+    "m2-music-assets-headless-debug.log": {
+      "sha256": "cf1cde75b089d344ab0ac41a0b73527c819f32fec16211326027afd2d66b04cf",
+      "bytes": 7205
+    },
+    "m2-music-assets-headless-release.xml": {
+      "sha256": "eb67fba90178b0c3091c172b85c2753c5803cf48ad09c919493a9637d3ce6ca4",
+      "bytes": 25159
+    },
+    "m2-music-assets-headless-release.log": {
+      "sha256": "4cd7c8826213392a5e2d9bf7b190c2dea7e7985d30a40a1a555b34811134c405",
+      "bytes": 7207
+    },
+    "m2-music-assets-headless-sanitize.xml": {
+      "sha256": "b6c15b74b0b9592bd5a1032d90c06134fb18337aaedab0938d0a62f249104aa8",
+      "bytes": 25112
+    },
+    "m2-music-assets-headless-sanitize.log": {
+      "sha256": "9f10b48933615086318ea1dafedb1f675d95428e700fbc85e930c1bca022fe74",
+      "bytes": 7208
+    },
+    "m2-music-assets-gpu-debug.xml": {
+      "sha256": "27b7a81071cb5438bad724f30be1067255809fe39d298b7ba723cf997e67a1e6",
+      "bytes": 4247
+    },
+    "m2-music-assets-gpu-debug.log": {
+      "sha256": "d04a9e3d8d0e14a89c12949ae39fc16fe62976866f10a4542e3df3e190a1ff93",
+      "bytes": 707
+    },
+    "m2-music-assets-gpu-release.xml": {
+      "sha256": "0e8ceb749220ae8ca784d8bfcb266ac4e2987f24973b8a56214ed758010ce1b3",
+      "bytes": 4247
+    },
+    "m2-music-assets-gpu-release.log": {
+      "sha256": "fea20499347c02825216f5bfa8aaa62399f4c2302a932b7fabca8dc746c999f6",
+      "bytes": 709
+    },
+    "m2-music-assets-gpu-ui-final.xml": {
+      "sha256": "365fbf433ecead8e8ba08b982e86e85a8ba91fc3e50a5fd5258a237c2f53b51c",
+      "bytes": 1531
+    },
+    "m2-music-assets-gpu-ui-final.log": {
+      "sha256": "401276b3c4dd1d838d1e5c82e0e3c0f1f0e7bf827178009c59d998ebe5a2e5ef",
+      "bytes": 373
+    },
+    "m2-music-assets-build-debug.log": {
+      "sha256": "88578e1247467b1548d50bb6f4aa5cd36374b26a6f88226f76016a43d9a10d4f",
+      "bytes": 57391
+    },
+    "m2-music-assets-build-debug-checks.log": {
+      "sha256": "1ce598a769da8ff3ec2b0601336e63b829896f1e3b4d322e16396e0b1b69844d",
+      "bytes": 11415
+    },
+    "m2-music-assets-build-debug-ui.log": {
+      "sha256": "21ebf9c129804755bb1c8ceee9a04b4c9bdd2d167669796021806f3e0ab45a55",
+      "bytes": 341
+    },
+    "m2-music-assets-build-release.log": {
+      "sha256": "239ca170b8de7b4f1d66d1d32a4a79f295bdcf5eff9c18df5078f5aa1a1f1bb6",
+      "bytes": 56847
+    },
+    "m2-music-assets-build-sanitize.log": {
+      "sha256": "2be5afeb899372fcf78547a4bf7a5c8dd87ff9b5d34252671d50e6cfa8f14714",
+      "bytes": 52159
+    },
+    "m2-music-assets-debug-initial.log": {
+      "sha256": "678549be58ab747b4015ff60d9971da76cc93b95ccca7e37867f0916321c7ba5",
+      "bytes": 718
+    },
+    "m2-music-assets-source-check.log": {
+      "sha256": "5d6930de6226116c42ff30b89da4be97811deb734682e4c820ae7029a25e25d0",
+      "bytes": 42
+    },
+    "m2-music-assets-format.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  "local_markdown_links": "3784 local Markdown link targets exist.",
+  "implementation_commit": "2a57e2c110b97fa67cf553e6747c65acad57ff3f"
+}

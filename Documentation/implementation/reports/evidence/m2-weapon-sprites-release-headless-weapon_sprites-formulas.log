@@ -1,0 +1,14 @@
+611/619 Testing: weapon_sprites.formulas
+611/619 Test: weapon_sprites.formulas
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon_sprite_tests" "formulas" "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon-sprites-formulas"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"weapon_sprites.formulas" start time: Oct 16 23:54 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_sprites.formulas" end time: Oct 16 23:54 CEST
+"weapon_sprites.formulas" time elapsed: 00:00:00
+----------------------------------------------------------

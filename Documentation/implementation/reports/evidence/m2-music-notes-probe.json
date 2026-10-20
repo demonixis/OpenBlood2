@@ -1,0 +1,18 @@
+{
+  "binary": "IMUSIC25.DLL",
+  "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "entry_rva": "0x8d5f",
+  "reader_core_bytes": 18,
+  "synthetic_cases": 3,
+  "note_chunks": 2836,
+  "notes": 7030,
+  "decoded_sha256": "23d6f84dff7cdd029ced2daf540b80af2205c1e15d216bec874653c5718db4e3",
+  "notes_by_bank": {
+    "A1": 2661,
+    "Bloat": 894,
+    "Cabal": 3049,
+    "Crudux": 237,
+    "Track1": 189
+  },
+  "scope": "Original loader order and exact field preservation only; no sequencer or native DLL execution"
+}

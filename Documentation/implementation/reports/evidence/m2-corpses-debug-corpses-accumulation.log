@@ -1,0 +1,14 @@
+498/499 Testing: corpses.accumulation
+498/499 Test: corpses.accumulation
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse_tests" "accumulation" "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse-fixtures/accumulation"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"corpses.accumulation" start time: Oct 16 16:48 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.accumulation" end time: Oct 16 16:48 CEST
+"corpses.accumulation" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,50 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 967
+    Start 967: player_death.camera
+
+967: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/player_death_tests "camera" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-death-fixtures/camera"
+967: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+967: Test timeout computed to be: 30
+1/3 Test #967: player_death.camera ..............   Passed    0.01 sec
+test 968
+    Start 968: player_death.guards
+
+968: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/player_death_tests "guards" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-death-fixtures/guards"
+968: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+968: Test timeout computed to be: 30
+2/3 Test #968: player_death.guards ..............   Passed    0.01 sec
+test 969
+    Start 969: player_death.private
+
+969: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/player_death_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+969: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+969: Test timeout computed to be: 120
+969: death type=0 position 0,42.001,0 -> 0,42.001,0 controls=0
+969: death type=1 position 0,42.001,0 -> 0,42.001,0 controls=0
+969: death type=4 position 0,42.001,0 -> 0,42.001,0 controls=0
+969: death type=8 position 0,42.001,0 -> 0,42.001,0 controls=0
+969: death type=7 position 0,42.001,0 -> 0,42.001,0 controls=0
+969: Original player death: 1 ordinary corpse / 3 gib paths / freefall omission / five live-checkpoint re-associations
+3/3 Test #969: player_death.private .............   Passed    0.78 sec
+
+The following tests passed:
+	player_death.camera
+	player_death.guards
+	player_death.private
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+headless        =   0.80 sec*proc (3 tests)
+player_death    =   0.80 sec*proc (3 tests)
+private         =   0.78 sec*proc (1 test)
+
+Total Test time (real) =   0.81 sec

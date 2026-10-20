@@ -1,0 +1,13 @@
+{
+  "name": "engine_contract_remove",
+  "command": [
+    "/tmp/lithtech-audit-2bVxTF/engine_contract_probe",
+    "remove"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:18:53.766331+00:00",
+  "elapsed_seconds": 0.007,
+  "timeout_seconds": 20,
+  "exit_code": 1,
+  "log": "engine_contract_remove.log"
+}

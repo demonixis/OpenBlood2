@@ -1,0 +1,43 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/launcher-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 4
+    Start 4: gpu.launcher_1
+
+4: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/blood2-launcher "--smoke" "--frames" "16" "--ui-scale" "1" "--state-dir" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/gpu-1" "--capture" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/gpu-1/launcher.png"
+4: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+4: Test timeout computed to be: 30
+4: [2026-10-19 15:21:07.094] [info] Launcher GPU backend=vulkan device=NVIDIA GeForce RTX 3060 Laptop GPU
+4: [2026-10-19 15:21:07.377] [info] Launcher UI smoke passed: frames=16 scale=1 resized=1010x670
+1/3 Test #4: gpu.launcher_1 ...................   Passed    2.36 sec
+test 5
+    Start 5: gpu.launcher_1.5
+
+5: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/blood2-launcher "--smoke" "--frames" "16" "--ui-scale" "1.5" "--state-dir" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/gpu-1.5" "--capture" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/gpu-1.5/launcher.png"
+5: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+5: Test timeout computed to be: 30
+5: [2026-10-19 15:21:08.028] [info] Launcher GPU backend=vulkan device=NVIDIA GeForce RTX 3060 Laptop GPU
+5: [2026-10-19 15:21:08.371] [info] Launcher UI smoke passed: frames=16 scale=1.5 resized=1515x1005
+2/3 Test #5: gpu.launcher_1.5 .................   Passed    1.00 sec
+test 6
+    Start 6: gpu.launcher_2
+
+6: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/blood2-launcher "--smoke" "--frames" "16" "--ui-scale" "2" "--state-dir" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/gpu-2" "--capture" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/gpu-2/launcher.png"
+6: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+6: Test timeout computed to be: 30
+6: [2026-10-19 15:21:08.891] [info] Launcher GPU backend=vulkan device=NVIDIA GeForce RTX 3060 Laptop GPU
+6: [2026-10-19 15:21:09.277] [info] Launcher UI smoke passed: frames=16 scale=2 resized=2020x1340
+3/3 Test #6: gpu.launcher_2 ...................   Passed    0.91 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+gpu         =   4.27 sec*proc (3 tests)
+launcher    =   4.27 sec*proc (3 tests)
+
+Total Test time (real) =   4.28 sec

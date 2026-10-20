@@ -1,0 +1,14 @@
+364/372 Testing: ai_state.commands
+364/372 Test: ai_state.commands
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_state_tests" "commands"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_state.commands" start time: Oct 16 11:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.commands" end time: Oct 16 11:01 CEST
+"ai_state.commands" time elapsed: 00:00:00
+----------------------------------------------------------

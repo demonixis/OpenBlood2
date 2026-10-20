@@ -1,0 +1,1967 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 520c249..eb555b6 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -104,3 +104,12 @@ owned bounded queue and explicit unresolved state. The PE reader executes no cod
+ ambiguous languages and malformed resources fail. SubwayA now has 142 created
+ source entries, 7 owned SelfTriggers, 372 editor-only and 66 unported. HUD/audio,
+ transitions and complete M2 acceptance remain pending.
++
++The latest [camera evidence](../Documentation/Implementation/M2_CAMERAS.md) connects original CameraObj activation,
++tracking and typed client camera selection, including movement/USE/fire gates.
++Read [camera contracts](docs/CAMERA_CONTRACTS.md) before extending camera modes, cinematics or
++player restrictions. Preserve source/client listener differences, strict timeout,
++unlink scheduling and already-started FIRE_KEY handling. Presentation/listener
++requests are not cinematic rendering/audio. SubwayA now has 144 created source
++entries, 7 owned SelfTriggers, 372 editor-only and 64 unported entries. KeyFramer,
++CinematicTrigger, transitions and the actual M2 gate remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 11d9396..85f1204 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,7 +32,7 @@ add_library(blood2_game STATIC
+     src/game/session.cpp
+     src/game/registration.cpp
+     src/game/server_adapter.cpp)
+-target_sources(blood2_game PRIVATE src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
++target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+@@ -45,13 +45,13 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp)
++add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+ target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+ if(BLOOD2_INSPECTOR)
+-    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
++    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
+     target_link_libraries(blood2_app PRIVATE imgui)
+ endif()
+ 
+diff --git a/README.md b/README.md
+index d253787..45b0ebd 100644
+--- a/README.md
++++ b/README.md
+@@ -26,7 +26,7 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
+ ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
+ ```
+ 
+-The default world is `01_SubwayA`. Its patched DAT supplies 580 source objects and 116 BSP models. **141 source instances** run (`GameStartPoint`, `Key`, `PathPoint`, `WorldProperties`, `Conveyor`, `Damage`, `Door`, `Trigger`, `CDestructableBrush`), plus **7 door-owned SelfTriggers** (148 runtime instances before player entry); 372 entries are original preprocessor-only objects and **67 required runtime objects remain unported**. Every source entry remains inspectable.
++The default world is `01_SubwayA`. Its patched DAT supplies 580 source objects and 116 BSP models. **144 source instances** run (`GameStartPoint`, `Key`, `PathPoint`, `WorldProperties`, `Conveyor`, `Damage`, `Door`, `Trigger`, `CDestructableBrush`, `ObjectivesTrigger`, `CameraObj`), plus **7 door-owned SelfTriggers** (151 runtime instances before player entry); 372 entries are original preprocessor-only objects and **64 required runtime objects remain unported**. Every source entry remains inspectable.
+ 
+ The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
+ 
+@@ -47,6 +47,8 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
+ | `--inspect-player` | Headless original shell/player entry inspection, with explicit gameplay blockers |
+ | `--player-smoke` | GPU Session panel, hidden player updates, unload/re-entry checks |
+ | `--weapons-smoke` | GPU Beretta/knife firing while hidden, unload/re-entry; capture at frame 181 |
++| `--cameras-smoke` | GPU original camera tracking, client view/player gates while hidden, inspection and reload |
++| `--objectives-smoke` | GPU original objective delivery and localized client text while hidden, inspection and reload |
+ | `--pickups-smoke` | GPU original ammo collection while hidden, Ward inspection and reload |
+ | `--brushes-smoke` | GPU original brush ON/OFF, hidden rider transport, explosive chain and dynamic box gravity/impulse, inspection and reload |
+ | `--interaction-smoke` | GPU SDL E press-edge USE, missing-key denial/unlock, synthetic rotating hinge, hidden motion and reload |
+@@ -65,7 +67,7 @@ ctest --preset debug
+ ctest --preset debug -L world
+ ```
+ 
+-There are **145 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases, 6 door/mover/collision/lifetime cases, 8 trigger/key/ownership/contact cases, 9 USE/rotation/input/transport cases, 7 brush/ramp/damage/lifetime cases and 8 debris/explosion/radius/chain/lifetime cases and 10 pushable/physics/priority/rider cases, 9 pickup/spawn cases and 6 objective/resource-string cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
++There are **151 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases, 6 door/mover/collision/lifetime cases, 8 trigger/key/ownership/contact cases, 9 USE/rotation/input/transport cases, 7 brush/ramp/damage/lifetime cases and 8 debris/explosion/radius/chain/lifetime cases and 10 pushable/physics/priority/rider cases, 9 pickup/spawn cases and 6 objective/resource-string cases plus 6 camera/tracking/player-gate cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
+ 
+ Enable installation-specific tests and real GPU windows explicitly:
+ 
+@@ -75,7 +77,7 @@ cmake --build --preset debug --parallel
+ ctest --preset debug
+ ```
+ 
+-The configured installation adds eighteen private headless tests and thirteen GPU tests, for **176 cases**. GPU captures are `build/debug/tests/gpu.png`, `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png`, `doors.png`, `triggers.png`, `interaction.png`, `brushes.png`, `pickups.png` and `objectives.png`. The ignored local presets enable these options:
++The configured installation adds nineteen private headless tests and fourteen GPU tests, for **184 cases**. GPU captures are `build/debug/tests/gpu.png`, `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png`, `doors.png`, `triggers.png`, `interaction.png`, `brushes.png`, `pickups.png`, `objectives.png` and `cameras.png`. The ignored local presets enable these options:
+ 
+ ```sh
+ cmake --preset local-debug
+@@ -94,7 +96,7 @@ On Windows use an MSVC Developer PowerShell and the same CMake/Ninja commands, t
+ 
+ Read [world/session contracts](docs/WORLD_CONTRACTS.md), [object contracts](docs/OBJECT_CONTRACTS.md), [provenance](docs/PROVENANCE.md) and [M2 results](../Documentation/Implementation/M2.md). The [roadmap's M2 gate](../Documentation/Roadmap/03_MILESTONES.md#m2--connect-world-session-and-gameplay-services) remains open: complete player/gameplay callbacks, required world classes, broader mover/physics behavior and remaining original services must still be connected. See the [service continuation](../Documentation/Implementation/M2_SERVICES.md) for the new tested subset. M3 has not started.
+ 
+-The [pickup continuation](../Documentation/Implementation/M2_PICKUPS.md) is the latest evidence; read [PICKUP_CONTRACTS.md](docs/PICKUP_CONTRACTS.md) before extending collection or destruction spawns. The [pushable continuation](../Documentation/Implementation/M2_PUSHABLES.md) records the preceding stage; read [PUSHABLE_CONTRACTS.md](docs/PUSHABLE_CONTRACTS.md) before extending body physics, pushing or impulses. The [explosion continuation](../Documentation/Implementation/M2_EXPLOSIONS.md) records the preceding stage; read [EXPLOSION_CONTRACTS.md](docs/EXPLOSION_CONTRACTS.md) before extending debris, area damage or chain reactions. Its effects are inspection requests; client FX/audio remain pending. The [brush continuation](../Documentation/Implementation/M2_BRUSHES.md) records the preceding stage; read [BRUSH_CONTRACTS.md](docs/BRUSH_CONTRACTS.md) before extending rotators, brush damage or debris. The [USE/rotation continuation](../Documentation/Implementation/M2_INTERACTION.md) records the preceding stage; read [INTERACTION_CONTRACTS.md](docs/INTERACTION_CONTRACTS.md) before extending USE, rotating collision or player door pushes. The [trigger/key continuation](../Documentation/Implementation/M2_TRIGGERS.md) records the preceding stage; read [TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending activation, keys or SelfTrigger ownership. The [door continuation](../Documentation/Implementation/M2_DOORS.md) records the previous stage; read [DOOR_CONTRACTS.md](docs/DOOR_CONTRACTS.md) before extending world-model motion or door commands. The [specialized volume continuation](../Documentation/Implementation/M2_SPECIALIZED_VOLUMES.md) records the preceding stage (Conveyor, Damage, FreeFall and level-entry damage protection). Read [SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md) before extending these branches. The [container continuation](../Documentation/Implementation/M2_CONTAINERS.md) records the preceding stage. Read [CONTAINER_CONTRACTS.md](docs/CONTAINER_CONTRACTS.md) for original VolumeBrush/MoveMgr/air rules, static shell queries and pending effects. The [locomotion continuation](../Documentation/Implementation/M2_LOCOMOTION.md) records the prior stage. Read [LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for source clip fallbacks, atomic resize and the replacement stair solver. Read [MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) for the original MoveMgr subset, shared body, timing and grounding adaptations, and the subsequent translating platform extension. The [weapon continuation](../Documentation/Implementation/M2_WEAPONS.md) retains the earlier weapon evidence. Read [WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) for ownership, original behavior and deliberate limits. Read [PLAYER_CONTRACTS.md](docs/PLAYER_CONTRACTS.md) before extending the source subsets, typed client messages or player lifetime. Entry inspection succeeds; `--start-game` still fails with missing gameplay services.
++The [pickup continuation](../Documentation/Implementation/M2_PICKUPS.md) records the preceding pickup stage; read [PICKUP_CONTRACTS.md](docs/PICKUP_CONTRACTS.md) before extending collection or destruction spawns. The [pushable continuation](../Documentation/Implementation/M2_PUSHABLES.md) records the preceding stage; read [PUSHABLE_CONTRACTS.md](docs/PUSHABLE_CONTRACTS.md) before extending body physics, pushing or impulses. The [explosion continuation](../Documentation/Implementation/M2_EXPLOSIONS.md) records the preceding stage; read [EXPLOSION_CONTRACTS.md](docs/EXPLOSION_CONTRACTS.md) before extending debris, area damage or chain reactions. Its effects are inspection requests; client FX/audio remain pending. The [brush continuation](../Documentation/Implementation/M2_BRUSHES.md) records the preceding stage; read [BRUSH_CONTRACTS.md](docs/BRUSH_CONTRACTS.md) before extending rotators, brush damage or debris. The [USE/rotation continuation](../Documentation/Implementation/M2_INTERACTION.md) records the preceding stage; read [INTERACTION_CONTRACTS.md](docs/INTERACTION_CONTRACTS.md) before extending USE, rotating collision or player door pushes. The [trigger/key continuation](../Documentation/Implementation/M2_TRIGGERS.md) records the preceding stage; read [TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending activation, keys or SelfTrigger ownership. The [door continuation](../Documentation/Implementation/M2_DOORS.md) records the previous stage; read [DOOR_CONTRACTS.md](docs/DOOR_CONTRACTS.md) before extending world-model motion or door commands. The [specialized volume continuation](../Documentation/Implementation/M2_SPECIALIZED_VOLUMES.md) records the preceding stage (Conveyor, Damage, FreeFall and level-entry damage protection). Read [SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md) before extending these branches. The [container continuation](../Documentation/Implementation/M2_CONTAINERS.md) records the preceding stage. Read [CONTAINER_CONTRACTS.md](docs/CONTAINER_CONTRACTS.md) for original VolumeBrush/MoveMgr/air rules, static shell queries and pending effects. The [locomotion continuation](../Documentation/Implementation/M2_LOCOMOTION.md) records the prior stage. Read [LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for source clip fallbacks, atomic resize and the replacement stair solver. Read [MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) for the original MoveMgr subset, shared body, timing and grounding adaptations, and the subsequent translating platform extension. The [weapon continuation](../Documentation/Implementation/M2_WEAPONS.md) retains the earlier weapon evidence. Read [WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) for ownership, original behavior and deliberate limits. Read [PLAYER_CONTRACTS.md](docs/PLAYER_CONTRACTS.md) before extending the source subsets, typed client messages or player lifetime. Entry inspection succeeds; `--start-game` still fails with missing gameplay services.
+ 
+ ## Source conventions
+ 
+@@ -114,3 +116,16 @@ typed client broadcasts and bounded PE resource-string lookup from external
+ cres.dll. The Objectives tab shows source objects, delivery/resolution state and
+ actual localized text. Use `./build/debug/blood2 --objectives-smoke` for the hidden
+ UI/reload check. Original HUD and audio are pending; M2 remains incomplete.
++
++## Scripted camera continuation
++
++[Latest evidence](../Documentation/Implementation/M2_CAMERAS.md) and
++[contracts](docs/CAMERA_CONTRACTS.md) cover original CameraObj activation/tracking,
++typed client camera selection and player movement/USE/fire restrictions. Cameras
++shows both source and published listener flags, target/pose, timers and player
++restrictions; diagnostic ON/OFF/LINK controls use original messages. Run
++`./build/debug/blood2 --cameras-smoke` for hidden-UI and reload checks. The selected
++view, visibility and audio listener are inspection data/requests; cinematic world
++rendering, KeyFramer/CinematicTrigger and audio remain pending. Latest SubwayA
++accounting is 144 source instances + 7 SelfTriggers, 154 with player/owned models,
++372 editor-only entries, 64 unported and zero failed. M2 is still open.
+diff --git a/docs/CAMERA_CONTRACTS.md b/docs/CAMERA_CONTRACTS.md
+new file mode 100644
+index 0000000..38e1fde
+--- /dev/null
++++ b/docs/CAMERA_CONTRACTS.md
+@@ -0,0 +1,107 @@
++# Original scripted cameras
++
++M2 remains incomplete. Read [player](PLAYER_CONTRACTS.md), [movement](MOVEMENT_CONTRACTS.md),
++[weapon](WEAPON_CONTRACTS.md) and [trigger](TRIGGER_CONTRACTS.md) contracts together
++with these [source selections](M2_CAMERA_SOURCES.json) and
++[implementation evidence](../../Documentation/Implementation/M2_CAMERAS.md).
++
++## Original rules
++
++CameraObj retains the B2BaseClass callback chain and difficulty/game-mode filters,
++original defaults, world/string properties, start-active behavior, user flags,
++ON/OFF/LINK commands, source camera list and target tracking. TypeActionMode is
++false by default. The camera is a non-colliding normal object; DebugCutScene=1
++requests the original camera model/skin and exposes any resource failure.
++Restore is rejected; save/load and the unused source debug-ray FX are not ported.
++
++ON arms a 0.01-second update and resets a positive ActiveTime deadline. Expiry uses
++strict `time > deadline`; zero and negative durations stay active indefinitely.
++OFF clears the active user flag and schedule. As in the source, a bare LINK
++unlinks the target and cancels scheduling even while active, so its timer also
++stops until ON or another link rearms it. Missing named targets retain the current
++link. Command keywords are case-insensitive; named lookup remains exact and uses
++the first match, with the original LINK prefix and name offset rather than new
++whitespace parsing. Target deletion sends MID_LINKBROKEN and clears the link.
++
++Camera type, movement, hide-player and listener flags are published once at
++initialization. Setup changes the source type without republishing it, preserving
++the original behavior. The original Blood II 1.0 workaround suppresses the
++**published client listener** flag when GAME_WORLDNAME contains `worlds\`.
++Portable slash/case normalization makes the same rule work with normalized REZ
++paths. The source IsListener property stays unchanged. World load sets this
++variable before creating objects; unload removes it from that adapter only.
++
++## Typed services and ownership
++
++A persistent CameraSettings descriptor replaces the selected SFX_CAMERA_ID packet
++and CameraFX metadata. It is value-owned by ServerAdapter, bounded to 4,096 live
++entries and keyed by a checked object handle; duplicate, invalid and pending
++publications fail. Camera destruction removes its descriptor; unload clears the
++registry. No generic SFX manager, packet ABI or success-shaped rendering/audio
++service was introduced.
++
++The client selects the first active descriptor in stable creation order, skipping
++pending/dead objects immediately. This replaces the old SFX slot array; slot-hole
++reuse parity is unverified. The original server g_hActiveCamera uses the source
++listener flag and list order: activating a listener selects it; deactivation or a
++non-listener activation searches the source list, newest first. These can select
++different cameras. A deferred-removal global handle may remain until destruction;
++consumers must check liveness. The inspector shows both selections separately.
++Server visibility/interest updates using that global are still pending.
++
++Tracking uses a narrow typed AlignRotation service for the source caller's world
++Y-up vector. It validates finite bounded vectors, computes pitch/yaw, uses zero
++yaw for a vertical direction and rejects coincident targets without replacing the
++old rotation. This is new engine math, not verified retail quaternion parity.
++Retargeting explicitly breaks the old link (a source lifetime defect); self/stale
++links reject. Type outside 0–2 and nonfinite or abs(ActiveTime)>1,000,000 reject
++precreate instead of truncating/propagating invalid data. No callback destroys an
++object synchronously. The runtime's single bound session remains required.
++
++## Player integration
++
++The client resolves CameraView before movement and again after body movement.
++The external pose is separate from the existing player eye used by the selected
++weapon path. Remote-camera firing never substitutes the camera's position for
++the player's shot origin. Viewport type, player visibility, weapon visibility
++and listener position are explicit **presentation requests**; the cinematic world
++renderer, letterbox/FOV presentation and audio listener are not implemented.
++Type 1 requests the source letterbox (top/bottom one-sixth); types 0/2 follow the
++source fullscreen branch. A non-listener view requests the default player-body
++listener position. Other camera modes/gadgets and third-person/death views remain
++pending.
++
++A camera with AllowPlayerMovement=false clears movement commands, requests idle
++controls, blocks USE and suppresses new fire input. Original MoveMgr still handles
++gravity/environment and the shared body integrates once. The camera gate is
++separate from existing player movement blocking. An already-started weapon
++animation continues: a later FIRE_KEY receives a typed Blocked acknowledgement
++with no shot/ammo consumption, preserving the original server movement guard.
++AllowPlayerMovement=true keeps movement/USE/fire available even though external
++views request hidden view weapons. Exit/re-entry clears view state; pending camera
++removal restores ordinary view/commands at the next client update.
++
++## Inspection and checks
++
++The Cameras tab includes hidden/inactive cameras, source/published properties,
++position/forward vector, tracking target/diagnostics, timer/schedule, both selections
++and actual player restrictions. ON/OFF/LINK actions queue ordinary original trigger
++messages; selection is a generation-checked ObjectId. World keeps failed source
++entries. `--cameras-smoke` activates an authored SubwayA camera and tracks the
++player, checks its selected view while UI is hidden, and repeats checks after
++unload/re-entry. Its diagnostic activation is not a cinematic script or playthrough.
++
++Six synthetic cases cover defaults/filtering, strict timers/unlink quirks, tracking
++and link lifetime, server/client selection, player command/late-fire blocking and
++validation/adapter ownership. A private catalog checks all 61 CameraObj entries
++across 57 readable installed worlds, plus actual SubwayA player selection and
++cleanup. SubwayA's original start-point/trigger entry now activates camera1 (seven
++seconds), then camera2 (five seconds); control returns just after twelve seconds. The weapon/movement/locomotion private scenarios first assert that
++intro and its natural expiry before sending their original inputs; their behavior
++assertions remain intact. Related GPU gameplay smoke scenarios also advance the
++authored intro to completion (bounded to thirty simulation seconds), including after
++reload. No forced OFF, shortened timer or disabled player gate is used. Normal
++application entry keeps the intro. The strict existing `16_bridge.dat` rejection remains unchanged.
++KeyFramer, CinematicTrigger, world transitions, other required classes/services,
++rendering/audio, save/load and complete M2 acceptance remain open. No retail
++executable comparison, additional-platform or XR validation is claimed.
+diff --git a/docs/M2_CAMERA_SOURCES.json b/docs/M2_CAMERA_SOURCES.json
+new file mode 100644
+index 0000000..73eeb8d
+--- /dev/null
++++ b/docs/M2_CAMERA_SOURCES.json
+@@ -0,0 +1,126 @@
++{
++  "date": "2026-10-15",
++  "status": "M2 incomplete; original scripted cameras and typed view/player gates",
++  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "imports": [
++    {
++      "source": "sources/blood2/ObjectDLL/CameraObj.cpp",
++      "target": "src/game/original/CameraObj.cpp",
++      "source_line_ranges": [
++        [
++          43,
++          159
++        ],
++        [
++          178,
++          337
++        ],
++        [
++          347,
++          353
++        ],
++        [
++          412,
++          605
++        ]
++      ],
++      "selection": "Original defaults, callbacks, flags/DebugCutScene model, property reads, published listener workaround, Setup, tracking, strict timeout, source list selection and ON/OFF/LINK. Typed publication and look service replace SDK calls. Retarget cleanup and stale/self checks are deliberate lifetime fixes. Restore and unused DisplayRay remain omitted.",
++      "source_sha256": "5255f0d0efe9ba67b081f5ea8684d8ed60cf94c8f23caaad8c186c21718756ec",
++      "target_sha256": "e0644e11d55292bbd807a9d79d9ac4ff0e3ae195424212e7cc3bc37b71f02b29"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/CameraObj.cpp",
++      "target": "src/game/registration.cpp",
++      "source_line_ranges": [
++        [
++          24,
++          32
++        ]
++      ],
++      "selection": "Original CameraObj property defaults, B2BaseClass ancestry and TypeActionMode=false.",
++      "source_sha256": "5255f0d0efe9ba67b081f5ea8684d8ed60cf94c8f23caaad8c186c21718756ec",
++      "target_sha256": "cc38634d42f054d2c11e68683891bfbbfc2e78801d26bed577750ec0ecc4d1eb"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/CameraObj.h",
++      "target": "src/game/original/CameraObj.h",
++      "source_line_ranges": [
++        [
++          21,
++          73
++        ]
++      ],
++      "selection": "Original camera class/state/list/link names, typed callback overrides and inspection diagnostics; no serialization or unused ray object.",
++      "source_sha256": "de6b95abcc5507fdbd64f59a63b29019c3dbdfe011b77e3d52fe145aff68b8fc",
++      "target_sha256": "9e308e8224af1533c281ab01ae57e825461e2490ae0ff1013b6ab5423c5a5f37"
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/CameraFX.h",
++      "target": "src/game/camera_messages.h",
++      "source_line_ranges": [
++        [
++          18,
++          72
++        ]
++      ],
++      "selection": "Selected persistent camera type, movement, hide-player and listener metadata as owned typed values; no generic SFX manager or packet ABI.",
++      "source_sha256": "5d76c3c1d1aec31baca9620b59f2b9c1c7fcc36b9af14993a0d18c57d13a5be8",
++      "target_sha256": "d683e187e237b02886e86cea525d781150279c3e94831825d102e5ead4e0e054"
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "target": "src/game/original/BloodShells.cpp",
++      "source_line_ranges": [
++        [
++          2250,
++          2295
++        ],
++        [
++          3271,
++          3297
++        ],
++        [
++          5432,
++          5444
++        ],
++        [
++          6738,
++          6793
++        ],
++        [
++          8919,
++          8969
++        ]
++      ],
++      "selection": "Selected first-active camera, player/view-weapon visibility, movement/fire gate and external pose/listener branches. Presentation requests remain inspection data, not rendering/audio; stable descriptor order replaces SFX slot allocation. Player body eye and external view are separate.",
++      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "target_sha256": "d52d2a50c735be9f9cfc7512e373079db810e0514a3eda79d2c3d373a8023653"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "target": "src/game/original/PlayerObj.cpp",
++      "source_line_ranges": [
++        [
++          4070,
++          4072
++        ],
++        [
++          6875,
++          6922
++        ]
++      ],
++      "selection": "Original movement permission gates server weapon fire, including already-started FIRE_KEY. Separate camera gate preserves prior movement reasons; typed Blocked acknowledgement consumes no ammo.",
++      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "target_sha256": "2d3995a509aef34703105555cd5bf7c44c6ee91398cf8557bef9686b302f079d"
++    }
++  ],
++  "adaptations": [
++    "Owned typed persistent CameraSettings descriptors, max 4096, checked handles and explicit publication failure; no network/DLL ABI",
++    "Client stable creation order vs original SFX slots; source server list and client selection remain distinct; pending handles skipped",
++    "Original world listener workaround after slash/case normalization; source property stays intact; world variable reset owned by adapter",
++    "Target replacement breaks old link; stale/self link rejected; narrow world-Y-up direction math rejects coincident/nonfinite input",
++    "Type 0-2 and finite abs(ActiveTime)<=1000000 checked; restore explicitly unsupported",
++    "Camera restrictions reach original MoveMgr, USE and late weapon FIRE_KEY; one body integration; external view does not change player shot origin",
++    "Viewport, player/weapon visibility and listener are inspectable requests; cinematic rendering/audio, server interest updates, KeyFramer/CinematicTrigger and other modes pending"
++  ]
++}
+diff --git a/docs/MOVEMENT_CONTRACTS.md b/docs/MOVEMENT_CONTRACTS.md
+index dcaa1ff..63c3fe9 100644
+--- a/docs/MOVEMENT_CONTRACTS.md
++++ b/docs/MOVEMENT_CONTRACTS.md
+@@ -132,3 +132,8 @@ The six reference repositories, commercial content and dependency pins are
+ unchanged. The later-generation LithTech motion implementation was consulted
+ as context, not imported as Blood II engine code. Only Linux has been exercised;
+ the retail executable has not been run for movement-feel comparison.
++
++[Camera contracts](CAMERA_CONTRACTS.md) add original CameraObj movement permission.
++A blocking camera clears commands but gravity/environment still use the same
++single body integration. Private gameplay tests await SubwayA's natural two-camera
++intro before issuing their movement sequence; normal entry retains that intro.
+diff --git a/docs/OBJECTIVES_CONTRACTS.md b/docs/OBJECTIVES_CONTRACTS.md
+index 3968a23..6c8eb4c 100644
+--- a/docs/OBJECTIVES_CONTRACTS.md
++++ b/docs/OBJECTIVES_CONTRACTS.md
+@@ -87,6 +87,7 @@ resolution from retail resources, stale selection and unload/reload; a diagnosti
+ rearm allows this check if the authored objective already fired at player spawn.
+ The same simulation runs in the inspector-free build.
+ 
+-Campaign transitions/ExitTrigger, CameraObj/KeyFramer/cinematics, remaining actors
++CameraObj is extended by [camera contracts](CAMERA_CONTRACTS.md). Campaign
++transitions/ExitTrigger, KeyFramer/cinematics, remaining actors
+ and effects, audio playback, original HUD, saves and full M2 acceptance remain
+ open. No retail executable behavior comparison or non-Linux/XR validation is claimed.
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index 3a65803..924f20f 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -111,7 +111,7 @@ object inspector also detaches the local client on the next step.
+ | Character animation commands | ABC playback and real callback delivery; unhandled character commands retained for inspection, not silently executed |
+ | Player movement | Original MoveMgr dry-land movement, crouch and body animation selection connected; shared local body replaces prediction/leash. Containers/platforms, full movement states and AI membership remain pending |
+ | Model flags | STAIRSTEP uses the bounded replacement stair solver; ANIMTRANSITION still does not implement blending |
+-| Client camera | Position plus original Caleb eye offset is inspectable; original camera effects and renderer are not ported |
++| Client camera | Player eye plus selected original CameraObj view/gates are inspectable; see [camera contracts](CAMERA_CONTRACTS.md). Cinematic rendering/audio remain pending |
+ | View weapons | Selected original client animation/firing paths, actual ABC resources, diagnostic input; see weapon contracts |
+ | Voice, HUD/menu, autosave, sound playback | Absent; no successful service stubs |
+ 
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 408d584..806c4cd 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -321,3 +321,13 @@ legacy message/HSTRING storage. The portable PE string reader is new engine code
+ based on Microsoft documentation, with no prototype dependency or native DLL
+ execution. [Contracts](OBJECTIVES_CONTRACTS.md) distinguish resource resolution,
+ source sound requests and pending original HUD/audio. Previous ledgers stay historical.
++
++## M2 scripted cameras
++
++[Source selections](M2_CAMERA_SOURCES.json) record CameraObj callbacks/properties,
++CameraFX metadata, the client external-camera selection/visibility/movement branches
++and the server weapon movement guard. [Contracts](CAMERA_CONTRACTS.md) distinguish
++source rules from typed descriptors, checked lifetime, look-direction math and
++stable client selection. Cinematic rendering and audio remain presentation requests;
++KeyFramer/CinematicTrigger and full M2 acceptance are not implemented by this port.
++Earlier ledgers remain historical; no dependency pin or reference tree changed.
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index d1b8459..ee4297b 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -120,3 +120,8 @@ collision, attachments, hand models, skins, muzzle light rendering, decals,
+ tracers, shell ejection and audio playback remain pending. Sound paths and whether
+ they are indexed are exposed as requests, never reported as played sounds. These
+ limits and the remaining 190 required SubwayA instances keep M2's exit gate open.
++
++[Camera contracts](CAMERA_CONTRACTS.md) extend input and late FIRE_KEY gating.
++The selected weapon path retains the player body eye as its origin; the external
++CameraObj view is separate. Blocked is an acknowledged no-shot result, with no
++ammo consumption. View-weapon visibility is a presentation request.
+diff --git a/src/app/camera_smoke.cpp b/src/app/camera_smoke.cpp
+new file mode 100644
+index 0000000..4614608
+--- /dev/null
++++ b/src/app/camera_smoke.cpp
+@@ -0,0 +1,38 @@
++#include "camera_smoke.h"
++#include "game/original/CameraObj.h"
++namespace OpenBlood2
++{
++    bool finish_camera_intro_for_smoke(GameSession& game)
++    {
++        // Diagnostic gameplay scenarios begin after the authored camera expires.
++        // Advance original callbacks, retaining the actual gate and timer.
++        for (int i = 0; i < 1800 && game.client_shell.view.object; ++i)
++            if (!game.step(1.0 / 60))
++                return false;
++        const auto* player = game.server_shell.Player(game.local_client);
++        return !game.client_shell.view.object && player && !player->camera_movement_blocked;
++    }
++    bool prepare_camera_smoke(GameSession& g, ObjectId& selected)
++    {
++        for (auto id : g.objects.snapshot())
++            if (auto* r = g.objects.get(id); r)
++                if (auto* c = dynamic_cast<CameraObj*>(r->game.get()))
++                {
++                    selected = id;
++                    c->SetActive(DTRUE);
++                    return c->SetLinkObject(g.client_shell.player);
++                }
++        return false;
++    }
++    bool check_camera_smoke(GameSession& g, ObjectId selected)
++    {
++        const auto* r = g.objects.get(selected);
++        const auto* c = r ? dynamic_cast<const CameraObj*>(r->game.get()) : nullptr;
++        const auto* player = g.server_shell.Player(g.local_client);
++        if (!c || !player || !c->tracking_updates || !c->tracking_error.empty() ||
++            g.client_shell.view.object != r->handle || !player->camera_movement_blocked)
++            return false;
++        const auto delta = vector_subtract(g.client_shell.view.position, r->state.m_Pos);
++        return vector_dot(delta, delta) < .0001f && !g.client_shell.weapons_visible && !c->published.listener;
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/camera_smoke.h b/src/app/camera_smoke.h
+new file mode 100644
+index 0000000..526e813
+--- /dev/null
++++ b/src/app/camera_smoke.h
+@@ -0,0 +1,8 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool finish_camera_intro_for_smoke(GameSession&);
++    bool prepare_camera_smoke(GameSession&, ObjectId&);
++    bool check_camera_smoke(GameSession&, ObjectId);
++} // namespace OpenBlood2
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 45b343f..3f6fe2f 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -77,6 +77,22 @@ namespace OpenBlood2
+ 
+     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
+     {
++        if (camera_request)
++        {
++            if (const auto* r = game.objects.get(camera_request);
++                r && r->life == Life::Alive && r->type->name == "CameraObj")
++            {
++                auto text = game.server.CreateString(camera_command.c_str());
++                auto message = game.server.StartMessageToObject(nullptr, r->handle, 1000);
++                if (message)
++                {
++                    game.server.WriteToMessageHString(message, text);
++                    game.server.EndMessage(message);
++                }
++                game.server.FreeString(text);
++            }
++            camera_request = {};
++        }
+         if (trigger_request)
+         {
+             auto* r = game.objects.get(trigger_request);
+@@ -498,6 +514,12 @@ namespace OpenBlood2
+                     draw_triggers(game, selection);
+                     ImGui::EndTabItem();
+                 }
++                if (ImGui::BeginTabItem("Cameras", nullptr, select_cameras ? ImGuiTabItemFlags_SetSelected : 0))
++                {
++                    select_cameras = false;
++                    draw_cameras(game, selection);
++                    ImGui::EndTabItem();
++                }
+                 if (ImGui::BeginTabItem("Objectives", nullptr, select_objectives ? ImGuiTabItemFlags_SetSelected : 0))
+                 {
+                     select_objectives = false;
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 4f5e4b1..182349e 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -21,6 +21,11 @@ namespace OpenBlood2
+         ObjectId trigger_selection{}, trigger_request{};
+         std::string trigger_command;
+         bool grant_key_request = false;
++        bool select_cameras = false;
++        ObjectId camera_selection{}, camera_request{};
++        char camera_link_name[96]{};
++        std::string camera_command;
++        void draw_cameras(GameSession&, ObjectSelection&);
+         bool select_objectives = false;
+         ObjectId objective_selection{};
+         void draw_objectives(GameSession&, ObjectSelection&);
+diff --git a/src/app/inspector_cameras.cpp b/src/app/inspector_cameras.cpp
+new file mode 100644
+index 0000000..843186f
+--- /dev/null
++++ b/src/app/inspector_cameras.cpp
+@@ -0,0 +1,102 @@
++#include "app/inspector.h"
++#include "game/original/CameraObj.h"
++#include <imgui.h>
++namespace OpenBlood2
++{
++    void Inspector::draw_cameras(GameSession& game, ObjectSelection& selection)
++    {
++        ImGui::TextWrapped(
++            "Original scripted cameras: activation, tracking and client view selection. Camera poses and "
++            "presentation/listener requests are inspected here; cinematic rendering and audio remain pending.");
++        if (!ImGui::BeginTable("Camera inspection", 2, ImGuiTableFlags_Resizable))
++            return;
++        ImGui::TableSetupColumn("Cameras", ImGuiTableColumnFlags_WidthFixed, 370);
++        ImGui::TableSetupColumn("Selected view");
++        ImGui::TableNextColumn();
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* r = game.objects.get(id);
++            const auto* c = r ? dynamic_cast<const CameraObj*>(r->game.get()) : nullptr;
++            if (!c)
++                continue;
++            if (!game.objects.get(camera_selection))
++                camera_selection = id;
++            auto label = std::string(r->state.m_Name) + (c->IsActive() ? " [on]" : " [off]");
++            if (!(r->state.m_Flags & FLAG_VISIBLE))
++                label += " [hidden]";
++            if (r->activity != OBJSTATE_ACTIVE)
++                label += " [inactive object]";
++            ImGui::PushID(static_cast<int>(id.slot));
++            if (ImGui::Selectable(label.c_str(), camera_selection == id))
++                camera_selection = selection.id = id;
++            ImGui::PopID();
++        }
++        ImGui::Text("Source list %u / descriptors %zu", CameraObj::m_dwNumCameras, game.server.camera_effects.size());
++        if (const auto* r = game.objects.get(camera_selection))
++            if (const auto* c = dynamic_cast<const CameraObj*>(r->game.get()))
++            {
++                ImGui::SeparatorText("Source properties/state");
++                ImGui::Text("Type %u / published %u", c->m_nType, c->published.type);
++                ImGui::Text("ActiveTime %.3f / deadline %.3f", c->m_fActiveTime, c->m_fDeactivateTime);
++                ImGui::Text("Scheduled %s / active %s", r->scheduled ? "yes" : "no", c->IsActive() ? "yes" : "no");
++                ImGui::Text("Listener: source %d / published %d", c->IsListener(), c->published.listener);
++                ImGui::Text("Movement %d / hide player %d", c->m_bPlayerMovement, c->m_bHidePlayer);
++                ImGui::Text("Position %.1f %.1f %.1f", r->state.m_Pos.x, r->state.m_Pos.y, r->state.m_Pos.z);
++                const auto forward = rotate_vector({0, 0, 1}, r->state.m_Rotation);
++                ImGui::Text("Forward %.3f %.3f %.3f", forward.x, forward.y, forward.z);
++                const auto* target = game.objects.get(c->GetLinkObject());
++                ImGui::TextWrapped("Track: %s / updates %llu", target ? target->state.m_Name : "none",
++                                   (unsigned long long)c->tracking_updates);
++                if (!c->tracking_error.empty())
++                    ImGui::TextWrapped("%s", c->tracking_error.c_str());
++                if (!r->model_error.empty())
++                    ImGui::TextWrapped("Debug model: %s", r->model_error.c_str());
++                if (ImGui::Button("ON"))
++                {
++                    camera_request = r->id;
++                    camera_command = "ON";
++                }
++                ImGui::SameLine();
++                if (ImGui::Button("OFF"))
++                {
++                    camera_request = r->id;
++                    camera_command = "OFF";
++                }
++                ImGui::InputText("Target name", camera_link_name, sizeof(camera_link_name));
++                if (ImGui::Button("LINK"))
++                {
++                    camera_request = r->id;
++                    camera_command = std::string("LINK ") + camera_link_name;
++                }
++                ImGui::SameLine();
++                if (ImGui::Button("Unlink"))
++                {
++                    camera_request = r->id;
++                    camera_command = "LINK";
++                }
++            }
++        ImGui::TableNextColumn();
++        const auto& client = game.client_shell;
++        const auto* viewed = game.objects.get(client.view.object);
++        const auto* listener = game.objects.get(g_hActiveCamera);
++        ImGui::TextWrapped("Client camera: %s", viewed ? viewed->state.m_Name : "player eye");
++        ImGui::TextWrapped("Server active listener camera: %s",
++                           listener && listener->life == Life::Alive ? listener->state.m_Name : "none");
++        ImGui::Text("View %.1f %.1f %.1f", client.view.position.x, client.view.position.y, client.view.position.z);
++        const auto f = rotate_vector({0, 0, 1}, client.view.rotation);
++        ImGui::Text("View forward %.3f %.3f %.3f", f.x, f.y, f.z);
++        ImGui::Text("Viewport request: %s",
++                    client.view.object && client.view.settings.type == 1 ? "letterbox (top/bottom 1/6)" : "fullscreen");
++        ImGui::Text("Player visible %d / weapons visible %d", client.player_visible, client.weapons_visible);
++        ImGui::Text("Listener request %.1f %.1f %.1f", client.listener_position.x, client.listener_position.y,
++                    client.listener_position.z);
++        if (const auto* owner = game.server_shell.Player(game.local_client))
++            ImGui::Text("Camera blocks movement / USE / fire: %s", owner->camera_movement_blocked ? "yes" : "no");
++        ImGui::Separator();
++        ImGui::TextWrapped(
++            "Client selection uses the first active camera descriptor; server listener selection follows "
++            "the original camera list. Retail worlds suppress the client IsListener flag. Camera "
++            "controls are diagnostic; CinematicTrigger and KeyFramer remain pending.");
++        ImGui::EndTable();
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index ab72161..d909d60 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -1,6 +1,7 @@
+ #include "app/movement_controls.h"
+ #include "brush_smoke.h"
+ #include "build_info.h"
++#include "camera_smoke.h"
+ #include "engine/capture.h"
+ #include "engine/config.h"
+ #include "engine/runtime.h"
+@@ -99,6 +100,12 @@ namespace
+                     spdlog::error("Player entry: {}", error);
+                     return 6;
+                 }
++                if ((options.weapons_smoke || options.movement_smoke || options.interaction_smoke) &&
++                    !OpenBlood2::finish_camera_intro_for_smoke(game))
++                {
++                    spdlog::error("Authored intro camera did not release player control");
++                    return 4;
++                }
+                 selection.id = game.objects.get(game.client_shell.player)->id;
+             }
+         }
+@@ -158,6 +165,14 @@ namespace
+                 return 4;
+             selection.id = smoke_pickup;
+         }
++        OpenBlood2::ObjectId smoke_camera{};
++        bool camera_hidden = false;
++        if (options.cameras_smoke)
++        {
++            if (!OpenBlood2::prepare_camera_smoke(game, smoke_camera))
++                return 4;
++            selection.id = smoke_camera;
++        }
+         bool interaction_hidden = false;
+         const auto original_selection = selection.id;
+         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
+@@ -171,13 +186,14 @@ namespace
+             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
+         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
+                                    !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke &&
+-                                   !options.pickups_smoke && !options.objectives_smoke;
++                                   !options.pickups_smoke && !options.objectives_smoke && !options.cameras_smoke;
+         inspector.select_weapons = options.weapons_smoke;
+         inspector.select_movement = options.movement_smoke;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
+         inspector.select_pickups = options.pickups_smoke;
+         inspector.select_objectives = options.objectives_smoke;
++        inspector.select_cameras = options.cameras_smoke;
+         inspector.brush_selection = smoke_body;
+         inspector.select_doors = options.doors_smoke || options.interaction_smoke;
+         inspector.keyboard_movement = options.interaction_smoke;
+@@ -279,12 +295,19 @@ namespace
+             controls.enabled = inspector.keyboard_movement;
+             text_editing = inspector_visible && ImGui::GetIO().WantTextInput;
+ #endif
++            if (frames == reload_frame + 1 &&
++                (options.weapons_smoke || options.movement_smoke || options.interaction_smoke) &&
++                !OpenBlood2::finish_camera_intro_for_smoke(game))
++                return 4;
+             if (options.interaction_smoke && frames == reload_frame + 1)
+                 if (!OpenBlood2::prepare_interaction_smoke(game, smoke_door))
+                     return 4;
+             if (options.brushes_smoke && frames == reload_frame + 1)
+                 if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
+                     return 4;
++            if (options.cameras_smoke && frames == reload_frame + 1 &&
++                !OpenBlood2::prepare_camera_smoke(game, smoke_camera))
++                return 4;
+             if (options.objectives_smoke && frames == reload_frame + 1 && !OpenBlood2::objective_smoke(game))
+                 return 4;
+             if (options.pickups_smoke && frames == reload_frame + 1)
+@@ -407,7 +430,7 @@ namespace
+                 frames >= (extended_smoke ? 180u
+                            : (options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
+                               options.interaction_smoke || options.brushes_smoke || options.pickups_smoke ||
+-                              options.objectives_smoke)
++                              options.objectives_smoke || options.cameras_smoke)
+                                ? 14u
+                                : 2u) &&
+                 !captured && !options.capture_file.empty();
+@@ -554,6 +577,8 @@ namespace
+                     use.key.down = frames == hide_frame;
+                     event_ok = SDL_PushEvent(&use);
+                 }
++                if (options.cameras_smoke && frames == show_frame - 1)
++                    camera_hidden = OpenBlood2::check_camera_smoke(game, smoke_camera);
+                 if (options.objectives_smoke && frames == show_frame - 1)
+                     objective_hidden = OpenBlood2::objective_smoke(game);
+                 if (options.pickups_smoke && frames == show_frame - 1)
+@@ -679,6 +704,7 @@ namespace
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
++                (options.cameras_smoke && (!camera_hidden || !OpenBlood2::check_camera_smoke(game, smoke_camera))) ||
+                 (options.objectives_smoke && !objective_hidden) || (options.pickups_smoke && !pickup_hidden) ||
+                 (options.interaction_smoke && !interaction_hidden) || (options.brushes_smoke && !brush_hidden) ||
+                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
+@@ -701,6 +727,9 @@ namespace
+             if (options.world_smoke)
+                 spdlog::info("World smoke passed: unload/reload, original instance/string counts restored, "
+                              "collision/model resources restored, preview animation advanced while hidden");
++            if (options.cameras_smoke)
++                spdlog::info("CAMERAS smoke: original camera tracks player while UI hidden; selected view, movement "
++                             "gate and reload checked");
+             if (options.objectives_smoke)
+                 spdlog::info("OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
+                              "unload/reload checked");
+@@ -776,6 +805,8 @@ int main(int argc, char** argv)
+                      "  --brushes-smoke GPU original rotating brush inspection\n"
+                      "  --interaction-smoke GPU original USE and rotating door inspection\n"
+                      "  --pickups-smoke   GPU original ammo pickup, hidden collection and reload\n"
++                     "  --objectives-smoke GPU original objectives and localized text, hidden delivery/reload\n"
++                     "  --cameras-smoke     GPU original camera tracking, player gates and reload\n"
+                      "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
+                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
+                      "  --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload\n"
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index 86623de..c47afc0 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -125,6 +125,10 @@ namespace OpenBlood2
+                 options.player_smoke = true;
+                 options.containers_smoke = true;
+             }
++            else if (arg == "--cameras-smoke")
++            {
++                options.world_smoke = options.player_smoke = options.cameras_smoke = true;
++            }
+             else if (arg == "--objectives-smoke")
+             {
+                 options.world_smoke = options.player_smoke = options.objectives_smoke = true;
+@@ -209,7 +213,8 @@ namespace OpenBlood2
+         }
+         if (int(options.weapons_smoke) + int(options.movement_smoke) + int(options.containers_smoke) +
+                 int(options.doors_smoke) + int(options.triggers_smoke) + int(options.interaction_smoke) +
+-                int(options.brushes_smoke) + int(options.pickups_smoke) + int(options.objectives_smoke) >
++                int(options.brushes_smoke) + int(options.pickups_smoke) + int(options.objectives_smoke) +
++                int(options.cameras_smoke) >
+             1)
+         {
+             error = "Choose one player smoke scenario";
+diff --git a/src/engine/config.h b/src/engine/config.h
+index 097909e..87ba73f 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -22,7 +22,8 @@ namespace OpenBlood2
+         bool player_smoke = false;
+         bool weapons_smoke = false;
+         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
+-             interaction_smoke = false, brushes_smoke = false, pickups_smoke = false, objectives_smoke = false;
++             interaction_smoke = false, brushes_smoke = false, pickups_smoke = false, objectives_smoke = false,
++             cameras_smoke = false;
+         bool start_game = false;
+         bool explicit_config = false;
+         bool help = false;
+diff --git a/src/game/camera_messages.h b/src/game/camera_messages.h
+new file mode 100644
+index 0000000..82b04bf
+--- /dev/null
++++ b/src/game/camera_messages.h
+@@ -0,0 +1,18 @@
++#pragma once
++#include "basedefs_de.h"
++namespace OpenBlood2
++{
++    // Owned equivalent of the original persistent SFX_CAMERA_ID descriptor.
++    struct CameraSettings
++    {
++        DBYTE type = 0;
++        bool player_movement = false, hide_player = false, listener = true;
++    };
++    struct CameraView
++    {
++        HOBJECT object = nullptr;
++        CameraSettings settings;
++        DVector position{};
++        DRotation rotation{};
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index f8bb23a..9765bb6 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ #include "basedefs_de.h"
+ #include "game/brush_messages.h"
++#include "game/camera_messages.h"
+ #include "game/container_messages.h"
+ #include "game/key_messages.h"
+ #include "game/mover_messages.h"
+@@ -57,6 +58,11 @@ class ServerDE : public CSBase
+     // raw C++ pointer whose lifetime can outlive its object.
+     virtual HOBJECT GetClientUserData(HCLIENT) = 0;
+     virtual DRESULT SetClientUserData(HCLIENT, HOBJECT) = 0;
++    virtual bool PublishCameraEffect(HOBJECT, const OpenBlood2::CameraSettings&) = 0;
++    virtual void RemoveCameraEffect(HOBJECT) = 0;
++    virtual OpenBlood2::CameraView GetCameraView() = 0;
++    virtual DRESULT AlignRotation(DRotation&, DVector forward) = 0; // Selected world-Y-up caller.
++    virtual DDWORD GetObjectUserFlags(HOBJECT) = 0;
+     virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
+     virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;
+     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index 506febd..3a88a30 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -142,6 +142,10 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client)
+     m_bFirstWorld = true;
+     position = {};
+     camera_position = {};
++    view = {};
++    listener_position = {};
++    player_visible = false;
++    weapons_visible = true;
+     rotation = {};
+     physics = {};
+     stats = {};
+@@ -168,6 +172,10 @@ void CBloodClientShell::OnExitWorld()
+     m_bFirstUpdate = true;
+     position = {};
+     camera_position = {};
++    view = {};
++    listener_position = {};
++    player_visible = false;
++    weapons_visible = true;
+     rotation = {};
+     physics = {};
+     stats = {};
+@@ -245,15 +253,22 @@ bool CBloodClientShell::Update()
+         return false;
+     camera_position = position;
+     camera_position.y += owner->eye_level;
++    if (!UpdateCameraSelection())
++        return false;
+     m_bFirstUpdate = false;
+     return true;
+ }
+ bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds, std::string& error)
+ {
+     auto* owner = server.Player(client_);
+-    if (!owner || !owner->ApplyDoorPush() ||
+-        !move_mgr.Update(server, movement_input, rotation.yaw, seconds, !owner->m_damage.IsDead(),
+-                         weapon_input.primary || weapon_input.alternate, rotation.pitch))
++    if (!owner || !UpdateCameraSelection())
++        return false;
++    if (owner->camera_movement_blocked && !owner->m_damage.IsDead() &&
++        !server.OnMessage(client_, OpenBlood2::PlayerControls{{}, false, rotation.yaw}))
++        return false;
++    if (!owner->ApplyDoorPush() || !move_mgr.Update(server, movement_input, rotation.yaw, seconds,
++                                                    !owner->m_damage.IsDead() && !owner->camera_movement_blocked,
++                                                    weapon_input.primary || weapon_input.alternate, rotation.pitch))
+     {
+         error = "Original MoveMgr step failed (invalid association, movement message or collision)";
+         if (owner && !owner->locomotion_error.empty())
+@@ -305,8 +320,33 @@ bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server, double seconds,
+ {
+     const float cp = std::cos(rotation.pitch);
+     const DVector forward{std::sin(rotation.yaw) * cp, -std::sin(rotation.pitch), std::cos(rotation.yaw) * cp};
++    auto input = weapon_input;
++    if (const auto* owner = server.Player(client_); owner && owner->camera_movement_blocked)
++        input.primary = input.alternate = false;
+     for (auto& weapon : weapons)
+-        if (!weapon.Update(server_, server, client_, weapon_input, camera_position, forward, seconds, error))
++        if (!weapon.Update(server_, server, client_, input, camera_position, forward, seconds, error))
+             return false;
+     return true;
+ }
++
++bool CBloodClientShell::UpdateCameraSelection()
++{
++    auto* owner = dynamic_cast<CPlayerObj*>(server_.HandleToObject(player));
++    if (!owner || server_.GetClientUserData(client_) != player)
++        return false;
++    view = server_.GetCameraView();
++    owner->camera_movement_blocked = view.object && !view.settings.player_movement;
++    player_visible = view.object && !view.settings.hide_player;
++    weapons_visible = !view.object;
++    if (!view.object)
++    {
++        view.position = camera_position;
++        view.rotation.m_Vec = {}; // Build the same player pitch/yaw orientation.
++        const float cp = std::cos(rotation.pitch);
++        const DVector forward{std::sin(rotation.yaw) * cp, -std::sin(rotation.pitch), std::cos(rotation.yaw) * cp};
++        if (server_.AlignRotation(view.rotation, forward) != DE_OK)
++            return false;
++    }
++    listener_position = view.object && view.settings.listener ? view.position : position;
++    return true;
++}
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index 140407c..a26a02a 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -56,6 +56,10 @@ class CBloodClientShell
+     bool m_bInWorld = false, m_bFirstWorld = true, m_bFirstUpdate = true;
+     HOBJECT player = nullptr;
+     DVector position{}, camera_position{};
++    OpenBlood2::CameraView view;
++    DVector listener_position{};
++    bool player_visible = false, weapons_visible = true;
++    bool UpdateCameraSelection();
+     OpenBlood2::PlayerRotation rotation;
+     OpenBlood2::PlayerPhysics physics;
+     OpenBlood2::PlayerStats stats;
+diff --git a/src/game/original/CameraObj.cpp b/src/game/original/CameraObj.cpp
+new file mode 100644
+index 0000000..b408288
+--- /dev/null
++++ b/src/game/original/CameraObj.cpp
+@@ -0,0 +1,219 @@
++// Selected original CameraObj callbacks and rules; see CAMERA_CONTRACTS.md.
++#include "CameraObj.h"
++#include "trigger_helpers.h"
++#include <algorithm>
++#include <cmath>
++using namespace OpenBlood2;
++DLink CameraObj::m_CameraHead{};
++DDWORD CameraObj::m_dwNumCameras = 0;
++HOBJECT g_hActiveCamera = nullptr;
++CameraObj::CameraObj() : B2BaseClass(OT_NORMAL)
++{
++    if (!m_dwNumCameras)
++        dl_TieOff(&m_CameraHead);
++}
++CameraObj::~CameraObj()
++{
++    if (g_pServerDE)
++    {
++        SetActive(DFALSE);
++        g_pServerDE->RemoveCameraEffect(m_hObject);
++    }
++    if (m_Link.m_pData && m_dwNumCameras)
++    {
++        dl_Remove(&m_Link);
++        --m_dwNumCameras;
++    }
++}
++bool CameraObj::ReadProp()
++{
++    GenericProp p;
++    if (g_pServerDE->GetPropGeneric("AllowPlayerMovement", &p) == DE_OK)
++        m_bPlayerMovement = p.m_Bool;
++    if (g_pServerDE->GetPropGeneric("StartActive", &p) == DE_OK)
++        m_bStartActive = p.m_Bool;
++    if (g_pServerDE->GetPropGeneric("IsListener", &p) == DE_OK)
++        m_bIsListener = p.m_Bool;
++    if (g_pServerDE->GetPropGeneric("HidePlayer", &p) == DE_OK)
++        m_bHidePlayer = p.m_Bool;
++    if (g_pServerDE->GetPropGeneric("ActiveTime", &p) == DE_OK)
++        m_fActiveTime = p.m_Float;
++    if (g_pServerDE->GetPropGeneric("Type", &p) == DE_OK)
++    {
++        if (p.m_Long < 0 || p.m_Long > 2)
++            return false;
++        m_nType = static_cast<DBYTE>(p.m_Long);
++    }
++    return std::isfinite(m_fActiveTime) && std::abs(m_fActiveTime) <= 1e6f;
++}
++void CameraObj::InitialUpdate()
++{
++    SetActive(m_bStartActive);
++    published = {m_nType, m_bPlayerMovement, m_bHidePlayer, m_bIsListener};
++    // Preserve the source b2 1.0 level workaround, after path normalization.
++    if (const auto var = g_pServerDE->GetGameConVar("GAME_WORLDNAME"))
++        if (const auto* value = g_pServerDE->GetVarValueString(var))
++        {
++            std::string world = value;
++            for (char& c : world)
++            {
++                if (c == '/')
++                    c = '\\';
++                if (c >= 'A' && c <= 'Z')
++                    c = static_cast<char>(c + 'a' - 'A');
++            }
++            if (world.find("worlds\\") != std::string::npos)
++                published.listener = false;
++        }
++    if (!g_pServerDE->PublishCameraEffect(m_hObject, published))
++    {
++        g_pServerDE->RemoveObject(m_hObject);
++        return;
++    }
++    g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3));
++}
++DDWORD CameraObj::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE)
++    {
++        if (!data || !B2BaseClass::EngineMessageFn(message, data, reason) || reason == 3 ||
++            ((reason == 1 || reason == 2) && !ReadProp()))
++            return 0;
++        auto& state = *static_cast<ObjectCreateStruct*>(data);
++        state.m_Flags = FLAG_FORCECLIENTUPDATE | FLAG_FULLPOSITIONRES | FLAG_GOTHRUWORLD;
++        if (g_pServerDE->GetVarValueFloat(g_pServerDE->GetGameConVar("DebugCutScene")) == 1)
++        {
++            state.m_ObjectType = OT_MODEL;
++            state.m_Flags |= FLAG_VISIBLE;
++            SAFE_STRCPY(state.m_Filename, "Models\\CameraObject.abc");
++            SAFE_STRCPY(state.m_SkinName, "Skins\\CameraObject.dtx");
++        }
++        state.m_NextUpdate = .001f;
++        return 1;
++    }
++    if (message == MID_INITIALUPDATE)
++    {
++        InitialUpdate();
++        if (!m_Link.m_pData && g_pServerDE->IsObjectAlive(m_hObject))
++        {
++            dl_Insert(&m_CameraHead, &m_Link);
++            m_Link.m_pData = this;
++            ++m_dwNumCameras;
++        }
++    }
++    else if (message == MID_LINKBROKEN && m_hLinkObject == static_cast<HOBJECT>(data))
++        m_hLinkObject = nullptr;
++    else if (message == MID_UPDATE)
++        Update();
++    return B2BaseClass::EngineMessageFn(message, data, reason);
++}
++void CameraObj::Update()
++{
++    g_pServerDE->SetNextUpdate(m_hObject, .01f);
++    if (m_hLinkObject && g_pServerDE->IsObjectAlive(m_hLinkObject))
++    {
++        DVector target, from;
++        g_pServerDE->GetObjectPos(m_hLinkObject, &target);
++        g_pServerDE->GetObjectPos(m_hObject, &from);
++        DRotation rotation;
++        const DVector forward{target.x - from.x, target.y - from.y, target.z - from.z};
++        if (g_pServerDE->AlignRotation(rotation, forward) != DE_OK ||
++            g_pServerDE->SetObjectRotation(m_hObject, &rotation) != DE_OK)
++            tracking_error = "Cannot orient camera toward target (coincident or invalid positions)";
++        else
++        {
++            tracking_error.clear();
++            ++tracking_updates;
++        }
++    }
++    if (m_fActiveTime > 0 && g_pServerDE->GetTime() > m_fDeactivateTime)
++        SetActive(DFALSE);
++}
++void CameraObj::SetActive(DBOOL active)
++{
++    if (!g_pServerDE)
++        return;
++    m_bActive = active != 0;
++    const auto flags = g_pServerDE->GetObjectUserFlags(m_hObject);
++    g_pServerDE->SetObjectUserFlags(m_hObject, m_bActive ? flags | 1 : flags & ~1u);
++    g_pServerDE->SetNextUpdate(m_hObject, m_bActive ? .01f : 0);
++    if (m_bActive)
++    {
++        if (m_fActiveTime > 0)
++            m_fDeactivateTime = g_pServerDE->GetTime() + m_fActiveTime;
++    }
++    else
++        m_fDeactivateTime = 0;
++    if (m_bIsListener && m_bActive)
++        g_hActiveCamera = m_hObject;
++    else
++    {
++        g_hActiveCamera = nullptr;
++        for (auto* link = m_CameraHead.m_pNext; link != &m_CameraHead; link = link->m_pNext)
++        {
++            auto* camera = static_cast<CameraObj*>(link->m_pData);
++            if (camera->IsActive() && camera->IsListener() && g_pServerDE->IsObjectAlive(camera->m_hObject))
++            {
++                g_hActiveCamera = camera->m_hObject;
++                break;
++            }
++        }
++    }
++}
++bool CameraObj::Setup(DBYTE type)
++{
++    if (type > 2)
++        return false;
++    m_nType = type;
++    return true; // Source does not republish an already-created camera effect.
++}
++bool CameraObj::SetLinkObject(HOBJECT target)
++{
++    if (target)
++    {
++        if (!g_pServerDE->IsObjectAlive(target) || target == m_hObject ||
++            g_pServerDE->CreateInterObjectLink(m_hObject, target) != DE_OK)
++            return false;
++        // Source forgot to break an old, replaced target. Keep one checked link.
++        if (m_hLinkObject && m_hLinkObject != target)
++            g_pServerDE->BreakInterObjectLink(m_hObject, m_hLinkObject);
++        if (m_bActive)
++            g_pServerDE->SetNextUpdate(m_hObject, .01f);
++    }
++    else
++    {
++        if (m_hLinkObject)
++            g_pServerDE->BreakInterObjectLink(m_hObject, m_hLinkObject);
++        g_pServerDE->SetNextUpdate(m_hObject, 0); // Original unlink also stops the timeout update.
++    }
++    m_hLinkObject = target;
++    return true;
++}
++DDWORD CameraObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    if (message == 1000)
++    {
++        auto text = g_pServerDE->ReadFromMessageHString(read);
++        const auto* raw = g_pServerDE->GetStringData(text);
++        last_command = raw ? raw : "";
++        g_pServerDE->FreeString(text);
++        if (same_name(last_command, "ON"))
++            SetActive(DTRUE);
++        else if (same_name(last_command, "OFF"))
++            SetActive(DFALSE);
++        else if (last_command.size() >= 4 && same_name(last_command.substr(0, 4), "LINK"))
++        {
++            if (last_command.size() >= 6)
++            {
++                auto* list = g_pServerDE->FindNamedObjects(last_command.c_str() + 5);
++                if (list && list->m_pFirstLink)
++                    SetLinkObject(list->m_pFirstLink->m_hObject);
++                if (list)
++                    g_pServerDE->RelinquishList(list);
++            }
++            else
++                SetLinkObject(nullptr);
++        }
++    }
++    return B2BaseClass::ObjectMessageFn(sender, message, read);
++}
+diff --git a/src/game/original/CameraObj.h b/src/game/original/CameraObj.h
+new file mode 100644
+index 0000000..23c8983
+--- /dev/null
++++ b/src/game/original/CameraObj.h
+@@ -0,0 +1,50 @@
++#pragma once
++#include "B2BaseClass.h"
++#include "dlink.h"
++#include <string>
++class CameraObj : public B2BaseClass
++{
++  public:
++    CameraObj();
++    ~CameraObj() override;
++    bool Setup(DBYTE);
++    void SetActive(DBOOL);
++    bool SetLinkObject(HOBJECT);
++    HOBJECT GetLinkObject() const
++    {
++        return m_hLinkObject;
++    }
++    bool IsListener() const
++    {
++        return m_bIsListener;
++    }
++    bool IsActive() const
++    {
++        return m_bActive;
++    }
++    bool AllowPlayerMovement() const
++    {
++        return m_bPlayerMovement;
++    }
++    static DLink m_CameraHead;
++    static DDWORD m_dwNumCameras;
++    DLink m_Link{};
++    bool m_bActive = false, m_bStartActive = false, m_bIsListener = true;
++    float m_fActiveTime = -1, m_fDeactivateTime = 0;
++    bool m_bPlayerMovement = false, m_bHidePlayer = false;
++    DBYTE m_nType = 0;
++    HOBJECT m_hLinkObject = nullptr;
++    OpenBlood2::CameraSettings published;
++    std::string last_command, tracking_error;
++    std::uint64_t tracking_updates = 0;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++
++  private:
++    bool ReadProp();
++    void InitialUpdate();
++    void Update();
++};
++extern HOBJECT g_hActiveCamera;
+diff --git a/src/game/original/PlayerObj.cpp b/src/game/original/PlayerObj.cpp
+index 3ca11e3..532630d 100644
+--- a/src/game/original/PlayerObj.cpp
++++ b/src/game/original/PlayerObj.cpp
+@@ -401,6 +401,8 @@ FireResult CPlayerObj::HandleWeaponFireMessage(const OpenBlood2::WeaponFire& req
+     if (!m_hClient || !attributes_received || m_damage.IsDead() ||
+         GetServerDE()->GetClientUserData(m_hClient) != m_hObject)
+         return FireResult::Invalid;
++    if (movement_blocked || camera_movement_blocked)
++        return FireResult::Blocked;
+     const auto result = m_InventoryMgr.FireCurrentWeapon(request);
+     if (result == FireResult::Fired || result == FireResult::DeliveryFailed)
+         UpdateStats();
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index a0b9e66..3436239 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -67,7 +67,7 @@ class CPlayerObj : public CBaseCharacter
+     std::string locomotion_clip, locomotion_requested_clip, locomotion_error;
+     std::uint64_t animation_changes = 0, blocked_resizes = 0;
+     bool OnCommandUse();
+-    bool movement_blocked = false;
++    bool movement_blocked = false, camera_movement_blocked = false;
+     bool door_push_pending = false;
+     DVector door_push_velocity{};
+     std::uint64_t door_pushes = 0;
+diff --git a/src/game/original/PlayerUse.cpp b/src/game/original/PlayerUse.cpp
+index 3292108..6b88697 100644
+--- a/src/game/original/PlayerUse.cpp
++++ b/src/game/original/PlayerUse.cpp
+@@ -9,7 +9,7 @@ using namespace OpenBlood2;
+ // Dead multiplayer respawn / slow-death rescue are outside the accepted session.
+ bool CPlayerObj::OnCommandUse()
+ {
+-    if (!g_pServerDE->IsObjectAlive(m_hObject) || movement_blocked)
++    if (!g_pServerDE->IsObjectAlive(m_hObject) || movement_blocked || camera_movement_blocked)
+         return false;
+     ++use_commands;
+     use_hit = {};
+diff --git a/src/game/original/ViewWeapon.cpp b/src/game/original/ViewWeapon.cpp
+index 0f4a6fa..f0f9732 100644
+--- a/src/game/original/ViewWeapon.cpp
++++ b/src/game/original/ViewWeapon.cpp
+@@ -88,7 +88,7 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
+             sound_indexed = resources_->find(pending_sound) != nullptr;
+             return true;
+         }
+-        if (result == FireResult::Dry)
++        if (result == FireResult::Dry || result == FireResult::Blocked)
+             return true;
+         error = "Original weapon fire rejected or damage delivery failed";
+         return false;
+diff --git a/src/game/original/Weapon.h b/src/game/original/Weapon.h
+index bf372cf..759f0be 100644
+--- a/src/game/original/Weapon.h
++++ b/src/game/original/Weapon.h
+@@ -9,7 +9,8 @@ enum class FireResult
+     Dry,
+     Invalid,
+     Unavailable,
+-    DeliveryFailed
++    DeliveryFailed,
++    Blocked
+ };
+ struct WeaponShot
+ {
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index e7ed574..b89c008 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -1,5 +1,6 @@
+ #include "game/original/AmmoPickups.h"
+ #include "game/original/B2BaseClass.h"
++#include "game/original/CameraObj.h"
+ #include "game/original/CameraSpot.h"
+ #include "game/original/Door.h"
+ #include "game/original/GameStartPoint.h"
+@@ -65,6 +66,16 @@ namespace OpenBlood2
+                 {"TypeCoop", true},
+                 {"DifficultyInsane", true, false} // Read by original code, absent from its class registration.
+             }};
++        const ClassInfo camera_object{"CameraObj",
++                                      &b2base,
++                                      construct<CameraObj>,
++                                      {{"Type", std::int32_t(0)},
++                                       {"ActiveTime", -1.0f},
++                                       {"AllowPlayerMovement", false},
++                                       {"StartActive", false},
++                                       {"IsListener", true},
++                                       {"HidePlayer", false},
++                                       {"TypeActionMode", false}}};
+         const ClassInfo start{"StartPoint", &base, construct<StartPoint>, {}};
+         const ClassInfo game_start{"GameStartPoint",
+                                    &start,
+@@ -395,12 +406,13 @@ namespace OpenBlood2
+     bool register_original_classes(Objects& objects)
+     {
+         return objects.register_class(base) && objects.register_class(b2base) && objects.register_class(camera) &&
+-               objects.register_class(key) && objects.register_class(start) && objects.register_class(game_start) &&
+-               objects.register_class(path) && objects.register_class(world_properties) &&
+-               objects.register_class(smell) && objects.register_class(character) && objects.register_class(player) &&
+-               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
+-               objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
+-               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
++               objects.register_class(camera_object) && objects.register_class(key) && objects.register_class(start) &&
++               objects.register_class(game_start) && objects.register_class(path) &&
++               objects.register_class(world_properties) && objects.register_class(smell) &&
++               objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
++               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
++               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
++               objects.register_class(freefall) && objects.register_class(trigger) &&
+                objects.register_class(key_pickup) && objects.register_class(pickup) &&
+                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+                objects.register_class(health_base) && objects.register_class(armor_base) &&
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 6683fe8..7ed5b33 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -69,6 +69,8 @@ namespace OpenBlood2
+             explosion_effects.clear();
+             spawn_reports.clear();
+             pickup_reports.clear();
++            camera_effects.clear();
++            variables_.erase("GAME_WORLDNAME");
+             client_strings = {};
+             client_strings_error.clear();
+             client_strings_attempted = false;
+@@ -92,6 +94,12 @@ namespace OpenBlood2
+         StringResources client_strings;
+         std::string client_strings_error;
+         bool client_strings_attempted = false;
++        std::vector<CameraView> camera_effects;
++        bool PublishCameraEffect(HOBJECT, const CameraSettings&) override;
++        void RemoveCameraEffect(HOBJECT) override;
++        CameraView GetCameraView() override;
++        DRESULT AlignRotation(DRotation&, DVector) override;
++        DDWORD GetObjectUserFlags(HOBJECT) override;
+         DRESULT SendObjectives(const MissionObjectives&) override;
+         bool GetClientResourceString(std::uint32_t, std::string&) override;
+         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
+diff --git a/src/game/server_cameras.cpp b/src/game/server_cameras.cpp
+new file mode 100644
+index 0000000..a27f53e
+--- /dev/null
++++ b/src/game/server_cameras.cpp
+@@ -0,0 +1,51 @@
++#include "game/original/CameraObj.h"
++#include "game/server_adapter.h"
++#include <algorithm>
++#include <cmath>
++namespace OpenBlood2
++{
++    DDWORD ServerAdapter::GetObjectUserFlags(HOBJECT h)
++    {
++        trace_service("GetObjectUserFlags");
++        const auto* r = objects_.get(h);
++        return r ? r->user_flags : 0;
++    }
++    bool ServerAdapter::PublishCameraEffect(HOBJECT h, const CameraSettings& settings)
++    {
++        trace_service("PublishCameraEffect");
++        if (!IsObjectAlive(h) || !dynamic_cast<CameraObj*>(objects_.get(h)->game.get()) || settings.type > 2 ||
++            camera_effects.size() >= 4096 ||
++            std::any_of(camera_effects.begin(), camera_effects.end(), [h](const auto& c) { return c.object == h; }))
++            return objects_.fail(ObjectError::Unsupported,
++                                 "Invalid/duplicate camera descriptor or camera limit exceeded");
++        camera_effects.push_back({h, settings, {}, {}});
++        return true;
++    }
++    void ServerAdapter::RemoveCameraEffect(HOBJECT h)
++    {
++        trace_service("RemoveCameraEffect");
++        std::erase_if(camera_effects, [h](const auto& c) { return c.object == h; });
++    }
++    CameraView ServerAdapter::GetCameraView()
++    {
++        trace_service("GetCameraView");
++        // Original client chooses the first visible camera FX. Stable creation
++        // order replaces the legacy SFX slot array; no visibility culling.
++        for (const auto& effect : camera_effects)
++            if (const auto* r = objects_.get(effect.object); r && r->life == Life::Alive && (r->user_flags & 1))
++                return {effect.object, effect.settings, r->state.m_Pos, r->state.m_Rotation};
++        return {};
++    }
++    DRESULT ServerAdapter::AlignRotation(DRotation& rotation, DVector forward)
++    {
++        trace_service("AlignRotation (world Y up)");
++        if (!physics_vector(forward) || vector_dot(forward, forward) < 1e-12f)
++            return DE_INVALIDPARAMS;
++        // Source CameraObj always supplies world Y up. Vertical forward has a
++        // deterministic zero yaw. Coincident targets retain their old rotation.
++        const float horizontal = std::hypot(forward.x, forward.z);
++        rotation = rotation_from_euler(
++            {std::atan2(-forward.y, horizontal), horizontal > 1e-6f ? std::atan2(forward.x, forward.z) : 0, 0});
++        return DE_OK;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 9aa60f1..40d6a29 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -60,6 +60,7 @@ namespace OpenBlood2
+         server.trace_enabled = true;
+         world = std::move(next);
+         world_path = request.filename;
++        server.SetGameConVar("GAME_WORLDNAME", world_path.c_str());
+         server_shell.PreStartWorld();
+         if (resources.find("models/characters/caleb.abc"))
+             models.load("models/characters/caleb.abc", preview_model, preview_error);
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 923c9e5..177d602 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -126,7 +126,9 @@ foreach(case IN ITEMS walking jumping collisions world_collision support boundar
+ endforeach()
+ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME movement.private COMMAND movement_tests private "${BLOOD2_TEST_DATA_DIR}")
+-    set_tests_properties(movement.private PROPERTIES LABELS "headless;movement;private" TIMEOUT 30)
++    # Three reload cycles now also simulate the original 12-second intro at 60 Hz
++    # (2,160 additional ticks). Retain all movement assertions and a finite ASan budget.
++    set_tests_properties(movement.private PROPERTIES LABELS "headless;movement;private" TIMEOUT 60)
+     if(BLOOD2_GPU_TESTS)
+         add_test(NAME gpu.movement COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+             --data-dir "${BLOOD2_TEST_DATA_DIR}" --movement-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/movement.png")
+@@ -295,3 +297,21 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --objectives-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/objectives.png")
+     set_tests_properties(gpu.objectives PROPERTIES LABELS "private;gpu;objectives" TIMEOUT 30 RUN_SERIAL TRUE)
+ endif()
++
++add_executable(camera_tests camera_tests.cpp)
++target_link_libraries(camera_tests PRIVATE blood2_game)
++blood2_project_options(camera_tests)
++foreach(case IN ITEMS defaults timing links selection player validation)
++    add_test(NAME cameras.${case} COMMAND camera_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/camera-fixtures/${case}")
++    set_tests_properties(cameras.${case} PROPERTIES LABELS "headless;cameras" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME cameras.catalog COMMAND camera_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(cameras.catalog PROPERTIES LABELS "headless;private;cameras" TIMEOUT 60)
++endif()
++
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.cameras COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --cameras-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/cameras.png")
++    set_tests_properties(gpu.cameras PROPERTIES LABELS "private;gpu;cameras" TIMEOUT 30 RUN_SERIAL TRUE)
++endif()
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index 098f55e..e4d7094 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -393,9 +393,9 @@ namespace
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+             ++entries[e.state];
+-        CHECK(entries[EntryState::Created] == 142 && entries[EntryState::EditorOnly] == 372 &&
+-              entries[EntryState::Unsupported] == 66 && entries[EntryState::Failed] == 0 &&
+-              g.objects.snapshot().size() == 149);
++        CHECK(entries[EntryState::Created] == 144 && entries[EntryState::EditorOnly] == 372 &&
++              entries[EntryState::Unsupported] == 64 && entries[EntryState::Failed] == 0 &&
++              g.objects.snapshot().size() == 151);
+         std::cout << "Subway instances=" << g.objects.snapshot().size() << "\n";
+         for (auto [state, n] : entries)
+             std::cout << "state=" << int(state) << " count=" << n << '\n';
+diff --git a/tests/camera_fixture.h b/tests/camera_fixture.h
+new file mode 100644
+index 0000000..fba9650
+--- /dev/null
++++ b/tests/camera_fixture.h
+@@ -0,0 +1,29 @@
++#pragma once
++#include "game/server_adapter.h"
++#include <iostream>
++namespace test_camera
++{
++    inline bool complete_subway_intro(OpenBlood2::GameSession& game)
++    {
++        // Actual start-point/trigger entry now reaches camera1. Do not force OFF
++        // or remove its permission gate to make pre-camera gameplay tests pass.
++        const float began = game.server.GetTime();
++        const auto* camera = game.objects.get(game.client_shell.view.object);
++        if (!camera || std::string_view(camera->state.m_Name) != "camera1" ||
++            game.client_shell.view.settings.player_movement)
++            return false;
++        bool second_seen = false;
++        for (int i = 0; i < 1800 && game.client_shell.view.object; ++i)
++        {
++            const auto* selected = game.objects.get(game.client_shell.view.object);
++            second_seen |= selected && std::string_view(selected->state.m_Name) == "camera2";
++            if (!game.step(1.0 / 60))
++                return false;
++        }
++        const float elapsed = game.server.GetTime() - began;
++        const auto* player = game.server_shell.Player(game.local_client);
++        std::cout << "Original SubwayA camera intro expired after " << elapsed << " simulation seconds\n";
++        return second_seen && elapsed >= 12 && elapsed < 12.1f && !game.client_shell.view.object && player &&
++               !player->camera_movement_blocked;
++    }
++} // namespace test_camera
+diff --git a/tests/camera_tests.cpp b/tests/camera_tests.cpp
+new file mode 100644
+index 0000000..0d895db
+--- /dev/null
++++ b/tests/camera_tests.cpp
+@@ -0,0 +1,315 @@
++#include "camera_fixture.h"
++#include "game/game_settings.h"
++#include "game/original/CameraObj.h"
++#include "player_fixture.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool close(DVector a, DVector b, float e = .001f)
++    {
++        auto d = vector_subtract(a, b);
++        return vector_dot(d, d) < e * e;
++    }
++    CameraObj* camera(GameSession& g, HOBJECT h)
++    {
++        return dynamic_cast<CameraObj*>(g.server.HandleToObject(h));
++    }
++    HOBJECT create(GameSession& g, Properties props = {})
++    {
++        return g.objects.create(g.objects.find_class("CameraObj"), {}, Creation::World, props);
++    }
++    bool command(GameSession& g, HOBJECT h, const char* value)
++    {
++        auto text = g.server.CreateString(value);
++        auto m = g.server.StartMessageToObject(nullptr, h, 1000);
++        if (!m)
++        {
++            g.server.FreeString(text);
++            return false;
++        }
++        auto written = g.server.WriteToMessageHString(m, text);
++        auto sent = g.server.EndMessage(m);
++        g.server.FreeString(text);
++        return written == DE_OK && sent == DE_OK;
++    }
++    bool defaults(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto h = create(g);
++        CHECK(h);
++        auto* c = camera(g, h);
++        auto* r = g.objects.get(h);
++        CHECK(c && !c->IsActive() && c->IsListener() && !c->AllowPlayerMovement() && !c->m_bHidePlayer &&
++              c->m_nType == 0);
++        CHECK(c->m_fActiveTime == -1 && !r->scheduled && !r->dimensions.x && r->user_flags == 8);
++        CHECK(r->state.m_Flags ==
++              (FLAG_FORCECLIENTUPDATE | FLAG_FULLPOSITIONRES | FLAG_GOTHRUWORLD | FLAG_DONTFOLLOWSTANDING));
++        CHECK(CameraObj::m_dwNumCameras == 1 && g.server.camera_effects.size() == 1 &&
++              !g.server.GetCameraView().object);
++        CHECK(!create(g, {{"Type", std::int32_t(-1)}}) && !create(g, {{"Type", std::int32_t(3)}}));
++        CHECK(!create(g, {{"ActiveTime", std::numeric_limits<float>::infinity()}}));
++        CHECK(!g.objects.create(g.objects.find_class("CameraObj"), {}, Creation::Restore));
++        CHECK(!c->Setup(3) && c->Setup(1) && c->published.type == 0 && c->m_nType == 1);
++        CHECK(g.objects.clear() && CameraObj::m_dwNumCameras == 0 && g.server.camera_effects.empty() &&
++              !g_hActiveCamera);
++        g.server.set_game_settings(1, GAMETYPE_ACTION);
++        auto filtered = create(g);
++        CHECK(filtered && g.objects.get(filtered)->life == Life::Pending);
++        CHECK(g.objects.finish_frame() && !g.objects.get(filtered) && CameraObj::m_dwNumCameras == 0 &&
++              g.server.camera_effects.empty() && !g_hActiveCamera);
++        return true;
++    }
++    bool timing(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto h = create(g, {{"StartActive", true}, {"ActiveTime", .25f}});
++        CHECK(h);
++        auto* c = camera(g, h);
++        CHECK(c->IsActive() && g_hActiveCamera == h && g.server.GetCameraView().object == h);
++        CHECK(g.step(.25) && c->IsActive()); // Source uses strict >, not >=.
++        CHECK(g.step(.02) && !c->IsActive() && !g_hActiveCamera && !g.server.GetCameraView().object);
++        CHECK(command(g, h, "oN") && c->IsActive());
++        auto end = c->m_fDeactivateTime;
++        CHECK(g.step(.1) && command(g, h, "ON") && c->m_fDeactivateTime > end);
++        CHECK(command(g, h, "LINK") && c->IsActive() && !g.objects.get(h)->scheduled);
++        CHECK(g.step(2) && c->IsActive()); // Original unlink stops even an active timer.
++        CHECK(command(g, h, "ON") && g.step(.3) && !c->IsActive());
++        CHECK(command(g, h, "OFF") && c->m_fDeactivateTime == 0);
++        for (float time : {0.0f, -1.0f, -2.0f})
++        {
++            auto other = create(g, {{"StartActive", true}, {"ActiveTime", time}});
++            CHECK(g.step(2) && camera(g, other)->IsActive());
++        }
++        return true;
++    }
++    bool links(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto h = create(g, {{"Name", std::string("camera")}, {"StartActive", true}});
++        auto* c = camera(g, h);
++        auto target = g.objects.create(g.objects.find_class("BaseClass"), {}, Creation::World,
++                                       {{"Name", std::string("Target")}, {"Pos", DVector{100, 0, 0}}});
++        CHECK(command(g, h, "LINK Target") && c->GetLinkObject() == target && g.objects.link_count(h) == 1);
++        CHECK(g.step(.02) && close(rotate_vector({0, 0, 1}, g.objects.get(h)->state.m_Rotation), {1, 0, 0}));
++        DVector pos{0, 100, 0};
++        CHECK(g.server.TeleportObject(target, &pos) == DE_OK && g.step(.02));
++        CHECK(close(rotate_vector({0, 0, 1}, g.objects.get(h)->state.m_Rotation), {0, 1, 0}));
++        pos = {};
++        CHECK(g.server.TeleportObject(target, &pos) == DE_OK && g.step(.02));
++        CHECK(!c->tracking_error.empty() &&
++              close(rotate_vector({0, 0, 1}, g.objects.get(h)->state.m_Rotation), {0, 1, 0}));
++        CHECK(command(g, h, "LINK target") &&
++              c->GetLinkObject() == target); // Exact case-sensitive name lookup, miss keeps link.
++        auto second = g.objects.create(g.objects.find_class("BaseClass"), {}, Creation::World,
++                                       {{"Name", std::string("Second")}, {"Pos", DVector{0, 0, -20}}});
++        CHECK(command(g, h, "LINK Second") && c->GetLinkObject() == second && g.objects.link_count(h) == 1);
++        CHECK(!c->SetLinkObject(h) && c->GetLinkObject() == second);
++        CHECK(g.objects.remove(target) && g.objects.finish_frame() && c->GetLinkObject() == second);
++        CHECK(g.objects.remove(second) && g.objects.finish_frame() && !c->GetLinkObject());
++        CHECK(g.step(.02) && c->IsActive() && g.objects.get(h)->scheduled);
++        CHECK(g.unload_world() && g.server.list_count() == 0 && g.server.string_count() == 0 && !g_hActiveCamera);
++        return true;
++    }
++    bool selection(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto a = create(g, {{"StartActive", true}}), b = create(g, {{"StartActive", true}});
++        CHECK(g_hActiveCamera == b && g.server.GetCameraView().object == a); // Server newest vs client first FX.
++        auto nonlistener = create(g, {{"StartActive", true}, {"IsListener", false}});
++        CHECK(g_hActiveCamera == b && g.server.GetCameraView().object == a);
++        CHECK(g.objects.remove(a) && g.server.GetCameraView().object == b);
++        CHECK(g.objects.remove(b) && g.server.GetCameraView().object == nonlistener);
++        CHECK(g.objects.finish_frame() && !g_hActiveCamera && CameraObj::m_dwNumCameras == 1);
++        CHECK(g.objects.clear() && CameraObj::m_dwNumCameras == 0);
++        g.server.SetGameConVar("GAME_WORLDNAME", "WORLDS/01_SubwayA.dat");
++        auto old = create(g, {{"StartActive", true}});
++        CHECK(camera(g, old)->IsListener() && !camera(g, old)->published.listener);
++        CHECK(g_hActiveCamera == old && !g.server.GetCameraView().settings.listener);
++        CHECK(g.unload_world() && !g.server.GetGameConVar("GAME_WORLDNAME"));
++        auto fresh = create(g, {{"StartActive", true}});
++        CHECK(camera(g, fresh)->published.listener);
++        return true;
++    }
++    bool player(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        for (int i = 0; i < 100; ++i)
++            CHECK(g.step(.016));
++        auto* p = g.server_shell.Player(g.local_client);
++        CHECK(p);
++        // An attack started before camera activation still emits its FIRE_KEY.
++        // The server must acknowledge the movement gate without consuming ammo.
++        g.client_shell.weapon_input.primary = true;
++        for (int i = 0; i < 100 && g.client_shell.weapons[0].state != WS_FIRING; ++i)
++            CHECK(g.step(.01));
++        CHECK(g.client_shell.weapons[0].state == WS_FIRING);
++        const auto markers = g.client_shell.weapons[0].fire_keys;
++        auto h = create(
++            g,
++            {{"StartActive", true}, {"Pos", DVector{300, 150, 300}}, {"Type", std::int32_t(1)}, {"HidePlayer", true}});
++        auto* c = camera(g, h);
++        CHECK(c && c->SetLinkObject(p->m_hObject));
++        auto from = g.client_shell.position;
++        g.client_shell.movement_input.forward = true;
++        g.client_shell.movement_input.jump = true;
++        g.client_shell.weapon_input.primary = true;
++        g.client_shell.use_down = true;
++        const auto uses = p->use_commands;
++        const auto ammo = p->m_InventoryMgr.GetAmmoCount(1);
++        for (int i = 0; i < 30; ++i)
++            CHECK(g.step(.016));
++        CHECK(close(from, g.client_shell.position) && p->camera_movement_blocked && p->use_commands == uses);
++        CHECK(g.client_shell.weapons[0].fire_keys > markers &&
++              g.client_shell.weapons[0].last_result == FireResult::Blocked);
++        CHECK(p->m_InventoryMgr.GetAmmoCount(1) == ammo && !g.client_shell.weapons_visible &&
++              !g.client_shell.player_visible);
++        CHECK(close(g.client_shell.view.position, {300, 150, 300}) &&
++              close(g.client_shell.listener_position, {300, 150, 300}));
++        CHECK(g.client_shell.view.object == h && g.client_shell.view.settings.type == 1 && c->tracking_updates > 0);
++        WeaponFire shot;
++        CHECK(p->HandleWeaponFireMessage(shot) == FireResult::Blocked);
++        CHECK(command(g, h, "OFF") && g.step(.016) && !p->camera_movement_blocked && !g.client_shell.view.object);
++        for (int i = 0; i < 20; ++i)
++            CHECK(g.step(.016));
++        CHECK(!close(from, g.client_shell.position, 1) && g.client_shell.weapons_visible);
++        auto movable = create(g, {{"StartActive", true}, {"AllowPlayerMovement", true}, {"IsListener", false}});
++        from = g.client_shell.position;
++        for (int i = 0; i < 20; ++i)
++            CHECK(g.step(.016));
++        CHECK(g.client_shell.view.object == movable && !p->camera_movement_blocked &&
++              !close(from, g.client_shell.position, 1));
++        CHECK(close(g.client_shell.listener_position, g.client_shell.position) && g.client_shell.player_visible);
++        CHECK(g.objects.remove(movable) && g.step(.016) && !g.client_shell.view.object);
++        CHECK(g.leave_player() && !g.client_shell.view.object && g.client_shell.weapons_visible);
++        CHECK(g.enter_player(error) && !g.client_shell.view.object);
++        CHECK(g.unload_world() && !g_hActiveCamera && CameraObj::m_dwNumCameras == 0 &&
++              g.server.camera_effects.empty());
++        return true;
++    }
++    bool validation(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        DRotation r;
++        CHECK(g.server.AlignRotation(r, {0, 0, 0}) == DE_INVALIDPARAMS);
++        CHECK(g.server.AlignRotation(r, {0, std::numeric_limits<float>::quiet_NaN(), 0}) == DE_INVALIDPARAMS);
++        for (DVector forward : {DVector{0, 0, 1}, DVector{-1, 0, 0}, DVector{0, -1, 0}, DVector{1, 2, 3}})
++        {
++            CHECK(g.server.AlignRotation(r, forward) == DE_OK);
++            CHECK(
++                close(rotate_vector({0, 0, 1}, r), vector_scale(forward, 1 / std::sqrt(vector_dot(forward, forward)))));
++        }
++        auto h = create(g);
++        CHECK(!g.server.PublishCameraEffect(h, {}));
++        CHECK(!g.server.PublishCameraEffect(nullptr, {}));
++        auto unrelated = g.objects.create(g.objects.find_class("BaseClass"));
++        CHECK(unrelated && !g.server.PublishCameraEffect(unrelated, {}));
++        CHECK(g.objects.remove(h) && !g.server.PublishCameraEffect(h, {}));
++        CHECK(g.objects.finish_frame() && g.server.camera_effects.empty());
++        // Unbound/failed-binding session destructors cannot touch another session's console state.
++        g.server.SetGameConVar("GAME_WORLDNAME", "keep");
++        {
++            GameSession unbound;
++        }
++        CHECK(std::string(g.server.GetVarValueString(g.server.GetGameConVar("GAME_WORLDNAME"))) == "keep");
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        unsigned worlds = 0, entries = 0, created = 0, rejected = 0;
++        std::map<std::string, unsigned> failures;
++        for (const auto& [path, resource] : g.resources.index())
++        {
++            (void)resource;
++            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
++                continue;
++            std::vector<std::uint8_t> bytes;
++            CHECK(g.resources.read(path, bytes, error));
++            World w;
++            if (!read_world(bytes, w, error))
++            {
++                CHECK(path == "worlds/16_bridge.dat");
++                continue;
++            }
++            ++worlds;
++            g.server.SetGameConVar("GAME_WORLDNAME", path.c_str());
++            for (const auto& source : w.objects)
++            {
++                if (source.class_name != "CameraObj")
++                    continue;
++                ++entries;
++                Properties props;
++                for (const auto& prop : source.properties)
++                    props.emplace(prop.name, prop.value);
++                auto h = create(g, props);
++                if (!h)
++                {
++                    ++rejected;
++                    ++failures[g.objects.diagnostics().back()];
++                }
++                else
++                {
++                    ++created;
++                    auto* c = camera(g, h);
++                    CHECK(!c->published.listener);
++                    CHECK(command(g, h, "ON") && g.step(.02));
++                    CHECK(g.server.GetCameraView().object == h);
++                    CHECK(command(g, h, "OFF") && !g.server.GetCameraView().object);
++                }
++                CHECK(g.objects.clear() && CameraObj::m_dwNumCameras == 0 && g.server.camera_effects.empty() &&
++                      !g_hActiveCamera);
++            }
++        }
++        for (const auto& [reason, count] : failures)
++            std::cout << count << " rejected: " << reason << '\n';
++        std::cout << "worlds=" << worlds << " CameraObj=" << entries << " created=" << created
++                  << " rejected=" << rejected << '\n';
++        CHECK(worlds == 57 && entries == 61 && created == 61 && rejected == 0);
++        CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++        CHECK(CameraObj::m_dwNumCameras == 2 && g.server.camera_effects.size() == 2 &&
++              g.objects.snapshot().size() == 154);
++        CHECK(test_camera::complete_subway_intro(g));
++        for (auto id : g.objects.snapshot())
++            if (auto* r = g.objects.get(id); r && dynamic_cast<CameraObj*>(r->game.get()))
++            {
++                CHECK(command(g, r->handle, "ON") && g.step(.02) && g.client_shell.view.object);
++                break;
++            }
++        CHECK(g.unload_world() && !g_hActiveCamera && CameraObj::m_dwNumCameras == 0);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests = {
++        {"defaults", defaults}, {"timing", timing},         {"links", links},    {"selection", selection},
++        {"player", player},     {"validation", validation}, {"catalog", catalog}};
++    auto it = tests.find(argv[1]);
++    return it != tests.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/locomotion_tests.cpp b/tests/locomotion_tests.cpp
+index 4dce8db..656d2f2 100644
+--- a/tests/locomotion_tests.cpp
++++ b/tests/locomotion_tests.cpp
+@@ -1,4 +1,5 @@
+ #include "app/movement_controls.h"
++#include "camera_fixture.h"
+ #include "player_fixture.h"
+ #include <cmath>
+ #include <functional>
+@@ -321,6 +322,7 @@ namespace
+         std::string error;
+         CHECK(game.resources.mount_game(config, error));
+         CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error));
++        CHECK(test_camera::complete_subway_intro(game));
+         auto& c = game.client_shell;
+         auto* r = game.objects.get(c.player);
+         for (const auto& clip : r->model->animations)
+diff --git a/tests/movement_tests.cpp b/tests/movement_tests.cpp
+index 0b210c1..16488f1 100644
+--- a/tests/movement_tests.cpp
++++ b/tests/movement_tests.cpp
+@@ -1,4 +1,5 @@
+ #include "app/movement_controls.h"
++#include "camera_fixture.h"
+ #include "player_fixture.h"
+ #include <cmath>
+ #include <functional>
+@@ -367,6 +368,7 @@ namespace
+         for (int cycle = 0; cycle < 3; ++cycle)
+         {
+             CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error));
++            CHECK(test_camera::complete_subway_intro(game));
+             auto& client = game.client_shell;
+             CHECK(steps(game, 20));
+             const auto initial = client.position;
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index 734b66e..ca2a6a3 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -204,14 +204,14 @@ namespace
+             CHECK(player);
+             CHECK(game.objects.get(player->m_hObject)->model->animations.size() == 86);
+             CHECK(game.objects.snapshot().size() ==
+-                  152); // 142 source instances + 7 door children + player + muzzle light + scent.
++                  154); // 144 source instances + 7 door children + player + muzzle light + scent.
+             CHECK(game.client_shell.position.x == -32 && game.client_shell.position.z == -3224);
+             CHECK(std::abs(game.client_shell.position.y - 170) < .01f);
+             for (int frame = 0; frame < 120; ++frame)
+                 CHECK(game.step(1.0 / 60.0));
+             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
+             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
+-            CHECK(!game.run_world(error) && error.find("66 uninstantiated") != std::string::npos);
++            CHECK(!game.run_world(error) && error.find("64 uninstantiated") != std::string::npos);
+             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
+                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
+                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()
+diff --git a/tests/weapon_tests.cpp b/tests/weapon_tests.cpp
+index 017619a..83ba863 100644
+--- a/tests/weapon_tests.cpp
++++ b/tests/weapon_tests.cpp
+@@ -1,3 +1,4 @@
++#include "camera_fixture.h"
+ #include "game/server_adapter.h"
+ #include "player_fixture.h"
+ #include <cmath>
+@@ -308,6 +309,7 @@ namespace
+         for (int cycle = 0; cycle < 3; ++cycle)
+         {
+             CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error));
++            CHECK(test_camera::complete_subway_intro(game));
+             auto& client = game.client_shell;
+             auto& inv = game.server_shell.Player(game.local_client)->m_InventoryMgr;
+             for (int slot : {1, 0})
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index a63a36f..98eceb2 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -1,6 +1,6 @@
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 149 original instances, 116 BSP models")
++if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 151 original instances, 116 BSP models")
+     message(FATAL_ERROR "World inspection: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-player
+@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 66" OR NOT out MATCHES "remaining mover classes")
++if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 64" OR NOT out MATCHES "remaining mover classes")
+     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 9b04a7e..5ce70e6 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -538,7 +538,7 @@ namespace
+         CHECK(game.world.version == 56);
+         CHECK(game.world.objects.size() == 580);
+         CHECK(game.world.models.size() == 116);
+-        CHECK(game.objects.snapshot().size() == 149);
++        CHECK(game.objects.snapshot().size() == 151);
+         CHECK(game.world.models[0].points.size() == 4996);
+         CHECK(game.world.models[0].polygons.size() == 3367);
+         CHECK(game.resources.find(game.world_path)->overrides == 1);

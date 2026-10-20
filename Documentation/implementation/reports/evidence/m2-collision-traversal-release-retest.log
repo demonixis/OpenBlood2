@@ -1,0 +1,51 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/release/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 54
+    Start  54: services.collision_queries
+
+54: Test command: <workspace>/Blood2/build/release/tests/services_tests "collision_queries"
+54: Working Directory: <workspace>/Blood2/build/release/tests
+54: Test timeout computed to be: 30
+1/3 Test  #54: services.collision_queries .......   Passed    0.00 sec
+test 55
+    Start  55: services.collision_traversal
+
+55: Test command: <workspace>/Blood2/build/release/tests/services_tests "collision_traversal"
+55: Working Directory: <workspace>/Blood2/build/release/tests
+55: Test timeout computed to be: 30
+2/3 Test  #55: services.collision_traversal .....   Passed    0.00 sec
+test 241
+    Start 241: worldpaths.subway
+
+241: Test command: <workspace>/Blood2/build/release/tests/worldpath_tests "subway" "<external-data-root>"
+241: Working Directory: <workspace>/Blood2/build/release/tests
+241: Test timeout computed to be: 90
+241: blocked_time=3 primary_polygon=1209 fraction=0.560681 normal=0,0,1
+241: blocked_time=3.01666 primary_polygon=1209 fraction=0.896829 normal=0,0,1
+241: cycle=0 moves=297 blocks=2 final=-32,168,3371.74 consumed_keys=9 runtime=233
+241: blocked_time=3 primary_polygon=1209 fraction=0.560681 normal=0,0,1
+241: blocked_time=3.01666 primary_polygon=1209 fraction=0.896829 normal=0,0,1
+241: cycle=1 moves=297 blocks=2 final=-32,168,3371.74 consumed_keys=9 runtime=233
+3/3 Test #241: worldpaths.subway ................   Passed    0.36 sec
+
+The following tests passed:
+	services.collision_queries
+	services.collision_traversal
+	worldpaths.subway
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+headless      =   0.37 sec*proc (3 tests)
+private       =   0.36 sec*proc (1 test)
+services      =   0.01 sec*proc (2 tests)
+worldpaths    =   0.36 sec*proc (1 test)
+
+Total Test time (real) =   0.38 sec

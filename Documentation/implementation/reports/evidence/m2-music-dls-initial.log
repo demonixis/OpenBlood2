@@ -1,0 +1,35 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 983: music_assets.reader
+1/7 Test #983: music_assets.reader ..............   Passed    0.01 sec
+    Start 984: music_assets.plan
+2/7 Test #984: music_assets.plan ................   Passed    0.00 sec
+    Start 985: music_assets.catalog
+3/7 Test #985: music_assets.catalog .............   Passed    0.01 sec
+    Start 986: music_assets.private
+4/7 Test #986: music_assets.private .............***Failed    1.32 sec
+Private music containers: 156 sections / 39 styles / 5 banks / 21513 chunks / 11986804 bytes
+01_SubwayA music directory music/cabal requests=52 files=45 bytes=2004402 error=
+279: catalog.assets.front().bank && catalog.assets.front().bank_error.empty() | 
+
+    Start 987: dls_bank.decode
+5/7 Test #987: dls_bank.decode ..................   Passed    0.00 sec
+    Start 988: dls_bank.malformed
+6/7 Test #988: dls_bank.malformed ...............   Passed    0.00 sec
+    Start 989: dls_bank.private
+7/7 Test #989: dls_bank.private .................***Failed    0.15 sec
+224: read_dls_bank(bytes, bank, error) | DLS: Unsupported/invalid mono PCM format
+
+
+71% tests passed, 2 tests failed out of 7
+
+Label Time Summary:
+headless        =   1.51 sec*proc (7 tests)
+music_assets    =   1.51 sec*proc (7 tests)
+private         =   1.47 sec*proc (2 tests)
+
+Total Test time (real) =   1.52 sec
+
+The following tests FAILED:
+	986 - music_assets.private (Failed)                     headless music_assets private
+	989 - dls_bank.private (Failed)                         headless music_assets private
+Errors while running CTest

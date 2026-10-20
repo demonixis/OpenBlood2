@@ -1,0 +1,307 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "cc329c6a5a9c8eded9894b43f3c6f59ab0e2b558",
+  "m2_complete": false,
+  "validation": {
+    "debug": {
+      "passed": 47,
+      "failed": 0,
+      "private": 6,
+      "seconds": 35.86
+    },
+    "release": {
+      "passed": 47,
+      "failed": 0,
+      "private": 6,
+      "seconds": 3.97
+    },
+    "sanitize": {
+      "passed": 47,
+      "failed": 0,
+      "private": 6,
+      "seconds": 150.87
+    },
+    "debug-gpu": {
+      "scenarios_passed": 5,
+      "private": 4,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "debug_pickup_retested_after_enabling_audio_output": true
+    },
+    "release-gpu": {
+      "scenarios_passed": 5,
+      "private": 4,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "debug_pickup_retested_after_enabling_audio_output": false
+    }
+  },
+  "artifacts": [
+    {
+      "file": "m2-pickup-audio-debug-build.log",
+      "sha256": "e604cf399f67c43a6bf77a56c3cec68a55f516d190b7cda2b7c0ce5e713d54d7",
+      "raw_capture_sha256": "f36ce390e3e3b899a5d1a29e2c4ab18c2b896ec5a32534b84b4d78f2ab598fca",
+      "bytes": 51675
+    },
+    {
+      "file": "m2-pickup-audio-debug-final-build.log",
+      "sha256": "f1a9cf7e7c56716c6282d9fcf98a431a5c86e0b77716cfe451b506f895720ca1",
+      "raw_capture_sha256": "1fd6e96abe0c7345264879c0bddf5617a1b96366187fcc80eddf3d831f0fa16c",
+      "bytes": 288
+    },
+    {
+      "file": "m2-pickup-audio-debug-final-gpu.log",
+      "sha256": "122f5da3ea57f017f2563d21faae58c97aa95668b1d439ba024874ccddb57d10",
+      "raw_capture_sha256": "c3e072b01e00ae58efda69dc44860c94a04624e0471707b4852ecee9c338b84e",
+      "bytes": 2721
+    },
+    {
+      "file": "m2-pickup-audio-debug-gpu.log",
+      "sha256": "33ffa0edacdf3c8b1556d3980c5b2fd0373b7ef6dad3e79ee2bfa06e332c1c37",
+      "raw_capture_sha256": "cbb6ad7dca439878ee423ee15e9064f70a704a1fe445e4c9b891d2cca5cdf895",
+      "bytes": 10831
+    },
+    {
+      "file": "m2-pickup-audio-debug-new.log",
+      "sha256": "54183911d961a25f6f5d8b02a3a2f52c2d55495ca058445656ccd4a9ad25aba3",
+      "raw_capture_sha256": "74dba8199c3c2d6890c26ab0701fa19f0f4f5e2485d1ec6f7a9c47d5aeba1e19",
+      "bytes": 2800
+    },
+    {
+      "file": "m2-pickup-audio-debug-tests.log",
+      "sha256": "a69d0292f45899a46668cbe4b3acf47f4603ac166c2aeb00ff207f60c46e6b89",
+      "raw_capture_sha256": "e92c67990f8db78d8a4392504a247e9f5f97ec6dfd84f39e98854af3eb4539fb",
+      "bytes": 27856
+    },
+    {
+      "file": "m2-pickup-audio-release-build.log",
+      "sha256": "ba4d66e1167c7c0521a2d19b7295a1e348e4528d6234dfcb7acb6ac2fd4c4abf",
+      "raw_capture_sha256": "20d42eabfea7f3312122ba485d274951369f8e70236e102f2077e2341a5d6195",
+      "bytes": 46403
+    },
+    {
+      "file": "m2-pickup-audio-release-final-build.log",
+      "sha256": "c56e22b92814d921c0cd7e3146363e7f86d7c6b8765b916004d7488888f44094",
+      "raw_capture_sha256": "55a3899967ed9e3e2d02d480c367ea0fed8e88e7ba71386c95c573349f0b88ea",
+      "bytes": 612
+    },
+    {
+      "file": "m2-pickup-audio-release-gpu.log",
+      "sha256": "73e04d28b0aa7afb7583bd7196419423d26d17766bc565b2205d868411ba6671",
+      "raw_capture_sha256": "08248bb5d5baf6e79fbdee0fd7bd3eaf2a186234241412e584b8d75ed6b4e583",
+      "bytes": 10955
+    },
+    {
+      "file": "m2-pickup-audio-release-tests.log",
+      "sha256": "96f48ce32f4526a6b36d730e5c2f93950b2c93433fd883ed9a853864948f3971",
+      "raw_capture_sha256": "2ea9ee3c7973bc446d3398445f22e2c6f694e6b96550fd36105239f1d65e5c03",
+      "bytes": 28108
+    },
+    {
+      "file": "m2-pickup-audio-sanitize-build.log",
+      "sha256": "b9548e015881fd64adc3061245bebcaf9253578b66d61c0554116d7fdb9658a2",
+      "raw_capture_sha256": "611ee4009295cdc61aeb2707fc3f3745836de640a4d8281b3b11683383fcf9a4",
+      "bytes": 46637
+    },
+    {
+      "file": "m2-pickup-audio-sanitize-final-build.log",
+      "sha256": "9267a7a85b77682814d7bc016ec7a17d1d6c9f7fe060348d7cb594f39b0fc6c7",
+      "raw_capture_sha256": "d9d70e0296ba0df5d28a309aeb012a5b6716af666c8920bd9ccdad70842678cf",
+      "bytes": 288
+    },
+    {
+      "file": "m2-pickup-audio-sanitize-tests.log",
+      "sha256": "f96db2f5971e47ad806c015ab639bd1b70207f26beeeafbe790f3b8412f97e2d",
+      "raw_capture_sha256": "2c1ce3be136aff556bbcf2c1ca812efd73ced1d3fe16992a0f9a6a21d423f4bc",
+      "bytes": 28235
+    },
+    {
+      "file": "m2-pickup-audio-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-pickup-audio-playtest-probe.log",
+      "sha256": "f25f021e80b8cc52c1220d4b4c99bba7d69172cda4d94260dbdb6b8a01318fea",
+      "raw_capture_sha256": "f25f021e80b8cc52c1220d4b4c99bba7d69172cda4d94260dbdb6b8a01318fea"
+    },
+    {
+      "file": "m2-pickup-audio-playtest-probe.cpp",
+      "sha256": "b1564b1ba1060ce14921b5fe4a63c47ea9bfb9f583e0ec76bc172c2b5ac4312b",
+      "raw_executed_source_sha256": "4a64748dfe084ba5690ea336d1289f8de63fcd270050523215efa445698841e8",
+      "note": "Formatting-only copy of executed baseline diagnostic."
+    }
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "diagnostic": {
+    "baseline": "cc329c6a5a9c8eded9894b43f3c6f59ab0e2b558",
+    "difficulty": 1,
+    "ammo_sequence": [
+      50,
+      44,
+      34,
+      28,
+      18
+    ],
+    "shots_per_mode_each_world": [
+      6,
+      10
+    ],
+    "npc_positions_tested": 24,
+    "npc_positions_skipped": 3,
+    "seconds_per_position": 5,
+    "latched_npc_failures_observed": 0,
+    "limitations": [
+      "Diagnostic player damage disabled; upward aim; typed inputs rather than native mouse.",
+      "Destination health 1000000 follows diagnostic invulnerability restoration; not ordinary play.",
+      "Player relocated near NPCs rather than traversing level. A stationary NPC is not proved fixed by a lack of service errors.",
+      "The user reports sustained post-transition stutter; no performance fix or measurement is claimed here."
+    ]
+  },
+  "captures": [
+    {
+      "local_path": "build/debug/tests/pickups.png",
+      "sha256": "a9400d3345a3c6b1c37d16c2d090e4b8c76a694baad54bec213b1c6052e0fa41",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/pickups.png",
+      "sha256": "f02d142617e1faaffac4ca9b5e56917f9647e90a77cea1d4d451de7c3a8114c3",
+      "committed": false
+    }
+  ],
+  "commands": [
+    "cmake --build build/<debug|release|sanitize> -j2 --target blood2_app pickup_audio_tests pickup_tests trigger_tests weapon_tests world_tests object_contract_tests",
+    "ctest --test-dir build/<debug|release> -R '^(pickup_audio|pickups|triggers|weapons|objects)\\.|^world\\.level_change' -V -j2",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^(pickup_audio|pickups|triggers|weapons|objects)\\.|^world\\.level_change' -V -j2",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(pickups|triggers|weapons|objectives|lifecycle)$' -V",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/debug -R '^gpu\\.pickups$' -V"
+  ],
+  "development_findings": [
+    "Original KeyPickup constructor selects inventory1.wav; removed the port comment incorrectly naming powerup4.wav.",
+    "Corrected a synthetic probe factory return type during compilation.",
+    "The initial rules test incorrectly expected delivery to a pending object; it now verifies refusal without duplicate voice/record.",
+    "Headless PCM checks explicitly enable PCM inspection, not only offline clocks.",
+    "The existing GPU pickup harness had no audio output enabled. The new check failed until the harness required SDL output like other audio tests. No gameplay guard or acceptance assertion was removed."
+  ],
+  "limitations": [
+    "Dry audio; reverb and priority arbitration remain unavailable.",
+    "Weapon pickup character quips, pickup FX and other required M2 services remain incomplete.",
+    "No native Metal or human listening verification.",
+    "Idle NPCs, durability, user-specific later firing, CityHub water and newly reported post-transition stutter remain open."
+  ],
+  "implementation_patch_sha256": "7ff634d2790d40997dca485f86b547631e24c78499dcc459cf58ffc615d24550",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "d4007df94f74d2c88c1223038aa9fcf09e8f50d88cc0aac651414b14cbcabb45"
+    },
+    {
+      "path": "README.md",
+      "sha256": "6c4b93e56aeb7eba16940a3643808af1cbb0b3261ed93cfa238085dc941c4283"
+    },
+    {
+      "path": "docs/M2_PICKUP_AUDIO_SOURCES.json",
+      "sha256": "d968727ad5a3994317257d473c642603e46edc1eff69456439f93efa6f20e1ba"
+    },
+    {
+      "path": "docs/PICKUP_AUDIO_CONTRACTS.md",
+      "sha256": "10199eda5ce1206b3672990f814ef71d2710c66ef1b75998e2421a917575f490"
+    },
+    {
+      "path": "docs/PICKUP_CONTRACTS.md",
+      "sha256": "4efc0e0aafe9ab240c28bbef8a93131fd964864636570f0cd04cb0f04331f315"
+    },
+    {
+      "path": "docs/TRIGGER_CONTRACTS.md",
+      "sha256": "5b4617aa39082317ca65411ae476602cfdeb00d5477fa8e26a117255857eb7a5"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "f41abf99a95d97ace09843ff1b45dd6b52fbc74b765aeba08f567bb43eec8a71"
+    },
+    {
+      "path": "src/app/inspector_pickups.cpp",
+      "sha256": "1eb26bc81bec88c911362a44274d5a3959c2c221d24738bc1a05638a8940da57"
+    },
+    {
+      "path": "src/app/main.cpp",
+      "sha256": "8e8cc837d09136b4f88cda4ead9d155511b5d497ab3e94619b78db14362fe304"
+    },
+    {
+      "path": "src/app/pickup_smoke.cpp",
+      "sha256": "7a734872c7d5d3abf6b99ddff2b909439accf0dbbeb921c38cb7e7eeca4b1597"
+    },
+    {
+      "path": "src/game/legacy/server_de.h",
+      "sha256": "f7d1eb28a9ed3413f24e9946fd777c4cc97f8eed3ed87141be7c78fc93fad55a"
+    },
+    {
+      "path": "src/game/original/KeyPickup.cpp",
+      "sha256": "42cb822e968899e02eb7a4f62c69a8a14126fe671979bb81b7724e80cc580bb6"
+    },
+    {
+      "path": "src/game/original/PickupObject.cpp",
+      "sha256": "2d8f0079e4f1d8817469a3eab3933bb25708ec13f5cac8dbfb204a410fb43f82"
+    },
+    {
+      "path": "src/game/original/PickupObject.h",
+      "sha256": "278c096a866c854b66741dd7a7e3fc7bee953d110382bf5efea6ccf075464191"
+    },
+    {
+      "path": "src/game/pickup_messages.h",
+      "sha256": "06fcdf848f9817f97b127b1adfb2ded209ab862f5ba578085177895d4c6e430d"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "37c5e8770860d214a21325b3d5fae4f3de4c2fa7f19d2ee045b9ace228ae6830"
+    },
+    {
+      "path": "src/game/server_pickups.cpp",
+      "sha256": "b7b5d6179f44d1227617b37a1939df8c4a27947b375689869763c667c3aa0f08"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "f616f1bede6b11f42fc2b08eb38e3d1cd736ab1b4dee2b9aba166aa4216af574"
+    },
+    {
+      "path": "tests/pickup_audio_tests.cpp",
+      "sha256": "9bae2aa9789f1058d634ad9bd94ee54e889564a78167dc3da971486587e06c32"
+    }
+  ],
+  "implementation_commit": "bbfc2f46c5c4e8c0590379e2f1e9c9ccd63dc1aa"
+}

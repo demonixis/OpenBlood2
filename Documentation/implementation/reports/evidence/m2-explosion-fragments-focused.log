@@ -1,0 +1,36 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 264: gpu.sceneexplosion
+ 1/11 Test #264: gpu.sceneexplosion ...............   Passed    4.60 sec
+      Start 554: explosion_models.private
+ 2/11 Test #554: explosion_models.private .........   Passed    1.43 sec
+      Start 567: explosion_rings.private
+ 3/11 Test #567: explosion_rings.private ..........   Passed    3.65 sec
+      Start 570: explosion_fragments.lifecycle
+ 4/11 Test #570: explosion_fragments.lifecycle ....   Passed    0.00 sec
+      Start 571: explosion_fragments.collision
+ 5/11 Test #571: explosion_fragments.collision ....   Passed    0.00 sec
+      Start 572: explosion_fragments.recipes
+ 6/11 Test #572: explosion_fragments.recipes ......   Passed    0.00 sec
+      Start 573: explosion_fragments.failures
+ 7/11 Test #573: explosion_fragments.failures .....   Passed    0.01 sec
+      Start 574: explosion_fragments.session
+ 8/11 Test #574: explosion_fragments.session ......   Passed    0.00 sec
+      Start 575: explosion_fragments.private
+ 9/11 Test #575: explosion_fragments.private ......   Passed    5.43 sec
+      Start 576: gpu.explosion_fragment_alpha
+10/11 Test #576: gpu.explosion_fragment_alpha .....   Passed    2.09 sec
+      Start 577: gpu.explosion_fragment_private
+11/11 Test #577: gpu.explosion_fragment_private ...   Passed    0.53 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Label Time Summary:
+explosion_fragments    =   8.07 sec*proc (8 tests)
+explosion_models       =   1.43 sec*proc (1 test)
+explosion_rings        =   3.65 sec*proc (1 test)
+gpu                    =   7.22 sec*proc (3 tests)
+headless               =  10.53 sec*proc (8 tests)
+private                =  15.64 sec*proc (5 tests)
+sceneexplosion         =   4.60 sec*proc (1 test)
+
+Total Test time (real) =  17.77 sec

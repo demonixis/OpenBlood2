@@ -1,0 +1,14 @@
+613/618 Testing: gideon_combat.choices
+613/618 Test: gideon_combat.choices
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_combat_tests" "choices" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-combat-choices"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_combat.choices" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.choices" end time: Oct 17 02:23 CEST
+"gideon_combat.choices" time elapsed: 00:00:00
+----------------------------------------------------------

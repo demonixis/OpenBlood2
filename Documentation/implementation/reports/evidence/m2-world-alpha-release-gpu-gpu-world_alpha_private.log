@@ -1,0 +1,96 @@
+630/630 Testing: gpu.world_alpha_private
+630/630 Test: gpu.world_alpha_private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/world_alpha_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-alpha-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.world_alpha_private" start time: Oct 17 00:38 CEST
+Output:
+----------------------------------------------------------
+GPU world alpha: zero/partial/full/black texels, far-to-near faces, opaque model occlusion, no depth writes, resize/reupload pass
+glass channel 0 expected=31 actual=31
+glass channel 1 expected=33 actual=33
+glass channel 2 expected=36 actual=36
+Private glass12: changed=11200 pink=0 submitted=1
+glass channel 0 expected=31 actual=31
+glass channel 1 expected=33 actual=33
+glass channel 2 expected=36 actual=36
+Private glass12: changed=11200 pink=0 submitted=1
+<end of output>
+Test time =   0.62 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.world_alpha_private" end time: Oct 17 00:38 CEST
+"gpu.world_alpha_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 00:38 CEST
+
+brushes =   1.50 sec*proc
+
+cameras =   1.63 sec*proc
+
+character =  13.35 sec*proc
+
+cinematics =   1.70 sec*proc
+
+containers =   3.42 sec*proc
+
+doors =   1.52 sec*proc
+
+explosion_flames =   0.90 sec*proc
+
+explosion_fragments =   0.80 sec*proc
+
+explosion_models =   0.82 sec*proc
+
+explosion_rings =   0.82 sec*proc
+
+gpu = 113.14 sec*proc
+
+interaction =   2.12 sec*proc
+
+keyframes =   1.68 sec*proc
+
+lights =   1.65 sec*proc
+
+model_view =   0.96 sec*proc
+
+movement =  13.20 sec*proc
+
+object_particles =   0.81 sec*proc
+
+objectives =   1.64 sec*proc
+
+pickups =   1.62 sec*proc
+
+player =   1.74 sec*proc
+
+player_controls =   1.03 sec*proc
+
+player_keepalive =   1.85 sec*proc
+
+player_restore =   1.72 sec*proc
+
+private = 105.67 sec*proc
+
+randomsound =  12.53 sec*proc
+
+sceneexplosion =   1.66 sec*proc
+
+session_playback =   0.99 sec*proc
+
+sound =   1.76 sec*proc
+
+sprite_view =   0.92 sec*proc
+
+sprites =   1.65 sec*proc
+
+triggers =   1.62 sec*proc
+
+weapon_sprites =   0.93 sec*proc
+
+weapons =  13.61 sec*proc
+
+world_view =  14.51 sec*proc
+
+worldpaths =   1.65 sec*proc
+

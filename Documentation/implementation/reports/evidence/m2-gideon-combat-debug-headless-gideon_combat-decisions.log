@@ -1,0 +1,14 @@
+666/673 Testing: gideon_combat.decisions
+666/673 Test: gideon_combat.decisions
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_combat_tests" "decisions" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-combat-decisions"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_combat.decisions" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.decisions" end time: Oct 17 02:23 CEST
+"gideon_combat.decisions" time elapsed: 00:00:00
+----------------------------------------------------------

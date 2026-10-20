@@ -1,0 +1,196 @@
+Test project <Blood2>/build/debug
+      Start 945: train_session.private_60
+      Start 944: train_session.private_30
+ 1/88 Test #944: train_session.private_30 .........   Passed   24.85 sec
+      Start 943: coverage.private
+ 2/88 Test #945: train_session.private_60 .........   Passed   25.84 sec
+      Start 134: doors.catalog
+ 3/88 Test #134: doors.catalog ....................   Passed    7.08 sec
+      Start 155: triggers.catalog
+ 4/88 Test #943: coverage.private .................   Passed   15.21 sec
+      Start 166: interaction.catalog
+ 5/88 Test #155: triggers.catalog .................   Passed    7.26 sec
+      Start 216: objectives.catalog
+ 6/88 Test #216: objectives.catalog ...............   Passed    4.62 sec
+      Start 264: cinematics.catalog
+ 7/88 Test #166: interaction.catalog ..............   Passed    6.89 sec
+      Start 837: conversation.catalog
+ 8/88 Test #264: cinematics.catalog ...............   Passed    4.50 sec
+      Start 836: conversation.private
+ 9/88 Test #837: conversation.catalog .............   Passed    4.23 sec
+      Start  12: objects.message_churn
+10/88 Test #836: conversation.private .............   Passed    2.01 sec
+      Start 154: triggers.private
+11/88 Test  #12: objects.message_churn ............   Passed    1.88 sec
+      Start 145: trigger_audio.private
+12/88 Test #154: triggers.private .................   Passed    2.09 sec
+      Start 140: door_audio.private
+13/88 Test #145: trigger_audio.private ............   Passed    1.77 sec
+      Start 135: doors.private
+14/88 Test #140: door_audio.private ...............   Passed    1.94 sec
+      Start 265: cinematics.subway
+15/88 Test #135: doors.private ....................   Passed    1.26 sec
+      Start 941: coverage.catalog
+16/88 Test #265: cinematics.subway ................   Passed    1.19 sec
+      Start  13: objects.message_limit
+17/88 Test  #13: objects.message_limit ............   Passed    0.10 sec
+      Start 574: exits.catalog
+18/88 Test #941: coverage.catalog .................   Passed    0.67 sec
+      Start 263: cinematics.device
+19/88 Test #263: cinematics.device ................   Passed    0.07 sec
+      Start 137: door_audio.states
+20/88 Test #137: door_audio.states ................   Passed    0.04 sec
+      Start 159: interaction.keys
+21/88 Test #159: interaction.keys .................   Passed    0.02 sec
+      Start 150: triggers.doors
+22/88 Test #150: triggers.doors ...................   Passed    0.02 sec
+      Start 835: conversation.lifetime
+23/88 Test #835: conversation.lifetime ............   Passed    0.01 sec
+      Start 160: interaction.state
+24/88 Test #160: interaction.state ................   Passed    0.01 sec
+      Start 132: doors.riders
+25/88 Test #132: doors.riders .....................   Passed    0.01 sec
+      Start 141: trigger_audio.activation
+26/88 Test #141: trigger_audio.activation .........   Passed    0.01 sec
+      Start 831: conversation.sequence
+27/88 Test #831: conversation.sequence ............   Passed    0.01 sec
+      Start 568: exits.delayed
+28/88 Test #568: exits.delayed ....................   Passed    0.01 sec
+      Start 572: exits.queue
+29/88 Test #572: exits.queue ......................   Passed    0.01 sec
+      Start 833: conversation.transport
+30/88 Test #833: conversation.transport ...........   Passed    0.01 sec
+      Start 573: exits.lifetime
+31/88 Test #573: exits.lifetime ...................   Passed    0.01 sec
+      Start 161: interaction.geometry
+32/88 Test #161: interaction.geometry .............   Passed    0.01 sec
+      Start 213: objectives.localized
+33/88 Test #213: objectives.localized .............   Passed    0.01 sec
+      Start 834: conversation.clock
+34/88 Test #834: conversation.clock ...............   Passed    0.01 sec
+      Start 832: conversation.delayed
+35/88 Test #832: conversation.delayed .............   Passed    0.01 sec
+      Start 567: exits.defaults
+36/88 Test #567: exits.defaults ...................   Passed    0.01 sec
+      Start 149: triggers.keys
+37/88 Test #149: triggers.keys ....................   Passed    0.01 sec
+      Start 215: objectives.queue
+38/88 Test #215: objectives.queue .................   Passed    0.01 sec
+      Start 570: exits.blocked
+39/88 Test #570: exits.blocked ....................   Passed    0.01 sec
+      Start 262: cinematics.failures
+40/88 Test #262: cinematics.failures ..............   Passed    0.01 sec
+      Start 162: interaction.transport
+41/88 Test #162: interaction.transport ............   Passed    0.01 sec
+      Start 142: trigger_audio.feedback
+42/88 Test #142: trigger_audio.feedback ...........   Passed    0.01 sec
+      Start 148: triggers.filters
+43/88 Test #148: triggers.filters .................   Passed    0.01 sec
+      Start 129: doors.options
+44/88 Test #129: doors.options ....................   Passed    0.01 sec
+      Start 261: cinematics.lifetime
+45/88 Test #261: cinematics.lifetime ..............   Passed    0.01 sec
+      Start 157: interaction.use
+46/88 Test #157: interaction.use ..................   Passed    0.01 sec
+      Start 212: objectives.defaults
+47/88 Test #212: objectives.defaults ..............   Passed    0.01 sec
+      Start 258: cinematics.mixer
+48/88 Test #258: cinematics.mixer .................   Passed    0.01 sec
+      Start 214: objectives.missing
+49/88 Test #214: objectives.missing ...............   Passed    0.01 sec
+      Start 571: exits.dead
+50/88 Test #571: exits.dead .......................   Passed    0.01 sec
+      Start 139: door_audio.lifetime
+51/88 Test #139: door_audio.lifetime ..............   Passed    0.01 sec
+      Start 165: interaction.player_push
+52/88 Test #165: interaction.player_push ..........   Passed    0.01 sec
+      Start 151: triggers.touch
+53/88 Test #151: triggers.touch ...................   Passed    0.01 sec
+      Start 146: triggers.schedule
+54/88 Test #146: triggers.schedule ................   Passed    0.01 sec
+      Start 138: door_audio.replacement
+55/88 Test #138: door_audio.replacement ...........   Passed    0.01 sec
+      Start 153: triggers.protocol
+56/88 Test #153: triggers.protocol ................   Passed    0.01 sec
+      Start 259: cinematics.spatial
+57/88 Test #259: cinematics.spatial ...............   Passed    0.01 sec
+      Start 260: cinematics.sequence
+58/88 Test #260: cinematics.sequence ..............   Passed    0.01 sec
+      Start 158: interaction.input
+59/88 Test #158: interaction.input ................   Passed    0.01 sec
+      Start 164: interaction.lifetime
+60/88 Test #164: interaction.lifetime .............   Passed    0.01 sec
+      Start 152: triggers.lifetime
+61/88 Test #152: triggers.lifetime ................   Passed    0.01 sec
+      Start 569: exits.broadcast
+62/88 Test #569: exits.broadcast ..................   Passed    0.01 sec
+      Start 147: triggers.toggle
+63/88 Test #147: triggers.toggle ..................   Passed    0.01 sec
+      Start 144: trigger_audio.failures
+64/88 Test #144: trigger_audio.failures ...........   Passed    0.01 sec
+      Start 143: trigger_audio.lifetime
+65/88 Test #143: trigger_audio.lifetime ...........   Passed    0.01 sec
+      Start 163: interaction.blocking
+66/88 Test #163: interaction.blocking .............   Passed    0.01 sec
+      Start 128: doors.state
+67/88 Test #128: doors.state ......................   Passed    0.01 sec
+      Start 130: doors.geometry
+68/88 Test #130: doors.geometry ...................   Passed    0.01 sec
+      Start 133: doors.lifetime
+69/88 Test #133: doors.lifetime ...................   Passed    0.01 sec
+      Start 131: doors.pushing
+70/88 Test #131: doors.pushing ....................   Passed    0.01 sec
+      Start 211: objectives.malformed
+71/88 Test #211: objectives.malformed .............   Passed    0.00 sec
+      Start 257: cinematics.decode
+72/88 Test #257: cinematics.decode ................   Passed    0.00 sec
+      Start 830: conversation.mapping
+73/88 Test #830: conversation.mapping .............   Passed    0.00 sec
+      Start 210: objectives.strings
+74/88 Test #210: objectives.strings ...............   Passed    0.00 sec
+      Start 942: coverage.observations
+75/88 Test #942: coverage.observations ............   Passed    0.00 sec
+      Start  14: objects.unsupported_teardown
+76/88 Test  #14: objects.unsupported_teardown .....   Passed    0.01 sec
+      Start   2: objects.builtin_model
+77/88 Test   #2: objects.builtin_model ............   Passed    0.00 sec
+      Start  15: objects.creation_failures
+78/88 Test  #15: objects.creation_failures ........   Passed    0.01 sec
+      Start  11: objects.messages_strings
+79/88 Test  #11: objects.messages_strings .........   Passed    0.01 sec
+      Start  10: objects.links_lists
+80/88 Test  #10: objects.links_lists ..............   Passed    0.00 sec
+      Start   3: objects.original_objects
+81/88 Test   #3: objects.original_objects .........   Passed    0.00 sec
+      Start   5: objects.reasons_properties
+82/88 Test   #5: objects.reasons_properties .......   Passed    0.00 sec
+      Start   9: objects.handles_selection
+83/88 Test   #9: objects.handles_selection ........   Passed    0.00 sec
+      Start   8: objects.aggregate_dispatch
+84/88 Test   #8: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start   4: objects.nested_creation
+85/88 Test   #4: objects.nested_creation ..........   Passed    0.00 sec
+      Start   7: objects.deferred_removal
+86/88 Test   #7: objects.deferred_removal .........   Passed    0.00 sec
+      Start   6: objects.scheduling
+87/88 Test   #6: objects.scheduling ...............   Passed    0.00 sec
+88/88 Test #574: exits.catalog ....................   Passed    3.22 sec
+
+100% tests passed, 0 tests failed out of 88
+
+Label Time Summary:
+audio            =   3.81 sec*proc (9 tests)
+cinematics       =   5.80 sec*proc (9 tests)
+conversation     =   6.30 sec*proc (8 tests)
+doors            =  10.38 sec*proc (12 tests)
+exits            =   3.28 sec*proc (8 tests)
+headless         = 117.26 sec*proc (88 tests)
+interaction      =   6.98 sec*proc (10 tests)
+objectives       =   4.67 sec*proc (7 tests)
+objects          =   2.04 sec*proc (14 tests)
+private          = 113.96 sec*proc (16 tests)
+services         =  15.88 sec*proc (3 tests)
+train_session    =  50.69 sec*proc (2 tests)
+triggers         =  11.25 sec*proc (15 tests)
+
+Total Test time (real) =  59.86 sec

@@ -1,0 +1,212 @@
+Test project <workspace>/Blood2/build/debug
+      Start 654: player_controls.corpse_clearance
+      Start 653: player_controls.combat
+      Start 617: object_particles.private
+      Start 505: ai_runtime.subway
+ 1/96 Test #505: ai_runtime.subway ..................   Passed    8.24 sec
+      Start 695: shield.private
+ 2/96 Test #617: object_particles.private ...........   Passed   10.73 sec
+      Start 655: player_controls.private
+ 3/96 Test #695: shield.private .....................   Passed    4.31 sec
+      Start 565: character_nodes.private
+ 4/96 Test #565: character_nodes.private ............   Passed    2.76 sec
+      Start 771: flare.private
+ 5/96 Test #655: player_controls.private ............   Passed    7.31 sec
+      Start 503: ai_runtime.catalog
+ 6/96 Test #503: ai_runtime.catalog .................   Passed    0.74 sec
+      Start 772: flare.ai
+ 7/96 Test #772: flare.ai ...........................   Passed    0.45 sec
+      Start 506: ai_runtime.arena
+ 8/96 Test #653: player_controls.combat .............   Passed   19.63 sec
+      Start 535: corpses.catalog
+ 9/96 Test #506: ai_runtime.arena ...................   Passed    0.43 sec
+      Start 517: ai_hit.catalog
+10/96 Test #517: ai_hit.catalog .....................   Passed    0.25 sec
+      Start 507: ai_runtime.sparse_weapons
+11/96 Test #535: corpses.catalog ....................   Passed    0.29 sec
+      Start 527: weapon_drops.catalog
+12/96 Test #507: ai_runtime.sparse_weapons ..........   Passed    0.21 sec
+      Start 875: death_effects.gibs
+13/96 Test #527: weapon_drops.catalog ...............   Passed    0.21 sec
+      Start 504: ai_runtime.failures
+14/96 Test #504: ai_runtime.failures ................   Passed    0.10 sec
+      Start 879: death_effects.lifetime
+15/96 Test #879: death_effects.lifetime .............   Passed    0.42 sec
+      Start 874: death_effects.burn
+16/96 Test #875: death_effects.gibs .................   Passed    0.53 sec
+      Start 876: death_effects.limbs
+17/96 Test #876: death_effects.limbs ................   Passed    0.14 sec
+      Start 878: death_effects.particles
+18/96 Test #878: death_effects.particles ............   Passed    0.10 sec
+      Start 877: death_effects.damage
+19/96 Test #877: death_effects.damage ...............   Passed    0.20 sec
+      Start 691: shield.failures
+20/96 Test #874: death_effects.burn .................   Passed    0.47 sec
+      Start 767: flare.weapon
+21/96 Test #691: shield.failures ....................   Passed    0.02 sec
+      Start 768: flare.collect
+22/96 Test #768: flare.collect ......................   Passed    0.02 sec
+      Start  11: objects.unsupported_teardown
+23/96 Test #767: flare.weapon .......................   Passed    0.03 sec
+      Start 769: flare.drop
+24/96 Test  #11: objects.unsupported_teardown .......   Passed    0.02 sec
+      Start 521: weapon_drops.falling
+25/96 Test #521: weapon_drops.falling ...............   Passed    0.01 sec
+      Start 765: flare.alternate
+26/96 Test #769: flare.drop .........................   Passed    0.02 sec
+      Start 518: weapon_drops.collect
+27/96 Test #765: flare.alternate ....................   Passed    0.01 sec
+      Start 764: flare.primary
+28/96 Test #518: weapon_drops.collect ...............   Passed    0.01 sec
+      Start 766: flare.lifetime
+29/96 Test #764: flare.primary ......................   Passed    0.01 sec
+      Start 692: shield.weapon
+30/96 Test #766: flare.lifetime .....................   Passed    0.01 sec
+      Start 522: weapon_drops.guards
+31/96 Test #692: shield.weapon ......................   Passed    0.01 sec
+      Start 770: flare.failures
+32/96 Test #522: weapon_drops.guards ................   Passed    0.01 sec
+      Start 523: weapon_drops.failures
+33/96 Test #770: flare.failures .....................   Passed    0.01 sec
+      Start 520: weapon_drops.drop
+34/96 Test #523: weapon_drops.failures ..............   Passed    0.01 sec
+      Start 526: weapon_drops.missing_pickup
+35/96 Test #520: weapon_drops.drop ..................   Passed    0.01 sec
+      Start 564: character_nodes.restore
+36/96 Test #526: weapon_drops.missing_pickup ........   Passed    0.01 sec
+      Start 531: corpses.lifetime
+37/96 Test #564: character_nodes.restore ............   Passed    0.01 sec
+      Start 519: weapon_drops.protocol
+38/96 Test #531: corpses.lifetime ...................   Passed    0.01 sec
+      Start 525: weapon_drops.callback
+39/96 Test #519: weapon_drops.protocol ..............   Passed    0.01 sec
+      Start 524: weapon_drops.nosliding
+40/96 Test #525: weapon_drops.callback ..............   Passed    0.01 sec
+      Start 534: corpses.accumulation
+41/96 Test #524: weapon_drops.nosliding .............   Passed    0.01 sec
+      Start 532: corpses.sounds
+42/96 Test #534: corpses.accumulation ...............   Passed    0.01 sec
+      Start 530: corpses.failures
+43/96 Test #532: corpses.sounds .....................   Passed    0.01 sec
+      Start 529: corpses.transfer
+44/96 Test #530: corpses.failures ...................   Passed    0.01 sec
+      Start 533: corpses.gates
+45/96 Test #529: corpses.transfer ...................   Passed    0.01 sec
+      Start 528: corpses.mappings
+46/96 Test #533: corpses.gates ......................   Passed    0.01 sec
+      Start 694: shield.ai
+47/96 Test #528: corpses.mappings ...................   Passed    0.01 sec
+48/96 Test #694: shield.ai ..........................   Passed    0.01 sec
+      Start 693: shield.session
+      Start  12: objects.creation_failures
+49/96 Test #693: shield.session .....................   Passed    0.01 sec
+      Start 508: ai_hit.geometry
+50/96 Test  #12: objects.creation_failures ..........   Passed    0.01 sec
+      Start  10: objects.messages_strings
+51/96 Test #508: ai_hit.geometry ....................   Passed    0.01 sec
+      Start 510: ai_hit.modifiers
+52/96 Test  #10: objects.messages_strings ...........   Passed    0.01 sec
+      Start 616: object_particles.session
+53/96 Test #510: ai_hit.modifiers ...................   Passed    0.01 sec
+      Start 615: object_particles.failures
+54/96 Test #616: object_particles.session ...........   Passed    0.01 sec
+      Start 493: ai_runtime.visibility_filter
+55/96 Test #615: object_particles.failures ..........   Passed    0.00 sec
+      Start 516: ai_hit.hidden
+56/96 Test #493: ai_runtime.visibility_filter .......   Passed    0.00 sec
+      Start 495: ai_runtime.lifetime
+57/96 Test #516: ai_hit.hidden ......................   Passed    0.00 sec
+      Start 511: ai_hit.reactions
+58/96 Test #495: ai_runtime.lifetime ................   Passed    0.00 sec
+      Start 614: object_particles.stopping
+59/96 Test #511: ai_hit.reactions ...................   Passed    0.00 sec
+      Start 689: shield.recipes
+60/96 Test #614: object_particles.stopping ..........   Passed    0.00 sec
+      Start 502: ai_runtime.missing
+61/96 Test #689: shield.recipes .....................   Passed    0.00 sec
+      Start 690: shield.clock
+62/96 Test #502: ai_runtime.missing .................   Passed    0.00 sec
+      Start 613: object_particles.emission
+63/96 Test #690: shield.clock .......................   Passed    0.00 sec
+      Start   1: objects.builtin_model
+64/96 Test #613: object_particles.emission ..........   Passed    0.00 sec
+      Start 515: ai_hit.lifetime
+65/96 Test   #1: objects.builtin_model ..............   Passed    0.00 sec
+      Start 562: character_nodes.names
+66/96 Test #515: ai_hit.lifetime ....................   Passed    0.00 sec
+      Start 501: ai_runtime.body
+67/96 Test #562: character_nodes.names ..............   Passed    0.00 sec
+      Start 491: ai_runtime.activation
+68/96 Test #501: ai_runtime.body ....................   Passed    0.00 sec
+      Start 496: ai_runtime.targets
+69/96 Test #491: ai_runtime.activation ..............   Passed    0.00 sec
+      Start 499: ai_runtime.spatial
+70/96 Test #496: ai_runtime.targets .................   Passed    0.00 sec
+      Start 561: character_nodes.services
+71/96 Test #499: ai_runtime.spatial .................   Passed    0.00 sec
+      Start 500: ai_runtime.triggers
+72/96 Test #561: character_nodes.services ...........   Passed    0.00 sec
+      Start 498: ai_runtime.camera
+73/96 Test #500: ai_runtime.triggers ................   Passed    0.00 sec
+      Start 497: ai_runtime.tracking
+74/96 Test #498: ai_runtime.camera ..................   Passed    0.00 sec
+      Start 563: character_nodes.rendering
+75/96 Test #497: ai_runtime.tracking ................   Passed    0.00 sec
+      Start 514: ai_hit.sides
+76/96 Test #563: character_nodes.rendering ..........   Passed    0.00 sec
+      Start 492: ai_runtime.visibility
+77/96 Test #514: ai_hit.sides .......................   Passed    0.00 sec
+      Start 494: ai_runtime.visibility_atomic
+78/96 Test #492: ai_runtime.visibility ..............   Passed    0.00 sec
+      Start 513: ai_hit.guards
+79/96 Test #494: ai_runtime.visibility_atomic .......   Passed    0.00 sec
+      Start 509: ai_hit.query
+80/96 Test #513: ai_hit.guards ......................   Passed    0.00 sec
+      Start 512: ai_hit.recoil
+81/96 Test #509: ai_hit.query .......................   Passed    0.00 sec
+      Start 649: player_controls.keys
+82/96 Test #512: ai_hit.recoil ......................   Passed    0.00 sec
+      Start 650: player_controls.mouse
+83/96 Test #649: player_controls.keys ...............   Passed    0.00 sec
+      Start   2: objects.original_objects
+84/96 Test #650: player_controls.mouse ..............   Passed    0.00 sec
+      Start   9: objects.links_lists
+85/96 Test   #2: objects.original_objects ...........   Passed    0.00 sec
+      Start 651: player_controls.gates
+86/96 Test   #9: objects.links_lists ................   Passed    0.00 sec
+      Start   4: objects.reasons_properties
+87/96 Test #651: player_controls.gates ..............   Passed    0.00 sec
+      Start   6: objects.deferred_removal
+88/96 Test   #4: objects.reasons_properties .........   Passed    0.00 sec
+      Start   3: objects.nested_creation
+89/96 Test   #6: objects.deferred_removal ...........   Passed    0.00 sec
+      Start   7: objects.aggregate_dispatch
+90/96 Test   #3: objects.nested_creation ............   Passed    0.00 sec
+      Start   8: objects.handles_selection
+91/96 Test   #7: objects.aggregate_dispatch .........   Passed    0.00 sec
+      Start   5: objects.scheduling
+92/96 Test   #8: objects.handles_selection ..........   Passed    0.00 sec
+      Start 652: player_controls.entry
+93/96 Test   #5: objects.scheduling .................   Passed    0.00 sec
+94/96 Test #652: player_controls.entry ..............   Passed    0.00 sec
+95/96 Test #654: player_controls.corpse_clearance ...   Passed   26.13 sec
+96/96 Test #771: flare.private ......................   Passed   24.87 sec
+
+100% tests passed, 0 tests failed out of 96
+
+Label Time Summary:
+ai_hit              =   0.29 sec*proc (10 tests)
+ai_runtime          =   9.77 sec*proc (17 tests)
+character_nodes     =   2.78 sec*proc (5 tests)
+corpses             =   0.34 sec*proc (8 tests)
+death_effects       =   1.86 sec*proc (6 tests)
+flare               =  25.42 sec*proc (9 tests)
+headless            = 109.01 sec*proc (96 tests)
+object_particles    =  10.74 sec*proc (5 tests)
+objects             =   0.07 sec*proc (12 tests)
+player_controls     =  53.08 sec*proc (7 tests)
+private             = 108.52 sec*proc (22 tests)
+shield              =   4.36 sec*proc (7 tests)
+weapon_drops        =   0.29 sec*proc (10 tests)
+
+Total Test time (real) =  40.21 sec

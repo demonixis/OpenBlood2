@@ -1,0 +1,2799 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 92c5aee..7ee1490 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -567,3 +567,6 @@ Interactive input/simulation frames are capped at 100 ms by `app_frame_delta`; d
+ The [proximity-bomb continuation](../Documentation/Implementation/M2_PROXIMITY.md) connects original ProximitiesPU, reserved inventory slot10, charged throws, sticking/detection/detonation, independent lifetime and inspection. CityHub now has 450 created / 31 transferred sounds / 541 editor-only / three unsupported / one failed entry. Remote bombs, flashlight and missing `fallengrills` geometry still block CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical. Read [contracts](docs/PROXIMITY_CONTRACTS.md). Preserve reserved-slot ownership, source hold/overhold boundaries, shooter-inclusive detection, no inherited fuse, death-delay ordering and checked deferred lifetime. The shared model-projectile solver is replacement physics; do not claim retail parity. P is the application selection binding.
+ 
+ The [remote-bomb continuation](../Documentation/Implementation/M2_REMOTE_BOMBS.md) connects original RemotesPU, reserved slot11, charged throws, separate detonation and player-owned charge cleanup, with inspection. CityHub now has 452 created / 31 transferred sounds / 541 editor-only / one unsupported / one failed entry. FlashlightPU and missing `fallengrills` geometry still reject CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical. Read [contracts](docs/REMOTE_BOMB_CONTRACTS.md). Preserve source no-fuse/no-overhold rules, first-character falling contact, deferred detonation, separate player/shooter links and original destructor/Respawn cleanup. Pending-owner link notifications must not erase the list before destruction. Supported restore retains inventory, never old projectile identities. R selects and B detonates independently of current weapon/ammo.
++
++
++The [flashlight continuation](../Documentation/Implementation/M2_FLASHLIGHT.md) connects original FlashlightPU/CInvFlashlight/CFlashlightFX, L toggle, battery, local audio, inactive restoration and visible radial point illumination with inspection. CityHub now has 453 created / 31 transferred sounds / 541 editor-only / zero unsupported / one failed entry. Missing `fallengrills` geometry still rejects CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical. Read [contracts](docs/FLASHLIGHT_CONTRACTS.md). Preserve rounded recharge refusal, body-position/internal-angle following, source shade-failure fallback, active-only discharge and forced inactive Restore/KeepAlive. Keep checked child ownership and expose failed updates. Radial brightening is replacement lighting; sky/FX/view weapons, shadows and general illumination remain separate. Regenerate all six SPIR-V/MSL artifacts together; NVIDIA validation does not certify native Metal execution of this change.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fc29130..69e0583 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -39,7 +39,7 @@ target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/
+ target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/original/ConversationTrigger.cpp src/game/original/ConversationStrings.cpp src/game/original/CommLink.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/WeaponPickups.cpp src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+-    src/game/original/ItemPickups.cpp src/game/original/GameInvItems.cpp src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
++    src/game/original/ItemPickups.cpp src/game/original/GameInvItems.cpp src/game/original/Flashlight.cpp src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+     src/game/server_activation.cpp src/game/original/AIRuntime.cpp
+diff --git a/README.md b/README.md
+index 564cd24..7b92545 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [flashlight continuation](../Documentation/Implementation/M2_FLASHLIGHT.md) connects original FlashlightPU/CInvFlashlight/CFlashlightFX, L toggle, battery, local audio, inactive restoration and visible radial point illumination with inspection. CityHub now has 453 created / 31 transferred sounds / 541 editor-only / zero unsupported / one failed entry. Missing `fallengrills` geometry still rejects CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical.
++
+ The [remote-bomb continuation](../Documentation/Implementation/M2_REMOTE_BOMBS.md) connects original RemotesPU, reserved slot11, charged throws, separate detonation and player-owned charge cleanup, with inspection. CityHub now has 452 created / 31 transferred sounds / 541 editor-only / one unsupported / one failed entry. FlashlightPU and missing `fallengrills` geometry still reject CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical.
+ 
+ The [proximity-bomb continuation](../Documentation/Implementation/M2_PROXIMITY.md) connects original ProximitiesPU, reserved inventory slot10, charged throws, sticking/detection/detonation, independent lifetime and inspection. CityHub now has 450 created / 31 transferred sounds / 541 editor-only / three unsupported / one failed entry. Remote bombs, flashlight and missing `fallengrills` geometry still block CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical.
+@@ -114,7 +116,7 @@ play. **F3** also toggles capture. The first click that focuses/captures the win
+ is not a shot. The original SubwayA intro blocks movement/fire for about 12 seconds.
+ 
+ Keyboard controls remain **WASD/ZQSD**, **Shift** run, **Space** jump, **Ctrl** crouch,
+-**arrows** look, **E** USE, **F/G** primary/secondary fire and **H** medkit. **P** selects proximity bombs,
++**arrows** look, **E** USE, **F/G** primary/secondary fire, **H** medkit and **L** flashlight toggle after collection (release Shift). **P** selects proximity bombs,
+ **R** selects remote bombs and **B** detonates registered remote charges. **F2**
+ toggles game controls; a new play request enables them again. Inspection can still
+ be folded with its title arrow and resized by dragging its borders.
+diff --git a/docs/FLASHLIGHT_CONTRACTS.md b/docs/FLASHLIGHT_CONTRACTS.md
+new file mode 100644
+index 0000000..5b333f2
+--- /dev/null
++++ b/docs/FLASHLIGHT_CONTRACTS.md
+@@ -0,0 +1,88 @@
++# Original flashlight and bounded point illumination
++
++Read the [source ledger](M2_FLASHLIGHT_SOURCES.json) and
++[implementation evidence](../../Documentation/Implementation/M2_FLASHLIGHT.md).
++This extends [inventory](INVENTORY_STATE_CONTRACTS.md),
++[medkit items](MEDKIT_CONTRACTS.md), [input](PLAYER_CONTROL_CONTRACTS.md),
++[rendering](WORLD_VIEW_CONTRACTS.md) and [shader packaging](METAL_SHADER_CONTRACTS.md).
++M2 remains incomplete.
++
++## Original rules
++
++`FlashlightPU` inherits `ItemPickupCharged`: original item ID 2, quantity 1,
++resource 301, Flashlight_pu model/skin and inventory1.wav pickup request. The
++existing checked touch/acknowledgement path rejects dead players and full charge,
++and defers removal. Only authored single-player creation is supported; historical
++TypeAction and string-created bounce behavior remain unavailable.
++
++`CInvFlashlight` starts at 100 displayed charges and 120 seconds. Recharge ignores
++the incoming quantity and requires the rounded count to be below 100. Activation
++creates the FORCECLIENTUPDATE normal child before testing for an empty battery.
++It toggles user-visible bit 1, sends the original item action, and retains the
++child while off. Both toggle directions play the original local flashlight.wav
++through the existing bounded client queue/audio service. Playback/queue failures
++remain visible and do not undo the original toggle. Pickup audio is still only a
++request. PCX HUD/localized item-name display remain unavailable.
++
++The inventory aggregate updates the child from the owner's **body** position and
++the player's internal pitch/yaw (ordinary owners use their object rotation).
++Active time decreases by simulation delta; exhaustion sets count zero and turns
++the item off. Positive charge displays `byte(100 * remaining / 120 + .5)`.
++Do not add a camera-eye offset, recharge while rounded to 100, or consume battery
++while rendering. Invalid owner/pose/child/time fails explicitly; the session
++propagates an unsuccessful item update. The child is removed by owned teardown,
++including pending owner removal, and checked identities suppress stale lighting.
++
++L is the application binding for the original direct-item command. It is a
++press edge and obeys text editing, focus, F2, held-key suppression and player
++replacement. Original dead/movement/camera/run gates apply; release Shift to
++toggle. No default flashlight is granted to the player.
++
++## Client light and renderer
++
++The selected `CFlashlightFX::Update` casts along the child's forward vector.
++A hit places the light at the hit point, clamps distance to at least 10, and
++sets radius to distance * .4. The source accidentally queries point shade at
++`body - hit`, which is retained as inspectable query metadata. GetPointShade
++remains unavailable: the original explicit failure fallback supplies minimum
++intensity 132/255. Intensity is `max(minimum, (1000 - distance/2) / 1000)`.
++A miss, hidden source or removed source/owner renders no light. Invalid or
++unavailable collision fails and hides the effect.
++
++One owned `PointLight` value replaces the client OT_LIGHT object. The existing
++bounded ray service excludes the authoritative local player body, which is absent
++from first-person client presentation, and tests its supported solid world/object
++subset. This is an explicit replacement collision policy, not complete retail
++client intersection equivalence. No fake successful point-shade service is added.
++
++World and world-model opaque/translucent passes receive a single point light.
++The replacement shader adds radial brightening to the existing unlit base:
++`baseRGB * (1 + color * max(0, 1 - distance/radius))`. It does not supply normals,
++lightmaps, shadows, occlusion, general dynamic-light rendering or retail lighting
++parity. A zero radius disables it. Sky, sprite/FX and near view-weapon passes
++retain their existing illumination; alpha/depth policy remains unchanged.
++
++The shared fragment uniform is three float4 values (48 bytes): modulation,
++world position/radius and RGB color. Both fragments use uniform slot 0 and
++sampled texture/sampler 0; the vertex stage passes current posed world positions.
++All six SPIR-V/MSL artifacts must be regenerated together through the existing
++pinned ShaderCross toolchain. No new dependency or runtime compiler is added.
++
++## Ownership, preservation and inspection
++
++InventoryState owns optional byte count and finite remaining time in [-60,120].
++The lower bound allows source exhaustion overshoot under the engine's checked
++frame limit. Save rejects malformed state without changing its output. Staged
++Restore and KeepAlive recreate an independent hidden child and bind the item to
++the new owner. Original InvItem::Load forces inactive in both modes; no previous
++handle or active light is transferred. Failure leaves existing inventory intact.
++All source/destination objects continue to be destroyed under their own adapter.
++
++Pickups inspection shows presence, battery/time, toggle state, live child,
++ray result, hit distance/position, radius/intensity and service errors, even when
++the effect is hidden. Restoration inspection shows saved charge and the inactive
++load rule. Reading inspection or rendering does not advance clocks.
++
++CityHub's FlashlightPU is now supported. Its separate missing `fallengrills`
++world-model binding still fails and blocks automatic destination promotion.
++Class counts are not proof of complete M2 services or a full-level playthrough.
+diff --git a/docs/INVENTORY_STATE_CONTRACTS.md b/docs/INVENTORY_STATE_CONTRACTS.md
+index fe50f46..83e62ab 100644
+--- a/docs/INVENTORY_STATE_CONTRACTS.md
++++ b/docs/INVENTORY_STATE_CONTRACTS.md
+@@ -113,3 +113,10 @@ charges have left that list. Restore/KeepAlive preserve weapon/ammo, never old b
+ handles. The shared model-projectile solver now admits CGrenade, CProximityBomb
+ and CRemoteBomb. Earlier remote omissions are historical; time bombs and the
+ complete M2 gate remain open.
++
++
++The [flashlight continuation](FLASHLIGHT_CONTRACTS.md) adds original item2, L toggle,
++active-only charge, local audio, checked child lifetime and forced-inactive
++Restore/KeepAlive. One radial point light is rendered over the unlit world/models;
++GetPointShade, shadows and general dynamic illumination remain unavailable.
++Earlier blanket flashlight omissions are superseded only by this bounded subset.
+diff --git a/docs/LIGHT_CONTRACTS.md b/docs/LIGHT_CONTRACTS.md
+index 5e1116d..12cb7a2 100644
+--- a/docs/LIGHT_CONTRACTS.md
++++ b/docs/LIGHT_CONTRACTS.md
+@@ -106,3 +106,10 @@ directional light are separate: the owner's clarification identifies DirLight as
+ spots. World illumination, shadows/fog, general client FX/audio, cinematic/world
+ model motion, AI, transitions and other required M2 services remain pending. No
+ retail executable, additional platform, mobile or XR validation is claimed.
++
++
++The [flashlight continuation](FLASHLIGHT_CONTRACTS.md) adds original item2, L toggle,
++active-only charge, local audio, checked child lifetime and forced-inactive
++Restore/KeepAlive. One radial point light is rendered over the unlit world/models;
++GetPointShade, shadows and general dynamic illumination remain unavailable.
++Earlier blanket flashlight omissions are superseded only by this bounded subset.
+diff --git a/docs/M2_FLASHLIGHT_SOURCES.json b/docs/M2_FLASHLIGHT_SOURCES.json
+new file mode 100644
+index 0000000..da50a47
+--- /dev/null
++++ b/docs/M2_FLASHLIGHT_SOURCES.json
+@@ -0,0 +1,65 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "370888772d481a1ea66db7f030e0c4bb0abac1bc",
++  "status": "M2 incomplete; original flashlight with bounded replacement point illumination",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/GameInvItems.cpp",
++      "source_sha256": "b2a72cdf5bd9e23ec496c6f6af3ed5bd4449e3b84d8cc088c33c1e1bbe081ee8",
++      "purpose": "CInvFlashlight construction, charge, child, activation, pose update and Save/Load."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameInvItems.h",
++      "source_sha256": "592488eb133230295961290bc2bfd621429c6ccc11df1de010ba7ccaa0bd7aac",
++      "purpose": "Flashlight constants and destructor ownership."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/InvItem.cpp",
++      "source_sha256": "89074a1645a0977cb8961731764d7b54b2b3da1720adc9cfe8ce0b539fff5aaa",
++      "purpose": "Original action active-bit serialization and item state preservation."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/InvItem.h",
++      "source_sha256": "7b0ffbe822337d7f430466fd469c435e604d2c264c34a9af64e79f938e1329cc",
++      "purpose": "ActivateItem toggle result and forced inactive Load in both modes."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
++      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
++      "purpose": "FlashlightPU assets/type/name and charged pickup ancestry."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "purpose": "Original item acquisition, direct activation and per-item update order."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "purpose": "Direct-item command gates and internal player rotation."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/FlashlightFX.cpp",
++      "source_sha256": "f623447fbe64461b421b404a88fb259cdc998e600f14121f350a32dc325192db",
++      "purpose": "Original forward hit point, distance/radius/intensity and shade-failure fallback."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "purpose": "Flashlight activation/deactivation local audio."
++    },
++    {
++      "source": "sources/blood2/Shared/ClientServerShared.h",
++      "source_sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
++      "purpose": "USRFLG_VISIBLE bit."
++    }
++  ],
++  "adaptations": [
++    "Owned typed inventory/child and client PointLight value replace item list and client OT_LIGHT.",
++    "Original shade-failure fallback remains explicit; no GetPointShade implementation is claimed.",
++    "Supported solid ray excludes the authoritative local player; no complete retail client intersection parity.",
++    "One radial point brightening over unlit materials, without shadows/lightmaps/normal response.",
++    "Application L binding, checked service failures, staged snapshot validation and inactive restore.",
++    "Existing pinned ShaderCross regenerates bundled SPIR-V/MSL; no runtime compiler."
++  ]
++}
+diff --git a/docs/MEDKIT_CONTRACTS.md b/docs/MEDKIT_CONTRACTS.md
+index 72fc922..89f1db6 100644
+--- a/docs/MEDKIT_CONTRACTS.md
++++ b/docs/MEDKIT_CONTRACTS.md
+@@ -76,3 +76,10 @@ Verification: 730/730 headless tests in Debug and inspector-free Release;
+ The private authored medkit fixture repeats CityHub loading and validates real
+ 45,312-frame activation audio. No Windows/macOS/mobile/XR or retail executable
+ parity is claimed. Detailed logs are linked from the implementation evidence.
++
++
++The [flashlight continuation](FLASHLIGHT_CONTRACTS.md) adds original item2, L toggle,
++active-only charge, local audio, checked child lifetime and forced-inactive
++Restore/KeepAlive. One radial point light is rendered over the unlit world/models;
++GetPointShade, shadows and general dynamic illumination remain unavailable.
++Earlier blanket flashlight omissions are superseded only by this bounded subset.
+diff --git a/docs/METAL_SHADER_CONTRACTS.md b/docs/METAL_SHADER_CONTRACTS.md
+index b442441..ecb0eb8 100644
+--- a/docs/METAL_SHADER_CONTRACTS.md
++++ b/docs/METAL_SHADER_CONTRACTS.md
+@@ -22,8 +22,10 @@ There is no runtime shader-file lookup or translation dependency.
+ 
+ The vertex uniform is eight float4 fields (128 bytes), including the per-batch
+ texture offset. Its uniform buffer is slot 0 and vertex attributes are 0/1/2.
+-Both fragments sample texture/sampler 0; the alpha fragment additionally uses
+-uniform buffer 0. Storage buffers/textures are unused. Keep reflection and all
++Both fragments sample texture/sampler 0 and use uniform buffer 0. The flashlight
++continuation expands that fragment buffer to three float4 fields (48 bytes):
++modulation, world position/radius and RGB light color. Both stages pass the
++current posed world position for the bounded radial illumination. Storage buffers/textures are unused. Keep reflection and all
+ packaged artifacts synchronized when GLSL changes. Source texture coordinates,
+ SDL GPU depth/orientation conventions, current transforms, alpha policy and
+ world-clock panning are identical inputs on both paths; add no backend-only
+diff --git a/docs/PLAYER_CONTROL_CONTRACTS.md b/docs/PLAYER_CONTROL_CONTRACTS.md
+index f26241e..83fd2b9 100644
+--- a/docs/PLAYER_CONTROL_CONTRACTS.md
++++ b/docs/PLAYER_CONTROL_CONTRACTS.md
+@@ -79,3 +79,10 @@ charges have left that list. Restore/KeepAlive preserve weapon/ammo, never old b
+ handles. The shared model-projectile solver now admits CGrenade, CProximityBomb
+ and CRemoteBomb. Earlier remote omissions are historical; time bombs and the
+ complete M2 gate remain open.
++
++
++The [flashlight continuation](FLASHLIGHT_CONTRACTS.md) adds original item2, L toggle,
++active-only charge, local audio, checked child lifetime and forced-inactive
++Restore/KeepAlive. One radial point light is rendered over the unlit world/models;
++GetPointShade, shadows and general dynamic illumination remain unavailable.
++Earlier blanket flashlight omissions are superseded only by this bounded subset.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index d03481f..6c79f88 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1,5 +1,14 @@
+ # Source and Dependency Provenance
+ 
++## Original flashlight
++
++Selected original GameInvItems, InvItem, ItemPickups, InventoryMgr, PlayerObj and
++client FlashlightFX/BloodClientShell branches supply charge, ownership, commands,
++hit-light placement and audio. Typed ownership/snapshots and one bounded radial
++point shader replace engine services; point-shade failure uses the original
++fallback. See [source hashes](M2_FLASHLIGHT_SOURCES.json) and
++[contracts](FLASHLIGHT_CONTRACTS.md). Reference files and dependency pins are unchanged.
++
+ ## Metal shader packaging
+ 
+ Project-owned GLSL is compiled to SPIR-V and translated offline using pinned
+diff --git a/docs/WORLD_VIEW_CONTRACTS.md b/docs/WORLD_VIEW_CONTRACTS.md
+index 2f94a48..c7a1340 100644
+--- a/docs/WORLD_VIEW_CONTRACTS.md
++++ b/docs/WORLD_VIEW_CONTRACTS.md
+@@ -101,3 +101,10 @@ The [sky continuation](SKY_CONTRACTS.md) supersedes blanket sky-rendering omissi
+ for registered world-model skies. Valid visible skies render behind the world and
+ replace bit-4 portal markers; unavailable skies retain diagnostics. No retail
+ lighting, fog or complete M2 acceptance is implied.
++
++
++The [flashlight continuation](FLASHLIGHT_CONTRACTS.md) adds original item2, L toggle,
++active-only charge, local audio, checked child lifetime and forced-inactive
++Restore/KeepAlive. One radial point light is rendered over the unlit world/models;
++GetPointShade, shadows and general dynamic illumination remain unavailable.
++Earlier blanket flashlight omissions are superseded only by this bounded subset.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index f92fc6a..8bea1c0 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -485,7 +485,7 @@ namespace OpenBlood2
+             ImGui::PopTextWrapPos();
+             ImGui::Checkbox("Game controls (F2)", &keyboard_movement);
+             ImGui::TextWrapped("WASD / ZQSD: walk | Shift: run | Space: jump | Ctrl: crouch | Arrows: look | E: use | "
+-                               "H: medkit (release Shift)");
++                               "H: medkit; L: flashlight (release Shift)");
+             ImGui::TextWrapped(
+                 "F3: capture mouse and hide inspector | Mouse: look | Left/F: fire | Right/G: alternate fire");
+             ImGui::Text("Mouse: %s", mouse_captured ? "captured" : "released for UI");
+diff --git a/src/app/inspector_objectives.cpp b/src/app/inspector_objectives.cpp
+index 356b04c..cdb8fcc 100644
+--- a/src/app/inspector_objectives.cpp
++++ b/src/app/inspector_objectives.cpp
+@@ -210,6 +210,9 @@ namespace OpenBlood2
+                         ImGui::Text("Saved medkit: %u charges (retained by keep-alive)", *inventory.medkit_charge);
+                     else
+                         ImGui::TextUnformatted("Saved medkit: absent");
++                    if (inventory.flashlight)
++                        ImGui::Text("Saved flashlight: %u / %.3f seconds; restores inactive",
++                                    inventory.flashlight->count, inventory.flashlight->remaining);
+                     for (const auto& key : inventory.keys)
+                         ImGui::Text("Key %s: %u uses", key.name.c_str(), key.uses);
+                     ImGui::TreePop();
+diff --git a/src/app/inspector_pickups.cpp b/src/app/inspector_pickups.cpp
+index e80f7af..6d14c4d 100644
+--- a/src/app/inspector_pickups.cpp
++++ b/src/app/inspector_pickups.cpp
+@@ -40,6 +40,21 @@ namespace OpenBlood2
+             for (unsigned i = 1; i <= 8; ++i)
+                 ImGui::Text("%u: %.0f / %.0f", i, player->m_InventoryMgr.GetAmmoCount(i),
+                             player->m_InventoryMgr.MaxAmmo(i));
++            if (const auto& item = player->m_InventoryMgr.flashlight)
++            {
++                const auto& fx = game.client_shell.flashlight;
++                ImGui::Text("Flashlight (L): %u / 100, %.3f seconds, active %d, child alive %d", item->count,
++                            item->remaining, item->active, game.server.IsObjectAlive(item->light));
++                ImGui::Text("Ray %d / visible %d / distance %.2f / radius %.2f / intensity %.3f", int(fx.result),
++                            fx.visible, fx.distance, fx.light.radius, fx.light.color.x);
++                ImGui::Text("Light at %.2f %.2f %.2f / updates %llu", fx.light.position.x, fx.light.position.y,
++                            fx.light.position.z, (unsigned long long)fx.updates);
++                ImGui::TextWrapped("Point shade unavailable: original fallback. Radial brightening, no shadows. "
++                                   "Resource 301 / flashlight.pcx HUD unavailable.");
++                ImGui::TextWrapped("Item: %s / effect: %s", item->error.c_str(), fx.error.c_str());
++            }
++            else
++                ImGui::TextUnformatted("Flashlight: not collected (L after collection)");
+             if (const auto& item = player->m_InventoryMgr.medkit)
+             {
+                 ImGui::Text("Medkit: %u / 100 charges", item->count);
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 5ac9f3e..9542192 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -611,6 +611,7 @@ namespace
+             if (!controls.focused && !smoke)
+                 game->client_shell.weapon_input = {};
+             game->client_shell.use_down = controls.sample_use(text_editing);
++            game->client_shell.flashlight_down = controls.sample_flashlight(text_editing);
+             game->client_shell.medkit_down = controls.sample_medkit(text_editing);
+             game->client_shell.proximity_down = controls.sample_proximity(text_editing);
+             game->client_shell.remote_down = controls.sample_remote(text_editing);
+@@ -913,6 +914,7 @@ namespace
+                 if (render_world)
+                 {
+                     const auto& view = game->client_shell.view;
++                    const auto flashlight = game->client_shell.flashlight.Current(game->server);
+                     if (!world_renderer.prepare(world_mesh, mesh_revision,
+                                                 SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
+                                                 height, error) ||
+@@ -926,7 +928,7 @@ namespace
+                             view.position, view.rotation, view.object && view.settings.type == 1, error,
+                             sky_draws.empty() ? OpenBlood2::DrawLoad::Clear : OpenBlood2::DrawLoad::Load, nullptr,
+                             sky_draws.empty() ? OpenBlood2::WorldPass::Opaque : OpenBlood2::WorldPass::OpaqueWithSky,
+-                            game->server.world_time()))
++                            game->server.world_time(), flashlight))
+                     {
+                         spdlog::error("World viewport: {}", error);
+                         SDL_SubmitGPUCommandBuffer(commands);
+@@ -938,7 +940,8 @@ namespace
+                         !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
+                                              model_scene.world_draws, view.position, view.rotation,
+                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
+-                                             world_renderer.depth_target()))
++                                             world_renderer.depth_target(), OpenBlood2::WorldPass::Opaque, 0,
++                                             flashlight))
+                     {
+                         spdlog::error("Model viewport: {}", error);
+                         SDL_SubmitGPUCommandBuffer(commands);
+@@ -948,7 +951,8 @@ namespace
+                         !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
+                                              world_draws, view.position, view.rotation,
+                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
+-                                             nullptr, OpenBlood2::WorldPass::Translucent, game->server.world_time()))
++                                             nullptr, OpenBlood2::WorldPass::Translucent, game->server.world_time(),
++                                             flashlight))
+                     {
+                         spdlog::error("Transparent world viewport: {}", error);
+                         SDL_SubmitGPUCommandBuffer(commands);
+@@ -958,7 +962,8 @@ namespace
+                         !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
+                                              model_scene.world_draws, view.position, view.rotation,
+                                              view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
+-                                             world_renderer.depth_target(), OpenBlood2::WorldPass::Translucent))
++                                             world_renderer.depth_target(), OpenBlood2::WorldPass::Translucent, 0,
++                                             flashlight))
+                     {
+                         spdlog::error("Transparent model viewport: {}", error);
+                         SDL_SubmitGPUCommandBuffer(commands);
+diff --git a/src/app/movement_controls.h b/src/app/movement_controls.h
+index 94f50d2..a42b83e 100644
+--- a/src/app/movement_controls.h
++++ b/src/app/movement_controls.h
+@@ -17,6 +17,7 @@ namespace OpenBlood2
+     {
+         std::array<bool, SDL_SCANCODE_COUNT> keys{};
+         bool focused = false, enabled = true, use_suppressed = false;
++        bool flashlight_suppressed = false;
+         bool medkit_suppressed = false, proximity_suppressed = false, remote_suppressed = false,
+              detonate_suppressed = false;
+         bool mouse_requested = false, mouse_captured = false;
+@@ -41,6 +42,7 @@ namespace OpenBlood2
+         void player_changed(bool play = false)
+         {
+             keys = {};
++            flashlight_suppressed = false;
+             use_suppressed = medkit_suppressed = proximity_suppressed = remote_suppressed = detonate_suppressed = false;
+             release_mouse();
+             if (play)
+@@ -91,6 +93,7 @@ namespace OpenBlood2
+                 case SDL_SCANCODE_R:
+                 case SDL_SCANCODE_B:
+                 case SDL_SCANCODE_P:
++                case SDL_SCANCODE_L:
+                 case SDL_SCANCODE_H:
+                 case SDL_SCANCODE_E:
+                 case SDL_SCANCODE_SPACE:
+@@ -109,6 +112,7 @@ namespace OpenBlood2
+             {
+                 focused = false;
+                 keys = {};
++                flashlight_suppressed = false;
+                 release_mouse();
+             }
+             if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED && event.window.windowID == window)
+@@ -135,9 +139,9 @@ namespace OpenBlood2
+                 if (!focused && event.type == SDL_EVENT_KEY_DOWN)
+                     return;
+                 const int code = event.key.scancode;
+-                if ((code == SDL_SCANCODE_R || code == SDL_SCANCODE_B || code == SDL_SCANCODE_P ||
+-                     code == SDL_SCANCODE_H || code == SDL_SCANCODE_E || code == SDL_SCANCODE_F ||
+-                     code == SDL_SCANCODE_G) &&
++                if ((code == SDL_SCANCODE_L || code == SDL_SCANCODE_R || code == SDL_SCANCODE_B ||
++                     code == SDL_SCANCODE_P || code == SDL_SCANCODE_H || code == SDL_SCANCODE_E ||
++                     code == SDL_SCANCODE_F || code == SDL_SCANCODE_G) &&
+                     event.type == SDL_EVENT_KEY_DOWN && event.key.repeat && !keys[static_cast<unsigned>(code)])
+                     return; // A held key after focus loss is not a fresh USE press.
+                 if (code > SDL_SCANCODE_UNKNOWN && code < SDL_SCANCODE_COUNT)
+@@ -203,6 +207,17 @@ namespace OpenBlood2
+             }
+             return keys[SDL_SCANCODE_P] && !proximity_suppressed;
+         }
++        bool sample_flashlight(bool text_editing)
++        {
++            if (!keys[SDL_SCANCODE_L])
++                flashlight_suppressed = false;
++            if (!focused || !enabled || text_editing)
++            {
++                flashlight_suppressed = keys[SDL_SCANCODE_L];
++                return false;
++            }
++            return keys[SDL_SCANCODE_L] && !flashlight_suppressed;
++        }
+         bool sample_medkit(bool text_editing)
+         {
+             if (!keys[SDL_SCANCODE_H])
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index a7e07d6..73f1de7 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -81,8 +81,8 @@ namespace OpenBlood2
+         const auto trial_before = g.destination_trial.attempts;
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+-            !g.destination_trial.player_entered || g.destination_trial.created != 452 ||
+-            g.destination_trial.unknown != 1 || g.destination_trial.failed != 1 ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 453 ||
++            g.destination_trial.unknown != 0 || g.destination_trial.failed != 1 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+@@ -100,8 +100,8 @@ namespace OpenBlood2
+                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
+                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+                g.destination_inspection.source_revision == old_revision &&
+-               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 484 &&
+-               g.destination_inspection.unknown == 1 && g.destination_inspection.invalid == 0 &&
++               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 485 &&
++               g.destination_inspection.unknown == 0 && g.destination_inspection.invalid == 0 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/engine/point_light.h b/src/engine/point_light.h
+new file mode 100644
+index 0000000..d503253
+--- /dev/null
++++ b/src/engine/point_light.h
+@@ -0,0 +1,11 @@
++#pragma once
++#include "basedefs_de.h"
++namespace OpenBlood2
++{
++    // One local flashlight for the single-player diagnostic renderer. No handles.
++    struct PointLight
++    {
++        DVector position{}, color{};
++        float radius = 0;
++    };
++} // namespace OpenBlood2
+diff --git a/src/engine/shaders/sprite.frag b/src/engine/shaders/sprite.frag
+index b253557..727a980 100644
+--- a/src/engine/shaders/sprite.frag
++++ b/src/engine/shaders/sprite.frag
+@@ -1,12 +1,19 @@
+ #version 450
+ layout(location=0) in vec3 faceColor;
+ layout(location=1) in vec2 texCoord;
++layout(location=2) in vec3 worldPosition;
+ layout(location=0) out vec4 color;
+ layout(set=2,binding=0) uniform sampler2D albedo;
+-layout(set=3,binding=0,std140) uniform Sprite { vec4 modulation; } u;
++
+ // DTX alpha multiplied by the original effect opacity. The original SDK explicitly disables FLAG_SPRITECHROMAKEY.
++layout(set=3,binding=0,std140) uniform Light { vec4 modulation, positionRadius, lightColor; } u;
++// Bounded radial brightening over the existing unlit base. No shadow/lightmap claim.
++vec3 illumination() {
++    float radial = u.positionRadius.w > 0.0 ? max(0.0, 1.0-distance(worldPosition,u.positionRadius.xyz)/u.positionRadius.w) : 0.0;
++    return vec3(1.0)+u.lightColor.xyz*radial;
++}
+ void main() {
+     vec4 texel=texture(albedo,texCoord);
+     if (texel.a == 0.0) discard;
+-    color=vec4(texel.rgb*faceColor,texel.a*u.modulation.x);
++    color=vec4(texel.rgb*faceColor*illumination(),texel.a*u.modulation.x);
+ }
+diff --git a/src/engine/shaders/sprite_frag.h b/src/engine/shaders/sprite_frag.h
+index b3a7cb2..36dbb8b 100644
+--- a/src/engine/shaders/sprite_frag.h
++++ b/src/engine/shaders/sprite_frag.h
+@@ -1,47 +1,76 @@
+ 	// 1116.2.0
+ 	 #pragma once
+ const uint32_t sprite_frag[] = {
+-	0x07230203,0x00010000,0x0008000b,0x00000038,0x00000000,0x00020011,0x00000001,0x0006000b,
++	0x07230203,0x00010000,0x0008000b,0x0000005e,0x00000000,0x00020011,0x00000001,0x0006000b,
+ 	0x00000001,0x4c534c47,0x6474732e,0x3035342e,0x00000000,0x0003000e,0x00000000,0x00000001,
+-	0x0008000f,0x00000004,0x00000004,0x6e69616d,0x00000000,0x00000011,0x00000020,0x00000025,
+-	0x00030010,0x00000004,0x00000007,0x00030003,0x00000002,0x000001c2,0x00040005,0x00000004,
+-	0x6e69616d,0x00000000,0x00040005,0x00000009,0x65786574,0x0000006c,0x00040005,0x0000000d,
+-	0x65626c61,0x00006f64,0x00050005,0x00000011,0x43786574,0x64726f6f,0x00000000,0x00040005,
+-	0x00000020,0x6f6c6f63,0x00000072,0x00050005,0x00000025,0x65636166,0x6f6c6f43,0x00000072,
+-	0x00040005,0x0000002a,0x69727053,0x00006574,0x00060006,0x0000002a,0x00000000,0x75646f6d,
+-	0x6974616c,0x00006e6f,0x00030005,0x0000002c,0x00000075,0x00040047,0x0000000d,0x00000021,
+-	0x00000000,0x00040047,0x0000000d,0x00000022,0x00000002,0x00040047,0x00000011,0x0000001e,
+-	0x00000001,0x00040047,0x00000020,0x0000001e,0x00000000,0x00040047,0x00000025,0x0000001e,
+-	0x00000000,0x00030047,0x0000002a,0x00000002,0x00050048,0x0000002a,0x00000000,0x00000023,
+-	0x00000000,0x00040047,0x0000002c,0x00000021,0x00000000,0x00040047,0x0000002c,0x00000022,
+-	0x00000003,0x00020013,0x00000002,0x00030021,0x00000003,0x00000002,0x00030016,0x00000006,
+-	0x00000020,0x00040017,0x00000007,0x00000006,0x00000004,0x00040020,0x00000008,0x00000007,
+-	0x00000007,0x00090019,0x0000000a,0x00000006,0x00000001,0x00000000,0x00000000,0x00000000,
+-	0x00000001,0x00000000,0x0003001b,0x0000000b,0x0000000a,0x00040020,0x0000000c,0x00000000,
+-	0x0000000b,0x0004003b,0x0000000c,0x0000000d,0x00000000,0x00040017,0x0000000f,0x00000006,
+-	0x00000002,0x00040020,0x00000010,0x00000001,0x0000000f,0x0004003b,0x00000010,0x00000011,
+-	0x00000001,0x00040015,0x00000014,0x00000020,0x00000000,0x0004002b,0x00000014,0x00000015,
+-	0x00000003,0x00040020,0x00000016,0x00000007,0x00000006,0x0004002b,0x00000006,0x00000019,
+-	0x00000000,0x00020014,0x0000001a,0x00040020,0x0000001f,0x00000003,0x00000007,0x0004003b,
+-	0x0000001f,0x00000020,0x00000003,0x00040017,0x00000021,0x00000006,0x00000003,0x00040020,
+-	0x00000024,0x00000001,0x00000021,0x0004003b,0x00000024,0x00000025,0x00000001,0x0003001e,
+-	0x0000002a,0x00000007,0x00040020,0x0000002b,0x00000002,0x0000002a,0x0004003b,0x0000002b,
+-	0x0000002c,0x00000002,0x00040015,0x0000002d,0x00000020,0x00000001,0x0004002b,0x0000002d,
+-	0x0000002e,0x00000000,0x0004002b,0x00000014,0x0000002f,0x00000000,0x00040020,0x00000030,
+-	0x00000002,0x00000006,0x00050036,0x00000002,0x00000004,0x00000000,0x00000003,0x000200f8,
+-	0x00000005,0x0004003b,0x00000008,0x00000009,0x00000007,0x0004003d,0x0000000b,0x0000000e,
+-	0x0000000d,0x0004003d,0x0000000f,0x00000012,0x00000011,0x00050057,0x00000007,0x00000013,
+-	0x0000000e,0x00000012,0x0003003e,0x00000009,0x00000013,0x00050041,0x00000016,0x00000017,
+-	0x00000009,0x00000015,0x0004003d,0x00000006,0x00000018,0x00000017,0x000500b4,0x0000001a,
+-	0x0000001b,0x00000018,0x00000019,0x000300f7,0x0000001d,0x00000000,0x000400fa,0x0000001b,
+-	0x0000001c,0x0000001d,0x000200f8,0x0000001c,0x000100fc,0x000200f8,0x0000001d,0x0004003d,
+-	0x00000007,0x00000022,0x00000009,0x0008004f,0x00000021,0x00000023,0x00000022,0x00000022,
+-	0x00000000,0x00000001,0x00000002,0x0004003d,0x00000021,0x00000026,0x00000025,0x00050085,
+-	0x00000021,0x00000027,0x00000023,0x00000026,0x00050041,0x00000016,0x00000028,0x00000009,
+-	0x00000015,0x0004003d,0x00000006,0x00000029,0x00000028,0x00060041,0x00000030,0x00000031,
+-	0x0000002c,0x0000002e,0x0000002f,0x0004003d,0x00000006,0x00000032,0x00000031,0x00050085,
+-	0x00000006,0x00000033,0x00000029,0x00000032,0x00050051,0x00000006,0x00000034,0x00000027,
+-	0x00000000,0x00050051,0x00000006,0x00000035,0x00000027,0x00000001,0x00050051,0x00000006,
+-	0x00000036,0x00000027,0x00000002,0x00070050,0x00000007,0x00000037,0x00000034,0x00000035,
+-	0x00000036,0x00000033,0x0003003e,0x00000020,0x00000037,0x000100fd,0x00010038
++	0x0009000f,0x00000004,0x00000004,0x6e69616d,0x00000000,0x00000020,0x00000041,0x0000004b,
++	0x0000004e,0x00030010,0x00000004,0x00000007,0x00030003,0x00000002,0x000001c2,0x00040005,
++	0x00000004,0x6e69616d,0x00000000,0x00060005,0x00000009,0x756c6c69,0x616e696d,0x6e6f6974,
++	0x00000028,0x00040005,0x0000000c,0x69646172,0x00006c61,0x00040005,0x0000000e,0x6867694c,
++	0x00000074,0x00060006,0x0000000e,0x00000000,0x75646f6d,0x6974616c,0x00006e6f,0x00070006,
++	0x0000000e,0x00000001,0x69736f70,0x6e6f6974,0x69646152,0x00007375,0x00060006,0x0000000e,
++	0x00000002,0x6867696c,0x6c6f4374,0x0000726f,0x00030005,0x00000010,0x00000075,0x00060005,
++	0x00000020,0x6c726f77,0x736f5064,0x6f697469,0x0000006e,0x00040005,0x00000039,0x65786574,
++	0x0000006c,0x00040005,0x0000003d,0x65626c61,0x00006f64,0x00050005,0x00000041,0x43786574,
++	0x64726f6f,0x00000000,0x00040005,0x0000004b,0x6f6c6f63,0x00000072,0x00050005,0x0000004e,
++	0x65636166,0x6f6c6f43,0x00000072,0x00030047,0x0000000e,0x00000002,0x00050048,0x0000000e,
++	0x00000000,0x00000023,0x00000000,0x00050048,0x0000000e,0x00000001,0x00000023,0x00000010,
++	0x00050048,0x0000000e,0x00000002,0x00000023,0x00000020,0x00040047,0x00000010,0x00000021,
++	0x00000000,0x00040047,0x00000010,0x00000022,0x00000003,0x00040047,0x00000020,0x0000001e,
++	0x00000002,0x00040047,0x0000003d,0x00000021,0x00000000,0x00040047,0x0000003d,0x00000022,
++	0x00000002,0x00040047,0x00000041,0x0000001e,0x00000001,0x00040047,0x0000004b,0x0000001e,
++	0x00000000,0x00040047,0x0000004e,0x0000001e,0x00000000,0x00020013,0x00000002,0x00030021,
++	0x00000003,0x00000002,0x00030016,0x00000006,0x00000020,0x00040017,0x00000007,0x00000006,
++	0x00000003,0x00030021,0x00000008,0x00000007,0x00040020,0x0000000b,0x00000007,0x00000006,
++	0x00040017,0x0000000d,0x00000006,0x00000004,0x0005001e,0x0000000e,0x0000000d,0x0000000d,
++	0x0000000d,0x00040020,0x0000000f,0x00000002,0x0000000e,0x0004003b,0x0000000f,0x00000010,
++	0x00000002,0x00040015,0x00000011,0x00000020,0x00000001,0x0004002b,0x00000011,0x00000012,
++	0x00000001,0x00040015,0x00000013,0x00000020,0x00000000,0x0004002b,0x00000013,0x00000014,
++	0x00000003,0x00040020,0x00000015,0x00000002,0x00000006,0x0004002b,0x00000006,0x00000018,
++	0x00000000,0x00020014,0x00000019,0x0004002b,0x00000006,0x0000001e,0x3f800000,0x00040020,
++	0x0000001f,0x00000001,0x00000007,0x0004003b,0x0000001f,0x00000020,0x00000001,0x00040020,
++	0x00000022,0x00000002,0x0000000d,0x0006002c,0x00000007,0x0000002e,0x0000001e,0x0000001e,
++	0x0000001e,0x0004002b,0x00000011,0x0000002f,0x00000002,0x00040020,0x00000038,0x00000007,
++	0x0000000d,0x00090019,0x0000003a,0x00000006,0x00000001,0x00000000,0x00000000,0x00000000,
++	0x00000001,0x00000000,0x0003001b,0x0000003b,0x0000003a,0x00040020,0x0000003c,0x00000000,
++	0x0000003b,0x0004003b,0x0000003c,0x0000003d,0x00000000,0x00040017,0x0000003f,0x00000006,
++	0x00000002,0x00040020,0x00000040,0x00000001,0x0000003f,0x0004003b,0x00000040,0x00000041,
++	0x00000001,0x00040020,0x0000004a,0x00000003,0x0000000d,0x0004003b,0x0000004a,0x0000004b,
++	0x00000003,0x0004003b,0x0000001f,0x0000004e,0x00000001,0x0004002b,0x00000011,0x00000055,
++	0x00000000,0x0004002b,0x00000013,0x00000056,0x00000000,0x00050036,0x00000002,0x00000004,
++	0x00000000,0x00000003,0x000200f8,0x00000005,0x0004003b,0x00000038,0x00000039,0x00000007,
++	0x0004003d,0x0000003b,0x0000003e,0x0000003d,0x0004003d,0x0000003f,0x00000042,0x00000041,
++	0x00050057,0x0000000d,0x00000043,0x0000003e,0x00000042,0x0003003e,0x00000039,0x00000043,
++	0x00050041,0x0000000b,0x00000044,0x00000039,0x00000014,0x0004003d,0x00000006,0x00000045,
++	0x00000044,0x000500b4,0x00000019,0x00000046,0x00000045,0x00000018,0x000300f7,0x00000048,
++	0x00000000,0x000400fa,0x00000046,0x00000047,0x00000048,0x000200f8,0x00000047,0x000100fc,
++	0x000200f8,0x00000048,0x0004003d,0x0000000d,0x0000004c,0x00000039,0x0008004f,0x00000007,
++	0x0000004d,0x0000004c,0x0000004c,0x00000000,0x00000001,0x00000002,0x0004003d,0x00000007,
++	0x0000004f,0x0000004e,0x00050085,0x00000007,0x00000050,0x0000004d,0x0000004f,0x00040039,
++	0x00000007,0x00000051,0x00000009,0x00050085,0x00000007,0x00000052,0x00000050,0x00000051,
++	0x00050041,0x0000000b,0x00000053,0x00000039,0x00000014,0x0004003d,0x00000006,0x00000054,
++	0x00000053,0x00060041,0x00000015,0x00000057,0x00000010,0x00000055,0x00000056,0x0004003d,
++	0x00000006,0x00000058,0x00000057,0x00050085,0x00000006,0x00000059,0x00000054,0x00000058,
++	0x00050051,0x00000006,0x0000005a,0x00000052,0x00000000,0x00050051,0x00000006,0x0000005b,
++	0x00000052,0x00000001,0x00050051,0x00000006,0x0000005c,0x00000052,0x00000002,0x00070050,
++	0x0000000d,0x0000005d,0x0000005a,0x0000005b,0x0000005c,0x00000059,0x0003003e,0x0000004b,
++	0x0000005d,0x000100fd,0x00010038,0x00050036,0x00000007,0x00000009,0x00000000,0x00000008,
++	0x000200f8,0x0000000a,0x0004003b,0x0000000b,0x0000000c,0x00000007,0x0004003b,0x0000000b,
++	0x0000001b,0x00000007,0x00060041,0x00000015,0x00000016,0x00000010,0x00000012,0x00000014,
++	0x0004003d,0x00000006,0x00000017,0x00000016,0x000500ba,0x00000019,0x0000001a,0x00000017,
++	0x00000018,0x000300f7,0x0000001d,0x00000000,0x000400fa,0x0000001a,0x0000001c,0x0000002c,
++	0x000200f8,0x0000001c,0x0004003d,0x00000007,0x00000021,0x00000020,0x00050041,0x00000022,
++	0x00000023,0x00000010,0x00000012,0x0004003d,0x0000000d,0x00000024,0x00000023,0x0008004f,
++	0x00000007,0x00000025,0x00000024,0x00000024,0x00000000,0x00000001,0x00000002,0x0007000c,
++	0x00000006,0x00000026,0x00000001,0x00000043,0x00000021,0x00000025,0x00060041,0x00000015,
++	0x00000027,0x00000010,0x00000012,0x00000014,0x0004003d,0x00000006,0x00000028,0x00000027,
++	0x00050088,0x00000006,0x00000029,0x00000026,0x00000028,0x00050083,0x00000006,0x0000002a,
++	0x0000001e,0x00000029,0x0007000c,0x00000006,0x0000002b,0x00000001,0x00000028,0x00000018,
++	0x0000002a,0x0003003e,0x0000001b,0x0000002b,0x000200f9,0x0000001d,0x000200f8,0x0000002c,
++	0x0003003e,0x0000001b,0x00000018,0x000200f9,0x0000001d,0x000200f8,0x0000001d,0x0004003d,
++	0x00000006,0x0000002d,0x0000001b,0x0003003e,0x0000000c,0x0000002d,0x00050041,0x00000022,
++	0x00000030,0x00000010,0x0000002f,0x0004003d,0x0000000d,0x00000031,0x00000030,0x0008004f,
++	0x00000007,0x00000032,0x00000031,0x00000031,0x00000000,0x00000001,0x00000002,0x0004003d,
++	0x00000006,0x00000033,0x0000000c,0x0005008e,0x00000007,0x00000034,0x00000032,0x00000033,
++	0x00050081,0x00000007,0x00000035,0x0000002e,0x00000034,0x000200fe,0x00000035,0x00010038
+ };
+diff --git a/src/engine/shaders/sprite_frag_msl.h b/src/engine/shaders/sprite_frag_msl.h
+index 8f7753d..7757fbc 100644
+--- a/src/engine/shaders/sprite_frag_msl.h
++++ b/src/engine/shaders/sprite_frag_msl.h
+@@ -2,14 +2,18 @@
+ // Generated by pinned SDL_shadercross; see tools/shaders and GenerateWorldShaders.cmake.
+ static constexpr unsigned sprite_frag_samplers = 1;
+ static constexpr unsigned sprite_frag_uniforms = 1;
+-static const char sprite_frag_msl[] = R"blood2msl(#include <metal_stdlib>
++static const char sprite_frag_msl[] = R"blood2msl(#pragma clang diagnostic ignored "-Wmissing-prototypes"
++
++#include <metal_stdlib>
+ #include <simd/simd.h>
+ 
+ using namespace metal;
+ 
+-struct Sprite
++struct Light
+ {
+     float4 modulation;
++    float4 positionRadius;
++    float4 lightColor;
+ };
+ 
+ struct main0_out
+@@ -21,9 +25,26 @@ struct main0_in
+ {
+     float3 faceColor [[user(locn0)]];
+     float2 texCoord [[user(locn1)]];
++    float3 worldPosition [[user(locn2)]];
+ };
+ 
+-fragment main0_out main0(main0_in in [[stage_in]], constant Sprite& u [[buffer(0)]], texture2d<float> albedo [[texture(0)]], sampler albedoSmplr [[sampler(0)]])
++static inline __attribute__((always_inline))
++float3 illumination(constant Light& u, thread float3& worldPosition)
++{
++    float _27;
++    if (u.positionRadius.w > 0.0)
++    {
++        _27 = fast::max(0.0, 1.0 - (distance(worldPosition, u.positionRadius.xyz) / u.positionRadius.w));
++    }
++    else
++    {
++        _27 = 0.0;
++    }
++    float radial = _27;
++    return float3(1.0) + (u.lightColor.xyz * radial);
++}
++
++fragment main0_out main0(main0_in in [[stage_in]], constant Light& u [[buffer(0)]], texture2d<float> albedo [[texture(0)]], sampler albedoSmplr [[sampler(0)]])
+ {
+     main0_out out = {};
+     float4 texel = albedo.sample(albedoSmplr, in.texCoord);
+@@ -31,7 +52,7 @@ fragment main0_out main0(main0_in in [[stage_in]], constant Sprite& u [[buffer(0
+     {
+         discard_fragment();
+     }
+-    out.color = float4(texel.xyz * in.faceColor, texel.w * u.modulation.x);
++    out.color = float4((texel.xyz * in.faceColor) * illumination(u, in.worldPosition), texel.w * u.modulation.x);
+     return out;
+ }
+ 
+diff --git a/src/engine/shaders/world.frag b/src/engine/shaders/world.frag
+index ae2e49d..60dbad8 100644
+--- a/src/engine/shaders/world.frag
++++ b/src/engine/shaders/world.frag
+@@ -2,6 +2,13 @@
+ layout(location=0) in vec3 faceColor;
+ layout(location=0) out vec4 color;
+ layout(location=1) in vec2 texCoord;
++layout(location=2) in vec3 worldPosition;
+ layout(set=2,binding=0) uniform sampler2D albedo;
+-// Opaque base-color diagnostic. Alpha/sky/lightmaps are explicitly separate work.
+-void main() { color=vec4(texture(albedo,texCoord).rgb*faceColor,1.0); }
++
++layout(set=3,binding=0,std140) uniform Light { vec4 modulation, positionRadius, lightColor; } u;
++// Bounded radial brightening over the existing unlit base. No shadow/lightmap claim.
++vec3 illumination() {
++    float radial = u.positionRadius.w > 0.0 ? max(0.0, 1.0-distance(worldPosition,u.positionRadius.xyz)/u.positionRadius.w) : 0.0;
++    return vec3(1.0)+u.lightColor.xyz*radial;
++}
++void main() { color=vec4(texture(albedo,texCoord).rgb*faceColor*illumination(),1.0); }
+diff --git a/src/engine/shaders/world.vert b/src/engine/shaders/world.vert
+index 9b1cc22..23cecbe 100644
+--- a/src/engine/shaders/world.vert
++++ b/src/engine/shaders/world.vert
+@@ -4,6 +4,7 @@ layout(location=1) in vec3 color;
+ layout(location=2) in vec2 uv;
+ layout(location=0) out vec3 faceColor;
+ layout(location=1) out vec2 texCoord;
++layout(location=2) out vec3 worldPosition;
+ layout(set=1,binding=0,std140) uniform View {
+     vec4 eye, right, up, forward, projection, translation, quaternion, textureOffset;
+ } u;
+@@ -15,6 +16,7 @@ void main() {
+     gl_Position=vec4(dot(relative,u.right.xyz)*u.projection.x,
+                      dot(relative,u.up.xyz)*u.projection.y,
+                      z*u.projection.z+u.projection.w,z);
++    worldPosition=world;
+     faceColor=color;
+     texCoord=uv+u.textureOffset.xy;
+ }
+diff --git a/src/engine/shaders/world_frag.h b/src/engine/shaders/world_frag.h
+index cd1f5a6..0b737a5 100644
+--- a/src/engine/shaders/world_frag.h
++++ b/src/engine/shaders/world_frag.h
+@@ -1,30 +1,67 @@
+ 	// 1116.2.0
+ 	 #pragma once
+ const uint32_t world_frag[] = {
+-	0x07230203,0x00010000,0x0008000b,0x0000001f,0x00000000,0x00020011,0x00000001,0x0006000b,
++	0x07230203,0x00010000,0x0008000b,0x0000004e,0x00000000,0x00020011,0x00000001,0x0006000b,
+ 	0x00000001,0x4c534c47,0x6474732e,0x3035342e,0x00000000,0x0003000e,0x00000000,0x00000001,
+-	0x0008000f,0x00000004,0x00000004,0x6e69616d,0x00000000,0x00000009,0x00000011,0x00000017,
+-	0x00030010,0x00000004,0x00000007,0x00030003,0x00000002,0x000001c2,0x00040005,0x00000004,
+-	0x6e69616d,0x00000000,0x00040005,0x00000009,0x6f6c6f63,0x00000072,0x00040005,0x0000000d,
+-	0x65626c61,0x00006f64,0x00050005,0x00000011,0x43786574,0x64726f6f,0x00000000,0x00050005,
+-	0x00000017,0x65636166,0x6f6c6f43,0x00000072,0x00040047,0x00000009,0x0000001e,0x00000000,
+-	0x00040047,0x0000000d,0x00000021,0x00000000,0x00040047,0x0000000d,0x00000022,0x00000002,
+-	0x00040047,0x00000011,0x0000001e,0x00000001,0x00040047,0x00000017,0x0000001e,0x00000000,
+-	0x00020013,0x00000002,0x00030021,0x00000003,0x00000002,0x00030016,0x00000006,0x00000020,
+-	0x00040017,0x00000007,0x00000006,0x00000004,0x00040020,0x00000008,0x00000003,0x00000007,
+-	0x0004003b,0x00000008,0x00000009,0x00000003,0x00090019,0x0000000a,0x00000006,0x00000001,
+-	0x00000000,0x00000000,0x00000000,0x00000001,0x00000000,0x0003001b,0x0000000b,0x0000000a,
+-	0x00040020,0x0000000c,0x00000000,0x0000000b,0x0004003b,0x0000000c,0x0000000d,0x00000000,
+-	0x00040017,0x0000000f,0x00000006,0x00000002,0x00040020,0x00000010,0x00000001,0x0000000f,
+-	0x0004003b,0x00000010,0x00000011,0x00000001,0x00040017,0x00000014,0x00000006,0x00000003,
+-	0x00040020,0x00000016,0x00000001,0x00000014,0x0004003b,0x00000016,0x00000017,0x00000001,
+-	0x0004002b,0x00000006,0x0000001a,0x3f800000,0x00050036,0x00000002,0x00000004,0x00000000,
+-	0x00000003,0x000200f8,0x00000005,0x0004003d,0x0000000b,0x0000000e,0x0000000d,0x0004003d,
+-	0x0000000f,0x00000012,0x00000011,0x00050057,0x00000007,0x00000013,0x0000000e,0x00000012,
+-	0x0008004f,0x00000014,0x00000015,0x00000013,0x00000013,0x00000000,0x00000001,0x00000002,
+-	0x0004003d,0x00000014,0x00000018,0x00000017,0x00050085,0x00000014,0x00000019,0x00000015,
+-	0x00000018,0x00050051,0x00000006,0x0000001b,0x00000019,0x00000000,0x00050051,0x00000006,
+-	0x0000001c,0x00000019,0x00000001,0x00050051,0x00000006,0x0000001d,0x00000019,0x00000002,
+-	0x00070050,0x00000007,0x0000001e,0x0000001b,0x0000001c,0x0000001d,0x0000001a,0x0003003e,
+-	0x00000009,0x0000001e,0x000100fd,0x00010038
++	0x0009000f,0x00000004,0x00000004,0x6e69616d,0x00000000,0x00000020,0x00000039,0x00000041,
++	0x00000045,0x00030010,0x00000004,0x00000007,0x00030003,0x00000002,0x000001c2,0x00040005,
++	0x00000004,0x6e69616d,0x00000000,0x00060005,0x00000009,0x756c6c69,0x616e696d,0x6e6f6974,
++	0x00000028,0x00040005,0x0000000c,0x69646172,0x00006c61,0x00040005,0x0000000e,0x6867694c,
++	0x00000074,0x00060006,0x0000000e,0x00000000,0x75646f6d,0x6974616c,0x00006e6f,0x00070006,
++	0x0000000e,0x00000001,0x69736f70,0x6e6f6974,0x69646152,0x00007375,0x00060006,0x0000000e,
++	0x00000002,0x6867696c,0x6c6f4374,0x0000726f,0x00030005,0x00000010,0x00000075,0x00060005,
++	0x00000020,0x6c726f77,0x736f5064,0x6f697469,0x0000006e,0x00040005,0x00000039,0x6f6c6f63,
++	0x00000072,0x00040005,0x0000003d,0x65626c61,0x00006f64,0x00050005,0x00000041,0x43786574,
++	0x64726f6f,0x00000000,0x00050005,0x00000045,0x65636166,0x6f6c6f43,0x00000072,0x00030047,
++	0x0000000e,0x00000002,0x00050048,0x0000000e,0x00000000,0x00000023,0x00000000,0x00050048,
++	0x0000000e,0x00000001,0x00000023,0x00000010,0x00050048,0x0000000e,0x00000002,0x00000023,
++	0x00000020,0x00040047,0x00000010,0x00000021,0x00000000,0x00040047,0x00000010,0x00000022,
++	0x00000003,0x00040047,0x00000020,0x0000001e,0x00000002,0x00040047,0x00000039,0x0000001e,
++	0x00000000,0x00040047,0x0000003d,0x00000021,0x00000000,0x00040047,0x0000003d,0x00000022,
++	0x00000002,0x00040047,0x00000041,0x0000001e,0x00000001,0x00040047,0x00000045,0x0000001e,
++	0x00000000,0x00020013,0x00000002,0x00030021,0x00000003,0x00000002,0x00030016,0x00000006,
++	0x00000020,0x00040017,0x00000007,0x00000006,0x00000003,0x00030021,0x00000008,0x00000007,
++	0x00040020,0x0000000b,0x00000007,0x00000006,0x00040017,0x0000000d,0x00000006,0x00000004,
++	0x0005001e,0x0000000e,0x0000000d,0x0000000d,0x0000000d,0x00040020,0x0000000f,0x00000002,
++	0x0000000e,0x0004003b,0x0000000f,0x00000010,0x00000002,0x00040015,0x00000011,0x00000020,
++	0x00000001,0x0004002b,0x00000011,0x00000012,0x00000001,0x00040015,0x00000013,0x00000020,
++	0x00000000,0x0004002b,0x00000013,0x00000014,0x00000003,0x00040020,0x00000015,0x00000002,
++	0x00000006,0x0004002b,0x00000006,0x00000018,0x00000000,0x00020014,0x00000019,0x0004002b,
++	0x00000006,0x0000001e,0x3f800000,0x00040020,0x0000001f,0x00000001,0x00000007,0x0004003b,
++	0x0000001f,0x00000020,0x00000001,0x00040020,0x00000022,0x00000002,0x0000000d,0x0006002c,
++	0x00000007,0x0000002e,0x0000001e,0x0000001e,0x0000001e,0x0004002b,0x00000011,0x0000002f,
++	0x00000002,0x00040020,0x00000038,0x00000003,0x0000000d,0x0004003b,0x00000038,0x00000039,
++	0x00000003,0x00090019,0x0000003a,0x00000006,0x00000001,0x00000000,0x00000000,0x00000000,
++	0x00000001,0x00000000,0x0003001b,0x0000003b,0x0000003a,0x00040020,0x0000003c,0x00000000,
++	0x0000003b,0x0004003b,0x0000003c,0x0000003d,0x00000000,0x00040017,0x0000003f,0x00000006,
++	0x00000002,0x00040020,0x00000040,0x00000001,0x0000003f,0x0004003b,0x00000040,0x00000041,
++	0x00000001,0x0004003b,0x0000001f,0x00000045,0x00000001,0x00050036,0x00000002,0x00000004,
++	0x00000000,0x00000003,0x000200f8,0x00000005,0x0004003d,0x0000003b,0x0000003e,0x0000003d,
++	0x0004003d,0x0000003f,0x00000042,0x00000041,0x00050057,0x0000000d,0x00000043,0x0000003e,
++	0x00000042,0x0008004f,0x00000007,0x00000044,0x00000043,0x00000043,0x00000000,0x00000001,
++	0x00000002,0x0004003d,0x00000007,0x00000046,0x00000045,0x00050085,0x00000007,0x00000047,
++	0x00000044,0x00000046,0x00040039,0x00000007,0x00000048,0x00000009,0x00050085,0x00000007,
++	0x00000049,0x00000047,0x00000048,0x00050051,0x00000006,0x0000004a,0x00000049,0x00000000,
++	0x00050051,0x00000006,0x0000004b,0x00000049,0x00000001,0x00050051,0x00000006,0x0000004c,
++	0x00000049,0x00000002,0x00070050,0x0000000d,0x0000004d,0x0000004a,0x0000004b,0x0000004c,
++	0x0000001e,0x0003003e,0x00000039,0x0000004d,0x000100fd,0x00010038,0x00050036,0x00000007,
++	0x00000009,0x00000000,0x00000008,0x000200f8,0x0000000a,0x0004003b,0x0000000b,0x0000000c,
++	0x00000007,0x0004003b,0x0000000b,0x0000001b,0x00000007,0x00060041,0x00000015,0x00000016,
++	0x00000010,0x00000012,0x00000014,0x0004003d,0x00000006,0x00000017,0x00000016,0x000500ba,
++	0x00000019,0x0000001a,0x00000017,0x00000018,0x000300f7,0x0000001d,0x00000000,0x000400fa,
++	0x0000001a,0x0000001c,0x0000002c,0x000200f8,0x0000001c,0x0004003d,0x00000007,0x00000021,
++	0x00000020,0x00050041,0x00000022,0x00000023,0x00000010,0x00000012,0x0004003d,0x0000000d,
++	0x00000024,0x00000023,0x0008004f,0x00000007,0x00000025,0x00000024,0x00000024,0x00000000,
++	0x00000001,0x00000002,0x0007000c,0x00000006,0x00000026,0x00000001,0x00000043,0x00000021,
++	0x00000025,0x00060041,0x00000015,0x00000027,0x00000010,0x00000012,0x00000014,0x0004003d,
++	0x00000006,0x00000028,0x00000027,0x00050088,0x00000006,0x00000029,0x00000026,0x00000028,
++	0x00050083,0x00000006,0x0000002a,0x0000001e,0x00000029,0x0007000c,0x00000006,0x0000002b,
++	0x00000001,0x00000028,0x00000018,0x0000002a,0x0003003e,0x0000001b,0x0000002b,0x000200f9,
++	0x0000001d,0x000200f8,0x0000002c,0x0003003e,0x0000001b,0x00000018,0x000200f9,0x0000001d,
++	0x000200f8,0x0000001d,0x0004003d,0x00000006,0x0000002d,0x0000001b,0x0003003e,0x0000000c,
++	0x0000002d,0x00050041,0x00000022,0x00000030,0x00000010,0x0000002f,0x0004003d,0x0000000d,
++	0x00000031,0x00000030,0x0008004f,0x00000007,0x00000032,0x00000031,0x00000031,0x00000000,
++	0x00000001,0x00000002,0x0004003d,0x00000006,0x00000033,0x0000000c,0x0005008e,0x00000007,
++	0x00000034,0x00000032,0x00000033,0x00050081,0x00000007,0x00000035,0x0000002e,0x00000034,
++	0x000200fe,0x00000035,0x00010038
+ };
+diff --git a/src/engine/shaders/world_frag_msl.h b/src/engine/shaders/world_frag_msl.h
+index 472a0d0..b200d80 100644
+--- a/src/engine/shaders/world_frag_msl.h
++++ b/src/engine/shaders/world_frag_msl.h
+@@ -1,12 +1,21 @@
+ #pragma once
+ // Generated by pinned SDL_shadercross; see tools/shaders and GenerateWorldShaders.cmake.
+ static constexpr unsigned world_frag_samplers = 1;
+-static constexpr unsigned world_frag_uniforms = 0;
+-static const char world_frag_msl[] = R"blood2msl(#include <metal_stdlib>
++static constexpr unsigned world_frag_uniforms = 1;
++static const char world_frag_msl[] = R"blood2msl(#pragma clang diagnostic ignored "-Wmissing-prototypes"
++
++#include <metal_stdlib>
+ #include <simd/simd.h>
+ 
+ using namespace metal;
+ 
++struct Light
++{
++    float4 modulation;
++    float4 positionRadius;
++    float4 lightColor;
++};
++
+ struct main0_out
+ {
+     float4 color [[color(0)]];
+@@ -16,12 +25,29 @@ struct main0_in
+ {
+     float3 faceColor [[user(locn0)]];
+     float2 texCoord [[user(locn1)]];
++    float3 worldPosition [[user(locn2)]];
+ };
+ 
+-fragment main0_out main0(main0_in in [[stage_in]], texture2d<float> albedo [[texture(0)]], sampler albedoSmplr [[sampler(0)]])
++static inline __attribute__((always_inline))
++float3 illumination(constant Light& u, thread float3& worldPosition)
++{
++    float _27;
++    if (u.positionRadius.w > 0.0)
++    {
++        _27 = fast::max(0.0, 1.0 - (distance(worldPosition, u.positionRadius.xyz) / u.positionRadius.w));
++    }
++    else
++    {
++        _27 = 0.0;
++    }
++    float radial = _27;
++    return float3(1.0) + (u.lightColor.xyz * radial);
++}
++
++fragment main0_out main0(main0_in in [[stage_in]], constant Light& u [[buffer(0)]], texture2d<float> albedo [[texture(0)]], sampler albedoSmplr [[sampler(0)]])
+ {
+     main0_out out = {};
+-    out.color = float4(albedo.sample(albedoSmplr, in.texCoord).xyz * in.faceColor, 1.0);
++    out.color = float4((albedo.sample(albedoSmplr, in.texCoord).xyz * in.faceColor) * illumination(u, in.worldPosition), 1.0);
+     return out;
+ }
+ 
+diff --git a/src/engine/shaders/world_vert.h b/src/engine/shaders/world_vert.h
+index 1cc8958..9927406 100644
+--- a/src/engine/shaders/world_vert.h
++++ b/src/engine/shaders/world_vert.h
+@@ -1,103 +1,105 @@
+ 	// 1116.2.0
+ 	 #pragma once
+ const uint32_t world_vert[] = {
+-	0x07230203,0x00010000,0x0008000b,0x00000070,0x00000000,0x00020011,0x00000001,0x0006000b,
++	0x07230203,0x00010000,0x0008000b,0x00000072,0x00000000,0x00020011,0x00000001,0x0006000b,
+ 	0x00000001,0x4c534c47,0x6474732e,0x3035342e,0x00000000,0x0003000e,0x00000000,0x00000001,
+-	0x000b000f,0x00000000,0x00000004,0x6e69616d,0x00000000,0x00000016,0x00000040,0x00000062,
+-	0x00000063,0x00000067,0x00000069,0x00030003,0x00000002,0x000001c2,0x00040005,0x00000004,
+-	0x6e69616d,0x00000000,0x00030005,0x00000009,0x00000071,0x00040005,0x0000000b,0x77656956,
+-	0x00000000,0x00040006,0x0000000b,0x00000000,0x00657965,0x00050006,0x0000000b,0x00000001,
+-	0x68676972,0x00000074,0x00040006,0x0000000b,0x00000002,0x00007075,0x00050006,0x0000000b,
+-	0x00000003,0x77726f66,0x00647261,0x00060006,0x0000000b,0x00000004,0x6a6f7270,0x69746365,
+-	0x00006e6f,0x00060006,0x0000000b,0x00000005,0x6e617274,0x74616c73,0x006e6f69,0x00060006,
+-	0x0000000b,0x00000006,0x74617571,0x696e7265,0x00006e6f,0x00070006,0x0000000b,0x00000007,
+-	0x74786574,0x4f657275,0x65736666,0x00000074,0x00030005,0x0000000d,0x00000075,0x00040005,
+-	0x00000014,0x6c726f77,0x00000064,0x00050005,0x00000016,0x69736f70,0x6e6f6974,0x00000000,
+-	0x00050005,0x0000002d,0x616c6572,0x65766974,0x00000000,0x00030005,0x00000035,0x0000007a,
+-	0x00060005,0x0000003e,0x505f6c67,0x65567265,0x78657472,0x00000000,0x00060006,0x0000003e,
+-	0x00000000,0x505f6c67,0x7469736f,0x006e6f69,0x00070006,0x0000003e,0x00000001,0x505f6c67,
+-	0x746e696f,0x657a6953,0x00000000,0x00070006,0x0000003e,0x00000002,0x435f6c67,0x4470696c,
+-	0x61747369,0x0065636e,0x00070006,0x0000003e,0x00000003,0x435f6c67,0x446c6c75,0x61747369,
+-	0x0065636e,0x00030005,0x00000040,0x00000000,0x00050005,0x00000062,0x65636166,0x6f6c6f43,
+-	0x00000072,0x00040005,0x00000063,0x6f6c6f63,0x00000072,0x00050005,0x00000067,0x43786574,
+-	0x64726f6f,0x00000000,0x00030005,0x00000069,0x00007675,0x00030047,0x0000000b,0x00000002,
+-	0x00050048,0x0000000b,0x00000000,0x00000023,0x00000000,0x00050048,0x0000000b,0x00000001,
+-	0x00000023,0x00000010,0x00050048,0x0000000b,0x00000002,0x00000023,0x00000020,0x00050048,
+-	0x0000000b,0x00000003,0x00000023,0x00000030,0x00050048,0x0000000b,0x00000004,0x00000023,
+-	0x00000040,0x00050048,0x0000000b,0x00000005,0x00000023,0x00000050,0x00050048,0x0000000b,
+-	0x00000006,0x00000023,0x00000060,0x00050048,0x0000000b,0x00000007,0x00000023,0x00000070,
+-	0x00040047,0x0000000d,0x00000021,0x00000000,0x00040047,0x0000000d,0x00000022,0x00000001,
+-	0x00040047,0x00000016,0x0000001e,0x00000000,0x00030047,0x0000003e,0x00000002,0x00050048,
+-	0x0000003e,0x00000000,0x0000000b,0x00000000,0x00050048,0x0000003e,0x00000001,0x0000000b,
+-	0x00000001,0x00050048,0x0000003e,0x00000002,0x0000000b,0x00000003,0x00050048,0x0000003e,
+-	0x00000003,0x0000000b,0x00000004,0x00040047,0x00000062,0x0000001e,0x00000000,0x00040047,
+-	0x00000063,0x0000001e,0x00000001,0x00040047,0x00000067,0x0000001e,0x00000001,0x00040047,
+-	0x00000069,0x0000001e,0x00000002,0x00020013,0x00000002,0x00030021,0x00000003,0x00000002,
+-	0x00030016,0x00000006,0x00000020,0x00040017,0x00000007,0x00000006,0x00000003,0x00040020,
+-	0x00000008,0x00000007,0x00000007,0x00040017,0x0000000a,0x00000006,0x00000004,0x000a001e,
+-	0x0000000b,0x0000000a,0x0000000a,0x0000000a,0x0000000a,0x0000000a,0x0000000a,0x0000000a,
+-	0x0000000a,0x00040020,0x0000000c,0x00000002,0x0000000b,0x0004003b,0x0000000c,0x0000000d,
+-	0x00000002,0x00040015,0x0000000e,0x00000020,0x00000001,0x0004002b,0x0000000e,0x0000000f,
+-	0x00000006,0x00040020,0x00000010,0x00000002,0x0000000a,0x00040020,0x00000015,0x00000001,
+-	0x00000007,0x0004003b,0x00000015,0x00000016,0x00000001,0x0004002b,0x00000006,0x00000018,
+-	0x40000000,0x00040015,0x0000001d,0x00000020,0x00000000,0x0004002b,0x0000001d,0x0000001e,
+-	0x00000003,0x00040020,0x0000001f,0x00000002,0x00000006,0x0004002b,0x0000000e,0x00000028,
+-	0x00000005,0x0004002b,0x0000000e,0x0000002f,0x00000000,0x00040020,0x00000034,0x00000007,
+-	0x00000006,0x0004002b,0x0000000e,0x00000037,0x00000003,0x0004002b,0x0000001d,0x0000003c,
+-	0x00000001,0x0004001c,0x0000003d,0x00000006,0x0000003c,0x0006001e,0x0000003e,0x0000000a,
+-	0x00000006,0x0000003d,0x0000003d,0x00040020,0x0000003f,0x00000003,0x0000003e,0x0004003b,
+-	0x0000003f,0x00000040,0x00000003,0x0004002b,0x0000000e,0x00000042,0x00000001,0x0004002b,
+-	0x0000000e,0x00000047,0x00000004,0x0004002b,0x0000001d,0x00000048,0x00000000,0x0004002b,
+-	0x0000000e,0x0000004d,0x00000002,0x0004002b,0x0000001d,0x00000056,0x00000002,0x00040020,
+-	0x0000005f,0x00000003,0x0000000a,0x00040020,0x00000061,0x00000003,0x00000007,0x0004003b,
+-	0x00000061,0x00000062,0x00000003,0x0004003b,0x00000015,0x00000063,0x00000001,0x00040017,
+-	0x00000065,0x00000006,0x00000002,0x00040020,0x00000066,0x00000003,0x00000065,0x0004003b,
+-	0x00000066,0x00000067,0x00000003,0x00040020,0x00000068,0x00000001,0x00000065,0x0004003b,
+-	0x00000068,0x00000069,0x00000001,0x0004002b,0x0000000e,0x0000006b,0x00000007,0x00050036,
+-	0x00000002,0x00000004,0x00000000,0x00000003,0x000200f8,0x00000005,0x0004003b,0x00000008,
+-	0x00000009,0x00000007,0x0004003b,0x00000008,0x00000014,0x00000007,0x0004003b,0x00000008,
+-	0x0000002d,0x00000007,0x0004003b,0x00000034,0x00000035,0x00000007,0x00050041,0x00000010,
+-	0x00000011,0x0000000d,0x0000000f,0x0004003d,0x0000000a,0x00000012,0x00000011,0x0008004f,
+-	0x00000007,0x00000013,0x00000012,0x00000012,0x00000000,0x00000001,0x00000002,0x0003003e,
+-	0x00000009,0x00000013,0x0004003d,0x00000007,0x00000017,0x00000016,0x0004003d,0x00000007,
+-	0x00000019,0x00000009,0x0004003d,0x00000007,0x0000001a,0x00000009,0x0004003d,0x00000007,
+-	0x0000001b,0x00000016,0x0007000c,0x00000007,0x0000001c,0x00000001,0x00000044,0x0000001a,
+-	0x0000001b,0x00060041,0x0000001f,0x00000020,0x0000000d,0x0000000f,0x0000001e,0x0004003d,
+-	0x00000006,0x00000021,0x00000020,0x0004003d,0x00000007,0x00000022,0x00000016,0x0005008e,
+-	0x00000007,0x00000023,0x00000022,0x00000021,0x00050081,0x00000007,0x00000024,0x0000001c,
+-	0x00000023,0x0007000c,0x00000007,0x00000025,0x00000001,0x00000044,0x00000019,0x00000024,
+-	0x0005008e,0x00000007,0x00000026,0x00000025,0x00000018,0x00050081,0x00000007,0x00000027,
+-	0x00000017,0x00000026,0x00050041,0x00000010,0x00000029,0x0000000d,0x00000028,0x0004003d,
+-	0x0000000a,0x0000002a,0x00000029,0x0008004f,0x00000007,0x0000002b,0x0000002a,0x0000002a,
+-	0x00000000,0x00000001,0x00000002,0x00050081,0x00000007,0x0000002c,0x00000027,0x0000002b,
+-	0x0003003e,0x00000014,0x0000002c,0x0004003d,0x00000007,0x0000002e,0x00000014,0x00050041,
+-	0x00000010,0x00000030,0x0000000d,0x0000002f,0x0004003d,0x0000000a,0x00000031,0x00000030,
+-	0x0008004f,0x00000007,0x00000032,0x00000031,0x00000031,0x00000000,0x00000001,0x00000002,
+-	0x00050083,0x00000007,0x00000033,0x0000002e,0x00000032,0x0003003e,0x0000002d,0x00000033,
+-	0x0004003d,0x00000007,0x00000036,0x0000002d,0x00050041,0x00000010,0x00000038,0x0000000d,
+-	0x00000037,0x0004003d,0x0000000a,0x00000039,0x00000038,0x0008004f,0x00000007,0x0000003a,
+-	0x00000039,0x00000039,0x00000000,0x00000001,0x00000002,0x00050094,0x00000006,0x0000003b,
+-	0x00000036,0x0000003a,0x0003003e,0x00000035,0x0000003b,0x0004003d,0x00000007,0x00000041,
+-	0x0000002d,0x00050041,0x00000010,0x00000043,0x0000000d,0x00000042,0x0004003d,0x0000000a,
+-	0x00000044,0x00000043,0x0008004f,0x00000007,0x00000045,0x00000044,0x00000044,0x00000000,
+-	0x00000001,0x00000002,0x00050094,0x00000006,0x00000046,0x00000041,0x00000045,0x00060041,
+-	0x0000001f,0x00000049,0x0000000d,0x00000047,0x00000048,0x0004003d,0x00000006,0x0000004a,
+-	0x00000049,0x00050085,0x00000006,0x0000004b,0x00000046,0x0000004a,0x0004003d,0x00000007,
+-	0x0000004c,0x0000002d,0x00050041,0x00000010,0x0000004e,0x0000000d,0x0000004d,0x0004003d,
+-	0x0000000a,0x0000004f,0x0000004e,0x0008004f,0x00000007,0x00000050,0x0000004f,0x0000004f,
+-	0x00000000,0x00000001,0x00000002,0x00050094,0x00000006,0x00000051,0x0000004c,0x00000050,
+-	0x00060041,0x0000001f,0x00000052,0x0000000d,0x00000047,0x0000003c,0x0004003d,0x00000006,
+-	0x00000053,0x00000052,0x00050085,0x00000006,0x00000054,0x00000051,0x00000053,0x0004003d,
+-	0x00000006,0x00000055,0x00000035,0x00060041,0x0000001f,0x00000057,0x0000000d,0x00000047,
+-	0x00000056,0x0004003d,0x00000006,0x00000058,0x00000057,0x00050085,0x00000006,0x00000059,
+-	0x00000055,0x00000058,0x00060041,0x0000001f,0x0000005a,0x0000000d,0x00000047,0x0000001e,
+-	0x0004003d,0x00000006,0x0000005b,0x0000005a,0x00050081,0x00000006,0x0000005c,0x00000059,
+-	0x0000005b,0x0004003d,0x00000006,0x0000005d,0x00000035,0x00070050,0x0000000a,0x0000005e,
+-	0x0000004b,0x00000054,0x0000005c,0x0000005d,0x00050041,0x0000005f,0x00000060,0x00000040,
+-	0x0000002f,0x0003003e,0x00000060,0x0000005e,0x0004003d,0x00000007,0x00000064,0x00000063,
+-	0x0003003e,0x00000062,0x00000064,0x0004003d,0x00000065,0x0000006a,0x00000069,0x00050041,
+-	0x00000010,0x0000006c,0x0000000d,0x0000006b,0x0004003d,0x0000000a,0x0000006d,0x0000006c,
+-	0x0007004f,0x00000065,0x0000006e,0x0000006d,0x0000006d,0x00000000,0x00000001,0x00050081,
+-	0x00000065,0x0000006f,0x0000006a,0x0000006e,0x0003003e,0x00000067,0x0000006f,0x000100fd,
+-	0x00010038
++	0x000c000f,0x00000000,0x00000004,0x6e69616d,0x00000000,0x00000016,0x00000040,0x00000062,
++	0x00000064,0x00000065,0x00000069,0x0000006b,0x00030003,0x00000002,0x000001c2,0x00040005,
++	0x00000004,0x6e69616d,0x00000000,0x00030005,0x00000009,0x00000071,0x00040005,0x0000000b,
++	0x77656956,0x00000000,0x00040006,0x0000000b,0x00000000,0x00657965,0x00050006,0x0000000b,
++	0x00000001,0x68676972,0x00000074,0x00040006,0x0000000b,0x00000002,0x00007075,0x00050006,
++	0x0000000b,0x00000003,0x77726f66,0x00647261,0x00060006,0x0000000b,0x00000004,0x6a6f7270,
++	0x69746365,0x00006e6f,0x00060006,0x0000000b,0x00000005,0x6e617274,0x74616c73,0x006e6f69,
++	0x00060006,0x0000000b,0x00000006,0x74617571,0x696e7265,0x00006e6f,0x00070006,0x0000000b,
++	0x00000007,0x74786574,0x4f657275,0x65736666,0x00000074,0x00030005,0x0000000d,0x00000075,
++	0x00040005,0x00000014,0x6c726f77,0x00000064,0x00050005,0x00000016,0x69736f70,0x6e6f6974,
++	0x00000000,0x00050005,0x0000002d,0x616c6572,0x65766974,0x00000000,0x00030005,0x00000035,
++	0x0000007a,0x00060005,0x0000003e,0x505f6c67,0x65567265,0x78657472,0x00000000,0x00060006,
++	0x0000003e,0x00000000,0x505f6c67,0x7469736f,0x006e6f69,0x00070006,0x0000003e,0x00000001,
++	0x505f6c67,0x746e696f,0x657a6953,0x00000000,0x00070006,0x0000003e,0x00000002,0x435f6c67,
++	0x4470696c,0x61747369,0x0065636e,0x00070006,0x0000003e,0x00000003,0x435f6c67,0x446c6c75,
++	0x61747369,0x0065636e,0x00030005,0x00000040,0x00000000,0x00060005,0x00000062,0x6c726f77,
++	0x736f5064,0x6f697469,0x0000006e,0x00050005,0x00000064,0x65636166,0x6f6c6f43,0x00000072,
++	0x00040005,0x00000065,0x6f6c6f63,0x00000072,0x00050005,0x00000069,0x43786574,0x64726f6f,
++	0x00000000,0x00030005,0x0000006b,0x00007675,0x00030047,0x0000000b,0x00000002,0x00050048,
++	0x0000000b,0x00000000,0x00000023,0x00000000,0x00050048,0x0000000b,0x00000001,0x00000023,
++	0x00000010,0x00050048,0x0000000b,0x00000002,0x00000023,0x00000020,0x00050048,0x0000000b,
++	0x00000003,0x00000023,0x00000030,0x00050048,0x0000000b,0x00000004,0x00000023,0x00000040,
++	0x00050048,0x0000000b,0x00000005,0x00000023,0x00000050,0x00050048,0x0000000b,0x00000006,
++	0x00000023,0x00000060,0x00050048,0x0000000b,0x00000007,0x00000023,0x00000070,0x00040047,
++	0x0000000d,0x00000021,0x00000000,0x00040047,0x0000000d,0x00000022,0x00000001,0x00040047,
++	0x00000016,0x0000001e,0x00000000,0x00030047,0x0000003e,0x00000002,0x00050048,0x0000003e,
++	0x00000000,0x0000000b,0x00000000,0x00050048,0x0000003e,0x00000001,0x0000000b,0x00000001,
++	0x00050048,0x0000003e,0x00000002,0x0000000b,0x00000003,0x00050048,0x0000003e,0x00000003,
++	0x0000000b,0x00000004,0x00040047,0x00000062,0x0000001e,0x00000002,0x00040047,0x00000064,
++	0x0000001e,0x00000000,0x00040047,0x00000065,0x0000001e,0x00000001,0x00040047,0x00000069,
++	0x0000001e,0x00000001,0x00040047,0x0000006b,0x0000001e,0x00000002,0x00020013,0x00000002,
++	0x00030021,0x00000003,0x00000002,0x00030016,0x00000006,0x00000020,0x00040017,0x00000007,
++	0x00000006,0x00000003,0x00040020,0x00000008,0x00000007,0x00000007,0x00040017,0x0000000a,
++	0x00000006,0x00000004,0x000a001e,0x0000000b,0x0000000a,0x0000000a,0x0000000a,0x0000000a,
++	0x0000000a,0x0000000a,0x0000000a,0x0000000a,0x00040020,0x0000000c,0x00000002,0x0000000b,
++	0x0004003b,0x0000000c,0x0000000d,0x00000002,0x00040015,0x0000000e,0x00000020,0x00000001,
++	0x0004002b,0x0000000e,0x0000000f,0x00000006,0x00040020,0x00000010,0x00000002,0x0000000a,
++	0x00040020,0x00000015,0x00000001,0x00000007,0x0004003b,0x00000015,0x00000016,0x00000001,
++	0x0004002b,0x00000006,0x00000018,0x40000000,0x00040015,0x0000001d,0x00000020,0x00000000,
++	0x0004002b,0x0000001d,0x0000001e,0x00000003,0x00040020,0x0000001f,0x00000002,0x00000006,
++	0x0004002b,0x0000000e,0x00000028,0x00000005,0x0004002b,0x0000000e,0x0000002f,0x00000000,
++	0x00040020,0x00000034,0x00000007,0x00000006,0x0004002b,0x0000000e,0x00000037,0x00000003,
++	0x0004002b,0x0000001d,0x0000003c,0x00000001,0x0004001c,0x0000003d,0x00000006,0x0000003c,
++	0x0006001e,0x0000003e,0x0000000a,0x00000006,0x0000003d,0x0000003d,0x00040020,0x0000003f,
++	0x00000003,0x0000003e,0x0004003b,0x0000003f,0x00000040,0x00000003,0x0004002b,0x0000000e,
++	0x00000042,0x00000001,0x0004002b,0x0000000e,0x00000047,0x00000004,0x0004002b,0x0000001d,
++	0x00000048,0x00000000,0x0004002b,0x0000000e,0x0000004d,0x00000002,0x0004002b,0x0000001d,
++	0x00000056,0x00000002,0x00040020,0x0000005f,0x00000003,0x0000000a,0x00040020,0x00000061,
++	0x00000003,0x00000007,0x0004003b,0x00000061,0x00000062,0x00000003,0x0004003b,0x00000061,
++	0x00000064,0x00000003,0x0004003b,0x00000015,0x00000065,0x00000001,0x00040017,0x00000067,
++	0x00000006,0x00000002,0x00040020,0x00000068,0x00000003,0x00000067,0x0004003b,0x00000068,
++	0x00000069,0x00000003,0x00040020,0x0000006a,0x00000001,0x00000067,0x0004003b,0x0000006a,
++	0x0000006b,0x00000001,0x0004002b,0x0000000e,0x0000006d,0x00000007,0x00050036,0x00000002,
++	0x00000004,0x00000000,0x00000003,0x000200f8,0x00000005,0x0004003b,0x00000008,0x00000009,
++	0x00000007,0x0004003b,0x00000008,0x00000014,0x00000007,0x0004003b,0x00000008,0x0000002d,
++	0x00000007,0x0004003b,0x00000034,0x00000035,0x00000007,0x00050041,0x00000010,0x00000011,
++	0x0000000d,0x0000000f,0x0004003d,0x0000000a,0x00000012,0x00000011,0x0008004f,0x00000007,
++	0x00000013,0x00000012,0x00000012,0x00000000,0x00000001,0x00000002,0x0003003e,0x00000009,
++	0x00000013,0x0004003d,0x00000007,0x00000017,0x00000016,0x0004003d,0x00000007,0x00000019,
++	0x00000009,0x0004003d,0x00000007,0x0000001a,0x00000009,0x0004003d,0x00000007,0x0000001b,
++	0x00000016,0x0007000c,0x00000007,0x0000001c,0x00000001,0x00000044,0x0000001a,0x0000001b,
++	0x00060041,0x0000001f,0x00000020,0x0000000d,0x0000000f,0x0000001e,0x0004003d,0x00000006,
++	0x00000021,0x00000020,0x0004003d,0x00000007,0x00000022,0x00000016,0x0005008e,0x00000007,
++	0x00000023,0x00000022,0x00000021,0x00050081,0x00000007,0x00000024,0x0000001c,0x00000023,
++	0x0007000c,0x00000007,0x00000025,0x00000001,0x00000044,0x00000019,0x00000024,0x0005008e,
++	0x00000007,0x00000026,0x00000025,0x00000018,0x00050081,0x00000007,0x00000027,0x00000017,
++	0x00000026,0x00050041,0x00000010,0x00000029,0x0000000d,0x00000028,0x0004003d,0x0000000a,
++	0x0000002a,0x00000029,0x0008004f,0x00000007,0x0000002b,0x0000002a,0x0000002a,0x00000000,
++	0x00000001,0x00000002,0x00050081,0x00000007,0x0000002c,0x00000027,0x0000002b,0x0003003e,
++	0x00000014,0x0000002c,0x0004003d,0x00000007,0x0000002e,0x00000014,0x00050041,0x00000010,
++	0x00000030,0x0000000d,0x0000002f,0x0004003d,0x0000000a,0x00000031,0x00000030,0x0008004f,
++	0x00000007,0x00000032,0x00000031,0x00000031,0x00000000,0x00000001,0x00000002,0x00050083,
++	0x00000007,0x00000033,0x0000002e,0x00000032,0x0003003e,0x0000002d,0x00000033,0x0004003d,
++	0x00000007,0x00000036,0x0000002d,0x00050041,0x00000010,0x00000038,0x0000000d,0x00000037,
++	0x0004003d,0x0000000a,0x00000039,0x00000038,0x0008004f,0x00000007,0x0000003a,0x00000039,
++	0x00000039,0x00000000,0x00000001,0x00000002,0x00050094,0x00000006,0x0000003b,0x00000036,
++	0x0000003a,0x0003003e,0x00000035,0x0000003b,0x0004003d,0x00000007,0x00000041,0x0000002d,
++	0x00050041,0x00000010,0x00000043,0x0000000d,0x00000042,0x0004003d,0x0000000a,0x00000044,
++	0x00000043,0x0008004f,0x00000007,0x00000045,0x00000044,0x00000044,0x00000000,0x00000001,
++	0x00000002,0x00050094,0x00000006,0x00000046,0x00000041,0x00000045,0x00060041,0x0000001f,
++	0x00000049,0x0000000d,0x00000047,0x00000048,0x0004003d,0x00000006,0x0000004a,0x00000049,
++	0x00050085,0x00000006,0x0000004b,0x00000046,0x0000004a,0x0004003d,0x00000007,0x0000004c,
++	0x0000002d,0x00050041,0x00000010,0x0000004e,0x0000000d,0x0000004d,0x0004003d,0x0000000a,
++	0x0000004f,0x0000004e,0x0008004f,0x00000007,0x00000050,0x0000004f,0x0000004f,0x00000000,
++	0x00000001,0x00000002,0x00050094,0x00000006,0x00000051,0x0000004c,0x00000050,0x00060041,
++	0x0000001f,0x00000052,0x0000000d,0x00000047,0x0000003c,0x0004003d,0x00000006,0x00000053,
++	0x00000052,0x00050085,0x00000006,0x00000054,0x00000051,0x00000053,0x0004003d,0x00000006,
++	0x00000055,0x00000035,0x00060041,0x0000001f,0x00000057,0x0000000d,0x00000047,0x00000056,
++	0x0004003d,0x00000006,0x00000058,0x00000057,0x00050085,0x00000006,0x00000059,0x00000055,
++	0x00000058,0x00060041,0x0000001f,0x0000005a,0x0000000d,0x00000047,0x0000001e,0x0004003d,
++	0x00000006,0x0000005b,0x0000005a,0x00050081,0x00000006,0x0000005c,0x00000059,0x0000005b,
++	0x0004003d,0x00000006,0x0000005d,0x00000035,0x00070050,0x0000000a,0x0000005e,0x0000004b,
++	0x00000054,0x0000005c,0x0000005d,0x00050041,0x0000005f,0x00000060,0x00000040,0x0000002f,
++	0x0003003e,0x00000060,0x0000005e,0x0004003d,0x00000007,0x00000063,0x00000014,0x0003003e,
++	0x00000062,0x00000063,0x0004003d,0x00000007,0x00000066,0x00000065,0x0003003e,0x00000064,
++	0x00000066,0x0004003d,0x00000067,0x0000006c,0x0000006b,0x00050041,0x00000010,0x0000006e,
++	0x0000000d,0x0000006d,0x0004003d,0x0000000a,0x0000006f,0x0000006e,0x0007004f,0x00000067,
++	0x00000070,0x0000006f,0x0000006f,0x00000000,0x00000001,0x00050081,0x00000067,0x00000071,
++	0x0000006c,0x00000070,0x0003003e,0x00000069,0x00000071,0x000100fd,0x00010038
+ };
+diff --git a/src/engine/shaders/world_vert_msl.h b/src/engine/shaders/world_vert_msl.h
+index 21c44dd..0817727 100644
+--- a/src/engine/shaders/world_vert_msl.h
++++ b/src/engine/shaders/world_vert_msl.h
+@@ -23,6 +23,7 @@ struct main0_out
+ {
+     float3 faceColor [[user(locn0)]];
+     float2 texCoord [[user(locn1)]];
++    float3 worldPosition [[user(locn2)]];
+     float4 gl_Position [[position]];
+ };
+ 
+@@ -41,6 +42,7 @@ vertex main0_out main0(main0_in in [[stage_in]], constant View& u [[buffer(0)]])
+     float3 relative = world - u.eye.xyz;
+     float z = dot(relative, u.forward.xyz);
+     out.gl_Position = float4(dot(relative, u.right.xyz) * u.projection.x, dot(relative, u.up.xyz) * u.projection.y, (z * u.projection.z) + u.projection.w, z);
++    out.worldPosition = world;
+     out.faceColor = in.color;
+     out.texCoord = in.uv + u._textureOffset.xy;
+     return out;
+diff --git a/src/engine/world_renderer.cpp b/src/engine/world_renderer.cpp
+index da60de9..e32c61f 100644
+--- a/src/engine/world_renderer.cpp
++++ b/src/engine/world_renderer.cpp
+@@ -1,4 +1,5 @@
+ #include "engine/world_renderer.h"
++#include "engine/collision.h"
+ #include "engine/world_shaders.h"
+ #include <cmath>
+ #include <cstring>
+@@ -360,8 +361,15 @@ namespace OpenBlood2
+     bool WorldRenderer::draw(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target, const WorldMesh& mesh,
+                              std::span<const WorldDraw> draws, DVector eye, DRotation view, bool letterbox,
+                              std::string& error, DrawLoad load, SDL_GPUTexture* shared_depth, WorldPass world_pass,
+-                             double surface_time)
++                             double surface_time, const PointLight& light)
+     {
++        if (!physics_vector(light.position) || !physics_vector(light.color) || !std::isfinite(light.radius) ||
++            light.radius < 0 || light.radius > 1e7 || light.color.x < 0 || light.color.y < 0 || light.color.z < 0 ||
++            light.color.x > 1 || light.color.y > 1 || light.color.z > 1)
++        {
++            error = "Invalid point light";
++            return false;
++        }
+         if (!pipeline_ || !depth_ || (!vertices_ && !mesh.vertices.empty()))
+         {
+             error = "Diagnostic renderer not prepared";
+@@ -469,11 +477,20 @@ namespace OpenBlood2
+                     uniform.projection[2] = far / (far - near);
+                     uniform.projection[3] = -near * far / (far - near);
+                 }
+-                if (sky || translucent || style_ == DrawStyle::SpriteAlpha)
+-                {
+-                    const std::array<float, 4> modulation{d.alpha, 0, 0, 0};
+-                    SDL_PushGPUFragmentUniformData(commands, 0, modulation.data(), sizeof(modulation));
+-                }
++                const bool illuminate = !sky && style_ == DrawStyle::Opaque && load != DrawLoad::ClearDepth;
++                const std::array<float, 12> fragment{d.alpha,
++                                                     0,
++                                                     0,
++                                                     0,
++                                                     light.position.x,
++                                                     light.position.y,
++                                                     light.position.z,
++                                                     illuminate ? light.radius : 0,
++                                                     light.color.x,
++                                                     light.color.y,
++                                                     light.color.z,
++                                                     0};
++                SDL_PushGPUFragmentUniformData(commands, 0, fragment.data(), sizeof(fragment));
+                 auto batch =
+                     [&](std::uint32_t first, std::uint32_t count, std::uint32_t material, std::array<double, 2> rate)
+                 {
+diff --git a/src/engine/world_renderer.h b/src/engine/world_renderer.h
+index f43d7c3..aa72c2e 100644
+--- a/src/engine/world_renderer.h
++++ b/src/engine/world_renderer.h
+@@ -1,4 +1,5 @@
+ #pragma once
++#include "engine/point_light.h"
+ #include "engine/world_view.h"
+ #include <SDL3/SDL_gpu.h>
+ 
+@@ -36,7 +37,8 @@ namespace OpenBlood2
+                      std::string& error, bool dynamic = false);
+         bool draw(SDL_GPUCommandBuffer*, SDL_GPUTexture*, const WorldMesh&, std::span<const WorldDraw>, DVector eye,
+                   DRotation view, bool letterbox, std::string& error, DrawLoad = DrawLoad::Clear,
+-                  SDL_GPUTexture* shared_depth = nullptr, WorldPass = WorldPass::Opaque, double surface_time = 0);
++                  SDL_GPUTexture* shared_depth = nullptr, WorldPass = WorldPass::Opaque, double surface_time = 0,
++                  const PointLight& light = {});
+         SDL_GPUTexture* depth_target() const
+         {
+             return depth_;
+diff --git a/src/game/inventory_state.h b/src/game/inventory_state.h
+index 745e62c..f9291ba 100644
+--- a/src/game/inventory_state.h
++++ b/src/game/inventory_state.h
+@@ -8,12 +8,18 @@ namespace OpenBlood2
+ {
+     // Owned source-level subset of CInventoryMgr::Save, not a retail save-file ABI.
+     // No engine handles, weapon pointers, client views or resource references.
++    struct FlashlightState
++    {
++        DBYTE count = 100;
++        float remaining = 120;
++    };
+     struct InventoryState
+     {
+         std::array<DBYTE, 13> right{}, left{};
+         std::array<float, 13> ammo{};
+         std::vector<KeyItem> keys;
+         std::optional<DBYTE> medkit_charge;
++        std::optional<FlashlightState> flashlight;
+         DBYTE strength = 1, magic = 1, current_slot = 0;
+         bool infinite_ammo = false;
+         float damage_multiplier = 1;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 8441dfe..a1aad51 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -104,7 +104,7 @@ class ServerDE : public CSBase
+                                     OpenBlood2::BodyPlacement&) = 0;
+     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
+     virtual float GetWorldTime() = 0;
+-    virtual OpenBlood2::SegmentResult CastRay(DVector, DVector, OpenBlood2::SegmentHit&) = 0;
++    virtual OpenBlood2::SegmentResult CastRay(DVector, DVector, OpenBlood2::SegmentHit&, HOBJECT ignore = nullptr) = 0;
+     virtual OpenBlood2::SegmentResult CastWorldRay(DVector, DVector, OpenBlood2::SegmentHit&) = 0;
+     virtual OpenBlood2::SegmentResult IntersectSegment(
+         DVector from, DVector to, HOBJECT ignore, OpenBlood2::SegmentHit&, bool fire_through = false,
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index 575ec20..d6c4c38 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -237,6 +237,8 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
+     boss_health_visible = false;
+     communication.Reset(server_);
+     medkit_down = medkit_was_down = false;
++    flashlight_down = flashlight_was_down = false;
++    flashlight = {};
+     proximity_down = proximity_was_down = false;
+     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
+     item_actions = item_sounds = item_voice = 0;
+@@ -278,6 +280,8 @@ void CBloodClientShell::OnExitWorld()
+     boss_health_visible = false;
+     communication.Reset(server_);
+     medkit_down = medkit_was_down = false;
++    flashlight_down = flashlight_was_down = false;
++    flashlight = {};
+     proximity_down = proximity_was_down = false;
+     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
+     item_actions = item_sounds = item_voice = 0;
+@@ -309,11 +313,11 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
+         return InitSinglePlayer(server);
+     if (const auto* value = std::get_if<OpenBlood2::InventoryAction>(&event))
+     {
+-        if (value->type != 1)
++        if (value->type != 1 && value->type != 2)
+             return false;
+         ++item_actions;
+         OpenBlood2::SoundRequest request;
+-        request.resource = "sounds/powerups/medikit.wav";
++        request.resource = value->type == 1 ? "sounds/powerups/medikit.wav" : "sounds/powerups/flashlight.wav";
+         request.space = OpenBlood2::SoundSpace::Local;
+         request.priority = 4; // SOUNDPRIORITY_PLAYER_LOW.
+         request.reverb_requested = false;
+@@ -486,6 +490,10 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerDetona
+ }
+ bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
+ {
++    const bool flashlight_pressed = flashlight_down && !flashlight_was_down;
++    flashlight_was_down = flashlight_down;
++    if (flashlight_pressed)
++        server.OnMessage(client_, OpenBlood2::PlayerItemCommand{2});
+     const bool remote_pressed = remote_down && !remote_was_down;
+     remote_was_down = remote_down;
+     if (remote_pressed)
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index fde4000..f39feb2 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -78,6 +78,8 @@ class CBloodClientShell
+     bool UpdateUse(CBloodServerShell&);
+     bool use_down = false, use_was_down = false;
+     bool medkit_down = false, medkit_was_down = false;
++    bool flashlight_down = false, flashlight_was_down = false;
++    CFlashlightFX flashlight;
+     bool proximity_down = false, proximity_was_down = false;
+     bool remote_down = false, remote_was_down = false, detonate_down = false, detonate_was_down = false;
+     std::uint64_t item_actions = 0, item_sounds = 0;
+diff --git a/src/game/original/Flashlight.cpp b/src/game/original/Flashlight.cpp
+new file mode 100644
+index 0000000..59cf50a
+--- /dev/null
++++ b/src/game/original/Flashlight.cpp
+@@ -0,0 +1,159 @@
++// Original GameInvItems.cpp CInvFlashlight and ClientShellDLL/FlashlightFX.cpp.
++#include "Flashlight.h"
++#include "PlayerObj.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++using namespace OpenBlood2;
++CInvFlashlight::~CInvFlashlight()
++{
++    if (light)
++        g_pServerDE->RemoveObject(light);
++}
++bool CInvFlashlight::CreateLight()
++{
++    if (!g_pServerDE->IsObjectAlive(owner))
++    {
++        error = "Flashlight owner unavailable";
++        return false;
++    }
++    if (light)
++        g_pServerDE->RemoveObject(light);
++    light = nullptr;
++    ObjectCreateStruct create;
++    create.m_Flags = FLAG_FORCECLIENTUPDATE;
++    create.m_ObjectType = OT_NORMAL;
++    auto* object = g_pServerDE->CreateObject(g_pServerDE->GetClass("BaseClass"), &create);
++    if (!object)
++    {
++        error = "Flashlight child creation failed";
++        return false;
++    }
++    light = object->m_hObject;
++    return true;
++}
++bool CInvFlashlight::AddItem(DBYTE)
++{
++    if (count >= 100)
++        return false;
++    count = 100;
++    remaining = 120; // Source ignores incoming quantity; rounded 100 refuses recharge.
++    return true;
++}
++bool CInvFlashlight::SetActive(bool on)
++{
++    error.clear();
++    if (!g_pServerDE->IsObjectAlive(owner))
++        return false;
++    if (on && !light && !CreateLight())
++        return false;
++    if (!g_pServerDE->IsObjectAlive(light))
++    {
++        error = "Flashlight child unavailable";
++        return false;
++    }
++    if (on && remaining <= 0)
++        return false; // Source creates the child before refusing an empty battery.
++    auto flags = g_pServerDE->GetObjectUserFlags(light);
++    g_pServerDE->SetObjectUserFlags(light, on ? flags | 1u : flags & ~1u);
++    active = on;
++    if (auto* player = dynamic_cast<CPlayerObj*>(g_pServerDE->HandleToObject(owner)))
++    {
++        if (g_pServerDE->SendToClient(player->GetClient(), InventoryAction{2, on}) == DE_OK)
++            ++actions;
++        else
++            error = "Flashlight action could not reach its client";
++    }
++    return true;
++}
++bool CInvFlashlight::ActivateItem()
++{
++    return SetActive(!active); // Original ActivateItem returns true after deactivation too.
++}
++bool CInvFlashlight::Update()
++{
++    ++updates;
++    update_ok = false;
++    const float dt = g_pServerDE->GetFrameTime();
++    if (!g_pServerDE->IsObjectAlive(owner) || !std::isfinite(dt) || dt < 0 || dt > 60)
++    {
++        error = "Invalid flashlight owner/frame time";
++        return false;
++    }
++    if (light)
++    {
++        DVector position;
++        DRotation rotation;
++        if (!g_pServerDE->IsObjectAlive(light) || g_pServerDE->GetObjectPos(owner, &position) != DE_OK ||
++            g_pServerDE->GetObjectRotation(owner, &rotation) != DE_OK)
++        {
++            error = "Flashlight child/owner pose unavailable";
++            return false;
++        }
++        if (auto* player = dynamic_cast<CPlayerObj*>(g_pServerDE->HandleToObject(owner)))
++            rotation = rotation_from_euler({player->m_fPitch, player->m_fYaw, 0});
++        if (g_pServerDE->TeleportObject(light, &position) != DE_OK ||
++            g_pServerDE->SetObjectRotation(light, &rotation) != DE_OK)
++        {
++            error = "Flashlight child pose rejected";
++            return false;
++        }
++    }
++    if (active)
++    {
++        remaining -= dt;
++        if (remaining <= 0)
++        {
++            count = 0;
++            return update_ok = SetActive(false);
++        }
++        count = static_cast<DBYTE>(100 * remaining / 120 + .5f);
++    }
++    return update_ok = true;
++}
++bool CFlashlightFX::Update(ServerDE& server, HOBJECT child, HOBJECT character)
++{
++    ++updates;
++    source = child;
++    owner = character;
++    visible = false;
++    error.clear();
++    if (!source)
++        return true;
++    if (!server.IsObjectAlive(source) || !server.IsObjectAlive(owner))
++        return true; // Original removed SFX has no visible client light.
++    if (!(server.GetObjectUserFlags(source) & 1))
++        return true;
++    DVector position;
++    DRotation rotation;
++    if (server.GetObjectPos(source, &position) != DE_OK || server.GetObjectRotation(source, &rotation) != DE_OK)
++    {
++        error = "Flashlight pose unavailable";
++        return false;
++    }
++    result = server.CastRay(position, rotate_vector(rotation, {0, 0, 1}), hit, owner);
++    if (result == SegmentResult::Miss)
++        return true;
++    if (result != SegmentResult::Hit)
++    {
++        error = "Flashlight ray unavailable";
++        return false;
++    }
++    shade_position = vector_subtract(position, hit.point);
++    distance = std::max(10.f, std::sqrt(vector_dot(shade_position, shade_position)));
++    // GetPointShade is unavailable; preserve the source's explicit failure fallback.
++    // No successful shade service or baked-lighting parity is claimed.
++    shade_available = false;
++    minimum_intensity = 132.f / 255;
++    const float intensity = std::max(minimum_intensity, (1000.f - distance / 2) / 1000);
++    light = {hit.point, {intensity, intensity, intensity}, distance * .4f};
++    visible = true;
++    return true;
++}
++PointLight CFlashlightFX::Current(ServerDE& server) const
++{
++    return visible && server.IsObjectAlive(source) && server.IsObjectAlive(owner) &&
++                   (server.GetObjectUserFlags(source) & 1)
++               ? light
++               : PointLight{};
++}
+diff --git a/src/game/original/Flashlight.h b/src/game/original/Flashlight.h
+new file mode 100644
+index 0000000..cae84eb
+--- /dev/null
++++ b/src/game/original/Flashlight.h
+@@ -0,0 +1,41 @@
++#pragma once
++#include "B2BaseClass.h"
++#include "engine/point_light.h"
++#include "game/weapon_messages.h"
++
++// Selected original CInvFlashlight; owns only its checked server effect child.
++class CInvFlashlight
++{
++  public:
++    explicit CInvFlashlight(HOBJECT owner) : owner(owner) {}
++    ~CInvFlashlight();
++    CInvFlashlight(const CInvFlashlight&) = delete;
++    CInvFlashlight& operator=(const CInvFlashlight&) = delete;
++    bool CreateLight();
++    bool AddItem(DBYTE);
++    bool ActivateItem();
++    bool Update();
++    bool SetActive(bool);
++    HOBJECT owner = nullptr, light = nullptr;
++    DBYTE count = 100;
++    float remaining = 120;
++    bool active = false, update_ok = true;
++    std::uint64_t updates = 0, actions = 0;
++    std::string error;
++};
++// Selected original client CFlashlightFX. An owned value replaces client OT_LIGHT.
++class CFlashlightFX
++{
++  public:
++    bool Update(ServerDE&, HOBJECT, HOBJECT);
++    OpenBlood2::PointLight Current(ServerDE&) const;
++    HOBJECT source = nullptr, owner = nullptr;
++    OpenBlood2::PointLight light;
++    OpenBlood2::SegmentHit hit;
++    OpenBlood2::SegmentResult result = OpenBlood2::SegmentResult::Miss;
++    DVector shade_position{}; // Source queries owner-position minus hit, not the hit point.
++    float distance = 0, minimum_intensity = 132.f / 255;
++    bool visible = false, shade_available = false;
++    std::uint64_t updates = 0;
++    std::string error;
++};
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index 77a3c1c..e021412 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -52,6 +52,14 @@ CInventoryMgr::~CInventoryMgr()
+ }
+ DDWORD CInventoryMgr::EngineMessageFn(LPBASECLASS object, DDWORD message, void* data, DFLOAT fData)
+ {
++    if (message == MID_UPDATE && flashlight)
++    {
++        const auto count = flashlight->count;
++        const auto active = flashlight->active;
++        flashlight->Update(); // Checked by the session; error remains on the item.
++        if (count != flashlight->count || active != flashlight->active)
++            ++revision;
++    }
+     if (message == MID_UPDATE)
+         for (unsigned i = 0; i < m_Weapons.size(); ++i)
+         {
+@@ -373,8 +381,17 @@ InventoryResult CInventoryMgr::DropCurrentWeapon()
+ // Selected original AddItem/SetActiveItem branches; other items remain unsupported.
+ InventoryResult CInventoryMgr::AddItem(DBYTE type, DBYTE value)
+ {
+-    if (type != 1 || !BaseClass::GetServerDE()->IsObjectAlive(m_hOwner))
++    if ((type != 1 && type != 2) || !BaseClass::GetServerDE()->IsObjectAlive(m_hOwner))
+         return InventoryResult::Invalid;
++    if (type == 2)
++    {
++        if (!flashlight)
++            flashlight = std::make_unique<CInvFlashlight>(m_hOwner);
++        else if (!flashlight->AddItem(value))
++            return InventoryResult::AlreadyHave;
++        ++revision;
++        return InventoryResult::Ok;
++    }
+     if (!medkit)
+         medkit.emplace().Init(m_hOwner);
+     else if (!medkit->AddItem(value))
+@@ -386,6 +403,13 @@ InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
+ {
+     if (type == 7 || type == 8)
+         return SelectInventoryWeapon(WEAP_PROXIMITYBOMB + type - 7);
++    if (type == 2)
++    {
++        if (!flashlight || !flashlight->ActivateItem())
++            return InventoryResult::NotAvailable;
++        ++revision;
++        return InventoryResult::Ok;
++    }
+     if (type != 1 || !medkit)
+         return InventoryResult::NotAvailable;
+     const auto before = medkit->count;
+diff --git a/src/game/original/InventoryMgr.h b/src/game/original/InventoryMgr.h
+index 59b3266..7426faf 100644
+--- a/src/game/original/InventoryMgr.h
++++ b/src/game/original/InventoryMgr.h
+@@ -1,5 +1,6 @@
+ #pragma once
+ #include "B2BaseClass.h"
++#include "Flashlight.h"
+ #include "GameInvItems.h"
+ #include "Weapon.h"
+ #include "game/inventory_state.h"
+@@ -32,6 +33,7 @@ class CInventoryMgr : public Aggregate
+     InventoryResult SelectNextWeapon();
+     InventoryResult SetActiveItem(DBYTE);
+     std::optional<CInvMedkit> medkit;
++    std::unique_ptr<CInvFlashlight> flashlight;
+     InventoryResult AddKey(const OpenBlood2::KeyItem&);
+     InventoryResult QueryKey(std::string_view);
+     std::vector<OpenBlood2::KeyItem> keys;
+diff --git a/src/game/original/InventorySave.cpp b/src/game/original/InventorySave.cpp
+index 75c0380..9dd1a4c 100644
+--- a/src/game/original/InventorySave.cpp
++++ b/src/game/original/InventorySave.cpp
+@@ -11,7 +11,9 @@ namespace
+             state.current_slot >= state.right.size() ||
+             (state.current_slot >= 10 && !state.right[state.current_slot]) || !std::isfinite(state.damage_multiplier) ||
+             state.damage_multiplier < 0 || state.damage_multiplier > 1000 || state.keys.size() > 256 ||
+-            (state.medkit_charge && *state.medkit_charge > 100))
++            (state.medkit_charge && *state.medkit_charge > 100) ||
++            (state.flashlight && (state.flashlight->count > 100 || !std::isfinite(state.flashlight->remaining) ||
++                                  state.flashlight->remaining < -60 || state.flashlight->remaining > 120)))
+         {
+             error = "Invalid inventory attributes, selection, multiplier or item count";
+             return false;
+@@ -87,6 +89,8 @@ bool CInventoryMgr::Save(OpenBlood2::InventoryState& output, std::string& error)
+     state.keys = keys;
+     if (medkit)
+         state.medkit_charge = medkit->count;
++    if (flashlight)
++        state.flashlight = OpenBlood2::FlashlightState{flashlight->count, flashlight->remaining};
+     state.current_slot = m_nCurWeaponSlot;
+     state.damage_multiplier = damage_multiplier;
+     if (!valid(state, error))
+@@ -149,6 +153,18 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
+         staged.medkit->count = *state.medkit_charge;
+     }
+ 
++    if (state.flashlight)
++    {
++        staged.flashlight = std::make_unique<CInvFlashlight>(m_hOwner);
++        staged.flashlight->count = state.flashlight->count;
++        staged.flashlight->remaining = state.flashlight->remaining;
++        if (!staged.flashlight->CreateLight())
++        {
++            error = staged.flashlight->error;
++            return false;
++        }
++        // Original InvItem::Load clears active for both load modes; new child stays hidden.
++    }
+     // Commit only after every fallible service. Old child removal is deferred;
+     // transferred weapons must point at this aggregate, never the local stage.
+     m_Weapons.swap(staged.m_Weapons);
+@@ -156,6 +172,7 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
+     std::swap(m_hMuzzleFlash, staged.m_hMuzzleFlash);
+     keys.swap(staged.keys);
+     medkit.swap(staged.medkit);
++    flashlight.swap(staged.flashlight);
+     m_fAmmo = staged.m_fAmmo;
+     m_nAttribStrength = staged.m_nAttribStrength;
+     m_nAttribMagic = staged.m_nAttribMagic;
+diff --git a/src/game/original/ItemPickups.cpp b/src/game/original/ItemPickups.cpp
+index f950a16..2315355 100644
+--- a/src/game/original/ItemPickups.cpp
++++ b/src/game/original/ItemPickups.cpp
+@@ -33,3 +33,11 @@ RemotesPU::RemotesPU()
+     display_name = "Remote Bomb";
+     resource_id = 307;
+ }
++
++FlashlightPU::FlashlightPU()
++{
++    value = {OpenBlood2::PickupKind::Item, 2, 1};
++    file = "Flashlight_pu";
++    display_name = "Flashlight";
++    resource_id = 301;
++}
+diff --git a/src/game/original/ItemPickups.h b/src/game/original/ItemPickups.h
+index 7411a6e..eae3f0b 100644
+--- a/src/game/original/ItemPickups.h
++++ b/src/game/original/ItemPickups.h
+@@ -14,6 +14,11 @@ class ItemPickup : public PickupObject
+ class ItemPickupCharged : public ItemPickup
+ {
+ };
++class FlashlightPU : public ItemPickupCharged
++{
++  public:
++    FlashlightPU();
++};
+ class MedKitPU : public ItemPickupCharged
+ {
+   public:
+diff --git a/src/game/player_messages.h b/src/game/player_messages.h
+index d9163db..e89fd10 100644
+--- a/src/game/player_messages.h
++++ b/src/game/player_messages.h
+@@ -32,6 +32,7 @@ namespace OpenBlood2
+     struct InventoryAction
+     {
+         DBYTE type = 1;
++        bool active = false;
+     };
+     struct PlayerUse
+     {
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index f55335b..8237be1 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -509,6 +509,7 @@ namespace OpenBlood2
+         const ClassInfo item_weapon{"ItemPickupWeapon", &item_pickup, construct<ItemPickupWeapon>, {}};
+         const ClassInfo remote_pickup{"RemotesPU", &item_weapon, construct<RemotesPU>, {}};
+         const ClassInfo proximity_pickup{"ProximitiesPU", &item_weapon, construct<ProximitiesPU>, {}};
++        const ClassInfo flashlight_pickup{"FlashlightPU", &charged_pickup, construct<FlashlightPU>, {}};
+         const ClassInfo medkit_pickup{"MedKitPU", &charged_pickup, construct<MedKitPU>, {}};
+         const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}};
+         const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
+@@ -834,27 +835,27 @@ namespace OpenBlood2
+                objects.register_class(item_pickup) && objects.register_class(item_weapon) &&
+                objects.register_class(proximity_pickup) && objects.register_class(remote_pickup) &&
+                objects.register_class(charged_pickup) && objects.register_class(medkit_pickup) &&
+-               objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
+-               objects.register_class(assault_pickup) && objects.register_class(flare_pickup) &&
+-               objects.register_class(mac10_pickup) && objects.register_class(ammo_pickup) &&
+-               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
+-               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
+-               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
+-               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
+-               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
+-               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
+-               objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
+-               objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
+-               objects.register_class(objectives_trigger) && objects.register_class(conversation_trigger) &&
+-               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+-               objects.register_class(door) && objects.register_class(rotating_door) &&
+-               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
+-               objects.register_class(rotating_brush) && objects.register_class(world_debris) &&
+-               objects.register_class(hand_model) && objects.register_class(corpse) &&
+-               objects.register_class(proximity) && objects.register_class(remote) && objects.register_class(grenade) &&
+-               objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
+-               objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
+-               objects.register_class(shockwave_projectile);
++               objects.register_class(flashlight_pickup) && objects.register_class(weapon_pickup) &&
++               objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
++               objects.register_class(flare_pickup) && objects.register_class(mac10_pickup) &&
++               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
++               objects.register_class(health_base) && objects.register_class(armor_base) &&
++               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
++               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
++               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
++               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
++               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
++               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
++               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
++               objects.register_class(conversation_trigger) && objects.register_class(big_trigger) &&
++               objects.register_class(toggle_trigger) && objects.register_class(door) &&
++               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
++               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
++               objects.register_class(world_debris) && objects.register_class(hand_model) &&
++               objects.register_class(corpse) && objects.register_class(proximity) && objects.register_class(remote) &&
++               objects.register_class(grenade) && objects.register_class(flare_projectile) &&
++               objects.register_class(flare_alt) && objects.register_class(flare_burst) &&
++               objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index d56c33d..a01ff44 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -171,7 +171,7 @@ namespace OpenBlood2
+         bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
+                                 BodyPlacement&) override;
+         bool GetMovementState(HOBJECT, MovementState&) override;
+-        SegmentResult CastRay(DVector, DVector, SegmentHit&) override;
++        SegmentResult CastRay(DVector, DVector, SegmentHit&, HOBJECT ignore = nullptr) override;
+         SegmentResult CastWorldRay(DVector, DVector, SegmentHit&) override;
+         SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false,
+                                        SegmentObjects objects = SegmentObjects::SolidOnly,
+diff --git a/src/game/server_clients.cpp b/src/game/server_clients.cpp
+index 6d2d537..a148962 100644
+--- a/src/game/server_clients.cpp
++++ b/src/game/server_clients.cpp
+@@ -81,7 +81,7 @@ namespace OpenBlood2
+                 else if constexpr (std::is_same_v<T, PlayerStats>)
+                     return std::isfinite(value.health) && std::isfinite(value.armor) && std::isfinite(value.bullets);
+                 else if constexpr (std::is_same_v<T, InventoryAction>)
+-                    return value.type == 1;
++                    return value.type == 1 || value.type == 2;
+                 else if constexpr (std::is_same_v<T, BossHealth>)
+                     return std::isfinite(value.fraction);
+                 else if constexpr (std::is_same_v<T, WorldExit>)
+diff --git a/src/game/server_pickups.cpp b/src/game/server_pickups.cpp
+index 4e070fe..985b219 100644
+--- a/src/game/server_pickups.cpp
++++ b/src/game/server_pickups.cpp
+@@ -73,8 +73,9 @@ namespace OpenBlood2
+             !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit ||
+             (value.kind == PickupKind::Weapon && !WeaponPickupClass(value.type)) || !std::isfinite(value.amount) ||
+             value.amount < 0 || value.amount > 1e6f ||
+-            (value.kind == PickupKind::Item && ((value.type != 1 && value.type != 7 && value.type != 8) ||
+-                                                value.amount > 255 || std::floor(value.amount) != value.amount)))
++            (value.kind == PickupKind::Item &&
++             ((value.type != 1 && value.type != 2 && value.type != 7 && value.type != 8) || value.amount > 255 ||
++              std::floor(value.amount) != value.amount)))
+         {
+             m->bad = true;
+             return DE_INVALIDPARAMS;
+diff --git a/src/game/server_sprites.cpp b/src/game/server_sprites.cpp
+index 65067be..e487e0b 100644
+--- a/src/game/server_sprites.cpp
++++ b/src/game/server_sprites.cpp
+@@ -29,7 +29,7 @@ namespace OpenBlood2
+             return SegmentResult::Hit; // A valid bounded segment, not an intersection result.
+         }
+     } // namespace
+-    SegmentResult ServerAdapter::CastRay(DVector from, DVector direction, SegmentHit& out)
++    SegmentResult ServerAdapter::CastRay(DVector from, DVector direction, SegmentHit& out, HOBJECT ignore)
+     {
+         trace_service("CastRay (solid world and objects)");
+         out = {};
+@@ -41,7 +41,7 @@ namespace OpenBlood2
+             return SegmentResult::Unavailable;
+         if (bound != SegmentResult::Hit)
+             return bound;
+-        return IntersectSegment(from, to, nullptr, out);
++        return IntersectSegment(from, to, ignore, out);
+     }
+     SegmentResult ServerAdapter::CastWorldRay(DVector from, DVector direction, SegmentHit& out)
+     {
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 0e53668..163b994 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -474,6 +474,12 @@ namespace OpenBlood2
+         ok = objects.finish_frame() && ok;
+         ok = objects.refresh_attachments() && ok;
+         ok = server.advance_lights() && ok;
++        auto* flash_owner = server_shell.Player(local_client);
++        const auto* flash_item = flash_owner ? flash_owner->m_InventoryMgr.flashlight.get() : nullptr;
++        ok = (!flash_item || flash_item->update_ok) && ok;
++        ok = client_shell.flashlight.Update(server, flash_item ? flash_item->light : nullptr,
++                                            flash_owner ? flash_owner->m_hObject : nullptr) &&
++             ok;
+         ok = server.explosion_sprites.advance(objects.time()) && ok;
+         ok = server.weapon_sprites.advance(objects.time()) && ok;
+         ok = server.explosion_models.advance(objects.time()) && ok;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index eea078e..069e873 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1686,3 +1686,26 @@ if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+     add_test(NAME gpu.remote_private COMMAND remote_gpu_tests "${BLOOD2_TEST_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/remote-")
+     set_tests_properties(gpu.remote_private PROPERTIES LABELS "gpu;private;remote" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+ endif()
++
++add_executable(flashlight_tests flashlight_tests.cpp)
++target_link_libraries(flashlight_tests PRIVATE blood2_game)
++blood2_project_options(flashlight_tests)
++foreach(case IN ITEMS rules pickup commands ray restore lifetime input session)
++    add_test(NAME flashlight.${case} COMMAND flashlight_tests ${case} "${CMAKE_CURRENT_BINARY_DIR}/flashlight-fixtures/${case}")
++    set_tests_properties(flashlight.${case} PROPERTIES LABELS "headless;flashlight" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME flashlight.private COMMAND flashlight_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(flashlight.private PROPERTIES LABELS "headless;private;flashlight" TIMEOUT 180)
++endif()
++if(BLOOD2_GPU_TESTS)
++    add_executable(flashlight_gpu_tests flashlight_gpu_tests.cpp)
++    target_link_libraries(flashlight_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(flashlight_gpu_tests)
++    add_test(NAME gpu.flashlight COMMAND flashlight_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/flashlight")
++    set_tests_properties(gpu.flashlight PROPERTIES LABELS "gpu;flashlight" TIMEOUT 45 RUN_SERIAL TRUE)
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.flashlight_private COMMAND flashlight_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/flashlight-private" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.flashlight_private PROPERTIES LABELS "gpu;private;flashlight" TIMEOUT 90 RUN_SERIAL TRUE)
++    endif()
++endif()
+diff --git a/tests/assault_tests.cpp b/tests/assault_tests.cpp
+index 87c597b..01a320b 100644
+--- a/tests/assault_tests.cpp
++++ b/tests/assault_tests.cpp
+@@ -446,7 +446,7 @@ bool private_game(const std::filesystem::path& root)
+         }
+         std::cout << "CityHub M16=" << assault << " created=" << created << " unknown=" << unknown
+                   << " failed=" << failed << '\n';
+-        CHECK(assault == 1 && created == 452 && unknown == 1 && failed == 1);
++        CHECK(assault == 1 && created == 453 && unknown == 0 && failed == 1);
+         CHECK(g.unload_world());
+         // Labelled arena uses actual private models/audio, with controlled geometry.
+         auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
+diff --git a/tests/audio_stream_tests.cpp b/tests/audio_stream_tests.cpp
+index ac785ea..35c56a7 100644
+--- a/tests/audio_stream_tests.cpp
++++ b/tests/audio_stream_tests.cpp
+@@ -295,7 +295,7 @@ namespace
+             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
+                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
+                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
+-            CHECK(created == 452 && transferred == 31 && unknown == 1 && failed == 1 && fx == 5 && fx_voices == 4);
++            CHECK(created == 453 && transferred == 31 && unknown == 0 && failed == 1 && fx == 5 && fx_voices == 4);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_bytes());
+         }
+diff --git a/tests/compound_shell_tests.cpp b/tests/compound_shell_tests.cpp
+index fb9853e..2f3031b 100644
+--- a/tests/compound_shell_tests.cpp
++++ b/tests/compound_shell_tests.cpp
+@@ -229,7 +229,7 @@ namespace
+             }
+             std::cout << "CityHub: " << created << " created / " << transferred << " sounds / " << unknown
+                       << " unsupported / " << failed << " failed\n";
+-            CHECK(created == 452 && transferred == 31 && unknown == 1 && failed == 1);
++            CHECK(created == 453 && transferred == 31 && unknown == 0 && failed == 1);
+             WorldMesh mesh;
+             CHECK(mesh.build(g.world, error, &g.resources));
+             if (gpu)
+diff --git a/tests/conversation_tests.cpp b/tests/conversation_tests.cpp
+index 2027db3..e4dcdb4 100644
+--- a/tests/conversation_tests.cpp
++++ b/tests/conversation_tests.cpp
+@@ -257,7 +257,7 @@ namespace
+             for (auto id : g.objects.snapshot())
+                 if (auto* c = dynamic_cast<ConversationTrigger*>(g.objects.get(id)->game.get()))
+                     conversation = c;
+-            CHECK(created == 452 && unknown == 1 && failed == 1 && conversation);
++            CHECK(created == 453 && unknown == 0 && failed == 1 && conversation);
+             std::cout << "CityHub conversation count=" << conversation->count << " file=" << conversation->waves[0]
+                       << " mapped=" << bool(conversation_text(conversation->waves[0])) << '\n';
+             g.server_shell.start_point_name = "01_egressa";
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+index 60a4627..bba081a 100644
+--- a/tests/destructable_model_tests.cpp
++++ b/tests/destructable_model_tests.cpp
+@@ -313,7 +313,7 @@ namespace
+             std::cout << "CityHub model initialization: " << count << " models / " << pushable << " pushable / "
+                       << gravity << " gravity / " << ground_misses << " ground misses\n";
+             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
+-            CHECK(created == 452 && unknown == 1 && failed == 1);
++            CHECK(created == 453 && unknown == 0 && failed == 1);
+             CHECK(update_model_scene(g, scene, error));
+             unsigned skin_failures = 0, triangles = 0;
+             for (auto id : ids)
+diff --git a/tests/flare_tests.cpp b/tests/flare_tests.cpp
+index e6404d0..af361a8 100644
+--- a/tests/flare_tests.cpp
++++ b/tests/flare_tests.cpp
+@@ -413,7 +413,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unsupported=" << unknown << " failed=" << failed
+                   << " flare NPCs=" << flare << '\n';
+-        CHECK(created == 452 && unknown == 1 && failed == 1 && flare == 1);
++        CHECK(created == 453 && unknown == 0 && failed == 1 && flare == 1);
+         CHECK(g.unload_world());
+         return true;
+     }
+diff --git a/tests/flashlight_gpu_tests.cpp b/tests/flashlight_gpu_tests.cpp
+new file mode 100644
+index 0000000..ce39bb7
+--- /dev/null
++++ b/tests/flashlight_gpu_tests.cpp
+@@ -0,0 +1,181 @@
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "game/server_adapter.h"
++#include <algorithm>
++#include <cmath>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x " " << error << " " << SDL_GetError() << '\n';                            \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool download(SDL_GPUDevice* gpu, SDL_GPUCommandBuffer* cmd, Capture& c, std::vector<Uint8>& pixels)
++    {
++        auto* pass = SDL_BeginGPUCopyPass(cmd);
++        if (!pass)
++            return false;
++        SDL_GPUTextureRegion source{};
++        source.texture = c.texture;
++        source.w = c.width;
++        source.h = c.height;
++        source.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = c.transfer;
++        target.pixels_per_row = c.width;
++        target.rows_per_layer = c.height;
++        SDL_DownloadFromGPUTexture(pass, &source, &target);
++        SDL_EndGPUCopyPass(pass);
++        if (!SDL_SubmitGPUCommandBuffer(cmd) || !SDL_WaitForGPUIdle(gpu))
++            return false;
++        auto* bytes = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(gpu, c.transfer, false));
++        if (!bytes)
++            return false;
++        pixels.assign(bytes, bytes + c.width * c.height * 4);
++        SDL_UnmapGPUTransferBuffer(gpu, c.transfer);
++        return true;
++    }
++    WorldMesh quad()
++    {
++        WorldMesh m;
++        for (DVector p : {DVector{-5, 5, 5}, {5, 5, 5}, {5, -5, 5}, {-5, 5, 5}, {5, -5, 5}, {-5, -5, 5}})
++            m.vertices.push_back({p, {.2f, .2f, .2f}, {0, 0}});
++        m.ranges.push_back({0, 6, {}, "dark wall", {{0, 6, 0, false, {0, 0, 5}}}});
++        return m;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    std::string error;
++    Runtime runtime;
++    CHECK(runtime.initialize(true, error));
++    std::cout << "GPU="
++              << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu), SDL_PROP_GPU_DEVICE_NAME_STRING,
++                                       "unknown")
++              << " backend=" << SDL_GetGPUDeviceDriver(runtime.gpu) << '\n';
++    WorldRenderer renderer(runtime.gpu), sprite(runtime.gpu, DrawStyle::SpriteAlpha);
++    auto m = quad();
++    WorldDraw draw;
++    std::vector<Uint8> pixels;
++    for (unsigned cycle = 0; cycle < 3; ++cycle)
++    {
++        unsigned w = cycle == 1 ? 400 : 320, h = cycle == 1 ? 300 : 240;
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, w, h));
++        CHECK(renderer.prepare(m, cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, w, h, error));
++        CHECK(sprite.prepare(m, cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, w, h, error));
++        DVector eye{};
++        DRotation view;
++        draw = {};
++        PointLight light{{0, 0, 5}, {1, 1, 1}, 2};
++        if (cycle == 2)
++        {
++            eye = {100, 20, -50};
++            view = rotation_from_euler({0, 1.57079632679f, 0});
++            draw.position = eye;
++            draw.rotation = view;
++            light.position = vector_add(eye, rotate_vector(view, {0, 0, 5}));
++        }
++        for (unsigned mode = 0; mode < 6; ++mode)
++        {
++            auto use = light;
++            if (mode == 0)
++                use.radius = 0;
++            if (mode == 2)
++                use.position.x += 100;
++            auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++            CHECK(cmd);
++            auto& r = mode == 4 ? sprite : renderer;
++            CHECK(r.draw(cmd, capture.texture, m, std::span(&draw, 1), eye, view, false, error,
++                         mode == 3 ? DrawLoad::ClearDepth : DrawLoad::Clear, nullptr,
++                         mode == 5 ? WorldPass::Sky : WorldPass::Opaque, 0, use));
++            CHECK(download(runtime.gpu, cmd, capture, pixels));
++            const int center = pixels[(h / 2 * w + w / 2) * 4], edge = pixels[(h / 2 * w + w * 9 / 10) * 4];
++            CHECK(std::abs(center - (mode == 1 ? 101 : 51)) <= 2 && std::abs(edge - 51) <= 1 &&
++                  pixels[(h / 2 * w + w / 2) * 4 + 3] == 255);
++            std::cout << "Synthetic light cycle=" << cycle << " mode=" << mode << " center=" << center
++                      << " outside=" << edge << '\n';
++            if (mode == 1)
++                CHECK(capture.save((std::string(argv[1]) + "-" + std::to_string(cycle) + ".png").c_str()));
++        }
++        auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(cmd);
++        light.radius = std::numeric_limits<float>::quiet_NaN();
++        CHECK(!renderer.draw(cmd, capture.texture, m, std::span(&draw, 1), eye, view, false, error, DrawLoad::Clear,
++                             nullptr, WorldPass::Opaque, 0, light));
++        CHECK(SDL_CancelGPUCommandBuffer(cmd));
++        renderer.clear_geometry();
++        sprite.clear_geometry();
++    }
++    if (argc == 3)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config cfg;
++        cfg.data_dir = argv[2];
++        CHECK(g.resources.mount_game(cfg, error));
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_subwaya", error) && g.enter_player(error));
++            auto* p = g.server_shell.Player(g.local_client);
++            CHECK(p && p->m_InventoryMgr.AddItem(2, 1) == InventoryResult::Ok);
++            auto& f = *p->m_InventoryMgr.flashlight;
++            CHECK(f.ActivateItem());
++            p->m_fPitch = 1.57079632679f;
++            p->m_fYaw = 0;
++            CHECK(f.Update() && g.client_shell.flashlight.Update(g.server, f.light, p->m_hObject));
++            auto light = g.client_shell.flashlight.Current(g.server);
++            CHECK(light.radius > 0);
++            WorldMesh mesh;
++            CHECK(mesh.build(g.world, error, &g.resources));
++            std::vector<WorldDraw> draws;
++            WorldViewStats stats;
++            CHECK(world_draws(mesh, g.objects, draws, stats, error));
++            auto eye = g.objects.get(f.light)->state.m_Pos;
++            auto view = g.objects.get(f.light)->state.m_Rotation;
++            Capture capture;
++            CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240));
++            CHECK(renderer.prepare(mesh, 10 + cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error));
++            std::vector<Uint8> off;
++            for (unsigned on = 0; on < 2; ++on)
++            {
++                auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++                CHECK(cmd);
++                CHECK(renderer.draw(cmd, capture.texture, mesh, draws, eye, view, false, error, DrawLoad::Clear,
++                                    nullptr, WorldPass::Opaque, 0, on ? light : PointLight{}));
++                CHECK(download(runtime.gpu, cmd, capture, pixels));
++                CHECK(capture.save(
++                    (std::string(argv[1]) + "-private-" + std::to_string(cycle) + "-" + std::to_string(on) + ".png")
++                        .c_str()));
++                if (!on)
++                    off = pixels;
++            }
++            unsigned brighter = 0, darker = 0;
++            for (unsigned i = 0; i < 320 * 240; ++i)
++                for (unsigned c = 0; c < 3; ++c)
++                {
++                    brighter += pixels[i * 4 + c] > off[i * 4 + c];
++                    darker += pixels[i * 4 + c] < off[i * 4 + c];
++                }
++            std::cout << "Private original ray cycle=" << cycle << " distance=" << g.client_shell.flashlight.distance
++                      << " radius=" << light.radius << " brighter channels=" << brighter << " darker=" << darker
++                      << '\n';
++            CHECK(brighter > 1000 && !darker);
++            auto old = f.light;
++            CHECK(g.leave_player() && !g.server.IsObjectAlive(old) &&
++                  g.client_shell.flashlight.Current(g.server).radius == 0 && g.unload_world());
++            renderer.clear_geometry();
++        }
++    }
++    return 0;
++}
+diff --git a/tests/flashlight_tests.cpp b/tests/flashlight_tests.cpp
+new file mode 100644
+index 0000000..3146dda
+--- /dev/null
++++ b/tests/flashlight_tests.cpp
+@@ -0,0 +1,354 @@
++#include "app/movement_controls.h"
++#include "game/original/ItemPickups.h"
++#include "player_fixture.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        std::string e;
++        CHECK(test_player::setup(g, root, true, true, true) && g.enter_player(e));
++        return true;
++    }
++    CPlayerObj& player(GameSession& g)
++    {
++        return *g.server_shell.Player(g.local_client);
++    }
++    bool rules(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto owner = g.objects.create(g.objects.find_class("BaseClass"));
++        CHECK(owner);
++        CInvFlashlight f(owner);
++        CHECK(f.count == 100 && f.remaining == 120 && !f.active && !f.light && !f.AddItem(255));
++        CHECK(f.ActivateItem() && f.active && f.light);
++        CHECK(g.server.GetObjectFlags(f.light) == FLAG_FORCECLIENTUPDATE && g.server.GetObjectUserFlags(f.light) == 1);
++        CHECK(g.objects.advance(.25) && f.Update() && f.count == 100 && f.remaining == 119.75 && !f.AddItem(0));
++        CHECK(g.objects.advance(.5) && f.Update() && f.count == 99 && f.AddItem(0) && f.remaining == 120);
++        CHECK(g.objects.advance(60) && f.Update() && f.count == 50 && f.remaining == 60);
++        CHECK(f.ActivateItem() && !f.active && !g.server.GetObjectUserFlags(f.light));
++        CHECK(g.objects.advance(20) && f.Update() && f.remaining == 60);
++        CHECK(f.ActivateItem() && g.objects.advance(60) && f.Update() && f.count == 0 && f.remaining == 0 && !f.active);
++        CHECK(!f.ActivateItem() && f.AddItem(255) && f.ActivateItem());
++        f.remaining = .01f;
++        CHECK(g.objects.advance(.1) && f.Update() && f.remaining < 0 && f.count == 0 && !f.active);
++        CInvFlashlight empty(owner);
++        empty.remaining = 0;
++        empty.count = 0;
++        CHECK(!empty.ActivateItem() && empty.light && !empty.active && !g.server.GetObjectUserFlags(empty.light));
++        CHECK(g.objects.advance(61) && !f.Update() && !f.error.empty());
++        return true;
++    }
++    bool pickup(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto& p = player(g);
++        for (unsigned i = 0; i < 3; ++i)
++        {
++            auto h = g.objects.create(g.objects.find_class("FlashlightPU"), {}, Creation::World,
++                                      {{"Pos", DVector{300, 100, 300}}});
++            auto* r = g.objects.get(h);
++            CHECK(r && r->model && r->model_error.empty());
++            auto* item = dynamic_cast<FlashlightPU*>(r->game.get());
++            CHECK(item && item->resource_id == 301 && item->value.type == 2 && item->value.amount == 1);
++            if (i)
++            {
++                CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p.m_hObject) && !item->picked_up);
++                p.m_InventoryMgr.flashlight->count = 99;
++                p.m_bDead = true;
++                CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p.m_hObject) && !item->picked_up);
++                p.m_bDead = false;
++            }
++            CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p.m_hObject) && item->picked_up);
++            CHECK(p.m_InventoryMgr.flashlight->count == 100 && p.m_InventoryMgr.flashlight->remaining == 120);
++            CHECK(!g.server.IsObjectAlive(h) && g.objects.finish_frame() && !g.objects.get(h));
++        }
++        CHECK(!g.objects.create(g.objects.find_class("FlashlightPU"), {}, Creation::String, {}));
++        CHECK(!g.server.message_count() && g.unload_world() && !g.server.string_count());
++        return true;
++    }
++    bool commands(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto& p = player(g);
++        CHECK(p.m_InventoryMgr.AddItem(2, 0) == InventoryResult::Ok);
++        auto& f = *p.m_InventoryMgr.flashlight;
++        p.m_bDead = true;
++        CHECK(!p.OnCommandItem(2) && !f.light);
++        p.m_bDead = false;
++        for (bool* gate : {&p.movement_blocked, &p.camera_movement_blocked, &p.command_run})
++        {
++            *gate = true;
++            CHECK(!p.OnCommandItem(2) && !f.light);
++            *gate = false;
++        }
++        g.client_shell.flashlight_down = true;
++        CHECK(g.client_shell.UpdateUse(g.server_shell) && f.active && f.actions == 1);
++        CHECK(g.client_shell.UpdateUse(g.server_shell) && f.active && f.actions == 1);
++        g.client_shell.flashlight_down = false;
++        CHECK(g.client_shell.UpdateUse(g.server_shell));
++        g.client_shell.flashlight_down = true;
++        CHECK(g.client_shell.UpdateUse(g.server_shell) && !f.active && f.actions == 2);
++        std::string e;
++        CHECK(g.pump_player_messages(e) && g.client_shell.item_actions == 2 && g.client_shell.item_sounds == 0 &&
++              !g.client_shell.item_audio_error.empty());
++        for (unsigned i = 0; i < 256; ++i)
++            CHECK(g.server.SendToClient(g.local_client, PlayerStats{}) == DE_OK);
++        CHECK(f.ActivateItem() && f.active && f.actions == 2 && !f.error.empty());
++        return true;
++    }
++    bool ray(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto& p = player(g);
++        CHECK(p.m_InventoryMgr.AddItem(2, 1) == InventoryResult::Ok);
++        auto& f = *p.m_InventoryMgr.flashlight;
++        auto& fx = g.client_shell.flashlight;
++        CHECK(f.ActivateItem());
++        DVector pos{0, 100, 0};
++        CHECK(g.server.TeleportObject(p.m_hObject, &pos) == DE_OK);
++        p.m_fPitch = 1.57079632679f;
++        p.m_fYaw = 0;
++        CHECK(f.Update() && fx.Update(g.server, f.light, p.m_hObject));
++        CHECK(fx.visible && fx.result == SegmentResult::Hit && !fx.hit.object && std::abs(fx.distance - 100) < .01f);
++        CHECK(std::abs(fx.light.radius - 40) < .01f && std::abs(fx.light.color.x - .95f) < .001f);
++        CHECK(std::abs(fx.shade_position.y - 100) < .01f && !fx.shade_available && fx.Current(g.server).radius > 0);
++        // Current player pitch, source body origin; the authoritative body is excluded from the client ray.
++        CHECK(std::abs(g.objects.get(f.light)->state.m_Pos.y - 100) < .01f);
++        p.m_fPitch = -1.57079632679f;
++        CHECK(f.Update() && fx.Update(g.server, f.light, p.m_hObject) && !fx.visible);
++        p.m_fPitch = 1.57079632679f;
++        DVector near{0, 2, 0};
++        CHECK(g.server.TeleportObject(p.m_hObject, &near) == DE_OK && f.Update() &&
++              fx.Update(g.server, f.light, p.m_hObject));
++        CHECK(fx.visible && fx.distance == 10 && fx.light.radius == 4);
++        DVector far{0, 2000, 0};
++        CHECK(g.server.TeleportObject(p.m_hObject, &far) == DE_OK && f.Update() &&
++              fx.Update(g.server, f.light, p.m_hObject));
++        CHECK(fx.visible && std::abs(fx.light.color.x - 132.f / 255) < .0001f &&
++              std::abs(fx.light.radius - 800) < .01f);
++        CHECK(f.ActivateItem() && fx.Current(g.server).radius == 0 && fx.Update(g.server, f.light, p.m_hObject) &&
++              !fx.visible);
++        CHECK(f.ActivateItem());
++        g.server.collision_ready = false;
++        CHECK(!fx.Update(g.server, f.light, p.m_hObject) && fx.result == SegmentResult::Unavailable &&
++              fx.Current(g.server).radius == 0 && !fx.error.empty());
++        g.server.collision_ready = true;
++        auto* child = g.objects.get(f.light);
++        child->state.m_Pos.x = std::numeric_limits<float>::quiet_NaN();
++        CHECK(!fx.Update(g.server, f.light, p.m_hObject) && fx.result == SegmentResult::Invalid);
++        return true;
++    }
++    bool restore(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto& inv = player(g).m_InventoryMgr;
++        CHECK(inv.AddItem(2, 1) == InventoryResult::Ok && inv.flashlight->ActivateItem());
++        inv.flashlight->remaining = 32;
++        inv.flashlight->count = 27;
++        auto old = inv.flashlight->light;
++        PlayerRestoreState s;
++        std::string e;
++        CHECK(g.capture_player(s, e) && s.inventory.flashlight->remaining == 32 && s.inventory.flashlight->count == 27);
++        CHECK(g.leave_player() && !g.server.IsObjectAlive(old));
++        auto bad = s;
++        bad.inventory.flashlight->remaining = 121;
++        CHECK(!g.restore_player(bad, e) && !g.client_shell.player);
++        CHECK(g.restore_player(s, e));
++        auto& f = *player(g).m_InventoryMgr.flashlight;
++        CHECK(f.light && f.light != old && !f.active && !g.server.GetObjectUserFlags(f.light) && f.remaining == 32 &&
++              f.count == 27);
++        CHECK(g.leave_player());
++        auto h = g.objects.create(g.objects.find_class("CPlayerObj"), {}, Creation::World, {});
++        auto* p = dynamic_cast<CPlayerObj*>(g.server.HandleToObject(h));
++        CHECK(p);
++        for (auto type : {InventoryLoadType::KeepAlive, InventoryLoadType::Restore})
++        {
++            CHECK(p->m_InventoryMgr.Load(s.inventory, type, e));
++            auto child = p->m_InventoryMgr.flashlight->light;
++            CHECK(!p->m_InventoryMgr.flashlight->active && p->m_InventoryMgr.flashlight->remaining == 32);
++            for (float invalid : {121.f, -61.f, std::numeric_limits<float>::quiet_NaN()})
++            {
++                auto b = s.inventory;
++                b.flashlight->remaining = invalid;
++                CHECK(!p->m_InventoryMgr.Load(b, type, e) && p->m_InventoryMgr.flashlight->light == child);
++            }
++            auto b = s.inventory;
++            b.flashlight->count = 101;
++            CHECK(!p->m_InventoryMgr.Load(b, type, e) && p->m_InventoryMgr.flashlight->light == child);
++            p->m_InventoryMgr.flashlight->remaining = std::numeric_limits<float>::quiet_NaN();
++            InventoryState output;
++            output.medkit_charge = 42;
++            CHECK(!p->m_InventoryMgr.Save(output, e) && output.medkit_charge == 42 && !output.flashlight);
++            p->m_InventoryMgr.flashlight->remaining = 32;
++            auto absent = s.inventory;
++            absent.flashlight.reset();
++            CHECK(p->m_InventoryMgr.Load(absent, type, e) && !p->m_InventoryMgr.flashlight &&
++                  !g.server.IsObjectAlive(child));
++            CHECK(g.objects.finish_frame());
++        }
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        {
++            GameSession g;
++            CHECK(setup(g, root));
++            auto& p = player(g);
++            CHECK(p.m_InventoryMgr.AddItem(2, 1) == InventoryResult::Ok);
++            auto& f = *p.m_InventoryMgr.flashlight;
++            auto& fx = g.client_shell.flashlight;
++            CHECK(f.ActivateItem());
++            p.m_fPitch = 1.57079632679f;
++            CHECK(f.Update() && fx.Update(g.server, f.light, p.m_hObject) && fx.visible);
++            auto child = f.light;
++            CHECK(g.objects.remove(child) && fx.Current(g.server).radius == 0 && !f.Update() && !f.error.empty());
++            CHECK(!f.ActivateItem() && g.objects.finish_frame());
++            CHECK(g.leave_player() && !g.objects.get(child) && g.unload_world());
++            CHECK(g.server.audio.voices().empty() && !g.server.message_count() && !g.server.string_count());
++        }
++        GameSession next_game;
++        CHECK(setup(next_game, root));
++        auto& next = player(next_game);
++        CHECK(next.m_InventoryMgr.AddItem(2, 1) == InventoryResult::Ok);
++        CHECK(next.m_InventoryMgr.flashlight->ActivateItem());
++        auto child = next.m_InventoryMgr.flashlight->light;
++        CHECK(next_game.objects.remove(next.m_hObject) && next_game.objects.finish_frame() &&
++              !next_game.server.IsObjectAlive(child));
++        CHECK(next_game.leave_player() && next_game.unload_world());
++        return true;
++    }
++    bool session(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto& p = player(g);
++        CHECK(p.m_InventoryMgr.AddItem(2, 1) == InventoryResult::Ok);
++        auto& f = *p.m_InventoryMgr.flashlight;
++        g.client_shell.flashlight_down = true;
++        CHECK(g.step(.01) && f.active);
++        g.client_shell.flashlight_down = false;
++        const auto before = f.remaining;
++        for (unsigned i = 0; i < 100; ++i)
++            CHECK(g.step(.01));
++        CHECK(f.remaining < before - .9f && f.remaining > before - 1.1f && f.updates >= 100);
++        const auto time = f.remaining;
++        g.client_shell.flashlight.Current(g.server);
++        CHECK(f.remaining == time);
++        CHECK(g.objects.remove(f.light) && !g.step(.01) && !f.update_ok && !f.error.empty());
++        return true;
++    }
++    bool input(const std::filesystem::path&)
++    {
++        MovementControls c;
++        c.focused = true;
++        SDL_Event e{};
++        e.type = SDL_EVENT_KEY_DOWN;
++        e.key.windowID = 7;
++        e.key.scancode = SDL_SCANCODE_L;
++        CHECK(c.consumes(e, false));
++        c.event(e, 7);
++        CHECK(c.sample_flashlight(false));
++        CHECK(!c.sample_flashlight(true) && !c.sample_flashlight(false));
++        e.type = SDL_EVENT_KEY_UP;
++        c.event(e, 7);
++        CHECK(!c.sample_flashlight(false));
++        e.type = SDL_EVENT_KEY_DOWN;
++        c.event(e, 7);
++        CHECK(c.sample_flashlight(false));
++        e.type = SDL_EVENT_WINDOW_FOCUS_LOST;
++        e.window.windowID = 7;
++        c.event(e, 7);
++        CHECK(!c.sample_flashlight(false));
++        e.type = SDL_EVENT_WINDOW_FOCUS_GAINED;
++        c.event(e, 7);
++        e.type = SDL_EVENT_KEY_DOWN;
++        e.key.windowID = 7;
++        e.key.scancode = SDL_SCANCODE_L;
++        e.key.repeat = true;
++        c.event(e, 7);
++        CHECK(!c.sample_flashlight(false));
++        e.key.repeat = false;
++        c.event(e, 8);
++        CHECK(!c.sample_flashlight(false));
++        c.event(e, 7);
++        CHECK(c.sample_flashlight(false));
++        c.player_changed();
++        CHECK(!c.sample_flashlight(false));
++        return true;
++    }
++    bool private_game(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config cfg;
++        cfg.data_dir = root;
++        std::string e;
++        CHECK(g.resources.mount_game(cfg, e));
++        g.server.audio.inspect_pcm = true;
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_cityhub", e));
++            g.server_shell.start_point_name = "01_egressa";
++            unsigned made = 0, unknown = 0, failed = 0;
++            HOBJECT h = nullptr;
++            for (const auto& entry : g.entries)
++            {
++                made += entry.state == EntryState::Created;
++                unknown += entry.state == EntryState::Unsupported;
++                failed += entry.state == EntryState::Failed;
++            }
++            CHECK(made == 453 && unknown == 0 && failed == 1);
++            for (auto id : g.objects.snapshot())
++                if (dynamic_cast<FlashlightPU*>(g.objects.get(id)->game.get()))
++                    h = g.objects.get(id)->handle;
++            CHECK(h && g.objects.get(h)->model && g.objects.get(h)->model_error.empty() && g.enter_player(e));
++            auto& p = player(g);
++            CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p.m_hObject) && p.m_InventoryMgr.flashlight);
++            for (unsigned i = 0; i < 2; ++i)
++            {
++                CHECK(p.OnCommandItem(2) && g.pump_player_messages(e));
++                auto voice = g.client_shell.item_voice;
++                auto* v = g.server.audio.get(voice);
++                CHECK(v && v->clip && v->request.space == SoundSpace::Local && v->request.priority == 4 &&
++                      v->world_owned);
++                CHECK(g.server.audio.advance(.1, {}, {}));
++                CHECK(g.server.audio.peak > 0);
++                std::cout << "Flashlight cycle=" << cycle << " active=" << p.m_InventoryMgr.flashlight->active
++                          << " frames=" << v->clip->frames() << " peak=" << g.server.audio.peak << '\n';
++            }
++            CHECK(g.client_shell.item_actions == 2 && g.client_shell.item_sounds == 2);
++            auto child = p.m_InventoryMgr.flashlight->light;
++            CHECK(g.leave_player() && !g.server.IsObjectAlive(child) && g.unload_world());
++            CHECK(!g.server.string_count() && !g.server.message_count() && g.server.audio.voices().empty());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests = {
++        {"rules", rules}, {"pickup", pickup},   {"commands", commands},
++        {"ray", ray},     {"restore", restore}, {"lifetime", lifetime},
++        {"input", input}, {"session", session}, {"private", private_game}};
++    auto i = tests.find(argv[1]);
++    return i != tests.end() && i->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/level_change_gpu_tests.cpp b/tests/level_change_gpu_tests.cpp
+index 727c5c2..52c3137 100644
+--- a/tests/level_change_gpu_tests.cpp
++++ b/tests/level_change_gpu_tests.cpp
+@@ -99,7 +99,7 @@ int main(int argc, char** argv)
+         CHECK(game->server.SendWorldExit({"02_CityHub"}, "01_egressa") == DE_OK && game->pump_player_messages(error));
+         CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+         CHECK(game.get() == before && game->client_shell.player == old_player && game->world_revision == revision);
+-        CHECK(game->level_change.unknown == 1 && game->level_change.failed == 1 && game->server.audio.has_output());
++        CHECK(game->level_change.unknown == 0 && game->level_change.failed == 1 && game->server.audio.has_output());
+         CHECK(game->server.SendWorldExit({"01_SubwayA"}, "start") == DE_OK && game->pump_player_messages(error));
+         CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Committed);
+         CHECK(game.get() != before && game->client_shell.player != old_player && game->server.audio.has_output());
+diff --git a/tests/mac10_tests.cpp b/tests/mac10_tests.cpp
+index 552ea28..ed985ef 100644
+--- a/tests/mac10_tests.cpp
++++ b/tests/mac10_tests.cpp
+@@ -263,7 +263,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unknown=" << unknown << " failed=" << failed << " Mac10=" << mac
+                   << '\n';
+-        CHECK(mac == 1 && created == 452 && unknown == 1 && failed == 1);
++        CHECK(mac == 1 && created == 453 && unknown == 0 && failed == 1);
+         for (auto id : g.objects.snapshot())
+             if (auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(g.objects.get(id)->handle));
+                 a && a->runtime_failed)
+diff --git a/tests/medkit_tests.cpp b/tests/medkit_tests.cpp
+index 634cb94..3ca7151 100644
+--- a/tests/medkit_tests.cpp
++++ b/tests/medkit_tests.cpp
+@@ -39,7 +39,7 @@ namespace
+         auto& inv = p.m_InventoryMgr;
+         auto& d = p.m_damage;
+         CHECK(inv.AddItem(1, 0) == InventoryResult::Ok && inv.medkit->count == 100);
+-        CHECK(inv.AddItem(1, 255) == InventoryResult::AlreadyHave && inv.AddItem(2, 1) == InventoryResult::Invalid);
++        CHECK(inv.AddItem(1, 255) == InventoryResult::AlreadyHave && inv.AddItem(3, 1) == InventoryResult::Invalid);
+         d.SetHitPoints(35);
+         d.m_fMaxHitPoints = 100;
+         CHECK(inv.SetActiveItem(1) == InventoryResult::Ok && d.m_fHitPoints == 100 && inv.medkit->count == 35);
+@@ -147,7 +147,7 @@ namespace
+         auto h = create(g);
+         CHECK(h);
+         auto* item = g.objects.get(h)->game.get();
+-        for (auto value : {PickupMessage{PickupKind::Item, 2, 1}, PickupMessage{PickupKind::Item, 1, .5},
++        for (auto value : {PickupMessage{PickupKind::Item, 3, 1}, PickupMessage{PickupKind::Item, 1, .5},
+                            PickupMessage{PickupKind::Item, 1, 256}, PickupMessage{PickupKind::Item, 1, -1}})
+         {
+             auto m = g.server.StartMessageToObject(item, p.m_hObject, add_item_message);
+@@ -157,7 +157,7 @@ namespace
+         auto m = g.server.StartMessageToObject(item, p.m_hObject, add_powerup_message);
+         CHECK(m && g.server.WritePickupMessage(m, {PickupKind::Item, 1, 1}) != DE_OK);
+         g.server.EndHMessageWrite(m);
+-        CHECK(g.server.SendToClient(g.local_client, InventoryAction{2}) == DE_INVALIDPARAMS);
++        CHECK(g.server.SendToClient(g.local_client, InventoryAction{3}) == DE_INVALIDPARAMS);
+         std::string sound_error;
+         SoundRequest request;
+         request.resource = "sounds/powerups/medikit.wav";
+@@ -291,7 +291,7 @@ namespace
+                 unknown += entry.state == EntryState::Unsupported;
+                 failed += entry.state == EntryState::Failed;
+             }
+-            CHECK(created == 452 && unknown == 1 && failed == 1);
++            CHECK(created == 453 && unknown == 0 && failed == 1);
+             for (auto id : g.objects.snapshot())
+                 if (dynamic_cast<MedKitPU*>(g.objects.get(id)->game.get()))
+                     h = g.objects.get(id)->handle;
+diff --git a/tests/particle_stream_tests.cpp b/tests/particle_stream_tests.cpp
+index b650c7f..456c447 100644
+--- a/tests/particle_stream_tests.cpp
++++ b/tests/particle_stream_tests.cpp
+@@ -296,7 +296,7 @@ namespace
+                 unknown += entry.state == EntryState::Unsupported;
+                 failed += entry.state == EntryState::Failed;
+             }
+-            CHECK(created == 452 && unknown == 1 && failed == 1);
++            CHECK(created == 453 && unknown == 0 && failed == 1);
+             auto& streams = g.server.particle_streams;
+             CHECK(streams.active.size() == 8 && !streams.failed);
+             unsigned initial = 0;
+diff --git a/tests/pickup_tests.cpp b/tests/pickup_tests.cpp
+index 28c43f7..6640dee 100644
+--- a/tests/pickup_tests.cpp
++++ b/tests/pickup_tests.cpp
+@@ -415,6 +415,12 @@ namespace
+                         CHECK(bomb && bomb->value.kind == PickupKind::Item && bomb->value.type == 8 &&
+                               bomb->value.amount == 1 && bomb->resource_id == 307);
+                     }
++                    if (source.class_name == "FlashlightPU")
++                    {
++                        auto* item = dynamic_cast<PickupObject*>(g.objects.get(h)->game.get());
++                        CHECK(item && item->value.kind == PickupKind::Item && item->value.type == 2 &&
++                              item->value.amount == 1 && item->resource_id == 301);
++                    }
+                     missing += !g.objects.get(h)->model;
+                 }
+                 CHECK(g.objects.clear() && AmmoPickup::m_dwNumPickups == 0);
+@@ -447,10 +453,10 @@ namespace
+         }
+         CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2 &&
+               counts["AssaultRiflePU"] == 5 && counts["MedKitPU"] == 22 && counts["ProximitiesPU"] == 161 &&
+-              counts["RemotesPU"] == 107);
++              counts["RemotesPU"] == 107 && counts["FlashlightPU"] == 10);
+         CHECK(failures["ProximitiesPU: invalid property TypeAction"] == 28);
+         CHECK(failures["RemotesPU: invalid property TypeAction"] == 14);
+-        CHECK(worlds == 57 && created == 1516 && missing == 0 && rejected == 220 && spawns == 60);
++        CHECK(worlds == 57 && created == 1526 && missing == 0 && rejected == 220 && spawns == 60);
+         return true;
+     }
+ } // namespace
+diff --git a/tests/player_fixture.h b/tests/player_fixture.h
+index a322220..a83d5e1 100644
+--- a/tests/player_fixture.h
++++ b/tests/player_fixture.h
+@@ -84,8 +84,8 @@ namespace test_player
+             }
+         if (pickup_assets)
+             for (auto name : {"bulletammo_pu", "shellammo_pu", "bmgammo_pu", "flareammo_pu", "diebugdieammo_pu",
+-                              "howitzerammo_pu", "medkit_pu", "fuelammo_pu", "batteryammo_pu", "health_pu",
+-                              "megahealth_pu", "ward_pu", "necroward_pu"})
++                              "howitzerammo_pu", "medkit_pu", "flashlight_pu", "fuelammo_pu", "batteryammo_pu",
++                              "health_pu", "megahealth_pu", "ward_pu", "necroward_pu"})
+             {
+                 dir.children["models"].children["powerups"].files[std::string(name) + ".abc"] =
+                     test_model::abc(false, true).b;
+diff --git a/tests/proximity_tests.cpp b/tests/proximity_tests.cpp
+index 3bf9ddd..b6d0414 100644
+--- a/tests/proximity_tests.cpp
++++ b/tests/proximity_tests.cpp
+@@ -299,7 +299,7 @@ namespace
+                 unknown += row.state == EntryState::Unsupported;
+                 failed += row.state == EntryState::Failed;
+             }
+-            CHECK(made == 452 && unknown == 1 && failed == 1);
++            CHECK(made == 453 && unknown == 0 && failed == 1);
+             for (auto id : g.objects.snapshot())
+                 if (auto* pu = dynamic_cast<ProximitiesPU*>(g.objects.get(id)->game.get()))
+                 {
+diff --git a/tests/remote_tests.cpp b/tests/remote_tests.cpp
+index da04ea4..3857b6a 100644
+--- a/tests/remote_tests.cpp
++++ b/tests/remote_tests.cpp
+@@ -296,7 +296,7 @@ namespace
+                 unknown += row.state == EntryState::Unsupported;
+                 failed += row.state == EntryState::Failed;
+             }
+-            CHECK(made == 452 && unknown == 1 && failed == 1);
++            CHECK(made == 453 && unknown == 0 && failed == 1);
+             for (auto id : g.objects.snapshot())
+                 if (auto* pu = dynamic_cast<RemotesPU*>(g.objects.get(id)->game.get()))
+                 {
+diff --git a/tests/sky_tests.cpp b/tests/sky_tests.cpp
+index 0a33f94..49d21f2 100644
+--- a/tests/sky_tests.cpp
++++ b/tests/sky_tests.cpp
+@@ -166,7 +166,7 @@ namespace
+                 failed += entry.state == EntryState::Failed;
+                 unknown += entry.state == EntryState::Unsupported;
+             }
+-            CHECK(created == 452 && failed == 1 && unknown == 1);
++            CHECK(created == 453 && failed == 1 && unknown == 0);
+             for (const auto& use : g.resource_uses)
+                 CHECK(use.path != "Clouds1Pointer" && use.path != "Moon1Pointer" && use.path != "Star1Pointer" &&
+                       use.path != "BuildingsPointer");
+diff --git a/tests/world_debris_tests.cpp b/tests/world_debris_tests.cpp
+index 50760db..9dd0d4c 100644
+--- a/tests/world_debris_tests.cpp
++++ b/tests/world_debris_tests.cpp
+@@ -246,7 +246,7 @@ namespace
+                 failed += e.state == EntryState::Failed;
+             }
+             std::cout << "Created=" << created << " unsupported=" << unknown << " failed=" << failed << '\n';
+-            CHECK(created == 452 && unknown == 1 && failed == 1);
++            CHECK(created == 453 && unknown == 0 && failed == 1);
+             // Exercise original destruction/name activation, not direct fragment creation.
+             auto* list = g.server.FindNamedObjects("billboard");
+             CHECK(list && list->m_pFirstLink);
+diff --git a/tests/world_shader_tests.cpp b/tests/world_shader_tests.cpp
+index 4937bcf..b9f428a 100644
+--- a/tests/world_shader_tests.cpp
++++ b/tests/world_shader_tests.cpp
+@@ -26,7 +26,7 @@ int main()
+             CHECK(info.code && info.code_size > 128 && info.props == 0);
+             CHECK(info.num_storage_buffers == 0 && info.num_storage_textures == 0);
+             CHECK(info.num_samplers == (shader == WorldShader::Vertex ? 0u : 1u));
+-            CHECK(info.num_uniform_buffers == (shader == WorldShader::OpaqueFragment ? 0u : 1u));
++            CHECK(info.num_uniform_buffers == 1u);
+             CHECK(info.stage ==
+                   (shader == WorldShader::Vertex ? SDL_GPU_SHADERSTAGE_VERTEX : SDL_GPU_SHADERSTAGE_FRAGMENT));
+             if (formats & SDL_GPU_SHADERFORMAT_SPIRV)
+@@ -39,7 +39,7 @@ int main()
+             {
+                 CHECK(info.format == SDL_GPU_SHADERFORMAT_MSL && std::strcmp(info.entrypoint, "main0") == 0);
+                 const std::string_view source(reinterpret_cast<const char*>(info.code), info.code_size);
+-                CHECK(source.starts_with("#include <metal_stdlib>"));
++                CHECK(source.find("#include <metal_stdlib>") != source.npos);
+                 CHECK(info.code[info.code_size] == 0); // Runtime Metal compilation also gets terminated source.
+                 CHECK(source.find(shader == WorldShader::Vertex ? "vertex main0_out main0("
+                                                                 : "fragment main0_out main0(") != source.npos);
+@@ -49,6 +49,10 @@ int main()
+                     CHECK(source.find("[[texture(0)]]") != source.npos && source.find("[[sampler(0)]]") != source.npos);
+                 if (shader == WorldShader::Vertex)
+                     CHECK(source.find("u._textureOffset.xy") != source.npos);
++                else
++                    CHECK(source.find("float4 positionRadius;") != source.npos &&
++                          source.find("float4 lightColor;") != source.npos &&
++                          source.find("float3 worldPosition") != source.npos);
+             }
+             const auto* owned = info.code;
+             SDL_GPUShaderCreateInfo repeated{};
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index ccd7016..205eafb 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -988,8 +988,8 @@ namespace
+                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
+                 else
+                 {
+-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 484 && d.editor_only == 541 &&
+-                          d.unknown == 1 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
++                    CHECK(d.entries.size() == 1026 && d.schema_checked == 485 && d.editor_only == 541 &&
++                          d.unknown == 0 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                     for (const auto& e : d.entries)
+                         if (e.state == DestinationEntryState::InvalidProperties)
+                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+@@ -1222,6 +1222,12 @@ namespace
+         player->m_nAttribSpeed = 6;
+         CHECK(player->m_InventoryMgr.AddItem(1, 1) == InventoryResult::Ok);
+         player->m_InventoryMgr.medkit->count = 43;
++        CHECK(player->m_InventoryMgr.AddItem(2, 1) == InventoryResult::Ok);
++        auto& flashlight = *player->m_InventoryMgr.flashlight;
++        CHECK(flashlight.ActivateItem());
++        flashlight.remaining = 32;
++        flashlight.count = 27;
++        auto flashlight_child = flashlight.light;
+         player->m_damage.SetHitPoints(37);
+         player->m_damage.SetArmorPoints(23);
+         player->m_InventoryMgr.SetAmmoCount(1, 1234);
+@@ -1247,6 +1253,7 @@ namespace
+             CHECK(game->world_revision == revision && game->objects.time() == time);
+             CHECK(player->m_damage.m_fHitPoints == 37 && player->m_InventoryMgr.GetAmmoCount(1) == 1234);
+             CHECK(player->m_InventoryMgr.keys.size() == 1);
++            CHECK(flashlight.active && flashlight.light == flashlight_child && flashlight.remaining == 32);
+             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::None);
+         }
+         CHECK(transition_images(*game, root));
+@@ -1285,6 +1292,11 @@ namespace
+             CHECK(player->m_damage.m_fMaxHitPoints == 311 && player->m_damage.m_fResistance == .42f);
+             CHECK(player->m_nAttribSpeed == 6 && player->respawns == 0);
+             CHECK(player->m_InventoryMgr.medkit && player->m_InventoryMgr.medkit->count == 43);
++            const auto& restored_light = player->m_InventoryMgr.flashlight;
++            CHECK(restored_light && !restored_light->active && restored_light->count == 27 &&
++                  restored_light->remaining == 32);
++            CHECK(restored_light->light && game->server.IsObjectAlive(restored_light->light) &&
++                  !game->server.GetObjectUserFlags(restored_light->light));
+             CHECK(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_DIFFICULTY")) == 3);
+             CHECK(game->client_shell.view.object && g_hActiveCamera);
+             CHECK(game->step(.016));
+@@ -1325,7 +1337,7 @@ namespace
+             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+             std::cout << "CityHub refusal " << cycle << ": " << error << '\n';
+             CHECK(game.get() == owner && game->objects.snapshot() == ids && globals.unchanged());
+-            CHECK(game->level_change.unknown == 1 && game->level_change.failed == 1);
++            CHECK(game->level_change.unknown == 0 && game->level_change.failed == 1);
+             CHECK(game->level_change.cleanup_complete && game->level_change.source_retained);
+             CHECK(game->world_revision == revision && game->objects.time() == time);
+             CHECK(game->server.audio.voices().size() == voices.size());
+@@ -1426,7 +1438,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 452 && d.unknown == 1 && d.failed == 1);
++                        CHECK(d.created == 453 && d.unknown == 0 && d.failed == 1);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

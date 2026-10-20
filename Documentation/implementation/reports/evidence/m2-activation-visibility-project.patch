@@ -1,0 +1,640 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 3fd7cca..8a93b66 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -512,3 +512,5 @@ The [Gideon fade/teleport continuation](../Documentation/Implementation/M2_GIDEO
+ The [Gideon attack continuation](../Documentation/Implementation/M2_GIDEON_ATTACKS.md) connects original close/far sequences, timed dodges, Bold taunt and Special1 recoil. Read [contracts](docs/GIDEON_ATTACK_CONTRACTS.md). Preserve cached distance/basis, entry-only taunt velocity, repeated dodge velocity, elapsed>=1 completion independent of playback, retained lateral motion and checked target lifetime. No production boss registration or new shared global is claimed; initialization/health/damage/table ownership, required FX and safe NEW_LEVEL keep M2 open.
+ 
+ The [Gideon lifecycle continuation](../Documentation/Implementation/M2_GIDEON_RUNTIME.md) registers original initialization/AI_Update and typed boss-health delivery. Read [contracts](docs/GIDEON_RUNTIME_CONTRACTS.md). Preserve pre-base health capture, repeated nonzero-ratio publication, gravity removal after base initialization, one accepted typed damage application and subclass-before-base reaction order. All five shared table owners participate in destination rehearsal isolation. Original HUD, complete encounter/death parity, required FX and safe NEW_LEVEL remain incomplete; M2 stays open.
++
++The [NPC activation correction](../Documentation/Implementation/M2_ACTIVATION_VISIBILITY.md) reuses the original AI glass/volume filter for replacement visibility pings and completes Gideon's authored intro script. Read [contracts](docs/ACTIVATION_VISIBILITY_CONTRACTS.md). Preserve manual inactivity, strict original ping cadence, atomic refresh and checked historical inspection. Center rays are not retail PVS; complete encounters, safe NEW_LEVEL and M2 remain open.
+diff --git a/README.md b/README.md
+index 26a6f2d..21f7a3c 100644
+--- a/README.md
++++ b/README.md
+@@ -556,3 +556,5 @@ The [Gideon fade/teleport continuation](../Documentation/Implementation/M2_GIDEO
+ The [Gideon attack continuation](../Documentation/Implementation/M2_GIDEON_ATTACKS.md) connects original close/far sequences, one-second dodges, Bold taunt and immediate Special1 recoil, with inspection. Cached transforms, retained lateral velocity and checked failures are preserved. Production boss initialization/health/damage/shared-table ownership, required FX and safe NEW_LEVEL keep M2 incomplete.
+ 
+ The [production Gideon continuation](../Documentation/Implementation/M2_GIDEON_RUNTIME.md) adds original initialization, AI_Update, typed boss-health delivery and inspection. The fifth shared table is isolated during destination rehearsals. It supersedes the earlier blanket production-Gideon omission; complete boss encounter/death parity, required remaining services and safe NEW_LEVEL still keep M2 incomplete.
++
++The [NPC activation correction](../Documentation/Implementation/M2_ACTIVATION_VISIBILITY.md) reuses the original AI glass/volume filter for replacement visibility pings and completes Gideon's authored intro script. Read [contracts](docs/ACTIVATION_VISIBILITY_CONTRACTS.md). Preserve manual inactivity, strict original ping cadence, atomic refresh and checked historical inspection. Center rays are not retail PVS; complete encounters, safe NEW_LEVEL and M2 remain open.
+diff --git a/docs/ACTIVATION_VISIBILITY_CONTRACTS.md b/docs/ACTIVATION_VISIBILITY_CONTRACTS.md
+new file mode 100644
+index 0000000..4c8b93c
+--- /dev/null
++++ b/docs/ACTIVATION_VISIBILITY_CONTRACTS.md
+@@ -0,0 +1,77 @@
++# NPC activation visibility and the authored Gideon intro
++
++This extends [NPC runtime](AI_RUNTIME_CONTRACTS.md), [AI visibility](AI_SIGHT_CONTRACTS.md)
++and [Gideon lifecycle](GIDEON_RUNTIME_CONTRACTS.md). See the
++[source ledger](M2_ACTIVATION_VISIBILITY_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_ACTIVATION_VISIBILITY.md).
++M2 remains incomplete.
++
++## Replacement visibility policy
++
++The original ServerDE header describes PingObjects as activation of objects seen
++by its observer. It also gives manual INACTIVE/INACTIVE_TOUCH priority over pings.
++The original player selects the active server camera, otherwise itself, strictly
++after each 0.5-second deadline. AI_Update configures a three-second deactivation
++period and initially auto-deactivates; its existing sleep-gap desynchronization
++and pending update deadline remain unchanged.
++
++The port does not decode retail visibility/PVS data. Its existing center-ray
++estimate now uses SegmentFilter::AIVisibility, reusing the original CanSee
++IGNORE_LIQUID | IGNORE_GLASS object filter. This is a documented replacement-engine
++policy, not an assertion that retail PingObjects used these rays or this callback.
++It fixes the authored SubwayA camera-to-Gideon ray through nglass1.
++
++Every VolumeBrush descendant is excluded. A CDestructableBrush is excluded only
++when Destructable is true and GetSurfaceType returns SURFTYPE_GLASS. CanDamage and
++FireThrough do not determine transparency. Indestructible glass, wooden FireThrough
++brushes, doors and primary-world glass polygons still block. The filter is based
++on original game properties, not decoded texture alpha or renderer visibility.
++
++Preserve SolidOnly candidate intersection, observer exclusion, actual primary
++world/world-model geometry and object bounds. A miss or hit on the candidate is
++visible. This differs deliberately from CanSee, which requires a target hit and
++can retry a head ray. No range/FOV, extra head ray, proximity activation or forced
++active state is added. Weapon/USE rays keep their existing filters.
++
++## Atomic refresh and historical diagnostics
++
++Ping snapshots checked live identities with automatic deactivation enabled and
++activity ACTIVE or AUTODEACTIVATE_NOW. It excludes the observer and both manual
++inactive states. Collect visible candidates before refreshing any activity,
++deactivation deadline or successful-ping counter. An invalid/unavailable query
++fails the whole refresh; it must not partly wake actors. No callbacks run inside
++these queries. Commit by checked identity, preserving deferred removal.
++
++Each eligible candidate retains one bounded ActivationProbe: query count, simulation
++time, copied endpoints, checked observer/hit IDs, polygon, fraction, outcome and
++whether that batch committed its refresh. Diagnostics are updated as queries run;
++a visible result with refreshed=false truthfully records an aborted batch. Candidates
++not reached after an error retain older records. Invalid observer or unavailable
++collision at preflight does not fabricate a new per-candidate query. The player's
++existing activation_ping_failures records the failed service call.
++
++Probe IDs own nothing and remain historical after removal. No handle dereference,
++object link, message or resource ownership is added. Unload removes the record
++with its object. The NPC lifecycle inspector resolves IDs before displaying names
++and labels absent identities as removed. It shows outcome, committed refresh,
++time, endpoints and hit details without issuing queries or advancing simulation.
++Blocked results and unqueried objects stay visible in inspection.
++
++## Observable acceptance and limits
++
++Synthetic tests exercise destructible/indestructible glass, CanDamage=false,
++wood/door FireThrough, solid diagnostic Water/Ladder volumes, baked glass geometry,
++manual inactivity, invalid-ray batch rollback, unavailable collision and observer/
++world removal. The ordinary solid ray still hits the same glass object.
++
++Three 13-second actual SubwayA runs retain the authored objects, scripts, cameras,
++health and timing. At two seconds camera1's ordinary ray hits nglass1 while the
++committed activation probe sees Gideon; original script updates have progressed.
++Gideon reaches PASSIVE before camera1 changes, and the authored camera sequence
++returns player control. The GPU viewport repeats the script-state check after
++initial entry and world reload; the normal hidden-inspector rendering checks remain.
++
++This supersedes the previous two-update/zero-ping Gideon observation for this
++sequence. It does not prove a complete boss encounter, death parity, portal/PVS
++activation, all camera/occlusion arrangements or missing world services. Safe
++NEW_LEVEL, remaining required services and the actual M2 exit gate stay open.
+diff --git a/docs/AI_RUNTIME_CONTRACTS.md b/docs/AI_RUNTIME_CONTRACTS.md
+index 3543648..1197189 100644
+--- a/docs/AI_RUNTIME_CONTRACTS.md
++++ b/docs/AI_RUNTIME_CONTRACTS.md
+@@ -1,5 +1,8 @@
+ # Original Cultist/Civilian initialization and AI_Update
+ 
++> Extended by [activation visibility contracts](ACTIVATION_VISIBILITY_CONTRACTS.md): replacement player/camera pings now reuse the original glass/volume object filter, with atomic refresh, checked inspection and authored Gideon intro acceptance. This is not retail PVS; M2 remains incomplete.
++
++
+ > Extended by [Gideon lifecycle contracts](GIDEON_RUNTIME_CONTRACTS.md): production initialization, AI_Update, health delivery and fifth-table isolation are now integrated. Earlier blanket boss-registration omissions are historical. M2 remains incomplete.
+ 
+ > Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
+diff --git a/docs/AI_SIGHT_CONTRACTS.md b/docs/AI_SIGHT_CONTRACTS.md
+index 1bae970..e31d7ba 100644
+--- a/docs/AI_SIGHT_CONTRACTS.md
++++ b/docs/AI_SIGHT_CONTRACTS.md
+@@ -1,5 +1,8 @@
+ # Original AI visibility queries
+ 
++> Extended by [activation visibility contracts](ACTIVATION_VISIBILITY_CONTRACTS.md): replacement player/camera pings now reuse the original glass/volume object filter, with atomic refresh, checked inspection and authored Gideon intro acceptance. This is not retail PVS; M2 remains incomplete.
++
++
+ > Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
+ > candidate lists and stimulus/target selection now execute. Automatic NPC states
+ > and complete M2 remain unavailable; earlier acquisition omissions are historical.
+diff --git a/docs/CAMERA_CONTRACTS.md b/docs/CAMERA_CONTRACTS.md
+index 42c1992..67aeb8f 100644
+--- a/docs/CAMERA_CONTRACTS.md
++++ b/docs/CAMERA_CONTRACTS.md
+@@ -1,5 +1,8 @@
+ # Original scripted cameras
+ 
++> Extended by [activation visibility contracts](ACTIVATION_VISIBILITY_CONTRACTS.md): replacement player/camera pings now reuse the original glass/volume object filter, with atomic refresh, checked inspection and authored Gideon intro acceptance. This is not retail PVS; M2 remains incomplete.
++
++
+ M2 remains incomplete. Read [player](PLAYER_CONTRACTS.md), [movement](MOVEMENT_CONTRACTS.md),
+ [weapon](WEAPON_CONTRACTS.md) and [trigger](TRIGGER_CONTRACTS.md) contracts together
+ with these [source selections](M2_CAMERA_SOURCES.json) and
+diff --git a/docs/GIDEON_RUNTIME_CONTRACTS.md b/docs/GIDEON_RUNTIME_CONTRACTS.md
+index c32b823..d7acddd 100644
+--- a/docs/GIDEON_RUNTIME_CONTRACTS.md
++++ b/docs/GIDEON_RUNTIME_CONTRACTS.md
+@@ -1,5 +1,8 @@
+ # Original Gideon initialization and boss-health delivery
+ 
++> Extended by [activation visibility contracts](ACTIVATION_VISIBILITY_CONTRACTS.md): replacement player/camera pings now reuse the original glass/volume object filter, with atomic refresh, checked inspection and authored Gideon intro acceptance. This is not retail PVS; M2 remains incomplete.
++
++
+ Gideon is now a registered original NPC with the existing AI_Update scheduler,
+ combat actions and four supported weapons. This extends the
+ [attack contracts](GIDEON_ATTACK_CONTRACTS.md), [NPC runtime](AI_RUNTIME_CONTRACTS.md)
+diff --git a/docs/M2_ACTIVATION_VISIBILITY_SOURCES.json b/docs/M2_ACTIVATION_VISIBILITY_SOURCES.json
+new file mode 100644
+index 0000000..00e3132
+--- /dev/null
++++ b/docs/M2_ACTIVATION_VISIBILITY_SOURCES.json
+@@ -0,0 +1,32 @@
++{
++  "baseline_commit": "365e3b5c74978859eec190d985286cd189dbf98e",
++  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/AppHeaders/server_de.h",
++      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "use": "Object-state priority and SetDeactivationTime/PingObjects interface (54-65,678-684)"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "use": "Original player/camera observer and strict half-second ping cadence (1830-1870)"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "use": "AI_Update deactivation initialization and CanSee filter (2150-2195,3080-3130)"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
++      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
++      "use": "GlobalFilterFn volume/glass rules (412-483)"
++    }
++  ],
++  "adaptations": [
++    "Reuse original AI glass/volume object filter for replacement PingObjects center rays; not recovered retail PVS or Ping implementation.",
++    "Preserve manual inactivity, original player cadence/observer, AI deactivation deadlines and atomic refresh.",
++    "Bounded per-object historical query diagnostics with checked IDs and separate committed refresh flag; read-only inspector.",
++    "Authored SubwayA script/camera acceptance without forced targets, state, health, timings or edited assets."
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 61d6644..08af59a 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -872,3 +872,7 @@ Selected MC_FadeOut, AI_STATE_Teleport and Special1 are directly adapted from th
+ Selected original close/far states, dodge commands, inline Recoil and shared Bold taunt are adapted directly from original sources. See [source ledger](M2_GIDEON_ATTACK_SOURCES.json) and [contracts](GIDEON_ATTACK_CONTRACTS.md). Typed failures, inspection and shared Beg/Bold implementation are explicit adaptations; no production boss or new global is introduced.
+ 
+ The [production Gideon continuation](../../Documentation/Implementation/M2_GIDEON_RUNTIME.md) adds original initialization, AI_Update, typed boss-health delivery and inspection. The fifth shared table is isolated during destination rehearsals. It supersedes the earlier blanket production-Gideon omission; complete boss encounter/death parity, required remaining services and safe NEW_LEVEL still keep M2 incomplete.
++
++## NPC activation visibility correction
++
++See [contracts](ACTIVATION_VISIBILITY_CONTRACTS.md) and [source ledger](M2_ACTIVATION_VISIBILITY_SOURCES.json). The original ServerDE activation contract and player/AI scheduling are retained. Existing original CanSee glass/volume filtering is reused for replacement PingObjects center rays after diagnosing SubwayA nglass1; no retail PVS implementation is claimed. Added bounded historical inspection and authored-script/lifetime regressions. No reference source, commercial resource or dependency revision was changed.
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index d274b49..97d4847 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -4,6 +4,7 @@
+ #include "game/original/CivilianAI.h"
+ #include "game/original/Corpse.h"
+ #include "game/original/CultistAI.h"
++#include "game/original/Gideon.h"
+ #include <cmath>
+ #include <limits>
+ #include <spdlog/spdlog.h>
+@@ -80,6 +81,31 @@ namespace OpenBlood2
+                                selected->m_damage.hit.node == 2 && !selected->m_damage.hit.random_fallback;
+         return cultists == 10 && civilians == 5 && updates >= 15 && localized;
+     }
++    bool check_gideon_intro_smoke(GameSession& g, const char* phase)
++    {
++        unsigned bosses = 0;
++        for (auto id : g.objects.snapshot())
++        {
++            const auto* r = g.objects.get(id);
++            const auto* a = r ? dynamic_cast<const Gideon*>(r->game.get()) : nullptr;
++            if (!a)
++                continue;
++            ++bosses;
++            spdlog::info("Authored Gideon intro {}: updates={}, pings={}, probes={}, state={}, selections={}, "
++                         "script updates={}, command={}, failures={}",
++                         phase, a->runtime_updates, r->activation_pings, r->activation_probe.checks, a->m_nState,
++                         a->script_selections, a->script_updates, a->CurrentScriptCommand().argument,
++                         a->script_failures);
++            if (!a->RuntimeReady() || a->m_nState != AI_Mgr::StatePassive || !r->activation_pings ||
++                !r->activation_probe.checks || a->script_selections != 2 || !a->script_updates || a->script_failures ||
++                a->CurrentScriptCommand().command != AI_Mgr::ScriptCommand::SetState ||
++                a->CurrentScriptCommand().argument != "PASSIVE")
++                return false;
++        }
++        const auto* player = g.server_shell.Player(g.local_client);
++        return bosses == 1 && player && !player->camera_movement_blocked && !player->activation_ping_failures &&
++               !g.client_shell.view.object;
++    }
+     namespace
+     {
+         // Isolated original flee/hide driver. It stops scheduling once beg begins;
+diff --git a/src/app/ai_model_key_smoke.h b/src/app/ai_model_key_smoke.h
+index 5d9be05..c00ba63 100644
+--- a/src/app/ai_model_key_smoke.h
++++ b/src/app/ai_model_key_smoke.h
+@@ -5,6 +5,7 @@ namespace OpenBlood2
+     bool prepare_corpse_smoke(GameSession&, ObjectId&);
+     bool check_corpse_smoke(GameSession&, ObjectId, bool log = false);
+     bool check_ai_runtime_smoke(GameSession&, ObjectId&);
++    bool check_gideon_intro_smoke(GameSession&, const char* phase);
+     bool prepare_ai_escape_smoke(GameSession&, ObjectId&);
+     bool check_ai_escape_smoke(GameSession&, ObjectId);
+     bool prepare_ai_follow_smoke(GameSession&, ObjectId&);
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index d25c6b7..4522742 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -121,6 +121,42 @@ namespace OpenBlood2
+                         (unsigned long long)a.runtime_camera_pauses, (unsigned long long)a.runtime_desyncs);
+             ImGui::Text("Activity %u | pings %llu | timeout %.3f", r->activity, (unsigned long long)r->activation_pings,
+                         r->deactivate_at);
++            const auto& ping = r->activation_probe;
++            const char* visibility = "not queried";
++            switch (ping.visibility)
++            {
++                case ActivationVisibility::Visible:
++                    visibility = "visible";
++                    break;
++                case ActivationVisibility::Blocked:
++                    visibility = "blocked";
++                    break;
++                case ActivationVisibility::Invalid:
++                    visibility = "invalid query";
++                    break;
++                case ActivationVisibility::Unavailable:
++                    visibility = "unavailable collision";
++                    break;
++                case ActivationVisibility::Unqueried:
++                    break;
++            }
++            ImGui::Text("Activation checks %llu | %s | refreshed %s | time %.3f", (unsigned long long)ping.checks,
++                        visibility, ping.refreshed ? "yes" : "no", ping.time);
++            if (ping.checks)
++            {
++                const auto* observer = game.objects.get(ping.observer);
++                const auto* blocker = game.objects.get(ping.hit_object);
++                ImGui::Text("Observer %s | hit %s | polygon %u | fraction %.3f",
++                            observer ? observer->state.m_Name : "removed",
++                            blocker           ? blocker->state.m_Name
++                            : ping.hit_object ? "removed"
++                                              : "world / none",
++                            ping.polygon, ping.fraction);
++                ImGui::Text("Ray %.1f %.1f %.1f -> %.1f %.1f %.1f", ping.from.x, ping.from.y, ping.from.z, ping.to.x,
++                            ping.to.y, ping.to.z);
++            }
++            ImGui::TextWrapped(
++                "Activation uses center rays with the original AI glass/volume filter; retail PVS is not implemented.");
+             ImGui::Text("State %d | phase %d | targeted %s | target losses %llu", a.m_nState, a.Metacmd,
+                         a.m_bHasTargeted ? "yes" : "no", (unsigned long long)a.runtime_target_losses);
+             ImGui::Text("HP %.2f / %.2f | damage factor %.3f", a.m_damage.m_fHitPoints, a.m_damage.m_fMaxHitPoints,
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 5a690f2..c3575c3 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -134,6 +134,8 @@ namespace
+                     spdlog::error("Authored intro camera did not release player control");
+                     return 4;
+                 }
++                if (options.viewport_smoke && !OpenBlood2::check_gideon_intro_smoke(game, "initial"))
++                    return 4;
+                 if (options.restore_smoke)
+                 {
+                     if (options.keepalive_smoke)
+@@ -523,6 +525,9 @@ namespace
+                 (options.weapons_smoke || options.movement_smoke || options.interaction_smoke) &&
+                 !OpenBlood2::finish_camera_intro_for_smoke(game))
+                 return 4;
++            if (frames == reload_frame + 1 && options.viewport_smoke &&
++                !OpenBlood2::check_gideon_intro_smoke(game, "reload"))
++                return 4;
+             if (options.interaction_smoke && frames == reload_frame + 1)
+                 if (!OpenBlood2::prepare_interaction_smoke(game, smoke_door))
+                     return 4;
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index ba9a4ce..04f4ffc 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -90,6 +90,24 @@ namespace OpenBlood2
+         DRotation rotation;
+         bool resolved = false;
+     };
++    enum class ActivationVisibility
++    {
++        Unqueried,
++        Visible,
++        Blocked,
++        Invalid,
++        Unavailable
++    };
++    struct ActivationProbe
++    {
++        std::uint64_t checks = 0;
++        double time = 0, fraction = 1;
++        ObjectId observer, hit_object;
++        DVector from{}, to{};
++        std::uint32_t polygon = UINT32_MAX;
++        ActivationVisibility visibility = ActivationVisibility::Unqueried;
++        bool refreshed = false; // Visibility alone is not a committed batch refresh.
++    };
+     struct ObjectRecord
+     {
+         ObjectId id;
+@@ -136,6 +154,7 @@ namespace OpenBlood2
+         bool auto_deactivate = false;
+         double deactivation_period = 0, deactivate_at = 0;
+         std::uint64_t activation_pings = 0;
++        ActivationProbe activation_probe;
+         double due = 0;
+         bool scheduled = false;
+         std::uint64_t updates = 0;
+diff --git a/src/game/server_activation.cpp b/src/game/server_activation.cpp
+index e76e006..e59fa5a 100644
+--- a/src/game/server_activation.cpp
++++ b/src/game/server_activation.cpp
+@@ -48,8 +48,8 @@ namespace OpenBlood2
+         if (!source || source->life != Life::Alive || !collision || !collision_ready)
+             return false;
+         const auto from = source->state.m_Pos;
+-        // Replacement visibility selection: checked center rays, independent of render/UI.
+-        // Retail PVS-based activation is not reproduced by the DAT reader yet.
++        // Replacement visibility selection: checked center rays using the original
++        // AI glass/volume filter, independent of render/UI. This is not retail PVS.
+         std::vector<ObjectId> visible;
+         for (auto id : objects_.snapshot())
+         {
+@@ -58,10 +58,27 @@ namespace OpenBlood2
+                 (r->activity != OBJSTATE_ACTIVE && r->activity != OBJSTATE_AUTODEACTIVATE_NOW))
+                 continue;
+             SegmentHit hit;
+-            auto result = IntersectSegment(from, r->state.m_Pos, observer, hit);
++            auto result = IntersectSegment(from, r->state.m_Pos, observer, hit, false, SegmentObjects::SolidOnly,
++                                           SegmentFilter::AIVisibility);
++            auto& probe = r->activation_probe;
++            ++probe.checks;
++            probe.time = objects_.time();
++            probe.observer = source->id;
++            probe.from = from;
++            probe.to = r->state.m_Pos;
++            const auto* blocker = objects_.get(hit.object);
++            probe.hit_object = blocker ? blocker->id : ObjectId{};
++            probe.polygon = hit.polygon;
++            probe.fraction = hit.fraction;
++            probe.refreshed = false;
++            probe.visibility = result == SegmentResult::Invalid       ? ActivationVisibility::Invalid
++                               : result == SegmentResult::Unavailable ? ActivationVisibility::Unavailable
++                               : result == SegmentResult::Miss || hit.object == r->handle
++                                   ? ActivationVisibility::Visible
++                                   : ActivationVisibility::Blocked;
+             if (result == SegmentResult::Invalid || result == SegmentResult::Unavailable)
+                 return false; // No partial refresh on failed queries.
+-            if (result == SegmentResult::Miss || (result == SegmentResult::Hit && hit.object == r->handle))
++            if (probe.visibility == ActivationVisibility::Visible)
+                 visible.push_back(id);
+         }
+         for (auto id : visible)
+@@ -72,6 +89,7 @@ namespace OpenBlood2
+             r->activity = OBJSTATE_ACTIVE;
+             r->deactivate_at = objects_.time() + r->deactivation_period;
+             ++r->activation_pings;
++            r->activation_probe.refreshed = true;
+         }
+         return true;
+     }
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 186b626..b2887a4 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -788,7 +788,7 @@ add_executable(ai_runtime_tests ai_runtime_tests.cpp)
+ target_link_libraries(ai_runtime_tests PRIVATE blood2_game)
+ blood2_project_options(ai_runtime_tests)
+ 
+-foreach(case IN ITEMS activation visibility lifetime targets tracking camera spatial triggers body missing)
++foreach(case IN ITEMS activation visibility visibility_filter visibility_atomic lifetime targets tracking camera spatial triggers body missing)
+     add_test(NAME ai_runtime.${case} COMMAND ai_runtime_tests "${case}")
+     set_tests_properties(ai_runtime.${case} PROPERTIES LABELS "headless;ai_runtime" TIMEOUT 30)
+ endforeach()
+diff --git a/tests/ai_runtime_tests.cpp b/tests/ai_runtime_tests.cpp
+index fb31205..911bfc2 100644
+--- a/tests/ai_runtime_tests.cpp
++++ b/tests/ai_runtime_tests.cpp
+@@ -2,6 +2,8 @@
+ #include "game/original/CameraObj.h"
+ #include "game/original/CivilianAI.h"
+ #include "game/original/CultistAI.h"
++#include "game/original/DestructableBrush.h"
++#include "game/original/SurfaceTypes.h"
+ #include "game/server_adapter.h"
+ #include "model_fixture.h"
+ #include <cmath>
+@@ -157,6 +159,109 @@ namespace
+         CHECK(g.objects.remove(observer) && !g.server.PingObjects(observer) && g.objects.finish_frame());
+         return true;
+     }
++    HOBJECT activation_brush(GameSession& g, const char* type, Properties props = {})
++    {
++        const auto name = "activation-brush" + std::to_string(g.world.models.size());
++        g.world.models.push_back(test_brush::box(name, {-20, 0, 22}, {20, 40, 28}));
++        props["Name"] = name;
++        props.try_emplace("Flags", std::int32_t(FLAG_SOLID));
++        if (std::string_view(type) == "CDestructableBrush")
++            props.try_emplace("HitPoints", 10.f);
++        return g.objects.create(g.objects.find_class(type), {}, Creation::World, props);
++    }
++    bool visibility_filter(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto observer = object(g, {0, 10, 50}, "observer");
++        auto target = object(g, {0, 10, 0}, "activation target");
++        CHECK(observer && target && g.server.SetDeactivationTime(target, 3));
++        auto* r = g.objects.get(target);
++        auto h = activation_brush(g, "CDestructableBrush",
++                                  {{"SurfaceType", std::int32_t(SURFTYPE_GLASS)}, {"CanDamage", false}});
++        auto* glass = h ? dynamic_cast<CDestructableBrush*>(g.objects.get(h)->game.get()) : nullptr;
++        CHECK(glass);
++        auto check = [&](bool visible)
++        {
++            g.server.SetObjectState(target, OBJSTATE_AUTODEACTIVATE_NOW);
++            const auto before = r->activation_pings;
++            if (!g.server.PingObjects(observer))
++                return false;
++            return r->activation_probe.observer == g.objects.get(observer)->id &&
++                   r->activation_probe.visibility ==
++                       (visible ? ActivationVisibility::Visible : ActivationVisibility::Blocked) &&
++                   r->activation_probe.refreshed == visible && r->activation_pings == before + unsigned(visible) &&
++                   r->activity == (visible ? OBJSTATE_ACTIVE : OBJSTATE_AUTODEACTIVATE_NOW);
++        };
++        CHECK(check(true)); // Source CanDamage does not define glass visibility.
++        SegmentHit hit;
++        CHECK(g.server.IntersectSegment({0, 10, 50}, {0, 10, 0}, observer, hit) == SegmentResult::Hit &&
++              hit.object == h);
++        glass->destructable = false;
++        CHECK(check(false) && r->activation_probe.hit_object == g.objects.get(h)->id);
++        glass->destructable = true;
++        glass->surface = SURFTYPE_WOOD;
++        glass->fire_through = true;
++        CHECK(check(false)); // FireThrough is a separate weapon rule.
++        glass->surface = SURFTYPE_GLASS;
++        CHECK(check(true));
++        const auto checks = r->activation_probe.checks;
++        g.server.SetObjectState(target, OBJSTATE_INACTIVE);
++        CHECK(g.server.PingObjects(observer) && r->activity == OBJSTATE_INACTIVE &&
++              r->activation_probe.checks == checks);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        for (const auto* type : {"Water", "Ladder"})
++        {
++            h = activation_brush(g, type);
++            CHECK(h);
++            g.server.SetObjectFlags(h, g.server.GetObjectFlags(h) | FLAG_SOLID);
++            CHECK(check(true)); // Excludes every VolumeBrush subclass, even a solid diagnostic volume.
++            CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        }
++        h = activation_brush(g, "Door", {{"FireThrough", true}});
++        CHECK(h && check(false) && r->activation_probe.hit_object == g.objects.get(h)->id);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        auto wall = test_brush::box("world", {-20, 0, 22}, {20, 40, 28});
++        for (auto& surface : wall.surfaces)
++        {
++            surface.flags = 1;
++            surface.texture_flags = SURFTYPE_GLASS;
++        }
++        std::string error;
++        CHECK(g.collision.build(wall, error) && check(false));
++        CHECK(!r->activation_probe.hit_object && r->activation_probe.polygon != UINT32_MAX);
++        return true; // Object filtering never invents transparent baked world geometry.
++    }
++    bool visibility_atomic(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto observer = object(g, {0, 10, 50});
++        auto target = object(g, {0, 10, 0});
++        auto invalid = object(g, {0, 10, 50}); // Invalid zero-length ray after a valid candidate.
++        CHECK(observer && target && invalid);
++        g.server.SetObjectFlags(invalid, 0); // Do not obstruct the first candidate's ray.
++        CHECK(g.server.SetDeactivationTime(target, 3) && g.server.SetDeactivationTime(invalid, 3));
++        g.server.SetObjectState(target, OBJSTATE_AUTODEACTIVATE_NOW);
++        g.server.SetObjectState(invalid, OBJSTATE_AUTODEACTIVATE_NOW);
++        auto* r = g.objects.get(target);
++        CHECK(!g.server.PingObjects(observer));
++        CHECK(r->activation_probe.visibility == ActivationVisibility::Visible && !r->activation_probe.refreshed &&
++              r->activation_pings == 0 && r->activity == OBJSTATE_AUTODEACTIVATE_NOW);
++        CHECK(g.objects.get(invalid)->activation_probe.visibility == ActivationVisibility::Invalid &&
++              g.objects.get(invalid)->activation_pings == 0);
++        CHECK(g.objects.remove(invalid) && g.server.PingObjects(observer));
++        CHECK(r->activation_pings == 1 && r->activation_probe.refreshed && r->activity == OBJSTATE_ACTIVE);
++        const auto checks = r->activation_probe.checks;
++        g.server.collision_ready = false;
++        CHECK(!g.server.PingObjects(observer) && r->activation_probe.checks == checks);
++        const auto old_observer = r->activation_probe.observer;
++        CHECK(g.objects.remove(observer) && g.objects.finish_frame() && !g.objects.get(old_observer));
++        CHECK(!g.server.PingObjects(observer) && r->activation_probe.observer == old_observer);
++        const auto target_id = r->id;
++        CHECK(g.unload_world() && !g.objects.get(target_id));
++        return true;
++    }
+     bool lifetime(const char*)
+     {
+         for (bool remove : {false, true})
+@@ -555,6 +660,8 @@ int main(int argc, char** argv)
+                                                                         {"missing", missing},
+                                                                         {"activation", activation},
+                                                                         {"visibility", visibility},
++                                                                        {"visibility_filter", visibility_filter},
++                                                                        {"visibility_atomic", visibility_atomic},
+                                                                         {"lifetime", lifetime},
+                                                                         {"targets", targets},
+                                                                         {"tracking", tracking},
+diff --git a/tests/gideon_runtime_tests.cpp b/tests/gideon_runtime_tests.cpp
+index 1de80c9..168df44 100644
+--- a/tests/gideon_runtime_tests.cpp
++++ b/tests/gideon_runtime_tests.cpp
+@@ -1,4 +1,6 @@
+ #include "game/game_settings.h"
++#include "game/original/CameraObj.h"
++#include "game/original/DestructableBrush.h"
+ #include "gideon_fixture.h"
+ #include <functional>
+ #include <limits>
+@@ -329,9 +331,38 @@ namespace
+             CHECK(g.server.GetAnimIndex(boss->m_hObject, "TALKING_02") == 19);
+             CHECK(g.enter_player(error));
+             std::cout << "Entered objects=" << g.objects.snapshot().size() << '\n';
+-            for (unsigned tick = 0; tick < 600; ++tick)
++            bool visible_through_glass = false, passive_before_camera_change = false;
++            for (unsigned tick = 0; tick < 780; ++tick)
+             {
+                 CHECK(g.step(1. / 60));
++                // Allow the source's initial desynchronization and half-second
++                // player pings to run before inspecting the still-active camera1.
++                if (tick == 120)
++                {
++                    const auto* r = g.objects.get(previous);
++                    const auto* observer = g.objects.get(g_hActiveCamera);
++                    CHECK(observer && std::string_view(observer->state.m_Name) == "camera1");
++                    SegmentHit hit;
++                    CHECK(g.server.IntersectSegment(observer->state.m_Pos, r->state.m_Pos, observer->handle, hit) ==
++                          SegmentResult::Hit);
++                    const auto* obstruction = g.objects.get(hit.object);
++                    const auto* glass =
++                        obstruction ? dynamic_cast<const CDestructableBrush*>(obstruction->game.get()) : nullptr;
++                    CHECK(glass && glass->destructable && glass->GetSurfaceType() == SURFTYPE_GLASS &&
++                          std::string_view(obstruction->state.m_Name) == "nglass1");
++                    std::cout << "Glass probe observer=" << (r->activation_probe.observer == observer->id)
++                              << " visibility=" << int(r->activation_probe.visibility)
++                              << " refreshed=" << r->activation_probe.refreshed << " pings=" << r->activation_pings
++                              << " script updates=" << boss->script_updates << '\n';
++                    CHECK(r->activation_probe.observer == observer->id &&
++                          r->activation_probe.visibility == ActivationVisibility::Visible &&
++                          r->activation_probe.refreshed && r->activation_pings > 0 && boss->script_updates > 10);
++                    visible_through_glass = true;
++                }
++                if (tick == 390)
++                    passive_before_camera_change =
++                        boss->m_nState == AI_Mgr::StatePassive && g_hActiveCamera &&
++                        std::string_view(g.objects.get(g_hActiveCamera)->state.m_Name) == "camera1";
+                 if (!tick)
+                     std::cout << "First tick objects=" << g.objects.snapshot().size()
+                               << " attachments=" << g.objects.attachments().size() << '\n';
+@@ -343,6 +374,10 @@ namespace
+             std::cout << "Boss updates=" << boss->runtime_updates << " state=" << boss->m_nState
+                       << " health messages=" << g.client_shell.boss_health_messages << " error=" << boss->runtime_error
+                       << '\n';
++            std::cout << "Intro glass visibility=" << visible_through_glass
++                      << " passive before camera switch=" << passive_before_camera_change
++                      << " selections=" << boss->script_selections << " script updates=" << boss->script_updates
++                      << " current=" << boss->CurrentScriptCommand().argument << '\n';
+             if (boss->runtime_failed)
+             {
+                 auto* r = g.objects.get(boss->m_hObject);
+@@ -356,6 +391,11 @@ namespace
+                 std::cerr << '\n';
+             }
+             CHECK(boss->RuntimeReady() && boss->runtime_updates > 0 && g.client_shell.boss_health_messages > 0);
++            CHECK(visible_through_glass && passive_before_camera_change && boss->m_nState == AI_Mgr::StatePassive &&
++                  boss->CurrentScriptCommand().command == AI_Mgr::ScriptCommand::SetState &&
++                  boss->CurrentScriptCommand().argument == "PASSIVE" && boss->script_selections == 2 &&
++                  boss->script_failures == 0 && !g_hActiveCamera && !g.client_shell.view.object &&
++                  !g.server_shell.Player(g.local_client)->activation_ping_failures);
+             CHECK(!g.run_world(error));
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.objects.get(previous));
+             CHECK(!AI_Mgr::m_dwNumMonster && !AI_Mgr::m_dwNumCabal && !CDestructable::m_dwNumDestructables);

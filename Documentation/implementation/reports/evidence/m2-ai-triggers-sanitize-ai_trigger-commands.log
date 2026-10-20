@@ -1,0 +1,14 @@
+361/366 Testing: ai_trigger.commands
+361/366 Test: ai_trigger.commands
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_trigger_tests" "commands" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-trigger-commands"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_trigger.commands" start time: Oct 16 12:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ai_trigger.commands" end time: Oct 16 12:07 CEST
+"ai_trigger.commands" time elapsed: 00:00:00
+----------------------------------------------------------

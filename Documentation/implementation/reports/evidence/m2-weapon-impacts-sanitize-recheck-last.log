@@ -1,0 +1,23 @@
+Start testing: Oct 16 23:30 CEST
+----------------------------------------------------------
+354/569 Testing: ai_fire.filters
+354/569 Test: ai_fire.filters
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_fire_tests" "filters"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_fire.filters" start time: Oct 16 23:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_fire.filters" end time: Oct 16 23:30 CEST
+"ai_fire.filters" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 23:30 CEST
+
+ai_fire =   0.02 sec*proc
+
+headless =   0.02 sec*proc
+

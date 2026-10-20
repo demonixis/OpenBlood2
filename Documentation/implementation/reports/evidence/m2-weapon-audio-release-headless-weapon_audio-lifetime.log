@@ -1,0 +1,14 @@
+602/603 Testing: weapon_audio.lifetime
+602/603 Test: weapon_audio.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon_audio_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon-audio-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"weapon_audio.lifetime" start time: Oct 16 23:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_audio.lifetime" end time: Oct 16 23:03 CEST
+"weapon_audio.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

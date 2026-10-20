@@ -1,0 +1,401 @@
+{
+  "date": "2026-10-15",
+  "status": "M2 incomplete; complete shells/player not connected",
+  "project_commit": "3b707f539be40406000049a8f7801f28c3aaf0f4",
+  "changes": "uncommitted continuation",
+  "dependencies": {
+    "SDL": {
+      "branch": "main",
+      "commit": "6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1",
+      "reported_version": "3.5.0",
+      "archive_sha256": "b59f24752e8ac3322853b43d6d773dfbce4d175d9e2c1db1c4305d8fe565b4e6"
+    },
+    "imgui": {
+      "branch": "master",
+      "commit": "c1aaac65e896a45f81f47a4d68f9959e0f86c859",
+      "reported_version": "1.93.0",
+      "archive_sha256": "b3d8f99838bb3ff05e14185562345f85e00c032da4d8fc277608d7898d847114"
+    },
+    "spdlog": {
+      "tag": "v1.15.3",
+      "commit": "6fa36017cfd5731d617e1a934f0e5ea9c4445b13",
+      "archive_sha256": "5097fb362e79a2bd7247beaf1f8377ed60e274fbe83a4b33e7b73383f0279022"
+    }
+  },
+  "reference_repositories": [
+    {
+      "path": "OpenBlood2",
+      "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+      "status": ""
+    },
+    {
+      "path": "NoMadEngine",
+      "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+      "status": ""
+    },
+    {
+      "path": "nomad",
+      "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+      "status": ""
+    },
+    {
+      "path": "sources/blood2",
+      "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "status": ""
+    },
+    {
+      "path": "sources/Shogo_Aegis",
+      "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+      "status": ""
+    },
+    {
+      "path": "sources/lithtech",
+      "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+      "status": ""
+    }
+  ],
+  "tests": {
+    "debug": {
+      "passed": 45,
+      "total": 45
+    },
+    "release": {
+      "passed": 45,
+      "total": 45
+    },
+    "asan_ubsan_headless": {
+      "passed": 43,
+      "total": 43
+    }
+  },
+  "retail": {
+    "world": "worlds/01_subwaya.dat",
+    "source_objects": 580,
+    "original_instances": 18,
+    "preprocessor_only": 372,
+    "unported": 190,
+    "solid_primary_triangles": 14300,
+    "bvh_nodes": 4095,
+    "caleb_nodes": 20,
+    "caleb_stored_vertices": 784,
+    "caleb_primary_vertices": 509,
+    "caleb_clips": 86,
+    "caleb_key_commands_dispatched": 46,
+    "caleb_deformation_entries": 189,
+    "caleb_unique_deformed_vertices": 120
+  },
+  "project_files": [
+    {
+      "path": ".gitignore",
+      "sha256": "52af96b3f9e7e92aeff1577219ceb333b08b0404cbbebc7f84f5f3310991a36c"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "ac8a3389fb72331037dbff3cc4326bc891d3715f1118ee2e894f3816ce654cce"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "1ecbad0e3c8d31ac0242d608ca670241c0385c35e812f659d6c44b3fee7529f5"
+    },
+    {
+      "path": "CMakePresets.json",
+      "sha256": "5f1480c97319fde9d69c45d26e1c19192f910d54169e3926c6f9ef775e8a7a5e"
+    },
+    {
+      "path": "README.md",
+      "sha256": "cd42533f07eb7dedadbd8b112fd7f4debbe59bef97b28c823bda8809ea9484c7"
+    },
+    {
+      "path": "cmake/Dependencies.cmake",
+      "sha256": "f60d3dc26a31caf75f0a35faa669119d7921a204afea62de4d2943405f4969b0"
+    },
+    {
+      "path": "cmake/build_info.h.in",
+      "sha256": "30aea322c732e6a5f4b0fbdc0c1eea150b3feab8835a67cea05aa57342d5d0bf"
+    },
+    {
+      "path": "config/blood2.example.ini",
+      "sha256": "862ef06472089f0412bdbed34c9344893c44551e364f1a85c53119d4b84f0889"
+    },
+    {
+      "path": "docs/M2_SERVICES_SOURCES.json",
+      "sha256": "7d0ffc84003c6d84407de4e30db984bfba930a67fa213ded7f2510c21e741a7a"
+    },
+    {
+      "path": "docs/M2_SOURCES.json",
+      "sha256": "e0348bee7e6bc7a876ae085785a0dd7e6b0b00c131282372933d2a9210941104"
+    },
+    {
+      "path": "docs/MODEL_AND_COLLISION_CONTRACTS.md",
+      "sha256": "1b1ace83a1dab61bfb545c3b969998dc59084ed5c6f5cabc784085cfe984ebf5"
+    },
+    {
+      "path": "docs/OBJECT_CONTRACTS.md",
+      "sha256": "640cd0137ecdbe81f3314a3feedcebf9ccf422509b8e5957d91cc891947e62a3"
+    },
+    {
+      "path": "docs/ORIGINAL_SOURCES.json",
+      "sha256": "a93a4fdce2aefb20cd2805356b63c8f26f8885730a133d9c0f47d735c81a6a76"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "60e970a157366096c8bf1e1297ced3d65b761a215920a3feb4807a3106b81cea"
+    },
+    {
+      "path": "docs/WORLD_CONTRACTS.md",
+      "sha256": "0aad9216f3ee4217fe2b4ecb2e33c3cd2c72db8e217ab502202f57caef445622"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "20f1b954a02e437d8d89f642b215a154dc80963e0f272e4313b80d8e81cac887"
+    },
+    {
+      "path": "src/app/inspector.h",
+      "sha256": "50b3c50b91283c99305f61e9693993060c7c9710dfb71d9475b817ae76e31591"
+    },
+    {
+      "path": "src/app/main.cpp",
+      "sha256": "85c976aac37d9741004b8a9b5b627558606aaad7a54260e3a03f42b3a2ab6daa"
+    },
+    {
+      "path": "src/engine/capture.cpp",
+      "sha256": "2c2649aa8eba96748fc7c9bfe43345a8071ecb5d846db6d8f9c89d072b88698f"
+    },
+    {
+      "path": "src/engine/capture.h",
+      "sha256": "9cc9b01db88ecfdcefd24b343894a24a67b6de148647280a864b5e00751d22ee"
+    },
+    {
+      "path": "src/engine/collision.cpp",
+      "sha256": "cb2a205a6ff350596ad9e18aa024e1a7578a44eeadc2bf57b8e24c5a38086bf1"
+    },
+    {
+      "path": "src/engine/collision.h",
+      "sha256": "a54dc9c8857cba73d96875d553e98838b65f7b067af79a81a50600b9ebd3e9e6"
+    },
+    {
+      "path": "src/engine/config.cpp",
+      "sha256": "70896a63825e79376f58a1345c9f55be6f5eda58310bdc7fb216b4a5a23681e2"
+    },
+    {
+      "path": "src/engine/config.h",
+      "sha256": "7a174024f29eebf37677817d5a6ccd0d43089402bc229acdce367a65632b1d2d"
+    },
+    {
+      "path": "src/engine/formats/reader.h",
+      "sha256": "af0dd0a4c776359bbda1d73ca588a70aaa301c02c11e100dbbf51fe949373702"
+    },
+    {
+      "path": "src/engine/model.cpp",
+      "sha256": "8bf862e04369bd0e0d5f950418421ad76773259e442572a38e6780bb683b880b"
+    },
+    {
+      "path": "src/engine/model.h",
+      "sha256": "aab95f2d33875138b6f561a743037265f185a91ef973d9f00c6a429ff2b99e3a"
+    },
+    {
+      "path": "src/engine/model_store.cpp",
+      "sha256": "874e218a8388259163f0695b31b643614e5b3e55c498e01f77ef6bade043a444"
+    },
+    {
+      "path": "src/engine/model_store.h",
+      "sha256": "6a0df50dae8be530f48fc7b570581686141f816d6e8b2a3e539b2510ac6a2e01"
+    },
+    {
+      "path": "src/engine/objects.cpp",
+      "sha256": "ef0a7c3f106f01038fa4370b184934dafa2ac6129c7b3e3df835086b4a7a6d0c"
+    },
+    {
+      "path": "src/engine/objects.h",
+      "sha256": "d4a8ce6f05eb31df678480e5562e04af489502531ba7f3abe34ae081479b8657"
+    },
+    {
+      "path": "src/engine/resources.cpp",
+      "sha256": "a15007b9db09b2b57dc4d6c57b65fc03283f2e86be362e161a66bccbb9e6b076"
+    },
+    {
+      "path": "src/engine/resources.h",
+      "sha256": "6104b08d022634a0d355325d384f68dd0186942c52ac2c53f1c2f347d2fe5b4c"
+    },
+    {
+      "path": "src/engine/runtime.cpp",
+      "sha256": "36ea68ba391b8b587c0328fccb9a877468ce2b23e730b38289864bc8ed75fb0c"
+    },
+    {
+      "path": "src/engine/runtime.h",
+      "sha256": "685fbbd466209f5dce6cfad5c254942bf3eb15e7aab25f55e0653a1c0fb557b2"
+    },
+    {
+      "path": "src/engine/world.cpp",
+      "sha256": "f41badee983bb3ed8ae2f1f5082e678e7e85b9279927ab13ec86bc35a8d54e34"
+    },
+    {
+      "path": "src/engine/world.h",
+      "sha256": "437c9ae425812da6f06384555c68aed73a6266f1fb93dfbbf8c6467776732c81"
+    },
+    {
+      "path": "src/game/game_settings.h",
+      "sha256": "d41e23667130ae1d3c83d752409379332f41994c1556b3671e39370d2f009cfd"
+    },
+    {
+      "path": "src/game/legacy/basedefs_de.h",
+      "sha256": "21fd610d13758466924f459660571713175e57c6c0058adcd211b82478adb0c4"
+    },
+    {
+      "path": "src/game/legacy/cpp_aggregate_de.h",
+      "sha256": "6968a508ffc2243d28300fe28454388a9575158cabfbb8dd925737fbc3f8fda7"
+    },
+    {
+      "path": "src/game/legacy/cpp_engineobjects_de.h",
+      "sha256": "916529c32e971e0537329a871b2cefce16a49a7c0329126ddc219b4b6e6cbe7b"
+    },
+    {
+      "path": "src/game/legacy/cpp_server_de.h",
+      "sha256": "0ddc661ef1102d19211fbcbba3e4c786e753ffeab9cbcbed4d8477c5d763f4e3"
+    },
+    {
+      "path": "src/game/legacy/dlink.h",
+      "sha256": "ca96cfb8b7b2ad4585fd7f91c59e0abf65eca1fd014a163180038dc1fefcbbec"
+    },
+    {
+      "path": "src/game/legacy/engineobjects_de.h",
+      "sha256": "dfc89c48e2daa2b216bc046407dfaff8482877e743ea1d5e4d7238c74af5dfea"
+    },
+    {
+      "path": "src/game/legacy/server_de.h",
+      "sha256": "2db37851cd37a1e421cac0257209e5ce1840395f171152d0a41741cc02085367"
+    },
+    {
+      "path": "src/game/legacy/serverobj_de.h",
+      "sha256": "b1d46d3e7f27e4c50e4994e39ac44c38ec8a40a357233b68d3dfcf9f87ca4af4"
+    },
+    {
+      "path": "src/game/original/B2BaseClass.cpp",
+      "sha256": "82b231210d96e2a353def126f0127ca38cb909c8fd1fd1198ae307a5f89d288c"
+    },
+    {
+      "path": "src/game/original/B2BaseClass.h",
+      "sha256": "22c12e53b50deaafd2a6cd5375992a059c0e5fc38deb7887dea83bc39a13bb0b"
+    },
+    {
+      "path": "src/game/original/CameraSpot.cpp",
+      "sha256": "1f73494789bc5d1201e5ba4deb4d7e02d36038ee5d2e84a6efe6666b8640352d"
+    },
+    {
+      "path": "src/game/original/CameraSpot.h",
+      "sha256": "f97ef1418326267916e6ad1e893071276363f02d0c6c2b5302642a888a263ba3"
+    },
+    {
+      "path": "src/game/original/GameStartPoint.cpp",
+      "sha256": "3ae1a86b933227a6c5bf2d5b1451bf736560c37e417213167e5a815b0cedb38f"
+    },
+    {
+      "path": "src/game/original/GameStartPoint.h",
+      "sha256": "5692a4dbbef949ab12da88cb2e8c796b281d5432e164ef04fb041f749c546c83"
+    },
+    {
+      "path": "src/game/original/Key.cpp",
+      "sha256": "4abf583d720a8d9f520873e46f910e0012a0ad69c6c43d8a503ab80a51d7523b"
+    },
+    {
+      "path": "src/game/original/Key.h",
+      "sha256": "918bdfe6f43a01a80c69afb57e050327b10ee2d0effc393a7035cc75529807ca"
+    },
+    {
+      "path": "src/game/original/PathPoint.cpp",
+      "sha256": "9272d866fd6f7c00be4723505bef232d545523cf372a43a48bb6ba2635bf498c"
+    },
+    {
+      "path": "src/game/original/PathPoint.h",
+      "sha256": "a6c95438213ea131aed7252fc2ec5f26bfb47ebb2a377bf3c13579a3dddab3da"
+    },
+    {
+      "path": "src/game/original/SmellHint.cpp",
+      "sha256": "138cf67afe43d9a95d7d303efdfe46744cbfe19c8668cff58b984734c62745a9"
+    },
+    {
+      "path": "src/game/original/SmellHint.h",
+      "sha256": "68b624dd41e6a55a6e726dda91d0613373479953c4a885a25da909e04e37a28c"
+    },
+    {
+      "path": "src/game/original/WorldProperties.cpp",
+      "sha256": "632a9e3b8cc55fe9796c82b8d7049794bb18d37415dd0c2b48537007bc16c330"
+    },
+    {
+      "path": "src/game/original/WorldProperties.h",
+      "sha256": "1f5eecb90ba201b2312376b858f6c7002188d32c95fd7510b9a0347ce9732c5c"
+    },
+    {
+      "path": "src/game/original/engineobjects.cpp",
+      "sha256": "9bd7d4094163e9ed778e0ed4d304b55603ebac4d8729f37a7873ea6920c683bb"
+    },
+    {
+      "path": "src/game/original/session_load.cpp",
+      "sha256": "c267c393b3de81ed297edded91fd5c207a31825ce9013344ff74a97d3cd823ee"
+    },
+    {
+      "path": "src/game/original/trigger_helpers.cpp",
+      "sha256": "196700333c3e0af85f1f0be229ad106d8dc8e9ad480e05ae758fb9797475f192"
+    },
+    {
+      "path": "src/game/original/trigger_helpers.h",
+      "sha256": "8eedb4185b3476128d02a9eb797ee130f65490081babce7a2c1b2416b2dd6e09"
+    },
+    {
+      "path": "src/game/registration.cpp",
+      "sha256": "190a4b66eb1f8fd8fb8960264bded095d73e1662559ab8e66341bc51db315602"
+    },
+    {
+      "path": "src/game/server_adapter.cpp",
+      "sha256": "1def5b663c7a0504e3f5f91be49bd9314090b41dbe7e2151d28315f88bdb6376"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "505c35a8bb8b285bd80de6c6c4c01a171bd59b6c56b956e26dd95d5f2e93a5cc"
+    },
+    {
+      "path": "src/game/server_models.cpp",
+      "sha256": "1fd180a291218acc5e64ccb2e6e0480cbdf1caafa8f576624920c4a120df089a"
+    },
+    {
+      "path": "src/game/server_physics.cpp",
+      "sha256": "5382c51014fec9cb8c7279e015ecd32b0c453e284bcb3affd5c287a02f6370ee"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "e6f57753546f18ebf10fff7e527ef40b2894689b90a96a61994bdee886ec73a7"
+    },
+    {
+      "path": "src/game/session.h",
+      "sha256": "51a208c2f961aedbe6a08dd6446b17ccfa240eb3f4431586a47d537b0dc9bf2f"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "7f008ac87311c5b383e82846e6b68b82dd4c714afd69a4b35422cafdf1b781f8"
+    },
+    {
+      "path": "tests/cli_test.cmake",
+      "sha256": "5f6964f79fa31b2dd1086e4acd2401860dcf3b78dbec863e999780993b7f420b"
+    },
+    {
+      "path": "tests/config_tests.cpp",
+      "sha256": "66b612515543583abd62867072ef50f5d4ed304ecd0865a6f855466dd0c04edc"
+    },
+    {
+      "path": "tests/object_contract_tests.cpp",
+      "sha256": "e320dabf10cbfd9a2568f0a4e720d7c1a7c0154bfe59af1b4930885e12c9997b"
+    },
+    {
+      "path": "tests/services_tests.cpp",
+      "sha256": "7cb17e914b96c7dd8f6b502bf5db63bef7125f4aa391e39350f3683f85fce4ea"
+    },
+    {
+      "path": "tests/world_cli_test.cmake",
+      "sha256": "55fe79eca6d4f74a4a08aeb5b51ff5284908d89e6be70cd9978bb224099349c6"
+    },
+    {
+      "path": "tests/world_tests.cpp",
+      "sha256": "6417a8140ca50687481148d7ddbb7a0ab2ae6768ce0c17bb3c203e7f0ab321e9"
+    }
+  ]
+}

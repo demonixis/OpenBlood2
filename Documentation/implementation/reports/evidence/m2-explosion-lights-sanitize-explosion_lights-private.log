@@ -1,0 +1,36 @@
+528/528 Testing: explosion_lights.private
+528/528 Test: explosion_lights.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_light_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_lights.private" start time: Oct 16 20:52 CEST
+Output:
+----------------------------------------------------------
+SubwayA cycle 0: 18 lights, nine flashes expired, nine residuals alive; IDs through 18
+SubwayA cycle 1: 18 lights, nine flashes expired, nine residuals alive; IDs through 36
+SubwayA cycle 2: 18 lights, nine flashes expired, nine residuals alive; IDs through 54
+<end of output>
+Test time =  14.11 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_lights.private" end time: Oct 16 20:52 CEST
+"explosion_lights.private" time elapsed: 00:00:14
+----------------------------------------------------------
+
+End testing: Oct 16 20:52 CEST
+
+explosion_lights =  14.24 sec*proc
+
+explosion_models =  12.58 sec*proc
+
+explosion_sprites =  10.20 sec*proc
+
+headless =  84.76 sec*proc
+
+lights =  22.92 sec*proc
+
+objects =   0.35 sec*proc
+
+private =  83.27 sec*proc
+
+sceneexplosion =  24.47 sec*proc
+

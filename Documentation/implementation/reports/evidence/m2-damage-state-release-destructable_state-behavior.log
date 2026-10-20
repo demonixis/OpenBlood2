@@ -1,0 +1,14 @@
+514/518 Testing: destructable_state.behavior
+514/518 Test: destructable_state.behavior
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/destructable_state_tests" "behavior" "/home/yann/projects/lithtech/Blood2/build/release/tests/destructable-state-fixtures/behavior"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"destructable_state.behavior" start time: Oct 16 18:13 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_state.behavior" end time: Oct 16 18:13 CEST
+"destructable_state.behavior" time elapsed: 00:00:00
+----------------------------------------------------------

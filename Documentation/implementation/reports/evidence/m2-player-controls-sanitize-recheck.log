@@ -1,0 +1,12 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 76: movement.private
+1/1 Test #76: movement.private .................   Passed   58.81 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+headless    =  58.81 sec*proc (1 test)
+movement    =  58.81 sec*proc (1 test)
+private     =  58.81 sec*proc (1 test)
+
+Total Test time (real) =  58.82 sec

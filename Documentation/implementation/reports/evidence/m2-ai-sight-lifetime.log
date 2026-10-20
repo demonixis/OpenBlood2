@@ -1,0 +1,14 @@
+313/315 Testing: ai_sight.lifetime
+313/315 Test: ai_sight.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_sight_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_sight.lifetime" start time: Oct 16 06:49 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_sight.lifetime" end time: Oct 16 06:49 CEST
+"ai_sight.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

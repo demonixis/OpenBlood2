@@ -1,0 +1,14 @@
+277/618 Testing: ai_keys.random
+277/618 Test: ai_keys.random
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_model_key_tests" "random" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-key-fixtures/random"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_keys.random" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"ai_keys.random" end time: Oct 17 02:23 CEST
+"ai_keys.random" time elapsed: 00:00:00
+----------------------------------------------------------

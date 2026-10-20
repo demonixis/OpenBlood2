@@ -1,0 +1,40 @@
+485/485 Testing: inventory_state.private
+485/485 Test: inventory_state.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory_state_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"inventory_state.private" start time: Oct 16 17:45 CEST
+Output:
+----------------------------------------------------------
+cycle 0: detached inventory restored; raw bullets 123.5; keys 0; both retail hand models loaded
+cycle 1: detached inventory restored; raw bullets 124.5; keys 0; both retail hand models loaded
+cycle 2: detached inventory restored; raw bullets 125.5; keys 0; both retail hand models loaded
+<end of output>
+Test time =   5.21 sec
+----------------------------------------------------------
+Test Passed.
+"inventory_state.private" end time: Oct 16 17:45 CEST
+"inventory_state.private" time elapsed: 00:00:05
+----------------------------------------------------------
+
+End testing: Oct 16 17:45 CEST
+
+attachments =   5.69 sec*proc
+
+exits =  11.27 sec*proc
+
+headless =  83.97 sec*proc
+
+inventory_state =   5.34 sec*proc
+
+objects =   0.23 sec*proc
+
+player =  11.47 sec*proc
+
+private =  81.73 sec*proc
+
+services =  10.58 sec*proc
+
+triggers =  39.25 sec*proc
+
+weapons =   0.14 sec*proc
+

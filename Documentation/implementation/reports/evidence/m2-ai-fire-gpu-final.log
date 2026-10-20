@@ -1,0 +1,16 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 273: gpu.character
+1/2 Test #273: gpu.character ....................   Passed   19.47 sec
+    Start 384: ai_fire.subway
+2/2 Test #384: ai_fire.subway ...................   Passed    2.05 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+ai_fire      =   2.05 sec*proc (1 test)
+character    =  19.47 sec*proc (1 test)
+gpu          =  19.47 sec*proc (1 test)
+headless     =   2.05 sec*proc (1 test)
+private      =  21.52 sec*proc (2 tests)
+
+Total Test time (real) =  21.52 sec

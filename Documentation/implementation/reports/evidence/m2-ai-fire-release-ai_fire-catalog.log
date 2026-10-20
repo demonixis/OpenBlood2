@@ -1,0 +1,20 @@
+383/384 Testing: ai_fire.catalog
+383/384 Test: ai_fire.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_fire_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_fire.catalog" start time: Oct 16 11:37 CEST
+Output:
+----------------------------------------------------------
+m_cultist1 pistol clip=11 available=1 duration=500 fire_keys=0
+f_cultist1 pistol clip=11 available=1 duration=500 fire_keys=0
+m_civilian1 pistol clip=4294967295 available=0
+f_civilian1 pistol clip=4294967295 available=0
+labtech pistol clip=4294967295 available=0
+gideon pistol clip=4 available=1 duration=2333 fire_keys=1
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_fire.catalog" end time: Oct 16 11:37 CEST
+"ai_fire.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

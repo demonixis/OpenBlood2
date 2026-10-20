@@ -1,0 +1,15 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start  75: gpu.movement
+1/2 Test  #75: gpu.movement .....................   Passed   12.91 sec
+    Start 339: gpu.viewport
+2/2 Test #339: gpu.viewport .....................   Passed   12.43 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+gpu           =  25.34 sec*proc (2 tests)
+movement      =  12.91 sec*proc (1 test)
+private       =  25.34 sec*proc (2 tests)
+world_view    =  12.43 sec*proc (1 test)
+
+Total Test time (real) =  25.35 sec

@@ -1,0 +1,95 @@
+WAV size=54816 riff=54807 chunks: fmt @12=16 data@36=54771
+worlds/01_subwaya.dat sound=sounds\enemies\gideon\laf1_gid.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+SUBWAY cinexit1
+  0 sounds\enemies\gideon\laf1_gid.wav speaker=player message=door12:TRIGGER
+SUBWAY cinhi5
+  0 sounds\events\metalcrush5a.wav speaker=player message=:
+  0 sounds\events\traincrash1.wav speaker=player message=:
+SUBWAY cintrig1
+  0 sounds\chosen\caleb\e1m4_1_cal.wav speaker=player message=:
+SUBWAY cintrig2
+  0 sounds\enemies\gideon\1agid1.wav speaker=player message=:
+  0 sounds\chosen\caleb\1acaleb1.wav speaker=player message=:
+WAV size=48141 riff=48133 chunks: fmt @12=16 data@36=48097
+worlds/02_cityhub.dat sound=sounds\enemies\civilian\spot11.wav error=Truncated WAVE chunk/padding
+worlds/02_cityhubb.dat sound=sounds\chosen\caleb\msc12cal.wav error=Missing or oversized sound resource
+WAV size=18320 riff=18311 chunks: fmt @12=16 data@36=18275
+worlds/03_museum.dat sound=sounds\chosen\gabriella\3gab2.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=21794 riff=21785 chunks: fmt @12=16 data@36=21749
+worlds/03_museum.dat sound=sounds\chosen\caleb\3caleb1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=57796 riff=57787 chunks: fmt @12=16 data@36=57751
+worlds/03_museum.dat sound=sounds\chosen\gabriella\3gab3.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=55440 riff=55431 chunks: fmt @12=16 data@36=55395
+worlds/03_museum.dat sound=sounds\chosen\gabriella\3gab4.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=84298 riff=84289 chunks: fmt @12=16 data@36=84253
+worlds/03_museum.dat sound=sounds\enemies\gideon\tnt4_gid.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/03_museum.dat sound=sounds\chosen\caleb\laugh1_calb.wav error=Missing or oversized sound resource
+WAV size=342702 riff=342693 chunks: fmt @12=16 data@36=342657
+worlds/03_museum.dat sound=sounds\events\davoice1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=292782 riff=292773 chunks: fmt @12=16 data@36=292737
+worlds/03_museum.dat sound=sounds\events\davoice2.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=51070 riff=51061 chunks: fmt @12=16 data@36=51025
+worlds/05_cdm.dat sound=sounds\events\cwvoice11.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=39762 riff=39753 chunks: fmt @12=16 data@36=39717
+worlds/05_cdm.dat sound=sounds\events\cwvoice6.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=160736 riff=160727 chunks: fmt @12=16 data@36=160691
+worlds/05_cdm.dat sound=sounds\chosen\caleb\e2m5_2_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=107142 riff=107133 chunks: fmt @12=16 data@36=107097
+worlds/05_cdm.dat sound=sounds\chosen\caleb\e2m5_1_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=36900 riff=36891 chunks: fmt @12=16 data@36=36855
+worlds/09_abandoned_buildings.dat sound=Sounds\Enemies\Gideon\7gid1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=49648 riff=49639 chunks: fmt @12=16 data@36=49603
+worlds/09_abandoned_buildings.dat sound=Sounds\Chosen\Ishmael\7Ish1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=63250 riff=63241 chunks: fmt @12=16 data@36=63205
+worlds/09_abandoned_buildings.dat sound=Sounds\Chosen\Ishmael\7Ish3.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=157254 riff=157245 chunks: fmt @12=16 data@36=157209
+worlds/09_abandoned_buildings.dat sound=Sounds\Chosen\Ishmael\7Ish4.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=124730 riff=124721 chunks: fmt @12=16 data@36=124685
+worlds/09_abandoned_buildings.dat sound=Sounds\Chosen\Ishmael\7Ish5.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=38800 riff=38791 chunks: fmt @12=16 data@36=38755
+worlds/09_abandoned_buildings.dat sound=Sounds\Chosen\Caleb\7Caleb4.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=157254 riff=157245 chunks: fmt @12=16 data@36=157209
+worlds/09_abandoned_buildings.dat sound=Sounds\Chosen\Ishmael\7Ish4.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=49020 riff=49011 chunks: fmt @12=16 data@36=48975
+worlds/09_abandoned_buildings.dat sound=sounds\chosen\caleb\e1m3_2_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/09_abandoned_buildings.dat sound=sounds\chosen\caleb\kill\laugh1_cal.wav error=Missing or oversized sound resource
+WAV size=33758 riff=33749 chunks: fmt @12=16 data@36=33713
+worlds/12_train_station.dat sound=sounds\enemies\civilian\12civ5.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=28484 riff=28475 chunks: fmt @12=16 data@36=28439
+worlds/12_train_station.dat sound=sounds\enemies\civilian\12civ2.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=33758 riff=33749 chunks: fmt @12=16 data@36=33713
+worlds/12_train_station.dat sound=sounds\enemies\civilian\12civ5.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=33758 riff=33749 chunks: fmt @12=16 data@36=33713
+worlds/12_train_station.dat sound=sounds\enemies\civilian\12civ5.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=28484 riff=28475 chunks: fmt @12=16 data@36=28439
+worlds/12_train_station.dat sound=sounds\enemies\civilian\12civ2.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=77142 riff=77133 chunks: fmt @12=16 data@36=77097
+worlds/15_crypt.dat sound=sounds\chosen\ishmael\9ish1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=117768 riff=117759 chunks: fmt @12=16 data@36=117723
+worlds/17_entrance.dat sound=sounds\chosen\caleb\e3m2_3_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=46340 riff=46331 chunks: fmt @12=16 data@36=46295
+worlds/17_entrance.dat sound=sounds\chosen\caleb\e3m2_1_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=96710 riff=96701 chunks: fmt @12=16 data@36=96665
+worlds/18_temple.dat sound=sounds\chosen\caleb\11caleb1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=74306 riff=74297 chunks: fmt @12=16 data@36=74261
+worlds/18_temple.dat sound=sounds\chosen\ophelia\11Oph2.WAV error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=111208 riff=111199 chunks: fmt @12=16 data@36=111163
+worlds/18_temple.dat sound=sounds\chosen\caleb\e3m5_3_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=155562 riff=155553 chunks: fmt @12=16 data@36=155517
+worlds/19_lobby.dat sound=sounds\chosen\caleb\e3m3_1_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=678510 riff=678501 chunks: fmt @12=16 data@36=678465
+worlds/21_laboratory.dat sound=sounds\enemies\mad scientist\12madsci1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=66942 riff=66933 chunks: fmt @12=16 data@36=66897
+worlds/23_rooftop.dat sound=sounds\chosen\caleb\14Caleb1.WAV error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=56504 riff=56495 chunks: fmt @12=16 data@36=56459
+worlds/24_ancientcity.dat sound=Sounds\Chosen\Caleb\Taunt\tnt5_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=32572 riff=32563 chunks: fmt @12=16 data@36=32527
+worlds/24_ancientcity.dat sound=Sounds\Chosen\Caleb\Kill\laugh1_calA.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=123974 riff=123965 chunks: fmt @12=16 data@36=123929
+worlds/24_ancientcity.dat sound=Sounds\Enemies\Gideon\16Gid1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=56510 riff=56501 chunks: fmt @12=16 data@36=56465
+worlds/24b_arena.dat sound=Sounds\Chosen\Caleb\17Caleb2.WAV error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+WAV size=201086 riff=201077 chunks: fmt @12=16 data@36=201041
+worlds/25_ancientone.dat sound=Sounds\Chosen\Ishmael\20Ish1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds=57 controllers=79 cues=201 missing=3 invalid=40
+encoding=1 cues=158

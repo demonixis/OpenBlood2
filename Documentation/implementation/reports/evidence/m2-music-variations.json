@@ -1,0 +1,134 @@
+{
+  "date": "2026-10-18",
+  "status": "M2 incomplete; original MUSIC remains unsupported",
+  "implementation_parent": "500fe12b948eca0cab64da4962fecd8a2e328a19",
+  "runs": [
+    {
+      "configuration": "debug",
+      "tests": 87,
+      "passed": 87,
+      "wall_seconds": 15.12
+    },
+    {
+      "configuration": "release",
+      "tests": 87,
+      "passed": 87,
+      "wall_seconds": 1.43
+    },
+    {
+      "configuration": "sanitize",
+      "tests": 87,
+      "passed": 87,
+      "wall_seconds": 68.53
+    },
+    {
+      "configuration": "debug NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 10.78
+    },
+    {
+      "configuration": "release NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 5.36
+    }
+  ],
+  "original_variation_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "header_copy_rva": "0x8748..0x8880",
+    "mode_defaults_rva": "0x81cd",
+    "choice_rva": "0x16e7e..0x16fd9",
+    "intercepted": [
+      "0x1b673 rand: explicit 15-bit returns"
+    ],
+    "synthetic_headers": 3,
+    "synthetic_choices": 18,
+    "patterns": 131,
+    "private_choices": 786,
+    "canonical_sha256": "e3f4cfb0badbdffc888b019611c4356f24fc21a8caa080befa8bfc33cdcb0f2a",
+    "canonical_fnv64": 7572323464032181405,
+    "scope": "Raw pattern fields, original channel defaults and one variation decision only; no scheduling, pitch conversion or audio"
+  },
+  "gpu_environment": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+    "SDL_AUDIODRIVER": "dummy"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1"
+  },
+  "commands": [
+    "python3 m2-music-variations-validation.py <debug|release|sanitize>",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/<debug|release> -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit <result.xml>",
+    "<tool-venv>/bin/python m2-music-variations-probe.py <external-content-root>",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror <seven changed C++ files>"
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "initial_validation_note": "One synthetic signed-byte assertion chose a positive fixture byte. Corrected to the intended -105 byte; no implementation or private equivalence failure.",
+  "limitations": [
+    "No live scheduler/command flag generation or pattern/band selection",
+    "No final pitch conversion, humanization, curves or MUSIC playback",
+    "No native Metal/Windows/mobile execution; NVIDIA Vulkan only",
+    "Music status capture reviewed; nested per-channel rows not captured",
+    "Dummy audio submission, no retail listening comparison",
+    "Other required services and M2 acceptance remain open"
+  ],
+  "artifacts": {
+    "Documentation/Implementation/evidence/m2-music-variations-debug-build-final.log": "e6187da5a030cde72d99d4beedbd97a7f6651b0df8cbd33ccb733e2acbfe790b",
+    "Documentation/Implementation/evidence/m2-music-variations-debug-gpu.log": "882ac4cd283b410d998b612caa482d52de5aef8edc102d640da6c54c24699658",
+    "Documentation/Implementation/evidence/m2-music-variations-debug-gpu.xml": "6db564f44609f904648d02bd722bc3205f82cb3f397a2911896bf46a5be6b0c9",
+    "Documentation/Implementation/evidence/m2-music-variations-debug-tests.log": "32ccd096b620ab2ecc6cd7c6f691bf4e6104678e599609cf67bfc3628801b688",
+    "Documentation/Implementation/evidence/m2-music-variations-debug-tests.xml": "a8278bcb38fde9fca5a428b43803f6cc4b806f8f2b31a1eb22efc1a040b43474",
+    "Documentation/Implementation/evidence/m2-music-variations-integrity.json": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+    "Documentation/Implementation/evidence/m2-music-variations-links.log": "b6b944e18c6f3744d252d3ffe74f3eabc2e155da36037fe62e8b161264496e85",
+    "Documentation/Implementation/evidence/m2-music-variations-probe.json": "dae2d6c545e440bceb77a9ea7dac0d8b8ad87b3c59bf649988f7b61e2d4ac357",
+    "Documentation/Implementation/evidence/m2-music-variations-probe.py": "64b800efd4330cb4cf7d4952c94f77e70e765571474eee77444e97d551936d0d",
+    "Documentation/Implementation/evidence/m2-music-variations-release-build-final.log": "d0441353474692fbd9a1c30c590cb9d2d771f88b69287588f7fec382b698f268",
+    "Documentation/Implementation/evidence/m2-music-variations-release-gpu.log": "ee04905e02ebdfcc7346fbd364f7276df2b8cd494182a7866a6fe6611814eb9d",
+    "Documentation/Implementation/evidence/m2-music-variations-release-gpu.xml": "d11c949b6f9505c544c3f0eac601a6468a44629d7042a1591b5b15dd2e0b942f",
+    "Documentation/Implementation/evidence/m2-music-variations-release-tests.log": "418c72abf7ab858eb72c5e53ab7abd054e80f7711227eac7200f38e2b30d0ba7",
+    "Documentation/Implementation/evidence/m2-music-variations-release-tests.xml": "7f305dabf83eb14e9c06823df9a9e67b98642aa0a90103e30ef246a83d146605",
+    "Documentation/Implementation/evidence/m2-music-variations-sanitize-build-final.log": "de883faf266ade08201458e388b2b8b946488953ddcdc52f6e6266bdc2c923f8",
+    "Documentation/Implementation/evidence/m2-music-variations-sanitize-tests.log": "81c12bceba00450c977806eaf773740ca2d1c25f971c9a780683bccc5378d74d",
+    "Documentation/Implementation/evidence/m2-music-variations-sanitize-tests.xml": "452d765c270a5baa3d08f20e96a4b6dffb478666ff4042c06a49d5046f4196f8",
+    "Documentation/Implementation/evidence/m2-music-variations-validation.py": "ea6b66560afb6760bce9c96a663c2f459e133b37d010d3202172df60929cb43f"
+  }
+}

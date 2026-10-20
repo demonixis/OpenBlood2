@@ -1,0 +1,1137 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 57d3680..a60445b 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -135,3 +135,13 @@ and the implicit main light are separate. SubwayA now has 160 created source ent
+ 7 SelfTriggers, 372 editor-only and 48 unported (167/170 initial runtime instances,
+ 158/161 after consuming nine Keys). The earlier missing GlowingLight statement is
+ superseded for this subset; M2 remains open.
++
++The latest [train path evidence](../Documentation/Implementation/M2_WORLDPATHS.md) extends original KeyFramer
++with translating BoxPhysics world models. Read [path contracts](docs/WORLDPATH_CONTRACTS.md).
++Keep unchanged-rotation validation before mutation, primary-world checks without
++GOTHRUWORLD, atomic pusher/rider commit, deferred contacts and single player integration.
++SubwayA's diagnostic train run records 297 moves/two primary-world blocks per cycle;
++this is replacement physics, not verified retail parity. Angular paths, dynamic
++world bodies and containers remain unavailable. Class counts stay 160 created,
++372 editor-only and 48 unported. Earlier blanket world-path omissions are superseded
++only for this translation subset; M2 stays open.
+diff --git a/README.md b/README.md
+index 4ba97c6..b23876d 100644
+--- a/README.md
++++ b/README.md
+@@ -26,7 +26,7 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
+ ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
+ ```
+ 
+-The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **160 source entries** create, including original KeyFramer and twelve GlowingLight objects, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **48 unported runtime entries**, zero failed. Runtime counts before/after player entry are **167/170**, then **158/161** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_LIGHTS.md) records these counts; earlier increment sections below are historical snapshots.
++The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **160 source entries** create, including original KeyFramer and twelve GlowingLight objects, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **48 unported runtime entries**, zero failed. Runtime counts before/after player entry are **167/170**, then **158/161** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_WORLDPATHS.md) records these counts; earlier increment sections below are historical snapshots.
+ 
+ The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
+ 
+@@ -47,6 +47,7 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
+ | `--inspect-player` | Headless original shell/player entry inspection, with explicit gameplay blockers |
+ | `--player-smoke` | GPU Session panel, hidden player updates, unload/re-entry checks |
+ | `--weapons-smoke` | GPU Beretta/knife firing while hidden, unload/re-entry; capture at frame 181 |
++| `--worldpaths-smoke` | GPU original SubwayA train translation, collision and reload with UI hidden |
+ | `--lights-smoke` | GPU original dynamic-light state/KeyFramer placement while hidden, Lights inspection and reload |
+ | `--cameras-smoke` | GPU original camera tracking, client view/player gates while hidden, inspection and reload |
+ | `--objectives-smoke` | GPU original objective delivery and localized client text while hidden, inspection and reload |
+@@ -143,7 +144,7 @@ motion, CinematicTrigger, sound and full M2 acceptance remain pending.
+ 
+ ## Original dynamic lights
+ 
+-[Latest evidence](../Documentation/Implementation/M2_LIGHTS.md) and
++[Light evidence](../Documentation/Implementation/M2_LIGHTS.md) and
+ [contracts](docs/LIGHT_CONTRACTS.md) cover ClientLightFX, thirteen original presets
+ and client CLightFX waves. Lights exposes hidden/off sources, lifecycle/damage,
+ parameters/plots, evaluated color/radius/position, an XZ placement overlay and
+@@ -152,3 +153,15 @@ the original sublight KeyFramer. `./build/debug/blood2 --lights-smoke` checks th
+ while UI is hidden and after reload. The computed point-light state does not yet
+ illuminate the world; shadows/fog, general SFX/audio, DirLight spots and the implicit
+ main light remain pending. M2 stays incomplete.
++
++## Keyframed train translation
++
++[Latest evidence](../Documentation/Implementation/M2_WORLDPATHS.md) and
++[path contracts](docs/WORLDPATH_CONTRACTS.md) extend original KeyFramer to static
++BoxPhysics brushes with unchanged rotation. Primary-world obstruction and
++pusher/rider motion are atomic; original time/endpoint rules remain unchanged.
++Keyframes now exposes queued ON/OFF, brush bounds/blockers and a path/collision
++plan view. `./build/debug/blood2 --worldpaths-smoke` checks SubwayA's train while
++hidden and after reload. Two full paths record 297 moves and two primary-world
++blocks each; this is replacement physics, not verified retail train behavior.
++Angular paths, moving containers, other required classes/services and M2 remain open.
+diff --git a/docs/DOOR_CONTRACTS.md b/docs/DOOR_CONTRACTS.md
+index 7fa8420..68d90d9 100644
+--- a/docs/DOOR_CONTRACTS.md
++++ b/docs/DOOR_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Sliding doors and translating world models
+ 
++> The later [train path contracts](WORLDPATH_CONTRACTS.md) supersede blanket
++> world-path/without-GOTHRUWORLD omissions below for static BoxPhysics translation.
++> Angular paths and moving containers remain unavailable; M2 stays open.
++
+ > Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
+ > are connected with bounded atomic collision. Earlier omissions below describe
+ > their previous increments; the full M2 gate remains open.
+diff --git a/docs/KEYFRAMER_CONTRACTS.md b/docs/KEYFRAMER_CONTRACTS.md
+index a12a954..5f328f9 100644
+--- a/docs/KEYFRAMER_CONTRACTS.md
++++ b/docs/KEYFRAMER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original keyframed paths
+ 
++> The later [train path contracts](WORLDPATH_CONTRACTS.md) supersede blanket
++> world-path/without-GOTHRUWORLD omissions below for static BoxPhysics translation.
++> Angular paths and moving containers remain unavailable; M2 stays open.
++
+ M2 remains incomplete. Read [object](OBJECT_CONTRACTS.md), [camera](CAMERA_CONTRACTS.md),
+ [collision](MODEL_AND_COLLISION_CONTRACTS.md) and [interaction](INTERACTION_CONTRACTS.md)
+ contracts with the [source selections](M2_KEYFRAMER_SOURCES.json) and
+diff --git a/docs/M2_WORLDPATH_SOURCES.json b/docs/M2_WORLDPATH_SOURCES.json
+new file mode 100644
+index 0000000..fe6de96
+--- /dev/null
++++ b/docs/M2_WORLDPATH_SOURCES.json
+@@ -0,0 +1,54 @@
++{
++  "date": "2026-10-16",
++  "status": "M2 incomplete; original KeyFramer static world-model translation through replacement collision",
++  "baseline_commit": "97e8bfbee699ec7f71956c04b9b8ebd99035455e",
++  "new_imports": [],
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/KeyFramer.cpp",
++      "source_line_ranges": [
++        [
++          541,
++          704
++        ]
++      ],
++      "source_sha256": "31489c8f6891fdce061548ac4903b80c90c73d94049da14698ec34a559ecbf67",
++      "purpose": "Existing original Update source: time progression, endpoint return, interpolation and MoveObject/RotateObject caller; no source code is changed or newly imported in this increment."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/basetypes_de.h",
++      "source_line_ranges": [
++        [
++          330,
++          358
++        ]
++      ],
++      "source_sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
++      "purpose": "Original SOLID, BOXPHYSICS, GOTHRUWORLD and DONTFOLLOWSTANDING meanings; source flags are not changed to permit the train path."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/server_de.h",
++      "source_line_ranges": [
++        [
++          688,
++          700
++        ]
++      ],
++      "source_sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "purpose": "Legacy MoveObject/TeleportObject boundary; this project supplies a typed source service rather than reproducing ABI or claiming recovered retail physics."
++    }
++  ],
++  "unchanged_original_files": {
++    "src/game/original/KeyFramer.cpp": "c08cb408d3fb776915116884f41b40c535c01064a3731aa980d32dabf7685bc0",
++    "src/game/original/KeyFramer.h": "adf451494f8868b9771b4afec99258e37dd0961cf5d84fc74227bd16bdb465ce",
++    "src/game/original/KeyData.cpp": "0576e8d770981baf9f3b36932f93288df9ffeb2fdcad692e35c4f055145f22ab",
++    "src/game/original/DestructableBrush.cpp": "c41e541af3407937b793cc1b8e5ca5d2e26815f4a8a3e9e140880923957063ee"
++  },
++  "new_engine_work": [
++    "MoveKeyframedObject accepts checked static world models only when orientation stays unchanged; rejects angular/dynamic/container requests before pose mutation",
++    "MoveWorldModel requires BoxPhysics for movers without GOTHRUWORLD and atomically rejects primary-world bounds obstructions",
++    "Existing immutable geometry, pusher/rider planning, single player body and deferred callback lifetime are reused",
++    "Keyframes inspection adds queued ON/OFF, actual bounds/blockers and diagnostic plan view; no world renderer or new dependency"
++  ],
++  "observed_difference": "All-or-nothing collision leaves the train at its previous pose at two authored turnaround attempts; original engine clipping/crushing/blocking-priority behavior is not recovered. Timeline and final no-snap behavior remain original."
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index ea98c69..b33f6f2 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -353,3 +353,14 @@ bounded descriptors, local portable jitter and retained source quirks. Registry,
+ UI/placement plots and test harnesses are new project code. No world-lighting,
+ shadow/fog, audio or generic SFX-manager service is claimed. Earlier omissions of
+ GlowingLight are superseded only for this selected server/client subset.
++
++## M2 translating train paths
++
++[Source/engine ledger](M2_WORLDPATH_SOURCES.json) identifies the unchanged original
++KeyFramer sequencer and SDK motion/flag contracts. No new source class or prototype
++code is imported. [Path contracts](WORLDPATH_CONTRACTS.md) document new typed
++unchanged-orientation routing and primary-world swept bounds in the existing atomic
++pusher/rider service. The observed two train blocks and all-or-nothing rejection
++are replacement physics, not claimed retail behavior. Earlier blanket world-path
++omissions are superseded only for static translation; no dependency or reference
++repository changed.
+diff --git a/docs/WORLDPATH_CONTRACTS.md b/docs/WORLDPATH_CONTRACTS.md
+new file mode 100644
+index 0000000..da80591
+--- /dev/null
++++ b/docs/WORLDPATH_CONTRACTS.md
+@@ -0,0 +1,98 @@
++# Keyframed translating world models
++
++M2 remains open. This extends [keyframe](KEYFRAMER_CONTRACTS.md),
++[door](DOOR_CONTRACTS.md), [interaction](INTERACTION_CONTRACTS.md) and
++[movement](MOVEMENT_CONTRACTS.md) contracts. See [source/engine provenance](M2_WORLDPATH_SOURCES.json)
++and [validation evidence](../../Documentation/Implementation/M2_WORLDPATHS.md).
++
++## Original controller, bounded new service
++
++No original game rule changes in this increment. The existing selected KeyFramer
++still collects/owns Keys, computes original position and quaternion-component
++offsets, advances its timeline, dispatches messages, ignores early ON and returns
++before the final endpoint snap. Its source MoveObject/RotateObject pair reaches
++the checked MoveKeyframedObject service. The timeline keeps advancing when a move
++is blocked; it does not wait, reverse or invent an arrival event.
++
++The service now admits translating static world models with checked authored
++geometry. A requested rotation must equal the current normalized orientation
++(within squared quaternion distance 1e-12, allowing either quaternion sign).
++A null rotation retains the existing orientation. Angular requests fail with
++Unavailable **before** changing position. Dynamic/gravity bodies, containers,
++shared client-controlled bodies and incomplete geometry remain unavailable.
++Malformed poses/dead handles return Invalid; missing collision returns Unavailable.
++No arbitrary SetObjectRotation/TeleportObject bypass is added.
++
++The existing MoveWorldModel atomic pusher/rider solver is reused. Doors retain
++GOTHRUWORLD, which permits their wall pockets. Other movers require BoxPhysics;
++their actual bounds center (not necessarily their pivot) and half-extents sweep
++against primary-world triangles. An interior start or obstruction before the
++endpoint blocks the entire request. Polygon-vs-primary-world translation remains
++unavailable. No flag is added to a source object to make a path succeed.
++The immutable authored/posed shell is retained; only the checked translation
++changes, and all rays/support/overlaps apply that same offset. No per-frame
++geometry rebuild or new dependency is needed for this translation subset.
++
++Solid bodies crossed by the mover and fresh standing riders retain existing
++relative-sweep, DONTFOLLOWSTANDING and jump-detachment rules. The plan validates
++all proposed body paths before committing mover/passenger positions. Other world
++models are immovable conservative blockers; at most 64 bodies are affected.
++Primary-world block diagnostics use a null blocker handle, distinct from zero
++block attempts. Touch/sensor callbacks run only after an accepted commit. They
++may request removal; destruction stays deferred, reentrant motion rejects and
++the keyframe caller reports Invalid if its target becomes pending during contacts.
++The original local player still has one MoveMgr integration and observes transported
++body/camera positions in the same frame.
++
++This is **replacement collision code**, not recovered retail world-model physics.
++It rejects a whole blocked step rather than clipping the mover or applying crushing,
++force/blocking-priority arbitration or chain pushes. That difference stays explicit.
++Combined angular paths, moving containers, polygon world collision and model
++attachments are not implemented by this increment.
++
++## SubwayA observation
++
++The original `htrain1` controls one `happytrain` CDestructableBrush with BoxPhysics,
++no GOTHRUWORLD and no dynamic-body state. Its three keys are at times 0/3/5 seconds,
++positions (-32,168,4912), (-32,168,2864), (-32,168,3376), all identity rotations.
++The inspector/test sends normal ON after original first-update key collection;
++this is a direct diagnostic activation, not proof of a complete reachable level script.
++
++At 60 Hz, two complete load/enter/run/unload cycles each produce **297 accepted
++moves and two blocked attempts**, followed by source completion with no final snap.
++Both blocks meet primary polygon **1209**, normal (0,0,1), at path times approximately
++3.0 and 3.01666 seconds; independent collision queries confirm the obstruction.
++The train resumes on the return leg and ends at approximately (-32,168,3371.74).
++This records the current engine result, not expected retail train parity. The initial
++new test assumed every authored move would succeed; investigation replaced that
++assumption with assertions for the actual independently checked obstruction,
++unchanged rejected poses, resumed motion and original endpoint behavior. Existing
++parser bounds, service failures, test timeouts and M2 startup gating are unchanged.
++
++Class counts are unchanged: 160 created source entries, seven SelfTriggers,
++372 editor-only, 48 unported, zero failed; 167/170 runtime instances before/after
++player, then 158/161 after consuming nine Keys. Unported AI and other classes
++could introduce additional blockers later, so this is not campaign completion.
++
++## Inspection and verification
++
++Keyframes includes hidden/inactive/pending controllers, queued original ON/OFF,
++target result/counters, actual brush pivot/bounds, pushes/riders/last blocker and
++a plan view of copied keys and current collision bounds. The overlay is diagnostic;
++world rendering remains absent. `--worldpaths-smoke` verifies actual authored train
++positions and collision rays with the UI hidden and after reload. The ordinary
++camera `--keyframes-smoke` remains separate and retains its original assertions.
++
++Eight synthetic tests cover translation/immutable shell/rays, primary-world atomic
++blocking/descending rider, riding vs DONTFOLLOWSTANDING/jumping, side pushes and
++blocked rollback, crossed sensors/reentrant removal, invalid/unsupported poses,
++shared player transport and original timeline/endpoint/link lifetime. The private
++SubwayA case checks each attempted pose and two full reloads. Existing keyframe
++catalog assertions now require the train's first move to succeed instead of requiring
++Unavailable. Debug, inspector-free Release and sequential Clang ASan/UBSan/leak
++results are recorded in the evidence. Sanitizers remain sequential because the
++prior weapons.private case has a narrow unchanged 90-second time budget.
++
++Required remaining objects/services, CinematicTrigger, Gideon/AI, angular paths,
++client FX/audio, transitions and attachments still prevent M2 completion. No retail
++executable, additional platform or XR verification is claimed.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 9e05564..aa3a510 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -78,6 +78,22 @@ namespace OpenBlood2
+ 
+     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
+     {
++        if (keyframe_request)
++        {
++            if (const auto* r = game.objects.get(keyframe_request);
++                r && r->life == Life::Alive && r->type->name == "KeyFramer")
++            {
++                auto text = game.server.CreateString(keyframe_command.c_str());
++                auto message = game.server.StartMessageToObject(nullptr, r->handle, 1000);
++                if (message)
++                {
++                    game.server.WriteToMessageHString(message, text);
++                    game.server.EndMessage(message);
++                }
++                game.server.FreeString(text);
++            }
++            keyframe_request = {};
++        }
+         if (light_request)
+         {
+             if (const auto* r = game.objects.get(light_request);
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 613dadd..d1ed249 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -26,7 +26,8 @@ namespace OpenBlood2
+         std::string light_command;
+         void draw_lights(GameSession&, ObjectSelection&);
+         bool select_keyframes = false;
+-        ObjectId keyframe_selection{};
++        ObjectId keyframe_selection{}, keyframe_request{};
++        std::string keyframe_command;
+         void draw_keyframes(GameSession&, ObjectSelection&);
+         bool select_cameras = false;
+         ObjectId camera_selection{}, camera_request{};
+diff --git a/src/app/inspector_keyframes.cpp b/src/app/inspector_keyframes.cpp
+index 1c07e87..cc4f268 100644
+--- a/src/app/inspector_keyframes.cpp
++++ b/src/app/inspector_keyframes.cpp
+@@ -1,13 +1,15 @@
+ #include "app/inspector.h"
++#include "engine/world_model.h"
+ #include "game/original/KeyFramer.h"
++#include <algorithm>
+ #include <imgui.h>
+ namespace OpenBlood2
+ {
+     void Inspector::draw_keyframes(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextWrapped(
+-            "Original KeyFramer timelines. Keys are copied, then their source objects are removed. "
+-            "Camera/ordinary-object paths run; world-model/container motion and key audio remain unavailable.");
++        ImGui::TextWrapped("Original KeyFramer timelines. Keys are copied, then their source objects are removed. "
++                           "Camera, ordinary-object and translating BoxPhysics brush paths run. Angular brush paths, "
++                           "moving containers and key audio remain unavailable.");
+         if (!ImGui::BeginTable("Keyframe inspection", 2, ImGuiTableFlags_Resizable))
+             return;
+         ImGui::TableSetupColumn("Controllers", ImGuiTableColumnFlags_WidthFixed, 270);
+@@ -22,6 +24,8 @@ namespace OpenBlood2
+             if (!game.objects.get(keyframe_selection))
+                 keyframe_selection = id;
+             std::string label = std::string(r->state.m_Name) + (f->active ? " [on]" : " [off]");
++            if (r->life != Life::Alive)
++                label += " [pending removal]";
+             if (!(r->state.m_Flags & FLAG_VISIBLE))
+                 label += " [hidden]";
+             if (r->activity != OBJSTATE_ACTIVE)
+@@ -43,6 +47,16 @@ namespace OpenBlood2
+                 ImGui::Text("Schedule %d / alive %d", r->scheduled, r->life == Life::Alive);
+                 if (!f->error.empty())
+                     ImGui::TextWrapped("Diagnostic: %s", f->error.c_str());
++                for (const char* cmd : {"ON", "OFF"})
++                {
++                    if (ImGui::Button(cmd))
++                    {
++                        keyframe_request = keyframe_selection;
++                        keyframe_command = cmd;
++                    }
++                    ImGui::SameLine();
++                }
++                ImGui::NewLine();
+                 ImGui::Text("Targets %zu / copied keys %zu", f->targets.size(), f->keys.size());
+                 for (const auto& t : f->targets)
+                 {
+@@ -56,8 +70,62 @@ namespace OpenBlood2
+                                        target ? target->type->name.c_str() : "none", result,
+                                        (unsigned long long)t.moves);
+                     if (target)
++                    {
+                         ImGui::Text("Position %.2f %.2f %.2f / offset %.2f %.2f %.2f", target->state.m_Pos.x,
+                                     target->state.m_Pos.y, target->state.m_Pos.z, t.offset.x, t.offset.y, t.offset.z);
++                        if (target->world_model)
++                        {
++                            const auto center = object_bounds_center(*target);
++                            ImGui::Text("Brush center %.2f %.2f %.2f / half %.1f %.1f %.1f", center.x, center.y,
++                                        center.z, target->dimensions.x, target->dimensions.y, target->dimensions.z);
++                            const auto* blocker = game.objects.get(target->mover_blocker);
++                            ImGui::Text(
++                                "Moves %llu / pushes %llu / riders %llu / blocks %llu",
++                                (unsigned long long)target->mover_moves, (unsigned long long)target->mover_pushes,
++                                (unsigned long long)target->mover_riders, (unsigned long long)target->mover_blocks);
++                            if (target->mover_blocks)
++                                ImGui::Text("Last blocker: %s", blocker                 ? blocker->state.m_Name
++                                                                : target->mover_blocker ? "removed object"
++                                                                                        : "primary world");
++                            ImGui::TextUnformatted("Plan view (Z right, X down): path / collision bounds");
++                            const auto origin = ImGui::GetCursorScreenPos();
++                            const ImVec2 size(std::max(100.0f, ImGui::GetContentRegionAvail().x), 80);
++                            auto low = vector_subtract(center, target->dimensions),
++                                 high = vector_add(center, target->dimensions);
++                            for (const auto& k : f->keys)
++                            {
++                                const auto p = vector_add(k.position, t.offset);
++                                low.x = std::min(low.x, p.x);
++                                low.z = std::min(low.z, p.z);
++                                high.x = std::max(high.x, p.x);
++                                high.z = std::max(high.z, p.z);
++                            }
++                            const float scale = std::min((size.x - 20) / std::max(1.0f, high.z - low.z),
++                                                         (size.y - 20) / std::max(1.0f, high.x - low.x));
++                            auto point = [&](DVector p)
++                            {
++                                return ImVec2(origin.x + 10 + (p.z - low.z) * scale,
++                                              origin.y + 10 + (p.x - low.x) * scale);
++                            };
++                            auto* draw = ImGui::GetWindowDrawList();
++                            draw->PushClipRect(origin, ImVec2(origin.x + size.x, origin.y + size.y), true);
++                            draw->AddRectFilled(origin, ImVec2(origin.x + size.x, origin.y + size.y),
++                                                IM_COL32(20, 24, 30, 255));
++                            for (std::size_t i = 0; i < f->keys.size(); ++i)
++                            {
++                                auto p = point(vector_add(f->keys[i].position, t.offset));
++                                draw->AddCircleFilled(p, 3, IM_COL32(100, 180, 250, 255));
++                                if (i)
++                                    draw->AddLine(point(vector_add(f->keys[i - 1].position, t.offset)), p,
++                                                  IM_COL32(100, 180, 250, 255));
++                            }
++                            draw->AddRect(point(vector_subtract(center, target->dimensions)),
++                                          point(vector_add(center, target->dimensions)), IM_COL32(240, 180, 40, 255));
++                            draw->AddCircleFilled(point(target->state.m_Pos), 4, IM_COL32(240, 180, 40, 255));
++                            draw->PopClipRect();
++                            ImGui::Dummy(size);
++                        }
++                    }
+                 }
+                 ImGui::Text("Message keys %llu / last matches %zu / unresolved %llu",
+                             (unsigned long long)f->message_keys, f->last_message_matches,
+@@ -66,26 +134,28 @@ namespace OpenBlood2
+                                    f->last_sound.c_str());
+                 ImGui::TextWrapped("Print requests %llu: %s", (unsigned long long)f->print_requests,
+                                    f->last_print.c_str());
+-                ImGui::SeparatorText("Owned original key values");
+-                ImGui::BeginChild("Copied keys", ImVec2(0, 200));
+-                for (const auto& key : f->keys)
++                if (ImGui::CollapsingHeader("Owned original key values"))
+                 {
+-                    ImGui::PushID(&key);
+-                    if (ImGui::TreeNode(key.name.c_str()))
++                    ImGui::BeginChild("Copied keys", ImVec2(0, 200));
++                    for (const auto& key : f->keys)
+                     {
+-                        ImGui::Text("Relative %.4f / cumulative %.4f", key.timestamp, key.time);
+-                        ImGui::Text("Position %.2f %.2f %.2f", key.position.x, key.position.y, key.position.z);
+-                        ImGui::Text("Quaternion %.3f %.3f %.3f %.3f", key.rotation.m_Vec.x, key.rotation.m_Vec.y,
+-                                    key.rotation.m_Vec.z, key.rotation.m_Spin);
+-                        ImGui::TextWrapped("Message %s: %s", key.message_target.c_str(), key.message.c_str());
+-                        ImGui::TextWrapped("Sound %s / radius %.1f / loop %d", key.sound.c_str(), key.sound_radius,
+-                                           key.loop_sound);
+-                        ImGui::TextWrapped("Print: %s", key.print.c_str());
+-                        ImGui::TreePop();
++                        ImGui::PushID(&key);
++                        if (ImGui::TreeNode(key.name.c_str()))
++                        {
++                            ImGui::Text("Relative %.4f / cumulative %.4f", key.timestamp, key.time);
++                            ImGui::Text("Position %.2f %.2f %.2f", key.position.x, key.position.y, key.position.z);
++                            ImGui::Text("Quaternion %.3f %.3f %.3f %.3f", key.rotation.m_Vec.x, key.rotation.m_Vec.y,
++                                        key.rotation.m_Vec.z, key.rotation.m_Spin);
++                            ImGui::TextWrapped("Message %s: %s", key.message_target.c_str(), key.message.c_str());
++                            ImGui::TextWrapped("Sound %s / radius %.1f / loop %d", key.sound.c_str(), key.sound_radius,
++                                               key.loop_sound);
++                            ImGui::TextWrapped("Print: %s", key.print.c_str());
++                            ImGui::TreePop();
++                        }
++                        ImGui::PopID();
+                     }
+-                    ImGui::PopID();
++                    ImGui::EndChild();
+                 }
+-                ImGui::EndChild();
+             }
+         ImGui::EndTable();
+     }
+diff --git a/src/app/keyframe_smoke.cpp b/src/app/keyframe_smoke.cpp
+index cea698c..6f2b041 100644
+--- a/src/app/keyframe_smoke.cpp
++++ b/src/app/keyframe_smoke.cpp
+@@ -1,34 +1,62 @@
+ #include "keyframe_smoke.h"
++#include "engine/world_model.h"
+ #include "game/original/KeyFramer.h"
+ namespace OpenBlood2
+ {
+-    bool prepare_keyframe_smoke(GameSession& game, ObjectId& selected)
++    bool prepare_keyframe_smoke(GameSession& game, ObjectId& selected, bool world_path)
+     {
+         for (auto id : game.objects.snapshot())
+             if (const auto* r = game.objects.get(id);
+-                r && std::string_view(r->state.m_Name) == "tracking1" && dynamic_cast<const KeyFramer*>(r->game.get()))
++                r && std::string_view(r->state.m_Name) == (world_path ? "htrain1" : "tracking1") &&
++                dynamic_cast<const KeyFramer*>(r->game.get()))
+             {
+                 selected = id;
++                if (world_path)
++                {
++                    // Source ON is ignored before BuildKeyList; initialize normally.
++                    if (!game.step(1.0 / 60))
++                        return false;
++                    const auto* live = game.objects.get(selected);
++                    if (!live || live->life != Life::Alive)
++                        return false;
++                    auto text = game.server.CreateString("ON");
++                    auto message = game.server.StartMessageToObject(nullptr, live->handle, 1000);
++                    const bool ok = text && message && game.server.WriteToMessageHString(message, text) == DE_OK &&
++                                    game.server.EndMessage(message) == DE_OK;
++                    game.server.FreeString(text);
++                    return ok;
++                }
+                 return true;
+             }
+         return false;
+     }
+-    bool check_keyframe_smoke(GameSession& game, ObjectId selected)
++    bool check_keyframe_smoke(GameSession& game, ObjectId selected, bool world_path)
+     {
+         const auto* r = game.objects.get(selected);
+         const auto* f = r ? dynamic_cast<const KeyFramer*>(r->game.get()) : nullptr;
+-        if (!f || !f->initialized || f->keys.size() != 2 || f->targets.size() != 1 || !f->active ||
+-            !f->targets[0].moves || f->targets[0].result != MoverResult::Moved || f->unresolved_messages != 1)
++        if (!f || !f->initialized || f->keys.size() != (world_path ? 3 : 2) || f->targets.size() != 1 || !f->active ||
++            !f->targets[0].moves || f->targets[0].result != MoverResult::Moved ||
++            f->unresolved_messages != (world_path ? 0 : 1))
+             return false;
+         const auto* target = game.objects.get(f->targets[0].object);
+-        if (!target || game.client_shell.view.object != target->handle)
++        if (!target || (!world_path && game.client_shell.view.object != target->handle))
+             return false;
+         const auto& a = f->keys[0];
+         const auto& b = f->keys[1];
+         const auto expected = vector_add(f->targets[0].offset,
+                                          vector_add(a.position, vector_scale(vector_subtract(b.position, a.position),
+                                                                              (f->time - a.time) / (b.time - a.time))));
+-        auto delta = vector_subtract(expected, game.client_shell.view.position);
++        auto delta = vector_subtract(expected, world_path ? target->state.m_Pos : game.client_shell.view.position);
++        if (world_path)
++        {
++            if (!target->world_model || !target->world_model_base || target->mover_blocks || !target->mover_moves)
++                return false;
++            CollisionHit hit;
++            const auto center = object_bounds_center(*target);
++            if (sweep_object(*target, vector_add(center, {0, 300, 0}), vector_add(center, {0, -300, 0}), {}, hit) !=
++                CollisionQuery::Hit)
++                return false;
++        }
+         return vector_dot(delta, delta) < .0001f;
+     }
+ } // namespace OpenBlood2
+diff --git a/src/app/keyframe_smoke.h b/src/app/keyframe_smoke.h
+index b7b570f..1d00813 100644
+--- a/src/app/keyframe_smoke.h
++++ b/src/app/keyframe_smoke.h
+@@ -2,6 +2,6 @@
+ #include "game/server_adapter.h"
+ namespace OpenBlood2
+ {
+-    bool prepare_keyframe_smoke(GameSession&, ObjectId&);
+-    bool check_keyframe_smoke(GameSession&, ObjectId);
++    bool prepare_keyframe_smoke(GameSession&, ObjectId&, bool world_path = false);
++    bool check_keyframe_smoke(GameSession&, ObjectId, bool world_path = false);
+ } // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 9f9b8e9..57ff563 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -187,7 +187,7 @@ namespace
+         bool keyframe_hidden = false;
+         if (options.keyframes_smoke)
+         {
+-            if (!OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe))
++            if (!OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe, options.worldpaths_smoke))
+                 return 4;
+             selection.id = smoke_keyframe;
+         }
+@@ -336,7 +336,7 @@ namespace
+                 !OpenBlood2::prepare_light_smoke(game, smoke_light))
+                 return 4;
+             if (options.keyframes_smoke && frames == reload_frame + 1 &&
+-                !OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe))
++                !OpenBlood2::prepare_keyframe_smoke(game, smoke_keyframe, options.worldpaths_smoke))
+                 return 4;
+             if (options.cameras_smoke && frames == reload_frame + 1 &&
+                 !OpenBlood2::prepare_camera_smoke(game, smoke_camera))
+@@ -614,7 +614,7 @@ namespace
+                 if (options.lights_smoke && frames == show_frame - 1)
+                     light_hidden = OpenBlood2::check_light_smoke(game, smoke_light);
+                 if (options.keyframes_smoke && frames == show_frame - 1)
+-                    keyframe_hidden = OpenBlood2::check_keyframe_smoke(game, smoke_keyframe);
++                    keyframe_hidden = OpenBlood2::check_keyframe_smoke(game, smoke_keyframe, options.worldpaths_smoke);
+                 if (options.cameras_smoke && frames == show_frame - 1)
+                     camera_hidden = OpenBlood2::check_camera_smoke(game, smoke_camera);
+                 if (options.objectives_smoke && frames == show_frame - 1)
+@@ -744,7 +744,8 @@ namespace
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+                 (options.lights_smoke && (!light_hidden || !OpenBlood2::check_light_smoke(game, smoke_light))) ||
+                 (options.keyframes_smoke &&
+-                 (!keyframe_hidden || !OpenBlood2::check_keyframe_smoke(game, smoke_keyframe))) ||
++                 (!keyframe_hidden ||
++                  !OpenBlood2::check_keyframe_smoke(game, smoke_keyframe, options.worldpaths_smoke))) ||
+                 (options.cameras_smoke && (!camera_hidden || !OpenBlood2::check_camera_smoke(game, smoke_camera))) ||
+                 (options.objectives_smoke && !objective_hidden) || (options.pickups_smoke && !pickup_hidden) ||
+                 (options.interaction_smoke && !interaction_hidden) || (options.brushes_smoke && !brush_hidden) ||
+@@ -771,7 +772,11 @@ namespace
+             if (options.lights_smoke)
+                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
+                              "and after reload; evaluated radius/color checked; world illumination unavailable");
+-            if (options.keyframes_smoke)
++            if (options.worldpaths_smoke)
++                spdlog::info(
++                    "WORLDPATHS smoke: original SubwayA train follows keys, posed collision checked while UI hidden "
++                    "and after reload; angular paths and world rendering remain unavailable");
++            else if (options.keyframes_smoke)
+                 spdlog::info("KEYFRAMES smoke: authored camera path and owned key lifetime checked while UI hidden and "
+                              "after reload; missing Gideon message exposed");
+             if (options.cameras_smoke)
+@@ -854,6 +859,7 @@ int main(int argc, char** argv)
+                      "  --pickups-smoke   GPU original ammo pickup, hidden collection and reload\n"
+                      "  --objectives-smoke GPU original objectives and localized text, hidden delivery/reload\n"
+                      "  --lights-smoke      GPU original light state, keyframe placement and reload\n"
++                     "  --worldpaths-smoke  GPU original translating train path, collision and reload\n"
+                      "  --keyframes-smoke   GPU original camera key path, key lifetime and reload\n"
+                      "  --cameras-smoke     GPU original camera tracking, player gates and reload\n"
+                      "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index c257894..eb6e0f6 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -129,6 +129,10 @@ namespace OpenBlood2
+             {
+                 options.world_smoke = options.player_smoke = options.lights_smoke = true;
+             }
++            else if (arg == "--worldpaths-smoke")
++            {
++                options.world_smoke = options.player_smoke = options.keyframes_smoke = options.worldpaths_smoke = true;
++            }
+             else if (arg == "--keyframes-smoke")
+             {
+                 options.world_smoke = options.player_smoke = options.keyframes_smoke = true;
+diff --git a/src/engine/config.h b/src/engine/config.h
+index ea1fe8b..1ffc51f 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -23,7 +23,7 @@ namespace OpenBlood2
+         bool weapons_smoke = false;
+         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
+              interaction_smoke = false, brushes_smoke = false, pickups_smoke = false, objectives_smoke = false,
+-             cameras_smoke = false, keyframes_smoke = false, lights_smoke = false;
++             cameras_smoke = false, keyframes_smoke = false, worldpaths_smoke = false, lights_smoke = false;
+         bool start_game = false;
+         bool explicit_config = false;
+         bool help = false;
+diff --git a/src/game/server_keyframes.cpp b/src/game/server_keyframes.cpp
+index 4e13026..eadb6d7 100644
+--- a/src/game/server_keyframes.cpp
++++ b/src/game/server_keyframes.cpp
+@@ -49,10 +49,28 @@ namespace OpenBlood2
+         DRotation q = rotation ? *rotation : DRotation{};
+         if (!record || record->life != Life::Alive || !physics_vector(position) || (rotation && !normalize(q)))
+             return MoverResult::Invalid;
+-        // Combined world-model rotation/translation and moving containers need an
+-        // atomic geometry transaction; never move first and fail rotation afterwards.
+-        if (record->container || record->world_model || record->client_movement ||
+-            (record->state.m_ObjectType != OT_NORMAL && record->state.m_ObjectType != OT_MODEL))
++        if (record->container || record->client_movement)
++            return MoverResult::Unavailable;
++        if (record->world_model)
++        {
++            // A translation can reuse the atomic pusher/rider transaction. Never
++            // translate then discover an unsupported angular request afterwards.
++            auto current = record->state.m_Rotation;
++            if (!record->world_model_base || record->world_body || !normalize(current))
++                return MoverResult::Unavailable;
++            const auto difference =
++                rotation ? std::min(vector_dot(vector_subtract(current.m_Vec, q.m_Vec),
++                                               vector_subtract(current.m_Vec, q.m_Vec)) +
++                                        (current.m_Spin - q.m_Spin) * (current.m_Spin - q.m_Spin),
++                                    vector_dot(vector_add(current.m_Vec, q.m_Vec), vector_add(current.m_Vec, q.m_Vec)) +
++                                        (current.m_Spin + q.m_Spin) * (current.m_Spin + q.m_Spin))
++                         : 0;
++            if (difference > 1e-12f)
++                return MoverResult::Unavailable;
++            const auto result = MoveWorldModel(h, position);
++            return IsObjectAlive(h) ? result : MoverResult::Invalid;
++        }
++        if (record->state.m_ObjectType != OT_NORMAL && record->state.m_ObjectType != OT_MODEL)
+             return MoverResult::Unavailable;
+         if (!collision_ready || !collision)
+             return MoverResult::Unavailable;
+diff --git a/src/game/server_movers.cpp b/src/game/server_movers.cpp
+index f0a7f7e..f5e85a0 100644
+--- a/src/game/server_movers.cpp
++++ b/src/game/server_movers.cpp
+@@ -33,10 +33,21 @@ namespace OpenBlood2
+             mover->mover_blocker = blocker;
+             return MoverResult::Blocked;
+         };
+-        // Door uses GOTHRUWORLD to enter its wall pocket. Other callers must
+-        // explicitly opt in; no guessed world-model/world depenetration.
++        // Doors retain their source world bypass for wall pockets. Authored
++        // BoxPhysics path movers instead sweep their actual bounds against the
++        // primary world. Polygon-vs-world translation remains unavailable.
+         if (!(mover->state.m_Flags & FLAG_GOTHRUWORLD))
+-            return MoverResult::Unavailable;
++        {
++            if (!(mover->state.m_Flags & FLAG_BOXPHYSICS))
++                return MoverResult::Unavailable;
++            CollisionHit hit;
++            const auto center = object_bounds_center(*mover);
++            const auto query = collision->sweep(center, vector_add(center, delta), mover->dimensions, hit);
++            if (query == CollisionQuery::Invalid)
++                return MoverResult::Invalid;
++            if (query == CollisionQuery::Hit && (hit.start_solid || hit.fraction < 1 - 1e-6))
++                return blocked(nullptr); // Primary world has no object handle.
++        }
+         if (mover->state.m_Flags & FLAG_SOLID)
+         {
+             for (auto id : ids)
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 015d079..2e7239c 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -351,3 +351,21 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --lights-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/lights.png")
+     set_tests_properties(gpu.lights PROPERTIES LABELS "private;gpu;lights" TIMEOUT 30 RUN_SERIAL TRUE)
+ endif()
++
++add_executable(worldpath_tests worldpath_tests.cpp)
++target_link_libraries(worldpath_tests PRIVATE blood2_game)
++blood2_project_options(worldpath_tests)
++foreach(case translation world_block riders push_block lifetime validation player timeline)
++    add_test(NAME worldpaths.${case} COMMAND worldpath_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/worldpath-fixtures/${case}")
++    set_tests_properties(worldpaths.${case} PROPERTIES LABELS "headless;worldpaths" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME worldpaths.subway COMMAND worldpath_tests subway "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(worldpaths.subway PROPERTIES LABELS "headless;private;worldpaths" TIMEOUT 90)
++endif()
++
++if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
++    add_test(NAME gpu.worldpaths COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --worldpaths-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/worldpaths.png")
++    set_tests_properties(gpu.worldpaths PROPERTIES LABELS "private;gpu;worldpaths" TIMEOUT 30 RUN_SERIAL TRUE)
++endif()
+diff --git a/tests/keyframer_tests.cpp b/tests/keyframer_tests.cpp
+index 54b710f..92c84ea 100644
+--- a/tests/keyframer_tests.cpp
++++ b/tests/keyframer_tests.cpp
+@@ -396,8 +396,8 @@ namespace
+             CHECK(tf && tf->targets.size() == 1);
+             auto original = g.objects.get(tf->targets[0].object)->state.m_Pos;
+             CHECK(command(g, train, "ON") && g.step(.1) && tf->targets[0].attempts &&
+-                  tf->targets[0].result == MoverResult::Unavailable);
+-            CHECK(close(original, g.objects.get(tf->targets[0].object)->state.m_Pos));
++                  tf->targets[0].result == MoverResult::Moved);
++            CHECK(!close(original, g.objects.get(tf->targets[0].object)->state.m_Pos));
+             CHECK(g.unload_world() && !g.server.string_count() && !g.server.list_count() && !g.server.message_count());
+         }
+         return true;
+diff --git a/tests/worldpath_tests.cpp b/tests/worldpath_tests.cpp
+new file mode 100644
+index 0000000..3f87cf6
+--- /dev/null
++++ b/tests/worldpath_tests.cpp
+@@ -0,0 +1,374 @@
++#include "brush_fixture.h"
++#include "engine/world_model.h"
++#include "game/original/KeyFramer.h"
++#include "player_fixture.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool close(DVector a, DVector b)
++    {
++        auto delta = vector_subtract(a, b);
++        return vector_dot(delta, delta) < .0001f;
++    }
++    HOBJECT brush(GameSession& g, DVector low = {-10, 40, -10}, DVector high = {10, 50, 10}, Properties props = {})
++    {
++        const auto name = "pathbrush" + std::to_string(g.world.models.size());
++        auto model = test_brush::box(name, low, high);
++        model.translation = {0, 40, 0}; // Bounds center deliberately differs from the pivot.
++        g.world.models.push_back(model);
++        props["Name"] = name;
++        props.try_emplace("BoxPhysics", true);
++        props.try_emplace("Gravity", false);
++        return g.objects.create(g.objects.find_class("CDestructableBrush"), {}, Creation::World, props);
++    }
++    HOBJECT body(GameSession& g, DVector pos, DVector dims = {1, 1, 1}, DDWORD flags = FLAG_SOLID)
++    {
++        auto h = g.objects.create(g.objects.find_class("BaseClass"), {}, Creation::World,
++                                  {{"Pos", pos}, {"Flags", std::int32_t(flags)}});
++        if (h)
++            g.server.SetObjectDims(h, &dims);
++        return h;
++    }
++    bool command(GameSession& g, HOBJECT h, const char* text)
++    {
++        auto s = g.server.CreateString(text);
++        auto msg = g.server.StartMessageToObject(nullptr, h, 1000);
++        const bool ok =
++            s && msg && g.server.WriteToMessageHString(msg, s) == DE_OK && g.server.EndMessage(msg) == DE_OK;
++        g.server.FreeString(s);
++        return ok;
++    }
++    bool translation(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = brush(g);
++        CHECK(h);
++        auto* r = g.objects.get(h);
++        const auto base = r->world_model_base, shape = r->world_model;
++        const auto initial = r->state.m_Pos;
++        CHECK(!(r->state.m_Flags & FLAG_GOTHRUWORLD));
++        const DRotation unchanged = r->state.m_Rotation;
++        CHECK(g.server.MoveKeyframedObject(h, vector_add(initial, {100, 10, 20}), &unchanged) == MoverResult::Moved);
++        CHECK(close(object_bounds_center(*r), {100, 55, 20}));
++        CHECK(r->world_model_base == base && r->world_model == shape); // Immutable shell plus checked translation.
++        CollisionHit hit;
++        CHECK(sweep_object(*r, {100, 100, 20}, {100, 0, 20}, {}, hit) == CollisionQuery::Hit &&
++              std::abs(hit.point.y - 60) < .01f);
++        CHECK(sweep_object(*r, {0, 100, 0}, {0, 0, 0}, {}, hit) == CollisionQuery::Miss);
++        CHECK(g.server.MoveKeyframedObject(h, initial, nullptr) == MoverResult::Moved);
++        CHECK(close(object_bounds_center(*r), {0, 45, 0}) && r->mover_moves == 2);
++        const DRotation opposite{vector_scale(unchanged.m_Vec, -1), -unchanged.m_Spin};
++        CHECK(g.server.MoveKeyframedObject(h, vector_add(initial, {0, 10, 0}), &opposite) == MoverResult::Moved);
++        CHECK(r->state.m_Rotation.m_Spin == unchanged.m_Spin);
++        return true;
++    }
++    bool world_block(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = brush(g);
++        auto* r = g.objects.get(h);
++        CHECK(r);
++        auto passenger = body(g, {0, 51.001f, 0});
++        CHECK(passenger);
++        MovementState support;
++        CHECK(g.server.GetMovementState(passenger, support) && support.ground_object == h);
++        const auto initial = r->state.m_Pos, saved = g.objects.get(passenger)->state.m_Pos;
++        const auto shape = r->world_model;
++        CHECK(g.server.MoveKeyframedObject(h, vector_add(initial, {0, -100, 0}), nullptr) == MoverResult::Blocked);
++        CHECK(close(r->state.m_Pos, initial) && close(g.objects.get(passenger)->state.m_Pos, saved));
++        CHECK(r->world_model == shape && r->mover_blocks == 1 && !r->mover_blocker && r->mover_moves == 0);
++        CHECK(g.server.MoveKeyframedObject(h, vector_add(initial, {0, -20, 0}), nullptr) == MoverResult::Moved);
++        CHECK(close(g.objects.get(passenger)->state.m_Pos, vector_add(saved, {0, -20, 0})));
++        CHECK(g.server.GetMovementState(passenger, support) && support.ground_object == h);
++        return true;
++    }
++    bool riders(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = brush(g, {-50, 40, -50}, {50, 50, 50});
++        CHECK(h);
++        auto riding = body(g, {-20, 51.001f, 0}),
++             detached = body(g, {0, 51.001f, 0}, {1, 1, 1}, FLAG_SOLID | FLAG_DONTFOLLOWSTANDING),
++             jumping = body(g, {20, 51.001f, 0});
++        CHECK(riding && detached && jumping);
++        DVector up{0, 100, 0};
++        CHECK(g.server.SetVelocity(jumping, &up) == DE_OK);
++        const auto original = g.objects.get(h)->state.m_Pos;
++        CHECK(g.server.MoveKeyframedObject(h, vector_add(original, {0, -5, 10}), nullptr) == MoverResult::Moved);
++        CHECK(close(g.objects.get(riding)->state.m_Pos, {-20, 46.001f, 10}));
++        CHECK(close(g.objects.get(detached)->state.m_Pos, {0, 51.001f, 0}) &&
++              close(g.objects.get(jumping)->state.m_Pos, {20, 51.001f, 0}));
++        CHECK(g.objects.get(h)->mover_riders == 1 && g.objects.get(h)->mover_pushes == 1);
++        return true;
++    }
++    bool push_block(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = brush(g);
++        CHECK(h);
++        auto pushed = body(g, {15, 45, 0});
++        CHECK(pushed);
++        const auto initial = g.objects.get(h)->state.m_Pos;
++        CHECK(g.server.MoveKeyframedObject(h, vector_add(initial, {10, 0, 0}), nullptr) == MoverResult::Moved);
++        CHECK(std::abs(g.objects.get(pushed)->state.m_Pos.x - 21.002f) < .01f && g.objects.get(h)->mover_pushes == 1);
++        const auto mover_before = g.objects.get(h)->state.m_Pos, body_before = g.objects.get(pushed)->state.m_Pos;
++        auto wall = body(g, {30, 45, 0}, {1, 5, 5});
++        CHECK(wall);
++        CHECK(g.server.MoveKeyframedObject(h, vector_add(mover_before, {20, 0, 0}), nullptr) == MoverResult::Blocked);
++        CHECK(close(g.objects.get(h)->state.m_Pos, mover_before) &&
++              close(g.objects.get(pushed)->state.m_Pos, body_before));
++        CHECK(g.objects.get(h)->mover_blocker == wall);
++        CHECK(g.objects.remove(wall) && g.objects.finish_frame());
++        auto other = brush(g, {50, 40, -10}, {60, 50, 10});
++        CHECK(other);
++        CHECK(g.server.MoveKeyframedObject(h, vector_add(mover_before, {100, 0, 0}), nullptr) == MoverResult::Blocked);
++        CHECK(close(g.objects.get(h)->state.m_Pos, mover_before));
++        return true;
++    }
++    class Probe : public BaseClass
++    {
++      public:
++        HOBJECT mover = nullptr;
++        bool remove = false;
++        unsigned touches = 0;
++        MoverResult recursive = MoverResult::Moved;
++
++      protected:
++        DDWORD EngineMessageFn(DDWORD message, void* data, DFLOAT reason) override
++        {
++            if (message == MID_TOUCHNOTIFY)
++            {
++                ++touches;
++                DVector pos;
++                g_pServerDE->GetObjectPos(mover, &pos);
++                recursive = g_pServerDE->MoveKeyframedObject(mover, vector_add(pos, {1, 0, 0}), nullptr);
++                if (remove)
++                {
++                    g_pServerDE->RemoveObject(mover);
++                    g_pServerDE->RemoveObject(m_hObject);
++                }
++            }
++            return BaseClass::EngineMessageFn(message, data, reason);
++        }
++    };
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        static ClassInfo info{
++            "PathProbe", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Probe>(); }, {}};
++        CHECK(g.objects.register_class(info));
++        auto h = brush(g);
++        CHECK(h);
++        auto passenger = body(g, {0, 51.001f, 0});
++        CHECK(passenger);
++        ObjectCreateStruct desc;
++        desc.m_Pos = {15, 51, 0};
++        desc.m_Flags = FLAG_TOUCH_NOTIFY;
++        auto sensor = g.objects.create(&info, desc);
++        CHECK(sensor);
++        DVector dims{1, 2, 2};
++        g.server.SetObjectDims(sensor, &dims);
++        CHECK(close(g.objects.get(sensor)->dimensions, dims));
++        auto* probe = dynamic_cast<Probe*>(g.server.HandleToObject(sensor));
++        probe->mover = h;
++        auto initial = g.objects.get(h)->state.m_Pos;
++        CHECK(g.server.MoveKeyframedObject(h, vector_add(initial, {30, 0, 0}), nullptr) == MoverResult::Moved);
++        CHECK(probe->touches == 1 && probe->recursive == MoverResult::Invalid);
++        CHECK(close(g.objects.get(passenger)->state.m_Pos, {30, 51.001f, 0}));
++        probe->remove = true;
++        CHECK(g.server.MoveKeyframedObject(h, initial, nullptr) == MoverResult::Invalid);
++        CHECK(probe->touches == 2 && g.objects.get(h)->life == Life::Pending &&
++              g.objects.get(sensor)->life == Life::Pending);
++        CHECK(close(g.objects.get(passenger)->state.m_Pos, {0, 51.001f, 0}));
++        CHECK(g.objects.finish_frame() && !g.objects.get(h) && !g.objects.get(sensor) && g.objects.get(passenger));
++        CHECK(g.unload_world() && !g.server.string_count() && !g.server.list_count());
++        return true;
++    }
++    bool validation(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = brush(g);
++        auto* r = g.objects.get(h);
++        CHECK(r);
++        const auto initial = r->state.m_Pos;
++        const auto shape = r->world_model;
++        const auto rotated = rotation_from_euler({0, .01f, 0});
++        CHECK(g.server.MoveKeyframedObject(h, vector_add(initial, {10, 0, 0}), &rotated) == MoverResult::Unavailable);
++        CHECK(close(r->state.m_Pos, initial) && r->world_model == shape && r->mover_moves == 0);
++        const DRotation zero{{}, 0};
++        CHECK(g.server.MoveKeyframedObject(h, vector_add(initial, {10, 0, 0}), &zero) == MoverResult::Invalid);
++        CHECK(g.server.MoveKeyframedObject(h, {NAN, 0, 0}, nullptr) == MoverResult::Invalid);
++        g.server.collision_ready = false;
++        CHECK(g.server.MoveKeyframedObject(h, vector_add(initial, {10, 0, 0}), nullptr) == MoverResult::Unavailable);
++        g.server.collision_ready = true;
++        auto polygon = brush(g, {50, 40, -10}, {60, 50, 10}, {{"BoxPhysics", false}});
++        CHECK(polygon);
++        auto p = g.objects.get(polygon)->state.m_Pos;
++        CHECK(g.server.MoveKeyframedObject(polygon, vector_add(p, {10, 0, 0}), nullptr) == MoverResult::Unavailable);
++        auto dynamic = brush(g, {100, 40, -10}, {110, 50, 10}, {{"Pushable", true}});
++        CHECK(dynamic && g.objects.get(dynamic)->world_body);
++        CHECK(g.server.MoveKeyframedObject(dynamic, {10, 50, 0}, nullptr) == MoverResult::Unavailable);
++        CHECK(close(r->state.m_Pos, initial) && r->world_model == shape);
++        CHECK(g.objects.remove(h) && g.server.MoveKeyframedObject(h, initial, nullptr) == MoverResult::Invalid);
++        CHECK(g.objects.finish_frame() && g.server.MoveKeyframedObject(h, initial, nullptr) == MoverResult::Invalid);
++        return true;
++    }
++    bool player(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto h = brush(g, {-100, 40, -100}, {100, 50, 100});
++        CHECK(h);
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        CHECK(p);
++        const auto half = g.objects.get(p->m_hObject)->dimensions.y;
++        DVector position{0, 50 + half + .001f, 0};
++        CHECK(g.server.TeleportObject(p->m_hObject, &position) == DE_OK);
++        DVector zero{};
++        CHECK(g.server.SetVelocity(p->m_hObject, &zero) == DE_OK);
++        CHECK(g.step(1.0 / 60));
++        auto initial = g.objects.get(p->m_hObject)->state.m_Pos;
++        MovementState support;
++        CHECK(g.server.GetMovementState(p->m_hObject, support) && support.ground_object == h);
++        auto dest = vector_add(g.objects.get(h)->state.m_Pos, {10, 0, 0});
++        CHECK(g.server.MoveKeyframedObject(h, dest, nullptr) == MoverResult::Moved);
++        CHECK(g.step(1.0 / 60));
++        auto actual = g.objects.get(p->m_hObject)->state.m_Pos;
++        CHECK(std::abs(actual.x - initial.x - 10) < .01f && std::abs(actual.z - initial.z) < .01f);
++        CHECK(close(g.client_shell.position, actual));
++        CHECK(g.server.GetMovementState(p->m_hObject, support) && support.ground_object == h);
++        CHECK(g.objects.get(h)->mover_riders == 1 && g.unload_world());
++        return true;
++    }
++    bool timeline(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = brush(g);
++        CHECK(h);
++        const auto initial = g.objects.get(h)->state.m_Pos;
++        for (unsigned i = 0; i < 2; ++i)
++            CHECK(g.objects.create(g.objects.find_class("Key"), {}, Creation::World,
++                                   {{"Name", "route" + std::to_string(i)},
++                                    {"Pos", vector_add(initial, {float(i) * 100, 0, 0})},
++                                    {"TimeStamp", float(i)}}));
++        auto f = g.objects.create(g.objects.find_class("KeyFramer"), {}, Creation::World,
++                                  {{"ObjectName", std::string(g.objects.get(h)->state.m_Name)},
++                                   {"BaseKeyName", std::string("route")},
++                                   {"StartActive", true}});
++        CHECK(f);
++        auto* path = dynamic_cast<KeyFramer*>(g.server.HandleToObject(f));
++        CHECK(g.step(.01) && path->active && path->targets.size() == 1);
++        CHECK(g.step(.25) && close(g.objects.get(h)->state.m_Pos, vector_add(initial, {25, 0, 0})));
++        CHECK(g.step(.25) && close(g.objects.get(h)->state.m_Pos, vector_add(initial, {50, 0, 0})));
++        CHECK(g.step(.5) && !path->active && close(g.objects.get(h)->state.m_Pos, vector_add(initial, {50, 0, 0})));
++        CHECK(path->targets[0].moves == 2 && path->processed == 2); // Preserve original missing final snap.
++        CHECK(g.objects.remove(h) && g.objects.finish_frame() && path->targets.empty());
++        CHECK(command(g, f, "ON") && g.step(.1) && g.unload_world());
++        CHECK(!g.server.string_count() && !g.server.list_count() && !g.server.message_count());
++        return true;
++    }
++    bool subway(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error) && g.step(1.0 / 60));
++            auto* list = g.server.FindNamedObjects("htrain1");
++            CHECK(list && list->m_pFirstLink);
++            auto h = list->m_pFirstLink->m_hObject;
++            g.server.RelinquishList(list);
++            auto* f = dynamic_cast<KeyFramer*>(g.server.HandleToObject(h));
++            CHECK(f && f->initialized && !f->active && f->keys.size() == 3 && f->targets.size() == 1);
++            const auto target = f->targets[0].object;
++            auto* r = g.objects.get(target);
++            CHECK(r && r->world_model && r->world_model_base);
++            const auto shape = r->world_model, base = r->world_model_base;
++            const auto initial = r->state.m_Pos;
++            CHECK(command(g, h, "ON"));
++            unsigned moves = 0, blocked = 0;
++            DVector last = initial;
++            for (unsigned i = 0; i < 310 && f->active; ++i)
++            {
++                const auto attempts = f->targets[0].attempts;
++                CHECK(g.step(1.0 / 60));
++                if (f->targets[0].attempts == attempts)
++                    continue;
++                const auto a = f->time < 3 ? 0u : 1u;
++                auto expected = vector_add(
++                    f->targets[0].offset,
++                    vector_add(f->keys[a].position,
++                               vector_scale(vector_subtract(f->keys[a + 1].position, f->keys[a].position),
++                                            (f->time - f->keys[a].time) / (f->keys[a + 1].time - f->keys[a].time))));
++                if (f->targets[0].result == MoverResult::Moved)
++                {
++                    ++moves;
++                    CHECK(close(r->state.m_Pos, expected));
++                }
++                else
++                {
++                    CHECK(f->targets[0].result == MoverResult::Blocked && !r->mover_blocker);
++                    CHECK(close(r->state.m_Pos, last));
++                    CollisionHit obstruction;
++                    const auto center = object_bounds_center(*r);
++                    CHECK(g.collision.sweep(center, vector_add(center, vector_subtract(expected, last)), r->dimensions,
++                                            obstruction) == CollisionQuery::Hit);
++                    CHECK(obstruction.start_solid || obstruction.fraction < 1 - 1e-6);
++                    ++blocked;
++                    std::cout << "blocked_time=" << f->time << " primary_polygon=" << obstruction.polygon
++                              << " fraction=" << obstruction.fraction << " normal=" << obstruction.normal.x << ','
++                              << obstruction.normal.y << ',' << obstruction.normal.z << '\n';
++                }
++                last = r->state.m_Pos;
++                CHECK(r->world_model == shape && r->world_model_base == base);
++                CollisionHit hit;
++                auto center = object_bounds_center(*r);
++                CHECK(sweep_object(*r, vector_add(center, {0, 300, 0}), vector_add(center, {0, -300, 0}), {}, hit) ==
++                      CollisionQuery::Hit);
++            }
++            CHECK(moves == 297 && blocked == 2 && !f->active && f->processed == 3 && close(r->state.m_Pos, last));
++            CHECK(!close(last, initial) && !close(last, vector_add(f->keys.back().position, f->targets[0].offset)));
++            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 161);
++            std::cout << "cycle=" << cycle << " moves=" << moves << " blocks=" << blocked << " final=" << last.x << ','
++                      << last.y << ',' << last.z << " consumed_keys=9 runtime=161\n";
++            CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.server.string_count() &&
++                  !g.server.list_count() && !g.server.message_count());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"translation", translation}, {"world_block", world_block}, {"riders", riders},
++        {"push_block", push_block},   {"lifetime", lifetime},       {"validation", validation},
++        {"player", player},           {"timeline", timeline},       {"subway", subway}};
++    auto it = cases.find(argv[1]);
++    return it != cases.end() && it->second(argv[2]) ? 0 : 1;
++}

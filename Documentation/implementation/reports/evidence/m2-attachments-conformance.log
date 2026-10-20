@@ -1,0 +1,445 @@
+sources/blood2/ObjectDLL/Weapon.cpp
+Selected destructor, ShowHandModel and CreateHandModel rules; checked handles and explicit failures
+SHA256 1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7
+241: //
+242: // ----------------------------------------------------------------------- //
+243: 
+244: void CWeapon::Term()
+245: {
+246: 	CServerDE* pServerDE = BaseClass::GetServerDE();
+247: 
+248: 	if (m_hHandAttachment)
+249: 	{
+250: 		pServerDE->RemoveAttachment(m_hHandAttachment);
+251: 		m_hHandAttachment = DNULL;
+252: 	}
+253: 
+254: 	if (m_pHandModel)
+255: 	{
+256: 		pServerDE->RemoveObject(m_pHandModel->m_hObject);
+257: 		m_pHandModel->SetWeaponOwner( NULL );
+258: 		m_pHandModel = DNULL;
+259: 	}
+362: // ----------------------------------------------------------------------- //
+363: 
+364: void CWeapon::ShowHandModel(DBOOL bShow)
+365: {
+366: 	CServerDE* pServerDE = BaseClass::GetServerDE();
+367: 
+368: 	if (bShow)	// Create it.
+369: 	{
+370: 		if (!m_pHandModel)
+371: 		{
+372: 			CreateHandModel();
+373: 		}
+374: 	}
+375: 	else	// Remove it.
+376: 	{
+377: 		if (m_hHandAttachment)
+378: 		{
+379: 			pServerDE->RemoveAttachment(m_hHandAttachment);
+380: 			m_hHandAttachment = DNULL;
+381: 		}
+382: 
+383: 		if (m_pHandModel && m_pHandModel->m_hObject)
+384: 		{
+385: 			pServerDE->RemoveObject(m_pHandModel->m_hObject);
+386: 			m_pHandModel->SetWeaponOwner( NULL );
+387: 			m_pHandModel = DNULL;
+388: 		}
+389: 	}
+390: }
+1404: void CWeapon::CreateHandModel()
+1405: {
+1406: 	CServerDE* pServerDE = BaseClass::GetServerDE();
+1407: 	if (!pServerDE || !m_pHandModelFilename || !m_pHandModelSkinname) return;
+1408: 
+1409: 	HCLASS hOwnerClass = pServerDE->GetObjectClass(m_hOwner);
+1410: 
+1411: 	DVector vPos;
+1412: 	DRotation rRot;
+1413: 	char* szNode = m_bLeftHand ? "l_gun" : "r_gun";
+1414: 
+1415: 	pServerDE->GetObjectPos(m_hOwner, &vPos);
+1416: 
+1417: 	// Create the hand view model
+1418: 	ObjectCreateStruct ocStruct;
+1419: 	INIT_OBJECTCREATESTRUCT(ocStruct);
+1420: 
+1421: 	ocStruct.m_ObjectType = OT_MODEL; 
+1422: 	ocStruct.m_Flags = FLAG_VISIBLE | FLAG_FORCECLIENTUPDATE;
+1423: 	VEC_COPY(ocStruct.m_Pos, vPos);
+1424: 
+1425: 	if(m_hClient)
+1426: 	{
+1427: 		ocStruct.m_UserData = pServerDE->GetClientID(m_hClient);
+1428: 		if(m_bLeftHand)
+1429: 			ocStruct.m_NextUpdate = 0.02f;
+1430: 	}
+1431: 	else
+1432: 		ocStruct.m_UserData = 0;
+1433: 
+1434: 	_mbscpy((unsigned char*)ocStruct.m_Filename, (const unsigned char*)m_pHandModelFilename);
+1435: 	_mbscpy((unsigned char*)ocStruct.m_SkinName, (const unsigned char*)m_pHandModelSkinname);
+1436: 
+1437: 	HCLASS hClass = pServerDE->GetClass("CHandWeaponModel");
+1438: 	m_pHandModel = (CHandWeaponModel*)pServerDE->CreateObject(hClass, &ocStruct);
+1439: 
+1440: 	if (m_pHandModel && m_pHandModel->m_hObject)
+1441: 	{
+1442: 		// Set to the animation with the proper origin offset
+1443: 		DDWORD dwAnim = pServerDE->GetAnimIndex(m_pHandModel->m_hObject, "handheld");
+1444: 		if (dwAnim != INVALID_ANI)
+1445: 			pServerDE->SetModelAnimation(m_pHandModel->m_hObject, dwAnim);
+1446: 
+1447: 		m_pHandModel->SetType(m_nType);
+1448: 		m_pHandModel->SetPlayerOwned( IsPlayer( m_hOwner ));
+1449: 		m_pHandModel->SetWeaponOwner( this );
+1450: 
+1451: 		if (m_hClient)
+1452: 			m_pHandModel->SetClient(m_hClient, m_bLeftHand);
+1453: 
+1454: 		DVector vOffset;
+1455: 		DRotation rRotOffset;
+1456: 		VEC_INIT(vOffset);
+1457: 		ROT_INIT(rRotOffset);
+1458: 
+1459: 		// Create an attachment and show the model if there is a node
+1460: 		if (pServerDE->GetModelNodeTransform(m_hOwner, szNode, &vPos, &rRot))
+1461: 		{
+1462: 			pServerDE->CreateAttachment(m_hOwner, m_pHandModel->m_hObject, szNode, &vOffset, &rRotOffset, &m_hHandAttachment);
+1463: 			m_pHandModel->SetVisible(DTRUE);
+1464: 		}
+1465: 		else
+1466: 		{	// hide it
+1467: 			pServerDE->CreateAttachment(m_hOwner, m_pHandModel->m_hObject, DNULL, &vOffset, &rRotOffset, &m_hHandAttachment);
+1468: 			m_pHandModel->SetVisible(DFALSE);
+1469: 		}
+1470: 	}
+1471: }
+sources/blood2/ObjectDLL/HandWeaponModel.cpp
+Held model initialization and first-update visibility; drop/SFX/precreate fallthrough excluded
+SHA256 480adb2a0ad140120bb9ddb160cf8f8112508abdf70e218067213e0f04c8ed96
+30: {
+31: 	m_bDropped = DFALSE;
+32: 	m_bOwnedByPlayer = DFALSE;
+33: 	m_hClient = DNULL;
+34: 	m_bFirstUpdate = DTRUE;
+35: 	m_bLeftHand = DFALSE;
+36: 	m_bVisible = DTRUE;
+37: 	m_pWeaponOwner = NULL;
+38: 	m_dwClientID = 0;
+39: }
+40: 
+41: 
+42: // ----------------------------------------------------------------------- //
+43: //
+44: //	ROUTINE:	CHandWeaponModel::~CHandWeaponModel()
+45: //
+46: //	PURPOSE:	Destructor
+47: //
+48: // ----------------------------------------------------------------------- //
+49: 
+50: CHandWeaponModel::~CHandWeaponModel()
+51: {
+52: 	if( m_pWeaponOwner )
+53: 		m_pWeaponOwner->SetHandModel( NULL );
+54: }
+55: 
+56: 
+57: // ----------------------------------------------------------------------- //
+58: //
+59: //	ROUTINE:	CHandWeaponModel::EngineMessageFn
+60: //
+61: //	PURPOSE:	Handle engine messages
+62: //
+63: // ----------------------------------------------------------------------- //
+64: 
+65: DDWORD CHandWeaponModel::EngineMessageFn(DDWORD messageID, void *pData, DFLOAT lData)
+66: {
+67: 	CServerDE* pServerDE = GetServerDE();
+68: 	if (!pServerDE) return 0;
+69: 
+70: 	switch(messageID)
+71: 	{
+72: 		case MID_PRECREATE:
+73: 		{
+74: 			ObjectCreateStruct *ocs = (ObjectCreateStruct*)pData;
+75: 			m_dwClientID = ocs->m_UserData;
+76: 
+77: 			if(ocs->m_NextUpdate == 0.02f)
+78: 				m_bLeftHand = DTRUE;
+79: 
+80: 			ocs = DNULL;
+81: 		}
+82: 
+83: 		case MID_UPDATE:
+84: 		{
+85: 			if (!Update())
+86: 				pServerDE->RemoveObject(m_hObject);
+87: 			break;
+88: 		}
+89: 
+90: 		case MID_INITIALUPDATE:
+91: 		{
+92: 			pServerDE->SetNextUpdate(m_hObject, 0.01f);
+93: 			DVector vDims;
+94: 			VEC_SET(vDims, 0.1f, 0.1f, 0.1f);
+95: 			pServerDE->SetObjectDims(m_hObject, &vDims);
+96: 
+97: 			if(m_dwClientID)
+98: 			{
+99: 				HMESSAGEWRITE hMsg = pServerDE->StartSpecialEffectMessage(this);
+100: 				pServerDE->WriteToMessageByte(hMsg, SFX_WEAPONHANDMODEL_ID);
+101: 				pServerDE->WriteToMessageDWord(hMsg, m_dwClientID);
+102: 				pServerDE->WriteToMessageByte(hMsg, (m_bLeftHand << 1) | DFALSE);
+103: 				pServerDE->EndMessage2(hMsg, MESSAGE_GUARANTEED);
+104: 			}
+105: 			break;
+106: 		}
+107: 
+108: 		default:
+109: 			break;
+110: 	}
+111: 
+112: 
+113: 	return BaseClass::EngineMessageFn(messageID, pData, lData);
+114: }
+115: 
+202: 
+203: 		if( !m_bDropped )
+204: 		{
+205: 			pServerDE->SetNextUpdate(m_hObject, 0.0f);
+206: 			return DTRUE;
+207: 		}
+208: 	}
+209: 
+210: 	// See if standing on anything
+211: 	CollisionInfo collisionInfo;
+212: 
+213: 	pServerDE->GetStandingOn(m_hObject, &collisionInfo);
+214: 	DBOOL bIsStandingOn = (collisionInfo.m_hObject != DNULL);
+215: 
+216: 	if (bIsStandingOn)
+217: 	{
+218: 		// Spawn a powerup
+219: 		DVector vF, vPos, vU;
+220: 		DRotation rRot;
+221: 
+222: 		// We want the rotation aligned.
+223: 		pServerDE->GetObjectRotation(m_hObject, &rRot);
+224: 		pServerDE->GetRotationVectors(&rRot, &vU, &vPos, &vF);
+225: 		vF.y = 0.0f;
+226: 		VEC_SET(vU, 0,1,0);
+227: 		pServerDE->AlignRotation(&rRot, &vF, &vU);
+sources/blood2/ObjectDLL/InventoryMgr.cpp
+Remove old selected hands and create living current hands
+SHA256 a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb
+842: int CInventoryMgr::ChangeWeaponSlot(DBYTE nSlot)
+843: {
+844: 	if(nSlot >= SLOTCOUNT_TOTALWEAPONS)
+845: 		return CHWEAP_NOTAVAIL;
+846: 
+847: //	if(m_pCurWeapon && !m_pCurWeapon->IsIdle())
+848: //		return CHWEAP_WEAPONBUSY;
+849: 
+850: 	CWeapon *w = m_Weapons[nSlot];
+851: 
+852: 	if(m_hClient != DNULL)
+853: 	{
+854: 		CServerDE* pServerDE = BaseClass::GetServerDE();
+855: 		CPlayerObj *pObj = (CPlayerObj*)pServerDE->HandleToObject(m_hOwner);
+856: 		pObj->SetZoomMode(DFALSE);
+857: 	}
+858: 
+859: 	if (!w) 
+860: 		return CHWEAP_NOTAVAIL;
+861: 		
+862: 	if (w->GetType() == m_nCurWeapon)
+863: 		return CHWEAP_CURRENT;
+864: 
+865: 	// Okay, we have it, change to it
+866: 	if (m_Weapons[m_nCurWeaponSlot])
+867: 		m_Weapons[m_nCurWeaponSlot]->ShowHandModel(DFALSE);
+868: 	if (m_LWeapons[m_nCurWeaponSlot])
+869: 		m_LWeapons[m_nCurWeaponSlot]->ShowHandModel(DFALSE);
+870: 
+871: /*	if (m_hClient)		// Only for player object owners
+872: 	{
+873: 		if (m_Weapons[m_nCurWeaponSlot]) 
+874: 			m_Weapons[m_nCurWeaponSlot]->Holster();
+875: 		if (m_LWeapons[m_nCurWeaponSlot]) 
+876: 			m_LWeapons[m_nCurWeaponSlot]->Holster();
+877: 
+878: 		m_bSwitchingWeapons = DTRUE;
+879: 		m_nNextWeaponSlot = nSlot;
+880: 	}
+881: 	else
+882: 	{*/
+883: 
+884: 		// Okay, we have it, change to it
+885: 		if(m_pCurWeapon)
+886: 		{
+887: 			m_pCurWeapon->Holster();
+888: 			m_pCurWeapon->ShowHandModel(DFALSE);
+889: 		}
+890: 
+891: 		m_pCurWeapon = w;
+892: 		m_nCurWeapon = w->GetType();
+893: 		m_nCurWeaponSlot = nSlot;
+894: 		assert( m_nCurWeaponSlot < 10 );
+895: 		w->SetupMuzzleFlash();
+896: //	}
+897: 
+898: 	return CHWEAP_OK;
+2700: 
+2701: 	// Show the current weapon
+2702: 	if (IsBaseCharacter(m_hOwner))
+2703: 	{
+2704: 		CBaseCharacter *pBC = (CBaseCharacter*)pServerDE->HandleToObject(m_hOwner);
+2705: 		if (pBC && !pBC->IsDead())
+2706: 		{
+2707: 			if(m_Weapons[m_nCurWeaponSlot])
+2708: 				m_Weapons[m_nCurWeaponSlot]->ShowHandModel(DTRUE);
+2709: 			if(m_LWeapons[m_nCurWeaponSlot])
+2710: 				m_LWeapons[m_nCurWeaponSlot]->ShowHandModel(DTRUE);
+2711: 		}
+sources/blood2/ObjectDLL/PlayerObj.cpp
+Dead-player hand hiding
+SHA256 56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc
+1771: 	if (m_bDead)
+1772: 	{
+1773: 		m_InventoryMgr.ShowHandModels(DFALSE);
+1774: 
+1775: 		int nRet = m_InventoryMgr.ChangeWeaponSlot(1);
+1776: 
+1777: 		if (nRet == CHWEAP_NOTAVAIL)
+1778: 		{
+1779: 			m_InventoryMgr.ChangeWeaponSlot(0);
+1780: 		}
+sources/blood2/AppHeaders/server_de.h
+Typed attachment services; strengthen undefined removal lifetime
+SHA256 ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945
+619: 			// Attaches hChild to hParent.  If pNodeName is set, it'll attach hChild to a 
+620: 			// specific node on hParent.
+621: 			// DE will automatically detach if you remove hParent,
+622: 			// but it will NOT automatically detach if you remove hChild.  If you remove the 
+623: 			// child without removing the attachment, the results are undefined.
+624: 			// Returns DE_OK, DE_NODENOTFOUND, or DE_INVALIDPARAMS.
+625: 			DRESULT	(*CreateAttachment)(HOBJECT hParent, HOBJECT hChild, char *pNodeName, 
+626: 				DVector *pOffset, DRotation *pRotationOffset, HATTACHMENT *pAttachment);
+627: 
+628: 			// Removes an attachment.  Note: an attachment becomes invalid when you remove the parent
+629: 			// so it'll crash if you call it with an attachment with a parent you've removed.
+630: 			DRESULT	(*RemoveAttachment)(HATTACHMENT hAttachment);
+631: 
+632: 			// Look for an attachment on the parent.  Returns LT_ERROR, DE_NOTFOUND,
+633: 			// or LT_OK if it found it.  hAttachment is set to NULL if there's an error.
+634: 			DRESULT	(*FindAttachment)(HOBJECT hParent, HOBJECT hChild, HATTACHMENT *hAttachment);
+797: 			// Get the absolute world position and rotation of a node on an attached model.
+798: 			// Inputs:
+799: 			//		hAttachment - Attachment created with CreateAttachment
+800: 			//		pChildNodeName - name of node on attached child model
+801: 			// Outputs:
+802: 			//		pPos - absolute world position of node.
+803: 			//		pRot - absolute world rotation of node.
+804: 			DRESULT	(*GetAttachedModelNodeTransform)( HATTACHMENT hAttachment, char *pChildNodeName, DVector *pPos, DRotation *pRot);
+sources/lithtech/runtime/shared/src/shared_iltcommon.cpp
+Reference only: compose parent/node rotation and unscaled offset; not an imported engine service
+SHA256 52de1688c2dc67b8b3798663a0f3b489a9b8a46220d328185e5d572830f785c3
+141: LTRESULT CLTCommonShared::GetAttachmentTransform(HATTACHMENT hAttachment, 
+142: 												 LTransform &transform, /* out */
+143: 												 bool bWorldSpace) 
+144: {
+145:     FN_NAME(CLTCommonShared::GetAttachmentTransform);
+146: 
+147:     LTObject *pParent, *pChild;
+148:     LTRESULT dResult;
+149:     Attachment *pAttachment;
+150:     LTransform tBase;
+151: 
+152:     pAttachment = (Attachment*)hAttachment;
+153:     if (!pAttachment) {
+154:         ERR(1, LT_INVALIDPARAMS);
+155:     }
+156: 
+157:     dResult = GetAttachmentObjects(hAttachment, pParent, pChild);
+158:     if (dResult != LT_OK) {
+159:         return dResult;
+160:     }
+161:  
+162:     // Setup the base transform.
+163:     if (pParent->m_ObjectType == OT_MODEL && pAttachment->m_iSocket != -1) 
+164: 	{
+165:         dResult = GetILTModel()->GetSocketTransform(pParent, pAttachment->m_iSocket, tBase, bWorldSpace == LTTRUE);
+166:         if (dResult != LT_OK)
+167:             return dResult;	
+168: 		
+169: 		transform.m_Scale = tBase.m_Scale;
+170:     }
+171:     else // attachment is connected to a world model.
+172: 	{
+173: 		tBase.m_Scale.Init(1.0f, 1.0f, 1.0f);
+174:         if (bWorldSpace) {
+175:             tBase.m_Pos = pParent->GetPos();
+176:             tBase.m_Rot = pParent->m_Rotation;
+177:         }
+178:         else {
+179:             tBase.m_Pos.Init();
+180:             tBase.m_Rot.Init();
+181:         }
+182: 
+183: 		transform.m_Scale =  pChild->m_Scale ;
+184:     }
+185: 
+186: 	// same as ilt_transform->multiply but without that pesky virtual call overhead.
+187: 	// basic formula : R2 R1, R2 t1 + t2)
+188:  	// (R', T', S' ) = (( R1 * R2 ) , ( R1 * P2 ) + P1 , S1 * S2
+189: 	transform.m_Rot = tBase.m_Rot * pAttachment->m_Offset.m_Rot ;
+190: 	quat_RotVec( &transform.m_Pos.x, tBase.m_Rot.m_Quat, &pAttachment->m_Offset.m_Pos.x);
+191: 	transform.m_Pos += tBase.m_Pos ;
+192: 
+193:     return LT_OK;
+sources/blood2/ObjectDLL/HandWeaponModel.h
+Original held metadata and stored SetVisible request; borrowed weapon pointer replaced
+SHA256 d2688a041b58493e7a21e854568a375e1bb3ade0568037acdc7705e6388bc04a
+29: 	public :
+30: 
+31: 		CHandWeaponModel();
+32: 		virtual ~CHandWeaponModel();
+33: 		void	SetPlayerOwned( DBOOL bOwnedByPlayer ) { m_bOwnedByPlayer = bOwnedByPlayer; }
+34: 		void	SetWeaponOwner( CWeapon *pWeapon ) { m_pWeaponOwner = pWeapon; }
+35: 		void	SetVisible(DBOOL bVisible);
+36: 		void	SetType(DDWORD dwType) { m_dwType = dwType; }
+37: 		void	SetClient(HCLIENT hClient, DBOOL bLeftHand) { m_hClient = hClient; m_bLeftHand = bLeftHand; }
+38: 		void	Drop();
+39: 		DBOOL	Update();
+40: 
+41: 	protected :
+42: 
+43: 		DDWORD EngineMessageFn(DDWORD messageID, void *pData, DFLOAT lData);
+44: 
+45: 	private :
+46: 
+47: 		DBOOL	m_bDropped;
+48: 		DDWORD	m_dwType;
+49: 		DBOOL	m_bOwnedByPlayer;
+50: 		DBOOL	m_bLeftHand;
+51: 		HCLIENT	m_hClient;
+52: 		DBOOL	m_bFirstUpdate;
+53: 		DBOOL	m_bVisible;
+54: 		CWeapon *m_pWeaponOwner;
+55: 		DDWORD	m_dwClientID;
+56: };
+57: 
+58: 
+59: // ----------------------------------------------------------------------- //
+60: //
+61: //	ROUTINE:	CHandWeaponModel::SetVisible()
+62: //
+63: //	PURPOSE:	Sets or clears the visible flag
+64: //
+65: // ----------------------------------------------------------------------- //
+66: 
+67: inline void CHandWeaponModel::SetVisible(DBOOL bVisible)
+68: {

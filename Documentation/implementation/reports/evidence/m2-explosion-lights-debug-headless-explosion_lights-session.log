@@ -1,0 +1,14 @@
+560/561 Testing: explosion_lights.session
+560/561 Test: explosion_lights.session
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_light_tests" "session"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"explosion_lights.session" start time: Oct 16 20:52 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_lights.session" end time: Oct 16 20:52 CEST
+"explosion_lights.session" time elapsed: 00:00:00
+----------------------------------------------------------

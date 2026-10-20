@@ -1,0 +1,14 @@
+391/395 Testing: ai_script.state_target
+391/395 Test: ai_script.state_target
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_script_tests" "state_target" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-script-state_target"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_script.state_target" start time: Oct 16 13:16 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.state_target" end time: Oct 16 13:16 CEST
+"ai_script.state_target" time elapsed: 00:00:00
+----------------------------------------------------------

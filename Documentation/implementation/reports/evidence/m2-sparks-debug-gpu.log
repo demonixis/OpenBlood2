@@ -1,0 +1,176 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 661
+    Start 661: gpu.mouse_combat
+
+661: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "gpu_combat" "<external-data-root>"
+661: Working Directory: <workspace>/Blood2/build/debug/tests
+661: Test timeout computed to be: 120
+661: Original SubwayA camera intro expired after 12.0167 simulation seconds
+661: Approached encounter at z=-2192.09
+661: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=8, ammo=42, independent corpse verified, native=1
+661: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=0
+661: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+661: Walked past killed Cultist to z=-1861.92
+661: Original SubwayA camera intro expired after 12.0167 simulation seconds
+661: Approached encounter at z=-2192.09
+661: Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=13, ammo=37, independent corpse verified, native=1
+661: Dodge updates=12, corpse candidates=23, zero-margin search=1, swept source clearance=0
+661: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+661: Walked past killed Cultist to z=-1861.92
+1/9 Test #661: gpu.mouse_combat .................   Passed   26.33 sec
+test 662
+    Start 662: gpu.corpse_clearance
+
+662: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "gpu_clearance" "<external-data-root>"
+662: Working Directory: <workspace>/Blood2/build/debug/tests
+662: Test timeout computed to be: 120
+662: Original SubwayA camera intro expired after 12.0167 simulation seconds
+662: Approached encounter at z=-2338.28
+662: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+662: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+662: Post-kill position=-32,170.001,-1854.18 camera=0 yaw=0
+662: Walked past killed Cultist to z=-1854.18
+662: Approached encounter at z=-1742.25
+662: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+662: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+662: Post-kill position=-32,170.001,-1340.93 camera=0 yaw=-3.72529e-09
+662: Walked past killed Cultist to z=-1340.93
+662: Original SubwayA camera intro expired after 12.0167 simulation seconds
+662: Approached encounter at z=-2341.42
+662: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+662: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+662: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+662: Walked past killed Cultist to z=-1861.92
+662: Approached encounter at z=-1745.4
+662: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+662: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+662: Post-kill position=-32,170.001,-1344.07 camera=0 yaw=3.72529e-09
+662: Walked past killed Cultist to z=-1344.07
+2/9 Test #662: gpu.corpse_clearance .............   Passed   30.59 sec
+test 827
+    Start 827: gpu.level_change
+
+827: Test command: <workspace>/Blood2/build/debug/tests/level_change_gpu_tests "<external-data-root>" "<workspace>/Blood2/build/debug/tests/level-change"
+827: Working Directory: <workspace>/Blood2/build/debug/tests
+827: Test timeout computed to be: 90
+827: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+827: Destination: CityHub /
+827: Cycle 0: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+827: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+827: Destination: SubwayA /
+827: Cycle 1: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+827: Destination: CityHub /
+827: Cycle 2: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+827: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+827: Destination: SubwayA /
+827: Cycle 3: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+3/9 Test #827: gpu.level_change .................   Passed    8.88 sec
+test 885
+    Start 885: gpu.death_effects
+
+885: Test command: <workspace>/Blood2/build/debug/tests/death_effect_gpu_tests "<workspace>/Blood2/build/debug/tests/death-effect-gpu" "<external-data-root>"
+885: Working Directory: <workspace>/Blood2/build/debug/tests
+885: Test timeout computed to be: 120
+885: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+885: death FX cycle=0 flame pixels=1991 smoke pixels=1441 limb pixels=831 flesh pixels=1682; hidden UI, repeated readback unchanged
+885: death FX cycle=1 flame pixels=1991 smoke pixels=1441 limb pixels=831 flesh pixels=1682; hidden UI, repeated readback unchanged
+4/9 Test #885: gpu.death_effects ................   Passed    1.44 sec
+test 891
+    Start 891: gpu.blood_splat_alpha
+
+891: Test command: <workspace>/Blood2/build/debug/tests/blood_splat_gpu_tests "<workspace>/Blood2/build/debug/tests/blood-splat-alpha"
+891: Working Directory: <workspace>/Blood2/build/debug/tests
+891: Test timeout computed to be: 30
+891: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+891: Original blood splat tint/Term alpha: 20000 exact opaque-texel blends
+5/9 Test #891: gpu.blood_splat_alpha ............   Passed    0.74 sec
+test 892
+    Start 892: gpu.blood_splat_private
+
+892: Test command: <workspace>/Blood2/build/debug/tests/blood_splat_gpu_tests "<workspace>/Blood2/build/debug/tests/blood-splat-private" "<external-data-root>"
+892: Working Directory: <workspace>/Blood2/build/debug/tests
+892: Test timeout computed to be: 90
+892: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+892: Original blood splat tint/Term alpha: 20000 exact opaque-texel blends
+892: Private cycle 0 variant 1 SpriteTextures\blood1.dtx changed pixels 11631
+892: Private cycle 0 variant 2 SpriteTextures\blood2.dtx changed pixels 13056
+892: Private cycle 0 variant 3 SpriteTextures\blood3.dtx changed pixels 13942
+892: Private cycle 1 variant 1 SpriteTextures\blood1.dtx changed pixels 11940
+892: Private cycle 1 variant 2 SpriteTextures\blood2.dtx changed pixels 12822
+892: Private cycle 1 variant 3 SpriteTextures\blood3.dtx changed pixels 14186
+892: Private cycle 2 variant 1 SpriteTextures\blood1.dtx changed pixels 12167
+892: Private cycle 2 variant 2 SpriteTextures\blood2.dtx changed pixels 12933
+892: Private cycle 2 variant 3 SpriteTextures\blood3.dtx changed pixels 14013
+6/9 Test #892: gpu.blood_splat_private ..........   Passed    2.92 sec
+test 898
+    Start 898: gpu.blood_spurt
+
+898: Test command: <workspace>/Blood2/build/debug/tests/blood_spurt_gpu_tests "<workspace>/Blood2/build/debug/tests/blood-spurt-gpu"
+898: Working Directory: <workspace>/Blood2/build/debug/tests
+898: Test timeout computed to be: 60
+898: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+898: cycle 0 three drop textures: 6895 changed pixels
+898: cycle 0 original emitter collision mark: 96 changed pixels
+898: cycle 1 three drop textures: 6895 changed pixels
+898: cycle 1 original emitter collision mark: 96 changed pixels
+898: cycle 2 three drop textures: 6895 changed pixels
+898: cycle 2 original emitter collision mark: 96 changed pixels
+7/9 Test #898: gpu.blood_spurt ..................   Passed    0.63 sec
+test 899
+    Start 899: gpu.blood_spurt_private
+
+899: Test command: <workspace>/Blood2/build/debug/tests/blood_spurt_gpu_tests "<workspace>/Blood2/build/debug/tests/blood-spurt-private" "<external-data-root>"
+899: Working Directory: <workspace>/Blood2/build/debug/tests
+899: Test timeout computed to be: 120
+899: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+899: cycle 0 three drop textures: 6110 changed pixels
+899: cycle 0 original emitter collision mark: 1737 changed pixels
+899: cycle 1 three drop textures: 6110 changed pixels
+899: cycle 1 original emitter collision mark: 1737 changed pixels
+899: cycle 2 three drop textures: 6110 changed pixels
+899: cycle 2 original emitter collision mark: 1737 changed pixels
+8/9 Test #899: gpu.blood_spurt_private ..........   Passed    2.33 sec
+test 904
+    Start 904: gpu.sparks_private
+
+904: Test command: <workspace>/Blood2/build/debug/tests/spark_gpu_tests "<workspace>/Blood2/build/debug/tests/sparks-private-gpu" "<external-data-root>"
+904: Working Directory: <workspace>/Blood2/build/debug/tests
+904: Test timeout computed to be: 120
+904: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+904: cycle 0: 300 source particles, red pixels 1107, yellow pixels 27, expiry clears GPU image
+904: cycle 1: 300 source particles, red pixels 1107, yellow pixels 27, expiry clears GPU image
+904: cycle 2: 300 source particles, red pixels 1107, yellow pixels 27, expiry clears GPU image
+9/9 Test #904: gpu.sparks_private ...............   Passed    2.32 sec
+
+The following tests passed:
+	gpu.mouse_combat
+	gpu.corpse_clearance
+	gpu.level_change
+	gpu.death_effects
+	gpu.blood_splat_alpha
+	gpu.blood_splat_private
+	gpu.blood_spurt
+	gpu.blood_spurt_private
+	gpu.sparks_private
+
+100% tests passed, 0 tests failed out of 9
+
+Label Time Summary:
+blood_splats       =   3.66 sec*proc (2 tests)
+blood_spurts       =   2.96 sec*proc (2 tests)
+death_effects      =   1.44 sec*proc (1 test)
+gpu                =  76.19 sec*proc (9 tests)
+player_controls    =  56.93 sec*proc (2 tests)
+private            =  74.82 sec*proc (7 tests)
+sparks             =   2.32 sec*proc (1 test)
+world              =   8.88 sec*proc (1 test)
+
+Total Test time (real) =  76.21 sec

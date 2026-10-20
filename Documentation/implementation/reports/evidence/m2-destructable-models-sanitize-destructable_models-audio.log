@@ -1,0 +1,14 @@
+657/659 Testing: destructable_models.audio
+657/659 Test: destructable_models.audio
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable_model_tests" "audio" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable-model-audio"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"destructable_models.audio" start time: Oct 17 05:14 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_models.audio" end time: Oct 17 05:15 CEST
+"destructable_models.audio" time elapsed: 00:00:00
+----------------------------------------------------------

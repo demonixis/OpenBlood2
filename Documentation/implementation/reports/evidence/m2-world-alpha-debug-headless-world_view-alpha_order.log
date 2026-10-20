@@ -1,0 +1,14 @@
+343/630 Testing: world_view.alpha_order
+343/630 Test: world_view.alpha_order
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_view_tests" "alpha_order"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"world_view.alpha_order" start time: Oct 17 00:37 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.alpha_order" end time: Oct 17 00:37 CEST
+"world_view.alpha_order" time elapsed: 00:00:00
+----------------------------------------------------------

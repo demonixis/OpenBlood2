@@ -1,0 +1,14 @@
+480/481 Testing: ai_hit.lifetime
+480/481 Test: ai_hit.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_hit_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_hit.lifetime" start time: Oct 16 15:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.lifetime" end time: Oct 16 15:34 CEST
+"ai_hit.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

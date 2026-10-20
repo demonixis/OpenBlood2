@@ -1,0 +1,64 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 187: pickups.defaults
+ 1/23 Test #187: pickups.defaults .................   Passed    0.02 sec
+      Start 188: pickups.ammunition
+ 2/23 Test #188: pickups.ammunition ...............   Passed    0.02 sec
+      Start 189: pickups.statistics
+ 3/23 Test #189: pickups.statistics ...............   Passed    0.02 sec
+      Start 190: pickups.protocol
+ 4/23 Test #190: pickups.protocol .................   Passed    0.02 sec
+      Start 191: pickups.contact
+ 5/23 Test #191: pickups.contact ..................   Passed    0.02 sec
+      Start 192: pickups.spawning
+ 6/23 Test #192: pickups.spawning .................   Passed    0.02 sec
+      Start 193: pickups.rejection
+ 7/23 Test #193: pickups.rejection ................   Passed    0.02 sec
+      Start 194: pickups.callbacks
+ 8/23 Test #194: pickups.callbacks ................   Passed    0.02 sec
+      Start 195: pickups.resources
+ 9/23 Test #195: pickups.resources ................   Passed    0.02 sec
+      Start 196: pickups.catalog
+10/23 Test #196: pickups.catalog ..................   Passed    4.09 sec
+      Start 384: ai_perception.factions
+11/23 Test #384: ai_perception.factions ...........   Passed    0.00 sec
+      Start 385: ai_perception.selection
+12/23 Test #385: ai_perception.selection ..........   Passed    0.00 sec
+      Start 386: ai_perception.visibility
+13/23 Test #386: ai_perception.visibility .........   Passed    0.00 sec
+      Start 387: ai_perception.hints
+14/23 Test #387: ai_perception.hints ..............   Passed    0.00 sec
+      Start 388: ai_perception.stimuli
+15/23 Test #388: ai_perception.stimuli ............   Passed    0.00 sec
+      Start 389: ai_perception.retaliation
+16/23 Test #389: ai_perception.retaliation ........   Passed    0.00 sec
+      Start 390: ai_perception.opportunity
+17/23 Test #390: ai_perception.opportunity ........   Passed    0.00 sec
+      Start 391: ai_perception.failures
+18/23 Test #391: ai_perception.failures ...........   Passed    0.00 sec
+      Start 392: ai_perception.lifetime
+19/23 Test #392: ai_perception.lifetime ...........   Passed    0.00 sec
+      Start 393: ai_perception.catalog
+20/23 Test #393: ai_perception.catalog ............   Passed    0.22 sec
+      Start 394: ai_perception.subway
+21/23 Test #394: ai_perception.subway .............   Passed    0.90 sec
+      Start 505: ai_runtime.ammo_receive
+22/23 Test #505: ai_runtime.ammo_receive ..........   Passed    0.00 sec
+      Start 506: ai_runtime.ammo_search
+23/23 Test #506: ai_runtime.ammo_search ...........***Failed    0.00 sec
+ammo_search:184: a->m_MoveObj.path().size() == 1 && a->AI_Update() && a->Metacmd == 3
+
+
+96% tests passed, 1 tests failed out of 23
+
+Label Time Summary:
+ai_perception    =   1.15 sec*proc (11 tests)
+ai_runtime       =   0.01 sec*proc (2 tests)
+headless         =   5.41 sec*proc (23 tests)
+pickups          =   4.25 sec*proc (10 tests)
+private          =   5.21 sec*proc (3 tests)
+
+Total Test time (real) =   5.42 sec
+
+The following tests FAILED:
+	506 - ai_runtime.ammo_search (Failed)                   ai_runtime headless
+Errors while running CTest

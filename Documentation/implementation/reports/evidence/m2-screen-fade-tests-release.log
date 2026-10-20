@@ -1,0 +1,163 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start 672: player_controls.combat
+      Start 931: coverage.private
+ 1/69 Test #672: player_controls.combat .............   Passed    1.59 sec
+      Start 636: object_particles.private
+ 2/69 Test #636: object_particles.private ...........   Passed    0.90 sec
+      Start 621: explosion_rings.private
+ 3/69 Test #621: explosion_rings.private ............***Failed    0.06 sec
+private_world:310: g.step(.11)
+
+      Start 673: player_controls.corpse_clearance
+ 4/69 Test #931: coverage.private ...................   Passed    2.57 sec
+      Start 597: sprite_view.subway
+ 5/69 Test #597: sprite_view.subway .................   Passed    0.14 sec
+      Start  44: world.level_change_private
+ 6/69 Test  #44: world.level_change_private .........   Passed    0.53 sec
+      Start 674: player_controls.private
+ 7/69 Test #674: player_controls.private ............   Passed    0.56 sec
+      Start 922: hud.private
+ 8/69 Test #922: hud.private ........................   Passed    0.14 sec
+      Start 929: coverage.catalog
+ 9/69 Test #929: coverage.catalog ...................   Passed    0.05 sec
+      Start  45: world.destination_trial_private
+10/69 Test  #45: world.destination_trial_private ....   Passed    0.51 sec
+      Start  27: world.surface_effects
+11/69 Test  #27: world.surface_effects ..............   Passed    0.02 sec
+      Start  46: world.destination_private
+12/69 Test #673: player_controls.corpse_clearance ...   Passed    2.15 sec
+      Start  28: world.destination_trials
+13/69 Test  #28: world.destination_trials ...........   Passed    0.01 sec
+      Start 588: player_restore.private
+14/69 Test  #46: world.destination_private ..........   Passed    0.25 sec
+      Start 596: sprite_view.failures
+15/69 Test #596: sprite_view.failures ...............   Passed    0.01 sec
+      Start  26: world.level_change
+16/69 Test  #26: world.level_change .................   Passed    0.01 sec
+      Start  31: world.destination_lifetime
+17/69 Test  #31: world.destination_lifetime .........   Passed    0.00 sec
+      Start  40: world.mutations
+18/69 Test  #40: world.mutations ....................   Passed    0.00 sec
+      Start 620: explosion_rings.session
+19/69 Test #620: explosion_rings.session ............   Passed    0.00 sec
+      Start  33: world.sound_entries
+20/69 Test  #33: world.sound_entries ................   Passed    0.00 sec
+      Start  32: world.sprite_entries
+21/69 Test  #32: world.sprite_entries ...............   Passed    0.00 sec
+      Start 632: object_particles.emission
+22/69 Test #632: object_particles.emission ..........   Passed    0.00 sec
+      Start 619: explosion_rings.failures
+23/69 Test #619: explosion_rings.failures ...........   Passed    0.00 sec
+      Start 635: object_particles.session
+24/69 Test #635: object_particles.session ...........   Passed    0.00 sec
+      Start  30: world.destination_schema
+25/69 Test  #30: world.destination_schema ...........   Passed    0.00 sec
+      Start 633: object_particles.stopping
+26/69 Test #633: object_particles.stopping ..........   Passed    0.00 sec
+      Start  29: world.destination_messages
+27/69 Test  #29: world.destination_messages .........   Passed    0.00 sec
+      Start 617: explosion_rings.lifecycle
+28/69 Test #617: explosion_rings.lifecycle ..........   Passed    0.00 sec
+      Start 634: object_particles.failures
+29/69 Test #634: object_particles.failures ..........   Passed    0.00 sec
+      Start  47: world.private
+30/69 Test #588: player_restore.private .............   Passed    0.16 sec
+      Start 595: sprite_view.geometry
+31/69 Test #595: sprite_view.geometry ...............   Passed    0.00 sec
+      Start  41: world.session_lifecycle
+32/69 Test  #41: world.session_lifecycle ............   Passed    0.00 sec
+      Start 618: explosion_rings.recipes
+33/69 Test #618: explosion_rings.recipes ............   Passed    0.00 sec
+      Start  36: world.resource_mount
+34/69 Test  #36: world.resource_mount ...............   Passed    0.00 sec
+      Start 616: explosion_rings.motion
+35/69 Test #616: explosion_rings.motion .............   Passed    0.00 sec
+      Start 670: player_controls.gates
+36/69 Test #670: player_controls.gates ..............   Passed    0.00 sec
+      Start  43: world.original_trigger
+37/69 Test  #43: world.original_trigger .............   Passed    0.00 sec
+      Start  39: world.world_rejection
+38/69 Test  #39: world.world_rejection ..............   Passed    0.00 sec
+      Start 668: player_controls.keys
+39/69 Test #668: player_controls.keys ...............   Passed    0.00 sec
+      Start  38: world.world_geometry
+40/69 Test  #38: world.world_geometry ...............   Passed    0.00 sec
+      Start 669: player_controls.mouse
+41/69 Test #669: player_controls.mouse ..............   Passed    0.00 sec
+      Start  37: world.world_properties
+42/69 Test  #37: world.world_properties .............   Passed    0.00 sec
+      Start  35: world.rez_rejection
+43/69 Test  #35: world.rez_rejection ................   Passed    0.00 sec
+      Start  42: world.session_messages
+44/69 Test  #42: world.session_messages .............   Passed    0.00 sec
+      Start 671: player_controls.entry
+45/69 Test #671: player_controls.entry ..............   Passed    0.00 sec
+      Start  34: world.rez_structure
+46/69 Test  #34: world.rez_structure ................   Passed    0.00 sec
+      Start 930: coverage.observations
+47/69 Test #930: coverage.observations ..............   Passed    0.00 sec
+      Start 921: hud.session
+48/69 Test #921: hud.session ........................   Passed    0.00 sec
+      Start 920: hud.input
+49/69 Test #920: hud.input ..........................   Passed    0.00 sec
+      Start 919: hud.values
+50/69 Test #919: hud.values .........................   Passed    0.00 sec
+      Start 585: player_restore.roundtrip
+51/69 Test #585: player_restore.roundtrip ...........   Passed    0.00 sec
+      Start 586: player_restore.failures
+52/69 Test #586: player_restore.failures ............   Passed    0.00 sec
+      Start 587: player_restore.lifetime
+53/69 Test #587: player_restore.lifetime ............   Passed    0.00 sec
+      Start   1: objects.builtin_model
+54/69 Test   #1: objects.builtin_model ..............   Passed    0.00 sec
+      Start  11: objects.unsupported_teardown
+55/69 Test  #11: objects.unsupported_teardown .......   Passed    0.00 sec
+      Start  12: objects.creation_failures
+56/69 Test  #12: objects.creation_failures ..........   Passed    0.00 sec
+      Start  10: objects.messages_strings
+57/69 Test  #10: objects.messages_strings ...........   Passed    0.00 sec
+      Start   2: objects.original_objects
+58/69 Test  #47: world.private ......................   Passed    0.10 sec
+      Start   4: objects.reasons_properties
+59/69 Test   #2: objects.original_objects ...........   Passed    0.00 sec
+      Start   8: objects.handles_selection
+60/69 Test   #4: objects.reasons_properties .........   Passed    0.00 sec
+      Start   5: objects.scheduling
+61/69 Test   #8: objects.handles_selection ..........   Passed    0.00 sec
+      Start   7: objects.aggregate_dispatch
+62/69 Test   #5: objects.scheduling .................   Passed    0.00 sec
+      Start   3: objects.nested_creation
+63/69 Test   #7: objects.aggregate_dispatch .........   Passed    0.00 sec
+      Start   9: objects.links_lists
+64/69 Test   #3: objects.nested_creation ............   Passed    0.00 sec
+      Start   6: objects.deferred_removal
+65/69 Test   #9: objects.links_lists ................   Passed    0.00 sec
+      Start 932: screen_fade.values
+66/69 Test   #6: objects.deferred_removal ...........   Passed    0.00 sec
+      Start 933: screen_fade.session
+67/69 Test #932: screen_fade.values .................   Passed    0.00 sec
+      Start 934: screen_fade.private
+68/69 Test #933: screen_fade.session ................   Passed    0.00 sec
+69/69 Test #934: screen_fade.private ................   Passed    4.36 sec
+
+99% tests passed, 1 tests failed out of 69
+
+Label Time Summary:
+explosion_rings     =   0.08 sec*proc (6 tests)
+headless            =  14.25 sec*proc (69 tests)
+hud                 =   0.15 sec*proc (4 tests)
+object_particles    =   0.91 sec*proc (5 tests)
+objects             =   0.02 sec*proc (12 tests)
+player_controls     =   4.31 sec*proc (7 tests)
+player_restore      =   0.17 sec*proc (4 tests)
+private             =  14.04 sec*proc (14 tests)
+screen_fade         =   4.37 sec*proc (3 tests)
+services            =   2.62 sec*proc (3 tests)
+sprite_view         =   0.15 sec*proc (3 tests)
+world               =   1.46 sec*proc (22 tests)
+
+Total Test time (real) =   9.33 sec
+
+The following tests FAILED:
+	621 - explosion_rings.private (Failed)                  explosion_rings headless private
+Errors while running CTest

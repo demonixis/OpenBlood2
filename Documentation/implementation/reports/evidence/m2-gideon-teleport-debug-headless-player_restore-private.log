@@ -1,0 +1,180 @@
+542/683 Testing: player_restore.private
+542/683 Test: player_restore.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_restore_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"player_restore.private" start time: Oct 17 02:47 CEST
+Output:
+----------------------------------------------------------
+cycle=0 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+cycle=1 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+cycle=2 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+<end of output>
+Test time =   1.53 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.private" end time: Oct 17 02:47 CEST
+"player_restore.private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 17 02:47 CEST
+
+ai_escape =   0.29 sec*proc
+
+ai_fire =   3.39 sec*proc
+
+ai_follow =   1.29 sec*proc
+
+ai_hit =   0.25 sec*proc
+
+ai_keys =   7.78 sec*proc
+
+ai_locomotion =   0.28 sec*proc
+
+ai_navigation =   0.97 sec*proc
+
+ai_perception =   1.22 sec*proc
+
+ai_recovery =   0.29 sec*proc
+
+ai_runtime =   7.77 sec*proc
+
+ai_script =   0.71 sec*proc
+
+ai_sight =   1.24 sec*proc
+
+ai_state =  13.89 sec*proc
+
+ai_target =   1.24 sec*proc
+
+ai_trigger =   0.97 sec*proc
+
+attachments =   1.48 sec*proc
+
+brushes =  11.61 sec*proc
+
+cameras =   9.58 sec*proc
+
+character =   7.99 sec*proc
+
+character_audio =  12.56 sec*proc
+
+character_motion =   0.31 sec*proc
+
+character_nodes =   1.49 sec*proc
+
+cinematics =   5.32 sec*proc
+
+cli =   0.05 sec*proc
+
+config =   0.01 sec*proc
+
+containers =   9.92 sec*proc
+
+corpses =   0.29 sec*proc
+
+destructable_state =   1.42 sec*proc
+
+doors =  10.19 sec*proc
+
+energy =   2.60 sec*proc
+
+exits =   3.42 sec*proc
+
+explosion_flames =   3.99 sec*proc
+
+explosion_fragments =   8.36 sec*proc
+
+explosion_lights =   3.03 sec*proc
+
+explosion_models =   1.44 sec*proc
+
+explosion_rings =   3.81 sec*proc
+
+explosion_sprites =   1.52 sec*proc
+
+explosions =   0.05 sec*proc
+
+gideon_combat =   0.25 sec*proc
+
+gideon_teleport =   0.19 sec*proc
+
+headless = 369.05 sec*proc
+
+interaction =   7.38 sec*proc
+
+inventory_state =   1.36 sec*proc
+
+keyframes =  15.97 sec*proc
+
+lights =   4.67 sec*proc
+
+locomotion =   4.40 sec*proc
+
+model_view =   1.10 sec*proc
+
+movement =  17.58 sec*proc
+
+naga =   2.55 sec*proc
+
+object_particles =  12.25 sec*proc
+
+objectives =   4.33 sec*proc
+
+objects =   0.04 sec*proc
+
+paths =   1.53 sec*proc
+
+pickups =   4.68 sec*proc
+
+player =   2.70 sec*proc
+
+player_controls =   5.02 sec*proc
+
+player_keepalive =   3.20 sec*proc
+
+player_restore =   1.57 sec*proc
+
+player_state =   1.44 sec*proc
+
+private = 364.56 sec*proc
+
+pushables =   0.08 sec*proc
+
+randomsound =   5.01 sec*proc
+
+sceneexplosion =   4.78 sec*proc
+
+services =   2.88 sec*proc
+
+session_playback =  13.69 sec*proc
+
+shield =   2.57 sec*proc
+
+sound =   5.40 sec*proc
+
+sprite_view =   1.41 sec*proc
+
+sprites =   8.34 sec*proc
+
+texture =   2.58 sec*proc
+
+triggers =  10.48 sec*proc
+
+weapon_audio =   1.43 sec*proc
+
+weapon_drops =   0.22 sec*proc
+
+weapon_impacts =  13.93 sec*proc
+
+weapon_sprites =   3.05 sec*proc
+
+weapons =  42.26 sec*proc
+
+wind =   2.68 sec*proc
+
+world =   9.79 sec*proc
+
+world_view =   1.04 sec*proc
+
+worldpaths =   3.20 sec*proc
+

@@ -1,0 +1,49 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 891
+    Start 891: gpu.blood_splat_alpha
+
+891: Test command: <workspace>/Blood2/build/debug/tests/blood_splat_gpu_tests "<workspace>/Blood2/build/debug/tests/blood-splat-alpha"
+891: Working Directory: <workspace>/Blood2/build/debug/tests
+891: Test timeout computed to be: 30
+891: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+891: Original blood splat tint/Term alpha: 20000 exact opaque-texel blends
+1/2 Test #891: gpu.blood_splat_alpha ............   Passed    2.04 sec
+test 892
+    Start 892: gpu.blood_splat_private
+
+892: Test command: <workspace>/Blood2/build/debug/tests/blood_splat_gpu_tests "<workspace>/Blood2/build/debug/tests/blood-splat-private" "<external-data-root>"
+892: Working Directory: <workspace>/Blood2/build/debug/tests
+892: Test timeout computed to be: 90
+892: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+892: Original blood splat tint/Term alpha: 20000 exact opaque-texel blends
+892: Private cycle 0 variant 1 SpriteTextures\blood1.dtx changed pixels 11631
+892: Private cycle 0 variant 2 SpriteTextures\blood2.dtx changed pixels 13056
+892: Private cycle 0 variant 3 SpriteTextures\blood3.dtx changed pixels 13942
+892: Private cycle 1 variant 1 SpriteTextures\blood1.dtx changed pixels 11940
+892: Private cycle 1 variant 2 SpriteTextures\blood2.dtx changed pixels 12822
+892: Private cycle 1 variant 3 SpriteTextures\blood3.dtx changed pixels 14186
+892: Private cycle 2 variant 1 SpriteTextures\blood1.dtx changed pixels 12167
+892: Private cycle 2 variant 2 SpriteTextures\blood2.dtx changed pixels 12933
+892: Private cycle 2 variant 3 SpriteTextures\blood3.dtx changed pixels 14013
+2/2 Test #892: gpu.blood_splat_private ..........   Passed    1.84 sec
+
+The following tests passed:
+	gpu.blood_splat_alpha
+	gpu.blood_splat_private
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+blood_splats    =   3.89 sec*proc (2 tests)
+gpu             =   3.89 sec*proc (2 tests)
+private         =   1.84 sec*proc (1 test)
+
+Total Test time (real) =   3.90 sec

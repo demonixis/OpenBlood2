@@ -1,0 +1,164 @@
+617/619 Testing: weapon_sprites.private
+617/619 Test: weapon_sprites.private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon_sprite_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"weapon_sprites.private" start time: Oct 16 23:54 CEST
+Output:
+----------------------------------------------------------
+Private cycle 0: 32 original diagnostic wood recipes, 64 actual SPR/DTX quads; source removal and unload passed
+Private cycle 1: 32 original diagnostic wood recipes, 64 actual SPR/DTX quads; source removal and unload passed
+Private cycle 2: 32 original diagnostic wood recipes, 64 actual SPR/DTX quads; source removal and unload passed
+<end of output>
+Test time =   0.26 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_sprites.private" end time: Oct 16 23:54 CEST
+"weapon_sprites.private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 23:54 CEST
+
+ai_escape =   0.05 sec*proc
+
+ai_fire =   0.37 sec*proc
+
+ai_follow =   0.15 sec*proc
+
+ai_hit =   0.05 sec*proc
+
+ai_keys =   0.80 sec*proc
+
+ai_locomotion =   0.05 sec*proc
+
+ai_navigation =   0.11 sec*proc
+
+ai_perception =   0.13 sec*proc
+
+ai_recovery =   0.06 sec*proc
+
+ai_runtime =   0.75 sec*proc
+
+ai_script =   0.08 sec*proc
+
+ai_sight =   0.12 sec*proc
+
+ai_state =   1.03 sec*proc
+
+ai_target =   0.13 sec*proc
+
+ai_trigger =   0.11 sec*proc
+
+attachments =   0.15 sec*proc
+
+brushes =   0.77 sec*proc
+
+cameras =   0.59 sec*proc
+
+character =   0.78 sec*proc
+
+character_audio =   1.09 sec*proc
+
+character_motion =   0.05 sec*proc
+
+character_nodes =   0.14 sec*proc
+
+cinematics =   0.47 sec*proc
+
+cli =   0.05 sec*proc
+
+config =   0.02 sec*proc
+
+containers =   0.75 sec*proc
+
+corpses =   0.04 sec*proc
+
+destructable_state =   0.13 sec*proc
+
+doors =   0.67 sec*proc
+
+exits =   0.36 sec*proc
+
+explosion_flames =   0.38 sec*proc
+
+explosion_fragments =   0.77 sec*proc
+
+explosion_lights =   0.37 sec*proc
+
+explosion_models =   0.14 sec*proc
+
+explosion_rings =   0.44 sec*proc
+
+explosion_sprites =   0.14 sec*proc
+
+explosions =   0.02 sec*proc
+
+headless =  28.58 sec*proc
+
+interaction =   0.55 sec*proc
+
+inventory_state =   0.13 sec*proc
+
+keyframes =   1.01 sec*proc
+
+lights =   0.33 sec*proc
+
+locomotion =   0.53 sec*proc
+
+model_view =   0.11 sec*proc
+
+movement =   1.42 sec*proc
+
+object_particles =   0.91 sec*proc
+
+objectives =   0.29 sec*proc
+
+objects =   0.03 sec*proc
+
+paths =   0.15 sec*proc
+
+pickups =   0.34 sec*proc
+
+player =   0.26 sec*proc
+
+player_keepalive =   0.30 sec*proc
+
+player_restore =   0.15 sec*proc
+
+player_state =   0.13 sec*proc
+
+private =  27.11 sec*proc
+
+pushables =   0.03 sec*proc
+
+randomsound =   0.40 sec*proc
+
+sceneexplosion =   0.34 sec*proc
+
+services =   0.29 sec*proc
+
+sound =   0.39 sec*proc
+
+sprite_view =   0.13 sec*proc
+
+sprites =   0.58 sec*proc
+
+texture =   0.14 sec*proc
+
+triggers =   0.67 sec*proc
+
+weapon_audio =   0.13 sec*proc
+
+weapon_drops =   0.04 sec*proc
+
+weapon_impacts =   1.25 sec*proc
+
+weapon_sprites =   0.28 sec*proc
+
+weapons =   3.55 sec*proc
+
+world =   0.97 sec*proc
+
+world_view =   0.10 sec*proc
+
+worldpaths =   0.36 sec*proc
+

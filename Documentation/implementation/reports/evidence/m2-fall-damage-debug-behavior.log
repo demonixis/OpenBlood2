@@ -1,0 +1,56 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 975
+    Start 975: fall_damage.rules
+
+975: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/fall_damage_tests "rules" "/home/yann/projects/lithtech/Blood2/build/debug/tests/fall-damage-fixtures/rules"
+975: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+975: Test timeout computed to be: 30
+1/4 Test #975: fall_damage.rules ................   Passed    0.04 sec
+test 976
+    Start 976: fall_damage.physics
+
+976: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/fall_damage_tests "physics" "/home/yann/projects/lithtech/Blood2/build/debug/tests/fall-damage-fixtures/physics"
+976: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+976: Test timeout computed to be: 30
+2/4 Test #976: fall_damage.physics ..............   Passed    0.01 sec
+test 977
+    Start 977: fall_damage.player
+
+977: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/fall_damage_tests "player" "/home/yann/projects/lithtech/Blood2/build/debug/tests/fall-damage-fixtures/player"
+977: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+977: Test timeout computed to be: 30
+3/4 Test #977: fall_damage.player ...............   Passed    0.04 sec
+test 978
+    Start 978: fall_damage.private
+
+978: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/fall_damage_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+978: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+978: Test timeout computed to be: 120
+978: 30 Hz: force=6008.45 incomingY=-2403.38 rawDamage=120.338 corpse=1
+978: 60 Hz: force=6008.45 incomingY=-2403.38 rawDamage=120.338 corpse=1
+978: 120 Hz: force=6008.45 incomingY=-2403.38 rawDamage=120.338 corpse=1
+4/4 Test #978: fall_damage.private ..............   Passed    0.67 sec
+
+The following tests passed:
+	fall_damage.rules
+	fall_damage.physics
+	fall_damage.player
+	fall_damage.private
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+fall_damage    =   0.76 sec*proc (4 tests)
+headless       =   0.76 sec*proc (4 tests)
+physics        =   0.76 sec*proc (4 tests)
+private        =   0.67 sec*proc (1 test)
+
+Total Test time (real) =   0.78 sec

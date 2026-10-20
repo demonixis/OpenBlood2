@@ -1,0 +1,1365 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index a767f4f..801f132 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -480,3 +480,7 @@ The [weapon fire-audio continuation](../Documentation/Implementation/M2_WEAPON_A
+ Read [contracts](docs/WEAPON_AUDIO_CONTRACTS.md). Preserve four slots, first-empty/earliest-end ordering, playback-before-alert even on missing WAV,
+ all-inventory cleanup and dry-fire silence. Refresh rays after eligible hearing callbacks, defer removal and expose interrupted shots.
+ Reverb/priority arbitration and other required services remain unavailable; safe NEW_LEVEL and M2 stay open.
++
++The [weapon impact continuation](../Documentation/Implementation/M2_WEAPON_IMPACTS.md) connects original vector continuation, selected material WAVs and impact hearing.
++Read [contracts](docs/WEAPON_IMPACT_CONTRACTS.md). Preserve source branch order, raw versus stopping material, fixed endpoint, one-unit advance and B2_LITE variants.
++Keep the 64-contact bound, explicit partial failures, checked callback lifetime and detached voices. Impact visuals/decals, safe NEW_LEVEL and M2 remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 15498a3..b9be8ab 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -49,7 +49,7 @@ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/origin
+     src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_exits.cpp src/game/original/ExitTrigger.cpp src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/PlayerSave.cpp src/game/original/CharacterNodes.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+-    src/game/original/InventoryMgr.cpp src/game/original/InventorySave.cpp src/game/original/Weapon.cpp src/game/original/WeaponSound.cpp src/game/original/ViewWeapon.cpp)
++    src/game/original/InventoryMgr.cpp src/game/original/InventorySave.cpp src/game/original/Weapon.cpp src/game/original/WeaponSound.cpp src/game/original/WeaponVector.cpp src/game/original/WeaponFX.cpp src/game/original/ViewWeapon.cpp)
+ target_link_libraries(blood2_game PUBLIC engine)
+ 
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableSave.cpp src/game/original/DestructableBrush.cpp
+diff --git a/README.md b/README.md
+index 6f7dbe6..cf9ff2f 100644
+--- a/README.md
++++ b/README.md
+@@ -524,3 +524,6 @@ Earlier callback-validation omissions are superseded for this explicit rehearsal
+ 
+ The [weapon fire-audio continuation](../Documentation/Implementation/M2_WEAPON_AUDIO.md) connects original Beretta/knife WAV playback, four retained voices and automatic NPC hearing, with hidden-UI lifetime checks and inspection.
+ Earlier fire-audio omissions are superseded for these two weapons; reverb, safe NEW_LEVEL and the complete M2 gate remain open.
++
++The [weapon impact continuation](../Documentation/Implementation/M2_WEAPON_IMPACTS.md) connects original glass/FireThrough/liquid vector rules, material WAV playback and impact hearing, with ordered contact inspection.
++Earlier impact-audio omissions are superseded for Beretta/knife; impact visuals, safe NEW_LEVEL and the actual M2 gate remain open.
+diff --git a/docs/AI_TRIGGER_CONTRACTS.md b/docs/AI_TRIGGER_CONTRACTS.md
+index 40bf6ed..851b3be 100644
+--- a/docs/AI_TRIGGER_CONTRACTS.md
++++ b/docs/AI_TRIGGER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI trigger commands and hearing
+ 
++> Extended by [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md): original multi-hit
++> material rules, selected impact audio and automatic impact hearing now execute.
++> Earlier impact-audio omissions are historical; visuals and the M2 gate remain open.
++
+ > Extended by [weapon fire-audio contracts](WEAPON_AUDIO_CONTRACTS.md): Beretta/knife
+ > retained playback and automatic gunfire hearing now execute; source weapon voices
+ > survive disposable destination rehearsal. Earlier fire-audio omissions are historical.
+diff --git a/docs/M2_WEAPON_IMPACT_SOURCES.json b/docs/M2_WEAPON_IMPACT_SOURCES.json
+new file mode 100644
+index 0000000..786c52e
+--- /dev/null
++++ b/docs/M2_WEAPON_IMPACT_SOURCES.json
+@@ -0,0 +1,83 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "e211d4e5d623f5f1ba26218ca5439c6e0430c65c",
++  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
++      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
++      "use": "FireVector 660-789; UpdateWeaponFX 580-648 selected sound/mark conditions; AddImpact 1891-1914 normal offset; AlignFireVector 1095-1138 liquid filter"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
++      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
++      "use": "GetSurfaceType 223-249; existing SendSoundTrigger impact broadcast"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
++      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
++      "use": "IsBrushObject/IsDoor class tests"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/VolumeBrushTypes.cpp",
++      "sha256": "f38190b88a30be71b587d0758093b85f4d0102631edb5eb7564cc91f7efa3021",
++      "use": "LiquidFilterFn 35-47 excludes all VolumeBrush classes"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/VolumeBrush.cpp",
++      "sha256": "ef2392f8e42f9f8185e94d0712a91c96c3a1dc89f5615ef00ff4f31bcfb6a94f",
++      "use": "Initial user flags 407-410 do not assign LIQUID material"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/BaseCharacter.cpp",
++      "sha256": "0002f599c46971e006829e2c41405d872e8fbb08d8ff7590cadd50d91e14aa95",
++      "use": "Default flesh surface 44 and initial user-flag high byte 85-89"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
++      "sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
++      "use": "Raw user-flag surface and GetSurfaceType fallback"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/WeaponFX.cpp",
++      "sha256": "95230fcffd888751528e1a9f1d4353844ebfce5dbf5ef0a46cb0cf0a8a1b0e25",
++      "use": "PlayImpactSound 977-992; GetImpactSound 1104-1152"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
++      "sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
++      "use": "PlaySoundFromPos defaults, spatial radii and reverb request"
++    },
++    {
++      "path": "sources/blood2/Shared/SharedDefs.h",
++      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "use": "Unconditional B2_LITE/NRES and surface identifiers"
++    },
++    {
++      "path": "sources/blood2/Shared/WeaponDefs.h",
++      "sha256": "9a16f7a9f5fe8c57be73aac97bbeb87e712725bc856b1fb110c531875fa655ca",
++      "use": "Ammo identifiers and supported weapon definitions"
++    },
++    {
++      "path": "sources/blood2/Shared/SoundTypes.h",
++      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
++      "use": "MISC_LOW priority"
++    },
++    {
++      "path": "sources/lithtech/runtime/world/src/fullintersectline.cpp",
++      "sha256": "f199f999a63986325675d9cb1bf2bdede98942e03cf0725dab937f506f6f3409",
++      "use": "Later-generation reference only: SOLID|RAYHIT and CHECK_FROM_POINT_INSIDE_OBJECTS policy 613-647"
++    }
++  ],
++  "adaptations": [
++    "Typed multi-contact damage and checked callback lifetime; maximum 64 contacts and forward-progress guard",
++    "SOLID|RAYHIT and explicit interior-entry policy, informed by a later engine reference; no retail parity claim",
++    "Owned impact strings and per-weapon portable client FX RNG separate from gameplay RNG",
++    "Detached decoded WAV audio with truthful failures; reverb/priority arbitration unavailable",
++    "Historical read-only inspection; original default character flesh surface only, lower user flags preserved"
++  ],
++  "remaining": [
++    "Weapon impact visuals, decals, visual random ordering and other weapons",
++    "Gideon, required world services/illumination, safe NEW_LEVEL, actual M2 acceptance"
++  ]
++}
+diff --git a/docs/MODEL_AND_COLLISION_CONTRACTS.md b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+index 9b8ae3b..c31ff21 100644
+--- a/docs/MODEL_AND_COLLISION_CONTRACTS.md
++++ b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # M2 Model and Collision Services
+ 
++> Extended by [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md): original multi-hit
++> material rules, selected impact audio and automatic impact hearing now execute.
++> Earlier impact-audio omissions are historical; visuals and the M2 gate remain open.
++
+ > Extended by [character animation contracts](CHARACTER_ANIMATION_CONTRACTS.md):
+ > original CAnim_Sound tables now drive locomotion; current model node queries and
+ > original sphere measurements are inspectable. AI/damage-localization callers
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 35cb8d2..123838c 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -805,3 +805,11 @@ original InventoryMgr all-slot scheduling and ObjectUtilities attached sound/hea
+ ordering. See [ledger](M2_WEAPON_AUDIO_SOURCES.json) and [contracts](WEAPON_AUDIO_CONTRACTS.md).
+ Typed decoded duration, checked voice IDs, callback-aware final rays and explicit
+ interrupted shots are preservation adaptations. No reference code/assets or pins changed.
++
++## Original vector impacts and material audio
++
++Selected Weapon.cpp FireVector/AddImpact, WeaponFX.cpp impact sound methods and
++BaseCharacter flesh flags are integrated. See [ledger](M2_WEAPON_IMPACT_SOURCES.json)
++and [contracts](WEAPON_IMPACT_CONTRACTS.md). Typed bounded continuation, later-engine
++interior policy, owned client audio RNG/strings and checked callback lifetime are
++explicit adaptations. Reference sources/assets and dependency pins remain unchanged.
+diff --git a/docs/WEAPON_AUDIO_CONTRACTS.md b/docs/WEAPON_AUDIO_CONTRACTS.md
+index 4830baf..8941246 100644
+--- a/docs/WEAPON_AUDIO_CONTRACTS.md
++++ b/docs/WEAPON_AUDIO_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original weapon fire audio and hearing
+ 
++> Extended by [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md): original multi-hit
++> material rules, selected impact audio and automatic impact hearing now execute.
++> Earlier impact-audio omissions are historical; visuals and the M2 gate remain open.
++
+ Selected `CWeapon::PlayFireSound`, the sound loop in `Update`, and `KillSounds`
+ now execute for the original Beretta and Chosen Knife. See [source ledger](M2_WEAPON_AUDIO_SOURCES.json)
+ and [validation](../../Documentation/Implementation/M2_WEAPON_AUDIO.md).
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index 3ab63d6..1792ac3 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original Inventory and Vector Weapon Boundary
+ 
++> Extended by [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md): original multi-hit
++> material rules, selected impact audio and automatic impact hearing now execute.
++> Earlier impact-audio omissions are historical; visuals and the M2 gate remain open.
++
+ > Extended by [weapon fire-audio contracts](WEAPON_AUDIO_CONTRACTS.md): Beretta/knife
+ > retained playback and automatic gunfire hearing now execute; source weapon voices
+ > survive disposable destination rehearsal. Earlier fire-audio omissions are historical.
+diff --git a/docs/WEAPON_IMPACT_CONTRACTS.md b/docs/WEAPON_IMPACT_CONTRACTS.md
+new file mode 100644
+index 0000000..9f185c6
+--- /dev/null
++++ b/docs/WEAPON_IMPACT_CONTRACTS.md
+@@ -0,0 +1,87 @@
++# Original vector impacts and material audio
++
++Selected `CWeapon::FireVector`, `AddImpact` and `CWeaponFX::GetImpactSound` /
++`PlayImpactSound` now execute for Beretta/knife. See [source ledger](M2_WEAPON_IMPACT_SOURCES.json)
++and [validation](../../Documentation/Implementation/M2_WEAPON_IMPACTS.md). This extends
++[weapon](WEAPON_CONTRACTS.md), [fire audio](WEAPON_AUDIO_CONTRACTS.md) and
++[AI hearing](AI_TRIGGER_CONTRACTS.md) contracts. **M2 remains incomplete.**
++
++## Source ordering and surfaces
++
++An accepted shot uses one damage/spread sample and one ammunition deduction for
++its entire vector. Each continued contact advances one unit along the normalized
++shot direction, retaining the original endpoint/range. Source branch order matters:
++
++| Contact | Damage / hearing | Continue |
++| --- | --- | --- |
++| Any VolumeBrush | No damage or impact alert; Water/Blood/Acid request impact effects | Always |
++| Primary world except FIRETHROUGH | Impact effect then radius-200 impact alert | Glass and non-melee only |
++| Destructible brush with mark-eligible ammo (bullet/shell/BMG) | FireThrough skips everything; otherwise effect, alert, damage | FireThrough or resolved glass |
++| Door | FireThrough skips everything; otherwise effect, alert, damage | FireThrough only |
++| Other | Effect, damage, then alert unless CBaseCharacter | Never |
++
++This preserves two non-obvious source behaviors. Primary-world FIRETHROUGH falls
++through into the general branch and **stops**; it is not an invisible surface.
++Knife ammo is not mark-eligible, so a destructible brush takes the general branch
++even when FireThrough is set. Door FireThrough applies to the knife as well.
++
++Surface audio uses the raw object user-flag high byte or baked polygon texture
++flags. The brush-specific `GetSurfaceType` determines continuation, but the source
++already captured the effect surface before that fallback. Keep both values visible.
++Default liquid brushes set no LIQUID surface byte: their impact request can correctly
++produce no audio. Do not invent a water material. New CBaseCharacter initialization
++publishes its original default FLESH high byte while preserving existing lower flags;
++this does not implement the other original vision flags. Saved engine user flags
++remain authoritative on restore. Primary world has no damage aggregate or original
++actor sentinel in this port, so a general world contact records no damage delivery.
++
++## Selected client impact sound
++
++The original mapping covers stone/building, metal, wood, energy, glass, terrain,
++cloth, plastic, flesh and liquid/water. Unknown/sky/FIRETHROUGH select no resource
++and consume no random draw. The source's unconditional B2_LITE means `NRES(4)=3`:
++variants are **impact1..3**, regardless of the supplied ammo type. An owned string
++replaces mutation of an original string literal. Portable per-weapon client-effect
++randomness is separate from shot/game RNG, seeded at one; CRT/global RNG parity is
++not claimed. Missing visual branches' random draws are not reproduced.
++
++`AddImpact` offsets playback by normal * 1.25. Existing typed WAV/SDL services play
++one detached spatial voice with outer/inner radii 500/50, full volume and priority
++MISC_LOW (0). Reverb remains requested but dry; priority arbitration is unavailable.
++A missing resource records failure without suppressing damage, continuation or
++hearing. Intentional silence has no voice and is not counted as playback. Detached
++voices survive source/weapon removal, expire by sample completion and clear on unload.
++
++## Engine and lifetime adaptations
++
++Weapon rays include SOLID or RAYHIT objects. Eye alignment filters every VolumeBrush;
++the final shot does not. The new typed `SegmentStart::SkipInterior` avoids repeatedly
++hitting an enclosing volume or a thick brush after entry. Default query behavior for
++other callers is unchanged; USE retains its existing entry-only policy. This bounded
++replacement engine policy is informed by a later LithTech engine generation, not
++verified retail physics. SegmentHit now retains primary-world texture flags.
++
++At most 64 contacts are applied. Exactly 64 followed by a miss succeeds; a 65th
++contact fails explicitly. Already applied effects/ammo cannot be rolled back.
++Queries fail explicitly; forward progress and original range remain checked. Existing
++collision preflight still runs before ammo use, and gunfire-hearing callbacks still
++refresh the final ray. Impact callbacks recheck the shooter and target before damage;
++removed shooters interrupt, removed targets are recorded without stale delivery.
++General-case hearing runs after damage, so removal there must also be respected.
++Deferred object destruction and existing weapon reentrancy guards remain mandatory.
++All added state is owned by the weapon/adapter; no mutable game global is added.
++
++## Inspection and remaining work
++
++Player and AI weapon inspection shows ordered last-shot contacts, raw/stopping
++material, branch, historical target, position, damage delivery, continuation, selected
++resource, resolved voice and separate hearing/audio errors. Cumulative counts remain
++visible for unselected player weapons. Historical handles/IDs are resolved each frame;
++inspection never advances game/audio state. Last-shot collision now describes the
++last query, which may be a miss after passing glass; the ordered contact list retains
++prior hits, and `damage_delivered` means any delivery, not confirmed health loss.
++
++This is selected impact **audio and gameplay**, not complete WeaponFX. Sparks, blood,
++smoke, liquid colors/splashes, tracers, decals and their source random ordering remain
++unavailable. Other weapons, retail parity, required world services, Gideon and safe
++NEW_LEVEL still keep the actual M2 exit gate open.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 2a5ab4e..223ee22 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -1483,6 +1483,64 @@ namespace OpenBlood2
+ {
+     void Inspector::draw_weapon_sound(const CWeapon& weapon, const GameSession& game)
+     {
++        if (ImGui::TreeNodeEx("Original vector impacts", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            ImGui::TextWrapped("Last shot %zu contacts | total %llu | sounds %llu | failed %llu", weapon.impacts.size(),
++                               (unsigned long long)weapon.impact_contacts, (unsigned long long)weapon.impact_sounds,
++                               (unsigned long long)weapon.impact_sound_failures);
++            if (!weapon.impact_error.empty())
++                ImGui::TextWrapped("Impact failure: %s", weapon.impact_error.c_str());
++            for (unsigned i = 0; i < weapon.impacts.size(); ++i)
++            {
++                const auto& impact = weapon.impacts[i];
++                const char* branch = "object";
++                switch (impact.branch)
++                {
++                    case WeaponImpactBranch::World:
++                        branch = "world";
++                        break;
++                    case WeaponImpactBranch::Brush:
++                        branch = "brush";
++                        break;
++                    case WeaponImpactBranch::Door:
++                        branch = "door";
++                        break;
++                    case WeaponImpactBranch::Volume:
++                        branch = "volume";
++                        break;
++                    case WeaponImpactBranch::Other:
++                        break;
++                }
++                ImGui::PushID(static_cast<int>(i));
++                if (ImGui::TreeNode("Contact", "%u: %s / material %u / %s", i + 1, branch, impact.surface,
++                                    impact.continued ? "continue" : "stop"))
++                {
++                    const auto* object = game.objects.get(impact.hit.object);
++                    const auto* voice = game.server.audio.get(impact.effect.sound);
++                    ImGui::TextWrapped("Target: %s | stopping material %u | damage delivered %s",
++                                       object ? object->state.m_Name
++                                              : (impact.hit.object ? "removed" : "primary world"),
++                                       impact.stopping_surface, impact.damage_delivered ? "yes" : "no");
++                    ImGui::Text("Position %.2f %.2f %.2f", impact.hit.point.x, impact.hit.point.y, impact.hit.point.z);
++                    ImGui::TextWrapped("Impact audio: %s / %s", impact.effect.resource.c_str(),
++                                       voice ? (voice->done ? "complete" : "playing")
++                                             : (impact.effect.sound ? "released" : "no voice"));
++                    if (!impact.effect.error.empty())
++                        ImGui::TextWrapped("Audio failure: %s", impact.effect.error.c_str());
++                    ImGui::Text("Impact hearing: %u deliveries / %s", impact.alert.delivered,
++                                impact.alert.complete ? "complete" : "not completed");
++                    if (!impact.alert.error.empty())
++                        ImGui::TextWrapped("Hearing failure: %s", impact.alert.error.c_str());
++                    if (impact.target_removed)
++                        ImGui::TextUnformatted("Target removed by hearing before damage.");
++                    ImGui::TreePop();
++                }
++                ImGui::PopID();
++            }
++            ImGui::TextWrapped("Ordered historical contacts; resolve handles before inspection. Impact visuals, decals "
++                               "and reverb remain unavailable.");
++            ImGui::TreePop();
++        }
+         if (!ImGui::TreeNodeEx("Original weapon fire audio", ImGuiTreeNodeFlags_DefaultOpen))
+             return;
+         ImGui::TextWrapped("Attempts %llu / played %llu / failed %llu / evicted %llu / released %llu",
+@@ -1550,6 +1608,10 @@ namespace OpenBlood2
+                 ImGui::Text("%u%s", slot, inventory.m_nCurWeaponSlot == slot ? " *" : "");
+                 ImGui::TableNextColumn();
+                 ImGui::TextUnformatted(right ? right->data.m_szWeaponName : "empty");
++                if (right)
++                    ImGui::TextWrapped(
++                        "Impacts %llu / sounds %llu / failures %llu", (unsigned long long)right->impact_contacts,
++                        (unsigned long long)right->impact_sounds, (unsigned long long)right->impact_sound_failures);
+                 ImGui::TableNextColumn();
+                 ImGui::TextUnformatted(left ? left->data.m_szWeaponName : "empty");
+                 ImGui::TableNextColumn();
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index f07087b..5564d46 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -1119,11 +1119,12 @@ namespace
+                 if (options.weapons_smoke && frames == show_frame)
+                 {
+                     const auto& inv = game.server_shell.Player(game.local_client)->m_InventoryMgr;
+-                    weapon_advanced_hidden = inv.GetWeapon(1)->shots > hidden_weapon_shots &&
+-                                             inv.GetWeapon(0)->shots > 0 &&
+-                                             inv.GetWeapon(1)->sounds_played == inv.GetWeapon(1)->shots &&
+-                                             inv.GetWeapon(0)->sounds_played == inv.GetWeapon(0)->shots &&
+-                                             !inv.GetWeapon(1)->sound_failures && !inv.GetWeapon(0)->sound_failures;
++                    weapon_advanced_hidden =
++                        inv.GetWeapon(1)->shots > hidden_weapon_shots && inv.GetWeapon(0)->shots > 0 &&
++                        inv.GetWeapon(1)->sounds_played == inv.GetWeapon(1)->shots &&
++                        inv.GetWeapon(0)->sounds_played == inv.GetWeapon(0)->shots &&
++                        !inv.GetWeapon(1)->sound_failures && !inv.GetWeapon(0)->sound_failures &&
++                        inv.GetWeapon(1)->impact_sounds > 0 && !inv.GetWeapon(1)->impact_sound_failures;
+                 }
+                 if (options.weapons_smoke && frames == unload_frame)
+                 {
+@@ -1133,7 +1134,11 @@ namespace
+                                     inv.GetWeapon(1)->sounds_played == inv.GetWeapon(1)->shots &&
+                                     inv.GetWeapon(0)->sounds_played == inv.GetWeapon(0)->shots &&
+                                     !inv.GetWeapon(1)->sound_failures && !inv.GetWeapon(0)->sound_failures &&
++                                    inv.GetWeapon(1)->impact_sounds > 0 && !inv.GetWeapon(1)->impact_sound_failures &&
+                                     game.server.audio.has_output() && game.server.audio.submitted_frames > 0;
++                    spdlog::info("Weapon impacts: contacts={}, sounds={}, failures={}, hidden={}",
++                                 inv.GetWeapon(1)->impact_contacts, inv.GetWeapon(1)->impact_sounds,
++                                 inv.GetWeapon(1)->impact_sound_failures, weapon_advanced_hidden);
+                 }
+                 if (frames == hide_frame || frames == show_frame)
+                     event_ok = push_toggle(runtime.window);
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index d4c9ce1..eb178a4 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -86,7 +86,8 @@ class ServerDE : public CSBase
+     virtual OpenBlood2::SegmentResult IntersectSegment(
+         DVector from, DVector to, HOBJECT ignore, OpenBlood2::SegmentHit&, bool fire_through = false,
+         OpenBlood2::SegmentObjects objects = OpenBlood2::SegmentObjects::SolidOnly,
+-        OpenBlood2::SegmentFilter filter = OpenBlood2::SegmentFilter::None) = 0;
++        OpenBlood2::SegmentFilter filter = OpenBlood2::SegmentFilter::None,
++        OpenBlood2::SegmentStart start = OpenBlood2::SegmentStart::IncludeInterior) = 0;
+     virtual DRESULT WriteDamage(HMESSAGEWRITE, const OpenBlood2::Damage&) = 0;
+     virtual bool ReadDamage(HMESSAGEREAD, OpenBlood2::Damage&) = 0;
+     // Source adaptation: client association is a checked object handle, never a
+diff --git a/src/game/original/PlayerObj.cpp b/src/game/original/PlayerObj.cpp
+index 12eab95..779295b 100644
+--- a/src/game/original/PlayerObj.cpp
++++ b/src/game/original/PlayerObj.cpp
+@@ -21,6 +21,7 @@ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
+     {
+         auto flags = g_pServerDE->GetObjectFlags(m_hObject);
+         g_pServerDE->SetObjectFlags(m_hObject, flags | FLAG_MODELGOURAUDSHADE | FLAG_ANIMTRANSITION);
++        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (m_dwSurfType << 24));
+     }
+     if (message == MID_MODELSTRINGKEY && data && !OnStringKey(static_cast<ArgList*>(data)) &&
+         pending_model_commands.size() < 32)
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index 91b111b..e1c4a59 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -21,6 +21,7 @@ class CBaseCharacter : public B2BaseClass
+ {
+   public:
+     CBaseCharacter();
++    DDWORD m_dwSurfType = SURFTYPE_FLESH;
+     CInventoryMgr m_InventoryMgr;
+     CDestructable m_damage;
+     CMovement m_MoveObj;
+diff --git a/src/game/original/Weapon.cpp b/src/game/original/Weapon.cpp
+index 0d985d0..b02661e 100644
+--- a/src/game/original/Weapon.cpp
++++ b/src/game/original/Weapon.cpp
+@@ -34,6 +34,8 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+     if (!std::isfinite(length) || length < 1e-6f)
+         return FireResult::Invalid;
+     last_shot = {};
++    impacts.clear();
++    impact_error.clear();
+     last_shot.request = request;
+     const auto forward = vector_scale(request.direction, 1 / length);
+     // AlignRotation's world-up basis (stable vertical fallback).
+@@ -76,7 +78,9 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+             eye.y += player->eye_level;
+             auto aim = vector_add(eye, vector_scale(aim_direction, range));
+             SegmentHit aim_hit;
+-            const auto query = server->IntersectSegment(eye, aim, m_hOwner, aim_hit);
++            const auto query =
++                server->IntersectSegment(eye, aim, m_hOwner, aim_hit, false, SegmentObjects::SolidOrRayHit,
++                                         SegmentFilter::IgnoreVolumes, SegmentStart::SkipInterior);
+             if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
+             {
+                 last_shot.result = FireResult::Unavailable;
+@@ -95,7 +99,9 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+         }
+         last_shot.direction = aim_direction;
+         last_shot.end = vector_add(request.position, vector_scale(aim_direction, range));
+-        const auto query = server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, true);
++        const auto query =
++            server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, false,
++                                     SegmentObjects::SolidOrRayHit, SegmentFilter::None, SegmentStart::SkipInterior);
+         last_shot.collision = query;
+         if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
+         {
+@@ -124,23 +130,5 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+     // callbacks, resolve the final ray again rather than damage a stale/moved target.
+     if (fire_sound_alert.eligible && !trace())
+         return last_shot.result;
+-    if (last_shot.collision == SegmentResult::Hit && last_shot.hit.object)
+-    {
+-        Damage damage{last_shot.direction, last_shot.hit.point, last_shot.damage * m_pInventoryMgr->damage_multiplier,
+-                      damage_type, m_hOwner};
+-        auto message =
+-            server->StartMessageToObject(server->HandleToObject(m_hOwner), last_shot.hit.object, damage_message);
+-        if (!message)
+-            last_shot.result = FireResult::DeliveryFailed;
+-        else if (server->WriteDamage(message, damage) != DE_OK)
+-        {
+-            server->EndHMessageWrite(message);
+-            last_shot.result = FireResult::DeliveryFailed;
+-        }
+-        else if (server->EndMessage(message) != DE_OK)
+-            last_shot.result = FireResult::DeliveryFailed;
+-        else
+-            last_shot.damage_delivered = true;
+-    }
+-    return last_shot.result;
++    return FireVector();
+ }
+diff --git a/src/game/original/Weapon.h b/src/game/original/Weapon.h
+index 3f694f3..436c085 100644
+--- a/src/game/original/Weapon.h
++++ b/src/game/original/Weapon.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ #include "AISound.h"
+ #include "WeaponDefs.h"
++#include "WeaponFX.h"
+ #include "engine/audio.h"
+ #include "game/weapon_messages.h"
+ #include <array>
+@@ -26,6 +27,24 @@ struct WeaponShot
+     bool damage_delivered = false, interrupted = false;
+     FireResult result = FireResult::Invalid;
+ };
++enum class WeaponImpactBranch
++{
++    World,
++    Brush,
++    Door,
++    Volume,
++    Other
++};
++struct WeaponImpact
++{
++    OpenBlood2::SegmentHit hit;
++    DVector from{};
++    unsigned surface = 0, stopping_surface = 0;
++    WeaponImpactBranch branch = WeaponImpactBranch::Other;
++    bool continued = false, effect_requested = false, damage_delivered = false, target_removed = false;
++    CWeaponFX effect;
++    OpenBlood2::SoundAlertReport alert;
++};
+ // Selected vector-weapon path and original retained fire-sound lifecycle.
+ class CWeapon
+ {
+@@ -58,6 +77,11 @@ class CWeapon
+     }
+     float CheckAmmo() const;
+     FireResult Fire(const OpenBlood2::WeaponFire&);
++    FireResult FireVector();
++    std::vector<WeaponImpact> impacts; // Latest validated shot attempt, bounded to 64 contacts.
++    std::string impact_error;
++    std::uint64_t impact_contacts = 0, impact_sounds = 0, impact_sound_failures = 0;
++    std::minstd_rand impact_random{1}; // Separate owned client-FX randomness; never changes game/shot RNG.
+     const WeaponData& data;
+     HOBJECT m_hOwner = nullptr;
+     CInventoryMgr* m_pInventoryMgr = nullptr;
+diff --git a/src/game/original/WeaponDefs.h b/src/game/original/WeaponDefs.h
+index 3092859..abba14e 100644
+--- a/src/game/original/WeaponDefs.h
++++ b/src/game/original/WeaponDefs.h
+@@ -2,7 +2,7 @@
+ #include "basedefs_de.h"
+ // Selected original definitions; the two table entries retain every source field.
+ inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_MELEE = 17;
+-inline constexpr DBYTE TYPE_PISTOL = 2, TYPE_MELEE = 4, AMMO_NONE = 0, AMMO_BULLET = 1;
++inline constexpr DBYTE TYPE_PISTOL = 2, TYPE_MELEE = 4, AMMO_NONE = 0, AMMO_BULLET = 1, AMMO_SHELL = 2, AMMO_BMG = 3;
+ inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_KNIFE = 366;
+ // Weapon spread structure
+ typedef struct Spread_t
+diff --git a/src/game/original/WeaponFX.cpp b/src/game/original/WeaponFX.cpp
+new file mode 100644
+index 0000000..af8055e
+--- /dev/null
++++ b/src/game/original/WeaponFX.cpp
+@@ -0,0 +1,61 @@
++// Original WeaponFX.cpp PlayImpactSound (977-992), GetImpactSound (1104-1152).
++#include "WeaponFX.h"
++#include "server_de.h"
++std::string CWeaponFX::GetImpactSound(std::minstd_rand& random) const
++{
++    const char* material = nullptr;
++    switch (m_eSurfaceType)
++    {
++        case SURFTYPE_STONE:
++        case SURFTYPE_BUILDING:
++            material = "stone";
++            break;
++        case SURFTYPE_METAL:
++            material = "metal";
++            break;
++        case SURFTYPE_WOOD:
++            material = "wood";
++            break;
++        case SURFTYPE_ENERGY:
++            material = "energy";
++            break;
++        case SURFTYPE_GLASS:
++            material = "glass";
++            break;
++        case SURFTYPE_TERRAIN:
++            material = "terrain";
++            break;
++        case SURFTYPE_CLOTH:
++            material = "cloth";
++            break;
++        case SURFTYPE_PLASTIC:
++            material = "plastic";
++            break;
++        case SURFTYPE_FLESH:
++            material = "flesh";
++            break;
++        case SURFTYPE_LIQUID:
++            material = "water";
++            break;
++        default:
++            return {}; // No random draw for unknown/sky/fire-through.
++    }
++    // SharedDefs.h defines B2_LITE: NRES(4) is 3. Own the string instead of writing a literal.
++    return std::string("Sounds/Weapons/impacts/") + material + "/impact" +
++           std::to_string(std::uniform_int_distribution<int>(0, 2)(random) + 1) + ".wav";
++}
++bool CWeaponFX::PlayImpactSound(ServerDE& server, HOBJECT source, std::minstd_rand& random)
++{
++    resource = GetImpactSound(random);
++    error.clear();
++    sound = 0;
++    if (resource.empty())
++        return true; // Original intentional silence, not a successful voice.
++    OpenBlood2::SoundRequest request;
++    request.resource = resource;
++    request.outer_radius = 500;
++    request.inner_radius = 50;
++    request.priority = 0; // SOUNDPRIORITY_MISC_LOW.
++    sound = server.PlayDetachedSound(source, request, m_vDestPos, error);
++    return sound != 0;
++}
+diff --git a/src/game/original/WeaponFX.h b/src/game/original/WeaponFX.h
+new file mode 100644
+index 0000000..286d868
+--- /dev/null
++++ b/src/game/original/WeaponFX.h
+@@ -0,0 +1,17 @@
++#pragma once
++#include "SurfaceTypes.h"
++#include "engine/audio.h"
++#include <random>
++class ServerDE;
++// Selected original CWeaponFX impact audio only. Other weapon visuals remain unavailable.
++class CWeaponFX
++{
++  public:
++    DBYTE m_nAmmoType = 0;
++    SurfaceType m_eSurfaceType = SURFTYPE_UNKNOWN;
++    DVector m_vDestPos{};
++    OpenBlood2::SoundId sound = 0;
++    std::string resource, error;
++    bool PlayImpactSound(ServerDE&, HOBJECT source, std::minstd_rand&);
++    std::string GetImpactSound(std::minstd_rand&) const;
++};
+diff --git a/src/game/original/WeaponVector.cpp b/src/game/original/WeaponVector.cpp
+new file mode 100644
+index 0000000..b17154f
+--- /dev/null
++++ b/src/game/original/WeaponVector.cpp
+@@ -0,0 +1,157 @@
++// Selected original Weapon.cpp FireVector, AddImpact and material/impact-audio path.
++#include "DestructableBrush.h"
++#include "Door.h"
++#include "InventoryMgr.h"
++#include "PlayerObj.h"
++#include "VolumeBrush.h"
++#include "Weapon.h"
++#include "engine/collision.h"
++using namespace OpenBlood2;
++FireResult CWeapon::FireVector()
++{
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !firing)
++        return FireResult::Invalid;
++    auto from = last_shot.request.position;
++    const auto end = last_shot.end, direction = last_shot.direction;
++    const bool marks =
++        data.m_nAmmoType == AMMO_BULLET || data.m_nAmmoType == AMMO_SHELL || data.m_nAmmoType == AMMO_BMG;
++    for (unsigned count = 0; count < 64; ++count)
++    {
++        if (!server->IsObjectAlive(m_hOwner))
++        {
++            last_shot.interrupted = true;
++            return last_shot.result;
++        }
++        if (last_shot.collision == SegmentResult::Miss)
++            return last_shot.result;
++        if (last_shot.collision != SegmentResult::Hit)
++        {
++            impact_error = "Impact continuation collision unavailable";
++            return last_shot.result = FireResult::Unavailable;
++        }
++        auto& impact = impacts.emplace_back();
++        ++impact_contacts;
++        impact.hit = last_shot.hit;
++        impact.from = from;
++        const auto h = impact.hit.object;
++        auto* object = h ? server->HandleToObject(h) : nullptr;
++        if (h && !server->IsObjectAlive(h))
++        {
++            impact_error = "Impact object no longer alive";
++            return last_shot.result = FireResult::Unavailable;
++        }
++        impact.surface = h ? server->GetObjectUserFlags(h) >> 24 : impact.hit.texture_flags;
++        impact.stopping_surface = impact.surface;
++        bool damage = false, alert_before = false, alert_after = false;
++        if (auto* volume = dynamic_cast<VolumeBrush*>(object))
++        {
++            impact.branch = WeaponImpactBranch::Volume;
++            impact.continued = true;
++            impact.effect_requested =
++                volume->info.code == CC_WATER || volume->info.code == CC_BLOOD || volume->info.code == CC_ACID;
++        }
++        else if (!h && impact.surface != SURFTYPE_FIRETHROUGH)
++        {
++            impact.branch = WeaponImpactBranch::World;
++            impact.effect_requested = alert_before = true;
++            impact.continued = impact.surface == SURFTYPE_GLASS && data.m_nType != WEAP_MELEE;
++        }
++        else if (auto* brush = dynamic_cast<CDestructableBrush*>(object); brush && marks)
++        {
++            impact.branch = WeaponImpactBranch::Brush;
++            impact.continued = brush->fire_through;
++            if (!brush->fire_through)
++            {
++                impact.stopping_surface = brush->GetSurfaceType();
++                impact.effect_requested = alert_before = damage = true;
++                impact.continued = impact.stopping_surface == SURFTYPE_GLASS;
++            }
++        }
++        else if (auto* door = dynamic_cast<Door*>(object))
++        {
++            impact.branch = WeaponImpactBranch::Door;
++            impact.continued = door->fire_through;
++            impact.effect_requested = alert_before = damage = !door->fire_through;
++        }
++        else
++        {
++            // Original primary-world FIRETHROUGH falls into this general branch and stops.
++            impact.effect_requested = true;
++            damage = h != nullptr; // No damage aggregate/actor exists for the primary-world sentinel.
++            alert_after = !dynamic_cast<CBaseCharacter*>(object);
++        }
++        if (impact.effect_requested)
++        {
++            impact.effect.m_nAmmoType = data.m_nAmmoType;
++            impact.effect.m_eSurfaceType = static_cast<SurfaceType>(static_cast<DBYTE>(impact.surface));
++            impact.effect.m_vDestPos = vector_add(impact.hit.point, vector_scale(impact.hit.normal, 1.25f));
++            if (!impact.effect.PlayImpactSound(*server, m_hOwner, impact_random))
++                ++impact_sound_failures;
++            if (impact.effect.sound)
++                ++impact_sounds;
++            // Other UpdateWeaponFX/AddImpact visuals and marks remain explicitly unavailable.
++        }
++        auto alert = [&]
++        {
++            if (!SendSoundTrigger(m_hOwner, 1, impact.hit.point, 200, impact.alert))
++                impact_error = impact.alert.error;
++        };
++        if (alert_before)
++            alert();
++        if (!server->IsObjectAlive(m_hOwner))
++        {
++            last_shot.interrupted = true;
++            return last_shot.result;
++        }
++        if (damage && !server->IsObjectAlive(h))
++            impact.target_removed = true;
++        else if (damage)
++        {
++            OpenBlood2::Damage value{direction, impact.hit.point, last_shot.damage * m_pInventoryMgr->damage_multiplier,
++                                     damage_type, m_hOwner};
++            auto message = server->StartMessageToObject(server->HandleToObject(m_hOwner), h, damage_message);
++            if (!message)
++                return last_shot.result = FireResult::DeliveryFailed;
++            if (server->WriteDamage(message, value) != DE_OK)
++            {
++                server->EndHMessageWrite(message);
++                return last_shot.result = FireResult::DeliveryFailed;
++            }
++            if (server->EndMessage(message) != DE_OK)
++                return last_shot.result = FireResult::DeliveryFailed;
++            impact.damage_delivered = last_shot.damage_delivered = true;
++        }
++        if (!server->IsObjectAlive(m_hOwner))
++        {
++            last_shot.interrupted = true;
++            return last_shot.result;
++        }
++        if (alert_after)
++            alert();
++        if (!server->IsObjectAlive(m_hOwner))
++        {
++            last_shot.interrupted = true;
++            return last_shot.result;
++        }
++        if (!impact.continued)
++            return last_shot.result;
++        // Original one-unit advance; retain original endpoint/range, do not restart a full-length ray.
++        const auto next = vector_add(impact.hit.point, direction);
++        if (vector_dot(vector_subtract(next, from), direction) <= 0)
++        {
++            impact_error = "Impact continuation made no progress";
++            return last_shot.result = FireResult::Unavailable;
++        }
++        from = next;
++        if (vector_dot(vector_subtract(end, from), direction) <= 0)
++            return last_shot.result;
++        last_shot.collision =
++            server->IntersectSegment(from, end, m_hOwner, last_shot.hit, false, SegmentObjects::SolidOrRayHit,
++                                     SegmentFilter::None, SegmentStart::SkipInterior);
++    }
++    if (last_shot.collision == SegmentResult::Miss)
++        return last_shot.result;
++    impact_error = "Impact continuation exceeds 64 contacts";
++    return last_shot.result = FireResult::Unavailable;
++}
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 62797d7..9a2694b 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -141,7 +141,8 @@ namespace OpenBlood2
+         SegmentResult CastWorldRay(DVector, DVector, SegmentHit&) override;
+         SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false,
+                                        SegmentObjects objects = SegmentObjects::SolidOnly,
+-                                       SegmentFilter filter = SegmentFilter::None) override;
++                                       SegmentFilter filter = SegmentFilter::None,
++                                       SegmentStart start = SegmentStart::IncludeInterior) override;
+         DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
+         bool ReadDamage(HMESSAGEREAD, Damage&) override;
+         HCLIENT connect_client();
+diff --git a/src/game/server_weapons.cpp b/src/game/server_weapons.cpp
+index cc37c5a..7f52741 100644
+--- a/src/game/server_weapons.cpp
++++ b/src/game/server_weapons.cpp
+@@ -10,13 +10,15 @@
+ namespace OpenBlood2
+ {
+     SegmentResult ServerAdapter::IntersectSegment(DVector from, DVector to, HOBJECT ignore, SegmentHit& out,
+-                                                  bool fire_through, SegmentObjects objects, SegmentFilter filter)
++                                                  bool fire_through, SegmentObjects objects, SegmentFilter filter,
++                                                  SegmentStart start)
+     {
+         trace_service("IntersectSegment");
+         out = {};
+         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
+         if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility &&
+-             filter != SegmentFilter::IgnoreCharacters) ||
++             filter != SegmentFilter::IgnoreCharacters && filter != SegmentFilter::IgnoreVolumes) ||
++            (start != SegmentStart::IncludeInterior && start != SegmentStart::SkipInterior) ||
+             (objects != SegmentObjects::SolidOnly && objects != SegmentObjects::SolidOrRayHit &&
+              objects != SegmentObjects::All) ||
+             !physics_vector(from) || !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
+@@ -49,6 +51,8 @@ namespace OpenBlood2
+                 (dynamic_cast<const VolumeBrush*>(record->game.get()) ||
+                  (brush && brush->destructable && brush->GetSurfaceType() == SURFTYPE_GLASS)))
+                 continue;
++            if (filter == SegmentFilter::IgnoreVolumes && dynamic_cast<const VolumeBrush*>(record->game.get()))
++                continue;
+             if (filter == SegmentFilter::IgnoreCharacters && dynamic_cast<const CBaseCharacter*>(record->game.get()))
+                 continue;
+             if (fire_through && ((door && door->fire_through) || (brush && brush->fire_through)))
+@@ -60,7 +64,7 @@ namespace OpenBlood2
+             // USE follows entry-face rays: an enclosing body/sensor must not
+             // mask all interactions. Later LithTech exposes interior hits as an
+             // opt-in flag; ordinary USE does not request it.
+-            if (objects == SegmentObjects::All && hit.start_solid)
++            if ((objects == SegmentObjects::All || start == SegmentStart::SkipInterior) && hit.start_solid)
+                 continue;
+             if (query == CollisionQuery::Hit && (!found || hit.fraction < nearest.fraction))
+             {
+@@ -71,7 +75,7 @@ namespace OpenBlood2
+         }
+         if (!found)
+             return SegmentResult::Miss;
+-        out = {nearest.point, nearest.normal, nearest.object, nearest.polygon, nearest.fraction};
++        out = {nearest.point, nearest.normal, nearest.object, nearest.polygon, nearest.fraction, nearest.texture_flags};
+         return SegmentResult::Hit;
+     }
+     void ServerAdapter::RecordBrushDestruction(HOBJECT handle, DVector direction, float damage, DBYTE amount)
+diff --git a/src/game/weapon_messages.h b/src/game/weapon_messages.h
+index 7477508..586d54b 100644
+--- a/src/game/weapon_messages.h
++++ b/src/game/weapon_messages.h
+@@ -38,6 +38,7 @@ namespace OpenBlood2
+         HOBJECT object = nullptr;
+         std::uint32_t polygon = UINT32_MAX;
+         double fraction = 1;
++        std::uint16_t texture_flags = 0; // Baked material identifier, distinct from polygon render flags.
+     };
+     enum class SegmentObjects
+     {
+@@ -45,11 +46,17 @@ namespace OpenBlood2
+         All,
+         SolidOrRayHit
+     };
++    enum class SegmentStart
++    {
++        IncludeInterior,
++        SkipInterior
++    };
+     enum class SegmentFilter
+     {
+         None,
+-        AIVisibility,    // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
+-        IgnoreCharacters // Original CMovement clearance filter.
++        AIVisibility,     // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
++        IgnoreCharacters, // Original CMovement clearance filter.
++        IgnoreVolumes     // Original LiquidFilterFn excludes every VolumeBrush subclass.
+     };
+     enum class SegmentResult
+     {
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 7d99ea6..3d78d0b 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1106,3 +1106,15 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME weapon_audio.private COMMAND weapon_audio_tests private "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(weapon_audio.private PROPERTIES LABELS "headless;private;weapon_audio" TIMEOUT 60)
+ endif()
++
++add_executable(weapon_impact_tests weapon_impact_tests.cpp)
++target_link_libraries(weapon_impact_tests PRIVATE blood2_game)
++blood2_project_options(weapon_impact_tests)
++foreach(case IN ITEMS selection world brushes volumes hearing limits)
++    add_test(NAME weapon_impacts.${case} COMMAND weapon_impact_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/weapon-impacts-${case}")
++    set_tests_properties(weapon_impacts.${case} PROPERTIES LABELS "headless;weapon_impacts" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME weapon_impacts.private COMMAND weapon_impact_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(weapon_impacts.private PROPERTIES LABELS "headless;private;weapon_impacts" TIMEOUT 180)
++endif()
+diff --git a/tests/ai_fire_tests.cpp b/tests/ai_fire_tests.cpp
+index f3ca902..dded7d6 100644
+--- a/tests/ai_fire_tests.cpp
++++ b/tests/ai_fire_tests.cpp
+@@ -220,9 +220,13 @@ namespace
+                                    {"HitPoints", 100.f},
+                                    {"SurfaceType", std::int32_t(SURFTYPE_GLASS)}});
+         CHECK(h && a->Fire() && a->clear_shot.first_hit.object == t->m_hObject);
+-        CHECK(a->m_InventoryMgr.CurrentWeapon()->last_shot.hit.object == h); // Clear aim still damages the glass.
++        const auto* weapon = a->m_InventoryMgr.CurrentWeapon();
++        CHECK(weapon->impacts.size() == 2 && weapon->impacts[0].hit.object == h && weapon->impacts[0].continued &&
++              weapon->impacts[0].damage_delivered && weapon->impacts[1].hit.object == t->m_hObject &&
++              weapon->impacts[1].damage_delivered);
+         auto* brush = dynamic_cast<CDestructableBrush*>(g.objects.get(h)->game.get());
+-        CHECK(brush);
++        CHECK(brush && brush->m_damage.m_fHitPoints < 100 && t->damage.m_fHitPoints < 1000 &&
++              a->m_InventoryMgr.GetAmmoCount(1) == 99); // One vector damages glass then target using one round.
+         brush->destructable = false;
+         CHECK(!a->Fire() && a->fire_result == FireResult::Blocked);
+         CHECK(g.objects.remove(h) && g.objects.finish_frame());
+diff --git a/tests/weapon_impact_tests.cpp b/tests/weapon_impact_tests.cpp
+new file mode 100644
+index 0000000..e08e664
+--- /dev/null
++++ b/tests/weapon_impact_tests.cpp
+@@ -0,0 +1,407 @@
++#include "audio_fixture.h"
++#include "brush_fixture.h"
++#include "camera_fixture.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/DestructableBrush.h"
++#include "game/original/VolumeBrush.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    const std::vector<std::pair<SurfaceType, std::string>> materials{
++        {SURFTYPE_STONE, "stone"},     {SURFTYPE_BUILDING, "stone"}, {SURFTYPE_METAL, "metal"},
++        {SURFTYPE_WOOD, "wood"},       {SURFTYPE_ENERGY, "energy"},  {SURFTYPE_GLASS, "glass"},
++        {SURFTYPE_TERRAIN, "terrain"}, {SURFTYPE_CLOTH, "cloth"},    {SURFTYPE_PLASTIC, "plastic"},
++        {SURFTYPE_FLESH, "flesh"},     {SURFTYPE_LIQUID, "water"}};
++    bool setup(GameSession& g, const std::filesystem::path& root, bool audio = true)
++    {
++        CHECK(test_player::setup(g, root));
++        if (audio)
++        {
++            test_player::Directory dir;
++            auto& weapons = dir.children["sounds"].children["weapons"];
++            weapons.children["beretta"].files["fire.wav"] = test_audio::wave();
++            weapons.children["knife"].files["fire.wav"] = test_audio::wave();
++            for (auto& [type, material] : materials)
++                for (unsigned i = 1; i <= 3; ++i)
++                    weapons.children["impacts"].children[material].files["impact" + std::to_string(i) + ".wav"] =
++                        test_audio::wave();
++            test_model::Writer w;
++            w.b.resize(168);
++            w.b[0] = w.b[62] = w.b[124] = 13;
++            w.b[1] = w.b[63] = w.b[125] = 10;
++            w.b[126] = 26;
++            w.patch(127, 1);
++            auto [offset, size] = test_player::write_dir(w, dir);
++            w.patch(131, offset);
++            w.patch(135, size);
++            std::ofstream out(root / "impact-audio.rez", std::ios::binary);
++            out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++            out.close();
++            std::string error;
++            CHECK(g.resources.mount(root / "impact-audio.rez", error));
++        }
++        std::string error;
++        CHECK(g.enter_player(error));
++        g.server.audio.inspect_pcm = true;
++        return true;
++    }
++    WeaponFire shot(GameSession& g, DBYTE type = WEAP_BERETTA)
++    {
++        auto* p = g.server_shell.Player(g.local_client);
++        auto pos = g.objects.get(p->m_hObject)->state.m_Pos;
++        pos.y += p->eye_level;
++        return {pos, {0, 0, 1}, 42, type, false, false};
++    }
++    CWeapon* weapon(GameSession& g, unsigned slot = 1)
++    {
++        return g.server_shell.Player(g.local_client)->m_InventoryMgr.GetWeapon(slot);
++    }
++    bool walls(GameSession& g, const std::vector<unsigned>& surfaces, float spacing = 30)
++    {
++        WorldModel model;
++        auto pos = shot(g).position;
++        float z = pos.z + 30;
++        for (auto surface : surfaces)
++        {
++            test_brush::face(model,
++                             {{pos.x - 200, pos.y - 200, z},
++                              {pos.x + 200, pos.y - 200, z},
++                              {pos.x + 200, pos.y + 200, z},
++                              {pos.x - 200, pos.y + 200, z}},
++                             {0, 0, -1});
++            model.surfaces.back().flags = 1;
++            model.surfaces.back().texture_flags = surface;
++            z += spacing;
++        }
++        std::string error;
++        CHECK(g.collision.build(model, error));
++        return true;
++    }
++    HOBJECT brush(GameSession& g, const char* type, float z, Properties props = {})
++    {
++        const auto pos = vector_add(shot(g).position, {0, 0, z});
++        const auto name = "impact" + std::to_string(g.world.models.size());
++        auto m = test_brush::box(name, vector_add(pos, {-20, -20, -5}), vector_add(pos, {20, 20, 5}));
++        m.translation = (std::string(type) == "Water" || std::string(type) == "VolumeBrush") ? DVector{} : pos;
++        g.world.models.push_back(m);
++        props["Name"] = name;
++        if (std::string(type) == "CDestructableBrush")
++            props.try_emplace("HitPoints", 100.0f);
++        if (std::string(type) == "Door")
++            props.try_emplace("MoveDir", DVector{1, 0, 0});
++        return g.objects.create(g.objects.find_class(type), {}, Creation::World, props);
++    }
++    struct Listener : AI_Mgr
++    {
++        unsigned action = 0, impacts = 0;
++        HOBJECT victim = nullptr;
++        bool damage_seen = false;
++        DDWORD ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read) override
++        {
++            auto result = AI_Mgr::ObjectMessageFn(sender, message, read);
++            if (message == 1000 && heard_sound == 1)
++            {
++                ++impacts;
++                if (auto* b = dynamic_cast<CDestructableBrush*>(g_pServerDE->HandleToObject(victim)))
++                    damage_seen = b->m_damage.m_fHitPoints < 100;
++                if (action == 1)
++                    g_pServerDE->RemoveObject(sender);
++                if (action == 2)
++                    g_pServerDE->RemoveObject(victim);
++            }
++            return result;
++        }
++    };
++    Listener* listener(GameSession& g)
++    {
++        static ClassInfo info{
++            "ImpactListener", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Listener>(); }, {}};
++        info.parent = g.objects.find_class("CBaseCharacter");
++        if (!g.objects.find_class(info.name) && !g.objects.register_class(info))
++            return nullptr;
++        ObjectCreateStruct state;
++        state.m_Pos = vector_add(shot(g).position, {80, 0, 40});
++        auto h = g.objects.create(&info, state);
++        auto* a = dynamic_cast<Listener*>(g.server.HandleToObject(h));
++        if (!a || !a->InsertMe())
++            return nullptr;
++        a->m_dwFlags = 8;
++        a->m_nState = AI_Mgr::StateAttackFar;
++        a->m_nLastState = AI_Mgr::StateIdle;
++        return a;
++    }
++    bool selection(const std::filesystem::path&)
++    {
++        CWeaponFX fx;
++        std::minstd_rand random(1);
++        for (auto& [surface, material] : materials)
++        {
++            fx.m_eSurfaceType = surface;
++            for (unsigned i = 0; i < 50; ++i)
++            {
++                fx.m_nAmmoType = i % 4;
++                auto resource = fx.GetImpactSound(random);
++                CHECK(resource.starts_with("Sounds/Weapons/impacts/" + material + "/impact"));
++                CHECK(resource.ends_with("1.wav") || resource.ends_with("2.wav") || resource.ends_with("3.wav"));
++            }
++        }
++        for (auto surface : {SURFTYPE_UNKNOWN, SURFTYPE_SKY, SURFTYPE_FIRETHROUGH})
++        {
++            fx.m_eSurfaceType = surface;
++            auto before = random;
++            CHECK(fx.GetImpactSound(random).empty() && random == before);
++        }
++        return true;
++    }
++    bool world(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        CHECK(walls(g, {SURFTYPE_GLASS, SURFTYPE_METAL}));
++        CHECK(g.server_shell.OnMessage(g.local_client, shot(g)) == FireResult::Fired);
++        auto* w = weapon(g);
++        CHECK(w->impacts.size() == 2 && w->impacts[0].continued && !w->impacts[1].continued && w->impact_sounds == 2);
++        CHECK(w->impacts[0].surface == SURFTYPE_GLASS && w->impacts[1].hit.texture_flags == SURFTYPE_METAL);
++        CHECK(!w->last_shot.damage_delivered &&
++              g.server_shell.Player(g.local_client)->m_InventoryMgr.GetAmmoCount(1) == 49);
++        const auto& contact = w->impacts[0];
++        const auto* voice = g.server.audio.get(contact.effect.sound);
++        CHECK(voice && voice->auto_remove && voice->world_owned && voice->clip->frames() == 800);
++        CHECK(voice->request.outer_radius == 500 && voice->request.inner_radius == 50 && voice->request.priority == 0);
++        CHECK(std::abs(voice->position.z - (contact.hit.point.z - 1.25f)) < .001f);
++        CHECK(g.server.advance_audio(.05, shot(g).position, {}) && g.server.audio.peak > 0);
++        std::string error;
++        CHECK(g.select_weapon(0, error));
++        CHECK(g.server_shell.OnMessage(g.local_client, shot(g, WEAP_MELEE)) == FireResult::Fired);
++        CHECK(weapon(g, 0)->impacts.size() == 1 && !weapon(g, 0)->impacts[0].continued);
++        CHECK(g.select_weapon(1, error));
++        CHECK(walls(g, {SURFTYPE_FIRETHROUGH, SURFTYPE_METAL}));
++        CHECK(g.server_shell.OnMessage(g.local_client, shot(g)) == FireResult::Fired);
++        CHECK(w->impacts.size() == 1 && w->impacts[0].branch == WeaponImpactBranch::Other &&
++              w->impacts[0].effect.resource.empty());
++        CHECK(walls(g, {SURFTYPE_SKY}));
++        CHECK(g.server_shell.OnMessage(g.local_client, shot(g)) == FireResult::Fired &&
++              w->impacts[0].effect.resource.empty());
++        return true;
++    }
++    bool brushes(const std::filesystem::path& root)
++    {
++        for (bool box : {false, true})
++        {
++            GameSession g;
++            CHECK(setup(g, root));
++            auto h = brush(g, "CDestructableBrush", 30,
++                           {{"SurfaceType", std::int32_t(SURFTYPE_GLASS)}, {"BoxPhysics", box}});
++            auto target = brush(g, "CDestructableBrush", 65, {{"SurfaceType", std::int32_t(SURFTYPE_METAL)}});
++            CHECK(h && target);
++            auto* b = dynamic_cast<CDestructableBrush*>(g.server.HandleToObject(h));
++            CHECK(g.server_shell.OnMessage(g.local_client, shot(g)) == FireResult::Fired);
++            auto* w = weapon(g);
++            CHECK(w->impacts.size() == 2 && w->impacts[0].hit.object == h && w->impacts[1].hit.object == target);
++            CHECK(w->impacts[0].damage_delivered &&
++                  std::abs(b->m_damage.m_fHitPoints - (100 - w->last_shot.damage)) < .001f);
++            b->fire_through = true;
++            CHECK(g.server_shell.OnMessage(g.local_client, shot(g)) == FireResult::Fired);
++            CHECK(w->impacts.size() == 2 && !w->impacts[0].effect_requested && !w->impacts[0].damage_delivered);
++            // Original ext.nSurface is captured before the brush-specific surface fallback.
++            b->fire_through = false;
++            g.server.SetObjectUserFlags(h, 0);
++            CHECK(g.server_shell.OnMessage(g.local_client, shot(g)) == FireResult::Fired);
++            CHECK(w->impacts.size() == 2 && w->impacts[0].surface == 0 &&
++                  w->impacts[0].stopping_surface == SURFTYPE_GLASS && w->impacts[0].effect.resource.empty());
++            b->fire_through = true;
++            std::string error;
++            CHECK(g.select_weapon(0, error));
++            CHECK(g.server_shell.OnMessage(g.local_client, shot(g, WEAP_MELEE)) == FireResult::Fired);
++            CHECK(weapon(g, 0)->impacts.size() == 1 && weapon(g, 0)->impacts[0].branch == WeaponImpactBranch::Other &&
++                  weapon(g, 0)->impacts[0].damage_delivered);
++        }
++        GameSession g;
++        CHECK(setup(g, root));
++        auto door = brush(g, "Door", 30, {{"FireThrough", true}});
++        auto target = brush(g, "CDestructableBrush", 60, {{"SurfaceType", std::int32_t(SURFTYPE_METAL)}});
++        CHECK(door && target);
++        std::string error;
++        CHECK(g.select_weapon(0, error));
++        CHECK(g.server_shell.OnMessage(g.local_client, shot(g, WEAP_MELEE)) == FireResult::Fired);
++        CHECK(weapon(g, 0)->impacts.size() == 2 && weapon(g, 0)->impacts[0].branch == WeaponImpactBranch::Door &&
++              !weapon(g, 0)->impacts[0].damage_delivered);
++        return true;
++    }
++    bool volumes(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto water = brush(g, "Water", 30);
++        auto air = brush(g, "VolumeBrush", 60);
++        auto target = brush(g, "CDestructableBrush", 90, {{"SurfaceType", std::int32_t(SURFTYPE_METAL)}});
++        CHECK(water && air && target);
++        for (auto h : {water, air})
++            g.objects.get(h)->state.m_Flags = FLAG_RAYHIT;
++        CHECK(g.server_shell.OnMessage(g.local_client, shot(g)) == FireResult::Fired);
++        auto* w = weapon(g);
++        CHECK(w->impacts.size() == 3);
++        CHECK(w->impacts[0].branch == WeaponImpactBranch::Volume && w->impacts[0].effect_requested &&
++              w->impacts[0].effect.resource.empty());
++        CHECK(!w->impacts[0].damage_delivered && !w->impacts[0].alert.complete && !w->impacts[1].effect_requested);
++        SegmentHit hit;
++        auto from = shot(g).position;
++        auto end = vector_add(from, {0, 0, 150});
++        CHECK(g.server.IntersectSegment(from, end, g.client_shell.player, hit, false, SegmentObjects::SolidOrRayHit,
++                                        SegmentFilter::IgnoreVolumes) == SegmentResult::Hit &&
++              hit.object == target);
++        g.server.SetObjectUserFlags(water, SURFTYPE_LIQUID << 24);
++        CHECK(g.server_shell.OnMessage(g.local_client, shot(g)) == FireResult::Fired && w->impacts[0].effect.sound);
++        from.z += 30;
++        CHECK(g.server.IntersectSegment(from, end, g.client_shell.player, hit, false, SegmentObjects::SolidOrRayHit) ==
++                  SegmentResult::Hit &&
++              hit.object == water);
++        CHECK(g.server.IntersectSegment(from, end, g.client_shell.player, hit, false, SegmentObjects::SolidOrRayHit,
++                                        SegmentFilter::None, SegmentStart::SkipInterior) == SegmentResult::Hit &&
++              hit.object == air);
++        CHECK(g.server.IntersectSegment(from, end, nullptr, hit, false, SegmentObjects::SolidOnly, SegmentFilter::None,
++                                        static_cast<SegmentStart>(99)) == SegmentResult::Invalid);
++        return true;
++    }
++    bool hearing(const std::filesystem::path& root)
++    {
++        for (unsigned action : {0u, 1u, 2u, 3u})
++        {
++            GameSession g;
++            CHECK(setup(g, root));
++            auto h = brush(g, "CDestructableBrush", 40, {{"SurfaceType", std::int32_t(SURFTYPE_METAL)}});
++            auto* a = listener(g);
++            CHECK(h && a);
++            a->action = action;
++            a->victim = h;
++            const auto strings = g.server.string_count();
++            std::string error;
++            if (action == 3)
++                CHECK(g.select_weapon(0, error));
++            auto* w = weapon(g, action == 3 ? 0 : 1);
++            CHECK(g.server_shell.OnMessage(g.local_client, shot(g, action == 3 ? WEAP_MELEE : WEAP_BERETTA)) ==
++                  FireResult::Fired);
++            CHECK(a->impacts == 1 && a->hearing_reactions == 1 && a->m_nState == AI_Mgr::StateDodge &&
++                  a->damage_seen == (action == 3));
++            CHECK(w->impacts[0].alert.complete && w->impacts[0].alert.delivered == 1);
++            CHECK(w->last_shot.interrupted == (action == 1) && w->impacts[0].target_removed == (action == 2));
++            CHECK(w->last_shot.damage_delivered == (action == 0 || action == 3));
++            const auto sound = w->impacts[0].effect.sound;
++            CHECK(sound && g.server.audio.get(sound));
++            CHECK(g.server.message_count() == 0 && g.server.string_count() == strings);
++            if (action != 1)
++                CHECK(g.leave_player());
++            CHECK(g.objects.finish_frame() && g.server.audio.get(sound));
++            CHECK(g.server.advance_audio(.11, {}, {}) && !g.server.audio.get(sound));
++            CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.string_count());
++        }
++        // Character hits use flesh audio but never dispatch impact hearing.
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = listener(g);
++        CHECK(a);
++        auto pos = vector_add(shot(g).position, {0, 0, 40});
++        DVector dims{10, 10, 10};
++        CHECK(g.server.TeleportObject(a->m_hObject, &pos) == DE_OK &&
++              g.server.SetObjectDims(a->m_hObject, &dims) == DE_OK);
++        g.objects.get(a->m_hObject)->state.m_Flags |= FLAG_SOLID;
++        CHECK(g.server_shell.OnMessage(g.local_client, shot(g)) == FireResult::Fired);
++        CHECK(weapon(g)->impacts[0].surface == SURFTYPE_FLESH && weapon(g)->impacts[0].effect.sound && !a->impacts);
++        return true;
++    }
++    bool limits(const std::filesystem::path& root)
++    {
++        for (unsigned count : {64u, 65u})
++        {
++            GameSession g;
++            CHECK(setup(g, root, false));
++            CHECK(walls(g, std::vector<unsigned>(count, SURFTYPE_GLASS), 2));
++            CHECK(g.server_shell.OnMessage(g.local_client, shot(g)) ==
++                  (count == 64 ? FireResult::Fired : FireResult::Unavailable));
++            auto* w = weapon(g);
++            CHECK(w->impacts.size() == 64 && w->impact_sound_failures == 64 && w->impact_sounds == 0);
++            CHECK(w->impact_error.empty() == (count == 64));
++            CHECK(!w->impacts[0].effect.error.empty() &&
++                  g.server_shell.Player(g.local_client)->m_InventoryMgr.GetAmmoCount(1) == 49);
++            CHECK(g.server.message_count() == 0);
++        }
++        return true;
++    }
++    bool private_audio(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_subwaya", error) && g.enter_player(error));
++            CHECK(test_camera::complete_subway_intro(g));
++            auto fire = shot(g);
++            for (auto direction : {DVector{0, 0, 1}, DVector{1, 0, 0}, DVector{0, 0, -1}, DVector{-1, 0, 0}})
++            {
++                fire.direction = direction;
++                CHECK(g.server_shell.OnMessage(g.local_client, fire) == FireResult::Fired);
++                auto* w = weapon(g);
++                CHECK(!w->impacts.empty() && w->impact_error.empty() && !w->impact_sound_failures);
++                std::cout << "cycle=" << cycle << " contacts=" << w->impacts.size() << " sounds=" << w->impact_sounds
++                          << " failed=" << w->impact_sound_failures << '\n';
++            }
++            // Diagnostic material requests supplement actual world shots; they do not claim a rendered impact.
++            CWeaponFX fx;
++            fx.m_vDestPos = fire.position;
++            std::minstd_rand random(1);
++            SoundId tail = 0;
++            for (auto& [surface, material] : materials)
++            {
++                fx.m_eSurfaceType = surface;
++                CHECK(fx.PlayImpactSound(g.server, g.client_shell.player, random) && fx.sound);
++                tail = fx.sound;
++                auto* voice = g.server.audio.get(tail);
++                CHECK(voice && voice->clip->frames() > 0);
++                std::cout << fx.resource << " frames=" << voice->clip->frames() << " rate=" << voice->clip->rate
++                          << '\n';
++            }
++            g.server.audio.inspect_pcm = true;
++            CHECK(g.server.advance_audio(.05, fire.position, {}) && g.server.audio.peak > 0);
++            CHECK(g.leave_player() && g.server.audio.get(tail));
++            CHECK(g.unload_world() && g.server.audio.voices().empty() && g.objects.snapshot().empty() &&
++                  !g.server.string_count());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::string name = argv[1];
++    const std::filesystem::path root = argv[2];
++    if (name == "selection")
++        return selection(root) ? 0 : 1;
++    if (name == "world")
++        return world(root) ? 0 : 1;
++    if (name == "brushes")
++        return brushes(root) ? 0 : 1;
++    if (name == "volumes")
++        return volumes(root) ? 0 : 1;
++    if (name == "hearing")
++        return hearing(root) ? 0 : 1;
++    if (name == "limits")
++        return limits(root) ? 0 : 1;
++    if (name == "private")
++        return private_audio(root) ? 0 : 1;
++    return 2;
++}

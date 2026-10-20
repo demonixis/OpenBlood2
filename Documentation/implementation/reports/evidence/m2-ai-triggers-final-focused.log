@@ -1,0 +1,49 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 283: character_audio.subway
+      Start 393: ai_trigger.subway
+      Start 282: character_audio.catalog
+      Start 281: character_audio.surfaces
+ 1/19 Test #281: character_audio.surfaces .........   Passed    0.01 sec
+      Start 280: character_audio.footsteps
+ 2/19 Test #280: character_audio.footsteps ........   Passed    0.01 sec
+      Start 278: character_audio.player
+ 3/19 Test #278: character_audio.player ...........   Passed    0.01 sec
+      Start 279: character_audio.callbacks
+ 4/19 Test #279: character_audio.callbacks ........   Passed    0.01 sec
+      Start 276: character_audio.lifetime
+ 5/19 Test #276: character_audio.lifetime .........   Passed    0.01 sec
+      Start 277: character_audio.rejection
+ 6/19 Test #277: character_audio.rejection ........   Passed    0.01 sec
+      Start 275: character_audio.voices
+ 7/19 Test #275: character_audio.voices ...........   Passed    0.01 sec
+      Start 392: ai_trigger.audio
+ 8/19 Test #392: ai_trigger.audio .................   Passed    0.01 sec
+      Start 391: ai_trigger.lifetime
+ 9/19 Test #391: ai_trigger.lifetime ..............   Passed    0.00 sec
+      Start 390: ai_trigger.broadcast
+10/19 Test #390: ai_trigger.broadcast .............   Passed    0.00 sec
+      Start 388: ai_trigger.commands
+11/19 Test #388: ai_trigger.commands ..............   Passed    0.00 sec
+      Start 389: ai_trigger.relay
+12/19 Test #389: ai_trigger.relay .................   Passed    0.00 sec
+      Start 274: character_audio.paths
+13/19 Test #274: character_audio.paths ............   Passed    0.00 sec
+      Start 387: ai_trigger.impact
+14/19 Test #387: ai_trigger.impact ................   Passed    0.00 sec
+      Start 385: ai_trigger.hearing
+15/19 Test #385: ai_trigger.hearing ...............   Passed    0.00 sec
+      Start 386: ai_trigger.gunfire
+16/19 Test #386: ai_trigger.gunfire ...............   Passed    0.00 sec
+17/19 Test #282: character_audio.catalog ..........   Passed    0.35 sec
+18/19 Test #393: ai_trigger.subway ................   Passed    0.54 sec
+19/19 Test #283: character_audio.subway ...........   Passed    4.98 sec
+
+100% tests passed, 0 tests failed out of 19
+
+Label Time Summary:
+ai_trigger         =   0.56 sec*proc (9 tests)
+character_audio    =   5.40 sec*proc (10 tests)
+headless           =   5.96 sec*proc (19 tests)
+private            =   5.87 sec*proc (3 tests)
+
+Total Test time (real) =   4.99 sec

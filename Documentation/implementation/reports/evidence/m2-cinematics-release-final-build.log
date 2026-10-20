@@ -1,0 +1,33 @@
+[0/2] Re-checking globbed directories...
+[1/46] Scanning /home/yann/projects/lithtech/Blood2/tests/player_tests.cpp for CXX dependencies
+[2/46] Scanning /home/yann/projects/lithtech/Blood2/src/engine/audio.cpp for CXX dependencies
+[3/46] Generating CXX dyndep file tests/CMakeFiles/player_tests.dir/CXX.dd
+[4/46] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[5/34] Scanning /home/yann/projects/lithtech/Blood2/tests/cinematic_tests.cpp for CXX dependencies
+[6/34] Generating CXX dyndep file tests/CMakeFiles/cinematic_tests.dir/CXX.dd
+[7/33] Building CXX object CMakeFiles/engine.dir/src/engine/audio.cpp.o
+[8/33] Linking CXX static library libengine.a
+[9/33] Linking CXX executable blood2
+[10/33] Linking CXX executable tests/config_tests
+[11/33] Linking CXX executable tests/object_contract_tests
+[12/33] Linking CXX executable tests/world_tests
+[13/33] Linking CXX executable tests/services_tests
+[14/33] Linking CXX executable tests/weapon_tests
+[15/33] Linking CXX executable tests/locomotion_tests
+[16/33] Linking CXX executable tests/movement_tests
+[17/33] Linking CXX executable tests/container_tests
+[18/33] Linking CXX executable tests/door_tests
+[19/33] Linking CXX executable tests/trigger_tests
+[20/33] Linking CXX executable tests/brush_tests
+[21/33] Linking CXX executable tests/interaction_tests
+[22/33] Linking CXX executable tests/explosion_tests
+[23/33] Linking CXX executable tests/pushable_tests
+[24/33] Linking CXX executable tests/pickup_tests
+[25/33] Linking CXX executable tests/camera_tests
+[26/33] Linking CXX executable tests/objectives_tests
+[27/33] Linking CXX executable tests/keyframer_tests
+[28/33] Linking CXX executable tests/light_tests
+[29/33] Linking CXX executable tests/worldpath_tests
+[30/33] Linking CXX executable tests/cinematic_tests
+[31/33] Building CXX object tests/CMakeFiles/player_tests.dir/player_tests.cpp.o
+[32/33] Linking CXX executable tests/player_tests

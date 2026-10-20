@@ -1,0 +1,14 @@
+357/361 Testing: ai_perception.opportunity
+357/361 Test: ai_perception.opportunity
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_perception_tests" "opportunity"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_perception.opportunity" start time: Oct 16 10:27 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.opportunity" end time: Oct 16 10:27 CEST
+"ai_perception.opportunity" time elapsed: 00:00:00
+----------------------------------------------------------

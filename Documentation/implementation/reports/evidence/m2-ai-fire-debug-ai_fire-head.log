@@ -1,0 +1,14 @@
+376/384 Testing: ai_fire.head
+376/384 Test: ai_fire.head
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests" "head"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_fire.head" start time: Oct 16 11:27 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_fire.head" end time: Oct 16 11:27 CEST
+"ai_fire.head" time elapsed: 00:00:00
+----------------------------------------------------------

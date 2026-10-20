@@ -1,0 +1,12 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 516: ai_runtime.clearance_private
+1/1 Test #516: ai_runtime.clearance_private .....   Passed   87.93 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+ai_runtime    =  87.93 sec*proc (1 test)
+headless      =  87.93 sec*proc (1 test)
+private       =  87.93 sec*proc (1 test)
+
+Total Test time (real) =  87.95 sec

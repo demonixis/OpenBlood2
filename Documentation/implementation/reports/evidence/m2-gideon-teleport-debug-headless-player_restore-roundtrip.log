@@ -1,0 +1,14 @@
+539/683 Testing: player_restore.roundtrip
+539/683 Test: player_restore.roundtrip
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_restore_tests" "roundtrip" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-restore-fixtures/roundtrip"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"player_restore.roundtrip" start time: Oct 17 02:47 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.roundtrip" end time: Oct 17 02:47 CEST
+"player_restore.roundtrip" time elapsed: 00:00:00
+----------------------------------------------------------

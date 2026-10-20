@@ -1,0 +1,20 @@
+91/92 Testing: containers.private
+91/92 Test: containers.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"containers.private" start time: Oct 15 18:53 CEST
+Output:
+----------------------------------------------------------
+Skipped unsupported DAT worlds/16_bridge.dat: DAT v56: invalid/unsupported typed property near byte 442114
+Missing named volume model worlds/multi/ctf_jam.dat Acid0
+Missing named volume model worlds/multi/ctf_jam.dat Acid1
+Private volume shells: 245, nonconvex=7, rejected=0
+CityHub: 5 original volumes; canal swimming and ladder ascent 29.1666 units
+<end of output>
+Test time =   3.78 sec
+----------------------------------------------------------
+Test Passed.
+"containers.private" end time: Oct 15 18:53 CEST
+"containers.private" time elapsed: 00:00:03
+----------------------------------------------------------
+

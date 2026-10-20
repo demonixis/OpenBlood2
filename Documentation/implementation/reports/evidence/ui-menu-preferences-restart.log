@@ -1,0 +1,32 @@
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Frontend complete: 5 frames, world , menu audio starts 1/failures 0
+
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Frontend complete: 5 frames, world , menu audio starts 1/failures 0
+
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[warning] Preferences: Invalid preferences value
+[info] Frontend complete: 5 frames, world , menu audio starts 1/failures 0
+
+Two normal application restarts accepted unchanged isolated preferences; malformed preferences produced an explicit warning/modal. File SHA256 efc062de8255d46ffd086650c1554d073631bfab65a6459332b71c1f4b847234

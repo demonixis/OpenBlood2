@@ -1,0 +1,137 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 570: weapon_impacts.private
+      Start  40: world.destination_trial_private
+ 1/60 Test  #40: world.destination_trial_private ...   Passed   32.03 sec
+      Start 589: naga.private
+ 2/60 Test #589: naga.private ......................   Passed   21.41 sec
+      Start 563: weapon_audio.private
+ 3/60 Test #563: weapon_audio.private ..............   Passed   12.31 sec
+      Start 364: ai_fire.subway
+ 4/60 Test #364: ai_fire.subway ....................   Passed   27.26 sec
+      Start 363: ai_fire.catalog
+ 5/60 Test #363: ai_fire.catalog ...................   Passed    1.47 sec
+      Start 568: weapon_impacts.hearing
+ 6/60 Test #568: weapon_impacts.hearing ............   Passed    0.28 sec
+      Start 569: weapon_impacts.limits
+ 7/60 Test #569: weapon_impacts.limits .............   Passed    0.33 sec
+      Start  24: world.destination_trials
+ 8/60 Test  #24: world.destination_trials ..........   Passed    0.33 sec
+      Start 566: weapon_impacts.brushes
+ 9/60 Test #566: weapon_impacts.brushes ............   Passed    0.23 sec
+      Start 561: weapon_audio.callbacks
+10/60 Test #561: weapon_audio.callbacks ............   Passed    0.12 sec
+      Start 565: weapon_impacts.world
+11/60 Test #565: weapon_impacts.world ..............   Passed    0.10 sec
+      Start 584: naga.weapon
+12/60 Test #584: naga.weapon .......................   Passed    0.08 sec
+      Start 567: weapon_impacts.volumes
+13/60 Test #567: weapon_impacts.volumes ............   Passed    0.12 sec
+      Start  27: world.destination_lifetime
+14/60 Test  #27: world.destination_lifetime ........   Passed    0.11 sec
+      Start 558: weapon_audio.voices
+15/60 Test #558: weapon_audio.voices ...............   Passed    0.10 sec
+      Start 559: weapon_audio.hearing
+16/60 Test #559: weapon_audio.hearing ..............   Passed    0.06 sec
+      Start 562: weapon_audio.lifetime
+17/60 Test #562: weapon_audio.lifetime .............   Passed    0.07 sec
+      Start 585: naga.failures
+18/60 Test #585: naga.failures .....................   Passed    0.05 sec
+      Start 560: weapon_audio.failures
+19/60 Test #560: weapon_audio.failures .............   Passed    0.05 sec
+      Start 587: naga.lifetime
+20/60 Test #587: naga.lifetime .....................   Passed    0.05 sec
+      Start 588: naga.ai
+21/60 Test #588: naga.ai ...........................   Passed    0.04 sec
+      Start 564: weapon_impacts.selection
+22/60 Test #564: weapon_impacts.selection ..........   Passed    0.02 sec
+      Start 586: naga.clocks
+23/60 Test #586: naga.clocks .......................   Passed    0.04 sec
+      Start 362: ai_fire.lifetime
+24/60 Test #362: ai_fire.lifetime ..................   Passed    0.04 sec
+      Start 354: ai_fire.clearance
+25/60 Test #354: ai_fire.clearance .................   Passed    0.04 sec
+      Start 356: ai_fire.head
+26/60 Test #356: ai_fire.head ......................   Passed    0.04 sec
+      Start 360: ai_fire.recovery
+27/60 Test #360: ai_fire.recovery ..................   Passed    0.03 sec
+      Start 358: ai_fire.keys
+28/60 Test #358: ai_fire.keys ......................   Passed    0.02 sec
+      Start 357: ai_fire.aim
+29/60 Test #357: ai_fire.aim .......................   Passed    0.02 sec
+      Start 359: ai_fire.cadence
+30/60 Test #359: ai_fire.cadence ...................   Passed    0.03 sec
+      Start 353: ai_fire.selection
+31/60 Test #353: ai_fire.selection .................   Passed    0.03 sec
+      Start 361: ai_fire.failures
+32/60 Test #361: ai_fire.failures ..................   Passed    0.04 sec
+      Start  10: objects.unsupported_teardown
+33/60 Test  #10: objects.unsupported_teardown ......   Passed    0.11 sec
+      Start   9: objects.messages_strings
+34/60 Test   #9: objects.messages_strings ..........   Passed    0.08 sec
+      Start  11: objects.creation_failures
+35/60 Test  #11: objects.creation_failures .........   Passed    0.06 sec
+      Start 355: ai_fire.filters
+36/60 Test #355: ai_fire.filters ...................   Passed    0.04 sec
+      Start   3: objects.reasons_properties
+37/60 Test   #3: objects.reasons_properties ........   Passed    0.03 sec
+      Start   8: objects.links_lists
+38/60 Test   #8: objects.links_lists ...............   Passed    0.02 sec
+      Start   1: objects.original_objects
+39/60 Test   #1: objects.original_objects ..........   Passed    0.03 sec
+      Start   5: objects.deferred_removal
+40/60 Test   #5: objects.deferred_removal ..........   Passed    0.03 sec
+      Start   7: objects.handles_selection
+41/60 Test   #7: objects.handles_selection .........   Passed    0.03 sec
+      Start   2: objects.nested_creation
+42/60 Test   #2: objects.nested_creation ...........   Passed    0.03 sec
+      Start   4: objects.scheduling
+43/60 Test   #4: objects.scheduling ................   Passed    0.03 sec
+      Start   6: objects.aggregate_dispatch
+44/60 Test   #6: objects.aggregate_dispatch ........   Passed    0.03 sec
+      Start 144: explosions.player
+45/60 Test #144: explosions.player .................   Passed    0.12 sec
+      Start 137: explosions.properties
+46/60 Test #137: explosions.properties .............   Passed    0.07 sec
+      Start 138: explosions.requests
+47/60 Test #138: explosions.requests ...............   Passed    0.07 sec
+      Start 140: explosions.chain
+48/60 Test #140: explosions.chain ..................   Passed    0.06 sec
+      Start 141: explosions.gates
+49/60 Test #141: explosions.gates ..................   Passed    0.06 sec
+      Start 139: explosions.radius
+50/60 Test #139: explosions.radius .................   Passed    0.06 sec
+      Start 143: explosions.limits
+51/60 Test #143: explosions.limits .................   Passed    0.06 sec
+      Start 142: explosions.lifetime
+52/60 Test #142: explosions.lifetime ...............   Passed    0.06 sec
+      Start 590: energy.weapon
+53/60 Test #590: energy.weapon .....................   Passed    0.11 sec
+      Start 591: energy.filters
+54/60 Test #591: energy.filters ....................   Passed    0.07 sec
+      Start 592: energy.lifetime
+55/60 Test #592: energy.lifetime ...................   Passed    0.07 sec
+      Start 593: energy.callbacks
+56/60 Test #593: energy.callbacks ..................   Passed    0.07 sec
+      Start 594: energy.failures
+57/60 Test #594: energy.failures ...................   Passed    0.07 sec
+      Start 595: energy.ai
+58/60 Test #595: energy.ai .........................   Passed    0.07 sec
+      Start 596: energy.private
+59/60 Test #570: weapon_impacts.private ............   Passed  100.47 sec
+60/60 Test #596: energy.private ....................   Passed   12.36 sec
+
+100% tests passed, 0 tests failed out of 60
+
+Label Time Summary:
+ai_fire           =  29.05 sec*proc (12 tests)
+energy            =  12.81 sec*proc (7 tests)
+explosions        =   0.55 sec*proc (8 tests)
+headless          = 211.30 sec*proc (60 tests)
+naga              =  21.67 sec*proc (6 tests)
+objects           =   0.49 sec*proc (11 tests)
+private           = 207.31 sec*proc (7 tests)
+weapon_audio      =  12.72 sec*proc (6 tests)
+weapon_impacts    = 101.54 sec*proc (7 tests)
+world             =  32.47 sec*proc (3 tests)
+
+Total Test time (real) = 110.87 sec

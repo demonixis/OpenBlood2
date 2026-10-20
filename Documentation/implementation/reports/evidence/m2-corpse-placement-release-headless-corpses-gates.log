@@ -1,0 +1,14 @@
+510/703 Testing: corpses.gates
+510/703 Test: corpses.gates
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/corpse_tests" "gates" "/home/yann/projects/lithtech/Blood2/build/release/tests/corpse-fixtures/gates"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"corpses.gates" start time: Oct 17 04:28 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.gates" end time: Oct 17 04:28 CEST
+"corpses.gates" time elapsed: 00:00:00
+----------------------------------------------------------

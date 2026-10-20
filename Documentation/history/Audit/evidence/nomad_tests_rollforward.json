@@ -1,0 +1,15 @@
+{
+  "name": "nomad_tests_rollforward",
+  "command": [
+    "dotnet",
+    "--roll-forward",
+    "Major",
+    "/tmp/lithtech-audit-2bVxTF/dotnet-tests/bin/Nomad.Tests/debug/Nomad.Tests.dll"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:13:54.605603+00:00",
+  "elapsed_seconds": 0.205,
+  "timeout_seconds": 60,
+  "exit_code": 1,
+  "log": "nomad_tests_rollforward.log"
+}

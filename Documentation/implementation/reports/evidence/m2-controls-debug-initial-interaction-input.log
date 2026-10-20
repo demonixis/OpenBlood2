@@ -1,0 +1,14 @@
+123/491 Testing: interaction.input
+123/491 Test: interaction.input
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction_tests" "input" "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction-fixtures/input"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"interaction.input" start time: Oct 16 16:22 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"interaction.input" end time: Oct 16 16:22 CEST
+"interaction.input" time elapsed: 00:00:00
+----------------------------------------------------------

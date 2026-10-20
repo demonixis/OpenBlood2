@@ -1,0 +1,14 @@
+514/626 Testing: player_restore.lifetime
+514/626 Test: player_restore.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_restore_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-restore-fixtures/lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_restore.lifetime" start time: Oct 17 02:45 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.17 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.lifetime" end time: Oct 17 02:45 CEST
+"player_restore.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,27 @@
+[0/2] Re-checking globbed directories...
+[1/27] Scanning /home/yann/projects/lithtech/Blood2/tests/object_contract_tests.cpp for CXX dependencies
+[2/27] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[3/27] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[4/27] Scanning /home/yann/projects/lithtech/Blood2/tests/player_restore_tests.cpp for CXX dependencies
+[5/27] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[6/27] Generating CXX dyndep file tests/CMakeFiles/player_restore_tests.dir/CXX.dd
+[7/27] Scanning /home/yann/projects/lithtech/Blood2/tests/player_tests.cpp for CXX dependencies
+[8/27] Generating CXX dyndep file tests/CMakeFiles/player_tests.dir/CXX.dd
+[9/27] Scanning /home/yann/projects/lithtech/Blood2/tests/player_keepalive_tests.cpp for CXX dependencies
+[10/27] Generating CXX dyndep file tests/CMakeFiles/player_keepalive_tests.dir/CXX.dd
+[11/27] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[12/27] Scanning /home/yann/projects/lithtech/Blood2/tests/screen_fade_tests.cpp for CXX dependencies
+[13/27] Generating CXX dyndep file tests/CMakeFiles/screen_fade_tests.dir/CXX.dd
+[14/27] Building CXX object tests/CMakeFiles/player_restore_tests.dir/__/src/app/model_scene.cpp.o
+[15/27] Building CXX object tests/CMakeFiles/player_keepalive_tests.dir/__/src/app/model_scene.cpp.o
+[16/27] Building CXX object tests/CMakeFiles/player_tests.dir/player_tests.cpp.o
+[17/27] Building CXX object tests/CMakeFiles/object_contract_tests.dir/object_contract_tests.cpp.o
+[18/27] Building CXX object tests/CMakeFiles/player_keepalive_tests.dir/player_keepalive_tests.cpp.o
+[19/27] Building CXX object tests/CMakeFiles/player_restore_tests.dir/player_restore_tests.cpp.o
+[20/27] Linking CXX executable tests/player_tests
+[21/27] Linking CXX executable tests/object_contract_tests
+[22/27] Building CXX object tests/CMakeFiles/screen_fade_tests.dir/__/src/app/sprite_scene.cpp.o
+[23/27] Linking CXX executable tests/player_keepalive_tests
+[24/27] Linking CXX executable tests/player_restore_tests
+[25/27] Building CXX object tests/CMakeFiles/screen_fade_tests.dir/screen_fade_tests.cpp.o
+[26/27] Linking CXX executable tests/screen_fade_tests

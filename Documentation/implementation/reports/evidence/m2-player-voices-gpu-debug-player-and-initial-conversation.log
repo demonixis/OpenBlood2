@@ -1,0 +1,77 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 75
+    Start  75: gpu.player
+
+75: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--player-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player.png"
+75: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+75: Test timeout computed to be: 25
+75: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+75: [info] BLOOD2.REZ: detected, 267758913 bytes
+75: [info] SOUND.REZ: detected, 204633068 bytes
+75: [info] BLOOD2P.REZ: detected, 24133434 bytes
+75: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+75: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+75: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+75: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+75: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+75: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+75: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/player.png
+75: [info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+75: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+75: [info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+75: [info] AI paths: hidden=true, reentered=true, copied points=7
+75: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+75: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+75: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+1/2 Test  #75: gpu.player .......................   Passed    2.83 sec
+test 847
+    Start 847: gpu.conversation_private
+
+847: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--world" "02_cityhub" "--cinematics-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/conversations.png"
+847: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+847: Environment variables: 
+847:  SDL_AUDIODRIVER=dummy
+847: Test timeout computed to be: 90
+847: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+847: [info] BLOOD2.REZ: detected, 267758913 bytes
+847: [info] SOUND.REZ: detected, 204633068 bytes
+847: [info] BLOOD2P.REZ: detected, 24133434 bytes
+847: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+847: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+847: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+847: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+847: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+847: [info] DAT v56: 1026 source objects, 487 original instances, 100 BSP models
+847: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/conversations.png
+847: [info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+847: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+847: [info] Session playback: waiting=0 time=0.9366666666666672 npc-ready=27 npc-failed=0 npc-updates=27
+847: [error] GPU smoke failed: selection=true, crouch/run frames=0/0, skeleton reentry/hidden=false/false, crouched/stood=false/false, locomotion/walk/run/jump=false/false/false/false, objects=491/491, strings=9/9
+2/2 Test #847: gpu.conversation_private .........***Failed    5.97 sec
+
+The following tests passed:
+	gpu.player
+
+50% tests passed, 1 tests failed out of 2
+
+Label Time Summary:
+conversation    =   5.97 sec*proc (1 test)
+gpu             =   8.80 sec*proc (2 tests)
+player          =   2.83 sec*proc (1 test)
+private         =   8.80 sec*proc (2 tests)
+
+Total Test time (real) =   8.81 sec
+
+The following tests FAILED:
+	847 - gpu.conversation_private (Failed)                 conversation gpu private
+Errors while running CTest
+Output from these tests are in: /home/yann/projects/lithtech/Blood2/build/debug/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

@@ -1,0 +1,13 @@
+{
+  "name": "abc_cycle",
+  "command": [
+    "/tmp/lithtech-audit-2bVxTF/abc_cycle_probe",
+    "/tmp/lithtech-audit-2bVxTF/synthetic-cycle.abc"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:21:31.872538+00:00",
+  "elapsed_seconds": 3.002,
+  "timeout_seconds": 3,
+  "exit_code": 124,
+  "log": "abc_cycle.log"
+}

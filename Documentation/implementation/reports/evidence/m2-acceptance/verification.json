@@ -1,0 +1,63 @@
+[
+  {
+    "name": "format",
+    "command": [
+      ".cache/format-venv/bin/clang-format",
+      "--dry-run",
+      "--Werror",
+      "src/app/inspector_sprites.cpp",
+      "src/game/blood_spurts.cpp",
+      "src/game/blood_spurts.h",
+      "src/game/original/ParticleExplosionFX.cpp",
+      "src/game/original/ParticleExplosionFX.h",
+      "tests/blood_spurt_fixture.h",
+      "tests/blood_spurt_tests.cpp",
+      "tests/train_session_tests.cpp"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "name": "implementation whitespace",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "name": "workspace maintained whitespace",
+    "command": [
+      "git",
+      "diff",
+      "--check",
+      "--",
+      "AGENTS.md",
+      "Documentation/Implementation/m2.md",
+      "Documentation/Roadmap/03_milestones.md",
+      "Documentation/Roadmap/readme.md"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "name": "links",
+    "command": [
+      "python",
+      "/tmp/b2-npc-links.py"
+    ],
+    "exit": 0,
+    "output": "4456 local Markdown links valid\n"
+  },
+  {
+    "name": "reference integrity",
+    "command": [
+      "python",
+      "/tmp/b2-npc-integrity.py"
+    ],
+    "exit": 0,
+    "output": "10923 reference files unchanged; six repositories clean\n"
+  }
+]

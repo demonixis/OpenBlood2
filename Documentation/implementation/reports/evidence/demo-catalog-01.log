@@ -1,0 +1,63 @@
+[info] Log session: /tmp/blood2-demo-inspect-logs/session-1792406155550992645-0
+[info] OpenBlood2 0.3.0 / 3a9466f-dirty / Debug / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-3a9466f (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=Demo_01; demo=true; config=blood2.local.ini; inspector=true; view=false; bench=false; headless=true; frames=0
+[info] External data: /home/yann/Games/B2Demo (--data-dir)
+[info] B2DEMO.REZ: detected, 55041396 bytes
+[info] World worlds/demo_01.dat from B2Demo.rez (0 overrides)
+[info] 1364 resources in 1 mounts; DAT v56: 1289 objects, 615 original instances, 120 BSP models
+[info] Acid / Original instance: 1
+[info] BaseClass / Original instance: 1
+[info] BerettaPU / Original instance: 1
+[info] Blood / Original instance: 1
+[info] BulletAmmoPU / Original instance: 2
+[info] CClientParticleStreamSFX / Original instance: 2
+[info] CDestructableBrush / Omitted: missing world model: 1
+[info] CDestructableBrush / Original instance: 43
+[info] CDestructableModel / Original instance: 106
+[info] CGib / Original instance: 24
+[info] CameraObj / Original instance: 1
+[info] CameraSpot / Original instance: 1
+[info] CinematicTrigger / Original instance: 5
+[info] CivilianAI / Original instance: 20
+[info] Container / Original instance: 1
+[info] Conveyor / Original instance: 3
+[info] Damage / Original instance: 2
+[info] DemoSkyWorldModel / Original instance: 1
+[info] DetailSprite / Original instance: 1
+[info] DirLight / Preprocessor only: 28
+[info] Door / Original instance: 55
+[info] ExitTrigger / Original instance: 1
+[info] Fanatic / Original instance: 31
+[info] GameStartPoint / Original instance: 1
+[info] HealthPU / Original instance: 1
+[info] Key / Original instance: 14
+[info] KeyFramer / Original instance: 2
+[info] KeyPickup / Original instance: 3
+[info] Ladder / Original instance: 4
+[info] Light / Preprocessor only: 688
+[info] MedKitPU / Original instance: 1
+[info] MegaHealthPU / Original instance: 1
+[info] Model / Original instance: 13
+[info] NecroWardPU / Original instance: 1
+[info] ObjectivesTrigger / Original instance: 6
+[info] OutsideDef / Preprocessor only: 1
+[info] PathPoint / Original instance: 64
+[info] RandomSoundFX / Original instance: 2
+[info] RotatingBrush / Original instance: 1
+[info] RotatingDoor / Original instance: 5
+[info] ShikariAI / Original instance: 1
+[info] SkyPointer / Original instance: 4
+[info] SoulDrudge / Original instance: 4
+[info] Sound / World-owned sound: 23
+[info] SoundFX / Original instance: 2
+[info] Spawner / Original instance: 20
+[info] StartPoint / Original instance: 1
+[info] StealthPU / Original instance: 1
+[info] Trigger / Original instance: 81
+[info] TripLaser / Original instance: 7
+[info] VoodooDollPU / Original instance: 1
+[info] Water / Original instance: 3
+[info] WorldProperties / Original instance: 1
+[info] World inspection succeeded; full gameplay remains blocked
+[info] Session finished: exit_code=0

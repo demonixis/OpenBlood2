@@ -1,0 +1,14 @@
+443/445 Testing: ai_runtime.failures
+443/445 Test: ai_runtime.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_runtime_tests" "failures" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_runtime.failures" start time: Oct 16 15:12 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.28 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.failures" end time: Oct 16 15:12 CEST
+"ai_runtime.failures" time elapsed: 00:00:00
+----------------------------------------------------------

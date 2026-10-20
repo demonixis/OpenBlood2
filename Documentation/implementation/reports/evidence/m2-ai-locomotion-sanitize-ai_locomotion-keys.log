@@ -1,0 +1,14 @@
+403/406 Testing: ai_locomotion.keys
+403/406 Test: ai_locomotion.keys
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "keys"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.keys" start time: Oct 16 13:42 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.keys" end time: Oct 16 13:42 CEST
+"ai_locomotion.keys" time elapsed: 00:00:00
+----------------------------------------------------------

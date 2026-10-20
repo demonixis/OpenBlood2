@@ -1,0 +1,14 @@
+471/701 Testing: ai_runtime.targets
+471/701 Test: ai_runtime.targets
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_runtime_tests" "targets"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_runtime.targets" start time: Oct 17 04:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.targets" end time: Oct 17 04:03 CEST
+"ai_runtime.targets" time elapsed: 00:00:00
+----------------------------------------------------------

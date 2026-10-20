@@ -1,0 +1,81 @@
+66/576 Testing: weapons.private
+66/576 Test: weapons.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapons.private" start time: Oct 16 23:50 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+weapon 1: 463 vertices; 6 clips
+  static_model 1 ms
+  draw 333 ms
+  fire 150 ms [0:fire_key]
+  start_alt_fire 166 ms
+  alt_fire 200 ms [0:fire_key]
+  end_alt_fire 200 ms
+weapon 17: 488 vertices; 5 clips
+  alt_fire 1066 ms [613:fire_key]
+  fire2 966 ms [233:fire_key] [566:fire_key]
+  fire 566 ms [133:fire_key] [366:fire_key]
+  draw 333 ms
+  static_model 1 ms
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+weapon 1: 463 vertices; 6 clips
+  static_model 1 ms
+  draw 333 ms
+  fire 150 ms [0:fire_key]
+  start_alt_fire 166 ms
+  alt_fire 200 ms [0:fire_key]
+  end_alt_fire 200 ms
+weapon 17: 488 vertices; 5 clips
+  alt_fire 1066 ms [613:fire_key]
+  fire2 966 ms [233:fire_key] [566:fire_key]
+  fire 566 ms [133:fire_key] [366:fire_key]
+  draw 333 ms
+  static_model 1 ms
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+weapon 1: 463 vertices; 6 clips
+  static_model 1 ms
+  draw 333 ms
+  fire 150 ms [0:fire_key]
+  start_alt_fire 166 ms
+  alt_fire 200 ms [0:fire_key]
+  end_alt_fire 200 ms
+weapon 17: 488 vertices; 5 clips
+  alt_fire 1066 ms [613:fire_key]
+  fire2 966 ms [233:fire_key] [566:fire_key]
+  fire 566 ms [133:fire_key] [366:fire_key]
+  draw 333 ms
+  static_model 1 ms
+<end of output>
+Test time = 184.46 sec
+----------------------------------------------------------
+Test Passed.
+"weapons.private" end time: Oct 16 23:53 CEST
+"weapons.private" time elapsed: 00:03:04
+----------------------------------------------------------
+
+End testing: Oct 16 23:53 CEST
+
+character_audio =  47.97 sec*proc
+
+explosion_sprites =   7.37 sec*proc
+
+headless = 412.86 sec*proc
+
+objects =   0.31 sec*proc
+
+private = 408.85 sec*proc
+
+sprite_view =   6.70 sec*proc
+
+weapon_audio =   8.66 sec*proc
+
+weapon_impacts =  88.61 sec*proc
+
+weapon_sprites =  16.07 sec*proc
+
+weapons = 185.15 sec*proc
+
+world =  52.01 sec*proc
+

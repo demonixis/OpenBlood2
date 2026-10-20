@@ -1,0 +1,360 @@
+{
+  "status": "verified and committed; M2 incomplete",
+  "baseline_commit": "23743a40b3db3bf1dcf597319895b00d6ae071d4",
+  "implementation_commit": "1a8915f962768de41739a646561b33c54bfbcc31",
+  "date": "2026-10-17",
+  "scope": "Original screen fades, authored train exit diagnostic, bounded smoke capacity; M2 remains incomplete",
+  "toolchain": {
+    "cmake": "4.3.0",
+    "debug_release": "GCC 16.2.1",
+    "sanitizers": "Clang 22.1.8 ASan/UBSan with leak detection",
+    "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU / Vulkan",
+    "release_inspector": false,
+    "native_metal_this_run": false
+  },
+  "checks": [
+    {
+      "configuration": "debug",
+      "kind": "headless",
+      "passed": 69,
+      "summary": "m2-screen-fade-final-tests-debug.log"
+    },
+    {
+      "configuration": "release",
+      "kind": "headless",
+      "passed": 69,
+      "summary": "m2-screen-fade-final-tests-release.log"
+    },
+    {
+      "configuration": "sanitize",
+      "kind": "headless",
+      "passed": 25,
+      "summary": "m2-screen-fade-final-tests-sanitize.log"
+    },
+    {
+      "configuration": "debug",
+      "kind": "gpu",
+      "passed": 10,
+      "summary": "m2-screen-fade-final-gpu-debug.log"
+    },
+    {
+      "configuration": "release",
+      "kind": "gpu",
+      "passed": 10,
+      "summary": "m2-screen-fade-final-gpu-release.log"
+    }
+  ],
+  "prior_sanitizer_suite": "68/69 passed; only the newly introduced fade delta guard rejected an existing .11-second test. Final 25-test run rechecks the corrected fade path, original ring test, object lifetime and player restoration. It does not claim a second full 69-test sanitizer run.",
+  "observations": {
+    "private_cycles": 2,
+    "simulation_hz": 60,
+    "fade_delay_seconds": 7,
+    "exit_relay_delay_seconds": 12,
+    "original_exit_delay_seconds": 2,
+    "peak_trail_particles": 10240,
+    "peak_total_trail_particles": 10240,
+    "smoke_system_and_total_budget": 16384,
+    "other_particle_default_budget": 2048,
+    "sprite_quad_limit": 32768,
+    "traced_boundaries_per_cycle": 174,
+    "source_trace_rows_per_configuration": 348,
+    "known_unsupported_player_commands_per_cycle": 1,
+    "source_trigger_slots_delivered_per_cycle": 10
+  },
+  "diagnostic_policy": "Completes authored intro, relocates to final carriage, then uses normal movement/USE/contact and original view-weapon firing with diagnostic aiming. No trigger rearm, NPC edits, health/ammo grants, invulnerability, damage injection or direct exit injection. Not a full playthrough.",
+  "initial_failures": [
+    {
+      "log": "m2-screen-fade-private-diagnostic4.log",
+      "reason": "Old 2048 per-trail pool exhausted at 6.78333 seconds, 2024 particles before burst / 3919 across trails."
+    },
+    {
+      "log": "m2-screen-fade-private-diagnostic5.log",
+      "reason": "A diagnostic larger manager pool still hit the old integrator cap; resolved with explicit bounded capacity, default 2048 unchanged."
+    },
+    {
+      "log": "m2-screen-fade-private-budget.log",
+      "reason": "Stationary relocated player died in the uncleared carriage. Final diagnostic fights through original FIRE_KEY; no immunity or health change."
+    },
+    {
+      "log": "m2-screen-fade-tests-sanitize.log",
+      "reason": "Fade initially rejected an existing valid .11-second session diagnostic; code corrected to the existing 60-second core bound, not a changed ring test."
+    },
+    {
+      "log": "m2-screen-fade-gpu-debug-initial.log",
+      "reason": "New UI pixel-count threshold assumed a large viewport. The 640px HUD has 814 bright text pixels; final check scales its minimum with width and retains pixel brightness/order assertions."
+    }
+  ],
+  "commands": {
+    "headless": "ctest --test-dir Blood2/build/<config> -j2 -R '^(objects|world|player_restore|coverage|screen_fade|object_particles|sprite_view|explosion_rings|hud|player_controls)\\.' --output-on-failure",
+    "final_sanitizers": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir Blood2/build/sanitize -j3 -R '^(objects|player_restore|screen_fade|explosion_rings)\\.' --output-on-failure",
+    "gpu": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir Blood2/build/<debug|release> -R '^gpu\\.(screen_fade|mouse_combat|corpse_clearance|level_change|lifecycle|object_particle_tint|object_particle_private|sprite_alpha|sprite_private|hud)$' --output-on-failure"
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "source_selections": "../../../Blood2/docs/M2_SCREEN_FADE_SOURCES.json",
+  "patch": {
+    "path": "m2-screen-fade.patch",
+    "sha256": "fe989c1ec76775d27ff8f6aceaa66ac49a8fab324a0cc5595165a777cf0a6564"
+  },
+  "implementation_files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "938f7b22d720f857c05850954ff35dbf15b28344ce6440f756a2dbb376ae97fd"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "00bfd9631f54706281192ae292764ceec9ca37b30291e5aaedafb2bd44dbeeeb"
+    },
+    {
+      "path": "docs/M2_SCREEN_FADE_SOURCES.json",
+      "sha256": "20c88c576ec0cdeb85328e4af5d19164c5507a725050bfd01f4d08296ba512c6"
+    },
+    {
+      "path": "docs/OBJECT_PARTICLE_CONTRACTS.md",
+      "sha256": "b5c37a1352c0c426e945a8b19482246780eb90d236722ce8641c55ba119d5137"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "968e93d5c945f6593a09a1a659d59344bcb0ed51137613e2d29bd7f13d341eb6"
+    },
+    {
+      "path": "docs/SCREEN_FADE_CONTRACTS.md",
+      "sha256": "f62356040b5fd7a39d130c9dfa9487da75c1b2ae9569fc4fc937a45419d20ad6"
+    },
+    {
+      "path": "src/app/hud.cpp",
+      "sha256": "89f441b491b4018397cbdb382f70c5db3d19d22e433a377648dd10d7a49f700d"
+    },
+    {
+      "path": "src/app/hud.h",
+      "sha256": "a3a793777fe11e999f9ea70d1806342ab5cfbaf94d27daa882844fae744cd5ee"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "871613834d15dddab33b46fcb355ac5776a90a3156648e4b236310a307ddd244"
+    },
+    {
+      "path": "src/app/main.cpp",
+      "sha256": "7e11a812ed6cc9ec735a62c93ea6268b7dd729b1297de84a008ce5a3977fd668"
+    },
+    {
+      "path": "src/engine/particles.cpp",
+      "sha256": "e1ab6262b6c57e197781dc5734605d98218c008ec2bec0aae863a9723b3fbeeb"
+    },
+    {
+      "path": "src/engine/particles.h",
+      "sha256": "87e2d88f82598efa91d383490fa596953c88b6f757de8c471860fb401b80a132"
+    },
+    {
+      "path": "src/engine/sprite_view.h",
+      "sha256": "4cbe66074b9a27423a0e1175913b49884efedb49e89b568eea6b89c43eb0ca26"
+    },
+    {
+      "path": "src/game/explosion_fragments.cpp",
+      "sha256": "1a9a79f7588a987b2246021792ccdbb2f58991d6eba6b4ce52d9da682b1aaadd"
+    },
+    {
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "7b50743815652143bff759712f3db2ab5c8f5f95825a0a9a0ee6bf4b2299179f"
+    },
+    {
+      "path": "src/game/original/BloodShells.h",
+      "sha256": "b1bbe2fa9ef8e812e6d7b337c313d23688ef1eb24558a9f706ea19f54d881630"
+    },
+    {
+      "path": "src/game/original/ObjectParticleFX.cpp",
+      "sha256": "3040430d7ca0e1e09615be3cbeeac651089f877030130d809699601cec2d4c99"
+    },
+    {
+      "path": "src/game/original/PlayerContainers.cpp",
+      "sha256": "4b4369db803d245cb465f2c69110acac67af4b2978713f86d97ee98d99801bad"
+    },
+    {
+      "path": "src/game/original/PlayerObj.h",
+      "sha256": "28a50ba1a26676b709640607daca2412ca04ef87efaac6bac2b7975025c0a889"
+    },
+    {
+      "path": "src/game/original/ScreenFade.cpp",
+      "sha256": "7b7831cfddf77a068382176599374b2b3d9eb634a6140410cdca4786d86d7c69"
+    },
+    {
+      "path": "src/game/original/ScreenFade.h",
+      "sha256": "35d10af45fe1777f0d4c073164f8023d8a481d94e1ce6f08b3ee703e1d977ba9"
+    },
+    {
+      "path": "src/game/player_messages.h",
+      "sha256": "10653190080f79e96829c6d594a47f6cc8aaf8769043ca1ddca56f2802935f34"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "aac4c3ded56719660bb91dd40fe9f878169bf24f332a51ec08b2688a5e48f7f5"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "cb2d5e793bebff0d4d80435cc67c2eb27f7f34dda860e851ccf9264985cedbd8"
+    },
+    {
+      "path": "tests/object_particle_tests.cpp",
+      "sha256": "e6dba20167c24d23a88c9e9897ae0ca5f949ea20543bc800f2e449e6d803d56f"
+    },
+    {
+      "path": "tests/screen_fade_gpu_tests.cpp",
+      "sha256": "b574fce5db59720c06a82c132f51de784fe7692e8a7100aeb1a643c498a464ee"
+    },
+    {
+      "path": "tests/screen_fade_tests.cpp",
+      "sha256": "5a51e1bc6658577a8790bd446592fa8960eee10eef63764dcd07be92b5deb1d8"
+    }
+  ],
+  "evidence_files": [
+    {
+      "path": "m2-screen-fade-final-build-debug.log",
+      "sha256": "d4444b21baf023b525695807c9a4fed201bf769991bcc28b553b15fa6390d6dd"
+    },
+    {
+      "path": "m2-screen-fade-final-build-release.log",
+      "sha256": "19d8742afd2a1c08f74c5c5d8cc9f8bc42cc64f3100ca5d650779badae0d995f"
+    },
+    {
+      "path": "m2-screen-fade-final-build-sanitize.log",
+      "sha256": "ba4aae759b8e96d7692ea024e20a61d67cf499257ce77c8de191b41faa6793f8"
+    },
+    {
+      "path": "m2-screen-fade-corrected-build-debug.log",
+      "sha256": "136922fc3db86a25c52991e005c384d259107f06d78eedec3a840d431845e6eb"
+    },
+    {
+      "path": "m2-screen-fade-corrected-build-release.log",
+      "sha256": "1677a77134d7babe305a59eec04e43dee33b17121d8fb39eaac38d09a6cca3f7"
+    },
+    {
+      "path": "m2-screen-fade-corrected-build-sanitize.log",
+      "sha256": "a0517925e3983cd322c6703fd734622169f35edbff052f3e7407a34c04c849af"
+    },
+    {
+      "path": "m2-screen-fade-final-tests-debug.log",
+      "sha256": "845e5a8506c522c3c28fb31725ae20aea73d9b467b73ee868841e35505b26d81"
+    },
+    {
+      "path": "m2-screen-fade-final-tests-release.log",
+      "sha256": "5538dbd5ab621b13613660d22908ae86b0bf9534a240603e686a8ffba0ef01c1"
+    },
+    {
+      "path": "m2-screen-fade-final-tests-sanitize.log",
+      "sha256": "01c1d414fc548cbb8eca62542395cccf6f391b401984d268ec05396a333672c6"
+    },
+    {
+      "path": "m2-screen-fade-final-gpu-debug.log",
+      "sha256": "8e8d2aeaa5549a5cefb9255bf99fbd1c33c2203bac86cf89db246d097ddfc6c3"
+    },
+    {
+      "path": "m2-screen-fade-final-gpu-release.log",
+      "sha256": "753b6b9a35e1037caf891d6904da66ea340381509b18248f56210b235cfd2cb4"
+    },
+    {
+      "path": "m2-screen-fade-gpu-detail-debug.log",
+      "sha256": "a5ba9fcb64e73b62cf803f300b69623a18aa57d4eedb24c1d00ef8a17dc16cff"
+    },
+    {
+      "path": "m2-screen-fade-gpu-detail-release.log",
+      "sha256": "b23c33f7c3c5f2d0783dba80905cb62864d746cc9935fcee02ae7db7c9ec0025"
+    },
+    {
+      "path": "m2-screen-fade-format.log",
+      "sha256": "d80811af002d41684fc7917678f58ac907ec7158de788942e40c54565889a212"
+    },
+    {
+      "path": "m2-screen-fade-links.log",
+      "sha256": "b3ad6cc0641e22bf5aabc7cfb52ae7eefa5bd8b0967599bda7dffe8e0933f56e"
+    },
+    {
+      "path": "m2-screen-fade-integrity.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6"
+    },
+    {
+      "path": "m2-screen-fade-private-diagnostic2.log",
+      "sha256": "f6ea86d4918a5df3e86447a9397f698b97734977d4e137a7779882c27063ce2e"
+    },
+    {
+      "path": "m2-screen-fade-private-diagnostic4.log",
+      "sha256": "b0bcb77b396ddc848c0153c95dc2d00ab0c1f9880476f6bae57074d9e621e701"
+    },
+    {
+      "path": "m2-screen-fade-private-diagnostic5.log",
+      "sha256": "c2e3b2caeb9fa13db2f417349e6e69a6e9f93f8dae7cd0672b43ff02ca61a3d7"
+    },
+    {
+      "path": "m2-screen-fade-private-budget.log",
+      "sha256": "483afb026adcfea6940735e1dd1776b49699f52d10d2cab5b7efe9b7b1c43a9b"
+    },
+    {
+      "path": "m2-screen-fade-tests-debug.log",
+      "sha256": "638645d859f579f6e25b4259f5e0a4e430010ebb3e72fda10766e00aca413148"
+    },
+    {
+      "path": "m2-screen-fade-tests-release.log",
+      "sha256": "f47cd5b5249d6162eb962caa7995b27bceafdff4c393e1ec1cabe40c56b91c44"
+    },
+    {
+      "path": "m2-screen-fade-tests-sanitize.log",
+      "sha256": "e31824d1a4cc4e22372a871f253380dfd26358d9dd81f606d23a724213a00136"
+    },
+    {
+      "path": "m2-screen-fade-gpu-debug-initial.log",
+      "sha256": "64fa9069f51e0df3483b46fdda99ed66516018241d4fd8d6b995db2a83378241"
+    },
+    {
+      "path": "m2-screen-fade-exit-trace-debug.tsv",
+      "sha256": "9591dc7775bd3e51f7bb2462aa878da4f1843eca091b2b0b894e41a000d8441d"
+    },
+    {
+      "path": "m2-screen-fade-exit-trace-release.tsv",
+      "sha256": "9591dc7775bd3e51f7bb2462aa878da4f1843eca091b2b0b894e41a000d8441d"
+    },
+    {
+      "path": "m2-screen-fade-private-sanitize.log",
+      "sha256": "cce9c101322f43b3e77619207f9d358475b4b13fd0e58168f575ca1d015bb7f8"
+    }
+  ],
+  "remaining": [
+    "M2 acceptance remains open; this is not complete level traversal or exhaustive required-service coverage.",
+    "Original Music/VoiceMgr/CTF commands, full lighting and other later milestones remain separate.",
+    "Compositing fade is not original material/global-light-scale fidelity.",
+    "Higher-rate/longer untested particle paths can still exhaust bounded pools.",
+    "No new native Apple GPU validation."
+  ]
+}

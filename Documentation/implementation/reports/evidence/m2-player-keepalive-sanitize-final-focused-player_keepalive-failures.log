@@ -1,0 +1,14 @@
+510/511 Testing: player_keepalive.failures
+510/511 Test: player_keepalive.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_keepalive_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-keepalive-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_keepalive.failures" start time: Oct 16 19:38 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"player_keepalive.failures" end time: Oct 16 19:38 CEST
+"player_keepalive.failures" time elapsed: 00:00:00
+----------------------------------------------------------

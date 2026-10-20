@@ -1,0 +1,14 @@
+465/472 Testing: ai_runtime.spatial
+465/472 Test: ai_runtime.spatial
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_runtime_tests" "spatial"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_runtime.spatial" start time: Oct 16 15:13 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.spatial" end time: Oct 16 15:13 CEST
+"ai_runtime.spatial" time elapsed: 00:00:00
+----------------------------------------------------------

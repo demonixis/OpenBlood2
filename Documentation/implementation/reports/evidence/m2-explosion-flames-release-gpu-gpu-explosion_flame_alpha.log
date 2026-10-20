@@ -1,0 +1,15 @@
+590/591 Testing: gpu.explosion_flame_alpha
+590/591 Test: gpu.explosion_flame_alpha
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_flame_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-flame-alpha"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.explosion_flame_alpha" start time: Oct 16 22:07 CEST
+Output:
+----------------------------------------------------------
+Flame RGB and system alpha: 3875 exact opaque-texel blend checks
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_flame_alpha" end time: Oct 16 22:07 CEST
+"gpu.explosion_flame_alpha" time elapsed: 00:00:00
+----------------------------------------------------------

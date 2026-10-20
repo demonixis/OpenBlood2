@@ -1,0 +1,31 @@
+335/649 Testing: model_view.builtin_city
+335/649 Test: model_view.builtin_city
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/model_view_tests" "builtin_city" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"model_view.builtin_city" start time: Oct 17 04:45 CEST
+Output:
+----------------------------------------------------------
+CityHub cycle 0: 47 built-in Models / 2 shared ABC assets / 3436 triangles / zero model or skin failures
+CityHub cycle 1: 47 built-in Models / 2 shared ABC assets / 3436 triangles / zero model or skin failures
+<end of output>
+Test time =   6.66 sec
+----------------------------------------------------------
+Test Passed.
+"model_view.builtin_city" end time: Oct 17 04:46 CEST
+"model_view.builtin_city" time elapsed: 00:00:06
+----------------------------------------------------------
+
+End testing: Oct 17 04:46 CEST
+
+headless =  71.38 sec*proc
+
+model_view =  12.18 sec*proc
+
+objects =   0.31 sec*proc
+
+private =  69.59 sec*proc
+
+services =  13.48 sec*proc
+
+world =  45.41 sec*proc
+

@@ -1,0 +1,3 @@
+LithTech::Engine::Update(float) at /home/yann/projects/lithtech/OpenBlood2/OpenLithTech/src/core/engine.cpp:61
+LithTech::Engine::RemoveObject(DObject*) at /home/yann/projects/lithtech/OpenBlood2/OpenLithTech/src/core/engine.cpp:163
+Callback(void*, unsigned int, void*, float) at /home/yann/projects/lithtech/Documentation/Audit/probes/engine_contract_probe.cpp:27

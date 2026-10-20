@@ -1,0 +1,141 @@
+{
+  "date": "2026-10-18",
+  "status": "M2 incomplete; explicit section/pattern decisions, MUSIC unsupported",
+  "implementation_parent": "08e3978f76c4de977a00e20497b41ff17f5fa00f",
+  "runs": [
+    {
+      "configuration": "debug",
+      "tests": 102,
+      "passed": 102,
+      "wall_seconds": 15.69
+    },
+    {
+      "configuration": "release",
+      "tests": 102,
+      "passed": 102,
+      "wall_seconds": 1.43
+    },
+    {
+      "configuration": "sanitize",
+      "tests": 102,
+      "passed": 102,
+      "wall_seconds": 65.7
+    },
+    {
+      "configuration": "debug NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 10.51
+    },
+    {
+      "configuration": "release NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 5.38
+    }
+  ],
+  "original_selection_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "rvas": [
+      "0x16afc..0x16b1a",
+      "0x16970..0x16996",
+      "0x17b33",
+      "0x17a4f"
+    ],
+    "generated": {
+      "cases": 4096,
+      "sha256": "7b8a629fa84cca632c63c8bf37babf7bf8c995edcf5ba7326295ee92b1ddda01",
+      "fnv64": 12281621980575432131
+    },
+    "private": {
+      "cases": 1188,
+      "sha256": "a1c4ad7fa377894e2a1bd6890095f6dd074439575a27508297238611b0082e83",
+      "fnv64": 2704444894253380274
+    },
+    "bound_sections": 132,
+    "missing_style_sections": 24,
+    "scope": "Original current chord/mute lookup, normal section pattern request, and pattern selection only; no global fallback, seek, activation or playback"
+  },
+  "gpu_environment": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+    "SDL_AUDIODRIVER": "dummy"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1"
+  },
+  "commands": [
+    "python3 m2-music-selection-validation.py <debug|release|sanitize>",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/<debug|release> -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit <result.xml>",
+    "<tool-venv>/bin/python m2-music-selection-probe.py <external-content-root>",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror <eight changed C++ files>"
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "limitations": [
+    "Normal section decision with explicit tick only; no live clock, seek/restart, pattern activation or MUSIC playback",
+    "Empty chord list global runtime fallback unavailable; failure remains explicit",
+    "24 installed Track1 sections retain missing-style failures",
+    "GPU capture reviews sound inspector summary; nested explicit-tick probe not visually exercised",
+    "Dummy audio; no soundtrack listening parity or native Metal/Windows/mobile verification",
+    "Required services and M2 acceptance remain open"
+  ],
+  "artifacts": {
+    "Documentation/Implementation/evidence/m2-music-selection-debug-build-final.log": "89a7bd819cfcf3cdd1502b6c835407123b02c88177fee6824afa29a09d69c2a5",
+    "Documentation/Implementation/evidence/m2-music-selection-debug-gpu.log": "45c99779186af192c2d4f702087b2068666f83a38b76e5da17f78c0ec862ee9b",
+    "Documentation/Implementation/evidence/m2-music-selection-debug-gpu.xml": "74832910fe450d0f505dbf1a1271225a7df902d927765b249e026cfcc6b48acf",
+    "Documentation/Implementation/evidence/m2-music-selection-debug-tests.log": "de29f3df90808d9fe6f3bdb0e64be54b1d3d068cc8b3f77e645c2244eab5e5cb",
+    "Documentation/Implementation/evidence/m2-music-selection-debug-tests.xml": "66a32471222d26c655e15c9da20b4ca23c490756822b488e2555d9b227a36b94",
+    "Documentation/Implementation/evidence/m2-music-selection-integrity.json": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+    "Documentation/Implementation/evidence/m2-music-selection-links.log": "f827d709579de64b830db010dc239997e47f460ba57e5da61dc6ade02a66433d",
+    "Documentation/Implementation/evidence/m2-music-selection-probe.json": "16ef88f96aca0dbf766c20397a427ee002178b81eb38290120df8520d0520a8c",
+    "Documentation/Implementation/evidence/m2-music-selection-probe.py": "82a651eca7d3d50237380c3f00bd4c3ccc062651d501c61c28eeac5f8816c16f",
+    "Documentation/Implementation/evidence/m2-music-selection-release-build-final.log": "3fef81699af732719e5a6ce164434d2f8db382c56dcfc30bbac8372e38fb772d",
+    "Documentation/Implementation/evidence/m2-music-selection-release-gpu.log": "f598a1cda712b0e46db19aaad57bc865bffd368de4e771d586570522944413a0",
+    "Documentation/Implementation/evidence/m2-music-selection-release-gpu.xml": "4660ed8f461b8186a47fab881c684b4727e82bf7c8df09ca21e195d69aa004e5",
+    "Documentation/Implementation/evidence/m2-music-selection-release-tests.log": "d6a2ea151afb9b572d4de2661dfa4ebca2b5ce9214c8c92df263b655faa3a78e",
+    "Documentation/Implementation/evidence/m2-music-selection-release-tests.xml": "4815d7d136cbe44cf5acbe632a4e7e5834fbdcc58fe18d32fc765550952e7200",
+    "Documentation/Implementation/evidence/m2-music-selection-sanitize-build-final.log": "9d0a8d9a6500205ae8f998266d85b6cf1306cfe4ffc98b50a4ab3ac32c35d184",
+    "Documentation/Implementation/evidence/m2-music-selection-sanitize-tests.log": "b82282a40d55496359a6d21b348cca5492b3cfd91c17cd54738fbdb790dbe50d",
+    "Documentation/Implementation/evidence/m2-music-selection-sanitize-tests.xml": "1ee82a834086bd3768bf073f60f5b467ee772328f249ca7808a60bd1791255e8",
+    "Documentation/Implementation/evidence/m2-music-selection-validation.py": "99b85716fd4e0b6b4ef1675df22153a082b1dfafa01726df20b965dac711d7fe"
+  },
+  "implementation_commit": "90ed46370d12dee326e9fbc12dcef2f0fc9e74e5",
+  "validation_note": "After headless validation, only an inspector summary label changed; the Debug app was rebuilt and its NVIDIA tests rerun. Release/sanitizer exclude the inspector."
+}

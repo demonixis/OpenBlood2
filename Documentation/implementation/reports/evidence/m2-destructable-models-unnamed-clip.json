@@ -1,0 +1,10 @@
+{
+  "resource": "models/worldobjects/ceilingfan2.abc",
+  "sha256": "402657c1a1b2144084ad28fee42852d1102227ffccd857562e55e259f62e1c16",
+  "bytes": 10971,
+  "animation_count": 1,
+  "clip_name": "",
+  "duration": 599,
+  "keys": 19,
+  "diagnosis": "The previous reader rejected the empty name despite a complete valid clip. No replacement clip or guessed name is supplied. All count, pose and payload bounds remain enabled."
+}

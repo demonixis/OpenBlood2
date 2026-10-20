@@ -1,0 +1,14 @@
+634/638 Testing: naga.lifetime
+634/638 Test: naga.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/naga_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/debug/tests/naga-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"naga.lifetime" start time: Oct 17 00:59 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"naga.lifetime" end time: Oct 17 00:59 CEST
+"naga.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,181 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  1: objects.original_objects
+ 1/81 Test  #1: objects.original_objects .........   Passed    0.00 sec
+      Start  2: objects.nested_creation
+ 2/81 Test  #2: objects.nested_creation ..........   Passed    0.00 sec
+      Start  3: objects.reasons_properties
+ 3/81 Test  #3: objects.reasons_properties .......   Passed    0.00 sec
+      Start  4: objects.scheduling
+ 4/81 Test  #4: objects.scheduling ...............   Passed    0.00 sec
+      Start  5: objects.deferred_removal
+ 5/81 Test  #5: objects.deferred_removal .........   Passed    0.00 sec
+      Start  6: objects.aggregate_dispatch
+ 6/81 Test  #6: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start  7: objects.handles_selection
+ 7/81 Test  #7: objects.handles_selection ........   Passed    0.00 sec
+      Start  8: objects.links_lists
+ 8/81 Test  #8: objects.links_lists ..............   Passed    0.00 sec
+      Start  9: objects.messages_strings
+ 9/81 Test  #9: objects.messages_strings .........   Passed    0.00 sec
+      Start 10: objects.unsupported_teardown
+10/81 Test #10: objects.unsupported_teardown .....   Passed    0.01 sec
+      Start 11: objects.creation_failures
+11/81 Test #11: objects.creation_failures ........   Passed    0.00 sec
+      Start 12: config.arguments
+12/81 Test #12: config.arguments .................   Passed    0.00 sec
+      Start 13: config.precedence
+13/81 Test #13: config.precedence ................   Passed    0.00 sec
+      Start 14: config.relative_paths
+14/81 Test #14: config.relative_paths ............   Passed    0.00 sec
+      Start 15: config.invalid_config
+15/81 Test #15: config.invalid_config ............   Passed    0.00 sec
+      Start 16: config.content_validation
+16/81 Test #16: config.content_validation ........   Passed    0.00 sec
+      Start 17: config.case_lookup
+17/81 Test #17: config.case_lookup ...............   Passed    0.00 sec
+      Start 18: cli.help
+18/81 Test #18: cli.help .........................   Passed    0.01 sec
+      Start 19: cli.unknown
+19/81 Test #19: cli.unknown ......................   Passed    0.01 sec
+      Start 20: cli.missing_data
+20/81 Test #20: cli.missing_data .................   Passed    0.01 sec
+      Start 21: cli.missing_config
+21/81 Test #21: cli.missing_config ...............   Passed    0.01 sec
+      Start 22: cli.metadata
+22/81 Test #22: cli.metadata .....................   Passed    0.01 sec
+      Start 23: content.local
+23/81 Test #23: content.local ....................   Passed    0.00 sec
+      Start 24: gpu.lifecycle
+24/81 Test #24: gpu.lifecycle ....................   Passed    3.42 sec
+      Start 25: world.rez_structure
+25/81 Test #25: world.rez_structure ..............   Passed    0.00 sec
+      Start 26: world.rez_rejection
+26/81 Test #26: world.rez_rejection ..............   Passed    0.00 sec
+      Start 27: world.resource_mount
+27/81 Test #27: world.resource_mount .............   Passed    0.00 sec
+      Start 28: world.world_properties
+28/81 Test #28: world.world_properties ...........   Passed    0.00 sec
+      Start 29: world.world_geometry
+29/81 Test #29: world.world_geometry .............   Passed    0.00 sec
+      Start 30: world.world_rejection
+30/81 Test #30: world.world_rejection ............   Passed    0.01 sec
+      Start 31: world.mutations
+31/81 Test #31: world.mutations ..................   Passed    0.05 sec
+      Start 32: world.session_lifecycle
+32/81 Test #32: world.session_lifecycle ..........   Passed    0.00 sec
+      Start 33: world.session_messages
+33/81 Test #33: world.session_messages ...........   Passed    0.00 sec
+      Start 34: world.original_trigger
+34/81 Test #34: world.original_trigger ...........   Passed    0.00 sec
+      Start 35: world.private
+35/81 Test #35: world.private ....................   Passed    0.32 sec
+      Start 36: gpu.world
+36/81 Test #36: gpu.world ........................   Passed    1.73 sec
+      Start 37: cli.world_modes
+37/81 Test #37: cli.world_modes ..................   Passed    0.68 sec
+      Start 38: services.model_reader
+38/81 Test #38: services.model_reader ............   Passed    0.00 sec
+      Start 39: services.model_rejection
+39/81 Test #39: services.model_rejection .........   Passed    0.07 sec
+      Start 40: services.animation_events
+40/81 Test #40: services.animation_events ........   Passed    0.00 sec
+      Start 41: services.model_callbacks
+41/81 Test #41: services.model_callbacks .........   Passed    0.00 sec
+      Start 42: services.collision_queries
+42/81 Test #42: services.collision_queries .......   Passed    0.00 sec
+      Start 43: services.movement_contacts
+43/81 Test #43: services.movement_contacts .......   Passed    0.00 sec
+      Start 44: services.original_services
+44/81 Test #44: services.original_services .......   Passed    0.00 sec
+      Start 45: services.private
+45/81 Test #45: services.private .................   Passed    0.21 sec
+      Start 46: player.handles
+46/81 Test #46: player.handles ...................   Passed    0.00 sec
+      Start 47: player.lifecycle
+47/81 Test #47: player.lifecycle .................   Passed    0.00 sec
+      Start 48: player.rollback
+48/81 Test #48: player.rollback ..................   Passed    0.01 sec
+      Start 49: player.messages
+49/81 Test #49: player.messages ..................   Passed    0.01 sec
+      Start 50: player.callbacks
+50/81 Test #50: player.callbacks .................   Passed    0.00 sec
+      Start 51: player.private
+51/81 Test #51: player.private ...................   Passed    0.60 sec
+      Start 52: gpu.player
+52/81 Test #52: gpu.player .......................   Passed    1.71 sec
+      Start 53: weapons.inventory
+53/81 Test #53: weapons.inventory ................   Passed    0.00 sec
+      Start 54: weapons.segments
+54/81 Test #54: weapons.segments .................   Passed    0.00 sec
+      Start 55: weapons.firing
+55/81 Test #55: weapons.firing ...................   Passed    0.00 sec
+      Start 56: weapons.melee
+56/81 Test #56: weapons.melee ....................   Passed    0.00 sec
+      Start 57: weapons.damage
+57/81 Test #57: weapons.damage ...................   Passed    0.00 sec
+      Start 58: weapons.animation
+58/81 Test #58: weapons.animation ................   Passed    0.03 sec
+      Start 59: weapons.lifetime
+59/81 Test #59: weapons.lifetime .................   Passed    0.01 sec
+      Start 60: weapons.rollback
+60/81 Test #60: weapons.rollback .................   Passed    0.00 sec
+      Start 61: weapons.private
+61/81 Test #61: weapons.private ..................   Passed    2.43 sec
+      Start 62: gpu.weapons
+62/81 Test #62: gpu.weapons ......................   Passed   12.56 sec
+      Start 63: movement.walking
+63/81 Test #63: movement.walking .................   Passed    0.02 sec
+      Start 64: movement.jumping
+64/81 Test #64: movement.jumping .................   Passed    0.01 sec
+      Start 65: movement.collisions
+65/81 Test #65: movement.collisions ..............   Passed    0.02 sec
+      Start 66: movement.world_collision
+66/81 Test #66: movement.world_collision .........   Passed    0.03 sec
+      Start 67: movement.support
+67/81 Test #67: movement.support .................   Passed    0.01 sec
+      Start 68: movement.boundaries
+68/81 Test #68: movement.boundaries ..............   Passed    0.01 sec
+      Start 69: movement.timing
+69/81 Test #69: movement.timing ..................   Passed    0.02 sec
+      Start 70: movement.lifetime
+70/81 Test #70: movement.lifetime ................   Passed    0.01 sec
+      Start 71: movement.controls
+71/81 Test #71: movement.controls ................   Passed    0.00 sec
+      Start 72: movement.private
+72/81 Test #72: movement.private .................   Passed    0.67 sec
+      Start 73: gpu.movement
+73/81 Test #73: gpu.movement .....................   Passed   12.64 sec
+      Start 74: locomotion.stairs
+74/81 Test #74: locomotion.stairs ................   Passed    0.01 sec
+      Start 75: locomotion.world_stairs
+75/81 Test #75: locomotion.world_stairs ..........   Passed    0.01 sec
+      Start 76: locomotion.limits
+76/81 Test #76: locomotion.limits ................   Passed    0.04 sec
+      Start 77: locomotion.crouch
+77/81 Test #77: locomotion.crouch ................   Passed    0.02 sec
+      Start 78: locomotion.animations
+78/81 Test #78: locomotion.animations ............   Passed    0.01 sec
+      Start 79: locomotion.lifetime
+79/81 Test #79: locomotion.lifetime ..............   Passed    0.01 sec
+      Start 80: locomotion.contacts
+80/81 Test #80: locomotion.contacts ..............   Passed    0.01 sec
+      Start 81: locomotion.private
+81/81 Test #81: locomotion.private ...............   Passed    0.28 sec
+
+100% tests passed, 0 tests failed out of 81
+
+Label Time Summary:
+cli           =   0.05 sec*proc (5 tests)
+config        =   0.01 sec*proc (6 tests)
+gpu           =  32.06 sec*proc (5 tests)
+headless      =   5.76 sec*proc (76 tests)
+locomotion    =   0.39 sec*proc (8 tests)
+movement      =  13.45 sec*proc (11 tests)
+objects       =   0.03 sec*proc (11 tests)
+player        =   2.33 sec*proc (7 tests)
+private       =  33.84 sec*proc (12 tests)
+services      =   0.29 sec*proc (8 tests)
+weapons       =  15.06 sec*proc (10 tests)
+world         =   1.07 sec*proc (12 tests)
+
+Total Test time (real) =  37.84 sec

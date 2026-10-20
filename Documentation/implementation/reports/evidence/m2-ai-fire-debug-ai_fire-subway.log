@@ -1,0 +1,16 @@
+384/384 Testing: ai_fire.subway
+384/384 Test: ai_fire.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_fire.subway" start time: Oct 16 11:27 CEST
+Output:
+----------------------------------------------------------
+cycle=0 shots=18 keys=10 completed=9 target_hp=855.716
+cycle=1 shots=19 keys=10 completed=9 target_hp=847.709
+<end of output>
+Test time =   2.23 sec
+----------------------------------------------------------
+Test Passed.
+"ai_fire.subway" end time: Oct 16 11:27 CEST
+"ai_fire.subway" time elapsed: 00:00:02
+----------------------------------------------------------

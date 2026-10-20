@@ -1,0 +1,14 @@
+689/691 Testing: gideon_attack.failures
+689/691 Test: gideon_attack.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_attack_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-attack-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_attack.failures" start time: Oct 17 03:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_attack.failures" end time: Oct 17 03:04 CEST
+"gideon_attack.failures" time elapsed: 00:00:00
+----------------------------------------------------------

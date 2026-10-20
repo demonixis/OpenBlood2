@@ -1,0 +1,299 @@
+Test project <workspace>/Blood2/build/release
+        Start 659: player_controls.corpse_clearance
+        Start 658: player_controls.combat
+        Start  88: movement.private
+  1/135 Test  #88: movement.private ...................   Passed    2.14 sec
+        Start 396: ai_state.subway
+  2/135 Test #658: player_controls.combat .............   Passed    3.37 sec
+        Start 510: ai_runtime.subway
+  3/135 Test #396: ai_state.subway ....................   Passed    1.25 sec
+        Start 660: player_controls.private
+  4/135 Test #660: player_controls.private ............   Passed    0.72 sec
+        Start  45: world.destination_trial_private
+  5/135 Test #659: player_controls.corpse_clearance ...   Passed    4.26 sec
+        Start  44: world.level_change_private
+  6/135 Test #510: ai_runtime.subway ..................   Passed    1.25 sec
+        Start 579: player_keepalive.private
+  7/135 Test  #45: world.destination_trial_private ....   Passed    0.74 sec
+        Start  46: world.destination_private
+  8/135 Test  #44: world.level_change_private .........   Passed    0.98 sec
+        Start  67: player.private
+  9/135 Test  #46: world.destination_private ..........   Passed    0.39 sec
+        Start 574: player_restore.private
+ 10/135 Test #579: player_keepalive.private ...........   Passed    0.79 sec
+        Start 565: player_state.private
+ 11/135 Test #574: player_restore.private .............   Passed    0.26 sec
+        Start 352: ai_target.subway
+ 12/135 Test #565: player_state.private ...............   Passed    0.22 sec
+        Start 385: ai_perception.subway
+ 13/135 Test  #67: player.private .....................   Passed    0.40 sec
+        Start 511: ai_runtime.arena
+ 14/135 Test #352: ai_target.subway ...................   Passed    0.16 sec
+        Start 508: ai_runtime.catalog
+ 15/135 Test #511: ai_runtime.arena ...................   Passed    0.05 sec
+        Start 495: ai_escape.catalog
+ 16/135 Test #495: ai_escape.catalog ..................   Passed    0.03 sec
+        Start 484: ai_recovery.catalog
+ 17/135 Test #508: ai_runtime.catalog .................   Passed    0.07 sec
+        Start 395: ai_state.catalog
+ 18/135 Test #484: ai_recovery.catalog ................   Passed    0.04 sec
+        Start 351: ai_target.catalog
+ 19/135 Test #395: ai_state.catalog ...................   Passed    0.04 sec
+        Start 384: ai_perception.catalog
+ 20/135 Test #385: ai_perception.subway ...............   Passed    0.16 sec
+        Start 512: ai_runtime.sparse_weapons
+ 21/135 Test #351: ai_target.catalog ..................   Passed    0.04 sec
+        Start 509: ai_runtime.failures
+ 22/135 Test #384: ai_perception.catalog ..............   Passed    0.04 sec
+        Start 577: player_keepalive.fallback
+ 23/135 Test #512: ai_runtime.sparse_weapons ..........   Passed    0.03 sec
+        Start  28: world.destination_trials
+ 24/135 Test #509: ai_runtime.failures ................   Passed    0.03 sec
+        Start  82: movement.world_collision
+ 25/135 Test #577: player_keepalive.fallback ..........   Passed    0.01 sec
+        Start  85: movement.timing
+ 26/135 Test  #28: world.destination_trials ...........   Passed    0.01 sec
+        Start  79: movement.walking
+ 27/135 Test  #85: movement.timing ....................   Passed    0.01 sec
+        Start 572: player_restore.failures
+ 28/135 Test  #82: movement.world_collision ...........   Passed    0.01 sec
+ 29/135 Test  #79: movement.walking ...................   Passed    0.01 sec
+        Start  81: movement.collisions
+        Start   1: objects.builtin_model
+ 30/135 Test   #1: objects.builtin_model ..............   Passed    0.00 sec
+        Start 573: player_restore.lifetime
+ 31/135 Test #572: player_restore.failures ............   Passed    0.01 sec
+        Start  31: world.destination_lifetime
+ 32/135 Test  #81: movement.collisions ................   Passed    0.01 sec
+ 33/135 Test #573: player_restore.lifetime ............   Passed    0.01 sec
+        Start 578: player_keepalive.failures
+        Start  83: movement.support
+ 34/135 Test  #31: world.destination_lifetime .........   Passed    0.01 sec
+        Start 571: player_restore.roundtrip
+ 35/135 Test #578: player_keepalive.failures ..........   Passed    0.00 sec
+        Start  30: world.destination_schema
+ 36/135 Test #571: player_restore.roundtrip ...........   Passed    0.00 sec
+        Start  29: world.destination_messages
+ 37/135 Test  #83: movement.support ...................   Passed    0.01 sec
+        Start 576: player_keepalive.named
+ 38/135 Test  #30: world.destination_schema ...........   Passed    0.00 sec
+        Start  80: movement.jumping
+ 39/135 Test  #29: world.destination_messages .........   Passed    0.00 sec
+        Start 563: player_state.failures
+ 40/135 Test #576: player_keepalive.named .............   Passed    0.00 sec
+        Start  11: objects.unsupported_teardown
+ 41/135 Test #563: player_state.failures ..............   Passed    0.00 sec
+        Start 498: ai_runtime.visibility_filter
+ 42/135 Test  #80: movement.jumping ...................   Passed    0.01 sec
+        Start 344: ai_target.named
+ 43/135 Test  #11: objects.unsupported_teardown .......   Passed    0.00 sec
+        Start 561: player_state.clocks
+ 44/135 Test #498: ai_runtime.visibility_filter .......   Passed    0.00 sec
+        Start 564: player_state.capture
+ 45/135 Test #344: ai_target.named ....................   Passed    0.00 sec
+        Start 562: player_state.initialization
+ 46/135 Test #561: player_state.clocks ................   Passed    0.00 sec
+        Start 488: ai_escape.routes
+ 47/135 Test #564: player_state.capture ...............   Passed    0.00 sec
+        Start 560: player_state.roundtrip
+ 48/135 Test #562: player_state.initialization ........   Passed    0.00 sec
+        Start 486: ai_escape.selection
+ 49/135 Test #488: ai_escape.routes ...................   Passed    0.00 sec
+        Start 473: ai_recovery.topos
+ 50/135 Test #560: player_state.roundtrip .............   Passed    0.00 sec
+        Start 469: ai_recovery.jump_physics
+ 51/135 Test #486: ai_escape.selection ................   Passed    0.00 sec
+        Start 499: ai_runtime.visibility_atomic
+ 52/135 Test #473: ai_recovery.topos ..................   Passed    0.00 sec
+        Start 500: ai_runtime.lifetime
+ 53/135 Test #469: ai_recovery.jump_physics ...........   Passed    0.00 sec
+        Start  84: movement.boundaries
+ 54/135 Test #499: ai_runtime.visibility_atomic .......   Passed    0.00 sec
+        Start 472: ai_recovery.clearance
+ 55/135 Test #500: ai_runtime.lifetime ................   Passed    0.00 sec
+        Start 478: ai_recovery.moving_fire
+ 56/135 Test #472: ai_recovery.clearance ..............   Passed    0.00 sec
+        Start  86: movement.lifetime
+ 57/135 Test  #84: movement.boundaries ................   Passed    0.00 sec
+ 58/135 Test #478: ai_recovery.moving_fire ............   Passed    0.00 sec
+        Start 507: ai_runtime.missing
+        Start 492: ai_escape.failures
+ 59/135 Test  #86: movement.lifetime ..................   Passed    0.00 sec
+        Start 491: ai_escape.guard
+ 60/135 Test #507: ai_runtime.missing .................   Passed    0.00 sec
+        Start 489: ai_escape.perception
+ 61/135 Test #492: ai_escape.failures .................   Passed    0.00 sec
+ 62/135 Test #491: ai_escape.guard ....................   Passed    0.00 sec
+        Start 485: ai_escape.beg
+        Start 487: ai_escape.facing
+ 63/135 Test #489: ai_escape.perception ...............***Failed    0.00 sec
+perception:278: !a->DispatchState()
+
+        Start 477: ai_recovery.lifetime
+ 64/135 Test #485: ai_escape.beg ......................   Passed    0.00 sec
+        Start 470: ai_recovery.crouch
+ 65/135 Test #487: ai_escape.facing ...................   Passed    0.00 sec
+        Start 376: ai_perception.selection
+ 66/135 Test #477: ai_recovery.lifetime ...............   Passed    0.00 sec
+        Start 475: ai_recovery.around
+ 67/135 Test #470: ai_recovery.crouch .................   Passed    0.00 sec
+        Start 471: ai_recovery.crawling
+ 68/135 Test #376: ai_perception.selection ............   Passed    0.00 sec
+        Start 476: ai_recovery.search
+ 69/135 Test #475: ai_recovery.around .................   Passed    0.00 sec
+        Start 474: ai_recovery.plans
+ 70/135 Test #471: ai_recovery.crawling ...............   Passed    0.00 sec
+        Start 502: ai_runtime.tracking
+ 71/135 Test #476: ai_recovery.search .................   Passed    0.00 sec
+ 72/135 Test #474: ai_recovery.plans ..................   Passed    0.00 sec
+        Start 375: ai_perception.factions
+        Start  12: objects.creation_failures
+ 73/135 Test #502: ai_runtime.tracking ................   Passed    0.00 sec
+        Start 479: ai_recovery.keys
+ 74/135 Test #375: ai_perception.factions .............   Passed    0.00 sec
+        Start 392: ai_state.dispatch
+ 75/135 Test  #12: objects.creation_failures ..........   Passed    0.00 sec
+        Start 505: ai_runtime.triggers
+ 76/135 Test #479: ai_recovery.keys ...................   Passed    0.00 sec
+        Start 656: player_controls.gates
+ 77/135 Test #392: ai_state.dispatch ..................   Passed    0.00 sec
+        Start 490: ai_escape.hiding
+ 78/135 Test #505: ai_runtime.triggers ................   Passed    0.00 sec
+ 79/135 Test #656: player_controls.gates ..............   Passed    0.00 sec
+        Start 504: ai_runtime.spatial
+        Start 468: ai_recovery.jump
+ 80/135 Test #490: ai_escape.hiding ...................   Passed    0.00 sec
+        Start 378: ai_perception.hints
+ 81/135 Test #504: ai_runtime.spatial .................   Passed    0.00 sec
+        Start 390: ai_state.decisions
+ 82/135 Test #468: ai_recovery.jump ...................   Passed    0.00 sec
+        Start 480: ai_recovery.fire_lifetime
+ 83/135 Test #378: ai_perception.hints ................   Passed    0.00 sec
+        Start 501: ai_runtime.targets
+ 84/135 Test #390: ai_state.decisions .................   Passed    0.00 sec
+        Start 493: ai_escape.tracking
+ 85/135 Test #480: ai_recovery.fire_lifetime ..........   Passed    0.00 sec
+        Start 394: ai_state.lifetime
+ 86/135 Test #501: ai_runtime.targets .................   Passed    0.00 sec
+        Start 494: ai_escape.lifetime
+ 87/135 Test #493: ai_escape.tracking .................   Passed    0.00 sec
+        Start 391: ai_state.civilian
+ 88/135 Test #394: ai_state.lifetime ..................   Passed    0.00 sec
+        Start 383: ai_perception.lifetime
+ 89/135 Test #494: ai_escape.lifetime .................   Passed    0.00 sec
+        Start  10: objects.messages_strings
+ 90/135 Test #391: ai_state.civilian ..................   Passed    0.00 sec
+        Start 654: player_controls.keys
+ 91/135 Test #383: ai_perception.lifetime .............   Passed    0.00 sec
+        Start 506: ai_runtime.body
+ 92/135 Test #654: player_controls.keys ...............   Passed    0.00 sec
+        Start 389: ai_state.resize
+ 93/135 Test  #10: objects.messages_strings ...........   Passed    0.00 sec
+        Start  61: player.lifecycle
+ 94/135 Test #506: ai_runtime.body ....................   Passed    0.00 sec
+        Start 503: ai_runtime.camera
+ 95/135 Test #389: ai_state.resize ....................   Passed    0.00 sec
+        Start 393: ai_state.failures
+ 96/135 Test  #61: player.lifecycle ...................   Passed    0.00 sec
+ 97/135 Test #503: ai_runtime.camera ..................   Passed    0.00 sec
+        Start 382: ai_perception.failures
+        Start 387: ai_state.transitions
+ 98/135 Test #393: ai_state.failures ..................   Passed    0.00 sec
+        Start 388: ai_state.commands
+ 99/135 Test #382: ai_perception.failures .............   Passed    0.00 sec
+100/135 Test #387: ai_state.transitions ...............   Passed    0.00 sec
+        Start  62: player.rollback
+        Start 345: ai_target.cached
+101/135 Test #388: ai_state.commands ..................   Passed    0.00 sec
+        Start 377: ai_perception.visibility
+102/135 Test #345: ai_target.cached ...................   Passed    0.00 sec
+        Start 379: ai_perception.stimuli
+103/135 Test  #62: player.rollback ....................   Passed    0.00 sec
+        Start 347: ai_target.failures
+104/135 Test #377: ai_perception.visibility ...........   Passed    0.00 sec
+105/135 Test #379: ai_perception.stimuli ..............   Passed    0.00 sec
+        Start 350: ai_target.services
+        Start   9: objects.links_lists
+106/135 Test #347: ai_target.failures .................   Passed    0.00 sec
+        Start 348: ai_target.lifetime
+107/135 Test #350: ai_target.services .................   Passed    0.00 sec
+        Start  63: player.messages
+108/135 Test   #9: objects.links_lists ................   Passed    0.00 sec
+        Start 655: player_controls.mouse
+109/135 Test #348: ai_target.lifetime .................   Passed    0.00 sec
+        Start 380: ai_perception.retaliation
+110/135 Test #655: player_controls.mouse ..............   Passed    0.00 sec
+        Start 346: ai_target.facing
+111/135 Test  #63: player.messages ....................   Passed    0.00 sec
+        Start  64: player.callbacks
+112/135 Test #380: ai_perception.retaliation ..........   Passed    0.00 sec
+113/135 Test #346: ai_target.facing ...................   Passed    0.00 sec
+        Start 381: ai_perception.opportunity
+        Start 386: ai_state.symbols
+114/135 Test  #64: player.callbacks ...................   Passed    0.00 sec
+        Start 657: player_controls.entry
+115/135 Test #381: ai_perception.opportunity ..........   Passed    0.00 sec
+        Start 349: ai_target.callbacks
+116/135 Test #386: ai_state.symbols ...................   Passed    0.00 sec
+117/135 Test #657: player_controls.entry ..............   Passed    0.00 sec
+        Start   6: objects.deferred_removal
+        Start   4: objects.reasons_properties
+118/135 Test #349: ai_target.callbacks ................   Passed    0.00 sec
+        Start   8: objects.handles_selection
+119/135 Test   #6: objects.deferred_removal ...........   Passed    0.00 sec
+        Start   2: objects.original_objects
+120/135 Test   #4: objects.reasons_properties .........   Passed    0.00 sec
+        Start   7: objects.aggregate_dispatch
+121/135 Test   #8: objects.handles_selection ..........   Passed    0.00 sec
+        Start   3: objects.nested_creation
+122/135 Test   #2: objects.original_objects ...........   Passed    0.00 sec
+        Start   5: objects.scheduling
+123/135 Test   #7: objects.aggregate_dispatch .........   Passed    0.00 sec
+        Start  60: player.handles
+124/135 Test   #3: objects.nested_creation ............   Passed    0.00 sec
+125/135 Test   #5: objects.scheduling .................   Passed    0.00 sec
+        Start  87: movement.controls
+        Start  26: world.level_change
+126/135 Test  #60: player.handles .....................   Passed    0.00 sec
+127/135 Test  #87: movement.controls ..................   Passed    0.00 sec
+        Start 497: ai_runtime.visibility
+        Start 496: ai_runtime.activation
+128/135 Test #497: ai_runtime.visibility ..............   Passed    0.00 sec
+        Start  65: player.smell
+129/135 Test #496: ai_runtime.activation ..............   Passed    0.00 sec
+        Start  66: player.smell_private
+130/135 Test  #65: player.smell .......................   Passed    0.00 sec
+        Start 481: ai_recovery.smell_guards
+131/135 Test #481: ai_recovery.smell_guards ...........   Passed    0.00 sec
+        Start 482: ai_recovery.smell_route
+132/135 Test #482: ai_recovery.smell_route ............   Passed    0.00 sec
+        Start 483: ai_recovery.smell_lifetime
+133/135 Test  #26: world.level_change .................   Passed    0.01 sec
+134/135 Test #483: ai_recovery.smell_lifetime .........   Passed    0.00 sec
+135/135 Test  #66: player.smell_private ...............   Passed    1.06 sec
+
+99% tests passed, 1 tests failed out of 135
+
+Label Time Summary:
+ai_escape           =   0.06 sec*proc (11 tests)
+ai_perception       =   0.23 sec*proc (11 tests)
+ai_recovery         =   0.08 sec*proc (17 tests)
+ai_runtime          =   1.46 sec*proc (17 tests)
+ai_state            =   1.32 sec*proc (11 tests)
+ai_target           =   0.22 sec*proc (9 tests)
+headless            =  18.95 sec*proc (135 tests)
+movement            =   2.20 sec*proc (10 tests)
+objects             =   0.04 sec*proc (12 tests)
+player              =   1.49 sec*proc (8 tests)
+player_controls     =   8.36 sec*proc (7 tests)
+player_keepalive    =   0.81 sec*proc (4 tests)
+player_restore      =   0.28 sec*proc (4 tests)
+player_state        =   0.24 sec*proc (6 tests)
+private             =  18.55 sec*proc (25 tests)
+world               =   2.15 sec*proc (8 tests)
+
+Total Test time (real) =   7.05 sec
+
+The following tests FAILED:
+	489 - ai_escape.perception (Failed)                     ai_escape headless
+Errors while running CTest

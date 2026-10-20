@@ -1,0 +1,22 @@
+-- The C compiler identification is GNU 16.2.1
+-- The CXX compiler identification is GNU 16.2.1
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- SPIRV-Cross: Finding Git version for SPIRV-Cross.
+-- Found Git: /usr/bin/git (found version "2.56.0")
+-- SPIRV-Cross: Git hash: 8ddaa85+
+-- Detecting Target CPU Architecture
+-- Detecting Target CPU Architecture - X64
+-- Performing Test HAVE_WL_NO_UNDEFINED
+-- Performing Test HAVE_WL_NO_UNDEFINED - Success
+-- Configuring done (2.7s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/yann/projects/lithtech/Blood2/build/shader-tools

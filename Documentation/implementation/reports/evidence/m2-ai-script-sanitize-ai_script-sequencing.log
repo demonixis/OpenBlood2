@@ -1,0 +1,14 @@
+388/395 Testing: ai_script.sequencing
+388/395 Test: ai_script.sequencing
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_script_tests" "sequencing" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-script-sequencing"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_script.sequencing" start time: Oct 16 13:16 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.sequencing" end time: Oct 16 13:16 CEST
+"ai_script.sequencing" time elapsed: 00:00:00
+----------------------------------------------------------

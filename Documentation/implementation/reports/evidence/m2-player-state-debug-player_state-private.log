@@ -1,0 +1,17 @@
+524/524 Testing: player_state.private
+524/524 Test: player_state.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_state_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"player_state.private" start time: Oct 16 18:29 CEST
+Output:
+----------------------------------------------------------
+cycle 0: original restore initialization, selected player/aggregate fields and independent model/air; no client/world transfer
+cycle 1: original restore initialization, selected player/aggregate fields and independent model/air; no client/world transfer
+cycle 2: original restore initialization, selected player/aggregate fields and independent model/air; no client/world transfer
+<end of output>
+Test time =   1.33 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.private" end time: Oct 16 18:29 CEST
+"player_state.private" time elapsed: 00:00:01
+----------------------------------------------------------

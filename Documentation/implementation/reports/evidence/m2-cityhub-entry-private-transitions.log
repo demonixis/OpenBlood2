@@ -1,0 +1,10 @@
+Malformed destination refusal 0: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 0:
+SubwayA transfer 0:
+Malformed destination refusal 1: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 1:
+SubwayA transfer 1:
+Malformed destination refusal 2: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 2:
+SubwayA transfer 2:
+PASS level_change_private

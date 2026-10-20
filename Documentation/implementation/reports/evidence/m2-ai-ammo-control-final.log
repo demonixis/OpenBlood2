@@ -1,0 +1,2 @@
+ammo_search:168: a && a->SetNewState(AI_Mgr::StateFindAmmo) && a->AI_Update()
+Negative control exit: 1

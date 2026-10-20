@@ -1,0 +1,17 @@
+575/577 Testing: explosion_fragments.private
+575/577 Test: explosion_fragments.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_fragment_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"explosion_fragments.private" start time: Oct 16 21:29 CEST
+Output:
+----------------------------------------------------------
+SubwayA cycle 0: nine sources, 27 metal fragments, 80 observed impacts, full expiry; IDs through 27
+SubwayA cycle 1: nine sources, 27 metal fragments, 80 observed impacts, full expiry; IDs through 54
+SubwayA cycle 2: nine sources, 27 metal fragments, 80 observed impacts, full expiry; IDs through 81
+<end of output>
+Test time =   9.19 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_fragments.private" end time: Oct 16 21:29 CEST
+"explosion_fragments.private" time elapsed: 00:00:09
+----------------------------------------------------------

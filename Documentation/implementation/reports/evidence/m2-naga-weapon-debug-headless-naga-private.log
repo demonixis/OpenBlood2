@@ -1,0 +1,17 @@
+636/638 Testing: naga.private
+636/638 Test: naga.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/naga_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"naga.private" start time: Oct 17 00:59 CEST
+Output:
+----------------------------------------------------------
+Private loop 0: 2 decoded beam models, 1 original WAV, shot damage 30.0142
+Private loop 1: 2 decoded beam models, 1 original WAV, shot damage 30.0142
+Private loop 2: 2 decoded beam models, 1 original WAV, shot damage 30.0142
+<end of output>
+Test time =   2.52 sec
+----------------------------------------------------------
+Test Passed.
+"naga.private" end time: Oct 17 00:59 CEST
+"naga.private" time elapsed: 00:00:02
+----------------------------------------------------------

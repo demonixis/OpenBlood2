@@ -1,0 +1,14 @@
+680/683 Testing: gideon_teleport.presentation
+680/683 Test: gideon_teleport.presentation
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_teleport_tests" "presentation" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-teleport-presentation"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_teleport.presentation" start time: Oct 17 02:47 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_teleport.presentation" end time: Oct 17 02:47 CEST
+"gideon_teleport.presentation" time elapsed: 00:00:00
+----------------------------------------------------------

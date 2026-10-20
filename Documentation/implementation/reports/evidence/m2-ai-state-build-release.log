@@ -1,0 +1,122 @@
+[0/2] Re-checking globbed directories...
+[1/270] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[2/249] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AISight.cpp for CXX dependencies
+[3/249] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIPerception.cpp for CXX dependencies
+[4/249] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIState.cpp for CXX dependencies
+[5/249] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AI_Mgr.cpp for CXX dependencies
+[6/249] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CivilianAI.cpp for CXX dependencies
+[7/249] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CultistAI.cpp for CXX dependencies
+[8/249] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AITarget.cpp for CXX dependencies
+[9/249] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerObj.cpp for CXX dependencies
+[10/249] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Destructable.cpp for CXX dependencies
+[11/249] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[12/176] Scanning /home/yann/projects/lithtech/Blood2/src/app/ai_model_key_smoke.cpp for CXX dependencies
+[13/176] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL.c.o
+[14/176] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[15/176] Linking C static library _deps/sdl3-build/libSDL3.a
+[16/176] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_sight_tests.cpp for CXX dependencies
+[17/176] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_model_key_tests.cpp for CXX dependencies
+[18/176] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_target_tests.cpp for CXX dependencies
+[19/176] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_perception_tests.cpp for CXX dependencies
+[20/176] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_state_tests.cpp for CXX dependencies
+[21/176] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AISight.cpp.o
+[22/176] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AI_Mgr.cpp.o
+[23/176] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIState.cpp.o
+[24/176] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIPerception.cpp.o
+[25/176] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CivilianAI.cpp.o
+[26/176] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CultistAI.cpp.o
+[27/176] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[28/160] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[29/159] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[30/158] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[31/157] Generating CXX dyndep file tests/CMakeFiles/services_tests.dir/CXX.dd
+[32/156] Generating CXX dyndep file tests/CMakeFiles/player_tests.dir/CXX.dd
+[33/155] Generating CXX dyndep file tests/CMakeFiles/weapon_tests.dir/CXX.dd
+[34/154] Generating CXX dyndep file tests/CMakeFiles/movement_tests.dir/CXX.dd
+[35/153] Generating CXX dyndep file tests/CMakeFiles/locomotion_tests.dir/CXX.dd
+[36/152] Generating CXX dyndep file tests/CMakeFiles/container_tests.dir/CXX.dd
+[37/151] Generating CXX dyndep file tests/CMakeFiles/door_tests.dir/CXX.dd
+[38/150] Generating CXX dyndep file tests/CMakeFiles/trigger_tests.dir/CXX.dd
+[39/149] Generating CXX dyndep file tests/CMakeFiles/interaction_tests.dir/CXX.dd
+[40/148] Generating CXX dyndep file tests/CMakeFiles/brush_tests.dir/CXX.dd
+[41/147] Generating CXX dyndep file tests/CMakeFiles/explosion_tests.dir/CXX.dd
+[42/146] Generating CXX dyndep file tests/CMakeFiles/pushable_tests.dir/CXX.dd
+[43/145] Generating CXX dyndep file tests/CMakeFiles/pickup_tests.dir/CXX.dd
+[44/144] Generating CXX dyndep file tests/CMakeFiles/objectives_tests.dir/CXX.dd
+[45/143] Generating CXX dyndep file tests/CMakeFiles/camera_tests.dir/CXX.dd
+[46/142] Generating CXX dyndep file tests/CMakeFiles/keyframer_tests.dir/CXX.dd
+[47/141] Generating CXX dyndep file tests/CMakeFiles/light_tests.dir/CXX.dd
+[48/140] Generating CXX dyndep file tests/CMakeFiles/worldpath_tests.dir/CXX.dd
+[49/139] Generating CXX dyndep file tests/CMakeFiles/cinematic_tests.dir/CXX.dd
+[50/138] Generating CXX dyndep file tests/CMakeFiles/random_sound_tests.dir/CXX.dd
+[51/137] Generating CXX dyndep file tests/CMakeFiles/sound_tests.dir/CXX.dd
+[52/136] Generating CXX dyndep file tests/CMakeFiles/sprite_tests.dir/CXX.dd
+[53/135] Generating CXX dyndep file tests/CMakeFiles/scene_explosion_tests.dir/CXX.dd
+[54/134] Generating CXX dyndep file tests/CMakeFiles/character_animation_tests.dir/CXX.dd
+[55/133] Generating CXX dyndep file tests/CMakeFiles/character_audio_tests.dir/CXX.dd
+[56/132] Generating CXX dyndep file tests/CMakeFiles/character_motion_tests.dir/CXX.dd
+[57/131] Generating CXX dyndep file tests/CMakeFiles/ai_model_key_tests.dir/CXX.dd
+[58/131] Generating CXX dyndep file tests/CMakeFiles/path_manager_tests.dir/CXX.dd
+[59/130] Generating CXX dyndep file tests/CMakeFiles/ai_sight_tests.dir/CXX.dd
+[60/130] Generating CXX dyndep file tests/CMakeFiles/attachment_tests.dir/CXX.dd
+[61/129] Generating CXX dyndep file tests/CMakeFiles/ai_target_tests.dir/CXX.dd
+[62/129] Generating CXX dyndep file tests/CMakeFiles/world_view_tests.dir/CXX.dd
+[63/128] Generating CXX dyndep file tests/CMakeFiles/world_gpu_tests.dir/CXX.dd
+[64/127] Generating CXX dyndep file tests/CMakeFiles/texture_tests.dir/CXX.dd
+[65/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AITarget.cpp.o
+[66/126] Generating CXX dyndep file tests/CMakeFiles/model_view_tests.dir/CXX.dd
+[67/124] Generating CXX dyndep file tests/CMakeFiles/model_gpu_tests.dir/CXX.dd
+[68/122] Generating CXX dyndep file tests/CMakeFiles/ai_perception_tests.dir/CXX.dd
+[69/122] Generating CXX dyndep file tests/CMakeFiles/ai_state_tests.dir/CXX.dd
+[70/122] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Destructable.cpp.o
+[71/122] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerObj.cpp.o
+[72/122] Linking CXX static library libblood2_game.a
+[73/122] Building CXX object CMakeFiles/blood2_app.dir/src/app/ai_model_key_smoke.cpp.o
+[74/122] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[75/122] Building CXX object tests/CMakeFiles/ai_sight_tests.dir/ai_sight_tests.cpp.o
+[76/122] Building CXX object tests/CMakeFiles/ai_target_tests.dir/ai_target_tests.cpp.o
+[77/122] Linking CXX executable blood2
+[78/122] Linking CXX executable tests/object_contract_tests
+[79/122] Linking CXX executable tests/config_tests
+[80/122] Building CXX object tests/CMakeFiles/ai_model_key_tests.dir/ai_model_key_tests.cpp.o
+[81/122] Linking CXX executable tests/world_tests
+[82/122] Linking CXX executable tests/services_tests
+[83/122] Linking CXX executable tests/player_tests
+[84/122] Linking CXX executable tests/weapon_tests
+[85/122] Linking CXX executable tests/movement_tests
+[86/122] Linking CXX executable tests/locomotion_tests
+[87/122] Linking CXX executable tests/container_tests
+[88/122] Linking CXX executable tests/door_tests
+[89/122] Linking CXX executable tests/trigger_tests
+[90/122] Linking CXX executable tests/interaction_tests
+[91/122] Linking CXX executable tests/brush_tests
+[92/122] Linking CXX executable tests/explosion_tests
+[93/122] Linking CXX executable tests/pushable_tests
+[94/122] Linking CXX executable tests/pickup_tests
+[95/122] Linking CXX executable tests/objectives_tests
+[96/122] Linking CXX executable tests/camera_tests
+[97/122] Linking CXX executable tests/keyframer_tests
+[98/122] Linking CXX executable tests/light_tests
+[99/122] Linking CXX executable tests/worldpath_tests
+[100/122] Linking CXX executable tests/cinematic_tests
+[101/122] Linking CXX executable tests/random_sound_tests
+[102/122] Linking CXX executable tests/sound_tests
+[103/122] Linking CXX executable tests/sprite_tests
+[104/122] Linking CXX executable tests/scene_explosion_tests
+[105/122] Linking CXX executable tests/character_animation_tests
+[106/122] Linking CXX executable tests/character_audio_tests
+[107/122] Linking CXX executable tests/character_motion_tests
+[108/122] Building CXX object tests/CMakeFiles/ai_perception_tests.dir/ai_perception_tests.cpp.o
+[109/122] Linking CXX executable tests/ai_model_key_tests
+[110/122] Linking CXX executable tests/path_manager_tests
+[111/122] Linking CXX executable tests/ai_sight_tests
+[112/122] Linking CXX executable tests/attachment_tests
+[113/122] Linking CXX executable tests/ai_target_tests
+[114/122] Linking CXX executable tests/world_view_tests
+[115/122] Linking CXX executable tests/world_gpu_tests
+[116/122] Linking CXX executable tests/texture_tests
+[117/122] Linking CXX executable tests/model_view_tests
+[118/122] Linking CXX executable tests/model_gpu_tests
+[119/122] Linking CXX executable tests/ai_perception_tests
+[120/122] Building CXX object tests/CMakeFiles/ai_state_tests.dir/ai_state_tests.cpp.o
+[121/122] Linking CXX executable tests/ai_state_tests

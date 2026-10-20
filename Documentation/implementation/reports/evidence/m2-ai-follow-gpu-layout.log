@@ -1,0 +1,57 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 273
+    Start 273: gpu.character
+
+273: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--skeleton-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/skeleton.png"
+273: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+273: Environment variables: 
+273:  SDL_AUDIODRIVER=dummy
+273: Test timeout computed to be: 30
+273: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+273: [info] BLOOD2.REZ: detected, 267758913 bytes
+273: [info] SOUND.REZ: detected, 204633068 bytes
+273: [info] BLOOD2P.REZ: detected, 24133434 bytes
+273: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+273: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+273: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+273: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+273: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+273: [info] DAT v56: 580 source objects, 194 original instances, 116 BSP models
+273: [info] Movement: hidden distance=295.31055, jumps=1, landings=2, ground=true, forward frames=55, jump frames=10
+273: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/skeleton.png
+273: [info] Shutdown: frames=240, UI frames=120, hidden frames=120, toggles=2, resize=true, quit=true
+273: [info] Character motion probe: hidden=true, reentered=true, old handle invalidated=true
+273: [info] AI model-key probe: hidden=true, reentered=true, old handle invalidated=true
+273: [info] AI target probe: hidden=true, reentered=true, old handle invalidated=true
+273: [info] AI sight probe: hidden=true, reentered=true, old handle invalidated=true
+273: [info] AI state probe: hidden=true, reentered=true, old handle invalidated=true
+273: [info] AI weapon probe: hidden=true, reentered=true, old identity invalidated=true
+273: [info] AI script movement: hidden=true, reentered=true, old identity invalidated=true
+273: [info] Held attachments: hidden=true, reentered=true, old identity invalidated=true
+273: [info] Character audio: hidden=true, reentered=true, starts=1, surface=10, submitted=728000
+273: [info] AI paths: hidden=true, reentered=true, copied points=7
+273: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+273: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+273: [info] Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, unload/re-entry
+273: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+1/1 Test #273: gpu.character ....................   Passed   10.69 sec
+
+The following tests passed:
+	gpu.character
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+character    =  10.69 sec*proc (1 test)
+gpu          =  10.69 sec*proc (1 test)
+private      =  10.69 sec*proc (1 test)
+
+Total Test time (real) =  10.69 sec

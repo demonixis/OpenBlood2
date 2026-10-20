@@ -1,0 +1,14 @@
+656/659 Testing: destructable_models.filters
+656/659 Test: destructable_models.filters
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable_model_tests" "filters" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable-model-filters"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"destructable_models.filters" start time: Oct 17 05:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_models.filters" end time: Oct 17 05:15 CEST
+"destructable_models.filters" time elapsed: 00:00:00
+----------------------------------------------------------

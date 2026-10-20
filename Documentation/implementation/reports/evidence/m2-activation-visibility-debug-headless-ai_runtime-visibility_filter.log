@@ -1,0 +1,181 @@
+468/701 Testing: ai_runtime.visibility_filter
+468/701 Test: ai_runtime.visibility_filter
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests" "visibility_filter"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_runtime.visibility_filter" start time: Oct 17 04:05 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.visibility_filter" end time: Oct 17 04:05 CEST
+"ai_runtime.visibility_filter" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 04:05 CEST
+
+ai_escape =   0.28 sec*proc
+
+ai_fire =   3.61 sec*proc
+
+ai_follow =   1.26 sec*proc
+
+ai_hit =   0.24 sec*proc
+
+ai_keys =   7.41 sec*proc
+
+ai_locomotion =   0.28 sec*proc
+
+ai_navigation =   1.01 sec*proc
+
+ai_perception =   1.27 sec*proc
+
+ai_recovery =   0.29 sec*proc
+
+ai_runtime =   7.27 sec*proc
+
+ai_script =   0.74 sec*proc
+
+ai_sight =   1.23 sec*proc
+
+ai_state =  10.97 sec*proc
+
+ai_target =   1.26 sec*proc
+
+ai_trigger =   0.99 sec*proc
+
+attachments =   1.47 sec*proc
+
+brushes =   9.51 sec*proc
+
+cameras =   8.13 sec*proc
+
+character =   7.56 sec*proc
+
+character_audio =  10.16 sec*proc
+
+character_motion =   0.31 sec*proc
+
+character_nodes =   1.63 sec*proc
+
+cinematics =   5.33 sec*proc
+
+cli =   0.05 sec*proc
+
+config =   0.02 sec*proc
+
+containers =  10.06 sec*proc
+
+corpses =   0.28 sec*proc
+
+destructable_state =   1.47 sec*proc
+
+doors =   8.44 sec*proc
+
+energy =   2.82 sec*proc
+
+exits =   3.52 sec*proc
+
+explosion_flames =   4.28 sec*proc
+
+explosion_fragments =   6.37 sec*proc
+
+explosion_lights =   3.20 sec*proc
+
+explosion_models =   1.56 sec*proc
+
+explosion_rings =   4.00 sec*proc
+
+explosion_sprites =   1.58 sec*proc
+
+explosions =   0.05 sec*proc
+
+gideon_attack =   0.23 sec*proc
+
+gideon_combat =   0.25 sec*proc
+
+gideon_runtime =  14.68 sec*proc
+
+gideon_teleport =   0.20 sec*proc
+
+headless = 349.90 sec*proc
+
+interaction =   6.58 sec*proc
+
+inventory_state =   1.46 sec*proc
+
+keyframes =  12.72 sec*proc
+
+lights =   4.94 sec*proc
+
+locomotion =   4.66 sec*proc
+
+model_view =   1.12 sec*proc
+
+movement =  14.46 sec*proc
+
+naga =   2.80 sec*proc
+
+object_particles =   9.51 sec*proc
+
+objectives =   4.33 sec*proc
+
+objects =   0.05 sec*proc
+
+paths =   1.55 sec*proc
+
+pickups =   4.66 sec*proc
+
+player =   2.81 sec*proc
+
+player_controls =   5.25 sec*proc
+
+player_keepalive =   3.37 sec*proc
+
+player_restore =   1.64 sec*proc
+
+player_state =   1.50 sec*proc
+
+private = 345.27 sec*proc
+
+pushables =   0.08 sec*proc
+
+randomsound =   5.12 sec*proc
+
+sceneexplosion =   4.84 sec*proc
+
+services =   2.96 sec*proc
+
+session_playback =  12.37 sec*proc
+
+shield =   2.85 sec*proc
+
+sound =   5.29 sec*proc
+
+sprite_view =   1.50 sec*proc
+
+sprites =   7.16 sec*proc
+
+texture =   2.62 sec*proc
+
+triggers =   8.62 sec*proc
+
+weapon_audio =   1.52 sec*proc
+
+weapon_drops =   0.21 sec*proc
+
+weapon_impacts =  12.44 sec*proc
+
+weapon_sprites =   3.25 sec*proc
+
+weapons =  32.76 sec*proc
+
+wind =   2.96 sec*proc
+
+world =  10.14 sec*proc
+
+world_view =   1.10 sec*proc
+
+worldpaths =   3.41 sec*proc
+

@@ -1,0 +1,78 @@
+569/569 Testing: gpu.explosion_ring_private
+569/569 Test: gpu.explosion_ring_private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_ring_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-ring-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.explosion_ring_private" start time: Oct 16 21:18 CEST
+Output:
+----------------------------------------------------------
+Original ring: 4800 pixels, tint and half-alpha linear blend verified
+Original Firepart64/Smoke32 particles: 96 quads, 4573 pixels
+Three original Smoke32 textures after delay: 96 visible quads, 3087 pixels
+<end of output>
+Test time =   0.47 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_ring_private" end time: Oct 16 21:18 CEST
+"gpu.explosion_ring_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 21:18 CEST
+
+brushes =   0.72 sec*proc
+
+cameras =   0.90 sec*proc
+
+character =   3.96 sec*proc
+
+cinematics =   0.94 sec*proc
+
+containers =   1.97 sec*proc
+
+doors =   0.70 sec*proc
+
+explosion_models =   0.93 sec*proc
+
+explosion_rings =   0.92 sec*proc
+
+gpu =  42.32 sec*proc
+
+interaction =   1.42 sec*proc
+
+keyframes =   0.91 sec*proc
+
+lights =   0.91 sec*proc
+
+model_view =   1.08 sec*proc
+
+movement =   3.64 sec*proc
+
+objectives =   0.95 sec*proc
+
+pickups =   0.90 sec*proc
+
+player =   0.97 sec*proc
+
+player_keepalive =   1.20 sec*proc
+
+player_restore =   0.96 sec*proc
+
+private =  39.04 sec*proc
+
+randomsound =   3.12 sec*proc
+
+sceneexplosion =   1.00 sec*proc
+
+sound =   0.93 sec*proc
+
+sprite_view =   1.05 sec*proc
+
+sprites =   0.92 sec*proc
+
+triggers =   0.92 sec*proc
+
+weapons =   3.69 sec*proc
+
+world_view =   4.15 sec*proc
+
+worldpaths =   1.00 sec*proc
+

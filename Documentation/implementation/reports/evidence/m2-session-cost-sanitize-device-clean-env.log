@@ -1,0 +1,27 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/sanitize/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/sanitize/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 253
+    Start 253: cinematics.device
+
+253: Test command: /home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests "device" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/device"
+253: Working Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+253: Test timeout computed to be: 30
+1/1 Test #253: cinematics.device ................   Passed    0.11 sec
+
+The following tests passed:
+	cinematics.device
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+cinematics    =   0.11 sec*proc (1 test)
+headless      =   0.11 sec*proc (1 test)
+
+Total Test time (real) =   0.12 sec

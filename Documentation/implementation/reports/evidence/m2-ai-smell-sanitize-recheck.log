@@ -1,0 +1,20 @@
+Test project <workspace>/Blood2/build/sanitize
+    Start  84: movement.private
+1/2 Test  #84: movement.private .................***Timeout  60.05 sec
+
+    Start 460: ai_escape.perception
+2/2 Test #460: ai_escape.perception .............   Passed    0.02 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Label Time Summary:
+ai_escape    =   0.02 sec*proc (1 test)
+headless     =  60.08 sec*proc (2 tests)
+movement     =  60.05 sec*proc (1 test)
+private      =  60.05 sec*proc (1 test)
+
+Total Test time (real) =  60.09 sec
+
+The following tests FAILED:
+	 84 - movement.private (Timeout)                        headless movement private
+Errors while running CTest

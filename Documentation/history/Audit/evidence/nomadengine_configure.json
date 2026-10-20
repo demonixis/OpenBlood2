@@ -1,0 +1,21 @@
+{
+  "name": "nomadengine_configure",
+  "command": [
+    "cmake",
+    "-S",
+    "NoMadEngine",
+    "-B",
+    "/tmp/lithtech-audit-2bVxTF/nomadengine",
+    "-G",
+    "Ninja",
+    "-DENABLE_VR=OFF",
+    "-DBUILD_TOOLS=OFF",
+    "-DCMAKE_BUILD_TYPE=Debug"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:13:54.605338+00:00",
+  "elapsed_seconds": 110.917,
+  "timeout_seconds": 180,
+  "exit_code": 1,
+  "log": "nomadengine_configure.log"
+}

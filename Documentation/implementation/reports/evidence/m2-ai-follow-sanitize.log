@@ -1,0 +1,195 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start   1: objects.original_objects
+ 1/88 Test   #1: objects.original_objects .........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+ 2/88 Test   #2: objects.nested_creation ..........   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+ 3/88 Test   #3: objects.reasons_properties .......   Passed    0.02 sec
+      Start   4: objects.scheduling
+ 4/88 Test   #4: objects.scheduling ...............   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+ 5/88 Test   #5: objects.deferred_removal .........   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+ 6/88 Test   #6: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   7: objects.handles_selection
+ 7/88 Test   #7: objects.handles_selection ........   Passed    0.02 sec
+      Start   8: objects.links_lists
+ 8/88 Test   #8: objects.links_lists ..............   Passed    0.02 sec
+      Start   9: objects.messages_strings
+ 9/88 Test   #9: objects.messages_strings .........   Passed    0.03 sec
+      Start  10: objects.unsupported_teardown
+10/88 Test  #10: objects.unsupported_teardown .....   Passed    0.04 sec
+      Start  11: objects.creation_failures
+11/88 Test  #11: objects.creation_failures ........   Passed    0.03 sec
+      Start  38: services.model_reader
+12/88 Test  #38: services.model_reader ............   Passed    0.02 sec
+      Start  39: services.model_rejection
+13/88 Test  #39: services.model_rejection .........   Passed    0.30 sec
+      Start  40: services.animation_events
+14/88 Test  #40: services.animation_events ........   Passed    0.02 sec
+      Start  41: services.model_callbacks
+15/88 Test  #41: services.model_callbacks .........   Passed    0.02 sec
+      Start  42: services.collision_queries
+16/88 Test  #42: services.collision_queries .......   Passed    0.01 sec
+      Start  43: services.movement_contacts
+17/88 Test  #43: services.movement_contacts .......   Passed    0.02 sec
+      Start  44: services.original_services
+18/88 Test  #44: services.original_services .......   Passed    0.02 sec
+      Start  45: services.private
+19/88 Test  #45: services.private .................   Passed    7.68 sec
+      Start  46: player.handles
+20/88 Test  #46: player.handles ...................   Passed    0.03 sec
+      Start  47: player.lifecycle
+21/88 Test  #47: player.lifecycle .................   Passed    0.04 sec
+      Start  48: player.rollback
+22/88 Test  #48: player.rollback ..................   Passed    0.05 sec
+      Start  49: player.messages
+23/88 Test  #49: player.messages ..................   Passed    0.04 sec
+      Start  50: player.callbacks
+24/88 Test  #50: player.callbacks .................   Passed    0.04 sec
+      Start  51: player.private
+25/88 Test  #51: player.private ...................   Passed    7.81 sec
+      Start 261: character_motion.lookup
+26/88 Test #261: character_motion.lookup ..........   Passed    0.01 sec
+      Start 262: character_motion.motion
+27/88 Test #262: character_motion.motion ..........   Passed    0.02 sec
+      Start 263: character_motion.rejection
+28/88 Test #263: character_motion.rejection .......   Passed    0.02 sec
+      Start 264: character_motion.collision
+29/88 Test #264: character_motion.collision .......   Passed    0.02 sec
+      Start 265: character_motion.callbacks
+30/88 Test #265: character_motion.callbacks .......   Passed    0.02 sec
+      Start 266: character_motion.player
+31/88 Test #266: character_motion.player ..........   Passed    0.03 sec
+      Start 267: character_motion.catalog
+32/88 Test #267: character_motion.catalog .........   Passed    1.05 sec
+      Start 278: paths.copy
+33/88 Test #278: paths.copy .......................   Passed    0.02 sec
+      Start 279: paths.selection
+34/88 Test #279: paths.selection ..................   Passed    0.02 sec
+      Start 280: paths.failure
+35/88 Test #280: paths.failure ....................   Passed    0.02 sec
+      Start 281: paths.lifetime
+36/88 Test #281: paths.lifetime ...................   Passed    0.02 sec
+      Start 282: paths.enumeration
+37/88 Test #282: paths.enumeration ................   Passed    0.02 sec
+      Start 283: paths.limits
+38/88 Test #283: paths.limits .....................   Passed    1.37 sec
+      Start 284: paths.catalog
+39/88 Test #284: paths.catalog ....................   Passed    2.51 sec
+      Start 301: ai_target.named
+40/88 Test #301: ai_target.named ..................   Passed    0.02 sec
+      Start 302: ai_target.cached
+41/88 Test #302: ai_target.cached .................   Passed    0.02 sec
+      Start 303: ai_target.facing
+42/88 Test #303: ai_target.facing .................   Passed    0.01 sec
+      Start 304: ai_target.failures
+43/88 Test #304: ai_target.failures ...............   Passed    0.02 sec
+      Start 305: ai_target.lifetime
+44/88 Test #305: ai_target.lifetime ...............   Passed    0.02 sec
+      Start 306: ai_target.callbacks
+45/88 Test #306: ai_target.callbacks ..............   Passed    0.01 sec
+      Start 307: ai_target.services
+46/88 Test #307: ai_target.services ...............   Passed    0.02 sec
+      Start 308: ai_target.catalog
+47/88 Test #308: ai_target.catalog ................   Passed    0.92 sec
+      Start 309: ai_target.subway
+48/88 Test #309: ai_target.subway .................   Passed    2.80 sec
+      Start 335: ai_state.symbols
+49/88 Test #335: ai_state.symbols .................   Passed    0.01 sec
+      Start 336: ai_state.transitions
+50/88 Test #336: ai_state.transitions .............   Passed    0.02 sec
+      Start 337: ai_state.commands
+51/88 Test #337: ai_state.commands ................   Passed    0.02 sec
+      Start 338: ai_state.resize
+52/88 Test #338: ai_state.resize ..................   Passed    0.02 sec
+      Start 339: ai_state.decisions
+53/88 Test #339: ai_state.decisions ...............   Passed    0.02 sec
+      Start 340: ai_state.civilian
+54/88 Test #340: ai_state.civilian ................   Passed    0.02 sec
+      Start 341: ai_state.dispatch
+55/88 Test #341: ai_state.dispatch ................   Passed    0.02 sec
+      Start 342: ai_state.failures
+56/88 Test #342: ai_state.failures ................   Passed    0.02 sec
+      Start 343: ai_state.lifetime
+57/88 Test #343: ai_state.lifetime ................   Passed    0.02 sec
+      Start 344: ai_state.catalog
+58/88 Test #344: ai_state.catalog .................   Passed    0.93 sec
+      Start 345: ai_state.subway
+59/88 Test #345: ai_state.subway ..................   Passed   26.30 sec
+      Start 358: ai_trigger.hearing
+60/88 Test #358: ai_trigger.hearing ...............   Passed    0.02 sec
+      Start 359: ai_trigger.gunfire
+61/88 Test #359: ai_trigger.gunfire ...............   Passed    0.01 sec
+      Start 360: ai_trigger.impact
+62/88 Test #360: ai_trigger.impact ................   Passed    0.02 sec
+      Start 361: ai_trigger.commands
+63/88 Test #361: ai_trigger.commands ..............   Passed    0.01 sec
+      Start 362: ai_trigger.relay
+64/88 Test #362: ai_trigger.relay .................   Passed    0.01 sec
+      Start 363: ai_trigger.broadcast
+65/88 Test #363: ai_trigger.broadcast .............   Passed    0.02 sec
+      Start 364: ai_trigger.lifetime
+66/88 Test #364: ai_trigger.lifetime ..............   Passed    0.02 sec
+      Start 365: ai_trigger.audio
+67/88 Test #365: ai_trigger.audio .................   Passed    0.04 sec
+      Start 366: ai_trigger.subway
+68/88 Test #366: ai_trigger.subway ................   Passed    2.29 sec
+      Start 367: ai_navigation.sample
+69/88 Test #367: ai_navigation.sample .............   Passed    0.02 sec
+      Start 368: ai_navigation.clearance
+70/88 Test #368: ai_navigation.clearance ..........   Passed    0.02 sec
+      Start 369: ai_navigation.rays
+71/88 Test #369: ai_navigation.rays ...............   Passed    0.02 sec
+      Start 370: ai_navigation.direct
+72/88 Test #370: ai_navigation.direct .............   Passed    0.02 sec
+      Start 371: ai_navigation.detour
+73/88 Test #371: ai_navigation.detour .............   Passed    0.02 sec
+      Start 372: ai_navigation.blocked
+74/88 Test #372: ai_navigation.blocked ............   Passed    0.02 sec
+      Start 373: ai_navigation.limits
+75/88 Test #373: ai_navigation.limits .............   Passed    0.11 sec
+      Start 374: ai_navigation.lifetime
+76/88 Test #374: ai_navigation.lifetime ...........   Passed    0.06 sec
+      Start 375: ai_navigation.subway
+77/88 Test #375: ai_navigation.subway .............   Passed    2.54 sec
+      Start 376: ai_follow.velocity
+78/88 Test #376: ai_follow.velocity ...............   Passed    0.02 sec
+      Start 377: ai_follow.locomotion
+79/88 Test #377: ai_follow.locomotion .............   Passed    0.02 sec
+      Start 378: ai_follow.follow
+80/88 Test #378: ai_follow.follow .................   Passed    0.02 sec
+      Start 379: ai_follow.cached
+81/88 Test #379: ai_follow.cached .................   Passed    0.02 sec
+      Start 380: ai_follow.moveto
+82/88 Test #380: ai_follow.moveto .................   Passed    0.02 sec
+      Start 381: ai_follow.actions
+83/88 Test #381: ai_follow.actions ................   Passed    0.02 sec
+      Start 382: ai_follow.lifetime
+84/88 Test #382: ai_follow.lifetime ...............   Passed    0.02 sec
+      Start 383: ai_follow.failures
+85/88 Test #383: ai_follow.failures ...............   Passed    0.02 sec
+      Start 384: ai_follow.physics
+86/88 Test #384: ai_follow.physics ................   Passed    0.04 sec
+      Start 385: ai_follow.catalog
+87/88 Test #385: ai_follow.catalog ................   Passed    0.85 sec
+      Start 386: ai_follow.subway
+88/88 Test #386: ai_follow.subway .................   Passed    2.34 sec
+
+100% tests passed, 0 tests failed out of 88
+
+Label Time Summary:
+ai_follow           =   3.38 sec*proc (11 tests)
+ai_navigation       =   2.80 sec*proc (9 tests)
+ai_state            =  27.39 sec*proc (11 tests)
+ai_target           =   3.83 sec*proc (9 tests)
+ai_trigger          =   2.44 sec*proc (9 tests)
+character_motion    =   1.16 sec*proc (7 tests)
+headless            =  61.29 sec*proc (88 tests)
+objects             =   0.23 sec*proc (11 tests)
+paths               =   3.97 sec*proc (7 tests)
+player              =   8.01 sec*proc (6 tests)
+private             =  58.04 sec*proc (12 tests)
+services            =   8.08 sec*proc (8 tests)
+
+Total Test time (real) =  61.32 sec

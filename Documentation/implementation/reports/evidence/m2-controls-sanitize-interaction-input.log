@@ -1,0 +1,14 @@
+114/464 Testing: interaction.input
+114/464 Test: interaction.input
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/interaction_tests" "input" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/interaction-fixtures/input"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"interaction.input" start time: Oct 16 16:26 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"interaction.input" end time: Oct 16 16:26 CEST
+"interaction.input" time elapsed: 00:00:00
+----------------------------------------------------------

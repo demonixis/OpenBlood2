@@ -1,0 +1,120 @@
+{
+  "binary": "MSynth25.dll",
+  "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+  "unicorn": "2.1.4",
+  "entry_rva": "0x80b1",
+  "stop_rva": "0x86d8",
+  "pan_field_offset": "0x40",
+  "cases": [
+    {
+      "integer_pan": -500,
+      "legacy_destination_2": -64,
+      "standard_destination_4": -64
+    },
+    {
+      "integer_pan": -406,
+      "legacy_destination_2": -51,
+      "standard_destination_4": -51
+    },
+    {
+      "integer_pan": -400,
+      "legacy_destination_2": -51,
+      "standard_destination_4": -51
+    },
+    {
+      "integer_pan": -300,
+      "legacy_destination_2": -38,
+      "standard_destination_4": -38
+    },
+    {
+      "integer_pan": -200,
+      "legacy_destination_2": -25,
+      "standard_destination_4": -25
+    },
+    {
+      "integer_pan": -6,
+      "legacy_destination_2": 0,
+      "standard_destination_4": 0
+    },
+    {
+      "integer_pan": 0,
+      "legacy_destination_2": 0,
+      "standard_destination_4": 0
+    },
+    {
+      "integer_pan": 6,
+      "legacy_destination_2": 0,
+      "standard_destination_4": 0
+    },
+    {
+      "integer_pan": 200,
+      "legacy_destination_2": 25,
+      "standard_destination_4": 25
+    },
+    {
+      "integer_pan": 306,
+      "legacy_destination_2": 39,
+      "standard_destination_4": 39
+    },
+    {
+      "integer_pan": 354,
+      "legacy_destination_2": 45,
+      "standard_destination_4": 45
+    },
+    {
+      "integer_pan": 400,
+      "legacy_destination_2": 51,
+      "standard_destination_4": 51
+    },
+    {
+      "integer_pan": 500,
+      "legacy_destination_2": 64,
+      "standard_destination_4": 64
+    }
+  ],
+  "order_cases": [
+    {
+      "records": [
+        [
+          2,
+          -500
+        ],
+        [
+          4,
+          32768000
+        ]
+      ],
+      "observed": 64,
+      "expected": 64
+    },
+    {
+      "records": [
+        [
+          4,
+          32768000
+        ],
+        [
+          2,
+          -500
+        ]
+      ],
+      "observed": -64,
+      "expected": -64
+    },
+    {
+      "records": [
+        [
+          2,
+          -500
+        ],
+        [
+          4,
+          -32768000
+        ]
+      ],
+      "observed": -64,
+      "expected": -64
+    }
+  ],
+  "scope": "Isolated original constant-pan dispatch; not complete synth/audio playback or retail parity"
+}

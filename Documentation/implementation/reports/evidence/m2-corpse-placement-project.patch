@@ -1,0 +1,798 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 8a93b66..c6a6756 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -514,3 +514,5 @@ The [Gideon attack continuation](../Documentation/Implementation/M2_GIDEON_ATTAC
+ The [Gideon lifecycle continuation](../Documentation/Implementation/M2_GIDEON_RUNTIME.md) registers original initialization/AI_Update and typed boss-health delivery. Read [contracts](docs/GIDEON_RUNTIME_CONTRACTS.md). Preserve pre-base health capture, repeated nonzero-ratio publication, gravity removal after base initialization, one accepted typed damage application and subclass-before-base reaction order. All five shared table owners participate in destination rehearsal isolation. Original HUD, complete encounter/death parity, required FX and safe NEW_LEVEL remain incomplete; M2 stays open.
+ 
+ The [NPC activation correction](../Documentation/Implementation/M2_ACTIVATION_VISIBILITY.md) reuses the original AI glass/volume filter for replacement visibility pings and completes Gideon's authored intro script. Read [contracts](docs/ACTIVATION_VISIBILITY_CONTRACTS.md). Preserve manual inactivity, strict original ping cadence, atomic refresh and checked historical inspection. Center rays are not retail PVS; complete encounters, safe NEW_LEVEL and M2 remain open.
++
++The [corpse placement correction](../Documentation/Implementation/M2_CORPSE_PLACEMENT.md) preserves original raw death dimensions and fits the new body locally against primary-world geometry. Read [contracts](docs/CORPSE_PLACEMENT_CONTRACTS.md). Preserve the clear cached anchor, same-side corrections, bounded distance/work, final box/center-path validation and deferred failure cleanup. Reports retain actual attempted/committed state without advancing simulation. This is replacement triangle collision, not retail depenetration; safe NEW_LEVEL, required services and M2 remain open.
+diff --git a/README.md b/README.md
+index 21f7a3c..2aeb6e3 100644
+--- a/README.md
++++ b/README.md
+@@ -558,3 +558,5 @@ The [Gideon attack continuation](../Documentation/Implementation/M2_GIDEON_ATTAC
+ The [production Gideon continuation](../Documentation/Implementation/M2_GIDEON_RUNTIME.md) adds original initialization, AI_Update, typed boss-health delivery and inspection. The fifth shared table is isolated during destination rehearsals. It supersedes the earlier blanket production-Gideon omission; complete boss encounter/death parity, required remaining services and safe NEW_LEVEL still keep M2 incomplete.
+ 
+ The [NPC activation correction](../Documentation/Implementation/M2_ACTIVATION_VISIBILITY.md) reuses the original AI glass/volume filter for replacement visibility pings and completes Gideon's authored intro script. Read [contracts](docs/ACTIVATION_VISIBILITY_CONTRACTS.md). Preserve manual inactivity, strict original ping cadence, atomic refresh and checked historical inspection. Center rays are not retail PVS; complete encounters, safe NEW_LEVEL and M2 remain open.
++
++The [initial corpse placement correction](../Documentation/Implementation/M2_CORPSE_PLACEMENT.md) now clears the wider original death-animation body in the SubwayA keyboard-fire encounter, with bounded atomic placement and inspection. Difficult fits still fail explicitly; M2 remains incomplete.
+diff --git a/docs/CORPSE_CONTRACTS.md b/docs/CORPSE_CONTRACTS.md
+index 2bf3172..693a21f 100644
+--- a/docs/CORPSE_CONTRACTS.md
++++ b/docs/CORPSE_CONTRACTS.md
+@@ -1,6 +1,6 @@
+ # Ordinary original NPC death and CCorpse
+ 
+-> Extended by [Gideon runtime integration](GIDEON_RUNTIME_CONTRACTS.md): corpse setup now checks primary-world placement before accepting transfer. Penetrating bodies fail visibly and roll back deferred, retaining the source; depenetration is still unavailable.
++> Extended by [initial placement contracts](CORPSE_PLACEMENT_CONTRACTS.md): the original raw body now receives bounded source-side clearance before transfer. Impossible placements fail visibly and roll back deferred, retaining the source; general/retail depenetration remains unavailable.
+ 
+ Selected original `AI_Mgr::HandleDamage`, `MC_Dead`, `AI_STATE_Dying`,
+ `CreateCorpse` and `CCorpse` now handle ordinary Cultist/Civilian death.
+@@ -39,8 +39,8 @@ CMovement's cached position/rotation and m_vDims, including the source's timing.
+ The sanity fallback draws a death clip if the selected clip precedes death[0].
+ Visual scale is copied, but collision dimensions remain the raw death-clip
+ user dimensions. Y placement subtracts `(oldDims.y - corpseDims.y) - 0.001`.
+-This uses checked teleport and the existing replacement physics, not proven retail
+-SetObjectDims2/collision parity. A failed setup removes the partial child deferred
++This now uses the bounded atomic initial-placement service described above, not
++proven retail SetObjectDims2/collision parity. A failed setup removes the partial child deferred
+ and retains the visible source; the unchecked original could hide it anyway.
+ Spawn reports retain checked child identities and outcomes after source removal.
+ 
+@@ -87,8 +87,9 @@ real sound attempts, blood-pool result and damage refusal. NPCs expose death slo
+ clip, accumulated fraction, transfer count and unavailable optional voice requests.
+ The normal model renderer samples corpse animation independently of the inspector.
+ 
+-SubwayA remains 202 created / 4 transferred sounds / 372 editor-only / 2 unsupported
+-(Gideon, ExitTrigger) / 0 failed source entries. Corpses are dynamic instances,
+-not extra authored coverage. Required FX, further AI actions, corpse/fire/gib
+-services and complete original session acceptance keep M2 open. Linux-only tests
+-and synthetic diagnostics do not establish original-executable or platform parity.
++After subsequent Gideon/ExitTrigger integration, SubwayA has 204 created / four
++transferred sounds / 372 editor-only / zero unsupported / zero failed source entries.
++Corpses are dynamic instances, not extra authored coverage. Required FX,
++corpse/fire/gib services, safe NEW_LEVEL and complete original session acceptance
++keep M2 open. Linux-only tests and synthetic diagnostics do not establish
++original-executable or platform parity.
+diff --git a/docs/CORPSE_PLACEMENT_CONTRACTS.md b/docs/CORPSE_PLACEMENT_CONTRACTS.md
+new file mode 100644
+index 0000000..dcdf985
+--- /dev/null
++++ b/docs/CORPSE_PLACEMENT_CONTRACTS.md
+@@ -0,0 +1,55 @@
++# Initial ordinary corpse placement
++
++The original CreateCorpse still supplies the cached CMovement transform, raw death
++animation dimensions, visual scale and foot-offset formula. The new engine service
++only resolves initial primary-world overlap caused by that shape change. It is a
++bounded replacement policy, not recovered retail SetObjectDims2 behavior.
++See [evidence](../../Documentation/Implementation/M2_CORPSE_PLACEMENT.md) and
++[source ledger](M2_CORPSE_PLACEMENT_SOURCES.json).
++
++## Checked placement
++
++PlaceNonSolidModel accepts a live, unattached, nonsolid character model. Pending,
++stale, solid, container/world-model and reentrant movement requests fail. Missing
++collision is unavailable. All positions/extents must be finite and within existing
++physics bounds; all half dimensions must be positive.
++
++The cached source box must already be clear of primary-world triangles. Preserve
++that anchor rather than querying a later actor position. Work on an owned candidate,
++leaving the object untouched until success. Each overlapping triangle supplies a
++separating-axis correction only on a side that separated the clear source box.
++Using just the nearest side can push a wide corpse through a train floor/seat.
++Resolve in the existing deterministic BVH/polygon order. Add 0.001 units of clearance,
++allow at most 16 corrections and cap cumulative distance at the smaller of 256
++units and the largest new half dimension. Exhausted budgets fail explicitly.
++
++Success requires a clear final full box and an unobstructed center segment from
++the source anchor. No dimension shrink, wall crossing or partial position commit
++is accepted. This is triangle-surface collision, not BSP solid-volume contents;
++center visibility does not establish a swept path for every point of the expanded
++shape. Intermediate candidates are queries, not simulated movement. The bounded
++solver can refuse a locally possible fit. It does not rescue an already penetrating
++source, resolve arbitrary dynamic-body stacks or claim retail collision parity.
++
++Only primary-world geometry participates, matching the nonsolid corpse's existing
++gravity integrator. Moving world models/other objects do not become solid supports
++for corpses. Generic MoveObject, TeleportObject and live-character ResizeObject
++policies are unchanged. Placement advances no clocks, dispatches no contacts and
++commits only position/contact reset; later gravity runs through the ordinary single
++integrator with the original dimensions and mass.
++
++## Ownership and inspection
++
++A successful transfer copies the bounded placement report into CCorpse before the
++original NPC hide/removal branch. Failure removes the partial child deferred and
++retains the visible actor and failed report. A source disappearing later does not
++invalidate the independent corpse report. The report stores values, not borrowed
++geometry or actor pointers: outcome, anchor, requested/candidate position, cumulative
++distance, correction count and last polygon. Failed candidates are never described
++as committed positions. Unqueried means earlier setup failed or placement has not run.
++
++The Skeletons panel shows these fields for NPC deaths and corpses, including hidden
++objects. Reading them does not query collision or advance animation. Spawn history
++keeps the final successful position or failed attempted candidate. Existing lifetime,
++model-key audio, blood-pool diagnostics and unsupported damage/fire/gib services
++remain as specified in [corpse contracts](CORPSE_CONTRACTS.md). M2 remains incomplete.
+diff --git a/docs/M2_CORPSE_PLACEMENT_SOURCES.json b/docs/M2_CORPSE_PLACEMENT_SOURCES.json
+new file mode 100644
+index 0000000..6deee24
+--- /dev/null
++++ b/docs/M2_CORPSE_PLACEMENT_SOURCES.json
+@@ -0,0 +1,28 @@
++{
++  "baseline_commit": "24f7f74215d7b80956424d22e5111077a59db143",
++  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "use": "Original CreateCorpse cached transform, raw dimensions, scale and foot-offset formula (3761-3860); existing selective port, no new wholesale import."
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/corpse.cpp",
++      "sha256": "f92ec5bd0e4175f61461aae1f5fe498b0a1d21b5f0ee7d889573d02480543fdd",
++      "use": "Original corpse flags, setup, animation and lifetime retained by existing port."
++    },
++    {
++      "path": "sources/blood2/AppHeaders/server_de.h",
++      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "use": "Original SetObjectDims2 interface contract; retail engine implementation is not available here."
++    }
++  ],
++  "adaptations": [
++    "Keep original CreateCorpse cached anchor, raw animation box, visual scale and requested Y offset.",
++    "New bounded same-source-side separating-axis placement against primary-world triangles; at most 16 corrections and cumulative distance <= min(256, largest new half dimension).",
++    "Check clear anchor, final full box and anchor-to-final center segment before atomic commit. No retail depenetration or BSP contents parity claimed.",
++    "Value-owned placement reports survive source removal; failed setup retains source and defers child cleanup.",
++    "Actual SubwayA keyboard-fire regression without modified health, aim, damage, NPC state or commercial data."
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 08af59a..700991a 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -876,3 +876,7 @@ The [production Gideon continuation](../../Documentation/Implementation/M2_GIDEO
+ ## NPC activation visibility correction
+ 
+ See [contracts](ACTIVATION_VISIBILITY_CONTRACTS.md) and [source ledger](M2_ACTIVATION_VISIBILITY_SOURCES.json). The original ServerDE activation contract and player/AI scheduling are retained. Existing original CanSee glass/volume filtering is reused for replacement PingObjects center rays after diagnosing SubwayA nglass1; no retail PVS implementation is claimed. Added bounded historical inspection and authored-script/lifetime regressions. No reference source, commercial resource or dependency revision was changed.
++
++## Initial corpse placement
++
++The [source ledger](M2_CORPSE_PLACEMENT_SOURCES.json) records original CreateCorpse/CCorpse references. Cached transforms, raw death dimensions, scale and foot offset remain source-driven. [Bounded initial placement](CORPSE_PLACEMENT_CONTRACTS.md) is new replacement-engine SAT clearance, not imported or recovered retail physics. No reference file or commercial asset was changed.
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index 97d4847..e149a4f 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -46,8 +46,8 @@ namespace OpenBlood2
+                 "Corpse diagnostic: present={}, setup={}, complete={}, sounds={}, updates={}, time={}, error={}",
+                 c != nullptr, c && c->configured, c && c->animation_done, c ? c->sound_starts : 0, c ? c->updates : 0,
+                 r ? r->animation.time : 0, c ? c->error : "removed");
+-        return c && c->configured && c->error.empty() && c->animation_done && c->sound_starts > 0 && r->model &&
+-               (r->state.m_Flags & FLAG_VISIBLE) && !r->attachment;
++        return c && c->configured && placement_succeeded(c->placement) && c->error.empty() && c->animation_done &&
++               c->sound_starts > 0 && r->model && (r->state.m_Flags & FLAG_VISIBLE) && !r->attachment;
+     }
+     bool check_ai_runtime_smoke(GameSession& g, ObjectId& selection)
+     {
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 4522742..4b764dd 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -7,6 +7,23 @@
+ #include <imgui.h>
+ namespace OpenBlood2
+ {
++    namespace
++    {
++        void draw_placement(const BodyPlacement& p)
++        {
++            ImGui::Text("Initial body placement: %s", body_placement_name(p.result));
++            if (p.result == BodyPlacementResult::Unqueried)
++                return;
++            ImGui::Text("Corrections %u | distance %.3f", p.corrections, p.distance);
++            if (p.polygon != UINT32_MAX)
++                ImGui::Text("Last queried polygon %u", p.polygon);
++            ImGui::Text("Source anchor %.2f %.2f %.2f", p.anchor.x, p.anchor.y, p.anchor.z);
++            ImGui::Text("Requested %.2f %.2f %.2f | candidate %.2f %.2f %.2f", p.requested.x, p.requested.y,
++                        p.requested.z, p.candidate.x, p.candidate.y, p.candidate.z);
++            ImGui::TextWrapped(
++                "Bounded primary-world clearance; original dimensions retained. Not retail physics parity.");
++        }
++    } // namespace
+     void Inspector::draw_skeleton(GameSession& game, ObjectSelection& selection)
+     {
+         ImGui::TextWrapped(
+@@ -79,6 +96,7 @@ namespace OpenBlood2
+                         double(r->animation.time), c.remove_time);
+             ImGui::Text("Raw dimensions %.2f %.2f %.2f | visual scale %.2f %.2f %.2f", r->dimensions.x, r->dimensions.y,
+                         r->dimensions.z, r->state.m_Scale.x, r->state.m_Scale.y, r->state.m_Scale.z);
++            draw_placement(c.placement);
+             ImGui::Text("Sound keys %llu / starts %llu | last voice %llu", (unsigned long long)c.sound_attempts,
+                         (unsigned long long)c.sound_starts, (unsigned long long)c.last_sound);
+             ImGui::TextWrapped("%s | %s", c.sound_resource.c_str(), c.sound_error.c_str());
+@@ -110,6 +128,7 @@ namespace OpenBlood2
+             ImGui::Text("Frame damage fraction %.3f | optional kill-voice requests %llu (unavailable)",
+                         a.m_damage.m_fLastDamagePercent, (unsigned long long)a.kill_voice_requests);
+             ImGui::TextWrapped("%s", a.death_error.c_str());
++            draw_placement(a.corpse_placement);
+         }
+         if (target_ai && target_ai->npc_type != AI_Mgr::NPCType::Diagnostic &&
+             ImGui::CollapsingHeader("Original NPC lifecycle", ImGuiTreeNodeFlags_DefaultOpen))
+diff --git a/src/engine/body_placement.h b/src/engine/body_placement.h
+new file mode 100644
+index 0000000..fcbeb75
+--- /dev/null
++++ b/src/engine/body_placement.h
+@@ -0,0 +1,33 @@
++#pragma once
++#include "basedefs_de.h"
++#include <cstdint>
++
++namespace OpenBlood2
++{
++    struct PlacementAnchor
++    {
++        DVector center{}, half{};
++    };
++    enum class BodyPlacementResult
++    {
++        Unqueried,
++        Placed,
++        Adjusted,
++        Blocked,
++        Invalid,
++        Unavailable
++    };
++    struct BodyPlacement
++    {
++        BodyPlacementResult result = BodyPlacementResult::Unqueried;
++        DVector anchor{}, requested{}, candidate{};
++        unsigned corrections = 0;
++        double distance = 0;
++        std::uint32_t polygon = UINT32_MAX;
++    };
++    inline bool placement_succeeded(const BodyPlacement& p)
++    {
++        return p.result == BodyPlacementResult::Placed || p.result == BodyPlacementResult::Adjusted;
++    }
++    const char* body_placement_name(BodyPlacementResult);
++} // namespace OpenBlood2
+diff --git a/src/engine/collision.cpp b/src/engine/collision.cpp
+index 638597c..7af52dd 100644
+--- a/src/engine/collision.cpp
++++ b/src/engine/collision.cpp
+@@ -98,6 +98,7 @@ namespace OpenBlood2
+             DVector from, delta, half, normal{}, penetration_normal{};
+             double enter = -std::numeric_limits<double>::infinity(), leave = 1,
+                    penetration = std::numeric_limits<double>::infinity();
++            const PlacementAnchor* anchor = nullptr;
+             bool axis(DVector axis, double low, double high)
+             {
+                 const double length = std::sqrt(precise_dot(axis, axis));
+@@ -110,16 +111,32 @@ namespace OpenBlood2
+                                        std::abs(double(axis.z)) * half.z) /
+                                       length;
+                 const double origin = precise_dot(from, axis) / length, speed = precise_dot(delta, axis) / length;
++                const double anchor_origin = anchor ? precise_dot(anchor->center, axis) / length : 0;
++                const double anchor_radius =
++                    anchor ? (std::abs(double(axis.x)) * anchor->half.x + std::abs(double(axis.y)) * anchor->half.y +
++                              std::abs(double(axis.z)) * anchor->half.z) /
++                                 length
++                           : 0;
+                 axis = {float(axis.x / length), float(axis.y / length), float(axis.z / length)};
+                 low /= length;
+                 high /= length;
++                // During initial placement, only use an axis that separates the
++                // clear source body from this triangle, and keep that same side.
++                // The nearest escape alone could push the new body through a floor.
++                double sign = origin < (low + high) / 2 ? -1 : 1;
++                if (anchor)
++                    sign = anchor_origin - anchor_radius >= high - 1e-6  ? 1
++                           : anchor_origin + anchor_radius <= low + 1e-6 ? -1
++                                                                         : 0;
+                 low -= radius;
+                 high += radius;
+-                const double depth = std::min(origin - low, high - origin);
++                const double depth = sign < 0   ? origin - low
++                                     : sign > 0 ? high - origin
++                                                : std::numeric_limits<double>::infinity();
+                 if (depth < penetration)
+                 {
+                     penetration = depth;
+-                    penetration_normal = vector_scale(axis, origin < (low + high) / 2 ? -1.0f : 1.0f);
++                    penetration_normal = vector_scale(axis, static_cast<float>(sign));
+                 }
+                 if (std::abs(speed) < 1e-10)
+                 {
+@@ -144,15 +161,18 @@ namespace OpenBlood2
+                 if (enter > leave + 1e-9 || leave <= 1e-8 || enter > 1)
+                     return false;
+                 hit.start_solid = enter < -1e-6;
++                hit.penetration = hit.start_solid ? penetration : 0;
+                 hit.fraction = std::max(0.0, enter);
+                 hit.normal = hit.start_solid ? penetration_normal : normal;
+                 hit.point = vector_add(from, vector_scale(delta, static_cast<float>(hit.fraction)));
+                 return true;
+             }
+         };
+-        bool triangle_hit(const std::array<DVector, 3>& p, DVector from, DVector to, DVector half, CollisionHit& hit)
++        bool triangle_hit(const std::array<DVector, 3>& p, DVector from, DVector to, DVector half, CollisionHit& hit,
++                          const PlacementAnchor* anchor = nullptr)
+         {
+             Sweep s{from, vector_subtract(to, from), half};
++            s.anchor = anchor;
+             const std::array<DVector, 3> edges{
+                 {vector_subtract(p[1], p[0]), vector_subtract(p[2], p[1]), vector_subtract(p[0], p[2])}};
+             auto test = [&](DVector axis)
+@@ -267,21 +287,21 @@ namespace OpenBlood2
+         return index;
+     }
+     void CollisionWorld::query(std::uint32_t index, DVector from, DVector to, DVector half, CollisionHit& hit,
+-                               bool& found) const
++                               bool& found, const PlacementAnchor* anchor) const
+     {
+         const auto& n = nodes_[index];
+         if (!broadphase(from, to, half, n.min, n.max))
+             return;
+         if (n.left)
+         {
+-            query(n.left, from, to, half, hit, found);
+-            query(n.right, from, to, half, hit, found);
++            query(n.left, from, to, half, hit, found, anchor);
++            query(n.right, from, to, half, hit, found, anchor);
+             return;
+         }
+         for (auto i = n.begin; i < n.end; ++i)
+         {
+             CollisionHit candidate;
+-            if (triangle_hit(triangles_[i].points, from, to, half, candidate) &&
++            if (triangle_hit(triangles_[i].points, from, to, half, candidate, anchor) &&
+                 (!found || candidate.fraction < hit.fraction ||
+                  (candidate.fraction == hit.fraction && triangles_[i].polygon < hit.polygon)))
+             {
+@@ -303,4 +323,79 @@ namespace OpenBlood2
+         query(0, from, to, half, hit, found);
+         return found ? CollisionQuery::Hit : CollisionQuery::Miss;
+     }
++    const char* body_placement_name(BodyPlacementResult result)
++    {
++        switch (result)
++        {
++            case BodyPlacementResult::Unqueried:
++                return "not queried";
++            case BodyPlacementResult::Placed:
++                return "placed unchanged";
++            case BodyPlacementResult::Adjusted:
++                return "placed with clearance correction";
++            case BodyPlacementResult::Blocked:
++                return "blocked";
++            case BodyPlacementResult::Invalid:
++                return "invalid";
++            case BodyPlacementResult::Unavailable:
++                return "collision unavailable";
++        }
++        return "invalid";
++    }
++    BodyPlacement CollisionWorld::place_body(DVector anchor, DVector anchor_half, DVector requested, DVector half) const
++    {
++        BodyPlacement report;
++        report.anchor = anchor;
++        report.requested = report.candidate = requested;
++        report.result = BodyPlacementResult::Invalid;
++        const auto positive = [](DVector d) { return extents(d) && d.x > 0 && d.y > 0 && d.z > 0; };
++        if (!physics_vector(anchor) || !physics_vector(requested) || !positive(anchor_half) || !positive(half))
++            return report;
++        CollisionHit hit;
++        if (sweep(anchor, anchor, anchor_half, hit) != CollisionQuery::Miss)
++        {
++            report.result = BodyPlacementResult::Blocked; // Never repair an already penetrating source body.
++            report.polygon = hit.polygon;
++            return report;
++        }
++        // Bounded replacement spawn placement, not a retail depenetration solver.
++        // Keep an owned candidate until the complete shape AND its center path from
++        // the clear source fit. Never tunnel across a wall to the nearer empty side.
++        const double limit = std::min(256.f, std::max({half.x, half.y, half.z}));
++        const PlacementAnchor reference{anchor, anchor_half};
++        for (unsigned attempt = 0; attempt <= 16; ++attempt)
++        {
++            if (!physics_vector(report.candidate))
++                return report;
++            hit = {};
++            bool found = false;
++            if (!nodes_.empty())
++                query(0, report.candidate, report.candidate, half, hit, found, &reference);
++            if (!found)
++            {
++                if (sweep(anchor, report.candidate, {}, hit) != CollisionQuery::Miss)
++                {
++                    report.result = BodyPlacementResult::Blocked;
++                    report.polygon = hit.polygon;
++                    return report;
++                }
++                report.result = report.corrections ? BodyPlacementResult::Adjusted : BodyPlacementResult::Placed;
++                return report;
++            }
++            report.polygon = hit.polygon;
++            if (!hit.start_solid || !std::isfinite(hit.penetration) || hit.penetration <= 0 ||
++                !physics_vector(hit.normal))
++                return report;
++            const auto distance = hit.penetration + .001;
++            if (attempt == 16 || report.distance + distance > limit)
++            {
++                report.result = BodyPlacementResult::Blocked;
++                return report;
++            }
++            report.candidate = vector_add(report.candidate, vector_scale(hit.normal, static_cast<float>(distance)));
++            report.distance += distance;
++            ++report.corrections;
++        }
++        return report;
++    }
+ } // namespace OpenBlood2
+diff --git a/src/engine/collision.h b/src/engine/collision.h
+index 90dbdbf..1225ad2 100644
+--- a/src/engine/collision.h
++++ b/src/engine/collision.h
+@@ -1,4 +1,5 @@
+ #pragma once
++#include "engine/body_placement.h"
+ #include "engine/world.h"
+ #include <array>
+ 
+@@ -11,6 +12,7 @@ namespace OpenBlood2
+         std::uint32_t polygon = UINT32_MAX;
+         HOBJECT object = nullptr;
+         bool start_solid = false;
++        double penetration = 0;
+         std::uint16_t texture_flags = 0;
+     };
+     enum class CollisionQuery
+@@ -33,6 +35,7 @@ namespace OpenBlood2
+             nodes_.clear();
+         }
+         CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit& hit) const;
++        BodyPlacement place_body(DVector anchor, DVector anchor_half, DVector requested, DVector half) const;
+         std::size_t triangles() const
+         {
+             return triangles_.size();
+@@ -58,7 +61,8 @@ namespace OpenBlood2
+         std::vector<Triangle> triangles_;
+         std::vector<Node> nodes_;
+         std::uint32_t partition(std::uint32_t begin, std::uint32_t end);
+-        void query(std::uint32_t node, DVector from, DVector to, DVector half, CollisionHit& hit, bool& found) const;
++        void query(std::uint32_t node, DVector from, DVector to, DVector half, CollisionHit& hit, bool& found,
++                   const PlacementAnchor* anchor = nullptr) const;
+     };
+     DVector rotate_vector(DVector, DRotation);
+     DRotation multiply_rotation(DRotation, DRotation);
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 40bda48..6c84728 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ #include "basedefs_de.h"
+ #include "engine/audio.h"
++#include "engine/body_placement.h"
+ #include "game/brush_messages.h"
+ #include "game/camera_messages.h"
+ #include "game/container_messages.h"
+@@ -88,6 +89,8 @@ class ServerDE : public CSBase
+     virtual bool GetPointContainerCode(DVector, ContainerCode&, bool visible_only = false) = 0;
+     virtual bool GetContainers(HOBJECT, DVector head, OpenBlood2::ContainerState&) = 0;
+     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
++    virtual bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
++                                    OpenBlood2::BodyPlacement&) = 0;
+     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
+     virtual float GetWorldTime() = 0;
+     virtual OpenBlood2::SegmentResult CastRay(DVector, DVector, OpenBlood2::SegmentHit&) = 0;
+diff --git a/src/game/original/AIDeath.cpp b/src/game/original/AIDeath.cpp
+index d4adf47..1fe5793 100644
+--- a/src/game/original/AIDeath.cpp
++++ b/src/game/original/AIDeath.cpp
+@@ -61,6 +61,7 @@ bool AI_Mgr::CreateCorpse()
+     using namespace OpenBlood2;
+     auto* s = GetServerDE();
+     SpawnReport report;
++    corpse_placement = {};
+     report.source = "AI_Mgr::CreateCorpse";
+     report.request = "CCorpse";
+     auto fail = [&](const char* why)
+@@ -113,21 +114,23 @@ bool AI_Mgr::CreateCorpse()
+         s->SetModelAnimation(h, m_nCorpseType);
+         s->SetModelLooping(h, false);
+     }
+-    // A stationary move checks the corpse's actual primary-world body before
+-    // accepting transfer. Raw death dimensions may overlap a wall/floor even
+-    // when the live actor fitted. Preserve explicit failure and deferred rollback;
+-    // never leave a penetrating child to abort an unrelated player's next tick.
++    // Keep the original cached anchor, raw death dimensions and requested foot
++    // position. The replacement engine fits this new nonsolid body locally without
++    // changing dimensions, crossing a wall or accepting a penetrating source.
+     if (!configured || s->GetModelAnimation(h) != m_nCorpseType || s->GetModelLooping(h) ||
+         !s->ScaleObject(h, m_vScale) || s->SetObjectDims(h, &dims) != DE_OK ||
+-        s->TeleportObject(h, &position) != DE_OK || s->MoveObject(h, &position) != DE_OK)
++        !s->PlaceNonSolidModel(h, position, state.m_Pos, m_vDims, corpse_placement))
+     {
++        report.position =
++            corpse_placement.result == BodyPlacementResult::Unqueried ? position : corpse_placement.candidate;
+         s->RemoveObject(h); // Deferred rollback; source remains inspectable.
+         return fail("Corpse setup failed; incomplete child removed");
+     }
++    corpse->placement = corpse_placement;
+     // All supported NPC nodes are visible; per-limb hiding remains unavailable.
+     last_corpse = h;
+     ++corpses_created;
+-    report.position = position;
++    report.position = corpse_placement.candidate;
+     report.outcome = "Original ordinary corpse initialized; independent animation/lifetime";
+     s->RecordSpawn(report);
+     return true;
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 20fdfb6..2928c6e 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -252,6 +252,7 @@ class AI_Mgr : public CBaseCharacter
+     int death_slot = -1, kill_voice_roll = -1;
+     std::uint64_t death_starts = 0, corpses_created = 0, kill_voice_requests = 0;
+     HOBJECT last_corpse = nullptr; // Non-owning; the corpse survives its original actor.
++    OpenBlood2::BodyPlacement corpse_placement;
+     std::string death_error;
+     virtual bool AI_STATE_Recoil();
+     std::uint64_t damage_reactions = 0, recoil_starts = 0;
+diff --git a/src/game/original/Corpse.h b/src/game/original/Corpse.h
+index ac9eef3..4c5344e 100644
+--- a/src/game/original/Corpse.h
++++ b/src/game/original/Corpse.h
+@@ -13,6 +13,7 @@ class CCorpse : public B2BaseClass
+     bool OnStringKey(ArgList*);
+     bool initialized = false, configured = false, animation_done = false;
+     bool limb_loss = true;
++    OpenBlood2::BodyPlacement placement;
+     float remove_time = 0;
+     CDestructable m_damage;
+     CAnim_Sound measurements;
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 9654c63..78981f0 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -150,6 +150,8 @@ namespace OpenBlood2
+             client_strings_attempted = false;
+         }
+         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
++        bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
++                                BodyPlacement&) override;
+         bool GetMovementState(HOBJECT, MovementState&) override;
+         SegmentResult CastRay(DVector, DVector, SegmentHit&) override;
+         SegmentResult CastWorldRay(DVector, DVector, SegmentHit&) override;
+diff --git a/src/game/server_physics.cpp b/src/game/server_physics.cpp
+index 75b503a..196b82c 100644
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -57,6 +57,35 @@ namespace OpenBlood2
+         r->state.m_Pos = position;
+         return ResizeResult::Resized;
+     }
++    bool ServerAdapter::PlaceNonSolidModel(HOBJECT h, DVector requested, DVector anchor, DVector anchor_half,
++                                           BodyPlacement& report)
++    {
++        trace_service("PlaceNonSolidModel");
++        report = {};
++        report.anchor = anchor;
++        report.requested = report.candidate = requested;
++        report.result = BodyPlacementResult::Invalid;
++        auto* r = objects_.get(h);
++        if (!r || r->life != Life::Alive || moving_ || r->attachment || r->container || r->world_model ||
++            r->state.m_ObjectType != OT_MODEL || !r->character_body || (r->state.m_Flags & FLAG_SOLID))
++            return false;
++        if (!collision || !collision_ready)
++        {
++            report.result = BodyPlacementResult::Unavailable;
++            return false;
++        }
++        report = collision->place_body(anchor, anchor_half, requested, r->dimensions);
++        if (!placement_succeeded(report))
++            return false;
++        // No callbacks or partial motion. Nonsolid corpses use primary-world
++        // collision only, like their subsequent ordinary gravity integration.
++        r->state.m_Pos = report.candidate;
++        r->grounded = false;
++        r->contact_normal = {};
++        r->contact_object = nullptr;
++        r->contact_polygon = UINT32_MAX;
++        return true;
++    }
+     bool ServerAdapter::GetMovementState(HOBJECT h, MovementState& state)
+     {
+         trace_service("GetMovementState");
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index b2887a4..aca56e7 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -76,7 +76,7 @@ endif()
+ add_executable(services_tests services_tests.cpp)
+ target_link_libraries(services_tests PRIVATE blood2_game)
+ blood2_project_options(services_tests)
+-foreach(case IN ITEMS model_reader model_rejection animation_events model_callbacks collision_queries movement_contacts original_services)
++foreach(case IN ITEMS model_reader model_rejection animation_events model_callbacks collision_queries movement_contacts placement_queries placement_service original_services)
+     add_test(NAME services.${case} COMMAND services_tests "${case}")
+     set_tests_properties(services.${case} PROPERTIES LABELS "headless;services" TIMEOUT 30)
+ endforeach()
+diff --git a/tests/corpse_tests.cpp b/tests/corpse_tests.cpp
+index 30df380..682d77b 100644
+--- a/tests/corpse_tests.cpp
++++ b/tests/corpse_tests.cpp
+@@ -131,6 +131,8 @@ namespace
+               !g.server.GetModelLooping(h));
+         CHECK(near(r->state.m_Pos.y, 41.001f) && near(r->state.m_Pos.x, 0) && r->dimensions.y == 41 &&
+               r->state.m_Scale.y == 2);
++        CHECK(c->placement.result == BodyPlacementResult::Placed && c->placement.corrections == 0 &&
++              c->placement.anchor.y == 60 && near(c->placement.requested.y, 41.001f));
+         CHECK(c->m_damage.m_fHitPoints == 50 && c->m_damage.m_fMass == 200 && !(r->state.m_Flags & FLAG_SOLID));
+         CHECK(g.objects.remove(source) && g.objects.finish_frame() && g.server.IsObjectAlive(h));
+         CHECK(g.server.advance_models(.2) && g.objects.advance(.2) && c->animation_done);
+@@ -156,6 +158,8 @@ namespace
+         CHECK(!a->DispatchState() && !a->m_bRemoveMe && (g.server.GetObjectFlags(h) & FLAG_VISIBLE));
+         CHECK(g.objects.finish_frame() && g.objects.snapshot().size() == before && a->corpses_created == 0);
+         CHECK(!a->death_error.empty() && !a->last_corpse);
++        CHECK(a->corpse_placement.result == BodyPlacementResult::Blocked && a->corpse_placement.corrections == 0 &&
++              a->corpse_placement.anchor.y == 59);
+         DVector clear{0, 60, 0};
+         CHECK(g.server.TeleportObject(h, &clear) == DE_OK && a->m_MoveObj.Update());
+         a->m_nCorpseType = 9999;
+@@ -254,6 +258,7 @@ namespace
+         auto m = g.server.StartMessageToObject(a, c->m_hObject, damage_message);
+         CHECK(g.server.WriteDamage(m, {{0, 0, 1}, {0, 30, 0}, 100, DamageType::Death, a->m_hObject}) == DE_OK &&
+               g.server.EndMessage(m) == DE_OK);
++        CHECK(c->placement.result == BodyPlacementResult::Unqueried); // Direct diagnostic construction, no transfer.
+         CHECK(c->m_damage.m_fHitPoints == 50 && c->damage_refusals == 1 && !c->damage_error.empty() &&
+               c->error.empty());
+         CHECK(g.server.advance_models(.2) && g.objects.advance(.2) && c->animation_done);
+diff --git a/tests/player_controls_tests.cpp b/tests/player_controls_tests.cpp
+index e26c653..0b98169 100644
+--- a/tests/player_controls_tests.cpp
++++ b/tests/player_controls_tests.cpp
+@@ -1,6 +1,8 @@
+ #include "app/movement_controls.h"
+ #include "camera_fixture.h"
+ #include "engine/runtime.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/Corpse.h"
+ #include <cmath>
+ using namespace OpenBlood2;
+ #define CHECK(x)                                                                                                       \
+@@ -246,6 +248,34 @@ namespace
+         }
+         CHECK(w->sounds_played == w->shots && !w->sound_failures);
+         CHECK(g.client_shell.weapons.front().fire_keys > 0);
++        unsigned corrected_corpses = 0;
++        for (auto identity : g.objects.snapshot())
++        {
++            const auto* body = g.objects.get(identity);
++            const auto* npc = body ? dynamic_cast<const AI_Mgr*>(body->game.get()) : nullptr;
++            if (npc && !npc->death_error.empty())
++                std::cout << "Death placement failure: " << body_placement_name(npc->corpse_placement.result)
++                          << " corrections=" << npc->corpse_placement.corrections
++                          << " distance=" << npc->corpse_placement.distance
++                          << " candidate=" << npc->corpse_placement.candidate.x << ','
++                          << npc->corpse_placement.candidate.y << ',' << npc->corpse_placement.candidate.z
++                          << " polygon=" << npc->corpse_placement.polygon << " error=" << npc->death_error << '\n';
++            const auto* corpse = body ? dynamic_cast<const CCorpse*>(body->game.get()) : nullptr;
++            if (!corpse)
++                continue;
++            CHECK(placement_succeeded(corpse->placement));
++            corrected_corpses += corpse->placement.result == BodyPlacementResult::Adjusted;
++            CollisionHit hit;
++            CHECK(g.collision.sweep(body->state.m_Pos, body->state.m_Pos, body->dimensions, hit) ==
++                  CollisionQuery::Miss);
++            std::cout << "Corpse placement: " << body_placement_name(corpse->placement.result)
++                      << " corrections=" << corpse->placement.corrections << " distance=" << corpse->placement.distance
++                      << " requested=" << corpse->placement.requested.x << ',' << corpse->placement.requested.y << ','
++                      << corpse->placement.requested.z << " fitted=" << corpse->placement.candidate.x << ','
++                      << corpse->placement.candidate.y << ',' << corpse->placement.candidate.z << '\n';
++        }
++        if (!gpu)
++            CHECK(corrected_corpses > 0); // Actual keyboard-fire encounter; no health/aim/AI override.
+         std::cout << "Original FIRE_KEY: shots=" << w->shots << " ammo=" << p->m_InventoryMgr.GetAmmoCount(1)
+                   << " voices=" << w->sounds_played << " mouse=" << gpu << "\n";
+         CHECK(g.leave_player() && g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);
+diff --git a/tests/services_tests.cpp b/tests/services_tests.cpp
+index 7ffb3d0..f88a452 100644
+--- a/tests/services_tests.cpp
++++ b/tests/services_tests.cpp
+@@ -286,6 +286,79 @@ namespace
+         CHECK(!game.server.collision_ready);
+         return true;
+     }
++    WorldModel placement_corner(bool cage = false)
++    {
++        auto w = floor_model();
++        w.points.insert(w.points.end(), {{0, 0, -100}, {0, 100, -100}, {0, 100, 100}, {0, 0, 100}});
++        w.polygons.push_back({0, {4, 5, 6, 7}});
++        if (cage)
++        {
++            w.points.insert(w.points.end(), {{4, 0, -100}, {4, 100, -100}, {4, 100, 100}, {4, 0, 100}});
++            w.polygons.push_back({0, {8, 9, 10, 11}});
++        }
++        return w;
++    }
++    bool placement_queries()
++    {
++        CollisionWorld w;
++        std::string error;
++        CHECK(w.build(placement_corner(), error));
++        auto p = w.place_body({4, 4, 0}, {1, 1, 1}, {4, 2, 0}, {3, 2, 1});
++        CHECK(p.result == BodyPlacementResult::Placed && !p.corrections && p.candidate.y == 2);
++        p = w.place_body({4, 4, 0}, {1, 1, 1}, {2, 1, 0}, {3, 2, 1});
++        CHECK(p.result == BodyPlacementResult::Adjusted && p.corrections == 2 && p.distance < 2.01);
++        CHECK(std::abs(p.candidate.x - 3.001) < .0001 && std::abs(p.candidate.y - 2.001) < .0001);
++        CollisionHit hit;
++        CHECK(w.sweep(p.candidate, p.candidate, {3, 2, 1}, hit) == CollisionQuery::Miss);
++        CHECK(w.sweep({4, 4, 0}, p.candidate, {}, hit) == CollisionQuery::Miss);
++        // The nearest escape is below the floor. Retain the clear source side instead.
++        p = w.place_body({4, 4, 0}, {1, 1, 1}, {2, -.25f, 0}, {3, 2, 4});
++        CHECK(p.result == BodyPlacementResult::Adjusted && p.candidate.y > 2 && p.candidate.x > 3);
++        CHECK(w.sweep(p.candidate, p.candidate, {3, 2, 4}, hit) == CollisionQuery::Miss);
++        CHECK(w.sweep({4, 4, 0}, p.candidate, {}, hit) == CollisionQuery::Miss);
++        CHECK(w.place_body({4, 4, 0}, {1, 1, 1}, {-4, 2, 0}, {1, 1, 1}).result == BodyPlacementResult::Blocked);
++        CHECK(w.place_body({.5, 4, 0}, {1, 1, 1}, {4, 2, 0}, {1, 1, 1}).result == BodyPlacementResult::Blocked);
++        CHECK(w.place_body({NAN, 4, 0}, {1, 1, 1}, {}, {1, 1, 1}).result == BodyPlacementResult::Invalid);
++        CHECK(w.place_body({4, 4, 0}, {0, 1, 1}, {}, {1, 1, 1}).result == BodyPlacementResult::Invalid);
++        CHECK(w.place_body({4, 4, 0}, {1, 1, 1}, {}, {-1, 1, 1}).result == BodyPlacementResult::Invalid);
++        CHECK(w.build(placement_corner(true), error));
++        p = w.place_body({2, 4, 0}, {1, 1, 1}, {2, 4, 0}, {3, 1, 1});
++        CHECK(p.result == BodyPlacementResult::Blocked && p.corrections <= 16 && p.distance <= 3);
++        return true;
++    }
++    bool placement_service()
++    {
++        GameSession g;
++        CHECK(setup(g));
++        std::string error;
++        CHECK(g.collision.build(placement_corner(), error));
++        g.server.collision_ready = true;
++        auto h = probe(g);
++        auto* r = g.objects.get(h);
++        CHECK(r);
++        r->state.m_ObjectType = OT_MODEL;
++        r->state.m_Flags = FLAG_GRAVITY;
++        r->state.m_Pos = {4, 4, 0};
++        r->dimensions = {3, 2, 1};
++        CHECK(g.server.ConfigureCharacterBody(h, 200, 9));
++        BodyPlacement p;
++        CHECK(g.server.PlaceNonSolidModel(h, {2, 1, 0}, {4, 4, 0}, {1, 1, 1}, p));
++        CHECK(p.result == BodyPlacementResult::Adjusted && r->state.m_Pos.x == p.candidate.x && r->dimensions.x == 3 &&
++              r->dimensions.y == 2 && g.objects.time() == 0);
++        CHECK(g.server.advance_physics(.01)); // Corrected body survives ordinary single gravity integration.
++        const auto before = r->state.m_Pos;
++        CHECK(!g.server.PlaceNonSolidModel(h, {-4, 2, 0}, {4, 4, 0}, {1, 1, 1}, p));
++        CHECK(p.result == BodyPlacementResult::Blocked && r->state.m_Pos.x == before.x && r->state.m_Pos.y == before.y);
++        g.server.collision_ready = false;
++        CHECK(!g.server.PlaceNonSolidModel(h, {}, {}, {1, 1, 1}, p) && p.result == BodyPlacementResult::Unavailable);
++        g.server.collision_ready = true;
++        r->state.m_Flags |= FLAG_SOLID;
++        CHECK(!g.server.PlaceNonSolidModel(h, {}, {}, {1, 1, 1}, p) && p.result == BodyPlacementResult::Invalid);
++        r->state.m_Flags &= ~FLAG_SOLID;
++        CHECK(g.objects.remove(h) && !g.server.PlaceNonSolidModel(h, {}, {}, {1, 1, 1}, p));
++        CHECK(g.objects.finish_frame() && !g.server.PlaceNonSolidModel(h, {}, {}, {1, 1, 1}, p));
++        return true;
++    }
+     bool original_services()
+     {
+         GameSession game;
+@@ -423,6 +496,10 @@ int main(int argc, char** argv)
+         ok = collision_queries();
+     else if (name == "movement_contacts")
+         ok = movement_contacts();
++    else if (name == "placement_queries")
++        ok = placement_queries();
++    else if (name == "placement_service")
++        ok = placement_service();
+     else if (name == "original_services")
+         ok = original_services();
+     else if (name == "private" && argc == 3)

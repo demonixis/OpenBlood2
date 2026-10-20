@@ -1,0 +1,40 @@
+596/596 Testing: energy.private
+596/596 Test: energy.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/energy_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"energy.private" start time: Oct 17 01:22 CEST
+Output:
+----------------------------------------------------------
+Private loop 0: SPR SpriteTextures\yellowflare2.dtx, primary and Tesla impact WAV, radius deliveries 7, isolated rehearsal retains projectile.
+Private loop 1: SPR SpriteTextures\yellowflare2.dtx, primary and Tesla impact WAV, radius deliveries 7, isolated rehearsal retains projectile.
+Private loop 2: SPR SpriteTextures\yellowflare2.dtx, primary and Tesla impact WAV, radius deliveries 7, isolated rehearsal retains projectile.
+<end of output>
+Test time =  12.36 sec
+----------------------------------------------------------
+Test Passed.
+"energy.private" end time: Oct 17 01:22 CEST
+"energy.private" time elapsed: 00:00:12
+----------------------------------------------------------
+
+End testing: Oct 17 01:22 CEST
+
+ai_fire =  29.05 sec*proc
+
+energy =  12.81 sec*proc
+
+explosions =   0.55 sec*proc
+
+headless = 211.30 sec*proc
+
+naga =  21.67 sec*proc
+
+objects =   0.49 sec*proc
+
+private = 207.31 sec*proc
+
+weapon_audio =  12.72 sec*proc
+
+weapon_impacts = 101.54 sec*proc
+
+world =  32.47 sec*proc
+

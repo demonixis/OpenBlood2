@@ -1,0 +1,1463 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 76dc83a..b4b438b 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -319,3 +319,11 @@ recovery overwrite, arrival/ledge short circuits and independent fire markers.
+ Failed plans cannot be followed until replanning succeeds. Earlier crawl/jump-body
+ omissions are superseded; shade recovery, smell/escape/recoil/death, full NPC
+ initialization/AI_Update, required FX and ExitTrigger keep M2 incomplete.
++
++The [AI escape/guard continuation](../Documentation/Implementation/M2_AI_ESCAPE.md) connects original Cultist/Civilian
++escape/hide, GuardLocation and the lateral beg command. Read [contracts](docs/AI_ESCAPE_CONTRACTS.md).
++Preserve class-specific hint filters, preceding cached facing, current civilian
++dimensions, guard ledge order and residual velocity. Tracking is a checked non-owning
++identity, not a new engine link. Diagnostic ray-hit hints do not change authored
++marker flags. Earlier escape/guard-body omissions are superseded; smell/recoil/death,
++full NPC initialization/AI_Update, required FX and ExitTrigger keep M2 incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2e7ca32..93506a4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,7 +41,7 @@ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+-    src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/Movement.cpp
++    src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/Movement.cpp
+     src/game/original/AIState.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+diff --git a/README.md b/README.md
+index e8ea604..bbe66b4 100644
+--- a/README.md
++++ b/README.md
+@@ -398,3 +398,15 @@ initialization/AI_Update, required FX and ExitTrigger keep M2 incomplete.
+ AI recovery/navigation verification: 447/447 Debug and inspector-free Release
+ checks (27 GPU each), plus 134 targeted ASan/UBSan/leak checks.
+ See [evidence](../Documentation/Implementation/M2_AI_RECOVERY.md).
++
++The [AI escape/guard continuation](../Documentation/Implementation/M2_AI_ESCAPE.md) connects original Cultist/Civilian
++escape/hide, GuardLocation and the lateral beg command. Read [contracts](docs/AI_ESCAPE_CONTRACTS.md).
++Preserve class-specific hint filters, preceding cached facing, current civilian
++dimensions, guard ledge order and residual velocity. Tracking is a checked non-owning
++identity, not a new engine link. Diagnostic ray-hit hints do not change authored
++marker flags. Earlier escape/guard-body omissions are superseded; smell/recoil/death,
++full NPC initialization/AI_Update, required FX and ExitTrigger keep M2 incomplete.
++
++AI escape/guard verification: 458/458 Debug and inspector-free Release checks
++(27 GPU each), plus 145 targeted ASan/UBSan/leak checks.
++See [evidence](../Documentation/Implementation/M2_AI_ESCAPE.md).
+diff --git a/docs/AI_ESCAPE_CONTRACTS.md b/docs/AI_ESCAPE_CONTRACTS.md
+new file mode 100644
+index 0000000..810bd2c
+--- /dev/null
++++ b/docs/AI_ESCAPE_CONTRACTS.md
+@@ -0,0 +1,110 @@
++# Original AI escape, hiding and guard states
++
++Selected CultistAI/CivilianAI Escape_RunAway and Escape_Hide, AI_Mgr GuardLocation
++and MC_Taunt_Beg execute through existing typed services. M2 remains incomplete;
++these classes are not registered as production NPCs. See [source selections](M2_AI_ESCAPE_SOURCES.json),
++[evidence](../../Documentation/Implementation/M2_AI_ESCAPE.md), [navigation](AI_RECOVERY_CONTRACTS.md),
++[perception](AI_PERCEPTION_CONTRACTS.md), [targets](AI_TARGET_CONTRACTS.md),
++[hearing](AI_TRIGGER_CONTRACTS.md) and [object lifetime](OBJECT_CONTRACTS.md).
++
++## Escape selection and phases
++
++Cultists select visible ExitHints with AvoidTarget and recompute actual stimuli
++before every phase after phase 1. Any positive stimulus requests ComputeState;
++required perception failures abort. Civilians select visible hints without that
++avoidance filter and do not recompute perception mid-route. Cultists use cached
++AI dimensions; civilians query current dimensions. Both arrival thresholds are
++inclusive at `(sqrt(x*x+z*z)+0.1)/2`.
++
++No matching hint sends Cultists to AttackFar and civilians to EscapeHide. After
++assignment, both explicitly sample the checked tracked position. Civilians first
++compare full 3D distance against the arrival threshold, then face the hint and
++compare the hint forward vector to the **preceding movement-cache forward**.
++The cache is not refreshed after facing. A nonpositive dot requests Hide. Both
++classes plan a path to an accepted hint. An ordinary blocked plan requests Hide;
++missing queries or invalid data fail. The existing failed-plan latch prevents
++following old/partial points until successful phase-1 replanning.
++
++Phase 2 faces the next point; an empty path sends Cultists to Hide and civilians
++back to EscapeRun. Phase 3 flattens the point Y to cached position Y. Arrival consumes
++one point, faces stored target position on the last point, or returns to phase 2.
++Otherwise MC_Run executes. There is no escape ledge query. Phase 4 requests the
++original class decision. A missing phase-3 point fails rather than reproducing the
++source null dereference. Arrival retains velocity until another action changes it.
++
++ExitHint remains an ordinary original marker with no newly invented collision
++flags. CanSee still requires hitting the selected target through the existing
++solid-or-ray-hit query. A non-ray-hit marker is not made visible just because an
++escape state needs it. Synthetic/GPU scenarios explicitly give their diagnostic
++hints FLAG_RAYHIT and dimensions; this does not change authored world objects or
++claim to resolve retail marker visibility behavior.
++
++## Hide, beg and guard
++
++Both Hide implementations request ComputeState when there is no combat target.
++Otherwise they face its stored position, cancel the face command's Metacmd
++increment, run MC_Taunt_Beg in phase 1 and request ComputeState in phase 2. A
++pending target remains a checked failure until its ordinary link callback clears
++it; no dangling object is dereferenced.
++
++MC_Taunt_Beg selects TAUNT[6], disables looping and moves along cached right by
++m_fRollSpeed. The selected source defaults are AI_Mgr 2, Cultist 105 and Civilian
++3.5. These defaults do not implement the rest of their constructors/initialization.
++The source's lateral movement is intentional preservation, not replaced with a
++stationary pose. Playback completion clears animating and increments Metacmd but
++**does not stop velocity**. Missing clips, failed atomic resize, invalid speed or
++counter bounds reject; no fallback animation is substituted. Existing generic
++physics and model clocks run once, independently of inspection.
++
++GuardLocation recomputes actual stimuli on each call. Smell requests SearchSmell,
++whose execution is still unavailable; other positive stimuli request ComputeState.
++Phase 1 uses full 3D distance to guard position, skipping to idle phase 4 when near.
++Otherwise it faces/plans; ordinary blockage requests Idle. The guard point must be
++supplied by a caller: source Init's automatic spawn-position capture is not yet
++integrated. Phase 2 faces a point, or requests EscapeRun when empty. Phase 3 checks
++empty/ledge before distance, flattens the point Y, then performs the second source
++ledge check. Its throttle normally makes that second result false. Arrival consumes
++one point and eventually faces stored target position; otherwise MC_Run executes.
++Phase 4 runs MC_Idle; phase 5 requests ComputeState. Failed plans remain latched.
++
++## Tracking and lifetime
++
++The private track identity is non-owning. Original escape assignment creates no
++engine link, so SetTrackedObject does not manufacture one or share ownership of
++the combat target's unique directed link. Stable checked identities reject self,
++pending, stale and foreign objects. Queries immediately exclude pending objects.
++RefreshTrackedPosition clears an invalid identity, marks the sample unavailable
++and retains historical coordinates. Reused object slots cannot revive it.
++
++If a legitimate existing link emits MID_LINKBROKEN for the same identity, the
++original track branch clears it independently of the combat target branch. Clearing
++one combat link while continuing to track its old object does not invalidate a live
++track. Source gun-impact hearing also writes m_vTrackObjPos; that write now marks
++the object-position sample unavailable until explicitly refreshed. No automatic
++AI_Update refresh loop, smell-link policy or target retention is invented.
++
++State/command guards reject nested calls and detect removal or nested failure
++across virtual decisions. All removals remain deferred. Inspection reads recorded
++positions, checked identity, sample flag, guard point, hint dot, roll speed, state,
++phase, route and failure counters without executing actions or position queries.
++
++## Verification boundary
++
++Ten synthetic cases exercise both original classes, real queries/path planning,
++normal motion/model clocks, current-versus-cached dimensions, facing-cache order,
++source fallback states, guard/ledge sequencing, failures and deferred lifetime.
++Decision-recording overrides are explicitly test fixtures; actual ComputeStimuli
++and original class decisions remain covered separately.
++
++The private catalog attempts TAUNT[6] on six real NPC assets: five resolve and
++execute; Gideon has no clip and explicitly fails. The existing GPU character test
++adds a labelled female-civilian escape/beg driver with a real ABC and diagnostic
++ray-hit hint. It schedules only until Beg starts; clocks/physics continue normally.
++Hidden inspection and unload/reentry require arrival, beg, nonzero lateral velocity,
++no state/navigation failures and invalidation of the old identity. Its explicitly
++assigned target, position and speed are not authored production AI_Update.
++
++Shade recovery, smell following, assist/pickup/recoil/death states, full production
++NPC initialization/update/activation, required client FX and ExitTrigger/session
++services remain open. SubwayA still has 17 unsupported source entries. Other
++platforms, XR and retail gameplay/physics parity remain unverified.
+diff --git a/docs/AI_RECOVERY_CONTRACTS.md b/docs/AI_RECOVERY_CONTRACTS.md
+index 4172dd1..c274258 100644
+--- a/docs/AI_RECOVERY_CONTRACTS.md
++++ b/docs/AI_RECOVERY_CONTRACTS.md
+@@ -96,3 +96,7 @@ it does not replace ComputeStimuli or assert complete NPC decisions. Private tes
+ attempt all four command clips on six real NPC models without substituting missing
+ animations. GetPointShade/FindPosAroundObj, smell following, escape/recoil/death,
+ complete NPC initialization/update, required client FX and ExitTrigger remain open.
++
++The [escape/guard continuation](AI_ESCAPE_CONTRACTS.md) supplies selected original
++escape/hide/guard and beg bodies, plus checked non-owning tracking. Earlier blanket
++omissions for those bodies are superseded; full NPC initialization/update remains open.
+diff --git a/docs/AI_STATE_CONTRACTS.md b/docs/AI_STATE_CONTRACTS.md
+index afe3fc0..51085be 100644
+--- a/docs/AI_STATE_CONTRACTS.md
++++ b/docs/AI_STATE_CONTRACTS.md
+@@ -152,3 +152,7 @@ The [AI recovery/navigation continuation](AI_RECOVERY_CONTRACTS.md) now executes
+ jump/crouch/crawl and seven destination/recovery/visual-search states. Earlier
+ blanket omissions for those bodies are superseded. Failed partial routes remain
+ unusable; shade recovery, other states and full production AI_Update remain open.
++
++The [escape/guard continuation](AI_ESCAPE_CONTRACTS.md) supplies selected original
++escape/hide/guard and beg bodies, plus checked non-owning tracking. Earlier blanket
++omissions for those bodies are superseded; full NPC initialization/update remains open.
+diff --git a/docs/AI_TARGET_CONTRACTS.md b/docs/AI_TARGET_CONTRACTS.md
+index c959a6d..07cad5f 100644
+--- a/docs/AI_TARGET_CONTRACTS.md
++++ b/docs/AI_TARGET_CONTRACTS.md
+@@ -107,3 +107,7 @@ CivilianAI, CultistAI, Gideon, ExitTrigger, required client FX and other service
+ keep --start-game at exit 6. Autonomous target acquisition/retention, death/state
+ transitions, script execution, navigation, attacks, track/smell links and retail,
+ other-platform or XR parity remain unverified/unimplemented.
++
++The [escape/guard continuation](AI_ESCAPE_CONTRACTS.md) supplies selected original
++escape/hide/guard and beg bodies, plus checked non-owning tracking. Earlier blanket
++omissions for those bodies are superseded; full NPC initialization/update remains open.
+diff --git a/docs/M2_AI_ESCAPE_SOURCES.json b/docs/M2_AI_ESCAPE_SOURCES.json
+new file mode 100644
+index 0000000..0347770
+--- /dev/null
++++ b/docs/M2_AI_ESCAPE_SOURCES.json
+@@ -0,0 +1,74 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "fe59a9e460a3e8a774d1e264cd8de0687ffebc62",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          121,
++          121
++        ],
++        [
++          138,
++          138
++        ],
++        [
++          716,
++          728
++        ],
++        [
++          2220,
++          2221
++        ],
++        [
++          5355,
++          5379
++        ],
++        [
++          6275,
++          6352
++        ]
++      ],
++      "use": "Checked track identity/sample and original link-break branch; roll default, beg and guard bodies. Full Init/AI_Update not imported."
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CultistAI.cpp",
++      "sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
++      "selected_lines": [
++        [
++          55,
++          55
++        ],
++        [
++          460,
++          555
++        ]
++      ],
++      "use": "Selected roll default and escape/hide bodies"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
++      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
++      "selected_lines": [
++        [
++          59,
++          59
++        ],
++        [
++          374,
++          485
++        ]
++      ],
++      "use": "Selected roll default and escape/hide bodies"
++    }
++  ],
++  "adaptations": [
++    "Shared escape/hide plumbing retains class-specific filters, cache and phase rules",
++    "Typed non-owning track identity with no new engine link; stale sample handling and impact sample invalidation",
++    "Required clip/query/resize/lifetime failures reject instead of unchecked continuation",
++    "Existing failed-plan latch also protects guard/escape routes",
++    "Diagnostic drivers only; authored hint flags, production class registry and dependencies unchanged"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index efb09e0..e844a89 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -604,3 +604,13 @@ checked failure/lifetime paths and the failed-plan latch are documented adaptati
+ See [contracts](AI_RECOVERY_CONTRACTS.md) and
+ [evidence](../../Documentation/Implementation/M2_AI_RECOVERY.md). Dependencies,
+ reference trees and commercial assets are unchanged; full NPCs remain unavailable.
++
++## M2 AI escape, hiding and guard
++
++Donor: `sources/blood2` at `006b4aabd3fb348f6846cad03799cf8df685ea95`.
++[Source selections](M2_AI_ESCAPE_SOURCES.json) cover Cultist/Civilian escape/hide,
++AI_Mgr beg/guard and selected track handling. Shared plumbing preserves the distinct
++source rules. [Contracts](AI_ESCAPE_CONTRACTS.md) separate safety adaptations,
++diagnostic hint flags and selected defaults from still-missing full NPC initialization.
++[Evidence](../../Documentation/Implementation/M2_AI_ESCAPE.md) records Linux checks.
++Reference repositories, commercial assets and pinned dependencies are unchanged.
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index 6db6963..f63176d 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -9,6 +9,29 @@ namespace OpenBlood2
+ {
+     namespace
+     {
++        // Isolated original flee/hide driver. It stops scheduling once beg begins;
++        // model clocks and physics continue normally, independent of inspection.
++        class AIEscapeProbe : public CivilianAI
++        {
++          public:
++            HOBJECT diagnostic_hint = nullptr;
++            bool beg_started = false;
++
++          private:
++            DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
++            {
++                if (m == MID_UPDATE)
++                {
++                    bool ok = true;
++                    if (m_nState == StateEscapeHide && !GetTarget())
++                        ok = SetNewTarget(diagnostic_hint) && RefreshTargetPosition();
++                    ok = ok && DispatchState();
++                    beg_started = ok && m_nState == StateEscapeHide && m_nCurMetacmd == 17;
++                    GetServerDE()->SetNextUpdate(m_hObject, ok && !beg_started ? .001f : 0);
++                }
++                return CivilianAI::EngineMessageFn(m, d, f);
++            }
++        };
+         // Explicit original script-state driver, not the complete AI_Update.
+         class AIFollowProbe : public AI_Mgr
+         {
+@@ -96,6 +119,56 @@ namespace OpenBlood2
+             }
+         };
+     } // namespace
++    bool prepare_ai_escape_smoke(GameSession& g, ObjectId& id)
++    {
++        static const ClassInfo type{"AIEscapeProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AIEscapeProbe>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return false;
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_MODEL;
++        state.m_Pos = {3000, 10000, 0};
++        SAFE_STRCPY(state.m_Name, "Civilian escape/beg probe (no full AI_Update)");
++        SAFE_STRCPY(state.m_Filename, "models/enemies/f_civilian1.abc");
++        const auto h = g.objects.create(&type, state);
++        auto* r = g.objects.get(h);
++        auto* a = r ? dynamic_cast<AIEscapeProbe*>(r->game.get()) : nullptr;
++        auto table = std::make_shared<CAnim_Sound>();
++        if (!a || !r->model || !table->SetAnimationIndexes(h) || !a->InitStatics(table) ||
++            !a->SetAnimation(table->m_nAnim_RUN[TYPE_MELEE]) || !a->m_MoveObj.Init(h))
++            return false;
++        a->m_damage.Init(h);
++        a->m_damage.m_fHitPoints = a->m_damage.m_fMaxHitPoints = 100;
++        a->m_fSeeingDist = 200;
++        a->m_fRunSpeed = 120;
++        a->m_szAIState = "HIDE";
++        ObjectCreateStruct hint;
++        hint.m_Pos = vector_add(r->state.m_Pos, {0, 0, 60});
++        hint.m_Flags = FLAG_RAYHIT;
++        SAFE_STRCPY(hint.m_Name, "Diagnostic ray-hit ExitHint (authored flags unchanged)");
++        const auto exit = g.objects.create(g.objects.find_class("ExitHint"), hint);
++        DVector dims{2, 2, 2};
++        if (!exit || g.server.SetObjectDims(exit, &dims) != DE_OK || !a->SetNewState(AI_Mgr::StateEscapeRun))
++            return false;
++        a->diagnostic_hint = exit;
++        a->m_vTargetPos = vector_add(r->state.m_Pos, {0, 0, -60});
++        id = r->id;
++        g.server.SetNextUpdate(h, .001f);
++        return true;
++    }
++    bool check_ai_escape_smoke(GameSession& g, ObjectId id)
++    {
++        const auto* r = g.objects.get(id);
++        const auto* a = r ? dynamic_cast<const AIEscapeProbe*>(r->game.get()) : nullptr;
++        return a && a->beg_started && a->m_nState == AI_Mgr::StateEscapeHide && a->m_nCurMetacmd == 17 &&
++               a->GetTrackedObject() == a->diagnostic_hint && a->GetTarget() == a->diagnostic_hint &&
++               a->navigation_arrivals == 1 && a->navigation_updates > 4 && a->navigation_failures == 0 &&
++               a->locomotion_failures == 0 && a->state_failures == 0 && !a->navigation_plan_failed &&
++               a->m_MoveObj.path().empty() && r->state.m_Pos.z > 40 && std::abs(r->velocity.x) > 0 &&
++               r->animation.time > 0 && r->model && r->animation.animation < r->model->animations.size();
++    }
+     bool prepare_ai_follow_smoke(GameSession& g, ObjectId& id)
+     {
+         static const ClassInfo type{"AIFollowProbe",
+diff --git a/src/app/ai_model_key_smoke.h b/src/app/ai_model_key_smoke.h
+index 8e35522..977507b 100644
+--- a/src/app/ai_model_key_smoke.h
++++ b/src/app/ai_model_key_smoke.h
+@@ -2,6 +2,8 @@
+ #include "game/server_adapter.h"
+ namespace OpenBlood2
+ {
++    bool prepare_ai_escape_smoke(GameSession&, ObjectId&);
++    bool check_ai_escape_smoke(GameSession&, ObjectId);
+     bool prepare_ai_follow_smoke(GameSession&, ObjectId&);
+     bool check_ai_follow_smoke(GameSession&, ObjectId);
+     bool prepare_ai_fire_smoke(GameSession&, ObjectId&);
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 1dca171..ba10598 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -60,6 +60,21 @@ namespace OpenBlood2
+         const auto* r = game.objects.get(skeleton_selection);
+         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
++        if (target_ai && ImGui::CollapsingHeader("Original escape and guard", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            const auto& a = *target_ai;
++            ImGui::TextWrapped(
++                "Original Civilian/Cultist flee/hide and Guard. Diagnostic drivers are not full NPC AI_Update.");
++            const auto* tracked = game.objects.get(a.GetTrackedObject());
++            ImGui::TextWrapped("Tracked: %s", tracked ? tracked->state.m_Name : "none/pending/removed");
++            ImGui::Text("Sampled object position: %s", tracked && a.tracked_position_valid ? "yes (cached)" : "no");
++            ImGui::Text("Track position (%.2f %.2f %.2f)", a.m_vTrackObjPos.x, a.m_vTrackObjPos.y, a.m_vTrackObjPos.z);
++            ImGui::Text("Guard position (%.2f %.2f %.2f)", a.m_vGuardPos.x, a.m_vGuardPos.y, a.m_vGuardPos.z);
++            ImGui::Text("Hint dot %.3f | roll speed %.2f | escape/hide updates %llu", a.escape_hint_dot, a.m_fRollSpeed,
++                        (unsigned long long)a.escape_updates);
++            ImGui::Text("Track assignments %llu | invalidations %llu", (unsigned long long)a.tracked_changes,
++                        (unsigned long long)a.tracked_invalidations);
++        }
+         if (target_ai && ImGui::CollapsingHeader("Original navigation and recovery", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& a = *target_ai;
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 4a07bdb..c1ca65f 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -263,6 +263,11 @@ namespace
+         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
+             return 4;
+         const auto original_ai_follow = smoke_ai_follow;
++        OpenBlood2::ObjectId smoke_ai_escape{};
++        bool ai_escape_hidden = false;
++        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_escape_smoke(game, smoke_ai_escape))
++            return 4;
++        const auto original_ai_escape = smoke_ai_escape;
+         bool ai_sight_hidden = false;
+         bool ai_target_hidden = false;
+         bool hand_hidden = false;
+@@ -327,7 +332,7 @@ namespace
+         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
+         inspector.select_skeleton = options.skeleton_smoke;
+         if (options.skeleton_smoke)
+-            inspector.skeleton_selection = smoke_ai_follow;
++            inspector.skeleton_selection = smoke_ai_escape;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
+         inspector.select_pickups = options.pickups_smoke;
+@@ -551,6 +556,8 @@ namespace
+                 ai_fire_hidden |= OpenBlood2::check_ai_fire_smoke(game, smoke_ai_fire);
+             if (options.skeleton_smoke && !inspector_visible)
+                 ai_follow_hidden |= OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
++            if (options.skeleton_smoke && !inspector_visible)
++                ai_escape_hidden |= OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
+             if (options.skeleton_smoke && !inspector_visible)
+                 ai_state_hidden |= OpenBlood2::check_ai_state_smoke(game, smoke_ai_state);
+             if (options.skeleton_smoke && !inspector_visible)
+@@ -1055,6 +1062,8 @@ namespace
+             bool ai_target_reentered = !options.skeleton_smoke;
+             if (options.skeleton_smoke)
+             {
++                if (game.objects.get(original_ai_escape) || !OpenBlood2::prepare_ai_escape_smoke(game, smoke_ai_escape))
++                    return 4;
+                 // Start the independent route before the existing key/state/fire clocks.
+                 // Its longer script + navigation sequence must not inherit the shot-only deadline.
+                 if (game.objects.get(original_ai_follow) || !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
+@@ -1122,6 +1131,11 @@ namespace
+                                      a->navigation_error);
+                 if (!ai_follow_hidden || !reentered)
+                     return 4;
++                const bool escape_reentered = OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
++                spdlog::info("AI escape/beg: hidden={}, reentered={}, old identity invalidated={}", ai_escape_hidden,
++                             escape_reentered, !game.objects.get(original_ai_escape));
++                if (!ai_escape_hidden || !escape_reentered)
++                    return 4;
+             }
+             bool hand_reentered = !options.skeleton_smoke;
+             if (options.skeleton_smoke)
+diff --git a/src/game/original/AIEscape.cpp b/src/game/original/AIEscape.cpp
+new file mode 100644
+index 0000000..454a324
+--- /dev/null
++++ b/src/game/original/AIEscape.cpp
+@@ -0,0 +1,294 @@
++// Original CultistAI.cpp:460-550, CivilianAI.cpp:374-489 and AI_Mgr.cpp:5355-5379,6275-6350.
++// Checked adaptations and diagnostic scope: AI_ESCAPE_CONTRACTS.md.
++#include "AI_Mgr.h"
++#include "engine/collision.h"
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++
++bool AI_Mgr::MC_Taunt_Beg()
++{
++    ++locomotion_calls;
++    if (locomotion_busy)
++        return LocomotionFailure("Reentrant beg command rejected");
++    locomotion_busy = true;
++    locomotion_error.clear();
++    locomotion_command = 17;
++    // No callbacks occur in these typed clip/velocity operations. Keep original
++    // SetAnimation -> nonloop -> rightward Move -> command state ordering.
++    bool ok = LocomotionReady();
++    if (ok && (!std::isfinite(m_fRollSpeed) || m_fRollSpeed < 0 || m_fRollSpeed > 1e7f ||
++               Metacmd == std::numeric_limits<int>::max()))
++        ok = LocomotionFailure("Invalid beg roll speed/Metacmd");
++    if (ok && (!m_bAnimating || m_nCurMetacmd != 17))
++    {
++        if (!m_pAnim_Sound || !SetAnimation(m_pAnim_Sound->m_nAnim_TAUNT[6]))
++            ok = LocomotionFailure("Beg animation table/clip/resize unavailable");
++        else
++        {
++            GetServerDE()->SetModelLooping(m_hObject, DFALSE);
++            ok = Move(m_MoveObj.GetRightVector(), m_fRollSpeed);
++            if (ok)
++            {
++                m_bAnimating = true;
++                m_nCurMetacmd = 17;
++            }
++            else
++                LocomotionFailure(script_motion_error);
++        }
++    }
++    else if (ok)
++    {
++        std::string name;
++        if (!GetServerDE()->GetModelAnimationName(m_hObject, GetServerDE()->GetModelAnimation(m_hObject), name))
++            ok = LocomotionFailure("Beg playback unavailable");
++        else if (GetServerDE()->GetModelPlaybackState(m_hObject) & MS_PLAYDONE)
++        {
++            m_bAnimating = false;
++            ++Metacmd;
++            ++animation_finishes;
++            // Source does not stop the lateral velocity here.
++        }
++    }
++    locomotion_busy = false;
++    return ok;
++}
++bool AI_Mgr::AI_STATE_Escape_RunAway()
++{
++    return StateFailure("Subclass escape action is not integrated");
++}
++bool AI_Mgr::AI_STATE_Escape_Hide()
++{
++    return StateFailure("Subclass hide action is not integrated");
++}
++bool AI_Mgr::EscapeRun(bool civilian)
++{
++    ++escape_updates;
++    ++navigation_updates;
++    if (navigation_busy)
++        return NavigationFailure("Reentrant escape state rejected");
++    navigation_busy = true;
++    navigation_state = StateEscapeRun;
++    navigation_error.clear();
++    const auto failures = navigation_failures;
++    const bool ok = EscapeRunStep(civilian);
++    navigation_busy = false;
++    return ok && navigation_failures == failures;
++}
++bool AI_Mgr::EscapeHide()
++{
++    ++escape_updates;
++    ++navigation_updates;
++    if (navigation_busy)
++        return NavigationFailure("Reentrant hide state rejected");
++    navigation_busy = true;
++    navigation_state = StateEscapeHide;
++    navigation_error.clear();
++    const auto failures = navigation_failures;
++    const bool ok = EscapeHideStep();
++    navigation_busy = false;
++    return ok && navigation_failures == failures;
++}
++bool AI_Mgr::EscapeRunStep(bool civilian)
++{
++    if (!LocomotionReady())
++        return NavigationFailure(locomotion_error);
++    if (Metacmd > std::numeric_limits<int>::max() - 2)
++        return NavigationFailure("Escape Metacmd overflow");
++    DVector dims = m_vDims;
++    if (civilian)
++    {
++        if (GetServerDE()->GetObjectDims(m_hObject, &dims) != DE_OK || !physics_vector(dims) || dims.x <= 0 ||
++            dims.y <= 0 || dims.z <= 0)
++            return NavigationFailure("Civilian escape dimensions unavailable");
++    }
++    else if (Metacmd > 1)
++    {
++        const int stim = ComputeStimuli();
++        if (stim < 0)
++            return NavigationFailure(perception_error);
++        if (stim > 0)
++            return NavigationDecision(stim);
++    }
++    navigation_threshold = (std::hypot(dims.x, dims.z) + .1f) / 2;
++    if ((Metacmd == 2 || Metacmd == 3) && navigation_plan_failed)
++        return NavigationFailure("Failed escape plan must be retried from phase 1");
++    switch (Metacmd)
++    {
++        case 1:
++        {
++            navigation_plan_failed = true;
++            const auto hint =
++                FindObjectInRadius(AIFindList::Exits, m_fSeeingDist, FindVisible | (civilian ? 0u : FindAvoidTarget));
++            if (!find.valid)
++                return NavigationFailure(find.error);
++            if (!SetTrackedObject(hint))
++                return NavigationFailure(target_error);
++            if (!hint)
++                return SetNewState(civilian ? StateEscapeHide : StateAttackFar) || NavigationFailure(state_error);
++            if (!RefreshTrackedPosition())
++                return NavigationFailure(target_error);
++            if (civilian)
++            {
++                const auto d = vector_subtract(m_vTrackObjPos, m_MoveObj.GetPos());
++                navigation_distance = std::hypot(d.x, d.y, d.z);
++                if (navigation_distance <= navigation_threshold)
++                    return SetNewState(StateEscapeHide) || NavigationFailure(state_error);
++            }
++            if (!MC_FacePos(m_vTrackObjPos))
++                return NavigationFailure(target_error);
++            if (civilian)
++            {
++                DRotation rotation;
++                if (GetServerDE()->GetObjectRotation(hint, &rotation) != DE_OK)
++                    return NavigationFailure("ExitHint rotation unavailable");
++                const auto forward = rotate_vector({0, 0, 1}, rotation);
++                const auto cached = m_MoveObj.GetForwardVector();
++                escape_hint_dot = forward.x * cached.x + forward.y * cached.y + forward.z * cached.z;
++                // The cache is not refreshed after facing: preserve the preceding sample.
++                if (escape_hint_dot <= 0)
++                    return SetNewState(StateEscapeHide) || NavigationFailure(state_error);
++            }
++            if (!m_MoveObj.CalculatePath(m_vTrackObjPos))
++            {
++                if (m_MoveObj.outcome != CMovement::Outcome::Blocked)
++                    return NavigationFailure(m_MoveObj.error);
++                return SetNewState(StateEscapeHide) || NavigationFailure(state_error);
++            }
++            navigation_plan_failed = false;
++            return true;
++        }
++        case 2:
++        {
++            DVector point;
++            if (!m_MoveObj.GetNextPathPoint(point))
++                return SetNewState(civilian ? StateEscapeRun : StateEscapeHide) || NavigationFailure(state_error);
++            return MC_FacePos(point) || NavigationFailure(target_error);
++        }
++        case 3:
++        {
++            DVector point;
++            if (!m_MoveObj.GetNextPathPoint(point))
++                return NavigationFailure("Missing source escape phase-3 point");
++            point.y = m_MoveObj.GetPos().y;
++            const auto d = vector_subtract(point, m_MoveObj.GetPos());
++            navigation_distance = std::hypot(d.x, d.y, d.z);
++            if (navigation_distance <= navigation_threshold)
++            {
++                ++navigation_arrivals;
++                if (!m_MoveObj.MoveToNextPathPoint())
++                    return MC_FacePos(m_vTargetPos) || NavigationFailure(target_error);
++                Metacmd = 2;
++                return true;
++            }
++            return MC_Run() || NavigationFailure(locomotion_error);
++        }
++        case 4:
++            return NavigationDecision();
++        default:
++            return true;
++    }
++}
++bool AI_Mgr::EscapeHideStep()
++{
++    if (!LocomotionReady())
++        return NavigationFailure(locomotion_error);
++    if (Metacmd > std::numeric_limits<int>::max() - 2)
++        return NavigationFailure("Hide Metacmd overflow");
++    if (!GetTarget())
++        return NavigationDecision();
++    if (!MC_FaceTarget())
++        return NavigationFailure(target_error);
++    --Metacmd;
++    if (Metacmd == 1)
++        return MC_Taunt_Beg() || NavigationFailure(locomotion_error);
++    if (Metacmd == 2)
++        return NavigationDecision();
++    return true;
++}
++bool AI_Mgr::AI_STATE_GuardLocation()
++{
++    return NavigationState(StateGuard);
++}
++bool AI_Mgr::GuardStep()
++{
++    if (!physics_vector(m_vGuardPos))
++        return NavigationFailure("Invalid guard position");
++    const int stim = ComputeStimuli();
++    if (stim < 0)
++        return NavigationFailure(perception_error);
++    if (stim == 3)
++        return SetNewState(StateSearchSmell) || NavigationFailure(state_error);
++    if (stim > 0)
++        return NavigationDecision(stim);
++    navigation_threshold = (std::hypot(m_vDims.x, m_vDims.z) + .1f) / 2;
++    if ((Metacmd == 2 || Metacmd == 3) && navigation_plan_failed)
++        return NavigationFailure("Failed guard plan must be retried from phase 1");
++    switch (Metacmd)
++    {
++        case 1:
++        {
++            const auto d = vector_subtract(m_vGuardPos, m_MoveObj.GetPos());
++            navigation_distance = std::hypot(d.x, d.y, d.z); // Guard initial distance is NOT flattened.
++            if (navigation_distance <= navigation_threshold)
++            {
++                Metacmd = 4;
++                return true;
++            }
++            navigation_plan_failed = true;
++            if (!MC_FacePos(m_vGuardPos))
++                return NavigationFailure(target_error);
++            if (!m_MoveObj.CalculatePath(m_vGuardPos))
++            {
++                if (m_MoveObj.outcome != CMovement::Outcome::Blocked)
++                    return NavigationFailure(m_MoveObj.error);
++                return SetNewState(StateIdle) || NavigationFailure(state_error);
++            }
++            navigation_plan_failed = false;
++            return true;
++        }
++        case 2:
++        {
++            DVector point;
++            if (!m_MoveObj.GetNextPathPoint(point))
++                return SetNewState(StateEscapeRun) || NavigationFailure(state_error);
++            return MC_FacePos(point) || NavigationFailure(target_error);
++        }
++        case 3:
++        {
++            DVector point;
++            if (!m_MoveObj.GetNextPathPoint(point))
++                return NavigationDecision();
++            bool edge;
++            if (!IsLedge(m_MoveObj.GetForwardVector(), edge))
++                return NavigationFailure(locomotion_error);
++            if (edge)
++                return NavigationDecision();
++            point.y = m_MoveObj.GetPos().y;
++            const auto d = vector_subtract(point, m_MoveObj.GetPos());
++            navigation_distance = std::hypot(d.x, d.y, d.z);
++            if (!IsLedge(m_MoveObj.GetForwardVector(), edge))
++                return NavigationFailure(locomotion_error);
++            if (edge)
++            {
++                ++Metacmd;
++                return true;
++            }
++            if (navigation_distance <= navigation_threshold)
++            {
++                ++navigation_arrivals;
++                if (!m_MoveObj.MoveToNextPathPoint())
++                    return MC_FacePos(m_vTargetPos) || NavigationFailure(target_error);
++                Metacmd = 2;
++                return true;
++            }
++            return MC_Run() || NavigationFailure(locomotion_error);
++        }
++        case 4:
++            return MC_Idle() || NavigationFailure(state_error);
++        case 5:
++            return NavigationDecision();
++        default:
++            return true;
++    }
++}
+diff --git a/src/game/original/AINavigationStates.cpp b/src/game/original/AINavigationStates.cpp
+index afd3963..bf3e279 100644
+--- a/src/game/original/AINavigationStates.cpp
++++ b/src/game/original/AINavigationStates.cpp
+@@ -50,6 +50,8 @@ bool AI_Mgr::NavigationStep(int state)
+                                                            : MC_Crawl();
+         return ok || NavigationFailure(locomotion_error);
+     }
++    if (state == StateGuard)
++        return GuardStep();
+     const bool search = state == StateSearchVisual;
+     const bool around = state == StateWalkAround || state == StateRunAround;
+     const bool run = search || state == StateRunAround || state == StateRunTo;
+diff --git a/src/game/original/AIState.cpp b/src/game/original/AIState.cpp
+index 68bca28..799c47c 100644
+--- a/src/game/original/AIState.cpp
++++ b/src/game/original/AIState.cpp
+@@ -252,6 +252,12 @@ bool AI_Mgr::DispatchState()
+         Metacmd = 1;
+     switch (m_nState)
+     {
++        case StateEscapeRun:
++            return AI_STATE_Escape_RunAway();
++        case StateEscapeHide:
++            return AI_STATE_Escape_Hide();
++        case StateGuard:
++            return AI_STATE_GuardLocation();
+         case StateJumpOver:
+             return AI_STATE_JumpOverObj();
+         case StateCrawlUnder:
+diff --git a/src/game/original/AITarget.cpp b/src/game/original/AITarget.cpp
+index 7b46725..61c2108 100644
+--- a/src/game/original/AITarget.cpp
++++ b/src/game/original/AITarget.cpp
+@@ -120,5 +120,50 @@ DDWORD AI_Mgr::EngineMessageFn(DDWORD message, void* data, DFLOAT value)
+         target_position_valid = false;
+         ++target_link_breaks;
+     }
++    if (message == MID_LINKBROKEN && data == m_hTrackObject && m_hTrackObject)
++    {
++        m_hTrackObject = nullptr;
++        tracked_position_valid = false;
++        ++tracked_invalidations;
++    }
+     return CBaseCharacter::EngineMessageFn(message, data, value);
+ }
++
++// Source Escape states assign a non-owning track identity without creating a link.
++// Stable checked tokens also handle removal when no MID_LINKBROKEN can be emitted.
++bool AI_Mgr::SetTrackedObject(HOBJECT object)
++{
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject) ||
++        (object && (object == m_hObject || !server->IsObjectAlive(object))))
++        return TargetFailure("Tracked assignment requires distinct live objects");
++    m_hTrackObject = object;
++    tracked_position_valid = false;
++    ++tracked_changes;
++    return true;
++}
++HOBJECT AI_Mgr::GetTrackedObject() const
++{
++    auto* server = GetServerDE();
++    return server && server->IsObjectAlive(m_hObject) && server->IsObjectAlive(m_hTrackObject) ? m_hTrackObject
++                                                                                               : nullptr;
++}
++bool AI_Mgr::RefreshTrackedPosition()
++{
++    auto* server = GetServerDE();
++    const auto object = GetTrackedObject();
++    DVector position;
++    if (!object || server->GetObjectPos(object, &position) != DE_OK)
++    {
++        tracked_position_valid = false;
++        if (!object && m_hTrackObject)
++        {
++            m_hTrackObject = nullptr;
++            ++tracked_invalidations;
++        }
++        return TargetFailure("Tracked pose unavailable; historical coordinates retained");
++    }
++    m_vTrackObjPos = position;
++    tracked_position_valid = true;
++    return true;
++}
+diff --git a/src/game/original/AITrigger.cpp b/src/game/original/AITrigger.cpp
+index b003822..15e6491 100644
+--- a/src/game/original/AITrigger.cpp
++++ b/src/game/original/AITrigger.cpp
+@@ -203,6 +203,7 @@ bool AI_Mgr::HandleTrigger(HOBJECT sender, std::string_view text)
+                     !number(args[4], point.z) || !OpenBlood2::physics_vector(point))
+                     return TriggerFailure("Invalid gun-impact coordinates");
+                 m_vTrackObjPos = heard_position = point; // Source does not apply hearing distance to impacts.
++                tracked_position_valid = false;          // This is an impact location, not a tracked-object sample.
+                 if (!SetNewState(StateDodge))
+                     return TriggerFailure(state_error.c_str());
+                 trigger_outcome = TriggerOutcome::Heard;
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 56ac184..9af3e6a 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -158,6 +158,18 @@ class AI_Mgr : public CBaseCharacter
+     bool SetNewState(int);
+     bool StopVelocity();
+     bool SetAnimation(DDWORD);
++    bool MC_Taunt_Beg();
++    virtual bool AI_STATE_Escape_RunAway();
++    virtual bool AI_STATE_Escape_Hide();
++    bool AI_STATE_GuardLocation();
++    bool SetTrackedObject(HOBJECT);
++    bool RefreshTrackedPosition();
++    HOBJECT GetTrackedObject() const;
++    DVector m_vGuardPos{};
++    float m_fRollSpeed = 2;
++    bool tracked_position_valid = false;
++    std::uint64_t tracked_changes = 0, tracked_invalidations = 0, escape_updates = 0;
++    float escape_hint_dot = 0;
+     bool MC_Jump();
+     bool MC_Crouch();
+     bool MC_Crawl();
+@@ -396,6 +408,8 @@ class AI_Mgr : public CBaseCharacter
+     bool TriggerFailure(const char*);
+     bool StateFailure(const char*);
+     bool AnimationCommand(DDWORD clip, int command);
++    bool EscapeRun(bool civilian);
++    bool EscapeHide();
+     bool OnStringKey(ArgList*) override;
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+ 
+@@ -407,6 +421,9 @@ class AI_Mgr : public CBaseCharacter
+     bool navigation_busy = false;
+     bool NavigationState(int);
+     bool NavigationStep(int);
++    bool EscapeRunStep(bool civilian);
++    bool EscapeHideStep();
++    bool GuardStep();
+     bool NavigationDecision(int stimulus = -1);
+     bool NavigationFailure(std::string_view);
+     bool script_busy = false;
+@@ -428,6 +445,7 @@ class AI_Mgr : public CBaseCharacter
+     static void InitLists();
+     int PerceptionFailure(const char*);
+     HOBJECT m_hTarget = nullptr;
++    HOBJECT m_hTrackObject = nullptr;
+     bool TargetFailure(const char*);
+     // Original subclasses share class/gender tables and their retained voice.
+     // Shared ownership replaces a borrowed pointer, preserving sharing safely.
+diff --git a/src/game/original/CivilianAI.h b/src/game/original/CivilianAI.h
+index 31b0d1a..0b8c7f4 100644
+--- a/src/game/original/CivilianAI.h
++++ b/src/game/original/CivilianAI.h
+@@ -1,10 +1,22 @@
+ #pragma once
+ #include "AI_Mgr.h"
+ // Selected original state rules only. Not registered for world creation:
+-// full initialization, fleeing, damage/trigger handling and AI_Update remain open.
++// full initialization, damage/trigger handling and AI_Update remain open.
+ class CivilianAI : public AI_Mgr
+ {
+   public:
++    CivilianAI()
++    {
++        m_fRollSpeed = 3.5;
++    } // Selected original constructor default.
++    bool AI_STATE_Escape_RunAway() override
++    {
++        return EscapeRun(true);
++    }
++    bool AI_STATE_Escape_Hide() override
++    {
++        return EscapeHide();
++    }
+     bool m_bScared = false;
+     bool ComputeState(int stimulus = -1) override;
+     bool AI_STATE_Idle() override;
+diff --git a/src/game/original/CultistAI.h b/src/game/original/CultistAI.h
+index 9cf85fb..4592a9b 100644
+--- a/src/game/original/CultistAI.h
++++ b/src/game/original/CultistAI.h
+@@ -5,6 +5,18 @@
+ class CultistAI : public AI_Mgr
+ {
+   public:
++    CultistAI()
++    {
++        m_fRollSpeed = 105;
++    } // Selected original constructor default.
++    bool AI_STATE_Escape_RunAway() override
++    {
++        return EscapeRun(false);
++    }
++    bool AI_STATE_Escape_Hide() override
++    {
++        return EscapeHide();
++    }
+     bool ComputeState(int stimulus = -1) override;
+     bool AI_STATE_AttackClose() override;
+     bool AI_STATE_AttackFar() override;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 4af7223..be9226b 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -762,3 +762,15 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME ai_recovery.catalog COMMAND ai_recovery_tests catalog "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(ai_recovery.catalog PROPERTIES LABELS "headless;private;ai_recovery" TIMEOUT 90)
+ endif()
++
++add_executable(ai_escape_tests ai_escape_tests.cpp)
++target_link_libraries(ai_escape_tests PRIVATE blood2_game)
++blood2_project_options(ai_escape_tests)
++foreach(case IN ITEMS beg selection facing routes perception hiding guard failures tracking lifetime)
++    add_test(NAME ai_escape.${case} COMMAND ai_escape_tests "${case}")
++    set_tests_properties(ai_escape.${case} PROPERTIES LABELS "headless;ai_escape" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME ai_escape.catalog COMMAND ai_escape_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(ai_escape.catalog PROPERTIES LABELS "headless;private;ai_escape" TIMEOUT 90)
++endif()
+diff --git a/tests/ai_escape_tests.cpp b/tests/ai_escape_tests.cpp
+new file mode 100644
+index 0000000..83909e8
+--- /dev/null
++++ b/tests/ai_escape_tests.cpp
+@@ -0,0 +1,455 @@
++#include "brush_fixture.h"
++#include "game/original/CivilianAI.h"
++#include "game/original/CultistAI.h"
++#include "game/original/ExitHint.h"
++#include "game/server_adapter.h"
++#include "model_fixture.h"
++#include <cmath>
++#include <functional>
++#include <iostream>
++#include <limits>
++#include <type_traits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .002f;
++    }
++    bool setup(GameSession& g)
++    {
++        CHECK(g.objects.find_class("BaseClass") || g.initialize());
++        auto floor = test_brush::box("floor", {-1000, -20, -1000}, {1000, -10, 1000});
++        for (auto& s : floor.surfaces)
++            s.flags = 1;
++        std::string error;
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        return true;
++    }
++    template <class Original> struct Probe : Original
++    {
++        int decisions = 0, requested_stimulus = -2;
++        bool record = false, recurse = false, remove = false, nested_ok = true;
++        bool ComputeState(int stimulus = -1) override
++        {
++            ++decisions;
++            requested_stimulus = stimulus;
++            if (recurse)
++                nested_ok = this->AI_STATE_Escape_Hide();
++            if (remove)
++                this->GetServerDE()->RemoveObject(this->m_hObject);
++            return record ? true : Original::ComputeState(stimulus);
++        }
++    };
++    using Civilian = Probe<CivilianAI>;
++    using Cultist = Probe<CultistAI>;
++    template <class T = Civilian> T* actor(GameSession& g, DVector pos = {0, 10, 0})
++    {
++        static const ClassInfo type{std::is_base_of_v<CivilianAI, T> ? "CivilianEscapeProbe" : "CultistEscapeProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<T>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Pos = pos;
++        s.m_Flags = 0;
++        auto h = g.objects.create(&type, s);
++        auto* r = g.objects.get(h);
++        auto* a = r ? dynamic_cast<T*>(r->game.get()) : nullptr;
++        if (!a)
++            return nullptr;
++        auto model = std::make_shared<Model>();
++        std::string error;
++        if (!read_model(test_model::abc().b, *model, error))
++            return nullptr;
++        auto clip = model->animations.front();
++        model->animations.clear();
++        for (unsigned i = 0; i < 77; ++i)
++        {
++            model->animations.push_back(clip);
++            auto& c = model->animations.back();
++            c.name = "clip" + std::to_string(i);
++            c.dimensions = {1, 2, 1};
++            c.keys.clear();
++        }
++        for (auto& c : model->animations)
++            for (auto& n : c.nodes)
++                for (auto& f : n.frames)
++                    f.position = {};
++        r->model = model;
++        r->dimensions = {1, 2, 1};
++        auto table = std::make_shared<CAnim_Sound>();
++        for (unsigned i = 0; i < 9; ++i)
++        {
++            table->m_nAnim_WALK[i] = i;
++            table->m_nAnim_RUN[i] = 9 + i;
++            table->m_nAnim_FIRE_WALK[i] = 22 + i;
++            table->m_nAnim_FIRE_RUN[i] = 31 + i;
++            table->m_nAnim_FIRE_STAND[i] = 40;
++            table->m_nAnim_JUMP[i] = 41 + i;
++            table->m_nAnim_CROUCH[i] = 50 + i;
++            table->m_nAnim_CRAWL[i] = 59 + i;
++            table->m_nAnim_FIRE_CRAWL[i] = 68 + i;
++        }
++        table->m_nAnim_TAUNT[6] = 76;
++        for (auto& clip : table->m_nAnim_IDLE)
++            clip = 75;
++        table->m_nAnim_WALK_INJURED_LLEG_PISTOL = 18;
++        table->m_nAnim_WALK_INJURED_RLEG_PISTOL = 19;
++        table->m_nAnim_WALK_INJURED_LLEG_RIFLE = 20;
++        table->m_nAnim_WALK_INJURED_RLEG_RIFLE = 21;
++        if (!a->InitStatics(table) || !a->m_MoveObj.Init(h))
++            return nullptr;
++        a->m_vDims = r->dimensions;
++        if (!a->m_MoveObj.Update() || !a->m_InventoryMgr.Init(h, nullptr))
++            return nullptr;
++        a->m_damage.Init(h);
++        a->m_damage.m_fHitPoints = a->m_damage.m_fMaxHitPoints = 100;
++        return a;
++    }
++    HOBJECT object(GameSession& g, const char* name, DVector pos, DVector dims = {})
++    {
++        ObjectCreateStruct s;
++        SAFE_STRCPY(s.m_Name, name);
++        s.m_Pos = pos;
++        s.m_Flags = dims.x ? FLAG_SOLID : 0;
++        auto h = g.objects.create(g.objects.find_class("BaseClass"), s);
++        if (h)
++            g.objects.get(h)->dimensions = dims;
++        return h;
++    }
++
++    HOBJECT hint(GameSession& g, DVector pos, bool rayhit = true)
++    {
++        ObjectCreateStruct s;
++        s.m_Pos = pos;
++        s.m_Flags = rayhit ? FLAG_RAYHIT : 0;
++        const auto h = g.objects.create(g.objects.find_class("ExitHint"), s);
++        if (h)
++            g.objects.get(h)->dimensions = {1, 1, 1};
++        return h;
++    }
++    bool beg(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        auto* c = actor<Cultist>(g, {100, 10, 0});
++        CHECK(a && c);
++        CHECK(near(a->m_fRollSpeed, 3.5f) && near(c->m_fRollSpeed, 105));
++        auto* r = g.objects.get(a->m_hObject);
++        a->Metacmd = 4;
++        CHECK(a->MC_Taunt_Beg() && a->m_nCurMetacmd == 17 && a->m_bAnimating && r->animation.animation == 76);
++        CHECK(near(r->velocity.x, 3.5f) && near(r->velocity.z, 0) && !r->animation.looping);
++        CHECK(g.step(.1) && near(r->state.m_Pos.x, .35f));
++        CHECK(g.server.advance_models(1) && a->MC_Taunt_Beg() && a->Metacmd == 5 && !a->m_bAnimating &&
++              near(r->velocity.x, 3.5f));
++        r->state.m_Rotation = rotation_from_euler({0, 1.57079632679f, 0});
++        CHECK(a->m_MoveObj.Update());
++        CHECK(a->MC_Taunt_Beg() && near(r->velocity.x, 0) && near(r->velocity.z, -3.5f));
++        a->m_bAnimating = false;
++        a->m_nTrapped = 1;
++        CHECK(a->MC_Taunt_Beg() && near(r->velocity.z, 0));
++        a->m_fRollSpeed = std::numeric_limits<float>::infinity();
++        CHECK(!a->MC_Taunt_Beg());
++        return true;
++    }
++    bool selection(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        auto* c = actor<Cultist>(g);
++        CHECK(a && c);
++        a->m_fSeeingDist = c->m_fSeeingDist = 100;
++        auto plain = hint(g, {0, 10, 20}, false);
++        CHECK(plain);
++        CHECK(a->SetNewState(AI_Mgr::StateEscapeRun) && a->DispatchState() && a->m_nState == AI_Mgr::StateEscapeHide);
++        CHECK(c->SetNewState(AI_Mgr::StateEscapeRun) && c->DispatchState() && c->m_nState == AI_Mgr::StateAttackFar);
++        // Nonsolid original hints do not become visible merely because a state needs one.
++        auto first = hint(g, {-20, 10, 40}), second = hint(g, {20, 10, 40});
++        CHECK(first && second);
++        CHECK(a->SetNewState(AI_Mgr::StateEscapeRun) && a->DispatchState() && a->GetTrackedObject() == second &&
++              a->Metacmd == 2);
++        auto enemy = object(g, "enemy", {0, 10, -30});
++        CHECK(c->SetNewTarget(enemy) && c->RefreshTargetPosition());
++        CHECK(c->SetNewState(AI_Mgr::StateEscapeRun) && c->DispatchState() && c->m_nState == AI_Mgr::StateAttackFar);
++        CHECK(a->SetNewTarget(enemy) && a->RefreshTargetPosition());
++        CHECK(a->SetNewState(AI_Mgr::StateEscapeRun) && a->DispatchState() && a->GetTrackedObject() == second);
++        return true;
++    }
++    bool facing(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        a->m_fSeeingDist = 100;
++        auto h = hint(g, {30, 10, 0});
++        CHECK(h);
++        // Facing turns to +X; the previous cache remains +Z and hint forward is +Z.
++        CHECK(a->SetNewState(AI_Mgr::StateEscapeRun) && a->DispatchState() && a->Metacmd == 2 &&
++              near(a->escape_hint_dot, 1));
++        CHECK(a->m_MoveObj.GetForwardVector().z == 1 &&
++              near(rotate_vector({0, 0, 1}, g.objects.get(a->m_hObject)->state.m_Rotation).x, 1));
++        CHECK(a->m_MoveObj.Update()); // Now cached +X is exactly orthogonal to a +Y hint.
++        g.objects.get(h)->state.m_Rotation = rotation_from_euler({-1.57079632679f, 0, 0});
++        CHECK(a->SetNewState(AI_Mgr::StateEscapeRun) && a->DispatchState() && a->m_nState == AI_Mgr::StateEscapeHide);
++        CHECK(a->navigation_plan_failed);
++        // Civilian uses current dimensions, unlike cached-dimension Cultist/Guard.
++        g.objects.get(a->m_hObject)->dimensions = {100, 2, 100};
++        CHECK(a->SetNewState(AI_Mgr::StateEscapeRun) && a->DispatchState() && a->m_nState == AI_Mgr::StateEscapeHide);
++        CHECK(a->navigation_threshold > 70 && a->navigation_distance == 30);
++        return true;
++    }
++    template <class T> bool route_one()
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor<T>(g);
++        CHECK(a);
++        a->m_fSeeingDist = 100;
++        a->m_fRunSpeed = 20;
++        CHECK(hint(g, {0, 10, 20}));
++        CHECK(a->SetNewState(AI_Mgr::StateEscapeRun) && a->DispatchState() && a->Metacmd == 2);
++        CHECK(a->DispatchState() && a->Metacmd == 3 && a->DispatchState());
++        auto* r = g.objects.get(a->m_hObject);
++        CHECK(near(r->velocity.z, 20));
++        CHECK(g.step(.1) && near(r->state.m_Pos.z, 2));
++        r->state.m_Pos.z = 20;
++        CHECK(a->m_MoveObj.Update());
++        a->m_vTargetPos = {0, 10, -10};
++        CHECK(a->DispatchState() && a->Metacmd == 4 && a->navigation_arrivals == 1 && a->m_MoveObj.path().empty());
++        CHECK(a->ledge_queries == 0 && near(r->velocity.z, 20));
++        a->record = true;
++        CHECK(a->DispatchState() && a->decisions == 1 && a->requested_stimulus == -1);
++        a->Metacmd = 2;
++        CHECK(a->DispatchState());
++        CHECK(a->m_nState == (std::is_base_of_v<CivilianAI, T> ? AI_Mgr::StateEscapeRun : AI_Mgr::StateEscapeHide));
++        a->Metacmd = 3;
++        CHECK(!a->AI_STATE_Escape_RunAway());
++        return true;
++    }
++    bool routes(const char*)
++    {
++        return route_one<Civilian>() && route_one<Cultist>();
++    }
++    bool perception(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* c = actor<Cultist>(g);
++        auto* a = actor(g, {10, 10, 0});
++        auto* enemy = actor(g, {0, 10, 50});
++        CHECK(c && a && enemy);
++        c->m_bCabal = a->m_bCabal = true;
++        enemy->m_bCabal = false;
++        CHECK(c->InsertMe() && a->InsertMe() && enemy->InsertMe());
++        g.objects.get(enemy->m_hObject)->state.m_Flags = FLAG_SOLID;
++        c->m_fSeeingDist = a->m_fSeeingDist = 100;
++        CHECK(hint(g, {20, 10, 20}));
++        CHECK(c->SetNewState(AI_Mgr::StateEscapeRun) && c->DispatchState());
++        c->record = true;
++        CHECK(c->DispatchState() && c->decisions == 1 && c->requested_stimulus == 1 &&
++              c->GetTarget() == enemy->m_hObject);
++        CHECK(a->SetNewState(AI_Mgr::StateEscapeRun) && a->DispatchState());
++        auto calls = a->perception_calls;
++        CHECK(a->DispatchState() && a->decisions == 0 && a->perception_calls == calls);
++        // Guard uses actual smell precedence; it selects the still-unported smell state.
++        ObjectCreateStruct s;
++        s.m_Pos = {100, 10, 0};
++        auto smell = g.objects.create(g.objects.find_class("SmellHint"), s);
++        CHECK(smell);
++        a->m_fSeeingDist = 0;
++        a->m_fSmellingDist = 200;
++        CHECK(a->SetNewState(AI_Mgr::StateGuard) && a->DispatchState() && a->m_nState == AI_Mgr::StateSearchSmell);
++        CHECK(!a->DispatchState());
++        c->Metacmd = 2;
++        g.server.collision_ready = false;
++        auto decisions = c->decisions;
++        CHECK(!c->AI_STATE_Escape_RunAway() && c->decisions == decisions);
++        return true;
++    }
++    bool hiding(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        auto* c = actor<Cultist>(g, {100, 10, 0});
++        CHECK(a && c);
++        for (AI_Mgr* ai : {static_cast<AI_Mgr*>(a), static_cast<AI_Mgr*>(c)})
++        {
++            auto target = object(g, "threat", {50, 10, 40});
++            CHECK(target && ai->SetNewTarget(target) && ai->RefreshTargetPosition());
++            CHECK(ai->SetNewState(AI_Mgr::StateEscapeHide));
++            const auto turns = ai->face_commands;
++            CHECK(ai->DispatchState() && ai->Metacmd == 1 && ai->m_nCurMetacmd == 17 && ai->face_commands == turns + 1);
++            // Facing uses current pose, lateral Move deliberately uses the preceding cache.
++            CHECK(g.objects.get(ai->m_hObject)->velocity.x > 0);
++            CHECK(g.server.advance_models(1) && ai->DispatchState() && ai->Metacmd == 2 && !ai->m_bAnimating);
++        }
++        a->record = true;
++        CHECK(a->DispatchState() && a->decisions == 1);
++        CHECK(a->SetNewTarget(nullptr));
++        auto face = a->face_commands;
++        CHECK(a->DispatchState() && a->decisions == 2 && a->face_commands == face);
++        return true;
++    }
++    bool guard(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g, {0, -8, 0});
++        CHECK(a);
++        a->record = true;
++        a->m_vGuardPos = {0, -8, 0};
++        CHECK(a->SetNewState(AI_Mgr::StateGuard) && a->DispatchState() && a->Metacmd == 4 &&
++              a->m_MoveObj.calculations == 0);
++        CHECK(a->DispatchState() && a->m_nCurMetacmd == 0);
++        CHECK(g.server.advance_models(1) && a->DispatchState() && a->Metacmd == 5);
++        CHECK(a->DispatchState() && a->decisions == 1);
++        a->m_vGuardPos = {0, 10, 20};
++        CHECK(a->SetNewState(AI_Mgr::StateGuard) && a->DispatchState() && a->Metacmd == 2);
++        CHECK(a->navigation_distance > 20 && a->DispatchState() && a->Metacmd == 3);
++        a->m_fRunSpeed = 20;
++        CHECK(a->DispatchState());
++        auto* r = g.objects.get(a->m_hObject);
++        r->state.m_Pos.z = 20;
++        CHECK(a->m_MoveObj.Update());
++        a->m_vTargetPos = {0, -8, -20};
++        CHECK(g.objects.advance(.051));
++        auto queries = a->ledge_queries;
++        CHECK(a->DispatchState() && a->Metacmd == 4 && a->navigation_arrivals == 1 && a->ledge_queries == queries + 1 &&
++              !a->ledge_sampled);
++        CHECK(near(r->velocity.z, 20)); // Arrival faces stored target but does not stop.
++        a->Metacmd = 2;
++        CHECK(a->DispatchState() && a->m_nState == AI_Mgr::StateEscapeRun);
++        return true;
++    }
++    bool failures(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        a->m_fSeeingDist = 100;
++        CHECK(hint(g, {0, 10, 40}));
++        CHECK(a->SetNewState(AI_Mgr::StateEscapeRun));
++        g.server.collision_ready = false;
++        CHECK(!a->DispatchState() && a->m_nState == AI_Mgr::StateEscapeRun && a->navigation_plan_failed);
++        g.server.collision_ready = true;
++        CHECK(a->DispatchState() && !a->navigation_plan_failed);
++        CHECK(object(g, "path obstruction", {0, 10, 25}, {4, 5, 5}));
++        a->m_vGuardPos = {0, 10, 100};
++        CHECK(a->SetNewState(AI_Mgr::StateGuard) && a->DispatchState() && a->m_nState == AI_Mgr::StateIdle);
++        CHECK(a->navigation_plan_failed && a->m_MoveObj.path().size() == 1);
++        a->Metacmd = 3;
++        CHECK(!a->AI_STATE_GuardLocation());
++        auto table = std::make_shared<CAnim_Sound>();
++        table->m_nAnim_TAUNT[6] = 9999;
++        CHECK(a->InitStatics(table) && !a->MC_Taunt_Beg());
++        a->Metacmd = std::numeric_limits<int>::max();
++        CHECK(!a->AI_STATE_Escape_Hide());
++        return true;
++    }
++    bool tracking(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto h = object(g, "tracked", {0, 10, 20}), other = object(g, "other", {0, 10, 30});
++        CHECK(h && other);
++        const auto owned_links = g.objects.link_count(a->m_hObject); // Inventory owns its muzzle-flash child.
++        CHECK(a->SetTrackedObject(h) && a->RefreshTrackedPosition() && a->tracked_position_valid &&
++              near(a->m_vTrackObjPos.z, 20));
++        CHECK(g.objects.link_count(a->m_hObject) == owned_links); // Tracking adds no source engine link.
++        a->m_dwFlags |= 8u;
++        CHECK(a->SetNewState(AI_Mgr::StateIdle) && a->HandleTrigger(other, "SOUND_TRIGGER 1 1 2 3"));
++        CHECK(!a->tracked_position_valid && a->GetTrackedObject() == h && near(a->m_vTrackObjPos.z, 3));
++        CHECK(a->RefreshTrackedPosition() && a->tracked_position_valid && near(a->m_vTrackObjPos.z, 20));
++        CHECK(a->SetNewTarget(h) && a->RefreshTargetPosition() && a->SetNewTarget(other));
++        CHECK(a->GetTrackedObject() == h && g.objects.link_count(a->m_hObject) == owned_links + 1);
++        CHECK(g.objects.remove(h) && !a->GetTrackedObject() && !a->RefreshTrackedPosition());
++        CHECK(!a->tracked_position_valid && a->tracked_invalidations == 1 && near(a->m_vTrackObjPos.z, 20));
++        CHECK(g.objects.finish_frame());
++        auto replacement = object(g, "replacement", {0, 10, 50});
++        CHECK(replacement && !a->GetTrackedObject());
++        CHECK(a->SetTrackedObject(other) && a->RefreshTrackedPosition() && g.objects.remove(other) &&
++              g.objects.finish_frame());
++        CHECK(!a->GetTarget() && !a->GetTrackedObject() && a->tracked_invalidations == 2);
++        CHECK(!a->SetTrackedObject(a->m_hObject) && !a->SetTrackedObject(h));
++        CHECK(g.objects.clear() && ExitHint::m_dwNumExits == 0);
++        return true;
++    }
++    bool lifetime(const char*)
++    {
++        for (bool remove : {false, true})
++        {
++            GameSession g;
++            CHECK(setup(g));
++            auto* a = actor(g);
++            CHECK(a);
++            a->record = true;
++            a->remove = remove;
++            a->recurse = !remove;
++            CHECK(a->SetNewState(AI_Mgr::StateEscapeHide) && !a->DispatchState() && a->navigation_failures > 0);
++            if (remove)
++                CHECK(!g.server.IsObjectAlive(a->m_hObject));
++            else
++                CHECK(!a->nested_ok && a->decisions == 1);
++            CHECK(g.objects.clear() && g.server.string_count() == 0 && g.server.message_count() == 0);
++        }
++        return true;
++    }
++    bool catalog(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        Config cfg;
++        cfg.data_dir = root;
++        std::string e;
++        CHECK(g.resources.mount_game(cfg, e));
++        for (const char* name : {"m_cultist1", "f_cultist1", "m_civilian1", "f_civilian1", "labtech", "gideon"})
++        {
++            auto* a = actor(g);
++            CHECK(a);
++            auto* r = g.objects.get(a->m_hObject);
++            CHECK(g.models.load(std::string("models/enemies/") + name + ".abc", r->model, e));
++            auto table = std::make_shared<CAnim_Sound>();
++            CHECK(table->SetAnimationIndexes(a->m_hObject) && a->InitStatics(table));
++            const auto clip = table->m_nAnim_TAUNT[6];
++            const bool ok = a->MC_Taunt_Beg();
++            CHECK(ok == (clip < r->model->animations.size()));
++            std::cout << name << " TAUNT[6]=" << clip << " available=" << ok
++                      << " duration=" << (ok ? r->model->animations[clip].duration : 0) << '\n';
++            CHECK(!ok || (r->animation.animation == clip && r->velocity.x > 0));
++            CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::map<std::string, std::function<bool(const char*)>> cases{
++        {"beg", beg},           {"selection", selection},   {"facing", facing},
++        {"routes", routes},     {"perception", perception}, {"hiding", hiding},
++        {"guard", guard},       {"failures", failures},     {"tracking", tracking},
++        {"lifetime", lifetime}, {"catalog", catalog}};
++    auto t = cases.find(argv[1]);
++    return t != cases.end() && t->second(argc > 2 ? argv[2] : "") ? 0 : 1;
++}

@@ -1,0 +1,15 @@
+652/655 Testing: wind.ai
+652/655 Test: wind.ai
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/wind_tests" "ai" "/home/yann/projects/lithtech/Blood2/build/release/tests/wind-ai"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"wind.ai" start time: Oct 17 01:43 CEST
+Output:
+----------------------------------------------------------
+Original generic r_gun FIRE_KEY creates a shockwave with no immediate vector damage.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"wind.ai" end time: Oct 17 01:43 CEST
+"wind.ai" time elapsed: 00:00:00
+----------------------------------------------------------

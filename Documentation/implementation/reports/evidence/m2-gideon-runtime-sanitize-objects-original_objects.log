@@ -1,0 +1,15 @@
+1/642 Testing: objects.original_objects
+1/642 Test: objects.original_objects
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "original_objects"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.original_objects" start time: Oct 17 03:43 CEST
+Output:
+----------------------------------------------------------
+PASS original_objects
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.original_objects" end time: Oct 17 03:43 CEST
+"objects.original_objects" time elapsed: 00:00:00
+----------------------------------------------------------

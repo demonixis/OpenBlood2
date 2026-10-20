@@ -1,0 +1,14 @@
+494/499 Testing: corpses.failures
+494/499 Test: corpses.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"corpses.failures" start time: Oct 16 16:48 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.failures" end time: Oct 16 16:48 CEST
+"corpses.failures" time elapsed: 00:00:00
+----------------------------------------------------------

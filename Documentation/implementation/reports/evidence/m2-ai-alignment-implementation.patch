@@ -1,0 +1,459 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 3dd730e..b67d120 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -573,3 +573,5 @@ The [flashlight continuation](../Documentation/Implementation/M2_FLASHLIGHT.md)
+ 
+ 
+ The [CityHub entry continuation](../Documentation/Implementation/M2_CITYHUB_ENTRY.md) records `fallengrills` as an explicitly omitted object because its named BSP is absent. The source instance is rejected before initial update, matching the available LithTech loader behavior; no replacement geometry is invented. CityHub now has 453 created / 31 sounds / 541 editor-only / one omitted / zero unsupported / zero failed entries. Safe NEW_LEVEL preserves the supported player and enters at `01_egressa`; required SPR world materials now decode and animate through SDL_GPU. M2 remains incomplete; earlier CityHub refusal/count statements are historical. Read [contracts](docs/CITYHUB_ENTRY_CONTRACTS.md). Keep missing-name rejection typed and world-file omission explicit; runtime creation still fails. Ambiguous/invalid geometry and other preparation failures remain blocking. Do not alias absent models or import reference engine dependencies. Later-engine source evidence is not a verified 1998 executable trace.
++
++The [AI alignment correction](../Documentation/Implementation/M2_AI_ALIGNMENT.md) honors the original SDK fallback for parallel movement/obstacle axes. Read [contracts](docs/AI_ALIGNMENT_CONTRACTS.md). Preserve valid-frame versus blocked-route distinction, failed partial-route guards, query budgets and the existing right-axis convention. The perturbation policy is corroborated by later LithTech, not a retail1998 trace. Per-owner historical axes are inspectable. Diagnostic relocation evidence does not prove full CityHub traversal; M2 stays incomplete.
+diff --git a/README.md b/README.md
+index 5ee0641..fdee3bd 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [AI alignment correction](../Documentation/Implementation/M2_AI_ALIGNMENT.md) restores the original parallel-axis fallback used by CMovement. Two reproduced CityHub Cultist update failures now become ordinary blocked-path decisions; inspection exposes the resolved axes. A 120-second relocation diagnostic reports no suspended NPCs after the correction, but is not a playthrough. M2 remains incomplete.
++
+ The [CityHub entry continuation](../Documentation/Implementation/M2_CITYHUB_ENTRY.md) records `fallengrills` as an explicitly omitted object because its named BSP is absent. The source instance is rejected before initial update, matching the available LithTech loader behavior; no replacement geometry is invented. CityHub now has 453 created / 31 sounds / 541 editor-only / one omitted / zero unsupported / zero failed entries. Safe NEW_LEVEL preserves the supported player and enters at `01_egressa`; required SPR world materials now decode and animate through SDL_GPU. M2 remains incomplete; earlier CityHub refusal/count statements are historical.
+ 
+ The [flashlight continuation](../Documentation/Implementation/M2_FLASHLIGHT.md) connects original FlashlightPU/CInvFlashlight/CFlashlightFX, L toggle, battery, local audio, inactive restoration and visible radial point illumination with inspection. CityHub now has 453 created / 31 transferred sounds / 541 editor-only / zero unsupported / one failed entry. Missing `fallengrills` geometry still rejects CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical.
+diff --git a/docs/AI_ALIGNMENT_CONTRACTS.md b/docs/AI_ALIGNMENT_CONTRACTS.md
+new file mode 100644
+index 0000000..f1b6305
+--- /dev/null
++++ b/docs/AI_ALIGNMENT_CONTRACTS.md
+@@ -0,0 +1,56 @@
++# CMovement parallel-axis alignment
++
++This corrects the local engine-service adaptation used by original CMovement
++clearance and obstacle-turn planning. See [source hashes](M2_AI_ALIGNMENT_SOURCES.json),
++[navigation contracts](AI_NAVIGATION_CONTRACTS.md) and
++[evidence](../../Documentation/Implementation/M2_AI_ALIGNMENT.md). M2 remains incomplete.
++
++## Source behavior and implementation
++
++Blood II's server SDK explicitly requires AlignRotation to choose another up vector
++when the reference is parallel to the requested direction. The original movement
++code invokes that service for both its destination direction and an obstacle normal.
++A horizontal surface can therefore produce a valid parallel-axis request.
++
++The previous port rejected this case as Invalid, which propagated through navigation
++to a latched AI_Update failure. The local frame builder now normalizes direction and
++reference up; when their absolute dot product exceeds 0.99, it perturbs and normalizes
++the reference in the order z+5, then x+5/y+5 if needed, then x+5/y-2/z-5 if needed.
++This order and threshold come from the available later LithTech
++gr_GetPerpendicularVector/BuildFrameOfReference implementation. They are corroborating
++engine evidence, not a verified trace of Blood II's 1998 binary.
++
++Only the right vector is needed here. Normalizing cross(reference, forward) is
++equivalent to first removing the reference's parallel component and then crossing.
++Keep the port's existing +X right convention; do not import the later engine's
++opposite cross order. No quaternion, object rotation or physical movement is changed.
++The fallback is bounded and allocates nothing.
++
++Zero, nonfinite and out-of-domain inputs, unavailable collision and stale owners
++remain failures. Existing search budgets, right/left ray order, source turn offsets,
++partial-route ownership and the failed-plan guard are unchanged. A valid frame does
++not guarantee a route: the two recorded CityHub requests return Blocked, allowing
++the existing original state transition to Idle instead of suspending AI_Update.
++Never report partial points as a successful route or remove actual collision.
++
++## Inspection and validation
++
++Each CMovement instance counts successful parallel-axis resolutions and retains
++the last normalized direction, original cached reference up and resolved right.
++These are historical values, not necessarily the last plan; Init/Term retain the
++counters like the existing sample/failure totals. They cannot mutate simulation and
++expire with the owning object. The Skeleton inspector displays them, including for
++hidden/inactive actors.
++
++Synthetic tests cover parallel/antiparallel/near-parallel directions, a rotated
++local up requiring the second perturbation, unchanged ordinary horizontal queries,
++invalid vectors, missing collision, deferred removal and no owner motion. Private
++tests recreate two recorded planner requests against CityHub DAT and require ordinary
++Blocked outcomes through reload/unload with no retained objects, clients, messages
++or strings. These are diagnostic inputs, not authored placements or a playthrough.
++The existing application character smoke exercises the fallback outside the inspector
++and retains its hidden/reentry checks in Debug and inspector-free Release.
++
++This correction adds no AI states or classes and changes no shaders, dependencies,
++commercial assets or reference files. Other unavailable AI actions, physics parity,
++complete CityHub traversal and the remaining M2 gate are still open.
+diff --git a/docs/AI_NAVIGATION_CONTRACTS.md b/docs/AI_NAVIGATION_CONTRACTS.md
+index 31e476c..8b455e6 100644
+--- a/docs/AI_NAVIGATION_CONTRACTS.md
++++ b/docs/AI_NAVIGATION_CONTRACTS.md
+@@ -83,8 +83,9 @@ objects with the existing closest-hit implementation. CastWorldRay stays primary
+ both share endpoint construction. Invalid input, missing collision, hit and miss
+ remain distinct. No arbitrary navigation range or invented hit is supplied.
+ 
+-Degenerate direction/up axes, nonfinite/out-of-domain points or direction vectors and negative dimensions
+-fail. Searches allow at most 4,096 iterations and 8,192 submitted ray queries per
++Zero/invalid direction or up, nonfinite/out-of-domain points or direction vectors and negative dimensions
++fail. Valid parallel axes use the [original AlignRotation fallback](AI_ALIGNMENT_CONTRACTS.md),
++superseding the earlier port's blanket degenerate-axis rejection. Searches allow at most 4,096 iterations and 8,192 submitted ray queries per
+ operation; diagnostics include the rejected extra attempt when a budget is exceeded.
+ Precision-stalled increments fail. Service failure aborts the algorithm rather than
+ being interpreted as a clear ray. Public clearance/consolidation start fresh query
+diff --git a/docs/M2_AI_ALIGNMENT_SOURCES.json b/docs/M2_AI_ALIGNMENT_SOURCES.json
+new file mode 100644
+index 0000000..8ec222f
+--- /dev/null
++++ b/docs/M2_AI_ALIGNMENT_SOURCES.json
+@@ -0,0 +1,34 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "b7313c194fb1d3ba2406dd19b1c0fa11bfce8ccb",
++  "status": "M2 incomplete; correct CMovement parallel-axis service adaptation",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/movement.cpp",
++      "source_sha256": "673a1f1bfe0f341b94fcb6b24a51a2ba5d817ffc7ef215839b82ab684ee2be26",
++      "purpose": "Original AlignRotation calls for clearance and obstacle-normal turns."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/server_de.h",
++      "source_sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "purpose": "Blood II SDK explicitly requires alternative up selection for parallel directions."
++    },
++    {
++      "source": "sources/lithtech/runtime/shared/src/mathlt_impl.cpp",
++      "source_sha256": "d629bcbede04219aa9d9486491aa37f2233ba714b674517a6cc9d6c57a874564",
++      "purpose": "Later AlignRotation delegates to the frame builder; corroboration, not a retail trace."
++    },
++    {
++      "source": "sources/lithtech/runtime/shared/src/geomroutines.cpp",
++      "source_sha256": "6e613e26d9be3d8a91f66bcea93e4a531816fa0abcd6d5a1a00d7f73ac9ddf20",
++      "purpose": "Later normalized reference, absolute-dot threshold .99 and bounded perturbation order; retain our existing right-axis convention."
++    }
++  ],
++  "adaptations": [
++    "No full reference files or engine dependencies imported; reference repositories remain unchanged.",
++    "Use the Blood II SDK guarantee with the later engine fallback policy; exact retail1998 parity is unverified.",
++    "Only right/forward query axes are needed; retain existing cross(up,forward) sign.",
++    "Zero/nonfinite/domain/identity/query-limit failures and blocked partial-path guards remain explicit.",
++    "Per-owner alignment counters are historical inspection state, independent of UI and retained across Init/Term like existing counters."
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 92aa916..c91148d 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1,5 +1,14 @@
+ # Source and Dependency Provenance
+ 
++## Original movement alignment
++
++The Blood II SDK requires a fallback up vector for parallel AlignRotation inputs.
++CMovement now follows that contract using the available later LithTech frame
++builder's bounded reference perturbations, retaining the existing right-axis
++convention. No reference files or dependencies are imported. See
++[source hashes](M2_AI_ALIGNMENT_SOURCES.json) and [contracts](AI_ALIGNMENT_CONTRACTS.md).
++The later implementation is corroboration, not verified retail1998 parity.
++
+ ## Missing named world-model creation
+ 
+ Original Blood II brush filename binding and SDK error 23 are cross-checked with
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index e149a4f..b2c3bb7 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -358,7 +358,10 @@ namespace OpenBlood2
+             return false;
+         // Original cache/path service, exercised outside UI. This isolated diagnostic
+         // placement is not a claim of authored NPC navigation or path following.
+-        if (!ai->m_MoveObj.Init(h) || !ai->m_MoveObj.CalculatePath({1100, 10000, 0}))
++        SegmentHit vertical;
++        if (!ai->m_MoveObj.Init(h) ||
++            !ai->m_MoveObj.ClearToPoint({1000, 10000, 0}, {1000, 10010, 0}, {1, 2, 1}, vertical) ||
++            ai->m_MoveObj.alignment_fallbacks != 1 || !ai->m_MoveObj.CalculatePath({1100, 10000, 0}))
+             return false;
+         ai->m_fHearingDist = 1000;
+         if (!ai->HandleTrigger(victim, "SOUND_TRIGGER 2"))
+@@ -381,9 +384,9 @@ namespace OpenBlood2
+             ai ? dynamic_cast<const AIFireTarget*>(g.server.HandleToObject(ai->diagnostic_target)) : nullptr;
+         return ai && target && ai->m_MoveObj.sampled && ai->m_MoveObj.samples > 2 &&
+                ai->m_MoveObj.outcome == CMovement::Outcome::Direct && ai->m_MoveObj.path().size() == 1 &&
+-               ai->m_MoveObj.failures == 0 && ai->hearing_reactions == 1 && ai->trigger_failures == 0 &&
+-               ai->trigger_outcome == AI_Mgr::TriggerOutcome::Heard && ai->fire_shots > 2 &&
+-               ai->animation_finishes > 0 && ai->attack_updates > 2 && ai->locomotion_calls > 2 &&
++               ai->m_MoveObj.failures == 0 && ai->m_MoveObj.alignment_fallbacks >= 1 && ai->hearing_reactions == 1 &&
++               ai->trigger_failures == 0 && ai->trigger_outcome == AI_Mgr::TriggerOutcome::Heard &&
++               ai->fire_shots > 2 && ai->animation_finishes > 0 && ai->attack_updates > 2 && ai->locomotion_calls > 2 &&
+                ai->locomotion_failures == 0 && ai->obstacle_queries > 0 && ai->obstruction_checks > 0 &&
+                r->state.m_Pos.z > 0 && ai->fire_failures == 0 && ai->state_failures == 0 && ai->key_failures == 0 &&
+                ai->audio_starts > 0 && target->damage.m_fHitPoints < 10000 &&
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 8b1ef72..bbd6e99 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -381,6 +381,15 @@ namespace OpenBlood2
+             ImGui::Text("Remaining points %zu | source accumulated %u", m.path().size(), m.added_points);
+             ImGui::Text("Requested destination %.2f %.2f %.2f", m.requested_destination.x, m.requested_destination.y,
+                         m.requested_destination.z);
++            ImGui::Text("AlignRotation parallel-axis fallbacks: %llu", (unsigned long long)m.alignment_fallbacks);
++            if (m.alignment_fallbacks)
++            {
++                ImGui::Text("Last direction %.3f %.3f %.3f / reference up %.3f %.3f %.3f", m.alignment_direction.x,
++                            m.alignment_direction.y, m.alignment_direction.z, m.alignment_up.x, m.alignment_up.y,
++                            m.alignment_up.z);
++                ImGui::Text("Resolved right %.3f %.3f %.3f", m.alignment_right.x, m.alignment_right.y,
++                            m.alignment_right.z);
++            }
+             for (std::size_t i = 0; i < m.path().size(); ++i)
+                 ImGui::Text("%zu: %.2f %.2f %.2f", i, m.path()[i].x, m.path()[i].y, m.path()[i].z);
+             if (!m.error.empty())
+diff --git a/src/game/original/Movement.cpp b/src/game/original/Movement.cpp
+index a6080b7..db74a01 100644
+--- a/src/game/original/Movement.cpp
++++ b/src/game/original/Movement.cpp
+@@ -18,11 +18,38 @@ namespace
+     {
+         return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
+     }
+-    // Same forward/up construction used by source AlignRotation/GetRotationVectors;
+-    // no need to create a quaternion for these local query axes.
+-    bool axes(DVector direction, DVector up, DVector& forward, DVector& right)
++    // Blood II's AlignRotation contract supplies another up vector for parallel
++    // axes. The later gr_GetPerpendicularVector corroborates this perturbation
++    // order/threshold. Keep this engine's existing +X right convention.
++    bool axes(DVector direction, DVector up, DVector& forward, DVector& right, bool& fallback)
+     {
+-        return normalize(direction, forward) && normalize(cross(up, forward), right);
++        fallback = false;
++        if (!normalize(direction, forward) || !normalize(up, up))
++            return false;
++        auto parallel = [&]() { return std::abs(vector_dot(forward, up)) > .99f; };
++        if (parallel())
++        {
++            fallback = true;
++            up.z += 5;
++            if (!normalize(up, up))
++                return false;
++            if (parallel())
++            {
++                up.x += 5;
++                up.y += 5;
++                if (!normalize(up, up))
++                    return false;
++                if (parallel())
++                {
++                    up.x += 5;
++                    up.y -= 2;
++                    up.z -= 5;
++                    if (!normalize(up, up))
++                        return false;
++                }
++            }
++        }
++        return normalize(cross(up, forward), right);
+     }
+     float distance(DVector a, DVector b)
+     {
+@@ -30,6 +57,20 @@ namespace
+         return std::hypot(d.x, d.y, d.z);
+     }
+ } // namespace
++bool CMovement::frame_axes(DVector direction, DVector& forward_axis, DVector& right_axis)
++{
++    bool fallback = false;
++    if (!axes(direction, up, forward_axis, right_axis, fallback))
++        return false;
++    if (fallback)
++    {
++        ++alignment_fallbacks;
++        alignment_direction = forward_axis;
++        alignment_up = up;
++        alignment_right = right_axis;
++    }
++    return true;
++}
+ bool CMovement::fail(Outcome status, const char* why)
+ {
+     outcome = status;
+@@ -163,7 +204,7 @@ bool CMovement::clear_to_point(DVector start, DVector destination, DVector dimen
+         dimensions.x < 0 || dimensions.y < 0 || dimensions.z < 0)
+         return fail(Outcome::Invalid, "Invalid movement clearance request");
+     DVector f, r;
+-    if (!axes(vector_subtract(destination, start), up, f, r))
++    if (!frame_axes(vector_subtract(destination, start), f, r))
+         return fail(Outcome::Invalid, "Movement clearance direction/up is degenerate");
+     const float width = std::hypot(dimensions.x, dimensions.z) + .1f;
+     // Source deliberately checks only two side rays, right before left. It is
+@@ -180,7 +221,7 @@ bool CMovement::clear_to_point(DVector start, DVector destination, DVector dimen
+ bool CMovement::shortest_turn(DVector start, DVector& facing, float step, DVector& out)
+ {
+     DVector f, r;
+-    if (!axes(facing, up, f, r))
++    if (!frame_axes(facing, f, r))
+         return fail(Outcome::Invalid, "Obstacle normal/up is degenerate");
+     const auto left = vector_scale(r, -1);
+     SegmentHit hit;
+diff --git a/src/game/original/Movement.h b/src/game/original/Movement.h
+index 591eb18..725dc39 100644
+--- a/src/game/original/Movement.h
++++ b/src/game/original/Movement.h
+@@ -64,6 +64,8 @@ class CMovement : public Aggregate
+     std::uint64_t samples = 0, sample_failures = 0, calculations = 0, failures = 0;
+     unsigned rays = 0, iterations = 0, added_points = 0;
+     DVector requested_destination{};
++    std::uint64_t alignment_fallbacks = 0;
++    DVector alignment_direction{}, alignment_up{}, alignment_right{}; // Last successful fallback, read-only history.
+     // Original FindTurn stops recursion after ten accumulated points; the typed
+     // service additionally bounds loops/rays, including tiny authored dimensions.
+     static constexpr unsigned max_iterations = 4096, max_rays = 8192, max_points = 64;
+@@ -78,6 +80,7 @@ class CMovement : public Aggregate
+     std::vector<DVector> points;
+     bool fail(Outcome, const char*);
+     bool ready();
++    bool frame_axes(DVector direction, DVector& forward_axis, DVector& right_axis);
+     bool clear_to_point(DVector, DVector, DVector, OpenBlood2::SegmentHit&);
+     bool add(DVector);
+     bool cast(DVector, DVector, OpenBlood2::SegmentHit&);
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 0f0c2e9..070ee05 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -736,13 +736,15 @@ endif()
+ add_executable(ai_navigation_tests ai_navigation_tests.cpp)
+ target_link_libraries(ai_navigation_tests PRIVATE blood2_game)
+ blood2_project_options(ai_navigation_tests)
+-foreach(case IN ITEMS sample clearance rays direct detour blocked limits lifetime)
++foreach(case IN ITEMS sample clearance parallel_axes rays direct detour blocked limits lifetime)
+     add_test(NAME ai_navigation.${case} COMMAND ai_navigation_tests "${case}")
+     set_tests_properties(ai_navigation.${case} PROPERTIES LABELS "headless;ai_navigation" TIMEOUT 30)
+ endforeach()
+ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME ai_navigation.subway COMMAND ai_navigation_tests subway "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(ai_navigation.subway PROPERTIES LABELS "headless;private;ai_navigation" TIMEOUT 90)
++    add_test(NAME ai_navigation.cityhub_parallel COMMAND ai_navigation_tests cityhub_parallel "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(ai_navigation.cityhub_parallel PROPERTIES LABELS "headless;private;ai_navigation" TIMEOUT 90)
+ endif()
+ 
+ add_executable(ai_follow_tests ai_follow_tests.cpp)
+diff --git a/tests/ai_navigation_tests.cpp b/tests/ai_navigation_tests.cpp
+index b3fbfc4..8377df7 100644
+--- a/tests/ai_navigation_tests.cpp
++++ b/tests/ai_navigation_tests.cpp
+@@ -162,10 +162,46 @@ namespace
+         g.server.collision_ready = true;
+         CHECK(m.ClearToPoint(start, end, dims, hit) && m.error.empty() && m.rays == 2);
+         CHECK(!m.ClearToPoint(start, start, dims, hit) && m.outcome == CMovement::Outcome::Invalid);
+-        CHECK(!m.ClearToPoint(start, {0, 100, 0}, dims, hit)); // Direction parallel to up has no defined side axis.
++        CHECK(m.ClearToPoint(start, {0, 100, 0}, dims, hit)); // SDK AlignRotation supplies a perpendicular up.
++        CHECK(m.alignment_fallbacks == 1 && same(m.alignment_right, {-1, 0, 0}));
+         CHECK(!m.ClearToPoint(start, end, {-1, 2, 1}, hit));
+         return true;
+     }
++    bool parallel_axes(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a && a->m_MoveObj.Init(a->m_hObject));
++        auto& m = a->m_MoveObj;
++        const auto position = m.GetPos();
++        SegmentHit hit;
++        const DVector dims{1, 2, 1};
++        CHECK(m.ClearToPoint(position, {0, 20, 0}, dims, hit));
++        CHECK(same(m.alignment_direction, {0, 1, 0}) && same(m.alignment_up, {0, 1, 0}));
++        CHECK(same(m.alignment_right, {-1, 0, 0}) && m.rays == 2);
++        CHECK(m.ClearToPoint(position, {0, 5, 0}, dims, hit));
++        CHECK(same(m.alignment_right, {1, 0, 0}));
++        CHECK(m.ClearToPoint(position, {0, 20, .01f}, dims, hit) && m.alignment_fallbacks == 3);
++        CHECK(near(vector_dot(m.alignment_direction, m.alignment_right), 0));
++        CHECK(near(vector_dot(m.alignment_right, m.alignment_right), 1));
++        CHECK(m.ClearToPoint(position, {0, 10, 100}, dims, hit) && m.alignment_fallbacks == 3);
++        CHECK(!m.ClearToPoint(position, position, dims, hit) && m.outcome == CMovement::Outcome::Invalid);
++        CHECK(!m.ClearToPoint(position, {NAN, 10, 0}, dims, hit) && m.outcome == CMovement::Outcome::Invalid);
++        CHECK(m.alignment_fallbacks == 3);
++        // Local up can also point along Z. This exercises the second reference
++        // perturbation, not a world-Y-only or hardcoded horizontal axis fallback.
++        g.objects.get(a->m_hObject)->state.m_Rotation = rotation_from_euler({1.57079632679f, 0, 0});
++        CHECK(m.Update() && m.ClearToPoint(position, {0, 10, 100}, dims, hit));
++        CHECK(m.alignment_fallbacks == 4 && same(m.alignment_up, {0, 0, 1}));
++        CHECK(near(m.alignment_right.x, .70710678f) && near(m.alignment_right.y, -.70710678f));
++        CHECK(same(g.objects.get(a->m_hObject)->state.m_Pos, position)); // Queries never move the owner.
++        g.server.collision_ready = false;
++        CHECK(!m.CalculatePath({0, 10, 100}) && m.outcome == CMovement::Outcome::Unavailable);
++        CHECK(g.objects.remove(a->m_hObject) && !m.Update() && !m.CalculatePath({0, 10, 100}));
++        CHECK(g.objects.finish_frame());
++        return true;
++    }
+     bool rays(const char*)
+     {
+         GameSession g;
+@@ -329,14 +365,67 @@ namespace
+         }
+         return true;
+     }
++    bool cityhub_parallel(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        HOBJECT previous = nullptr;
++        // Recorded production Cultist requests from a labelled relocation
++        // diagnostic. Recreate planner inputs against the real DAT; this is not
++        // authored NPC placement or a campaign playthrough.
++        const DVector positions[]{{1312, 613.818f, -2544}, {884.889f, 676.914f, -2394.71f}};
++        const DVector destinations[]{{1760, 446.118f, -2656}, {1760, 500.718f, -2656}};
++        const DVector dimensions[]{{24.0261f, 37.8169f, 24.0261f}, {24.6436f, 36.9135f, 24.6436f}};
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_CityHub", error) && g.enter_player(error) && !g.objects.get(previous));
++            for (unsigned i = 0; i < 2; ++i)
++            {
++                auto* a = actor(g, positions[i]);
++                CHECK(a);
++                previous = a->m_hObject;
++                g.objects.get(previous)->dimensions = dimensions[i];
++                auto& m = a->m_MoveObj;
++                CHECK(m.Init(previous));
++                const bool planned = m.CalculatePath(destinations[i]);
++                std::cout << "CityHub parallel contact " << i << " cycle " << cycle << ": planned=" << planned
++                          << " outcome=" << int(m.outcome) << " fallback=" << m.alignment_fallbacks
++                          << " rays=" << m.rays << " reason=" << m.error << '\n';
++                // The original lateral search cannot find a route here. That is
++                // an ordinary blocked plan, not a failed engine service or a
++                // successful route through the horizontal surface.
++                CHECK(!planned && m.outcome == CMovement::Outcome::Blocked && m.alignment_fallbacks == 1);
++                CHECK(m.rays <= m.max_rays && m.iterations <= m.max_iterations);
++                for (const auto& point : m.path())
++                    CHECK(physics_vector(point));
++                CHECK(same(g.objects.get(previous)->state.m_Pos, positions[i]));
++                CHECK(g.objects.remove(previous) && g.objects.finish_frame());
++            }
++            CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.server.string_count() &&
++                  !g.server.message_count() && !g.server.client_count());
++        }
++        return true;
++    }
+ } // namespace
+ int main(int argc, char** argv)
+ {
+     if (argc < 2)
+         return 2;
+-    const std::map<std::string, std::function<bool(const char*)>> tests{
+-        {"sample", sample},   {"clearance", clearance}, {"rays", rays},         {"direct", direct}, {"detour", detour},
+-        {"blocked", blocked}, {"limits", limits},       {"lifetime", lifetime}, {"subway", subway}};
++    const std::map<std::string, std::function<bool(const char*)>> tests{{"sample", sample},
++                                                                        {"clearance", clearance},
++                                                                        {"rays", rays},
++                                                                        {"direct", direct},
++                                                                        {"detour", detour},
++                                                                        {"blocked", blocked},
++                                                                        {"limits", limits},
++                                                                        {"lifetime", lifetime},
++                                                                        {"subway", subway},
++                                                                        {"parallel_axes", parallel_axes},
++                                                                        {"cityhub_parallel", cityhub_parallel}};
+     auto i = tests.find(argv[1]);
+     return i != tests.end() && i->second(argc > 2 ? argv[2] : "") ? 0 : 1;
+ }

@@ -1,0 +1,17 @@
+224/225 Testing: cinematics.subway
+224/225 Test: cinematics.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"cinematics.subway" start time: Oct 16 01:32 CEST
+Output:
+----------------------------------------------------------
+cycle=0 cue=sounds\chosen\caleb\e1m4_1_cal.wav rate=22050 frames=53872 duration=2.44317
+cycle=1 cue=sounds\chosen\caleb\e1m4_1_cal.wav rate=22050 frames=53872 duration=2.44317
+two authored crash cues completed; 2 full session reloads clean
+<end of output>
+Test time =   0.67 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.subway" end time: Oct 16 01:32 CEST
+"cinematics.subway" time elapsed: 00:00:00
+----------------------------------------------------------

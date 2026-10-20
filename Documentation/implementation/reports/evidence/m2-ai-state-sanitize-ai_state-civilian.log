@@ -1,0 +1,14 @@
+340/345 Testing: ai_state.civilian
+340/345 Test: ai_state.civilian
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_state_tests" "civilian"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_state.civilian" start time: Oct 16 11:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.civilian" end time: Oct 16 11:04 CEST
+"ai_state.civilian" time elapsed: 00:00:00
+----------------------------------------------------------

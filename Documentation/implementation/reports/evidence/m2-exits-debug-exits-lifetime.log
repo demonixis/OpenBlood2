@@ -1,0 +1,14 @@
+506/507 Testing: exits.lifetime
+506/507 Test: exits.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit-fixtures/lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"exits.lifetime" start time: Oct 16 17:21 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"exits.lifetime" end time: Oct 16 17:21 CEST
+"exits.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

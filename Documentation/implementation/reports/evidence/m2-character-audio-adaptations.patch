@@ -1,0 +1,1881 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 1d43439..991aaee 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -204,3 +204,11 @@ humiliation spelling/order and intermediate-zero ForceAnimation behavior.
+ Missing head nodes fail explicitly; later-node fallback stays visible. Spheres
+ are measurements, not active damage/collision services. AI, ExitTrigger, client
+ FX and complete M2 remain open; SubwayA counts are unchanged.
++
++The latest [character audio evidence](../Documentation/Implementation/M2_CHARACTER_AUDIO.md) connects original CAnim_Sound
++voice helpers, player model-key audio and surface/liquid footsteps to real WAV
++playback. Read [audio contracts](docs/CHARACTER_AUDIO_CONTRACTS.md). Preserve busy-voice refusal,
++player interrupt-before-failure, source 3D speed threshold and left/right alternation,
++raw first-container liquid precedence and distinct baked material flags. Typed
++movement keeps stale surface messages rejected. AI sound alerts remain explicitly
++unavailable; no new AI class or complete M2 gate is claimed.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f1d6bb0..8d5f74a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -39,7 +39,7 @@ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original
+ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+-target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp)
++target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+     src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+diff --git a/README.md b/README.md
+index 5b5fbfa..f06d7d1 100644
+--- a/README.md
++++ b/README.md
+@@ -237,3 +237,7 @@ Latest M2 continuation: [original character animations and model nodes](../Docum
+ connects the original animation table to locomotion and exposes current skeletal
+ transforms and original sphere measurements. AI/damage-localization consumers,
+ ExitTrigger, client FX and the actual M2 exit gate remain incomplete.
++
++Latest M2 continuation: [original character audio and footsteps](../Documentation/Implementation/M2_CHARACTER_AUDIO.md)
++adds attached voices, original animation-key playback and material/liquid selection.
++AI hearing, remaining classes/services and the M2 acceptance gate are still open.
+diff --git a/docs/CHARACTER_ANIMATION_CONTRACTS.md b/docs/CHARACTER_ANIMATION_CONTRACTS.md
+index fb03238..4b6ab7f 100644
+--- a/docs/CHARACTER_ANIMATION_CONTRACTS.md
++++ b/docs/CHARACTER_ANIMATION_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original character animations and node queries
+ 
++> Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
++> voice helpers, player sound keys and material/liquid footsteps now execute.
++> Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
++
+ This extends [locomotion](LOCOMOTION_CONTRACTS.md) and [model services](MODEL_AND_COLLISION_CONTRACTS.md).
+ M2 remains incomplete. CAnim_Sound imports animation discovery, CheckAnims,
+ GenerateHitSpheres and ForceAnimation from Blood II; its voice helpers, damage
+diff --git a/docs/CHARACTER_AUDIO_CONTRACTS.md b/docs/CHARACTER_AUDIO_CONTRACTS.md
+new file mode 100644
+index 0000000..1edb02c
+--- /dev/null
++++ b/docs/CHARACTER_AUDIO_CONTRACTS.md
+@@ -0,0 +1,130 @@
++# Original character voices and player animation sounds
++
++M2 remains incomplete. This extends [character animation](CHARACTER_ANIMATION_CONTRACTS.md),
++[audio](CINEMATIC_CONTRACTS.md), [movement](MOVEMENT_CONTRACTS.md) and
++[container](CONTAINER_CONTRACTS.md) contracts. Read the
++[source ledger](M2_CHARACTER_AUDIO_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_CHARACTER_AUDIO.md).
++
++## Original voice rules
++
++CAnim_Sound retains sound roots, indexed path construction, PlaySound and PlayVoice.
++A nonzero index appends the signed decimal index and .wav; zero appends neither.
++The root, separator and supplied name remain literal until resource normalization.
++Original 256-byte storage becomes owned strings with a 255-byte payload limit;
++embedded NUL and overlong paths reject without modifying the previous root/output.
++The mixer's existing 100-byte playback-path bound remains unchanged.
++
++PlayVoice refuses another voice while the retained handle reports unfinished.
++A completed or missing handle is killed/cleared before attempting the replacement.
++The destructor releases a retained voice. Instances cannot copy their owning handle.
++The original Silent flag remains stored and inspectable; these source helper methods
++never consult it. Do not infer automatic muting from its name. PlaySound uses
++attached spatial one-shots, AI_MEDIUM priority 3, caller volume, outer radius R,
++inner radius R*0.1 and requested reverb. Without GETHANDLE it returns zero even on
++successful playback, matching the original distinction; explicit starts/failures
++and the actual mixer voice distinguish that case. Such unretained voices release
++at sample completion. Retained voices stay queryable until their caller kills them.
++
++PlayVoice and PlayPlayerSound deliberately return actual playback success instead
++of the source's unconditional true after an attempt. Missing resources, invalid
++radius/volume, stale owners and capacity failures allocate no successful placeholder.
++This return-value adaptation must be considered when importing further AI callers.
++The voice helpers are ready for those callers, but no AI is registered by this work.
++Original CivilianAI/CultistAI/Gideon use class/gender-static CAnim_Sound tables
++through AI_Mgr::InitStatics; their voice handle can therefore be shared. Preserve
++that caller ownership and the AI-specific Sparam/camera/script gates when importing
++them; the current player sound-key path does not implement those AI branches.
++
++## Player key and footstep flow
++
++The base character callback now dispatches virtual OnStringKey before recording
++unhandled commands. CPlayerObj preserves case-insensitive play_sound recognition.
++Ordinary tokens receive .wav unconditionally, then the Caleb sound root established
++by SetCharacter. Extra arguments do not change the source request. The player does
++not forward other keys to the base character's RotY/velocity/dimension branch;
++those commands remain explicitly unhandled and inspectable.
++
++A player sound first kills the current player sound, even when its replacement
++fails. Volume clamps to 0–100; priority is PLAYER base 4 plus the caller modifier.
++Animation sounds request 1000/100 outer/inner radii at full volume; footsteps use
++400/40 at 70%. They remain attached, with a retained handle. Original update-time
++completion polling and destruction release it. FileStream requests fail explicitly.
++The original post-attempt SendSoundTrigger operation still lacks AI lists/receivers:
++an unavailable-operation counter records each attempt; it is never reported as
++successful hearing or message delivery. Voice-manager groups, pain/death events,
++landing sounds, weapon audio and full combat reactions remain pending.
++
++The source disables footsteps below **50 units/second of full 3D velocity**, not
++horizontal speed alone. Exactly 50 is enabled. Unknown materials do not play a
++fallback sound, interrupt an existing sound, or alternate the foot. Supported
++materials are wood, flesh, glass, metal, plastic, stone, terrain, liquid/water and
++cloth/carpet. Successful name selection alternates left/right before playback,
++including when playback subsequently fails. Caleb uses leftm.wav/rightm.wav;
++other character profiles still reject entry. There is no random numbered variant.
++The supplied archives contain 34 of the 36 male/female material/side paths;
++carpet/leftm.wav and carpet/rightm.wav are absent and remain playback failures.
++
++At each footstep, the player queries **position.y - (half-height - 1)**. The first
++point container overrides the last ground material if IsLiquid accepts its code
++(Water/Blood/Acid/FreeFall). This original branch does not inspect Hidden; therefore
++a hidden first liquid still produces water footsteps and masks later containers.
++The fresh bounded point query uses existing exact closed shapes and stable slot
++order, excludes pending/stale objects, and never substitutes body/head membership.
++The retail overlap order remains unverified.
++
++## Surface metadata and ownership
++
++The v56 DAT surface's final uint16 is now retained as texture_flags, separately
++from its render/collision flags. Reference readers label this field TextureFlags;
++the later engine confirms GetPolyTextureFlags returns baked surface material flags.
++Private validation compares this field to external DTX user flags: 2,163 of
++2,723 SubwayA surfaces match; the other 560 have baked zero despite nonzero DTX
++metadata. All 1,853 nonzero baked values match the corresponding DTX flags.
++Baked flags remain authoritative; they are never backfilled. No texture
++pixels, header service, DTX decoder or guessed texture-name classification is added.
++The original field is carried through collision triangles and their transformations.
++Support queries take nonzero polygon material first; an ordinary object's high
++UserFlags byte is the original client fallback when polygon material is zero.
++Box-only support cannot invent a polygon material. Unknown numeric values remain
++unknown; the player wire-equivalent field remains a byte as in the source.
++
++MoveMgr updates last surface when it observes support, before its steep-slope
++rejection, and retains the value in air. WritePositionInfo sends that byte through
++the typed local movement message. The player commits it only after the existing
++association, move-code, finite-data and collision checks succeed. Unlike the
++original legacy handler's early byte assignment, a stale rejected message cannot
++change surface state. Movement still integrates once; this addition does not
++change collision geometry, friction, damage materials or the replacement solver.
++
++PlayCharacterSound requires a live owner equal to the attached speaker, a spatial
++nonlooping request and the existing real WAV decoder/budgets. Hidden/inactive live
++objects can play; pending/stale owners cannot. Attached audio follows later motion;
++removal releases it on the next audio sweep, with retained character handles also
++released by their destructor. Unload destroys game objects before clearing audio.
++Handles remain globally monotonic, so old destructors cannot kill a new voice.
++Reverb, priority arbitration, occlusion and retail acoustic parity remain absent.
++
++## Inspection and verification
++
++The Skeleton tab displays root, Silent metadata, voice/player attempts, starts,
++failures, busy refusals, actual resource/cursor/attachment position, source and foot
++materials, point-container code, next foot, speed-suppressed/unmapped keys and
++unavailable AI alerts. Counts never replace decoded voice evidence. Unknown keys
++remain in the Session panel. State updates independently of ImGui.
++
++Synthetic checks exercise path bounds, busy/completed/missing handles, helper
++ownership, hidden/inactive/pending lifetime, capacity reuse, real model callbacks,
++interrupt-before-failure, source suffix behavior, volume/priority/radii, the speed
++threshold, all footstep mappings, liquid precedence, surface metadata transport,
++object fallback and stale movement rejection. Private checks inventory Caleb's
++actual model keys and original footstep WAV paths, compare baked materials, and
++walk the real SubwayA/player through two entry/unload cycles. The GPU Skeleton
++scenario requires actual attached footstep advancement and SDL sample submission
++while the inspector is hidden and after reload (dummy audio driver).
++
++SubwayA remains 187 live-created source entries, 4 transferred world sounds,
++372 editor-only, 17 unsupported and zero failed, plus 7 SelfTriggers. AI classes,
++ExitTrigger, actual client FX, attachments and required services keep M2 open.
++--start-game must still fail. Linux-only testing does not establish retail binary,
++other-platform, XR or audible-device equivalence.
+diff --git a/docs/CINEMATIC_CONTRACTS.md b/docs/CINEMATIC_CONTRACTS.md
+index e493d20..374425a 100644
+--- a/docs/CINEMATIC_CONTRACTS.md
++++ b/docs/CINEMATIC_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original cinematic cues and bounded audio
+ 
++> Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
++> voice helpers, player sound keys and material/liquid footsteps now execute.
++> Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
++
+ The later [world sound contracts](WORLD_SOUND_CONTRACTS.md) add the selected built-in
+ Sound whole-clip loops and consumed-source accounting. Earlier blanket loop/world
+ ownership omissions below are historical; streaming and the M2 gate remain open.
+diff --git a/docs/CONTAINER_CONTRACTS.md b/docs/CONTAINER_CONTRACTS.md
+index cedeede..daab9d6 100644
+--- a/docs/CONTAINER_CONTRACTS.md
++++ b/docs/CONTAINER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Container, liquid and ladder boundary
+ 
++> Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
++> voice helpers, player sound keys and material/liquid footsteps now execute.
++> Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
++
+ > The [scene explosion continuation](SCENE_EXPLOSION_CONTRACTS.md#hot-query-allocation-adjustment)
+ > reduces hot-query copying to fresh snapshots of bound containers. Order,
+ > lifetime, membership and source physics rules are unchanged.
+diff --git a/docs/M2_CHARACTER_AUDIO_SOURCES.json b/docs/M2_CHARACTER_AUDIO_SOURCES.json
+new file mode 100644
+index 0000000..048a211
+--- /dev/null
++++ b/docs/M2_CHARACTER_AUDIO_SOURCES.json
+@@ -0,0 +1,224 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "014e32b9dd105ef81fb4f875837175fddb39b6ee",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/Anim_Sound.cpp",
++      "sha256": "238744b904e32e418188bfdc2f74d970bb544f1a027fab1c2ae9dca2b2d9aa4f",
++      "selected_lines": [
++        [
++          128,
++          142
++        ],
++        [
++          522,
++          607
++        ]
++      ],
++      "use": "Original voice lifetime, paths, busy guard and attached playback"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Anim_Sound.h",
++      "sha256": "3e42f686a5f492bdca336efdba239d61617b366221c559c8942f6e35824ccde4",
++      "selected_lines": [
++        [
++          296,
++          301
++        ],
++        [
++          377,
++          381
++        ]
++      ],
++      "use": "Sound fields and helper declarations"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "selected_lines": [
++        [
++          377,
++          423
++        ],
++        [
++          503,
++          504
++        ],
++        [
++          919,
++          925
++        ],
++        [
++          1608,
++          1616
++        ],
++        [
++          2378,
++          2379
++        ],
++        [
++          3114,
++          3144
++        ],
++        [
++          4878,
++          4901
++        ],
++        [
++          5769,
++          5820
++        ],
++        [
++          6457,
++          6487
++        ]
++      ],
++      "use": "Player sounds, footstep selection, completion, root and incoming surface byte"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/BaseCharacter.cpp",
++      "sha256": "0002f599c46971e006829e2c41405d872e8fbb08d8ff7590cadd50d91e14aa95",
++      "selected_lines": [
++        [
++          61,
++          67
++        ]
++      ],
++      "use": "Virtual string-key callback dispatch"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
++      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
++      "selected_lines": [
++        [
++          38,
++          84
++        ],
++        [
++          284,
++          352
++        ]
++      ],
++      "use": "Attached sound utility and unavailable AI hearing delivery"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
++      "sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
++      "selected_lines": [
++        [
++          225,
++          250
++        ]
++      ],
++      "use": "Polygon material then object-user-flags fallback"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/MoveMgr.cpp",
++      "sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a",
++      "selected_lines": [
++        [
++          394,
++          415
++        ],
++        [
++          1623,
++          1623
++        ]
++      ],
++      "use": "Last supporting surface and outgoing byte"
++    },
++    {
++      "path": "sources/blood2/Shared/SharedDefs.h",
++      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "selected_lines": [
++        [
++          502,
++          520
++        ]
++      ],
++      "use": "Original SurfaceType identifiers"
++    },
++    {
++      "path": "sources/blood2/Shared/SoundTypes.h",
++      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
++      "selected_lines": [
++        [
++          14,
++          30
++        ]
++      ],
++      "use": "Original priority values"
++    },
++    {
++      "path": "sources/blood2/Shared/ContainerCodes.h",
++      "sha256": "e06bd4c2b5a9a4b32c1883f9e3f59bb1ffe419d7eb4232a2a3f6570c400fce64",
++      "selected_lines": [],
++      "use": "Original IsLiquid classification"
++    },
++    {
++      "path": "OpenBlood2/tools/Research/convert_dat.py",
++      "sha256": "35e1802e6f597476e9c2c0a28070062b503fa091c1f73bbf2e0389386e72446b",
++      "use": "Reference final v56 TextureFlags field; no code copied"
++    },
++    {
++      "path": "sources/lithtech/runtime/client/src/clientde_impl.cpp",
++      "sha256": "abcb1404c1a1fa3462fec343232a2387676674b677f77a9f19c7f67c714c865b",
++      "use": "Later engine GetPolyTextureFlags semantic reference; no binary/layout reuse"
++    },
++    {
++      "path": "sources/lithtech/tools/shared/engine/dtxmgr.h",
++      "sha256": "9e0bfad07330e9a1b10bd123211d06062862f434d3d5408a7380a2ea64060df0",
++      "use": "DTX user-flags metadata offset for private cross-check, no production DTX service"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
++      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
++      "selected_lines": [
++        [
++          25,
++          27
++        ]
++      ],
++      "use": "Original utility defaults: bInstant=false confirms attached player playback"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          276,
++          281
++        ],
++        [
++          880,
++          975
++        ]
++      ],
++      "use": "Reviewed future caller ownership and Sparam/camera/script gates; not imported"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
++      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
++      "selected_lines": [
++        [
++          301,
++          331
++        ]
++      ],
++      "use": "Reviewed class/gender-static CAnim_Sound ownership; not imported"
++    }
++  ],
++  "adaptations": [
++    "Owned bounded strings and typed checked sound IDs, no packet ABI",
++    "Actual success return for PlayVoice/PlayPlayerSound instead of source unconditional true",
++    "Checked movement surface assignment after successful motion",
++    "Source-compatible raw first point-container query using existing replacement geometry",
++    "Game rule audio helpers separate from bounded SDL mixer; dry reverb metadata only"
++  ],
++  "not_implemented": [
++    "AI hearing and character AI callers",
++    "Voice-manager/pain/death/landing/weapon sound callers",
++    "Reverb, priority arbitration and streaming",
++    "ExitTrigger, full client FX and M2 gameplay gate"
++  ]
++}
+diff --git a/docs/MOVEMENT_CONTRACTS.md b/docs/MOVEMENT_CONTRACTS.md
+index 63c3fe9..c6c6274 100644
+--- a/docs/MOVEMENT_CONTRACTS.md
++++ b/docs/MOVEMENT_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original MoveMgr Boundary
+ 
++> Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
++> voice helpers, player sound keys and material/liquid footsteps now execute.
++> Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
++
+ > Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
+ > are connected with bounded atomic collision. Earlier omissions below describe
+ > their previous increments; the full M2 gate remains open.
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index 4209652..bacdc92 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original Player Entry Boundary
+ 
++> Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
++> voice helpers, player sound keys and material/liquid footsteps now execute.
++> Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
++
+ > Extended by [character animation contracts](CHARACTER_ANIMATION_CONTRACTS.md):
+ > original CAnim_Sound tables now drive locomotion; current model node queries and
+ > original sphere measurements are inspectable. AI/damage-localization callers
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index fefc092..9731b4b 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -421,3 +421,7 @@ and locomotion. See [source ledger](M2_CHARACTER_ANIMATION_SOURCES.json) and
+ bounded ABC sampler; later LithTech informs name matching only. OpenBlood2's
+ false-returning node function was reviewed and not imported. Voice helpers,
+ AI callers, damage localization, attachments and blending remain unimplemented.
++
++Character audio continuation: [source ledger](M2_CHARACTER_AUDIO_SOURCES.json),
++[contracts](CHARACTER_AUDIO_CONTRACTS.md). Original Anim_Sound and PlayerObj sound
++rules are integrated selectively; no reference repository is a build dependency.
+diff --git a/docs/WORLD_CONTRACTS.md b/docs/WORLD_CONTRACTS.md
+index 550475e..66c8935 100644
+--- a/docs/WORLD_CONTRACTS.md
++++ b/docs/WORLD_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Resource, World and Session Contracts
+ 
++> Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
++> voice helpers, player sound keys and material/liquid footsteps now execute.
++> Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
++
+ > Extended by [scene explosion contracts](SCENE_EXPLOSION_CONTRACTS.md): original
+ > CClientExplosionSFX activation/removal and detached audio, preserving its null
+ > damager (zero delivered damage). Client FX and complete M2 remain unavailable.
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 2f260c2..fee32aa 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -54,6 +54,48 @@ namespace OpenBlood2
+             }
+             else
+                 ImGui::TextUnformatted("No original character animation table on this object");
++            if (anim && ImGui::CollapsingHeader("Character audio", ImGuiTreeNodeFlags_DefaultOpen))
++            {
++                ImGui::TextWrapped("Root: %s | silent flag: %s (source helper does not test it)",
++                                   anim->GetSoundRoot().c_str(), anim->m_bSilent ? "set" : "clear");
++                ImGui::Text("Voice helper: %llu starts / %llu attempts / %llu failures / %llu busy",
++                            (unsigned long long)anim->sound_starts, (unsigned long long)anim->sound_attempts,
++                            (unsigned long long)anim->sound_failures, (unsigned long long)anim->voice_busy);
++                if (!anim->sound_error.empty())
++                    ImGui::TextWrapped("%s", anim->sound_error.c_str());
++                auto voice = [&](SoundId id)
++                {
++                    const auto* v = game.server.audio.get(id);
++                    if (!v)
++                    {
++                        ImGui::Text("Voice %llu: none / released", (unsigned long long)id);
++                        return;
++                    }
++                    ImGui::TextWrapped("%s | %s | %.3f / %.3f s | attached %.1f %.1f %.1f", v->request.resource.c_str(),
++                                       v->done ? "done" : "playing", v->cursor / v->clip->rate, v->clip->duration(),
++                                       v->position.x, v->position.y, v->position.z);
++                };
++                voice(anim->m_hVoxSound);
++                if (const auto* player = dynamic_cast<const CPlayerObj*>(character))
++                {
++                    ImGui::Text("Player keys: %llu | starts %llu / attempts %llu / failures %llu",
++                                (unsigned long long)player->sound_keys, (unsigned long long)player->sound_starts,
++                                (unsigned long long)player->sound_attempts, (unsigned long long)player->sound_failures);
++                    ImGui::TextWrapped("Last request: %s", player->sound_resource.c_str());
++                    if (!player->sound_error.empty())
++                        ImGui::TextWrapped("%s", player->sound_error.c_str());
++                    voice(player->m_hCurSound);
++                    ImGui::Text("Footsteps: %llu speed-suppressed / %llu unmapped",
++                                (unsigned long long)player->suppressed_footsteps,
++                                (unsigned long long)player->unresolved_footsteps);
++                    ImGui::Text("Ground material: %d | foot material: %d | volume: %u | next foot: %s",
++                                player->m_eLastSurface, player->footstep_surface, unsigned(player->footstep_container),
++                                player->m_bNextFootstepLeft ? "left" : "right");
++                    ImGui::Text("AI sound alerts unavailable: %llu",
++                                (unsigned long long)player->unavailable_sound_alerts);
++                }
++                ImGui::TextWrapped("Dry audio only. AI hearing, voice-manager events and reverb remain unavailable.");
++            }
+             std::vector<NodePose> pose;
+             if (sample_pose(model, r->animation.animation, r->animation.time, pose))
+             {
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 5facd55..6dde939 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -76,13 +76,14 @@ namespace
+             spdlog::error("Original game boundary initialization failed");
+             return 4;
+         }
+-        if ((options.scene_explosions_smoke || options.cinematics_smoke || options.world_sounds_smoke ||
+-             options.random_sounds_smoke || (!options.gpu_smoke && !options.world_smoke)) &&
++        if ((options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
++             options.world_sounds_smoke || options.random_sounds_smoke ||
++             (!options.gpu_smoke && !options.world_smoke)) &&
+             !game.server.audio.open_output(error))
+         {
+             spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
+-            if (options.scene_explosions_smoke || options.cinematics_smoke || options.world_sounds_smoke ||
+-                options.random_sounds_smoke)
++            if (options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
++                options.world_sounds_smoke || options.random_sounds_smoke)
+                 return 4;
+         }
+         HOBJECT key = nullptr;
+@@ -302,7 +303,7 @@ namespace
+         DVector hidden_position{};
+         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
+         unsigned forward_frames = 0, jump_frames = 0, crouch_frames = 0, run_frames = 0;
+-        bool skeleton_hidden = false;
++        bool skeleton_hidden = false, character_audio_hidden = false;
+         bool crouched_hidden = false, stood_after_crouch = false, locomotion_pose = false;
+         bool saw_walk = false, saw_run = false, saw_jump = false;
+         bool container_hidden = false;
+@@ -468,6 +469,12 @@ namespace
+                 const auto* record = player ? game.objects.get(player->m_hObject) : nullptr;
+                 if (player && record)
+                 {
++                    if (options.skeleton_smoke && !inspector_visible)
++                        if (const auto* voice = game.server.audio.get(player->m_hCurSound))
++                            character_audio_hidden |=
++                                voice->cursor > 0 && voice->request.speaker == player->m_hObject &&
++                                voice->request.resource.starts_with("sounds/player/footsteps/") &&
++                                game.server.audio.submitted_frames > 0 && game.server.audio.output_error.empty();
+                     saw_walk |= player->move_state == CPlayerObj::MoveState::Walk;
+                     saw_run |= player->move_state == CPlayerObj::MoveState::Run;
+                     saw_jump |= player->move_state == CPlayerObj::MoveState::Jump;
+@@ -834,10 +841,30 @@ namespace
+                     skeleton_reentered = player->m_Anim_Sound.hit_spheres_valid &&
+                                          game.server.GetModelNodeTransform(player->m_hObject, "head", &head, &rotation);
+                 }
++            bool character_audio_reentered = !options.skeleton_smoke;
++            if (options.skeleton_smoke)
++            {
++                auto* player = game.server_shell.Player(game.local_client);
++                game.client_shell.movement_input.forward = true;
++                for (int i = 0; player && i < 90 && !character_audio_reentered; ++i)
++                {
++                    if (!game.step(1.0 / 60))
++                        return 4;
++                    if (const auto* voice = game.server.audio.get(player->m_hCurSound))
++                        character_audio_reentered = voice->cursor > 0 && player->sound_starts > 0 &&
++                                                    game.server.audio.submitted_frames > 0 &&
++                                                    game.server.audio.output_error.empty();
++                }
++                game.client_shell.movement_input = {};
++                spdlog::info("Character audio: hidden={}, reentered={}, starts={}, surface={}, submitted={}",
++                             character_audio_hidden, character_audio_reentered, player ? player->sound_starts : 0,
++                             player ? int(player->m_eLastSurface) : -1, game.server.audio.submitted_frames);
++            }
+             const bool ui_ok =
+                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
+             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
+                 !selection_cleared ||
++                (options.skeleton_smoke && (!character_audio_hidden || !character_audio_reentered)) ||
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+diff --git a/src/engine/collision.cpp b/src/engine/collision.cpp
+index 86105bc..638597c 100644
+--- a/src/engine/collision.cpp
++++ b/src/engine/collision.cpp
+@@ -222,7 +222,8 @@ namespace OpenBlood2
+                             model.points[polygon.points[j + 1]]},
+                            {},
+                            {},
+-                           i};
++                           i,
++                           model.surfaces[polygon.surface].texture_flags};
+                 auto normal =
+                     cross(vector_subtract(t.points[1], t.points[0]), vector_subtract(t.points[2], t.points[0]));
+                 if (vector_dot(normal, normal) < 1e-12f)
+@@ -286,6 +287,7 @@ namespace OpenBlood2
+             {
+                 hit = candidate;
+                 hit.polygon = triangles_[i].polygon;
++                hit.texture_flags = triangles_[i].texture_flags;
+                 found = true;
+             }
+         }
+diff --git a/src/engine/collision.h b/src/engine/collision.h
+index cea1c97..90dbdbf 100644
+--- a/src/engine/collision.h
++++ b/src/engine/collision.h
+@@ -11,6 +11,7 @@ namespace OpenBlood2
+         std::uint32_t polygon = UINT32_MAX;
+         HOBJECT object = nullptr;
+         bool start_solid = false;
++        std::uint16_t texture_flags = 0;
+     };
+     enum class CollisionQuery
+     {
+@@ -47,6 +48,7 @@ namespace OpenBlood2
+             std::array<DVector, 3> points;
+             DVector min, max;
+             std::uint32_t polygon;
++            std::uint16_t texture_flags = 0;
+         };
+         struct Node
+         {
+diff --git a/src/engine/world.cpp b/src/engine/world.cpp
+index e844d6e..2c123fd 100644
+--- a/src/engine/world.cpp
++++ b/src/engine/world.cpp
+@@ -154,7 +154,7 @@ namespace OpenBlood2
+                     r.string();
+                     r.string();
+                 }
+-                r.u16();
++                s.texture_flags = r.u16();
+                 if (!r.require(effect <= 1 && s.texture < textures && s.plane < planes))
+                     return false;
+                 out.surfaces.push_back(s);
+diff --git a/src/engine/world.h b/src/engine/world.h
+index 41553dc..5f6b915 100644
+--- a/src/engine/world.h
++++ b/src/engine/world.h
+@@ -26,6 +26,7 @@ namespace OpenBlood2
+         DVector origin, u, v;
+         std::uint16_t texture = 0;
+         std::uint32_t plane = 0, flags = 0;
++        std::uint16_t texture_flags = 0; // Serialized v56 surface material, not render flags.
+     };
+     struct Polygon
+     {
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index a85cdf4..7094e58 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -32,6 +32,8 @@ class CSBase
+ class ServerDE : public CSBase
+ {
+   public:
++    virtual OpenBlood2::SoundId PlayCharacterSound(HOBJECT, const OpenBlood2::SoundRequest&, bool retain,
++                                                   std::string&) = 0;
+     virtual OpenBlood2::SoundId PlayCinematicSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
+     virtual OpenBlood2::SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
+     virtual OpenBlood2::SoundId PlaySoundAt(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
+@@ -57,6 +59,7 @@ class ServerDE : public CSBase
+     virtual bool ReadKeyMessage(HMESSAGEREAD, OpenBlood2::KeyMessage&) = 0;
+     virtual OpenBlood2::MoverResult MoveWorldModel(HOBJECT, DVector destination) = 0;
+     virtual OpenBlood2::MoverResult RotateWorldModel(HOBJECT, const OpenBlood2::RotationMove&) = 0;
++    virtual bool GetPointContainerCode(DVector, ContainerCode&) = 0;
+     virtual bool GetContainers(HOBJECT, DVector head, OpenBlood2::ContainerState&) = 0;
+     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
+     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
+diff --git a/src/game/original/Anim_Sound.h b/src/game/original/Anim_Sound.h
+index 839288b..521eaba 100644
+--- a/src/game/original/Anim_Sound.h
++++ b/src/game/original/Anim_Sound.h
+@@ -5,14 +5,34 @@
+ #include <string>
+ #include <vector>
+ 
+-// Original animation/node subset. Voice helpers and damage localization callers
+-// are not yet imported. See CHARACTER_ANIMATION_CONTRACTS.md.
++// Original animation/node and voice subsets. Damage localization and AI callers
++// remain pending. See CHARACTER_ANIMATION_CONTRACTS.md and CHARACTER_AUDIO_CONTRACTS.md.
+ inline constexpr unsigned NUM_ALL_NODES = 21, NUM_STD_NODES = 18;
+ extern const std::array<const char*, NUM_ALL_NODES> szNodes;
+ void CheckAnims(std::span<DDWORD>);
+ class CAnim_Sound
+ {
+   public:
++    CAnim_Sound() = default;
++    ~CAnim_Sound();
++    CAnim_Sound(const CAnim_Sound&) = delete;
++    CAnim_Sound& operator=(const CAnim_Sound&) = delete;
++    bool SetSoundRoot(std::string_view);
++    const std::string& GetSoundRoot() const
++    {
++        return sound_root_;
++    }
++    void SetSilent(DBOOL silent)
++    {
++        m_bSilent = silent;
++    }
++    bool GetSoundPath(std::string&, int index = 0) const;
++    bool PlayVoice(HOBJECT, std::string_view, float radius, int volume);
++    OpenBlood2::SoundId PlaySound(HOBJECT, std::string_view, float radius, int volume, bool get_handle = false);
++    OpenBlood2::SoundId m_hVoxSound = 0;
++    DBOOL m_bSilent = DFALSE; // Source helper methods do not test this flag.
++    std::uint64_t sound_attempts = 0, sound_starts = 0, sound_failures = 0, voice_busy = 0;
++    std::string sound_resource, sound_error;
+     bool SetAnimationIndexes(HOBJECT);
+     bool GenerateHitSpheres(HOBJECT);
+     bool ForceAnimation(HOBJECT, DDWORD);
+@@ -74,4 +94,7 @@ class CAnim_Sound
+     DDWORD m_nAnim_CORPSE[12]{};
+     DDWORD m_nAnim_LIMB[3]{};
+     DDWORD m_nAnim_SPECIAL[9]{};
++
++  private:
++    std::string sound_root_;
+ };
+diff --git a/src/game/original/CharacterSound.cpp b/src/game/original/CharacterSound.cpp
+new file mode 100644
+index 0000000..1210780
+--- /dev/null
++++ b/src/game/original/CharacterSound.cpp
+@@ -0,0 +1,247 @@
++// Selected original Anim_Sound voice helpers and PlayerObj model-key sound path.
++// See docs/CHARACTER_AUDIO_CONTRACTS.md for preserved rules and unavailable callers.
++#include "PlayerObj.h"
++#include <algorithm>
++#include <cmath>
++#include <string_view>
++using OpenBlood2::SoundId;
++namespace
++{
++    bool bounded(std::string_view text, std::size_t maximum)
++    {
++        return text.size() <= maximum && text.find('\0') == std::string_view::npos;
++    }
++    bool same(std::string_view a, std::string_view b)
++    {
++        return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(),
++                                                  [](unsigned char x, unsigned char y)
++                                                  {
++                                                      auto lower = [](unsigned char c)
++                                                      { return c >= 'A' && c <= 'Z' ? c + ('a' - 'A') : c; };
++                                                      return lower(x) == lower(y);
++                                                  });
++    }
++} // namespace
++CAnim_Sound::~CAnim_Sound()
++{
++    if (m_hVoxSound && g_pServerDE)
++        g_pServerDE->KillSound(m_hVoxSound);
++}
++bool CAnim_Sound::SetSoundRoot(std::string_view root)
++{
++    if (!bounded(root, 255))
++        return false;
++    sound_root_ = root;
++    return true;
++}
++bool CAnim_Sound::GetSoundPath(std::string& sound, int index) const
++{
++    if (!bounded(sound, 255))
++        return false;
++    auto path = sound_root_ + "\\" + sound;
++    if (index)
++        path += std::to_string(index) + ".wav";
++    if (path.size() > 255)
++        return false;
++    sound = std::move(path);
++    return true;
++}
++SoundId CAnim_Sound::PlaySound(HOBJECT object, std::string_view sound, float radius, int volume, bool get_handle)
++{
++    const bool valid_name = bounded(sound, 255);
++    const std::string name = valid_name ? std::string(sound) : std::string{};
++    ++sound_attempts;
++    sound_error.clear();
++    sound_resource.clear();
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(object) || !valid_name)
++        sound_error = "Character sound owner or name unavailable";
++    else
++    {
++        sound_resource = name;
++        if (!GetSoundPath(sound_resource))
++            sound_error = "Character sound path exceeds original 255-byte capacity";
++        else
++        {
++            OpenBlood2::SoundRequest request;
++            request.resource = sound_resource;
++            request.speaker = object;
++            request.inner_radius = radius * .1f;
++            request.outer_radius = radius;
++            request.volume = static_cast<float>(volume) / 100.f;
++            request.priority = 3; // SOUNDPRIORITY_AI_MEDIUM
++            const auto id = server->PlayCharacterSound(object, request, get_handle, sound_error);
++            if (id)
++            {
++                ++sound_starts;
++                return get_handle ? id : 0; // Original GETHANDLE distinction; unretained voices self-release.
++            }
++        }
++    }
++    ++sound_failures;
++    return 0;
++}
++bool CAnim_Sound::PlayVoice(HOBJECT object, std::string_view sound, float radius, int volume)
++{
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(object))
++    {
++        sound_error = "Character voice owner unavailable";
++        return false;
++    }
++    if (m_hVoxSound)
++    {
++        bool done = false;
++        if (server->IsSoundDone(m_hVoxSound, done) && !done)
++        {
++            ++voice_busy;
++            return false;
++        }
++        server->KillSound(m_hVoxSound);
++        m_hVoxSound = 0;
++    }
++    m_hVoxSound = PlaySound(object, sound, radius, volume, true);
++    // Adaptation: expose actual start failure instead of the source's unconditional true.
++    return m_hVoxSound != 0;
++}
++bool CPlayerObj::PlayPlayerSound(std::string_view sound, float radius, DBYTE volume, bool stream, DBYTE priority)
++{
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject))
++        return false;
++    ++sound_attempts;
++    if (m_hCurSound)
++        server->KillSound(m_hCurSound);
++    m_hCurSound = 0; // The source interrupts even when the replacement subsequently fails.
++    sound_resource = bounded(sound, 255) ? std::string(sound) : std::string{};
++    sound_error.clear();
++    if (stream)
++        sound_error = "Character FileStream playback is unavailable";
++    else if (sound_resource.empty())
++        sound_error = "Character sound name unavailable or over limit";
++    else
++    {
++        OpenBlood2::SoundRequest request;
++        request.resource = sound_resource;
++        request.speaker = m_hObject;
++        request.inner_radius = radius * .1f;
++        request.outer_radius = radius;
++        request.volume = std::min<unsigned>(volume, 100) / 100.f;
++        request.priority = static_cast<DBYTE>(priority + 4); // Original PLAYER base + caller modifier.
++        m_hCurSound = server->PlayCharacterSound(m_hObject, request, true, sound_error);
++    }
++    // Original SendSoundTrigger happens after every playback attempt. AI lists/receivers
++    // are not imported: count the missing operation explicitly, never claim delivery.
++    ++unavailable_sound_alerts;
++    if (m_hCurSound)
++        ++sound_starts;
++    else
++        ++sound_failures;
++    return m_hCurSound != 0;
++}
++bool CPlayerObj::OnStringKey(ArgList* args)
++{
++    if (!args || !args->argv || args->argc < 2 || !args->argv[0] || !args->argv[1] ||
++        !same(args->argv[0], "play_sound"))
++        return false;
++    ++sound_keys;
++    if (same(args->argv[1], "footstep"))
++    {
++        if (m_bDisableFootsteps)
++        {
++            ++suppressed_footsteps;
++            return true;
++        }
++        std::string sound;
++        if (GetFootstepSound(sound))
++            PlayPlayerSound(sound, 400, 70, false, 0);
++        else
++            ++unresolved_footsteps;
++        return true;
++    }
++    std::string sound = args->argv[1];
++    if (!bounded(sound, 251))
++    {
++        sound_error = "Model sound key exceeds original path capacity";
++        ++sound_failures;
++        return true;
++    }
++    sound += ".wav"; // The source appends even if the key already has a suffix.
++    if (!m_Anim_Sound.GetSoundPath(sound))
++    {
++        sound_error = "Model sound key exceeds original path capacity";
++        ++sound_failures;
++        return true;
++    }
++    PlayPlayerSound(sound, 1000, 100, false, 0);
++    return true;
++}
++bool CPlayerObj::GetFootstepSound(std::string& sound)
++{
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject))
++        return false;
++    DVector position{}, dimensions{};
++    server->GetObjectPos(m_hObject, &position);
++    if (server->GetObjectDims(m_hObject, &dimensions) != DE_OK)
++        return false;
++    position.y -= dimensions.y - 1.f;
++    footstep_surface = m_eLastSurface;
++    if (!server->GetPointContainerCode(position, footstep_container))
++        return false;
++    if (IsLiquid(footstep_container))
++        footstep_surface = SURFTYPE_LIQUID;
++    const char* material = nullptr;
++    switch (footstep_surface)
++    {
++        case SURFTYPE_WOOD:
++            material = "wood";
++            break;
++        case SURFTYPE_FLESH:
++            material = "flesh";
++            break;
++        case SURFTYPE_GLASS:
++            material = "glass";
++            break;
++        case SURFTYPE_METAL:
++            material = "metal";
++            break;
++        case SURFTYPE_PLASTIC:
++            material = "plastic";
++            break;
++        case SURFTYPE_STONE:
++            material = "stone";
++            break;
++        case SURFTYPE_TERRAIN:
++            material = "terrain";
++            break;
++        case SURFTYPE_LIQUID:
++            material = "water";
++            break;
++        case SURFTYPE_CLOTH:
++            material = "carpet";
++            break;
++        default:
++            sound_error = "No original footstep mapping for surface " + std::to_string(footstep_surface);
++            return false;
++    }
++    sound = std::string("sounds/player/footsteps/") + material + (m_bNextFootstepLeft ? "/leftm.wav" : "/rightm.wav");
++    m_bNextFootstepLeft = !m_bNextFootstepLeft; // Caleb is the only admitted character; female entry still rejects.
++    return true;
++}
++void CPlayerObj::UpdateSound()
++{
++    auto* server = GetServerDE();
++    DVector velocity{};
++    if (server->GetVelocity(m_hObject, &velocity) == DE_OK)
++        m_bDisableFootsteps = std::hypot(velocity.x, velocity.y, velocity.z) < 50;
++    if (m_hCurSound)
++    {
++        bool done = false;
++        if (server->IsSoundDone(m_hCurSound, done) && done)
++        {
++            server->KillSound(m_hCurSound);
++            m_hCurSound = 0;
++        }
++    }
++}
+diff --git a/src/game/original/MoveMgr.cpp b/src/game/original/MoveMgr.cpp
+index f5da61c..376ce20 100644
+--- a/src/game/original/MoveMgr.cpp
++++ b/src/game/original/MoveMgr.cpp
+@@ -104,6 +104,8 @@ void CMoveMgr::UpdateControlFlags(const MovementInput& input, bool can_move)
+ void CMoveMgr::UpdateOnGround()
+ {
+     m_bOnGround = body.standing;
++    if (m_bOnGround)
++        m_eLastSurface = static_cast<SurfaceType>(body.ground_surface);
+     if (m_bOnGround && body.ground_normal.y < 0.5f)
+     {
+         const auto across = normalized(cross(body.ground_normal, {0, 1, 0}));
+@@ -285,7 +287,8 @@ void CMoveMgr::UpdateMotion(float yaw, float pitch)
+ }
+ PlayerMove CMoveMgr::WritePositionInfo(DVector destination, DVector velocity) const
+ {
+-    return {m_ClientMoveCode, destination, velocity, body.acceleration, m_bOnGround};
++    return {m_ClientMoveCode,  destination, velocity,
++            body.acceleration, m_bOnGround, static_cast<DBYTE>(m_eLastSurface)};
+ }
+ bool CMoveMgr::MoveLocalSolidObject(CBloodServerShell& shell)
+ {
+diff --git a/src/game/original/MoveMgr.h b/src/game/original/MoveMgr.h
+index a7ed7d4..27feae6 100644
+--- a/src/game/original/MoveMgr.h
++++ b/src/game/original/MoveMgr.h
+@@ -1,4 +1,5 @@
+ #pragma once
++#include "SurfaceTypes.h"
+ #include "server_de.h"
+ 
+ class CBloodServerShell;
+@@ -19,6 +20,7 @@ class CMoveMgr
+     OpenBlood2::PlayerPhysics physics;
+     DDWORD m_dwControlFlags = 0, m_dwLastControlFlags = 0;
+     DBYTE m_ClientMoveCode = 0;
++    SurfaceType m_eLastSurface = SURFTYPE_UNKNOWN;
+     bool m_bOnGround = false, m_bLastJumpCommand = false, m_bFalling = false;
+     bool m_bForcedCrouch = false;
+     OpenBlood2::ContainerState containers;
+diff --git a/src/game/original/PlayerObj.cpp b/src/game/original/PlayerObj.cpp
+index 2237b97..bf675d7 100644
+--- a/src/game/original/PlayerObj.cpp
++++ b/src/game/original/PlayerObj.cpp
+@@ -19,7 +19,8 @@ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
+         auto flags = g_pServerDE->GetObjectFlags(m_hObject);
+         g_pServerDE->SetObjectFlags(m_hObject, flags | FLAG_MODELGOURAUDSHADE | FLAG_ANIMTRANSITION);
+     }
+-    if (message == MID_MODELSTRINGKEY && data && pending_model_commands.size() < 32)
++    if (message == MID_MODELSTRINGKEY && data && !OnStringKey(static_cast<ArgList*>(data)) &&
++        pending_model_commands.size() < 32)
+     {
+         auto* args = static_cast<ArgList*>(data);
+         std::string command;
+@@ -27,7 +28,8 @@ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
+         {
+             if (i)
+                 command += ' ';
+-            command += args->argv[i];
++            if (args->argv[i])
++                command += args->argv[i];
+         }
+         pending_model_commands.push_back(std::move(command));
+     }
+@@ -36,6 +38,8 @@ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
+ CPlayerObj::~CPlayerObj()
+ {
+     auto* server = GetServerDE();
++    if (m_hCurSound)
++        server->KillSound(m_hCurSound);
+     if (m_hClient)
+         server->SetClientUserData(m_hClient, nullptr);
+     if (m_hstrTrigger)
+@@ -90,8 +94,8 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
+ }
+ bool CPlayerObj::SetCharacter(DBYTE character)
+ {
+-    // Caleb, default skin only until the other original character branches,
+-    // sound roots are ported. Reject before mutation.
++    // Caleb, default skin only until the other original character branches
++    // are ported. Reject before mutation.
+     if (character != 0 || m_nSkin != 0)
+     {
+         entry_error = "Only Caleb's default entry profile is ported";
+@@ -106,6 +110,7 @@ bool CPlayerObj::SetCharacter(DBYTE character)
+     if (!m_Anim_Sound.SetAnimationIndexes(m_hObject))
+         return false;
+     m_Anim_Sound.GenerateHitSpheres(m_hObject);
++    m_Anim_Sound.SetSoundRoot("sounds\\chosen\\caleb");
+     m_nCharacter = character;
+     return true;
+ }
+@@ -339,6 +344,7 @@ bool CPlayerObj::HandlePlayerPositionMessage(const OpenBlood2::PlayerMove& move)
+     // prediction leash. Here one local body resolves collisions once, so use
+     // the resulting support and never teleport through a rejected collision.
+     m_bOnGround = state.standing && state.ground_normal.y >= 0.5f;
++    m_eLastSurface = static_cast<SurfaceType>(move.surface);
+     ++movement_messages;
+     return true;
+ }
+@@ -356,6 +362,7 @@ DBOOL CPlayerObj::Update(DVector*)
+             return DFALSE;
+         m_bFirstUpdate = DFALSE;
+     }
++    UpdateSound();
+     return UpdateStats();
+ }
+ bool CPlayerObj::UpdateStats()
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index be61fdb..03facab 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -3,6 +3,7 @@
+ #include "B2BaseClass.h"
+ #include "Destructable.h"
+ #include "InventoryMgr.h"
++#include "SurfaceTypes.h"
+ #include "dlink.h"
+ #include <array>
+ #include <random>
+@@ -20,17 +21,31 @@ class CBaseCharacter : public B2BaseClass
+     CInventoryMgr m_InventoryMgr;
+     CDestructable m_damage;
+     CAnim_Sound m_Anim_Sound;
+-    // Retain unhandled model commands for inspection, never execute them as
+-    // though sound/weapon/character animation-key services were available.
++    // Retain commands outside the selected original player sound-key path.
++    // Recording a key never claims its missing service was executed.
+     std::vector<std::string> pending_model_commands;
+ 
+   protected:
++    virtual bool OnStringKey(ArgList*)
++    {
++        return false;
++    }
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+ };
+ class CPlayerObj : public CBaseCharacter
+ {
+   public:
+     ~CPlayerObj() override;
++    bool PlayPlayerSound(std::string_view, float radius, DBYTE volume, bool stream, DBYTE priority = 2);
++    OpenBlood2::SoundId m_hCurSound = 0;
++    bool m_bDisableFootsteps = false, m_bNextFootstepLeft = true;
++    SurfaceType m_eLastSurface = SURFTYPE_UNKNOWN, footstep_surface = SURFTYPE_UNKNOWN;
++    ContainerCode footstep_container = CC_NOTHING;
++    bool GetFootstepSound(std::string&);
++    std::uint64_t sound_keys = 0, sound_attempts = 0, sound_starts = 0, sound_failures = 0;
++    std::uint64_t suppressed_footsteps = 0, unresolved_footsteps = 0, unavailable_sound_alerts = 0;
++    std::string sound_resource, sound_error;
++    void UpdateSound();
+     void PostPropRead(ObjectCreateStruct*);
+     DBOOL InitialUpdate(int);
+     DBOOL Update(DVector*);
+@@ -108,6 +123,7 @@ class CPlayerObj : public CBaseCharacter
+   protected:
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++    bool OnStringKey(ArgList*) override;
+ 
+   private:
+     OpenBlood2::PlayerStats last_sent_stats_{-1, -1, -1};
+diff --git a/src/game/original/SurfaceTypes.h b/src/game/original/SurfaceTypes.h
+new file mode 100644
+index 0000000..06f9d4c
+--- /dev/null
++++ b/src/game/original/SurfaceTypes.h
+@@ -0,0 +1,22 @@
++#pragma once
++#include <cstdint>
++// Original Shared/SharedDefs.h surface identifiers. DAT texture flags are distinct
++// from polygon render/collision flags; unknown identifiers are not guessed.
++enum SurfaceType : std::uint32_t
++{
++    SURFTYPE_UNKNOWN = 0,
++    SURFTYPE_STONE = 10,
++    SURFTYPE_METAL = 20,
++    SURFTYPE_WOOD = 30,
++    SURFTYPE_ENERGY = 40,
++    SURFTYPE_GLASS = 50,
++    SURFTYPE_BUILDING = 60,
++    SURFTYPE_TERRAIN = 70,
++    SURFTYPE_CLOTH = 80,
++    SURFTYPE_PLASTIC = 90,
++    SURFTYPE_FLESH = 100,
++    SURFTYPE_SKY = 110,
++    SURFTYPE_FIRETHROUGH = 120,
++    SURFTYPE_LIQUID = 200,
++    SURFTYPE_MAX
++};
+diff --git a/src/game/player_messages.h b/src/game/player_messages.h
+index ccd789a..711a28b 100644
+--- a/src/game/player_messages.h
++++ b/src/game/player_messages.h
+@@ -53,6 +53,7 @@ namespace OpenBlood2
+     {
+         DVector position{}, velocity{}, acceleration{}, dimensions{}, ground_normal{};
+         bool standing = false;
++        std::uint32_t ground_surface = 0;
+         std::uint64_t stair_attempts = 0, stair_steps = 0;
+         float last_step_height = 0;
+         HOBJECT ground_object = nullptr;
+@@ -63,6 +64,7 @@ namespace OpenBlood2
+         DBYTE move_code = 0;
+         DVector position{}, velocity{}, acceleration{};
+         bool on_ground = false;
++        DBYTE surface = 0;
+     };
+     struct PlayerPhysics
+     {
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index c8e905f..90f62db 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -32,6 +32,7 @@ namespace OpenBlood2
+     {
+       public:
+         AudioMixer audio;
++        SoundId PlayCharacterSound(HOBJECT, const SoundRequest&, bool retain, std::string&) override;
+         SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
+         SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) override;
+         SoundId PlaySoundAt(HOBJECT, const SoundRequest&, DVector, std::string&) override;
+@@ -67,6 +68,7 @@ namespace OpenBlood2
+         bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
+         MoverResult MoveWorldModel(HOBJECT, DVector destination) override;
+         MoverResult RotateWorldModel(HOBJECT, const RotationMove&) override;
++        bool GetPointContainerCode(DVector, ContainerCode&) override;
+         bool GetContainers(HOBJECT, DVector head, ContainerState&) override;
+         bool damage_containers();
+         float GetWorldTime() override
+diff --git a/src/game/server_audio.cpp b/src/game/server_audio.cpp
+index a2437ca..cfaa7df 100644
+--- a/src/game/server_audio.cpp
++++ b/src/game/server_audio.cpp
+@@ -1,6 +1,23 @@
+ #include "game/server_adapter.h"
+ namespace OpenBlood2
+ {
++    SoundId ServerAdapter::PlayCharacterSound(HOBJECT object, const SoundRequest& request, bool retain,
++                                              std::string& error)
++    {
++        trace_service("PlayCharacterSound");
++        if (!IsObjectAlive(object) || !client_resources || request.speaker != object ||
++            request.space != SoundSpace::Spatial || request.loop)
++        {
++            error = "Character sound requires a live attached owner and a spatial one-shot request";
++            return 0;
++        }
++        DVector position{};
++        GetObjectPos(object, &position);
++        const auto id = audio.play(*client_resources, object, request, position, error);
++        if (auto* voice = audio.get(id))
++            voice->auto_remove = !retain;
++        return id;
++    }
+     SoundId ServerAdapter::PlayCinematicSound(HOBJECT owner, const SoundRequest& request, std::string& error)
+     {
+         trace_service("PlayCinematicSound");
+diff --git a/src/game/server_containers.cpp b/src/game/server_containers.cpp
+index 3a22998..c101a45 100644
+--- a/src/game/server_containers.cpp
++++ b/src/game/server_containers.cpp
+@@ -5,6 +5,25 @@
+ 
+ namespace OpenBlood2
+ {
++    bool ServerAdapter::GetPointContainerCode(DVector point, ContainerCode& code)
++    {
++        trace_service("GetPointContainerCode");
++        if (!physics_vector(point))
++            return false;
++        code = CC_NOTHING;
++        for (auto id : objects_.container_snapshot())
++        {
++            const auto* r = objects_.get(id);
++            if (!r || r->life != Life::Alive || !r->container || !r->container->contains(point))
++                continue;
++            if (const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get()))
++            {
++                code = brush->info.code; // Original foot query does not filter Hidden.
++                return true;
++            }
++        }
++        return true;
++    }
+     bool ServerAdapter::GetContainers(HOBJECT object, DVector head, ContainerState& state)
+     {
+         trace_service("GetContainers");
+diff --git a/src/game/server_physics.cpp b/src/game/server_physics.cpp
+index a374a1d..71c5b0b 100644
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -93,6 +93,9 @@ namespace OpenBlood2
+             state.ground_normal = nearest.normal;
+             state.ground_object = nearest.object;
+             state.ground_polygon = nearest.polygon;
++            state.ground_surface = nearest.texture_flags;
++            if (!state.ground_surface && nearest.object)
++                state.ground_surface = GetObjectUserFlags(nearest.object) >> 24;
+         }
+         return true;
+     }
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 2b92a14..7f337dc 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -489,6 +489,20 @@ if(BLOOD2_TEST_DATA_DIR)
+     if(BLOOD2_GPU_TESTS)
+         add_test(NAME gpu.character COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+             --data-dir "${BLOOD2_TEST_DATA_DIR}" --skeleton-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/skeleton.png")
+-        set_tests_properties(gpu.character PROPERTIES LABELS "gpu;character;private" TIMEOUT 30 RUN_SERIAL TRUE)
++        set_tests_properties(gpu.character PROPERTIES LABELS "gpu;character;private" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+     endif()
+ endif()
++
++add_executable(character_audio_tests character_audio_tests.cpp)
++target_link_libraries(character_audio_tests PRIVATE blood2_game)
++blood2_project_options(character_audio_tests)
++foreach(case IN ITEMS paths voices lifetime rejection player callbacks footsteps surfaces)
++    add_test(NAME character_audio.${case} COMMAND character_audio_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/character-audio-fixtures/${case}")
++    set_tests_properties(character_audio.${case} PROPERTIES LABELS "headless;character_audio" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case IN ITEMS catalog subway)
++        add_test(NAME character_audio.${case} COMMAND character_audio_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(character_audio.${case} PROPERTIES LABELS "headless;private;character_audio" TIMEOUT 60)
++    endforeach()
++endif()
+diff --git a/tests/character_audio_tests.cpp b/tests/character_audio_tests.cpp
+new file mode 100644
+index 0000000..560d177
+--- /dev/null
++++ b/tests/character_audio_tests.cpp
+@@ -0,0 +1,503 @@
++#include "audio_fixture.h"
++#include "brush_fixture.h"
++#include "camera_fixture.h"
++#include "engine/container.h"
++#include "engine/model_commands.h"
++#include <functional>
++#include <limits>
++#include <set>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        CHECK(test_audio::setup(g, root));
++        test_player::Directory d;
++        auto& chosen = d.children["sounds"].children["chosen"].children["caleb"];
++        chosen.files["cue.wav"] = test_audio::wave();
++        chosen.files["long.wav"] = test_audio::wave(1, 16, 8000, 8000);
++        for (auto material : {"wood", "flesh", "glass", "metal", "plastic", "stone", "terrain", "water", "carpet"})
++            for (auto side : {"leftm.wav", "rightm.wav"})
++                d.children["sounds"].children["player"].children["footsteps"].children[material].files[side] =
++                    test_audio::wave();
++        auto w = test_model::Writer{};
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, d);
++        w.patch(131, off);
++        w.patch(135, size);
++        std::ofstream out(root / "character.rez", std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        std::string error;
++        CHECK(g.resources.mount(root / "character.rez", error));
++        CHECK(g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
++                               {{"Name", std::string("start")}, {"Pos", DVector{32, 100, 64}}}));
++        return true;
++    }
++    HOBJECT owner(GameSession& g)
++    {
++        return g.objects.create(g.objects.find_class("BaseClass"), {});
++    }
++    bool key(GameSession& g, HOBJECT h, const char* name, const char* sound)
++    {
++        char* args[]{const_cast<char*>(name), const_cast<char*>(sound)};
++        ArgList list{args, 2};
++        return g.objects.engine_message(h, MID_MODELSTRINGKEY, &list);
++    }
++    bool paths(const std::filesystem::path&)
++    {
++        CAnim_Sound a;
++        CHECK(a.SetSoundRoot("Sounds\\Chosen\\Caleb"));
++        std::string p = "pain";
++        CHECK(a.GetSoundPath(p, 3) && p == "Sounds\\Chosen\\Caleb\\pain3.wav");
++        p = "pain.wav";
++        CHECK(a.GetSoundPath(p) && p == "Sounds\\Chosen\\Caleb\\pain.wav");
++        p = "pain";
++        CHECK(a.GetSoundPath(p, -1) && p == "Sounds\\Chosen\\Caleb\\pain-1.wav");
++        CHECK(!a.SetSoundRoot(std::string(256, 'x')) && a.GetSoundRoot() == "Sounds\\Chosen\\Caleb");
++        CHECK(!a.SetSoundRoot(std::string("x\0y", 3)));
++        p = std::string(255, 'x');
++        const auto old = p;
++        CHECK(!a.GetSoundPath(p) && p == old);
++        p = std::string("x\0y", 3);
++        CHECK(!a.GetSoundPath(p) && p.size() == 3);
++        return true;
++    }
++    bool voices(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        const auto h = owner(g);
++        CAnim_Sound a;
++        CHECK(a.SetSoundRoot("sounds/chosen/caleb"));
++        CHECK(a.PlayVoice(h, "cue.wav", 500, 70));
++        const auto first = a.m_hVoxSound;
++        const auto* v = g.server.audio.get(first);
++        CHECK(v && v->owner == h && v->request.speaker == h && !v->auto_remove && !v->world_owned);
++        CHECK(v->request.inner_radius == 50 && v->request.outer_radius == 500 && v->request.volume == .7f &&
++              v->request.priority == 3 && v->request.reverb_requested);
++        CHECK(!a.PlayVoice(h, "missing.wav", 500, 100) && a.m_hVoxSound == first && a.voice_busy == 1 &&
++              a.sound_attempts == 1);
++        CHECK(g.server.advance_audio(.1, {}, {}));
++        bool done = false;
++        CHECK(g.server.IsSoundDone(first, done) && done);
++        a.SetSilent(DTRUE);
++        CHECK(a.PlayVoice(h, "long.wav", 500, 100)); // Source flag is not checked here.
++        const auto second = a.m_hVoxSound;
++        CHECK(second != first && !g.server.audio.get(first));
++        CHECK(g.server.KillSound(second));
++        CHECK(a.PlayVoice(h, "cue.wav", 500, 100)); // Failed completion lookup permits retry.
++        CHECK(g.server.advance_audio(.1, {}, {}));
++        CHECK(!a.PlayVoice(h, "missing.wav", 500, 100) && !a.m_hVoxSound && a.sound_starts == 3 &&
++              a.sound_failures == 1 && !a.sound_error.empty());
++        CHECK(a.PlayVoice(h, "cue.wav", 500, 100));
++        return true; // Destructor kills retained voice before session teardown.
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto h = owner(g);
++        SoundId saved = 0;
++        {
++            CAnim_Sound a;
++            CHECK(a.SetSoundRoot("sounds/chosen/caleb"));
++            CHECK(a.PlayVoice(h, "long.wav", 500, 100));
++            saved = a.m_hVoxSound;
++            CHECK(a.PlaySound(h, "cue.wav", 500, 100) == 0 && a.sound_starts == 2);
++            CHECK(g.server.audio.voices().size() == 2);
++            g.server.audio.inspect_pcm = true;
++            auto* r = g.objects.get(h);
++            r->state.m_Pos = {25, 0, 0};
++            r->activity = OBJSTATE_INACTIVE;
++            CHECK(g.server.advance_audio(.05, {}, {}));
++            const auto* v = g.server.audio.get(saved);
++            CHECK(v && v->position.x == 25 && v->right > v->left && g.server.audio.peak > 0);
++            CHECK(g.server.advance_audio(.05, {}, {}));
++            CHECK(g.server.audio.voices().size() == 1);
++        }
++        CHECK(!g.server.audio.get(saved));
++        CAnim_Sound a;
++        CHECK(a.SetSoundRoot("sounds/chosen/caleb") && a.PlayVoice(h, "long.wav", 500, 100));
++        saved = a.m_hVoxSound;
++        g.server.RemoveObject(h);
++        CHECK(!a.PlayVoice(h, "cue.wav", 500, 100));
++        CHECK(g.server.advance_audio(0, {}, {}));
++        CHECK(!g.server.audio.get(saved));
++        CHECK(g.objects.finish_frame());
++        CHECK(!a.PlayVoice(h, "cue.wav", 500, 100));
++        CHECK(g.unload_world() && g.server.audio.voices().empty() && g.server.audio.cached_clips() == 0);
++        return true;
++    }
++    bool rejection(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto h = owner(g), other = owner(g);
++        std::string error;
++        SoundRequest r;
++        r.resource = "cue.wav";
++        r.speaker = h;
++        CHECK(!g.server.PlayCharacterSound(nullptr, r, true, error));
++        CHECK(!g.server.PlayCharacterSound(other, r, true, error));
++        r.speaker = nullptr;
++        CHECK(!g.server.PlayCharacterSound(h, r, true, error));
++        r.speaker = h;
++        r.loop = true;
++        CHECK(!g.server.PlayCharacterSound(h, r, true, error));
++        r.loop = false;
++        r.space = SoundSpace::Local;
++        CHECK(!g.server.PlayCharacterSound(h, r, true, error));
++        r.space = SoundSpace::Spatial;
++        CAnim_Sound a;
++        CHECK(a.SetSoundRoot("sounds/chosen/caleb"));
++        for (float radius : {0.f, -1.f, std::numeric_limits<float>::infinity(), 1.1e6f})
++            CHECK(!a.PlayVoice(h, "cue.wav", radius, 100));
++        CHECK(!a.PlayVoice(h, "cue.wav", 500, -1) && !a.PlayVoice(h, "cue.wav", 500, 101));
++        CHECK(!a.PlayVoice(h, "../cue.wav", 500, 100));
++        for (int i = 0; i < 128; ++i)
++            CHECK(g.server.PlayCharacterSound(h, r, false, error));
++        CHECK(!a.PlayVoice(h, "cue.wav", 500, 100));
++        CHECK(g.server.advance_audio(.1, {}, {}));
++        CHECK(g.server.audio.voices().empty());
++        CHECK(a.PlayVoice(h, "cue.wav", 500, 100));
++        return true;
++    }
++    bool player(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        CHECK(p && p->m_Anim_Sound.GetSoundRoot() == "sounds\\chosen\\caleb");
++        auto h = p->m_hObject;
++        CHECK(key(g, h, "PLAY_SOUND", "long"));
++        const auto old = p->m_hCurSound;
++        CHECK(old && p->sound_starts == 1 && p->pending_model_commands.empty());
++        CHECK(key(g, h, "play_sound", "missing"));
++        CHECK(!g.server.audio.get(old) && !p->m_hCurSound && p->sound_failures == 1 &&
++              p->unavailable_sound_alerts == 2);
++        CHECK(key(g, h, "play_sound", "cue.wav") && p->sound_resource == "sounds\\chosen\\caleb\\cue.wav.wav" &&
++              !p->m_hCurSound);
++        CHECK(p->PlayPlayerSound("sounds/chosen/caleb/cue.wav", 1000, 255, false, 0));
++        auto id = p->m_hCurSound;
++        const auto* v = g.server.audio.get(id);
++        CHECK(v && v->request.volume == 1 && v->request.inner_radius == 100 && v->request.priority == 4);
++        CHECK(g.server.advance_audio(.1, {}, {}));
++        p->UpdateSound();
++        CHECK(!p->m_hCurSound && !g.server.audio.get(id));
++        DVector velocity{0, 50, 0};
++        CHECK(g.server.SetVelocity(h, &velocity) == DE_OK);
++        p->UpdateSound();
++        CHECK(!p->m_bDisableFootsteps);
++        CHECK(key(g, h, "play_sound", "FOOTSTEP") && p->unresolved_footsteps == 1 && p->pending_model_commands.empty());
++        velocity.y = 49;
++        CHECK(g.server.SetVelocity(h, &velocity) == DE_OK);
++        p->UpdateSound();
++        CHECK(key(g, h, "play_sound", "footstep") && p->suppressed_footsteps == 1 && p->pending_model_commands.empty());
++        CHECK(key(g, h, "RotY", "1") &&
++              p->pending_model_commands.size() == 1); // Player does not call BaseCharacter motion-key branch.
++        CHECK(p->PlayPlayerSound("sounds/chosen/caleb/long.wav", 1000, 100, false));
++        id = p->m_hCurSound;
++        CHECK(!p->PlayPlayerSound("sounds/chosen/caleb/cue.wav", 1000, 100, true) && !g.server.audio.get(id) &&
++              !p->m_hCurSound);
++        CHECK(key(g, h, "play_sound", "long"));
++        id = p->m_hCurSound;
++        CHECK(g.leave_player() && !g.server.audio.get(id));
++        CHECK(!key(g, h, "play_sound", "cue"));
++        return true;
++    }
++    bool callbacks(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        auto* r = g.objects.get(p->m_hObject);
++        auto model = std::make_shared<Model>(*r->model);
++        auto& clip = model->animations.front();
++        for (auto& k : clip.keys)
++            k.text.clear();
++        CHECK(clip.keys.size() >= 2);
++        clip.keys[0].text = "play_sound long; play_sound cue";
++        r->model = model;
++        g.server.SetModelAnimation(r->handle, 0);
++        CHECK(g.server.ResetModelAnimation(r->handle) == DE_OK);
++        CHECK(g.server.advance_models(.05));
++        CHECK(p->sound_keys == 2 && p->sound_starts == 2 && g.server.audio.voices().size() == 1 &&
++              p->sound_resource.ends_with("cue.wav"));
++        const auto count = p->sound_starts;
++        CHECK(g.server.advance_models(.01) && p->sound_starts == count);
++        r->activity = OBJSTATE_INACTIVE;
++        CHECK(g.server.ResetModelAnimation(r->handle) == DE_OK);
++        CHECK(g.server.advance_models(.05) && p->sound_starts == count);
++        r->activity = OBJSTATE_ACTIVE;
++        r->state.m_Flags &= ~FLAG_MODELKEYS;
++        CHECK(g.server.advance_models(.05) && p->sound_starts == count);
++        return true;
++    }
++    bool footsteps(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        auto* r = g.objects.get(p->m_hObject);
++        std::string path = "unchanged";
++        CHECK(!p->GetFootstepSound(path) && path == "unchanged" && p->m_bNextFootstepLeft);
++        for (auto [surface, material] : std::map<SurfaceType, std::string>{{SURFTYPE_WOOD, "wood"},
++                                                                           {SURFTYPE_FLESH, "flesh"},
++                                                                           {SURFTYPE_GLASS, "glass"},
++                                                                           {SURFTYPE_METAL, "metal"},
++                                                                           {SURFTYPE_PLASTIC, "plastic"},
++                                                                           {SURFTYPE_STONE, "stone"},
++                                                                           {SURFTYPE_TERRAIN, "terrain"},
++                                                                           {SURFTYPE_LIQUID, "water"},
++                                                                           {SURFTYPE_CLOTH, "carpet"}})
++        {
++            p->m_eLastSurface = surface;
++            CHECK(p->GetFootstepSound(path) && path == "sounds/player/footsteps/" + material + "/leftm.wav");
++            CHECK(p->GetFootstepSound(path) && path == "sounds/player/footsteps/" + material + "/rightm.wav");
++        }
++        for (auto type : {SURFTYPE_UNKNOWN, SURFTYPE_ENERGY, SURFTYPE_BUILDING, SURFTYPE_SKY, SURFTYPE_FIRETHROUGH})
++        {
++            p->m_eLastSurface = type;
++            CHECK(!p->GetFootstepSound(path) && p->m_bNextFootstepLeft);
++        }
++        auto point = r->state.m_Pos;
++        point.y -= r->dimensions.y - 1;
++        g.world.models.push_back(test_brush::box("wet", {point.x - 20, point.y - 2, point.z - 20},
++                                                 {point.x + 20, point.y + 2, point.z + 20}));
++        auto water = g.objects.create(g.objects.find_class("Water"), {}, Creation::World,
++                                      {{"Name", std::string("wet")}, {"Hidden", true}});
++        CHECK(water);
++        p->m_eLastSurface = SURFTYPE_METAL;
++        CHECK(p->GetFootstepSound(path) && path == "sounds/player/footsteps/water/leftm.wav" &&
++              p->footstep_container == CC_WATER);
++        g.server.RemoveObject(water);
++        CHECK(p->GetFootstepSound(path) && path == "sounds/player/footsteps/metal/rightm.wav");
++        ContainerCode code = CC_LADDER;
++        CHECK(!g.server.GetPointContainerCode({NAN, 0, 0}, code) && code == CC_LADDER);
++        CHECK(g.objects.finish_frame());
++        p->m_bDisableFootsteps = false;
++        CHECK(key(g, r->handle, "play_sound", "footstep") && p->m_hCurSound && !p->m_bNextFootstepLeft);
++        // Unknown material does not cancel an existing sound or advance the foot.
++        auto id = p->m_hCurSound;
++        p->m_eLastSurface = SURFTYPE_UNKNOWN;
++        CHECK(key(g, r->handle, "play_sound", "footstep") && p->m_hCurSound == id && !p->m_bNextFootstepLeft);
++        return true;
++    }
++    bool surfaces(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        const auto h = p->m_hObject;
++        WorldModel floor;
++        floor.points = {{-1000, 0, -1000}, {1000, 0, -1000}, {1000, 0, 1000}, {-1000, 0, 1000}};
++        floor.surfaces.push_back({});
++        floor.surfaces[0].flags = 1;
++        floor.surfaces[0].texture_flags = 20;
++        floor.polygons.push_back({0, {0, 1, 2, 3}});
++        CHECK(g.collision.build(floor, error));
++        CollisionHit hit;
++        CHECK(g.collision.transform(rotation_from_euler({0, .5f, 0}), {}, {0, 2, 0}));
++        CHECK(g.collision.sweep({0, 10, 0}, {0, -10, 0}, {1, 1, 1}, hit) == CollisionQuery::Hit &&
++              hit.texture_flags == 20);
++        CHECK(g.collision.build(floor, error));
++        auto mesh = test_brush::box("material", {-20, -2, -20}, {20, 2, 20});
++        for (auto& surface : mesh.surfaces)
++            surface.texture_flags = 30;
++        ContainerShape shape;
++        CHECK(shape.build(mesh, {}, error));
++        CHECK(shape.transform(rotation_from_euler({0, .3f, 0}), {0, 3, 0}));
++        CHECK(shape.sweep({0, 12, 0}, {0, -10, 0}, {1, 1, 1}, hit) == CollisionQuery::Hit && hit.texture_flags == 30);
++        MovementState state;
++        CHECK(g.server.GetMovementState(h, state) && state.standing && state.ground_surface == 20);
++        g.client_shell.movement_input.forward = true;
++        CHECK(g.step(.05));
++        CHECK(g.client_shell.move_mgr.m_eLastSurface == SURFTYPE_METAL && p->m_eLastSurface == SURFTYPE_METAL);
++        auto request = g.client_shell.move_mgr.WritePositionInfo(state.position, {});
++        request.move_code++;
++        request.surface = 30;
++        CHECK(!p->HandlePlayerPositionMessage(request) && p->m_eLastSurface == SURFTYPE_METAL);
++        floor.surfaces[0].texture_flags = UINT16_MAX;
++        CHECK(g.collision.build(floor, error));
++        CHECK(g.step(.05));
++        CHECK(g.client_shell.move_mgr.m_eLastSurface == static_cast<SurfaceType>(UINT16_MAX) &&
++              p->m_eLastSurface == static_cast<SurfaceType>(UINT8_MAX)); // Original byte transport, no material alias.
++        // UserFlags fallback applies to ordinary body support, independent of primary polygon identity.
++        const auto box = owner(g);
++        auto* b = g.objects.get(box);
++        b->state.m_Pos = {32, 10, 64};
++        b->dimensions = {50, 10, 50};
++        b->state.m_Flags = FLAG_SOLID;
++        b->user_flags = 100u << 24;
++        DVector position{32, 20 + g.objects.get(h)->dimensions.y + .001f, 64};
++        CHECK(g.server.TeleportObject(h, &position) == DE_OK);
++        DVector zero{};
++        CHECK(g.server.SetVelocity(h, &zero) == DE_OK);
++        CHECK(g.server.GetMovementState(h, state) && state.standing && state.ground_surface == 100);
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        std::shared_ptr<const Model> model;
++        CHECK(g.models.load("models/characters/caleb.abc", model, error));
++        CAnim_Sound a;
++        CHECK(a.SetSoundRoot("sounds/chosen/caleb"));
++        size_t keys = 0, footsteps = 0, decoded = 0, missing = 0;
++        std::set<std::string> paths;
++        for (const auto& clip : model->animations)
++            for (const auto& k : clip.keys)
++            {
++                std::vector<std::vector<std::string>> commands;
++                CHECK(model_commands(k.text, commands));
++                for (const auto& command : commands)
++                    if (command.size() > 1 && command[0] == "play_sound")
++                    {
++                        ++keys;
++                        if (command[1] == "footstep")
++                        {
++                            ++footsteps;
++                            continue;
++                        }
++                        auto path = command[1] + ".wav";
++                        CHECK(a.GetSoundPath(path));
++                        paths.insert(path);
++                    }
++            }
++        // Caleb's authored keys are footsteps only; validate their original mapping resources.
++        for (auto material : {"wood", "flesh", "glass", "metal", "plastic", "stone", "terrain", "water", "carpet"})
++            for (auto side : {"leftm.wav", "rightm.wav", "leftf.wav", "rightf.wav"})
++                paths.insert(std::string("sounds/player/footsteps/") + material + "/" + side);
++        for (const auto& path : paths)
++        {
++            std::shared_ptr<const AudioClip> clip;
++            if (g.server.audio.load(g.resources, path, clip, error))
++            {
++                ++decoded;
++                std::cout << path << " frames=" << clip->frames() << " rate=" << clip->rate << '\n';
++            }
++            else
++            {
++                CHECK(!g.resources.find(path));
++                ++missing;
++                std::cout << path << " unavailable=" << error << '\n';
++            }
++        }
++        std::cout << "Caleb sound keys=" << keys << " footsteps=" << footsteps << " unique_resources=" << paths.size()
++                  << " decoded=" << decoded << " missing=" << missing << '\n';
++        CHECK(keys == 46 && footsteps == 46 && decoded > 0);
++        CHECK(g.request_world("01_SubwayA", error));
++        std::map<unsigned, unsigned> surfaces;
++        unsigned compared = 0, matched = 0;
++        std::map<std::string, unsigned> disagreements;
++        std::map<std::string, unsigned> header_flags;
++        for (const auto& world : g.world.models)
++            for (const auto& s : world.surfaces)
++            {
++                ++surfaces[s.texture_flags];
++                const auto& path = world.textures[s.texture];
++                if (!header_flags.contains(path))
++                {
++                    std::vector<std::uint8_t> bytes;
++                    CHECK(g.resources.read(path, bytes, error) && bytes.size() >= 164);
++                    unsigned value = 0;
++                    for (unsigned b = 0; b < 4; ++b)
++                        value |= unsigned(bytes[20 + b]) << (8 * b);
++                    header_flags[path] = value;
++                }
++                const auto value = header_flags[path];
++                ++compared;
++                matched += value == s.texture_flags;
++                if (value != s.texture_flags)
++                    ++disagreements[path + " baked=" + std::to_string(s.texture_flags) +
++                                    " dtx=" + std::to_string(value)];
++            }
++        for (auto [type, count] : surfaces)
++            std::cout << "Subway surface=" << type << " count=" << count << '\n';
++        std::cout << "DAT material / DTX user flags comparisons=" << compared << " matched=" << matched << '\n';
++        for (const auto& [difference, count] : disagreements)
++            std::cout << difference << " surfaces=" << count << '\n';
++        // The engine API uses baked flags: live DTX metadata is a comparison, not an override.
++        CHECK(compared == 2723 && matched == 2163 && surfaces[20] == 1438 && surfaces[80] == 244);
++        CHECK(decoded == 34 && missing == 2);
++        return true;
++    }
++    bool subway(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        SoundId old = 0;
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            auto* p = g.server_shell.Player(g.local_client);
++            CHECK(test_camera::complete_subway_intro(g));
++            g.server.audio.inspect_pcm = true;
++            g.client_shell.movement_input.forward = true;
++            bool heard = false;
++            for (unsigned frame = 0; frame < 120; ++frame)
++            {
++                CHECK(g.step(1. / 60));
++                const auto* voice = g.server.audio.get(p->m_hCurSound);
++                if (voice && voice->cursor > 0 && g.server.audio.peak > 0)
++                {
++                    heard = true;
++                    old = p->m_hCurSound;
++                    CHECK(voice->request.resource.starts_with("sounds/player/footsteps/"));
++                    CHECK(voice->request.inner_radius == 40 && voice->request.outer_radius == 400 &&
++                          voice->request.volume == .7f);
++                }
++            }
++            g.client_shell.movement_input = {};
++            std::cout << "cycle=" << cycle << " keys=" << p->sound_keys << " starts=" << p->sound_starts
++                      << " material=" << p->m_eLastSurface << " last=" << p->sound_resource << '\n';
++            CHECK(heard && p->sound_starts > 0 && p->sound_failures == 0 &&
++                  p->unavailable_sound_alerts == p->sound_attempts);
++            CHECK(g.unload_world() && g.server.audio.voices().empty() && g.server.audio.cached_clips() == 0 &&
++                  !g.server.audio.get(old));
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"paths", paths},     {"voices", voices},       {"lifetime", lifetime},   {"rejection", rejection},
++        {"player", player},   {"callbacks", callbacks}, {"footsteps", footsteps}, {"surfaces", surfaces},
++        {"catalog", catalog}, {"subway", subway}};
++    auto i = cases.find(argv[1]);
++    return i == cases.end() ? 2 : i->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 9e175c3..14074d3 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -187,7 +187,7 @@ namespace
+         w.u32(0);
+         w.u32(0);
+         w.byte(0);
+-        w.u16(0);
++        w.u16(20); // Serialized material flags, independent of surface flags.
+         w.zero(12);
+         w.u32(0);
+         for (unsigned i = 0; i < 3; ++i)
+@@ -348,6 +348,7 @@ namespace
+         CHECK(m.polygons[0].points == std::vector<std::uint16_t>({0, 1, 2}));
+         CHECK(m.planes[0].normal.y == 1);
+         CHECK(m.textures[0] == "t.dtx");
++        CHECK(m.surfaces[0].texture_flags == 20 && m.surfaces[0].flags == 0);
+         CHECK(w.min.x == -10);
+         return true;
+     }

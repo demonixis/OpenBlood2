@@ -1,0 +1,5 @@
+_NET_WM_PID(CARDINAL) = 171438
+_NET_WM_NAME(UTF8_STRING) = "OpenBlood 2 Launcher"
+_NET_WM_PID(CARDINAL) = 171516
+_NET_WM_NAME(UTF8_STRING) = "OpenBlood 2"
+Both displayed window titles verified; relocated-cwd launcher used the default sibling game.

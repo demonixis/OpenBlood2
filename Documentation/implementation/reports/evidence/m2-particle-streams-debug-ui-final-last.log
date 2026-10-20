@@ -1,0 +1,33 @@
+Start testing: Oct 17 10:44 CEST
+----------------------------------------------------------
+25/823 Testing: gpu.lifecycle
+25/823 Test: gpu.lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--gpu-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gpu.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.lifecycle" start time: Oct 17 10:44 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/gpu.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+<end of output>
+Test time =   3.08 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.lifecycle" end time: Oct 17 10:44 CEST
+"gpu.lifecycle" time elapsed: 00:00:03
+----------------------------------------------------------
+
+End testing: Oct 17 10:44 CEST
+
+gpu =   3.08 sec*proc

@@ -1,0 +1,14 @@
+360/659 Testing: ai_fire.filters
+360/659 Test: ai_fire.filters
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_fire_tests" "filters"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_fire.filters" start time: Oct 17 05:13 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ai_fire.filters" end time: Oct 17 05:13 CEST
+"ai_fire.filters" time elapsed: 00:00:00
+----------------------------------------------------------

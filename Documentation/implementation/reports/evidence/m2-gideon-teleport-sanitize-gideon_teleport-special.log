@@ -1,0 +1,14 @@
+622/626 Testing: gideon_teleport.special
+622/626 Test: gideon_teleport.special
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_teleport_tests" "special" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-teleport-special"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_teleport.special" start time: Oct 17 02:45 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_teleport.special" end time: Oct 17 02:45 CEST
+"gideon_teleport.special" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+475/480 Testing: exits.broadcast
+475/480 Test: exits.broadcast
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit_tests" "broadcast" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit-fixtures/broadcast"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"exits.broadcast" start time: Oct 16 17:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"exits.broadcast" end time: Oct 16 17:25 CEST
+"exits.broadcast" time elapsed: 00:00:00
+----------------------------------------------------------

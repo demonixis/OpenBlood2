@@ -1,0 +1,19 @@
+{
+  "name": "lithtech_policy_configure",
+  "command": [
+    "cmake",
+    "-S",
+    "sources/lithtech",
+    "-B",
+    "/tmp/lithtech-audit-2bVxTF/lithtech-policy",
+    "-G",
+    "Ninja",
+    "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:13:54.611594+00:00",
+  "elapsed_seconds": 0.343,
+  "timeout_seconds": 60,
+  "exit_code": 1,
+  "log": "lithtech_policy_configure.log"
+}

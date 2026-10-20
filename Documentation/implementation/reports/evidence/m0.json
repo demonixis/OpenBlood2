@@ -1,0 +1,320 @@
+{
+  "milestone": "M0",
+  "date": "2026-10-15",
+  "timezone": "Europe/Paris",
+  "project": "Blood2",
+  "git": {
+    "branch": "main",
+    "commit": null,
+    "state": "New repository; implementation files not committed."
+  },
+  "dependencies": {
+    "SDL": {
+      "branch": "main",
+      "commit": "6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1",
+      "reported_version": "3.5.0",
+      "archive_sha256": "b59f24752e8ac3322853b43d6d773dfbce4d175d9e2c1db1c4305d8fe565b4e6"
+    },
+    "imgui": {
+      "branch": "master",
+      "commit": "c1aaac65e896a45f81f47a4d68f9959e0f86c859",
+      "reported_version": "1.93.0",
+      "archive_sha256": "b3d8f99838bb3ff05e14185562345f85e00c032da4d8fc277608d7898d847114"
+    },
+    "spdlog": {
+      "tag": "v1.15.3",
+      "commit": "6fa36017cfd5731d617e1a934f0e5ea9c4445b13",
+      "archive_sha256": "5097fb362e79a2bd7247beaf1f8377ed60e274fbe83a4b33e7b73383f0279022"
+    }
+  },
+  "host": {
+    "os": "Fedora 44",
+    "architecture": "x86_64",
+    "kernel": "7.2.10-200.fc44.x86_64",
+    "window_system": "Wayland",
+    "gpu_backend": "Vulkan",
+    "gpu_device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+    "cmake": "4.3.0",
+    "ninja": "1.13.2",
+    "gcc": "16.2.1",
+    "clang_sanitizer": "22.1.8"
+  },
+  "commands": [
+    {
+      "cwd": "Blood2",
+      "argv": [
+        "cmake",
+        "--preset",
+        "local-debug"
+      ],
+      "exit_code": 0
+    },
+    {
+      "cwd": "Blood2",
+      "argv": [
+        "cmake",
+        "--build",
+        "--preset",
+        "debug",
+        "-j",
+        "8"
+      ],
+      "exit_code": 0
+    },
+    {
+      "cwd": "Blood2",
+      "argv": [
+        "ctest",
+        "--preset",
+        "debug"
+      ],
+      "exit_code": 0,
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "cwd": "Blood2",
+      "argv": [
+        "cmake",
+        "--preset",
+        "local-release"
+      ],
+      "exit_code": 0
+    },
+    {
+      "cwd": "Blood2",
+      "argv": [
+        "cmake",
+        "--build",
+        "--preset",
+        "release",
+        "-j",
+        "8"
+      ],
+      "exit_code": 0
+    },
+    {
+      "cwd": "Blood2",
+      "argv": [
+        "ctest",
+        "--preset",
+        "release"
+      ],
+      "exit_code": 0,
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "cwd": "Blood2",
+      "argv": [
+        "clang++",
+        "-std=c++20",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-I",
+        "src",
+        "src/engine/config.cpp",
+        "tests/config_tests.cpp",
+        "-o",
+        "build/config_tests_asan"
+      ],
+      "exit_code": 0
+    },
+    {
+      "cwd": "Blood2",
+      "argv": [
+        "./build/debug/blood2",
+        "--check-data"
+      ],
+      "exit_code": 0
+    },
+    {
+      "cwd": "Blood2",
+      "argv": [
+        "./build/debug/blood2",
+        "--frames",
+        "3",
+        "--capture",
+        ".cache/local-inspector.png"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "sanitizer_cases": [
+    "arguments",
+    "precedence",
+    "relative_paths",
+    "invalid_config",
+    "content_validation",
+    "case_lookup"
+  ],
+  "sanitizer_command": [
+    "./build/config_tests_asan",
+    "<case>",
+    "build/asan-test-runs"
+  ],
+  "sanitizer_result": {
+    "passed": 6,
+    "failed": 0,
+    "scope": "Configuration and file metadata; graphics not instrumented."
+  },
+  "content": {
+    "root": "/home/yann/.steam/steam/steamapps/common/Blood II/",
+    "readme_version": "2.1",
+    "archive_contents_parsed": false,
+    "original_game_executed": false
+  },
+  "limitations": [
+    "Forced X11 launch stalled before GPU startup and was terminated; only Wayland validated.",
+    "Windows/macOS build procedures documented but not executed.",
+    "Android/iOS/OpenXR headset not tested.",
+    "No original gameplay or level loading."
+  ],
+  "source_files": [
+    {
+      "path": ".gitignore",
+      "sha256": "52af96b3f9e7e92aeff1577219ceb333b08b0404cbbebc7f84f5f3310991a36c"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "40db9489b59053c4e0a1a140bf452005b02ffb69f02adbe746e4bccd9beb1573"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "f67ebff46699e0b1c3ee1ebeacdbea4fa2fef24d4619cf994720577c237c7bb6"
+    },
+    {
+      "path": "CMakePresets.json",
+      "sha256": "5f1480c97319fde9d69c45d26e1c19192f910d54169e3926c6f9ef775e8a7a5e"
+    },
+    {
+      "path": "README.md",
+      "sha256": "d52c2e9b5a601fd0b452d628bdf93ae2079e62bd967d3170cc453f249e2d5b17"
+    },
+    {
+      "path": "cmake/Dependencies.cmake",
+      "sha256": "f60d3dc26a31caf75f0a35faa669119d7921a204afea62de4d2943405f4969b0"
+    },
+    {
+      "path": "cmake/build_info.h.in",
+      "sha256": "30aea322c732e6a5f4b0fbdc0c1eea150b3feab8835a67cea05aa57342d5d0bf"
+    },
+    {
+      "path": "config/blood2.example.ini",
+      "sha256": "862ef06472089f0412bdbed34c9344893c44551e364f1a85c53119d4b84f0889"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "2eff9ee004d893035fb708fd2277be990bdc05f434a0373a4be21c293e9d9a37"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "931d438a976990571ce7f130511ac6102842f1b4c4657eab1b6c12769d6ce60d"
+    },
+    {
+      "path": "src/app/inspector.h",
+      "sha256": "ed60ba7b38fb91db844367af04c168a774698abe0a1276c66d30e49d8c72d0ec"
+    },
+    {
+      "path": "src/app/main.cpp",
+      "sha256": "4698189a427f062eadef1ba7c8f695b8d14dc149105a94bdb9deb924358cea9e"
+    },
+    {
+      "path": "src/engine/capture.cpp",
+      "sha256": "2c2649aa8eba96748fc7c9bfe43345a8071ecb5d846db6d8f9c89d072b88698f"
+    },
+    {
+      "path": "src/engine/capture.h",
+      "sha256": "9cc9b01db88ecfdcefd24b343894a24a67b6de148647280a864b5e00751d22ee"
+    },
+    {
+      "path": "src/engine/config.cpp",
+      "sha256": "4a87640a18ff91d709b856a4c0b21e195e627c7dc7564ac806f7b7bdab5340e4"
+    },
+    {
+      "path": "src/engine/config.h",
+      "sha256": "90f75f08463b621cebad1aaf9c885c7006c7a6c2606b8ce3b4df340a9f336b68"
+    },
+    {
+      "path": "src/engine/runtime.cpp",
+      "sha256": "36ea68ba391b8b587c0328fccb9a877468ce2b23e730b38289864bc8ed75fb0c"
+    },
+    {
+      "path": "src/engine/runtime.h",
+      "sha256": "685fbbd466209f5dce6cfad5c254942bf3eb15e7aab25f55e0653a1c0fb557b2"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "29f2af81313b596cb38a4ff2f8d9a65d0c0a86c296836454aba41ee3c755e979"
+    },
+    {
+      "path": "tests/cli_test.cmake",
+      "sha256": "5f6964f79fa31b2dd1086e4acd2401860dcf3b78dbec863e999780993b7f420b"
+    },
+    {
+      "path": "tests/config_tests.cpp",
+      "sha256": "66b612515543583abd62867072ef50f5d4ed304ecd0865a6f855466dd0c04edc"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "m0-build-debug.log",
+      "sha256": "eaff03ac600e05cdcf375102f67e1cdc4dcd4a08db63269e6d05c00272cdf998"
+    },
+    {
+      "path": "m0-build-release.log",
+      "sha256": "eaff03ac600e05cdcf375102f67e1cdc4dcd4a08db63269e6d05c00272cdf998"
+    },
+    {
+      "path": "m0-config-asan.log",
+      "sha256": "bcb0e9592175a38b9c6c67730c6ecfbff39d08eef66893ab91bc1b9110b4df44"
+    },
+    {
+      "path": "m0-configure-debug.log",
+      "sha256": "73bacb897d9b930cce2bebab9c07801449fd928d7f0c2b762eea97df29f5fc49"
+    },
+    {
+      "path": "m0-configure-release.log",
+      "sha256": "d74e38b0e83066f9841df2dc6b11dd88e703d9b7db0fdc6ffb43532d5ee9fc11"
+    },
+    {
+      "path": "m0-ctest-debug.log",
+      "sha256": "61f5878854f00de1c8747e1b836ddfcc036f927e7e36ef38ae213e7cd721d4af"
+    },
+    {
+      "path": "m0-ctest-release.log",
+      "sha256": "5512174a336c3370eaba6377d6d62a20e1516cbfd7f164d55465beec8a4c6936"
+    },
+    {
+      "path": "m0-inspector.png",
+      "sha256": "61780d671fe4f092e8eab396fced2fbb5f40360a9503f9bc6938a33da6240f1c"
+    },
+    {
+      "path": "m0-local-config.log",
+      "sha256": "84d3486be95ad744cece0fc53c6707bf35b97183c19f28af4235c9cf1ec4c0c6"
+    },
+    {
+      "path": "m0-local-launch.log",
+      "sha256": "6464984487adbf4409acf53f7df0a1c3a2d560fdb8be73ddbb1c6c7e3ecf67db"
+    },
+    {
+      "path": "m0-release.png",
+      "sha256": "14101b8a97f272cb5c3e2e34fae1a01eadd76c75b9aa9410703e116cfaa01a83"
+    },
+    {
+      "path": "m0-tests-debug.log",
+      "sha256": "86d753068ae3541a0d7b506c256937db2c66c466b06039ee575907a5f91bbed8"
+    },
+    {
+      "path": "m0-tests-release.log",
+      "sha256": "42308fb4b9d0eb313e546f7c698095d345ca4d91b2b465b14687ed76efff0332"
+    },
+    {
+      "path": "m0-x11-incomplete.log",
+      "sha256": "84d3486be95ad744cece0fc53c6707bf35b97183c19f28af4235c9cf1ec4c0c6"
+    }
+  ]
+}

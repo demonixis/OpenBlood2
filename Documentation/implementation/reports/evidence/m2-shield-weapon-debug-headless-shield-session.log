@@ -1,0 +1,15 @@
+660/664 Testing: shield.session
+660/664 Test: shield.session
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/shield_tests" "session" "/home/yann/projects/lithtech/Blood2/build/debug/tests/shield-session"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"shield.session" start time: Oct 17 02:03 CEST
+Output:
+----------------------------------------------------------
+UI-independent session updates, read-only repeated render, removal/unload, nonreused IDs and durable failure inspection verified.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"shield.session" end time: Oct 17 02:03 CEST
+"shield.session" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,15 @@
+354/569 Testing: ai_fire.filters
+354/569 Test: ai_fire.filters
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_fire_tests" "filters"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_fire.filters" start time: Oct 16 23:27 CEST
+Output:
+----------------------------------------------------------
+filters:223: a->m_InventoryMgr.CurrentWeapon()->last_shot.hit.object == h
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Failed.
+"ai_fire.filters" end time: Oct 16 23:27 CEST
+"ai_fire.filters" time elapsed: 00:00:00
+----------------------------------------------------------

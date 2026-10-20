@@ -1,0 +1,26 @@
+[0/2] Re-checking globbed directories...
+[1/64] Scanning /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp for CXX dependencies
+[2/64] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[3/26] Building CXX object CMakeFiles/engine.dir/src/engine/dls_sampler.cpp.o
+[4/26] Scanning /home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp for CXX dependencies
+[5/26] Linking CXX static library libengine.a
+[6/26] Generating CXX dyndep file tests/CMakeFiles/dls_sampler_tests.dir/CXX.dd
+[7/26] Building CXX object tests/CMakeFiles/dls_sampler_tests.dir/dls_sampler_tests.cpp.o
+[8/26] Linking CXX executable tests/object_contract_tests
+[9/26] Linking CXX executable tests/config_tests
+[10/26] Linking CXX executable tests/world_tests
+[11/26] Linking CXX executable tests/sound_tests
+[12/26] Linking CXX executable tests/audio_stream_tests
+[13/26] Linking CXX executable tests/music_asset_tests
+[14/26] Linking CXX executable tests/dls_bank_tests
+[15/26] Linking CXX executable tests/dls_sampler_tests
+[16/26] Linking CXX executable tests/ima_style_tests
+[17/26] Linking CXX executable tests/ima_band_tests
+[18/26] Linking CXX executable tests/ima_section_tests
+[19/26] Linking CXX executable tests/ima_timeline_tests
+[20/26] Linking CXX executable tests/ima_variation_tests
+[21/26] Linking CXX executable tests/ima_note_event_tests
+[22/26] Linking CXX executable tests/ima_note_pitch_tests
+[23/26] Linking CXX executable tests/ima_harmony_tests
+[24/26] Linking CXX executable tests/ima_selection_tests
+[25/26] Linking CXX executable tests/ima_cursor_tests

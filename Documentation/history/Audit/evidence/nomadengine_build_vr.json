@@ -1,0 +1,16 @@
+{
+  "name": "nomadengine_build_vr",
+  "command": [
+    "cmake",
+    "--build",
+    "/tmp/lithtech-audit-2bVxTF/nomadengine",
+    "--parallel",
+    "4"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:20:49.868559+00:00",
+  "elapsed_seconds": 52.206,
+  "timeout_seconds": 180,
+  "exit_code": 0,
+  "log": "nomadengine_build_vr.log"
+}

@@ -1,0 +1,14 @@
+476/480 Testing: exits.blocked
+476/480 Test: exits.blocked
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit_tests" "blocked" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit-fixtures/blocked"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"exits.blocked" start time: Oct 16 17:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"exits.blocked" end time: Oct 16 17:25 CEST
+"exits.blocked" time elapsed: 00:00:00
+----------------------------------------------------------

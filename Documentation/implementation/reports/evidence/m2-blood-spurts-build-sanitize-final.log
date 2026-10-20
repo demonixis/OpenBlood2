@@ -1,0 +1,25 @@
+[0/2] Re-checking globbed directories...
+[1/14] Scanning <workspace>/Blood2/tests/blood_spurt_tests.cpp for CXX dependencies
+[2/14] Generating CXX dyndep file tests/CMakeFiles/blood_spurt_tests.dir/CXX.dd
+[3/13] Linking CXX executable tests/object_contract_tests
+[4/13] Linking CXX executable blood2
+[5/13] Building CXX object tests/CMakeFiles/blood_spurt_tests.dir/blood_spurt_tests.cpp.o
+FAILED: [code=1] tests/CMakeFiles/blood_spurt_tests.dir/blood_spurt_tests.cpp.o
+/usr/bin/clang++  -I<workspace>/Blood2/src -I<workspace>/Blood2/src/game/legacy -isystem <workspace>/Blood2/build/sanitize/_deps/sdl3-build/include-revision -isystem <workspace>/Blood2/build/sanitize/_deps/sdl3-src/include -g -std=c++20 -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -MD -MT tests/CMakeFiles/blood_spurt_tests.dir/blood_spurt_tests.cpp.o -MF tests/CMakeFiles/blood_spurt_tests.dir/blood_spurt_tests.cpp.o.d @tests/CMakeFiles/blood_spurt_tests.dir/blood_spurt_tests.cpp.o.modmap -o tests/CMakeFiles/blood_spurt_tests.dir/blood_spurt_tests.cpp.o -c <workspace>/Blood2/tests/blood_spurt_tests.cpp
+<workspace>/Blood2/tests/blood_spurt_tests.cpp:206:64: error: non-constant-expression cannot be narrowed from type 'unsigned int' to 'DBYTE' (aka 'unsigned char') in initializer list [-Wc++11-narrowing]
+  206 |                 CHECK(weapon->Fire({{-200, 100, 0}, {1, 0, 0}, 42 + shot, WEAP_BERETTA, false, false}) ==
+      |                                                                ^~~~~~~~~
+<workspace>/Blood2/tests/blood_spurt_tests.cpp:11:15: note: expanded from macro 'CHECK'
+   11 |         if (!(x))                                                                                                      \
+      |               ^
+<workspace>/Blood2/tests/blood_spurt_tests.cpp:206:64: note: insert an explicit cast to silence this issue
+  206 |                 CHECK(weapon->Fire({{-200, 100, 0}, {1, 0, 0}, 42 + shot, WEAP_BERETTA, false, false}) ==
+      |                                                                ^~~~~~~~~
+      |                                                                static_cast<DBYTE>(
+<workspace>/Blood2/tests/blood_spurt_tests.cpp:11:15: note: expanded from macro 'CHECK'
+   11 |         if (!(x))                                                                                                      \
+      |               ^
+1 error generated.
+[6/13] Linking CXX executable tests/world_tests
+[7/13] Linking CXX executable tests/corpse_tests
+ninja: build stopped: subcommand failed.

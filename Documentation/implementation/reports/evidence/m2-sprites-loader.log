@@ -1,0 +1,15 @@
+25/255 Testing: world.sprite_entries
+25/255 Test: world.sprite_entries
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests" "sprite_entries" "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/sprite_entries"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"world.sprite_entries" start time: Oct 16 02:49 CEST
+Output:
+----------------------------------------------------------
+PASS sprite_entries
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"world.sprite_entries" end time: Oct 16 02:49 CEST
+"world.sprite_entries" time elapsed: 00:00:00
+----------------------------------------------------------

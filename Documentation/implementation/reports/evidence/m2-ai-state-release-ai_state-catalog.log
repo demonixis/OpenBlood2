@@ -1,0 +1,34 @@
+371/372 Testing: ai_state.catalog
+371/372 Test: ai_state.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_state_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_state.catalog" start time: Oct 16 11:01 CEST
+Output:
+----------------------------------------------------------
+m_civilian1 special1 duration=9166
+m_civilian1 special2 duration=6000
+m_civilian1 special3 duration=6000
+m_civilian1 special4 duration=2866
+m_civilian1 special5 duration=5466
+m_civilian1 special6 duration=4133
+m_civilian1 special7 duration=7533
+m_civilian1 special8 duration=9533
+m_civilian1 special9 duration=5300
+f_civilian1 special1 duration=9166
+f_civilian1 special2 duration=6000
+f_civilian1 special3 duration=6000
+f_civilian1 special4 duration=2033
+f_civilian1 special5 duration=5466
+f_civilian1 special6 duration=4133
+f_civilian1 special7 duration=7533
+f_civilian1 special8 duration=9533
+labtech special1 duration=9166
+labtech special5 duration=5466
+Private NPC animation changes/resets=240; available special slots=19
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.catalog" end time: Oct 16 11:01 CEST
+"ai_state.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

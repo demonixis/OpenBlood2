@@ -1,0 +1,1561 @@
+{
+  "scope": "Documentation navigation only; no milestone acceptance changes",
+  "moves": [
+    {
+      "from": "docs/activation_visibility_contracts.md",
+      "to": "docs/contracts/activation_visibility_contracts.md",
+      "before_sha256": "3bfcf3be41f033f7b6dcc25a2653bddeeb1b1b804dc148fc120b4fbc430e7a64",
+      "after_sha256": "9d3a76f8de9b0e4b7b79a5827ebf1c86e62f46a94a33fbf0d4a0965899458590"
+    },
+    {
+      "from": "docs/ai_alignment_contracts.md",
+      "to": "docs/contracts/ai_alignment_contracts.md",
+      "before_sha256": "adcdfadab02bf2bce5155eef58b857e2aebdfba2c556f18ec790adebc10cee61",
+      "after_sha256": "8515a8b75541fd22f0f97a004d05fab6f96cebfa0afca5900160f67d3b772b17"
+    },
+    {
+      "from": "docs/ai_ammo_contracts.md",
+      "to": "docs/contracts/ai_ammo_contracts.md",
+      "before_sha256": "1fa5eb4206537c0dd9f4a8e536efda784256654151ee139f83524948db82e0ff",
+      "after_sha256": "1e25d03d4a770a957c8859a72d4d78e5612786fe38089350a909ec7735cab849"
+    },
+    {
+      "from": "docs/ai_animation_clearance_contracts.md",
+      "to": "docs/contracts/ai_animation_clearance_contracts.md",
+      "before_sha256": "38762d4d2906761958958b84ca4e3ee685d74a533f7366269c717588345c8f36",
+      "after_sha256": "a6684bcb43c3da02ee454f5a0ad0b185f35f26571bff605cb76b761310ca64e1"
+    },
+    {
+      "from": "docs/ai_escape_contracts.md",
+      "to": "docs/contracts/ai_escape_contracts.md",
+      "before_sha256": "1eeb6efaba572fb8c445c71dfcde9611f5a02ce4384b452266cb11883b9731a8",
+      "after_sha256": "612ebd1f26a881397839fa49afe0f4b9323addf6a43eacabd771e6842f11c4c4"
+    },
+    {
+      "from": "docs/ai_fire_contracts.md",
+      "to": "docs/contracts/ai_fire_contracts.md",
+      "before_sha256": "b13fe5ea28c050551b62d389fcaa21589b666ae45edf39ce068bb2cc28cf04aa",
+      "after_sha256": "ce8091f65a839a5b4820b9951676b0f5c55dcdc7d1cf643b087555c988a02ef6"
+    },
+    {
+      "from": "docs/ai_follow_contracts.md",
+      "to": "docs/contracts/ai_follow_contracts.md",
+      "before_sha256": "86328e835ba394cc11995f6b1a25ec095fcd8badd78e60bdc38c42c2b0d4624d",
+      "after_sha256": "615cbec77c0670897694dc6ebf31cf21aaa936a5cd1a9e0976dc4894d1c117c0"
+    },
+    {
+      "from": "docs/ai_hit_contracts.md",
+      "to": "docs/contracts/ai_hit_contracts.md",
+      "before_sha256": "bc0ac19173ddc1e9b8dc4a7afa93a6a530742d4270437a06f82a9fca5b17bef4",
+      "after_sha256": "bd31243b697225d9547901efd110d3e0a1377aeb6b2f2d3efdd4eb1f8b5b668f"
+    },
+    {
+      "from": "docs/ai_locomotion_contracts.md",
+      "to": "docs/contracts/ai_locomotion_contracts.md",
+      "before_sha256": "35743bb2da99606ab714bcaea204001940f233ba487ccef26283351f05e483f6",
+      "after_sha256": "af1a77a8fab3940cbf1ef51179ff02883062d15277cc4b17b1186149e82fdd6a"
+    },
+    {
+      "from": "docs/ai_model_key_contracts.md",
+      "to": "docs/contracts/ai_model_key_contracts.md",
+      "before_sha256": "c746c58470167d786cb3a762a47386f3c2958ebb21fe05f942b6796a51f84882",
+      "after_sha256": "34732e42bab82e6548314b1e6d39865ca20db2082a28a662fd0f813568c310f8"
+    },
+    {
+      "from": "docs/ai_navigation_contracts.md",
+      "to": "docs/contracts/ai_navigation_contracts.md",
+      "before_sha256": "d2a97b7e0016e9608766e4a8a374c3c19f653617af42e893304a4975b5f0faa0",
+      "after_sha256": "0c9fa172c260080a71b4dd8dc75b6feca472a3ed505cde6de8e312d102738c6e"
+    },
+    {
+      "from": "docs/ai_perception_contracts.md",
+      "to": "docs/contracts/ai_perception_contracts.md",
+      "before_sha256": "d9184e17c0ca184c49f5db95e8d5d61d9c93d78b2b08b505dae670d98f11298f",
+      "after_sha256": "83bbc0b06436b64ba87717d89a5851f53cef79eb0c64036caae7389fb0025598"
+    },
+    {
+      "from": "docs/ai_recovery_contracts.md",
+      "to": "docs/contracts/ai_recovery_contracts.md",
+      "before_sha256": "16dd13a20b3b211a46cf4dd2a3bc9ba09f9d412de745e29e2d018319e58ba00d",
+      "after_sha256": "d81c15a0b2bcd3abb0f42d349f87215b8c6debf01fe3ae0d2a68a74edd9409cb"
+    },
+    {
+      "from": "docs/ai_runtime_contracts.md",
+      "to": "docs/contracts/ai_runtime_contracts.md",
+      "before_sha256": "aa0a8a056d7538aeeb013a99b6bb98377c8e42f2050784b4c063cc693d0aa82f",
+      "after_sha256": "82cf82f60483f95ed71357e320285b1fb266ed3da7a7a25564028c9def3cdf20"
+    },
+    {
+      "from": "docs/ai_script_contracts.md",
+      "to": "docs/contracts/ai_script_contracts.md",
+      "before_sha256": "10dcecfa511bd203adbfb9e37ee11e1c0621903169a09649551aabf3fe009946",
+      "after_sha256": "253d45732f06ff47a04f3546acc91282549e9503f2c5c0b1e02a2edd16110064"
+    },
+    {
+      "from": "docs/ai_script_fire_contracts.md",
+      "to": "docs/contracts/ai_script_fire_contracts.md",
+      "before_sha256": "a3668504f8f0b2528eae5c2b88455c4bf2df9ac82b8c1c29e6492d922fc2ee62",
+      "after_sha256": "1f7d33562d533e3e2583079e49a487006ac698c9632477213bfcb52854b2078d"
+    },
+    {
+      "from": "docs/ai_sight_contracts.md",
+      "to": "docs/contracts/ai_sight_contracts.md",
+      "before_sha256": "bc892033b5a3be4b2f610e760c647f2dea7237dcec6b567e20601a11fcbea646",
+      "after_sha256": "15c069bcf3c22627ff2afbe3a58c7fa313ee314237712e7054f545a11b0df21c"
+    },
+    {
+      "from": "docs/ai_smell_contracts.md",
+      "to": "docs/contracts/ai_smell_contracts.md",
+      "before_sha256": "31bead7b8ae18ee0c3d0ca5d0866bd2c0cd8387068d6c7a60843a0882a657cee",
+      "after_sha256": "b8d806d1e493c86c14e0e4c23f05fe37ded23921b7e14b071abb629a942d00a8"
+    },
+    {
+      "from": "docs/ai_state_contracts.md",
+      "to": "docs/contracts/ai_state_contracts.md",
+      "before_sha256": "830fa524da9ce097d2d56300c440b8b55b07deffe667282a2ed79c4ea618aecb",
+      "after_sha256": "ba9d37c46768f30a609361602ff2ba839b147bb442c986412a9c990c528e9d4c"
+    },
+    {
+      "from": "docs/ai_target_contracts.md",
+      "to": "docs/contracts/ai_target_contracts.md",
+      "before_sha256": "68f9e026c4ae54f77c7dd7fb3b54e6daf3b86285b19a6672eb961d79de22130a",
+      "after_sha256": "d9f877ba0305c9b16eb9a303f815f3ee4e973c334334d1e6ee4ae6feaf603dcc"
+    },
+    {
+      "from": "docs/ai_trigger_contracts.md",
+      "to": "docs/contracts/ai_trigger_contracts.md",
+      "before_sha256": "812af323154de6101badacbb522800526efb7367caf92d02b6640c32fec5dc10",
+      "after_sha256": "195a5c060897b9f6c5960f4036f133ffd91cd4033d2be7ca6e33a1619cc4a6d2"
+    },
+    {
+      "from": "docs/assault_contracts.md",
+      "to": "docs/contracts/assault_contracts.md",
+      "before_sha256": "e07b3da77a4d167a80e55244420ab5c4901a88e65cd03e03222b85a8570c13e0",
+      "after_sha256": "99482b8133b6c848ca89c2f2580fa888524558afeec7ed3bd310138003cd9687"
+    },
+    {
+      "from": "docs/attachment_contracts.md",
+      "to": "docs/contracts/attachment_contracts.md",
+      "before_sha256": "fd9c51f5ac4600fb9bdee86df9c1caeb3b4f37758bc0c4354629a4003ebb2f87",
+      "after_sha256": "1b254fb0c7213c33b731a03ac6d68d9bd87d4dabb046a43cf7a3c0845a438699"
+    },
+    {
+      "from": "docs/audio_stream_contracts.md",
+      "to": "docs/contracts/audio_stream_contracts.md",
+      "before_sha256": "94100687fcbc70f898e8a712f55537f7766fd275ddce59c17f96fd9a94c244e9",
+      "after_sha256": "34b760b170dd6a743d51453dcef96d9d4c847539239f2d149067bed88c527c7e"
+    },
+    {
+      "from": "docs/blood_splat_contracts.md",
+      "to": "docs/contracts/blood_splat_contracts.md",
+      "before_sha256": "9658d34228f2aa51d4cd9b71d2dff7c842e3bb922f885cdb56d88264a4768282",
+      "after_sha256": "9e0669e922c32c52be018a311dd3b46e00b1b7dc0cce7142e9d9edcdc0505fda"
+    },
+    {
+      "from": "docs/blood_spurt_contracts.md",
+      "to": "docs/contracts/blood_spurt_contracts.md",
+      "before_sha256": "a4e13b4d586ba44822016dcf25bd6efeafe0e932cbdb17c9bb85d475f3fae488",
+      "after_sha256": "a4e13b4d586ba44822016dcf25bd6efeafe0e932cbdb17c9bb85d475f3fae488"
+    },
+    {
+      "from": "docs/brush_contracts.md",
+      "to": "docs/contracts/brush_contracts.md",
+      "before_sha256": "2eb1a6a8373d845f40f404b72b02895c0dae8fca710cb4fec265f7a50dc795d7",
+      "after_sha256": "a8883443f2fdf82b9b70bf6f69dc6e589e6ea56d1bc548250a84d6c4f3f9089b"
+    },
+    {
+      "from": "docs/builtin_model_contracts.md",
+      "to": "docs/contracts/builtin_model_contracts.md",
+      "before_sha256": "fbcf73ba2e08cf7dc38ff93156f1dd0d3b9c7125d8139ca5b89cdb9344c7838f",
+      "after_sha256": "581e10fd3c1271e0380544460c4b7fc929f9b9d937553683a2affe353260fdae"
+    },
+    {
+      "from": "docs/camera_contracts.md",
+      "to": "docs/contracts/camera_contracts.md",
+      "before_sha256": "97f7450a0f62c403f7b2831bce9eab2166deb5c2796e983bd46add987ebc23b5",
+      "after_sha256": "95576086559d5e3a129a3afa6993e6610ab159126d82ad0017f960444c620e84"
+    },
+    {
+      "from": "docs/character_animation_contracts.md",
+      "to": "docs/contracts/character_animation_contracts.md",
+      "before_sha256": "512aadea4e7fd27ad6b0ef2226a27f5f2921585ed802390dd2bced29a0cf686a",
+      "after_sha256": "b734eedad031f0e6ffd00ccc841fb5999858c7484f976b3aaed40be163c8cdd3"
+    },
+    {
+      "from": "docs/character_audio_contracts.md",
+      "to": "docs/contracts/character_audio_contracts.md",
+      "before_sha256": "923dfd95b3e715a8f4a33c0410b772dc06c3b536fa84cdd99a69e9629118046c",
+      "after_sha256": "08d27f211ca868bfef5e375476db83a2bd52de6ff380df754f4e11fe44e4c305"
+    },
+    {
+      "from": "docs/character_motion_contracts.md",
+      "to": "docs/contracts/character_motion_contracts.md",
+      "before_sha256": "23ce0053e7463845ec4694faadecc4c6f39122186811a6e92475ee0b566f9a78",
+      "after_sha256": "a86d6196815a82316b5bd78f00af26809227d28de646b9a954459388e036ae6c"
+    },
+    {
+      "from": "docs/character_node_contracts.md",
+      "to": "docs/contracts/character_node_contracts.md",
+      "before_sha256": "2b97678123001ac6d49a0d09a58260d010fb34a3c3f25f5cb1da3967ae8241a0",
+      "after_sha256": "43ca38917c880697adf48b7974139cede25a52e9bac17d924172e0f2c879bd94"
+    },
+    {
+      "from": "docs/cinematic_contracts.md",
+      "to": "docs/contracts/cinematic_contracts.md",
+      "before_sha256": "997d7754588cd756a0ac9c90cbf7b1cd6a1718ce9899ba9929a871ecaa54fa56",
+      "after_sha256": "403ade6ad4177ad1de67772f224c470117df85bbe254e627c99be552c271d8c5"
+    },
+    {
+      "from": "docs/cityhub_entry_contracts.md",
+      "to": "docs/contracts/cityhub_entry_contracts.md",
+      "before_sha256": "a36cec9bde7267680b9887efa59d956abc6c4a22615a58a54de6e4993f1c93f4",
+      "after_sha256": "3e3236418259ef4b8c276c7dc86cc0d68637b30f9b24d4de11a16f58c290baa7"
+    },
+    {
+      "from": "docs/collision_traversal_contracts.md",
+      "to": "docs/contracts/collision_traversal_contracts.md",
+      "before_sha256": "0348fdbf13397ad12e7030814cc856e59d70b6d4a70bbba1deae586a2c89ff65",
+      "after_sha256": "6b5bae8357deab67af9b5eea23fbb6bb9357d2f1414466757d081abf3956e23a"
+    },
+    {
+      "from": "docs/compound_shell_contracts.md",
+      "to": "docs/contracts/compound_shell_contracts.md",
+      "before_sha256": "c461e33e842ae9ca02b92a1bed57fa6828c751530ecdfb8364750c8556b6dde2",
+      "after_sha256": "882b910dbbe6668ba14ce889f0cca0f975d6310e5d859dc47fd79c73a40c9c58"
+    },
+    {
+      "from": "docs/container_contracts.md",
+      "to": "docs/contracts/container_contracts.md",
+      "before_sha256": "00eb79cdc533cd1d6b6a8df43ec0409bfb809d704fb022380c1f0ac642c8fcb3",
+      "after_sha256": "022266f0a7f8a741cbda410d3c6d8e9a65903b54674d5f4f266ef9dd265791dc"
+    },
+    {
+      "from": "docs/container_index_contracts.md",
+      "to": "docs/contracts/container_index_contracts.md",
+      "before_sha256": "f863f278cb186f37787d6b7edf2514c8f023e00aa404166d87e5702229365dd0",
+      "after_sha256": "d4304a10ca63ecf6061e4c7f995d6cbf924d82779462113f3114a70d898c86c3"
+    },
+    {
+      "from": "docs/conversation_contracts.md",
+      "to": "docs/contracts/conversation_contracts.md",
+      "before_sha256": "1a1b5f87b0d6519c879bb556c0150c53d12c4c4331bcbb7fe02c96c4dca1c083",
+      "after_sha256": "7aea39f62f29e714fcb2bdfaa5ec35e3fda5b26514fa5ca25f4e75104c21606a"
+    },
+    {
+      "from": "docs/corpse_clearance_contracts.md",
+      "to": "docs/contracts/corpse_clearance_contracts.md",
+      "before_sha256": "64b45ceac6aa0e3d47fb48c54baacf91311574926b9805f3d4d4dcdb156e69f8",
+      "after_sha256": "97fe03dab9bf8a2cace9bcdbc992dff697105cc4383a5d9833a3b071c7c8db1e"
+    },
+    {
+      "from": "docs/corpse_contracts.md",
+      "to": "docs/contracts/corpse_contracts.md",
+      "before_sha256": "2da22b3f09db2e143db8bad43432eec4b5a277c561b18d2e1edd13dff4fecd13",
+      "after_sha256": "690d4233ad9653b8ae76b978a23b9de8e2078108a82ccc2f1356b953dd8597f8"
+    },
+    {
+      "from": "docs/corpse_placement_contracts.md",
+      "to": "docs/contracts/corpse_placement_contracts.md",
+      "before_sha256": "43c435ff2d89bbe6bcaad1bb924a06570ca73f57a02f83b7788f30f1948aedd7",
+      "after_sha256": "5048ed59023c3bb12cc357d0a2247bdb98799ed7c05b1620a98be29dcb0e5518"
+    },
+    {
+      "from": "docs/damage_state_contracts.md",
+      "to": "docs/contracts/damage_state_contracts.md",
+      "before_sha256": "5f2dfcdb78ee9cae3bfbb5108e91b22a872e2d6228fc0fdfa053ff5ce40af6fe",
+      "after_sha256": "4451c33aaeb291b3d6b9119ac60632c6745e3da1fcf2b13cb36a2246d090d026"
+    },
+    {
+      "from": "docs/death_effect_contracts.md",
+      "to": "docs/contracts/death_effect_contracts.md",
+      "before_sha256": "3484ea0d186edf6548684538c072df7013619e126a348a6ebf600afed3d16dfa",
+      "after_sha256": "22e758fbcd6357b7a5202962c5d6e4ac6bb37a9cd89217ba9b6afc3bf174dbb9"
+    },
+    {
+      "from": "docs/destination_contracts.md",
+      "to": "docs/contracts/destination_contracts.md",
+      "before_sha256": "9a7efc5d09a3d0255c3606847c16350aa2da82390d59070fb3e962210e0f8071",
+      "after_sha256": "8011f9c1e41263e26e8358b552cb6134b06fee4c8f13e9139c4f8674eb571992"
+    },
+    {
+      "from": "docs/destination_trial_contracts.md",
+      "to": "docs/contracts/destination_trial_contracts.md",
+      "before_sha256": "711c1984097a98402ac42a2f54884e5aeb8b5b9b290389826996f98077b61ca2",
+      "after_sha256": "77215af785d90cc50b02fb7701a35fea06dc2f1931265d544e7173dc908eebe0"
+    },
+    {
+      "from": "docs/destructable_model_contracts.md",
+      "to": "docs/contracts/destructable_model_contracts.md",
+      "before_sha256": "ea8e67524f8635bcd56a81ddddcd44476d8f3937a5bb215b47f6296f78047ff1",
+      "after_sha256": "a42189138717fe0b99442754629b2edbebc9afdecf58aeaf8c36762b1f4ed1ee"
+    },
+    {
+      "from": "docs/door_audio_contracts.md",
+      "to": "docs/contracts/door_audio_contracts.md",
+      "before_sha256": "36d729715a3f1200697e3281e34bd4786fa37fa69c34202168506eaa8cb932c0",
+      "after_sha256": "99ca77fcd1e64d83ec4ec21076897b1357759124370569348c9043870216fad6"
+    },
+    {
+      "from": "docs/door_contracts.md",
+      "to": "docs/contracts/door_contracts.md",
+      "before_sha256": "dc309b61a652ba96f73668431a5920943bb064aa8887e921ebc5cd9f0be7c6dd",
+      "after_sha256": "504cb4dbb2467dd7106962aac95a1b2850b64eb8fa4d185ffe6bb319e2f78df6"
+    },
+    {
+      "from": "docs/energy_projectile_contracts.md",
+      "to": "docs/contracts/energy_projectile_contracts.md",
+      "before_sha256": "2077167509913480025c4577d0baaf91eca9999777e1bfeb027140ee4d5d9b88",
+      "after_sha256": "aaa84aba928e2108a839ee6f3d71864494d6702421cff44c794cd8c48ac9aa7a"
+    },
+    {
+      "from": "docs/exit_contracts.md",
+      "to": "docs/contracts/exit_contracts.md",
+      "before_sha256": "a5011e0d93108ee1909721a92015e2f3916411299cb8fa48e2cc92b06183125f",
+      "after_sha256": "e2102d9fcf98ddf1c46c2fe49f6bea01076ed6656c14b8ee96f80f8fc29c8bd9"
+    },
+    {
+      "from": "docs/explosion_contracts.md",
+      "to": "docs/contracts/explosion_contracts.md",
+      "before_sha256": "f79d202d979124325b43c137b7605ecf06de6561525fd2b2b8a7be1ca1a037f2",
+      "after_sha256": "87ef44125a0b4a4242ea2a455551366076911fa708f39da43355e9d6519ab6b3"
+    },
+    {
+      "from": "docs/explosion_flame_contracts.md",
+      "to": "docs/contracts/explosion_flame_contracts.md",
+      "before_sha256": "c02d298f15b9048be3913ad8d7b8c57ecee0ca8064a55d0837069004cb395163",
+      "after_sha256": "31fa8125328027d8e03e94e4cf0c18ab1721f510cfbf7b57f5e6952a4a77a9aa"
+    },
+    {
+      "from": "docs/explosion_fragment_contracts.md",
+      "to": "docs/contracts/explosion_fragment_contracts.md",
+      "before_sha256": "64345966d59e8e5bd612a2ca32ed7efe15dccdb6aa53e88c61d7fb8cd2cfadb3",
+      "after_sha256": "5d379f3f61c38f2bda3454cfcb41abc5a868d85a270bb189ed84378836a76cb1"
+    },
+    {
+      "from": "docs/explosion_light_contracts.md",
+      "to": "docs/contracts/explosion_light_contracts.md",
+      "before_sha256": "9f542551109426f8fd40251f08d9673ed39268a992490807eb533326f9a20808",
+      "after_sha256": "cc5c2bfeb19de08d1fe398ed9ff912d7b02698d7fb487c7e17d2f88880594037"
+    },
+    {
+      "from": "docs/explosion_model_contracts.md",
+      "to": "docs/contracts/explosion_model_contracts.md",
+      "before_sha256": "9858353f37964731fc57c51658c37072f7fc680663a381d6e67924255d224422",
+      "after_sha256": "dc8da4b474f6b47c26cc48a90d3289f30cf173bdb5eaf9bbe9e0ad652dbbd0a7"
+    },
+    {
+      "from": "docs/explosion_ring_contracts.md",
+      "to": "docs/contracts/explosion_ring_contracts.md",
+      "before_sha256": "42597ce86ba6bbdf3fa7c889c093cdd4427b41a7032d31202c01fe824b51ff92",
+      "after_sha256": "72a1215c9f5a2f43c6ec736d3c4f2b4f6da0ec7a3388083474ab19a8f54226b0"
+    },
+    {
+      "from": "docs/explosion_sprite_contracts.md",
+      "to": "docs/contracts/explosion_sprite_contracts.md",
+      "before_sha256": "082d3b6d0978d27203d01602766a170037c6e674085d0f1a5baf012b9783de00",
+      "after_sha256": "12cd95c56bf9cc493951745a57c48870bae1fa0f2db5832d84c51a28336ae428"
+    },
+    {
+      "from": "docs/flare_contracts.md",
+      "to": "docs/contracts/flare_contracts.md",
+      "before_sha256": "440c57070d175fafb3256bbd37943d10e459d12000bfa155bb7fd02bd97eacd5",
+      "after_sha256": "ae87b8429800b79d711187a3cf491572c2e03b003ec9ac3d2bfe24d7ae97fd87"
+    },
+    {
+      "from": "docs/flashlight_contracts.md",
+      "to": "docs/contracts/flashlight_contracts.md",
+      "before_sha256": "7e2a45b02ac75618075ba3af94dff47c1dfd0aa3d7bd195ed4650b4420d760f3",
+      "after_sha256": "8e177d2bbc762d2dfdfe5730d5d7c9d17255b38e1431ff327b368b7def29a3a6"
+    },
+    {
+      "from": "docs/gideon_attack_contracts.md",
+      "to": "docs/contracts/gideon_attack_contracts.md",
+      "before_sha256": "b6d620e2a55245d66def1649a5e23146a7ed890a529d65938e65699d1881e28c",
+      "after_sha256": "929a54e8d88deffa2c517e56f3e3b9f5c1f3e482949593ed27440a3c4c544f2b"
+    },
+    {
+      "from": "docs/gideon_combat_contracts.md",
+      "to": "docs/contracts/gideon_combat_contracts.md",
+      "before_sha256": "4f488c2e188f584c24c41c6718b77fd08ba534d61d53974a98fcae559cac9974",
+      "after_sha256": "506552686773d6cdd91b84c14eb987c83681226d8c3fad2b02ec260d600d53e4"
+    },
+    {
+      "from": "docs/gideon_runtime_contracts.md",
+      "to": "docs/contracts/gideon_runtime_contracts.md",
+      "before_sha256": "612eca822c67bb94b398d0c0838b7bc91d66d175dd7ca0d45607dd32386965c0",
+      "after_sha256": "d4f4e5b924bbe4c21a74fe4a1c16990032b01165591e69dab9dcbd604c0a755d"
+    },
+    {
+      "from": "docs/gideon_teleport_contracts.md",
+      "to": "docs/contracts/gideon_teleport_contracts.md",
+      "before_sha256": "89b1e69d970b252861d1436c490a1245b10a18959da2e4918a6b64584f602def",
+      "after_sha256": "cbb5b7d7d29835b9cad8a1db1b5c2d3465a1f5ded136a85703bb759356c62776"
+    },
+    {
+      "from": "docs/hud_contracts.md",
+      "to": "docs/contracts/hud_contracts.md",
+      "before_sha256": "2a62801516971910640661d3b81a8a08fe9a8b09ca3c9460ed80b876db27bdad",
+      "after_sha256": "6f139d38229a86c6d4fbe935fc5aa49834a41167e0a8fabe451743594dd4be72"
+    },
+    {
+      "from": "docs/interaction_contracts.md",
+      "to": "docs/contracts/interaction_contracts.md",
+      "before_sha256": "a5ad3c9d4c24ea75e3c066290c0c49c8ae838da9b2601f19cc781944639704e2",
+      "after_sha256": "24aef99841f260f473fb418ac3a33f8a02785ebee202714dc4a66e1867cb36a3"
+    },
+    {
+      "from": "docs/inventory_state_contracts.md",
+      "to": "docs/contracts/inventory_state_contracts.md",
+      "before_sha256": "613f5e486fe3c6af5ee10551311faf35a126dc554fd43aa75c1a1f2e14e22c71",
+      "after_sha256": "2f7c7ec55597788e0badb1b91547e630eb5c53f647d55f366c253b587a42a2e8"
+    },
+    {
+      "from": "docs/keyframer_contracts.md",
+      "to": "docs/contracts/keyframer_contracts.md",
+      "before_sha256": "79a616236ad9f96e216080dee606107e4a354bfd1f66bcc2ad6aa40a4839999d",
+      "after_sha256": "a6ca102f97ea5624639d54ffc3c189724d6faf395994d58536fe08115d0dd164"
+    },
+    {
+      "from": "docs/level_change_contracts.md",
+      "to": "docs/contracts/level_change_contracts.md",
+      "before_sha256": "3d1507da636923d4c14fa172d61b3ee774d46f47c05fb5bd3d3c1994b9d1e117",
+      "after_sha256": "aa77637434725f54b2598e728cc4fa30b5f44e4026f49fa82044dc85689978ce"
+    },
+    {
+      "from": "docs/light_contracts.md",
+      "to": "docs/contracts/light_contracts.md",
+      "before_sha256": "25f0ba008e03cf61601c11f505a75368c6377fe5a10ea37f3ea10b1a1d9ac9a3",
+      "after_sha256": "a81f6634317b86fe1cb5750f3e1dedc49a0048a510396be3bbe2b042d62d2ec0"
+    },
+    {
+      "from": "docs/locomotion_contracts.md",
+      "to": "docs/contracts/locomotion_contracts.md",
+      "before_sha256": "b5715df7974200fa7ec20d978c1c1ad3d780e2163902644fb7d6dc7a43aa0016",
+      "after_sha256": "6f1ed8bf7250ec0491698041d666b20d8c9983d38d8cfe20e8262ed5b677ad40"
+    },
+    {
+      "from": "docs/m2_activation_visibility_sources.json",
+      "to": "docs/implementation/sources/m2_activation_visibility_sources.json",
+      "before_sha256": "bd5660eced8db09c471818d7f39a919eda9995fc6e31910a6d737644abd8cf63",
+      "after_sha256": "bd5660eced8db09c471818d7f39a919eda9995fc6e31910a6d737644abd8cf63"
+    },
+    {
+      "from": "docs/m2_ai_alignment_sources.json",
+      "to": "docs/implementation/sources/m2_ai_alignment_sources.json",
+      "before_sha256": "c27de61408fad7fd6febc5641c778feb4efb6736e604ed8da09a40e29c1b30da",
+      "after_sha256": "c27de61408fad7fd6febc5641c778feb4efb6736e604ed8da09a40e29c1b30da"
+    },
+    {
+      "from": "docs/m2_ai_ammo_sources.json",
+      "to": "docs/implementation/sources/m2_ai_ammo_sources.json",
+      "before_sha256": "703dbae7c6fad2d89697792c649a76e040d19acaaf26fc20987c3429f92b00d3",
+      "after_sha256": "703dbae7c6fad2d89697792c649a76e040d19acaaf26fc20987c3429f92b00d3"
+    },
+    {
+      "from": "docs/m2_ai_animation_clearance_sources.json",
+      "to": "docs/implementation/sources/m2_ai_animation_clearance_sources.json",
+      "before_sha256": "121907de07510a917e800c36059589ae6bd22d6f778da3118adcdfe336dba29a",
+      "after_sha256": "121907de07510a917e800c36059589ae6bd22d6f778da3118adcdfe336dba29a"
+    },
+    {
+      "from": "docs/m2_ai_escape_sources.json",
+      "to": "docs/implementation/sources/m2_ai_escape_sources.json",
+      "before_sha256": "2e7e01081e1b1fb11d5c6cad385e83e83b129fdd3701b800bf180bef31d74a20",
+      "after_sha256": "2e7e01081e1b1fb11d5c6cad385e83e83b129fdd3701b800bf180bef31d74a20"
+    },
+    {
+      "from": "docs/m2_ai_fire_sources.json",
+      "to": "docs/implementation/sources/m2_ai_fire_sources.json",
+      "before_sha256": "3e1a8c91cf5ae15fa5cdde0e0403f8aad31771247941d13ab0c4070fa592aa7d",
+      "after_sha256": "3e1a8c91cf5ae15fa5cdde0e0403f8aad31771247941d13ab0c4070fa592aa7d"
+    },
+    {
+      "from": "docs/m2_ai_follow_sources.json",
+      "to": "docs/implementation/sources/m2_ai_follow_sources.json",
+      "before_sha256": "1657c5bf05cee6a2d5ff39655612325e49d79ccd07ace8c37b2efc0dbd9f59d0",
+      "after_sha256": "1657c5bf05cee6a2d5ff39655612325e49d79ccd07ace8c37b2efc0dbd9f59d0"
+    },
+    {
+      "from": "docs/m2_ai_hit_sources.json",
+      "to": "docs/implementation/sources/m2_ai_hit_sources.json",
+      "before_sha256": "aa4e227a6002bc1c62b2b3ddde5b50965d99088ba3037cac3405da595c9e729a",
+      "after_sha256": "aa4e227a6002bc1c62b2b3ddde5b50965d99088ba3037cac3405da595c9e729a"
+    },
+    {
+      "from": "docs/m2_ai_locomotion_sources.json",
+      "to": "docs/implementation/sources/m2_ai_locomotion_sources.json",
+      "before_sha256": "2f4f0d81b8aea6a0c999208ea0845c5b752583d58c57c51ca3da0cc74c5c1385",
+      "after_sha256": "2f4f0d81b8aea6a0c999208ea0845c5b752583d58c57c51ca3da0cc74c5c1385"
+    },
+    {
+      "from": "docs/m2_ai_model_key_sources.json",
+      "to": "docs/implementation/sources/m2_ai_model_key_sources.json",
+      "before_sha256": "9c96cf4c83555f701830dbec47c4382c1efe5d6ac9b6f1e2b714451f78368203",
+      "after_sha256": "9c96cf4c83555f701830dbec47c4382c1efe5d6ac9b6f1e2b714451f78368203"
+    },
+    {
+      "from": "docs/m2_ai_navigation_sources.json",
+      "to": "docs/implementation/sources/m2_ai_navigation_sources.json",
+      "before_sha256": "c12ca0c326d43b662a9afff06d975abd1563e54a08326bf0da7ecd4526ff456e",
+      "after_sha256": "c12ca0c326d43b662a9afff06d975abd1563e54a08326bf0da7ecd4526ff456e"
+    },
+    {
+      "from": "docs/m2_ai_perception_sources.json",
+      "to": "docs/implementation/sources/m2_ai_perception_sources.json",
+      "before_sha256": "ad7b0cbbf23289ea1ff27b9df369cea565fcb1e54b8b79017abbcf19a0a5fc27",
+      "after_sha256": "ad7b0cbbf23289ea1ff27b9df369cea565fcb1e54b8b79017abbcf19a0a5fc27"
+    },
+    {
+      "from": "docs/m2_ai_recovery_sources.json",
+      "to": "docs/implementation/sources/m2_ai_recovery_sources.json",
+      "before_sha256": "4f0692e9bd274f6b80874e446d3eaedbae5a3d8fae87dd0805a42b0629b0c517",
+      "after_sha256": "4f0692e9bd274f6b80874e446d3eaedbae5a3d8fae87dd0805a42b0629b0c517"
+    },
+    {
+      "from": "docs/m2_ai_runtime_sources.json",
+      "to": "docs/implementation/sources/m2_ai_runtime_sources.json",
+      "before_sha256": "bd575e1e794e69983135c4dddbaf2e34b8448e26c6808642ce29e461b870452b",
+      "after_sha256": "bd575e1e794e69983135c4dddbaf2e34b8448e26c6808642ce29e461b870452b"
+    },
+    {
+      "from": "docs/m2_ai_script_fire_sources.json",
+      "to": "docs/implementation/sources/m2_ai_script_fire_sources.json",
+      "before_sha256": "cdc93c76a6b16987062bf1d81318f1e0468a1c8d77899870f69c7d322f964f6b",
+      "after_sha256": "cdc93c76a6b16987062bf1d81318f1e0468a1c8d77899870f69c7d322f964f6b"
+    },
+    {
+      "from": "docs/m2_ai_script_sources.json",
+      "to": "docs/implementation/sources/m2_ai_script_sources.json",
+      "before_sha256": "55b5f90fb153f9b7a01a21d2edbb88e28d537fdf5bcec349753640d76f8adcec",
+      "after_sha256": "55b5f90fb153f9b7a01a21d2edbb88e28d537fdf5bcec349753640d76f8adcec"
+    },
+    {
+      "from": "docs/m2_ai_sight_sources.json",
+      "to": "docs/implementation/sources/m2_ai_sight_sources.json",
+      "before_sha256": "b7b20765b51a1e95429f6c9f68c0cd19d926c71a009883c6b1067eefaaecd03e",
+      "after_sha256": "b7b20765b51a1e95429f6c9f68c0cd19d926c71a009883c6b1067eefaaecd03e"
+    },
+    {
+      "from": "docs/m2_ai_smell_sources.json",
+      "to": "docs/implementation/sources/m2_ai_smell_sources.json",
+      "before_sha256": "41db0cda96c58ebafa71299b7942187902c890b8cde9f1a7c76107a7e8c4bcff",
+      "after_sha256": "41db0cda96c58ebafa71299b7942187902c890b8cde9f1a7c76107a7e8c4bcff"
+    },
+    {
+      "from": "docs/m2_ai_state_sources.json",
+      "to": "docs/implementation/sources/m2_ai_state_sources.json",
+      "before_sha256": "b30fda3e31d0d02627e7146121f0bb62a5b0911b41069236289b8c9368beaa8c",
+      "after_sha256": "b30fda3e31d0d02627e7146121f0bb62a5b0911b41069236289b8c9368beaa8c"
+    },
+    {
+      "from": "docs/m2_ai_target_sources.json",
+      "to": "docs/implementation/sources/m2_ai_target_sources.json",
+      "before_sha256": "df309d8f41b19fc95be160331aa251e2f55530eeeac7ef883fab7640c3c265bd",
+      "after_sha256": "df309d8f41b19fc95be160331aa251e2f55530eeeac7ef883fab7640c3c265bd"
+    },
+    {
+      "from": "docs/m2_ai_trigger_sources.json",
+      "to": "docs/implementation/sources/m2_ai_trigger_sources.json",
+      "before_sha256": "c632e4d68d86d79f00523eb9dddabddacef343148df6434dfad44797003b2158",
+      "after_sha256": "c632e4d68d86d79f00523eb9dddabddacef343148df6434dfad44797003b2158"
+    },
+    {
+      "from": "docs/m2_assault_sources.json",
+      "to": "docs/implementation/sources/m2_assault_sources.json",
+      "before_sha256": "f637e1d6e2b97b2589ef7c3405714845cb1dcb76b31886240448278257d25c33",
+      "after_sha256": "f637e1d6e2b97b2589ef7c3405714845cb1dcb76b31886240448278257d25c33"
+    },
+    {
+      "from": "docs/m2_attachment_sources.json",
+      "to": "docs/implementation/sources/m2_attachment_sources.json",
+      "before_sha256": "db525b305d162c2a356db97e988b98f4886871d84fd475559011fb1f2d3e5baa",
+      "after_sha256": "db525b305d162c2a356db97e988b98f4886871d84fd475559011fb1f2d3e5baa"
+    },
+    {
+      "from": "docs/m2_audio_stream_sources.json",
+      "to": "docs/implementation/sources/m2_audio_stream_sources.json",
+      "before_sha256": "dd19268d5d20cd96bcb172ca48a366c9de34c719507c876ef7546bf652869a70",
+      "after_sha256": "dd19268d5d20cd96bcb172ca48a366c9de34c719507c876ef7546bf652869a70"
+    },
+    {
+      "from": "docs/m2_blood_splat_sources.json",
+      "to": "docs/implementation/sources/m2_blood_splat_sources.json",
+      "before_sha256": "7c1b9ab50176078b419080a032a489240abf38f7b994d12f9bf6e0d6d6513da2",
+      "after_sha256": "7c1b9ab50176078b419080a032a489240abf38f7b994d12f9bf6e0d6d6513da2"
+    },
+    {
+      "from": "docs/m2_blood_spurt_sources.json",
+      "to": "docs/implementation/sources/m2_blood_spurt_sources.json",
+      "before_sha256": "478ce6adbaba499b4f36843432dd6979cee655c7d4c2fbcd23b72cacfb5243f0",
+      "after_sha256": "478ce6adbaba499b4f36843432dd6979cee655c7d4c2fbcd23b72cacfb5243f0"
+    },
+    {
+      "from": "docs/m2_brush_sources.json",
+      "to": "docs/implementation/sources/m2_brush_sources.json",
+      "before_sha256": "d58489c78628a84423145fdaaf623b0d51f06568b61cd6e1f10f236c11c8ca19",
+      "after_sha256": "d58489c78628a84423145fdaaf623b0d51f06568b61cd6e1f10f236c11c8ca19"
+    },
+    {
+      "from": "docs/m2_builtin_model_sources.json",
+      "to": "docs/implementation/sources/m2_builtin_model_sources.json",
+      "before_sha256": "6566ffdbdcae742ebc15d7f7da1505b25ed8324418ed81237de8668374cfd67c",
+      "after_sha256": "6566ffdbdcae742ebc15d7f7da1505b25ed8324418ed81237de8668374cfd67c"
+    },
+    {
+      "from": "docs/m2_camera_sources.json",
+      "to": "docs/implementation/sources/m2_camera_sources.json",
+      "before_sha256": "e19a47c40ec1ccf68992f5467f10ab52915e928e2dfcad271311836f5945ddf2",
+      "after_sha256": "e19a47c40ec1ccf68992f5467f10ab52915e928e2dfcad271311836f5945ddf2"
+    },
+    {
+      "from": "docs/m2_character_animation_sources.json",
+      "to": "docs/implementation/sources/m2_character_animation_sources.json",
+      "before_sha256": "e4a17ced3d0729cdd50cc3ece9d71ba2c4cdd5bd80e1784d89203bec87fabdda",
+      "after_sha256": "e4a17ced3d0729cdd50cc3ece9d71ba2c4cdd5bd80e1784d89203bec87fabdda"
+    },
+    {
+      "from": "docs/m2_character_audio_sources.json",
+      "to": "docs/implementation/sources/m2_character_audio_sources.json",
+      "before_sha256": "7240c5215c2a82cf3edd6eb9833a98a00678d36abdcb06efb5380450d1c18377",
+      "after_sha256": "7240c5215c2a82cf3edd6eb9833a98a00678d36abdcb06efb5380450d1c18377"
+    },
+    {
+      "from": "docs/m2_character_motion_sources.json",
+      "to": "docs/implementation/sources/m2_character_motion_sources.json",
+      "before_sha256": "85f21144b0b9df0091499306ffb831d0788218463c195d26c41c515b1264b624",
+      "after_sha256": "85f21144b0b9df0091499306ffb831d0788218463c195d26c41c515b1264b624"
+    },
+    {
+      "from": "docs/m2_character_nodes_sources.json",
+      "to": "docs/implementation/sources/m2_character_nodes_sources.json",
+      "before_sha256": "43e1c4e1c17a9ebe836206c0db4ab410cb0f6c6e5f659ef591e9f365625d9180",
+      "after_sha256": "43e1c4e1c17a9ebe836206c0db4ab410cb0f6c6e5f659ef591e9f365625d9180"
+    },
+    {
+      "from": "docs/m2_cinematic_sources.json",
+      "to": "docs/implementation/sources/m2_cinematic_sources.json",
+      "before_sha256": "0fdce2aa808b29ef85ae114d28ac6df268416c868a6541394688704c13ff1d03",
+      "after_sha256": "0fdce2aa808b29ef85ae114d28ac6df268416c868a6541394688704c13ff1d03"
+    },
+    {
+      "from": "docs/m2_cityhub_entry_sources.json",
+      "to": "docs/implementation/sources/m2_cityhub_entry_sources.json",
+      "before_sha256": "194c05fec269ac7973f9c6b600196019a1c71dbf64868ed61530d1254e5e40ef",
+      "after_sha256": "194c05fec269ac7973f9c6b600196019a1c71dbf64868ed61530d1254e5e40ef"
+    },
+    {
+      "from": "docs/m2_collision_traversal_sources.json",
+      "to": "docs/implementation/sources/m2_collision_traversal_sources.json",
+      "before_sha256": "5864f42cba2d13eb551fa4727f220941fbb1602c241f1257b691029feec79f45",
+      "after_sha256": "5864f42cba2d13eb551fa4727f220941fbb1602c241f1257b691029feec79f45"
+    },
+    {
+      "from": "docs/m2_compound_shell_sources.json",
+      "to": "docs/implementation/sources/m2_compound_shell_sources.json",
+      "before_sha256": "e4019070dcc717c05e80ea06c5b21213b357ff954129e68dfa1d0e374f4b98b5",
+      "after_sha256": "e4019070dcc717c05e80ea06c5b21213b357ff954129e68dfa1d0e374f4b98b5"
+    },
+    {
+      "from": "docs/m2_container_index_sources.json",
+      "to": "docs/implementation/sources/m2_container_index_sources.json",
+      "before_sha256": "0a6c744fda297e1e9c0c264980d051af692f6b30ed01798abc269ff4011f620a",
+      "after_sha256": "0a6c744fda297e1e9c0c264980d051af692f6b30ed01798abc269ff4011f620a"
+    },
+    {
+      "from": "docs/m2_container_sources.json",
+      "to": "docs/implementation/sources/m2_container_sources.json",
+      "before_sha256": "faf3d75bb59476524ecdeb583cc6989af51f5ab5f4f9b360e351482a17e32e66",
+      "after_sha256": "faf3d75bb59476524ecdeb583cc6989af51f5ab5f4f9b360e351482a17e32e66"
+    },
+    {
+      "from": "docs/m2_conversation_sources.json",
+      "to": "docs/implementation/sources/m2_conversation_sources.json",
+      "before_sha256": "3ce4c7619c911b1007340ef7bdb2690faf9c092844a7579e0613a7a5b5dc194a",
+      "after_sha256": "3ce4c7619c911b1007340ef7bdb2690faf9c092844a7579e0613a7a5b5dc194a"
+    },
+    {
+      "from": "docs/m2_corpse_placement_sources.json",
+      "to": "docs/implementation/sources/m2_corpse_placement_sources.json",
+      "before_sha256": "bdd851d6ebe5d11d420e99e94ef2762c7d46332c82af05a31b42dd3b0f3511ea",
+      "after_sha256": "bdd851d6ebe5d11d420e99e94ef2762c7d46332c82af05a31b42dd3b0f3511ea"
+    },
+    {
+      "from": "docs/m2_corpse_sources.json",
+      "to": "docs/implementation/sources/m2_corpse_sources.json",
+      "before_sha256": "57fa14e57a7778ee38bff6d3b65e3fa481ca318c69ce2e19fd6ceef22c89bd38",
+      "after_sha256": "57fa14e57a7778ee38bff6d3b65e3fa481ca318c69ce2e19fd6ceef22c89bd38"
+    },
+    {
+      "from": "docs/m2_damage_state_sources.json",
+      "to": "docs/implementation/sources/m2_damage_state_sources.json",
+      "before_sha256": "80c863a14d07d29c8206d931f146b555f1ceee699656cb6c4098a7fa06201c90",
+      "after_sha256": "80c863a14d07d29c8206d931f146b555f1ceee699656cb6c4098a7fa06201c90"
+    },
+    {
+      "from": "docs/m2_death_effects_sources.json",
+      "to": "docs/implementation/sources/m2_death_effects_sources.json",
+      "before_sha256": "be58e2851d51497d564393b2cace6d1b984e4b79f0073fe519459db1d3780e77",
+      "after_sha256": "be58e2851d51497d564393b2cace6d1b984e4b79f0073fe519459db1d3780e77"
+    },
+    {
+      "from": "docs/m2_destination_sources.json",
+      "to": "docs/implementation/sources/m2_destination_sources.json",
+      "before_sha256": "2904f86051db8aa6fe36bba4bfe6e37a01989d6b68bbedf205a8d04de908d6b7",
+      "after_sha256": "2904f86051db8aa6fe36bba4bfe6e37a01989d6b68bbedf205a8d04de908d6b7"
+    },
+    {
+      "from": "docs/m2_destination_trial_sources.json",
+      "to": "docs/implementation/sources/m2_destination_trial_sources.json",
+      "before_sha256": "e215accef84e59ace6048a124f37c9612eb9162750fa023427a1c4047d8cbf57",
+      "after_sha256": "e215accef84e59ace6048a124f37c9612eb9162750fa023427a1c4047d8cbf57"
+    },
+    {
+      "from": "docs/m2_destructable_model_sources.json",
+      "to": "docs/implementation/sources/m2_destructable_model_sources.json",
+      "before_sha256": "1a3102fc9da612f5e511a5438c8e424cce95df49f23121523d7290e3f4f8f126",
+      "after_sha256": "1a3102fc9da612f5e511a5438c8e424cce95df49f23121523d7290e3f4f8f126"
+    },
+    {
+      "from": "docs/m2_door_audio_sources.json",
+      "to": "docs/implementation/sources/m2_door_audio_sources.json",
+      "before_sha256": "44feabd341a6a0817e3c2ec3941f3a6846d798635519dbfdde2f2141a2fb67b1",
+      "after_sha256": "44feabd341a6a0817e3c2ec3941f3a6846d798635519dbfdde2f2141a2fb67b1"
+    },
+    {
+      "from": "docs/m2_door_sources.json",
+      "to": "docs/implementation/sources/m2_door_sources.json",
+      "before_sha256": "3fc707423faae3d76955546924a776c2b26b16acc68ef1b47e6d29f51ffb85d0",
+      "after_sha256": "3fc707423faae3d76955546924a776c2b26b16acc68ef1b47e6d29f51ffb85d0"
+    },
+    {
+      "from": "docs/m2_energy_projectile_sources.json",
+      "to": "docs/implementation/sources/m2_energy_projectile_sources.json",
+      "before_sha256": "ec9638e7ac87b61fed30584a926333145ea330bca0959133afe0a1a33fad0023",
+      "after_sha256": "ec9638e7ac87b61fed30584a926333145ea330bca0959133afe0a1a33fad0023"
+    },
+    {
+      "from": "docs/m2_exit_sources.json",
+      "to": "docs/implementation/sources/m2_exit_sources.json",
+      "before_sha256": "02de92cab13519850defa98d6a69fa0a7c7940a839a965c6ed2c9b4f83781434",
+      "after_sha256": "02de92cab13519850defa98d6a69fa0a7c7940a839a965c6ed2c9b4f83781434"
+    },
+    {
+      "from": "docs/m2_explosion_flame_sources.json",
+      "to": "docs/implementation/sources/m2_explosion_flame_sources.json",
+      "before_sha256": "add13f6aa32df1b024067b2858877efcc66a4b71da6749a15b1e8b0e989e6db3",
+      "after_sha256": "add13f6aa32df1b024067b2858877efcc66a4b71da6749a15b1e8b0e989e6db3"
+    },
+    {
+      "from": "docs/m2_explosion_fragment_sources.json",
+      "to": "docs/implementation/sources/m2_explosion_fragment_sources.json",
+      "before_sha256": "c83ad9cc93d6fdd89d9b0cf79240a6fa84868c99862215c9aed0b2ae1084bdeb",
+      "after_sha256": "c83ad9cc93d6fdd89d9b0cf79240a6fa84868c99862215c9aed0b2ae1084bdeb"
+    },
+    {
+      "from": "docs/m2_explosion_light_sources.json",
+      "to": "docs/implementation/sources/m2_explosion_light_sources.json",
+      "before_sha256": "41720733560c7c327d5e0db7609196181a922a0d4c0e282bf9bf875c880eda54",
+      "after_sha256": "41720733560c7c327d5e0db7609196181a922a0d4c0e282bf9bf875c880eda54"
+    },
+    {
+      "from": "docs/m2_explosion_model_sources.json",
+      "to": "docs/implementation/sources/m2_explosion_model_sources.json",
+      "before_sha256": "0071ca62d705c68e98dfaa68e930a07f3f96d8a0566760baa69133c23c232ce3",
+      "after_sha256": "0071ca62d705c68e98dfaa68e930a07f3f96d8a0566760baa69133c23c232ce3"
+    },
+    {
+      "from": "docs/m2_explosion_ring_sources.json",
+      "to": "docs/implementation/sources/m2_explosion_ring_sources.json",
+      "before_sha256": "040d6a90a325ef323a5a8ba28607d3ad0e9ea3f049a2d5f368cf845bddd41195",
+      "after_sha256": "040d6a90a325ef323a5a8ba28607d3ad0e9ea3f049a2d5f368cf845bddd41195"
+    },
+    {
+      "from": "docs/m2_explosion_sources.json",
+      "to": "docs/implementation/sources/m2_explosion_sources.json",
+      "before_sha256": "69b8dcea4e0aecb464c07332995e02f847991e78541cc47af1ce527c7ab6bc9c",
+      "after_sha256": "69b8dcea4e0aecb464c07332995e02f847991e78541cc47af1ce527c7ab6bc9c"
+    },
+    {
+      "from": "docs/m2_explosion_sprite_sources.json",
+      "to": "docs/implementation/sources/m2_explosion_sprite_sources.json",
+      "before_sha256": "04ab8e7240d0013301eeb8614fbdeee711ecb5882438b9f1cf7cda537dd4801b",
+      "after_sha256": "04ab8e7240d0013301eeb8614fbdeee711ecb5882438b9f1cf7cda537dd4801b"
+    },
+    {
+      "from": "docs/m2_flare_sources.json",
+      "to": "docs/implementation/sources/m2_flare_sources.json",
+      "before_sha256": "f9bc4796d07eaaeff9cacacd3a04ee9413d5dbb84d7a870b231e9050346671b8",
+      "after_sha256": "f9bc4796d07eaaeff9cacacd3a04ee9413d5dbb84d7a870b231e9050346671b8"
+    },
+    {
+      "from": "docs/m2_flashlight_sources.json",
+      "to": "docs/implementation/sources/m2_flashlight_sources.json",
+      "before_sha256": "d653de16041e134f7650207a12fa1e02a5023dcfa45be65c21eb40485a7d61ed",
+      "after_sha256": "d653de16041e134f7650207a12fa1e02a5023dcfa45be65c21eb40485a7d61ed"
+    },
+    {
+      "from": "docs/m2_gideon_attack_sources.json",
+      "to": "docs/implementation/sources/m2_gideon_attack_sources.json",
+      "before_sha256": "982b9f3fe6b455c899aff9e3b11b03cb067e999475390039cd0673bcf444b927",
+      "after_sha256": "982b9f3fe6b455c899aff9e3b11b03cb067e999475390039cd0673bcf444b927"
+    },
+    {
+      "from": "docs/m2_gideon_combat_sources.json",
+      "to": "docs/implementation/sources/m2_gideon_combat_sources.json",
+      "before_sha256": "097d04c511f50eb3a9f7a461421778fce530fecf7a001cfdb9db81a52de90b1d",
+      "after_sha256": "097d04c511f50eb3a9f7a461421778fce530fecf7a001cfdb9db81a52de90b1d"
+    },
+    {
+      "from": "docs/m2_gideon_runtime_sources.json",
+      "to": "docs/implementation/sources/m2_gideon_runtime_sources.json",
+      "before_sha256": "f551c201f5256469c3ac50e6b8c3e2322e28eb23d32bc9e87e1b5a3e687c3324",
+      "after_sha256": "f551c201f5256469c3ac50e6b8c3e2322e28eb23d32bc9e87e1b5a3e687c3324"
+    },
+    {
+      "from": "docs/m2_gideon_teleport_sources.json",
+      "to": "docs/implementation/sources/m2_gideon_teleport_sources.json",
+      "before_sha256": "05cdea898d2fa3ac9e5858b554677d503a426760e13b2cf1a057b073513c11db",
+      "after_sha256": "05cdea898d2fa3ac9e5858b554677d503a426760e13b2cf1a057b073513c11db"
+    },
+    {
+      "from": "docs/m2_hud_sources.json",
+      "to": "docs/implementation/sources/m2_hud_sources.json",
+      "before_sha256": "4882caa045304f19e0856780ae349fe62eb62d467a67bb8cd2185c283b9df9dc",
+      "after_sha256": "4882caa045304f19e0856780ae349fe62eb62d467a67bb8cd2185c283b9df9dc"
+    },
+    {
+      "from": "docs/m2_interaction_sources.json",
+      "to": "docs/implementation/sources/m2_interaction_sources.json",
+      "before_sha256": "a057f2ecb0e949277a054c981ac10c364a0853cac1a8331e2ab9bcef3b62f1e3",
+      "after_sha256": "a057f2ecb0e949277a054c981ac10c364a0853cac1a8331e2ab9bcef3b62f1e3"
+    },
+    {
+      "from": "docs/m2_inventory_state_sources.json",
+      "to": "docs/implementation/sources/m2_inventory_state_sources.json",
+      "before_sha256": "9a2246389ca69a184746bc58be08ba69837ac42edc31574fe2718506f28117c9",
+      "after_sha256": "9a2246389ca69a184746bc58be08ba69837ac42edc31574fe2718506f28117c9"
+    },
+    {
+      "from": "docs/m2_keyframer_sources.json",
+      "to": "docs/implementation/sources/m2_keyframer_sources.json",
+      "before_sha256": "207448f845334413756eba6264659c3ac900583217ef1361471241465df8ec1c",
+      "after_sha256": "207448f845334413756eba6264659c3ac900583217ef1361471241465df8ec1c"
+    },
+    {
+      "from": "docs/m2_level_change_sources.json",
+      "to": "docs/implementation/sources/m2_level_change_sources.json",
+      "before_sha256": "cb3e6495993c24e70fa9f53f660deea15e5e7a3829ca4f12448c5ef537033d88",
+      "after_sha256": "cb3e6495993c24e70fa9f53f660deea15e5e7a3829ca4f12448c5ef537033d88"
+    },
+    {
+      "from": "docs/m2_light_sources.json",
+      "to": "docs/implementation/sources/m2_light_sources.json",
+      "before_sha256": "eb96e663284f605e29ba68fe6e91719155331c6ca9349f57611d661ef8e2f0a8",
+      "after_sha256": "eb96e663284f605e29ba68fe6e91719155331c6ca9349f57611d661ef8e2f0a8"
+    },
+    {
+      "from": "docs/m2_locomotion_sources.json",
+      "to": "docs/implementation/sources/m2_locomotion_sources.json",
+      "before_sha256": "51e10e41e4cb939fadfcf2cd9ea091c824b06554407c706ca8847205b853aaa7",
+      "after_sha256": "51e10e41e4cb939fadfcf2cd9ea091c824b06554407c706ca8847205b853aaa7"
+    },
+    {
+      "from": "docs/m2_mac10_sources.json",
+      "to": "docs/implementation/sources/m2_mac10_sources.json",
+      "before_sha256": "9af1674f6d26ba0278f6706b8de0a473d006a5031b0f1eb16f792560b2b03fc6",
+      "after_sha256": "9af1674f6d26ba0278f6706b8de0a473d006a5031b0f1eb16f792560b2b03fc6"
+    },
+    {
+      "from": "docs/m2_medkit_sources.json",
+      "to": "docs/implementation/sources/m2_medkit_sources.json",
+      "before_sha256": "5ba71b025d87d027e63372b55642e118022109f26bf1f17103aaf303dc4754e9",
+      "after_sha256": "5ba71b025d87d027e63372b55642e118022109f26bf1f17103aaf303dc4754e9"
+    },
+    {
+      "from": "docs/m2_message_lifetime_sources.json",
+      "to": "docs/implementation/sources/m2_message_lifetime_sources.json",
+      "before_sha256": "cdc1526ceaf0d67232d781c0bc4bab5ec5f9ee76517181cd9ca45daef44da366",
+      "after_sha256": "cdc1526ceaf0d67232d781c0bc4bab5ec5f9ee76517181cd9ca45daef44da366"
+    },
+    {
+      "from": "docs/m2_metal_sources.json",
+      "to": "docs/implementation/sources/m2_metal_sources.json",
+      "before_sha256": "5bdc687792861d0a4cc29ac721ed99ec1ef0ab4eac5939003da71cd67704c794",
+      "after_sha256": "5bdc687792861d0a4cc29ac721ed99ec1ef0ab4eac5939003da71cd67704c794"
+    },
+    {
+      "from": "docs/m2_model_preparation_sources.json",
+      "to": "docs/implementation/sources/m2_model_preparation_sources.json",
+      "before_sha256": "e0f2d54990b72c6186cf26fede2ee4acdde80280497924d15d957f69bad4d36e",
+      "after_sha256": "e0f2d54990b72c6186cf26fede2ee4acdde80280497924d15d957f69bad4d36e"
+    },
+    {
+      "from": "docs/m2_model_view_sources.json",
+      "to": "docs/implementation/sources/m2_model_view_sources.json",
+      "before_sha256": "343bd01d5ae623b0088f0524d0faca88e2667234bb9ec0f130ce410d92f6c726",
+      "after_sha256": "343bd01d5ae623b0088f0524d0faca88e2667234bb9ec0f130ce410d92f6c726"
+    },
+    {
+      "from": "docs/m2_movement_sources.json",
+      "to": "docs/implementation/sources/m2_movement_sources.json",
+      "before_sha256": "ba9ffb0fa8db4272e5345606088caf350ec80e436fe53eff54d08eb4c8707756",
+      "after_sha256": "ba9ffb0fa8db4272e5345606088caf350ec80e436fe53eff54d08eb4c8707756"
+    },
+    {
+      "from": "docs/m2_naga_weapon_sources.json",
+      "to": "docs/implementation/sources/m2_naga_weapon_sources.json",
+      "before_sha256": "650d0829da0968ea45419ace68c7efc904f40a6cd2d95360b8063055db83667d",
+      "after_sha256": "650d0829da0968ea45419ace68c7efc904f40a6cd2d95360b8063055db83667d"
+    },
+    {
+      "from": "docs/m2_npc_entry_sources.json",
+      "to": "docs/implementation/sources/m2_npc_entry_sources.json",
+      "before_sha256": "be38bf045a4e120fe9e5c539d71f5fa67aadc9a46e32fe97ee363098bbf9f75f",
+      "after_sha256": "be38bf045a4e120fe9e5c539d71f5fa67aadc9a46e32fe97ee363098bbf9f75f"
+    },
+    {
+      "from": "docs/m2_object_particle_sources.json",
+      "to": "docs/implementation/sources/m2_object_particle_sources.json",
+      "before_sha256": "e3203189f91dbd56a1b6c9bdf749159089dec13d2f8a866d9be52b60a67dc442",
+      "after_sha256": "e3203189f91dbd56a1b6c9bdf749159089dec13d2f8a866d9be52b60a67dc442"
+    },
+    {
+      "from": "docs/m2_objective_sources.json",
+      "to": "docs/implementation/sources/m2_objective_sources.json",
+      "before_sha256": "3e4a19cd5033a531259e41700a3de584604d719b3898c9cdfb8d5b7ae4c1f02b",
+      "after_sha256": "3e4a19cd5033a531259e41700a3de584604d719b3898c9cdfb8d5b7ae4c1f02b"
+    },
+    {
+      "from": "docs/m2_particle_stream_sources.json",
+      "to": "docs/implementation/sources/m2_particle_stream_sources.json",
+      "before_sha256": "e7341b470770673de4707c009b2729432f6c9151e510843c8b01ec26bca31b37",
+      "after_sha256": "e7341b470770673de4707c009b2729432f6c9151e510843c8b01ec26bca31b37"
+    },
+    {
+      "from": "docs/m2_path_manager_sources.json",
+      "to": "docs/implementation/sources/m2_path_manager_sources.json",
+      "before_sha256": "0935e28e55c25cc107a0729acc50b2c67de9c7ebd88f8f6dc5a560bcbc050e70",
+      "after_sha256": "0935e28e55c25cc107a0729acc50b2c67de9c7ebd88f8f6dc5a560bcbc050e70"
+    },
+    {
+      "from": "docs/m2_pickup_audio_sources.json",
+      "to": "docs/implementation/sources/m2_pickup_audio_sources.json",
+      "before_sha256": "d968727ad5a3994317257d473c642603e46edc1eff69456439f93efa6f20e1ba",
+      "after_sha256": "d968727ad5a3994317257d473c642603e46edc1eff69456439f93efa6f20e1ba"
+    },
+    {
+      "from": "docs/m2_pickup_sources.json",
+      "to": "docs/implementation/sources/m2_pickup_sources.json",
+      "before_sha256": "800cb5f4f10ee5c768b413acc31e8846925eec782b339eb4677e01ebdd146c25",
+      "after_sha256": "800cb5f4f10ee5c768b413acc31e8846925eec782b339eb4677e01ebdd146c25"
+    },
+    {
+      "from": "docs/m2_player_control_sources.json",
+      "to": "docs/implementation/sources/m2_player_control_sources.json",
+      "before_sha256": "6f9c31063199270a0f6395d7d7c09858157302759ecca8a186d519bc5e944ac6",
+      "after_sha256": "6f9c31063199270a0f6395d7d7c09858157302759ecca8a186d519bc5e944ac6"
+    },
+    {
+      "from": "docs/m2_player_keepalive_sources.json",
+      "to": "docs/implementation/sources/m2_player_keepalive_sources.json",
+      "before_sha256": "5519df0f8d3d39c71ed46c9fd3a3c9118f9a845bcc6e085632aefbb2d3d0374d",
+      "after_sha256": "5519df0f8d3d39c71ed46c9fd3a3c9118f9a845bcc6e085632aefbb2d3d0374d"
+    },
+    {
+      "from": "docs/m2_player_restore_sources.json",
+      "to": "docs/implementation/sources/m2_player_restore_sources.json",
+      "before_sha256": "85ae180ad7f47ec9b0e73f771975bcd1956f8ed404f822e2589744f048ff573d",
+      "after_sha256": "85ae180ad7f47ec9b0e73f771975bcd1956f8ed404f822e2589744f048ff573d"
+    },
+    {
+      "from": "docs/m2_player_sources.json",
+      "to": "docs/implementation/sources/m2_player_sources.json",
+      "before_sha256": "ed5cde6d63b8b5eed65e5c798584473cd5dc9a712f6e957122eed2663010e937",
+      "after_sha256": "ed5cde6d63b8b5eed65e5c798584473cd5dc9a712f6e957122eed2663010e937"
+    },
+    {
+      "from": "docs/m2_player_state_sources.json",
+      "to": "docs/implementation/sources/m2_player_state_sources.json",
+      "before_sha256": "cbf0376a1819524a4fa4d031cee0dc6ada70ea674ed149a3456e7e806903b0e2",
+      "after_sha256": "cbf0376a1819524a4fa4d031cee0dc6ada70ea674ed149a3456e7e806903b0e2"
+    },
+    {
+      "from": "docs/m2_playtest_input_sources.json",
+      "to": "docs/implementation/sources/m2_playtest_input_sources.json",
+      "before_sha256": "724e290da5350e5f760678a3a626e6adba8d8e58c32079b6e08f8028fafb26f9",
+      "after_sha256": "724e290da5350e5f760678a3a626e6adba8d8e58c32079b6e08f8028fafb26f9"
+    },
+    {
+      "from": "docs/m2_polygrid_sources.json",
+      "to": "docs/implementation/sources/m2_polygrid_sources.json",
+      "before_sha256": "945d54087043cc7941db9e4a800790a6db9093851164a550c631bcdb256a7dd1",
+      "after_sha256": "945d54087043cc7941db9e4a800790a6db9093851164a550c631bcdb256a7dd1"
+    },
+    {
+      "from": "docs/m2_proximity_sources.json",
+      "to": "docs/implementation/sources/m2_proximity_sources.json",
+      "before_sha256": "dccb97a2296f988dd7341b06e488a68d26283dfdab0039681dd39d18b5e65835",
+      "after_sha256": "dccb97a2296f988dd7341b06e488a68d26283dfdab0039681dd39d18b5e65835"
+    },
+    {
+      "from": "docs/m2_pushable_sources.json",
+      "to": "docs/implementation/sources/m2_pushable_sources.json",
+      "before_sha256": "d979a0d7f2b27886d72834cd36db460e88c28e3bd389c84c956b83e7bd171b7e",
+      "after_sha256": "d979a0d7f2b27886d72834cd36db460e88c28e3bd389c84c956b83e7bd171b7e"
+    },
+    {
+      "from": "docs/m2_random_sound_sources.json",
+      "to": "docs/implementation/sources/m2_random_sound_sources.json",
+      "before_sha256": "8499e798a3ec769a909c8049433d052598900e9c34e8acea5b5a324db959e9bc",
+      "after_sha256": "8499e798a3ec769a909c8049433d052598900e9c34e8acea5b5a324db959e9bc"
+    },
+    {
+      "from": "docs/m2_remote_sources.json",
+      "to": "docs/implementation/sources/m2_remote_sources.json",
+      "before_sha256": "4403182578caff0045d8a8885cc46cfd82a9d082fc4852be625ce954e91ca8c6",
+      "after_sha256": "4403182578caff0045d8a8885cc46cfd82a9d082fc4852be625ce954e91ca8c6"
+    },
+    {
+      "from": "docs/m2_scene_explosion_sources.json",
+      "to": "docs/implementation/sources/m2_scene_explosion_sources.json",
+      "before_sha256": "1a41220e5b572ecfdf9032b698c13101962bafdebc84385abf3ec75becf6bda6",
+      "after_sha256": "1a41220e5b572ecfdf9032b698c13101962bafdebc84385abf3ec75becf6bda6"
+    },
+    {
+      "from": "docs/m2_screen_fade_sources.json",
+      "to": "docs/implementation/sources/m2_screen_fade_sources.json",
+      "before_sha256": "20c88c576ec0cdeb85328e4af5d19164c5507a725050bfd01f4d08296ba512c6",
+      "after_sha256": "20c88c576ec0cdeb85328e4af5d19164c5507a725050bfd01f4d08296ba512c6"
+    },
+    {
+      "from": "docs/m2_services_sources.json",
+      "to": "docs/implementation/sources/m2_services_sources.json",
+      "before_sha256": "7d0ffc84003c6d84407de4e30db984bfba930a67fa213ded7f2510c21e741a7a",
+      "after_sha256": "7d0ffc84003c6d84407de4e30db984bfba930a67fa213ded7f2510c21e741a7a"
+    },
+    {
+      "from": "docs/m2_shield_weapon_sources.json",
+      "to": "docs/implementation/sources/m2_shield_weapon_sources.json",
+      "before_sha256": "881a63c9ea6c7766ab223c522a8ead2ba0048481679341949ea2887635061b34",
+      "after_sha256": "881a63c9ea6c7766ab223c522a8ead2ba0048481679341949ea2887635061b34"
+    },
+    {
+      "from": "docs/m2_sky_sources.json",
+      "to": "docs/implementation/sources/m2_sky_sources.json",
+      "before_sha256": "b86c8e8a50bf52f411e65e8b75f5b1d462f491df5c21c8bef650ce46bb8475d1",
+      "after_sha256": "b86c8e8a50bf52f411e65e8b75f5b1d462f491df5c21c8bef650ce46bb8475d1"
+    },
+    {
+      "from": "docs/m2_sound_fx_sources.json",
+      "to": "docs/implementation/sources/m2_sound_fx_sources.json",
+      "before_sha256": "e6f28c90d723b1007aa04d0c2fa332a87357b9d135a71c71b146534f86d14adb",
+      "after_sha256": "e6f28c90d723b1007aa04d0c2fa332a87357b9d135a71c71b146534f86d14adb"
+    },
+    {
+      "from": "docs/m2_sources.json",
+      "to": "docs/implementation/sources/m2_sources.json",
+      "before_sha256": "e0348bee7e6bc7a876ae085785a0dd7e6b0b00c131282372933d2a9210941104",
+      "after_sha256": "e0348bee7e6bc7a876ae085785a0dd7e6b0b00c131282372933d2a9210941104"
+    },
+    {
+      "from": "docs/m2_spark_sources.json",
+      "to": "docs/implementation/sources/m2_spark_sources.json",
+      "before_sha256": "78af92642c9dd52a2bc81fbb80637ade403438b6614872bedaf1fcaf62617969",
+      "after_sha256": "78af92642c9dd52a2bc81fbb80637ade403438b6614872bedaf1fcaf62617969"
+    },
+    {
+      "from": "docs/m2_specialized_volume_sources.json",
+      "to": "docs/implementation/sources/m2_specialized_volume_sources.json",
+      "before_sha256": "863d0efd5ca6df974ec53c7270a8499b9ab32b0564358851d41dea2c19a3e1cc",
+      "after_sha256": "863d0efd5ca6df974ec53c7270a8499b9ab32b0564358851d41dea2c19a3e1cc"
+    },
+    {
+      "from": "docs/m2_sprite_sources.json",
+      "to": "docs/implementation/sources/m2_sprite_sources.json",
+      "before_sha256": "197968c35f7ed68d57f142cd6ea55c69513230e5721b998fd85aeeda0cc79b0a",
+      "after_sha256": "197968c35f7ed68d57f142cd6ea55c69513230e5721b998fd85aeeda0cc79b0a"
+    },
+    {
+      "from": "docs/m2_sprite_view_sources.json",
+      "to": "docs/implementation/sources/m2_sprite_view_sources.json",
+      "before_sha256": "138b82367953593f7f43670dd2bf1fa53ed22087b5e6a9996bdabf3db7b9c2f2",
+      "after_sha256": "138b82367953593f7f43670dd2bf1fa53ed22087b5e6a9996bdabf3db7b9c2f2"
+    },
+    {
+      "from": "docs/m2_surface_effect_sources.json",
+      "to": "docs/implementation/sources/m2_surface_effect_sources.json",
+      "before_sha256": "9b2fb511d349160d3799393ad62e2707347663d442cf3312698d48f959a6093a",
+      "after_sha256": "9b2fb511d349160d3799393ad62e2707347663d442cf3312698d48f959a6093a"
+    },
+    {
+      "from": "docs/m2_trigger_sources.json",
+      "to": "docs/implementation/sources/m2_trigger_sources.json",
+      "before_sha256": "633934554a798faf9b1f342d23aadaa2cac8058bbcc1b370a3617634711f4e6a",
+      "after_sha256": "633934554a798faf9b1f342d23aadaa2cac8058bbcc1b370a3617634711f4e6a"
+    },
+    {
+      "from": "docs/m2_weapon_audio_sources.json",
+      "to": "docs/implementation/sources/m2_weapon_audio_sources.json",
+      "before_sha256": "db1288675a9d44c7b435eaa1931254702c9db9291bb96c6764b905a1945a840e",
+      "after_sha256": "db1288675a9d44c7b435eaa1931254702c9db9291bb96c6764b905a1945a840e"
+    },
+    {
+      "from": "docs/m2_weapon_drop_sources.json",
+      "to": "docs/implementation/sources/m2_weapon_drop_sources.json",
+      "before_sha256": "13e110a41741b3cd1595131494883b9857ed46d95e76b2971b00eda38b47364b",
+      "after_sha256": "13e110a41741b3cd1595131494883b9857ed46d95e76b2971b00eda38b47364b"
+    },
+    {
+      "from": "docs/m2_weapon_impact_sources.json",
+      "to": "docs/implementation/sources/m2_weapon_impact_sources.json",
+      "before_sha256": "2065698d4b3b1c05bd4c91295d745fb97d69ffff18bafed3f8963558c899f4a4",
+      "after_sha256": "2065698d4b3b1c05bd4c91295d745fb97d69ffff18bafed3f8963558c899f4a4"
+    },
+    {
+      "from": "docs/m2_weapon_sources.json",
+      "to": "docs/implementation/sources/m2_weapon_sources.json",
+      "before_sha256": "345784fdfd5ce356598382d29091da6f8db34abecbaa4b9536f7e96f3f5435b3",
+      "after_sha256": "345784fdfd5ce356598382d29091da6f8db34abecbaa4b9536f7e96f3f5435b3"
+    },
+    {
+      "from": "docs/m2_weapon_sprite_sources.json",
+      "to": "docs/implementation/sources/m2_weapon_sprite_sources.json",
+      "before_sha256": "3b5490d9af478695c31d0f08bb67ca262aedf958069c7089f225ffac9e44f487",
+      "after_sha256": "3b5490d9af478695c31d0f08bb67ca262aedf958069c7089f225ffac9e44f487"
+    },
+    {
+      "from": "docs/m2_wind_weapon_sources.json",
+      "to": "docs/implementation/sources/m2_wind_weapon_sources.json",
+      "before_sha256": "e34b99a6619a3fa0f5b1f8712d16c71c9ea6fc6355fcc556474c7009ec9a6f96",
+      "after_sha256": "e34b99a6619a3fa0f5b1f8712d16c71c9ea6fc6355fcc556474c7009ec9a6f96"
+    },
+    {
+      "from": "docs/m2_world_alpha_sources.json",
+      "to": "docs/implementation/sources/m2_world_alpha_sources.json",
+      "before_sha256": "0b10baf8ffc90f429cfe147c8d6a9d5d03136469239d5c980502edc9e1ba75b5",
+      "after_sha256": "0b10baf8ffc90f429cfe147c8d6a9d5d03136469239d5c980502edc9e1ba75b5"
+    },
+    {
+      "from": "docs/m2_world_debris_sources.json",
+      "to": "docs/implementation/sources/m2_world_debris_sources.json",
+      "before_sha256": "28ebd8001170a418e2d48bc0c937fdbee4ccf0abadc481f98b64e344c9c7adb8",
+      "after_sha256": "28ebd8001170a418e2d48bc0c937fdbee4ccf0abadc481f98b64e344c9c7adb8"
+    },
+    {
+      "from": "docs/m2_world_sound_sources.json",
+      "to": "docs/implementation/sources/m2_world_sound_sources.json",
+      "before_sha256": "f95a7dca60a6b9be61f7a4d3425202bc863e41456a27b4dcd1ca1af939aa92e6",
+      "after_sha256": "f95a7dca60a6b9be61f7a4d3425202bc863e41456a27b4dcd1ca1af939aa92e6"
+    },
+    {
+      "from": "docs/m2_worldpath_sources.json",
+      "to": "docs/implementation/sources/m2_worldpath_sources.json",
+      "before_sha256": "defc6b383b356f4bf213ded005c81580547c786526a88fe35e07e71971ebf53e",
+      "after_sha256": "defc6b383b356f4bf213ded005c81580547c786526a88fe35e07e71971ebf53e"
+    },
+    {
+      "from": "docs/mac10_contracts.md",
+      "to": "docs/contracts/mac10_contracts.md",
+      "before_sha256": "093467bec11e1b053387ce65bcfbd99e19c607e7e1a3ec6f6ee293ddc277fddc",
+      "after_sha256": "e4ae2256dce5f22d67403fbd7269fb6e51001f4ab39b72c660fa05374c223589"
+    },
+    {
+      "from": "docs/medkit_contracts.md",
+      "to": "docs/contracts/medkit_contracts.md",
+      "before_sha256": "de93ab257bf71145b12be041ac5eab6bd5b5110134b1aadd00fc2368f5b2b7f6",
+      "after_sha256": "989e410c7b29be0bcfddbc4fa1f43bd8619b50664aaf06393f7e61105527c1b3"
+    },
+    {
+      "from": "docs/message_lifetime_contracts.md",
+      "to": "docs/contracts/message_lifetime_contracts.md",
+      "before_sha256": "57533b7b15b32b05c6f86fad34bfb3f2150a27b554abd53fcd4dfe7db08ee913",
+      "after_sha256": "fcc1a2cd07602a7de132aae9270b8a7c4929d67750be5cd6ad784c0788f55d4f"
+    },
+    {
+      "from": "docs/metal_shader_contracts.md",
+      "to": "docs/contracts/metal_shader_contracts.md",
+      "before_sha256": "0d10087f901d121a7b4f6a0b4a1e17a2c803437e3b6ab6b0e7c8ede9836e55e1",
+      "after_sha256": "35a004308f26a0f289d3b734b6e8ce3939304fc35ba1eba0d2335d3e4ed95ce2"
+    },
+    {
+      "from": "docs/model_and_collision_contracts.md",
+      "to": "docs/contracts/model_and_collision_contracts.md",
+      "before_sha256": "03148e6c87dcd750cc30bec9360394dea8a9f7de3b4374c2327f61851e6f9fe9",
+      "after_sha256": "0d25e744730a69cfc26430f55bb6992e38c454697784808d6bb494393c275ee9"
+    },
+    {
+      "from": "docs/model_preparation_contracts.md",
+      "to": "docs/contracts/model_preparation_contracts.md",
+      "before_sha256": "191b6bf3fabf3c8d75050432a9a694078df5eb32cbc7885e7318e64f1fe048de",
+      "after_sha256": "ef9bbebd0398332fa56d7161998b00d9cfad4f62fd06748cd90de8eb2e725566"
+    },
+    {
+      "from": "docs/model_view_contracts.md",
+      "to": "docs/contracts/model_view_contracts.md",
+      "before_sha256": "be9fb5258e29f94c3d95bbf2fe13ae840e5b71281bfc6820022d0ba05a4b1f7e",
+      "after_sha256": "17566a0e3777a6c2b3dd32f0781602e3f15dba6ba874e4b93553b87284dd26bc"
+    },
+    {
+      "from": "docs/movement_contracts.md",
+      "to": "docs/contracts/movement_contracts.md",
+      "before_sha256": "9aed74f6063d39b5a609be088f0a38181c1decbd4ae9158b9ac05a544f002d9e",
+      "after_sha256": "166dbc177148c3a93ac5bdd85078185556177a482c506dd0d8dae994af302df8"
+    },
+    {
+      "from": "docs/naga_weapon_contracts.md",
+      "to": "docs/contracts/naga_weapon_contracts.md",
+      "before_sha256": "6de2398ce68b8f72f26bcb4991c8008988d3a99206b1672e0e44d5d483b8a238",
+      "after_sha256": "4c6d0cfd1bf2eee0fca1a2653db89aeb7683864c573460a3ce79446ab29f163b"
+    },
+    {
+      "from": "docs/object_contracts.md",
+      "to": "docs/contracts/object_contracts.md",
+      "before_sha256": "4a4f22519e1a7c94ffac01b655589190e451a32a6c64d48f45595fb6b9633b30",
+      "after_sha256": "666c124e9bd746260e2bf75311f9df69dd77c8828faa27b4abeafac0b4699097"
+    },
+    {
+      "from": "docs/object_particle_contracts.md",
+      "to": "docs/contracts/object_particle_contracts.md",
+      "before_sha256": "b104db05a630d98f1d3c19f622b676e2f4000428ad661b72d14d6a15ddf2447c",
+      "after_sha256": "61037a9e5bc9d79471a0e684580b0a2f2e72f19ac13e1013b43d6a160c0ff0d8"
+    },
+    {
+      "from": "docs/objectives_contracts.md",
+      "to": "docs/contracts/objectives_contracts.md",
+      "before_sha256": "f597e6d51366fd5c101d95502c3e6e30c237afcd28f6ae6689eb3ac583f63780",
+      "after_sha256": "c118ee367723c3c24125486ae5480f461a5149ee3baf754cc4df6714e6a70567"
+    },
+    {
+      "from": "docs/original_sources.json",
+      "to": "docs/implementation/sources/original_sources.json",
+      "before_sha256": "a93a4fdce2aefb20cd2805356b63c8f26f8885730a133d9c0f47d735c81a6a76",
+      "after_sha256": "a93a4fdce2aefb20cd2805356b63c8f26f8885730a133d9c0f47d735c81a6a76"
+    },
+    {
+      "from": "docs/particle_stream_contracts.md",
+      "to": "docs/contracts/particle_stream_contracts.md",
+      "before_sha256": "7823984b4d38008b17fc7db92115c0b02e6b77ebb61a19127f3f2b21905a4473",
+      "after_sha256": "ed29e6a879a3d358a4ddba445a19569635c600f27f8681e580ad4346f0220147"
+    },
+    {
+      "from": "docs/path_manager_contracts.md",
+      "to": "docs/contracts/path_manager_contracts.md",
+      "before_sha256": "c22d2aaadee3557cac7f42c669c79b996cfb52a9beda16dd14d76e964aa4ba36",
+      "after_sha256": "7e4136ee7161fb580524402dfe2c2fe44144024460591ac24e1c4c329d19e1f0"
+    },
+    {
+      "from": "docs/pickup_audio_contracts.md",
+      "to": "docs/contracts/pickup_audio_contracts.md",
+      "before_sha256": "73e2cb03f0ce539eaf044f1f529dc4b5a711e9ad3f04bebf53aad85e8220af80",
+      "after_sha256": "91991c8ffbafd3cc9c03be912eb96c1f7b3a3bf4dc1fe087d59ad4dad9790c59"
+    },
+    {
+      "from": "docs/pickup_contracts.md",
+      "to": "docs/contracts/pickup_contracts.md",
+      "before_sha256": "05013d587dde2925b26a7dd31105a8bb72cb09da43b0c54b13761c41ab2190d8",
+      "after_sha256": "66cd997c013192dbd19e7c0fb1ee06d43120ae3be51d488a53e8a7b6b3536b20"
+    },
+    {
+      "from": "docs/player_contracts.md",
+      "to": "docs/contracts/player_contracts.md",
+      "before_sha256": "936a428b8edfaed9b3692c408852f127d9e72f58bb8ed8fe61d8aaf6585d61d4",
+      "after_sha256": "074f8db79549790ceb861276d3d60c28bdb58e1e21da45b9db61bbbef1c0c3c4"
+    },
+    {
+      "from": "docs/player_control_contracts.md",
+      "to": "docs/contracts/player_control_contracts.md",
+      "before_sha256": "2145ff43f3e8a3c613e216951fc7dcf60edc167ddbe23b350f979a25d97fd6ac",
+      "after_sha256": "ea02dfb68f694a0583222c71244f7ef75505b3af5d0915b4a8ee12f2f54e460d"
+    },
+    {
+      "from": "docs/player_keepalive_contracts.md",
+      "to": "docs/contracts/player_keepalive_contracts.md",
+      "before_sha256": "976b430ae859f23e77d519b924508f8c37d47e246654adb9cdb15246760f5fef",
+      "after_sha256": "ac2986cbef365b9678e034d7d08bcc6684adde63dd529fc698a4454ab4133420"
+    },
+    {
+      "from": "docs/player_restore_contracts.md",
+      "to": "docs/contracts/player_restore_contracts.md",
+      "before_sha256": "d006de9ca02a6d7dc1807608f9c0b843c7f57c18f1b5e8c19e48fd7e3d37c726",
+      "after_sha256": "d006de9ca02a6d7dc1807608f9c0b843c7f57c18f1b5e8c19e48fd7e3d37c726"
+    },
+    {
+      "from": "docs/player_state_contracts.md",
+      "to": "docs/contracts/player_state_contracts.md",
+      "before_sha256": "e110f3b44eff5546309381791a568f4c195a34892d478427d9f2c6d5e26268f7",
+      "after_sha256": "e8b248b6cb715bf164bc5183cf41bb462d9c1058c26128ba871770fbe975334a"
+    },
+    {
+      "from": "docs/playtest_input_contracts.md",
+      "to": "docs/contracts/playtest_input_contracts.md",
+      "before_sha256": "c351837a0e8841eefc57437c9507f7f188f2ecb258f055786e563fe27e0839a3",
+      "after_sha256": "c7d78e6feb300a855efc5cf96e33850ddfb7d215c1e0477958a233d299efe690"
+    },
+    {
+      "from": "docs/polygrid_contracts.md",
+      "to": "docs/contracts/polygrid_contracts.md",
+      "before_sha256": "b3ff8afa93662d5cc9efb2e075d2afb56cc11d7614972970bea0dd0c321d9b4f",
+      "after_sha256": "2b8cc31afdf7769378525a6673fd74a827858e1af761c4ff1c0239ee1533978c"
+    },
+    {
+      "from": "docs/provenance.md",
+      "to": "docs/implementation/provenance.md",
+      "before_sha256": "69352228303fac0f80a68ed87412d7567b286d2eef1674cda6cf95598376e651",
+      "after_sha256": "85eb4d575c6c42c29bed9fd154c58ee2d5b006ce911b8c4a70c7f2c396803777"
+    },
+    {
+      "from": "docs/proximity_contracts.md",
+      "to": "docs/contracts/proximity_contracts.md",
+      "before_sha256": "5420ac9c3128c21499bbe2bb9bf93e4eadf4a86d54ea85c51ad5492f96b44092",
+      "after_sha256": "ff285a6f87c577badd17770f8139eaddbf90d9bae3499068c83c87471110d1be"
+    },
+    {
+      "from": "docs/pushable_contracts.md",
+      "to": "docs/contracts/pushable_contracts.md",
+      "before_sha256": "ab3d5da27ac826c7570c92f7ed04d166372fa1c3824a99555f8bf2d4cac2c299",
+      "after_sha256": "27177bf6156ccc6506e6bb41b97ac522c3050952bae63b3df986138d6678d600"
+    },
+    {
+      "from": "docs/random_sound_contracts.md",
+      "to": "docs/contracts/random_sound_contracts.md",
+      "before_sha256": "8963fc186d0b6acbd21a452204179e4cecae8ea59e2be1da49578580a30f7a32",
+      "after_sha256": "2b0e2877dc5b92085a6da2db6f054de27d06c2f58890059e402cf9c4986a8dec"
+    },
+    {
+      "from": "docs/remote_bomb_contracts.md",
+      "to": "docs/contracts/remote_bomb_contracts.md",
+      "before_sha256": "14c682c802f786ad8d113ba54f1690c7d7a64ba6640eee2dddeb173b8d9b22e8",
+      "after_sha256": "40cc557367355f80913fd52ad5f11d03959a70b850d154e6ed1d809c3bd67265"
+    },
+    {
+      "from": "docs/scene_explosion_contracts.md",
+      "to": "docs/contracts/scene_explosion_contracts.md",
+      "before_sha256": "c555b8a4bda8ac5b05e251c0b2fd694c7e369a6f475fa4653b5ecea8cdbc1e2b",
+      "after_sha256": "84b2f7d61d544dada43b385f7d8380c906cac0387459fb4da9dc57963c4ab7b3"
+    },
+    {
+      "from": "docs/screen_fade_contracts.md",
+      "to": "docs/contracts/screen_fade_contracts.md",
+      "before_sha256": "f62356040b5fd7a39d130c9dfa9487da75c1b2ae9569fc4fc937a45419d20ad6",
+      "after_sha256": "f62356040b5fd7a39d130c9dfa9487da75c1b2ae9569fc4fc937a45419d20ad6"
+    },
+    {
+      "from": "docs/service_coverage_contracts.md",
+      "to": "docs/contracts/service_coverage_contracts.md",
+      "before_sha256": "cbc60d2e6683382ceede652656e72b7848f7f9c8dd22b8b71efcaa8434468c19",
+      "after_sha256": "4520ba154197d46f30c68674917b1ba2a389deeedc4f64889112e5e934a3682c"
+    },
+    {
+      "from": "docs/session_playback_contracts.md",
+      "to": "docs/contracts/session_playback_contracts.md",
+      "before_sha256": "4920a3058a7f356644ba25df439821cc3e40a0ba8c9a45b93b5453ad29923bef",
+      "after_sha256": "d658b44bbfbc32e8c222bc3c7e445e24c82c6faf4cc6d0c60383767afcb47971"
+    },
+    {
+      "from": "docs/shield_weapon_contracts.md",
+      "to": "docs/contracts/shield_weapon_contracts.md",
+      "before_sha256": "08e0f813ebd709fd5cf70ead5928213fd6f17db32f4ec0307e7c2b36aa11518f",
+      "after_sha256": "3a31ae1be080f46ffa4d69eb88b709e69a27d74c6aecb81be11c01e4508e5550"
+    },
+    {
+      "from": "docs/sky_contracts.md",
+      "to": "docs/contracts/sky_contracts.md",
+      "before_sha256": "1ba684cb8b91be540bf9714e589604a6d9c5c150089acddd20d1c05d18d4f2dc",
+      "after_sha256": "3a1ae3e85b31ad7bf4137e43276c10e487acf11d3eb2e48e8b1db3e540f26ada"
+    },
+    {
+      "from": "docs/sound_fx_contracts.md",
+      "to": "docs/contracts/sound_fx_contracts.md",
+      "before_sha256": "4fcff4ab7f7f00fb671d1b62687ca2cb1d27cf867d2afbb784790eb017990423",
+      "after_sha256": "ac5918ba53e303d9145a67c8d0cd0670658308991cefd2cdcebf6f902139ca80"
+    },
+    {
+      "from": "docs/spark_contracts.md",
+      "to": "docs/contracts/spark_contracts.md",
+      "before_sha256": "a122a29a6de67796a0a5ed0a3662b1a46abc02c6616975a6a47cd137903e4cfd",
+      "after_sha256": "3c578db3e1f2d9424d316f1e01addd3d7ec43601ee0ff640c16404d620016961"
+    },
+    {
+      "from": "docs/specialized_volume_contracts.md",
+      "to": "docs/contracts/specialized_volume_contracts.md",
+      "before_sha256": "17841426dbbf2019001f6128c26f341bbbb4dd1177de0ea856fc436b510624ec",
+      "after_sha256": "10dfb7558f1301c51aefabf773f278b627fcc2ac9f25f7624c3177dda0214f88"
+    },
+    {
+      "from": "docs/sprite_contracts.md",
+      "to": "docs/contracts/sprite_contracts.md",
+      "before_sha256": "a4366319bf7ea8f9bff195ab03b51e74103c2d04283d75d1470c433a4c4a3200",
+      "after_sha256": "cd374c3eed5b91f4cc83dd395ae390070195d28c9c6e9c9b0d8e99dbe20897b5"
+    },
+    {
+      "from": "docs/sprite_view_contracts.md",
+      "to": "docs/contracts/sprite_view_contracts.md",
+      "before_sha256": "6c1c0958e5bd57547ab4c5ec10201ab74d90b6f2e1aa19869d63a965da3a1578",
+      "after_sha256": "d7d8272a48472ef756929e864599a058dfc7e4fa2ec5dc1c53fa4e52c2efa183"
+    },
+    {
+      "from": "docs/surface_effect_contracts.md",
+      "to": "docs/contracts/surface_effect_contracts.md",
+      "before_sha256": "7b6d85c0c340c86ba9c665fa2c5c3aa9ff4072ef88b84d7f82ccac76f5b7a24d",
+      "after_sha256": "6ca5b3b729caaba1cb7b5ddd9c0d8fd28db9f4c36b1bf62c69bdf45c847203a2"
+    },
+    {
+      "from": "docs/texture_contracts.md",
+      "to": "docs/contracts/texture_contracts.md",
+      "before_sha256": "683e831279e6b56af4dd5ac4e83eaeb5de6a2a3cc5be9839727144952d0e3465",
+      "after_sha256": "34d5c0c4829a95c7b8599c3e203bd9dd7932fe64170e7fb90a1b6e1d6b714ce7"
+    },
+    {
+      "from": "docs/trigger_contracts.md",
+      "to": "docs/contracts/trigger_contracts.md",
+      "before_sha256": "d770cc9ad01abc49472c5cee44dfcae2d0b38f1d303098a2b054895e14d94c31",
+      "after_sha256": "a60abc76ee1a3999d74b14982924192b8ccd02d61bda35e033930b79e10bce4b"
+    },
+    {
+      "from": "docs/weapon_audio_contracts.md",
+      "to": "docs/contracts/weapon_audio_contracts.md",
+      "before_sha256": "9cf1c8adb713234eeb197b441a1eefc38d30c986cc97a3140dac279bb2cfcec1",
+      "after_sha256": "e48aa9da4f63d6631fdcb00c58d019c7e23684bec204f70a62e54cfa40560ee2"
+    },
+    {
+      "from": "docs/weapon_contracts.md",
+      "to": "docs/contracts/weapon_contracts.md",
+      "before_sha256": "e8daa2e76e6b16c0c02e082a9583a549ebaf8ee603dfa9878ea3597147f18a2d",
+      "after_sha256": "b95d789d62d252b65ef578a920c5fcffd7fdf724ac3f5de453f51a3ff380b6fe"
+    },
+    {
+      "from": "docs/weapon_drop_contracts.md",
+      "to": "docs/contracts/weapon_drop_contracts.md",
+      "before_sha256": "03b0334b8962da0c70c4b4cbfc31ad2d041afb72295cec8ac1ebbb907c026bdb",
+      "after_sha256": "ab2ab9463b09248ae1086b2aa4a0db327a854fe664159ae637f3f7e9d5766e95"
+    },
+    {
+      "from": "docs/weapon_impact_contracts.md",
+      "to": "docs/contracts/weapon_impact_contracts.md",
+      "before_sha256": "ee3d81d2f42a43254b55e190e76c046fce4c8c7e912babecf1097f32f54f6540",
+      "after_sha256": "305c5d182c20786f1e5516567f82d82382c283e20e70ed1b772f7a680a9d6275"
+    },
+    {
+      "from": "docs/weapon_sprite_contracts.md",
+      "to": "docs/contracts/weapon_sprite_contracts.md",
+      "before_sha256": "aac487c577e05dac630d30f570cee7e44b18fb02d553ab9fed459bcb7e5323e8",
+      "after_sha256": "7efb7e6c392d6d6795d6817c8549cc3bf784d5297f93b07e9a5554377a12e079"
+    },
+    {
+      "from": "docs/wind_weapon_contracts.md",
+      "to": "docs/contracts/wind_weapon_contracts.md",
+      "before_sha256": "5bb250da947ce510ab81189cd623dc3403a7ab2df855856e26b31711f876ddb9",
+      "after_sha256": "82fd2a4c877468931b161b7d978f1c2b1841ff3100261fbe94c6a011a75ead59"
+    },
+    {
+      "from": "docs/world_alpha_contracts.md",
+      "to": "docs/contracts/world_alpha_contracts.md",
+      "before_sha256": "a39dbc92f780fe3739b12bc402b6aed900e223e2702a503bb78b3baf94f3efe6",
+      "after_sha256": "b9c84be4e3584660a5aae546097413557b1583835c35e80a25a22c386f25ceb4"
+    },
+    {
+      "from": "docs/world_contracts.md",
+      "to": "docs/contracts/world_contracts.md",
+      "before_sha256": "900d6deddfa62c05168b5e17eb7317445893fda1baf98eba856e776b09ff0a24",
+      "after_sha256": "900d6deddfa62c05168b5e17eb7317445893fda1baf98eba856e776b09ff0a24"
+    },
+    {
+      "from": "docs/world_debris_contracts.md",
+      "to": "docs/contracts/world_debris_contracts.md",
+      "before_sha256": "0b0eb9c83e9f419be9487eb21063bf051d4a04274ca6b3748fa784b4c72a8fc2",
+      "after_sha256": "c522a127f7117d03a7e63902a73676107b36605427890978e6759235e79ce25a"
+    },
+    {
+      "from": "docs/world_sound_contracts.md",
+      "to": "docs/contracts/world_sound_contracts.md",
+      "before_sha256": "1ed9ffc9f1bbcfde6e0444a719b36e9aea9c73ae5cef4474545b0af593d31980",
+      "after_sha256": "18f228b69bfecc6e2df66488159be3bcbf059118589f9a8cfc19bec8a900231c"
+    },
+    {
+      "from": "docs/world_view_contracts.md",
+      "to": "docs/contracts/world_view_contracts.md",
+      "before_sha256": "40d624306cc8b81f9c2d0675d6fa1af893410c9b7344391156fca39ff723794f",
+      "after_sha256": "86feac706f26da4df663e49be351b11bca6b604ae4ea9c6d920ab20aea83cfe1"
+    },
+    {
+      "from": "docs/worldpath_contracts.md",
+      "to": "docs/contracts/worldpath_contracts.md",
+      "before_sha256": "2fd2de7e06fabede0dc1115bbf5f0a8efd7f662e5a7f9a6eee8b8a3a4a112fb7",
+      "after_sha256": "6e47c41d64d757da9b9aa3765d36f439779b572aa636c0f7bcef8442d27f87b3"
+    }
+  ],
+  "comment_only_files": [
+    "src/game/legacy/basedefs_de.h",
+    "src/game/original/CharacterSound.cpp",
+    "src/game/original/MoveMgr.cpp",
+    "src/game/original/PathMgr.cpp",
+    "src/game/original/PickupObject.h",
+    "src/game/original/PlayerLocomotion.cpp",
+    "src/game/original/PlayerObj.cpp",
+    "src/game/original/SoundFX.cpp",
+    "src/game/original/WorldModelDebris.cpp",
+    "src/game/original/trigger_helpers.cpp"
+  ],
+  "status": "verified documentation-only change; M2 remains incomplete",
+  "root_guides": [
+    "docs/readme.md",
+    "docs/getting_started.md",
+    "docs/architecture.md",
+    "docs/contributing.md"
+  ],
+  "contracts": 125,
+  "source_ledgers": 121,
+  "baseline_commits": {
+    "Blood2": "ff631744ca511648e40c30a1be35f0c636dad882",
+    "workspace": "13c9f69bbd4325915531802f0b2c3b45f920c1f2"
+  },
+  "implementation_commit": "db8170fd712440d16466605e5761cba0200e34cb",
+  "verification": {
+    "valid_local_markdown_links": 3572,
+    "moved_files": 247,
+    "byte_identical_source_ledgers": 121,
+    "historical_evidence": "unchanged",
+    "stale_maintained_doc_paths": 0,
+    "comment_only_cpp_files": 10,
+    "executable_cpp_text": "unchanged",
+    "clang_format": "passed for all changed C++ comment files",
+    "blood2_staged_diff_check": "passed",
+    "reference_integrity": {
+      "checked_inventory_files": 10923,
+      "changed_files": [],
+      "reference_repositories": [
+        {
+          "path": "OpenBlood2",
+          "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+          "status": ""
+        },
+        {
+          "path": "NoMadEngine",
+          "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+          "status": ""
+        },
+        {
+          "path": "nomad",
+          "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+          "status": ""
+        },
+        {
+          "path": "sources/blood2",
+          "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+          "status": ""
+        },
+        {
+          "path": "sources/Shogo_Aegis",
+          "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+          "status": ""
+        },
+        {
+          "path": "sources/lithtech",
+          "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+          "status": ""
+        }
+      ]
+    },
+    "build_and_runtime_tests": "not rerun: documentation and comment-only changes; preceding execution evidence is m2_door_audio.md"
+  }
+}

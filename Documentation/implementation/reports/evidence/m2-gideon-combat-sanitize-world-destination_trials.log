@@ -1,0 +1,22 @@
+24/618 Testing: world.destination_trials
+24/618 Test: world.destination_trials
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "destination_trials" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/destination_trials"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.destination_trials" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+trial4: loaded=1 entered=1 cleanup=1 failed=1 error=
+trial2: loaded=1 entered=0 cleanup=1 failed=0 error=No single-player GameStartPoint
+trial3: loaded=1 entered=0 cleanup=1 failed=0 error=Start point has no supported ground collision
+broken: loaded=0 entered=0 cleanup=1 failed=0 error=DAT v56: invalid/unsupported section offsets near byte 4
+missing: loaded=0 entered=0 cleanup=1 failed=0 error=Resource not found: worlds/missing.dat
+trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+PASS destination_trials
+<end of output>
+Test time =   0.18 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_trials" end time: Oct 17 02:23 CEST
+"world.destination_trials" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+473/701 Testing: ai_runtime.camera
+473/701 Test: ai_runtime.camera
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests" "camera"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_runtime.camera" start time: Oct 17 04:05 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.camera" end time: Oct 17 04:05 CEST
+"ai_runtime.camera" time elapsed: 00:00:00
+----------------------------------------------------------

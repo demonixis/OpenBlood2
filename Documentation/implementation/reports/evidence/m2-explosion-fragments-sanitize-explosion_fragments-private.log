@@ -1,0 +1,40 @@
+540/540 Testing: explosion_fragments.private
+540/540 Test: explosion_fragments.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_fragment_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_fragments.private" start time: Oct 16 21:30 CEST
+Output:
+----------------------------------------------------------
+SubwayA cycle 0: nine sources, 27 metal fragments, 80 observed impacts, full expiry; IDs through 27
+SubwayA cycle 1: nine sources, 27 metal fragments, 80 observed impacts, full expiry; IDs through 54
+SubwayA cycle 2: nine sources, 27 metal fragments, 80 observed impacts, full expiry; IDs through 81
+<end of output>
+Test time =  35.38 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_fragments.private" end time: Oct 16 21:31 CEST
+"explosion_fragments.private" time elapsed: 00:00:35
+----------------------------------------------------------
+
+End testing: Oct 16 21:31 CEST
+
+explosion_fragments =  35.52 sec*proc
+
+explosion_lights =  16.20 sec*proc
+
+explosion_models =   6.91 sec*proc
+
+explosion_rings =  18.46 sec*proc
+
+explosion_sprites =   6.98 sec*proc
+
+headless = 117.22 sec*proc
+
+objects =   0.28 sec*proc
+
+private = 115.95 sec*proc
+
+sceneexplosion =  23.74 sec*proc
+
+sprite_view =   9.12 sec*proc
+

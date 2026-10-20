@@ -1,0 +1,40 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start   29: config.demo
+ 1/13 Test   #29: config.demo ......................   Passed    0.00 sec
+      Start 1175: menus.state
+ 2/13 Test #1175: menus.state ......................   Passed    0.00 sec
+      Start 1176: menus.artwork
+ 3/13 Test #1176: menus.artwork ....................   Passed    0.31 sec
+      Start 1178: menus.session
+ 4/13 Test #1178: menus.session ....................   Passed    1.60 sec
+      Start 1179: menus.profiles
+ 5/13 Test #1179: menus.profiles ...................   Passed   14.76 sec
+      Start 1180: menus.preferences
+ 6/13 Test #1180: menus.preferences ................   Passed    0.00 sec
+      Start 1199: demo.flow
+ 7/13 Test #1199: demo.flow ........................   Passed    0.00 sec
+      Start 1200: demo.rules
+ 8/13 Test #1200: demo.rules .......................   Passed    0.01 sec
+      Start 1203: gpu.demo
+ 9/13 Test #1203: gpu.demo .........................   Passed    9.62 sec
+      Start 1204: demo_menu.manifest
+10/13 Test #1204: demo_menu.manifest ...............   Passed    0.00 sec
+      Start 1205: demo_menu.flow
+11/13 Test #1205: demo_menu.flow ...................   Passed    0.00 sec
+      Start 1206: demo_menu.assets
+12/13 Test #1206: demo_menu.assets .................   Passed    0.42 sec
+      Start 1207: gpu.demo_menu
+13/13 Test #1207: gpu.demo_menu ....................   Passed   12.94 sec
+
+100% tests passed, 0 tests failed out of 13
+
+Label Time Summary:
+config       =   0.00 sec*proc (1 test)
+demo         =   9.64 sec*proc (3 tests)
+demo_menu    =  13.36 sec*proc (4 tests)
+gpu          =  22.56 sec*proc (2 tests)
+headless     =  17.11 sec*proc (11 tests)
+menus        =  16.67 sec*proc (5 tests)
+private      =  39.65 sec*proc (6 tests)
+
+Total Test time (real) =  39.70 sec

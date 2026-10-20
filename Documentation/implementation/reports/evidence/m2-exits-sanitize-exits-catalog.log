@@ -1,0 +1,38 @@
+480/480 Testing: exits.catalog
+480/480 Test: exits.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"exits.catalog" start time: Oct 16 17:25 CEST
+Output:
+----------------------------------------------------------
+Authored exit2 -> 02_cityhub / start 01_egressa
+Authored exit2 -> 02_cityhub / start 01_egressa
+Authored exit2 -> 02_cityhub / start 01_egressa
+<end of output>
+Test time =  11.58 sec
+----------------------------------------------------------
+Test Passed.
+"exits.catalog" end time: Oct 16 17:25 CEST
+"exits.catalog" time elapsed: 00:00:11
+----------------------------------------------------------
+
+End testing: Oct 16 17:25 CEST
+
+exits =  11.86 sec*proc
+
+headless =  96.40 sec*proc
+
+objectives =  15.11 sec*proc
+
+objects =   0.24 sec*proc
+
+player =  11.87 sec*proc
+
+private =  94.19 sec*proc
+
+services =  11.03 sec*proc
+
+triggers =  42.03 sec*proc
+
+world =   4.27 sec*proc
+

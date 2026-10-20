@@ -1,0 +1,1517 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 78
+        Start  78: weapons.private
+
+78: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "private" "<external-data-root>"
+78: Working Directory: <workspace>/Blood2/build/debug/tests
+78: Test timeout computed to be: 90
+test 666
+        Start 666: player_controls.corpse_clearance
+
+666: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "clearance" "<external-data-root>"
+666: Working Directory: <workspace>/Blood2/build/debug/tests
+666: Test timeout computed to be: 240
+666: Original SubwayA camera intro expired after 12.0167 simulation seconds
+666: Approached encounter at z=-2338.28
+666: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=0
+666: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+666: Post-kill position=-32,170.001,-1854.18 camera=0 yaw=0
+666: Walked past killed Cultist to z=-1854.18
+666: Approached encounter at z=-1742.25
+666: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=0
+666: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+666: Post-kill position=-32,170.001,-1340.93 camera=0 yaw=-3.72529e-09
+666: Walked past killed Cultist to z=-1340.93
+666: Original SubwayA camera intro expired after 12.0167 simulation seconds
+666: Approached encounter at z=-2341.42
+666: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=0
+666: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+666: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+666: Walked past killed Cultist to z=-1861.92
+666: Approached encounter at z=-1745.4
+666: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=0
+666: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+666: Post-kill position=-32,170.001,-1344.07 camera=0 yaw=3.72529e-09
+666: Walked past killed Cultist to z=-1344.07
+  1/122 Test #666: player_controls.corpse_clearance ...   Passed   15.49 sec
+test 665
+        Start 665: player_controls.combat
+
+665: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "combat" "<external-data-root>"
+665: Working Directory: <workspace>/Blood2/build/debug/tests
+665: Test timeout computed to be: 120
+78: Original SubwayA camera intro expired after 12.0167 simulation seconds
+78: weapon 1: 463 vertices; 6 clips
+78:   static_model 1 ms
+78:   draw 333 ms
+78:   fire 150 ms [0:fire_key]
+78:   start_alt_fire 166 ms
+78:   alt_fire 200 ms [0:fire_key]
+78:   end_alt_fire 200 ms
+78: weapon 17: 488 vertices; 5 clips
+78:   alt_fire 1066 ms [613:fire_key]
+78:   fire2 966 ms [233:fire_key] [566:fire_key]
+78:   fire 566 ms [133:fire_key] [366:fire_key]
+78:   draw 333 ms
+78:   static_model 1 ms
+78: Original SubwayA camera intro expired after 12.0167 simulation seconds
+78: weapon 1: 463 vertices; 6 clips
+78:   static_model 1 ms
+78:   draw 333 ms
+78:   fire 150 ms [0:fire_key]
+78:   start_alt_fire 166 ms
+78:   alt_fire 200 ms [0:fire_key]
+78:   end_alt_fire 200 ms
+78: weapon 17: 488 vertices; 5 clips
+78:   alt_fire 1066 ms [613:fire_key]
+78:   fire2 966 ms [233:fire_key] [566:fire_key]
+78:   fire 566 ms [133:fire_key] [366:fire_key]
+78:   draw 333 ms
+78:   static_model 1 ms
+78: Original SubwayA camera intro expired after 12.0167 simulation seconds
+78: weapon 1: 463 vertices; 6 clips
+78:   static_model 1 ms
+78:   draw 333 ms
+78:   fire 150 ms [0:fire_key]
+78:   start_alt_fire 166 ms
+78:   alt_fire 200 ms [0:fire_key]
+78:   end_alt_fire 200 ms
+78: weapon 17: 488 vertices; 5 clips
+78:   alt_fire 1066 ms [613:fire_key]
+78:   fire2 966 ms [233:fire_key] [566:fire_key]
+78:   fire 566 ms [133:fire_key] [366:fire_key]
+78:   draw 333 ms
+78:   static_model 1 ms
+  2/122 Test  #78: weapons.private ....................   Passed   24.52 sec
+test 223
+        Start 223: keyframes.catalog
+
+223: Test command: <workspace>/Blood2/build/debug/tests/keyframer_tests "catalog" "<external-data-root>"
+223: Working Directory: <workspace>/Blood2/build/debug/tests
+223: Test timeout computed to be: 120
+665: Original SubwayA camera intro expired after 12.0167 simulation seconds
+665: Approached encounter at z=-2192.09
+665: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=8, ammo=42, independent corpse verified, native=0
+665: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=0
+665: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+665: Walked past killed Cultist to z=-1861.92
+665: Original SubwayA camera intro expired after 12.0167 simulation seconds
+665: Approached encounter at z=-2192.09
+665: Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=13, ammo=37, independent corpse verified, native=0
+665: Dodge updates=12, corpse candidates=23, zero-margin search=1, swept source clearance=0
+665: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+665: Walked past killed Cultist to z=-1861.92
+  3/122 Test #665: player_controls.combat .............   Passed   11.96 sec
+test 89
+        Start  89: movement.private
+
+89: Test command: <workspace>/Blood2/build/debug/tests/movement_tests "private" "<external-data-root>"
+89: Working Directory: <workspace>/Blood2/build/debug/tests
+89: Test timeout computed to be: 60
+223: worlds=57 controllers=94 source_keys=383 copied=375 empty_paths=0 missing_targets=44 malformed=0
+  4/122 Test #223: keyframes.catalog ..................   Passed   10.71 sec
+test 131
+        Start 131: doors.catalog
+
+131: Test command: <workspace>/Blood2/build/debug/tests/door_tests "catalog" "<external-data-root>"
+131: Working Directory: <workspace>/Blood2/build/debug/tests
+131: Test timeout computed to be: 60
+89: Original SubwayA camera intro expired after 12.0167 simulation seconds
+89: cycle 0: distance 186.661; rise 55.998; jumps 1; landings 2; ground 1; messages 1762
+89: Original SubwayA camera intro expired after 12.0333 simulation seconds
+89: cycle 1: distance 186.661; rise 55.998; jumps 1; landings 2; ground 1; messages 1764
+89: Original SubwayA camera intro expired after 12.0167 simulation seconds
+89: cycle 2: distance 186.661; rise 55.998; jumps 1; landings 2; ground 1; messages 1762
+  5/122 Test  #89: movement.private ...................   Passed   10.00 sec
+test 154
+        Start 154: interaction.catalog
+
+154: Test command: <workspace>/Blood2/build/debug/tests/interaction_tests "catalog" "<external-data-root>"
+154: Working Directory: <workspace>/Blood2/build/debug/tests
+154: Test timeout computed to be: 90
+131: worlds/02_cityhub.dat Buildings: 2 closed components / 2 shared edges
+131: worlds/02_cityhubb.dat Buildings: 2 closed components / 2 shared edges
+131: worlds/02_cityhubc.dat Buildings: 2 closed components / 2 shared edges
+131: worlds/03_museum.dat Buildings: 2 closed components / 2 shared edges
+131: worlds/04_steamtunnels.dat noname rejected: noname: Missing named world model
+131: worlds/05_cdm.dat Buildings: 2 closed components / 2 shared edges
+131: worlds/06_airship1.dat girder1 rejected: girder1: Missing named world model
+131: worlds/06_airship1.dat forcefield1 rejected: forcefield1: Ambiguous named world model
+131: worlds/06_airship1.dat forcefield1 rejected: forcefield1: Ambiguous named world model
+131: worlds/07_cathedral.dat Buildings: 3 closed components / 4 shared edges
+131: worlds/09_abandoned_buildings.dat Buildings: 3 closed components / 4 shared edges
+131: worlds/10_sewagetreatmentplant.dat Buildings: 3 closed components / 4 shared edges
+131: worlds/12_train_station.dat Buildings: 4 closed components / 5 shared edges
+131: worlds/12_train_stationb.dat Buildings: 4 closed components / 5 shared edges
+131: worlds/13_downtown.dat Door11: 3 closed components / 2 shared edges
+131: worlds/13_downtown.dat Clouds1 rejected: Clouds1: Ambiguous named world model
+131: worlds/13_downtown.dat Moon1 rejected: Moon1: Ambiguous named world model
+131: worlds/13_downtown.dat Stars1 rejected: Stars1: Ambiguous named world model
+131: worlds/13_downtown.dat Buildings rejected: Buildings: Ambiguous named world model
+131: worlds/13_downtown.dat Clouds2 rejected: Clouds2: Ambiguous named world model
+131: worlds/13_downtown.dat Clouds1 rejected: Clouds1: Ambiguous named world model
+131: worlds/13_downtown.dat Moon1 rejected: Moon1: Ambiguous named world model
+131: worlds/13_downtown.dat Stars1 rejected: Stars1: Ambiguous named world model
+131: worlds/13_downtown.dat Buildings rejected: Buildings: Ambiguous named world model
+131: worlds/13_downtown.dat Clouds2 rejected: Clouds2: Ambiguous named world model
+131: worlds/15_crypt.dat Buildings: 4 closed components / 5 shared edges
+131: worlds/17_entrance.dat lock1 rejected: lock1: Missing named world model
+131: worlds/17_entrance.dat lock2 rejected: lock2: Missing named world model
+131: worlds/17_entrance.dat goo2 rejected: goo2: Missing named world model
+131: worlds/17_entrance.dat goo3 rejected: goo3: Missing named world model
+131: worlds/17_entrance.dat Door0 rejected: Door0: Missing named world model
+131: worlds/18_temple.dat Buildings: 4 closed components / 5 shared edges
+131: worlds/19_lobby.dat messedup2 rejected: messedup2: Missing named world model
+131: worlds/19_lobbyb.dat messedup rejected: messedup: Missing named world model
+131: worlds/19_lobbyb.dat messedup2 rejected: messedup2: Missing named world model
+131: worlds/19_lobbyc.dat messedup rejected: messedup: Missing named world model
+131: worlds/19_lobbyc.dat messedup2 rejected: messedup2: Missing named world model
+131: worlds/22_office.dat Buildings: 4 closed components / 5 shared edges
+131: worlds/22_office.dat Door1 rejected: Door1: Ambiguous named world model
+131: worlds/multi/bb_bloodarena.dat Clouds1 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat Horizon rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat Moon rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat grill1 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat grill2 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat lift5 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat lift6 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat lift7 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder1v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder2v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder3v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder4v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder5v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder6v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder7v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder8v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder9v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder10v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder11v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder12v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder13v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat ladder14v rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat lift1 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bloodarena.dat lift2 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bodies.dat window2 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bodies.dat window3 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bodies.dat Clouds1 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bodies.dat Horizon rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bodies.dat Moon rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bodies.dat window3 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bodies.dat lift rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bodies.dat Door0 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bridge.dat Clouds1 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bridge.dat Moon rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_bridge.dat Horizon rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_condemned.dat ladder1 rejected: ladder1: Ambiguous named world model
+131: worlds/multi/bb_condemned.dat ladder2 rejected: ladder2: Ambiguous named world model
+131: worlds/multi/bb_condemned.dat Buildings rejected: Buildings: Open or non-manifold container shell: 4 edges / balance 0 in component 3 at -7488 -1986 -1568 -> -7488 -2048 -1568
+131: worlds/multi/bb_jgrave.dat door12 rejected: door12: Ambiguous named world model
+131: worlds/multi/bb_jgrave.dat door13 rejected: door13: Ambiguous named world model
+131: worlds/multi/bb_jgrave.dat Door12 rejected: Door12: Ambiguous named world model
+131: worlds/multi/bb_jgrave.dat Door13 rejected: Door13: Ambiguous named world model
+131: worlds/multi/bb_midgard.dat lift1 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_midgard.dat Clouds1 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_midgard.dat Horizon rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_midgard.dat Moon rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_midgard.dat switch1 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_midgard.dat powerlift rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_midgard.dat switch2 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_midgard.dat maindoor rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_midgard.dat switch3 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_midgard.dat lift3 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_midgard.dat switch4 rejected: Door: invalid property TypeAction
+131: worlds/multi/bb_midgard.dat lift2 rejected: Door: invalid property TypeAction
+131: Door catalog: created=619, rejected=79, unreadable=1, SelfTrigger=149, polygon=114
+  6/122 Test #131: doors.catalog ......................   Passed    7.29 sec
+test 517
+        Start 517: ai_runtime.subway
+
+517: Test command: <workspace>/Blood2/build/debug/tests/ai_runtime_tests "subway" "<external-data-root>"
+517: Working Directory: <workspace>/Blood2/build/debug/tests
+517: Test timeout computed to be: 90
+154: worlds/04_steamtunnels.dat Gear3 rejected: Gear3: Missing named world model
+154: worlds/19_lobby.dat temple1 rejected: temple1: Missing named world model
+154: worlds/19_lobby.dat exec2 rejected: exec2: Missing named world model
+154: worlds/19_lobbyb.dat temple1 rejected: temple1: Missing named world model
+154: worlds/19_lobbyb.dat secdoor2 rejected: secdoor2: Missing named world model
+154: worlds/19_lobbyc.dat temple1 rejected: temple1: Missing named world model
+154: worlds/19_lobbyc.dat secdoor2 rejected: secdoor2: Missing named world model
+154: worlds/22_office.dat door1 rejected: door1: Ambiguous named world model
+154: worlds/multi/bb_bridge.dat door02 rejected: RotatingDoor: invalid property TypeAction
+154: worlds/multi/bb_bridge.dat door01 rejected: RotatingDoor: invalid property TypeAction
+154: worlds/multi/bb_bridge.dat lid01 rejected: RotatingDoor: invalid property TypeAction
+154: worlds/multi/bb_bridge.dat lid01 rejected: RotatingDoor: invalid property TypeAction
+154: RotatingDoor catalog created=223 rejected=12 filtered=0 unreadable=1 children=155 moved=215
+154: ambiguous=1
+154: missing=7
+154: schema=4
+  7/122 Test #154: interaction.catalog ................   Passed    6.94 sec
+test 44
+        Start  44: world.level_change_private
+
+44: Test command: <workspace>/Blood2/build/debug/tests/world_tests "level_change_private" "<external-data-root>"
+44: Working Directory: <workspace>/Blood2/build/debug/tests
+44: Test timeout computed to be: 120
+517: SubwayA load=0 created=204 unsupported=0 AI_Update=537 pings=20
+517: SubwayA load=1 created=204 unsupported=0 AI_Update=537 pings=20
+  8/122 Test #517: ai_runtime.subway ..................   Passed    4.25 sec
+test 121
+        Start 121: containers.specialized_private
+
+121: Test command: <workspace>/Blood2/build/debug/tests/container_tests "specialized_private" "<external-data-root>"
+121: Working Directory: <workspace>/Blood2/build/debug/tests
+121: Test timeout computed to be: 90
+121: worlds/01_subwaya.dat Damage pain1 bounds -256,32,2208 / 192,96,4096 current 0,0,0 damage 100 type 0
+121: worlds/01_subwaya.dat Conveyor conveyor1 bounds -256,32,-6144 / 192,96,4096 current 0,0,-1024 damage 0 type 0
+121: worlds/01_subwaya.dat Damage pain2 bounds -256,32,-5675 / 192,96,-3360 current 0,0,0 damage 100 type 0
+121: worlds/01_subwaya.dat Damage pain3 bounds -256,32,-3360 / -144,96,2208 current 0,0,0 damage 100 type 0
+121: worlds/01_subwaya.dat Damage pain4 bounds 80,32,-3360 / 192,96,2208 current 0,0,0 damage 100 type 0
+121: worlds/02_cityhub.dat Conveyor escalator1 bounds -336,0,2720 / -272,192,3040 current 0,0,512 damage 0 type 0
+121: worlds/02_cityhub.dat Conveyor escalator2 bounds -496,0,2720 / -432,192,3040 current 0,0,-512 damage 0 type 0
+121: worlds/02_cityhub.dat Conveyor escalator4 bounds -224,128,2448 / 96,320,2512 current 512,0,0 damage 0 type 0
+121: worlds/02_cityhub.dat Conveyor escalator3 bounds -224,128,2608 / 96,320,2672 current -512,0,0 damage 0 type 0
+121: worlds/02_cityhub.dat Conveyor escalator6 bounds -224,-128,3248 / 96,64,3312 current -512,0,0 damage 0 type 0
+121: worlds/02_cityhub.dat Conveyor escalator5 bounds -224,-128,3088 / 96,64,3152 current 512,0,0 damage 0 type 0
+121: worlds/02_cityhubb.dat Conveyor escalator1 bounds -336,0,2720 / -272,192,3040 current 0,0,512 damage 0 type 0
+121: worlds/02_cityhubb.dat Conveyor escalator2 bounds -496,0,2720 / -432,192,3040 current 0,0,-512 damage 0 type 0
+121: worlds/02_cityhubb.dat Conveyor escalator4 bounds -224,128,2448 / 96,320,2512 current 512,0,0 damage 0 type 0
+121: worlds/02_cityhubb.dat Conveyor escalator3 bounds -224,128,2608 / 96,320,2672 current -512,0,0 damage 0 type 0
+121: worlds/02_cityhubb.dat Conveyor escalator6 bounds -224,-128,3248 / 96,64,3312 current -512,0,0 damage 0 type 0
+121: worlds/02_cityhubb.dat Conveyor escalator5 bounds -224,-128,3088 / 96,64,3152 current 512,0,0 damage 0 type 0
+121: worlds/02_cityhubb.dat Damage trackdamage bounds 832,-256,1792 / 1216,-224,3968 current 0,0,0 damage 1000 type 0
+121: worlds/02_cityhubc.dat Conveyor escalator1 bounds -336,0,2720 / -272,192,3040 current 0,0,512 damage 0 type 0
+121: worlds/02_cityhubc.dat Conveyor escalator2 bounds -496,0,2720 / -432,192,3040 current 0,0,-512 damage 0 type 0
+121: worlds/02_cityhubc.dat Conveyor escalator4 bounds -224,128,2448 / 96,320,2512 current 512,0,0 damage 0 type 0
+121: worlds/02_cityhubc.dat Conveyor escalator3 bounds -224,128,2608 / 96,320,2672 current -512,0,0 damage 0 type 0
+121: worlds/02_cityhubc.dat Conveyor escalator6 bounds -224,-128,3248 / 96,64,3312 current -512,0,0 damage 0 type 0
+121: worlds/02_cityhubc.dat Conveyor escalator5 bounds -224,-128,3088 / 96,64,3152 current 512,0,0 damage 0 type 0
+121: worlds/02_cityhubc.dat Damage trackdamage bounds 832,-256,1792 / 1216,-224,3968 current 0,0,0 damage 1000 type 0
+121: worlds/04_steamtunnels.dat Damage wahwahsteamdamage bounds 528,-224,1408 / 624,-128,1616 current 0,0,0 damage 10000 type 0
+121: worlds/04_steamtunnels.dat Damage waterjetdamage bounds 768,-1696,3936 / 896,-1664,4064 current 0,0,0 damage 10000 type 0
+121: worlds/04_steamtunnels.dat Damage endsteam1damage bounds 3568,-512,2160 / 3728,-352,2224 current 0,0,0 damage 10000 type 0
+121: worlds/04_steamtunnels.dat Damage endsteam2damage bounds 3568,-512,2016 / 3728,-352,2080 current 0,0,0 damage 10000 type 0
+121: worlds/04_steamtunnels.dat Damage endsteam3damage bounds 3568,-512,1872 / 3728,-352,1936 current 0,0,0 damage 10000 type 0
+121: worlds/04_steamtunnels.dat Damage mainsteam3damage bounds 1104,-256,928 / 1200,-96,1136 current 0,0,0 damage 10000 type 0
+121: worlds/04_steamtunnels.dat Damage mainsteam2damage bounds 912,-256,1040 / 1008,-96,1248 current 0,0,0 damage 10000 type 0
+121: worlds/04_steamtunnels.dat Damage mainsteam1damage bounds 720,-256,928 / 816,-96,1136 current 0,0,0 damage 10000 type 0
+121: worlds/04_steamtunnels.dat Damage steamdamage2 bounds -464,-224,1072 / -256,-128,1296 current 0,0,0 damage 10000 type 0
+121: worlds/04_steamtunnels.dat Damage steamdamage1 bounds -112,-144,560 / 112,-48,768 current 0,0,0 damage 10000 type 0
+121: worlds/05_cdm.dat Conveyor Conveyor2 bounds -1216,2082,-704 / -1152,2086,-512 current 0,0,425 damage 0 type 0
+121: worlds/05_cdm.dat Conveyor Conveyor1 bounds -1600,2082,-704 / -1152,2086,-640 current 425,0,0 damage 0 type 0
+121: worlds/05_cdm.dat Conveyor Conveyor3 bounds -1216,2082,-576 / 344,2086,-512 current 425,0,0 damage 0 type 0
+121: worlds/05_cdm.dat Damage sawbladedamage bounds -856,2088,-572 / -680,2152,-516 current 0,0,0 damage 1000 type 0
+121: worlds/05_cdm.dat Damage fallingkiller bounds -688,1984,-3312 / -592,2112,-3216 current 0,0,0 damage 1000 type 0
+121: worlds/06_airship1.dat Damage damage2 bounds -576,-256,-1152 / -64,384,-1088 current 0,0,0 damage 100 type 0
+121: worlds/06_airship1.dat Damage damage3 bounds 576,-256,-1152 / 1088,384,-1088 current 0,0,0 damage 100 type 0
+121: worlds/06_airship1.dat Damage damage4 bounds 0,-704,512 / 512,-384,576 current 0,0,0 damage 100 type 0
+121: worlds/06_airship1.dat FreeFall freefall1 bounds -1792,-768,-2304 / 2304,-256,4864 current 0,0,0 damage 1e+07 type 10
+121: worlds/06_airship1.dat Conveyor wind bounds -1152,1248,-704 / 1664,1792,4992 current 0,0,-10000 damage 0 type 0
+121: worlds/06_airship2.dat FreeFall freefall1 bounds -256,-320,-2688 / 256,-192,-1536 current 0,0,0 damage 1e+07 type 10
+121: worlds/07_cathedral.dat FreeFall freefall1 bounds -2560,656,-2304 / -1280,784,1280 current 0,0,0 damage 1e+07 type 10
+121: worlds/07_cathedral.dat FreeFall freefall2 bounds -1280,656,-1152 / -448,784,-896 current 0,0,0 damage 1e+07 type 10
+121: worlds/07_cathedral.dat FreeFall freefall99 bounds -1280,656,-2176 / -512,784,-1920 current 0,0,0 damage 1e+07 type 10
+121: worlds/07_cathedral.dat FreeFall freefall3 bounds -1280,656,-128 / -448,784,128 current 0,0,0 damage 1e+07 type 10
+121: worlds/07_cathedral.dat FreeFall freefall4 bounds -1280,656,896 / -544,784,1152 current 0,0,0 damage 1e+07 type 10
+121: worlds/07_cathedral.dat Damage mainhallfall bounds -512,576,-1792 / 512,640,-1280 current 0,0,0 damage 1000 type 0
+121: worlds/08_subwayb.dat Damage pain1 bounds -256,32,-6144 / 192,96,4096 current 0,0,0 damage 100 type 0
+121: worlds/08_subwayb.dat Conveyor conveyor1 bounds -256,32,-6144 / 192,96,4096 current 0,0,-1024 damage 0 type 0
+121: worlds/11_slaughter_house.dat Conveyor conveyor1 bounds -704,48,-2560 / -576,112,-2160 current 0,0,500 damage 0 type 0
+121: worlds/11_slaughter_house.dat Conveyor conveyor2 bounds -576,48,-2560 / 1248,112,-2432 current -500,0,0 damage 0 type 0
+121: worlds/11_slaughter_house.dat Conveyor conveyor4 bounds -1216,48,1856 / -832,112,1984 current -500,0,0 damage 0 type 0
+121: worlds/11_slaughter_house.dat Conveyor conveyor3 bounds -1344,48,1856 / -1216,112,3776 current 0,0,500 damage 0 type 0
+121: worlds/11_slaughter_house.dat Damage grinderdam bounds 704,128,-2576 / 1088,224,-2416 current 0,0,0 damage 100 type 0
+121: worlds/11_slaughter_house.dat Damage ovendam1 bounds -1328,48,3232 / -1216,128,3360 current 0,0,0 damage 10 type 0
+121: worlds/11_slaughter_house.dat Damage ovendam2 bounds -1216,48,3776 / -1024,128,3904 current 0,0,0 damage 10 type 0
+121: worlds/11_slaughter_house.dat Damage ovendam3 bounds -1328,48,3360 / -1216,128,3488 current 0,0,0 damage 25 type 0
+121: worlds/11_slaughter_house.dat Damage ovendam4 bounds -1328,48,3616 / -1216,128,3744 current 0,0,0 damage 25 type 0
+121: worlds/11_slaughter_house.dat Damage ovendam5 bounds -1328,48,3488 / -1216,128,3616 current 0,0,0 damage 100 type 0
+121: worlds/11_slaughter_house.dat Conveyor conveyor4tt bounds -1344,48,3776 / -448,112,3904 current 500,0,0 damage 0 type 0
+121: worlds/11_slaughter_house.dat Damage ovendam2aa bounds -1328,48,3744 / -1216,128,3904 current 0,0,0 damage 10 type 0
+121: worlds/11_slaughter_house.dat Conveyor conveyor3afget bounds -448,48,3776 / -320,112,4256 current 0,0,500 damage 0 type 0
+121: worlds/12_train_station.dat Damage damage1 bounds 1472,256,128 / 1728,576,960 current 0,0,0 damage 100 type 0
+121: worlds/12_train_station.dat Damage damage2 bounds 1472,256,-4416 / 1728,576,-3584 current 0,0,0 damage 100 type 0
+121: worlds/12_train_station.dat Conveyor escalator6 bounds -672,-320,-1248 / -128,64,-1184 current -512,0,0 damage 0 type 0
+121: worlds/12_train_station.dat Conveyor escalator5 bounds -672,-320,-1376 / -128,64,-1312 current 512,0,0 damage 0 type 0
+121: worlds/12_train_station.dat Damage train bounds 1488,288,2827 / 1712,560,6960 current 0,0,0 damage 100000 type 0
+44: Malformed destination refusal 0: DAT v56: invalid/unsupported typed property near byte 442114
+44: CityHub transfer 0:
+44: SubwayA transfer 0:
+44: Malformed destination refusal 1: DAT v56: invalid/unsupported typed property near byte 442114
+44: CityHub transfer 1:
+44: SubwayA transfer 1:
+44: Malformed destination refusal 2: DAT v56: invalid/unsupported typed property near byte 442114
+44: CityHub transfer 2:
+44: SubwayA transfer 2:
+44: PASS level_change_private
+  9/122 Test  #44: world.level_change_private .........   Passed    5.63 sec
+test 122
+        Start 122: containers.private
+
+122: Test command: <workspace>/Blood2/build/debug/tests/container_tests "private" "<external-data-root>"
+122: Working Directory: <workspace>/Blood2/build/debug/tests
+122: Test timeout computed to be: 90
+121: worlds/12_train_stationb.dat Conveyor escalator6 bounds -672,-320,-1248 / -128,64,-1184 current -512,0,0 damage 0 type 0
+121: worlds/12_train_stationb.dat Conveyor escalator5 bounds -672,-320,-1376 / -128,64,-1312 current 512,0,0 damage 0 type 0
+121: worlds/13_downtown.dat Damage Damage1 bounds -512,-1920,3072 / 0,-1792,4608 current 0,0,0 damage 10000 type 0
+121: worlds/13_downtown.dat Damage Damage2 bounds -2560,-3072,2816 / -1792,-2944,4672 current 0,0,0 damage 10000 type 0
+121: worlds/13_downtown.dat Damage train bounds -6368,0,-3312 / -2240,272,-3088 current 0,0,0 damage 10000 type 0
+121: worlds/14_subwayc.dat Damage: noname model is ambiguous
+121: worlds/14_subwayc.dat Damage: noname model is ambiguous
+121: worlds/14_subwayc.dat Conveyor: noname model is ambiguous
+121: worlds/14_subwayc.dat Conveyor: noname model is ambiguous
+121: worlds/18_temple.dat FreeFall FREEFALL bounds 640,-1920,-1088 / 1344,-832,-544 current 0,0,0 damage 1e+07 type 10
+121: worlds/20_powerstation.dat Damage tt bounds 64,-448,1536 / 864,-352,2688 current 0,0,0 damage 1000 type 0
+121: worlds/20_powerstation.dat Damage: missing kkk model
+121: worlds/20_powerstation.dat FreeFall freefall bounds -2048,-1472,-576 / -1792,-576,64 current 0,0,0 damage 1e+07 type 10
+121: worlds/20_powerstation.dat FreeFall freefall2 bounds -1792,-1472,-576 / -1280,-576,-320 current 0,0,0 damage 1e+07 type 10
+121: worlds/20_powerstation.dat FreeFall freefall69 bounds 0,-1472,-1472 / 896,-960,-576 current 0,0,0 damage 1e+07 type 10
+121: worlds/20_powerstation.dat FreeFall freefall89 bounds -1024,-1024,-832 / -768,-704,-64 current 0,0,0 damage 1e+07 type 10
+121: worlds/20_powerstation.dat FreeFall ffall16 bounds 1216,-2048,-1408 / 1792,-1088,-960 current 0,0,0 damage 1e+07 type 10
+121: worlds/21_laboratory.dat FreeFall blades bounds 128,-832,-6208 / 704,336,-5632 current 0,0,0 damage 1e+07 type 10
+121: worlds/23_rooftop.dat Damage hurt12nd bounds -480,256,4704 / 784,264,4752 current 0,0,0 damage 4 type 0
+121: worlds/23_rooftop.dat Damage hurt22nd bounds 736,256,4000 / 784,264,4704 current 0,0,0 damage 4 type 0
+121: worlds/23_rooftop.dat Damage hurt32nd bounds -480,256,3952 / 784,264,4000 current 0,0,0 damage 4 type 0
+121: worlds/23_rooftop.dat FreeFall KILLBRUSH2nd bounds -2304,-5376,2816 / 2176,-2304,7040 current 0,0,0 damage 1e+07 type 10
+121: worlds/23_rooftop.dat Damage hurt1 bounds -480,256,-32 / 784,264,16 current 0,0,0 damage 4 type 0
+121: worlds/23_rooftop.dat Damage hurt2 bounds 736,256,-736 / 784,264,-32 current 0,0,0 damage 4 type 0
+121: worlds/23_rooftop.dat Damage hurt3 bounds -480,256,-784 / 784,264,-736 current 0,0,0 damage 4 type 0
+121: worlds/23_rooftop.dat FreeFall KILLBRUSH bounds -2304,-5376,-1920 / 2176,-2304,2304 current 0,0,0 damage 1e+07 type 10
+121: worlds/24_ancientcity.dat Conveyor VolumeBrush-Wind1 bounds -1280,192,-3840 / 512,512,-3328 current 0,-5120,102800 damage 0 type 0
+121: worlds/24_ancientcity.dat Conveyor VolumeBrush-Wind2 bounds 0,192,-3840 / 512,512,-2048 current -104800,-5120,0 damage 0 type 0
+121: worlds/24_ancientcity.dat Conveyor VolumeBrush-Wind3 bounds -1280,192,-2560 / 512,512,-2048 current -104800,-5120,0 damage 0 type 0
+121: worlds/24_ancientcity.dat Conveyor VolumeBrush-Wind4 bounds -1280,192,-3840 / -768,512,-2048 current 104800,-5120,0 damage 0 type 0
+121: worlds/multi/bb_condemned.dat FreeFall FREEFALL bounds -1792,-2176,-768 / 2560,-1024,2304 current 0,0,0 damage 1e+07 type 10
+121: worlds/multi/bb_jgrave.dat Damage Damage0 bounds 328,176,232 / 504,280,408 current 0,0,0 damage 10 type 0
+121: worlds/multi/bb_rooftop.dat FreeFall fall0 bounds -2304,-2816,-1920 / 2176,-1984,2304 current 0,0,0 damage 1e+07 type 10
+121: worlds/multi/bb_rooftop.dat Damage hurt1 bounds -480,256,-32 / 800,264,16 current 0,0,0 damage 4 type 0
+121: worlds/multi/bb_rooftop.dat Damage hurt2 bounds 752,256,-736 / 800,264,-32 current 0,0,0 damage 4 type 0
+121: worlds/multi/bb_rooftop.dat Damage hurt3 bounds -480,256,-784 / 800,264,-736 current 0,0,0 damage 4 type 0
+121: Skipped DATs 1; ambiguous models 4; missing models 1
+121: Conveyor: 38 original instances created and removed
+121: Damage: 47 original instances created and removed
+121: FreeFall: 18 original instances created and removed
+121: Subway conveyor: start -32,41.001,0; travel -1.67384; level clock 2.16667; protected hits 0
+121: Subway conveyor: start -32,41.001,0; travel -1.67384; level clock 0.0666667; protected hits 1
+ 10/122 Test #121: containers.specialized_private .....   Passed    5.28 sec
+test 289
+        Start 289: sceneexplosion.catalog
+
+289: Test command: <workspace>/Blood2/build/debug/tests/scene_explosion_tests "catalog" "<external-data-root>"
+289: Working Directory: <workspace>/Blood2/build/debug/tests
+289: Test timeout computed to be: 90
+289: worlds/01_subwaya.dat name=exp1 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/01_subwaya.dat name=exp1 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/01_subwaya.dat name=exp2 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/01_subwaya.dat name=exp3 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/01_subwaya.dat name=exp3 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/01_subwaya.dat name=exp4 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/01_subwaya.dat name=exp4 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/01_subwaya.dat name=exp5 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/01_subwaya.dat name=exp5 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/07_cathedral.dat name=lightningexplosion1 type=8 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/07_cathedral.dat name=lightningexplosion2 type=8 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/07_cathedral.dat name=lightningexplosion3 type=8 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/08_subwayb.dat name=exp1 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/08_subwayb.dat name=exp1 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/08_subwayb.dat name=exp2 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/08_subwayb.dat name=exp3 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/08_subwayb.dat name=exp3 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/08_subwayb.dat name=exp4 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/08_subwayb.dat name=exp4 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/08_subwayb.dat name=exp5 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/08_subwayb.dat name=exp5 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+289: worlds/12_train_station.dat name=exp4 type=3 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/12_train_station.dat name=exp3 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/12_train_station.dat name=exp2 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/12_train_station.dat name=exp2 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/12_train_station.dat name=exp1 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/24b_arena.dat name=Explosion1 type=1 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/24b_arena.dat name=Explosion1 type=1 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/24b_arena.dat name=Explosion1 type=1 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/25_ancientone.dat name=ExplosionSFX1 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/25_ancientone.dat name=ExplosionSFX1 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/25_ancientone.dat name=ExplosionSFX1 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/25_ancientone.dat name=ExplosionSFX2 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+122: Skipped unsupported DAT worlds/16_bridge.dat: DAT v56: invalid/unsupported typed property near byte 442114
+122: Missing named volume model worlds/multi/ctf_jam.dat Acid0
+122: Missing named volume model worlds/multi/ctf_jam.dat Acid1
+122: Private volume shells: 245, nonconvex=7, rejected=0
+122: CityHub: 11 original volumes; canal swimming and ladder ascent 29.1666 units
+ 11/122 Test #122: containers.private .................   Passed    6.30 sec
+test 98
+        Start  98: locomotion.private
+
+98: Test command: <workspace>/Blood2/build/debug/tests/locomotion_tests "private" "<external-data-root>"
+98: Working Directory: <workspace>/Blood2/build/debug/tests
+98: Test timeout computed to be: 30
+289: worlds/25_ancientone.dat name=ExplosionSFX2 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/25_ancientone.dat name=ExplosionSFX2 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/25_ancientone.dat name=ExplosionSFX3 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/25_ancientone.dat name=ExplosionSFX3 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/25_ancientone.dat name=ExplosionSFX4 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/25_ancientone.dat name=ExplosionSFX4 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/25_ancientone.dat name=ExplosionSFX5 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/25_ancientone.dat name=ExplosionSFX5 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/25_ancientone.dat name=ExplosionSFX5 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+289: worlds/25_ancientone.dat name=Vortex-AncientOne type=24 damage=0 radius=1000 normal=0,1,0 sound=Sounds\enemies\Ancientone\vortex.wav voice=decoded
+289: worlds=57 sources=43 accepted=43 rejected=0 decoded=19 missing=24
+289: type=1 count=3
+289: type=2 count=10
+289: type=3 count=19
+289: type=6 count=7
+289: type=8 count=3
+289: type=24 count=1
+ 12/122 Test #289: sceneexplosion.catalog .............   Passed    4.91 sec
+test 667
+        Start 667: player_controls.private
+
+667: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "private" "<external-data-root>"
+667: Working Directory: <workspace>/Blood2/build/debug/tests
+667: Test timeout computed to be: 120
+98: Original SubwayA camera intro expired after 12.0167 simulation seconds
+98: idle1 [12,42,12] 6233ms
+98: idle2 [12,42,12] 3033ms
+98: walk_nogun [12,42,12] 1166ms
+98: walk_rifle [12,42,12] 1399ms
+98: run_nogun [12,42,12] 666ms
+98: run_rifle [12,42,12] 666ms
+98: jmp_nogun [12,42,12] 666ms
+98: jmp_rifle [12,42,12] 733ms
+98: crawl_pistol [12,28,12] 966ms
+98: crawl_rifle [12,28,12] 966ms
+98: swim_1pistol [12,12,32] 1066ms
+98: swim_2pistol [12,12,32] 599ms
+98: pickup_weapon [12,36.1108,12] 1000ms
+98: switch_weapon_2pistol [12,42,12] 466ms
+98: switch_weapon_2rifle [12,42,12] 666ms
+98: fire_stand_rifle [12,42,12] 566ms
+98: fire_stand_1pistol [12,42,12] 500ms
+98: fire_stand_2pistol [12,42,12] 466ms
+98: fire_walk_rifle [12,42,12] 1399ms
+98: fire_walk_1pistol [12,42,12] 1166ms
+98: fire_walk_2pistol [12,42,12] 1166ms
+98: fire_run_rifle [12,42,12] 666ms
+98: fire_run_1pistol [12,42,12] 666ms
+98: fire_run_2pistol [12,42,12] 666ms
+98: fire_jump_rifle [12,42,12] 733ms
+98: fire_jump_1pistol [12,42,12] 733ms
+98: fire_jump_2pistol [12,42,12] 733ms
+98: fire_crouch_rifle [12,28,12] 500ms
+98: fire_crouch_1pistol [12,28,12] 500ms
+98: fire_crouch_2pistol [12,28,12] 500ms
+98: fire_crawl_rifle [12,28,12] 966ms
+98: fire_crawl_1pistol [12,28,12] 966ms
+98: fire_crawl_2pistol [12,28,12] 966ms
+98: roll_forward [12,35.1108,12] 1000ms
+98: roll_right [12,37.1108,12] 1000ms
+98: roll_left [12,38.1108,12] 1000ms
+98: roll_back [12,40.1108,12] 1000ms
+98: dodge_right [12,39.1108,12] 1ms
+98: dodge_left [12,38.1108,12] 1ms
+98: recoil_head1 [12,42,12] 533ms
+98: recoil_chest [12,42,12] 466ms
+98: recoil_rchest [12,42,12] 766ms
+98: recoil_lchest [12,42,12] 566ms
+98: recoil_lleg1 [12,42,12] 1000ms
+98: recoil_rleg1 [12,42,12] 966ms
+98: recoil_head2 [12,42,12] 666ms
+98: recoil_chest2 [12,42,12] 933ms
+98: recoil_lchest2 [12,42,12] 500ms
+98: recoil_rchest2 [12,42,12] 666ms
+98: recoil_lleg2 [12,42,12] 966ms
+98: recoil_rleg2 [12,42,12] 833ms
+98: death_head1 [12,42,12] 1333ms
+98: death_chest [12,42,12] 9733ms
+98: death_rchest1 [12,42,12] 2666ms
+98: death_lchest1 [12,42,12] 2766ms
+98: death_lleg1 [12,42,12] 3666ms
+98: death_rleg1 [12,42,12] 2666ms
+98: death_rchest2 [12,42,12] 7333ms
+98: death_lchest2 [12,42,12] 3266ms
+98: death_lleg2 [12,42,12] 7666ms
+98: death_rleg2 [12,42,12] 9733ms
+98: death_head2 [12,42,12] 3666ms
+98: death_chest2 [12,42,12] 3666ms
+98: strafe_right_rifle [12,42,12] 700ms
+98: strafe_right_2pistol [12,42,12] 700ms
+98: strafe_right_1pistol [12,42,12] 700ms
+98: strafe_left_rifle [12,42,12] 700ms
+98: strafe_left_2pistol [12,42,12] 700ms
+98: strafe_left_1pistol [12,42,12] 700ms
+98: limb_arm [14,4,14] 633ms
+98: limb_leg [20,4,20] 633ms
+98: limb_head [5,5,5] 1ms
+98: humiliation_01 [12,26,12] 2966ms
+98: humiliation_02 [12,26,12] 2966ms
+98: humiliation_03 [12,26,12] 2966ms
+98: humiliation_04 [12,13,27] 0ms
+98: Newspaper [12,38.1108,12] 1633ms
+98: 20_finale [12,43.1108,12] 9000ms
+98: Train_grab [12,43.1108,12] 2500ms
+98: talk1 [12,43.1108,12] 5000ms
+98: talk2 [12,43.1108,12] 8566ms
+98: talk3 [12,43.1108,12] 7666ms
+98: talk4 [12,43.1108,12] 9333ms
+98: talk5 [12,43.1108,12] 8500ms
+98: crouch_pistol [12,28,12] 0ms
+98: crouch_rifle [12,28,12] 0ms
+ 13/122 Test  #98: locomotion.private .................   Passed    4.41 sec
+test 103
+        Start 103: compound_shell.private
+
+103: Test command: <workspace>/Blood2/build/debug/tests/compound_shell_tests "private" "<external-data-root>"
+103: Working Directory: <workspace>/Blood2/build/debug/tests
+103: Test timeout computed to be: 90
+667: Original SubwayA camera intro expired after 12.0167 simulation seconds
+667: Alternate input: hp=100 dead=0 ammo=38 shots=12 before=5
+667: Corpse placement: placed with clearance correction corrections=2 distance=28.8523 requested=-73.1721,133.002,-2412.32 fitted=-59.999,133.002,-2428
+667: Original FIRE_KEY: shots=12 ammo=38 voices=12 mouse=0
+ 14/122 Test #667: player_controls.private ............   Passed    4.08 sec
+test 132
+        Start 132: doors.private
+
+132: Test command: <workspace>/Blood2/build/debug/tests/door_tests "private" "<external-data-root>"
+132: Working Directory: <workspace>/Blood2/build/debug/tests
+132: Test timeout computed to be: 60
+132: SubwayA doors: 7 created, 0 rejected
+132: SubwayA moving doors: 7
+ 15/122 Test #132: doors.private ......................   Passed    1.82 sec
+test 290
+        Start 290: sceneexplosion.subway
+
+290: Test command: <workspace>/Blood2/build/debug/tests/scene_explosion_tests "subway" "<external-data-root>"
+290: Working Directory: <workspace>/Blood2/build/debug/tests
+290: Test timeout computed to be: 90
+103: CityHub: 453 created / 31 sounds / 0 unsupported / 0 failed
+103: startfences: 3 closed components / 2 shared edges / 36 triangles
+103: Buildings: 2 closed components / 2 shared edges / 90 triangles
+103: CityHub: 453 created / 31 sounds / 0 unsupported / 0 failed
+103: startfences: 3 closed components / 2 shared edges / 36 triangles
+103: Buildings: 2 closed components / 2 shared edges / 90 triangles
+ 16/122 Test #103: compound_shell.private .............   Passed    2.25 sec
+test 221
+        Start 221: keyframes.limits
+
+221: Test command: <workspace>/Blood2/build/debug/tests/keyframer_tests "limits" "<workspace>/Blood2/build/debug/tests/keyframe-fixtures/limits"
+221: Working Directory: <workspace>/Blood2/build/debug/tests
+221: Test timeout computed to be: 30
+ 17/122 Test #221: keyframes.limits ...................   Passed    0.25 sec
+test 93
+        Start  93: locomotion.limits
+
+93: Test command: <workspace>/Blood2/build/debug/tests/locomotion_tests "limits" "<workspace>/Blood2/build/debug/tests/locomotion-fixtures/limits"
+93: Working Directory: <workspace>/Blood2/build/debug/tests
+93: Test timeout computed to be: 30
+ 18/122 Test  #93: locomotion.limits ..................   Passed    0.08 sec
+test 83
+        Start  83: movement.world_collision
+
+83: Test command: <workspace>/Blood2/build/debug/tests/movement_tests "world_collision" "<workspace>/Blood2/build/debug/tests/movement-fixtures/world_collision"
+83: Working Directory: <workspace>/Blood2/build/debug/tests
+83: Test timeout computed to be: 30
+ 19/122 Test  #83: movement.world_collision ...........   Passed    0.07 sec
+test 75
+        Start  75: weapons.animation
+
+75: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "animation" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/animation"
+75: Working Directory: <workspace>/Blood2/build/debug/tests
+75: Test timeout computed to be: 30
+ 20/122 Test  #75: weapons.animation ..................   Passed    0.07 sec
+test 94
+        Start  94: locomotion.crouch
+
+94: Test command: <workspace>/Blood2/build/debug/tests/locomotion_tests "crouch" "<workspace>/Blood2/build/debug/tests/locomotion-fixtures/crouch"
+94: Working Directory: <workspace>/Blood2/build/debug/tests
+94: Test timeout computed to be: 30
+ 21/122 Test  #94: locomotion.crouch ..................   Passed    0.05 sec
+test 86
+        Start  86: movement.timing
+
+86: Test command: <workspace>/Blood2/build/debug/tests/movement_tests "timing" "<workspace>/Blood2/build/debug/tests/movement-fixtures/timing"
+86: Working Directory: <workspace>/Blood2/build/debug/tests
+86: Test timeout computed to be: 30
+ 22/122 Test  #86: movement.timing ....................   Passed    0.05 sec
+test 80
+        Start  80: movement.walking
+
+80: Test command: <workspace>/Blood2/build/debug/tests/movement_tests "walking" "<workspace>/Blood2/build/debug/tests/movement-fixtures/walking"
+80: Working Directory: <workspace>/Blood2/build/debug/tests
+80: Test timeout computed to be: 30
+ 23/122 Test  #80: movement.walking ...................   Passed    0.05 sec
+test 26
+        Start  26: world.level_change
+
+26: Test command: <workspace>/Blood2/build/debug/tests/world_tests "level_change" "<workspace>/Blood2/build/debug/tests/world-fixtures/level_change"
+26: Working Directory: <workspace>/Blood2/build/debug/tests
+26: Test timeout computed to be: 20
+26: trial1: Destination world texture t.dtx: Missing exact-path resource
+26: trial2: No single-player GameStartPoint
+26: trial3: Start point has no supported ground collision
+26: trial4: Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+26: trial5: Destination initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+26: trial6: Destination start trigger requested another level during entry
+26: broken: DAT v56: invalid/unsupported section offsets near byte 4
+26: missing: Resource not found: worlds/missing.dat
+26: Commit 0:
+26: Commit 1:
+26: Commit 2:
+26: PASS level_change
+ 24/122 Test  #26: world.level_change .................   Passed    0.10 sec
+test 82
+        Start  82: movement.collisions
+
+82: Test command: <workspace>/Blood2/build/debug/tests/movement_tests "collisions" "<workspace>/Blood2/build/debug/tests/movement-fixtures/collisions"
+82: Working Directory: <workspace>/Blood2/build/debug/tests
+82: Test timeout computed to be: 30
+ 25/122 Test  #82: movement.collisions ................   Passed    0.05 sec
+test 243
+        Start 243: worldpaths.subway
+
+243: Test command: <workspace>/Blood2/build/debug/tests/worldpath_tests "subway" "<external-data-root>"
+243: Working Directory: <workspace>/Blood2/build/debug/tests
+243: Test timeout computed to be: 90
+290: cycle=0 nine original emitters, null-damager suppression, decoded audio, removal and shell unload verified
+290: cycle=1 nine original emitters, null-damager suppression, decoded audio, removal and shell unload verified
+ 26/122 Test #290: sceneexplosion.subway ..............   Passed    1.63 sec
+test 97
+        Start  97: locomotion.contacts
+
+97: Test command: <workspace>/Blood2/build/debug/tests/locomotion_tests "contacts" "<workspace>/Blood2/build/debug/tests/locomotion-fixtures/contacts"
+97: Working Directory: <workspace>/Blood2/build/debug/tests
+97: Test timeout computed to be: 30
+ 27/122 Test  #97: locomotion.contacts ................   Passed    0.04 sec
+test 147
+        Start 147: interaction.keys
+
+147: Test command: <workspace>/Blood2/build/debug/tests/interaction_tests "keys" "<workspace>/Blood2/build/debug/tests/interaction-fixtures/keys"
+147: Working Directory: <workspace>/Blood2/build/debug/tests
+147: Test timeout computed to be: 30
+ 28/122 Test #147: interaction.keys ...................   Passed    0.04 sec
+test 114
+        Start 114: containers.ladders
+
+114: Test command: <workspace>/Blood2/build/debug/tests/container_tests "ladders" "<workspace>/Blood2/build/debug/tests/container-fixtures/ladders"
+114: Working Directory: <workspace>/Blood2/build/debug/tests
+114: Test timeout computed to be: 30
+ 29/122 Test #114: containers.ladders .................   Passed    0.04 sec
+test 92
+        Start  92: locomotion.world_stairs
+
+92: Test command: <workspace>/Blood2/build/debug/tests/locomotion_tests "world_stairs" "<workspace>/Blood2/build/debug/tests/locomotion-fixtures/world_stairs"
+92: Working Directory: <workspace>/Blood2/build/debug/tests
+92: Test timeout computed to be: 30
+ 30/122 Test  #92: locomotion.world_stairs ............   Passed    0.03 sec
+test 95
+        Start  95: locomotion.animations
+
+95: Test command: <workspace>/Blood2/build/debug/tests/locomotion_tests "animations" "<workspace>/Blood2/build/debug/tests/locomotion-fixtures/animations"
+95: Working Directory: <workspace>/Blood2/build/debug/tests
+95: Test timeout computed to be: 30
+ 31/122 Test  #95: locomotion.animations ..............   Passed    0.04 sec
+test 112
+        Start 112: containers.swimming
+
+112: Test command: <workspace>/Blood2/build/debug/tests/container_tests "swimming" "<workspace>/Blood2/build/debug/tests/container-fixtures/swimming"
+112: Working Directory: <workspace>/Blood2/build/debug/tests
+112: Test timeout computed to be: 30
+ 32/122 Test #112: containers.swimming ................   Passed    0.04 sec
+test 91
+        Start  91: locomotion.stairs
+
+91: Test command: <workspace>/Blood2/build/debug/tests/locomotion_tests "stairs" "<workspace>/Blood2/build/debug/tests/locomotion-fixtures/stairs"
+91: Working Directory: <workspace>/Blood2/build/debug/tests
+91: Test timeout computed to be: 30
+ 33/122 Test  #91: locomotion.stairs ..................   Passed    0.03 sec
+test 84
+        Start  84: movement.support
+
+84: Test command: <workspace>/Blood2/build/debug/tests/movement_tests "support" "<workspace>/Blood2/build/debug/tests/movement-fixtures/support"
+84: Working Directory: <workspace>/Blood2/build/debug/tests
+84: Test timeout computed to be: 30
+ 34/122 Test  #84: movement.support ...................   Passed    0.03 sec
+test 120
+        Start 120: containers.freefall_motion
+
+120: Test command: <workspace>/Blood2/build/debug/tests/container_tests "freefall_motion" "<workspace>/Blood2/build/debug/tests/container-fixtures/freefall_motion"
+120: Working Directory: <workspace>/Blood2/build/debug/tests
+120: Test timeout computed to be: 30
+ 35/122 Test #120: containers.freefall_motion .........   Passed    0.03 sec
+test 288
+        Start 288: sceneexplosion.budget
+
+288: Test command: <workspace>/Blood2/build/debug/tests/scene_explosion_tests "budget" "<workspace>/Blood2/build/debug/tests/scene-explosion-fixtures/budget"
+288: Working Directory: <workspace>/Blood2/build/debug/tests
+288: Test timeout computed to be: 30
+ 36/122 Test #288: sceneexplosion.budget ..............   Passed    0.03 sec
+test 81
+        Start  81: movement.jumping
+
+81: Test command: <workspace>/Blood2/build/debug/tests/movement_tests "jumping" "<workspace>/Blood2/build/debug/tests/movement-fixtures/jumping"
+81: Working Directory: <workspace>/Blood2/build/debug/tests
+81: Test timeout computed to be: 30
+ 37/122 Test  #81: movement.jumping ...................   Passed    0.03 sec
+test 148
+        Start 148: interaction.state
+
+148: Test command: <workspace>/Blood2/build/debug/tests/interaction_tests "state" "<workspace>/Blood2/build/debug/tests/interaction-fixtures/state"
+148: Working Directory: <workspace>/Blood2/build/debug/tests
+148: Test timeout computed to be: 30
+ 38/122 Test #148: interaction.state ..................   Passed    0.02 sec
+test 117
+        Start 117: containers.conveyor_motion
+
+117: Test command: <workspace>/Blood2/build/debug/tests/container_tests "conveyor_motion" "<workspace>/Blood2/build/debug/tests/container-fixtures/conveyor_motion"
+117: Working Directory: <workspace>/Blood2/build/debug/tests
+117: Test timeout computed to be: 30
+ 39/122 Test #117: containers.conveyor_motion .........   Passed    0.13 sec
+test 129
+        Start 129: doors.riders
+
+129: Test command: <workspace>/Blood2/build/debug/tests/door_tests "riders" "<workspace>/Blood2/build/debug/tests/door-fixtures/riders"
+129: Working Directory: <workspace>/Blood2/build/debug/tests
+129: Test timeout computed to be: 30
+ 40/122 Test #129: doors.riders .......................   Passed    0.13 sec
+test 11
+        Start  11: objects.unsupported_teardown
+
+11: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "unsupported_teardown"
+11: Working Directory: <workspace>/Blood2/build/debug/tests
+11: Test timeout computed to be: 10
+11: PASS unsupported_teardown
+ 41/122 Test  #11: objects.unsupported_teardown .......   Passed    0.10 sec
+test 76
+        Start  76: weapons.lifetime
+
+76: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "lifetime" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/lifetime"
+76: Working Directory: <workspace>/Blood2/build/debug/tests
+76: Test timeout computed to be: 30
+ 42/122 Test  #76: weapons.lifetime ...................   Passed    0.12 sec
+test 85
+        Start  85: movement.boundaries
+
+85: Test command: <workspace>/Blood2/build/debug/tests/movement_tests "boundaries" "<workspace>/Blood2/build/debug/tests/movement-fixtures/boundaries"
+85: Working Directory: <workspace>/Blood2/build/debug/tests
+85: Test timeout computed to be: 30
+ 43/122 Test  #85: movement.boundaries ................   Passed    0.01 sec
+test 149
+        Start 149: interaction.geometry
+
+149: Test command: <workspace>/Blood2/build/debug/tests/interaction_tests "geometry" "<workspace>/Blood2/build/debug/tests/interaction-fixtures/geometry"
+149: Working Directory: <workspace>/Blood2/build/debug/tests
+149: Test timeout computed to be: 30
+ 44/122 Test #149: interaction.geometry ...............   Passed    0.02 sec
+test 87
+        Start  87: movement.lifetime
+
+87: Test command: <workspace>/Blood2/build/debug/tests/movement_tests "lifetime" "<workspace>/Blood2/build/debug/tests/movement-fixtures/lifetime"
+87: Working Directory: <workspace>/Blood2/build/debug/tests
+87: Test timeout computed to be: 30
+ 45/122 Test  #87: movement.lifetime ..................   Passed    0.02 sec
+test 96
+        Start  96: locomotion.lifetime
+
+96: Test command: <workspace>/Blood2/build/debug/tests/locomotion_tests "lifetime" "<workspace>/Blood2/build/debug/tests/locomotion-fixtures/lifetime"
+96: Working Directory: <workspace>/Blood2/build/debug/tests
+96: Test timeout computed to be: 30
+ 46/122 Test  #96: locomotion.lifetime ................   Passed    0.01 sec
+test 107
+        Start 107: containers.membership
+
+107: Test command: <workspace>/Blood2/build/debug/tests/container_tests "membership" "<workspace>/Blood2/build/debug/tests/container-fixtures/membership"
+107: Working Directory: <workspace>/Blood2/build/debug/tests
+107: Test timeout computed to be: 30
+ 47/122 Test #107: containers.membership ..............   Passed    0.01 sec
+test 150
+        Start 150: interaction.transport
+
+150: Test command: <workspace>/Blood2/build/debug/tests/interaction_tests "transport" "<workspace>/Blood2/build/debug/tests/interaction-fixtures/transport"
+150: Working Directory: <workspace>/Blood2/build/debug/tests
+150: Test timeout computed to be: 30
+ 48/122 Test #150: interaction.transport ..............   Passed    0.01 sec
+test 116
+        Start 116: containers.specialized_defaults
+
+116: Test command: <workspace>/Blood2/build/debug/tests/container_tests "specialized_defaults" "<workspace>/Blood2/build/debug/tests/container-fixtures/specialized_defaults"
+116: Working Directory: <workspace>/Blood2/build/debug/tests
+116: Test timeout computed to be: 30
+ 49/122 Test #116: containers.specialized_defaults ....   Passed    0.01 sec
+test 241
+        Start 241: worldpaths.player
+
+241: Test command: <workspace>/Blood2/build/debug/tests/worldpath_tests "player" "<workspace>/Blood2/build/debug/tests/worldpath-fixtures/player"
+241: Working Directory: <workspace>/Blood2/build/debug/tests
+241: Test timeout computed to be: 30
+ 50/122 Test #241: worldpaths.player ..................   Passed    0.01 sec
+test 126
+        Start 126: doors.options
+
+126: Test command: <workspace>/Blood2/build/debug/tests/door_tests "options" "<workspace>/Blood2/build/debug/tests/door-fixtures/options"
+126: Working Directory: <workspace>/Blood2/build/debug/tests
+126: Test timeout computed to be: 30
+ 51/122 Test #126: doors.options ......................   Passed    0.01 sec
+test 115
+        Start 115: containers.air_damage
+
+115: Test command: <workspace>/Blood2/build/debug/tests/container_tests "air_damage" "<workspace>/Blood2/build/debug/tests/container-fixtures/air_damage"
+115: Working Directory: <workspace>/Blood2/build/debug/tests
+115: Test timeout computed to be: 30
+ 52/122 Test #115: containers.air_damage ..............   Passed    0.01 sec
+test 145
+        Start 145: interaction.use
+
+145: Test command: <workspace>/Blood2/build/debug/tests/interaction_tests "use" "<workspace>/Blood2/build/debug/tests/interaction-fixtures/use"
+145: Working Directory: <workspace>/Blood2/build/debug/tests
+145: Test timeout computed to be: 30
+ 53/122 Test #145: interaction.use ....................   Passed    0.01 sec
+test 113
+        Start 113: containers.surface
+
+113: Test command: <workspace>/Blood2/build/debug/tests/container_tests "surface" "<workspace>/Blood2/build/debug/tests/container-fixtures/surface"
+113: Working Directory: <workspace>/Blood2/build/debug/tests
+113: Test timeout computed to be: 30
+ 54/122 Test #113: containers.surface .................   Passed    0.01 sec
+test 70
+        Start  70: weapons.inventory
+
+70: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "inventory" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/inventory"
+70: Working Directory: <workspace>/Blood2/build/debug/tests
+70: Test timeout computed to be: 30
+ 55/122 Test  #70: weapons.inventory ..................   Passed    0.01 sec
+test 77
+        Start  77: weapons.rollback
+
+77: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "rollback" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/rollback"
+77: Working Directory: <workspace>/Blood2/build/debug/tests
+77: Test timeout computed to be: 30
+ 56/122 Test  #77: weapons.rollback ...................   Passed    0.01 sec
+test 119
+        Start 119: containers.specialized_damage
+
+119: Test command: <workspace>/Blood2/build/debug/tests/container_tests "specialized_damage" "<workspace>/Blood2/build/debug/tests/container-fixtures/specialized_damage"
+119: Working Directory: <workspace>/Blood2/build/debug/tests
+119: Test timeout computed to be: 30
+ 57/122 Test #119: containers.specialized_damage ......   Passed    0.01 sec
+test 153
+        Start 153: interaction.player_push
+
+153: Test command: <workspace>/Blood2/build/debug/tests/interaction_tests "player_push" "<workspace>/Blood2/build/debug/tests/interaction-fixtures/player_push"
+153: Working Directory: <workspace>/Blood2/build/debug/tests
+153: Test timeout computed to be: 30
+ 58/122 Test #153: interaction.player_push ............   Passed    0.01 sec
+test 102
+        Start 102: compound_shell.ground
+
+102: Test command: <workspace>/Blood2/build/debug/tests/compound_shell_tests "ground" "<workspace>/Blood2/build/debug/tests/compound-shell-fixtures/ground"
+102: Working Directory: <workspace>/Blood2/build/debug/tests
+102: Test timeout computed to be: 30
+102: Ground rays use actual polygon pieces/gaps and authored box bounds independently of pivot
+ 59/122 Test #102: compound_shell.ground ..............   Passed    0.01 sec
+test 108
+        Start 108: containers.lifetime
+
+108: Test command: <workspace>/Blood2/build/debug/tests/container_tests "lifetime" "<workspace>/Blood2/build/debug/tests/container-fixtures/lifetime"
+108: Working Directory: <workspace>/Blood2/build/debug/tests
+108: Test timeout computed to be: 30
+ 60/122 Test #108: containers.lifetime ................   Passed    0.01 sec
+test 73
+        Start  73: weapons.melee
+
+73: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "melee" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/melee"
+73: Working Directory: <workspace>/Blood2/build/debug/tests
+73: Test timeout computed to be: 30
+ 61/122 Test  #73: weapons.melee ......................   Passed    0.01 sec
+test 146
+        Start 146: interaction.input
+
+146: Test command: <workspace>/Blood2/build/debug/tests/interaction_tests "input" "<workspace>/Blood2/build/debug/tests/interaction-fixtures/input"
+146: Working Directory: <workspace>/Blood2/build/debug/tests
+146: Test timeout computed to be: 30
+ 62/122 Test #146: interaction.input ..................   Passed    0.01 sec
+test 284
+        Start 284: sceneexplosion.commands
+
+284: Test command: <workspace>/Blood2/build/debug/tests/scene_explosion_tests "commands" "<workspace>/Blood2/build/debug/tests/scene-explosion-fixtures/commands"
+284: Working Directory: <workspace>/Blood2/build/debug/tests
+284: Test timeout computed to be: 30
+ 63/122 Test #284: sceneexplosion.commands ............   Passed    0.01 sec
+test 152
+        Start 152: interaction.lifetime
+
+152: Test command: <workspace>/Blood2/build/debug/tests/interaction_tests "lifetime" "<workspace>/Blood2/build/debug/tests/interaction-fixtures/lifetime"
+152: Working Directory: <workspace>/Blood2/build/debug/tests
+152: Test timeout computed to be: 30
+ 64/122 Test #152: interaction.lifetime ...............   Passed    0.01 sec
+test 287
+        Start 287: sceneexplosion.failures
+
+287: Test command: <workspace>/Blood2/build/debug/tests/scene_explosion_tests "failures" "<workspace>/Blood2/build/debug/tests/scene-explosion-fixtures/failures"
+287: Working Directory: <workspace>/Blood2/build/debug/tests
+287: Test timeout computed to be: 30
+ 65/122 Test #287: sceneexplosion.failures ............   Passed    0.01 sec
+test 286
+        Start 286: sceneexplosion.lifetime
+
+286: Test command: <workspace>/Blood2/build/debug/tests/scene_explosion_tests "lifetime" "<workspace>/Blood2/build/debug/tests/scene-explosion-fixtures/lifetime"
+286: Working Directory: <workspace>/Blood2/build/debug/tests
+286: Test timeout computed to be: 30
+ 66/122 Test #286: sceneexplosion.lifetime ............   Passed    0.01 sec
+test 101
+        Start 101: compound_shell.lifetime
+
+101: Test command: <workspace>/Blood2/build/debug/tests/compound_shell_tests "lifetime" "<workspace>/Blood2/build/debug/tests/compound-shell-fixtures/lifetime"
+101: Working Directory: <workspace>/Blood2/build/debug/tests
+101: Test timeout computed to be: 30
+ 67/122 Test #101: compound_shell.lifetime ............   Passed    0.01 sec
+test 283
+        Start 283: sceneexplosion.properties
+
+283: Test command: <workspace>/Blood2/build/debug/tests/scene_explosion_tests "properties" "<workspace>/Blood2/build/debug/tests/scene-explosion-fixtures/properties"
+283: Working Directory: <workspace>/Blood2/build/debug/tests
+283: Test timeout computed to be: 30
+ 68/122 Test #283: sceneexplosion.properties ..........   Passed    0.01 sec
+test 71
+        Start  71: weapons.segments
+
+71: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "segments" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/segments"
+71: Working Directory: <workspace>/Blood2/build/debug/tests
+71: Test timeout computed to be: 30
+ 69/122 Test  #71: weapons.segments ...................   Passed    0.01 sec
+test 72
+        Start  72: weapons.firing
+
+72: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "firing" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/firing"
+72: Working Directory: <workspace>/Blood2/build/debug/tests
+72: Test timeout computed to be: 30
+ 70/122 Test  #72: weapons.firing .....................   Passed    0.01 sec
+test 74
+        Start  74: weapons.damage
+
+74: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "damage" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/damage"
+74: Working Directory: <workspace>/Blood2/build/debug/tests
+74: Test timeout computed to be: 30
+ 71/122 Test  #74: weapons.damage .....................   Passed    0.01 sec
+test 285
+        Start 285: sceneexplosion.damage
+
+285: Test command: <workspace>/Blood2/build/debug/tests/scene_explosion_tests "damage" "<workspace>/Blood2/build/debug/tests/scene-explosion-fixtures/damage"
+285: Working Directory: <workspace>/Blood2/build/debug/tests
+285: Test timeout computed to be: 30
+ 72/122 Test #285: sceneexplosion.damage ..............   Passed    0.01 sec
+test 12
+        Start  12: objects.creation_failures
+
+12: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "creation_failures"
+12: Working Directory: <workspace>/Blood2/build/debug/tests
+12: Test timeout computed to be: 10
+12: PASS creation_failures
+ 73/122 Test  #12: objects.creation_failures ..........   Passed    0.01 sec
+test 10
+        Start  10: objects.messages_strings
+
+10: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "messages_strings"
+10: Working Directory: <workspace>/Blood2/build/debug/tests
+10: Test timeout computed to be: 10
+10: PASS messages_strings
+ 74/122 Test  #10: objects.messages_strings ...........   Passed    0.01 sec
+test 151
+        Start 151: interaction.blocking
+
+151: Test command: <workspace>/Blood2/build/debug/tests/interaction_tests "blocking" "<workspace>/Blood2/build/debug/tests/interaction-fixtures/blocking"
+151: Working Directory: <workspace>/Blood2/build/debug/tests
+151: Test timeout computed to be: 30
+ 75/122 Test #151: interaction.blocking ...............   Passed    0.01 sec
+test 240
+        Start 240: worldpaths.validation
+
+240: Test command: <workspace>/Blood2/build/debug/tests/worldpath_tests "validation" "<workspace>/Blood2/build/debug/tests/worldpath-fixtures/validation"
+240: Working Directory: <workspace>/Blood2/build/debug/tests
+240: Test timeout computed to be: 30
+ 76/122 Test #240: worldpaths.validation ..............   Passed    0.01 sec
+test 125
+        Start 125: doors.state
+
+125: Test command: <workspace>/Blood2/build/debug/tests/door_tests "state" "<workspace>/Blood2/build/debug/tests/door-fixtures/state"
+125: Working Directory: <workspace>/Blood2/build/debug/tests
+125: Test timeout computed to be: 30
+ 77/122 Test #125: doors.state ........................   Passed    0.01 sec
+test 182
+        Start 182: pushables.containers
+
+182: Test command: <workspace>/Blood2/build/debug/tests/pushable_tests "containers" "<workspace>/Blood2/build/debug/tests/pushable-fixtures/containers"
+182: Working Directory: <workspace>/Blood2/build/debug/tests
+182: Test timeout computed to be: 30
+ 78/122 Test #182: pushables.containers ...............   Passed    0.01 sec
+test 242
+        Start 242: worldpaths.timeline
+
+242: Test command: <workspace>/Blood2/build/debug/tests/worldpath_tests "timeline" "<workspace>/Blood2/build/debug/tests/worldpath-fixtures/timeline"
+242: Working Directory: <workspace>/Blood2/build/debug/tests
+242: Test timeout computed to be: 30
+ 79/122 Test #242: worldpaths.timeline ................   Passed    0.01 sec
+test 215
+        Start 215: keyframes.timeline
+
+215: Test command: <workspace>/Blood2/build/debug/tests/keyframer_tests "timeline" "<workspace>/Blood2/build/debug/tests/keyframe-fixtures/timeline"
+215: Working Directory: <workspace>/Blood2/build/debug/tests
+215: Test timeout computed to be: 30
+ 80/122 Test #215: keyframes.timeline .................   Passed    0.01 sec
+test 238
+        Start 238: worldpaths.push_block
+
+238: Test command: <workspace>/Blood2/build/debug/tests/worldpath_tests "push_block" "<workspace>/Blood2/build/debug/tests/worldpath-fixtures/push_block"
+238: Working Directory: <workspace>/Blood2/build/debug/tests
+238: Test timeout computed to be: 30
+ 81/122 Test #238: worldpaths.push_block ..............   Passed    0.01 sec
+test 127
+        Start 127: doors.geometry
+
+127: Test command: <workspace>/Blood2/build/debug/tests/door_tests "geometry" "<workspace>/Blood2/build/debug/tests/door-fixtures/geometry"
+127: Working Directory: <workspace>/Blood2/build/debug/tests
+127: Test timeout computed to be: 30
+ 82/122 Test #127: doors.geometry .....................   Passed    0.01 sec
+test 218
+        Start 218: keyframes.events
+
+218: Test command: <workspace>/Blood2/build/debug/tests/keyframer_tests "events" "<workspace>/Blood2/build/debug/tests/keyframe-fixtures/events"
+218: Working Directory: <workspace>/Blood2/build/debug/tests
+218: Test timeout computed to be: 30
+ 83/122 Test #218: keyframes.events ...................   Passed    0.01 sec
+test 130
+        Start 130: doors.lifetime
+
+130: Test command: <workspace>/Blood2/build/debug/tests/door_tests "lifetime" "<workspace>/Blood2/build/debug/tests/door-fixtures/lifetime"
+130: Working Directory: <workspace>/Blood2/build/debug/tests
+130: Test timeout computed to be: 30
+ 84/122 Test #130: doors.lifetime .....................   Passed    0.01 sec
+test 217
+        Start 217: keyframes.rotation
+
+217: Test command: <workspace>/Blood2/build/debug/tests/keyframer_tests "rotation" "<workspace>/Blood2/build/debug/tests/keyframe-fixtures/rotation"
+217: Working Directory: <workspace>/Blood2/build/debug/tests
+217: Test timeout computed to be: 30
+ 85/122 Test #217: keyframes.rotation .................   Passed    0.01 sec
+test 219
+        Start 219: keyframes.reentrant
+
+219: Test command: <workspace>/Blood2/build/debug/tests/keyframer_tests "reentrant" "<workspace>/Blood2/build/debug/tests/keyframe-fixtures/reentrant"
+219: Working Directory: <workspace>/Blood2/build/debug/tests
+219: Test timeout computed to be: 30
+ 86/122 Test #219: keyframes.reentrant ................   Passed    0.01 sec
+test 216
+        Start 216: keyframes.looping
+
+216: Test command: <workspace>/Blood2/build/debug/tests/keyframer_tests "looping" "<workspace>/Blood2/build/debug/tests/keyframe-fixtures/looping"
+216: Working Directory: <workspace>/Blood2/build/debug/tests
+216: Test timeout computed to be: 30
+ 87/122 Test #216: keyframes.looping ..................   Passed    0.01 sec
+test 239
+        Start 239: worldpaths.lifetime
+
+239: Test command: <workspace>/Blood2/build/debug/tests/worldpath_tests "lifetime" "<workspace>/Blood2/build/debug/tests/worldpath-fixtures/lifetime"
+239: Working Directory: <workspace>/Blood2/build/debug/tests
+239: Test timeout computed to be: 30
+ 88/122 Test #239: worldpaths.lifetime ................   Passed    0.01 sec
+test 99
+        Start  99: compound_shell.geometry
+
+99: Test command: <workspace>/Blood2/build/debug/tests/compound_shell_tests "geometry" "<workspace>/Blood2/build/debug/tests/compound-shell-fixtures/geometry"
+99: Working Directory: <workspace>/Blood2/build/debug/tests
+99: Test timeout computed to be: 30
+99: Closed edge/vertex-touching and disconnected components: contents, gap sweeps, overlap, T junctions and transforms pass
+ 89/122 Test  #99: compound_shell.geometry ............   Passed    0.00 sec
+test 237
+        Start 237: worldpaths.riders
+
+237: Test command: <workspace>/Blood2/build/debug/tests/worldpath_tests "riders" "<workspace>/Blood2/build/debug/tests/worldpath-fixtures/riders"
+237: Working Directory: <workspace>/Blood2/build/debug/tests
+237: Test timeout computed to be: 30
+ 90/122 Test #237: worldpaths.riders ..................   Passed    0.01 sec
+test 128
+        Start 128: doors.pushing
+
+128: Test command: <workspace>/Blood2/build/debug/tests/door_tests "pushing" "<workspace>/Blood2/build/debug/tests/door-fixtures/pushing"
+128: Working Directory: <workspace>/Blood2/build/debug/tests
+128: Test timeout computed to be: 30
+ 91/122 Test #128: doors.pushing ......................   Passed    0.01 sec
+test 118
+        Start 118: containers.conveyor_bodies
+
+118: Test command: <workspace>/Blood2/build/debug/tests/container_tests "conveyor_bodies" "<workspace>/Blood2/build/debug/tests/container-fixtures/conveyor_bodies"
+118: Working Directory: <workspace>/Blood2/build/debug/tests
+118: Test timeout computed to be: 30
+ 92/122 Test #118: containers.conveyor_bodies .........   Passed    0.01 sec
+test 236
+        Start 236: worldpaths.world_block
+
+236: Test command: <workspace>/Blood2/build/debug/tests/worldpath_tests "world_block" "<workspace>/Blood2/build/debug/tests/worldpath-fixtures/world_block"
+236: Working Directory: <workspace>/Blood2/build/debug/tests
+236: Test timeout computed to be: 30
+ 93/122 Test #236: worldpaths.world_block .............   Passed    0.01 sec
+test 235
+        Start 235: worldpaths.translation
+
+235: Test command: <workspace>/Blood2/build/debug/tests/worldpath_tests "translation" "<workspace>/Blood2/build/debug/tests/worldpath-fixtures/translation"
+235: Working Directory: <workspace>/Blood2/build/debug/tests
+235: Test timeout computed to be: 30
+ 94/122 Test #235: worldpaths.translation .............   Passed    0.01 sec
+test 222
+        Start 222: keyframes.collision
+
+222: Test command: <workspace>/Blood2/build/debug/tests/keyframer_tests "collision" "<workspace>/Blood2/build/debug/tests/keyframe-fixtures/collision"
+222: Working Directory: <workspace>/Blood2/build/debug/tests
+222: Test timeout computed to be: 30
+ 95/122 Test #222: keyframes.collision ................   Passed    0.01 sec
+test 111
+        Start 111: containers.physics
+
+111: Test command: <workspace>/Blood2/build/debug/tests/container_tests "physics" "<workspace>/Blood2/build/debug/tests/container-fixtures/physics"
+111: Working Directory: <workspace>/Blood2/build/debug/tests
+111: Test timeout computed to be: 30
+ 96/122 Test #111: containers.physics .................   Passed    0.01 sec
+test 220
+        Start 220: keyframes.validation
+
+220: Test command: <workspace>/Blood2/build/debug/tests/keyframer_tests "validation" "<workspace>/Blood2/build/debug/tests/keyframe-fixtures/validation"
+220: Working Directory: <workspace>/Blood2/build/debug/tests
+220: Test timeout computed to be: 30
+ 97/122 Test #220: keyframes.validation ...............   Passed    0.01 sec
+test 505
+        Start 505: ai_runtime.visibility_filter
+
+505: Test command: <workspace>/Blood2/build/debug/tests/ai_runtime_tests "visibility_filter"
+505: Working Directory: <workspace>/Blood2/build/debug/tests
+505: Test timeout computed to be: 30
+ 98/122 Test #505: ai_runtime.visibility_filter .......   Passed    0.01 sec
+test 100
+        Start 100: compound_shell.malformed
+
+100: Test command: <workspace>/Blood2/build/debug/tests/compound_shell_tests "malformed" "<workspace>/Blood2/build/debug/tests/compound-shell-fixtures/malformed"
+100: Working Directory: <workspace>/Blood2/build/debug/tests
+100: Test timeout computed to be: 30
+100: Open, duplicate, oppositely oriented, face-coincident and over-limit shells reject without partial output
+ 99/122 Test #100: compound_shell.malformed ...........   Passed    0.00 sec
+test 1
+        Start   1: objects.builtin_model
+
+1: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "builtin_model"
+1: Working Directory: <workspace>/Blood2/build/debug/tests
+1: Test timeout computed to be: 10
+1: PASS builtin_model
+100/122 Test   #1: objects.builtin_model ..............   Passed    0.00 sec
+test 503
+        Start 503: ai_runtime.activation
+
+503: Test command: <workspace>/Blood2/build/debug/tests/ai_runtime_tests "activation"
+503: Working Directory: <workspace>/Blood2/build/debug/tests
+503: Test timeout computed to be: 30
+101/122 Test #503: ai_runtime.activation ..............   Passed    0.00 sec
+test 506
+        Start 506: ai_runtime.visibility_atomic
+
+506: Test command: <workspace>/Blood2/build/debug/tests/ai_runtime_tests "visibility_atomic"
+506: Working Directory: <workspace>/Blood2/build/debug/tests
+506: Test timeout computed to be: 30
+102/122 Test #506: ai_runtime.visibility_atomic .......   Passed    0.00 sec
+test 504
+        Start 504: ai_runtime.visibility
+
+504: Test command: <workspace>/Blood2/build/debug/tests/ai_runtime_tests "visibility"
+504: Working Directory: <workspace>/Blood2/build/debug/tests
+504: Test timeout computed to be: 30
+103/122 Test #504: ai_runtime.visibility ..............   Passed    0.00 sec
+test 214
+        Start 214: keyframes.defaults
+
+214: Test command: <workspace>/Blood2/build/debug/tests/keyframer_tests "defaults" "<workspace>/Blood2/build/debug/tests/keyframe-fixtures/defaults"
+214: Working Directory: <workspace>/Blood2/build/debug/tests
+214: Test timeout computed to be: 30
+104/122 Test #214: keyframes.defaults .................   Passed    0.00 sec
+test 661
+        Start 661: player_controls.keys
+
+661: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "keys"
+661: Working Directory: <workspace>/Blood2/build/debug/tests
+661: Test timeout computed to be: 30
+105/122 Test #661: player_controls.keys ...............   Passed    0.00 sec
+test 105
+        Start 105: containers.geometry
+
+105: Test command: <workspace>/Blood2/build/debug/tests/container_tests "geometry" "<workspace>/Blood2/build/debug/tests/container-fixtures/geometry"
+105: Working Directory: <workspace>/Blood2/build/debug/tests
+105: Test timeout computed to be: 30
+106/122 Test #105: containers.geometry ................   Passed    0.00 sec
+test 2
+        Start   2: objects.original_objects
+
+2: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "original_objects"
+2: Working Directory: <workspace>/Blood2/build/debug/tests
+2: Test timeout computed to be: 10
+2: PASS original_objects
+107/122 Test   #2: objects.original_objects ...........   Passed    0.00 sec
+test 662
+        Start 662: player_controls.mouse
+
+662: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "mouse"
+662: Working Directory: <workspace>/Blood2/build/debug/tests
+662: Test timeout computed to be: 30
+108/122 Test #662: player_controls.mouse ..............   Passed    0.00 sec
+test 9
+        Start   9: objects.links_lists
+
+9: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "links_lists"
+9: Working Directory: <workspace>/Blood2/build/debug/tests
+9: Test timeout computed to be: 10
+9: PASS links_lists
+109/122 Test   #9: objects.links_lists ................   Passed    0.00 sec
+test 106
+        Start 106: containers.concave
+
+106: Test command: <workspace>/Blood2/build/debug/tests/container_tests "concave" "<workspace>/Blood2/build/debug/tests/container-fixtures/concave"
+106: Working Directory: <workspace>/Blood2/build/debug/tests
+106: Test timeout computed to be: 30
+110/122 Test #106: containers.concave .................   Passed    0.00 sec
+test 663
+        Start 663: player_controls.gates
+
+663: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "gates"
+663: Working Directory: <workspace>/Blood2/build/debug/tests
+663: Test timeout computed to be: 30
+111/122 Test #663: player_controls.gates ..............   Passed    0.00 sec
+test 4
+        Start   4: objects.reasons_properties
+
+4: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "reasons_properties"
+4: Working Directory: <workspace>/Blood2/build/debug/tests
+4: Test timeout computed to be: 10
+4: PASS reasons_properties
+112/122 Test   #4: objects.reasons_properties .........   Passed    0.00 sec
+test 6
+        Start   6: objects.deferred_removal
+
+6: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "deferred_removal"
+6: Working Directory: <workspace>/Blood2/build/debug/tests
+6: Test timeout computed to be: 10
+6: PASS deferred_removal
+113/122 Test   #6: objects.deferred_removal ...........   Passed    0.00 sec
+test 7
+        Start   7: objects.aggregate_dispatch
+
+7: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "aggregate_dispatch"
+7: Working Directory: <workspace>/Blood2/build/debug/tests
+7: Test timeout computed to be: 10
+7: PASS aggregate_dispatch
+114/122 Test   #7: objects.aggregate_dispatch .........   Passed    0.00 sec
+test 3
+        Start   3: objects.nested_creation
+
+3: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "nested_creation"
+3: Working Directory: <workspace>/Blood2/build/debug/tests
+3: Test timeout computed to be: 10
+3: PASS nested_creation
+115/122 Test   #3: objects.nested_creation ............   Passed    0.00 sec
+test 8
+        Start   8: objects.handles_selection
+
+8: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "handles_selection"
+8: Working Directory: <workspace>/Blood2/build/debug/tests
+8: Test timeout computed to be: 10
+8: PASS handles_selection
+116/122 Test   #8: objects.handles_selection ..........   Passed    0.00 sec
+test 5
+        Start   5: objects.scheduling
+
+5: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "scheduling"
+5: Working Directory: <workspace>/Blood2/build/debug/tests
+5: Test timeout computed to be: 10
+5: PASS scheduling
+117/122 Test   #5: objects.scheduling .................   Passed    0.00 sec
+test 88
+        Start  88: movement.controls
+
+88: Test command: <workspace>/Blood2/build/debug/tests/movement_tests "controls" "<workspace>/Blood2/build/debug/tests/movement-fixtures/controls"
+88: Working Directory: <workspace>/Blood2/build/debug/tests
+88: Test timeout computed to be: 30
+118/122 Test  #88: movement.controls ..................   Passed    0.00 sec
+test 664
+        Start 664: player_controls.entry
+
+664: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "entry"
+664: Working Directory: <workspace>/Blood2/build/debug/tests
+664: Test timeout computed to be: 30
+119/122 Test #664: player_controls.entry ..............   Passed    0.00 sec
+test 109
+        Start 109: containers.index_lifetime
+
+109: Test command: <workspace>/Blood2/build/debug/tests/container_tests "index_lifetime" "<workspace>/Blood2/build/debug/tests/container-fixtures/index_lifetime"
+109: Working Directory: <workspace>/Blood2/build/debug/tests
+109: Test timeout computed to be: 30
+120/122 Test #109: containers.index_lifetime ..........   Passed    0.01 sec
+test 110
+        Start 110: containers.index_callbacks
+
+110: Test command: <workspace>/Blood2/build/debug/tests/container_tests "index_callbacks" "<workspace>/Blood2/build/debug/tests/container-fixtures/index_callbacks"
+110: Working Directory: <workspace>/Blood2/build/debug/tests
+110: Test timeout computed to be: 30
+121/122 Test #110: containers.index_callbacks .........   Passed    0.01 sec
+243: blocked_time=3 primary_polygon=1209 fraction=0.560681 normal=0,0,1
+243: blocked_time=3.01666 primary_polygon=1209 fraction=0.896829 normal=0,0,1
+243: cycle=0 moves=297 blocks=2 final=-32,168,3371.74 consumed_keys=9 runtime=233
+243: blocked_time=3 primary_polygon=1209 fraction=0.560681 normal=0,0,1
+243: blocked_time=3.01666 primary_polygon=1209 fraction=0.896829 normal=0,0,1
+243: cycle=1 moves=297 blocks=2 final=-32,168,3371.74 consumed_keys=9 runtime=233
+122/122 Test #243: worldpaths.subway ..................   Passed    3.46 sec
+
+The following tests passed:
+	player_controls.corpse_clearance
+	weapons.private
+	player_controls.combat
+	keyframes.catalog
+	movement.private
+	doors.catalog
+	interaction.catalog
+	ai_runtime.subway
+	world.level_change_private
+	containers.specialized_private
+	containers.private
+	sceneexplosion.catalog
+	locomotion.private
+	player_controls.private
+	doors.private
+	compound_shell.private
+	keyframes.limits
+	locomotion.limits
+	movement.world_collision
+	weapons.animation
+	locomotion.crouch
+	movement.timing
+	movement.walking
+	world.level_change
+	movement.collisions
+	sceneexplosion.subway
+	locomotion.contacts
+	interaction.keys
+	containers.ladders
+	locomotion.world_stairs
+	locomotion.animations
+	containers.swimming
+	locomotion.stairs
+	movement.support
+	containers.freefall_motion
+	sceneexplosion.budget
+	movement.jumping
+	interaction.state
+	containers.conveyor_motion
+	doors.riders
+	objects.unsupported_teardown
+	weapons.lifetime
+	movement.boundaries
+	interaction.geometry
+	movement.lifetime
+	locomotion.lifetime
+	containers.membership
+	interaction.transport
+	containers.specialized_defaults
+	worldpaths.player
+	doors.options
+	containers.air_damage
+	interaction.use
+	containers.surface
+	weapons.inventory
+	weapons.rollback
+	containers.specialized_damage
+	interaction.player_push
+	compound_shell.ground
+	containers.lifetime
+	weapons.melee
+	interaction.input
+	sceneexplosion.commands
+	interaction.lifetime
+	sceneexplosion.failures
+	sceneexplosion.lifetime
+	compound_shell.lifetime
+	sceneexplosion.properties
+	weapons.segments
+	weapons.firing
+	weapons.damage
+	sceneexplosion.damage
+	objects.creation_failures
+	objects.messages_strings
+	interaction.blocking
+	worldpaths.validation
+	doors.state
+	pushables.containers
+	worldpaths.timeline
+	keyframes.timeline
+	worldpaths.push_block
+	doors.geometry
+	keyframes.events
+	doors.lifetime
+	keyframes.rotation
+	keyframes.reentrant
+	keyframes.looping
+	worldpaths.lifetime
+	compound_shell.geometry
+	worldpaths.riders
+	doors.pushing
+	containers.conveyor_bodies
+	worldpaths.world_block
+	worldpaths.translation
+	keyframes.collision
+	containers.physics
+	keyframes.validation
+	ai_runtime.visibility_filter
+	compound_shell.malformed
+	objects.builtin_model
+	ai_runtime.activation
+	ai_runtime.visibility_atomic
+	ai_runtime.visibility
+	keyframes.defaults
+	player_controls.keys
+	containers.geometry
+	objects.original_objects
+	player_controls.mouse
+	objects.links_lists
+	containers.concave
+	player_controls.gates
+	objects.reasons_properties
+	objects.deferred_removal
+	objects.aggregate_dispatch
+	objects.nested_creation
+	objects.handles_selection
+	objects.scheduling
+	movement.controls
+	player_controls.entry
+	containers.index_lifetime
+	containers.index_callbacks
+	worldpaths.subway
+
+100% tests passed, 0 tests failed out of 122
+
+Label Time Summary:
+ai_runtime         =   4.26 sec*proc (5 tests)
+containers         =  14.19 sec*proc (23 tests)
+doors              =   9.27 sec*proc (8 tests)
+headless           = 133.15 sec*proc (122 tests)
+interaction        =   7.06 sec*proc (10 tests)
+keyframes          =  11.02 sec*proc (10 tests)
+locomotion         =   4.70 sec*proc (8 tests)
+movement           =  10.32 sec*proc (10 tests)
+objects            =   0.15 sec*proc (12 tests)
+player_controls    =  31.55 sec*proc (7 tests)
+private            = 130.94 sec*proc (18 tests)
+pushables          =   0.01 sec*proc (1 test)
+sceneexplosion     =   6.61 sec*proc (8 tests)
+weapons            =  24.77 sec*proc (9 tests)
+world              =   5.73 sec*proc (2 tests)
+worldpaths         =   3.51 sec*proc (9 tests)
+
+Total Test time (real) =  67.25 sec

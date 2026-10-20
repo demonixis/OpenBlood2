@@ -1,0 +1,15 @@
+265/273 Testing: character.mappings
+265/273 Test: character.mappings
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_animation_tests" "mappings" "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-fixtures/mappings"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"character.mappings" start time: Oct 16 04:11 CEST
+Output:
+----------------------------------------------------------
+animation bindings=227
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"character.mappings" end time: Oct 16 04:11 CEST
+"character.mappings" time elapsed: 00:00:00
+----------------------------------------------------------

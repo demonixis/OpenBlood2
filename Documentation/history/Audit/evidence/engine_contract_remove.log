@@ -1,0 +1,72 @@
+precreate_struct_x=42.00 stored_object_x=0.00 initial_reason=0
+=================================================================
+==39440==ERROR: AddressSanitizer: heap-use-after-free on address 0x7cf044de011c at pc 0x0000004f9b73 bp 0x7ffe35207a30 sp 0x7ffe35207a28
+WRITE of size 4 at 0x7cf044de011c thread T0
+    #0 0x0000004f9b72  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x4f9b72) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #1 0x0000004ed06b  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x4ed06b) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #2 0x7f7045c0a680  (/lib64/libc.so.6+0x3680) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #3 0x7f7045c0a797  (/lib64/libc.so.6+0x3797) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #4 0x000000400aa4  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x400aa4) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+
+0x7cf044de011c is located 156 bytes inside of 824-byte region [0x7cf044de0080,0x7cf044de03b8)
+freed by thread T0 here:
+    #0 0x0000004ebbd6  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x4ebbd6) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #1 0x000000507a44  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x507a44) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #2 0x000000500200  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x500200) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #3 0x00000050727b  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x50727b) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #4 0x000000507057  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x507057) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #5 0x000000506ebf  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x506ebf) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #6 0x00000065538e  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x65538e) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #7 0x000000655180  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x655180) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #8 0x000000500850  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x500850) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #9 0x0000004fc3cb  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x4fc3cb) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #10 0x0000004ed9d5  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x4ed9d5) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #11 0x000000673817  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x673817) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #12 0x0000004f9f4f  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x4f9f4f) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #13 0x0000004f9a65  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x4f9a65) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #14 0x0000004ed06b  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x4ed06b) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #15 0x7f7045c0a680  (/lib64/libc.so.6+0x3680) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #16 0x7f7045c0a797  (/lib64/libc.so.6+0x3797) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #17 0x000000400aa4  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x400aa4) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+
+previously allocated by thread T0 here:
+    #0 0x0000004eafd1  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x4eafd1) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #1 0x0000004fa0b7  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x4fa0b7) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #2 0x0000004ecddf  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x4ecddf) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+    #3 0x7f7045c0a680  (/lib64/libc.so.6+0x3680) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #4 0x7f7045c0a797  (/lib64/libc.so.6+0x3797) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #5 0x000000400aa4  (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x400aa4) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945)
+
+SUMMARY: AddressSanitizer: heap-use-after-free (/tmp/lithtech-audit-2bVxTF/engine_contract_probe+0x4f9b72) (BuildId: f22f289dba2eab2018667dfa83bfc57387a89945) 
+Shadow bytes around the buggy address:
+  0x7cf044ddfe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7cf044ddff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7cf044ddff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7cf044de0000: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x7cf044de0080: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+=>0x7cf044de0100: fd fd fd[fd]fd fd fd fd fd fd fd fd fd fd fd fd
+  0x7cf044de0180: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x7cf044de0200: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x7cf044de0280: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x7cf044de0300: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x7cf044de0380: fd fd fd fd fd fd fd fa fa fa fa fa fa fa fa fa
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==39440==ABORTING

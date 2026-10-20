@@ -1,0 +1,20 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 350: gpu.model_private
+    Test #350: gpu.model_private ................   Passed    1.03 sec
+    Start 350: gpu.model_private
+    Test #350: gpu.model_private ................   Passed    0.96 sec
+    Start 350: gpu.model_private
+    Test #350: gpu.model_private ................   Passed    0.97 sec
+    Start 350: gpu.model_private
+    Test #350: gpu.model_private ................   Passed    1.00 sec
+    Start 350: gpu.model_private
+1/1 Test #350: gpu.model_private ................   Passed    0.98 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+gpu           =   0.98 sec*proc (1 test)
+model_view    =   0.98 sec*proc (1 test)
+private       =   0.98 sec*proc (1 test)
+
+Total Test time (real) =   4.94 sec

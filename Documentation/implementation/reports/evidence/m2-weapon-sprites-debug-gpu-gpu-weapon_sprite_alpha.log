@@ -1,0 +1,15 @@
+618/619 Testing: gpu.weapon_sprite_alpha
+618/619 Test: gpu.weapon_sprite_alpha
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_sprite_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-sprite-alpha"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.weapon_sprite_alpha" start time: Oct 16 23:53 CEST
+Output:
+----------------------------------------------------------
+Smoke RGB / original fade: 10000 exact opaque-texel blend checks
+<end of output>
+Test time =   0.50 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.weapon_sprite_alpha" end time: Oct 16 23:53 CEST
+"gpu.weapon_sprite_alpha" time elapsed: 00:00:00
+----------------------------------------------------------

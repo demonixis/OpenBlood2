@@ -1,0 +1,39 @@
+167/168 Testing: pickups.catalog
+167/168 Test: pickups.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"pickups.catalog" start time: Oct 15 22:44 CEST
+Output:
+----------------------------------------------------------
+BMGAmmoPU=76
+BatteryAmmoPU=150
+BulletAmmoPU=243
+DieBugDieAmmoPU=105
+FlareAmmoPU=117
+FuelAmmoPU=108
+HealthPU=209
+HowitzerAmmoPU=100
+MegaHealthPU=49
+NecroWardPU=33
+ShellAmmoPU=186
+WardPU=58
+rejected BMGAmmoPU: invalid property TypeAction=8
+rejected BatteryAmmoPU: invalid property TypeAction=17
+rejected BulletAmmoPU: invalid property TypeAction=35
+rejected DieBugDieAmmoPU: invalid property TypeAction=12
+rejected FlareAmmoPU: invalid property TypeAction=17
+rejected FuelAmmoPU: invalid property TypeAction=17
+rejected HealthPU: invalid property TypeAction=21
+rejected HowitzerAmmoPU: invalid property TypeAction=12
+rejected MegaHealthPU: invalid property TypeAction=4
+rejected NecroWardPU: invalid property TypeAction=3
+rejected ShellAmmoPU: invalid property TypeAction=24
+rejected WardPU: invalid property TypeAction=6
+worlds=57 created=1258 missing=0 supported_spawns=60
+<end of output>
+Test time =   4.11 sec
+----------------------------------------------------------
+Test Passed.
+"pickups.catalog" end time: Oct 15 22:44 CEST
+"pickups.catalog" time elapsed: 00:00:04
+----------------------------------------------------------

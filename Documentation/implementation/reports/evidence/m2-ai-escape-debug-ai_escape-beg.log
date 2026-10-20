@@ -1,0 +1,14 @@
+448/458 Testing: ai_escape.beg
+448/458 Test: ai_escape.beg
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests" "beg"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_escape.beg" start time: Oct 16 14:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.beg" end time: Oct 16 14:25 CEST
+"ai_escape.beg" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,15 @@
+656/664 Testing: shield.recipes
+656/664 Test: shield.recipes
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/shield_tests" "recipes" "/home/yann/projects/lithtech/Blood2/build/release/tests/shield-recipes"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"shield.recipes" start time: Oct 17 02:03 CEST
+Output:
+----------------------------------------------------------
+Shield sphere24 and powerup ring18: recipe/RNG, cached-right, local-up offset, whole-system follow/rotation and no catch-up verified.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"shield.recipes" end time: Oct 17 02:03 CEST
+"shield.recipes" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,17 @@
+691/691 Testing: gideon_attack.private
+691/691 Test: gideon_attack.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_attack_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_attack.private" start time: Oct 17 03:04 CEST
+Output:
+----------------------------------------------------------
+cycle=0 dodge_clip=10 elapsed=1 taunt_clip=9 original_shield_shots=1 updates=404
+cycle=1 dodge_clip=10 elapsed=1 taunt_clip=9 original_shield_shots=1 updates=404
+cycle=2 dodge_clip=10 elapsed=1 taunt_clip=9 original_shield_shots=1 updates=404
+<end of output>
+Test time =   0.21 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_attack.private" end time: Oct 17 03:04 CEST
+"gideon_attack.private" time elapsed: 00:00:00
+----------------------------------------------------------

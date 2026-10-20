@@ -1,0 +1,305 @@
+{
+  "date": "2026-10-17",
+  "baseline": "b7313c194fb1d3ba2406dd19b1c0fa11bfce8ccb",
+  "status": "M2 incomplete; valid parallel axes no longer suspend original CMovement callers",
+  "validation": {
+    "headless-debug": {
+      "total": 100,
+      "failed": 0,
+      "private": 17,
+      "seconds": 21.86
+    },
+    "headless-release": {
+      "total": 100,
+      "failed": 0,
+      "private": 17,
+      "seconds": 5.08
+    },
+    "sanitize": {
+      "total": 54,
+      "failed": 0,
+      "private": 8,
+      "seconds": 31.33
+    },
+    "gpu-debug": {
+      "total": 6,
+      "failed": 0,
+      "private": 5,
+      "seconds": 70.75
+    },
+    "gpu-release": {
+      "total": 6,
+      "failed": 0,
+      "private": 5,
+      "seconds": 24.84
+    },
+    "debug-assertion-test": {
+      "total": 1,
+      "failed": 0,
+      "private": 1,
+      "seconds": 1.58
+    },
+    "release-assertion-test": {
+      "total": 1,
+      "failed": 0,
+      "private": 1,
+      "seconds": 0.17
+    },
+    "sanitize-assertion-test": {
+      "total": 1,
+      "failed": 0,
+      "private": 1,
+      "seconds": 6.79
+    }
+  },
+  "source_basis": "Blood II SDK fallback guarantee; exact .99 threshold/perturbation order corroborated by later LithTech, not a retail1998 executable trace",
+  "private_probe": {
+    "npcs": 27,
+    "accepted_player_relocations": 24,
+    "skipped_blocked_positions": 3,
+    "ticks_per_relocation": 300,
+    "timestep": "1/60",
+    "simulated_seconds": 120,
+    "before_suspended_npcs": 2,
+    "after_suspended_npcs": 0,
+    "scope": "Invulnerable player relocation diagnostic, not walking, normal combat or a campaign playthrough",
+    "baseline_build": "Compiled against headers exported from b7313c1 and baseline libraries before rebuilding; same probe source used after the change",
+    "planner_replay": "Both recorded queries return Blocked with one fallback, respectively 14 and 13 rays, through two reload cycles"
+  },
+  "commands": [
+    "cmake --build build/<debug|release> --target blood2_app ai_navigation_tests ai_recovery_tests ai_runtime_tests ai_follow_tests ai_locomotion_tests ai_escape_tests player_controls_tests world_tests object_contract_tests -j3",
+    "cmake --build build/<debug|release> --target level_change_gpu_tests -j3",
+    "ctest --test-dir build/<debug|release> -j3 -R '^ai_(navigation|recovery|runtime|follow|locomotion|escape)\\.|^objects\\.|^world\\.(level_change|level_change_private|destination_lifetime|destination_trial_private)$|^player_controls\\.' --output-on-failure",
+    "cmake --build build/sanitize --target ai_navigation_tests ai_recovery_tests ai_runtime_tests object_contract_tests -j2",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -j2 -R '^ai_(navigation|recovery|runtime)\\.|^objects\\.' --output-on-failure",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(character|lifecycle|mouse_combat|corpse_clearance|objectives|level_change)$' --output-on-failure -V",
+    "cmake --build build/<debug|release|sanitize> --target ai_navigation_tests -j2 && ctest --test-dir build/<debug|release|sanitize> -R '^ai_navigation.cityhub_parallel$' --output-on-failure (final stronger Blocked assertion)",
+    "c++ -std=c++20 -I src -I src/game/legacy -I src/game/original -I build/release/generated -I build/release/_deps/sdl3-src/include <probe.cpp> -o <probe> build/release/libblood2_game.a build/release/libengine.a build/release/_deps/sdl3-build/libSDL3.a build/release/_deps/spdlog-build/libspdlog.a -pthread -lm; run <probe> with the external data root as its only argument"
+  ],
+  "limits": [
+    "No new AI states/classes",
+    "Query success does not guarantee physical traversal; blocked plans remain blocked",
+    "Two-minute diagnostic is not full CityHub traversal",
+    "No native macOS validation or shader changes",
+    "M2 remains incomplete"
+  ],
+  "artifacts": [
+    {
+      "file": "m2-ai-alignment-headless-debug.log",
+      "sha256": "a66419e4dffc7f9652d4847539cd453665d65e955df4e82af11a68759a952a94",
+      "raw_capture_sha256": "a66419e4dffc7f9652d4847539cd453665d65e955df4e82af11a68759a952a94",
+      "bytes": 12432
+    },
+    {
+      "file": "m2-ai-alignment-headless-release.log",
+      "sha256": "847aa0f367f04d58f4a6300c587d65f6fcb9475dbeefd211ec76d73b9815ffa2",
+      "raw_capture_sha256": "847aa0f367f04d58f4a6300c587d65f6fcb9475dbeefd211ec76d73b9815ffa2",
+      "bytes": 12434
+    },
+    {
+      "file": "m2-ai-alignment-sanitize.log",
+      "sha256": "33465b910f5904d482c7374045ed33dd32232c2c41754d872c70856e85a92426",
+      "raw_capture_sha256": "33465b910f5904d482c7374045ed33dd32232c2c41754d872c70856e85a92426",
+      "bytes": 6488
+    },
+    {
+      "file": "m2-ai-alignment-gpu-debug.log",
+      "sha256": "d242132677061272935e9d82abeb9753486b5bee550af8e396c359263324fb9f",
+      "raw_capture_sha256": "28b9e1348bc95bafd23de7dea9d7ae7beae64f68429aeeaead915189110df438",
+      "bytes": 13742
+    },
+    {
+      "file": "m2-ai-alignment-gpu-release.log",
+      "sha256": "5f4aa0f3db6fbb0df621fb19dc388753e5205c58041551af0cf4635a166483b1",
+      "raw_capture_sha256": "b23f24191c38e3ada8cd3cd6884844b4e1e4f018e3a200421acca5351e110dd1",
+      "bytes": 13790
+    },
+    {
+      "file": "m2-ai-alignment-debug-nav.log",
+      "sha256": "8fd93646a587b97a097fa049bd21be6f9eef74c47a91cfa470bde698c3f45d3b",
+      "raw_capture_sha256": "8fd93646a587b97a097fa049bd21be6f9eef74c47a91cfa470bde698c3f45d3b",
+      "bytes": 1543
+    },
+    {
+      "file": "m2-ai-alignment-cityhub-parallel.log",
+      "sha256": "eac2cb3087f2a1a69688984f3a9b6db44f869dac5cb4ce11a63e62155ad4edfb",
+      "raw_capture_sha256": "eac2cb3087f2a1a69688984f3a9b6db44f869dac5cb4ce11a63e62155ad4edfb",
+      "bytes": 444
+    },
+    {
+      "file": "m2-ai-alignment-probe-before.log",
+      "sha256": "87c214f1b6036ee4f0e2073c79786093ce0ce1626ffb78bfe1aca26890904d84",
+      "raw_capture_sha256": "87c214f1b6036ee4f0e2073c79786093ce0ce1626ffb78bfe1aca26890904d84",
+      "bytes": 4031
+    },
+    {
+      "file": "m2-ai-alignment-probe-after.log",
+      "sha256": "65bd4db8f996f45b006973af24575a5a8d433d43d7a095d03a43827c6e46d9d8",
+      "raw_capture_sha256": "65bd4db8f996f45b006973af24575a5a8d433d43d7a095d03a43827c6e46d9d8",
+      "bytes": 1777
+    },
+    {
+      "file": "m2-ai-alignment-reference-integrity.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "raw_capture_sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "bytes": 56
+    },
+    {
+      "file": "m2-ai-alignment-format.log",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "raw_capture_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 1
+    },
+    {
+      "file": "m2-ai-alignment-debug-build.log",
+      "sha256": "498112a20991856c6bcd97c74ce3dad16a7e0f3340628376de9fed0733c610e8",
+      "raw_capture_sha256": "7d51b8750e4a4c057da208a817f441a0977aec3b7f432e3b649dc20db02f55a6",
+      "bytes": 32503
+    },
+    {
+      "file": "m2-ai-alignment-debug-build-refresh.log",
+      "sha256": "9fd4d5b5421305ff66129710ea68aaf86874b17333e1b69835ca945c597a4ba4",
+      "raw_capture_sha256": "038a33a9c6836df4efad4ef3985598497f75bfad913732b20535e62ef1300c5b",
+      "bytes": 8941
+    },
+    {
+      "file": "m2-ai-alignment-debug-assertion-build.log",
+      "sha256": "14d69cd9490550268d5bee0c0448c99e6dd24fea4a5ebbd62e1aed5cdd6434bf",
+      "raw_capture_sha256": "14d69cd9490550268d5bee0c0448c99e6dd24fea4a5ebbd62e1aed5cdd6434bf",
+      "bytes": 372
+    },
+    {
+      "file": "m2-ai-alignment-debug-assertion-test.log",
+      "sha256": "56f795a777ca843e2ef7a917e96d4507d80bbf254c408be42da1db2f11d95a14",
+      "raw_capture_sha256": "56f795a777ca843e2ef7a917e96d4507d80bbf254c408be42da1db2f11d95a14",
+      "bytes": 412
+    },
+    {
+      "file": "m2-ai-alignment-release-build.log",
+      "sha256": "19ac9d41652f463fb7431b417b810067f6449f00385062957ce6c716703d743a",
+      "raw_capture_sha256": "0c7e64c6982ee0434e22081a0afdcb10f8ca4514700843356d6c7a34ba50d967",
+      "bytes": 29527
+    },
+    {
+      "file": "m2-ai-alignment-release-build-refresh.log",
+      "sha256": "e3e0eb71d0e9f420f12d241d177dc893973a8f5acfb7448fa2269e2d6314bb0b",
+      "raw_capture_sha256": "ab2bce7405fed2b7cbc14e9208ef2a36a03a89ea73208da56f4695bc0d221d1d",
+      "bytes": 9402
+    },
+    {
+      "file": "m2-ai-alignment-release-assertion-build.log",
+      "sha256": "14d69cd9490550268d5bee0c0448c99e6dd24fea4a5ebbd62e1aed5cdd6434bf",
+      "raw_capture_sha256": "14d69cd9490550268d5bee0c0448c99e6dd24fea4a5ebbd62e1aed5cdd6434bf",
+      "bytes": 372
+    },
+    {
+      "file": "m2-ai-alignment-release-assertion-test.log",
+      "sha256": "b407babc9e1ec23524da5072cca127f2663fd1f01fd5c8a7a868e1c0c0684a58",
+      "raw_capture_sha256": "b407babc9e1ec23524da5072cca127f2663fd1f01fd5c8a7a868e1c0c0684a58",
+      "bytes": 414
+    },
+    {
+      "file": "m2-ai-alignment-sanitize-build.log",
+      "sha256": "7e554bcae2248b4bedd7c6530f16963fae81b448bfb0b70516e536ea352b130e",
+      "raw_capture_sha256": "a4100e0c0e6daa9acee12c1cf3719d3f6e6254da269a98b67e23d8cc660c50e0",
+      "bytes": 24523
+    },
+    {
+      "file": "m2-ai-alignment-sanitize-build-refresh.log",
+      "sha256": "360582671925b0f331ec63d24dcc8c8727d28ce94996fb942d7bdead30a43254",
+      "raw_capture_sha256": "6029cdb2e24e15a2516fab469effdd810af17ea7bae755f3a59b89bb2e4172a6",
+      "bytes": 8416
+    },
+    {
+      "file": "m2-ai-alignment-sanitize-assertion-build.log",
+      "sha256": "14d69cd9490550268d5bee0c0448c99e6dd24fea4a5ebbd62e1aed5cdd6434bf",
+      "raw_capture_sha256": "14d69cd9490550268d5bee0c0448c99e6dd24fea4a5ebbd62e1aed5cdd6434bf",
+      "bytes": 372
+    },
+    {
+      "file": "m2-ai-alignment-sanitize-assertion-test.log",
+      "sha256": "4501d947d8b43520c8a2bbd5ab69b7421186a2f2eccad59b5df14968a008436e",
+      "raw_capture_sha256": "4501d947d8b43520c8a2bbd5ab69b7421186a2f2eccad59b5df14968a008436e",
+      "bytes": 415
+    },
+    {
+      "file": "m2-ai-alignment-gpu-debug-build.log",
+      "sha256": "be378e38e916932803c789ce1211cad10e85c1e392b503ec62dcc456ff636ef0",
+      "raw_capture_sha256": "be378e38e916932803c789ce1211cad10e85c1e392b503ec62dcc456ff636ef0",
+      "bytes": 582
+    },
+    {
+      "file": "m2-ai-alignment-gpu-release-build.log",
+      "sha256": "be378e38e916932803c789ce1211cad10e85c1e392b503ec62dcc456ff636ef0",
+      "raw_capture_sha256": "be378e38e916932803c789ce1211cad10e85c1e392b503ec62dcc456ff636ef0",
+      "bytes": 582
+    },
+    {
+      "file": "m2-ai-alignment-probe.cpp",
+      "sha256": "6ccc907e7a47529ba848504db67dc8a407d649fe984b1d6a9189587395989867",
+      "bytes": 1933
+    },
+    {
+      "file": "m2-ai-alignment-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+      "bytes": 831
+    },
+    {
+      "file": "m2-ai-alignment-links.log",
+      "sha256": "02282f470949c2bc6a202d5459e1e1ee67a5bcb2e02b15eb87077d1c99e3a99f",
+      "bytes": 32
+    }
+  ],
+  "implementation_patch_sha256": "a247beb842eac480369bfcb912e841c7b2e215c77c9282f3ec23d186421a836e",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "c95b8de08e802bd1359248f6666b21c642e6b5db31e6a1ad3f4580789f59c45c"
+    },
+    {
+      "path": "README.md",
+      "sha256": "7a3afe33e19298aea7123909475b5289c67d2c2e590409fb5923f4a894bf7336"
+    },
+    {
+      "path": "docs/AI_ALIGNMENT_CONTRACTS.md",
+      "sha256": "4f3dc2625d81d3b712b29dd891f77f4358e078a18b9c35f4ee3383fc53e91862"
+    },
+    {
+      "path": "docs/AI_NAVIGATION_CONTRACTS.md",
+      "sha256": "18a4edada37c474ac3223ce002e9d4d97ffd7e80c9daaf2a06ee2896380a56ae"
+    },
+    {
+      "path": "docs/M2_AI_ALIGNMENT_SOURCES.json",
+      "sha256": "c27de61408fad7fd6febc5641c778feb4efb6736e604ed8da09a40e29c1b30da"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "1b40a1e06d6a3710cea5a57fe708ea5d93e301db4cc26f290f87cdd4259276fe"
+    },
+    {
+      "path": "src/app/ai_model_key_smoke.cpp",
+      "sha256": "a69556c8ba096426ff5d57363fca44ea11a45dfc960d8875d02b74d4732abba4"
+    },
+    {
+      "path": "src/app/inspector_skeleton.cpp",
+      "sha256": "8dd249b90607457778bd5fc3bc637e7aa3e909dae401a32e7290e4290afd960e"
+    },
+    {
+      "path": "src/game/original/Movement.cpp",
+      "sha256": "6372e95157eaa797ec6f4fcfaf74d8e35f33dbc8a83095ffca8cf62fecd393ac"
+    },
+    {
+      "path": "src/game/original/Movement.h",
+      "sha256": "4b334f778a40495879d8b63099531cbcc0ec4e240dbc842755530d794fabda92"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "7e60b4a01601b63c7a859020a9b532a189d8864e39cb61bda7b8f92cbb1f425b"
+    },
+    {
+      "path": "tests/ai_navigation_tests.cpp",
+      "sha256": "66c6772b717d39e9a309cecc22e110a460337576bd6c121b4997c099ace1f5ef"
+    }
+  ],
+  "implementation_commit": "6aeb63750107c064c1b612d9be1399f0e19a8e17"
+}

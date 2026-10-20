@@ -1,0 +1,3 @@
+[0/2] Re-checking globbed directories...
+[1/5] Scanning /home/yann/projects/lithtech/Blood2/tests/player_controls_tests.cpp for CXX dependencies
+[2/5] Generating CXX dyndep file tests/CMakeFiles/player_controls_tests.dir/CXX.dd

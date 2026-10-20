@@ -1,0 +1,14 @@
+571/577 Testing: explosion_fragments.collision
+571/577 Test: explosion_fragments.collision
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_fragment_tests" "collision" "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fragments-collision"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"explosion_fragments.collision" start time: Oct 16 21:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_fragments.collision" end time: Oct 16 21:30 CEST
+"explosion_fragments.collision" time elapsed: 00:00:00
+----------------------------------------------------------

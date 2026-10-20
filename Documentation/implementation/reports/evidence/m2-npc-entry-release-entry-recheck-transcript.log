@@ -1,0 +1,42 @@
+Start testing: Oct 17 00:24 CEST
+----------------------------------------------------------
+625/627 Testing: session_playback.policy
+625/627 Test: session_playback.policy
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/session_playback_tests" "policy"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"session_playback.policy" start time: Oct 17 00:24 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"session_playback.policy" end time: Oct 17 00:24 CEST
+"session_playback.policy" time elapsed: 00:00:00
+----------------------------------------------------------
+
+626/627 Testing: session_playback.private
+626/627 Test: session_playback.private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/session_playback_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"session_playback.private" start time: Oct 17 00:24 CEST
+Output:
+----------------------------------------------------------
+SubwayA entry 0: waited 180 frames without ticking; shooters=1 shots=15 player HP=39.9175
+SubwayA entry 1: waited 180 frames without ticking; shooters=1 shots=15 player HP=39.9175
+<end of output>
+Test time =   1.18 sec
+----------------------------------------------------------
+Test Passed.
+"session_playback.private" end time: Oct 17 00:24 CEST
+"session_playback.private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 17 00:24 CEST
+
+headless =   1.18 sec*proc
+
+private =   1.18 sec*proc
+
+session_playback =   1.18 sec*proc
+

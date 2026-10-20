@@ -1,0 +1,38 @@
+Breakpoint 1 at 0x4778cf: file /home/yann/projects/lithtech/Blood2/src/app/world_sound_smoke.cpp, line 226.
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <ima:enforcing>
+  <https://debuginfod.fedoraproject.org/>
+  <ima:ignore>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+
+Thread 1 "blood2" hit Breakpoint 1, OpenBlood2::check_world_sound_smoke (g=...) at /home/yann/projects/lithtech/Blood2/src/app/world_sound_smoke.cpp:226
+226	            return false;
+$1 = ""
+$2 = 84
+$3 = 0
+$4 = 0
+$5 = 0
+$6 = 2
+$7 = std::vector of length 2, capacity 2 = {{id = 3, frames = 960, gate = 18446744073709551615, loops = 0, bank = std::shared_ptr<const OpenBlood2::DlsBank> (use count 37, weak count 0) = {get() = 0x2f8c380}, instrument = 0, region = 0, key = 63, velocity = 100, controllers = {volume = 127, expression = 127, pan = 69, pitch_bend = 8192}, midi_channel = std::optional = {[contained value] = 4}, choke_frame = std::optional [no contained value], choke_level = 0, choke_seconds = 0, channel = std::optional = {[contained value] = {bank_msb = 0, bank_lsb = 0, program = 1, percussion = false, controllers = {volume = 127, expression = 127, pan = 69, pitch_bend = 8192}}}, cursor = 524.4403377162032, base_step = 0.54629201845437492, gain = 0.12400024800049601, left = 0.67579058397245129, right = 0.73709367560315786, nominal_gain = 0.12400024800049601, bend_step = 1, pitch_extent = 300, pan = 0, pan_destination = 0, legacy_pan = false, lfo_hz = 5, lfo_delay = 0.01, lfo_pitch = 0, lfo_gain = 0, envelope_pitch = 0, amplitude = {attack = 0, decay = 0, sustain = 1, release = 0}, pitch = {attack = 0, decay = 0, sustain = 1, release = 0}}, {id = 4, frames = 0, gate = 18446744073709551615, loops = 0, bank = std::shared_ptr<const OpenBlood2::DlsBank> (use count 37, weak count 0) = {get() = 0x2f8c380}, instrument = 0, region = 0, key = 63, velocity = 100, controllers = {volume = 127, expression = 127, pan = 69, pitch_bend = 8192}, midi_channel = std::optional = {[contained value] = 4}, choke_frame = std::optional [no contained value], choke_level = 0, choke_seconds = 0, channel = std::optional = {[contained value] = {bank_msb = 0, bank_lsb = 0, program = 1, percussion = false, controllers = {volume = 127, expression = 127, pan = 69, pitch_bend = 8192}}}, cursor = 0, base_step = 0.54629201845437492, gain = 0.12400024800049601, left = 0.67579058397245129, right = 0.73709367560315786, nominal_gain = 0.12400024800049601, bend_step = 1, pitch_extent = 300, pan = 0, pan_destination = 0, legacy_pan = false, lfo_hz = 5, lfo_delay = 0.01, lfo_pitch = 0, lfo_gain = 0, envelope_pitch = 0, amplitude = {attack = 0, decay = 0, sustain = 1, release = 0}, pitch = {attack = 0, decay = 0, sustain = 1, release = 0}}}
+$8 = {bank_msb = 0, bank_lsb = 0, program = 1, percussion = false, controllers = {volume = 127, expression = 127, pan = 69, pitch_bend = 8192}}
+$9 = 1
+A debugging session is active.
+
+	Inferior 1 [process 2035227] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]

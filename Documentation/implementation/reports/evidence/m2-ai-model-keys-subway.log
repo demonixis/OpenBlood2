@@ -1,0 +1,16 @@
+300/300 Testing: ai_keys.subway
+300/300 Test: ai_keys.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_model_key_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_keys.subway" start time: Oct 16 05:50 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+<end of output>
+Test time =   4.13 sec
+----------------------------------------------------------
+Test Passed.
+"ai_keys.subway" end time: Oct 16 05:50 CEST
+"ai_keys.subway" time elapsed: 00:00:04
+----------------------------------------------------------

@@ -1,0 +1,114 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start 954: train_session.private_60
+      Start 953: train_session.private_30
+ 1/48 Test #953: train_session.private_30 .........   Passed    4.40 sec
+      Start 958: screen_fade.private
+ 2/48 Test #954: train_session.private_60 .........   Passed    4.89 sec
+      Start  73: player.smell_private
+ 3/48 Test  #73: player.smell_private .............   Passed    0.84 sec
+      Start 846: conversation.catalog
+ 4/48 Test #846: conversation.catalog .............   Passed    0.23 sec
+      Start 845: conversation.private
+ 5/48 Test #845: conversation.private .............   Passed    0.21 sec
+      Start  74: player.private
+ 6/48 Test  #74: player.private ...................   Passed    0.26 sec
+      Start  50: world.level_change_private
+ 7/48 Test  #50: world.level_change_private .......   Passed    0.52 sec
+      Start  12: objects.message_churn
+ 8/48 Test  #12: objects.message_churn ............   Passed    0.09 sec
+      Start 201: pickup_audio.private
+ 9/48 Test #201: pickup_audio.private .............   Passed    0.06 sec
+      Start  13: objects.message_limit
+10/48 Test  #13: objects.message_limit ............   Passed    0.02 sec
+      Start 199: pickup_audio.failures
+11/48 Test #199: pickup_audio.failures ............   Passed    0.03 sec
+      Start  32: world.level_change
+12/48 Test  #32: world.level_change ...............   Passed    0.01 sec
+      Start 844: conversation.lifetime
+13/48 Test #844: conversation.lifetime ............   Passed    0.00 sec
+      Start 840: conversation.sequence
+14/48 Test #840: conversation.sequence ............   Passed    0.00 sec
+      Start 957: screen_fade.session
+15/48 Test #957: screen_fade.session ..............   Passed    0.00 sec
+      Start 843: conversation.clock
+16/48 Test #843: conversation.clock ...............   Passed    0.00 sec
+      Start 842: conversation.transport
+17/48 Test #842: conversation.transport ...........   Passed    0.00 sec
+      Start 841: conversation.delayed
+18/48 Test #841: conversation.delayed .............   Passed    0.00 sec
+      Start  72: player.smell
+19/48 Test  #72: player.smell .....................   Passed    0.00 sec
+      Start  47: world.session_lifecycle
+20/48 Test  #47: world.session_lifecycle ..........   Passed    0.00 sec
+      Start 198: pickup_audio.rules
+21/48 Test #198: pickup_audio.rules ...............   Passed    0.00 sec
+      Start 200: pickup_audio.callbacks
+22/48 Test #200: pickup_audio.callbacks ...........   Passed    0.00 sec
+      Start 839: conversation.mapping
+23/48 Test #839: conversation.mapping .............   Passed    0.00 sec
+      Start  68: player.lifecycle
+24/48 Test  #68: player.lifecycle .................   Passed    0.00 sec
+      Start  69: player.rollback
+25/48 Test  #69: player.rollback ..................   Passed    0.00 sec
+      Start  70: player.messages
+26/48 Test  #70: player.messages ..................   Passed    0.00 sec
+      Start  71: player.callbacks
+27/48 Test  #71: player.callbacks .................   Passed    0.00 sec
+      Start  67: player.handles
+28/48 Test  #67: player.handles ...................   Passed    0.00 sec
+      Start  48: world.session_messages
+29/48 Test  #48: world.session_messages ...........   Passed    0.00 sec
+      Start 956: screen_fade.values
+30/48 Test #956: screen_fade.values ...............   Passed    0.00 sec
+      Start   2: objects.builtin_model
+31/48 Test   #2: objects.builtin_model ............   Passed    0.00 sec
+      Start  14: objects.unsupported_teardown
+32/48 Test  #14: objects.unsupported_teardown .....   Passed    0.00 sec
+      Start  15: objects.creation_failures
+33/48 Test  #15: objects.creation_failures ........   Passed    0.00 sec
+      Start  11: objects.messages_strings
+34/48 Test  #11: objects.messages_strings .........   Passed    0.00 sec
+      Start   5: objects.reasons_properties
+35/48 Test   #5: objects.reasons_properties .......   Passed    0.00 sec
+      Start   3: objects.original_objects
+36/48 Test   #3: objects.original_objects .........   Passed    0.00 sec
+      Start   9: objects.handles_selection
+37/48 Test   #9: objects.handles_selection ........   Passed    0.00 sec
+      Start   4: objects.nested_creation
+38/48 Test   #4: objects.nested_creation ..........   Passed    0.00 sec
+      Start   8: objects.aggregate_dispatch
+39/48 Test   #8: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start   6: objects.scheduling
+40/48 Test   #6: objects.scheduling ...............   Passed    0.00 sec
+      Start   7: objects.deferred_removal
+41/48 Test   #7: objects.deferred_removal .........   Passed    0.00 sec
+      Start  10: objects.links_lists
+42/48 Test  #10: objects.links_lists ..............   Passed    0.00 sec
+      Start 960: player_voice.groups
+43/48 Test #960: player_voice.groups ..............   Passed    0.00 sec
+      Start 961: player_voice.timing
+44/48 Test #961: player_voice.timing ..............   Passed    0.00 sec
+      Start 962: player_voice.messages
+45/48 Test #962: player_voice.messages ............   Passed    0.00 sec
+      Start 963: player_voice.pickup
+46/48 Test #963: player_voice.pickup ..............   Passed    0.05 sec
+      Start 964: player_voice.private
+47/48 Test #964: player_voice.private .............   Passed    0.48 sec
+48/48 Test #958: screen_fade.private ..............   Passed    4.21 sec
+
+100% tests passed, 0 tests failed out of 48
+
+Label Time Summary:
+audio            =   0.63 sec*proc (9 tests)
+conversation     =   0.45 sec*proc (8 tests)
+headless         =  16.38 sec*proc (48 tests)
+objects          =   0.14 sec*proc (14 tests)
+pickups          =   0.10 sec*proc (4 tests)
+player           =   1.12 sec*proc (8 tests)
+player_voice     =   0.53 sec*proc (5 tests)
+private          =  16.10 sec*proc (10 tests)
+screen_fade      =   4.22 sec*proc (3 tests)
+train_session    =   9.29 sec*proc (2 tests)
+world            =   0.54 sec*proc (4 tests)
+
+Total Test time (real) =   8.63 sec

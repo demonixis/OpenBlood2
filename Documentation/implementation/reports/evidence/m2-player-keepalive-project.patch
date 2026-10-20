@@ -1,0 +1,1043 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 9488899..7853363 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -408,3 +408,9 @@ relative scheduling, raw attributes/caps and single MoveMgr integration. First u
+ must derive speeds without ValidateAttributes. No live-client replacement or start
+ trigger replay; current-world clearance may reject. Whole-world/client saves,
+ dead/powered states and safe NEW_LEVEL transfer remain unavailable; M2 stays open.
++
++The [named keep-alive entry continuation](../Documentation/Implementation/M2_PLAYER_KEEPALIVE.md) connects supported captured players to already loaded destinations. Read [contracts](docs/PLAYER_KEEPALIVE_CONTRACTS.md).
++Preserve key removal, raw stats, case-insensitive solo marker selection/last fallback,
++trigger-before-teleport ordering, checked callback lifetime and one MoveMgr integrator.
++Failure cleans staged ownership, not destination trigger effects or an unloaded world.
++Automatic NEW_LEVEL still refuses before teardown; safe transfer and M2 remain open.
+diff --git a/README.md b/README.md
+index 34c6281..afe5540 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,9 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [named keep-alive entry continuation](../Documentation/Implementation/M2_PLAYER_KEEPALIVE.md) preserves supported player stats/weapons into an explicitly loaded destination,
++discards keys and executes original named start entry. Session exposes its mode,
++selected marker and fallback. Automatic level transfer and the M2 gate remain open.
++
+ Current continuation: [player engine restoration and client association](../Documentation/Implementation/M2_PLAYER_RESTORE.md)
+ connects the supported same-world living-player snapshot to original restored entry,
+ without fresh stats or start-trigger replay. Session inspection supports capture,
+diff --git a/docs/EXIT_CONTRACTS.md b/docs/EXIT_CONTRACTS.md
+index e1fc245..f6ce1bc 100644
+--- a/docs/EXIT_CONTRACTS.md
++++ b/docs/EXIT_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original level-exit contracts
+ 
++> Continued by [named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md): supported
++> captured players can enter an already loaded different world at a named start.
++> Automatic NEW_LEVEL still refuses; staged cleanup is not world rollback.
++
+ > Continued by [player state contracts](PLAYER_STATE_CONTRACTS.md): selected player
+ > values and the original savegame initialization early return now execute.
+ > Earlier blanket player-field/initialization omissions are historical; full
+@@ -68,10 +72,12 @@ replacement is accepted. Music/menu/loading-screen teardown and first-world stat
+ changes from the rest of the original HandleExitWorld are deliberately deferred
+ with the unavailable transfer, not represented as completed services.
+ 
+-The next increment must port supported player/inventory/damage keep-alive state,
+-original restored-client association and named start-point entry before enabling
+-NEW_LEVEL. It must validate destination resources and lifetime rollback, preserve
+-current state on refusal and retain explicit failure for unsupported saved fields.
++Supported captured-player restoration, restored-client association and named
++keep-alive entry into an already loaded destination are now implemented (see the
++continuation above). Before enabling NEW_LEVEL, destination preparation still must
++validate required resources/classes and protect the current session on refusal;
++staged player cleanup alone cannot roll back world initialization or start triggers.
++Unsupported saved fields must continue to fail explicitly.
+ General saves, addon character swaps, multiplayer and demo EndGame handling remain
+ outside this increment. The original commented-out world-revisit save is not active
+ behavior to reintroduce.
+diff --git a/docs/INVENTORY_STATE_CONTRACTS.md b/docs/INVENTORY_STATE_CONTRACTS.md
+index 11ebae5..0ca2f8f 100644
+--- a/docs/INVENTORY_STATE_CONTRACTS.md
++++ b/docs/INVENTORY_STATE_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original inventory Save/Load subset
+ 
++> Continued by [named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md): supported
++> captured players can enter an already loaded different world at a named start.
++> Automatic NEW_LEVEL still refuses; staged cleanup is not world rollback.
++
+ > Continued by [player restore contracts](PLAYER_RESTORE_CONTRACTS.md): supported
+ > engine state and original restored-client association now execute in the same
+ > loaded world. Earlier blanket omissions below are historical. Full client/world
+diff --git a/docs/M2_PLAYER_KEEPALIVE_SOURCES.json b/docs/M2_PLAYER_KEEPALIVE_SOURCES.json
+new file mode 100644
+index 0000000..6583932
+--- /dev/null
++++ b/docs/M2_PLAYER_KEEPALIVE_SOURCES.json
+@@ -0,0 +1,63 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "8ec5efd4f167e8b2ffdca66e109168842aaab936",
++  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
++      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
++      "selected_lines": [
++        [
++          192,
++          245
++        ],
++        [
++          746,
++          803
++        ],
++        [
++          959,
++          977
++        ],
++        [
++          1142,
++          1212
++        ]
++      ],
++      "use": "Original saved-client branch, named entry for keep-alive, active player selection and type 1 load; no disk SaveObjects implementation"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "selected_lines": [
++        [
++          2156,
++          2300
++        ]
++      ],
++      "use": "Original single-player named start selection, fallback, yaw, trigger-before-teleport and grounding"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "selected_lines": [],
++      "use": "Existing type 1 Load key removal reused without changing aggregate semantics"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/GameStartPoint.cpp",
++      "sha256": "88194b2c13fba7e4bc30380e84b6f8e276690b32adfce4bce28c6e6ec67dc8c2",
++      "selected_lines": [],
++      "use": "Existing original SendTrigger ownership and authored values reused"
++    }
++  ],
++  "adaptations": [
++    "Explicit loaded-destination entry mode with owned snapshot/start name; no automatic level transaction",
++    "Checked callback lifetime, no-start failure and final body clearance",
++    "Staged player cleanup does not rewind destination trigger effects"
++  ],
++  "remaining": [
++    "Safe automatic NEW_LEVEL/world preparation",
++    "Full client/player saved state, other classes and required FX/services",
++    "Actual M2 exit criteria"
++  ]
++}
+diff --git a/docs/PLAYER_KEEPALIVE_CONTRACTS.md b/docs/PLAYER_KEEPALIVE_CONTRACTS.md
+new file mode 100644
+index 0000000..13fe5ac
+--- /dev/null
++++ b/docs/PLAYER_KEEPALIVE_CONTRACTS.md
+@@ -0,0 +1,67 @@
++# Named keep-alive player entry
++
++This extends [player restoration](PLAYER_RESTORE_CONTRACTS.md) with the original
++new-level entry branch **into an already loaded destination**. It is not an
++accepted ExitTrigger/NEW_LEVEL transaction, a retail Keep.sav implementation or a
++whole-world checkpoint. Automatic exit requests still refuse before teardown.
++
++## Source behavior and ownership
++
++`GameSession::restore_player` accepts explicit `PlayerRestoreMode::KeepAlive` and
++an owned-at-call start name. It requires no current client, a started single-player
++world and the same supported living-player snapshot validation as saved-position
++restoration. The source world may differ. Ordinary SavedPosition still requires
++the same world and refuses a supplied start name. Unknown modes, NULs and names
++over 100 bytes fail. Capture/output ownership is unchanged; no old handle crosses
++worlds. This API never loads or unloads a world itself.
++
++Original inventory Load uses type 1: keys are discarded, while supported weapons,
++raw ammo and selection survive. Damage/player values, raw attributes/caps, original
++Load overrides and relative clocks use the existing restore path. Neither shell
++entry nor client initialization calls Respawn or fresh profile validation.
++
++The original RespawnPlayer keep-alive branch calls GoToStartPoint after association
++and the init message. An empty supplied name selects the source default `start`.
++Matching is case-insensitive, excludes multiplayer markers, and falls back to the
++last enumerated solo marker if the name is absent. FindNamedObjects prepends stable-slot entries to its list; fallback uses the last
++solo entry in that list, not the last-created object. This is not claimed retail-order equivalent. With no solo marker, the port fails rather
++than teleporting a partially initialized player to zero.
++
++GoToStartPoint copies the selected marker name for inspection, takes its yaw and
++zero pitch, samples its position, then **sends its trigger before teleporting**.
++The marker can remove itself; no marker fields are read after dispatch. A trigger
++that removes the player prevents further entry and causes staged cleanup. The
++existing ground helper and physics/force-position messages run, then first-update
++speeds/stats are published eagerly so the single MoveMgr integrator is ready.
++The saved source-world position is not clearance-tested against destination geometry;
++final destination placement is checked with the restored body. Animation/body/eye
++retain existing restore semantics, including crouched snapshots.
++
++Failures discard newly staged player/children/client association. They do not
++reload or rewind the destination, undo start-trigger effects, or resurrect a
++previously unloaded world. Missing ground/resources and blocked placement report
++failure. This limitation is why automatic NEW_LEVEL remains refused. Future
++transaction work must validate/stage the destination without discarding the current
++session; merely reloading the old DAT would lose world/NPC state.
++
++## Inspection and validation
++
++Session retains the same-world restore button and adds a destination start field
++and **Enter loaded world with captured player**. Capture first, explicitly load a
++destination, then enter with the saved player. Last successful mode, destination,
++requested/selected start and fallback status are owned diagnostic values; failures
++have a separate error. The UI never advances the entry path while drawing.
++
++`player_keepalive.named/fallback/failures/private` checks source ordering, key
++removal without modifying the snapshot, raw stats, facing, real movement, missing
++and multiplayer markers, fallback, malformed mode/name, ground/clearance failures,
++callback removal and repeated list/string/attachment teardown. Private checks
++explicitly load CityHub after capturing SubwayA, then enter at `01_egressa`.
++This is harness-directed entry, not evidence of a completed authored level exit.
++`--keepalive-smoke` exercises the same destination entry across hidden UI and reload.
++See [implementation evidence](../../Documentation/Implementation/M2_PLAYER_KEEPALIVE.md)
++and [source ledger](M2_PLAYER_KEEPALIVE_SOURCES.json).
++
++Full client state (objectives/cinematics/music), missing player powers/death state,
++automatic safe transfer, remaining world classes and required FX/services still
++keep M2 incomplete. CityHub inspection does not imply all of its classes work.
+diff --git a/docs/PLAYER_RESTORE_CONTRACTS.md b/docs/PLAYER_RESTORE_CONTRACTS.md
+index 0ab0d97..ccadc3d 100644
+--- a/docs/PLAYER_RESTORE_CONTRACTS.md
++++ b/docs/PLAYER_RESTORE_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Player engine restoration and restored client association
+ 
++> Continued by [named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md): supported
++> captured players can enter an already loaded different world at a named start.
++> Automatic NEW_LEVEL still refuses; staged cleanup is not world rollback.
++
+ This is an owned, in-memory snapshot of the **supported living local player** in
+ the same loaded single-player world. It combines selected original inventory,
+ damage and player Save/Load paths with replacement engine state restoration and
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 11dd614..d30b956 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -720,3 +720,12 @@ checked identities, current geometry and staged cleanup. It reuses the selected
+ original Save/Load and model tail. First update now derives speeds without fresh
+ attribute validation, matching source. See [contracts](PLAYER_RESTORE_CONTRACTS.md)
+ for limits: no retail ABI, full client/world save or cross-world transfer claim.
++
++## Named keep-alive player entry
++
++The [source ledger](M2_PLAYER_KEEPALIVE_SOURCES.json) records original shell
++RespawnPlayer and CPlayerObj GoToStartPoint selections. Existing aggregate Load
++uses KeepAlive type 1 to discard keys. Explicit mode/start ownership, final body
++clearance and callback-lifetime checks are engine adaptations. No dependency,
++reference repository or commercial resource is imported. See
++[contracts](PLAYER_KEEPALIVE_CONTRACTS.md); automatic NEW_LEVEL remains refused.
+diff --git a/docs/WORLD_CONTRACTS.md b/docs/WORLD_CONTRACTS.md
+index b503f38..14810eb 100644
+--- a/docs/WORLD_CONTRACTS.md
++++ b/docs/WORLD_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Resource, World and Session Contracts
+ 
++> Continued by [named keep-alive entry](PLAYER_KEEPALIVE_CONTRACTS.md): supported
++> captured players can enter an already loaded different world at a named start.
++> Automatic NEW_LEVEL still refuses; staged cleanup is not world rollback.
++
+ > Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and
+ > shell exit/load messages now execute. NEW_LEVEL still explicitly refuses missing
+ > keep-alive transfer before teardown; this is not a completed level transition.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 6a2a58b..0bbc960 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -317,11 +317,20 @@ namespace OpenBlood2
+             }
+             capture_player_request = false;
+         }
+-        if (restore_player_request)
++        if (keep_world_request)
+         {
+-            if (game.restoration.saved && game.restore_player(*game.restoration.saved, world_error))
++            if (!game.local_client)
++                game.request_world(keep_world_name, world_error);
++            keep_world_request = false;
++        }
++        if (restore_player_request || keep_player_request)
++        {
++            if (game.restoration.saved && game.restore_player(*game.restoration.saved, world_error,
++                                                              keep_player_request ? PlayerRestoreMode::KeepAlive
++                                                                                  : PlayerRestoreMode::SavedPosition,
++                                                              keep_player_request ? keep_start_name : ""))
+                 selection.id = game.restoration.last_player;
+-            restore_player_request = false;
++            restore_player_request = keep_player_request = false;
+         }
+         if (respawn_request)
+         {
+@@ -1033,7 +1042,7 @@ namespace OpenBlood2
+         }
+         if (!world_error.empty())
+             ImGui::TextWrapped("%s", world_error.c_str());
+-        ImGui::SeparatorText("Player restoration (same loaded world)");
++        ImGui::SeparatorText("Player restoration / keep-alive entry");
+         ImGui::BeginDisabled(!player);
+         if (ImGui::Button("Capture player state"))
+             capture_player_request = true;
+@@ -1043,15 +1052,38 @@ namespace OpenBlood2
+         if (ImGui::Button("Restore captured player"))
+             restore_player_request = true;
+         ImGui::EndDisabled();
++        ImGui::InputText("Destination world", keep_world_name, sizeof(keep_world_name));
++        ImGui::BeginDisabled(player);
++        if (ImGui::Button("Load destination for inspection"))
++            keep_world_request = true;
++        ImGui::EndDisabled();
++        ImGui::TextWrapped(
++            "Leave the player before loading. Loading replaces the current world; the captured player is retained.");
++        ImGui::InputText("Destination start (empty = start)", keep_start_name, sizeof(keep_start_name));
++        ImGui::BeginDisabled(player || !game.restoration.saved || game.world_path.empty());
++        if (ImGui::Button("Enter loaded world with captured player"))
++            keep_player_request = true;
++        ImGui::EndDisabled();
+         const auto& restore = game.restoration;
++        if (restore.restored)
++        {
++            ImGui::TextWrapped("Last success: %s | destination %s | requested start %s | selected %s | fallback %s",
++                               restore.last_mode == PlayerRestoreMode::KeepAlive ? "keep-alive" : "saved position",
++                               restore.destination_world.c_str(), restore.requested_start.c_str(),
++                               restore.selected_start.c_str(), restore.start_fallback ? "yes" : "no");
++        }
++        else
++            ImGui::TextDisabled("No completed restoration");
+         ImGui::Text("Captures %llu | Restored %llu / %llu | Restored client: %s", (unsigned long long)restore.captures,
+                     (unsigned long long)restore.restored, (unsigned long long)restore.attempts,
+                     game.client_shell.restored_entry ? "yes" : "no");
+         if (!restore.error.empty())
+             ImGui::TextWrapped("%s", restore.error.c_str());
+-        ImGui::TextWrapped("Capture, leave the player, then restore. Original Load resets velocity/standard node "
+-                           "visibility; client force-position clears acceleration. World/NPC state, complete "
+-                           "client saves and level transfer are not restored.");
++        ImGui::TextWrapped(
++            "Capture, leave the player, then restore. Original Load resets velocity/standard node "
++            "visibility; client force-position clears acceleration. Keep-alive enters the already loaded "
++            "destination at its named start and discards keys. Automatic level transfer, world/client saves "
++            "and rollback of start-trigger effects remain unavailable.");
+         if (restore.saved && ImGui::TreeNode("Saved engine/player values"))
+         {
+             const auto& s = *restore.saved;
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 060a10a..cf93c92 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -81,7 +81,10 @@ namespace OpenBlood2
+         std::optional<WeaponInput> weapon_input_request;
+         std::optional<PlayerRotation> weapon_aim_request;
+         bool enter_player_request = false, leave_player_request = false, respawn_request = false;
+-        bool capture_player_request = false, restore_player_request = false;
++        bool capture_player_request = false, restore_player_request = false, keep_player_request = false;
++        char keep_start_name[101]{};
++        char keep_world_name[256]{"02_cityhub"};
++        bool keep_world_request = false;
+         ObjectId remove_request{};
+         std::string spawn_request;
+         std::string world_error, reload_world_name = "01_SubwayA";
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index b8b64fd..208a1ad 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -134,9 +134,22 @@ namespace
+                 }
+                 if (options.restore_smoke)
+                 {
++                    if (options.keepalive_smoke)
++                    {
++                        auto* p = game.server_shell.Player(game.local_client);
++                        p->m_damage.SetHitPoints(73);
++                        p->m_InventoryMgr.SetAmmoCount(1, 17);
++                        if (p->m_InventoryMgr.AddKey({"keep-probe", "Diagnostic key", "icon", "selected", 1}) !=
++                            InventoryResult::Ok)
++                            return 6;
++                    }
+                     OpenBlood2::PlayerRestoreState saved;
+                     if (!game.capture_player(saved, error) || !game.leave_player() ||
+-                        !game.request_world(options.world, error) || !game.restore_player(saved, error))
++                        !game.request_world(options.keepalive_smoke ? "02_cityhub" : options.world, error) ||
++                        !game.restore_player(saved, error,
++                                             options.keepalive_smoke ? OpenBlood2::PlayerRestoreMode::KeepAlive
++                                                                     : OpenBlood2::PlayerRestoreMode::SavedPosition,
++                                             options.keepalive_smoke ? "01_egressa" : ""))
+                     {
+                         spdlog::error("Restored player entry: {}", error);
+                         return 6;
+@@ -343,6 +356,8 @@ namespace
+         inspector.world_mesh = &world_mesh;
+         inspector.model_view = &model_scene;
+         inspector.world_render = &world_renderer.stats;
++        if (options.keepalive_smoke)
++            SAFE_STRCPY(inspector.keep_start_name, "01_egressa");
+         inspector.select_models =
+             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
+         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
+@@ -1049,19 +1064,27 @@ namespace
+                     {
+                         inspector.reload_request = true;
+                         inspector.enter_player_request = options.player_smoke && !options.restore_smoke;
+-                        inspector.restore_player_request = options.restore_smoke;
++                        inspector.restore_player_request = options.restore_smoke && !options.keepalive_smoke;
++                        inspector.keep_player_request = options.keepalive_smoke;
++                        if (options.keepalive_smoke)
++                            SAFE_STRCPY(inspector.keep_start_name, "01_egressa");
+                     }
+ #else
+                     if (frames == unload_frame)
+                         game.unload_world();
+-                    else if (!game.request_world(options.world, error))
++                    else if (!game.request_world(options.keepalive_smoke ? "02_cityhub" : options.world, error))
+                     {
+                         spdlog::error("{}", error);
+                         return 5;
+                     }
+                     else if (options.player_smoke &&
+-                             !(options.restore_smoke ? game.restore_player(*game.restoration.saved, error)
+-                                                     : game.enter_player(error)))
++                             !(options.restore_smoke
++                                   ? game.restore_player(*game.restoration.saved, error,
++                                                         options.keepalive_smoke
++                                                             ? OpenBlood2::PlayerRestoreMode::KeepAlive
++                                                             : OpenBlood2::PlayerRestoreMode::SavedPosition,
++                                                         options.keepalive_smoke ? "01_egressa" : "")
++                                   : game.enter_player(error)))
+                     {
+                         spdlog::error("{}", error);
+                         return 6;
+@@ -1288,6 +1311,12 @@ namespace
+                   forward_frames != 55 || jump_frames != 10 || crouch_frames != 45 || run_frames != 20 ||
+                   !skeleton_reentered || !skeleton_hidden || !crouched_hidden || !stood_after_crouch ||
+                   !locomotion_pose || !saw_walk || !saw_run || !saw_jump)) ||
++                (options.keepalive_smoke &&
++                 (game.restoration.last_mode != OpenBlood2::PlayerRestoreMode::KeepAlive ||
++                  game.restoration.selected_start != "01_egressa" || game.restoration.start_fallback ||
++                  game.client_shell.stats.health != 73 || game.client_shell.stats.bullets != 17 ||
++                  !game.server_shell.Player(game.local_client) ||
++                  !game.server_shell.Player(game.local_client)->m_InventoryMgr.keys.empty())) ||
+                 (options.restore_smoke && (game.restoration.restored != 2 || !game.client_shell.restored_entry ||
+                                            !game.server_shell.Player(game.local_client) ||
+                                            game.server_shell.Player(game.local_client)->respawns != 0)) ||
+@@ -1418,6 +1447,7 @@ int main(int argc, char** argv)
+                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled\n"
+                      "  --gpu-smoke         Exercise GPU presentation, inspector toggle, resize and quit\n"
+                      "  --world-smoke       GPU lifecycle with real world unload/reload assertions\n"
++                     "  --keepalive-smoke   GPU SubwayA capture / CityHub named entry, hidden updates and reload\n"
+                      "  --restore-smoke     GPU saved-player entry, hidden updates and restore after reload\n"
+                      "  --player-smoke      GPU shell/player entry, hidden updates and unload/re-entry\n"
+                      "  --weapons-smoke     GPU Beretta/knife firing, hidden simulation and reload\n"
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index fcedc71..104ee9b 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -181,6 +181,8 @@ namespace OpenBlood2
+                 options.world_smoke = true;
+                 options.doors_smoke = true;
+             }
++            else if (arg == "--keepalive-smoke")
++                options.world_smoke = options.player_smoke = options.restore_smoke = options.keepalive_smoke = true;
+             else if (arg == "--restore-smoke")
+                 options.world_smoke = options.player_smoke = options.restore_smoke = true;
+             else if (arg == "--player-smoke")
+diff --git a/src/engine/config.h b/src/engine/config.h
+index a01425f..03fd631 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -19,7 +19,7 @@ namespace OpenBlood2
+         std::string world = "01_SubwayA";
+         bool inspect_world = false;
+         bool inspect_player = false;
+-        bool player_smoke = false, restore_smoke = false;
++        bool player_smoke = false, restore_smoke = false, keepalive_smoke = false;
+         bool weapons_smoke = false;
+         bool skeleton_smoke = false;
+         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index 9d43af6..5cfda2b 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -134,7 +134,7 @@ CPlayerObj* CBloodServerShell::OnClientEnterWorld(HCLIENT client)
+     }
+     return player;
+ }
+-CPlayerObj* CBloodServerShell::OnRestoredClientEnterWorld(HCLIENT client, HOBJECT object)
++CPlayerObj* CBloodServerShell::OnRestoredClientEnterWorld(HCLIENT client, HOBJECT object, const char* start_name)
+ {
+     // Typed local equivalent of OnClientEnterWorld's saved HCLIENTREF branch.
+     // The caller supplies a fully staged owner; never fall back to CreatePlayer.
+@@ -147,11 +147,18 @@ CPlayerObj* CBloodServerShell::OnRestoredClientEnterWorld(HCLIENT client, HOBJEC
+     if (server_.SetClientUserData(client, object) != DE_OK)
+         return nullptr;
+     player->SetClient(client);
+-    // RespawnPlayer's saved-position branch: associate, initialize client,
+-    // restore facing/eye; no Respawn or GoToStartPoint/start-trigger replay.
+-    if (server_.SendToClient(client, OpenBlood2::PlayerInitRequest{}) != DE_OK ||
+-        server_.SendToClient(client, OpenBlood2::PlayerRotation{player->m_fPitch, player->m_fYaw}) != DE_OK ||
+-        !player->InitializeClientState())
++    // RespawnPlayer chooses named entry for keep-alive, saved facing otherwise.
++    // Neither branch calls CPlayerObj::Respawn or grants a fresh profile.
++    HSTRING name = start_name && *start_name ? server_.CreateString(start_name) : nullptr;
++    bool ok =
++        (!start_name || !*start_name || name) && server_.SendToClient(client, OpenBlood2::PlayerInitRequest{}) == DE_OK;
++    if (ok)
++        ok = start_name
++                 ? player->GoToStartPoint(name)
++                 : server_.SendToClient(client, OpenBlood2::PlayerRotation{player->m_fPitch, player->m_fYaw}) == DE_OK;
++    if (name)
++        server_.FreeString(name);
++    if (!ok || !server_.IsObjectAlive(object) || !player->InitializeClientState())
+     {
+         player->SetClient(nullptr);
+         server_.SetClientUserData(client, nullptr);
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index 9998a1c..2dc9a90 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -14,7 +14,7 @@ class CBloodServerShell
+     void PreStartWorld();
+     bool PostStartWorld();
+     CPlayerObj* OnClientEnterWorld(HCLIENT);
+-    CPlayerObj* OnRestoredClientEnterWorld(HCLIENT, HOBJECT);
++    CPlayerObj* OnRestoredClientEnterWorld(HCLIENT, HOBJECT, const char* start_name = nullptr);
+     void OnClientExitWorld(HCLIENT);
+     bool OnMessage(HCLIENT, const OpenBlood2::PlayerInit&);
+     FireResult OnMessage(HCLIENT, const OpenBlood2::WeaponFire&);
+diff --git a/src/game/original/PlayerObj.cpp b/src/game/original/PlayerObj.cpp
+index 0755cc1..12eab95 100644
+--- a/src/game/original/PlayerObj.cpp
++++ b/src/game/original/PlayerObj.cpp
+@@ -244,6 +244,8 @@ bool CPlayerObj::OnSinglePlayerInit(const OpenBlood2::PlayerInit& init)
+ bool CPlayerObj::GoToStartPoint(HSTRING start_name)
+ {
+     auto* server = GetServerDE();
++    entry_start_name.clear();
++    entry_start_fallback = false;
+     auto* list = server->FindNamedObjects("Blood2StartPoint");
+     if (!list)
+         return false;
+@@ -267,7 +269,7 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name)
+     for (auto* link = list->m_pFirstLink; link; link = link->m_pNext)
+     {
+         auto* candidate = dynamic_cast<GameStartPoint*>(server->HandleToObject(link->m_hObject));
+-        if (candidate && !candidate->IsMultiplayer())
++        if (candidate && server->IsObjectAlive(link->m_hObject) && !candidate->IsMultiplayer())
+         {
+             fallback = candidate;
+             if (server->CompareStringsUpper(start_name, candidate->GetName()))
+@@ -280,18 +282,25 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name)
+     if (remove_string)
+         server->FreeString(start_name);
+     if (!start)
++    {
+         start = fallback;
++        entry_start_fallback = true;
++    }
+     if (!start)
+     {
+         entry_error = "No single-player GameStartPoint";
+         return false;
+     }
++    const auto* selected_name = server->GetStringData(start->GetName());
++    entry_start_name = selected_name ? selected_name : "";
+     m_fYaw = start->GetPitchYawRoll().y;
+     m_fPitch = 0;
+     DVector position;
+-    server->GetObjectPos(start->m_hObject, &position);
++    if (server->GetObjectPos(start->m_hObject, &position) != DE_OK)
++        return false;
+     start->SendTrigger();
+-    if (server->TeleportObject(m_hObject, &position) != DE_OK ||
++    // Trigger delivery may remove this owner or the marker. No marker reads after it.
++    if (!server->IsObjectAlive(m_hObject) || server->TeleportObject(m_hObject, &position) != DE_OK ||
+         server->SendToClient(m_hClient, OpenBlood2::PlayerRotation{m_fPitch, m_fYaw}) != DE_OK)
+         return false;
+     if (server->MoveObjectToGround(m_hObject) != DE_OK)
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index fa31e89..91b111b 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -82,6 +82,8 @@ class CPlayerObj : public CBaseCharacter
+     std::string restore_model_error;
+     bool restore_initialization = false, restore_fields_loaded = false;
+     bool GoToStartPoint(HSTRING start_name);
++    std::string entry_start_name; // Owned inspection of the actual selected marker.
++    bool entry_start_fallback = false;
+     bool SetCharacter(DBYTE);
+     bool OnSinglePlayerInit(const OpenBlood2::PlayerInit&);
+     void ValidateAttributes();
+diff --git a/src/game/player_restore.cpp b/src/game/player_restore.cpp
+index d3c5aa9..cfc5861 100644
+--- a/src/game/player_restore.cpp
++++ b/src/game/player_restore.cpp
+@@ -6,17 +6,20 @@ namespace OpenBlood2
+ {
+     namespace
+     {
+-        bool validate_engine(GameSession& game, const PlayerRestoreState& s, std::string& error)
++        bool validate_engine(GameSession& game, const PlayerRestoreState& s, std::string& error,
++                             PlayerRestoreMode mode = PlayerRestoreMode::SavedPosition)
+         {
+             auto fail = [&](const char* why)
+             {
+                 error = why;
+                 return false;
+             };
+-            if (s.world.empty() || s.world != game.world_path || !game.server.collision_ready ||
+-                !game.server_shell.world_started ||
++            if (s.world.empty() || game.world_path.empty() ||
++                (mode == PlayerRestoreMode::SavedPosition && s.world != game.world_path) ||
++                !game.server.collision_ready || !game.server_shell.world_started ||
+                 game.server.GetVarValueFloat(game.server.GetGameConVar("GAME_GAMETYPE")) != 0)
+-                return fail("Player restoration requires the same loaded single-player world");
++                return fail("Player restoration requires a loaded single-player world; saved-position mode also "
++                            "requires the same world");
+             if (s.name.size() > 100 || s.name.find('\0') != std::string::npos)
+                 return fail("Invalid saved player object name");
+             std::string model_path, skin_path;
+@@ -86,7 +89,8 @@ namespace OpenBlood2
+         output = std::move(s);
+         return true;
+     }
+-    bool GameSession::restore_player(const PlayerRestoreState& s, std::string& error)
++    bool GameSession::restore_player(const PlayerRestoreState& s, std::string& error, PlayerRestoreMode mode,
++                                     std::string_view start_name)
+     {
+         error.clear();
+         ++restoration.attempts;
+@@ -100,7 +104,16 @@ namespace OpenBlood2
+             error = "Leave the current player before restoring; callback/live-client replacement is unavailable";
+             return failed();
+         }
+-        if (!validate_engine(*this, s, error))
++        if ((mode != PlayerRestoreMode::SavedPosition && mode != PlayerRestoreMode::KeepAlive) ||
++            start_name.size() > 100 || start_name.find('\0') != std::string_view::npos ||
++            (mode == PlayerRestoreMode::SavedPosition && !start_name.empty()))
++        {
++            error = "Invalid player restoration mode or start-point name";
++            return failed();
++        }
++        const bool keep_alive = mode == PlayerRestoreMode::KeepAlive;
++        const std::string owned_start(start_name);
++        if (!validate_engine(*this, s, error, mode))
+             return failed();
+         const auto before = objects.snapshot();
+         auto rollback = [&]()
+@@ -136,12 +149,13 @@ namespace OpenBlood2
+             return rollback();
+         record->animation = s.animation;
+         record->hidden_nodes = s.hidden_nodes;
+-        if (server.ResizeObject(object, s.dimensions) != ResizeResult::Resized)
++        if (!keep_alive && server.ResizeObject(object, s.dimensions) != ResizeResult::Resized)
+         {
+             error = "Saved player body is blocked in the current world";
+             return rollback();
+         }
+-        if (!player->m_InventoryMgr.Load(s.inventory, InventoryLoadType::Restore, error) ||
++        if (!player->m_InventoryMgr.Load(
++                s.inventory, keep_alive ? InventoryLoadType::KeepAlive : InventoryLoadType::Restore, error) ||
+             !player->m_damage.Load(s.damage, error) || !player->LoadFields(s.player, error) ||
+             !player->RestoreModelState(error))
+             return rollback();
+@@ -152,8 +166,18 @@ namespace OpenBlood2
+         record->due = objects.time() + s.next_update;
+         record->scheduled = true;
+         local_client = server.connect_client();
+-        if (!local_client || !server_shell.OnRestoredClientEnterWorld(local_client, object) ||
+-            !client_shell.OnEnterWorld(local_client, true) || !pump_player_messages(error) || !client_shell.Update() ||
++        if (!local_client ||
++            !server_shell.OnRestoredClientEnterWorld(local_client, object, keep_alive ? owned_start.c_str() : nullptr))
++        {
++            error = player->entry_error.empty() ? "Restored client/start-point entry failed" : player->entry_error;
++            return rollback();
++        }
++        if (keep_alive && server.ResizeObject(object, s.dimensions) != ResizeResult::Resized)
++        {
++            error = "Destination start-point body is blocked";
++            return rollback();
++        }
++        if (!client_shell.OnEnterWorld(local_client, true) || !pump_player_messages(error) || !client_shell.Update() ||
+             !client_shell.SyncWeapons(models, resources, server_shell, error) ||
+             !player->m_InventoryMgr.UpdateHandModels() || !objects.finish_frame() || !objects.refresh_attachments())
+             return rollback();
+@@ -163,11 +187,18 @@ namespace OpenBlood2
+             error = "Restored player removed during child cleanup";
+             return rollback();
+         }
++        restoration.last_mode = mode;
++        restoration.destination_world = world_path;
++        restoration.requested_start = owned_start;
++        restoration.selected_start = player->entry_start_name;
++        restoration.start_fallback = player->entry_start_fallback;
+         ++restoration.restored;
+         restoration.last_player = record->id;
+         restoration.error.clear();
+-        trace.push_back("Restored player engine/aggregates -> original Load tail -> saved-client shell branch; no "
+-                        "Respawn/start trigger");
++        trace.push_back(
++            keep_alive ? "Kept player -> inventory KeepAlive (keys discarded) -> original named start entry; no Respawn"
++                       : "Restored player engine/aggregates -> original Load tail -> saved-client shell branch; no "
++                         "Respawn/start trigger");
+         return true;
+     }
+ } // namespace OpenBlood2
+diff --git a/src/game/player_restore.h b/src/game/player_restore.h
+index 8c6d804..c5acb97 100644
+--- a/src/game/player_restore.h
++++ b/src/game/player_restore.h
+@@ -6,6 +6,12 @@
+ 
+ namespace OpenBlood2
+ {
++    enum class PlayerRestoreMode
++    {
++        SavedPosition,
++        KeepAlive
++    };
++
+     // Owned values for the supported local player. No retail save format,
+     // client token, source object, contact identity or borrowed resource.
+     struct PlayerRestoreState
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index ed3bd05..81d78ec 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -327,13 +327,17 @@ namespace OpenBlood2
+         bool run_world(std::string& error);
+         bool enter_player(std::string& error);
+         bool capture_player(PlayerRestoreState&, std::string&);
+-        bool restore_player(const PlayerRestoreState&, std::string&);
++        bool restore_player(const PlayerRestoreState&, std::string&,
++                            PlayerRestoreMode = PlayerRestoreMode::SavedPosition, std::string_view start_name = {});
+         struct Restoration
+         {
+             std::optional<PlayerRestoreState> saved;
+             std::string error;
+             std::uint64_t captures = 0, attempts = 0, restored = 0;
+             ObjectId last_player{}; // Inspection only, never a restoration input.
++            PlayerRestoreMode last_mode = PlayerRestoreMode::SavedPosition;
++            std::string destination_world, requested_start, selected_start;
++            bool start_fallback = false;
+         } restoration;
+ 
+         bool select_weapon(DBYTE slot, std::string& error);
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index b09fcb9..e8f6361 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -908,3 +908,20 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --restore-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/player-restore.png")
+     set_tests_properties(gpu.player_restore PROPERTIES LABELS "gpu;private;player_restore" TIMEOUT 60 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+ endif()
++add_executable(player_keepalive_tests player_keepalive_tests.cpp ../src/app/model_scene.cpp)
++target_link_libraries(player_keepalive_tests PRIVATE blood2_game)
++blood2_project_options(player_keepalive_tests)
++foreach(case IN ITEMS named fallback failures)
++    add_test(NAME player_keepalive.${case} COMMAND player_keepalive_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/player-keepalive-fixtures/${case}")
++    set_tests_properties(player_keepalive.${case} PROPERTIES LABELS "headless;player_keepalive" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME player_keepalive.private COMMAND player_keepalive_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(player_keepalive.private PROPERTIES LABELS "headless;private;player_keepalive" TIMEOUT 120)
++endif()
++
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.player_keepalive COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --keepalive-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/player-keepalive.png")
++    set_tests_properties(gpu.player_keepalive PROPERTIES LABELS "gpu;private;player_keepalive" TIMEOUT 60 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
++endif()
+diff --git a/tests/player_keepalive_tests.cpp b/tests/player_keepalive_tests.cpp
+new file mode 100644
+index 0000000..193cc91
+--- /dev/null
++++ b/tests/player_keepalive_tests.cpp
+@@ -0,0 +1,273 @@
++#include "app/model_scene.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/GameStartPoint.h"
++#include "player_fixture.h"
++#include <algorithm>
++#include <cmath>
++#include <functional>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x << " | " << e << '\n';                                 \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    GameSession* active = nullptr;
++    unsigned deliveries = 0;
++    bool remove_player = false, remove_start = false;
++    DVector observed_position{};
++    struct EntryProbe : BaseClass
++    {
++        DDWORD ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read) override
++        {
++            if (message != 1000)
++                return 0;
++            auto& g = *active;
++            auto text = g.server.ReadFromMessageHString(read);
++            g.server.FreeString(text);
++            ++deliveries;
++            auto* p = g.server_shell.Player(g.local_client);
++            if (p)
++            {
++                g.server.GetObjectPos(p->m_hObject, &observed_position);
++                if (remove_player)
++                    g.server.RemoveObject(p->m_hObject);
++            }
++            if (remove_start)
++                g.server.RemoveObject(sender);
++            return 1;
++        }
++    };
++    HOBJECT marker(GameSession& g, const char* name, DVector position, bool multiplayer = false, bool trigger = false)
++    {
++        return g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
++                                {{"Name", std::string(name)},
++                                 {"Pos", position},
++                                 {"Multiplayer", multiplayer},
++                                 {"Rotation", EulerAngles{{.4f, -1.25f, .3f}}},
++                                 {"TriggerTarget", std::string(trigger ? "entry-probe" : "")},
++                                 {"TriggerMessage", std::string(trigger ? "OBSERVE" : "")}});
++    }
++    bool destination(GameSession& g, const CollisionWorld& floor)
++    {
++        g.collision = floor;
++        g.server.collision_ready = true;
++        g.world_path = "destination.dat";
++        g.state = SessionState::Inspection;
++        return g.server_shell.PostStartWorld();
++    }
++    bool named(const char* root)
++    {
++        GameSession g;
++        std::string e;
++        CHECK(test_player::setup(g, root) && g.enter_player(e));
++        auto* p = g.server_shell.Player(g.local_client);
++        p->m_damage.SetHitPoints(37);
++        p->m_damage.SetArmorPoints(23);
++        p->m_damage.m_fMaxHitPoints = 311;
++        p->m_damage.m_fResistance = .42f;
++        p->m_nAttribSpeed = 6;
++        p->m_InventoryMgr.SetAmmoCount(1, 1234);
++        CHECK(p->m_InventoryMgr.AddKey({"old-key", "Old key", "icon", "selected", 2}) == InventoryResult::Ok);
++        PlayerRestoreState s;
++        CHECK(g.capture_player(s, e));
++        auto old = p->m_hObject;
++        auto old_client = g.local_client;
++        auto floor = g.collision;
++        CHECK(!g.restore_player(s, e, PlayerRestoreMode::KeepAlive, "arrival") && g.client_shell.player == old);
++        CHECK(g.unload_world() && destination(g, floor));
++        // Old coordinates would collide in the destination: they must not be used for placement clearance.
++        s.position = {0, -20, 0};
++        CHECK(marker(g, "unused", {200, 100, 200}));
++        CHECK(marker(g, "ARRIVAL", {-120, 100, 220}, false, true));
++        CHECK(marker(g, "last", {300, 100, 300}));
++        static ClassInfo type{
++            "EntryProbe", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<EntryProbe>(); }, {}};
++        CHECK(g.objects.register_class(type));
++        ObjectCreateStruct desc;
++        SAFE_STRCPY(desc.m_Name, "entry-probe");
++        CHECK(g.objects.create(&type, desc));
++        active = &g;
++        deliveries = 0;
++        remove_start = true;
++        CHECK(!g.restore_player(s, e)); // Ordinary restore cannot cross worlds.
++        CHECK(g.restore_player(s, e, PlayerRestoreMode::KeepAlive, "arrival"));
++        p = g.server_shell.Player(g.local_client);
++        auto* r = g.objects.get(p->m_hObject);
++        CHECK(p->m_hObject != old && g.local_client != old_client && !g.server.GetClientUserData(old_client));
++        CHECK(deliveries == 1 && observed_position.y == -20); // Trigger before teleport; marker can disappear.
++        CHECK(r->state.m_Pos.x == -120 && r->state.m_Pos.z == 220 && std::abs(r->state.m_Pos.y - 41.001f) < .01f);
++        CHECK(p->entry_start_name == "ARRIVAL" && !p->entry_start_fallback && p->respawns == 0);
++        CHECK(p->m_fPitch == 0 && p->m_fYaw == -1.25f && g.client_shell.rotation.yaw == -1.25f);
++        CHECK(p->m_damage.m_fHitPoints == 37 && p->m_damage.m_fArmorPoints == 23 && p->m_damage.m_fMaxHitPoints == 311);
++        CHECK(p->m_damage.m_fResistance == .42f && p->m_nAttribSpeed == 6 && p->m_fMoveVel == 350);
++        CHECK(p->m_InventoryMgr.GetAmmoCount(1) == 1234 && p->m_InventoryMgr.keys.empty() &&
++              s.inventory.keys.size() == 1);
++        CHECK(g.client_shell.stats.health == 37 && g.client_shell.stats.bullets == 1234 &&
++              g.client_shell.restored_entry);
++        CHECK(g.restoration.last_mode == PlayerRestoreMode::KeepAlive &&
++              g.restoration.destination_world == "destination.dat");
++        CHECK(g.restoration.selected_start == "ARRIVAL" && !g.restoration.start_fallback);
++        g.client_shell.movement_input.forward = true;
++        CHECK(g.step(1. / 60) && p->movement_messages == 2 && deliveries == 1);
++        CHECK(r->state.m_Pos.x != -120 || r->state.m_Pos.z != 220);
++        CHECK(g.unload_world() && !g.server.string_count() && g.objects.attachments().empty());
++        CHECK(!CDestructable::m_dwNumDestructables && !AI_Mgr::m_dwNumCabal && !AI_Mgr::m_dwNumMonster);
++        return true;
++    }
++    bool fallback(const char* root)
++    {
++        for (unsigned i = 0; i < 4; ++i)
++        {
++            GameSession g;
++            std::string e;
++            CHECK(test_player::setup(g, root) && g.enter_player(e));
++            PlayerRestoreState s;
++            CHECK(g.capture_player(s, e));
++            if (i == 3)
++            {
++                s.crouched = true;
++                s.eye_level = 12;
++                s.dimensions.y = 20;
++            }
++            auto floor = g.collision;
++            CHECK(g.unload_world() && destination(g, floor));
++            // FindNamedObjects prepends stable-slot entries: first-created is last in this fixture's list.
++            auto last = marker(g, "fallback-solo", {200, 100, 200});
++            CHECK(last && marker(g, "start", {100, 100, 100}));
++            CHECK(marker(g, "multiplayer", {300, 100, 300}, true));
++            auto* list = g.server.FindNamedObjects("Blood2StartPoint");
++            CHECK(list && list->m_nInList == 3 && list->m_pFirstLink->m_pNext->m_pNext->m_hObject == last);
++            g.server.RelinquishList(list);
++            CHECK(g.restore_player(s, e, PlayerRestoreMode::KeepAlive, i % 2 ? "missing" : ""));
++            auto* p = g.server_shell.Player(g.local_client);
++            CHECK(p->entry_start_name == (i % 2 ? "fallback-solo" : "start"));
++            CHECK(p->entry_start_fallback == bool(i % 2));
++            CHECK(g.client_shell.position.x == (i % 2 ? 200 : 100));
++            CHECK(p->crouched == s.crouched && p->eye_level == s.eye_level);
++            CHECK(g.objects.get(p->m_hObject)->dimensions.y == s.dimensions.y);
++            CHECK(g.step(1. / 60) && p->movement_messages == 2);
++            CHECK(g.unload_world() && !g.server.string_count() && g.objects.attachments().empty());
++            CHECK(!CDestructable::m_dwNumDestructables && !AI_Mgr::m_dwNumCabal && !AI_Mgr::m_dwNumMonster);
++        }
++        return true;
++    }
++    bool failures(const char* root)
++    {
++        GameSession g;
++        std::string e;
++        CHECK(test_player::setup(g, root) && g.enter_player(e));
++        PlayerRestoreState s;
++        CHECK(g.capture_player(s, e));
++        auto floor = g.collision;
++        CHECK(g.unload_world() && destination(g, floor));
++        const auto revision = g.world_revision;
++        auto rejected = [&](PlayerRestoreMode mode, std::string_view start)
++        {
++            const auto before = g.objects.snapshot().size(), strings = g.server.string_count();
++            return !g.restore_player(s, e, mode, start) && !e.empty() && g.objects.snapshot().size() == before &&
++                   g.server.string_count() == strings && !g.local_client && !g.server.client_count() &&
++                   !g.client_shell.m_bInWorld && !CDestructable::m_dwNumDestructables && !AI_Mgr::m_dwNumCabal &&
++                   !AI_Mgr::m_dwNumMonster && g.objects.attachments().empty() && g.world_revision == revision &&
++                   g.world_path == "destination.dat";
++        };
++        CHECK(rejected(PlayerRestoreMode::KeepAlive, "missing") && e == "No single-player GameStartPoint");
++        CHECK(rejected(static_cast<PlayerRestoreMode>(99), ""));
++        CHECK(rejected(PlayerRestoreMode::KeepAlive, std::string(101, 'x')));
++        CHECK(rejected(PlayerRestoreMode::KeepAlive, std::string("a\0b", 3)));
++        auto start = marker(g, "arrival", {2000, 100, 2000});
++        CHECK(start && rejected(PlayerRestoreMode::KeepAlive, "arrival")); // No ground.
++        g.objects.get(start)->state.m_Pos = {100, -20, 100};
++        CHECK(rejected(PlayerRestoreMode::KeepAlive, "arrival")); // Embedded body.
++        CHECK(g.objects.remove(start) && g.objects.finish_frame());
++        CHECK(marker(g, "arrival", {100, 100, 100}, false, true));
++        static ClassInfo type{
++            "EntryProbe", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<EntryProbe>(); }, {}};
++        CHECK(g.objects.register_class(type));
++        ObjectCreateStruct desc;
++        SAFE_STRCPY(desc.m_Name, "entry-probe");
++        CHECK(g.objects.create(&type, desc));
++        active = &g;
++        deliveries = 0;
++        remove_player = true;
++        CHECK(rejected(PlayerRestoreMode::KeepAlive, "arrival") && deliveries == 1);
++        remove_player = false;
++        CHECK(g.restore_player(s, e, PlayerRestoreMode::KeepAlive, "arrival") && deliveries == 2);
++        CHECK(g.unload_world() && !g.server.string_count());
++        return true;
++    }
++    bool private_entry(const char* root)
++    {
++        GameSession g;
++        std::string e;
++        Config config;
++        config.data_dir = root;
++        CHECK(g.initialize() && g.resources.mount_game(config, e));
++        ModelView scene;
++        for (unsigned i = 0; i < 3; ++i)
++        {
++            CHECK(g.request_world("01_SubwayA", e) && g.enter_player(e) && g.step(1. / 60));
++            auto* p = g.server_shell.Player(g.local_client);
++            p->m_damage.SetHitPoints(73);
++            p->m_InventoryMgr.SetAmmoCount(1, 17);
++            CHECK(p->m_InventoryMgr.AddKey({"exit-key", "Synthetic check", "icon", "selected", 1}) ==
++                  InventoryResult::Ok);
++            PlayerRestoreState s;
++            CHECK(g.capture_player(s, e));
++            auto old = p->m_hObject;
++            CHECK(g.request_world("02_cityhub", e) && !g.objects.get(old));
++            CHECK(g.restore_player(s, e, PlayerRestoreMode::KeepAlive, "01_egressa"));
++            p = g.server_shell.Player(g.local_client);
++            CHECK(p->respawns == 0 && p->m_damage.m_fHitPoints == 73 && p->m_InventoryMgr.GetAmmoCount(1) == 17);
++            CHECK(p->m_InventoryMgr.keys.empty() && s.inventory.keys.size() == 1 && !p->entry_start_fallback);
++            CHECK(p->entry_start_name == "01_egressa" && g.client_shell.stats.health == 73);
++            g.client_shell.player_visible = true;
++            CHECK(update_model_scene(g, scene, e) && !scene.world_draws.empty());
++            auto found = std::find_if(scene.entries.begin(), scene.entries.end(),
++                                      [&](const auto& v) { return v.object == g.objects.get(p->m_hObject)->id; });
++            CHECK(found != scene.entries.end() && found->triangles == 941);
++            if (i == 0)
++                for (size_t n = 0; n < g.entries.size(); ++n)
++                    if (g.entries[n].state == EntryState::Failed)
++                        std::cout << "Destination failure: " << g.world.objects[n].class_name << ": "
++                                  << g.entries[n].detail << '\n';
++            auto pos = g.client_shell.position;
++            CHECK(pos.x == 704 && pos.z == 2368 && std::abs(pos.y + 85.999f) < .01f);
++            std::map<EntryState, size_t> counts;
++            std::map<std::string, size_t> missing;
++            for (size_t n = 0; n < g.entries.size(); ++n)
++            {
++                ++counts[g.entries[n].state];
++                if (g.entries[n].state == EntryState::Unsupported || g.entries[n].state == EntryState::Failed)
++                    ++missing[g.world.objects[n].class_name];
++            }
++            std::cout << "cycle=" << i << " CityHub named entry at " << pos.x << ',' << pos.y << ',' << pos.z
++                      << "; HP=73 bullets=17 keys=0 respawns=0 Caleb triangles=941\n";
++            for (auto [state, count] : counts)
++                std::cout << entry_state_name(state) << '=' << count << ' ';
++            std::cout << '\n';
++            for (auto [name, count] : missing)
++                std::cout << name << '=' << count << ' ';
++            std::cout << '\n';
++            CHECK(g.step(1. / 60) && p->movement_messages == 2);
++            CHECK(g.unload_world() && !g.server.string_count() && g.objects.attachments().empty());
++            CHECK(!CDestructable::m_dwNumDestructables && !AI_Mgr::m_dwNumCabal && !AI_Mgr::m_dwNumMonster);
++            scene.clear();
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    const std::map<std::string, std::function<bool(const char*)>> cases{
++        {"named", named}, {"fallback", fallback}, {"failures", failures}, {"private", private_entry}};
++    if (argc != 3)
++        return 2;
++    auto it = cases.find(argv[1]);
++    return it != cases.end() && it->second(argv[2]) ? 0 : 1;
++}

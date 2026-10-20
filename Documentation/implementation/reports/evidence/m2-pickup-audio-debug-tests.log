@@ -1,0 +1,576 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 180
+      Start 180: pickup_audio.rules
+
+180: Test command: <workspace>/Blood2/build/debug/tests/pickup_audio_tests "rules" "<workspace>/Blood2/build/debug/tests/pickup-audio-fixtures/rules"
+180: Working Directory: <workspace>/Blood2/build/debug/tests
+180: Test timeout computed to be: 30
+test 183
+      Start 183: pickup_audio.private
+
+183: Test command: <workspace>/Blood2/build/debug/tests/pickup_audio_tests "private" "<external-data-root>"
+183: Working Directory: <workspace>/Blood2/build/debug/tests
+183: Test timeout computed to be: 90
+ 1/47 Test #180: pickup_audio.rules ...............   Passed    0.02 sec
+test 77
+      Start  77: weapons.private
+
+77: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "private" "<external-data-root>"
+77: Working Directory: <workspace>/Blood2/build/debug/tests
+77: Test timeout computed to be: 90
+183: BulletAmmoPU -> sounds\powerups\ammo1.wav frames=30978 cursor=441
+183: ShellAmmoPU -> sounds\powerups\ammo1.wav frames=30978 cursor=441
+183: BMGAmmoPU -> sounds\powerups\ammo1.wav frames=30978 cursor=441
+183: FlareAmmoPU -> sounds\powerups\ammo1.wav frames=30978 cursor=441
+183: DieBugDieAmmoPU -> sounds\powerups\ammo1.wav frames=30978 cursor=441
+183: HowitzerAmmoPU -> sounds\powerups\ammo1.wav frames=30978 cursor=441
+183: FuelAmmoPU -> sounds\powerups\ammo1.wav frames=30978 cursor=441
+183: BatteryAmmoPU -> sounds\powerups\ammo1.wav frames=30978 cursor=441
+183: HealthPU -> sounds\powerups\health1a.wav frames=12800 cursor=441
+183: MegaHealthPU -> sounds\powerups\health2.wav frames=44113 cursor=441
+183: WardPU -> sounds\powerups\armour1.wav frames=10243 cursor=441
+183: NecroWardPU -> sounds\powerups\powerup3.wav frames=22239 cursor=441
+183: BerettaPU -> sounds\powerups\weapon1.wav frames=22016 cursor=441
+183: SubMachineGunPU -> sounds\powerups\weapon1.wav frames=22016 cursor=441
+183: AssaultRiflePU -> sounds\powerups\weapon1.wav frames=22016 cursor=441
+183: FlareGunPU -> sounds\powerups\weapon1.wav frames=22016 cursor=441
+183: MedKitPU -> sounds/powerups/inventory1.wav frames=16428 cursor=441
+183: FlashlightPU -> sounds/powerups/inventory1.wav frames=16428 cursor=441
+183: ProximitiesPU -> sounds/powerups/ammo2.wav frames=13376 cursor=441
+183: RemotesPU -> sounds/powerups/ammo2.wav frames=13376 cursor=441
+183: KeyPickup -> sounds\powerups\inventory1.wav frames=16428 cursor=441
+ 2/47 Test #183: pickup_audio.private .............   Passed    0.68 sec
+test 140
+      Start 140: triggers.catalog
+
+140: Test command: <workspace>/Blood2/build/debug/tests/trigger_tests "catalog" "<external-data-root>"
+140: Working Directory: <workspace>/Blood2/build/debug/tests
+140: Test timeout computed to be: 90
+140: worlds/05_cdm.dat key CRUCard model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+140: worlds/05_cdm.dat key LabKey model=models\powerups\key_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+140: worlds/05_cdm.dat key ExpressCard model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+140: worlds/06_airship2.dat key Parachute model=models\powerups\parachute_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+140: worlds/07_cathedral.dat key ApseKey model=models\powerups\skullkey_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+140: worlds/07_cathedral.dat key TowerKey model=models\powerups\skullkey_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+140: worlds/17_entrance.dat key Level3Card model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+140: worlds/19_lobby.dat key ExecAccess model=models\powerups\skullkey_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+140: worlds/21_laboratory.dat key STATUS9 model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+140: worlds/21_laboratory.dat key SingularityAccess model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+140: worlds/21_laboratory.dat key INTRAACCESS model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+140: worlds/21_laboratory.dat key KeyPickup0 model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+140: worlds/22_office.dat key LevelB model=models\powerups\skullkey_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+140: worlds/multi/bb_bridge.dat Trigger0 failed Dims=64 128 256 ResetTime=4.000000 SoundRadius=200.000000 MessageName1=Trigger
+140: worlds/multi/bb_bridge.dat Trigger1 failed Dims=128 64 128 ResetTime=5.000000 SoundRadius=200.000000 MessageName1=Trigger
+140: worlds/multi/bb_midgard.dat BigTrigger0 failed Dims=16 32 4 ResetTime=7.000000 SoundRadius=200.000000 MessageName1=Trigger
+140: worlds/multi/bb_midgard.dat BigTrigger1 failed Dims=16 32 4 ResetTime=6.000000 SoundRadius=200.000000 MessageName1=Trigger
+140: worlds/multi/bb_midgard.dat BigTrigger2 failed Dims=16 32 4 ResetTime=6.000000 SoundRadius=200.000000 MessageName1=Trigger
+140: worlds/multi/bb_midgard.dat BigTrigger3 failed Dims=16 32 4 ResetTime=6.000000 SoundRadius=200.000000 MessageName1=Trigger
+140: Worlds=57 unreadable=1
+140: BigTrigger: 84/89 created; 1 filtered
+140: KeyPickup: 13/13 created; 0 filtered
+140: ToggleTrigger: 3/3 created; 0 filtered
+140: Trigger: 599/603 created; 2 filtered
+140: 4 rejected: BigTrigger: invalid property TypeAction
+140: 2 rejected: Trigger: invalid property TypeAction
+ 3/47 Test #140: triggers.catalog .................   Passed    8.94 sec
+test 44
+      Start  44: world.level_change_private
+
+44: Test command: <workspace>/Blood2/build/debug/tests/world_tests "level_change_private" "<external-data-root>"
+44: Working Directory: <workspace>/Blood2/build/debug/tests
+44: Test timeout computed to be: 120
+44: Malformed destination refusal 0: DAT v56: invalid/unsupported typed property near byte 442114
+44: CityHub transfer 0:
+44: SubwayA transfer 0:
+44: Malformed destination refusal 1: DAT v56: invalid/unsupported typed property near byte 442114
+44: CityHub transfer 1:
+44: SubwayA transfer 1:
+44: Malformed destination refusal 2: DAT v56: invalid/unsupported typed property near byte 442114
+44: CityHub transfer 2:
+44: SubwayA transfer 2:
+44: PASS level_change_private
+ 4/47 Test  #44: world.level_change_private .......   Passed    7.96 sec
+test 139
+      Start 139: triggers.private
+
+139: Test command: <workspace>/Blood2/build/debug/tests/trigger_tests "private" "<external-data-root>"
+139: Working Directory: <workspace>/Blood2/build/debug/tests
+139: Test timeout computed to be: 90
+139: SubwayA: created=204 editor=372 unsupported=0 failed=0 triggers=17 children=7
+139: CDM pickup CRUCard / CRUCard / Localized ResourceNum display name unavailable; ObjectName shown
+139: CDM pickup LabKey / LabKey / Localized ResourceNum display name unavailable; ObjectName shown
+139: CDM pickup ExpressCard / ExpressCard / Localized ResourceNum display name unavailable; ObjectName shown
+ 5/47 Test #139: triggers.private .................   Passed    2.34 sec
+test 193
+      Start 193: pickups.catalog
+
+193: Test command: <workspace>/Blood2/build/debug/tests/pickup_tests "catalog" "<external-data-root>"
+193: Working Directory: <workspace>/Blood2/build/debug/tests
+193: Test timeout computed to be: 90
+193: Authored SubMachineGunPU: worlds/02_cityhub.dat
+193: Authored AssaultRiflePU: worlds/02_cityhub.dat
+193: Authored SubMachineGunPU: worlds/02_cityhubb.dat
+193: Authored SubMachineGunPU: worlds/02_cityhubc.dat
+193: Authored BerettaPU: worlds/05_cdm.dat
+193: Authored AssaultRiflePU: worlds/06_airship2.dat
+193: Authored FlareGunPU: worlds/06_airship2.dat
+193: Authored AssaultRiflePU: worlds/10_sewagetreatmentplant.dat
+193: Authored FlareGunPU: worlds/11_slaughter_house.dat
+193: Authored AssaultRiflePU: worlds/14_subwayc.dat
+193: Authored SubMachineGunPU: worlds/20_powerstation.dat
+193: Authored AssaultRiflePU: worlds/25_ancientone.dat
+193: AssaultRiflePU=5
+193: BMGAmmoPU=76
+193: BatteryAmmoPU=150
+193: BerettaPU=1
+193: BulletAmmoPU=243
+193: DieBugDieAmmoPU=105
+193: FlareAmmoPU=117
+193: FlareGunPU=2
+193: FlashlightPU=10
+193: FuelAmmoPU=108
+193: HealthPU=209
+193: HowitzerAmmoPU=100
+193: MedKitPU=22
+193: MegaHealthPU=49
+193: NecroWardPU=33
+193: ProximitiesPU=161
+193: RemotesPU=107
+193: ShellAmmoPU=186
+193: SubMachineGunPU=4
+193: WardPU=58
+193: rejected BMGAmmoPU: invalid property TypeAction=8
+193: rejected BatteryAmmoPU: invalid property TypeAction=17
+193: rejected BulletAmmoPU: invalid property TypeAction=35
+193: rejected DieBugDieAmmoPU: invalid property TypeAction=12
+193: rejected FlareAmmoPU: invalid property TypeAction=17
+193: rejected FuelAmmoPU: invalid property TypeAction=17
+193: rejected HealthPU: invalid property TypeAction=21
+193: rejected HowitzerAmmoPU: invalid property TypeAction=12
+193: rejected MedKitPU: invalid property TypeAction=2
+193: rejected MegaHealthPU: invalid property TypeAction=4
+193: rejected NecroWardPU: invalid property TypeAction=3
+193: rejected ProximitiesPU: invalid property TypeAction=28
+193: rejected RemotesPU: invalid property TypeAction=14
+193: rejected ShellAmmoPU: invalid property TypeAction=24
+193: rejected WardPU: invalid property TypeAction=6
+193: worlds=57 created=1526 missing=0 supported_spawns=60
+ 6/47 Test #193: pickups.catalog ..................   Passed    6.96 sec
+test 74
+      Start  74: weapons.animation
+
+74: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "animation" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/animation"
+74: Working Directory: <workspace>/Blood2/build/debug/tests
+74: Test timeout computed to be: 30
+ 7/47 Test  #74: weapons.animation ................   Passed    0.11 sec
+test 181
+      Start 181: pickup_audio.failures
+
+181: Test command: <workspace>/Blood2/build/debug/tests/pickup_audio_tests "failures" "<workspace>/Blood2/build/debug/tests/pickup-audio-fixtures/failures"
+181: Working Directory: <workspace>/Blood2/build/debug/tests
+181: Test timeout computed to be: 30
+ 8/47 Test #181: pickup_audio.failures ............   Passed    0.33 sec
+test 26
+      Start  26: world.level_change
+
+26: Test command: <workspace>/Blood2/build/debug/tests/world_tests "level_change" "<workspace>/Blood2/build/debug/tests/world-fixtures/level_change"
+26: Working Directory: <workspace>/Blood2/build/debug/tests
+26: Test timeout computed to be: 20
+26: trial1: Destination world texture t.dtx: Missing exact-path resource
+26: trial2: No single-player GameStartPoint
+26: trial3: Start point has no supported ground collision
+26: trial4: Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+26: trial5: Destination initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+26: trial6: Destination start trigger requested another level during entry
+26: broken: DAT v56: invalid/unsupported section offsets near byte 4
+26: missing: Resource not found: worlds/missing.dat
+26: Commit 0:
+26: Commit 1:
+26: Commit 2:
+26: PASS level_change
+ 9/47 Test  #26: world.level_change ...............   Passed    0.10 sec
+test 184
+      Start 184: pickups.defaults
+
+184: Test command: <workspace>/Blood2/build/debug/tests/pickup_tests "defaults" "<workspace>/Blood2/build/debug/tests/pickup-fixtures/defaults"
+184: Working Directory: <workspace>/Blood2/build/debug/tests
+184: Test timeout computed to be: 30
+10/47 Test #184: pickups.defaults .................   Passed    0.05 sec
+test 135
+      Start 135: triggers.doors
+
+135: Test command: <workspace>/Blood2/build/debug/tests/trigger_tests "doors" "<workspace>/Blood2/build/debug/tests/trigger-fixtures/doors"
+135: Working Directory: <workspace>/Blood2/build/debug/tests
+135: Test timeout computed to be: 30
+11/47 Test #135: triggers.doors ...................   Passed    0.05 sec
+test 185
+      Start 185: pickups.ammunition
+
+185: Test command: <workspace>/Blood2/build/debug/tests/pickup_tests "ammunition" "<workspace>/Blood2/build/debug/tests/pickup-fixtures/ammunition"
+185: Working Directory: <workspace>/Blood2/build/debug/tests
+185: Test timeout computed to be: 30
+12/47 Test #185: pickups.ammunition ...............   Passed    0.03 sec
+test 192
+      Start 192: pickups.resources
+
+192: Test command: <workspace>/Blood2/build/debug/tests/pickup_tests "resources" "<workspace>/Blood2/build/debug/tests/pickup-fixtures/resources"
+192: Working Directory: <workspace>/Blood2/build/debug/tests
+192: Test timeout computed to be: 30
+13/47 Test #192: pickups.resources ................   Passed    0.03 sec
+test 190
+      Start 190: pickups.rejection
+
+190: Test command: <workspace>/Blood2/build/debug/tests/pickup_tests "rejection" "<workspace>/Blood2/build/debug/tests/pickup-fixtures/rejection"
+190: Working Directory: <workspace>/Blood2/build/debug/tests
+190: Test timeout computed to be: 30
+14/47 Test #190: pickups.rejection ................   Passed    0.03 sec
+test 182
+      Start 182: pickup_audio.callbacks
+
+182: Test command: <workspace>/Blood2/build/debug/tests/pickup_audio_tests "callbacks" "<workspace>/Blood2/build/debug/tests/pickup-audio-fixtures/callbacks"
+182: Working Directory: <workspace>/Blood2/build/debug/tests
+182: Test timeout computed to be: 30
+15/47 Test #182: pickup_audio.callbacks ...........   Passed    0.03 sec
+test 186
+      Start 186: pickups.statistics
+
+186: Test command: <workspace>/Blood2/build/debug/tests/pickup_tests "statistics" "<workspace>/Blood2/build/debug/tests/pickup-fixtures/statistics"
+186: Working Directory: <workspace>/Blood2/build/debug/tests
+186: Test timeout computed to be: 30
+16/47 Test #186: pickups.statistics ...............   Passed    0.03 sec
+test 191
+      Start 191: pickups.callbacks
+
+191: Test command: <workspace>/Blood2/build/debug/tests/pickup_tests "callbacks" "<workspace>/Blood2/build/debug/tests/pickup-fixtures/callbacks"
+191: Working Directory: <workspace>/Blood2/build/debug/tests
+191: Test timeout computed to be: 30
+17/47 Test #191: pickups.callbacks ................   Passed    0.03 sec
+test 189
+      Start 189: pickups.spawning
+
+189: Test command: <workspace>/Blood2/build/debug/tests/pickup_tests "spawning" "<workspace>/Blood2/build/debug/tests/pickup-fixtures/spawning"
+189: Working Directory: <workspace>/Blood2/build/debug/tests
+189: Test timeout computed to be: 30
+18/47 Test #189: pickups.spawning .................   Passed    0.03 sec
+test 188
+      Start 188: pickups.contact
+
+188: Test command: <workspace>/Blood2/build/debug/tests/pickup_tests "contact" "<workspace>/Blood2/build/debug/tests/pickup-fixtures/contact"
+188: Working Directory: <workspace>/Blood2/build/debug/tests
+188: Test timeout computed to be: 30
+19/47 Test #188: pickups.contact ..................   Passed    0.02 sec
+test 187
+      Start 187: pickups.protocol
+
+187: Test command: <workspace>/Blood2/build/debug/tests/pickup_tests "protocol" "<workspace>/Blood2/build/debug/tests/pickup-fixtures/protocol"
+187: Working Directory: <workspace>/Blood2/build/debug/tests
+187: Test timeout computed to be: 30
+20/47 Test #187: pickups.protocol .................   Passed    0.02 sec
+test 11
+      Start  11: objects.unsupported_teardown
+
+11: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "unsupported_teardown"
+11: Working Directory: <workspace>/Blood2/build/debug/tests
+11: Test timeout computed to be: 10
+11: PASS unsupported_teardown
+21/47 Test  #11: objects.unsupported_teardown .....   Passed    0.02 sec
+test 75
+      Start  75: weapons.lifetime
+
+75: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "lifetime" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/lifetime"
+75: Working Directory: <workspace>/Blood2/build/debug/tests
+75: Test timeout computed to be: 30
+22/47 Test  #75: weapons.lifetime .................   Passed    0.02 sec
+test 134
+      Start 134: triggers.keys
+
+134: Test command: <workspace>/Blood2/build/debug/tests/trigger_tests "keys" "<workspace>/Blood2/build/debug/tests/trigger-fixtures/keys"
+134: Working Directory: <workspace>/Blood2/build/debug/tests
+134: Test timeout computed to be: 30
+23/47 Test #134: triggers.keys ....................   Passed    0.01 sec
+test 133
+      Start 133: triggers.filters
+
+133: Test command: <workspace>/Blood2/build/debug/tests/trigger_tests "filters" "<workspace>/Blood2/build/debug/tests/trigger-fixtures/filters"
+133: Working Directory: <workspace>/Blood2/build/debug/tests
+133: Test timeout computed to be: 30
+24/47 Test #133: triggers.filters .................   Passed    0.01 sec
+test 69
+      Start  69: weapons.inventory
+
+69: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "inventory" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/inventory"
+69: Working Directory: <workspace>/Blood2/build/debug/tests
+69: Test timeout computed to be: 30
+25/47 Test  #69: weapons.inventory ................   Passed    0.01 sec
+test 76
+      Start  76: weapons.rollback
+
+76: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "rollback" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/rollback"
+76: Working Directory: <workspace>/Blood2/build/debug/tests
+76: Test timeout computed to be: 30
+26/47 Test  #76: weapons.rollback .................   Passed    0.01 sec
+test 136
+      Start 136: triggers.touch
+
+136: Test command: <workspace>/Blood2/build/debug/tests/trigger_tests "touch" "<workspace>/Blood2/build/debug/tests/trigger-fixtures/touch"
+136: Working Directory: <workspace>/Blood2/build/debug/tests
+136: Test timeout computed to be: 30
+27/47 Test #136: triggers.touch ...................   Passed    0.01 sec
+test 131
+      Start 131: triggers.schedule
+
+131: Test command: <workspace>/Blood2/build/debug/tests/trigger_tests "schedule" "<workspace>/Blood2/build/debug/tests/trigger-fixtures/schedule"
+131: Working Directory: <workspace>/Blood2/build/debug/tests
+131: Test timeout computed to be: 30
+28/47 Test #131: triggers.schedule ................   Passed    0.01 sec
+test 138
+      Start 138: triggers.protocol
+
+138: Test command: <workspace>/Blood2/build/debug/tests/trigger_tests "protocol" "<workspace>/Blood2/build/debug/tests/trigger-fixtures/protocol"
+138: Working Directory: <workspace>/Blood2/build/debug/tests
+138: Test timeout computed to be: 30
+29/47 Test #138: triggers.protocol ................   Passed    0.01 sec
+test 72
+      Start  72: weapons.melee
+
+72: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "melee" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/melee"
+72: Working Directory: <workspace>/Blood2/build/debug/tests
+72: Test timeout computed to be: 30
+30/47 Test  #72: weapons.melee ....................   Passed    0.01 sec
+test 137
+      Start 137: triggers.lifetime
+
+137: Test command: <workspace>/Blood2/build/debug/tests/trigger_tests "lifetime" "<workspace>/Blood2/build/debug/tests/trigger-fixtures/lifetime"
+137: Working Directory: <workspace>/Blood2/build/debug/tests
+137: Test timeout computed to be: 30
+31/47 Test #137: triggers.lifetime ................   Passed    0.01 sec
+test 70
+      Start  70: weapons.segments
+
+70: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "segments" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/segments"
+70: Working Directory: <workspace>/Blood2/build/debug/tests
+70: Test timeout computed to be: 30
+32/47 Test  #70: weapons.segments .................   Passed    0.01 sec
+test 71
+      Start  71: weapons.firing
+
+71: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "firing" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/firing"
+71: Working Directory: <workspace>/Blood2/build/debug/tests
+71: Test timeout computed to be: 30
+33/47 Test  #71: weapons.firing ...................   Passed    0.01 sec
+test 73
+      Start  73: weapons.damage
+
+73: Test command: <workspace>/Blood2/build/debug/tests/weapon_tests "damage" "<workspace>/Blood2/build/debug/tests/weapon-fixtures/damage"
+73: Working Directory: <workspace>/Blood2/build/debug/tests
+73: Test timeout computed to be: 30
+34/47 Test  #73: weapons.damage ...................   Passed    0.01 sec
+test 132
+      Start 132: triggers.toggle
+
+132: Test command: <workspace>/Blood2/build/debug/tests/trigger_tests "toggle" "<workspace>/Blood2/build/debug/tests/trigger-fixtures/toggle"
+132: Working Directory: <workspace>/Blood2/build/debug/tests
+132: Test timeout computed to be: 30
+35/47 Test #132: triggers.toggle ..................   Passed    0.01 sec
+test 12
+      Start  12: objects.creation_failures
+
+12: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "creation_failures"
+12: Working Directory: <workspace>/Blood2/build/debug/tests
+12: Test timeout computed to be: 10
+12: PASS creation_failures
+36/47 Test  #12: objects.creation_failures ........   Passed    0.01 sec
+test 10
+      Start  10: objects.messages_strings
+
+10: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "messages_strings"
+10: Working Directory: <workspace>/Blood2/build/debug/tests
+10: Test timeout computed to be: 10
+10: PASS messages_strings
+37/47 Test  #10: objects.messages_strings .........   Passed    0.01 sec
+test 1
+      Start   1: objects.builtin_model
+
+1: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "builtin_model"
+1: Working Directory: <workspace>/Blood2/build/debug/tests
+1: Test timeout computed to be: 10
+1: PASS builtin_model
+38/47 Test   #1: objects.builtin_model ............   Passed    0.00 sec
+test 2
+      Start   2: objects.original_objects
+
+2: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "original_objects"
+2: Working Directory: <workspace>/Blood2/build/debug/tests
+2: Test timeout computed to be: 10
+2: PASS original_objects
+39/47 Test   #2: objects.original_objects .........   Passed    0.00 sec
+test 9
+      Start   9: objects.links_lists
+
+9: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "links_lists"
+9: Working Directory: <workspace>/Blood2/build/debug/tests
+9: Test timeout computed to be: 10
+9: PASS links_lists
+40/47 Test   #9: objects.links_lists ..............   Passed    0.01 sec
+test 4
+      Start   4: objects.reasons_properties
+
+4: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "reasons_properties"
+4: Working Directory: <workspace>/Blood2/build/debug/tests
+4: Test timeout computed to be: 10
+4: PASS reasons_properties
+41/47 Test   #4: objects.reasons_properties .......   Passed    0.01 sec
+test 6
+      Start   6: objects.deferred_removal
+
+6: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "deferred_removal"
+6: Working Directory: <workspace>/Blood2/build/debug/tests
+6: Test timeout computed to be: 10
+6: PASS deferred_removal
+42/47 Test   #6: objects.deferred_removal .........   Passed    0.01 sec
+test 3
+      Start   3: objects.nested_creation
+
+3: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "nested_creation"
+3: Working Directory: <workspace>/Blood2/build/debug/tests
+3: Test timeout computed to be: 10
+3: PASS nested_creation
+43/47 Test   #3: objects.nested_creation ..........   Passed    0.01 sec
+test 7
+      Start   7: objects.aggregate_dispatch
+
+7: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "aggregate_dispatch"
+7: Working Directory: <workspace>/Blood2/build/debug/tests
+7: Test timeout computed to be: 10
+7: PASS aggregate_dispatch
+44/47 Test   #7: objects.aggregate_dispatch .......   Passed    0.01 sec
+test 8
+      Start   8: objects.handles_selection
+
+8: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "handles_selection"
+8: Working Directory: <workspace>/Blood2/build/debug/tests
+8: Test timeout computed to be: 10
+8: PASS handles_selection
+45/47 Test   #8: objects.handles_selection ........   Passed    0.01 sec
+test 5
+      Start   5: objects.scheduling
+
+5: Test command: <workspace>/Blood2/build/debug/tests/object_contract_tests "scheduling"
+5: Working Directory: <workspace>/Blood2/build/debug/tests
+5: Test timeout computed to be: 10
+5: PASS scheduling
+46/47 Test   #5: objects.scheduling ...............   Passed    0.01 sec
+77: Original SubwayA camera intro expired after 12.0167 simulation seconds
+77: weapon 1: 463 vertices; 6 clips
+77:   static_model 1 ms
+77:   draw 333 ms
+77:   fire 150 ms [0:fire_key]
+77:   start_alt_fire 166 ms
+77:   alt_fire 200 ms [0:fire_key]
+77:   end_alt_fire 200 ms
+77: weapon 17: 488 vertices; 5 clips
+77:   alt_fire 1066 ms [613:fire_key]
+77:   fire2 966 ms [233:fire_key] [566:fire_key]
+77:   fire 566 ms [133:fire_key] [366:fire_key]
+77:   draw 333 ms
+77:   static_model 1 ms
+77: Original SubwayA camera intro expired after 12.0167 simulation seconds
+77: weapon 1: 463 vertices; 6 clips
+77:   static_model 1 ms
+77:   draw 333 ms
+77:   fire 150 ms [0:fire_key]
+77:   start_alt_fire 166 ms
+77:   alt_fire 200 ms [0:fire_key]
+77:   end_alt_fire 200 ms
+77: weapon 17: 488 vertices; 5 clips
+77:   alt_fire 1066 ms [613:fire_key]
+77:   fire2 966 ms [233:fire_key] [566:fire_key]
+77:   fire 566 ms [133:fire_key] [366:fire_key]
+77:   draw 333 ms
+77:   static_model 1 ms
+77: Original SubwayA camera intro expired after 12.0167 simulation seconds
+77: weapon 1: 463 vertices; 6 clips
+77:   static_model 1 ms
+77:   draw 333 ms
+77:   fire 150 ms [0:fire_key]
+77:   start_alt_fire 166 ms
+77:   alt_fire 200 ms [0:fire_key]
+77:   end_alt_fire 200 ms
+77: weapon 17: 488 vertices; 5 clips
+77:   alt_fire 1066 ms [613:fire_key]
+77:   fire2 966 ms [233:fire_key] [566:fire_key]
+77:   fire 566 ms [133:fire_key] [366:fire_key]
+77:   draw 333 ms
+77:   static_model 1 ms
+47/47 Test  #77: weapons.private ..................   Passed   35.83 sec
+
+The following tests passed:
+	pickup_audio.rules
+	pickup_audio.private
+	triggers.catalog
+	world.level_change_private
+	triggers.private
+	pickups.catalog
+	weapons.animation
+	pickup_audio.failures
+	world.level_change
+	pickups.defaults
+	triggers.doors
+	pickups.ammunition
+	pickups.resources
+	pickups.rejection
+	pickup_audio.callbacks
+	pickups.statistics
+	pickups.callbacks
+	pickups.spawning
+	pickups.contact
+	pickups.protocol
+	objects.unsupported_teardown
+	weapons.lifetime
+	triggers.keys
+	triggers.filters
+	weapons.inventory
+	weapons.rollback
+	triggers.touch
+	triggers.schedule
+	triggers.protocol
+	weapons.melee
+	triggers.lifetime
+	weapons.segments
+	weapons.firing
+	weapons.damage
+	triggers.toggle
+	objects.creation_failures
+	objects.messages_strings
+	objects.builtin_model
+	objects.original_objects
+	objects.links_lists
+	objects.reasons_properties
+	objects.deferred_removal
+	objects.nested_creation
+	objects.aggregate_dispatch
+	objects.handles_selection
+	objects.scheduling
+	weapons.private
+
+100% tests passed, 0 tests failed out of 47
+
+Label Time Summary:
+audio       =   1.06 sec*proc (4 tests)
+headless    =  63.87 sec*proc (47 tests)
+objects     =   0.09 sec*proc (12 tests)
+pickups     =   8.30 sec*proc (14 tests)
+private     =  62.71 sec*proc (6 tests)
+triggers    =  11.40 sec*proc (10 tests)
+weapons     =  36.02 sec*proc (9 tests)
+world       =   8.06 sec*proc (2 tests)
+
+Total Test time (real) =  35.86 sec

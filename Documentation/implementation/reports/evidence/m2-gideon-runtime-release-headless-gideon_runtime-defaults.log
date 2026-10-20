@@ -1,0 +1,14 @@
+692/699 Testing: gideon_runtime.defaults
+692/699 Test: gideon_runtime.defaults
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon_runtime_tests" "defaults" "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon-runtime-defaults"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gideon_runtime.defaults" start time: Oct 17 03:42 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_runtime.defaults" end time: Oct 17 03:42 CEST
+"gideon_runtime.defaults" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,257 @@
+Start testing: Oct 17 18:40 CEST
+----------------------------------------------------------
+25/935 Testing: gpu.lifecycle
+25/935 Test: gpu.lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--gpu-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gpu.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.lifecycle" start time: Oct 17 18:40 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/gpu.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+<end of output>
+Test time =   3.08 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.lifecycle" end time: Oct 17 18:40 CEST
+"gpu.lifecycle" time elapsed: 00:00:03
+----------------------------------------------------------
+
+598/935 Testing: gpu.sprite_alpha
+598/935 Test: gpu.sprite_alpha
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-alpha"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.sprite_alpha" start time: Oct 17 18:40 CEST
+Output:
+----------------------------------------------------------
+Pixels: zero/partial/opaque/opaque-black DTX alpha, per-instance opacity, overlap sort, world occlusion, no depth writes, resize and reupload passed
+<end of output>
+Test time =   0.42 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sprite_alpha" end time: Oct 17 18:40 CEST
+"gpu.sprite_alpha" time elapsed: 00:00:00
+----------------------------------------------------------
+
+599/935 Testing: gpu.sprite_private
+599/935 Test: gpu.sprite_private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.sprite_private" start time: Oct 17 18:40 CEST
+Output:
+----------------------------------------------------------
+Pixels: zero/partial/opaque/opaque-black DTX alpha, per-instance opacity, overlap sort, world occlusion, no depth writes, resize and reupload passed
+Private authored sprite pose/scale: 1556 non-background pixels, 118444 clear; unload emptied CPU/GPU geometry
+<end of output>
+Test time =   0.96 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sprite_private" end time: Oct 17 18:40 CEST
+"gpu.sprite_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+637/935 Testing: gpu.object_particle_tint
+637/935 Test: gpu.object_particle_tint
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_particle_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/object-particle-tint"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.object_particle_tint" start time: Oct 17 18:40 CEST
+Output:
+----------------------------------------------------------
+Original smoke stream: 2914 covered pixels, 992 opaque tint checks; authored alpha remains unused
+<end of output>
+Test time =   0.36 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.object_particle_tint" end time: Oct 17 18:40 CEST
+"gpu.object_particle_tint" time elapsed: 00:00:00
+----------------------------------------------------------
+
+638/935 Testing: gpu.object_particle_private
+638/935 Test: gpu.object_particle_private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_particle_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/object-particle-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.object_particle_private" start time: Oct 17 18:40 CEST
+Output:
+----------------------------------------------------------
+Original smoke stream: 2914 covered pixels, 992 opaque tint checks; authored alpha remains unused
+Original smoke64_2: five stream quads, 7090 covered pixels, 2769 partial-alpha texels
+<end of output>
+Test time =   0.45 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.object_particle_private" end time: Oct 17 18:40 CEST
+"gpu.object_particle_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+675/935 Testing: gpu.mouse_combat
+675/935 Test: gpu.mouse_combat
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_controls_tests" "gpu_combat" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.mouse_combat" start time: Oct 17 18:40 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2192.09
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=8, ammo=42, independent corpse verified, native=1
+Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=0
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2192.09
+Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=13, ammo=37, independent corpse verified, native=1
+Dodge updates=12, corpse candidates=23, zero-margin search=1, swept source clearance=0
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+<end of output>
+Test time =   8.92 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.mouse_combat" end time: Oct 17 18:41 CEST
+"gpu.mouse_combat" time elapsed: 00:00:08
+----------------------------------------------------------
+
+676/935 Testing: gpu.corpse_clearance
+676/935 Test: gpu.corpse_clearance
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_controls_tests" "gpu_clearance" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.corpse_clearance" start time: Oct 17 18:41 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2338.28
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+Post-kill position=-32,170.001,-1854.18 camera=0 yaw=0
+Walked past killed Cultist to z=-1854.18
+Approached encounter at z=-1742.25
+Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+Post-kill position=-32,170.001,-1340.93 camera=0 yaw=-3.72529e-09
+Walked past killed Cultist to z=-1340.93
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2341.42
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+Approached encounter at z=-1745.4
+Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+Post-kill position=-32,170.001,-1344.07 camera=0 yaw=3.72529e-09
+Walked past killed Cultist to z=-1344.07
+<end of output>
+Test time =  11.50 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.corpse_clearance" end time: Oct 17 18:41 CEST
+"gpu.corpse_clearance" time elapsed: 00:00:11
+----------------------------------------------------------
+
+841/935 Testing: gpu.level_change
+841/935 Test: gpu.level_change
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/level_change_gpu_tests" "/home/yann/.steam/steam/steamapps/common/Blood II" "/home/yann/projects/lithtech/Blood2/build/debug/tests/level-change"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.level_change" start time: Oct 17 18:41 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+Destination: CityHub / 
+Cycle 0: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+World SPR sprites/motelhell.spr: 11 frames / 15 fps
+Destination: SubwayA / 
+Cycle 1: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+Destination: CityHub / 
+Cycle 2: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+World SPR sprites/motelhell.spr: 11 frames / 15 fps
+Destination: SubwayA / 
+Cycle 3: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+<end of output>
+Test time =   6.35 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.level_change" end time: Oct 17 18:41 CEST
+"gpu.level_change" time elapsed: 00:00:06
+----------------------------------------------------------
+
+923/935 Testing: gpu.hud
+923/935 Test: gpu.hud
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/hud_tests" "gpu" "/home/yann/projects/lithtech/Blood2/build/debug/tests/hud-gpu"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.hud" start time: Oct 17 18:41 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+cycle 0 frame 0 HUD pixels 107412
+cycle 0 frame 1 HUD pixels 107412
+cycle 0 frame 2 HUD pixels 107412
+cycle 0 frame 3 HUD pixels 0
+cycle 1 frame 0 HUD pixels 29092
+cycle 1 frame 1 HUD pixels 29092
+cycle 1 frame 2 HUD pixels 29092
+cycle 1 frame 3 HUD pixels 0
+cycle 2 frame 0 HUD pixels 15092
+cycle 2 frame 1 HUD pixels 15092
+cycle 2 frame 2 HUD pixels 15092
+cycle 2 frame 3 HUD pixels 0
+<end of output>
+Test time =   0.69 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.hud" end time: Oct 17 18:41 CEST
+"gpu.hud" time elapsed: 00:00:00
+----------------------------------------------------------
+
+935/935 Testing: gpu.screen_fade
+935/935 Test: gpu.screen_fade
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/screen_fade_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/screen-fade-gpu"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.screen_fade" start time: Oct 17 18:41 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+cycle=0 scale=1 expected RGB=204 HUD=89000 inspector=12847
+cycle=0 scale=0.5 expected RGB=102 HUD=89000 inspector=13190
+cycle=0 scale=0 expected RGB=0 HUD=2407 inspector=6728
+cycle=0 scale=1 expected RGB=204 HUD=89000 inspector=13202
+cycle=1 scale=1 expected RGB=204 HUD=56960 inspector=12847
+cycle=1 scale=0.5 expected RGB=102 HUD=56960 inspector=13190
+cycle=1 scale=0 expected RGB=0 HUD=814 inspector=6728
+cycle=1 scale=1 expected RGB=204 HUD=56960 inspector=13202
+<end of output>
+Test time =   0.50 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.screen_fade" end time: Oct 17 18:41 CEST
+"gpu.screen_fade" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 18:41 CEST
+
+gpu =  33.22 sec*proc
+
+hud =   0.69 sec*proc
+
+object_particles =   0.81 sec*proc
+
+player_controls =  20.42 sec*proc
+
+private =  28.17 sec*proc
+
+screen_fade =   0.50 sec*proc
+
+sprite_view =   1.37 sec*proc
+
+world =   6.35 sec*proc
+

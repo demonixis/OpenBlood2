@@ -1,0 +1,20 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 1203: demo.spawned_overlap
+1/1 Test #1203: demo.spawned_overlap .............***Failed    1.38 sec
+Existing source omission Demo_01 #674 CDestructableBrush / SecScreen: SecScreen: Missing named world model; engine rejected creation before initial update; world loading continues
+Spawn pose -1888 2137.86 -2387; nudge 0 -6.13501 -3.00098
+spawned_overlap:199: child->state.m_Pos.y > authored.y + child->placement_nudge.y && child->placement_nudges == 1 | 
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+demo        =   1.38 sec*proc (1 test)
+headless    =   1.38 sec*proc (1 test)
+private     =   1.38 sec*proc (1 test)
+
+Total Test time (real) =   1.40 sec
+
+The following tests FAILED:
+	1203 - demo.spawned_overlap (Failed)                     demo headless private
+Errors while running CTest

@@ -1,0 +1,17 @@
+507/507 Testing: exits.catalog
+507/507 Test: exits.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/exit_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"exits.catalog" start time: Oct 16 17:26 CEST
+Output:
+----------------------------------------------------------
+Authored exit2 -> 02_cityhub / start 01_egressa
+Authored exit2 -> 02_cityhub / start 01_egressa
+Authored exit2 -> 02_cityhub / start 01_egressa
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"exits.catalog" end time: Oct 16 17:26 CEST
+"exits.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+364/366 Testing: ai_trigger.lifetime
+364/366 Test: ai_trigger.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_trigger_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-trigger-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_trigger.lifetime" start time: Oct 16 12:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_trigger.lifetime" end time: Oct 16 12:07 CEST
+"ai_trigger.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

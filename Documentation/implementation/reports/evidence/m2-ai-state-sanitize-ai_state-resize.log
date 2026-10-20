@@ -1,0 +1,14 @@
+338/345 Testing: ai_state.resize
+338/345 Test: ai_state.resize
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_state_tests" "resize"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_state.resize" start time: Oct 16 11:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.resize" end time: Oct 16 11:04 CEST
+"ai_state.resize" time elapsed: 00:00:00
+----------------------------------------------------------

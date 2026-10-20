@@ -1,0 +1,11 @@
+[0/2] Re-checking globbed directories...
+[1/32] Scanning <workspace>/Blood2/src/app/hud.cpp for CXX dependencies
+[2/32] Scanning <workspace>/Blood2/src/app/hud.cpp for CXX dependencies
+[3/32] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[4/12] Scanning <workspace>/Blood2/tests/hud_tests.cpp for CXX dependencies
+[5/12] Generating CXX dyndep file tests/CMakeFiles/hud_tests.dir/CXX.dd
+[6/11] Building CXX object CMakeFiles/blood2_app.dir/src/app/hud.cpp.o
+[7/11] Building CXX object tests/CMakeFiles/hud_tests.dir/__/src/app/hud.cpp.o
+[8/11] Linking CXX executable blood2
+[9/11] Building CXX object tests/CMakeFiles/hud_tests.dir/hud_tests.cpp.o
+[10/11] Linking CXX executable tests/hud_tests

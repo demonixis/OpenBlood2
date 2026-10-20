@@ -1,0 +1,254 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 26
+      Start  26: world.level_change
+
+26: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests "level_change" "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/level_change"
+26: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+26: Test timeout computed to be: 20
+26: trial1: Destination world texture t.dtx: Missing exact-path resource
+26: trial2: No single-player GameStartPoint
+26: trial3: Start point has no supported ground collision
+26: trial4: Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+26: trial5: Destination initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+26: trial6: Destination start trigger requested another level during entry
+26: broken: DAT v56: invalid/unsupported section offsets near byte 4
+26: missing: Resource not found: worlds/missing.dat
+26: Commit 0:
+26: Commit 1:
+26: Commit 2:
+26: PASS level_change
+ 1/20 Test  #26: world.level_change ...............   Passed    0.06 sec
+test 187
+      Start 187: pickups.catalog
+
+187: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/pickup_tests "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+187: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+187: Test timeout computed to be: 90
+187: Authored SubMachineGunPU: worlds/02_cityhub.dat
+187: Authored AssaultRiflePU: worlds/02_cityhub.dat
+187: Authored SubMachineGunPU: worlds/02_cityhubb.dat
+187: Authored SubMachineGunPU: worlds/02_cityhubc.dat
+187: Authored BerettaPU: worlds/05_cdm.dat
+187: Authored AssaultRiflePU: worlds/06_airship2.dat
+187: Authored FlareGunPU: worlds/06_airship2.dat
+187: Authored AssaultRiflePU: worlds/10_sewagetreatmentplant.dat
+187: Authored FlareGunPU: worlds/11_slaughter_house.dat
+187: Authored AssaultRiflePU: worlds/14_subwayc.dat
+187: Authored SubMachineGunPU: worlds/20_powerstation.dat
+187: Authored AssaultRiflePU: worlds/25_ancientone.dat
+187: AssaultRiflePU=5
+187: BMGAmmoPU=76
+187: BatteryAmmoPU=150
+187: BerettaPU=1
+187: BulletAmmoPU=243
+187: DieBugDieAmmoPU=105
+187: FlareAmmoPU=117
+187: FlareGunPU=2
+187: FlashlightPU=10
+187: FuelAmmoPU=108
+187: HealthPU=209
+187: HowitzerAmmoPU=100
+187: MedKitPU=22
+187: MegaHealthPU=49
+187: NecroWardPU=33
+187: ProximitiesPU=161
+187: RemotesPU=107
+187: ShellAmmoPU=186
+187: SubMachineGunPU=4
+187: WardPU=58
+187: rejected BMGAmmoPU: invalid property TypeAction=8
+187: rejected BatteryAmmoPU: invalid property TypeAction=17
+187: rejected BulletAmmoPU: invalid property TypeAction=35
+187: rejected DieBugDieAmmoPU: invalid property TypeAction=12
+187: rejected FlareAmmoPU: invalid property TypeAction=17
+187: rejected FuelAmmoPU: invalid property TypeAction=17
+187: rejected HealthPU: invalid property TypeAction=21
+187: rejected HowitzerAmmoPU: invalid property TypeAction=12
+187: rejected MedKitPU: invalid property TypeAction=2
+187: rejected MegaHealthPU: invalid property TypeAction=4
+187: rejected NecroWardPU: invalid property TypeAction=3
+187: rejected ProximitiesPU: invalid property TypeAction=28
+187: rejected RemotesPU: invalid property TypeAction=14
+187: rejected ShellAmmoPU: invalid property TypeAction=24
+187: rejected WardPU: invalid property TypeAction=6
+187: worlds=57 created=1526 missing=0 supported_spawns=60
+ 2/20 Test #187: pickups.catalog ..................   Passed    4.19 sec
+test 800
+      Start 800: medkit.rules
+
+800: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/medkit_tests "rules" "/home/yann/projects/lithtech/Blood2/build/debug/tests/medkit-fixtures/rules"
+800: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+800: Test timeout computed to be: 30
+ 3/20 Test #800: medkit.rules .....................   Passed    0.01 sec
+test 801
+      Start 801: medkit.pickup
+
+801: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/medkit_tests "pickup" "/home/yann/projects/lithtech/Blood2/build/debug/tests/medkit-fixtures/pickup"
+801: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+801: Test timeout computed to be: 30
+ 4/20 Test #801: medkit.pickup ....................   Passed    0.02 sec
+test 802
+      Start 802: medkit.commands
+
+802: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/medkit_tests "commands" "/home/yann/projects/lithtech/Blood2/build/debug/tests/medkit-fixtures/commands"
+802: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+802: Test timeout computed to be: 30
+ 5/20 Test #802: medkit.commands ..................   Passed    0.01 sec
+test 803
+      Start 803: medkit.transport
+
+803: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/medkit_tests "transport" "/home/yann/projects/lithtech/Blood2/build/debug/tests/medkit-fixtures/transport"
+803: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+803: Test timeout computed to be: 30
+ 6/20 Test #803: medkit.transport .................   Passed    0.02 sec
+test 804
+      Start 804: medkit.restore
+
+804: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/medkit_tests "restore" "/home/yann/projects/lithtech/Blood2/build/debug/tests/medkit-fixtures/restore"
+804: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+804: Test timeout computed to be: 30
+ 7/20 Test #804: medkit.restore ...................   Passed    0.02 sec
+test 805
+      Start 805: medkit.lifetime
+
+805: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/medkit_tests "lifetime" "/home/yann/projects/lithtech/Blood2/build/debug/tests/medkit-fixtures/lifetime"
+805: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+805: Test timeout computed to be: 30
+ 8/20 Test #805: medkit.lifetime ..................   Passed    0.02 sec
+test 806
+      Start 806: medkit.input
+
+806: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/medkit_tests "input" "/home/yann/projects/lithtech/Blood2/build/debug/tests/medkit-fixtures/input"
+806: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+806: Test timeout computed to be: 30
+ 9/20 Test #806: medkit.input .....................   Passed    0.00 sec
+test 807
+      Start 807: medkit.private
+
+807: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/medkit_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+807: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+807: Test timeout computed to be: 180
+807: CityHub MedKitPU model=Models/Powerups/Medkit_pu.abc
+807: Medkit cycle=0 charges=45 frames=45312 peak=0.339641
+807: CityHub MedKitPU model=Models/Powerups/Medkit_pu.abc
+807: Medkit cycle=1 charges=45 frames=45312 peak=0.339641
+10/20 Test #807: medkit.private ...................   Passed    1.64 sec
+test 813
+      Start 813: world_shaders.formats
+
+813: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/world_shader_tests
+813: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+813: Test timeout computed to be: 15
+813: Shader selection: SPIR-V/MSL stages, generated entry points, reflected bindings, static lifetime and unsupported formats pass; native Metal compilation not exercised
+11/20 Test #813: world_shaders.formats ............   Passed    0.00 sec
+test 854
+      Start 854: flashlight.rules
+
+854: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight_tests "rules" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight-fixtures/rules"
+854: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+854: Test timeout computed to be: 30
+12/20 Test #854: flashlight.rules .................   Passed    0.00 sec
+test 855
+      Start 855: flashlight.pickup
+
+855: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight_tests "pickup" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight-fixtures/pickup"
+855: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+855: Test timeout computed to be: 30
+13/20 Test #855: flashlight.pickup ................   Passed    0.02 sec
+test 856
+      Start 856: flashlight.commands
+
+856: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight_tests "commands" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight-fixtures/commands"
+856: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+856: Test timeout computed to be: 30
+14/20 Test #856: flashlight.commands ..............   Passed    0.02 sec
+test 857
+      Start 857: flashlight.ray
+
+857: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight_tests "ray" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight-fixtures/ray"
+857: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+857: Test timeout computed to be: 30
+15/20 Test #857: flashlight.ray ...................   Passed    0.02 sec
+test 858
+      Start 858: flashlight.restore
+
+858: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight_tests "restore" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight-fixtures/restore"
+858: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+858: Test timeout computed to be: 30
+16/20 Test #858: flashlight.restore ...............   Passed    0.02 sec
+test 859
+      Start 859: flashlight.lifetime
+
+859: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight_tests "lifetime" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight-fixtures/lifetime"
+859: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+859: Test timeout computed to be: 30
+17/20 Test #859: flashlight.lifetime ..............   Passed    0.03 sec
+test 860
+      Start 860: flashlight.input
+
+860: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight_tests "input" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight-fixtures/input"
+860: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+860: Test timeout computed to be: 30
+18/20 Test #860: flashlight.input .................   Passed    0.00 sec
+test 861
+      Start 861: flashlight.session
+
+861: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight_tests "session" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight-fixtures/session"
+861: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+861: Test timeout computed to be: 30
+19/20 Test #861: flashlight.session ...............   Passed    0.03 sec
+test 862
+      Start 862: flashlight.private
+
+862: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/flashlight_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+862: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+862: Test timeout computed to be: 180
+862: Flashlight cycle=0 active=1 frames=4777 peak=1
+862: Flashlight cycle=0 active=0 frames=4777 peak=1
+862: Flashlight cycle=1 active=1 frames=4777 peak=1
+862: Flashlight cycle=1 active=0 frames=4777 peak=1
+20/20 Test #862: flashlight.private ...............   Passed    1.57 sec
+
+The following tests passed:
+	world.level_change
+	pickups.catalog
+	medkit.rules
+	medkit.pickup
+	medkit.commands
+	medkit.transport
+	medkit.restore
+	medkit.lifetime
+	medkit.input
+	medkit.private
+	world_shaders.formats
+	flashlight.rules
+	flashlight.pickup
+	flashlight.commands
+	flashlight.ray
+	flashlight.restore
+	flashlight.lifetime
+	flashlight.input
+	flashlight.session
+	flashlight.private
+
+100% tests passed, 0 tests failed out of 20
+
+Label Time Summary:
+flashlight    =   1.70 sec*proc (9 tests)
+headless      =   7.69 sec*proc (20 tests)
+medkit        =   1.74 sec*proc (8 tests)
+pickups       =   4.19 sec*proc (1 test)
+private       =   7.40 sec*proc (3 tests)
+shaders       =   0.00 sec*proc (1 test)
+world         =   0.06 sec*proc (1 test)
+world_view    =   0.00 sec*proc (1 test)
+
+Total Test time (real) =   7.70 sec

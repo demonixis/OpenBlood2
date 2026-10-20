@@ -1,0 +1,1269 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index c5ac7d3..27cd7c0 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -504,3 +504,5 @@ The [energy projectile continuation](../Documentation/Implementation/M2_ENERGY_P
+ The [wind weapon continuation](../Documentation/Implementation/M2_WIND_WEAPON.md) connects original Gideon Wind and CBehemothShockwaveProjectile. Read [contracts](docs/WIND_WEAPON_CONTRACTS.md). Preserve the one-shot override, current-shooter ground query, center-distance450/full damage, owner exclusion/self inclusion, raw damage vectors/target positions and no AREAEFFECT flag. The uninitialized source ray endpoint is repaired explicitly; entry-face collision is replacement policy. Keep callback snapshots/reentrancy guards, independent FX/audio and truthful terminal history. Gideon/shield/powerup, safe NEW_LEVEL and M2 remain open.
+ 
+ The [shield/powerup continuation](../Documentation/Implementation/M2_SHIELD_WEAPON.md) connects original CGideonShield and owner-bound ObjectFX19/36. Read [contracts](docs/SHIELD_WEAPON_CONTRACTS.md). Preserve visual-only weapon semantics (armor belongs to Gideon), cached-right emission, local-up offset, per-callback rotations, absolute emission clocks and powerup alpha1 until its final ramp. Checked owner removal ends all particles; keep bounded failures, retained inspection and destination isolation. Gideon initialization/actions/extra-key caller, required services, safe NEW_LEVEL and M2 remain open.
++
++The [Gideon combat continuation](../Documentation/Implementation/M2_GIDEON_COMBAT.md) connects selected original decisions, shield armor, node firing and extra-key powerup. Read [contracts](docs/GIDEON_COMBAT_CONTRACTS.md). Preserve strict shield/sight gates, reversed panic inequality, MAGIC column8, absent Soul Hook completion, cached-forward fallback and no timed/generic-clearance fire. Extra keys retain branch priority and checked deferred lifetime. Sparse NPC IDs must never index a player-sized array. No production boss registration/new shared table is claimed; fade/teleport, initialization, required services and safe NEW_LEVEL keep M2 open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0d3cb37..511c42e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -46,7 +46,7 @@ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/origin
+     src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/Movement.cpp
+     src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AIDeath.cpp src/game/original/Corpse.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+-    src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
++    src/game/original/CultistAI.cpp src/game/original/Gideon.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_exits.cpp src/game/original/ExitTrigger.cpp src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/PlayerSave.cpp src/game/original/CharacterNodes.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+     src/game/original/InventoryMgr.cpp src/game/original/InventorySave.cpp src/game/original/Weapon.cpp src/game/original/WeaponSound.cpp src/game/original/WeaponVector.cpp src/game/original/WeaponFX.cpp src/game/original/ViewWeapon.cpp)
+diff --git a/README.md b/README.md
+index 386e4cf..c1e9c2f 100644
+--- a/README.md
++++ b/README.md
+@@ -548,3 +548,5 @@ The [energy projectile continuation](../Documentation/Implementation/M2_ENERGY_P
+ The [wind weapon continuation](../Documentation/Implementation/M2_WIND_WEAPON.md) connects the original one-shot shockwave, full-radius damage and actual model/WAV presentation. The repaired ground query and checked callback lifetime are explicit. Gideon state/shield integration, required services and safe NEW_LEVEL keep M2 incomplete.
+ 
+ The [shield/powerup dependency](../Documentation/Implementation/M2_SHIELD_WEAPON.md) adds the original visual-only shield weapon, actual WAV and owner-bound sphere/ring particles with inspection. Armor remains the responsibility of the pending boss action. Gideon, required services and safe NEW_LEVEL still keep M2 incomplete.
++
++The [Gideon combat continuation](../Documentation/Implementation/M2_GIDEON_COMBAT.md) connects original decision thresholds, shield armor, animation-driven fire and extra-key/node aiming. It also fixes sparse NPC weapon-ID initialization. Production boss lifecycle/fade/teleport, required services and safe NEW_LEVEL remain open; M2 is incomplete.
+diff --git a/docs/AI_FIRE_CONTRACTS.md b/docs/AI_FIRE_CONTRACTS.md
+index 952140e..620adf7 100644
+--- a/docs/AI_FIRE_CONTRACTS.md
++++ b/docs/AI_FIRE_CONTRACTS.md
+@@ -105,3 +105,5 @@ AI_Update/deactivation, remaining states and shade recovery stay unavailable.
+ The [Naga weapon continuation](NAGA_WEAPON_CONTRACTS.md) extends the supported NPC weapon subset with original eye-beam damage, head_gun aiming and red-small beam presentation. Gideon and the eye impact composite remain unavailable; earlier blanket weapon omissions are superseded only for this subset.
+ 
+ The [shield continuation](SHIELD_WEAPON_CONTRACTS.md) also permits original GIDEON_SHIELD selection and generic r_gun/body aiming through FIRE_KEY. This supplies the visual-only weapon, not Gideon's own fire-node override or boss state loop.
++
++The [Gideon combat continuation](GIDEON_COMBAT_CONTRACTS.md) supersedes the selected-method omissions for boss decisions, shield armor, node firing and extra-key powerup. Production boss lifecycle remains unavailable. Sparse supported NPC weapon IDs now use value-based duplicate suppression.
+diff --git a/docs/AI_RUNTIME_CONTRACTS.md b/docs/AI_RUNTIME_CONTRACTS.md
+index 5f7d054..35e1db6 100644
+--- a/docs/AI_RUNTIME_CONTRACTS.md
++++ b/docs/AI_RUNTIME_CONTRACTS.md
+@@ -133,3 +133,5 @@ The [interactive entry correction](SESSION_PLAYBACK_CONTRACTS.md) now holds appl
+ The [Naga weapon continuation](NAGA_WEAPON_CONTRACTS.md) extends the supported NPC weapon subset with original eye-beam damage, head_gun aiming and red-small beam presentation. Gideon and the eye impact composite remain unavailable; earlier blanket weapon omissions are superseded only for this subset.
+ 
+ The [wind/shockwave continuation](WIND_WEAPON_CONTRACTS.md) extends the runtime-only projectile subset with OT_NORMAL scale metadata and the original type20 model/light recipe. Earlier type/resource restrictions are superseded only for this bounded subset; production Gideon and M2 remain incomplete.
++
++The [Gideon combat continuation](GIDEON_COMBAT_CONTRACTS.md) supersedes the selected-method omissions for boss decisions, shield armor, node firing and extra-key powerup. Production boss lifecycle remains unavailable. Sparse supported NPC weapon IDs now use value-based duplicate suppression.
+diff --git a/docs/AI_STATE_CONTRACTS.md b/docs/AI_STATE_CONTRACTS.md
+index 08f6886..ec01035 100644
+--- a/docs/AI_STATE_CONTRACTS.md
++++ b/docs/AI_STATE_CONTRACTS.md
+@@ -160,3 +160,5 @@ unusable; shade recovery, other states and full production AI_Update remain open
+ The [escape/guard continuation](AI_ESCAPE_CONTRACTS.md) supplies selected original
+ escape/hide/guard and beg bodies, plus checked non-owning tracking. Earlier blanket
+ omissions for those bodies are superseded; full NPC initialization/update remains open.
++
++The [Gideon combat continuation](GIDEON_COMBAT_CONTRACTS.md) supersedes the selected-method omissions for boss decisions, shield armor, node firing and extra-key powerup. Production boss lifecycle remains unavailable. Sparse supported NPC weapon IDs now use value-based duplicate suppression.
+diff --git a/docs/GIDEON_COMBAT_CONTRACTS.md b/docs/GIDEON_COMBAT_CONTRACTS.md
+new file mode 100644
+index 0000000..602a5f3
+--- /dev/null
++++ b/docs/GIDEON_COMBAT_CONTRACTS.md
+@@ -0,0 +1,105 @@
++# Original Gideon combat actions
++
++Selected original `Gideon::ComputeState`, `MC_Fire_Stand`, `Fire`, `MC_Extra`
++and `MagicPowerup` now use the typed engine services. See the
++[source ledger](M2_GIDEON_COMBAT_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_GIDEON_COMBAT.md).
++Read the [AI state](AI_STATE_CONTRACTS.md), [weapon](AI_FIRE_CONTRACTS.md),
++[shield](SHIELD_WEAPON_CONTRACTS.md) and [lifetime](OBJECT_CONTRACTS.md) contracts.
++
++**This is a combat-method dependency, not a registered production boss.** Tests
++register their own explicitly diagnostic Gideon with an injected inventory/table;
++normal worlds still report Gideon unsupported. Full original initialization,
++shared boss table, boss-health messages, damage dispatch, dodge/attack sequencing,
++fade/teleport and save/load remain pending. No additional mutable game global is
++introduced. Destination rehearsal still exchanges the existing four class/gender
++tables; a later production boss table must join that ownership audit.
++
++## Decisions
++
++No stimulus selects Special1 from Idle, SearchVisual from Teleport, Idle from
++SearchVisual and Teleport otherwise. With a stimulus, health<.25 or threat>.75
++first considers the strict `now-lastShield > shieldDuration` gate and selects
++AttackClose when the shield is available. Otherwise health<.05 can select Teleport
++only when `lastPanic+15 >= now`, updating lastPanic. This reversed-looking panic
++inequality is original and is retained. The other low-health/threat cases select
++AttackClose. SearchVisual with an ordinary stimulus selects Special1; otherwise
++sight>.94 selects close, sight>.75 selects far, and the remainder selects Special1.
++
++All transitions use the existing original SetNewState behavior, including its
++Idle deadline and velocity policy. A selected state does not imply that its action
++is implemented. Invalid/nonfinite input, stale owner and failed ComputeStimuli
++reject; a failed query is never interpreted as a usable stimulus.
++
++## Standing fire and armor
++
++A new fire command checks armor<=25 and a strictly expired 60-second shield
++interval. That branch selects Shield, adds exactly 100 armor without a cap, records
++the current time and selects FIRE_STAND[TYPE_RIFLE=0]. It consumes no chance draw.
++Otherwise AttackFar consumes one original 0..99 chance draw: <70 selects Energy
++Blast and FIRE_STAND[TYPE_MAGIC=8], even though the weapon definition's fire type is
++MELEE. The other far branch selects Naga/RIFLE. Other states select Wind/RIFLE for
++<50 and Naga/RIFLE otherwise. The portable generator is not retail CRT bit parity.
++
++The animation is nonlooping. Continuing this command never fires on a reload
++clock: Gideon's original override fires exclusively through model keys. Completion
++tries Soul Hook (base-game ID23), clears animating and increments Metacmd once.
++The original ignores the missing weapon; the typed inventory reports Invalid for
++this unsupported definition, retains the current weapon and exposes the actual
++result. No Soul Hook implementation or fallback weapon is fabricated.
++
++Missing inventory/table/animation services fail explicitly. Selection and shield
++armor changes precede SetAnimation in the original; they remain committed if its
++checked replacement resize fails. The port does not set animating on that failure,
++where the source ignored its bRet result. The shield timestamp prevents an immediate
++second grant. Metacmd overflow rejects before completion mutation. Calling the
++shield weapon itself still does not change armor.
++
++## Node aiming, keys and presentation
++
++The default fire node is `rr_gun`. A successful current node query aims toward the
++stored target position. If the node is missing, use current body position and
++**CMovement's cached forward**, not the current rotation or target direction.
++The cache must be initialized and sampled. Validate and normalize the direction;
++invalid pose, degenerate aim and pending owner/target fail. This boss override never
++calls generic CheckClearShot or substitutes head_gun/r_hand_extra2. Actual weapons
++retain their own collision, callbacks, ammo, audio and checked owner rules.
++
++The original accepts inventory dry attempts. The port distinguishes fired, dry
++and failed services in the shared AI inspection fields; invalid/unavailable shots
++are not accepted. It uses the existing typed seeded WeaponFire transport, with
++explicit virtual dispatch from the base model-key handler.
++
++`extra_key` invokes the subclass virtual method after the existing fire/show branch
++priority. A case-sensitive `powerup` prefix publishes ObjectFX36 on the checked
++owner; any other value replaces the fire-node name and immediately calls Fire.
++Unlike fire_key, extra_key has no no-target guard. Source `fire_key:head` does not
++select a head node: its value is ignored, preserving the previously selected node.
++The old unbounded scalar/string buffers are replaced by nonempty, NUL-free inputs
++of at most 63 bytes. Unknown nodes still use the source cached-forward fallback.
++Powerup publication failure is visible as a failed key/effect, not a successful
++placeholder. Other AI subclasses retain explicit unsupported MC_Extra responses.
++Base character motion keys continue after the action; fire_key's no-target early
++return and pending-target rejection still stop that forwarding.
++
++Owner-bound effects follow the existing shield/powerup lifetime. Pending owner
++removal ends them, while detached beam/projectile presentation keeps its existing
++ownership. Removal during a shot callback prevents later animation keys from using
++the pending actor. Inspector/GPU preparation only reads current state and clocks.
++The Skeleton inspector shows selected node/weapon/chance, shield interval/grants,
++armor, panic time, extra keys, historical powerup ID/errors and completion selection.
++
++## Sparse NPC weapon IDs
++
++The original initialization path can now acquire the supported non-player weapon
++IDs 27/38/41/42 safely. An 18-element array indexed by raw IDs was left over from the
++player-only subset; the newer name mappings could access it out of bounds. Duplicate
++suppression now stores at most the five requested IDs and compares values. A private
++regression initializes three real Cultists with all four IDs and a duplicate fifth
++slot, verifies four correctly ordered weapons and unloads them. This does not change
++their authored defaults or give those models Gideon's node override.
++
++SubwayA remains 203 created / 4 transferred sounds / 372 editor-only / 1 unsupported
++Gideon / 0 creation failures. Required FX, production boss services, safe NEW_LEVEL
++and the unchanged M2 acceptance gate remain open. No retail playthrough, other
++platform or XR validation is claimed.
+diff --git a/docs/M2_GIDEON_COMBAT_SOURCES.json b/docs/M2_GIDEON_COMBAT_SOURCES.json
+new file mode 100644
+index 0000000..ba331f5
+--- /dev/null
++++ b/docs/M2_GIDEON_COMBAT_SOURCES.json
+@@ -0,0 +1,39 @@
++{
++  "baseline_commit": "37928d12fc4720accacff4eec5f2424087ea87d7",
++  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
++      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
++      "use": "Selected constructor fire-node/shield/panic defaults 61-74; ComputeState 323-407; MC_Fire_Stand 415-473; MagicPowerup 583-600; MC_Extra/Fire 770-808"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Gideon.h",
++      "sha256": "5a1c49b5d7e8cfd89b851955a0bc64d5f07c2718b2b911ab40a45f0b745e57c9",
++      "use": "Subclass virtual combat methods, fire-node buffer and shield/panic fields"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "use": "OnStringKey 880-975; extra-key dispatch and source 32-byte unsafe scalar buffer"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "use": "ChangeWeapon 772-837; absent Soul Hook is ignored by original caller"
++    },
++    {
++      "path": "sources/blood2/Shared/SharedDefs.h",
++      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "use": "TYPE_MAGIC=8, base-game WEAP_SOUL_HOOK=23 and existing boss weapon IDs"
++    }
++  ],
++  "adaptations": [
++    "Selected methods only; no production Gideon class registration or original initialization claimed.",
++    "Checked typed object/model/inventory/particle services and existing owned WeaponFire transport; failed services reject.",
++    "Nonempty NUL-free 63-byte extra-key/node limit replaces unsafe buffers; failed animation retains prior original armor/selection mutations.",
++    "Existing inventory reports Invalid for unsupported Soul Hook; original ignored completion request is retained and inspected.",
++    "No new mutable original globals; fixture tables are independently owned.",
++    "Sparse supported NPC weapon IDs are deduplicated by value across the five requested names, replacing unsafe 18-entry raw-ID indexing."
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 4458047..e482aca 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -858,3 +858,7 @@ Selected original Gideon Wind definition, projectile Update and high-detail mode
+ ## Original Gideon shield / spell particles
+ 
+ Selected original CGideonShield, complete WeaponData41, AI name/generic firing branch, and ObjectFX19/36 recipe/lifecycle/ring/sphere emission extend the existing CObjectParticleFX. [Source hashes and adaptations](M2_SHIELD_WEAPON_SOURCES.json), [contracts](SHIELD_WEAPON_CONTRACTS.md) and [verification](../../Documentation/Implementation/M2_SHIELD_WEAPON.md) distinguish source gameplay from the typed lifetime, bounded arrays and later-engine rotation/particle policies. No new dependency or commercial resource is imported. Gideon itself remains pending.
++
++## Original Gideon combat methods
++
++Selected ComputeState, MC_Fire_Stand, Fire, MC_Extra and MagicPowerup are directly adapted from the original subclass, with typed failures and existing lifetime rules. See [source ledger](M2_GIDEON_COMBAT_SOURCES.json) and [contracts](GIDEON_COMBAT_CONTRACTS.md). No production boss constructor/registration or mutable shared table is introduced. The NPC initialization ID-bound repair is engine integration, not a gameplay rule change.
+diff --git a/docs/SHIELD_WEAPON_CONTRACTS.md b/docs/SHIELD_WEAPON_CONTRACTS.md
+index 75c8776..b4eb1a7 100644
+--- a/docs/SHIELD_WEAPON_CONTRACTS.md
++++ b/docs/SHIELD_WEAPON_CONTRACTS.md
+@@ -116,3 +116,5 @@ caller is still pending. No authored boss fight is claimed.
+ SubwayA remains 203 created / 4 transferred sounds / 372 editor-only / 1 unsupported
+ Gideon / 0 failures. Boss initialization/actions, required missing FX, safe NEW_LEVEL
+ and the actual M2 exit criteria remain open.
++
++The [Gideon combat continuation](GIDEON_COMBAT_CONTRACTS.md) supersedes the selected-method omissions for boss decisions, shield armor, node firing and extra-key powerup. Production boss lifecycle remains unavailable. Sparse supported NPC weapon IDs now use value-based duplicate suppression.
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 65d1543..3d0c9d2 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -1,6 +1,7 @@
+ #include "game/original/AI_Mgr.h"
+ #include "game/original/Corpse.h"
+ #include "game/original/CultistAI.h"
++#include "game/original/Gideon.h"
+ #include "inspector.h"
+ #include <algorithm>
+ #include <imgui.h>
+@@ -393,8 +394,12 @@ namespace OpenBlood2
+             }
+             ImGui::Text("Last attempt: %s", ai.fire_calls ? result : "none");
+             ImGui::Text("Origin %s: %.2f %.2f %.2f | cadence %.3f / last %.3f",
+-                        ai.fire_gun_node ? (weapon && weapon->data.m_nType == WEAP_NAGA_EYEBEAM ? "head_gun" : "r_gun")
+-                                         : "body fallback",
++                        ai.fire_gun_node
++                            ? (dynamic_cast<const Gideon*>(&ai) ? static_cast<const Gideon&>(ai).m_szFireNode.c_str()
++                               : weapon && weapon->data.m_nType == WEAP_NAGA_EYEBEAM       ? "head_gun"
++                               : weapon && weapon->data.m_nType == WEAP_ZEALOT_ENERGYBLAST ? "r_hand_extra2"
++                                                                                           : "r_gun")
++                            : "body fallback",
+                         ai.fire_origin.x, ai.fire_origin.y, ai.fire_origin.z, ai.m_fAttackLoadTime,
+                         ai.m_fLoadTimeStart);
+             ImGui::Text("Clearance: %s | rays %u | head retry %s", ai_clear_outcome_name(ai.clear_shot.outcome),
+@@ -412,6 +417,26 @@ namespace OpenBlood2
+             if (!ai.fire_error.empty())
+                 ImGui::TextWrapped("Failed: %s", ai.fire_error.c_str());
+         }
++        if (const auto* boss = dynamic_cast<const Gideon*>(target_ai);
++            boss && ImGui::CollapsingHeader("Original Gideon combat actions", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            ImGui::TextWrapped("Selected original combat methods; diagnostic actor. Boss initialization, fade/teleport "
++                               "and full AI_Update remain unavailable.");
++            ImGui::Text("Node %s | selected weapon %u | chance draw %d", boss->m_szFireNode.c_str(),
++                        boss->selected_weapon, boss->attack_roll);
++            ImGui::Text("Armor %.2f | grants %llu | last shield %.3f / interval %.3f | last panic %.3f",
++                        boss->m_damage.m_fArmorPoints, (unsigned long long)boss->shield_grants, boss->m_fLastShield,
++                        boss->m_fShieldDuration, boss->m_fLastPanic);
++            ImGui::Text("Extra keys %llu | powerup attempts %llu | historical effect %llu",
++                        (unsigned long long)boss->extra_calls, (unsigned long long)boss->powerup_calls,
++                        (unsigned long long)boss->powerup_effect);
++            ImGui::Text("Completion Soul Hook request result %d (source ignores absent weapon)",
++                        int(boss->completion_selection));
++            ImGui::TextWrapped("No timed firing or generic clearance query. Actual weapon shots retain their own "
++                               "collision and lifetime checks.");
++            if (!boss->powerup_error.empty())
++                ImGui::TextWrapped("Powerup failed: %s", boss->powerup_error.c_str());
++        }
+         if (target_ai && ImGui::CollapsingHeader("Original AI state actions", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& ai = *target_ai;
+diff --git a/src/game/original/AIRuntime.cpp b/src/game/original/AIRuntime.cpp
+index 4c2108b..4015c11 100644
+--- a/src/game/original/AIRuntime.cpp
++++ b/src/game/original/AIRuntime.cpp
+@@ -4,6 +4,7 @@
+ #include "CameraObj.h"
+ #include "CivilianAI.h"
+ #include "engine/collision.h"
++#include <algorithm>
+ #include <cmath>
+ using namespace OpenBlood2;
+ namespace
+@@ -220,17 +221,19 @@ bool AI_Mgr::RuntimeInitialize(int reason)
+     if (!InitStatics(table) || !m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
+         return RuntimeFailure("NPC aggregates unavailable");
+     m_InventoryMgr.SetStrength(5);
+-    std::array<bool, 18> obtained{};
++    // Original weapon IDs are sparse (Gideon's loadout reaches 42). Track the
++    // at-most-five requested IDs, not an array sized for player-only weapons.
++    std::array<DBYTE, 5> obtained{};
+     for (const auto& name : npc_weapons)
+     {
+         DBYTE id;
+         if (!weapon(name, id))
+             return RuntimeFailure("NPC weapon unavailable");
+-        if (id && !obtained[id])
++        if (id && std::find(obtained.begin(), obtained.end(), id) == obtained.end())
+         {
+             if (m_InventoryMgr.ObtainWeapon(id) != InventoryResult::Ok)
+                 return RuntimeFailure("NPC weapon acquisition failed");
+-            obtained[id] = true;
++            *std::find(obtained.begin(), obtained.end(), DBYTE{0}) = id;
+         }
+     }
+     DBYTE first;
+diff --git a/src/game/original/AI_Mgr.cpp b/src/game/original/AI_Mgr.cpp
+index 4cb7304..cc3add4 100644
+--- a/src/game/original/AI_Mgr.cpp
++++ b/src/game/original/AI_Mgr.cpp
+@@ -12,6 +12,8 @@ namespace OpenBlood2
+     {
+         switch (value)
+         {
++            case AIKeyOutcome::ExtraAction:
++                return "Extra action accepted (inspect effect/shot)";
+             case AIKeyOutcome::FireAttempt:
+                 return "Weapon attempt (inspect shot result)";
+             case AIKeyOutcome::FireBlocked:
+@@ -68,6 +70,11 @@ bool AI_Mgr::InitStatics(std::shared_ptr<CAnim_Sound> sound)
+     m_pAnim_Sound = std::move(sound);
+     return true;
+ }
++bool AI_Mgr::MC_Extra(std::string_view)
++{
++    ai_key_error = "Original AI MC_Extra is not integrated for this class";
++    return false;
++}
+ bool AI_Mgr::OnStringKey(ArgList* args)
+ {
+     using OpenBlood2::AIKeyOutcome;
+@@ -126,12 +133,22 @@ bool AI_Mgr::OnStringKey(ArgList* args)
+             fail(AIKeyOutcome::Unavailable, fire_error.c_str());
+         }
+     }
+-    else if (branch == 1 || branch == 2)
++    else if (branch == 2)
++    {
++        if (MC_Extra(value))
++            key_outcome = AIKeyOutcome::ExtraAction;
++        else
++        {
++            ++unavailable_keys;
++            // Copy before fail assigns ai_key_error (its buffer may alias the input).
++            const auto reason = ai_key_error;
++            fail(AIKeyOutcome::Unavailable, reason.c_str());
++        }
++    }
++    else if (branch == 1)
+     {
+         ++unavailable_keys;
+-        fail(AIKeyOutcome::Unavailable, branch == 1
+-                                            ? "AI ShowHandModel unavailable; source reads an uninitialized buffer"
+-                                            : "Original AI MC_Extra is not integrated");
++        fail(AIKeyOutcome::Unavailable, "AI ShowHandModel unavailable; source reads an uninitialized buffer");
+     }
+     else if (branch == 3)
+     {
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 5e0c450..fca61bf 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -42,7 +42,8 @@ namespace OpenBlood2
+         Invalid,
+         PlaybackFailed,
+         FireAttempt,
+-        FireBlocked
++        FireBlocked,
++        ExtraAction
+     };
+     const char* ai_key_outcome_name(AIKeyOutcome);
+     enum class AISightOutcome
+@@ -255,9 +256,10 @@ class AI_Mgr : public CBaseCharacter
+     std::string damage_reaction_error;
+     bool MC_Idle();
+     bool MC_BestWeapon();
+-    bool MC_Fire_Stand();
++    virtual bool MC_Fire_Stand();
+     bool CheckClearShot(DVector origin, DVector& direction, bool alternate = false);
+-    bool Fire(bool alternate = false); // Source acceptance includes dry attempts; inspect fire_result.
++    virtual bool Fire(bool alternate = false); // Source acceptance includes dry attempts; inspect fire_result.
++    virtual bool MC_Extra(std::string_view);
+     OpenBlood2::AIClearShot clear_shot;
+     FireResult fire_result = FireResult::Invalid;
+     DVector fire_origin{}, fire_direction{};
+diff --git a/src/game/original/Gideon.cpp b/src/game/original/Gideon.cpp
+new file mode 100644
+index 0000000..3356ffe
+--- /dev/null
++++ b/src/game/original/Gideon.cpp
+@@ -0,0 +1,211 @@
++// Original ObjectDLL/Gideon.cpp:323-473,583-600,770-808 (Monolith, 1998).
++// Typed failure/lifetime adaptations are documented in GIDEON_COMBAT_CONTRACTS.md.
++#include "Gideon.h"
++#include "engine/collision.h"
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++
++bool Gideon::ComputeState(int value)
++{
++    state_error.clear();
++    const int stim = value == -1 ? ComputeStimuli() : value;
++    auto* s = GetServerDE();
++    if (!s || !s->IsObjectAlive(m_hObject) || stim < 0 || stim > 4 || !std::isfinite(s->GetTime()) ||
++        !std::isfinite(m_fStimuli[0]) || !std::isfinite(m_fStimuli[4]) || !std::isfinite(m_fStimuli[5]) ||
++        !std::isfinite(m_fLastShield) || !std::isfinite(m_fShieldDuration) || m_fShieldDuration < 0 ||
++        !std::isfinite(m_fLastPanic + 15))
++        return StateFailure("Gideon decision inputs or required perception unavailable");
++    if (!stim)
++    {
++        switch (m_nState)
++        {
++            case StateIdle:
++                return SetNewState(StateSpecial1);
++            case StateTeleport:
++                return SetNewState(StateSearchVisual);
++            case StateSearchVisual:
++                return SetNewState(StateIdle);
++            default:
++                return SetNewState(StateTeleport);
++        }
++    }
++    if (m_fStimuli[5] < .25f || m_fStimuli[4] > .75f)
++    {
++        if (s->GetTime() - m_fLastShield > m_fShieldDuration)
++            return SetNewState(StateAttackClose);
++        if (m_fStimuli[5] < .05f && m_fLastPanic + 15 >= s->GetTime())
++        {
++            // Preserve the source's >= (recent panic permits another panic).
++            m_fLastPanic = s->GetTime();
++            return SetNewState(StateTeleport);
++        }
++        return SetNewState(StateAttackClose);
++    }
++    if (m_nState == StateSearchVisual)
++        return SetNewState(StateSpecial1);
++    return SetNewState(m_fStimuli[0] > .94f ? StateAttackClose : m_fStimuli[0] > .75f ? StateAttackFar : StateSpecial1);
++}
++
++bool Gideon::MC_Fire_Stand()
++{
++    state_error.clear();
++    auto* s = GetServerDE();
++    const auto* table = AnimSound();
++    if (!s || !s->IsObjectAlive(m_hObject) || !table || !std::isfinite(s->GetTime()) ||
++        !std::isfinite(m_damage.m_fArmorPoints) || !std::isfinite(m_fLastShield) || !std::isfinite(m_fShieldDuration) ||
++        m_fShieldDuration < 0)
++        return StateFailure("Gideon fire command owner/table/clock unavailable");
++    if (!m_bAnimating || m_nCurMetacmd != 7)
++    {
++        attack_roll = -1;
++        const bool shield = m_damage.m_fArmorPoints <= 25 && s->GetTime() - m_fLastShield > m_fShieldDuration;
++        unsigned column = TYPE_RIFLE;
++        if (shield)
++            selected_weapon = WEAP_GIDEON_SHIELD;
++        else
++        {
++            if (!s->RandomInt(0, 99, attack_roll))
++                return StateFailure("Gideon attack chance draw failed");
++            if (m_nState == StateAttackFar && attack_roll < 70)
++            {
++                selected_weapon = WEAP_ZEALOT_ENERGYBLAST;
++                column = TYPE_MAGIC; // Source selects MAGIC even though this weapon's fire type is MELEE.
++            }
++            else if (m_nState != StateAttackFar && attack_roll < 50)
++                selected_weapon = WEAP_GIDEON_WIND;
++            else
++                selected_weapon = WEAP_NAGA_EYEBEAM;
++        }
++        const auto choice = m_InventoryMgr.ChangeWeapon(selected_weapon);
++        if (choice != InventoryResult::Ok && choice != InventoryResult::Current)
++            return StateFailure("Gideon selected weapon is unavailable");
++        if (shield)
++        {
++            m_damage.SetArmorPoints(m_damage.m_fArmorPoints + 100);
++            m_fLastShield = s->GetTime();
++            ++shield_grants;
++        }
++        // Source ignores bRet. Keep preceding selection/armor effects, but do not
++        // claim a running animation when the required engine service fails.
++        if (!SetAnimation(table->m_nAnim_FIRE_STAND[column]))
++            return false;
++        s->SetModelLooping(m_hObject, DFALSE);
++        m_bAnimating = true;
++        m_nCurMetacmd = 7;
++    }
++    else
++    {
++        std::string animation;
++        if (!s->GetModelAnimationName(m_hObject, s->GetModelAnimation(m_hObject), animation))
++            return StateFailure("Gideon fire playback unavailable");
++        if (s->GetModelPlaybackState(m_hObject) & MS_PLAYDONE)
++        {
++            if (Metacmd == std::numeric_limits<int>::max())
++                return StateFailure("Gideon Metacmd overflow");
++            // Source always tries the absent Soul Hook and ignores the result.
++            // Retain this failed request, not an invented weapon or fallback.
++            completion_selection = m_InventoryMgr.ChangeWeapon(WEAP_SOUL_HOOK);
++            m_bAnimating = false;
++            ++Metacmd;
++            ++animation_finishes;
++        }
++    }
++    // Unlike base MC_Fire_Stand, no timed firing: only model keys fire here.
++    return true;
++}
++
++bool Gideon::MagicPowerup()
++{
++    ++powerup_calls;
++    powerup_effect = 0;
++    powerup_error.clear();
++    auto* s = GetServerDE();
++    if (!s || !s->IsObjectAlive(m_hObject))
++    {
++        powerup_error = "Gideon powerup requires a live owner";
++        return false;
++    }
++    powerup_effect = s->PublishObjectParticles(m_hObject, 36, powerup_error);
++    return powerup_effect != 0;
++}
++
++bool Gideon::MC_Extra(std::string_view text)
++{
++    ++extra_calls;
++    ai_key_error.clear();
++    auto* s = GetServerDE();
++    if (!s || !s->IsObjectAlive(m_hObject) || text.empty() || text.size() > 63 || text.find('\0') != text.npos)
++    {
++        ai_key_error = "Gideon extra key owner/text invalid (maximum 63 bytes)";
++        return false;
++    }
++    if (text.starts_with("powerup"))
++    {
++        if (MagicPowerup())
++            return true;
++        ai_key_error = powerup_error;
++        return false;
++    }
++    m_szFireNode = text;
++    if (Fire())
++        return true;
++    ai_key_error = fire_error;
++    return false;
++}
++
++bool Gideon::Fire(bool alternate)
++{
++    ++fire_calls;
++    fire_error.clear();
++    fire_result = FireResult::Invalid;
++    clear_shot = {}; // Boss override does not call CheckClearShot.
++    fire_origin = fire_direction = {};
++    fire_gun_node = false;
++    auto fail = [&](FireResult result, const char* error)
++    {
++        fire_result = result;
++        fire_error = error;
++        ++fire_failures;
++        return false;
++    };
++    auto* s = GetServerDE();
++    if (!s || !s->IsObjectAlive(m_hObject) || (GetTarget() && !s->IsObjectAlive(GetTarget())))
++        return fail(FireResult::Invalid, "Gideon fire owner/target unavailable");
++    auto* weapon = m_InventoryMgr.CurrentWeapon();
++    if (!weapon)
++        return fail(FireResult::Unavailable, "Gideon has no current weapon");
++    if (m_szFireNode.empty() || m_szFireNode.size() > 63 || m_szFireNode.find('\0') != m_szFireNode.npos)
++        return fail(FireResult::Invalid, "Gideon fire node invalid");
++    DRotation rotation;
++    fire_gun_node = s->GetModelNodeTransform(m_hObject, m_szFireNode.c_str(), &fire_origin, &rotation);
++    if (fire_gun_node)
++        fire_direction = vector_subtract(m_vTargetPos, fire_origin);
++    else
++    {
++        if (!m_MoveObj.initialized || !m_MoveObj.sampled || s->GetObjectPos(m_hObject, &fire_origin) != DE_OK)
++            return fail(FireResult::Unavailable, "Gideon cached-forward/body fallback unavailable");
++        fire_direction = m_MoveObj.GetForwardVector();
++    }
++    const float length = std::hypot(fire_direction.x, fire_direction.y, fire_direction.z);
++    if (!physics_vector(fire_origin) || !physics_vector(fire_direction) || !std::isfinite(length) || length < 1e-6f)
++        return fail(FireResult::Invalid, "Gideon aim is invalid or degenerate");
++    fire_direction = vector_scale(fire_direction, 1 / length);
++    int seed;
++    if (!s->RandomInt(0, 255, seed))
++        return fail(FireResult::Unavailable, "Gideon shot randomness unavailable");
++    WeaponFire request;
++    request.position = fire_origin;
++    request.direction = fire_direction;
++    request.weapon = weapon->data.m_nType;
++    request.alternate = alternate;
++    request.seed = static_cast<DBYTE>(seed);
++    fire_result = m_InventoryMgr.FireCurrentWeapon(request);
++    if (fire_result == FireResult::Fired)
++        ++fire_shots;
++    else if (fire_result == FireResult::Dry)
++        ++fire_dry;
++    else
++        return fail(fire_result, "Gideon weapon shot service failed");
++    return true; // Original ignores the inventory return; dry attempts are accepted.
++}
+diff --git a/src/game/original/Gideon.h b/src/game/original/Gideon.h
+new file mode 100644
+index 0000000..7916a76
+--- /dev/null
++++ b/src/game/original/Gideon.h
+@@ -0,0 +1,24 @@
++#pragma once
++#include "AI_Mgr.h"
++
++// Selected original Gideon combat methods. Not registered for world creation:
++// initialization, fade/teleport states and boss-health delivery remain pending.
++// See GIDEON_COMBAT_CONTRACTS.md before extending this subclass.
++class Gideon : public AI_Mgr
++{
++  public:
++    bool ComputeState(int stimulus = -1) override;
++    bool MC_Fire_Stand() override;
++    bool Fire(bool alternate = false) override;
++    bool MC_Extra(std::string_view) override;
++    bool MagicPowerup();
++
++    float m_fShieldDuration = 60, m_fLastShield = 0, m_fLastPanic = 0;
++    std::string m_szFireNode = "rr_gun";
++    int attack_roll = -1;
++    DBYTE selected_weapon = 0;
++    std::uint64_t shield_grants = 0, powerup_calls = 0, extra_calls = 0;
++    std::uint64_t powerup_effect = 0;
++    std::string powerup_error;
++    InventoryResult completion_selection = InventoryResult::NotAvailable;
++};
+diff --git a/src/game/original/WeaponDefs.h b/src/game/original/WeaponDefs.h
+index cf681a6..56e5146 100644
+--- a/src/game/original/WeaponDefs.h
++++ b/src/game/original/WeaponDefs.h
+@@ -2,9 +2,9 @@
+ #include "basedefs_de.h"
+ // Selected original definitions; complete source fields, base-game weapon numbering.
+ inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38, WEAP_ZEALOT_ENERGYBLAST = 27,
+-                       WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42;
+-inline constexpr DBYTE TYPE_RIFLE = 0, TYPE_PISTOL = 2, TYPE_MELEE = 4, AMMO_NONE = 0, AMMO_BULLET = 1, AMMO_SHELL = 2,
+-                       AMMO_BMG = 3;
++                       WEAP_SOUL_HOOK = 23, WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42;
++inline constexpr DBYTE TYPE_RIFLE = 0, TYPE_PISTOL = 2, TYPE_MELEE = 4, TYPE_MAGIC = 8, AMMO_NONE = 0, AMMO_BULLET = 1,
++                       AMMO_SHELL = 2, AMMO_BMG = 3;
+ inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_KNIFE = 366;
+ // Weapon spread structure
+ typedef struct Spread_t
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 64e5eda..123a0b1 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -793,7 +793,7 @@ foreach(case IN ITEMS activation visibility lifetime targets tracking camera spa
+     set_tests_properties(ai_runtime.${case} PROPERTIES LABELS "headless;ai_runtime" TIMEOUT 30)
+ endforeach()
+ if(BLOOD2_TEST_DATA_DIR)
+-    foreach(case IN ITEMS catalog failures subway arena)
++    foreach(case IN ITEMS catalog failures subway arena sparse_weapons)
+         add_test(NAME ai_runtime.${case} COMMAND ai_runtime_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
+         set_tests_properties(ai_runtime.${case} PROPERTIES LABELS "headless;private;ai_runtime" TIMEOUT 90)
+     endforeach()
+@@ -1279,3 +1279,15 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.shield_private PROPERTIES LABELS "gpu;private;shield" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+     endif()
+ endif()
++
++add_executable(gideon_combat_tests gideon_combat_tests.cpp ../src/app/model_scene.cpp ../src/app/sprite_scene.cpp)
++target_link_libraries(gideon_combat_tests PRIVATE blood2_game)
++blood2_project_options(gideon_combat_tests)
++foreach(case decisions shield choices aim keys failures lifetime)
++    add_test(NAME gideon_combat.${case} COMMAND gideon_combat_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/gideon-combat-${case}")
++    set_tests_properties(gideon_combat.${case} PROPERTIES LABELS "headless;gideon_combat" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME gideon_combat.private COMMAND gideon_combat_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(gideon_combat.private PROPERTIES LABELS "headless;private;gideon_combat" TIMEOUT 90)
++endif()
+diff --git a/tests/ai_runtime_tests.cpp b/tests/ai_runtime_tests.cpp
+index 59a24f0..99694fe 100644
+--- a/tests/ai_runtime_tests.cpp
++++ b/tests/ai_runtime_tests.cpp
+@@ -424,6 +424,28 @@ namespace
+         CHECK(g.unload_world() && AI_Mgr::m_dwNumCabal == 0 && AI_Mgr::m_dwNumMonster == 0);
+         return true;
+     }
++    bool sparse_weapons(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        Properties p{{"AIWeapon1", std::string("GIDEON_SHIELD")}, {"AIWeapon2", std::string("ENERGY_BLAST")},
++                     {"AIWeapon3", std::string("NAGA_BLAST")},    {"AIWeapon4", std::string("GIDEON_WIND")},
++                     {"AIWeapon5", std::string("GIDEON_SHIELD")}, {"AIState", std::string("INACTIVE")}};
++        for (int cycle = 0; cycle < 3; ++cycle)
++        {
++            auto* a = npc(g, "CultistAI", p);
++            CHECK(a && a->RuntimeReady());
++            const DBYTE expected[]{41, 27, 38, 42};
++            for (unsigned i = 0; i < 4; ++i)
++                CHECK(a->m_InventoryMgr.GetWeapon(i) && a->m_InventoryMgr.GetWeapon(i)->data.m_nType == expected[i]);
++            CHECK(!a->m_InventoryMgr.GetWeapon(4) && a->m_InventoryMgr.CurrentWeapon()->data.m_nType == 41);
++            CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame());
++        }
++        CHECK(g.unload_world());
++        std::cout << "Sparse IDs 41/27/38/42 and duplicate fifth slot initialized three times through original NPC "
++                     "lifecycle.\n";
++        return true;
++    }
+     bool failures(const char* root)
+     {
+         GameSession g;
+@@ -528,11 +550,21 @@ namespace
+ } // namespace
+ int main(int argc, char** argv)
+ {
+-    const std::map<std::string, std::function<bool(const char*)>> tests{
+-        {"body", body},         {"missing", missing},   {"activation", activation}, {"visibility", visibility},
+-        {"lifetime", lifetime}, {"targets", targets},   {"tracking", tracking},     {"camera", camera},
+-        {"spatial", spatial},   {"triggers", triggers}, {"arena", arena},           {"catalog", catalog},
+-        {"failures", failures}, {"subway", subway}};
++    const std::map<std::string, std::function<bool(const char*)>> tests{{"body", body},
++                                                                        {"missing", missing},
++                                                                        {"activation", activation},
++                                                                        {"visibility", visibility},
++                                                                        {"lifetime", lifetime},
++                                                                        {"targets", targets},
++                                                                        {"tracking", tracking},
++                                                                        {"camera", camera},
++                                                                        {"spatial", spatial},
++                                                                        {"triggers", triggers},
++                                                                        {"arena", arena},
++                                                                        {"catalog", catalog},
++                                                                        {"failures", failures},
++                                                                        {"subway", subway},
++                                                                        {"sparse_weapons", sparse_weapons}};
+     if (argc < 2)
+         return 2;
+     auto t = tests.find(argv[1]);
+diff --git a/tests/gideon_combat_tests.cpp b/tests/gideon_combat_tests.cpp
+new file mode 100644
+index 0000000..ff24955
+--- /dev/null
++++ b/tests/gideon_combat_tests.cpp
+@@ -0,0 +1,364 @@
++#include "app/model_scene.h"
++#include "app/sprite_scene.h"
++#include "gideon_fixture.h"
++#include <cmath>
++#include <functional>
++#include <limits>
++#include <map>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .001f;
++    }
++    bool setup(GameSession& g, const char* root)
++    {
++        CHECK(g.initialize() && test_gideon::floor(g));
++        std::string error;
++        std::filesystem::create_directories(root);
++        CHECK(test_shield::mount(g.resources, root, error));
++        return true;
++    }
++    bool decisions(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = test_gideon::actor(g);
++        CHECK(a);
++        a->m_fStimuli = {.95f, 0, 0, 0, .75f, .25f};
++        for (auto [from, to] : {std::pair{AI_Mgr::StateIdle, AI_Mgr::StateSpecial1},
++                                {AI_Mgr::StateTeleport, AI_Mgr::StateSearchVisual},
++                                {AI_Mgr::StateSearchVisual, AI_Mgr::StateIdle},
++                                {AI_Mgr::StateAttackClose, AI_Mgr::StateTeleport}})
++        {
++            a->m_nState = from;
++            CHECK(a->ComputeState(0) && a->m_nState == to);
++        }
++        for (auto [sight, to] : {std::pair{.95f, AI_Mgr::StateAttackClose},
++                                 {.94f, AI_Mgr::StateAttackFar},
++                                 {.7501f, AI_Mgr::StateAttackFar},
++                                 {.75f, AI_Mgr::StateSpecial1}})
++        {
++            a->m_nState = AI_Mgr::StateIdle;
++            a->m_fStimuli[0] = sight;
++            CHECK(a->ComputeState(1) && a->m_nState == to);
++        }
++        a->m_nState = AI_Mgr::StateSearchVisual;
++        a->m_fStimuli[0] = 1;
++        CHECK(a->ComputeState(1) && a->m_nState == AI_Mgr::StateSpecial1);
++        a->m_fStimuli[5] = .05f;
++        CHECK(g.step(15));
++        CHECK(a->ComputeState(1) && a->m_nState == AI_Mgr::StateAttackClose);
++        a->m_fStimuli[5] = .049f;
++        CHECK(a->ComputeState(1) && a->m_nState == AI_Mgr::StateTeleport && a->m_fLastPanic == 15);
++        CHECK(g.step(15));
++        CHECK(a->ComputeState(1) && a->m_nState == AI_Mgr::StateTeleport && a->m_fLastPanic == 30);
++        CHECK(g.step(15.01));
++        CHECK(a->ComputeState(1) && a->m_nState == AI_Mgr::StateAttackClose && a->m_fLastPanic == 30);
++        a->m_fLastPanic = 60;
++        CHECK(g.step(14.99)); // exact shield deadline: panic still allowed
++        CHECK(a->ComputeState(1) && a->m_nState == AI_Mgr::StateTeleport);
++        CHECK(g.step(.01));
++        CHECK(a->ComputeState(1) && a->m_nState == AI_Mgr::StateAttackClose);
++        a->m_fStimuli[5] = 1;
++        a->m_fStimuli[4] = .7501f;
++        a->m_fStimuli[0] = 0;
++        CHECK(a->ComputeState(1) && a->m_nState == AI_Mgr::StateAttackClose);
++        const auto old = a->m_nState;
++        a->m_fStimuli[4] = NAN;
++        CHECK(!a->ComputeState(1) && a->m_nState == old);
++        a->m_fStimuli[4] = 0;
++        CHECK(!a->ComputeState(5));
++        // Recomputed perception failure must not become a usable stimulus.
++        a->m_fSeeingDist = NAN;
++        CHECK(!a->ComputeState() && a->m_nState == old);
++        return true;
++    }
++    bool shield(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = test_gideon::actor(g);
++        CHECK(a);
++        a->m_damage.SetArmorPoints(25);
++        CHECK(g.step(60));
++        CHECK(a->MC_Fire_Stand() && a->shield_grants == 0 && a->attack_roll >= 0);
++        a->m_bAnimating = false;
++        CHECK(g.step(.001));
++        CHECK(a->MC_Fire_Stand() && a->shield_grants == 1 && a->attack_roll == -1 && a->selected_weapon == 41);
++        CHECK(a->m_damage.m_fArmorPoints == 125 && a->m_fLastShield > 60 && a->m_bAnimating);
++        CHECK(a->fire_calls == 0 && g.server.object_particles.active.empty());
++        // The boss command does not borrow base timed-fire behavior.
++        CHECK(a->MC_Fire_Stand() && a->fire_calls == 0 && a->shield_grants == 1);
++        CHECK(g.server.advance_models(.2) && a->MC_Fire_Stand());
++        CHECK(!a->m_bAnimating && a->Metacmd == 2 && a->animation_finishes == 1 && a->fire_calls == 0);
++        CHECK(a->m_InventoryMgr.CurrentWeapon()->data.m_nType == 41 &&
++              a->completion_selection == InventoryResult::Invalid);
++        CHECK(a->Fire() && a->m_damage.m_fArmorPoints == 125 && g.server.object_particles.active.size() == 1);
++        a->m_damage.SetArmorPoints(25.001f);
++        a->m_fLastShield = -100;
++        CHECK(a->MC_Fire_Stand() && a->shield_grants == 1);
++        return true;
++    }
++    bool choices(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = test_gideon::actor(g);
++        CHECK(a);
++        auto table = std::make_shared<CAnim_Sound>();
++        table->m_nAnim_FIRE_STAND[TYPE_MAGIC] = 1;
++        CHECK(a->InitStatics(table));
++        bool energy = false, naga = false, wind = false;
++        for (int i = 0; i < 80; ++i)
++        {
++            a->m_nState = i < 40 ? AI_Mgr::StateAttackFar : AI_Mgr::StateAttackClose;
++            a->m_bAnimating = false;
++            CHECK(a->MC_Fire_Stand());
++            const auto expected = i < 40 ? (a->attack_roll < 70 ? 27 : 38) : (a->attack_roll < 50 ? 42 : 38);
++            CHECK(a->selected_weapon == expected && a->m_InventoryMgr.CurrentWeapon()->data.m_nType == expected);
++            CHECK(a->requested_animation == unsigned(expected == 27 ? 1 : 0));
++            energy |= expected == 27;
++            naga |= expected == 38;
++            wind |= expected == 42;
++        }
++        CHECK(energy && naga && wind && a->fire_calls == 0);
++        return true;
++    }
++    bool aim(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = test_gideon::actor(g);
++        CHECK(a);
++        CHECK(a->m_InventoryMgr.ChangeWeapon(41) == InventoryResult::Current);
++        g.server.collision_ready = false;
++        AI_Mgr* base = a;
++        CHECK(base->Fire() && a->fire_gun_node && a->clear_shot.rays == 0 && a->fire_shots == 1);
++        DVector expected;
++        DRotation rot;
++        CHECK(g.server.GetModelNodeTransform(a->m_hObject, "rr_gun", &expected, &rot));
++        CHECK(near(a->fire_origin.x, expected.x) && near(a->fire_origin.y, expected.y));
++        // No node -> CMovement cached forward, deliberately different from current pose and target.
++        a->m_szFireNode = "missing";
++        DRotation turned{{0, .70710678f, 0}, .70710678f};
++        CHECK(g.server.SetObjectRotation(a->m_hObject, &turned) == DE_OK);
++        a->m_vTargetPos = {2000, 10, 0};
++        CHECK(a->Fire(true) && !a->fire_gun_node && near(a->fire_direction.z, 1) && near(a->fire_direction.x, 0));
++        CHECK(a->m_MoveObj.Update());
++        CHECK(a->Fire() && near(a->fire_direction.x, 1));
++        a->m_MoveObj.sampled = false; // Deliberately unavailable cached sample.
++        CHECK(!a->Fire() && a->fire_result == FireResult::Unavailable);
++        a->m_szFireNode = "rr_gun";
++        CHECK(a->Fire()); // Valid node does not need the movement fallback.
++        CHECK(g.server.GetModelNodeTransform(a->m_hObject, "rr_gun", &a->m_vTargetPos, &rot));
++        CHECK(!a->Fire() && a->fire_result == FireResult::Invalid);
++        return true;
++    }
++    bool keys(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = test_gideon::actor(g);
++        CHECK(a);
++        // extra_key does not have fire_key's target guard.
++        CHECK(test_gideon::key(g, *a, "[extra_key:powerup_suffix][UpVel:7]"));
++        CHECK(a->key_outcome == AIKeyOutcome::ExtraAction && a->powerup_calls == 1 && a->powerup_effect &&
++              g.objects.get(a->m_hObject)->velocity.y == 7 && a->fire_calls == 0);
++        CHECK(test_gideon::key(g, *a, "[extra_key:rr_gun]"));
++        CHECK(a->fire_shots == 1 && a->key_outcome == AIKeyOutcome::ExtraAction);
++        CHECK(test_gideon::key(g, *a, "[fire_key:1][extra_key:powerup]"));
++        CHECK(a->no_target == 1 && a->extra_calls == 2 && a->powerup_calls == 1);
++        auto* t = test_energy::actor(g, {0, 10, 500});
++        CHECK(t && a->SetNewTarget(t->m_hObject));
++        CHECK(test_gideon::key(g, *a, "[fire_key:1]"));
++        CHECK(a->fire_shots == 2 && a->key_outcome == AIKeyOutcome::FireAttempt);
++        CHECK(a->MC_Extra("POWERUP")); // case-sensitive: this is a node name, with body fallback.
++        CHECK(a->m_szFireNode == "POWERUP" && a->powerup_calls == 1 && a->fire_shots == 3);
++        const auto node = a->m_szFireNode;
++        CHECK(!a->MC_Extra(std::string(64, 'x')) && a->m_szFireNode == node);
++        CHECK(!a->MC_Extra(std::string_view("x\0y", 3)) && !a->MC_Extra(""));
++        CHECK(g.objects.remove(t->m_hObject));
++        const auto count = a->fire_calls;
++        CHECK(test_gideon::key(g, *a, "[fire_key:1]"));
++        CHECK(a->key_outcome == AIKeyOutcome::Invalid && a->fire_calls == count);
++        CHECK(!a->MC_Extra("rr_gun") && a->fire_result == FireResult::Invalid);
++        CHECK(g.objects.finish_frame());
++        CHECK(!a->GetTarget());
++        return true;
++    }
++    bool failures(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = test_gideon::actor(g);
++        CHECK(a);
++        auto table = std::make_shared<CAnim_Sound>();
++        table->m_nAnim_FIRE_STAND[0] = UINT32_MAX;
++        CHECK(a->InitStatics(table));
++        CHECK(g.step(60) && g.step(1));
++        a->m_damage.SetArmorPoints(0);
++        CHECK(!a->MC_Fire_Stand() && !a->m_bAnimating && a->shield_grants == 1 && a->m_damage.m_fArmorPoints == 100);
++        a->m_InventoryMgr.ClearWeapons();
++        CHECK(!a->Fire() && a->fire_result == FireResult::Unavailable);
++        a->m_fLastShield = -100;
++        a->m_damage.SetArmorPoints(0);
++        CHECK(!a->MC_Fire_Stand() && a->m_damage.m_fArmorPoints == 0 && a->shield_grants == 1);
++        CHECK(g.objects.remove(a->m_hObject));
++        CHECK(!a->ComputeState(0) && !a->MC_Fire_Stand() && !a->Fire() && !a->MC_Extra("powerup"));
++        CHECK(g.objects.finish_frame());
++        return true;
++    }
++    bool lifetime(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = test_gideon::actor(g);
++        CHECK(a);
++        auto* t = test_energy::actor(g, {0, 10, 80});
++        CHECK(t && a->SetNewTarget(t->m_hObject));
++        auto h = a->m_hObject;
++        CHECK(a->MagicPowerup());
++        CHECK(a->m_InventoryMgr.ChangeWeapon(38) == InventoryResult::Ok);
++        t->remove_on_damage = h;
++        auto* r = g.objects.get(h);
++        auto model = std::make_shared<Model>(*r->model);
++        r->model = model;
++        model->animations[0].keys = {
++            {0, {}, {}, "[extra_key:rr_gun]"}, {10, {}, {}, "[extra_key:powerup]"}, {100, {}, {}, ""}};
++        CHECK(g.server.ResetModelAnimation(h) == DE_OK);
++        const auto destroyed = test_gideon::Actor::destroyed;
++        CHECK(g.server.advance_models(.2));
++        // advance_models finishes its deferred batch; the actor is now destroyed.
++        CHECK(!g.objects.get(h) && test_gideon::Actor::destroyed == destroyed + 1 &&
++              test_gideon::Actor::final_extra == 1 && test_gideon::Actor::final_powerup == 1 &&
++              t->damage.m_fHitPoints < 1000);
++        CHECK(g.objects.finish_frame());
++        CHECK(g.server.object_particles.advance(.2, g.server));
++        CHECK(g.server.object_particles.active.empty());
++        CHECK(g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++    bool private_actions(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize() && test_gideon::floor(g));
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            auto* a = test_gideon::actor(g, true, {0, 100, 0});
++            CHECK(a);
++            auto* t = test_energy::actor(g, {0, 100, 500});
++            CHECK(t && a->SetNewTarget(t->m_hObject));
++            a->m_fLastShield = -100;
++            a->m_damage.SetArmorPoints(0);
++            CHECK(a->MC_Fire_Stand());
++            const auto clip = g.server.GetModelAnimation(a->m_hObject);
++            const auto* r = g.objects.get(a->m_hObject);
++            unsigned authored_keys = 0;
++            for (const auto& key : r->model->animations[clip].keys)
++                if (!key.text.empty())
++                {
++                    ++authored_keys;
++                    std::cout << "shield-key=" << key.text << '\n';
++                }
++            CHECK(authored_keys > 0);
++            CHECK(r->model->animations[clip].duration < 30000);
++            const auto steps = r->model->animations[clip].duration * 60 / 1000 + 2;
++            for (unsigned i = 0; i < steps && a->m_bAnimating; ++i)
++            {
++                CHECK(g.step(1. / 60));
++                CHECK(a->MC_Fire_Stand());
++            }
++            std::cout << "cycle=" << cycle << " shield_clip=" << clip << " keys=" << a->model_keys
++                      << " shots=" << a->fire_shots << " armor=" << a->m_damage.m_fArmorPoints
++                      << " duration_ms=" << r->model->animations[clip].duration << " animating=" << a->m_bAnimating
++                      << " key_failures=" << a->key_failures << " key_error=" << a->ai_key_error << '\n';
++            CHECK(!a->m_bAnimating && a->fire_shots > 0 && a->m_damage.m_fArmorPoints == 100 && a->key_failures == 0);
++            // Run the original magic clip: fire_key values name both guns, but the source ignores those values.
++            a->m_nState = AI_Mgr::StateAttackFar;
++            for (unsigned attempt = 0; attempt < 128; ++attempt)
++            {
++                a->m_bAnimating = false;
++                CHECK(a->MC_Fire_Stand());
++                if (a->selected_weapon == WEAP_ZEALOT_ENERGYBLAST)
++                    break;
++            }
++            CHECK(a->selected_weapon == WEAP_ZEALOT_ENERGYBLAST);
++            const auto magic_clip = g.server.GetModelAnimation(a->m_hObject);
++            CHECK(magic_clip != clip && r->model->animations[magic_clip].duration < 30000);
++            unsigned expected_shots = 0;
++            for (const auto& key : r->model->animations[magic_clip].keys)
++                if (!key.text.empty())
++                {
++                    std::cout << "magic-key=" << key.text << '\n';
++                    if (key.text.find("[fire_key:") != key.text.npos ||
++                        (key.text.find("[extra_key:") != key.text.npos &&
++                         key.text.find("[extra_key:powerup") == key.text.npos))
++                        ++expected_shots;
++                }
++            const auto before = a->fire_shots;
++            const auto nodes_before = a->fired_nodes.size();
++            const auto magic_steps = r->model->animations[magic_clip].duration * 60 / 1000 + 2;
++            for (unsigned i = 0; i < magic_steps && a->m_bAnimating; ++i)
++            {
++                CHECK(g.step(1. / 60));
++                CHECK(a->MC_Fire_Stand());
++            }
++            std::cout << "magic_clip=" << magic_clip << " shots=" << (a->fire_shots - before)
++                      << " expected=" << expected_shots << " last_node=" << a->m_szFireNode
++                      << " failures=" << a->key_failures << " key_error=" << a->ai_key_error << '\n';
++            CHECK(expected_shots > 0 && a->fire_shots - before == expected_shots && a->key_failures == 0 &&
++                  !a->m_bAnimating);
++            CHECK(a->fired_nodes.size() == nodes_before + expected_shots);
++            for (auto i = nodes_before; i < a->fired_nodes.size(); ++i)
++                CHECK(a->fired_nodes[i] == "rr_gun");
++            CHECK(a->MC_Extra("powerup") && a->powerup_effect);
++            CHECK(g.step(.11));
++            SpriteView sprites;
++            CHECK(update_sprite_scene(g, sprites, error));
++            CHECK(!sprites.draws.empty());
++            ModelView models;
++            CHECK(update_model_scene(g, models, error));
++            CHECK(!models.world_draws.empty());
++            // All four weapons use Gideon's actual rr_gun, never generic head_gun/r_hand_extra2.
++            for (auto id : {41, 27, 38, 42})
++            {
++                const auto result = a->m_InventoryMgr.ChangeWeapon(id);
++                CHECK(result == InventoryResult::Ok || result == InventoryResult::Current);
++                CHECK(a->Fire() && a->fire_gun_node && a->clear_shot.rays == 0);
++                std::cout << "weapon=" << id << " node=" << a->m_szFireNode << " origin=" << a->fire_origin.x << ','
++                          << a->fire_origin.y << ',' << a->fire_origin.z << '\n';
++            }
++            auto h = a->m_hObject;
++            CHECK(g.unload_world() && !g.objects.get(h));
++            CHECK(g.server.object_particles.active.empty() && g.server.string_count() == 0 &&
++                  g.server.message_count() == 0);
++            CHECK(test_gideon::floor(g));
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const char*)>> cases{
++        {"decisions", decisions}, {"shield", shield},     {"choices", choices},   {"aim", aim},
++        {"keys", keys},           {"failures", failures}, {"lifetime", lifetime}, {"private", private_actions}};
++    auto found = cases.find(argv[1]);
++    return found != cases.end() && found->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/gideon_fixture.h b/tests/gideon_fixture.h
+new file mode 100644
+index 0000000..28d21f6
+--- /dev/null
++++ b/tests/gideon_fixture.h
+@@ -0,0 +1,99 @@
++#pragma once
++#include "brush_fixture.h"
++#include "game/original/Gideon.h"
++#include "shield_fixture.h"
++
++namespace test_gideon
++{
++    struct Actor : Gideon
++    {
++        std::vector<std::string> fired_nodes;
++        bool Fire(bool alternate = false) override
++        {
++            fired_nodes.push_back(m_szFireNode);
++            return Gideon::Fire(alternate);
++        }
++        inline static unsigned destroyed = 0;
++        inline static std::uint64_t final_extra = 0, final_powerup = 0;
++        ~Actor() override
++        {
++            ++destroyed;
++            final_extra = extra_calls;
++            final_powerup = powerup_calls;
++        }
++    };
++    // Test-only class registration. This is not the production Gideon lifecycle.
++    inline Actor* actor(OpenBlood2::GameSession& g, bool retail = false, DVector position = {0, 10, 0})
++    {
++        using namespace OpenBlood2;
++        static ClassInfo type{
++            "Gideon", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
++        type.parent = g.objects.find_class("CBaseCharacter");
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_MODEL;
++        state.m_Pos = position;
++        state.m_Flags = FLAG_VISIBLE | FLAG_MODELKEYS;
++        if (retail)
++        {
++            SAFE_STRCPY(state.m_Filename, "Models/Enemies/gideon.abc");
++            SAFE_STRCPY(state.m_SkinName, "Skins/Enemies/gideon.dtx");
++        }
++        auto h = g.objects.create(&type, state);
++        auto* r = g.objects.get(h);
++        auto* a = r ? dynamic_cast<Actor*>(r->game.get()) : nullptr;
++        if (!a || !a->m_InventoryMgr.Init(h, nullptr) || !a->m_damage.Init(h, &a->m_InventoryMgr) ||
++            !a->m_MoveObj.Init(h))
++            return nullptr;
++        auto table = std::make_shared<CAnim_Sound>();
++        if (retail)
++        {
++            if (!r->model || !table->SetAnimationIndexes(h) || !table->GenerateHitSpheres(h))
++                return nullptr;
++        }
++        else
++        {
++            auto model = std::make_shared<Model>();
++            std::string error;
++            if (!read_model(test_model::abc().b, *model, error))
++                return nullptr;
++            model->nodes[1].name = "rr_gun";
++            for (auto& clip : model->animations)
++            {
++                clip.keys = {{0, {}, {}, ""}, {100, {}, {}, ""}};
++                clip.dimensions = {1, 1, 1};
++                for (auto& n : clip.nodes)
++                    for (auto& f : n.frames)
++                        f.position = {};
++            }
++            r->model = model;
++            r->dimensions = {1, 1, 1};
++        }
++        if (!table->SetSoundRoot("sounds/enemies/Gideon") || !a->InitStatics(table))
++            return nullptr;
++        g.server.SetModelAnimation(h, 0);
++        a->m_damage.SetHitPoints(4000);
++        a->m_damage.SetArmorPoints(200);
++        a->m_vTargetPos = {0, position.y, position.z + 500};
++        for (auto id : {WEAP_GIDEON_SHIELD, WEAP_ZEALOT_ENERGYBLAST, WEAP_NAGA_EYEBEAM, WEAP_GIDEON_WIND})
++            if (a->m_InventoryMgr.ObtainWeapon(id) != InventoryResult::Ok)
++                return nullptr;
++        return a;
++    }
++    inline bool key(OpenBlood2::GameSession& g, Gideon& a, const char* text)
++    {
++        char* argv[]{const_cast<char*>(text)};
++        ArgList args{argv, 1};
++        return g.objects.engine_message(a.m_hObject, MID_MODELSTRINGKEY, &args);
++    }
++    inline bool floor(OpenBlood2::GameSession& g)
++    {
++        auto world = test_brush::box("floor", {-10000, -20, -10000}, {10000, -10, 10000});
++        for (auto& s : world.surfaces)
++            s.flags = 1;
++        std::string error;
++        g.server.collision_ready = g.collision.build(world, error);
++        return g.server.collision_ready;
++    }
++} // namespace test_gideon
+diff --git a/tests/shield_gpu_tests.cpp b/tests/shield_gpu_tests.cpp
+index f47053a..6df73f2 100644
+--- a/tests/shield_gpu_tests.cpp
++++ b/tests/shield_gpu_tests.cpp
+@@ -2,7 +2,7 @@
+ #include "engine/capture.h"
+ #include "engine/runtime.h"
+ #include "engine/world_renderer.h"
+-#include "shield_fixture.h"
++#include "gideon_fixture.h"
+ #include <cmath>
+ using namespace OpenBlood2;
+ #define CHECK(x)                                                                                                       \
+@@ -76,12 +76,12 @@ int main(int argc, char** argv)
+     }
+     else
+         CHECK(test_shield::mount(g.resources, argv[1], error));
+-    ObjectCreateStruct state;
+-    state.m_Pos = {0, 0, 100};
+-    auto h = g.objects.create(g.objects.find_class("BaseClass"), state);
+-    CHECK(h);
+-    CHECK(g.server.PublishObjectParticles(h, 19, error));
+-    CHECK(g.server.PublishObjectParticles(h, 36, error));
++    auto* boss = test_gideon::actor(g, false, {0, 0, 100});
++    CHECK(boss);
++    auto h = boss->m_hObject;
++    CHECK(boss->Fire());
++    CHECK(test_gideon::key(g, *boss, "[extra_key:powerup]"));
++    CHECK(boss->fire_shots == 1 && boss->powerup_effect && boss->key_outcome == AIKeyOutcome::ExtraAction);
+     auto& manager = g.server.object_particles;
+     CHECK(manager.advance(0, g.server) && manager.advance(.11, g.server));
+     SpriteView scene;

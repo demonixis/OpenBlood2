@@ -1,0 +1,14 @@
+459/472 Testing: ai_runtime.activation
+459/472 Test: ai_runtime.activation
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests" "activation"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_runtime.activation" start time: Oct 16 15:09 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.activation" end time: Oct 16 15:09 CEST
+"ai_runtime.activation" time elapsed: 00:00:00
+----------------------------------------------------------

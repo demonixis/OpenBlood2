@@ -1,0 +1,20 @@
+214/215 Testing: worldpaths.subway
+214/215 Test: worldpaths.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"worldpaths.subway" start time: Oct 16 00:46 CEST
+Output:
+----------------------------------------------------------
+blocked_time=3 primary_polygon=1209 fraction=0.560681 normal=0,0,1
+blocked_time=3.01666 primary_polygon=1209 fraction=0.896829 normal=0,0,1
+cycle=0 moves=297 blocks=2 final=-32,168,3371.74 consumed_keys=9 runtime=161
+blocked_time=3 primary_polygon=1209 fraction=0.560681 normal=0,0,1
+blocked_time=3.01666 primary_polygon=1209 fraction=0.896829 normal=0,0,1
+cycle=1 moves=297 blocks=2 final=-32,168,3371.74 consumed_keys=9 runtime=161
+<end of output>
+Test time =   2.56 sec
+----------------------------------------------------------
+Test Passed.
+"worldpaths.subway" end time: Oct 16 00:46 CEST
+"worldpaths.subway" time elapsed: 00:00:02
+----------------------------------------------------------

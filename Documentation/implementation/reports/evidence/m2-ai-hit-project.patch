@@ -1,0 +1,1344 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 19c19a6..23f3caa 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -336,3 +336,13 @@ SubwayA has 202 created source entries, 4 transferred sounds, 372 editor-only,
+ 2 unsupported and no creation failures. Remaining actions/death, Gideon, required
+ FX and ExitTrigger keep M2 open. User-reported pink train glass and direct movement
+ failure after intro are retained in the evidence for later investigation.
++
++The [NPC hit/recoil continuation](../Documentation/Implementation/M2_AI_HIT.md) connects original visible-node hit localization,
++region damage and nonlethal HandleDamage/MC_Recoil through production AI_Update.
++Read [contracts](docs/AI_HIT_CONTRACTS.md). Preserve NORMAL=0 random fallback including raw node 18,
++unwrapped side-angle difference, Cabal head kill before armor, strict limp threshold,
++remaining-HP/accumulated-damage recoil threshold and Civilian EscapeRun override.
++Missing later nodes may reuse the prior transform; invalid poses must fail before
++health mutation. Refused/nested packets cannot replay stale reactions. Lethal
++corpse/drop/gib services remain explicit failures; NPC impulses, hidden limbs,
++Gideon, ExitTrigger and required FX keep M2 incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4179802..1abb8f3 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -43,7 +43,7 @@ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_m
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+     src/game/server_activation.cpp src/game/original/AIRuntime.cpp
+     src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/Movement.cpp
+-    src/game/original/AIState.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
++    src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+diff --git a/README.md b/README.md
+index cc088e4..84a2cc1 100644
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,11 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
+-Latest gameplay continuation: [original Cultist/Civilian initialization and AI_Update](../Documentation/Implementation/M2_AI_RUNTIME.md)
++Latest combat continuation: [original NPC hit localization and recoil](../Documentation/Implementation/M2_AI_HIT.md)
++connects hit regions, limb damage, injured legs and nonlethal reactions to production
++Cultist/Civilian updates, with in-game inspection. Corpse/drop/gib services, required
++FX, Gideon and ExitTrigger still keep M2 incomplete.
++
++Production lifecycle foundation: [original Cultist/Civilian initialization and AI_Update](../Documentation/Implementation/M2_AI_RUNTIME.md)
+ registers the fifteen authored SubwayA NPCs, with original properties, animation,
+ inventory, activation and state dispatch. Remaining combat/death actions, required
+ FX, Gideon and ExitTrigger still keep M2 incomplete.
+@@ -414,3 +419,8 @@ Production NPC lifecycle verification: 472/472 Debug and inspector-free Release
+ checks (27 GPU each), plus 179 targeted ASan/UBSan/leak checks. See
+ [evidence](../Documentation/Implementation/M2_AI_RUNTIME.md) for the no-player
+ self-target boundary and remaining M2 requirements.
++
++NPC hit/recoil verification: 481/481 Debug and inspector-free Release checks
++(27 GPU each), plus 188 targeted ASan/UBSan/leak checks. See
++[evidence](../Documentation/Implementation/M2_AI_HIT.md) for source quirks,
++nonlethal production recoil and the remaining death/M2 boundary.
+diff --git a/docs/AI_HIT_CONTRACTS.md b/docs/AI_HIT_CONTRACTS.md
+new file mode 100644
+index 0000000..554674e
+--- /dev/null
++++ b/docs/AI_HIT_CONTRACTS.md
+@@ -0,0 +1,97 @@
++# Original NPC hit localization and recoil
++
++Production CultistAI/CivilianAI now enable the original CDestructable hit-region
++selection and AI_Mgr nonlethal damage/recoil branches after successful initialization.
++[Source ledger](M2_AI_HIT_SOURCES.json) and [execution evidence](../../Documentation/Implementation/M2_AI_HIT.md)
++record the selected source and tests. This extends [runtime contracts](AI_RUNTIME_CONTRACTS.md)
++and [character measurements](CHARACTER_ANIMATION_CONTRACTS.md); M2 remains incomplete.
++
++## Localization and damage
++
++The original algorithm projects the incoming hit position along a segment whose
++length comes from the current animation's **unscaled** user dimensions and the
++strictly largest absolute direction component. Tied axes and zero direction give
++no segment/candidate; explicit zero handling replaces floating-point NaNs. Current
++world-space animated nodes (including object scale/rotation) are compared against
++the shared original fixed-radius hit spheres. Candidates must project within the
++segment, be within their radius and be strictly closer than the previous best
++(initial distance 999). Equal distances retain the first node. The radii do not
++receive an additional object-scale factor.
++
++The typed node query distinguishes absent names from unavailable/ambiguous poses.
++Missing head data fails. Missing later nodes retain the previous node transform,
++matching the source's ignored failed transform read; the missing count is visible.
++Invalid present-node poses never use that fallback. The bounded implemented path
++uses visible nodes: current actors have no per-node hide state, and renderer and
++hit queries both include every node. Limb hiding/dismemberment remains unavailable.
++This is not an always-successful GetModelNodeHideStatus facade.
++
++The raw indices map to neck 1, torso 2, right arm 4, left arm 7, left leg 10 or
++right leg 14. The source `DAMAGE_TYPE_NORMAL` is zero, so its
++`!(type & DAMAGE_TYPE_NORMAL)` condition also takes the random fallback for normal
++bullet misses. Preserve the inclusive raw draw 0..18: 18 maps to -1, still receives
++the non-neck/non-torso half-damage multiplier, then skips HandleDamage reactions.
++Missing required services fail before HP/armor or attacker-memory mutation; they
++never become successful random hits. Portable random sequences are not verified
++against the retail CRT.
++
++Facing and reversed incoming yaw are independently mapped to [0,2pi); their
++difference is deliberately **not wrapped**. The original front test selects side
++0 when difference <=pi/2 or >=3pi/2, otherwise back side 6. This includes the
++negative-angle front classification quirk.
++
++Resistance precedes localization; neck/torso/limbs multiply damage by 1.5/1/0.5
++before the existing armor absorption. Cabal neck hits set HP to zero before armor,
++including zero-damage packets, as in the source. SoulDrudge is still unported.
++Death-type damage bypasses localization and retains previous node/side metadata.
++The post-armor amount accumulates until the original aggregate MID_UPDATE resets
++it; reaction type only changes on nonzero damage. Raw delivered damage remains
++separately inspectable. Existing checked non-owning attacker memory is retained.
++NPC damage impulses are still unavailable; this increment does not enable them.
++
++## Reactions and AI_Update
++
++AI_Mgr forwards MID_DAMAGE through the base/aggregate chain exactly once before
++HandleDamage. Dying/removing actors and mapped node -1 return early. FLAG_LIMP
++latches the first left/right leg injury only below half maximum HP. The existing
++original injured walking-animation selection consumes that same field.
++
++Noninterruptible SCRIPT (missing flag bit 1) keeps its state. Otherwise ALWAYSRECOIL
++wins; accumulated damage >= one quarter of **remaining** HP selects Recoil except
++in Teleport/Dodge. Smaller hits outside AttackClose/AttackFar call the original
++ComputeState. CivilianAI then applies its original EscapeRun override after the
++base reaction; it does not play Cultist recoil merely because the base selected it.
++A latched runtime failure cannot be revived by that subclass override.
++
++MC_Recoil uses region plus front/back side to select the original 12-entry table,
++starts a nonlooping animation and records command 19. Completion increments the
++phase; StateRecoil phase 2 calls ComputeState. Physics/animation clocks remain
++external to AI_Update and independent of rendering/UI. FIRE uses the original
++**unmapped** random raw node: unmatched draws keep the current animation but still
++make it nonlooping and start command 19. The typed Fire damage value is accepted;
++this does not implement fire weapons, burning effects or fire death.
++
++Safety adaptations: only newly accepted nonnested damage receipts invoke the base
++reaction; refused packets do not replay stale hit metadata as the unchecked source
++could. CivilianAI still applies its unconditional source EscapeRun override to
++a received damage message, even when the aggregate refused it, unless removal or
++a latched runtime failure prevents the state change. Removal during a damage trigger cancels the reaction while preserving deferred
++destruction. Checked model/animation/resize failures suspend the NPC through the
++existing runtime failure path, and phase increment rejects integer overflow.
++
++## Inspection and remaining boundary
++
++The Skeletons panel exposes activation, accepted damage/query counts, raw/mapped
++node, side, fallback, missing nodes, distance, multiplier, Cabal head-kill flag,
++accumulated damage, injured leg, reaction/recoil counters, selected slot and failures.
++The last localization query is labelled separately from accepted damage: GPU smoke
++queries use real production poses without inflicting damage or changing authored
++flags. Hidden-inspector and reload checks repeat those queries; old identities fail.
++Private headless tests drive actual production damage and AI_Update recoil.
++
++Lethal health changes are applied, but the first unavailable original death service
++(weapon drops/corpses/gibs/death effects) explicitly suspends the actor. It remains
++inspectable with zero HP and an error, not a fabricated corpse or completed kill
++sequence. This boundary, Gideon, ExitTrigger, required client FX and other missing
++session/state services keep M2 open. The earlier no-player self-target boundary
++also remains. Only the documented Linux configurations have been verified.
+diff --git a/docs/AI_RUNTIME_CONTRACTS.md b/docs/AI_RUNTIME_CONTRACTS.md
+index 7cda97a..c26f9da 100644
+--- a/docs/AI_RUNTIME_CONTRACTS.md
++++ b/docs/AI_RUNTIME_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original Cultist/Civilian initialization and AI_Update
+ 
++> Extended by [NPC hit/recoil contracts](AI_HIT_CONTRACTS.md): original visible-node
++> localization, region damage and nonlethal reactions now execute for initialized
++> Cultist/Civilian NPCs. Earlier blanket localization/recoil omissions are historical;
++> lethal death/corpse/drop services remain unavailable and M2 is incomplete.
++
+ CultistAI and CivilianAI are now registered for world creation. Their selected
+ original constructors, properties, model selection, initialization and AI_Update
+ execute through typed services. See [source selections](M2_AI_RUNTIME_SOURCES.json)
+diff --git a/docs/CHARACTER_ANIMATION_CONTRACTS.md b/docs/CHARACTER_ANIMATION_CONTRACTS.md
+index b7e484e..9a80ae2 100644
+--- a/docs/CHARACTER_ANIMATION_CONTRACTS.md
++++ b/docs/CHARACTER_ANIMATION_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original character animations and node queries
+ 
++> Extended by [NPC hit/recoil contracts](AI_HIT_CONTRACTS.md): original visible-node
++> localization, region damage and nonlethal reactions now execute for initialized
++> Cultist/Civilian NPCs. Earlier blanket localization/recoil omissions are historical;
++> lethal death/corpse/drop services remain unavailable and M2 is incomplete.
++
+ > Extended by [AI state/action contracts](AI_STATE_CONTRACTS.md): selected original
+ > state decisions, transitions and stationary animation commands now execute.
+ > Full AI_Update and production NPCs remain unavailable; M2 is still open.
+diff --git a/docs/M2_AI_HIT_SOURCES.json b/docs/M2_AI_HIT_SOURCES.json
+new file mode 100644
+index 0000000..dd0a0fd
+--- /dev/null
++++ b/docs/M2_AI_HIT_SOURCES.json
+@@ -0,0 +1,104 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "3f14a7ceda7e56c49f55b7920824a63c0d2e1b0b",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
++      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
++      "selected_lines": [
++        [
++          394,
++          514
++        ],
++        [
++          591,
++          651
++        ],
++        [
++          739,
++          893
++        ]
++      ],
++      "use": "AI hit selection, region mapping, side and damage multipliers; visible-node subset"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          763,
++          806
++        ],
++        [
++          1780,
++          1907
++        ],
++        [
++          5417,
++          5463
++        ],
++        [
++          6428,
++          6440
++        ]
++      ],
++      "use": "Base/aggregate damage order, nonlethal damage, recoil command/state; lethal branch explicitly unavailable"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
++      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
++      "selected_lines": [
++        [
++          144,
++          200
++        ]
++      ],
++      "use": "Civilian damage override after base HandleDamage"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Anim_Sound.h",
++      "sha256": "3e42f686a5f492bdca336efdba239d61617b366221c559c8942f6e35824ccde4",
++      "selected_lines": [
++        [
++          14,
++          33
++        ],
++        [
++          350,
++          383
++        ]
++      ],
++      "use": "Original node constants and shared recoil table"
++    },
++    {
++      "path": "sources/blood2/Shared/SharedDefs.h",
++      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "selected_lines": [
++        [
++          375,
++          400
++        ]
++      ],
++      "use": "Damage identifiers, especially NORMAL=0 and FIRE=1"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
++      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
++      "selected_lines": [
++        [
++          90,
++          175
++        ]
++      ],
++      "use": "Original recoil command, limp/always-recoil flags and script interruption bit"
++    }
++  ],
++  "adaptations": [
++    "Typed node-query outcomes separate missing names and pose failures",
++    "Explicit tied-axis/zero-segment handling replaces NaN projection",
++    "No hidden-node service: renderer/current NPCs include all nodes",
++    "Checked accepted-damage receipts suppress stale and nested reactions",
++    "Required failure suspends NPC; lethal corpse/drop/gib services remain unavailable",
++    "No raw original pointers, DLL ABI or additional dependencies"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 30191c6..41db2d0 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -624,3 +624,16 @@ damage factors. Another LithTech generation supplies only a linear Random refere
+ [Contracts](AI_RUNTIME_CONTRACTS.md) distinguish checked-lifetime/error adaptations,
+ world-scoped tables, replacement visibility/physics and still-missing actions.
+ No reference tree, commercial asset or dependency pin changed.
++
++## M2 NPC hit localization and recoil
++
++Selected `CDestructable::CalculateHitLimb/SetProperNode/HandleDamage` and
++`AI_Mgr::HandleDamage/MC_Recoil/AI_STATE_Recoil`, with the existing Civilian
++post-damage override, come from `sources/blood2` commit
++`006b4aabd3fb348f6846cad03799cf8df685ea95`. See
++[M2_AI_HIT_SOURCES.json](M2_AI_HIT_SOURCES.json) for hashes and exact selections.
++Typed node outcomes, receipt/lifetime guards, explicit zero-segment handling and
++failure diagnostics are portability/safety adaptations. No prototype, new
++dependency, commercial asset or death-service placeholder was imported.
++[Contracts](AI_HIT_CONTRACTS.md) and [validation](../../Documentation/Implementation/M2_AI_HIT.md)
++define the visible-node subset and remaining M2 gate.
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index 4fdb6b5..86794d7 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original Inventory and Vector Weapon Boundary
+ 
++> Extended by [NPC hit/recoil contracts](AI_HIT_CONTRACTS.md): original visible-node
++> localization, region damage and nonlethal reactions now execute for initialized
++> Cultist/Civilian NPCs. Earlier blanket localization/recoil omissions are historical;
++> lethal death/corpse/drop services remain unavailable and M2 is incomplete.
++
+ > Extended by [AI weapon-action contracts](AI_FIRE_CONTRACTS.md): supported weapon
+ > choice, aiming, clearance, standing fire and AI fire_key now execute. Earlier
+ > blanket weapon/fire omissions are historical; full NPCs and M2 remain open.
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index f58c143..95e9ae4 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -25,7 +25,19 @@ namespace OpenBlood2
+             if (!g.objects.get(selection) || std::string_view(r->state.m_Name) == "spank")
+                 selection = id;
+         }
+-        return cultists == 10 && civilians == 5 && updates >= 15;
++        // A diagnostic localization query against a real production pose; no damage
++        // or authored flags are changed. Repeat while hidden and after world reload.
++        auto* r = g.objects.get(selection);
++        auto* selected = r ? dynamic_cast<AI_Mgr*>(r->game.get()) : nullptr;
++        DVector torso{};
++        DRotation rotation;
++        if (!selected || !selected->AnimSound() ||
++            !g.server.GetModelNodeTransform(r->handle, "torso", &torso, &rotation))
++            return false;
++        Damage query{{0, 0, 1}, {torso.x, torso.y, torso.z - 1}, 0, DamageType::Normal, nullptr};
++        const bool localized = selected->m_damage.LocalizeHit(query, *selected->AnimSound()) &&
++                               selected->m_damage.hit.node == 2 && !selected->m_damage.hit.random_fallback;
++        return cultists == 10 && civilians == 5 && updates >= 15 && localized;
+     }
+     namespace
+     {
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 9dc36ef..97c58f9 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -7,9 +7,8 @@ namespace OpenBlood2
+ {
+     void Inspector::draw_skeleton(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextWrapped("Current ABC node transforms and original CAnim_Sound tables. Spheres are the original "
+-                           "initialization radii, shown at live node positions; damage localization and complete AI "
+-                           "behavior remain unported.");
++        ImGui::TextWrapped("Original hit spheres at current ABC node poses. Initialized NPCs use them for hit "
++                           "localization. Death/corpse services remain unavailable.");
+         if (ImGui::CollapsingHeader("Live attachments"))
+         {
+             ImGui::TextWrapped("Held models follow current parent nodes. Physical/nested attachments and dropped "
+@@ -79,6 +78,30 @@ namespace OpenBlood2
+             if (!a.runtime_error.empty())
+                 ImGui::TextWrapped("Failure: %s", a.runtime_error.c_str());
+         }
++        if (target_ai && ImGui::CollapsingHeader("Original NPC hit and recoil", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            const auto& a = *target_ai;
++            const auto& d = a.m_damage;
++            const auto& h = d.hit;
++            ImGui::Text("Localization %s | accepted packets %llu | queries %llu",
++                        d.ai_hit_localization ? "enabled" : "disabled", (unsigned long long)d.accepted_damage,
++                        (unsigned long long)d.hit_queries);
++            ImGui::Text("Last query %s | raw node %d | region %d | side %d", h.valid ? "valid" : "unavailable/none",
++                        h.raw_node, h.node, h.side);
++            ImGui::Text("Random fallback %s | missing later nodes %u | distance %.3f | multiplier %.2f",
++                        h.random_fallback ? "yes" : "no", h.missing_nodes, h.distance, h.multiplier);
++            ImGui::Text("Head kill %s | injured leg %d | accumulated damage %.3f", h.head_kill ? "yes" : "no",
++                        a.m_nInjuredLeg, d.m_fLastDamageAmount);
++            ImGui::Text("Reactions %llu | recoil starts %llu | selected node %d / slot %d",
++                        (unsigned long long)a.damage_reactions, (unsigned long long)a.recoil_starts, a.recoil_node,
++                        a.recoil_slot);
++            if (!h.error.empty())
++                ImGui::TextWrapped("Localization failure: %s", h.error.c_str());
++            if (!a.damage_reaction_error.empty())
++                ImGui::TextWrapped("Reaction failure: %s", a.damage_reaction_error.c_str());
++            ImGui::TextWrapped(
++                "Visible-node hit spheres; no limb hiding. Death/corpses/gibs and NPC impulses remain unavailable.");
++        }
+         if (target_ai && ImGui::CollapsingHeader("Original escape and guard", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& a = *target_ai;
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index f6b553c..3fc09cf 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -1141,8 +1141,9 @@ namespace
+                 if (!ai_follow_hidden || !reentered)
+                     return 4;
+                 const bool runtime_reentered = OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
+-                spdlog::info("Original NPC AI_Update: hidden={}, reentered={}, old identity invalidated={}",
+-                             ai_runtime_hidden, runtime_reentered, !game.objects.get(original_ai_runtime));
++                spdlog::info(
++                    "Original NPC AI_Update + hit localization: hidden={}, reentered={}, old identity invalidated={}",
++                    ai_runtime_hidden, runtime_reentered, !game.objects.get(original_ai_runtime));
+                 if (!ai_runtime_hidden || !runtime_reentered || game.objects.get(original_ai_runtime))
+                     return 4;
+                 const bool escape_reentered = OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 33f8a88..ca2e656 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -142,6 +142,13 @@ class ServerDE : public CSBase
+     void (*SetModelLooping)(HOBJECT, DBOOL) = nullptr;
+     DBOOL (*GetModelLooping)(HOBJECT) = nullptr;
+     virtual DRESULT GetModelAnimUserDims(HOBJECT, DVector*, HMODELANIM) = 0;
++    enum class NodeQuery
++    {
++        Found,
++        Missing,
++        Unavailable
++    };
++    virtual NodeQuery QueryModelNodeTransform(HOBJECT, const char*, DVector*, DRotation*) = 0;
+     virtual DBOOL GetModelNodeTransform(HOBJECT, const char*, DVector*, DRotation*) = 0;
+     virtual bool GetModelAnimationName(HOBJECT, HMODELANIM, std::string&) = 0;
+     virtual DRESULT SetGlobalForce(DVector*) = 0;
+diff --git a/src/game/original/AIHitReaction.cpp b/src/game/original/AIHitReaction.cpp
+new file mode 100644
+index 0000000..ebbcb81
+--- /dev/null
++++ b/src/game/original/AIHitReaction.cpp
+@@ -0,0 +1,176 @@
++// Selected original Destructable hit localization and AI_Mgr damage/recoil.
++// See AI_HIT_CONTRACTS.md for explicit service failures and safety adaptations.
++#include "AI_Mgr.h"
++#include "engine/collision.h"
++#include <cmath>
++#include <limits>
++#include <numbers>
++
++int CDestructable::SetProperNode(int node)
++{
++    if (node < 0 || node > 17)
++        return -1;
++    if (node <= 1)
++        return 1;
++    if (node <= 3)
++        return 2;
++    if (node <= 6)
++        return 4;
++    if (node <= 9)
++        return 7;
++    if (node <= 13)
++        return 10;
++    return 14;
++}
++bool CDestructable::LocalizeHit(const OpenBlood2::Damage& damage, const CAnim_Sound& table)
++{
++    using namespace OpenBlood2;
++    auto* s = BaseClass::GetServerDE();
++    ++hit_queries;
++    hit = {};
++    hit.from = damage.position;
++    auto fail = [&](const char* why)
++    {
++        hit.error = why;
++        ++hit_failures;
++        return false;
++    };
++    DVector dims{};
++    DRotation rotation;
++    if (!s || !s->IsObjectAlive(m_hObject) || !m_pInventoryMgr || !table.hit_spheres_valid ||
++        !physics_vector(damage.direction) || !physics_vector(damage.position) ||
++        s->GetModelAnimUserDims(m_hObject, &dims, s->GetModelAnimation(m_hObject)) != DE_OK || !physics_vector(dims) ||
++        dims.x < 0 || dims.y < 0 || dims.z < 0 || s->GetObjectRotation(m_hObject, &rotation) != DE_OK)
++        return fail("NPC hit owner/model/table/dimensions unavailable");
++    const auto d = damage.direction;
++    const DVector absolute{std::abs(d.x), std::abs(d.y), std::abs(d.z)};
++    float length = 0;
++    if (absolute.x > absolute.y && absolute.x > absolute.z)
++        length = dims.x / absolute.x;
++    else if (absolute.y > absolute.x && absolute.y > absolute.z)
++        length = dims.y / absolute.y;
++    else if (absolute.z > absolute.x && absolute.z > absolute.y)
++        length = dims.z / absolute.z;
++    hit.segment = vector_scale(d, length);
++    const auto squared = vector_dot(hit.segment, hit.segment);
++    if (!physics_vector(hit.segment) || !std::isfinite(squared))
++        return fail("NPC hit segment invalid");
++    DVector node{};
++    DRotation node_rotation;
++    for (unsigned i = 0; i < NUM_STD_NODES; ++i)
++    {
++        if (!std::isfinite(table.m_fHitSpheres[i]) || table.m_fHitSpheres[i] < 0)
++            return fail("NPC hit sphere invalid");
++        // No limb hiding is implemented; current actors render all model nodes.
++        // Missing later names preserve the preceding transform, as the source's
++        // ignored GetModelNodeTransform result does. Pose errors never do.
++        const auto result = s->QueryModelNodeTransform(m_hObject, szNodes[i], &node, &node_rotation);
++        if (result == ServerDE::NodeQuery::Unavailable || (i == 0 && result != ServerDE::NodeQuery::Found))
++            return fail("NPC hit node pose unavailable");
++        hit.missing_nodes += result == ServerDE::NodeQuery::Missing;
++        if (squared == 0)
++            continue; // Source zero/tied direction yields NaN: no candidate.
++        const auto inverse = 1.f / squared;
++        const auto t = vector_dot(hit.segment, node) * inverse - vector_dot(hit.segment, damage.position) * inverse;
++        if (t < 0 || t > 1)
++            continue;
++        const auto delta = vector_subtract(node, vector_add(damage.position, vector_scale(hit.segment, t)));
++        const auto distance = std::sqrt(vector_dot(delta, delta));
++        if (distance < hit.distance && distance <= table.m_fHitSpheres[i])
++        {
++            hit.raw_node = static_cast<int>(i);
++            hit.distance = distance;
++        }
++    }
++    if (hit.raw_node == -1)
++    {
++        // DAMAGE_TYPE_NORMAL is zero. The original !(type & NORMAL) is always true.
++        hit.random_fallback = true;
++        if (!s->RandomInt(0, NUM_ALL_NODES - 3, hit.raw_node))
++            return fail("NPC hit RNG unavailable");
++    }
++    hit.node = SetProperNode(hit.raw_node);
++    const auto forward = rotate_vector(rotation, {0, 0, 1});
++    const float pi = std::numbers::pi_v<float>;
++    float incoming = std::atan2(-d.x, -d.z), facing = std::atan2(forward.x, forward.z);
++    if (incoming < 0)
++        incoming += 2 * pi;
++    if (facing < 0)
++        facing += 2 * pi;
++    const auto angle = facing - incoming; // Intentionally NOT wrapped again.
++    hit.side = angle <= pi / 2 || angle >= 3 * pi / 2 ? 0 : 6;
++    hit.multiplier = hit.node == 1 ? 1.5f : hit.node == 2 ? 1.f : .5f;
++    hit.valid = true;
++    return true;
++}
++bool AI_Mgr::HandleDamage()
++{
++    ++damage_reactions;
++    damage_reaction_error.clear();
++    if (m_nState == StateDying || m_bRemoveMe || m_damage.node_hit == -1)
++        return true;
++    const int node = m_damage.node_hit;
++    if ((m_dwFlags & 0x4) && !m_nInjuredLeg && (node == 10 || node == 14) &&
++        m_damage.m_fHitPoints < m_damage.m_fMaxHitPoints * .5f)
++        m_nInjuredLeg = node;
++    if (m_damage.m_fHitPoints <= 0)
++    {
++        damage_reaction_error = "NPC lethal reaction requires weapon drops, corpses/gibs and death services";
++        return false;
++    }
++    if (m_nState == StateScript && !(m_dwScriptFlags & (1u << 1)))
++        return true;
++    if ((m_dwFlags & 0x20) || (m_damage.m_fLastDamageAmount >= m_damage.m_fHitPoints * .25f &&
++                               m_nState != StateTeleport && m_nState != StateDodge))
++        return SetNewState(StateRecoil);
++    if (m_nState != StateAttackClose && m_nState != StateAttackFar)
++        return ComputeState();
++    return true;
++}
++bool AI_Mgr::MC_Recoil()
++{
++    auto* s = GetServerDE();
++    std::string name;
++    if (!s || !s->IsObjectAlive(m_hObject) || !m_pAnim_Sound ||
++        !s->GetModelAnimationName(m_hObject, s->GetModelAnimation(m_hObject), name))
++        return StateFailure("AI recoil owner/model/table unavailable");
++    if (!m_bAnimating || m_nCurMetacmd != 19)
++    {
++        if (m_damage.side_hit != 0 && m_damage.side_hit != 6)
++            return StateFailure("AI recoil side invalid");
++        recoil_node = m_damage.node_hit;
++        if (m_damage.reaction_damage_type == OpenBlood2::DamageType::Fire &&
++            !s->RandomInt(0, NUM_ALL_NODES - 3, recoil_node))
++            return StateFailure("AI fire recoil RNG unavailable");
++        recoil_slot = -1;
++        constexpr int nodes[]{1, 2, 4, 7, 10, 14};
++        for (int i = 0; i < 6; ++i)
++            if (recoil_node == nodes[i])
++                recoil_slot = i + m_damage.side_hit;
++        if (recoil_slot >= 0 && !SetAnimation(m_pAnim_Sound->m_nAnim_RECOIL[recoil_slot]))
++            return false;
++        // Raw fire draws are intentionally not mapped through SetProperNode.
++        // Unmatched draws keep the current animation and still make it nonlooping.
++        s->SetModelLooping(m_hObject, DFALSE);
++        m_bAnimating = true;
++        m_nCurMetacmd = 19;
++        ++recoil_starts;
++    }
++    else if (s->GetModelPlaybackState(m_hObject) & MS_PLAYDONE)
++    {
++        if (Metacmd == std::numeric_limits<int>::max())
++            return StateFailure("AI Metacmd overflow");
++        m_bAnimating = false;
++        ++Metacmd;
++        ++animation_finishes;
++    }
++    return true;
++}
++bool AI_Mgr::AI_STATE_Recoil()
++{
++    if (Metacmd == 1)
++        return MC_Recoil();
++    if (Metacmd == 2)
++        return ComputeState();
++    return true;
++}
+diff --git a/src/game/original/AIRuntime.cpp b/src/game/original/AIRuntime.cpp
+index 7c079fd..633268e 100644
+--- a/src/game/original/AIRuntime.cpp
++++ b/src/game/original/AIRuntime.cpp
+@@ -271,6 +271,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
+     if (reason == INITIALUPDATE_WORLDFILE && s->MoveObjectToGround(m_hObject) != DE_OK)
+         return RuntimeFailure("NPC world ground placement failed");
+     m_fLastUpdate = s->GetTime();
++    m_damage.ai_hit_localization = true;
+     runtime_initialized = true;
+     return true;
+ }
+diff --git a/src/game/original/AIState.cpp b/src/game/original/AIState.cpp
+index 799c47c..7729536 100644
+--- a/src/game/original/AIState.cpp
++++ b/src/game/original/AIState.cpp
+@@ -252,6 +252,8 @@ bool AI_Mgr::DispatchState()
+         Metacmd = 1;
+     switch (m_nState)
+     {
++        case StateRecoil:
++            return AI_STATE_Recoil();
+         case StateEscapeRun:
+             return AI_STATE_Escape_RunAway();
+         case StateEscapeHide:
+diff --git a/src/game/original/AITrigger.cpp b/src/game/original/AITrigger.cpp
+index 67814e8..d76024c 100644
+--- a/src/game/original/AITrigger.cpp
++++ b/src/game/original/AITrigger.cpp
+@@ -271,6 +271,17 @@ bool AI_Mgr::HandleTrigger(HOBJECT sender, std::string_view text)
+ }
+ DDWORD AI_Mgr::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
+ {
++    if (message == OpenBlood2::damage_message)
++    {
++        const bool nested = m_damage.handling_damage;
++        const auto before = m_damage.accepted_damage;
++        const auto result = CBaseCharacter::ObjectMessageFn(sender, message, read);
++        // Safety adaptation: refused/nested packets never replay stale hit metadata.
++        if (!nested && m_damage.ai_hit_localization && !runtime_failed && before != m_damage.accepted_damage &&
++            GetServerDE()->IsObjectAlive(m_hObject) && !HandleDamage())
++            RuntimeFailure(damage_reaction_error.empty() ? state_error : damage_reaction_error);
++        return result;
++    }
+     if (message == 1000 /* MID_TRIGGER */)
+     {
+         auto* server = GetServerDE();
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index b4a3e75..17b6121 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -237,6 +237,12 @@ class AI_Mgr : public CBaseCharacter
+     std::uint64_t locomotion_calls = 0, locomotion_failures = 0;
+     int locomotion_command = 0;
+     std::string locomotion_error;
++    bool HandleDamage();
++    bool MC_Recoil();
++    bool AI_STATE_Recoil();
++    std::uint64_t damage_reactions = 0, recoil_starts = 0;
++    int recoil_node = -1, recoil_slot = -1;
++    std::string damage_reaction_error;
+     bool MC_Idle();
+     bool MC_BestWeapon();
+     bool MC_Fire_Stand();
+diff --git a/src/game/original/Anim_Sound.h b/src/game/original/Anim_Sound.h
+index 521eaba..8a35429 100644
+--- a/src/game/original/Anim_Sound.h
++++ b/src/game/original/Anim_Sound.h
+@@ -5,8 +5,8 @@
+ #include <string>
+ #include <vector>
+ 
+-// Original animation/node and voice subsets. Damage localization and AI callers
+-// remain pending. See CHARACTER_ANIMATION_CONTRACTS.md and CHARACTER_AUDIO_CONTRACTS.md.
++// Original animation/node and voice subsets, also used by production NPC hit localization.
++// See CHARACTER_ANIMATION_CONTRACTS.md and AI_HIT_CONTRACTS.md.
+ inline constexpr unsigned NUM_ALL_NODES = 21, NUM_STD_NODES = 18;
+ extern const std::array<const char*, NUM_ALL_NODES> szNodes;
+ void CheckAnims(std::span<DDWORD>);
+diff --git a/src/game/original/CivilianAI.cpp b/src/game/original/CivilianAI.cpp
+index 3d5655e..c64a602 100644
+--- a/src/game/original/CivilianAI.cpp
++++ b/src/game/original/CivilianAI.cpp
+@@ -93,7 +93,7 @@ DDWORD CivilianAI::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD
+         }
+     }
+     const auto result = AI_Mgr::ObjectMessageFn(sender, message, read);
+-    if (npc_type == NPCType::Civilian && message == OpenBlood2::damage_message &&
++    if (!runtime_failed && npc_type == NPCType::Civilian && message == OpenBlood2::damage_message &&
+         GetServerDE()->IsObjectAlive(m_hObject))
+     {
+         if (!SetNewState(StateEscapeRun))
+diff --git a/src/game/original/Destructable.cpp b/src/game/original/Destructable.cpp
+index 2610378..eda5ac5 100644
+--- a/src/game/original/Destructable.cpp
++++ b/src/game/original/Destructable.cpp
+@@ -120,8 +120,8 @@ void CDestructable::SendTrigger(const std::string& target, const std::string& me
+     if (text)
+         server->FreeString(text);
+ }
+-// Selected ordinary normal/melee damage branch from Destructable.cpp. AI hit
+-// limbs, player damage impulses, powerups and complete character death reactions are deferred.
++// Shared damage; production NPC localization is in AIHitReaction.cpp.
++// Player/NPC impulses, powerups and complete death reactions remain bounded separately.
+ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD message, HMESSAGEREAD read)
+ {
+     if (message == 1000)
+@@ -159,6 +159,23 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD
+                 m_fArmorPoints = 0;
+                 amount = m_fHitPoints;
+             }
++            else if (ai_hit_localization)
++            {
++                auto* ai = dynamic_cast<AI_Mgr*>(owner);
++                if (!ai || !ai->AnimSound() || !LocalizeHit(damage, *ai->AnimSound()))
++                {
++                    handling_damage = false;
++                    if (ai)
++                        ai->RuntimeFailure(hit.error.empty() ? "NPC hit table unavailable" : hit.error);
++                    return 0;
++                }
++                node_hit = hit.node;
++                side_hit = hit.side;
++                hit.head_kill = node_hit == 1 && ai->m_bCabal;
++                if (hit.head_kill)
++                    m_fHitPoints = 0; // Original Cabal headshot bypasses armor before ordinary absorption.
++                amount *= hit.multiplier;
++            }
+             if (apply_damage_physics && damage.type != OpenBlood2::DamageType::Death)
+                 ApplyDamagePhysics(amount, damage.direction);
+             if (m_fArmorPoints > 0 && damage.type != OpenBlood2::DamageType::Suffocate)
+@@ -181,7 +198,10 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD
+             m_fHitPoints -= amount;
+             m_fLastDamageAmount += amount;
+             last_damage = damage;
+-            // Original AI-only retaliation identity; limb multipliers remain unavailable.
++            if (amount != 0)
++                reaction_damage_type = damage.type;
++            ++accepted_damage;
++            // Original AI-only retaliation identity.
+             // A checked token avoids sharing/breaking the AI target's directed link.
+             if (dynamic_cast<AI_Mgr*>(owner) && damage.type != OpenBlood2::DamageType::Death)
+                 last_damager_ = damage.attacker;
+diff --git a/src/game/original/Destructable.h b/src/game/original/Destructable.h
+index 066ec48..15263d6 100644
+--- a/src/game/original/Destructable.h
++++ b/src/game/original/Destructable.h
+@@ -52,6 +52,22 @@ class CDestructable : public Aggregate
+     bool m_bGodMode = false;
+     float m_fLastDamageAmount = 0;
+     OpenBlood2::Damage last_damage;
++    // Production NPCs enable the original visible-node localization path after table initialization.
++    bool ai_hit_localization = false;
++    struct HitReport
++    {
++        bool valid = false, random_fallback = false, head_kill = false;
++        int raw_node = -1, node = -1, side = 0;
++        unsigned missing_nodes = 0;
++        float distance = 999, multiplier = 1;
++        DVector from{}, segment{};
++        std::string error;
++    } hit;
++    static int SetProperNode(int);
++    bool LocalizeHit(const OpenBlood2::Damage&, const class CAnim_Sound&);
++    std::uint64_t accepted_damage = 0, hit_queries = 0, hit_failures = 0;
++    int node_hit = 0, side_hit = 0;
++    OpenBlood2::DamageType reaction_damage_type = OpenBlood2::DamageType::Normal;
+     bool can_damage = true, trigger_only = false, handling_damage = false;
+     std::string damage_target, damage_message, death_target, death_message;
+     void SendTrigger(const std::string& target, const std::string& message);
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 425e5da..e929eef 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -186,6 +186,7 @@ namespace OpenBlood2
+         DRESULT EndMessage(HMESSAGEWRITE) override;
+         DRESULT MoveObject(HOBJECT, DVector*) override;
+         DRESULT GetModelAnimUserDims(HOBJECT, DVector*, HMODELANIM) override;
++        NodeQuery QueryModelNodeTransform(HOBJECT, const char*, DVector*, DRotation*) override;
+         DBOOL GetModelNodeTransform(HOBJECT, const char*, DVector*, DRotation*) override;
+         bool GetModelAnimationName(HOBJECT, HMODELANIM, std::string&) override;
+         DRESULT SetGlobalForce(DVector*) override;
+diff --git a/src/game/server_models.cpp b/src/game/server_models.cpp
+index cffc26d..216bc8f 100644
+--- a/src/game/server_models.cpp
++++ b/src/game/server_models.cpp
+@@ -91,6 +91,24 @@ namespace OpenBlood2
+         return record && objects_.refresh_attachment(object) &&
+                object_node_transform(*record, name, position, rotation);
+     }
++    ServerDE::NodeQuery ServerAdapter::QueryModelNodeTransform(HOBJECT object, const char* name, DVector* position,
++                                                               DRotation* rotation)
++    {
++        trace_service("QueryModelNodeTransform");
++        const auto* r = objects_.get(object);
++        if (!r || r->life != Life::Alive || !r->model || r->state.m_ObjectType != OT_MODEL || !name || !*name ||
++            !position || !rotation)
++            return NodeQuery::Unavailable;
++        unsigned matches = 0;
++        for (const auto& node : r->model->nodes)
++            matches += !CaseLess{}(node.name, name) && !CaseLess{}(name, node.name);
++        if (!matches)
++            return NodeQuery::Missing;
++        if (matches != 1 || !objects_.refresh_attachment(object) ||
++            !object_node_transform(*r, name, position, rotation))
++            return NodeQuery::Unavailable;
++        return NodeQuery::Found;
++    }
+     bool ServerAdapter::GetModelAnimationName(HOBJECT object, HMODELANIM animation, std::string& name)
+     {
+         trace_service("GetModelAnimationName");
+diff --git a/src/game/server_weapons.cpp b/src/game/server_weapons.cpp
+index 7bc5a46..cc37c5a 100644
+--- a/src/game/server_weapons.cpp
++++ b/src/game/server_weapons.cpp
+@@ -95,10 +95,10 @@ namespace OpenBlood2
+             attacker->life != Life::Alive || m->sender != value.attacker || !physics_vector(value.position) ||
+             !physics_vector(value.direction) || !std::isfinite(value.amount) || value.amount < 0 ||
+             value.amount > 1e6f ||
+-            (value.type != DamageType::Normal && value.type != DamageType::Melee && value.type != DamageType::Explode &&
+-             value.type != DamageType::Suffocate && value.type != DamageType::Death &&
+-             value.type != DamageType::FreeFall && value.type != DamageType::Blind && value.type != DamageType::Slow &&
+-             value.type != DamageType::Acid))
++            (value.type != DamageType::Fire && value.type != DamageType::Normal && value.type != DamageType::Melee &&
++             value.type != DamageType::Explode && value.type != DamageType::Suffocate &&
++             value.type != DamageType::Death && value.type != DamageType::FreeFall && value.type != DamageType::Blind &&
++             value.type != DamageType::Slow && value.type != DamageType::Acid))
+         {
+             m->bad = true;
+             return DE_INVALIDPARAMS;
+diff --git a/src/game/weapon_messages.h b/src/game/weapon_messages.h
+index 2758ea4..7477508 100644
+--- a/src/game/weapon_messages.h
++++ b/src/game/weapon_messages.h
+@@ -13,6 +13,7 @@ namespace OpenBlood2
+     enum class DamageType : DBYTE
+     {
+         Normal = 0,
++        Fire = 1,
+         Melee = 4,
+         Explode = 5,
+         Suffocate = 6,
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 5ea8e84..7d1c676 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -794,3 +794,15 @@ if(BLOOD2_TEST_DATA_DIR)
+         set_tests_properties(ai_runtime.${case} PROPERTIES LABELS "headless;private;ai_runtime" TIMEOUT 90)
+     endforeach()
+ endif()
++
++add_executable(ai_hit_tests ai_hit_tests.cpp)
++target_link_libraries(ai_hit_tests PRIVATE blood2_game)
++blood2_project_options(ai_hit_tests)
++foreach(case IN ITEMS geometry query modifiers reactions recoil guards sides lifetime)
++    add_test(NAME ai_hit.${case} COMMAND ai_hit_tests "${case}")
++    set_tests_properties(ai_hit.${case} PROPERTIES LABELS "headless;ai_hit" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME ai_hit.catalog COMMAND ai_hit_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(ai_hit.catalog PROPERTIES LABELS "headless;private;ai_hit" TIMEOUT 90)
++endif()
+diff --git a/tests/ai_hit_tests.cpp b/tests/ai_hit_tests.cpp
+new file mode 100644
+index 0000000..4139910
+--- /dev/null
++++ b/tests/ai_hit_tests.cpp
+@@ -0,0 +1,452 @@
++#include "brush_fixture.h"
++#include "game/original/CultistAI.h"
++#include "game/server_adapter.h"
++#include <cmath>
++#include <functional>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .003f;
++    }
++    class Probe : public AI_Mgr
++    {
++      public:
++        unsigned computations = 0;
++        bool ComputeState(int = -1) override
++        {
++            ++computations;
++            return SetNewState(StateAttackClose);
++        }
++    };
++    bool setup(GameSession& g, const char* root = "")
++    {
++        CHECK(g.initialize());
++        auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
++        for (auto& s : floor.surfaces)
++            s.flags = 1;
++        std::string e;
++        CHECK(g.collision.build(floor, e));
++        g.server.collision_ready = true;
++        if (*root)
++        {
++            Config c;
++            c.data_dir = root;
++            CHECK(g.resources.mount_game(c, e));
++        }
++        return true;
++    }
++    Probe* actor(GameSession& g, std::shared_ptr<Model>& model)
++    {
++        static const ClassInfo type{"HitProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<Probe>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Pos = {0, 100, 0};
++        auto h = g.objects.create(&type, s);
++        auto* r = g.objects.get(h);
++        auto* a = r ? dynamic_cast<Probe*>(r->game.get()) : nullptr;
++        if (!a)
++            return nullptr;
++        model = std::make_shared<Model>();
++        ModelAnimation animation;
++        animation.name = "hit";
++        animation.dimensions = {20, 20, 20};
++        animation.duration = 100;
++        animation.keys.resize(2);
++        animation.keys[1].time = 100;
++        for (unsigned i = 0; i < 18; ++i)
++        {
++            ModelNode n;
++            n.name = szNodes[i];
++            n.index = i;
++            model->nodes.push_back(n);
++            NodeAnimation node;
++            node.frames = {{{float(i) * 4, 0, 0}, {}}, {{float(i) * 4, 0, 0}, {}}};
++            animation.nodes.push_back(node);
++        }
++        for (int i = 0; i < 12; ++i)
++            model->animations.push_back(animation);
++        r->model = model;
++        r->dimensions = {20, 20, 20};
++        auto table = std::make_shared<CAnim_Sound>();
++        table->hit_spheres_valid = true;
++        table->m_fHitSpheres.fill(1);
++        for (int i = 0; i < 12; ++i)
++            table->m_nAnim_RECOIL[i] = i;
++        if (!a->InitStatics(table) || !a->m_InventoryMgr.Init(h, nullptr) || !a->m_damage.Init(h, &a->m_InventoryMgr))
++            return nullptr;
++        a->m_damage.SetHitPoints(100);
++        a->m_damage.m_fMaxHitPoints = 100;
++        a->m_damage.ai_hit_localization = true;
++        a->m_vDims = {20, 20, 20};
++        a->m_nState = AI_Mgr::StateAttackClose;
++        return a;
++    }
++    HOBJECT sender(GameSession& g)
++    {
++        ObjectCreateStruct s;
++        s.m_Pos = {0, 100, 200};
++        return g.objects.create(g.objects.find_class("BaseClass"), s);
++    }
++    Damage shot(HOBJECT from, int node, float amount = 10)
++    {
++        return {{0, 0, 1}, {float(node) * 4, 100, -1}, amount, DamageType::Normal, from};
++    }
++    bool send(GameSession& g, HOBJECT h, const Damage& d)
++    {
++        auto m = g.server.StartMessageToObject(g.server.HandleToObject(d.attacker), h, damage_message);
++        CHECK(m && g.server.WriteDamage(m, d) == DE_OK && g.server.EndMessage(m) == DE_OK);
++        return true;
++    }
++    bool geometry(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        std::shared_ptr<Model> m;
++        auto* a = actor(g, m);
++        CHECK(a);
++        auto from = sender(g);
++        for (int i = 0; i < 18; ++i)
++        {
++            CHECK(a->m_damage.LocalizeHit(shot(from, i), *a->AnimSound()));
++            auto& h = a->m_damage.hit;
++            CHECK(h.valid && !h.random_fallback && h.raw_node == i && near(h.distance, 0) && h.missing_nodes == 0);
++            const int expected[] = {1, 1, 2, 2, 4, 4, 4, 7, 7, 7, 10, 10, 10, 10, 14, 14, 14, 14};
++            CHECK(h.node == expected[i]);
++        }
++        CHECK(CDestructable::SetProperNode(18) == -1 && CDestructable::SetProperNode(-1) == -1);
++        // Same distance retains the first node. Segment endpoints included; beyond endpoint misses.
++        m->animations[0].nodes[3].frames = m->animations[0].nodes[2].frames;
++        CHECK(a->m_damage.LocalizeHit(shot(from, 2), *a->AnimSound()) && a->m_damage.hit.raw_node == 2);
++        auto d = shot(from, 2);
++        d.position.z = -20;
++        CHECK(a->m_damage.LocalizeHit(d, *a->AnimSound()) && !a->m_damage.hit.random_fallback);
++        d.position.z = -21;
++        CHECK(a->m_damage.LocalizeHit(d, *a->AnimSound()) && a->m_damage.hit.random_fallback);
++        // Source tied axes form no segment; normal=0 still takes random fallback.
++        d.direction = {1, 1, 0};
++        CHECK(a->m_damage.LocalizeHit(d, *a->AnimSound()) && a->m_damage.hit.random_fallback);
++        CHECK(vector_dot(a->m_damage.hit.segment, a->m_damage.hit.segment) == 0);
++        d.direction = {};
++        CHECK(a->m_damage.LocalizeHit(d, *a->AnimSound()) && a->m_damage.hit.random_fallback);
++        // Query the current animation clock, not the sphere-generation pose.
++        m->animations[0].nodes[2].frames[1].position.y = 8;
++        g.objects.get(a->m_hObject)->animation.time = 50;
++        d = shot(from, 2);
++        d.position.y = 104;
++        CHECK(a->m_damage.LocalizeHit(d, *a->AnimSound()) && a->m_damage.hit.raw_node == 2 &&
++              !a->m_damage.hit.random_fallback);
++        g.objects.get(a->m_hObject)->animation.time = 0;
++        // Missing later nodes keep preceding pose, without masking invalid/ambiguous present poses.
++        m->nodes[12].name = "missing";
++        CHECK(a->m_damage.LocalizeHit(shot(from, 11), *a->AnimSound()) && a->m_damage.hit.missing_nodes == 1);
++        m->nodes[0].name = "absent_head";
++        CHECK(!a->m_damage.LocalizeHit(d, *a->AnimSound()) && !a->m_damage.hit.valid);
++        return true;
++    }
++    bool query(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        std::shared_ptr<Model> m;
++        auto* a = actor(g, m);
++        CHECK(a);
++        DVector pos{9, 8, 7};
++        DRotation rot;
++        auto h = a->m_hObject;
++        CHECK(g.server.QueryModelNodeTransform(h, "missing", &pos, &rot) == ServerDE::NodeQuery::Missing && pos.x == 9);
++        CHECK(g.server.QueryModelNodeTransform(h, "HEAD", &pos, &rot) == ServerDE::NodeQuery::Found && pos.y == 100);
++        m->nodes[1].name = "HEAD";
++        pos = {9, 8, 7};
++        CHECK(g.server.QueryModelNodeTransform(h, "head", &pos, &rot) == ServerDE::NodeQuery::Unavailable &&
++              pos.x == 9);
++        m->nodes[1].name = "neck";
++        g.objects.get(h)->animation.animation = 99;
++        CHECK(!a->m_damage.LocalizeHit(shot(sender(g), 2), *a->AnimSound()));
++        CHECK(g.objects.remove(h));
++        CHECK(g.server.QueryModelNodeTransform(h, "head", &pos, &rot) == ServerDE::NodeQuery::Unavailable);
++        return true;
++    }
++    bool modifiers(const char*)
++    {
++        for (int node : {2, 4, 10, 0})
++        {
++            GameSession g;
++            CHECK(setup(g));
++            std::shared_ptr<Model> m;
++            auto* a = actor(g, m);
++            CHECK(a);
++            auto from = sender(g);
++            a->m_damage.m_fArmorPoints = 20;
++            auto packet = shot(from, node);
++            if (node == 4)
++                packet.type = DamageType::Fire;
++            CHECK(send(g, a->m_hObject, packet));
++            CHECK(a->m_damage.reaction_damage_type == packet.type);
++            const float factor = node == 0 ? 1.5f : node == 2 ? 1.f : .5f;
++            CHECK(near(a->m_damage.m_fArmorPoints, 20 - 10 * factor * .3f));
++            CHECK(near(a->m_damage.m_fHitPoints, node == 0 ? 0 : 100 - 10 * factor * .7f));
++            CHECK(a->m_damage.GetLastDamager() == from && a->m_damage.accepted_damage == 1 && a->damage_reactions == 1);
++            CHECK(a->runtime_failed == (node == 0));
++        }
++        // Ordinary miss may draw 18 -> mapped -1, half damage, no reaction/state change.
++        GameSession g;
++        CHECK(setup(g));
++        std::shared_ptr<Model> m;
++        auto* a = actor(g, m);
++        CHECK(a);
++        auto from = sender(g);
++        auto d = shot(from, 2, 2);
++        d.direction = {};
++        a->m_bCabal = false;
++        bool found = false;
++        for (int i = 0; i < 300 && !found; ++i)
++        {
++            a->m_damage.SetHitPoints(100);
++            a->m_damage.m_fLastDamageAmount = 0;
++            CHECK(send(g, a->m_hObject, d));
++            found = a->m_damage.node_hit == -1;
++        }
++        CHECK(found && a->m_damage.hit.random_fallback && a->m_damage.hit.raw_node == 18 &&
++              a->m_damage.m_fHitPoints == 99);
++        a->m_bCabal = true;
++        CHECK(send(g, a->m_hObject, shot(from, 0, 0)) && a->m_damage.IsDead() && a->runtime_failed);
++        return true;
++    }
++    bool reactions(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        std::shared_ptr<Model> m;
++        auto* a = actor(g, m);
++        CHECK(a);
++        auto from = sender(g);
++        a->m_dwFlags = 4;
++        a->m_damage.SetHitPoints(51);
++        CHECK(send(g, a->m_hObject, shot(from, 10, 2)) && a->m_damage.m_fHitPoints == 50 && a->m_nInjuredLeg == 0);
++        CHECK(send(g, a->m_hObject, shot(from, 10, 2)) && a->m_damage.m_fHitPoints == 49 && a->m_nInjuredLeg == 10);
++        CHECK(send(g, a->m_hObject, shot(from, 14, 2)) && a->m_nInjuredLeg == 10);
++        a->m_damage.SetHitPoints(100);
++        a->m_damage.m_fLastDamageAmount = 0;
++        CHECK(send(g, a->m_hObject, shot(from, 2, 19)) && a->m_nState == AI_Mgr::StateAttackClose);
++        // Accumulator (20), compared against remaining HP (80), exact boundary recoils.
++        CHECK(send(g, a->m_hObject, shot(from, 2, 1)) && a->m_nState == AI_Mgr::StateRecoil);
++        CHECK(g.objects.engine_message(a->m_hObject, MID_UPDATE, nullptr) && a->m_damage.m_fLastDamageAmount == 0);
++        a->m_nState = AI_Mgr::StateScript;
++        a->m_dwScriptFlags = 0;
++        a->m_dwFlags = 32;
++        CHECK(send(g, a->m_hObject, shot(from, 2, 1)) && a->m_nState == AI_Mgr::StateScript);
++        a->m_dwScriptFlags = 2;
++        CHECK(send(g, a->m_hObject, shot(from, 2, 1)) && a->m_nState == AI_Mgr::StateRecoil);
++        for (int state : {AI_Mgr::StateTeleport, AI_Mgr::StateDodge})
++        {
++            a->m_nState = state;
++            a->m_dwFlags = 0;
++            a->m_damage.m_fLastDamageAmount = 30;
++            CHECK(send(g, a->m_hObject, shot(from, 2, 1)) && a->m_nState == AI_Mgr::StateAttackClose);
++        }
++        CHECK(a->computations == 2);
++        return true;
++    }
++    bool recoil(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        std::shared_ptr<Model> m;
++        auto* a = actor(g, m);
++        CHECK(a);
++        constexpr int nodes[]{1, 2, 4, 7, 10, 14};
++        for (int side : {0, 6})
++            for (int i = 0; i < 6; ++i)
++            {
++                a->m_damage.node_hit = nodes[i];
++                a->m_damage.side_hit = side;
++                CHECK(a->SetNewState(AI_Mgr::StateRecoil) && a->DispatchState());
++                CHECK(a->recoil_slot == i + side && g.server.GetModelAnimation(a->m_hObject) == unsigned(i + side));
++                CHECK(a->m_bAnimating && a->Metacmd == 1 && !g.server.GetModelLooping(a->m_hObject));
++                CHECK(g.server.advance_models(.11) && a->DispatchState() && a->Metacmd == 2 && !a->m_bAnimating);
++                CHECK(a->DispatchState() && a->m_nState == AI_Mgr::StateAttackClose);
++            }
++        a->m_damage.reaction_damage_type = DamageType::Fire;
++        bool unmatched = false;
++        for (int i = 0; i < 100 && !unmatched; ++i)
++        {
++            CHECK(a->SetNewState(AI_Mgr::StateRecoil));
++            auto before = g.server.GetModelAnimation(a->m_hObject);
++            CHECK(a->DispatchState());
++            unmatched = a->recoil_slot == -1;
++            if (unmatched)
++                CHECK(g.server.GetModelAnimation(a->m_hObject) == before && a->m_nCurMetacmd == 19 && a->m_bAnimating);
++        }
++        CHECK(unmatched);
++        a->Metacmd = std::numeric_limits<int>::max();
++        g.objects.get(a->m_hObject)->animation.done = true;
++        CHECK(!a->MC_Recoil());
++        return true;
++    }
++    bool guards(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        std::shared_ptr<Model> m;
++        auto* a = actor(g, m);
++        CHECK(a);
++        auto from = sender(g);
++        a->m_damage.m_bGodMode = true;
++        CHECK(send(g, a->m_hObject, shot(from, 2)) && a->damage_reactions == 0 && a->m_damage.hit_queries == 0);
++        a->m_damage.m_bGodMode = false;
++        a->m_damage.handling_damage = true;
++        CHECK(send(g, a->m_hObject, shot(from, 2)) && a->damage_reactions == 0);
++        a->m_damage.handling_damage = false;
++        m->nodes[0].name = "missing";
++        CHECK(send(g, a->m_hObject, shot(from, 2)) && a->runtime_failed && a->m_damage.m_fHitPoints == 100);
++        CHECK(a->m_damage.accepted_damage == 0 && a->m_damage.hit_failures == 1);
++        CHECK(g.server.message_count() == 0);
++        return true;
++    }
++    class HitCallback : public B2BaseClass
++    {
++      public:
++        std::function<void()> action;
++
++      protected:
++        DDWORD ObjectMessageFn(HOBJECT from, DDWORD message, HMESSAGEREAD read) override
++        {
++            if (message == 1000 && action)
++                action();
++            return B2BaseClass::ObjectMessageFn(from, message, read);
++        }
++    };
++    bool lifetime(const char*)
++    {
++        for (bool remove : {false, true})
++        {
++            GameSession g;
++            CHECK(setup(g));
++            std::shared_ptr<Model> m;
++            auto* a = actor(g, m);
++            CHECK(a);
++            static const ClassInfo type{"HitCallback",
++                                        g.objects.find_class("BaseClass"),
++                                        []() -> std::unique_ptr<BaseClass> { return std::make_unique<HitCallback>(); },
++                                        {}};
++            CHECK(g.objects.register_class(type));
++            ObjectCreateStruct s;
++            SAFE_STRCPY(s.m_Name, "hit_callback");
++            auto callback = g.objects.create(&type, s);
++            auto* c = dynamic_cast<HitCallback*>(g.server.HandleToObject(callback));
++            CHECK(c);
++            auto from = sender(g);
++            auto h = a->m_hObject;
++            bool nested = false;
++            c->action = [&]
++            {
++                nested = send(g, h, shot(from, 2));
++                if (remove)
++                    g.server.RemoveObject(h);
++            };
++            a->m_damage.damage_target = "hit_callback";
++            a->m_damage.damage_message = "TRIGGER";
++            CHECK(send(g, h, shot(from, 2)) && nested);
++            CHECK(a->m_damage.accepted_damage == 1 && a->m_damage.m_fHitPoints == 90 &&
++                  a->damage_reactions == (remove ? 0 : 1));
++            CHECK(g.server.IsObjectAlive(h) != remove && g.server.message_count() == 0 && g.server.string_count() == 0);
++            CHECK(g.unload_world() && g.objects.snapshot().empty() && CDestructable::m_dwNumDestructables == 0);
++        }
++        return true;
++    }
++    bool sides(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        std::shared_ptr<Model> m;
++        auto* a = actor(g, m);
++        CHECK(a);
++        auto from = sender(g);
++        auto d = shot(from, 2); // facing +Z, incoming -Z, difference -pi is deliberately front.
++        CHECK(a->m_damage.LocalizeHit(d, *a->AnimSound()) && a->m_damage.hit.side == 0);
++        auto& rotation = g.objects.get(a->m_hObject)->state.m_Rotation;
++        rotation = {{0, 1, 0}, 0}; // facing -Z
++        d.direction = {0, 0, -1};
++        CHECK(a->m_damage.LocalizeHit(d, *a->AnimSound()) && a->m_damage.hit.side == 6);
++        return true;
++    }
++    bool catalog(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        for (auto type : {"CultistAI", "CivilianAI"})
++            for (bool male : {true, false})
++            {
++                auto h = g.objects.create(g.objects.find_class(type), {}, Creation::World,
++                                          {{"Pos", DVector{0, 100, 0}},
++                                           {"Male", male},
++                                           {"AIState", std::string("GUARD")},
++                                           {"RandomHitPoints", 1.f}});
++                auto* a = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h));
++                if (!a)
++                    for (const auto& e : g.objects.diagnostics())
++                        std::cerr << e << "\n";
++                CHECK(a && a->RuntimeReady());
++                auto from = sender(g);
++                DVector torso;
++                DRotation r;
++                CHECK(g.server.GetModelNodeTransform(h, "torso", &torso, &r));
++                Damage d{{0, 0, 1}, {torso.x, torso.y, torso.z - 1}, 1, DamageType::Normal, from};
++                CHECK(a->m_damage.LocalizeHit(d, *a->AnimSound()));
++                CHECK(a->m_damage.hit.node == 2 && !a->m_damage.hit.random_fallback &&
++                      a->m_damage.hit.missing_nodes == 2);
++                a->m_dwFlags |= 32; // Test stimulus forces source ALWAYSRECOIL; class/state logic remains original.
++                CHECK(send(g, h, d) && a->RuntimeReady());
++                if (type == std::string_view("CultistAI"))
++                {
++                    CHECK(a->m_nState == AI_Mgr::StateRecoil && a->AI_Update() && a->m_bAnimating &&
++                          a->recoil_slot == 1);
++                    CHECK(g.server.PingObjects(from));
++                    for (int i = 0; i < 180 && a->Metacmd == 1; ++i)
++                        CHECK(g.step(1.0 / 60));
++                    std::cout << "recoil private error=" << a->runtime_error << " phase=" << a->Metacmd
++                              << " finishes=" << a->animation_finishes << " updates=" << a->runtime_updates
++                              << " clip=" << g.server.GetModelAnimation(h)
++                              << " time=" << g.objects.get(h)->animation.time << "\n";
++                    CHECK(a->RuntimeReady() && a->animation_finishes > 0);
++                }
++                else
++                    CHECK(a->m_nState == AI_Mgr::StateEscapeRun); // source subclass override follows base recoil.
++                std::cout << type << " male=" << male << " hit=" << a->m_damage.hit.node
++                          << " missing=" << a->m_damage.hit.missing_nodes << " reactions=" << a->damage_reactions
++                          << " recoil=" << a->recoil_starts << " hp=" << a->m_damage.m_fHitPoints << '\n';
++                CHECK(g.objects.remove(h) && g.objects.remove(from) && g.objects.finish_frame());
++                CHECK(g.objects.snapshot().empty() && g.server.message_count() == 0 && g.objects.attachments().empty());
++            }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    const std::map<std::string, std::function<bool(const char*)>> tests{
++        {"geometry", geometry},   {"query", query},   {"modifiers", modifiers},
++        {"reactions", reactions}, {"recoil", recoil}, {"guards", guards},
++        {"lifetime", lifetime},   {"sides", sides},   {"catalog", catalog}};
++    if (argc < 2)
++        return 2;
++    auto t = tests.find(argv[1]);
++    return t != tests.end() && t->second(argc > 2 ? argv[2] : "") ? 0 : 1;
++}

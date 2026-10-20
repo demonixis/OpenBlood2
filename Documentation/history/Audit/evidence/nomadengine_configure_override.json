@@ -1,0 +1,23 @@
+{
+  "name": "nomadengine_configure_override",
+  "command": [
+    "cmake",
+    "-S",
+    "NoMadEngine",
+    "-B",
+    "/tmp/lithtech-audit-2bVxTF/nomadengine",
+    "-G",
+    "Ninja",
+    "-DENABLE_VR=OFF",
+    "-DBUILD_TOOLS=OFF",
+    "-DBUILD_EDITOR=OFF",
+    "-DCMAKE_BUILD_TYPE=Debug",
+    "-DFETCHCONTENT_SOURCE_DIR_IMGUIZMO=/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/imguizmo-src/src"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:16:17.707136+00:00",
+  "elapsed_seconds": 3.568,
+  "timeout_seconds": 120,
+  "exit_code": 0,
+  "log": "nomadengine_configure_override.log"
+}

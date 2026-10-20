@@ -1,0 +1,351 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "79a2cef1891b0f10b9ab83b076cd19867352e305",
+  "m2_complete": false,
+  "validation": {
+    "debug-headless": {
+      "passed": 96,
+      "failed": 0,
+      "private": 22,
+      "seconds": 40.21
+    },
+    "release-headless": {
+      "passed": 96,
+      "failed": 0,
+      "private": 22,
+      "seconds": 4.49
+    },
+    "sanitize-headless": {
+      "passed": 96,
+      "failed": 0,
+      "private": 22,
+      "seconds": 129.41
+    },
+    "release-gpu": {
+      "passed": 7,
+      "failed": 0,
+      "private": 6,
+      "seconds": 31.16
+    },
+    "debug-gpu": {
+      "passed_after_targeted_recheck": 7,
+      "initial_passed": 6,
+      "initial_failed": 1,
+      "failed_after_recheck": 0,
+      "private": 6,
+      "initial_seconds": 80.52,
+      "character_recheck": {
+        "passed": 1,
+        "failed": 0,
+        "private": 1,
+        "seconds": 17.29
+      },
+      "note": "Initial character smoke lost desktop window focus at frame 50 and correctly rejected missing crouch/run input. Rerun only that unchanged test on NVIDIA; retain both logs."
+    }
+  },
+  "artifacts": [
+    {
+      "file": "m2-death-effects-debug-headless.log",
+      "sha256": "f524f4c52f7963146cf25112ce9d2adf7b3bce665cb8827970011e491069a1f8",
+      "raw_capture_sha256": "f91f83fd7caf43f62955c654a5d353bd8eceab2fabf80a5085cf49c285d45d48",
+      "bytes": 11519
+    },
+    {
+      "file": "m2-death-effects-release-headless.log",
+      "sha256": "b6124007c05147f80be868468d20c59567e46ae9bba2dd2311ea5849e8bcdf10",
+      "raw_capture_sha256": "0b1019e602235bdf2b31788ad5543b3fdb8920c49f3970015e7a5722296659f5",
+      "bytes": 11521
+    },
+    {
+      "file": "m2-death-effects-sanitize-headless.log",
+      "sha256": "c31772c2f323142d9687d0541552ae4c31ac6ab0c189f7281edda7228daca87a",
+      "raw_capture_sha256": "d1b47233456f2704a0468ba29104693fda116735d46df2327936fa9f0abfd4d7",
+      "bytes": 11522
+    },
+    {
+      "file": "m2-death-effects-debug-gpu.log",
+      "sha256": "279298907485b589ac17f7b16f83573116d17dcec449b9ab3e0e24719541253d",
+      "raw_capture_sha256": "d4406f9c74e6ce0b51c7d9359fbcc11bbe3043d6072eccd8427ba0392be44205",
+      "bytes": 13901
+    },
+    {
+      "file": "m2-death-effects-debug-gpu-character-recheck.log",
+      "sha256": "8d37033f1497bedbae2bb7d9528d8f8bb89c8f1dee0d6ce8190c8bb7966de6b4",
+      "raw_capture_sha256": "c31b26b73c4333f0aeb6fc44ed3bc7cd8a2a7c78088d2cd9efb6dd001371aa5b",
+      "bytes": 4785
+    },
+    {
+      "file": "m2-death-effects-release-gpu.log",
+      "sha256": "6adaa63420613a6213a722f1ff62c19404a6e422b9e361553e818c9a70706ee9",
+      "raw_capture_sha256": "cb4b0ccd36116e46691586478399cf90ccf6ec59a5969ea9dc9967a624f38eb5",
+      "bytes": 13862
+    },
+    {
+      "file": "m2-death-effects-debug-build.log",
+      "sha256": "76237208818635149fe178889a172dabb37dbf3d9efa40e6ffa875d53f3f3fa4",
+      "raw_capture_sha256": "7f50a9267319bbd34dcea833e986be6ac22bb36804bea9401a38d0b235515d33",
+      "bytes": 1085
+    },
+    {
+      "file": "m2-death-effects-release-build.log",
+      "sha256": "7afd01f4fb0e7d600271324ff5c7c3969fa9e530cab585b607ae4d70f3fd5bd4",
+      "raw_capture_sha256": "a695a7d1d974be9aac0da0b1f03e5156ce35279bf499a010785b182af04994d5",
+      "bytes": 1085
+    },
+    {
+      "file": "m2-death-effects-sanitize-build.log",
+      "sha256": "53c8ee65a57a5a2838e277a7034b85760b8d97127238f8305969bb5f1b5fd2f3",
+      "raw_capture_sha256": "9b112071a7d01fe7539bcceacc41e5f7028931c67b50192f663df5bef2cd948c",
+      "bytes": 927
+    },
+    {
+      "file": "m2-death-effects-private.log",
+      "sha256": "71b5d6cbb2093a219cb7b4761e9021c84f2684c3ffcf06b27632b705cb15b731",
+      "raw_capture_sha256": "71b5d6cbb2093a219cb7b4761e9021c84f2684c3ffcf06b27632b705cb15b731",
+      "bytes": 322
+    },
+    {
+      "file": "m2-death-effects-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-death-effects-links.log",
+      "sha256": "b0dcfe0e8f9663b8f9d50d2525790ad4d5429be04bb9df28d5d06e159dd92c4d"
+    }
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "gpu": {
+    "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+    "backend": "Vulkan",
+    "cycles_per_configuration": 2,
+    "pixels_per_cycle": {
+      "flame": 1991,
+      "smoke": 1441,
+      "detached_head": 831,
+      "flesh_fragments": 1329
+    },
+    "render_does_not_advance_clock": true,
+    "validation_errors": 0
+  },
+  "captures": [
+    {
+      "local_path": "build/debug/tests/death-effect-gpu/flame-0.png",
+      "sha256": "b215777c3adaf7997e85b911f7005d14edb56a629cede1bbb9cd505263297858",
+      "review": "External flame/flesh texture visible against the empty diagnostic background; no missing-material color. Capture stays local."
+    },
+    {
+      "local_path": "build/debug/tests/death-effect-gpu/flesh-0.png",
+      "sha256": "b814b3064722db7ff889863b3e9edf6ba0fda9acc3fa5c0245542ac2de86ea03",
+      "review": "External flame/flesh texture visible against the empty diagnostic background; no missing-material color. Capture stays local."
+    }
+  ],
+  "commands": [
+    "cmake --build build/<debug|release> --target corpse_tests death_effect_tests ai_hit_tests weapon_drop_tests character_nodes_tests object_particle_tests shield_tests flare_tests player_controls_tests ai_runtime_tests object_contract_tests blood2_app death_effect_gpu_tests level_change_gpu_tests -j3",
+    "cmake --build build/sanitize --target corpse_tests death_effect_tests ai_hit_tests weapon_drop_tests character_nodes_tests object_particle_tests shield_tests flare_tests player_controls_tests ai_runtime_tests object_contract_tests -j3",
+    "ctest --test-dir build/<debug|release> -R '^(objects|corpses|death_effects|ai_hit|weapon_drops|character_nodes|object_particles|shield|flare|player_controls|ai_runtime)\\.' --output-on-failure -j4",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^(objects|corpses|death_effects|ai_hit|weapon_drops|character_nodes|object_particles|shield|flare|player_controls|ai_runtime)\\.' --output-on-failure -j4",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(death_effects|character|lifecycle|mouse_combat|corpse_clearance|objectives|level_change)$' -V",
+    "build/release/tests/death_effect_tests <burn|gibs|limbs|damage|particles|lifetime> <external-data-root>"
+  ],
+  "development_findings": [
+    "Rejected invalid fragment owner initially dereferenced a null source name; validation now handles it.",
+    "Creation-frame zero elapsed time originally produced a zero-length collision ray; explicitly skip it without weakening the ray service.",
+    "Sustained retail alternate Flare fire exposed a detached limb starting inside train geometry. Reuse bounded nonsolid-body placement with a parent anchor before physics. Original flare.private passes without changes to that test.",
+    "Old corpse and weapon-drop tests expected unavailable fire/gib services; they now assert actual lethal behavior, source removal intent, gib publication and preserved drop ordering.",
+    "Final Debug character GPU smoke lost desktop window focus at frame 50, so its crouch/run assertions failed. The unchanged focused test was rerun independently; initial failure and rerun logs retained.",
+    "Source smoke STREAMING combines MOVINGSOURCE/MOVINGSTREAM; a stationary smoke source emits no particles. Explicit moving-source CPU/GPU probes verify its actual recipe."
+  ],
+  "limits": [
+    "Tests combine original external assets with diagnostic placements; this is not a complete retail playthrough.",
+    "Physics, bounded limb placement, client RNG and GPU rendering are replacement services, not verified retail parity.",
+    "Blood-spurt/splats/pools, generic recursive material gibs, save/restore and general client SFX eviction/fade remain unavailable.",
+    "No native macOS execution of this increment; existing shared Metal pipelines unchanged.",
+    "No dependency, shader, reference or commercial asset changes.",
+    "M2 remains incomplete."
+  ],
+  "implementation_patch_sha256": "e74d5669539f47a2e282e603357847c9b05b832f775202d49f15c7bc6e0aed50",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "063fa91e665d89f08cc7044a0efde738f17d8e8067a5e050c67d21aaf44e1f3a"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "9bfa2a8ac12985687a6125386a4958b58dedfaba0bd413aa12c3cdf64da7c29e"
+    },
+    {
+      "path": "README.md",
+      "sha256": "c9e6932e0f6d0a3adb4bfa4a2fb10df327d46e41e5074a1ce7483e0d816fa3b3"
+    },
+    {
+      "path": "docs/AI_HIT_CONTRACTS.md",
+      "sha256": "35fdf22224fe7e2caba3b808a62aeaf3bccab4a4b1eb7f5081212ec05bebb2da"
+    },
+    {
+      "path": "docs/CHARACTER_NODE_CONTRACTS.md",
+      "sha256": "c830de79c441ea64971d027ca5503a18893607fd64485f78030c747e1af52b18"
+    },
+    {
+      "path": "docs/CORPSE_CONTRACTS.md",
+      "sha256": "d3daf5414564d481c7e8a7fdf7024081b932b5708bfe6b2ccdd042feb764b5fa"
+    },
+    {
+      "path": "docs/DEATH_EFFECT_CONTRACTS.md",
+      "sha256": "0f93b863e7b4f541f3d998903557cbcd9dfc92d4a391dff0e252f81d22797885"
+    },
+    {
+      "path": "docs/M2_DEATH_EFFECTS_SOURCES.json",
+      "sha256": "be58e2851d51497d564393b2cace6d1b984e4b79f0073fe519459db1d3780e77"
+    },
+    {
+      "path": "docs/OBJECT_PARTICLE_CONTRACTS.md",
+      "sha256": "d96fcad4bd5daa89f80720163b432628abc58ed7d73a2521784d1344f56bcd22"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "4b43ed1e74d29ea3188c5e04226760ab6fc385daecced4bc950bf34f8599ceda"
+    },
+    {
+      "path": "docs/WEAPON_DROP_CONTRACTS.md",
+      "sha256": "2292300add84115efd85bccd1de18ab36eb58eb5418cbe31131641775182690c"
+    },
+    {
+      "path": "src/app/inspector_skeleton.cpp",
+      "sha256": "b673bff8a947e387e59dc701d123aec6bf84f7a1bcb912b3956f3ae7e53f540d"
+    },
+    {
+      "path": "src/app/model_scene.cpp",
+      "sha256": "0cb8889fd9f7a7242057a1fb34c60d50af6a825c2dd4b5b9280c11fae1f2c184"
+    },
+    {
+      "path": "src/game/flesh_gibs.cpp",
+      "sha256": "725b11466abc7c851cdad20d511ebf30c5ce3ac90856e212f763f4b2f8c0e133"
+    },
+    {
+      "path": "src/game/flesh_gibs.h",
+      "sha256": "b39093051c01e92833c4d337bec9e43cce2b01b079fdffa3962b8c9844566369"
+    },
+    {
+      "path": "src/game/legacy/server_de.h",
+      "sha256": "a1fc7271adc5ac300c39ba57bacdb234cd7a1a5bad6d8aa9729c683857f02e88"
+    },
+    {
+      "path": "src/game/object_particles.cpp",
+      "sha256": "e82393a5a9efcf0566abc0c25a78e87bc272264a961de12b2b5f87edd697b21e"
+    },
+    {
+      "path": "src/game/original/AIDeath.cpp",
+      "sha256": "5ab54050371f99719bb19b36021d16b2da8aca4ad9092f81b83b6c4826836709"
+    },
+    {
+      "path": "src/game/original/AIHitReaction.cpp",
+      "sha256": "747baaa83c98a549dad7a493d7367e419008c34fa037dacea7bcb49f612e420e"
+    },
+    {
+      "path": "src/game/original/AIPerception.cpp",
+      "sha256": "310ebc99da03787ecc9a4bb3bfe64231fd24e1ecc4a7f85d926227be85b1adfe"
+    },
+    {
+      "path": "src/game/original/AI_Mgr.h",
+      "sha256": "7d1cf84fc8d574434d3e407607da52944af25aea0dbb8d7391a1b02d8a6c88dc"
+    },
+    {
+      "path": "src/game/original/Corpse.cpp",
+      "sha256": "cfe8a916cc52ce3267663e4e01083538b3c387fafb8996cf538ed57a22044765"
+    },
+    {
+      "path": "src/game/original/Corpse.h",
+      "sha256": "83ff7ab4cf3427678102db3d410d72635dd289ed0042a1c01d1cdec7ebe621af"
+    },
+    {
+      "path": "src/game/original/Gib.cpp",
+      "sha256": "03ce77461d5108484b873b19ce1ef6b897635960ae50d8d49c2ffa20ab29db06"
+    },
+    {
+      "path": "src/game/original/Gib.h",
+      "sha256": "9679b07592cf7c7cd56e048a9fc46e8ebecbe30dc07753ba3e673ce9c3f4696a"
+    },
+    {
+      "path": "src/game/original/ObjectParticleFX.cpp",
+      "sha256": "fc03c3570b328313edb6762f9da8089028bb1756f75063cebea3ed78f32b5d31"
+    },
+    {
+      "path": "src/game/registration.cpp",
+      "sha256": "d5bf6889652905fb6d367325a15d12c42d50985b0cd00e09bf5369a000ff651f"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "7108f31fb5c92b9eef26560bf6a329f18807ab3fd123381dc5fe6ad009a3225d"
+    },
+    {
+      "path": "src/game/server_audio.cpp",
+      "sha256": "089d89c9b7acd512bf7a170ab9c8ce4f374ef539977d6a5951ae824001b1b31d"
+    },
+    {
+      "path": "src/game/server_effects.cpp",
+      "sha256": "d00765498ea1a0094a8b79cd456b985cd6180120aebce3eca3f254e8d586f387"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "3cfdac48f1a6184ac87407bf6c663e4e00396f489f35f9f4a28f2a73a50bb357"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "c264f3b9e01c79c57d046d9f36d1e563dfbb014d1d3d543222c7fec97018722c"
+    },
+    {
+      "path": "tests/corpse_tests.cpp",
+      "sha256": "aad30836b978e508b319b505d20f157fb07eaa9ffa6757edc6005764fc5d32b5"
+    },
+    {
+      "path": "tests/death_effect_gpu_tests.cpp",
+      "sha256": "9c16a58c1faf70a6397403f5e43b733ec94c7935d7082609abdfd8792d4b969e"
+    },
+    {
+      "path": "tests/death_effect_tests.cpp",
+      "sha256": "638361861fcda2ce418c6c43ea74e96c5dcd0d6bd33ca5eb84d5876fd6a43b84"
+    },
+    {
+      "path": "tests/weapon_drop_tests.cpp",
+      "sha256": "135657726fbbb1c9d616f9fa7900c4b1173e810e77037ad38c7a41ec18d57c8a"
+    }
+  ],
+  "formatting": "clang-format --dry-run --Werror passed for all changed/new C++ headers and sources",
+  "implementation_commit": "10e24b394a296446e3235948a2875da3ffedf59f",
+  "transcript_normalization": "Local workspace/data roots replaced with placeholders; trailing whitespace stripped. Raw capture hashes are retained."
+}

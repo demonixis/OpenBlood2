@@ -1,0 +1,1785 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 1509339..e0332f9 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -156,3 +156,12 @@ not rendered. General sound emitters/music and complete M2 acceptance remain ope
+ SubwayA now has 164 created source entries, 7 SelfTriggers, 372 editor-only and
+ 44 unported (171/174 runtime before/after player, 162/165 after consuming nine Keys).
+ Earlier CinematicTrigger/audio omissions are superseded only for this subset.
++
++The latest [random sound evidence](../Documentation/Implementation/M2_RANDOM_SOUNDS.md) connects original RandomSoundFX and typed fixed-position ambient/spatial voices.
++Read [random sound contracts](docs/RANDOM_SOUND_CONTRACTS.md). Preserve case-sensitive prefix commands,
++OFF voice tails, first-empty list termination, interval-based replacement, sequence
++progression after failed starts, and one release per message read. Ambient attenuates
++without panning; sampled voices do not follow later emitter motion. Built-in Sound
++loops/streaming and other audio callers remain missing. SubwayA now has 166 created
++source entries, 7 SelfTriggers, 372 editor-only and 42 unported (173/176 runtime
++before/after player, 164/167 after consuming nine Keys). M2 remains incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 38064be..a85488b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,7 +32,7 @@ add_library(blood2_game STATIC
+     src/game/session.cpp
+     src/game/registration.cpp
+     src/game/server_adapter.cpp)
+-target_sources(blood2_game PRIVATE src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp)
++target_sources(blood2_game PRIVATE src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/LightFX.cpp src/game/original/ClientLightFX.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+@@ -48,13 +48,13 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp)
++add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+ target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+ if(BLOOD2_INSPECTOR)
+-    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_cinematics.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
++    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_cinematics.cpp src/app/inspector_random_sounds.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
+     target_link_libraries(blood2_app PRIVATE imgui)
+ endif()
+ 
+diff --git a/README.md b/README.md
+index ea7c6c7..0b29820 100644
+--- a/README.md
++++ b/README.md
+@@ -26,7 +26,7 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
+ ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
+ ```
+ 
+-The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **164 source entries** create, including four original CinematicTriggers, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **44 unported runtime entries**, zero failed. Runtime counts before/after player entry are **171/174**, then **162/165** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_CINEMATICS.md) records these counts; earlier increment sections below are historical snapshots.
++The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **166 source entries** create, including two original RandomSoundFX emitters, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **42 unported runtime entries**, zero failed. Runtime counts before/after player entry are **173/176**, then **164/167** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_RANDOM_SOUNDS.md) records these counts; earlier increment sections below are historical snapshots.
+ 
+ The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
+ 
+@@ -174,5 +174,21 @@ to actual WAV sample duration, dry local/attached mixing and SDL playback. The
+ Cinematics tab inspects inactive controllers, all cues, voices, PCM and failures.
+ Interactive runs open the default audio device; output failure is visible and
+ leaves offline timing. Headless tests avoid output; the device/GPU checks use SDL's
+-dummy driver. Reverb, general Sound/RandomSoundFX emitters, other audio callers and
++dummy driver. Reverb, built-in Sound loops/streaming, other audio callers and
+ music remain unavailable. This is not complete cinematic rendering or M2 acceptance.
++
++## Original random sound emitters
++
++RandomSoundFX now preserves original interval-based random/sequential playback,
++fixed X/Z placement and ON/OFF/TOGGLE behavior through typed owned voices. Ambient
++attenuates with distance without panning; positional audio uses the existing dry
++spatial mixer. OFF lets the current voice finish. The Random sounds tab exposes
++hidden/inactive emitters, duplicate-name object IDs, ignored slots, missing resources,
++schedules, decoded voice state and output diagnostics. Built-in Sound loops,
++streaming, priority arbitration, reverb/Doppler and complete M2 gameplay remain pending.
++See [contracts](docs/RANDOM_SOUND_CONTRACTS.md) and [source ledger](docs/M2_RANDOM_SOUND_SOURCES.json).
++
++```sh
++ctest --test-dir build/debug -R 'randomsound' --output-on-failure
++SDL_AUDIODRIVER=dummy ./build/debug/blood2 --random-sounds-smoke --capture build/random-sounds.png
++```
+diff --git a/docs/CINEMATIC_CONTRACTS.md b/docs/CINEMATIC_CONTRACTS.md
+index 3b4f1c8..2901e85 100644
+--- a/docs/CINEMATIC_CONTRACTS.md
++++ b/docs/CINEMATIC_CONTRACTS.md
+@@ -1,6 +1,9 @@
+ # Original cinematic cues and bounded audio
+ 
+-M2 remains incomplete. Read [camera](CAMERA_CONTRACTS.md), [trigger](TRIGGER_CONTRACTS.md)
++M2 remains incomplete. The later [random sound contracts](RANDOM_SOUND_CONTRACTS.md)
++extend audio with original RandomSoundFX, fixed-position voices and ambient distance-only
++output. Earlier general-emitter omissions below are historical for this bounded subset.
++ Read [camera](CAMERA_CONTRACTS.md), [trigger](TRIGGER_CONTRACTS.md)
+ and [object](OBJECT_CONTRACTS.md) contracts with the [source ledger](M2_CINEMATIC_SOURCES.json)
+ and [implementation evidence](../../Documentation/Implementation/M2_CINEMATICS.md).
+ 
+diff --git a/docs/M2_RANDOM_SOUND_SOURCES.json b/docs/M2_RANDOM_SOUND_SOURCES.json
+new file mode 100644
+index 0000000..5cb07ae
+--- /dev/null
++++ b/docs/M2_RANDOM_SOUND_SOURCES.json
+@@ -0,0 +1,67 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "84fac9b1a94b59d717be1319e1a4539876b46e41",
++  "status": "M2 incomplete; original RandomSoundFX with typed owned fixed-position audio",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/RandomSoundFX.cpp",
++      "source_line_ranges": [
++        [
++          20,
++          440
++        ]
++      ],
++      "source_sha256": "c5e6fd0000ea3f059c141bf46b8c0a8680cbbc11ff65627942c3277e2e0d4979",
++      "purpose": "Selected constructor/destructor, properties, callbacks, trigger prefixes, random/sequential choice, fixed placement and interval scheduling; save/load/precache excluded."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/RandomSoundFX.h",
++      "source_line_ranges": [
++        [
++          1,
++          71
++        ]
++      ],
++      "source_sha256": "b41cce07697e6f3de80096a6c19d54e13aec0bc7c45907ebdd5747ed4a8fe274",
++      "purpose": "Original state, ten-slot list and owned voice lifetime."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/basedefs_de.h",
++      "source_line_ranges": [
++        [
++          524,
++          620
++        ]
++      ],
++      "source_sha256": "10f543764aa94339f2e48edcba384dda3cdce2d738f0be2731dcff3a1117fb72",
++      "purpose": "Original mutually exclusive local/ambient/3D semantics, position and handle lifetime documentation."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/engineobjects.c",
++      "source_line_ranges": [
++        [
++          307,
++          431
++        ]
++      ],
++      "source_sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
++      "purpose": "Read-only next-step reference: built-in Sound loops outlive immediate source removal; not imported in this increment."
++    }
++  ],
++  "ports": [
++    "src/game/original/RandomSoundFX.h",
++    "src/game/original/RandomSoundFX.cpp"
++  ],
++  "adaptations": [
++    "Value-owned file strings and checked monotonic SoundId replace legacy handles",
++    "Release trigger message once instead of original double FreeString",
++    "Bound and validate ranges; reject restore, retain zero-delay disabling",
++    "Typed ambient/spatial mode and fixed-position ownership reuse bounded WAV/SDL audio",
++    "Portable seeded integer/float RNG is not retail-bit-identical"
++  ],
++  "unsupported": [
++    "Built-in Sound loops and streaming/world-owned voices",
++    "Priority arbitration, reverb, Doppler, occlusion, music and other game audio callers",
++    "Save/restore and complete M2 acceptance"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 980c922..38814e0 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -373,3 +373,14 @@ contracts](CINEMATIC_CONTRACTS.md) separate original timing/messages from owned
+ strings, checked IDs, a source list-leak fix, malformed-data validation and new
+ bounded SDL decoding/dry mixing/output. No prototype audio backend or dependency
+ was imported. Missing audio remains failure; reverb is explicitly unavailable.
++
++## M2 original RandomSoundFX
++
++[Source selections](M2_RANDOM_SOUND_SOURCES.json) record exact original files/ranges
++and hashes; [contracts](RANDOM_SOUND_CONTRACTS.md) describe the adaptation boundary.
++Original commands, properties, random/sequential scheduling, fixed X/Z placement,
++voice replacement and destructor lifetime are ported directly. The duplicate
++FreeString is fixed with one owned read release; invalid ranges/restore reject.
++Typed fixed-position playback and ambient distance-only mixing are new engine
++services. The portable RNG is not the retail sequence. Built-in Sound loops, priority
++arbitration, reverb/Doppler, save/restore and the actual M2 gate remain open.
+diff --git a/docs/RANDOM_SOUND_CONTRACTS.md b/docs/RANDOM_SOUND_CONTRACTS.md
+new file mode 100644
+index 0000000..7ca2cd4
+--- /dev/null
++++ b/docs/RANDOM_SOUND_CONTRACTS.md
+@@ -0,0 +1,89 @@
++# Original random sound emitters
++
++M2 remains incomplete. Read [cinematic audio](CINEMATIC_CONTRACTS.md),
++[object lifetime](OBJECT_CONTRACTS.md), the [source ledger](M2_RANDOM_SOUND_SOURCES.json)
++and [implementation evidence](../../Documentation/Implementation/M2_RANDOM_SOUNDS.md).
++
++## Original rules
++
++`RandomSoundFX` selectively ports the original constructor, destructor, property
++reading, initial/update and trigger callbacks. The B2BaseClass callback chain and
++filters remain intact. World/string defaults select positional sound, whereas the
++original runtime constructor selects ambient sound. InitiallyOn schedules a random
++MinWaitTime..MaxWaitTime interval. Zero disables the schedule, including an on
++controller with zero wait; it is not replaced with a minimum interval.
++
++The playable list stops at its first empty SoundFile1..10 property. Later authored
++slots remain inspectable but are ignored by the source rule. Volume casts to the
++original unsigned byte before clamping to 100. The registered Ambient property is
++unused in the original; PositionalSound alone selects spatial versus ambient output.
++Position randomness independently offsets X and Z in +/-PosRangeRadius, a square
++rather than a circular distribution; Y is unchanged. Playback stays at that sampled
++position even if the emitter subsequently moves.
++
++Each update first kills the previous voice, including one still playing. Random
++mode chooses an inclusive integer index; sequential mode increments and either
++wraps or turns off after its last slot. A failed sound still advances the sequence
++and schedules the next interval. Delay is independent of clip duration. An empty
++list removes the controller on its first update, rather than rejecting creation.
++The ten-slot sequence is separate from audio looping; it does not loop a WAV.
++
++Trigger comparisons are case-sensitive prefixes: TOGGLE, ON and OFF. Every trigger,
++including unknown text, resets the sequential index when on and sets the next update
++to 0.1 seconds when on, or disables it when off. OFF does **not** kill the playing
++voice. Its completed handle remains owned until replacement or destruction. The
++source's duplicate FreeString is corrected: each owned message read releases once.
++Resource strings use values, and voice IDs use the existing checked monotonic type.
++
++Invalid/nonfinite/negative ranges, reversed waits, radius <= 0 or values above
++1,000,000 reject precreate; restore creation also rejects. These are explicit bounded
++adaptations. Save/load and original cache callbacks remain unavailable. `RandomInt`
++uses the existing session-seeded generator with an inclusive uniform distribution;
++resetting the world restores its seed. It does not claim the retail random sequence
++or cross-standard-library bit identity. Sharing the generator with light phase
++selection means additional original random calls can change later phases.
++
++## Typed fixed-position audio
++
++`SoundSpace` makes Local, Ambient and Spatial mutually exclusive. The existing
++cinematic local/attached behavior remains covered by its regression tests.
++`PlaySoundAt` requires a live owner, mounted resources, an ambient/spatial request
++without a speaker attachment, a finite bounded position and valid audio parameters.
++It performs real bounded resource decoding and returns no voice on failure. Ambient
++uses distance attenuation without orientation/panning; spatial adds the existing
++replacement constant-power panning. These are dry mixer policies, not recovered
++retail audio. Reverb intent is retained for positional requests but not rendered.
++Doppler, occlusion, priority arbitration and full legacy PlaySound flags are absent.
++The source low-priority intent is not an implemented allocation policy.
++
++Fixed voices do not use a speaker handle. Live owner validation, deferred destruction,
++explicit replacement and unload release their voices. The same 128-voice, decoded
++cache, WAV preflight, sample-count clock, bounded PCM output and SDL stream contracts
++apply. Completed voices remain queryable until their original owner releases them;
++no stale ID resolves after reload. Sampling and output are independent of ImGui.
++
++The built-in `Sound` class is still unsupported. Its source in
++`sources/blood2/AppHeaders/engineobjects.c` starts a loop, optionally requests streaming,
++and immediately removes its own object. That requires world-owned playback lifetime,
++not the object-owned fixed voices added here. Do not register it using a short-lived
++RandomSoundFX or claim its four SubwayA entries are implemented.
++
++## Inspection and verification
++
++The Random sounds tab includes hidden/inactive/pending emitters, distinct object IDs
++for duplicate authored names, schedules, random/sequential state, commands, attempted
++and failed starts, all ten authored slots (including ignored gaps), resource presence,
++actual decoded voice format/cursor/duration, fixed position, gains and output errors.
++ON/OFF/TOGGLE are queued checked original messages. Presence and attempt counters
++are not successful decoding or audible playback evidence. World retains unported
++classes and rejected entries. The inspector does not supply game rules.
++
++Tests cover constructor/world defaults, byte wrapping, first gaps, zero intervals,
++prefix/case handling and OFF tails, sequential replacement/wrap/stop, seeded random
++bounds, ambient orientation independence, fixed versus attached positions, failed
++starts, pending-owner removal, stale IDs and unload. Private tests inspect 57 readable
++worlds and exercise both actual SubwayA emitters across two full shell/player reloads.
++The GPU test starts an authored emitter through ON and verifies PCM submission to
++SDL's dummy driver while inspection is hidden and after unload/reload, including
++an inspector-free build. This does not validate audible hardware quality, retail
++executable parity, other platforms, world rendering or the complete M2 gate.
+diff --git a/src/app/cinematic_smoke.cpp b/src/app/cinematic_smoke.cpp
+index 62dc765..7412c2e 100644
+--- a/src/app/cinematic_smoke.cpp
++++ b/src/app/cinematic_smoke.cpp
+@@ -25,7 +25,7 @@ namespace OpenBlood2
+         const auto* c = r ? dynamic_cast<const CinematicTrigger*>(r->game.get()) : nullptr;
+         const auto* v = c ? g.server.audio.get(c->sound) : nullptr;
+         return c && c->starts == 1 && !c->failures && c->current == 0 && v && !v->done && v->cursor > 0 &&
+-               v->request.local && v->clip->duration() > .2 && g.server.audio.has_output() &&
++               v->request.space == SoundSpace::Local && v->clip->duration() > .2 && g.server.audio.has_output() &&
+                g.server.audio.submitted_frames > 0 && g.server.audio.output_error.empty();
+     }
+ } // namespace OpenBlood2
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index a2ef9bd..a8ec6c7 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -78,6 +78,22 @@ namespace OpenBlood2
+ 
+     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
+     {
++        if (random_sound_request)
++        {
++            if (const auto* r = game.objects.get(random_sound_request);
++                r && r->life == Life::Alive && r->type->name == "RandomSoundFX")
++            {
++                auto text = game.server.CreateString(random_sound_command.c_str());
++                auto message = game.server.StartMessageToObject(nullptr, r->handle, 1000);
++                if (message)
++                {
++                    game.server.WriteToMessageHString(message, text);
++                    game.server.EndMessage(message);
++                }
++                game.server.FreeString(text);
++            }
++            random_sound_request = {};
++        }
+         if (cinematic_request)
+         {
+             if (const auto* r = game.objects.get(cinematic_request);
+@@ -569,6 +585,13 @@ namespace OpenBlood2
+                     draw_lights(game, selection);
+                     ImGui::EndTabItem();
+                 }
++                if (ImGui::BeginTabItem("Random sounds", nullptr,
++                                        select_random_sounds ? ImGuiTabItemFlags_SetSelected : 0))
++                {
++                    select_random_sounds = false;
++                    draw_random_sounds(game, selection);
++                    ImGui::EndTabItem();
++                }
+                 if (ImGui::BeginTabItem("Cinematics", nullptr, select_cinematics ? ImGuiTabItemFlags_SetSelected : 0))
+                 {
+                     select_cinematics = false;
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 3e5f924..8362f69 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -21,6 +21,10 @@ namespace OpenBlood2
+         ObjectId trigger_selection{}, trigger_request{};
+         std::string trigger_command;
+         bool grant_key_request = false;
++        bool select_random_sounds = false;
++        ObjectId random_sound_selection{}, random_sound_request{};
++        std::string random_sound_command;
++        void draw_random_sounds(GameSession&, ObjectSelection&);
+         bool select_cinematics = false;
+         ObjectId cinematic_selection{}, cinematic_request{};
+         void draw_cinematics(GameSession&, ObjectSelection&);
+diff --git a/src/app/inspector_cinematics.cpp b/src/app/inspector_cinematics.cpp
+index f7d6be0..9fbcace 100644
+--- a/src/app/inspector_cinematics.cpp
++++ b/src/app/inspector_cinematics.cpp
+@@ -52,8 +52,8 @@ namespace OpenBlood2
+         if (const auto* v = audio.get(c->sound))
+         {
+             ImGui::Separator();
+-            ImGui::Text("Voice %llu | %s | %s", (unsigned long long)v->id, v->request.local ? "local" : "attached 3D",
+-                        v->done ? "done" : "playing");
++            ImGui::Text("Voice %llu | %s | %s", (unsigned long long)v->id,
++                        v->request.space == SoundSpace::Local ? "local" : "attached 3D", v->done ? "done" : "playing");
+             ImGui::Text("WAV encoding %u | %u Hz / %u channels | %.3f / %.3f s", v->clip->encoding, v->clip->rate,
+                         v->clip->channels, v->cursor / v->clip->rate, v->clip->duration());
+             ImGui::Text("Gains L/R %.3f / %.3f | radii %.0f / %.0f | speaker lost %s", v->left, v->right,
+diff --git a/src/app/inspector_random_sounds.cpp b/src/app/inspector_random_sounds.cpp
+new file mode 100644
+index 0000000..c7b448c
+--- /dev/null
++++ b/src/app/inspector_random_sounds.cpp
+@@ -0,0 +1,83 @@
++#include "game/original/RandomSoundFX.h"
++#include "inspector.h"
++#include <imgui.h>
++namespace OpenBlood2
++{
++    void Inspector::draw_random_sounds(GameSession& game, ObjectSelection& selection)
++    {
++        auto& audio = game.server.audio;
++        ImGui::TextWrapped(
++            "Original RandomSoundFX: intervals replace the previous voice. OFF cancels the next start, "
++            "but lets the current sound finish. Ambient uses distance without panning; positional audio is dry 3D.");
++        ImGui::Text("Output %s | voices %zu | cached %.2f MiB | submitted %llu frames",
++                    audio.has_output() ? "SDL stream" : "offline clock", audio.voices().size(),
++                    audio.cached_bytes() / 1048576.0, (unsigned long long)audio.submitted_frames);
++        if (!audio.output_error.empty())
++            ImGui::TextWrapped("Output failure: %s", audio.output_error.c_str());
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* r = game.objects.get(id);
++            if (!dynamic_cast<const RandomSoundFX*>(r->game.get()))
++                continue;
++            if (!game.objects.get(random_sound_selection))
++                random_sound_selection = id;
++            auto label = std::string(r->state.m_Name) + " [object " + std::to_string(id.slot) + "]";
++            if (ImGui::Selectable(label.c_str(), random_sound_selection == id))
++                random_sound_selection = selection.id = id;
++        }
++        const auto* r = game.objects.get(random_sound_selection);
++        const auto* c = r ? dynamic_cast<const RandomSoundFX*>(r->game.get()) : nullptr;
++        if (!c)
++            return;
++        ImGui::Separator();
++        ImGui::Text("%s | %s | on %s | scheduled %s (%.3f s)", r->state.m_Name,
++                    r->life == Life::Alive ? "alive" : "pending removal", c->on ? "yes" : "no",
++                    r->scheduled ? "yes" : "no", r->scheduled ? r->due - game.objects.time() : 0);
++        if (r->life == Life::Alive)
++            for (const char* command : {"ON", "OFF", "TOGGLE"})
++            {
++                if (ImGui::Button(command))
++                {
++                    random_sound_request = r->id;
++                    random_sound_command = command;
++                }
++                ImGui::SameLine();
++            }
++        ImGui::NewLine();
++        ImGui::Text("%s | loop sequence %s | playable %u | sequence index %u | last slot %s",
++                    c->sequential ? "sequential" : "random", c->loop_sequence ? "yes" : "no", c->count, c->current + 1,
++                    c->attempts ? std::to_string(c->last_choice + 1).c_str() : "none");
++        ImGui::Text("Wait %.3f .. %.3f s | X/Z range +/-%.1f | outer radius %.1f | volume %u%%", c->min_wait,
++                    c->max_wait, c->position_radius, c->sound_radius, unsigned(c->volume));
++        ImGui::Text("Commands %llu | attempted starts %llu | failed starts %llu", (unsigned long long)c->commands,
++                    (unsigned long long)c->attempts, (unsigned long long)c->failures);
++        if (!c->error.empty())
++            ImGui::TextWrapped("Start failure: %s", c->error.c_str());
++        if (const auto* v = audio.get(c->sound))
++        {
++            ImGui::Text("Voice %llu | %s | %s | %.3f / %.3f s", (unsigned long long)v->id,
++                        v->request.space == SoundSpace::Ambient ? "ambient" : "spatial",
++                        v->done ? "finished" : "playing", v->cursor / v->clip->rate, v->clip->duration());
++            ImGui::Text("Fixed position %.1f %.1f %.1f | gains L/R %.3f / %.3f", v->position.x, v->position.y,
++                        v->position.z, v->left, v->right);
++            ImGui::Text("WAV encoding %u | %u Hz / %u channels | reverb requested %s (unavailable)", v->clip->encoding,
++                        v->clip->rate, v->clip->channels, v->request.reverb_requested ? "yes" : "no");
++        }
++        for (unsigned i = 0; i < c->sounds.size(); ++i)
++        {
++            std::string authored;
++            for (const auto& [key, value] : r->properties)
++                if (same_name(key, "SoundFile" + std::to_string(i + 1)))
++                    if (const auto* s = std::get_if<std::string>(&value))
++                        authored = *s;
++            ImGui::TextWrapped("%u: %s [%s; %s]", i + 1, authored.empty() ? "empty" : authored.c_str(),
++                               i < c->count ? "playable slot" : "after first gap / ignored",
++                               authored.empty()                ? "no resource"
++                               : game.resources.find(authored) ? "archive present"
++                                                               : "MISSING");
++        }
++        ImGui::TextWrapped("Hidden/inactive emitters are included. Archive presence is separate from decoding. "
++                           "The original unused Ambient property remains visible in World. Sound loops, other callers, "
++                           "reverb, Doppler and complete M2 gameplay remain unavailable.");
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index d2d17bc..69e55ab 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -13,6 +13,7 @@
+ #include "light_smoke.h"
+ #include "objectives_smoke.h"
+ #include "pickup_smoke.h"
++#include "random_sound_smoke.h"
+ #include "trigger_smoke.h"
+ 
+ #include <SDL3/SDL_main.h>
+@@ -71,11 +72,11 @@ namespace
+             spdlog::error("Original game boundary initialization failed");
+             return 4;
+         }
+-        if ((options.cinematics_smoke || (!options.gpu_smoke && !options.world_smoke)) &&
++        if ((options.cinematics_smoke || options.random_sounds_smoke || (!options.gpu_smoke && !options.world_smoke)) &&
+             !game.server.audio.open_output(error))
+         {
+             spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
+-            if (options.cinematics_smoke)
++            if (options.cinematics_smoke || options.random_sounds_smoke)
+                 return 4;
+         }
+         HOBJECT key = nullptr;
+@@ -183,6 +184,14 @@ namespace
+                 return 4;
+             selection.id = smoke_camera;
+         }
++        OpenBlood2::ObjectId smoke_random_sound{};
++        bool random_sound_hidden = false;
++        if (options.random_sounds_smoke)
++        {
++            if (!OpenBlood2::prepare_random_sound_smoke(game, smoke_random_sound))
++                return 4;
++            selection.id = smoke_random_sound;
++        }
+         OpenBlood2::ObjectId smoke_cinematic{};
+         bool cinematic_hidden = false;
+         if (options.cinematics_smoke)
+@@ -225,7 +234,8 @@ namespace
+         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
+                                    !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke &&
+                                    !options.pickups_smoke && !options.objectives_smoke && !options.cameras_smoke &&
+-                                   !options.keyframes_smoke && !options.lights_smoke && !options.cinematics_smoke;
++                                   !options.keyframes_smoke && !options.lights_smoke && !options.cinematics_smoke &&
++                                   !options.random_sounds_smoke;
+         inspector.select_weapons = options.weapons_smoke;
+         inspector.select_movement = options.movement_smoke;
+         inspector.select_containers = options.containers_smoke;
+@@ -233,6 +243,8 @@ namespace
+         inspector.select_pickups = options.pickups_smoke;
+         inspector.select_objectives = options.objectives_smoke;
+         inspector.select_cameras = options.cameras_smoke;
++        inspector.select_random_sounds = options.random_sounds_smoke;
++        inspector.random_sound_selection = smoke_random_sound;
+         inspector.select_cinematics = options.cinematics_smoke;
+         inspector.cinematic_selection = smoke_cinematic;
+         inspector.select_lights = options.lights_smoke;
+@@ -278,7 +290,7 @@ namespace
+         bool saw_walk = false, saw_run = false, saw_jump = false;
+         bool container_hidden = false;
+         float initial_air = 100;
+-        const bool extended_smoke = options.weapons_smoke || options.movement_smoke;
++        const bool extended_smoke = options.random_sounds_smoke || options.weapons_smoke || options.movement_smoke;
+         const unsigned hide_frame = extended_smoke ? 40 : 4, show_frame = extended_smoke ? 160 : 8;
+         const unsigned unload_frame = extended_smoke ? 210 : 16, reload_frame = extended_smoke ? 220 : 18,
+                        quit_frame = extended_smoke ? 240 : 24;
+@@ -350,6 +362,9 @@ namespace
+             if (options.brushes_smoke && frames == reload_frame + 1)
+                 if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
+                     return 4;
++            if (options.random_sounds_smoke && frames == reload_frame + 1 &&
++                !OpenBlood2::prepare_random_sound_smoke(game, smoke_random_sound))
++                return 4;
+             if (options.cinematics_smoke && frames == reload_frame + 1 &&
+                 !OpenBlood2::prepare_cinematic_smoke(game, smoke_cinematic))
+                 return 4;
+@@ -485,7 +500,7 @@ namespace
+                            : (options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
+                               options.interaction_smoke || options.brushes_smoke || options.pickups_smoke ||
+                               options.objectives_smoke || options.cameras_smoke || options.keyframes_smoke ||
+-                              options.lights_smoke || options.cinematics_smoke)
++                              options.lights_smoke || options.cinematics_smoke || options.random_sounds_smoke)
+                                ? 14u
+                                : 2u) &&
+                 !captured && !options.capture_file.empty();
+@@ -632,6 +647,8 @@ namespace
+                     use.key.down = frames == hide_frame;
+                     event_ok = SDL_PushEvent(&use);
+                 }
++                if (options.random_sounds_smoke && frames == show_frame - 1)
++                    random_sound_hidden = OpenBlood2::check_random_sound_smoke(game, smoke_random_sound);
+                 if (options.cinematics_smoke && frames == show_frame - 1)
+                     cinematic_hidden = OpenBlood2::check_cinematic_smoke(game, smoke_cinematic);
+                 if (options.lights_smoke && frames == show_frame - 1)
+@@ -765,6 +782,8 @@ namespace
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
++                (options.random_sounds_smoke &&
++                 (!random_sound_hidden || !OpenBlood2::check_random_sound_smoke(game, smoke_random_sound))) ||
+                 (options.cinematics_smoke &&
+                  (!cinematic_hidden || !OpenBlood2::check_cinematic_smoke(game, smoke_cinematic))) ||
+                 (options.lights_smoke && (!light_hidden || !OpenBlood2::check_light_smoke(game, smoke_light))) ||
+@@ -797,6 +816,9 @@ namespace
+             if (options.lights_smoke)
+                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
+                              "and after reload; evaluated radius/color checked; world illumination unavailable");
++            if (options.random_sounds_smoke)
++                spdlog::info("RANDOM SOUNDS smoke: authored emitter starts original ON, fixed-position decoded voice "
++                             "and SDL output verified with hidden UI and reload; dry output only");
+             if (options.cinematics_smoke)
+                 spdlog::info("CINEMATICS smoke: original cue and decoded samples submitted to SDL stream with hidden "
+                              "UI and reload; dry output only");
+@@ -886,6 +908,7 @@ int main(int argc, char** argv)
+                      "  --interaction-smoke GPU original USE and rotating door inspection\n"
+                      "  --pickups-smoke   GPU original ammo pickup, hidden collection and reload\n"
+                      "  --objectives-smoke GPU original objectives and localized text, hidden delivery/reload\n"
++                     "  --random-sounds-smoke  GPU original random sound, PCM output and reload\n"
+                      "  --cinematics-smoke  GPU original cue, WAV mixing, SDL output and reload\n"
+                      "  --lights-smoke      GPU original light state, keyframe placement and reload\n"
+                      "  --worldpaths-smoke  GPU original translating train path, collision and reload\n"
+diff --git a/src/app/random_sound_smoke.cpp b/src/app/random_sound_smoke.cpp
+new file mode 100644
+index 0000000..cace8ec
+--- /dev/null
++++ b/src/app/random_sound_smoke.cpp
+@@ -0,0 +1,30 @@
++#include "random_sound_smoke.h"
++#include "game/original/RandomSoundFX.h"
++namespace OpenBlood2
++{
++    bool prepare_random_sound_smoke(GameSession& g, ObjectId& selected)
++    {
++        for (auto id : g.objects.snapshot())
++        {
++            const auto* r = g.objects.get(id);
++            if (!dynamic_cast<const RandomSoundFX*>(r->game.get()))
++                continue;
++            selected = id;
++            auto text = g.server.CreateString("ON");
++            auto msg = g.server.StartMessageToObject(nullptr, r->handle, 1000);
++            bool ok = msg && g.server.WriteToMessageHString(msg, text) == DE_OK && g.server.EndMessage(msg) == DE_OK;
++            g.server.FreeString(text);
++            return ok;
++        }
++        return false;
++    }
++    bool check_random_sound_smoke(GameSession& g, ObjectId selected)
++    {
++        const auto* r = g.objects.get(selected);
++        const auto* c = r ? dynamic_cast<const RandomSoundFX*>(r->game.get()) : nullptr;
++        const auto* v = c ? g.server.audio.get(c->sound) : nullptr;
++        return c && c->attempts == 1 && !c->failures && v && v->cursor > 0 && !v->request.speaker &&
++               v->request.space != SoundSpace::Local && v->clip->duration() > 0 && g.server.audio.has_output() &&
++               g.server.audio.submitted_frames > 0 && g.server.audio.output_error.empty();
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/random_sound_smoke.h b/src/app/random_sound_smoke.h
+new file mode 100644
+index 0000000..925f1dc
+--- /dev/null
++++ b/src/app/random_sound_smoke.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool prepare_random_sound_smoke(GameSession&, ObjectId&);
++    bool check_random_sound_smoke(GameSession&, ObjectId);
++} // namespace OpenBlood2
+diff --git a/src/engine/audio.cpp b/src/engine/audio.cpp
+index 334d07a..02b85e6 100644
+--- a/src/engine/audio.cpp
++++ b/src/engine/audio.cpp
+@@ -200,7 +200,9 @@ namespace OpenBlood2
+             !physics_vector(position) || !std::isfinite(request.volume) || request.volume < 0 || request.volume > 1 ||
+             !std::isfinite(request.inner_radius) || !std::isfinite(request.outer_radius) || request.inner_radius < 0 ||
+             request.outer_radius <= request.inner_radius || request.outer_radius > 1e6f ||
+-            request.resource.size() > 100)
++            request.resource.size() > 100 ||
++            (request.space != SoundSpace::Local && request.space != SoundSpace::Ambient &&
++             request.space != SoundSpace::Spatial))
+         {
+             error = "Invalid or over-limit sound request";
+             return 0;
+@@ -249,18 +251,18 @@ namespace OpenBlood2
+             if (v.done)
+                 continue;
+             float gain = v.request.volume, pan = 0;
+-            if (!v.request.local)
++            if (v.request.space != SoundSpace::Local)
+             {
+                 const auto direction = vector_subtract(v.position, listener);
+                 const auto distance = std::sqrt(vector_dot(direction, direction));
+                 gain *=
+                     std::clamp((v.request.outer_radius - distance) / (v.request.outer_radius - v.request.inner_radius),
+                                0.0f, 1.0f);
+-                if (distance > 1e-6f)
++                if (v.request.space == SoundSpace::Spatial && distance > 1e-6f)
+                     pan = std::clamp(vector_dot(direction, right) / distance, -1.0f, 1.0f);
+             }
+-            v.left = gain * (v.request.local ? 1 : std::sqrt((1 - pan) * .5f));
+-            v.right = gain * (v.request.local ? 1 : std::sqrt((1 + pan) * .5f));
++            v.left = gain * (v.request.space != SoundSpace::Spatial ? 1 : std::sqrt((1 - pan) * .5f));
++            v.right = gain * (v.request.space != SoundSpace::Spatial ? 1 : std::sqrt((1 + pan) * .5f));
+             const auto& clip = *v.clip;
+             const double increment = double(clip.rate) / rate;
+             for (std::size_t frame = 0; frame < count; ++frame)
+diff --git a/src/engine/audio.h b/src/engine/audio.h
+index df83f01..5bc3f89 100644
+--- a/src/engine/audio.h
++++ b/src/engine/audio.h
+@@ -20,11 +20,17 @@ namespace OpenBlood2
+         }
+     };
+     bool read_wave(std::span<const std::uint8_t>, AudioClip&, std::string&);
++    enum class SoundSpace
++    {
++        Local,
++        Ambient,
++        Spatial
++    };
+     struct SoundRequest
+     {
+         std::string resource;
+         HOBJECT speaker = nullptr;
+-        bool local = false;
++        SoundSpace space = SoundSpace::Spatial;
+         float inner_radius = 250, outer_radius = 1000, volume = 1;
+         bool reverb_requested = true; // Original cinematic flag; dry output currently only.
+     };
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index c746921..9be2456 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -125,6 +125,8 @@ namespace OpenBlood2
+                 options.player_smoke = true;
+                 options.containers_smoke = true;
+             }
++            else if (arg == "--random-sounds-smoke")
++                options.world_smoke = options.player_smoke = options.random_sounds_smoke = true;
+             else if (arg == "--cinematics-smoke")
+                 options.world_smoke = options.player_smoke = options.cinematics_smoke = true;
+             else if (arg == "--lights-smoke")
+@@ -229,7 +231,7 @@ namespace OpenBlood2
+                 int(options.doors_smoke) + int(options.triggers_smoke) + int(options.interaction_smoke) +
+                 int(options.brushes_smoke) + int(options.pickups_smoke) + int(options.objectives_smoke) +
+                 int(options.cameras_smoke) + int(options.keyframes_smoke) + int(options.lights_smoke) +
+-                int(options.cinematics_smoke) >
++                int(options.cinematics_smoke) + int(options.random_sounds_smoke) >
+             1)
+         {
+             error = "Choose one player smoke scenario";
+diff --git a/src/engine/config.h b/src/engine/config.h
+index 1b49b67..f063f36 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -24,7 +24,7 @@ namespace OpenBlood2
+         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
+              interaction_smoke = false, brushes_smoke = false, pickups_smoke = false, objectives_smoke = false,
+              cameras_smoke = false, keyframes_smoke = false, worldpaths_smoke = false, lights_smoke = false,
+-             cinematics_smoke = false;
++             cinematics_smoke = false, random_sounds_smoke = false;
+         bool start_game = false;
+         bool explicit_config = false;
+         bool help = false;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 4031cd3..df000f6 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -33,6 +33,8 @@ class ServerDE : public CSBase
+ {
+   public:
+     virtual OpenBlood2::SoundId PlayCinematicSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
++    virtual OpenBlood2::SoundId PlaySoundAt(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
++    virtual bool RandomInt(int, int, int&) = 0;
+     virtual bool IsSoundDone(OpenBlood2::SoundId, bool&) = 0;
+     virtual bool KillSound(OpenBlood2::SoundId) = 0;
+ 
+diff --git a/src/game/original/CinematicTrigger.cpp b/src/game/original/CinematicTrigger.cpp
+index 6db744b..773a3bb 100644
+--- a/src/game/original/CinematicTrigger.cpp
++++ b/src/game/original/CinematicTrigger.cpp
+@@ -131,8 +131,8 @@ void CinematicTrigger::StartSound()
+         return;
+     SoundRequest request;
+     request.resource = cue.sound;
+-    request.local = same_name(cue.speaker, "player");
+-    request.speaker = request.local ? nullptr : PlayedBy(cue.speaker);
++    request.space = same_name(cue.speaker, "player") ? SoundSpace::Local : SoundSpace::Spatial;
++    request.speaker = request.space == SoundSpace::Local ? nullptr : PlayedBy(cue.speaker);
+     last_speaker = request.speaker;
+     sound = g_pServerDE->PlayCinematicSound(m_hObject, request, error);
+     ++starts;
+diff --git a/src/game/original/RandomSoundFX.cpp b/src/game/original/RandomSoundFX.cpp
+new file mode 100644
+index 0000000..7d8c9e0
+--- /dev/null
++++ b/src/game/original/RandomSoundFX.cpp
+@@ -0,0 +1,126 @@
++// Selected original ObjectDLL/RandomSoundFX.cpp. Save/load and precache remain unavailable.
++#include "RandomSoundFX.h"
++#include <algorithm>
++#include <cmath>
++using namespace OpenBlood2;
++RandomSoundFX::~RandomSoundFX()
++{
++    if (g_pServerDE && sound)
++        g_pServerDE->KillSound(sound);
++}
++bool RandomSoundFX::ReadProp()
++{
++    auto boolean = [&](const char* name, bool& out)
++    {
++        GenericProp p;
++        if (g_pServerDE->GetPropGeneric(name, &p) == DE_OK)
++            out = p.m_Bool != 0;
++    };
++    boolean("InitiallyOn", on);
++    boolean("PositionalSound", positional);
++    boolean("SequentialPlay", sequential);
++    boolean("LoopSequence", loop_sequence);
++    g_pServerDE->GetPropReal("PosRangeRadius", &position_radius);
++    g_pServerDE->GetPropReal("SoundRadius", &sound_radius);
++    g_pServerDE->GetPropReal("MinWaitTime", &min_wait);
++    g_pServerDE->GetPropReal("MaxWaitTime", &max_wait);
++    GenericProp prop;
++    if (g_pServerDE->GetPropGeneric("Volume", &prop) == DE_OK)
++        volume = std::min<DBYTE>(static_cast<DBYTE>(prop.m_Long), 100); // Source casts before clamping.
++    for (unsigned i = 0; i < sounds.size(); ++i)
++        if (g_pServerDE->GetPropGeneric(("SoundFile" + std::to_string(i + 1)).c_str(), &prop) == DE_OK)
++        {
++            if (!prop.m_String[0])
++                break; // First gap terminates the playable list; later authored slots remain in World properties.
++            sounds[i] = prop.m_String;
++            ++count;
++        }
++    // Explicit bounded adaptation: reject malformed ranges rather than scheduling undefined time/positions.
++    return std::isfinite(position_radius) && position_radius >= 0 && position_radius <= 1e6f &&
++           std::isfinite(sound_radius) && sound_radius > 0 && sound_radius <= 1e6f && std::isfinite(min_wait) &&
++           std::isfinite(max_wait) && min_wait >= 0 && min_wait <= max_wait && max_wait <= 1e6f;
++}
++void RandomSoundFX::ScheduleWait()
++{
++    float wait = 0;
++    if (g_pServerDE->RandomFloat(min_wait, max_wait, wait))
++        g_pServerDE->SetNextUpdate(m_hObject, wait); // Source zero disables, never an invented minimum delay.
++}
++DDWORD RandomSoundFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE)
++    {
++        if (!data || reason == 3)
++            return 0;
++        if ((reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP) && !ReadProp())
++            return 0;
++    }
++    else if (message == MID_INITIALUPDATE && on)
++        ScheduleWait();
++    else if (message == MID_UPDATE && !Update())
++        g_pServerDE->RemoveObject(m_hObject);
++    return B2BaseClass::EngineMessageFn(message, data, reason);
++}
++DDWORD RandomSoundFX::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    if (message == 1000)
++    {
++        ++commands;
++        auto text = g_pServerDE->ReadFromMessageHString(read);
++        const char* bytes = g_pServerDE->GetStringData(text);
++        const std::string_view command = bytes ? bytes : "";
++        if (command.starts_with("TOGGLE"))
++            on = !on;
++        else if (command.starts_with("ON"))
++            on = true;
++        else if (command.starts_with("OFF"))
++            on = false;
++        g_pServerDE->FreeString(text); // Original frees this handle twice; release our owned read once.
++        if (on && sequential)
++            current = 0;
++        g_pServerDE->SetNextUpdate(m_hObject, on ? .1f : 0.0f);
++        // OFF cancels scheduling, not the currently playing voice. Unknown payloads also rearm/reset if on.
++    }
++    return B2BaseClass::ObjectMessageFn(sender, message, read);
++}
++bool RandomSoundFX::Update()
++{
++    if (sound)
++    {
++        g_pServerDE->KillSound(sound);
++        sound = 0;
++    }
++    if (!count)
++        return false;
++    int choice = int(current);
++    if (!sequential && !g_pServerDE->RandomInt(0, int(count) - 1, choice))
++        return false;
++    last_choice = unsigned(choice);
++    g_pServerDE->GetObjectPos(m_hObject, &last_position);
++    float x = 0, z = 0;
++    if (!g_pServerDE->RandomFloat(-position_radius, position_radius, x) ||
++        !g_pServerDE->RandomFloat(-position_radius, position_radius, z))
++        return false;
++    last_position.x += x;
++    last_position.z += z;
++    SoundRequest request;
++    request.resource = sounds[last_choice];
++    request.space = positional ? SoundSpace::Spatial : SoundSpace::Ambient;
++    request.inner_radius = sound_radius * .5f;
++    request.outer_radius = sound_radius;
++    request.volume = volume / 100.0f;
++    request.reverb_requested = positional;
++    ++attempts;
++    sound = g_pServerDE->PlaySoundAt(m_hObject, request, last_position, error);
++    if (!sound)
++        ++failures;
++    if (sequential && ++current == count)
++    {
++        current = 0;
++        if (!loop_sequence)
++            on = false;
++    }
++    if (on)
++        ScheduleWait(); // Delays are independent of the previous clip's duration, including failed starts.
++    return true;
++}
+diff --git a/src/game/original/RandomSoundFX.h b/src/game/original/RandomSoundFX.h
+new file mode 100644
+index 0000000..bae8418
+--- /dev/null
++++ b/src/game/original/RandomSoundFX.h
+@@ -0,0 +1,28 @@
++#pragma once
++#include "B2BaseClass.h"
++#include "engine/audio.h"
++#include <array>
++// Selected original ObjectDLL/RandomSoundFX.h; value-owned resources and checked voice ID.
++class RandomSoundFX : public B2BaseClass
++{
++  public:
++    bool on = true, positional = false, sequential = false, loop_sequence = false;
++    float position_radius = 0, sound_radius = 1000, min_wait = 60, max_wait = 60;
++    DBYTE volume = 100;
++    std::array<std::string, 10> sounds;
++    unsigned count = 0, current = 0, last_choice = 0;
++    OpenBlood2::SoundId sound = 0;
++    DVector last_position{};
++    std::uint64_t commands = 0, attempts = 0, failures = 0;
++    std::string error;
++    ~RandomSoundFX() override;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++
++  private:
++    bool ReadProp();
++    bool Update();
++    void ScheduleWait();
++};
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 2ef6cae..08fc77a 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -12,6 +12,7 @@
+ #include "game/original/ObjectivesTrigger.h"
+ #include "game/original/PathPoint.h"
+ #include "game/original/PowerupPickups.h"
++#include "game/original/RandomSoundFX.h"
+ #include "game/original/RotatingBrush.h"
+ #include "game/original/RotatingDoor.h"
+ #include "game/original/SmellHint.h"
+@@ -79,6 +80,18 @@ namespace OpenBlood2
+                                        {"IsListener", true},
+                                        {"HidePlayer", false},
+                                        {"TypeActionMode", false}}};
++        const ClassInfo random_sound{"RandomSoundFX", &b2base, construct<RandomSoundFX>, []
++                                     {
++                                         std::vector<PropertySpec> p{
++                                             {"InitiallyOn", true},         {"PositionalSound", true},
++                                             {"SequentialPlay", false},     {"LoopSequence", false},
++                                             {"PosRangeRadius", 0.0f},      {"SoundRadius", 1000.0f},
++                                             {"Volume", std::int32_t(100)}, {"Ambient", true},
++                                             {"MinWaitTime", 60.0f},        {"MaxWaitTime", 60.0f}};
++                                         for (unsigned i = 1; i <= 10; ++i)
++                                             p.push_back({"SoundFile" + std::to_string(i), std::string{}});
++                                         return p;
++                                     }()};
+         const ClassInfo cinematic_trigger{
+             "CinematicTrigger", &b2base, construct<CinematicTrigger>, []
+             {
+@@ -532,13 +545,14 @@ namespace OpenBlood2
+                objects.register_class(light_Flicker4WaveLightFX) && objects.register_class(light_StrobeWaveLightFX) &&
+                objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
+                objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
+-               objects.register_class(cinematic_trigger) && objects.register_class(keyframer) &&
+-               objects.register_class(key) && objects.register_class(start) && objects.register_class(game_start) &&
+-               objects.register_class(path) && objects.register_class(world_properties) &&
+-               objects.register_class(smell) && objects.register_class(character) && objects.register_class(player) &&
+-               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
+-               objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
+-               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
++               objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
++               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
++               objects.register_class(game_start) && objects.register_class(path) &&
++               objects.register_class(world_properties) && objects.register_class(smell) &&
++               objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
++               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
++               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
++               objects.register_class(freefall) && objects.register_class(trigger) &&
+                objects.register_class(key_pickup) && objects.register_class(pickup) &&
+                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+                objects.register_class(health_base) && objects.register_class(armor_base) &&
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 6eb9fb4..059cd38 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -33,6 +33,8 @@ namespace OpenBlood2
+       public:
+         AudioMixer audio;
+         SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
++        SoundId PlaySoundAt(HOBJECT, const SoundRequest&, DVector, std::string&) override;
++        bool RandomInt(int, int, int&) override;
+         bool IsSoundDone(SoundId, bool&) override;
+         bool KillSound(SoundId) override;
+         bool advance_audio(double, DVector, DRotation);
+diff --git a/src/game/server_audio.cpp b/src/game/server_audio.cpp
+index f04551b..7a7ad2f 100644
+--- a/src/game/server_audio.cpp
++++ b/src/game/server_audio.cpp
+@@ -4,16 +4,36 @@ namespace OpenBlood2
+     SoundId ServerAdapter::PlayCinematicSound(HOBJECT owner, const SoundRequest& request, std::string& error)
+     {
+         trace_service("PlayCinematicSound");
+-        if (!IsObjectAlive(owner) || !client_resources || (!request.local && !IsObjectAlive(request.speaker)))
++        if (!IsObjectAlive(owner) || !client_resources || request.space == SoundSpace::Ambient ||
++            (request.space == SoundSpace::Local && request.speaker) ||
++            (request.space != SoundSpace::Local && !IsObjectAlive(request.speaker)))
+         {
+             error = "Cinematic sound owner/speaker unavailable";
+             return 0;
+         }
+         DVector position{};
+-        if (!request.local)
++        if (request.space != SoundSpace::Local)
+             GetObjectPos(request.speaker, &position);
+         return audio.play(*client_resources, owner, request, position, error);
+     }
++    SoundId ServerAdapter::PlaySoundAt(HOBJECT owner, const SoundRequest& request, DVector position, std::string& error)
++    {
++        trace_service("PlaySoundAt");
++        if (!IsObjectAlive(owner) || !client_resources || request.speaker || request.space == SoundSpace::Local)
++        {
++            error = "Fixed sound requires a live owner and ambient/spatial request without attachment";
++            return 0;
++        }
++        return audio.play(*client_resources, owner, request, position, error);
++    }
++    bool ServerAdapter::RandomInt(int low, int high, int& value)
++    {
++        trace_service("RandomInt");
++        if (low > high)
++            return false;
++        value = std::uniform_int_distribution<int>(low, high)(random_);
++        return true;
++    }
+     bool ServerAdapter::IsSoundDone(SoundId id, bool& done)
+     {
+         trace_service("IsSoundDone");
+@@ -38,7 +58,7 @@ namespace OpenBlood2
+                 removed.push_back(id);
+                 continue;
+             }
+-            if (!entry.request.local)
++            if (entry.request.speaker != nullptr)
+             {
+                 auto* voice = audio.get(id);
+                 if (!IsObjectAlive(voice->request.speaker))
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 7454f49..ece5cdb 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -391,3 +391,23 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --cinematics-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/cinematics.png")
+     set_tests_properties(gpu.cinematics PROPERTIES LABELS "private;gpu;cinematics" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+ endif()
++
++add_executable(random_sound_tests random_sound_tests.cpp)
++target_link_libraries(random_sound_tests PRIVATE blood2_game)
++blood2_project_options(random_sound_tests)
++foreach(case defaults commands sequence random spatial lifetime failures)
++    add_test(NAME randomsound.${case} COMMAND random_sound_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/random-sound-fixtures/${case}")
++    set_tests_properties(randomsound.${case} PROPERTIES LABELS "headless;randomsound" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case catalog subway)
++        add_test(NAME randomsound.${case} COMMAND random_sound_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(randomsound.${case} PROPERTIES LABELS "headless;private;randomsound" TIMEOUT 90)
++    endforeach()
++endif()
++
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.randomsound COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --random-sounds-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/random-sounds.png")
++    set_tests_properties(gpu.randomsound PROPERTIES LABELS "private;gpu;randomsound" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
++endif()
+diff --git a/tests/audio_fixture.h b/tests/audio_fixture.h
+new file mode 100644
+index 0000000..e4536f3
+--- /dev/null
++++ b/tests/audio_fixture.h
+@@ -0,0 +1,59 @@
++#pragma once
++#include "player_fixture.h"
++namespace test_audio
++{
++    using namespace OpenBlood2;
++    inline std::vector<std::uint8_t> wave(unsigned channels = 1, unsigned bits = 16, unsigned rate = 8000,
++                                          unsigned frames = 800)
++    {
++        test_model::Writer w;
++        for (char c : std::string("RIFF"))
++            w.u8(c);
++        w.u32(36 + frames * channels * (bits / 8));
++        for (char c : std::string("WAVEfmt "))
++            w.u8(c);
++        w.u32(16);
++        w.u16(1);
++        w.u16(channels);
++        w.u32(rate);
++        w.u32(rate * channels * (bits / 8));
++        w.u16(channels * (bits / 8));
++        w.u16(bits);
++        for (char c : std::string("data"))
++            w.u8(c);
++        w.u32(frames * channels * (bits / 8));
++        for (unsigned i = 0; i < frames * channels; ++i)
++        {
++            if (bits == 8)
++                w.u8(192);
++            else
++                w.u16(16384);
++        }
++        return w.b;
++    }
++    inline bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        if (!test_player::setup(g, root, false))
++            return false;
++        test_player::Directory d;
++        d.files["cue.wav"] = wave();
++        d.files["long.wav"] = wave(1, 16, 8000, 8000);
++        d.files["stereo.wav"] = wave(2);
++        auto w = test_model::Writer{};
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, d);
++        w.patch(131, off);
++        w.patch(135, size);
++        std::ofstream out(root / "sound.rez", std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        std::string error;
++        if (!g.resources.mount(root / "sound.rez", error))
++            return false;
++        return true;
++    }
++} // namespace test_audio
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index 98c75a7..c5f0581 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -393,9 +393,9 @@ namespace
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+             ++entries[e.state];
+-        CHECK(entries[EntryState::Created] == 164 && entries[EntryState::EditorOnly] == 372 &&
+-              entries[EntryState::Unsupported] == 44 && entries[EntryState::Failed] == 0 &&
+-              g.objects.snapshot().size() == 171);
++        CHECK(entries[EntryState::Created] == 166 && entries[EntryState::EditorOnly] == 372 &&
++              entries[EntryState::Unsupported] == 42 && entries[EntryState::Failed] == 0 &&
++              g.objects.snapshot().size() == 173);
+         std::cout << "Subway instances=" << g.objects.snapshot().size() << "\n";
+         for (auto [state, n] : entries)
+             std::cout << "state=" << int(state) << " count=" << n << '\n';
+diff --git a/tests/camera_tests.cpp b/tests/camera_tests.cpp
+index 2c17111..a1faff5 100644
+--- a/tests/camera_tests.cpp
++++ b/tests/camera_tests.cpp
+@@ -291,7 +291,7 @@ namespace
+         CHECK(worlds == 57 && entries == 61 && created == 61 && rejected == 0);
+         CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+         CHECK(CameraObj::m_dwNumCameras == 2 && g.server.camera_effects.size() == 2 &&
+-              g.objects.snapshot().size() == 174);
++              g.objects.snapshot().size() == 176);
+         CHECK(test_camera::complete_subway_intro(g));
+         for (auto id : g.objects.snapshot())
+             if (auto* r = g.objects.get(id); r && dynamic_cast<CameraObj*>(r->game.get()))
+diff --git a/tests/cinematic_tests.cpp b/tests/cinematic_tests.cpp
+index 7c4ed1e..f78576e 100644
+--- a/tests/cinematic_tests.cpp
++++ b/tests/cinematic_tests.cpp
+@@ -1,6 +1,6 @@
++#include "audio_fixture.h"
+ #include "game/game_settings.h"
+ #include "game/original/CinematicTrigger.h"
+-#include "player_fixture.h"
+ #include <SDL3/SDL.h>
+ #include <algorithm>
+ #include <functional>
+@@ -16,57 +16,8 @@ using namespace OpenBlood2;
+     } while (false)
+ namespace
+ {
+-    std::vector<std::uint8_t> wave(unsigned channels = 1, unsigned bits = 16, unsigned rate = 8000,
+-                                   unsigned frames = 800)
+-    {
+-        test_model::Writer w;
+-        for (char c : std::string("RIFF"))
+-            w.u8(c);
+-        w.u32(36 + frames * channels * (bits / 8));
+-        for (char c : std::string("WAVEfmt "))
+-            w.u8(c);
+-        w.u32(16);
+-        w.u16(1);
+-        w.u16(channels);
+-        w.u32(rate);
+-        w.u32(rate * channels * (bits / 8));
+-        w.u16(channels * (bits / 8));
+-        w.u16(bits);
+-        for (char c : std::string("data"))
+-            w.u8(c);
+-        w.u32(frames * channels * (bits / 8));
+-        for (unsigned i = 0; i < frames * channels; ++i)
+-        {
+-            if (bits == 8)
+-                w.u8(192);
+-            else
+-                w.u16(16384);
+-        }
+-        return w.b;
+-    }
+-    bool setup(GameSession& g, const std::filesystem::path& root)
+-    {
+-        CHECK(test_player::setup(g, root, false));
+-        test_player::Directory d;
+-        d.files["cue.wav"] = wave();
+-        d.files["long.wav"] = wave(1, 16, 8000, 8000);
+-        d.files["stereo.wav"] = wave(2);
+-        auto w = test_model::Writer{};
+-        w.b.resize(168);
+-        w.b[0] = w.b[62] = w.b[124] = 13;
+-        w.b[1] = w.b[63] = w.b[125] = 10;
+-        w.b[126] = 26;
+-        w.patch(127, 1);
+-        auto [off, size] = test_player::write_dir(w, d);
+-        w.patch(131, off);
+-        w.patch(135, size);
+-        std::ofstream out(root / "sound.rez", std::ios::binary);
+-        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
+-        out.close();
+-        std::string error;
+-        CHECK(g.resources.mount(root / "sound.rez", error));
+-        return true;
+-    }
++    using test_audio::setup;
++    using test_audio::wave;
+     HOBJECT cine(GameSession& g, Properties p = {})
+     {
+         return g.objects.create(g.objects.find_class("CinematicTrigger"), {}, Creation::World, p);
+@@ -197,7 +148,7 @@ namespace
+         CHECK(h);
+         SoundRequest r;
+         r.resource = "cue.wav";
+-        r.local = true;
++        r.space = SoundSpace::Local;
+         std::string error;
+         g.server.audio.inspect_pcm = true;
+         auto id = g.server.PlayCinematicSound(h, r, error);
+@@ -273,7 +224,7 @@ namespace
+         CHECK(trigger(g, h, "OFF")); // Payload is intentionally ignored in original code.
+         CHECK(g.step(.05) && !c->sound && !c->starts);
+         CHECK(g.step(.001) && c->sound && c->current == 0 && c->starts == 1 && c->messages == 1);
+-        CHECK(g.server.audio.get(c->sound)->request.local);
++        CHECK(g.server.audio.get(c->sound)->request.space == SoundSpace::Local);
+         const auto voice = c->sound;
+         CHECK(trigger(g, h, "ON") && c->sound == voice && c->current == 0);
+         CHECK(g.step(.1) && !c->sound && c->current == 1);
+@@ -328,9 +279,12 @@ namespace
+         CHECK(filtered && g.objects.get(filtered)->life == Life::Pending && g.step(0) && !g.objects.get(filtered));
+         SoundRequest r;
+         r.resource = "cue.wav";
+-        r.local = true;
++        r.space = SoundSpace::Local;
+         std::string error;
+         CHECK(!g.server.PlayCinematicSound(nullptr, r, error));
++        r.speaker = h;
++        CHECK(!g.server.PlayCinematicSound(h, r, error));
++        r.speaker = nullptr;
+         r.volume = NAN;
+         CHECK(!g.server.PlayCinematicSound(h, r, error));
+         r.volume = 1;
+@@ -361,7 +315,7 @@ namespace
+         auto h = cine(g);
+         SoundRequest r;
+         r.resource = "cue.wav";
+-        r.local = true;
++        r.space = SoundSpace::Local;
+         CHECK(g.server.PlayCinematicSound(h, r, error));
+         CHECK(g.server.advance_audio(.01, {}, {}));
+         CHECK(g.server.audio.has_output() && g.server.audio.submitted_frames == 480 && g.server.audio.peak > .49f &&
+@@ -384,9 +338,9 @@ namespace
+             std::map<EntryState, unsigned> counts;
+             for (const auto& e : g.entries)
+                 ++counts[e.state];
+-            CHECK(counts[EntryState::Created] == 164 && counts[EntryState::EditorOnly] == 372 &&
+-                  counts[EntryState::Unsupported] == 44 && counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 171 && g.enter_player(error) && g.objects.snapshot().size() == 174);
++            CHECK(counts[EntryState::Created] == 166 && counts[EntryState::EditorOnly] == 372 &&
++                  counts[EntryState::Unsupported] == 42 && counts[EntryState::Failed] == 0);
++            CHECK(g.objects.snapshot().size() == 173 && g.enter_player(error) && g.objects.snapshot().size() == 176);
+             HOBJECT target = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (std::string_view(g.objects.get(id)->state.m_Name) == "cintrig1")
+@@ -398,14 +352,14 @@ namespace
+             CHECK(id > previous && !g.server.audio.get(previous));
+             previous = id;
+             const auto* v = g.server.audio.get(id);
+-            CHECK(v && v->request.local && v->clip->duration() > 0);
++            CHECK(v && v->request.space == SoundSpace::Local && v->clip->duration() > 0);
+             std::cout << "cycle=" << cycle << " cue=" << v->request.resource << " rate=" << v->clip->rate
+                       << " frames=" << v->clip->frames() << " duration=" << v->clip->duration() << '\n';
+             g.server.audio.inspect_pcm = true;
+             for (unsigned i = 0; i < 6; ++i)
+                 CHECK(g.step(1.0 / 60));
+             v = g.server.audio.get(id);
+-            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 165);
++            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 167);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_clips() && !g.server.audio.get(id) && !g.server.message_count() &&
+                   !g.server.list_count() && !g.server.string_count());
+diff --git a/tests/keyframer_tests.cpp b/tests/keyframer_tests.cpp
+index 541cf21..c7ca261 100644
+--- a/tests/keyframer_tests.cpp
++++ b/tests/keyframer_tests.cpp
+@@ -361,14 +361,14 @@ namespace
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+             const float entered = g.server.GetTime();
+-            CHECK(g.objects.snapshot().size() == 174);
++            CHECK(g.objects.snapshot().size() == 176);
+             auto* list = g.server.FindNamedObjects("tracking1");
+             CHECK(list && list->m_pFirstLink);
+             auto h = list->m_pFirstLink->m_hObject;
+             g.server.RelinquishList(list);
+             auto* f = framer(g, h);
+             CHECK(g.step(1.0 / 60) && f->keys.size() == 2 && f->targets.size() == 1 && f->active && f->time == 0);
+-            CHECK(g.objects.snapshot().size() == 165);
++            CHECK(g.objects.snapshot().size() == 167);
+             auto camera = f->targets[0].object;
+             auto start = g.objects.get(camera)->state.m_Pos;
+             CHECK(g.step(1.0 / 60) && f->targets[0].moves == 1 && f->processed == 1 && f->unresolved_messages == 1);
+diff --git a/tests/light_tests.cpp b/tests/light_tests.cpp
+index 603ada9..076fbd0 100644
+--- a/tests/light_tests.cpp
++++ b/tests/light_tests.cpp
+@@ -350,8 +350,8 @@ namespace
+         for (int cycle = 0; cycle < 2; ++cycle)
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+-            CHECK(g.objects.snapshot().size() == 174 && g.server.light_effects.size() == 12);
+-            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 165);
++            CHECK(g.objects.snapshot().size() == 176 && g.server.light_effects.size() == 12);
++            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 167);
+             KeyFramer* path = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (auto* f = dynamic_cast<KeyFramer*>(g.objects.get(id)->game.get());
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index c17a950..417f14f 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -204,14 +204,14 @@ namespace
+             CHECK(player);
+             CHECK(game.objects.get(player->m_hObject)->model->animations.size() == 86);
+             CHECK(game.objects.snapshot().size() ==
+-                  174); // 164 source instances + 7 door children + player + muzzle light + scent.
++                  176); // 166 source instances + 7 door children + player + muzzle light + scent.
+             CHECK(game.client_shell.position.x == -32 && game.client_shell.position.z == -3224);
+             CHECK(std::abs(game.client_shell.position.y - 170) < .01f);
+             for (int frame = 0; frame < 120; ++frame)
+                 CHECK(game.step(1.0 / 60.0));
+             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
+             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
+-            CHECK(!game.run_world(error) && error.find("44 uninstantiated") != std::string::npos);
++            CHECK(!game.run_world(error) && error.find("42 uninstantiated") != std::string::npos);
+             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
+                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
+                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()
+diff --git a/tests/random_sound_tests.cpp b/tests/random_sound_tests.cpp
+new file mode 100644
+index 0000000..3608683
+--- /dev/null
++++ b/tests/random_sound_tests.cpp
+@@ -0,0 +1,368 @@
++#include "audio_fixture.h"
++#include "game/original/RandomSoundFX.h"
++#include <cmath>
++#include <functional>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    HOBJECT make(GameSession& g, Properties p = {})
++    {
++        return g.objects.create(g.objects.find_class("RandomSoundFX"), {}, Creation::World, p);
++    }
++    RandomSoundFX* get(GameSession& g, HOBJECT h)
++    {
++        return dynamic_cast<RandomSoundFX*>(g.server.HandleToObject(h));
++    }
++    bool trigger(GameSession& g, HOBJECT h, const char* cmd)
++    {
++        auto text = g.server.CreateString(cmd);
++        auto msg = g.server.StartMessageToObject(nullptr, h, 1000);
++        bool ok = msg && g.server.WriteToMessageHString(msg, text) == DE_OK && g.server.EndMessage(msg) == DE_OK;
++        g.server.FreeString(text);
++        return ok;
++    }
++    Properties sequence_props()
++    {
++        return {{"InitiallyOn", false},
++                {"SequentialPlay", true},
++                {"SoundFile1", std::string("long.wav")},
++                {"SoundFile2", std::string("cue.wav")},
++                {"MinWaitTime", .2f},
++                {"MaxWaitTime", .2f}};
++    }
++    bool defaults(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto h = make(g);
++        CHECK(h);
++        auto* c = get(g, h);
++        CHECK(c && c->on && c->positional && !c->sequential && !c->loop_sequence && !c->count && c->volume == 100);
++        CHECK(g.objects.get(h)->scheduled && g.step(59) && g.objects.get(h));
++        CHECK(g.step(2) && !g.objects.get(h)); // Empty list removes on first update, not precreate.
++        h = g.objects.create(g.objects.find_class("RandomSoundFX"), {}, Creation::Runtime);
++        CHECK(h && !get(g, h)->positional); // Source constructor differs from world property default.
++        auto gap = make(g, {{"SoundFile1", std::string("cue.wav")}, {"SoundFile3", std::string("long.wav")}});
++        CHECK(gap && get(g, gap)->count == 1 && get(g, gap)->sounds[2].empty());
++        auto wrapped = make(g, {{"Volume", std::int32_t(256)}});
++        CHECK(wrapped && get(g, wrapped)->volume == 0);
++        wrapped = make(g, {{"Volume", std::int32_t(-1)}});
++        CHECK(wrapped && get(g, wrapped)->volume == 100);
++        auto zero = make(g, {{"MinWaitTime", 0.0f}, {"MaxWaitTime", 0.0f}, {"SoundFile1", std::string("cue.wav")}});
++        CHECK(zero && !g.objects.get(zero)->scheduled);
++        return true;
++    }
++    bool commands(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto h = make(g, sequence_props());
++        CHECK(h);
++        auto* c = get(g, h);
++        CHECK(trigger(g, h, "on") && !c->on && !g.objects.get(h)->scheduled); // Case-sensitive source prefixes.
++        CHECK(trigger(g, h, "ONWARD") && c->on && g.step(.101) && c->attempts == 1 && c->current == 1);
++        auto voice = c->sound;
++        CHECK(voice);
++        CHECK(trigger(g, h, "OFF anything") && !c->on && !g.objects.get(h)->scheduled && c->sound == voice);
++        CHECK(g.step(.3) && c->attempts == 1 && !g.server.audio.get(voice)->done);
++        CHECK(g.step(1) && c->sound == voice && g.server.audio.get(voice)->done);
++        CHECK(trigger(g, h, "TOGGLE suffix") && c->on && c->current == 0);
++        CHECK(g.step(.101) && c->attempts == 2 && c->current == 1 && c->sound != voice && !g.server.audio.get(voice));
++        CHECK(trigger(g, h, "unrecognized") && c->current == 0 && g.step(.101) && c->last_choice == 0);
++        CHECK(trigger(g, h, "OFF") && !c->on && trigger(g, h, "TOGGLE") && c->on);
++        CHECK(!g.server.string_count() && !g.server.message_count() && !g.server.list_count());
++        return true;
++    }
++    bool sequence(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto h = make(g, sequence_props());
++        CHECK(h && trigger(g, h, "ON") && g.step(.101));
++        auto* c = get(g, h);
++        auto first = c->sound;
++        CHECK(first && c->current == 1 && c->last_choice == 0 &&
++              g.server.audio.get(first)->request.resource == "long.wav");
++        CHECK(g.step(.201) && c->attempts == 2 && c->current == 0 && !c->on && !g.objects.get(h)->scheduled);
++        CHECK(!g.server.audio.get(first) && c->sound && g.server.audio.get(c->sound)->request.resource == "cue.wav");
++        CHECK(g.step(1) && c->attempts == 2 && g.server.audio.get(c->sound)->done);
++        auto props = sequence_props();
++        props["LoopSequence"] = true;
++        h = make(g, props);
++        CHECK(h && trigger(g, h, "ON") && g.step(.101));
++        c = get(g, h);
++        for (unsigned i = 0; i < 6; ++i)
++            CHECK(g.step(.201) && c->on && c->last_choice == ((i + 1) % 2));
++        CHECK(c->attempts == 7 && g.server.audio.voices().size() == 2);
++        return true;
++    }
++    bool random_sequence(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        std::vector<unsigned> previous;
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            // Same session reset restores the portable seed, without claiming the retail RNG sequence.
++            CHECK(g.unload_world());
++            auto h = make(g, {{"SoundFile1", std::string("cue.wav")},
++                              {"SoundFile2", std::string("long.wav")},
++                              {"SoundFile3", std::string("stereo.wav")},
++                              {"MinWaitTime", .1f},
++                              {"MaxWaitTime", .2f},
++                              {"PosRangeRadius", 10.0f},
++                              {"Pos", DVector{20, 30, 40}}});
++            CHECK(h);
++            auto* c = get(g, h);
++            std::vector<unsigned> choices;
++            unsigned counts[3]{};
++            for (unsigned i = 0; i < 120; ++i)
++            {
++                CHECK(g.step(.201) && c->attempts == i + 1 && c->sound && !c->failures);
++                CHECK(c->last_choice < 3 && c->last_position.x >= 10 && c->last_position.x <= 30 &&
++                      c->last_position.y == 30 && c->last_position.z >= 30 && c->last_position.z <= 50);
++                auto* r = g.objects.get(h);
++                CHECK(r->scheduled && r->due - g.objects.time() >= .0999 && r->due - g.objects.time() <= .2001);
++                choices.push_back(c->last_choice);
++                ++counts[c->last_choice];
++            }
++            CHECK(counts[0] && counts[1] && counts[2]);
++            if (cycle)
++                CHECK(choices == previous);
++            else
++                previous = choices;
++        }
++        int value = 9;
++        CHECK(!g.server.RandomInt(2, 1, value) && value == 9);
++        CHECK(g.server.RandomInt(-3, -3, value) && value == -3);
++        return true;
++    }
++    bool spatial(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto h = make(g, {{"InitiallyOn", false},
++                          {"SequentialPlay", true},
++                          {"PositionalSound", false},
++                          {"SoundFile1", std::string("long.wav")},
++                          {"SoundRadius", 100.0f},
++                          {"Volume", std::int32_t(50)},
++                          {"Pos", DVector{75, 0, 0}}});
++        CHECK(h && trigger(g, h, "ON") && g.step(.101));
++        auto* c = get(g, h);
++        auto id = c->sound;
++        g.server.audio.inspect_pcm = true;
++        CHECK(g.server.advance_audio(.01, {}, {}));
++        auto* v = g.server.audio.get(id);
++        CHECK(v && v->request.space == SoundSpace::Ambient && !v->request.reverb_requested && !v->request.speaker);
++        CHECK(std::abs(v->left - .25f) < .0001 && v->left == v->right && std::abs(g.server.audio.peak - .125f) < .001);
++        CHECK(g.server.advance_audio(.01, {}, {{0, 1, 0}, 0}) && v->left == v->right &&
++              std::abs(v->left - .25f) < .0001);
++        DVector moved{};
++        CHECK(g.server.TeleportObject(h, &moved) == DE_OK && g.server.advance_audio(.01, {}, {}));
++        CHECK(v->position.x == 75); // Fixed random position does not follow emitter after start.
++        CHECK(g.server.advance_audio(.01, {-30, 0, 0}, {}) && v->left == 0 && v->right == 0);
++        CHECK(g.server.KillSound(id));
++        SoundRequest r;
++        r.resource = "long.wav";
++        r.inner_radius = 50;
++        r.outer_radius = 100;
++        std::string error;
++        id = g.server.PlaySoundAt(h, r, {75, 0, 0}, error);
++        CHECK(id);
++        CHECK(g.server.advance_audio(.01, {}, {}));
++        v = g.server.audio.get(id);
++        CHECK(v && v->left == 0 && std::abs(v->right - .5f) < .0001);
++        CHECK(g.server.advance_audio(.01, {}, {{0, 1, 0}, 0}) && std::abs(v->left - .5f) < .0001 && v->right == 0);
++        r.speaker = h;
++        CHECK(!g.server.PlaySoundAt(h, r, {}, error));
++        r.speaker = nullptr;
++        r.space = SoundSpace::Local;
++        CHECK(!g.server.PlaySoundAt(h, r, {}, error));
++        r.space = SoundSpace(99);
++        CHECK(!g.server.PlaySoundAt(h, r, {}, error));
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto h = make(g, sequence_props());
++        CHECK(h && trigger(g, h, "ON") && g.step(.101));
++        auto id = get(g, h)->sound;
++        CHECK(id);
++        CHECK(g.objects.remove(h) && g.server.advance_audio(.01, {}, {}));
++        CHECK(!g.server.audio.get(id) && g.objects.finish_frame() && !g.objects.get(h));
++        h = make(g, sequence_props());
++        CHECK(h && trigger(g, h, "ON") && g.step(.101));
++        auto next = get(g, h)->sound;
++        CHECK(next > id);
++        CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips());
++        CHECK(!trigger(g, h, "ON") && !g.server.KillSound(next) && !g.server.string_count() &&
++              !g.server.message_count());
++        h = make(g, sequence_props());
++        CHECK(h && trigger(g, h, "ON") && g.step(.101) && get(g, h)->sound > next);
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto props = sequence_props();
++        props["SoundFile1"] = std::string("missing.wav");
++        auto h = make(g, props);
++        CHECK(h && trigger(g, h, "ON") && g.step(.101));
++        auto* c = get(g, h);
++        CHECK(c->attempts == 1 && c->failures == 1 && !c->sound && c->current == 1 && !c->error.empty());
++        CHECK(g.step(.201) && c->attempts == 2 && c->failures == 1 && c->sound && !c->on && c->error.empty());
++        CHECK(!make(g, {{"MinWaitTime", -1.0f}}));
++        CHECK(!make(g, {{"MinWaitTime", 61.0f}, {"MaxWaitTime", 60.0f}}));
++        CHECK(!make(g, {{"PosRangeRadius", -1.0f}}));
++        CHECK(!make(g, {{"SoundRadius", 0.0f}}));
++        CHECK(!g.objects.create(g.objects.find_class("RandomSoundFX"), {}, Creation::Restore));
++        CHECK(g.objects.finish_frame());
++        CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty());
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        unsigned worlds = 0, controllers = 0, references = 0, missing = 0, invalid = 0, rejected = 0;
++        for (const auto& [path, resource] : g.resources.index())
++        {
++            (void)resource;
++            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
++                continue;
++            std::vector<std::uint8_t> bytes;
++            World w;
++            CHECK(g.resources.read(path, bytes, error));
++            if (!read_world(bytes, w, error))
++            {
++                CHECK(path == "worlds/16_bridge.dat");
++                continue;
++            }
++            ++worlds;
++            for (const auto& o : w.objects)
++                if (o.class_name == "RandomSoundFX")
++                {
++                    ++controllers;
++                    Properties p;
++                    for (const auto& prop : o.properties)
++                        p.emplace(prop.name, prop.value);
++                    auto h = make(g, p);
++                    if (!h)
++                    {
++                        ++rejected;
++                        std::cout << path << " rejected controller\n";
++                        continue;
++                    }
++                    auto* c = get(g, h);
++                    CHECK(c);
++                    if (path == "worlds/01_subwaya.dat")
++                        std::cout << "SUBWAY " << g.objects.get(h)->state.m_Name << " on=" << c->on
++                                  << " positional=" << c->positional << " sequential=" << c->sequential
++                                  << " loop=" << c->loop_sequence << " waits=" << c->min_wait << ',' << c->max_wait
++                                  << " range=" << c->position_radius << " radius=" << c->sound_radius
++                                  << " volume=" << unsigned(c->volume) << '\n';
++                    for (unsigned i = 0; i < c->count; ++i)
++                    {
++                        ++references;
++                        std::shared_ptr<const AudioClip> clip;
++                        if (!g.server.audio.load(g.resources, c->sounds[i], clip, error))
++                        {
++                            if (!g.resources.find(c->sounds[i]))
++                                ++missing;
++                            else
++                                ++invalid;
++                            std::cout << path << ' ' << c->sounds[i] << " failure=" << error << '\n';
++                        }
++                        else if (path == "worlds/01_subwaya.dat")
++                            std::cout << "  " << c->sounds[i] << " rate=" << clip->rate << " frames=" << clip->frames()
++                                      << " duration=" << clip->duration() << '\n';
++                    }
++                }
++            CHECK(g.objects.clear());
++            g.server.audio.clear();
++        }
++        std::cout << "worlds=" << worlds << " controllers=" << controllers << " refs=" << references
++                  << " missing=" << missing << " invalid=" << invalid << " rejected=" << rejected << '\n';
++        CHECK(worlds == 57 && controllers == 54 && references == 223 && missing == 35 && !invalid && !rejected);
++        return true;
++    }
++    bool subway(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        SoundId last = 0;
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error));
++            std::map<EntryState, unsigned> counts;
++            for (const auto& e : g.entries)
++                ++counts[e.state];
++            CHECK(counts[EntryState::Created] == 166 && counts[EntryState::Unsupported] == 42 &&
++                  counts[EntryState::EditorOnly] == 372 && !counts[EntryState::Failed]);
++            CHECK(g.objects.snapshot().size() == 173 && g.enter_player(error) && g.objects.snapshot().size() == 176);
++            std::vector<HOBJECT> targets;
++            for (auto id : g.objects.snapshot())
++                if (dynamic_cast<RandomSoundFX*>(g.objects.get(id)->game.get()))
++                    targets.push_back(g.objects.get(id)->handle);
++            CHECK(targets.size() == 2);
++            for (auto h : targets)
++            {
++                const auto* c = get(g, h);
++                const auto* r = g.objects.get(h);
++                CHECK(c->on && r->scheduled && r->due - g.objects.time() >= c->min_wait - .001 &&
++                      r->due - g.objects.time() <= c->max_wait + .001);
++                CHECK(trigger(g, h, "ON"));
++            }
++            CHECK(g.step(.101));
++            g.server.audio.inspect_pcm = true;
++            for (auto h : targets)
++            {
++                auto* c = get(g, h);
++                CHECK(c->sound && !c->failures && c->sound > last && c->attempts == 1);
++                last = c->sound;
++                const auto* v = g.server.audio.get(c->sound);
++                CHECK(v && v->clip->duration() > 0 && !v->request.speaker);
++                std::cout << "cycle=" << cycle << " name=" << g.objects.get(h)->state.m_Name
++                          << " sound=" << v->request.resource << '\n';
++            }
++            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 167);
++            CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips() &&
++                  !g.server.audio.get(last) && g.objects.snapshot().empty() && !g.server.message_count() &&
++                  !g.server.string_count() && !g.server.list_count());
++            g.server.audio.inspect_pcm = false;
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"defaults", defaults},      {"commands", commands}, {"sequence", sequence},
++        {"random", random_sequence}, {"spatial", spatial},   {"lifetime", lifetime},
++        {"failures", failures},      {"catalog", catalog},   {"subway", subway}};
++    auto it = cases.find(argv[1]);
++    return it != cases.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index f4aacfa..b10dadf 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -1,6 +1,6 @@
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 171 original instances, 116 BSP models")
++if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 173 original instances, 116 BSP models")
+     message(FATAL_ERROR "World inspection: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-player
+@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 44" OR NOT out MATCHES "remaining mover classes")
++if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 42" OR NOT out MATCHES "remaining mover classes")
+     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 1164825..eabaa99 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -538,7 +538,7 @@ namespace
+         CHECK(game.world.version == 56);
+         CHECK(game.world.objects.size() == 580);
+         CHECK(game.world.models.size() == 116);
+-        CHECK(game.objects.snapshot().size() == 171);
++        CHECK(game.objects.snapshot().size() == 173);
+         CHECK(game.world.models[0].points.size() == 4996);
+         CHECK(game.world.models[0].polygons.size() == 3367);
+         CHECK(game.resources.find(game.world_path)->overrides == 1);
+diff --git a/tests/worldpath_tests.cpp b/tests/worldpath_tests.cpp
+index 0b56366..35a2d41 100644
+--- a/tests/worldpath_tests.cpp
++++ b/tests/worldpath_tests.cpp
+@@ -352,9 +352,9 @@ namespace
+             }
+             CHECK(moves == 297 && blocked == 2 && !f->active && f->processed == 3 && close(r->state.m_Pos, last));
+             CHECK(!close(last, initial) && !close(last, vector_add(f->keys.back().position, f->targets[0].offset)));
+-            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 165);
++            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 167);
+             std::cout << "cycle=" << cycle << " moves=" << moves << " blocks=" << blocked << " final=" << last.x << ','
+-                      << last.y << ',' << last.z << " consumed_keys=9 runtime=165\n";
++                      << last.y << ',' << last.z << " consumed_keys=9 runtime=167\n";
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.server.string_count() &&
+                   !g.server.list_count() && !g.server.message_count());
+         }

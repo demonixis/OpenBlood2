@@ -1,0 +1,136 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start    5: objects.builtin_model
+ 1/41 Test    #5: objects.builtin_model ............   Passed    0.00 sec
+      Start    6: objects.original_objects
+ 2/41 Test    #6: objects.original_objects .........   Passed    0.00 sec
+      Start    7: objects.nested_creation
+ 3/41 Test    #7: objects.nested_creation ..........   Passed    0.00 sec
+      Start    8: objects.reasons_properties
+ 4/41 Test    #8: objects.reasons_properties .......   Passed    0.00 sec
+      Start    9: objects.scheduling
+ 5/41 Test    #9: objects.scheduling ...............   Passed    0.00 sec
+      Start   10: objects.deferred_removal
+ 6/41 Test   #10: objects.deferred_removal .........   Passed    0.00 sec
+      Start   11: objects.aggregate_dispatch
+ 7/41 Test   #11: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start   12: objects.handles_selection
+ 8/41 Test   #12: objects.handles_selection ........   Passed    0.00 sec
+      Start   13: objects.links_lists
+ 9/41 Test   #13: objects.links_lists ..............   Passed    0.00 sec
+      Start   14: objects.messages_strings
+10/41 Test   #14: objects.messages_strings .........   Passed    0.01 sec
+      Start   15: objects.message_churn
+11/41 Test   #15: objects.message_churn ............   Passed    1.84 sec
+      Start   16: objects.message_limit
+12/41 Test   #16: objects.message_limit ............   Passed    0.10 sec
+      Start   17: objects.unsupported_teardown
+13/41 Test   #17: objects.unsupported_teardown .....   Passed    0.02 sec
+      Start   18: objects.creation_failures
+14/41 Test   #18: objects.creation_failures ........   Passed    0.01 sec
+      Start   22: config.arguments
+15/41 Test   #22: config.arguments .................   Passed    0.00 sec
+      Start   23: config.precedence
+16/41 Test   #23: config.precedence ................   Passed    0.00 sec
+      Start   24: config.relative_paths
+17/41 Test   #24: config.relative_paths ............   Passed    0.00 sec
+      Start   25: config.invalid_config
+18/41 Test   #25: config.invalid_config ............   Passed    0.01 sec
+      Start   26: config.content_validation
+19/41 Test   #26: config.content_validation ........   Passed    0.00 sec
+      Start   27: config.case_lookup
+20/41 Test   #27: config.case_lookup ...............   Passed    0.00 sec
+      Start   28: logging.basic
+21/41 Test   #28: logging.basic ....................***Failed    0.01 sec
+CMake Error at /home/yann/projects/lithtech/Blood2/tests/logging_test.cmake:21 (message):
+  Logging test failed (1): [info] Log session:
+  /home/yann/projects/lithtech/Blood2/build/debug/tests/log-fixtures/basic/session-1792325310693027158-0
+
+  [info] OpenBlood2 0.3.0 / 53a5967-dirty / Debug / GNU 16.2.1;
+  platform=Linux; SDL=SDL-3.5.0-53a5967
+
+  [info] INFO visibility sentinel
+
+  [warning] literal braces {{}} and UTF-8 é
+
+  [error] SDL[0]: SDL bridge sentinel {literal}
+
+
+
+  FAIL line 159: text.find("literal braces {} and UTF-8 é") !=
+  std::string::npos
+
+
+
+
+      Start   29: logging.level
+22/41 Test   #29: logging.level ....................***Failed    0.01 sec
+CMake Error at /home/yann/projects/lithtech/Blood2/tests/logging_test.cmake:21 (message):
+  Logging test failed (1): [warning] literal braces {{}} and UTF-8 é
+
+  [error] SDL[0]: SDL bridge sentinel {literal}
+
+
+
+  FAIL line 159: text.find("literal braces {} and UTF-8 é") !=
+  std::string::npos
+
+
+
+
+      Start   30: logging.rotation
+23/41 Test   #30: logging.rotation .................   Passed    0.02 sec
+      Start   31: logging.failure
+24/41 Test   #31: logging.failure ..................   Passed    0.01 sec
+      Start   32: logging.write_failure
+25/41 Test   #32: logging.write_failure ............   Passed    0.03 sec
+      Start   33: logging.retention
+26/41 Test   #33: logging.retention ................   Passed    0.01 sec
+      Start   34: logging.threads
+27/41 Test   #34: logging.threads ..................   Passed    0.02 sec
+      Start   35: logging.abrupt
+28/41 Test   #35: logging.abrupt ...................   Passed    0.01 sec
+      Start   36: logging.crash
+29/41 Test   #36: logging.crash ....................   Passed    0.07 sec
+      Start   37: logging.cli
+30/41 Test   #37: logging.cli ......................   Passed    0.03 sec
+      Start   38: cli.help
+31/41 Test   #38: cli.help .........................   Passed    0.02 sec
+      Start   39: cli.unknown
+32/41 Test   #39: cli.unknown ......................   Passed    0.01 sec
+      Start   40: cli.missing_data
+33/41 Test   #40: cli.missing_data .................   Passed    0.01 sec
+      Start   41: cli.missing_config
+34/41 Test   #41: cli.missing_config ...............   Passed    0.01 sec
+      Start   42: cli.metadata
+35/41 Test   #42: cli.metadata .....................   Passed    0.01 sec
+      Start   72: cli.world_modes
+36/41 Test   #72: cli.world_modes ..................   Passed    2.59 sec
+      Start 1112: menus.state
+37/41 Test #1112: menus.state ......................   Passed    0.00 sec
+      Start 1113: menus.artwork
+38/41 Test #1113: menus.artwork ....................   Passed    0.33 sec
+      Start 1115: menus.session
+39/41 Test #1115: menus.session ....................   Passed    1.75 sec
+      Start 1116: menus.profiles
+40/41 Test #1116: menus.profiles ...................   Passed   17.53 sec
+      Start 1117: menus.preferences
+41/41 Test #1117: menus.preferences ................   Passed    0.00 sec
+
+95% tests passed, 2 tests failed out of 41
+
+Label Time Summary:
+cli         =   0.10 sec*proc (6 tests)
+config      =   0.02 sec*proc (6 tests)
+headless    =  24.54 sec*proc (41 tests)
+logging     =   0.24 sec*proc (10 tests)
+menus       =  19.61 sec*proc (5 tests)
+objects     =   2.00 sec*proc (14 tests)
+private     =  22.20 sec*proc (4 tests)
+world       =   2.59 sec*proc (1 test)
+
+Total Test time (real) =  24.57 sec
+
+The following tests FAILED:
+	 28 - logging.basic (Failed)                            headless logging
+	 29 - logging.level (Failed)                            headless logging
+Errors while running CTest

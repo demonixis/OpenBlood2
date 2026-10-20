@@ -1,0 +1,14 @@
+709/718 Testing: destructable_models.rejects
+709/718 Test: destructable_models.rejects
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable_model_tests" "rejects" "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable-model-rejects"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"destructable_models.rejects" start time: Oct 17 05:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_models.rejects" end time: Oct 17 05:15 CEST
+"destructable_models.rejects" time elapsed: 00:00:00
+----------------------------------------------------------

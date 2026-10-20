@@ -1,0 +1,14 @@
+49/507 Testing: player.messages
+49/507 Test: player.messages
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_tests" "messages" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-fixtures/messages"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player.messages" start time: Oct 16 19:19 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"player.messages" end time: Oct 16 19:19 CEST
+"player.messages" time elapsed: 00:00:00
+----------------------------------------------------------

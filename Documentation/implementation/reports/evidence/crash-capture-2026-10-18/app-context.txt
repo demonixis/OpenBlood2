@@ -1,0 +1,5 @@
+signal=6
+pid=2491722
+thread=2491722
+fault_address=0x0
+instruction=0x938e74

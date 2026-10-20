@@ -1,0 +1,14 @@
+548/550 Testing: explosion_flames.failures
+548/550 Test: explosion_flames.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_flame_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-flames-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_flames.failures" start time: Oct 16 22:02 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_flames.failures" end time: Oct 16 22:02 CEST
+"explosion_flames.failures" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+76/580 Testing: movement.private
+76/580 Test: movement.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/movement_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"movement.private" start time: Oct 17 00:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =  60.09 sec
+----------------------------------------------------------
+Test Failed.
+"movement.private" end time: Oct 17 00:04 CEST
+"movement.private" time elapsed: 00:01:00
+----------------------------------------------------------

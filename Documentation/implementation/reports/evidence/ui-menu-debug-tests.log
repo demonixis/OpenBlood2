@@ -1,0 +1,193 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start   22: config.arguments
+ 1/85 Test   #22: config.arguments ...................   Passed    0.00 sec
+      Start   23: config.precedence
+ 2/85 Test   #23: config.precedence ..................   Passed    0.00 sec
+      Start   24: config.relative_paths
+ 3/85 Test   #24: config.relative_paths ..............   Passed    0.00 sec
+      Start   25: config.invalid_config
+ 4/85 Test   #25: config.invalid_config ..............   Passed    0.00 sec
+      Start   26: config.content_validation
+ 5/85 Test   #26: config.content_validation ..........   Passed    0.00 sec
+      Start   27: config.case_lookup
+ 6/85 Test   #27: config.case_lookup .................   Passed    0.00 sec
+      Start   35: world.session_start
+ 7/85 Test   #35: world.session_start ................   Passed    0.04 sec
+      Start   36: world.level_change
+ 8/85 Test   #36: world.level_change .................   Passed    0.07 sec
+      Start   54: world.session_start_private
+ 9/85 Test   #54: world.session_start_private ........   Passed    6.22 sec
+      Start   55: world.level_change_private
+10/85 Test   #55: world.level_change_private .........   Passed    6.36 sec
+      Start   74: player.handles
+11/85 Test   #74: player.handles .....................   Passed    0.01 sec
+      Start   75: player.lifecycle
+12/85 Test   #75: player.lifecycle ...................   Passed    0.01 sec
+      Start   76: player.rollback
+13/85 Test   #76: player.rollback ....................   Passed    0.01 sec
+      Start   77: player.messages
+14/85 Test   #77: player.messages ....................   Passed    0.01 sec
+      Start   78: player.callbacks
+15/85 Test   #78: player.callbacks ...................   Passed    0.01 sec
+      Start   79: player.smell
+16/85 Test   #79: player.smell .......................   Passed    0.01 sec
+      Start   80: player.smell_private
+17/85 Test   #80: player.smell_private ...............   Passed    5.73 sec
+      Start   81: player.private
+18/85 Test   #81: player.private .....................   Passed    3.04 sec
+      Start  104: locomotion.stairs
+19/85 Test  #104: locomotion.stairs ..................   Passed    0.02 sec
+      Start  105: locomotion.world_stairs
+20/85 Test  #105: locomotion.world_stairs ............   Passed    0.02 sec
+      Start  106: locomotion.limits
+21/85 Test  #106: locomotion.limits ..................   Passed    0.07 sec
+      Start  107: locomotion.crouch
+22/85 Test  #107: locomotion.crouch ..................   Passed    0.05 sec
+      Start  108: locomotion.animations
+23/85 Test  #108: locomotion.animations ..............   Passed    0.02 sec
+      Start  109: locomotion.lifetime
+24/85 Test  #109: locomotion.lifetime ................   Passed    0.01 sec
+      Start  110: locomotion.contacts
+25/85 Test  #110: locomotion.contacts ................   Passed    0.03 sec
+      Start  111: locomotion.private
+26/85 Test  #111: locomotion.private .................   Passed    2.96 sec
+      Start  329: character_audio.paths
+27/85 Test  #329: character_audio.paths ..............   Passed    0.00 sec
+      Start  330: character_audio.voices
+28/85 Test  #330: character_audio.voices .............   Passed    0.01 sec
+      Start  331: character_audio.lifetime
+29/85 Test  #331: character_audio.lifetime ...........   Passed    0.01 sec
+      Start  332: character_audio.rejection
+30/85 Test  #332: character_audio.rejection ..........   Passed    0.01 sec
+      Start  333: character_audio.player
+31/85 Test  #333: character_audio.player .............   Passed    0.01 sec
+      Start  334: character_audio.callbacks
+32/85 Test  #334: character_audio.callbacks ..........   Passed    0.01 sec
+      Start  335: character_audio.footsteps
+33/85 Test  #335: character_audio.footsteps ..........   Passed    0.01 sec
+      Start  336: character_audio.surfaces
+34/85 Test  #336: character_audio.surfaces ...........   Passed    0.01 sec
+      Start  337: character_audio.catalog
+35/85 Test  #337: character_audio.catalog ............   Passed    0.70 sec
+      Start  338: character_audio.subway
+36/85 Test  #338: character_audio.subway .............   Passed    5.99 sec
+      Start  602: player_state.roundtrip
+37/85 Test  #602: player_state.roundtrip .............   Passed    0.01 sec
+      Start  603: player_state.clocks
+38/85 Test  #603: player_state.clocks ................   Passed    0.01 sec
+      Start  604: player_state.initialization
+39/85 Test  #604: player_state.initialization ........   Passed    0.01 sec
+      Start  605: player_state.failures
+40/85 Test  #605: player_state.failures ..............   Passed    0.01 sec
+      Start  606: player_state.capture
+41/85 Test  #606: player_state.capture ...............   Passed    0.01 sec
+      Start  607: player_state.private
+42/85 Test  #607: player_state.private ...............   Passed    1.81 sec
+      Start  613: player_restore.roundtrip
+43/85 Test  #613: player_restore.roundtrip ...........   Passed    0.01 sec
+      Start  614: player_restore.failures
+44/85 Test  #614: player_restore.failures ............   Passed    0.02 sec
+      Start  615: player_restore.lifetime
+45/85 Test  #615: player_restore.lifetime ............   Passed    0.02 sec
+      Start  616: player_restore.private
+46/85 Test  #616: player_restore.private .............   Passed    2.07 sec
+      Start  696: player_controls.keys
+47/85 Test  #696: player_controls.keys ...............   Passed    0.00 sec
+      Start  697: player_controls.mouse
+48/85 Test  #697: player_controls.mouse ..............   Passed    0.00 sec
+      Start  698: player_controls.gates
+49/85 Test  #698: player_controls.gates ..............   Passed    0.00 sec
+      Start  699: player_controls.entry
+50/85 Test  #699: player_controls.entry ..............   Passed    0.00 sec
+      Start  700: player_controls.combat
+51/85 Test  #700: player_controls.combat .............   Passed    9.29 sec
+      Start  701: player_controls.corpse_clearance
+52/85 Test  #701: player_controls.corpse_clearance ...   Passed   12.41 sec
+      Start  702: player_controls.private
+53/85 Test  #702: player_controls.private ............   Passed    3.67 sec
+      Start  948: hud.bitmaps
+54/85 Test  #948: hud.bitmaps ........................   Passed    0.00 sec
+      Start  949: hud.values
+55/85 Test  #949: hud.values .........................   Passed    0.00 sec
+      Start  950: hud.input
+56/85 Test  #950: hud.input ..........................   Passed    0.00 sec
+      Start  951: hud.session
+57/85 Test  #951: hud.session ........................   Passed    0.01 sec
+      Start  952: hud.private
+58/85 Test  #952: hud.private ........................   Passed    2.02 sec
+      Start  977: player_death.camera
+59/85 Test  #977: player_death.camera ................   Passed    0.01 sec
+      Start  978: player_death.guards
+60/85 Test  #978: player_death.guards ................   Passed    0.01 sec
+      Start  979: player_death.private
+61/85 Test  #979: player_death.private ...............   Passed    1.04 sec
+      Start  980: movement_audio.rules
+62/85 Test  #980: movement_audio.rules ...............   Passed    0.03 sec
+      Start  981: movement_audio.jumps
+63/85 Test  #981: movement_audio.jumps ...............   Passed    0.04 sec
+      Start  982: movement_audio.contexts
+64/85 Test  #982: movement_audio.contexts ............   Passed    0.14 sec
+      Start  983: movement_audio.failures
+65/85 Test  #983: movement_audio.failures ............   Passed    0.02 sec
+      Start  984: movement_audio.private
+66/85 Test  #984: movement_audio.private .............   Passed    0.52 sec
+      Start 1000: dls_sampler.pcm
+67/85 Test #1000: dls_sampler.pcm ....................   Passed    0.00 sec
+      Start 1001: dls_sampler.envelopes
+68/85 Test #1001: dls_sampler.envelopes ..............   Passed    0.01 sec
+      Start 1002: dls_sampler.lifetime
+69/85 Test #1002: dls_sampler.lifetime ...............   Passed    0.06 sec
+      Start 1003: dls_sampler.legacy_pan
+70/85 Test #1003: dls_sampler.legacy_pan .............   Passed    0.00 sec
+      Start 1004: dls_sampler.routing
+71/85 Test #1004: dls_sampler.routing ................   Passed    0.00 sec
+      Start 1005: dls_sampler.controllers
+72/85 Test #1005: dls_sampler.controllers ............   Passed    0.00 sec
+      Start 1006: dls_sampler.private
+73/85 Test #1006: dls_sampler.private ................   Passed    0.74 sec
+      Start 1063: dls_sampler.live_controls
+74/85 Test #1063: dls_sampler.live_controls ..........   Passed    0.01 sec
+      Start 1064: dls_sampler.bend_reference
+75/85 Test #1064: dls_sampler.bend_reference .........   Passed    0.00 sec
+      Start 1065: dls_sampler.live_private
+76/85 Test #1065: dls_sampler.live_private ...........   Passed    0.73 sec
+      Start 1066: dls_sampler.midi_receiver
+77/85 Test #1066: dls_sampler.midi_receiver ..........   Passed    0.03 sec
+      Start 1067: dls_sampler.midi_limits
+78/85 Test #1067: dls_sampler.midi_limits ............   Passed    0.00 sec
+      Start 1068: dls_sampler.midi_private
+79/85 Test #1068: dls_sampler.midi_private ...........   Passed    0.48 sec
+      Start 1094: dls_sampler.scalar_equivalence
+80/85 Test #1094: dls_sampler.scalar_equivalence .....   Passed    0.06 sec
+      Start 1095: menus.state
+81/85 Test #1095: menus.state ........................   Passed    0.00 sec
+      Start 1096: menus.artwork
+82/85 Test #1096: menus.artwork ......................   Passed    0.35 sec
+      Start 1098: menus.session
+83/85 Test #1098: menus.session ......................   Passed    1.74 sec
+      Start 1099: menus.profiles
+84/85 Test #1099: menus.profiles .....................   Passed   16.65 sec
+      Start 1100: menus.preferences
+85/85 Test #1100: menus.preferences ..................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 85
+
+Label Time Summary:
+audio              =   2.15 sec*proc (16 tests)
+character_audio    =   6.77 sec*proc (10 tests)
+config             =   0.01 sec*proc (6 tests)
+headless           =  85.56 sec*proc (85 tests)
+hud                =   2.04 sec*proc (5 tests)
+locomotion         =   3.17 sec*proc (8 tests)
+menus              =  18.75 sec*proc (5 tests)
+movement_audio     =   0.76 sec*proc (5 tests)
+music_assets       =   2.14 sec*proc (14 tests)
+player             =   8.83 sec*proc (8 tests)
+player_controls    =  25.38 sec*proc (7 tests)
+player_death       =   1.07 sec*proc (3 tests)
+player_restore     =   2.12 sec*proc (4 tests)
+player_state       =   1.85 sec*proc (6 tests)
+private            =  84.53 sec*proc (21 tests)
+world              =  12.69 sec*proc (4 tests)
+
+Total Test time (real) =  85.60 sec

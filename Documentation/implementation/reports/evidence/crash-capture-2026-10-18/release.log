@@ -1,0 +1,86 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start 22: config.arguments
+ 1/36 Test #22: config.arguments .................   Passed    0.00 sec
+      Start 23: config.precedence
+ 2/36 Test #23: config.precedence ................   Passed    0.00 sec
+      Start 24: config.relative_paths
+ 3/36 Test #24: config.relative_paths ............   Passed    0.00 sec
+      Start 25: config.invalid_config
+ 4/36 Test #25: config.invalid_config ............   Passed    0.01 sec
+      Start 26: config.content_validation
+ 5/36 Test #26: config.content_validation ........   Passed    0.00 sec
+      Start 27: config.case_lookup
+ 6/36 Test #27: config.case_lookup ...............   Passed    0.00 sec
+      Start 28: logging.basic
+ 7/36 Test #28: logging.basic ....................   Passed    0.01 sec
+      Start 29: logging.level
+ 8/36 Test #29: logging.level ....................   Passed    0.01 sec
+      Start 30: logging.rotation
+ 9/36 Test #30: logging.rotation .................   Passed    0.01 sec
+      Start 31: logging.failure
+10/36 Test #31: logging.failure ..................   Passed    0.01 sec
+      Start 32: logging.write_failure
+11/36 Test #32: logging.write_failure ............   Passed    0.02 sec
+      Start 33: logging.retention
+12/36 Test #33: logging.retention ................   Passed    0.01 sec
+      Start 34: logging.threads
+13/36 Test #34: logging.threads ..................   Passed    0.01 sec
+      Start 35: logging.abrupt
+14/36 Test #35: logging.abrupt ...................   Passed    0.01 sec
+      Start 36: logging.crash
+15/36 Test #36: logging.crash ....................   Passed    0.07 sec
+      Start 37: logging.cli
+16/36 Test #37: logging.cli ......................   Passed    0.07 sec
+      Start 38: crash.missing
+17/36 Test #38: crash.missing ....................   Passed    0.01 sec
+      Start 39: crash.existing
+18/36 Test #39: crash.existing ...................   Passed    0.01 sec
+      Start 40: crash.child_reaper
+19/36 Test #40: crash.child_reaper ...............   Passed    0.01 sec
+      Start 41: crash.lifecycle
+20/36 Test #41: crash.lifecycle ..................   Passed    0.02 sec
+      Start 42: crash.debugger
+21/36 Test #42: crash.debugger ...................   Passed    0.16 sec
+      Start 43: crash.segv
+22/36 Test #43: crash.segv .......................   Passed    0.40 sec
+      Start 44: crash.thread
+23/36 Test #44: crash.thread .....................   Passed    0.38 sec
+      Start 45: crash.abort
+24/36 Test #45: crash.abort ......................   Passed    0.38 sec
+      Start 46: crash.overflow
+25/36 Test #46: crash.overflow ...................   Passed    0.38 sec
+      Start 47: crash.dead_helper
+26/36 Test #47: crash.dead_helper ................   Passed    0.07 sec
+      Start 48: crash.collector_loss
+27/36 Test #48: crash.collector_loss .............   Passed    0.08 sec
+      Start 49: crash.timeout
+28/36 Test #49: crash.timeout ....................   Passed    0.31 sec
+      Start 50: crash.dump_failure
+29/36 Test #50: crash.dump_failure ...............   Passed    0.23 sec
+      Start 51: crash.size_limit
+30/36 Test #51: crash.size_limit .................   Passed    0.26 sec
+      Start 52: cli.help
+31/36 Test #52: cli.help .........................   Passed    0.03 sec
+      Start 53: cli.unknown
+32/36 Test #53: cli.unknown ......................   Passed    0.03 sec
+      Start 54: cli.missing_data
+33/36 Test #54: cli.missing_data .................   Passed    0.03 sec
+      Start 55: cli.missing_config
+34/36 Test #55: cli.missing_config ...............   Passed    0.03 sec
+      Start 56: cli.metadata
+35/36 Test #56: cli.metadata .....................   Passed    0.02 sec
+      Start 86: cli.world_modes
+36/36 Test #86: cli.world_modes ..................   Passed    0.30 sec
+
+100% tests passed, 0 tests failed out of 36
+
+Label Time Summary:
+cli         =   0.22 sec*proc (6 tests)
+config      =   0.02 sec*proc (6 tests)
+crash       =   2.71 sec*proc (14 tests)
+headless    =   3.42 sec*proc (36 tests)
+logging     =   0.24 sec*proc (10 tests)
+private     =   0.30 sec*proc (1 test)
+world       =   0.30 sec*proc (1 test)
+
+Total Test time (real) =   3.45 sec

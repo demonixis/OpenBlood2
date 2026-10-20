@@ -1,0 +1,42 @@
+634/634 Testing: gideon_attack.private
+634/634 Test: gideon_attack.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_attack_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_attack.private" start time: Oct 17 03:03 CEST
+Output:
+----------------------------------------------------------
+cycle=0 dodge_clip=10 elapsed=1 taunt_clip=9 original_shield_shots=1 updates=404
+cycle=1 dodge_clip=10 elapsed=1 taunt_clip=9 original_shield_shots=1 updates=404
+cycle=2 dodge_clip=10 elapsed=1 taunt_clip=9 original_shield_shots=1 updates=404
+<end of output>
+Test time =   1.83 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_attack.private" end time: Oct 17 03:03 CEST
+"gideon_attack.private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 17 03:03 CEST
+
+ai_escape =   1.95 sec*proc
+
+ai_hit =   2.17 sec*proc
+
+ai_locomotion =   2.33 sec*proc
+
+ai_runtime =  68.00 sec*proc
+
+gideon_attack =   2.15 sec*proc
+
+gideon_combat =   2.96 sec*proc
+
+gideon_teleport =   1.55 sec*proc
+
+headless = 120.84 sec*proc
+
+objects =   0.50 sec*proc
+
+private = 117.71 sec*proc
+
+world =  39.24 sec*proc
+

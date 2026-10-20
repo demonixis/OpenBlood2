@@ -1,0 +1,15 @@
+{
+  "name": "openblood2_ctest_inventory",
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/tmp/lithtech-audit-2bVxTF/openblood2",
+    "-N"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:22:17.458768+00:00",
+  "elapsed_seconds": 0.025,
+  "timeout_seconds": 20,
+  "exit_code": 0,
+  "log": "openblood2_ctest_inventory.log"
+}

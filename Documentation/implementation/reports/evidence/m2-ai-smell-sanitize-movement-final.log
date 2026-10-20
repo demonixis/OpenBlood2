@@ -1,0 +1,34 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/sanitize
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 84
+    Start 84: movement.private
+
+84: Test command: <workspace>/Blood2/build/sanitize/tests/movement_tests "private" "<external-data-root>"
+84: Working Directory: <workspace>/Blood2/build/sanitize/tests
+84: Test timeout computed to be: 120
+84: Original SubwayA camera intro expired after 12.0167 simulation seconds
+84: cycle 0: distance 186.661; rise 55.998; jumps 1; landings 2; ground 1; messages 1762
+84: Original SubwayA camera intro expired after 12.0333 simulation seconds
+84: cycle 1: distance 186.661; rise 55.998; jumps 1; landings 2; ground 1; messages 1764
+84: Original SubwayA camera intro expired after 12.0167 simulation seconds
+84: cycle 2: distance 186.661; rise 55.998; jumps 1; landings 2; ground 1; messages 1762
+1/1 Test #84: movement.private .................   Passed   60.97 sec
+
+The following tests passed:
+	movement.private
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+headless    =  60.97 sec*proc (1 test)
+movement    =  60.97 sec*proc (1 test)
+private     =  60.97 sec*proc (1 test)
+
+Total Test time (real) =  60.98 sec

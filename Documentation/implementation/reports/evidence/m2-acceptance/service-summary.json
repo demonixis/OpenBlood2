@@ -1,0 +1,116 @@
+{
+  "catalogue_rows": 174,
+  "checkpoints": {
+    "30_SubwayA": {
+      "reached": 137,
+      "unexercised": 37
+    },
+    "60_SubwayA": {
+      "reached": 135,
+      "unexercised": 39
+    },
+    "30_CityHub": {
+      "reached": 96,
+      "unexercised": 78
+    },
+    "60_CityHub": {
+      "reached": 96,
+      "unexercised": 78
+    },
+    "30_teardown": {
+      "reached": 101,
+      "unexercised": 73
+    },
+    "60_teardown": {
+      "reached": 101,
+      "unexercised": 73
+    }
+  },
+  "unexercised_across_route": [
+    "AddObjectToList",
+    "AdvanceModelProjectile",
+    "CopyString",
+    "CreateObjectList",
+    "EndHMessageRead",
+    "EndHMessageWrite",
+    "GetAcceleration",
+    "GetAttachedModelNodeTransform",
+    "GetObjectColor",
+    "PlayLocalSound",
+    "PublishBloodSpurt",
+    "PublishFleshGibs",
+    "PublishLaserBeam",
+    "PublishObjectParticles",
+    "ReadKeyMessage",
+    "RecordBrushDestruction",
+    "RecordDebrisEffect",
+    "RecordExplosionEffect",
+    "RecordProjectile",
+    "RemoveObjectFromList",
+    "ReportSkyFailure",
+    "ResetRead",
+    "RestoreObjects",
+    "RotateWorldModel",
+    "SaveObjects",
+    "SendConversation",
+    "WriteKeyMessage"
+  ],
+  "observations": [
+    {
+      "rate": "30",
+      "observation": "Route summary: damaged=10 dead=10 ammoPickup=1 healthPickup=1 relay=1 relayStart=40.3167 fade=1 time=54.3167"
+    },
+    {
+      "rate": "30",
+      "observation": "TRAIN_EFFECTS\tSubwayA\t177 retained FX reports; unexpected failures=0; original absent gib_impact0 requests=7"
+    },
+    {
+      "rate": "30",
+      "observation": "Completed train at 30 Hz: 10 damaged / 10 dead authored Cultists, HP=129.974 ammo=9"
+    },
+    {
+      "rate": "30",
+      "observation": "Message lifetime: 83246 created, 83246 released, peak=3"
+    },
+    {
+      "rate": "30",
+      "observation": "Knife FIRE_KEY shots=2"
+    },
+    {
+      "rate": "30",
+      "observation": "TRAIN_EFFECTS\tCityHub\t10 retained FX reports; unexpected failures=0; original absent gib_impact0 requests=0"
+    },
+    {
+      "rate": "30",
+      "observation": "TRAIN_EFFECTS\tteardown\t0 retained FX reports; unexpected failures=0; original absent gib_impact0 requests=0"
+    },
+    {
+      "rate": "60",
+      "observation": "Route summary: damaged=10 dead=10 ammoPickup=1 healthPickup=1 relay=1 relayStart=41.2833 fade=1 time=55.2833"
+    },
+    {
+      "rate": "60",
+      "observation": "TRAIN_EFFECTS\tSubwayA\t192 retained FX reports; unexpected failures=0; original absent gib_impact0 requests=8"
+    },
+    {
+      "rate": "60",
+      "observation": "Completed train at 60 Hz: 10 damaged / 10 dead authored Cultists, HP=175 ammo=11"
+    },
+    {
+      "rate": "60",
+      "observation": "Message lifetime: 65534 created, 65534 released, peak=3"
+    },
+    {
+      "rate": "60",
+      "observation": "Knife FIRE_KEY shots=0"
+    },
+    {
+      "rate": "60",
+      "observation": "TRAIN_EFFECTS\tCityHub\t10 retained FX reports; unexpected failures=0; original absent gib_impact0 requests=0"
+    },
+    {
+      "rate": "60",
+      "observation": "TRAIN_EFFECTS\tteardown\t0 retained FX reports; unexpected failures=0; original absent gib_impact0 requests=0"
+    }
+  ]
+}

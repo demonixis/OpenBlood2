@@ -1,0 +1,14 @@
+347/357 Testing: ai_fire.clearance
+347/357 Test: ai_fire.clearance
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_fire_tests" "clearance"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_fire.clearance" start time: Oct 16 11:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_fire.clearance" end time: Oct 16 11:41 CEST
+"ai_fire.clearance" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,15 @@
+576/577 Testing: gpu.explosion_fragment_alpha
+576/577 Test: gpu.explosion_fragment_alpha
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_fragment_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fragment-alpha"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.explosion_fragment_alpha" start time: Oct 16 21:32 CEST
+Output:
+----------------------------------------------------------
+Original fragment after collision/rest: 1510 pixels, half-opacity blend verified
+<end of output>
+Test time =   0.42 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_fragment_alpha" end time: Oct 16 21:32 CEST
+"gpu.explosion_fragment_alpha" time elapsed: 00:00:00
+----------------------------------------------------------

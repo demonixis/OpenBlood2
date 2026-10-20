@@ -1,0 +1,14 @@
+387/395 Testing: ai_script.parsing
+387/395 Test: ai_script.parsing
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_script_tests" "parsing" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-script-parsing"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_script.parsing" start time: Oct 16 13:16 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.parsing" end time: Oct 16 13:16 CEST
+"ai_script.parsing" time elapsed: 00:00:00
+----------------------------------------------------------

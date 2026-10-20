@@ -1,0 +1,14 @@
+616/619 Testing: weapon_sprites.session
+616/619 Test: weapon_sprites.session
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_sprite_tests" "session" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-sprites-session"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapon_sprites.session" start time: Oct 16 23:50 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_sprites.session" end time: Oct 16 23:50 CEST
+"weapon_sprites.session" time elapsed: 00:00:00
+----------------------------------------------------------

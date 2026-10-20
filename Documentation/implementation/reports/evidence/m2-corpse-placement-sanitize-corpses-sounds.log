@@ -1,0 +1,14 @@
+482/646 Testing: corpses.sounds
+482/646 Test: corpses.sounds
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "sounds" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/sounds"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.sounds" start time: Oct 17 04:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.sounds" end time: Oct 17 04:30 CEST
+"corpses.sounds" time elapsed: 00:00:00
+----------------------------------------------------------

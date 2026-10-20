@@ -1,0 +1,36 @@
+4/609 Testing: objects.scheduling
+4/609 Test: objects.scheduling
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "scheduling"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.scheduling" start time: Oct 17 02:03 CEST
+Output:
+----------------------------------------------------------
+PASS scheduling
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.scheduling" end time: Oct 17 02:03 CEST
+"objects.scheduling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 02:03 CEST
+
+ai_fire =  19.12 sec*proc
+
+ai_runtime =  53.74 sec*proc
+
+explosion_fragments =  42.91 sec*proc
+
+headless = 228.63 sec*proc
+
+object_particles =  66.39 sec*proc
+
+objects =   0.46 sec*proc
+
+private = 226.36 sec*proc
+
+shield =  22.66 sec*proc
+
+world =  23.35 sec*proc
+

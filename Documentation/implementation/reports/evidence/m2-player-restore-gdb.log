@@ -1,0 +1,37 @@
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <ima:enforcing>
+  <https://debuginfod.fedoraproject.org/>
+  <ima:ignore>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+[New Thread 0x7ffff77566c0 (LWP 754155)]
+[New Thread 0x7ffff6f096c0 (LWP 754156)]
+[New Thread 0x7ffff67086c0 (LWP 754157)]
+[New Thread 0x7fffcc3ff6c0 (LWP 754158)]
+[Thread 0x7fffcc3ff6c0 (LWP 754158) exited]
+[New Thread 0x7fffcc3ff6c0 (LWP 754159)]
+[New Thread 0x7ffff56746c0 (LWP 754161)]
+[New Thread 0x7fffeffff6c0 (LWP 754162)]
+[New Thread 0x7fffef7fe6c0 (LWP 754164)]
+[New Thread 0x7fffee3ff6c0 (LWP 754165)]
+[New Thread 0x7fffedbfe6c0 (LWP 754167)]
+[New Thread 0x7fffe6c606c0 (LWP 754169)]
+[Thread 0x7fffe6c606c0 (LWP 754169) exited]
+[Thread 0x7fffedbfe6c0 (LWP 754167) exited]
+[Thread 0x7fffee3ff6c0 (LWP 754165) exited]
+[Thread 0x7fffeffff6c0 (LWP 754162) exited]
+[Thread 0x7fffef7fe6c0 (LWP 754164) exited]
+[Thread 0x7ffff56746c0 (LWP 754161) exited]
+[Thread 0x7fffcc3ff6c0 (LWP 754159) exited]
+Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+Restored original player/client association before private GPU rendering
+Private isolated Caleb/held Beretta diagnostic: 8271 non-background pixels, 37179 vertices
+Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+[Thread 0x7ffff67086c0 (LWP 754157) exited]
+[Thread 0x7ffff6f096c0 (LWP 754156) exited]
+[Thread 0x7ffff77566c0 (LWP 754155) exited]
+[Inferior 1 (process 754151) exited normally]

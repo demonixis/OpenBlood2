@@ -1,0 +1,90 @@
+359/707 Testing: model_view.subway
+359/707 Test: model_view.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/model_view_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"model_view.subway" start time: Oct 17 04:46 CEST
+Output:
+----------------------------------------------------------
+Prepared world=28 close=0 entries=36
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Characters\Caleb.abc visible=1 triangles=941 error=
+Models/Enemies/f_civilian1.abc visible=1 triangles=756 error=
+Models/Enemies/m_civilian1.abc visible=1 triangles=654 error=
+Models/Enemies/m_civilian1.abc visible=1 triangles=654 error=
+Models/Enemies/m_civilian1.abc visible=1 triangles=654 error=
+Models/Enemies/m_Cultist1.abc visible=1 triangles=730 error=
+Models/Enemies/f_Cultist1.abc visible=1 triangles=738 error=
+Models/Enemies/m_Cultist1.abc visible=1 triangles=730 error=
+Models/Enemies/m_Cultist1.abc visible=1 triangles=730 error=
+Models/Enemies/f_Cultist1.abc visible=1 triangles=738 error=
+Models/Enemies/m_Cultist1.abc visible=1 triangles=730 error=
+Models/Enemies/m_civilian1.abc visible=1 triangles=654 error=
+Models/Enemies/m_Cultist1.abc visible=1 triangles=730 error=
+Models/Enemies/m_Cultist1.abc visible=1 triangles=730 error=
+Models/Enemies/f_Cultist1.abc visible=1 triangles=738 error=
+Models/Enemies/gideon.abc visible=1 triangles=1100 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models/Enemies/f_Cultist1.abc visible=1 triangles=738 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+right view weapon visible=0 triangles=0 error=
+Models: world=28 entries=36 vertices=40479 diagnostics=0 skin bytes=3440644
+Prepared world=28 close=0 entries=36
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Characters\Caleb.abc visible=1 triangles=941 error=
+Models/Enemies/f_civilian1.abc visible=1 triangles=756 error=
+Models/Enemies/m_civilian1.abc visible=1 triangles=654 error=
+Models/Enemies/m_civilian1.abc visible=1 triangles=654 error=
+Models/Enemies/m_civilian1.abc visible=1 triangles=654 error=
+Models/Enemies/m_Cultist1.abc visible=1 triangles=730 error=
+Models/Enemies/f_Cultist1.abc visible=1 triangles=738 error=
+Models/Enemies/m_Cultist1.abc visible=1 triangles=730 error=
+Models/Enemies/m_Cultist1.abc visible=1 triangles=730 error=
+Models/Enemies/f_Cultist1.abc visible=1 triangles=738 error=
+Models/Enemies/m_Cultist1.abc visible=1 triangles=730 error=
+Models/Enemies/m_civilian1.abc visible=1 triangles=654 error=
+Models/Enemies/m_Cultist1.abc visible=1 triangles=730 error=
+Models/Enemies/m_Cultist1.abc visible=1 triangles=730 error=
+Models/Enemies/f_Cultist1.abc visible=1 triangles=738 error=
+Models/Enemies/gideon.abc visible=1 triangles=1100 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models/Enemies/f_Cultist1.abc visible=1 triangles=738 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+right view weapon visible=0 triangles=0 error=
+Models: world=28 entries=36 vertices=40479 diagnostics=0 skin bytes=3440644
+<end of output>
+Test time =   1.12 sec
+----------------------------------------------------------
+Test Passed.
+"model_view.subway" end time: Oct 17 04:46 CEST
+"model_view.subway" time elapsed: 00:00:01
+----------------------------------------------------------

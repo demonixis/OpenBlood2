@@ -1,0 +1,14 @@
+675/683 Testing: gideon_teleport.fade
+675/683 Test: gideon_teleport.fade
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon_teleport_tests" "fade" "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon-teleport-fade"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gideon_teleport.fade" start time: Oct 17 02:46 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_teleport.fade" end time: Oct 17 02:46 CEST
+"gideon_teleport.fade" time elapsed: 00:00:00
+----------------------------------------------------------

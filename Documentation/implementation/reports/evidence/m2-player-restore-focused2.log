@@ -1,0 +1,31 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 531: player_restore.roundtrip
+    Start 532: player_restore.failures
+1/5 Test #531: player_restore.roundtrip .........   Passed    0.01 sec
+    Start 533: player_restore.lifetime
+2/5 Test #532: player_restore.failures ..........   Passed    0.02 sec
+    Start 534: player_restore.private
+3/5 Test #533: player_restore.lifetime ..........   Passed    0.01 sec
+4/5 Test #534: player_restore.private ...........   Passed    1.34 sec
+    Start 350: gpu.model_private
+5/5 Test #350: gpu.model_private ................***Exception: SegFault  1.35 sec
+Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+Restored original player/client association before private GPU rendering
+Private isolated Caleb/held Beretta diagnostic: 8271 non-background pixels, 37179 vertices
+Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+
+
+80% tests passed, 1 tests failed out of 5
+
+Label Time Summary:
+gpu               =   1.35 sec*proc (1 test)
+headless          =   1.38 sec*proc (4 tests)
+model_view        =   1.35 sec*proc (1 test)
+player_restore    =   1.38 sec*proc (4 tests)
+private           =   2.68 sec*proc (2 tests)
+
+Total Test time (real) =   2.71 sec
+
+The following tests FAILED:
+	350 - gpu.model_private (SEGFAULT)                      gpu model_view private
+Errors while running CTest

@@ -1,0 +1,24 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 817: particle_stream.ramps
+    Start 821: particle_stream.private
+    Start 820: particle_stream.budgets
+1/7 Test #817: particle_stream.ramps ............   Passed    0.00 sec
+    Start 819: particle_stream.session
+2/7 Test #819: particle_stream.session ..........   Passed    0.00 sec
+    Start 815: particle_stream.rules
+3/7 Test #815: particle_stream.rules ............   Passed    0.00 sec
+    Start 816: particle_stream.clocks
+4/7 Test #816: particle_stream.clocks ...........   Passed    0.00 sec
+    Start 818: particle_stream.failures
+5/7 Test #818: particle_stream.failures .........   Passed    0.00 sec
+6/7 Test #820: particle_stream.budgets ..........   Passed    0.03 sec
+7/7 Test #821: particle_stream.private ..........   Passed   30.90 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+headless           =  30.95 sec*proc (7 tests)
+particle_stream    =  30.95 sec*proc (7 tests)
+private            =  30.90 sec*proc (1 test)
+
+Total Test time (real) =  30.91 sec

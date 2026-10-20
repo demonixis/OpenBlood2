@@ -1,0 +1,23 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start  28: gpu.lifecycle
+1/5 Test  #28: gpu.lifecycle ....................   Passed    2.16 sec
+    Start  82: gpu.weapons
+2/5 Test  #82: gpu.weapons ......................   Passed    3.00 sec
+    Start 844: gpu.level_change
+3/5 Test #844: gpu.level_change .................   Passed    1.47 sec
+    Start 937: gpu.train_session
+4/5 Test #937: gpu.train_session ................   Passed    6.25 sec
+    Start 941: gpu.screen_fade
+5/5 Test #941: gpu.screen_fade ..................   Passed    0.43 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+gpu              =  13.32 sec*proc (5 tests)
+private          =  10.72 sec*proc (3 tests)
+screen_fade      =   0.43 sec*proc (1 test)
+train_session    =   6.25 sec*proc (1 test)
+weapons          =   3.00 sec*proc (1 test)
+world            =   1.47 sec*proc (1 test)
+
+Total Test time (real) =  13.33 sec

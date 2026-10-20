@@ -1,0 +1,29 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start    3: gpu.platform_video
+1/8 Test    #3: gpu.platform_video ...............   Passed    0.16 sec
+    Start    4: gpu.platform_window
+2/8 Test    #4: gpu.platform_window ..............   Passed    0.16 sec
+    Start    5: gpu.platform_gpu
+3/8 Test    #5: gpu.platform_gpu .................   Passed    0.98 sec
+    Start   60: gpu.lifecycle
+4/8 Test   #60: gpu.lifecycle ....................   Passed    0.53 sec
+    Start 1031: gpu.hud
+5/8 Test #1031: gpu.hud ..........................   Passed    0.52 sec
+    Start 1177: gpu.menus
+6/8 Test #1177: gpu.menus ........................   Passed    1.77 sec
+    Start 1181: gpu.menu_traversal
+7/8 Test #1181: gpu.menu_traversal ...............   Passed    4.19 sec
+    Start 1207: gpu.demo_menu
+8/8 Test #1207: gpu.demo_menu ....................   Passed    5.78 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+demo_menu    =   5.78 sec*proc (1 test)
+gpu          =  14.09 sec*proc (8 tests)
+hud          =   0.52 sec*proc (1 test)
+menus        =   5.96 sec*proc (2 tests)
+platform     =   1.30 sec*proc (3 tests)
+private      =  12.26 sec*proc (4 tests)
+
+Total Test time (real) =  14.11 sec

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-c++"
+	tests="5"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gigabyte-g5"
+	time="0"
+	timestamp="2026-10-18T06:09:39"
+	>
+	<testcase name="ima_clock.timing" classname="ima_clock.timing" time="0.00182801" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ima_clock.limits" classname="ima_clock.limits" time="0.00145387" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ima_clock.dispatch" classname="ima_clock.dispatch" time="0.00238428" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ima_clock.reference" classname="ima_clock.reference" time="0.00981251" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>Original IMRT25 synthetic FNV64 624056526007582026
+</system-out>
+	</testcase>
+	<testcase name="ima_clock.private" classname="ima_clock.private" time="0.0164948" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets;private"/>
+		</properties>
+		<system-out>156 original section clocks / FNV64 217478193828128853
+</system-out>
+	</testcase>
+</testsuite>

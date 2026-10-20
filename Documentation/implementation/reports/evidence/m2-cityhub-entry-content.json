@@ -1,0 +1,11 @@
+{
+  "archive": "BLOOD2.REZ",
+  "resource": "worlds/02_cityhub.dat",
+  "offset": 144209905,
+  "size": 3899649,
+  "overrides": 0,
+  "sha256": "11ca9c6cac3665f50b095cb42aff9929c361dc5059152468dc757f3358f2ce84",
+  "case_insensitive_fallengrills_occurrences": 1,
+  "source_objects": 1026,
+  "world_models": 100
+}

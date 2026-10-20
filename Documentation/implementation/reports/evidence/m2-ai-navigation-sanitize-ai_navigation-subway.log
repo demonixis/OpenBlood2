@@ -1,0 +1,59 @@
+375/375 Testing: ai_navigation.subway
+375/375 Test: ai_navigation.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_navigation_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_navigation.subway" start time: Oct 16 12:33 CEST
+Output:
+----------------------------------------------------------
+cycle=0 real SubwayA local clearance at -32 170 -3224
+cycle=1 real SubwayA local clearance at -32 170 -3224
+<end of output>
+Test time =   2.68 sec
+----------------------------------------------------------
+Test Passed.
+"ai_navigation.subway" end time: Oct 16 12:33 CEST
+"ai_navigation.subway" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 16 12:33 CEST
+
+ai_fire =  10.85 sec*proc
+
+ai_keys =  20.66 sec*proc
+
+ai_navigation =   2.95 sec*proc
+
+ai_perception =   3.69 sec*proc
+
+ai_sight =   3.54 sec*proc
+
+ai_state =  26.42 sec*proc
+
+ai_target =   3.67 sec*proc
+
+ai_trigger =   2.47 sec*proc
+
+attachments =   4.34 sec*proc
+
+character =  21.09 sec*proc
+
+character_audio =  25.47 sec*proc
+
+character_motion =   1.13 sec*proc
+
+headless = 271.73 sec*proc
+
+locomotion =  13.11 sec*proc
+
+objects =   0.23 sec*proc
+
+player =   8.31 sec*proc
+
+private = 266.64 sec*proc
+
+services =   7.86 sec*proc
+
+sprites =  34.18 sec*proc
+
+weapons =  81.75 sec*proc
+

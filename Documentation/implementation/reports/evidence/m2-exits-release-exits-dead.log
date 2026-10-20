@@ -1,0 +1,14 @@
+504/507 Testing: exits.dead
+504/507 Test: exits.dead
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/exit_tests" "dead" "/home/yann/projects/lithtech/Blood2/build/release/tests/exit-fixtures/dead"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"exits.dead" start time: Oct 16 17:26 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"exits.dead" end time: Oct 16 17:26 CEST
+"exits.dead" time elapsed: 00:00:00
+----------------------------------------------------------

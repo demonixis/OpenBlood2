@@ -1,0 +1,170 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 569: weapon_impacts.private
+      Start  40: world.destination_trial_private
+ 1/76 Test  #40: world.destination_trial_private ...   Passed   32.34 sec
+      Start  41: world.destination_private
+ 2/76 Test  #41: world.destination_private .........   Passed   14.13 sec
+      Start  66: weapons.private
+ 3/76 Test #569: weapon_impacts.private ............   Passed   87.81 sec
+      Start 562: weapon_audio.private
+ 4/76 Test #562: weapon_audio.private ..............   Passed    8.34 sec
+      Start 266: character_audio.subway
+ 5/76 Test #266: character_audio.subway ............   Passed   44.95 sec
+      Start 520: sprite_view.subway
+ 6/76 Test #520: sprite_view.subway ................   Passed    6.50 sec
+      Start 524: explosion_sprites.private
+ 7/76 Test #524: explosion_sprites.private .........   Passed    7.28 sec
+      Start  42: world.private
+ 8/76 Test  #42: world.private .....................   Passed    4.68 sec
+      Start 567: weapon_impacts.hearing
+ 9/76 Test #567: weapon_impacts.hearing ............   Passed    0.25 sec
+      Start 568: weapon_impacts.limits
+10/76 Test #568: weapon_impacts.limits .............   Passed    0.22 sec
+      Start  24: world.destination_trials
+11/76 Test  #24: world.destination_trials ..........   Passed    0.19 sec
+      Start 565: weapon_impacts.brushes
+12/76 Test #565: weapon_impacts.brushes ............   Passed    0.17 sec
+      Start 560: weapon_audio.callbacks
+13/76 Test #560: weapon_audio.callbacks ............   Passed    0.11 sec
+      Start 265: character_audio.catalog
+14/76 Test #265: character_audio.catalog ...........   Passed    2.52 sec
+      Start 564: weapon_impacts.world
+15/76 Test #564: weapon_impacts.world ..............   Passed    0.07 sec
+      Start 566: weapon_impacts.volumes
+16/76 Test #566: weapon_impacts.volumes ............   Passed    0.07 sec
+      Start 557: weapon_audio.voices
+17/76 Test #557: weapon_audio.voices ...............   Passed    0.06 sec
+      Start  27: world.destination_lifetime
+18/76 Test  #27: world.destination_lifetime ........   Passed    0.06 sec
+      Start 558: weapon_audio.hearing
+19/76 Test #558: weapon_audio.hearing ..............   Passed    0.05 sec
+      Start 561: weapon_audio.lifetime
+20/76 Test #561: weapon_audio.lifetime .............   Passed    0.05 sec
+      Start 559: weapon_audio.failures
+21/76 Test #559: weapon_audio.failures .............   Passed    0.04 sec
+      Start 563: weapon_impacts.selection
+22/76 Test #563: weapon_impacts.selection ..........   Passed    0.02 sec
+      Start  36: world.mutations
+23/76 Test  #36: world.mutations ...................   Passed    0.25 sec
+      Start  63: weapons.animation
+24/76 Test  #63: weapons.animation .................   Passed    0.34 sec
+      Start 519: sprite_view.failures
+25/76 Test #519: sprite_view.failures ..............   Passed    0.18 sec
+      Start  26: world.destination_schema
+26/76 Test  #26: world.destination_schema ..........   Passed    0.02 sec
+      Start  25: world.destination_messages
+27/76 Test  #25: world.destination_messages ........   Passed    0.02 sec
+      Start  28: world.sprite_entries
+28/76 Test  #28: world.sprite_entries ..............   Passed    0.05 sec
+      Start  29: world.sound_entries
+29/76 Test  #29: world.sound_entries ...............   Passed    0.05 sec
+      Start  35: world.world_rejection
+30/76 Test  #35: world.world_rejection .............   Passed    0.06 sec
+      Start 522: explosion_sprites.failures
+31/76 Test #522: explosion_sprites.failures ........   Passed    0.05 sec
+      Start  64: weapons.lifetime
+32/76 Test  #64: weapons.lifetime ..................   Passed    0.07 sec
+      Start  10: objects.unsupported_teardown
+33/76 Test  #10: objects.unsupported_teardown ......   Passed    0.05 sec
+      Start 264: character_audio.surfaces
+34/76 Test #264: character_audio.surfaces ..........   Passed    0.07 sec
+      Start 521: explosion_sprites.formulas
+35/76 Test #521: explosion_sprites.formulas ........   Passed    0.02 sec
+      Start 263: character_audio.footsteps
+36/76 Test #263: character_audio.footsteps .........   Passed    0.07 sec
+      Start 261: character_audio.player
+37/76 Test #261: character_audio.player ............   Passed    0.09 sec
+      Start 262: character_audio.callbacks
+38/76 Test #262: character_audio.callbacks .........   Passed    0.07 sec
+      Start 259: character_audio.lifetime
+39/76 Test #259: character_audio.lifetime ..........   Passed    0.06 sec
+      Start   9: objects.messages_strings
+40/76 Test   #9: objects.messages_strings ..........   Passed    0.05 sec
+      Start  37: world.session_lifecycle
+41/76 Test  #37: world.session_lifecycle ...........   Passed    0.03 sec
+      Start 518: sprite_view.geometry
+42/76 Test #518: sprite_view.geometry ..............   Passed    0.02 sec
+      Start  58: weapons.inventory
+43/76 Test  #58: weapons.inventory .................   Passed    0.05 sec
+      Start 260: character_audio.rejection
+44/76 Test #260: character_audio.rejection .........   Passed    0.06 sec
+      Start  61: weapons.melee
+45/76 Test  #61: weapons.melee .....................   Passed    0.05 sec
+      Start  65: weapons.rollback
+46/76 Test  #65: weapons.rollback ..................   Passed    0.05 sec
+      Start  60: weapons.firing
+47/76 Test  #60: weapons.firing ....................   Passed    0.05 sec
+      Start 258: character_audio.voices
+48/76 Test #258: character_audio.voices ............   Passed    0.05 sec
+      Start  59: weapons.segments
+49/76 Test  #59: weapons.segments ..................   Passed    0.04 sec
+      Start 523: explosion_sprites.session
+50/76 Test #523: explosion_sprites.session .........   Passed    0.02 sec
+      Start  62: weapons.damage
+51/76 Test  #62: weapons.damage ....................   Passed    0.04 sec
+      Start  11: objects.creation_failures
+52/76 Test  #11: objects.creation_failures .........   Passed    0.04 sec
+      Start  39: world.original_trigger
+53/76 Test  #39: world.original_trigger ............   Passed    0.02 sec
+      Start  33: world.world_properties
+54/76 Test  #33: world.world_properties ............   Passed    0.02 sec
+      Start  34: world.world_geometry
+55/76 Test  #34: world.world_geometry ..............   Passed    0.02 sec
+      Start  32: world.resource_mount
+56/76 Test  #32: world.resource_mount ..............   Passed    0.02 sec
+      Start  31: world.rez_rejection
+57/76 Test  #31: world.rez_rejection ...............   Passed    0.02 sec
+      Start  30: world.rez_structure
+58/76 Test  #30: world.rez_structure ...............   Passed    0.02 sec
+      Start  38: world.session_messages
+59/76 Test  #38: world.session_messages ............   Passed    0.02 sec
+      Start   8: objects.links_lists
+60/76 Test   #8: objects.links_lists ...............   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+61/76 Test   #3: objects.reasons_properties ........   Passed    0.02 sec
+      Start   1: objects.original_objects
+62/76 Test   #1: objects.original_objects ..........   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+63/76 Test   #5: objects.deferred_removal ..........   Passed    0.02 sec
+      Start   7: objects.handles_selection
+64/76 Test   #7: objects.handles_selection .........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+65/76 Test   #2: objects.nested_creation ...........   Passed    0.02 sec
+      Start   4: objects.scheduling
+66/76 Test   #4: objects.scheduling ................   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+67/76 Test   #6: objects.aggregate_dispatch ........   Passed    0.02 sec
+      Start 257: character_audio.paths
+68/76 Test #257: character_audio.paths .............   Passed    0.02 sec
+      Start 570: weapon_sprites.formulas
+69/76 Test #570: weapon_sprites.formulas ...........   Passed    0.02 sec
+      Start 571: weapon_sprites.delay
+70/76 Test #571: weapon_sprites.delay ..............   Passed    0.02 sec
+      Start 572: weapon_sprites.failures
+71/76 Test #572: weapon_sprites.failures ...........   Passed    0.05 sec
+      Start 573: weapon_sprites.selection
+72/76 Test #573: weapon_sprites.selection ..........   Passed    0.05 sec
+      Start 574: weapon_sprites.containers
+73/76 Test #574: weapon_sprites.containers .........   Passed    0.05 sec
+      Start 575: weapon_sprites.session
+74/76 Test #575: weapon_sprites.session ............   Passed    0.05 sec
+      Start 576: weapon_sprites.private
+75/76 Test #576: weapon_sprites.private ............   Passed   15.83 sec
+76/76 Test  #66: weapons.private ...................   Passed  184.46 sec
+
+100% tests passed, 0 tests failed out of 76
+
+Label Time Summary:
+character_audio      =  47.97 sec*proc (10 tests)
+explosion_sprites    =   7.37 sec*proc (4 tests)
+headless             = 412.86 sec*proc (76 tests)
+objects              =   0.31 sec*proc (11 tests)
+private              = 408.85 sec*proc (11 tests)
+sprite_view          =   6.70 sec*proc (3 tests)
+weapon_audio         =   8.66 sec*proc (6 tests)
+weapon_impacts       =  88.61 sec*proc (7 tests)
+weapon_sprites       =  16.07 sec*proc (7 tests)
+weapons              = 185.15 sec*proc (9 tests)
+world                =  52.01 sec*proc (19 tests)
+
+Total Test time (real) = 230.95 sec

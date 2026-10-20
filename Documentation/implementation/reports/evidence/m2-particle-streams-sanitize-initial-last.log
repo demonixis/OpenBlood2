@@ -1,0 +1,586 @@
+Start testing: Oct 17 10:35 CEST
+----------------------------------------------------------
+43/749 Testing: world.level_change_private
+43/749 Test: world.level_change_private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "level_change_private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.level_change_private" start time: Oct 17 10:35 CEST
+Output:
+----------------------------------------------------------
+CityHub refusal 0: Destination initialization rejected: 10 unsupported classes, 1 failed entries, 0 unavailable services
+SubwayA transfer 0:
+CityHub refusal 1: Destination initialization rejected: 10 unsupported classes, 1 failed entries, 0 unavailable services
+SubwayA transfer 1:
+CityHub refusal 2: Destination initialization rejected: 10 unsupported classes, 1 failed entries, 0 unavailable services
+SubwayA transfer 2:
+PASS level_change_private
+<end of output>
+Test time =  42.95 sec
+----------------------------------------------------------
+Test Passed.
+"world.level_change_private" end time: Oct 17 10:35 CEST
+"world.level_change_private" time elapsed: 00:00:42
+----------------------------------------------------------
+
+44/749 Testing: world.destination_trial_private
+44/749 Test: world.destination_trial_private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "destination_trial_private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.destination_trial_private" start time: Oct 17 10:35 CEST
+Output:
+----------------------------------------------------------
+Cycle 0 02_cityhub: loaded=1 entered=1 cleanup=1 created=443 unknown=10 failed=1 objects=478 error=
+Cycle 0 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 0 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1 02_cityhub: loaded=1 entered=1 cleanup=1 created=443 unknown=10 failed=1 objects=478 error=
+Cycle 1 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 1 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2 02_cityhub: loaded=1 entered=1 cleanup=1 created=443 unknown=10 failed=1 objects=478 error=
+Cycle 2 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 2 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+PASS destination_trial_private
+<end of output>
+Test time =  49.81 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_trial_private" end time: Oct 17 10:36 CEST
+"world.destination_trial_private" time elapsed: 00:00:49
+----------------------------------------------------------
+
+570/749 Testing: object_particles.private
+570/749 Test: object_particles.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_particle_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"object_particles.private" start time: Oct 17 10:35 CEST
+Output:
+----------------------------------------------------------
+SubwayA cycle 0 dt=0.02: 27 trails, peak 5872 particles, observed 6819 emitted; all expired
+SubwayA cycle 1 dt=0.0166667: 27 trails, peak 6304 particles, observed 6819 emitted; all expired
+SubwayA cycle 2 dt=0.05: 27 trails, peak 2936 particles, observed 6716 emitted; all expired
+<end of output>
+Test time =  95.74 sec
+----------------------------------------------------------
+Test Passed.
+"object_particles.private" end time: Oct 17 10:36 CEST
+"object_particles.private" time elapsed: 00:01:35
+----------------------------------------------------------
+
+25/749 Testing: world.level_change
+25/749 Test: world.level_change
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "level_change" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/level_change"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.level_change" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+trial1: Destination world texture t.dtx: Missing exact-path resource
+trial2: No single-player GameStartPoint
+trial3: Start point has no supported ground collision
+trial4: Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+trial5: Destination initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+trial6: Destination start trigger requested another level during entry
+broken: DAT v56: invalid/unsupported section offsets near byte 4
+missing: Resource not found: worlds/missing.dat
+Commit 0:
+Commit 1:
+Commit 2:
+PASS level_change
+<end of output>
+Test time =   0.47 sec
+----------------------------------------------------------
+Test Passed.
+"world.level_change" end time: Oct 17 10:36 CEST
+"world.level_change" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/749 Testing: world.destination_trials
+27/749 Test: world.destination_trials
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "destination_trials" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/destination_trials"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.destination_trials" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+trial4: loaded=1 entered=1 cleanup=1 failed=1 error=
+trial2: loaded=1 entered=0 cleanup=1 failed=0 error=No single-player GameStartPoint
+trial3: loaded=1 entered=0 cleanup=1 failed=0 error=Start point has no supported ground collision
+broken: loaded=0 entered=0 cleanup=1 failed=0 error=DAT v56: invalid/unsupported section offsets near byte 4
+missing: loaded=0 entered=0 cleanup=1 failed=0 error=Resource not found: worlds/missing.dat
+trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+PASS destination_trials
+<end of output>
+Test time =   0.31 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_trials" end time: Oct 17 10:36 CEST
+"world.destination_trials" time elapsed: 00:00:00
+----------------------------------------------------------
+
+30/749 Testing: world.destination_lifetime
+30/749 Test: world.destination_lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "destination_lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/destination_lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.destination_lifetime" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+PASS destination_lifetime
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_lifetime" end time: Oct 17 10:36 CEST
+"world.destination_lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1/749 Testing: objects.builtin_model
+1/749 Test: objects.builtin_model
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "builtin_model"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.builtin_model" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+PASS builtin_model
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.builtin_model" end time: Oct 17 10:36 CEST
+"objects.builtin_model" time elapsed: 00:00:00
+----------------------------------------------------------
+
+569/749 Testing: object_particles.session
+569/749 Test: object_particles.session
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_particle_tests" "session" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object-particles-session"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"object_particles.session" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"object_particles.session" end time: Oct 17 10:36 CEST
+"object_particles.session" time elapsed: 00:00:00
+----------------------------------------------------------
+
+566/749 Testing: object_particles.emission
+566/749 Test: object_particles.emission
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_particle_tests" "emission" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object-particles-emission"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"object_particles.emission" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"object_particles.emission" end time: Oct 17 10:36 CEST
+"object_particles.emission" time elapsed: 00:00:00
+----------------------------------------------------------
+
+568/749 Testing: object_particles.failures
+568/749 Test: object_particles.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_particle_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object-particles-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"object_particles.failures" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"object_particles.failures" end time: Oct 17 10:36 CEST
+"object_particles.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/749 Testing: objects.unsupported_teardown
+11/749 Test: objects.unsupported_teardown
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "unsupported_teardown"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.unsupported_teardown" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+PASS unsupported_teardown
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"objects.unsupported_teardown" end time: Oct 17 10:36 CEST
+"objects.unsupported_teardown" time elapsed: 00:00:00
+----------------------------------------------------------
+
+567/749 Testing: object_particles.stopping
+567/749 Test: object_particles.stopping
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_particle_tests" "stopping" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object-particles-stopping"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"object_particles.stopping" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"object_particles.stopping" end time: Oct 17 10:36 CEST
+"object_particles.stopping" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/749 Testing: objects.messages_strings
+10/749 Test: objects.messages_strings
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "messages_strings"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.messages_strings" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+PASS messages_strings
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"objects.messages_strings" end time: Oct 17 10:36 CEST
+"objects.messages_strings" time elapsed: 00:00:00
+----------------------------------------------------------
+
+574/749 Testing: explosion_flames.session
+574/749 Test: explosion_flames.session
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_flame_tests" "session" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-flames-session"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_flames.session" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_flames.session" end time: Oct 17 10:36 CEST
+"explosion_flames.session" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/749 Testing: objects.creation_failures
+12/749 Test: objects.creation_failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "creation_failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.creation_failures" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+PASS creation_failures
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"objects.creation_failures" end time: Oct 17 10:36 CEST
+"objects.creation_failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+573/749 Testing: explosion_flames.failures
+573/749 Test: explosion_flames.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_flame_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-flames-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_flames.failures" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_flames.failures" end time: Oct 17 10:36 CEST
+"explosion_flames.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+571/749 Testing: explosion_flames.zones
+571/749 Test: explosion_flames.zones
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_flame_tests" "zones" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-flames-zones"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_flames.zones" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_flames.zones" end time: Oct 17 10:36 CEST
+"explosion_flames.zones" time elapsed: 00:00:00
+----------------------------------------------------------
+
+572/749 Testing: explosion_flames.lifecycle
+572/749 Test: explosion_flames.lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_flame_tests" "lifecycle" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-flames-lifecycle"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_flames.lifecycle" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_flames.lifecycle" end time: Oct 17 10:36 CEST
+"explosion_flames.lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/749 Testing: objects.reasons_properties
+4/749 Test: objects.reasons_properties
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "reasons_properties"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.reasons_properties" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+PASS reasons_properties
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"objects.reasons_properties" end time: Oct 17 10:36 CEST
+"objects.reasons_properties" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/749 Testing: objects.links_lists
+9/749 Test: objects.links_lists
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "links_lists"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.links_lists" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+PASS links_lists
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"objects.links_lists" end time: Oct 17 10:36 CEST
+"objects.links_lists" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/749 Testing: objects.original_objects
+2/749 Test: objects.original_objects
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "original_objects"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.original_objects" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+PASS original_objects
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"objects.original_objects" end time: Oct 17 10:36 CEST
+"objects.original_objects" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/749 Testing: objects.deferred_removal
+6/749 Test: objects.deferred_removal
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "deferred_removal"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.deferred_removal" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+PASS deferred_removal
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"objects.deferred_removal" end time: Oct 17 10:36 CEST
+"objects.deferred_removal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/749 Testing: objects.nested_creation
+3/749 Test: objects.nested_creation
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "nested_creation"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.nested_creation" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+PASS nested_creation
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"objects.nested_creation" end time: Oct 17 10:36 CEST
+"objects.nested_creation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/749 Testing: objects.handles_selection
+8/749 Test: objects.handles_selection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "handles_selection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.handles_selection" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+PASS handles_selection
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"objects.handles_selection" end time: Oct 17 10:36 CEST
+"objects.handles_selection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/749 Testing: objects.aggregate_dispatch
+7/749 Test: objects.aggregate_dispatch
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "aggregate_dispatch"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.aggregate_dispatch" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+PASS aggregate_dispatch
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"objects.aggregate_dispatch" end time: Oct 17 10:36 CEST
+"objects.aggregate_dispatch" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/749 Testing: objects.scheduling
+5/749 Test: objects.scheduling
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "scheduling"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.scheduling" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+PASS scheduling
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.scheduling" end time: Oct 17 10:36 CEST
+"objects.scheduling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+743/749 Testing: particle_stream.rules
+743/749 Test: particle_stream.rules
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/particle_stream_tests" "rules" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/particle-stream-rules"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"particle_stream.rules" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"particle_stream.rules" end time: Oct 17 10:36 CEST
+"particle_stream.rules" time elapsed: 00:00:00
+----------------------------------------------------------
+
+744/749 Testing: particle_stream.clocks
+744/749 Test: particle_stream.clocks
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/particle_stream_tests" "clocks" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/particle-stream-clocks"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"particle_stream.clocks" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"particle_stream.clocks" end time: Oct 17 10:36 CEST
+"particle_stream.clocks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+745/749 Testing: particle_stream.ramps
+745/749 Test: particle_stream.ramps
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/particle_stream_tests" "ramps" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/particle-stream-ramps"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"particle_stream.ramps" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"particle_stream.ramps" end time: Oct 17 10:36 CEST
+"particle_stream.ramps" time elapsed: 00:00:00
+----------------------------------------------------------
+
+746/749 Testing: particle_stream.failures
+746/749 Test: particle_stream.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/particle_stream_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/particle-stream-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"particle_stream.failures" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"particle_stream.failures" end time: Oct 17 10:36 CEST
+"particle_stream.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+747/749 Testing: particle_stream.session
+747/749 Test: particle_stream.session
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/particle_stream_tests" "session" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/particle-stream-session"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"particle_stream.session" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"particle_stream.session" end time: Oct 17 10:36 CEST
+"particle_stream.session" time elapsed: 00:00:00
+----------------------------------------------------------
+
+748/749 Testing: particle_stream.budgets
+748/749 Test: particle_stream.budgets
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/particle_stream_tests" "budgets" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/particle-stream-budgets"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"particle_stream.budgets" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.25 sec
+----------------------------------------------------------
+Test Passed.
+"particle_stream.budgets" end time: Oct 17 10:36 CEST
+"particle_stream.budgets" time elapsed: 00:00:00
+----------------------------------------------------------
+
+575/749 Testing: explosion_flames.private
+575/749 Test: explosion_flames.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_flame_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_flames.private" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+SubwayA diagnostic Tesla cycle 0: peak 79, eight bursts observed, complete expiry
+SubwayA diagnostic Tesla cycle 1: peak 81, eight bursts observed, complete expiry
+SubwayA diagnostic Tesla cycle 2: peak 80, eight bursts observed, complete expiry
+Authored Cathedral Tesla: lightningexplosion1, 24 initial particles
+Authored Cathedral Tesla: lightningexplosion2, 24 initial particles
+Authored Cathedral Tesla: lightningexplosion3, 24 initial particles
+<end of output>
+Test time =  38.16 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_flames.private" end time: Oct 17 10:37 CEST
+"explosion_flames.private" time elapsed: 00:00:38
+----------------------------------------------------------
+
+749/749 Testing: particle_stream.private
+749/749 Test: particle_stream.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/particle_stream_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"particle_stream.private" start time: Oct 17 10:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time = 180.15 sec
+----------------------------------------------------------
+Test Failed.
+"particle_stream.private" end time: Oct 17 10:39 CEST
+"particle_stream.private" time elapsed: 00:03:00
+----------------------------------------------------------
+
+End testing: Oct 17 10:39 CEST
+
+explosion_flames =  38.34 sec*proc
+
+headless = 408.97 sec*proc
+
+object_particles =  95.88 sec*proc
+
+objects =   0.55 sec*proc
+
+particle_stream = 180.59 sec*proc
+
+private = 406.81 sec*proc
+
+world =  93.61 sec*proc

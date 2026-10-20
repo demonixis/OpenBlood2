@@ -1,0 +1,14 @@
+620/624 Testing: player_controls.keys
+620/624 Test: player_controls.keys
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_controls_tests" "keys"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"player_controls.keys" start time: Oct 17 00:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.keys" end time: Oct 17 00:04 CEST
+"player_controls.keys" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,487 @@
+{
+  "date": "2026-10-17",
+  "implementation_baseline": "370888772d481a1ea66db7f030e0c4bb0abac1bc",
+  "status": "M2 incomplete; CityHub has zero unsupported entries and one missing world-model binding",
+  "validation": {
+    "headless-debug": {
+      "total": 783,
+      "failed": 0,
+      "private": 128,
+      "seconds": 165.15
+    },
+    "headless-release": {
+      "total": 783,
+      "failed": 0,
+      "private": 128,
+      "seconds": 24.63
+    },
+    "focused": {
+      "total": 20,
+      "failed": 0,
+      "private": 3,
+      "seconds": 7.7
+    },
+    "sanitize": {
+      "total": 45,
+      "failed": 0,
+      "private": 5,
+      "seconds": 59.15
+    },
+    "gpu-debug": {
+      "total": 22,
+      "failed": 0,
+      "private": 14,
+      "seconds": 92.69
+    },
+    "gpu-release": {
+      "total": 22,
+      "failed": 0,
+      "private": 14,
+      "seconds": 22.83
+    }
+  },
+  "accounting": {
+    "created": 453,
+    "world_sounds": 31,
+    "editor_only": 541,
+    "unsupported": 0,
+    "failed": 1,
+    "initial_total": 1026
+  },
+  "flashlight": {
+    "item_type": 2,
+    "charge": 100,
+    "seconds": 120,
+    "private_ray_distance": 42,
+    "private_radius": 16.8,
+    "private_brighter_rgb_channels": 37859,
+    "private_darker_rgb_channels": 0,
+    "private_reload_cycles": 2
+  },
+  "catalog": {
+    "readable_worlds": 57,
+    "flashlight_entries": 10,
+    "created_pickups": 1526,
+    "missing_models": 0,
+    "rejected_typeaction": 220,
+    "supported_spawns": 60
+  },
+  "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU; Vulkan ICD explicitly selected and runtime device logged",
+  "commands": [
+    "cmake --build build/<debug|release> -j3",
+    "ctest --test-dir build/<debug|release> -L headless -j3 --output-on-failure",
+    "cmake --build build/sanitize --target flashlight_tests medkit_tests object_contract_tests inventory_state_tests player_restore_tests player_keepalive_tests world_tests -j2",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -j2 -R '^(flashlight|medkit|objects|inventory_state|player_restore|player_keepalive)\\.|^world\\.(level_change|destination_trials|destination_lifetime)$' --output-on-failure",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(flashlight|flashlight_private|world_depth|model_depth|model_private|world_alpha|world_alpha_private|surface_effect|surface_effect_private|sky|sky_private|sky_app|sprite_alpha|sprite_private|mouse_combat|corpse_clearance|level_change|lifecycle|pickups|objectives|remote_private|proximity_private)$' --output-on-failure -V"
+  ],
+  "development_failures": [
+    "Test fixtures were corrected to use the original integer dead flag and a mutable SDK position argument.",
+    "The lifetime test initially attempted a second active adapter/reinitialization; separate session scopes preserve the existing exclusivity contract.",
+    "ShaderCross emits an additional Metal diagnostic pragma for helper functions; header tests now require the stdlib include and exact reflected light fields rather than assuming it is the first line.",
+    "Catalog totals and GPU destination/objectives probes still expected pre-flashlight accounting. Exact counts now reflect ten validated pickups, CityHub zero unsupported/one failed, and 485 schema-checked entries; TypeAction and missing geometry remain rejected."
+  ],
+  "limits": [
+    "Bounded solid ray excludes the local authoritative body; no complete retail client intersection parity",
+    "GetPointShade remains unavailable; original failure fallback is explicit",
+    "Single radial brightening has no shadows, occlusion, normals or baked lighting",
+    "Sky, sprites/FX and view weapons keep existing illumination",
+    "Missing fallengrills geometry still rejects CityHub NEW_LEVEL",
+    "Pickup sound output, PCX HUD, full game and native Apple automation remain incomplete"
+  ],
+  "artifacts": [
+    {
+      "file": "m2-flashlight-initial-build-debug.log",
+      "sha256": "a18dba2d99c43f219d63c2a2d16a1d750162365aadc3a77e127f32db36cf0d20",
+      "raw_capture_sha256": "a18dba2d99c43f219d63c2a2d16a1d750162365aadc3a77e127f32db36cf0d20",
+      "bytes": 53854
+    },
+    {
+      "file": "m2-flashlight-initial-build-release.log",
+      "sha256": "8891e8a4bbba4ec3f6bd45bf590a1e79523f7ce5b1ed061f3d36479c0c97c28c",
+      "raw_capture_sha256": "2784e5790afe0dee904bac1779e434c0a219d4e91990e0bf5a690da682537e2b",
+      "bytes": 95047
+    },
+    {
+      "file": "m2-flashlight-initial-gpu-accounting.log",
+      "sha256": "25f7259d2a0b89527bb4b36d54273cc0cd1805d940d0ad79ce1cc3deb384ea40",
+      "raw_capture_sha256": "b9b87fb729ac6191f36a644558b8099ffc57b0426955ce5071df6c25ecf28b43",
+      "bytes": 26376
+    },
+    {
+      "file": "m2-flashlight-build-debug.log",
+      "sha256": "5e7f13c66d16b8b67241eea3efcc920acf8d6ff40b49fe2c4d1237335b7e29da",
+      "raw_capture_sha256": "5e7f13c66d16b8b67241eea3efcc920acf8d6ff40b49fe2c4d1237335b7e29da",
+      "bytes": 1499
+    },
+    {
+      "file": "m2-flashlight-build-release.log",
+      "sha256": "fee7f62eb8e1f6ea3c1d651933828bdb7cf1828b3be34deb201542d2c710c022",
+      "raw_capture_sha256": "fee7f62eb8e1f6ea3c1d651933828bdb7cf1828b3be34deb201542d2c710c022",
+      "bytes": 677
+    },
+    {
+      "file": "m2-flashlight-build-sanitize.log",
+      "sha256": "8419c7cefc68f26d3327dceaf8c8d0a42076d64778050ac0b0a927dee5bb4dad",
+      "raw_capture_sha256": "ffb74fc52d7c25d1b077430b4307b2d3b732885ad14725b398b7144ad9cab0e7",
+      "bytes": 44739
+    },
+    {
+      "file": "m2-flashlight-build-sanitize-world.log",
+      "sha256": "3fa08bab4d504e5b9c58493daa12da3bcd44ed40882de31024836c51aec2d0bb",
+      "raw_capture_sha256": "3fa08bab4d504e5b9c58493daa12da3bcd44ed40882de31024836c51aec2d0bb",
+      "bytes": 332
+    },
+    {
+      "file": "m2-flashlight-headless-debug.log",
+      "sha256": "797fb9911cefdbf5cc2f2b1783865d8d4c757d635a1e1451a4f7bc3e57e8ab9b",
+      "raw_capture_sha256": "797fb9911cefdbf5cc2f2b1783865d8d4c757d635a1e1451a4f7bc3e57e8ab9b",
+      "bytes": 95758
+    },
+    {
+      "file": "m2-flashlight-headless-release.log",
+      "sha256": "97f4f06903b4288cd049ff2216fc22dd096ac6632b1fe4ee58a2e1aaec89b875",
+      "raw_capture_sha256": "97f4f06903b4288cd049ff2216fc22dd096ac6632b1fe4ee58a2e1aaec89b875",
+      "bytes": 95760
+    },
+    {
+      "file": "m2-flashlight-focused.log",
+      "sha256": "2840ada0eb081edb8e62a1cec2c7db59e28a603ed59695f969a8b76517a20108",
+      "raw_capture_sha256": "0cca3653080bb2feb85925c93853c636fb337a0f9a192abfce38a5bd6f3af902",
+      "bytes": 12577
+    },
+    {
+      "file": "m2-flashlight-sanitize.log",
+      "sha256": "22fd92783d82d2a63851ae4244bdd148f4649b259adfb332b49dd9024c11cc80",
+      "raw_capture_sha256": "22fd92783d82d2a63851ae4244bdd148f4649b259adfb332b49dd9024c11cc80",
+      "bytes": 5621
+    },
+    {
+      "file": "m2-flashlight-gpu-debug.log",
+      "sha256": "896a0d37c354c5eca13a265ccb2f5ccc25a42386ba6f05eee0e639a7a817cb2d",
+      "raw_capture_sha256": "896a0d37c354c5eca13a265ccb2f5ccc25a42386ba6f05eee0e639a7a817cb2d",
+      "bytes": 26321
+    },
+    {
+      "file": "m2-flashlight-gpu-release.log",
+      "sha256": "2182f7897c2cfacc8b2be675f7f0a0d94cb1260c94225ed04e17e77a9d73cf32",
+      "raw_capture_sha256": "2182f7897c2cfacc8b2be675f7f0a0d94cb1260c94225ed04e17e77a9d73cf32",
+      "bytes": 26446
+    },
+    {
+      "file": "m2-flashlight-gpu-device.log",
+      "sha256": "566729476a466d3f59b695b8b4baf046111389a1ec6273745e7471513b8fa1fc",
+      "raw_capture_sha256": "566729476a466d3f59b695b8b4baf046111389a1ec6273745e7471513b8fa1fc",
+      "bytes": 46
+    },
+    {
+      "file": "m2-flashlight-shader-regeneration.log",
+      "sha256": "7405a06e5b7c44b740b34ccf5d13e6dccbe47055a29273b31853f7b056bff785",
+      "raw_capture_sha256": "7405a06e5b7c44b740b34ccf5d13e6dccbe47055a29273b31853f7b056bff785",
+      "bytes": 512
+    },
+    {
+      "file": "m2-flashlight-format.log",
+      "sha256": "a916f4ad54d6de36549904027bbdd080e81ba100be997e5bcc2577b187a1696f",
+      "raw_capture_sha256": "a916f4ad54d6de36549904027bbdd080e81ba100be997e5bcc2577b187a1696f",
+      "bytes": 65
+    },
+    {
+      "file": "m2-flashlight-reference-integrity.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "raw_capture_sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "bytes": 56
+    },
+    {
+      "file": "m2-flashlight-grill-inspection.log",
+      "sha256": "e95c9a843b4534fd259ec9be131a0272cf4e853a7d8c006792fcb563dca83779",
+      "raw_capture_sha256": "e95c9a843b4534fd259ec9be131a0272cf4e853a7d8c006792fcb563dca83779",
+      "bytes": 773
+    },
+    {
+      "file": "m2-flashlight-initial-catalog-total.log",
+      "sha256": "78273f01846923dfe6eca9afa60cf3d236c0f1dc55b26851c796c83a2ca112d0",
+      "raw_capture_sha256": "78273f01846923dfe6eca9afa60cf3d236c0f1dc55b26851c796c83a2ca112d0",
+      "bytes": 1828
+    }
+  ],
+  "implementation_patch_sha256": "c309525ea3d9f6c85f15350036f1c6618355b7f1e50b95106d867f45345fd166",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "3d06688eac104774692acf226b2a59dec9481d9db07eeccd344f8bd4ec74e68a"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "117415d5b51ebd0183197493d9e6e4beeb438f6fb1d90100e4f7e9f768fb39d5"
+    },
+    {
+      "path": "README.md",
+      "sha256": "b57774bfb541b769e85d7fd84c7fd3ab4b296bb4638a3f0118b0624a84ee604e"
+    },
+    {
+      "path": "docs/FLASHLIGHT_CONTRACTS.md",
+      "sha256": "b517e99f0cd537dc8908e6ec5eb062f368dd0c299a6125d5b0b27763dccdb472"
+    },
+    {
+      "path": "docs/INVENTORY_STATE_CONTRACTS.md",
+      "sha256": "3b5418792f76e5b19747e1f2aa74e66d4af16eb932dc08d9a345b2a4dc0c2519"
+    },
+    {
+      "path": "docs/LIGHT_CONTRACTS.md",
+      "sha256": "65080376e74ed336761c6d46345ccc78141c691198bd3850e7fb6659eb2478f1"
+    },
+    {
+      "path": "docs/M2_FLASHLIGHT_SOURCES.json",
+      "sha256": "d653de16041e134f7650207a12fa1e02a5023dcfa45be65c21eb40485a7d61ed"
+    },
+    {
+      "path": "docs/MEDKIT_CONTRACTS.md",
+      "sha256": "fb7c1fc249281e53f5e9d513c291306f8e66931286c4e2e9c96722ddcf7b8cf6"
+    },
+    {
+      "path": "docs/METAL_SHADER_CONTRACTS.md",
+      "sha256": "97ea882a28d6549d832ff012450da96c899e33a0e7277900b4f6ea206787e838"
+    },
+    {
+      "path": "docs/PLAYER_CONTROL_CONTRACTS.md",
+      "sha256": "7294772c907610dc097d280416d84d088e7c54e222e90241817dc7a5bafa9c6d"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "503f044f7e1fd94a9430daab4b6c3556314ff1f2b808844e495cb75dc28ed03b"
+    },
+    {
+      "path": "docs/WORLD_VIEW_CONTRACTS.md",
+      "sha256": "94e66153129cf0308103249405691a76baf5a4e504a14072e69f7235e0d6b0ab"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "21fd6216608919993cee20a266fe4058dce1f33b5112a45072c913d8e8e9b463"
+    },
+    {
+      "path": "src/app/inspector_objectives.cpp",
+      "sha256": "77f3fe159ec8cb7ed8363014d8636367d210181da59d7cb9caeebea6b245a10b"
+    },
+    {
+      "path": "src/app/inspector_pickups.cpp",
+      "sha256": "684b6b5e3ec68b94ec67c7706f5f1f6eeebb67064ea3acb8cea57e26b5d5bc61"
+    },
+    {
+      "path": "src/app/main.cpp",
+      "sha256": "fd104885b84f0b5bf560da48717c3c327c33245ac05912e0cf5d75475ddba7b0"
+    },
+    {
+      "path": "src/app/movement_controls.h",
+      "sha256": "5d4f0e0ae87f5f80809b775a3cfa72920df12c499749f104c0a7153fbc043e92"
+    },
+    {
+      "path": "src/app/objectives_smoke.cpp",
+      "sha256": "2bf9ea7857722b1ac2d361f708b7db173d1dc6bf952e3adf27d41f77e42cdf39"
+    },
+    {
+      "path": "src/engine/point_light.h",
+      "sha256": "498bea166ae06e45c45244116c02214c0b688cbdabaf6b389ac15f2dfd59ca4d"
+    },
+    {
+      "path": "src/engine/shaders/sprite.frag",
+      "sha256": "e9024fd4daa575c77cfdf66bf6b0eb88a067d0bdd056bc1d35f73751ba1c86df"
+    },
+    {
+      "path": "src/engine/shaders/sprite_frag.h",
+      "sha256": "1e8319b521fc3edecc5fc4ec80fad3e7940bce80c192a0aac2da44821f59d9dd"
+    },
+    {
+      "path": "src/engine/shaders/sprite_frag_msl.h",
+      "sha256": "82b73df773b1bc00bdb1058ccec4f4d3318b6a35e69d326b7f9da1c8d154e516"
+    },
+    {
+      "path": "src/engine/shaders/world.frag",
+      "sha256": "72b5704f04fd91badfeee700b3f9377950d231f942a294621f142934df881ae1"
+    },
+    {
+      "path": "src/engine/shaders/world.vert",
+      "sha256": "e4c7739cd43a781336f9e032357ff3caf9774a7b968c2cc59dadb793edc30445"
+    },
+    {
+      "path": "src/engine/shaders/world_frag.h",
+      "sha256": "1861fbc3fd6784a8e24907a301ca75377e9ebdaca6101325c31ce010577009e4"
+    },
+    {
+      "path": "src/engine/shaders/world_frag_msl.h",
+      "sha256": "0c59f25ff27534960fb3fc68f692c4d4f0868c79a72039d768442587da1e00c2"
+    },
+    {
+      "path": "src/engine/shaders/world_vert.h",
+      "sha256": "c19cd212da32ed6df575e9a9697735c2b71bc616798a459ea836b3b4926237e4"
+    },
+    {
+      "path": "src/engine/shaders/world_vert_msl.h",
+      "sha256": "a9ead38abfe63f16476cad48eba43d750fb4719df63ba42e5f94e3b53d174793"
+    },
+    {
+      "path": "src/engine/world_renderer.cpp",
+      "sha256": "fc4ffe029cf70fdb1dc783ff12b3414532a68403dd3b56f5f10d2845ed69b328"
+    },
+    {
+      "path": "src/engine/world_renderer.h",
+      "sha256": "251155a204c1ca6d84340c22ef2cc8949140d9e6fd59bb22dfcc7fa2df8a06ce"
+    },
+    {
+      "path": "src/game/inventory_state.h",
+      "sha256": "90c1c61ce6e21ad0fda8ed021b9d31c3ffc303259facd9050627a6e284a735b1"
+    },
+    {
+      "path": "src/game/legacy/server_de.h",
+      "sha256": "0b7e3e3e6653f437ff1a67741e6bd107a6aa21ad47e0cd14c8347145321bba14"
+    },
+    {
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "27db99e8e377934a51a94cbcd8bbc96e6bd034d4c6384b93f1e07870c97e0a9d"
+    },
+    {
+      "path": "src/game/original/BloodShells.h",
+      "sha256": "335ebf20665400cefe5a223582f869f0dc6f7e2cc422dcb2892ac7b270c57009"
+    },
+    {
+      "path": "src/game/original/Flashlight.cpp",
+      "sha256": "a54538d89744ee84830c2a832d4b32252daea878b1aff2db4368f0d5a089023f"
+    },
+    {
+      "path": "src/game/original/Flashlight.h",
+      "sha256": "5396d419650d3093425d370fce2de522a5c60942dfef92fbff1ffa7d0ca10643"
+    },
+    {
+      "path": "src/game/original/InventoryMgr.cpp",
+      "sha256": "c6924c2e2016394a08fdf0cef31f8e24a542b74b180d3e3cd03ccb6d1a4bbe1d"
+    },
+    {
+      "path": "src/game/original/InventoryMgr.h",
+      "sha256": "846d7b046302e4b09541887815915d2f883a7d7a11595bd15de6bd76e15bb535"
+    },
+    {
+      "path": "src/game/original/InventorySave.cpp",
+      "sha256": "48c37c59f1caa9fdcd005896ab5dc248daf41674d7c068cb3a0dd96d0246866a"
+    },
+    {
+      "path": "src/game/original/ItemPickups.cpp",
+      "sha256": "4ee4c53ff4559cc85f04fde21192e0a702be09b19b1f47188a86316cf529369d"
+    },
+    {
+      "path": "src/game/original/ItemPickups.h",
+      "sha256": "a0ca33aa27fa7b195d0cd8c2edff562ef91f90cae4163cdca16694e48d37d342"
+    },
+    {
+      "path": "src/game/player_messages.h",
+      "sha256": "9ddab301f5ec56b62ee819d33768939e3d6fa974f367e7043db33d11888099b2"
+    },
+    {
+      "path": "src/game/registration.cpp",
+      "sha256": "2ae2c1d364098ce98f185b90f9335395cfa75b3c6aeb0595fda7e82d1f7c6616"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "528d11f24f1bc14ea6f3cab249da941934e890f5051dea3ae472ca0d5480d13a"
+    },
+    {
+      "path": "src/game/server_clients.cpp",
+      "sha256": "c68f829712d30bba6aa49cad75fc05c6a09bc5a3e3d312e5f0ec63b0013cb160"
+    },
+    {
+      "path": "src/game/server_pickups.cpp",
+      "sha256": "5fc2f6c87e07a797774632bb20b1a5b8255c268de869586888005b224a4802a0"
+    },
+    {
+      "path": "src/game/server_sprites.cpp",
+      "sha256": "698e0de34655628964f1a02f487391619ced0b7bc92df3dcbdecbe47d13b9fe6"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "d9334c668e58fc314b981fbe30102c1451a992106d53b7ecb9cf60d6a378eb64"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "daa89f929abe4c59dab60c1dc423eab97667df5cbd00b5ff83303b367715a014"
+    },
+    {
+      "path": "tests/assault_tests.cpp",
+      "sha256": "35b623f7bd16f8e85bb49f05924cb1cc338e4cf2388c6937641bdb45f7a2c692"
+    },
+    {
+      "path": "tests/audio_stream_tests.cpp",
+      "sha256": "bf7593da8a5f06514c55e4c3fd7c6cbee720539f881e123c6b98121128a22459"
+    },
+    {
+      "path": "tests/compound_shell_tests.cpp",
+      "sha256": "fe685016c4d5743e15172fc55c007ee7059dd72e797ee31de86e2b47e4fceb27"
+    },
+    {
+      "path": "tests/conversation_tests.cpp",
+      "sha256": "5a562de02cf851d4e3befe90e1a644c87be865a7aae531720bd6e459db536902"
+    },
+    {
+      "path": "tests/destructable_model_tests.cpp",
+      "sha256": "f98b3d497f956ab30df12697c48178c9c4d3c79f9af691ea95c0b2a51be86329"
+    },
+    {
+      "path": "tests/flare_tests.cpp",
+      "sha256": "ef1f8381a6fc621a009d7aa7d46bad0bb550232eb5f958bdc856f47ea57e8cd5"
+    },
+    {
+      "path": "tests/flashlight_gpu_tests.cpp",
+      "sha256": "5122c6ac1ff065c26ab7e871c576e2b5c497f29231956e0ed53872c0d8142515"
+    },
+    {
+      "path": "tests/flashlight_tests.cpp",
+      "sha256": "2e84a0a18152942ebb3ba80813ec8453c0383c8b7b5c470aff2c1a9eca5d22d9"
+    },
+    {
+      "path": "tests/level_change_gpu_tests.cpp",
+      "sha256": "1448ccb9fe09d5b5a096b333dbdd412643503ea8d0bb93d94ed3585e07318f10"
+    },
+    {
+      "path": "tests/mac10_tests.cpp",
+      "sha256": "757ea516d2589a3c52b81f42eb43f99616c0cbd9496ba6f0958f7416519fcfa8"
+    },
+    {
+      "path": "tests/medkit_tests.cpp",
+      "sha256": "797a38c443ec6a7c3a0e784d32e482dd305bfddafafc24697f600c7767ea2dea"
+    },
+    {
+      "path": "tests/particle_stream_tests.cpp",
+      "sha256": "72cdc232cdd7b37181b5c53764cbeb4bc0b979ce1667e42f83ae26a274dc2425"
+    },
+    {
+      "path": "tests/pickup_tests.cpp",
+      "sha256": "65d819b93970a9141d7b4a521c344648e8ca63e99226aed250f71a5c4458b31e"
+    },
+    {
+      "path": "tests/player_fixture.h",
+      "sha256": "ab41ed5115f77d2c69795f87fda774687f25bf7d82eabbc1fbd70594a210caaa"
+    },
+    {
+      "path": "tests/proximity_tests.cpp",
+      "sha256": "21ef91f33c91252da07734509a29b6e138b1ec9d13ea1bc299d32c06c2729515"
+    },
+    {
+      "path": "tests/remote_tests.cpp",
+      "sha256": "7789976dc3550133b84df128edf5d85bfab26e235dd9d935d13a303ddbe2f683"
+    },
+    {
+      "path": "tests/sky_tests.cpp",
+      "sha256": "99c5d09f8d178c864b4ed00a54af688c80811b60563a6f42c2b955d8788aa65b"
+    },
+    {
+      "path": "tests/world_debris_tests.cpp",
+      "sha256": "2a77db07fc39acff0445aefd2c430d27a510e24086600b9322e094fe6f8e71fc"
+    },
+    {
+      "path": "tests/world_shader_tests.cpp",
+      "sha256": "9667af59bbd59e8a091275d0dd85a131c42ee3c4d6826aff812ffd358fafd9bf"
+    },
+    {
+      "path": "tests/world_tests.cpp",
+      "sha256": "c4a21f2b2723202145ed0dde689a60b594f3093260710ed2f1689d2b1f09f497"
+    }
+  ],
+  "implementation_commit": "d9a83f0b7c1b4d79643fc2b70e15b456416cf728"
+}

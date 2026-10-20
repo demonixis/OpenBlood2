@@ -1,0 +1,251 @@
+{
+  "date": "2026-10-17",
+  "status": "verified scoped increment; M2 remains incomplete",
+  "baseline_commits": {
+    "workspace": "19529f98c5a62358fafa7d1f6ef19749f46b3998",
+    "Blood2": "b2319718de144511b53d1ae9e95fd7ae376481e4"
+  },
+  "scope": "Original KeyFramer retained attached audio and truthful inspection",
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "private_assets": "External installation only; no commercial resource bytes copied",
+  "gpu": "Vulkan / NVIDIA GeForce RTX 3060 Laptop GPU; dummy SDL audio; no native Metal run",
+  "normalization": "Local workspace/content prefixes replaced, trailing line whitespace trimmed, and a single terminal newline retained; raw and saved hashes recorded.",
+  "commands": [
+    {
+      "cwd": "Blood2",
+      "command": "cmake --build --preset debug --target blood2_app keyframe_audio_tests keyframer_tests worldpath_tests object_contract_tests cinematic_tests door_audio_tests trigger_audio_tests service_coverage_tests train_session_tests level_change_gpu_tests -j 6",
+      "result": "passed after fixing initial smoke output_error field access; inspector-only app rebuild also passed"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "cmake --build --preset release --target blood2_app keyframe_audio_tests keyframer_tests worldpath_tests object_contract_tests cinematic_tests door_audio_tests trigger_audio_tests service_coverage_tests train_session_tests level_change_gpu_tests -j 4",
+      "result": "passed; inspector disabled"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "cmake --build build/sanitize --target keyframe_audio_tests keyframer_tests worldpath_tests object_contract_tests cinematic_tests door_audio_tests trigger_audio_tests service_coverage_tests train_session_tests -j 4",
+      "result": "passed; Clang ASan/UBSan"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "ctest --test-dir build/{debug,release,sanitize} -R '<test_selection>' -LE gpu --output-on-failure -j 2",
+      "environment": "Sanitize: ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1",
+      "result": "61/61 in each configuration"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "ctest --test-dir build/{debug,release} -R '<gpu_selection>' --output-on-failure",
+      "environment": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy",
+      "result": "5/5 in each; final inspector placement-only change additionally gpu.keyframe_audio 1/1 Debug"
+    }
+  ],
+  "test_selection": "^(keyframe_audio|keyframes|worldpaths|objects|cinematics|door_audio|trigger_audio|coverage|train_session)\\.",
+  "gpu_selection": "^gpu\\.(keyframes|keyframe_audio|worldpaths|lifecycle|level_change)$",
+  "results": {
+    "debug-tests": {
+      "passed": 61,
+      "seconds": 49.6
+    },
+    "release-tests": {
+      "passed": 61,
+      "seconds": 8.65
+    },
+    "sanitize-tests": {
+      "passed": 61,
+      "seconds": 301.9
+    },
+    "debug-gpu": {
+      "passed": 5,
+      "seconds": 28.38
+    },
+    "release-gpu": {
+      "passed": 5,
+      "seconds": 11.72
+    },
+    "inspector-gpu": {
+      "passed": 1,
+      "seconds": 15.42
+    }
+  },
+  "initial_failures": [
+    "First synthetic lifetime build referenced nonexistent SetObjectPos; fixture now uses existing MoveObject.",
+    "First voice-budget setup had default inner radius 250 greater than requested outer 200; corrected to source inner radius 20.",
+    "Catalog initially expected only two basename misses; exact-path inspection found a third missing Slaughter House scream. Asserted exact three references, 13 decodes and 16 total keys.",
+    "Initial app smoke used output_error as a method; corrected to the existing field.",
+    "Initial Markdown check preceded creation of the new report/source ledger; final check passes.",
+    "Final staged whitespace check found terminal empty lines in new detail logs; normalized this increment to one terminal newline before finalizing its commit."
+  ],
+  "limits": [
+    "M2 remains incomplete; full acceptance was not substituted by these scoped checks.",
+    "Train Station actual train target is a Damage volume; moving-container motion remains unavailable despite real attached audio.",
+    "Diagnostic ON activation is not Train Station player traversal or retail parity.",
+    "Reverb, priority arbitration, key print presentation and full save/restore remain unavailable.",
+    "Prior clearance_private ASan timeout and unsuppressed exploratory NVIDIA/libdbus LeakSanitizer report remain unresolved in door-audio evidence.",
+    "No human listening, native Metal, mobile or XR certification."
+  ],
+  "logs": [
+    {
+      "file": "m2-keyframe-audio-debug-build.log",
+      "original_sha256": "52d7c748a87ce8d5286a297d55c0a5fcae7ac30cef10df99ba09e6bdae24d7dd",
+      "saved_sha256": "b20b1a618dbf7ac6d129e2174cafef910150d43888dcde25825e212089ccb239"
+    },
+    {
+      "file": "m2-keyframe-audio-debug-build2.log",
+      "original_sha256": "79c39b9a5bce1342f855422b415dc0b73b0b6850c1bd429cb92b159398bc718f",
+      "saved_sha256": "099cf8ab1d8e0045e795eb40b6d83fc056e3bd62ef90c61b4280397d4ac7e51c"
+    },
+    {
+      "file": "m2-keyframe-audio-initial-tests.log",
+      "original_sha256": "0488df9756cd41433d6e6eca234d8536fbb85138e90455709db2f6cff39dc740",
+      "saved_sha256": "c798939d6f966b22e17bd794b3066615ba672e63edb723421e7b8d1fa02d06f7"
+    },
+    {
+      "file": "m2-keyframe-audio-catalog.log",
+      "original_sha256": "e6589227830e258a044743129d9536edaddf9e8aadddce2b401eee2bdcb53290",
+      "saved_sha256": "e6589227830e258a044743129d9536edaddf9e8aadddce2b401eee2bdcb53290"
+    },
+    {
+      "file": "m2-keyframe-audio-path-probe.log",
+      "original_sha256": "98d60024a6f9bacfe3fb452d1cee2869269a82876ac09230ea52ef88ded0ebfd",
+      "saved_sha256": "98d60024a6f9bacfe3fb452d1cee2869269a82876ac09230ea52ef88ded0ebfd"
+    },
+    {
+      "file": "m2-keyframe-audio-focused.log",
+      "original_sha256": "ae256be54a2d4b456557dd728e069c398809b410e41bf4ca314bf0d8dcc36df5",
+      "saved_sha256": "75be7aaac127c64604b1388f416a6213e05b07ae95d3aea3f0ab1b3867c2d2a5"
+    },
+    {
+      "file": "m2-keyframe-audio-focused2.log",
+      "original_sha256": "c87e988e33c5d4d9f612e69c744ebaa9ef0e6404af4a89fc4048b08b04856ecc",
+      "saved_sha256": "f1e63237f52905231c8dfddd540cd99dfce5b500405d197400b51284b54d64f3"
+    },
+    {
+      "file": "m2-keyframe-audio-debug-final-build.log",
+      "original_sha256": "0c9f5623fdb3efde1027574c07d3e07d5f56bb4cdda90745cf2fb01e4742e271",
+      "saved_sha256": "8a08e76f320ebc9b7f97d26795412244a701af68abab1dfa91658870eed59333"
+    },
+    {
+      "file": "m2-keyframe-audio-debug-final-build2.log",
+      "original_sha256": "f6565d26a1aa11b46c38f626bc926546c86f0f9c97ea3948222c33c476400d27",
+      "saved_sha256": "03da4fce62552f4c9bb8b86e44ecd97ec6e80a56c5d68a89e13a8071760139bc"
+    },
+    {
+      "file": "m2-keyframe-audio-release-build.log",
+      "original_sha256": "be4046fd3939f3319ab037408c16826aafeafc1e2d018c4903134ce6c882f5cf",
+      "saved_sha256": "50b87aac126ef4abf0a7ccf0c058b6f8642f4c8dd31bdb74d91344fd01fc7f69"
+    },
+    {
+      "file": "m2-keyframe-audio-sanitize-build.log",
+      "original_sha256": "c68ee6c6431e0a0044764bc93f36c14ba69363c1cae771c200d4398b7949f501",
+      "saved_sha256": "55618aae36be4fcf714641051869f9583e775ade9a22ed89e08957dad6b9aa5c"
+    },
+    {
+      "file": "m2-keyframe-audio-inspector-build.log",
+      "original_sha256": "f4cc6bd26f67cfaf7ab75f94b5b317fc15cf72d07eb97e9b732d8bb97a24b244",
+      "saved_sha256": "8eb9f002bd32ad80a4bd95d1c4c15f663a308a6e1e9d3b232880ad77d171d947"
+    },
+    {
+      "file": "m2-keyframe-audio-debug-tests.log",
+      "original_sha256": "a4ad82769bdaec67f7a32b0063476f416189b4501cf2b6a062e70e30ab7cca3b",
+      "saved_sha256": "809eacb35774b795b498dc4449ddbf95ba2d4a50aded162802a6829803b37b59"
+    },
+    {
+      "file": "m2-keyframe-audio-debug-detail.log",
+      "original_sha256": "9c25bfcc0c0805642fb1e1a8274dbaf4e81fe828992eb28006b150f2e24c6818",
+      "saved_sha256": "1c63a085d42484ac1350eb06eb7d325e23b6da07ae8597f3f9fbe291a3f4dd4c"
+    },
+    {
+      "file": "m2-keyframe-audio-release-tests.log",
+      "original_sha256": "52b5e5c4f43fd1eef1f0e8ef9006bcfdf6d1ee6c5434d5c25a49f2ea0a5ed119",
+      "saved_sha256": "163a90a89b381236ba2b7d3f177e53b5ab54a15c8d215e701638834848765b82"
+    },
+    {
+      "file": "m2-keyframe-audio-release-detail.log",
+      "original_sha256": "e6ba6503e71791e6c19c18ac552b1474435e0fd9ceff4a7a0a334ac1c20ce034",
+      "saved_sha256": "f7d6e6764bec755ec36fd684ce11b31d6ee94e20bea63f144bb6eb23f2001bea"
+    },
+    {
+      "file": "m2-keyframe-audio-sanitize-tests.log",
+      "original_sha256": "4f10edb2e3e0e5fe74a245f510b02d149662abf3dbae730d9a783a3ab9259d71",
+      "saved_sha256": "dd6bfebe678d55a8b2d877dadd495039f69a74f777e81b795ba6b714507af2e2"
+    },
+    {
+      "file": "m2-keyframe-audio-sanitize-detail.log",
+      "original_sha256": "4a289cbd45dca0dbb10592621a886080fe84b701069b268ccfd85bfe9c0af32a",
+      "saved_sha256": "9cab0dcff03dc2fceb2820250d91069aed9917e3b59ccafc29dd647f3ee821da"
+    },
+    {
+      "file": "m2-keyframe-audio-debug-gpu.log",
+      "original_sha256": "fe4fcd7ed72681f9efc9f66b86be34aae13af95e39b1a601319063e0a5ff5c00",
+      "saved_sha256": "d38b886e7a1333dda73168fe59bdd9b05bdf15045a5ffe4978d0fd62b95e0b80"
+    },
+    {
+      "file": "m2-keyframe-audio-debug-gpu-detail.log",
+      "original_sha256": "e1aa3c3191a821344fbed34c8fb4e65c34fcb7af02c52af8f010e11bdab3b125",
+      "saved_sha256": "b6a8334eede065f8673ad68ac09ef729a6113f288a859309a69a45329ad86859"
+    },
+    {
+      "file": "m2-keyframe-audio-release-gpu.log",
+      "original_sha256": "4c110ed0d71abf9ab46d64ee4dd11215c19e2b8d371831b0fa82ca87feeae0bf",
+      "saved_sha256": "3b59b1374d4c207d01671a146dca3034a9d010bdf23c34be133ee659c7f58c97"
+    },
+    {
+      "file": "m2-keyframe-audio-release-gpu-detail.log",
+      "original_sha256": "66cad8d28fea5f1c4b3ae3c5201b9b153b713f59b64264d06608463dd7b8a366",
+      "saved_sha256": "8f4dab74339556fe0a7776c166800a5450d91ad391bbe7198b48b6ef371d3ab1"
+    },
+    {
+      "file": "m2-keyframe-audio-inspector-gpu.log",
+      "original_sha256": "7c8de41861147b427141023967987b35444ccf901b9337e53aa52b3c17809a37",
+      "saved_sha256": "acf3430333284e7751c0b3559cb6ee02bddf0e9ddb55271aa281d1430292a422"
+    },
+    {
+      "file": "m2-keyframe-audio-inspector-gpu-detail.log",
+      "original_sha256": "86282cd769741b898ef8f72e1069154193594d7a574c6c2418588f52aa159648",
+      "saved_sha256": "3973179da38623d31bd22c9592ea33175056e7f0742b10376d43cfb95a25c747"
+    }
+  ],
+  "quality_checks": {
+    "markdown_links": 3607,
+    "clang_format": "six changed C++ files pass --dry-run --Werror",
+    "git_diff_check": "both repositories pass",
+    "screenshot": "NVIDIA Debug keyframe-audio.png visually inspected; live audio fields visible; commercial image remains untracked",
+    "source_hashes": "four source selections and target hashes verified"
+  },
+  "implementation_commit": "821c9e7f4bcb815c7e9ce648e848f931d53384b4"
+}

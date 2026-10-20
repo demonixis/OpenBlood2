@@ -1,0 +1,3 @@
+Original footstep material/name cases and order: 9/9 exact
+Original explicit SurfaceType identifiers: 14 exact; fixed uint32 underlying type permits unknown serialized values
+Reviewed source sound ordering, radii, volume, priorities, root suffix, left/right alternation and raw first-liquid predicate; behavioral/lifetime tests execute these branches.

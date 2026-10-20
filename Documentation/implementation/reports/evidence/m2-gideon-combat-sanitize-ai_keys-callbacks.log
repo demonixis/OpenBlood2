@@ -1,0 +1,14 @@
+280/618 Testing: ai_keys.callbacks
+280/618 Test: ai_keys.callbacks
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_model_key_tests" "callbacks" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-key-fixtures/callbacks"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_keys.callbacks" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"ai_keys.callbacks" end time: Oct 17 02:23 CEST
+"ai_keys.callbacks" time elapsed: 00:00:00
+----------------------------------------------------------

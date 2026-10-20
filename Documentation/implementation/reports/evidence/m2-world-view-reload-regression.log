@@ -1,0 +1,15 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 132: gpu.interaction
+1/2 Test #132: gpu.interaction ..................   Passed    6.91 sec
+    Start 141: gpu.brushes
+2/2 Test #141: gpu.brushes ......................   Passed    1.20 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+brushes        =   1.20 sec*proc (1 test)
+gpu            =   8.11 sec*proc (2 tests)
+interaction    =   6.91 sec*proc (1 test)
+private        =   8.11 sec*proc (2 tests)
+
+Total Test time (real) =   8.12 sec

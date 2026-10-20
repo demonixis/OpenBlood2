@@ -1,0 +1,57 @@
+[0/2] Re-checking globbed directories...
+[1/175] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[2/168] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[3/106] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[4/89] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[5/88] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[6/87] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[7/86] Generating CXX dyndep file tests/CMakeFiles/services_tests.dir/CXX.dd
+[8/85] Generating CXX dyndep file tests/CMakeFiles/weapon_tests.dir/CXX.dd
+[9/84] Generating CXX dyndep file tests/CMakeFiles/movement_tests.dir/CXX.dd
+[10/83] Generating CXX dyndep file tests/CMakeFiles/locomotion_tests.dir/CXX.dd
+[11/82] Generating CXX dyndep file tests/CMakeFiles/container_tests.dir/CXX.dd
+[12/81] Generating CXX dyndep file tests/CMakeFiles/door_tests.dir/CXX.dd
+[13/80] Generating CXX dyndep file tests/CMakeFiles/trigger_tests.dir/CXX.dd
+[14/79] Generating CXX dyndep file tests/CMakeFiles/interaction_tests.dir/CXX.dd
+[15/78] Generating CXX dyndep file tests/CMakeFiles/brush_tests.dir/CXX.dd
+[16/77] Generating CXX dyndep file tests/CMakeFiles/explosion_tests.dir/CXX.dd
+[17/76] Generating CXX dyndep file tests/CMakeFiles/pushable_tests.dir/CXX.dd
+[18/75] Generating CXX dyndep file tests/CMakeFiles/pickup_tests.dir/CXX.dd
+[19/74] Generating CXX dyndep file tests/CMakeFiles/objectives_tests.dir/CXX.dd
+[20/73] Scanning /home/yann/projects/lithtech/Blood2/tests/player_tests.cpp for CXX dependencies
+[21/73] Generating CXX dyndep file tests/CMakeFiles/player_tests.dir/CXX.dd
+[22/73] Generating CXX dyndep file tests/CMakeFiles/camera_tests.dir/CXX.dd
+[23/72] Scanning /home/yann/projects/lithtech/Blood2/src/engine/audio.cpp for CXX dependencies
+[24/72] Generating CXX dyndep file tests/CMakeFiles/light_tests.dir/CXX.dd
+[25/71] Generating CXX dyndep file tests/CMakeFiles/keyframer_tests.dir/CXX.dd
+[26/70] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[27/58] Generating CXX dyndep file tests/CMakeFiles/worldpath_tests.dir/CXX.dd
+[28/57] Scanning /home/yann/projects/lithtech/Blood2/tests/cinematic_tests.cpp for CXX dependencies
+[29/57] Generating CXX dyndep file tests/CMakeFiles/cinematic_tests.dir/CXX.dd
+[30/57] Building CXX object CMakeFiles/engine.dir/src/engine/audio.cpp.o
+[31/57] Linking CXX static library libengine.a
+[32/57] Linking CXX executable tests/object_contract_tests
+[33/57] Linking CXX executable tests/config_tests
+[34/57] Linking CXX executable blood2
+[35/57] Building CXX object tests/CMakeFiles/player_tests.dir/player_tests.cpp.o
+[36/57] Linking CXX executable tests/world_tests
+[37/57] Linking CXX executable tests/services_tests
+[38/57] Linking CXX executable tests/player_tests
+[39/57] Building CXX object tests/CMakeFiles/cinematic_tests.dir/cinematic_tests.cpp.o
+[40/57] Linking CXX executable tests/movement_tests
+[41/57] Linking CXX executable tests/weapon_tests
+[42/57] Linking CXX executable tests/locomotion_tests
+[43/57] Linking CXX executable tests/container_tests
+[44/57] Linking CXX executable tests/door_tests
+[45/57] Linking CXX executable tests/trigger_tests
+[46/57] Linking CXX executable tests/interaction_tests
+[47/57] Linking CXX executable tests/brush_tests
+[48/57] Linking CXX executable tests/explosion_tests
+[49/57] Linking CXX executable tests/pushable_tests
+[50/57] Linking CXX executable tests/pickup_tests
+[51/57] Linking CXX executable tests/objectives_tests
+[52/57] Linking CXX executable tests/camera_tests
+[53/57] Linking CXX executable tests/keyframer_tests
+[54/57] Linking CXX executable tests/light_tests
+[55/57] Linking CXX executable tests/worldpath_tests
+[56/57] Linking CXX executable tests/cinematic_tests

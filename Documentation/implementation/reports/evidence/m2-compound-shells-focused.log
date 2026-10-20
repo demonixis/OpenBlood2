@@ -1,0 +1,32 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 122: doors.catalog
+    Start  96: compound_shell.private
+1/6 Test  #96: compound_shell.private ...........   Passed    3.68 sec
+    Start  95: compound_shell.lifetime
+2/6 Test  #95: compound_shell.lifetime ..........   Passed    0.01 sec
+    Start  93: compound_shell.geometry
+3/6 Test  #93: compound_shell.geometry ..........   Passed    0.01 sec
+    Start  94: compound_shell.malformed
+4/6 Test  #94: compound_shell.malformed .........   Passed    0.01 sec
+5/6 Test #122: doors.catalog ....................   Passed   12.35 sec
+    Start  97: gpu.compound_shell
+6/6 Test  #97: gpu.compound_shell ...............***Failed    5.81 sec
+CityHub: 421 created / 31 sounds / 31 unsupported / 2 failed
+render:173: visible ? changed > 100 : changed == 0
+private_data:257: draw_gpu("visible", true)
+
+
+83% tests passed, 1 tests failed out of 6
+
+Label Time Summary:
+containers    =   9.52 sec*proc (5 tests)
+doors         =  12.35 sec*proc (1 test)
+gpu           =   5.81 sec*proc (1 test)
+headless      =  16.06 sec*proc (5 tests)
+private       =  21.84 sec*proc (3 tests)
+
+Total Test time (real) =  18.20 sec
+
+The following tests FAILED:
+	 97 - gpu.compound_shell (Failed)                       containers gpu private
+Errors while running CTest

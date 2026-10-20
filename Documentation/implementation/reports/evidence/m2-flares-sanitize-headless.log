@@ -1,0 +1,123 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 692: flare.private
+      Start 683: mac10.private
+ 1/54 Test #692: flare.private ....................   Passed  119.84 sec
+      Start 463: ai_runtime.subway
+ 2/54 Test #683: mac10.private ....................   Passed  132.10 sec
+      Start  69: weapons.private
+ 3/54 Test #463: ai_runtime.subway ................   Passed   27.53 sec
+      Start 609: energy.private
+ 4/54 Test #609: energy.private ...................   Passed   11.15 sec
+      Start 461: ai_runtime.catalog
+ 5/54 Test #461: ai_runtime.catalog ...............   Passed    2.32 sec
+      Start 693: flare.ai
+ 6/54 Test #693: flare.ai .........................   Passed    2.19 sec
+      Start 684: mac10.ai
+ 7/54 Test #684: mac10.ai .........................   Passed    2.54 sec
+      Start 464: ai_runtime.arena
+ 8/54 Test #464: ai_runtime.arena .................   Passed    2.73 sec
+      Start 506: inventory_state.private
+ 9/54 Test #506: inventory_state.private ..........   Passed    7.75 sec
+      Start 679: mac10.automatic
+10/54 Test #679: mac10.automatic ..................   Passed    0.97 sec
+      Start 465: ai_runtime.sparse_weapons
+11/54 Test #465: ai_runtime.sparse_weapons ........   Passed    0.59 sec
+      Start 462: ai_runtime.failures
+12/54 Test #462: ai_runtime.failures ..............   Passed    0.28 sec
+      Start 682: mac10.drop
+13/54 Test #682: mac10.drop .......................   Passed    0.12 sec
+      Start 690: flare.drop
+14/54 Test #690: flare.drop .......................   Passed    0.05 sec
+      Start 688: flare.weapon
+15/54 Test #688: flare.weapon .....................   Passed    0.05 sec
+      Start 686: flare.alternate
+16/54 Test #686: flare.alternate ..................   Passed    0.04 sec
+      Start 689: flare.collect
+17/54 Test #689: flare.collect ....................   Passed    0.05 sec
+      Start 687: flare.lifetime
+18/54 Test #687: flare.lifetime ...................   Passed    0.04 sec
+      Start 691: flare.failures
+19/54 Test #691: flare.failures ...................   Passed    0.04 sec
+      Start 685: flare.primary
+20/54 Test #685: flare.primary ....................   Passed    0.04 sec
+      Start 603: energy.weapon
+21/54 Test #603: energy.weapon ....................   Passed    0.04 sec
+      Start 678: mac10.collect
+22/54 Test #678: mac10.collect ....................   Passed    0.05 sec
+      Start 680: mac10.damage
+23/54 Test #680: mac10.damage .....................   Passed    0.05 sec
+      Start  66: weapons.animation
+24/54 Test  #66: weapons.animation ................   Passed    0.29 sec
+      Start 681: mac10.restore
+25/54 Test #681: mac10.restore ....................   Passed    0.05 sec
+      Start 605: energy.lifetime
+26/54 Test #605: energy.lifetime ..................   Passed    0.03 sec
+      Start 606: energy.callbacks
+27/54 Test #606: energy.callbacks .................   Passed    0.03 sec
+      Start 608: energy.ai
+28/54 Test #608: energy.ai ........................   Passed    0.03 sec
+      Start 604: energy.filters
+29/54 Test #604: energy.filters ...................   Passed    0.03 sec
+      Start 607: energy.failures
+30/54 Test #607: energy.failures ..................   Passed    0.03 sec
+      Start 451: ai_runtime.visibility_filter
+31/54 Test #451: ai_runtime.visibility_filter .....   Passed    0.02 sec
+      Start 453: ai_runtime.lifetime
+32/54 Test #453: ai_runtime.lifetime ..............   Passed    0.02 sec
+      Start 452: ai_runtime.visibility_atomic
+33/54 Test #452: ai_runtime.visibility_atomic .....   Passed    0.02 sec
+      Start 460: ai_runtime.missing
+34/54 Test #460: ai_runtime.missing ...............   Passed    0.02 sec
+      Start 459: ai_runtime.body
+35/54 Test #459: ai_runtime.body ..................   Passed    0.02 sec
+      Start 449: ai_runtime.activation
+36/54 Test #449: ai_runtime.activation ............   Passed    0.02 sec
+      Start 458: ai_runtime.triggers
+37/54 Test #458: ai_runtime.triggers ..............   Passed    0.02 sec
+      Start 454: ai_runtime.targets
+38/54 Test #454: ai_runtime.targets ...............   Passed    0.02 sec
+      Start 457: ai_runtime.spatial
+39/54 Test #457: ai_runtime.spatial ...............   Passed    0.02 sec
+      Start 455: ai_runtime.tracking
+40/54 Test #455: ai_runtime.tracking ..............   Passed    0.02 sec
+      Start 456: ai_runtime.camera
+41/54 Test #456: ai_runtime.camera ................   Passed    0.02 sec
+      Start 450: ai_runtime.visibility
+42/54 Test #450: ai_runtime.visibility ............   Passed    0.02 sec
+      Start 505: inventory_state.capture
+43/54 Test #505: inventory_state.capture ..........   Passed    0.04 sec
+      Start 502: inventory_state.roundtrip
+44/54 Test #502: inventory_state.roundtrip ........   Passed    0.03 sec
+      Start 503: inventory_state.malformed
+45/54 Test #503: inventory_state.malformed ........   Passed    0.03 sec
+      Start 504: inventory_state.rollback
+46/54 Test #504: inventory_state.rollback .........   Passed    0.03 sec
+      Start  67: weapons.lifetime
+47/54 Test  #67: weapons.lifetime .................   Passed    0.06 sec
+      Start  61: weapons.inventory
+48/54 Test  #61: weapons.inventory ................   Passed    0.04 sec
+      Start  64: weapons.melee
+49/54 Test  #64: weapons.melee ....................   Passed    0.04 sec
+      Start  68: weapons.rollback
+50/54 Test  #68: weapons.rollback .................   Passed    0.04 sec
+      Start  63: weapons.firing
+51/54 Test  #63: weapons.firing ...................   Passed    0.04 sec
+      Start  65: weapons.damage
+52/54 Test  #65: weapons.damage ...................   Passed    0.04 sec
+      Start  62: weapons.segments
+53/54 Test  #62: weapons.segments .................   Passed    0.04 sec
+54/54 Test  #69: weapons.private ..................   Passed  146.50 sec
+
+100% tests passed, 0 tests failed out of 54
+
+Label Time Summary:
+ai_runtime         =  33.68 sec*proc (17 tests)
+energy             =  11.36 sec*proc (7 tests)
+flare              = 122.32 sec*proc (9 tests)
+headless           = 458.21 sec*proc (54 tests)
+inventory_state    =   7.88 sec*proc (5 tests)
+mac10              = 135.88 sec*proc (7 tests)
+private            = 455.52 sec*proc (12 tests)
+weapons            = 147.08 sec*proc (9 tests)
+
+Total Test time (real) = 278.62 sec

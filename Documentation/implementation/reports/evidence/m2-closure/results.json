@@ -1,0 +1,37 @@
+{
+  "utc_time": "2026-10-18T08:09:44.580036+00:00",
+  "environment": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+    "SDL_AUDIODRIVER": "dummy",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+    "UBSAN_OPTIONS": "halt_on_error=1"
+  },
+  "results": [
+    {
+      "mode": "window",
+      "command": [
+        "timeout",
+        "30",
+        "build/sanitize/tests/platform_lifetime_tests",
+        "window",
+        "1"
+      ],
+      "exit": 0,
+      "leak_bytes": null,
+      "leak_allocations": null
+    },
+    {
+      "mode": "gpu",
+      "command": [
+        "timeout",
+        "30",
+        "build/sanitize/tests/platform_lifetime_tests",
+        "gpu",
+        "1"
+      ],
+      "exit": 1,
+      "leak_bytes": 43992,
+      "leak_allocations": 816
+    }
+  ]
+}

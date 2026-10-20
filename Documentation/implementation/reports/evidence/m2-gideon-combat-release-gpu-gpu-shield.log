@@ -1,0 +1,15 @@
+664/673 Testing: gpu.shield
+664/673 Test: gpu.shield
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/shield_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/shield-gpu"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.shield" start time: Oct 17 02:24 CEST
+Output:
+----------------------------------------------------------
+Synthetic shield/powerup: 42 textured quads, 1471 changed pixels; repeated readback identical, clocks unchanged.
+<end of output>
+Test time =   0.40 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.shield" end time: Oct 17 02:24 CEST
+"gpu.shield" time elapsed: 00:00:00
+----------------------------------------------------------

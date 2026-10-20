@@ -1,0 +1,33 @@
+Start testing: Oct 17 07:18 CEST
+----------------------------------------------------------
+700/700 Testing: world_debris.private
+700/700 Test: world_debris.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_debris_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world_debris.private" start time: Oct 17 07:18 CEST
+Output:
+----------------------------------------------------------
+CityHub pieces=10
+Created=432 unsupported=21 failed=1
+Billboard starts=6
+Landed=6 list tokens live=0
+CityHub pieces=10
+Created=432 unsupported=21 failed=1
+Billboard starts=6
+Landed=6 list tokens live=0
+<end of output>
+Test time = 127.49 sec
+----------------------------------------------------------
+Test Passed.
+"world_debris.private" end time: Oct 17 07:20 CEST
+"world_debris.private" time elapsed: 00:02:07
+----------------------------------------------------------
+
+End testing: Oct 17 07:20 CEST
+
+headless = 127.49 sec*proc
+
+private = 127.49 sec*proc
+
+world_debris = 127.49 sec*proc
+

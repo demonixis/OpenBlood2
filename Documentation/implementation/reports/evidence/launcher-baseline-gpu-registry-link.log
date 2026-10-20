@@ -1,0 +1,5 @@
+/usr/bin/ld.bfd: build/debug/tests/CMakeFiles/gpu_registry_tests.dir/gpu_registry_tests.cpp.o: in function `BaseClass::EngineMessageFn(unsigned int, void*, float)':
+/home/yann/projects/lithtech/Blood2/src/game/legacy/cpp_engineobjects_de.h:112:(.text._ZN9BaseClass15EngineMessageFnEjPvf[_ZN9BaseClass15EngineMessageFnEjPvf]+0x6a): undefined reference to `bc_EngineMessageFn(BaseClass*, unsigned int, void*, float)'
+/usr/bin/ld.bfd: build/debug/tests/CMakeFiles/gpu_registry_tests.dir/gpu_registry_tests.cpp.o: in function `BaseClass::ObjectMessageFn(DObject*, unsigned int, OpenBlood2::MessageHandle)':
+/home/yann/projects/lithtech/Blood2/src/game/legacy/cpp_engineobjects_de.h:118:(.text._ZN9BaseClass15ObjectMessageFnEP7DObjectjN10OpenBlood213MessageHandleE[_ZN9BaseClass15ObjectMessageFnEP7DObjectjN10OpenBlood213MessageHandleE]+0x2a): undefined reference to `bc_ObjectMessageFn(BaseClass*, DObject*, unsigned int, OpenBlood2::MessageHandle)'
+collect2: error: ld returned 1 exit status

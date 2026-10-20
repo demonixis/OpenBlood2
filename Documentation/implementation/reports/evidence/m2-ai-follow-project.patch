@@ -1,0 +1,1532 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index c804245..a9f40ea 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -287,3 +287,11 @@ character-only filtering, zero lateral range on misses, source offsets/partial p
+ and accumulated point count. Planning never integrates motion; players do not initialize
+ this cache. Bounded searches and value ownership are adaptations. Full NPC initialization,
+ following/actions, shade queries and the actual M2 gate remain open.
++
++The [script movement continuation](../Documentation/Implementation/M2_AI_FOLLOW.md) connects original Script_Walk/Run,
++FOLLOWPATH and MOVETOOBJECT helpers, owned arrival actions and velocity commands.
++Read [contracts](docs/AI_FOLLOW_CONTRACTS.md). Preserve cached facing timing, initial injury slowdown,
++one-point arrival ordering, linked-target lifetime and residual velocity. Failed
++partial plans and missing opportunity-fire branches must remain failures. Full
++SCRIPT dispatch, production initialization/AI_Update/deactivation, required FX and
++ExitTrigger keep M2 incomplete; source-class counts are unchanged.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8abc9b2..be2b2fc 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,7 +41,7 @@ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+-    src/game/original/Movement.cpp
++    src/game/original/AIScriptMovement.cpp src/game/original/Movement.cpp
+     src/game/original/AIState.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+diff --git a/README.md b/README.md
+index 9890585..77d85ba 100644
+--- a/README.md
++++ b/README.md
+@@ -350,3 +350,15 @@ production NPCs and the actual M2 session gate remain incomplete.
+ 
+ CMovement verification: 402/402 Debug and inspector-free Release checks (27 GPU
+ each), plus 162 targeted ASan/UBSan/leak checks. See [evidence](../Documentation/Implementation/M2_AI_NAVIGATION.md).
++
++The [script movement continuation](../Documentation/Implementation/M2_AI_FOLLOW.md) connects original Script_Walk/Run,
++FOLLOWPATH and MOVETOOBJECT helpers, owned arrival actions and velocity commands.
++Read [contracts](docs/AI_FOLLOW_CONTRACTS.md). Preserve cached facing timing, initial injury slowdown,
++one-point arrival ordering, linked-target lifetime and residual velocity. Failed
++partial plans and missing opportunity-fire branches must remain failures. Full
++SCRIPT dispatch, production initialization/AI_Update/deactivation, required FX and
++ExitTrigger keep M2 incomplete; source-class counts are unchanged.
++
++Script movement verification: 413/413 Debug and inspector-free Release checks
++(27 GPU each), plus 88 targeted ASan/UBSan/leak checks.
++See [evidence](../Documentation/Implementation/M2_AI_FOLLOW.md).
+diff --git a/docs/AI_FOLLOW_CONTRACTS.md b/docs/AI_FOLLOW_CONTRACTS.md
+new file mode 100644
+index 0000000..25cf460
+--- /dev/null
++++ b/docs/AI_FOLLOW_CONTRACTS.md
+@@ -0,0 +1,95 @@
++# Original scripted locomotion and route following
++
++Selected AI_Mgr helpers now connect original velocity, Script_Walk/Script_Run,
++SETMOVEMENT, FOLLOWPATH and MOVETOOBJECT rules to existing typed services. See
++[source selections](M2_AI_FOLLOW_SOURCES.json), [navigation](AI_NAVIGATION_CONTRACTS.md),
++[state actions](AI_STATE_CONTRACTS.md), [targets](AI_TARGET_CONTRACTS.md),
++[path snapshots](PATH_MANAGER_CONTRACTS.md) and
++[evidence](../../Documentation/Implementation/M2_AI_FOLLOW.md).
++These are explicit helper calls, not the full SCRIPT interpreter, AI_Update or
++production NPC registration. The M2 gate remains open.
++
++## Velocity and animation
++
++Move writes velocity and never integrates position. It preserves the exact
++1e-11 speed sentinel (copy input velocity), unnormalized direction multiplication,
++negative speeds and trapped-zero velocity. The ordinary physics step integrates
++once; local player MoveMgr retains its existing separate ownership.
++
++Script_Walk/Run choose the current weapon fire-type animation, or melee without a
++weapon. Injured left/right leg indices 10/14 select the pistol/melee or rifle walk
++variant only when a weapon exists. Any nonzero injury divides the initial walk
++speed by three, even without a weapon; subsequent walk calls use full speed.
++Running is unaffected. Both variants loop, use the cached CMovement forward basis
++and restart on a different command. A completed playback stops horizontal velocity (all axes if trapped) and clears
++animating without advancing Metacmd. They do not choose crawl recovery.
++
++Current facing changes do not immediately refresh the movement aggregate: it
++samples after the actor's own MID_UPDATE handler and before physics. The initial
++velocity after a turn can therefore use the preceding basis. This source ordering
++is intentional. Existing MC_FacePos still uses its documented current-transform
++adaptation. Animation resize retains the existing foot-anchored replacement solver.
++The script source ignored SetAnimation failure; this port returns a failure instead
++of pretending an unavailable clip or blocked resize succeeded.
++
++## FOLLOWPATH
++
++SETMOVEMENT accepts exact case-insensitive WALK/RUN and ignores other text without
++trimming. FOLLOWPATH owns PathMgr's reverse-enumeration snapshot; later clearing
++the manager or removing original PathPoints cannot invalidate its text/positions.
++Source identities are inspection-only. Each update faces the first point, replaces
++its Y with cached actor Y, and uses the inclusive `distance <= 2 * dt * speed`
++arrival test. A trapped actor consumes/actions an arrived point without snapping.
++Otherwise arrival requests a checked collision move. DE_OK can mean a clipped
++move; source actions still run and the point is consumed. At most one point is
++consumed per update. Completion occurs on the following empty-route update.
++
++An optional action message with no target is delivered to self. A present empty
++target means no delivery. Named targets use the service's prepended order; identities
++are copied before callbacks and pending recipients are skipped. Exact case-insensitive
++REMOVE removes named recipients, but an untargeted REMOVE is an ordinary self-trigger.
++Deliveries count successful transport, not recipient acceptance or a gameplay effect.
++Strings/messages/lists have explicit ownership and are released on failures.
++
++## MOVETOOBJECT
++
++Selection takes the first named result (newest matching live object in the current
++service), creates the existing non-owning target link and starts Metacmd 1. No match
++completes without changing the prior target link. The done guard prevents following
++that old target. Deferred MID_LINKBROKEN clears a removed target and the next update
++completes; a target already pending before that callback is an explicit failure.
++
++The four phases calculate a CMovement path, face its next point, move/consume within
++the inclusive arrival threshold, then snap to the current target position and
++complete. The route is not automatically recalculated if the target moves; the
++final snap uses its fresh position with cached actor Y. Failed path calculation is
++never followed, even if the original algorithm left partial points. Trapped actors
++skip the final snap. Neither command stops residual velocity on arrival/completion;
++the enclosing script/state must select its next action. The diagnostic scheduler
++stops scheduling on completion but does not invent a velocity reset.
++
++## Safety, inspection and limits
++
++An initialized, valid CMovement sample and live owner are required. Finite speeds,
++positions and frame deltas are checked; frame delta is limited to 0..0.5 seconds,
++speeds to 0..10 million for script modes (Move permits signed speed). Bounded names
++and messages reject embedded NUL. Failed commands latch until an explicit new
++selection, preventing replay of actions after partial callback execution. Direct
++locomotion/velocity calls may be retried but do not clear that command failure latch.
++Reentrant selection/update/locomotion is rejected while an update is active; callback
++removal remains deferred and owner validity is checked before continuing. Zero-distance
++facing preserves the heading and source Metacmd increment instead of normalizing zero.
++These are documented safety adaptations, not claims of binary or retail physics parity.
++
++The Skeleton inspector shows command/mode/outcome, name, Metacmd, speed/injury,
++destination, distance/threshold, requested velocity, updates/failures, arrivals,
++trigger deliveries/removals and owned remaining points/actions. It reports live or
++removed historical identities without dereferencing stale handles. Hidden, inactive
++and missing-model objects remain selectable. Inspection runs no commands or queries.
++
++OPPORTFIRE moving branches return an explicit unavailable error when required.
++MC_Walk/MC_Run obstacle recovery, shade queries, full SCRIPT parsing/dispatch,
++AI initialization/update/deactivation, production CivilianAI/CultistAI/Gideon,
++death, required client FX and ExitTrigger remain open. Existing authored counts and
++startup refusal are unchanged. Diagnostic actors and targets are labelled and do not
++turn missing world classes into successful creations.
+diff --git a/docs/M2_AI_FOLLOW_SOURCES.json b/docs/M2_AI_FOLLOW_SOURCES.json
+new file mode 100644
+index 0000000..1ce209c
+--- /dev/null
++++ b/docs/M2_AI_FOLLOW_SOURCES.json
+@@ -0,0 +1,62 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "270fb8868f8d80e4376fb6cf974a60e37dcdb7f4",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          1397,
++          1654
++        ],
++        [
++          3139,
++          3157
++        ],
++        [
++          4109,
++          4167
++        ],
++        [
++          4244,
++          4274
++        ]
++      ],
++      "use": "Original movement selection, authored following, named-object following, velocity and script walk/run"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
++      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
++      "selected_lines": [
++        [
++          165,
++          174
++        ],
++        [
++          318,
++          328
++        ]
++      ],
++      "use": "Script flags and movement modes"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Trigger.cpp",
++      "sha256": "373658121f86b4d792eeb986a0e093291af3e1205b831385f142cf2ea445198c",
++      "selected_lines": [
++        [
++          32,
++          84
++        ]
++      ],
++      "use": "Reference named-trigger helper: target iteration and REMOVE special case"
++    }
++  ],
++  "adaptations": [
++    "Typed explicit helper entry points; interpreter/AI_Update remain unavailable",
++    "Owned snapshots, checked named recipient identities and message lifetime",
++    "Reentrancy/failure latch, live-owner and bounded numeric/text validation",
++    "Explicit clip/resize/path-calculation errors; partial paths never followed",
++    "Defined zero-direction facing; opportunity-fire branches explicitly unavailable"
++  ]
++}
+diff --git a/docs/PATH_MANAGER_CONTRACTS.md b/docs/PATH_MANAGER_CONTRACTS.md
+index 8bf078e..d639ca2 100644
+--- a/docs/PATH_MANAGER_CONTRACTS.md
++++ b/docs/PATH_MANAGER_CONTRACTS.md
+@@ -105,3 +105,8 @@ SubwayA remains 187 live-created source entries, 4 transferred sounds, 372 edito
+ script FOLLOWPATH/action delivery, ExitTrigger, attachments and required FX/services
+ keep M2 incomplete and --start-game blocked with exit 6. No retail executable,
+ other-platform or XR parity is claimed.
++
++Selected FOLLOWPATH consumption and arrival actions are now connected through
++[typed AI script helpers](AI_FOLLOW_CONTRACTS.md). Full SCRIPT dispatch and
++production AI following remain unavailable; the snapshot and lifetime contracts
++above are unchanged.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 8229c0f..dad14a0 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -560,3 +560,14 @@ are integrated with the original CBaseCharacter aggregate order. [Source selecti
+ and [contracts](AI_NAVIGATION_CONTRACTS.md) record initial-sample safety, value
+ ownership, bounds and explicit omissions. Full NPC initialization, following and
+ shade queries remain unavailable; collision is the existing replacement solver.
++
++## M2 original script movement helpers
++
++Donor remains `sources/blood2` at `006b4aabd3fb348f6846cad03799cf8df685ea95`.
++Selected AI_Mgr movement/following and Trigger named-action rules are recorded in
++[M2_AI_FOLLOW_SOURCES.json](M2_AI_FOLLOW_SOURCES.json). Direct typed helpers,
++owned snapshots, checked message/lifetime boundaries and explicit failure returns
++replace unbounded legacy ownership and ignored failures. No other repository or
++commercial asset was imported. The inspector/smoke fixtures are new diagnostic
++code, not production NPC or interpreter implementations. See
++[contracts](AI_FOLLOW_CONTRACTS.md) and [evidence](../../Documentation/Implementation/M2_AI_FOLLOW.md).
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index e74352a..e5c54a8 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -8,6 +8,19 @@ namespace OpenBlood2
+ {
+     namespace
+     {
++        // Explicit script-helper driver, not AI_Update or the SCRIPT interpreter.
++        class AIFollowProbe : public AI_Mgr
++        {
++            DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
++            {
++                if (m == MID_UPDATE)
++                {
++                    const bool ok = UpdateMoveToObjectCmd();
++                    GetServerDE()->SetNextUpdate(m_hObject, ok && !m_bUpdateScriptCmd ? .001f : 0);
++                }
++                return AI_Mgr::EngineMessageFn(m, d, f);
++            }
++        };
+         class AIFireProbe : public AI_Mgr
+         {
+           public:
+@@ -61,6 +74,48 @@ namespace OpenBlood2
+             }
+         };
+     } // namespace
++    bool prepare_ai_follow_smoke(GameSession& g, ObjectId& id)
++    {
++        static const ClassInfo type{"AIFollowProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AIFollowProbe>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return false;
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_MODEL;
++        state.m_Pos = {2000, 10000, 0};
++        // No model-key audio driver; this probe isolates script movement and actual model clocks.
++        SAFE_STRCPY(state.m_Name, "AI script movement probe (no interpreter)");
++        SAFE_STRCPY(state.m_Filename, "models/enemies/m_cultist1.abc");
++        auto h = g.objects.create(&type, state);
++        auto* r = g.objects.get(h);
++        auto* ai = r ? dynamic_cast<AIFollowProbe*>(r->game.get()) : nullptr;
++        auto table = std::make_shared<CAnim_Sound>();
++        if (!ai || !r->model || !table->SetAnimationIndexes(h) || !ai->InitStatics(table) ||
++            !ai->SetAnimation(table->m_nAnim_RUN[TYPE_MELEE]) || !ai->m_MoveObj.Init(h))
++            return false;
++        ObjectCreateStruct target;
++        target.m_Pos = vector_add(r->state.m_Pos, {0, 0, 20});
++        SAFE_STRCPY(target.m_Name, "AI script movement destination");
++        if (!g.objects.create(g.objects.find_class("BaseClass"), target))
++            return false;
++        ai->m_fRunSpeed = 60;
++        if (!ai->SetSetMovementCmd("RUN") || !ai->SetMoveToObjectCmd(target.m_Name))
++            return false;
++        id = r->id;
++        g.server.SetNextUpdate(h, .001f);
++        return true;
++    }
++    bool check_ai_follow_smoke(GameSession& g, ObjectId id)
++    {
++        const auto* r = g.objects.get(id);
++        const auto* a = r ? dynamic_cast<const AIFollowProbe*>(r->game.get()) : nullptr;
++        return a && r->model && a->m_bUpdateScriptCmd && a->script_motion_outcome == AI_Mgr::MotionOutcome::Completed &&
++               a->script_motion_failures == 0 && a->path_arrivals == 1 && a->velocity_commands > 0 &&
++               a->m_MoveObj.calculations == 1 && a->m_MoveObj.samples > 4 && r->state.m_Pos.z >= 20 &&
++               g.server.GetModelAnimation(a->m_hObject) < r->model->animations.size();
++    }
+     bool prepare_ai_fire_smoke(GameSession& g, ObjectId& id)
+     {
+         static const ClassInfo type{"AIFireProbe",
+diff --git a/src/app/ai_model_key_smoke.h b/src/app/ai_model_key_smoke.h
+index d1a15d7..8e35522 100644
+--- a/src/app/ai_model_key_smoke.h
++++ b/src/app/ai_model_key_smoke.h
+@@ -2,6 +2,8 @@
+ #include "game/server_adapter.h"
+ namespace OpenBlood2
+ {
++    bool prepare_ai_follow_smoke(GameSession&, ObjectId&);
++    bool check_ai_follow_smoke(GameSession&, ObjectId);
+     bool prepare_ai_fire_smoke(GameSession&, ObjectId&);
+     bool check_ai_fire_smoke(GameSession&, ObjectId);
+     bool prepare_ai_state_smoke(GameSession&, ObjectId&);
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 50d45cf..b60aae2 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -59,6 +59,43 @@ namespace OpenBlood2
+         const auto* r = game.objects.get(skeleton_selection);
+         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
++        if (target_ai && ImGui::CollapsingHeader("Original script movement", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            const auto& a = *target_ai;
++            const char* commands[]{"None", "FOLLOWPATH", "MOVETOOBJECT"};
++            const char* outcomes[]{"None", "Selected", "Moving", "Arrived", "Completed", "Failed"};
++            ImGui::TextWrapped("Typed original helpers. Full SCRIPT interpreter / AI_Update unavailable.");
++            ImGui::Text("%s | %s | mode %s | Metacmd %d", commands[static_cast<unsigned>(a.script_motion_command)],
++                        outcomes[static_cast<unsigned>(a.script_motion_outcome)],
++                        a.m_eScriptMovement == AI_Mgr::SM_WALK  ? "WALK"
++                        : a.m_eScriptMovement == AI_Mgr::SM_RUN ? "RUN"
++                                                                : "INVALID",
++                        a.Metacmd);
++            ImGui::TextWrapped("Argument: %s", a.script_motion_name.c_str());
++            ImGui::Text("Speeds %.2f / %.2f | injured node %d | done %s", a.m_fWalkSpeed, a.m_fRunSpeed,
++                        a.m_nInjuredLeg, a.m_bUpdateScriptCmd ? "yes" : "no");
++            ImGui::Text("Distance %.3f / arrival threshold %.3f", a.script_motion_distance, a.script_motion_threshold);
++            const auto d = a.script_motion_destination, v = a.script_motion_velocity;
++            ImGui::Text("Destination %.2f %.2f %.2f", d.x, d.y, d.z);
++            ImGui::Text("Requested velocity %.2f %.2f %.2f", v.x, v.y, v.z);
++            ImGui::Text("Updates %llu / failed %llu | velocity writes %llu",
++                        (unsigned long long)a.script_motion_updates, (unsigned long long)a.script_motion_failures,
++                        (unsigned long long)a.velocity_commands);
++            ImGui::Text("Arrivals %llu | trigger deliveries %llu | removals %llu | remaining %zu",
++                        (unsigned long long)a.path_arrivals, (unsigned long long)a.path_deliveries,
++                        (unsigned long long)a.path_removals, a.ScriptPath().size());
++            for (const auto& p : a.ScriptPath())
++            {
++                const auto* source = game.objects.get(p.source);
++                ImGui::TextWrapped("%s (%.2f %.2f %.2f), source %s; target %s / message %s", p.name.c_str(),
++                                   p.position.x, p.position.y, p.position.z,
++                                   source && game.server.IsObjectAlive(p.source) ? "live" : "removed",
++                                   p.action_target ? p.action_target->c_str() : "<self>",
++                                   p.action_message ? p.action_message->c_str() : "<none>");
++            }
++            if (!a.script_motion_error.empty())
++                ImGui::TextWrapped("Unavailable: %s", a.script_motion_error.c_str());
++        }
+         if (character && ImGui::CollapsingHeader("Original CMovement cache / path", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& m = character->m_MoveObj;
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index fe81e53..c284791 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -29,6 +29,7 @@
+ #include <cmath>
+ #include <cstdlib>
+ #include <iostream>
++#include <map>
+ #include <spdlog/spdlog.h>
+ #include <vector>
+ 
+@@ -256,6 +257,11 @@ namespace
+         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_fire_smoke(game, smoke_ai_fire))
+             return 4;
+         const auto original_ai_fire = smoke_ai_fire;
++        OpenBlood2::ObjectId smoke_ai_follow{};
++        bool ai_follow_hidden = false;
++        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
++            return 4;
++        const auto original_ai_follow = smoke_ai_follow;
+         bool ai_sight_hidden = false;
+         bool ai_target_hidden = false;
+         bool hand_hidden = false;
+@@ -284,7 +290,16 @@ namespace
+         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
+         bool selection_cleared = false, world_unloaded = false;
+         const auto initial_objects = game.objects.snapshot().size(), initial_strings = game.server.string_count();
++        auto smoke_object_counts = [&]()
++        {
++            std::map<std::string, int> counts;
++            for (auto id : game.objects.snapshot())
++                if (const auto* r = game.objects.get(id))
++                    ++counts[std::string(r->type->name) + ":" + r->state.m_Name];
++            return counts;
++        };
+         const bool smoke = options.gpu_smoke || options.world_smoke;
++        const auto initial_smoke_objects = smoke ? smoke_object_counts() : std::map<std::string, int>{};
+         bool inspector_visible = BLOOD2_INSPECTOR && options.inspector && !options.view_world;
+         OpenBlood2::WorldMesh world_mesh;
+         OpenBlood2::WorldRenderer world_renderer(runtime.gpu), model_renderer(runtime.gpu);
+@@ -311,7 +326,7 @@ namespace
+         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
+         inspector.select_skeleton = options.skeleton_smoke;
+         if (options.skeleton_smoke)
+-            inspector.skeleton_selection = smoke_ai_fire;
++            inspector.skeleton_selection = smoke_ai_follow;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
+         inspector.select_pickups = options.pickups_smoke;
+@@ -533,6 +548,8 @@ namespace
+             }
+             if (options.skeleton_smoke && !inspector_visible)
+                 ai_fire_hidden |= OpenBlood2::check_ai_fire_smoke(game, smoke_ai_fire);
++            if (options.skeleton_smoke && !inspector_visible)
++                ai_follow_hidden |= OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
+             if (options.skeleton_smoke && !inspector_visible)
+                 ai_state_hidden |= OpenBlood2::check_ai_state_smoke(game, smoke_ai_state);
+             if (options.skeleton_smoke && !inspector_visible)
+@@ -1072,6 +1089,8 @@ namespace
+             {
+                 if (game.objects.get(original_ai_fire) || !OpenBlood2::prepare_ai_fire_smoke(game, smoke_ai_fire))
+                     return 4;
++                if (game.objects.get(original_ai_follow) || !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
++                    return 4;
+                 bool reentered = false;
+                 for (int i = 0; i < 360 && !reentered; ++i)
+                 {
+@@ -1084,6 +1103,16 @@ namespace
+                 if (!ai_fire_hidden || !reentered)
+                     return 4;
+             }
++            if (options.skeleton_smoke)
++            {
++                // Runs alongside the existing fire probe: do not extend the authored
++                // scene clock past the cinematic's existing lifetime assertion.
++                const bool reentered = OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
++                spdlog::info("AI script movement: hidden={}, reentered={}, old identity invalidated={}",
++                             ai_follow_hidden, reentered, !game.objects.get(original_ai_follow));
++                if (!ai_follow_hidden || !reentered)
++                    return 4;
++            }
+             bool hand_reentered = !options.skeleton_smoke;
+             if (options.skeleton_smoke)
+             {
+@@ -1179,6 +1208,12 @@ namespace
+                   game.objects.snapshot().size() != initial_objects - (options.scene_explosions_smoke ? 1 : 0) ||
+                   game.server.string_count() != initial_strings)))
+             {
++                auto delta = smoke_object_counts();
++                for (const auto& [key, count] : initial_smoke_objects)
++                    delta[key] -= count;
++                for (const auto& [key, count] : delta)
++                    if (count)
++                        spdlog::error("Smoke object delta {}: {}", key, count);
+                 spdlog::error(
+                     "GPU smoke failed: selection={}, crouch/run frames={}/{}, skeleton reentry/hidden={}/{}, "
+                     "crouched/stood={}/{}, locomotion/walk/run/jump={}/{}/{}/{}, objects={}/{}, strings={}/{}",
+diff --git a/src/game/original/AIScriptMovement.cpp b/src/game/original/AIScriptMovement.cpp
+new file mode 100644
+index 0000000..9c48a75
+--- /dev/null
++++ b/src/game/original/AIScriptMovement.cpp
+@@ -0,0 +1,415 @@
++// Selected original AI_Mgr.cpp:1397-1654,3139-3157,4109-4167,4244-4274.
++// Typed, checked command helpers; not the full SCRIPT interpreter or AI_Update.
++#include "AI_Mgr.h"
++#include "engine/collision.h"
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++namespace
++{
++    struct Busy
++    {
++        bool& value;
++        explicit Busy(bool& v) : value(v)
++        {
++            value = true;
++        }
++        ~Busy()
++        {
++            value = false;
++        }
++    };
++    bool equal(std::string_view a, std::string_view b)
++    {
++        if (a.size() != b.size())
++            return false;
++        for (std::size_t i = 0; i < a.size(); ++i)
++        {
++            const auto upper = [](char c) { return c >= 'a' && c <= 'z' ? char(c - 'a' + 'A') : c; };
++            if (upper(a[i]) != upper(b[i]))
++                return false;
++        }
++        return true;
++    }
++    bool text_valid(std::string_view text, std::size_t max)
++    {
++        return text.size() <= max && text.find('\0') == text.npos;
++    }
++} // namespace
++bool AI_Mgr::MotionFailure(const char* error)
++{
++    script_motion_error = error;
++    script_motion_outcome = MotionOutcome::Failed;
++    ++script_motion_failures;
++    return false;
++}
++bool AI_Mgr::MotionReady()
++{
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject) || !m_MoveObj.initialized || !m_MoveObj.sampled)
++        return MotionFailure("Script movement requires a live owner and initialized sampled CMovement");
++    if ((m_eScriptMovement != SM_WALK && m_eScriptMovement != SM_RUN) || !std::isfinite(m_fWalkSpeed) ||
++        !std::isfinite(m_fRunSpeed) || m_fWalkSpeed < 0 || m_fRunSpeed < 0 || m_fWalkSpeed > 1e7f || m_fRunSpeed > 1e7f)
++        return MotionFailure("Invalid original script movement mode/speeds");
++    return true;
++}
++bool AI_Mgr::Move(DVector direction, float speed)
++{
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject) || !physics_vector(direction) || !std::isfinite(speed) ||
++        std::abs(speed) > 1e7f)
++        return MotionFailure("Invalid AI velocity request");
++    // Original epsilon sentinel copies the supplied velocity; direction is never normalized.
++    auto velocity = m_nTrapped ? DVector{} : speed == 1e-11f ? direction : vector_scale(direction, speed);
++    if (!physics_vector(velocity) || server->SetVelocity(m_hObject, &velocity) != DE_OK)
++        return MotionFailure("AI velocity service rejected request");
++    script_motion_velocity = velocity;
++    ++velocity_commands;
++    return true;
++}
++bool AI_Mgr::ScriptLocomotion(bool run)
++{
++    if (!MotionReady())
++        return false;
++    auto* server = GetServerDE();
++    const int command = run ? 2 : 1;
++    if (!m_bAnimating || m_nCurMetacmd != command)
++    {
++        auto* weapon = m_InventoryMgr.CurrentWeapon();
++        const auto type = weapon ? weapon->data.m_nFireType : TYPE_MELEE;
++        if (!m_pAnim_Sound || type >= std::size(m_pAnim_Sound->m_nAnim_WALK))
++            return MotionFailure("Script locomotion animation table unavailable");
++        auto clip = run ? m_pAnim_Sound->m_nAnim_RUN[type] : m_pAnim_Sound->m_nAnim_WALK[type];
++        // Source injury clip choice requires a weapon, even though any injury slows the first walk command.
++        if (!run && weapon && (m_nInjuredLeg == 10 || m_nInjuredLeg == 14))
++        {
++            const bool pistol = type == TYPE_PISTOL || type == TYPE_MELEE;
++            clip = m_nInjuredLeg == 10 ? (pistol ? m_pAnim_Sound->m_nAnim_WALK_INJURED_LLEG_PISTOL
++                                                 : m_pAnim_Sound->m_nAnim_WALK_INJURED_LLEG_RIFLE)
++                                       : (pistol ? m_pAnim_Sound->m_nAnim_WALK_INJURED_RLEG_PISTOL
++                                                 : m_pAnim_Sound->m_nAnim_WALK_INJURED_RLEG_RIFLE);
++        }
++        const auto time = server->GetTime();
++        if (!std::isfinite(time))
++            return MotionFailure("Script locomotion clock unavailable");
++        if (!SetAnimation(clip))
++            return MotionFailure("Script locomotion clip/resize failed");
++        // Unlike MC_Walk/Run, source Script_Walk/Run does not choose crawl recovery.
++        // It ignored resize failure; the typed port explicitly fails instead.
++        server->SetModelLooping(m_hObject, DTRUE);
++        if (!Move(m_MoveObj.GetForwardVector(), run ? m_fRunSpeed : m_nInjuredLeg ? m_fWalkSpeed / 3 : m_fWalkSpeed))
++            return false;
++        m_fTimeStart = time;
++        m_bAnimating = true;
++        m_nCurMetacmd = command;
++    }
++    else
++    {
++        std::string clip;
++        if (!server->GetModelAnimationName(m_hObject, server->GetModelAnimation(m_hObject), clip))
++            return MotionFailure("Script locomotion playback unavailable");
++        if (!Move(m_MoveObj.GetForwardVector(), run ? m_fRunSpeed : m_fWalkSpeed))
++            return false;
++        if (server->GetModelPlaybackState(m_hObject) & MS_PLAYDONE)
++        {
++            if (!StopVelocity())
++                return MotionFailure("Script locomotion stop failed");
++            m_bAnimating = false;
++            ++animation_finishes; // Script variant does not advance Metacmd.
++        }
++    }
++    return true;
++}
++bool AI_Mgr::Script_Walk()
++{
++    if (motion_busy)
++        return MotionFailure("Reentrant script walk rejected");
++    return ScriptLocomotion(false);
++}
++bool AI_Mgr::Script_Run()
++{
++    if (motion_busy)
++        return MotionFailure("Reentrant script run rejected");
++    return ScriptLocomotion(true);
++}
++bool AI_Mgr::SetSetMovementCmd(std::string_view name)
++{
++    if (motion_busy)
++        return MotionFailure("Reentrant script movement selection rejected");
++    if (!text_valid(name, 255))
++        return MotionFailure("Invalid script movement text");
++    if (equal(name, "WALK"))
++        m_eScriptMovement = SM_WALK;
++    else if (equal(name, "RUN"))
++        m_eScriptMovement = SM_RUN;
++    return true; // Source ignores an unknown mode, without trimming.
++}
++bool AI_Mgr::SetFollowPathCmd(PathMgr& paths, std::string_view name)
++{
++    if (motion_busy)
++        return MotionFailure("Reentrant FOLLOWPATH selection rejected");
++    if (!MotionReady())
++        return false;
++    if (!text_valid(name, 100) || name.empty())
++        return MotionFailure("Invalid FOLLOWPATH request");
++    script_motion_name = std::string(name);
++    script_path.clear();
++    script_motion_error.clear();
++    script_motion_command = MotionCommand::FollowPath;
++    m_bUpdateScriptCmd = false;
++    Metacmd = 1;
++    std::string error;
++    if (!paths.GetPath(script_motion_name, script_path, error))
++        return MotionFailure(error.c_str());
++    script_motion_outcome = MotionOutcome::Selected;
++    return true;
++}
++bool AI_Mgr::SetMoveToObjectCmd(std::string_view name)
++{
++    if (motion_busy)
++        return MotionFailure("Reentrant MOVETOOBJECT selection rejected");
++    if (!MotionReady())
++        return false;
++    if (!text_valid(name, 100) || name.empty())
++        return MotionFailure("Invalid MOVETOOBJECT request");
++    script_motion_name = std::string(name);
++    script_motion_error.clear();
++    auto* server = GetServerDE();
++    auto* list = server->FindNamedObjects(script_motion_name.c_str());
++    if (!list)
++        return MotionFailure("MOVETOOBJECT name lookup unavailable");
++    const auto target = list->m_pFirstLink ? list->m_pFirstLink->m_hObject : nullptr;
++    server->RelinquishList(list);
++    if (target && !SetNewTarget(target))
++        return MotionFailure("MOVETOOBJECT target link failed");
++    script_motion_command = MotionCommand::MoveToObject;
++    m_bUpdateScriptCmd = !target;
++    Metacmd = 1;
++    script_motion_outcome = target ? MotionOutcome::Selected : MotionOutcome::Completed;
++    return true; // No match completes, preserving the previous linked target as in source.
++}
++bool AI_Mgr::FaceScriptPoint(DVector point)
++{
++    DVector current;
++    if (GetServerDE()->GetObjectPos(m_hObject, &current) != DE_OK)
++        return MotionFailure("Script facing owner unavailable");
++    if (vector_dot(vector_subtract(point, current), vector_subtract(point, current)) == 0)
++    {
++        // Defined zero-direction adaptation: keep heading and the source command increment.
++        if (Metacmd == std::numeric_limits<int>::max())
++            return MotionFailure("Script facing command overflow");
++        ++Metacmd;
++        return true;
++    }
++    return MC_FacePos(point) || MotionFailure("Script facing failed");
++}
++bool AI_Mgr::DeliverPathAction(const PathListData& point)
++{
++    if (!point.action_message)
++        return true;
++    auto* server = GetServerDE();
++    if (!text_valid(*point.action_message, 1279) || (point.action_target && !text_valid(*point.action_target, 100)))
++        return MotionFailure("Path action text exceeds typed message limits");
++    std::vector<HOBJECT> targets;
++    if (point.action_target)
++    {
++        if (point.action_target->empty())
++            return true; // Source named helper ignores an empty target.
++        auto* list = server->FindNamedObjects(point.action_target->c_str());
++        if (!list)
++            return MotionFailure("Path action target lookup unavailable");
++        for (auto* link = list->m_pFirstLink; link; link = link->m_pNext)
++        {
++            if (targets.size() == 65536)
++            {
++                server->RelinquishList(list);
++                return MotionFailure("Path action target limit");
++            }
++            targets.push_back(link->m_hObject);
++        }
++        server->RelinquishList(list);
++    }
++    else
++        targets.push_back(m_hObject);
++    for (auto target : targets)
++    {
++        if (!server->IsObjectAlive(m_hObject))
++            return MotionFailure("Path owner removed during action");
++        if (!server->IsObjectAlive(target))
++            continue;
++        if (point.action_target && equal(*point.action_message, "REMOVE"))
++        {
++            server->SetObjectUserFlags(target, 0);
++            server->RemoveObject(target);
++            ++path_removals;
++        }
++        else
++        {
++            auto string = server->CreateString(point.action_message->c_str());
++            auto message = server->StartMessageToObject(this, target, 1000);
++            if (!string || !message || server->WriteToMessageHString(message, string) != DE_OK)
++            {
++                if (string)
++                    server->FreeString(string);
++                if (message)
++                    server->EndHMessageWrite(message);
++                return MotionFailure("Path action message allocation failed");
++            }
++            server->FreeString(string);
++            if (server->EndMessage(message) != DE_OK)
++                return MotionFailure("Path action delivery failed");
++            ++path_deliveries; // Transport success, not recipient action acceptance.
++        }
++    }
++    if (!server->IsObjectAlive(m_hObject))
++        return MotionFailure("Path owner removed during action");
++    return true;
++}
++bool AI_Mgr::UpdateFollowPathCmd()
++{
++    if (motion_busy)
++        return MotionFailure("Reentrant FOLLOWPATH update rejected");
++    if (script_motion_outcome == MotionOutcome::Failed)
++        return false;
++    if (!MotionReady())
++        return false;
++    if (script_motion_command != MotionCommand::FollowPath)
++        return MotionFailure("FOLLOWPATH is not selected");
++    if (m_bUpdateScriptCmd)
++        return true;
++    Busy guard(motion_busy);
++    ++script_motion_updates;
++    if (script_path.empty())
++    {
++        m_bUpdateScriptCmd = true;
++        script_motion_outcome = MotionOutcome::Completed;
++        return true;
++    }
++    const auto point = script_path.front(); // Own action data across arbitrary trigger callbacks.
++    const auto pos = m_MoveObj.GetPos();
++    auto target = point.position;
++    target.y = pos.y;
++    script_motion_destination = target;
++    const auto dt = GetServerDE()->GetFrameTime();
++    const auto speed = m_eScriptMovement == SM_RUN ? m_fRunSpeed : m_fWalkSpeed;
++    if (!physics_vector(target) || !std::isfinite(dt) || dt < 0 || dt > .5f)
++        return MotionFailure("Invalid FOLLOWPATH position/frame delta");
++    if (!FaceScriptPoint(target))
++        return false;
++    const auto delta = vector_subtract(target, pos);
++    script_motion_distance = std::hypot(delta.x, delta.y, delta.z);
++    script_motion_threshold = dt * speed * 2;
++    if (script_motion_distance <= script_motion_threshold)
++    {
++        if (!m_nTrapped && GetServerDE()->MoveObject(m_hObject, &target) != DE_OK)
++            return MotionFailure("FOLLOWPATH arrival move failed");
++        if (!GetServerDE()->IsObjectAlive(m_hObject))
++            return MotionFailure("FOLLOWPATH owner removed during arrival");
++        if (script_motion_outcome == MotionOutcome::Failed)
++            return false; // A touch callback may have rejected a recursive command.
++        if (!DeliverPathAction(point))
++            return false;
++        script_path.erase(script_path.begin());
++        ++path_arrivals;
++        if (script_motion_outcome == MotionOutcome::Failed)
++            return false;
++        script_motion_outcome = MotionOutcome::Arrived;
++    }
++    else
++    {
++        if (m_dwScriptFlags & (1u << 2))
++            return MotionFailure("Script opportunity fire is unavailable");
++        if (!ScriptLocomotion(m_eScriptMovement == SM_RUN))
++            return false;
++        script_motion_outcome = MotionOutcome::Moving;
++    }
++    return true;
++}
++bool AI_Mgr::UpdateMoveToObjectCmd()
++{
++    if (motion_busy)
++        return MotionFailure("Reentrant MOVETOOBJECT update rejected");
++    if (script_motion_outcome == MotionOutcome::Failed)
++        return false;
++    if (!MotionReady())
++        return false;
++    if (script_motion_command != MotionCommand::MoveToObject)
++        return MotionFailure("MOVETOOBJECT is not selected");
++    if (m_bUpdateScriptCmd)
++        return true;
++    Busy guard(motion_busy);
++    ++script_motion_updates;
++    auto* server = GetServerDE();
++    if (!m_hTarget)
++    {
++        m_bUpdateScriptCmd = true;
++        script_motion_outcome = MotionOutcome::Completed;
++        return true;
++    }
++    DVector target;
++    if (!server->IsObjectAlive(m_hTarget) || server->GetObjectPos(m_hTarget, &target) != DE_OK)
++        return MotionFailure("MOVETOOBJECT target is pending or unavailable");
++    const auto pos = m_MoveObj.GetPos();
++    target.y = pos.y;
++    script_motion_destination = target;
++    switch (Metacmd)
++    {
++        case 1:
++            if (!m_MoveObj.CalculatePath(target))
++                return MotionFailure("MOVETOOBJECT path calculation failed; partial path not followed");
++            ++Metacmd;
++            break;
++        case 2:
++        {
++            DVector point;
++            if (!m_MoveObj.GetNextPathPoint(point))
++                return MotionFailure("MOVETOOBJECT route unexpectedly empty");
++            if (!FaceScriptPoint(point))
++                return false;
++            break;
++        }
++        case 3:
++        {
++            DVector point;
++            if (!m_MoveObj.GetNextPathPoint(point))
++                return MotionFailure("MOVETOOBJECT route unexpectedly empty");
++            const float speed = m_eScriptMovement == SM_RUN ? m_fRunSpeed : m_fWalkSpeed, dt = server->GetFrameTime();
++            if (!std::isfinite(dt) || dt < 0 || dt > .5f)
++                return MotionFailure("Invalid MOVETOOBJECT frame delta");
++            const auto d = vector_subtract(point, pos);
++            script_motion_distance = std::hypot(d.x, d.y, d.z);
++            script_motion_threshold = dt * speed * 2;
++            if (script_motion_distance <= script_motion_threshold)
++            {
++                if (!m_MoveObj.MoveToNextPathPoint())
++                    ++Metacmd;
++                else
++                    Metacmd = 2;
++                ++path_arrivals;
++            }
++            else
++            {
++                if (m_dwScriptFlags & (1u << 2))
++                    return MotionFailure("Script moving opportunity fire is unavailable");
++                if (!ScriptLocomotion(m_eScriptMovement == SM_RUN))
++                    return false;
++                Metacmd = 2;
++            }
++            break;
++        }
++        case 4:
++            if (!m_nTrapped && server->MoveObject(m_hObject, &target) != DE_OK)
++                return MotionFailure("MOVETOOBJECT final move failed");
++            if (!server->IsObjectAlive(m_hObject))
++                return MotionFailure("MOVETOOBJECT owner removed during final move");
++            if (script_motion_outcome == MotionOutcome::Failed)
++                return false;
++            m_bUpdateScriptCmd = true;
++            script_motion_outcome = MotionOutcome::Completed;
++            return true;
++        default:
++            return MotionFailure("MOVETOOBJECT command index invalid");
++    }
++    script_motion_outcome = MotionOutcome::Moving;
++    return true;
++}
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 7d68c70..0f25e87 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -1,4 +1,5 @@
+ #pragma once
++#include "PathMgr.h"
+ #include "PlayerObj.h"
+ #include <memory>
+ 
+@@ -191,6 +192,50 @@ class AI_Mgr : public CBaseCharacter
+     DDWORD requested_animation = UINT32_MAX;
+     std::string state_error;
+ 
++    enum AIScriptMovement
++    {
++        SM_WALK = 0,
++        SM_RUN = 1
++    };
++    enum class MotionCommand
++    {
++        None,
++        FollowPath,
++        MoveToObject
++    };
++    enum class MotionOutcome
++    {
++        None,
++        Selected,
++        Moving,
++        Arrived,
++        Completed,
++        Failed
++    };
++    bool Move(DVector direction, float speed);
++    bool Script_Walk();
++    bool Script_Run();
++    bool SetSetMovementCmd(std::string_view);
++    bool SetFollowPathCmd(PathMgr&, std::string_view);
++    bool UpdateFollowPathCmd();
++    bool SetMoveToObjectCmd(std::string_view);
++    bool UpdateMoveToObjectCmd();
++    std::span<const PathListData> ScriptPath() const
++    {
++        return script_path;
++    }
++    AIScriptMovement m_eScriptMovement = SM_WALK;
++    float m_fWalkSpeed = 5, m_fRunSpeed = 10;
++    int m_nInjuredLeg = 0;
++    bool m_bUpdateScriptCmd = false;
++    MotionCommand script_motion_command = MotionCommand::None;
++    MotionOutcome script_motion_outcome = MotionOutcome::None;
++    std::uint64_t script_motion_updates = 0, script_motion_failures = 0, velocity_commands = 0;
++    std::uint64_t path_arrivals = 0, path_deliveries = 0, path_removals = 0;
++    DVector script_motion_destination{}, script_motion_velocity{};
++    float script_motion_distance = 0, script_motion_threshold = 0;
++    std::string script_motion_name, script_motion_error;
++
+     enum class TriggerOutcome
+     {
+         None,
+@@ -262,6 +307,13 @@ class AI_Mgr : public CBaseCharacter
+ 
+   private:
+     bool trigger_busy = false;
++    bool motion_busy = false;
++    PathList script_path;
++    bool MotionFailure(const char*);
++    bool MotionReady();
++    bool ScriptLocomotion(bool run);
++    bool FaceScriptPoint(DVector);
++    bool DeliverPathAction(const PathListData&);
+     DLink m_Link{};
+     bool registered_cabal = true;
+     static void InitLists();
+diff --git a/src/game/original/PathMgr.h b/src/game/original/PathMgr.h
+index a01d41e..9574c7f 100644
+--- a/src/game/original/PathMgr.h
++++ b/src/game/original/PathMgr.h
+@@ -16,7 +16,7 @@ struct PathListData
+ };
+ using PathList = std::vector<PathListData>;
+ 
+-// Selected original PathMgr rules. Save/load and AI path traversal remain unavailable.
++// Selected original PathMgr rules. Save/load remains unavailable; script helpers consume owned snapshots.
+ class PathMgr
+ {
+   public:
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 7f5fee5..f5e356c 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -712,3 +712,17 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME ai_navigation.subway COMMAND ai_navigation_tests subway "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(ai_navigation.subway PROPERTIES LABELS "headless;private;ai_navigation" TIMEOUT 90)
+ endif()
++
++add_executable(ai_follow_tests ai_follow_tests.cpp)
++target_link_libraries(ai_follow_tests PRIVATE blood2_game)
++blood2_project_options(ai_follow_tests)
++foreach(case IN ITEMS velocity locomotion follow cached moveto actions lifetime failures physics)
++    add_test(NAME ai_follow.${case} COMMAND ai_follow_tests "${case}")
++    set_tests_properties(ai_follow.${case} PROPERTIES LABELS "headless;ai_follow" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case IN ITEMS catalog subway)
++        add_test(NAME ai_follow.${case} COMMAND ai_follow_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(ai_follow.${case} PROPERTIES LABELS "headless;private;ai_follow" TIMEOUT 90)
++    endforeach()
++endif()
+diff --git a/tests/ai_follow_tests.cpp b/tests/ai_follow_tests.cpp
+new file mode 100644
+index 0000000..89bacbc
+--- /dev/null
++++ b/tests/ai_follow_tests.cpp
+@@ -0,0 +1,513 @@
++#include "brush_fixture.h"
++#include "game/original/AI_Mgr.h"
++#include "game/server_adapter.h"
++#include "model_fixture.h"
++#include <cmath>
++#include <functional>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .002f;
++    }
++    bool setup(GameSession& g)
++    {
++        CHECK(g.objects.find_class("BaseClass") || g.initialize());
++        auto floor = test_brush::box("floor", {-1000, -20, -1000}, {1000, -10, 1000});
++        for (auto& s : floor.surfaces)
++            s.flags = 1;
++        std::string error;
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        return true;
++    }
++    struct Probe : AI_Mgr
++    {
++        bool driving = false, ok = true, remove_on_touch = false, reenter_on_touch = false;
++        unsigned recursive_touches = 0;
++        unsigned self_actions = 0;
++        DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
++        {
++            if (m == MID_TOUCHNOTIFY && remove_on_touch)
++                GetServerDE()->RemoveObject(m_hObject);
++            if (m == MID_TOUCHNOTIFY && reenter_on_touch)
++            {
++                ++recursive_touches;
++                UpdateMoveToObjectCmd();
++            }
++            if (m == MID_UPDATE && driving)
++            {
++                ok = script_motion_command == MotionCommand::FollowPath ? UpdateFollowPathCmd()
++                                                                        : UpdateMoveToObjectCmd();
++                driving = ok && !m_bUpdateScriptCmd;
++                GetServerDE()->SetNextUpdate(m_hObject, driving ? .001f : 0);
++            }
++            return AI_Mgr::EngineMessageFn(m, d, f);
++        }
++        DDWORD ObjectMessageFn(HOBJECT sender, DDWORD m, HMESSAGEREAD d) override
++        {
++            if (m == 1000)
++                ++self_actions;
++            return AI_Mgr::ObjectMessageFn(sender, m, d);
++        }
++    };
++    Probe* actor(GameSession& g, DVector pos = {0, 10, 0})
++    {
++        static const ClassInfo type{"AIFollowProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<Probe>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Pos = pos;
++        s.m_Flags = FLAG_SOLID;
++        auto h = g.objects.create(&type, s);
++        auto* r = g.objects.get(h);
++        auto* a = r ? dynamic_cast<Probe*>(r->game.get()) : nullptr;
++        if (!a)
++            return nullptr;
++        auto model = std::make_shared<Model>();
++        std::string error;
++        if (!read_model(test_model::abc().b, *model, error))
++            return nullptr;
++        auto clip = model->animations.front();
++        model->animations.clear();
++        for (unsigned i = 0; i < 22; ++i)
++        {
++            model->animations.push_back(clip);
++            auto& c = model->animations.back();
++            c.name = "clip" + std::to_string(i);
++            c.dimensions = {1, 2, 1};
++            c.keys.clear();
++        }
++        r->model = model;
++        r->dimensions = {1, 2, 1};
++        auto table = std::make_shared<CAnim_Sound>();
++        for (unsigned i = 0; i < 9; ++i)
++        {
++            table->m_nAnim_WALK[i] = i;
++            table->m_nAnim_RUN[i] = 9 + i;
++        }
++        table->m_nAnim_WALK_INJURED_LLEG_PISTOL = 18;
++        table->m_nAnim_WALK_INJURED_RLEG_PISTOL = 19;
++        table->m_nAnim_WALK_INJURED_LLEG_RIFLE = 20;
++        table->m_nAnim_WALK_INJURED_RLEG_RIFLE = 21;
++        if (!a->InitStatics(table) || !a->m_MoveObj.Init(h))
++            return nullptr;
++        a->m_damage.Init(h);
++        a->m_damage.m_fHitPoints = a->m_damage.m_fMaxHitPoints = 100;
++        return a;
++    }
++    HOBJECT object(GameSession& g, const char* name, DVector pos, DVector dims = {})
++    {
++        ObjectCreateStruct s;
++        SAFE_STRCPY(s.m_Name, name);
++        s.m_Pos = pos;
++        s.m_Flags = dims.x ? FLAG_SOLID : 0;
++        auto h = g.objects.create(g.objects.find_class("BaseClass"), s);
++        if (h)
++            g.objects.get(h)->dimensions = dims;
++        return h;
++    }
++    HOBJECT point(GameSession& g, const char* name, DVector pos, Properties props = {})
++    {
++        ObjectCreateStruct s;
++        SAFE_STRCPY(s.m_Name, name);
++        s.m_Pos = pos;
++        props["Name"] = std::string(name);
++        props["Pos"] = pos;
++        return g.objects.create(g.objects.find_class("PathPoint"), s, Creation::World, props);
++    }
++    bool select(GameSession& g, Probe* a, const char* name = "route")
++    {
++        CHECK(g.server_shell.paths.BuildPathList());
++        CHECK(a->SetFollowPathCmd(g.server_shell.paths, name));
++        return true;
++    }
++    bool velocity(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        CHECK(a->Move({2, 3, 4}, -2) && near(r->velocity.z, -8) && near(r->state.m_Pos.z, 0));
++        CHECK(a->Move({2, 3, 4}, 1e-11f) && near(r->velocity.z, 4));
++        CHECK(a->Move({2, 3, 4}, 2e-11f) && std::abs(r->velocity.z) < 1e-9f);
++        a->m_nTrapped = 1;
++        CHECK(a->Move({2, 3, 4}, 9) && near(r->velocity.y, 0));
++        CHECK(!a->Move({1, 0, 0}, std::numeric_limits<float>::infinity()));
++        a->m_nTrapped = 0;
++        CHECK(!a->Move({1e7f, 0, 0}, 2));
++        CHECK(a->velocity_commands == 4);
++        return true;
++    }
++    bool locomotion(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        a->m_fWalkSpeed = 30;
++        a->m_fRunSpeed = 60;
++        a->m_nInjuredLeg = 10;
++        a->Metacmd = 7;
++        CHECK(a->Script_Walk() && g.server.GetModelAnimation(a->m_hObject) == TYPE_MELEE && near(r->velocity.z, 10));
++        CHECK(a->Script_Walk() && near(r->velocity.z, 30) && a->Metacmd == 7);
++        CHECK(a->m_InventoryMgr.Init(a->m_hObject, nullptr));
++        CHECK(a->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA, 0) == InventoryResult::Ok);
++        a->m_bAnimating = false;
++        CHECK(a->Script_Walk() && g.server.GetModelAnimation(a->m_hObject) == 18 && near(r->velocity.z, 10));
++        a->m_nInjuredLeg = 14;
++        a->m_bAnimating = false;
++        CHECK(a->Script_Walk() && g.server.GetModelAnimation(a->m_hObject) == 19);
++        CHECK(a->Script_Run() && g.server.GetModelAnimation(a->m_hObject) == 9 + TYPE_PISTOL &&
++              near(r->velocity.z, 60));
++        g.server.SetModelLooping(a->m_hObject, DFALSE);
++        CHECK(g.step(.5f));
++        CHECK(g.step(.5f));
++        CHECK(a->Script_Run() && !a->m_bAnimating && near(r->velocity.z, 0) && a->Metacmd == 7);
++        CHECK(a->SetSetMovementCmd("rUn") && a->m_eScriptMovement == AI_Mgr::SM_RUN);
++        CHECK(a->SetSetMovementCmd(" WALK") && a->m_eScriptMovement == AI_Mgr::SM_RUN);
++        CHECK(a->SetSetMovementCmd("walk") && a->m_eScriptMovement == AI_Mgr::SM_WALK);
++        auto missing = std::make_shared<CAnim_Sound>();
++        missing->m_nAnim_WALK[TYPE_PISTOL] = 9999;
++        CHECK(a->InitStatics(missing));
++        a->m_nInjuredLeg = 0;
++        CHECK(!a->Script_Walk() && !a->script_motion_error.empty());
++        return true;
++    }
++    bool follow(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        CHECK(g.objects.advance(.1f));
++        CHECK(point(g, "route1", {0, 900, 2}));
++        auto source = point(g, "route2", {0, -900, 1});
++        CHECK(source && select(g, a));
++        CHECK(a->ScriptPath().size() == 2 && a->ScriptPath()[0].name == "route2");
++        CHECK(g.objects.remove(source) && g.objects.finish_frame());
++        g.server_shell.paths.ClearPathList();
++        CHECK(a->Move({0, 0, 1}, 3));
++        CHECK(a->UpdateFollowPathCmd());
++        auto* r = g.objects.get(a->m_hObject);
++        CHECK(near(r->state.m_Pos.z, 1) && near(r->state.m_Pos.y, 10));
++        CHECK(a->path_arrivals == 1 && !a->m_bUpdateScriptCmd && a->ScriptPath().size() == 1 && near(r->velocity.z, 3));
++        CHECK(a->m_MoveObj.Update() && a->UpdateFollowPathCmd() && a->path_arrivals == 2 && !a->m_bUpdateScriptCmd);
++        CHECK(a->UpdateFollowPathCmd() && a->m_bUpdateScriptCmd && near(r->velocity.z, 3));
++        // Exact coincident point is defined to preserve heading and still consume the point.
++        CHECK(point(g, "zero1", r->state.m_Pos) && select(g, a, "zero") && a->m_MoveObj.Update());
++        CHECK(a->UpdateFollowPathCmd() && a->ScriptPath().empty());
++        return true;
++    }
++    bool cached(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        CHECK(g.objects.advance(.1f));
++        CHECK(point(g, "route1", {100, 10, 0}) && select(g, a));
++        CHECK(a->UpdateFollowPathCmd());
++        auto* r = g.objects.get(a->m_hObject);
++        CHECK(near(r->velocity.x, 0) &&
++              near(r->velocity.z, 5)); // Facing changes current rotation; velocity reads preceding cache.
++        CHECK(a->m_MoveObj.Update() && a->UpdateFollowPathCmd() && near(r->velocity.x, 5) && near(r->velocity.z, 0));
++        a->m_nTrapped = 1;
++        CHECK(a->UpdateFollowPathCmd() && near(r->velocity.x, 0));
++        r->state.m_Pos = {99, 10, 0};
++        CHECK(a->m_MoveObj.Update() && a->UpdateFollowPathCmd());
++        CHECK(near(r->state.m_Pos.x, 99) && a->path_arrivals == 1);
++        return true;
++    }
++    bool moveto(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        CHECK(g.objects.advance(.1f));
++        CHECK(object(g, "goal", {0, 700, 100}));
++        auto first = object(g, "goal", {0, 700, 1});
++        CHECK(first); // FindNamedObjects prepends: newest matching object is first.
++        CHECK(a->SetMoveToObjectCmd("goal") && a->GetTarget() == first && a->Metacmd == 1);
++        CHECK(a->UpdateMoveToObjectCmd() && a->Metacmd == 2);
++        CHECK(a->UpdateMoveToObjectCmd() && a->Metacmd == 3);
++        CHECK(a->UpdateMoveToObjectCmd() && a->Metacmd == 4 && a->path_arrivals == 1);
++        g.objects.get(first)->state.m_Pos = {0, 800, 5};
++        CHECK(a->UpdateMoveToObjectCmd() && a->m_bUpdateScriptCmd &&
++              near(g.objects.get(a->m_hObject)->state.m_Pos.z, 5));
++        CHECK(a->SetMoveToObjectCmd("absent") && a->m_bUpdateScriptCmd && a->GetTarget() == first);
++        CHECK(a->UpdateMoveToObjectCmd() && near(g.objects.get(a->m_hObject)->state.m_Pos.z, 5));
++        CHECK(a->SetMoveToObjectCmd("goal"));
++        CHECK(g.objects.remove(first) && g.objects.finish_frame());
++        CHECK(!a->GetTarget() && a->UpdateMoveToObjectCmd() && a->m_bUpdateScriptCmd);
++        return true;
++    }
++    struct Receiver : BaseClass
++    {
++        AI_Mgr* caller = nullptr;
++        HOBJECT remove = nullptr;
++        bool recurse = false;
++        unsigned calls = 0;
++        DDWORD ObjectMessageFn(HOBJECT, DDWORD m, HMESSAGEREAD) override
++        {
++            if (m == 1000)
++            {
++                ++calls;
++                if (remove)
++                    GetServerDE()->RemoveObject(remove);
++                if (recurse)
++                    caller->UpdateFollowPathCmd();
++            }
++            return 1;
++        }
++    };
++    Receiver* receiver(GameSession& g, const char* name)
++    {
++        static const ClassInfo type{"AIFollowReceiver",
++                                    g.objects.find_class("BaseClass"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<Receiver>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        SAFE_STRCPY(s.m_Name, name);
++        return dynamic_cast<Receiver*>(g.server.HandleToObject(g.objects.create(&type, s)));
++    }
++    bool actions(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto* one = receiver(g, "group");
++        auto* two = receiver(g, "group");
++        CHECK(one && two);
++        two->remove = one->m_hObject;
++        CHECK(point(g, "route1", {0, 90, 0},
++                    {{"ActionTarget", std::string("group")}, {"ActionMessage", std::string("ON")}}) &&
++              select(g, a));
++        auto strings = g.server.string_count();
++        CHECK(a->UpdateFollowPathCmd() && one->calls == 0 && two->calls == 1 && a->path_deliveries == 1);
++        CHECK(g.server.string_count() == strings && g.server.message_count() == 0);
++        CHECK(point(g, "self1", {0, 0, 0}, {{"ActionMessage", std::string("REMOVE")}}) && select(g, a, "self"));
++        CHECK(a->UpdateFollowPathCmd() && a->self_actions == 1 && g.server.IsObjectAlive(a->m_hObject) &&
++              a->path_removals == 0);
++        CHECK(point(g, "remove1", {0, 0, 0},
++                    {{"ActionTarget", std::string("group")}, {"ActionMessage", std::string("rEmOvE")}}) &&
++              select(g, a, "remove"));
++        CHECK(a->UpdateFollowPathCmd() && a->path_removals == 1 && !g.server.IsObjectAlive(two->m_hObject));
++        CHECK(g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++    bool lifetime(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        HOBJECT old = nullptr;
++        for (int cycle = 0; cycle < 4; ++cycle)
++        {
++            auto* a = actor(g);
++            CHECK(a && !g.objects.get(old));
++            old = a->m_hObject;
++            auto* r = receiver(g, "callback");
++            CHECK(r);
++            r->caller = a;
++            r->recurse = cycle % 2 == 0;
++            r->remove = r->recurse ? nullptr : old;
++            CHECK(point(g, "route1", {0, 0, 0},
++                        {{"ActionTarget", std::string("callback")}, {"ActionMessage", std::string("ON")}}) &&
++                  select(g, a));
++            CHECK(!a->UpdateFollowPathCmd() && a->script_motion_failures > 0 && r->calls == 1 &&
++                  g.server.message_count() == 0);
++            CHECK(!a->UpdateFollowPathCmd() && r->calls == 1); // Latch prevents replaying an action after failure.
++            CHECK(g.unload_world() && !g.objects.get(old) && g.server.string_count() == 0 &&
++                  g.server.message_count() == 0);
++            CHECK(setup(g));
++        }
++        auto* touching = actor(g);
++        CHECK(touching);
++        touching->remove_on_touch = true;
++        touching->m_fWalkSpeed = 20;
++        auto h = touching->m_hObject;
++        g.objects.get(h)->state.m_Flags |= FLAG_TOUCH_NOTIFY;
++        CHECK(object(g, "touch wall", {0, 10, 3}, {5, 5, 1}));
++        CHECK(point(g, "touch1", {0, 10, 2}) && select(g, touching, "touch") && g.objects.advance(.1f));
++        CHECK(!touching->UpdateFollowPathCmd() && !g.server.IsObjectAlive(h));
++        CHECK(g.objects.finish_frame() && !g.objects.get(h));
++        auto* recursive = actor(g, {100, 10, 0});
++        CHECK(recursive);
++        recursive->reenter_on_touch = true;
++        recursive->m_fWalkSpeed = 20;
++        g.objects.get(recursive->m_hObject)->state.m_Flags |= FLAG_TOUCH_NOTIFY;
++        CHECK(object(g, "recursive wall", {100, 10, 3}, {5, 5, 1}));
++        CHECK(object(g, "recursive goal", {100, 10, 2}) && recursive->SetMoveToObjectCmd("recursive goal"));
++        recursive->Metacmd = 4; // Isolate the source final-snap callback boundary.
++        CHECK(!recursive->UpdateMoveToObjectCmd() && recursive->script_motion_outcome == AI_Mgr::MotionOutcome::Failed);
++        CHECK(!recursive->m_bUpdateScriptCmd && recursive->recursive_touches > 0 &&
++              recursive->script_motion_failures == recursive->recursive_touches);
++        CHECK(g.unload_world() && g.server.message_count() == 0 && g.server.string_count() == 0);
++        return true;
++    }
++    bool failures(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        CHECK(!a->UpdateFollowPathCmd());
++        CHECK(!a->SetFollowPathCmd(g.server_shell.paths, "missing"));
++        CHECK(point(g, "route1", {0, 10, 100}) && select(g, a));
++        a->m_dwScriptFlags = 4;
++        CHECK(!a->UpdateFollowPathCmd() && a->script_motion_error.find("opportunity") != std::string::npos);
++        a->m_dwScriptFlags = 0;
++        CHECK(select(g, a));
++        a->m_fWalkSpeed = std::numeric_limits<float>::quiet_NaN();
++        CHECK(!a->UpdateFollowPathCmd());
++        a->m_fWalkSpeed = 5;
++        auto target = object(g, "goal", {0, 10, 100});
++        CHECK(target && object(g, "wall", {0, 10, 25}, {4, 5, 5}));
++        CHECK(a->SetMoveToObjectCmd("goal") && !a->UpdateMoveToObjectCmd() && a->m_MoveObj.path().size() == 1);
++        CHECK(!a->UpdateMoveToObjectCmd() &&
++              a->velocity_commands == 0); // Partial source route must not become success.
++        CHECK(a->SetMoveToObjectCmd("goal") && g.objects.remove(target) && !a->UpdateMoveToObjectCmd());
++        CHECK(!a->HandleTrigger(nullptr, "SCRIPT FOLLOWPATH route"));
++        auto* b = actor(g, {100, 10, 0});
++        CHECK(b);
++        b->m_MoveObj.initialized = false;
++        CHECK(!b->Script_Run());
++        CHECK(b->m_MoveObj.Init(b->m_hObject));
++        auto* body = g.objects.get(b->m_hObject);
++        auto tall = std::make_shared<Model>(*body->model);
++        tall->animations[9 + TYPE_MELEE].dimensions = {1, 20, 1};
++        body->model = tall;
++        CHECK(object(g, "ceiling", {100, 20, 0}, {5, 1, 5}));
++        CHECK(!b->Script_Run() && b->animation_blocked && !b->m_bAnimating && near(body->velocity.z, 0));
++        return true;
++    }
++    bool physics(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        a->m_fWalkSpeed = 10;
++        CHECK(point(g, "route1", {0, 10, 100}) && select(g, a));
++        a->driving = true;
++        g.server.SetNextUpdate(a->m_hObject, .001f);
++        CHECK(g.step(.1f) && a->ok && near(r->state.m_Pos.z, 1));
++        CHECK(g.step(.1f) && near(r->state.m_Pos.z, 2));
++        auto* b = actor(g, {100, 10, 0});
++        CHECK(b);
++        CHECK(object(g, "physical goal", {100, 10, 5}));
++        b->m_fRunSpeed = 10;
++        CHECK(b->SetSetMovementCmd("RUN") && b->SetMoveToObjectCmd("physical goal"));
++        b->driving = true;
++        g.server.SetNextUpdate(b->m_hObject, .001f);
++        for (int i = 0; i < 30 && b->driving; ++i)
++            CHECK(g.step(.1f) && b->ok);
++        CHECK(b->m_bUpdateScriptCmd && b->path_arrivals == 1 && b->velocity_commands > 0);
++        CHECK(g.objects.get(b->m_hObject)->state.m_Pos.z >= 5 && near(g.objects.get(b->m_hObject)->velocity.z, 10));
++        DVector reset{0, 10, 2};
++        CHECK(g.server.MoveObject(a->m_hObject, &reset) == DE_OK && a->m_MoveObj.Update());
++        CHECK(object(g, "wall", {0, 10, 10}, {5, 5, 1}));
++        for (int i = 0; i < 30; ++i)
++            CHECK(g.step(.1f) && a->ok);
++        CHECK(r->state.m_Pos.z < 8.01f && r->state.m_Pos.z > 7.8f && a->path_arrivals == 0);
++        return true;
++    }
++    bool catalog(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        for (const char* name : {"m_cultist1", "f_cultist1", "m_civilian1", "f_civilian1", "labtech", "gideon"})
++        {
++            auto* a = actor(g, {0, 10000, 0});
++            CHECK(a);
++            auto* r = g.objects.get(a->m_hObject);
++            CHECK(g.models.load(std::string("models/enemies/") + name + ".abc", r->model, error));
++            auto table = std::make_shared<CAnim_Sound>();
++            CHECK(table->SetAnimationIndexes(a->m_hObject) && a->InitStatics(table));
++            CHECK(a->m_InventoryMgr.Init(a->m_hObject, nullptr) &&
++                  a->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA, 0) == InventoryResult::Ok);
++            for (int mode = 0; mode < 4; ++mode)
++            {
++                a->m_bAnimating = false;
++                a->m_nInjuredLeg = mode == 2 ? 10 : mode == 3 ? 14 : 0;
++                unsigned clip = mode == 0   ? table->m_nAnim_WALK[TYPE_PISTOL]
++                                : mode == 1 ? table->m_nAnim_RUN[TYPE_PISTOL]
++                                : mode == 2 ? table->m_nAnim_WALK_INJURED_LLEG_PISTOL
++                                            : table->m_nAnim_WALK_INJURED_RLEG_PISTOL;
++                const bool present = clip < r->model->animations.size();
++                CHECK((mode == 1 ? a->Script_Run() : a->Script_Walk()) == present);
++                std::cout << name << " mode=" << mode << " clip=" << clip << " available=" << present << '\n';
++            }
++            CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame());
++        }
++        return true;
++    }
++    bool subway(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            auto* p = g.server_shell.Player(g.local_client);
++            CHECK(p);
++            auto pos = g.objects.get(p->m_hObject)->state.m_Pos;
++            CHECK(!p->m_MoveObj.initialized);
++            CHECK(g.leave_player()); // Free the actual spawn volume before the diagnostic body enters it.
++            auto* a = actor(g, pos);
++            CHECK(a);
++            CHECK(point(g, "diagnostic1", vector_add(pos, {0, 0, .05f})) && select(g, a, "diagnostic"));
++            CHECK(g.objects.advance(.1f));
++            const bool moved = a->UpdateFollowPathCmd();
++            if (!moved)
++                std::cerr << a->script_motion_error << " distance=" << a->script_motion_distance << "\n";
++            CHECK(moved && a->path_arrivals == 1);
++            CHECK(a->UpdateFollowPathCmd() && a->m_bUpdateScriptCmd);
++            std::cout << "SubwayA cycle=" << cycle << " path arrival=" << a->path_arrivals << '\n';
++            CHECK(g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::map<std::string, std::function<bool(const char*)>> tests{
++        {"velocity", velocity}, {"locomotion", locomotion}, {"follow", follow},     {"cached", cached},
++        {"moveto", moveto},     {"actions", actions},       {"lifetime", lifetime}, {"failures", failures},
++        {"physics", physics},   {"catalog", catalog},       {"subway", subway}};
++    auto i = tests.find(argv[1]);
++    return i != tests.end() && i->second(argc > 2 ? argv[2] : "") ? 0 : 1;
++}

@@ -1,0 +1,14 @@
+415/422 Testing: ai_script.sequencing
+415/422 Test: ai_script.sequencing
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_script_tests" "sequencing" "/home/yann/projects/lithtech/Blood2/build/release/tests/ai-script-sequencing"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_script.sequencing" start time: Oct 16 13:20 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.sequencing" end time: Oct 16 13:20 CEST
+"ai_script.sequencing" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,9 @@
+[0/2] Re-checking globbed directories...
+[1/9] Scanning /home/yann/projects/lithtech/Blood2/tests/object_contract_tests.cpp for CXX dependencies
+[2/9] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[3/9] Scanning /home/yann/projects/lithtech/Blood2/tests/object_snapshot_tests.cpp for CXX dependencies
+[4/9] Generating CXX dyndep file tests/CMakeFiles/object_snapshot_tests.dir/CXX.dd
+[5/9] Building CXX object tests/CMakeFiles/object_snapshot_tests.dir/object_snapshot_tests.cpp.o
+[6/9] Building CXX object tests/CMakeFiles/object_contract_tests.dir/object_contract_tests.cpp.o
+[7/9] Linking CXX executable tests/object_snapshot_tests
+[8/9] Linking CXX executable tests/object_contract_tests

@@ -1,0 +1,30 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 455: weapon_drops.collect
+ 1/10 Test #455: weapon_drops.collect .............   Passed    0.04 sec
+      Start 456: weapon_drops.protocol
+ 2/10 Test #456: weapon_drops.protocol ............   Passed    0.04 sec
+      Start 457: weapon_drops.drop
+ 3/10 Test #457: weapon_drops.drop ................   Passed    0.04 sec
+      Start 458: weapon_drops.falling
+ 4/10 Test #458: weapon_drops.falling .............   Passed    0.05 sec
+      Start 459: weapon_drops.guards
+ 5/10 Test #459: weapon_drops.guards ..............   Passed    0.04 sec
+      Start 460: weapon_drops.failures
+ 6/10 Test #460: weapon_drops.failures ............   Passed    0.04 sec
+      Start 461: weapon_drops.nosliding
+ 7/10 Test #461: weapon_drops.nosliding ...........   Passed    0.03 sec
+      Start 462: weapon_drops.callback
+ 8/10 Test #462: weapon_drops.callback ............   Passed    0.04 sec
+      Start 463: weapon_drops.missing_pickup
+ 9/10 Test #463: weapon_drops.missing_pickup ......   Passed    0.04 sec
+      Start 464: weapon_drops.catalog
+10/10 Test #464: weapon_drops.catalog .............   Passed    0.52 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+headless        =   0.85 sec*proc (10 tests)
+private         =   0.52 sec*proc (1 test)
+weapon_drops    =   0.85 sec*proc (10 tests)
+
+Total Test time (real) =   0.86 sec

@@ -1,0 +1,985 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 556fff9..cde1928 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -520,3 +520,5 @@ The [corpse placement correction](../Documentation/Implementation/M2_CORPSE_PLAC
+ The [built-in Model continuation](../Documentation/Implementation/M2_BUILTIN_MODELS.md) integrates the original engine Model callback and 47 actual CityHub instances. Read [contracts](docs/BUILTIN_MODEL_CONTRACTS.md). Preserve forced OT_MODEL, BaseClass defaults/property order, empty/missing resource distinctions, shared immutable assets and deferred lifetime. Do not conflate Model with CModelObject/CDestructableModel or infer lighting/physical bodies. CityHub remains 159 unsupported / 35 failed; safe NEW_LEVEL and M2 remain open.
+ 
+ The [destructible-model continuation](../Documentation/Implementation/M2_DESTRUCTABLE_MODELS.md) connects original CDestructableModel rules and 122 CityHub objects. Read [contracts](docs/DESTRUCTABLE_MODEL_CONTRACTS.md). Preserve authored versus automatic dimensions, replacement non-rotation, cascade/base callback order, exact destroyed flags and deferred destruction. Models reuse the bounded atomic box solver; no contact forces or depenetration are invented. Unnamed ABC clips remain unnamed. CheckClearShot's destructible filter is separate from CanSee. Chrome/save/partial destroy pairs remain explicit failures. CityHub is 413 created / 37 unsupported / 35 failed; safe NEW_LEVEL and M2 stay open.
++
++The [SoundFX continuation](../Documentation/Implementation/M2_SOUND_FX.md) connects original nonstreaming state/command rules and retained audio. Read [contracts](docs/SOUND_FX_CONTRACTS.md). Preserve startup deadline cancellation, ambient-only looping, whole-string commands, ramp interruption/restart and stale deadlines. Owned strings fix duplicate release; source filtering remains after startup. Historical VoiceType schemas and FileStream/TIMESYNC remain failures, including all five CityHub entries. No class-count increase certifies playback. Safe NEW_LEVEL and M2 remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9b8d4cd..674a25f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -34,7 +34,7 @@ add_library(blood2_game STATIC src/game/original/GideonShield.cpp src/game/objec
+     src/game/player_restore.cpp
+     src/game/registration.cpp
+     src/game/server_adapter.cpp)
+-target_sources(blood2_game PRIVATE src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp)
++target_sources(blood2_game PRIVATE src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp src/game/original/SoundFX.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/LightFX.cpp src/game/original/ClientLightFX.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+diff --git a/README.md b/README.md
+index 61851b9..736bf34 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [SoundFX continuation](../Documentation/Implementation/M2_SOUND_FX.md) connects original nonstreaming ramp/ON/OFF rules to real audio and inspection. The private catalog exposes unresolved historical schemas on all 124 authored emitters (121 VoiceType / three TypeAction). CityHub remains 413 created; its five SoundFX entries are now explicit schema failures (32 unsupported / 40 failed), not successful playback. Streaming, safe NEW_LEVEL and M2 remain incomplete.
++
+ The [original destructible-model continuation](../Documentation/Implementation/M2_DESTRUCTABLE_MODELS.md) connects 122 CityHub objects to original damage, model replacement, fading and bounded box physics. CityHub now has 413 created, 37 unsupported and 35 failed entries; earlier counts below are historical. Contact-force sliding audio, required remaining services, safe NEW_LEVEL and M2 remain incomplete.
+ 
+ The [original built-in Model continuation](../Documentation/Implementation/M2_BUILTIN_MODELS.md) renders 47 authored CityHub lamps with real ABC/DTX resources and inspection. CityHub now has 291 created, 159 unsupported and 35 failed entries; the source session remains intact during rehearsal. Destructible models, safe NEW_LEVEL and M2 remain incomplete.
+diff --git a/docs/M2_SOUND_FX_SOURCES.json b/docs/M2_SOUND_FX_SOURCES.json
+new file mode 100644
+index 0000000..3f9ddf5
+--- /dev/null
++++ b/docs/M2_SOUND_FX_SOURCES.json
+@@ -0,0 +1,41 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "87b6c35b8af8c2322091615644401c3d3e88afab",
++  "status": "M2 incomplete; original nonstreaming SoundFX controllers",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/SoundFX.cpp",
++      "source_sha256": "0e9115b1a3d8fc3ff85298dd99c9d3c09c12d1a5fa8ed8aa9d231cfe766bf5ce",
++      "purpose": "Original constructor, properties, callback order, trigger/state/duration rules and playback flags; save/load/precache omitted."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/SoundFX.h",
++      "source_sha256": "203ce748e77c8f81f5e42d63f1aef0b319fd06a77cf5997216595adb380b474d",
++      "purpose": "Original four-state model and fields; owned strings and checked voice identities replace legacy handles."
++    },
++    {
++      "source": "sources/blood2/Shared/SoundTypes.h",
++      "source_sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
++      "purpose": "MISC_LOW constructor priority zero."
++    },
++    {
++      "source": "sources/blood2/Shared/ClientServerShared.h",
++      "source_sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
++      "purpose": "Original saveable user flag bit three."
++    }
++  ],
++  "ports": [
++    "src/game/original/SoundFX.cpp",
++    "src/game/original/SoundFX.h"
++  ],
++  "adaptations": [
++    "Owned path strings remove duplicate destructor release; checked null trigger text",
++    "Reuse typed fixed-position retained audio; explicit streaming rejection",
++    "Registration and read-only in-game inspection; strict historical schema failures retained"
++  ],
++  "unsupported": [
++    "FileStream/TIMESYNC; historical VoiceType schemas",
++    "Save/restore, precache, reverb, priority arbitration",
++    "Safe automatic NEW_LEVEL and complete M2"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 79b0b85..ccdcb5f 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -889,3 +889,12 @@ bodies reuse the existing atomic box solver; source contact forces remain absent
+ AI CheckClearShot now includes the original model-only destructible exclusion.
+ See [ledger](M2_DESTRUCTABLE_MODEL_SOURCES.json) and [contracts](DESTRUCTABLE_MODEL_CONTRACTS.md).
+ No new dependency or mutable global is introduced.
++
++## Original SoundFX controllers
++
++The original ObjectDLL SoundFX property/callback/command/state rules now use the
++existing typed audio mixer, including real ramp durations and ambient loops.
++See [ledger](M2_SOUND_FX_SOURCES.json) and [contracts](SOUND_FX_CONTRACTS.md).
++Owned strings fix the original duplicate destructor release; null commands are
++checked. FileStream/TIMESYNC, historical VoiceType, reverb and save remain explicit
++limits. No reference source, mutable game global or new dependency is introduced.
+diff --git a/docs/SOUND_FX_CONTRACTS.md b/docs/SOUND_FX_CONTRACTS.md
+new file mode 100644
+index 0000000..8b8a90c
+--- /dev/null
++++ b/docs/SOUND_FX_CONTRACTS.md
+@@ -0,0 +1,86 @@
++# Original SoundFX controllers
++
++This is the original ObjectDLL `SoundFX`, distinct from built-in `Sound` and
++`RandomSoundFX`. Read [audio ownership](WORLD_SOUND_CONTRACTS.md),
++[object lifetime](OBJECT_CONTRACTS.md), [source ledger](M2_SOUND_FX_SOURCES.json)
++and [implementation evidence](../../Documentation/Implementation/M2_SOUND_FX.md).
++M2 remains incomplete; registration never implies successful authored playback.
++
++## Original behavior
++
++World/string creation reads StartOn, RampUpSound, RampDownSound, Sound, Priority,
++OuterRadius, InnerRadius, Volume, Ambient and FileStream. Defaults match the
++original registration; runtime creation retains the constructor's zero radii,
++zero volume and non-ambient mode. Restore creation explicitly rejects.
++Priority/volume cast to bytes; volume below 100 controls gain, otherwise full gain.
++
++InitialUpdate marks the object saveable, immediately enters ON when StartOn, and
++then **disables updates**, including any duration scheduled by that first playback.
++Startup bypasses the ramp-up sound. The base initial callback and difficulty
++filter run afterwards, as in the source. A filtered object releases its newly
++started voice during deferred destruction. The saveable bit does not implement
++save/restore.
++
++Trigger commands match whole strings case-insensitively: ON/TRIGGER, OFF and
++TOGGLE. Unknown/empty/null commands do nothing. Each recognized command calls
++UpdateSound, which kills the previous retained voice before selecting a new one.
++ON while already ON therefore restarts playback. ON during ramp-down restarts
++ramp-down; it does not reverse it. TOGGLE treats every non-OFF state as on.
++
++Ramp-up/down use their respective one-shots when present; missing paths select
++ON/OFF immediately. Only **ambient ON loops**. Spatial ON plays once and schedules
++ramp-down from the decoded sample duration. Scheduled Update first disables its
++deadline, then advances ramp-up -> ON, ramp-down -> OFF or ON -> ramp-down. No
++invented minimum delay or retry is added. A missing resource can leave a ramp
++state without a deadline, matching the original failed-start path.
++
++UpdateSound itself does not cancel an old deadline. OFF without a ramp-down
++retains an already scheduled callback; that callback later observes OFF and
++cancels itself. Failed replacement playback similarly leaves the old deadline.
++The original boolean precedence attempts a duration query for failed spatial ON
++as well; a missing voice yields no duration and does not schedule success.
++
++## Typed audio and lifetime
++
++Existing PlaySoundAt provides actual bounded WAV decoding, retained checked voice
++IDs, fixed sampled position, ambient distance attenuation or spatial panning and
++whole-clip looping. The emitter owns its voice; unlike built-in Sound it stays
++alive, and its removal stops playback. Moving the object does not attach or move
++an already sampled sound. Inactivity stops scheduled object callbacks but the
++independent audio clock continues. World unload destroys original objects while
++the adapter is bound and clears voices/caches. Reload uses new IDs. No mutable
++game global or dependency is added; destination rehearsal needs no new global
++exchange.
++
++FileStream/TIMESYNC fails explicitly before playback. Invalid radii, missing or
++malformed WAVs, region-loop metadata and voice budgets retain existing mixer
++failures. Spatial reverb intent is retained but output is dry; priority is
++metadata without arbitration. CacheFiles is omitted: mounted resources are
++indexed and decoded on demand, not claimed precached. Save/load and streaming
++remain unavailable. Historical VoiceType schemas remain rejected, including all
++five CityHub SoundFX entries; their FileStream=true request is an additional
++unimplemented service even if the schema were resolved. Do not discard that
++property or pretend full-clip loading implements streaming.
++
++Strings are owned values rather than retained HSTRING fields. Message reads are
++released once, and the source destructor's duplicate RampDownSound FreeString is
++removed. Null trigger text is a checked no-op rather than a null dereference.
++These are memory-safety adaptations, not gameplay replacements.
++
++## Inspection and tests
++
++Objects displays state, startup/ambient/streaming flags, all three resources,
++radii/volume/priority, command/start/failure counters, current retained voice and
++its real cursor/loop/fixed position, plus the last playback failure. Generic
++activity/scheduling/properties and hidden/inactive entries remain available.
++World retains rejected source schemas and references; indexed is not decoded.
++
++Behavioral tests cover startup cancellation, byte casts, exact command matching,
++ramp interruptions, ambient looping, spatial one-shot completion, sampled position,
++stale deadlines, missing/streaming failures, filtering order, inactive clocks,
++deferred destruction and repeated unload. The private catalog enumerates every
++SoundFX and attempts only its unmodified authored schema; resource decoding is
++reported separately from creation/playback. The existing GPU Sound scenario adds
++a labelled SoundFX probe using an actual SubwayA WAV, verifies PCM submission,
++ON/OFF removal while UI is hidden and after reload. This is not a CityHub emitter
++success or a listening assessment. Safe NEW_LEVEL and the actual M2 gate remain open.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 4245256..e039c81 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -11,6 +11,7 @@
+ #include "game/original/Projectile.h"
+ #include "game/original/RotatingBrush.h"
+ #include "game/original/RotatingDoor.h"
++#include "game/original/SoundFX.h"
+ #include "game/original/Trigger.h"
+ #include "game/original/VolumeBrush.h"
+ 
+@@ -596,6 +597,33 @@ namespace OpenBlood2
+                         if (state.m_ObjectType == OT_MODEL)
+                             ImGui::Text("Model additive RGB (lighting pending) %.3f %.3f %.3f | alpha %.3f",
+                                         object->color.x, object->color.y, object->color.z, object->alpha);
++                        if (const auto* sound = dynamic_cast<const SoundFX*>(object->game.get()))
++                        {
++                            ImGui::SeparatorText("Original SoundFX");
++                            ImGui::Text("State %s | startup %s | %s | streaming requested %s", sound->state_name(),
++                                        sound->start_on ? "on" : "off", sound->ambient ? "ambient" : "spatial",
++                                        sound->file_stream ? "yes (unsupported)" : "no");
++                            ImGui::TextWrapped("Ramp up: %s | Main: %s | Ramp down: %s", sound->ramp_up.c_str(),
++                                               sound->sound_path.c_str(), sound->ramp_down.c_str());
++                            ImGui::Text("Radii %.1f / %.1f | volume byte %u | priority %u", sound->inner_radius,
++                                        sound->outer_radius, unsigned(sound->volume), unsigned(sound->priority));
++                            ImGui::Text("Commands %llu | starts %llu | failures %llu",
++                                        (unsigned long long)sound->commands, (unsigned long long)sound->attempts,
++                                        (unsigned long long)sound->failures);
++                            if (const auto* voice = game.server.audio.get(sound->sound))
++                                ImGui::Text("Voice %llu | %s | loop %s | %.3f / %.3f s | fixed %.1f %.1f %.1f",
++                                            (unsigned long long)voice->id, voice->done ? "finished" : "playing",
++                                            voice->request.loop ? "yes" : "no", voice->cursor / voice->clip->rate,
++                                            voice->clip->duration(), voice->position.x, voice->position.y,
++                                            voice->position.z);
++                            else
++                                ImGui::TextUnformatted("No live voice.");
++                            if (!sound->error.empty())
++                                ImGui::TextWrapped("Playback failure: %s", sound->error.c_str());
++                            ImGui::TextWrapped(
++                                "Only ambient ON loops. Reverb/streaming/save are unavailable. "
++                                "Hidden/inactive objects remain listed; failed source schemas are in World.");
++                        }
+                         if (const auto* model = dynamic_cast<const CDestructableModel*>(object->game.get()))
+                         {
+                             ImGui::SeparatorText("Original destructible model");
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 5e49712..9337486 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -82,7 +82,7 @@ namespace OpenBlood2
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+             !g.destination_trial.player_entered || g.destination_trial.created != 413 ||
+-            g.destination_trial.unknown != 37 || g.destination_trial.failed != 35 ||
++            g.destination_trial.unknown != 32 || g.destination_trial.failed != 40 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+@@ -101,7 +101,7 @@ namespace OpenBlood2
+                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+                g.destination_inspection.source_revision == old_revision &&
+                g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 417 &&
+-               g.destination_inspection.unknown == 37 && g.destination_inspection.invalid == 31 &&
++               g.destination_inspection.unknown == 32 && g.destination_inspection.invalid == 36 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/app/world_sound_smoke.cpp b/src/app/world_sound_smoke.cpp
+index 0a00b48..3eed40b 100644
+--- a/src/app/world_sound_smoke.cpp
++++ b/src/app/world_sound_smoke.cpp
+@@ -1,4 +1,5 @@
+ #include "world_sound_smoke.h"
++#include "game/original/SoundFX.h"
+ namespace OpenBlood2
+ {
+     bool check_world_sound_smoke(GameSession& g)
+@@ -14,7 +15,42 @@ namespace OpenBlood2
+                     return false;
+                 ++count;
+             }
+-        return count == 4 && g.server.audio.has_output() && g.server.audio.submitted_frames > 0 &&
+-               g.server.audio.output_error.empty();
++        if (count != 4 || !g.server.audio.has_output() || !g.server.audio.submitted_frames ||
++            !g.server.audio.output_error.empty())
++            return false;
++        // Labelled SoundFX probe with an actual decoded SubwayA asset; runs while UI is hidden and after reload.
++        std::string resource;
++        for (const auto& entry : g.entries)
++            if (entry.state == EntryState::WorldSound)
++            {
++                resource = g.server.audio.get(entry.sound)->request.resource;
++                break;
++            }
++        auto h =
++            g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::World,
++                             {{"Name", std::string("diagnostic_soundfx")}, {"StartOn", false}, {"Sound", resource}});
++        auto* sound = dynamic_cast<SoundFX*>(g.server.HandleToObject(h));
++        if (!sound)
++            return false;
++        auto command = [&](const char* text)
++        {
++            auto str = g.server.CreateString(text);
++            auto message = g.server.StartMessageToObject(nullptr, h, 1000);
++            const bool ok = message && g.server.WriteToMessageHString(message, str) == DE_OK &&
++                            g.server.EndMessage(message) == DE_OK;
++            g.server.FreeString(str);
++            return ok;
++        };
++        if (!command("ON") || !sound->sound || sound->state != SoundFX::On)
++            return false;
++        const auto voice = sound->sound;
++        const auto submitted = g.server.audio.submitted_frames;
++        if (!g.server.advance_audio(.02, {}, {}) || g.server.audio.submitted_frames <= submitted ||
++            !g.server.audio.get(voice) || g.server.audio.get(voice)->cursor <= 0 ||
++            !g.server.audio.get(voice)->request.loop || !command("OFF") || sound->state != SoundFX::Off ||
++            g.server.audio.get(voice) || !g.objects.remove(h))
++            return false;
++        g.objects.finish_frame();
++        return !g.objects.get(h) && g.server.audio.output_error.empty();
+     }
+ } // namespace OpenBlood2
+diff --git a/src/game/original/SoundFX.cpp b/src/game/original/SoundFX.cpp
+new file mode 100644
+index 0000000..7a38f03
+--- /dev/null
++++ b/src/game/original/SoundFX.cpp
+@@ -0,0 +1,182 @@
++// Original ObjectDLL/SoundFX.cpp rules; see docs/SOUND_FX_CONTRACTS.md.
++#include "SoundFX.h"
++#include "game/key_messages.h"
++#include <algorithm>
++using namespace OpenBlood2;
++SoundFX::~SoundFX()
++{
++    if (g_pServerDE && sound)
++        g_pServerDE->KillSound(sound);
++    // Value-owned paths also remove the source destructor's duplicate RampDown FreeString.
++}
++const char* SoundFX::state_name() const
++{
++    switch (state)
++    {
++        case Off:
++            return "off";
++        case RampUp:
++            return "ramp up";
++        case On:
++            return "on";
++        case RampDown:
++            return "ramp down";
++    }
++    return "invalid";
++}
++void SoundFX::ReadProp()
++{
++    GenericProp p;
++    auto boolean = [&](const char* key, bool& value)
++    {
++        if (g_pServerDE->GetPropGeneric(key, &p) == DE_OK)
++            value = p.m_Bool != 0;
++    };
++    auto path = [&](const char* key, std::string& value)
++    {
++        if (g_pServerDE->GetPropGeneric(key, &p) == DE_OK && p.m_String[0])
++            value = p.m_String;
++    };
++    boolean("StartOn", start_on);
++    boolean("Ambient", ambient);
++    boolean("FileStream", file_stream);
++    path("RampUpSound", ramp_up);
++    path("RampDownSound", ramp_down);
++    path("Sound", sound_path);
++    g_pServerDE->GetPropReal("OuterRadius", &outer_radius);
++    g_pServerDE->GetPropReal("InnerRadius", &inner_radius);
++    if (g_pServerDE->GetPropGeneric("Priority", &p) == DE_OK)
++        priority = static_cast<DBYTE>(p.m_Long);
++    if (g_pServerDE->GetPropGeneric("Volume", &p) == DE_OK)
++        volume = static_cast<DBYTE>(p.m_Long);
++}
++DDWORD SoundFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE)
++    {
++        if (!data || reason == 3)
++            return 0; // Save/restore is unavailable.
++        const auto result = B2BaseClass::EngineMessageFn(message, data, reason);
++        if (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP)
++            ReadProp();
++        static_cast<ObjectCreateStruct*>(data)->m_NextUpdate = start_on ? .01f : 0;
++        return result;
++    }
++    if (message == MID_INITIALUPDATE)
++    {
++        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3));
++        if (start_on)
++        {
++            state = On; // Startup bypasses RampUp.
++            UpdateSound();
++        }
++        // Preserve the source cancellation even for a non-ambient initial one-shot.
++        g_pServerDE->SetNextUpdate(m_hObject, 0);
++    }
++    else if (message == MID_UPDATE)
++    {
++        g_pServerDE->SetNextUpdate(m_hObject, 0);
++        if (state == RampUp)
++            state = On;
++        else if (state == RampDown)
++            state = Off;
++        else if (state == On)
++            state = RampDown;
++        else
++            return B2BaseClass::EngineMessageFn(message, data, reason);
++        UpdateSound();
++    }
++    // Original filtering happens after sound startup; deferred teardown owns its cleanup.
++    return B2BaseClass::EngineMessageFn(message, data, reason);
++}
++DDWORD SoundFX::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    if (message == 1000)
++    {
++        ++commands;
++        const auto text = g_pServerDE->ReadFromMessageHString(read);
++        const char* bytes = g_pServerDE->GetStringData(text);
++        const std::string command = bytes ? bytes : "";
++        g_pServerDE->FreeString(text);
++        if (same_name(command, "TOGGLE"))
++        {
++            state = state == Off ? RampUp : RampDown;
++            UpdateSound();
++        }
++        else if (same_name(command, "ON") || same_name(command, "TRIGGER"))
++        {
++            if (state == Off)
++                state = RampUp;
++            UpdateSound(); // Even an already-on command kills and restarts its current sound.
++        }
++        else if (same_name(command, "OFF"))
++        {
++            if (state != Off)
++                state = RampDown;
++            UpdateSound();
++        }
++    }
++    return B2BaseClass::ObjectMessageFn(sender, message, read);
++}
++void SoundFX::UpdateSound()
++{
++    if (sound)
++        g_pServerDE->KillSound(sound);
++    sound = 0;
++    const std::string* path = nullptr;
++    switch (state)
++    {
++        case Off:
++            return;
++        case RampUp:
++            if (!ramp_up.empty())
++                path = &ramp_up;
++            else
++            {
++                state = On;
++                path = &sound_path;
++            }
++            break;
++        case RampDown:
++            if (!ramp_down.empty())
++                path = &ramp_down;
++            else
++            {
++                state = Off;
++                return;
++            }
++            break;
++        case On:
++            path = &sound_path;
++            break;
++    }
++    if (!path || path->empty())
++        return;
++    ++attempts;
++    error.clear();
++    SoundRequest request;
++    request.resource = *path;
++    request.inner_radius = inner_radius;
++    request.outer_radius = outer_radius;
++    request.priority = priority;
++    request.volume = std::min<DBYTE>(volume, 100) / 100.0f;
++    request.space = ambient ? SoundSpace::Ambient : SoundSpace::Spatial;
++    request.loop = state == On && ambient;
++    request.reverb_requested = !ambient;
++    if (file_stream)
++        error = "SoundFX FileStream/TIMESYNC playback is not implemented";
++    else if (g_pServerDE->GetObjectPos(m_hObject, &last_position) != DE_OK)
++        error = "SoundFX source position unavailable";
++    else
++        sound = g_pServerDE->PlaySoundAt(m_hObject, request, last_position, error);
++    if (!sound)
++        ++failures;
++    // Original precedence also queries duration for a failed non-ambient ON request.
++    // UpdateSound does not cancel a previous deadline when no new one is obtained.
++    if ((sound && (state == RampUp || state == RampDown)) || (state == On && !ambient))
++    {
++        float duration = 0;
++        if (g_pServerDE->GetSoundDuration(sound, duration))
++            g_pServerDE->SetNextUpdate(m_hObject, duration);
++    }
++}
+diff --git a/src/game/original/SoundFX.h b/src/game/original/SoundFX.h
+new file mode 100644
+index 0000000..6b9ebac
+--- /dev/null
++++ b/src/game/original/SoundFX.h
+@@ -0,0 +1,35 @@
++#pragma once
++#include "B2BaseClass.h"
++#include "engine/audio.h"
++
++// Selected original ObjectDLL/SoundFX; strings are owned values, voices checked identities.
++class SoundFX : public B2BaseClass
++{
++  public:
++    enum State : DBYTE
++    {
++        Off,
++        RampUp,
++        On,
++        RampDown
++    };
++    bool start_on = true, ambient = false, file_stream = false;
++    State state = Off;
++    std::string ramp_up, ramp_down, sound_path;
++    float outer_radius = 0, inner_radius = 0;
++    DBYTE volume = 0, priority = 0;
++    OpenBlood2::SoundId sound = 0;
++    DVector last_position{};
++    std::uint64_t commands = 0, attempts = 0, failures = 0;
++    std::string error;
++    ~SoundFX() override;
++    const char* state_name() const;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++
++  private:
++    void ReadProp();
++    void UpdateSound();
++};
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 114f524..2711bb8 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -29,6 +29,7 @@
+ #include "game/original/RotatingDoor.h"
+ #include "game/original/SmellHint.h"
+ #include "game/original/Sound.h"
++#include "game/original/SoundFX.h"
+ #include "game/original/Trigger.h"
+ #include "game/original/VolumeBrush.h"
+ #include "game/original/WeaponPickups.h"
+@@ -128,6 +129,19 @@ namespace OpenBlood2
+                                {"Volume", std::int32_t(100)},
+                                {"Ambient", true},
+                                {"FileStream", false}}};
++        const ClassInfo sound_fx{"SoundFX",
++                                 &b2base,
++                                 construct<SoundFX>,
++                                 {{"StartOn", true},
++                                  {"RampUpSound", std::string{}},
++                                  {"RampDownSound", std::string{}},
++                                  {"Sound", std::string{}},
++                                  {"Priority", std::int32_t(0)},
++                                  {"OuterRadius", 500.0f},
++                                  {"InnerRadius", 100.0f},
++                                  {"Volume", std::int32_t(100)},
++                                  {"Ambient", true},
++                                  {"FileStream", false}}};
+         const ClassInfo random_sound{"RandomSoundFX", &b2base, construct<RandomSoundFX>, []
+                                      {
+                                          std::vector<PropertySpec> p{
+@@ -711,9 +725,9 @@ namespace OpenBlood2
+                objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
+                objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
+                objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
+-               objects.register_class(detail_sprite) && objects.register_class(sound) &&
+-               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
+-               objects.register_class(game_start) && objects.register_class(path) &&
++               objects.register_class(sound_fx) && objects.register_class(detail_sprite) &&
++               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
++               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
+                objects.register_class(world_properties) && objects.register_class(smell) &&
+                objects.register_class(exit_hint) && objects.register_class(character) &&
+                objects.register_class(ai_manager) && objects.register_class(cultist) &&
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 0cbadb3..1adfacf 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -157,9 +157,10 @@ namespace OpenBlood2
+                 use(path, "BSP texture");
+         for (const auto& source : world.objects)
+             for (auto key :
+-                 {"Filename", "Skin", "SoundName", "SpriteSurfaceName", "OpenBusySound", "OpenStopSound",
+-                  "CloseBusySound", "CloseStopSound", "LockedSound", "UnlockedSound", "InitFilename", "InitSkin",
+-                  "DamageFilename", "DamageSkin", "DestroyFilename", "DestroySkin", "SlidingSound"})
++                 {"Filename",      "Skin",           "SoundName",      "SpriteSurfaceName", "OpenBusySound",
++                  "OpenStopSound", "CloseBusySound", "CloseStopSound", "LockedSound",       "UnlockedSound",
++                  "InitFilename",  "InitSkin",       "DamageFilename", "DamageSkin",        "DestroyFilename",
++                  "DestroySkin",   "SlidingSound",   "RampUpSound",    "RampDownSound",     "Sound"})
+                 if (const auto* p = source.find(key))
+                     if (const auto* path = std::get_if<std::string>(p))
+                         use(*path, key);
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 547568e..b163892 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1363,3 +1363,15 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+     add_test(NAME gpu.destructable_models COMMAND model_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/destructable-model-city" "${BLOOD2_TEST_DATA_DIR}" destructable_city)
+     set_tests_properties(gpu.destructable_models PROPERTIES LABELS "gpu;private;destructable_models" TIMEOUT 90)
+ endif()
++
++add_executable(sound_fx_tests sound_fx_tests.cpp)
++target_link_libraries(sound_fx_tests PRIVATE blood2_game)
++blood2_project_options(sound_fx_tests)
++foreach(case defaults ramps spatial deadlines failures lifetime)
++    add_test(NAME soundfx.${case} COMMAND sound_fx_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/sound-fx-${case}")
++    set_tests_properties(soundfx.${case} PROPERTIES LABELS "headless;soundfx" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME soundfx.catalog COMMAND sound_fx_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(soundfx.catalog PROPERTIES LABELS "headless;private;soundfx" TIMEOUT 90)
++endif()
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+index 1e2cc1a..b011dec 100644
+--- a/tests/destructable_model_tests.cpp
++++ b/tests/destructable_model_tests.cpp
+@@ -311,7 +311,7 @@ namespace
+                 ids.push_back(r->id);
+             }
+             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
+-            CHECK(created == 413 && unknown == 37 && failed == 35);
++            CHECK(created == 413 && unknown == 32 && failed == 40);
+             CHECK(update_model_scene(g, scene, error));
+             unsigned skin_failures = 0, triangles = 0;
+             for (auto id : ids)
+diff --git a/tests/sound_fx_tests.cpp b/tests/sound_fx_tests.cpp
+new file mode 100644
+index 0000000..d7b6d62
+--- /dev/null
++++ b/tests/sound_fx_tests.cpp
+@@ -0,0 +1,318 @@
++#include "audio_fixture.h"
++#include "game/original/SoundFX.h"
++#include <functional>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    HOBJECT make(GameSession& g, Properties p = {})
++    {
++        return g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::World, p);
++    }
++    SoundFX* get(GameSession& g, HOBJECT h)
++    {
++        return dynamic_cast<SoundFX*>(g.server.HandleToObject(h));
++    }
++    bool trigger(GameSession& g, HOBJECT h, const char* text)
++    {
++        auto s = g.server.CreateString(text);
++        auto m = g.server.StartMessageToObject(nullptr, h, 1000);
++        bool ok = m && g.server.WriteToMessageHString(m, s) == DE_OK && g.server.EndMessage(m) == DE_OK;
++        g.server.FreeString(s);
++        return ok;
++    }
++    Properties props(bool ambient = true)
++    {
++        return {{"StartOn", false},
++                {"Sound", std::string("long.wav")},
++                {"Ambient", ambient},
++                {"RampUpSound", std::string("cue.wav")},
++                {"RampDownSound", std::string("stereo.wav")}};
++    }
++    bool defaults(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto h = make(g);
++        CHECK(h);
++        auto* s = get(g, h);
++        CHECK(s && s->state == SoundFX::On && s->ambient && s->start_on && !s->file_stream && !s->sound);
++        CHECK(s->outer_radius == 500 && s->inner_radius == 100 && s->volume == 100 && s->priority == 0);
++        CHECK(!g.objects.get(h)->scheduled && (g.server.GetObjectUserFlags(h) & (1u << 3)));
++        h = g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::Runtime);
++        CHECK(h);
++        s = get(g, h);
++        CHECK(!s->ambient && s->outer_radius == 0 && s->volume == 0 && s->state == SoundFX::On);
++        auto p = props(false);
++        p["StartOn"] = true;
++        p["Volume"] = std::int32_t(-1);
++        p["Priority"] = std::int32_t(258);
++        h = g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::String, p);
++        CHECK(h);
++        s = get(g, h);
++        CHECK(s->state == SoundFX::On && s->volume == 255 && s->priority == 2 && s->sound);
++        CHECK(g.server.audio.get(s->sound)->request.volume == 1 && !g.server.audio.get(s->sound)->request.loop);
++        CHECK(!g.objects.get(h)->scheduled); // InitialUpdate cancels duration even for a spatial ON one-shot.
++        CHECK(g.step(2) && s->state == SoundFX::On && g.server.audio.get(s->sound)->done);
++        return true;
++    }
++    bool ramps(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto h = make(g, props());
++        CHECK(h);
++        auto* s = get(g, h);
++        CHECK(s->state == SoundFX::Off && !s->sound && !g.objects.get(h)->scheduled);
++        CHECK(trigger(g, h, "oN") && s->state == SoundFX::RampUp && s->sound);
++        auto first = s->sound;
++        CHECK(g.server.audio.get(first)->request.resource == "cue.wav" && !g.server.audio.get(first)->request.loop);
++        CHECK(g.step(.05) && s->state == SoundFX::RampUp && g.step(.051) && s->state == SoundFX::On);
++        CHECK(!g.server.audio.get(first) && s->sound != first && !g.objects.get(h)->scheduled);
++        auto loop = s->sound;
++        CHECK(g.server.audio.get(loop)->request.loop && g.step(3.1) && g.server.audio.get(loop)->loops >= 3);
++        CHECK(trigger(g, h, "TRIGGER") && s->sound != loop && !g.server.audio.get(loop)); // Restart, not idempotent.
++        CHECK(trigger(g, h, "OFF") && s->state == SoundFX::RampDown && g.objects.get(h)->scheduled);
++        CHECK(g.step(.101) && s->state == SoundFX::Off && !s->sound && !g.objects.get(h)->scheduled);
++        CHECK(trigger(g, h, "TOGGLE") && s->state == SoundFX::RampUp);
++        CHECK(trigger(g, h, "toggle") && s->state == SoundFX::RampDown); // Any non-OFF counts as on.
++        CHECK(trigger(g, h, "ON") && s->state == SoundFX::RampDown);     // ON doesn't reverse ramp down.
++        CHECK(g.step(.101) && s->state == SoundFX::Off);
++        auto attempts = s->attempts;
++        CHECK(trigger(g, h, "ONWARD") && trigger(g, h, " ON") && trigger(g, h, "OFF;") && trigger(g, h, nullptr));
++        CHECK(s->attempts == attempts && s->state == SoundFX::Off && !g.server.string_count() &&
++              !g.server.message_count());
++        return true;
++    }
++    bool spatial(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto p = props(false);
++        p["RampUpSound"] = std::string{};
++        p["Pos"] = DVector{300, 0, 0};
++        p["Volume"] = std::int32_t(50);
++        auto h = make(g, p);
++        CHECK(h);
++        auto* s = get(g, h);
++        CHECK(trigger(g, h, "ON") && s->state == SoundFX::On && s->sound);
++        auto first = s->sound;
++        auto* v = g.server.audio.get(first);
++        CHECK(v && !v->request.loop && v->request.reverb_requested && !v->request.speaker && !v->world_owned);
++        CHECK(g.server.advance_audio(.05, {}, {}) && v->right > v->left && v->request.volume == .5f);
++        DVector moved{0, 0, 300};
++        CHECK(g.server.TeleportObject(h, &moved) == DE_OK);
++        CHECK(g.server.advance_audio(.05, {}, {}) && v->position.x == 300 &&
++              v->position.z == 0); // Sampled, not attached.
++        CHECK(g.step(1.001) && s->state == SoundFX::RampDown && s->sound != first && !g.server.audio.get(first));
++        CHECK(g.step(.101) && s->state == SoundFX::Off && !s->sound);
++        p = props();
++        p["RampUpSound"] = p["RampDownSound"] = std::string{};
++        h = make(g, p);
++        CHECK(h);
++        s = get(g, h);
++        CHECK(trigger(g, h, "ON") && s->state == SoundFX::On && s->sound);
++        CHECK(trigger(g, h, "OFF") && s->state == SoundFX::Off && !s->sound && !g.objects.get(h)->scheduled);
++        return true;
++    }
++    bool deadlines(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto p = props();
++        p["RampDownSound"] = std::string{};
++        auto h = make(g, p);
++        CHECK(h);
++        auto* s = get(g, h);
++        CHECK(trigger(g, h, "ON") && g.objects.get(h)->scheduled);
++        const auto due = g.objects.get(h)->due;
++        CHECK(trigger(g, h, "OFF") && s->state == SoundFX::Off && !s->sound && g.objects.get(h)->due == due);
++        CHECK(g.objects.get(h)->scheduled && g.step(.101) && !g.objects.get(h)->scheduled);
++        // Failed replacement preserves the old ramp deadline, which later advances the new state.
++        h = make(g, props());
++        CHECK(h);
++        s = get(g, h);
++        CHECK(trigger(g, h, "ON"));
++        s->ramp_down = "missing.wav";
++        CHECK(trigger(g, h, "OFF") && !s->sound && s->failures == 1 && g.objects.get(h)->scheduled);
++        CHECK(g.step(.101) && s->state == SoundFX::Off && !g.objects.get(h)->scheduled);
++        h = make(g, {{"StartOn", false}, {"RampUpSound", std::string("cue.wav")}});
++        CHECK(h);
++        s = get(g, h);
++        CHECK(trigger(g, h, "ON") && g.step(.101) && s->state == SoundFX::On && !s->sound &&
++              !g.objects.get(h)->scheduled);
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        CHECK(!g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::Restore));
++        CHECK(!make(g, {{"VoiceType", std::int32_t(0)}})); // Do not silently discard unknown historical properties.
++        auto p = props();
++        p["RampUpSound"] = std::string("missing.wav");
++        auto h = make(g, p);
++        CHECK(h);
++        auto* s = get(g, h);
++        CHECK(trigger(g, h, "ON") && !s->sound && s->state == SoundFX::RampUp && s->failures == 1 && !s->error.empty());
++        CHECK(!g.objects.get(h)->scheduled && g.step(5) && s->state == SoundFX::RampUp && s->attempts == 1);
++        p = props(false);
++        p["RampUpSound"] = std::string{};
++        p["FileStream"] = true;
++        h = make(g, p);
++        CHECK(h);
++        s = get(g, h);
++        CHECK(trigger(g, h, "ON") && s->state == SoundFX::On && !s->sound &&
++              s->error.find("TIMESYNC") != std::string::npos);
++        CHECK(!g.objects.get(h)->scheduled && s->failures == 1);
++        p = props();
++        p["StartOn"] = true;
++        p["OuterRadius"] = -1.0f;
++        h = make(g, p);
++        CHECK(h);
++        s = get(g, h);
++        CHECK(s->failures == 1 && !s->sound && !s->error.empty()); // Typed mixer refuses invalid radii.
++        CHECK(g.server.audio.voices().empty());
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        SoundId previous = 0;
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            auto p = props();
++            p["StartOn"] = true;
++            p["DifficultyMed"] = false;
++            auto filtered = make(g, p);
++            CHECK(filtered && g.objects.get(filtered)->life == Life::Pending);
++            auto id = get(g, filtered)->sound;
++            CHECK(id && g.server.audio.get(id)); // Own startup precedes base filter.
++            g.objects.finish_frame();
++            CHECK(!g.objects.get(filtered) && !g.server.audio.get(id));
++            auto h = make(g, props());
++            CHECK(h && trigger(g, h, "ON"));
++            auto* s = get(g, h);
++            auto voice = s->sound;
++            CHECK(voice > previous);
++            previous = voice;
++            g.server.SetObjectState(h, OBJSTATE_INACTIVE);
++            CHECK(g.server.GetObjectState(h) == OBJSTATE_INACTIVE);
++            CHECK(g.step(.2) && s->state == SoundFX::RampUp && g.server.audio.get(voice)->done);
++            g.server.SetObjectState(h, OBJSTATE_ACTIVE);
++            CHECK(g.server.GetObjectState(h) == OBJSTATE_ACTIVE && g.step(.001) && s->state == SoundFX::On);
++            voice = s->sound;
++            CHECK(voice && g.objects.remove(h));
++            g.objects.finish_frame();
++            CHECK(!g.server.audio.get(voice) && !g.objects.get(h) && !trigger(g, h, "ON"));
++            CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_bytes());
++            CHECK(!g.server.string_count() && !g.server.message_count() && !g.server.list_count());
++        }
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        unsigned worlds = 0, entries = 0, rejected = 0, created = 0, attempts = 0, failures = 0, references = 0,
++                 missing = 0, city = 0;
++        unsigned voice_schema = 0, action_schema = 0;
++        for (const auto& [path, resource] : g.resources.index())
++        {
++            (void)resource;
++            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
++                continue;
++            std::vector<std::uint8_t> bytes;
++            World world;
++            CHECK(g.resources.read(path, bytes, error));
++            if (!read_world(bytes, world, error))
++            {
++                CHECK(path == "worlds/16_bridge.dat");
++                continue;
++            }
++            ++worlds;
++            for (const auto& o : world.objects)
++                if (o.class_name == "SoundFX")
++                {
++                    ++entries;
++                    Properties p;
++                    for (const auto& prop : o.properties)
++                        p.emplace(prop.name, prop.value);
++                    if (path == "worlds/02_cityhub.dat")
++                        ++city;
++                    auto h = make(g, p);
++                    if (!h)
++                    {
++                        ++rejected;
++                        const auto& detail = g.objects.diagnostics().back();
++                        if (detail == "SoundFX: invalid property VoiceType")
++                            ++voice_schema;
++                        else if (detail == "SoundFX: invalid property TypeAction")
++                            ++action_schema;
++                        else
++                            CHECK(false);
++                        std::cout << path << " rejected: " << g.objects.diagnostics().back() << '\n';
++                    }
++                    else
++                    {
++                        ++created;
++                        auto* s = get(g, h);
++                        CHECK(s);
++                        attempts += s->attempts;
++                        failures += s->failures;
++                        std::cout << path << " created: " << g.objects.get(h)->state.m_Name
++                                  << " state=" << s->state_name() << " stream=" << s->file_stream
++                                  << " error=" << s->error << '\n';
++                    }
++                    for (const auto* key : {"Sound", "RampUpSound", "RampDownSound"})
++                        if (p.contains(key))
++                        {
++                            const auto* value = std::get_if<std::string>(&p.at(key));
++                            CHECK(value);
++                            if (value->empty())
++                                continue;
++                            ++references;
++                            std::shared_ptr<const AudioClip> clip;
++                            if (!g.server.audio.load(g.resources, *value, clip, error))
++                            {
++                                ++missing;
++                                std::cout << path << " resource " << *value << ": " << error << '\n';
++                            }
++                        }
++                    CHECK(g.objects.clear());
++                    g.server.audio.clear();
++                }
++        }
++        std::cout << "SoundFX catalog worlds=" << worlds << " entries=" << entries << " created=" << created
++                  << " rejected=" << rejected << " starts=" << attempts << " failures=" << failures
++                  << " references=" << references << " unreadable=" << missing << " city=" << city
++                  << " VoiceType=" << voice_schema << " TypeAction=" << action_schema << '\n';
++        CHECK(worlds == 57 && entries == 124 && rejected == 124 && created == 0 && attempts == 0 && failures == 0 &&
++              references == 124 && missing == 1 && voice_schema == 121 && action_schema == 3 && city == 5 &&
++              !g.server.string_count());
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"defaults", defaults}, {"ramps", ramps},       {"spatial", spatial}, {"deadlines", deadlines},
++        {"failures", failures}, {"lifetime", lifetime}, {"catalog", catalog}};
++    auto it = cases.find(argv[1]);
++    return it != cases.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index aa68271..5cf043d 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -917,7 +917,7 @@ namespace
+                 else
+                 {
+                     CHECK(d.entries.size() == 1026 && d.schema_checked == 417 && d.editor_only == 541 &&
+-                          d.unknown == 37 && d.invalid == 31 && d.models == 100 && d.triangles == 39724);
++                          d.unknown == 32 && d.invalid == 36 && d.models == 100 && d.triangles == 39724);
+                     for (const auto& e : d.entries)
+                         if (e.state == DestinationEntryState::InvalidProperties)
+                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+@@ -1161,7 +1161,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 413 && d.unknown == 37 && d.failed == 35);
++                        CHECK(d.created == 413 && d.unknown == 32 && d.failed == 40);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

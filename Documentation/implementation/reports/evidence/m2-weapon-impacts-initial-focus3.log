@@ -1,0 +1,13 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 606: weapon_impacts.brushes
+1/2 Test #606: weapon_impacts.brushes ...........   Passed    0.03 sec
+    Start 607: weapon_impacts.volumes
+2/2 Test #607: weapon_impacts.volumes ...........   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+headless          =   0.05 sec*proc (2 tests)
+weapon_impacts    =   0.05 sec*proc (2 tests)
+
+Total Test time (real) =   0.06 sec

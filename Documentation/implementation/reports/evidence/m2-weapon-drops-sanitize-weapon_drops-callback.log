@@ -1,0 +1,14 @@
+462/464 Testing: weapon_drops.callback
+462/464 Test: weapon_drops.callback
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_drop_tests" "callback" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-drop-fixtures/callback"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_drops.callback" start time: Oct 16 16:12 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_drops.callback" end time: Oct 16 16:12 CEST
+"weapon_drops.callback" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,9 @@
+[0/2] Re-checking globbed directories...
+[1/201] Scanning <workspace>/Blood2/src/game/original/KeyPickup.cpp for CXX dependencies
+[2/201] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[3/31] Scanning <workspace>/Blood2/src/app/main.cpp for CXX dependencies
+[4/31] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[5/11] Scanning <workspace>/Blood2/tests/pickup_audio_tests.cpp for CXX dependencies
+[6/11] Generating CXX dyndep file tests/CMakeFiles/pickup_audio_tests.dir/CXX.dd
+[7/9] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[8/9] Linking CXX executable blood2

@@ -1,0 +1,5 @@
+Reviewed actual SDL_GPU captures on 2026-10-16.
+Subway viewport: train interior volumes and perspective are visible; solid diagnostic orientation colors, no textures/models/lighting claim.
+Interactive --view-world startup: original intro camera faces the train; geometry is rendered without the inspector.
+3D view inspector: readable prepared geometry, omissions and GPU counters; correctly labels no entered player with zero GPU frames.
+Synthetic depth capture: near red triangle occludes later far blue faces; +X/+Y green marker is upper-right and near-clipped yellow triangle is absent.

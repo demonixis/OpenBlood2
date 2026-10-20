@@ -1,0 +1,14 @@
+405/406 Testing: ai_locomotion.attacks
+405/406 Test: ai_locomotion.attacks
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "attacks"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.attacks" start time: Oct 16 13:42 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.attacks" end time: Oct 16 13:42 CEST
+"ai_locomotion.attacks" time elapsed: 00:00:00
+----------------------------------------------------------

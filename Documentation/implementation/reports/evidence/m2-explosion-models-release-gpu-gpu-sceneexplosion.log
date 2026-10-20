@@ -1,0 +1,31 @@
+264/556 Testing: gpu.sceneexplosion
+264/556 Test: gpu.sceneexplosion
+Command: "/home/yann/projects/lithtech/Blood2/build/release/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--scene-explosions-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/scene-explosions.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.sceneexplosion" start time: Oct 16 20:40 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 225 original instances, 116 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/scene-explosions.png
+[info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL audio plus original explosion models/sprites verified hidden and after reload; other composite FX unavailable
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   1.68 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sceneexplosion" end time: Oct 16 20:40 CEST
+"gpu.sceneexplosion" time elapsed: 00:00:01
+----------------------------------------------------------

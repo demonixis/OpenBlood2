@@ -1,0 +1,140 @@
+Test project <Blood2>/build/sanitize
+      Start 859: train_session.private_30
+      Start 860: train_session.private_60
+ 1/61 Test #859: train_session.private_30 .........   Passed  162.81 sec
+      Start 858: coverage.private
+ 2/61 Test #860: train_session.private_60 .........   Passed  164.64 sec
+      Start 131: door_audio.private
+ 3/61 Test #131: door_audio.private ...............   Passed    7.29 sec
+      Start 251: cinematics.catalog
+ 4/61 Test #251: cinematics.catalog ...............   Passed   13.28 sec
+      Start 136: trigger_audio.private
+ 5/61 Test #136: trigger_audio.private ............   Passed    6.59 sec
+      Start  12: objects.message_churn
+ 6/61 Test  #12: objects.message_churn ............   Passed    5.86 sec
+      Start 220: keyframes.catalog
+ 7/61 Test #220: keyframes.catalog ................   Passed   38.57 sec
+      Start 856: coverage.catalog
+ 8/61 Test #856: coverage.catalog .................   Passed    4.39 sec
+      Start 243: worldpaths.subway
+ 9/61 Test #858: coverage.private .................   Passed   79.17 sec
+      Start 252: cinematics.subway
+10/61 Test #252: cinematics.subway ................   Passed    4.44 sec
+      Start  13: objects.message_limit
+11/61 Test  #13: objects.message_limit ............   Passed    0.39 sec
+      Start 128: door_audio.states
+12/61 Test #128: door_audio.states ................   Passed    0.20 sec
+      Start 218: keyframes.limits
+13/61 Test #218: keyframes.limits .................   Passed    0.63 sec
+      Start 132: trigger_audio.activation
+14/61 Test #132: trigger_audio.activation .........   Passed    0.06 sec
+      Start 133: trigger_audio.feedback
+15/61 Test #133: trigger_audio.feedback ...........   Passed    0.05 sec
+      Start 129: door_audio.replacement
+16/61 Test #129: door_audio.replacement ...........   Passed    0.04 sec
+      Start 135: trigger_audio.failures
+17/61 Test #135: trigger_audio.failures ...........   Passed    0.04 sec
+      Start 130: door_audio.lifetime
+18/61 Test #130: door_audio.lifetime ..............   Passed    0.04 sec
+      Start 250: cinematics.device
+19/61 Test #250: cinematics.device ................   Passed    0.09 sec
+      Start 134: trigger_audio.lifetime
+20/61 Test #134: trigger_audio.lifetime ...........   Passed    0.04 sec
+      Start 857: coverage.observations
+21/61 Test #857: coverage.observations ............   Passed    0.02 sec
+      Start 248: cinematics.lifetime
+22/61 Test #248: cinematics.lifetime ..............   Passed    0.04 sec
+      Start 249: cinematics.failures
+23/61 Test #249: cinematics.failures ..............   Passed    0.04 sec
+      Start 245: cinematics.mixer
+24/61 Test #245: cinematics.mixer .................   Passed    0.04 sec
+      Start 246: cinematics.spatial
+25/61 Test #246: cinematics.spatial ...............   Passed    0.03 sec
+      Start 247: cinematics.sequence
+26/61 Test #247: cinematics.sequence ..............   Passed    0.04 sec
+      Start 241: worldpaths.player
+27/61 Test #241: worldpaths.player ................   Passed    0.04 sec
+      Start 244: cinematics.decode
+28/61 Test #244: cinematics.decode ................   Passed    0.02 sec
+      Start 240: worldpaths.validation
+29/61 Test #240: worldpaths.validation ............   Passed    0.03 sec
+      Start 242: worldpaths.timeline
+30/61 Test #242: worldpaths.timeline ..............   Passed    0.03 sec
+      Start 238: worldpaths.push_block
+31/61 Test #238: worldpaths.push_block ............   Passed    0.03 sec
+      Start 239: worldpaths.lifetime
+32/61 Test #239: worldpaths.lifetime ..............   Passed    0.03 sec
+      Start 237: worldpaths.riders
+33/61 Test #237: worldpaths.riders ................   Passed    0.03 sec
+      Start 235: worldpaths.translation
+34/61 Test #235: worldpaths.translation ...........   Passed    0.03 sec
+      Start 236: worldpaths.world_block
+35/61 Test #236: worldpaths.world_block ...........   Passed    0.03 sec
+      Start 212: keyframes.timeline
+36/61 Test #212: keyframes.timeline ...............   Passed    0.03 sec
+      Start 215: keyframes.events
+37/61 Test #215: keyframes.events .................   Passed    0.03 sec
+      Start 214: keyframes.rotation
+38/61 Test #214: keyframes.rotation ...............   Passed    0.03 sec
+      Start 216: keyframes.reentrant
+39/61 Test #216: keyframes.reentrant ..............   Passed    0.03 sec
+      Start 213: keyframes.looping
+40/61 Test #213: keyframes.looping ................   Passed    0.03 sec
+      Start 217: keyframes.validation
+41/61 Test #217: keyframes.validation .............   Passed    0.03 sec
+      Start 219: keyframes.collision
+42/61 Test #219: keyframes.collision ..............   Passed    0.03 sec
+      Start   2: objects.builtin_model
+43/61 Test   #2: objects.builtin_model ............   Passed    0.02 sec
+      Start  14: objects.unsupported_teardown
+44/61 Test  #14: objects.unsupported_teardown .....   Passed    0.05 sec
+      Start 211: keyframes.defaults
+45/61 Test #211: keyframes.defaults ...............   Passed    0.02 sec
+      Start  11: objects.messages_strings
+46/61 Test  #11: objects.messages_strings .........   Passed    0.04 sec
+      Start  15: objects.creation_failures
+47/61 Test  #15: objects.creation_failures ........   Passed    0.03 sec
+      Start   5: objects.reasons_properties
+48/61 Test   #5: objects.reasons_properties .......   Passed    0.02 sec
+      Start   3: objects.original_objects
+49/61 Test   #3: objects.original_objects .........   Passed    0.02 sec
+      Start  10: objects.links_lists
+50/61 Test  #10: objects.links_lists ..............   Passed    0.02 sec
+      Start   7: objects.deferred_removal
+51/61 Test   #7: objects.deferred_removal .........   Passed    0.02 sec
+      Start   9: objects.handles_selection
+52/61 Test   #9: objects.handles_selection ........   Passed    0.02 sec
+      Start   4: objects.nested_creation
+53/61 Test   #4: objects.nested_creation ..........   Passed    0.02 sec
+      Start   6: objects.scheduling
+54/61 Test   #6: objects.scheduling ...............   Passed    0.02 sec
+      Start   8: objects.aggregate_dispatch
+55/61 Test   #8: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start 221: keyframe_audio.timeline
+56/61 Test #221: keyframe_audio.timeline ..........   Passed    0.04 sec
+      Start 222: keyframe_audio.replacement
+57/61 Test #222: keyframe_audio.replacement .......   Passed    0.04 sec
+      Start 223: keyframe_audio.lifetime
+58/61 Test #223: keyframe_audio.lifetime ..........   Passed    0.04 sec
+      Start 224: keyframe_audio.failures
+59/61 Test #224: keyframe_audio.failures ..........   Passed    0.04 sec
+      Start 225: keyframe_audio.private
+60/61 Test #243: worldpaths.subway ................   Passed   12.19 sec
+61/61 Test #225: keyframe_audio.private ...........   Passed   52.76 sec
+
+100% tests passed, 0 tests failed out of 61
+
+Label Time Summary:
+audio            =  67.24 sec*proc (14 tests)
+cinematics       =  18.02 sec*proc (9 tests)
+doors            =   7.56 sec*proc (4 tests)
+headless         = 554.69 sec*proc (61 tests)
+keyframes        =  92.34 sec*proc (15 tests)
+objects          =   6.53 sec*proc (14 tests)
+private          = 541.74 sec*proc (10 tests)
+services         =  83.58 sec*proc (3 tests)
+train_session    = 327.46 sec*proc (2 tests)
+triggers         =   6.77 sec*proc (5 tests)
+worldpaths       =  12.44 sec*proc (9 tests)
+
+Total Test time (real) = 301.90 sec

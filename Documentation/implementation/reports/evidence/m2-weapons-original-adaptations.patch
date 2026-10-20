@@ -1,0 +1,3830 @@
+--- sources/blood2/Shared/WeaponDefs.h [selected source]
++++ Blood2/src/game/original/WeaponDefs.h
+@@ -1,9 +1,9 @@
+-#ifndef __WEAPONDEFS_H__
+-#define __WEAPONDEFS_H__
+-
+-// Includes....
+-#include "SharedDefs.h"
+-
++#pragma once
++#include "basedefs_de.h"
++// Selected original definitions; the two table entries retain every source field.
++inline constexpr DBYTE WEAP_BERETTA=1, WEAP_MELEE=17;
++inline constexpr DBYTE TYPE_PISTOL=2, TYPE_MELEE=4, AMMO_NONE=0, AMMO_BULLET=1;
++inline constexpr int IDS_WEAPON_BERETTA=350, IDS_WEAPON_KNIFE=366;
+ // Weapon spread structure
+ typedef struct Spread_t
+ {
+@@ -35,16 +35,16 @@
+ 
+ // Structure to hold initial values for weapons
+ typedef struct WeaponData_t {
+-		char*		m_szViewModelFilename;
+-		char*		m_szLeftViewModelFilename;
+-		char*		m_szViewModelSkin;
+-		char*		m_szHandModelFilename;
+-		char*		m_szHandModelSkin;
++		const char*		m_szViewModelFilename;
++		const char*		m_szLeftViewModelFilename;
++		const char*		m_szViewModelSkin;
++		const char*		m_szHandModelFilename;
++		const char*		m_szHandModelSkin;
+ 		DBYTE		m_nType;			// Weapon type
+ 		DBYTE		m_nFireType;		// Weapon animation
+ 		DBYTE		m_nAmmoType;		// Type of ammo
+-		D_WORD		m_nAmmoUse;			// Amount of ammo to use per shot
+-		D_WORD		m_nAltAmmoUse;		// Amount of ammo to use per Alt shot
++		std::uint16_t		m_nAmmoUse;			// Amount of ammo to use per shot
++		std::uint16_t		m_nAltAmmoUse;		// Amount of ammo to use per Alt shot
+ 		DFLOAT		m_fMinDamage;		// minimum amount of damage per shot vector
+ 		DFLOAT		m_fMaxDamage;		// maximum amount of damage per shot vector
+ 		DFLOAT		m_fMinAltDamage;	// Alt minimum fire damage
+@@ -65,19 +65,19 @@
+ 		int			m_nAltDamageRadius;
+ 		DBOOL		m_bAltFireZoom;			// Alt fire for this weapon is a zoom function.
+ 		DBOOL		m_bSemiAuto;			// Weapon has semi-auto firing
+-		char*		m_szFireSound;			// Sound made when weapon fires.
+-		char*		m_szAltFireSound;		// Sound made when weapon fires.
+-		char*		m_szEmptyWeaponSound;	// Sound made when weapon is empty
+-		char*		m_szAltEmptyWeaponSound;// Sound made when weapon is empty
+-		char*		m_szProjectileClass;
+-		char*		m_szAltProjectileClass;
++		const char*		m_szFireSound;			// Sound made when weapon fires.
++		const char*		m_szAltFireSound;		// Sound made when weapon fires.
++		const char*		m_szEmptyWeaponSound;	// Sound made when weapon is empty
++		const char*		m_szAltEmptyWeaponSound;// Sound made when weapon is empty
++		const char*		m_szProjectileClass;
++		const char*		m_szAltProjectileClass;
+ 		DFLOAT		m_fFlashRadius;
+ 		VectorInit	m_vFlashColor;
+ 		// Info for client
+-		char*		m_szWeaponName;
++		const char*		m_szWeaponName;
+ 		int			m_nWeaponNameID;
+-		char*		m_szFlashSprite;
+-		char*		m_szAltFlashSprite;
++		const char*		m_szFlashSprite;
++		const char*		m_szAltFlashSprite;
+ 		DFLOAT		m_fFlashDuration;
+ 		DFLOAT		m_fFlashScale;
+ 		VectorInit	m_vHandModelOffset;	// Offset for the 3rd person view
+@@ -90,8 +90,8 @@
+ 		DBOOL		m_bCumulativeKick;	// Kick is Cumulative
+ 		DBOOL		m_bLoopAnim;		// Anim is looping
+ 		DBOOL		m_bAltLoopAnim;		// Alt Anim is looping
+-		char*		m_szStatusIcon;		// Icon displayed on the status bar
+-		char*		m_szStatusIconH;	// Highlighed icon displayed on the status bar
++		const char*		m_szStatusIcon;		// Icon displayed on the status bar
++		const char*		m_szStatusIconH;	// Highlighed icon displayed on the status bar
+ } WeaponData;
+ 
+ 
+@@ -110,33 +110,5 @@
+ 	WS_HOLSTERED			// holstered/inactive state (Greg 9/18)
+ };
+ 
+-typedef struct WeaponFXExtras
+-{
+-	WeaponFXExtras::WeaponFXExtras();
+ 
+-	DBYTE		nAmmo;
+-	DBYTE		nSurface;
+-	DBYTE		nExp;
+-	DFLOAT		fDamage;
+-	DFLOAT		fDensity;
+-	DVector		vColor1;
+-	DVector		vColor2;
+-	DVector		vLightColor1;
+-	DVector		vLightColor2;
+-}	WeaponFXExtras;
+-
+-// ----------------------------------------------------------------------- //
+-
+-inline WeaponFXExtras::WeaponFXExtras()
+-{
+-	memset(this, 0, sizeof(WeaponFXExtras));
+-}
+-
+-// ----------------------------------------------------------------------- //
+-
+-
+-
+-// initial values for standard weapons
+-extern WeaponData g_WeaponDefaults[WEAP_MAXWEAPONTYPES];
+-
+-#endif __WEAPONDEFS_H__+const WeaponData* weapon_definition(DBYTE type);
+--- sources/blood2/Shared/WeaponDefs.cpp [selected source]
++++ Blood2/src/game/original/WeaponDefs.cpp
+@@ -1,3 +1,6 @@
++#include "WeaponDefs.h"
++namespace {
++constexpr WeaponData definitions[] = {
+ 	// Beretta (Pistol)
+ 	{
+ 		"Models\\Weapons\\Beretta_pv.abc",	// View Model
+@@ -117,3 +120,9 @@
+ 		"interface\\statusbar\\weapons\\c_knife.pcx",		// Icon for status bar
+ 		"interface\\statusbar\\weapons\\c_knife_h.pcx",	// Highlighted icon for status bar
+ 	},
++};
++}
++const WeaponData* weapon_definition(DBYTE type) {
++    for (const auto& value : definitions) if (value.m_nType == type) return &value;
++    return nullptr;
++}
+--- sources/blood2/ObjectDLL/InventoryMgr.cpp [selected source]
++++ Blood2/src/game/original/InventoryMgr.cpp
+@@ -1,552 +1,117 @@
+-//	ROUTINE:	CInventoryMgr::ObtainWeapon()
+-//
+-//	PURPOSE:	Adds a particular weapon to the inventory.  If slot is not
+-//              -1, a particular slot is attempted for use.
+-//
+-// ----------------------------------------------------------------------- //
+-
+-int CInventoryMgr::ObtainWeapon(DDWORD nWeapon, int slot)
++#include "InventoryMgr.h"
++#include <algorithm>
++#include <cmath>
++namespace {
++constexpr float fMaxAmmoCount[13][6] = 
+ {
+-	if(nWeapon >= WEAP_BASEINVENTORY)		// Need to use AddInventoryWeapon for these
+-		return CHWEAP_NOTAVAIL;
+-
+-	CWeapon *w;
+-	DBOOL bLeftHand = DFALSE;
+-	int emptyslot = -1;
+-
+-	// See if a particular slot is requested
+-	if (slot != -1)
+-	{
+-		w = m_Weapons[slot];
+-		if (!w)
+-			emptyslot = slot;
+-		else if (w->GetType() == nWeapon)
+-		{
+-			// Have it, see if it's dual-handed & we don't yet have 2.
+-			if (w->IsDualHanded() && !m_LWeapons[slot])
+-			{
+-				emptyslot = slot;
+-				bLeftHand = DTRUE;
+-			}
+-			else
+-			{
+-				return CHWEAP_ALREADYHAVE;
+-			}
+-		}
+-	}
+-	if (emptyslot == -1)
+-	{
+-		// Count down through the slots
+-		for (int i=0; i < SLOTCOUNT_WEAPONS; i++)
+-		{
+-			w = m_Weapons[i];
+-			if (w)		// See if we already have it..
+-			{
+-				if (w->GetType() == nWeapon) 
+-				{
+-					// Have it, see if it's dual-handed & we don't yet have 2.
+-					if (w->IsDualHanded() && !m_LWeapons[i])
+-					{
+-						emptyslot = i;
+-						bLeftHand = DTRUE;
+-						break;
+-					}
+-					else
+-					{
+-						return CHWEAP_ALREADYHAVE;
+-					}
+-				}
+-			}
+-			else if (emptyslot == -1) // Empty slot, mark it..
+-			{
+-				emptyslot = i;
+-			}
+-		}
+-	}
+-
+-	if (emptyslot == -1) return CHWEAP_NOAVAILSLOTS;
+-
+-#ifdef _DEMO
+-	if (!IsDemoWeapon(nWeapon) && IsPlayer(m_hOwner))
+-	{
+-		return(CHWEAP_NOTAVAIL);
+-	}
+-#endif
+-
+-	switch(nWeapon)
+-	{
+-		case WEAP_BERETTA:
+-			w = new CBeretta;
+-			break;
+-
+-		case WEAP_SHOTGUN:
+-			w = new CShotgun;
+-			break;
+-
+-		case WEAP_SNIPERRIFLE:
+-			w = new CSniperRifle;
+-			break;
+-
+-		case WEAP_ASSAULTRIFLE:
+-			w = new CAssaultRifle;
+-			break;
+-
+-		case WEAP_SUBMACHINEGUN:
+-			w = new CSubMachineGun;
+-			break;
+-
+-		case WEAP_FLAREGUN:
+-			w = new CFlareGun;
+-			break;
+-
+-		case WEAP_HOWITZER:
+-			w = new CHowitzer;
+-			break;
+-
+-		case WEAP_BUGSPRAY:
+-			w = new CBugSpray;
+-			break;
+-
+-		case WEAP_NAPALMCANNON:
+-			w = new CNapalmCannon;
+-			break;
+-
+-		case WEAP_MINIGUN:
+-			w = new CMiniGun;
+-			break;
+-
+-		case WEAP_VOODOO:
+-			w = new CVoodooDoll;
+-			break;
+-
+-		case WEAP_ORB:
+-			w = new COrb;
+-			break;
+-
+-		case WEAP_DEATHRAY:
+-			w = new CDeathRay;
+-			break;
+-
+-		case WEAP_LIFELEECH:
+-			w = new CLifeLeech;
+-			break;
+-
+-		case WEAP_TESLACANNON:
+-			w = new CTeslaCannon;
+-			break;
+-
+-		case WEAP_SINGULARITY:
+-			w = new CSingularity;
+-			break;
+-
+-		case WEAP_MELEE:
+-			w = new CMelee;
+-			break;
+-
+-#ifdef _ADD_ON
+-
+-		case WEAP_COMBATSHOTGUN:
+-			w = new CCombatShotgun;
+-			break;
+-
+-		case WEAP_FLAYER:
+-			w = new CFlayer;
+-			break;
+-#endif
+-
+-#ifndef _DEMO
+-		case WEAP_PROXIMITYBOMB:
+-			w = new CWeapProximityBomb;
+-			break;
+-
+-		case WEAP_REMOTEBOMB:
+-			w = new CWeapRemoteBomb;
+-			break;
+-
+-		case WEAP_TIMEBOMB:
+-			w = new CWeapTimeBomb;
+-			break;
+-#endif
+-		case WEAP_SHIKARI_CLAW:
+-			w = new CShikariClaw;
+-			break;
+-
+-		case WEAP_SHIKARI_SPIT:
+-			w = new CShikariSpit;
+-			break;
+-
+-		case WEAP_SOUL_CROWBAR:
+-			w = new CSoulCrowbar;
+-			break;
+-
+-		case WEAP_SOUL_AXE:
+-			w = new CSoulAxe;
+-			break;
+-		case WEAP_SOUL_PIPE:
+-			w = new CSoulPipe;
+-			break;
+-
+-		case WEAP_SOUL_HOOK:
+-			w = new CSoulHook;
+-			break;
+-
+-		case WEAP_BEHEMOTH_CLAW:
+-			w = new CBehemothClaw;
+-			break;
+-
+-		case WEAP_ZEALOT_HEAL:
+-			w = new CZealotHeal;
+-			break;
+-
+-		case WEAP_ZEALOT_SHIELD:
+-			w = new CZealotShield;
+-			break;
+-
+-		case WEAP_ZEALOT_ENERGYBLAST:
+-			w = new CEnergyBlast;
+-			break;
+-
+-		case WEAP_ZEALOT_SHOCKWAVE:
+-			w = new CShockwave;
+-			break;
+-
+-		case WEAP_ZEALOT_GROUNDFIRE:
+-			w = new CGroundStrike;
+-			break;
+-
+-		case WEAP_DRUDGE_FIREBALL:
+-			w = new CFireball;
+-			break;
+-
+-		case WEAP_DRUDGE_LIGHTNING:
+-			w = new CDrudgeLightning;
+-			break;
+-
+-		case WEAP_HAND_SQUEEZE:
+-			w = new CHandSqueeze;
+-			break;
+-
+-		case WEAP_THIEF_SUCK:
+-			w = new CThiefSuck;
+-			break;
+-
+-		case WEAP_BONELEECH_SUCK:
+-			w = new CThiefSuck;
+-			break;
+-
+-		case WEAP_NIGHTMARE_BITE:
+-			w = new CNightmareBite;
+-			break;
+-
+-		case WEAP_BEHEMOTH_SHOCKWAVE:
+-			w = new CBehemothShockwave;
+-			break;
+-
+-		case WEAP_DEATHSHROUD_ZAP:
+-			w = new CDeathShroudZap;
+-			break;
+-
+-		case WEAP_NAGA_EYEBEAM:
+-			w = new CNagaEyes;
+-			break;
+-
+-		case WEAP_NAGA_SPIKE:
+-			w = new CNagaSpike;
+-			break;
+-
+-		case WEAP_NAGA_DEBRIS:
+-			w = new CNagaDebris;
+-			break;
+-
+-		case WEAP_GIDEON_SHIELD:
+-			w = new CGideonShield;
+-			break;
+-
+-		case WEAP_GIDEON_WIND:
+-			w = new CGideonWind;
+-			break;
+-
+-		case WEAP_GIDEON_GOO:
+-			w = new CGooSpit;
+-			break;
+-
+-		case WEAP_GIDEON_VOMIT:
+-			w = new CVomit;
+-			break;
+-
+-		case WEAP_GIDEON_SPEAR:
+-			w = new CGideonSpear;
+-			break;
+-
+-		case WEAP_ANCIENTONE_BEAM:
+-			w = new CAncientOneBeam;
+-			break;
+-
+-		case WEAP_ANCIENTONE_TENTACLE:
+-			w = new CAncientOneTentacle;
+-			break;
+-
+-		case WEAP_SKULL:
+-			w = new CSkull;
+-			break;
+-
+-#ifdef _ADD_ON
+-
+-		case WEAP_GREMLIN_ROCK:
+-			w = new CGremlinRock;
+-			break;
+-
+-		case WEAP_NIGHTMARE_FIREBALLS:
+-			w = new CNightmareFireballs;
+-			break;
+-
+-#endif
+-
+-		default: return DFALSE;
+-	}
+-/* Disabled strength check [gjk 10/23/98]
+-	// Make sure we can carry this dang thing
+-	DDWORD nAttrib;
+-	int iRet;
+-
+-	if (w->GetAmmoType() != AMMO_FOCUS)	// not a magic weapon
+-	{
+-		nAttrib = m_nAttribStrength;
+-		iRet = CHWEAP_NOTENOUGHSTRENGTH;
+-	}
+-	else
+-	{
+-		nAttrib = m_nAttribMagic;
+-		iRet = CHWEAP_NOTENOUGHMAGIC;
+-	}
+-
+-	DDWORD dwWeapStrength;
+-	if (bLeftHand) 
+-		dwWeapStrength = w->GetTwoHandStrengthReq();
+-	else 
+-		dwWeapStrength = w->GetStrengthReq();
+-
+-	if (dwWeapStrength > nAttrib)
+-	{
+-		w->Term();
+-		delete w;
+-		return iRet;
+-	}
+-*/
+-	w->Init(m_hOwner, this, bLeftHand, m_hMuzzleFlash);
+-	if (m_hClient)
+-	{
+-//		w->SetClient(m_hClient, bLeftHand ? m_pLViewModel : m_pViewModel);
+-		w->SetClient(m_hClient, bLeftHand ? m_pLViewModel : m_pViewModel);
+-	}
+-
+-	if (bLeftHand)
+-		m_LWeapons[emptyslot] = w;
+-	else
+-		m_Weapons[emptyslot] = w;
+-
+-	// if this is the current slot, set a pointer
+-	if (emptyslot == m_nCurWeaponSlot)
+-	{
+-		m_nCurWeapon = nWeapon;
+-		m_pCurWeapon = w;
+-
+-		if(m_pCurWeapon->IsOwnerAPlayer())
+-			w->Draw();
+-		else
+-			w->SetupMuzzleFlash();
+-	}
+-
+-	return CHWEAP_OK;
++// Strength or Magic attrib:
++//   1		2		3		4		5		6
++	{0.0f,  0.0f,   0.0f,   0.0f,   0.0f,   0.0f},		// None
++	{100.0f,200.0f, 300.0f, 400.0f, 500.0f, 600.0f},	// Bullets
++	{50.0f,	75.0f,  100.0f, 125.0f, 150.0f, 175.0f},	// Shells
++	{20.0f,	40.0f,  60.0f,  80.0f,  100.0f, 120.0f},	// BMG Rounds
++	{20.0f,	40.0f,  60.0f,  80.0f,  100.0f, 120.0f},	// Flares
++	{25.0f,	50.0f,  75.0f,  100.0f, 150.0f, 200.0f},	// DieBugDie
++	{5.0f,	10.0f,	20.0f,	35.0f,	50.0f,	120.0f},	// Rockets
++	{25.0f,	25.0f,	50.0f,	75.0f,	100.0f,	125.0f},	// Fuel
++	{100.0f,200.0f, 300.0f, 400.0f, 500.0f, 600.0f},	// Batteries
++	{100.0f,200.0f, 300.0f, 400.0f, 500.0f, 600.0f},	// Focus
++	{10.0f, 10.0f,  10.0f,  10.0f,  10.0f,  10.0f},		// ProximityBomb
++	{10.0f, 10.0f,  10.0f,  10.0f,  10.0f,  10.0f},		// RemoteBomb
++	{10.0f, 10.0f,  10.0f,  10.0f,  10.0f,  10.0f},		// TimeBomb
++};
++}
++bool CInventoryMgr::Init(HOBJECT object,HCLIENT client) {
++    auto* server = BaseClass::GetServerDE(); m_hOwner = object;
++    if (!m_hMuzzleFlash) {
++        ObjectCreateStruct state; state.m_ObjectType = OT_LIGHT;
++        if (auto* flash = server->CreateObject(server->GetClass("BaseClass"),&state)) {
++            m_hMuzzleFlash = flash->m_hObject;
++            if (server->CreateInterObjectLink(m_hOwner,m_hMuzzleFlash) != DE_OK) return false;
++        } else return false;
++    }
++    if (client) SetClient(client);
++    return true;
++}
++CInventoryMgr::~CInventoryMgr() {
++    if (m_hMuzzleFlash) BaseClass::GetServerDE()->RemoveObject(m_hMuzzleFlash);
++}
++DDWORD CInventoryMgr::EngineMessageFn(LPBASECLASS object,DDWORD message,void* data,DFLOAT fData) {
++    if (message == MID_LINKBROKEN && data == m_hMuzzleFlash) {
++        // The engine notifies on either endpoint's removal. Release this owned
++        // child before clearing the handle, including when the owner is pending.
++        BaseClass::GetServerDE()->RemoveObject(m_hMuzzleFlash); m_hMuzzleFlash = nullptr;
++    }
++    return Aggregate::EngineMessageFn(object,message,data,fData);
++}
++void CInventoryMgr::SetAmmoCount(DBYTE type,float count) {
++    if (type == 0 || type > 12 || m_bInfiniteAmmo || !std::isfinite(count) || count < 0) return;
++    m_fAmmo[type] = count;
++    ++revision;
++}
++float CInventoryMgr::MaxAmmo(DBYTE type) const {
++    if (type==0 || type>12) return 0;
++    auto attribute=type==9 ? m_nAttribMagic : m_nAttribStrength;
++    return fMaxAmmoCount[type][std::clamp<int>(attribute,1,6)-1];
++}
++void CInventoryMgr::SetStrength(DBYTE strength) {
++    strength=std::clamp<DBYTE>(strength,1,6);
++    if (m_nAttribStrength>strength) for (DBYTE i=1;i<=8;++i) m_fAmmo[i]=std::min(m_fAmmo[i],fMaxAmmoCount[i][strength-1]);
++    m_nAttribStrength=strength; ++revision;
++}
++void CInventoryMgr::SetMagic(DBYTE magic) {
++    magic=std::clamp<DBYTE>(magic,1,6);
++    if (m_nAttribMagic>magic) m_fAmmo[9]=std::min(m_fAmmo[9],fMaxAmmoCount[9][magic-1]);
++    m_nAttribMagic=magic; ++revision;
++}
++InventoryResult CInventoryMgr::AddAmmo(DBYTE type,float amount) {
++    if (type==0 || type>12 || !std::isfinite(amount) || amount<0) return InventoryResult::Invalid;
++    if (m_fAmmo[type]>=MaxAmmo(type)) return InventoryResult::Full;
++    m_fAmmo[type]=std::min(m_fAmmo[type]+amount,MaxAmmo(type)); ++revision; return InventoryResult::Ok;
++}
++InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type,int slot) {
++    const auto* definition=weapon_definition(type);
++    if (!definition) return InventoryResult::NotAvailable;
++    if (!m_hOwner || !BaseClass::GetServerDE()->HandleToObject(m_hOwner) || slot < -1 || slot>=10) return InventoryResult::Invalid;
++    int empty=-1; bool left=false;
++    if (slot>=0) {
++        auto* weapon=GetWeapon(static_cast<unsigned>(slot));
++        if (!weapon) empty=slot;
++        else if (weapon->data.m_nType==type) {
++            if (definition->m_dwTwoHandStrengthReq && !GetWeapon(static_cast<unsigned>(slot),true)) { empty=slot; left=true; }
++            else return InventoryResult::AlreadyHave;
++        }
++    }
++    if (empty<0) for (unsigned i=0;i<10;++i) {
++        auto* weapon=GetWeapon(i);
++        if (!weapon && empty<0) empty=static_cast<int>(i);
++        else if (weapon && weapon->data.m_nType==type) {
++            if (definition->m_dwTwoHandStrengthReq && !GetWeapon(i,true)) { empty=static_cast<int>(i); left=true; break; }
++            return InventoryResult::AlreadyHave;
++        }
++    }
++    if (empty<0) return InventoryResult::Full;
++    // Original strength gate was commented out; do not introduce a new one.
++    std::unique_ptr<CWeapon> weapon;
++    if (type==WEAP_BERETTA) weapon=std::make_unique<CBeretta>();
++    else weapon=std::make_unique<CMelee>();
++    weapon->Init(m_hOwner,this,left);
++    (left ? m_LWeapons : m_Weapons)[static_cast<unsigned>(empty)]=std::move(weapon);
++    ++revision; return InventoryResult::Ok;
++}
++InventoryResult CInventoryMgr::ChangeWeaponSlot(DBYTE slot) {
++    auto* weapon=GetWeapon(slot); if (!weapon) return InventoryResult::NotAvailable;
++    if (CurrentWeapon() && CurrentWeapon()->data.m_nType==weapon->data.m_nType) return InventoryResult::Current;
++    m_nCurWeaponSlot=slot; ++revision; return InventoryResult::Ok;
++}
++FireResult CInventoryMgr::FireCurrentWeapon(const blood2::WeaponFire& request) {
++    auto* weapon=CurrentWeapon(request.left);
++    if (!weapon || weapon->data.m_nType!=request.weapon) return FireResult::Invalid;
++    return weapon->Fire(request);
+ }
+ 
+-//	ROUTINE:	CInventoryMgr::ChangeWeaponSlot()
+-//
+-//	PURPOSE:	Changes to a particular weapon slot
+-//
+-// ----------------------------------------------------------------------- //
+-
+-int CInventoryMgr::ChangeWeaponSlot(DBYTE nSlot)
+-{
+-	if(nSlot >= SLOTCOUNT_TOTALWEAPONS)
+-		return CHWEAP_NOTAVAIL;
+-
+-//	if(m_pCurWeapon && !m_pCurWeapon->IsIdle())
+-//		return CHWEAP_WEAPONBUSY;
+-
+-	CWeapon *w = m_Weapons[nSlot];
+-
+-	if(m_hClient != DNULL)
+-	{
+-		CServerDE* pServerDE = BaseClass::GetServerDE();
+-		CPlayerObj *pObj = (CPlayerObj*)pServerDE->HandleToObject(m_hOwner);
+-		pObj->SetZoomMode(DFALSE);
+-	}
+-
+-	if (!w) 
+-		return CHWEAP_NOTAVAIL;
+-		
+-	if (w->GetType() == m_nCurWeapon)
+-		return CHWEAP_CURRENT;
+-
+-	// Okay, we have it, change to it
+-	if (m_Weapons[m_nCurWeaponSlot])
+-		m_Weapons[m_nCurWeaponSlot]->ShowHandModel(DFALSE);
+-	if (m_LWeapons[m_nCurWeaponSlot])
+-		m_LWeapons[m_nCurWeaponSlot]->ShowHandModel(DFALSE);
+-
+-/*	if (m_hClient)		// Only for player object owners
+-	{
+-		if (m_Weapons[m_nCurWeaponSlot]) 
+-			m_Weapons[m_nCurWeaponSlot]->Holster();
+-		if (m_LWeapons[m_nCurWeaponSlot]) 
+-			m_LWeapons[m_nCurWeaponSlot]->Holster();
+-
+-		m_bSwitchingWeapons = DTRUE;
+-		m_nNextWeaponSlot = nSlot;
+-	}
+-	else
+-	{*/
+-
+-		// Okay, we have it, change to it
+-		if(m_pCurWeapon)
+-		{
+-			m_pCurWeapon->Holster();
+-			m_pCurWeapon->ShowHandModel(DFALSE);
+-		}
+-
+-		m_pCurWeapon = w;
+-		m_nCurWeapon = w->GetType();
+-		m_nCurWeaponSlot = nSlot;
+-		assert( m_nCurWeaponSlot < 10 );
+-		w->SetupMuzzleFlash();
+-//	}
+-
+-	return CHWEAP_OK;
++void CInventoryMgr::ClearWeapons() {
++    for (auto& weapon:m_Weapons) weapon.reset();
++    for (auto& weapon:m_LWeapons) weapon.reset();
++    m_nCurWeaponSlot=0; requested_weapons={}; ++revision;
+ }
+-
+-//	ROUTINE:	CInventoryMgr::SetAmmoCount()
+-//
+-//	PURPOSE:	Sets the ammo value
+-//
+-// ----------------------------------------------------------------------- //
+-
+-void CInventoryMgr::SetAmmoCount(DBYTE nAmmoType, DFLOAT fAmmoCount)
+-{
+-	CInvItem *pInvItem = DNULL;
+-	CWeapon *pWeapon;
+-	CServerDE* pServerDE = BaseClass::GetServerDE();
+-
+-	if(nAmmoType <= AMMO_NONE || nAmmoType > AMMO_MAXAMMOTYPES)
+-		return;
+-
+-	// Don't allow ammo changes in infinite mode
+-	if (m_bInfiniteAmmo)
+-		return;
+-
+-	m_fAmmo[nAmmoType] = fAmmoCount;
+-
+-	// If it's Mana and less than max, start the recharge timer
+-	if (nAmmoType == AMMO_FOCUS )
+-	{
+-		DBYTE nMagic = m_nAttribMagic - 1;
+-		CLIPLOWHIGH(nMagic, 0, 5);
+-	}
+-
+-	// If out of ammo, remove inventory item from weapons that have them...
+-	if( fAmmoCount <= 0.0f )
+-	{
+-		int nInvItem;
+-
+-		pWeapon = DNULL;
+-		switch( nAmmoType )
+-		{
+-			case AMMO_PROXIMITYBOMB:
+-				nInvItem = INV_PROXIMITY;
+-				pWeapon = GetWeapon( nInvItem - INV_BASEINVWEAPON + SLOTCOUNT_WEAPONS );
+-				break;
+-			case AMMO_REMOTEBOMB:
+-				nInvItem = INV_REMOTE;
+-				pWeapon = GetWeapon( nInvItem - INV_BASEINVWEAPON + SLOTCOUNT_WEAPONS );
+-				break;
+-			case AMMO_TIMEBOMB:
+-				nInvItem = INV_TIMEBOMB;
+-				pWeapon = GetWeapon( nInvItem - INV_BASEINVWEAPON + SLOTCOUNT_WEAPONS );
+-				break;
+-			default:
+-				nInvItem = -1;
+-				break;
+-		}
+-
+-		if( nInvItem != -1 )
+-		{
+- 			RemoveItem( nInvItem );
+-			if( pWeapon )
+-				pWeapon->Holster( );
+-		}
+-	}
+-}
+-
+-//	ROUTINE:	CInventoryMgr::SetStrength()
+-//
+-//	PURPOSE:	Sets strength and checks to see if your inventory is ok.
+-//
+-// ----------------------------------------------------------------------- //
+-
+-void CInventoryMgr::SetStrength(DBYTE nStrength)
+-{
+-	if (m_nAttribStrength > nStrength)	// Strength going down
+-	{
+-		DBYTE nTmpStrength = nStrength - 1;
+-		CLIPLOWHIGH(nTmpStrength, 0, 5);
+-		for (int i = AMMO_BULLET; i <= AMMO_BATTERY; i++)
+-			if (m_fAmmo[i] > fMaxAmmoCount[i][nTmpStrength])
+-				m_fAmmo[i] = fMaxAmmoCount[i][nTmpStrength];
+-	}
+-	m_nAttribStrength = nStrength;
+-}
+-
+-//	ROUTINE:	CInventoryMgr::SetMagic()
+-//
+-//	PURPOSE:	Sets magic and checks to see if your inventory is ok.
+-//
+-// ----------------------------------------------------------------------- //
+-
+-void CInventoryMgr::SetMagic(DBYTE nMagic)
+-{
+-	if (m_nAttribMagic > nMagic)	// Magic going down
+-	{
+-		DBYTE nTmpMagic = nMagic-1;
+-		CLIPLOWHIGH(nTmpMagic, 0, 5);
+-		if (m_fAmmo[AMMO_FOCUS] > fMaxAmmoCount[AMMO_FOCUS][nTmpMagic])
+-				m_fAmmo[AMMO_FOCUS] = fMaxAmmoCount[AMMO_FOCUS][nTmpMagic];
+-	}
+-	m_nAttribMagic = nMagic;
+-}
+-
+-//	ROUTINE:	CInventoryMgr::AddAmmo()
+-//
+-//	PURPOSE:	Adds some ammo
+-//
+-// ----------------------------------------------------------------------- //
+-
+-int CInventoryMgr::AddAmmo(DBYTE nAmmoType, DFLOAT fAmmoCount)
+-{
+-	if(nAmmoType <= AMMO_NONE || nAmmoType > AMMO_MAXAMMOTYPES)
+-		return CHWEAP_NOMESSAGE;
+-
+-	// Get the appropriate attribute
+-	DBYTE nAttrib = (nAmmoType == AMMO_FOCUS) ? m_nAttribMagic : m_nAttribStrength;
+-	nAttrib -= 1;	// Subtract 1 to use as index into array
+-	CLIPLOWHIGH(nAttrib, 0, 5);
+-
+-	if (fMaxAmmoCount[nAmmoType][nAttrib] > m_fAmmo[nAmmoType])	// Room for more!
+-	{
+-		m_fAmmo[nAmmoType] += fAmmoCount;
+-		if (m_fAmmo[nAmmoType] > fMaxAmmoCount[nAmmoType][nAttrib])
+-			m_fAmmo[nAmmoType] = fMaxAmmoCount[nAmmoType][nAttrib]; 
+-		return CHWEAP_OK;
+-	}
+-
+-	return CHWEAP_NOMESSAGE;
+-}
+--- sources/blood2/ObjectDLL/InventoryMgr.h [selected source]
++++ Blood2/src/game/original/InventoryMgr.h
+@@ -1,474 +1,35 @@
+-#ifndef __INVENTORYMGR_H__
+-#define __INVENTORYMGR_H__
++#pragma once
++#include "B2BaseClass.h"
++#include "Weapon.h"
++#include <array>
++#include <memory>
+ 
+-
+-#include "cpp_aggregate_de.h"
+-#include "cpp_engineobjects_de.h"
+-#include "SharedDefs.h"
+-#include "generic_msg_de.h"
+-#include "Weapon.h"
+-#include "InvItem.h"
+-#include "DLink.h"
+-
+-
+-
+-// Defines....
+-
+-// Return values from change weapon
+-#define CHWEAP_OK					0
+-#define CHWEAP_NOTENOUGHSTRENGTH	-1
+-#define CHWEAP_NOTAVAIL				-2
+-#define CHWEAP_CURRENT				-3
+-#define CHWEAP_NOTENOUGHMAGIC		-4
+-#define CHWEAP_NOAVAILSLOTS			-5
+-#define CHWEAP_ALREADYHAVE			-6
+-#define CHWEAP_WEAPONBUSY			-7
+-#define CHWEAP_NOMESSAGE			-8
+-#define CHWEAP_NOAMMO				-9
+-
+-
+-// inventory structure
+-class CInventoryMgr : public Aggregate
+-{
+-	public :
+-
+-		CInventoryMgr();
+-		virtual ~CInventoryMgr();
+-
+-		void		Init(HOBJECT hObject, HCLIENT hClient=NULL);
+-		void		Term();
+-		void		Update();
+-		
+-		// @cmember Handle object destruction
+-		virtual void HandleDestruction();
+-
+-		// Weapon & ammo functions
+-		CViewWeaponModel* CreateViewModel(HATTACHMENT *hAttachment);
+-		int			ObtainWeapon(DDWORD nWeapon, int slot = -1);
+-		int			ChangeWeapon(DDWORD nWeapon);
+-		int			ChangeWeaponSlot(DBYTE nSlot);
+-		CWeapon*	FindBestWeapon(DFLOAT fTargetDist);
+-		int			SelectNextWeapon();
+-		int			SelectPrevWeapon();
+-		int			DropWeapon(DBYTE slot);
+-		int			DropCurrentWeapon();
+-		CWeapon*	GetWeapon(int slot) { return m_Weapons[slot]; }
+-		CWeapon*	GetCurrentWeapon() { return m_pCurWeapon; }
+-		DBOOL		HasWeapon(DDWORD nWeapon);
+-		void		ShowHandModels(DBOOL bShow);
+-
+-		int			GetCurrentWeaponSlot() { return m_nCurWeaponSlot; }
+-		DDWORD		FireCurrentWeapon(DVector *firedPos, DRotation *rotP, DBOOL bAltFire, DBOOL bLefthand = DFALSE);
+-		void		UpdateCurrentWeaponFiring(DVector *firedPos, DVector *lFiredPos, DRotation *rotP, DBOOL bFiring, DBOOL bAltFiring);
+-		void		SetNotFiringCurrentWeapon();
+-		void		ShowViewWeapons(DBOOL bVisible);
+-		void		SetCurrentWeaponSpecialData(DDWORD dwSpecial, DFLOAT fSpecial);
+-
+-		void		SetFullAmmo();
+-		void		SetInfiniteAmmo(DBOOL bInfinite)	{ m_bInfiniteAmmo = bInfinite; SetFullAmmo(); }
+-		int			AddAmmo(DBYTE nAmmoType, DFLOAT fAmmoCount);
+-		DFLOAT		GetAmmoCount(DBYTE nAmmoType);
+-		void		SetAmmoCount(DBYTE nAmmoType, DFLOAT fAmmoCount);
+-		DFLOAT		GetCurrentWeaponAmmoCount();
+-		DFLOAT		GetCurrentWeaponAltFireAmmoCount();
+-
+-		DBYTE		GetItemCharges( CInvItem *pItem );
+-
+-		// Inventory/key/spell item functions
+-		int			AddItem(DBYTE nItemType, DBYTE nValue );
+-		int			SetActiveItem(DBYTE nItemSlot);
+-
+-		// Select the next and previous items
+-		CInvItem	*GetPrevItem();
+-		CInvItem	*GetNextItem();
+-		void		SelectNextItem();
+-		void		SelectPrevItem();
+-		void		UpdateClient( );
+-
+-		int			AddInventoryWeapon(DBYTE nWeapType, DBYTE nCount = 1);
+-		int			SelectInventoryWeapon(DDWORD nWeapon);
+-		DBOOL		IsItemActive(int nItem);
+-		CInvItem*	GetItem(int nItem);
+-		CInvItem*	GetCurrentItem() { return m_pCurItem ? (CInvItem*)m_pCurItem->m_pData : DNULL; }
+-		void		SelectItem(int nItemType );
+-
+-		int			RemoveItem(DBYTE nItemType);
+-		int			RemoveItem( CInvItem *pItem );
+-
+-		int			AddKey(HSTRING hstrItemName, HSTRING hstrDisplayName, HSTRING hstrIconFile, HSTRING hstrIconFile2, DBYTE byUseCount);
+-		int			QueryKey(HSTRING hstrItemName);
+-
+-
+-		// Owner attributes functions
+-		void		SetStrength(DBYTE nStrength);
+-		DBYTE       GetStrength()   { return m_nAttribStrength;}
+-		void		SetMagic(DBYTE nMagic);
+-		void		SetClient(HCLIENT hClient);
+-
+-		void		AddDamageMultiplier(DFLOAT fFactor) { m_fDamageMultiplier *= fFactor; }
+-		void		RemoveDamageMultiplier(DFLOAT fFactor) { m_fDamageMultiplier /= fFactor; }
+-		DFLOAT		GetDamageMultiplier() { return m_fDamageMultiplier; }
+-		
+-		void		AddFireRateMultiplier(DFLOAT fFactor) { m_fFireRateMultiplier *= fFactor; }
+-		void		RemoveFireRateMultiplier(DFLOAT fFactor) { m_fFireRateMultiplier /= fFactor; }
+-		DFLOAT		GetFireRateMultiplier() { return m_fFireRateMultiplier; }
+-
+-		void		SetGodMode(DBOOL bGodMode) { m_bGodMode = bGodMode; if (bGodMode) SetFullAmmo();}
+-		void		SendPickedUpMessage(HOBJECT hObject, int iRet);
+-		void		SendKeyQueryResponse(HOBJECT hObject, HSTRING hstrItemName, int iRet);
+-		void		SendClientItemMsg(DBYTE nMsg, DBYTE nItem);
+-
+-	protected:
+-
+-		DDWORD		EngineMessageFn(LPBASECLASS pObject, DDWORD messageID, void *pData, DFLOAT lData);
+-		void		SendConsoleMessageToClient(char *msg);
+-		void		SetForceUpdateList(ForceUpdate* pFU);
+-		void		Save(HMESSAGEWRITE hWrite, DDWORD dwSaveFlags);
+-		void		Load(HMESSAGEREAD hWrite, DDWORD dwLoadFlags);
+-	
+-	private: // Member Variables
+-
+-		HOBJECT		m_hOwner;
+-		HCLIENT		m_hClient;
+-
+-		DBYTE		m_nAttribStrength;
+-		DBYTE		m_nAttribMagic;
+-		DBOOL		m_bGodMode;
+-		DBOOL		m_bInfiniteAmmo;
+-
+-		int			m_nCurWeaponSlot;
+-		DDWORD		m_nCurWeapon;	// The current weapon ID
+-		CViewWeaponModel*	m_pViewModel;	// View model
+-		CViewWeaponModel*	m_pLViewModel;	// Left view model
+-		HATTACHMENT	m_hViewModelAttach;
+-		HATTACHMENT m_hLViewModelAttach;
+-		HOBJECT		m_hMuzzleFlash;			// Muzzle flash light object
+-		CWeapon*	m_Weapons[SLOTCOUNT_TOTALWEAPONS]; // Array of carried weapons
+-		CWeapon*	m_LWeapons[SLOTCOUNT_TOTALWEAPONS]; // Array of left-hand weapons
+-		CWeapon*	m_pCurWeapon;
+-		DFLOAT		m_fAmmo[AMMO_MAXAMMOTYPES+1];	// All of our current ammo, DFLOAT to better set continuous use types
+-
+-		DList		m_InvItemList;
+-		DLink*		m_pCurItem;
+-		DDWORD		m_WeapCount;
+-		DFLOAT		m_fManaRechargeTime;
+-		DFLOAT		m_fDamageMultiplier;
+-		DFLOAT		m_fFireRateMultiplier;
+-		DFLOAT		m_fMeleeMultiplier;
+-
+-		HOBJECT		m_hLastPickupObject;
+-		int			m_nLastPickupResult;
+-		HOBJECT		m_hLastDroppedItem;
+-		DFLOAT		m_fLastDroppedTime;
+-        
+-        DBOOL       m_bDropEye;
+-
+-		// Weapon switching
+-		DBOOL		m_bSwitchingWeapons;
+-		int			m_nNextWeaponSlot;
+-
+-		// Update info...
+-		CInvItem *	m_pLastCurrentItem;
+-		CInvItem *	m_pLastPrevItem;
+-		CInvItem *	m_pLastNextItem;
+-		DBYTE		m_nLastCurrentItemCharge;
+-		DBYTE		m_nLastPrevItemCharge;
+-		DBYTE		m_nLastNextItemCharge;
+-
+-		DBOOL		m_bShowItems;
++enum class InventoryResult { Ok, AlreadyHave, Current, NotAvailable, Full, Invalid };
++class CInventoryMgr : public Aggregate {
++public:
++    ~CInventoryMgr() override;
++    bool Init(HOBJECT,HCLIENT);
++    void SetClient(HCLIENT client) { m_hClient=client; }
++    void SetAmmoCount(DBYTE,float);
++    float GetAmmoCount(DBYTE type) const { return type<m_fAmmo.size() ? m_fAmmo[type] : 0; }
++    InventoryResult AddAmmo(DBYTE,float);
++    float MaxAmmo(DBYTE) const;
++    void SetStrength(DBYTE);
++    void SetMagic(DBYTE);
++    void ClearWeapons();
++    InventoryResult ObtainWeapon(DBYTE,int slot=-1);
++    InventoryResult ChangeWeaponSlot(DBYTE);
++    CWeapon* GetWeapon(unsigned slot,bool left=false) const { return slot<10 ? (left ? m_LWeapons[slot].get() : m_Weapons[slot].get()) : nullptr; }
++    CWeapon* CurrentWeapon(bool left=false) const { return GetWeapon(m_nCurWeaponSlot,left); }
++    FireResult FireCurrentWeapon(const blood2::WeaponFire&);
++    HOBJECT m_hOwner=nullptr,m_hMuzzleFlash=nullptr;
++    HCLIENT m_hClient=nullptr;
++    std::array<float,13> m_fAmmo{};
++    std::array<DBYTE,9> requested_weapons{};
++    bool m_bInfiniteAmmo=false;
++    DBYTE m_nCurWeaponSlot=0, m_nAttribStrength=1,m_nAttribMagic=1;
++    std::uint64_t revision=0;
++private:
++    std::array<std::unique_ptr<CWeapon>,10> m_Weapons{},m_LWeapons{};
++    DDWORD EngineMessageFn(LPBASECLASS,DDWORD,void*,DFLOAT) override;
+ };
+-
+-
+-// INLINE FUNCTIONS
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::GetAmmoCount()
+-//
+-//	PURPOSE:	Returns the ammount of the specified ammo
+-//
+-// ----------------------------------------------------------------------- //
+-
+-inline DFLOAT CInventoryMgr::GetAmmoCount(DBYTE nAmmoType)
+-{
+-	if (nAmmoType <= AMMO_NONE || nAmmoType > AMMO_MAXAMMOTYPES)
+-		return 0;
+-
+-    // If no ammo required then always return 1
+-    if (nAmmoType == AMMO_NONE) return 1;
+-    
+-	return m_fAmmo[nAmmoType];
+-}
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::GetCurrentWeaponAmmoCount()
+-//
+-//	PURPOSE:	Returns the ammount of the current weapons ammo
+-//
+-// ----------------------------------------------------------------------- //
+-
+-inline DFLOAT CInventoryMgr::GetCurrentWeaponAmmoCount()
+-{
+-	if (m_pCurWeapon)
+-		return GetAmmoCount(m_pCurWeapon->GetAmmoType(DFALSE));
+-	else
+-		return 0;
+-}
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::GetCurrentWeaponAltFireAmmoCount()
+-//
+-//	PURPOSE:	Returns the ammount of the current weapons ammo
+-//
+-// ----------------------------------------------------------------------- //
+-
+-inline DFLOAT CInventoryMgr::GetCurrentWeaponAltFireAmmoCount()
+-{
+-	if (m_pCurWeapon)
+-		return GetAmmoCount(m_pCurWeapon->GetAmmoType(DTRUE));
+-	else
+-		return 0;
+-}
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::FireCurrentWeapon()
+-//
+-//	PURPOSE:	Fires the current weapon
+-//
+-// ----------------------------------------------------------------------- //
+-
+-inline DDWORD CInventoryMgr::FireCurrentWeapon(DVector *firedPos, DRotation *rotP, DBOOL bAltFire, DBOOL bLeftHand)
+-{
+-	DDWORD dwRetval = 0;
+-
+-	//SCHLEGZ 4/27/98 1:59:35 PM: GetAIWeaponPos does not work like you would think
+-	CServerDE* pServerDE = BaseClass::GetServerDE();
+-
+-	CWeapon *pWeap = m_Weapons[m_nCurWeaponSlot];
+-	CWeapon *pLWeap = m_LWeapons[m_nCurWeaponSlot];
+-
+-	if (!bLeftHand && pWeap)
+-	{
+-		pWeap->SetFirePosRot(firedPos, rotP, bAltFire);
+-		dwRetval = pWeap->Fire();
+-		pWeap->SetNotFiring();
+-	}
+-	else if (bLeftHand && pLWeap)
+-	{
+-		pLWeap->SetFirePosRot(firedPos, rotP, bAltFire);
+-		dwRetval = pLWeap->Fire();
+-		pLWeap->SetNotFiring();
+-		// ^ This pLWeap was 'pWeap'... I changed it cause it looks like a bug (Andy 1/11/99)
+-	}
+-
+-	return dwRetval;
+-}
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::SetCurrentWeaponSpecialData()
+-//
+-//	PURPOSE:	Sets the special firing values for the current weapon
+-//
+-// ----------------------------------------------------------------------- //
+-
+-inline void CInventoryMgr::SetCurrentWeaponSpecialData(DDWORD dwSpecial, DFLOAT fSpecial)
+-{
+-	CServerDE* pServerDE = BaseClass::GetServerDE();
+-
+-	CWeapon *pWeap = m_Weapons[m_nCurWeaponSlot];
+-	CWeapon *pLWeap = m_LWeapons[m_nCurWeaponSlot];
+-
+-	if(pWeap)
+-		pWeap->SetSpecialData(dwSpecial, fSpecial);
+-
+-	if(pLWeap)
+-		pLWeap->SetSpecialData(dwSpecial, fSpecial);
+-}
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::SetNotFiring()
+-//
+-//	PURPOSE:	Tells current weapon it isn't firing anymore.
+-//
+-// ----------------------------------------------------------------------- //
+-
+-inline void CInventoryMgr::SetNotFiringCurrentWeapon()
+-{
+-//	if (m_pCurWeapon)
+-//		m_pCurWeapon->SetNotFiring();
+-}
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::HideViewWeapons()
+-//
+-//	PURPOSE:	Hides or shows the view weapons
+-//
+-// ----------------------------------------------------------------------- //
+-
+-inline void CInventoryMgr::ShowViewWeapons(DBOOL bVisible)
+-{
+-	if (m_pViewModel && m_Weapons[m_nCurWeaponSlot])
+-	{
+-		m_pViewModel->SetVisible(bVisible);
+-	}
+-	if (m_pLViewModel && m_LWeapons[m_nCurWeaponSlot]) 
+-	{
+-		m_pLViewModel->SetVisible(bVisible);
+-	}
+-}
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::SendConsoleMessageToClient()
+-//
+-//	PURPOSE:	Sends a message to the client
+-//
+-// ----------------------------------------------------------------------- //
+-
+-inline void CInventoryMgr::SendConsoleMessageToClient(char *msg)
+-{
+-	CServerDE* pServerDE = BaseClass::GetServerDE();
+-	HMESSAGEWRITE hMsg;
+-	
+-	if (!m_hClient)
+-		return;
+- 
+-	hMsg = pServerDE->StartMessage(m_hClient, SMSG_CONSOLEMESSAGE);
+-	pServerDE->WriteToMessageString(hMsg, msg);
+-	pServerDE->EndMessage(hMsg);
+-}
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::IsItemActive()
+-//
+-//	PURPOSE:	Returns the active state of the inventory item or spell.
+-//
+-// ----------------------------------------------------------------------- //
+-
+-inline DBOOL CInventoryMgr::IsItemActive(int nItemType)
+-{
+-	DLink *pLink = m_InvItemList.m_Head.m_pNext;
+-	CInvItem *pItem = DNULL;
+-	for (unsigned long i=0; i < m_InvItemList.m_nElements; i++)
+-	{
+-		pItem = (CInvItem*) pLink->m_pData;
+-		if (pItem && pItem->GetType() == nItemType && pItem->IsActive())
+-		{
+-			return DTRUE;
+-		}
+-		pLink = pLink->m_pNext;
+-	}
+-	return DFALSE;
+-}
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::GetCurrentItemIndex()
+-//
+-//	PURPOSE:	Returns the currently selected item
+-//
+-// ----------------------------------------------------------------------- //
+-/*
+-inline int CInventoryMgr::GetCurrentItemIndex()
+-{
+-	return m_nCurrentItemIndex;
+-}
+-
+-inline void CInventoryMgr::SetCurrentItemIndex(int nIndex)
+-{
+-	m_nCurrentItemIndex=nIndex;
+-}
+-*/
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::GetItem()
+-//
+-//	PURPOSE:	Returns a pointer to the inventory item.
+-//
+-// ----------------------------------------------------------------------- //
+-
+-inline CInvItem* CInventoryMgr::GetItem(int nItemType)
+-{
+-	DLink *pLink = m_InvItemList.m_Head.m_pNext;
+-	CInvItem *pItem = DNULL;
+-	for (unsigned long i=0; i < m_InvItemList.m_nElements; i++)
+-	{
+-		pItem = (CInvItem*) pLink->m_pData;
+-		if (pItem && pItem->GetType() == nItemType)
+-		{
+-			return pItem;
+-		}
+-		pLink = pLink->m_pNext;
+-	}
+-	return DNULL;
+-}
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::GetItemIndex()
+-//
+-//	PURPOSE:	Returns a pointer to the inventory item at the specified index.
+-//
+-// ----------------------------------------------------------------------- //
+-/*
+-inline CInvItem* CInventoryMgr::GetItemIndex(int nIndex)
+-{
+-	assert(nIndex >= 0 && nIndex < SLOTCOUNT_ITEMS);
+-	return m_InvItems[nIndex];
+-}
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::GetSlotItem()
+-//
+-//	PURPOSE:	Returns a pointer to the inventory item.
+-//
+-// ----------------------------------------------------------------------- //
+-
+-inline CInvItem* CInventoryMgr::GetSlotItem(DBYTE nItemSlot)
+-{
+-	if(nItemSlot < 0 || nItemSlot >= SLOTCOUNT_ITEMS)
+-		return DNULL;
+-
+-	if (m_InvItems[nItemSlot])
+-		return m_InvItems[nItemSlot];
+-
+-	return DNULL;
+-}
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CInventoryMgr::GetSlotSpell()
+-//
+-//	PURPOSE:	Returns a pointer to the inventory item.
+-//
+-// ----------------------------------------------------------------------- //
+-
+-inline CInvItem* CInventoryMgr::GetSlotSpell(DBYTE nSpellSlot)
+-{
+-	if(nSpellSlot < 0 || nSpellSlot >= SLOTCOUNT_SPELLS)
+-		return DNULL;
+-
+-	if (m_InvSpells[nSpellSlot])
+-		return m_InvSpells[nSpellSlot];
+-
+-	return DNULL;
+-}
+-*/
+-
+-#endif // __INVENTORYMGR_H__--- sources/blood2/ObjectDLL/Weapon.cpp [selected source]
++++ Blood2/src/game/original/Weapon.cpp
+@@ -1,264 +1,63 @@
+-//	ROUTINE:	CWeapon::CheckAmmo()
+-//
+-//	PURPOSE:	returns amount of ammo available to this weapon
+-//
+-// ----------------------------------------------------------------------- //
++#include "Weapon.h"
++#include "InventoryMgr.h"
++#include "engine/collision.h"
++#include <cmath>
++#include <random>
+ 
+-DFLOAT CWeapon::CheckAmmo(DBOOL bAltFire)
+-{
+-    // If the No Ammo is required for the Weapon then return 1
+-    if (GetAmmoType(bAltFire) == AMMO_NONE)
+-    {
+-        return 1.0f;
+-    }        
+-
+-	if (m_pInventoryMgr)
+-		return m_pInventoryMgr->GetAmmoCount(GetAmmoType(bAltFire));
+-	else
+-		return 0.0f;
++using namespace blood2;
++float CWeapon::CheckAmmo() const { return data.m_nAmmoType==AMMO_NONE ? 1.0f : (m_pInventoryMgr ? m_pInventoryMgr->GetAmmoCount(data.m_nAmmoType) : 0.0f); }
++FireResult CWeapon::Fire(const WeaponFire& request) {
++    auto* server=BaseClass::GetServerDE();
++    if (!server || !m_pInventoryMgr || !server->HandleToObject(m_hOwner) || request.weapon!=data.m_nType || request.left!=m_bLeftHand ||
++        !physics_vector(request.position) || !physics_vector(request.direction)) return FireResult::Invalid;
++    const auto length=std::sqrt(vector_dot(request.direction,request.direction));
++    if (!std::isfinite(length) || length<1e-6f) return FireResult::Invalid;
++    last_shot={}; last_shot.request=request;
++    const auto forward=vector_scale(request.direction,1/length);
++    // AlignRotation's world-up basis (stable vertical fallback).
++    auto right=DVector{forward.z,0,-forward.x};
++    const auto right_length=std::sqrt(vector_dot(right,right));
++    right=right_length>1e-6f ? vector_scale(right,1/right_length) : DVector{1,0,0};
++    const DVector up{forward.y*right.z-forward.z*right.y,forward.z*right.x-forward.x*right.z,forward.x*right.y-forward.y*right.x};
++    // Source srand(seed) / GetRandom order, with a local portable generator.
++    // CRT-dependent retail random bits are intentionally not asserted identical.
++    std::minstd_rand random(request.seed);
++    auto sample=[&](float low,float high) { return low+(high-low)*static_cast<float>(random()-random.min())/static_cast<float>(random.max()-random.min()); };
++    last_shot.damage=request.alternate ? sample(data.m_fMinAltDamage,data.m_fMaxAltDamage) : sample(data.m_fMinDamage,data.m_fMaxDamage);
++    const auto use=request.alternate ? data.m_nAltAmmoUse : data.m_nAmmoUse;
++    const auto ammo=CheckAmmo();
++    if (ammo<use) { last_shot.result=FireResult::Dry; return last_shot.result; }
++    const auto spread=request.alternate ? data.m_AltSpread : data.m_Spread;
++    auto direction=vector_add(forward,vector_scale(right,sample(-spread.h,spread.h)/2000));
++    direction=vector_add(direction,vector_scale(up,sample(-spread.v,spread.v)/2000));
++    direction=vector_scale(direction,1/std::sqrt(vector_dot(direction,direction)));
++    const auto range=request.alternate ? data.m_fAltRange : data.m_fRange;
++    // FireSpread -> AlignFireVector: project from Caleb's standing eye, then
++    // aim the muzzle at that intersection. Player input owns the muzzle origin.
++    DVector eye; server->GetObjectPos(m_hOwner,&eye); eye.y+=36;
++    auto aim=vector_add(eye,vector_scale(direction,range)); SegmentHit aim_hit;
++    auto query=server->IntersectSegment(eye,aim,m_hOwner,aim_hit);
++    if (query==SegmentResult::Invalid || query==SegmentResult::Unavailable) { last_shot.result=FireResult::Unavailable; return last_shot.result; }
++    if (query==SegmentResult::Hit) aim=aim_hit.point;
++    direction=vector_subtract(aim,request.position);
++    const auto aim_length=std::sqrt(vector_dot(direction,direction));
++    if (aim_length<1e-6f) { last_shot.result=FireResult::Invalid; return last_shot.result; }
++    direction=vector_scale(direction,1/aim_length);
++    last_shot.direction=direction; last_shot.end=vector_add(request.position,vector_scale(direction,range));
++    query=server->IntersectSegment(request.position,last_shot.end,m_hOwner,last_shot.hit);
++    last_shot.collision=query;
++    if (query==SegmentResult::Invalid || query==SegmentResult::Unavailable) { last_shot.result=FireResult::Unavailable; return last_shot.result; }
++    // Both selected definitions fire exactly one vector and use one unit.
++    m_pInventoryMgr->SetAmmoCount(data.m_nAmmoType,ammo-use);
++    m_fLastShotTime=server->GetTime(); m_bLastFireAlt=request.alternate; ++shots;
++    last_shot.result=FireResult::Fired;
++    if (query==SegmentResult::Hit && last_shot.hit.object) {
++        Damage damage{direction,last_shot.hit.point,last_shot.damage,damage_type,m_hOwner};
++        auto message=server->StartMessageToObject(server->HandleToObject(m_hOwner),last_shot.hit.object,damage_message);
++        if (!message) last_shot.result=FireResult::DeliveryFailed;
++        else if (server->WriteDamage(message,damage)!=DE_OK) { server->EndHMessageWrite(message); last_shot.result=FireResult::DeliveryFailed; }
++        else if (server->EndMessage(message)!=DE_OK) last_shot.result=FireResult::DeliveryFailed;
++        else last_shot.damage_delivered=true;
++    }
++    return last_shot.result;
+ }
+-
+-//	ROUTINE:	CWeapon::Fire()
+-//
+-//	PURPOSE:	Fires the weapon
+-//
+-// ----------------------------------------------------------------------- //
+-
+-DDWORD CWeapon::Fire()
+-{
+-	//***** Make sure the server and inventory systems are valid *****//
+-	CServerDE* pServerDE = BaseClass::GetServerDE();
+-	if (!pServerDE || !m_pInventoryMgr)
+-		return 0;
+-
+-	//***** General variable declarations *****//
+-	DFLOAT		fReloadTime;
+-	DBYTE		nFiredType = 0;
+-	DFLOAT		cTime = pServerDE->GetTime();
+-	DFLOAT		range;
+-	Spread		*spread;
+-	DDWORD		dwShotsPerFire;
+-	D_WORD		nAmmoUse;
+-	DBOOL		bHitPlayerObj = DFALSE;
+-
+-
+-	// Reload time depends on current barrel or alt fire
+-	if(m_bLastFireAlt)		fReloadTime = m_fAltReloadTime;
+-		else				fReloadTime = m_fReloadTime;
+-
+-	// See if any reload time modifiers are in effect
+-	fReloadTime *= m_pInventoryMgr->GetFireRateMultiplier();
+-
+-	// Set up varaible for primary or alternate firing states
+-	DBOOL bAltFire = (m_eState == WS_ALT_FIRING) || (m_eState == WS_START_ALT_FIRING) || (m_eState == WS_STOP_ALT_FIRING);
+-
+-	if(!bAltFire)
+-	{
+-		dwShotsPerFire = m_dwShotsPerFire;
+-		spread = &m_Spread;
+-		range = m_fRange;
+-		m_fDamage = pServerDE->Random(m_fMinDamage, m_fMaxDamage);
+-		nAmmoUse = m_nAmmoUse;
+-	}
+-	else
+-	{
+-		dwShotsPerFire = m_dwAltShotsPerFire;
+-		spread = &m_AltSpread;
+-		range = m_fAltRange;
+-		m_fDamage = pServerDE->Random(m_fMinAltDamage, m_fMaxAltDamage);
+-		nAmmoUse = m_nAltAmmoUse;
+-	}
+-
+-	// Only fire ammo if we have the ammo
+-	DFLOAT fAmmoCount = CheckAmmo(bAltFire);
+-	if (fAmmoCount)
+-	{
+-		switch(GetAmmoType(bAltFire))
+-		{
+-			// Shells only use 1 shell per fire, no matter how many vectors
+-			case AMMO_SHELL:
+-				fAmmoCount -= (DFLOAT)nAmmoUse;
+-				break;
+-			// default is 1 bullet per vector
+-			default:
+-				if ((DFLOAT)(dwShotsPerFire * nAmmoUse) > fAmmoCount)
+-					dwShotsPerFire = (int)fAmmoCount / nAmmoUse;
+-				fAmmoCount -= (DFLOAT)(dwShotsPerFire * nAmmoUse);
+-				break;
+-		}
+-		m_pInventoryMgr->SetAmmoCount(GetAmmoType(bAltFire), fAmmoCount);
+-	}
+-	else
+-		dwShotsPerFire = 0;
+-
+-	//***** If no shots are available, play empty sound and exit the function *****//
+-	if(dwShotsPerFire <= 0)
+-	{
+-		PlayEmptyWeaponSound(bAltFire);
+-		if (!IsOwnerAPlayer())		m_eState = WS_REST;		//SCHLEGZ
+-		return 0;	// Don't fire if we don't have ammo
+-	}
+-
+-	//***** For non-melee weapons... display a muzzle flash *****//
+-	if(m_nFireType != TYPE_MELEE)
+-		ShowMuzzleFlash(&m_vPosition );
+-
+-	PlayFireSound(bAltFire);
+-
+-	DVector		shellDir;
+-	FireSpread(spread, dwShotsPerFire, range, bAltFire, &shellDir);
+-
+-	m_fLastShotTime = cTime;
+-
+-	if(m_eState == WS_ALT_FIRING)
+-	{
+-		m_bLastFireAlt = DTRUE;
+-		nFiredType = 2;
+-	}
+-	else
+-	{
+-		m_bLastFireAlt = DFALSE;
+-		nFiredType = 1;
+-	}
+-
+-	if (!IsOwnerAPlayer())		m_eState = WS_REST;		//SCHLEGZ
+-
+-	// Reset the shell eject flag for the next fire..
+-	if(m_nAmmoType == AMMO_BULLET || m_nAmmoType == AMMO_SHELL)
+-		m_bEjectShell = DTRUE;
+-	else
+-		m_bEjectShell = DFALSE;
+-
+-	return nFiredType;
+-}
+-
+-//	ROUTINE:	CWeapon::FireSpread()
+-//
+-//	PURPOSE:	Fires the weapon
+-//
+-// ----------------------------------------------------------------------- //
+-
+-void CWeapon::FireSpread(Spread *spread, DDWORD shots, DFLOAT range, DBOOL bAltFire, DVector *rDir)
+-{
+-	//***** Make sure the server and inventory systems are valid *****//
+-	CServerDE* pServerDE = BaseClass::GetServerDE();
+-	if (!pServerDE || !m_pInventoryMgr)		return;
+-
+-	//***** Variables to calculate the spread of the weapon fire *****//
+-	DFLOAT		hOffset, vOffset;
+-	DVector		vTmp, vFire;
+-	DVector		vU, vR, vF;
+-	DBOOL		bTracer = DFALSE;
+-	pServerDE->GetRotationVectors(&m_rRotation, &vU, &vR, &vF); 
+-
+-	// Check to see if the player is standing too close to something, and we need
+-	// to move the firing position back in order to hit it
+-//	if(IsPlayer(m_hOwner) && FiringTooClose(&vF, 60.0f, &vTmp))
+-//		{ VEC_COPY(m_vPosition, vTmp); }
+-
+-	for(int i = (shots - 1); i >= 0; i--)
+-	{
+-		VEC_COPY(vFire, vF)
+-
+-		if(spread->h)
+-		{
+-			hOffset = pServerDE->Random(-spread->h, spread->h) / 2000.0f;
+-			VEC_MULSCALAR(vTmp, vR, hOffset)
+-			VEC_ADD(vFire, vFire, vTmp)
+-		}
+-
+-		if(spread->v)
+-		{
+-			vOffset = pServerDE->Random(-spread->v, spread->v) / 2000.0f;
+-			VEC_MULSCALAR(vTmp, vU, vOffset)
+-			VEC_ADD(vFire, vFire, vTmp)
+-		}
+-
+-		VEC_NORM(vFire)
+-
+-		if(m_bAccuracyCheck && IsPlayer(m_hOwner))
+-			AlignFireVector(&vFire, range);
+-
+-		// See if we should fire a tracer for bullets
+-		if(GetAmmoType(bAltFire) == AMMO_BULLET)
+-			bTracer = DTRUE;
+-
+-		// Reset the splash
+-		m_bSplash = DTRUE;
+-
+-		// Fire the appropriate thing
+-		if((bAltFire && !m_szAltProjectileClass) || (!bAltFire && !m_szProjectileClass))
+-			FireVector(&vFire, range, bTracer);
+-		else
+-			FireProjectile(&vFire, range, bAltFire);
+-	}
+-
+-	VEC_COPY(*rDir, vR);
+-}
+-
+-void CWeapon::AlignFireVector(DVector *vFire, DFLOAT fDist)
+-{
+-	//***** Make sure the server and inventory systems are valid *****//
+-	CServerDE* pServerDE = BaseClass::GetServerDE();
+-	if (!pServerDE || !m_hOwner) return;
+-
+-   	CPlayerObj	*pObj = (CPlayerObj*)pServerDE->HandleToObject(m_hOwner);
+-	DFLOAT fOffset = 0.0f;
+-
+-	if(pObj)	fOffset = pObj->GetEyeLevel();
+-
+-	DVector	vPos, vOffset;
+-	VEC_SET(vOffset, 0.0f, fOffset, 0.0f);
+-
+-	// Setup the vectors for the intersect
+-	pServerDE->GetObjectPos(m_hOwner, &vPos);
+-	VEC_ADD(vPos, vPos, vOffset);
+-
+-	VEC_NORM(*vFire);
+-	VEC_MULSCALAR(*vFire, *vFire, fDist);
+-
+-	IntersectQuery	iq;
+-	IntersectInfo	ii;
+-
+-	// Set the intersection query values
+-	iq.m_Flags = INTERSECT_OBJECTS | IGNORE_NONSOLID | INTERSECT_HPOLY;
+-	iq.m_FilterFn = LiquidFilterFn;
+-	iq.m_pUserData = DNULL;
+-
+-	VEC_COPY(iq.m_From, vPos);
+-	VEC_ADD(iq.m_To, iq.m_From, *vFire);
+-
+-	if(pServerDE->IntersectSegment(&iq, &ii))
+-	{
+-		VEC_SUB(*vFire, ii.m_Point, m_vPosition);
+-		VEC_NORM(*vFire);
+-	}
+-	else
+-	{
+-		VEC_SUB(*vFire, iq.m_To, m_vPosition);
+-		VEC_NORM(*vFire);
+-	}
+-}
+-
+-//	ROUTINE:	CWeapon::SendDamageMsg()
+-//
+-//	PURPOSE:    Weapon Damage Message
+-//
+-// ----------------------------------------------------------------------- //
+-DBOOL CWeapon::SendDamageMsg(HOBJECT firedTo, DVector vPoint, DVector *vFire, DFLOAT fDamage)
+-{
+-	CServerDE* pServerDE = BaseClass::GetServerDE();
+-
+-	if (!pServerDE)
+-		return DFALSE;
+-
+-	BaseClass *ffObj = pServerDE->HandleToObject(m_hOwner);
+-
+-	// Send a damage message to the object
+-	if(g_pBloodServerShell->IsMultiplayerGame() && m_bMultiDamageBoost)
+-		DamageObject(m_hOwner, ffObj, firedTo, fDamage * GetDamageMultiplier() * 2.0f, *vFire, vPoint, m_nDamageType);
+-	else
+-		DamageObject(m_hOwner, ffObj, firedTo, fDamage * GetDamageMultiplier(), *vFire, vPoint, m_nDamageType);
+-
+-    return DTRUE;
+-}
+--- sources/blood2/ObjectDLL/Weapon.h [selected source]
++++ Blood2/src/game/original/Weapon.h
+@@ -1,231 +1,36 @@
+-#ifndef __WEAPON_H__
+-#define __WEAPON_H__
+-
+-#include "cpp_server_de.h"
+-#include "cpp_engineobjects_de.h"
+-#include "SharedDefs.h"
+-#include "Projectile.h"
+-#include "ObjectUtilities.h"
+-#include "ViewWeaponModel.h"
+-#include "HandWeaponModel.h"
++#pragma once
+ #include "WeaponDefs.h"
+-#include "ClientWeaponSFX.h"
++#include "game/weapon_messages.h"
+ 
+ class CInventoryMgr;
+-
+-// class to contain weapon info
+-class CWeapon
+-{
+-	public:
+-
+-		CWeapon(DBYTE dwWeapType);
+-		~CWeapon();
+-		virtual void	Init(HOBJECT hOwner, CInventoryMgr *pInventoryMgr, DBOOL bLeftHand = DFALSE, HOBJECT hMuzzleFlash = DNULL);
+-		virtual void	SetClient(HCLIENT hClient, CViewWeaponModel *pViewWeaponModel);
+-		virtual DDWORD	Fire();
+-		virtual void	FireSpread(Spread *spread, DDWORD shots, DFLOAT range, DBOOL bAltFire, DVector *rDir);
+-		virtual DBOOL	FiringTooClose(DVector *vFire, DFLOAT fDist, DVector *vNewPos);
+-		virtual void	AlignFireVector(DVector *vFire, DFLOAT fDist);
+-		virtual void	Update();
+-		virtual void	UpdateFiringState(DVector *firedPos, DRotation *rotP, DBOOL bFiring, DBOOL bAltFiring);
+-
+-		virtual void	SetSpecialData(DDWORD dwSpecial, DFLOAT fSpecial)	{ return; }
+-
+-		void		Term();
+-		DBOOL		IsAltFireZoom()			{ return m_bAltFireZoom; }
+-		DBOOL		IsDualHanded()			{ return m_bDualHanded; } 
+-
+-		DBYTE		GetType()				{ return m_nType; }
+-		DBYTE		GetFireType()			{ return m_nFireType; }
+-		DFLOAT		GetReloadTime()			{ return m_fReloadTime; }
+-		DDWORD		GetStrengthReq()		{ return m_dwStrengthReq; }
+-		DDWORD		GetTwoHandStrengthReq()	{ return m_dwTwoHandStrengthReq; }
+-
+-        DFLOAT		GetWeaponRange()		{ return m_fRange; }
+-        DFLOAT		GetAltWeaponRange()		{ return m_fAltRange; }
+-        
+-        DDWORD		GetWeaponDamage()		{ return (DDWORD)m_fMaxDamage; }
+-		DFLOAT		GetWeaponDmgRange()		{ return (DFLOAT)m_nDamageRadius; }
+-        DDWORD		GetAltWeaponDamage()	{ return (DDWORD)m_fMaxAltDamage; }
+-        
+-		D_WORD		GetAmmoUse()			{ return (D_WORD)m_nAmmoUse; }
+-		D_WORD		GetAltAmmoUse()			{ return (D_WORD)m_nAltAmmoUse; }
+-
+-		DVector*	GetPosition()			{ return &m_vPosition; }
+-
+-		DBOOL		IsInitialized()			{ return m_bInitialized; }
+-		DBOOL		IsClientNotified()		{ return m_bClientNotified; }
+-		DBOOL		IsOwnerAPlayer()		{ return (m_hClient != DNULL); }
+-		DBOOL		IsIdle()				{ return (m_eState == WS_REST) || (m_eState == WS_IDLE) || (m_eState == WS_DRAW) ||
+-													 (m_eState == WS_HOLSTER) || (m_eState == WS_HOLSTERED); }
+-		HOBJECT		GetOwner( ) const		{ return m_hOwner; }
+-
+-		DBOOL		IsChanging();
+-		void		Draw();
+-		void		Holster()				{ m_eState = WS_HOLSTER; }
+-
+-		virtual DBYTE	GetAmmoType(DBOOL bAltFire = DFALSE)	{ return m_nAmmoType; }
+-		virtual void	SetNotFiring()							{ m_eState = WS_REST; }
+-
+-		void		OnFireKey();
+-		void		SendClientInfo(DBYTE slot);
+-		void		SetFirePosRot(DVector *firedPos, DRotation *rotP, DBOOL bAltFire);
+-		DBOOL		GetHandModelPos(DVector *vPos, DRotation *rRot);
+-		void		ShowHandModel(DBOOL bShow);
+-		HOBJECT		GetViewModel() { return (m_pViewModel) ? m_pViewModel->m_hObject : DNULL; }
+-		HOBJECT		GetHandModel() { return (m_pHandModel) ? m_pHandModel->m_hObject : DNULL; }
+-		void		SetHandModel( CHandWeaponModel *pHandWeaponModel ) { m_pHandModel = pHandWeaponModel; }
+-		void		DropHandModel();
+-		void		SetupMuzzleFlash();
+-
+-	protected:
+-
+-		virtual	DBOOL		FireVector(DVector *vFire, DFLOAT dist, DBOOL bTracer = DFALSE);
+-		virtual	CProjectile	*FireProjectile(DVector *vFire, DFLOAT dist, DBOOL bAltFire);
+-        virtual	DBOOL		SendDamageMsg(HOBJECT firedTo, DVector vPoint, DVector *vFire, DFLOAT fDamage);
+-		virtual DFLOAT		GetDamageMultiplier();
+-        
+-		DFLOAT      CheckAmmo(DBOOL bAltFire = DFALSE);
+-		void		PlayFireSound(DBOOL bAltFire);
+-		void		PlayEmptyWeaponSound(DBOOL bAltFire);
+-		void		KillSounds();
+-		void		SetupViewModel();
+-		void		CreateHandModel();
+-		void		SetupMuzzleFlash(DFLOAT fRadius, DFLOAT fRed, DFLOAT fGreen, DFLOAT fBlue);
+-		void		ShowMuzzleFlash(DVector *vPos);
+-		void		UpdateMuzzleFlash();
+-		void		SendClientFiring(DBYTE type);
+-
+-		DBOOL		PlayAnimation(DDWORD dwNewAni);
+-
+-	public:
+-		void		UpdateWeaponFX(DDWORD &nFX, DDWORD &nExtras, WeaponFXExtras *ext, SurfaceType eType, DBYTE nAmmoType, DFLOAT fDamage);
+-
+-		void		AddSplash(DVector vPos, DVector vNormal, HOBJECT hObject, DVector vColor1, DVector vColor2);
+-		void		AddSparks(DVector vPos, DVector vNormal, DFLOAT fDamage, HOBJECT hObject, SurfaceType eType);
+-		void		AddWorldModelMark(DVector vPos, DVector vNormal, HOBJECT hObject, SurfaceType eType);
+-		virtual void AddImpact(DVector *vSource, DVector *vDest, DVector *vForward, DVector *vNormal, DDWORD nFX, DDWORD nExtras, WeaponFXExtras *ext);
+-
+-	protected:
+-
+-		CViewWeaponModel*	m_pViewModel;	// View model
+-		CInventoryMgr*		m_pInventoryMgr;// Inventory mgr for ammo usage
+-		CHandWeaponModel*	m_pHandModel;	// Hand view model
+-//		HOBJECT		m_hHandModel;			// The model held by the character
+-		HATTACHMENT	m_hHandAttachment;		// Attachment handle to the character hand
+-		HOBJECT		m_hOwner;				// The character holding this weapon
+-		HCLIENT		m_hClient;				// The client of the owner if it's a player
+-		DBOOL		m_bInitialized;			// The weapon is initialized
+-		DBOOL		m_bClientNotified;		// The owner's client has been notified
+-		DBOOL		m_bLeftHand;			// This weapon is in the player's left hand
+-
+-		char* 		m_pViewModelFilename;
+-		char*		m_pLeftViewModelFilename;
+-		char* 		m_pViewModelSkinname;
+-		char*		m_pHandModelFilename;
+-		char*		m_pHandModelSkinname;
+-		DBYTE		m_nType;				// Weapon type
+-		DBYTE		m_nFireType;			// Weapon animation
+-		DBYTE		m_nAmmoType;			// Type of ammo
+-		D_WORD		m_nAmmoUse;				// Amount of ammo to use per shot
+-		D_WORD		m_nAltAmmoUse;			// Amount of ammo to use per Alt shot
+-		DFLOAT		m_fDamage;				// Current amount of damage per shot vector
+-		DFLOAT		m_fMinDamage;			// minimum amount of damage
+-		DFLOAT		m_fMaxDamage;			// maximum amount of damage
+-		DFLOAT		m_fMinAltDamage;		// Alt minimum fire damage
+-		DFLOAT		m_fMaxAltDamage;		// Alt maximum fire damage
+-		DFLOAT		m_fReloadTime;			// How long to reload?
+-		DFLOAT		m_fAltReloadTime;		// How long to reload for alt fire?
+-		Spread		m_Spread;				// Width and height range for random fire locations
+-		Spread		m_AltSpread;			// Width and height range for random fire locations
+-		DFLOAT		m_fProjVelocity;		// Speed of the Primary Fire projectile
+-		DFLOAT		m_fAltProjVelocity;		// Speed of the Alt Fire projectile
+-		DFLOAT		m_fRange;				// Distance the Primary Fire can shoot
+-		DFLOAT		m_fAltRange;			// Distance the Alt Fire can shoot
+-		DDWORD		m_dwShotsPerFire;		// Number of vectors to shoot for Primary Fire
+-		DDWORD		m_dwAltShotsPerFire;	// Number of vectors to shoot for Alt Fire
+-		DDWORD		m_dwStrengthReq;		// Amount of strength required for this weapon
+-		DDWORD		m_dwTwoHandStrengthReq;	// Amount of strength required for two of this weapon
+-		int			m_nDamageRadius;		// An area of effect damage radius for primary projectile
+-		int			m_nAltDamageRadius;		// An area of effect damage radius for alt projectile
+-		DBOOL		m_bAltFireZoom;			// Alt fire for this weapon is a zoom function.
+-		DBOOL		m_bDualHanded;			// 2 of these can be carried simulataneously
+-		DBOOL		m_bSemiAuto;			// Weapon has semi-auto firing
+-		HOBJECT		m_hFlash;				// Object with the muzzle flash light
+-		DFLOAT		m_fFlashStartTime;		// Start time of the flash
+-		DBOOL		m_bFlashShowing;		// Is the muzzle flash light showing
+-
+-		char*		m_szFireSound;			// Sound made when weapon fires.
+-		char*		m_szAltFireSound;		// Sound made when weapon fires.
+-		char*		m_szEmptyWeaponSound;	// Sound made when weapon is empty
+-		char*		m_szAltEmptyWeaponSound;// Sound made when weapon is empty
+-		char*		m_szProjectileClass;	// Class of projectile used in Primary Fire
+-		char*		m_szAltProjectileClass;	// Class of projectile used in Alt Fire
+-
+-		char*		m_szWeaponName;			// Name of the weapon
+-		int			m_nWeaponNameID;		// Resource number of weapon name
+-		char*		m_szFlashSprite;		// Sprite to use for flashes
+-		char*		m_szAltFlashSprite;		// Sprite to use for alternate flashes
+-//		char*		m_szShellCasingFilename;// Model of shell casing to use
+-//		char*		m_szShellCasingSkinName;// Skin to place on the shell casing
+-//		char*		m_szShellCasingSound;	// Sound played when shell casing hits something
+-		DBOOL		m_bEjectShell;			// Should we eject a shell?
+-		DBOOL		m_bSplash;				// Should we cause another splash
+-		DFLOAT		m_fFlashDuration;		// Length to display the flash sprite
+-		DFLOAT		m_fFlashScale;			// Scale of the flash sprite
+-		DVector		m_vHandModelOffset;		// Offset for the 3rd person view
+-		DVector		m_vViewModelOffset;		// Gun offset in relation to player
+-		DVector		m_vMuzzleOffset;		// Muzzle Offset
+-		DVector		m_vRecoil;				// Gun's recoil
+-		DVector		m_vFlash;				// Flash position
+-		DFLOAT		m_fEjectInterval;		// How often to eject shells
+-		DFLOAT		m_fViewKick;			// Amount to adjust view when firing.
+-		DBOOL		m_bCumulativeKick;		// Kick is Cumulative
+-		DBOOL		m_bLoopAnim;			// Anim is looping
+-		DBOOL		m_bAltLoopAnim;			// Alt Anim is looping
+-		DBOOL		m_bLoopStatic;			// Loop the static_model animation
+-
+-		DBOOL		m_bLastFireAlt;			// Was last fire an alt fire?
+-		DFLOAT		m_fFireTime;			// Time of last fire sound
+-		DFLOAT		m_fLastShotTime;		// temp to store when the last legal shot was fired
+-
+-		DDWORD		m_nRestAnim;			// Rest animation
+-		DDWORD		m_nIdleAnim;			// Idle animation
+-		DDWORD		m_nDrawAnim;			// Unholstering the weapon animation
+-		DDWORD		m_nDrawDuelAnim;		// Unholstering in duel weapon mode
+-		DDWORD		m_nHolsterAnim;			// Holstering the weapon animation
+-		DDWORD		m_nHolsterDuelAnim;		// Holstering the weapons in duel mode
+-		DDWORD		m_nStartFireAnim;		// Firing spin-up animation
+-		DDWORD		m_nFireAnim;			// Firing animation
+-		DDWORD		m_nStopFireAnim;		// Firing spin-down animation
+-		DDWORD		m_nStartAltFireAnim;	// Firing spin-up animation
+-		DDWORD		m_nAltFireAnim;			// Firing animation
+-		DDWORD		m_nStopAltFireAnim;		// Firing spin-down animation
+-
+-		DFLOAT		m_fIdleStartTime;		// Starting time of an Idle delay
+-		DFLOAT		m_fIdleDelay;			// Current time to delay for idle animations
+-		DFLOAT		m_fMinIdleDelay;		// Minimum amount of time to delay for idle state
+-		DFLOAT		m_fMaxIdleDelay;		// Maximum amount of time to delay for idle state
+-
+-		WeaponState	m_eState;				// Weapon state
+-		DVector		m_vPosition;			// View weapon position
+-		DRotation	m_rRotation;			// View weapon rotation
+-
+-		DBYTE		m_nDamageType;
+-		HSOUNDDE	m_hCurFireSounds[MAX_FIRE_SOUNDS];	// Keep track of current looping
+-		DFLOAT		m_fCurFireSoundsEndTime[MAX_FIRE_SOUNDS];	// End the sound past this time..
+-
+-		DBOOL		m_bLastFiring;			// Was firing last time through UpdateFiringState?
+-		DBOOL		m_bAccuracyCheck;		// Should we check and improve the accuracy?
+-		DBOOL		m_bMultiDamageBoost;	// Should we double the damage of this weapon for multiplay?
+-
+-		int			m_nUpdateWait;
+-		DDWORD		m_nFlags;				// Extra flags when creating the weapon
+-
+-		DFLOAT		m_fChromeValue;			// Value to set the alpha for the chrome texture
+-
+-		HSTRING		m_szPic;				// Regular icon for the weapon
+-		HSTRING		m_szPicH;				// Highlighted icon for the weapon
++enum class FireResult { Fired, Dry, Invalid, Unavailable, DeliveryFailed };
++struct WeaponShot {
++    blood2::WeaponFire request;
++    DVector direction{}, end{};
++    float damage=0;
++    blood2::SegmentResult collision=blood2::SegmentResult::Miss;
++    blood2::SegmentHit hit;
++    bool damage_delivered=false;
++    FireResult result=FireResult::Invalid;
+ };
+-
+-#endif // __WEAPON_H__+// Selected vector-weapon path of CWeapon; no projectile/FX/audio facades.
++class CWeapon {
++protected:
++    explicit CWeapon(DBYTE type) : data(*weapon_definition(type)) {}
++public:
++    virtual ~CWeapon() = default;
++    void Init(HOBJECT owner,CInventoryMgr* inventory,bool left) { m_hOwner=owner; m_pInventoryMgr=inventory; m_bLeftHand=left; }
++    float CheckAmmo() const;
++    FireResult Fire(const blood2::WeaponFire&);
++    const WeaponData& data;
++    HOBJECT m_hOwner=nullptr;
++    CInventoryMgr* m_pInventoryMgr=nullptr;
++    bool m_bLeftHand=false;
++    blood2::DamageType damage_type=blood2::DamageType::Normal;
++    float m_fLastShotTime=0;
++    bool m_bLastFireAlt=false;
++    std::uint64_t shots=0;
++    WeaponShot last_shot;
++};
++class CBeretta final : public CWeapon { public: CBeretta() : CWeapon(WEAP_BERETTA) {} };
++class CMelee final : public CWeapon { public: CMelee() : CWeapon(WEAP_MELEE) { damage_type=blood2::DamageType::Melee; } };
+--- sources/blood2/ClientShellDLL/ViewWeapon.cpp [selected source]
++++ Blood2/src/game/original/ViewWeapon.cpp
+@@ -1,472 +1,110 @@
+-//	ROUTINE:	CViewWeapon::Fire()
+-//
+-//	PURPOSE:	Fires the weapon
+-//
+-// ----------------------------------------------------------------------- //
++#include "ViewWeapon.h"
++#include "BloodShells.h"
++#include "engine/model_commands.h"
++#include "engine/collision.h"
+ 
+-DDWORD CViewWeapon::Fire()
+-{
+-	if (!m_pClientDE) return 0;
+-
+-	//***** General variable declarations *****//
+-	DFLOAT		fReloadTime;
+-	DBYTE		nFiredType = 0;
+-	DFLOAT		cTime = m_pClientDE->GetTime();
+-	DFLOAT		range;
+-	Spread		*spread;
+-	DDWORD		dwShotsPerFire;
+-	D_WORD		nAmmoUse;
+-	DBOOL		bHitPlayerObj = DFALSE;
+-
+-
+-	CBloodClientShell *pShell = (CBloodClientShell*)g_pClientDE->GetClientShell();
+-	if( !pShell )
+-		return 0;
+-
+-	// Can't fire while binocs active.
+-	if( pShell->BinocularsActive( ))
+-		return 0;
+-
+-	// Calculate a random seed...(srand uses this value so it can't be 1, since
+-	// that has a special meaning for srand)
+-	g_byRandomWeaponSeed = GetRandom(2, 255);
+-	srand(g_byRandomWeaponSeed);
+-
+-	// Reload time depends on current barrel or alt fire
+-	if(m_bLastFireAlt)		fReloadTime = m_fAltReloadTime;
+-		else				fReloadTime = m_fReloadTime;
+-
+-	// See if any reload time modifiers are in effect
+-	fReloadTime *= 1;	// TODO m_pInventoryMgr->GetFireRateMultiplier();
+-
+-	// Set up varaible for primary or alternate firing states
+-	DBOOL bAltFire = (m_eState == WS_ALT_FIRING);
+-
+-	if(!bAltFire)
+-	{
+-		dwShotsPerFire = m_dwShotsPerFire;
+-		spread = &m_Spread;
+-		range = m_fRange;
+-		m_fDamage = GetRandom(m_fMinDamage, m_fMaxDamage);
+-		nAmmoUse = m_nAmmoUse;
+-	}
+-	else
+-	{
+-		dwShotsPerFire = m_dwAltShotsPerFire;
+-		spread = &m_AltSpread;
+-		range = m_fAltRange;
+-		m_fDamage = GetRandom(m_fMinAltDamage, m_fMaxAltDamage);
+-		nAmmoUse = m_nAltAmmoUse;
+-	}
+-
+-	// Only fire ammo if we have the ammo
+-	DFLOAT fAmmoCount = CheckAmmo(bAltFire);
+-	if (fAmmoCount >= nAmmoUse)
+-	{
+-		switch(GetAmmoType(bAltFire))
+-		{
+-			// Shells only use 1 shell per fire, no matter how many vectors
+-			case AMMO_SHELL:
+-				fAmmoCount -= (DFLOAT)nAmmoUse;
+-				break;
+-			// default is 1 bullet per vector
+-			default:
+-				if ((DFLOAT)(dwShotsPerFire * nAmmoUse) > fAmmoCount)
+-					dwShotsPerFire = (int)fAmmoCount / nAmmoUse;
+-				fAmmoCount -= (DFLOAT)(dwShotsPerFire * nAmmoUse);
+-				break;
+-		}
+-	}
+-	else
+-		dwShotsPerFire = 0;
+-
+-	//***** If no shots are available, play empty sound and exit the function *****//
+-	if(dwShotsPerFire <= 0)
+-	{
+-		PlayEmptyWeaponSound(bAltFire);
+-		return 0;	// Don't fire if we don't have ammo
+-	}
+-
+-	PlayFireSound(bAltFire);
+-
+-	DVector		shellDir;
+-	FireSpread(spread, dwShotsPerFire, range, bAltFire, &shellDir);
+-
+-	m_fLastShotTime = cTime;
+-
+-	if(m_eState == WS_ALT_FIRING)
+-	{
+-		m_bLastFireAlt = DTRUE;
+-		nFiredType = 2;
+-	}
+-	else
+-	{
+-		m_bLastFireAlt = DFALSE;
+-		nFiredType = 1;
+-	}
+-
+-	// Reset the shell eject flag for the next fire..
+-	if(m_nAmmoType == AMMO_BULLET || m_nAmmoType == AMMO_SHELL)
+-		m_bEjectShell = DTRUE;
+-	else
+-		m_bEjectShell = DFALSE;
+-
+-	m_nFiredType = nFiredType;
+-	if (((m_nFiredType == 1) && m_hFlashSprite) || ((m_nFiredType == 2) && m_hAltFlashSprite))
+-	{
+-		m_nFlashVisible = (DBYTE)m_nFiredType;
+-		m_fFlashStartTime = m_pClientDE->GetTime();
+-	}
+-
+-	return nFiredType;
++using namespace blood2;
++bool CViewWeapon::Create(DBYTE weapon,bool left_hand,ModelStore& models,Resources& resources,std::string& error) {
++    const auto* definition=weapon_definition(weapon); if (!definition) { error="Unsupported view weapon"; return false; }
++    std::shared_ptr<const Model> loaded;
++    if (!models.load(left_hand ? definition->m_szLeftViewModelFilename : definition->m_szViewModelFilename,loaded,error)) return false;
++    if (!resources.find(definition->m_szViewModelSkin)) { error="Weapon skin is not indexed"; return false; }
++    *this={}; type=weapon; left=left_hand; model=std::move(loaded); resources_=&resources;
++    auto index=[&](const char* name) { return animation_index(*model,name); };
++    rest_=index("static_model"); idle_=index("idle"); draw_=index("draw"); holster_=index("holster");
++    start_={index("start_fire"),index("start_alt_fire")}; fire_={index("fire"),index("alt_fire")}; stop_={index("end_fire"),index("end_alt_fire")};
++    animation.animation=no_animation; animation.looping=false; state=WS_DRAW; PlayAnimation(draw_);
++    return true;
+ }
+-
+-void CViewWeapon::UpdateFiringState(DVector *firedPos, DRotation *rotP, DBOOL bFiring, DBOOL bAltFiring)
+-{
+-	if (!m_pClientDE) return;
+-
+-	VEC_COPY(m_vPosition, *firedPos);
+-	ROT_COPY(m_rRotation, *rotP);
+-
+-	DFLOAT fTime = m_pClientDE->GetTime();
+-	DBOOL bAltFire = DFALSE;
+-
+-	switch (m_eState)
+-	{
+-		case WS_IDLE:
+-			{
+-				if(!PlayAnimation(m_nIdleAnim))
+-				{	
+-					PlayAnimation(m_nRestAnim);
+-					m_eState = WS_REST;
+-					m_fIdleStartTime = fTime;
+-					m_fIdleDelay = GetRandom(m_fMinIdleDelay, m_fMaxIdleDelay);
+-
+-					m_pClientDE->SetModelLooping(m_hObject, m_bLoopStatic);
+-				}
+-			}
+-
+-		case WS_REST:
+-			{
+-				DFLOAT fReloadTime;
+-				if (m_bLastFireAlt)
+-					fReloadTime = m_fAltReloadTime;
+-				else
+-					fReloadTime = m_fReloadTime;
+-
+-				fReloadTime *= 1;	// m_pInventoryMgr->GetFireRateMultiplier();
+-
+-				// See if we should play an idle animation
+-				if((m_pClientDE->GetTime() - m_fIdleStartTime) > m_fIdleDelay)
+-				{
+-					m_pClientDE->SetModelLooping(m_hObject, DFALSE);
+-
+-					PlayAnimation(m_nIdleAnim);
+-					m_eState = WS_IDLE;
+-				}
+-				// Make sure enough time has gone by to allow firing
+-				if(((fTime - m_fLastShotTime) > fReloadTime))
+-				{
+-					if (bFiring && (CheckAmmo(DFALSE) >= m_nAmmoUse))
+-					{
+-						m_fLastShotTime = fTime;
+-	
+-						m_eState = WS_START_FIRING;
+-						if (!PlayAnimation(m_nStartFireAnim))
+-						{
+-							m_pClientDE->SetModelLooping(m_hObject, m_bLoopAnim);
+-
+-							PlayAnimation(m_nFireAnim);
+-							m_eState = WS_FIRING;
+-						}
+-					}
+-					else if (bAltFiring && !IsAltFireZoom() && (CheckAmmo(DTRUE) >= m_nAltAmmoUse))
+-					{
+-						m_fLastShotTime = fTime;
+-
+-						m_eState = WS_START_ALT_FIRING;
+-						if (!PlayAnimation(m_nStartAltFireAnim))
+-						{
+-							m_pClientDE->SetModelLooping(m_hObject, m_bAltLoopAnim);
+-
+-							PlayAnimation(m_nAltFireAnim);
+-							m_eState = WS_ALT_FIRING;
+-						}
+-					}
+-				}
+-			}
+-			break;
+-
+-		case WS_DRAW:
+-			{
+-				if(!PlayAnimation(m_nDrawAnim))
+-				{	
+-					PlayAnimation(m_nRestAnim);
+-					m_eState = WS_REST;
+-
+-					m_pClientDE->SetModelLooping(m_hObject, m_bLoopStatic);
+-					m_fIdleStartTime = fTime;
+-				}
+-			}
+-			break;
+-
+-		case WS_HOLSTER:
+-			{
+-				if(!PlayAnimation(m_nHolsterAnim))
+-				{	
+-					m_eState = WS_HOLSTERED;
+-
+-					m_pClientDE->SetModelLooping(m_hObject, DFALSE);
+-				}
+-			}
+-			break;
+-
+-		case WS_START_ALT_FIRING:
+-		case WS_START_FIRING:
+-			{
+-				bAltFire = (m_eState == WS_START_ALT_FIRING);
+-				if (!PlayAnimation(bAltFire ? m_nStartAltFireAnim : m_nStartFireAnim))
+-				{
+-					if (bAltFire ? m_bAltLoopAnim : m_bLoopAnim)
+-						m_pClientDE->SetModelLooping(m_hObject, DTRUE);
+-					else
+-						m_pClientDE->SetModelLooping(m_hObject, DFALSE);
+-
+-					PlayAnimation(bAltFire ? m_nAltFireAnim : m_nFireAnim);
+-					m_eState = bAltFire ? WS_ALT_FIRING : WS_FIRING;
+-				}
+-				m_fIdleStartTime = fTime;
+-			}
+-			break;
+-
+-		case WS_ALT_FIRING:
+-		case WS_FIRING:
+-			{
+-				bAltFire = (m_eState == WS_ALT_FIRING);
+-				DBOOL bLoopAnim;
+-				DDWORD nFireAnim;
+-				DBOOL  bNowFiring;
+-				DFLOAT fReloadTime;
+-				DDWORD nAmmoUse;
+-				DFLOAT fAmmo;
+-				WeaponState eNextState;
+-
+-				if (bAltFire)
+-				{
+-					bLoopAnim	= m_bAltLoopAnim;
+-					nFireAnim	= m_nAltFireAnim;
+-					bNowFiring	= bAltFiring;
+-					fReloadTime = m_fAltReloadTime;
+-					eNextState	= WS_STOP_ALT_FIRING;
+-					nAmmoUse	= m_nAltAmmoUse;
+-					fAmmo		= CheckAmmo(DTRUE);
+-				}
+-				else
+-				{
+-					bLoopAnim	= m_bLoopAnim;
+-					nFireAnim	= m_nFireAnim;
+-					bNowFiring	= bFiring;
+-					fReloadTime = m_fReloadTime;
+-					eNextState	= WS_STOP_FIRING;
+-					nAmmoUse	= m_nAmmoUse;
+-					fAmmo		= CheckAmmo(DFALSE);
+-				}
+-
+-				// No fire anim, so fire right away
+-				if (nFireAnim == INVALID_ANI && !bLoopAnim)
+-				{
+-					if(fAmmo >= nAmmoUse)
+-						Fire();
+-
+-					m_eState = eNextState;
+-				}
+-				// Else looping anim, so fire based on rate of fire
+-				else if (bLoopAnim)
+-				{
+-					if (!bNowFiring || (fAmmo < nAmmoUse))
+-					{
+-						m_eState = eNextState;
+-						m_pClientDE->SetModelLooping(m_hObject, DFALSE);
+-					}
+-				}
+-				else if (m_bSemiAuto && !bAltFire)
+-				{
+-					// Stopped firing
+-					if (!m_bLastFiring && bNowFiring && (fAmmo >= nAmmoUse))
+-					{
+-						m_pClientDE->ResetModelAnimation(m_hObject);
+-					}
+-					else if (!PlayAnimation(bAltFire ? m_nAltFireAnim : m_nFireAnim))
+-					{
+-						m_eState = eNextState;
+-					}
+-				}
+-				// Else just wait for the animation to stop
+-				else if (!PlayAnimation(bAltFire ? m_nAltFireAnim : m_nFireAnim))
+-				{
+-					m_eState = eNextState;
+-				}
+-				// check if there is a fire rate multiplier
+-				/// TODO: This may need to be copied from the server? GK
+-//				else if (m_pInventoryMgr->GetFireRateMultiplier() < 1.0f)
+-//				{
+-//					if (!m_bLastFiring && bNowFiring && (fTime - m_fLastShotTime) > fReloadTime * m_pInventoryMgr->GetFireRateMultiplier())
+-//						m_pClientDE->ResetModelAnimation(m_hObject);
+-//				}
+-				m_fIdleStartTime = fTime;
+-			}
+-			break;
+-
+-		case WS_STOP_ALT_FIRING:
+-		case WS_STOP_FIRING:
+-			{
+-				bAltFire = (m_eState == WS_STOP_ALT_FIRING);
+-				if (!PlayAnimation(bAltFire ? m_nStopAltFireAnim : m_nStopFireAnim))
+-				{
+-					PlayAnimation(m_nRestAnim);
+-					m_eState = WS_REST;
+-
+-					m_pClientDE->SetModelLooping(m_hObject, m_bLoopStatic);
+-				}
+-				m_fIdleStartTime = fTime;
+-			}
+-			break;
+-
+-		default : break;
+-	}
+-	m_bLastFiring = bFiring | bAltFiring;
++bool CViewWeapon::PlayAnimation(std::uint32_t clip) {
++    if (!model || clip==no_animation) return false;
++    if (animation.animation==clip && animation.done) return false;
++    if (animation.animation!=clip) { animation.animation=clip; animation.reset(); }
++    return true;
+ }
+-
+-//	ROUTINE:	CViewWeapon::PlayAnimation()
+-//
+-//	PURPOSE:	Set model to new animation
+-//
+-// ----------------------------------------------------------------------- //
+-
+-DBOOL CViewWeapon::PlayAnimation(DDWORD dwNewAni)
+-{
+-	if (!m_pClientDE || dwNewAni == INVALID_ANI) return DFALSE;
+-
+-	DDWORD dwAni	= m_pClientDE->GetModelAnimation(m_hObject);
+-	DDWORD dwState	= m_pClientDE->GetModelPlaybackState(m_hObject);
+-
+-	if (dwAni == dwNewAni && (dwState & MS_PLAYDONE))
+-	{
+-		return DFALSE;
+-	}
+-	else if (dwAni != dwNewAni)
+-	{
+-		m_pClientDE->SetModelAnimation(m_hObject, dwNewAni);
+-	}
+-
+-	return DTRUE;
++bool CViewWeapon::Update(ServerDE& engine,CBloodServerShell& server,HCLIENT client,const WeaponInput& input,
++                         DVector position,DVector direction,double seconds,std::string& error) {
++    if (!model) return true;
++    auto* player=server.Player(client); if (!player || player->m_damage.IsDead()) return true;
++    auto* weapon=player->m_InventoryMgr.CurrentWeapon(left);
++    if (!weapon || weapon->data.m_nType!=type) { error="View/server weapon association mismatch"; return false; }
++    const auto& data=weapon->data;
++    auto ammo=[&] { return weapon->CheckAmmo(); };
++    auto fire=[&]() {
++        if (!server.Player(client)) return true;
++        if (state!=WS_FIRING && state!=WS_ALT_FIRING) return true;
++        const bool alternate=state==WS_ALT_FIRING;
++        next_seed_=static_cast<DBYTE>(2+random_()%254);
++        auto result=server.OnMessage(client,WeaponFire{position,direction,next_seed_,type,alternate,left});
++        last_result=result;
++        if (result==FireResult::Fired) {
++            ++shots; last_shot_time_=engine.GetTime(); last_alt_=alternate;
++            pending_sound=alternate ? data.m_szAltFireSound : data.m_szFireSound;
++            sound_indexed=resources_->find(pending_sound)!=nullptr;
++            return true;
++        }
++        if (result==FireResult::Dry) return true;
++        error="Original weapon fire rejected or damage delivery failed"; return false;
++    };
++    const float time=engine.GetTime();
++    const bool primary=input.primary && input.left==left, alternate=input.alternate && input.left==left;
++    // Client CMelee::UpdateFiringState chooses fire/fire2 while resting.
++    if (type==WEAP_MELEE && state==WS_REST) fire_[0]=animation_index(*model,random_()%2 ? "fire" : "fire2");
++    // Original CViewWeapon::UpdateFiringState branches, same transition order.
++    switch (state) {
++    case WS_IDLE:
++        if (!PlayAnimation(idle_)) { PlayAnimation(rest_); state=WS_REST; idle_start_=time; idle_delay_=20+40*static_cast<float>(random_()-random_.min())/static_cast<float>(random_.max()-random_.min()); animation.looping=false; }
++        [[fallthrough]];
++    case WS_REST:
++        if (time-idle_start_>idle_delay_) { animation.looping=false; PlayAnimation(idle_); state=WS_IDLE; }
++        if (time-last_shot_time_>(last_alt_ ? data.m_fAltReloadTime : data.m_fReloadTime)) {
++            const int mode=primary && ammo()>=data.m_nAmmoUse ? 0 : alternate && ammo()>=data.m_nAltAmmoUse ? 1 : -1;
++            if (mode>=0) {
++                last_shot_time_=time; state=mode ? WS_START_ALT_FIRING : WS_START_FIRING;
++                if (!PlayAnimation(start_[mode])) { animation.looping=mode ? data.m_bAltLoopAnim : data.m_bLoopAnim; PlayAnimation(fire_[mode]); state=mode ? WS_ALT_FIRING : WS_FIRING; }
++            }
++        }
++        break;
++    case WS_DRAW:
++        if (!PlayAnimation(draw_)) { PlayAnimation(rest_); state=WS_REST; animation.looping=false; idle_start_=time; }
++        break;
++    case WS_HOLSTER:
++        if (!PlayAnimation(holster_)) { state=WS_HOLSTERED; animation.looping=false; }
++        break;
++    case WS_START_FIRING: case WS_START_ALT_FIRING: {
++        const bool alt=state==WS_START_ALT_FIRING;
++        if (!PlayAnimation(start_[alt])) { animation.looping=alt ? data.m_bAltLoopAnim : data.m_bLoopAnim; PlayAnimation(fire_[alt]); state=alt ? WS_ALT_FIRING : WS_FIRING; }
++        idle_start_=time; break;
++    }
++    case WS_FIRING: case WS_ALT_FIRING: {
++        const bool alt=state==WS_ALT_FIRING, looping=alt ? data.m_bAltLoopAnim : data.m_bLoopAnim, firing=alt ? alternate : primary;
++        const auto next=alt ? WS_STOP_ALT_FIRING : WS_STOP_FIRING;
++        const auto use=alt ? data.m_nAltAmmoUse : data.m_nAmmoUse;
++        if (fire_[alt]==no_animation && !looping) { if (ammo()>=use && !fire()) return false; state=next; }
++        else if (looping) { if (!firing || ammo()<use) { state=next; animation.looping=false; } }
++        else if (data.m_bSemiAuto && !alt && !last_firing_ && firing && ammo()>=use) animation.reset();
++        else if (!PlayAnimation(fire_[alt])) state=next;
++        idle_start_=time; break;
++    }
++    case WS_STOP_FIRING: case WS_STOP_ALT_FIRING:
++        if (!PlayAnimation(stop_[state==WS_STOP_ALT_FIRING])) { PlayAnimation(rest_); state=WS_REST; animation.looping=false; }
++        idle_start_=time; break;
++    default: break;
++    }
++    last_firing_=primary || alternate;
++    if (animation.animation==no_animation) return true; // Original missing-animation fallback above.
++    std::vector<std::uint32_t> events;
++    if (!advance_animation(*model,animation,seconds,events,error)) return false;
++    for (auto key : events) {
++        if (!server.Player(client)) break; // A hit callback may remove the owner.
++        last_key=model->animations[animation.animation].keys[key].text;
++        std::vector<std::vector<std::string>> parsed;
++        if (!model_commands(last_key,parsed)) { error="Malformed weapon model key"; return false; }
++        for (const auto& command : parsed) for (std::size_t i=0;i<command.size();++i) {
++            const auto equal=[](std::string_view a,std::string_view b) { return !CaseLess{}(a,b) && !CaseLess{}(b,a); };
++            if (equal(command[i],"FIRE_KEY")) { ++fire_keys; if (!fire()) return false; }
++            else if (equal(command[i],"SOUND_KEY") && i+1<command.size()) { pending_sound="Sounds\\Weapons\\"+command[++i]; sound_indexed=resources_->find(pending_sound)!=nullptr; }
++        }
++    }
++    return true;
+ }
+-
+-//	ROUTINE:	CViewWeapon::OnModelKey()
+-//
+-//	PURPOSE:	Handle animation command
+-//
+-// ----------------------------------------------------------------------- //
+-
+-void CViewWeapon::OnModelKey(HLOCALOBJ hObj, ArgList* pArgList)
+-{
+-	char*	pKey;
+-	int		count = pArgList->argc;
+-
+-	CBloodClientShell *pShell = (CBloodClientShell*)g_pClientDE->GetClientShell();
+-
+-	for(int i = 0; i < count; i++)
+-	{
+-		pKey = pArgList->argv[i];
+-		if(!pKey) break;
+-
+-		if(_mbsicmp((const unsigned char*)pKey, (const unsigned char*)WEAPON_KEY_FIRE) == 0)
+-		{
+-			Fire();
+-		}
+-		else if(_mbsicmp((const unsigned char*)pKey, (const unsigned char*)WEAPON_KEY_SOUND) == 0)
+-		{
+-			char*	pSound = pArgList->argv[++i];
+-			char	pDir[100];
+-
+-			if(pSound)
+-			{
+-				_mbscpy((unsigned char*)pDir, (const unsigned char*)"Sounds\\Weapons\\");
+-				_mbscat((unsigned char*)pDir, (const unsigned char*)pSound);
+-
+-				SendSoundMsg(pDir, 0x00);
+-//				PlaySoundFromObject(m_hObject, pDir, 1000, SOUNDPRIORITY_PLAYER_HIGH,
+-//					DFALSE, DFALSE, DFALSE, 100 );
+-			}
+-		}
+-		else if(_mbsicmp((const unsigned char*)pKey, (const unsigned char*)WEAPON_KEY_SOUNDLOOP) == 0)
+-		{
+-			char*	pSound = pArgList->argv[++i];
+-			char	pDir[100];
+-
+-			if(pSound && !m_hLoopSound)
+-			{
+-				_mbscpy((unsigned char*)pDir, (const unsigned char*)"Sounds\\Weapons\\");
+-				_mbscat((unsigned char*)pDir, (const unsigned char*)pSound);
+-
+-				SendSoundMsg(pDir, 0x01);
+-//				m_hLoopSound = PlaySoundFromObject(m_hObject, pDir, 1000, SOUNDPRIORITY_PLAYER_HIGH, DTRUE, DTRUE);
+-			}
+-		}
+-		else if(_mbsicmp((const unsigned char*)pKey, (const unsigned char*)WEAPON_KEY_SOUNDSTOP) == 0)
+-		{
+-			SendSoundMsg(DNULL, 0x02);
+-
+-//			if(m_hLoopSound)
+-//				m_pClientDE->KillSound(m_hLoopSound);
+-//			m_hLoopSound = DNULL;
+-		}
+-		else if(_mbsicmp((const unsigned char*)pKey, (const unsigned char*)WEAPON_KEY_HIDE) == 0)
+-		{
+-			char*	pNode = pArgList->argv[++i];
+-			DBOOL	nodeStat;
+-			m_pClientDE->GetModelNodeHideStatus(m_hObject, pNode, &nodeStat);
+-
+-			if(!nodeStat)
+-				m_pClientDE->SetModelNodeHideStatus(m_hObject, pNode, DTRUE);
+-		}
+-		else if(_mbsicmp((const unsigned char*)pKey, (const unsigned char*)WEAPON_KEY_SHOW) == 0)
+-		{
+-			char*	pNode = pArgList->argv[++i];
+-			DBOOL	nodeStat;
+-			m_pClientDE->GetModelNodeHideStatus(m_hObject, pNode, &nodeStat);
+-
+-			if(nodeStat)
+-				m_pClientDE->SetModelNodeHideStatus(m_hObject, pNode, DFALSE);
+-		}
+-	}
+-	/*
+-	else if (stricmp(pKey, WEAPON_KEY_SOUND) == 0)
+-	{
+-		if (pArgList->argc > 1)
+-		{
+-			char* pSound = pArgList->argv[1];
+-			if (pSound)
+-			{
+-				char buf[100];
+-				sprintf(buf,"Sounds\\Weapons\\%s.wav", pSound);
+-
+-				PlaySoundLocal(buf, SOUNDPRIORITY_PLAYER_HIGH, DFALSE, DFALSE, 100, DTRUE );
+-
+-				// Send message to Server so that other client's can hear this sound...
+-
+-				HSTRING hSound = m_pClientDE->CreateString(buf);
+-
+-				HMESSAGEWRITE hWrite = m_pClientDE->StartMessage(CMSG_WEAPON_SOUND);
+-				m_pClientDE->WriteToMessageByte(hWrite, WEAPON_SOUND_KEY);
+-				m_pClientDE->WriteToMessageByte(hWrite, m_nWeaponId);
+-				m_pClientDE->WriteToMessageVector(hWrite, &m_vFlashPos);
+-				m_pClientDE->WriteToMessageHString(hWrite, hSound);
+-				m_pClientDE->EndMessage2(hWrite, MESSAGE_NAGGLEFAST|MESSAGE_GUARANTEED);
+-
+-				m_pClientDE->FreeString(hSound);
+-			}
+-		}
+-	}
+-	*/
+-}
+--- sources/blood2/ClientShellDLL/GameWeapons.cpp [selected source]
++++ Blood2/src/game/original/ViewWeapon.cpp
+@@ -1,21 +1,110 @@
+-//	ROUTINE:	CMelee::UpdateFiringState()
+-//
+-//	PURPOSE:	
+-//
+-// ----------------------------------------------------------------------- //
++#include "ViewWeapon.h"
++#include "BloodShells.h"
++#include "engine/model_commands.h"
++#include "engine/collision.h"
+ 
+-void CMelee::UpdateFiringState(DVector *firedPos, DRotation *rotP, DBOOL bFiring, DBOOL bAltFiring)
+-{
+-	if(!m_pClientDE)		return;
+-
+-	// Randomly pick a new hit type until we go into the fire state...
+-	if(m_eState == WS_REST)
+-	{
+-		if(GetRandom(0,1))
+-			m_nFireAnim = m_pClientDE->GetAnimIndex(m_hObject, "fire");
+-		else
+-			m_nFireAnim = m_pClientDE->GetAnimIndex(m_hObject, "fire2");
+-	}
+-
+-	CViewWeapon::UpdateFiringState(firedPos, rotP, bFiring, bAltFiring);
++using namespace blood2;
++bool CViewWeapon::Create(DBYTE weapon,bool left_hand,ModelStore& models,Resources& resources,std::string& error) {
++    const auto* definition=weapon_definition(weapon); if (!definition) { error="Unsupported view weapon"; return false; }
++    std::shared_ptr<const Model> loaded;
++    if (!models.load(left_hand ? definition->m_szLeftViewModelFilename : definition->m_szViewModelFilename,loaded,error)) return false;
++    if (!resources.find(definition->m_szViewModelSkin)) { error="Weapon skin is not indexed"; return false; }
++    *this={}; type=weapon; left=left_hand; model=std::move(loaded); resources_=&resources;
++    auto index=[&](const char* name) { return animation_index(*model,name); };
++    rest_=index("static_model"); idle_=index("idle"); draw_=index("draw"); holster_=index("holster");
++    start_={index("start_fire"),index("start_alt_fire")}; fire_={index("fire"),index("alt_fire")}; stop_={index("end_fire"),index("end_alt_fire")};
++    animation.animation=no_animation; animation.looping=false; state=WS_DRAW; PlayAnimation(draw_);
++    return true;
+ }
++bool CViewWeapon::PlayAnimation(std::uint32_t clip) {
++    if (!model || clip==no_animation) return false;
++    if (animation.animation==clip && animation.done) return false;
++    if (animation.animation!=clip) { animation.animation=clip; animation.reset(); }
++    return true;
++}
++bool CViewWeapon::Update(ServerDE& engine,CBloodServerShell& server,HCLIENT client,const WeaponInput& input,
++                         DVector position,DVector direction,double seconds,std::string& error) {
++    if (!model) return true;
++    auto* player=server.Player(client); if (!player || player->m_damage.IsDead()) return true;
++    auto* weapon=player->m_InventoryMgr.CurrentWeapon(left);
++    if (!weapon || weapon->data.m_nType!=type) { error="View/server weapon association mismatch"; return false; }
++    const auto& data=weapon->data;
++    auto ammo=[&] { return weapon->CheckAmmo(); };
++    auto fire=[&]() {
++        if (!server.Player(client)) return true;
++        if (state!=WS_FIRING && state!=WS_ALT_FIRING) return true;
++        const bool alternate=state==WS_ALT_FIRING;
++        next_seed_=static_cast<DBYTE>(2+random_()%254);
++        auto result=server.OnMessage(client,WeaponFire{position,direction,next_seed_,type,alternate,left});
++        last_result=result;
++        if (result==FireResult::Fired) {
++            ++shots; last_shot_time_=engine.GetTime(); last_alt_=alternate;
++            pending_sound=alternate ? data.m_szAltFireSound : data.m_szFireSound;
++            sound_indexed=resources_->find(pending_sound)!=nullptr;
++            return true;
++        }
++        if (result==FireResult::Dry) return true;
++        error="Original weapon fire rejected or damage delivery failed"; return false;
++    };
++    const float time=engine.GetTime();
++    const bool primary=input.primary && input.left==left, alternate=input.alternate && input.left==left;
++    // Client CMelee::UpdateFiringState chooses fire/fire2 while resting.
++    if (type==WEAP_MELEE && state==WS_REST) fire_[0]=animation_index(*model,random_()%2 ? "fire" : "fire2");
++    // Original CViewWeapon::UpdateFiringState branches, same transition order.
++    switch (state) {
++    case WS_IDLE:
++        if (!PlayAnimation(idle_)) { PlayAnimation(rest_); state=WS_REST; idle_start_=time; idle_delay_=20+40*static_cast<float>(random_()-random_.min())/static_cast<float>(random_.max()-random_.min()); animation.looping=false; }
++        [[fallthrough]];
++    case WS_REST:
++        if (time-idle_start_>idle_delay_) { animation.looping=false; PlayAnimation(idle_); state=WS_IDLE; }
++        if (time-last_shot_time_>(last_alt_ ? data.m_fAltReloadTime : data.m_fReloadTime)) {
++            const int mode=primary && ammo()>=data.m_nAmmoUse ? 0 : alternate && ammo()>=data.m_nAltAmmoUse ? 1 : -1;
++            if (mode>=0) {
++                last_shot_time_=time; state=mode ? WS_START_ALT_FIRING : WS_START_FIRING;
++                if (!PlayAnimation(start_[mode])) { animation.looping=mode ? data.m_bAltLoopAnim : data.m_bLoopAnim; PlayAnimation(fire_[mode]); state=mode ? WS_ALT_FIRING : WS_FIRING; }
++            }
++        }
++        break;
++    case WS_DRAW:
++        if (!PlayAnimation(draw_)) { PlayAnimation(rest_); state=WS_REST; animation.looping=false; idle_start_=time; }
++        break;
++    case WS_HOLSTER:
++        if (!PlayAnimation(holster_)) { state=WS_HOLSTERED; animation.looping=false; }
++        break;
++    case WS_START_FIRING: case WS_START_ALT_FIRING: {
++        const bool alt=state==WS_START_ALT_FIRING;
++        if (!PlayAnimation(start_[alt])) { animation.looping=alt ? data.m_bAltLoopAnim : data.m_bLoopAnim; PlayAnimation(fire_[alt]); state=alt ? WS_ALT_FIRING : WS_FIRING; }
++        idle_start_=time; break;
++    }
++    case WS_FIRING: case WS_ALT_FIRING: {
++        const bool alt=state==WS_ALT_FIRING, looping=alt ? data.m_bAltLoopAnim : data.m_bLoopAnim, firing=alt ? alternate : primary;
++        const auto next=alt ? WS_STOP_ALT_FIRING : WS_STOP_FIRING;
++        const auto use=alt ? data.m_nAltAmmoUse : data.m_nAmmoUse;
++        if (fire_[alt]==no_animation && !looping) { if (ammo()>=use && !fire()) return false; state=next; }
++        else if (looping) { if (!firing || ammo()<use) { state=next; animation.looping=false; } }
++        else if (data.m_bSemiAuto && !alt && !last_firing_ && firing && ammo()>=use) animation.reset();
++        else if (!PlayAnimation(fire_[alt])) state=next;
++        idle_start_=time; break;
++    }
++    case WS_STOP_FIRING: case WS_STOP_ALT_FIRING:
++        if (!PlayAnimation(stop_[state==WS_STOP_ALT_FIRING])) { PlayAnimation(rest_); state=WS_REST; animation.looping=false; }
++        idle_start_=time; break;
++    default: break;
++    }
++    last_firing_=primary || alternate;
++    if (animation.animation==no_animation) return true; // Original missing-animation fallback above.
++    std::vector<std::uint32_t> events;
++    if (!advance_animation(*model,animation,seconds,events,error)) return false;
++    for (auto key : events) {
++        if (!server.Player(client)) break; // A hit callback may remove the owner.
++        last_key=model->animations[animation.animation].keys[key].text;
++        std::vector<std::vector<std::string>> parsed;
++        if (!model_commands(last_key,parsed)) { error="Malformed weapon model key"; return false; }
++        for (const auto& command : parsed) for (std::size_t i=0;i<command.size();++i) {
++            const auto equal=[](std::string_view a,std::string_view b) { return !CaseLess{}(a,b) && !CaseLess{}(b,a); };
++            if (equal(command[i],"FIRE_KEY")) { ++fire_keys; if (!fire()) return false; }
++            else if (equal(command[i],"SOUND_KEY") && i+1<command.size()) { pending_sound="Sounds\\Weapons\\"+command[++i]; sound_indexed=resources_->find(pending_sound)!=nullptr; }
++        }
++    }
++    return true;
++}
+--- sources/blood2/ClientShellDLL/ViewWeapon.h [selected source]
++++ Blood2/src/game/original/ViewWeapon.h
+@@ -1,230 +1,33 @@
+-#ifndef __VIEWWEAPON_H__
+-#define __VIEWWEAPON_H__
++#pragma once
++#include "Weapon.h"
++#include "engine/model_store.h"
++#include <random>
++class ServerDE;
++class CBloodServerShell;
++namespace blood2 { struct WeaponInput { bool primary=false,alternate=false,left=false; }; }
+ 
+-
+-#include "cpp_clientshell_de.h"
+-#include "SharedDefs.h"
+-#include "WeaponDefs.h"
+-
+-#define MAX_CS_FILENAME_LEN 100
+-
+-#define FIREMSG_SPECIAL_DWORD	0x04
+-#define FIREMSG_SPECIAL_FLOAT	0x08
+-
+-class CViewWeapon
+-{
+-    public:
+-
+-        CViewWeapon();
+-        ~CViewWeapon();
+-
+-		DBOOL		Create(CClientDE* pClientDE, DBYTE byWeaponID, DBOOL bLeftHand);
+-		void		CreateFlash(DFLOAT fScale);
+-		void		Term();
+-		void		Update(DFLOAT fPitch, DFLOAT fYaw, DVector *pos);
+-		void		UpdateBob(DFLOAT nHeight, DFLOAT nWidth);
+-		void		Hide();
+-		void		Show();
+-
+-		DVector&	GetGunOffset() { return m_vViewModelOffset; }
+-		void		SetGunOffset(DVector& offset) { VEC_COPY(m_vViewModelOffset, offset); }
+-		char*		GetWeaponName() { return m_szWeaponName; }
+-		DBYTE		GetWeaponID() { return m_nWeaponID; }
+-		DVector&	GetFlash() { return m_vAdjFlashPos; }
+-		DFLOAT		GetViewKick() { return m_fViewKick; }
+-		DBOOL		IsCumulativeKick() { return m_bCumulativeKick; }
+-		DBOOL		IsLeftHand() { return m_bLeftHand; }
+-		DVector&	GetFlashOffset() { return m_vFlashPos; }
+-		void		SetFlashOffset(DVector& offset) { VEC_COPY(m_vFlashPos, offset); }
+-		DVector&	GetMuzzlePos() { return m_vMuzzleOffset; }
+-		HLOCALOBJ	GetWeapObj() { return m_hObject; }
+-		virtual void	UpdateFiringState(DVector *firedPos, DRotation *rotP, DBOOL bFiring, DBOOL bAltFiring);
+-		virtual void	CancelFiringState();
+-		DBOOL		IsAltFireZoom()			{ return m_bAltFireZoom; }
+-		void		OnModelKey(HLOCALOBJ hObj, ArgList* pArgList);
+-		void		SendFireMsg(DVector* pvPos, DVector* pvFire, DBYTE byRandomSeed, DBOOL bAltFire);
+-		void		SendSoundMsg(char *szSound, DBYTE byFlags);
+-
+-		virtual DBYTE	GetAmmoType(DBOOL bAltFire = DFALSE)	{ return m_nAmmoType; }
+- 
+-    protected:
+-
+-		void		AdjustAngleAndSetPos(DFLOAT fPitch, DFLOAT fYaw, DVector *pos);
+-		void		UpdateFlash(DVector vFlashPos);
+-
+-		void		SendFireMsg();
+-		virtual DBOOL	FireMsgSpecialData(HMESSAGEWRITE &hWrite, DBYTE &byFlags)	{ return DFALSE; }
+-
+-/*************************************************************/
+-		DBOOL		IsChanging();
+-		void		Draw();
+-		DFLOAT		CheckAmmo(DBOOL bAltFire);
+-		HSOUNDDE	PlayFireSound(DBOOL bAltFire);
+-		HSOUNDDE	PlayEmptyWeaponSound(DBOOL bAltFire);
+-		void		KillSounds();
+-		void		UpdateWeaponFX(DDWORD &nFX, DDWORD &nExtras, WeaponFXExtras *ext, SurfaceType eType, DBYTE nAmmoType, DFLOAT fDamage);
+-		virtual DBOOL	FireVector(DVector *vFire, DFLOAT dist, DBOOL bTracer);
+-		virtual DBOOL	FireProjectile(DVector *vFire, DFLOAT dist, DBOOL bAltFire);
+-		virtual DDWORD	Fire();
+-		virtual void	FireSpread(Spread *spread, DDWORD shots, DFLOAT range, DBOOL bAltFire, DVector *rDir);
+-		DBOOL		FiringTooClose(DVector *vFire, DFLOAT fDist, DVector *vNewPos);
+-		void		AlignFireVector(DVector *vFire, DFLOAT fDist);
+-		void		SetFirePosRot(DVector *firedPos, DRotation *rotP, DBOOL bAltFire);
+-		void		SetupViewModel();
+-		void		ShowMuzzleFlash(DVector *vPos);
+-		void		UpdateMuzzleFlash();
+-		DBOOL		PlayAnimation(DDWORD dwNewAni);
+-		void		AddImpact(DVector *vSource, DVector *vDest, DVector *vForward, DVector *vNormal, DDWORD nFX, DDWORD nExtras, WeaponFXExtras *ext);
+-		void		AddWorldModelMark(DVector vPos, DVector vNormal, HOBJECT hObject, SurfaceType eType);
+-
+-/*************************************************************/
+-
+-
+-	protected:
+-//		char		m_szWeaponName[MAX_CS_FILENAME_LEN];
+-//		char		m_szFlashSprite[MAX_CS_FILENAME_LEN];
+-//		char		m_szAltFlashSprite[MAX_CS_FILENAME_LEN];
+-//		DFLOAT		m_fFlashDuration;
+-//		DFLOAT		m_fFlashStartTime;
+-		DBYTE		m_nFlashVisible;
+-		DBYTE		m_nWeaponID;
+-//		DVector		m_MuzzleOffset;		// Muzzle Offset
+-//		DVector		m_Recoil;			// Gun's recoil
+-		DVector		m_vFlashPos;		// Flash position
+-		DVector		m_vAdjFlashPos;		// Adjusted flash position
+-//		DFLOAT		m_fViewKick;		// How much to adjust perspective when firing
+-//		DBOOL		m_bCumulativeKick;	// Kick effect is Cumulative
+-
+-		DFLOAT		m_fBobHeight;		// Amount of gun bobbing
+-		DFLOAT		m_fBobWidth;		// Current bobbing position
+-
+-		DFLOAT		m_fLastEjectedTime;	// When a shell was last ejected
+-
+-		HLOCALOBJ	m_hFlashSprite;		// Handle for the flash sprite
+-		HLOCALOBJ	m_hAltFlashSprite;	// Handle for the flash sprite
+-		HLOCALOBJ	m_hObject;
+-		DFLOAT		m_fLowerOffset;
+-		DBOOL		m_bOkToFire;
+-		DDWORD		m_nFiredType;
+-		DDWORD		m_nType;
+-		DBOOL		m_bLeftHand;		// Weapon is carried in the left hand
+-		CClientDE * m_pClientDE;
+-
+-
+-		char* 		m_pViewModelFilename;
+-		char*		m_pLeftViewModelFilename;
+-		char* 		m_pViewModelSkinname;
+-		DBYTE		m_nFireType;			// Weapon animation
+-		DBYTE		m_nAmmoType;			// Type of ammo
+-		D_WORD		m_nAmmoUse;				// Amount of ammo to use per shot
+-		D_WORD		m_nAltAmmoUse;			// Amount of ammo to use per Alt shot
+-		DFLOAT		m_fDamage;				// Current amount of damage per shot vector
+-		DFLOAT		m_fMinDamage;			// minimum amount of damage
+-		DFLOAT		m_fMaxDamage;			// maximum amount of damage
+-		DFLOAT		m_fMinAltDamage;		// Alt minimum fire damage
+-		DFLOAT		m_fMaxAltDamage;		// Alt maximum fire damage
+-		DFLOAT		m_fReloadTime;			// How long to reload?
+-		DFLOAT		m_fAltReloadTime;		// How long to reload for alt fire?
+-		Spread		m_Spread;				// Width and height range for random fire locations
+-		Spread		m_AltSpread;			// Width and height range for random fire locations
+-		DFLOAT		m_fProjVelocity;		// Speed of the Primary Fire projectile
+-		DFLOAT		m_fAltProjVelocity;		// Speed of the Alt Fire projectile
+-		DFLOAT		m_fRange;				// Distance the Primary Fire can shoot
+-		DFLOAT		m_fAltRange;			// Distance the Alt Fire can shoot
+-		DDWORD		m_dwShotsPerFire;		// Number of vectors to shoot for Primary Fire
+-		DDWORD		m_dwAltShotsPerFire;	// Number of vectors to shoot for Alt Fire
+-		DDWORD		m_dwStrengthReq;		// Amount of strength required for this weapon
+-		DDWORD		m_dwTwoHandStrengthReq;	// Amount of strength required for two of this weapon
+-		int			m_nDamageRadius;		// An area of effect damage radius for primary projectile
+-		int			m_nAltDamageRadius;		// An area of effect damage radius for alt projectile
+-		DBOOL		m_bAltFireZoom;			// Alt fire for this weapon is a zoom function.
+-		DBOOL		m_bDualHanded;			// 2 of these can be carried simulataneously
+-		DBOOL		m_bSemiAuto;			// Weapon has semi-auto firing
+-		HOBJECT		m_hFlash;				// Object with the muzzle flash light
+-		DFLOAT		m_fFlashStartTime;		// Start time of the flash
+-		DBOOL		m_bFlashShowing;		// Is the muzzle flash light showing
+-
+-		char*		m_szFireSound;			// Sound made when weapon fires.
+-		char*		m_szAltFireSound;		// Sound made when weapon fires.
+-		char*		m_szEmptyWeaponSound;	// Sound made when weapon is empty
+-		char*		m_szAltEmptyWeaponSound;// Sound made when weapon is empty
+-		char*		m_szProjectileClass;	// Class of projectile used in Primary Fire
+-		char*		m_szAltProjectileClass;	// Class of projectile used in Alt Fire
+-
+-		char*		m_szWeaponName;			// Name of the weapon
+-		int			m_nWeaponNameID;		// Resource number of weapon name
+-		char*		m_szFlashSprite;		// Sprite to use for flashes
+-		char*		m_szAltFlashSprite;		// Sprite to use for alternate flashes
+-//		char*		m_szShellCasingFilename;// Model of shell casing to use
+-//		char*		m_szShellCasingSkinName;// Skin to place on the shell casing
+-//		char*		m_szShellCasingSound;	// Sound played when shell casing hits something
+-		DBOOL		m_bEjectShell;			// Should we eject a shell?
+-		DBOOL		m_bSplash;				// Should we cause another splash
+-		DFLOAT		m_fFlashDuration;		// Length to display the flash sprite
+-		DFLOAT		m_fFlashScale;			// Scale of the flash sprite
+-		DVector		m_vViewModelOffset;		// Gun offset in relation to player
+-		DVector		m_vMuzzleOffset;		// Muzzle Offset
+-		DVector		m_vRecoil;				// Gun's recoil
+-//		DVector		m_vFlash;				// Flash position
+-		DFLOAT		m_fViewKick;			// Amount to adjust view when firing.
+-		DBOOL		m_bCumulativeKick;		// Kick is Cumulative
+-		DBOOL		m_bLoopAnim;			// Anim is looping
+-		DBOOL		m_bAltLoopAnim;			// Alt Anim is looping
+-		DBOOL		m_bLoopStatic;			// Loop the static_model animation
+-
+-		DBOOL		m_bLastFireAlt;			// Was last fire an alt fire?
+-		DFLOAT		m_fFireTime;			// Time of last fire sound
+-		DFLOAT		m_fLastShotTime;		// temp to store when the last legal shot was fired
+-
+-		DDWORD		m_nRestAnim;			// Rest animation
+-		DDWORD		m_nIdleAnim;			// Idle animation
+-		DDWORD		m_nDrawAnim;			// Unholstering the weapon animation
+-		DDWORD		m_nDrawDuelAnim;		// Unholstering in duel weapon mode
+-		DDWORD		m_nHolsterAnim;			// Holstering the weapon animation
+-		DDWORD		m_nHolsterDuelAnim;		// Holstering the weapons in duel mode
+-		DDWORD		m_nStartFireAnim;		// Firing spin-up animation
+-		DDWORD		m_nFireAnim;			// Firing animation
+-		DDWORD		m_nStopFireAnim;		// Firing spin-down animation
+-		DDWORD		m_nStartAltFireAnim;	// Firing spin-up animation
+-		DDWORD		m_nAltFireAnim;			// Firing animation
+-		DDWORD		m_nStopAltFireAnim;		// Firing spin-down animation
+-
+-		DFLOAT		m_fIdleStartTime;		// Starting time of an Idle delay
+-		DFLOAT		m_fIdleDelay;			// Current time to delay for idle animations
+-		DFLOAT		m_fMinIdleDelay;		// Minimum amount of time to delay for idle state
+-		DFLOAT		m_fMaxIdleDelay;		// Maximum amount of time to delay for idle state
+-
+-		WeaponState	m_eState;				// Weapon state
+-		DVector		m_vPosition;			// View weapon position
+-		DRotation	m_rRotation;			// View weapon rotation
+-
+-		DBYTE		m_nDamageType;
+-		HSOUNDDE	m_hCurFireSounds[MAX_FIRE_SOUNDS];	// Keep track of current looping
+-		HSOUNDDE	m_hLoopSound;
+-		DFLOAT		m_fCurFireSoundsEndTime[MAX_FIRE_SOUNDS];	// End the sound past this time..
+-
+-		DBOOL		m_bLastFiring;			// Was firing last time through UpdateFiringState?
+-		DBOOL		m_bAccuracyCheck;		// Should we check and improve the accuracy?
+-
+-		int			m_nUpdateWait;
+-		DDWORD		m_nFlags;				// Extra flags when creating the weapon
+-
+-		DFLOAT		m_fChromeValue;			// Value to set the alpha for the chrome texture
+-
+-		HSTRING		m_szPic;				// Regular icon for the weapon
+-		HSTRING		m_szPicH;				// Highlighted icon for the weapon
+-
+-		DDWORD		m_nIgnoreFX;
++// Selected CViewWeapon client animation/firing path, backed by an owned ABC
++// track instead of a legacy local renderer object. No server HOBJECT is forged.
++class CViewWeapon {
++public:
++    bool Create(DBYTE,bool,blood2::ModelStore&,blood2::Resources&,std::string&);
++    bool Update(ServerDE&,CBloodServerShell&,HCLIENT,const blood2::WeaponInput&,DVector,DVector,double,std::string&);
++    DBYTE type=0;
++    bool left=false;
++    std::shared_ptr<const blood2::Model> model;
++    blood2::AnimationTrack animation;
++    WeaponState state=WS_HOLSTERED;
++    std::string last_key, pending_sound;
++    bool sound_indexed=false; // Request only; audio output is not ported.
++    std::uint64_t fire_keys=0,shots=0;
++    FireResult last_result=FireResult::Invalid;
++private:
++    bool PlayAnimation(std::uint32_t);
++    std::uint32_t rest_=UINT32_MAX,idle_=UINT32_MAX,draw_=UINT32_MAX,holster_=UINT32_MAX;
++    std::array<std::uint32_t,2> start_{UINT32_MAX,UINT32_MAX},fire_{UINT32_MAX,UINT32_MAX},stop_{UINT32_MAX,UINT32_MAX};
++    float last_shot_time_=0,idle_start_=0,idle_delay_=20;
++    bool last_alt_=false,last_firing_=false;
++    DBYTE next_seed_=2;
++    std::minstd_rand random_{1};
++    blood2::Resources* resources_=nullptr;
+ };
+-
+-
+-
+-enum SHELL_TYPES {
+-	SHELL_NONE = 0,
+-	SHELL_SHOTGUN
+-};
+-
+-extern HLOCALOBJ g_hWeaponModel;
+-extern DRotation g_rotGun;
+-
+-#endif __VIEWWEAPON_H__--- sources/blood2/ObjectDLL/PlayerObj.cpp [selected source]
++++ Blood2/src/game/original/PlayerObj.cpp
+@@ -1,133 +1,254 @@
+-void CPlayerObj::HandleWeaponFireMessage(HMESSAGEREAD hRead)
+-{
+-	ServerDE *pServerDE = GetServerDE();
+-	if (!pServerDE) return;
++// Selected original entry code; source ranges and adaptations are recorded in
++// docs/M2_PLAYER_SOURCES.json. This is an executable lifecycle port, not the
++// complete 7,657-line PlayerObj gameplay implementation.
++#include "PlayerObj.h"
++#include "GameStartPoint.h"
++#include <algorithm>
++#include <cmath>
+ 
+-	DVector vFirePos, vDir;
+-	pServerDE->ReadFromMessageVector(hRead, &vFirePos);
++DLink CDestructable::m_DestructableHead{};
++DDWORD CDestructable::m_dwNumDestructables = 0;
++CDestructable::CDestructable() {
++    if (m_dwNumDestructables == 0) dl_TieOff(&m_DestructableHead);
++}
++CDestructable::~CDestructable() {
++    if (m_Link.m_pData && m_dwNumDestructables > 0) { dl_Remove(&m_Link); --m_dwNumDestructables; }
++}
++DBOOL CDestructable::Init(HOBJECT object,CInventoryMgr* inventory) {
++    if (!object || !BaseClass::GetServerDE()) return DFALSE;
++    m_hObject = object;
++    if (!m_Link.m_pData) {
++        dl_Insert(&m_DestructableHead,&m_Link); m_Link.m_pData = this; ++m_dwNumDestructables;
++    }
++    m_pInventoryMgr = inventory; return DTRUE;
++}
++void CDestructable::CalculateResistance(DBYTE value) {
++    if (value == 1) m_fResistance = 1.20f;
++    else if (value == 2) m_fResistance = 1.10f;
++    else if (value == 3) m_fResistance = 1.0f;
++    else if (value == 4) m_fResistance = 0.9f;
++    else if (value == 5) m_fResistance = 0.8f;
++    else if (value >= 6) m_fResistance = 0.7f;
++}
++CBaseCharacter::CBaseCharacter() : B2BaseClass(OT_MODEL) {
++    AddAggregate(&m_damage); AddAggregate(&m_InventoryMgr);
++    // Original m_MoveObj (steering/AI movement) is not imported in this subset.
++}
++DDWORD CBaseCharacter::EngineMessageFn(DDWORD message,void* data,DFLOAT fData) {
++    if (message == MID_INITIALUPDATE && fData != INITIALUPDATE_SAVEGAME) {
++        auto flags = g_pServerDE->GetObjectFlags(m_hObject);
++        g_pServerDE->SetObjectFlags(m_hObject,flags | FLAG_MODELGOURAUDSHADE | FLAG_ANIMTRANSITION);
++    }
++    if (message == MID_MODELSTRINGKEY && data && pending_model_commands.size() < 32) {
++        auto* args = static_cast<ArgList*>(data); std::string command;
++        for (int i = 0; args->argv && i < args->argc; ++i) { if (i) command += ' '; command += args->argv[i]; }
++        pending_model_commands.push_back(std::move(command));
++    }
++    return B2BaseClass::EngineMessageFn(message,data,fData);
++}
++CPlayerObj::~CPlayerObj() {
++    auto* server = GetServerDE();
++    if (m_hClient) server->SetClientUserData(m_hClient,nullptr);
++    if (m_hstrTrigger) server->FreeString(m_hstrTrigger);
++    if (m_hstrPlayerName) server->FreeString(m_hstrPlayerName);
++    // Creation rollback owns the initial smell until entry succeeds. Ordinary
++    // lifetime leaves the world-owned scent to its original 20-second timeout.
++    if (!attributes_received && initial_smell_) server->RemoveObject(initial_smell_);
++}
++void CPlayerObj::PostPropRead(ObjectCreateStruct* state) {
++    SAFE_STRCPY(state->m_Filename,"Models\\Characters\\Caleb.abc");
++    SAFE_STRCPY(state->m_SkinName,"Skins\\Characters\\Caleb1.dtx");
++    SAFE_STRCPY(state->m_Name,"player"); state->m_ObjectType = OT_MODEL;
++}
++DBOOL CPlayerObj::InitialUpdate(int reason) {
++    auto* server = GetServerDE();
++    if (reason == INITIALUPDATE_SAVEGAME) { entry_error = "Player save restoration is not ported"; return DFALSE; }
++    // InitialUpdate precedes SetClient, as in the original engine.
++    if (!m_InventoryMgr.Init(m_hObject,m_hClient) || !m_damage.Init(m_hObject,&m_InventoryMgr)) return DFALSE;
++    m_bFirstUpdate = DTRUE;
++    m_InventoryMgr.SetAmmoCount(1,50);
++    server->SetNextUpdate(m_hObject,.001f);
++    m_damage.SetHitPoints(100); m_damage.SetArmorPoints(0);
++    m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = 100;
++    m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = 100;
++    m_damage.m_fMass = 250;
++    m_fSmellTime = server->GetTime(); m_fSmellDelay = .5f;
++    ObjectCreateStruct state; server->GetObjectPos(m_hObject,&state.m_Pos);
++    if (auto* smell = server->CreateObject(server->GetClass("SmellHint"),&state)) initial_smell_ = smell->m_hObject;
++    else return DFALSE;
++    DVector dims{12,82.0f/2,12}; server->SetObjectDims(m_hObject,&dims);
++    m_hstrTrigger = server->CreateString("TRIGGER");
++    initialized = m_hstrTrigger != nullptr;
++    return initialized;
++}
++bool CPlayerObj::SetCharacter(DBYTE character) {
++    // Caleb, default skin only until the other original character branches,
++    // sound roots and hit-sphere generation are ported. Reject before mutation.
++    if (character != 0 || m_nSkin != 0) { entry_error = "Only Caleb's default entry profile is ported"; return false; }
++    if (GetServerDE()->SetModelFilenames(m_hObject,"Models\\Characters\\Caleb.abc","Skins\\Characters\\Caleb1.dtx") != DE_OK) {
++        entry_error = "Player model could not be loaded"; return false;
++    }
++    m_nCharacter = character; return true;
++}
++bool CPlayerObj::Respawn() {
++    auto* server = GetServerDE();
++    // Preserve the original single-player dead-player gate. This operation is
++    // an entry reset, not a replacement for loading a save after death.
++    if (m_damage.IsDead()) { entry_error = "A dead single-player character requires save restoration"; return false; }
++    if (!SetCharacter(m_nCharacter)) return false;
++    const DDWORD flags = FLAG_VISIBLE | FLAG_MODELKEYS | FLAG_YROTATION | FLAG_ANIMTRANSITION |
++        FLAG_TOUCH_NOTIFY | FLAG_SOLID | FLAG_STAIRSTEP | FLAG_SHADOW;
++    server->SetObjectFlags(m_hObject,flags);
++    DVector velocity{}; server->SetVelocity(m_hObject,&velocity);
++    m_damage.SetHitPoints(100); m_damage.SetArmorPoints(0); m_bDead = DFALSE; m_fAirLevel = 100;
++    for (DBYTE i = 1; i <= 12; ++i) m_InventoryMgr.SetAmmoCount(i,0);
++    m_InventoryMgr.SetAmmoCount(1,50);
++    ++respawns;
++    return UpdateClientPhysics() && TeleportClientToServerPos();
++}
++void CPlayerObj::ValidateAttributes() {
++    auto clamp = [](DBYTE value) { return std::clamp<DBYTE>(value,1,5); };
++    m_nAttribStrength = clamp(m_nAttribStrength); m_nAttribSpeed = clamp(m_nAttribSpeed);
++    m_nAttribResistance = clamp(m_nAttribResistance); m_nAttribMagic = clamp(m_nAttribMagic);
++    if (m_nAttribStrength+m_nAttribSpeed+m_nAttribResistance+m_nAttribMagic > 12)
++        m_nAttribStrength = m_nAttribSpeed = m_nAttribResistance = m_nAttribMagic = 3;
++    m_damage.CalculateResistance(m_nAttribResistance);
++    m_InventoryMgr.SetStrength(m_nAttribStrength); m_InventoryMgr.SetMagic(m_nAttribMagic);
++    static constexpr float move[] = {220,250,280,310,330,350};
++    static constexpr float maximum[] = {100,100,125,150,200,250};
++    static constexpr float mega[] = {100,150,200,250,300,400};
++    m_fMoveVel = move[m_nAttribSpeed-1]; m_fJumpVel = 600;
++    m_damage.m_fMaxHitPoints = maximum[m_nAttribStrength-1];
++    m_damage.m_fMaxMegaHitPoints = mega[m_nAttribStrength-1];
++    m_damage.m_fMaxArmorPoints = maximum[m_nAttribMagic-1];
++    m_damage.m_fMaxNecroArmorPoints = mega[m_nAttribMagic-1];
++}
++bool CPlayerObj::OnSinglePlayerInit(const blood2::PlayerInit& init) {
++    if (attributes_received || !m_hClient || init.name.size() > 100 || init.name.find('\0') != std::string::npos || init.character != 0 || init.skin != 0) return false;
++    // Reject unsupported loadouts before allocating strings or weapons.
++    for (auto type : init.weapons) if (type && !weapon_definition(type & ~DUAL_HAND_MASK)) return false;
++    m_hstrPlayerName = GetServerDE()->CreateString(init.name.c_str()); if (!m_hstrPlayerName) return false;
++    struct Rollback {
++        CInventoryMgr& inventory; HSTRING& name; bool committed=false;
++        ~Rollback() { if (!committed) { inventory.ClearWeapons(); g_pServerDE->FreeString(name); name=nullptr; } }
++    } rollback{m_InventoryMgr,m_hstrPlayerName};
++    m_nCharacter = init.character; m_nSkin = init.skin;
++    m_nAttribStrength = init.strength; m_nAttribSpeed = init.speed;
++    m_nAttribResistance = init.resistance; m_nAttribMagic = init.magic;
++    ValidateAttributes();
++    m_InventoryMgr.requested_weapons = init.weapons;
++    if (m_InventoryMgr.ObtainWeapon(WEAP_MELEE,0)!=InventoryResult::Ok) return false;
++    for (unsigned i=0;i<init.weapons.size();++i) {
++        const auto type=static_cast<DBYTE>(init.weapons[i] & ~DUAL_HAND_MASK);
++        if (!type) continue;
++        auto obtained=m_InventoryMgr.ObtainWeapon(type,static_cast<int>(i+1));
++        if (obtained!=InventoryResult::Ok && obtained!=InventoryResult::AlreadyHave) return false;
++        if (init.weapons[i] & DUAL_HAND_MASK) m_InventoryMgr.ObtainWeapon(type,static_cast<int>(i+1));
++    }
++    m_InventoryMgr.ChangeWeaponSlot(1);
++    if (!Respawn()) return false;
++    rollback.committed=true; attributes_received = true; return true;
++}
++bool CPlayerObj::GoToStartPoint(HSTRING start_name) {
++    auto* server = GetServerDE(); auto* list = server->FindNamedObjects("Blood2StartPoint");
++    if (!list) return false;
++    // Fix the original empty-list early-return leak and use checked casts.
++    struct Release { ServerDE* server; ObjectList* list; ~Release() { server->RelinquishList(list); } } release{server,list};
++    bool remove_string = !start_name;
++    if (remove_string) start_name = server->CreateString("start");
++    if (!start_name) return false;
++    GameStartPoint* start = nullptr; GameStartPoint* fallback = nullptr;
++    for (auto* link = list->m_pFirstLink; link; link = link->m_pNext) {
++        auto* candidate = dynamic_cast<GameStartPoint*>(server->HandleToObject(link->m_hObject));
++        if (candidate && !candidate->IsMultiplayer()) {
++            fallback = candidate;
++            if (server->CompareStringsUpper(start_name,candidate->GetName())) { start = candidate; break; }
++        }
++    }
++    if (remove_string) server->FreeString(start_name);
++    if (!start) start = fallback;
++    if (!start) { entry_error = "No single-player GameStartPoint"; return false; }
++    m_fYaw = start->GetPitchYawRoll().y; m_fPitch = 0;
++    DVector position; server->GetObjectPos(start->m_hObject,&position);
++    start->SendTrigger();
++    if (server->TeleportObject(m_hObject,&position) != DE_OK ||
++        server->SendToClient(m_hClient,blood2::PlayerRotation{m_fPitch,m_fYaw}) != DE_OK) return false;
++    if (server->MoveObjectToGround(m_hObject) != DE_OK) { entry_error = "Start point has no supported ground collision"; return false; }
++    return UpdateClientPhysics() && TeleportClientToServerPos();
++}
++bool CPlayerObj::UpdateClientPhysics() {
++    if (!m_hClient) return true; // Original InitialUpdate has no client yet.
++    blood2::PlayerPhysics physics; physics.model = "Models\\Characters\\Caleb.abc";
++    physics.skin = "Skins\\Characters\\Caleb1.dtx";
++    auto* server = GetServerDE();
++    if (server->GetObjectDims(m_hObject,&physics.dimensions) != DE_OK || server->GetGlobalForce(&physics.gravity) != DE_OK) return false;
++    physics.move_speed = m_fMoveVel; physics.jump_speed = m_fJumpVel;
++    return server->SendToClient(m_hClient,physics) == DE_OK;
++}
++bool CPlayerObj::TeleportClientToServerPos() {
++    if (!m_hClient) return true;
++    blood2::PlayerPosition position; GetServerDE()->GetObjectPos(m_hObject,&position.position);
++    return GetServerDE()->SendToClient(m_hClient,position) == DE_OK;
++}
++DBOOL CPlayerObj::Update(DVector*) {
++    auto* server = GetServerDE(); server->SetNextUpdate(m_hObject,.001f); ++updates;
++    if (!m_hClient) return DTRUE;
++    if (m_bFirstUpdate) {
++        ValidateAttributes();
++        if (!UpdateClientPhysics() || !TeleportClientToServerPos()) return DFALSE;
++        m_bFirstUpdate = DFALSE;
++    }
++    return UpdateStats();
++}
++bool CPlayerObj::UpdateStats() {
++    const blood2::PlayerStats value{m_damage.m_fHitPoints,m_damage.m_fArmorPoints,m_InventoryMgr.GetAmmoCount(1)};
++    if (value.health==last_sent_stats_.health && value.armor==last_sent_stats_.armor && value.bullets==last_sent_stats_.bullets) return true;
++    if (GetServerDE()->SendToClient(m_hClient,value)!=DE_OK) return false;
++    last_sent_stats_=value; return true;
++}
++DDWORD CPlayerObj::EngineMessageFn(DDWORD message,void* data,DFLOAT fData) {
++    DBOOL result = DTRUE;
++    switch (message) {
++        case MID_PRECREATE: {
++            auto ret = CBaseCharacter::EngineMessageFn(message,data,fData);
++            if (data) PostPropRead(static_cast<ObjectCreateStruct*>(data));
++            return ret;
++        }
++        case MID_INITIALUPDATE: result = InitialUpdate(static_cast<int>(fData)); break;
++        case MID_UPDATE: result = Update(static_cast<DVector*>(data)); break;
++        default: break;
++    }
++    if (result) return CBaseCharacter::EngineMessageFn(message,data,fData);
++    GetServerDE()->RemoveObject(m_hObject); return result;
++}
+ 
+-	pServerDE->ReadFromMessageVector(hRead, &vDir);
+-	DBYTE nRandomSeed	= pServerDE->ReadFromMessageByte(hRead);
+-	DBYTE nWeaponId		= pServerDE->ReadFromMessageByte(hRead);
+-	DBYTE byFlags		= pServerDE->ReadFromMessageByte(hRead);
+-
+-	// Get the alt fire flag..
+-	DBOOL bAltFire  = (byFlags & 0x01) ? DTRUE : DFALSE;
+-	DBOOL bLeftHand = (byFlags & 0x02) ? DTRUE : DFALSE;
+-
+-	//**********************************************************
+-	// Get some special information about the weapon (Andy 1/7/99)
+-	DDWORD	dwSpecial = 0;
+-	DFLOAT	fSpecial = 0.0f;
+-	DBOOL	bUpdateData = DFALSE;
+-
+-	if(byFlags & 0x04)
+-	{
+-		dwSpecial = pServerDE->ReadFromMessageDWord(hRead);
+-		bUpdateData = DTRUE;
+-	}
+-
+-	if(byFlags & 0x08)
+-	{
+-		fSpecial = pServerDE->ReadFromMessageFloat(hRead);
+-		bUpdateData = DTRUE;
+-	}
+-	//**********************************************************
+-
+-	DRotation rRot;
+-	pServerDE->AlignRotation(&rRot, &vDir, DNULL);
+-
+-	srand(nRandomSeed);
+-
+-	if (!m_bMovementBlocked)
+-	{
+-		if(bUpdateData)
+-			m_InventoryMgr.SetCurrentWeaponSpecialData(dwSpecial, fSpecial);
+-
+-		m_InventoryMgr.FireCurrentWeapon(&vFirePos, &rRot, bAltFire, bLeftHand);
+-	}
+-}
+-
+-//	ROUTINE:	CPlayerObj::UpdateStats()
+-//
+-//	PURPOSE:	Updates player stats.
+-//
+-// --------------------------------------------------------------------------- //
+-void CPlayerObj::UpdateStats()
+-{
+-	 // Check to see if the status bar display items have changed
+-	DDWORD nItem;
+-
+-	m_nStatsFlags = 0;
+-
+-	// See if the health has changed, send to client
+-	nItem = (DDWORD)m_damage.GetHitPoints();
+-	if (m_nLastHitPoints != nItem)
+-	{
+-		// If we took damage, tell the client
+-		if (m_nLastHitPoints > nItem)
+-		{
+-			m_nLastDamage = m_nLastHitPoints - nItem;
+-			m_nStatsFlags |= PLAYERSTATS_TOOKDAMAGE;
+-
+-			if (IsRandomChance(69 + m_nLastDamage))
+-			{
+-				if (m_damage.GetLastDamageType() == DAMAGE_TYPE_FIRE)
+-				{
+-					PlayVoiceGroupEventOnClient(VME_BURNING, DTRUE);
+-				}
+-				else
+-				{
+-					PlayVoiceGroupEventOnClient(VME_PAIN, DTRUE);
+-				}
+-			}
+-		}
+-
+-		m_nLastHitPoints = nItem;
+-		m_nStatsFlags |= PLAYERSTATS_HEALTH;
+-	}
+-
+-	// See if the ammo has changed, send to client
+-	nItem = (DDWORD)m_InventoryMgr.GetCurrentWeaponAmmoCount();
+-	if (m_nLastAmmo != nItem)
+-	{
+-		m_nLastAmmo = nItem;
+-		m_nStatsFlags |= PLAYERSTATS_AMMO;
+-	}
+-
+-	// See if the ammo has changed, send to client
+-	nItem = (DDWORD)m_InventoryMgr.GetCurrentWeaponAltFireAmmoCount();
+-	if (m_nLastAltAmmo != nItem)
+-	{
+-		m_nLastAltAmmo = nItem;
+-		m_nStatsFlags |= PLAYERSTATS_ALTAMMO;
+-	}
+-
+-	// See if the armor has changed, send to client
+-	nItem = (DDWORD)m_damage.GetArmorPoints();
+-	if (m_nLastArmor != nItem)
+-	{
+-		m_nLastArmor = nItem;
+-		m_nStatsFlags |= PLAYERSTATS_ARMOR;
+-	}
+-
+-	// See if the focus has changed, send to client
+-	nItem = (DDWORD)m_InventoryMgr.GetAmmoCount(AMMO_FOCUS);
+-	if (m_nLastFocus != nItem)
+-	{
+-		m_nLastFocus = nItem;
+-		m_nStatsFlags |= PLAYERSTATS_FOCUS;
+-	}
+-
+-
+-	// See if air level has changed...
+-
+-	if (m_fOldAirLevel != m_fAirLevel)
+-	{
+-		m_fOldAirLevel = m_fAirLevel;
+-		m_nStatsFlags |= PLAYERSTATS_AIRLEVEL;
+-	}
+-
+-	if( m_nStatsFlags )
+-		SendMessageToClient( SMSG_PLAYERSTATSUPDATE );
+-}
++// Selected ordinary normal/melee damage branch from Destructable.cpp. AI hit
++// limbs, damage impulses, powerups, triggers and death reactions are deferred.
++DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner,HOBJECT sender,DDWORD message,HMESSAGEREAD read) {
++    if (message==blood2::damage_message) {
++        blood2::Damage damage;
++        if (!BaseClass::GetServerDE()->ReadDamage(read,damage)) return 0;
++        if (!m_bGodMode && !m_bDead) {
++            auto amount=damage.amount*m_fResistance;
++            if (m_fArmorPoints>0) {
++                const auto ratio=m_fArmorPoints<=25 ? .3f : m_fArmorPoints<=50 ? .5f : m_fArmorPoints<=100 ? .7f : m_fArmorPoints<=150 ? .8f : .9f;
++                auto absorb=amount*ratio;
++                m_fArmorPoints-=absorb;
++                if (m_fArmorPoints<0) { absorb+=m_fArmorPoints; m_fArmorPoints=0; }
++                amount-=absorb;
++            }
++            amount=std::max(amount,0.0f);
++            m_fHitPoints-=amount; m_fLastDamageAmount+=amount; last_damage=damage;
++            if (m_fHitPoints<=0) { m_bDead=DTRUE; m_fHitPoints=0; }
++        }
++    }
++    return Aggregate::ObjectMessageFn(owner,sender,message,read);
++}
++FireResult CPlayerObj::HandleWeaponFireMessage(const blood2::WeaponFire& request) {
++    if (!m_hClient || !attributes_received || m_damage.IsDead() ||
++        GetServerDE()->GetClientUserData(m_hClient)!=m_hObject) return FireResult::Invalid;
++    const auto result=m_InventoryMgr.FireCurrentWeapon(request);
++    if (result==FireResult::Fired || result==FireResult::DeliveryFailed)
++        UpdateStats();
++    return result;
++}
+--- sources/blood2/ObjectDLL/Destructable.cpp [selected source]
++++ Blood2/src/game/original/PlayerObj.cpp
+@@ -1,307 +1,254 @@
+-void CDestructable::HandleDamage(HOBJECT hSender, HMESSAGEREAD hRead)
+-{
+-	CServerDE* pServerDE = BaseClass::GetServerDE();
+-	if (!pServerDE) return;
++// Selected original entry code; source ranges and adaptations are recorded in
++// docs/M2_PLAYER_SOURCES.json. This is an executable lifecycle port, not the
++// complete 7,657-line PlayerObj gameplay implementation.
++#include "PlayerObj.h"
++#include "GameStartPoint.h"
++#include <algorithm>
++#include <cmath>
+ 
+-	DVector vDir,vPos;
++DLink CDestructable::m_DestructableHead{};
++DDWORD CDestructable::m_dwNumDestructables = 0;
++CDestructable::CDestructable() {
++    if (m_dwNumDestructables == 0) dl_TieOff(&m_DestructableHead);
++}
++CDestructable::~CDestructable() {
++    if (m_Link.m_pData && m_dwNumDestructables > 0) { dl_Remove(&m_Link); --m_dwNumDestructables; }
++}
++DBOOL CDestructable::Init(HOBJECT object,CInventoryMgr* inventory) {
++    if (!object || !BaseClass::GetServerDE()) return DFALSE;
++    m_hObject = object;
++    if (!m_Link.m_pData) {
++        dl_Insert(&m_DestructableHead,&m_Link); m_Link.m_pData = this; ++m_dwNumDestructables;
++    }
++    m_pInventoryMgr = inventory; return DTRUE;
++}
++void CDestructable::CalculateResistance(DBYTE value) {
++    if (value == 1) m_fResistance = 1.20f;
++    else if (value == 2) m_fResistance = 1.10f;
++    else if (value == 3) m_fResistance = 1.0f;
++    else if (value == 4) m_fResistance = 0.9f;
++    else if (value == 5) m_fResistance = 0.8f;
++    else if (value >= 6) m_fResistance = 0.7f;
++}
++CBaseCharacter::CBaseCharacter() : B2BaseClass(OT_MODEL) {
++    AddAggregate(&m_damage); AddAggregate(&m_InventoryMgr);
++    // Original m_MoveObj (steering/AI movement) is not imported in this subset.
++}
++DDWORD CBaseCharacter::EngineMessageFn(DDWORD message,void* data,DFLOAT fData) {
++    if (message == MID_INITIALUPDATE && fData != INITIALUPDATE_SAVEGAME) {
++        auto flags = g_pServerDE->GetObjectFlags(m_hObject);
++        g_pServerDE->SetObjectFlags(m_hObject,flags | FLAG_MODELGOURAUDSHADE | FLAG_ANIMTRANSITION);
++    }
++    if (message == MID_MODELSTRINGKEY && data && pending_model_commands.size() < 32) {
++        auto* args = static_cast<ArgList*>(data); std::string command;
++        for (int i = 0; args->argv && i < args->argc; ++i) { if (i) command += ' '; command += args->argv[i]; }
++        pending_model_commands.push_back(std::move(command));
++    }
++    return B2BaseClass::EngineMessageFn(message,data,fData);
++}
++CPlayerObj::~CPlayerObj() {
++    auto* server = GetServerDE();
++    if (m_hClient) server->SetClientUserData(m_hClient,nullptr);
++    if (m_hstrTrigger) server->FreeString(m_hstrTrigger);
++    if (m_hstrPlayerName) server->FreeString(m_hstrPlayerName);
++    // Creation rollback owns the initial smell until entry succeeds. Ordinary
++    // lifetime leaves the world-owned scent to its original 20-second timeout.
++    if (!attributes_received && initial_smell_) server->RemoveObject(initial_smell_);
++}
++void CPlayerObj::PostPropRead(ObjectCreateStruct* state) {
++    SAFE_STRCPY(state->m_Filename,"Models\\Characters\\Caleb.abc");
++    SAFE_STRCPY(state->m_SkinName,"Skins\\Characters\\Caleb1.dtx");
++    SAFE_STRCPY(state->m_Name,"player"); state->m_ObjectType = OT_MODEL;
++}
++DBOOL CPlayerObj::InitialUpdate(int reason) {
++    auto* server = GetServerDE();
++    if (reason == INITIALUPDATE_SAVEGAME) { entry_error = "Player save restoration is not ported"; return DFALSE; }
++    // InitialUpdate precedes SetClient, as in the original engine.
++    if (!m_InventoryMgr.Init(m_hObject,m_hClient) || !m_damage.Init(m_hObject,&m_InventoryMgr)) return DFALSE;
++    m_bFirstUpdate = DTRUE;
++    m_InventoryMgr.SetAmmoCount(1,50);
++    server->SetNextUpdate(m_hObject,.001f);
++    m_damage.SetHitPoints(100); m_damage.SetArmorPoints(0);
++    m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = 100;
++    m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = 100;
++    m_damage.m_fMass = 250;
++    m_fSmellTime = server->GetTime(); m_fSmellDelay = .5f;
++    ObjectCreateStruct state; server->GetObjectPos(m_hObject,&state.m_Pos);
++    if (auto* smell = server->CreateObject(server->GetClass("SmellHint"),&state)) initial_smell_ = smell->m_hObject;
++    else return DFALSE;
++    DVector dims{12,82.0f/2,12}; server->SetObjectDims(m_hObject,&dims);
++    m_hstrTrigger = server->CreateString("TRIGGER");
++    initialized = m_hstrTrigger != nullptr;
++    return initialized;
++}
++bool CPlayerObj::SetCharacter(DBYTE character) {
++    // Caleb, default skin only until the other original character branches,
++    // sound roots and hit-sphere generation are ported. Reject before mutation.
++    if (character != 0 || m_nSkin != 0) { entry_error = "Only Caleb's default entry profile is ported"; return false; }
++    if (GetServerDE()->SetModelFilenames(m_hObject,"Models\\Characters\\Caleb.abc","Skins\\Characters\\Caleb1.dtx") != DE_OK) {
++        entry_error = "Player model could not be loaded"; return false;
++    }
++    m_nCharacter = character; return true;
++}
++bool CPlayerObj::Respawn() {
++    auto* server = GetServerDE();
++    // Preserve the original single-player dead-player gate. This operation is
++    // an entry reset, not a replacement for loading a save after death.
++    if (m_damage.IsDead()) { entry_error = "A dead single-player character requires save restoration"; return false; }
++    if (!SetCharacter(m_nCharacter)) return false;
++    const DDWORD flags = FLAG_VISIBLE | FLAG_MODELKEYS | FLAG_YROTATION | FLAG_ANIMTRANSITION |
++        FLAG_TOUCH_NOTIFY | FLAG_SOLID | FLAG_STAIRSTEP | FLAG_SHADOW;
++    server->SetObjectFlags(m_hObject,flags);
++    DVector velocity{}; server->SetVelocity(m_hObject,&velocity);
++    m_damage.SetHitPoints(100); m_damage.SetArmorPoints(0); m_bDead = DFALSE; m_fAirLevel = 100;
++    for (DBYTE i = 1; i <= 12; ++i) m_InventoryMgr.SetAmmoCount(i,0);
++    m_InventoryMgr.SetAmmoCount(1,50);
++    ++respawns;
++    return UpdateClientPhysics() && TeleportClientToServerPos();
++}
++void CPlayerObj::ValidateAttributes() {
++    auto clamp = [](DBYTE value) { return std::clamp<DBYTE>(value,1,5); };
++    m_nAttribStrength = clamp(m_nAttribStrength); m_nAttribSpeed = clamp(m_nAttribSpeed);
++    m_nAttribResistance = clamp(m_nAttribResistance); m_nAttribMagic = clamp(m_nAttribMagic);
++    if (m_nAttribStrength+m_nAttribSpeed+m_nAttribResistance+m_nAttribMagic > 12)
++        m_nAttribStrength = m_nAttribSpeed = m_nAttribResistance = m_nAttribMagic = 3;
++    m_damage.CalculateResistance(m_nAttribResistance);
++    m_InventoryMgr.SetStrength(m_nAttribStrength); m_InventoryMgr.SetMagic(m_nAttribMagic);
++    static constexpr float move[] = {220,250,280,310,330,350};
++    static constexpr float maximum[] = {100,100,125,150,200,250};
++    static constexpr float mega[] = {100,150,200,250,300,400};
++    m_fMoveVel = move[m_nAttribSpeed-1]; m_fJumpVel = 600;
++    m_damage.m_fMaxHitPoints = maximum[m_nAttribStrength-1];
++    m_damage.m_fMaxMegaHitPoints = mega[m_nAttribStrength-1];
++    m_damage.m_fMaxArmorPoints = maximum[m_nAttribMagic-1];
++    m_damage.m_fMaxNecroArmorPoints = mega[m_nAttribMagic-1];
++}
++bool CPlayerObj::OnSinglePlayerInit(const blood2::PlayerInit& init) {
++    if (attributes_received || !m_hClient || init.name.size() > 100 || init.name.find('\0') != std::string::npos || init.character != 0 || init.skin != 0) return false;
++    // Reject unsupported loadouts before allocating strings or weapons.
++    for (auto type : init.weapons) if (type && !weapon_definition(type & ~DUAL_HAND_MASK)) return false;
++    m_hstrPlayerName = GetServerDE()->CreateString(init.name.c_str()); if (!m_hstrPlayerName) return false;
++    struct Rollback {
++        CInventoryMgr& inventory; HSTRING& name; bool committed=false;
++        ~Rollback() { if (!committed) { inventory.ClearWeapons(); g_pServerDE->FreeString(name); name=nullptr; } }
++    } rollback{m_InventoryMgr,m_hstrPlayerName};
++    m_nCharacter = init.character; m_nSkin = init.skin;
++    m_nAttribStrength = init.strength; m_nAttribSpeed = init.speed;
++    m_nAttribResistance = init.resistance; m_nAttribMagic = init.magic;
++    ValidateAttributes();
++    m_InventoryMgr.requested_weapons = init.weapons;
++    if (m_InventoryMgr.ObtainWeapon(WEAP_MELEE,0)!=InventoryResult::Ok) return false;
++    for (unsigned i=0;i<init.weapons.size();++i) {
++        const auto type=static_cast<DBYTE>(init.weapons[i] & ~DUAL_HAND_MASK);
++        if (!type) continue;
++        auto obtained=m_InventoryMgr.ObtainWeapon(type,static_cast<int>(i+1));
++        if (obtained!=InventoryResult::Ok && obtained!=InventoryResult::AlreadyHave) return false;
++        if (init.weapons[i] & DUAL_HAND_MASK) m_InventoryMgr.ObtainWeapon(type,static_cast<int>(i+1));
++    }
++    m_InventoryMgr.ChangeWeaponSlot(1);
++    if (!Respawn()) return false;
++    rollback.committed=true; attributes_received = true; return true;
++}
++bool CPlayerObj::GoToStartPoint(HSTRING start_name) {
++    auto* server = GetServerDE(); auto* list = server->FindNamedObjects("Blood2StartPoint");
++    if (!list) return false;
++    // Fix the original empty-list early-return leak and use checked casts.
++    struct Release { ServerDE* server; ObjectList* list; ~Release() { server->RelinquishList(list); } } release{server,list};
++    bool remove_string = !start_name;
++    if (remove_string) start_name = server->CreateString("start");
++    if (!start_name) return false;
++    GameStartPoint* start = nullptr; GameStartPoint* fallback = nullptr;
++    for (auto* link = list->m_pFirstLink; link; link = link->m_pNext) {
++        auto* candidate = dynamic_cast<GameStartPoint*>(server->HandleToObject(link->m_hObject));
++        if (candidate && !candidate->IsMultiplayer()) {
++            fallback = candidate;
++            if (server->CompareStringsUpper(start_name,candidate->GetName())) { start = candidate; break; }
++        }
++    }
++    if (remove_string) server->FreeString(start_name);
++    if (!start) start = fallback;
++    if (!start) { entry_error = "No single-player GameStartPoint"; return false; }
++    m_fYaw = start->GetPitchYawRoll().y; m_fPitch = 0;
++    DVector position; server->GetObjectPos(start->m_hObject,&position);
++    start->SendTrigger();
++    if (server->TeleportObject(m_hObject,&position) != DE_OK ||
++        server->SendToClient(m_hClient,blood2::PlayerRotation{m_fPitch,m_fYaw}) != DE_OK) return false;
++    if (server->MoveObjectToGround(m_hObject) != DE_OK) { entry_error = "Start point has no supported ground collision"; return false; }
++    return UpdateClientPhysics() && TeleportClientToServerPos();
++}
++bool CPlayerObj::UpdateClientPhysics() {
++    if (!m_hClient) return true; // Original InitialUpdate has no client yet.
++    blood2::PlayerPhysics physics; physics.model = "Models\\Characters\\Caleb.abc";
++    physics.skin = "Skins\\Characters\\Caleb1.dtx";
++    auto* server = GetServerDE();
++    if (server->GetObjectDims(m_hObject,&physics.dimensions) != DE_OK || server->GetGlobalForce(&physics.gravity) != DE_OK) return false;
++    physics.move_speed = m_fMoveVel; physics.jump_speed = m_fJumpVel;
++    return server->SendToClient(m_hClient,physics) == DE_OK;
++}
++bool CPlayerObj::TeleportClientToServerPos() {
++    if (!m_hClient) return true;
++    blood2::PlayerPosition position; GetServerDE()->GetObjectPos(m_hObject,&position.position);
++    return GetServerDE()->SendToClient(m_hClient,position) == DE_OK;
++}
++DBOOL CPlayerObj::Update(DVector*) {
++    auto* server = GetServerDE(); server->SetNextUpdate(m_hObject,.001f); ++updates;
++    if (!m_hClient) return DTRUE;
++    if (m_bFirstUpdate) {
++        ValidateAttributes();
++        if (!UpdateClientPhysics() || !TeleportClientToServerPos()) return DFALSE;
++        m_bFirstUpdate = DFALSE;
++    }
++    return UpdateStats();
++}
++bool CPlayerObj::UpdateStats() {
++    const blood2::PlayerStats value{m_damage.m_fHitPoints,m_damage.m_fArmorPoints,m_InventoryMgr.GetAmmoCount(1)};
++    if (value.health==last_sent_stats_.health && value.armor==last_sent_stats_.armor && value.bullets==last_sent_stats_.bullets) return true;
++    if (GetServerDE()->SendToClient(m_hClient,value)!=DE_OK) return false;
++    last_sent_stats_=value; return true;
++}
++DDWORD CPlayerObj::EngineMessageFn(DDWORD message,void* data,DFLOAT fData) {
++    DBOOL result = DTRUE;
++    switch (message) {
++        case MID_PRECREATE: {
++            auto ret = CBaseCharacter::EngineMessageFn(message,data,fData);
++            if (data) PostPropRead(static_cast<ObjectCreateStruct*>(data));
++            return ret;
++        }
++        case MID_INITIALUPDATE: result = InitialUpdate(static_cast<int>(fData)); break;
++        case MID_UPDATE: result = Update(static_cast<DVector*>(data)); break;
++        default: break;
++    }
++    if (result) return CBaseCharacter::EngineMessageFn(message,data,fData);
++    GetServerDE()->RemoveObject(m_hObject); return result;
++}
+ 
+-	pServerDE->ReadFromMessageVector(hRead, &vDir);
+-	DFLOAT fDamage = pServerDE->ReadFromMessageFloat(hRead);
+-	DBYTE nDamageType	= pServerDE->ReadFromMessageByte(hRead);
+-	HOBJECT hWhoHit = pServerDE->ReadFromMessageObject(hRead);
+-	pServerDE->ReadFromMessageVector(hRead, &vPos);
+-
+-//	char buf[50];
+-	DFLOAT fOldHitPoints = m_fHitPoints;
+-	fDamage = fDamage * m_fResistance;
+-
+-	// Just return if we can't take damage
+-	if (m_bGodMode || (m_bTriggerOnly && nDamageType != DAMAGE_TYPE_DEATH) || fDamage < 0)
+-	{
+-		return;
+-	}
+-
+-	if (!IsPlayerToPlayerDamageOk(hSender, hWhoHit))
+-	{
+-		return;
+-	}
+-
+-	// If instant death, don't bother calculating stuff.. 
+-	if( m_bDestructable && nDamageType == DAMAGE_TYPE_DEATH)
+-	{
+-		m_fArmorPoints = 0;
+-		m_fHitPoints = 0;
+-		m_fDeathHitPoints = 0;
+-		m_fLastDamagePercent = 100.0f;
+-		m_fLastDamageAmount = (DFLOAT)m_fMaxHitPoints;
+-
+-		nDamageType &= 0x0f;	// Mask off the damage type flags
+-		m_nLastDamageType = nDamageType;
+-	}
+-	else
+-	{
+-		// Special pre-damage base character modifiers
+-		if (IsAICharacter(m_hObject))
+-		{
+-			m_nNodeHit = CalculateHitLimb(vDir,vPos,fDamage);
+-
+-			if(m_nNodeHit == -1 && !(nDamageType & DAMAGE_TYPE_NORMAL))
+-				m_nNodeHit = SetProperNode(pServerDE->IntRandom(0,NUM_ALL_NODES - 3));
+-			else if(m_nNodeHit >= 0)
+-				m_nNodeHit = SetProperNode(m_nNodeHit);
+-			else
+-				return;
+-
+-			//Compute one side got hit for recoils
+-			DVector vU, vR, vF, vTmpDir;
+-			DRotation rRot;
+-			pServerDE->GetObjectRotation(m_hObject, &rRot);
+-			pServerDE->GetRotationVectors(&rRot, &vU, &vR, &vF);
+-
+-			VEC_COPY(vTmpDir, vDir);
+-
+-			VEC_MULSCALAR(vTmpDir,vTmpDir,-1.0f);
+-			DFLOAT fAmount = (DFLOAT) atan2(vTmpDir.x, vTmpDir.z);    
+-			DFLOAT fAmount2 = (DFLOAT) atan2(vF.x, vF.z);
+-
+-			if(fAmount < 0.0f)
+-				fAmount = (MATH_PI*2) + fAmount;
+-			if(fAmount2 < 0.0f)
+-				fAmount2 = (MATH_PI*2) + fAmount2;
+-
+-			DFLOAT fAngle = fAmount2 - fAmount;
+-
+-			if(fAngle <= MATH_PI/2 || fAngle >= 3*MATH_PI/2)	//Hit the front
+-			{
+-				m_nSideHit = 0;
+-			}
+-			else //Hit the back
+-			{
+-				m_nSideHit = 6;	
+-			}
+-
+-			if (m_hLastDamager)
+-				pServerDE->BreakInterObjectLink(m_hObject, m_hLastDamager);
+-
+-			m_hLastDamager = hWhoHit;
+-
+-			if(m_hLastDamager)
+-				pServerDE->CreateInterObjectLink(m_hObject, m_hLastDamager);
+-
+-			if(m_nNodeHit == NODE_NECK)
+-			{
+-				AI_Mgr* pAI = (AI_Mgr*)pServerDE->HandleToObject(m_hObject);
+-
+-				if(pAI->m_bCabal || pServerDE->IsKindOf(pServerDE->GetObjectClass(m_hObject), pServerDE->GetClass("SoulDrudge")))
+-					m_fHitPoints = 0;
+-				
+-				fDamage *= 1.5f;
+-			}
+-			else if(m_nNodeHit == NODE_TORSO)
+-			{
+-				fDamage *= 1.0f;
+-			}
+-			else
+-			{
+-				fDamage *= 0.5f;
+-			}
+-		}
+-
+-		if (IsBaseCharacter(m_hObject))
+-		{
+-			CBaseCharacter *pOwner = (CBaseCharacter*)pServerDE->HandleToObject(m_hObject);
+-
+-//			if (pOwner->IsItemActive(SPELL_STONE))
+-//				return;
+-
+-			// If Nigh-invulnerability powerup in effect..
+-			if (m_bNighInvulnerable)
+-				fDamage = fDamage * 0.05f;
+-
+-			// Shield absorbs the damage as Focus ammo use
+-/*			if (nDamageType != DAMAGE_TYPE_DEATH && pOwner->IsItemActive(SPELL_SHIELD))
+-			{
+-				DFLOAT fFocusAmmo = pOwner->GetInventoryMgr()->GetAmmoCount(AMMO_FOCUS);
+-		
+-				fFocusAmmo -= fDamage;
+-
+-				if (fFocusAmmo < 0.0f)
+-				{
+-					fDamage = -fFocusAmmo;
+-					fFocusAmmo = 0.0f;
+-				}
+-				else
+-				{
+-					fDamage = 0.0f;
+-				}
+-
+-				pOwner->GetInventoryMgr()->SetAmmoCount(AMMO_FOCUS, fFocusAmmo);
+-			}
+-*/
+-			// Reflection reflects damage back to the sender, and absorbs 
+-			// twice the damage in focus ammo
+-/*			if (pOwner->IsItemActive(SPELL_REFLECTION) && !(nDamageType & DAMAGE_FLAG_AREAEFFECT))
+-			{
+-				DFLOAT fFocusAmmo = pOwner->GetInventoryMgr()->GetAmmoCount(AMMO_FOCUS);
+-		
+-				fFocusAmmo -= fDamage * 2.0f;
+-
+-				if (fFocusAmmo < 0.0f)
+-				{
+-					fDamage = -fFocusAmmo / 2.0f;
+-					fFocusAmmo = 0.0f;
+-				}
+-				else
+-				{
+-					fDamage = 0.0f;
+-				}
+-
+-				pOwner->GetInventoryMgr()->SetAmmoCount(AMMO_FOCUS, fFocusAmmo);
+-			}
+-*/
+-		}
+-
+-		// If single player, don't let the player apply damage to himself.
+-		if (m_bApplyDamagePhysics && !(g_pBloodServerShell->GetGameType() == GAMETYPE_SINGLE && (m_hObject == hWhoHit) && IsPlayer(m_hObject)))
+-			ApplyDamagePhysics(fDamage, &vDir);
+-		
+-		// Can't damage if already dead...
+-
+-		if( m_bDestructable && m_bDead )
+-			return;
+-
+-		if( m_bDestructable && m_fArmorPoints > 0.0 && nDamageType != DAMAGE_TYPE_SUFFOCATE )
+-		{
+-			DFLOAT fAbsorb = 0.0f;
+-
+-			if (m_fArmorPoints <= 25.0f)
+-				fAbsorb = fDamage * 0.3f;
+-			else if (m_fArmorPoints <= 50.0f)
+-				fAbsorb = fDamage * 0.5f;
+-			else if (m_fArmorPoints <= 100.0f)
+-				fAbsorb = fDamage * 0.7f;
+-			else if (m_fArmorPoints <= 150.0f)
+-				fAbsorb = fDamage * 0.8f;
+-			else 
+-				fAbsorb = fDamage * 0.9f;
+-
+-			if (!m_bGodMode)
+-			{
+-				m_fArmorPoints -= fAbsorb;
+-				if (m_fArmorPoints < 0.0f) 
+-				{
+-					fAbsorb += m_fArmorPoints;
+-					m_fArmorPoints = 0.0f;
+-				}
+-        
+-				fDamage -= fAbsorb;
+-       		}
+-		}
+-
+-		if (fDamage < 0.0f) fDamage = 0.0f;	// just to be sure :)
+-
+-		// Save damage type so entity will know how to react
+-		nDamageType &= 0x0f;	// Mask off the damage type flags
+-		if (fDamage) m_nLastDamageType = nDamageType;
+-
+-		if( m_bDestructable )
+-		{
+-			m_fHitPoints -= fDamage;
+-			m_fDeathHitPoints -= fDamage;
+-		}
+-	}
+-	// 01/13/98  How much damage was done (percentage of max hit points)
+-	m_fLastDamagePercent += (DFLOAT)fDamage/(DFLOAT)GetMaxHitPoints();
+-	m_fLastDamageAmount += fDamage;
+-	VEC_COPY(m_vLastDamageDirection, vDir);
+-
+-	// Set pSender if sender is a player
+-	CPlayerObj* pSender = DNULL;
+-
+-	if( m_bDestructable )
+-	{
+-		if(hWhoHit)
+-			if(pServerDE->IsKindOf(pServerDE->GetObjectClass(hWhoHit), pServerDE->GetClass("CPlayerObj")))
+-				pSender = (CPlayerObj*)pServerDE->HandleToObject(hWhoHit);
+-
+-		// If it was hurt with a leech weapon, then add the damage done back to playerobj
+-		if(pSender && pServerDE->IsKindOf(pServerDE->GetObjectClass(m_hObject), pServerDE->GetClass("CBaseCharacter")))
+-		{
+-			if(nDamageType == DAMAGE_TYPE_LEECH)
+-			{
+-				if (!pSender->IsDead() && !pSender->IsInSlowDeath())
+-				{
+-					pSender->GetDestructable()->Heal(fDamage / 10.0f);
+-				}
+-			}
+-		}
+-	}
+-
+-//	m_fHitPoints = 1;
+-	if( m_bDestructable && m_fHitPoints <= 0 )
+-	{
+-		m_bDead = DTRUE;
+-		m_fHitPoints = 0;
+-		HandleDestruction();
+-
+-		m_hWhoKilledMeLast = hWhoHit;
+-
+-        // If its a PlayerObj then Increase the Kills 
+-/*		if(pSender && pServerDE->IsKindOf(pServerDE->GetObjectClass(m_hObject), pServerDE->GetClass("CBaseCharacter"))) 
+-		{
+-            // If it was killed with a melee weapon, then add the damage done back to playerobj
+-        	if(nDamageType == DAMAGE_TYPE_LEECH)
+-            {
+-				pSender->GetDestructable()->Heal(fDamage / 5.0f);
+-				pSender->AddMeleeKill();
+-
+-				DFLOAT fIncrease = 0.0f;
+-				int nKills = pSender->GetMeleeKills();
+-        
+-				if (nKills > 0)
+-				{
+-                    // Increase Damage by 5% for every kill
+-                    fIncrease = (DFLOAT)nKills * .05f;
+-                    // Max Increase 200%
+-                    if (fIncrease > 2.0f)   fIncrease = 2.0f;
+-                }            
+-                
+-                // If the Increase is greater than 50% then add back some of the damage to player
+-                if (fIncrease > 0.5f)
+-                {
+-                    // Add back damage to playerobj
+-                    DFLOAT fAddHits = fDamage * (fIncrease/2.0f);
+-                    
+-    				pSender->GetDestructable()->Heal(fAddHits);
+-                    
+-                    // Need to Glow the player Sword...
+-                    // Set Glow on the Melee Weapon
+-                    
+-                }
++// Selected ordinary normal/melee damage branch from Destructable.cpp. AI hit
++// limbs, damage impulses, powerups, triggers and death reactions are deferred.
++DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner,HOBJECT sender,DDWORD message,HMESSAGEREAD read) {
++    if (message==blood2::damage_message) {
++        blood2::Damage damage;
++        if (!BaseClass::GetServerDE()->ReadDamage(read,damage)) return 0;
++        if (!m_bGodMode && !m_bDead) {
++            auto amount=damage.amount*m_fResistance;
++            if (m_fArmorPoints>0) {
++                const auto ratio=m_fArmorPoints<=25 ? .3f : m_fArmorPoints<=50 ? .5f : m_fArmorPoints<=100 ? .7f : m_fArmorPoints<=150 ? .8f : .9f;
++                auto absorb=amount*ratio;
++                m_fArmorPoints-=absorb;
++                if (m_fArmorPoints<0) { absorb+=m_fArmorPoints; m_fArmorPoints=0; }
++                amount-=absorb;
+             }
+-        }*/
+-	}
+-
+-
+-	// If this is supposed to send a damage trigger, send it now..
+-
+-	if( m_bDestructable && m_hstrDamageTriggerTarget && m_hstrDamageTriggerMessage )
+-	{
+-		LPBASECLASS pD = pServerDE->HandleToObject(m_hObject);
+-		SendTriggerMsgToObjects(pD, m_hstrDamageTriggerTarget, m_hstrDamageTriggerMessage);
+-	}
+-
+-	// If player did this damage and has soul stealing binding..
+-	if( m_bDestructable && fOldHitPoints != m_fHitPoints && m_hObject != hWhoHit)
+-	{
+-		// Make sure it's a player
+-		if(pSender) 
+-		{
+-			DFLOAT fHeal;
+-			if (pSender->HasSoulStealingBinding() && (fHeal = (fOldHitPoints - m_fHitPoints) / 10.0f))
+-			{
+-				pSender->GetDestructable()->Heal(fHeal);
+-			}
+-		}
+-	}
+-}
++            amount=std::max(amount,0.0f);
++            m_fHitPoints-=amount; m_fLastDamageAmount+=amount; last_damage=damage;
++            if (m_fHitPoints<=0) { m_bDead=DTRUE; m_fHitPoints=0; }
++        }
++    }
++    return Aggregate::ObjectMessageFn(owner,sender,message,read);
++}
++FireResult CPlayerObj::HandleWeaponFireMessage(const blood2::WeaponFire& request) {
++    if (!m_hClient || !attributes_received || m_damage.IsDead() ||
++        GetServerDE()->GetClientUserData(m_hClient)!=m_hObject) return FireResult::Invalid;
++    const auto result=m_InventoryMgr.FireCurrentWeapon(request);
++    if (result==FireResult::Fired || result==FireResult::DeliveryFailed)
++        UpdateStats();
++    return result;
++}

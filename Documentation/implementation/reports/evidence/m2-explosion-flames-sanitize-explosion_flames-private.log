@@ -1,0 +1,47 @@
+550/550 Testing: explosion_flames.private
+550/550 Test: explosion_flames.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_flame_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_flames.private" start time: Oct 16 22:02 CEST
+Output:
+----------------------------------------------------------
+SubwayA diagnostic Tesla cycle 0: peak 79, eight bursts observed, complete expiry
+SubwayA diagnostic Tesla cycle 1: peak 81, eight bursts observed, complete expiry
+SubwayA diagnostic Tesla cycle 2: peak 80, eight bursts observed, complete expiry
+Authored Cathedral Tesla: lightningexplosion1, 24 initial particles
+Authored Cathedral Tesla: lightningexplosion2, 24 initial particles
+Authored Cathedral Tesla: lightningexplosion3, 24 initial particles
+<end of output>
+Test time =  17.92 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_flames.private" end time: Oct 16 22:03 CEST
+"explosion_flames.private" time elapsed: 00:00:17
+----------------------------------------------------------
+
+End testing: Oct 16 22:03 CEST
+
+explosion_flames =  18.02 sec*proc
+
+explosion_fragments =  46.03 sec*proc
+
+explosion_lights =  17.78 sec*proc
+
+explosion_models =   6.93 sec*proc
+
+explosion_rings =  20.93 sec*proc
+
+explosion_sprites =   5.85 sec*proc
+
+headless = 184.52 sec*proc
+
+object_particles =  41.72 sec*proc
+
+objects =   0.29 sec*proc
+
+private = 182.91 sec*proc
+
+sceneexplosion =  20.87 sec*proc
+
+sprite_view =   6.10 sec*proc
+

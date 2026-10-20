@@ -1,0 +1,14 @@
+541/545 Testing: object_particles.emission
+541/545 Test: object_particles.emission
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_particle_tests" "emission" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object-particles-emission"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"object_particles.emission" start time: Oct 16 21:44 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"object_particles.emission" end time: Oct 16 21:44 CEST
+"object_particles.emission" time elapsed: 00:00:00
+----------------------------------------------------------

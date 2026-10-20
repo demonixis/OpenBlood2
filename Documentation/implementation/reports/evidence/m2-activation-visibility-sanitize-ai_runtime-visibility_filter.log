@@ -1,0 +1,39 @@
+441/644 Testing: ai_runtime.visibility_filter
+441/644 Test: ai_runtime.visibility_filter
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_runtime_tests" "visibility_filter"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_runtime.visibility_filter" start time: Oct 17 04:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.visibility_filter" end time: Oct 17 04:04 CEST
+"ai_runtime.visibility_filter" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 04:04 CEST
+
+ai_runtime =  36.43 sec*proc
+
+ai_script =   3.61 sec*proc
+
+ai_sight =   5.93 sec*proc
+
+gideon_runtime =  96.27 sec*proc
+
+headless = 280.44 sec*proc
+
+objects =   0.35 sec*proc
+
+player =  14.94 sec*proc
+
+private = 278.00 sec*proc
+
+services =  13.30 sec*proc
+
+session_playback =  88.67 sec*proc
+
+world =  20.94 sec*proc
+

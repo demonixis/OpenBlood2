@@ -1,0 +1,13 @@
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -214,9 +214,7 @@
+             return unsupported("Moving this object type");
+         MovementState support;
+         const bool can_step = !(r->state.m_Flags & FLAG_NOSLIDING) && (r->state.m_Flags & FLAG_STAIRSTEP) &&
+-                              (r->state.m_Flags & FLAG_SOLID) && GetMovementState(h, support) && support.standing &&
+-                              support.ground_normal.y >= 0.5f && r->velocity.y <= 0.01f &&
+-                              destination->y <= r->state.m_Pos.y + 0.001f;
++                              (r->state.m_Flags & FLAG_SOLID) && GetMovementState(h, support);
+         moving_ = true;
+         const auto ids = objects_.snapshot();
+         struct Contact

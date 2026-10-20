@@ -1,0 +1,38 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start  25: gpu.lifecycle
+ 1/11 Test  #25: gpu.lifecycle ....................   Passed    3.38 sec
+      Start  73: gpu.weapons
+ 2/11 Test  #73: gpu.weapons ......................   Passed   14.05 sec
+      Start  98: gpu.compound_shell
+ 3/11 Test  #98: gpu.compound_shell ...............   Passed    0.82 sec
+      Start 567: gpu.sprite_private
+ 4/11 Test #567: gpu.sprite_private ...............   Passed    0.52 sec
+      Start 661: gpu.energy
+ 5/11 Test #661: gpu.energy .......................   Passed    0.42 sec
+      Start 662: gpu.energy_private
+ 6/11 Test #662: gpu.energy_private ...............   Passed    0.42 sec
+      Start 697: gpu.gideon_teleport_private
+ 7/11 Test #697: gpu.gideon_teleport_private ......   Passed    0.46 sec
+      Start 745: gpu.mac10
+ 8/11 Test #745: gpu.mac10 ........................   Passed    2.93 sec
+      Start 755: gpu.flare
+ 9/11 Test #755: gpu.flare ........................   Passed    0.42 sec
+      Start 756: gpu.flare_private
+10/11 Test #756: gpu.flare_private ................   Passed    0.47 sec
+      Start 757: gpu.flare_views_private
+11/11 Test #757: gpu.flare_views_private ..........   Passed    1.37 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Label Time Summary:
+containers         =   0.82 sec*proc (1 test)
+energy             =   0.84 sec*proc (2 tests)
+flare              =   2.26 sec*proc (3 tests)
+gideon_teleport    =   0.46 sec*proc (1 test)
+gpu                =  25.25 sec*proc (11 tests)
+mac10              =   2.93 sec*proc (1 test)
+private            =  21.04 sec*proc (8 tests)
+sprite_view        =   0.52 sec*proc (1 test)
+weapons            =  14.05 sec*proc (1 test)
+
+Total Test time (real) =  25.28 sec

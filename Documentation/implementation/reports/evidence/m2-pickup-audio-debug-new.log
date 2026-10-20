@@ -1,0 +1,60 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 180
+    Start 180: pickup_audio.rules
+
+180: Test command: <workspace>/Blood2/build/debug/tests/pickup_audio_tests "rules" "<workspace>/Blood2/build/debug/tests/pickup-audio-fixtures/rules"
+180: Working Directory: <workspace>/Blood2/build/debug/tests
+180: Test timeout computed to be: 30
+test 181
+    Start 181: pickup_audio.failures
+
+181: Test command: <workspace>/Blood2/build/debug/tests/pickup_audio_tests "failures" "<workspace>/Blood2/build/debug/tests/pickup-audio-fixtures/failures"
+181: Working Directory: <workspace>/Blood2/build/debug/tests
+181: Test timeout computed to be: 30
+180: rules:86: touch(g, h) && g.server.pickup_reports.size() == 1 && g.server.audio.voices().size() == 1
+1/4 Test #180: pickup_audio.rules ...............***Failed    0.02 sec
+test 182
+    Start 182: pickup_audio.callbacks
+
+182: Test command: <workspace>/Blood2/build/debug/tests/pickup_audio_tests "callbacks" "<workspace>/Blood2/build/debug/tests/pickup-audio-fixtures/callbacks"
+182: Working Directory: <workspace>/Blood2/build/debug/tests
+182: Test timeout computed to be: 30
+2/4 Test #182: pickup_audio.callbacks ...........   Passed    0.02 sec
+test 183
+    Start 183: pickup_audio.private
+
+183: Test command: <workspace>/Blood2/build/debug/tests/pickup_audio_tests "private" "<external-data-root>"
+183: Working Directory: <workspace>/Blood2/build/debug/tests
+183: Test timeout computed to be: 90
+3/4 Test #181: pickup_audio.failures ............   Passed    0.05 sec
+183: private_data:208: g.objects.finish_frame() && g.server.advance_audio(.02, r.position, {}) && g.server.audio.peak > 0
+4/4 Test #183: pickup_audio.private .............***Failed    0.63 sec
+
+The following tests passed:
+	pickup_audio.callbacks
+	pickup_audio.failures
+
+50% tests passed, 2 tests failed out of 4
+
+Label Time Summary:
+audio       =   0.71 sec*proc (4 tests)
+headless    =   0.71 sec*proc (4 tests)
+pickups     =   0.71 sec*proc (4 tests)
+private     =   0.63 sec*proc (1 test)
+
+Total Test time (real) =   0.68 sec
+
+The following tests FAILED:
+	180 - pickup_audio.rules (Failed)                       audio headless pickups
+	183 - pickup_audio.private (Failed)                     audio headless pickups private
+Errors while running CTest
+Output from these tests are in: <workspace>/Blood2/build/debug/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

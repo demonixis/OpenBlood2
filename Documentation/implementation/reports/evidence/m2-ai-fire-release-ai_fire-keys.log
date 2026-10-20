@@ -1,0 +1,14 @@
+378/384 Testing: ai_fire.keys
+378/384 Test: ai_fire.keys
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_fire_tests" "keys"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_fire.keys" start time: Oct 16 11:37 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_fire.keys" end time: Oct 16 11:37 CEST
+"ai_fire.keys" time elapsed: 00:00:00
+----------------------------------------------------------

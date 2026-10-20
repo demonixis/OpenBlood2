@@ -1,0 +1,54 @@
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -1,3 +1,5 @@
++#include <chrono>
++#include <iostream>
+ #include "game/original/AI_Mgr.h"
+ #include "game/original/ClientParticleStreamSFX.h"
+ #include "game/original/DestructableModel.h"
+@@ -453,6 +455,7 @@
+     }
+     bool GameSession::step(double seconds)
+     {
++        auto measured = [&](const char* label, auto fn) { auto now = std::chrono::steady_clock::now(); bool ok = fn(); double elapsed = std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-now).count(); if(elapsed>2) std::cout << "SLOW " << objects.time() << " " << label << " " << elapsed << '\n'; return ok; };
+         // Shell and original-object updates do not depend on inspector visibility.
+         if (!std::isfinite(seconds) || seconds < 0 || seconds > 60)
+             return objects.fail(ObjectError::InvalidTime, "Invalid session delta");
+@@ -466,9 +469,9 @@
+             client_shell.view.object && client_shell.view.settings.listener
+                 ? client_shell.view.rotation
+                 : rotation_from_euler({client_shell.rotation.pitch, client_shell.rotation.yaw, 0});
+-        bool ok = server.advance_audio(seconds, listener, listener_rotation) && objects.advance(seconds) &&
+-                  server.advance_physics(seconds) && server.advance_projectiles(seconds) &&
+-                  server.advance_models(seconds);
++        bool ok = measured("server.advance_audio(seconds, listener, listener_rotation)", [&] { return server.advance_audio(seconds, listener, listener_rotation); }) && measured("objects.advance(seconds)", [&] { return objects.advance(seconds); }) &&
++                  measured("server.advance_physics(seconds)", [&] { return server.advance_physics(seconds); }) && measured("server.advance_projectiles(seconds)", [&] { return server.advance_projectiles(seconds); }) &&
++                  measured("server.advance_models(seconds)", [&] { return server.advance_models(seconds); });
+         if (local_client)
+         {
+             if (!server.GetClientUserData(local_client))
+@@ -477,10 +480,10 @@
+             {
+                 std::string error;
+                 const bool updated = pump_player_messages(error) &&
+-                                     client_shell.UpdateMovement(server_shell, seconds, error) &&
++                                     measured("client_shell.UpdateMovement(server_shell, seconds, error)", [&] { return client_shell.UpdateMovement(server_shell, seconds, error); }) &&
+                                      client_shell.Update() && client_shell.UpdateUse(server_shell) &&
+                                      client_shell.SyncWeapons(models, resources, server_shell, error) &&
+-                                     client_shell.UpdateWeapons(server_shell, seconds, error) &&
++                                     measured("client_shell.UpdateWeapons(server_shell, seconds, error)", [&] { return client_shell.UpdateWeapons(server_shell, seconds, error); }) &&
+                                      (!server_shell.Player(local_client) ||
+                                       server_shell.Player(local_client)->m_InventoryMgr.UpdateHandModels());
+                 if (!server.GetClientUserData(local_client))
+@@ -496,9 +499,9 @@
+             }
+         }
+         if (seconds > 0)
+-            ok = server.damage_containers() && ok;
++            ok = measured("server.damage_containers()", [&] { return server.damage_containers(); }) && ok;
+         ok = objects.finish_frame() && ok;
+-        ok = objects.refresh_attachments() && ok;
++        ok = measured("objects.refresh_attachments()", [&] { return objects.refresh_attachments(); }) && ok;
+         ok = server.advance_lights() && ok;
+         auto* flash_owner = server_shell.Player(local_client);
+         const auto* flash_item = flash_owner ? flash_owner->m_InventoryMgr.flashlight.get() : nullptr;

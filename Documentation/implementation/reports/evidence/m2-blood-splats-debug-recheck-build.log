@@ -1,0 +1,31 @@
+[0/2] Re-checking globbed directories...
+[1/196] Scanning <workspace>/Blood2/src/game/original/BloodSplatFX.cpp for CXX dependencies
+[2/196] Scanning <workspace>/Blood2/tests/world_tests.cpp for CXX dependencies
+[3/196] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[4/32] Scanning <workspace>/Blood2/tests/player_controls_tests.cpp for CXX dependencies
+[5/32] Scanning <workspace>/Blood2/tests/level_change_gpu_tests.cpp for CXX dependencies
+[6/32] Scanning <workspace>/Blood2/src/app/model_scene.cpp for CXX dependencies
+[7/32] Scanning <workspace>/Blood2/tests/death_effect_gpu_tests.cpp for CXX dependencies
+[8/32] Scanning <workspace>/Blood2/src/app/model_scene.cpp for CXX dependencies
+[9/32] Scanning <workspace>/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[10/32] Scanning <workspace>/Blood2/tests/blood_splat_tests.cpp for CXX dependencies
+[11/32] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[12/32] Generating CXX dyndep file tests/CMakeFiles/player_controls_tests.dir/CXX.dd
+[13/32] Generating CXX dyndep file tests/CMakeFiles/level_change_gpu_tests.dir/CXX.dd
+[14/32] Generating CXX dyndep file tests/CMakeFiles/death_effect_gpu_tests.dir/CXX.dd
+[15/32] Generating CXX dyndep file tests/CMakeFiles/blood_splat_tests.dir/CXX.dd
+[16/31] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/BloodSplatFX.cpp.o
+[17/31] Linking CXX static library libblood2_game.a
+[18/31] Building CXX object tests/CMakeFiles/player_controls_tests.dir/player_controls_tests.cpp.o
+[19/31] Building CXX object tests/CMakeFiles/level_change_gpu_tests.dir/level_change_gpu_tests.cpp.o
+[20/31] Building CXX object tests/CMakeFiles/world_tests.dir/world_tests.cpp.o
+[21/31] Building CXX object tests/CMakeFiles/level_change_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[22/31] Building CXX object tests/CMakeFiles/death_effect_gpu_tests.dir/__/src/app/sprite_scene.cpp.o
+[23/31] Building CXX object tests/CMakeFiles/death_effect_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[24/31] Building CXX object tests/CMakeFiles/death_effect_gpu_tests.dir/death_effect_gpu_tests.cpp.o
+[25/31] Linking CXX executable tests/world_tests
+[26/31] Linking CXX executable tests/player_controls_tests
+[27/31] Linking CXX executable tests/level_change_gpu_tests
+[28/31] Linking CXX executable tests/death_effect_gpu_tests
+[29/31] Building CXX object tests/CMakeFiles/blood_splat_tests.dir/blood_splat_tests.cpp.o
+[30/31] Linking CXX executable tests/blood_splat_tests

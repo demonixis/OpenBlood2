@@ -1,0 +1,14 @@
+492/497 Testing: player_state.roundtrip
+492/497 Test: player_state.roundtrip
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_state_tests" "roundtrip" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-state-fixtures/roundtrip"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_state.roundtrip" start time: Oct 16 18:33 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.roundtrip" end time: Oct 16 18:33 CEST
+"player_state.roundtrip" time elapsed: 00:00:00
+----------------------------------------------------------

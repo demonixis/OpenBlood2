@@ -1,0 +1,65 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  69: weapons.private
+      Start 603: weapon_audio.private
+      Start  66: weapons.animation
+ 1/22 Test  #66: weapons.animation ................   Passed    0.05 sec
+      Start 601: weapon_audio.callbacks
+ 2/22 Test #601: weapon_audio.callbacks ...........   Passed    0.02 sec
+      Start 598: weapon_audio.voices
+ 3/22 Test #598: weapon_audio.voices ..............   Passed    0.01 sec
+      Start 599: weapon_audio.hearing
+ 4/22 Test #599: weapon_audio.hearing .............   Passed    0.01 sec
+      Start 602: weapon_audio.lifetime
+ 5/22 Test #602: weapon_audio.lifetime ............   Passed    0.01 sec
+      Start  67: weapons.lifetime
+ 6/22 Test  #67: weapons.lifetime .................   Passed    0.01 sec
+      Start 600: weapon_audio.failures
+ 7/22 Test #600: weapon_audio.failures ............   Passed    0.01 sec
+      Start  61: weapons.inventory
+ 8/22 Test  #61: weapons.inventory ................   Passed    0.01 sec
+      Start  68: weapons.rollback
+ 9/22 Test  #68: weapons.rollback .................   Passed    0.01 sec
+      Start  64: weapons.melee
+10/22 Test  #64: weapons.melee ....................   Passed    0.01 sec
+      Start  62: weapons.segments
+11/22 Test  #62: weapons.segments .................   Passed    0.01 sec
+      Start  63: weapons.firing
+12/22 Test  #63: weapons.firing ...................   Passed    0.01 sec
+      Start  65: weapons.damage
+13/22 Test  #65: weapons.damage ...................   Passed    0.01 sec
+      Start 604: weapon_impacts.selection
+14/22 Test #604: weapon_impacts.selection .........   Passed    0.00 sec
+      Start 605: weapon_impacts.world
+15/22 Test #605: weapon_impacts.world .............   Passed    0.01 sec
+      Start 606: weapon_impacts.brushes
+16/22 Test #606: weapon_impacts.brushes ...........***Failed    0.03 sec
+brushes:192: door&&target
+
+      Start 607: weapon_impacts.volumes
+17/22 Test #607: weapon_impacts.volumes ...........***Failed    0.01 sec
+volumes:204: water&&air&&target
+
+      Start 608: weapon_impacts.hearing
+18/22 Test #608: weapon_impacts.hearing ...........   Passed    0.03 sec
+      Start 609: weapon_impacts.limits
+19/22 Test #609: weapon_impacts.limits ............   Passed    0.01 sec
+      Start 610: weapon_impacts.private
+20/22 Test #603: weapon_audio.private .............   Passed    1.22 sec
+21/22 Test #610: weapon_impacts.private ...........   Passed    9.42 sec
+22/22 Test  #69: weapons.private ..................   Passed   26.28 sec
+
+91% tests passed, 2 tests failed out of 22
+
+Label Time Summary:
+headless          =  37.16 sec*proc (22 tests)
+private           =  36.92 sec*proc (3 tests)
+weapon_audio      =   1.26 sec*proc (6 tests)
+weapon_impacts    =   9.52 sec*proc (7 tests)
+weapons           =  26.38 sec*proc (9 tests)
+
+Total Test time (real) =  26.29 sec
+
+The following tests FAILED:
+	606 - weapon_impacts.brushes (Failed)                   headless weapon_impacts
+	607 - weapon_impacts.volumes (Failed)                   headless weapon_impacts
+Errors while running CTest

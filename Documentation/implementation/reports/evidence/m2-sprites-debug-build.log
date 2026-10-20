@@ -1,0 +1,5 @@
+[0/2] Re-checking globbed directories...
+[1/27] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_sprites.cpp for CXX dependencies
+[2/27] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[3/5] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_sprites.cpp.o
+[4/5] Linking CXX executable blood2

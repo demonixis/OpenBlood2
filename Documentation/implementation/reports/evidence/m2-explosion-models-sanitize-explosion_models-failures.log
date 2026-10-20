@@ -1,0 +1,14 @@
+521/523 Testing: explosion_models.failures
+521/523 Test: explosion_models.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_model_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-models-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_models.failures" start time: Oct 16 20:39 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_models.failures" end time: Oct 16 20:39 CEST
+"explosion_models.failures" time elapsed: 00:00:00
+----------------------------------------------------------

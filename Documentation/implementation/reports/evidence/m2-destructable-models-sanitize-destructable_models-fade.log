@@ -1,0 +1,14 @@
+654/659 Testing: destructable_models.fade
+654/659 Test: destructable_models.fade
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable_model_tests" "fade" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable-model-fade"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"destructable_models.fade" start time: Oct 17 05:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_models.fade" end time: Oct 17 05:15 CEST
+"destructable_models.fade" time elapsed: 00:00:00
+----------------------------------------------------------

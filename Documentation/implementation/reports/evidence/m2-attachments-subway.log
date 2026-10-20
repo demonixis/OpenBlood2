@@ -1,0 +1,14 @@
+323/323 Testing: attachments.subway
+323/323 Test: attachments.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"attachments.subway" start time: Oct 16 07:33 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.65 sec
+----------------------------------------------------------
+Test Passed.
+"attachments.subway" end time: Oct 16 07:33 CEST
+"attachments.subway" time elapsed: 00:00:00
+----------------------------------------------------------

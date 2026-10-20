@@ -1,0 +1,282 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "c8d122b5fd8d9bd451ff0d0671c0d44d26c4cc4c",
+  "status": "M2 incomplete; selected band values drive routed diagnostic PCM, no MUSIC transport",
+  "frozen_sources": {
+    "src/app/inspector_world_sounds.cpp": "1f5f5fdaafa196e6a017af378c0b78a2ccac3bdbc4feb6012fdf058eef757766",
+    "src/app/world_sound_smoke.cpp": "92e45a865ee5b3084f963f1d1cc23d0fe96c50f470c4901877c02cea7ac8acff",
+    "src/engine/dls_sampler.cpp": "cc5d58929da3b34f774b76c436f5d2d6721bbfd0d0880641d622b82c5cd563d7",
+    "src/engine/dls_sampler.h": "f3cb462bcd3248988851f1f08bb472febe40e24c569a78b5e31717d7d993b18d",
+    "src/game/music_catalog.cpp": "a7084fba6342b90ea87c1fca41ac714478e44b2045da6267c5690f463e0f3de1",
+    "src/game/music_catalog.h": "bdaf6529b56a59d7655daddeba6a4db8537efa9c59cd1f89b58376e59cec341e",
+    "tests/CMakeLists.txt": "4631cf21f77d768435dd80effac680697467cecabdeedd9c9f693fd6b8b3413d",
+    "tests/dls_sampler_tests.cpp": "e14aa494da3c6c0ec27ffffc12325e3cbd1f3cd7dcc14ec95a9d9a78ef45fcc5",
+    "tests/music_asset_tests.cpp": "31ed164e4572ae0776a8e6d4513f6e5a8d34e340d8d75c29048ad2e7d028eddb"
+  },
+  "results": {
+    "debug-tests": {
+      "passed": 110,
+      "wall_seconds": 16.52
+    },
+    "release-tests": {
+      "passed": 110,
+      "wall_seconds": 1.61
+    },
+    "sanitize-tests": {
+      "passed": 110,
+      "wall_seconds": 65.67
+    },
+    "debug-gpu": {
+      "passed": 2,
+      "wall_seconds": 11.27
+    },
+    "release-gpu": {
+      "passed": 2,
+      "wall_seconds": 3.77
+    }
+  },
+  "probe": {
+    "binary": "MSynth25.dll",
+    "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+    "unicorn": "2.1.4",
+    "packed_locale_cases": 512,
+    "routing_cases": 66,
+    "fnv64": 6386313400906083943,
+    "default_channel_map": [
+      9,
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "default_percussion_midi_channel": 9,
+    "decisions_sha256": "1e96e617d132022020f4aba966009d9bd6213ef8bc13dae8886d9c7b35d29f9a",
+    "scope": "Isolated original locale conversion and resident instrument/key lookup with percussion fallback; no synthesis, residency loader or OS GM collection"
+  },
+  "commands": [
+    "python /tmp/b2-music-routing-validation.py {debug,release,sanitize} (three independent builds, -j1 each)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/{debug,release} -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit /tmp/b2-music-routing-{debug,release}-gpu.xml",
+    "/tmp/b2-legacy-pan-tools/bin/python Documentation/Implementation/evidence/m2-music-routing-probe.py EXTERNAL_MSYNTH25_DLL",
+    "clang++ -std=c++20 -fsanitize=address,undefined -fno-omit-frame-pointer -Isrc /tmp/b2-music-routing-alias-probe.cpp build/sanitize/libengine.a -o /tmp/b2-music-routing-alias-probe",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 /tmp/b2-music-routing-alias-probe (before: exit1/use-after-free; after: exit0)",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror (eight changed C++ files)",
+    "python /tmp/b2-npc-integrity.py; python /tmp/b2-npc-links.py; git diff --check (both repositories)"
+  ],
+  "private_observations": {
+    "worlds": [
+      "01_SubwayA",
+      "02_CityHub"
+    ],
+    "selected_sections_per_world": 34,
+    "routed_notes_per_world": 510,
+    "missing_percussion_routes_per_world": 34,
+    "hidden_pcm_prefix_equivalence": true,
+    "bank_aliases_expire_on_unload": true
+  },
+  "lifetime_regression": {
+    "before_exit": 1,
+    "before": "ASan heap-use-after-free on aliased channel after voice-vector growth",
+    "after_exit": 0,
+    "permanent_test": "dls_sampler.routing; 16 repeated additions using existing voice channel"
+  },
+  "limitations": [
+    "Original executable probe covers conversion/reset/lookup, not full synthesis or download manager",
+    "Decoded configured bank is treated as resident for explicit notes; original MUSIC still unsupported",
+    "Reviewed Debug NVIDIA screenshot shows sound summary and two completed notes, not the nested routing controls",
+    "Dummy SDL audio verifies PCM/submission, no listening comparison",
+    "No native Metal/Windows/mobile execution",
+    "Five pre-existing deprecated enum/float warnings appear in each initial full build; changed code and final incremental builds have no warnings",
+    "Initial private expectation for channel15 was corrected from missing to legacy program1 after inspecting actual band bytes"
+  ],
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "readme_preserved_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "files": [
+    {
+      "file": "m2-music-routing-alias-after.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-music-routing-alias-before.log",
+      "sha256": "3d7b2b51d4fc0ba09d4d5115f6eb5f29a71eb4f4ad5f5a1804f77bb04d39bc12"
+    },
+    {
+      "file": "m2-music-routing-alias-probe.cpp",
+      "sha256": "575bed2bc3bed22fb3ee5fcd014314509d7a1117e3fdb86f89b1225e8fbfa323"
+    },
+    {
+      "file": "m2-music-routing-debug-build-final.log",
+      "sha256": "9c1cdd9c7a48873293ec5ea39c9630c0a0b9922b279140a8dfbd142f7a8d11b2"
+    },
+    {
+      "file": "m2-music-routing-debug-gpu.log",
+      "sha256": "f59ac021a9854bda14ded361f95a50ae00c50849766603a382b5582416dde53b"
+    },
+    {
+      "file": "m2-music-routing-debug-gpu.xml",
+      "sha256": "c1f5d4c00fab692facedb78aa3b97f260eeac24666d8c6169d549ae171b58ef0"
+    },
+    {
+      "file": "m2-music-routing-debug-tests.log",
+      "sha256": "76580d3bd9c18d687a493585f5e65735708e09984c9e024a13255c7c61a7538c"
+    },
+    {
+      "file": "m2-music-routing-debug-tests.xml",
+      "sha256": "77b4838cc8aa3293fd80aa1ca312997a792b0a62079c0d5706084b41abd4d46a"
+    },
+    {
+      "file": "m2-music-routing-focus-build.log",
+      "sha256": "3ba8dbc5e4222912a23936f8e6f33b75c28db552aefac7f7b8339e365869f8eb"
+    },
+    {
+      "file": "m2-music-routing-focus-fix-build.log",
+      "sha256": "a486a0435ce795a7434f2731ae44a9b53a8133421e2ba0f8324c052e6d5c8365"
+    },
+    {
+      "file": "m2-music-routing-focus-fix-tests.log",
+      "sha256": "f08cb23da10b6fed6ee915e03b9b7646f719bf327e301d125c9bebb0cb54f6d6"
+    },
+    {
+      "file": "m2-music-routing-focus-tests.log",
+      "sha256": "298b320a3f91276e4f6a3e6a68ec8ae710ea60d26b873e458aa152f7475c1c5c"
+    },
+    {
+      "file": "m2-music-routing-frozen.json",
+      "sha256": "067f9052b4745718743d57cfe74d99a539b565ced0e1dda456e0d7d8501ef158"
+    },
+    {
+      "file": "m2-music-routing-initial-debug-build-final.log",
+      "sha256": "53001d1ecd39a5adbd850d58358060306fa3d825f456deec0f8806b6a21d3fdf"
+    },
+    {
+      "file": "m2-music-routing-initial-debug-tests.log",
+      "sha256": "831084b3caa0f65e2aa7604b221a0602e1eb466cadc425e58b06d2d8e046e872"
+    },
+    {
+      "file": "m2-music-routing-initial-debug-tests.xml",
+      "sha256": "02d5ac4dce8315141d212bdf8cec9572fe68102ac8397b0dd753ee4ba69f28f6"
+    },
+    {
+      "file": "m2-music-routing-initial-frozen.json",
+      "sha256": "86183bae0011b928ca5b56c38089c36ce4ff5ca9b59906dddaaf6ca288ec3487"
+    },
+    {
+      "file": "m2-music-routing-initial-release-build-final.log",
+      "sha256": "b3c96fdc7967cd22f0da1cfd1c840975b0cbe0fe16b82f31d7b971be2c56ac86"
+    },
+    {
+      "file": "m2-music-routing-initial-release-tests.log",
+      "sha256": "ec3334e233576e90c84cc26d643ecf9dfd4dc0e0fd07d38695e21c5ca67acfbf"
+    },
+    {
+      "file": "m2-music-routing-initial-release-tests.xml",
+      "sha256": "9ee35e5db4c2e68d7769d72ce2bd0f5cd3e8b5b8d96bb10cd3567e229f224cbc"
+    },
+    {
+      "file": "m2-music-routing-initial-sanitize-build-final.log",
+      "sha256": "5ec9a5f1a59f602d74950bbb036619f231b604642f2d43ede7e4ea1255eb06bf"
+    },
+    {
+      "file": "m2-music-routing-initial-sanitize-tests.log",
+      "sha256": "b89d8d8913112f0aa61d3f7eb8f2efeaa6e286f6f18ae1bebba2195ec3639d11"
+    },
+    {
+      "file": "m2-music-routing-initial-sanitize-tests.xml",
+      "sha256": "33c6570fa452d4a6b8f123c9e85335bb1a44d0a55b588cc4a3bf729e14c48ff8"
+    },
+    {
+      "file": "m2-music-routing-probe.json",
+      "sha256": "32450c6e341d84063eed7c91c694b58a2442c23a2e1d6f558f614480ae598a6e"
+    },
+    {
+      "file": "m2-music-routing-release-build-final.log",
+      "sha256": "9c1cdd9c7a48873293ec5ea39c9630c0a0b9922b279140a8dfbd142f7a8d11b2"
+    },
+    {
+      "file": "m2-music-routing-release-gpu.log",
+      "sha256": "0bd09cfbc938d32218cbbf2e83314582b8379af684e6c307d851e4d16d94146f"
+    },
+    {
+      "file": "m2-music-routing-release-gpu.xml",
+      "sha256": "b88c3cce5d7c88df29d4dc3b0c957f7fcf8a81e8ccc55bd849e39cab020f7718"
+    },
+    {
+      "file": "m2-music-routing-release-tests.log",
+      "sha256": "6bd8d482a4dd057f9ac3fcd048c9bee205b49aca30cb310e855774748268bd70"
+    },
+    {
+      "file": "m2-music-routing-release-tests.xml",
+      "sha256": "3b1af6b53ca2134b3f0303145402bd08b1f3cfd9f10bb037cea85e62fcf8398c"
+    },
+    {
+      "file": "m2-music-routing-sanitize-build-final.log",
+      "sha256": "89cfaa368f5487b0ec0df8f8025c58be906bf1fcc6baa727364a2f95249e1d45"
+    },
+    {
+      "file": "m2-music-routing-sanitize-tests.log",
+      "sha256": "60212546b6e1cb9a70d376ff88520dc1a2551c5d185a5c4f72dc609ed393dd8a"
+    },
+    {
+      "file": "m2-music-routing-sanitize-tests.xml",
+      "sha256": "8e3a7cb452a4b6f5a00578c3be154a56686c0c924bbada52d90ece657ffa469e"
+    },
+    {
+      "file": "m2-music-routing-validation.py",
+      "sha256": "233e808463d473a65a961dcb1d076745bc91a42a9176826808f9cf7c9a579298"
+    },
+    {
+      "file": "m2-music-routing-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-music-routing-links.log",
+      "sha256": "6074f62d9aaca413097b639d807a935db427ed216ba1b261805fd8753726cadb"
+    }
+  ],
+  "implementation_commit": "7431f3a33f094059a59f8f93fcda11ed9a5ab2c3"
+}

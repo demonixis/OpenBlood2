@@ -1,0 +1,242 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+        Start 893: music_assets.private
+        Start  49: world.level_change_private
+  1/113 Test #893: music_assets.private ..............   Passed   13.30 sec
+        Start 732: audio_stream.city
+  2/113 Test #732: audio_stream.city .................   Passed    8.39 sec
+        Start 271: sound.catalog
+  3/113 Test  #49: world.level_change_private ........   Passed   27.01 sec
+        Start 896: dls_bank.private
+  4/113 Test #896: dls_bank.private ..................   Passed    6.93 sec
+        Start  50: world.destination_trial_private
+  5/113 Test #271: sound.catalog .....................   Passed   15.45 sec
+        Start  51: world.destination_private
+  6/113 Test  #51: world.destination_private .........   Passed   13.77 sec
+        Start  12: objects.message_churn
+  7/113 Test  #12: objects.message_churn .............   Passed    6.68 sec
+        Start 903: dls_sampler.private
+  8/113 Test #903: dls_sampler.private ...............   Passed    2.33 sec
+        Start 272: sound.subway
+  9/113 Test  #50: world.destination_trial_private ...   Passed   27.03 sec
+        Start 943: ima_cursor.private
+ 10/113 Test #943: ima_cursor.private ................   Passed    2.21 sec
+        Start 920: ima_timeline.private
+ 11/113 Test #920: ima_timeline.private ..............   Passed    1.33 sec
+        Start 939: ima_selection.private
+ 12/113 Test #272: sound.subway ......................   Passed    5.22 sec
+        Start  52: world.private
+ 13/113 Test #939: ima_selection.private .............   Passed    1.35 sec
+        Start  32: world.surface_effects
+ 14/113 Test  #32: world.surface_effects .............   Passed    0.96 sec
+        Start 911: ima_band.selection_generated
+ 15/113 Test #911: ima_band.selection_generated ......   Passed    0.37 sec
+        Start 905: ima_style.malformed
+ 16/113 Test #905: ima_style.malformed ...............   Passed    0.37 sec
+        Start 927: ima_note_event.private
+ 17/113 Test #927: ima_note_event.private ............   Passed    0.38 sec
+        Start 924: ima_variation.private
+ 18/113 Test #924: ima_variation.private .............   Passed    0.36 sec
+        Start 906: ima_style.private
+ 19/113 Test #906: ima_style.private .................   Passed    0.36 sec
+        Start 931: ima_note_pitch.private
+ 20/113 Test #931: ima_note_pitch.private ............   Passed    0.32 sec
+        Start 912: ima_band.private
+ 21/113 Test #912: ima_band.private ..................   Passed    0.35 sec
+        Start 899: dls_sampler.lifetime
+ 22/113 Test #899: dls_sampler.lifetime ..............   Passed    0.27 sec
+        Start 730: audio_stream.seams
+ 23/113 Test #730: audio_stream.seams ................   Passed    0.33 sec
+        Start 937: ima_selection.generated
+ 24/113 Test #937: ima_selection.generated ...........   Passed    0.23 sec
+        Start  13: objects.message_limit
+ 25/113 Test  #52: world.private .....................   Passed    5.05 sec
+        Start 935: ima_harmony.private
+ 26/113 Test #935: ima_harmony.private ...............   Passed    0.17 sec
+        Start 942: ima_cursor.generated
+ 27/113 Test  #13: objects.message_limit .............   Passed    0.40 sec
+        Start 892: music_assets.catalog
+ 28/113 Test #942: ima_cursor.generated ..............   Passed    0.28 sec
+        Start 916: ima_section.private
+ 29/113 Test #916: ima_section.private ...............   Passed    0.09 sec
+        Start  31: world.level_change
+ 30/113 Test #892: music_assets.catalog ..............   Passed    0.30 sec
+        Start 934: ima_harmony.generated
+ 31/113 Test #934: ima_harmony.generated .............   Passed    0.07 sec
+        Start 729: audio_stream.mixer
+ 32/113 Test  #31: world.level_change ................   Passed    0.28 sec
+        Start 890: music_assets.reader
+ 33/113 Test #729: audio_stream.mixer ................   Passed    0.08 sec
+        Start 727: audio_stream.pcm
+ 34/113 Test #890: music_assets.reader ...............   Passed    0.07 sec
+        Start 908: ima_band.malformed
+ 35/113 Test #727: audio_stream.pcm ..................   Passed    0.06 sec
+        Start 898: dls_sampler.envelopes
+ 36/113 Test #908: ima_band.malformed ................   Passed    0.04 sec
+        Start  33: world.destination_trials
+ 37/113 Test #898: dls_sampler.envelopes .............   Passed    0.04 sec
+        Start  45: world.mutations
+ 38/113 Test  #33: world.destination_trials ..........   Passed    0.18 sec
+        Start 914: ima_section.malformed
+ 39/113 Test #914: ima_section.malformed .............   Passed    0.03 sec
+        Start 731: audio_stream.truncation
+ 40/113 Test  #45: world.mutations ...................   Passed    0.22 sec
+        Start 895: dls_bank.malformed
+ 41/113 Test #731: audio_stream.truncation ...........   Passed    0.03 sec
+        Start 941: ima_cursor.bounds_lifetime
+ 42/113 Test #941: ima_cursor.bounds_lifetime ........   Passed    0.02 sec
+        Start 900: dls_sampler.legacy_pan
+ 43/113 Test #895: dls_bank.malformed ................   Passed    0.03 sec
+        Start 728: audio_stream.malformed
+ 44/113 Test #900: dls_sampler.legacy_pan ............   Passed    0.02 sec
+        Start 901: dls_sampler.routing
+ 45/113 Test #728: audio_stream.malformed ............   Passed    0.02 sec
+        Start 266: sound.loops
+ 46/113 Test #901: dls_sampler.routing ...............   Passed    0.02 sec
+        Start 902: dls_sampler.controllers
+ 47/113 Test #902: dls_sampler.controllers ...........   Passed    0.02 sec
+        Start 894: dls_bank.decode
+ 48/113 Test #894: dls_bank.decode ...................   Passed    0.02 sec
+        Start 897: dls_sampler.pcm
+ 49/113 Test #266: sound.loops .......................   Passed    0.04 sec
+        Start 891: music_assets.plan
+ 50/113 Test #897: dls_sampler.pcm ...................   Passed    0.02 sec
+        Start 270: sound.metadata
+ 51/113 Test #891: music_assets.plan .................   Passed    0.02 sec
+        Start 932: ima_harmony.reader
+ 52/113 Test #932: ima_harmony.reader ................   Passed    0.01 sec
+        Start 269: sound.failures
+ 53/113 Test #270: sound.metadata ....................   Passed    0.04 sec
+        Start 265: sound.defaults
+ 54/113 Test #269: sound.failures ....................   Passed    0.04 sec
+        Start 268: sound.lifetime
+ 55/113 Test #265: sound.defaults ....................   Passed    0.04 sec
+        Start 267: sound.resampling
+ 56/113 Test #268: sound.lifetime ....................   Passed    0.04 sec
+        Start  36: world.destination_lifetime
+ 57/113 Test #267: sound.resampling ..................   Passed    0.04 sec
+        Start 904: ima_style.reader
+ 58/113 Test #904: ima_style.reader ..................   Passed    0.01 sec
+        Start 938: ima_selection.bounds
+ 59/113 Test #938: ima_selection.bounds ..............   Passed    0.01 sec
+        Start 910: ima_band.selection
+ 60/113 Test #910: ima_band.selection ................   Passed    0.01 sec
+        Start 921: ima_variation.reader
+ 61/113 Test #921: ima_variation.reader ..............   Passed    0.01 sec
+        Start 929: ima_note_pitch.generated
+ 62/113 Test  #36: world.destination_lifetime ........   Passed    0.07 sec
+        Start 940: ima_cursor.behavior
+ 63/113 Test #929: ima_note_pitch.generated ..........   Passed    0.01 sec
+        Start 913: ima_section.reader
+ 64/113 Test #940: ima_cursor.behavior ...............   Passed    0.01 sec
+        Start  38: world.sound_entries
+ 65/113 Test #913: ima_section.reader ................   Passed    0.01 sec
+        Start 907: ima_band.reader
+ 66/113 Test #907: ima_band.reader ...................   Passed    0.01 sec
+        Start 933: ima_harmony.behavior
+ 67/113 Test #933: ima_harmony.behavior ..............   Passed    0.01 sec
+        Start  37: world.sprite_entries
+ 68/113 Test  #38: world.sound_entries ...............   Passed    0.04 sec
+        Start 936: ima_selection.behavior
+ 69/113 Test #936: ima_selection.behavior ............   Passed    0.01 sec
+        Start 917: ima_timeline.timing
+ 70/113 Test #917: ima_timeline.timing ...............   Passed    0.01 sec
+        Start 915: ima_section.timing
+ 71/113 Test  #37: world.sprite_entries ..............   Passed    0.04 sec
+        Start 919: ima_timeline.bounds
+ 72/113 Test #915: ima_section.timing ................   Passed    0.01 sec
+        Start  44: world.world_rejection
+ 73/113 Test #919: ima_timeline.bounds ...............   Passed    0.01 sec
+        Start 925: ima_note_event.behavior
+ 74/113 Test #925: ima_note_event.behavior ...........   Passed    0.01 sec
+        Start 926: ima_note_event.bounds
+ 75/113 Test #926: ima_note_event.bounds .............   Passed    0.01 sec
+        Start 923: ima_variation.bounds
+ 76/113 Test #923: ima_variation.bounds ..............   Passed    0.01 sec
+        Start 918: ima_timeline.mutes
+ 77/113 Test #918: ima_timeline.mutes ................   Passed    0.01 sec
+        Start 928: ima_note_pitch.behavior
+ 78/113 Test #928: ima_note_pitch.behavior ...........   Passed    0.01 sec
+        Start 909: ima_band.setup
+ 79/113 Test #909: ima_band.setup ....................   Passed    0.01 sec
+        Start 922: ima_variation.selection
+ 80/113 Test  #44: world.world_rejection .............   Passed    0.06 sec
+        Start 930: ima_note_pitch.bounds
+ 81/113 Test #922: ima_variation.selection ...........   Passed    0.01 sec
+        Start  35: world.destination_schema
+ 82/113 Test #930: ima_note_pitch.bounds .............   Passed    0.01 sec
+        Start  34: world.destination_messages
+ 83/113 Test  #34: world.destination_messages ........   Passed    0.02 sec
+        Start  14: objects.unsupported_teardown
+ 84/113 Test  #35: world.destination_schema ..........   Passed    0.02 sec
+        Start  46: world.session_lifecycle
+ 85/113 Test  #46: world.session_lifecycle ...........   Passed    0.02 sec
+        Start   2: objects.builtin_model
+ 86/113 Test   #2: objects.builtin_model .............   Passed    0.02 sec
+        Start  11: objects.messages_strings
+ 87/113 Test  #14: objects.unsupported_teardown ......   Passed    0.05 sec
+        Start  48: world.original_trigger
+ 88/113 Test  #48: world.original_trigger ............   Passed    0.02 sec
+        Start  42: world.world_properties
+ 89/113 Test  #11: objects.messages_strings ..........   Passed    0.04 sec
+        Start  43: world.world_geometry
+ 90/113 Test  #42: world.world_properties ............   Passed    0.02 sec
+        Start  41: world.resource_mount
+ 91/113 Test  #43: world.world_geometry ..............   Passed    0.02 sec
+        Start  22: config.invalid_config
+ 92/113 Test  #41: world.resource_mount ..............   Passed    0.02 sec
+        Start  40: world.rez_rejection
+ 93/113 Test  #22: config.invalid_config .............   Passed    0.01 sec
+        Start  15: objects.creation_failures
+ 94/113 Test  #40: world.rez_rejection ...............   Passed    0.02 sec
+        Start  39: world.rez_structure
+ 95/113 Test  #39: world.rez_structure ...............   Passed    0.02 sec
+        Start  47: world.session_messages
+ 96/113 Test  #15: objects.creation_failures .........   Passed    0.03 sec
+        Start  20: config.precedence
+ 97/113 Test  #20: config.precedence .................   Passed    0.01 sec
+        Start  21: config.relative_paths
+ 98/113 Test  #47: world.session_messages ............   Passed    0.02 sec
+        Start  23: config.content_validation
+ 99/113 Test  #21: config.relative_paths .............   Passed    0.01 sec
+        Start  24: config.case_lookup
+100/113 Test  #23: config.content_validation .........   Passed    0.01 sec
+        Start  19: config.arguments
+101/113 Test  #24: config.case_lookup ................   Passed    0.01 sec
+        Start   5: objects.reasons_properties
+102/113 Test  #19: config.arguments ..................   Passed    0.01 sec
+        Start   3: objects.original_objects
+103/113 Test   #5: objects.reasons_properties ........   Passed    0.02 sec
+104/113 Test   #3: objects.original_objects ..........   Passed    0.02 sec
+        Start  10: objects.links_lists
+        Start   7: objects.deferred_removal
+105/113 Test  #10: objects.links_lists ...............   Passed    0.02 sec
+106/113 Test   #7: objects.deferred_removal ..........   Passed    0.02 sec
+        Start   9: objects.handles_selection
+        Start   4: objects.nested_creation
+107/113 Test   #9: objects.handles_selection .........   Passed    0.02 sec
+        Start   8: objects.aggregate_dispatch
+108/113 Test   #4: objects.nested_creation ...........   Passed    0.02 sec
+        Start   6: objects.scheduling
+109/113 Test   #8: objects.aggregate_dispatch ........   Passed    0.02 sec
+        Start 944: ima_cursor.notes_generated
+110/113 Test   #6: objects.scheduling ................   Passed    0.02 sec
+        Start 945: ima_cursor.notes_behavior
+111/113 Test #945: ima_cursor.notes_behavior .........   Passed    0.01 sec
+        Start 946: ima_cursor.notes_private
+112/113 Test #944: ima_cursor.notes_generated ........   Passed    0.39 sec
+113/113 Test #946: ima_cursor.notes_private ..........   Passed    3.16 sec
+
+100% tests passed, 0 tests failed out of 113
+
+Label Time Summary:
+audio           =   2.72 sec*proc (7 tests)
+audio_stream    =   8.92 sec*proc (6 tests)
+config          =   0.06 sec*proc (6 tests)
+headless        = 147.64 sec*proc (113 tests)
+music_assets    =  35.50 sec*proc (57 tests)
+objects         =   7.37 sec*proc (14 tests)
+private         = 134.58 sec*proc (21 tests)
+sound           =  20.89 sec*proc (8 tests)
+world           =  74.90 sec*proc (22 tests)
+
+Total Test time (real) =  75.24 sec

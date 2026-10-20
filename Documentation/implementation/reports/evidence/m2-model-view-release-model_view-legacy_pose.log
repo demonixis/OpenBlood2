@@ -1,0 +1,14 @@
+347/350 Testing: model_view.legacy_pose
+347/350 Test: model_view.legacy_pose
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/model_view_tests" "legacy_pose"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"model_view.legacy_pose" start time: Oct 16 10:00 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"model_view.legacy_pose" end time: Oct 16 10:00 CEST
+"model_view.legacy_pose" time elapsed: 00:00:00
+----------------------------------------------------------

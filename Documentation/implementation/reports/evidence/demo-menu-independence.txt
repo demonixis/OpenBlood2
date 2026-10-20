@@ -1,0 +1,5 @@
+Private-copy REZ index mutation only; original archive unchanged.
+Original SHA-256: e410ce2944210c776c7407a79e01cfa031c782132f68407cd0871379c5e7218c
+Renamed cshell.dll index first character at 55041284; payload unchanged (168, 719872).
+Renamed cres.dll index first character at 55041354; payload unchanged (1546920, 3584).
+Private directory: /tmp/blood2-demo-no-menu-dlls-fa_32cmt

@@ -1,0 +1,15 @@
+648/655 Testing: wind.weapon
+648/655 Test: wind.weapon
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/wind_tests" "weapon" "/home/yann/projects/lithtech/Blood2/build/release/tests/wind-weapon"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"wind.weapon" start time: Oct 17 01:43 CEST
+Output:
+----------------------------------------------------------
+Original ID42 both modes, no ammo/held model, first-update source-centered 450-unit full damage, owner exclusion/self inclusion verified.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"wind.weapon" end time: Oct 17 01:43 CEST
+"wind.weapon" time elapsed: 00:00:00
+----------------------------------------------------------

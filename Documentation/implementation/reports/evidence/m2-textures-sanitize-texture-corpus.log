@@ -1,0 +1,31 @@
+318/318 Testing: texture.corpus
+318/318 Test: texture.corpus
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/texture_tests" "corpus" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"texture.corpus" start time: Oct 16 09:18 CEST
+Output:
+----------------------------------------------------------
+skins/crate1.dtx: DTX: only embedded-palette version -2 is supported
+skins/grycret1.dtx: DTX: only embedded-palette version -2 is supported
+skins/metal1.dtx: DTX: only embedded-palette version -2 is supported
+skins/orgbrikb.dtx: DTX: only embedded-palette version -2 is supported
+textures/greys/dull1_trans.dtx: DTX: only embedded-palette version -2 is supported
+DTX corpus: decoded=3820 rejected=5 alpha=1450
+<end of output>
+Test time =   8.08 sec
+----------------------------------------------------------
+Test Passed.
+"texture.corpus" end time: Oct 16 09:18 CEST
+"texture.corpus" time elapsed: 00:00:08
+----------------------------------------------------------
+
+End testing: Oct 16 09:18 CEST
+
+headless =  11.02 sec*proc
+
+private =  10.93 sec*proc
+
+texture =   8.13 sec*proc
+
+world_view =   2.90 sec*proc
+

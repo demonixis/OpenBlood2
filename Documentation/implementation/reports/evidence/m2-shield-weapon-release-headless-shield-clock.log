@@ -1,0 +1,15 @@
+657/664 Testing: shield.clock
+657/664 Test: shield.clock
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/shield_tests" "clock" "/home/yann/projects/lithtech/Blood2/build/release/tests/shield-clock"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"shield.clock" start time: Oct 17 02:03 CEST
+Output:
+----------------------------------------------------------
+Delayed first-return, source alpha1 until ramp (powerup jumps to .5), exact duration final emission and strict removal verified.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"shield.clock" end time: Oct 17 02:03 CEST
+"shield.clock" time elapsed: 00:00:00
+----------------------------------------------------------

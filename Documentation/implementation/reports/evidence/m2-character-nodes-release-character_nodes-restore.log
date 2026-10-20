@@ -1,0 +1,14 @@
+529/530 Testing: character_nodes.restore
+529/530 Test: character_nodes.restore
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/character_nodes_tests" "restore" "/home/yann/projects/lithtech/Blood2/build/release/tests/character-node-fixtures/restore"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"character_nodes.restore" start time: Oct 16 18:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"character_nodes.restore" end time: Oct 16 18:56 CEST
+"character_nodes.restore" time elapsed: 00:00:00
+----------------------------------------------------------

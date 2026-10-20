@@ -1,0 +1,32 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 356: ai_perception.retaliation
+      Start 359: ai_perception.lifetime
+      Start 361: ai_perception.subway
+      Start 360: ai_perception.catalog
+ 1/11 Test #356: ai_perception.retaliation ........   Passed    0.01 sec
+ 2/11 Test #359: ai_perception.lifetime ...........   Passed    0.00 sec
+      Start 351: ai_perception.factions
+      Start 353: ai_perception.visibility
+ 3/11 Test #351: ai_perception.factions ...........   Passed    0.00 sec
+      Start 357: ai_perception.opportunity
+ 4/11 Test #353: ai_perception.visibility .........   Passed    0.00 sec
+      Start 355: ai_perception.stimuli
+ 5/11 Test #357: ai_perception.opportunity ........   Passed    0.01 sec
+ 6/11 Test #355: ai_perception.stimuli ............   Passed    0.00 sec
+      Start 352: ai_perception.selection
+      Start 354: ai_perception.hints
+ 7/11 Test #352: ai_perception.selection ..........   Passed    0.00 sec
+      Start 358: ai_perception.failures
+ 8/11 Test #354: ai_perception.hints ..............   Passed    0.01 sec
+ 9/11 Test #358: ai_perception.failures ...........   Passed    0.00 sec
+10/11 Test #360: ai_perception.catalog ............   Passed    0.31 sec
+11/11 Test #361: ai_perception.subway .............   Passed    0.78 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Label Time Summary:
+ai_perception    =   1.13 sec*proc (11 tests)
+headless         =   1.13 sec*proc (11 tests)
+private          =   1.09 sec*proc (2 tests)
+
+Total Test time (real) =   0.79 sec

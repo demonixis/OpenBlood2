@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-c++"
+	tests="5"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gigabyte-g5"
+	time="0"
+	timestamp="2026-10-18T00:35:04"
+	>
+	<testcase name="dls_sampler.pcm" classname="dls_sampler.pcm" time="0.00241941" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>PCM interpolation, loop seam/tail exclusion, tuning, velocity, gain, pan and one-shot completion verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.envelopes" classname="dls_sampler.envelopes" time="0.0110926" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>Linear amplitude attack, logarithmic decay/release, early note-off, absorbing zero, EG2/LFO pitch and /128 scaling verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.lifetime" classname="dls_sampler.lifetime" time="0.085688" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>Block partition, muted advance, bounded refusal, stale IDs, shared PCM, output transfer and world cleanup verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.legacy_pan" classname="dls_sampler.legacy_pan" time="0.00250928" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>Legacy integer/standard fixed pan, signed PCM gains, ordered aliases, invalid graphs, failure atomicity and local precedence verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.private" classname="dls_sampler.private" time="0.569325" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets;private"/>
+		</properties>
+		<system-out>Cabal region notes: 38 synthesized/nonzero, 5 with legacy pan; no refused regions; hidden clocks and release cleanup verified
+</system-out>
+	</testcase>
+</testsuite>

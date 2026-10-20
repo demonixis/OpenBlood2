@@ -1,0 +1,14 @@
+341/630 Testing: world_view.camera
+341/630 Test: world_view.camera
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_view_tests" "camera"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"world_view.camera" start time: Oct 17 00:37 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.camera" end time: Oct 17 00:37 CEST
+"world_view.camera" time elapsed: 00:00:00
+----------------------------------------------------------

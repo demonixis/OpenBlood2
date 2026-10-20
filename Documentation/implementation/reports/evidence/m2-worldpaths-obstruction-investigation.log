@@ -1,0 +1,2 @@
+Blocked at t=3 pos=2875.38 result=1 blocker=world class=world
+subway:248: f->targets[0].result==MoverResult::Moved

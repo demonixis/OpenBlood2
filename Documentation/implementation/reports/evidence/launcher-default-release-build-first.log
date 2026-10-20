@@ -1,0 +1,1696 @@
+[0/2] Re-checking globbed directories...
+[1/1221] Creating directories for 'blood2_launcher'
+[2/1221] No download step for 'blood2_launcher'
+[3/1221] No update step for 'blood2_launcher'
+[4/1221] Scanning /home/yann/projects/lithtech/Blood2/src/startup/protocol.cpp for CXX dependencies
+[5/1221] No patch step for 'blood2_launcher'
+[5/1221] Performing configure step for 'blood2_launcher'
+-- The C compiler identification is GNU 16.2.1
+-- The CXX compiler identification is GNU 16.2.1
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found PkgConfig: /usr/bin/pkg-config (found version "2.5.1")
+-- Detecting Target CPU Architecture
+-- Detecting Target CPU Architecture - X64
+-- Performing Test HAVE_GCC_WALL
+-- Performing Test HAVE_GCC_WALL - Success
+-- Performing Test HAVE_GCC_WUNDEF
+-- Performing Test HAVE_GCC_WUNDEF - Success
+-- Performing Test HAVE_GCC_WFLOAT_CONVERSION
+-- Performing Test HAVE_GCC_WFLOAT_CONVERSION - Success
+-- Performing Test HAVE_GCC_NO_STRICT_ALIASING
+-- Performing Test HAVE_GCC_NO_STRICT_ALIASING - Success
+-- Performing Test HAVE_GCC_WDOCUMENTATION
+-- Performing Test HAVE_GCC_WDOCUMENTATION - Failed
+-- Performing Test HAVE_GCC_WDOCUMENTATION_UNKNOWN_COMMAND
+-- Performing Test HAVE_GCC_WDOCUMENTATION_UNKNOWN_COMMAND - Failed
+-- Performing Test HAVE_GCC_COMMENT_BLOCK_COMMANDS
+-- Performing Test HAVE_GCC_COMMENT_BLOCK_COMMANDS - Failed
+-- Performing Test HAVE_CLANG_COMMENT_BLOCK_COMMANDS
+-- Performing Test HAVE_CLANG_COMMENT_BLOCK_COMMANDS - Failed
+-- Performing Test HAVE_GCC_WSHADOW
+-- Performing Test HAVE_GCC_WSHADOW - Success
+-- Performing Test HAVE_GCC_WUNUSED_LOCAL_TYPEDEFS
+-- Performing Test HAVE_GCC_WUNUSED_LOCAL_TYPEDEFS - Success
+-- Performing Test HAVE_GCC_WIMPLICIT_FALLTHROUGH
+-- Performing Test HAVE_GCC_WIMPLICIT_FALLTHROUGH - Success
+-- Performing Test COMPILER_SUPPORTS_FDIAGNOSTICS_COLOR_ALWAYS
+-- Performing Test COMPILER_SUPPORTS_FDIAGNOSTICS_COLOR_ALWAYS - Success
+-- Looking for __GLIBC__
+-- Looking for __GLIBC__ - found
+-- Performing Test HAVE_WL_VERSION_SCRIPT
+-- Performing Test HAVE_WL_VERSION_SCRIPT - Success
+-- Performing Test COMPILER_SUPPORTS_GCC_ATOMICS
+-- Performing Test COMPILER_SUPPORTS_GCC_ATOMICS - Success
+-- Performing Test HAVE_GCC_FVISIBILITY
+-- Performing Test HAVE_GCC_FVISIBILITY - Success
+-- Performing Test LINKER_SUPPORTS_WL_NO_UNDEFINED
+-- Performing Test LINKER_SUPPORTS_WL_NO_UNDEFINED - Success
+-- Performing Test COMPILER_SUPPORTS_MMX
+-- Performing Test COMPILER_SUPPORTS_MMX - Success
+-- Performing Test COMPILER_SUPPORTS_SSE
+-- Performing Test COMPILER_SUPPORTS_SSE - Success
+-- Performing Test COMPILER_SUPPORTS_SSE2
+-- Performing Test COMPILER_SUPPORTS_SSE2 - Success
+-- Performing Test COMPILER_SUPPORTS_SSE3
+-- Performing Test COMPILER_SUPPORTS_SSE3 - Success
+-- Performing Test COMPILER_SUPPORTS_SSE4_1
+-- Performing Test COMPILER_SUPPORTS_SSE4_1 - Success
+-- Performing Test COMPILER_SUPPORTS_SSE4_2
+-- Performing Test COMPILER_SUPPORTS_SSE4_2 - Success
+-- Performing Test COMPILER_SUPPORTS_AVX
+-- Performing Test COMPILER_SUPPORTS_AVX - Success
+-- Performing Test COMPILER_SUPPORTS_AVX2
+-- Performing Test COMPILER_SUPPORTS_AVX2 - Success
+-- Performing Test COMPILER_SUPPORTS_AVX512F
+-- Performing Test COMPILER_SUPPORTS_AVX512F - Success
+-- Looking for alloca.h
+-- Looking for alloca.h - found
+-- Looking for float.h
+-- Looking for float.h - found
+-- Looking for iconv.h
+-- Looking for iconv.h - found
+-- Looking for inttypes.h
+-- Looking for inttypes.h - found
+-- Looking for limits.h
+-- Looking for limits.h - found
+-- Looking for malloc.h
+-- Looking for malloc.h - found
+-- Looking for math.h
+-- Looking for math.h - found
+-- Looking for memory.h
+-- Looking for memory.h - found
+-- Looking for signal.h
+-- Looking for signal.h - found
+-- Looking for stdarg.h
+-- Looking for stdarg.h - found
+-- Looking for stdbool.h
+-- Looking for stdbool.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stdio.h
+-- Looking for stdio.h - found
+-- Looking for stdlib.h
+-- Looking for stdlib.h - found
+-- Looking for string.h
+-- Looking for string.h - found
+-- Looking for strings.h
+-- Looking for strings.h - found
+-- Looking for sys/types.h
+-- Looking for sys/types.h - found
+-- Looking for time.h
+-- Looking for time.h - found
+-- Looking for wchar.h
+-- Looking for wchar.h - found
+-- Looking for pow in m
+-- Looking for pow in m - found
+-- Looking for abs
+-- Looking for abs - found
+-- Looking for acos
+-- Looking for acos - found
+-- Looking for acosf
+-- Looking for acosf - found
+-- Looking for asin
+-- Looking for asin - found
+-- Looking for asinf
+-- Looking for asinf - found
+-- Looking for atan
+-- Looking for atan - found
+-- Looking for atan2
+-- Looking for atan2 - found
+-- Looking for atan2f
+-- Looking for atan2f - found
+-- Looking for atanf
+-- Looking for atanf - found
+-- Looking for atof
+-- Looking for atof - found
+-- Looking for atoi
+-- Looking for atoi - found
+-- Looking for bcopy
+-- Looking for bcopy - found
+-- Looking for ceil
+-- Looking for ceil - found
+-- Looking for ceilf
+-- Looking for ceilf - found
+-- Looking for copysign
+-- Looking for copysign - found
+-- Looking for copysignf
+-- Looking for copysignf - found
+-- Looking for cos
+-- Looking for cos - found
+-- Looking for cosf
+-- Looking for cosf - found
+-- Looking for _Exit
+-- Looking for _Exit - found
+-- Looking for exp
+-- Looking for exp - found
+-- Looking for expf
+-- Looking for expf - found
+-- Looking for fabs
+-- Looking for fabs - found
+-- Looking for fabsf
+-- Looking for fabsf - found
+-- Looking for floor
+-- Looking for floor - found
+-- Looking for floorf
+-- Looking for floorf - found
+-- Looking for fmod
+-- Looking for fmod - found
+-- Looking for fmodf
+-- Looking for fmodf - found
+-- Looking for fopen64
+-- Looking for fopen64 - found
+-- Looking for fseeko
+-- Looking for fseeko - found
+-- Looking for fseeko64
+-- Looking for fseeko64 - found
+-- Looking for getenv
+-- Looking for getenv - found
+-- Looking for _i64toa
+-- Looking for _i64toa - not found
+-- Looking for index
+-- Looking for index - found
+-- Looking for itoa
+-- Looking for itoa - not found
+-- Looking for log
+-- Looking for log - found
+-- Looking for log10
+-- Looking for log10 - found
+-- Looking for log10f
+-- Looking for log10f - found
+-- Looking for logf
+-- Looking for logf - found
+-- Looking for lround
+-- Looking for lround - found
+-- Looking for lroundf
+-- Looking for lroundf - found
+-- Looking for _ltoa
+-- Looking for _ltoa - not found
+-- Looking for malloc
+-- Looking for malloc - found
+-- Looking for memcmp
+-- Looking for memcmp - found
+-- Looking for memcpy
+-- Looking for memcpy - found
+-- Looking for memmove
+-- Looking for memmove - found
+-- Looking for memset
+-- Looking for memset - found
+-- Looking for modf
+-- Looking for modf - found
+-- Looking for modff
+-- Looking for modff - found
+-- Looking for pow
+-- Looking for pow - found
+-- Looking for powf
+-- Looking for powf - found
+-- Looking for putenv
+-- Looking for putenv - found
+-- Looking for rindex
+-- Looking for rindex - found
+-- Looking for round
+-- Looking for round - found
+-- Looking for roundf
+-- Looking for roundf - found
+-- Looking for scalbn
+-- Looking for scalbn - found
+-- Looking for scalbnf
+-- Looking for scalbnf - found
+-- Looking for setenv
+-- Looking for setenv - found
+-- Looking for sin
+-- Looking for sin - found
+-- Looking for sinf
+-- Looking for sinf - found
+-- Looking for sqr
+-- Looking for sqr - not found
+-- Looking for sqrt
+-- Looking for sqrt - found
+-- Looking for sqrtf
+-- Looking for sqrtf - found
+-- Looking for sscanf
+-- Looking for sscanf - found
+-- Looking for strchr
+-- Looking for strchr - found
+-- Looking for strcmp
+-- Looking for strcmp - found
+-- Looking for strlcat
+-- Looking for strlcat - found
+-- Looking for strlcpy
+-- Looking for strlcpy - found
+-- Looking for strlen
+-- Looking for strlen - found
+-- Looking for strncmp
+-- Looking for strncmp - found
+-- Looking for strnlen
+-- Looking for strnlen - found
+-- Looking for strpbrk
+-- Looking for strpbrk - found
+-- Looking for strrchr
+-- Looking for strrchr - found
+-- Looking for strstr
+-- Looking for strstr - found
+-- Looking for strnstr
+-- Looking for strnstr - not found
+-- Looking for strtod
+-- Looking for strtod - found
+-- Looking for strtok_r
+-- Looking for strtok_r - found
+-- Looking for strtol
+-- Looking for strtol - found
+-- Looking for strtoll
+-- Looking for strtoll - found
+-- Looking for strtoul
+-- Looking for strtoul - found
+-- Looking for strtoull
+-- Looking for strtoull - found
+-- Looking for tan
+-- Looking for tan - found
+-- Looking for tanf
+-- Looking for tanf - found
+-- Looking for trunc
+-- Looking for trunc - found
+-- Looking for truncf
+-- Looking for truncf - found
+-- Looking for unsetenv
+-- Looking for unsetenv - found
+-- Looking for vsnprintf
+-- Looking for vsnprintf - found
+-- Looking for vsscanf
+-- Looking for vsscanf - found
+-- Looking for wcsnlen
+-- Looking for wcsnlen - found
+-- Looking for wcscmp
+-- Looking for wcscmp - found
+-- Looking for wcsdup
+-- Looking for wcsdup - found
+-- Looking for wcslcat
+-- Looking for wcslcat - found
+-- Looking for wcslcpy
+-- Looking for wcslcpy - found
+-- Looking for wcslen
+-- Looking for wcslen - found
+-- Looking for wcsncmp
+-- Looking for wcsncmp - found
+-- Looking for wcsstr
+-- Looking for wcsstr - found
+-- Looking for wcstol
+-- Looking for wcstol - found
+-- Looking for wcstoll
+-- Looking for wcstoll - found
+-- Looking for wcstoul
+-- Looking for wcstoul - found
+-- Looking for wcstoull
+-- Looking for wcstoull - found
+-- Looking for strcasestr
+-- Looking for strcasestr - found
+-- Performing Test LIBC_HAS_ISINF
+-- Performing Test LIBC_HAS_ISINF - Success
+-- Performing Test LIBC_ISINF_HANDLES_FLOAT
+-- Performing Test LIBC_ISINF_HANDLES_FLOAT - Success
+-- Performing Test LIBC_HAS_ISINFF
+-- Performing Test LIBC_HAS_ISINFF - Success
+-- Performing Test LIBC_HAS_ISNAN
+-- Performing Test LIBC_HAS_ISNAN - Success
+-- Performing Test LIBC_ISNAN_HANDLES_FLOAT
+-- Performing Test LIBC_ISNAN_HANDLES_FLOAT - Success
+-- Performing Test LIBC_HAS_ISNANF
+-- Performing Test LIBC_HAS_ISNANF - Success
+-- Looking for fdatasync
+-- Looking for fdatasync - found
+-- Looking for getexecpath
+-- Looking for getexecpath - not found
+-- Looking for gethostname
+-- Looking for gethostname - found
+-- Looking for getpagesize
+-- Looking for getpagesize - found
+-- Looking for getresgid
+-- Looking for getresgid - found
+-- Looking for getresuid
+-- Looking for getresuid - found
+-- Looking for sigaction
+-- Looking for sigaction - found
+-- Looking for sigtimedwait
+-- Looking for sigtimedwait - found
+-- Looking for setjmp
+-- Looking for setjmp - found
+-- Looking for nanosleep
+-- Looking for nanosleep - found
+-- Looking for gmtime_r
+-- Looking for gmtime_r - found
+-- Looking for localtime_r
+-- Looking for localtime_r - found
+-- Looking for nl_langinfo
+-- Looking for nl_langinfo - found
+-- Looking for sysconf
+-- Looking for sysconf - found
+-- Looking for sysctlbyname
+-- Looking for sysctlbyname - not found
+-- Looking for getauxval
+-- Looking for getauxval - found
+-- Looking for elf_aux_info
+-- Looking for elf_aux_info - not found
+-- Looking for ppoll
+-- Looking for ppoll - found
+-- Looking for memfd_create
+-- Looking for memfd_create - found
+-- Looking for posix_fallocate
+-- Looking for posix_fallocate - found
+-- Looking for posix_spawn_file_actions_addchdir
+-- Looking for posix_spawn_file_actions_addchdir - not found
+-- Looking for posix_spawn_file_actions_addchdir_np
+-- Looking for posix_spawn_file_actions_addchdir_np - found
+-- Performing Test ICONV_IN_LIBC
+-- Performing Test ICONV_IN_LIBC - Success
+-- Performing Test ICONV_IN_LIBICONV
+-- Performing Test ICONV_IN_LIBICONV - Failed
+-- Performing Test HAVE_SA_SIGACTION
+-- Performing Test HAVE_SA_SIGACTION - Success
+-- Performing Test HAVE_ST_MTIM
+-- Performing Test HAVE_ST_MTIM - Success
+-- Looking for dlopen
+-- Looking for dlopen - found
+-- Performing Test HAVE_O_CLOEXEC
+-- Performing Test HAVE_O_CLOEXEC - Success
+-- Performing Test COMPILER_SUPPORTS_ELFNOTES
+-- Performing Test COMPILER_SUPPORTS_ELFNOTES - Success
+-- Found ALSA: /usr/lib64/libasound.so (found version "1.2.16.1")
+-- dynamic libasound -> libasound.so.2
+-- Checking for module 'jack'
+--   Found jack, version 3.1609.0
+-- dynamic libjack -> libjack.so.0
+-- Checking for module 'libpipewire-0.3>=0.3.44'
+--   Found libpipewire-0.3, version 1.6.9
+-- dynamic libpipewire-0.3 -> libpipewire-0.3.so.0
+-- Checking for module 'libpulse>=0.9.15'
+--   Found libpulse, version 17.0
+-- dynamic libpulse -> libpulse.so.0
+-- Checking for module 'sndio'
+--   Package 'sndio' not found
+-- Found X11: /usr/include
+-- Looking for XOpenDisplay in /usr/lib64/libX11.so;/usr/lib64/libXext.so
+-- Looking for XOpenDisplay in /usr/lib64/libX11.so;/usr/lib64/libXext.so - found
+-- Looking for gethostbyname
+-- Looking for gethostbyname - found
+-- Looking for connect
+-- Looking for connect - found
+-- Looking for remove
+-- Looking for remove - found
+-- Looking for shmat
+-- Looking for shmat - found
+-- dynamic libX11 -> libX11.so.6
+-- dynamic libXext -> libXext.so.6
+-- dynamic libXcursor -> libXcursor.so.1
+-- dynamic libXi -> libXi.so.6
+-- dynamic libXfixes -> libXfixes.so.3
+-- dynamic libXrandr -> libXrandr.so.2
+-- dynamic libXrender -> libXrender.so.1
+-- dynamic libXss -> libXss.so.1
+-- dynamic libXtst -> libXtst.so.6
+-- Looking for shmat
+-- Looking for shmat - found
+-- Performing Test HAVE_XGENERICEVENT
+-- Performing Test HAVE_XGENERICEVENT - Success
+-- Looking for X11/XKBlib.h
+-- Looking for X11/XKBlib.h - found
+-- Performing Test HAVE_XINPUT2_SCROLLINFO
+-- Performing Test HAVE_XINPUT2_SCROLLINFO - Success
+-- Performing Test HAVE_XINPUT2_MULTITOUCH
+-- Performing Test HAVE_XINPUT2_MULTITOUCH - Success
+-- Performing Test HAVE_XINPUT2_GESTURE
+-- Performing Test HAVE_XINPUT2_GESTURE - Success
+-- Performing Test HAVE_XFIXES_H
+-- Performing Test HAVE_XFIXES_H - Success
+-- Checking for module 'fribidi'
+--   Found fribidi, version 1.0.16
+-- dynamic libfribidi -> libfribidi.so.0
+-- Checking for module 'libthai'
+--   Found libthai, version 0.1.30
+-- dynamic libthai -> libthai.so.0
+-- Found OpenGL: /usr/lib64/libOpenGL.so
+-- Performing Test HAVE_OPENGL_EGL
+-- Performing Test HAVE_OPENGL_EGL - Success
+-- Checking for module 'libdrm'
+--   Found libdrm, version 2.4.134
+-- Checking for module 'gbm'
+--   Found gbm, version 26.2.4
+-- dynamic libdrm -> libdrm.so.2
+-- dynamic libgbm -> libgbm.so.1
+-- Performing Test HAVE_OPENGL_GLX
+-- Performing Test HAVE_OPENGL_GLX - Success
+-- Performing Test HAVE_OPENGL
+-- Performing Test HAVE_OPENGL - Success
+-- Performing Test HAVE_OPENGLES_V1
+-- Performing Test HAVE_OPENGLES_V1 - Success
+-- Performing Test HAVE_OPENGLES_V2
+-- Performing Test HAVE_OPENGLES_V2 - Success
+-- Checking for modules 'wayland-client>=1.18;wayland-egl;wayland-cursor;egl;xkbcommon>=0.5.0'
+--   Found wayland-client, version 1.26.0
+--   Found wayland-egl, version 18.1.0
+--   Found wayland-cursor, version 1.26.0
+--   Found egl, version 1.5
+--   Found xkbcommon, version 1.13.1
+-- dynamic libwayland-client -> libwayland-client.so.0
+-- dynamic libwayland-egl -> libwayland-egl.so.1
+-- dynamic libwayland-cursor -> libwayland-cursor.so.0
+-- dynamic libxkbcommon -> libxkbcommon.so.0
+-- Checking for module 'libdecor-0'
+--   Found libdecor-0, version 0.2.5
+-- dynamic libdecor-0 -> libdecor-0.so.0
+-- Performing Test HAVE_LINUX_INPUT_H
+-- Performing Test HAVE_LINUX_INPUT_H - Success
+-- Performing Test HAVE_INPUT_KD
+-- Performing Test HAVE_INPUT_KD - Success
+-- Performing Test HAVE_LINUX_VIDEODEV2_H
+-- Performing Test HAVE_LINUX_VIDEODEV2_H - Success
+-- Looking for libudev.h
+-- Looking for libudev.h - found
+-- dynamic libudev -> libudev.so.1
+-- Looking for sys/inotify.h
+-- Looking for sys/inotify.h - found
+-- Looking for inotify_init
+-- Looking for inotify_init - found
+-- Looking for inotify_init1
+-- Looking for inotify_init1 - found
+-- Checking for one of the modules 'dbus-1;dbus'
+-- Checking for one of the modules 'ibus-1.0;ibus'
+-- Checking for one of the modules 'liburing-ffi'
+-- Checking for module 'libusb-1.0>=1.0.16'
+--   Found libusb-1.0, version 1.0.30
+-- Found LibUSB: /usr/lib64/libusb-1.0.so (found version "1.0.30")
+-- Performing Test HAVE_LIBUSB_H
+-- Performing Test HAVE_LIBUSB_H - Success
+-- Performing Test HAVE_PTHREADS
+-- Performing Test HAVE_PTHREADS - Success
+-- Performing Test HAVE_RECURSIVE_MUTEXES
+-- Performing Test HAVE_RECURSIVE_MUTEXES - Success
+-- Performing Test HAVE_PTHREADS_SEM
+-- Performing Test HAVE_PTHREADS_SEM - Success
+-- Performing Test COMPILER_HAS_SEM_TIMEDWAIT
+-- Performing Test COMPILER_HAS_SEM_TIMEDWAIT - Success
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Looking for pthread_np.h
+-- Looking for pthread_np.h - not found
+-- Performing Test HAVE_PTHREAD_SETNAME_NP
+-- Performing Test HAVE_PTHREAD_SETNAME_NP - Success
+-- Looking for clock_gettime in c
+-- Looking for clock_gettime in c - found
+-- Performing Test HAVE_POSIX_SPAWN
+-- Performing Test HAVE_POSIX_SPAWN - Success
+-- Looking for vfork
+-- Looking for vfork - found
+-- 
+-- SDL3 was configured with the following options:
+-- 
+-- Platform: Linux-7.2.10-200.fc44.x86_64
+-- 64-bit:   TRUE
+-- Compiler: /usr/bin/cc
+-- Revision: SDL-3.5.0-86404e8
+-- Vendor:   
+-- 
+-- Subsystems:
+--   Audio:        ON
+--   Video:        ON
+--   GPU:          ON
+--   Render:       OFF
+--   Camera:       OFF
+--   Joystick:     ON
+--   Haptic:       ON
+--   Hidapi:       ON
+--   Power:        ON
+--   Sensor:       ON
+--   Dialog:       ON
+--   Tray:         OFF
+--   Notification: OFF
+-- 
+-- Options:
+--   SDL_ALSA                    (Wanted: ON): ON
+--   SDL_ALSA_SHARED             (Wanted: ON): ON
+--   SDL_ALTIVEC                 (Wanted: OFF): OFF
+--   SDL_ARMNEON                 (Wanted: OFF): OFF
+--   SDL_ARMSVE2                 (Wanted: OFF): OFF
+--   SDL_ASAN                    (Wanted: OFF): OFF
+--   SDL_ASSEMBLY                (Wanted: ON): ON
+--   SDL_ASSERTIONS              (Wanted: auto): auto
+--   SDL_AVX                     (Wanted: ON): ON
+--   SDL_AVX2                    (Wanted: ON): ON
+--   SDL_AVX512F                 (Wanted: ON): ON
+--   SDL_BACKGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_CCACHE                  (Wanted: OFF): OFF
+--   SDL_CLANG_TIDY              (Wanted: OFF): OFF
+--   SDL_CLOCK_GETTIME           (Wanted: ON): ON
+--   SDL_COCOA                   (Wanted: OFF): OFF
+--   SDL_DBUS                    (Wanted: ON): ON
+--   SDL_DEPS_SHARED             (Wanted: ON): OFF
+--   SDL_DIRECTX                 (Wanted: OFF): OFF
+--   SDL_DISKAUDIO               (Wanted: OFF): OFF
+--   SDL_DLOPEN_NOTES            (Wanted: ON): ON
+--   SDL_DUMMYAUDIO              (Wanted: ON): ON
+--   SDL_DUMMYCAMERA             (Wanted: OFF): OFF
+--   SDL_DUMMYVIDEO              (Wanted: ON): ON
+--   SDL_EXAMPLES                (Wanted: OFF): OFF
+--   SDL_EXAMPLES_LINK_SHARED    (Wanted: OFF): OFF
+--   SDL_FOREGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_FRIBIDI                 (Wanted: ON): ON
+--   SDL_FRIBIDI_SHARED          (Wanted: ON): ON
+--   SDL_GCC_ATOMICS             (Wanted: ON): ON
+--   SDL_GPU_OPENXR              (Wanted: ON): ON
+--   SDL_HIDAPI                  (Wanted: ON): ON
+--   SDL_HIDAPI_JOYSTICK         (Wanted: ON): ON
+--   SDL_HIDAPI_LIBUSB           (Wanted: ON): ON
+--   SDL_HIDAPI_LIBUSB_SHARED    (Wanted: ON): ON
+--   SDL_IBUS                    (Wanted: ON): ON
+--   SDL_INSTALL                 (Wanted: OFF): OFF
+--   SDL_INSTALL_TESTS           (Wanted: OFF): OFF
+--   SDL_JACK                    (Wanted: ON): ON
+--   SDL_JACK_SHARED             (Wanted: ON): ON
+--   SDL_KMSDRM                  (Wanted: ON): ON
+--   SDL_KMSDRM_SHARED           (Wanted: ON): ON
+--   SDL_LASX                    (Wanted: OFF): OFF
+--   SDL_LEAN_AND_MEAN           (Wanted: OFF): OFF
+--   SDL_LIBC                    (Wanted: ON): ON
+--   SDL_LIBICONV                (Wanted: OFF): OFF
+--   SDL_LIBTHAI                 (Wanted: ON): ON
+--   SDL_LIBTHAI_SHARED          (Wanted: ON): ON
+--   SDL_LIBUDEV                 (Wanted: ON): ON
+--   SDL_LIBUDEV_SHARED          (Wanted: ON): ON
+--   SDL_LIBURING                (Wanted: ON): OFF
+--   SDL_LSX                     (Wanted: OFF): OFF
+--   SDL_METAL                   (Wanted: OFF): OFF
+--   SDL_MMX                     (Wanted: ON): ON
+--   SDL_OFFSCREEN               (Wanted: ON): ON
+--   SDL_OPENGL                  (Wanted: ON): ON
+--   SDL_OPENGLES                (Wanted: ON): ON
+--   SDL_OPENVR                  (Wanted: OFF): OFF
+--   SDL_OSS                     (Wanted: OFF): OFF
+--   SDL_PIPEWIRE                (Wanted: ON): ON
+--   SDL_PIPEWIRE_SHARED         (Wanted: ON): ON
+--   SDL_PTHREADS                (Wanted: ON): ON
+--   SDL_PTHREADS_SEM            (Wanted: ON): ON
+--   SDL_PULSEAUDIO              (Wanted: ON): ON
+--   SDL_PULSEAUDIO_SHARED       (Wanted: ON): ON
+--   SDL_RENDER_D3D              (Wanted: OFF): OFF
+--   SDL_RENDER_D3D11            (Wanted: OFF): OFF
+--   SDL_RENDER_D3D12            (Wanted: OFF): OFF
+--   SDL_RENDER_GPU              (Wanted: OFF): OFF
+--   SDL_RENDER_METAL            (Wanted: OFF): OFF
+--   SDL_RENDER_VULKAN           (Wanted: OFF): OFF
+--   SDL_ROCKCHIP                (Wanted: OFF): OFF
+--   SDL_RPATH                   (Wanted: ON): OFF
+--   SDL_RPI                     (Wanted: OFF): OFF
+--   SDL_SNDIO                   (Wanted: ON): OFF
+--   SDL_SNDIO_SHARED            (Wanted: ON): OFF
+--   SDL_SSE                     (Wanted: ON): ON
+--   SDL_SSE2                    (Wanted: ON): ON
+--   SDL_SSE3                    (Wanted: ON): ON
+--   SDL_SSE4_1                  (Wanted: ON): ON
+--   SDL_SSE4_2                  (Wanted: ON): ON
+--   SDL_SYSTEM_ICONV            (Wanted: ON): ON
+--   SDL_TESTS                   (Wanted: OFF): OFF
+--   SDL_TESTS_LINK_SHARED       (Wanted: OFF): OFF
+--   SDL_UNINSTALL               (Wanted: OFF): OFF
+--   SDL_VIRTUAL_JOYSTICK        (Wanted: ON): ON
+--   SDL_VIVANTE                 (Wanted: OFF): OFF
+--   SDL_VULKAN                  (Wanted: ON): ON
+--   SDL_WASAPI                  (Wanted: OFF): OFF
+--   SDL_WAYLAND                 (Wanted: ON): ON
+--   SDL_WAYLAND_LIBDECOR        (Wanted: ON): ON
+--   SDL_WAYLAND_LIBDECOR_SHARED (Wanted: ON): ON
+--   SDL_WAYLAND_SHARED          (Wanted: ON): ON
+--   SDL_X11                     (Wanted: ON): ON
+--   SDL_X11_SHARED              (Wanted: ON): ON
+--   SDL_X11_XCURSOR             (Wanted: ON): ON
+--   SDL_X11_XDBE                (Wanted: ON): ON
+--   SDL_X11_XFIXES              (Wanted: ON): ON
+--   SDL_X11_XINPUT              (Wanted: ON): ON
+--   SDL_X11_XRANDR              (Wanted: ON): ON
+--   SDL_X11_XSCRNSAVER          (Wanted: ON): ON
+--   SDL_X11_XSHAPE              (Wanted: ON): ON
+--   SDL_X11_XSYNC               (Wanted: ON): ON
+--   SDL_X11_XTEST               (Wanted: ON): ON
+--   SDL_XINPUT                  (Wanted: OFF): OFF
+-- 
+--  Build Shared Library: OFF
+--  Build Static Library: ON
+-- 
+-- Enabled backends:
+--   Video drivers: dummy kmsdrm(dynamic) offscreen wayland(dynamic) x11(dynamic)
+--   X11 libraries: xcursor xdbe xfixes xinput2 xrandr xscrnsaver xshape xsync xtest
+--   Render drivers: ogl ogl_es ogl_es2
+--   GPU drivers: openxr vulkan
+--   Audio drivers: alsa(dynamic) dummy jack(dynamic) pipewire(dynamic) pulseaudio(dynamic)
+--   Joystick drivers: hidapi linux virtual
+--   Camera drivers: dummy pipewire(dynamic)
+-- 
+-- If something was not detected, although the libraries
+-- were installed, then make sure you have set the
+-- CMAKE_C_FLAGS and CMAKE_PREFIX_PATH CMake variables correctly.
+-- 
+-- Build spdlog: 1.15.3
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Build type: Release
+-- Looking for fwrite_unlocked
+-- Looking for fwrite_unlocked - found
+-- Found OpenSSL: /usr/lib64/libcrypto.so (found version "3.5.9")
+-- Using CMake version 4.3.0
+-- curl version=[8.20.0-DEV]
+-- CMake platform flags: UNIX GCC
+-- Picky compiler options: -Werror-implicit-function-declaration -W -Wall -Wpedantic -Wbad-function-cast -Wconversion -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wcast-qual -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-padded -Wno-sign-conversion -Wno-switch-default -Wno-switch-enum -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wclobbered -Wmissing-parameter-type -Wold-style-declaration -Wpragmas -Wstrict-aliasing=3 -ftree-vrp -Wjump-misses-init -Wdouble-promotion -Wformat=2 -Wtrampolines -Warray-bounds=2 -Wno-format-signedness -Wduplicated-cond -Wnull-dereference -fdelete-null-pointer-checks -Wshift-negative-value -Wshift-overflow=2 -Wunused-const-variable -Walloc-zero -Wduplicated-branches -Wformat-truncation=2 -Wimplicit-fallthrough -Wrestrict -Warith-conversion -Wenum-conversion -Warray-compare -Wenum-int-mismatch -Wxor-used-as-pow -Wleading-whitespace=spaces -Wtrailing-whitespace=any -Wunterminated-string-initialization
+-- Found Perl: /usr/bin/perl (found version "5.42.3")
+-- Looking for connect in socket
+-- Looking for connect in socket - not found
+-- Performing Test HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID
+-- Performing Test HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID - Success
+-- Performing Test HAVE_SOCKADDR_IN6_SIN6_ADDR
+-- Performing Test HAVE_SOCKADDR_IN6_SIN6_ADDR - Success
+-- Looking for OPENSSL_IS_BORINGSSL
+-- Looking for OPENSSL_IS_BORINGSSL - not found
+-- Looking for OPENSSL_IS_AWSLC
+-- Looking for OPENSSL_IS_AWSLC - not found
+-- Looking for LIBRESSL_VERSION_NUMBER
+-- Looking for LIBRESSL_VERSION_NUMBER - not found
+-- Looking for DES_ecb_encrypt
+-- Looking for DES_ecb_encrypt - found
+-- Looking for SSL_set0_wbio
+-- Looking for SSL_set0_wbio - found
+-- Looking for SSL_CTX_set_srp_username
+-- Looking for SSL_CTX_set_srp_username - found
+-- Checking for module 'libidn2'
+--   Package 'libidn2' not found
+-- Could NOT find Libidn2 (missing: LIBIDN2_INCLUDE_DIR LIBIDN2_LIBRARY) 
+-- Performing Test USE_UNIX_SOCKETS
+-- Performing Test USE_UNIX_SOCKETS - Success
+-- Found CA bundle: /etc/ssl/certs/ca-certificates.crt
+-- Looking for sys/eventfd.h
+-- Looking for sys/eventfd.h - found
+-- Looking for sys/filio.h
+-- Looking for sys/filio.h - not found
+-- Looking for sys/ioctl.h
+-- Looking for sys/ioctl.h - found
+-- Looking for sys/param.h
+-- Looking for sys/param.h - found
+-- Looking for sys/poll.h
+-- Looking for sys/poll.h - found
+-- Looking for sys/resource.h
+-- Looking for sys/resource.h - found
+-- Looking for 3 include files sys/socket.h, ..., sys/select.h
+-- Looking for 3 include files sys/socket.h, ..., sys/select.h - found
+-- Looking for sys/sockio.h
+-- Looking for sys/sockio.h - not found
+-- Looking for 4 include files sys/socket.h, ..., sys/types.h
+-- Looking for 4 include files sys/socket.h, ..., sys/types.h - found
+-- Looking for sys/un.h
+-- Looking for sys/un.h - found
+-- Looking for 5 include files sys/socket.h, ..., sys/utime.h
+-- Looking for 5 include files sys/socket.h, ..., sys/utime.h - not found
+-- Looking for 5 include files sys/socket.h, ..., arpa/inet.h
+-- Looking for 5 include files sys/socket.h, ..., arpa/inet.h - found
+-- Looking for dirent.h
+-- Looking for dirent.h - found
+-- Looking for fcntl.h
+-- Looking for fcntl.h - found
+-- Looking for 6 include files sys/socket.h, ..., ifaddrs.h
+-- Looking for 6 include files sys/socket.h, ..., ifaddrs.h - found
+-- Looking for io.h
+-- Looking for io.h - not found
+-- Looking for 7 include files sys/socket.h, ..., libgen.h
+-- Looking for 7 include files sys/socket.h, ..., libgen.h - found
+-- Looking for linux/tcp.h
+-- Looking for linux/tcp.h - found
+-- Looking for locale.h
+-- Looking for locale.h - found
+-- Looking for 8 include files sys/socket.h, ..., net/if.h
+-- Looking for 8 include files sys/socket.h, ..., net/if.h - found
+-- Looking for 9 include files sys/socket.h, ..., netdb.h
+-- Looking for 9 include files sys/socket.h, ..., netdb.h - found
+-- Looking for 10 include files sys/socket.h, ..., netinet/in.h
+-- Looking for 10 include files sys/socket.h, ..., netinet/in.h - found
+-- Looking for netinet/in6.h
+-- Looking for netinet/in6.h - not found
+-- Looking for 11 include files sys/socket.h, ..., netinet/tcp.h
+-- Looking for 11 include files sys/socket.h, ..., netinet/tcp.h - found
+-- Looking for 12 include files sys/socket.h, ..., netinet/udp.h
+-- Looking for 12 include files sys/socket.h, ..., netinet/udp.h - found
+-- Looking for poll.h
+-- Looking for poll.h - found
+-- Looking for pwd.h
+-- Looking for pwd.h - found
+-- Looking for stdatomic.h
+-- Looking for stdatomic.h - found
+-- Looking for stdbool.h
+-- Looking for stdbool.h - found
+-- Looking for strings.h
+-- Looking for strings.h - found
+-- Looking for stropts.h
+-- Looking for stropts.h - not found
+-- Looking for termio.h
+-- Looking for termio.h - not found
+-- Looking for termios.h
+-- Looking for termios.h - found
+-- Looking for 13 include files sys/socket.h, ..., unistd.h
+-- Looking for 13 include files sys/socket.h, ..., unistd.h - found
+-- Looking for utime.h
+-- Looking for utime.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of size_t
+-- Check size of size_t - done
+-- Check size of ssize_t
+-- Check size of ssize_t - done
+-- Check size of long
+-- Check size of long - done
+-- Check size of int
+-- Check size of int - done
+-- Check size of __int64
+-- Check size of __int64 - failed
+-- Check size of time_t
+-- Check size of time_t - done
+-- Check size of suseconds_t
+-- Check size of suseconds_t - done
+-- Looking for accept4
+-- Looking for accept4 - found
+-- Looking for fnmatch
+-- Looking for fnmatch - found
+-- Looking for basename
+-- Looking for basename - found
+-- Looking for opendir
+-- Looking for opendir - found
+-- Looking for poll
+-- Looking for poll - found
+-- Looking for socket
+-- Looking for socket - found
+-- Looking for socketpair
+-- Looking for socketpair - found
+-- Looking for recv
+-- Looking for recv - found
+-- Looking for send
+-- Looking for send - found
+-- Looking for sendmsg
+-- Looking for sendmsg - found
+-- Looking for sendmmsg
+-- Looking for sendmmsg - found
+-- Looking for select
+-- Looking for select - found
+-- Looking for memrchr
+-- Looking for memrchr - found
+-- Looking for alarm
+-- Looking for alarm - found
+-- Looking for fcntl
+-- Looking for fcntl - found
+-- Looking for getppid
+-- Looking for getppid - found
+-- Looking for utimes
+-- Looking for utimes - found
+-- Looking for gettimeofday
+-- Looking for gettimeofday - found
+-- Looking for closesocket
+-- Looking for closesocket - not found
+-- Looking for sigsetjmp
+-- Looking for sigsetjmp - found
+-- Looking for getpass_r
+-- Looking for getpass_r - not found
+-- Looking for getpwuid
+-- Looking for getpwuid - found
+-- Looking for getpwuid_r
+-- Looking for getpwuid_r - found
+-- Looking for geteuid
+-- Looking for geteuid - found
+-- Looking for utime
+-- Looking for utime - found
+-- Looking for gethostbyname_r
+-- Looking for gethostbyname_r - found
+-- Looking for signal
+-- Looking for signal - found
+-- Looking for strerror_r
+-- Looking for strerror_r - found
+-- Looking for siginterrupt
+-- Looking for siginterrupt - found
+-- Looking for getaddrinfo
+-- Looking for getaddrinfo - found
+-- Looking for getifaddrs
+-- Looking for getifaddrs - found
+-- Looking for freeaddrinfo
+-- Looking for freeaddrinfo - found
+-- Looking for pipe
+-- Looking for pipe - found
+-- Looking for eventfd
+-- Looking for eventfd - found
+-- Looking for getpeername
+-- Looking for getpeername - found
+-- Looking for getsockname
+-- Looking for getsockname - found
+-- Looking for getrlimit
+-- Looking for getrlimit - found
+-- Looking for setlocale
+-- Looking for setlocale - found
+-- Looking for setrlimit
+-- Looking for setrlimit - found
+-- Looking for pipe2
+-- Looking for pipe2 - found
+-- Looking for if_nametoindex
+-- Looking for if_nametoindex - found
+-- Looking for realpath
+-- Looking for realpath - found
+-- Looking for sched_yield
+-- Looking for sched_yield - found
+-- Looking for strcasecmp
+-- Looking for strcasecmp - found
+-- Looking for stricmp
+-- Looking for stricmp - not found
+-- Looking for strcmpi
+-- Looking for strcmpi - not found
+-- Looking for inet_ntop
+-- Looking for inet_ntop - found
+-- Looking for inet_pton
+-- Looking for inet_pton - found
+-- Looking for fsetxattr
+-- Looking for fsetxattr - found
+-- Performing Test HAVE_FSETXATTR_5
+-- Performing Test HAVE_FSETXATTR_5 - Success
+-- Performing Test HAVE_FSETXATTR_6
+-- Performing Test HAVE_FSETXATTR_6 - Failed
+-- Check size of sa_family_t
+-- Check size of sa_family_t - done
+-- Performing Test HAVE_FCNTL_O_NONBLOCK
+-- Performing Test HAVE_FCNTL_O_NONBLOCK - Success
+-- Performing Test HAVE_IOCTLSOCKET
+-- Performing Test HAVE_IOCTLSOCKET - Failed
+-- Performing Test HAVE_IOCTLSOCKET_CAMEL
+-- Performing Test HAVE_IOCTLSOCKET_CAMEL - Failed
+-- Performing Test HAVE_IOCTLSOCKET_CAMEL_FIONBIO
+-- Performing Test HAVE_IOCTLSOCKET_CAMEL_FIONBIO - Failed
+-- Performing Test HAVE_IOCTLSOCKET_FIONBIO
+-- Performing Test HAVE_IOCTLSOCKET_FIONBIO - Failed
+-- Performing Test HAVE_IOCTL_FIONBIO
+-- Performing Test HAVE_IOCTL_FIONBIO - Success
+-- Performing Test HAVE_IOCTL_SIOCGIFADDR
+-- Performing Test HAVE_IOCTL_SIOCGIFADDR - Success
+-- Performing Test HAVE_SETSOCKOPT_SO_NONBLOCK
+-- Performing Test HAVE_SETSOCKOPT_SO_NONBLOCK - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_3
+-- Performing Test HAVE_GETHOSTBYNAME_R_3 - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_5
+-- Performing Test HAVE_GETHOSTBYNAME_R_5 - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_6
+-- Performing Test HAVE_GETHOSTBYNAME_R_6 - Success
+-- Performing Test HAVE_BOOL_T
+-- Performing Test HAVE_BOOL_T - Success
+-- Performing Test STDC_HEADERS
+-- Performing Test STDC_HEADERS - Success
+-- Performing Test HAVE_ATOMIC
+-- Performing Test HAVE_ATOMIC - Success
+-- Performing Test HAVE_GETHOSTBYNAME_R_3_REENTRANT
+-- Performing Test HAVE_GETHOSTBYNAME_R_3_REENTRANT - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_5_REENTRANT
+-- Performing Test HAVE_GETHOSTBYNAME_R_5_REENTRANT - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_6_REENTRANT
+-- Performing Test HAVE_GETHOSTBYNAME_R_6_REENTRANT - Success
+-- Performing Test HAVE_FILE_OFFSET_BITS
+-- Performing Test HAVE_FILE_OFFSET_BITS - Success
+-- Check size of off_t
+-- Check size of off_t - done
+-- Looking for fseeko
+-- Looking for fseeko - found
+-- Check size of curl_off_t
+-- Check size of curl_off_t - done
+-- Check size of curl_socket_t
+-- Check size of curl_socket_t - done
+-- Performing Test HAVE_WRITABLE_ARGV
+-- Performing Test HAVE_WRITABLE_ARGV - Success
+-- Performing Test HAVE_TIME_T_UNSIGNED
+-- Performing Test HAVE_TIME_T_UNSIGNED - Failed
+-- Performing Test HAVE_GLIBC_STRERROR_R
+-- Performing Test HAVE_GLIBC_STRERROR_R - Success
+-- Performing Test HAVE_POSIX_STRERROR_R
+-- Performing Test HAVE_POSIX_STRERROR_R - Failed
+-- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC
+-- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC - Success
+-- Check size of struct sockaddr_storage
+-- Check size of struct sockaddr_storage - done
+-- Performing Test HAVE_STRUCT_TIMEVAL
+-- Performing Test HAVE_STRUCT_TIMEVAL - Success
+-- Performing Test HAVE_H_ERRNO
+-- Performing Test HAVE_H_ERRNO - Success
+-- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC_RAW
+-- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC_RAW - Success
+-- Enabled examples with dependencies: cacertinmem:USE_OPENSSL threaded:HAVE_THREADS_POSIX usercertinmem:USE_OPENSSL
+-- Protocols: http https
+-- Features: alt-svc AsynchDNS HSTS HTTPS-proxy IPv6 Largefile SSL threadsafe TLS-SRP UnixSockets
+-- Enabled SSL backends: OpenSSL
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR - Success
+-- Configuring done (37.5s)
+-- Generating done (0.2s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    BLOOD2_GPU_TESTS
+    BLOOD2_INSPECTOR
+    CMAKE_CXX_FLAGS_MINSIZEREL
+    CMAKE_CXX_FLAGS_RELWITHDEBINFO
+    CMAKE_C_FLAGS_MINSIZEREL
+    CMAKE_C_FLAGS_RELWITHDEBINFO
+    CMAKE_EXE_LINKER_FLAGS_DEBUG
+    CMAKE_EXE_LINKER_FLAGS_MINSIZEREL
+    CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO
+
+
+-- Build files have been written to: /home/yann/projects/lithtech/Blood2/build/release/launcher
+[142/957] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[143/957] Performing build step for 'blood2_launcher'
+[0/2] Re-checking globbed directories...
+[1/633] Generating wayland-generated-protocols/alpha-modifier-v1-client-protocol.h
+[2/633] Generating wayland-generated-protocols/color-management-v1-client-protocol.h
+[3/633] Generating wayland-generated-protocols/cursor-shape-v1-client-protocol.h
+[4/633] Generating wayland-generated-protocols/fractional-scale-v1-client-protocol.h
+[5/633] Generating wayland-generated-protocols/frog-color-management-v1-client-protocol.h
+[6/633] Generating wayland-generated-protocols/idle-inhibit-unstable-v1-client-protocol.h
+[7/633] Generating wayland-generated-protocols/input-timestamps-unstable-v1-client-protocol.h
+[8/633] Generating wayland-generated-protocols/keyboard-shortcuts-inhibit-unstable-v1-client-protocol.h
+[9/633] Generating wayland-generated-protocols/pointer-constraints-unstable-v1-client-protocol.h
+[10/633] Generating wayland-generated-protocols/pointer-gestures-unstable-v1-client-protocol.h
+[11/633] Generating wayland-generated-protocols/pointer-warp-v1-client-protocol.h
+[12/633] Generating wayland-generated-protocols/primary-selection-unstable-v1-client-protocol.h
+[13/633] Generating wayland-generated-protocols/relative-pointer-unstable-v1-client-protocol.h
+[14/633] Generating wayland-generated-protocols/single-pixel-buffer-v1-client-protocol.h
+[15/633] Generating wayland-generated-protocols/text-input-unstable-v3-client-protocol.h
+[16/633] Generating wayland-generated-protocols/tablet-v2-client-protocol.h
+[17/633] Generating wayland-generated-protocols/viewporter-client-protocol.h
+[18/633] Generating wayland-generated-protocols/xdg-activation-v1-client-protocol.h
+[19/633] Generating wayland-generated-protocols/xdg-decoration-unstable-v1-client-protocol.h
+[20/633] Generating wayland-generated-protocols/wayland-client-protocol.h
+[21/633] Generating wayland-generated-protocols/xdg-foreign-unstable-v2-client-protocol.h
+[22/633] Generating wayland-generated-protocols/xdg-dialog-v1-client-protocol.h
+[23/633] Generating wayland-generated-protocols/xdg-output-unstable-v1-client-protocol.h
+[24/633] Generating wayland-generated-protocols/xdg-session-management-v1-client-protocol.h
+[25/633] Generating wayland-generated-protocols/xdg-shell-client-protocol.h
+[26/633] Generating wayland-generated-protocols/xdg-toplevel-icon-v1-client-protocol.h
+[27/633] Generating wayland-generated-protocols/xdg-toplevel-tag-v1-client-protocol.h
+[28/633] Scanning /home/yann/projects/lithtech/Blood2/src/engine/resources.cpp for CXX dependencies
+[29/633] Scanning /home/yann/projects/lithtech/Blood2/src/engine/config.cpp for CXX dependencies
+[30/633] Generating wayland-generated-protocols/alpha-modifier-v1-protocol.c
+[31/633] Generating wayland-generated-protocols/color-management-v1-protocol.c
+[32/633] Generating wayland-generated-protocols/cursor-shape-v1-protocol.c
+[33/633] Generating wayland-generated-protocols/fractional-scale-v1-protocol.c
+[34/633] Generating wayland-generated-protocols/frog-color-management-v1-protocol.c
+[35/633] Generating wayland-generated-protocols/idle-inhibit-unstable-v1-protocol.c
+[36/633] Generating wayland-generated-protocols/input-timestamps-unstable-v1-protocol.c
+[37/633] Scanning /home/yann/projects/lithtech/Blood2/src/startup/protocol.cpp for CXX dependencies
+[38/633] Generating wayland-generated-protocols/keyboard-shortcuts-inhibit-unstable-v1-protocol.c
+[39/633] Generating wayland-generated-protocols/pointer-constraints-unstable-v1-protocol.c
+[40/633] Generating wayland-generated-protocols/pointer-gestures-unstable-v1-protocol.c
+[41/633] Generating wayland-generated-protocols/pointer-warp-v1-protocol.c
+[42/633] Generating wayland-generated-protocols/primary-selection-unstable-v1-protocol.c
+[43/633] Generating wayland-generated-protocols/relative-pointer-unstable-v1-protocol.c
+[44/633] Generating wayland-generated-protocols/single-pixel-buffer-v1-protocol.c
+[45/633] Generating wayland-generated-protocols/tablet-v2-protocol.c
+[46/633] Generating wayland-generated-protocols/text-input-unstable-v3-protocol.c
+[47/633] Generating wayland-generated-protocols/viewporter-protocol.c
+[48/633] Generating wayland-generated-protocols/xdg-activation-v1-protocol.c
+[49/633] Generating wayland-generated-protocols/xdg-decoration-unstable-v1-protocol.c
+[50/633] Generating wayland-generated-protocols/wayland-protocol.c
+[51/633] Generating wayland-generated-protocols/xdg-dialog-v1-protocol.c
+[52/633] Generating wayland-generated-protocols/xdg-foreign-unstable-v2-protocol.c
+[53/633] Generating wayland-generated-protocols/xdg-output-unstable-v1-protocol.c
+[54/633] Generating wayland-generated-protocols/xdg-session-management-v1-protocol.c
+[55/633] Generating wayland-generated-protocols/xdg-toplevel-icon-v1-protocol.c
+[56/633] Generating wayland-generated-protocols/xdg-shell-protocol.c
+[57/633] Generating wayland-generated-protocols/xdg-toplevel-tag-v1-protocol.c
+[58/633] Generating CXX dyndep file CMakeFiles/blood2_startup.dir/CXX.dd
+[59/633] Scanning /home/yann/projects/lithtech/Blood2/build/release/launcher/_deps/imgui_source-src/imgui_draw.cpp for CXX dependencies
+[60/633] Scanning /home/yann/projects/lithtech/Blood2/build/release/launcher/_deps/imgui_source-src/imgui.cpp for CXX dependencies
+[61/633] Scanning /home/yann/projects/lithtech/Blood2/build/release/launcher/_deps/imgui_source-src/imgui_tables.cpp for CXX dependencies
+[62/633] Scanning /home/yann/projects/lithtech/Blood2/build/release/launcher/_deps/imgui_source-src/backends/imgui_impl_sdl3.cpp for CXX dependencies
+[63/633] Scanning /home/yann/projects/lithtech/Blood2/build/release/launcher/_deps/imgui_source-src/backends/imgui_impl_sdlgpu3.cpp for CXX dependencies
+[64/633] Scanning /home/yann/projects/lithtech/Blood2/build/release/launcher/_deps/imgui_source-src/imgui_widgets.cpp for CXX dependencies
+[65/633] Scanning /home/yann/projects/lithtech/Blood2/src/launcher/state.cpp for CXX dependencies
+[66/633] Scanning /home/yann/projects/lithtech/Blood2/src/launcher/dialog.cpp for CXX dependencies
+[67/633] Scanning /home/yann/projects/lithtech/Blood2/src/launcher/content.cpp for CXX dependencies
+[68/633] Scanning /home/yann/projects/lithtech/Blood2/src/launcher/process.cpp for CXX dependencies
+[69/633] Scanning /home/yann/projects/lithtech/Blood2/src/launcher/controller.cpp for CXX dependencies
+[70/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/cmake_pch.h.gch
+[71/633] Scanning /home/yann/projects/lithtech/Blood2/src/launcher/mods.cpp for CXX dependencies
+[72/633] Scanning /home/yann/projects/lithtech/Blood2/src/launcher/demo_install.cpp for CXX dependencies
+[73/633] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[74/633] Scanning /home/yann/projects/lithtech/Blood2/src/launcher/artwork.cpp for CXX dependencies
+[75/633] Building CXX object CMakeFiles/blood2_startup.dir/src/engine/config.cpp.o
+[76/633] Building CXX object CMakeFiles/blood2_startup.dir/src/engine/resources.cpp.o
+[77/633] Building CXX object CMakeFiles/blood2_startup.dir/src/startup/protocol.cpp.o
+[78/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL.c.o
+[79/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_assert.c.o
+[80/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_error.c.o
+[81/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_guid.c.o
+[82/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_hints.c.o
+[83/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_hashtable.c.o
+[84/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_list.c.o
+[85/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_log.c.o
+[86/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_properties.c.o
+[87/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_utils.c.o
+[88/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/atomic/SDL_atomic.c.o
+[89/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/atomic/SDL_spinlock.c.o
+[90/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audio.c.o
+[91/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audiodev.c.o
+[92/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audioqueue.c.o
+[93/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audioresample.c.o
+[94/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audiocvt.c.o
+[95/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_mixer.c.o
+[96/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audiotypecvt.c.o
+[97/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_wave.c.o
+[98/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/SDL_core_unsupported.c.o
+[99/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/camera/SDL_camera.c.o
+[100/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/cpuinfo/SDL_cpuinfo.c.o
+[101/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_categories.c.o
+[102/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_clipboardevents.c.o
+[103/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_displayevents.c.o
+[104/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_dropevents.c.o
+[105/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_events.c.o
+[106/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_eventwatch.c.o
+[107/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_keyboard.c.o
+[108/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_keymap.c.o
+[109/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_keysym_to_keycode.c.o
+[110/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_keysym_to_scancode.c.o
+[111/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_mouse.c.o
+[112/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_notificationevents.c.o
+[113/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_pen.c.o
+[114/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_quit.c.o
+[115/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_scancode_tables.c.o
+[116/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_touch.c.o
+[117/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_windowevents.c.o
+[118/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/imKStoUCS.c.o
+[119/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/filesystem/SDL_filesystem.c.o
+[120/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/gpu/SDL_gpu.c.o
+[121/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/gpu/xr/SDL_gpu_openxr.c.o
+[122/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/gpu/xr/SDL_openxrdyn.c.o
+[123/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/haptic/SDL_haptic.c.o
+[124/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/hidapi/SDL_hidapi.c.o
+[125/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/io/SDL_asyncio.c.o
+[126/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dynapi/SDL_dynapi.c.o
+[127/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/io/generic/SDL_asyncio_generic.c.o
+[128/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/io/SDL_iostream.c.o
+[129/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/SDL_gamepad.c.o
+[130/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/SDL_steam_virtual_gamepad.c.o
+[131/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/controller_type.c.o
+[132/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/locale/SDL_locale.c.o
+[133/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/main/SDL_main_callbacks.c.o
+[134/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/main/SDL_runapp.c.o
+[135/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/misc/SDL_libusb.c.o
+[136/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/misc/SDL_url.c.o
+[137/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/notification/SDL_notification.c.o
+[138/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/power/SDL_power.c.o
+[139/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/SDL_joystick.c.o
+[140/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/SDL_render_unsupported.c.o
+[141/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/SDL_yuv_sw.c.o
+[142/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d/SDL_render_d3d.c.o
+[143/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d/SDL_shaders_d3d.c.o
+[144/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d11/SDL_render_d3d11.c.o
+[145/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d11/SDL_shaders_d3d11.c.o
+[146/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d12/SDL_render_d3d12.c.o
+[147/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d12/SDL_shaders_d3d12.c.o
+[148/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/gpu/SDL_pipeline_gpu.c.o
+[149/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/gpu/SDL_render_gpu.c.o
+[150/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/gpu/SDL_shaders_gpu.c.o
+[151/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/ngage/SDL_render_ngage.c.o
+[152/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengl/SDL_render_gl.c.o
+[153/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengl/SDL_shaders_gl.c.o
+[154/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengles/SDL_render_gles.c.o
+[155/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengles2/SDL_render_gles2.c.o
+[156/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengles2/SDL_shaders_gles2.c.o
+[157/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/ps2/SDL_render_ps2.c.o
+[158/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/psp/SDL_render_psp.c.o
+[159/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_blendfillrect.c.o
+[160/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_blendline.c.o
+[161/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_blendpoint.c.o
+[162/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_drawline.c.o
+[163/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_drawpoint.c.o
+[164/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_render_sw.c.o
+[165/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_triangle.c.o
+[166/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vitagxm/SDL_render_vita_gxm.c.o
+[167/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vitagxm/SDL_render_vita_gxm_memory.c.o
+[168/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vitagxm/SDL_render_vita_gxm_tools.c.o
+[169/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vulkan/SDL_render_vulkan.c.o
+[170/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vulkan/SDL_shaders_vulkan.c.o
+[171/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/SDL_render.c.o
+[172/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_crc16.c.o
+[173/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/sensor/SDL_sensor.c.o
+[174/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_crc32.c.o
+[175/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_getenv.c.o
+[176/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_iconv.c.o
+[177/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_malloc.c.o
+[178/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_memcpy.c.o
+[179/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_memmove.c.o
+[180/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_memset.c.o
+[181/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_mslibc.c.o
+[182/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_murmur3.c.o
+[183/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_random.c.o
+[184/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_stdlib.c.o
+[185/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_string.c.o
+[186/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_strtokr.c.o
+[187/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_qsort.c.o
+[188/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/storage/SDL_storage.c.o
+[189/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/SDL_thread.c.o
+[190/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/time/SDL_time.c.o
+[191/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/timer/SDL_timer.c.o
+[192/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit.c.o
+[193/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_RLEaccel.c.o
+[194/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_0.c.o
+[195/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_1.c.o
+[196/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_A.c.o
+[197/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_N.c.o
+[198/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_copy.c.o
+[199/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_slow.c.o
+[200/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_bmp.c.o
+[201/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_clipboard.c.o
+[202/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_egl.c.o
+[203/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_fillrect.c.o
+[204/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_pixels.c.o
+[205/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_rect.c.o
+[206/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_rotate.c.o
+[207/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_stb.c.o
+[208/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_stretch.c.o
+[209/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_surface.c.o
+[210/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_auto.c.o
+[211/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_video_unsupported.c.o
+[212/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_vulkan_utils.c.o
+[213/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_video.c.o
+[214/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/yuv2rgb/yuv_rgb_lsx.c.o
+[215/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/yuv2rgb/yuv_rgb_sse.c.o
+[216/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_yuv.c.o
+[217/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_atan2.c.o
+[218/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_exp.c.o
+[219/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_fmod.c.o
+[220/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_log.c.o
+[221/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_log10.c.o
+[222/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_pow.c.o
+[223/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_rem_pio2.c.o
+[224/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_sqrt.c.o
+[225/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/k_cos.c.o
+[226/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/k_rem_pio2.c.o
+[227/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/k_sin.c.o
+[228/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/k_tan.c.o
+[229/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_atan.c.o
+[230/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_copysign.c.o
+[231/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_cos.c.o
+[232/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_fabs.c.o
+[233/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_floor.c.o
+[234/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_isinf.c.o
+[235/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_isinff.c.o
+[236/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_isnan.c.o
+[237/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_isnanf.c.o
+[238/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_modf.c.o
+[239/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_scalbn.c.o
+[240/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_sin.c.o
+[241/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_tan.c.o
+[242/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/dummy/SDL_dummyaudio.c.o
+[243/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/loadso/dlopen/SDL_sysloadso.c.o
+[244/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/virtual/SDL_virtualjoystick.c.o
+[245/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/dummy/SDL_nullevents.c.o
+[246/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/dummy/SDL_nullframebuffer.c.o
+[247/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/dummy/SDL_nullvideo.c.o
+[248/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/yuv2rgb/yuv_rgb_std.c.o
+[249/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/jack/SDL_jackaudio.c.o
+[250/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/alsa/SDL_alsa_audio.c.o
+[251/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/camera/pipewire/SDL_camera_pipewire.c.o
+[252/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/pulseaudio/SDL_pulseaudio.c.o
+[253/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11clipboard.c.o
+[254/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11dyn.c.o
+[255/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11events.c.o
+[256/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/pipewire/SDL_pipewire.c.o
+[257/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11framebuffer.c.o
+[258/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11messagebox.c.o
+[259/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11keyboard.c.o
+[260/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11mouse.c.o
+[261/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11modes.c.o
+[262/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11opengles.c.o
+[263/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11opengl.c.o
+[264/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11settings.c.o
+[265/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11shape.c.o
+[266/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11pen.c.o
+[267/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11touch.c.o
+[268/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11video.c.o
+[269/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11vulkan.c.o
+[270/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11toolkit.c.o
+[271/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11xfixes.c.o
+[272/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11window.c.o
+[273/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11xinput2.c.o
+[274/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11xsync.c.o
+[275/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11xtest.c.o
+[276/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/edid-parse.c.o
+[277/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/xsettings-client.c.o
+[278/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmevents.c.o
+[279/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmmouse.c.o
+[280/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmdyn.c.o
+[281/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmopengles.c.o
+[282/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmvulkan.c.o
+[283/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandclipboard.c.o
+[284/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandcolor.c.o
+[285/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmvideo.c.o
+[286/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylanddatamanager.c.o
+[287/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylanddyn.c.o
+[288/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandeventthread.c.o
+[289/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandkeyboard.c.o
+[290/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandmessagebox.c.o
+[291/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandmouse.c.o
+[292/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandopengles.c.o
+[293/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandshmbuffer.c.o
+[294/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandutil.c.o
+[295/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandevents.c.o
+[296/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandvulkan.c.o
+[297/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandvideo.c.o
+[298/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/alpha-modifier-v1-protocol.c.o
+[299/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/color-management-v1-protocol.c.o
+[300/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/cursor-shape-v1-protocol.c.o
+[301/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/fractional-scale-v1-protocol.c.o
+[302/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/frog-color-management-v1-protocol.c.o
+[303/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/idle-inhibit-unstable-v1-protocol.c.o
+[304/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/input-timestamps-unstable-v1-protocol.c.o
+[305/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/keyboard-shortcuts-inhibit-unstable-v1-protocol.c.o
+[306/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/pointer-constraints-unstable-v1-protocol.c.o
+[307/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/pointer-gestures-unstable-v1-protocol.c.o
+[308/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/pointer-warp-v1-protocol.c.o
+[309/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/primary-selection-unstable-v1-protocol.c.o
+[310/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/relative-pointer-unstable-v1-protocol.c.o
+[311/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/single-pixel-buffer-v1-protocol.c.o
+[312/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/tablet-v2-protocol.c.o
+[313/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/text-input-unstable-v3-protocol.c.o
+[314/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/viewporter-protocol.c.o
+[315/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/wayland-protocol.c.o
+[316/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-activation-v1-protocol.c.o
+[317/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-decoration-unstable-v1-protocol.c.o
+[318/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-dialog-v1-protocol.c.o
+[319/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-foreign-unstable-v2-protocol.c.o
+[320/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-output-unstable-v1-protocol.c.o
+[321/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandwindow.c.o
+[322/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-session-management-v1-protocol.c.o
+[323/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-shell-protocol.c.o
+[324/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-toplevel-icon-v1-protocol.c.o
+[325/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-toplevel-tag-v1-protocol.c.o
+[326/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/unix/SDL_appid.c.o
+[327/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/unix/SDL_fribidi.c.o
+[328/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/unix/SDL_libthai.c.o
+[329/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/unix/SDL_poll.c.o
+[330/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/haptic/linux/SDL_syshaptic.c.o
+[331/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_system_theme.c.o
+[332/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_progressbar.c.o
+[333/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_dbus.c.o
+[334/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_ime.c.o
+[335/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_fcitx.c.o
+[336/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_udev.c.o
+[337/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_ibus.c.o
+[338/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_evdev.c.o
+[339/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_evdev_capabilities.c.o
+[340/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_evdev_kbd.c.o
+[341/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_ubuntu_touch.c.o
+[342/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_threadprio.c.o
+[343/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_combined.c.o
+[344/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_8bitdo.c.o
+[345/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_flydigi.c.o
+[346/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_gamecube.c.o
+[347/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_gamesir.c.o
+[348/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_lg4ff.c.o
+[349/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_luna.c.o
+[350/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_gip.c.o
+[351/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_ps3.c.o
+[352/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_ps4.c.o
+[353/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_rumble.c.o
+[354/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_shield.c.o
+[355/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_ps5.c.o
+[356/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_stadia.c.o
+[357/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_sinput.c.o
+[358/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_steam_hori.c.o
+[359/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_steam.c.o
+[360/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_steam_triton.c.o
+[361/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_steamdeck.c.o
+[362/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_switch2.c.o
+[363/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_wii.c.o
+[364/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_xbox360.c.o
+[365/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_xbox360bb.c.o
+[366/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_switch.c.o
+[367/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_xbox360w.c.o
+[368/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_zuiki.c.o
+[369/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_xboxone.c.o
+[370/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_report_descriptor.c.o
+[371/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/haptic/hidapi/SDL_hidapihaptic.c.o
+[372/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapijoystick.c.o
+[373/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/haptic/hidapi/SDL_hidapihaptic_lg4ff.c.o
+[374/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_systhread.c.o
+[375/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_sysmutex.c.o
+[376/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_syscond.c.o
+[377/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_sysrwlock.c.o
+[378/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/linux/SDL_sysjoystick.c.o
+[379/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_systls.c.o
+[380/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_syssem.c.o
+[381/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/misc/unix/SDL_sysurl.c.o
+[382/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/locale/unix/SDL_syslocale.c.o
+[383/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/power/linux/SDL_syspower.c.o
+[384/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/filesystem/unix/SDL_sysfilesystem.c.o
+[385/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/storage/generic/SDL_genericstorage.c.o
+[386/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/storage/steam/SDL_steamstorage.c.o
+[387/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/filesystem/posix/SDL_sysfsops.c.o
+[388/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/timer/unix/SDL_systimer.c.o
+[389/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/time/unix/SDL_systime.c.o
+[390/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/SDL_dialog.c.o
+[391/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/unix/SDL_unixdialog.c.o
+[392/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/SDL_dialog_utils.c.o
+[393/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/unix/SDL_zenitydialog.c.o
+[394/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/unix/SDL_portaldialog.c.o
+[395/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/unix/SDL_zenitymessagebox.c.o
+[396/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/process/SDL_process.c.o
+[397/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenevents.c.o
+[398/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenframebuffer.c.o
+[399/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenopengles.c.o
+[400/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/process/posix/SDL_posixprocess.c.o
+[401/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenvideo.c.o
+[402/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenwindow.c.o
+[403/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenvulkan.c.o
+[404/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/tray/SDL_tray_utils.c.o
+[405/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/sensor/dummy/SDL_dummysensor.c.o
+[406/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/tray/dummy/SDL_tray.c.o
+[407/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/camera/dummy/SDL_camera_dummy.c.o
+[408/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/notification/dummy/SDL_dummynotification.c.o
+[409/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/main/generic/SDL_sysmain_callbacks.c.o
+[410/633] Generating CXX dyndep file src/launcher/CMakeFiles/blood2_launcher_core.dir/CXX.dd
+[411/633] Scanning /home/yann/projects/lithtech/Blood2/src/launcher/main.cpp for CXX dependencies
+[412/633] Scanning /home/yann/projects/lithtech/Blood2/src/engine/capture.cpp for CXX dependencies
+[413/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/altsvc.c.o
+[414/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/amigaos.c.o
+[415/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/asyn-ares.c.o
+[416/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/asyn-base.c.o
+[417/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/asyn-thrdd.c.o
+[418/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/bufq.c.o
+[419/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/bufref.c.o
+[420/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/cf-dns.c.o
+[421/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/cf-h1-proxy.c.o
+[422/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/cf-h2-proxy.c.o
+[423/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/cf-haproxy.c.o
+[424/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/cf-https-connect.c.o
+[425/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/cf-ip-happy.c.o
+[426/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/cf-socket.c.o
+[427/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/cfilters.c.o
+[428/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/conncache.c.o
+[429/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/connect.c.o
+[430/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/content_encoding.c.o
+[431/633] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/gpu/vulkan/SDL_gpu_vulkan.c.o
+[432/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/cookie.c.o
+[433/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/cshutdn.c.o
+[434/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_addrinfo.c.o
+[435/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_endian.c.o
+[436/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_fnmatch.c.o
+[437/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_fopen.c.o
+[438/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_get_line.c.o
+[439/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_gethostname.c.o
+[440/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_gssapi.c.o
+[441/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_ntlm_core.c.o
+[442/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_memrchr.c.o
+[443/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_range.c.o
+[444/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_sasl.c.o
+[445/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_sha512_256.c.o
+[446/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_sspi.c.o
+[447/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_threads.c.o
+[448/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_share.c.o
+[449/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curl_trc.c.o
+[450/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/cw-out.c.o
+[451/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/cw-pause.c.o
+[452/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/dict.c.o
+[453/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/dnscache.c.o
+[454/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/doh.c.o
+[455/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/dynhds.c.o
+[456/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/easy.c.o
+[457/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/easyoptions.c.o
+[458/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/easygetopt.c.o
+[459/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/fake_addrinfo.c.o
+[460/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/escape.c.o
+[461/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/file.c.o
+[462/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/fileinfo.c.o
+[463/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/ftp.c.o
+[464/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/ftplistparser.c.o
+[465/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/getenv.c.o
+[466/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/getinfo.c.o
+[467/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/gopher.c.o
+[468/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/formdata.c.o
+[469/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/hash.c.o
+[470/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/hmac.c.o
+[471/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/headers.c.o
+[472/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/hostip4.c.o
+[473/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/hostip6.c.o
+[474/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/hostip.c.o
+[475/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/hsts.c.o
+[476/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/http1.c.o
+[477/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/http2.c.o
+[478/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/http_aws_sigv4.c.o
+[479/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/http_chunks.c.o
+[480/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/http.c.o
+[481/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/http_digest.c.o
+[482/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/http_negotiate.c.o
+[483/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/http_ntlm.c.o
+[484/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/httpsrr.c.o
+[485/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/idn.c.o
+[486/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/http_proxy.c.o
+[487/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/imap.c.o
+[488/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/if2ip.c.o
+[489/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/ldap.c.o
+[490/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/llist.c.o
+[491/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/macos.c.o
+[492/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/md4.c.o
+[493/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/memdebug.c.o
+[494/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/md5.c.o
+[495/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/mime.c.o
+[496/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/mqtt.c.o
+[497/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/mprintf.c.o
+[498/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/multi_ev.c.o
+[499/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/multi_ntfy.c.o
+[500/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/netrc.c.o
+[501/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/noproxy.c.o
+[502/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/openldap.c.o
+[503/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/parsedate.c.o
+[504/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/multi.c.o
+[505/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/pingpong.c.o
+[506/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/pop3.c.o
+[507/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/protocol.c.o
+[508/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/psl.c.o
+[509/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/rand.c.o
+[510/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/progress.c.o
+[511/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/ratelimit.c.o
+[512/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/rtsp.c.o
+[513/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/request.c.o
+[514/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/select.c.o
+[515/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/sendf.c.o
+[516/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/sha256.c.o
+[517/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/slist.c.o
+[518/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/smb.c.o
+[519/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/smtp.c.o
+[520/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/setopt.c.o
+[521/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/socketpair.c.o
+[522/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/socks_gssapi.c.o
+[523/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/socks_sspi.c.o
+[524/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/splay.c.o
+[525/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/strcase.c.o
+[526/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/socks.c.o
+[527/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/strequal.c.o
+[528/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/strerror.c.o
+[529/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/system_win32.c.o
+[530/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/telnet.c.o
+[531/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/tftp.c.o
+[532/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/thrdqueue.c.o
+[533/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/thrdpool.c.o
+[534/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/uint-bset.c.o
+[535/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/uint-hash.c.o
+[536/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/transfer.c.o
+[537/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/uint-spbset.c.o
+[538/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/uint-table.c.o
+[539/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/url.c.o
+[540/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/urlapi.c.o
+[541/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/ws.c.o
+[542/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/version.c.o
+[543/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vauth/cleartext.c.o
+[544/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vauth/cram.c.o
+[545/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vauth/digest_sspi.c.o
+[546/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vauth/gsasl.c.o
+[547/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_gssapi.c.o
+[548/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_sspi.c.o
+[549/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm.c.o
+[550/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vauth/digest.c.o
+[551/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm_sspi.c.o
+[552/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vauth/oauth2.c.o
+[553/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_gssapi.c.o
+[554/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_sspi.c.o
+[555/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/apple.c.o
+[556/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vauth/vauth.c.o
+[557/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/cipher_suite.c.o
+[558/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/gtls.c.o
+[559/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/hostcheck.c.o
+[560/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/keylog.c.o
+[561/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/mbedtls.c.o
+[562/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/rustls.c.o
+[563/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/schannel.c.o
+[564/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/schannel_verify.c.o
+[565/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/vtls.c.o
+[566/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/openssl.c.o
+[567/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_spack.c.o
+[568/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/wolfssl.c.o
+[569/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/x509asn1.c.o
+[570/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_scache.c.o
+[571/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vquic/curl_ngtcp2.c.o
+[572/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vquic/curl_quiche.c.o
+[573/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vquic/vquic.c.o
+[574/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vquic/vquic-tls.c.o
+[575/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vssh/libssh.c.o
+[576/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vssh/libssh2.c.o
+[577/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/vssh/vssh.c.o
+[578/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/basename.c.o
+[579/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/base64.c.o
+[580/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/dynbuf.c.o
+[581/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/fopen.c.o
+[582/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/inet_ntop.c.o
+[583/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/inet_pton.c.o
+[584/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/multibyte.c.o
+[585/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/nonblock.c.o
+[586/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/snprintf.c.o
+[587/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/strcopy.c.o
+[588/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/strdup.c.o
+[589/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/strerr.c.o
+[590/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/timediff.c.o
+[591/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/strparse.c.o
+[592/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/timeval.c.o
+[593/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/version_win32.c.o
+[594/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/wait.c.o
+[595/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/winapi.c.o
+[596/633] Building C object _deps/launcher_curl-build/lib/CMakeFiles/libcurl_static.dir/curlx/warnless.c.o
+[597/633] Building C object _deps/launcher_miniz-build/CMakeFiles/miniz.dir/miniz.c.o
+[598/633] Building C object _deps/launcher_miniz-build/CMakeFiles/miniz.dir/miniz_tinfl.c.o
+[599/633] Building C object _deps/launcher_miniz-build/CMakeFiles/miniz.dir/miniz_zip.c.o
+[600/633] Building C object _deps/launcher_miniz-build/CMakeFiles/miniz.dir/miniz_tdef.c.o
+[601/633] Building CXX object CMakeFiles/imgui.dir/_deps/imgui_source-src/imgui_draw.cpp.o
+[602/633] Building CXX object CMakeFiles/imgui.dir/_deps/imgui_source-src/imgui.cpp.o
+[603/633] Building CXX object CMakeFiles/imgui.dir/_deps/imgui_source-src/imgui_tables.cpp.o
+[604/633] Building CXX object CMakeFiles/imgui.dir/_deps/imgui_source-src/backends/imgui_impl_sdl3.cpp.o
+[605/633] Building CXX object CMakeFiles/imgui.dir/_deps/imgui_source-src/backends/imgui_impl_sdlgpu3.cpp.o
+[606/633] Linking CXX static library libblood2_startup.a
+[607/633] Linking C static library _deps/sdl3-build/libSDL3.a
+[608/633] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/spdlog.cpp.o
+[609/633] Building CXX object CMakeFiles/imgui.dir/_deps/imgui_source-src/imgui_widgets.cpp.o
+[610/633] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/stdout_sinks.cpp.o
+[611/633] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/file_sinks.cpp.o
+[612/633] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/color_sinks.cpp.o
+[613/633] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/cfg.cpp.o
+[614/633] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/async.cpp.o
+[615/633] Building CXX object src/launcher/CMakeFiles/blood2_launcher_core.dir/state.cpp.o
+[616/633] Building CXX object src/launcher/CMakeFiles/blood2_launcher_core.dir/dialog.cpp.o
+[617/633] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/bundled_fmtlib_format.cpp.o
+[618/633] Building CXX object src/launcher/CMakeFiles/blood2_launcher_core.dir/content.cpp.o
+[619/633] Building CXX object src/launcher/CMakeFiles/blood2_launcher_core.dir/process.cpp.o
+[620/633] Building CXX object src/launcher/CMakeFiles/blood2_launcher_core.dir/controller.cpp.o
+[621/633] Building CXX object src/launcher/CMakeFiles/blood2_launcher_core.dir/demo_install.cpp.o
+[622/633] Building CXX object src/launcher/CMakeFiles/blood2_launcher_core.dir/artwork.cpp.o
+[623/633] Generating CXX dyndep file src/launcher/CMakeFiles/blood2_launcher.dir/CXX.dd
+[624/633] Linking C static library _deps/launcher_curl-build/lib/libcurl.a
+[625/633] Linking C static library _deps/launcher_miniz-build/libminiz.a
+[626/633] Linking CXX static library libimgui.a
+[627/633] Linking CXX static library _deps/spdlog-build/libspdlog.a
+[628/633] Building CXX object src/launcher/CMakeFiles/blood2_launcher_core.dir/mods.cpp.o
+[629/633] Linking CXX static library src/launcher/libblood2_launcher_core.a
+[630/633] Building CXX object src/launcher/CMakeFiles/blood2_launcher.dir/__/engine/capture.cpp.o
+[631/633] Building CXX object src/launcher/CMakeFiles/blood2_launcher.dir/main.cpp.o
+[632/633] Linking CXX executable blood2-launcher
+[477/951] Building CXX object tests/CMakeFiles/container_tests.dir/container_tests.cpp.o
+[478/951] Performing install step for 'blood2_launcher'
+-- Installing: /home/yann/projects/lithtech/Blood2/build/release/./blood2-launcher
+-- Installing: /home/yann/projects/lithtech/Blood2/build/release/./licenses
+-- Installing: /home/yann/projects/lithtech/Blood2/build/release/./licenses/launcher-notices.txt
+-- Installing: /home/yann/projects/lithtech/Blood2/build/release/./licenses/DroidSans-Apache-2.0.txt
+-- Installing: /home/yann/projects/lithtech/Blood2/build/release/./licenses/curl.txt
+-- Installing: /home/yann/projects/lithtech/Blood2/build/release/./licenses/miniz.txt
+-- Installing: /home/yann/projects/lithtech/Blood2/build/release/./licenses/imgui.txt
+-- Installing: /home/yann/projects/lithtech/Blood2/build/release/./licenses/SDL.txt
+-- Installing: /home/yann/projects/lithtech/Blood2/build/release/./licenses/spdlog.txt
+[480/951] Completed 'blood2_launcher'
+[481/951] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[482/951] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[483/925] Building CXX object tests/CMakeFiles/compound_shell_tests.dir/compound_shell_tests.cpp.o
+[484/925] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[485/925] Building CXX object tests/CMakeFiles/door_tests.dir/door_tests.cpp.o
+[486/925] Building CXX object tests/CMakeFiles/door_audio_tests.dir/door_audio_tests.cpp.o
+[487/925] Building CXX object tests/CMakeFiles/trigger_audio_tests.dir/trigger_audio_tests.cpp.o
+[488/925] Building CXX object tests/CMakeFiles/trigger_tests.dir/trigger_tests.cpp.o
+[489/925] Building CXX object tests/CMakeFiles/interaction_tests.dir/interaction_tests.cpp.o
+[490/925] Building CXX object tests/CMakeFiles/brush_tests.dir/brush_tests.cpp.o
+[491/925] Building CXX object tests/CMakeFiles/explosion_tests.dir/explosion_tests.cpp.o
+[492/925] Building CXX object tests/CMakeFiles/pushable_tests.dir/pushable_tests.cpp.o
+[493/925] Building CXX object tests/CMakeFiles/pickup_audio_tests.dir/pickup_audio_tests.cpp.o
+[494/925] Building CXX object tests/CMakeFiles/pickup_tests.dir/pickup_tests.cpp.o
+[495/925] Building CXX object tests/CMakeFiles/objectives_tests.dir/objectives_tests.cpp.o
+[496/925] Building CXX object tests/CMakeFiles/camera_tests.dir/camera_tests.cpp.o
+[497/925] Building CXX object tests/CMakeFiles/keyframer_tests.dir/keyframer_tests.cpp.o
+[498/925] Building CXX object tests/CMakeFiles/keyframe_audio_tests.dir/keyframe_audio_tests.cpp.o
+[499/925] Building CXX object tests/CMakeFiles/light_tests.dir/light_tests.cpp.o
+[500/925] Building CXX object tests/CMakeFiles/worldpath_tests.dir/worldpath_tests.cpp.o
+[501/925] Building CXX object tests/CMakeFiles/cinematic_tests.dir/cinematic_tests.cpp.o
+[502/925] Building CXX object tests/CMakeFiles/random_sound_tests.dir/random_sound_tests.cpp.o
+[503/925] Building CXX object tests/CMakeFiles/sound_tests.dir/sound_tests.cpp.o
+[504/925] Building CXX object tests/CMakeFiles/sprite_tests.dir/sprite_tests.cpp.o
+[505/925] Building CXX object tests/CMakeFiles/scene_explosion_tests.dir/scene_explosion_tests.cpp.o
+[506/925] Building CXX object tests/CMakeFiles/character_animation_tests.dir/character_animation_tests.cpp.o
+[507/925] Building CXX object tests/CMakeFiles/character_audio_tests.dir/character_audio_tests.cpp.o
+[508/925] Building CXX object tests/CMakeFiles/character_motion_tests.dir/character_motion_tests.cpp.o
+[509/925] Building CXX object tests/CMakeFiles/ai_model_key_tests.dir/ai_model_key_tests.cpp.o
+[510/925] Building CXX object tests/CMakeFiles/path_manager_tests.dir/path_manager_tests.cpp.o
+[511/925] Building CXX object tests/CMakeFiles/ai_sight_tests.dir/ai_sight_tests.cpp.o
+[512/925] Building CXX object tests/CMakeFiles/attachment_tests.dir/attachment_tests.cpp.o
+[513/925] Building CXX object tests/CMakeFiles/world_lighting_tests.dir/world_lighting_tests.cpp.o
+[514/925] Building CXX object tests/CMakeFiles/ai_target_tests.dir/ai_target_tests.cpp.o
+[515/925] Building CXX object tests/CMakeFiles/world_lighting_tests.dir/__/src/app/model_lighting.cpp.o
+[516/925] Building CXX object tests/CMakeFiles/world_lighting_tests.dir/__/src/app/model_scene.cpp.o
+[517/925] Building CXX object tests/CMakeFiles/world_gpu_tests.dir/world_gpu_tests.cpp.o
+[518/925] Building CXX object tests/CMakeFiles/world_view_tests.dir/world_view_tests.cpp.o
+[519/925] Building CXX object tests/CMakeFiles/texture_tests.dir/texture_tests.cpp.o
+/home/yann/projects/lithtech/Blood2/tests/texture_tests.cpp: In function ‘bool {anonymous}::mapping()’:
+/home/yann/projects/lithtech/Blood2/tests/texture_tests.cpp:185:88: warning: missing initializer for member ‘OpenBlood2::Surface::effect_name’ [-Wmissing-field-initializers]
+  185 |         model.surfaces = {{{4, 0, 4}, {2, 0, 0}, {0, -1, 0}, 0, 0, 0, 0, false, {}, {}}};
+      |                                                                                        ^
+/home/yann/projects/lithtech/Blood2/tests/texture_tests.cpp:185:88: warning: missing initializer for member ‘OpenBlood2::Surface::effect_parameters’ [-Wmissing-field-initializers]
+[520/925] Building CXX object tests/CMakeFiles/model_view_tests.dir/__/src/app/model_scene.cpp.o
+[521/925] Building CXX object tests/CMakeFiles/model_view_tests.dir/model_view_tests.cpp.o
+[522/925] Building CXX object tests/CMakeFiles/model_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[523/925] Building CXX object tests/CMakeFiles/model_gpu_tests.dir/model_gpu_tests.cpp.o
+[524/925] Building CXX object tests/CMakeFiles/gpu_registry_tests.dir/gpu_registry_tests.cpp.o
+[525/925] Building CXX object tests/CMakeFiles/model_skinning_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[526/925] Building CXX object tests/CMakeFiles/model_skinning_gpu_tests.dir/model_skinning_gpu_tests.cpp.o
+[527/925] Building CXX object tests/CMakeFiles/ai_perception_tests.dir/ai_perception_tests.cpp.o
+[528/925] Building CXX object tests/CMakeFiles/ai_state_tests.dir/ai_state_tests.cpp.o
+[529/925] Building CXX object tests/CMakeFiles/ai_trigger_tests.dir/ai_trigger_tests.cpp.o
+[530/925] Building CXX object tests/CMakeFiles/ai_fire_tests.dir/ai_fire_tests.cpp.o
+[531/925] Building CXX object tests/CMakeFiles/ai_navigation_tests.dir/ai_navigation_tests.cpp.o
+[532/925] Building CXX object tests/CMakeFiles/ai_follow_tests.dir/ai_follow_tests.cpp.o
+[533/925] Building CXX object tests/CMakeFiles/ai_script_tests.dir/ai_script_tests.cpp.o
+[534/925] Building CXX object tests/CMakeFiles/ai_locomotion_tests.dir/ai_locomotion_tests.cpp.o
+[535/925] Building CXX object tests/CMakeFiles/ai_recovery_tests.dir/ai_recovery_tests.cpp.o
+[536/925] Building CXX object tests/CMakeFiles/ai_escape_tests.dir/ai_escape_tests.cpp.o
+[537/925] Building CXX object tests/CMakeFiles/ai_hit_tests.dir/ai_hit_tests.cpp.o
+[538/925] Building CXX object tests/CMakeFiles/ai_runtime_tests.dir/ai_runtime_tests.cpp.o
+[539/925] Building CXX object tests/CMakeFiles/weapon_drop_tests.dir/weapon_drop_tests.cpp.o
+[540/925] Building CXX object tests/CMakeFiles/corpse_tests.dir/corpse_tests.cpp.o
+[541/925] Building CXX object tests/CMakeFiles/exit_tests.dir/exit_tests.cpp.o
+[542/925] Building CXX object tests/CMakeFiles/inventory_state_tests.dir/inventory_state_tests.cpp.o
+[543/925] Building CXX object tests/CMakeFiles/destructable_state_tests.dir/destructable_state_tests.cpp.o
+[544/925] Building CXX object tests/CMakeFiles/player_state_tests.dir/player_state_tests.cpp.o
+[545/925] Building CXX object tests/CMakeFiles/character_nodes_tests.dir/__/src/app/model_scene.cpp.o
+[546/925] Building CXX object tests/CMakeFiles/character_nodes_tests.dir/character_nodes_tests.cpp.o
+ninja: build stopped: interrupted by user.

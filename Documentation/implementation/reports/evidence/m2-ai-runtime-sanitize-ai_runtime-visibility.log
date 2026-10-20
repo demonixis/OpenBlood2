@@ -1,0 +1,14 @@
+433/445 Testing: ai_runtime.visibility
+433/445 Test: ai_runtime.visibility
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_runtime_tests" "visibility"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_runtime.visibility" start time: Oct 16 15:12 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.visibility" end time: Oct 16 15:12 CEST
+"ai_runtime.visibility" time elapsed: 00:00:00
+----------------------------------------------------------

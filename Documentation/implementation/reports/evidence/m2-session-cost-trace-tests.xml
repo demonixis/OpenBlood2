@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="3"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname="gigabyte-g5"
+	time="94"
+	timestamp="2026-10-18T08:02:20"
+	>
+	<testcase name="ai_runtime.clearance_private" classname="ai_runtime.clearance_private" time="90.1189" status="fail">
+		<failure message="Timeout"/>
+		<properties>
+			<property name="cmake_labels" value="ai_runtime;headless;private"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="coverage.catalog" classname="coverage.catalog" time="4.28233" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out>Catalog: 171 interface services / 174 trace boundaries
+</system-out>
+	</testcase>
+	<testcase name="coverage.observations" classname="coverage.observations" time="0.0199917" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+</testsuite>

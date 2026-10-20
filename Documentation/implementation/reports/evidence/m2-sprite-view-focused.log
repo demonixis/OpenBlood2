@@ -1,0 +1,16 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 541: sprite_view.geometry
+1/3 Test #541: sprite_view.geometry .............   Passed    0.00 sec
+    Start 542: sprite_view.failures
+2/3 Test #542: sprite_view.failures .............   Passed    0.01 sec
+    Start 543: sprite_view.subway
+3/3 Test #543: sprite_view.subway ...............   Passed    1.18 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+headless       =   1.19 sec*proc (3 tests)
+private        =   1.18 sec*proc (1 test)
+sprite_view    =   1.19 sec*proc (3 tests)
+
+Total Test time (real) =   1.20 sec

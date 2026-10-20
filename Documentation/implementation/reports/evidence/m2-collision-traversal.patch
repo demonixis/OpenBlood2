@@ -1,0 +1,327 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index f680884..e2f1cb0 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -592,3 +592,5 @@ The [original impact-spark continuation](../Documentation/Implementation/M2_SPAR
+ The [compact HUD continuation](../Documentation/Implementation/M2_HUD.md) displays delivered health, armor and current primary/alternate ammunition independently of the inspector. Physical 1..9/0 and keypad keys select original normal inventory slots; empty slots and original player/camera gates remain enforced. Read [contracts](docs/HUD_CONTRACTS.md). Preserve owned snapshots, distinct M16 pools, input suppression and shared UI lifetime in inspector-free builds. The original PCX status-bar artwork and other required services remain pending; M2 is incomplete.
+ 
+ The [original pickup-audio continuation](../Documentation/Implementation/M2_PICKUP_AUDIO.md) connects collection WAVs and durable results, including keys. Read [contracts](docs/PICKUP_AUDIO_CONTRACTS.md). Preserve accepted-ack-only playback, original 30/300 radii, inventory1.wav for keys, sound-before-trigger order, failure-independent collection and detached lifetime. Severe post-transition stutter, idle Cultists/durability and missing CityHub water remain user-reported follow-ups. M2 stays incomplete.
++
++The [collision traversal continuation](../Documentation/Implementation/M2_COLLISION_TRAVERSAL.md) addresses measured post-transition activation spikes with conservative BVH/triangle interval rejection. Read [contracts](docs/COLLISION_TRAVERSAL_CONTRACTS.md); preserve exact SAT results, equal-time ordering, placement and original AI cadence. Services exposes bounded work counters. CPU model preparation and other frame costs remain; M2 stays open.
+diff --git a/README.md b/README.md
+index 0992ca3..49f5aa9 100644
+--- a/README.md
++++ b/README.md
+@@ -634,3 +634,5 @@ The [original impact-spark continuation](../Documentation/Implementation/M2_SPAR
+ The [compact HUD continuation](../Documentation/Implementation/M2_HUD.md) displays delivered health, armor and current primary/alternate ammunition independently of the inspector. Physical 1..9/0 and keypad keys select original normal inventory slots; empty slots and original player/camera gates remain enforced. Read [contracts](docs/HUD_CONTRACTS.md). Preserve owned snapshots, distinct M16 pools, input suppression and shared UI lifetime in inspector-free builds. The original PCX status-bar artwork and other required services remain pending; M2 is incomplete.
+ 
+ The [original pickup-audio continuation](../Documentation/Implementation/M2_PICKUP_AUDIO.md) connects collection WAVs and durable results, including keys. Read [contracts](docs/PICKUP_AUDIO_CONTRACTS.md). Preserve accepted-ack-only playback, original 30/300 radii, inventory1.wav for keys, sound-before-trigger order, failure-independent collection and detached lifetime. Severe post-transition stutter, idle Cultists/durability and missing CityHub water remain user-reported follow-ups. M2 stays incomplete.
++
++The [collision traversal continuation](../Documentation/Implementation/M2_COLLISION_TRAVERSAL.md) addresses measured post-transition activation spikes with conservative BVH/triangle interval rejection. Read [contracts](docs/COLLISION_TRAVERSAL_CONTRACTS.md); preserve exact SAT results, equal-time ordering, placement and original AI cadence. Services exposes bounded work counters. CPU model preparation and other frame costs remain; M2 stays open.
+diff --git a/docs/COLLISION_TRAVERSAL_CONTRACTS.md b/docs/COLLISION_TRAVERSAL_CONTRACTS.md
+new file mode 100644
+index 0000000..b1d7a56
+--- /dev/null
++++ b/docs/COLLISION_TRAVERSAL_CONTRACTS.md
+@@ -0,0 +1,46 @@
++# Collision traversal and post-transition work
++
++The replacement collision engine now rejects BVH branches and leaf triangles
++using conservative segment-versus-expanded-box intervals before the unchanged
++triangle SAT. This addresses measured CityHub activation-query spikes; it is not
++a change to original AI cadence, range, visibility filters or state transitions.
++See [evidence](../../Documentation/Implementation/M2_COLLISION_TRAVERSAL.md).
++
++## Query invariants
++
++Keep the existing coarse node AABB rejection. Intersect the actual center segment
++with bounds expanded by the query half dimensions and 1e-6 spatial tolerance.
++Use the same float displacement as SAT, double interval calculations, 1e-10
++stationary threshold and inclusive 1e-9 interval tolerance. This is deliberately
++conservative: SAT still decides contact, initial penetration, normals and timing.
++The triangle bounds check must not use the old strict coarse node test; narrowphase
++stationary-axis tolerances can accept points just outside a triangle's raw bounds.
++
++Once a hit is found, use its fraction as the upper interval bound without changing
++the segment or narrowphase displacement. Retain left/right and leaf visitation
++order for surviving candidates. Equal-time contacts remain eligible; the lower
++source polygon index still wins. Initial overlap at fraction zero must not prune
++other overlapping triangles. No radius, skin, dimension or collision rule changes.
++Body placement, transformed world-model indices and container boundaries use this
++same traversal. The existing bounded placement searches and lifetime/atomic-motion
++contracts remain in effect.
++
++## Inspection and limits
++
++`CollisionWorld::work()` reports cumulative node tests/rejections, triangle-bound
++tests/rejections and full triangle SAT tests since build/clear. Counters allocate
++nothing, retain no objects and advance no clock. They include internal placement
++queries, not just public sweeps. They are diagnostic data on the existing single
++simulation thread; reading the inspector performs no additional collision query.
++Transforms preserve totals; clear and successful/failed rebuild reset them.
++
++Services displays the primary-world index's totals. Separate world-model indices,
++object-box intersections, rendering and GPU work are excluded; this is not a total
++frame profiler. Invalid/empty sweeps perform no node/triangle work.
++
++The renderer still skins and expands visible ABC geometry on the CPU every frame,
++including packed vertex deformation, then uploads it through SDL_GPU. Hidden
++objects skip geometry work; visible off-screen models have no frustum rejection.
++CPU skeleton poses are also needed independently for model-node queries and
++attachments. This collision change does not claim GPU skinning, rendering culling,
++retail physics equivalence, universally smooth transitions or M2 completion.
+diff --git a/docs/M2_COLLISION_TRAVERSAL_SOURCES.json b/docs/M2_COLLISION_TRAVERSAL_SOURCES.json
+new file mode 100644
+index 0000000..58a6261
+--- /dev/null
++++ b/docs/M2_COLLISION_TRAVERSAL_SOURCES.json
+@@ -0,0 +1,17 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "bbfc2f46c5c4e8c0590379e2f1e9c9ccd63dc1aa",
++  "status": "M2 incomplete; replacement engine broadphase optimization, no original rule change",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "purpose": "Original PINGPERIOD scheduling and player/camera observer selection, unchanged."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/server_de.h",
++      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "purpose": "Original activation state and PingObjects service contract."
++    }
++  ]
++}
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 7a2a820..550babb 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -1815,9 +1815,18 @@ namespace OpenBlood2
+         ImGui::Text("Primary-world collision: %s / %zu triangles / %zu BVH nodes",
+                     game.server.collision_ready ? "indexed" : "not loaded", game.collision.triangles(),
+                     game.collision.nodes());
++        const auto& work = game.collision.work();
++        ImGui::Text("Since collision build: %llu node tests / %llu rejected",
++                    static_cast<unsigned long long>(work.node_tests),
++                    static_cast<unsigned long long>(work.node_rejections));
++        ImGui::Text("Triangle bounds: %llu tests / %llu rejected / %llu full SAT tests",
++                    static_cast<unsigned long long>(work.triangle_bounds_tests),
++                    static_cast<unsigned long long>(work.triangle_rejections),
++                    static_cast<unsigned long long>(work.triangle_tests));
+         ImGui::TextWrapped(
+-            "Continuous axis-aligned boxes, sliding and object touch callbacks. Moving/rotating BSP "
+-            "models and crush response are not implemented. Grounded FLAG_STAIRSTEP and player locomotion are active.");
++            "Continuous axis-aligned boxes, sliding and object touch callbacks. Selected translating/rotating "
++            "world models and player locomotion are active. These counters cover primary-world queries, "
++            "including placement; they exclude object boxes and separate world-model indices.");
+         ImGui::Text("Gravity: %.2f %.2f %.2f", game.server.gravity.x, game.server.gravity.y, game.server.gravity.z);
+         if (ImGui::BeginTable("World console variables", 2,
+                               ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+diff --git a/src/engine/collision.cpp b/src/engine/collision.cpp
+index f151b68..4b65a74 100644
+--- a/src/engine/collision.cpp
++++ b/src/engine/collision.cpp
+@@ -225,6 +225,28 @@ namespace OpenBlood2
+             auto lo = vector_subtract(minv(from, to), half), hi = vector_add(maxv(from, to), half);
+             return lo.x <= max.x && hi.x >= min.x && lo.y <= max.y && hi.y >= min.y && lo.z <= max.z && hi.z >= min.z;
+         }
++        bool segment_bounds(DVector from, DVector delta, DVector half, DVector min, DVector max, double nearest)
++        {
++            // Conservative subset of the narrowphase's XYZ interval tests.
++            // Keep its float displacement, stationary threshold and tolerances;
++            // touching, penetration and normals remain the SAT's responsibility.
++            double enter = 0, leave = nearest;
++            auto axis = [&](double origin, double speed, double low, double high, double radius)
++            {
++                low -= radius + 1e-6;
++                high += radius + 1e-6;
++                if (std::abs(speed) < 1e-10)
++                    return origin >= low && origin <= high;
++                auto first = (low - origin) / speed, last = (high - origin) / speed;
++                if (first > last)
++                    std::swap(first, last);
++                enter = std::max(enter, first);
++                leave = std::min(leave, last);
++                return enter <= leave + 1e-9;
++            };
++            return axis(from.x, delta.x, min.x, max.x, half.x) && axis(from.y, delta.y, min.y, max.y, half.y) &&
++                   axis(from.z, delta.z, min.z, max.z, half.z);
++        }
+     } // namespace
+     CollisionQuery sweep_box(DVector from, DVector to, DVector half, DVector center, DVector other_half,
+                              CollisionHit& hit)
+@@ -319,8 +341,16 @@ namespace OpenBlood2
+                                bool& found, const PlacementAnchor* anchor, const Triangle** selected) const
+     {
+         const auto& n = nodes_[index];
+-        if (!broadphase(from, to, half, n.min, n.max))
++        ++work_.node_tests;
++        const auto delta = vector_subtract(to, from);
++        // Retain the existing coarse rejection policy as well as traversal order.
++        // Inclusive nearest bounds keep equal-time polygon tie-breaking intact.
++        if (!broadphase(from, to, half, n.min, n.max) ||
++            !segment_bounds(from, delta, half, n.min, n.max, found ? hit.fraction : 1))
++        {
++            ++work_.node_rejections;
+             return;
++        }
+         if (n.left)
+         {
+             query(n.left, from, to, half, hit, found, anchor, selected);
+@@ -329,6 +359,13 @@ namespace OpenBlood2
+         }
+         for (auto i = n.begin; i < n.end; ++i)
+         {
++            ++work_.triangle_bounds_tests;
++            if (!segment_bounds(from, delta, half, triangles_[i].min, triangles_[i].max, found ? hit.fraction : 1))
++            {
++                ++work_.triangle_rejections;
++                continue;
++            }
++            ++work_.triangle_tests;
+             CollisionHit candidate;
+             if (triangle_hit(triangles_[i].points, from, to, half, candidate, anchor) &&
+                 (!found || candidate.fraction < hit.fraction ||
+diff --git a/src/engine/collision.h b/src/engine/collision.h
+index 7fc52a0..53aff81 100644
+--- a/src/engine/collision.h
++++ b/src/engine/collision.h
+@@ -21,6 +21,11 @@ namespace OpenBlood2
+         Miss,
+         Hit
+     };
++    struct CollisionWork
++    {
++        std::uint64_t node_tests = 0, node_rejections = 0;
++        std::uint64_t triangle_bounds_tests = 0, triangle_rejections = 0, triangle_tests = 0;
++    };
+     // Continuous axis-aligned box/triangle queries against the primary DAT model.
+     // Dynamic world-model transforms, stair stepping and BSP contents are not
+     // inferred here. The caller can inspect precisely which geometry is indexed.
+@@ -33,6 +38,7 @@ namespace OpenBlood2
+         {
+             triangles_.clear();
+             nodes_.clear();
++            work_ = {};
+         }
+         CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit& hit) const;
+         BodyPlacement place_body(DVector anchor, DVector anchor_half, DVector requested, DVector half) const;
+@@ -44,6 +50,12 @@ namespace OpenBlood2
+         {
+             return nodes_.size();
+         }
++        // Diagnostic work since build/clear, including body-placement queries.
++        // Like the collision index's transforms, access is simulation-thread only.
++        const CollisionWork& work() const
++        {
++            return work_;
++        }
+ 
+       private:
+         struct Triangle
+@@ -60,6 +72,7 @@ namespace OpenBlood2
+         };
+         std::vector<Triangle> triangles_;
+         std::vector<Node> nodes_;
++        mutable CollisionWork work_;
+         std::uint32_t partition(std::uint32_t begin, std::uint32_t end);
+         void query(std::uint32_t node, DVector from, DVector to, DVector half, CollisionHit& hit, bool& found,
+                    const PlacementAnchor* anchor = nullptr, const Triangle** selected = nullptr) const;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 70ff3de..316676d 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -78,7 +78,7 @@ endif()
+ add_executable(services_tests services_tests.cpp)
+ target_link_libraries(services_tests PRIVATE blood2_game)
+ blood2_project_options(services_tests)
+-foreach(case IN ITEMS model_reader model_rejection animation_events model_callbacks collision_queries movement_contacts placement_queries placement_service original_services)
++foreach(case IN ITEMS model_reader model_rejection animation_events model_callbacks collision_queries collision_traversal movement_contacts placement_queries placement_service original_services)
+     add_test(NAME services.${case} COMMAND services_tests "${case}")
+     set_tests_properties(services.${case} PROPERTIES LABELS "headless;services" TIMEOUT 30)
+ endforeach()
+diff --git a/tests/services_tests.cpp b/tests/services_tests.cpp
+index 58e1c39..d748d40 100644
+--- a/tests/services_tests.cpp
++++ b/tests/services_tests.cpp
+@@ -237,6 +237,51 @@ namespace
+         CHECK(!world.build(w, error) && world.triangles() == 0);
+         return true;
+     }
++    bool collision_traversal()
++    {
++        WorldModel model;
++        model.surfaces.resize(1);
++        model.surfaces[0].flags = 1;
++        for (unsigned x = 0; x < 32; ++x)
++            for (unsigned z = 0; z < 32; ++z)
++            {
++                auto first = static_cast<std::uint32_t>(model.points.size());
++                const float px = x * 10, pz = z * 10;
++                model.points.insert(
++                    model.points.end(),
++                    {{px - 2, 0, pz - 2}, {px + 2, 0, pz - 2}, {px + 2, 0, pz + 2}, {px - 2, 0, pz + 2}});
++                model.polygons.push_back(
++                    {0,
++                     {static_cast<std::uint16_t>(first), static_cast<std::uint16_t>(first + 1),
++                      static_cast<std::uint16_t>(first + 2), static_cast<std::uint16_t>(first + 3)}});
++            }
++        CollisionWorld world;
++        std::string error;
++        CHECK(world.build(model, error));
++        CollisionHit hit;
++        // The segment's enclosing box overlaps the entire grid. Only its actual
++        // path near y=0 requires expensive triangle tests, even without a hit.
++        CHECK(world.sweep({0, 50, 0}, {310, -50, 310}, {}, hit) == CollisionQuery::Miss);
++        CHECK(world.work().triangle_tests < 128 && world.work().node_rejections > 0);
++        CHECK(world.sweep({0, 50, 0}, {300, -50, 300}, {}, hit) == CollisionQuery::Hit);
++        CHECK(hit.fraction == .5 && hit.polygon == 15 * 32 + 15 && hit.normal.y == 1);
++        // Nearest-hit pruning must still examine equal-time and penetrating
++        // contacts. Source polygon zero wins independently of BVH order.
++        CHECK(world.sweep({155, 0, 155}, {155, 0, 155}, {500, 1, 500}, hit) == CollisionQuery::Hit);
++        CHECK(hit.start_solid && hit.fraction == 0 && hit.polygon == 0);
++        CHECK(world.transform({}, {}, {0, 20, 0}));
++        CHECK(world.sweep({150, 50, 150}, {150, -50, 150}, {}, hit) == CollisionQuery::Hit);
++        CHECK(hit.fraction == .3 && std::abs(hit.point.y - 20) < 1e-5);
++        CHECK(world.work().triangle_bounds_tests == world.work().triangle_tests + world.work().triangle_rejections);
++        world.clear();
++        CHECK(world.work().node_tests == 0 && world.work().triangle_tests == 0);
++        CHECK(world.sweep({}, {}, {}, hit) == CollisionQuery::Miss && world.work().node_tests == 0);
++        CHECK(world.build(model, error) && world.work().triangle_bounds_tests == 0);
++        CHECK(world.sweep({}, {}, {-1, 0, 0}, hit) == CollisionQuery::Invalid && world.work().node_tests == 0);
++        model.polygons[0].points[0] = UINT16_MAX;
++        CHECK(!world.build(model, error) && world.nodes() == 0 && world.work().node_tests == 0);
++        return true;
++    }
+     bool movement_contacts()
+     {
+         GameSession game;
+@@ -554,6 +599,8 @@ int main(int argc, char** argv)
+         ok = model_callbacks();
+     else if (name == "collision_queries")
+         ok = collision_queries();
++    else if (name == "collision_traversal")
++        ok = collision_traversal();
+     else if (name == "movement_contacts")
+         ok = movement_contacts();
+     else if (name == "placement_queries")
+diff --git a/tests/worldpath_tests.cpp b/tests/worldpath_tests.cpp
+index 6c216b1..eb48ddc 100644
+--- a/tests/worldpath_tests.cpp
++++ b/tests/worldpath_tests.cpp
+@@ -352,10 +352,12 @@ namespace
+             }
+             CHECK(moves == 297 && blocked == 2 && !f->active && f->processed == 3 && close(r->state.m_Pos, last));
+             CHECK(!close(last, initial) && !close(last, vector_add(f->keys.back().position, f->targets[0].offset)));
+-            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 232 &&
++            // Current registered/runtime classes: independently reproduced with
++            // the pre-optimization collision implementation as well.
++            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 233 &&
+                   g.objects.attachments().size() == 11);
+             std::cout << "cycle=" << cycle << " moves=" << moves << " blocks=" << blocked << " final=" << last.x << ','
+-                      << last.y << ',' << last.z << " consumed_keys=9 runtime=188\n";
++                      << last.y << ',' << last.z << " consumed_keys=9 runtime=" << g.objects.snapshot().size() << '\n';
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.server.string_count() &&
+                   !g.server.list_count() && !g.server.message_count());
+         }

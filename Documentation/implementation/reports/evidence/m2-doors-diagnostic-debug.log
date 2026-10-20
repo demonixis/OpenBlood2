@@ -1,0 +1,27 @@
+[0/2] Re-checking globbed directories...
+[1/44] Scanning /home/yann/projects/lithtech/Blood2/src/game/session.cpp for CXX dependencies
+[2/44] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[3/15] Building CXX object CMakeFiles/blood2_game.dir/src/game/session.cpp.o
+[4/15] Linking CXX static library libblood2_game.a
+[5/15] Linking CXX executable tests/object_contract_tests
+[6/15] Linking CXX executable tests/world_tests
+[7/15] Linking CXX executable tests/services_tests
+[8/15] Linking CXX executable tests/player_tests
+[9/15] Linking CXX executable tests/movement_tests
+[10/15] Linking CXX executable blood2
+[11/15] Linking CXX executable tests/weapon_tests
+[12/15] Linking CXX executable tests/locomotion_tests
+[13/15] Linking CXX executable tests/container_tests
+[14/15] Linking CXX executable tests/door_tests
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 37: cli.world_modes
+1/1 Test #37: cli.world_modes ..................   Passed    0.79 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+headless    =   0.79 sec*proc (1 test)
+private     =   0.79 sec*proc (1 test)
+world       =   0.79 sec*proc (1 test)
+
+Total Test time (real) =   0.79 sec

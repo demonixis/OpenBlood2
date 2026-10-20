@@ -1,0 +1,2673 @@
+--- sources/blood2/ClientShellDLL/MoveMgr.h (selected excerpts)
++++ Blood2/src/game/original/MoveMgr.h
+@@ -1,187 +1,34 @@
+-// ORIGINAL EXCERPT: sources/blood2/ClientShellDLL/MoveMgr.h:1-186; only documented branches are ported.
++#pragma once
++#include "server_de.h"
+ 
+-// Client side movement manager for Blood 2.
+-
+-#ifndef __MOVEMGR_H__
+-#define __MOVEMGR_H__
+-
+-
+-#define DEFAULT_LADDER_VEL			400.0f
+-#define DEFAULT_SWIM_VEL			175.0f
+-
+-
+-	
+-#include "client_de.h"
+-#include "ContainerCodes.h"
+-#include "SharedMovement.h"
+-#include "SharedDefs.h"
+-//	#include "ModelFuncs.h"
+-enum ModelSize { MS_NORMAL=0, MS_SMALL, MS_LARGE, NUM_MODELSIZES };
+-
+-	
+-	class CPhysicsLT;
+-	class CBloodClientShell;
+-
+-	
+-	class CContainerInfo
+-	{
+-	public:
+-		float			m_fGravity;
+-		DVector			m_Current;
+-		ContainerCode	m_ContainerCode;
+-		DBOOL			m_bHidden;
+-	};
+-
+-	
+-	class CMoveMgr
+-	{
+-	public:
+-
+-					CMoveMgr(CBloodClientShell *pShell);
+-					~CMoveMgr();
+-		
+-		DBOOL		Init(ClientDE *pClientDE);
+-		
+-		void		Update();
+-		void		OnPhysicsUpdate(HMESSAGEREAD hRead);
+-
+-		DRESULT		OnObjectMove(HOBJECT hObj, DBOOL bTeleport, DVector *pPos);
+-		DRESULT		OnObjectRotate(HOBJECT hObj, DBOOL bTeleport, DRotation *pNewRot);
+-
+-		void		OnObjectRemove(HOBJECT hObj);
+-
+-		// CMoveMgr keeps a list of spheres that repel the player object.
+-		// These are created from explosions.
+-		DRESULT		AddPusher(DVector &pos, float radius, 
+-			float startDelay, float duration, float strength);
+-
+-		HOBJECT		GetObject() {return m_hObject;}
+-
+-		void		OnServerForcePos(HMESSAGEREAD hRead);
+-
+-		void		WritePositionInfo(HMESSAGEWRITE hWrite);
+-		DDWORD		GetControlFlags() { return m_dwControlFlags; }
+-
+-		void		ClearControlFlags() { m_dwControlFlags = 0; }
+-
+-		void		UpdateAxisMovement(DBOOL bUseAxisForwardBackward, float fForwardBackward, float fForwardBackwardDeadZone,
+-									   DBOOL bUseAxisLeftRight,float fLeftRight, float fLeftRightDeadZone );
+-
+-	protected:
+-
+-		void		ShowPos(char *pBlah);
+-		void		UpdateControlFlags();
+-		void		UpdateMotion();
+-		void		UpdatePushers();
+-		void		UpdatePlayerAnimation();
+-		
+-		DBOOL		AreDimsCorrect();
+-		void		ResetDims(DVector *pOffset=NULL);
+-		
+-		void		UpdateFriction();
+-		
+-		void		UpdateOnLadder(CContainerInfo *pInfo);
+-		void		UpdateOnConveyor(CContainerInfo *pInfo);
+-		void		UpdateInLiquid(CContainerInfo *pInfo);
+-		void		UpdateOnGround(CollisionInfo *pInfo);
+-		
+-		void		MoveLocalSolidObject();
+-		void		UpdateVelMagnitude();
+-		void		SetClientObjNonsolid();
+-		void		MoveToClientObj();
+-
+-		DBOOL		IsBodyInLiquid();
+-		DBOOL		IsDead();
+-
+-		
+-		DBYTE		m_ClientMoveCode;
+-
+-		// The object representing our movement.  
+-		HOBJECT		m_hObject;
+-
+-		ClientDE			*m_pClientDE;
+-		CPhysicsLT			*m_pPhysicsLT;
+-		CBloodClientShell	*m_pClientShell;
+-
+-		float		m_DimsScale[NUM_MODELSIZES];
+-		DLink		m_Pushers;
+-
+-
+-		DVector		m_WantedDims;
+-
+-		// Movement state.
+-		DDWORD		m_dwControlFlags;
+-		DDWORD		m_dwLastControlFlags;
+-		DDWORD		m_nMouseStrafeFlags;
+-		
+-		DBOOL		m_bBodyInLiquid;
+-		DBOOL		m_bSwimmingOnSurface;
+-		DBOOL		m_bCanSwimJump;
+-		float		m_fSwimmingOnSurfaceStart;
+-		
+-		DBOOL		m_bBodyOnLadder;
+-		DBOOL		m_bBodyOnConveyor;
+-
+-		DBOOL		m_bSpectatorMode;
+-		DBOOL		m_bForceJump;
+-
+-		DBOOL		m_bOnGround;
+-		
+-		float		m_fBaseMoveAccel;
+-		float		m_fMoveAccelMultiplier;
+-
+-		float		m_fLeashLen;
+-		float		m_FrameTime;
+-
+-
+-		// Movement speeds.
+-		float		m_fJumpVel;
+-		float		m_fJumpMultiplier;
+-
+-		float		m_fMoveVel;
+-		float		m_fLadderVel;
+-		float		m_fSwimVel;
+-		float		m_fMoveMultiplier;
+-		float		m_fFrictionCoeff;
+-		
+-		DBOOL		m_bSwimmingJump;
+-
+-		ContainerCode	m_eLastContainerCode;
+-		CContainerInfo	m_Containers[MAX_TRACKED_CONTAINERS];
+-		DDWORD			m_nContainers;
+-
+-		// special movement axis information
+-		DBOOL		m_bUseAxisLeftRight;
+-		DBOOL		m_bUseAxisForwardBackward;
+-		float		m_fAxisLeftRightVel; // Right is positive
+-		float		m_fAxisLeftRightDeadZone; 
+-		float		m_fAxisForwardBackwardVel; // Forward is positive ?????????
+-		float		m_fAxisForwardBackwardDeadZone; 
+-
+-		// Still animations.
+-		char			m_StillAnimNames[MAX_STILL_ANIMATIONS][MAX_STILL_ANIM_NAME_LEN];
+-		HMODELANIM		m_hStillAnims[MAX_STILL_ANIMATIONS];
+-		DDWORD			m_nStillAnims;
+-
+-		// Player attributes
+-		DBOOL		m_bFalling;
+-		DBOOL		m_bForcedCrouch;
+-		DBOOL		m_bMovementBlocked;
+-		DFLOAT		m_startFall;
+-		DBOOL		m_bLastJumpCommand;
+-		DBOOL		m_bPowerupActivated;
+-		DBOOL		m_bLastCrouchCommand;
+-		DBOOL		m_bSlowMode;
+-		DFLOAT		m_fSlowTime;
+-
+-		D_WORD		m_wLastChangeFlags;
+-
+-		SurfaceType	m_eLastSurface;
+-		
+-		DVector		m_vServerVelocity;
+-	};
+-
+-
+-#endif  // __MOVEMGR_H__
+-
+-
++class CBloodServerShell;
++// Selected standing, dry-land branches of original ClientShellDLL/MoveMgr.
++// One checked local player body replaces the legacy client/server duplicate.
++// See MOVEMENT_CONTRACTS.md for the source selections and physics adaptations.
++class CMoveMgr {
++public:
++    bool Init(ServerDE&,HCLIENT);
++    void Term();
++    bool OnPhysicsUpdate(const blood2::PlayerPhysics&);
++    bool OnServerForcePos(const blood2::PlayerPosition&);
++    bool Update(CBloodServerShell&,const blood2::MovementInput&,float yaw,double seconds,bool can_move);
++    blood2::PlayerMove WritePositionInfo(DVector destination,DVector velocity) const;
++    blood2::MovementState body;
++    blood2::PlayerPhysics physics;
++    DDWORD m_dwControlFlags=0, m_dwLastControlFlags=0;
++    DBYTE m_ClientMoveCode=0;
++    bool m_bOnGround=false, m_bLastJumpCommand=false, m_bFalling=false;
++    float m_fVelMagnitude=0, m_FrameTime=0;
++    double discarded_time=0;
++    std::uint64_t updates=0, substeps=0, jumps=0, landings=0;
++    bool ready() const { return server_ && configured_ && positioned_; }
++private:
++    void UpdateControlFlags(const blood2::MovementInput&,bool);
++    void UpdateOnGround();
++    void UpdateMotion(float yaw);
++    bool MoveLocalSolidObject(CBloodServerShell&);
++    ServerDE* server_=nullptr;
++    HCLIENT client_=nullptr;
++    HOBJECT object_=nullptr;
++    bool configured_=false, positioned_=false;
++};
+--- sources/blood2/ClientShellDLL/MoveMgr.cpp (selected excerpts)
++++ Blood2/src/game/original/MoveMgr.cpp
+@@ -1,1048 +1,142 @@
+-// ORIGINAL EXCERPT: sources/blood2/ClientShellDLL/MoveMgr.cpp:46-109; only documented branches are ported.
+-CMoveMgr::CMoveMgr(CBloodClientShell *pShell)
+-{
+-	VEC_SET(m_WantedDims, 1, 1, 1);
+-	m_nStillAnims		= 0;
+-	m_bSwimmingJump		= DFALSE;
+-	m_eLastContainerCode= CC_NOTHING;
+-	m_nContainers		= 0;
+-	m_hObject			= DNULL;
+-	m_pClientDE			= DNULL;
+-	m_pClientShell		= pShell;
+-	dl_TieOff(&m_Pushers);
+-	m_dwControlFlags	= 0;
+-	m_dwLastControlFlags= 0;
+-	m_bMovementBlocked	= DFALSE;
+-	m_bForcedCrouch		= DFALSE;
+-	m_wLastChangeFlags	= 0;
+-	m_eLastSurface		= SURFTYPE_UNKNOWN;
++// Original dry-land movement/control branches, adapted to typed local services.
++// Source attribution and deliberate differences: docs/M2_MOVEMENT_SOURCES.json.
++#include "MoveMgr.h"
++#include "BloodShells.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++
++namespace {
++constexpr DDWORD run=0x0001, jump=0x0002, forward=0x0008, backward=0x0010,
++    strafe_right=0x0100, strafe_left=0x0200; // Shared/SharedMovement.h
++constexpr float drag=15.0f; // Original g_fDragCoeff.
++DVector cross(DVector a,DVector b) { return {a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x}; }
++float magnitude(DVector v) { return std::sqrt(blood2::vector_dot(v,v)); }
++DVector normalized(DVector v) { const auto n=magnitude(v); return n>0 ? blood2::vector_scale(v,1/n) : DVector{}; }
++void TiltVectorToPlane(DVector& v,DVector normal) {
++    auto q=cross(normal,v);
++    if (blood2::vector_dot(q,q)>0.001f) v=blood2::vector_scale(cross(normalized(q),normal),magnitude(v));
+ }
++}
++using namespace blood2;
+ 
+-
+-CMoveMgr::~CMoveMgr()
+-{
+-	DLink *pCur, *pNext;
+-
+-	for(pCur=m_Pushers.m_pNext; pCur != &m_Pushers; pCur=pNext)
+-	{
+-		pNext = pCur->m_pNext;
+-		delete (Pusher*)pCur->m_pData;
+-	}
+-	dl_TieOff(&m_Pushers);
++bool CMoveMgr::Init(ServerDE& server,HCLIENT client) {
++    Term(); auto object=server.GetClientUserData(client);
++    if (!object || !server.GetMovementState(object,body)) return false;
++    server_=&server; client_=client; object_=object; return true;
+ }
+-
+-
+-DBOOL CMoveMgr::Init(ClientDE *pClientDE)
+-{
+-	m_pClientDE = pClientDE;
+-	m_pPhysicsLT = pClientDE->Physics();
+-
+-	// Init some defaults.  These should NEVER get used because we don't
+-	// have our object until the server sends the physics update.
+-	m_fMoveVel = 0.0f;
+-	m_fJumpVel = DEFAULT_JUMPVEL;
+-	m_fSwimVel = DEFAULT_SWIM_VEL;
+-	m_fLadderVel = DEFAULT_LADDER_VEL;
+-	m_fFrictionCoeff = 0.0f;
+-	m_fMoveMultiplier = 1.0f;
+-	m_bBodyInLiquid = DFALSE;
+-	m_bBodyOnLadder = DFALSE;
+-	m_bBodyOnConveyor = DFALSE;
+-	m_bOnGround = DTRUE;
+-	m_nMouseStrafeFlags = 0;
+-	m_bSwimmingOnSurface = DFALSE;
+-	m_bCanSwimJump = DFALSE;
+-
+-	m_fLeashLen = 100.0f;
+-	m_fBaseMoveAccel = 0.0f;
+-	m_fMoveAccelMultiplier = 1.0f;
+-	m_fJumpMultiplier = 1.0f;
+-
+-	VEC_INIT( m_vServerVelocity );
+-
+-	return DTRUE;
++void CMoveMgr::Term() { *this=CMoveMgr{}; }
++bool CMoveMgr::OnPhysicsUpdate(const PlayerPhysics& value) {
++    if (!server_ || server_->GetClientUserData(client_)!=object_ || !physics_vector(value.gravity) ||
++        !std::isfinite(value.move_speed) || value.move_speed<0 || value.move_speed>10000 ||
++        !std::isfinite(value.jump_speed) || value.jump_speed<0 || value.jump_speed>10000) return false;
++    physics=value; configured_=true; return true;
+ }
+-
+-// ORIGINAL EXCERPT: sources/blood2/ClientShellDLL/MoveMgr.cpp:123-203; only documented branches are ported.
+-void CMoveMgr::UpdateControlFlags()
+-{
+-	// Clear control flags...
+-
+-	m_dwLastControlFlags = m_dwControlFlags;
+-	m_dwControlFlags = 0; 
+-
+-
+-	// Make sure it's ok for us to move...
+-
+-	if (g_pBloodClientShell->IsDead()) return;
+-	if (!(m_pClientShell->GetCDataFlags() & CDATA_CANMOVE)) return;
+-	if (g_pBloodClientShell->IsWonkyNoMove()) return;	// [blg] 01/13/99
+-
+-
+-	// Determine what commands are currently on...
+-
+-	if (m_pClientDE->IsCommandOn(COMMAND_RUN) || m_pClientShell->GetCDataFlags() & CDATA_RUNLOCK)
+-	{
+-		m_dwControlFlags |= CTRLFLAG_RUN;
+-	}
+-
+-	if (m_pClientDE->IsCommandOn(COMMAND_JUMP))
+-	{
+-		m_dwControlFlags |= CTRLFLAG_JUMP;
+-	}
+-
+-	if (m_pClientDE->IsCommandOn(COMMAND_DUCK))
+-	{
+-		m_dwControlFlags |= CTRLFLAG_CROUCH;
+-	}
+-
+-	if (m_pClientDE->IsCommandOn(COMMAND_FORWARD))
+-	{
+-		m_dwControlFlags |= CTRLFLAG_FORWARD;
+-	}
+-
+-	if (m_pClientDE->IsCommandOn(COMMAND_BACKWARD))
+-	{
+-		m_dwControlFlags |= CTRLFLAG_BACKWARD;
+-	}
+-
+-	if (m_pClientDE->IsCommandOn(COMMAND_LEFT))
+-	{
+-		m_dwControlFlags |= CTRLFLAG_LEFT;
+-	}
+-
+-	if (m_pClientDE->IsCommandOn(COMMAND_RIGHT))
+-	{
+-		m_dwControlFlags |= CTRLFLAG_RIGHT;
+-	}
+-
+-	if (m_pClientDE->IsCommandOn(COMMAND_STRAFE))
+-	{
+-		m_dwControlFlags |= CTRLFLAG_STRAFE;
+-	}
+-
+-	if (m_pClientDE->IsCommandOn(COMMAND_STRAFERIGHT))
+-	{
+-		m_dwControlFlags |= CTRLFLAG_STRAFERIGHT;
+-	}
+-
+-	if (m_pClientDE->IsCommandOn(COMMAND_STRAFELEFT))
+-	{
+-		m_dwControlFlags |= CTRLFLAG_STRAFELEFT;
+-	}
+-
+-	if (m_pClientDE->IsCommandOn(COMMAND_FIRE))
+-	{
+-		m_dwControlFlags |= CTRLFLAG_FIRE;
+-	}
+-
+-	if (m_pClientDE->IsCommandOn(COMMAND_ALTFIRE))
+-	{
+-		m_dwControlFlags |= CTRLFLAG_ALTFIRE;
+-	}
+-
+-	if (m_pClientDE->IsCommandOn(COMMAND_GRAB))
+-	{
+-		m_dwControlFlags |= CTRLFLAG_GRAB;
+-	}
+-// ORIGINAL EXCERPT: sources/blood2/ClientShellDLL/MoveMgr.cpp:392-437; only documented branches are ported.
+-void CMoveMgr::UpdateOnGround(CollisionInfo *pInfo)
+-{
+-	DVector vAccel, vCross1, vCross2;
+-	DVector vVel;
+-
+-	// Lets see if we are in the ground or in the air.
+-
+-	m_pPhysicsLT->GetStandingOn(m_hObject, pInfo);
+-
+-	if (pInfo->m_hObject) 
+-	{
+-		m_bOnGround = DTRUE;
+-
+-		// Get the last surface type (for footsteps, etc)
+-		m_eLastSurface = ::GetSurfaceType(pInfo->m_hObject, pInfo->m_hPoly);
+-
+-		// Don't allow climbing slopes greater than 60 degrees.
+-		if( pInfo->m_Plane.m_Normal.y < 0.5 )
+-		{
+-			m_pPhysicsLT->GetAcceleration( m_hObject, &vAccel );
+-			DVector vCross1, vCross2;
+-			VEC_SET(vCross1, 0.0, 1.0, 0.0);
+-			VEC_CROSS(vCross2, pInfo->m_Plane.m_Normal, vCross1);
+-			VEC_NORM(vCross2);
+-			VEC_CROSS(vCross1, vCross2, pInfo->m_Plane.m_Normal);
+-			VEC_MULSCALAR(vCross1, vCross1, -2000.0f);
+-			VEC_ADD(vAccel, vAccel, vCross1);
+-			m_pPhysicsLT->SetAcceleration( m_hObject, &vAccel );
+-
+-			m_bOnGround = DFALSE;
+-
+-			// Force us down...
+-
+-			m_pPhysicsLT->GetVelocity(m_hObject, &vVel);
+-
+-			vVel.y = - VEC_MAG(vVel);
+-			vVel.x = vVel.z = 0.0f;
+-			m_pPhysicsLT->SetVelocity(m_hObject, &vVel);
+-		}
+-	} 
+-	else 
+-	{
+-		m_bOnGround = DFALSE;
+-	}
++bool CMoveMgr::OnServerForcePos(const PlayerPosition& value) {
++    if (!server_ || server_->GetClientUserData(client_)!=object_ || !physics_vector(value.position)) return false;
++    // The server already teleported the shared body. Reset motion as the
++    // original force-position handler does, without replaying a second teleport.
++    DVector zero;
++    if (server_->SetVelocity(object_,&zero)!=DE_OK || server_->SetAcceleration(object_,&zero)!=DE_OK ||
++        !server_->GetMovementState(object_,body)) return false;
++    m_ClientMoveCode=value.move_code; positioned_=true;
++    m_bLastJumpCommand=false; UpdateOnGround(); return true;
+ }
+-
+-// ORIGINAL EXCERPT: sources/blood2/ClientShellDLL/MoveMgr.cpp:458-1047; only documented branches are ported.
+-void CMoveMgr::UpdateMotion()
+-{
+-	DVector		vMyVel;
+-	DVector		vAccel;
+-	DVector		vUp;
+-	DVector		vRight;
+-	DVector		vForward;
+-	DVector		vMyPos;
+-	DFLOAT		fMaxMoveAccel;
+-	DFLOAT		fMaxMoveVel;
+-	DFLOAT		fMoveAccel = 0.0;
+-	DFLOAT		fStrafeAccel = 0;
+-	DFLOAT		fMoveVel;
+-	DFLOAT		fOrigMaxMoveVel;
+-
+-	// Normally we have gravity on, but the containers might turn it off.
+-	DDWORD dwFlags = m_pClientDE->GetObjectFlags(m_hObject);
+-
+-	if(!m_pClientShell->IsSpectatorMode())
+-	{
+-		dwFlags |= FLAG_GRAVITY | FLAG_SOLID;
+-		dwFlags &= ~(FLAG_GOTHRUWORLD);
+-	}
+-	else
+-	{
+-		dwFlags &= ~(FLAG_SOLID | FLAG_GRAVITY);
+-		dwFlags |= FLAG_GOTHRUWORLD;
+-	}
+-
+-	m_pClientDE->SetObjectFlags(m_hObject, dwFlags);
+-	
+-	// Zero acceleration to start with
+-	VEC_INIT(vAccel);
+-	m_pPhysicsLT->SetAcceleration(m_hObject, &vAccel);
+-
+-
+-	// Get the axis offset
+-	DFLOAT offsets[3];
+-	g_pClientDE->GetAxisOffsets(offsets);
+-
+-	DFLOAT fMouseAxis0 = offsets[0];
+-	DFLOAT fMouseAxis1 = offsets[1];
+-
+-	
+-	// Update containers
+-	DBOOL		bDidLiquid = DFALSE;
+-	DBOOL		bDidLadder = DFALSE;
+-	DBOOL		bDidConveyor = DFALSE;
+-	for(unsigned i=0; i < m_nContainers; i++)
+-	{
+-		if(IsLiquid(m_Containers[i].m_ContainerCode) && !bDidLiquid)
+-		{
+-			UpdateInLiquid(&m_Containers[i]);
+-			bDidLiquid = DTRUE;
+-		}
+-		else if(m_Containers[i].m_ContainerCode == CC_LADDER && !bDidLadder)
+-		{
+-			UpdateOnLadder(&m_Containers[i]);
+-			bDidLadder = DTRUE;
+-		}
+-		else if( m_Containers[i].m_ContainerCode == CC_CONVEYOR && !bDidConveyor )
+-		{
+-			UpdateOnConveyor(&m_Containers[i]);
+-			bDidConveyor = DTRUE;
+-		}
+-	
+-		if(!m_Containers[i].m_bHidden)
+-		{
+-			m_pPhysicsLT->GetVelocity(m_hObject, &vMyVel);
+-			vMyVel += m_Containers[i].m_Current * m_FrameTime;
+-			m_pPhysicsLT->SetVelocity(m_hObject, &vMyVel);
+-		}
+-	}
+-
+-	DBOOL		bHeadInLiquid = IsLiquid(m_pClientShell->GetCurContainerCode());
+-	DBOOL		bInLiquid	  = bHeadInLiquid || m_bBodyInLiquid;
+-	DBOOL		bFreeMovement = bHeadInLiquid || m_bBodyOnLadder || m_pClientShell->IsSpectatorMode();
+-	DBOOL		bLateralMovement = DFALSE;
+-
+-
+-	// Get my position
+-	m_pClientDE->GetObjectPos(m_hObject, &vMyPos);
+-
+-	CollisionInfo collisionInfo;
+-	UpdateOnGround(&collisionInfo);
+-
+-	m_pPhysicsLT->GetAcceleration(m_hObject, &vAccel);
+-
+-	// Get current velocity
+-	m_pPhysicsLT->GetVelocity(m_hObject, &vMyVel);
+-
+-	DFLOAT fMyVelMag = VEC_MAG(vMyVel);
+-
+-	// BEGIN 10/6/98 Kevin additions ////////////////////////////////////
+-
+-	// KEVIN's ASSY ADDITIONS 1/9/99
+-	m_fSwimVel	 = (m_dwControlFlags & CTRLFLAG_RUN) ? DEFAULT_SWIM_VEL : DEFAULT_SWIM_VEL/2.0f;
+-	m_fLadderVel = (m_dwControlFlags & CTRLFLAG_RUN) ? DEFAULT_LADDER_VEL : DEFAULT_LADDER_VEL/2.0f;
+-
+-	fMoveVel = m_fMoveVel;
+-
+-	if (m_dwControlFlags & CTRLFLAG_RUN)
+-	{
+-		fMoveVel *= 1.5;
+-	}
+-
+-	if (((m_dwControlFlags & CTRLFLAG_CROUCH) || m_bForcedCrouch) && !bFreeMovement)
+-	{
+-		fMoveVel /= 2;
+-	}
+-
+-	// Use swim vel if all the way in water or on surface but not standing on something.
+-	if( m_bBodyInLiquid )
+-		fMaxMoveVel = m_fSwimVel;
+-	// Use ladder velocity
+-	else if( m_bBodyOnLadder )
+-		fMaxMoveVel = m_fLadderVel;
+-	// Use regular velocity
+-	else
+-		fMaxMoveVel = fMoveVel;
+-
+-
+-	// Cap Velocity for joystick or other velocity related input device
+-	{
+-		fOrigMaxMoveVel = fMaxMoveVel;
+-
+-		DBOOL OverrideForwardBackward = ((m_dwControlFlags & CTRLFLAG_FORWARD) || (m_dwControlFlags & CTRLFLAG_BACKWARD));
+-		DBOOL OverrideLeftRight = ((m_dwControlFlags & CTRLFLAG_STRAFELEFT) || (m_dwControlFlags & CTRLFLAG_STRAFERIGHT));
+-
+-		if ((m_bUseAxisForwardBackward || m_bUseAxisLeftRight) && !(OverrideForwardBackward && OverrideLeftRight))
+-		{
+-			float fLeftRightCap = fMaxMoveVel;
+-			float fForwardBackwardCap = fMaxMoveVel;
+-
+-			if (m_bUseAxisForwardBackward && !OverrideForwardBackward)
+-			{
+-				fForwardBackwardCap = fMaxMoveVel * m_fAxisForwardBackwardVel;
+-			}
+-
+-			if (m_bUseAxisLeftRight && !OverrideLeftRight)
+-			{
+-				fLeftRightCap = fMaxMoveVel * m_fAxisLeftRightVel;
+-			}
+-
+-			fMaxMoveVel = (float)sqrt(fForwardBackwardCap*fForwardBackwardCap + fLeftRightCap*fLeftRightCap);
+-
+-			if (fMaxMoveVel > fOrigMaxMoveVel) fMaxMoveVel = fOrigMaxMoveVel;
+-		}
+-	}
+-
+-
+-	fMaxMoveAccel = ( m_bBodyOnLadder ) ? fMaxMoveVel * fDragCoeff * 0.5f : fMaxMoveVel * fDragCoeff;
+-
+-	// KEVIN's ASSY ADDITIONS 1/9/99
+-
+-	
+-	if (!m_bBodyInLiquid) m_bSwimmingJump = DFALSE;
+-
+-	// Limit velocity when in certain containers...
+-	if (m_bBodyOnLadder || m_bBodyOnConveyor)
+-	{
+-		if (fMyVelMag > m_fLadderVel)
+-		{
+-			VEC_NORM(vMyVel);
+-			VEC_MULSCALAR(vMyVel, vMyVel, m_fLadderVel);
+-		}
+-	}
+-	else if ( m_bBodyInLiquid && ( bHeadInLiquid || !m_bOnGround ))
+-	{
+-		if (fMyVelMag > m_fSwimVel)
+-		{
+-			VEC_NORM(vMyVel);
+-			VEC_MULSCALAR(vMyVel, vMyVel, m_fSwimVel);
+-			if (m_bSwimmingJump)	// Keep setting jump speed until I jump out
+-				vMyVel.y = m_fJumpVel * 0.75f;
+-		}
+-	}
+-	// END 10/6/98 Kevin additions ////////////////////////////////////
+-
+-
+-	DRotation myRot;
+-	m_pClientShell->GetCameraRotation(&myRot);
+-	m_pClientDE->SetObjectRotation(m_hObject, &myRot);
+-
+-	// See if dead
+-	if (!IsDead())
+-	{
+-		// get the object's vectors
+-
+-		m_pClientDE->GetRotationVectors(&myRot, &vUp, &vRight, &vForward);
+-
+-		if (m_pClientShell->IsSpectatorMode())
+-		{
+-//			DVector vel;
+-//			VEC_INIT(vel);
+-//			m_pPhysicsLT->SetVelocity(m_hObject, &vel);
+-			fMaxMoveAccel = 1.0f;
+-			fMaxMoveVel = 500.0f;
+-		}
+-		else if (!bFreeMovement && !bInLiquid)
+-		{
+-			// Only want x and z components for movement
+-			vRight.y = 0;
+-			VEC_NORM(vRight)
+-
+-			vForward.y = 0;
+-			VEC_NORM(vForward)
+-		}
+-
+-		// Set acceleration based on player controls
+-
+-		// Move forward/backwards
+-		if ((m_dwControlFlags & CTRLFLAG_FORWARD) && !m_bMovementBlocked)
+-		{
+-			fMoveAccel += fMaxMoveAccel;
+-			bLateralMovement = DTRUE;
+-		}
+-		if ((m_dwControlFlags & CTRLFLAG_BACKWARD) && !m_bMovementBlocked)
+-		{
+-			fMoveAccel += -fMaxMoveAccel;
+-			bLateralMovement = DTRUE;
+-		}
+-/*
+-		// set the movement for velocity axis
+-		if (m_bUseAxisForwardBackward || m_bUseAxisLeftRight)
+-		{
+-			DVector vTemp;
+-
+-			// get current velocity
+-			DVector velCurrent;
+-			m_pPhysicsLT->GetVelocity(m_hObject, &velCurrent);
+-
+-			if (m_bUseAxisForwardBackward)
+-			{
+-				// figure out current velocity component forward
+-				float fVelCurrentForward;
+-				fVelCurrentForward = VEC_DOT(vForward, velCurrent);
+-
+-				// is joystick pointing forward?
+-				if (m_fAxisForwardBackwardVel > m_fAxisForwardBackwardDeadZone)
+-				{
+-					// check if we are going to apply acceleration forward
+-					if (fVelCurrentForward < (m_fAxisForwardBackwardVel * fOrigMaxMoveVel))
+-					{
+-//						VEC_MULSCALAR(vTemp, vForward, fMoveAccel);
+-//						VEC_ADD(vAccel, vAccel, vTemp);
+-						fMoveAccel += fMaxMoveAccel;
+-					}
+-				}
+-
+-				// is joystick pointing backward?
+-				else if (m_fAxisForwardBackwardVel < -m_fAxisForwardBackwardDeadZone)
+-				{
+-					// check if we are going to apply acceleration backward
+-					if (fVelCurrentForward > (m_fAxisForwardBackwardVel * fOrigMaxMoveVel))
+-					{
+-//						VEC_MULSCALAR(vTemp, vForward, -fMoveAccel);
+-//						VEC_ADD(vAccel, vAccel, vTemp);
+-						fMoveAccel -= fMaxMoveAccel;
+-					}
+-				}
+-			}
+-
+-			if (m_bUseAxisLeftRight)
+-			{
+-				// figure out current velocity component to the right
+-				float fVelCurrentRight;
+-				fVelCurrentRight = VEC_DOT(vRight, velCurrent);
+-
+-				// is joystick pointing right?
+-				if (m_fAxisLeftRightVel > m_fAxisLeftRightDeadZone)
+-				{
+-					// check if we are going to apply acceleration right
+-					if (fVelCurrentRight < (m_fAxisLeftRightVel * fOrigMaxMoveVel))
+-					{
+-//						VEC_MULSCALAR(vTemp, vRight, fMoveAccel);
+-//						VEC_ADD(vAccel, vAccel, vTemp);
+-						fStrafeAccel += +fMaxMoveAccel;
+-						bLateralMovement = DTRUE;
+-					}
+-				}
+-
+-				// is joystick pointing left?
+-				else if (m_fAxisLeftRightVel < -m_fAxisLeftRightDeadZone)
+-				{
+-					// check if we are going to apply acceleration left
+-					if (fVelCurrentRight > (m_fAxisLeftRightVel * fOrigMaxMoveVel))
+-					{
+-//						VEC_MULSCALAR(vTemp, vRight, -fMoveAccel);
+-//						VEC_ADD(vAccel, vAccel, vTemp);
+-						fStrafeAccel += -fMaxMoveAccel;
+-						bLateralMovement = DTRUE;
+-					}
+-				}
+-			}
+-		}
+-*/
+-		if (!(m_pClientShell->GetCDataFlags() & CDATA_MOUSEAIMING) && !m_bMovementBlocked)
+-		{
+-			fMaxMoveAccel *= 2;	// [blg] allow a little more acceleration when moving with the mouse
+-			fMoveAccel += -(fMouseAxis1) * fMaxMoveAccel * 10.0f;	// [blg] 01/25/99 turned mouse movement back on
+-			m_dwControlFlags |= CTRLFLAG_FORWARD;
+-			bLateralMovement = DTRUE;
+-		}
+-
+-		if (fMoveAccel > fMaxMoveAccel) 
+-			fMoveAccel = fMaxMoveAccel;
+-		else if (fMoveAccel < -fMaxMoveAccel) 
+-			fMoveAccel = -fMaxMoveAccel;
+-
+-		VEC_MULSCALAR(vForward, vForward, fMoveAccel)
+-		VEC_ADD(vAccel, vAccel, vForward)
+-
+-		// Strafe.. Check for strafe modifier first
+-		if (m_dwControlFlags & CTRLFLAG_STRAFE)
+-		{
+-			if (m_dwControlFlags & CTRLFLAG_LEFT)
+-				fStrafeAccel += -fMaxMoveAccel;
+-			if (m_dwControlFlags & CTRLFLAG_RIGHT)
+-				fStrafeAccel += fMaxMoveAccel;
+-
+-			fStrafeAccel += (fMouseAxis0) * fMaxMoveAccel * 4.0f;	// [blg] 01/25/99 turned mouse movement back on
+-
+-			bLateralMovement = DTRUE;
+-		}
+-
+-		// Check individual strafe commands
+-		if (m_dwControlFlags & CTRLFLAG_STRAFELEFT)
+-		{
+-			fStrafeAccel += -fMaxMoveAccel;
+-			bLateralMovement = DTRUE;
+-		}
+-		if (m_dwControlFlags & CTRLFLAG_STRAFERIGHT)
+-		{
+-			fStrafeAccel += fMaxMoveAccel;
+-			bLateralMovement = DTRUE;
+-		}
+-
+-		if (fStrafeAccel > fMaxMoveAccel) 
+-			fStrafeAccel = fMaxMoveAccel;
+-		else if (fStrafeAccel < -fMaxMoveAccel) 
+-			fStrafeAccel = -fMaxMoveAccel;
+-
+-		VEC_MULSCALAR(vRight, vRight, fStrafeAccel)
+-		VEC_ADD(vAccel, vAccel, vRight)
+-
+-		// tone down run-strafing, but not too much.
+-		DFLOAT fAccelMag = VEC_MAG(vAccel);
+-		DFLOAT fMaxRunStrafeAccel = (DFLOAT)sqrt((fMaxMoveAccel * fMaxMoveAccel) * 2);
+-		if (fAccelMag > fMaxRunStrafeAccel)
+-		{
+-			VEC_MULSCALAR(vAccel, vAccel, (fMaxRunStrafeAccel/fAccelMag));
+-		}
+-
+-		DBOOL  bSteep = DFALSE;
+-		if (!m_pClientShell->IsSpectatorMode() && !m_bMovementBlocked)
+-		{
+-			// Make sure the slope isn't too steep to climb or jump up (prevent jump-skip)
+-
+-			if (m_bOnGround && !bFreeMovement)
+-			{
+-				// If standing on something, tilt the acceleration so it's aligned with
+-				// the surface.
+-				DVector &v = collisionInfo.m_Plane.m_Normal;
+-				if ((v.z + v.x) > v.y)			// Check for slope > 45 degrees
+-				{
+-					vAccel.y -= 4000.0f;		// Just to make sure I slide down
+-					bSteep = DTRUE;
+-				}
+-				else
+-				{
+-					TiltVectorToPlane(&vAccel, &collisionInfo.m_Plane.m_Normal);
+-				}
+-			}
+-
+-			// See if we just broke the surface of water...
+-			if ((IsLiquid(m_eLastContainerCode) && !bHeadInLiquid) && !m_bOnGround && !m_bBodyOnLadder)
+-			{
+-				m_bSwimmingOnSurface = DTRUE;
+-			}
+-			else if (bHeadInLiquid)  // See if we went back under...
+-			{
+-				m_bSwimmingOnSurface = DFALSE;
+-				m_bCanSwimJump		 = DTRUE;
+-			}	
+-
+-			// See if we landed (after falling)...
+-			if (!bFreeMovement && m_bFalling && m_bOnGround)
+-			{
+-/*				// See if we should play a landing sound
+-				if ((m_fMaxFallPos - m_fMinFallPos) > 56.0f && !m_bPowerupActivated[PU_INCORPOREAL])
+-				{
+-					char	szSound[MAX_CS_FILENAME_LEN+1];
+-					if (GetLandingSound(szSound))
+-					{
+-						PlayPlayerSound(szSound, 200.0f, 70, DFALSE, SOUNDPRIORITY_LOW);
+-					}
+-				}
+-  */          
+-				m_startFall = -1.0;
+-			}
+-			else if (bFreeMovement)
+-			{
+-				m_startFall = -1.0;
+-			}
+-
+-			// now update m_bFalling
+-			m_bFalling = m_bOnGround ? DFALSE : DTRUE;
+-
+-/*			if (m_bFalling)
+-			{
+-				if (m_startFall < 0)
+-				{
+-					m_startFall = m_pClientDE->GetTime();
+-					m_fMinFallPos = m_fMaxFallPos = vMyPos.y;
+-				}
+-				else 
+-				{
+-					if (vMyPos.y > m_fMaxFallPos)
+-						m_fMaxFallPos = vMyPos.y;
+-					if (vMyPos.y < m_fMinFallPos)
+-						m_fMinFallPos = vMyPos.y;
+-				}
+-			}
+-*/
+-			// Jumping
+-			if (m_dwControlFlags & CTRLFLAG_JUMP)
+-			{
+-				// If we are in a container that supports free movement, see if we are 
+-				// moving up or down...
+-				if (bFreeMovement)
+-				{
+-					vAccel.y += fMaxMoveAccel;
+-
+-//					m_bLastJumpCommand = DFALSE;
+-				}
+-				else if (!m_bLastJumpCommand)
+-				{
+-					// BEGIN 10/5/98 Kevin additions ////////////////////////////////////
+-
+-					// Handling jumping out of water...
+-					if (m_bBodyInLiquid && !bHeadInLiquid)
+-					{
+-						if (m_bCanSwimJump)
+-						{
+-							m_bSwimmingJump = DTRUE;
+-							m_bCanSwimJump  = DFALSE;
+-						}
+-						// If our head is out of the liquid and we're standing on the
+-						// ground, let us jump out of the water...
+-						else if (m_bOnGround)
+-						{
+-							m_bSwimmingJump = DTRUE;
+-						}
+-
+-						if (m_bSwimmingJump)
+-						{
+-							m_bSwimmingOnSurface = DFALSE;
+-							vMyVel.y += m_fJumpVel * 0.75f;
+-							m_bLastJumpCommand = DTRUE;
+-							m_bOnGround = DFALSE;
+-							bFreeMovement = DFALSE;
+-						}
+-					}
+-					else if (m_bOnGround && !bSteep)
+-					{
+-						if (m_bForcedCrouch)
+-							vMyVel.y += m_fJumpVel * 0.75f;
+-						else
+-							vMyVel.y += m_fJumpVel;
+-
+-						// Play the jump sound
+-						g_pBloodClientShell->GetVoiceMgr()->PlayEventSound(g_pBloodClientShell->GetCharacter(), VME_JUMP);
+-
+-						m_bLastJumpCommand = DTRUE;
+-						m_bOnGround = DFALSE;
+-					}
+-				}
+-			}
+-			else
+-				m_bLastJumpCommand = DFALSE;
+-
+-
+-			// Crouching
+-			if (m_dwControlFlags & CTRLFLAG_CROUCH)
+-			{
+-				if ((bInLiquid || bFreeMovement) && !m_bOnGround)
+-				{
+-					vAccel.y -= fMaxMoveAccel;
+-				}
+-				else
+-				{
+-					m_bLastCrouchCommand = DTRUE;
+-					m_bForcedCrouch = DTRUE;
+-				}
+-			}
+-			else	// Stand up again
+-			{
+-				m_bLastCrouchCommand = DFALSE;
+-			}
+-		}
+-	}
+-
+-	// Calculate drag for in-air movement, we want air movement consistent
+-	// with ground movement. fDragCoeff needs to be the same as the object's 
+-	// friction coefficient.
+-	
+-	DVector vAirVel;
+-
+-	// No air friction in liquid
+-//	if( !m_bBodyInLiquid )
+-	if( !m_bBodyInLiquid && !m_bBodyOnLadder && !m_bBodyOnConveyor )
+-	{
+-		VEC_COPY(vAirVel, vMyVel);
+-		// Apply drag to y when going down, but not going up.
+-		if (!m_bOnGround)
+-		{
+-			// Don't add friction if we are jumping up
+-			if (vAirVel.y >= 0.0f ) 
+-				vAirVel.y = 0.0f;	
+-			else
+-			{
+-				vAirVel.y = DCLAMP(vAirVel.y/2.0f, -25.0f, 0.0f);
+-			}
+-		}
+-
+-		DFLOAT fVel = VEC_MAGSQR(vAirVel);
+-
+-	//	if (!bFreeMovement && !m_bOnGround && fVel > 0.01f)
+-		if (!bFreeMovement && fVel > 0.01f )
+-		{
+-			DFLOAT fDragAccel = fDragCoeff;
+-
+-			VEC_MULSCALAR(vAirVel, vAirVel, -fDragAccel);
+-
+-			VEC_ADD(vAccel, vAccel, vAirVel);
+-		}
+-	}
+-
+-	if (!m_pClientShell->IsSpectatorMode())
+-	{
+-		// ADDED BY ANDY 9-20-98
+-		if(m_bSlowMode)
+-		{
+-			VEC_MULSCALAR(vMyVel, vMyVel, 0.5f);
+-
+-			if(m_pClientDE->GetTime() > m_fSlowTime)
+-				m_bSlowMode = DFALSE;
+-		}
+-
+-		// Cap horizontal velcity at max to make sure.
+-		DFLOAT fYVel = vMyVel.y;
+-		vMyVel.y = 0.0f;
+-
+-		DFLOAT fMag = VEC_MAG(vMyVel);
+-		fMaxMoveVel = (DFLOAT)sqrt(fMaxMoveVel * fMaxMoveVel * 2);
+-		if (fMag > fMaxMoveVel)
+-		{
+-			fMag = fMaxMoveVel / fMag;
+-			VEC_MULSCALAR(vMyVel, vMyVel, fMag);
+-		}
+-		vMyVel.y = fYVel;
+-		m_pPhysicsLT->SetVelocity(m_hObject, &vMyVel);
+-	}
+-	else	// m_bSpectatorMode
+-	{
+-		if (bLateralMovement)
+-		{
+-			VEC_NORM(vAccel);
+-			VEC_MULSCALAR(vAccel, vAccel, fMaxMoveVel);
+-		}
+-		else
+-		{
+-			VEC_INIT(vAccel);
+-		}
+-		m_pPhysicsLT->SetVelocity(m_hObject, &vAccel);
+-	}
+-
+-	if (m_bLastJumpCommand && vMyVel.y > 0 && vAccel.y > 0)
+-		vAccel.y = 0;
+-
+-	m_pPhysicsLT->SetAcceleration(m_hObject, &vAccel);
+-
+-	// Reset these value
+-	m_bBodyInLiquid				= DFALSE;
+-	m_bBodyOnLadder				= DFALSE;
+-	m_bBodyOnConveyor			= DFALSE;
+-
+-	m_eLastContainerCode = m_pClientShell->GetCurContainerCode();
++void CMoveMgr::UpdateControlFlags(const MovementInput& input,bool can_move) {
++    m_dwLastControlFlags=m_dwControlFlags; m_dwControlFlags=0;
++    if (!can_move) return;
++    if (input.run) m_dwControlFlags|=run;
++    if (input.jump) m_dwControlFlags|=jump;
++    if (input.forward) m_dwControlFlags|=forward;
++    if (input.backward) m_dwControlFlags|=backward;
++    if (input.left) m_dwControlFlags|=strafe_left;
++    if (input.right) m_dwControlFlags|=strafe_right;
+ }
+-// ORIGINAL EXCERPT: sources/blood2/ClientShellDLL/MoveMgr.cpp:1196-1230; only documented branches are ported.
+-void CMoveMgr::MoveLocalSolidObject()
+-{
+-	MoveInfo info;
+-	DVector newPos, curPos, vVel;
+-
+-	info.m_hObject = m_hObject;
+-	info.m_dt = m_FrameTime;
+-	m_pPhysicsLT->UpdateMovement(&info);
+-
+-	if(info.m_Offset.MagSqr() > 0.01f)
+-	{
+-		m_pClientDE->GetObjectPos(m_hObject, &curPos);
+-		newPos = curPos + info.m_Offset;
+-
+-		// Get the velocity before moving the object, because the moveobject will zero the velocity if 
+-		// we hit anything.
+-		m_pPhysicsLT->GetVelocity( m_hObject, &m_vServerVelocity );
+-		m_pPhysicsLT->MoveObject(m_hObject, &newPos, 0);
+-	}
++void CMoveMgr::UpdateOnGround() {
++    m_bOnGround=body.standing;
++    if (m_bOnGround && body.ground_normal.y<0.5f) {
++        const auto across=normalized(cross(body.ground_normal,{0,1,0}));
++        body.acceleration=vector_add(body.acceleration,vector_scale(cross(across,body.ground_normal),-2000));
++        m_bOnGround=false;
++        body.velocity={0,-magnitude(body.velocity),0};
++    }
+ }
+-
+-
+-void CMoveMgr::UpdateVelMagnitude()
+-{
+-	DVector vel;
+-
+-	if(!m_pPhysicsLT || !m_pClientShell || !m_hObject)
+-		return;
+-
+-	m_pPhysicsLT->GetVelocity(m_hObject, &vel);
+-	vel.y = 0;
+-	m_pClientShell->SetVelMagnitude(vel.Mag());
++void CMoveMgr::UpdateMotion(float yaw) {
++    body.acceleration={}; UpdateOnGround();
++    const auto max_velocity=physics.move_speed*((m_dwControlFlags&run) ? 1.5f : 1.0f);
++    const auto max_acceleration=max_velocity*drag;
++    // Source flattened/normalized camera axes: looking up/down never changes
++    // walking speed. Digital diagonals retain the original sqrt(2) allowance.
++    const DVector front{std::sin(yaw),0,std::cos(yaw)}, right{std::cos(yaw),0,-std::sin(yaw)};
++    const float forward_accel=((m_dwControlFlags&forward) ? max_acceleration : 0)-((m_dwControlFlags&backward) ? max_acceleration : 0);
++    const float strafe_accel=((m_dwControlFlags&strafe_right) ? max_acceleration : 0)-((m_dwControlFlags&strafe_left) ? max_acceleration : 0);
++    body.acceleration=vector_add(body.acceleration,vector_add(vector_scale(front,forward_accel),vector_scale(right,strafe_accel)));
++    bool steep=false;
++    if (m_bOnGround) {
++        if (body.ground_normal.z+body.ground_normal.x>body.ground_normal.y) {
++            body.acceleration.y-=4000; steep=true;
++        } else TiltVectorToPlane(body.acceleration,body.ground_normal);
++    }
++    m_bFalling=!m_bOnGround;
++    if (m_dwControlFlags&jump) {
++        if (!m_bLastJumpCommand && m_bOnGround && !steep) {
++            body.velocity.y+=physics.jump_speed;
++            m_bLastJumpCommand=true; m_bOnGround=false; ++jumps;
++        }
++    } else m_bLastJumpCommand=false;
++    auto air_velocity=body.velocity;
++    if (!m_bOnGround) air_velocity.y=air_velocity.y>=0 ? 0 : std::max(air_velocity.y/2,-25.0f);
++    if (vector_dot(air_velocity,air_velocity)>0.01f)
++        body.acceleration=vector_add(body.acceleration,vector_scale(air_velocity,-drag));
++    const float horizontal=std::hypot(body.velocity.x,body.velocity.z);
++    const float cap=max_velocity*std::sqrt(2.0f);
++    if (horizontal>cap) { body.velocity.x*=cap/horizontal; body.velocity.z*=cap/horizontal; }
++    if (m_bLastJumpCommand && body.velocity.y>0 && body.acceleration.y>0) body.acceleration.y=0;
+ }
+-
+-
+-// ORIGINAL EXCERPT: sources/blood2/ClientShellDLL/MoveMgr.cpp:1304-1457; only documented branches are ported.
+-void CMoveMgr::Update()
+-{
+-	HOBJECT hObj;
+-
+-	hObj = m_pClientDE->GetClientObject();
+-	if(!m_hObject || !hObj)
+-		return;
+-			   
+-	// m_pClientDE->CPrint("On Ground: %s", m_bOnGround ? "TRUE" : "FALSE");
+-
+-	m_FrameTime = m_pClientDE->GetFrameTime();
+-	if(m_FrameTime > 0.1f)
+-		m_FrameTime = 0.1f;
+-
+-	// We don't want to hit the real client object.
+-	SetClientObjNonsolid();
+-
+-	UpdatePlayerAnimation();
+-
+-	UpdateControlFlags();
+-
+-	if(!m_pClientShell->IsTrapped())
+-	{
+-		UpdateMotion();
+-		// Update friction...
+-//		UpdateFriction();
+-		UpdatePushers();
+-	}
+-
+-	// Make sure we have desired dims.
+-	if(!AreDimsCorrect())
+-		ResetDims();
+-
+-	if(!m_pClientShell->IsTrapped())
+-	{
+-		MoveLocalSolidObject();
+-		UpdateVelMagnitude();
+-	}
+-	else
+-	{
+-		DVector vTemp;
+-		VEC_INIT(vTemp);
+-		m_pPhysicsLT->SetVelocity(m_hObject, &vTemp);
+-	}
+-
+-	// Clear these and they'll get set if mouse is moving.
+-	m_nMouseStrafeFlags = 0;
++PlayerMove CMoveMgr::WritePositionInfo(DVector destination,DVector velocity) const {
++    return {m_ClientMoveCode,destination,velocity,body.acceleration,m_bOnGround};
+ }
+-
+-
+-void CMoveMgr::OnPhysicsUpdate(HMESSAGEREAD hRead)
+-{
+-	ObjectCreateStruct theStruct;
+-	D_WORD changeFlags;
+-	DVector grav;
+-	HOBJECT hClientObj;
+-	DDWORD i; 
+-
+-	if(!m_pClientDE)
+-		return;
+-
+-	changeFlags = m_pClientDE->ReadFromMessageWord(hRead);
+-
+-	// Change our model file?
+-	if (changeFlags & PSTATE_MODELFILENAMES)
+-	{
+-		INIT_OBJECTCREATESTRUCT(theStruct);
+-
+-		hClientObj = m_pClientDE->GetClientObject();
+-
+-		if(m_hObject)
+-		{
+-			m_pClientDE->GetObjectPos( m_hObject, &theStruct.m_Pos );
+-			m_pClientDE->DeleteObject(m_hObject);
+-		}
+-		else if( hClientObj )
+-		{
+-			m_pClientDE->GetObjectPos(hClientObj, &theStruct.m_Pos);
+-		}
+-
+-		SAFE_STRCPY(theStruct.m_Filename, m_pClientDE->ReadFromMessageString(hRead));
+-		SAFE_STRCPY(theStruct.m_SkinName, m_pClientDE->ReadFromMessageString(hRead));
+-		theStruct.m_ObjectType = OT_MODEL;
+-		theStruct.m_Flags = FLAG_SOLID | FLAG_GRAVITY | FLAG_STAIRSTEP;
+-		
+-		m_hObject = m_pClientDE->CreateObject(&theStruct);
+-		if(m_hObject)
+-		{
+-			m_pClientDE->SetObjectClientFlags(m_hObject, CF_DONTSETDIMS|CF_NOTIFYREMOVE);
+-			m_pPhysicsLT->SetFrictionCoefficient( m_hObject, m_fFrictionCoeff );
+-		}
+-
+-		// Reset dims..
+-		m_pClientDE->Common()->GetModelAnimUserDims(m_hObject, &m_WantedDims, 0);
+-		
+-		// This makes you small before setting the dims so you don't clip thru stuff.
+-		ResetDims();
+-	}
+-
+-	if (changeFlags & PSTATE_ADDVELOCITY)
+-	{
+-		DVector vAddVel, vVel;
+-		m_pClientDE->ReadFromMessageVector(hRead, &vAddVel);
+-		m_pPhysicsLT->GetVelocity(m_hObject, &vVel);
+-		vVel = vVel + vAddVel;
+-		m_pPhysicsLT->SetVelocity(m_hObject, &vVel);
+-	}
+-
+-	if (changeFlags & PSTATE_GRAVITY)
+-	{
+-		m_pClientDE->ReadFromMessageVector(hRead, &grav);
+-		m_pPhysicsLT->SetGlobalForce(grav);
+-	}
+-
+-	if (changeFlags & PSTATE_CONTAINERTYPE)
+-	{
+-		m_nContainers = m_pClientDE->ReadFromMessageByte(hRead);
+-		if(m_nContainers >= MAX_TRACKED_CONTAINERS)
+-			return;
+-
+-		for(i=0; i < m_nContainers; i++)
+-		{
+-			m_Containers[i].m_ContainerCode = (ContainerCode)m_pClientDE->ReadFromMessageByte(hRead);
+-
+-			m_pClientDE->ReadFromMessageVector(hRead, &m_Containers[i].m_Current);
+-			m_Containers[i].m_fGravity = m_pClientDE->ReadFromMessageFloat(hRead);
+-			m_Containers[i].m_bHidden = m_pClientDE->ReadFromMessageByte(hRead);
+-		}
+-	}
+-
+-	if (changeFlags & PSTATE_SPEEDS)
+-	{
+-		m_fMoveVel = m_pClientDE->ReadFromMessageFloat(hRead);
+-		m_fJumpVel = m_pClientDE->ReadFromMessageFloat(hRead);
+-		m_fSwimVel = m_pClientDE->ReadFromMessageFloat(hRead);
+-
+-		m_fMoveMultiplier = m_pClientDE->ReadFromMessageFloat(hRead);
+-		m_fMoveAccelMultiplier = m_pClientDE->ReadFromMessageFloat(hRead);
+-
+-		m_fLeashLen = m_pClientDE->ReadFromMessageFloat(hRead);
+-		m_fBaseMoveAccel = m_pClientDE->ReadFromMessageFloat(hRead);
+-		m_fJumpMultiplier = m_pClientDE->ReadFromMessageFloat(hRead);
+-		m_fLadderVel = m_pClientDE->ReadFromMessageFloat(hRead);
+-		
+-		m_fFrictionCoeff = m_pClientDE->ReadFromMessageFloat(hRead);
+-		m_pPhysicsLT->SetFrictionCoefficient(m_hObject, m_fFrictionCoeff);
+-	}
+-
+-	// Update crouch state
+-	if (changeFlags & PSTATE_CROUCH)
+-	{
+-		m_bForcedCrouch = m_pClientDE->ReadFromMessageByte(hRead);
+-	}
++bool CMoveMgr::MoveLocalSolidObject(CBloodServerShell& shell) {
++    // Replacement for the unavailable Blood II PhysicsLT::UpdateMovement:
++    // constant-acceleration integration, followed by the actual swept solver.
++    // Substeps keep source drag stable. Even tiny displacements resolve contact.
++    // The source stops applying drag below speed 0.1; let the replacement
++    // integrator sleep that horizontal residue instead of creeping forever.
++    if (std::hypot(body.velocity.x,body.velocity.z)<0.1f && body.acceleration.x==0 && body.acceleration.z==0)
++        body.velocity.x=body.velocity.z=0;
++    auto gravity=physics.gravity;
++    if (m_bOnGround && vector_dot(gravity,body.ground_normal)<0)
++        gravity=vector_scale(body.ground_normal,vector_dot(gravity,body.ground_normal));
++    // Supported walkable slopes constrain gravity to the contact normal.
++    // Otherwise idle players slide forever; source steep-slope acceleration
++    // remains separate and jumps immediately regain the full global force.
++    const auto acceleration=vector_add(body.acceleration,gravity);
++    const auto offset=vector_add(vector_scale(body.velocity,m_FrameTime),vector_scale(acceleration,0.5f*m_FrameTime*m_FrameTime));
++    const auto velocity=vector_add(body.velocity,vector_scale(acceleration,m_FrameTime));
++    const bool was_air=!m_bOnGround;
++    if (!shell.OnMessage(client_,WritePositionInfo(vector_add(body.position,offset),velocity))) return false;
++    if (!server_->GetMovementState(object_,body)) return false;
++    m_bOnGround=body.standing && body.ground_normal.y>=0.5f;
++    m_bFalling=!m_bOnGround;
++    if (was_air && m_bOnGround) ++landings;
++    m_fVelMagnitude=std::hypot(body.velocity.x,body.velocity.z);
++    return true;
+ }
+-// ORIGINAL EXCERPT: sources/blood2/ClientShellDLL/MoveMgr.cpp:1556-1626; only documented branches are ported.
+-void CMoveMgr::OnServerForcePos(HMESSAGEREAD hRead)
+-{
+-	DVector zeroVec, tempDims, pos, curDims;
+-
+-	if(!m_pClientDE || !m_pPhysicsLT)
+-		return;
+-
+-	m_ClientMoveCode = m_pClientDE->ReadFromMessageByte(hRead);
+-
+-	// Teleport to where it says.
+-	if(m_hObject)
+-	{
+-		SetClientObjNonsolid();
+-
+-		// Move there.  We make our object a point first and then resize the dims so 
+-		// we don't teleport clipping into the world.
+-		m_pClientDE->ReadFromMessageVector(hRead, &pos);
+-		
+-		tempDims.Init(0.5f, 0.5f, 0.5f);
+-		m_pPhysicsLT->GetObjectDims(m_hObject, &curDims);
+-		m_pPhysicsLT->SetObjectDims(m_hObject, &tempDims, 0);
+-		m_pPhysicsLT->MoveObject(m_hObject, &pos, MOVEOBJECT_TELEPORT);
+-		m_pPhysicsLT->SetObjectDims(m_hObject, &curDims, SETDIMS_PUSHOBJECTS);
+-
+-		// Clear our velocity and acceleration.
+-		zeroVec.Init();
+-		m_pPhysicsLT->SetVelocity(m_hObject, &zeroVec);
+-		m_pPhysicsLT->SetAcceleration(m_hObject, &zeroVec);
+-	}
++bool CMoveMgr::Update(CBloodServerShell& shell,const MovementInput& input,float yaw,double seconds,bool can_move) {
++    if (!ready() || !std::isfinite(seconds) || seconds<0 || seconds>60 || !std::isfinite(yaw) ||
++        server_->GetClientUserData(client_)!=object_) return false;
++    UpdateControlFlags(input,can_move);
++    ++updates;
++    // Original Update caps a frame at 0.1s. Track discarded time explicitly.
++    const auto duration=std::min(seconds,0.1); discarded_time+=seconds-duration;
++    if (duration==0) return server_->GetMovementState(object_,body);
++    const auto count=static_cast<unsigned>(std::max(1.0,std::ceil(duration*120)));
++    m_FrameTime=static_cast<float>(duration/count);
++    for (unsigned i=0;i<count;++i) {
++        if (!server_->GetMovementState(object_,body)) return false;
++        UpdateMotion(yaw);
++        if (!MoveLocalSolidObject(shell)) return false;
++        ++substeps;
++    }
++    return true;
+ }
+-
+-
+-void CMoveMgr::WritePositionInfo(HMESSAGEWRITE hWrite)
+-{
+-	DVector myPos, myVel;
+-	short compVel[3];
+-	DBYTE nMovementFlags;
+-
+-	if(!m_pClientDE)
+-		return;
+-
+-	if(m_hObject)
+-	{
+-		m_pClientDE->GetObjectPos(m_hObject, &myPos);
+-//		m_pPhysicsLT->GetVelocity(m_hObject, &myVel);
+-		VEC_COPY( myVel, m_vServerVelocity );
+-	}
+-	else
+-	{
+-		myPos.Init();
+-		myVel.Init();
+-	}
+-	
+-	m_pClientDE->WriteToMessageByte(hWrite, m_ClientMoveCode);
+-	m_pClientDE->WriteToMessageVector(hWrite, &myPos);
+-	
+-	compVel[0] = (short)myVel.x;
+-	compVel[1] = (short)myVel.y;
+-	compVel[2] = (short)myVel.z;
+-	m_pClientDE->WriteToMessageWord(hWrite, compVel[0]);
+-	m_pClientDE->WriteToMessageWord(hWrite, compVel[1]);
+-	m_pClientDE->WriteToMessageWord(hWrite, compVel[2]);
+-
+-	nMovementFlags = 0;
+-	if( m_bOnGround )
+-		nMovementFlags |= CLIENTMOVEMENTFLAG_ONGROUND;
+-	m_pClientDE->WriteToMessageByte(hWrite, (DBYTE)nMovementFlags);
+-	m_pClientDE->WriteToMessageByte(hWrite, (DBYTE)m_eLastSurface);
+-}
+-
+-
+--- sources/blood2/ClientShellDLL/ClientUtilities.cpp (selected excerpts)
++++ Blood2/src/game/original/MoveMgr.cpp
+@@ -1,23 +1,142 @@
+-// ORIGINAL EXCERPT: sources/blood2/ClientShellDLL/ClientUtilities.cpp:257-278; only documented branches are ported.
+-//	ROUTINE:	TiltVectorToPlane
+-//
+-//	PURPOSE:	Tilts a vector so that it is perpendicular to a plane's normal.
+-//
+-// ----------------------------------------------------------------------- //
++// Original dry-land movement/control branches, adapted to typed local services.
++// Source attribution and deliberate differences: docs/M2_MOVEMENT_SOURCES.json.
++#include "MoveMgr.h"
++#include "BloodShells.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
+ 
+-void TiltVectorToPlane(DVector *pVec, DVector *pNormal)
+-{
+-	DVector q, slope;
+-	
+-	// Get slope along vector...
+-	VEC_CROSS(q, *pNormal, *pVec);
+-	if(VEC_MAGSQR(q) > 0.001f)
+-	{
+-		VEC_NORM(q);
+-		VEC_CROSS(slope, q, *pNormal);
++namespace {
++constexpr DDWORD run=0x0001, jump=0x0002, forward=0x0008, backward=0x0010,
++    strafe_right=0x0100, strafe_left=0x0200; // Shared/SharedMovement.h
++constexpr float drag=15.0f; // Original g_fDragCoeff.
++DVector cross(DVector a,DVector b) { return {a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x}; }
++float magnitude(DVector v) { return std::sqrt(blood2::vector_dot(v,v)); }
++DVector normalized(DVector v) { const auto n=magnitude(v); return n>0 ? blood2::vector_scale(v,1/n) : DVector{}; }
++void TiltVectorToPlane(DVector& v,DVector normal) {
++    auto q=cross(normal,v);
++    if (blood2::vector_dot(q,q)>0.001f) v=blood2::vector_scale(cross(normalized(q),normal),magnitude(v));
++}
++}
++using namespace blood2;
+ 
+-		// Fix vector along slope...
+-		VEC_MULSCALAR(*pVec, slope, VEC_MAG(*pVec));
+-	}
++bool CMoveMgr::Init(ServerDE& server,HCLIENT client) {
++    Term(); auto object=server.GetClientUserData(client);
++    if (!object || !server.GetMovementState(object,body)) return false;
++    server_=&server; client_=client; object_=object; return true;
+ }
+-
++void CMoveMgr::Term() { *this=CMoveMgr{}; }
++bool CMoveMgr::OnPhysicsUpdate(const PlayerPhysics& value) {
++    if (!server_ || server_->GetClientUserData(client_)!=object_ || !physics_vector(value.gravity) ||
++        !std::isfinite(value.move_speed) || value.move_speed<0 || value.move_speed>10000 ||
++        !std::isfinite(value.jump_speed) || value.jump_speed<0 || value.jump_speed>10000) return false;
++    physics=value; configured_=true; return true;
++}
++bool CMoveMgr::OnServerForcePos(const PlayerPosition& value) {
++    if (!server_ || server_->GetClientUserData(client_)!=object_ || !physics_vector(value.position)) return false;
++    // The server already teleported the shared body. Reset motion as the
++    // original force-position handler does, without replaying a second teleport.
++    DVector zero;
++    if (server_->SetVelocity(object_,&zero)!=DE_OK || server_->SetAcceleration(object_,&zero)!=DE_OK ||
++        !server_->GetMovementState(object_,body)) return false;
++    m_ClientMoveCode=value.move_code; positioned_=true;
++    m_bLastJumpCommand=false; UpdateOnGround(); return true;
++}
++void CMoveMgr::UpdateControlFlags(const MovementInput& input,bool can_move) {
++    m_dwLastControlFlags=m_dwControlFlags; m_dwControlFlags=0;
++    if (!can_move) return;
++    if (input.run) m_dwControlFlags|=run;
++    if (input.jump) m_dwControlFlags|=jump;
++    if (input.forward) m_dwControlFlags|=forward;
++    if (input.backward) m_dwControlFlags|=backward;
++    if (input.left) m_dwControlFlags|=strafe_left;
++    if (input.right) m_dwControlFlags|=strafe_right;
++}
++void CMoveMgr::UpdateOnGround() {
++    m_bOnGround=body.standing;
++    if (m_bOnGround && body.ground_normal.y<0.5f) {
++        const auto across=normalized(cross(body.ground_normal,{0,1,0}));
++        body.acceleration=vector_add(body.acceleration,vector_scale(cross(across,body.ground_normal),-2000));
++        m_bOnGround=false;
++        body.velocity={0,-magnitude(body.velocity),0};
++    }
++}
++void CMoveMgr::UpdateMotion(float yaw) {
++    body.acceleration={}; UpdateOnGround();
++    const auto max_velocity=physics.move_speed*((m_dwControlFlags&run) ? 1.5f : 1.0f);
++    const auto max_acceleration=max_velocity*drag;
++    // Source flattened/normalized camera axes: looking up/down never changes
++    // walking speed. Digital diagonals retain the original sqrt(2) allowance.
++    const DVector front{std::sin(yaw),0,std::cos(yaw)}, right{std::cos(yaw),0,-std::sin(yaw)};
++    const float forward_accel=((m_dwControlFlags&forward) ? max_acceleration : 0)-((m_dwControlFlags&backward) ? max_acceleration : 0);
++    const float strafe_accel=((m_dwControlFlags&strafe_right) ? max_acceleration : 0)-((m_dwControlFlags&strafe_left) ? max_acceleration : 0);
++    body.acceleration=vector_add(body.acceleration,vector_add(vector_scale(front,forward_accel),vector_scale(right,strafe_accel)));
++    bool steep=false;
++    if (m_bOnGround) {
++        if (body.ground_normal.z+body.ground_normal.x>body.ground_normal.y) {
++            body.acceleration.y-=4000; steep=true;
++        } else TiltVectorToPlane(body.acceleration,body.ground_normal);
++    }
++    m_bFalling=!m_bOnGround;
++    if (m_dwControlFlags&jump) {
++        if (!m_bLastJumpCommand && m_bOnGround && !steep) {
++            body.velocity.y+=physics.jump_speed;
++            m_bLastJumpCommand=true; m_bOnGround=false; ++jumps;
++        }
++    } else m_bLastJumpCommand=false;
++    auto air_velocity=body.velocity;
++    if (!m_bOnGround) air_velocity.y=air_velocity.y>=0 ? 0 : std::max(air_velocity.y/2,-25.0f);
++    if (vector_dot(air_velocity,air_velocity)>0.01f)
++        body.acceleration=vector_add(body.acceleration,vector_scale(air_velocity,-drag));
++    const float horizontal=std::hypot(body.velocity.x,body.velocity.z);
++    const float cap=max_velocity*std::sqrt(2.0f);
++    if (horizontal>cap) { body.velocity.x*=cap/horizontal; body.velocity.z*=cap/horizontal; }
++    if (m_bLastJumpCommand && body.velocity.y>0 && body.acceleration.y>0) body.acceleration.y=0;
++}
++PlayerMove CMoveMgr::WritePositionInfo(DVector destination,DVector velocity) const {
++    return {m_ClientMoveCode,destination,velocity,body.acceleration,m_bOnGround};
++}
++bool CMoveMgr::MoveLocalSolidObject(CBloodServerShell& shell) {
++    // Replacement for the unavailable Blood II PhysicsLT::UpdateMovement:
++    // constant-acceleration integration, followed by the actual swept solver.
++    // Substeps keep source drag stable. Even tiny displacements resolve contact.
++    // The source stops applying drag below speed 0.1; let the replacement
++    // integrator sleep that horizontal residue instead of creeping forever.
++    if (std::hypot(body.velocity.x,body.velocity.z)<0.1f && body.acceleration.x==0 && body.acceleration.z==0)
++        body.velocity.x=body.velocity.z=0;
++    auto gravity=physics.gravity;
++    if (m_bOnGround && vector_dot(gravity,body.ground_normal)<0)
++        gravity=vector_scale(body.ground_normal,vector_dot(gravity,body.ground_normal));
++    // Supported walkable slopes constrain gravity to the contact normal.
++    // Otherwise idle players slide forever; source steep-slope acceleration
++    // remains separate and jumps immediately regain the full global force.
++    const auto acceleration=vector_add(body.acceleration,gravity);
++    const auto offset=vector_add(vector_scale(body.velocity,m_FrameTime),vector_scale(acceleration,0.5f*m_FrameTime*m_FrameTime));
++    const auto velocity=vector_add(body.velocity,vector_scale(acceleration,m_FrameTime));
++    const bool was_air=!m_bOnGround;
++    if (!shell.OnMessage(client_,WritePositionInfo(vector_add(body.position,offset),velocity))) return false;
++    if (!server_->GetMovementState(object_,body)) return false;
++    m_bOnGround=body.standing && body.ground_normal.y>=0.5f;
++    m_bFalling=!m_bOnGround;
++    if (was_air && m_bOnGround) ++landings;
++    m_fVelMagnitude=std::hypot(body.velocity.x,body.velocity.z);
++    return true;
++}
++bool CMoveMgr::Update(CBloodServerShell& shell,const MovementInput& input,float yaw,double seconds,bool can_move) {
++    if (!ready() || !std::isfinite(seconds) || seconds<0 || seconds>60 || !std::isfinite(yaw) ||
++        server_->GetClientUserData(client_)!=object_) return false;
++    UpdateControlFlags(input,can_move);
++    ++updates;
++    // Original Update caps a frame at 0.1s. Track discarded time explicitly.
++    const auto duration=std::min(seconds,0.1); discarded_time+=seconds-duration;
++    if (duration==0) return server_->GetMovementState(object_,body);
++    const auto count=static_cast<unsigned>(std::max(1.0,std::ceil(duration*120)));
++    m_FrameTime=static_cast<float>(duration/count);
++    for (unsigned i=0;i<count;++i) {
++        if (!server_->GetMovementState(object_,body)) return false;
++        UpdateMotion(yaw);
++        if (!MoveLocalSolidObject(shell)) return false;
++        ++substeps;
++    }
++    return true;
++}
+--- sources/blood2/Shared/SharedMovement.h (selected excerpts)
++++ Blood2/src/game/original/MoveMgr.cpp
+@@ -1,52 +1,142 @@
+-// ORIGINAL EXCERPT: sources/blood2/Shared/SharedMovement.h:1-51; only documented branches are ported.
++// Original dry-land movement/control branches, adapted to typed local services.
++// Source attribution and deliberate differences: docs/M2_MOVEMENT_SOURCES.json.
++#include "MoveMgr.h"
++#include "BloodShells.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
+ 
+-// Shared movement definitions.
++namespace {
++constexpr DDWORD run=0x0001, jump=0x0002, forward=0x0008, backward=0x0010,
++    strafe_right=0x0100, strafe_left=0x0200; // Shared/SharedMovement.h
++constexpr float drag=15.0f; // Original g_fDragCoeff.
++DVector cross(DVector a,DVector b) { return {a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x}; }
++float magnitude(DVector v) { return std::sqrt(blood2::vector_dot(v,v)); }
++DVector normalized(DVector v) { const auto n=magnitude(v); return n>0 ? blood2::vector_scale(v,1/n) : DVector{}; }
++void TiltVectorToPlane(DVector& v,DVector normal) {
++    auto q=cross(normal,v);
++    if (blood2::vector_dot(q,q)>0.001f) v=blood2::vector_scale(cross(normalized(q),normal),magnitude(v));
++}
++}
++using namespace blood2;
+ 
+-#ifndef __SHAREDMOVEMENT_H__
+-#define __SHAREDMOVEMENT_H__
+-
+-
+-	// Maximum containers it will handle the player being in.
+-	#define MAX_TRACKED_CONTAINERS	4
+-	
+-	
+-	// The client keeps track of a bunch of animations and if its object
+-	// is using any of them it doesn't allow movement.
+-	#define MAX_STILL_ANIMATIONS	4
+-	#define MAX_STILL_ANIM_NAME_LEN	16
+-
+-
+-	// These flags are used in the MID_PHYSICS_UPDATE to tell which 
+-	// things are in the message.
+-	#define PSTATE_MODELFILENAMES	(1<<0)
+-	#define PSTATE_ADDVELOCITY		(1<<1)
+-	#define PSTATE_GRAVITY			(1<<2)
+-	#define PSTATE_CONTAINERTYPE	(1<<3)
+-	#define PSTATE_SPEEDS			(1<<4)
+-	#define PSTATE_CROUCH			(1<<5)	// Special flag to tell the player to stand..
+-	#define PSTATE_ALL				(PSTATE_MODELFILENAMES | PSTATE_GRAVITY | PSTATE_CONTAINERTYPE | PSTATE_SPEEDS | PSTATE_CROUCH)
+-
+-
+-
+-// Control flags
+-#define  CTRLFLAG_RUN			0x0001
+-#define  CTRLFLAG_JUMP			0x0002
+-#define  CTRLFLAG_CROUCH		0x0004
+-#define  CTRLFLAG_FORWARD		0x0008
+-#define  CTRLFLAG_BACKWARD		0x0010
+-#define  CTRLFLAG_LEFT			0x0020
+-#define  CTRLFLAG_RIGHT			0x0040
+-#define  CTRLFLAG_STRAFE		0x0080
+-#define  CTRLFLAG_STRAFERIGHT	0x0100	
+-#define  CTRLFLAG_STRAFELEFT	0x0200
+-#define  CTRLFLAG_FIRE			0x0400
+-#define  CTRLFLAG_ALTFIRE		0x0800
+-#define  CTRLFLAG_GRAB			0x1000
+-#define  CTRLFLAG_TAUNT			0x2000
+-
+-// Client position info flags
+-#define		CLIENTMOVEMENTFLAG_ONGROUND		(1<<0)
+-
+-
+-
+-#endif  // __SHAREDMOVEMENT_H__
++bool CMoveMgr::Init(ServerDE& server,HCLIENT client) {
++    Term(); auto object=server.GetClientUserData(client);
++    if (!object || !server.GetMovementState(object,body)) return false;
++    server_=&server; client_=client; object_=object; return true;
++}
++void CMoveMgr::Term() { *this=CMoveMgr{}; }
++bool CMoveMgr::OnPhysicsUpdate(const PlayerPhysics& value) {
++    if (!server_ || server_->GetClientUserData(client_)!=object_ || !physics_vector(value.gravity) ||
++        !std::isfinite(value.move_speed) || value.move_speed<0 || value.move_speed>10000 ||
++        !std::isfinite(value.jump_speed) || value.jump_speed<0 || value.jump_speed>10000) return false;
++    physics=value; configured_=true; return true;
++}
++bool CMoveMgr::OnServerForcePos(const PlayerPosition& value) {
++    if (!server_ || server_->GetClientUserData(client_)!=object_ || !physics_vector(value.position)) return false;
++    // The server already teleported the shared body. Reset motion as the
++    // original force-position handler does, without replaying a second teleport.
++    DVector zero;
++    if (server_->SetVelocity(object_,&zero)!=DE_OK || server_->SetAcceleration(object_,&zero)!=DE_OK ||
++        !server_->GetMovementState(object_,body)) return false;
++    m_ClientMoveCode=value.move_code; positioned_=true;
++    m_bLastJumpCommand=false; UpdateOnGround(); return true;
++}
++void CMoveMgr::UpdateControlFlags(const MovementInput& input,bool can_move) {
++    m_dwLastControlFlags=m_dwControlFlags; m_dwControlFlags=0;
++    if (!can_move) return;
++    if (input.run) m_dwControlFlags|=run;
++    if (input.jump) m_dwControlFlags|=jump;
++    if (input.forward) m_dwControlFlags|=forward;
++    if (input.backward) m_dwControlFlags|=backward;
++    if (input.left) m_dwControlFlags|=strafe_left;
++    if (input.right) m_dwControlFlags|=strafe_right;
++}
++void CMoveMgr::UpdateOnGround() {
++    m_bOnGround=body.standing;
++    if (m_bOnGround && body.ground_normal.y<0.5f) {
++        const auto across=normalized(cross(body.ground_normal,{0,1,0}));
++        body.acceleration=vector_add(body.acceleration,vector_scale(cross(across,body.ground_normal),-2000));
++        m_bOnGround=false;
++        body.velocity={0,-magnitude(body.velocity),0};
++    }
++}
++void CMoveMgr::UpdateMotion(float yaw) {
++    body.acceleration={}; UpdateOnGround();
++    const auto max_velocity=physics.move_speed*((m_dwControlFlags&run) ? 1.5f : 1.0f);
++    const auto max_acceleration=max_velocity*drag;
++    // Source flattened/normalized camera axes: looking up/down never changes
++    // walking speed. Digital diagonals retain the original sqrt(2) allowance.
++    const DVector front{std::sin(yaw),0,std::cos(yaw)}, right{std::cos(yaw),0,-std::sin(yaw)};
++    const float forward_accel=((m_dwControlFlags&forward) ? max_acceleration : 0)-((m_dwControlFlags&backward) ? max_acceleration : 0);
++    const float strafe_accel=((m_dwControlFlags&strafe_right) ? max_acceleration : 0)-((m_dwControlFlags&strafe_left) ? max_acceleration : 0);
++    body.acceleration=vector_add(body.acceleration,vector_add(vector_scale(front,forward_accel),vector_scale(right,strafe_accel)));
++    bool steep=false;
++    if (m_bOnGround) {
++        if (body.ground_normal.z+body.ground_normal.x>body.ground_normal.y) {
++            body.acceleration.y-=4000; steep=true;
++        } else TiltVectorToPlane(body.acceleration,body.ground_normal);
++    }
++    m_bFalling=!m_bOnGround;
++    if (m_dwControlFlags&jump) {
++        if (!m_bLastJumpCommand && m_bOnGround && !steep) {
++            body.velocity.y+=physics.jump_speed;
++            m_bLastJumpCommand=true; m_bOnGround=false; ++jumps;
++        }
++    } else m_bLastJumpCommand=false;
++    auto air_velocity=body.velocity;
++    if (!m_bOnGround) air_velocity.y=air_velocity.y>=0 ? 0 : std::max(air_velocity.y/2,-25.0f);
++    if (vector_dot(air_velocity,air_velocity)>0.01f)
++        body.acceleration=vector_add(body.acceleration,vector_scale(air_velocity,-drag));
++    const float horizontal=std::hypot(body.velocity.x,body.velocity.z);
++    const float cap=max_velocity*std::sqrt(2.0f);
++    if (horizontal>cap) { body.velocity.x*=cap/horizontal; body.velocity.z*=cap/horizontal; }
++    if (m_bLastJumpCommand && body.velocity.y>0 && body.acceleration.y>0) body.acceleration.y=0;
++}
++PlayerMove CMoveMgr::WritePositionInfo(DVector destination,DVector velocity) const {
++    return {m_ClientMoveCode,destination,velocity,body.acceleration,m_bOnGround};
++}
++bool CMoveMgr::MoveLocalSolidObject(CBloodServerShell& shell) {
++    // Replacement for the unavailable Blood II PhysicsLT::UpdateMovement:
++    // constant-acceleration integration, followed by the actual swept solver.
++    // Substeps keep source drag stable. Even tiny displacements resolve contact.
++    // The source stops applying drag below speed 0.1; let the replacement
++    // integrator sleep that horizontal residue instead of creeping forever.
++    if (std::hypot(body.velocity.x,body.velocity.z)<0.1f && body.acceleration.x==0 && body.acceleration.z==0)
++        body.velocity.x=body.velocity.z=0;
++    auto gravity=physics.gravity;
++    if (m_bOnGround && vector_dot(gravity,body.ground_normal)<0)
++        gravity=vector_scale(body.ground_normal,vector_dot(gravity,body.ground_normal));
++    // Supported walkable slopes constrain gravity to the contact normal.
++    // Otherwise idle players slide forever; source steep-slope acceleration
++    // remains separate and jumps immediately regain the full global force.
++    const auto acceleration=vector_add(body.acceleration,gravity);
++    const auto offset=vector_add(vector_scale(body.velocity,m_FrameTime),vector_scale(acceleration,0.5f*m_FrameTime*m_FrameTime));
++    const auto velocity=vector_add(body.velocity,vector_scale(acceleration,m_FrameTime));
++    const bool was_air=!m_bOnGround;
++    if (!shell.OnMessage(client_,WritePositionInfo(vector_add(body.position,offset),velocity))) return false;
++    if (!server_->GetMovementState(object_,body)) return false;
++    m_bOnGround=body.standing && body.ground_normal.y>=0.5f;
++    m_bFalling=!m_bOnGround;
++    if (was_air && m_bOnGround) ++landings;
++    m_fVelMagnitude=std::hypot(body.velocity.x,body.velocity.z);
++    return true;
++}
++bool CMoveMgr::Update(CBloodServerShell& shell,const MovementInput& input,float yaw,double seconds,bool can_move) {
++    if (!ready() || !std::isfinite(seconds) || seconds<0 || seconds>60 || !std::isfinite(yaw) ||
++        server_->GetClientUserData(client_)!=object_) return false;
++    UpdateControlFlags(input,can_move);
++    ++updates;
++    // Original Update caps a frame at 0.1s. Track discarded time explicitly.
++    const auto duration=std::min(seconds,0.1); discarded_time+=seconds-duration;
++    if (duration==0) return server_->GetMovementState(object_,body);
++    const auto count=static_cast<unsigned>(std::max(1.0,std::ceil(duration*120)));
++    m_FrameTime=static_cast<float>(duration/count);
++    for (unsigned i=0;i<count;++i) {
++        if (!server_->GetMovementState(object_,body)) return false;
++        UpdateMotion(yaw);
++        if (!MoveLocalSolidObject(shell)) return false;
++        ++substeps;
++    }
++    return true;
++}
+--- sources/blood2/ObjectDLL/PlayerObj.cpp (selected excerpts)
++++ Blood2/src/game/original/PlayerObj.cpp
+@@ -1,264 +1,273 @@
+-// ORIGINAL EXCERPT: sources/blood2/ObjectDLL/PlayerObj.cpp:2598-2604; only documented branches are ported.
++// Selected original entry code; source ranges and adaptations are recorded in
++// docs/M2_PLAYER_SOURCES.json. This is an executable lifecycle port, not the
++// complete 7,657-line PlayerObj gameplay implementation.
++#include "PlayerObj.h"
++#include "GameStartPoint.h"
++#include <algorithm>
++#include <cmath>
+ 
+-		case CMSG_PLAYERPOSITION:
+-		{
+-			HandlePlayerPositionMessage(hMsg);
+-		}
+-		break;
++DLink CDestructable::m_DestructableHead{};
++DDWORD CDestructable::m_dwNumDestructables = 0;
++CDestructable::CDestructable() {
++    if (m_dwNumDestructables == 0) dl_TieOff(&m_DestructableHead);
++}
++CDestructable::~CDestructable() {
++    if (m_Link.m_pData && m_dwNumDestructables > 0) { dl_Remove(&m_Link); --m_dwNumDestructables; }
++}
++DBOOL CDestructable::Init(HOBJECT object,CInventoryMgr* inventory) {
++    if (!object || !BaseClass::GetServerDE()) return DFALSE;
++    m_hObject = object;
++    if (!m_Link.m_pData) {
++        dl_Insert(&m_DestructableHead,&m_Link); m_Link.m_pData = this; ++m_dwNumDestructables;
++    }
++    m_pInventoryMgr = inventory; return DTRUE;
++}
++void CDestructable::CalculateResistance(DBYTE value) {
++    if (value == 1) m_fResistance = 1.20f;
++    else if (value == 2) m_fResistance = 1.10f;
++    else if (value == 3) m_fResistance = 1.0f;
++    else if (value == 4) m_fResistance = 0.9f;
++    else if (value == 5) m_fResistance = 0.8f;
++    else if (value >= 6) m_fResistance = 0.7f;
++}
++CBaseCharacter::CBaseCharacter() : B2BaseClass(OT_MODEL) {
++    AddAggregate(&m_damage); AddAggregate(&m_InventoryMgr);
++    // Original m_MoveObj (steering/AI movement) is not imported in this subset.
++}
++DDWORD CBaseCharacter::EngineMessageFn(DDWORD message,void* data,DFLOAT fData) {
++    if (message == MID_INITIALUPDATE && fData != INITIALUPDATE_SAVEGAME) {
++        auto flags = g_pServerDE->GetObjectFlags(m_hObject);
++        g_pServerDE->SetObjectFlags(m_hObject,flags | FLAG_MODELGOURAUDSHADE | FLAG_ANIMTRANSITION);
++    }
++    if (message == MID_MODELSTRINGKEY && data && pending_model_commands.size() < 32) {
++        auto* args = static_cast<ArgList*>(data); std::string command;
++        for (int i = 0; args->argv && i < args->argc; ++i) { if (i) command += ' '; command += args->argv[i]; }
++        pending_model_commands.push_back(std::move(command));
++    }
++    return B2BaseClass::EngineMessageFn(message,data,fData);
++}
++CPlayerObj::~CPlayerObj() {
++    auto* server = GetServerDE();
++    if (m_hClient) server->SetClientUserData(m_hClient,nullptr);
++    if (m_hstrTrigger) server->FreeString(m_hstrTrigger);
++    if (m_hstrPlayerName) server->FreeString(m_hstrPlayerName);
++    // Creation rollback owns the initial smell until entry succeeds. Ordinary
++    // lifetime leaves the world-owned scent to its original 20-second timeout.
++    if (!attributes_received && initial_smell_) server->RemoveObject(initial_smell_);
++}
++void CPlayerObj::PostPropRead(ObjectCreateStruct* state) {
++    SAFE_STRCPY(state->m_Filename,"Models\\Characters\\Caleb.abc");
++    SAFE_STRCPY(state->m_SkinName,"Skins\\Characters\\Caleb1.dtx");
++    SAFE_STRCPY(state->m_Name,"player"); state->m_ObjectType = OT_MODEL;
++}
++DBOOL CPlayerObj::InitialUpdate(int reason) {
++    auto* server = GetServerDE();
++    if (reason == INITIALUPDATE_SAVEGAME) { entry_error = "Player save restoration is not ported"; return DFALSE; }
++    // InitialUpdate precedes SetClient, as in the original engine.
++    if (!m_InventoryMgr.Init(m_hObject,m_hClient) || !m_damage.Init(m_hObject,&m_InventoryMgr)) return DFALSE;
++    m_bFirstUpdate = DTRUE;
++    m_InventoryMgr.SetAmmoCount(1,50);
++    server->SetNextUpdate(m_hObject,.001f);
++    m_damage.SetHitPoints(100); m_damage.SetArmorPoints(0);
++    m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = 100;
++    m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = 100;
++    m_damage.m_fMass = 250;
++    m_fSmellTime = server->GetTime(); m_fSmellDelay = .5f;
++    ObjectCreateStruct state; server->GetObjectPos(m_hObject,&state.m_Pos);
++    if (auto* smell = server->CreateObject(server->GetClass("SmellHint"),&state)) initial_smell_ = smell->m_hObject;
++    else return DFALSE;
++    DVector dims{12,82.0f/2,12}; server->SetObjectDims(m_hObject,&dims);
++    m_hstrTrigger = server->CreateString("TRIGGER");
++    initialized = m_hstrTrigger != nullptr;
++    return initialized;
++}
++bool CPlayerObj::SetCharacter(DBYTE character) {
++    // Caleb, default skin only until the other original character branches,
++    // sound roots and hit-sphere generation are ported. Reject before mutation.
++    if (character != 0 || m_nSkin != 0) { entry_error = "Only Caleb's default entry profile is ported"; return false; }
++    if (GetServerDE()->SetModelFilenames(m_hObject,"Models\\Characters\\Caleb.abc","Skins\\Characters\\Caleb1.dtx") != DE_OK) {
++        entry_error = "Player model could not be loaded"; return false;
++    }
++    m_nCharacter = character; return true;
++}
++bool CPlayerObj::Respawn() {
++    auto* server = GetServerDE();
++    // Preserve the original single-player dead-player gate. This operation is
++    // an entry reset, not a replacement for loading a save after death.
++    if (m_damage.IsDead()) { entry_error = "A dead single-player character requires save restoration"; return false; }
++    if (!SetCharacter(m_nCharacter)) return false;
++    const DDWORD flags = FLAG_VISIBLE | FLAG_MODELKEYS | FLAG_YROTATION | FLAG_ANIMTRANSITION |
++        FLAG_TOUCH_NOTIFY | FLAG_SOLID | FLAG_STAIRSTEP | FLAG_SHADOW;
++    server->SetObjectFlags(m_hObject,flags);
++    DVector velocity{}; server->SetVelocity(m_hObject,&velocity); server->SetAcceleration(m_hObject,&velocity);
++    m_damage.SetHitPoints(100); m_damage.SetArmorPoints(0); m_bDead = DFALSE; m_fAirLevel = 100;
++    for (DBYTE i = 1; i <= 12; ++i) m_InventoryMgr.SetAmmoCount(i,0);
++    m_InventoryMgr.SetAmmoCount(1,50);
++    ++respawns;
++    return UpdateClientPhysics() && TeleportClientToServerPos();
++}
++void CPlayerObj::ValidateAttributes() {
++    auto clamp = [](DBYTE value) { return std::clamp<DBYTE>(value,1,5); };
++    m_nAttribStrength = clamp(m_nAttribStrength); m_nAttribSpeed = clamp(m_nAttribSpeed);
++    m_nAttribResistance = clamp(m_nAttribResistance); m_nAttribMagic = clamp(m_nAttribMagic);
++    if (m_nAttribStrength+m_nAttribSpeed+m_nAttribResistance+m_nAttribMagic > 12)
++        m_nAttribStrength = m_nAttribSpeed = m_nAttribResistance = m_nAttribMagic = 3;
++    m_damage.CalculateResistance(m_nAttribResistance);
++    m_InventoryMgr.SetStrength(m_nAttribStrength); m_InventoryMgr.SetMagic(m_nAttribMagic);
++    static constexpr float move[] = {220,250,280,310,330,350};
++    static constexpr float maximum[] = {100,100,125,150,200,250};
++    static constexpr float mega[] = {100,150,200,250,300,400};
++    m_fMoveVel = move[m_nAttribSpeed-1]; m_fJumpVel = 600;
++    m_damage.m_fMaxHitPoints = maximum[m_nAttribStrength-1];
++    m_damage.m_fMaxMegaHitPoints = mega[m_nAttribStrength-1];
++    m_damage.m_fMaxArmorPoints = maximum[m_nAttribMagic-1];
++    m_damage.m_fMaxNecroArmorPoints = mega[m_nAttribMagic-1];
++}
++bool CPlayerObj::OnSinglePlayerInit(const blood2::PlayerInit& init) {
++    if (attributes_received || !m_hClient || init.name.size() > 100 || init.name.find('\0') != std::string::npos || init.character != 0 || init.skin != 0) return false;
++    // Reject unsupported loadouts before allocating strings or weapons.
++    for (auto type : init.weapons) if (type && !weapon_definition(type & ~DUAL_HAND_MASK)) return false;
++    m_hstrPlayerName = GetServerDE()->CreateString(init.name.c_str()); if (!m_hstrPlayerName) return false;
++    struct Rollback {
++        CInventoryMgr& inventory; HSTRING& name; bool committed=false;
++        ~Rollback() { if (!committed) { inventory.ClearWeapons(); g_pServerDE->FreeString(name); name=nullptr; } }
++    } rollback{m_InventoryMgr,m_hstrPlayerName};
++    m_nCharacter = init.character; m_nSkin = init.skin;
++    m_nAttribStrength = init.strength; m_nAttribSpeed = init.speed;
++    m_nAttribResistance = init.resistance; m_nAttribMagic = init.magic;
++    ValidateAttributes();
++    m_InventoryMgr.requested_weapons = init.weapons;
++    if (m_InventoryMgr.ObtainWeapon(WEAP_MELEE,0)!=InventoryResult::Ok) return false;
++    for (unsigned i=0;i<init.weapons.size();++i) {
++        const auto type=static_cast<DBYTE>(init.weapons[i] & ~DUAL_HAND_MASK);
++        if (!type) continue;
++        auto obtained=m_InventoryMgr.ObtainWeapon(type,static_cast<int>(i+1));
++        if (obtained!=InventoryResult::Ok && obtained!=InventoryResult::AlreadyHave) return false;
++        if (init.weapons[i] & DUAL_HAND_MASK) m_InventoryMgr.ObtainWeapon(type,static_cast<int>(i+1));
++    }
++    m_InventoryMgr.ChangeWeaponSlot(1);
++    if (!Respawn()) return false;
++    rollback.committed=true; attributes_received = true; return true;
++}
++bool CPlayerObj::GoToStartPoint(HSTRING start_name) {
++    auto* server = GetServerDE(); auto* list = server->FindNamedObjects("Blood2StartPoint");
++    if (!list) return false;
++    // Fix the original empty-list early-return leak and use checked casts.
++    struct Release { ServerDE* server; ObjectList* list; ~Release() { server->RelinquishList(list); } } release{server,list};
++    bool remove_string = !start_name;
++    if (remove_string) start_name = server->CreateString("start");
++    if (!start_name) return false;
++    GameStartPoint* start = nullptr; GameStartPoint* fallback = nullptr;
++    for (auto* link = list->m_pFirstLink; link; link = link->m_pNext) {
++        auto* candidate = dynamic_cast<GameStartPoint*>(server->HandleToObject(link->m_hObject));
++        if (candidate && !candidate->IsMultiplayer()) {
++            fallback = candidate;
++            if (server->CompareStringsUpper(start_name,candidate->GetName())) { start = candidate; break; }
++        }
++    }
++    if (remove_string) server->FreeString(start_name);
++    if (!start) start = fallback;
++    if (!start) { entry_error = "No single-player GameStartPoint"; return false; }
++    m_fYaw = start->GetPitchYawRoll().y; m_fPitch = 0;
++    DVector position; server->GetObjectPos(start->m_hObject,&position);
++    start->SendTrigger();
++    if (server->TeleportObject(m_hObject,&position) != DE_OK ||
++        server->SendToClient(m_hClient,blood2::PlayerRotation{m_fPitch,m_fYaw}) != DE_OK) return false;
++    if (server->MoveObjectToGround(m_hObject) != DE_OK) { entry_error = "Start point has no supported ground collision"; return false; }
++    return UpdateClientPhysics() && TeleportClientToServerPos();
++}
++bool CPlayerObj::UpdateClientPhysics() {
++    if (!m_hClient) return true; // Original InitialUpdate has no client yet.
++    blood2::PlayerPhysics physics; physics.model = "Models\\Characters\\Caleb.abc";
++    physics.skin = "Skins\\Characters\\Caleb1.dtx";
++    auto* server = GetServerDE();
++    if (server->GetObjectDims(m_hObject,&physics.dimensions) != DE_OK || server->GetGlobalForce(&physics.gravity) != DE_OK) return false;
++    physics.move_speed = m_fMoveVel; physics.jump_speed = m_fJumpVel;
++    return server->SendToClient(m_hClient,physics) == DE_OK;
++}
++bool CPlayerObj::TeleportClientToServerPos() {
++    if (!m_hClient) return true;
++    blood2::PlayerPosition position; GetServerDE()->GetObjectPos(m_hObject,&position.position);
++    position.move_code=++m_byClientMoveCode;
++    return GetServerDE()->SendToClient(m_hClient,position) == DE_OK;
++}
++bool CPlayerObj::HandlePlayerPositionMessage(const blood2::PlayerMove& move) {
++    auto* server=GetServerDE();
++    if (!m_hClient || !attributes_received || server->GetClientUserData(m_hClient)!=m_hObject || move.move_code!=m_byClientMoveCode)
++        return false;
++    auto finite=[](DVector v) { return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z) &&
++        std::abs(v.x)<=10000000 && std::abs(v.y)<=10000000 && std::abs(v.z)<=10000000; };
++    if (!finite(move.position) || !finite(move.velocity) || !finite(move.acceleration)) return false;
++    auto velocity=move.velocity, acceleration=move.acceleration, position=move.position;
++    if (server->SetVelocity(m_hObject,&velocity)!=DE_OK || server->SetAcceleration(m_hObject,&acceleration)!=DE_OK ||
++        server->MoveObject(m_hObject,&position)!=DE_OK) return false;
++    blood2::MovementState state;
++    if (!server->GetMovementState(m_hObject,state)) return false;
++    // The original handler accepts the client's on-ground bit and enforces a
++    // prediction leash. Here one local body resolves collisions once, so use
++    // the resulting support and never teleport through a rejected collision.
++    m_bOnGround=state.standing && state.ground_normal.y>=0.5f;
++    ++movement_messages; return true;
++}
++DBOOL CPlayerObj::Update(DVector*) {
++    auto* server = GetServerDE(); server->SetNextUpdate(m_hObject,.001f); ++updates;
++    if (!m_hClient) return DTRUE;
++    if (m_bFirstUpdate) {
++        ValidateAttributes();
++        if (!UpdateClientPhysics() || !TeleportClientToServerPos()) return DFALSE;
++        m_bFirstUpdate = DFALSE;
++    }
++    return UpdateStats();
++}
++bool CPlayerObj::UpdateStats() {
++    const blood2::PlayerStats value{m_damage.m_fHitPoints,m_damage.m_fArmorPoints,m_InventoryMgr.GetAmmoCount(1)};
++    if (value.health==last_sent_stats_.health && value.armor==last_sent_stats_.armor && value.bullets==last_sent_stats_.bullets) return true;
++    if (GetServerDE()->SendToClient(m_hClient,value)!=DE_OK) return false;
++    last_sent_stats_=value; return true;
++}
++DDWORD CPlayerObj::EngineMessageFn(DDWORD message,void* data,DFLOAT fData) {
++    DBOOL result = DTRUE;
++    switch (message) {
++        case MID_PRECREATE: {
++            auto ret = CBaseCharacter::EngineMessageFn(message,data,fData);
++            if (data) PostPropRead(static_cast<ObjectCreateStruct*>(data));
++            return ret;
++        }
++        case MID_INITIALUPDATE: result = InitialUpdate(static_cast<int>(fData)); break;
++        case MID_UPDATE: result = Update(static_cast<DVector*>(data)); break;
++        default: break;
++    }
++    if (result) return CBaseCharacter::EngineMessageFn(message,data,fData);
++    GetServerDE()->RemoveObject(m_hObject); return result;
++}
+ 
+-// ORIGINAL EXCERPT: sources/blood2/ObjectDLL/PlayerObj.cpp:6273-6449; only documented branches are ported.
+-void CPlayerObj::UpdateClientPhysics()
+-{
+-	HMESSAGEWRITE hWrite;
+-	char fileName[256], skinName[256];
+-	DVector grav;
+-	ServerDE *pServerDE = GetServerDE();
+-	HOBJECT objContainers[40];
+-	DDWORD i, objContainerFlags[40], nContainers;
+-	D_WORD containerCode;
+-	DVector current;
+-	HCLASS hVolClass;
+-	VolumeBrush *pVolBrush;
+-	float fGravity, frigginCoeff;
+-	DBOOL bHidden;
+-	DVector tbPos;
+-	DVector vAddVelocity;
+-
+-	if(!m_hClient || !m_hObject || !pServerDE)
+-		return;
+-
+-	VEC_INIT( vAddVelocity );
+-	if (m_damage.IsAddedVelocity())
+-	{
+-		m_damage.GetAddedVelocity(&vAddVelocity);
+-		m_PStateChangeFlags |= PSTATE_ADDVELOCITY;
+-	}
+-	if( m_bDoorPush )
+-	{
+-		m_bDoorPush = DFALSE;
+-		VEC_ADD( vAddVelocity, vAddVelocity, m_vDoorPush );
+-		m_PStateChangeFlags |= PSTATE_ADDVELOCITY;
+-	}
+-
+-	
+-	// Update leash length.
+-	ChangeSpeedsVar(m_fLeashLen, m_LeashLenTrack.GetFloat());
+-
+-	// Update crouch bit
+-	if (m_bForcedCrouch)
+-		m_PStateChangeFlags |= PSTATE_CROUCH;
+-
+-
+-	// Did our container states change?
+-	nContainers = pServerDE->GetObjectContainers(m_hObject, objContainers, objContainerFlags,
+-		sizeof(objContainers)/sizeof(objContainers[0]));
+-	nContainers = DMIN(nContainers, MAX_TRACKED_CONTAINERS);
+-	if(nContainers != m_nCurContainers)
+-	{
+-		m_PStateChangeFlags |= PSTATE_CONTAINERTYPE;
+-	}
+-	else
+-	{
+-		// Did we enter a container?
+-		for(i=0; i < nContainers; i++)
+-		{
+-			if(!IsObjectInList(m_CurContainers, m_nCurContainers, objContainers[i]))
+-			{
+-				m_PStateChangeFlags |= PSTATE_CONTAINERTYPE;
+-				break;
+-			}
+-		}
+-
+-		// Did we exit a container?
+-		if(!(m_PStateChangeFlags & PSTATE_CONTAINERTYPE))
+-		{
+-			for(i=0; i < m_nCurContainers; i++)
+-			{
+-				if(!IsObjectInList(objContainers, nContainers, m_CurContainers[i]))
+-				{
+-					m_PStateChangeFlags |= PSTATE_CONTAINERTYPE;
+-					break;
+-				}
+-			}
+-		}
+-	}
+-	
+-
+-	if(!m_PStateChangeFlags)
+-		return;
+-
+-//	hWrite = pServerDE->StartMessage(m_hClient, SMSG_PHYSICS_UPDATE);
+-	hWrite = StartMessageToClient(SMSG_PHYSICS_UPDATE);
+-	if(hWrite)
+-	{
+-		pServerDE->WriteToMessageWord(hWrite, (D_WORD)m_PStateChangeFlags);
+-		
+-		if(m_PStateChangeFlags & PSTATE_MODELFILENAMES)
+-		{
+-			pServerDE->GetModelFilenames(m_hObject, fileName, sizeof(fileName), skinName, sizeof(skinName));
+-			pServerDE->WriteToMessageString(hWrite, fileName);
+-			pServerDE->WriteToMessageString(hWrite, skinName);
+-		}
+-
+-		if(m_PStateChangeFlags & PSTATE_ADDVELOCITY)
+-		{
+-			pServerDE->WriteToMessageVector(hWrite, &vAddVelocity);
+-		}
+-
+-		if(m_PStateChangeFlags & PSTATE_GRAVITY)
+-		{
+-			pServerDE->GetGlobalForce(&grav);
+-			pServerDE->WriteToMessageVector(hWrite, &grav);
+-		}
+-
+-		if(m_PStateChangeFlags & PSTATE_CONTAINERTYPE)
+-		{
+-			// Send the new container info.
+-			pServerDE->WriteToMessageByte(hWrite, (DBYTE)nContainers);
+-			for(i=0; i < nContainers; i++)
+-			{
+-				// Send container code.
+-				if(!pServerDE->GetContainerCode(objContainers[i], &containerCode))
+-					containerCode = CC_NOTHING;
+-
+-				pServerDE->WriteToMessageByte(hWrite, (DBYTE)containerCode);
+-				
+-				// Send current and gravity.
+-				fGravity = 0.0f;
+-				current.Init();
+-				bHidden = DFALSE;
+-				hVolClass = pServerDE->GetClass("VolumeBrush");
+-				if(hVolClass)
+-				{
+-					if(pServerDE->IsKindOf(pServerDE->GetObjectClass(objContainers[i]), hVolClass))
+-					{
+-						pVolBrush = (VolumeBrush*)pServerDE->HandleToObject(objContainers[i]);
+-						if(pVolBrush)
+-						{
+-							current = pVolBrush->GetCurrent();
+-							fGravity = pVolBrush->GetGravity();
+-							bHidden = pVolBrush->GetHidden();
+-						}
+-					}
+-				}
+-				pServerDE->WriteToMessageVector(hWrite, &current);
+-				pServerDE->WriteToMessageFloat(hWrite, fGravity);
+-				pServerDE->WriteToMessageByte(hWrite, (DBYTE)bHidden);
+-			}
+-			
+-			// Remember what we sent last.
+-			memcpy(m_CurContainers, objContainers, sizeof(m_CurContainers[0])*nContainers);
+-			m_nCurContainers = nContainers;
+-		}		
+-
+-		if(m_PStateChangeFlags & PSTATE_SPEEDS)
+-		{
+-			pServerDE->WriteToMessageFloat(hWrite, m_fMoveVel);
+-			pServerDE->WriteToMessageFloat(hWrite, m_fJumpVel);
+-			pServerDE->WriteToMessageFloat(hWrite, m_fSwimVel);
+-
+-			// These are paired in here so RunSpeed lets you run as fast as you want.. the
+-			// client treats the first one as a 'max speed' multiplier and the second one 
+-			// as an acceleration multiplier.
+-			pServerDE->WriteToMessageFloat(hWrite, m_fMoveMultiplier);
+-			pServerDE->WriteToMessageFloat(hWrite, m_fMoveMultiplier);
+-
+-			pServerDE->WriteToMessageFloat(hWrite, m_LeashLenTrack.GetFloat()); // Leash length (allows for half a second of lag)
+-			pServerDE->WriteToMessageFloat(hWrite, m_fBaseMoveAccel);
+-			pServerDE->WriteToMessageFloat(hWrite, m_fJumpMultiplier);
+-			pServerDE->WriteToMessageFloat(hWrite, m_fLadderVel);
+-
+-			frigginCoeff = 0.0f;
+-			pServerDE->Physics()->GetFrictionCoefficient(m_hObject, frigginCoeff);
+-			pServerDE->WriteToMessageFloat(hWrite, frigginCoeff);
+-		}
+-
+-		if(m_PStateChangeFlags & PSTATE_CROUCH)
+-		{
+-			pServerDE->WriteToMessageByte(hWrite, m_bForcedCrouch);
+-		}
+-
+-		pServerDE->EndMessage2(hWrite, MESSAGE_GUARANTEED);
+-	}
+-
+-	m_PStateChangeFlags = 0;
+-}
+-
+-// ORIGINAL EXCERPT: sources/blood2/ObjectDLL/PlayerObj.cpp:6458-6534; only documented branches are ported.
+-void CPlayerObj::HandlePlayerPositionMessage(HMESSAGEREAD hRead)
+-{
+-	DVector newPos, curPos, curVel;
+-	DBYTE moveCode, nMovementFlags;
+-	DBOOL bOnGround;
+-	float fDiff, fTime;
+-
+-	ServerDE *pServerDE = GetServerDE();
+-	if(!pServerDE)
+-		return;
+-
+-	moveCode = pServerDE->ReadFromMessageByte(hRead);
+-
+-	pServerDE->ReadFromMessageVector(hRead, &newPos);
+-	
+-	curVel.x = (float)(short)pServerDE->ReadFromMessageWord(hRead);
+-	curVel.y = (float)(short)pServerDE->ReadFromMessageWord(hRead);
+-	curVel.z = (float)(short)pServerDE->ReadFromMessageWord(hRead);
+-
+-	nMovementFlags = pServerDE->ReadFromMessageByte(hRead);
+-	bOnGround = ( nMovementFlags & CLIENTMOVEMENTFLAG_ONGROUND ) ? DTRUE : DFALSE;
+-	m_eLastSurface = (SurfaceType)pServerDE->ReadFromMessageByte(hRead);
+-
+-	if(moveCode == m_byClientMoveCode)
+-	{
+-		if(m_nTrapped) return;
+-
+-		SetOnGround(bOnGround);
+-		pServerDE->SetVelocity(m_hObject, &curVel);
+-		pServerDE->MoveObject(m_hObject, &newPos);
+-
+-		fTime = g_pServerDE->GetTime( );
+-		// Check our leash.
+-		pServerDE->GetObjectPos(m_hObject, &curPos);
+-		fDiff = VEC_DIST( curPos, newPos );
+-		if( fDiff > 0.0f )
+-		{
+-			if( fDiff > m_fLeashLen || fTime > m_fTeleportTime )
+-			{
+-				pServerDE->TeleportObject( m_hObject, &newPos );
+-				m_fTeleportTime = fTime + TELEPORTPERIOD;
+-			}
+-		}
+-		else
+-			m_fTeleportTime = fTime + TELEPORTPERIOD;
+-	}
+-}
+-
+-
+-// ----------------------------------------------------------------------- //
+-// This sends a message to the client telling it to move to our position.
+-// Used when loading games and respawning.
+-// ----------------------------------------------------------------------- //
+-void CPlayerObj::TeleportClientToServerPos()
+-{
+-	HMESSAGEWRITE hWrite;
+-	DVector myPos;
+-	ServerDE *pServerDE = GetServerDE();
+-
+-
+-	pServerDE->GetObjectPos(m_hObject, &myPos);
+-
+-
+-	// Tell the player about the new move code.
+-	++m_byClientMoveCode;
+-//	hWrite = pServerDE->StartMessage(m_hClient, SMSG_FORCEPOS);
+-	hWrite = StartMessageToClient(SMSG_FORCEPOS);
+-	if( !hWrite )
+-		return;
+-	pServerDE->WriteToMessageByte(hWrite, m_byClientMoveCode);
+-	pServerDE->WriteToMessageVector(hWrite, &myPos);
+-	pServerDE->EndMessage(hWrite);
+-}
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
++// Selected ordinary normal/melee damage branch from Destructable.cpp. AI hit
++// limbs, damage impulses, powerups, triggers and death reactions are deferred.
++DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner,HOBJECT sender,DDWORD message,HMESSAGEREAD read) {
++    if (message==blood2::damage_message) {
++        blood2::Damage damage;
++        if (!BaseClass::GetServerDE()->ReadDamage(read,damage)) return 0;
++        if (!m_bGodMode && !m_bDead) {
++            auto amount=damage.amount*m_fResistance;
++            if (m_fArmorPoints>0) {
++                const auto ratio=m_fArmorPoints<=25 ? .3f : m_fArmorPoints<=50 ? .5f : m_fArmorPoints<=100 ? .7f : m_fArmorPoints<=150 ? .8f : .9f;
++                auto absorb=amount*ratio;
++                m_fArmorPoints-=absorb;
++                if (m_fArmorPoints<0) { absorb+=m_fArmorPoints; m_fArmorPoints=0; }
++                amount-=absorb;
++            }
++            amount=std::max(amount,0.0f);
++            m_fHitPoints-=amount; m_fLastDamageAmount+=amount; last_damage=damage;
++            if (m_fHitPoints<=0) { m_bDead=DTRUE; m_fHitPoints=0; }
++        }
++    }
++    return Aggregate::ObjectMessageFn(owner,sender,message,read);
++}
++FireResult CPlayerObj::HandleWeaponFireMessage(const blood2::WeaponFire& request) {
++    if (!m_hClient || !attributes_received || m_damage.IsDead() ||
++        GetServerDE()->GetClientUserData(m_hClient)!=m_hObject) return FireResult::Invalid;
++    const auto result=m_InventoryMgr.FireCurrentWeapon(request);
++    if (result==FireResult::Fired || result==FireResult::DeliveryFailed)
++        UpdateStats();
++    return result;
++}
+--- sources/blood2/ClientShellDLL/BloodClientShell.cpp (selected excerpts)
++++ Blood2/src/game/original/BloodShells.cpp
+@@ -1,46 +1,154 @@
+-// ORIGINAL EXCERPT: sources/blood2/ClientShellDLL/BloodClientShell.cpp:868-878; only documented branches are ported.
++// Selected branches of BloodServerShell.cpp and BloodClientShell.cpp. The
++// original call ordering is retained; source-level adaptations replace raw
++// client data / packet reads with checked handles and owned typed values.
++#include "BloodShells.h"
++#include "PathPoint.h"
++#include <cmath>
+ 
+-	*pAppGuid = BLOOD2GUID;
+-
+-	// Init Move mgr...
+-	m_pMoveMgr = new CMoveMgr(this);
+-	if(!m_pMoveMgr)
+-		return LT_ERROR;
+-
+-	m_pMoveMgr->Init(pClientDE);
+-
+-	// Initialize The Voice data...
+-// ORIGINAL EXCERPT: sources/blood2/ClientShellDLL/BloodClientShell.cpp:1898-1906; only documented branches are ported.
+-
+-	// Send position packet
+-	HMESSAGEWRITE hMessage = pClientDE->StartMessage(CMSG_PLAYERPOSITION);
+-
+-	// Write position info.
+-	m_pMoveMgr->WritePositionInfo(hMessage);
+-
+-	pClientDE->EndMessage2(hMessage, 0); // Send unguaranteed.
+-	
+-// ORIGINAL EXCERPT: sources/blood2/ClientShellDLL/BloodClientShell.cpp:2494-2501; only documented branches are ported.
+-void CBloodClientShell::Update()
+-{
+-	HLOCALOBJ hPlayerObj;
+-
+-	CClientDE* pClientDE = GetClientDE();
+-
+-	m_pMoveMgr->Update();
+-
+-// ORIGINAL EXCERPT: sources/blood2/ClientShellDLL/BloodClientShell.cpp:4034-4047; only documented branches are ported.
+-		case SMSG_PHYSICS_UPDATE:
+-		{
+-			if(m_pMoveMgr)
+-				m_pMoveMgr->OnPhysicsUpdate(hMessage);
+-		}
+-		break;
+-
+-		case SMSG_FORCEPOS:
+-		{
+-			if(m_pMoveMgr)
+-				m_pMoveMgr->OnServerForcePos(hMessage);
+-		}
+-		break;
+-
++void CBloodServerShell::PreStartWorld() {
++    paths.clear(); world_started = false; updates = 0;
++    // Team setup, active cinematics, voice and multiplayer state are outside
++    // the accepted fresh single-player entry mode.
++}
++bool CBloodServerShell::PostStartWorld() {
++    paths.clear();
++    // Original PathMgr::BuildPathList / PathListData::Copy, with value-owned
++    // strings. No AI GetPath/sorting/save support is implied by this snapshot.
++    for (HOBJECT object = server_.GetNextObject(nullptr); object; object = server_.GetNextObject(object)) {
++        if (!server_.IsKindOf(server_.GetObjectClass(object),server_.GetClass("PathPoint"))) continue;
++        auto* point = dynamic_cast<PathPoint*>(server_.HandleToObject(object)); if (!point) return false;
++        PathEntry entry; server_.GetObjectPos(object,&entry.position);
++        if (const char* value = server_.GetObjectName(object)) entry.name = value;
++        if (const char* value = server_.GetStringData(point->GetActionTarget())) entry.action_target = value;
++        if (const char* value = server_.GetStringData(point->GetActionMessage())) entry.action_message = value;
++        paths.push_back(std::move(entry));
++    }
++    world_started = true; return true;
++}
++CPlayerObj* CBloodServerShell::Player(HCLIENT client) {
++    auto object = server_.GetClientUserData(client);
++    return object ? dynamic_cast<CPlayerObj*>(server_.HandleToObject(object)) : nullptr;
++}
++CPlayerObj* CBloodServerShell::CreatePlayer(HCLIENT client) {
++    ObjectCreateStruct state; // Original zero position, identity rotation, no flags.
++    auto type = server_.GetClass("CPlayerObj");
++    auto* player = type ? dynamic_cast<CPlayerObj*>(server_.CreateObject(type,&state)) : nullptr;
++    if (!player) return nullptr;
++    player->SetClient(client);
++    if (server_.SetClientUserData(client,player->m_hObject) != DE_OK || !player->Respawn()) {
++        player->SetClient(nullptr); server_.SetClientUserData(client,nullptr); server_.RemoveObject(player->m_hObject); return nullptr;
++    }
++    return player;
++}
++bool CBloodServerShell::RespawnPlayer(CPlayerObj* player,HCLIENT client) {
++    if (!player || !client) return false;
++    player->SetClient(client);
++    if (server_.SetClientUserData(client,player->m_hObject) != DE_OK ||
++        server_.SendToClient(client,blood2::PlayerInitRequest{}) != DE_OK) return false;
++    // Fresh single-player only: no saved client refs, team selection or restore.
++    if (!player->GoToStartPoint(nullptr)) return false;
++    server_.SetGameConVar("GAME_GOTOSTARTPOINT","1"); return true;
++}
++CPlayerObj* CBloodServerShell::OnClientEnterWorld(HCLIENT client) {
++    if (!world_started || !client || Player(client)) return nullptr;
++    auto* player = CreatePlayer(client);
++    if (!player || !RespawnPlayer(player,client)) { OnClientExitWorld(client); return nullptr; }
++    return player;
++}
++void CBloodServerShell::OnClientExitWorld(HCLIENT client) {
++    auto* player = Player(client);
++    if (player) { player->SetClient(nullptr); server_.RemoveObject(player->m_hObject); }
++    server_.SetClientUserData(client,nullptr);
++}
++bool CBloodServerShell::OnMessage(HCLIENT client,const blood2::PlayerInit& init) {
++    auto* player = Player(client); return player && player->OnSinglePlayerInit(init);
++}
++FireResult CBloodServerShell::OnMessage(HCLIENT client,const blood2::WeaponFire& fire) {
++    auto* player=Player(client); return player ? player->HandleWeaponFireMessage(fire) : FireResult::Invalid;
++}
++bool CBloodServerShell::OnMessage(HCLIENT client,const blood2::PlayerMove& move) {
++    auto* player=Player(client); return player && player->HandlePlayerPositionMessage(move);
++}
++void CBloodServerShell::Update(float) {
++    ++updates;
++    // Original Update returns here for GAMETYPE_SINGLE. Remaining code is MP.
++}
++bool CBloodClientShell::StartNewWorld(const char* world,blood2::WorldMessage& message) {
++    if (!blood2::original_world_request(world,0,blood2::LOADTYPE_NEW_GAME,1,message)) return false;
++    return true; // State changes wait until the engine accepts the world.
++}
++bool CBloodClientShell::OnEnterWorld(HCLIENT client) {
++    auto object = server_.GetClientUserData(client); if (!object || m_bInWorld) return false;
++    if (!move_mgr.Init(server_,client)) return false;
++    client_ = client; player = object;
++    m_bInWorld = true; m_bFirstUpdate = true; m_bFirstWorld = true;
++    position = {}; camera_position = {}; rotation = {}; physics = {}; stats = {};
++    messages = updates = 0;
++    blocker = "Standing movement/weapon inspection: stairs, containers, moving platforms, full combat, audio and autosave remain unported";
++    return true;
++}
++void CBloodClientShell::OnExitWorld() {
++    weapons={}; weapon_input={}; move_mgr.Term(); movement_input={};
++    player = nullptr; client_ = nullptr; m_bInWorld = false; m_bFirstWorld = true; m_bFirstUpdate = true;
++    position = {}; camera_position = {}; rotation = {}; physics = {}; stats = {};
++    blocker.clear();
++}
++bool CBloodClientShell::InitSinglePlayer(CBloodServerShell& server) {
++    if (!m_bFirstWorld) return false;
++    blood2::PlayerInit init; // Default entry profile; original fields/order retained.
++    if (!server.OnMessage(client_,init)) return false;
++    m_bFirstWorld = false;
++    // Original next requests CMSG_AUTOSAVE and sets GS_PLAYING. Both remain
++    // gated: successful attribute exchange cannot imply complete gameplay.
++    return true;
++}
++bool CBloodClientShell::OnMessage(const blood2::PlayerEvent& event,CBloodServerShell& server) {
++    if (!m_bInWorld || server_.GetClientUserData(client_) != player) return false;
++    ++messages;
++    if (std::holds_alternative<blood2::PlayerInitRequest>(event)) return InitSinglePlayer(server);
++    if (const auto* value = std::get_if<blood2::PlayerRotation>(&event)) rotation = *value;
++    else if (const auto* value = std::get_if<blood2::PlayerPosition>(&event)) {
++        if (!move_mgr.OnServerForcePos(*value)) return false;
++        position=value->position;
++    } else if (const auto* value = std::get_if<blood2::PlayerPhysics>(&event)) {
++        if (!move_mgr.OnPhysicsUpdate(*value)) return false;
++        physics=*value;
++    }
++    else if (const auto* value = std::get_if<blood2::PlayerStats>(&event)) stats = *value;
++    return true;
++}
++bool CBloodClientShell::Update() {
++    if (!m_bInWorld || server_.GetClientUserData(client_) != player) return false;
++    ++updates;
++    server_.GetObjectPos(player,&position);
++    // Caleb's source standing eye level. Original camera effects remain absent.
++    camera_position = position; camera_position.y += 36;
++    m_bFirstUpdate = false; return true;
++}
++bool CBloodClientShell::UpdateMovement(CBloodServerShell& server,double seconds,std::string& error) {
++    auto* owner=server.Player(client_);
++    if (!owner || !move_mgr.Update(server,movement_input,rotation.yaw,seconds,!owner->m_damage.IsDead())) {
++        error="Original MoveMgr step failed (invalid association, movement message or collision)"; return false;
++    }
++    return true;
++}
++bool CBloodClientShell::SyncWeapons(blood2::ModelStore& models,blood2::Resources& resources,CBloodServerShell& server,std::string& error) {
++    auto* owner=server.Player(client_); if (!owner) return false;
++    std::array<CViewWeapon,2> prepared;
++    std::array<bool,2> changed{};
++    for (unsigned i=0;i<2;++i) {
++        const auto* weapon=owner->m_InventoryMgr.CurrentWeapon(i!=0);
++        const auto type=weapon ? weapon->data.m_nType : 0;
++        changed[i]=type!=weapons[i].type;
++        if (changed[i] && type && !prepared[i].Create(type,i!=0,models,resources,error)) return false;
++    }
++    for (unsigned i=0;i<2;++i) if (changed[i]) weapons[i]=std::move(prepared[i]);
++    return true;
++}
++bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server,double seconds,std::string& error) {
++    const float cp=std::cos(rotation.pitch);
++    const DVector forward{std::sin(rotation.yaw)*cp,-std::sin(rotation.pitch),std::cos(rotation.yaw)*cp};
++    for (auto& weapon : weapons)
++        if (!weapon.Update(server_,server,client_,weapon_input,camera_position,forward,seconds,error)) return false;
++    return true;
++}
+--- sources/blood2/ObjectDLL/BloodServerShell.cpp (selected excerpts)
++++ Blood2/src/game/original/BloodShells.cpp
+@@ -1,12 +1,154 @@
+-// ORIGINAL EXCERPT: sources/blood2/ObjectDLL/BloodServerShell.cpp:517-527; only documented branches are ported.
++// Selected branches of BloodServerShell.cpp and BloodClientShell.cpp. The
++// original call ordering is retained; source-level adaptations replace raw
++// client data / packet reads with checked handles and owned typed values.
++#include "BloodShells.h"
++#include "PathPoint.h"
++#include <cmath>
+ 
+-		}
+-		break;
+-
+-		default:	// Let the player handle it
+-		{
+-			CPlayerObj *pObj = (CPlayerObj*)g_pServerDE->GetClientUserData(hSender);
+-			if (pObj)
+-				pObj->OnMessage(messageID, hMessage);
+-		}
+-	}
++void CBloodServerShell::PreStartWorld() {
++    paths.clear(); world_started = false; updates = 0;
++    // Team setup, active cinematics, voice and multiplayer state are outside
++    // the accepted fresh single-player entry mode.
++}
++bool CBloodServerShell::PostStartWorld() {
++    paths.clear();
++    // Original PathMgr::BuildPathList / PathListData::Copy, with value-owned
++    // strings. No AI GetPath/sorting/save support is implied by this snapshot.
++    for (HOBJECT object = server_.GetNextObject(nullptr); object; object = server_.GetNextObject(object)) {
++        if (!server_.IsKindOf(server_.GetObjectClass(object),server_.GetClass("PathPoint"))) continue;
++        auto* point = dynamic_cast<PathPoint*>(server_.HandleToObject(object)); if (!point) return false;
++        PathEntry entry; server_.GetObjectPos(object,&entry.position);
++        if (const char* value = server_.GetObjectName(object)) entry.name = value;
++        if (const char* value = server_.GetStringData(point->GetActionTarget())) entry.action_target = value;
++        if (const char* value = server_.GetStringData(point->GetActionMessage())) entry.action_message = value;
++        paths.push_back(std::move(entry));
++    }
++    world_started = true; return true;
++}
++CPlayerObj* CBloodServerShell::Player(HCLIENT client) {
++    auto object = server_.GetClientUserData(client);
++    return object ? dynamic_cast<CPlayerObj*>(server_.HandleToObject(object)) : nullptr;
++}
++CPlayerObj* CBloodServerShell::CreatePlayer(HCLIENT client) {
++    ObjectCreateStruct state; // Original zero position, identity rotation, no flags.
++    auto type = server_.GetClass("CPlayerObj");
++    auto* player = type ? dynamic_cast<CPlayerObj*>(server_.CreateObject(type,&state)) : nullptr;
++    if (!player) return nullptr;
++    player->SetClient(client);
++    if (server_.SetClientUserData(client,player->m_hObject) != DE_OK || !player->Respawn()) {
++        player->SetClient(nullptr); server_.SetClientUserData(client,nullptr); server_.RemoveObject(player->m_hObject); return nullptr;
++    }
++    return player;
++}
++bool CBloodServerShell::RespawnPlayer(CPlayerObj* player,HCLIENT client) {
++    if (!player || !client) return false;
++    player->SetClient(client);
++    if (server_.SetClientUserData(client,player->m_hObject) != DE_OK ||
++        server_.SendToClient(client,blood2::PlayerInitRequest{}) != DE_OK) return false;
++    // Fresh single-player only: no saved client refs, team selection or restore.
++    if (!player->GoToStartPoint(nullptr)) return false;
++    server_.SetGameConVar("GAME_GOTOSTARTPOINT","1"); return true;
++}
++CPlayerObj* CBloodServerShell::OnClientEnterWorld(HCLIENT client) {
++    if (!world_started || !client || Player(client)) return nullptr;
++    auto* player = CreatePlayer(client);
++    if (!player || !RespawnPlayer(player,client)) { OnClientExitWorld(client); return nullptr; }
++    return player;
++}
++void CBloodServerShell::OnClientExitWorld(HCLIENT client) {
++    auto* player = Player(client);
++    if (player) { player->SetClient(nullptr); server_.RemoveObject(player->m_hObject); }
++    server_.SetClientUserData(client,nullptr);
++}
++bool CBloodServerShell::OnMessage(HCLIENT client,const blood2::PlayerInit& init) {
++    auto* player = Player(client); return player && player->OnSinglePlayerInit(init);
++}
++FireResult CBloodServerShell::OnMessage(HCLIENT client,const blood2::WeaponFire& fire) {
++    auto* player=Player(client); return player ? player->HandleWeaponFireMessage(fire) : FireResult::Invalid;
++}
++bool CBloodServerShell::OnMessage(HCLIENT client,const blood2::PlayerMove& move) {
++    auto* player=Player(client); return player && player->HandlePlayerPositionMessage(move);
++}
++void CBloodServerShell::Update(float) {
++    ++updates;
++    // Original Update returns here for GAMETYPE_SINGLE. Remaining code is MP.
++}
++bool CBloodClientShell::StartNewWorld(const char* world,blood2::WorldMessage& message) {
++    if (!blood2::original_world_request(world,0,blood2::LOADTYPE_NEW_GAME,1,message)) return false;
++    return true; // State changes wait until the engine accepts the world.
++}
++bool CBloodClientShell::OnEnterWorld(HCLIENT client) {
++    auto object = server_.GetClientUserData(client); if (!object || m_bInWorld) return false;
++    if (!move_mgr.Init(server_,client)) return false;
++    client_ = client; player = object;
++    m_bInWorld = true; m_bFirstUpdate = true; m_bFirstWorld = true;
++    position = {}; camera_position = {}; rotation = {}; physics = {}; stats = {};
++    messages = updates = 0;
++    blocker = "Standing movement/weapon inspection: stairs, containers, moving platforms, full combat, audio and autosave remain unported";
++    return true;
++}
++void CBloodClientShell::OnExitWorld() {
++    weapons={}; weapon_input={}; move_mgr.Term(); movement_input={};
++    player = nullptr; client_ = nullptr; m_bInWorld = false; m_bFirstWorld = true; m_bFirstUpdate = true;
++    position = {}; camera_position = {}; rotation = {}; physics = {}; stats = {};
++    blocker.clear();
++}
++bool CBloodClientShell::InitSinglePlayer(CBloodServerShell& server) {
++    if (!m_bFirstWorld) return false;
++    blood2::PlayerInit init; // Default entry profile; original fields/order retained.
++    if (!server.OnMessage(client_,init)) return false;
++    m_bFirstWorld = false;
++    // Original next requests CMSG_AUTOSAVE and sets GS_PLAYING. Both remain
++    // gated: successful attribute exchange cannot imply complete gameplay.
++    return true;
++}
++bool CBloodClientShell::OnMessage(const blood2::PlayerEvent& event,CBloodServerShell& server) {
++    if (!m_bInWorld || server_.GetClientUserData(client_) != player) return false;
++    ++messages;
++    if (std::holds_alternative<blood2::PlayerInitRequest>(event)) return InitSinglePlayer(server);
++    if (const auto* value = std::get_if<blood2::PlayerRotation>(&event)) rotation = *value;
++    else if (const auto* value = std::get_if<blood2::PlayerPosition>(&event)) {
++        if (!move_mgr.OnServerForcePos(*value)) return false;
++        position=value->position;
++    } else if (const auto* value = std::get_if<blood2::PlayerPhysics>(&event)) {
++        if (!move_mgr.OnPhysicsUpdate(*value)) return false;
++        physics=*value;
++    }
++    else if (const auto* value = std::get_if<blood2::PlayerStats>(&event)) stats = *value;
++    return true;
++}
++bool CBloodClientShell::Update() {
++    if (!m_bInWorld || server_.GetClientUserData(client_) != player) return false;
++    ++updates;
++    server_.GetObjectPos(player,&position);
++    // Caleb's source standing eye level. Original camera effects remain absent.
++    camera_position = position; camera_position.y += 36;
++    m_bFirstUpdate = false; return true;
++}
++bool CBloodClientShell::UpdateMovement(CBloodServerShell& server,double seconds,std::string& error) {
++    auto* owner=server.Player(client_);
++    if (!owner || !move_mgr.Update(server,movement_input,rotation.yaw,seconds,!owner->m_damage.IsDead())) {
++        error="Original MoveMgr step failed (invalid association, movement message or collision)"; return false;
++    }
++    return true;
++}
++bool CBloodClientShell::SyncWeapons(blood2::ModelStore& models,blood2::Resources& resources,CBloodServerShell& server,std::string& error) {
++    auto* owner=server.Player(client_); if (!owner) return false;
++    std::array<CViewWeapon,2> prepared;
++    std::array<bool,2> changed{};
++    for (unsigned i=0;i<2;++i) {
++        const auto* weapon=owner->m_InventoryMgr.CurrentWeapon(i!=0);
++        const auto type=weapon ? weapon->data.m_nType : 0;
++        changed[i]=type!=weapons[i].type;
++        if (changed[i] && type && !prepared[i].Create(type,i!=0,models,resources,error)) return false;
++    }
++    for (unsigned i=0;i<2;++i) if (changed[i]) weapons[i]=std::move(prepared[i]);
++    return true;
++}
++bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server,double seconds,std::string& error) {
++    const float cp=std::cos(rotation.pitch);
++    const DVector forward{std::sin(rotation.yaw)*cp,-std::sin(rotation.pitch),std::cos(rotation.yaw)*cp};
++    for (auto& weapon : weapons)
++        if (!weapon.Update(server_,server,client_,weapon_input,camera_position,forward,seconds,error)) return false;
++    return true;
++}

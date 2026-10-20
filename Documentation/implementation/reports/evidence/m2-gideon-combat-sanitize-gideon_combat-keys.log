@@ -1,0 +1,14 @@
+615/618 Testing: gideon_combat.keys
+615/618 Test: gideon_combat.keys
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_combat_tests" "keys" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-combat-keys"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_combat.keys" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.keys" end time: Oct 17 02:23 CEST
+"gideon_combat.keys" time elapsed: 00:00:00
+----------------------------------------------------------

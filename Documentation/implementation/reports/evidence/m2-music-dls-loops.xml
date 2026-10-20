@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-c++"
+	tests="7"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname="gigabyte-g5"
+	time="3"
+	timestamp="2026-10-17T23:53:33"
+	>
+	<testcase name="music_assets.reader" classname="music_assets.reader" time="0.0138382" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Reader: exact ranges, padding, recursion/count limits, references and owned output verified
+</system-out>
+	</testcase>
+	<testcase name="music_assets.plan" classname="music_assets.plan" time="0.0022194" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Original plan: reverse transition loading, repeated cts.sec, playlist order and first-command parsing verified
+</system-out>
+	</testcase>
+	<testcase name="music_assets.catalog" classname="music_assets.catalog" time="0.0139062" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Catalog: deduplicated reads, explicit missing/ambiguous/symlink/oversize failures and reset verified
+</system-out>
+	</testcase>
+	<testcase name="music_assets.private" classname="music_assets.private" time="2.2256" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private music containers: 156 sections / 39 styles / 5 banks / 21513 chunks / 11986804 bytes
+01_SubwayA music directory music/cabal requests=52 files=45 bytes=2004402 error=
+02_CityHub music directory music/cabal requests=52 files=45 bytes=2004402 error=
+</system-out>
+	</testcase>
+	<testcase name="dls_bank.decode" classname="dls_bank.decode" time="0.00252402" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>DLS PCM endpoints, signed values, reordered/aliased cues, region override/inheritance, layered order, raw graphs and owned lifetime verified
+</system-out>
+	</testcase>
+	<testcase name="dls_bank.malformed" classname="dls_bank.malformed" time="0.00484858" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>DLS all synthetic truncations, references/counts/ranges/duplicates/loops/formats and transactional budget failure verified
+</system-out>
+	</testcase>
+	<testcase name="dls_bank.private" classname="dls_bank.private" time="0.891095" status="fail">
+		<failure message="Failed"/>
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Ancient.dls: 12 instruments / 106 regions / 55 waves / 1131051 frames / 21 connections / 138 opaque chunks
+bloat.dls: 8 instruments / 30 regions / 28 waves / 1073503 frames / 26 connections / 76 opaque chunks
+Cabal.dls: 14 instruments / 38 regions / 35 waves / 913403 frames / 44 connections / 102 opaque chunks
+244: !decoded &amp;&amp; error.starts_with("DLS: Effective region loop exceeds linked wave frames:") | DLS: Effective region loop exceeds linked wave frames
+</system-out>
+	</testcase>
+</testsuite>

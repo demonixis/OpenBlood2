@@ -1,0 +1,33 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start   26: config.demo
+ 1/10 Test   #26: config.demo ......................   Passed    0.01 sec
+      Start 1059: menus.state
+ 2/10 Test #1059: menus.state ......................   Passed    0.02 sec
+      Start 1060: menus.artwork
+ 3/10 Test #1060: menus.artwork ....................   Passed    1.59 sec
+      Start 1061: menus.session
+ 4/10 Test #1061: menus.session ....................   Passed    6.76 sec
+      Start 1063: menus.preferences
+ 5/10 Test #1063: menus.preferences ................   Passed    0.02 sec
+      Start 1081: demo.flow
+ 6/10 Test #1081: demo.flow ........................   Passed    0.02 sec
+      Start 1082: demo.rules
+ 7/10 Test #1082: demo.rules .......................   Passed    0.06 sec
+      Start 1085: demo_menu.manifest
+ 8/10 Test #1085: demo_menu.manifest ...............   Passed    0.02 sec
+      Start 1086: demo_menu.flow
+ 9/10 Test #1086: demo_menu.flow ...................   Passed    0.02 sec
+      Start 1087: demo_menu.assets
+10/10 Test #1087: demo_menu.assets .................   Passed    1.85 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+config       =   0.01 sec*proc (1 test)
+demo         =   0.07 sec*proc (2 tests)
+demo_menu    =   1.88 sec*proc (3 tests)
+headless     =  10.36 sec*proc (10 tests)
+menus        =   8.39 sec*proc (4 tests)
+private      =  10.20 sec*proc (3 tests)
+
+Total Test time (real) =  10.38 sec

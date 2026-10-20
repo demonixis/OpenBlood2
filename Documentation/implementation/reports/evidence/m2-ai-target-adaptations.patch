@@ -1,0 +1,1122 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index af7739c..87ee694 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -248,3 +248,10 @@ Preserve original gun-node/origin fallback, handheld clip, independent child rem
+ non-reused IDs and deferred ownership cleanup. Visual children only: chains, physical
+ children, dropped weapons and client visibility SFX remain unavailable. Hidden/reload
+ inspection runs outside UI; required AI/ExitTrigger/FX keep M2 incomplete.
++
++The latest [explicit AI target evidence](../Documentation/Implementation/M2_AI_TARGETS.md) connects original named/link selection,
++stored-position facing and target MID_LINKBROKEN. Read [contracts](docs/AI_TARGET_CONTRACTS.md).
++Preserve same-target no-op, SetTarget's net-zero Metacmd change, local-up yaw,
++deferred non-owning target lifetime and checked pose failures. Explicit commands
++are not autonomous acquisition or an AI state machine. Source counts and the
++actual M2 gate remain unchanged; NPCs, ExitTrigger and required FX remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 54e7785..b4e8712 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -40,7 +40,7 @@ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original
+ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+-target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
++target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+     src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+diff --git a/README.md b/README.md
+index d21b785..6d8e8c8 100644
+--- a/README.md
++++ b/README.md
+@@ -287,3 +287,8 @@ The held-model/attachment increment passed 323/323 tests in both Debug and
+ inspector-free Release, plus 300/300 sequential headless checks with Clang
+ ASan/UBSan/leak detection on Linux. Seven private character models cover 652
+ clip/hand samples, including 160 explicit missing-gun-node origin fallbacks.
++
++Latest M2 continuation: [original explicit AI targets and facing](../Documentation/Implementation/M2_AI_TARGETS.md) adds
++named target selection, checked links, stored-position/local-up orientation and
++inspection. Target departure/re-entry is exercised without owning the target.
++Autonomous perception, NPC states and the actual M2 acceptance gate remain open.
+diff --git a/docs/AI_MODEL_KEY_CONTRACTS.md b/docs/AI_MODEL_KEY_CONTRACTS.md
+index 6759714..d2017b0 100644
+--- a/docs/AI_MODEL_KEY_CONTRACTS.md
++++ b/docs/AI_MODEL_KEY_CONTRACTS.md
+@@ -109,3 +109,8 @@ are not established by Linux tests and SDL dummy output.
+ The [AI visibility continuation](AI_SIGHT_CONTRACTS.md) adds selected original CanSee
+ and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
+ Visibility queries do not implement target selection, AI states or complete M2.
++
++The [explicit target/facing continuation](AI_TARGET_CONTRACTS.md) adds original
++AI_Mgr named target/link commands and deferred target clearing. GetObjectPos now
++returns a typed status; target sampling and CanSee reject unresolved poses.
++Autonomous acquisition/retention and full AI behavior remain unavailable.
+diff --git a/docs/AI_SIGHT_CONTRACTS.md b/docs/AI_SIGHT_CONTRACTS.md
+index b35523d..329c386 100644
+--- a/docs/AI_SIGHT_CONTRACTS.md
++++ b/docs/AI_SIGHT_CONTRACTS.md
+@@ -81,3 +81,8 @@ SubwayA remains 187 live-created entries, four transferred world sounds, 372
+ editor-only, 17 unsupported and zero failed, plus seven SelfTriggers. CivilianAI,
+ CultistAI, Gideon, ExitTrigger, target selection, navigation/actions, attachments
+ and required FX/services keep the M2 exit gate open and --start-game at exit 6.
++
++The [explicit target/facing continuation](AI_TARGET_CONTRACTS.md) adds original
++AI_Mgr named target/link commands and deferred target clearing. GetObjectPos now
++returns a typed status; target sampling and CanSee reject unresolved poses.
++Autonomous acquisition/retention and full AI behavior remain unavailable.
+diff --git a/docs/AI_TARGET_CONTRACTS.md b/docs/AI_TARGET_CONTRACTS.md
+new file mode 100644
+index 0000000..dc76a58
+--- /dev/null
++++ b/docs/AI_TARGET_CONTRACTS.md
+@@ -0,0 +1,105 @@
++# Original explicit AI targets and facing
++
++M2 remains incomplete. This ports AI_Mgr::SetTarget, SetNewTarget,
++MC_FaceTarget, MC_FacePos and its target MID_LINKBROKEN branch. The isolated
++RefreshTargetPosition call selects the GetObjectPos statement from AI_Update;
++it does not implement that update, autonomous perception or a state machine.
++See [source selections](M2_AI_TARGET_SOURCES.json),
++[execution evidence](../../Documentation/Implementation/M2_AI_TARGETS.md),
++[object lifetime](OBJECT_CONTRACTS.md), [sight](AI_SIGHT_CONTRACTS.md) and
++[attachments](ATTACHMENT_CONTRACTS.md). No production NPC is registered.
++
++## Source rules
++
++SetNewTarget changes only the checked target identity and directed engine link.
++Reassigning the same live target is a no-op; it does not sample its position or
++change orientation. Clearing the target breaks the old link without removing
++that object. The target member is private so new callers must use this path.
++GetTarget returns an identity, not a borrowed C++ object pointer.
++
++SetTarget searches an exact, case-sensitive name and takes the first returned
++match. The current engine's list prepends matches from slot enumeration, including
++hidden/inactive live objects; it excludes pending removals. Its tie order is not
++claimed equivalent to retail engine enumeration. An empty result retains the
++old target and returns an explicit failure. The copied name is limited to the
++engine's 100-byte object name boundary; empty, oversized and embedded-NUL names
++reject. Lists are always relinquished, including failures after selection.
++
++After selection, SetTarget samples the target position and calls MC_FaceTarget.
++It cancels that method's Metacmd increment, preserving the original net zero
++command advancement. MC_FaceTarget uses the stored position; it does not silently
++refresh a moving target. With no target it only increments Metacmd. A selected
++but never sampled target rejects instead of using an uninitialized/zero vector.
++RefreshTargetPosition marks a failed sample unavailable and retains its old
++coordinates as historical inspection data. No automatic tracking loop is added.
++
++MC_FacePos computes atan2(direction.x, direction.z) minus the observer's current
++forward yaw, then rotates about its **local up axis**. The angle is not wrapped or
++rate-limited. Existing pitch/roll therefore affect the result; replacing this
++with a world-Y look-at would change behavior. Vertical noncoincident directions
++retain atan2(0,0)'s zero yaw. The original normalization does not affect this yaw
++ratio and is omitted to avoid overflow; coincident/nonfinite directions reject.
++The MoveObj aggregate is not integrated, so checked current position/rotation
++replace its cached transform. The existing quaternion helpers implement the
++rotation; later LithTech matrix code was consulted as reference only.
++
++Successful direct face commands increment Metacmd once. Counter overflow, invalid
++owners and a rejected rotation service apply no rotation or increment. Attached
++observers cannot rotate independently, per existing attachment contracts. Facing
++does not translate, integrate physics, advance an animation or dispatch model
++keys. Explicit commands can run on hidden/inactive live objects.
++
++## Lifetime and service failures
++
++Unlike the original unchecked break/assign/create sequence, SetNewTarget validates
++and acquires the new link before releasing the old link. Creation invokes no game
++callbacks. A rejected link leaves the previous target and link intact. Null clears
++are supported; self, pending, stale and foreign identities reject. The same-target
++no-op does not repair an externally broken link: callers must not break an AI's
++target link behind its back. There is no ownership of the target object.
++
++Removal immediately makes target queries fail; the original MID_LINKBROKEN callback
++clears the identity and sampled-position flag at deferred reclamation. Unrelated
++broken links leave the target alone. The callback then forwards through the original
++base/aggregate chain. Reentrant callback target changes/removals use the existing
++safe worklist. Owner removal/world unload releases links without killing an
++independent target. Target assignment followed by a later position/rotation failure
++can retain the selected target, matching original operation order; it is reported
++as a failure, never an executed face command.
++
++GetObjectPos now returns a typed DRESULT. Existing ignored-return callers retain
++their output behavior: invalid identities and unresolved attachments write zero;
++valid records return their current position. A null output is invalid. This does
++not change the existing read-only access to a pending record before reclamation;
++AI callers separately require Alive identities. Required AI target samples check
++the result. CanSee also checks its origin fallback and target position: unresolved
++poses produce Unavailable with zero rays instead of querying an invented origin.
++No generic successful SDK stub or unbounded raw pointer is introduced.
++
++## Inspection and verification scope
++
++The Skeleton panel reports target lifetime, last named request, outgoing link
++count, stored position/availability, Metacmd, completed turns, last yaw delta,
++assignment/link-break/failure counts and error. This panel remains available even
++when the selected actor's model is missing. It reads recorded state only.
++
++Synthetic checks cover duplicate names, exact case and no match, cached versus
++refreshed positions, no-target commands, cardinal/tilted/vertical facing, inactive
++objects, overflow/nonfinite/degenerate inputs, injected service failure, unresolved
++attachments, deferred and reentrant removal and repeated unload. Existing AI
++model-key checks verify pending-target rejection followed by the no-target branch
++after the actual link callback. Private tests sample all six NPC model catalogs
++and exercise real player leave/re-entry and world reload in SubwayA. These are
++labelled probes, not replacements for the missing authored NPCs.
++
++The existing GPU character scenario binds its diagnostic AI probe to the real
++player, samples/faces it while the UI is hidden and checks fresh identity after
++reload. Headless and inspector-free checks exercise the same commands. No AI
++selection rule is inferred from the probe's explicitly assigned target.
++
++SubwayA source accounting remains 187 created, four transferred world sounds,
++372 editor-only, 17 unsupported and zero failed, plus seven SelfTriggers. Missing
++CivilianAI, CultistAI, Gideon, ExitTrigger, required client FX and other services
++keep --start-game at exit 6. Autonomous target acquisition/retention, death/state
++transitions, script execution, navigation, attacks, track/smell links and retail,
++other-platform or XR parity remain unverified/unimplemented.
+diff --git a/docs/M2_AI_TARGET_SOURCES.json b/docs/M2_AI_TARGET_SOURCES.json
+new file mode 100644
+index 0000000..7d18890
+--- /dev/null
++++ b/docs/M2_AI_TARGET_SOURCES.json
+@@ -0,0 +1,73 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "184245acc44d027e1335b49f99625e04071e18c7",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          145,
++          145
++        ],
++        [
++          716,
++          722
++        ],
++        [
++          1269,
++          1314
++        ],
++        [
++          2200,
++          2200
++        ],
++        [
++          5556,
++          5608
++        ]
++      ],
++      "use": "Target link callback, named selection, explicit target link, target position sample and local-up face commands"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
++      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
++      "selected_lines": [
++        [
++          353,
++          430
++        ]
++      ],
++      "use": "GetTarget and target/command interface reference"
++    },
++    {
++      "path": "sources/lithtech/runtime/shared/src/mathlt_impl.cpp",
++      "sha256": "d629bcbede04219aa9d9486491aa37f2233ba714b674517a6cc9d6c57a874564",
++      "selected_lines": [
++        [
++          114,
++          121
++        ],
++        [
++          131,
++          144
++        ]
++      ],
++      "use": "Later engine local-axis matrix composition reference only; no import"
++    }
++  ],
++  "adaptations": [
++    "Checked target identity with private assignment and deferred original link callback",
++    "Acquire new link before old release on success; failure retains previous target",
++    "Bounded names and explicit outcomes; no-match does not clear target",
++    "Current checked transforms replace unported MoveObj snapshots",
++    "Unavailable position/attachment results are checked by target and sight callers",
++    "Reject degenerate/nonfinite/overflow commands and uninitialized target snapshots"
++  ],
++  "not_implemented": [
++    "Autonomous perception/acquisition/retention and AI state machine",
++    "Track/smell ownership, script commands, navigation, attacks and production NPC registration",
++    "Retail transform scheduling, other-platform and XR parity",
++    "Complete M2"
++  ]
++}
+diff --git a/docs/OBJECT_CONTRACTS.md b/docs/OBJECT_CONTRACTS.md
+index 440f9dc..b74fdec 100644
+--- a/docs/OBJECT_CONTRACTS.md
++++ b/docs/OBJECT_CONTRACTS.md
+@@ -85,3 +85,8 @@ The [held-model/attachment continuation](ATTACHMENT_CONTRACTS.md) adds original
+ Beretta/knife held children and typed visual attachments. Earlier blanket hand-model
+ and attachment omissions are superseded for this bounded subset. Dropping, physical
+ attachments, client visibility SFX and complete M2 remain unavailable.
++
++The [explicit target/facing continuation](AI_TARGET_CONTRACTS.md) adds original
++AI_Mgr named target/link commands and deferred target clearing. GetObjectPos now
++returns a typed status; target sampling and CanSee reject unresolved poses.
++Autonomous acquisition/retention and full AI behavior remain unavailable.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 3294da0..4942526 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -461,3 +461,15 @@ The engine attachment store and transform refresh are new replacement services.
+ The later LithTech shared transform code informed offset composition only; no
+ code or dependency from that engine was copied. See [contracts](ATTACHMENT_CONTRACTS.md)
+ for bounded visual children, unsupported chains/physics and strengthened lifetime.
++
++## M2 explicit AI targets and facing
++
++[Source selections](M2_AI_TARGET_SOURCES.json) cover original AI_Mgr SetTarget,
++SetNewTarget, MC_FaceTarget, MC_FacePos, target link-break handling and the isolated
++AI_Update position sample. Current checked transforms replace MoveObj snapshots;
++new-link preflight prevents losing an old target on failure. Typed GetObjectPos
++outcomes let AI samples reject unresolved attachment poses. Source local-up yaw,
++list-first selection, cached targets and Metacmd rules are retained. No production
++NPC registration, perception/state machine or script scheduler is imported.
++See [contracts](AI_TARGET_CONTRACTS.md) and
++[execution evidence](../../Documentation/Implementation/M2_AI_TARGETS.md).
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index 8584790..8262a0c 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -1,5 +1,7 @@
+ #include "ai_model_key_smoke.h"
++#include "engine/collision.h"
+ #include "game/original/AI_Mgr.h"
++#include <cmath>
+ #include <limits>
+ namespace OpenBlood2
+ {
+@@ -19,6 +21,7 @@ namespace OpenBlood2
+         ObjectCreateStruct state;
+         state.m_ObjectType = OT_MODEL;
+         state.m_Pos = body->state.m_Pos;
++        state.m_Pos.x -= 50;
+         state.m_Flags = FLAG_MODELKEYS;
+         SAFE_STRCPY(state.m_Name, "AI model-key probe (no AI states)");
+         SAFE_STRCPY(state.m_Filename, "models/enemies/m_cultist1.abc");
+@@ -49,7 +52,22 @@ namespace OpenBlood2
+             return false;
+         r->animation.looping = false;
+         id = r->id;
+-        return check_ai_sight_smoke(g, id);
++        return check_ai_target_smoke(g, id) && check_ai_sight_smoke(g, id);
++    }
++    bool check_ai_target_smoke(GameSession& g, ObjectId id)
++    {
++        const auto* r = g.objects.get(id);
++        auto* ai = r ? dynamic_cast<AI_Mgr*>(r->game.get()) : nullptr;
++        const auto* player = g.server_shell.Player(g.local_client);
++        const auto* body = player ? g.objects.get(player->m_hObject) : nullptr;
++        if (!ai || !body || !ai->SetNewTarget(body->handle) || !ai->RefreshTargetPosition() || !ai->MC_FaceTarget())
++            return false;
++        const auto delta = vector_subtract(body->state.m_Pos, r->state.m_Pos);
++        const auto forward = rotate_vector({0, 0, 1}, r->state.m_Rotation);
++        const auto distance = std::hypot(delta.x, delta.z);
++        return distance > 0 && std::abs(forward.x - delta.x / distance) < .001f &&
++               std::abs(forward.z - delta.z / distance) < .001f && ai->GetTarget() == body->handle &&
++               g.objects.link_count(r->handle) == 1 && ai->target_position_valid && ai->target_failures == 0;
+     }
+     bool check_ai_sight_smoke(GameSession& g, ObjectId id)
+     {
+diff --git a/src/app/ai_model_key_smoke.h b/src/app/ai_model_key_smoke.h
+index f86c55b..fe8ef41 100644
+--- a/src/app/ai_model_key_smoke.h
++++ b/src/app/ai_model_key_smoke.h
+@@ -4,5 +4,6 @@ namespace OpenBlood2
+ {
+     bool prepare_ai_model_key_smoke(GameSession&, ObjectId&);
+     bool check_ai_model_key_smoke(GameSession&, ObjectId, std::uint64_t minimum_keys);
++    bool check_ai_target_smoke(GameSession&, ObjectId);
+     bool check_ai_sight_smoke(GameSession&, ObjectId);
+ } // namespace OpenBlood2
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 4faf9dc..57473f0 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -57,6 +57,28 @@ namespace OpenBlood2
+         }
+         ImGui::TableNextColumn();
+         const auto* r = game.objects.get(skeleton_selection);
++        const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
++        if (target_ai && ImGui::CollapsingHeader("Original AI target / facing", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            const auto* target = game.objects.get(target_ai->GetTarget());
++            ImGui::Text("Target: %s | %s", target ? target->state.m_Name : "none / removed",
++                        target ? (target->life == Life::Alive ? "alive" : "pending removal") : "no link");
++            ImGui::Text("Named request: %s | outgoing links: %zu", target_ai->target_name.c_str(),
++                        game.objects.link_count(r->handle));
++            const auto pos = target_ai->m_vTargetPos;
++            ImGui::Text("Cached position: %.2f %.2f %.2f | %s", pos.x, pos.y, pos.z,
++                        target_ai->target_position_valid ? "sampled" : "unavailable");
++            ImGui::Text("Metacmd %d | turns %llu | last local yaw %.4f rad", target_ai->Metacmd,
++                        (unsigned long long)target_ai->face_commands, target_ai->face_yaw_delta);
++            ImGui::Text("Target changes %llu | broken links %llu | failures %llu",
++                        (unsigned long long)target_ai->target_changes,
++                        (unsigned long long)target_ai->target_link_breaks,
++                        (unsigned long long)target_ai->target_failures);
++            if (!target_ai->target_error.empty())
++                ImGui::TextWrapped("%s", target_ai->target_error.c_str());
++            ImGui::TextWrapped(
++                "Explicit source commands only. Automatic perception, tracking and AI states remain unavailable.");
++        }
+         if (!r)
+             ImGui::TextUnformatted("No selected model");
+         else if (!r->model)
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 7c45641..58a6f93 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -245,6 +245,7 @@ namespace
+             return 4;
+         const auto original_ai_key = smoke_ai_key;
+         bool ai_sight_hidden = false;
++        bool ai_target_hidden = false;
+         bool hand_hidden = false;
+         HATTACHMENT old_hand = 0;
+         auto check_hand = [&]()
+@@ -507,6 +508,8 @@ namespace
+                     old_hand =
+                         game.server_shell.Player(game.local_client)->m_InventoryMgr.CurrentWeapon()->m_hHandAttachment;
+             }
++            if (options.skeleton_smoke && !inspector_visible)
++                ai_target_hidden |= OpenBlood2::check_ai_target_smoke(game, smoke_ai_key);
+             if (options.skeleton_smoke && !inspector_visible)
+                 ai_sight_hidden |= OpenBlood2::check_ai_sight_smoke(game, smoke_ai_key);
+             if (options.skeleton_smoke && !inspector_visible)
+@@ -916,6 +919,7 @@ namespace
+             }
+             bool ai_key_reentered = !options.skeleton_smoke;
+             bool ai_sight_reentered = !options.skeleton_smoke;
++            bool ai_target_reentered = !options.skeleton_smoke;
+             if (options.skeleton_smoke)
+             {
+                 if (game.objects.get(original_ai_key) || !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
+@@ -928,6 +932,9 @@ namespace
+                 }
+                 spdlog::info("AI model-key probe: hidden={}, reentered={}, old handle invalidated={}", ai_key_hidden,
+                              ai_key_reentered, !game.objects.get(original_ai_key));
++                ai_target_reentered = OpenBlood2::check_ai_target_smoke(game, smoke_ai_key);
++                spdlog::info("AI target probe: hidden={}, reentered={}, old handle invalidated={}", ai_target_hidden,
++                             ai_target_reentered, !game.objects.get(original_ai_key));
+                 ai_sight_reentered = OpenBlood2::check_ai_sight_smoke(game, smoke_ai_key);
+                 spdlog::info("AI sight probe: hidden={}, reentered={}, old handle invalidated={}", ai_sight_hidden,
+                              ai_sight_reentered, !game.objects.get(original_ai_key));
+@@ -969,7 +976,8 @@ namespace
+                 (options.skeleton_smoke &&
+                  (!character_audio_hidden || !character_audio_reentered || !character_motion_hidden ||
+                   !character_motion_reentered || !ai_key_hidden || !ai_key_reentered || !ai_sight_hidden ||
+-                  !ai_sight_reentered || !hand_hidden || !hand_reentered)) ||
++                  !ai_sight_reentered || !ai_target_hidden || !ai_target_reentered || !hand_hidden ||
++                  !hand_reentered)) ||
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 1d62f2a..b0ce3dd 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -114,7 +114,7 @@ class ServerDE : public CSBase
+     void (*SetObjectUserFlags)(HOBJECT, DDWORD) = nullptr;
+     HOBJECT (*GetNextObject)(HOBJECT) = nullptr;
+     char* (*GetObjectName)(HOBJECT) = nullptr;
+-    void (*GetObjectPos)(HOBJECT, DVector*) = nullptr;
++    DRESULT (*GetObjectPos)(HOBJECT, DVector*) = nullptr;
+     DRESULT (*GetObjectRotation)(HOBJECT, DRotation*) = nullptr;
+     int (*GetObjectState)(HOBJECT) = nullptr;
+     void (*SetObjectState)(HOBJECT, int) = nullptr;
+diff --git a/src/game/original/AISight.cpp b/src/game/original/AISight.cpp
+index 43b6eba..f1c0bf6 100644
+--- a/src/game/original/AISight.cpp
++++ b/src/game/original/AISight.cpp
+@@ -39,9 +39,13 @@ bool AI_Mgr::CanSee(HOBJECT target)
+     }
+     DRotation rotation;
+     sight.origin_head = server->GetModelNodeTransform(m_hObject, "head", &sight.origin, &rotation);
+-    if (!sight.origin_head)
+-        server->GetObjectPos(m_hObject, &sight.origin); // Source cached MoveObj position; current pose in this engine.
+-    server->GetObjectPos(target, &sight.body);
++    // Source cached MoveObj position; current pose in this engine.
++    if ((!sight.origin_head && server->GetObjectPos(m_hObject, &sight.origin) != DE_OK) ||
++        server->GetObjectPos(target, &sight.body) != DE_OK)
++    {
++        sight.outcome = AISightOutcome::Unavailable;
++        return false;
++    }
+     auto query = [&](DVector end, SegmentHit& hit, SegmentResult& result)
+     {
+         ++sight.rays;
+diff --git a/src/game/original/AITarget.cpp b/src/game/original/AITarget.cpp
+new file mode 100644
+index 0000000..7b46725
+--- /dev/null
++++ b/src/game/original/AITarget.cpp
+@@ -0,0 +1,124 @@
++// Original AI_Mgr.cpp:716-722,1269-1314,2200,5556-5608.
++// See AI_TARGET_CONTRACTS.md for checked failures and current-transform adaptation.
++#include "AI_Mgr.h"
++#include "engine/collision.h"
++#include <cmath>
++#include <limits>
++
++bool AI_Mgr::TargetFailure(const char* error)
++{
++    ++target_failures;
++    target_error = error;
++    return false;
++}
++bool AI_Mgr::SetNewTarget(HOBJECT target)
++{
++    auto* server = GetServerDE();
++    target_error.clear();
++    if (!server || !server->IsObjectAlive(m_hObject) ||
++        (target && (!server->IsObjectAlive(target) || target == m_hObject)))
++        return TargetFailure("Target assignment requires distinct live objects");
++    if (target == m_hTarget)
++        return true; // Source same-target no-op: no link or position refresh.
++
++    // Validate/acquire the new link before releasing the old one. A rejected
++    // service must not lose the original target. Link creation has no callbacks.
++    if (target && server->CreateInterObjectLink(m_hObject, target) != DE_OK)
++        return TargetFailure("Target link creation failed; previous target retained");
++    if (m_hTarget)
++        server->BreakInterObjectLink(m_hObject, m_hTarget);
++    m_hTarget = target;
++    target_position_valid = false;
++    ++target_changes;
++    return true;
++}
++bool AI_Mgr::RefreshTargetPosition()
++{
++    auto* server = GetServerDE();
++    target_error.clear();
++    DVector position;
++    if (!server || !server->IsObjectAlive(m_hObject) || !server->IsObjectAlive(m_hTarget) ||
++        server->GetObjectPos(m_hTarget, &position) != DE_OK)
++    {
++        target_position_valid = false;
++        return TargetFailure("Target position requires live observer and target with a resolved transform");
++    }
++    m_vTargetPos = position;
++    target_position_valid = true;
++    return true;
++}
++bool AI_Mgr::SetTarget(std::string_view name)
++{
++    auto* server = GetServerDE();
++    target_error.clear();
++    target_name.assign(name.substr(0, 100));
++    if (!server || !server->IsObjectAlive(m_hObject) || name.empty() || name.size() > 100 ||
++        target_name.find('\0') != target_name.npos)
++        return TargetFailure("Invalid named target request");
++    auto* list = server->FindNamedObjects(target_name.c_str());
++    if (!list)
++        return TargetFailure("Named target list unavailable");
++    const auto target = list->m_pFirstLink ? list->m_pFirstLink->m_hObject : nullptr;
++    // Copy the checked identity; never keep a list or raw game-object pointer.
++    server->RelinquishList(list);
++    if (!target)
++        return TargetFailure("No matching named target; previous target retained");
++    if (!SetNewTarget(target) || !RefreshTargetPosition() || !MC_FaceTarget())
++        return false;
++    --Metacmd; // SetTarget cancels MC_FaceTarget's original command increment.
++    return true;
++}
++bool AI_Mgr::MC_FaceTarget()
++{
++    if (m_hTarget)
++    {
++        auto* server = GetServerDE();
++        if (!server || !server->IsObjectAlive(m_hTarget) || !target_position_valid)
++            return TargetFailure("Face target requires a live target and a sampled position");
++        // Original method uses the stored position, not a new target query.
++        return MC_FacePos(m_vTargetPos);
++    }
++    target_error.clear();
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject) || Metacmd == std::numeric_limits<int>::max())
++        return TargetFailure("Face command owner or command counter unavailable");
++    ++Metacmd;
++    return true;
++}
++bool AI_Mgr::MC_FacePos(DVector position)
++{
++    auto* server = GetServerDE();
++    target_error.clear();
++    DVector origin;
++    DRotation rotation;
++    if (!server || !server->IsObjectAlive(m_hObject) || Metacmd == std::numeric_limits<int>::max() ||
++        server->GetObjectPos(m_hObject, &origin) != DE_OK || server->GetObjectRotation(m_hObject, &rotation) != DE_OK)
++        return TargetFailure("Face command owner, transform or command counter unavailable");
++    auto finite = [](DVector v) { return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z); };
++    const auto delta = OpenBlood2::vector_subtract(position, origin);
++    if (!finite(position) || !finite(delta) || (delta.x == 0 && delta.y == 0 && delta.z == 0))
++        return TargetFailure("Face position is nonfinite or coincides with the observer");
++    // Normalizing vDir in the source does not change atan2(x,z). Avoid its
++    // zero/overflow hazards. Preserve the source's raw (unwrapped) yaw delta
++    // and rotation about current local up, including pitched/rolled owners.
++    const auto forward = OpenBlood2::rotate_vector({0, 0, 1}, rotation);
++    const float angle = std::atan2(delta.x, delta.z) - std::atan2(forward.x, forward.z);
++    const auto result = OpenBlood2::compose_rotation(rotation, {{0, std::sin(angle * .5f), 0}, std::cos(angle * .5f)});
++    if (server->SetObjectRotation(m_hObject, &result) != DE_OK)
++        return TargetFailure("Face rotation service rejected the request");
++    face_position = position;
++    face_yaw_delta = angle;
++    ++face_commands;
++    ++Metacmd;
++    return true;
++}
++DDWORD AI_Mgr::EngineMessageFn(DDWORD message, void* data, DFLOAT value)
++{
++    if (message == MID_LINKBROKEN && data == m_hTarget && m_hTarget)
++    {
++        m_hTarget = nullptr;
++        target_position_valid = false;
++        ++target_link_breaks;
++    }
++    return CBaseCharacter::EngineMessageFn(message, data, value);
++}
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index f2088f1..e34946a 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -43,7 +43,8 @@ namespace OpenBlood2
+ 
+ // Selective original AI_Mgr::InitStatics/OnStringKey port. No production AI class
+ // registration, state machine, target acquisition, Fire or MC_Extra implementation yet.
+-// Selected CanSee queries are documented in AI_SIGHT_CONTRACTS.md.
++// Selected CanSee and explicit target/facing commands are documented in
++// AI_SIGHT_CONTRACTS.md and AI_TARGET_CONTRACTS.md.
+ class AI_Mgr : public CBaseCharacter
+ {
+   public:
+@@ -57,7 +58,23 @@ class AI_Mgr : public CBaseCharacter
+         return m_pAnim_Sound.get();
+     }
+     int m_nState = StateIdle;
+-    HOBJECT m_hTarget = nullptr;
++    // Target assignment must go through the original inter-object link path.
++    HOBJECT GetTarget() const
++    {
++        return m_hTarget;
++    }
++    bool SetNewTarget(HOBJECT);
++    bool SetTarget(std::string_view name);
++    bool RefreshTargetPosition();
++    bool MC_FaceTarget();
++    bool MC_FacePos(DVector);
++    DVector m_vTargetPos{};
++    int Metacmd = 1;
++    std::uint64_t target_changes = 0, target_link_breaks = 0, target_failures = 0, face_commands = 0;
++    std::string target_name, target_error;
++    DVector face_position{};
++    float face_yaw_delta = 0;
++    bool target_position_valid = false;
+     OpenBlood2::AIKeyOutcome key_outcome = OpenBlood2::AIKeyOutcome::None;
+     std::uint64_t model_keys = 0, audio_keys = 0, audio_starts = 0, key_failures = 0;
+     std::uint64_t camera_suppressed = 0, script_suppressed = 0, chance_suppressed = 0;
+@@ -67,8 +84,11 @@ class AI_Mgr : public CBaseCharacter
+ 
+   protected:
+     bool OnStringKey(ArgList*) override;
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+ 
+   private:
++    HOBJECT m_hTarget = nullptr;
++    bool TargetFailure(const char*);
+     // Original subclasses share class/gender tables and their retained voice.
+     // Shared ownership replaces a borrowed pointer, preserving sharing safely.
+     std::shared_ptr<CAnim_Sound> m_pAnim_Sound;
+diff --git a/src/game/server_adapter.cpp b/src/game/server_adapter.cpp
+index d42df3d..f0f35f9 100644
+--- a/src/game/server_adapter.cpp
++++ b/src/game/server_adapter.cpp
+@@ -159,15 +159,25 @@ namespace OpenBlood2
+             auto* r = active().objects_.get(h);
+             return r ? r->state.m_Name : nullptr;
+         };
+-        GetObjectPos = [](HOBJECT h, DVector* out)
++        GetObjectPos = [](HOBJECT h, DVector* out) -> DRESULT
+         {
+             active().trace_service("GetObjectPos");
+-            if (out)
++            if (!out)
++                return DE_INVALIDPARAMS;
++            auto& objects = active().objects_;
++            const auto* record = objects.get(h);
++            if (!record)
+             {
+-                auto& o = active().objects_;
+-                auto* r = o.get(h);
+-                *out = r && o.refresh_attachment(h) ? r->state.m_Pos : DVector{};
++                *out = {};
++                return DE_INVALIDPARAMS;
+             }
++            if (!objects.refresh_attachment(h))
++            {
++                *out = {};
++                return DE_ERROR;
++            }
++            *out = record->state.m_Pos;
++            return DE_OK;
+         };
+         GetObjectRotation = [](HOBJECT h, DRotation* out) -> DRESULT
+         {
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 6994563..b502e87 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -572,3 +572,17 @@ if(BLOOD2_TEST_DATA_DIR)
+         set_tests_properties(attachments.${case} PROPERTIES LABELS "headless;private;attachments" TIMEOUT 90)
+     endforeach()
+ endif()
++
++add_executable(ai_target_tests ai_target_tests.cpp)
++target_link_libraries(ai_target_tests PRIVATE blood2_game)
++blood2_project_options(ai_target_tests)
++foreach(case IN ITEMS named cached facing failures lifetime callbacks services)
++    add_test(NAME ai_target.${case} COMMAND ai_target_tests "${case}")
++    set_tests_properties(ai_target.${case} PROPERTIES LABELS "headless;ai_target" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case IN ITEMS catalog subway)
++        add_test(NAME ai_target.${case} COMMAND ai_target_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(ai_target.${case} PROPERTIES LABELS "headless;private;ai_target" TIMEOUT 90)
++    endforeach()
++endif()
+diff --git a/tests/ai_model_key_tests.cpp b/tests/ai_model_key_tests.cpp
+index a4e94d3..0c492ee 100644
+--- a/tests/ai_model_key_tests.cpp
++++ b/tests/ai_model_key_tests.cpp
+@@ -110,8 +110,8 @@ namespace
+         auto* r = g.objects.get(ai->m_hObject);
+         CHECK(key(g, ai, "[play_sound:cue][fire_key:head][RotY:1]"));
+         CHECK(ai->no_target == 1 && ai->audio_keys == 0 && ai->motion_keys == 0);
+-        ai->m_hTarget = g.objects.create(g.objects.find_class("BaseClass"), {});
+-        CHECK(ai->m_hTarget);
++        CHECK(ai->SetNewTarget(g.objects.create(g.objects.find_class("BaseClass"), {})));
++        CHECK(ai->GetTarget());
+         CHECK(key(g, ai, "[extra_key:x][play_sound:cue][fire_key:head][RotY:1]"));
+         CHECK(ai->key_outcome == AIKeyOutcome::Unavailable && ai->unavailable_keys == 1 && ai->motion_keys == 1 &&
+               ai->audio_starts == 0);
+@@ -123,9 +123,12 @@ namespace
+         CHECK(ai->pending_model_commands.size() == 1);
+         CHECK(key(g, ai, "[UpVel:2]"));
+         CHECK(r->velocity.y == 2 && ai->key_outcome == AIKeyOutcome::None);
+-        CHECK(g.objects.remove(ai->m_hTarget));
++        CHECK(g.objects.remove(ai->GetTarget()));
+         CHECK(key(g, ai, "[fire_key:head][UpVel:10]"));
+         CHECK(ai->key_outcome == AIKeyOutcome::Invalid && r->velocity.y == 2);
++        CHECK(g.objects.finish_frame() && !ai->GetTarget() && ai->target_link_breaks == 1);
++        CHECK(key(g, ai, "[fire_key:head][UpVel:10]"));
++        CHECK(ai->key_outcome == AIKeyOutcome::NoTarget && r->velocity.y == 2);
+         return true;
+     }
+     bool gates(const std::filesystem::path& root)
+diff --git a/tests/ai_sight_tests.cpp b/tests/ai_sight_tests.cpp
+index b15b0be..9af55fb 100644
+--- a/tests/ai_sight_tests.cpp
++++ b/tests/ai_sight_tests.cpp
+@@ -83,7 +83,7 @@ namespace
+         auto t = body(g);
+         CHECK(ai && t && ai->CanSee(t));
+         CHECK(ai->sight.outcome == AISightOutcome::Body && ai->sight.rays == 1 && !ai->sight.origin_head);
+-        CHECK(ai->sight.body_hit.object == t && !ai->sight.retried_head && !ai->m_hTarget);
++        CHECK(ai->sight.body_hit.object == t && !ai->sight.retried_head && !ai->GetTarget());
+         // No source distance/FOV/visibility-flag checks in CanSee itself.
+         g.objects.get(t)->state.m_Pos = {0, 10, -900};
+         g.objects.get(t)->activity = OBJSTATE_INACTIVE;
+@@ -220,7 +220,7 @@ namespace
+             const auto strings = g.server.string_count(), messages = g.server.message_count();
+             for (int i = 0; i < 100; ++i)
+                 CHECK(ai->CanSee(t));
+-            CHECK(g.server.string_count() == strings && g.server.message_count() == messages && !ai->m_hTarget);
++            CHECK(g.server.string_count() == strings && g.server.message_count() == messages && !ai->GetTarget());
+             auto saved = ai->sight;
+             old = ai->m_hObject;
+             CHECK(g.objects.remove(old) && !ai->CanSee(t) && ai->sight.outcome == AISightOutcome::Invalid);
+diff --git a/tests/ai_target_tests.cpp b/tests/ai_target_tests.cpp
+new file mode 100644
+index 0000000..0963a88
+--- /dev/null
++++ b/tests/ai_target_tests.cpp
+@@ -0,0 +1,366 @@
++#include "engine/collision.h"
++#include "game/original/AI_Mgr.h"
++#include "game/server_adapter.h"
++#include "model_fixture.h"
++#include <cmath>
++#include <functional>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .001f;
++    }
++    bool near(DVector a, DVector b)
++    {
++        return near(a.x, b.x) && near(a.y, b.y) && near(a.z, b.z);
++    }
++    AI_Mgr* actor(GameSession& g)
++    {
++        static const ClassInfo type{"AITargetProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AI_Mgr>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_MODEL;
++        SAFE_STRCPY(state.m_Name, "explicit target probe (no AI states)");
++        auto h = g.objects.create(&type, state);
++        return h ? dynamic_cast<AI_Mgr*>(g.objects.get(h)->game.get()) : nullptr;
++    }
++    HOBJECT target(GameSession& g, const char* name = "target", DVector position = {100, 0, 0})
++    {
++        ObjectCreateStruct state;
++        SAFE_STRCPY(state.m_Name, name);
++        state.m_Pos = position;
++        return g.objects.create(g.objects.find_class("BaseClass"), state);
++    }
++    DVector forward(GameSession& g, HOBJECT h)
++    {
++        return rotate_vector({0, 0, 1}, g.objects.get(h)->state.m_Rotation);
++    }
++    bool named(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto* ai = actor(g);
++        auto first = target(g), second = target(g, "target", {0, 50, -100});
++        CHECK(ai && first && second);
++        g.server.trace_enabled = true;
++        g.objects.get(second)->activity = OBJSTATE_INACTIVE;
++        // Existing named lists prepend matches: newest slot is first, even hidden/inactive.
++        CHECK(ai->SetTarget("target") && ai->GetTarget() == second && ai->Metacmd == 1);
++        CHECK(near(forward(g, ai->m_hObject), {0, 0, -1}) && ai->target_position_valid);
++        CHECK(g.server.list_count() == 0 && g.objects.link_count(ai->m_hObject) == 1);
++        CHECK(ai->SetTarget("target") && ai->target_changes == 1 && ai->face_commands == 2);
++        ai->target_name = "prefix_target";
++        CHECK(ai->SetTarget(std::string_view(ai->target_name).substr(7)) && ai->GetTarget() == second);
++        CHECK(!ai->SetTarget("Target") && ai->GetTarget() == second && ai->Metacmd == 1);
++        CHECK(g.server.list_count() == 0 && ai->target_error.find("No matching") != std::string::npos);
++        CHECK(g.objects.remove(second));
++        CHECK(ai->SetTarget("target") && ai->GetTarget() == first && ai->target_changes == 2);
++        CHECK(g.objects.finish_frame() && ai->GetTarget() == first && ai->target_link_breaks == 0);
++        CHECK(near(forward(g, ai->m_hObject), {1, 0, 0}));
++        auto coincident = target(g, "coincident", {});
++        const auto commands = ai->face_commands;
++        CHECK(coincident && !ai->SetTarget("coincident") && ai->GetTarget() == coincident);
++        CHECK(ai->Metacmd == 1 && ai->face_commands == commands && g.server.list_count() == 0);
++        for (const auto* service : {"FindNamedObjects", "RelinquishList", "CreateInterObjectLink",
++                                    "BreakInterObjectLink", "GetObjectPos", "GetObjectRotation", "SetObjectRotation"})
++        {
++            CHECK(g.server.service_calls[service] > 0);
++            std::cout << service << "=" << g.server.service_calls[service] << '\n';
++        }
++        return true;
++    }
++    bool cached(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto* ai = actor(g);
++        auto t = target(g);
++        CHECK(ai && t);
++        CHECK(ai->SetNewTarget(t) && !ai->target_position_valid);
++        CHECK(!ai->MC_FaceTarget() && ai->Metacmd == 1);
++        CHECK(ai->RefreshTargetPosition() && ai->MC_FaceTarget() && ai->Metacmd == 2);
++        CHECK(near(forward(g, ai->m_hObject), {1, 0, 0}));
++        g.objects.get(t)->state.m_Pos = {0, 0, -100};
++        CHECK(ai->SetNewTarget(t) && ai->target_changes == 1);
++        CHECK(ai->MC_FaceTarget() && near(forward(g, ai->m_hObject), {1, 0, 0}));
++        CHECK(ai->RefreshTargetPosition() && ai->MC_FaceTarget() && near(forward(g, ai->m_hObject), {0, 0, -1}));
++        CHECK(ai->SetNewTarget(nullptr) && !ai->GetTarget() && g.objects.link_count(ai->m_hObject) == 0);
++        const auto commands = ai->face_commands;
++        const auto rotation = g.objects.get(ai->m_hObject)->state.m_Rotation;
++        CHECK(ai->MC_FaceTarget() && ai->Metacmd == 5 && ai->face_commands == commands);
++        CHECK(near(rotate_vector({0, 0, 1}, rotation), forward(g, ai->m_hObject)));
++        return true;
++    }
++    bool facing(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto* ai = actor(g);
++        CHECK(ai);
++        auto h = ai->m_hObject;
++        auto* r = g.objects.get(h);
++        r->state.m_Pos = {50, 30, 70};
++        r->activity = OBJSTATE_INACTIVE;
++        const auto clock = r->animation;
++        for (auto direction : {DVector{1, 0, 0}, DVector{0, 0, -1}, DVector{-1, 0, 0}, DVector{0, 0, 1}})
++        {
++            CHECK(ai->MC_FacePos(vector_add(r->state.m_Pos, direction)));
++            CHECK(near(forward(g, h), direction) && near(r->state.m_Pos, {50, 30, 70}));
++        }
++        // A rolled observer rotates about local up; a world-Y LookAt is different.
++        const float q = std::sqrt(.5f);
++        DRotation roll{{0, 0, q}, q};
++        CHECK(g.server.SetObjectRotation(h, &roll) == DE_OK);
++        CHECK(ai->MC_FacePos({150, 30, 70}));
++        CHECK(near(forward(g, h), {0, 1, 0}) && near(rotate_vector({0, 1, 0}, r->state.m_Rotation), {-1, 0, 0}));
++        // Vertical displacement has atan2(0,0)==0, as in source, and remains finite.
++        DRotation identity;
++        CHECK(g.server.SetObjectRotation(h, &identity) == DE_OK);
++        CHECK(ai->MC_FacePos({50, 130, 70}) && near(forward(g, h), {0, 0, 1}));
++        CHECK(r->animation.time == clock.time && r->animation.revision == clock.revision && ai->model_keys == 0);
++        CHECK(g.objects.link_count(h) == 0 && g.server.list_count() == 0);
++        return true;
++    }
++    bool failures(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto* ai = actor(g);
++        auto t = target(g);
++        auto other = target(g, "other");
++        CHECK(ai && t && other && ai->SetTarget("target"));
++        auto h = ai->m_hObject;
++        const auto changes = ai->target_changes, faces = ai->face_commands;
++        for (auto bad : {h, reinterpret_cast<HOBJECT>(std::uintptr_t(1))})
++            CHECK(!ai->SetNewTarget(bad) && ai->GetTarget() == t);
++        const auto link = g.server.CreateInterObjectLink;
++        g.server.CreateInterObjectLink = [](HOBJECT, HOBJECT) -> DRESULT { return DE_ERROR; };
++        CHECK(!ai->SetNewTarget(other) && ai->GetTarget() == t && g.objects.link_count(h) == 1);
++        g.server.CreateInterObjectLink = link;
++        for (auto name : {std::string(), std::string(101, 'x'), std::string("target\0ignored", 14)})
++            CHECK(!ai->SetTarget(name) && ai->GetTarget() == t && g.server.list_count() == 0);
++        auto list = g.server.FindNamedObjects;
++        g.server.FindNamedObjects = [](const char*) -> ObjectList* { return nullptr; };
++        CHECK(!ai->SetTarget("target") && ai->GetTarget() == t);
++        g.server.FindNamedObjects = list;
++        for (auto p : {DVector{}, DVector{std::numeric_limits<float>::infinity(), 0, 0}, DVector{0, NAN, 0}})
++            CHECK(!ai->MC_FacePos(p) && ai->Metacmd == 1 && near(forward(g, h), {1, 0, 0}));
++        ai->Metacmd = std::numeric_limits<int>::max();
++        CHECK(!ai->MC_FaceTarget() && ai->Metacmd == std::numeric_limits<int>::max());
++        CHECK(ai->target_changes == changes && ai->face_commands == faces);
++        CHECK(g.objects.remove(t));
++        CHECK(!ai->RefreshTargetPosition() && !ai->MC_FaceTarget() && !ai->SetNewTarget(t));
++        CHECK(g.objects.finish_frame() && !ai->GetTarget() && ai->target_link_breaks == 1);
++        CHECK(!ai->MC_FaceTarget()); // No target also rejects overflow.
++        CHECK(!ai->SetNewTarget(t));
++        CHECK(g.objects.remove(h) && !ai->SetNewTarget(other) && !ai->MC_FacePos({0, 0, 100}));
++        return true;
++    }
++    bool services(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto* ai = actor(g);
++        auto t = target(g);
++        auto parent = target(g, "parent", {200, 0, 0});
++        CHECK(ai && t && parent);
++        DVector position{9, 9, 9}, offset{};
++        DRotation identity;
++        HATTACHMENT attachment = 0;
++        CHECK(g.server.GetObjectPos(nullptr, &position) == DE_INVALIDPARAMS && near(position, {}));
++        CHECK(g.server.GetObjectPos(t, nullptr) == DE_INVALIDPARAMS);
++        auto& live_position = g.objects.get(t)->state.m_Pos;
++        CHECK(g.server.GetObjectPos(t, &live_position) == DE_OK && near(live_position, {100, 0, 0}));
++        auto model = std::make_shared<Model>();
++        std::string error;
++        CHECK(read_model(test_model::abc().b, *model, error));
++        auto* record = g.objects.get(parent);
++        record->state.m_ObjectType = OT_MODEL;
++        record->model = model;
++        CHECK(g.server.CreateAttachment(parent, t, "hand", &offset, &identity, &attachment) == DE_OK);
++        CHECK(g.server.GetObjectPos(t, &position) == DE_OK && ai->SetNewTarget(t) && ai->RefreshTargetPosition());
++        const auto snapshot = ai->m_vTargetPos;
++        record->model.reset();
++        CHECK(g.server.GetObjectPos(t, &position) == DE_ERROR && near(position, {}));
++        CHECK(!ai->RefreshTargetPosition() && !ai->target_position_valid && near(ai->m_vTargetPos, snapshot));
++        CHECK(!ai->CanSee(t) && ai->sight.outcome == AISightOutcome::Unavailable && ai->sight.rays == 0);
++        record->model = model;
++        CHECK(ai->RefreshTargetPosition() && ai->MC_FaceTarget());
++        CHECK(g.server.RemoveAttachment(attachment) == DE_OK);
++        // The rotation service rejects an attached observer. Do not increment Metacmd or claim a turn.
++        CHECK(g.server.CreateAttachment(parent, ai->m_hObject, nullptr, &offset, &identity, &attachment) == DE_OK);
++        const auto count = ai->face_commands;
++        const auto meta = ai->Metacmd;
++        CHECK(!ai->MC_FacePos({500, 0, 0}) && ai->face_commands == count && ai->Metacmd == meta);
++        CHECK(ai->target_error.find("rotation service") != std::string::npos);
++        CHECK(g.server.RemoveAttachment(attachment) == DE_OK);
++        CHECK(ai->MC_FacePos({500, 0, 0}));
++        return true;
++    }
++    bool lifetime(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        HOBJECT old = nullptr;
++        for (int cycle = 0; cycle < 3; ++cycle)
++        {
++            auto* ai = actor(g);
++            auto t = target(g), extra = target(g, "extra");
++            CHECK(ai && t && extra);
++            CHECK(!g.objects.get(old) && ai->SetTarget("target"));
++            old = ai->m_hObject;
++            CHECK(g.objects.link(old, extra) && g.objects.remove(extra) && g.objects.finish_frame());
++            CHECK(ai->GetTarget() == t && ai->target_link_breaks == 0);
++            CHECK(g.objects.remove(t) && ai->GetTarget() == t); // Deferred callback, checked queries already fail.
++            CHECK(!ai->MC_FaceTarget() && g.objects.finish_frame());
++            CHECK(!ai->GetTarget() && !ai->target_position_valid && ai->target_link_breaks == 1);
++            t = target(g);
++            CHECK(t && ai->SetTarget("target"));
++            CHECK(g.objects.remove(old) && g.objects.finish_frame());
++            CHECK(g.objects.get(t) && g.objects.link_count(old) == 0); // Target never owned by observer.
++            CHECK(g.unload_world() && g.server.list_count() == 0 && g.server.message_count() == 0);
++        }
++        return true;
++    }
++    struct CallbackAI : AI_Mgr
++    {
++        static inline HOBJECT replacement = nullptr;
++        static inline bool called = false, removed = false, cleared = false;
++        DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
++        {
++            auto result = AI_Mgr::EngineMessageFn(m, d, f);
++            if (m == MID_LINKBROKEN && replacement)
++            {
++                called = true;
++                cleared = !GetTarget();
++                auto next = replacement;
++                replacement = nullptr;
++                if (SetNewTarget(next))
++                {
++                    GetServerDE()->RemoveObject(next);
++                    removed = true;
++                }
++            }
++            return result;
++        }
++    };
++    bool callbacks(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        static const ClassInfo type{"AITargetCallbackProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<CallbackAI>(); },
++                                    {}};
++        CHECK(g.objects.register_class(type));
++        auto h = g.objects.create(&type, {});
++        auto t = target(g), next = target(g, "next");
++        auto* ai = h ? dynamic_cast<CallbackAI*>(g.objects.get(h)->game.get()) : nullptr;
++        CHECK(ai && t && next && ai->SetNewTarget(t));
++        CallbackAI::replacement = next;
++        CHECK(g.objects.remove(t) && g.objects.finish_frame());
++        CHECK(CallbackAI::called && CallbackAI::cleared && CallbackAI::removed);
++        CHECK(!ai->GetTarget() && ai->target_link_breaks == 2 && g.objects.link_count(h) == 0);
++        CHECK(!g.objects.get(t) && !g.objects.get(next));
++        return true;
++    }
++    bool catalog(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        auto* ai = actor(g);
++        auto t = target(g, "marker", {100, 25, 100});
++        CHECK(ai && t);
++        unsigned poses = 0;
++        for (const char* name : {"m_civilian1", "f_civilian1", "labtech", "m_cultist1", "f_cultist1", "gideon"})
++        {
++            auto* r = g.objects.get(ai->m_hObject);
++            CHECK(g.models.load("models/enemies/" + std::string(name) + ".abc", r->model, error));
++            for (unsigned clip = 0; clip < r->model->animations.size(); ++clip)
++            {
++                r->animation.animation = clip;
++                r->animation.time = r->model->animations[clip].duration * .5;
++                auto before = r->animation;
++                CHECK(ai->SetTarget("marker") && ai->GetTarget() == t && ai->Metacmd == 1);
++                CHECK(near(forward(g, ai->m_hObject), {std::sqrt(.5f), 0, std::sqrt(.5f)}));
++                CHECK(before.time == r->animation.time && before.revision == r->animation.revision &&
++                      ai->model_keys == 0);
++                DVector head;
++                DRotation rot;
++                CHECK(g.server.GetModelNodeTransform(ai->m_hObject, "head", &head, &rot));
++                ++poses;
++            }
++        }
++        CHECK(g.objects.link_count(ai->m_hObject) == 1 && g.server.list_count() == 0);
++        std::cout << "Private character facing samples=" << poses << "; unchanged animation clocks/keys\n";
++        return true;
++    }
++    bool subway(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        HOBJECT old = nullptr, old_player = nullptr;
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            auto* player = g.server_shell.Player(g.local_client);
++            auto* ai = actor(g);
++            CHECK(player && ai);
++            CHECK(!g.objects.get(old) && !g.objects.get(old_player));
++            old = ai->m_hObject;
++            old_player = player->m_hObject;
++            auto* r = g.objects.get(old);
++            CHECK(g.models.load("models/enemies/m_cultist1.abc", r->model, error));
++            const auto pos = g.objects.get(old_player)->state.m_Pos;
++            r->state.m_Pos = vector_add(pos, {-100, 0, 0});
++            CHECK(ai->SetNewTarget(old_player) && ai->RefreshTargetPosition() && ai->MC_FaceTarget());
++            CHECK(near(forward(g, old), {1, 0, 0}));
++            CHECK(g.step(1. / 60));
++            CHECK(g.leave_player() && !g.objects.get(old_player));
++            CHECK(!ai->GetTarget() && ai->target_link_breaks == 1 && !g.objects.link_count(old));
++            CHECK(g.enter_player(error));
++            player = g.server_shell.Player(g.local_client);
++            CHECK(player && player->m_hObject != old_player);
++            CHECK(ai->SetNewTarget(player->m_hObject) && ai->RefreshTargetPosition() && ai->MC_FaceTarget());
++            CHECK(g.unload_world() && !g.objects.get(old) && g.server.list_count() == 0 &&
++                  g.server.string_count() == 0);
++            std::cout << "Subway cycle=" << cycle << ": player leave/reentry clears/rebinds original target link\n";
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::map<std::string, std::function<bool(const char*)>> tests{
++        {"named", named},       {"cached", cached},     {"facing", facing},
++        {"failures", failures}, {"lifetime", lifetime}, {"callbacks", callbacks},
++        {"services", services}, {"catalog", catalog},   {"subway", subway}};
++    auto t = tests.find(argv[1]);
++    return t != tests.end() && t->second(argc > 2 ? argv[2] : "") ? 0 : 1;
++}

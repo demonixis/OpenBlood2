@@ -1,0 +1,16 @@
+361/361 Testing: ai_perception.subway
+361/361 Test: ai_perception.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_perception_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_perception.subway" start time: Oct 16 10:27 CEST
+Output:
+----------------------------------------------------------
+Subway cycle=0: original player enters both factions; acquisition/invisibility/leave/reentry checked
+Subway cycle=1: original player enters both factions; acquisition/invisibility/leave/reentry checked
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.subway" end time: Oct 16 10:27 CEST
+"ai_perception.subway" time elapsed: 00:00:00
+----------------------------------------------------------

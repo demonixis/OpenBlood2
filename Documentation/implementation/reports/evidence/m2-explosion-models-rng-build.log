@@ -1,0 +1,13 @@
+[0/2] Re-checking globbed directories...
+[1/161] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[2/154] Generating CXX dyndep file tests/CMakeFiles/explosion_model_tests.dir/CXX.dd
+[3/152] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[4/120] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ExplosionModelFX.cpp for CXX dependencies
+[5/120] Scanning /home/yann/projects/lithtech/Blood2/src/game/explosion_models.cpp for CXX dependencies
+[6/120] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[7/13] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionModelFX.cpp.o
+[8/13] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_models.cpp.o
+[9/13] Linking CXX static library libblood2_game.a
+[10/13] Linking CXX executable tests/explosion_model_gpu_tests
+[11/13] Linking CXX executable tests/explosion_model_tests
+[12/13] Linking CXX executable blood2

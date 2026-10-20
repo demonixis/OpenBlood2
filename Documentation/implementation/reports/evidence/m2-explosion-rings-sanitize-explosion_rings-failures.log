@@ -1,0 +1,14 @@
+532/534 Testing: explosion_rings.failures
+532/534 Test: explosion_rings.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_ring_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-rings-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_rings.failures" start time: Oct 16 21:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_rings.failures" end time: Oct 16 21:15 CEST
+"explosion_rings.failures" time elapsed: 00:00:00
+----------------------------------------------------------

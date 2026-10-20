@@ -1,0 +1,14 @@
+538/540 Testing: player_keepalive.failures
+538/540 Test: player_keepalive.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_keepalive_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-keepalive-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"player_keepalive.failures" start time: Oct 16 19:37 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"player_keepalive.failures" end time: Oct 16 19:37 CEST
+"player_keepalive.failures" time elapsed: 00:00:00
+----------------------------------------------------------

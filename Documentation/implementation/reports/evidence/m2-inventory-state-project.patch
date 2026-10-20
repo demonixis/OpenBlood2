@@ -1,0 +1,917 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 95cb96c..183345f 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -373,3 +373,10 @@ slot rules and dead-player early return. NEW_LEVEL explicitly refuses missing
+ KeepAliveSave/Load before teardown; do not substitute fresh-game entry or claim a
+ completed transfer. SubwayA has 203 created, four transferred sounds, 372 editor-only,
+ one unsupported (Gideon), no failures. Required transfer/FX/services keep M2 open.
++
++The [inventory preservation continuation](../Documentation/Implementation/M2_INVENTORY_STATE.md) ports selected original
++CInventoryMgr Save/Load and owned exit-time capture. Read [contracts](docs/INVENTORY_STATE_CONTRACTS.md).
++Preserve raw ammo after weapon recreation, selected-slot order, keep-alive key
++removal, transient reset and checked staged ownership. Load refuses associated
++clients; snapshots are inventory only. Player/damage fields, restored client
++association and safe destination entry remain pending; NEW_LEVEL and M2 stay open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 718e791..8a70264 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -48,7 +48,7 @@ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/origin
+     src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_exits.cpp src/game/original/ExitTrigger.cpp src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+-    src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
++    src/game/original/InventoryMgr.cpp src/game/original/InventorySave.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+ target_link_libraries(blood2_game PUBLIC engine)
+ 
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+diff --git a/README.md b/README.md
+index 0d7d8df..5e371b6 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,12 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++Latest inventory continuation: [original Save/Load subset](../Documentation/Implementation/M2_INVENTORY_STATE.md).
++Exit requests now capture owned inventory state; original keep-alive restoration
++removes keys and recreates weapons. Full player preservation/client association
++and safe destination entry remain unavailable, so NEW_LEVEL stays refused and
++**M2 stays incomplete**. Earlier blanket inventory-save omissions are superseded
++only for this aggregate subset.
++
+ Latest continuation: [original ExitTrigger and shell exit requests](../Documentation/Implementation/M2_EXITS.md).
+ SubwayA now has one unported entry (Gideon). NEW_LEVEL still requires unavailable
+ KeepAliveSave/Load and is explicitly refused while retaining the current player and
+diff --git a/docs/EXIT_CONTRACTS.md b/docs/EXIT_CONTRACTS.md
+index 121fec5..1c6a887 100644
+--- a/docs/EXIT_CONTRACTS.md
++++ b/docs/EXIT_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original level-exit contracts
+ 
++> Extended by [inventory state contracts](INVENTORY_STATE_CONTRACTS.md): supported
++> original inventory Save/Load and exit-time capture now execute. Full player
++> preservation/association and safe destination entry remain unavailable; NEW_LEVEL
++> is still refused and M2 remains open.
++
+ `ExitTrigger` now executes its original property and activation branches and
+ broadcasts an owned typed `SMSG_EXITWORLD` equivalent. The client shell applies
+ `HandleExitWorld`'s dead-player guard and constructs the original
+diff --git a/docs/INVENTORY_STATE_CONTRACTS.md b/docs/INVENTORY_STATE_CONTRACTS.md
+new file mode 100644
+index 0000000..6670198
+--- /dev/null
++++ b/docs/INVENTORY_STATE_CONTRACTS.md
+@@ -0,0 +1,78 @@
++# Original inventory Save/Load subset
++
++This ports the supported fields and ordering of original `CInventoryMgr::Save`
++and `Load` into an owned typed `InventoryState`. It is an inventory aggregate
++checkpoint, **not KeepAliveSave/KeepAliveLoad, a player save or a retail save-file
++reader**. NEW_LEVEL remains refused before world/player teardown. See
++[source selections](M2_INVENTORY_STATE_SOURCES.json) and
++[validation](../../Documentation/Implementation/M2_INVENTORY_STATE.md).
++
++## Original behavior
++
++The snapshot owns ten right/left weapon type pairs, thirteen raw ammo pools,
++strength/magic, infinite-ammo state, selected slot, damage multiplier and the
++supported key strings/charges. Original Load recreates right then left weapons
++in each slot, assigns raw ammo **after** recreation, and restores selection last.
++Do not use pickup grants, capacity clamps or SetAmmoCount here: the last of those
++refuses writes under infinite ammo. Counts above capacity are valid saved state.
++
++`InventoryLoadType::KeepAlive` has source value 1 and **discards keys**. Ordinary
++aggregate Restore (0) preserves their owned strings and charges. Neither mode is
++general engine restoration. Source weapon objects are reconstructed from types;
++last-shot time, shot counters, firing state and held-object identities are not
++serialized and restart. Existing hand children are removed, and normal
++UpdateHandModels creates new attachments against the destination owner.
++
++Unported source fields (inventory god mode, bomb slots/items, selected active item,
++fire-rate/melee multipliers and dropped-eye state) have no successful placeholder
++serialization. Player profile requested_weapons is initialization input, not the
++original saved inventory, and is cleared on Load. Player damage/health, movement,
++relative timers, powers, client saved data and object associations are not captured.
++A future full player checkpoint must explicitly account for those fields before
++accepting transfer; it cannot treat this structure as sufficient.
++
++## Validation and ownership adaptations
++
++Save checks a live owner and no weapon currently executing its synchronous fire
++callback. It validates the complete candidate before replacing the caller's output.
++Load requires a live **unassociated** owner, a known load type and no active weapon
++callback. Restoring an associated player's inventory is refused because its client
++views and gameplay state are not yet transactionally restored.
++
++Only supported Beretta/knife types are accepted. A left slot requires the same
++right-hand type with source dual-hand support. Attributes must be 1..6, selection
++0..9, ammo finite/nonnegative, and damage multiplier finite in the existing 0..1000
++range. Empty selected slots remain representable. Keys are bounded to 256 distinct
++case-insensitive names, nonempty/NUL-free strings of at most 100 bytes and positive
++byte charges. Invalid data, including keys that keep-alive would discard, fails
++before any object or existing inventory is changed.
++
++Instead of source Term-before-read, Load stages the original Init and ObtainWeapon
++operations. A muzzle-child or link failure destroys only the stage; old weapons,
++keys, ammo, selection and revision remain intact. Commit swaps owned weapons/child,
++rebinds every weapon to the destination aggregate, then defers old child removal
++through existing engine lifetime rules. A stack-local aggregate address must never
++escape in a restored weapon. Snapshots contain no engine handles, resource pointers
++or borrowed strings and survive source destruction/unload.
++
++## Session and inspection
++
++At an accepted client exit request, outside callbacks, the server shell captures
++the active associated player's inventory before the existing NEW_LEVEL refusal.
++This follows KeepAliveSave's active-player selection restriction for the supported
++single client. Capture failure clears the last candidate and exposes its error;
++it never changes the current player or permits transfer. Dead/invalid client exit
++requests never reach capture. PreStartWorld/unload clears the diagnostic record.
++
++The Objectives tab shows capture attempts/success, validity/error, attributes,
++selected slot, every saved weapon/ammo entry and keys. It explicitly labels
++inventory-only coverage and missing full transfer. The data is captured during
++simulation even with UI hidden; drawing the inspector performs no Save/Load.
++
++Tests cover raw over-capacity/infinite ammo, nondefault dual slots, original key
++removal, weapon transient reset, owned strings across source unload, malformed
++values, fire guards, live-client refusal, injected child/link failures, pending
++owner rejection and repeated cleanup. Private tests restore into a detached
++CPlayerObj with real Caleb/held assets; they **do not** claim a whole player or
++world transfer. The existing GPU exit scenario checks inventory capture while UI
++is hidden and after world reload, keeping the current player/world unchanged.
+diff --git a/docs/M2_INVENTORY_STATE_SOURCES.json b/docs/M2_INVENTORY_STATE_SOURCES.json
+new file mode 100644
+index 0000000..50e733c
+--- /dev/null
++++ b/docs/M2_INVENTORY_STATE_SOURCES.json
+@@ -0,0 +1,76 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "7c340c547b783e17a024a821668bf8fc7ce52001",
++  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "selected_lines": [
++        [
++          258,
++          332
++        ],
++        [
++          2843,
++          3061
++        ]
++      ],
++      "use": "Selected Term, Save and Load field/order/key branches"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/InvItem.h",
++      "sha256": "7b0ffbe822337d7f430466fd469c435e604d2c264c34a9af64e79f938e1329cc",
++      "selected_lines": [
++        [
++          181,
++          229
++        ]
++      ],
++      "use": "Owned key strings/charge and ignored old-owner association"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/GameInvItems.h",
++      "sha256": "592488eb133230295961290bc2bfd621429c6ccc11df1de010ba7ccaa0bd7aac",
++      "selected_lines": [
++        [
++          142,
++          171
++        ]
++      ],
++      "use": "CInvKey inherits base Save/Load"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
++      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
++      "selected_lines": [
++        [
++          1142,
++          1210
++        ]
++      ],
++      "use": "Audited active player enumeration and pending whole-player keep-alive dependency"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
++      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
++      "selected_lines": [
++        [
++          46,
++          122
++        ]
++      ],
++      "use": "Audited constructor reset of transient firing state; existing weapon implementation reused"
++    }
++  ],
++  "adaptations": [
++    "Owned typed supported inventory fields, no retail binary save compatibility",
++    "Preflight and staged Init/ObtainWeapon before commit, checked ownership and deferred child cleanup",
++    "Restore requires unassociated owner; exit capture is diagnostic inventory data, not full keep-alive"
++  ],
++  "not_implemented": [
++    "Player/Destructable Save/Load and restored client association",
++    "Destination entry and atomic world transfer",
++    "General saves, other items/weapons and unported inventory fields"
++  ]
++}
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index 2431adc..665e3da 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original Player Entry Boundary
+ 
++> Extended by [inventory state contracts](INVENTORY_STATE_CONTRACTS.md): supported
++> original inventory Save/Load and exit-time capture now execute. Full player
++> preservation/association and safe destination entry remain unavailable; NEW_LEVEL
++> is still refused and M2 remains open.
++
+ > Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and
+ > shell exit/load messages now execute. NEW_LEVEL still explicitly refuses missing
+ > keep-alive transfer before teardown; this is not a completed level transition.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 370db4f..93a4c25 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -671,3 +671,13 @@ local lifetime and explicit NEW_LEVEL refusal replace unimplemented keep-alive
+ services. No prototype code, binary library or commercial asset was imported.
+ See [source selections](M2_EXIT_SOURCES.json), [contracts](EXIT_CONTRACTS.md) and
+ [validation](../../Documentation/Implementation/M2_EXITS.md).
++
++## Original inventory preservation
++
++Selected CInventoryMgr Save/Load/Term and inherited CInvKey base fields, directly
++from the original Blood II source. Typed owned snapshots and staged rollback
++replace destructive message reads; no engine save format is claimed. Active
++player inventory is captured at exit, but whole-player keep-alive transfer remains
++refused. No donor code, dependencies or commercial assets were imported. See
++[source ledger](M2_INVENTORY_STATE_SOURCES.json), [contracts](INVENTORY_STATE_CONTRACTS.md)
++and [evidence](../../Documentation/Implementation/M2_INVENTORY_STATE.md).
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index 86794d7..f1783db 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original Inventory and Vector Weapon Boundary
+ 
++> Extended by [inventory state contracts](INVENTORY_STATE_CONTRACTS.md): supported
++> original inventory Save/Load and exit-time capture now execute. Full player
++> preservation/association and safe destination entry remain unavailable; NEW_LEVEL
++> is still refused and M2 remains open.
++
+ > Extended by [NPC hit/recoil contracts](AI_HIT_CONTRACTS.md): original visible-node
+ > localization, region damage and nonlethal reactions now execute for initialized
+ > Cultist/Civilian NPCs. Earlier blanket localization/recoil omissions are historical;
+diff --git a/src/app/inspector_objectives.cpp b/src/app/inspector_objectives.cpp
+index 84bae99..081da0a 100644
+--- a/src/app/inspector_objectives.cpp
++++ b/src/app/inspector_objectives.cpp
+@@ -26,6 +26,31 @@ namespace OpenBlood2
+                                static_cast<unsigned>(exit.request.type), game.server_shell.start_point_name.c_str());
+             ImGui::TextWrapped("%s", exit.error.empty() ? "No transfer attempted; KeepAliveSave/Load unavailable."
+                                                         : exit.error.c_str());
++            const auto& saved = game.server_shell.inventory_capture;
++            ImGui::Text("Inventory capture: %llu / %llu attempts; %s", (unsigned long long)saved.captures,
++                        (unsigned long long)saved.attempts, saved.valid ? "owned snapshot" : "unavailable");
++            if (!saved.error.empty())
++                ImGui::TextWrapped("%s", saved.error.c_str());
++            if (saved.valid)
++            {
++                const auto& inventory = saved.state;
++                ImGui::Text("Saved strength %u / magic %u / infinite %d / damage x%.2f", inventory.strength,
++                            inventory.magic, inventory.infinite_ammo, inventory.damage_multiplier);
++                ImGui::Text("Selected slot %u / %zu keys (discarded by original keep-alive Load)",
++                            inventory.current_slot, inventory.keys.size());
++                if (ImGui::TreeNode("Saved inventory contents"))
++                {
++                    for (unsigned i = 0; i < inventory.right.size(); ++i)
++                        ImGui::Text("Slot %u: right %u / left %u", i, inventory.right[i], inventory.left[i]);
++                    for (unsigned i = 0; i < inventory.ammo.size(); ++i)
++                        ImGui::Text("Ammo %u: %.2f", i, inventory.ammo[i]);
++                    for (const auto& key : inventory.keys)
++                        ImGui::Text("Key %s: %u uses", key.name.c_str(), key.uses);
++                    ImGui::TreePop();
++                }
++            }
++            ImGui::TextWrapped("Inventory only: player health/timers, restored client association and destination "
++                               "entry are not saved or transferred. Current inventory is unchanged.");
+             for (auto id : game.objects.snapshot())
+             {
+                 const auto* record = game.objects.get(id);
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 93e4395..0756a54 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -43,6 +43,7 @@ namespace OpenBlood2
+         const auto old_bullets = player->m_InventoryMgr.GetAmmoCount(1);
+         const auto received = g.client_shell.world_exit.received;
+         const auto blocked = g.client_shell.world_exit.blocked;
++        const auto captures = g.server_shell.inventory_capture.captures;
+         unsigned exits = 0;
+         for (auto id : g.objects.snapshot())
+         {
+@@ -75,7 +76,9 @@ namespace OpenBlood2
+                 return false;
+         }
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+-               g.client_shell.world_exit.blocked == blocked + 1 &&
++               g.client_shell.world_exit.blocked == blocked + 1 && g.server_shell.inventory_capture.valid &&
++               g.server_shell.inventory_capture.captures == captures + 1 &&
++               g.server_shell.inventory_capture.state.ammo[1] == old_bullets &&
+                g.client_shell.world_exit.error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+diff --git a/src/game/inventory_state.h b/src/game/inventory_state.h
+new file mode 100644
+index 0000000..5254d99
+--- /dev/null
++++ b/src/game/inventory_state.h
+@@ -0,0 +1,24 @@
++#pragma once
++#include "game/key_messages.h"
++#include <array>
++#include <vector>
++
++namespace OpenBlood2
++{
++    // Owned source-level subset of CInventoryMgr::Save, not a retail save-file ABI.
++    // No engine handles, weapon pointers, client views or resource references.
++    struct InventoryState
++    {
++        std::array<DBYTE, 10> right{}, left{};
++        std::array<float, 13> ammo{};
++        std::vector<KeyItem> keys;
++        DBYTE strength = 1, magic = 1, current_slot = 0;
++        bool infinite_ammo = false;
++        float damage_multiplier = 1;
++    };
++    enum class InventoryLoadType
++    {
++        Restore = 0,
++        KeepAlive = 1
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index d99d096..64744e5 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -10,6 +10,7 @@ void CBloodServerShell::PreStartWorld()
+     paths.ClearPathList();
+     world_started = false;
+     updates = 0;
++    inventory_capture = {};
+     // Team setup, active cinematics, voice and multiplayer state are outside
+     // the accepted fresh single-player entry mode.
+ }
+@@ -26,6 +27,28 @@ CPlayerObj* CBloodServerShell::Player(HCLIENT client)
+     auto object = server_.GetClientUserData(client);
+     return object ? dynamic_cast<CPlayerObj*>(server_.HandleToObject(object)) : nullptr;
+ }
++bool CBloodServerShell::CapturePlayerInventory(HCLIENT client)
++{
++    auto& capture = inventory_capture;
++    ++capture.attempts;
++    capture.valid = false;
++    capture.state = {};
++    capture.error.clear();
++    const auto* player = Player(client);
++    // Original KeepAliveSave enumerates active player objects. This captures
++    // only their currently supported inventory aggregate, not a whole player.
++    if (!player || !server_.IsObjectAlive(player->m_hObject) ||
++        server_.GetObjectState(player->m_hObject) != OBJSTATE_ACTIVE)
++    {
++        capture.error = "Inventory capture requires an active associated player";
++        return false;
++    }
++    if (!player->m_InventoryMgr.Save(capture.state, capture.error))
++        return false;
++    capture.valid = true;
++    ++capture.captures;
++    return true;
++}
+ CPlayerObj* CBloodServerShell::CreatePlayer(HCLIENT client)
+ {
+     ObjectCreateStruct state; // Original zero position, identity rotation, no flags.
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index ba8ec62..8b59d59 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -22,6 +22,14 @@ class CBloodServerShell
+     bool OnMessage(HCLIENT, const OpenBlood2::PlayerUse&);
+     void Update(float);
+     CPlayerObj* Player(HCLIENT);
++    bool CapturePlayerInventory(HCLIENT);
++    struct InventoryCapture
++    {
++        OpenBlood2::InventoryState state;
++        std::string error;
++        std::uint64_t attempts = 0, captures = 0;
++        bool valid = false;
++    } inventory_capture; // Inventory only; never a successful KeepAliveSave.
+     void SetStartPointName(const std::string& name)
+     {
+         start_point_name = name;
+diff --git a/src/game/original/InventoryMgr.h b/src/game/original/InventoryMgr.h
+index 707b225..ae871b1 100644
+--- a/src/game/original/InventoryMgr.h
++++ b/src/game/original/InventoryMgr.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ #include "B2BaseClass.h"
+ #include "Weapon.h"
++#include "game/inventory_state.h"
+ #include <array>
+ #include <memory>
+ #include <vector>
+@@ -19,6 +20,10 @@ class CInventoryMgr : public Aggregate
+ {
+   public:
+     ~CInventoryMgr() override;
++    bool Save(OpenBlood2::InventoryState&, std::string&) const;
++    // Restore before client association: rebuilding live client views is a
++    // separate player-transfer responsibility, never silently bypassed here.
++    bool Load(const OpenBlood2::InventoryState&, OpenBlood2::InventoryLoadType, std::string&);
+     InventoryResult AddKey(const OpenBlood2::KeyItem&);
+     InventoryResult QueryKey(std::string_view);
+     std::vector<OpenBlood2::KeyItem> keys;
+diff --git a/src/game/original/InventorySave.cpp b/src/game/original/InventorySave.cpp
+new file mode 100644
+index 0000000..d74731b
+--- /dev/null
++++ b/src/game/original/InventorySave.cpp
+@@ -0,0 +1,160 @@
++// Selected InventoryMgr.cpp:2843-3061 Save/Load branches. Typed values replace
++// message serialization; staging replaces destructive Term-before-read.
++#include "InventoryMgr.h"
++#include <cmath>
++
++namespace
++{
++    bool valid(const OpenBlood2::InventoryState& state, std::string& error)
++    {
++        if (state.strength < 1 || state.strength > 6 || state.magic < 1 || state.magic > 6 ||
++            state.current_slot >= state.right.size() || !std::isfinite(state.damage_multiplier) ||
++            state.damage_multiplier < 0 || state.damage_multiplier > 1000 || state.keys.size() > 256)
++        {
++            error = "Invalid inventory attributes, selection, multiplier or item count";
++            return false;
++        }
++        for (auto ammo : state.ammo)
++            if (!std::isfinite(ammo) || ammo < 0)
++            {
++                error = "Invalid inventory ammo";
++                return false;
++            }
++        for (unsigned i = 0; i < state.right.size(); ++i)
++        {
++            const auto* right = weapon_definition(state.right[i]);
++            if ((state.right[i] && !right) ||
++                (state.left[i] && (!right || state.left[i] != state.right[i] || !right->m_dwTwoHandStrengthReq)))
++            {
++                error = "Unsupported weapon or invalid dual-hand inventory slot";
++                return false;
++            }
++        }
++        for (std::size_t i = 0; i < state.keys.size(); ++i)
++        {
++            const auto& key = state.keys[i];
++            for (const auto* text : {&key.name, &key.display_name, &key.icon, &key.highlighted_icon})
++                if (text->empty() || text->size() > 100 || text->find('\0') != std::string::npos)
++                {
++                    error = "Invalid saved key string";
++                    return false;
++                }
++            if (!key.uses)
++            {
++                error = "Invalid saved key charge";
++                return false;
++            }
++            for (std::size_t j = 0; j < i; ++j)
++                if (OpenBlood2::same_name(key.name, state.keys[j].name))
++                {
++                    error = "Duplicate saved key";
++                    return false;
++                }
++        }
++        return true;
++    }
++} // namespace
++
++bool CInventoryMgr::Save(OpenBlood2::InventoryState& output, std::string& error) const
++{
++    error.clear();
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hOwner))
++    {
++        error = "Inventory save requires a live owner";
++        return false;
++    }
++    OpenBlood2::InventoryState state;
++    state.strength = m_nAttribStrength;
++    state.magic = m_nAttribMagic;
++    state.infinite_ammo = m_bInfiniteAmmo;
++    for (unsigned i = 0; i < state.right.size(); ++i)
++        for (bool left : {false, true})
++            if (const auto* weapon = GetWeapon(i, left))
++            {
++                if (weapon->firing)
++                {
++                    error = "Inventory save during a weapon callback rejected";
++                    return false;
++                }
++                (left ? state.left : state.right)[i] = weapon->data.m_nType;
++            }
++    state.ammo = m_fAmmo;
++    state.keys = keys;
++    state.current_slot = m_nCurWeaponSlot;
++    state.damage_multiplier = damage_multiplier;
++    if (!valid(state, error))
++        return false;
++    output = std::move(state);
++    return true;
++}
++
++bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::InventoryLoadType type,
++                         std::string& error)
++{
++    error.clear();
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hOwner) || m_hClient)
++    {
++        error = "Inventory restore requires a live owner before client association";
++        return false;
++    }
++    if (type != OpenBlood2::InventoryLoadType::Restore && type != OpenBlood2::InventoryLoadType::KeepAlive)
++    {
++        error = "Unsupported inventory load type";
++        return false;
++    }
++    if (!valid(state, error))
++        return false;
++    for (unsigned i = 0; i < state.right.size(); ++i)
++        for (bool left : {false, true})
++            if (const auto* weapon = GetWeapon(i, left); weapon && weapon->firing)
++            {
++                error = "Inventory restore during a weapon callback rejected";
++                return false;
++            }
++
++    CInventoryMgr staged;
++    if (!staged.Init(m_hOwner, nullptr))
++    {
++        error = "Inventory restore could not create its muzzle child";
++        return false;
++    }
++    staged.m_nAttribStrength = state.strength;
++    staged.m_nAttribMagic = state.magic;
++    staged.m_bInfiniteAmmo = state.infinite_ammo;
++    for (unsigned i = 0; i < state.right.size(); ++i)
++        for (auto weapon : {state.right[i], state.left[i]})
++            if (weapon && staged.ObtainWeapon(weapon, static_cast<int>(i)) != InventoryResult::Ok)
++            {
++                error = "Inventory restore could not recreate a weapon";
++                return false;
++            }
++    // Original Load assigns raw pools after obtaining weapons: no capacity
++    // clamp, infinite-ammo setter guard or pickup reward may alter saved counts.
++    staged.m_fAmmo = state.ammo;
++    if (type != OpenBlood2::InventoryLoadType::KeepAlive)
++        staged.keys = state.keys;                 // Source drops INV_KEY only for dwLoadType == 1.
++    staged.m_nCurWeaponSlot = state.current_slot; // After recreation, as in source.
++    staged.damage_multiplier = state.damage_multiplier;
++
++    // Commit only after every fallible service. Old child removal is deferred;
++    // transferred weapons must point at this aggregate, never the local stage.
++    m_Weapons.swap(staged.m_Weapons);
++    m_LWeapons.swap(staged.m_LWeapons);
++    std::swap(m_hMuzzleFlash, staged.m_hMuzzleFlash);
++    keys.swap(staged.keys);
++    m_fAmmo = staged.m_fAmmo;
++    m_nAttribStrength = staged.m_nAttribStrength;
++    m_nAttribMagic = staged.m_nAttribMagic;
++    m_bInfiniteAmmo = staged.m_bInfiniteAmmo;
++    m_nCurWeaponSlot = staged.m_nCurWeaponSlot;
++    damage_multiplier = staged.damage_multiplier;
++    requested_weapons = {}; // Initialization profile, not source saved weapons.
++    for (unsigned i = 0; i < state.right.size(); ++i)
++        for (bool left : {false, true})
++            if (auto* weapon = GetWeapon(i, left))
++                weapon->Init(m_hOwner, this, left);
++    ++revision;
++    return true;
++}
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index ed2c9ed..9f14e34 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -200,8 +200,9 @@ namespace OpenBlood2
+                 if (exit.pending)
+                 {
+                     exit.pending = false;
++                    server_shell.CapturePlayerInventory(local_client);
+                     // NEW_LEVEL is rejected by the decoder before any teardown:
+-                    // original KeepAliveSave/Load has not yet been integrated.
++                    // an inventory snapshot alone is not KeepAliveSave/Load.
+                     WorldRequest request;
+                     if (!decode_world_request(exit.load, request, exit.error))
+                         ++exit.blocked;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index e3f79d8..fbd3b2e 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -842,3 +842,15 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME exits.catalog COMMAND exit_tests catalog "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(exits.catalog PROPERTIES LABELS "headless;private;exits" TIMEOUT 90)
+ endif()
++
++add_executable(inventory_state_tests inventory_state_tests.cpp)
++target_link_libraries(inventory_state_tests PRIVATE blood2_game)
++blood2_project_options(inventory_state_tests)
++foreach(case roundtrip malformed rollback capture)
++    add_test(NAME inventory_state.${case} COMMAND inventory_state_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/inventory-state-fixtures/${case}")
++    set_tests_properties(inventory_state.${case} PROPERTIES LABELS "headless;inventory_state" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME inventory_state.private COMMAND inventory_state_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(inventory_state.private PROPERTIES LABELS "headless;private;inventory_state" TIMEOUT 120)
++endif()
+diff --git a/tests/inventory_state_tests.cpp b/tests/inventory_state_tests.cpp
+new file mode 100644
+index 0000000..f1b3f79
+--- /dev/null
++++ b/tests/inventory_state_tests.cpp
+@@ -0,0 +1,264 @@
++#include "player_fixture.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    CPlayerObj* detached(GameSession& g)
++    {
++        auto h = g.objects.create(g.objects.find_class("CPlayerObj"), {});
++        return dynamic_cast<CPlayerObj*>(g.server.HandleToObject(h));
++    }
++    bool seed(CInventoryMgr& inv)
++    {
++        CHECK(inv.ObtainWeapon(WEAP_MELEE, 0) == InventoryResult::Ok);
++        CHECK(inv.ObtainWeapon(WEAP_BERETTA, 7) == InventoryResult::Ok);
++        CHECK(inv.ObtainWeapon(WEAP_BERETTA, 7) == InventoryResult::Ok);
++        CHECK(inv.ChangeWeaponSlot(7) == InventoryResult::Ok);
++        inv.m_nAttribStrength = 2;
++        inv.m_nAttribMagic = 3;
++        inv.damage_multiplier = 1.75f;
++        for (unsigned i = 0; i < 13; ++i)
++            inv.m_fAmmo[i] = 700.5f + i;
++        inv.m_bInfiniteAmmo = true;
++        CHECK(inv.AddKey({"Laboratory", "Lab access", "icon.pcx", "selected.pcx", 3}) == InventoryResult::Ok);
++        inv.CurrentWeapon()->shots = 42;
++        inv.CurrentWeapon()->m_fLastShotTime = 99;
++        return true;
++    }
++    bool matches(CInventoryMgr& inv, const InventoryState& s, bool keys)
++    {
++        CHECK(inv.m_fAmmo == s.ammo && inv.m_nCurWeaponSlot == s.current_slot);
++        CHECK(inv.m_nAttribStrength == s.strength && inv.m_nAttribMagic == s.magic);
++        CHECK(inv.m_bInfiniteAmmo == s.infinite_ammo && inv.damage_multiplier == s.damage_multiplier);
++        CHECK(inv.keys.size() == (keys ? s.keys.size() : 0));
++        for (unsigned i = 0; i < 10; ++i)
++            for (bool left : {false, true})
++            {
++                auto* w = inv.GetWeapon(i, left);
++                CHECK((w ? w->data.m_nType : 0) == (left ? s.left[i] : s.right[i]));
++                if (w)
++                    CHECK(w->m_pInventoryMgr == &inv && w->m_hOwner == inv.m_hOwner && w->m_bLeftHand == left);
++            }
++        return true;
++    }
++    bool roundtrip(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto* p = detached(g);
++        CHECK(p);
++        auto& inv = p->m_InventoryMgr;
++        CHECK(seed(inv));
++        InventoryState state;
++        std::string error;
++        CHECK(inv.Save(state, error));
++        const auto old_flash = inv.m_hMuzzleFlash;
++        CHECK(inv.UpdateHandModels());
++        const auto old_hand = inv.CurrentWeapon()->m_hHandModel;
++        CHECK(old_hand);
++        CHECK(inv.Load(state, InventoryLoadType::Restore, error) && matches(inv, state, true));
++        CHECK(inv.QueryKey("LABORATORY") == InventoryResult::Ok && inv.keys[0].uses == 2 && state.keys[0].uses == 3);
++        CHECK(inv.CurrentWeapon()->shots == 0 && inv.CurrentWeapon()->m_fLastShotTime == 0);
++        CHECK(inv.CurrentWeapon()->m_hHandModel == nullptr && inv.m_hMuzzleFlash != old_flash);
++        CHECK(!g.server.IsObjectAlive(old_flash) && !g.server.IsObjectAlive(old_hand));
++        CHECK(g.objects.finish_frame() && g.server.IsObjectAlive(inv.m_hMuzzleFlash));
++        CHECK(inv.Load(state, InventoryLoadType::KeepAlive, error) && matches(inv, state, false));
++        CHECK(state.keys.size() == 1 && state.keys[0].uses == 3);
++        CHECK(inv.UpdateHandModels() && inv.CurrentWeapon()->m_hHandModel && inv.CurrentWeapon(true)->m_hHandModel);
++        CHECK(g.unload_world() && g.objects.snapshot().empty() && g.objects.attachments().empty());
++        CHECK(g.server.string_count() == 0 && CDestructable::m_dwNumDestructables == 0);
++        return true;
++    }
++    bool malformed(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto* p = detached(g);
++        CHECK(p);
++        auto& inv = p->m_InventoryMgr;
++        CHECK(seed(inv));
++        InventoryState state;
++        std::string error;
++        CHECK(inv.Save(state, error));
++        const auto ids = g.objects.snapshot();
++        const auto revision = inv.revision;
++        const auto* weapon = inv.CurrentWeapon();
++        std::vector<std::function<void(InventoryState&)>> corrupt{
++            [](auto& s) { s.strength = 0; },
++            [](auto& s) { s.magic = 7; },
++            [](auto& s) { s.current_slot = 10; },
++            [](auto& s) { s.right[2] = 2; },
++            [](auto& s) { s.left[2] = WEAP_BERETTA; },
++            [](auto& s) { s.left[0] = WEAP_MELEE; },
++            [](auto& s) { s.left[7] = WEAP_MELEE; },
++            [](auto& s) { s.ammo[0] = -1; },
++            [](auto& s) { s.ammo[12] = std::numeric_limits<float>::infinity(); },
++            [](auto& s) { s.damage_multiplier = std::numeric_limits<float>::quiet_NaN(); },
++            [](auto& s) { s.damage_multiplier = 1001; },
++            [](auto& s) { s.keys.resize(257); },
++            [](auto& s) { s.keys[0].uses = 0; },
++            [](auto& s) { s.keys[0].name.clear(); },
++            [](auto& s) { s.keys[0].display_name = std::string(101, 'x'); },
++            [](auto& s) { s.keys[0].icon = std::string("x\0y", 3); },
++            [](auto& s)
++            {
++                auto k = s.keys[0];
++                k.name = "LABORATORY";
++                s.keys.push_back(k);
++            }};
++        for (auto& change : corrupt)
++        {
++            auto bad = state;
++            change(bad);
++            CHECK(!inv.Load(bad, InventoryLoadType::KeepAlive, error) && !error.empty());
++            CHECK(g.objects.snapshot() == ids && inv.revision == revision && inv.CurrentWeapon() == weapon);
++            CHECK(matches(inv, state, true));
++        }
++        CHECK(!inv.Load(state, static_cast<InventoryLoadType>(99), error));
++        InventoryState output;
++        output.ammo[1] = 123;
++        inv.CurrentWeapon()->firing = true;
++        CHECK(!inv.Save(output, error) && output.ammo[1] == 123);
++        CHECK(!inv.Load(state, InventoryLoadType::KeepAlive, error));
++        inv.CurrentWeapon()->firing = false;
++        inv.m_fAmmo[1] = -1;
++        CHECK(!inv.Save(output, error) && output.ammo[1] == 123);
++        inv.m_fAmmo = state.ammo;
++        CHECK(g.objects.remove(p->m_hObject));
++        CHECK(!inv.Save(output, error) && !inv.Load(state, InventoryLoadType::KeepAlive, error));
++        CHECK(g.objects.finish_frame() && g.unload_world());
++        return true;
++    }
++    bool rollback(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto* p = detached(g);
++        CHECK(p);
++        auto& inv = p->m_InventoryMgr;
++        CHECK(seed(inv));
++        InventoryState state;
++        std::string error;
++        CHECK(inv.Save(state, error));
++        const auto ids = g.objects.snapshot();
++        const auto revision = inv.revision;
++        const auto flash = inv.m_hMuzzleFlash;
++        const auto* weapon = inv.CurrentWeapon();
++        // Test-only fault injection of the already typed service, restored before assertions.
++        const auto create = g.server.CreateObject;
++        g.server.CreateObject = [](HCLASS, ObjectCreateStruct*) -> LPBASECLASS { return nullptr; };
++        const bool created = inv.Load(state, InventoryLoadType::KeepAlive, error);
++        g.server.CreateObject = create;
++        CHECK(!created && !error.empty() && g.objects.snapshot() == ids);
++        const auto link = g.server.CreateInterObjectLink;
++        g.server.CreateInterObjectLink = [](HOBJECT, HOBJECT) -> DRESULT { return DE_ERROR; };
++        const bool linked = inv.Load(state, InventoryLoadType::KeepAlive, error);
++        g.server.CreateInterObjectLink = link;
++        CHECK(!linked && !error.empty() && g.objects.finish_frame());
++        CHECK(g.objects.snapshot() == ids && inv.revision == revision && inv.m_hMuzzleFlash == flash &&
++              inv.CurrentWeapon() == weapon);
++        CHECK(matches(inv, state, true));
++        CHECK(inv.Load(state, InventoryLoadType::KeepAlive, error));
++        CHECK(g.objects.finish_frame() && g.server.IsObjectAlive(inv.m_hMuzzleFlash));
++        return true;
++    }
++    bool capture(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        std::string error;
++        CHECK(!g.server_shell.CapturePlayerInventory(nullptr));
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        CHECK(p);
++        auto& inv = p->m_InventoryMgr;
++        CHECK(inv.AddKey({"key", "Key", "icon", "selected", 2}) == InventoryResult::Ok);
++        CHECK(g.server.SendWorldExit({"next", WorldExitType::World}, "arrival") == DE_OK &&
++              g.pump_player_messages(error));
++        auto& capture = g.server_shell.inventory_capture;
++        CHECK(capture.valid && capture.captures == 1 && capture.attempts == 2 && capture.state.keys.size() == 1);
++        CHECK(g.client_shell.world_exit.blocked == 1 && inv.keys.size() == 1);
++        auto saved = capture.state;
++        inv.SetAmmoCount(1, 17);
++        CHECK(capture.state.ammo[1] == 50 && !inv.Load(saved, InventoryLoadType::KeepAlive, error));
++        CHECK(inv.GetAmmoCount(1) == 17 && g.client_shell.m_bInWorld);
++        g.server.SetObjectState(p->m_hObject, OBJSTATE_INACTIVE);
++        CHECK(!g.server_shell.CapturePlayerInventory(g.local_client) && !capture.valid && !capture.error.empty());
++        CHECK(capture.state.keys.empty() && capture.captures == 1);
++        CHECK(g.unload_world() && capture.attempts == 0 && !capture.valid);
++        CHECK(saved.keys[0].name == "key" && saved.ammo[1] == 50);
++        auto* restored = detached(g);
++        CHECK(restored);
++        CHECK(restored->m_InventoryMgr.Load(saved, InventoryLoadType::KeepAlive, error));
++        CHECK(matches(restored->m_InventoryMgr, saved, false));
++        CHECK(g.unload_world() && g.objects.snapshot().empty());
++        return true;
++    }
++    bool private_data(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        InventoryState saved;
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            auto* source = g.server_shell.Player(g.local_client);
++            CHECK(source);
++            auto& inv = source->m_InventoryMgr;
++            CHECK(inv.ObtainWeapon(WEAP_BERETTA) == InventoryResult::Ok);
++            inv.SetAmmoCount(1, 123.5f + cycle);
++            CHECK(inv.AddKey({"transfer-probe", "Diagnostic key", "icon", "selected", 2}) == InventoryResult::Ok);
++            CHECK(g.server_shell.CapturePlayerInventory(g.local_client));
++            saved = g.server_shell.inventory_capture.state;
++            auto* destination = detached(g);
++            CHECK(destination && destination->SetCharacter(0));
++            auto& restored = destination->m_InventoryMgr;
++            CHECK(restored.Load(saved, InventoryLoadType::KeepAlive, error) && matches(restored, saved, false));
++            CHECK(restored.UpdateHandModels());
++            CHECK(g.server.IsObjectAlive(restored.CurrentWeapon()->m_hHandModel));
++            CHECK(g.server.IsObjectAlive(restored.CurrentWeapon(true)->m_hHandModel));
++            CHECK(inv.keys.size() == 1 && inv.GetAmmoCount(1) == 123.5f + cycle);
++            std::cout << "cycle " << cycle << ": detached inventory restored; raw bullets " << restored.GetAmmoCount(1)
++                      << "; keys " << restored.keys.size() << "; both retail hand models loaded\n";
++            CHECK(g.objects.remove(source->m_hObject) && g.objects.finish_frame());
++            CHECK(matches(restored, saved, false) && saved.keys.size() == 1);
++            CHECK(g.unload_world() && g.objects.snapshot().empty() && g.objects.attachments().empty());
++            CHECK(g.server.string_count() == 0 && g.server.message_count() == 0 &&
++                  CDestructable::m_dwNumDestructables == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::string_view name = argv[1];
++    const auto root = path_from_utf8(argv[2]);
++    bool ok = false;
++    if (name == "roundtrip")
++        ok = roundtrip(root);
++    else if (name == "malformed")
++        ok = malformed(root);
++    else if (name == "rollback")
++        ok = rollback(root);
++    else if (name == "capture")
++        ok = capture(root);
++    else if (name == "private")
++        ok = private_data(root);
++    return ok ? 0 : 1;
++}

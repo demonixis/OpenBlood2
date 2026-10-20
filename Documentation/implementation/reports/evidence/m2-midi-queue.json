@@ -1,0 +1,221 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "f7f7c5a9a5b2441be48a8862152f266b9d640edd",
+  "status": "M2 incomplete; explicit sample-scheduled MIDI only, no IMA tick/section/playlist transport or MUSIC",
+  "frozen_sources": {
+    "CMakeLists.txt": "f51ff12b0ebdae6aca93568faaac1de71c3a434ce5670da5ffaa6459fb95cb46",
+    "src/engine/dls_sampler.h": "e151896c7e7e29910df414e87945a20450d8d4fc8b35935a74a44d2b31b3ed61",
+    "src/engine/dls_sampler.cpp": "0b706b6aa124623bcbfb9707f2b20d786626db79cea11ca9019b155756d4b0a4",
+    "src/engine/dls_midi_queue.cpp": "c64f1a8eb06286ee3b98137cb919dbaad3bf561f993310e195f97917fe535a3c",
+    "src/engine/audio.cpp": "1433d402786e7fe3e0e2d5ac324bf1914cde73f9e53ac480fc1b2c6aa9c54676",
+    "src/app/inspector_world_sounds.cpp": "d7787f5823279a3cfc1c7dd4da6f225e9927981a5bec6c9a48e9627d70f2f1be",
+    "src/app/world_sound_smoke.cpp": "fae35ffe291ca84570354982c911750ac52fa1d3c000e7ab7e793323614b3b4c",
+    "tests/dls_timing_tests.cpp": "42c8289ae17c176ddb189765daf757c748c75bc78d021c557ea55750df362f1d",
+    "tests/CMakeLists.txt": "f416d19f1d466a1c29db4247c845fbd0413e3a3e4c0ab2edb1acbdc0ff188736"
+  },
+  "results": {
+    "debug-tests": {
+      "passed": 137,
+      "wall_seconds": 20.71
+    },
+    "release-tests": {
+      "passed": 137,
+      "wall_seconds": 1.98
+    },
+    "sanitize-tests": {
+      "passed": 137,
+      "wall_seconds": 82.85
+    },
+    "debug-gpu": {
+      "passed": 2,
+      "wall_seconds": 11.02
+    },
+    "release-gpu": {
+      "passed": 2,
+      "wall_seconds": 5.35
+    }
+  },
+  "unchanged_source_warnings": {
+    "debug": [],
+    "release": [
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:36:78: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]"
+    ],
+    "sanitize": [
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:36:78: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]"
+    ]
+  },
+  "original_probe": {
+    "binary": "MSynth25.dll",
+    "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+    "unicorn": "2.1.4",
+    "queue_horizons": 700,
+    "control_patch_queries": 1400,
+    "bank_patch_cases": 900,
+    "decisions_sha256": "6ea8812d82b9553a57fac66e5a56a5b4d7ffd27abb05740ed546e056b11f994f",
+    "scope": "Original sorted insertion and equal-time stability; inclusive due extraction, last-due value lookup and submission-time bank capture. Synthetic pool only, no native DLL, OS imports, full synth, PCM or music tick-to-sample conversion."
+  },
+  "commands": [
+    "python /tmp/b2-midi-queue-validation.py {debug,release,sanitize} (three builds at -j1 each; relevant CTests at -j2)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/{debug,release} -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit /tmp/b2-midi-queue-{debug,release}-gpu.xml",
+    "/tmp/b2-legacy-pan-tools/bin/python Documentation/Implementation/evidence/m2-midi-queue-probe.py EXTERNAL_MSYNTH25_DLL",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror (seven changed C++ files)",
+    "python /tmp/b2-npc-integrity.py; python /tmp/b2-npc-links.py; git diff --check (raw .log/.xml excluded)"
+  ],
+  "limitations": [
+    "Explicit sample boundaries only; no IMA musical tick conversion, running section/playlist or successful MUSIC",
+    "Original isolated queue/value routines executed with synthetic pool, not whole synth or original PCM parity",
+    "38-region PCM block-size equality is internal replacement equivalence, not retail audio equivalence",
+    "NVIDIA Linux dummy SDL audio, hidden inspector and inspector-free Release; no native Metal/Windows/mobile or listening comparison",
+    "Capture reviewed for actual queue/counters; delayed-note UI button not manually exercised",
+    "Initial new test static link needed direct engine before blood2_game; real callbacks retained"
+  ],
+  "capture": {
+    "path": "Blood2/build/debug/tests/world-sounds.png",
+    "sha256": "ce23e91f87755517e1f5c2bd6a65c725dbee1b29409ae554a0dc43f50732a95d",
+    "committed": false
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "readme_preserved_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "files": [
+    {
+      "file": "m2-midi-queue-probe.py",
+      "sha256": "4d3c458cc2f9952ab7786abf5f4122275d4202c2fa8515c7bab67f854dbaae0a"
+    },
+    {
+      "file": "m2-midi-queue-probe.json",
+      "sha256": "424a8b55892174e2fb6831d0594f7d1862842deb15a236376ba61b2203c790cb"
+    },
+    {
+      "file": "m2-midi-queue-probe-errors.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-midi-queue-validation.py",
+      "sha256": "d561b261015bbdb7c2356b37adcbf97fa36e511acaf4528193713d1a4738cc59"
+    },
+    {
+      "file": "m2-midi-queue-focus-build.log",
+      "sha256": "02af62b85007d5a588590b89acf1ab93172a8dadb756f236ee52f9b673c5f41d"
+    },
+    {
+      "file": "m2-midi-queue-focus-fix-build.log",
+      "sha256": "46d87add6816bad6e2bfee4847c19fbcbad3da35629634c375f4ac1a7c1b53cd"
+    },
+    {
+      "file": "m2-midi-queue-focus.log",
+      "sha256": "1a030965c9c6263e60c2dd4f7b51b04649f380bf6650cc878c2786ccec1b74b1"
+    },
+    {
+      "file": "m2-midi-queue-focus.xml",
+      "sha256": "848edc620ebde65fea66c168a021ac76e55e48df4f0c1c812acc251abb4b49c9"
+    },
+    {
+      "file": "m2-midi-queue-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-midi-queue-debug-tests.log",
+      "sha256": "aa7f2f5560bee57b53053550979a04f641fe8f1c0a8e8285a9558f15c414d82b"
+    },
+    {
+      "file": "m2-midi-queue-debug-tests.xml",
+      "sha256": "557a9d1d0a652a54cd73d7be06b8732c2057b9689b0f9db82c1ff5855f82d8e5"
+    },
+    {
+      "file": "m2-midi-queue-release-tests.log",
+      "sha256": "6610e8e6fa79a4698847b2f2fabbfeb93e8340a834ee370fb5e78c5b3c7f327c"
+    },
+    {
+      "file": "m2-midi-queue-release-tests.xml",
+      "sha256": "aff4548a2e5bf0b2fee1b15842b0eed0e975f3e966a9fa9857da0d7e0b7d2ec0"
+    },
+    {
+      "file": "m2-midi-queue-sanitize-tests.log",
+      "sha256": "7e5f6da12c653d5c53945ce15e2f06621ec4582bd8cb4e383cfd976ccff58bf4"
+    },
+    {
+      "file": "m2-midi-queue-sanitize-tests.xml",
+      "sha256": "dd5036eaee6a72f1511e5a0b44023cb351746a2dc085f56b3ca65699680725e7"
+    },
+    {
+      "file": "m2-midi-queue-debug-gpu.log",
+      "sha256": "234db93aeb9caa9dd6e3ec7e82c6636c0b802f2dcdf25ceaca61bb373ece1fe8"
+    },
+    {
+      "file": "m2-midi-queue-debug-gpu.xml",
+      "sha256": "c2a20760289fabb968eef4b881f67959470b4c95426f09d81ee6a90bdce9663a"
+    },
+    {
+      "file": "m2-midi-queue-release-gpu.log",
+      "sha256": "83d57d22f68f81528159f81ce586d779d8299207e63264224670ca795c15c2f8"
+    },
+    {
+      "file": "m2-midi-queue-release-gpu.xml",
+      "sha256": "42be87d6e5fb22bb24e9a47cb7cf3748917c0093f09ce720d1b29705f2155698"
+    },
+    {
+      "file": "m2-midi-queue-debug-build-final.log",
+      "sha256": "1ffd7086ef21472b95e694c14b05d93dba353fff697f55dd80120612056abbc1"
+    },
+    {
+      "file": "m2-midi-queue-release-build-final.log",
+      "sha256": "268798d5a1bffbd4208fc50f6bf33781e0e0b43d1243de19bfc0915433470807"
+    },
+    {
+      "file": "m2-midi-queue-sanitize-build-final.log",
+      "sha256": "3dee6622c8fd23ee72d6dd4373d73da55a07f2048b38bd703e1c99c3204b7f30"
+    },
+    {
+      "file": "m2-midi-queue-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-midi-queue-links.log",
+      "sha256": "0388dd7096e04f7ce654698b78441af86bf1f63b125847834cd9ee24915894ed"
+    }
+  ],
+  "implementation_commit": "603ac0c8c5036a8803a2092beaaeb3e9b7e81178"
+}

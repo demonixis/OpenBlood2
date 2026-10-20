@@ -1,0 +1,1353 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 4dd6994..c804245 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -280,3 +280,10 @@ source command early returns, exact hearing boundaries, reversed gunfire class t
+ impact guards, two-faction order/duplicates and alert-after-playback-failure. Snapshot
+ checked identities across callbacks; delivery is not reaction. Scripts and full NPC
+ initialization/AI_Update/deactivation remain unavailable; M2 stays open.
++
++The [CMovement continuation](../Documentation/Implementation/M2_AI_NAVIGATION.md) adds the original cached transform aggregate
++and obstacle-path calculation. Read [contracts](docs/AI_NAVIGATION_CONTRACTS.md). Preserve two side rays,
++character-only filtering, zero lateral range on misses, source offsets/partial paths
++and accumulated point count. Planning never integrates motion; players do not initialize
++this cache. Bounded searches and value ownership are adaptations. Full NPC initialization,
++following/actions, shade queries and the actual M2 gate remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 87bf736..8abc9b2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,6 +41,7 @@ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
++    src/game/original/Movement.cpp
+     src/game/original/AIState.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+diff --git a/README.md b/README.md
+index 66302b0..9890585 100644
+--- a/README.md
++++ b/README.md
+@@ -343,3 +343,10 @@ is inspectable but their complete NPC actions and the M2 gate remain unavailable
+ Command/hearing verification: 393/393 Debug and inspector-free Release checks
+ (27 GPU each), 145 targeted ASan/UBSan/leak checks, and 19/19 final Debug hearing/audio
+ checks after numeric-validation refinements. See the [evidence](../Documentation/Implementation/M2_AI_TRIGGERS.md).
++
++The [CMovement continuation](docs/AI_NAVIGATION_CONTRACTS.md) adds original transform caching and obstacle
++path planning, with inspectable partial failures and bounded searches. Following,
++production NPCs and the actual M2 session gate remain incomplete.
++
++CMovement verification: 402/402 Debug and inspector-free Release checks (27 GPU
++each), plus 162 targeted ASan/UBSan/leak checks. See [evidence](../Documentation/Implementation/M2_AI_NAVIGATION.md).
+diff --git a/docs/AI_NAVIGATION_CONTRACTS.md b/docs/AI_NAVIGATION_CONTRACTS.md
+new file mode 100644
+index 0000000..3d269ef
+--- /dev/null
++++ b/docs/AI_NAVIGATION_CONTRACTS.md
+@@ -0,0 +1,110 @@
++# Original CMovement cache and obstacle paths
++
++Selected original `ObjectDLL/movement.cpp` is now integrated as the CBaseCharacter
++aggregate `m_MoveObj`. It is distinct from the player's client MoveMgr and from
++PathMgr's authored PathPoint snapshots. See [source selections](M2_AI_NAVIGATION_SOURCES.json),
++[evidence](../../Documentation/Implementation/M2_AI_NAVIGATION.md),
++[object lifetime](OBJECT_CONTRACTS.md), [collision](MODEL_AND_COLLISION_CONTRACTS.md)
++and [AI state actions](AI_STATE_CONTRACTS.md). No production NPC is registered;
++M2 remains incomplete.
++
++## Transform cache and ownership
++
++The aggregate is added after damage and inventory in the original constructor
++order. It samples position, previous position, rotation and basis on MID_UPDATE,
++after the character's own handler, without moving the body or advancing clocks.
++Cache getters return that sample, not an implicit current-transform query. Sampling
++does not refresh an existing route when position or animation dimensions change. Normal
++inactive objects receive no scheduled update. An explicit Update still validates
++and samples a live inactive owner. Pending/stale owners fail and invalidate the
++sample; failure does not turn a historical value into a valid pose.
++
++Init checks a live identity and immediately samples its transform. This deliberate
++adaptation removes the original uninitialized current transform before its first
++update. Previous position starts at zero. Valid reinitialization clears the prior
++route safely. Source CPlayerObj does not initialize this aggregate; the port keeps
++it uninitialized and silent for players. Original AI InitialUpdate calls Init, but
++that full initialization path is still unported. Only explicit diagnostic actors
++initialize the aggregate currently. Existing AI helpers retain their documented
++current-transform adaptations; this increment does not silently switch their timing
++to the new cache.
++
++Path points are owned vector values, capped at 64, replacing DLinks whose original
++removal leaked separately allocated DVectors. GetNextPathPoint copies the first
++value and preserves output when empty. MoveToNextPathPoint consumes the first and
++returns whether another remains; consuming the last returns false, and an empty
++call is safe. The original accumulated point count is not decremented by consumption
++or consolidation. Term clears points/count but does not disable transform sampling.
++No owner pointer, point pointer or object ownership survives callback removal.
++A returned path span is read-only and expires on mutation/destruction; callers
++needing persistence must copy it and still discard it at world transitions.
++
++## Preserved algorithm
++
++CalculatePath rejects the world origin before clearing the previous route. The
++same preflight preservation applies to invalid coordinates/owner/sample. After
++preflight it clears the route, reads dimensions and uses the cached position.
++ClearToPoint constructs right/forward from direction and cached up. Its width is
++`sqrt(dims.x² + dims.z²) + 0.1`. It checks the right side first, then the left.
++**There is no center ray, swept body, vertical/head clearance or floor test.** A
++thin central obstruction can pass this original test; success is not proof that
++an actor can physically traverse the route.
++
++Clearance ignores the owner and all CBaseCharacter descendants and requires solid
++objects. Its character filter does not exclude glass or VolumeBrush classes.
++Current container services enforce nonsolid volumes; those therefore pass the
++solid-only query. The existing AI visibility filter's glass/liquid rules remain
++separate. Primary-world geometry is never removed by either object filter.
++
++An obstruction yields a point offset along its normal by width minus 0.1.
++FindShortestTurn casts left then right for maximum search distances. A missed
++infinite ray means zero distance, as in source, not unlimited open space. Searches
++start one width away, testing right before left at each increment, with forward
++probe length width+5. A clear side overshoots by another half of the current search
++width and turns facing the opposite side. FindTurn advances along the negated
++obstacle normal, probes the facing direction, and adds an extra forward step after
++a clear probe. On exhaustion it can add an intermediate point and rotate its search;
++the source accumulated-count >=10 rule bounds recursion. Final two-ray clearance
++must succeed before appending the turn and destination. Later failure preserves
++partial points. Callers must check the return/result and must not follow those
++partial routes as success.
++
++ConsolidatePath is optional and is not called by CalculatePath (the source call
++is commented out). It tests cached position to the second point, then successive
++point-to-point shortcuts. These rays have no character/owner filter: even the
++owner's enclosing solid body can prevent the first shortcut. Source removal/order
++and accumulated-count behavior are retained.
++
++## Typed service and safety bounds
++
++CastRay uses the existing collision domain, clipping an infinite direction to the
++first boundary of ±10 million units. It queries primary geometry plus live solid
++objects with the existing closest-hit implementation. CastWorldRay stays primary-only;
++both share endpoint construction. Invalid input, missing collision, hit and miss
++remain distinct. No arbitrary navigation range or invented hit is supplied.
++
++Degenerate direction/up axes, nonfinite/out-of-domain points or direction vectors and negative dimensions
++fail. Searches allow at most 4,096 iterations and 8,192 submitted ray queries per
++operation; diagnostics include the rejected extra attempt when a budget is exceeded.
++Precision-stalled increments fail. Service failure aborts the algorithm rather than
++being interpreted as a clear ray. Public clearance/consolidation start fresh query
++budgets; internal path queries share the entire plan's budget. Outcome/error report
++the last query/plan operation; transform sample validity is shown independently.
++Collision remains the documented replacement engine solver, not verified retail
++physics. These limits are explicit portability/safety adaptations.
++
++## Inspection and remaining scope
++
++The Skeleton panel exposes initialized/sampled state, cached/current-previous
++positions, forward vector, samples/failures, last destination/outcome, remaining
++points versus accumulated count and ray/search work. Hidden/inactive/missing-model
++records remain inspectable. No inspection control moves an actor or runs a query.
++The existing GPU character diagnostic now plans an isolated direct route, samples
++through callbacks and checks results while hidden and after reload. This is labelled
++diagnostic placement; the headless private case separately queries real SubwayA
++spawn geometry through two load/unload cycles.
++
++FindPosAroundObj remains excluded because its required GetPointShade service is
++missing. Original debug-line object spawning, save/restore, autonomous following,
++full AI initialization/update/deactivation, production CivilianAI/CultistAI/Gideon,
++required FX and ExitTrigger remain open. No authored class counts change.
+diff --git a/docs/AI_STATE_CONTRACTS.md b/docs/AI_STATE_CONTRACTS.md
+index 8187d6f..8d7b61f 100644
+--- a/docs/AI_STATE_CONTRACTS.md
++++ b/docs/AI_STATE_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI state decisions and stationary actions
+ 
++> Extended by [CMovement contracts](AI_NAVIGATION_CONTRACTS.md): original cached
++> transforms and obstacle-path calculation are available for explicitly initialized
++> actors. Current-transform adaptations below remain; full AI following is still absent.
++
+ > Extended by [AI command/hearing contracts](AI_TRIGGER_CONTRACTS.md): player sound
+ > alerts, original hearing reactions and selected trigger commands now execute.
+ > Complete production NPCs and M2 remain open.
+diff --git a/docs/M2_AI_NAVIGATION_SOURCES.json b/docs/M2_AI_NAVIGATION_SOURCES.json
+new file mode 100644
+index 0000000..d90a18b
+--- /dev/null
++++ b/docs/M2_AI_NAVIGATION_SOURCES.json
+@@ -0,0 +1,83 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "f71a2d390234e383d4bc38c52eaefd7df7128d5a",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/movement.cpp",
++      "sha256": "673a1f1bfe0f341b94fcb6b24a51a2ba5d817ffc7ef215839b82ab684ee2be26",
++      "selected_lines": [
++        [
++          29,
++          195
++        ],
++        [
++          245,
++          534
++        ]
++      ],
++      "use": "Selected aggregate update, transform cache, two-side clearance, obstacle-turn search and optional consolidation"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/movement.h",
++      "sha256": "ec77ae305932f01b125ec441f148cb7a0a0807ae1c46618d5da8bf99f606d5de",
++      "selected_lines": [
++        [
++          29,
++          114
++        ]
++      ],
++      "use": "Aggregate members, getters, route consumption and lifetime; value ownership replaces leaked vector allocations"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/BaseCharacter.cpp",
++      "sha256": "0002f599c46971e006829e2c41405d872e8fbb08d8ff7590cadd50d91e14aa95",
++      "selected_lines": [
++        [
++          32,
++          36
++        ]
++      ],
++      "use": "Original damage/inventory/movement aggregate order"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/BaseCharacter.h",
++      "sha256": "40160424f0b03f38b2513ba34e9abb44bc27d8a92b5735470d9d995f01d1face",
++      "selected_lines": [
++        [
++          60,
++          68
++        ]
++      ],
++      "use": "Owned original movement aggregate"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
++      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
++      "selected_lines": [
++        [
++          412,
++          477
++        ]
++      ],
++      "use": "GlobalFilterFn IGNORE_CHARACTER, separate from visibility filters"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          2088,
++          2100
++        ]
++      ],
++      "use": "Reference-only initialization dependency; full AI InitialUpdate remains unavailable"
++    }
++  ],
++  "adaptations": [
++    "Explicit valid initial pose, checked identity and sample failures",
++    "Owned bounded path values, safe empty consumption",
++    "Operation-wide loop/ray budgets and finite-domain collision queries",
++    "Degenerate axes and unavailable services fail instead of uninitialized results",
++    "Inspector replaces debug object allocation; shade-based positioning, save/load and full AI initialization remain excluded"
++  ]
++}
+diff --git a/docs/PATH_MANAGER_CONTRACTS.md b/docs/PATH_MANAGER_CONTRACTS.md
+index 7548c2f..8bf078e 100644
+--- a/docs/PATH_MANAGER_CONTRACTS.md
++++ b/docs/PATH_MANAGER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI path snapshots and selection
+ 
++> Extended by [CMovement contracts](AI_NAVIGATION_CONTRACTS.md): original cached
++> transforms and obstacle-path calculation are available for explicitly initialized
++> actors. Current-transform adaptations below remain; full AI following is still absent.
++
+ M2 remains incomplete. Selected PathMgr::BuildPathList/GetPath and
+ PathListData::Copy now replace the shell's earlier ad hoc snapshot. They provide
+ original path selection for future AI callers, not path following, navigation or
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index e38669d..8229c0f 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -552,3 +552,11 @@ ObjectUtilities SendSoundTrigger are integrated, including the original player
+ sound caller. See [source hashes/ranges](M2_AI_TRIGGER_SOURCES.json) and
+ [bounded contracts/adaptations](AI_TRIGGER_CONTRACTS.md). Scripts and full NPCs
+ remain unported; checked snapshots replace mutable callback list traversal.
++
++## M2 original movement aggregate and navigation
++
++Selected ObjectDLL movement.cpp/h cache, clearance, obstacle turns and consolidation
++are integrated with the original CBaseCharacter aggregate order. [Source selections](M2_AI_NAVIGATION_SOURCES.json)
++and [contracts](AI_NAVIGATION_CONTRACTS.md) record initial-sample safety, value
++ownership, bounds and explicit omissions. Full NPC initialization, following and
++shade queries remain unavailable; collision is the existing replacement solver.
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index 128e1f4..e74352a 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -101,6 +101,10 @@ namespace OpenBlood2
+         if (!victim || g.server.SetObjectDims(victim, &dimensions) != DE_OK || !ai->SetNewTarget(victim) ||
+             !ai->RefreshTargetPosition())
+             return false;
++        // Original cache/path service, exercised outside UI. This isolated diagnostic
++        // placement is not a claim of authored NPC navigation or path following.
++        if (!ai->m_MoveObj.Init(h) || !ai->m_MoveObj.CalculatePath({1100, 10000, 0}))
++            return false;
+         ai->m_fHearingDist = 1000;
+         if (!ai->HandleTrigger(victim, "SOUND_TRIGGER 2"))
+             return false;
+@@ -115,7 +119,9 @@ namespace OpenBlood2
+         const auto* ai = r ? dynamic_cast<const AIFireProbe*>(r->game.get()) : nullptr;
+         const auto* target =
+             ai ? dynamic_cast<const AIFireTarget*>(g.server.HandleToObject(ai->diagnostic_target)) : nullptr;
+-        return ai && target && ai->hearing_reactions == 1 && ai->trigger_failures == 0 &&
++        return ai && target && ai->m_MoveObj.sampled && ai->m_MoveObj.samples > 2 &&
++               ai->m_MoveObj.outcome == CMovement::Outcome::Direct && ai->m_MoveObj.path().size() == 1 &&
++               ai->m_MoveObj.failures == 0 && ai->hearing_reactions == 1 && ai->trigger_failures == 0 &&
+                ai->trigger_outcome == AI_Mgr::TriggerOutcome::Heard && ai->fire_shots > 2 &&
+                ai->animation_finishes > 0 && ai->fire_failures == 0 && ai->state_failures == 0 &&
+                ai->key_failures == 0 && ai->audio_starts > 0 && target->damage.m_fHitPoints < 10000 &&
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 9420454..50d45cf 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -58,6 +58,38 @@ namespace OpenBlood2
+         ImGui::TableNextColumn();
+         const auto* r = game.objects.get(skeleton_selection);
+         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
++        const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
++        if (character && ImGui::CollapsingHeader("Original CMovement cache / path", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            const auto& m = character->m_MoveObj;
++            const char* outcomes[]{"None",
++                                   "Direct path",
++                                   "Detour path",
++                                   "Blocked / partial path",
++                                   "Invalid",
++                                   "Unavailable",
++                                   "Budget exhausted / partial path",
++                                   "Clear side rays",
++                                   "Obstructed side ray"};
++            ImGui::Text("Initialized: %s | sampled: %s | %s", m.initialized ? "yes" : "no", m.sampled ? "yes" : "no",
++                        outcomes[static_cast<unsigned>(m.outcome)]);
++            const auto p = m.GetPos(), last = m.GetLastPos(), f = m.GetForwardVector();
++            ImGui::Text("Cache %.2f %.2f %.2f | previous %.2f %.2f %.2f", p.x, p.y, p.z, last.x, last.y, last.z);
++            ImGui::Text("Forward %.2f %.2f %.2f | samples %llu / failed %llu", f.x, f.y, f.z,
++                        (unsigned long long)m.samples, (unsigned long long)m.sample_failures);
++            ImGui::Text("Plans %llu | failures %llu | rays %u / iterations %u", (unsigned long long)m.calculations,
++                        (unsigned long long)m.failures, m.rays, m.iterations);
++            ImGui::Text("Remaining points %zu | source accumulated %u", m.path().size(), m.added_points);
++            ImGui::Text("Requested destination %.2f %.2f %.2f", m.requested_destination.x, m.requested_destination.y,
++                        m.requested_destination.z);
++            for (std::size_t i = 0; i < m.path().size(); ++i)
++                ImGui::Text("%zu: %.2f %.2f %.2f", i, m.path()[i].x, m.path()[i].y, m.path()[i].z);
++            if (!m.error.empty())
++                ImGui::TextWrapped("%s", m.error.c_str());
++            ImGui::TextWrapped("Two side rays only; partial paths are not usable success. Planning does not move an "
++                               "actor. Player cache remains uninitialized, as in source. NPC following, shade-based "
++                               "position selection and full AI_Update remain unavailable.");
++        }
+         if (target_ai && ImGui::CollapsingHeader("Original AI commands / hearing", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& ai = *target_ai;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index b0ce3dd..7dea23e 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -68,6 +68,7 @@ class ServerDE : public CSBase
+     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
+     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
+     virtual float GetWorldTime() = 0;
++    virtual OpenBlood2::SegmentResult CastRay(DVector, DVector, OpenBlood2::SegmentHit&) = 0;
+     virtual OpenBlood2::SegmentResult CastWorldRay(DVector, DVector, OpenBlood2::SegmentHit&) = 0;
+     virtual OpenBlood2::SegmentResult IntersectSegment(
+         DVector from, DVector to, HOBJECT ignore, OpenBlood2::SegmentHit&, bool fire_through = false,
+diff --git a/src/game/original/Movement.cpp b/src/game/original/Movement.cpp
+new file mode 100644
+index 0000000..a6080b7
+--- /dev/null
++++ b/src/game/original/Movement.cpp
+@@ -0,0 +1,343 @@
++// Selected original ObjectDLL/movement.cpp:29-534 (Monolith, 1997/1998).
++#include "Movement.h"
++#include "cpp_engineobjects_de.h"
++#include "engine/collision.h"
++#include <cmath>
++using namespace OpenBlood2;
++namespace
++{
++    bool normalize(DVector v, DVector& out)
++    {
++        const auto length = std::hypot(v.x, v.y, v.z);
++        if (!physics_vector(v) || !std::isfinite(length) || length < 1e-6f)
++            return false;
++        out = vector_scale(v, 1 / length);
++        return true;
++    }
++    DVector cross(DVector a, DVector b)
++    {
++        return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
++    }
++    // Same forward/up construction used by source AlignRotation/GetRotationVectors;
++    // no need to create a quaternion for these local query axes.
++    bool axes(DVector direction, DVector up, DVector& forward, DVector& right)
++    {
++        return normalize(direction, forward) && normalize(cross(up, forward), right);
++    }
++    float distance(DVector a, DVector b)
++    {
++        auto d = vector_subtract(a, b);
++        return std::hypot(d.x, d.y, d.z);
++    }
++} // namespace
++bool CMovement::fail(Outcome status, const char* why)
++{
++    outcome = status;
++    error = why;
++    ++failures;
++    return false;
++}
++bool CMovement::ready()
++{
++    auto* server = BaseClass::GetServerDE();
++    return server && initialized && sampled && server->IsObjectAlive(owner);
++}
++bool CMovement::Init(HOBJECT object)
++{
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(object))
++        return fail(Outcome::Invalid, "Movement initialization requires a live owner");
++    Term();
++    error.clear();
++    outcome = Outcome::None;
++    rays = iterations = 0;
++    owner = object;
++    initialized = true;
++    sampled = false;
++    last_position = {};
++    // Source leaves the initial current transform uninitialized. Sample explicitly
++    // instead of permitting navigation to read indeterminate data on its first tick.
++    if (!Update())
++    {
++        initialized = false;
++        owner = nullptr;
++        return false;
++    }
++    last_position = {};
++    return true;
++}
++void CMovement::Term()
++{
++    points.clear();
++    added_points = 0;
++}
++bool CMovement::Update()
++{
++    auto* server = BaseClass::GetServerDE();
++    DVector pos;
++    DRotation rot;
++    if (!server || !initialized || !server->IsObjectAlive(owner) || server->GetObjectPos(owner, &pos) != DE_OK ||
++        server->GetObjectRotation(owner, &rot) != DE_OK)
++    {
++        ++sample_failures;
++        sampled = false;
++        return fail(Outcome::Unavailable, "Movement owner/transform unavailable");
++    }
++    last_position = sampled ? position : DVector{};
++    position = pos;
++    rotation = rot;
++    right = rotate_vector({1, 0, 0}, rot);
++    up = rotate_vector({0, 1, 0}, rot);
++    forward = rotate_vector({0, 0, 1}, rot);
++    sampled = true;
++    ++samples;
++    return true;
++}
++DDWORD CMovement::EngineMessageFn(LPBASECLASS object, DDWORD message, void* data, DFLOAT value)
++{
++    if (message == MID_UPDATE && initialized)
++        Update();
++    // Save/load is deliberately absent from the bounded interface, not a successful no-op service.
++    return Aggregate::EngineMessageFn(object, message, data, value);
++}
++bool CMovement::GetNextPathPoint(DVector& out) const
++{
++    if (points.empty())
++        return false;
++    out = points.front();
++    return true;
++}
++bool CMovement::MoveToNextPathPoint()
++{
++    if (points.empty())
++        return false;
++    points.erase(points.begin());
++    return !points.empty();
++}
++bool CMovement::add(DVector p)
++{
++    if (!physics_vector(p))
++        return fail(Outcome::Invalid, "Path point outside collision coordinate domain");
++    if (points.size() == max_points)
++        return fail(Outcome::Limit, "Movement path point budget exhausted");
++    points.push_back(p);
++    ++added_points;
++    return true;
++}
++bool CMovement::segment(DVector from, DVector to, SegmentHit& hit, bool clearance)
++{
++    if (++rays > max_rays)
++        return fail(Outcome::Limit, "Movement ray budget exhausted");
++    const auto result = BaseClass::GetServerDE()->IntersectSegment(
++        from, to, clearance ? owner : nullptr, hit, false, SegmentObjects::SolidOnly,
++        clearance ? SegmentFilter::IgnoreCharacters : SegmentFilter::None);
++    if (result == SegmentResult::Invalid || result == SegmentResult::Unavailable)
++        return fail(result == SegmentResult::Invalid ? Outcome::Invalid : Outcome::Unavailable,
++                    "Movement segment service failed");
++    return result == SegmentResult::Hit;
++}
++bool CMovement::cast(DVector from, DVector direction, SegmentHit& hit)
++{
++    if (++rays > max_rays)
++        return fail(Outcome::Limit, "Movement ray budget exhausted");
++    const auto result = BaseClass::GetServerDE()->CastRay(from, direction, hit);
++    if (result == SegmentResult::Invalid || result == SegmentResult::Unavailable)
++        return fail(result == SegmentResult::Invalid ? Outcome::Invalid : Outcome::Unavailable,
++                    "Movement infinite-ray service failed");
++    return result == SegmentResult::Hit;
++}
++bool CMovement::ClearToPoint(DVector start, DVector destination, DVector dimensions, SegmentHit& hit)
++{
++    error.clear();
++    rays = iterations = 0;
++    outcome = Outcome::None;
++    const bool clear = clear_to_point(start, destination, dimensions, hit);
++    if (error.empty())
++        outcome = clear ? Outcome::Clear : Outcome::Obstructed;
++    return clear;
++}
++bool CMovement::clear_to_point(DVector start, DVector destination, DVector dimensions, SegmentHit& hit)
++{
++    hit = {};
++    if (!ready() || !physics_vector(start) || !physics_vector(destination) || !physics_vector(dimensions) ||
++        dimensions.x < 0 || dimensions.y < 0 || dimensions.z < 0)
++        return fail(Outcome::Invalid, "Invalid movement clearance request");
++    DVector f, r;
++    if (!axes(vector_subtract(destination, start), up, f, r))
++        return fail(Outcome::Invalid, "Movement clearance direction/up is degenerate");
++    const float width = std::hypot(dimensions.x, dimensions.z) + .1f;
++    // Source deliberately checks only two side rays, right before left. It is
++    // not a swept body or a check for an obstacle between the two rays.
++    for (auto sign : {1.f, -1.f})
++    {
++        const auto offset = vector_scale(r, sign * width);
++        const bool hit_object = segment(vector_add(start, offset), vector_add(destination, offset), hit, true);
++        if (!error.empty() || hit_object)
++            return false;
++    }
++    return true;
++}
++bool CMovement::shortest_turn(DVector start, DVector& facing, float step, DVector& out)
++{
++    DVector f, r;
++    if (!axes(facing, up, f, r))
++        return fail(Outcome::Invalid, "Obstacle normal/up is degenerate");
++    const auto left = vector_scale(r, -1);
++    SegmentHit hit;
++    float left_distance = 0, right_distance = 0;
++    if (cast(start, left, hit))
++        left_distance = distance(start, hit.point);
++    if (!error.empty())
++        return false;
++    if (cast(start, r, hit))
++        right_distance = distance(start, hit.point);
++    if (!error.empty())
++        return false;
++    const auto extension = vector_scale(f, step + 5);
++    out = start;
++    for (float width = step; !(width >= right_distance && width >= left_distance);)
++    {
++        if (++iterations > max_iterations)
++            return fail(Outcome::Limit, "Movement turn-search budget exhausted");
++        for (unsigned side = 0; side < 2; ++side)
++        {
++            if (width >= (side == 0 ? right_distance : left_distance))
++                continue;
++            const auto axis = side == 0 ? r : left;
++            const auto from = vector_add(start, vector_scale(axis, width));
++            const bool blocked = segment(from, vector_add(from, extension), hit);
++            if (!error.empty())
++                return false;
++            if (!blocked)
++            {
++                out = vector_add(from, vector_scale(axis, width / 2));
++                facing = side == 0 ? left : r;
++                return true;
++            }
++        }
++        const auto next = width + step;
++        if (!(next > width))
++            return fail(Outcome::Limit, "Movement search increment lost precision");
++        width = next;
++    }
++    return true;
++}
++bool CMovement::turn(DVector start, DVector test_direction, DVector move_direction, float step, float test_length,
++                     DVector& out)
++{
++    SegmentHit hit;
++    float maximum = 0;
++    if (cast(start, move_direction, hit))
++        maximum = distance(start, hit.point);
++    if (!error.empty())
++        return false;
++    DVector current = start;
++    float travelled = 0;
++    for (; !((travelled + step) >= maximum);)
++    {
++        if (++iterations > max_iterations)
++            return fail(Outcome::Limit, "Movement recursive-turn budget exhausted");
++        current = vector_add(current, vector_scale(move_direction, step));
++        const bool blocked = segment(current, vector_add(current, vector_scale(test_direction, test_length)), hit);
++        if (!error.empty())
++            return false;
++        if (!blocked)
++        {
++            out = vector_add(current, vector_scale(move_direction, step));
++            return true;
++        }
++        const float next = travelled + step;
++        if (!(next > travelled))
++            return fail(Outcome::Limit, "Movement turn increment lost precision");
++        travelled = next;
++    }
++    if (added_points >= 10 || distance(current, start) <= 0)
++    {
++        out = current;
++        return true;
++    }
++    if (!add(current))
++        return false;
++    return turn(current, move_direction, vector_scale(test_direction, -1), step, (maximum - travelled) + 1, out);
++}
++bool CMovement::CalculatePath(DVector destination)
++{
++    ++calculations;
++    error.clear();
++    outcome = Outcome::None;
++    rays = iterations = 0;
++    requested_destination = destination;
++    // Source rejects the world origin before clearing the old route.
++    if (!ready() || !physics_vector(destination) || distance({}, destination) <= 0)
++        return fail(Outcome::Invalid, "Path requires a sampled live owner and nonzero finite destination");
++    Term();
++    DVector dimensions;
++    if (BaseClass::GetServerDE()->GetObjectDims(owner, &dimensions) != DE_OK)
++        return fail(Outcome::Unavailable, "Path owner dimensions unavailable");
++    const float width = std::hypot(dimensions.x, dimensions.z) + .1f;
++    SegmentHit hit;
++    if (clear_to_point(position, destination, dimensions, hit))
++    {
++        if (!add(destination))
++            return false;
++        outcome = Outcome::Direct;
++        return true;
++    }
++    if (!error.empty())
++        return false;
++    const auto contact = vector_add(hit.point, vector_scale(hit.normal, width - .1f));
++    if (!add(contact))
++        return false;
++    auto normal = vector_scale(hit.normal, -1);
++    auto facing = normal;
++    DVector next;
++    if (!shortest_turn(contact, facing, width, next))
++        return false;
++    if (distance(next, contact) <= 0)
++        return fail(Outcome::Blocked, "No source lateral turn found");
++    if (!add(next) || !turn(next, facing, normal, width, width, next))
++        return false;
++    if (distance(next, destination) <= 0)
++        return fail(Outcome::Blocked, "Source rejects turn coincident with destination");
++    if (!clear_to_point(next, destination, dimensions, hit))
++    {
++        if (!error.empty())
++            return false;
++        return fail(Outcome::Blocked, "Source final detour clearance failed");
++    }
++    if (!add(next) || !add(destination))
++        return false;
++    outcome = Outcome::Detour;
++    return true;
++}
++bool CMovement::ConsolidatePath()
++{
++    error.clear();
++    rays = iterations = 0;
++    if (!ready())
++        return fail(Outcome::Invalid, "Path consolidation requires a live sampled owner");
++    SegmentHit hit;
++    if (points.size() >= 2)
++    {
++        bool blocked = segment(position, points[1], hit);
++        if (!error.empty())
++            return false;
++        if (!blocked)
++            points.erase(points.begin());
++    }
++    std::size_t first = 0, second = 2;
++    while (second < points.size())
++    {
++        bool blocked = segment(points[first], points[second], hit);
++        if (!error.empty())
++            return false;
++        if (!blocked)
++            points.erase(points.begin() + first + 1); // second retains the next source node's new index.
++        else
++        {
++            ++first;
++            ++second;
++        }
++    }
++    return true;
++}
+diff --git a/src/game/original/Movement.h b/src/game/original/Movement.h
+new file mode 100644
+index 0000000..591eb18
+--- /dev/null
++++ b/src/game/original/Movement.h
+@@ -0,0 +1,87 @@
++#pragma once
++#include "cpp_aggregate_de.h"
++#include "game/weapon_messages.h"
++#include <span>
++#include <string>
++#include <vector>
++
++// Original CMovement aggregate and obstacle path algorithm. Not the client MoveMgr.
++// Selected source rules, bounded searches and adaptations: AI_NAVIGATION_CONTRACTS.md.
++class CMovement : public Aggregate
++{
++  public:
++    bool Init(HOBJECT);
++    void Term();
++    bool Update();
++    DVector GetPos() const
++    {
++        return position;
++    }
++    DVector GetLastPos() const
++    {
++        return last_position;
++    }
++    DRotation GetRotation() const
++    {
++        return rotation;
++    }
++    DVector GetRightVector() const
++    {
++        return right;
++    }
++    DVector GetUpVector() const
++    {
++        return up;
++    }
++    DVector GetForwardVector() const
++    {
++        return forward;
++    }
++    bool GetNextPathPoint(DVector&) const;
++    bool MoveToNextPathPoint(); // False on empty or after consuming the last point, as in source.
++    bool CalculatePath(DVector destination);
++    bool ClearToPoint(DVector start, DVector destination, DVector dimensions, OpenBlood2::SegmentHit&);
++    bool ConsolidatePath(); // Original optional method; CalculatePath does not call it.
++    std::span<const DVector> path() const
++    {
++        return points;
++    }
++    enum class Outcome
++    {
++        None,
++        Direct,
++        Detour,
++        Blocked,
++        Invalid,
++        Unavailable,
++        Limit,
++        Clear,
++        Obstructed
++    };
++    Outcome outcome = Outcome::None;
++    std::string error;
++    bool initialized = false, sampled = false;
++    std::uint64_t samples = 0, sample_failures = 0, calculations = 0, failures = 0;
++    unsigned rays = 0, iterations = 0, added_points = 0;
++    DVector requested_destination{};
++    // Original FindTurn stops recursion after ten accumulated points; the typed
++    // service additionally bounds loops/rays, including tiny authored dimensions.
++    static constexpr unsigned max_iterations = 4096, max_rays = 8192, max_points = 64;
++
++  protected:
++    DDWORD EngineMessageFn(LPBASECLASS, DDWORD, void*, DFLOAT) override;
++
++  private:
++    HOBJECT owner = nullptr;
++    DVector position{}, last_position{}, right{1, 0, 0}, up{0, 1, 0}, forward{0, 0, 1};
++    DRotation rotation;
++    std::vector<DVector> points;
++    bool fail(Outcome, const char*);
++    bool ready();
++    bool clear_to_point(DVector, DVector, DVector, OpenBlood2::SegmentHit&);
++    bool add(DVector);
++    bool cast(DVector, DVector, OpenBlood2::SegmentHit&);
++    bool segment(DVector, DVector, OpenBlood2::SegmentHit&, bool clearance = false);
++    bool shortest_turn(DVector, DVector& facing, float, DVector&);
++    bool turn(DVector, DVector, DVector, float, float, DVector&);
++};
+diff --git a/src/game/original/PlayerObj.cpp b/src/game/original/PlayerObj.cpp
+index a43a2f4..bea3db6 100644
+--- a/src/game/original/PlayerObj.cpp
++++ b/src/game/original/PlayerObj.cpp
+@@ -11,7 +11,7 @@ CBaseCharacter::CBaseCharacter() : B2BaseClass(OT_MODEL)
+ {
+     AddAggregate(&m_damage);
+     AddAggregate(&m_InventoryMgr);
+-    // Original m_MoveObj (steering/AI movement) is not imported in this subset.
++    AddAggregate(&m_MoveObj); // Source order; only explicitly initialized owners sample transforms.
+ }
+ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
+ {
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index 6bff1c4..80cad7f 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -4,6 +4,7 @@
+ #include "B2BaseClass.h"
+ #include "Destructable.h"
+ #include "InventoryMgr.h"
++#include "Movement.h"
+ #include "SurfaceTypes.h"
+ #include "dlink.h"
+ #include <array>
+@@ -21,6 +22,7 @@ class CBaseCharacter : public B2BaseClass
+     CBaseCharacter();
+     CInventoryMgr m_InventoryMgr;
+     CDestructable m_damage;
++    CMovement m_MoveObj;
+     CAnim_Sound m_Anim_Sound;
+     std::uint64_t motion_keys = 0, motion_actions = 0, motion_failures = 0;
+     unsigned motion_applied = 0; // RotY, ForwVel, RightVel, UpVel, AddXYZ, DimsXYZ bits.
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 997a2b7..6f70861 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -101,6 +101,7 @@ namespace OpenBlood2
+         }
+         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
+         bool GetMovementState(HOBJECT, MovementState&) override;
++        SegmentResult CastRay(DVector, DVector, SegmentHit&) override;
+         SegmentResult CastWorldRay(DVector, DVector, SegmentHit&) override;
+         SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false,
+                                        SegmentObjects objects = SegmentObjects::SolidOnly,
+diff --git a/src/game/server_sprites.cpp b/src/game/server_sprites.cpp
+index ce9de09..65067be 100644
+--- a/src/game/server_sprites.cpp
++++ b/src/game/server_sprites.cpp
+@@ -4,31 +4,57 @@
+ #include <limits>
+ namespace OpenBlood2
+ {
++    namespace
++    {
++        SegmentResult ray_end(DVector from, DVector direction, DVector& to)
++        {
++            if (!physics_vector(from) || !physics_vector(direction))
++                return SegmentResult::Invalid;
++            const double length = std::sqrt(double(direction.x) * direction.x + double(direction.y) * direction.y +
++                                            double(direction.z) * direction.z);
++            if (length < 1e-8)
++                return SegmentResult::Invalid;
++            // Clip an infinite ray to the same finite domain accepted by collision.
++            double distance = std::numeric_limits<double>::infinity();
++            const double d[3]{direction.x / length, direction.y / length, direction.z / length};
++            const double f[3]{from.x, from.y, from.z};
++            for (unsigned i = 0; i < 3; ++i)
++                if (d[i] != 0)
++                    distance = std::min(distance, ((d[i] > 0 ? 1e7 : -1e7) - f[i]) / d[i]);
++            if (!(distance > 0))
++                return SegmentResult::Miss;
++            to = DVector{float(std::clamp(f[0] + distance * d[0], -1e7, 1e7)),
++                         float(std::clamp(f[1] + distance * d[1], -1e7, 1e7)),
++                         float(std::clamp(f[2] + distance * d[2], -1e7, 1e7))};
++            return SegmentResult::Hit; // A valid bounded segment, not an intersection result.
++        }
++    } // namespace
++    SegmentResult ServerAdapter::CastRay(DVector from, DVector direction, SegmentHit& out)
++    {
++        trace_service("CastRay (solid world and objects)");
++        out = {};
++        DVector to;
++        const auto bound = ray_end(from, direction, to);
++        if (bound == SegmentResult::Invalid)
++            return bound;
++        if (!collision || !collision_ready)
++            return SegmentResult::Unavailable;
++        if (bound != SegmentResult::Hit)
++            return bound;
++        return IntersectSegment(from, to, nullptr, out);
++    }
+     SegmentResult ServerAdapter::CastWorldRay(DVector from, DVector direction, SegmentHit& out)
+     {
+         trace_service("CastWorldRay");
+         out = {};
+-        if (!physics_vector(from) || !physics_vector(direction))
+-            return SegmentResult::Invalid;
+-        const double length = std::sqrt(double(direction.x) * direction.x + double(direction.y) * direction.y +
+-                                        double(direction.z) * direction.z);
+-        if (length < 1e-8)
+-            return SegmentResult::Invalid;
++        DVector to;
++        const auto bound = ray_end(from, direction, to);
++        if (bound == SegmentResult::Invalid)
++            return bound;
+         if (!collision || !collision_ready)
+             return SegmentResult::Unavailable;
+-        // Clip an infinite ray to the same finite domain accepted by collision.
+-        // The original query omits INTERSECT_OBJECTS, so dynamic objects are excluded.
+-        double distance = std::numeric_limits<double>::infinity();
+-        const double d[3]{direction.x / length, direction.y / length, direction.z / length};
+-        const double f[3]{from.x, from.y, from.z};
+-        for (unsigned i = 0; i < 3; ++i)
+-            if (d[i] != 0)
+-                distance = std::min(distance, ((d[i] > 0 ? 1e7 : -1e7) - f[i]) / d[i]);
+-        if (!(distance > 0))
+-            return SegmentResult::Miss;
+-        DVector to{float(std::clamp(f[0] + distance * d[0], -1e7, 1e7)),
+-                   float(std::clamp(f[1] + distance * d[1], -1e7, 1e7)),
+-                   float(std::clamp(f[2] + distance * d[2], -1e7, 1e7))};
++        if (bound != SegmentResult::Hit)
++            return bound;
+         CollisionHit hit;
+         const auto result = collision->sweep(from, to, {}, hit);
+         if (result == CollisionQuery::Invalid)
+diff --git a/src/game/server_weapons.cpp b/src/game/server_weapons.cpp
+index 22ca4ee..7bc5a46 100644
+--- a/src/game/server_weapons.cpp
++++ b/src/game/server_weapons.cpp
+@@ -1,6 +1,7 @@
+ #include "engine/world_model.h"
+ #include "game/original/DestructableBrush.h"
+ #include "game/original/Door.h"
++#include "game/original/PlayerObj.h"
+ #include "game/original/SurfaceTypes.h"
+ #include "game/original/VolumeBrush.h"
+ #include "game/server_adapter.h"
+@@ -14,7 +15,8 @@ namespace OpenBlood2
+         trace_service("IntersectSegment");
+         out = {};
+         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
+-        if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility) ||
++        if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility &&
++             filter != SegmentFilter::IgnoreCharacters) ||
+             (objects != SegmentObjects::SolidOnly && objects != SegmentObjects::SolidOrRayHit &&
+              objects != SegmentObjects::All) ||
+             !physics_vector(from) || !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
+@@ -47,6 +49,8 @@ namespace OpenBlood2
+                 (dynamic_cast<const VolumeBrush*>(record->game.get()) ||
+                  (brush && brush->destructable && brush->GetSurfaceType() == SURFTYPE_GLASS)))
+                 continue;
++            if (filter == SegmentFilter::IgnoreCharacters && dynamic_cast<const CBaseCharacter*>(record->game.get()))
++                continue;
+             if (fire_through && ((door && door->fire_through) || (brush && brush->fire_through)))
+                 continue;
+             CollisionHit hit;
+diff --git a/src/game/weapon_messages.h b/src/game/weapon_messages.h
+index 8974e76..2758ea4 100644
+--- a/src/game/weapon_messages.h
++++ b/src/game/weapon_messages.h
+@@ -47,7 +47,8 @@ namespace OpenBlood2
+     enum class SegmentFilter
+     {
+         None,
+-        AIVisibility // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
++        AIVisibility,    // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
++        IgnoreCharacters // Original CMovement clearance filter.
+     };
+     enum class SegmentResult
+     {
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index bf17eda..7f5fee5 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -700,3 +700,15 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME ai_trigger.subway COMMAND ai_trigger_tests subway "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(ai_trigger.subway PROPERTIES LABELS "headless;private;ai_trigger" TIMEOUT 90)
+ endif()
++
++add_executable(ai_navigation_tests ai_navigation_tests.cpp)
++target_link_libraries(ai_navigation_tests PRIVATE blood2_game)
++blood2_project_options(ai_navigation_tests)
++foreach(case IN ITEMS sample clearance rays direct detour blocked limits lifetime)
++    add_test(NAME ai_navigation.${case} COMMAND ai_navigation_tests "${case}")
++    set_tests_properties(ai_navigation.${case} PROPERTIES LABELS "headless;ai_navigation" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME ai_navigation.subway COMMAND ai_navigation_tests subway "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(ai_navigation.subway PROPERTIES LABELS "headless;private;ai_navigation" TIMEOUT 90)
++endif()
+diff --git a/tests/ai_navigation_tests.cpp b/tests/ai_navigation_tests.cpp
+new file mode 100644
+index 0000000..b3fbfc4
+--- /dev/null
++++ b/tests/ai_navigation_tests.cpp
+@@ -0,0 +1,342 @@
++#include "brush_fixture.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/SurfaceTypes.h"
++#include "game/server_adapter.h"
++#include <cmath>
++#include <functional>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .002f;
++    }
++    bool same(DVector a, DVector b)
++    {
++        return near(a.x, b.x) && near(a.y, b.y) && near(a.z, b.z);
++    }
++    bool setup(GameSession& g)
++    {
++        CHECK(g.objects.find_class("BaseClass") || g.initialize());
++        auto floor = test_brush::box("floor", {-1000, -20, -1000}, {1000, -10, 1000});
++        for (auto& s : floor.surfaces)
++            s.flags = 1;
++        std::string error;
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        return true;
++    }
++    struct Probe : AI_Mgr
++    {
++        DVector before{};
++        DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
++        {
++            if (m == MID_UPDATE)
++                before = m_MoveObj.GetPos();
++            return AI_Mgr::EngineMessageFn(m, d, f);
++        }
++    };
++    Probe* actor(GameSession& g, DVector pos = {0, 10, 0})
++    {
++        static const ClassInfo type{"AINavigationProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<Probe>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Pos = pos;
++        s.m_Flags = FLAG_SOLID;
++        auto h = g.objects.create(&type, s);
++        auto* r = g.objects.get(h);
++        if (!r)
++            return nullptr;
++        r->dimensions = {1, 2, 1};
++        return dynamic_cast<Probe*>(r->game.get());
++    }
++    HOBJECT box(GameSession& g, DVector p, DVector d)
++    {
++        ObjectCreateStruct s;
++        s.m_Pos = p;
++        s.m_Flags = FLAG_SOLID;
++        auto h = g.objects.create(g.objects.find_class("BaseClass"), s);
++        if (h)
++            g.server.SetObjectDims(h, &d);
++        return h;
++    }
++    bool sample(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto& m = a->m_MoveObj;
++        CHECK(!m.initialized && !m.sampled);
++        CHECK(g.objects.advance(.01f));
++        CHECK(m.samples == 0 && m.sample_failures == 0);
++        CHECK(m.Init(a->m_hObject) && same(m.GetPos(), {0, 10, 0}) && same(m.GetLastPos(), {}));
++        auto* r = g.objects.get(a->m_hObject);
++        r->state.m_Pos = {10, 20, 30};
++        CHECK(same(m.GetPos(), {0, 10, 0})); // Cached, not an implicit current-position query.
++        g.server.SetNextUpdate(a->m_hObject, .001f);
++        CHECK(g.objects.advance(.01f));
++        CHECK(same(a->before, {0, 10, 0}) && same(m.GetPos(), {10, 20, 30}) && same(m.GetLastPos(), {0, 10, 0}));
++        CHECK(m.samples == 2 && same(r->state.m_Pos, {10, 20, 30})); // Cache never integrates physics.
++        r->activity = OBJSTATE_INACTIVE;
++        r->state.m_Pos.x = 15;
++        g.server.SetNextUpdate(a->m_hObject, .001f);
++        CHECK(g.objects.advance(.01f));
++        CHECK(m.samples == 2);
++        const auto rot = rotation_from_euler({0, 1.57079632679f, 0});
++        r->state.m_Rotation = rot;
++        CHECK(m.Update() && same(m.GetForwardVector(), {1, 0, 0}) && same(m.GetRightVector(), {0, 0, -1}));
++        CHECK(m.CalculatePath({20, 20, 30}) && m.Init(a->m_hObject) && m.path().empty());
++        CHECK(g.objects.remove(a->m_hObject) && !m.Update() && !m.sampled && m.sample_failures == 1);
++        CHECK(!m.CalculatePath({20, 20, 30}));
++        CHECK(g.objects.finish_frame());
++        return true;
++    }
++    bool clearance(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a && a->m_MoveObj.Init(a->m_hObject));
++        auto& m = a->m_MoveObj;
++        SegmentHit hit;
++        const DVector start{0, 10, 0}, end{0, 10, 100}, dims{1, 2, 1};
++        CHECK(m.ClearToPoint(start, end, dims, hit) && m.rays == 2 && m.outcome == CMovement::Outcome::Clear);
++        auto center = box(g, {0, 10, 50}, {.1f, 5, 1});
++        CHECK(center && m.ClearToPoint(start, end, dims, hit)); // Source has no center ray.
++        auto right = box(g, {1.5f, 10, 60}, {.2f, 5, 1});
++        auto left = box(g, {-1.5f, 10, 20}, {.2f, 5, 1});
++        CHECK(right && left);
++        CHECK(!m.ClearToPoint(start, end, dims, hit) && hit.object == right && m.rays == 1 && m.error.empty());
++        CHECK(g.objects.remove(right));
++        CHECK(!m.ClearToPoint(start, end, dims, hit) && hit.object == left && m.rays == 2);
++        CHECK(g.objects.remove(left) && g.objects.remove(center) && g.objects.finish_frame());
++        auto* character = actor(g, {0, 10, 50});
++        CHECK(character);
++        g.objects.get(character->m_hObject)->dimensions = {5, 5, 5};
++        CHECK(m.ClearToPoint(start, end, dims, hit)); // Every CBaseCharacter descendant is filtered.
++        CHECK(g.server.IntersectSegment(start, end, a->m_hObject, hit) == SegmentResult::Hit &&
++              hit.object == character->m_hObject);
++        // Unlike AI visibility, the character filter itself excludes neither glass nor volumes.
++        for (const char* type : {"CDestructableBrush", "Water"})
++        {
++            const auto name = std::string("navigation-") + type;
++            g.world.models.push_back(test_brush::box(name, {-5, 5, 45}, {5, 15, 55}));
++            Properties props{{"Name", name}, {"Flags", std::int32_t(FLAG_SOLID)}};
++            if (std::string_view(type) == "CDestructableBrush")
++            {
++                props["HitPoints"] = 10.f;
++                props["SurfaceType"] = std::int32_t(SURFTYPE_GLASS);
++            }
++            auto h = g.objects.create(g.objects.find_class(type), {}, Creation::World, props);
++            CHECK(h);
++            if (std::string_view(type) == "CDestructableBrush")
++                CHECK(!m.ClearToPoint(start, end, dims, hit) && hit.object == h);
++            else
++            {
++                CHECK(!(g.server.GetObjectFlags(h) & FLAG_SOLID) && m.ClearToPoint(start, end, dims, hit));
++                CHECK(g.server.IntersectSegment(start, end, a->m_hObject, hit, false, SegmentObjects::SolidOrRayHit,
++                                                SegmentFilter::IgnoreCharacters) == SegmentResult::Hit &&
++                      hit.object == h);
++            }
++            CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        }
++        g.server.collision_ready = false;
++        CHECK(!m.ClearToPoint(start, end, dims, hit) && m.outcome == CMovement::Outcome::Unavailable);
++        g.server.collision_ready = true;
++        CHECK(m.ClearToPoint(start, end, dims, hit) && m.error.empty() && m.rays == 2);
++        CHECK(!m.ClearToPoint(start, start, dims, hit) && m.outcome == CMovement::Outcome::Invalid);
++        CHECK(!m.ClearToPoint(start, {0, 100, 0}, dims, hit)); // Direction parallel to up has no defined side axis.
++        CHECK(!m.ClearToPoint(start, end, {-1, 2, 1}, hit));
++        return true;
++    }
++    bool rays(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        SegmentHit hit;
++        auto b = box(g, {0, 10, 50}, {2, 2, 2});
++        CHECK(b);
++        CHECK(g.server.CastRay({0, 10, 0}, {0, 0, 4}, hit) == SegmentResult::Hit && hit.object == b &&
++              near(hit.point.z, 48));
++        CHECK(g.server.CastWorldRay({0, 10, 0}, {0, 0, 4}, hit) == SegmentResult::Miss);
++        CHECK(g.server.CastRay({0, 10, 0}, {0, -1, 0}, hit) == SegmentResult::Hit && !hit.object &&
++              near(hit.point.y, -10));
++        CHECK(g.server.CastRay({1e7f, 0, 0}, {1, 0, 0}, hit) == SegmentResult::Miss);
++        CHECK(g.server.CastRay({1e7f, 0, 0}, {-1, 0, 0}, hit) == SegmentResult::Miss);
++        CHECK(g.server.CastRay({}, {}, hit) == SegmentResult::Invalid);
++        CHECK(g.server.CastRay({}, {NAN, 0, 1}, hit) == SegmentResult::Invalid);
++        g.server.collision_ready = false;
++        CHECK(g.server.CastRay({0, 10, 0}, {0, 0, 1}, hit) == SegmentResult::Unavailable);
++        CHECK(g.server.CastRay({}, {}, hit) == SegmentResult::Invalid);
++        return true;
++    }
++    bool direct(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto& m = a->m_MoveObj;
++        CHECK(!m.CalculatePath({0, 10, 100}) && m.path().empty());
++        CHECK(m.Init(a->m_hObject));
++        CHECK(m.CalculatePath({0, 10, 100}) && m.outcome == CMovement::Outcome::Direct && m.rays == 2 &&
++              m.path().size() == 1);
++        DVector p{7, 7, 7};
++        CHECK(m.GetNextPathPoint(p) && same(p, {0, 10, 100}));
++        CHECK(!m.CalculatePath({}) && m.path().size() == 1 && m.rays == 0);
++        CHECK(!m.CalculatePath({INFINITY, 0, 0}) && m.path().size() == 1);
++        CHECK(!m.MoveToNextPathPoint() && m.path().empty() && m.added_points == 1);
++        p = {7, 7, 7};
++        CHECK(!m.GetNextPathPoint(p) && same(p, {7, 7, 7}) && !m.MoveToNextPathPoint());
++        CHECK(m.CalculatePath({0, 10, 100}));
++        g.server.collision_ready = false;
++        CHECK(!m.CalculatePath({0, 10, 100}) && m.outcome == CMovement::Outcome::Unavailable && m.path().empty());
++        g.server.collision_ready = true;
++        CHECK(m.CalculatePath({0, 10, 100}));
++        m.Term();
++        CHECK(m.path().empty() && m.added_points == 0);
++        return true;
++    }
++    bool walls(GameSession& g)
++    {
++        CHECK(box(g, {-100, 10, 100}, {1, 10, 200}));
++        CHECK(box(g, {100, 10, 100}, {1, 10, 200}));
++        CHECK(box(g, {0, 10, 200}, {100, 10, 1}));
++        return true;
++    }
++    bool detour(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a && a->m_MoveObj.Init(a->m_hObject));
++        auto& m = a->m_MoveObj;
++        auto obstacle = box(g, {0, 10, 20.25f}, {4, 5, .25f});
++        CHECK(obstacle && walls(g));
++        CHECK(m.CalculatePath({0, 10, 100}) && m.outcome == CMovement::Outcome::Detour && m.path().size() == 4);
++        const auto width = std::sqrt(2.f) + .1f;
++        CHECK(same(m.path()[0], {width, 10, 20 - std::sqrt(2.f)}));
++        CHECK(same(m.path()[1], {4 * width, 10, 20 - std::sqrt(2.f)})); // Right chosen first, 1.5 * 2-width overshoot.
++        CHECK(same(m.path()[2], {4 * width, 10, 20 - std::sqrt(2.f) + 2 * width})); // One extra forward step.
++        CHECK(m.added_points == 4 && m.iterations == 3 && m.rays == 10);
++        // Consolidation uses unfiltered solid rays: the owner's enclosing box blocks the first shortcut.
++        CHECK(g.objects.remove(obstacle) && g.objects.finish_frame());
++        CHECK(m.ConsolidatePath() && m.path().size() == 2 && m.added_points == 4);
++        CHECK(same(m.path().front(), {width, 10, 20 - std::sqrt(2.f)}) && same(m.path().back(), {0, 10, 100}));
++        CHECK(m.MoveToNextPathPoint() && !m.MoveToNextPathPoint() && m.path().empty());
++        return true;
++    }
++    bool blocked(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a && a->m_MoveObj.Init(a->m_hObject));
++        auto& m = a->m_MoveObj;
++        CHECK(box(g, {0, 10, 25}, {4, 5, 5}));
++        CHECK(!m.CalculatePath({0, 10, 100}) && m.outcome == CMovement::Outcome::Blocked && m.path().size() == 1);
++        CHECK(m.rays == 3); // Missing lateral hits mean zero search range, not unlimited free space.
++        CHECK(walls(g));
++        CHECK(!m.CalculatePath({0, 10, 100}) && m.outcome == CMovement::Outcome::Blocked && m.path().size() == 2);
++        CHECK(m.error == "Source final detour clearance failed");
++        return true;
++    }
++    bool limits(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a && a->m_MoveObj.Init(a->m_hObject));
++        auto& m = a->m_MoveObj;
++        g.objects.get(a->m_hObject)->dimensions = {.1f, 0, .1f};
++        CHECK(box(g, {0, 10, 25}, {10000, 5, 5}));
++        CHECK(box(g, {20000, 10, 0}, {1, 5, 200}) && box(g, {-20000, 10, 0}, {1, 5, 200}));
++        CHECK(!m.CalculatePath({0, 10, 100}) && m.outcome == CMovement::Outcome::Limit);
++        CHECK(m.rays <= m.max_rays + 1 && m.iterations <= m.max_iterations + 1 && m.path().size() == 1 &&
++              !m.error.empty());
++        std::cout << "bounded search: " << m.rays << " ray attempts, " << m.iterations << " iterations\n";
++        return true;
++    }
++    bool lifetime(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        HOBJECT old = nullptr;
++        for (int cycle = 0; cycle < 4; ++cycle)
++        {
++            auto* a = actor(g);
++            CHECK(a && a->m_MoveObj.Init(a->m_hObject));
++            CHECK(!g.objects.get(old));
++            old = a->m_hObject;
++            for (int i = 0; i < 1000; ++i)
++            {
++                CHECK(a->m_MoveObj.CalculatePath({0, 10, 100}));
++                CHECK(!a->m_MoveObj.MoveToNextPathPoint());
++            }
++            CHECK(a->m_MoveObj.CalculatePath({0, 10, 100}));
++            CMovement external;
++            CHECK(external.Init(old));
++            CHECK(g.objects.remove(old) && !a->m_MoveObj.CalculatePath({0, 10, 100}));
++            CHECK(g.unload_world() && !g.objects.get(old) && !external.Update() &&
++                  !external.CalculatePath({0, 10, 100}));
++            CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++            CHECK(setup(g));
++        }
++        return true;
++    }
++    bool subway(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            auto* p = g.server_shell.Player(g.local_client);
++            CHECK(p);
++            CHECK(!p->m_MoveObj.initialized); // Source CPlayerObj does not initialize this AI cache.
++            const auto pos = g.objects.get(p->m_hObject)->state.m_Pos;
++            auto* a = actor(g, pos);
++            CHECK(a && a->m_MoveObj.Init(a->m_hObject));
++            auto* r = g.objects.get(a->m_hObject);
++            CHECK(g.models.load("models/enemies/m_cultist1.abc", r->model, error));
++            CHECK(a->m_MoveObj.CalculatePath(vector_add(pos, {0, 0, 1})) &&
++                  a->m_MoveObj.outcome == CMovement::Outcome::Direct);
++            CHECK(a->m_MoveObj.path().size() == 1 && a->m_MoveObj.rays == 2);
++            std::cout << "cycle=" << cycle << " real SubwayA local clearance at " << pos.x << ' ' << pos.y << ' '
++                      << pos.z << "\n";
++            CHECK(g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::map<std::string, std::function<bool(const char*)>> tests{
++        {"sample", sample},   {"clearance", clearance}, {"rays", rays},         {"direct", direct}, {"detour", detour},
++        {"blocked", blocked}, {"limits", limits},       {"lifetime", lifetime}, {"subway", subway}};
++    auto i = tests.find(argv[1]);
++    return i != tests.end() && i->second(argc > 2 ? argv[2] : "") ? 0 : 1;
++}

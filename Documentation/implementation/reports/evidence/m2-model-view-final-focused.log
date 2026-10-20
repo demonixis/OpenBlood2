@@ -1,0 +1,20 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 344: model_view.sample
+1/5 Test #344: model_view.sample ................   Passed    0.00 sec
+    Start 345: model_view.rejects
+2/5 Test #345: model_view.rejects ...............   Passed    0.00 sec
+    Start 346: model_view.weapon_pose
+3/5 Test #346: model_view.weapon_pose ...........   Passed    0.00 sec
+    Start 347: model_view.legacy_pose
+4/5 Test #347: model_view.legacy_pose ...........   Passed    0.00 sec
+    Start 348: model_view.subway
+5/5 Test #348: model_view.subway ................   Passed    0.58 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+headless      =   0.58 sec*proc (5 tests)
+model_view    =   0.58 sec*proc (5 tests)
+private       =   0.58 sec*proc (1 test)
+
+Total Test time (real) =   0.59 sec

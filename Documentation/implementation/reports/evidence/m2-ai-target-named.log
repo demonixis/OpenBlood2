@@ -1,0 +1,21 @@
+324/332 Testing: ai_target.named
+324/332 Test: ai_target.named
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests" "named"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_target.named" start time: Oct 16 08:07 CEST
+Output:
+----------------------------------------------------------
+FindNamedObjects=6
+RelinquishList=6
+CreateInterObjectLink=3
+BreakInterObjectLink=2
+GetObjectPos=10
+GetObjectRotation=5
+SetObjectRotation=4
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.named" end time: Oct 16 08:07 CEST
+"ai_target.named" time elapsed: 00:00:00
+----------------------------------------------------------

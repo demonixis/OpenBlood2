@@ -1,0 +1,15 @@
+[0/2] Re-checking globbed directories...
+[1/155] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_projectiles.cpp for CXX dependencies
+[2/155] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[3/15] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_projectiles.cpp.o
+[4/15] Linking CXX static library libblood2_game.a
+[5/15] Linking CXX executable tests/object_contract_tests
+[6/15] Linking CXX executable tests/world_tests
+[7/15] Linking CXX executable tests/services_tests
+[8/15] Linking CXX executable tests/weapon_tests
+[9/15] Linking CXX executable tests/weapon_drop_tests
+[10/15] Linking CXX executable tests/inventory_state_tests
+[11/15] Linking CXX executable tests/energy_tests
+[12/15] Linking CXX executable tests/mac10_tests
+[13/15] Linking CXX executable tests/flare_tests
+[14/15] Linking CXX executable tests/assault_tests

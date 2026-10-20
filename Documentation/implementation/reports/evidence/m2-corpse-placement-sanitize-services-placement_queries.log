@@ -1,0 +1,14 @@
+50/646 Testing: services.placement_queries
+50/646 Test: services.placement_queries
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "placement_queries"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.placement_queries" start time: Oct 17 04:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"services.placement_queries" end time: Oct 17 04:30 CEST
+"services.placement_queries" time elapsed: 00:00:00
+----------------------------------------------------------

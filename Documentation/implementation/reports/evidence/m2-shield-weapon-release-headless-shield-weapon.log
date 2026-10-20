@@ -1,0 +1,15 @@
+659/664 Testing: shield.weapon
+659/664 Test: shield.weapon
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/shield_tests" "weapon" "/home/yann/projects/lithtech/Blood2/build/release/tests/shield-weapon"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"shield.weapon" start time: Oct 17 02:03 CEST
+Output:
+----------------------------------------------------------
+Both shield modes publish original FX/audio, no collision/damage/armor/ammo mutation; failed FX remains visible, player acquisition refused.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"shield.weapon" end time: Oct 17 02:03 CEST
+"shield.weapon" time elapsed: 00:00:00
+----------------------------------------------------------

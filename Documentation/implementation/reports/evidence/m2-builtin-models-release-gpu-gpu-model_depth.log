@@ -1,0 +1,16 @@
+361/707 Testing: gpu.model_depth
+361/707 Test: gpu.model_depth
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/model_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/model-depth.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.model_depth" start time: Oct 17 04:47 CEST
+Output:
+----------------------------------------------------------
+Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+<end of output>
+Test time =   0.46 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.model_depth" end time: Oct 17 04:47 CEST
+"gpu.model_depth" time elapsed: 00:00:00
+----------------------------------------------------------

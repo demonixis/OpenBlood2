@@ -1,0 +1,17 @@
+645/647 Testing: energy.private
+645/647 Test: energy.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/energy_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"energy.private" start time: Oct 17 01:22 CEST
+Output:
+----------------------------------------------------------
+Private loop 0: SPR SpriteTextures\yellowflare2.dtx, primary and Tesla impact WAV, radius deliveries 7, isolated rehearsal retains projectile.
+Private loop 1: SPR SpriteTextures\yellowflare2.dtx, primary and Tesla impact WAV, radius deliveries 7, isolated rehearsal retains projectile.
+Private loop 2: SPR SpriteTextures\yellowflare2.dtx, primary and Tesla impact WAV, radius deliveries 7, isolated rehearsal retains projectile.
+<end of output>
+Test time =   3.00 sec
+----------------------------------------------------------
+Test Passed.
+"energy.private" end time: Oct 17 01:22 CEST
+"energy.private" time elapsed: 00:00:02
+----------------------------------------------------------

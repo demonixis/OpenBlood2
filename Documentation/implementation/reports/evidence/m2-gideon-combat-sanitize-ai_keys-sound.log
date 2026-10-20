@@ -1,0 +1,14 @@
+274/618 Testing: ai_keys.sound
+274/618 Test: ai_keys.sound
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_model_key_tests" "sound" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-key-fixtures/sound"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_keys.sound" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"ai_keys.sound" end time: Oct 17 02:23 CEST
+"ai_keys.sound" time elapsed: 00:00:00
+----------------------------------------------------------

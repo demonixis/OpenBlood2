@@ -1,0 +1,7 @@
+[0/2] Re-checking globbed directories...
+[1/7] Scanning <workspace>/Blood2/tests/polygrid_tests.cpp for CXX dependencies
+[2/7] Scanning <workspace>/Blood2/src/app/polygrid_scene.cpp for CXX dependencies
+[3/7] Generating CXX dyndep file tests/CMakeFiles/polygrid_tests.dir/CXX.dd
+[4/7] Building CXX object tests/CMakeFiles/polygrid_tests.dir/__/src/app/polygrid_scene.cpp.o
+[5/7] Building CXX object tests/CMakeFiles/polygrid_tests.dir/polygrid_tests.cpp.o
+[6/7] Linking CXX executable tests/polygrid_tests

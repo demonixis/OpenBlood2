@@ -1,0 +1,128 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 848: screen_fade.private
+      Start 630: player_controls.corpse_clearance
+ 1/56 Test #630: player_controls.corpse_clearance ...   Passed   85.88 sec
+      Start 843: coverage.private
+ 2/56 Test #848: screen_fade.private ................   Passed  158.14 sec
+      Start 629: player_controls.combat
+ 3/56 Test #843: coverage.private ...................   Passed   86.13 sec
+      Start 631: player_controls.private
+ 4/56 Test #631: player_controls.private ............   Passed   21.48 sec
+      Start  45: world.level_change_private
+ 5/56 Test  #45: world.level_change_private .........   Passed   22.99 sec
+      Start 841: coverage.catalog
+ 6/56 Test #629: player_controls.combat .............   Passed   59.79 sec
+      Start  46: world.destination_trial_private
+ 7/56 Test #841: coverage.catalog ...................   Passed    4.54 sec
+      Start  47: world.destination_private
+ 8/56 Test  #47: world.destination_private ..........   Passed   12.64 sec
+      Start 561: player_restore.private
+ 9/56 Test  #46: world.destination_trial_private ....   Passed   22.45 sec
+      Start  28: world.surface_effects
+10/56 Test #561: player_restore.private .............   Passed    6.76 sec
+      Start  48: world.private
+11/56 Test  #28: world.surface_effects ..............   Passed    0.92 sec
+      Start  29: world.destination_trials
+12/56 Test  #29: world.destination_trials ...........   Passed    0.17 sec
+      Start  27: world.level_change
+13/56 Test  #27: world.level_change .................   Passed    0.26 sec
+      Start  41: world.mutations
+14/56 Test  #41: world.mutations ....................   Passed    0.21 sec
+      Start  49: cli.world_modes
+15/56 Test  #48: world.private ......................   Passed    4.05 sec
+      Start  32: world.destination_lifetime
+16/56 Test  #32: world.destination_lifetime .........   Passed    0.07 sec
+      Start 847: screen_fade.session
+17/56 Test #847: screen_fade.session ................   Passed    0.06 sec
+      Start  34: world.sound_entries
+18/56 Test  #34: world.sound_entries ................   Passed    0.04 sec
+      Start  33: world.sprite_entries
+19/56 Test  #33: world.sprite_entries ...............   Passed    0.04 sec
+      Start  40: world.world_rejection
+20/56 Test  #40: world.world_rejection ..............   Passed    0.06 sec
+      Start  31: world.destination_schema
+21/56 Test  #31: world.destination_schema ...........   Passed    0.02 sec
+      Start 559: player_restore.failures
+22/56 Test #559: player_restore.failures ............   Passed    0.09 sec
+      Start 842: coverage.observations
+23/56 Test #842: coverage.observations ..............   Passed    0.02 sec
+      Start  30: world.destination_messages
+24/56 Test  #30: world.destination_messages .........   Passed    0.02 sec
+      Start 560: player_restore.lifetime
+25/56 Test #560: player_restore.lifetime ............   Passed    0.09 sec
+      Start 628: player_controls.entry
+26/56 Test #628: player_controls.entry ..............   Passed    0.02 sec
+      Start 626: player_controls.mouse
+27/56 Test #626: player_controls.mouse ..............   Passed    0.02 sec
+      Start 625: player_controls.keys
+28/56 Test #625: player_controls.keys ...............   Passed    0.02 sec
+      Start 627: player_controls.gates
+29/56 Test #627: player_controls.gates ..............   Passed    0.02 sec
+      Start 846: screen_fade.values
+30/56 Test #846: screen_fade.values .................   Passed    0.02 sec
+      Start 558: player_restore.roundtrip
+31/56 Test #558: player_restore.roundtrip ...........   Passed    0.05 sec
+      Start  42: world.session_lifecycle
+32/56 Test  #42: world.session_lifecycle ............   Passed    0.03 sec
+      Start  44: world.original_trigger
+33/56 Test  #44: world.original_trigger .............   Passed    0.02 sec
+      Start  39: world.world_geometry
+34/56 Test  #39: world.world_geometry ...............   Passed    0.02 sec
+      Start  38: world.world_properties
+35/56 Test  #38: world.world_properties .............   Passed    0.02 sec
+      Start  37: world.resource_mount
+36/56 Test  #37: world.resource_mount ...............   Passed    0.02 sec
+      Start  36: world.rez_rejection
+37/56 Test  #36: world.rez_rejection ................   Passed    0.02 sec
+      Start  43: world.session_messages
+38/56 Test  #43: world.session_messages .............   Passed    0.02 sec
+      Start  35: world.rez_structure
+39/56 Test  #35: world.rez_structure ................   Passed    0.02 sec
+      Start   1: objects.builtin_model
+40/56 Test   #1: objects.builtin_model ..............   Passed    0.02 sec
+      Start  13: objects.unsupported_teardown
+41/56 Test  #13: objects.unsupported_teardown .......   Passed    0.05 sec
+      Start  10: objects.messages_strings
+42/56 Test  #10: objects.messages_strings ...........   Passed    0.04 sec
+      Start  14: objects.creation_failures
+43/56 Test  #14: objects.creation_failures ..........   Passed    0.04 sec
+      Start   4: objects.reasons_properties
+44/56 Test   #4: objects.reasons_properties .........   Passed    0.02 sec
+      Start   2: objects.original_objects
+45/56 Test   #2: objects.original_objects ...........   Passed    0.02 sec
+      Start   9: objects.links_lists
+46/56 Test   #9: objects.links_lists ................   Passed    0.02 sec
+      Start   8: objects.handles_selection
+47/56 Test   #8: objects.handles_selection ..........   Passed    0.02 sec
+      Start   6: objects.deferred_removal
+48/56 Test   #6: objects.deferred_removal ...........   Passed    0.02 sec
+      Start   3: objects.nested_creation
+49/56 Test   #3: objects.nested_creation ............   Passed    0.02 sec
+      Start   5: objects.scheduling
+50/56 Test   #5: objects.scheduling .................   Passed    0.02 sec
+      Start   7: objects.aggregate_dispatch
+51/56 Test   #7: objects.aggregate_dispatch .........   Passed    0.02 sec
+      Start  11: objects.message_churn
+52/56 Test  #49: cli.world_modes ....................   Passed    6.81 sec
+      Start  12: objects.message_limit
+53/56 Test  #12: objects.message_limit ..............   Passed    0.41 sec
+      Start 844: train_session.private_30
+54/56 Test  #11: objects.message_churn ..............   Passed    6.02 sec
+      Start 845: train_session.private_60
+55/56 Test #844: train_session.private_30 ...........   Passed  167.73 sec
+56/56 Test #845: train_session.private_60 ...........   Passed  169.34 sec
+
+100% tests passed, 0 tests failed out of 56
+
+Label Time Summary:
+headless           = 837.82 sec*proc (56 tests)
+objects            =   6.73 sec*proc (14 tests)
+player_controls    = 167.21 sec*proc (7 tests)
+player_restore     =   7.00 sec*proc (4 tests)
+private            = 824.18 sec*proc (13 tests)
+screen_fade        = 158.21 sec*proc (3 tests)
+services           =  90.68 sec*proc (3 tests)
+train_session      = 337.07 sec*proc (2 tests)
+world              =  70.91 sec*proc (23 tests)
+
+Total Test time (real) = 420.95 sec

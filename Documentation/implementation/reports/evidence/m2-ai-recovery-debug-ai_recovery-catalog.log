@@ -1,0 +1,38 @@
+447/447 Testing: ai_recovery.catalog
+447/447 Test: ai_recovery.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_recovery.catalog" start time: Oct 16 14:04 CEST
+Output:
+----------------------------------------------------------
+m_cultist1 command=0 clip=6 available=1
+m_cultist1 command=1 clip=7 available=1
+m_cultist1 command=2 clip=8 available=1
+m_cultist1 command=3 clip=15 available=1
+f_cultist1 command=0 clip=6 available=1
+f_cultist1 command=1 clip=7 available=1
+f_cultist1 command=2 clip=8 available=1
+f_cultist1 command=3 clip=15 available=1
+m_civilian1 command=0 clip=4294967295 available=0
+m_civilian1 command=1 clip=4294967295 available=0
+m_civilian1 command=2 clip=4294967295 available=0
+m_civilian1 command=3 clip=4294967295 available=0
+f_civilian1 command=0 clip=4294967295 available=0
+f_civilian1 command=1 clip=4294967295 available=0
+f_civilian1 command=2 clip=4294967295 available=0
+f_civilian1 command=3 clip=4294967295 available=0
+labtech command=0 clip=4294967295 available=0
+labtech command=1 clip=4294967295 available=0
+labtech command=2 clip=4294967295 available=0
+labtech command=3 clip=4294967295 available=0
+gideon command=0 clip=4294967295 available=0
+gideon command=1 clip=4294967295 available=0
+gideon command=2 clip=4294967295 available=0
+gideon command=3 clip=4294967295 available=0
+<end of output>
+Test time =   0.26 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.catalog" end time: Oct 16 14:04 CEST
+"ai_recovery.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

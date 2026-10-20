@@ -1,0 +1,1168 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index f4f29e0..1f860d0 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -435,3 +435,9 @@ formulas, explicit RNG ordering, final-update removal and independent model/spri
+ failure/lifetime. Fullbright alpha rendering is bounded diagnostic presentation;
+ separate model/sprite sorting is not retail parity. Required remaining composite
+ FX, safe NEW_LEVEL and M2 stay open; world-source counts do not change.
++
++The [explosion point-light continuation](../Documentation/Implementation/M2_EXPLOSION_LIGHTS.md) connects original CExplosionLightFX and selected high-detail light recipes.
++Read [contracts](docs/EXPLOSION_LIGHT_CONTRACTS.md). Preserve delay overshoot discard, activation return,
++linear/final updates, reused zero Radius2 and independent sibling/source lifetime.
++These are evaluated lights, not surface illumination or scorch decals. Keep missing
++composite/lighting services explicit; safe NEW_LEVEL and M2 remain incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7cdfe68..44d065b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index 2e01445..4a0e394 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,9 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [explosion point-light continuation](../Documentation/Implementation/M2_EXPLOSION_LIGHTS.md) evaluates original flash/residual light colors, radii, delays and lifetime, independently of emitter/resource lifetime.
++Inspection and hidden/reload checks cover all nine SubwayA emitters. Surface
++illumination, remaining composite components, safe level transfer and M2 remain open.
++
+ The [explosion model continuation](../Documentation/Implementation/M2_EXPLOSION_MODELS.md) adds original ABC effects,
+ growth, rotation, alpha and independent lifetime to the existing fire/smoke sprites.
+ The nine SubwayA emitters and GPU model opacity are tested and inspectable. Required
+diff --git a/docs/EXPLOSION_LIGHT_CONTRACTS.md b/docs/EXPLOSION_LIGHT_CONTRACTS.md
+new file mode 100644
+index 0000000..3bcaa39
+--- /dev/null
++++ b/docs/EXPLOSION_LIGHT_CONTRACTS.md
+@@ -0,0 +1,94 @@
++# Original explosion point-light contracts
++
++This continues [explosion models](EXPLOSION_MODEL_CONTRACTS.md),
++[sprites](EXPLOSION_SPRITE_CONTRACTS.md) and [scene emitters](SCENE_EXPLOSION_CONTRACTS.md).
++See [source selections](M2_EXPLOSION_LIGHT_SOURCES.json) and
++[evidence](../../Documentation/Implementation/M2_EXPLOSION_LIGHTS.md).
++**M2 remains incomplete.** These are evaluated point lights, not rendered surface
++illumination. The existing [CLightFX contract](LIGHT_CONTRACTS.md) remains separate:
++explosion lights are detached and do not follow a server source or its visibility.
++
++## Original lifecycle
++
++CExplosionLightFX retains original Init/CreateObject/Update color/radius and delay
++rules. Typed owned position, RGB and radius replace legacy client OT_LIGHT handles;
++FLAG_VISIBLE is retained. There are no resource paths or server object IDs to resolve.
++The original uninitialized false cases of m_bChangeColor and m_bScale are explicitly
++initialized, including when an instance is reinitialized.
++
++Creation sets color1. Radius is radius1 without delay, or zero with any positive
++delay. During delay, color stays unchanged and the effect stays alive. At elapsed
++**>= delay**, radius becomes radius1, start time becomes the current time and delay
++becomes zero. That update returns immediately without color/radius interpolation.
++Delay overshoot is discarded even when it exceeds the duration. Duration therefore
++starts when the delayed update actually executes, not at the scheduled deadline.
++
++After delay, color/radius interpolate linearly only when their endpoints differ.
++The final update performs source interpolation before returning elapsed < duration.
++Terminal overshoot is not clamped; the manager removes that light before inspection
++or any future renderer consumes it. Unchanged endpoints remain unchanged. The
++CSFXMgr 1 ms cadence and next = now + interval apply to waiting and active lights.
++All advancement runs once per session step, outside ImGui, without another player
++integration. Nonfinite/backward clocks fail and remove the affected light; errors
++are retained and make the session step fail.
++
++Descriptors require finite bounded positions, RGB channels in [0,1], radii in
++[0,10000], duration in (0,600] and delay in [0,600]. These are explicit supported
++engine bounds, not new gameplay clamps. Invalid descriptors or creation state fail.
++These bounds cover all selected recipes; broader original callers are not claimed.
++
++## Selected composite recipes
++
++The same high-detail types as the model/sprite ports are routed from original
++CClientExplosionSFX. Normal is checked and normalized; a zero normal fails.
++
++| Types | Position offset along normal | Flash radius | Residual radius |
++| --- | --- | --- | --- |
++| 0 small / 6 napalm fireball | 10 | 150 to 0 | 50 to 0 |
++| 1 medium | 10 | 200 to 0 | 75 to 0 |
++| 2 large / 3 grenade | 10 | 250 to 0 | 100 to 0 |
++
++Flash RGB goes (1,.5,0) to (1,1,1) over 1.25 s. The source's light named
++“scorch” goes (.2,.2,.2) to (.5,.5,.5) over 25 s: it is a light, **not a decal**.
++The source writes fRadius1 twice for this second light and leaves fRadius2 at zero
++from the preceding descriptor. Preserve that shrinking radius; do not invent a
++constant-radius correction. Both lights have zero delay.
++
++Type 8 Tesla alternate creates one light, offset 30, radius 100 to 350, RGB
++(.75,.75,1) to (.5,.5,.5), duration 3 s and zero delay. Other types, including 24,
++fail explicitly. No extra RNG draws, quality menu or generic FX caller is added.
++
++The model/sprite/light publications remain separate, owned local deliveries before
++the existing null-damager radius call and sound. Light creation does not depend on
++model/sprite/audio resource success, and source removal leaves lights alive.
++Grouping by component preserves the selected deterministic light values, not the
++full retail composite manager's random/global ordering. No damage behavior changes.
++
++## Ownership, failure and inspection
++
++The session owns at most 256 active lights and 64 retained delivery reports.
++A report/event ID denotes a delivery attempt; it is not successful illumination.
++IDs are never reused across unload. Reports own source names, created light IDs
++and errors, without emitter pointers. Partial capacity failure preserves the first
++created sibling. Failure, normal expiry and total starts count separately. Unload
++clears values/reports/errors/counters, retaining only the monotonic identities.
++
++Scene explosions shows each light's ID/event, position, elapsed time, duration,
++pending delay state, update count, RGB swatch and exact radius/endpoints. Retained
++reports survive emitter removal; missing components and unsupported illumination
++stay explicit. This is diagnostic state, not world lighting. No shader or renderer
++claims shadows, fog, surface illumination or scorch decals from these records.
++Complete-composite availability therefore stays false even for type 6.
++
++Synthetic tests cover delay boundaries/overshoot, constant and changing endpoints,
++1 ms cadence, final interpolation, invalid state/clock/descriptors, capacities,
++partial sibling creation, retained report bounds, non-reused IDs and independent
++resource failures. Private tests exercise all nine SubwayA type-3 sources through
++three player/world cycles: 18 lights, source removal, nine flashes expiring while
++nine residuals survive, and teardown. Existing GPU application smoke checks the
++same evolving lights while the UI is hidden and after reload, including the build
++without ImGui. This proves evaluated state and inspector operation, not light pixels.
++
++SubwayA counts remain 203 created / four transferred sounds / 372 editor-only /
++one unsupported Gideon / zero failed sources. Other composite components,
++illumination, safe automatic NEW_LEVEL and required services remain open.
+diff --git a/docs/EXPLOSION_MODEL_CONTRACTS.md b/docs/EXPLOSION_MODEL_CONTRACTS.md
+index 1c55e0d..13a7682 100644
+--- a/docs/EXPLOSION_MODEL_CONTRACTS.md
++++ b/docs/EXPLOSION_MODEL_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original explosion model contracts
+ 
++Continuation: [explosion point lights](EXPLOSION_LIGHT_CONTRACTS.md) now evaluate
++selected original transient colors/radii with independent lifetime. Earlier light
++omissions are superseded only for that state; surface illumination stays unavailable.
++
+ This extends [sprite effects](EXPLOSION_SPRITE_CONTRACTS.md) and
+ [scene explosions](SCENE_EXPLOSION_CONTRACTS.md). See
+ [evidence](../../Documentation/Implementation/M2_EXPLOSION_MODELS.md) and
+@@ -62,7 +66,7 @@ All use alpha .75, fade 1 and random orientation 1. Types 0..3 choose waveform
+ model branch**: its report succeeds with no created model, not a fabricated effect.
+ Other types, including RIFT_2, still reject. No generic brush/weapon FX routing or
+ quality menu is introduced. Complete-composite availability stays false: rings,
+-particle flames, fragments/trails and lights are still missing.
++particle flames, fragments/trails and light illumination are still missing.
+ 
+ At most 128 models and 64 retained model-delivery reports are owned by the session.
+ IDs are never reused, including across unload. Model/event IDs and failure strings
+@@ -92,7 +96,8 @@ outside ImGui. No extra player integration or server world object is created.
+ The Scene explosions panel shows model identity/event, time, scale, alpha, waveform,
+ model/skin names, triangles/preparation/failure, totals and retained reports. Model
+ and sprite failures have distinct delivery IDs. Sprite reports list missing
+-particle/light/fragment components; model availability is reported separately.
++particle/fragment/illumination components; model and evaluated-light availability
++are reported separately.
+ 
+ All nine SubwayA emitters are type 3. Three load/player/unload cycles verify nine
+ 168-triangle exp_sphere models, valid Explosion_1 skins, alpha .585 after .11 s,
+diff --git a/docs/EXPLOSION_SPRITE_CONTRACTS.md b/docs/EXPLOSION_SPRITE_CONTRACTS.md
+index fda393f..6bc03e8 100644
+--- a/docs/EXPLOSION_SPRITE_CONTRACTS.md
++++ b/docs/EXPLOSION_SPRITE_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original explosion sprite contracts
+ 
++Continuation: [explosion point lights](EXPLOSION_LIGHT_CONTRACTS.md) now evaluate
++selected original transient colors/radii with independent lifetime. Earlier light
++omissions are superseded only for that state; surface illumination stays unavailable.
++
+ Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supply
+ selected model components with independent lifetime and alpha rendering. The earlier
+ model omission is superseded only for that subset; complete composite FX remain unavailable.
+@@ -40,7 +44,7 @@ CExplosionFX detail >= 2 recipe normalizes the direction and creates these sprit
+ Paths are original `Sprites\*.spr`, all recipe Z scales are zero and fade mode is
+ 1. These are deterministic sprite branches, not the full CExplosionFX switch or
+ a quality-setting implementation. Selected model branches now use their own
+-documented client RNG stream; unimplemented particle/light/fragment branches
++documented client RNG stream; unimplemented particle/fragment branches
+ consume no random draws. Full composite random ordering is not claimed.
+ Other preset types fail explicitly, including type 24 RIFT_2 (which has no sprite
+ branch here). Brush ExplosionEffect, weapon and other FX callers are not routed.
+diff --git a/docs/LIGHT_CONTRACTS.md b/docs/LIGHT_CONTRACTS.md
+index c4ad18e..5e1116d 100644
+--- a/docs/LIGHT_CONTRACTS.md
++++ b/docs/LIGHT_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original dynamic light contracts
+ 
++Continuation: [explosion point lights](EXPLOSION_LIGHT_CONTRACTS.md) now evaluate
++selected original transient colors/radii with independent lifetime. Earlier light
++omissions are superseded only for that state; surface illumination stays unavailable.
++
+ M2 is incomplete. Read [object contracts](OBJECT_CONTRACTS.md),
+ [keyframe contracts](KEYFRAMER_CONTRACTS.md), [shared damage](BRUSH_CONTRACTS.md),
+ [pickup/spawn contracts](PICKUP_CONTRACTS.md), [source selections](M2_LIGHT_SOURCES.json)
+diff --git a/docs/M2_EXPLOSION_LIGHT_SOURCES.json b/docs/M2_EXPLOSION_LIGHT_SOURCES.json
+new file mode 100644
+index 0000000..a03ea37
+--- /dev/null
++++ b/docs/M2_EXPLOSION_LIGHT_SOURCES.json
+@@ -0,0 +1,96 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "7051bbb39091bd66eae1b5ae17ff7c29a15208c4",
++  "source_files": [
++    {
++      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
++      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
++      "selected_lines": [
++        [
++          813,
++          913
++        ],
++        [
++          1301,
++          1325
++        ],
++        [
++          1409,
++          1433
++        ],
++        [
++          1518,
++          1542
++        ],
++        [
++          1719,
++          1743
++        ],
++        [
++          2014,
++          2038
++        ],
++        [
++          2213,
++          2225
++        ]
++      ],
++      "use": "Original light initialization, creation, delayed update and selected high-detail light recipes, including reused Radius2."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ExplosionFX.h",
++      "sha256": "2bc5a35f4da4929bdb0f10652d9014a56fdf9fe561d7ad320bf1dcf0f042dc18",
++      "selected_lines": [
++        [
++          163,
++          181
++        ],
++        [
++          486,
++          518
++        ]
++      ],
++      "use": "Descriptor/defaults; explicitly initialize false change flags to repair original indeterminate members."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
++      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
++      "selected_lines": [
++        [
++          1435,
++          1463
++        ]
++      ],
++      "use": "Absolute next-update cadence and removal."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/SpecialFX.h",
++      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
++      "selected_lines": [
++        [
++          32,
++          56
++        ]
++      ],
++      "use": "One millisecond cadence and independent client lifetime."
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ClientExplosionSFX.cpp",
++      "sha256": "fc51674223cf67456341d4529bc93acbe8df9365a8730b0491c7e22803c85a09",
++      "selected_lines": [
++        [
++          282,
++          304
++        ]
++      ],
++      "use": "FX publication before original null-damager damage and detached sound."
++    }
++  ],
++  "implementation": "Selected original CExplosionLightFX Init/CreateObject/Update and high-detail CExplosionFX light recipes; bounded owned client point-light state and inspection.",
++  "limitations": [
++    "No surface illumination, shadow, fog or scorch decal rendering.",
++    "No generic SFX packet ABI or light routing from other callers.",
++    "Remaining composite components and safe NEW_LEVEL keep M2 incomplete.",
++    "Private content exercises type 3; other recipes and delay use synthetic tests."
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 0d41319..6ec4d93 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -759,3 +759,11 @@ explicit failures adapt engine services; original wave/fade/per-update rotations
+ remain. Existing ABC/DTX/ModelView and the SDL_GPU alpha shader supply presentation.
+ No reference engine, dependency or commercial asset is imported. See
+ [contracts](EXPLOSION_MODEL_CONTRACTS.md) for remaining composite/rendering limits.
++
++## Original explosion point lights
++
++Selected CExplosionLightFX methods and CExplosionFX high-detail light branches come
++from sources/blood2/ClientShellDLL/ExplosionFX.cpp/.h. The [source ledger](M2_EXPLOSION_LIGHT_SOURCES.json) records hashes and exact ranges;
++[contracts](EXPLOSION_LIGHT_CONTRACTS.md) distinguish source delay/radius quirks
++from explicit initialization, bounded values and owned client-light adaptations.
++No reference file, external asset, dependency revision or renderer was modified.
+diff --git a/docs/SCENE_EXPLOSION_CONTRACTS.md b/docs/SCENE_EXPLOSION_CONTRACTS.md
+index cd1e6d3..0381f2e 100644
+--- a/docs/SCENE_EXPLOSION_CONTRACTS.md
++++ b/docs/SCENE_EXPLOSION_CONTRACTS.md
+@@ -1,10 +1,14 @@
+ # Original scene explosion emitters
+ 
+-Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supplies
++Continuation: [explosion point lights](EXPLOSION_LIGHT_CONTRACTS.md) now evaluate
++selected original transient colors/radii with independent lifetime. Earlier light
++omissions are superseded only for that state; surface illumination stays unavailable.
++
++Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supply
+ selected model components with independent lifetime and alpha rendering. The earlier
+ model omission is superseded only for that subset; complete composite FX remain unavailable.
+ 
+-Continuation: [original explosion sprites](EXPLOSION_SPRITE_CONTRACTS.md). Selected original fire/smoke components now render and outlive their emitter. The complete-composite flag remains false; model/particle/light/fragment services are still unavailable. Original null-damager damage and audio behavior stay unchanged.
++Continuation: [original explosion sprites](EXPLOSION_SPRITE_CONTRACTS.md). Selected original fire/smoke components now render and outlive their emitter. The complete-composite flag remains false; particle/fragment/illumination services remain unavailable. Original null-damager damage and audio behavior stay unchanged.
+ 
+ M2 remains incomplete. This extends [object contracts](OBJECT_CONTRACTS.md),
+ [brush explosion contracts](EXPLOSION_CONTRACTS.md) and [audio contracts](CINEMATIC_CONTRACTS.md).
+@@ -70,7 +74,8 @@ Typed delivery now routes selected high-detail sprite branches to original
+ CExplosionSpriteFX methods; see [sprite contracts](EXPLOSION_SPRITE_CONTRACTS.md).
+ The original binary client packet/complete manager is not recreated. Up to 32 owned
+ SceneExplosionReports retain type, initial position/direction, configured damage,
+-actual radius-delivery counters, sound ID/failure and client sprite event ID/failure.
++actual radius-delivery counters, sound ID/failure and separate client model, sprite
++and light event IDs/failures.
+ Sprite success does not set complete-composite availability. Selected model components now render; particles, fragments and dynamic
+ illumination remain absent. A loaded emitter is still a
+ partial system; required missing services keep M2 open.
+diff --git a/src/app/inspector_scene_explosions.cpp b/src/app/inspector_scene_explosions.cpp
+index 2ecd174..8a57c1b 100644
+--- a/src/app/inspector_scene_explosions.cpp
++++ b/src/app/inspector_scene_explosions.cpp
+@@ -8,7 +8,8 @@ namespace OpenBlood2
+         ImGui::TextWrapped(
+             "Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
+             "Spatial WAV playback and selected original sprite/model components are implemented. Composite "
+-            "particles, fragments and lights remain unavailable.");
++            "particles, fragments and surface illumination remain unavailable. Light color/radius are evaluated "
++            "below.");
+         ImGui::Text("Audio: %s | active voices %zu | submitted frames %llu",
+                     game.server.audio.has_output() ? "SDL stream" : "offline clock", game.server.audio.voices().size(),
+                     (unsigned long long)game.server.audio.submitted_frames);
+@@ -55,6 +56,34 @@ namespace OpenBlood2
+             ImGui::PopID();
+         }
+         ImGui::Separator();
++        const auto& lights = game.server.explosion_lights;
++        ImGui::Text("Explosion point lights: %zu active / %llu started / %llu expired / %llu failed",
++                    lights.active.size(), (unsigned long long)lights.started, (unsigned long long)lights.expired,
++                    (unsigned long long)lights.failed);
++        ImGui::TextWrapped("Evaluated client light state only; no surface illumination, shadows or scorch decals.");
++        if (!lights.update_error.empty())
++            ImGui::TextWrapped("%s", lights.update_error.c_str());
++        for (const auto& fx : lights.active)
++        {
++            ImGui::PushID(static_cast<int>(fx.id));
++            ImGui::Text("Light %llu / event %llu: %.3f / %.3f s | waiting %d / delay %.3f | %llu updates",
++                        (unsigned long long)fx.id, (unsigned long long)fx.event, fx.last_time - fx.start_time,
++                        fx.settings.duration, fx.delay > 0, fx.delay, (unsigned long long)fx.updates);
++            ImGui::Text("Position %.2f %.2f %.2f | radius %.3f (%.1f to %.1f)", fx.settings.position.x,
++                        fx.settings.position.y, fx.settings.position.z, fx.radius, fx.settings.radius1,
++                        fx.settings.radius2);
++            ImGui::ColorButton("Current light color", ImVec4(fx.color.x, fx.color.y, fx.color.z, 1),
++                               ImGuiColorEditFlags_NoTooltip, ImVec2(40, 16));
++            ImGui::SameLine();
++            ImGui::Text("RGB %.4f %.4f %.4f", fx.color.x, fx.color.y, fx.color.z);
++            ImGui::PopID();
++        }
++        if (ImGui::CollapsingHeader("Last 64 light deliveries / failures"))
++            for (const auto& r : lights.reports)
++                ImGui::TextWrapped("Event %llu / type %u / %s / %zu lights: %s", (unsigned long long)r.id, r.type,
++                                   r.source.c_str(), r.lights.size(),
++                                   r.error.empty() ? "created; illumination unavailable" : r.error.c_str());
++        ImGui::Separator();
+         const auto& models = game.server.explosion_models;
+         ImGui::Text("Client explosion models: %zu active / %llu started / %llu expired / %llu failed",
+                     models.active.size(), (unsigned long long)models.started, (unsigned long long)models.expired,
+@@ -126,6 +155,9 @@ namespace OpenBlood2
+                             r.targets.null_damager ? "yes (original guard)" : "no");
+                 ImGui::Text("Model event %llu | sprite event %llu", (unsigned long long)r.model_event,
+                             (unsigned long long)r.sprite_event);
++                ImGui::Text("Light event %llu", (unsigned long long)r.light_event);
++                if (!r.light_error.empty())
++                    ImGui::TextWrapped("%s", r.light_error.c_str());
+                 if (!r.model_error.empty())
+                     ImGui::TextWrapped("%s", r.model_error.c_str());
+                 if (!r.sprite_error.empty())
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 19b8e4e..a6d791c 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -1426,10 +1426,10 @@ namespace
+                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
+                              "and after reload; evaluated radius/color checked; world illumination unavailable");
+             if (options.scene_explosions_smoke)
+-                spdlog::info(
+-                    "SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
+-                    "audio plus original explosion models/sprites verified hidden and after reload; other composite "
+-                    "FX unavailable");
++                spdlog::info("SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
++                             "audio plus original explosion models/sprites and evaluated point lights verified hidden "
++                             "and after reload; illumination/other composite "
++                             "FX unavailable");
+             if (options.sprites_smoke)
+                 spdlog::info("SPRITES smoke: 12 original DetailSprites, SPR manifests, frame clocks, hidden UI and "
+                              "unload/reload verified; 12 alpha-textured quads submitted with shared world depth");
+diff --git a/src/app/scene_explosion_smoke.cpp b/src/app/scene_explosion_smoke.cpp
+index beedd16..1a4d10b 100644
+--- a/src/app/scene_explosion_smoke.cpp
++++ b/src/app/scene_explosion_smoke.cpp
+@@ -30,6 +30,14 @@ namespace OpenBlood2
+         if (g.objects.get(selected) || g.server.scene_explosions.size() != 1)
+             return false;
+         const auto& report = g.server.scene_explosions.back();
++        const auto& lights = g.server.explosion_lights;
++        if (!report.light_event || !report.light_error.empty() || lights.active.size() != 2 || lights.started != 2 ||
++            lights.failed || lights.reports.size() != 1 || !lights.update_error.empty())
++            return false;
++        for (const auto& fx : lights.active)
++            if (fx.event != report.light_event || !fx.updates || fx.radius >= fx.settings.radius1 || fx.radius <= 0 ||
++                fx.color.y <= fx.settings.color1.y || fx.delay || !fx.error.empty())
++                return false;
+         const auto& models = g.server.explosion_models;
+         if (!report.model_event || !report.model_error.empty() || models.active.size() != 1 || models.started != 1 ||
+             models.failed || models.reports.size() != 1 || !models.active[0].updates ||
+diff --git a/src/game/brush_messages.h b/src/game/brush_messages.h
+index d89cf81..c57ebb5 100644
+--- a/src/game/brush_messages.h
++++ b/src/game/brush_messages.h
+@@ -25,11 +25,13 @@ namespace OpenBlood2
+         float damage = 0, radius = 0;
+         RadiusDamageReport targets;
+         std::uint64_t voice = 0;
++        std::uint64_t light_event = 0;
++        std::string light_error;
+         std::uint64_t model_event = 0;
+         std::string model_error;
+         std::uint64_t sprite_event = 0;
+         std::string sprite_error;
+-        // Sprite components are now real; the complete composite remains unavailable.
++        // Selected components execute; illumination and complete composite remain unavailable.
+         bool client_fx_available = false;
+     };
+     struct DebrisEffect
+diff --git a/src/game/explosion_lights.cpp b/src/game/explosion_lights.cpp
+new file mode 100644
+index 0000000..03bf7dc
+--- /dev/null
++++ b/src/game/explosion_lights.cpp
+@@ -0,0 +1,121 @@
++#include "game/explosion_lights.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++namespace OpenBlood2
++{
++    bool original_explosion_lights(DDWORD type, DVector position, DVector normal,
++                                   std::vector<ExplosionLightSettings>& out, std::string& error)
++    {
++        out.clear();
++        error.clear();
++        if (!physics_vector(position) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f)
++        {
++            error = "Explosion requires a finite position and nonzero normal";
++            return false;
++        }
++        if (type > 3 && type != 6 && type != 8)
++        {
++            error = "Explosion light recipe is unavailable";
++            return false;
++        }
++        const float length = std::sqrt(vector_dot(normal, normal));
++        const float offset = (type == 8 ? 30.f : 10.f) / length;
++        ExplosionLightSettings s;
++        s.position = {position.x + normal.x * offset, position.y + normal.y * offset, position.z + normal.z * offset};
++        if (type == 8)
++        {
++            s.color1 = {.75f, .75f, 1};
++            s.color2 = {.5f, .5f, .5f};
++            s.duration = 3;
++            s.radius1 = 100;
++            s.radius2 = 350;
++            out.push_back(s);
++            return true;
++        }
++        s.color1 = {1, .5f, 0};
++        s.color2 = {1, 1, 1};
++        s.duration = 1.25f;
++        s.radius1 = type == 0 || type == 6 ? 150.f : type == 1 ? 200.f : 250.f;
++        s.radius2 = 0;
++        out.push_back(s);
++        s.color1 = {.2f, .2f, .2f};
++        s.color2 = {.5f, .5f, .5f};
++        s.duration = 25;
++        s.radius1 = type == 0 || type == 6 ? 50.f : type == 1 ? 75.f : 100.f;
++        // Source writes Radius1 twice: Radius2 remains zero from the preceding flash.
++        out.push_back(s);
++        return true;
++    }
++    std::uint64_t ExplosionLights::publish(DDWORD type, DVector position, DVector normal, std::string_view source,
++                                           double now, std::string& error)
++    {
++        error.clear();
++        if (source.size() > 100 || source.find('\0') != std::string_view::npos || next_event_ == UINT64_MAX)
++        {
++            error = "Invalid explosion light source/event";
++            return 0;
++        }
++        ExplosionLightReport report{next_event_++, type, std::string(source), {}, {}};
++        std::vector<ExplosionLightSettings> settings;
++        if (original_explosion_lights(type, position, normal, settings, report.error))
++            for (const auto& setting : settings)
++            {
++                CExplosionLightFX fx;
++                std::string failure;
++                if (active.size() >= 256 || next_id_ == UINT64_MAX)
++                    failure = "Explosion light capacity exhausted";
++                else if (fx.Init(setting, failure) && fx.CreateObject(now, failure))
++                {
++                    fx.id = next_id_++;
++                    fx.event = report.id;
++                    report.lights.push_back(fx.id);
++                    active.push_back(std::move(fx));
++                    ++started;
++                }
++                if (!failure.empty())
++                {
++                    ++failed;
++                    if (!report.error.empty())
++                        report.error += "; ";
++                    report.error += failure;
++                }
++            }
++        else
++            ++failed;
++        error = report.error;
++        const auto id = report.id;
++        if (reports.size() == 64)
++            reports.erase(reports.begin());
++        reports.push_back(std::move(report));
++        return id;
++    }
++    bool ExplosionLights::advance(double now)
++    {
++        bool valid = true;
++        std::erase_if(active,
++                      [&](auto& fx)
++                      {
++                          if (fx.Update(now))
++                              return false;
++                          if (fx.error.empty())
++                              ++expired;
++                          else
++                          {
++                              ++failed;
++                              valid = false;
++                              update_error = fx.error;
++                          }
++                          return true;
++                      });
++        return valid;
++    }
++    void ExplosionLights::clear()
++    {
++        active.clear();
++        reports.clear();
++        update_error.clear();
++        started = expired = failed = 0;
++        // Do not reuse client identities across world unload.
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/explosion_lights.h b/src/game/explosion_lights.h
+new file mode 100644
+index 0000000..5fb2c5b
+--- /dev/null
++++ b/src/game/explosion_lights.h
+@@ -0,0 +1,29 @@
++#pragma once
++#include "game/original/ExplosionLightFX.h"
++#include <string_view>
++#include <vector>
++namespace OpenBlood2
++{
++    bool original_explosion_lights(DDWORD, DVector, DVector, std::vector<ExplosionLightSettings>&, std::string&);
++    struct ExplosionLightReport
++    {
++        std::uint64_t id = 0;
++        DDWORD type = 0;
++        std::string source, error;
++        std::vector<std::uint64_t> lights;
++    };
++    class ExplosionLights
++    {
++      public:
++        std::uint64_t publish(DDWORD, DVector, DVector, std::string_view, double, std::string&);
++        bool advance(double now);
++        void clear();
++        std::vector<CExplosionLightFX> active;
++        std::vector<ExplosionLightReport> reports;
++        std::string update_error;
++        std::uint64_t started = 0, expired = 0, failed = 0;
++
++      private:
++        std::uint64_t next_id_ = 1, next_event_ = 1;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/explosion_sprites.cpp b/src/game/explosion_sprites.cpp
+index ae5f9ab..e078c0f 100644
+--- a/src/game/explosion_sprites.cpp
++++ b/src/game/explosion_sprites.cpp
+@@ -44,18 +44,19 @@ namespace OpenBlood2
+                 : type == 1 ? 2.f
+                             : 2.5f,
+                 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
+-            unavailable = type == 3 ? "particle rings, fragments/trails, lights" : "particle ring, lights";
++            unavailable = type == 3 ? "particle rings, fragments/trails, light illumination"
++                                    : "particle ring, light illumination";
+         }
+         else if (type == 6)
+         {
+             add(0, .25f, .25f, .5f, 1, 0, 1, "Sprites\\debrisimp.spr");
+             add(20, .25f, 1.5f, 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
+-            unavailable = "lights";
++            unavailable = "light illumination";
+         }
+         else if (type == 8)
+         {
+             add(30, .1f, .75f, 3, .75f, 0, 0, "Sprites\\TesAltLoop.spr");
+-            unavailable = "particle flame, light";
++            unavailable = "particle flame, light illumination";
+         }
+         else
+         {
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 420282b..765ef94 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -63,6 +63,7 @@ class ServerDE : public CSBase
+     virtual bool SetBlockingPriority(HOBJECT, DBYTE) = 0;
+     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
++    virtual std::uint64_t PublishExplosionLights(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionModels(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) = 0;
+diff --git a/src/game/original/ClientExplosionSFX.cpp b/src/game/original/ClientExplosionSFX.cpp
+index 78539a4..77b95fb 100644
+--- a/src/game/original/ClientExplosionSFX.cpp
++++ b/src/game/original/ClientExplosionSFX.cpp
+@@ -73,6 +73,7 @@ void CClientExplosionSFX::SetupFX()
+     report.sound = sound;
+     report.model_event = g_pServerDE->PublishExplosionModels(m_hObject, type, position, normal, report.model_error);
+     report.sprite_event = g_pServerDE->PublishExplosionSprites(m_hObject, type, position, normal, report.sprite_error);
++    report.light_event = g_pServerDE->PublishExplosionLights(m_hObject, type, position, normal, report.light_error);
+     // IMPORTANT: the source passes NULL, so DamageObject's null-damager guard
+     // suppresses every delivery. Do not silently "repair" this gameplay behavior.
+     targets = DamageObjectsInRadius(m_hObject, nullptr, position, radius, damage, DamageType::Normal);
+diff --git a/src/game/original/ExplosionLightFX.cpp b/src/game/original/ExplosionLightFX.cpp
+new file mode 100644
+index 0000000..11f6849
+--- /dev/null
++++ b/src/game/original/ExplosionLightFX.cpp
+@@ -0,0 +1,78 @@
++#include "ExplosionLightFX.h"
++#include "engine/collision.h"
++#include <cmath>
++using namespace OpenBlood2;
++bool CExplosionLightFX::Init(const ExplosionLightSettings& input, std::string& failure)
++{
++    failure.clear();
++    *this = {};
++    auto color_valid = [](DVector c)
++    { return physics_vector(c) && c.x >= 0 && c.x <= 1 && c.y >= 0 && c.y <= 1 && c.z >= 0 && c.z <= 1; };
++    auto radius_valid = [](float r) { return std::isfinite(r) && r >= 0 && r <= 10000; };
++    if (!physics_vector(input.position) || !color_valid(input.color1) || !color_valid(input.color2) ||
++        !radius_valid(input.radius1) || !radius_valid(input.radius2) || !std::isfinite(input.duration) ||
++        input.duration <= 0 || input.duration > 600 || !std::isfinite(input.delay) || input.delay < 0 ||
++        input.delay > 600)
++    {
++        failure = "Invalid explosion light descriptor";
++        return false;
++    }
++    settings = input;
++    change_color_ =
++        input.color1.x != input.color2.x || input.color1.y != input.color2.y || input.color1.z != input.color2.z;
++    scale_ = input.radius1 != input.radius2;
++    initialized_ = true;
++    return true;
++}
++bool CExplosionLightFX::CreateObject(double now, std::string& failure)
++{
++    failure.clear();
++    if (!initialized_ || created_ || !std::isfinite(now) || now < 0)
++    {
++        failure = "Invalid explosion light creation state/time";
++        return false;
++    }
++    color = settings.color1;
++    delay = settings.delay;
++    radius = delay ? 0 : settings.radius1;
++    start_time = last_time = now;
++    created_ = true;
++    return true;
++}
++bool CExplosionLightFX::Update(double now)
++{
++    error.clear();
++    if (!created_ || !std::isfinite(now) || now < last_time)
++    {
++        error = "Invalid explosion light clock/state";
++        return false;
++    }
++    last_time = now;
++    if (now < next_update)
++        return true;
++    ++updates;
++    const float time = static_cast<float>(now - start_time), ratio = time / settings.duration;
++    if (!std::isfinite(ratio))
++    {
++        error = "Explosion light elapsed time overflow";
++        return false;
++    }
++    next_update = now + .001; // Original CSFXMgr scheduling, including the delay branch.
++    if (delay)
++    {
++        if (time >= delay)
++        {
++            radius = settings.radius1;
++            start_time = now; // Discard delay overshoot, then return without interpolation.
++            delay = 0;
++        }
++        return true;
++    }
++    if (change_color_)
++        color = {settings.color1.x + (settings.color2.x - settings.color1.x) * ratio,
++                 settings.color1.y + (settings.color2.y - settings.color1.y) * ratio,
++                 settings.color1.z + (settings.color2.z - settings.color1.z) * ratio};
++    if (scale_)
++        radius = settings.radius1 + (settings.radius2 - settings.radius1) * ratio;
++    return time < settings.duration; // Final source interpolation precedes removal.
++}
+diff --git a/src/game/original/ExplosionLightFX.h b/src/game/original/ExplosionLightFX.h
+new file mode 100644
+index 0000000..08dd00a
+--- /dev/null
++++ b/src/game/original/ExplosionLightFX.h
+@@ -0,0 +1,30 @@
++#pragma once
++#include "basedefs_de.h"
++#include <cstdint>
++#include <string>
++namespace OpenBlood2
++{
++    struct ExplosionLightSettings
++    {
++        DVector position{}, color1{1, 1, 0}, color2{1, 1, 1};
++        float duration = 1, delay = 0, radius1 = 50, radius2 = 100;
++    };
++} // namespace OpenBlood2
++// Selected original ExplosionFX.cpp methods; owned client point-light state.
++class CExplosionLightFX
++{
++  public:
++    bool Init(const OpenBlood2::ExplosionLightSettings&, std::string&);
++    bool CreateObject(double now, std::string&);
++    bool Update(double now);
++    OpenBlood2::ExplosionLightSettings settings;
++    DVector color{};
++    float radius = 0, delay = 0;
++    double start_time = 0, last_time = 0, next_update = 0;
++    std::uint64_t id = 0, event = 0, updates = 0;
++    DDWORD flags = FLAG_VISIBLE;
++    std::string error;
++
++  private:
++    bool initialized_ = false, created_ = false, change_color_ = false, scale_ = false;
++};
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 221167b..9b3f1fa 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -3,6 +3,7 @@
+ #include "engine/model_store.h"
+ #include "engine/objects.h"
+ #include "engine/string_resources.h"
++#include "game/explosion_lights.h"
+ #include "game/explosion_models.h"
+ #include "game/explosion_sprites.h"
+ #include "game/original/BloodShells.h"
+@@ -78,6 +79,8 @@ namespace OpenBlood2
+         std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         ExplosionSprites explosion_sprites;
+         ExplosionModels explosion_models;
++        ExplosionLights explosion_lights;
++        std::uint64_t PublishExplosionLights(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         std::uint64_t PublishExplosionModels(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) override;
+         void RecordExplosionEffect(const ExplosionEffect&) override;
+@@ -107,6 +110,7 @@ namespace OpenBlood2
+             scene_explosions.clear();
+             explosion_sprites.clear();
+             explosion_models.clear();
++            explosion_lights.clear();
+             spawn_reports.clear();
+             pickup_reports.clear();
+             camera_effects.clear();
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index 98d1d25..7b221f4 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -4,6 +4,17 @@ namespace OpenBlood2
+ {
+     // These copied, bounded records expose pending client FX/audio. They do not
+     // enqueue gameplay and never retain a pointer into an original object.
++    std::uint64_t ServerAdapter::PublishExplosionLights(HOBJECT source, DDWORD type, DVector position, DVector normal,
++                                                        std::string& error)
++    {
++        trace_service("PublishExplosionLights (evaluated point lights; illumination unavailable)");
++        if (!IsObjectAlive(source))
++        {
++            error = "Explosion light source unavailable";
++            return 0;
++        }
++        return explosion_lights.publish(type, position, normal, GetObjectName(source), objects_.time(), error);
++    }
+     std::uint64_t ServerAdapter::PublishExplosionModels(HOBJECT source, DDWORD type, DVector position, DVector normal,
+                                                         std::string& error)
+     {
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index fa2e111..824140a 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -436,6 +436,7 @@ namespace OpenBlood2
+         ok = server.advance_lights() && ok;
+         ok = server.explosion_sprites.advance(objects.time()) && ok;
+         ok = server.explosion_models.advance(objects.time()) && ok;
++        ok = server.explosion_lights.advance(objects.time()) && ok;
+         if (ok && preview_model && preview_playing &&
+             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
+             preview_playing = false;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 516b9ec..ddea020 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -985,3 +985,15 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.explosion_model_private PROPERTIES LABELS "gpu;private;explosion_models" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+     endif()
+ endif()
++
++add_executable(explosion_light_tests explosion_light_tests.cpp)
++target_link_libraries(explosion_light_tests PRIVATE blood2_game)
++blood2_project_options(explosion_light_tests)
++foreach(case lifecycle recipes failures session)
++    add_test(NAME explosion_lights.${case} COMMAND explosion_light_tests "${case}")
++    set_tests_properties(explosion_lights.${case} PROPERTIES LABELS "headless;explosion_lights" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME explosion_lights.private COMMAND explosion_light_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(explosion_lights.private PROPERTIES LABELS "headless;private;explosion_lights" TIMEOUT 90)
++endif()
+diff --git a/tests/explosion_light_tests.cpp b/tests/explosion_light_tests.cpp
+new file mode 100644
+index 0000000..e1e27b3
+--- /dev/null
++++ b/tests/explosion_light_tests.cpp
+@@ -0,0 +1,257 @@
++#include "game/original/ClientExplosionSFX.h"
++#include "game/server_adapter.h"
++#include <cmath>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .0001f;
++    }
++    bool command(GameSession& g, HOBJECT h)
++    {
++        auto s = g.server.CreateString("TRIGGER");
++        auto m = g.server.StartMessageToObject(nullptr, h, 1000);
++        bool ok = m && g.server.WriteToMessageHString(m, s) == DE_OK && g.server.EndMessage(m) == DE_OK;
++        g.server.FreeString(s);
++        return ok;
++    }
++    bool lifecycle()
++    {
++        std::string error;
++        ExplosionLightSettings s;
++        s.color1 = {.2f, .4f, .6f};
++        s.color2 = {.8f, .2f, 1};
++        s.radius1 = 200;
++        s.radius2 = 0;
++        s.duration = 2;
++        CExplosionLightFX fx;
++        CHECK(fx.Init(s, error) && fx.CreateObject(10, error));
++        CHECK(fx.flags == FLAG_VISIBLE && near(fx.radius, 200) && near(fx.color.x, .2f));
++        CHECK(fx.Update(10) && fx.updates == 1);
++        CHECK(fx.Update(10.0005) && fx.updates == 1);
++        CHECK(fx.Update(10.5) && fx.updates == 2 && near(fx.radius, 150));
++        CHECK(near(fx.color.x, .35f) && near(fx.color.y, .35f) && near(fx.color.z, .7f));
++        CHECK(!fx.Update(12) && fx.error.empty() && near(fx.radius, 0) && near(fx.color.x, .8f));
++        // Do not initialize the no-change flags from indeterminate original bytes.
++        s.color2 = s.color1;
++        s.radius2 = s.radius1;
++        CHECK(fx.Init(s, error) && fx.CreateObject(1, error) && fx.Update(2));
++        CHECK(near(fx.radius, 200) && near(fx.color.x, .2f));
++        CHECK(!fx.Update(3) && fx.error.empty());
++        // Delays hold the initial color and zero radius; exact boundary starts a fresh clock.
++        s.delay = .5f;
++        s.radius2 = 0;
++        s.color2 = {1, 1, 1};
++        CHECK(fx.Init(s, error) && fx.CreateObject(10, error));
++        CHECK(fx.radius == 0 && near(fx.color.x, .2f));
++        CHECK(fx.Update(10.499) && fx.radius == 0 && fx.delay == .5f);
++        CHECK(fx.Update(10.5) && fx.delay == 0 && fx.start_time == 10.5 && fx.radius == 200);
++        CHECK(near(fx.color.x, .2f)); // Activation returns before interpolation.
++        CHECK(fx.Update(11) && near(fx.radius, 150) && near(fx.color.x, .4f));
++        CHECK(!fx.Update(12.5) && fx.error.empty());
++        // Source discards delay overshoot even when it exceeds the effect duration.
++        CHECK(fx.Init(s, error) && fx.CreateObject(10, error) && fx.Update(100));
++        CHECK(fx.start_time == 100 && fx.radius == 200 && fx.delay == 0 && near(fx.color.x, .2f));
++        CHECK(fx.Update(101) && near(fx.radius, 100));
++        CHECK(!fx.Update(103) && fx.error.empty() && near(fx.radius, -100));
++        return true;
++    }
++    bool recipes()
++    {
++        std::vector<ExplosionLightSettings> out;
++        std::string error;
++        for (unsigned type : {0u, 1u, 2u, 3u, 6u, 8u})
++        {
++            CHECK(original_explosion_lights(type, {10, 20, 30}, {0, 2, 0}, out, error));
++            CHECK(out.size() == (type == 8 ? 1u : 2u));
++            CHECK(out[0].position.x == 10 && out[0].position.y == (type == 8 ? 50 : 30));
++            CHECK(out[0].delay == 0);
++            if (type == 8)
++            {
++                CHECK(out[0].duration == 3 && out[0].radius1 == 100 && out[0].radius2 == 350);
++                CHECK(near(out[0].color1.x, .75f) && near(out[0].color2.z, .5f));
++                continue;
++            }
++            CHECK(out[0].radius1 == (type == 0 || type == 6 ? 150 : type == 1 ? 200 : 250));
++            CHECK(out[0].duration == 1.25f && out[0].radius2 == 0 && out[0].color1.z == 0 && out[0].color2.z == 1);
++            CHECK(out[1].duration == 25 && out[1].radius2 == 0); // Reused descriptor, not Radius2=Radius1.
++            CHECK(out[1].radius1 == (type == 0 || type == 6 ? 50 : type == 1 ? 75 : 100));
++            CHECK(near(out[1].color1.x, .2f) && near(out[1].color2.x, .5f));
++        }
++        CHECK(!original_explosion_lights(24, {}, {0, 1, 0}, out, error) && out.empty() && !error.empty());
++        CHECK(!original_explosion_lights(3, {}, {}, out, error) && out.empty());
++        return true;
++    }
++    bool failures()
++    {
++        std::string error;
++        CExplosionLightFX fx;
++        CHECK(!fx.CreateObject(0, error) && !fx.Update(0) && !fx.error.empty());
++        for (unsigned kind = 0; kind < 10; ++kind)
++        {
++            ExplosionLightSettings s;
++            switch (kind)
++            {
++                case 0:
++                    s.duration = 0;
++                    break;
++                case 1:
++                    s.duration = 601;
++                    break;
++                case 2:
++                    s.delay = -1;
++                    break;
++                case 3:
++                    s.delay = 601;
++                    break;
++                case 4:
++                    s.radius1 = -1;
++                    break;
++                case 5:
++                    s.radius2 = 10001;
++                    break;
++                case 6:
++                    s.color1.x = -.1f;
++                    break;
++                case 7:
++                    s.color2.y = 1.1f;
++                    break;
++                case 8:
++                    s.position.z = std::numeric_limits<float>::infinity();
++                    break;
++                case 9:
++                    s.delay = std::numeric_limits<float>::quiet_NaN();
++                    break;
++            }
++            CHECK(!fx.Init(s, error) && !error.empty() && !fx.CreateObject(0, error));
++        }
++        CHECK(fx.Init({}, error) && !fx.CreateObject(-1, error) && fx.CreateObject(1, error));
++        CHECK(!fx.CreateObject(2, error) && !fx.Update(.5) && !fx.error.empty());
++        CHECK(!fx.Update(std::numeric_limits<double>::infinity()));
++        ExplosionLights lights;
++        CHECK(!lights.publish(3, {}, {0, 1, 0}, std::string("a\0b", 3), 0, error) && lights.reports.empty());
++        CHECK(lights.publish(24, {}, {0, 1, 0}, "bad", 0, error) && !error.empty() && lights.failed == 1);
++        CHECK(lights.publish(3, {}, {0, 1, 0}, "bad clock", -1, error) && !error.empty() && lights.failed == 3);
++        lights.clear();
++        for (unsigned i = 0; i < 127; ++i)
++            CHECK(lights.publish(3, {}, {0, 1, 0}, "pair", 0, error) && error.empty());
++        CHECK(lights.publish(8, {}, {0, 1, 0}, "one", 0, error) && error.empty());
++        CHECK(lights.active.size() == 255);
++        CHECK(lights.publish(3, {}, {0, 1, 0}, "partial", 0, error) && !error.empty());
++        CHECK(lights.active.size() == 256 && lights.started == 256 && lights.failed == 1);
++        CHECK(lights.reports.size() == 64 && lights.reports.back().lights.size() == 1);
++        const auto last = lights.active.back().id, event = lights.reports.back().id;
++        CHECK(lights.advance(30) && lights.active.empty() && lights.expired == 256);
++        lights.clear();
++        CHECK(lights.publish(3, {}, {0, 1, 0}, "new", 10, error) && error.empty());
++        CHECK(lights.active.front().id > last && lights.reports.front().id > event);
++        CHECK(!lights.advance(9) && lights.active.empty() && lights.failed == 2 && !lights.update_error.empty());
++        lights.clear();
++        CHECK(lights.update_error.empty() && !lights.started && !lights.failed && !lights.expired);
++        return true;
++    }
++    bool session()
++    {
++        GameSession g;
++        std::string error;
++        CHECK(g.initialize()); // Deliberately no model, sprite or WAV resources.
++        auto& lights = g.server.explosion_lights;
++        auto h = g.objects.create(g.objects.find_class("CClientExplosionSFX"), {}, Creation::World,
++                                  {{"Name", std::string("source")},
++                                   {"Pos", DVector{10, 20, 30}},
++                                   {"Direction", DVector{0, 3, 0}},
++                                   {"ExplosionType", 3}});
++        CHECK(h);
++        DVector moved{100, 200, 300};
++        CHECK(g.server.TeleportObject(h, &moved) == DE_OK && command(g, h) && command(g, h));
++        CHECK(lights.active.size() == 4 && lights.reports.size() == 2 && lights.started == 4 && !lights.failed);
++        const auto& report = g.server.scene_explosions.back();
++        CHECK(report.light_event && report.light_error.empty() && !report.client_fx_available);
++        CHECK(!report.model_error.empty() && !report.sprite_error.empty() && !report.sound_error.empty());
++        CHECK(report.targets.null_damager && report.targets.delivered == 0);
++        for (const auto& fx : lights.active)
++            CHECK(fx.settings.position.x == 10 && fx.settings.position.y == 30);
++        CHECK(g.step(.11) && !g.objects.get(h) && lights.active.size() == 4);
++        CHECK(near(lights.active[0].radius, 228) && near(lights.active[1].radius, 99.56f));
++        CHECK(near(lights.active[0].color.y, .544f) && near(lights.active[1].color.y, .20132f));
++        CHECK(!g.server.PublishExplosionLights(h, 3, {}, {0, 1, 0}, error) && !error.empty());
++        CHECK(lights.reports.size() == 2);
++        CHECK(g.step(1.14) && lights.active.size() == 2 && lights.expired == 2);
++        CHECK(g.step(1) && lights.active.size() == 2 && lights.active.front().radius < 100);
++        CHECK(g.unload_world() && lights.active.empty() && lights.reports.empty());
++        CHECK(!g.server.string_count() && !g.server.message_count());
++        return true;
++    }
++    bool private_world(const std::filesystem::path& root)
++    {
++        GameSession g;
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.initialize() && g.resources.mount_game(c, error));
++        std::uint64_t previous = 0;
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            std::vector<ObjectId> emitters;
++            for (auto id : g.objects.snapshot())
++            {
++                auto* r = g.objects.get(id);
++                if (dynamic_cast<CClientExplosionSFX*>(r->game.get()))
++                {
++                    emitters.push_back(id);
++                    CHECK(command(g, r->handle));
++                }
++            }
++            auto& lights = g.server.explosion_lights;
++            CHECK(emitters.size() == 9 && lights.active.size() == 18 && lights.started == 18 && !lights.failed);
++            CHECK(g.step(.11));
++            for (auto id : emitters)
++                CHECK(!g.objects.get(id));
++            for (unsigned i = 0; i < 18; i += 2)
++            {
++                CHECK(near(lights.active[i].radius, 228) && near(lights.active[i + 1].radius, 99.56f));
++                CHECK(near(lights.active[i].color.y, .544f) && near(lights.active[i + 1].color.x, .20132f));
++            }
++            CHECK(lights.active.front().id > previous);
++            previous = lights.active.back().id;
++            // Advance the real session in bounded steps; long residual lights survive models/sprites.
++            for (unsigned i = 0; i < 130; ++i)
++                CHECK(g.step(.01));
++            CHECK(lights.active.size() == 9 && lights.expired == 9);
++            for (const auto& fx : lights.active)
++                CHECK(fx.settings.duration == 25 && fx.radius > 0 && fx.radius < 100);
++            CHECK(g.server.explosion_models.active.empty() && g.server.explosion_sprites.active.size() == 18);
++            std::cout << "SubwayA cycle " << cycle
++                      << ": 18 lights, nine flashes expired, nine residuals alive; IDs through " << previous << '\n';
++            CHECK(g.unload_world() && lights.active.empty() && lights.reports.empty());
++            CHECK(g.objects.snapshot().empty() && !g.server.string_count() && !g.server.message_count());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::string name = argv[1];
++    return (name == "lifecycle"  ? lifecycle()
++            : name == "recipes"  ? recipes()
++            : name == "failures" ? failures()
++            : name == "session"  ? session()
++                                 : name == "private" && argc == 3 && private_world(argv[2]))
++               ? 0
++               : 1;
++}
+diff --git a/tests/explosion_sprite_tests.cpp b/tests/explosion_sprite_tests.cpp
+index 961d8d9..b1295e1 100644
+--- a/tests/explosion_sprite_tests.cpp
++++ b/tests/explosion_sprite_tests.cpp
+@@ -137,7 +137,7 @@ namespace
+         CHECK(effects.publish(1, {}, {0, 2, 0}, "partial", store, 0, error));
+         CHECK(effects.active.size() == 1 && effects.started == 1 && effects.failed == 1 && !error.empty());
+         CHECK(effects.reports.back().sprites.size() == 1 &&
+-              effects.reports.back().unavailable == "particle ring, lights");
++              effects.reports.back().unavailable == "particle ring, light illumination");
+         CHECK(effects.publish(24, {}, {0, 1, 0}, "unsupported", store, 0, error) && !error.empty());
+         CHECK(effects.publish(1, {}, {}, "zero normal", store, 0, error) && !error.empty());
+         const auto old_id = effects.active.front().id;

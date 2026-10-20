@@ -1,0 +1,13 @@
+{
+  "name": "openblood2_help",
+  "command": [
+    "/tmp/lithtech-audit-2bVxTF/openblood2/game/OpenBlood2",
+    "--help"
+  ],
+  "cwd": "/tmp/lithtech-audit-2bVxTF",
+  "started_utc": "2026-10-15T10:19:37.654761+00:00",
+  "elapsed_seconds": 0.003,
+  "timeout_seconds": 20,
+  "exit_code": 0,
+  "log": "openblood2_help.log"
+}

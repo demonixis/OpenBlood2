@@ -1,0 +1,28 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 686: flare.alternate
+    Start 687: flare.lifetime
+1/9 Test #687: flare.lifetime ...................   Passed    0.08 sec
+    Start 691: flare.failures
+2/9 Test #686: flare.alternate ..................   Passed    0.09 sec
+    Start 688: flare.weapon
+3/9 Test #688: flare.weapon .....................   Passed    0.07 sec
+    Start 689: flare.collect
+4/9 Test #691: flare.failures ...................   Passed    0.08 sec
+    Start 690: flare.drop
+5/9 Test #689: flare.collect ....................   Passed    0.06 sec
+    Start 685: flare.primary
+6/9 Test #690: flare.drop .......................   Passed    0.10 sec
+    Start 692: flare.private
+7/9 Test #685: flare.primary ....................   Passed    0.06 sec
+    Start 693: flare.ai
+8/9 Test #693: flare.ai .........................   Passed    2.83 sec
+9/9 Test #692: flare.private ....................   Passed  127.05 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Label Time Summary:
+flare       = 130.42 sec*proc (9 tests)
+headless    = 130.42 sec*proc (9 tests)
+private     = 129.88 sec*proc (2 tests)
+
+Total Test time (real) = 127.34 sec

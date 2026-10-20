@@ -1,0 +1,39 @@
+[0/2] Re-checking globbed directories...
+[1/65] Scanning <workspace>/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[2/65] Scanning <workspace>/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[3/65] Scanning <workspace>/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[4/65] Scanning <workspace>/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[5/65] Scanning <workspace>/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[6/65] Scanning <workspace>/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[7/65] Scanning <workspace>/Blood2/tests/spark_tests.cpp for CXX dependencies
+[8/65] Scanning <workspace>/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[9/65] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[10/47] Generating CXX dyndep file tests/CMakeFiles/weapon_sprite_tests.dir/CXX.dd
+[11/46] Generating CXX dyndep file tests/CMakeFiles/death_effect_gpu_tests.dir/CXX.dd
+[12/44] Generating CXX dyndep file tests/CMakeFiles/blood_splat_tests.dir/CXX.dd
+[13/43] Generating CXX dyndep file tests/CMakeFiles/blood_splat_gpu_tests.dir/CXX.dd
+[14/42] Generating CXX dyndep file tests/CMakeFiles/blood_spurt_tests.dir/CXX.dd
+[15/41] Scanning <workspace>/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[16/41] Generating CXX dyndep file tests/CMakeFiles/blood_spurt_gpu_tests.dir/CXX.dd
+[17/40] Generating CXX dyndep file tests/CMakeFiles/spark_tests.dir/CXX.dd
+[18/40] Scanning <workspace>/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[19/40] Generating CXX dyndep file tests/CMakeFiles/spark_gpu_tests.dir/CXX.dd
+[20/39] Building CXX object CMakeFiles/blood2_app.dir/src/app/sprite_scene.cpp.o
+[21/39] Building CXX object tests/CMakeFiles/weapon_sprite_tests.dir/__/src/app/sprite_scene.cpp.o
+[22/39] Building CXX object tests/CMakeFiles/death_effect_gpu_tests.dir/__/src/app/sprite_scene.cpp.o
+[23/39] Building CXX object tests/CMakeFiles/blood_splat_tests.dir/__/src/app/sprite_scene.cpp.o
+[24/39] Building CXX object tests/CMakeFiles/blood_spurt_tests.dir/__/src/app/sprite_scene.cpp.o
+[25/39] Building CXX object tests/CMakeFiles/blood_splat_gpu_tests.dir/__/src/app/sprite_scene.cpp.o
+[26/39] Building CXX object tests/CMakeFiles/blood_spurt_gpu_tests.dir/__/src/app/sprite_scene.cpp.o
+[27/39] Building CXX object tests/CMakeFiles/spark_tests.dir/__/src/app/sprite_scene.cpp.o
+[28/39] Linking CXX executable blood2
+[29/39] Linking CXX executable tests/weapon_sprite_tests
+[30/39] Linking CXX executable tests/death_effect_gpu_tests
+[31/39] Linking CXX executable tests/blood_splat_tests
+[32/39] Linking CXX executable tests/blood_splat_gpu_tests
+[33/39] Linking CXX executable tests/blood_spurt_tests
+[34/39] Linking CXX executable tests/blood_spurt_gpu_tests
+[35/39] Building CXX object tests/CMakeFiles/spark_gpu_tests.dir/__/src/app/sprite_scene.cpp.o
+[36/39] Linking CXX executable tests/spark_gpu_tests
+[37/39] Building CXX object tests/CMakeFiles/spark_tests.dir/spark_tests.cpp.o
+[38/39] Linking CXX executable tests/spark_tests

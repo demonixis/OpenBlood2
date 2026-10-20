@@ -1,0 +1,191 @@
+sources/blood2/ObjectDLL/AI_Mgr.cpp SHA256 05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7
+
+3071: // ROUTINE		: AI_Mgr::CanSee
+3072: // DESCRIPTION	: Check if we have visual of target
+3073: // RETURN TYPE	: DBOOL 
+3074: // PARAMS		: HOBJECT hTarget - who we want to see
+3075: // ----------------------------------------------------------------------- //
+3076: DBOOL AI_Mgr::CanSee( HOBJECT hTarget )
+3077: {
+3078: 	IntersectQuery IQuery;
+3079: 	IntersectInfo IInfo;
+3080: 	DVector vTargetHeadPos;
+3081: 	DRotation rRot;
+3082: 	DVector vMyPos, vObjPos;
+3083: 	GlobalFilterFnData globalFilterFnData;
+3084: 
+3085: #ifdef _ADD_ON
+3086: 	// The nightmare ALWAYS sees you.
+3087: 	if(m_pServerDE->IsKindOf(m_pServerDE->GetObjectClass(m_hObject),
+3088: 		m_pServerDE->GetClass("Nightmare")))
+3089: 		return DTRUE;
+3090: #endif
+3091: 
+3092: 	if(!m_pServerDE->GetModelNodeTransform(m_hObject,"head",&vMyPos,&rRot))
+3093: 		VEC_COPY(vMyPos, m_MoveObj.GetPos());
+3094: 
+3095: 	m_pServerDE->GetObjectPos(hTarget, &vObjPos);
+3096: 	
+3097: 	VEC_COPY(IQuery.m_From, vMyPos);
+3098: 	VEC_COPY(IQuery.m_To, vObjPos);
+3099: 
+3100: 	IQuery.m_Flags	  = INTERSECT_OBJECTS | IGNORE_NONSOLID;
+3101: 	IQuery.m_FilterFn = GlobalFilterFn;
+3102: 	globalFilterFnData.m_dwFlags = IGNORE_LIQUID | IGNORE_GLASS;
+3103: 	globalFilterFnData.m_nIgnoreObjects = 1;
+3104: 	globalFilterFnData.m_hIgnoreObjects = &m_hObject;
+3105: 	IQuery.m_pUserData = &globalFilterFnData;	
+3106: 
+3107: 	if(m_pServerDE->IntersectSegment(&IQuery, &IInfo))
+3108: 	{
+3109: 		if( hTarget == IInfo.m_hObject)
+3110: 			return DTRUE;
+3111: 		else
+3112: 		{
+3113: 			// His body is blocked.  Check if we can see the little camper's head
+3114: 			if( m_pServerDE->GetModelNodeTransform( hTarget, "head", &vTargetHeadPos, &rRot ))
+3115: 			{
+3116: 				VEC_COPY( IQuery.m_From, vMyPos );
+3117: 				VEC_COPY( IQuery.m_To, vTargetHeadPos );
+3118: 
+3119: 				if( m_pServerDE->IntersectSegment( &IQuery, &IInfo ))
+3120: 				{
+3121: 					if( hTarget == IInfo.m_hObject )
+3122: 						return DTRUE;
+3123: 				}
+3124: 			}
+3125: 		}
+3126: 	}
+3127: 
+3128: 	return DFALSE;
+3129: }
+3130: 
+
+sources/blood2/ObjectDLL/ObjectUtilities.cpp SHA256 72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3
+
+412: DBOOL GlobalFilterFn(HOBJECT hObj, void *pUserData)
+413: {
+414: 	DDWORD dwObject;
+415: 	GlobalFilterFnData *pGlobalFilterFnData;
+416: 	if (!hObj || !g_pServerDE) return DFALSE;
+417: 
+418: 	if( !pUserData )
+419: 		return DTRUE;
+420: 
+421: 	pGlobalFilterFnData = ( GlobalFilterFnData * )pUserData;
+422: 
+423: 	if( pGlobalFilterFnData->m_nIgnoreObjects && pGlobalFilterFnData->m_hIgnoreObjects )
+424: 	{
+425: 		for( dwObject = 0; dwObject < pGlobalFilterFnData->m_nIgnoreObjects; dwObject++ )
+426: 		{
+427: 			if( pGlobalFilterFnData->m_hIgnoreObjects[dwObject] == hObj )
+428: 				return DFALSE;
+429: 		}
+430: 	}
+431: 
+432: 	HCLASS hObjClass	= g_pServerDE->GetObjectClass(hObj);
+433: 	BaseClass* pObj = (BaseClass*)g_pServerDE->HandleToObject(hObj);			
+434: 
+435: 	if( pGlobalFilterFnData->m_dwFlags & IGNORE_CHARACTER)
+436: 	{
+437: 		HCLASS hCharacter = g_pServerDE->GetClass("CBaseCharacter");
+438: 
+439: 		if(g_pServerDE->IsKindOf(hObjClass, hCharacter))
+440: 			return DFALSE;
+441: 	}
+442: 
+443: 	if( pGlobalFilterFnData->m_dwFlags & IGNORE_LIQUID)
+444: 	{
+445: 		HCLASS hLiquid	= g_pServerDE->GetClass("VolumeBrush");
+446: 
+447: 		if(g_pServerDE->IsKindOf(hObjClass, hLiquid))
+448: 			return DFALSE;
+449: 	}
+450: 
+451: 	if( pGlobalFilterFnData->m_dwFlags & IGNORE_DESTRUCTABLE)
+452: 	{
+453: 		HCLASS hDestruct = g_pServerDE->GetClass("CDestructableModel");
+454: 
+455: 		if(g_pServerDE->IsKindOf(hObjClass, hDestruct))
+456: 		{
+457: 			CDestructableModel* pModel = (CDestructableModel*)g_pServerDE->HandleToObject(hObj);			
+458: 
+459: 			if(pModel->IsDestructable())
+460: 				return DFALSE;
+461: 		}
+462: 	}
+463: 
+464: 	if( pGlobalFilterFnData->m_dwFlags & IGNORE_GLASS)
+465: 	{
+466: 		HCLASS hBrush = g_pServerDE->GetClass("CDestructableBrush");
+467: 
+468: 		if(g_pServerDE->IsKindOf(hObjClass, hBrush))
+469: 		{
+470: 			CDestructableBrush* pBrush = (CDestructableBrush*)g_pServerDE->HandleToObject(hObj);			
+471: 
+472: 			if(pBrush->GetSurfaceType() == SURFTYPE_GLASS && pBrush->IsDestructable())
+473: 				return DFALSE;
+474: 		}
+475: 	}
+476: 
+477: 	return DTRUE;
+
+sources/blood2/ObjectDLL/DestructableBrush.h SHA256 bb5e5d9ac30ea0a4036c75ebf85ac009e6075260caec08c865d8b4cf99fb56bf
+
+17: 
+18: 		CDestructableBrush();
+19: 		virtual		~CDestructableBrush();
+20: 
+21: 		DBOOL		ReadProp(ObjectCreateStruct *pStruct);
+22: 		void		PostPropRead(ObjectCreateStruct *pStruct);
+23: 		SurfaceType	GetSurfaceType();
+24: 		DBOOL		IsMarkable() const { return m_bAllowMarks; }
+25: 		DBOOL		IsFireThrough() const { return m_bFireThrough; }
+26: 		DBOOL		IsDestructable() const { return m_bDestructable; }
+27: 	protected:
+28: 
+29: 		DDWORD		EngineMessageFn(DDWORD messageID, void *pData, float lData);
+30: 		DDWORD		ObjectMessageFn(HOBJECT hSender, DDWORD messageID, HMESSAGEREAD hRead);
+
+sources/blood2/AppHeaders/basetypes_de.h SHA256 ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141
+
+350: 	#define FLAG_GRAVITY			(1<<17)	// Gravity is applied.
+351: 	#define FLAG_STAIRSTEP			(1<<18)	// Steps up stairs.
+352: 	#define FLAG_MODELKEYS			(1<<19)	// The object won't get get MID_MODELSTRINGKEY messages unless
+353: 											// it sets this flag.
+354: 	#define FLAG_KEEPALIVE			(1<<20)	// Save and restore this object when switching worlds.
+355: 	#define FLAG_GOTHRUWORLD		(1<<21) // Object can pass through world
+356: 	#define FLAG_RAYHIT				(1<<22) // Object is hit by raycasts.
+357: 	#define FLAG_DONTFOLLOWSTANDING	(1<<23) // Dont follow the object this object is standing on.
+358: 	#define FLAG_FORCECLIENTUPDATE	(1<<24)	// Force client updates even if the object is OT_NORMAL or invisible.
+
+sources/lithtech/runtime/world/src/fullintersectline.cpp SHA256 f199f999a63986325675d9cb1bf2bdede98942e03cf0725dab937f506f6f3409
+
+607: // Called by the WorldTree in IntersectSegment.
+608: static bool i_ISCallback(WorldTreeObj *pObj, void *pCBUser) 
+609: {    
+610:     ASSERT(pObj->GetObjType() == WTObj_DObject);
+611:     LTObject *pObject = (LTObject*)pObj;
+612:     
+613:     if (pObject->m_Flags & (FLAG_RAYHIT|FLAG_SOLID) || g_bProcessNonSolid) 
+614: 	{
+615:         // Honor the INTERSECT_OBJECTS flag (or lack thereof...)
+616:         if (!g_bProcessObjects && !pObject->IsMainWorldModel()) 
+617: 		{
+618:             return false;
+619:         }
+620: 
+621:         // Hit the object if it has the ray hit flag, is solid, or if non-solid and it
+622:         // query doesn't have ignore non-solid...
+623:         // This is basically everything except for objects with only touch-notify...
+624:         // Do further tests..
+625:         return i_HandlePossibleIntersection(g_pCurQuery->m_From, g_pCurQuery->m_To, pObject);
+626:     }
+627: 
+
+642:     g_pWorldIntersection = LTNULL;
+643:     g_hWorldPoly = INVALID_HPOLY;
+644: 	g_hModelNode = INVALID_MODEL_NODE;
+645:     g_bProcessNonSolid = !(pQuery->m_Flags & IGNORE_NONSOLID);
+646:     g_bProcessObjects = !!(pQuery->m_Flags & INTERSECT_OBJECTS);
+647: 	g_bCheckIfFromPointIsInsideObject = !!(pQuery->m_Flags & CHECK_FROM_POINT_INSIDE_OBJECTS);

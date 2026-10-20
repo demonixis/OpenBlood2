@@ -1,0 +1,20 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 946: hud.bitmaps
+1/5 Test #946: hud.bitmaps ......................   Passed    0.00 sec
+    Start 947: hud.values
+2/5 Test #947: hud.values .......................   Passed    0.00 sec
+    Start 948: hud.input
+3/5 Test #948: hud.input ........................   Passed    0.00 sec
+    Start 949: hud.session
+4/5 Test #949: hud.session ......................   Passed    0.01 sec
+    Start 950: hud.private
+5/5 Test #950: hud.private ......................   Passed    1.84 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+headless    =   1.86 sec*proc (5 tests)
+hud         =   1.86 sec*proc (5 tests)
+private     =   1.84 sec*proc (1 test)
+
+Total Test time (real) =   1.87 sec

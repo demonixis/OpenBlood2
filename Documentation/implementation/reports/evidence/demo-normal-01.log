@@ -1,0 +1,14 @@
+Command: ['build/release/blood2', '--demo', '--data-dir', '/home/yann/Games/B2Demo', '--frames', '120', '--log-dir', '/tmp/blood2-demo-normal-logs', '--capture', '/tmp/blood2-demo-normal-01-verified.png']
+[info] Log session: /tmp/blood2-demo-normal-logs/session-1792406095678837257-0
+[info] OpenBlood2 0.3.0 / 3a9466f-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-3a9466f (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=Demo_01; demo=true; config=blood2.local.ini; inspector=false; view=false; bench=false; headless=false; frames=120
+[info] External data: /home/yann/Games/B2Demo (--data-dir)
+[info] B2DEMO.REZ: detected, 55041396 bytes
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: Demo_01 (direct entry)
+[info] World ready: worlds/demo_01.dat
+[info] Frontend complete: 120 frames, world worlds/demo_01.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+Exit code: 0

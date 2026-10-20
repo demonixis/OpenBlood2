@@ -1,0 +1,362 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 61d2597..dee1a63 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -353,3 +353,8 @@ Read [contracts](docs/WEAPON_DROP_CONTRACTS.md). Preserve left-first selection,
+ checked independent lifetime, one-second initial support check and ammo-dependent
+ pickup acceptance. Failed transfers stay inspectable. Player drop controls,
+ corpses/gibs, required FX, Gideon and ExitTrigger remain unavailable; M2 stays open.
++
++The [inspector/input continuation](../Documentation/Implementation/M2_CONTROLS.md) enables keyboard controls by default
++and native inspector folding/resizing. Preserve text/focus suppression, F2's
++explicit preference, original cinematic gates and single MoveMgr integration.
++Folding or hiding UI must not stop the session; M2 remains incomplete.
+diff --git a/README.md b/README.md
+index 4c6f446..a69da6d 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,12 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The inspector is now **collapsible and resizable**: click the title arrow to fold
++or unfold it, drag its borders to resize, or use F1 to hide/show it. After entering
++the player in Session, keyboard movement is enabled by default: **WASD/ZQSD**,
++**Shift** run, **Space** jump, **Ctrl** crouch, **arrows** look, **E** USE. **F2** toggles
++keyboard controls. SubwayA's original intro temporarily blocks movement; wait for
++it to end. See [input/UI evidence](../Documentation/Implementation/M2_CONTROLS.md).
++
+ Latest death prerequisite: [original NPC weapon drops](../Documentation/Implementation/M2_WEAPON_DROPS.md)
+ connects detached Beretta physics, original pickups and player collection. Corpses/gibs,
+ required FX, Gideon and ExitTrigger still keep M2 incomplete.
+diff --git a/docs/MOVEMENT_CONTRACTS.md b/docs/MOVEMENT_CONTRACTS.md
+index c6c6274..776e496 100644
+--- a/docs/MOVEMENT_CONTRACTS.md
++++ b/docs/MOVEMENT_CONTRACTS.md
+@@ -113,9 +113,10 @@ discarded time. A local top view draws the actual primary-world solid slice,
+ solid object boxes and player heading. It is a diagnostic map, not game rendering.
+ Hold buttons supply temporary commands at frame boundaries.
+ 
+-**F2** or the checkbox enables physical **WASD / AZERTY ZQSD**, **Shift** run,
++Keyboard movement is enabled by default. **F2** or the common-header checkbox toggles physical **WASD / AZERTY ZQSD**, **Shift** run,
+ **Space** jump, **Ctrl** crouch and arrow-key look. **F1** hides the inspector without stopping
+-keyboard movement. Text editing suppresses keyboard commands; focus loss clears
++keyboard movement. The title arrow folds/unfolds it, and its borders resize it;
++folded input fields cannot capture gameplay keys. See [UI evidence](../../Documentation/Implementation/M2_CONTROLS.md). Text editing suppresses keyboard commands; focus loss clears
+ pressed keys and suppresses panel movement. When keyboard movement is enabled,
+ its keys are routed away from ImGui navigation (unless editing text); Space cannot
+ also activate a focused inspection button. Game rules receive no SDL types.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 41aebff..d6d5667 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -646,3 +646,9 @@ BerettaPU, SpawnWeaponPickup and PlayerObj MID_ADDWEAPON rules. See the
+ No donor engine code/dependency was imported. Original NOSLIDING bit 25 is
+ implemented by the existing replacement solver; later LithTech moveplayer was
+ consulted for first-contact meaning only, not treated as retail Blood II proof.
++
++## Inspector folding and keyboard defaults
++
++Application-owned SDL/ImGui usability changes only. No new original-source import
++or dependency update. Existing MoveMgr bindings and camera gates remain unchanged;
++see [evidence](../../Documentation/Implementation/M2_CONTROLS.md).
+diff --git a/docs/WORLD_VIEW_CONTRACTS.md b/docs/WORLD_VIEW_CONTRACTS.md
+index 3803262..bd48e12 100644
+--- a/docs/WORLD_VIEW_CONTRACTS.md
++++ b/docs/WORLD_VIEW_CONTRACTS.md
+@@ -78,7 +78,8 @@ The shader compiler is an offline tool, not a new runtime dependency.
+ 
+ `--view-world` mounts the selected world and enters the existing original player
+ subset, starts with the inspector hidden and keyboard controls enabled, and retains
+-the authored intro. F1 toggles the inspector; F2 toggles movement. Physical WASD/ZQSD,
++the authored intro. F1 toggles inspector visibility; its title arrow folds/unfolds it. F2 toggles movement,
++which now also starts enabled for normal Session entry. Physical WASD/ZQSD,
+ arrows, Shift, Space, Ctrl and E retain existing movement/look/USE rules and focus/text
+ input handling. Mouse-look, weapon mouse bindings and rendered view weapons are not
+ added by this increment. `--start-game` still exits 6 for required missing services.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 8918aa0..4e810c3 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -360,24 +360,34 @@ namespace OpenBlood2
+         if (!visible)
+             return;
+         const auto display = ImGui::GetIO().DisplaySize;
+-        ImGui::SetNextWindowPos(ImVec2(16, 16), ImGuiCond_Always);
+-        ImGui::SetNextWindowSize(ImVec2(display.x - 32, display.y - 32), ImGuiCond_Always);
+-        if (ImGui::Begin("Blood II | In-game inspector", &visible,
+-                         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
++        ImGui::SetNextWindowPos(ImVec2(16, 16), ImGuiCond_FirstUseEver);
++        ImGui::SetNextWindowSize(ImVec2(display.x - 32, display.y - 32), ImGuiCond_FirstUseEver);
++        const ImVec2 maximum(std::max(1.0f, display.x - 32), std::max(1.0f, display.y - 32));
++        ImGui::SetNextWindowSizeConstraints(ImVec2(std::min(480.0f, maximum.x), std::min(300.0f, maximum.y)), maximum);
++        const bool expanded = ImGui::Begin("Blood II | In-game inspector", &visible);
++        collapsed = ImGui::IsWindowCollapsed();
++        if (expanded)
+         {
+             ImGui::TextColored(ImVec4(0.95f, 0.48f, 0.43f, 1),
+                                game.world_path.empty() ? "ORIGINAL OBJECT DIAGNOSTICS" : "M2  /  WORLD INSPECTION");
+             ImGui::TextWrapped("Original objects, ABC animation and primary-world collision. Full original player "
+                                "session remains blocked.");
+-            ImGui::TextDisabled("F1: toggle inspector    |    Escape: quit when UI does not capture input");
++            ImGui::TextDisabled("Title arrow: fold/unfold | Drag borders: resize | F1: hide/show | Escape: quit");
++            ImGui::Checkbox("Keyboard movement (F2)", &keyboard_movement);
++            ImGui::TextWrapped("WASD / ZQSD: walk | Shift: run | Space: jump | Ctrl: crouch | Arrows: look | E: use");
++            if (!game.client_shell.m_bInWorld)
++                ImGui::TextDisabled("Enter the player in Session to use the keyboard.");
++            else if (game.client_shell.view.object && !game.client_shell.view.settings.player_movement)
++                ImGui::TextDisabled("The original cinematic currently blocks movement. Controls return when it ends.");
+             ImGui::Separator();
+             if (ImGui::BeginTabBar("Inspection"))
+             {
+                 if (ImGui::BeginTabItem("3D view"))
+                 {
+-                    ImGui::TextWrapped("Diagnostic textured geometry with depth. F1 shows the world; F2 enables "
+-                                       "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
+-                                       "the player in Session first, or launch --view-world.");
++                    ImGui::TextWrapped(
++                        "Diagnostic textured geometry with depth. Fold the title bar to see the world. F2 toggles "
++                        "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
++                        "the player in Session first, or launch --view-world.");
+                     ImGui::TextWrapped(
+                         "Opaque textures/models are unlit. Lightmaps, sprites, liquid surfaces, "
+                         "transparency and sky rendering remain unavailable. Unsupported objects stay in World.");
+@@ -1080,8 +1090,6 @@ namespace OpenBlood2
+         const auto& body = move.body;
+         if (ImGui::Button("Select player"))
+             selection.id = game.objects.get(player->m_hObject)->id;
+-        ImGui::SameLine();
+-        ImGui::Checkbox("Keyboard movement (F2)", &keyboard_movement);
+         ImGui::TextWrapped(
+             "WASD / ZQSD: walk | Shift: run | Space: jump | Ctrl: crouch | Arrows: look. F1 hides UI. Text editing and "
+             "focus loss suspend keys.");
+@@ -1567,8 +1575,6 @@ namespace OpenBlood2
+         {
+             const auto& state = player->containers;
+             const auto& move = game.client_shell.move_mgr;
+-            ImGui::Checkbox("Keyboard movement (F2)", &keyboard_movement);
+-            ImGui::SameLine();
+             ImGui::Text("Air %.1f / 100 | head code %u", player->m_fAirLevel, unsigned(state.head.code));
+             ImGui::Text("Body %zu / %zu | liquid %s | ladder %s | conveyor %s | gravity %s", state.count, state.total,
+                         move.m_bBodyInLiquid ? "yes" : "no", move.m_bBodyOnLadder ? "yes" : "no",
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index ef1c4ad..27790a5 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -23,7 +23,8 @@ namespace OpenBlood2
+         ObjectId skeleton_selection{};
+         void draw_skeleton(GameSession&, ObjectSelection&);
+         bool select_session = false;
+-        bool select_movement = false, keyboard_movement = false;
++        bool select_movement = false, keyboard_movement = true;
++        bool collapsed = false;
+         bool select_containers = false;
+         bool select_triggers = false;
+         ObjectId trigger_selection{}, trigger_request{};
+diff --git a/src/app/inspector_controls_smoke.h b/src/app/inspector_controls_smoke.h
+new file mode 100644
+index 0000000..9966dd2
+--- /dev/null
++++ b/src/app/inspector_controls_smoke.h
+@@ -0,0 +1,63 @@
++#pragma once
++#include "app/inspector.h"
++#include <imgui_internal.h>
++#include <spdlog/spdlog.h>
++
++namespace OpenBlood2
++{
++    // UI-only smoke driver for the existing gpu.movement scenario. Game input
++    // still enters through SDL events in main; no game state is modified here.
++    struct InspectorControlsSmoke
++    {
++        ImVec2 collapse_button{};
++        bool folded = false;
++        std::uint64_t updates = 0;
++
++        void before_frame(std::uint64_t frame)
++        {
++            if (frame == 172 || frame == 173 || frame == 187 || frame == 188)
++            {
++                auto& io = ImGui::GetIO();
++                io.AddMousePosEvent(collapse_button.x, collapse_button.y);
++                io.AddMouseButtonEvent(0, frame == 172 || frame == 187);
++            }
++        }
++        bool after_draw(std::uint64_t frame, const GameSession& game, const Inspector& inspector)
++        {
++            if (frame < 170 || frame > 195)
++                return true;
++            const auto* window = ImGui::FindWindowByName("Blood II | In-game inspector");
++            if (!window || (window->Flags & (ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize)))
++                return false;
++            // Native title-bar arrow location in the pinned Dear ImGui layout.
++            const auto& style = ImGui::GetStyle();
++            collapse_button = {window->Pos.x + style.FramePadding.x + ImGui::GetFontSize() * .5f,
++                               window->Pos.y + window->TitleBarHeight * .5f};
++            if (frame == 176)
++            {
++                folded = inspector.collapsed && window->Size.y < 80 && inspector.keyboard_movement;
++                updates = game.client_shell.updates;
++                if (!folded)
++                {
++                    spdlog::error("Inspector title-arrow click did not fold the window");
++                    return false;
++                }
++            }
++            if (frame == 185)
++            {
++                if (!folded || !inspector.collapsed || game.client_shell.updates <= updates ||
++                    !game.client_shell.movement_input.crouch || !game.client_shell.move_mgr.ready())
++                    return false;
++                spdlog::info("Collapsed inspector: live updates={}, original keyboard crouch active",
++                             game.client_shell.updates - updates);
++            }
++            if (frame == 195)
++            {
++                const bool restored = folded && !inspector.collapsed && window->Size.y > 300;
++                spdlog::info("Inspector title-arrow fold/unfold: restored={}", restored);
++                return restored;
++            }
++            return true;
++        }
++    };
++} // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 3fc09cf..220128e 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -36,6 +36,7 @@
+ 
+ #if BLOOD2_INSPECTOR
+ #include "app/inspector.h"
++#include "app/inspector_controls_smoke.h"
+ #include <imgui.h>
+ #include <imgui_impl_sdl3.h>
+ #include <imgui_impl_sdlgpu3.h>
+@@ -357,7 +358,6 @@ namespace
+         inspector.keyframe_selection = smoke_keyframe;
+         inspector.brush_selection = smoke_body;
+         inspector.select_doors = options.doors_smoke || options.interaction_smoke;
+-        inspector.keyboard_movement = options.interaction_smoke || options.view_world;
+         inspector.select_triggers = options.triggers_smoke;
+         inspector.trigger_selection = smoke_trigger;
+         inspector.door_selection = smoke_door;
+@@ -369,6 +369,11 @@ namespace
+ #else
+         (void)config;
+         (void)data;
++#endif
++#if BLOOD2_INSPECTOR
++        OpenBlood2::InspectorControlsSmoke inspector_controls_smoke;
++        const bool check_inspector_controls =
++            options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
+ #endif
+         bool done = false;
+         bool resized = false;
+@@ -385,7 +390,6 @@ namespace
+         bool weapons_fired = false, weapon_advanced_hidden = false;
+         std::uint64_t hidden_weapon_shots = 0;
+         OpenBlood2::MovementControls controls;
+-        controls.enabled = options.interaction_smoke || options.view_world;
+         controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
+         DVector hidden_position{};
+         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
+@@ -408,12 +412,16 @@ namespace
+             while (SDL_PollEvent(&event))
+             {
+                 controls.event(event, SDL_GetWindowID(runtime.window));
++                if (options.movement_smoke &&
++                    (event.type == SDL_EVENT_WINDOW_FOCUS_LOST || event.type == SDL_EVENT_WINDOW_FOCUS_GAINED))
++                    spdlog::info("Movement smoke focus at frame {}: {}", frames, controls.focused);
+ #if BLOOD2_INSPECTOR
+                 if (event.type == SDL_EVENT_KEY_DOWN && event.key.scancode == SDL_SCANCODE_F2 && !event.key.repeat)
+                     inspector.keyboard_movement = controls.enabled;
+ #endif
+ #if BLOOD2_INSPECTOR
+-                if (!controls.consumes(event, inspector_visible && ImGui::GetIO().WantTextInput))
++                if (!controls.consumes(event,
++                                       inspector_visible && !inspector.collapsed && ImGui::GetIO().WantTextInput))
+                     ImGui_ImplSDL3_ProcessEvent(&event);
+ #endif
+                 if (event.type == SDL_EVENT_QUIT || (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED &&
+@@ -457,7 +465,7 @@ namespace
+ #if BLOOD2_INSPECTOR
+             inspector.apply_commands(game, selection);
+             controls.enabled = inspector.keyboard_movement;
+-            text_editing = inspector_visible && ImGui::GetIO().WantTextInput;
++            text_editing = inspector_visible && !inspector.collapsed && ImGui::GetIO().WantTextInput;
+ #endif
+             if (frames == reload_frame + 1 &&
+                 (options.weapons_smoke || options.movement_smoke || options.interaction_smoke) &&
+@@ -510,6 +518,10 @@ namespace
+             controls.look(game.client_shell.rotation, delta, text_editing);
+             if (options.movement_smoke)
+             {
++                if (frames == 45 || frames == 100 || frames == 170 || frames == 185)
++                    spdlog::info("Movement smoke input at {}: enabled={}, focused={}, text={}, W={}, Ctrl={}", frames,
++                                 controls.enabled, controls.focused, text_editing, controls.keys[SDL_SCANCODE_W],
++                                 controls.keys[SDL_SCANCODE_LCTRL]);
+                 forward_frames += movement.forward;
+                 jump_frames += movement.jump;
+                 crouch_frames += movement.crouch;
+@@ -668,8 +680,12 @@ namespace
+                 ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
+             else
+                 ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
++            if (check_inspector_controls)
++                inspector_controls_smoke.before_frame(frames);
+             ImGui::NewFrame();
+             inspector.draw(config, data, inspector_visible, frames, game, selection);
++            if (check_inspector_controls && !inspector_controls_smoke.after_draw(frames, game, inspector))
++                return 4;
+             ImGui::Render();
+ #endif
+             SDL_GPUCommandBuffer* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
+@@ -837,8 +853,7 @@ namespace
+                         SDL_Event focus{};
+                         focus.type = SDL_EVENT_WINDOW_FOCUS_GAINED;
+                         focus.window.windowID = SDL_GetWindowID(runtime.window);
+-                        event_ok = SDL_PushEvent(&focus) && key_event(SDL_SCANCODE_F2, true) &&
+-                                   key_event(SDL_SCANCODE_F2, false);
++                        event_ok = SDL_PushEvent(&focus); // Default controls must work without an F2 opt-in.
+                     }
+                     if (frames == 45)
+                         event_ok = key_event(SDL_SCANCODE_W, true) && key_event(SDL_SCANCODE_SPACE, true);
+diff --git a/src/app/movement_controls.h b/src/app/movement_controls.h
+index 2d09876..9ec04cc 100644
+--- a/src/app/movement_controls.h
++++ b/src/app/movement_controls.h
+@@ -11,7 +11,7 @@ namespace OpenBlood2
+     struct MovementControls
+     {
+         std::array<bool, SDL_SCANCODE_COUNT> keys{};
+-        bool focused = false, enabled = false, use_suppressed = false;
++        bool focused = false, enabled = true, use_suppressed = false;
+         bool consumes(const SDL_Event& event, bool text_editing) const
+         {
+             if (!focused || !enabled || text_editing ||
+diff --git a/tests/movement_tests.cpp b/tests/movement_tests.cpp
+index 16488f1..bbcbe59 100644
+--- a/tests/movement_tests.cpp
++++ b/tests/movement_tests.cpp
+@@ -334,7 +334,7 @@ namespace
+             event.key.windowID = id;
+             input.event(event, window);
+         };
+-        key(SDL_SCANCODE_F2, true);
++        CHECK(input.enabled); // Normal inspector entry and no-UI launches share this default.
+         key(SDL_SCANCODE_W, true);
+         key(SDL_SCANCODE_SPACE, true);
+         key(SDL_SCANCODE_LSHIFT, true);
+@@ -347,6 +347,11 @@ namespace
+         key(SDL_SCANCODE_RIGHT, true);
+         input.look(rotation, .1, false);
+         CHECK(rotation.yaw > .19f);
++        key(SDL_SCANCODE_F2, true);
++        CHECK(!input.enabled && !input.sample(false).forward);
++        key(SDL_SCANCODE_F2, false);
++        key(SDL_SCANCODE_F2, true);
++        CHECK(input.enabled && input.sample(false).forward);
+         event = {};
+         event.type = SDL_EVENT_WINDOW_FOCUS_LOST;
+         event.window.windowID = window;

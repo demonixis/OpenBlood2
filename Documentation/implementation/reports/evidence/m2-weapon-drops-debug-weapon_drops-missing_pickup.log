@@ -1,0 +1,14 @@
+490/491 Testing: weapon_drops.missing_pickup
+490/491 Test: weapon_drops.missing_pickup
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests" "missing_pickup" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-drop-fixtures/missing_pickup"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapon_drops.missing_pickup" start time: Oct 16 16:00 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_drops.missing_pickup" end time: Oct 16 16:00 CEST
+"weapon_drops.missing_pickup" time elapsed: 00:00:00
+----------------------------------------------------------

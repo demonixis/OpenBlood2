@@ -1,0 +1,9 @@
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walked from spawn to z=-2192.09
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=8, ammo=42, independent corpse verified, native=0
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walked from spawn to z=-2192.09
+gak: AI_Update: Selected AI action is not integrated  state=10 last=0 phase=1 command=999 placement=not queried corrections=0 distance=0 anchor=0,0,0 requested=0,0,0 candidate=0,0,0 polygon=4294967295
+Death dims 17,35.0451,17 old 16.3785,38.4286,16.3785
+Wider anchor 1 travel=1 start=0 fraction=1 point=0,0,0 normal=0,0,0
+combat:335: !actor->runtime_failed

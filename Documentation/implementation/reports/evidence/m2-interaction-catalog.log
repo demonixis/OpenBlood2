@@ -1,0 +1,30 @@
+129/130 Testing: interaction.catalog
+129/130 Test: interaction.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"interaction.catalog" start time: Oct 15 21:04 CEST
+Output:
+----------------------------------------------------------
+worlds/04_steamtunnels.dat Gear3 rejected: Gear3: Missing named world model
+worlds/19_lobby.dat temple1 rejected: temple1: Missing named world model
+worlds/19_lobby.dat exec2 rejected: exec2: Missing named world model
+worlds/19_lobbyb.dat temple1 rejected: temple1: Missing named world model
+worlds/19_lobbyb.dat secdoor2 rejected: secdoor2: Missing named world model
+worlds/19_lobbyc.dat temple1 rejected: temple1: Missing named world model
+worlds/19_lobbyc.dat secdoor2 rejected: secdoor2: Missing named world model
+worlds/22_office.dat door1 rejected: door1: Ambiguous named world model
+worlds/multi/bb_bridge.dat door02 rejected: RotatingDoor: invalid property TypeAction
+worlds/multi/bb_bridge.dat door01 rejected: RotatingDoor: invalid property TypeAction
+worlds/multi/bb_bridge.dat lid01 rejected: RotatingDoor: invalid property TypeAction
+worlds/multi/bb_bridge.dat lid01 rejected: RotatingDoor: invalid property TypeAction
+RotatingDoor catalog created=223 rejected=12 filtered=0 unreadable=1 children=155 moved=215
+ambiguous=1
+missing=7
+schema=4
+<end of output>
+Test time =   5.77 sec
+----------------------------------------------------------
+Test Passed.
+"interaction.catalog" end time: Oct 15 21:04 CEST
+"interaction.catalog" time elapsed: 00:00:05
+----------------------------------------------------------

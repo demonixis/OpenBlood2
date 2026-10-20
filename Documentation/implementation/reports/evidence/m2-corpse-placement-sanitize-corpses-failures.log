@@ -1,0 +1,14 @@
+480/646 Testing: corpses.failures
+480/646 Test: corpses.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.failures" start time: Oct 17 04:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.failures" end time: Oct 17 04:30 CEST
+"corpses.failures" time elapsed: 00:00:00
+----------------------------------------------------------

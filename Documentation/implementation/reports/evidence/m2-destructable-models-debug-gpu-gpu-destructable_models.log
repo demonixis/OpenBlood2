@@ -1,0 +1,107 @@
+718/718 Testing: gpu.destructable_models
+718/718 Test: gpu.destructable_models
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/model_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable-model-city" "/home/yann/.steam/steam/steamapps/common/Blood II" "destructable_city"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.destructable_models" start time: Oct 17 05:18 CEST
+Output:
+----------------------------------------------------------
+Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+CityHub Model garbagecan2.abc cycle 0: 5726 textured pixels, no fallback; hidden/restored checked
+CityHub Model barrel.abc cycle 0: 7052 textured pixels, no fallback; hidden/restored checked
+CityHub Model ceilingfan2.abc cycle 0: 879 textured pixels, no fallback; hidden/restored checked
+CityHub Model garbagecan2.abc cycle 1: 5726 textured pixels, no fallback; hidden/restored checked
+CityHub Model barrel.abc cycle 1: 7052 textured pixels, no fallback; hidden/restored checked
+CityHub Model ceilingfan2.abc cycle 1: 879 textured pixels, no fallback; hidden/restored checked
+Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+<end of output>
+Test time =   2.04 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.destructable_models" end time: Oct 17 05:18 CEST
+"gpu.destructable_models" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 17 05:18 CEST
+
+brushes =   2.49 sec*proc
+
+cameras =   2.72 sec*proc
+
+character =  20.30 sec*proc
+
+cinematics =   2.69 sec*proc
+
+containers =   8.71 sec*proc
+
+destructable_models =   2.04 sec*proc
+
+doors =   2.41 sec*proc
+
+energy =   0.88 sec*proc
+
+explosion_flames =   1.78 sec*proc
+
+explosion_fragments =   0.89 sec*proc
+
+explosion_models =   0.89 sec*proc
+
+explosion_rings =   0.92 sec*proc
+
+gideon_teleport =   0.98 sec*proc
+
+gpu = 194.51 sec*proc
+
+interaction =   8.16 sec*proc
+
+keyframes =   2.70 sec*proc
+
+lights =   2.65 sec*proc
+
+model_view =   3.50 sec*proc
+
+movement =  18.93 sec*proc
+
+naga =   0.89 sec*proc
+
+object_particles =   0.87 sec*proc
+
+objectives =   5.37 sec*proc
+
+pickups =   2.66 sec*proc
+
+player =   2.86 sec*proc
+
+player_controls =   5.89 sec*proc
+
+player_keepalive =   6.54 sec*proc
+
+player_restore =   3.17 sec*proc
+
+private = 184.83 sec*proc
+
+randomsound =  13.70 sec*proc
+
+sceneexplosion =   2.75 sec*proc
+
+session_playback =   1.58 sec*proc
+
+shield =   0.88 sec*proc
+
+sound =   2.80 sec*proc
+
+sprite_view =   1.41 sec*proc
+
+sprites =   2.65 sec*proc
+
+triggers =   2.84 sec*proc
+
+weapon_sprites =   2.18 sec*proc
+
+weapons =  20.64 sec*proc
+
+wind =   1.28 sec*proc
+
+world_view =  21.46 sec*proc
+
+worldpaths =   2.65 sec*proc
+

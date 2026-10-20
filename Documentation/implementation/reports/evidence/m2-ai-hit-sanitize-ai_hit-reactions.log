@@ -1,0 +1,14 @@
+449/454 Testing: ai_hit.reactions
+449/454 Test: ai_hit.reactions
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "reactions"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.reactions" start time: Oct 16 15:38 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.reactions" end time: Oct 16 15:38 CEST
+"ai_hit.reactions" time elapsed: 00:00:00
+----------------------------------------------------------

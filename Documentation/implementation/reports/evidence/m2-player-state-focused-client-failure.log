@@ -1,0 +1,28 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 519: player_state.roundtrip
+1/6 Test #519: player_state.roundtrip ...........   Passed    0.01 sec
+    Start 520: player_state.clocks
+2/6 Test #520: player_state.clocks ..............   Passed    0.00 sec
+    Start 521: player_state.initialization
+3/6 Test #521: player_state.initialization ......   Passed    0.01 sec
+    Start 522: player_state.failures
+4/6 Test #522: player_state.failures ............   Passed    0.01 sec
+    Start 523: player_state.capture
+5/6 Test #523: player_state.capture .............   Passed    0.01 sec
+    Start 524: player_state.private
+6/6 Test #524: player_state.private .............***Failed    0.44 sec
+private_data:331: target->UpdateAirLevel(.1f) && std::abs(target->m_fAirLevel - (saved.air + 4)) < .001f
+
+
+83% tests passed, 1 tests failed out of 6
+
+Label Time Summary:
+headless        =   0.47 sec*proc (6 tests)
+player_state    =   0.47 sec*proc (6 tests)
+private         =   0.44 sec*proc (1 test)
+
+Total Test time (real) =   0.47 sec
+
+The following tests FAILED:
+	524 - player_state.private (Failed)                     headless player_state private
+Errors while running CTest

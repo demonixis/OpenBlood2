@@ -1,0 +1,17 @@
+518/518 Testing: destructable_state.private
+518/518 Test: destructable_state.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable_state_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"destructable_state.private" start time: Oct 16 18:04 CEST
+Output:
+----------------------------------------------------------
+cycle 0: aggregate HP 68, armor 24, source-independent damage/heal; no world transfer
+cycle 1: aggregate HP 69, armor 24, source-independent damage/heal; no world transfer
+cycle 2: aggregate HP 70, armor 24, source-independent damage/heal; no world transfer
+<end of output>
+Test time =   1.28 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_state.private" end time: Oct 16 18:04 CEST
+"destructable_state.private" time elapsed: 00:00:01
+----------------------------------------------------------

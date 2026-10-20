@@ -1,0 +1,15 @@
+592/596 Testing: energy.lifetime
+592/596 Test: energy.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/energy_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/energy-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"energy.lifetime" start time: Oct 17 01:22 CEST
+Output:
+----------------------------------------------------------
+Shooter unlink retains unattributed damage; strict lifetime expiry and complete unload release verified.
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"energy.lifetime" end time: Oct 17 01:22 CEST
+"energy.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

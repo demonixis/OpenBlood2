@@ -1,0 +1,45 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 44: world.level_change_private
+      Start 45: world.destination_trial_private
+ 1/17 Test #45: world.destination_trial_private ...   Passed    6.09 sec
+      Start 28: world.destination_trials
+ 2/17 Test #28: world.destination_trials ..........   Passed    0.04 sec
+      Start 31: world.destination_lifetime
+ 3/17 Test #31: world.destination_lifetime ........   Passed    0.01 sec
+      Start 11: objects.unsupported_teardown
+ 4/17 Test #11: objects.unsupported_teardown ......   Passed    0.01 sec
+      Start 12: objects.creation_failures
+ 5/17 Test #12: objects.creation_failures .........   Passed    0.01 sec
+      Start 10: objects.messages_strings
+ 6/17 Test #10: objects.messages_strings ..........   Passed    0.01 sec
+      Start 26: world.level_change
+ 7/17 Test #26: world.level_change ................   Passed    0.07 sec
+      Start  1: objects.builtin_model
+ 8/17 Test  #1: objects.builtin_model .............   Passed    0.00 sec
+      Start  2: objects.original_objects
+ 9/17 Test  #2: objects.original_objects ..........   Passed    0.00 sec
+      Start  9: objects.links_lists
+10/17 Test  #9: objects.links_lists ...............   Passed    0.00 sec
+      Start  4: objects.reasons_properties
+11/17 Test  #4: objects.reasons_properties ........   Passed    0.00 sec
+      Start  6: objects.deferred_removal
+12/17 Test  #6: objects.deferred_removal ..........   Passed    0.00 sec
+      Start  3: objects.nested_creation
+13/17 Test  #3: objects.nested_creation ...........   Passed    0.00 sec
+      Start  7: objects.aggregate_dispatch
+14/17 Test  #7: objects.aggregate_dispatch ........   Passed    0.00 sec
+      Start  8: objects.handles_selection
+15/17 Test  #8: objects.handles_selection .........   Passed    0.00 sec
+      Start  5: objects.scheduling
+16/17 Test  #5: objects.scheduling ................   Passed    0.00 sec
+17/17 Test #44: world.level_change_private ........   Passed    6.58 sec
+
+100% tests passed, 0 tests failed out of 17
+
+Label Time Summary:
+headless    =  12.86 sec*proc (17 tests)
+objects     =   0.06 sec*proc (12 tests)
+private     =  12.68 sec*proc (2 tests)
+world       =  12.80 sec*proc (5 tests)
+
+Total Test time (real) =   6.60 sec

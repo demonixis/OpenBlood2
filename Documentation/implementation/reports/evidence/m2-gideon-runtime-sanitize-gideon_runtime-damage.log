@@ -1,0 +1,14 @@
+638/642 Testing: gideon_runtime.damage
+638/642 Test: gideon_runtime.damage
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_runtime_tests" "damage" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-runtime-damage"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_runtime.damage" start time: Oct 17 03:43 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_runtime.damage" end time: Oct 17 03:43 CEST
+"gideon_runtime.damage" time elapsed: 00:00:00
+----------------------------------------------------------

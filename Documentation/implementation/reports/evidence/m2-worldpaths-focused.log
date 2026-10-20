@@ -1,0 +1,31 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 214: worldpaths.subway
+      Start 212: worldpaths.player
+      Start 209: worldpaths.push_block
+      Start 211: worldpaths.validation
+ 1/10 Test #209: worldpaths.push_block ............   Passed    0.00 sec
+      Start 207: worldpaths.world_block
+ 2/10 Test #212: worldpaths.player ................   Passed    0.01 sec
+ 3/10 Test #211: worldpaths.validation ............   Passed    0.00 sec
+      Start 208: worldpaths.riders
+      Start 206: worldpaths.translation
+ 4/10 Test #207: worldpaths.world_block ...........   Passed    0.00 sec
+      Start 213: worldpaths.timeline
+ 5/10 Test #208: worldpaths.riders ................   Passed    0.00 sec
+      Start 210: worldpaths.lifetime
+ 6/10 Test #206: worldpaths.translation ...........   Passed    0.00 sec
+ 7/10 Test #213: worldpaths.timeline ..............   Passed    0.00 sec
+ 8/10 Test #210: worldpaths.lifetime ..............   Passed    0.00 sec
+ 9/10 Test #214: worldpaths.subway ................   Passed    2.33 sec
+      Start 215: gpu.worldpaths
+10/10 Test #215: gpu.worldpaths ...................   Passed    3.82 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+gpu           =   3.82 sec*proc (1 test)
+headless      =   2.37 sec*proc (9 tests)
+private       =   6.15 sec*proc (2 tests)
+worldpaths    =   6.18 sec*proc (10 tests)
+
+Total Test time (real) =   6.15 sec

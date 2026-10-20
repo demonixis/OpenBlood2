@@ -1,0 +1,14 @@
+519/524 Testing: player_state.roundtrip
+519/524 Test: player_state.roundtrip
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_state_tests" "roundtrip" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-state-fixtures/roundtrip"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"player_state.roundtrip" start time: Oct 16 18:29 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.roundtrip" end time: Oct 16 18:29 CEST
+"player_state.roundtrip" time elapsed: 00:00:00
+----------------------------------------------------------

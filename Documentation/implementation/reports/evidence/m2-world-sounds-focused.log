@@ -1,0 +1,29 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 236: sound.defaults
+    Start 237: sound.loops
+    Start 238: sound.resampling
+    Start 239: sound.lifetime
+1/9 Test #236: sound.defaults ...................   Passed    0.01 sec
+    Start 240: sound.failures
+2/9 Test #238: sound.resampling .................   Passed    0.01 sec
+    Start 241: sound.metadata
+3/9 Test #237: sound.loops ......................   Passed    0.01 sec
+4/9 Test #239: sound.lifetime ...................   Passed    0.01 sec
+    Start 242: sound.catalog
+    Start 243: sound.subway
+5/9 Test #240: sound.failures ...................   Passed    0.01 sec
+6/9 Test #241: sound.metadata ...................   Passed    0.01 sec
+7/9 Test #243: sound.subway .....................   Passed    0.59 sec
+8/9 Test #242: sound.catalog ....................   Passed    3.94 sec
+    Start 244: gpu.sound
+9/9 Test #244: gpu.sound ........................   Passed    4.09 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Label Time Summary:
+gpu         =   4.09 sec*proc (1 test)
+headless    =   4.57 sec*proc (8 tests)
+private     =   8.61 sec*proc (3 tests)
+sound       =   8.65 sec*proc (9 tests)
+
+Total Test time (real) =   8.04 sec

@@ -1,0 +1,880 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 1cb09cd..aac0550 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -526,3 +526,5 @@ The [SoundFX continuation](../Documentation/Implementation/M2_SOUND_FX.md) conne
+ The [PCM streaming continuation](../Documentation/Implementation/M2_AUDIO_STREAM.md) supplies real disk-backed Sound/SoundFX playback. Read [contracts](docs/AUDIO_STREAM_CONTRACTS.md). Preserve REZ slice bounds, two fixed sample windows, local sample clocks, failed-read diagnostics and world/source voice ownership. VoiceType=0 is explicit unused historical metadata only; nonzero values and TypeAction remain rejected. Compressed streams, reverb/priority arbitration and late network synchronization remain unavailable. CityHub has 418 created / 31 transferred sounds / 32 unsupported / four failed; safe NEW_LEVEL and M2 remain open.
+ 
+ The [Mac-10 continuation](../Documentation/Implementation/M2_MAC10.md) connects original weapon ID 2, both-hand firing, pickups, NPC drops and autonomous Cultist use. Read [contracts](docs/MAC10_CONTRACTS.md). Preserve marker-driven cadence, complete primary-sequence fallback when alt_fire is absent, typed pickup acknowledgements and checked detached-hand lifetime. Chrome/multiplayer boost and view-key audio remain unavailable. CityHub has 419 created / 31 transferred sounds / 31 unsupported / four failed; safe NEW_LEVEL and M2 remain open.
++
++The [compound-shell correction](../Documentation/Implementation/M2_COMPOUND_SHELLS.md) admits independently closed DAT components sharing edges. Read [contracts](docs/COMPOUND_SHELL_CONTRACTS.md). Preserve per-component opposite-edge closure, base rings/welding/work limits, actual query geometry and authored BoxPhysics. Balanced winding alone is insufficient; unresolved non-manifold sheets still fail. Inspect topology even when hidden and retain checked removal/reload. CityHub is 421 created / 31 transferred sounds / 31 unsupported / two failed; safe NEW_LEVEL and M2 stay open.
+diff --git a/README.md b/README.md
+index e80368d..a21bb90 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [compound-shell correction](../Documentation/Implementation/M2_COMPOUND_SHELLS.md) validates independently closed DAT components that share edges. CityHub now creates `startfences` and `Buildings`: 421 created / 31 transferred sounds / 31 unsupported / two failed. Collision gaps, hidden/removal inspection and GPU submission are checked; earlier counts below are historical. Missing geometry, FLAREGUN, required services and safe NEW_LEVEL keep M2 incomplete.
++
+ The [Mac-10 continuation](../Documentation/Implementation/M2_MAC10.md) connects original automatic fire, dual inventory, pickup/NPC drop and autonomous Cultist use. Actual left-view assets exercise the restored original alternate-animation fallback. CityHub now has 419 created objects, 31 transferred sounds, 31 unsupported and four failed entries; earlier counts below are historical. Chrome, remaining required services and safe NEW_LEVEL keep M2 incomplete.
+ 
+ The [audio-stream continuation](../Documentation/Implementation/M2_AUDIO_STREAM.md) connects real bounded PCM reads from REZ and retains observed VoiceType=0 metadata. CityHub now has 418 created objects, 31 transferred sounds, 32 unsupported and four failed entries; its five SoundFX create, four start initially, and 35 streamed voices share 384 KiB of buffers. Compressed streams, TypeAction schemas, required remaining services and safe NEW_LEVEL keep M2 incomplete.
+diff --git a/docs/COMPOUND_SHELL_CONTRACTS.md b/docs/COMPOUND_SHELL_CONTRACTS.md
+new file mode 100644
+index 0000000..f11f2e4
+--- /dev/null
++++ b/docs/COMPOUND_SHELL_CONTRACTS.md
+@@ -0,0 +1,75 @@
++# Compound DAT shell validation
++
++This extends [container geometry](CONTAINER_CONTRACTS.md) and
++[world-model binding](DOOR_CONTRACTS.md). Evidence is retained in
++[M2_COMPOUND_SHELLS.md](../../Documentation/Implementation/M2_COMPOUND_SHELLS.md).
++The [source ledger](M2_COMPOUND_SHELL_SOURCES.json) records the unchanged original rules.
++It changes replacement engine validation, not original gameplay code or DAT assets.
++
++A named DAT model may contain several closed components that touch along an edge.
++CityHub's `startfences` has three such components, `Buildings` two. Each has two
++shared edges with four oriented face incidences. The former requirement of exactly
++two incidences over the entire model rejected these otherwise independently closed
++components. Simply accepting balanced four-face edges would also accept ambiguous
++geometry; the new validator requires an independent closure proof.
++
++After the existing base-ring selection, plane checks, 0.01-unit topology welding,
++face orientation and T-junction splitting, connect faces only across edges with
++exactly two oppositely directed uses. Weighted disjoint sets with path compression
++keep this build-time grouping bounded. Group every edge's incidences by component:
++each group must have exactly two distinct faces with opposite directions. An open,
++misoriented, duplicated or still non-manifold component fails the whole build and
++clears geometry and diagnostics counters. Coincident faces are not automatically
++removed or merged. Vertex-only contacts and disconnected closed components remain
++valid. Ambiguous pinches that cannot be separated this way still fail.
++
++The existing 4,096-point / 4,096-face / 512-indices-per-face and 16-million
++edge/vertex comparison limits remain. Face incidence storage is bounded by that
++same splitting work; component storage is bounded by the face limit. No new work
++or allocations are introduced in per-frame contents/collision queries. This is
++not a general self-intersection or constructive-solid-geometry solver; those
++capabilities were not present in the earlier validator either.
++
++All faces, planes, triangle positions and materials retain their actual values.
++The existing solid-angle contents and triangle BVH queries handle the validated
++compound model. Broad-phase bounds do not fill gaps. Original `BoxPhysics` remains
++an authored rule: CityHub `startfences` uses polygon collision, while `Buildings`
++uses its overall box. No malformed model receives an automatic box fallback.
++
++Ground placement now also uses `sweep_object` for each checked solid candidate.
++The previous `MoveObjectToGround` implementation tested every object as a box at
++its pivot, incorrectly filling polygon gaps and misplacing offset box bounds.
++The original helper's downward query (`ObjectUtilities.cpp::MoveObjectToGround`),
++character dimensions, distance formula and final collision-checked movement are
++unchanged. An unavailable geometry query returns an error. Synthetic ground probes
++verify support over each actual piece, empty gaps and the authored box mode with
++a deliberately offset pivot; CityHub retains the prior 18 ground no-hit results
++for its 98 gravity-enabled CDestructableModel objects.
++Source references are `ObjectDLL/DestructableBrush.cpp::PostPropRead` and
++`ObjectDLL/Door.cpp::PostPropRead` in `sources/blood2/`; neither is modified.
++
++`closed_components` and `shared_edges` belong to the immutable shape, survive
++checked transforms and are zero after failure. The common selected-object,
++Containers and Doors inspection panels display them, including hidden/inactive
++objects. Source failures remain listed separately. Draw submission still checks
++current visibility and lifetime; pending removal makes a model disappear before
++deferred destruction. World unload/reload does not retain stale object bindings.
++
++The private door catalog now creates 619 doors (14 newly accepted), with 149 owned
++SelfTriggers and 114 polygon-mode doors. The 79 rejections remain explicit: 47
++historical TypeAction schemas, 19 ambiguous names, 12 missing models and one
++unresolved shell (`worlds/multi/bb_condemned.dat`, `Buildings`). The latter has four
++uses in a single connected component, so balanced winding is insufficient.
++
++The brush catalog additionally recovers three `startfences` instances across the
++CityHub variants: 2,298 CDestructableBrush instances create, 157 reject, and all
++98 supported RotatingBrush instances remain unchanged. Existing explosive/spawn
++counts and failure categories stay checked. Two invalid brush shells still fail.
++
++CityHub now has 421 created entries, 31 transferred sounds, 541 editor-only,
++31 unsupported and two failed entries. `fallengrills` still lacks a named model;
++CultistAI0 still requests the unimplemented FLAREGUN. Structural destination
++preparation remains 454 checked / 31 unknown / zero invalid. Destination rehearsal
++retains the source session; no automatic NEW_LEVEL transfer is enabled.
++Required remaining services keep M2 incomplete. This increment does not claim
++retail physics equivalence or complete CityHub playability.
+diff --git a/docs/CONTAINER_CONTRACTS.md b/docs/CONTAINER_CONTRACTS.md
+index daab9d6..1636cb3 100644
+--- a/docs/CONTAINER_CONTRACTS.md
++++ b/docs/CONTAINER_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Container, liquid and ladder boundary
+ 
++> [Compound-shell validation](COMPOUND_SHELL_CONTRACTS.md) now accepts independently closed components sharing edges; ambiguous/non-manifold components still fail. Geometry and authored BoxPhysics are unchanged.
++
+ > Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
+ > voice helpers, player sound keys and material/liquid footsteps now execute.
+ > Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
+diff --git a/docs/DESTRUCTABLE_MODEL_CONTRACTS.md b/docs/DESTRUCTABLE_MODEL_CONTRACTS.md
+index 7e1a53b..07bf686 100644
+--- a/docs/DESTRUCTABLE_MODEL_CONTRACTS.md
++++ b/docs/DESTRUCTABLE_MODEL_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original destructible models
+ 
++> [Compound-shell validation and ground queries](COMPOUND_SHELL_CONTRACTS.md) preserve polygon gaps and offset authored-box bounds during initial ground placement. Original model rules remain unchanged.
++
+ `CDestructableModel` is a selective direct port of original
+ `ObjectDLL/DestructableModel.cpp`, registered under B2BaseClass. It reuses
+ CDestructable, CDebris, ABC/DTX resources and the existing model renderer.
+diff --git a/docs/DOOR_CONTRACTS.md b/docs/DOOR_CONTRACTS.md
+index 68d90d9..dce0e95 100644
+--- a/docs/DOOR_CONTRACTS.md
++++ b/docs/DOOR_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Sliding doors and translating world models
+ 
++> [Compound-shell validation](COMPOUND_SHELL_CONTRACTS.md) now accepts independently closed components sharing edges; ambiguous/non-manifold components still fail. Geometry and authored BoxPhysics are unchanged.
++
+ > The later [train path contracts](WORLDPATH_CONTRACTS.md) supersede blanket
+ > world-path/without-GOTHRUWORLD omissions below for static BoxPhysics translation.
+ > Angular paths and moving containers remain unavailable; M2 stays open.
+diff --git a/docs/M2_COMPOUND_SHELL_SOURCES.json b/docs/M2_COMPOUND_SHELL_SOURCES.json
+new file mode 100644
+index 0000000..dd31485
+--- /dev/null
++++ b/docs/M2_COMPOUND_SHELL_SOURCES.json
+@@ -0,0 +1,39 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "f6df7536b451e8e2b50b26d0452a9bda766fccb5",
++  "status": "M2 incomplete; replacement engine validation and ground-query correction",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
++      "source_sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
++      "purpose": "Authored polygon/BoxPhysics choice and named world-model binding; unchanged."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Door.cpp",
++      "source_sha256": "d96ba29e12f1892008725e02ad02c9a9c314d86db85d7bb7cdc2a7823b3961e0",
++      "purpose": "Authored BoxPhysics flag and named world-model binding; unchanged."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
++      "source_sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
++      "purpose": "MoveObjectToGround downward query, dimensions and final movement; existing selected rules unchanged."
++    }
++  ],
++  "implementation": [
++    "src/engine/container.cpp",
++    "src/engine/container.h",
++    "src/game/server_clients.cpp",
++    "src/app/inspector.cpp"
++  ],
++  "adaptations": [
++    "No new original source import; existing selected game callbacks and properties unchanged",
++    "Conservative independently closed face components, preserving base-ring/welding/closure work bounds",
++    "Ground placement reuses checked current polygon/box geometry instead of pivot-centered boxes for all objects",
++    "Immutable shape inspection counters; no new dependency or mutable game global"
++  ],
++  "unsupported": [
++    "Self-intersection repair, coincident-face union and retail physics parity",
++    "Missing named models and unsupported weapon classes still fail",
++    "Required remaining services and safe NEW_LEVEL; M2 incomplete"
++  ]
++}
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 8c6e034..3cd7735 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -600,6 +600,10 @@ namespace OpenBlood2
+                         if (state.m_ObjectType == OT_MODEL)
+                             ImGui::Text("Model additive RGB (lighting pending) %.3f %.3f %.3f | alpha %.3f",
+                                         object->color.x, object->color.y, object->color.z, object->alpha);
++                        if (const auto* shape =
++                                object->world_model ? object->world_model.get() : object->container.get())
++                            ImGui::Text("Geometry: %zu closed components | %zu shared edges | %zu triangles",
++                                        shape->closed_components, shape->shared_edges, shape->triangles.size());
+                         if (const auto* sound = dynamic_cast<const SoundFX*>(object->game.get()))
+                         {
+                             ImGui::SeparatorText("Original SoundFX");
+@@ -2123,6 +2127,7 @@ namespace OpenBlood2
+                 ImGui::TextWrapped("FreeFall: zero liquid gravity, no air depletion; source damage remains active.");
+             ImGui::Text("%zu triangles | %s closed shell", shape.triangles.size(),
+                         shape.convex ? "convex" : "nonconvex");
++            ImGui::Text("%zu closed components | %zu shared edges", shape.closed_components, shape.shared_edges);
+             ImGui::Text("Fog %s | near %.0f / far %.0f", brush->fog ? "requested" : "off", brush->fog_near,
+                         brush->fog_far);
+             ImGui::Text("Surface %s | height %.1f | alpha %.2f", brush->show_surface ? "requested" : "off",
+@@ -2235,6 +2240,8 @@ namespace OpenBlood2
+             }
+             ImGui::Text("Collision: %s | %zu shell triangles", d->box_physics ? "authored box" : "polygon",
+                         r->world_model->triangles.size());
++            ImGui::Text("%zu closed components | %zu shared edges", r->world_model->closed_components,
++                        r->world_model->shared_edges);
+             if (const auto* rotating = dynamic_cast<const RotatingDoor*>(d))
+             {
+                 ImGui::Text("Euler radians %.3f %.3f %.3f | substeps %u", rotating->angles.x, rotating->angles.y,
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 34aefba..6f6b362 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -81,8 +81,8 @@ namespace OpenBlood2
+         const auto trial_before = g.destination_trial.attempts;
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+-            !g.destination_trial.player_entered || g.destination_trial.created != 419 ||
+-            g.destination_trial.unknown != 31 || g.destination_trial.failed != 4 ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 421 ||
++            g.destination_trial.unknown != 31 || g.destination_trial.failed != 2 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+diff --git a/src/engine/container.cpp b/src/engine/container.cpp
+index 40e9f0d..d884fc4 100644
+--- a/src/engine/container.cpp
++++ b/src/engine/container.cpp
+@@ -98,11 +98,17 @@ namespace OpenBlood2
+                     break;
+                 }
+         }
+-        std::map<std::pair<unsigned, unsigned>, std::pair<unsigned, int>> edges;
++        struct EdgeUse
++        {
++            unsigned face;
++            int direction;
++        };
++        std::map<std::pair<unsigned, unsigned>, std::vector<EdgeUse>> edges;
+         std::size_t work = 0;
+         convex = true;
+-        for (auto& polygon : mesh.polygons)
++        for (unsigned face = 0; face < mesh.polygons.size(); ++face)
+         {
++            auto& polygon = mesh.polygons[face];
+             // Keep both serialized arrays in World; use the base ring for volume topology.
+             // In retail v56, extra vertices repeat the ring with possible edge subdivisions.
+             if (polygon.base_points != UINT16_MAX)
+@@ -179,23 +185,62 @@ namespace OpenBlood2
+                 {
+                     const auto u = split[k - 1].second, v = split[k].second;
+                     auto& edge = edges[{std::min(u, v), std::max(u, v)}];
+-                    ++edge.first;
+-                    edge.second += u < v ? 1 : -1;
++                    edge.push_back({face, u < v ? 1 : -1});
+                 }
+             }
+         }
+-        for (const auto& [key, value] : edges)
++        // Multiple closed brushes can touch along the same DAT edge. First join
++        // faces only through unambiguous two-face edges, then require each resulting
++        // component to close independently. Balance alone would accept ambiguous
++        // non-manifold sheets or duplicated geometry.
++        std::vector<unsigned> parent(mesh.polygons.size()), size(mesh.polygons.size(), 1);
++        for (unsigned i = 0; i < parent.size(); ++i)
++            parent[i] = i;
++        auto root = [&](unsigned face)
+         {
+-            (void)key;
+-            if (value.first != 2 || value.second != 0)
++            while (parent[face] != face)
++            {
++                parent[face] = parent[parent[face]];
++                face = parent[face];
++            }
++            return face;
++        };
++        for (const auto& [key, uses] : edges)
++            if (uses.size() == 2 && uses[0].direction + uses[1].direction == 0)
+             {
+-                const auto a = mesh.points[key.first], b = mesh.points[key.second];
+-                const auto detail = std::string("Open or non-manifold container shell: ") +
+-                                    std::to_string(value.first) + " edges / balance " + std::to_string(value.second) +
+-                                    " at " + property_text(a) + " -> " + property_text(b);
+-                return fail(detail.c_str());
++                auto a = root(uses[0].face), b = root(uses[1].face);
++                if (a == b)
++                    continue;
++                if (size[a] < size[b])
++                    std::swap(a, b);
++                parent[b] = a;
++                size[a] += size[b];
++            }
++        for (auto& [key, uses] : edges)
++        {
++            std::sort(uses.begin(), uses.end(),
++                      [&](const auto& a, const auto& b) { return root(a.face) < root(b.face); });
++            for (std::size_t first = 0; first < uses.size();)
++            {
++                auto end = first;
++                int balance = 0;
++                while (end < uses.size() && root(uses[end].face) == root(uses[first].face))
++                    balance += uses[end++].direction;
++                if (end - first != 2 || balance != 0 || uses[first].face == uses[first + 1].face)
++                {
++                    const auto a = mesh.points[key.first], b = mesh.points[key.second];
++                    const auto detail = std::string("Open or non-manifold container shell: ") +
++                                        std::to_string(end - first) + " edges / balance " + std::to_string(balance) +
++                                        " in component " + std::to_string(root(uses[first].face)) + " at " +
++                                        property_text(a) + " -> " + property_text(b);
++                    return fail(detail.c_str());
++                }
++                first = end;
+             }
++            shared_edges += uses.size() > 2;
+         }
++        for (unsigned i = 0; i < parent.size(); ++i)
++            closed_components += root(i) == i;
+         for (auto& surface : mesh.surfaces)
+             surface.flags |= 1;
+         if (!boundary_.build(mesh, error))
+diff --git a/src/engine/container.h b/src/engine/container.h
+index 5483baf..597d06f 100644
+--- a/src/engine/container.h
++++ b/src/engine/container.h
+@@ -3,7 +3,8 @@
+ 
+ namespace OpenBlood2
+ {
+-    // Closed, consistently oriented DAT polygon shell. AABBs only reject broad-phase misses.
++    // Closed, consistently oriented DAT polygon components, possibly touching at edges.
++    // AABBs only reject broad-phase misses.
+     class ContainerShape
+     {
+       public:
+@@ -14,6 +15,7 @@ namespace OpenBlood2
+         CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit&) const;
+         DVector min{}, max{}, origin{};
+         bool convex = false;
++        std::size_t closed_components = 0, shared_edges = 0;
+         std::vector<std::array<DVector, 3>> triangles;
+ 
+       private:
+diff --git a/src/game/server_clients.cpp b/src/game/server_clients.cpp
+index 44269cf..afba370 100644
+--- a/src/game/server_clients.cpp
++++ b/src/game/server_clients.cpp
+@@ -1,3 +1,4 @@
++#include "engine/world_model.h"
+ #include "game/server_adapter.h"
+ #include <cmath>
+ 
+@@ -221,8 +222,10 @@ namespace OpenBlood2
+                 !(other->state.m_Flags & FLAG_SOLID))
+                 continue;
+             CollisionHit hit;
+-            if (sweep_box(from, to, {}, other->state.m_Pos, other->dimensions, hit) == CollisionQuery::Hit &&
+-                (!found || hit.fraction < nearest.fraction))
++            const auto query = sweep_object(*other, from, to, {}, hit);
++            if (query == CollisionQuery::Invalid)
++                return DE_ERROR;
++            if (query == CollisionQuery::Hit && (!found || hit.fraction < nearest.fraction))
+             {
+                 nearest = hit;
+                 found = true;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 7e60c3d..68a2ca2 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -160,6 +160,21 @@ endif()
+ add_executable(container_tests container_tests.cpp)
+ target_link_libraries(container_tests PRIVATE blood2_game)
+ blood2_project_options(container_tests)
++add_executable(compound_shell_tests compound_shell_tests.cpp)
++target_link_libraries(compound_shell_tests PRIVATE blood2_game)
++blood2_project_options(compound_shell_tests)
++foreach(case IN ITEMS geometry malformed lifetime ground)
++    add_test(NAME compound_shell.${case} COMMAND compound_shell_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/compound-shell-fixtures/${case}")
++    set_tests_properties(compound_shell.${case} PROPERTIES LABELS "headless;containers" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME compound_shell.private COMMAND compound_shell_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(compound_shell.private PROPERTIES LABELS "private;headless;containers" TIMEOUT 90)
++    if(BLOOD2_GPU_TESTS)
++        add_test(NAME gpu.compound_shell COMMAND compound_shell_tests gpu "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.compound_shell PROPERTIES LABELS "private;gpu;containers" TIMEOUT 90 RUN_SERIAL TRUE)
++    endif()
++endif()
+ foreach(case IN ITEMS geometry concave membership lifetime physics swimming surface ladders air_damage
+         specialized_defaults conveyor_motion conveyor_bodies specialized_damage freefall_motion)
+     add_test(NAME containers.${case} COMMAND container_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/container-fixtures/${case}")
+diff --git a/tests/audio_stream_tests.cpp b/tests/audio_stream_tests.cpp
+index d75a440..6e0c576 100644
+--- a/tests/audio_stream_tests.cpp
++++ b/tests/audio_stream_tests.cpp
+@@ -295,7 +295,7 @@ namespace
+             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
+                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
+                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
+-            CHECK(created == 419 && transferred == 31 && unknown == 31 && failed == 4 && fx == 5 && fx_voices == 4);
++            CHECK(created == 421 && transferred == 31 && unknown == 31 && failed == 2 && fx == 5 && fx_voices == 4);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_bytes());
+         }
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index b54f14e..a754a2c 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -1,4 +1,5 @@
+ #include "brush_fixture.h"
++#include "engine/container.h"
+ #include "game/original/RotatingBrush.h"
+ #include "game/original/Trigger.h"
+ #include "player_fixture.h"
+@@ -248,7 +249,7 @@ namespace
+         struct Count
+         {
+             unsigned created = 0, rejected = 0, filtered = 0, moved = 0, explosive = 0, detonated = 0, dynamic = 0,
+-                     blocked = 0, spawned = 0;
++                     blocked = 0, spawned = 0, compound = 0;
+         };
+         std::map<std::string, Count> counts;
+         std::map<std::string, unsigned> failures, spawns;
+@@ -327,6 +328,13 @@ namespace
+                 {
+                     ++count.created;
+                     CHECK(r->world_model && dynamic_cast<CDestructableBrush*>(r->game.get()));
++                    if (r->world_model->shared_edges)
++                    {
++                        ++count.compound;
++                        CHECK(r->world_model->closed_components > 1);
++                        std::cout << path << " " << r->state.m_Name << ": " << r->world_model->closed_components
++                                  << " closed components / " << r->world_model->shared_edges << " shared edges\n";
++                    }
+                     CHECK(command(g, h, "ON"));
+                     for (int i = 0; i < 4; ++i)
+                         CHECK(g.step(.02));
+@@ -386,9 +394,13 @@ namespace
+             std::cout << name << "=" << n << '\n';
+         CHECK(unreadable == 1 && counts["RotatingBrush"].created == 98 && counts["RotatingBrush"].rejected == 38 &&
+               counts["RotatingBrush"].moved == 98 && counts["RotatingBrush"].filtered == 0 &&
+-              counts["CDestructableBrush"].created == 2295 && counts["CDestructableBrush"].rejected == 160 &&
++              counts["CDestructableBrush"].created == 2298 && counts["CDestructableBrush"].rejected == 157 &&
+               counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 50 &&
+-              counts["CDestructableBrush"].detonated == 50 && counts["CDestructableBrush"].spawned == 58);
++              counts["CDestructableBrush"].detonated == 50 && counts["CDestructableBrush"].spawned == 58 &&
++              counts["CDestructableBrush"].compound == 3);
++        CHECK(failures["CDestructableBrush/shell"] == 2 && failures["CDestructableBrush/schema"] == 51 &&
++              failures["CDestructableBrush/ambiguous"] == 32 && failures["CDestructableBrush/missing"] == 32 &&
++              failures["CDestructableBrush/polygon dynamics"] == 28 && failures["CDestructableBrush/spawn"] == 12);
+         CHECK(g.request_world("01_SubwayA", error));
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+diff --git a/tests/compound_shell_tests.cpp b/tests/compound_shell_tests.cpp
+new file mode 100644
+index 0000000..f15b271
+--- /dev/null
++++ b/tests/compound_shell_tests.cpp
+@@ -0,0 +1,320 @@
++#include "brush_fixture.h"
++#include "engine/capture.h"
++#include "engine/container.h"
++#include "engine/runtime.h"
++#include "engine/world_model.h"
++#include "engine/world_renderer.h"
++#include "engine/world_view.h"
++#include "game/original/Door.h"
++#include "player_fixture.h"
++#include <algorithm>
++#include <functional>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    void append(WorldModel& to, const WorldModel& from)
++    {
++        const auto points = to.points.size(), planes = to.planes.size(), surfaces = to.surfaces.size();
++        to.points.insert(to.points.end(), from.points.begin(), from.points.end());
++        to.planes.insert(to.planes.end(), from.planes.begin(), from.planes.end());
++        for (auto surface : from.surfaces)
++        {
++            surface.plane += planes;
++            to.surfaces.push_back(surface);
++        }
++        for (auto face : from.polygons)
++        {
++            face.surface += surfaces;
++            for (auto& index : face.points)
++                index += points;
++            to.polygons.push_back(std::move(face));
++        }
++    }
++    WorldModel compound(bool partial = false)
++    {
++        auto m = test_brush::box("compound", {0, 0, 0}, {4, 4, 4});
++        append(m, test_brush::box("", {4, partial ? 1.0f : 0.0f, 4}, {8, partial ? 3.0f : 4.0f, 8}));
++        m.translation = {1, 1, 1};
++        return m;
++    }
++    bool geometry(const std::filesystem::path&)
++    {
++        ContainerShape s;
++        std::string error;
++        for (bool partial : {false, true})
++        {
++            auto m = compound(partial);
++            CHECK(s.build(m, {}, error));
++            CHECK(s.closed_components == 2 && s.shared_edges == 1 && !s.convex);
++            CHECK(s.triangles.size() == 24 && s.origin.x == 1);
++            CHECK(s.contains({2, 2, 2}) && s.contains({6, 2, 6}) && s.contains({4, 2, 4}));
++            CHECK(!s.contains({6, 2, 2}) && !s.overlaps({6, 2, 2}, {.5f, .5f, .5f}));
++            CHECK(s.overlaps({4.1f, 2, 2}, {.2f, .2f, .2f}));
++            CollisionHit hit;
++            CHECK(s.sweep({6, 2, 0}, {6, 2, 2}, {}, hit) == CollisionQuery::Miss);
++            CHECK(s.sweep({6, 2, 2}, {6, 2, 10}, {}, hit) == CollisionQuery::Hit);
++            CHECK(!hit.start_solid && std::abs(hit.fraction - .25f) < .0001f);
++            CHECK(s.sweep({2, 2, 2}, {6, 2, 2}, {}, hit) == CollisionQuery::Hit && hit.start_solid);
++            const auto q = rotation_from_euler({.1f, .7f, .2f});
++            const DVector dest{100, 20, -50};
++            CHECK(s.transform(q, dest) && s.closed_components == 2 && s.shared_edges == 1);
++            auto pose = [&](DVector p)
++            { return vector_add(dest, rotate_vector(vector_subtract(p, m.translation), q)); };
++            CHECK(s.contains(pose({2, 2, 2})) && s.contains(pose({6, 2, 6})) && !s.contains(pose({6, 2, 2})));
++            CHECK(s.build(m, q, error) && s.closed_components == 2 && s.shared_edges == 1);
++        }
++        auto m = compound();
++        append(m, test_brush::box("", {8, 4, 8}, {10, 6, 10})); // Vertex contact only.
++        append(m, test_brush::box("", {20, 0, 0}, {24, 4, 4})); // Disconnected shell.
++        CHECK(s.build(m, {}, error) && s.closed_components == 4 && s.shared_edges == 1);
++        CHECK(s.contains({9, 5, 9}) && s.contains({22, 2, 2}) && !s.contains({15, 2, 2}));
++        std::cout << "Closed edge/vertex-touching and disconnected components: contents, gap sweeps, overlap, T "
++                     "junctions and transforms pass\n";
++        return true;
++    }
++    bool malformed(const std::filesystem::path&)
++    {
++        ContainerShape s;
++        std::string error;
++        for (int mutation = 0; mutation < 6; ++mutation)
++        {
++            auto m = compound();
++            if (mutation == 0)
++                m.polygons.pop_back();
++            if (mutation == 1)
++                m.polygons.push_back(m.polygons[0]);
++            if (mutation == 2)
++                append(m, test_brush::box("", {0, 0, 0}, {4, 4, 4}));
++            if (mutation == 3)
++            {
++                auto& p = m.planes.back();
++                p.normal = vector_scale(p.normal, -1);
++                p.distance = -p.distance;
++            }
++            if (mutation == 4)
++            {
++                m = test_brush::box("faces", {0, 0, 0}, {4, 4, 4});
++                append(m, test_brush::box("", {4, 0, 0}, {8, 4, 4}));
++            }
++            if (mutation == 5)
++                m.points.resize(4097);
++            CHECK(!s.build(m, {}, error) && !error.empty());
++            CHECK(s.triangles.empty() && s.closed_components == 0 && s.shared_edges == 0);
++            CHECK(!s.contains({2, 2, 2}));
++        }
++        std::cout << "Open, duplicate, oppositely oriented, face-coincident and over-limit shells reject without "
++                     "partial output\n";
++        return true;
++    }
++    bool ground(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        g.world.models.push_back(compound());
++        for (bool box : {false, true})
++        {
++            auto door = g.objects.create(g.objects.find_class("Door"), {}, Creation::World,
++                                         {{"Name", std::string("compound")}, {"BoxPhysics", box}});
++            CHECK(door);
++            for (auto p : {DVector{6, 10, 6}, DVector{6, 10, 2}})
++            {
++                auto h = g.objects.create(g.objects.find_class("BaseClass"), {}, Creation::World,
++                                          {{"Pos", p}, {"Flags", std::int32_t(FLAG_SOLID)}});
++                DVector dims{.5f, .5f, .5f};
++                CHECK(h && g.server.SetObjectDims(h, &dims) == DE_OK);
++                CHECK(g.server.MoveObjectToGround(h) == DE_OK);
++                const float expected = (box || p.z == 6) ? 4.5f : .5f;
++                CHECK(std::abs(g.objects.get(h)->state.m_Pos.y - expected) < .01f);
++                CHECK(g.objects.remove(h) && g.objects.finish_frame());
++            }
++            CHECK(g.objects.remove(door) && g.objects.finish_frame());
++        }
++        CHECK(g.unload_world() && g.server.message_count() == 0 && g.server.string_count() == 0);
++        std::cout << "Ground rays use actual polygon pieces/gaps and authored box bounds independently of pivot\n";
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        g.world.models.push_back(compound());
++        auto h = g.objects.create(g.objects.find_class("Door"), {}, Creation::World,
++                                  {{"Name", std::string("compound")}, {"BoxPhysics", false}, {"Visible", false}});
++        auto* r = g.objects.get(h);
++        CHECK(r && r->world_model && r->world_model->closed_components == 2);
++        const auto id = r->id;
++        auto retained = r->world_model;
++        CollisionHit hit;
++        CHECK(sweep_object(*r, {6, 2, 0}, {6, 2, 2}, {}, hit) == CollisionQuery::Miss);
++        CHECK(sweep_object(*r, {6, 2, 2}, {6, 2, 10}, {}, hit) == CollisionQuery::Hit);
++        CHECK(g.server.MoveWorldModel(h, {21, 1, 1}) == MoverResult::Moved);
++        CHECK(r->state.m_Pos.x == 21 && r->world_model->closed_components == 2);
++        CHECK(sweep_object(*r, {26, 2, 2}, {26, 2, 10}, {}, hit) == CollisionQuery::Hit);
++        CHECK(sweep_object(*r, {6, 2, 2}, {6, 2, 10}, {}, hit) == CollisionQuery::Miss);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame() && !g.objects.get(id));
++        CHECK(retained->contains({2, 2, 2})); // Value-owned geometry survives its original source object.
++        CHECK(g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);
++        CHECK(retained->closed_components == 2 && retained->contains({6, 2, 6}));
++        return true;
++    }
++    bool render(Runtime& runtime, WorldRenderer& renderer, const WorldMesh& mesh, std::span<const WorldDraw> draws,
++                const ContainerShape& shape, const std::string& label, bool visible)
++    {
++        Capture capture;
++        std::string error;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240));
++        const auto center = vector_scale(vector_add(shape.min, shape.max), .5f);
++        const auto extent = vector_subtract(shape.max, shape.min);
++        const auto eye = vector_subtract(center, {0, 0, 1.5f * std::max({extent.x, extent.y, extent.z}) + 64});
++        auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(cmd && renderer.draw(cmd, capture.texture, mesh, draws, eye, {}, false, error));
++        CHECK(renderer.draw(cmd, capture.texture, mesh, draws, eye, {}, false, error, DrawLoad::Load, nullptr,
++                            WorldPass::Translucent));
++        auto* copy = SDL_BeginGPUCopyPass(cmd);
++        CHECK(copy);
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 320;
++        region.h = 240;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 320;
++        target.rows_per_layer = 240;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        CHECK(SDL_SubmitGPUCommandBuffer(cmd) && SDL_WaitForGPUIdle(runtime.gpu));
++        const auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        unsigned changed = 0;
++        for (unsigned i = 0; i < 320 * 240; ++i)
++            changed += pixels[i * 4] != 6 || pixels[i * 4 + 1] != 9 || pixels[i * 4 + 2] != 13;
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        if (visible)
++            CHECK(capture.save((label + ".png").c_str()));
++        std::cout << label << ": " << changed << " non-background pixels\n";
++        CHECK(visible ? changed > 100 : changed == 0);
++        return true;
++    }
++    bool private_data(const std::filesystem::path& root, bool gpu = false)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        std::string error;
++        CHECK(g.resources.mount_game(Config{root, "private"}, error));
++        Runtime runtime;
++        if (gpu)
++            CHECK(runtime.initialize(true, error));
++        WorldRenderer renderer(runtime.gpu);
++        ObjectId previous{};
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_cityhub", error));
++            unsigned created = 0, unknown = 0, failed = 0, transferred = 0;
++            for (auto& e : g.entries)
++            {
++                created += e.state == EntryState::Created;
++                unknown += e.state == EntryState::Unsupported;
++                failed += e.state == EntryState::Failed;
++                transferred += e.state == EntryState::WorldSound;
++            }
++            std::cout << "CityHub: " << created << " created / " << transferred << " sounds / " << unknown
++                      << " unsupported / " << failed << " failed\n";
++            CHECK(created == 421 && transferred == 31 && unknown == 31 && failed == 2);
++            WorldMesh mesh;
++            CHECK(mesh.build(g.world, error, &g.resources));
++            if (gpu)
++                CHECK(renderer.prepare(mesh, g.world_revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error));
++            for (const auto& name : {"startfences", "Buildings"})
++            {
++                ObjectRecord* r = nullptr;
++                for (auto id : g.objects.snapshot())
++                    if (std::string_view(g.objects.get(id)->state.m_Name) == name)
++                        r = g.objects.get(id);
++                CHECK(r && r->life == Life::Alive && r->world_model);
++                const auto& s = *r->world_model;
++                CHECK(s.closed_components == (std::string_view(name) == "startfences" ? 3u : 2u) &&
++                      s.shared_edges == 2);
++                CollisionHit hit;
++                if (std::string_view(name) == "startfences")
++                {
++                    CHECK(!(r->state.m_Flags & FLAG_BOXPHYSICS));
++                    CHECK(s.contains({-3376, 1280, -400}) && s.contains({-3000, 1280, -816}) &&
++                          s.contains({-3000, 1280, 48}));
++                    CHECK(!s.contains({-3000, 1280, -400}));
++                    CHECK(sweep_object(*r, {-3000, 1280, -700}, {-3000, 1280, 0}, {}, hit) == CollisionQuery::Miss);
++                    CHECK(sweep_object(*r, {-3000, 1280, 0}, {-3000, 1280, 100}, {}, hit) == CollisionQuery::Hit);
++                    CHECK(std::abs(hit.fraction - .32f) < .0001f && !hit.start_solid);
++                }
++                else
++                {
++                    CHECK(r->state.m_Flags & FLAG_BOXPHYSICS);
++                    const auto center = object_bounds_center(*r);
++                    CHECK(sweep_object(*r, center, center, {}, hit) == CollisionQuery::Hit && hit.start_solid);
++                }
++                CHECK(r->id != previous);
++                previous = r->id;
++                std::vector<WorldDraw> draws;
++                WorldViewStats stats;
++                CHECK(world_draws(mesh, g.objects, draws, stats, error));
++                auto drawn = [&]
++                {
++                    return std::any_of(draws.begin(), draws.end(),
++                                       [&](auto& d) { return mesh.ranges[d.range].name == name; });
++                };
++                CHECK(drawn());
++                auto draw_gpu = [&](const char* state, bool visible)
++                {
++                    if (!gpu)
++                        return true;
++                    std::vector<WorldDraw> selected;
++                    for (auto& draw : draws)
++                        if (mesh.ranges[draw.range].name == name)
++                            selected.push_back(draw);
++                    return render(runtime, renderer, mesh, selected, s,
++                                  std::string("compound-") + name + "-" + std::to_string(cycle) + "-" + state, visible);
++                };
++                CHECK(draw_gpu("visible", true));
++                const auto flags = r->state.m_Flags;
++                r->state.m_Flags &= ~FLAG_VISIBLE;
++                CHECK(world_draws(mesh, g.objects, draws, stats, error) && !drawn());
++                CHECK(draw_gpu("absent", false));
++                CHECK(s.closed_components > 1); // Hidden inspection preserves topology.
++                r->state.m_Flags = flags;
++                std::cout << name << ": " << s.closed_components << " closed components / " << s.shared_edges
++                          << " shared edges / " << s.triangles.size() << " triangles\n";
++                CHECK(g.objects.remove(r->handle));
++                CHECK(world_draws(mesh, g.objects, draws, stats, error) && !drawn());
++                CHECK(draw_gpu("absent", false));
++                CHECK(g.objects.finish_frame());
++            }
++            renderer.clear_geometry();
++            CHECK(g.unload_world() && !g.objects.get(previous));
++            CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"geometry", geometry},
++        {"malformed", malformed},
++        {"lifetime", lifetime},
++        {"ground", ground},
++        {"private", [](auto& root) { return private_data(root); }},
++        {"gpu", [](auto& root) { return private_data(root, true); }}};
++    auto it = cases.find(argv[1]);
++    return it == cases.end() ? 2 : it->second(path_from_utf8(argv[2])) ? 0 : 1;
++}
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+index 9d1a704..06e9bb5 100644
+--- a/tests/destructable_model_tests.cpp
++++ b/tests/destructable_model_tests.cpp
+@@ -310,8 +310,10 @@ namespace
+                 CHECK(r->model_body && r->model_error.empty() && m->damage_hit_points == 0 && m->destroy_model.empty());
+                 ids.push_back(r->id);
+             }
++            std::cout << "CityHub model initialization: " << count << " models / " << pushable << " pushable / "
++                      << gravity << " gravity / " << ground_misses << " ground misses\n";
+             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
+-            CHECK(created == 419 && unknown == 31 && failed == 4);
++            CHECK(created == 421 && unknown == 31 && failed == 2);
+             CHECK(update_model_scene(g, scene, error));
+             unsigned skin_failures = 0, triangles = 0;
+             for (auto id : ids)
+diff --git a/tests/door_tests.cpp b/tests/door_tests.cpp
+index 1acbe8e..3b4349e 100644
+--- a/tests/door_tests.cpp
++++ b/tests/door_tests.cpp
+@@ -301,7 +301,7 @@ namespace
+         CHECK(g.initialize());
+         std::string error;
+         CHECK(g.resources.mount_game(Config{root, "private"}, error));
+-        unsigned created = 0, rejected = 0, skipped = 0, self_triggers = 0, polygon = 0;
++        unsigned created = 0, rejected = 0, skipped = 0, self_triggers = 0, polygon = 0, compound = 0;
+         std::map<std::string, unsigned> failures;
+         for (const auto& [path, resource] : g.resources.index())
+         {
+@@ -339,7 +339,11 @@ namespace
+                     else if (diagnostic.ends_with(": Missing named world model"))
+                         ++failures["missing"];
+                     else if (diagnostic.find("Open or non-manifold container shell") != std::string::npos)
++                    {
+                         ++failures["shell"];
++                        CHECK(path == "worlds/multi/bb_condemned.dat" &&
++                              property_text(props.at("Name")) == "Buildings");
++                    }
+                     else
+                         CHECK(false); // A new failure must be investigated, not silently counted.
+                     std::cout << path << " " << property_text(props.at("Name")) << " rejected: "
+@@ -353,6 +357,13 @@ namespace
+                     ++created;
+                     self_triggers += d->self_trigger;
+                     polygon += !d->box_physics;
++                    if (r->world_model->shared_edges)
++                    {
++                        ++compound;
++                        CHECK(r->world_model->closed_components > 1);
++                        std::cout << path << " " << r->state.m_Name << ": " << r->world_model->closed_components
++                                  << " closed components / " << r->world_model->shared_edges << " shared edges\n";
++                    }
+                     CHECK(g.objects.remove(h));
+                 }
+                 CHECK(g.objects.finish_frame());
+@@ -360,9 +371,10 @@ namespace
+         }
+         std::cout << "Door catalog: created=" << created << ", rejected=" << rejected << ", unreadable=" << skipped
+                   << ", SelfTrigger=" << self_triggers << ", polygon=" << polygon << "\n";
+-        CHECK(created == 605 && rejected == 93 && skipped == 1 && self_triggers == 146 && polygon == 113);
++        CHECK(created == 619 && rejected == 79 && skipped == 1 && self_triggers == 149 && polygon == 114 &&
++              compound == 14);
+         CHECK(failures["schema"] == 47 && failures["ambiguous"] == 19 && failures["missing"] == 12 &&
+-              failures["shell"] == 15);
++              failures["shell"] == 1);
+         return true;
+     }
+     bool private_data(const std::filesystem::path& root)
+diff --git a/tests/mac10_tests.cpp b/tests/mac10_tests.cpp
+index efc777e..6dd2b74 100644
+--- a/tests/mac10_tests.cpp
++++ b/tests/mac10_tests.cpp
+@@ -263,7 +263,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unknown=" << unknown << " failed=" << failed << " Mac10=" << mac
+                   << '\n';
+-        CHECK(mac == 1 && created == 419 && unknown == 31 && failed == 4);
++        CHECK(mac == 1 && created == 421 && unknown == 31 && failed == 2);
+         for (auto id : g.objects.snapshot())
+             if (auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(g.objects.get(id)->handle));
+                 a && a->runtime_failed)
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 286f56c..d9160e9 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -1168,7 +1168,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 419 && d.unknown == 31 && d.failed == 4);
++                        CHECK(d.created == 421 && d.unknown == 31 && d.failed == 2);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

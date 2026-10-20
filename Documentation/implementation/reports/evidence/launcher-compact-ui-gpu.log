@@ -1,0 +1,32 @@
+Test project /home/yann/projects/lithtech/Blood2/build/launcher-release
+    Start 12: launcher.ui_fixture
+1/8 Test #12: launcher.ui_fixture ..............   Passed    0.00 sec
+    Start 13: gpu.launcher_process
+2/8 Test #13: gpu.launcher_process .............   Passed    3.39 sec
+    Start 14: gpu.launcher_1
+3/8 Test #14: gpu.launcher_1 ...................   Passed    1.05 sec
+    Start 15: gpu.launcher_1.5
+4/8 Test #15: gpu.launcher_1.5 .................   Passed    0.95 sec
+    Start 16: gpu.launcher_2
+5/8 Test #16: gpu.launcher_2 ...................   Passed    1.00 sec
+    Start 20: gpu.launcher_settings
+6/8 Test #20: gpu.launcher_settings ............   Passed    1.00 sec
+    Start 21: gpu.launcher_mods
+7/8 Test #21: gpu.launcher_mods ................   Passed    1.00 sec
+    Start 22: gpu.launcher_navigation
+8/8 Test #22: gpu.launcher_navigation ..........***Failed    1.40 sec
+[2026-10-19 16:30:24.619] [info] Launcher GPU backend=vulkan device=NVIDIA GeForce RTX 3060 Laptop GPU
+
+
+88% tests passed, 1 tests failed out of 8
+
+Label Time Summary:
+gpu         =   9.79 sec*proc (7 tests)
+headless    =   0.00 sec*proc (1 test)
+launcher    =   9.79 sec*proc (8 tests)
+
+Total Test time (real) =   9.79 sec
+
+The following tests FAILED:
+	 22 - gpu.launcher_navigation (Failed)                  gpu launcher
+Errors while running CTest

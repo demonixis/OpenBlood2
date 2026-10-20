@@ -1,0 +1,14 @@
+427/433 Testing: ai_locomotion.walking
+427/433 Test: ai_locomotion.walking
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_locomotion_tests" "walking"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_locomotion.walking" start time: Oct 16 13:42 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.walking" end time: Oct 16 13:42 CEST
+"ai_locomotion.walking" time elapsed: 00:00:00
+----------------------------------------------------------

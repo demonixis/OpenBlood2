@@ -1,0 +1,26 @@
+562/562 Testing: weapon_audio.private
+562/562 Test: weapon_audio.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_audio_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_audio.private" start time: Oct 16 23:03 CEST
+Output:
+----------------------------------------------------------
+Sounds\weapons\beretta\fire.wav frames=30821 rate=22050 priority=6
+Sounds\weapons\beretta\fire.wav frames=30821 rate=22050 priority=6
+Sounds\Weapons\Knife\fire.wav frames=9116 rate=22050 priority=6
+Sounds\Weapons\Knife\alt.wav frames=12646 rate=22050 priority=6
+Sounds\weapons\beretta\fire.wav frames=30821 rate=22050 priority=6
+Sounds\weapons\beretta\fire.wav frames=30821 rate=22050 priority=6
+Sounds\Weapons\Knife\fire.wav frames=9116 rate=22050 priority=6
+Sounds\Weapons\Knife\alt.wav frames=12646 rate=22050 priority=6
+Sounds\weapons\beretta\fire.wav frames=30821 rate=22050 priority=6
+Sounds\weapons\beretta\fire.wav frames=30821 rate=22050 priority=6
+Sounds\Weapons\Knife\fire.wav frames=9116 rate=22050 priority=6
+Sounds\Weapons\Knife\alt.wav frames=12646 rate=22050 priority=6
+<end of output>
+Test time =   5.28 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_audio.private" end time: Oct 16 23:03 CEST
+"weapon_audio.private" time elapsed: 00:00:05
+----------------------------------------------------------

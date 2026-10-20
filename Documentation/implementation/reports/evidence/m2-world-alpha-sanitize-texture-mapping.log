@@ -1,0 +1,14 @@
+324/583 Testing: texture.mapping
+324/583 Test: texture.mapping
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/texture_tests" "mapping"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"texture.mapping" start time: Oct 17 00:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"texture.mapping" end time: Oct 17 00:34 CEST
+"texture.mapping" time elapsed: 00:00:00
+----------------------------------------------------------

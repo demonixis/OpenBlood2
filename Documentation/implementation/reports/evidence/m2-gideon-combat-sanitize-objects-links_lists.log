@@ -1,0 +1,15 @@
+8/618 Testing: objects.links_lists
+8/618 Test: objects.links_lists
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "links_lists"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.links_lists" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+PASS links_lists
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.links_lists" end time: Oct 17 02:23 CEST
+"objects.links_lists" time elapsed: 00:00:00
+----------------------------------------------------------

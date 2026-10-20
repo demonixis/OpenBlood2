@@ -1,0 +1,14 @@
+445/602 Testing: ai_runtime.spatial
+445/602 Test: ai_runtime.spatial
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_runtime_tests" "spatial"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_runtime.spatial" start time: Oct 17 01:44 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.spatial" end time: Oct 17 01:44 CEST
+"ai_runtime.spatial" time elapsed: 00:00:00
+----------------------------------------------------------

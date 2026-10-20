@@ -1,0 +1,80 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start   5: objects.builtin_model
+ 1/33 Test   #5: objects.builtin_model ............   Passed    0.01 sec
+      Start   6: objects.original_objects
+ 2/33 Test   #6: objects.original_objects .........   Passed    0.01 sec
+      Start   7: objects.nested_creation
+ 3/33 Test   #7: objects.nested_creation ..........   Passed    0.01 sec
+      Start   8: objects.reasons_properties
+ 4/33 Test   #8: objects.reasons_properties .......   Passed    0.01 sec
+      Start   9: objects.scheduling
+ 5/33 Test   #9: objects.scheduling ...............   Passed    0.01 sec
+      Start  10: objects.deferred_removal
+ 6/33 Test  #10: objects.deferred_removal .........   Passed    0.01 sec
+      Start  11: objects.aggregate_dispatch
+ 7/33 Test  #11: objects.aggregate_dispatch .......   Passed    0.01 sec
+      Start  12: objects.handles_selection
+ 8/33 Test  #12: objects.handles_selection ........   Passed    0.00 sec
+      Start  13: objects.links_lists
+ 9/33 Test  #13: objects.links_lists ..............   Passed    0.01 sec
+      Start  14: objects.messages_strings
+10/33 Test  #14: objects.messages_strings .........   Passed    0.01 sec
+      Start  15: objects.message_churn
+11/33 Test  #15: objects.message_churn ............   Passed    2.28 sec
+      Start  16: objects.message_limit
+12/33 Test  #16: objects.message_limit ............   Passed    0.15 sec
+      Start  17: objects.unsupported_teardown
+13/33 Test  #17: objects.unsupported_teardown .....   Passed    0.02 sec
+      Start  18: objects.creation_failures
+14/33 Test  #18: objects.creation_failures ........   Passed    0.01 sec
+      Start  72: player.handles
+15/33 Test  #72: player.handles ...................   Passed    0.01 sec
+      Start  73: player.lifecycle
+16/33 Test  #73: player.lifecycle .................   Passed    0.02 sec
+      Start  74: player.rollback
+17/33 Test  #74: player.rollback ..................   Passed    0.02 sec
+      Start  75: player.messages
+18/33 Test  #75: player.messages ..................   Passed    0.02 sec
+      Start  76: player.callbacks
+19/33 Test  #76: player.callbacks .................   Passed    0.01 sec
+      Start  77: player.smell
+20/33 Test  #77: player.smell .....................   Passed    0.02 sec
+      Start  78: player.smell_private
+21/33 Test  #78: player.smell_private .............   Passed    8.77 sec
+      Start  79: player.private
+22/33 Test  #79: player.private ...................   Passed    3.96 sec
+      Start 611: player_restore.roundtrip
+23/33 Test #611: player_restore.roundtrip .........   Passed    0.01 sec
+      Start 612: player_restore.failures
+24/33 Test #612: player_restore.failures ..........   Passed    0.02 sec
+      Start 613: player_restore.lifetime
+25/33 Test #613: player_restore.lifetime ..........   Passed    0.02 sec
+      Start 614: player_restore.private
+26/33 Test #614: player_restore.private ...........   Passed    2.39 sec
+      Start 616: player_keepalive.named
+27/33 Test #616: player_keepalive.named ...........   Passed    0.02 sec
+      Start 617: player_keepalive.fallback
+28/33 Test #617: player_keepalive.fallback ........   Passed    0.04 sec
+      Start 618: player_keepalive.failures
+29/33 Test #618: player_keepalive.failures ........   Passed    0.02 sec
+      Start 619: player_keepalive.private
+30/33 Test #619: player_keepalive.private .........   Passed    5.94 sec
+      Start 964: screen_fade.values
+31/33 Test #964: screen_fade.values ...............   Passed    0.00 sec
+      Start 965: screen_fade.session
+32/33 Test #965: screen_fade.session ..............   Passed    0.01 sec
+      Start 966: screen_fade.private
+33/33 Test #966: screen_fade.private ..............   Passed   29.61 sec
+
+100% tests passed, 0 tests failed out of 33
+
+Label Time Summary:
+headless            =  53.44 sec*proc (33 tests)
+objects             =   2.53 sec*proc (14 tests)
+player              =  12.81 sec*proc (8 tests)
+player_keepalive    =   6.02 sec*proc (4 tests)
+player_restore      =   2.45 sec*proc (4 tests)
+private             =  50.67 sec*proc (5 tests)
+screen_fade         =  29.63 sec*proc (3 tests)
+
+Total Test time (real) =  53.48 sec

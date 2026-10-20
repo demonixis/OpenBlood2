@@ -1,0 +1,1320 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "d1ddceb972fa0052b93abe27eaed2f786c1531df",
+  "m2_complete": false,
+  "validation": {
+    "debug": {
+      "passed": 122,
+      "failed": 0,
+      "private": 18
+    },
+    "release": {
+      "passed": 122,
+      "failed": 0,
+      "private": 18
+    },
+    "sanitize": {
+      "passed": 122,
+      "failed": 0,
+      "private": 18
+    },
+    "debug-gpu": {
+      "scenarios_passed": 7,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan"
+    },
+    "release-gpu": {
+      "scenarios_passed": 7,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan"
+    }
+  },
+  "artifacts": [
+    {
+      "file": "m2-container-index-debug-build.log",
+      "sha256": "4ce8cbfce16776155a3e1d2dcd57816e5ceef1008726dd568b12f54c8cf2fe99",
+      "raw_capture_sha256": "fe9453a62b4c43cceea005fcc7c583b60526c5d714eedbc3587eab0cd850333f",
+      "bytes": 87643
+    },
+    {
+      "file": "m2-container-index-debug-gpu.log",
+      "sha256": "c9ae63c06bf66ff79052245d822e6e64815cf74c091a09db972a6ab77b712aa9",
+      "raw_capture_sha256": "2cdd8cb12d0e4ae4fc44ad93820888717f17983a200469bacac9987df7429c20",
+      "bytes": 13508
+    },
+    {
+      "file": "m2-container-index-debug-tests.log",
+      "sha256": "64a18e882421fa6e2429ac2c3f1f0997733363179d178dda2fbcaac472fd6f0e",
+      "raw_capture_sha256": "b596eb5c05d362ed644328639d55c9f8eddef529fe1a329a539a38a176319a15",
+      "bytes": 86971
+    },
+    {
+      "file": "m2-container-index-debug-timing-1-after.log",
+      "sha256": "59aa45fb36139fb98b21e4b7fca8b8225d296d164f2ebf25bd08011876b76e2e",
+      "raw_capture_sha256": "59aa45fb36139fb98b21e4b7fca8b8225d296d164f2ebf25bd08011876b76e2e",
+      "bytes": 48910
+    },
+    {
+      "file": "m2-container-index-debug-timing-1-before.log",
+      "sha256": "0bfdad9bfa102ded612fe6749fa5caea3f9c463a081f6ea25767d31e3e1a2d15",
+      "raw_capture_sha256": "0bfdad9bfa102ded612fe6749fa5caea3f9c463a081f6ea25767d31e3e1a2d15",
+      "bytes": 65771
+    },
+    {
+      "file": "m2-container-index-debug-timing-2-after.log",
+      "sha256": "1a572515e91c5038456bc222d4216052c4680ef3399964df66ba6ef7e914f073",
+      "raw_capture_sha256": "1a572515e91c5038456bc222d4216052c4680ef3399964df66ba6ef7e914f073",
+      "bytes": 48893
+    },
+    {
+      "file": "m2-container-index-debug-timing-2-before.log",
+      "sha256": "f46a82206c24fc82f18b090466f21ca530199e968ed217fdbae017cf1ab0c0b6",
+      "raw_capture_sha256": "f46a82206c24fc82f18b090466f21ca530199e968ed217fdbae017cf1ab0c0b6",
+      "bytes": 65748
+    },
+    {
+      "file": "m2-container-index-debug-timing-3-after.log",
+      "sha256": "62c96a2e0e486af84470c1f55753f1ea88602a6ffab1440fee5de78e588c84bd",
+      "raw_capture_sha256": "62c96a2e0e486af84470c1f55753f1ea88602a6ffab1440fee5de78e588c84bd",
+      "bytes": 48908
+    },
+    {
+      "file": "m2-container-index-debug-timing-3-before.log",
+      "sha256": "4efdb66d091bc2e5f40b98b8af628fe161bfaa5174243a096767ddc26a0495bc",
+      "raw_capture_sha256": "4efdb66d091bc2e5f40b98b8af628fe161bfaa5174243a096767ddc26a0495bc",
+      "bytes": 65815
+    },
+    {
+      "file": "m2-container-index-equivalence-after.log",
+      "sha256": "d2ca2ba694ef25bf3608750ed7014e59d1fd00e541ca9a68621491aa3ad476cd",
+      "raw_capture_sha256": "d2ca2ba694ef25bf3608750ed7014e59d1fd00e541ca9a68621491aa3ad476cd",
+      "bytes": 891
+    },
+    {
+      "file": "m2-container-index-equivalence-before.log",
+      "sha256": "fe7cd26e4a9cf8f49281ef405e88ba92b451c3d3bf287240f0fc5bdcb6f503ce",
+      "raw_capture_sha256": "fe7cd26e4a9cf8f49281ef405e88ba92b451c3d3bf287240f0fc5bdcb6f503ce",
+      "bytes": 894
+    },
+    {
+      "file": "m2-container-index-probe-build.log",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "raw_capture_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 1
+    },
+    {
+      "file": "m2-container-index-release-build.log",
+      "sha256": "6404d2939f0e3b330ead062aa471cf8fc1247a22a6a14d39b102f47f0e820e9c",
+      "raw_capture_sha256": "bf086512c653e2a2fb56342444ba3c372e99910fa1a61af8568ab0c2488571ec",
+      "bytes": 85185
+    },
+    {
+      "file": "m2-container-index-release-gpu.log",
+      "sha256": "7fc1415b2d1fd0aa770787330e7f723c464e1020813c4a33c7e8c899b3ddb9e3",
+      "raw_capture_sha256": "72ffd9529e130f90d6e7f188830f1557920fb155851e5b915266201000c24b6d",
+      "bytes": 13432
+    },
+    {
+      "file": "m2-container-index-release-tests.log",
+      "sha256": "98178cd5cc734b2954263bf48617f7d9fa1f43804ac35e6818cada9f24345976",
+      "raw_capture_sha256": "9c0b9fb35966ff38d40b3266f9d39fa52679169d49b8724bf9197c9a4e02e640",
+      "bytes": 87633
+    },
+    {
+      "file": "m2-container-index-release-timing-1-after.log",
+      "sha256": "fc2718f35d76e82adccaac49499907789fd5aa6ce398387abe93f2e1c31a2ae2",
+      "raw_capture_sha256": "fc2718f35d76e82adccaac49499907789fd5aa6ce398387abe93f2e1c31a2ae2",
+      "bytes": 812
+    },
+    {
+      "file": "m2-container-index-release-timing-1-before.log",
+      "sha256": "dd2d58bc022795060a3556e6e8b6bdaa37b52505d775022fcfe8abf20a38cef3",
+      "raw_capture_sha256": "dd2d58bc022795060a3556e6e8b6bdaa37b52505d775022fcfe8abf20a38cef3",
+      "bytes": 808
+    },
+    {
+      "file": "m2-container-index-release-timing-2-after.log",
+      "sha256": "b38e5c1ee69319187fcdca012d491d5f219adee5594ffdbe888c397181341af3",
+      "raw_capture_sha256": "b38e5c1ee69319187fcdca012d491d5f219adee5594ffdbe888c397181341af3",
+      "bytes": 814
+    },
+    {
+      "file": "m2-container-index-release-timing-2-before.log",
+      "sha256": "d5e20c39b57bb9b2907e2b1f3cc361324fd54cb6db64c82e96f8daab2c6b9a2b",
+      "raw_capture_sha256": "d5e20c39b57bb9b2907e2b1f3cc361324fd54cb6db64c82e96f8daab2c6b9a2b",
+      "bytes": 808
+    },
+    {
+      "file": "m2-container-index-release-timing-3-after.log",
+      "sha256": "03a0b4714b66833e8fb9f67c06124567709cfdd72236f02b46f04223ba974112",
+      "raw_capture_sha256": "03a0b4714b66833e8fb9f67c06124567709cfdd72236f02b46f04223ba974112",
+      "bytes": 811
+    },
+    {
+      "file": "m2-container-index-release-timing-3-before.log",
+      "sha256": "21615c8825760058ed0fbd5b778d15d9e558901ba342aaaca7f11706862dc08b",
+      "raw_capture_sha256": "21615c8825760058ed0fbd5b778d15d9e558901ba342aaaca7f11706862dc08b",
+      "bytes": 811
+    },
+    {
+      "file": "m2-container-index-sanitize-build.log",
+      "sha256": "9492963d0a0a9e80f849282daa1e5dd85a8a9d7560d91dda8f1c98222ba8c0d3",
+      "raw_capture_sha256": "f1ca0b43f056fa1c4d1b1e05b52963816fffd51ac61d58c2761a327883df1ae6",
+      "bytes": 70809
+    },
+    {
+      "file": "m2-container-index-sanitize-tests.log",
+      "sha256": "ce9a960513973e1693ba257f8f4053ff65cda1a79355acc35120f2ef3d7878d9",
+      "raw_capture_sha256": "4aec50833a08ce2daf5121f2b5d00947c7d00170e0b09558e7bdb613ecdc6d13",
+      "bytes": 87938
+    },
+    {
+      "file": "m2-container-index-cost-frame.log",
+      "sha256": "b267fa7455f4a826b749e4b66aa69a71aa9d8bfad2410b73a5bf8e5f3376fcf2",
+      "raw_capture_sha256": "b267fa7455f4a826b749e4b66aa69a71aa9d8bfad2410b73a5bf8e5f3376fcf2",
+      "bytes": 1264
+    },
+    {
+      "file": "m2-container-index-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-container-index-frame-probe.cpp",
+      "sha256": "dcc537cd073f63f88fb1e4886fa56be3ec48f017789e445a9bc95c59526d30c6",
+      "note": "Diagnostic source/recipe; commercial data remains external."
+    },
+    {
+      "file": "m2-container-index-equivalence.cpp",
+      "sha256": "b3648e10d42e282f2094e86d6db328fbd909d88f95a6a9756f0879b4d916d09d",
+      "note": "Diagnostic source/recipe; commercial data remains external."
+    },
+    {
+      "file": "m2-container-index-profile.patch",
+      "sha256": "94db1d9fe06b8dd76a451f8b3b01b0d5d04cae5a87d03e0123118d798aeb8352",
+      "note": "Diagnostic source/recipe; commercial data remains external."
+    },
+    {
+      "file": "m2-container-index-session-profile.patch",
+      "sha256": "7a1b4441473bf4a0416afcfa08c7f12b3d3e0b06b0faa55e8a850c0cb07eb5e0",
+      "note": "Diagnostic source/recipe; commercial data remains external."
+    },
+    {
+      "file": "m2-container-index-profile.h",
+      "sha256": "2003bf71a8454a8b9656d3bd91052af4cea9598335672308a7d623f40482ab27",
+      "note": "Diagnostic source/recipe; commercial data remains external."
+    },
+    {
+      "file": "m2-container-index-profile-frame.cpp",
+      "sha256": "a0369d3a639ace4083f396c8c9ac79818828145c60e287ae8b1947c453775af3",
+      "note": "Diagnostic source/recipe; commercial data remains external."
+    },
+    {
+      "file": "m2-container-index-profile-build.sh",
+      "sha256": "9a03f876c4cf71645ba49976b6faa4fe13f8e2c2945ccf449ce8dc933c115151",
+      "note": "Diagnostic source/recipe; commercial data remains external."
+    },
+    {
+      "file": "m2-container-index-compile.sh",
+      "sha256": "b2a69c94d8419ae700568b97f245c94f9c4e4d2fbaea5cd51b829a90a9e998cc",
+      "note": "Diagnostic source/recipe; commercial data remains external."
+    },
+    {
+      "file": "m2-container-index-tests.sh",
+      "sha256": "e03c2739c19f684f0e20f07252ab57aed902519033b24ea3ef80eb95edb6c41c",
+      "note": "Diagnostic source/recipe; commercial data remains external."
+    },
+    {
+      "file": "m2-container-index-timing.sh",
+      "sha256": "ca3f94b622d0d064a7541c29f0227ceebebfd9922b56527c7be1a6e5c9527162",
+      "note": "Diagnostic source/recipe; commercial data remains external."
+    }
+  ],
+  "comparison": {
+    "ticks": 720,
+    "equal": true,
+    "digests": [
+      "DIGEST worlds/01_subwaya.dat 12697327032460833559",
+      "DIGEST worlds/02_cityhub.dat 16390435214447318215"
+    ],
+    "baseline_adaptation": "Old objects.cpp scan compiled with the current record layout and read-only accessor, linked ahead of the same current Debug libraries; all other game/engine code identical."
+  },
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "timing": {
+    "runs": [
+      {
+        "configuration": "debug",
+        "run": 1,
+        "version": "before",
+        "worlds": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 3.27144,
+              "p50": 3.13189,
+              "p95": 3.40412,
+              "max": 7.38116
+            },
+            "world": {
+              "mean": 1.53283,
+              "p50": 1.53678,
+              "p95": 1.60153,
+              "max": 2.15871
+            },
+            "model": {
+              "mean": 4.7744,
+              "p50": 4.76149,
+              "p95": 4.96461,
+              "max": 7.81211
+            },
+            "sprite": {
+              "mean": 0.059644,
+              "p50": 0.056498,
+              "p95": 0.076272,
+              "max": 0.110033
+            },
+            "fx": {
+              "mean": 0.00024225,
+              "p50": 0.000212,
+              "p95": 0.000402,
+              "max": 0.000744
+            }
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 23.0483,
+              "p50": 22.0031,
+              "p95": 22.9679,
+              "max": 54.4273
+            },
+            "world": {
+              "mean": 0.805185,
+              "p50": 0.80397,
+              "p95": 0.849738,
+              "max": 0.967735
+            },
+            "model": {
+              "mean": 12.7568,
+              "p50": 12.7484,
+              "p95": 13.0914,
+              "max": 14.1444
+            },
+            "sprite": {
+              "mean": 0.39329,
+              "p50": 0.398645,
+              "p95": 0.485641,
+              "max": 0.994356
+            },
+            "fx": {
+              "mean": 0.000288153,
+              "p50": 0.000255,
+              "p95": 0.000537,
+              "max": 0.000976
+            }
+          }
+        }
+      },
+      {
+        "configuration": "debug",
+        "run": 1,
+        "version": "after",
+        "worlds": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 2.21425,
+              "p50": 2.08079,
+              "p95": 2.20191,
+              "max": 6.05033
+            },
+            "world": {
+              "mean": 1.6007,
+              "p50": 1.59611,
+              "p95": 1.63667,
+              "max": 1.75624
+            },
+            "model": {
+              "mean": 4.77021,
+              "p50": 4.75045,
+              "p95": 4.91307,
+              "max": 5.50844
+            },
+            "sprite": {
+              "mean": 0.0581421,
+              "p50": 0.057657,
+              "p95": 0.060553,
+              "max": 0.085253
+            },
+            "fx": {
+              "mean": 0.000214487,
+              "p50": 0.000203,
+              "p95": 0.000258,
+              "max": 0.000807
+            }
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 14.8578,
+              "p50": 13.8057,
+              "p95": 14.2673,
+              "max": 46.0306
+            },
+            "world": {
+              "mean": 0.812791,
+              "p50": 0.812506,
+              "p95": 0.814232,
+              "max": 0.867723
+            },
+            "model": {
+              "mean": 12.6635,
+              "p50": 12.6524,
+              "p95": 12.73,
+              "max": 13.3571
+            },
+            "sprite": {
+              "mean": 0.38652,
+              "p50": 0.393006,
+              "p95": 0.471641,
+              "max": 1.02623
+            },
+            "fx": {
+              "mean": 0.000257477,
+              "p50": 0.000249,
+              "p95": 0.000321,
+              "max": 0.000413
+            }
+          }
+        }
+      },
+      {
+        "configuration": "debug",
+        "run": 2,
+        "version": "before",
+        "worlds": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 3.25815,
+              "p50": 3.11613,
+              "p95": 3.31738,
+              "max": 7.33629
+            },
+            "world": {
+              "mean": 1.53551,
+              "p50": 1.53605,
+              "p95": 1.60552,
+              "max": 2.01677
+            },
+            "model": {
+              "mean": 4.73908,
+              "p50": 4.72657,
+              "p95": 4.88634,
+              "max": 5.68098
+            },
+            "sprite": {
+              "mean": 0.0577606,
+              "p50": 0.056369,
+              "p95": 0.070396,
+              "max": 0.106093
+            },
+            "fx": {
+              "mean": 0.00019904,
+              "p50": 0.000189,
+              "p95": 0.000251,
+              "max": 0.000536
+            }
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 22.8525,
+              "p50": 21.8087,
+              "p95": 22.6509,
+              "max": 54.1702
+            },
+            "world": {
+              "mean": 0.79892,
+              "p50": 0.793476,
+              "p95": 0.854099,
+              "max": 0.93517
+            },
+            "model": {
+              "mean": 12.6503,
+              "p50": 12.64,
+              "p95": 13.0531,
+              "max": 13.7652
+            },
+            "sprite": {
+              "mean": 0.388714,
+              "p50": 0.392904,
+              "p95": 0.486257,
+              "max": 0.996768
+            },
+            "fx": {
+              "mean": 0.000249547,
+              "p50": 0.000234,
+              "p95": 0.000345,
+              "max": 0.00067
+            }
+          }
+        }
+      },
+      {
+        "configuration": "debug",
+        "run": 2,
+        "version": "after",
+        "worlds": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 2.19881,
+              "p50": 2.06799,
+              "p95": 2.1374,
+              "max": 6.10754
+            },
+            "world": {
+              "mean": 1.59848,
+              "p50": 1.59535,
+              "p95": 1.60524,
+              "max": 1.87658
+            },
+            "model": {
+              "mean": 4.74187,
+              "p50": 4.73682,
+              "p95": 4.7532,
+              "max": 5.52961
+            },
+            "sprite": {
+              "mean": 0.0571277,
+              "p50": 0.057029,
+              "p95": 0.059288,
+              "max": 0.060971
+            },
+            "fx": {
+              "mean": 0.000208427,
+              "p50": 0.000201,
+              "p95": 0.00026,
+              "max": 0.000499
+            }
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 15.21,
+              "p50": 14.1116,
+              "p95": 14.6029,
+              "max": 47.966
+            },
+            "world": {
+              "mean": 0.82255,
+              "p50": 0.814997,
+              "p95": 0.864844,
+              "max": 1.06506
+            },
+            "model": {
+              "mean": 12.8181,
+              "p50": 12.7804,
+              "p95": 13.1077,
+              "max": 13.7995
+            },
+            "sprite": {
+              "mean": 0.392469,
+              "p50": 0.395255,
+              "p95": 0.477736,
+              "max": 1.03607
+            },
+            "fx": {
+              "mean": 0.000324433,
+              "p50": 0.000288,
+              "p95": 0.0006,
+              "max": 0.000809
+            }
+          }
+        }
+      },
+      {
+        "configuration": "debug",
+        "run": 3,
+        "version": "before",
+        "worlds": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 3.247,
+              "p50": 3.1124,
+              "p95": 3.2969,
+              "max": 7.2478
+            },
+            "world": {
+              "mean": 1.5243,
+              "p50": 1.51703,
+              "p95": 1.5858,
+              "max": 1.73029
+            },
+            "model": {
+              "mean": 4.72288,
+              "p50": 4.71606,
+              "p95": 4.89428,
+              "max": 5.07625
+            },
+            "sprite": {
+              "mean": 0.0573461,
+              "p50": 0.056277,
+              "p95": 0.070055,
+              "max": 0.093636
+            },
+            "fx": {
+              "mean": 0.000187243,
+              "p50": 0.000184,
+              "p95": 0.000226,
+              "max": 0.000302
+            }
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 22.9322,
+              "p50": 21.8348,
+              "p95": 23.2911,
+              "max": 54.2926
+            },
+            "world": {
+              "mean": 0.800061,
+              "p50": 0.802643,
+              "p95": 0.840545,
+              "max": 1.19247
+            },
+            "model": {
+              "mean": 12.6986,
+              "p50": 12.6517,
+              "p95": 13.2241,
+              "max": 14.3391
+            },
+            "sprite": {
+              "mean": 0.396622,
+              "p50": 0.391456,
+              "p95": 0.478092,
+              "max": 1.062
+            },
+            "fx": {
+              "mean": 0.00035486,
+              "p50": 0.000302,
+              "p95": 0.000638,
+              "max": 0.00094
+            }
+          }
+        }
+      },
+      {
+        "configuration": "debug",
+        "run": 3,
+        "version": "after",
+        "worlds": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 2.29942,
+              "p50": 2.1534,
+              "p95": 2.46722,
+              "max": 6.48994
+            },
+            "world": {
+              "mean": 1.63722,
+              "p50": 1.63887,
+              "p95": 1.69892,
+              "max": 2.05732
+            },
+            "model": {
+              "mean": 4.8811,
+              "p50": 4.85972,
+              "p95": 5.02023,
+              "max": 6.21227
+            },
+            "sprite": {
+              "mean": 0.0619058,
+              "p50": 0.0596,
+              "p95": 0.073641,
+              "max": 0.129832
+            },
+            "fx": {
+              "mean": 0.000277587,
+              "p50": 0.000225,
+              "p95": 0.000474,
+              "max": 0.005326
+            }
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 15.2986,
+              "p50": 14.207,
+              "p95": 14.8334,
+              "max": 47.1755
+            },
+            "world": {
+              "mean": 0.825248,
+              "p50": 0.814714,
+              "p95": 0.865922,
+              "max": 1.03802
+            },
+            "model": {
+              "mean": 12.9365,
+              "p50": 12.9186,
+              "p95": 13.2023,
+              "max": 13.4045
+            },
+            "sprite": {
+              "mean": 0.399958,
+              "p50": 0.405629,
+              "p95": 0.490964,
+              "max": 1.06485
+            },
+            "fx": {
+              "mean": 0.00028841,
+              "p50": 0.000257,
+              "p95": 0.000567,
+              "max": 0.000805
+            }
+          }
+        }
+      },
+      {
+        "configuration": "release",
+        "run": 1,
+        "version": "before",
+        "worlds": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 0.46382,
+              "p50": 0.43549,
+              "p95": 0.444265,
+              "max": 1.33164
+            },
+            "world": {
+              "mean": 0.132334,
+              "p50": 0.131922,
+              "p95": 0.135305,
+              "max": 0.141772
+            },
+            "model": {
+              "mean": 0.450446,
+              "p50": 0.450387,
+              "p95": 0.453922,
+              "max": 0.471457
+            },
+            "sprite": {
+              "mean": 0.00592065,
+              "p50": 0.005873,
+              "p95": 0.006173,
+              "max": 0.009284
+            },
+            "fx": {
+              "mean": 7.921e-05,
+              "p50": 7.7e-05,
+              "p95": 9.6e-05,
+              "max": 0.000122
+            }
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 3.57217,
+              "p50": 3.29684,
+              "p95": 3.36876,
+              "max": 11.5228
+            },
+            "world": {
+              "mean": 0.0828428,
+              "p50": 0.082583,
+              "p95": 0.085582,
+              "max": 0.098218
+            },
+            "model": {
+              "mean": 1.24288,
+              "p50": 1.24186,
+              "p95": 1.25267,
+              "max": 1.28087
+            },
+            "sprite": {
+              "mean": 0.0442815,
+              "p50": 0.044531,
+              "p95": 0.054245,
+              "max": 0.09606
+            },
+            "fx": {
+              "mean": 0.000108993,
+              "p50": 0.000109,
+              "p95": 0.000128,
+              "max": 0.000151
+            }
+          }
+        }
+      },
+      {
+        "configuration": "release",
+        "run": 1,
+        "version": "after",
+        "worlds": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 0.445887,
+              "p50": 0.414564,
+              "p95": 0.440385,
+              "max": 1.36002
+            },
+            "world": {
+              "mean": 0.134256,
+              "p50": 0.133284,
+              "p95": 0.145242,
+              "max": 0.192073
+            },
+            "model": {
+              "mean": 0.460296,
+              "p50": 0.456868,
+              "p95": 0.48282,
+              "max": 0.632304
+            },
+            "sprite": {
+              "mean": 0.00609776,
+              "p50": 0.006031,
+              "p95": 0.006423,
+              "max": 0.012048
+            },
+            "fx": {
+              "mean": 8.22933e-05,
+              "p50": 8.1e-05,
+              "p95": 0.000104,
+              "max": 0.000128
+            }
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 3.50255,
+              "p50": 3.19957,
+              "p95": 3.55448,
+              "max": 13.137
+            },
+            "world": {
+              "mean": 0.0847782,
+              "p50": 0.084194,
+              "p95": 0.091857,
+              "max": 0.115339
+            },
+            "model": {
+              "mean": 1.28455,
+              "p50": 1.27697,
+              "p95": 1.36102,
+              "max": 1.83524
+            },
+            "sprite": {
+              "mean": 0.047701,
+              "p50": 0.047188,
+              "p95": 0.059723,
+              "max": 0.099495
+            },
+            "fx": {
+              "mean": 0.00012906,
+              "p50": 0.000127,
+              "p95": 0.000166,
+              "max": 0.000311
+            }
+          }
+        }
+      },
+      {
+        "configuration": "release",
+        "run": 2,
+        "version": "before",
+        "worlds": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 0.464082,
+              "p50": 0.434975,
+              "p95": 0.448695,
+              "max": 1.33214
+            },
+            "world": {
+              "mean": 0.132815,
+              "p50": 0.132135,
+              "p95": 0.135515,
+              "max": 0.170656
+            },
+            "model": {
+              "mean": 0.450877,
+              "p50": 0.44955,
+              "p95": 0.453254,
+              "max": 0.69848
+            },
+            "sprite": {
+              "mean": 0.00588837,
+              "p50": 0.00584,
+              "p95": 0.006121,
+              "max": 0.010858
+            },
+            "fx": {
+              "mean": 6.80333e-05,
+              "p50": 6.6e-05,
+              "p95": 8.9e-05,
+              "max": 0.000171
+            }
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 3.6414,
+              "p50": 3.29007,
+              "p95": 5.64184,
+              "max": 11.5135
+            },
+            "world": {
+              "mean": 0.0842823,
+              "p50": 0.082281,
+              "p95": 0.085681,
+              "max": 0.146316
+            },
+            "model": {
+              "mean": 1.27765,
+              "p50": 1.2422,
+              "p95": 1.27884,
+              "max": 2.3417
+            },
+            "sprite": {
+              "mean": 0.0453766,
+              "p50": 0.04407,
+              "p95": 0.055291,
+              "max": 0.101439
+            },
+            "fx": {
+              "mean": 0.000129347,
+              "p50": 0.000122,
+              "p95": 0.000177,
+              "max": 0.000393
+            }
+          }
+        }
+      },
+      {
+        "configuration": "release",
+        "run": 2,
+        "version": "after",
+        "worlds": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 0.447302,
+              "p50": 0.415248,
+              "p95": 0.460582,
+              "max": 1.38556
+            },
+            "world": {
+              "mean": 0.134255,
+              "p50": 0.134161,
+              "p95": 0.144944,
+              "max": 0.181748
+            },
+            "model": {
+              "mean": 0.459516,
+              "p50": 0.460344,
+              "p95": 0.477493,
+              "max": 0.506771
+            },
+            "sprite": {
+              "mean": 0.00631288,
+              "p50": 0.006135,
+              "p95": 0.006464,
+              "max": 0.035908
+            },
+            "fx": {
+              "mean": 9.085e-05,
+              "p50": 8.9e-05,
+              "p95": 0.000128,
+              "max": 0.000151
+            }
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 3.51289,
+              "p50": 3.22546,
+              "p95": 3.36268,
+              "max": 12.0581
+            },
+            "world": {
+              "mean": 0.0843684,
+              "p50": 0.084033,
+              "p95": 0.087251,
+              "max": 0.130047
+            },
+            "model": {
+              "mean": 1.27965,
+              "p50": 1.27719,
+              "p95": 1.32831,
+              "max": 1.42839
+            },
+            "sprite": {
+              "mean": 0.0461803,
+              "p50": 0.045641,
+              "p95": 0.057108,
+              "max": 0.102211
+            },
+            "fx": {
+              "mean": 0.000170193,
+              "p50": 0.000167,
+              "p95": 0.000212,
+              "max": 0.000441
+            }
+          }
+        }
+      },
+      {
+        "configuration": "release",
+        "run": 3,
+        "version": "before",
+        "worlds": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 0.476008,
+              "p50": 0.442614,
+              "p95": 0.494579,
+              "max": 1.40256
+            },
+            "world": {
+              "mean": 0.133961,
+              "p50": 0.132847,
+              "p95": 0.136785,
+              "max": 0.186197
+            },
+            "model": {
+              "mean": 0.455573,
+              "p50": 0.452606,
+              "p95": 0.479566,
+              "max": 0.542906
+            },
+            "sprite": {
+              "mean": 0.00602611,
+              "p50": 0.005976,
+              "p95": 0.006406,
+              "max": 0.00915
+            },
+            "fx": {
+              "mean": 6.95767e-05,
+              "p50": 6.8e-05,
+              "p95": 9.2e-05,
+              "max": 0.000116
+            }
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 3.6733,
+              "p50": 3.38577,
+              "p95": 3.65112,
+              "max": 13.1061
+            },
+            "world": {
+              "mean": 0.0835009,
+              "p50": 0.082499,
+              "p95": 0.086636,
+              "max": 0.142065
+            },
+            "model": {
+              "mean": 1.2671,
+              "p50": 1.24861,
+              "p95": 1.3152,
+              "max": 2.01291
+            },
+            "sprite": {
+              "mean": 0.0452429,
+              "p50": 0.044328,
+              "p95": 0.056414,
+              "max": 0.111232
+            },
+            "fx": {
+              "mean": 0.000132177,
+              "p50": 0.000128,
+              "p95": 0.000171,
+              "max": 0.000457
+            }
+          }
+        }
+      },
+      {
+        "configuration": "release",
+        "run": 3,
+        "version": "after",
+        "worlds": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 0.447374,
+              "p50": 0.410784,
+              "p95": 0.592044,
+              "max": 1.4427
+            },
+            "world": {
+              "mean": 0.134336,
+              "p50": 0.131641,
+              "p95": 0.14469,
+              "max": 0.233644
+            },
+            "model": {
+              "mean": 0.460082,
+              "p50": 0.453562,
+              "p95": 0.498725,
+              "max": 0.764084
+            },
+            "sprite": {
+              "mean": 0.00621671,
+              "p50": 0.006012,
+              "p95": 0.006947,
+              "max": 0.013122
+            },
+            "fx": {
+              "mean": 8.32633e-05,
+              "p50": 8.1e-05,
+              "p95": 0.000114,
+              "max": 0.00016
+            }
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 3.36635,
+              "p50": 3.09264,
+              "p95": 3.25651,
+              "max": 11.5127
+            },
+            "world": {
+              "mean": 0.0801451,
+              "p50": 0.078852,
+              "p95": 0.083399,
+              "max": 0.117462
+            },
+            "model": {
+              "mean": 1.22738,
+              "p50": 1.21838,
+              "p95": 1.30004,
+              "max": 1.56038
+            },
+            "sprite": {
+              "mean": 0.0438423,
+              "p50": 0.043329,
+              "p95": 0.055734,
+              "max": 0.09032
+            },
+            "fx": {
+              "mean": 0.00011583,
+              "p50": 0.000114,
+              "p95": 0.000143,
+              "max": 0.000178
+            }
+          }
+        }
+      }
+    ],
+    "summary": [
+      {
+        "configuration": "debug",
+        "world": "worlds/01_subwaya.dat",
+        "before": {
+          "step_p50_median": 3.11613,
+          "step_max_median": 7.33629,
+          "model_mean_median": 4.73908
+        },
+        "after": {
+          "step_p50_median": 2.08079,
+          "step_max_median": 6.10754,
+          "model_mean_median": 4.77021
+        }
+      },
+      {
+        "configuration": "debug",
+        "world": "worlds/02_cityhub.dat",
+        "before": {
+          "step_p50_median": 21.8348,
+          "step_max_median": 54.2926,
+          "model_mean_median": 12.6986
+        },
+        "after": {
+          "step_p50_median": 14.1116,
+          "step_max_median": 47.1755,
+          "model_mean_median": 12.8181
+        }
+      },
+      {
+        "configuration": "release",
+        "world": "worlds/01_subwaya.dat",
+        "before": {
+          "step_p50_median": 0.43549,
+          "step_max_median": 1.33214,
+          "model_mean_median": 0.450877
+        },
+        "after": {
+          "step_p50_median": 0.414564,
+          "step_max_median": 1.38556,
+          "model_mean_median": 0.460082
+        }
+      },
+      {
+        "configuration": "release",
+        "world": "worlds/02_cityhub.dat",
+        "before": {
+          "step_p50_median": 3.29684,
+          "step_max_median": 11.5228,
+          "model_mean_median": 1.2671
+        },
+        "after": {
+          "step_p50_median": 3.19957,
+          "step_max_median": 12.0581,
+          "model_mean_median": 1.27965
+        }
+      }
+    ]
+  },
+  "commands": [
+    "cmake --build build/debug -j3",
+    "cmake --build build/release -j2",
+    "cmake --build build/sanitize -j2",
+    "sh /tmp/b2-container-index-tests.sh <debug|release|sanitize> (ASan leak detection and UBSan halt enabled by recipe)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(lifecycle|containers|conveyor|movement|keyframes|mouse_combat|level_change)$' -V",
+    "sh /tmp/b2-container-index-compile.sh",
+    "sh /tmp/b2-container-index-timing.sh (without concurrent builds/tests)",
+    "/tmp/b2-container-index-equivalence-<before|after> <external-data-root> 01_SubwayA"
+  ],
+  "captures": [
+    {
+      "local_path": "build/debug/tests/containers.png",
+      "sha256": "37f13a0044d40dd2a687af9fa2de53ec2cbe8a566a537fe626ae2e012fe93a78",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/level-change-1.png",
+      "sha256": "5b9756486e5e3e88e8c0affc360e3e7ca98363389ea28b819132b95b3f81b84a",
+      "committed": false
+    }
+  ],
+  "limitations": [
+    "CPU diagnostic timings exclude GPU, ImGui and real audio-device scheduling. Debug wrapper/app scene units use -O2 with actual -O0 game/engine libraries.",
+    "Fixed-step diagnostic NEW_LEVEL during SubwayA intro, not a human playthrough.",
+    "Finite state comparison hashes object identity/life/activity/flags/transforms/velocity/dimensions/scheduling and current head/body container data, not all internal game state.",
+    "No change to CPU skinning, frustum culling, AI cadence or gameplay tuning.",
+    "Remaining user reports and required M2 services stay open. Native Metal not retested."
+  ],
+  "implementation_patch_sha256": "540bc7298e7d539b25bddc5cd6b5c16a825b2334926dda8250337cac607fb728",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "7f2bf84d42d9f54b654ccfe9477e08bc4b9b1c299959b7c472cb0f690ea744f2"
+    },
+    {
+      "path": "README.md",
+      "sha256": "7bfeaad4819b6a5f55d02f08587f942ea7809bc6d1432bb60c38843a0af12003"
+    },
+    {
+      "path": "docs/CONTAINER_CONTRACTS.md",
+      "sha256": "44d5f601152c5dc03e4008c02bd4c608aef4f7054baee9bc28d8241f35e150a1"
+    },
+    {
+      "path": "docs/CONTAINER_INDEX_CONTRACTS.md",
+      "sha256": "915d7fe34f3cbbd8f9cb01ccc12e84ebfd4b388ed5f83c4d7bec6a2f6c02139c"
+    },
+    {
+      "path": "docs/M2_CONTAINER_INDEX_SOURCES.json",
+      "sha256": "0a6c744fda297e1e9c0c264980d051af692f6b30ed01798abc269ff4011f620a"
+    },
+    {
+      "path": "docs/OBJECT_CONTRACTS.md",
+      "sha256": "6b7917132d5f1eb59b661791abe3e8c8f2616d7a7cefd6fa4a981d434fca947e"
+    },
+    {
+      "path": "docs/SCENE_EXPLOSION_CONTRACTS.md",
+      "sha256": "c83c51a23fbdb034440635980df9de1932eeff09a4cc8d0d2f0e66c86fbdde2a"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "c14aebf80ef5ffd5092395cd96420476827f6ceeef5e607064d1badd48bc3351"
+    },
+    {
+      "path": "src/engine/attachments.cpp",
+      "sha256": "3dba55ab8c8820e282352508ca8044b60fd8fd367b770c62b2db0fc405f2d22e"
+    },
+    {
+      "path": "src/engine/objects.cpp",
+      "sha256": "9d34354470406ff7e89469736ef56f86d8f56467d76f1b8f22c970f27cf2171a"
+    },
+    {
+      "path": "src/engine/objects.h",
+      "sha256": "559ce464dd1a68d99315f5686bab12141ef180ba2f336fce1b99ab1b742527b4"
+    },
+    {
+      "path": "src/engine/world_model.cpp",
+      "sha256": "466aeab25798a1c8e73fcb3b6c7d7fa12fab97f124ffb88b13345db79259a637"
+    },
+    {
+      "path": "src/game/server_adapter.cpp",
+      "sha256": "d0dad4c0bbfa8ab7d613da87911f2dbcc46a15fb66fedc18eda4bff3891c0727"
+    },
+    {
+      "path": "src/game/server_clients.cpp",
+      "sha256": "b27478140b1ae389209e1e971072b20701d263456160e10221067abec3d08dc1"
+    },
+    {
+      "path": "src/game/server_containers.cpp",
+      "sha256": "2815815c0aa9cde0ab2005b233a3960dec4a268265b3d8277bd88bd6f6406524"
+    },
+    {
+      "path": "src/game/server_keyframes.cpp",
+      "sha256": "6f5d110e2a84f8d17bd7066bcab21632e020ca2e89bacb954cc23154b5185d1a"
+    },
+    {
+      "path": "src/game/server_movers.cpp",
+      "sha256": "b548d3b3980c1aaf15183f0ce3d16cce9ee8b76e9b468d5694349993a4acbfee"
+    },
+    {
+      "path": "src/game/server_physics.cpp",
+      "sha256": "22a10cef2719dfbeee2329d9b11b8bb4d7dff9c202f8cfd89f0a7e7f52bea3f3"
+    },
+    {
+      "path": "src/game/server_rotation.cpp",
+      "sha256": "34c5e8c57c53269a5b0c428a4f1cbbb3e353b3a9c056cbe23f6f07b8adaf68fa"
+    },
+    {
+      "path": "src/game/server_world_bodies.cpp",
+      "sha256": "3966a663e2db93d9c509d65a8db46251b31acc3c83d503b98d553df58b204119"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "8dc739293151c28ee1e5dccd7355a2e4dc1b47726dd470fabcef79a428682eae"
+    },
+    {
+      "path": "tests/container_tests.cpp",
+      "sha256": "a08eb8da269b30b40018c75eeffc4fb31b52d21fd87b02a7dee64de01465d198"
+    },
+    {
+      "path": "tests/door_tests.cpp",
+      "sha256": "645f24769165a8cfcbc66934dff9724e6c20404c2c21b4c13283a80e82586996"
+    },
+    {
+      "path": "tests/keyframer_tests.cpp",
+      "sha256": "7121f4ee103678d58db2202fe9f9d57a8d3ff9dc61d74610813db68e2dd0a74d"
+    }
+  ],
+  "implementation_commit": "2c82c1fc2c744bced9847dc66b9c4b7b51f1bd93"
+}

@@ -1,0 +1,4 @@
+Missing worlds/09_abandoned_buildings.dat pickuptruckloop1.wav error=Resource not found: pickuptruckloop1.wav
+Missing worlds/09_abandoned_buildings.dat pickuptruckloop1.wav error=Resource not found: pickuptruckloop1.wav
+Missing worlds/11_slaughter_house.dat sounds\enemies\civilian\scream2.wav error=Resource not found: sounds\enemies\civilian\scream2.wav
+private_data:206: name == "worlds/09_abandoned_buildings.dat" && *sound == "pickuptruckloop1.wav"

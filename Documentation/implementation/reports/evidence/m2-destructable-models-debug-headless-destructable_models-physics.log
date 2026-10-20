@@ -1,0 +1,14 @@
+713/718 Testing: destructable_models.physics
+713/718 Test: destructable_models.physics
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable_model_tests" "physics" "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable-model-physics"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"destructable_models.physics" start time: Oct 17 05:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_models.physics" end time: Oct 17 05:15 CEST
+"destructable_models.physics" time elapsed: 00:00:00
+----------------------------------------------------------

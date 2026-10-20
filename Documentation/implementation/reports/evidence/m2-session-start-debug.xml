@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-c++"
+	tests="81"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gigabyte-g5"
+	time="127"
+	timestamp="2026-10-18T08:57:32"
+	>
+	<testcase name="world.session_start" classname="world.session_start" time="0.0401061" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>Startup rejects unknown/failed entries, incomplete accounting, missing music, unavailable services, recursive exits and malformed images; foreign/report and player ownership preserved
+PASS session_start
+</system-out>
+	</testcase>
+	<testcase name="world.level_change" classname="world.level_change" time="0.0628679" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>trial1: World texture t.dtx: Missing exact-path resource
+trial2: No single-player GameStartPoint
+trial3: Start point has no supported ground collision
+trial4: World initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+trial5: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+trial6: Destination start trigger requested another level during entry
+broken: DAT v56: invalid/unsupported section offsets near byte 4
+missing: Resource not found: worlds/missing.dat
+Commit 0: 
+Commit 1: 
+Commit 2: 
+PASS level_change
+</system-out>
+	</testcase>
+	<testcase name="world.surface_effects" classname="world.surface_effects" time="0.34774" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS surface_effects
+</system-out>
+	</testcase>
+	<testcase name="world.destination_trials" classname="world.destination_trials" time="0.0394746" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+trial4: loaded=1 entered=1 cleanup=1 failed=1 error=
+trial2: loaded=1 entered=0 cleanup=1 failed=0 error=No single-player GameStartPoint
+trial3: loaded=1 entered=0 cleanup=1 failed=0 error=Start point has no supported ground collision
+broken: loaded=0 entered=0 cleanup=1 failed=0 error=DAT v56: invalid/unsupported section offsets near byte 4
+missing: loaded=0 entered=0 cleanup=1 failed=0 error=Resource not found: worlds/missing.dat
+trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+PASS destination_trials
+</system-out>
+	</testcase>
+	<testcase name="world.destination_messages" classname="world.destination_messages" time="0.00228348" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS destination_messages
+</system-out>
+	</testcase>
+	<testcase name="world.destination_schema" classname="world.destination_schema" time="0.00231241" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS destination_schema
+</system-out>
+	</testcase>
+	<testcase name="world.destination_lifetime" classname="world.destination_lifetime" time="0.0124141" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS destination_lifetime
+</system-out>
+	</testcase>
+	<testcase name="world.sprite_entries" classname="world.sprite_entries" time="0.00684059" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS sprite_entries
+</system-out>
+	</testcase>
+	<testcase name="world.sound_entries" classname="world.sound_entries" time="0.00696385" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS sound_entries
+</system-out>
+	</testcase>
+	<testcase name="world.rez_structure" classname="world.rez_structure" time="0.00187125" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS rez_structure
+</system-out>
+	</testcase>
+	<testcase name="world.rez_rejection" classname="world.rez_rejection" time="0.00190881" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS rez_rejection
+</system-out>
+	</testcase>
+	<testcase name="world.resource_mount" classname="world.resource_mount" time="0.00211179" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS resource_mount
+</system-out>
+	</testcase>
+	<testcase name="world.world_properties" classname="world.world_properties" time="0.00199889" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS world_properties
+</system-out>
+	</testcase>
+	<testcase name="world.world_geometry" classname="world.world_geometry" time="0.00191259" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS world_geometry
+</system-out>
+	</testcase>
+	<testcase name="world.world_rejection" classname="world.world_rejection" time="0.0112833" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS world_rejection
+</system-out>
+	</testcase>
+	<testcase name="world.mutations" classname="world.mutations" time="0.0495472" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS mutations
+</system-out>
+	</testcase>
+	<testcase name="world.session_lifecycle" classname="world.session_lifecycle" time="0.00380767" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS session_lifecycle
+</system-out>
+	</testcase>
+	<testcase name="world.session_messages" classname="world.session_messages" time="0.00195364" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS session_messages
+</system-out>
+	</testcase>
+	<testcase name="world.original_trigger" classname="world.original_trigger" time="0.00232903" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS original_trigger
+</system-out>
+	</testcase>
+	<testcase name="world.session_start_private" classname="world.session_start_private" time="5.72997" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>01_SubwayA startup: 68 decoded images, 0 original missing-BSP omissions; 60 original updates
+02_CityHub startup: 275 decoded images, 1 original missing-BSP omissions; 60 original updates
+01_SubwayA startup: 68 decoded images, 0 original missing-BSP omissions; 60 original updates
+PASS session_start_private
+</system-out>
+	</testcase>
+	<testcase name="world.level_change_private" classname="world.level_change_private" time="5.71" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>Malformed destination refusal 0: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 0: 
+SubwayA transfer 0: 
+Malformed destination refusal 1: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 1: 
+SubwayA transfer 1: 
+Malformed destination refusal 2: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 2: 
+SubwayA transfer 2: 
+PASS level_change_private
+</system-out>
+	</testcase>
+	<testcase name="world.destination_trial_private" classname="world.destination_trial_private" time="5.8228" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>Cycle 0 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=490 error=
+Cycle 0 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 0 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=490 error=
+Cycle 1 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 1 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=490 error=
+Cycle 2 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 2 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="world.destination_private" classname="world.destination_private" time="3.28691" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>Cycle 0: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 0: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 1: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 2: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unk...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="world.private" classname="world.private" time="1.27133" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>No-player suspended=0 dims calls=57
+Service ConfigureCharacterBody: 16
+Service CreateAttachment: 10
+Service CreateInterObjectLink: 39
+Service CreateObject: 33
+Service CreateString: 5
+Service FindNamedObjects: 17
+Service FreeString: 2
+Service GetAnimIndex: 2419
+Service GetClass: 44
+Service GetClientUserData: 1
+Service GetContainers: 58
+Service GetGameConVar: 449
+Service GetModelAnimUserDims: 47
+Service GetModelAnimation: 21
+Service GetModelAnimationName: 32
+Service GetModelNodeTransform: 242
+Service GetMovementState: 31
+Service GetNextObject: 227
+Service GetObjectClass: 236
+Service GetObjectDims: 7
+Service GetObjectFlags: 344
+Service GetObjectName: 37
+Service GetObjectPos: 188
+Service GetObjectRotation: 88
+Service GetObjectUserFlags: 61
+Service GetPropBool: 764
+Service GetPropGeneric: 10699
+Service GetPropReal: 764
+Service GetPropString: 72
+Service GetPropVector: 64
+Service GetStringData: 36
+Service GetTime: 74
+Service GetVarValueFloat: 447
+Service GetVarValueString: 2
+Service GetVelocity: 1
+Service HandleToOb...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="cli.world_modes" classname="cli.world_modes" time="2.18741" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="player.handles" classname="player.handles" time="0.00459678" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;player"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="player.lifecycle" classname="player.lifecycle" time="0.00919385" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;player"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="player.rollback" classname="player.rollback" time="0.00986867" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;player"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="player.messages" classname="player.messages" time="0.00879871" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;player"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="player.callbacks" classname="player.callbacks" time="0.00797916" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;player"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="player.smell" classname="player.smell" time="0.00966396" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;player"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="player.smell_private" classname="player.smell_private" time="5.22438" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;player;private"/>
+		</properties>
+		<system-out>Original SubwayA camera intro expired after 12.0167 simulation seconds
+SubwayA smell cycle 0: original intro, forward movement, 6 drops, 841 checks, 6 live hints
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+SubwayA smell cycle 1: original intro, forward movement, 6 drops, 841 checks, 6 live hints
+</system-out>
+	</testcase>
+	<testcase name="player.private" classname="player.private" time="2.75563" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;player;private"/>
+		</properties>
+		<system-out>Cycle 0: CPlayerObj at -32,170.001,-3224; 120 updates; 102 client messages; 7 paths
+Cycle 1: CPlayerObj at -32,170.001,-3224; 120 updates; 102 client messages; 7 paths
+Cycle 2: CPlayerObj at -32,170.001,-3224; 120 updates; 102 client messages; 7 paths
+</system-out>
+	</testcase>
+	<testcase name="sound.defaults" classname="sound.defaults" time="0.0067716" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sound"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sound.loops" classname="sound.loops" time="0.0092595" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sound"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sound.resampling" classname="sound.resampling" time="0.00667151" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sound"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sound.lifetime" classname="sound.lifetime" time="0.00659041" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sound"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sound.failures" classname="sound.failures" time="0.00675564" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sound"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sound.metadata" classname="sound.metadata" time="0.00697573" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sound"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sound.catalog" classname="sound.catalog" time="4.19005" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;sound"/>
+		</properties>
+		<system-out>worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=1 frames=198623 rate=22050
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=2 frames=198623 rate=22050
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=3 frames=198623 rate=22050
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=4 frames=198623 rate=22050
+worlds/04_steamtunnels.dat sounds\ambient\amb16.wav playback=Invalid or over-limit sound request
+worlds/06_airship1.dat sounds\ambient\wind1.wav playback=Invalid or over-limit sound request
+worlds/06_airship1.dat sounds\ambient\wind1.wav playback=Invalid or over-limit sound request
+worlds/09_abandoned_buildings.dat sounds\ambients\amb1.wav decode=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\amb1.wav playback=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav decode=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="sound.subway" classname="sound.subway" time="1.66702" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;sound"/>
+		</properties>
+		<system-out>cycle=0 4 world loops survived source removal, wrapped twice, produced PCM and unloaded
+cycle=1 4 world loops survived source removal, wrapped twice, produced PCM and unloaded
+</system-out>
+	</testcase>
+	<testcase name="sprites.reader" classname="sprites.reader" time="0.00996538" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sprites"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sprites.clock" classname="sprites.clock" time="0.00253633" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sprites"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sprites.properties" classname="sprites.properties" time="0.0052248" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sprites"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sprites.placement" classname="sprites.placement" time="0.00595651" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sprites"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sprites.ray" classname="sprites.ray" time="0.0049946" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sprites"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sprites.failures" classname="sprites.failures" time="0.00621949" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sprites"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sprites.catalog" classname="sprites.catalog" time="5.93788" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;sprites"/>
+		</properties>
+		<system-out>worlds/04_steamtunnels.dat rejected=noname: Missing, oversized or non-SPR sprite resource: sprites\bloodsplat1.dtx
+worlds/04_steamtunnels.dat rejected=noname: Missing, oversized or non-SPR sprite resource: sprites\bloodsplat2.dtx
+worlds/04_steamtunnels.dat rejected=noname: Missing, oversized or non-SPR sprite resource: sprites\bloodsplat3.dtx
+worlds/17_entrance.dat flush=2 y=-544
+worlds/17_entrance.dat flush=2 y=-544
+worlds/18_temple.dat rejected=sprites\redlight1.spr: Missing, oversized or non-SPR sprite resource: 
+worlds/multi/bb_bridge.dat rejected=DetailSprite: invalid property TypeAction
+worlds=57 sources=124 manifests=120 missing=4 invalid=0 rejected=5 flush=2 repeat=0
+</system-out>
+	</testcase>
+	<testcase name="sprites.subway" classname="sprites.subway" time="1.43401" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;sprites"/>
+		</properties>
+		<system-out>cycle=0 12 DetailSprite source instances, exact SPR frame resources, hidden-independent clocks and unload verified; full M2 acceptance remains separate
+cycle=1 12 DetailSprite source instances, exact SPR frame resources, hidden-independent clocks and unload verified; full M2 acceptance remains separate
+</system-out>
+	</testcase>
+	<testcase name="sceneexplosion.properties" classname="sceneexplosion.properties" time="0.00684202" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sceneexplosion"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sceneexplosion.commands" classname="sceneexplosion.commands" time="0.00690156" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sceneexplosion"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sceneexplosion.damage" classname="sceneexplosion.damage" time="0.00664324" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sceneexplosion"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sceneexplosion.lifetime" classname="sceneexplosion.lifetime" time="0.00695768" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sceneexplosion"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sceneexplosion.failures" classname="sceneexplosion.failures" time="0.00694572" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sceneexplosion"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sceneexplosion.budget" classname="sceneexplosion.budget" time="0.0217159" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sceneexplosion"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sceneexplosion.catalog" classname="sceneexplosion.catalog" time="4.07035" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;sceneexplosion"/>
+		</properties>
+		<system-out>worlds/01_subwaya.dat name=exp1 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp1 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp2 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp3 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp3 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp4 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp4 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp5 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/0...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="sceneexplosion.subway" classname="sceneexplosion.subway" time="1.55594" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;sceneexplosion"/>
+		</properties>
+		<system-out>cycle=0 nine original emitters, null-damager suppression, decoded audio, removal and shell unload verified
+cycle=1 nine original emitters, null-damager suppression, decoded audio, removal and shell unload verified
+</system-out>
+	</testcase>
+	<testcase name="exits.defaults" classname="exits.defaults" time="0.0103724" status="run">
+		<properties>
+			<property name="cmake_labels" value="exits;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="exits.delayed" classname="exits.delayed" time="0.011895" status="run">
+		<properties>
+			<property name="cmake_labels" value="exits;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="exits.broadcast" classname="exits.broadcast" time="0.00676568" status="run">
+		<properties>
+			<property name="cmake_labels" value="exits;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="exits.blocked" classname="exits.blocked" time="0.0090771" status="run">
+		<properties>
+			<property name="cmake_labels" value="exits;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="exits.dead" classname="exits.dead" time="0.0083483" status="run">
+		<properties>
+			<property name="cmake_labels" value="exits;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="exits.queue" classname="exits.queue" time="0.0152646" status="run">
+		<properties>
+			<property name="cmake_labels" value="exits;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="exits.lifetime" classname="exits.lifetime" time="0.0126359" status="run">
+		<properties>
+			<property name="cmake_labels" value="exits;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="exits.catalog" classname="exits.catalog" time="3.61678" status="run">
+		<properties>
+			<property name="cmake_labels" value="exits;headless;private"/>
+		</properties>
+		<system-out>Authored exit2 -&gt; 02_cityhub / start 01_egressa
+Exit snapshot: objects=233 attachments=11 smells=2
+Authored exit2 -&gt; 02_cityhub / start 01_egressa
+Exit snapshot: objects=233 attachments=11 smells=2
+Authored exit2 -&gt; 02_cityhub / start 01_egressa
+Exit snapshot: objects=233 attachments=11 smells=2
+</system-out>
+	</testcase>
+	<testcase name="sprite_view.geometry" classname="sprite_view.geometry" time="0.00302277" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sprite_view"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sprite_view.failures" classname="sprite_view.failures" time="0.0686089" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sprite_view"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sprite_view.subway" classname="sprite_view.subway" time="1.8967" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;sprite_view"/>
+		</properties>
+		<system-out>SubwayA frame=SpriteTextures\bloodsplat3.dtx 128x128 zero=14828 partial=1556
+SubwayA frame=SpriteTextures\bloodsplat3.dtx 128x128 zero=14828 partial=1556
+SubwayA frame=SpriteTextures\bloodsplat3.dtx 128x128 zero=14828 partial=1556
+</system-out>
+	</testcase>
+	<testcase name="gideon_runtime.defaults" classname="gideon_runtime.defaults" time="0.00539808" status="run">
+		<properties>
+			<property name="cmake_labels" value="gideon_runtime;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="gideon_runtime.health" classname="gideon_runtime.health" time="0.00575758" status="run">
+		<properties>
+			<property name="cmake_labels" value="gideon_runtime;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="gideon_runtime.client" classname="gideon_runtime.client" time="0.00837794" status="run">
+		<properties>
+			<property name="cmake_labels" value="gideon_runtime;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="gideon_runtime.damage" classname="gideon_runtime.damage" time="0.00576355" status="run">
+		<properties>
+			<property name="cmake_labels" value="gideon_runtime;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="gideon_runtime.lifetime" classname="gideon_runtime.lifetime" time="0.00819811" status="run">
+		<properties>
+			<property name="cmake_labels" value="gideon_runtime;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="gideon_runtime.profile" classname="gideon_runtime.profile" time="0.321296" status="run">
+		<properties>
+			<property name="cmake_labels" value="gideon_runtime;headless;private"/>
+		</properties>
+		<system-out>Gideon difficulty=0 hp=1000.25 captured=1 ratio=1000.25
+Gideon difficulty=1 hp=4001 captured=1 ratio=4001
+Gideon difficulty=2 hp=6001.5 captured=1 ratio=6001.5
+</system-out>
+	</testcase>
+	<testcase name="gideon_runtime.subway" classname="gideon_runtime.subway" time="7.7678" status="run">
+		<properties>
+			<property name="cmake_labels" value="gideon_runtime;headless;private"/>
+		</properties>
+		<system-out>SubwayA created=204 unknown=0 failed=0 npcs=16 objects=227
+Entered objects=230
+First tick objects=232 attachments=11
+Glass probe observer=1 visibility=1 refreshed=1 pings=3 script updates=91
+Boss activity=3 pings=13 animation=31
+Boss updates=332 state=24 health messages=331 error=
+Intro glass visibility=1 passive before camera switch=1 selections=2 script updates=293 current=PASSIVE
+SubwayA created=204 unknown=0 failed=0 npcs=16 objects=227
+Entered objects=230
+First tick objects=232 attachments=11
+Glass probe observer=1 visibility=1 refreshed=1 pings=3 script updates=91
+Boss activity=3 pings=13 animation=31
+Boss updates=332 state=24 health messages=331 error=
+Intro glass visibility=1 passive before camera switch=1 selections=2 script updates=293 current=PASSIVE
+SubwayA created=204 unknown=0 failed=0 npcs=16 objects=227
+Entered objects=230
+First tick objects=232 attachments=11
+Glass probe observer=1 visibility=1 refreshed=1 pings=3 script updates=91
+Boss activity=3 pings=13 animation=31
+Boss updates=332 state=...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="gideon_runtime.arena" classname="gideon_runtime.arena" time="0.19556" status="run">
+		<properties>
+			<property name="cmake_labels" value="gideon_runtime;headless;private"/>
+		</properties>
+		<system-out>Arena updates=122 attack=99 shots=1 state=0 error=
+</system-out>
+	</testcase>
+	<testcase name="coverage.catalog" classname="coverage.catalog" time="0.669208" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out>Catalog: 171 interface services / 174 trace boundaries
+</system-out>
+	</testcase>
+	<testcase name="coverage.observations" classname="coverage.observations" time="0.00378208" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="coverage.private" classname="coverage.private" time="13.1036" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;services"/>
+		</properties>
+		<system-out>SubwayA-entry	AddObjectToList	ServerDE	Implemented (bounded)	0
+SubwayA-entry	AddSkyObject	ServerDE	Implemented (bounded)	0
+SubwayA-entry	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+SubwayA-entry	AlignRotation	ServerDE	Implemented (bounded)	0
+SubwayA-entry	BreakInterObjectLink	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CastRay	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CastWorldRay	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CompareStringsUpper	ServerDE	Implemented (bounded)	1
+SubwayA-entry	ConfigureCharacterBody	ServerDE	Implemented (bounded)	17
+SubwayA-entry	ConfigureModelBody	ServerDE	Implemented (bounded)	0
+SubwayA-entry	ConfigureWorldBody	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CopyString	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CreateAttachment	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CreateInterObjectLink	ServerDE	Implemented (bounded)	24
+SubwayA-entry	CreateObject	ServerDE	Implemented (bounded)	26
+SubwayA-entry	CreateObjectList	ServerDE	Implemented (bounded)	0
+...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="train_session.private_30" classname="train_session.private_30" time="22.9531" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;train_session"/>
+		</properties>
+		<system-out>Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walk t=0 pos=-32,170.001,-3224 HP=100 ammo=50 target=none
+Walk t=2 pos=-32,170.001,-2681.51 HP=100 ammo=50 target=none
+Walk t=4 pos=-30.8339,170.001,-2175.55 HP=100 ammo=44 target=none
+Walk t=6 pos=-30.5801,170.001,-1721.66 HP=100 ammo=41 target=noname
+Walk t=8 pos=-41.6618,170.001,-1445.53 HP=120.993 ammo=35 target=noname
+Walk t=10 pos=-24.1948,170.001,-1262.2 HP=116.99 ammo=29 target=noname
+Walk t=12 pos=-33.3093,170.001,-1149.02 HP=116.99 ammo=24 target=none
+Walk t=14 pos=-33.5281,170.001,-632.001 HP=116.99 ammo=24 target=none
+Walk t=16 pos=-36.793,170.001,-304.768 HP=116.99 ammo=21 target=noname
+Walk t=18 pos=-71.1363,170.001,252.583 HP=116.99 ammo=15 target=pete
+Walk t=20 pos=-29.3611,170.001,550.656 HP=116.99 ammo=11 target=none
+Walk t=22 pos=-29.3323,170.001,841.327 HP=116.99 ammo=9 target=noname
+Walk t=24 pos=-39.8892,170.001,1252.88 HP=116.99 ammo=2 target=noname
+Walk t=26 pos=-41.372,170.001,1691.1 HP=104.974 ammo=11 target=nonam...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="train_session.private_60" classname="train_session.private_60" time="24.9846" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;train_session"/>
+		</properties>
+		<system-out>Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walk t=0 pos=-32,170.001,-3224 HP=100 ammo=50 target=none
+Walk t=2 pos=-32,170.001,-2681.51 HP=100 ammo=50 target=none
+Walk t=4 pos=-32.5398,170.001,-2121.53 HP=100 ammo=45 target=none
+Walk t=6 pos=-32.0424,170.001,-1742.92 HP=100 ammo=42 target=noname
+Walk t=8 pos=-41.4027,170.001,-1438.17 HP=125 ammo=35 target=noname
+Walk t=10 pos=-10.9157,170.001,-1144.98 HP=125 ammo=28 target=noname
+Walk t=12 pos=-34.2327,170.001,-961.817 HP=125 ammo=24 target=none
+Walk t=14 pos=-34.2491,170.001,-520.001 HP=125 ammo=24 target=none
+Walk t=16 pos=-13.1251,170.001,-25.8379 HP=125 ammo=18 target=noname
+Walk t=18 pos=-75.999,170.001,339.24 HP=125 ammo=23 target=pete
+Walk t=20 pos=-29.333,170.001,611.073 HP=125 ammo=20 target=none
+Walk t=22 pos=-29.3323,170.001,841.327 HP=125 ammo=18 target=noname
+Walk t=24 pos=-30.8271,170.001,1262.49 HP=125 ammo=11 target=noname
+Walk t=26 pos=-42.5627,170.001,1671.51 HP=125 ammo=4 target=noname
+Walk t=28 pos=-33.2759,170.0...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+</testsuite>

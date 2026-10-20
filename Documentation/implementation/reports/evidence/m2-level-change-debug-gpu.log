@@ -1,0 +1,36 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  25: gpu.lifecycle
+ 1/10 Test  #25: gpu.lifecycle ....................   Passed    2.26 sec
+      Start 196: gpu.objectives
+ 2/10 Test #196: gpu.objectives ...................   Passed    7.48 sec
+      Start 357: gpu.world_depth
+ 3/10 Test #357: gpu.world_depth ..................   Passed    0.59 sec
+      Start 358: gpu.viewport
+ 4/10 Test #358: gpu.viewport .....................   Passed   15.74 sec
+      Start 370: gpu.model_depth
+ 5/10 Test #370: gpu.model_depth ..................   Passed    0.52 sec
+      Start 562: gpu.player_restore
+ 6/10 Test #562: gpu.player_restore ...............   Passed    3.07 sec
+      Start 567: gpu.player_keepalive
+ 7/10 Test #567: gpu.player_keepalive .............   Passed    8.49 sec
+      Start 647: gpu.mouse_combat
+ 8/10 Test #647: gpu.mouse_combat .................   Passed   16.83 sec
+      Start 653: gpu.world_alpha_private
+ 9/10 Test #653: gpu.world_alpha_private ..........   Passed    1.83 sec
+      Start 812: gpu.level_change
+10/10 Test #812: gpu.level_change .................   Passed    7.27 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+gpu                 =  64.07 sec*proc (10 tests)
+model_view          =   0.52 sec*proc (1 test)
+objectives          =   7.48 sec*proc (1 test)
+player_controls     =  16.83 sec*proc (1 test)
+player_keepalive    =   8.49 sec*proc (1 test)
+player_restore      =   3.07 sec*proc (1 test)
+private             =  60.71 sec*proc (7 tests)
+world               =   7.27 sec*proc (1 test)
+world_view          =  18.15 sec*proc (3 tests)
+
+Total Test time (real) =  64.09 sec

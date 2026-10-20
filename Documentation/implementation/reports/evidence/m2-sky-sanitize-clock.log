@@ -1,0 +1,11 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 603: session_playback.policy
+1/1 Test #603: session_playback.policy ..........   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+headless            =   0.02 sec*proc (1 test)
+session_playback    =   0.02 sec*proc (1 test)
+
+Total Test time (real) =   0.03 sec

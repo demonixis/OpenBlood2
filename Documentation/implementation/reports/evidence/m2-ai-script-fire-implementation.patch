@@ -1,0 +1,707 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index b67d120..529ad57 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -575,3 +575,5 @@ The [flashlight continuation](../Documentation/Implementation/M2_FLASHLIGHT.md)
+ The [CityHub entry continuation](../Documentation/Implementation/M2_CITYHUB_ENTRY.md) records `fallengrills` as an explicitly omitted object because its named BSP is absent. The source instance is rejected before initial update, matching the available LithTech loader behavior; no replacement geometry is invented. CityHub now has 453 created / 31 sounds / 541 editor-only / one omitted / zero unsupported / zero failed entries. Safe NEW_LEVEL preserves the supported player and enters at `01_egressa`; required SPR world materials now decode and animate through SDL_GPU. M2 remains incomplete; earlier CityHub refusal/count statements are historical. Read [contracts](docs/CITYHUB_ENTRY_CONTRACTS.md). Keep missing-name rejection typed and world-file omission explicit; runtime creation still fails. Ambiguous/invalid geometry and other preparation failures remain blocking. Do not alias absent models or import reference engine dependencies. Later-engine source evidence is not a verified 1998 executable trace.
+ 
+ The [AI alignment correction](../Documentation/Implementation/M2_AI_ALIGNMENT.md) honors the original SDK fallback for parallel movement/obstacle axes. Read [contracts](docs/AI_ALIGNMENT_CONTRACTS.md). Preserve valid-frame versus blocked-route distinction, failed partial-route guards, query budgets and the existing right-axis convention. The perturbation policy is corroborated by later LithTech, not a retail1998 trace. Per-owner historical axes are inspectable. Diagnostic relocation evidence does not prove full CityHub traversal; M2 stays incomplete.
++
++The [scripted opportunity-fire continuation](../Documentation/Implementation/M2_AI_SCRIPT_FIRE.md) connects original standing/walking/running fire to path/object movement. Read [contracts](docs/AI_SCRIPT_FIRE_CONTRACTS.md). Preserve strict cadence, source cached moving aim and shared target, standing residual velocity, distinct blocked-shot/phase rules, one integration and checked post-shot lifetime. No-target decisions must stay distinct from failed services. Inspector values are last-call history; diagnostic encounters do not complete M2.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 69e0583..7a1078b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -43,7 +43,7 @@ target_sources(blood2_game PRIVATE src/game/original/WeaponPickups.cpp src/game/
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+     src/game/server_activation.cpp src/game/original/AIRuntime.cpp
+-    src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIDodge.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/Movement.cpp
++    src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIDodge.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/AIScriptFire.cpp src/game/original/Movement.cpp
+     src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AIDeath.cpp src/game/original/Corpse.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/Gideon.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+diff --git a/README.md b/README.md
+index fdee3bd..5c37de7 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [scripted opportunity-fire continuation](../Documentation/Implementation/M2_AI_SCRIPT_FIRE.md) connects original standing/walking/running fire to FOLLOWPATH and MOVETOOBJECT, with inspection and checked lifetime. Real Cultist model diagnostics verify shots, damage and movement through reloads; these are not authored encounter or traversal proofs. M2 remains incomplete.
++
+ The [AI alignment correction](../Documentation/Implementation/M2_AI_ALIGNMENT.md) restores the original parallel-axis fallback used by CMovement. Two reproduced CityHub Cultist update failures now become ordinary blocked-path decisions; inspection exposes the resolved axes. A 120-second relocation diagnostic reports no suspended NPCs after the correction, but is not a playthrough. M2 remains incomplete.
+ 
+ The [CityHub entry continuation](../Documentation/Implementation/M2_CITYHUB_ENTRY.md) records `fallengrills` as an explicitly omitted object because its named BSP is absent. The source instance is rejected before initial update, matching the available LithTech loader behavior; no replacement geometry is invented. CityHub now has 453 created / 31 sounds / 541 editor-only / one omitted / zero unsupported / zero failed entries. Safe NEW_LEVEL preserves the supported player and enters at `01_egressa`; required SPR world materials now decode and animate through SDL_GPU. M2 remains incomplete; earlier CityHub refusal/count statements are historical.
+diff --git a/docs/AI_FOLLOW_CONTRACTS.md b/docs/AI_FOLLOW_CONTRACTS.md
+index d3ed613..a365148 100644
+--- a/docs/AI_FOLLOW_CONTRACTS.md
++++ b/docs/AI_FOLLOW_CONTRACTS.md
+@@ -87,7 +87,9 @@ trigger deliveries/removals and owned remaining points/actions. It reports live
+ removed historical identities without dereferencing stale handles. Hidden, inactive
+ and missing-model objects remain selectable. Inspection runs no commands or queries.
+ 
+-OPPORTFIRE moving branches return an explicit unavailable error when required.
++The [opportunity-fire continuation](AI_SCRIPT_FIRE_CONTRACTS.md) now connects
++standing fire in FOLLOWPATH and moving fire in MOVETOOBJECT, preserving their
++different aim, cadence and phase rules. Earlier OPPORTFIRE refusals are superseded.
+ MC_Walk/MC_Run obstacle recovery, shade queries, full SCRIPT parsing/dispatch,
+ AI initialization/update/deactivation, production CivilianAI/CultistAI/Gideon,
+ death, required client FX and ExitTrigger remain open. Existing authored counts and
+diff --git a/docs/AI_SCRIPT_CONTRACTS.md b/docs/AI_SCRIPT_CONTRACTS.md
+index 3d3cbbf..d44f9cc 100644
+--- a/docs/AI_SCRIPT_CONTRACTS.md
++++ b/docs/AI_SCRIPT_CONTRACTS.md
+@@ -95,6 +95,8 @@ rejections) and complete one real animation on each of six character models.
+ Parsing authored text does not prove those scripts execute against production NPCs.
+ 
+ Full AI_Update/initialization/deactivation, autonomous attack/death actions, shade
+-queries and opportunity-fire movement branches remain unavailable. Required client
++queries remain unavailable at this historical snapshot. The
++[opportunity-fire continuation](AI_SCRIPT_FIRE_CONTRACTS.md) now supplies the original
++standing/walking/running scripted firing branches. Required client
+ FX, ExitTrigger and complete session services also keep M2 open. Source object counts
+ remain 187 created, 4 transferred sounds, 372 editor-only, 17 unsupported, 0 failed.
+diff --git a/docs/AI_SCRIPT_FIRE_CONTRACTS.md b/docs/AI_SCRIPT_FIRE_CONTRACTS.md
+new file mode 100644
+index 0000000..20dc2aa
+--- /dev/null
++++ b/docs/AI_SCRIPT_FIRE_CONTRACTS.md
+@@ -0,0 +1,76 @@
++# Original scripted opportunity fire
++
++Selected AI_Mgr Script_Fire_Stand/Walk/Run now serve the OPPORTFIRE flag in
++FOLLOWPATH and MOVETOOBJECT. See [source hashes](M2_AI_SCRIPT_FIRE_SOURCES.json),
++[script movement](AI_FOLLOW_CONTRACTS.md), [interpreter](AI_SCRIPT_CONTRACTS.md),
++[perception](AI_PERCEPTION_CONTRACTS.md), [weapons](AI_FIRE_CONTRACTS.md) and
++[evidence](../../Documentation/Implementation/M2_AI_SCRIPT_FIRE.md). M2 remains open.
++
++## Standing opportunity fire
++
++FOLLOWPATH faces the next path point first. Outside the arrival threshold, bit 2
++calls Script_Fire_Stand. A successful no-target decision permits ordinary scripted
++walk/run; acquisition or weapon-service failure is distinct and aborts the command.
++The typed method returns service success plus an `engaged` output rather than
++conflating these cases in the original boolean result.
++
++Each standing call selects an opportunity through the existing original faction,
++visibility, facing and range rules. It refreshes the chosen position, faces it and
++cancels that first Metacmd increment. Initial command 7 selects the fire-type clip,
++disables looping and resets both start clocks to zero, preserving primary reload
++time. No new scheduling interval, crawl recovery or velocity reset is added.
++FOLLOWPATH skips its locomotion command while engaged, but retains residual velocity
++exactly as the source does; it is not an immediate physical stop.
++
++Later calls fire only when time is strictly greater than last-load plus reload.
++The extra timed face increments Metacmd without cancellation. Accepted and dry
++attempts update last-load. A blocked shot clears animating without advancing the
++phase or consuming cadence. Completed playback independently clears animating,
++with no phase increment. Missing required services still fail explicitly.
++
++## Moving opportunity fire
++
++MOVETOOBJECT phase 3 chooses Script_Fire_Walk or Script_Fire_Run when bit 2 is set,
++then restores phase 2 as in source. These methods use commands 8/9 and looping
++fire-type clips; without a weapon, the source fallback is TYPE_PISTOL. They always
++use full walk/run speed, without the ordinary Script_Walk initial injury slowdown.
++Velocity comes from CMovement's previous sampled forward vector, before any target
++turn; the engine remains responsible for integrating it once.
++
++Initial selection does not search or shoot. Subsequent calls move first, then
++attempt acquisition only after the strict reload deadline. No target leaves the
++clock unchanged. A target causes a face and Fire attempt; moving fire consumes
++cadence even when that shot is blocked. Invalid/unavailable firing services fail
++instead of being silently ignored as in the unchecked source. Completion stops
++horizontal velocity (all axes when trapped), clears animating and does not advance
++the phase.
++
++The moving source does **not** refresh m_vTargetPos after ChooseOpportunityTarget.
++The port preserves that cached-position aim and calls the checked MC_FacePos helper
++without falsely marking the new target's pose as freshly sampled. This differs from
++standing fire. MOVETOOBJECT also shares m_hTarget with opportunity acquisition:
++reacquisition may replace the named movement target while the calculated route
++remains unchanged. Do not introduce a separate hidden target or silently refresh
++the path/aim to repair these source quirks.
++
++## Safety and inspection
++
++Existing object, model, animation-resize, time, speed, path and query bounds remain.
++No missing clip or blocked resize becomes successful playback. The existing motion
++guard rejects recursive script-fire calls. After Fire, verify the owner and command
++failure state and detect state changes or nested script failure before updating
++cadence or playback. Destruction remains deferred. Missing weapon during ordinary
++standing acquisition is a valid no-target decision; a shot-service failure is not.
++
++The Skeleton inspector exposes the last script-fire mode, last-call engagement and
++call count, with reload/last-attempt clocks and existing shot/blocked counts. These
++are historical observations, not a claim that OPPORTFIRE is currently enabled.
++Inspection never selects targets, fires or advances clocks.
++
++Tests cover the distinct timing/phase/velocity branches, real damage and dry fire,
++cached moving aim, script dispatch, path resumption, MOVETOOBJECT phase handling,
++missing services, pending removal, reentry and state replacement during a shot.
++Private diagnostics use a real Cultist ABC and original animation table in all
++three modes through independent reloads. They are labelled diagnostic placements,
++not proof of an authored opportunity-fire encounter or complete traversal. Existing
++NPC death/gib/fire services and the actual M2 gate remain separate work.
+diff --git a/docs/M2_AI_SCRIPT_FIRE_SOURCES.json b/docs/M2_AI_SCRIPT_FIRE_SOURCES.json
+new file mode 100644
+index 0000000..4dcd584
+--- /dev/null
++++ b/docs/M2_AI_SCRIPT_FIRE_SOURCES.json
+@@ -0,0 +1,25 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "6aeb63750107c064c1b612d9be1399f0e19a8e17",
++  "status": "M2 incomplete; original scripted standing/walking/running opportunity fire",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "purpose": "Original opportunity acquisition, FOLLOWPATH/MOVETOOBJECT and Script_Fire_Stand/Walk/Run bodies."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/AI_Mgr.h",
++      "source_sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
++      "purpose": "Original OPPORTFIRE flag and metacommand values 7/8/9."
++    }
++  ],
++  "adaptations": [
++    "Direct source methods share a small checked helper; no source repository files or dependencies imported.",
++    "Return success plus engaged for standing fire, keeping no-target separate from service failure.",
++    "Preserve source cached moving aim, distinct standing/moving blocked-shot cadence, phase increments and residual velocity.",
++    "Existing typed model/physics/weapon services replace SDK calls; resize, missing-service and numeric failures remain explicit.",
++    "Guard recursive fire and detect owner removal, state replacement or nested script failure after damage callbacks before further mutation.",
++    "Inspection records last-call state and existing shot counters; diagnostic actors remain explicitly separate from authored scene acceptance."
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index c91148d..080784d 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1,5 +1,14 @@
+ # Source and Dependency Provenance
+ 
++## Original scripted opportunity fire
++
++AI_Mgr Script_Fire_Stand/Walk/Run and their FOLLOWPATH/MOVETOOBJECT callers now use
++the existing typed perception, weapon, animation and movement services. A small
++shared helper preserves their different target-refresh, cadence and phase rules;
++checked failures and deferred callback lifetime are explicit adaptations. See
++[source hashes](M2_AI_SCRIPT_FIRE_SOURCES.json) and [contracts](AI_SCRIPT_FIRE_CONTRACTS.md).
++No reference files, shader artifacts or dependency pins changed.
++
+ ## Original movement alignment
+ 
+ The Blood II SDK requires a fallback up vector for parallel AlignRotation inputs.
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index bbd6e99..09ae648 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -357,6 +357,12 @@ namespace OpenBlood2
+             }
+             if (!a.script_motion_error.empty())
+                 ImGui::TextWrapped("Unavailable: %s", a.script_motion_error.c_str());
++            const char* fire_modes[]{"None", "Stand", "Walk", "Run"};
++            ImGui::Text("Script opportunity fire: %s | engaged %s | calls %llu",
++                        fire_modes[static_cast<unsigned>(a.script_fire_mode)], a.script_fire_engaged ? "yes" : "no",
++                        (unsigned long long)a.script_fire_calls);
++            ImGui::Text("Reload %.3f | last attempt %.3f | shots %llu | blocked %llu", a.m_fAttackLoadTime,
++                        a.m_fLoadTimeStart, (unsigned long long)a.fire_shots, (unsigned long long)a.fire_blocked);
+         }
+         if (character && ImGui::CollapsingHeader("Original CMovement cache / path", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+diff --git a/src/game/original/AIScriptFire.cpp b/src/game/original/AIScriptFire.cpp
+new file mode 100644
+index 0000000..8819ae7
+--- /dev/null
++++ b/src/game/original/AIScriptFire.cpp
+@@ -0,0 +1,121 @@
++// Selected original AI_Mgr.cpp:4618-4744,4823-4892 (Monolith, 1997/1998).
++// Source scripted fire differs from autonomous MC_Fire_* in cadence/phase handling.
++#include "AI_Mgr.h"
++#include <cmath>
++
++bool AI_Mgr::ScriptFire(ScriptFireMode mode, bool& engaged)
++{
++    engaged = script_fire_engaged = false;
++    script_fire_mode = mode;
++    ++script_fire_calls;
++    if (!MotionReady())
++        return false;
++    auto* s = GetServerDE();
++    const bool moving = mode != ScriptFireMode::Stand, run = mode == ScriptFireMode::Run;
++    const int command = moving ? (run ? 9 : 8) : 7;
++    const float time = s->GetTime();
++    if (!std::isfinite(time) || !std::isfinite(m_fLoadTimeStart) || !std::isfinite(m_fAttackLoadTime) ||
++        m_fAttackLoadTime < 0)
++        return MotionFailure("Script fire clock/cadence invalid");
++    if (!moving)
++    {
++        if (!ChooseOpportunityTarget())
++            return perception_error.empty() || MotionFailure(perception_error.c_str());
++        if (!RefreshTargetPosition() || !MC_FaceTarget())
++            return MotionFailure(target_error.c_str());
++        --Metacmd; // Source cancels this face increment, but not the later timed-fire face.
++        engaged = script_fire_engaged = true;
++    }
++    if (!m_bAnimating || m_nCurMetacmd != command)
++    {
++        auto* weapon = m_InventoryMgr.CurrentWeapon();
++        const auto type = weapon ? weapon->data.m_nFireType : moving ? TYPE_PISTOL : TYPE_MELEE;
++        if (!m_pAnim_Sound || type >= std::size(m_pAnim_Sound->m_nAnim_FIRE_STAND))
++            return MotionFailure("Script fire animation table unavailable");
++        if (weapon)
++            m_fAttackLoadTime = weapon->data.m_fReloadTime;
++        if (!std::isfinite(m_fAttackLoadTime) || m_fAttackLoadTime < 0)
++            return MotionFailure("Script fire weapon reload invalid");
++        const auto clip = !moving ? m_pAnim_Sound->m_nAnim_FIRE_STAND[type]
++                          : run   ? m_pAnim_Sound->m_nAnim_FIRE_RUN[type]
++                                  : m_pAnim_Sound->m_nAnim_FIRE_WALK[type];
++        if (!SetAnimation(clip))
++            return MotionFailure("Script fire clip/resize failed"); // No invented crawl recovery.
++        s->SetModelLooping(m_hObject, moving);
++        m_fLoadTimeStart = m_fTimeStart = 0;
++        if (moving && !Move(m_MoveObj.GetForwardVector(), run ? m_fRunSpeed : m_fWalkSpeed))
++            return false;
++        m_bAnimating = true;
++        m_nCurMetacmd = command;
++        return true;
++    }
++    std::string clip;
++    if (!s->GetModelAnimationName(m_hObject, s->GetModelAnimation(m_hObject), clip))
++        return MotionFailure("Script fire playback unavailable");
++    if (moving && !Move(m_MoveObj.GetForwardVector(), run ? m_fRunSpeed : m_fWalkSpeed))
++        return false;
++    if (time > m_fLoadTimeStart + m_fAttackLoadTime)
++    {
++        bool target = !moving || ChooseOpportunityTarget();
++        if (!target && !perception_error.empty())
++            return MotionFailure(perception_error.c_str());
++        if (target)
++        {
++            engaged = script_fire_engaged = true;
++            // Moving source fire does not refresh m_vTargetPos after acquisition.
++            // Preserve its cached-position aim; MC_FacePos checks the coordinates
++            // without claiming a fresh pose for the newly linked identity.
++            if (!(moving ? MC_FacePos(m_vTargetPos) : MC_FaceTarget()))
++                return MotionFailure(target_error.c_str());
++            const auto changes = state_changes, failures = script_failures;
++            const bool accepted = Fire();
++            if (!s->IsObjectAlive(m_hObject) || script_motion_outcome == MotionOutcome::Failed ||
++                state_changes != changes || script_failures != failures)
++                return MotionFailure("Script fire owner removed or command reentered during shot");
++            if (!accepted && fire_result != FireResult::Blocked)
++                return MotionFailure("Script fire required shot service failed");
++            if (moving || accepted)
++                m_fLoadTimeStart = time; // Moving source consumes cadence even for a blocked shot.
++            else
++                m_bAnimating = false;
++        }
++    }
++    if (s->GetModelPlaybackState(m_hObject) & MS_PLAYDONE)
++    {
++        if (moving && !StopVelocity())
++            return MotionFailure("Script fire stop failed");
++        m_bAnimating = false;
++        ++animation_finishes; // Neither script variant advances Metacmd on completion.
++    }
++    return true;
++}
++bool AI_Mgr::Script_Fire_Stand(bool& engaged)
++{
++    engaged = false;
++    if (motion_busy)
++        return MotionFailure("Reentrant script fire rejected");
++    motion_busy = true;
++    const bool ok = ScriptFire(ScriptFireMode::Stand, engaged);
++    motion_busy = false;
++    return ok;
++}
++bool AI_Mgr::Script_Fire_Walk()
++{
++    if (motion_busy)
++        return MotionFailure("Reentrant script fire rejected");
++    motion_busy = true;
++    bool engaged = false;
++    const bool ok = ScriptFire(ScriptFireMode::Walk, engaged);
++    motion_busy = false;
++    return ok;
++}
++bool AI_Mgr::Script_Fire_Run()
++{
++    if (motion_busy)
++        return MotionFailure("Reentrant script fire rejected");
++    motion_busy = true;
++    bool engaged = false;
++    const bool ok = ScriptFire(ScriptFireMode::Run, engaged);
++    motion_busy = false;
++    return ok;
++}
+diff --git a/src/game/original/AIScriptMovement.cpp b/src/game/original/AIScriptMovement.cpp
+index 9c48a75..16ea796 100644
+--- a/src/game/original/AIScriptMovement.cpp
++++ b/src/game/original/AIScriptMovement.cpp
+@@ -317,9 +317,10 @@ bool AI_Mgr::UpdateFollowPathCmd()
+     }
+     else
+     {
+-        if (m_dwScriptFlags & (1u << 2))
+-            return MotionFailure("Script opportunity fire is unavailable");
+-        if (!ScriptLocomotion(m_eScriptMovement == SM_RUN))
++        bool engaged = false;
++        if ((m_dwScriptFlags & (1u << 2)) && !ScriptFire(ScriptFireMode::Stand, engaged))
++            return false;
++        if (!engaged && !ScriptLocomotion(m_eScriptMovement == SM_RUN))
+             return false;
+         script_motion_outcome = MotionOutcome::Moving;
+     }
+@@ -390,8 +391,12 @@ bool AI_Mgr::UpdateMoveToObjectCmd()
+             else
+             {
+                 if (m_dwScriptFlags & (1u << 2))
+-                    return MotionFailure("Script moving opportunity fire is unavailable");
+-                if (!ScriptLocomotion(m_eScriptMovement == SM_RUN))
++                {
++                    bool engaged = false;
++                    if (!ScriptFire(m_eScriptMovement == SM_RUN ? ScriptFireMode::Run : ScriptFireMode::Walk, engaged))
++                        return false;
++                }
++                else if (!ScriptLocomotion(m_eScriptMovement == SM_RUN))
+                     return false;
+                 Metacmd = 2;
+             }
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 8cb5269..0eaf915 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -324,6 +324,19 @@ class AI_Mgr : public CBaseCharacter
+     bool Move(DVector direction, float speed);
+     bool Script_Walk();
+     bool Script_Run();
++    enum class ScriptFireMode
++    {
++        None,
++        Stand,
++        Walk,
++        Run
++    };
++    bool Script_Fire_Stand(bool& engaged);
++    bool Script_Fire_Walk();
++    bool Script_Fire_Run();
++    ScriptFireMode script_fire_mode = ScriptFireMode::None;
++    bool script_fire_engaged = false;
++    std::uint64_t script_fire_calls = 0;
+     bool SetSetMovementCmd(std::string_view);
+     bool SetFollowPathCmd(PathMgr&, std::string_view);
+     bool UpdateFollowPathCmd();
+@@ -506,6 +519,7 @@ class AI_Mgr : public CBaseCharacter
+     bool MotionFailure(const char*);
+     bool MotionReady();
+     bool ScriptLocomotion(bool run);
++    bool ScriptFire(ScriptFireMode, bool& engaged);
+     bool FaceScriptPoint(DVector);
+     bool DeliverPathAction(const PathListData&);
+     DLink m_Link{};
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 070ee05..cac8ba9 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -710,12 +710,12 @@ endif()
+ add_executable(ai_fire_tests ai_fire_tests.cpp)
+ target_link_libraries(ai_fire_tests PRIVATE blood2_game)
+ blood2_project_options(ai_fire_tests)
+-foreach(case selection clearance filters head aim keys cadence recovery failures lifetime)
++foreach(case selection clearance filters head aim keys cadence recovery failures lifetime script_stand script_moving script_refusal script_lifetime script_routes)
+     add_test(NAME ai_fire.${case} COMMAND ai_fire_tests "${case}")
+     set_tests_properties(ai_fire.${case} PROPERTIES LABELS "headless;ai_fire" TIMEOUT 30)
+ endforeach()
+ if(BLOOD2_TEST_DATA_DIR)
+-    foreach(case catalog subway)
++    foreach(case catalog subway script_private)
+         add_test(NAME ai_fire.${case} COMMAND ai_fire_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
+         set_tests_properties(ai_fire.${case} PROPERTIES LABELS "headless;private;ai_fire" TIMEOUT 90)
+     endforeach()
+diff --git a/tests/ai_fire_tests.cpp b/tests/ai_fire_tests.cpp
+index 64f0763..dea9a36 100644
+--- a/tests/ai_fire_tests.cpp
++++ b/tests/ai_fire_tests.cpp
+@@ -38,6 +38,26 @@ namespace
+     struct Probe : AI_Mgr
+     {
+         bool scheduled = false;
++        int scheduled_script = 0;
++        bool scheduled_ok = true;
++        int script_fault = 0; // Labelled branch/callback probes; ordinary tests use the real Fire service.
++        bool Fire(bool alternate = false) override
++        {
++            if (!script_fault)
++                return AI_Mgr::Fire(alternate);
++            if (script_fault == 1 || script_fault == 2)
++            {
++                fire_result = script_fault == 1 ? FireResult::Blocked : FireResult::Unavailable;
++                return false;
++            }
++            if (script_fault == 3)
++                GetServerDE()->RemoveObject(m_hObject);
++            else if (script_fault == 4)
++                Script_Fire_Run(); // Deliberate reentry while the caller owns the motion guard.
++            else
++                PrepareScript("SCRIPT; WAIT 1"); // Replace a directly driven command during its shot.
++            return true;
++        }
+         inline static unsigned destroyed = 0;
+         inline static std::uint64_t final_calls = 0, final_shots = 0;
+         ~Probe() override
+@@ -51,7 +71,12 @@ namespace
+             if (m == MID_UPDATE && scheduled)
+             {
+                 GetServerDE()->SetNextUpdate(m_hObject, .001f);
+-                if (!MC_Fire_Stand())
++                bool engaged = false;
++                scheduled_ok = scheduled_script == 1   ? Script_Fire_Stand(engaged)
++                               : scheduled_script == 2 ? Script_Fire_Walk()
++                               : scheduled_script == 3 ? Script_Fire_Run()
++                                                       : MC_Fire_Stand();
++                if (!scheduled_ok)
+                     GetServerDE()->SetNextUpdate(m_hObject, 0);
+             }
+             return AI_Mgr::EngineMessageFn(m, d, f);
+@@ -146,6 +171,200 @@ namespace
+         a->m_InventoryMgr.SetAmmoCount(AMMO_BULLET, 100);
+         return true;
+     }
++    Probe* script_actor(GameSession& g, DVector pos = {0, 10, 0}, bool cabal = true)
++    {
++        auto* a = actor(g);
++        if (!a)
++            return nullptr;
++        auto* r = g.objects.get(a->m_hObject);
++        r->state.m_Pos = pos;
++        r->state.m_Flags |= FLAG_SOLID;
++        a->m_bCabal = cabal;
++        a->m_damage.Init(a->m_hObject);
++        a->m_damage.m_fHitPoints = a->m_damage.m_fMaxHitPoints = 1000;
++        a->m_fSeeingDist = 1000;
++        return a->InsertMe() && a->m_MoveObj.Init(a->m_hObject) ? a : nullptr;
++    }
++    bool script_stand(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = script_actor(g);
++        auto* enemy = script_actor(g, {0, 10, 100}, false);
++        CHECK(a && enemy);
++        g.objects.get(enemy->m_hObject)->dimensions = {10, 10, 5};
++        bool engaged = true;
++        CHECK(a->Script_Fire_Stand(engaged) && !engaged && a->fire_calls == 0);
++        CHECK(armed(a));
++        a->Metacmd = 5;
++        CHECK(a->Move({0, 2, 3}, 1e-11f));
++        CHECK(a->Script_Fire_Stand(engaged) && engaged && a->Metacmd == 5 && a->m_nCurMetacmd == 7);
++        CHECK(!g.server.GetModelLooping(a->m_hObject) && near(g.objects.get(a->m_hObject)->velocity.z, 3));
++        CHECK(g.objects.advance(a->m_fAttackLoadTime) && a->Script_Fire_Stand(engaged) && a->fire_calls == 0);
++        CHECK(g.objects.advance(.001) && a->Script_Fire_Stand(engaged) && a->fire_shots == 1 && a->Metacmd == 6);
++        CHECK(enemy->m_damage.m_fHitPoints < 1000 && a->m_InventoryMgr.GetAmmoCount(AMMO_BULLET) == 99);
++        a->m_InventoryMgr.SetAmmoCount(AMMO_BULLET, 0);
++        CHECK(g.objects.advance(1) && a->Script_Fire_Stand(engaged) && a->fire_dry == 1 && a->m_bAnimating);
++        // No opportunity is a valid decision, including after a previous target.
++        g.objects.get(enemy->m_hObject)->state.m_Pos = {0, 10, 2000};
++        const auto phase = a->Metacmd;
++        CHECK(a->Script_Fire_Stand(engaged) && !engaged && !a->GetTarget() && a->Metacmd == phase);
++        CHECK(g.unload_world() && !AI_Mgr::m_dwNumCabal && !AI_Mgr::m_dwNumMonster);
++        return true;
++    }
++    bool script_moving(const char*)
++    {
++        for (bool run : {false, true})
++        {
++            GameSession g;
++            CHECK(setup(g));
++            auto* a = script_actor(g);
++            CHECK(a && script_actor(g, {0, 10, 100}, false) && armed(a));
++            a->m_fWalkSpeed = 20;
++            a->m_fRunSpeed = 40;
++            a->m_nInjuredLeg = 10;
++            a->m_vTargetPos = {10, 10, 100}; // Source moving fire keeps this old position after reacquisition.
++            auto tick = [&]() { return run ? a->Script_Fire_Run() : a->Script_Fire_Walk(); };
++            CHECK(tick() && !a->script_fire_engaged && !a->perception_calls && g.server.GetModelLooping(a->m_hObject));
++            CHECK(near(g.objects.get(a->m_hObject)->velocity.z, run ? 40 : 20));
++            CHECK(a->m_nCurMetacmd == (run ? 9 : 8));
++            a->Metacmd = 5;
++            CHECK(g.objects.advance(a->m_fAttackLoadTime) && tick() && !a->fire_calls);
++            CHECK(g.objects.advance(.001) && tick() && a->fire_shots == 1 && a->Metacmd == 6);
++            CHECK(a->script_fire_engaged && near(a->face_position.x, 10) && !a->target_position_valid);
++            CHECK(near(a->script_motion_velocity.x, 0)); // Previous cached forward, before facing.
++            const auto phase = a->Metacmd;
++            g.server.SetModelLooping(a->m_hObject, false);
++            CHECK(g.server.advance_models(1));
++            a->m_fLoadTimeStart = g.server.GetTime();
++            CHECK(tick() && !a->m_bAnimating && a->Metacmd == phase &&
++                  near(g.objects.get(a->m_hObject)->velocity.z, 0));
++        }
++        return true;
++    }
++    bool script_refusal(const char*)
++    {
++        for (bool moving : {false, true})
++        {
++            GameSession g;
++            CHECK(setup(g));
++            auto* a = script_actor(g);
++            CHECK(a && script_actor(g, {0, 10, 100}, false) && armed(a));
++            bool engaged = false;
++            auto tick = [&]() { return moving ? a->Script_Fire_Walk() : a->Script_Fire_Stand(engaged); };
++            CHECK(tick() && g.objects.advance(1));
++            a->script_fault = 1;
++            CHECK(tick() && a->m_bAnimating == moving && near(a->m_fLoadTimeStart, moving ? 1 : 0));
++            a->m_bAnimating = false;
++            CHECK(tick() && g.objects.advance(1));
++            a->script_fault = 2;
++            CHECK(!tick() && a->script_motion_outcome == AI_Mgr::MotionOutcome::Failed);
++        }
++        return true;
++    }
++    bool script_lifetime(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        HOBJECT old = nullptr;
++        for (int fault : {3, 4, 5})
++        {
++            auto* a = script_actor(g);
++            CHECK(a && !g.objects.get(old) && script_actor(g, {0, 10, 100}, false) && armed(a));
++            old = a->m_hObject;
++            bool engaged = false;
++            CHECK(a->Script_Fire_Stand(engaged) && g.objects.advance(1));
++            a->script_fault = fault;
++            CHECK(!a->Script_Fire_Stand(engaged) && a->script_motion_outcome == AI_Mgr::MotionOutcome::Failed);
++            CHECK(g.unload_world() && !g.objects.get(old) && !g.server.string_count() && !g.server.message_count());
++            CHECK(setup(g));
++        }
++        auto* a = script_actor(g);
++        CHECK(a && script_actor(g, {0, 10, 100}, false) && armed(a));
++        bool engaged = false;
++        g.server.collision_ready = false;
++        CHECK(!a->Script_Fire_Stand(engaged) && !a->m_bAnimating);
++        g.server.collision_ready = true;
++        a->Metacmd = std::numeric_limits<int>::max();
++        CHECK(!a->Script_Fire_Stand(engaged));
++        a->Metacmd = 1;
++        auto bad = std::make_shared<CAnim_Sound>();
++        bad->m_nAnim_FIRE_RUN[TYPE_PISTOL] = UINT32_MAX;
++        CHECK(a->InitStatics(bad) && !a->Script_Fire_Run() && a->m_nState != AI_Mgr::StateCrawlUnder);
++        CHECK(g.objects.remove(a->m_hObject) && !a->Script_Fire_Run() && g.objects.finish_frame());
++        return true;
++    }
++    bool script_private(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        HOBJECT old = nullptr;
++        for (int mode : {1, 2, 3})
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error) && !g.objects.get(old));
++            auto* a = script_actor(g, {0, 10000, 0});
++            auto* enemy = script_actor(g, {0, 10000, 400}, false);
++            CHECK(a && enemy && armed(a));
++            enemy->m_damage.m_fHitPoints = enemy->m_damage.m_fMaxHitPoints = 10000;
++            g.objects.get(enemy->m_hObject)->dimensions = {60, 100, 30};
++            auto* body = g.objects.get(a->m_hObject);
++            CHECK(g.models.load("models/enemies/m_cultist1.abc", body->model, error));
++            auto table = std::make_shared<CAnim_Sound>();
++            CHECK(table->SetAnimationIndexes(a->m_hObject) && table->SetSoundRoot("sounds/enemies/m_cultist") &&
++                  a->InitStatics(table));
++            a->m_vTargetPos = {0, 10000, 400};
++            a->m_fWalkSpeed = 20;
++            a->m_fRunSpeed = 40;
++            a->scheduled = true;
++            a->scheduled_script = mode;
++            g.server.SetNextUpdate(a->m_hObject, .001f);
++            for (unsigned i = 0; i < 240; ++i)
++                CHECK(g.step(1. / 60));
++            std::cout << "Script fire mode=" << mode << " shots=" << a->fire_shots
++                      << " target HP=" << enemy->m_damage.m_fHitPoints << " position Z=" << body->state.m_Pos.z
++                      << " failures=" << a->script_motion_failures << " error=" << a->script_motion_error << '\n';
++            CHECK(a->scheduled_ok && a->fire_shots > 2 && enemy->m_damage.m_fHitPoints < 10000 &&
++                  !a->script_motion_failures && !a->fire_failures);
++            CHECK(mode == 1 ? near(body->state.m_Pos.z, 0) : body->state.m_Pos.z > 60);
++            old = a->m_hObject;
++            CHECK(g.unload_world() && !g.objects.get(old) && !g.server.string_count() && !g.server.message_count() &&
++                  !g.server.client_count());
++        }
++        return true;
++    }
++    bool script_routes(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = script_actor(g);
++        auto* enemy = script_actor(g, {0, 10, 100}, false);
++        CHECK(a && enemy && armed(a));
++        ObjectCreateStruct s;
++        s.m_Pos = {0, 10, 200};
++        CHECK(g.objects.create(g.objects.find_class("PathPoint"), s, Creation::World,
++                               {{"Name", std::string("opportunity1")}, {"Pos", s.m_Pos}}));
++        CHECK(g.server_shell.paths.BuildPathList() && a->PrepareScript("SCRIPT 4; FOLLOWPATH opportunity"));
++        CHECK(a->AI_STATE_Script(g.server_shell.paths) && a->script_fire_engaged && a->m_nCurMetacmd == 7 &&
++              a->velocity_commands == 0);
++        CHECK(g.objects.advance(.5) && a->AI_STATE_Script(g.server_shell.paths) && a->fire_shots == 1 &&
++              !a->path_arrivals);
++        g.objects.get(enemy->m_hObject)->state.m_Pos = {0, 10, 2000};
++        CHECK(a->AI_STATE_Script(g.server_shell.paths) && !a->script_fire_engaged && a->m_nCurMetacmd == 1 &&
++              a->velocity_commands == 1);
++        SAFE_STRCPY(g.objects.get(enemy->m_hObject)->state.m_Name, "moving goal");
++        g.objects.get(enemy->m_hObject)->state.m_Pos = {0, 10, 100};
++        CHECK(a->SetMoveToObjectCmd("moving goal") && a->SetSetMovementCmd("RUN"));
++        CHECK(a->UpdateMoveToObjectCmd() && a->Metacmd == 2);
++        CHECK(a->UpdateMoveToObjectCmd() && a->Metacmd == 3);
++        CHECK(a->UpdateMoveToObjectCmd() && a->Metacmd == 2 && a->m_nCurMetacmd == 9);
++        CHECK(g.objects.advance(.5) && a->UpdateMoveToObjectCmd() && a->UpdateMoveToObjectCmd());
++        CHECK(a->Metacmd == 2 && a->script_fire_engaged && a->script_motion_failures == 0);
++        return true;
++    }
+     bool selection(const char*)
+     {
+         GameSession g;
+@@ -520,7 +739,13 @@ int main(int argc, char** argv)
+ {
+     if (argc < 2)
+         return 2;
+-    const std::map<std::string, std::function<bool(const char*)>> tests{{"selection", selection},
++    const std::map<std::string, std::function<bool(const char*)>> tests{{"script_private", script_private},
++                                                                        {"script_stand", script_stand},
++                                                                        {"script_moving", script_moving},
++                                                                        {"script_refusal", script_refusal},
++                                                                        {"script_lifetime", script_lifetime},
++                                                                        {"script_routes", script_routes},
++                                                                        {"selection", selection},
+                                                                         {"clearance", clearance},
+                                                                         {"filters", filters},
+                                                                         {"head", head},
+diff --git a/tests/ai_follow_tests.cpp b/tests/ai_follow_tests.cpp
+index 89bacbc..69cae16 100644
+--- a/tests/ai_follow_tests.cpp
++++ b/tests/ai_follow_tests.cpp
+@@ -377,7 +377,7 @@ namespace
+         CHECK(!a->SetFollowPathCmd(g.server_shell.paths, "missing"));
+         CHECK(point(g, "route1", {0, 10, 100}) && select(g, a));
+         a->m_dwScriptFlags = 4;
+-        CHECK(!a->UpdateFollowPathCmd() && a->script_motion_error.find("opportunity") != std::string::npos);
++        CHECK(a->UpdateFollowPathCmd() && !a->script_fire_engaged && a->velocity_commands == 1);
+         a->m_dwScriptFlags = 0;
+         CHECK(select(g, a));
+         a->m_fWalkSpeed = std::numeric_limits<float>::quiet_NaN();
+@@ -387,7 +387,7 @@ namespace
+         CHECK(target && object(g, "wall", {0, 10, 25}, {4, 5, 5}));
+         CHECK(a->SetMoveToObjectCmd("goal") && !a->UpdateMoveToObjectCmd() && a->m_MoveObj.path().size() == 1);
+         CHECK(!a->UpdateMoveToObjectCmd() &&
+-              a->velocity_commands == 0); // Partial source route must not become success.
++              a->velocity_commands == 1); // Partial source route must not become success.
+         CHECK(a->SetMoveToObjectCmd("goal") && g.objects.remove(target) && !a->UpdateMoveToObjectCmd());
+         CHECK(!a->HandleTrigger(nullptr, "SCRIPT FOLLOWPATH route"));
+         auto* b = actor(g, {100, 10, 0});

@@ -1,0 +1,239 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "7431f3a33f094059a59f8f93fcda11ed9a5ab2c3",
+  "status": "M2 incomplete; connected normal-mode grid note preparation, no live MUSIC",
+  "frozen_sources": {
+    "src/engine/ima_cursor.h": "1fd121921103adc50125974b17980f5c424686d13dd2913cdbf3a259fa3b1567",
+    "src/engine/ima_cursor.cpp": "c00ea89861dadab7410b13ab98a58127a3c165ba760078d104d7ae0f9a1f1363",
+    "src/game/music_catalog.h": "d8f70265b417f3ed54560bf16cd2e016b83ba2bcada02298d797f4e3f24e857d",
+    "src/game/music_catalog.cpp": "5179997136fdf36878e89f32d4eccd39401143d531813448402f300c750a3d5a",
+    "src/app/inspector_world_sounds.cpp": "1ba3446018cac2e0165a11d7d17e961a4b2c963d9872a9f0e4bb029ecad5676a",
+    "src/app/world_sound_smoke.cpp": "148bbff47702e333c2fdc903fb59273908ed5b4133d92302ee1fa402d2d1863e",
+    "tests/ima_cursor_tests.cpp": "b09de5b0bc4d2bac72efbd1a44ea1aa4334959663e1701d8bd221e697f44dfdd",
+    "tests/CMakeLists.txt": "a32d3bc86aaa8a286e713ec5adf4a9fdc784ce1f70e6d1f2c3137c09f09314be"
+  },
+  "results": {
+    "debug-tests": {
+      "passed": 113,
+      "wall_seconds": 18.87
+    },
+    "release-tests": {
+      "passed": 113,
+      "wall_seconds": 1.58
+    },
+    "sanitize-tests": {
+      "passed": 113,
+      "wall_seconds": 75.24
+    },
+    "debug-gpu": {
+      "passed": 2,
+      "wall_seconds": 12.22
+    },
+    "release-gpu": {
+      "passed": 2,
+      "wall_seconds": 5.37
+    }
+  },
+  "original_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "rva": "0x16908",
+    "generated": {
+      "sections": 128,
+      "steps": 2799,
+      "admitted_notes": 6779,
+      "emitted_pairs": 6686,
+      "note_draws": 12179,
+      "sha256": "b578076f070506c957fd9ca9806c5587274794292381806cc668ed2c51082079",
+      "fnv64": 937667046537544111
+    },
+    "private": {
+      "sections": 132,
+      "steps": 8174,
+      "admitted_notes": 6290,
+      "emitted_pairs": 6290,
+      "note_draws": 12580,
+      "sha256": "8acaa1db032da34dd2a43eebabba07e722760883ae85cadfda0f551103ed6226",
+      "fnv64": 5880823308775508798
+    },
+    "scope": "Original normal-mode grid/chord/mute/pattern/variation decisions, admitted note pitch and paired event values. Prepared inputs come from previously verified readers/helpers. Section event list and active notes empty; notifications, metronome, MIDI sink, note allocation/registration, playlist lookahead/repeats/transitions intercepted. Active notes discarded after pair observation: no later reharmonization/note-off dispatch claim. This is not a full tick/audio equivalence claim."
+  },
+  "commands": [
+    "python /tmp/b2-music-grid-notes-validation.py {debug,release,sanitize} (three builds at -j1 each; relevant CTests at -j2)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/{debug,release} -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit /tmp/b2-music-grid-notes-{debug,release}-gpu.xml",
+    "build/debug/tests/ima_cursor_tests notes_export TRANSIENT_FIXTURE_FILE EXTERNAL_GAME_ROOT",
+    "/tmp/b2-legacy-pan-tools/bin/python Documentation/Implementation/evidence/m2-music-grid-notes-probe.py EXTERNAL_GAME_ROOT TRANSIENT_FIXTURE_FILE",
+    "cmp /tmp/b2-music-grid-notes-private.bin /tmp/b2-music-grid-notes-final-private.bin (final frozen-source export equals probed input)",
+    "sha256sum -c /tmp/b2-music-grid-notes-build-inputs.sha256",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror (seven changed C++ files)",
+    "python /tmp/b2-npc-integrity.py; python /tmp/b2-npc-links.py; git diff --check (both repositories)"
+  ],
+  "limitations": [
+    "Prepared pairs only: no live transport, active-note shortening/dispatch, controller curves or playlists",
+    "Original isolated probe intercepts external side effects; not full tick/audio parity",
+    "24 Track1 sections retain explicit missing style bindings",
+    "GPU smoke prepares section notes with hidden inspection and inspector-free Release; reviewed Debug capture shows the music summary, not the nested new note controls",
+    "Dummy SDL audio; no listening comparison or native Metal/Windows/mobile validation"
+  ],
+  "capture": {
+    "path": "Blood2/build/debug/tests/world-sounds.png",
+    "sha256": "3f754640b761d00ba600288fda9d388a311b063448c81d72d8ab8c9a9d47e04f",
+    "committed": false
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "readme_preserved_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "files": [
+    {
+      "file": "m2-music-grid-notes-behavior-build.log",
+      "sha256": "d55a12425f89fd52b9ab186548be26e6c3acfbb93275db284c6d8fdcb97e8e67"
+    },
+    {
+      "file": "m2-music-grid-notes-build-inputs.sha256",
+      "sha256": "11f87c6790b5bd64a436c8d0372c6c3bbbc0381fa0d56f431d3ec9b616f6d55e"
+    },
+    {
+      "file": "m2-music-grid-notes-debug-build-final.log",
+      "sha256": "d653f694b9a2937a86f7af6fe574765a5db088b97f9df3c3b44631b5a0c9059f"
+    },
+    {
+      "file": "m2-music-grid-notes-debug-gpu.log",
+      "sha256": "62df38ecc09815d8e2474925e2fdb65382c83d80fa1f6f0c466855168708f7a5"
+    },
+    {
+      "file": "m2-music-grid-notes-debug-gpu.xml",
+      "sha256": "81fe35a55141ba8b359ac13ac2eba4d8071610bf713b7f75fea709725c32772f"
+    },
+    {
+      "file": "m2-music-grid-notes-debug-tests.log",
+      "sha256": "6deecbb0c7c394d739471ec15b5e4a16aeabf6f12f72acc344cd7ba6eb7ce08c"
+    },
+    {
+      "file": "m2-music-grid-notes-debug-tests.xml",
+      "sha256": "3240ed1b97b3166617db60ba214c5a90e1391f7b38761bc2d47f17b45b5adb6d"
+    },
+    {
+      "file": "m2-music-grid-notes-export.log",
+      "sha256": "9c11922b0243bffe4a1b45c8b2295b513c85f5a79ca4328239331666c4a102fb"
+    },
+    {
+      "file": "m2-music-grid-notes-final-export.log",
+      "sha256": "9c11922b0243bffe4a1b45c8b2295b513c85f5a79ca4328239331666c4a102fb"
+    },
+    {
+      "file": "m2-music-grid-notes-focus-build.log",
+      "sha256": "bc151f4ca24fa28c87ada45d4b273f47b8a50a18c91c4a9c0f5c75df57b7bc9f"
+    },
+    {
+      "file": "m2-music-grid-notes-focus.log",
+      "sha256": "867ba4140af1e74d99a17deaea805b72872c84371ba33ac1ae861b987a818851"
+    },
+    {
+      "file": "m2-music-grid-notes-focus.xml",
+      "sha256": "e2ed7ca59a90758a1b1bc5da73903a9778218d6ef464c28e2f2d80937e182cd3"
+    },
+    {
+      "file": "m2-music-grid-notes-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-music-grid-notes-hash-check.log",
+      "sha256": "73db0a4bbc82f307eb0cd20df36d839d07d31c7ef4ce1881181e2e0dd09b4097"
+    },
+    {
+      "file": "m2-music-grid-notes-probe.json",
+      "sha256": "16c37995fa4480f84c6e63ae7685b8795cd949ca65853ed86734fed0806c3d89"
+    },
+    {
+      "file": "m2-music-grid-notes-probe.log",
+      "sha256": "1239776238171a3b9229244619fd0b67cf7bc19bf818cd663b0ac32c7d2225e5"
+    },
+    {
+      "file": "m2-music-grid-notes-probe.py",
+      "sha256": "62edfc62c5cad437f2964f00bfa0e91a60e25292eaf0b7e01e616daba2969862"
+    },
+    {
+      "file": "m2-music-grid-notes-release-build-final.log",
+      "sha256": "4d8c592c71512592b16b79ec001da4c3268fd46596e7af6b5417b7cce6af733e"
+    },
+    {
+      "file": "m2-music-grid-notes-release-gpu.log",
+      "sha256": "732b6d20f9a4a826d27e16c59601a084bcfcf6cd49a58e34d99c9f32f763716e"
+    },
+    {
+      "file": "m2-music-grid-notes-release-gpu.xml",
+      "sha256": "1023a8408228b24b932d614e60200a6e9bbd9454e6a54fceb4f41d67f931e858"
+    },
+    {
+      "file": "m2-music-grid-notes-release-tests.log",
+      "sha256": "031ab7f443b3a278a55f294a3190260e5b29ae9f842d78cf99fc5e103553ecdb"
+    },
+    {
+      "file": "m2-music-grid-notes-release-tests.xml",
+      "sha256": "ea79e5993f2120ee5e4e9d0a4dddedd009f0dfe032f0e17bc8e4004074343cc7"
+    },
+    {
+      "file": "m2-music-grid-notes-sanitize-build-final.log",
+      "sha256": "db65d06845aee33736207d752ec428a17e8925e9c2bf3b6018aa53c36954fea3"
+    },
+    {
+      "file": "m2-music-grid-notes-sanitize-tests.log",
+      "sha256": "4e23f9a38634f47d2b8cc661493cd2b9ed90b7006a9233654f280dd04b453495"
+    },
+    {
+      "file": "m2-music-grid-notes-sanitize-tests.xml",
+      "sha256": "63eaedc0f052963bc1afcd7766f7394b222397fde1f1d84821ae32e0d5a2f193"
+    },
+    {
+      "file": "m2-music-grid-notes-validation.py",
+      "sha256": "8defd0422340ee133035b8de37be90c4816574d4394380d46da9ff13a75988e8"
+    },
+    {
+      "file": "m2-music-grid-notes-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-music-grid-notes-links.log",
+      "sha256": "4594f476e61974e1ccebd4c2309e61b89c67b4ee55ce7e46ae3be24f847df330"
+    },
+    {
+      "file": "m2-music-grid-notes-links-final.log",
+      "sha256": "2b12f0a44ffbf6dd7f1fc0c9a36d5ce3486abfc030850117d27b9a99c92e5e39"
+    }
+  ],
+  "implementation_commit": "b5c3ee55d2dcf5084470f308747f31163a632bdf"
+}

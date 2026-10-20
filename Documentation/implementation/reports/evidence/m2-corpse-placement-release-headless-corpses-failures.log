@@ -1,0 +1,14 @@
+507/703 Testing: corpses.failures
+507/703 Test: corpses.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/corpse_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/release/tests/corpse-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"corpses.failures" start time: Oct 17 04:28 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.failures" end time: Oct 17 04:28 CEST
+"corpses.failures" time elapsed: 00:00:00
+----------------------------------------------------------

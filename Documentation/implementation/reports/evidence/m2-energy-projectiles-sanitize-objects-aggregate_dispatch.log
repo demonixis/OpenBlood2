@@ -1,0 +1,15 @@
+6/596 Testing: objects.aggregate_dispatch
+6/596 Test: objects.aggregate_dispatch
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "aggregate_dispatch"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.aggregate_dispatch" start time: Oct 17 01:22 CEST
+Output:
+----------------------------------------------------------
+PASS aggregate_dispatch
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.aggregate_dispatch" end time: Oct 17 01:22 CEST
+"objects.aggregate_dispatch" time elapsed: 00:00:00
+----------------------------------------------------------

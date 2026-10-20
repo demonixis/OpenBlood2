@@ -1,0 +1,14 @@
+693/699 Testing: gideon_runtime.health
+693/699 Test: gideon_runtime.health
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon_runtime_tests" "health" "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon-runtime-health"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gideon_runtime.health" start time: Oct 17 03:42 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_runtime.health" end time: Oct 17 03:42 CEST
+"gideon_runtime.health" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,83 @@
+66/562 Testing: weapons.private
+66/562 Test: weapons.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapons.private" start time: Oct 16 23:03 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+weapon 1: 463 vertices; 6 clips
+  static_model 1 ms
+  draw 333 ms
+  fire 150 ms [0:fire_key]
+  start_alt_fire 166 ms
+  alt_fire 200 ms [0:fire_key]
+  end_alt_fire 200 ms
+weapon 17: 488 vertices; 5 clips
+  alt_fire 1066 ms [613:fire_key]
+  fire2 966 ms [233:fire_key] [566:fire_key]
+  fire 566 ms [133:fire_key] [366:fire_key]
+  draw 333 ms
+  static_model 1 ms
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+weapon 1: 463 vertices; 6 clips
+  static_model 1 ms
+  draw 333 ms
+  fire 150 ms [0:fire_key]
+  start_alt_fire 166 ms
+  alt_fire 200 ms [0:fire_key]
+  end_alt_fire 200 ms
+weapon 17: 488 vertices; 5 clips
+  alt_fire 1066 ms [613:fire_key]
+  fire2 966 ms [233:fire_key] [566:fire_key]
+  fire 566 ms [133:fire_key] [366:fire_key]
+  draw 333 ms
+  static_model 1 ms
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+weapon 1: 463 vertices; 6 clips
+  static_model 1 ms
+  draw 333 ms
+  fire 150 ms [0:fire_key]
+  start_alt_fire 166 ms
+  alt_fire 200 ms [0:fire_key]
+  end_alt_fire 200 ms
+weapon 17: 488 vertices; 5 clips
+  alt_fire 1066 ms [613:fire_key]
+  fire2 966 ms [233:fire_key] [566:fire_key]
+  fire 566 ms [133:fire_key] [366:fire_key]
+  draw 333 ms
+  static_model 1 ms
+<end of output>
+Test time = 148.85 sec
+----------------------------------------------------------
+Test Passed.
+"weapons.private" end time: Oct 16 23:05 CEST
+"weapons.private" time elapsed: 00:02:28
+----------------------------------------------------------
+
+End testing: Oct 16 23:05 CEST
+
+ai_fire =  15.24 sec*proc
+
+ai_runtime =  33.15 sec*proc
+
+ai_trigger =   3.79 sec*proc
+
+headless = 263.83 sec*proc
+
+objects =   0.24 sec*proc
+
+player_keepalive =  13.29 sec*proc
+
+player_restore =   6.43 sec*proc
+
+private = 260.71 sec*proc
+
+weapon_audio =   5.54 sec*proc
+
+weapon_drops =   0.89 sec*proc
+
+weapons = 149.43 sec*proc
+
+world =  35.84 sec*proc
+

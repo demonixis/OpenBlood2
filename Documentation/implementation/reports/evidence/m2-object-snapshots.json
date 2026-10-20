@@ -1,0 +1,350 @@
+{
+  "date": "2026-10-17",
+  "scope": "Occupied-slot object identity index; no original game rule change",
+  "status": "verified scoped increment; M2 remains incomplete",
+  "baseline_commits": {
+    "workspace": "79ee7a2",
+    "implementation_before_user_readme": "821c9e7f4bcb815c7e9ce648e848f931d53384b4",
+    "implementation_parent": "dfb10a1382449853568bbb6af42c1a3e45a85f4c"
+  },
+  "user_changes": {
+    "Blood2_README_commit": "dfb10a1",
+    "workspace_README": "existing user modification preserved and excluded from this commit"
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "private_assets": "External installation only; no commercial bytes copied into either repository",
+  "normalization": "Workspace/content prefixes replaced, trailing line whitespace trimmed, one terminal newline; raw and saved SHA-256 recorded",
+  "test_selection": "^(objects|object_snapshots|services|movement|containers|attachments|ai_runtime|coverage|train_session)\\.",
+  "gpu_selection": "^gpu\\.(lifecycle|movement|containers|train_session|level_change)$",
+  "commands": [
+    {
+      "cwd": "Blood2",
+      "command": "cmake --build --preset debug --target blood2_app object_contract_tests object_snapshot_tests services_tests movement_tests container_tests attachment_tests ai_runtime_tests service_coverage_tests train_session_tests level_change_gpu_tests -j 3",
+      "result": "passed"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "cmake --build --preset release --target blood2_app object_contract_tests object_snapshot_tests services_tests movement_tests container_tests attachment_tests ai_runtime_tests service_coverage_tests train_session_tests level_change_gpu_tests -j 4",
+      "result": "passed"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "cmake --build build/sanitize --target object_contract_tests object_snapshot_tests services_tests movement_tests container_tests attachment_tests ai_runtime_tests service_coverage_tests train_session_tests -j 4",
+      "result": "passed"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "ctest --test-dir build/debug -R '<test_selection>' -LE gpu --output-on-failure -j 2",
+      "environment": "default",
+      "result": "91/91"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "ctest --test-dir build/release -R '<test_selection>' -LE gpu --output-on-failure -j 2",
+      "environment": "default",
+      "result": "91/91"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "ctest --test-dir build/sanitize -R '<test_selection>' -LE gpu --output-on-failure -j 2 -E '^ai_runtime.clearance_private$'",
+      "environment": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1",
+      "result": "90/90"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "ctest --test-dir build/sanitize -R '^ai_runtime.clearance_private$' --output-on-failure",
+      "environment": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1",
+      "result": "1/1, 88.16 seconds; run alone without build/test contention"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "ctest --test-dir build/debug -R '<gpu_selection>' --output-on-failure",
+      "environment": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy",
+      "result": "5/5"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "ctest --test-dir build/release -R '<gpu_selection>' --output-on-failure",
+      "environment": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy",
+      "result": "5/5"
+    }
+  ],
+  "results": {
+    "debug-tests": {
+      "passed": 91,
+      "seconds": 51.45
+    },
+    "release-tests": {
+      "passed": 91,
+      "seconds": 9.2
+    },
+    "sanitize-tests": {
+      "passed": 90,
+      "seconds": 277.17
+    },
+    "sanitize-clearance": {
+      "passed": 1,
+      "seconds": 88.16
+    },
+    "debug-gpu": {
+      "passed": 5,
+      "seconds": 54.86
+    },
+    "release-gpu": {
+      "passed": 5,
+      "seconds": 16.53
+    }
+  },
+  "logs": [
+    {
+      "file": "m2-object-snapshots-baseline-build.log",
+      "raw_sha256": "3a8f2145f65ab49cdbcd8c5fea82ecfe6cbfb252947d2d00e648ba80e92be9ef",
+      "saved_sha256": "e4e102c9ccb687f682edb0555c0c39b47e844d22dbcab349e0a0f228493c5b81"
+    },
+    {
+      "file": "m2-object-snapshots-baseline.log",
+      "raw_sha256": "a7adcf2df47d1f7c2efb13e534ddf6c29d14a101b4471d877e3e69c3f0976c98",
+      "saved_sha256": "a7adcf2df47d1f7c2efb13e534ddf6c29d14a101b4471d877e3e69c3f0976c98"
+    },
+    {
+      "file": "m2-object-snapshots-sanitize-baseline-build.log",
+      "raw_sha256": "96336d9d4c0236579006162d044b1ca7ed631aaae2e7553633422cf9b667d952",
+      "saved_sha256": "549ff40b284f8bc43bdb85593a0e51e6574d9b42c3757267900f418e96a7ad5c"
+    },
+    {
+      "file": "m2-object-snapshots-sanitize-baseline.log",
+      "raw_sha256": "aa3b4db64b55de7ba8f4a7625ea32b1c1647350465c11090c95a7717fea4a703",
+      "saved_sha256": "989d2fd1546986590be0cdb1cf1bb3c0c4605e0530747cad4f94b28593da7663"
+    },
+    {
+      "file": "m2-object-snapshots-sanitize-baseline-detail.log",
+      "raw_sha256": "25b9316eeb95a21a8daffa7a152aea94e1cb6768d835d1e8be95291486786e08",
+      "saved_sha256": "a127719afcd80f6fd0988072d9feab6d08879d135d9df118225fc1af272fc372"
+    },
+    {
+      "file": "m2-object-snapshots-index-build.log",
+      "raw_sha256": "3b451c49f12a5716f1c70d643003a37cc46dae80646f02d2da2adf60aabc8e73",
+      "saved_sha256": "d9e4f102428f960dfbf19bdfef6b635e6943a992910fc39a34da7562e026b773"
+    },
+    {
+      "file": "m2-object-snapshots-index-time.log",
+      "raw_sha256": "fdc532e276894cf3dacf488f0571c06754d0b28f656e68f8ded447c475a4a06a",
+      "saved_sha256": "fdc532e276894cf3dacf488f0571c06754d0b28f656e68f8ded447c475a4a06a"
+    },
+    {
+      "file": "m2-object-snapshots-snapshot-tests.log",
+      "raw_sha256": "852b622c1d4c1b97d6bed9ab87cf96f29e8b0b044f17c5c7c4ab7579223f11cc",
+      "saved_sha256": "2925a6b5beadf8cc4f11e591d11301f8d9a11aca6e7e5aad3d90ebeb651506de"
+    },
+    {
+      "file": "m2-object-snapshots-debug-build.log",
+      "raw_sha256": "c26f7506b650e2027f05a3ecc242c2320314001bfb253591d8a55f636e824574",
+      "saved_sha256": "20edbb23329c1306a807a08b3b15dc4b6a97cfc58681836d832a678a5e9759e1"
+    },
+    {
+      "file": "m2-object-snapshots-release-build.log",
+      "raw_sha256": "36cf7b8d11d14ccd30d1d11f4af3874bee05aae3fbedfe22f4b705b0e0a5bd35",
+      "saved_sha256": "005154052fb8433ecad60e055572b43a480c6be52ed26dc29a8c07fb6a53599d"
+    },
+    {
+      "file": "m2-object-snapshots-sanitize-build.log",
+      "raw_sha256": "d5b2a4f3c2722bc23b2c95ba0650bed296558206226cc63b60bfdf893179ef79",
+      "saved_sha256": "5edc59aa82e70ac3c978aaa31f537db4cd9686ef0be75b8d74333981872177c4"
+    },
+    {
+      "file": "m2-object-snapshots-debug-tests.log",
+      "raw_sha256": "689dd36808e8a0bd771f50ff6201dd94581fa327de29706d9b3f1fb018ac728e",
+      "saved_sha256": "4be3f3ca87cacea6b5fb035fdc6b1b18f4033cf97f28649b1fe4831071b7af15"
+    },
+    {
+      "file": "m2-object-snapshots-release-tests.log",
+      "raw_sha256": "3acf9972ac6ecf1f8405ba2117e0b4420d7f809cd1b7ace31534039ec46818ae",
+      "saved_sha256": "d10e991118c7fb3d6b6b0bcce93156cb673e6a12c5d0aebf35b7c4cbc644d17b"
+    },
+    {
+      "file": "m2-object-snapshots-sanitize-tests.log",
+      "raw_sha256": "6792a1563c191a0b3439b2eb3f31f2a700f37687f463ac130ac6a6b7d81b842e",
+      "saved_sha256": "5642c5aba427ccc1480c184f42ac244b43055e34ab4f32ea2e0095ecbc1a22fa"
+    },
+    {
+      "file": "m2-object-snapshots-sanitize-clearance.log",
+      "raw_sha256": "54bfbb677cf6f35d394459100752be0c627af810b985833c71a0b78e5468a136",
+      "saved_sha256": "b96537d7c0ad1c6dbb18704cafbf1100f9842e55c605065f0b296d28342ff53d"
+    },
+    {
+      "file": "m2-object-snapshots-sanitize-clearance-detail.log",
+      "raw_sha256": "febc3e4b7a16406e3e2e10265345422e5cfdf8f5d5d0a0990f366c9b7c1716c7",
+      "saved_sha256": "c0054c4411152ccf0af877d2a6c82f53216af37e648faec52087b362eec110ea"
+    },
+    {
+      "file": "m2-object-snapshots-debug-gpu.log",
+      "raw_sha256": "1e2ddb6d50b5caac69cdff0cc9bec10ca1920457264f0e5cd72b46d85b93a373",
+      "saved_sha256": "d55c6a36c06965b4058c06ec770a743e944ed9c5ec9ea9893e95d05cc484ee3e"
+    },
+    {
+      "file": "m2-object-snapshots-release-gpu.log",
+      "raw_sha256": "04756d1dc23b9113795b0b8bb20aa64f919fb65d9d849bb2cb05ca2e3588699d",
+      "saved_sha256": "752b62d603460bd211f40aaf8e45b8cd127696d719d701490f22fc1b80d8b09d"
+    },
+    {
+      "file": "m2-object-snapshots-debug-gpu-detail.log",
+      "raw_sha256": "5c06c68891e3f63fa88403f279f66e47326b8de73abef426285110a798d81556",
+      "saved_sha256": "376d6831dbacd8d21bb9c0e43e28bc7ab9a746512c7d43acd3e1e0d35194c677"
+    },
+    {
+      "file": "m2-object-snapshots-release-gpu-detail.log",
+      "raw_sha256": "6ac617ebb92d8e1ec3f7e07896e1b3bb61094afd265103bb3a85c925e5f94a19",
+      "saved_sha256": "41adc52211dc090b03362231d352d46ef93e3bc25790b97f09a745cc7c9ce4dc"
+    },
+    {
+      "file": "m2-object-snapshots-profile.json",
+      "raw_sha256": "7ce580f0421129dc313032897077d5df3c89701317cd93d9111a7abdf070af14",
+      "saved_sha256": "028ec82593fa470930af97edf61814e4f26e3c827224ca2390a845ab63a34828"
+    },
+    {
+      "file": "m2-object-snapshots-profile.py",
+      "raw_sha256": "9cbb69f21b26621b2ded89287736af7747c9b0d0da364e55e4a7bd3d4da3aa6c",
+      "saved_sha256": "9cbb69f21b26621b2ded89287736af7747c9b0d0da364e55e4a7bd3d4da3aa6c"
+    }
+  ],
+  "measurement": {
+    "fixture": "ai_runtime.clearance_private: two relocated invulnerable NPC encounters and ordinary death/removal in each of two world lifetimes; not retail playthrough",
+    "baseline_debug_seconds": 13.76,
+    "updated_debug_seconds": 12.57,
+    "debug_reduction_percent": 8.65,
+    "baseline_asan_seconds": 88.9,
+    "updated_asan_seconds": 88.16,
+    "unchanged_timeout_seconds": 90,
+    "counters_per_lifetime": {
+      "blocked_resizes": 8,
+      "original_AI_shots": 93,
+      "suspended_Cultist": 0
+    },
+    "limits": "Single local before/after Debug timing; ASan difference is too small to claim dependable headroom. Prior timeout history remains valid. No FPS or cross-machine speedup claim.",
+    "profile": "500 interrupted GDB stacks, 465 include GameSession::step, 80 include Objects::snapshot; indicative, not exact CPU attribution"
+  },
+  "gpu": "Vulkan / NVIDIA GeForce RTX 3060 Laptop GPU, SDL dummy audio; native Metal not run",
+  "limitations": [
+    "M2 remains incomplete: required unsupported services and broader acceptance remain open.",
+    "Existing NVIDIA/libdbus LeakSanitizer findings remain unresolved; these ASan/UBSan checks are headless.",
+    "Index insertion/removal is O(occupied records); each snapshot still allocates an owned copy.",
+    "No rule, physics, animation cadence, skinning algorithm, test timeout, dependency pin or commercial asset was changed."
+  ],
+  "capture_policy": "Images remain in ignored build directories because they contain commercial content; hashes only are recorded.",
+  "captures": [
+    {
+      "path": "build/debug/tests/gpu.png",
+      "sha256": "40f1825352c141923a5dcb1f5eb43e9585efec45ed44b561197e89b381454128"
+    },
+    {
+      "path": "build/debug/tests/movement.png",
+      "sha256": "38f4c7483fc4811b39373423b0e8a2d9c41a1c254f3c9eb90c2fefc9c02dbd8f"
+    },
+    {
+      "path": "build/debug/tests/containers.png",
+      "sha256": "58aa7b3b44fbca2ed859c389af4d6c28a8cdf26aa07be0a3cc8aafab619f09e8"
+    },
+    {
+      "path": "build/debug/tests/level-change-0.png",
+      "sha256": "3129c3e4ec32629a51dc6fb9dd33395f6108a48dd58b7f402fd68fa6ac2f09d8"
+    },
+    {
+      "path": "build/debug/tests/level-change-1.png",
+      "sha256": "5b9756486e5e3e88e8c0affc360e3e7ca98363389ea28b819132b95b3f81b84a"
+    },
+    {
+      "path": "build/debug/tests/train-session-gpu/start.png",
+      "sha256": "ba8c8b2144b7bd2a0ccc122ac4bbf945438022fc9cfbb4bf10faf41e106be410"
+    },
+    {
+      "path": "build/debug/tests/train-session-gpu/middle.png",
+      "sha256": "96e56a8afaf490ac5eca52e400c2ab3bf798a491eab54a7c920e6b7cd6dd8e28"
+    },
+    {
+      "path": "build/debug/tests/train-session-gpu/cityhub.png",
+      "sha256": "352b39473eb8e4da46bb638fe0f3e3bb9e33681f73cf945c1190da19c4489eca"
+    },
+    {
+      "path": "build/release/tests/gpu.png",
+      "sha256": "14101b8a97f272cb5c3e2e34fae1a01eadd76c75b9aa9410703e116cfaa01a83"
+    },
+    {
+      "path": "build/release/tests/movement.png",
+      "sha256": "43ddbf2b17d250772fcd7f2855c1915dfa63086c839ec81839ceeec742adc985"
+    },
+    {
+      "path": "build/release/tests/containers.png",
+      "sha256": "86ecafbccdc0fa20e5c35642df5e3a0aa77f82ac77d592a589c10dbb7f21ac8d"
+    },
+    {
+      "path": "build/release/tests/level-change-0.png",
+      "sha256": "3129c3e4ec32629a51dc6fb9dd33395f6108a48dd58b7f402fd68fa6ac2f09d8"
+    },
+    {
+      "path": "build/release/tests/level-change-1.png",
+      "sha256": "5b9756486e5e3e88e8c0affc360e3e7ca98363389ea28b819132b95b3f81b84a"
+    },
+    {
+      "path": "build/release/tests/train-session-gpu/start.png",
+      "sha256": "ba8c8b2144b7bd2a0ccc122ac4bbf945438022fc9cfbb4bf10faf41e106be410"
+    },
+    {
+      "path": "build/release/tests/train-session-gpu/middle.png",
+      "sha256": "96e56a8afaf490ac5eca52e400c2ab3bf798a491eab54a7c920e6b7cd6dd8e28"
+    },
+    {
+      "path": "build/release/tests/train-session-gpu/cityhub.png",
+      "sha256": "352b39473eb8e4da46bb638fe0f3e3bb9e33681f73cf945c1190da19c4489eca"
+    }
+  ],
+  "readme_sha256": {
+    "README.md": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+    "Blood2/README.md": "1d7b23c7d20306432d751958792dc73a4ec17ca1dd4fd451d11cf464b6058911"
+  },
+  "verification": {
+    "local_markdown_links_checked": 3623,
+    "clang_format": "passed for all four modified/new C++ files",
+    "diff_check": "passed in both repositories",
+    "test_assertions_and_timeouts": "unchanged for existing tests"
+  },
+  "visual_review": {
+    "capture": "Blood2/build/debug/tests/train-session-gpu/cityhub.png",
+    "observation": "Destination geometry and characters rendered; this capture does not show the Objects tab."
+  },
+  "implementation_commit": "d0a040b8a04b9a2c0b5c4dcad6d02e43e9d0fad1"
+}

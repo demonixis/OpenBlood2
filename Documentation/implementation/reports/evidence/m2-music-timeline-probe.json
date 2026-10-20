@@ -1,0 +1,368 @@
+{
+  "binary": "IMUSIC25.DLL",
+  "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "entry_rva": "0x19441",
+  "style_copy_rva": "0xeb4c..0xeb9c",
+  "intercepted": [
+    "allocation/free",
+    "0x192a9 chord harmonization"
+  ],
+  "synthetic_cases": 7,
+  "synthetic_timelines": [
+    {
+      "beat": 192,
+      "measure": 768,
+      "duration": 1536,
+      "commands": [
+        -768,
+        0,
+        1536,
+        -25165824
+      ],
+      "mutes": [
+        [
+          0,
+          7
+        ],
+        [
+          192,
+          7
+        ],
+        [
+          384,
+          7
+        ],
+        [
+          576,
+          13
+        ],
+        [
+          768,
+          13
+        ],
+        [
+          960,
+          13
+        ],
+        [
+          1152,
+          13
+        ],
+        [
+          1344,
+          13
+        ]
+      ],
+      "chords": [
+        -1728,
+        5952,
+        -24576
+      ]
+    },
+    {
+      "beat": 96,
+      "measure": 576,
+      "duration": 1152,
+      "commands": [
+        -576,
+        0,
+        1152,
+        -18874368
+      ],
+      "mutes": [
+        [
+          0,
+          7
+        ],
+        [
+          96,
+          7
+        ],
+        [
+          192,
+          7
+        ],
+        [
+          288,
+          7
+        ],
+        [
+          384,
+          7
+        ],
+        [
+          480,
+          7
+        ],
+        [
+          576,
+          13
+        ],
+        [
+          672,
+          13
+        ],
+        [
+          768,
+          13
+        ],
+        [
+          864,
+          13
+        ],
+        [
+          960,
+          13
+        ],
+        [
+          1056,
+          13
+        ]
+      ],
+      "chords": [
+        -1248,
+        4512,
+        -12288
+      ]
+    },
+    {
+      "beat": 192,
+      "measure": 768,
+      "duration": 1536,
+      "commands": [
+        -768,
+        0,
+        1536,
+        -25165824
+      ],
+      "mutes": [
+        [
+          0,
+          7
+        ],
+        [
+          192,
+          7
+        ],
+        [
+          384,
+          7
+        ],
+        [
+          576,
+          13
+        ],
+        [
+          768,
+          13
+        ],
+        [
+          960,
+          13
+        ],
+        [
+          1152,
+          13
+        ],
+        [
+          1344,
+          13
+        ]
+      ],
+      "chords": [
+        -1728,
+        5952,
+        -24576
+      ]
+    },
+    {
+      "beat": 109,
+      "measure": 327,
+      "duration": 654,
+      "commands": [
+        -327,
+        0,
+        654,
+        -10715136
+      ],
+      "mutes": [
+        [
+          0,
+          7
+        ],
+        [
+          109,
+          7
+        ],
+        [
+          218,
+          7
+        ],
+        [
+          327,
+          7
+        ],
+        [
+          436,
+          7
+        ],
+        [
+          545,
+          9
+        ]
+      ],
+      "chords": [
+        -763,
+        2507,
+        -13952
+      ]
+    },
+    {
+      "beat": 192,
+      "measure": 1536,
+      "duration": 3072,
+      "commands": [
+        -1536,
+        0,
+        3072,
+        -50331648
+      ],
+      "mutes": [
+        [
+          0,
+          7
+        ],
+        [
+          192,
+          7
+        ],
+        [
+          384,
+          7
+        ],
+        [
+          576,
+          13
+        ],
+        [
+          768,
+          13
+        ],
+        [
+          960,
+          13
+        ],
+        [
+          1152,
+          13
+        ],
+        [
+          1344,
+          13
+        ],
+        [
+          1536,
+          13
+        ],
+        [
+          1728,
+          13
+        ],
+        [
+          1920,
+          13
+        ],
+        [
+          2112,
+          13
+        ],
+        [
+          2304,
+          13
+        ],
+        [
+          2496,
+          13
+        ],
+        [
+          2688,
+          13
+        ],
+        [
+          2880,
+          13
+        ]
+      ],
+      "chords": [
+        -3264,
+        12096,
+        -24576
+      ]
+    },
+    {
+      "beat": 192,
+      "measure": 768,
+      "duration": 768,
+      "commands": [
+        0,
+        -768
+      ],
+      "mutes": [
+        [
+          0,
+          0
+        ],
+        [
+          192,
+          0
+        ],
+        [
+          384,
+          0
+        ],
+        [
+          576,
+          0
+        ]
+      ],
+      "chords": []
+    }
+  ],
+  "style_headers": 39,
+  "bound_sections": 132,
+  "missing_style_sections": 24,
+  "missing_style_paths": [
+    "Music/Track1/a1.sec",
+    "Music/Track1/a2.sec",
+    "Music/Track1/a3.sec",
+    "Music/Track1/atc.sec",
+    "Music/Track1/ath.sec",
+    "Music/Track1/ats.sec",
+    "Music/Track1/c1.sec",
+    "Music/Track1/c2.sec",
+    "Music/Track1/c3.sec",
+    "Music/Track1/c4.sec",
+    "Music/Track1/cta.sec",
+    "Music/Track1/cth.sec",
+    "Music/Track1/cts.sec",
+    "Music/Track1/h1.sec",
+    "Music/Track1/h2.sec",
+    "Music/Track1/h3.sec",
+    "Music/Track1/h4.sec",
+    "Music/Track1/hta.sec",
+    "Music/Track1/htc.sec",
+    "Music/Track1/hts.sec",
+    "Music/Track1/s.sec",
+    "Music/Track1/sta.sec",
+    "Music/Track1/stc.sec",
+    "Music/Track1/sth.sec"
+  ],
+  "records": {
+    "commands": 132,
+    "mutes": 3030,
+    "chords": 132
+  },
+  "timeline_sha256": "d051b363a130222fe560a1a9d95bfc198ca17e58bf70df6be841662260bfe356",
+  "timeline_fnv64": 4011438205292846879,
+  "scope": "Meter, duration, ordered command/chord times and resampled mute values only; no pitch harmonization, pattern choice or playback"
+}

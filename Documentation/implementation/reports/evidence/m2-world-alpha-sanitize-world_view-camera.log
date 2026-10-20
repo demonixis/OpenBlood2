@@ -1,0 +1,14 @@
+318/583 Testing: world_view.camera
+318/583 Test: world_view.camera
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_view_tests" "camera"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world_view.camera" start time: Oct 17 00:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.camera" end time: Oct 17 00:34 CEST
+"world_view.camera" time elapsed: 00:00:00
+----------------------------------------------------------

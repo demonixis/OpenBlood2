@@ -1,0 +1,14 @@
+428/433 Testing: ai_locomotion.physics
+428/433 Test: ai_locomotion.physics
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_locomotion_tests" "physics"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_locomotion.physics" start time: Oct 16 13:45 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.physics" end time: Oct 16 13:45 CEST
+"ai_locomotion.physics" time elapsed: 00:00:00
+----------------------------------------------------------

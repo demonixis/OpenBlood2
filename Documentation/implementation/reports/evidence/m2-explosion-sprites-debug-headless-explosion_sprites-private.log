@@ -1,0 +1,41 @@
+549/549 Testing: explosion_sprites.private
+549/549 Test: explosion_sprites.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_sprite_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"explosion_sprites.private" start time: Oct 16 20:16 CEST
+Output:
+----------------------------------------------------------
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+type=3 sprites=2 error= missing=model, particle rings, fragments/trails, lights
+<end of output>
+Test time =   1.51 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_sprites.private" end time: Oct 16 20:16 CEST
+"explosion_sprites.private" time elapsed: 00:00:01
+----------------------------------------------------------

@@ -1,0 +1,101 @@
+[New LWP 121070]
+[New LWP 121068]
+[New LWP 121067]
+[New LWP 121065]
+[New LWP 121064]
+[New LWP 121042]
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <ima:enforcing>
+  <https://debuginfod.fedoraproject.org/>
+  <ima:ignore>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+0x00007faaec2f92fd in ioctl () from /lib64/libc.so.6
+
+Thread 7 (Thread 0x7faaec06d6c0 (LWP 121042) "wl_event_thread"):
+#0  0x00007faaec282352 in __syscall_cancel_arch () from /lib64/libc.so.6
+#1  0x00007faaec27654c in __internal_syscall_cancel () from /lib64/libc.so.6
+#2  0x00007faaec276594 in __syscall_cancel () from /lib64/libc.so.6
+#3  0x00007faaec2f0466 in ppoll () from /lib64/libc.so.6
+#4  0x00000000006e46e2 in SDL_IOReady (fd=5, flags=1, timeoutNS=-1) at /home/yann/projects/lithtech/Blood2/build/launcher-debug/_deps/sdl3-src/src/core/unix/SDL_poll.c:62
+#5  0x000000000080165e in Wayland_EventThreadFunc (data=0x1bfecae0) at /home/yann/projects/lithtech/Blood2/build/launcher-debug/_deps/sdl3-src/src/video/wayland/SDL_waylandeventthread.c:80
+#6  0x00000000005efc25 in SDL_RunThread (thread=0x1bfec6f0) at /home/yann/projects/lithtech/Blood2/build/launcher-debug/_deps/sdl3-src/src/thread/SDL_thread.c:339
+#7  0x0000000000700b2b in RunThread (data=0x1bfec6f0) at /home/yann/projects/lithtech/Blood2/build/launcher-debug/_deps/sdl3-src/src/thread/pthread/SDL_systhread.c:73
+#8  0x00007faaec279c42 in start_thread () from /lib64/libc.so.6
+#9  0x00007faaec2fd5ac in __clone3 () from /lib64/libc.so.6
+
+Thread 6 (Thread 0x7faae88616c0 (LWP 121064) "blood2-launcher"):
+#0  0x00007faaec282352 in __syscall_cancel_arch () from /lib64/libc.so.6
+#1  0x00007faaec27654c in __internal_syscall_cancel () from /lib64/libc.so.6
+#2  0x00007faaec276897 in __futex_abstimed_wait_cancelable64 () from /lib64/libc.so.6
+#3  0x00007faaec279302 in pthread_cond_timedwait@@GLIBC_2.3.2 () from /lib64/libc.so.6
+#4  0x00007faae95f569c in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#5  0x00007faae9a35b61 in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#6  0x00007faae95f5854 in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#7  0x00007faaec279c42 in start_thread () from /lib64/libc.so.6
+#8  0x00007faaec2fd5ac in __clone3 () from /lib64/libc.so.6
+
+Thread 5 (Thread 0x7faadbdff6c0 (LWP 121065) "[vkcf] Analysis"):
+#0  0x00007faaec282352 in __syscall_cancel_arch () from /lib64/libc.so.6
+#1  0x00007faaec27654c in __internal_syscall_cancel () from /lib64/libc.so.6
+#2  0x00007faaec276897 in __futex_abstimed_wait_cancelable64 () from /lib64/libc.so.6
+#3  0x00007faaec2790ec in pthread_cond_wait@@GLIBC_2.3.2 () from /lib64/libc.so.6
+#4  0x00007faae95f563c in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#5  0x00007faae9a29e9e in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#6  0x00007faae95f5854 in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#7  0x00007faaec279c42 in start_thread () from /lib64/libc.so.6
+#8  0x00007faaec2fd5ac in __clone3 () from /lib64/libc.so.6
+
+Thread 4 (Thread 0x7faadb5fe6c0 (LWP 121067) "[vkrt] Analysis"):
+#0  0x00007faaec282352 in __syscall_cancel_arch () from /lib64/libc.so.6
+#1  0x00007faaec27654c in __internal_syscall_cancel () from /lib64/libc.so.6
+#2  0x00007faaec276897 in __futex_abstimed_wait_cancelable64 () from /lib64/libc.so.6
+#3  0x00007faaec2790ec in pthread_cond_wait@@GLIBC_2.3.2 () from /lib64/libc.so.6
+#4  0x00007faae95f563c in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#5  0x00007faae9a4b697 in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#6  0x00007faae95f5854 in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#7  0x00007faaec279c42 in start_thread () from /lib64/libc.so.6
+#8  0x00007faaec2fd5ac in __clone3 () from /lib64/libc.so.6
+
+Thread 3 (Thread 0x7faadadfd6c0 (LWP 121068) "[vkps] Update"):
+#0  0x00007faaec282352 in __syscall_cancel_arch () from /lib64/libc.so.6
+#1  0x00007faaec27654c in __internal_syscall_cancel () from /lib64/libc.so.6
+#2  0x00007faaec276897 in __futex_abstimed_wait_cancelable64 () from /lib64/libc.so.6
+#3  0x00007faaec279302 in pthread_cond_timedwait@@GLIBC_2.3.2 () from /lib64/libc.so.6
+#4  0x00007faae95f569c in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#5  0x00007faae9a1dbed in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#6  0x00007faae95f5854 in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#7  0x00007faaec279c42 in start_thread () from /lib64/libc.so.6
+#8  0x00007faaec2fd5ac in __clone3 () from /lib64/libc.so.6
+
+Thread 2 (Thread 0x7faada2fc6c0 (LWP 121070) "blood2-launcher"):
+#0  0x00007faaec282352 in __syscall_cancel_arch () from /lib64/libc.so.6
+#1  0x00007faaec27654c in __internal_syscall_cancel () from /lib64/libc.so.6
+#2  0x00007faaec276897 in __futex_abstimed_wait_cancelable64 () from /lib64/libc.so.6
+#3  0x00007faaec279302 in pthread_cond_timedwait@@GLIBC_2.3.2 () from /lib64/libc.so.6
+#4  0x00007faae95f569c in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#5  0x00007faae9b5c139 in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#6  0x00007faae9b538e6 in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#7  0x00007faae95f5854 in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#8  0x00007faaec279c42 in start_thread () from /lib64/libc.so.6
+#9  0x00007faaec2fd5ac in __clone3 () from /lib64/libc.so.6
+
+Thread 1 (Thread 0x7faaec7447c0 (LWP 121040) "blood2-launcher"):
+#0  0x00007faaec2f92fd in ioctl () from /lib64/libc.so.6
+#1  0x00007faae8bba580 in drmIoctl () from /lib64/libdrm.so.2
+#2  0x00007faae8bbebfa in drmSyncobjTimelineWait () from /lib64/libdrm.so.2
+#3  0x00007faae960554d in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#4  0x00007faae98eb955 in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#5  0x00007faae9b951b2 in ?? () from /lib64/libnvidia-glcore.so.615.78.08
+#6  0x0000000000720f25 in VULKAN_INTERNAL_AcquireSwapchainTexture (block=true, commandBuffer=0x1c961210, window=0x1c006280, swapchainTexture=0x7ffdb26b55d0, swapchainTextureWidth=0x7ffdb26b55cc, swapchainTextureHeight=0x7ffdb26b55c8) at /home/yann/projects/lithtech/Blood2/build/launcher-debug/_deps/sdl3-src/src/gpu/vulkan/SDL_gpu_vulkan.c:10260
+#7  0x000000000072136a in VULKAN_WaitAndAcquireSwapchainTexture (command_buffer=0x1c961210, window=0x1c006280, swapchain_texture=0x7ffdb26b55d0, swapchain_texture_width=0x7ffdb26b55cc, swapchain_texture_height=0x7ffdb26b55c8) at /home/yann/projects/lithtech/Blood2/build/launcher-debug/_deps/sdl3-src/src/gpu/vulkan/SDL_gpu_vulkan.c:10395
+#8  0x00000000005b2c02 in SDL_WaitAndAcquireGPUSwapchainTexture_REAL (command_buffer=0x1c961210, window=0x1c006280, swapchain_texture=0x7ffdb26b55d0, swapchain_texture_width=0x7ffdb26b55cc, swapchain_texture_height=0x7ffdb26b55c8) at /home/yann/projects/lithtech/Blood2/build/launcher-debug/_deps/sdl3-src/src/gpu/SDL_gpu.c:3427
+#9  0x000000000058ee39 in SDL_WaitAndAcquireGPUSwapchainTexture (a=0x1c961210, b=0x1c006280, c=0x7ffdb26b55d0, d=0x7ffdb26b55cc, e=0x7ffdb26b55c8) at /home/yann/projects/lithtech/Blood2/build/launcher-debug/_deps/sdl3-src/src/dynapi/SDL_dynapi_procs.h:1240
+#10 0x000000000040614a in OpenBlood2::Launcher::View::present (this=0x7ffdb26b7ca0, screenshot=filesystem::path "") at /home/yann/projects/lithtech/Blood2/src/launcher/main.cpp:211
+#11 0x0000000000404626 in OpenBlood2::Launcher::run (options=...) at /home/yann/projects/lithtech/Blood2/src/launcher/main.cpp:572
+#12 0x0000000000404cbf in main (argc=13, argv=0x7ffdb26b82d8) at /home/yann/projects/lithtech/Blood2/src/launcher/main.cpp:632
+[Inferior 1 (process 121040) detached]

@@ -1,0 +1,14 @@
+668/673 Testing: gideon_combat.choices
+668/673 Test: gideon_combat.choices
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon_combat_tests" "choices" "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon-combat-choices"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gideon_combat.choices" start time: Oct 17 02:22 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.choices" end time: Oct 17 02:22 CEST
+"gideon_combat.choices" time elapsed: 00:00:00
+----------------------------------------------------------

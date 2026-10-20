@@ -1,0 +1,200 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 685: flare.primary
+    Start 686: flare.alternate
+1/7 Test #686: flare.alternate ..................***Failed    0.06 sec
+=================================================================
+==1135033==ERROR: AddressSanitizer: heap-use-after-free on address 0x7d4e55be2bac at pc 0x000000539835 bp 0x7fff5f4b3db0 sp 0x7fff5f4b3da8
+READ of size 4 at 0x7d4e55be2bac thread T0
+    #0 0x000000539834  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x539834) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #1 0x0000005e95a7  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e95a7) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #2 0x0000005e942a  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e942a) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #3 0x0000005e9035  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e9035) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #4 0x0000005597ba  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5597ba) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #5 0x000000532fe1  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x532fe1) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #6 0x7fce56a0a680  (/lib64/libc.so.6+0x3680) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #7 0x7fce56a0a797  (/lib64/libc.so.6+0x3797) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #8 0x000000446c34  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x446c34) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+
+0x7d4e55be2bac is located 812 bytes inside of 824-byte region [0x7d4e55be2880,0x7d4e55be2bb8)
+freed by thread T0 here:
+    #0 0x000000531d66  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x531d66) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #1 0x000000615ba5  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x615ba5) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #2 0x000000c30056  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0xc30056) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #3 0x000000c2fdc4  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0xc2fdc4) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #4 0x000000c20d9f  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0xc20d9f) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #5 0x000000c03b28  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0xc03b28) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #6 0x000000c02891  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0xc02891) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #7 0x00000053975e  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x53975e) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #8 0x0000005e95a7  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e95a7) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #9 0x0000005e942a  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e942a) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #10 0x0000005e9035  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e9035) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #11 0x0000005597ba  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5597ba) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #12 0x000000532fe1  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x532fe1) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #13 0x7fce56a0a680  (/lib64/libc.so.6+0x3680) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #14 0x7fce56a0a797  (/lib64/libc.so.6+0x3797) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #15 0x000000446c34  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x446c34) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+
+previously allocated by thread T0 here:
+    #0 0x000000531161  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x531161) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #1 0x0000006cfd58  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x6cfd58) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #2 0x0000006703f5  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x6703f5) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #3 0x000000bf4849  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0xbf4849) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #4 0x000000735390  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x735390) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #5 0x00000073504c  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x73504c) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #6 0x0000005ea1b0  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5ea1b0) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #7 0x000000538ee8  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x538ee8) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #8 0x0000005e95a7  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e95a7) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #9 0x0000005e942a  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e942a) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #10 0x0000005e9035  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e9035) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #11 0x0000005597ba  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5597ba) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #12 0x000000532fe1  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x532fe1) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #13 0x7fce56a0a680  (/lib64/libc.so.6+0x3680) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #14 0x7fce56a0a797  (/lib64/libc.so.6+0x3797) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #15 0x000000446c34  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x446c34) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+
+SUMMARY: AddressSanitizer: heap-use-after-free (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x539834) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d) 
+Shadow bytes around the buggy address:
+  0x7d4e55be2900: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x7d4e55be2980: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x7d4e55be2a00: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x7d4e55be2a80: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x7d4e55be2b00: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+=>0x7d4e55be2b80: fd fd fd fd fd[fd]fd fa fa fa fa fa fa fa fa fa
+  0x7d4e55be2c00: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x7d4e55be2c80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7d4e55be2d00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7d4e55be2d80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7d4e55be2e00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==1135033==ABORTING
+
+    Start 687: flare.lifetime
+2/7 Test #685: flare.primary ....................   Passed    0.08 sec
+    Start 688: flare.weapon
+3/7 Test #687: flare.lifetime ...................***Failed    0.07 sec
+=================================================================
+==1135036==ERROR: AddressSanitizer: heap-use-after-free on address 0x7d50385e36e4 at pc 0x000000542848 bp 0x7fff8da11fd0 sp 0x7fff8da11fc8
+READ of size 1 at 0x7d50385e36e4 thread T0
+    #0 0x000000542847  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x542847) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #1 0x0000005e95a7  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e95a7) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #2 0x0000005e942a  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e942a) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #3 0x0000005e9035  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e9035) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #4 0x0000005597ba  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5597ba) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #5 0x000000532fe1  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x532fe1) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #6 0x7fd03940a680  (/lib64/libc.so.6+0x3680) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #7 0x7fd03940a797  (/lib64/libc.so.6+0x3797) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #8 0x000000446c34  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x446c34) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+
+0x7d50385e36e4 is located 612 bytes inside of 824-byte region [0x7d50385e3480,0x7d50385e37b8)
+freed by thread T0 here:
+    #0 0x000000531d66  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x531d66) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #1 0x000000615ba5  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x615ba5) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #2 0x000000c30056  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0xc30056) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #3 0x000000c2fdc4  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0xc2fdc4) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #4 0x000000c20d9f  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0xc20d9f) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #5 0x000000c03b28  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0xc03b28) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #6 0x000000c02891  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0xc02891) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #7 0x00000054274e  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x54274e) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #8 0x0000005e95a7  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e95a7) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #9 0x0000005e942a  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e942a) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #10 0x0000005e9035  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e9035) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #11 0x0000005597ba  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5597ba) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #12 0x000000532fe1  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x532fe1) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #13 0x7fd03940a680  (/lib64/libc.so.6+0x3680) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #14 0x7fd03940a797  (/lib64/libc.so.6+0x3797) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #15 0x000000446c34  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x446c34) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+
+previously allocated by thread T0 here:
+    #0 0x000000531161  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x531161) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #1 0x0000006cfd58  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x6cfd58) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #2 0x0000006703f5  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x6703f5) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #3 0x000000bf4849  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0xbf4849) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #4 0x000000735390  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x735390) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #5 0x00000073504c  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x73504c) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #6 0x0000005ea1b0  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5ea1b0) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #7 0x0000005421b0  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5421b0) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #8 0x0000005e95a7  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e95a7) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #9 0x0000005e942a  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e942a) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #10 0x0000005e9035  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5e9035) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #11 0x0000005597ba  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x5597ba) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #12 0x000000532fe1  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x532fe1) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+    #13 0x7fd03940a680  (/lib64/libc.so.6+0x3680) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #14 0x7fd03940a797  (/lib64/libc.so.6+0x3797) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #15 0x000000446c34  (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x446c34) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d)
+
+SUMMARY: AddressSanitizer: heap-use-after-free (/home/yann/projects/lithtech/Blood2/build/sanitize/tests/flare_tests+0x542847) (BuildId: a19234a56ead161f62ac4d25a8ef76aa4be2f08d) 
+Shadow bytes around the buggy address:
+  0x7d50385e3400: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x7d50385e3480: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x7d50385e3500: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x7d50385e3580: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x7d50385e3600: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+=>0x7d50385e3680: fd fd fd fd fd fd fd fd fd fd fd fd[fd]fd fd fd
+  0x7d50385e3700: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x7d50385e3780: fd fd fd fd fd fd fd fa fa fa fa fa fa fa fa fa
+  0x7d50385e3800: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x7d50385e3880: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7d50385e3900: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==1135036==ABORTING
+
+    Start 689: flare.collect
+4/7 Test #688: flare.weapon .....................   Passed    0.11 sec
+    Start 690: flare.drop
+5/7 Test #689: flare.collect ....................   Passed    0.11 sec
+    Start 691: flare.failures
+6/7 Test #690: flare.drop .......................   Passed    0.10 sec
+7/7 Test #691: flare.failures ...................***Failed    0.06 sec
+fixture: game.initialize()
+failures:260: g.unload_world() && test_flare::setup(g,root)
+
+
+57% tests passed, 3 tests failed out of 7
+
+Label Time Summary:
+flare       =   0.58 sec*proc (7 tests)
+headless    =   0.58 sec*proc (7 tests)
+
+Total Test time (real) =   0.31 sec
+
+The following tests FAILED:
+	686 - flare.alternate (Failed)                          flare headless
+	687 - flare.lifetime (Failed)                           flare headless
+	691 - flare.failures (Failed)                           flare headless
+Errors while running CTest

@@ -1,0 +1,10 @@
+[0/2] Re-checking globbed directories...
+[1/36] Scanning <workspace>/Blood2/src/app/pickup_smoke.cpp for CXX dependencies
+[2/36] Scanning <workspace>/Blood2/tests/player_controls_tests.cpp for CXX dependencies
+[3/36] Generating CXX dyndep file tests/CMakeFiles/player_controls_tests.dir/CXX.dd
+[4/34] Scanning <workspace>/Blood2/src/app/main.cpp for CXX dependencies
+[5/34] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[6/14] Scanning <workspace>/Blood2/tests/hud_tests.cpp for CXX dependencies
+[7/14] Generating CXX dyndep file tests/CMakeFiles/hud_tests.dir/CXX.dd
+[8/10] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[9/10] Linking CXX executable blood2

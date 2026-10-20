@@ -1,0 +1,2053 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index c544f7f..3fd7cca 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -510,3 +510,5 @@ The [Gideon combat continuation](../Documentation/Implementation/M2_GIDEON_COMBA
+ The [Gideon fade/teleport continuation](../Documentation/Implementation/M2_GIDEON_TELEPORT.md) connects original per-call fade, cached/target-centered rays and collision-aware moves. Read [contracts](docs/GIDEON_TELEPORT_CONTRACTS.md). Preserve unnormalized directions, unused miss offsets, source SOLID timing, no-GETHANDLE sound semantics and checked contact lifetime. Model alpha is rendered; additive RGB remains lighting metadata and survives supported player restoration. Production boss initialization/health/damage/attack sequencing, required FX and safe NEW_LEVEL keep M2 open.
+ 
+ The [Gideon attack continuation](../Documentation/Implementation/M2_GIDEON_ATTACKS.md) connects original close/far sequences, timed dodges, Bold taunt and Special1 recoil. Read [contracts](docs/GIDEON_ATTACK_CONTRACTS.md). Preserve cached distance/basis, entry-only taunt velocity, repeated dodge velocity, elapsed>=1 completion independent of playback, retained lateral motion and checked target lifetime. No production boss registration or new shared global is claimed; initialization/health/damage/table ownership, required FX and safe NEW_LEVEL keep M2 open.
++
++The [Gideon lifecycle continuation](../Documentation/Implementation/M2_GIDEON_RUNTIME.md) registers original initialization/AI_Update and typed boss-health delivery. Read [contracts](docs/GIDEON_RUNTIME_CONTRACTS.md). Preserve pre-base health capture, repeated nonzero-ratio publication, gravity removal after base initialization, one accepted typed damage application and subclass-before-base reaction order. All five shared table owners participate in destination rehearsal isolation. Original HUD, complete encounter/death parity, required FX and safe NEW_LEVEL remain incomplete; M2 stays open.
+diff --git a/README.md b/README.md
+index 7825c9b..26a6f2d 100644
+--- a/README.md
++++ b/README.md
+@@ -554,3 +554,5 @@ The [Gideon combat continuation](../Documentation/Implementation/M2_GIDEON_COMBA
+ The [Gideon fade/teleport continuation](../Documentation/Implementation/M2_GIDEON_TELEPORT.md) adds original disappearance/reappearance, checked collision-aware teleport states, stored model color and rendered alpha and inspection. Production boss lifecycle/attack sequencing, required services and safe NEW_LEVEL remain open; M2 is incomplete.
+ 
+ The [Gideon attack continuation](../Documentation/Implementation/M2_GIDEON_ATTACKS.md) connects original close/far sequences, one-second dodges, Bold taunt and immediate Special1 recoil, with inspection. Cached transforms, retained lateral velocity and checked failures are preserved. Production boss initialization/health/damage/shared-table ownership, required FX and safe NEW_LEVEL keep M2 incomplete.
++
++The [production Gideon continuation](../Documentation/Implementation/M2_GIDEON_RUNTIME.md) adds original initialization, AI_Update, typed boss-health delivery and inspection. The fifth shared table is isolated during destination rehearsals. It supersedes the earlier blanket production-Gideon omission; complete boss encounter/death parity, required remaining services and safe NEW_LEVEL still keep M2 incomplete.
+diff --git a/docs/AI_HIT_CONTRACTS.md b/docs/AI_HIT_CONTRACTS.md
+index 4db981e..e4370ec 100644
+--- a/docs/AI_HIT_CONTRACTS.md
++++ b/docs/AI_HIT_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original NPC hit localization and recoil
+ 
++> Extended by [Gideon lifecycle contracts](GIDEON_RUNTIME_CONTRACTS.md): production initialization, AI_Update, health delivery and fifth-table isolation are now integrated. Earlier blanket boss-registration omissions are historical. M2 remains incomplete.
++
+ > Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
+ > original named resets now affect rendering/hit candidates, and the selected Load
+ > model/flags/velocity tail is available before client association. Earlier blanket
+diff --git a/docs/AI_RUNTIME_CONTRACTS.md b/docs/AI_RUNTIME_CONTRACTS.md
+index 35e1db6..3543648 100644
+--- a/docs/AI_RUNTIME_CONTRACTS.md
++++ b/docs/AI_RUNTIME_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original Cultist/Civilian initialization and AI_Update
+ 
++> Extended by [Gideon lifecycle contracts](GIDEON_RUNTIME_CONTRACTS.md): production initialization, AI_Update, health delivery and fifth-table isolation are now integrated. Earlier blanket boss-registration omissions are historical. M2 remains incomplete.
++
+ > Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
+ > transfer ordinary deaths. Earlier blanket corpse omissions are historical;
+ > fire/gibs, corpse damage, required FX and complete M2 remain unavailable.
+diff --git a/docs/CORPSE_CONTRACTS.md b/docs/CORPSE_CONTRACTS.md
+index f94f868..2bf3172 100644
+--- a/docs/CORPSE_CONTRACTS.md
++++ b/docs/CORPSE_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Ordinary original NPC death and CCorpse
+ 
++> Extended by [Gideon runtime integration](GIDEON_RUNTIME_CONTRACTS.md): corpse setup now checks primary-world placement before accepting transfer. Penetrating bodies fail visibly and roll back deferred, retaining the source; depenetration is still unavailable.
++
+ Selected original `AI_Mgr::HandleDamage`, `MC_Dead`, `AI_STATE_Dying`,
+ `CreateCorpse` and `CCorpse` now handle ordinary Cultist/Civilian death.
+ [Source selections](M2_CORPSE_SOURCES.json) and
+diff --git a/docs/DESTINATION_TRIAL_CONTRACTS.md b/docs/DESTINATION_TRIAL_CONTRACTS.md
+index 2f63aaf..8ce8975 100644
+--- a/docs/DESTINATION_TRIAL_CONTRACTS.md
++++ b/docs/DESTINATION_TRIAL_CONTRACTS.md
+@@ -44,7 +44,7 @@ single-threaded diagnostic only, suspend and exchange exactly these runtime glob
+ - Cabal and Monster faction heads/counts;
+ - destructible, smell, exit-hint, ammo-pickup and camera heads/counts;
+ - active camera handle;
+-- the four ported class/gender AI animation/sound table owners;
++- the five ported class/gender AI animation/sound table owners (including Gideon);
+ - active server adapter binding and `g_pServerDE`.
+ 
+ Sentinel addresses do not move. Source nodes keep their original endpoint addresses
+@@ -66,7 +66,7 @@ capture diagnostics/caches; the contract is not a bitwise rollback of all counte
+ 
+ Cleanup checks binding release, all seven empty list counts and active-camera reset.
+ Lifetime tests additionally compare every source intrusive node's address, previous,
+-next and data pointers, all shared table owners, and a live shared Cultist voice.
++next and data pointers, all shared table owners, and live shared Cultist/Gideon voices.
+ No destination failure reloads the source DAT or reconstructs its NPCs.
+ 
+ ## Inspection and evidence
+@@ -84,13 +84,15 @@ missing marker/ground/resource/data, source key preservation with destination ke
+ removal, repeat attempts, foreign-session rejection and report lifetime. Existing
+ `world.destination_lifetime` also rejects callback rehearsal. Private tests repeat
+ SubwayA -> temporary CityHub/SubwayA/malformed Bridge -> unchanged SubwayA three
+-times, with 15 production NPCs and a diagnostic live shared Cultist voice. The GPU
++times, with 16 production NPCs and diagnostic live shared Cultist/Gideon voices. The GPU
+ objectives scenario executes CityHub entry and cleanup with hidden UI and reload.
+ See [source ledger](M2_DESTINATION_TRIAL_SOURCES.json) and
+ [implementation evidence](../../Documentation/Implementation/M2_DESTINATION_TRIAL.md).
+ 
+ A rehearsal cannot promote the staged runtime, preserve all client presentation
+ state, guarantee subsequent updates or make an incomplete destination playable.
+-Automatic NEW_LEVEL, Gideon, required remaining FX/illumination and other required
++Automatic NEW_LEVEL, complete boss encounter/death behavior, required remaining FX/illumination and other required
+ services still block M2. This isolation is new engine adaptation, not recovered
+ retail transition code or proof of retail behavior equivalence.
++
++The fifth-table extension is documented in [Gideon runtime contracts](GIDEON_RUNTIME_CONTRACTS.md).
+diff --git a/docs/GIDEON_ATTACK_CONTRACTS.md b/docs/GIDEON_ATTACK_CONTRACTS.md
+index 7e39be6..4c3f227 100644
+--- a/docs/GIDEON_ATTACK_CONTRACTS.md
++++ b/docs/GIDEON_ATTACK_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original Gideon attack, dodge and recoil sequencing
+ 
++> Extended by [Gideon lifecycle contracts](GIDEON_RUNTIME_CONTRACTS.md): production initialization, AI_Update, health delivery and fifth-table isolation are now integrated. Earlier blanket boss-registration omissions are historical. M2 remains incomplete.
++
+ Selected `AI_STATE_AttackClose`, `AI_STATE_AttackFar`, `MC_Dodge_Left/Right`
+ and the inline Recoil override now execute through the original virtual state
+ dispatcher. The shared original `MC_Taunt_Bold` is also connected. See the
+diff --git a/docs/GIDEON_COMBAT_CONTRACTS.md b/docs/GIDEON_COMBAT_CONTRACTS.md
+index 2e9be12..505c84b 100644
+--- a/docs/GIDEON_COMBAT_CONTRACTS.md
++++ b/docs/GIDEON_COMBAT_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original Gideon combat actions
+ 
++> Extended by [Gideon lifecycle contracts](GIDEON_RUNTIME_CONTRACTS.md): production initialization, AI_Update, health delivery and fifth-table isolation are now integrated. Earlier blanket boss-registration omissions are historical. M2 remains incomplete.
++
+ Selected original `Gideon::ComputeState`, `MC_Fire_Stand`, `Fire`, `MC_Extra`
+ and `MagicPowerup` now use the typed engine services. See the
+ [source ledger](M2_GIDEON_COMBAT_SOURCES.json) and
+diff --git a/docs/GIDEON_RUNTIME_CONTRACTS.md b/docs/GIDEON_RUNTIME_CONTRACTS.md
+new file mode 100644
+index 0000000..c32b823
+--- /dev/null
++++ b/docs/GIDEON_RUNTIME_CONTRACTS.md
+@@ -0,0 +1,113 @@
++# Original Gideon initialization and boss-health delivery
++
++Gideon is now a registered original NPC with the existing AI_Update scheduler,
++combat actions and four supported weapons. This extends the
++[attack contracts](GIDEON_ATTACK_CONTRACTS.md), [NPC runtime](AI_RUNTIME_CONTRACTS.md)
++and [damage contracts](AI_HIT_CONTRACTS.md). M2 remains incomplete.
++See [source ledger](M2_GIDEON_RUNTIME_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_GIDEON_RUNTIME.md).
++
++## Initialization and world ownership
++
++The production factory applies the original 4000 HP / 200 armor profile, strength
++10 (stored without the player upper cap), hearing/smell zero, sight/sense 10000, walk/run 75/180, roll 3.5, ALWAYSRECOIL,
++non-Cabal faction and disabled damage impulses. Weapons are shield, energy blast,
++Naga eye beam and wind, in source order. Original base difficulty/random-health,
++ammo, focus, scale and scheduler rules still apply; RandomHitPoints=0 retains the
++existing reversed-endpoint Random(1,0) adaptation. Fixed external resources are
++Models/Enemies/gideon.abc and Skins/Enemies/gideon.dtx. Enhanced is an original
++registered property with no consumer in the selected source. No alternative skin,
++weapon or model is substituted when initialization fails. Save restoration remains
++rejected before initialization; this does not implement Gideon's Save/Load fields.
++
++Skip the base world-ground placement because Gideon can fly, then clear gravity
++AFTER base initialization. Other base flags, physical body and scheduling remain.
++The fifth shared animation/sound table uses sounds/enemies/Gideon and initializes
++once per world, independent of Cultist/Civilian tables. A failed table preflight
++cannot poison another instance. Source tables are retained and all five owners are
++exchanged during disposable destination initialization, then restored after its
++objects/tables are destroyed under the destination adapter. No destination tick,
++world promotion or NEW_LEVEL acceptance is added.
++
++Diagnostic boss fixtures retain an explicit DiagnosticGideon subclass and no
++production initialization. They must not shadow the real Gideon class.
++
++## Health messages and source ordering
++
++Gideon captures m_fFullHealth before base AI initialization changes HP/difficulty.
++The original CDestructable constructor's health is **1**. Do not silently normalize
++that denominator to 4000: a fresh actor can broadcast ratios above 1. While
++m_bCreateHealth is set, each scheduled update publishes HP/fullHealth BEFORE
++AI_Update. The nonzero-denominator branch does not clear that flag. The zero branch
++publishes 1, clears the flag, then captures current HP. No client does not defer or
++invent a delivery; that update still follows the source flag/capture rules.
++
++BossHealth is an owned typed float in the existing bounded local client queue.
++Nonfinite health operands or ratios fail, finite ratios outside [0,1] remain unchanged. No audience is
++DE_NOTFOUND and is counted separately from queued delivery. Capacity failure is
++explicit and quiesces the production NPC through its existing runtime failure path.
++The client retains the raw ratio and, like SMSG_BOSSHEALTH, displays a bar only for
++0 < ratio < 1. Entry/unload reset this client state. Sender removal does not erase
++already owned packets; client detach clears the queue. No sender handle crosses
++this boundary. Only the supported single local client is implemented.
++
++The inspector displays captured/current HP, raw ratio, create-health flag, request,
++queued/no-audience counts, delivery errors and damage-special count, alongside the
++actual AI state. The Session panel displays received count, original visibility
++rule and a plain diagnostic progress bar. This is not the original HUD artwork.
++
++## Damage adaptation
++
++Original Gideon::ObjectMessageFn calls CBaseCharacter, publishes health, selects
++Special1 when accumulated post-armor damage is strictly >20, then calls AI_Mgr.
++That base damage branch calls CBaseCharacter again with the SAME reader. Original
++engineobjects.c passes that reader to aggregates without ResetRead; Destructable
++consumes vector/float/byte/object/vector. The retail exhausted-reader behavior is
++not established by these sources. Replaying our immutable typed Damage twice would
++invent a second independent health deduction.
++
++The port therefore applies one accepted damage packet, invokes a protected subclass
++hook for Gideon's health/strict threshold, then runs the existing base HandleDamage.
++This explicit safety adaptation does not claim verified retail second-pass parity.
++ALWAYSRECOIL can supersede Special1; Gideon's next Recoil state returns to Special1.
++The threshold observes the existing accumulator until aggregate MID_UPDATE resets
++it. Refused/nested packets and removal during a damage callback do not replay the
++hook, old hit metadata or base reaction. Accepted HP changes precede delivery failure;
++there is no fabricated rollback. A zero/nonfinite denominator fails visibly.
++
++Original localized damage, non-Cabal head behavior and unsupported death branches
++remain inherited. Shared hit/voice ownership and single physics/animation integration
++are unchanged. Complete boss encounter/death parity, remaining required weapon FX,
++illumination, full HUD and safe NEW_LEVEL are not established by registration.
++
++## Animation-name compatibility
++
++SubwayA's actual script requests TALKING_02 while Gideon's ABC names talking_02.
++The former exact-case lookup prevented the first authored dialogue animation.
++Animation lookup now compares ASCII case-insensitively and retains the first
++matching index, without trimming or inventing aliases. The available later-engine
++reference Model::FindAnim uses stricmp (sources/lithtech/runtime/model/src/model.cpp,
++841-866); this supports the policy but is not a recovered Blood II engine binary.
++The production DAT/ABC pair provides the direct compatibility evidence. Resource
++path lookup and node-name ambiguity handling are unchanged.
++
++Inventory SetStrength now retains valid high NPC values and clamps only ammunition
++columns to the six-entry table, as the source does. Both MaxAmmo and decreasing
++strength remain bounded; the existing typed minimum of one is retained for zero
++input. Player attribute validation and supported player save ranges are unchanged.
++This does not authorize saving arbitrary NPC inventory through player-only state.
++
++## Corpse placement exposed by the integrated encounter
++
++The existing keyboard/alternate-fire test reached an ordinary CCorpse whose raw
++death-animation dimensions started inside primary-world geometry. The next generic
++physics step failed, aborting unrelated player input. CreateCorpse now performs a
++stationary checked MoveObject after its original transform/dimensions setup, before
++accepting transfer or hiding the source. Nonsolid gravity bodies already test only
++primary-world geometry in that service. The check does not integrate time or invent
++a depenetrated position. A refused placement removes the partial child deferred,
++retains the source visibly and records the existing death/runtime error. The engine
++diagnostic now includes class/name. This is validation of the existing typed setup
++contract, not an implementation of retail depenetration or successful corpse creation.
++A focused floor-overlap regression verifies rollback; the unchanged input actions
++then pass without health, ammo, difficulty or collision bypasses.
+diff --git a/docs/GIDEON_TELEPORT_CONTRACTS.md b/docs/GIDEON_TELEPORT_CONTRACTS.md
+index 865879b..a270c53 100644
+--- a/docs/GIDEON_TELEPORT_CONTRACTS.md
++++ b/docs/GIDEON_TELEPORT_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original Gideon fade and teleport states
+ 
++> Extended by [Gideon lifecycle contracts](GIDEON_RUNTIME_CONTRACTS.md): production initialization, AI_Update, health delivery and fifth-table isolation are now integrated. Earlier blanket boss-registration omissions are historical. M2 remains incomplete.
++
+ Selected `MC_FadeOut`, `AI_STATE_Teleport` and `AI_STATE_Special1` now execute
+ through the original state dispatcher. See the [source ledger](M2_GIDEON_TELEPORT_SOURCES.json),
+ [combat contracts](GIDEON_COMBAT_CONTRACTS.md) and
+diff --git a/docs/M2_GIDEON_RUNTIME_SOURCES.json b/docs/M2_GIDEON_RUNTIME_SOURCES.json
+new file mode 100644
+index 0000000..36b5d32
+--- /dev/null
++++ b/docs/M2_GIDEON_RUNTIME_SOURCES.json
+@@ -0,0 +1,56 @@
++{
++  "baseline_commit": "e34525eeaf6bb7d55dd59ce310e15e6ef3c6de3b",
++  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
++      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
++      "use": "Constructor, EngineMessageFn, ObjectMessageFn, PostPropRead and InitialUpdate (15-240)"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "use": "Base initialization and damage dispatch/reaction"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
++      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
++      "use": "Initial HP=1 and sequential damage reads (47,395-406)"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/engineobjects.c",
++      "sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
++      "use": "bc_ObjectMessageFn aggregate forwarding (129-142)"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/CSBase.h",
++      "sha256": "e07e05c7a94ae38c68329293ed3d45a8ad4361c805b6471aaff07ca7a597610b",
++      "use": "Explicit ResetRead interface"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "use": "SMSG_BOSSHEALTH visibility at4141"
++    },
++    {
++      "path": "sources/lithtech/runtime/model/src/model.cpp",
++      "sha256": "47340a20b31acee4748dc6d171873df7560ae444bf485153cf4f86d6ac1b9cf8",
++      "use": "Later engine Model::FindAnim case-insensitive first-match policy (841-866); compatibility reference, not original Blood II engine proof"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "use": "SetStrength raw NPC value with bounded decrease-table index (1233-1243)"
++    }
++  ],
++  "adaptations": [
++    "Production factory uses existing typed NPC initialization and resource services; no new dependency.",
++    "Fifth shared table participates in unload and disposable destination isolation.",
++    "Owned finite-only boss-health messages, bounded queue, explicit no-audience and failure inspection.",
++    "One accepted typed damage application then Gideon hook then base AI reaction; exhausted retail reader behavior unverified.",
++    "Original HUD artwork and complete boss death/encounter behavior remain unavailable.",
++    "ASCII case-insensitive first-match animation lookup connects authored TALKING_02 to external talking_02; no alias or resource modification.",
++    "SetStrength retains high NPC values; ammo columns remain bounded and the existing typed minimum is retained.",
++    "Corpse setup validates primary-world placement with a stationary move, rolling back rejected children and preserving visible source failure; no depenetration fabricated."
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index a3ee556..61d6644 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -870,3 +870,5 @@ Selected MC_FadeOut, AI_STATE_Teleport and Special1 are directly adapted from th
+ ## Gideon attack and dodge sequences
+ 
+ Selected original close/far states, dodge commands, inline Recoil and shared Bold taunt are adapted directly from original sources. See [source ledger](M2_GIDEON_ATTACK_SOURCES.json) and [contracts](GIDEON_ATTACK_CONTRACTS.md). Typed failures, inspection and shared Beg/Bold implementation are explicit adaptations; no production boss or new global is introduced.
++
++The [production Gideon continuation](../../Documentation/Implementation/M2_GIDEON_RUNTIME.md) adds original initialization, AI_Update, typed boss-health delivery and inspection. The fifth shared table is isolated during destination rehearsals. It supersedes the earlier blanket production-Gideon omission; complete boss encounter/death parity, required remaining services and safe NEW_LEVEL still keep M2 incomplete.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index b4f0498..f439456 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -1224,6 +1224,13 @@ namespace OpenBlood2
+                     game.client_shell.m_bInWorld ? "yes" : "no",
+                     static_cast<unsigned long long>(game.client_shell.messages),
+                     static_cast<unsigned long long>(game.client_shell.updates));
++        const auto& boss_client = game.client_shell;
++        ImGui::Text("Boss health messages %llu | raw ratio %.3f | bar %s",
++                    (unsigned long long)boss_client.boss_health_messages, boss_client.boss_health.fraction,
++                    boss_client.boss_health_visible ? "visible" : "hidden");
++        if (boss_client.boss_health_visible)
++            ImGui::ProgressBar(boss_client.boss_health.fraction, ImVec2(-1, 0), "Original boss-health state");
++        ImGui::TextUnformatted("Inspection bar; original HUD artwork is not implemented.");
+         draw_paths(game, selection);
+         if (player)
+         {
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index d7eec0d..d25c6b7 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -420,8 +420,18 @@ namespace OpenBlood2
+         if (const auto* boss = dynamic_cast<const Gideon*>(target_ai);
+             boss && ImGui::CollapsingHeader("Original Gideon combat actions", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+-            ImGui::TextWrapped("Selected original combat/fade/teleport methods; diagnostic actor. Boss initialization "
+-                               "and full AI_Update remain unavailable.");
++            ImGui::Text("Driver: %s",
++                        boss->npc_type == AI_Mgr::NPCType::Gideon ? "production AI_Update" : "diagnostic actor");
++            ImGui::Text("Health %.3f / captured %.3f | raw ratio %.3f | create-health %s", boss->m_damage.m_fHitPoints,
++                        boss->m_fFullHealth, boss->boss_health_fraction, boss->m_bCreateHealth ? "yes" : "no");
++            ImGui::Text("Health requests %llu | queued %llu | no audience %llu | result %d | damage specials %llu",
++                        (unsigned long long)boss->health_requests, (unsigned long long)boss->health_deliveries,
++                        (unsigned long long)boss->health_no_client, boss->health_result,
++                        (unsigned long long)boss->damage_specials);
++            if (!boss->health_error.empty())
++                ImGui::TextWrapped("%s", boss->health_error.c_str());
++            ImGui::TextWrapped(
++                "Captured health precedes base AI initialization. Raw ratios outside (0,1) hide the client bar.");
+             ImGui::Text("Node %s | selected weapon %u | chance draw %d", boss->m_szFireNode.c_str(),
+                         boss->selected_weapon, boss->attack_roll);
+             ImGui::Text("Armor %.2f | grants %llu | last shield %.3f / interval %.3f | last panic %.3f",
+diff --git a/src/app/keyframe_smoke.cpp b/src/app/keyframe_smoke.cpp
+index 6f2b041..4cd3ad5 100644
+--- a/src/app/keyframe_smoke.cpp
++++ b/src/app/keyframe_smoke.cpp
+@@ -36,7 +36,7 @@ namespace OpenBlood2
+         const auto* f = r ? dynamic_cast<const KeyFramer*>(r->game.get()) : nullptr;
+         if (!f || !f->initialized || f->keys.size() != (world_path ? 3 : 2) || f->targets.size() != 1 || !f->active ||
+             !f->targets[0].moves || f->targets[0].result != MoverResult::Moved ||
+-            f->unresolved_messages != (world_path ? 0 : 1))
++            f->unresolved_messages != 0) // The authored Gideon recipient is now instantiated.
+             return false;
+         const auto* target = game.objects.get(f->targets[0].object);
+         if (!target || (!world_path && game.client_shell.view.object != target->handle))
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 8beb736..5a690f2 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -1460,7 +1460,7 @@ namespace
+                     "Model viewport: frames={}, world hidden={}, weapon hidden={}, instances={}, close={}, vertices={}",
+                     model_frames, models_hidden, close_weapon_hidden, model_scene.world_draws.size(),
+                     model_scene.close_draws.size(), model_scene.mesh.vertices.size());
+-                if (!close_weapon_hidden || model_scene.world_draws.size() != 25 ||
++                if (!close_weapon_hidden || model_scene.world_draws.size() != 26 ||
+                     model_frames != world_renderer.stats.frames)
+                     return 4;
+                 std::size_t decoded = 0, missing = 0;
+@@ -1580,7 +1580,7 @@ namespace
+                     "and after reload; angular paths and world rendering remain unavailable");
+             else if (options.keyframes_smoke)
+                 spdlog::info("KEYFRAMES smoke: authored camera path and owned key lifetime checked while UI hidden and "
+-                             "after reload; missing Gideon message exposed");
++                             "after reload; authored Gideon message recipient resolved");
+             if (options.cameras_smoke)
+                 spdlog::info("CAMERAS smoke: original camera tracks player while UI hidden; selected view, movement "
+                              "gate and reload checked");
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 9ba39d8..80ebfac 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -81,8 +81,8 @@ namespace OpenBlood2
+         const auto trial_before = g.destination_trial.attempts;
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+-            !g.destination_trial.player_entered || g.destination_trial.created != 243 ||
+-            g.destination_trial.unknown != 207 || g.destination_trial.failed != 35 ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 244 ||
++            g.destination_trial.unknown != 206 || g.destination_trial.failed != 35 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+@@ -100,8 +100,8 @@ namespace OpenBlood2
+                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
+                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+                g.destination_inspection.source_revision == old_revision &&
+-               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 247 &&
+-               g.destination_inspection.unknown == 207 && g.destination_inspection.invalid == 31 &&
++               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 248 &&
++               g.destination_inspection.unknown == 206 && g.destination_inspection.invalid == 31 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/engine/model.cpp b/src/engine/model.cpp
+index ded86b2..b0507e1 100644
+--- a/src/engine/model.cpp
++++ b/src/engine/model.cpp
+@@ -345,8 +345,14 @@ namespace OpenBlood2
+     std::uint32_t animation_index(const Model& model, std::string_view name)
+     {
+         for (std::uint32_t i = 0; i < model.animations.size(); ++i)
+-            if (model.animations[i].name == name)
+-                return i;
++            if (std::equal(model.animations[i].name.begin(), model.animations[i].name.end(), name.begin(), name.end(),
++                           [](unsigned char a, unsigned char b)
++                           {
++                               const auto lower = [](unsigned char c)
++                               { return c >= 'A' && c <= 'Z' ? c + ('a' - 'A') : c; };
++                               return lower(a) == lower(b);
++                           }))
++                return i; // Original authored scripts use uppercase clip names; retain first matching index.
+         return no_animation;
+     }
+     namespace
+diff --git a/src/game/destination_trial.cpp b/src/game/destination_trial.cpp
+index 70fba67..2133cab 100644
+--- a/src/game/destination_trial.cpp
++++ b/src/game/destination_trial.cpp
+@@ -26,7 +26,7 @@ namespace OpenBlood2
+             std::array<DLink, 7> saved_heads{};
+             std::array<DDWORD, 7> saved_counts{};
+             HOBJECT camera = nullptr;
+-            std::array<std::shared_ptr<CAnim_Sound>, 4> tables;
++            AI_Mgr::RuntimeTables tables;
+             void exchange()
+             {
+                 for (std::size_t i = 0; i < heads.size(); ++i)
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 6ff8756..40bda48 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -114,6 +114,7 @@ class ServerDE : public CSBase
+     virtual OpenBlood2::MoverResult MoveKeyframedObject(HOBJECT, DVector, const DRotation*) = 0;
+     virtual DDWORD GetObjectUserFlags(HOBJECT) = 0;
+     virtual DRESULT SendWorldExit(const OpenBlood2::WorldExit&, const std::string& start_point) = 0;
++    virtual DRESULT SendBossHealth(const OpenBlood2::BossHealth&) = 0;
+     virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
+     virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;
+     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;
+diff --git a/src/game/original/AIDeath.cpp b/src/game/original/AIDeath.cpp
+index 89ffb70..d4adf47 100644
+--- a/src/game/original/AIDeath.cpp
++++ b/src/game/original/AIDeath.cpp
+@@ -113,8 +113,13 @@ bool AI_Mgr::CreateCorpse()
+         s->SetModelAnimation(h, m_nCorpseType);
+         s->SetModelLooping(h, false);
+     }
++    // A stationary move checks the corpse's actual primary-world body before
++    // accepting transfer. Raw death dimensions may overlap a wall/floor even
++    // when the live actor fitted. Preserve explicit failure and deferred rollback;
++    // never leave a penetrating child to abort an unrelated player's next tick.
+     if (!configured || s->GetModelAnimation(h) != m_nCorpseType || s->GetModelLooping(h) ||
+-        !s->ScaleObject(h, m_vScale) || s->SetObjectDims(h, &dims) != DE_OK || s->TeleportObject(h, &position) != DE_OK)
++        !s->ScaleObject(h, m_vScale) || s->SetObjectDims(h, &dims) != DE_OK ||
++        s->TeleportObject(h, &position) != DE_OK || s->MoveObject(h, &position) != DE_OK)
+     {
+         s->RemoveObject(h); // Deferred rollback; source remains inspectable.
+         return fail("Corpse setup failed; incomplete child removed");
+diff --git a/src/game/original/AIRuntime.cpp b/src/game/original/AIRuntime.cpp
+index 4015c11..6f21908 100644
+--- a/src/game/original/AIRuntime.cpp
++++ b/src/game/original/AIRuntime.cpp
+@@ -9,7 +9,7 @@
+ using namespace OpenBlood2;
+ namespace
+ {
+-    std::array<std::shared_ptr<CAnim_Sound>, 4> tables; // Reset after world objects are destroyed.
++    AI_Mgr::RuntimeTables tables; // Reset after world objects are destroyed.
+     bool weapon(std::string_view name, DBYTE& id)
+     {
+         if (name.starts_with("NONE"))
+@@ -31,7 +31,7 @@ namespace
+         return true;
+     }
+ } // namespace
+-void AI_Mgr::ExchangeRuntimeTables(std::array<std::shared_ptr<CAnim_Sound>, 4>& other)
++void AI_Mgr::ExchangeRuntimeTables(AI_Mgr::RuntimeTables& other)
+ {
+     tables.swap(other);
+ }
+@@ -55,6 +55,16 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
+     npc_ammo[2] = type == NPCType::Cultist ? 60 : 0;
+     npc_ammo[5] = type == NPCType::Cultist ? 20 : 0;
+     npc_ammo[6] = type == NPCType::Civilian ? 100 : 0;
++    if (type == NPCType::Gideon)
++    {
++        m_fHearingDist = 0;
++        m_fSeeingDist = m_fSensingDist = 10000;
++        m_bCabal = false;
++        npc_hp = 4000;
++        npc_armor = 200;
++        npc_weapons = {"GIDEON_SHIELD", "ENERGY_BLAST", "NAGA_BLAST", "GIDEON_WIND", "NONE"};
++        m_damage.apply_damage_physics = false;
++    }
+ }
+ bool AI_Mgr::RuntimeFailure(std::string_view why)
+ {
+@@ -99,7 +109,7 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
+         text("TriggerRelayTarget", trigger_relay_target);
+     }
+     // Source subclass booleans are read only for world-file creation.
+-    if (reason == PRECREATE_WORLDFILE)
++    if (reason == PRECREATE_WORLDFILE && npc_type != NPCType::Gideon)
+     {
+         auto flag = [&](const char* key, bool& out)
+         {
+@@ -138,7 +148,12 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
+         return RuntimeFailure("Invalid NPC authored state");
+     std::string model, skin;
+     int variant = 1;
+-    if (npc_type == NPCType::Cultist)
++    if (npc_type == NPCType::Gideon)
++    {
++        model = "Models/Enemies/gideon.abc";
++        skin = "Skins/Enemies/gideon.dtx";
++    }
++    else if (npc_type == NPCType::Cultist)
+     {
+         if (npc_robe)
+             return RuntimeFailure("Add-on robe Cultist initialization is not integrated");
+@@ -187,7 +202,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
+     if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
+         return RuntimeFailure("Invalid or repeated NPC initialization");
+     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
+-    const auto group = (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
++    const auto group = npc_type == NPCType::Gideon ? 4 : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
+     auto initialize_table = [&](unsigned slot, bool refresh, const char* root)
+     {
+         if (!refresh)
+@@ -215,12 +230,14 @@ bool AI_Mgr::RuntimeInitialize(int reason)
+             return RuntimeFailure("NPC female animation table initialization failed");
+     }
+     else if (!initialize_table(group, !tables[group],
+-                               male_group ? "sounds/enemies/m_cultist" : "sounds/enemies/f_cultist"))
++                               npc_type == NPCType::Gideon ? "sounds/enemies/Gideon"
++                               : male_group                ? "sounds/enemies/m_cultist"
++                                                           : "sounds/enemies/f_cultist"))
+         return RuntimeFailure("NPC shared animation table initialization failed");
+     auto table = tables[group];
+     if (!InitStatics(table) || !m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
+         return RuntimeFailure("NPC aggregates unavailable");
+-    m_InventoryMgr.SetStrength(5);
++    m_InventoryMgr.SetStrength(npc_type == NPCType::Gideon ? 10 : 5);
+     // Original weapon IDs are sparse (Gideon's loadout reaches 42). Track the
+     // at-most-five requested IDs, not an array sized for player-only weapons.
+     std::array<DBYTE, 5> obtained{};
+@@ -283,7 +300,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
+         return RuntimeFailure("NPC initial model dimensions/scale/animation failed: " + state_error);
+     s->SetNextUpdate(m_hObject, .001f);
+     m_bSetShutdown = false;
+-    if (reason == INITIALUPDATE_WORLDFILE && s->MoveObjectToGround(m_hObject) != DE_OK)
++    if (reason == INITIALUPDATE_WORLDFILE && npc_type != NPCType::Gideon && s->MoveObjectToGround(m_hObject) != DE_OK)
+         return RuntimeFailure("NPC world ground placement failed");
+     m_fLastUpdate = s->GetTime();
+     m_damage.ai_hit_localization = true;
+diff --git a/src/game/original/AITrigger.cpp b/src/game/original/AITrigger.cpp
+index d76024c..ec7252c 100644
+--- a/src/game/original/AITrigger.cpp
++++ b/src/game/original/AITrigger.cpp
+@@ -278,7 +278,7 @@ DDWORD AI_Mgr::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read
+         const auto result = CBaseCharacter::ObjectMessageFn(sender, message, read);
+         // Safety adaptation: refused/nested packets never replay stale hit metadata.
+         if (!nested && m_damage.ai_hit_localization && !runtime_failed && before != m_damage.accepted_damage &&
+-            GetServerDE()->IsObjectAlive(m_hObject) && !HandleDamage())
++            GetServerDE()->IsObjectAlive(m_hObject) && (!OnAcceptedDamage() || !HandleDamage()))
+             RuntimeFailure(damage_reaction_error.empty() ? state_error : damage_reaction_error);
+         return result;
+     }
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 5ef7c1c..20fdfb6 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -101,10 +101,12 @@ class AI_Mgr : public CBaseCharacter
+     {
+         Diagnostic,
+         Cultist,
+-        Civilian
++        Civilian,
++        Gideon
+     };
+     static void ResetRuntimeTables();
+-    static void ExchangeRuntimeTables(std::array<std::shared_ptr<CAnim_Sound>, 4>&);
++    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 5>;
++    static void ExchangeRuntimeTables(RuntimeTables&);
+     void ConfigureRuntime(NPCType); // Original constructor defaults, selected by production factories only.
+     bool AI_Update();
+     bool RuntimeReady() const
+@@ -453,6 +455,10 @@ class AI_Mgr : public CBaseCharacter
+ 
+   protected:
+     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++    virtual bool OnAcceptedDamage()
++    {
++        return true;
++    }
+     bool TriggerFailure(const char*);
+     bool StateFailure(const char*);
+     bool AnimationCommand(DDWORD clip, int command);
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index 5cfda2b..64ea523 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -232,6 +232,9 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
+     physics = {};
+     stats = {};
+     world_exit = {};
++    boss_health = {};
++    boss_health_messages = 0;
++    boss_health_visible = false;
+     objectives = {};
+     objectives_error.clear();
+     objective_messages = 0;
+@@ -264,6 +267,9 @@ void CBloodClientShell::OnExitWorld()
+     physics = {};
+     stats = {};
+     world_exit = {};
++    boss_health = {};
++    boss_health_messages = 0;
++    boss_health_visible = false;
+     objectives = {};
+     objectives_error.clear();
+     objective_messages = 0;
+@@ -328,6 +334,15 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
+     }
+     else if (const auto* value = std::get_if<OpenBlood2::PlayerStats>(&event))
+         stats = *value;
++    else if (const auto* value = std::get_if<OpenBlood2::BossHealth>(&event))
++    {
++        if (!std::isfinite(value->fraction))
++            return false;
++        boss_health = *value;
++        ++boss_health_messages;
++        // Original SMSG_BOSSHEALTH hides the bar at full health or zero.
++        boss_health_visible = value->fraction > 0 && value->fraction < 1;
++    }
+     else if (const auto* value = std::get_if<OpenBlood2::MissionObjectives>(&event))
+     {
+         // SMSG_OBJECTIVES: single/custom only; resource IDs override authored strings.
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index 2dc9a90..5ac941c 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -100,6 +100,9 @@ class CBloodClientShell
+         std::uint64_t received = 0, ignored_dead = 0, blocked = 0;
+         bool pending = false;
+     } world_exit;
++    OpenBlood2::BossHealth boss_health;
++    std::uint64_t boss_health_messages = 0;
++    bool boss_health_visible = false;
+     OpenBlood2::MissionObjectives objectives;
+     std::string objectives_error;
+     std::uint64_t objective_messages = 0;
+diff --git a/src/game/original/Gideon.cpp b/src/game/original/Gideon.cpp
+index e3f9cbd..08a074b 100644
+--- a/src/game/original/Gideon.cpp
++++ b/src/game/original/Gideon.cpp
+@@ -1,11 +1,89 @@
+-// Original ObjectDLL/Gideon.cpp:323-473,583-600,770-808 (Monolith, 1998).
+-// Typed failure/lifetime adaptations are documented in GIDEON_COMBAT_CONTRACTS.md.
++// Original ObjectDLL/Gideon.cpp:15-240,323-473,583-600,770-808 (Monolith, 1998).
++// Typed failure/lifetime adaptations are documented in GIDEON_RUNTIME_CONTRACTS.md.
+ #include "Gideon.h"
+ #include "engine/collision.h"
+ #include <cmath>
+ #include <limits>
+ using namespace OpenBlood2;
+ 
++bool Gideon::PublishHealth(float fraction)
++{
++    ++health_requests;
++    health_error.clear();
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject) || !std::isfinite(fraction) || !std::isfinite(m_fFullHealth) ||
++        !std::isfinite(m_damage.m_fHitPoints))
++    {
++        health_result = DE_INVALIDPARAMS;
++        health_error = "Gideon health owner or ratio unavailable";
++        return StateFailure(health_error.c_str());
++    }
++    boss_health_fraction = fraction; // Keep the source ratio, including values outside [0,1].
++    health_result = server->SendBossHealth({fraction});
++    if (health_result == DE_OK)
++        ++health_deliveries;
++    else if (health_result == DE_NOTFOUND)
++        ++health_no_client; // A null-client broadcast with no audience is not a delivery.
++    else
++    {
++        health_error = "Gideon boss-health delivery failed";
++        return StateFailure(health_error.c_str());
++    }
++    return true;
++}
++DDWORD Gideon::EngineMessageFn(DDWORD message, void* data, DFLOAT value)
++{
++    if (npc_type != NPCType::Gideon)
++        return AI_Mgr::EngineMessageFn(message, data, value);
++    if (message == MID_INITIALUPDATE)
++    {
++        // Source subclass InitialUpdate precedes base health/difficulty initialization.
++        m_fFullHealth = m_damage.m_fHitPoints;
++        m_bCreateHealth = true;
++    }
++    if (message == MID_UPDATE && RuntimeReady() && m_bCreateHealth)
++    {
++        const float fraction = m_fFullHealth == 0 ? 1 : m_damage.m_fHitPoints / m_fFullHealth;
++        if (!PublishHealth(fraction))
++        {
++            RuntimeFailure(health_error);
++            return 0;
++        }
++        if (m_fFullHealth == 0)
++        {
++            m_bCreateHealth = false;
++            m_fFullHealth = m_damage.m_fHitPoints;
++        }
++        // The original nonzero branch deliberately keeps m_bCreateHealth set.
++    }
++    const auto result = AI_Mgr::EngineMessageFn(message, data, value);
++    if (message == MID_INITIALUPDATE && RuntimeReady() && GetServerDE()->IsObjectAlive(m_hObject))
++        GetServerDE()->SetObjectFlags(m_hObject, GetServerDE()->GetObjectFlags(m_hObject) & ~FLAG_GRAVITY);
++    return result;
++}
++bool Gideon::OnAcceptedDamage()
++{
++    if (npc_type != NPCType::Gideon)
++        return true;
++    // One accepted typed damage application, then Gideon, then base AI reaction.
++    // The source forwards the same consumed reader twice without ResetRead; never
++    // replay our immutable damage value as a second independent packet.
++    if (m_fFullHealth == 0)
++    {
++        health_result = DE_INVALIDPARAMS;
++        health_error = "Gideon damage health denominator is zero";
++        return StateFailure(health_error.c_str());
++    }
++    if (!PublishHealth(m_damage.m_fHitPoints / m_fFullHealth))
++        return false;
++    if (m_damage.m_fLastDamageAmount > 20)
++    {
++        ++damage_specials;
++        return SetNewState(StateSpecial1);
++    }
++    return true;
++}
++
+ bool Gideon::ComputeState(int value)
+ {
+     state_error.clear();
+diff --git a/src/game/original/Gideon.h b/src/game/original/Gideon.h
+index 471e3d6..cee8457 100644
+--- a/src/game/original/Gideon.h
++++ b/src/game/original/Gideon.h
+@@ -1,12 +1,17 @@
+ #pragma once
+ #include "AI_Mgr.h"
+ 
+-// Selected original Gideon combat methods. Not registered for world creation:
+-// initialization and boss-health delivery remain pending.
++// Original Gideon lifecycle and selected combat methods.
++// See GIDEON_RUNTIME_CONTRACTS.md for message ordering and remaining services.
+ // See GIDEON_COMBAT_CONTRACTS.md before extending this subclass.
+ class Gideon : public AI_Mgr
+ {
+   public:
++    float m_fFullHealth = 0, boss_health_fraction = 0;
++    bool m_bCreateHealth = true;
++    std::uint64_t health_requests = 0, health_deliveries = 0, health_no_client = 0, damage_specials = 0;
++    DRESULT health_result = DE_NOTFOUND;
++    std::string health_error;
+     bool ComputeState(int stimulus = -1) override;
+     bool MC_Fire_Stand() override;
+     bool Fire(bool alternate = false) override;
+@@ -38,7 +43,12 @@ class Gideon : public AI_Mgr
+     std::string powerup_error;
+     InventoryResult completion_selection = InventoryResult::NotAvailable;
+ 
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    bool OnAcceptedDamage() override;
++
+   private:
++    bool PublishHealth(float);
+     bool Dodge(bool right);
+     bool AttackReady(bool distance);
+     bool TeleportStep(bool special);
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index 8823780..8a1d29c 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -90,10 +90,13 @@ float CInventoryMgr::MaxAmmo(DBYTE type) const
+ }
+ void CInventoryMgr::SetStrength(DBYTE strength)
+ {
+-    strength = std::clamp<DBYTE>(strength, 1, 6);
++    // NPCs such as Gideon store strength 10. Only the ammo-table column is
++    // capped at six; keep the typed boundary's existing minimum of one.
++    strength = std::max<DBYTE>(strength, 1);
++    const auto column = std::min<unsigned>(strength - 1, 5);
+     if (m_nAttribStrength > strength)
+         for (DBYTE i = 1; i <= 8; ++i)
+-            m_fAmmo[i] = std::min(m_fAmmo[i], fMaxAmmoCount[i][strength - 1]);
++            m_fAmmo[i] = std::min(m_fAmmo[i], fMaxAmmoCount[i][column]);
+     m_nAttribStrength = strength;
+     ++revision;
+ }
+diff --git a/src/game/player_messages.h b/src/game/player_messages.h
+index 6546c35..08d6760 100644
+--- a/src/game/player_messages.h
++++ b/src/game/player_messages.h
+@@ -76,6 +76,10 @@ namespace OpenBlood2
+     {
+         float health = 0, armor = 0, bullets = 0;
+     };
++    struct BossHealth
++    {
++        float fraction = 0;
++    };
+     struct MissionObjectives
+     {
+         std::uint32_t resource = 0;
+@@ -93,5 +97,5 @@ namespace OpenBlood2
+         WorldExitType type = WorldExitType::World;
+     };
+     using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
+-                                     MissionObjectives, WorldExit>;
++                                     MissionObjectives, WorldExit, BossHealth>;
+ } // namespace OpenBlood2
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 7d9653f..3b22998 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -13,6 +13,7 @@
+ #include "game/original/ExitHint.h"
+ #include "game/original/ExitTrigger.h"
+ #include "game/original/GameStartPoint.h"
++#include "game/original/Gideon.h"
+ #include "game/original/HandWeaponModel.h"
+ #include "game/original/Key.h"
+ #include "game/original/KeyFramer.h"
+@@ -320,6 +321,11 @@ namespace OpenBlood2
+                                   {"Scared", false},
+                                   {"Dims", DVector{21, 37, 21}},
+                                   {"SororitySkin", false}}};
++        const ClassInfo gideon{
++            "Gideon",
++            &ai_manager,
++            construct_npc<Gideon, AI_Mgr::NPCType::Gideon>,
++            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}}};
+         const ClassInfo player{"CPlayerObj", &character, construct<CPlayerObj>, {}};
+         const ClassInfo world_properties{
+             "WorldProperties",
+@@ -663,10 +669,10 @@ namespace OpenBlood2
+                objects.register_class(world_properties) && objects.register_class(smell) &&
+                objects.register_class(exit_hint) && objects.register_class(character) &&
+                objects.register_class(ai_manager) && objects.register_class(cultist) &&
+-               objects.register_class(civilian) && objects.register_class(player) && objects.register_class(volume) &&
+-               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
+-               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
+-               objects.register_class(freefall) && objects.register_class(trigger) &&
++               objects.register_class(civilian) && objects.register_class(gideon) && objects.register_class(player) &&
++               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
++               objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
++               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
+                objects.register_class(key_pickup) && objects.register_class(pickup) &&
+                objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
+                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 67509c1..9654c63 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -188,6 +188,7 @@ namespace OpenBlood2
+         DDWORD GetObjectUserFlags(HOBJECT) override;
+         CBloodServerShell* session_shell = nullptr;
+         DRESULT SendWorldExit(const WorldExit&, const std::string&) override;
++        DRESULT SendBossHealth(const BossHealth&) override;
+         DRESULT SendObjectives(const MissionObjectives&) override;
+         bool GetClientResourceString(std::uint32_t, std::string&) override;
+         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
+diff --git a/src/game/server_clients.cpp b/src/game/server_clients.cpp
+index e8d6806..44269cf 100644
+--- a/src/game/server_clients.cpp
++++ b/src/game/server_clients.cpp
+@@ -79,6 +79,8 @@ namespace OpenBlood2
+                     return physics_vector(value.position);
+                 else if constexpr (std::is_same_v<T, PlayerStats>)
+                     return std::isfinite(value.health) && std::isfinite(value.armor) && std::isfinite(value.bullets);
++                else if constexpr (std::is_same_v<T, BossHealth>)
++                    return std::isfinite(value.fraction);
+                 else if constexpr (std::is_same_v<T, WorldExit>)
+                     return value.next_world.size() <= 100 && value.next_world.find('\0') == std::string::npos &&
+                            static_cast<DBYTE>(value.type) <= static_cast<DBYTE>(WorldExitType::Episode);
+@@ -105,6 +107,19 @@ namespace OpenBlood2
+         events.push_back(event);
+         return DE_OK;
+     }
++    DRESULT ServerAdapter::SendBossHealth(const BossHealth& value)
++    {
++        trace_service("SendBossHealth");
++        if (!std::isfinite(value.fraction))
++            return DE_INVALIDPARAMS;
++        for (const auto& [client, state] : clients_)
++        {
++            (void)state;
++            if (GetClientUserData(client))
++                return SendToClient(client, value);
++        }
++        return DE_NOTFOUND;
++    }
+     bool ServerAdapter::take_client_events(HCLIENT client, std::vector<PlayerEvent>& events)
+     {
+         events.clear();
+diff --git a/src/game/server_physics.cpp b/src/game/server_physics.cpp
+index c29fa89..75b503a 100644
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -378,7 +378,8 @@ namespace OpenBlood2
+         if (blocked_start)
+         {
+             objects_.fail(ObjectError::Unsupported,
+-                          "MoveObject starts penetrating geometry; depenetration is not implemented");
++                          "MoveObject starts penetrating geometry; depenetration is not implemented: " + r->type->name +
++                              " / " + r->state.m_Name);
+             return DE_ERROR;
+         }
+         return DE_OK;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index a29cd80..186b626 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1326,3 +1326,17 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME gideon_attack.private COMMAND gideon_attack_tests private "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(gideon_attack.private PROPERTIES LABELS "headless;private;gideon_attack" TIMEOUT 90)
+ endif()
++
++add_executable(gideon_runtime_tests gideon_runtime_tests.cpp)
++target_link_libraries(gideon_runtime_tests PRIVATE blood2_game)
++blood2_project_options(gideon_runtime_tests)
++foreach(case defaults health client damage lifetime)
++    add_test(NAME gideon_runtime.${case} COMMAND gideon_runtime_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/gideon-runtime-${case}")
++    set_tests_properties(gideon_runtime.${case} PROPERTIES LABELS "headless;gideon_runtime" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case profile subway arena)
++        add_test(NAME gideon_runtime.${case} COMMAND gideon_runtime_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gideon_runtime.${case} PROPERTIES LABELS "headless;private;gideon_runtime" TIMEOUT 120)
++    endforeach()
++endif()
+diff --git a/tests/ai_perception_tests.cpp b/tests/ai_perception_tests.cpp
+index 497e4a8..a0e953e 100644
+--- a/tests/ai_perception_tests.cpp
++++ b/tests/ai_perception_tests.cpp
+@@ -400,7 +400,7 @@ namespace
+             CHECK(a);
+             auto* r = g.objects.get(a->m_hObject);
+             CHECK(g.models.load("models/enemies/m_cultist1.abc", r->model, error));
+-            CHECK(AI_Mgr::m_dwNumCabal == 17 && AI_Mgr::m_dwNumMonster == 1);
++            CHECK(AI_Mgr::m_dwNumCabal == 17 && AI_Mgr::m_dwNumMonster == 2);
+             a->m_fSensingDist = 200;
+             CHECK(a->ComputeStimuli() == 4 && a->GetTarget() == p->m_hObject);
+             CHECK(a->RefreshTargetPosition() && a->MC_FaceTarget());
+@@ -410,7 +410,7 @@ namespace
+             p->m_bPowerupActivated[PU_INVISIBLE] = true;
+             CHECK(a->ComputeStimuli() == 4 && a->stimulus_queries[0].rays == 0);
+             old = p->m_hObject;
+-            CHECK(g.leave_player() && !a->GetTarget() && AI_Mgr::m_dwNumMonster == 0);
++            CHECK(g.leave_player() && !a->GetTarget() && AI_Mgr::m_dwNumMonster == 1);
+             CHECK(g.enter_player(error));
+             p = g.server_shell.Player(g.local_client);
+             CHECK(p && p->m_hObject != old && a->ComputeStimuli() > 0 && a->GetTarget() == p->m_hObject);
+diff --git a/tests/ai_runtime_tests.cpp b/tests/ai_runtime_tests.cpp
+index 99694fe..fb31205 100644
+--- a/tests/ai_runtime_tests.cpp
++++ b/tests/ai_runtime_tests.cpp
+@@ -499,7 +499,7 @@ namespace
+         for (int load = 0; load < 2; ++load)
+         {
+             CHECK(g.request_world("01_SubwayA", e) && !g.objects.get(old));
+-            unsigned cultists = 0, civilians = 0, failed = 0, unsupported = 0, created = 0;
++            unsigned cultists = 0, civilians = 0, bosses = 0, failed = 0, unsupported = 0, created = 0;
+             for (auto& entry : g.entries)
+             {
+                 failed += entry.state == EntryState::Failed;
+@@ -516,14 +516,15 @@ namespace
+                 old = id;
+                 cultists += a->npc_type == AI_Mgr::NPCType::Cultist;
+                 civilians += a->npc_type == AI_Mgr::NPCType::Civilian;
++                bosses += a->npc_type == AI_Mgr::NPCType::Gideon;
+             }
+-            CHECK(cultists == 10 && civilians == 5 && failed == 0 && unsupported == 1 && created == 203);
+-            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(e) && g.objects.snapshot().size() == 228);
++            CHECK(cultists == 10 && civilians == 5 && bosses == 1 && failed == 0 && unsupported == 0 && created == 204);
++            CHECK(g.objects.snapshot().size() == 227 && g.enter_player(e) && g.objects.snapshot().size() == 230);
+             for (int tick = 0; tick < 600; ++tick)
+             {
+                 CHECK(g.step(1.0 / 60));
+                 if (!tick)
+-                    CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
++                    CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11);
+             }
+             std::uint64_t updates = 0, pings = 0;
+             for (auto id : g.objects.snapshot())
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index eeaedac..b54f14e 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -393,9 +393,9 @@ namespace
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+             ++entries[e.state];
+-        CHECK(entries[EntryState::Created] == 203 && entries[EntryState::EditorOnly] == 372 &&
+-              entries[EntryState::Unsupported] == 1 && entries[EntryState::Failed] == 0 &&
+-              g.objects.snapshot().size() == 225);
++        CHECK(entries[EntryState::Created] == 204 && entries[EntryState::EditorOnly] == 372 &&
++              entries[EntryState::Unsupported] == 0 && entries[EntryState::Failed] == 0 &&
++              g.objects.snapshot().size() == 227);
+         std::cout << "Subway instances=" << g.objects.snapshot().size() << "\n";
+         for (auto [state, n] : entries)
+             std::cout << "state=" << int(state) << " count=" << n << '\n';
+diff --git a/tests/camera_tests.cpp b/tests/camera_tests.cpp
+index d6da0a7..e703f98 100644
+--- a/tests/camera_tests.cpp
++++ b/tests/camera_tests.cpp
+@@ -291,7 +291,7 @@ namespace
+         CHECK(worlds == 57 && entries == 61 && created == 61 && rejected == 0);
+         CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+         CHECK(CameraObj::m_dwNumCameras == 2 && g.server.camera_effects.size() == 2 &&
+-              g.objects.snapshot().size() == 228);
++              g.objects.snapshot().size() == 230);
+         CHECK(test_camera::complete_subway_intro(g));
+         for (auto id : g.objects.snapshot())
+             if (auto* r = g.objects.get(id); r && dynamic_cast<CameraObj*>(r->game.get()))
+diff --git a/tests/cinematic_tests.cpp b/tests/cinematic_tests.cpp
+index 9daeff3..47c155d 100644
+--- a/tests/cinematic_tests.cpp
++++ b/tests/cinematic_tests.cpp
+@@ -338,9 +338,9 @@ namespace
+             std::map<EntryState, unsigned> counts;
+             for (const auto& e : g.entries)
+                 ++counts[e.state];
+-            CHECK(counts[EntryState::Created] == 203 && counts[EntryState::EditorOnly] == 372 &&
+-                  counts[EntryState::Unsupported] == 1 && counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228);
++            CHECK(counts[EntryState::Created] == 204 && counts[EntryState::EditorOnly] == 372 &&
++                  counts[EntryState::Unsupported] == 0 && counts[EntryState::Failed] == 0);
++            CHECK(g.objects.snapshot().size() == 227 && g.enter_player(error) && g.objects.snapshot().size() == 230);
+             HOBJECT target = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (std::string_view(g.objects.get(id)->state.m_Name) == "cintrig1")
+@@ -359,7 +359,7 @@ namespace
+             for (unsigned i = 0; i < 6; ++i)
+                 CHECK(g.step(1.0 / 60));
+             v = g.server.audio.get(id);
+-            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 230 &&
++            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 232 &&
+                   g.objects.attachments().size() == 11);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_clips() && !g.server.audio.get(id) && !g.server.message_count() &&
+diff --git a/tests/corpse_tests.cpp b/tests/corpse_tests.cpp
+index c2df7b4..30df380 100644
+--- a/tests/corpse_tests.cpp
++++ b/tests/corpse_tests.cpp
+@@ -151,6 +151,13 @@ namespace
+         CHECK(!a->DispatchState() && !a->m_bRemoveMe && (g.server.GetObjectFlags(h) & FLAG_VISIBLE));
+         CHECK(g.objects.finish_frame() && g.objects.snapshot().size() == before && a->corpses_created == 0);
+         a->m_vScale = {1, 1, 1};
++        DVector penetrating{0, 59, 0};
++        CHECK(g.server.TeleportObject(h, &penetrating) == DE_OK && a->m_MoveObj.Update());
++        CHECK(!a->DispatchState() && !a->m_bRemoveMe && (g.server.GetObjectFlags(h) & FLAG_VISIBLE));
++        CHECK(g.objects.finish_frame() && g.objects.snapshot().size() == before && a->corpses_created == 0);
++        CHECK(!a->death_error.empty() && !a->last_corpse);
++        DVector clear{0, 60, 0};
++        CHECK(g.server.TeleportObject(h, &clear) == DE_OK && a->m_MoveObj.Update());
+         a->m_nCorpseType = 9999;
+         CHECK(!a->DispatchState() && g.objects.snapshot().size() == before);
+         a->m_nCorpseType = 0;
+diff --git a/tests/energy_fixture.h b/tests/energy_fixture.h
+index bfc3ed9..df69a9a 100644
+--- a/tests/energy_fixture.h
++++ b/tests/energy_fixture.h
+@@ -74,10 +74,11 @@ namespace test_energy
+     inline Actor* actor(OpenBlood2::GameSession& g, DVector pos, bool gideon = false, DDWORD flags = FLAG_SOLID)
+     {
+         static OpenBlood2::ClassInfo owner{
+-            "Gideon", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
++            "EnergyGideonProbe", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
+         static OpenBlood2::ClassInfo target{
+             "EnergyTarget", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
+-        owner.parent = target.parent = g.objects.find_class("BaseClass");
++        owner.parent = g.objects.find_class("Gideon");
++        target.parent = g.objects.find_class("BaseClass");
+         auto& type = gideon ? owner : target;
+         if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
+             return nullptr;
+diff --git a/tests/entry_wait_test.cmake b/tests/entry_wait_test.cmake
+index d319121..c5fa52a 100644
+--- a/tests/entry_wait_test.cmake
++++ b/tests/entry_wait_test.cmake
+@@ -1,7 +1,7 @@
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --frames 12 --capture "${CAPTURE}"
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+ message("${out}${err}")
+-if(NOT status EQUAL 0 OR NOT out MATCHES "Session playback: waiting=12 time=0 npc-ready=15 npc-failed=0 npc-updates=0")
++if(NOT status EQUAL 0 OR NOT out MATCHES "Session playback: waiting=12 time=0 npc-ready=16 npc-failed=0 npc-updates=0")
+     message(FATAL_ERROR "Interactive world advanced before player entry: ${status}")
+ endif()
+ if(out MATCHES "Validation Error|VUID-" OR err MATCHES "Validation Error|VUID-")
+diff --git a/tests/exit_tests.cpp b/tests/exit_tests.cpp
+index 008ab2b..b9cd305 100644
+--- a/tests/exit_tests.cpp
++++ b/tests/exit_tests.cpp
+@@ -197,10 +197,10 @@ namespace
+             std::map<EntryState, unsigned> counts;
+             for (const auto& entry : g.entries)
+                 ++counts[entry.state];
+-            CHECK(counts[EntryState::Created] == 203 && counts[EntryState::Unsupported] == 1 &&
++            CHECK(counts[EntryState::Created] == 204 && counts[EntryState::Unsupported] == 0 &&
+                   counts[EntryState::WorldSound] == 4 && counts[EntryState::EditorOnly] == 372 &&
+                   counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228);
++            CHECK(g.objects.snapshot().size() == 227 && g.enter_player(error) && g.objects.snapshot().size() == 230);
+             unsigned exits = 0;
+             for (const auto& entry : g.entries)
+             {
+@@ -228,10 +228,10 @@ namespace
+                 CHECK(t->deliveries == 0 && g.step(.05) && t->deliveries == 1);
+             }
+             CHECK(exits == 1);
+-            CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
++            CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11);
+             CHECK(g.client_shell.world_exit.received == 1 && g.client_shell.world_exit.blocked == 1);
+             CHECK(g.world_path == "worlds/01_subwaya.dat" && g.client_shell.m_bInWorld);
+-            CHECK(!g.run_world(error) && error.find("1 uninstantiated") != std::string::npos);
++            CHECK(!g.run_world(error) && error.find("0 uninstantiated") != std::string::npos);
+             CHECK(g.unload_world() && g.server.string_count() == 0 && g.objects.snapshot().empty());
+         }
+         return true;
+diff --git a/tests/gideon_fixture.h b/tests/gideon_fixture.h
+index 28d21f6..aea0546 100644
+--- a/tests/gideon_fixture.h
++++ b/tests/gideon_fixture.h
+@@ -27,8 +27,8 @@ namespace test_gideon
+     {
+         using namespace OpenBlood2;
+         static ClassInfo type{
+-            "Gideon", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
+-        type.parent = g.objects.find_class("CBaseCharacter");
++            "DiagnosticGideon", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
++        type.parent = g.objects.find_class("Gideon");
+         if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
+             return nullptr;
+         ObjectCreateStruct state;
+diff --git a/tests/gideon_runtime_tests.cpp b/tests/gideon_runtime_tests.cpp
+new file mode 100644
+index 0000000..1de80c9
+--- /dev/null
++++ b/tests/gideon_runtime_tests.cpp
+@@ -0,0 +1,397 @@
++#include "game/game_settings.h"
++#include "gideon_fixture.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    // Synthetic node table for precise packet/order tests. Private tests below
++    // use the production factory and external ABC, without injected initialization.
++    test_gideon::Actor* probe(GameSession& g)
++    {
++        auto* a = test_gideon::actor(g, false, {0, 100, 0});
++        if (!a)
++            return nullptr;
++        auto model = std::make_shared<Model>();
++        ModelAnimation clip;
++        clip.name = "idle";
++        clip.dimensions = {20, 20, 20};
++        clip.duration = 100;
++        clip.keys.resize(2);
++        clip.keys[1].time = 100;
++        for (unsigned i = 0; i < 18; ++i)
++        {
++            ModelNode n;
++            n.name = szNodes[i];
++            n.index = i;
++            model->nodes.push_back(n);
++            NodeAnimation node;
++            node.frames = {{{float(i) * 4, 0, 0}, {}}, {{float(i) * 4, 0, 0}, {}}};
++            clip.nodes.push_back(node);
++        }
++        model->animations.push_back(clip);
++        auto* r = g.objects.get(a->m_hObject);
++        r->model = model;
++        r->dimensions = clip.dimensions;
++        auto table = std::make_shared<CAnim_Sound>();
++        table->hit_spheres_valid = true;
++        table->m_fHitSpheres.fill(1);
++        if (!a->InitStatics(table))
++            return nullptr;
++        a->ConfigureRuntime(AI_Mgr::NPCType::Gideon);
++        a->runtime_initialized = true;
++        a->m_nState = AI_Mgr::StateInactive;
++        a->m_damage.SetHitPoints(100);
++        a->m_damage.SetArmorPoints(0);
++        a->m_damage.m_fMaxHitPoints = 100;
++        a->m_damage.ai_hit_localization = true;
++        a->m_fFullHealth = 100;
++        a->m_vDims = clip.dimensions;
++        return a;
++    }
++    bool defaults(const char* root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto* type = g.objects.find_class("Gideon");
++        CHECK(type);
++        {
++            auto object = type->construct();
++            auto* a = dynamic_cast<Gideon*>(object.get());
++            CHECK(a && a->npc_type == AI_Mgr::NPCType::Gideon && !a->m_bCabal);
++            CHECK(a->npc_hp == 4000 && a->npc_armor == 200 && a->npc_random_hp == 0);
++            CHECK(a->m_fHearingDist == 0 && a->m_fSensingDist == 10000 && a->m_fSeeingDist == 10000);
++            CHECK(a->m_fWalkSpeed == 75 && a->m_fRunSpeed == 180 && a->m_fRollSpeed == 3.5f && a->m_dwFlags == 0x20);
++            CHECK(a->npc_weapons[0] == "GIDEON_SHIELD" && a->npc_weapons[3] == "GIDEON_WIND");
++            CHECK(!a->m_damage.apply_damage_physics && a->m_fFullHealth == 0 && a->m_bCreateHealth);
++        }
++        const auto count = g.objects.snapshot().size();
++        CHECK(!g.server.IsObjectAlive(
++            g.objects.create(type, {}, Creation::World))); // Missing ABC must fail, never substitute.
++        CHECK(g.objects.finish_frame() && g.objects.snapshot().size() == count);
++        CHECK(!g.server.IsObjectAlive(g.objects.create(type, {}, Creation::Restore)));
++        CHECK(g.objects.finish_frame() && g.objects.snapshot().size() == count);
++        return true;
++    }
++    bool health(const char* root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto* a = probe(g);
++        CHECK(a);
++        a->m_damage.SetHitPoints(75);
++        CHECK(g.objects.engine_message(a->m_hObject, MID_UPDATE, nullptr));
++        CHECK(a->health_no_client == 1 && a->health_deliveries == 0 && a->boss_health_fraction == .75f &&
++              a->m_bCreateHealth);
++        CHECK(g.objects.engine_message(a->m_hObject, MID_UPDATE, nullptr) && a->health_requests == 2);
++        a->m_fFullHealth = 0;
++        CHECK(g.objects.engine_message(a->m_hObject, MID_UPDATE, nullptr));
++        CHECK(!a->m_bCreateHealth && a->m_fFullHealth == 75 && a->boss_health_fraction == 1);
++        CHECK(g.objects.engine_message(a->m_hObject, MID_UPDATE, nullptr) && a->health_requests == 3);
++        a->m_bCreateHealth = true;
++        a->m_fFullHealth = std::numeric_limits<float>::quiet_NaN();
++        g.objects.engine_message(a->m_hObject, MID_UPDATE, nullptr);
++        CHECK(a->runtime_failed && a->health_result == DE_INVALIDPARAMS && !a->health_error.empty());
++        CHECK(!g.objects.get(a->m_hObject)->scheduled);
++        for (bool denominator : {false, true})
++        {
++            auto* invalid = probe(g);
++            CHECK(invalid);
++            if (denominator)
++                invalid->m_fFullHealth = std::numeric_limits<float>::infinity();
++            else
++            {
++                invalid->m_fFullHealth = 0; // The initial full-health packet must not hide invalid HP.
++                invalid->m_damage.m_fHitPoints = std::numeric_limits<float>::infinity();
++            }
++            g.objects.engine_message(invalid->m_hObject, MID_UPDATE, nullptr);
++            CHECK(invalid->runtime_failed && invalid->health_result == DE_INVALIDPARAMS &&
++                  invalid->health_deliveries == 0 && invalid->health_no_client == 0);
++            CHECK(!g.objects.get(invalid->m_hObject)->scheduled);
++        }
++        return true;
++    }
++    bool client(const char* root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        std::string error;
++        CHECK(g.server.SendBossHealth({.5f}) == DE_NOTFOUND);
++        CHECK(g.enter_player(error));
++        for (float f : {1.f, .5f, 0.f, -1.f, 4001.f})
++        {
++            const auto before = g.client_shell.boss_health_messages;
++            CHECK(g.server.SendBossHealth({f}) == DE_OK && g.pump_player_messages(error));
++            CHECK(g.client_shell.boss_health_messages == before + 1 && g.client_shell.boss_health.fraction == f);
++            CHECK(g.client_shell.boss_health_visible == (f > 0 && f < 1));
++        }
++        const float bad = std::numeric_limits<float>::quiet_NaN();
++        CHECK(g.server.SendBossHealth({bad}) == DE_INVALIDPARAMS);
++        CHECK(!g.client_shell.OnMessage(BossHealth{bad}, g.server_shell));
++        auto* a = probe(g);
++        CHECK(a);
++        a->m_damage.SetHitPoints(25);
++        CHECK(g.objects.engine_message(a->m_hObject, MID_UPDATE, nullptr) && a->health_deliveries == 1);
++        CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame() && g.pump_player_messages(error));
++        CHECK(g.client_shell.boss_health.fraction == .25f &&
++              g.client_shell.boss_health_visible); // Owned packet survives sender.
++        for (unsigned i = 0; i < 256; ++i)
++            CHECK(g.server.SendBossHealth({.1f}) == DE_OK);
++        CHECK(g.server.SendBossHealth({.1f}) == DE_ERROR);
++        auto* blocked = probe(g);
++        CHECK(blocked);
++        g.objects.engine_message(blocked->m_hObject, MID_UPDATE, nullptr);
++        CHECK(blocked->runtime_failed && blocked->health_result == DE_ERROR && !blocked->health_error.empty());
++        CHECK(g.unload_world());
++        CHECK(!g.client_shell.boss_health_visible && g.client_shell.boss_health_messages == 0);
++        CHECK(g.server.SendBossHealth({.5f}) == DE_NOTFOUND);
++        return true;
++    }
++    bool send(GameSession& g, HOBJECT target, HOBJECT sender, float amount)
++    {
++        auto m = g.server.StartMessageToObject(g.server.HandleToObject(sender), target, damage_message);
++        return m && g.server.WriteDamage(m, {{0, 0, 1}, {8, 100, -1}, amount, DamageType::Normal, sender}) == DE_OK &&
++               g.server.EndMessage(m) == DE_OK;
++    }
++    bool damage(const char* root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto* a = probe(g);
++        CHECK(a);
++        auto sender = g.objects.create(g.objects.find_class("BaseClass"));
++        CHECK(sender);
++        CHECK(send(g, a->m_hObject, sender, 20));
++        CHECK(a->m_damage.m_fHitPoints == 80 && a->m_damage.accepted_damage == 1 && a->damage_specials == 0);
++        CHECK(a->m_nState == AI_Mgr::StateRecoil && a->health_requests == 1 && a->boss_health_fraction == .8f);
++        CHECK(send(g, a->m_hObject, sender, 1));
++        CHECK(a->m_damage.m_fHitPoints == 79 && a->m_damage.accepted_damage == 2 && a->damage_specials == 1);
++        CHECK(a->m_nState == AI_Mgr::StateRecoil &&
++              a->damage_reactions == 2); // Gideon Special1 precedes base ALWAYSRECOIL.
++        CHECK(a->AI_STATE_Recoil() && a->m_nState == AI_Mgr::StateSpecial1);
++        a->m_damage.can_damage = false;
++        CHECK(send(g, a->m_hObject, sender, 100) && a->health_requests == 2 && a->damage_specials == 1);
++        CHECK(a->m_damage.m_fHitPoints == 79 && !a->runtime_failed && g.server.message_count() == 0);
++        a->m_damage.can_damage = true;
++        a->m_fFullHealth = 0;
++        CHECK(send(g, a->m_hObject, sender, 1));
++        CHECK(a->m_damage.m_fHitPoints == 78 && a->m_damage.accepted_damage == 3 && a->runtime_failed);
++        CHECK(a->health_result == DE_INVALIDPARAMS && !a->health_error.empty() && a->damage_reactions == 2);
++        return true;
++    }
++    class Callback : public BaseClass
++    {
++      public:
++        std::function<void()> action;
++
++      protected:
++        DDWORD ObjectMessageFn(HOBJECT, DDWORD message, HMESSAGEREAD) override
++        {
++            if (message == 1000 && action)
++                action();
++            return 1;
++        }
++    };
++    bool lifetime(const char* root)
++    {
++        for (bool remove : {false, true})
++        {
++            GameSession g;
++            CHECK(test_player::setup(g, root));
++            auto* a = probe(g);
++            CHECK(a);
++            static ClassInfo type{"BossDamageCallback",
++                                  nullptr,
++                                  []() -> std::unique_ptr<BaseClass> { return std::make_unique<Callback>(); },
++                                  {}};
++            type.parent = g.objects.find_class("BaseClass");
++            CHECK(g.objects.register_class(type));
++            ObjectCreateStruct s;
++            SAFE_STRCPY(s.m_Name, "boss_callback");
++            auto h = g.objects.create(&type, s);
++            auto* cb = dynamic_cast<Callback*>(g.server.HandleToObject(h));
++            CHECK(cb);
++            auto target = a->m_hObject;
++            bool nested = false;
++            const auto strings = g.server.string_count();
++            cb->action = [&]
++            {
++                nested = send(g, target, h, 100);
++                if (remove)
++                    g.server.RemoveObject(target);
++            };
++            a->m_damage.damage_target = "boss_callback";
++            a->m_damage.damage_message = "TRIGGER";
++            CHECK(send(g, target, h, 25) && nested && a->m_damage.accepted_damage == 1 &&
++                  a->m_damage.m_fHitPoints == 75);
++            CHECK(a->health_requests == (remove ? 0 : 1) && a->damage_specials == (remove ? 0 : 1));
++            CHECK(g.server.IsObjectAlive(target) != remove && g.server.message_count() == 0 &&
++                  g.server.string_count() == strings);
++            CHECK(g.unload_world() && g.objects.snapshot().empty());
++        }
++        return true;
++    }
++    bool mount(GameSession& g, const char* root)
++    {
++        CHECK(g.initialize() && test_gideon::floor(g));
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        return true;
++    }
++    Gideon* production(GameSession& g, DVector pos = {0, 100, 500}, const char* state = "INACTIVE")
++    {
++        auto h = g.objects.create(g.objects.find_class("Gideon"), {}, Creation::World,
++                                  {{"Pos", pos}, {"AIState", std::string(state)}, {"RandomHitPoints", 1.f}});
++        return g.server.IsObjectAlive(h) ? dynamic_cast<Gideon*>(g.server.HandleToObject(h)) : nullptr;
++    }
++    bool profile(const char* root)
++    {
++        for (int difficulty = 0; difficulty < 3; ++difficulty)
++        {
++            GameSession g;
++            CHECK(mount(g, root));
++            g.server.set_game_settings(difficulty, 0);
++            auto* a = production(g);
++            CHECK(a);
++            auto* r = g.objects.get(a->m_hObject);
++            const float factor = difficulty == 0 ? .25f : difficulty == 2 ? 1.5f : 1.f;
++            DVector initial;
++            CHECK(g.server.GetModelAnimUserDims(a->m_hObject, &initial, 0) == DE_OK);
++            CHECK(a->RuntimeReady() && r->model &&
++                  std::abs(r->state.m_Pos.y - (100 + initial.y * (a->m_vScale.y - 1))) < .003f &&
++                  !(r->state.m_Flags & FLAG_GRAVITY));
++            CHECK(a->m_damage.m_fHitPoints == 4001 * factor && a->m_damage.m_fArmorPoints == 200 * factor);
++            CHECK(a->m_fFullHealth == 1 && a->m_bCreateHealth && a->m_InventoryMgr.damage_multiplier == factor);
++            CHECK(dynamic_cast<CGideonShield*>(a->m_InventoryMgr.CurrentWeapon()) != nullptr);
++            CHECK(a->AnimSound()->GetSoundRoot() == "sounds/enemies/Gideon" && a->m_MoveObj.initialized);
++            CHECK(a->m_damage.ai_hit_localization && !a->m_damage.apply_damage_physics &&
++                  a->m_InventoryMgr.m_nAttribStrength == 10);
++            constexpr DBYTE weapon_ids[]{WEAP_GIDEON_SHIELD, WEAP_ZEALOT_ENERGYBLAST, WEAP_NAGA_EYEBEAM,
++                                         WEAP_GIDEON_WIND};
++            for (unsigned slot = 0; slot < 4; ++slot)
++                CHECK(a->m_InventoryMgr.GetWeapon(slot) &&
++                      a->m_InventoryMgr.GetWeapon(slot)->data.m_nType == weapon_ids[slot]);
++            auto* second = production(g, {500, 300, 500});
++            CHECK(second && second->AnimSound() == a->AnimSound());
++            CHECK(g.objects.advance(.016) && a->runtime_updates == 1 && a->boss_health_fraction == 4001 * factor);
++            std::cout << "Gideon difficulty=" << difficulty << " hp=" << a->m_damage.m_fHitPoints
++                      << " captured=" << a->m_fFullHealth << " ratio=" << a->boss_health_fraction << '\n';
++            CHECK(g.unload_world());
++            AI_Mgr::RuntimeTables tables;
++            AI_Mgr::ExchangeRuntimeTables(tables);
++            for (const auto& t : tables)
++                CHECK(!t);
++        }
++        return true;
++    }
++    bool subway(const char* root)
++    {
++        GameSession g;
++        CHECK(mount(g, root));
++        std::string error;
++        ObjectId previous{};
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && !g.objects.get(previous));
++            Gideon* boss = nullptr;
++            unsigned created = 0, failed = 0, unknown = 0, npcs = 0;
++            for (const auto& e : g.entries)
++            {
++                created += e.state == EntryState::Created;
++                failed += e.state == EntryState::Failed;
++                unknown += e.state == EntryState::Unsupported;
++            }
++            for (auto id : g.objects.snapshot())
++            {
++                auto* base = g.objects.get(id)->game.get();
++                npcs += dynamic_cast<AI_Mgr*>(base) != nullptr;
++                if (auto* a = dynamic_cast<Gideon*>(base))
++                {
++                    CHECK(!boss);
++                    boss = a;
++                    previous = id;
++                }
++            }
++            std::cout << "SubwayA created=" << created << " unknown=" << unknown << " failed=" << failed
++                      << " npcs=" << npcs << " objects=" << g.objects.snapshot().size() << '\n';
++            CHECK(boss && boss->RuntimeReady() && created == 204 && !failed && !unknown && npcs == 16);
++            CHECK(g.server.GetAnimIndex(boss->m_hObject, "TALKING_02") == 19);
++            CHECK(g.enter_player(error));
++            std::cout << "Entered objects=" << g.objects.snapshot().size() << '\n';
++            for (unsigned tick = 0; tick < 600; ++tick)
++            {
++                CHECK(g.step(1. / 60));
++                if (!tick)
++                    std::cout << "First tick objects=" << g.objects.snapshot().size()
++                              << " attachments=" << g.objects.attachments().size() << '\n';
++            }
++            const auto* boss_record = g.objects.get(previous);
++            CHECK(boss_record && boss_record->life == Life::Alive && boss_record->game.get() == boss);
++            std::cout << "Boss activity=" << boss_record->activity << " pings=" << boss_record->activation_pings
++                      << " animation=" << boss_record->animation.animation << '\n';
++            std::cout << "Boss updates=" << boss->runtime_updates << " state=" << boss->m_nState
++                      << " health messages=" << g.client_shell.boss_health_messages << " error=" << boss->runtime_error
++                      << '\n';
++            if (boss->runtime_failed)
++            {
++                auto* r = g.objects.get(boss->m_hObject);
++                std::cerr << "Script arg=" << boss->CurrentScriptCommand().argument
++                          << " State error=" << boss->state_error << " requested clip=" << boss->requested_animation
++                          << " pos=" << r->state.m_Pos.x << "," << r->state.m_Pos.y << "," << r->state.m_Pos.z
++                          << " dims=" << r->dimensions.x << "," << r->dimensions.y << "," << r->dimensions.z
++                          << " flags=" << r->state.m_Flags << '\n';
++                for (unsigned i = 0; i < r->model->animations.size(); ++i)
++                    std::cerr << i << ":" << r->model->animations[i].name << " ";
++                std::cerr << '\n';
++            }
++            CHECK(boss->RuntimeReady() && boss->runtime_updates > 0 && g.client_shell.boss_health_messages > 0);
++            CHECK(!g.run_world(error));
++            CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.objects.get(previous));
++            CHECK(!AI_Mgr::m_dwNumMonster && !AI_Mgr::m_dwNumCabal && !CDestructable::m_dwNumDestructables);
++        }
++        return true;
++    }
++    bool arena(const char* root)
++    {
++        GameSession g;
++        CHECK(mount(g, root));
++        std::string error;
++        g.server.set_game_settings(1, 0);
++        g.world_path = "synthetic Gideon arena";
++        g.state = SessionState::Inspection;
++        CHECK(g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
++                               {{"Name", std::string("START")}, {"Pos", DVector{0, 100, 0}}}));
++        auto* a = production(g, {0, 100, 500}, "IDLE");
++        CHECK(a);
++        g.server_shell.PreStartWorld();
++        CHECK(g.server_shell.PostStartWorld() && g.enter_player(error));
++        g.server_shell.Player(g.local_client)->m_damage.m_bGodMode =
++            true; // Observe the boss without ending this bounded arena.
++        for (unsigned i = 0; i < 1800 && !a->fire_shots; ++i)
++            CHECK(g.step(1. / 60));
++        std::cout << "Arena updates=" << a->runtime_updates << " attack=" << a->attack_updates
++                  << " shots=" << a->fire_shots << " state=" << a->m_nState << " error=" << a->runtime_error << '\n';
++        CHECK(a->RuntimeReady() && a->runtime_updates > 0 && a->attack_updates > 0 && a->fire_shots > 0);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    const std::map<std::string, std::function<bool(const char*)>> tests{
++        {"defaults", defaults}, {"health", health},   {"client", client}, {"damage", damage},
++        {"lifetime", lifetime}, {"profile", profile}, {"subway", subway}, {"arena", arena}};
++    if (argc != 3 || !tests.contains(argv[1]))
++        return 2;
++    return tests.at(argv[1])(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/gideon_teleport_gpu_tests.cpp b/tests/gideon_teleport_gpu_tests.cpp
+index 213d688..e1c4512 100644
+--- a/tests/gideon_teleport_gpu_tests.cpp
++++ b/tests/gideon_teleport_gpu_tests.cpp
+@@ -169,6 +169,30 @@ int main(int argc, char** argv)
+     CHECK(std::abs(record->state.m_Pos.x - start.x - 3.5f) < .003f && record->velocity.x == 3.5f);
+     CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame() && update_model_scene(g, view, error));
+     CHECK(view.entries.empty() && render(runtime, renderer, view, eye, camera, capture, again, error) && again == zero);
++    if (argc == 3)
++    {
++        // Production factory/scheduler with the actual external model. No inspector
++        // or manual AI dispatch drives this check; INACTIVE is an explicit fixture state.
++        auto boss_handle = g.objects.create(g.objects.find_class("Gideon"), {}, Creation::World,
++                                            {{"AIState", std::string("INACTIVE")}});
++        auto* boss = dynamic_cast<Gideon*>(g.server.HandleToObject(boss_handle));
++        CHECK(boss && boss->RuntimeReady() && g.step(.016));
++        const auto updates = boss->runtime_updates;
++        const auto health = boss->health_requests;
++        CHECK(updates == 1 && health == 1 && boss->health_no_client == 1);
++        CHECK(update_model_scene(g, view, error) && view.entries.size() == 1 && !view.world_draws.empty());
++        CHECK(render(runtime, renderer, view, eye, camera, capture, again, error) && again != zero);
++        CHECK(capture.save((std::filesystem::path(argv[1]) / "gideon-runtime.png").c_str()));
++        clock = g.objects.get(boss_handle)->animation.time;
++        CHECK(update_model_scene(g, view, error) && render(runtime, renderer, view, eye, camera, capture, half, error));
++        CHECK(again == half && boss->runtime_updates == updates && boss->health_requests == health &&
++              g.objects.get(boss_handle)->animation.time == clock);
++        CHECK(g.objects.remove(boss_handle) && g.objects.finish_frame() && update_model_scene(g, view, error));
++        CHECK(view.entries.empty() && render(runtime, renderer, view, eye, camera, capture, again, error) &&
++              again == zero);
++        std::cout << "Production Gideon: real initialization, scheduled AI_Update, no-audience health, read-only GPU "
++                     "and deferred removal verified.\n";
++    }
+     CHECK(g.unload_world());
+     view.clear();
+     renderer.clear_geometry();
+diff --git a/tests/keyframer_tests.cpp b/tests/keyframer_tests.cpp
+index 440ffcc..bbafcf9 100644
+--- a/tests/keyframer_tests.cpp
++++ b/tests/keyframer_tests.cpp
+@@ -361,17 +361,17 @@ namespace
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+             const float entered = g.server.GetTime();
+-            CHECK(g.objects.snapshot().size() == 228);
++            CHECK(g.objects.snapshot().size() == 230);
+             auto* list = g.server.FindNamedObjects("tracking1");
+             CHECK(list && list->m_pFirstLink);
+             auto h = list->m_pFirstLink->m_hObject;
+             g.server.RelinquishList(list);
+             auto* f = framer(g, h);
+             CHECK(g.step(1.0 / 60) && f->keys.size() == 2 && f->targets.size() == 1 && f->active && f->time == 0);
+-            CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
++            CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11);
+             auto camera = f->targets[0].object;
+             auto start = g.objects.get(camera)->state.m_Pos;
+-            CHECK(g.step(1.0 / 60) && f->targets[0].moves == 1 && f->processed == 1 && f->unresolved_messages == 1);
++            CHECK(g.step(1.0 / 60) && f->targets[0].moves == 1 && f->processed == 1 && f->unresolved_messages == 0);
+             CHECK(!close(start, g.objects.get(camera)->state.m_Pos));
+             auto expected =
+                 vector_add(f->keys[0].position, vector_scale(vector_subtract(f->keys[1].position, f->keys[0].position),
+diff --git a/tests/light_tests.cpp b/tests/light_tests.cpp
+index 4680fb7..05ad824 100644
+--- a/tests/light_tests.cpp
++++ b/tests/light_tests.cpp
+@@ -350,8 +350,8 @@ namespace
+         for (int cycle = 0; cycle < 2; ++cycle)
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+-            CHECK(g.objects.snapshot().size() == 228 && g.server.light_effects.size() == 12);
+-            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
++            CHECK(g.objects.snapshot().size() == 230 && g.server.light_effects.size() == 12);
++            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11);
+             KeyFramer* path = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (auto* f = dynamic_cast<KeyFramer*>(g.objects.get(id)->game.get());
+diff --git a/tests/model_gpu_tests.cpp b/tests/model_gpu_tests.cpp
+index 9277f34..f93fd84 100644
+--- a/tests/model_gpu_tests.cpp
++++ b/tests/model_gpu_tests.cpp
+@@ -176,7 +176,7 @@ int main(int argc, char** argv)
+         game.client_shell.weapons_visible = false;
+         ModelView scene;
+         CHECK(update_model_scene(game, scene, error));
+-        CHECK(scene.world_draws.size() == 27);
++        CHECK(scene.world_draws.size() == 28); // Includes the original Gideon model.
+         const auto* player = game.objects.get(game.client_shell.player);
+         CHECK(player);
+         DVector eye = player->state.m_Pos;
+diff --git a/tests/model_view_tests.cpp b/tests/model_view_tests.cpp
+index 25908a1..3b730a5 100644
+--- a/tests/model_view_tests.cpp
++++ b/tests/model_view_tests.cpp
+@@ -179,7 +179,7 @@ namespace
+             for (const auto& entry : scene.entries)
+                 std::cout << entry.label << " visible=" << entry.visible << " triangles=" << entry.triangles
+                           << " error=" << entry.error << '\n';
+-            CHECK(scene.world_draws.size() == 27 && scene.close_draws.empty());
++            CHECK(scene.world_draws.size() == 28 && scene.close_draws.empty());
+             std::size_t failures = 0;
+             for (const auto& entry : scene.entries)
+             {
+@@ -215,8 +215,8 @@ namespace
+             CHECK(update_model_scene(g, scene, e));
+             for (const auto& entry : scene.entries)
+                 CHECK(!(entry.object.slot == id.slot && entry.object.generation == id.generation));
+-            CHECK(scene.world_draws.size() == 26 &&
+-                  scene.close_draws.empty()); // 25 NPC draws + independent player child.
++            CHECK(scene.world_draws.size() == 27 &&
++                  scene.close_draws.empty()); // 26 NPC draws (including Gideon) + independent player child.
+             CHECK(g.unload_world());
+             scene.clear();
+             CHECK(scene.revision > revision);
+diff --git a/tests/player_controls_tests.cpp b/tests/player_controls_tests.cpp
+index 6d4170e..e26c653 100644
+--- a/tests/player_controls_tests.cpp
++++ b/tests/player_controls_tests.cpp
+@@ -187,7 +187,15 @@ namespace
+             controls.look(g.client_shell.rotation, 1. / 60, false);
+             const auto fire = controls.sample_fire(false);
+             g.client_shell.weapon_input = {fire.primary, fire.alternate, false};
+-            return g.step(1. / 60);
++            const float hp_before = p->m_damage.m_fHitPoints;
++            if (g.step(1. / 60))
++                return true;
++            std::cerr << "Input session failed at " << g.objects.time() << " hp before " << hp_before << '\n';
++            for (const auto& line : g.trace)
++                std::cerr << "Trace " << line << '\n';
++            for (const auto& line : g.objects.diagnostics())
++                std::cerr << "Object " << line << '\n';
++            return false;
+         };
+         auto steps = [&](unsigned count)
+         {
+@@ -229,7 +237,11 @@ namespace
+         else
+         {
+             const auto before = w->shots;
+-            CHECK(event(key(SDL_SCANCODE_G, true, id)) && steps(90) && w->shots > before);
++            CHECK(event(key(SDL_SCANCODE_G, true, id)) && steps(90));
++            std::cout << "Alternate input: hp=" << p->m_damage.m_fHitPoints << " dead=" << p->m_damage.IsDead()
++                      << " ammo=" << p->m_InventoryMgr.GetAmmoCount(1) << " shots=" << w->shots << " before=" << before
++                      << '\n';
++            CHECK(w->shots > before);
+             CHECK(event(key(SDL_SCANCODE_G, false, id)) && steps(60));
+         }
+         CHECK(w->sounds_played == w->shots && !w->sound_failures);
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index 7b177fa..e5d31e7 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -204,14 +204,15 @@ namespace
+             CHECK(player);
+             CHECK(game.objects.get(player->m_hObject)->model->animations.size() == 86);
+             CHECK(game.objects.snapshot().size() ==
+-                  228); // 203 source + 7 door children + 15 NPC muzzle lights + player/muzzle/scent.
++                  230); // 204 source + 7 door children + 16 NPC muzzle lights + player/muzzle/scent.
+             CHECK(game.client_shell.position.x == -32 && game.client_shell.position.z == -3224);
+             CHECK(std::abs(game.client_shell.position.y - 170) < .01f);
+             for (int frame = 0; frame < 120; ++frame)
+                 CHECK(game.step(1.0 / 60.0));
+             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
+             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
+-            CHECK(!game.run_world(error) && error.find("1 uninstantiated") != std::string::npos);
++            CHECK(!game.run_world(error) && error.find("0 uninstantiated") != std::string::npos &&
++                  error.find("keep-alive level transfer") != std::string::npos);
+             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
+                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
+                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()
+diff --git a/tests/random_sound_tests.cpp b/tests/random_sound_tests.cpp
+index 6b5fcfc..b89905b 100644
+--- a/tests/random_sound_tests.cpp
++++ b/tests/random_sound_tests.cpp
+@@ -318,9 +318,9 @@ namespace
+             std::map<EntryState, unsigned> counts;
+             for (const auto& e : g.entries)
+                 ++counts[e.state];
+-            CHECK(counts[EntryState::Created] == 203 && counts[EntryState::Unsupported] == 1 &&
++            CHECK(counts[EntryState::Created] == 204 && counts[EntryState::Unsupported] == 0 &&
+                   counts[EntryState::EditorOnly] == 372 && !counts[EntryState::Failed]);
+-            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228);
++            CHECK(g.objects.snapshot().size() == 227 && g.enter_player(error) && g.objects.snapshot().size() == 230);
+             std::vector<HOBJECT> targets;
+             for (auto id : g.objects.snapshot())
+                 if (dynamic_cast<RandomSoundFX*>(g.objects.get(id)->game.get()))
+@@ -346,7 +346,7 @@ namespace
+                 std::cout << "cycle=" << cycle << " name=" << g.objects.get(h)->state.m_Name
+                           << " sound=" << v->request.resource << '\n';
+             }
+-            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 230 &&
++            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 232 &&
+                   g.objects.attachments().size() == 11);
+             CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips() &&
+                   !g.server.audio.get(last) && g.objects.snapshot().empty() && !g.server.message_count() &&
+diff --git a/tests/scene_explosion_tests.cpp b/tests/scene_explosion_tests.cpp
+index b58398f..6b4ea95 100644
+--- a/tests/scene_explosion_tests.cpp
++++ b/tests/scene_explosion_tests.cpp
+@@ -312,12 +312,12 @@ namespace
+                 ++n;
+                 CHECK(e.state == EntryState::Created);
+             }
+-            CHECK(n == 9 && counts[EntryState::Created] == 203 && counts[EntryState::WorldSound] == 4 &&
+-                  counts[EntryState::EditorOnly] == 372 && counts[EntryState::Unsupported] == 1 &&
++            CHECK(n == 9 && counts[EntryState::Created] == 204 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::EditorOnly] == 372 && counts[EntryState::Unsupported] == 0 &&
+                   counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228 &&
++            CHECK(g.objects.snapshot().size() == 227 && g.enter_player(error) && g.objects.snapshot().size() == 230 &&
+                   g.step(.02));
+-            CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
++            CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11);
+             auto* player = g.server_shell.Player(g.local_client);
+             CHECK(player);
+             auto health = player->m_damage.m_fHitPoints;
+@@ -334,7 +334,7 @@ namespace
+             CHECK(g.server.scene_explosions.size() == 9 && player->m_damage.m_fHitPoints == health && g.step(.11));
+             for (auto h : emitted)
+                 CHECK(!g.objects.get(h));
+-            CHECK(!g.run_world(error) && error.find("1 uninstantiated") != std::string::npos);
++            CHECK(!g.run_world(error) && error.find("0 uninstantiated") != std::string::npos);
+             CHECK(g.unload_world() && g.server.scene_explosions.empty() && g.server.audio.voices().empty() &&
+                   g.server.string_count() == 0 && g.server.message_count() == 0 && g.server.list_count() == 0);
+             std::cout << "cycle=" << cycle
+diff --git a/tests/services_tests.cpp b/tests/services_tests.cpp
+index 3110d3d..7ffb3d0 100644
+--- a/tests/services_tests.cpp
++++ b/tests/services_tests.cpp
+@@ -33,6 +33,12 @@ namespace
+         CHECK(m.vertices.size() == 3 && m.faces[0].vertices[2] == 2);
+         CHECK(m.faces[0].uv[1][0] == 1);
+         CHECK(animation_index(m, "walk") == 0 && animation_index(m, "missing") == no_animation);
++        CHECK(animation_index(m, "WaLk") == 0 && animation_index(m, "WALK") == 0);
++        CHECK(animation_index(m, "wal") == no_animation && animation_index(m, "walk ") == no_animation);
++        auto duplicate = m;
++        duplicate.animations.push_back(m.animations[0]);
++        duplicate.animations.back().name = "WALK";
++        CHECK(animation_index(duplicate, "WALK") == 0); // Same first-match rule as the reference engine.
+         std::vector<NodePose> pose;
+         CHECK(sample_pose(m, 0, 25, pose));
+         CHECK(std::abs(pose[1].position.x - 5) < .0001 && pose[1].position.y == 2);
+diff --git a/tests/session_playback_tests.cpp b/tests/session_playback_tests.cpp
+index 40778a0..f2c2237 100644
+--- a/tests/session_playback_tests.cpp
++++ b/tests/session_playback_tests.cpp
+@@ -40,7 +40,7 @@ namespace
+                 CHECK(a->RuntimeReady() && (!untouched || !a->runtime_updates));
+                 ++count;
+             }
+-        CHECK(count == 15);
++        CHECK(count == 16);
+         return true;
+     }
+     bool private_entry(const char* root)
+diff --git a/tests/sound_tests.cpp b/tests/sound_tests.cpp
+index b1935c9..c555407 100644
+--- a/tests/sound_tests.cpp
++++ b/tests/sound_tests.cpp
+@@ -349,12 +349,12 @@ namespace
+                     CHECK(v->clip->rate == 22050 && v->clip->frames() == 198623 && v->clip->channels == 1);
+                 }
+             }
+-            CHECK(ids.size() == 4 && counts[EntryState::Created] == 203 && counts[EntryState::WorldSound] == 4 &&
+-                  counts[EntryState::Unsupported] == 1 && counts[EntryState::EditorOnly] == 372 &&
++            CHECK(ids.size() == 4 && counts[EntryState::Created] == 204 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::Unsupported] == 0 && counts[EntryState::EditorOnly] == 372 &&
+                   !counts[EntryState::Failed]);
+-            CHECK(g.objects.snapshot().size() == 225 && g.server.audio.voices().size() == 4 &&
++            CHECK(g.objects.snapshot().size() == 227 && g.server.audio.voices().size() == 4 &&
+                   g.server.audio.cached_clips() == 1);
+-            CHECK(g.enter_player(error) && g.objects.snapshot().size() == 228 && g.step(1.0 / 60));
++            CHECK(g.enter_player(error) && g.objects.snapshot().size() == 230 && g.step(1.0 / 60));
+             // Advance actual sample clocks across a full retail clip without adding unrelated physics work.
+             CHECK(g.server.advance_audio(20, {}, {}));
+             for (auto id : ids)
+@@ -366,7 +366,7 @@ namespace
+             const auto pos = g.server.audio.get(ids.front())->position;
+             CHECK(g.server.advance_audio(.02, pos, {}) && g.server.audio.peak > 0 &&
+                   g.server.audio.mixed_frames == 960);
+-            CHECK(!g.run_world(error) && error.find("1 uninstantiated") != std::string::npos);
++            CHECK(!g.run_world(error) && error.find("0 uninstantiated") != std::string::npos);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_clips());
+             for (auto id : ids)
+diff --git a/tests/sprite_tests.cpp b/tests/sprite_tests.cpp
+index 0488c7e..2917255 100644
+--- a/tests/sprite_tests.cpp
++++ b/tests/sprite_tests.cpp
+@@ -380,10 +380,10 @@ namespace
+                       !r->sprite->translucent);
+                 weak = r->sprite;
+             }
+-            CHECK(sprites == 12 && counts[EntryState::Created] == 203 && counts[EntryState::WorldSound] == 4 &&
+-                  counts[EntryState::Unsupported] == 1 && counts[EntryState::EditorOnly] == 372 &&
++            CHECK(sprites == 12 && counts[EntryState::Created] == 204 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::Unsupported] == 0 && counts[EntryState::EditorOnly] == 372 &&
+                   counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228 &&
++            CHECK(g.objects.snapshot().size() == 227 && g.enter_player(error) && g.objects.snapshot().size() == 230 &&
+                   g.step(.02));
+             for (auto id : g.objects.snapshot())
+             {
+@@ -391,8 +391,8 @@ namespace
+                 if (r->sprite)
+                     CHECK(r->sprite_track.frame == 0 && std::abs(r->sprite_track.milliseconds - 20) < 1e-6);
+             }
+-            CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11 && !g.run_world(error) &&
+-                  error.find("1 uninstantiated") != std::string::npos);
++            CHECK(g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11 && !g.run_world(error) &&
++                  error.find("0 uninstantiated") != std::string::npos);
+             CHECK(g.unload_world() && weak.expired() && g.objects.snapshot().empty() && g.server.string_count() == 0 &&
+                   g.server.message_count() == 0 && g.server.list_count() == 0);
+             std::cout << "cycle=" << cycle
+diff --git a/tests/weapon_tests.cpp b/tests/weapon_tests.cpp
+index 0ed4475..4eacd87 100644
+--- a/tests/weapon_tests.cpp
++++ b/tests/weapon_tests.cpp
+@@ -92,6 +92,12 @@ namespace
+               inv.m_nCurWeaponSlot == 1);
+         CHECK(inv.MaxAmmo(1) == 500 && inv.AddAmmo(1, 1000) == InventoryResult::Ok && inv.GetAmmoCount(1) == 500);
+         CHECK(inv.AddAmmo(1, 1) == InventoryResult::Full);
++        inv.SetStrength(10);
++        CHECK(inv.m_nAttribStrength == 10 && inv.MaxAmmo(1) == 600);
++        CHECK(inv.AddAmmo(1, 1000) == InventoryResult::Ok && inv.GetAmmoCount(1) == 600);
++        inv.SetStrength(255);
++        inv.SetStrength(7); // Decrease above the table range must not index beyond column five.
++        CHECK(inv.m_nAttribStrength == 7 && inv.MaxAmmo(1) == 600 && inv.GetAmmoCount(1) == 600);
+         inv.SetStrength(1);
+         CHECK(inv.GetAmmoCount(1) == 100);
+         CHECK(inv.AddAmmo(1, -1) == InventoryResult::Invalid && inv.AddAmmo(0, 1) == InventoryResult::Invalid);
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index 849f660..625d1e0 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -1,6 +1,6 @@
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 225 original instances, 116 BSP models")
++if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 227 original instances, 116 BSP models")
+     message(FATAL_ERROR "World inspection: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-player
+@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 1" OR NOT out MATCHES "remaining mover classes")
++if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 0" OR NOT out MATCHES "remaining mover classes")
+     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 375a279..95fe040 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -912,12 +912,12 @@ namespace
+                           << " triangles / " << d.collision_nodes << " collision nodes\n";
+                 CHECK(d.scan_complete && d.source_world == path && d.source_revision == revision);
+                 if (d.destination == "worlds/01_subwaya.dat")
+-                    CHECK(d.entries.size() == 580 && d.schema_checked == 207 && d.editor_only == 372 &&
+-                          d.unknown == 1 && d.invalid == 0 && d.models == 116);
++                    CHECK(d.entries.size() == 580 && d.schema_checked == 208 && d.editor_only == 372 &&
++                          d.unknown == 0 && d.invalid == 0 && d.models == 116);
+                 else
+                 {
+-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 247 && d.editor_only == 541 &&
+-                          d.unknown == 207 && d.invalid == 31 && d.models == 100 && d.triangles == 39724);
++                    CHECK(d.entries.size() == 1026 && d.schema_checked == 248 && d.editor_only == 541 &&
++                          d.unknown == 206 && d.invalid == 31 && d.models == 100 && d.triangles == 39724);
+                     for (const auto& e : d.entries)
+                         if (e.state == DestinationEntryState::InvalidProperties)
+                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+@@ -1100,7 +1100,7 @@ namespace
+             for (auto id : game.objects.snapshot())
+                 if (auto* a = dynamic_cast<AI_Mgr*>(game.objects.get(id)->game.get()))
+                     tables.emplace_back(a, a->AnimSound());
+-            CHECK(tables.size() == 15);
++            CHECK(tables.size() == 16);
+             CAnim_Sound* voiced_table = nullptr;
+             for (const auto& [actor, table] : tables)
+                 if (table->GetSoundRoot() == "sounds/enemies/m_cultist")
+@@ -1112,13 +1112,26 @@ namespace
+                 }
+             CHECK(voiced_table && voiced_table->m_hVoxSound);
+             const auto voice_id = voiced_table->m_hVoxSound;
++            CAnim_Sound* boss_table = nullptr;
++            for (const auto& [actor, table] : tables)
++                if (actor->npc_type == AI_Mgr::NPCType::Gideon)
++                {
++                    boss_table = const_cast<CAnim_Sound*>(table);
++                    CHECK(boss_table->PlayVoice(actor->m_hObject, "shield.wav", 1000, 100));
++                    break;
++                }
++            CHECK(boss_table && boss_table->m_hVoxSound);
++            const auto boss_voice = boss_table->m_hVoxSound;
++            const auto boss_messages = game.client_shell.boss_health_messages;
++            const auto boss_fraction = game.client_shell.boss_health.fraction;
+             // Explicit diagnostic audio, not a shot through the intro camera's input gate.
+             auto* weapon = player->m_InventoryMgr.CurrentWeapon();
+             weapon->PlayFireSound(false, game.client_shell.position);
+             const auto fire_voices = weapon->fire_sounds;
+             CHECK(weapon->sounds_played == 1 && game.server.audio.get(weapon->last_fire_sound));
+-            std::array<std::shared_ptr<CAnim_Sound>, 4> slots;
++            AI_Mgr::RuntimeTables slots;
+             AI_Mgr::ExchangeRuntimeTables(slots);
++            CHECK(slots[4] && slots[4].get() == boss_table);
+             auto original_slots = slots;
+             AI_Mgr::ExchangeRuntimeTables(slots);
+             const auto ids = game.objects.snapshot();
+@@ -1148,9 +1161,9 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 243 && d.unknown == 207 && d.failed == 35);
++                        CHECK(d.created == 244 && d.unknown == 206 && d.failed == 35);
+                     else
+-                        CHECK(d.created == 203 && d.unknown == 1 && d.failed == 0);
++                        CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }
+                 CHECK(game.objects.snapshot() == ids && game.local_client == client && game.world_revision == revision);
+                 CHECK(game.objects.time() == time && game.client_shell.player == player->m_hObject);
+@@ -1161,6 +1174,9 @@ namespace
+                 for (const auto& [ai, table] : tables)
+                     CHECK(ai->AnimSound() == table);
+                 CHECK(voiced_table->m_hVoxSound == voice_id && game.server.audio.get(voice_id));
++                CHECK(boss_table->m_hVoxSound == boss_voice && game.server.audio.get(boss_voice));
++                CHECK(game.client_shell.boss_health_messages == boss_messages &&
++                      game.client_shell.boss_health.fraction == boss_fraction);
+                 CHECK(weapon->fire_sounds == fire_voices);
+                 AI_Mgr::ExchangeRuntimeTables(slots);
+                 CHECK(slots == original_slots);
+@@ -1184,7 +1200,7 @@ namespace
+         CHECK(game.world.version == 56);
+         CHECK(game.world.objects.size() == 580);
+         CHECK(game.world.models.size() == 116);
+-        CHECK(game.objects.snapshot().size() == 225);
++        CHECK(game.objects.snapshot().size() == 227);
+         CHECK(game.world.models[0].points.size() == 4996);
+         CHECK(game.world.models[0].polygons.size() == 3367);
+         CHECK(game.resources.find(game.world_path)->overrides == 1);
+@@ -1201,8 +1217,10 @@ namespace
+                 CHECK(game.objects.get(id)->activity == OBJSTATE_INACTIVE);
+                 std::cout << "No-player NPC " << game.objects.get(id)->state.m_Name << ": " << a->runtime_error << '\n';
+             }
+-        CHECK(suspended == 3);
+-        CHECK(game.server.service_calls["SetObjectDims"] == 54);
++        std::cout << "No-player suspended=" << suspended << " dims calls=" << game.server.service_calls["SetObjectDims"]
++                  << '\n';
++        CHECK(suspended == 0); // Gideon supplies a real opposite-faction candidate; no self fallback.
++        CHECK(game.server.service_calls["SetObjectDims"] == 57);
+         CHECK(game.server.service_calls["GetPropGeneric"] > 0);
+         for (const auto& [name, count] : game.server.service_calls)
+             std::cout << "Service " << name << ": " << count << '\n';
+diff --git a/tests/worldpath_tests.cpp b/tests/worldpath_tests.cpp
+index dcc895f..6c216b1 100644
+--- a/tests/worldpath_tests.cpp
++++ b/tests/worldpath_tests.cpp
+@@ -352,7 +352,7 @@ namespace
+             }
+             CHECK(moves == 297 && blocked == 2 && !f->active && f->processed == 3 && close(r->state.m_Pos, last));
+             CHECK(!close(last, initial) && !close(last, vector_add(f->keys.back().position, f->targets[0].offset)));
+-            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 230 &&
++            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 232 &&
+                   g.objects.attachments().size() == 11);
+             std::cout << "cycle=" << cycle << " moves=" << moves << " blocks=" << blocked << " final=" << last.x << ','
+                       << last.y << ',' << last.z << " consumed_keys=9 runtime=188\n";

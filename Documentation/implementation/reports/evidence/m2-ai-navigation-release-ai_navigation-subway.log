@@ -1,0 +1,16 @@
+402/402 Testing: ai_navigation.subway
+402/402 Test: ai_navigation.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_navigation_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_navigation.subway" start time: Oct 16 12:29 CEST
+Output:
+----------------------------------------------------------
+cycle=0 real SubwayA local clearance at -32 170 -3224
+cycle=1 real SubwayA local clearance at -32 170 -3224
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"ai_navigation.subway" end time: Oct 16 12:29 CEST
+"ai_navigation.subway" time elapsed: 00:00:00
+----------------------------------------------------------

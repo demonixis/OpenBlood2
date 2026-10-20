@@ -1,0 +1,14 @@
+696/701 Testing: gideon_runtime.client
+696/701 Test: gideon_runtime.client
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_runtime_tests" "client" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-runtime-client"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_runtime.client" start time: Oct 17 04:05 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_runtime.client" end time: Oct 17 04:05 CEST
+"gideon_runtime.client" time elapsed: 00:00:00
+----------------------------------------------------------

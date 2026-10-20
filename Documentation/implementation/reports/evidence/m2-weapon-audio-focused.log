@@ -1,0 +1,22 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 601: weapon_audio.callbacks
+    Start 603: weapon_audio.private
+1/6 Test #601: weapon_audio.callbacks ...........   Passed    0.02 sec
+    Start 599: weapon_audio.hearing
+2/6 Test #599: weapon_audio.hearing .............   Passed    0.01 sec
+    Start 598: weapon_audio.voices
+3/6 Test #598: weapon_audio.voices ..............   Passed    0.01 sec
+    Start 602: weapon_audio.lifetime
+4/6 Test #602: weapon_audio.lifetime ............   Passed    0.01 sec
+    Start 600: weapon_audio.failures
+5/6 Test #600: weapon_audio.failures ............   Passed    0.01 sec
+6/6 Test #603: weapon_audio.private .............   Passed    1.37 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+headless        =   1.43 sec*proc (6 tests)
+private         =   1.37 sec*proc (1 test)
+weapon_audio    =   1.43 sec*proc (6 tests)
+
+Total Test time (real) =   1.38 sec

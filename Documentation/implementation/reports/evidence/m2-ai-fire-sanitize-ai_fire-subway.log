@@ -1,0 +1,53 @@
+357/357 Testing: ai_fire.subway
+357/357 Test: ai_fire.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_fire_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_fire.subway" start time: Oct 16 11:41 CEST
+Output:
+----------------------------------------------------------
+cycle=0 shots=18 keys=10 completed=9 audio=0 suppressed=10 key_error= fire_error= key_failures=0 target_hp=855.716
+cycle=1 shots=19 keys=10 completed=9 audio=0 suppressed=10 key_error= fire_error= key_failures=0 target_hp=847.709
+<end of output>
+Test time =   9.55 sec
+----------------------------------------------------------
+Test Passed.
+"ai_fire.subway" end time: Oct 16 11:42 CEST
+"ai_fire.subway" time elapsed: 00:00:09
+----------------------------------------------------------
+
+End testing: Oct 16 11:42 CEST
+
+ai_fire =  10.58 sec*proc
+
+ai_keys =  21.11 sec*proc
+
+ai_perception =   3.64 sec*proc
+
+ai_sight =   3.49 sec*proc
+
+ai_state =  25.61 sec*proc
+
+ai_target =   3.60 sec*proc
+
+attachments =   4.29 sec*proc
+
+character =  21.14 sec*proc
+
+character_audio =  25.03 sec*proc
+
+character_motion =   1.18 sec*proc
+
+headless = 226.03 sec*proc
+
+locomotion =  12.97 sec*proc
+
+objects =   0.22 sec*proc
+
+player =   7.66 sec*proc
+
+private = 221.68 sec*proc
+
+services =   7.38 sec*proc
+
+weapons =  78.13 sec*proc
+

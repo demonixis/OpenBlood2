@@ -1,0 +1,113 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 81
+    Start 81: locomotion.private
+
+81: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+81: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+81: Test timeout computed to be: 30
+81: idle1 [12,42,12] 6233ms
+81: idle2 [12,42,12] 3033ms
+81: walk_nogun [12,42,12] 1166ms
+81: walk_rifle [12,42,12] 1399ms
+81: run_nogun [12,42,12] 666ms
+81: run_rifle [12,42,12] 666ms
+81: jmp_nogun [12,42,12] 666ms
+81: jmp_rifle [12,42,12] 733ms
+81: crawl_pistol [12,28,12] 966ms
+81: crawl_rifle [12,28,12] 966ms
+81: swim_1pistol [12,12,32] 1066ms
+81: swim_2pistol [12,12,32] 599ms
+81: pickup_weapon [12,36.1108,12] 1000ms
+81: switch_weapon_2pistol [12,42,12] 466ms
+81: switch_weapon_2rifle [12,42,12] 666ms
+81: fire_stand_rifle [12,42,12] 566ms
+81: fire_stand_1pistol [12,42,12] 500ms
+81: fire_stand_2pistol [12,42,12] 466ms
+81: fire_walk_rifle [12,42,12] 1399ms
+81: fire_walk_1pistol [12,42,12] 1166ms
+81: fire_walk_2pistol [12,42,12] 1166ms
+81: fire_run_rifle [12,42,12] 666ms
+81: fire_run_1pistol [12,42,12] 666ms
+81: fire_run_2pistol [12,42,12] 666ms
+81: fire_jump_rifle [12,42,12] 733ms
+81: fire_jump_1pistol [12,42,12] 733ms
+81: fire_jump_2pistol [12,42,12] 733ms
+81: fire_crouch_rifle [12,28,12] 500ms
+81: fire_crouch_1pistol [12,28,12] 500ms
+81: fire_crouch_2pistol [12,28,12] 500ms
+81: fire_crawl_rifle [12,28,12] 966ms
+81: fire_crawl_1pistol [12,28,12] 966ms
+81: fire_crawl_2pistol [12,28,12] 966ms
+81: roll_forward [12,35.1108,12] 1000ms
+81: roll_right [12,37.1108,12] 1000ms
+81: roll_left [12,38.1108,12] 1000ms
+81: roll_back [12,40.1108,12] 1000ms
+81: dodge_right [12,39.1108,12] 1ms
+81: dodge_left [12,38.1108,12] 1ms
+81: recoil_head1 [12,42,12] 533ms
+81: recoil_chest [12,42,12] 466ms
+81: recoil_rchest [12,42,12] 766ms
+81: recoil_lchest [12,42,12] 566ms
+81: recoil_lleg1 [12,42,12] 1000ms
+81: recoil_rleg1 [12,42,12] 966ms
+81: recoil_head2 [12,42,12] 666ms
+81: recoil_chest2 [12,42,12] 933ms
+81: recoil_lchest2 [12,42,12] 500ms
+81: recoil_rchest2 [12,42,12] 666ms
+81: recoil_lleg2 [12,42,12] 966ms
+81: recoil_rleg2 [12,42,12] 833ms
+81: death_head1 [12,42,12] 1333ms
+81: death_chest [12,42,12] 9733ms
+81: death_rchest1 [12,42,12] 2666ms
+81: death_lchest1 [12,42,12] 2766ms
+81: death_lleg1 [12,42,12] 3666ms
+81: death_rleg1 [12,42,12] 2666ms
+81: death_rchest2 [12,42,12] 7333ms
+81: death_lchest2 [12,42,12] 3266ms
+81: death_lleg2 [12,42,12] 7666ms
+81: death_rleg2 [12,42,12] 9733ms
+81: death_head2 [12,42,12] 3666ms
+81: death_chest2 [12,42,12] 3666ms
+81: strafe_right_rifle [12,42,12] 700ms
+81: strafe_right_2pistol [12,42,12] 700ms
+81: strafe_right_1pistol [12,42,12] 700ms
+81: strafe_left_rifle [12,42,12] 700ms
+81: strafe_left_2pistol [12,42,12] 700ms
+81: strafe_left_1pistol [12,42,12] 700ms
+81: limb_arm [14,4,14] 633ms
+81: limb_leg [20,4,20] 633ms
+81: limb_head [5,5,5] 1ms
+81: humiliation_01 [12,26,12] 2966ms
+81: humiliation_02 [12,26,12] 2966ms
+81: humiliation_03 [12,26,12] 2966ms
+81: humiliation_04 [12,13,27] 0ms
+81: Newspaper [12,38.1108,12] 1633ms
+81: 20_finale [12,43.1108,12] 9000ms
+81: Train_grab [12,43.1108,12] 2500ms
+81: talk1 [12,43.1108,12] 5000ms
+81: talk2 [12,43.1108,12] 8566ms
+81: talk3 [12,43.1108,12] 7666ms
+81: talk4 [12,43.1108,12] 9333ms
+81: talk5 [12,43.1108,12] 8500ms
+81: crouch_pistol [12,28,12] 0ms
+81: crouch_rifle [12,28,12] 0ms
+1/1 Test #81: locomotion.private ...............   Passed    0.28 sec
+
+The following tests passed:
+	locomotion.private
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+headless      =   0.28 sec*proc (1 test)
+locomotion    =   0.28 sec*proc (1 test)
+private       =   0.28 sec*proc (1 test)
+
+Total Test time (real) =   0.28 sec

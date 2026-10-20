@@ -1,0 +1,11 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 66: movement.world_collision
+1/1 Test #66: movement.world_collision .........   Passed    0.03 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+headless    =   0.03 sec*proc (1 test)
+movement    =   0.03 sec*proc (1 test)
+
+Total Test time (real) =   0.03 sec

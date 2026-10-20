@@ -1,0 +1,18 @@
+clang-format --dry-run --Werror: 17 changed C++ files pass
+src/app/inspector.cpp
+src/app/inspector.h
+src/app/main.cpp
+src/game/original/BloodShells.cpp
+src/game/player_restore.cpp
+src/game/server_adapter.cpp
+src/game/server_adapter.h
+src/game/server_audio.cpp
+src/game/server_cameras.cpp
+src/game/server_effects.cpp
+src/game/server_projectiles.cpp
+src/game/server_sky.cpp
+src/game/server_sprites.cpp
+src/game/service_coverage.cpp
+src/game/service_coverage.h
+src/game/session.cpp
+tests/service_coverage_tests.cpp

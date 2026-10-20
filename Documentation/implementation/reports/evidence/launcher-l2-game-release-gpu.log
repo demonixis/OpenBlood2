@@ -1,0 +1,82 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1178
+    Start 1178: gpu.menus
+
+1178: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/menu_tests "gpu" "/home/yann/.steam/steam/steamapps/common/Blood II" "/home/yann/projects/lithtech/Blood2/build/release/tests/menu-gpu"
+1178: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1178: Test timeout computed to be: 30
+1178: GPU: NVIDIA GeForce RTX 3060 Laptop GPU
+1/3 Test #1178: gpu.menus ........................   Passed    3.39 sec
+test 1182
+    Start 1182: gpu.menu_traversal
+
+1182: Test command: /home/yann/projects/lithtech/Blood2/build/release/blood2 "--menu-smoke" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/menu-traversal.png"
+1182: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1182: Environment variables: 
+1182:  SDL_AUDIODRIVER=dummy
+1182: Test timeout computed to be: 120
+1182: [info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792416880249336030-0
+1182: [info] OpenBlood2 0.3.0 / bbc7ef4-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-bbc7ef4 (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+1182: [info] Crash capture ready: all-thread stacks and core dump in the log session directory
+1182: [info] Requested world=01_SubwayA; demo=false; config=blood2.local.ini; inspector=false; view=false; bench=false; headless=false; frames=0
+1182: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+1182: [info] BLOOD2.REZ: detected, 267758913 bytes
+1182: [info] SOUND.REZ: detected, 204633068 bytes
+1182: [info] BLOOD2P.REZ: detected, 24133434 bytes
+1182: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+1182: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+1182: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+1182: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+1182: [info] New game requested: world=01_SubwayA; character=0; difficulty=1
+1182: [info] World ready: worlds/01_subwaya.dat
+1182: [info] Menu traversal passed: startup, pause snapshots, independent audio, options, resize, inspector, resume and quit
+1182: [info] Frontend complete: 216 frames, world worlds/01_subwaya.dat, menu audio starts 26/failures 0
+1182: [info] Session finished: exit_code=0
+2/3 Test #1182: gpu.menu_traversal ...............   Passed   11.53 sec
+test 1209
+    Start 1209: gpu.demo_menu
+
+1209: Test command: /home/yann/projects/lithtech/Blood2/build/release/blood2 "--demo" "--menu-smoke" "--data-dir" "/home/yann/Games/B2Demo" "--log-dir" "/home/yann/projects/lithtech/Blood2/build/release/tests/demo-menu-logs" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/demo-menu.png"
+1209: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1209: Test timeout computed to be: 180
+1209: [info] Log session: /home/yann/projects/lithtech/Blood2/build/release/tests/demo-menu-logs/session-1792416891780480431-0
+1209: [info] OpenBlood2 0.3.0 / bbc7ef4-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-bbc7ef4 (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+1209: [info] Crash capture ready: all-thread stacks and core dump in the log session directory
+1209: [info] Requested world=Demo_01; demo=true; config=blood2.local.ini; inspector=false; view=false; bench=false; headless=false; frames=0
+1209: [info] External data: /home/yann/Games/B2Demo (--data-dir)
+1209: [info] B2DEMO.REZ: detected, 55041396 bytes
+1209: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+1209: [info] New game requested: world=Demo_01; character=0; difficulty=2
+1209: [info] World ready: worlds/demo_01.dat
+1209: [info] Demo restarted with initial Caleb equipment: worlds/demo_01.dat
+1209: [info] NEW_LEVEL committed: worlds/demo_01.dat -> worlds/demo_02.dat / start 05_egress
+1209: [info] Demo completed: original EndGame / screens/info.pcx / return to menu
+1209: [info] New game requested: world=Demo_01; character=0; difficulty=0
+1209: [info] World ready: worlds/demo_01.dat
+1209: [info] Demo menu traversal passed: source pages/promotions, supported options, pause/audio/focus, death/Enter retry, transfer, EndGame return, new game after end, quit promotion
+1209: [info] Frontend complete: 251 frames, world worlds/demo_01.dat, menu audio starts 48/failures 0
+1209: [info] Session finished: exit_code=0
+3/3 Test #1209: gpu.demo_menu ....................   Passed   13.62 sec
+
+The following tests passed:
+	gpu.menus
+	gpu.menu_traversal
+	gpu.demo_menu
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+demo_menu    =  13.62 sec*proc (1 test)
+gpu          =  28.55 sec*proc (3 tests)
+menus        =  14.93 sec*proc (2 tests)
+private      =  28.55 sec*proc (3 tests)
+
+Total Test time (real) =  28.56 sec

@@ -1,0 +1,214 @@
+673/673 Testing: gideon_combat.private
+673/673 Test: gideon_combat.private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon_combat_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gideon_combat.private" start time: Oct 17 02:22 CEST
+Output:
+----------------------------------------------------------
+shield-key=[play_sound:build]
+shield-key=[extra_key:powerup]
+shield-key=[fire_key:head]
+cycle=0 shield_clip=6 keys=3 shots=1 armor=100 duration_ms=3333 animating=0 key_failures=0 key_error=
+magic-key=[play_sound:build]
+magic-key=[fire_key:rr_gun]
+magic-key=[fire_key:ll_gun]
+magic-key=[fire_key:rr_gun]
+magic_clip=7 shots=3 expected=3 last_node=rr_gun failures=0 key_error=
+weapon=41 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=27 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=38 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=42 node=rr_gun origin=44.4828,121.577,11.6681
+shield-key=[play_sound:build]
+shield-key=[extra_key:powerup]
+shield-key=[fire_key:head]
+cycle=1 shield_clip=6 keys=3 shots=1 armor=100 duration_ms=3333 animating=0 key_failures=0 key_error=
+magic-key=[play_sound:build]
+magic-key=[fire_key:rr_gun]
+magic-key=[fire_key:ll_gun]
+magic-key=[fire_key:rr_gun]
+magic_clip=7 shots=3 expected=3 last_node=rr_gun failures=0 key_error=
+weapon=41 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=27 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=38 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=42 node=rr_gun origin=44.4828,121.577,11.6681
+shield-key=[play_sound:build]
+shield-key=[extra_key:powerup]
+shield-key=[fire_key:head]
+cycle=2 shield_clip=6 keys=3 shots=1 armor=100 duration_ms=3333 animating=0 key_failures=0 key_error=
+magic-key=[play_sound:build]
+magic-key=[fire_key:rr_gun]
+magic-key=[fire_key:ll_gun]
+magic-key=[fire_key:rr_gun]
+magic_clip=7 shots=3 expected=3 last_node=rr_gun failures=0 key_error=
+weapon=41 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=27 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=38 node=rr_gun origin=44.4828,121.577,11.6681
+weapon=42 node=rr_gun origin=44.4828,121.577,11.6681
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.private" end time: Oct 17 02:22 CEST
+"gideon_combat.private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 02:22 CEST
+
+ai_escape =   0.09 sec*proc
+
+ai_fire =   0.69 sec*proc
+
+ai_follow =   0.31 sec*proc
+
+ai_hit =   0.08 sec*proc
+
+ai_keys =   1.45 sec*proc
+
+ai_locomotion =   0.10 sec*proc
+
+ai_navigation =   0.21 sec*proc
+
+ai_perception =   0.26 sec*proc
+
+ai_recovery =   0.11 sec*proc
+
+ai_runtime =   1.51 sec*proc
+
+ai_script =   0.17 sec*proc
+
+ai_sight =   0.26 sec*proc
+
+ai_state =   1.90 sec*proc
+
+ai_target =   0.25 sec*proc
+
+ai_trigger =   0.20 sec*proc
+
+attachments =   0.34 sec*proc
+
+brushes =   1.27 sec*proc
+
+cameras =   1.07 sec*proc
+
+character =   1.50 sec*proc
+
+character_audio =   1.39 sec*proc
+
+character_motion =   0.13 sec*proc
+
+character_nodes =   0.28 sec*proc
+
+cinematics =   0.80 sec*proc
+
+cli =   0.09 sec*proc
+
+config =   0.03 sec*proc
+
+containers =   1.21 sec*proc
+
+corpses =   0.09 sec*proc
+
+destructable_state =   0.25 sec*proc
+
+doors =   1.13 sec*proc
+
+energy =   0.42 sec*proc
+
+exits =   0.57 sec*proc
+
+explosion_flames =   0.70 sec*proc
+
+explosion_fragments =   1.06 sec*proc
+
+explosion_lights =   0.64 sec*proc
+
+explosion_models =   0.24 sec*proc
+
+explosion_rings =   0.78 sec*proc
+
+explosion_sprites =   0.30 sec*proc
+
+explosions =   0.04 sec*proc
+
+gideon_combat =   0.07 sec*proc
+
+headless =  54.42 sec*proc
+
+interaction =   0.90 sec*proc
+
+inventory_state =   0.25 sec*proc
+
+keyframes =   1.86 sec*proc
+
+lights =   0.60 sec*proc
+
+locomotion =   0.64 sec*proc
+
+model_view =   0.21 sec*proc
+
+movement =   2.45 sec*proc
+
+naga =   0.41 sec*proc
+
+object_particles =   1.63 sec*proc
+
+objectives =   0.39 sec*proc
+
+objects =   0.05 sec*proc
+
+paths =   0.39 sec*proc
+
+pickups =   0.58 sec*proc
+
+player =   0.53 sec*proc
+
+player_controls =   1.09 sec*proc
+
+player_keepalive =   0.32 sec*proc
+
+player_restore =   0.24 sec*proc
+
+player_state =   0.23 sec*proc
+
+private =  51.38 sec*proc
+
+pushables =   0.05 sec*proc
+
+randomsound =   0.66 sec*proc
+
+sceneexplosion =   0.69 sec*proc
+
+services =   0.41 sec*proc
+
+session_playback =   2.14 sec*proc
+
+shield =   0.48 sec*proc
+
+sound =   0.62 sec*proc
+
+sprite_view =   0.26 sec*proc
+
+sprites =   0.97 sec*proc
+
+texture =   0.28 sec*proc
+
+triggers =   1.22 sec*proc
+
+weapon_audio =   0.26 sec*proc
+
+weapon_drops =   0.09 sec*proc
+
+weapon_impacts =   2.19 sec*proc
+
+weapon_sprites =   0.41 sec*proc
+
+weapons =   6.15 sec*proc
+
+wind =   0.44 sec*proc
+
+world =   1.70 sec*proc
+
+world_view =   0.21 sec*proc
+
+worldpaths =   0.42 sec*proc
+

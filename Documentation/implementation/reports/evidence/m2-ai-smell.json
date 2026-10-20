@@ -1,0 +1,407 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "10e24b394a296446e3235948a2875da3ffedf59f",
+  "m2_complete": false,
+  "validation": {
+    "debug-headless": {
+      "passed_after_targeted_recheck": 135,
+      "initial_passed": 134,
+      "initial_failed": 1,
+      "failed_after_recheck": 0,
+      "private": 25,
+      "initial_seconds": 38.73,
+      "targeted_recheck_passed": 1,
+      "targeted_recheck_seconds": 0.02,
+      "note": "Old escape assertion expected unavailable smell-state refusal; now verifies actual source guard/decision and no fabricated cursor."
+    },
+    "release-headless": {
+      "passed_after_targeted_recheck": 135,
+      "initial_passed": 134,
+      "initial_failed": 1,
+      "failed_after_recheck": 0,
+      "private": 25,
+      "initial_seconds": 7.05,
+      "targeted_recheck_passed": 1,
+      "targeted_recheck_seconds": 0.02,
+      "note": "Old escape assertion expected unavailable smell-state refusal; now verifies actual source guard/decision and no fabricated cursor."
+    },
+    "sanitize-headless": {
+      "passed_after_targeted_recheck": 135,
+      "initial_passed": 133,
+      "initial_failed": 2,
+      "failed_after_recheck": 0,
+      "private": 25,
+      "initial_seconds": 198.4,
+      "targeted_recheck_passed": 2,
+      "targeted_recheck_seconds": 121.07,
+      "note": "Old escape assertion expected unavailable smell-state refusal; now verifies actual source guard/decision and no fabricated cursor. Movement private exceeded 60s both concurrently and serially. Its unchanged three-cycle body then completed directly in 58.52s with no sanitizer finding. The sanitizer-only CTest wall-time budget is now 120s (normal remains 60s); final CTest retry passes. No frame, reload or assertion removed; production timing bounds unchanged.",
+      "movement_final_seconds": 60.98
+    },
+    "debug-gpu": {
+      "passed": 7,
+      "failed": 0,
+      "private": 6,
+      "seconds": 84.07,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan"
+    },
+    "release-gpu": {
+      "passed": 7,
+      "failed": 0,
+      "private": 6,
+      "seconds": 26.54,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan"
+    },
+    "debug-inspector-final": {
+      "passed": 1,
+      "failed": 0,
+      "seconds": 21.84,
+      "note": "After wrapping the smell exit legend and splitting cursor/count text for narrow inspector panels."
+    }
+  },
+  "artifacts": [
+    {
+      "file": "m2-ai-smell-debug-inspector-final.log",
+      "sha256": "688a14306c20d141bccc17cdd5500531db4e4b520e6dbc8580c2d6bc4c911c6b",
+      "raw_capture_sha256": "f2dc2dcefbef02a6e69a11cf9ae55888c70b4a5d389a7a5383a8117cf1c319f3",
+      "bytes": 4735
+    },
+    {
+      "file": "m2-ai-smell-debug-inspector-build.log",
+      "sha256": "e9b849255429db43aa9860362057f8a1a8a377e790174fc0d663191c28d9f9ef",
+      "raw_capture_sha256": "82f73de1a476dad9283dace211a57748706260d386fe0e2eca0a9be6000f1bca",
+      "bytes": 378
+    },
+    {
+      "file": "m2-ai-smell-release-inspector-build.log",
+      "sha256": "0576b7d6c27e7b93887402bcf72bb2c1fe99572decc8ca60b5e619bf3bfcd1fa",
+      "raw_capture_sha256": "0576b7d6c27e7b93887402bcf72bb2c1fe99572decc8ca60b5e619bf3bfcd1fa",
+      "bytes": 108
+    },
+    {
+      "file": "m2-ai-smell-sanitize-movement-final.log",
+      "sha256": "5bd14e5500ba62936e448f799c9f0cf0903cb1feee3e23377b46f9053f28f5fe",
+      "raw_capture_sha256": "519076986f537fb8dc26e30f3482258852939c28cf70271f94f3fc33fdd9c0b6",
+      "bytes": 1490
+    },
+    {
+      "file": "m2-ai-smell-sanitize-movement-direct.log",
+      "sha256": "815935152ccf942a51842eb556bf52e5fa23672688731b44411c13ef52c3ec21",
+      "raw_capture_sha256": "815935152ccf942a51842eb556bf52e5fa23672688731b44411c13ef52c3ec21",
+      "bytes": 505
+    },
+    {
+      "file": "m2-ai-smell-debug-final-build.log",
+      "sha256": "3139adfbb308bbf1e2ae91a72b7ee11fe1c4489c114ef5cc827a4670cf4de216",
+      "raw_capture_sha256": "8a5cb112416d3a59030e79ed14c1031efa357cb5adf52c3db2a7f3bfa0523bfc",
+      "bytes": 8043
+    },
+    {
+      "file": "m2-ai-smell-release-final-build.log",
+      "sha256": "c002a1fc00be2a97b834d855b324c45e60259d4c421fb3258ce2bfdad5f9bae2",
+      "raw_capture_sha256": "4f46adebaf2d1618654547d20676b4dcea27889da83d47a6087d2d6d446789a9",
+      "bytes": 8047
+    },
+    {
+      "file": "m2-ai-smell-sanitize-final-build.log",
+      "sha256": "169bea21075c504e89eb13be5afabdb9f734eb556d4b15e126e8f1779ab021ac",
+      "raw_capture_sha256": "54dbe8ae672552f6624ac6c1cce8802ea46444127c76d4d5d82c39d9751e1424",
+      "bytes": 8049
+    },
+    {
+      "file": "m2-ai-smell-debug-headless.log",
+      "sha256": "859af58b1c9cbe543a8808260e96ef7c615f3483f11364d1f7bd6e16ecdf82d8",
+      "raw_capture_sha256": "2e1c86df4af19adf41c885cf594e81b3a253eb74a8b8dc36d316abb8d831043c",
+      "bytes": 16895
+    },
+    {
+      "file": "m2-ai-smell-release-headless.log",
+      "sha256": "3e9ff720d705486dbb045ce175ccd63f3ad260b478115bd7435eb9abcfbf02a7",
+      "raw_capture_sha256": "b455d83aed74a46a5043a6d124cc33e061909a18df84ce5fc3ba654837c76779",
+      "bytes": 16897
+    },
+    {
+      "file": "m2-ai-smell-sanitize-headless.log",
+      "sha256": "d0153d83463126813a03ff25809f085da5237c926fddd949e58c34022bd18697",
+      "raw_capture_sha256": "aa3c826d229ef8c5b981a973a14265883679fbc40c079223f21e7baab1a1e7b5",
+      "bytes": 16982
+    },
+    {
+      "file": "m2-ai-smell-debug-escape-recheck.log",
+      "sha256": "c718331ae8dc8fb7345c748d2cd73e8a7a814c73778c5de56da0be9268198b66",
+      "raw_capture_sha256": "5208a88ccac157d02e11439c3f4e6f28f96761ee35172dcbb6dd000c52791f37",
+      "bytes": 333
+    },
+    {
+      "file": "m2-ai-smell-release-escape-recheck.log",
+      "sha256": "d6d196103bb4bb6dbf894e1095f683ad3d94479592ab5b7d4cf85e1260472865",
+      "raw_capture_sha256": "4684eb406707cc8f5c6647a570d61d763effb2a34f41c1e0bea69274e97ed4a1",
+      "bytes": 335
+    },
+    {
+      "file": "m2-ai-smell-sanitize-recheck.log",
+      "sha256": "c60bce320386fdb7b1d497a09ba5f9343a2700d536816f250f119407fec6fe82",
+      "raw_capture_sha256": "61c8870ce05947b97afd6ccbdc1cda96170442b9f385f7392426c40590989628",
+      "bytes": 659
+    },
+    {
+      "file": "m2-ai-smell-debug-gpu.log",
+      "sha256": "d9c490e24a361676ca976c23396314fb597328fbe4d12fb228539e049b5618ad",
+      "raw_capture_sha256": "5f453946c87f7f9912e6a9f0583a51ec8b3620db37f457b7ebc5f4028bb0950b",
+      "bytes": 15080
+    },
+    {
+      "file": "m2-ai-smell-release-gpu.log",
+      "sha256": "9b9042c7287f9d04c0f44e038c711053fa8c5fb0bfba23c1b7e3b8d90614d71a",
+      "raw_capture_sha256": "01a5eaf57adc0bf93547b11d9b2a555692b6fc9f8343c9f9f909cac85e437535",
+      "bytes": 15138
+    },
+    {
+      "file": "m2-ai-smell-debug-build.log",
+      "sha256": "cd2ae7d6381a8800b308344a9cefd8c1023ea74ef9779b099e848f3fafacd1a8",
+      "raw_capture_sha256": "7308e29347c30424a8e964d0a312e80d0c991d20fd1c833890e665e883644dd8",
+      "bytes": 16752
+    },
+    {
+      "file": "m2-ai-smell-release-build.log",
+      "sha256": "4683ee559de25756fcf575d45f3648750cffcfb22291e4c5a0a270bff09ecf63",
+      "raw_capture_sha256": "c8986dd5b140ddcbedac3e842b6aa83dd1678d51e5e73cbe1a4baff8a42e7970",
+      "bytes": 31118
+    },
+    {
+      "file": "m2-ai-smell-sanitize-build.log",
+      "sha256": "e21262faaab6c610238ad175a243e1fe45074cc19100d4015f1e3775c54d76c4",
+      "raw_capture_sha256": "360c6ecdffbeb19ce66982ec857e2904b33fd28ebd426443e221aec1f4deed79",
+      "bytes": 27214
+    },
+    {
+      "file": "m2-ai-smell-debug-escape-build.log",
+      "sha256": "13e8740e918d4374edda3c7b0412aef508d917a259164235d72f847c59a01345",
+      "raw_capture_sha256": "08d08ea8701e179185817010acfb4f3dbaff206475e950b881266da964f9cff2",
+      "bytes": 335
+    },
+    {
+      "file": "m2-ai-smell-release-escape-build.log",
+      "sha256": "13e8740e918d4374edda3c7b0412aef508d917a259164235d72f847c59a01345",
+      "raw_capture_sha256": "08d08ea8701e179185817010acfb4f3dbaff206475e950b881266da964f9cff2",
+      "bytes": 335
+    },
+    {
+      "file": "m2-ai-smell-sanitize-recheck-build.log",
+      "sha256": "246e6de7f8caca7ce44ff6b77811564fd0cf47159e6f0cf6b335c13f96c6d742",
+      "raw_capture_sha256": "3b1c4549eaa21714be8a4e8cefb25c14f98d61b41431014934802764831f9658",
+      "bytes": 644
+    },
+    {
+      "file": "m2-ai-smell-debug-state-build.log",
+      "sha256": "b4ffa8b7c2a55ece29b19966134d690916ee03db86697e57d6e086a032163493",
+      "raw_capture_sha256": "5ff1b9ca227cdac5ed300f3e775f9a671310c999e43821325a9470a43e56eec8",
+      "bytes": 350
+    },
+    {
+      "file": "m2-ai-smell-release-state-build.log",
+      "sha256": "b4ffa8b7c2a55ece29b19966134d690916ee03db86697e57d6e086a032163493",
+      "raw_capture_sha256": "5ff1b9ca227cdac5ed300f3e775f9a671310c999e43821325a9470a43e56eec8",
+      "bytes": 350
+    },
+    {
+      "file": "m2-ai-smell-debug-headless-details.log",
+      "sha256": "2e7a472361c6592bc109b1cc45bd896a8250e328db6f4fe390336f609888d91b",
+      "raw_capture_sha256": "bd04166aa560aac5855c5e42456e40449241d9e3e678e4a971fc04ef3d9690ee",
+      "bytes": 95962
+    },
+    {
+      "file": "m2-ai-smell-release-headless-details.log",
+      "sha256": "e0895703b30ffadec3fd47ffc602a7009ed1b39691d9919ef3f16f8ad85b98a3",
+      "raw_capture_sha256": "ec82df1d4f3bf24f8a7cae5f60e47b210630ad58f793f721f6469c950b9d3b4f",
+      "bytes": 96564
+    },
+    {
+      "file": "m2-ai-smell-sanitize-headless-details.log",
+      "sha256": "58313e2bf010410cae3fc68a1ef2d7d08275085b49fb9e120ba25ed3aaca12f4",
+      "raw_capture_sha256": "5843519d12912021b6897ef6c3894479627f4bad55fc79268f74d97a6ef20a8c",
+      "bytes": 96397
+    },
+    {
+      "file": "m2-ai-smell-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    }
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "private_trail": {
+    "world": "01_SubwayA",
+    "cycles": 2,
+    "original_intro_completed": true,
+    "movement": "original MoveMgr forward input for 120 frames",
+    "per_cycle": {
+      "drops": 6,
+      "checks": 841,
+      "live_hints": 6
+    },
+    "hints_after_unload": 0
+  },
+  "commands": [
+    "cmake --build build/<debug|release> --target ai_recovery_tests ai_perception_tests ai_state_tests ai_runtime_tests ai_target_tests ai_escape_tests player_tests player_state_tests player_restore_tests player_keepalive_tests object_contract_tests world_tests player_controls_tests movement_tests blood2_app level_change_gpu_tests -j3",
+    "cmake --build build/sanitize --target ai_recovery_tests ai_perception_tests ai_state_tests ai_runtime_tests ai_target_tests ai_escape_tests player_tests player_state_tests player_restore_tests player_keepalive_tests object_contract_tests world_tests player_controls_tests movement_tests -j3",
+    "ctest --test-dir build/<debug|release> -R '^(objects|player|player_state|player_restore|player_keepalive|ai_recovery|ai_perception|ai_state|ai_runtime|ai_target|ai_escape|player_controls|movement)\\.|^world\\.(level_change.*|destination_.*)$' --output-on-failure -j3",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^(objects|player|player_state|player_restore|player_keepalive|ai_recovery|ai_perception|ai_state|ai_runtime|ai_target|ai_escape|player_controls|movement)\\.|^world\\.(level_change.*|destination_.*)$' --output-on-failure -j3",
+    "ctest --test-dir build/<debug|release> -R '^ai_escape.perception$' --output-on-failure",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^(ai_escape.perception|movement.private)$' --output-on-failure -j1",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^movement.private$' -V",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 /usr/bin/time -f 'Elapsed %e s; peak RSS %M KiB' timeout 180 build/sanitize/tests/movement_tests private <external-data-root>",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(character|lifecycle|mouse_combat|corpse_clearance|objectives|level_change|player_restore)$' -V",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/debug -R '^gpu.character$' -V"
+  ],
+  "development_findings": [
+    "Strict-clock fixture used an increment just before a floating-point scheduler deadline; after testing the exact .5-second boundary it now advances .002 rather than .001. Production comparisons are unchanged.",
+    "Inspector initially treated ObjectId as a scalar; the actual slot and generation are now displayed.",
+    "Existing around/escape tests expected unavailable SearchSmellTarget; they now require its original guarded decision, without inventing a cursor.",
+    "Sanitizer movement runs timed out at 60s both concurrently and serially. Unchanged direct execution completed in 58.52s; instrumented CTest deadline alone now provides 120s headroom, with all three intro/reload cycles and assertions retained. All failure and final retry logs are kept."
+  ],
+  "limits": [
+    "Normal source smell perception clears the target and does not seed the cursor; registered NPC smell ranges remain zero. No invented autonomous acquisition.",
+    "Route-body tests explicitly seed a cursor and use real dead-attacker perception; positive visibility uses a diagnostic-only ray-hit hint.",
+    "Private trail movement and GPU regressions are not a complete authored encounter or retail parity proof.",
+    "Spectator storage is a guard only; full AI/world saves, multiplayer and remaining M2 required services stay open.",
+    "No native macOS run; no dependency/shader/reference/commercial asset changes."
+  ],
+  "implementation_patch_sha256": "5725332b7062a1efbab5d803aafbf1c4f15f09361536d10b4063389199214b46",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "33bd606107ad52f322ed75915275acd7982f1f91ac4d080824f585ab14752634"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "6a2a9574a768d960be99701aaa04420aa52b903d76ac6d628daba6594afbdb08"
+    },
+    {
+      "path": "README.md",
+      "sha256": "228041b96639725b99abfdd1f471f2d4b55ecf27a76b5ff4f588c006adaa95d7"
+    },
+    {
+      "path": "docs/AI_PERCEPTION_CONTRACTS.md",
+      "sha256": "1ec2050cd4c3fb41eb2e69b0effd0693d87f9f504f09494a808891f1ad6cf40a"
+    },
+    {
+      "path": "docs/AI_RECOVERY_CONTRACTS.md",
+      "sha256": "eb62b5cb2c63a8591323eb0b6d256f9b08a947312239ac4e843a6d99db218968"
+    },
+    {
+      "path": "docs/AI_SMELL_CONTRACTS.md",
+      "sha256": "f268f2cd745276be02b3b624c472f0c7d43e9f909fd1d4e97c346d09cde08ce0"
+    },
+    {
+      "path": "docs/M2_AI_SMELL_SOURCES.json",
+      "sha256": "41db0cda96c58ebafa71299b7942187902c890b8cde9f1a7c76107a7e8c4bcff"
+    },
+    {
+      "path": "docs/PLAYER_CONTRACTS.md",
+      "sha256": "76dab47f23171a3d3196d21cc4e8a5307635dbb44f44b9890ebc61ce70b67f95"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "561c11cd7f611cc80dc89cca248fd5911c840d98d990dd03ef9c7a3abd153254"
+    },
+    {
+      "path": "src/app/inspector_skeleton.cpp",
+      "sha256": "0a0155853e0d1ac651b6aa06a493dae4923dc1e12ac7f752a55e8351b281a5d8"
+    },
+    {
+      "path": "src/game/original/AINavigationStates.cpp",
+      "sha256": "3fa5601f864ead35690dd96c12b267be2a3d948949d909b6e28c8fed9d38f5df"
+    },
+    {
+      "path": "src/game/original/AISmell.cpp",
+      "sha256": "a7a801b9598d3e635d45818aada95249b5d90365f60f91df9f839c0dfaab234b"
+    },
+    {
+      "path": "src/game/original/AIState.cpp",
+      "sha256": "b5048e71acdcbb8cd060082bb1b1d7082c01a4478375c4d735a40f4af888bd3b"
+    },
+    {
+      "path": "src/game/original/AITarget.cpp",
+      "sha256": "cd32ba1164945aef0cd40562de5df27a50acb38027a894dfb9fb83dd79d17716"
+    },
+    {
+      "path": "src/game/original/AI_Mgr.h",
+      "sha256": "f1a2efe2827ffb38008a4307eae227c47fd642a7e59d5d71bda9e1c4b7612fac"
+    },
+    {
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "002d89631d746cb2dd7a91367598f865c3147391cead09c581494df7e32d6df4"
+    },
+    {
+      "path": "src/game/original/PlayerObj.h",
+      "sha256": "02d11705b972c44394b62aa8758c9bc2a0c06704552d48464195e76aaded4083"
+    },
+    {
+      "path": "src/game/original/SmellHint.h",
+      "sha256": "3e1ced4e9822149950de4c2e2093a78349f73356af35c1ff095968f176905b2d"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "6d9cc99426a26a4fd3e03964d98e997db12bd093fb20ed7335f5b58b97106445"
+    },
+    {
+      "path": "tests/ai_escape_tests.cpp",
+      "sha256": "b3557419d890e1b3e6c61c5d4fb4c162e583f812068e1d0ade96c9766c2d3522"
+    },
+    {
+      "path": "tests/ai_recovery_tests.cpp",
+      "sha256": "353d47fb67e3c63c08c017fbf50eae04730963c3dba8c70ad898829deb9145da"
+    },
+    {
+      "path": "tests/player_state_tests.cpp",
+      "sha256": "30e063fdb03ace0f402e9e38e19e55454326d853e44a0848c3e4457f548201b4"
+    },
+    {
+      "path": "tests/player_tests.cpp",
+      "sha256": "ccfc4c6b2091f03b759ee7f24b1846cd120c7c750ff1d2c73e6688c2970c3dd9"
+    }
+  ],
+  "project_commit": "d7b744394b6a9fde0969362b3b6374bd52981f8e",
+  "checks": {
+    "formatting_cpp_files": 13,
+    "local_markdown_links": 3384,
+    "reference_inventory_files": 10923,
+    "reference_repositories_clean": 6,
+    "diff_check": "Passes for implementation and documentation/logs; the exact recorded Git patch retains required blank-context space prefixes."
+  }
+}

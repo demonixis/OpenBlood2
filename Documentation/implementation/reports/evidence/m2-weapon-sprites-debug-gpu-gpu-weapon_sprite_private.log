@@ -1,0 +1,90 @@
+619/619 Testing: gpu.weapon_sprite_private
+619/619 Test: gpu.weapon_sprite_private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_sprite_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-sprite-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.weapon_sprite_private" start time: Oct 16 23:53 CEST
+Output:
+----------------------------------------------------------
+Smoke RGB / original fade: 10000 exact opaque-texel blend checks
+Private cycle 0 flash SpriteTextures\impact64_1.dtx changed pixels 1282
+Private cycle 0 smoke SpriteTextures\smoke64_2.dtx changed pixels 3607
+Private cycle 1 flash SpriteTextures\impact64_1.dtx changed pixels 1282
+Private cycle 1 smoke SpriteTextures\smoke64_1.dtx changed pixels 3607
+Private cycle 2 flash SpriteTextures\impact64_1.dtx changed pixels 1282
+Private cycle 2 smoke SpriteTextures\smoke64_3.dtx changed pixels 3583
+<end of output>
+Test time =   1.81 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.weapon_sprite_private" end time: Oct 16 23:53 CEST
+"gpu.weapon_sprite_private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 16 23:53 CEST
+
+brushes =   2.22 sec*proc
+
+cameras =   2.61 sec*proc
+
+character =  16.54 sec*proc
+
+cinematics =   2.63 sec*proc
+
+containers =   7.69 sec*proc
+
+doors =   2.12 sec*proc
+
+explosion_flames =   1.90 sec*proc
+
+explosion_fragments =   1.02 sec*proc
+
+explosion_models =   0.99 sec*proc
+
+explosion_rings =   0.99 sec*proc
+
+gpu = 156.64 sec*proc
+
+interaction =   9.05 sec*proc
+
+keyframes =   2.55 sec*proc
+
+lights =   2.60 sec*proc
+
+model_view =   1.58 sec*proc
+
+movement =  16.39 sec*proc
+
+object_particles =   0.95 sec*proc
+
+objectives =   5.27 sec*proc
+
+pickups =   2.67 sec*proc
+
+player =   2.83 sec*proc
+
+player_keepalive =   4.69 sec*proc
+
+player_restore =   2.77 sec*proc
+
+private = 149.81 sec*proc
+
+randomsound =   8.88 sec*proc
+
+sceneexplosion =   2.73 sec*proc
+
+sound =   2.67 sec*proc
+
+sprite_view =   1.51 sec*proc
+
+sprites =   2.81 sec*proc
+
+triggers =   3.14 sec*proc
+
+weapon_sprites =   2.30 sec*proc
+
+weapons =  21.01 sec*proc
+
+world_view =  14.39 sec*proc
+
+worldpaths =   2.60 sec*proc
+

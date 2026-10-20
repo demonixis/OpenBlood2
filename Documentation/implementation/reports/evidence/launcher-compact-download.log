@@ -1,0 +1,2 @@
+Installed: /tmp/blood2-launcher-redesign/downloaded/content/Blood2Demo-1.0-139638-0/Game
+220: load_artwork(data, image) && image.size() == 320 * 240 * 4

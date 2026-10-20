@@ -1,0 +1,17 @@
+512/512 Testing: inventory_state.private
+512/512 Test: inventory_state.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/inventory_state_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"inventory_state.private" start time: Oct 16 17:40 CEST
+Output:
+----------------------------------------------------------
+cycle 0: detached inventory restored; raw bullets 123.5; keys 0; both retail hand models loaded
+cycle 1: detached inventory restored; raw bullets 124.5; keys 0; both retail hand models loaded
+cycle 2: detached inventory restored; raw bullets 125.5; keys 0; both retail hand models loaded
+<end of output>
+Test time =   1.30 sec
+----------------------------------------------------------
+Test Passed.
+"inventory_state.private" end time: Oct 16 17:40 CEST
+"inventory_state.private" time elapsed: 00:00:01
+----------------------------------------------------------

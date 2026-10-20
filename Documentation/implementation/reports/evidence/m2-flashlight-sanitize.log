@@ -1,0 +1,106 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 536: player_keepalive.private
+      Start 738: medkit.private
+ 1/45 Test #738: medkit.private ...................   Passed   17.42 sec
+      Start 783: flashlight.private
+ 2/45 Test #783: flashlight.private ...............   Passed   17.01 sec
+      Start 532: player_restore.private
+ 3/45 Test #536: player_keepalive.private .........   Passed   49.95 sec
+      Start 511: inventory_state.private
+ 4/45 Test #532: player_restore.private ...........   Passed   16.19 sec
+      Start  25: world.level_change
+ 5/45 Test  #25: world.level_change ...............   Passed    0.57 sec
+      Start  27: world.destination_trials
+ 6/45 Test  #27: world.destination_trials .........   Passed    0.37 sec
+      Start 782: flashlight.session
+ 7/45 Test #782: flashlight.session ...............   Passed    0.30 sec
+      Start 776: flashlight.pickup
+ 8/45 Test #776: flashlight.pickup ................   Passed    0.10 sec
+      Start 780: flashlight.lifetime
+ 9/45 Test #780: flashlight.lifetime ..............   Passed    0.24 sec
+      Start 534: player_keepalive.fallback
+10/45 Test #534: player_keepalive.fallback ........   Passed    0.31 sec
+      Start 735: medkit.restore
+11/45 Test #735: medkit.restore ...................   Passed    0.22 sec
+      Start 779: flashlight.restore
+12/45 Test #779: flashlight.restore ...............   Passed    0.20 sec
+      Start 732: medkit.pickup
+13/45 Test #732: medkit.pickup ....................   Passed    0.19 sec
+      Start 734: medkit.transport
+14/45 Test #734: medkit.transport .................   Passed    0.17 sec
+      Start 733: medkit.commands
+15/45 Test #733: medkit.commands ..................   Passed    0.17 sec
+      Start 731: medkit.rules
+16/45 Test #731: medkit.rules .....................   Passed    0.17 sec
+      Start 736: medkit.lifetime
+17/45 Test #736: medkit.lifetime ..................   Passed    0.17 sec
+      Start 777: flashlight.commands
+18/45 Test #777: flashlight.commands ..............   Passed    0.18 sec
+      Start 530: player_restore.failures
+19/45 Test #530: player_restore.failures ..........   Passed    0.20 sec
+      Start 778: flashlight.ray
+20/45 Test #778: flashlight.ray ...................   Passed    0.17 sec
+      Start 531: player_restore.lifetime
+21/45 Test #531: player_restore.lifetime ..........   Passed    0.18 sec
+      Start 535: player_keepalive.failures
+22/45 Test #535: player_keepalive.failures ........   Passed    0.17 sec
+      Start  30: world.destination_lifetime
+23/45 Test  #30: world.destination_lifetime .......   Passed    0.11 sec
+      Start 529: player_restore.roundtrip
+24/45 Test #529: player_restore.roundtrip .........   Passed    0.10 sec
+      Start 533: player_keepalive.named
+25/45 Test #533: player_keepalive.named ...........   Passed    0.11 sec
+      Start 775: flashlight.rules
+26/45 Test #775: flashlight.rules .................   Passed    0.06 sec
+      Start 510: inventory_state.capture
+27/45 Test #510: inventory_state.capture ..........   Passed    0.09 sec
+      Start   1: objects.builtin_model
+28/45 Test   #1: objects.builtin_model ............   Passed    0.04 sec
+      Start 507: inventory_state.roundtrip
+29/45 Test #507: inventory_state.roundtrip ........   Passed    0.07 sec
+      Start 508: inventory_state.malformed
+30/45 Test #508: inventory_state.malformed ........   Passed    0.06 sec
+      Start 509: inventory_state.rollback
+31/45 Test #509: inventory_state.rollback .........   Passed    0.06 sec
+      Start  11: objects.unsupported_teardown
+32/45 Test  #11: objects.unsupported_teardown .....   Passed    0.10 sec
+      Start 737: medkit.input
+33/45 Test #737: medkit.input .....................   Passed    0.03 sec
+      Start  10: objects.messages_strings
+34/45 Test  #10: objects.messages_strings .........   Passed    0.08 sec
+      Start 781: flashlight.input
+35/45 Test #781: flashlight.input .................   Passed    0.03 sec
+      Start  12: objects.creation_failures
+36/45 Test  #12: objects.creation_failures ........   Passed    0.06 sec
+      Start   4: objects.reasons_properties
+37/45 Test   #4: objects.reasons_properties .......   Passed    0.04 sec
+      Start   9: objects.links_lists
+38/45 Test   #9: objects.links_lists ..............   Passed    0.04 sec
+      Start   2: objects.original_objects
+39/45 Test   #2: objects.original_objects .........   Passed    0.04 sec
+      Start   3: objects.nested_creation
+40/45 Test   #3: objects.nested_creation ..........   Passed    0.03 sec
+      Start   6: objects.deferred_removal
+41/45 Test   #6: objects.deferred_removal .........   Passed    0.03 sec
+      Start   8: objects.handles_selection
+42/45 Test   #8: objects.handles_selection ........   Passed    0.03 sec
+      Start   7: objects.aggregate_dispatch
+43/45 Test   #7: objects.aggregate_dispatch .......   Passed    0.03 sec
+      Start   5: objects.scheduling
+44/45 Test   #5: objects.scheduling ...............   Passed    0.03 sec
+45/45 Test #511: inventory_state.private ..........   Passed    9.18 sec
+
+100% tests passed, 0 tests failed out of 45
+
+Label Time Summary:
+flashlight          =  18.30 sec*proc (9 tests)
+headless            = 115.13 sec*proc (45 tests)
+inventory_state     =   9.46 sec*proc (5 tests)
+medkit              =  18.55 sec*proc (8 tests)
+objects             =   0.56 sec*proc (12 tests)
+player_keepalive    =  50.53 sec*proc (4 tests)
+player_restore      =  16.67 sec*proc (4 tests)
+private             = 109.76 sec*proc (5 tests)
+world               =   1.05 sec*proc (3 tests)
+
+Total Test time (real) =  59.15 sec

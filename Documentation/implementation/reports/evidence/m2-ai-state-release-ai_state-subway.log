@@ -1,0 +1,16 @@
+372/372 Testing: ai_state.subway
+372/372 Test: ai_state.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_state_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_state.subway" start time: Oct 16 11:01 CEST
+Output:
+----------------------------------------------------------
+Subway diagnostic cycle=0 starts=3 finishes=2 dispatches=960
+Subway diagnostic cycle=1 starts=3 finishes=2 dispatches=960
+<end of output>
+Test time =   0.52 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.subway" end time: Oct 16 11:01 CEST
+"ai_state.subway" time elapsed: 00:00:00
+----------------------------------------------------------

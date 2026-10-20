@@ -1,0 +1,14 @@
+502/507 Testing: exits.broadcast
+502/507 Test: exits.broadcast
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit_tests" "broadcast" "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit-fixtures/broadcast"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"exits.broadcast" start time: Oct 16 17:21 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"exits.broadcast" end time: Oct 16 17:21 CEST
+"exits.broadcast" time elapsed: 00:00:00
+----------------------------------------------------------

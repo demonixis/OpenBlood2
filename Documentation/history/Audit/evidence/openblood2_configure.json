@@ -1,0 +1,21 @@
+{
+  "name": "openblood2_configure",
+  "command": [
+    "cmake",
+    "-S",
+    "OpenBlood2",
+    "-B",
+    "/tmp/lithtech-audit-2bVxTF/openblood2",
+    "-G",
+    "Ninja",
+    "-DENABLE_VR=OFF",
+    "-DBUILD_TOOLS=OFF",
+    "-DCMAKE_BUILD_TYPE=Debug"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:10:11.980039+00:00",
+  "elapsed_seconds": 101.066,
+  "timeout_seconds": 180,
+  "exit_code": 1,
+  "log": "openblood2_configure.log"
+}

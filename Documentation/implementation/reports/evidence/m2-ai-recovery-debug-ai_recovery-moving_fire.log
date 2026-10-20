@@ -1,0 +1,14 @@
+444/447 Testing: ai_recovery.moving_fire
+444/447 Test: ai_recovery.moving_fire
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests" "moving_fire"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_recovery.moving_fire" start time: Oct 16 14:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.moving_fire" end time: Oct 16 14:04 CEST
+"ai_recovery.moving_fire" time elapsed: 00:00:00
+----------------------------------------------------------

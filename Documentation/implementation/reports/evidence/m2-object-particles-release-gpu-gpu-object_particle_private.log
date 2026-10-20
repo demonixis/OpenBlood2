@@ -1,0 +1,81 @@
+584/584 Testing: gpu.object_particle_private
+584/584 Test: gpu.object_particle_private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/object_particle_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/object-particle-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.object_particle_private" start time: Oct 16 21:50 CEST
+Output:
+----------------------------------------------------------
+Original smoke stream: 2914 covered pixels, 992 opaque tint checks; authored alpha remains unused
+Original smoke64_2: five stream quads, 7090 covered pixels, 2769 partial-alpha texels
+<end of output>
+Test time =   0.42 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.object_particle_private" end time: Oct 16 21:50 CEST
+"gpu.object_particle_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 21:50 CEST
+
+brushes =   1.56 sec*proc
+
+cameras =   1.60 sec*proc
+
+character =  13.34 sec*proc
+
+cinematics =   1.71 sec*proc
+
+containers =   3.52 sec*proc
+
+doors =   1.53 sec*proc
+
+explosion_fragments =   0.85 sec*proc
+
+explosion_models =   0.85 sec*proc
+
+explosion_rings =   0.87 sec*proc
+
+gpu = 106.30 sec*proc
+
+interaction =   2.11 sec*proc
+
+keyframes =   1.60 sec*proc
+
+lights =   1.65 sec*proc
+
+model_view =   1.02 sec*proc
+
+movement =  13.04 sec*proc
+
+object_particles =   0.84 sec*proc
+
+objectives =   1.61 sec*proc
+
+pickups =   1.67 sec*proc
+
+player =   1.68 sec*proc
+
+player_keepalive =   1.90 sec*proc
+
+player_restore =   1.70 sec*proc
+
+private = 101.67 sec*proc
+
+randomsound =  12.57 sec*proc
+
+sceneexplosion =   1.72 sec*proc
+
+sound =   1.77 sec*proc
+
+sprite_view =   0.93 sec*proc
+
+sprites =   1.65 sec*proc
+
+triggers =   1.68 sec*proc
+
+weapons =  13.03 sec*proc
+
+world_view =  13.52 sec*proc
+
+worldpaths =   1.68 sec*proc
+

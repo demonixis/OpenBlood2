@@ -1,0 +1,27 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start  73: gpu.weapons
+1/6 Test  #73: gpu.weapons ......................   Passed   16.07 sec
+    Start 187: gpu.objectives
+2/6 Test #187: gpu.objectives ...................   Passed    2.44 sec
+    Start 362: gpu.model_private
+3/6 Test #362: gpu.model_private ................   Passed    0.82 sec
+    Start 551: gpu.player_restore
+4/6 Test #551: gpu.player_restore ...............   Passed    2.07 sec
+    Start 556: gpu.player_keepalive
+5/6 Test #556: gpu.player_keepalive .............   Passed    2.72 sec
+    Start 739: gpu.mac10
+6/6 Test #739: gpu.mac10 ........................   Passed    3.64 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+gpu                 =  27.76 sec*proc (6 tests)
+mac10               =   3.64 sec*proc (1 test)
+model_view          =   0.82 sec*proc (1 test)
+objectives          =   2.44 sec*proc (1 test)
+player_keepalive    =   2.72 sec*proc (1 test)
+player_restore      =   2.07 sec*proc (1 test)
+private             =  27.76 sec*proc (6 tests)
+weapons             =  16.07 sec*proc (1 test)
+
+Total Test time (real) =  27.78 sec

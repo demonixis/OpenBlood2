@@ -1,0 +1,560 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/sanitize
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 614
+      Start 614: player_controls.corpse_clearance
+
+614: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "clearance" "<external-data-root>"
+614: Working Directory: <workspace>/Blood2/build/sanitize/tests
+614: Test timeout computed to be: 240
+test 613
+      Start 613: player_controls.combat
+
+613: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "combat" "<external-data-root>"
+613: Working Directory: <workspace>/Blood2/build/sanitize/tests
+613: Test timeout computed to be: 120
+613: Original SubwayA camera intro expired after 12.0167 simulation seconds
+613: Approached encounter at z=-2192.09
+613: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=8, ammo=42, independent corpse verified, native=0
+613: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=0
+613: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+613: Walked past killed Cultist to z=-1861.92
+613: Original SubwayA camera intro expired after 12.0167 simulation seconds
+613: Approached encounter at z=-2192.09
+613: Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=13, ammo=37, independent corpse verified, native=0
+613: Dodge updates=12, corpse candidates=23, zero-margin search=1, swept source clearance=0
+613: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+613: Walked past killed Cultist to z=-1861.92
+ 1/50 Test #613: player_controls.combat .............   Passed   74.66 sec
+test 64
+      Start  64: player.smell_private
+
+64: Test command: <workspace>/Blood2/build/sanitize/tests/player_tests "smell_private" "<external-data-root>"
+64: Working Directory: <workspace>/Blood2/build/sanitize/tests
+64: Test timeout computed to be: 90
+614: Original SubwayA camera intro expired after 12.0167 simulation seconds
+614: Approached encounter at z=-2338.28
+614: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=0
+614: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+614: Post-kill position=-32,170.001,-1854.18 camera=0 yaw=0
+614: Walked past killed Cultist to z=-1854.18
+614: Approached encounter at z=-1742.25
+614: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=0
+614: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+614: Post-kill position=-32,170.001,-1340.93 camera=0 yaw=-3.72529e-09
+614: Walked past killed Cultist to z=-1340.93
+614: Original SubwayA camera intro expired after 12.0167 simulation seconds
+614: Approached encounter at z=-2341.42
+614: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=0
+614: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+614: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+614: Walked past killed Cultist to z=-1861.92
+614: Approached encounter at z=-1745.4
+614: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=0
+614: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+614: Post-kill position=-32,170.001,-1344.07 camera=0 yaw=3.72529e-09
+614: Walked past killed Cultist to z=-1344.07
+ 2/50 Test #614: player_controls.corpse_clearance ...   Passed   98.46 sec
+test 615
+      Start 615: player_controls.private
+
+615: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "private" "<external-data-root>"
+615: Working Directory: <workspace>/Blood2/build/sanitize/tests
+615: Test timeout computed to be: 120
+64: Original SubwayA camera intro expired after 12.0167 simulation seconds
+64: SubwayA smell cycle 0: original intro, forward movement, 6 drops, 841 checks, 6 live hints
+64: Original SubwayA camera intro expired after 12.0167 simulation seconds
+64: SubwayA smell cycle 1: original intro, forward movement, 6 drops, 841 checks, 6 live hints
+ 3/50 Test  #64: player.smell_private ...............   Passed   40.90 sec
+test 43
+      Start  43: world.level_change_private
+
+43: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "level_change_private" "<external-data-root>"
+43: Working Directory: <workspace>/Blood2/build/sanitize/tests
+43: Test timeout computed to be: 120
+615: Original SubwayA camera intro expired after 12.0167 simulation seconds
+615: Alternate input: hp=100 dead=0 ammo=38 shots=12 before=5
+615: Corpse placement: placed with clearance correction corrections=2 distance=28.8523 requested=-73.1721,133.002,-2412.32 fitted=-59.999,133.002,-2428
+615: Original FIRE_KEY: shots=12 ammo=38 voices=12 mouse=0
+ 4/50 Test #615: player_controls.private ............   Passed   26.35 sec
+test 74
+      Start  74: weapons.private
+
+74: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_tests "private" "<external-data-root>"
+74: Working Directory: <workspace>/Blood2/build/sanitize/tests
+74: Test timeout computed to be: 240
+43: Malformed destination refusal 0: DAT v56: invalid/unsupported typed property near byte 442114
+43: CityHub transfer 0:
+43: SubwayA transfer 0:
+43: Malformed destination refusal 1: DAT v56: invalid/unsupported typed property near byte 442114
+43: CityHub transfer 1:
+43: SubwayA transfer 1:
+43: Malformed destination refusal 2: DAT v56: invalid/unsupported typed property near byte 442114
+43: CityHub transfer 2:
+43: SubwayA transfer 2:
+43: PASS level_change_private
+ 5/50 Test  #43: world.level_change_private .........   Passed   25.05 sec
+test 549
+      Start 549: player_keepalive.private
+
+549: Test command: <workspace>/Blood2/build/sanitize/tests/player_keepalive_tests "private" "<external-data-root>"
+549: Working Directory: <workspace>/Blood2/build/sanitize/tests
+549: Test timeout computed to be: 120
+549: cycle=0 CityHub named entry at 704,-85.999,2368; HP=73 bullets=17 keys=0 respawns=0 Caleb triangles=941
+549: Original instance=453 World-owned sound=31 Preprocessor only=541 Omitted: missing world model=1
+549:
+549: cycle=1 CityHub named entry at 704,-85.999,2368; HP=73 bullets=17 keys=0 respawns=0 Caleb triangles=941
+549: Original instance=453 World-owned sound=31 Preprocessor only=541 Omitted: missing world model=1
+549:
+549: cycle=2 CityHub named entry at 704,-85.999,2368; HP=73 bullets=17 keys=0 respawns=0 Caleb triangles=941
+549: Original instance=453 World-owned sound=31 Preprocessor only=541 Omitted: missing world model=1
+549:
+ 6/50 Test #549: player_keepalive.private ...........   Passed   20.16 sec
+test 545
+      Start 545: player_restore.private
+
+545: Test command: <workspace>/Blood2/build/sanitize/tests/player_restore_tests "private" "<external-data-root>"
+545: Working Directory: <workspace>/Blood2/build/sanitize/tests
+545: Test timeout computed to be: 120
+545: cycle=0 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+545: cycle=1 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+545: cycle=2 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+ 7/50 Test #545: player_restore.private .............   Passed    6.52 sec
+test 65
+      Start  65: player.private
+
+65: Test command: <workspace>/Blood2/build/sanitize/tests/player_tests "private" "<external-data-root>"
+65: Working Directory: <workspace>/Blood2/build/sanitize/tests
+65: Test timeout computed to be: 30
+65: Cycle 0: CPlayerObj at -32,170.001,-3224; 120 updates; 101 client messages; 7 paths
+65: Cycle 1: CPlayerObj at -32,170.001,-3224; 120 updates; 101 client messages; 7 paths
+65: Cycle 2: CPlayerObj at -32,170.001,-3224; 120 updates; 101 client messages; 7 paths
+ 8/50 Test  #65: player.private .....................   Passed   12.09 sec
+test 547
+      Start 547: player_keepalive.fallback
+
+547: Test command: <workspace>/Blood2/build/sanitize/tests/player_keepalive_tests "fallback" "<workspace>/Blood2/build/sanitize/tests/player-keepalive-fixtures/fallback"
+547: Working Directory: <workspace>/Blood2/build/sanitize/tests
+547: Test timeout computed to be: 30
+ 9/50 Test #547: player_keepalive.fallback ..........   Passed    0.14 sec
+test 25
+      Start  25: world.level_change
+
+25: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "level_change" "<workspace>/Blood2/build/sanitize/tests/world-fixtures/level_change"
+25: Working Directory: <workspace>/Blood2/build/sanitize/tests
+25: Test timeout computed to be: 20
+25: trial1: Destination world texture t.dtx: Missing exact-path resource
+25: trial2: No single-player GameStartPoint
+25: trial3: Start point has no supported ground collision
+25: trial4: Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+25: trial5: Destination initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+25: trial6: Destination start trigger requested another level during entry
+25: broken: DAT v56: invalid/unsupported section offsets near byte 4
+25: missing: Resource not found: worlds/missing.dat
+25: Commit 0:
+25: Commit 1:
+25: Commit 2:
+25: PASS level_change
+10/50 Test  #25: world.level_change .................   Passed    0.26 sec
+test 543
+      Start 543: player_restore.failures
+
+543: Test command: <workspace>/Blood2/build/sanitize/tests/player_restore_tests "failures" "<workspace>/Blood2/build/sanitize/tests/player-restore-fixtures/failures"
+543: Working Directory: <workspace>/Blood2/build/sanitize/tests
+543: Test timeout computed to be: 30
+11/50 Test #543: player_restore.failures ............   Passed    0.09 sec
+test 544
+      Start 544: player_restore.lifetime
+
+544: Test command: <workspace>/Blood2/build/sanitize/tests/player_restore_tests "lifetime" "<workspace>/Blood2/build/sanitize/tests/player-restore-fixtures/lifetime"
+544: Working Directory: <workspace>/Blood2/build/sanitize/tests
+544: Test timeout computed to be: 30
+12/50 Test #544: player_restore.lifetime ............   Passed    0.09 sec
+test 548
+      Start 548: player_keepalive.failures
+
+548: Test command: <workspace>/Blood2/build/sanitize/tests/player_keepalive_tests "failures" "<workspace>/Blood2/build/sanitize/tests/player-keepalive-fixtures/failures"
+548: Working Directory: <workspace>/Blood2/build/sanitize/tests
+548: Test timeout computed to be: 30
+13/50 Test #548: player_keepalive.failures ..........   Passed    0.08 sec
+test 542
+      Start 542: player_restore.roundtrip
+
+542: Test command: <workspace>/Blood2/build/sanitize/tests/player_restore_tests "roundtrip" "<workspace>/Blood2/build/sanitize/tests/player-restore-fixtures/roundtrip"
+542: Working Directory: <workspace>/Blood2/build/sanitize/tests
+542: Test timeout computed to be: 30
+14/50 Test #542: player_restore.roundtrip ...........   Passed    0.05 sec
+test 546
+      Start 546: player_keepalive.named
+
+546: Test command: <workspace>/Blood2/build/sanitize/tests/player_keepalive_tests "named" "<workspace>/Blood2/build/sanitize/tests/player-keepalive-fixtures/named"
+546: Working Directory: <workspace>/Blood2/build/sanitize/tests
+546: Test timeout computed to be: 30
+15/50 Test #546: player_keepalive.named .............   Passed    0.05 sec
+test 63
+      Start  63: player.smell
+
+63: Test command: <workspace>/Blood2/build/sanitize/tests/player_tests "smell" "<workspace>/Blood2/build/sanitize/tests/player-fixtures/smell"
+63: Working Directory: <workspace>/Blood2/build/sanitize/tests
+63: Test timeout computed to be: 30
+16/50 Test  #63: player.smell .......................   Passed    0.05 sec
+test 71
+      Start  71: weapons.animation
+
+71: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_tests "animation" "<workspace>/Blood2/build/sanitize/tests/weapon-fixtures/animation"
+71: Working Directory: <workspace>/Blood2/build/sanitize/tests
+71: Test timeout computed to be: 30
+17/50 Test  #71: weapons.animation ..................   Passed    0.33 sec
+test 1
+      Start   1: objects.builtin_model
+
+1: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "builtin_model"
+1: Working Directory: <workspace>/Blood2/build/sanitize/tests
+1: Test timeout computed to be: 10
+1: PASS builtin_model
+18/50 Test   #1: objects.builtin_model ..............   Passed    0.02 sec
+test 11
+      Start  11: objects.unsupported_teardown
+
+11: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "unsupported_teardown"
+11: Working Directory: <workspace>/Blood2/build/sanitize/tests
+11: Test timeout computed to be: 10
+11: PASS unsupported_teardown
+19/50 Test  #11: objects.unsupported_teardown .......   Passed    0.05 sec
+test 10
+      Start  10: objects.messages_strings
+
+10: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "messages_strings"
+10: Working Directory: <workspace>/Blood2/build/sanitize/tests
+10: Test timeout computed to be: 10
+10: PASS messages_strings
+20/50 Test  #10: objects.messages_strings ...........   Passed    0.04 sec
+test 12
+      Start  12: objects.creation_failures
+
+12: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "creation_failures"
+12: Working Directory: <workspace>/Blood2/build/sanitize/tests
+12: Test timeout computed to be: 10
+12: PASS creation_failures
+21/50 Test  #12: objects.creation_failures ..........   Passed    0.03 sec
+test 612
+      Start 612: player_controls.entry
+
+612: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "entry"
+612: Working Directory: <workspace>/Blood2/build/sanitize/tests
+612: Test timeout computed to be: 30
+22/50 Test #612: player_controls.entry ..............   Passed    0.02 sec
+test 610
+      Start 610: player_controls.mouse
+
+610: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "mouse"
+610: Working Directory: <workspace>/Blood2/build/sanitize/tests
+610: Test timeout computed to be: 30
+23/50 Test #610: player_controls.mouse ..............   Passed    0.02 sec
+test 609
+      Start 609: player_controls.keys
+
+609: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "keys"
+609: Working Directory: <workspace>/Blood2/build/sanitize/tests
+609: Test timeout computed to be: 30
+24/50 Test #609: player_controls.keys ...............   Passed    0.02 sec
+test 611
+      Start 611: player_controls.gates
+
+611: Test command: <workspace>/Blood2/build/sanitize/tests/player_controls_tests "gates"
+611: Working Directory: <workspace>/Blood2/build/sanitize/tests
+611: Test timeout computed to be: 30
+25/50 Test #611: player_controls.gates ..............   Passed    0.02 sec
+test 72
+      Start  72: weapons.lifetime
+
+72: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_tests "lifetime" "<workspace>/Blood2/build/sanitize/tests/weapon-fixtures/lifetime"
+72: Working Directory: <workspace>/Blood2/build/sanitize/tests
+72: Test timeout computed to be: 30
+26/50 Test  #72: weapons.lifetime ...................   Passed    0.06 sec
+test 4
+      Start   4: objects.reasons_properties
+
+4: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "reasons_properties"
+4: Working Directory: <workspace>/Blood2/build/sanitize/tests
+4: Test timeout computed to be: 10
+4: PASS reasons_properties
+27/50 Test   #4: objects.reasons_properties .........   Passed    0.02 sec
+test 9
+      Start   9: objects.links_lists
+
+9: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "links_lists"
+9: Working Directory: <workspace>/Blood2/build/sanitize/tests
+9: Test timeout computed to be: 10
+9: PASS links_lists
+28/50 Test   #9: objects.links_lists ................   Passed    0.02 sec
+test 2
+      Start   2: objects.original_objects
+
+2: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "original_objects"
+2: Working Directory: <workspace>/Blood2/build/sanitize/tests
+2: Test timeout computed to be: 10
+2: PASS original_objects
+29/50 Test   #2: objects.original_objects ...........   Passed    0.02 sec
+test 3
+      Start   3: objects.nested_creation
+
+3: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "nested_creation"
+3: Working Directory: <workspace>/Blood2/build/sanitize/tests
+3: Test timeout computed to be: 10
+3: PASS nested_creation
+30/50 Test   #3: objects.nested_creation ............   Passed    0.02 sec
+test 6
+      Start   6: objects.deferred_removal
+
+6: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "deferred_removal"
+6: Working Directory: <workspace>/Blood2/build/sanitize/tests
+6: Test timeout computed to be: 10
+6: PASS deferred_removal
+31/50 Test   #6: objects.deferred_removal ...........   Passed    0.02 sec
+test 8
+      Start   8: objects.handles_selection
+
+8: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "handles_selection"
+8: Working Directory: <workspace>/Blood2/build/sanitize/tests
+8: Test timeout computed to be: 10
+8: PASS handles_selection
+32/50 Test   #8: objects.handles_selection ..........   Passed    0.02 sec
+test 60
+      Start  60: player.rollback
+
+60: Test command: <workspace>/Blood2/build/sanitize/tests/player_tests "rollback" "<workspace>/Blood2/build/sanitize/tests/player-fixtures/rollback"
+60: Working Directory: <workspace>/Blood2/build/sanitize/tests
+60: Test timeout computed to be: 30
+33/50 Test  #60: player.rollback ....................   Passed    0.05 sec
+test 7
+      Start   7: objects.aggregate_dispatch
+
+7: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "aggregate_dispatch"
+7: Working Directory: <workspace>/Blood2/build/sanitize/tests
+7: Test timeout computed to be: 10
+7: PASS aggregate_dispatch
+34/50 Test   #7: objects.aggregate_dispatch .........   Passed    0.02 sec
+test 5
+      Start   5: objects.scheduling
+
+5: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "scheduling"
+5: Working Directory: <workspace>/Blood2/build/sanitize/tests
+5: Test timeout computed to be: 10
+5: PASS scheduling
+35/50 Test   #5: objects.scheduling .................   Passed    0.02 sec
+test 59
+      Start  59: player.lifecycle
+
+59: Test command: <workspace>/Blood2/build/sanitize/tests/player_tests "lifecycle" "<workspace>/Blood2/build/sanitize/tests/player-fixtures/lifecycle"
+59: Working Directory: <workspace>/Blood2/build/sanitize/tests
+59: Test timeout computed to be: 30
+36/50 Test  #59: player.lifecycle ...................   Passed    0.05 sec
+test 61
+      Start  61: player.messages
+
+61: Test command: <workspace>/Blood2/build/sanitize/tests/player_tests "messages" "<workspace>/Blood2/build/sanitize/tests/player-fixtures/messages"
+61: Working Directory: <workspace>/Blood2/build/sanitize/tests
+61: Test timeout computed to be: 30
+37/50 Test  #61: player.messages ....................   Passed    0.05 sec
+test 62
+      Start  62: player.callbacks
+
+62: Test command: <workspace>/Blood2/build/sanitize/tests/player_tests "callbacks" "<workspace>/Blood2/build/sanitize/tests/player-fixtures/callbacks"
+62: Working Directory: <workspace>/Blood2/build/sanitize/tests
+62: Test timeout computed to be: 30
+38/50 Test  #62: player.callbacks ...................   Passed    0.05 sec
+test 66
+      Start  66: weapons.inventory
+
+66: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_tests "inventory" "<workspace>/Blood2/build/sanitize/tests/weapon-fixtures/inventory"
+66: Working Directory: <workspace>/Blood2/build/sanitize/tests
+66: Test timeout computed to be: 30
+39/50 Test  #66: weapons.inventory ..................   Passed    0.05 sec
+test 73
+      Start  73: weapons.rollback
+
+73: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_tests "rollback" "<workspace>/Blood2/build/sanitize/tests/weapon-fixtures/rollback"
+73: Working Directory: <workspace>/Blood2/build/sanitize/tests
+73: Test timeout computed to be: 30
+40/50 Test  #73: weapons.rollback ...................   Passed    0.05 sec
+test 69
+      Start  69: weapons.melee
+
+69: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_tests "melee" "<workspace>/Blood2/build/sanitize/tests/weapon-fixtures/melee"
+69: Working Directory: <workspace>/Blood2/build/sanitize/tests
+69: Test timeout computed to be: 30
+41/50 Test  #69: weapons.melee ......................   Passed    0.04 sec
+test 68
+      Start  68: weapons.firing
+
+68: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_tests "firing" "<workspace>/Blood2/build/sanitize/tests/weapon-fixtures/firing"
+68: Working Directory: <workspace>/Blood2/build/sanitize/tests
+68: Test timeout computed to be: 30
+42/50 Test  #68: weapons.firing .....................   Passed    0.04 sec
+test 70
+      Start  70: weapons.damage
+
+70: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_tests "damage" "<workspace>/Blood2/build/sanitize/tests/weapon-fixtures/damage"
+70: Working Directory: <workspace>/Blood2/build/sanitize/tests
+70: Test timeout computed to be: 30
+43/50 Test  #70: weapons.damage .....................   Passed    0.04 sec
+test 67
+      Start  67: weapons.segments
+
+67: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_tests "segments" "<workspace>/Blood2/build/sanitize/tests/weapon-fixtures/segments"
+67: Working Directory: <workspace>/Blood2/build/sanitize/tests
+67: Test timeout computed to be: 30
+44/50 Test  #67: weapons.segments ...................   Passed    0.04 sec
+test 58
+      Start  58: player.handles
+
+58: Test command: <workspace>/Blood2/build/sanitize/tests/player_tests "handles" "<workspace>/Blood2/build/sanitize/tests/player-fixtures/handles"
+58: Working Directory: <workspace>/Blood2/build/sanitize/tests
+58: Test timeout computed to be: 30
+45/50 Test  #58: player.handles .....................   Passed    0.03 sec
+test 817
+      Start 817: hud.values
+
+817: Test command: <workspace>/Blood2/build/sanitize/tests/hud_tests "values" "<workspace>/Blood2/build/sanitize/tests/hud-fixtures/values"
+817: Working Directory: <workspace>/Blood2/build/sanitize/tests
+817: Test timeout computed to be: 30
+46/50 Test #817: hud.values .........................   Passed    0.02 sec
+test 818
+      Start 818: hud.input
+
+818: Test command: <workspace>/Blood2/build/sanitize/tests/hud_tests "input" "<workspace>/Blood2/build/sanitize/tests/hud-fixtures/input"
+818: Working Directory: <workspace>/Blood2/build/sanitize/tests
+818: Test timeout computed to be: 30
+47/50 Test #818: hud.input ..........................   Passed    0.02 sec
+test 819
+      Start 819: hud.session
+
+819: Test command: <workspace>/Blood2/build/sanitize/tests/hud_tests "session" "<workspace>/Blood2/build/sanitize/tests/hud-fixtures/session"
+819: Working Directory: <workspace>/Blood2/build/sanitize/tests
+819: Test timeout computed to be: 30
+48/50 Test #819: hud.session ........................   Passed    0.04 sec
+test 820
+      Start 820: hud.private
+
+820: Test command: <workspace>/Blood2/build/sanitize/tests/hud_tests "private" "<external-data-root>"
+820: Working Directory: <workspace>/Blood2/build/sanitize/tests
+820: Test timeout computed to be: 60
+49/50 Test #820: hud.private ........................   Passed    6.00 sec
+74: Original SubwayA camera intro expired after 12.0167 simulation seconds
+74: weapon 1: 463 vertices; 6 clips
+74:   static_model 1 ms
+74:   draw 333 ms
+74:   fire 150 ms [0:fire_key]
+74:   start_alt_fire 166 ms
+74:   alt_fire 200 ms [0:fire_key]
+74:   end_alt_fire 200 ms
+74: weapon 17: 488 vertices; 5 clips
+74:   alt_fire 1066 ms [613:fire_key]
+74:   fire2 966 ms [233:fire_key] [566:fire_key]
+74:   fire 566 ms [133:fire_key] [366:fire_key]
+74:   draw 333 ms
+74:   static_model 1 ms
+74: Original SubwayA camera intro expired after 12.0167 simulation seconds
+74: weapon 1: 463 vertices; 6 clips
+74:   static_model 1 ms
+74:   draw 333 ms
+74:   fire 150 ms [0:fire_key]
+74:   start_alt_fire 166 ms
+74:   alt_fire 200 ms [0:fire_key]
+74:   end_alt_fire 200 ms
+74: weapon 17: 488 vertices; 5 clips
+74:   alt_fire 1066 ms [613:fire_key]
+74:   fire2 966 ms [233:fire_key] [566:fire_key]
+74:   fire 566 ms [133:fire_key] [366:fire_key]
+74:   draw 333 ms
+74:   static_model 1 ms
+74: Original SubwayA camera intro expired after 12.0167 simulation seconds
+74: weapon 1: 463 vertices; 6 clips
+74:   static_model 1 ms
+74:   draw 333 ms
+74:   fire 150 ms [0:fire_key]
+74:   start_alt_fire 166 ms
+74:   alt_fire 200 ms [0:fire_key]
+74:   end_alt_fire 200 ms
+74: weapon 17: 488 vertices; 5 clips
+74:   alt_fire 1066 ms [613:fire_key]
+74:   fire2 966 ms [233:fire_key] [566:fire_key]
+74:   fire 566 ms [133:fire_key] [366:fire_key]
+74:   draw 333 ms
+74:   static_model 1 ms
+50/50 Test  #74: weapons.private ....................   Passed  143.53 sec
+
+The following tests passed:
+	player_controls.combat
+	player_controls.corpse_clearance
+	player.smell_private
+	player_controls.private
+	world.level_change_private
+	player_keepalive.private
+	player_restore.private
+	player.private
+	player_keepalive.fallback
+	world.level_change
+	player_restore.failures
+	player_restore.lifetime
+	player_keepalive.failures
+	player_restore.roundtrip
+	player_keepalive.named
+	player.smell
+	weapons.animation
+	objects.builtin_model
+	objects.unsupported_teardown
+	objects.messages_strings
+	objects.creation_failures
+	player_controls.entry
+	player_controls.mouse
+	player_controls.keys
+	player_controls.gates
+	weapons.lifetime
+	objects.reasons_properties
+	objects.links_lists
+	objects.original_objects
+	objects.nested_creation
+	objects.deferred_removal
+	objects.handles_selection
+	player.rollback
+	objects.aggregate_dispatch
+	objects.scheduling
+	player.lifecycle
+	player.messages
+	player.callbacks
+	weapons.inventory
+	weapons.rollback
+	weapons.melee
+	weapons.firing
+	weapons.damage
+	weapons.segments
+	player.handles
+	hud.values
+	hud.input
+	hud.session
+	hud.private
+	weapons.private
+
+100% tests passed, 0 tests failed out of 50
+
+Label Time Summary:
+headless            = 455.84 sec*proc (50 tests)
+hud                 =   6.08 sec*proc (4 tests)
+objects             =   0.30 sec*proc (12 tests)
+player              =  53.27 sec*proc (8 tests)
+player_controls     = 199.53 sec*proc (7 tests)
+player_keepalive    =  20.43 sec*proc (4 tests)
+player_restore      =   6.75 sec*proc (4 tests)
+private             = 453.71 sec*proc (10 tests)
+weapons             = 144.18 sec*proc (9 tests)
+world               =  25.31 sec*proc (2 tests)
+
+Total Test time (real) = 268.35 sec

@@ -1,0 +1,14 @@
+616/618 Testing: gideon_combat.failures
+616/618 Test: gideon_combat.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_combat_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-combat-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_combat.failures" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.failures" end time: Oct 17 02:23 CEST
+"gideon_combat.failures" time elapsed: 00:00:00
+----------------------------------------------------------

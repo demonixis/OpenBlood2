@@ -1,0 +1,14 @@
+318/323 Testing: attachments.rejects
+318/323 Test: attachments.rejects
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests" "rejects" "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment-fixtures/rejects"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"attachments.rejects" start time: Oct 16 07:33 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"attachments.rejects" end time: Oct 16 07:33 CEST
+"attachments.rejects" time elapsed: 00:00:00
+----------------------------------------------------------

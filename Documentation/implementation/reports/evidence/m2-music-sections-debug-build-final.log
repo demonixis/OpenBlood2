@@ -1,0 +1,29 @@
+[0/2] Re-checking globbed directories...
+[1/33] Scanning /home/yann/projects/lithtech/Blood2/tests/object_contract_tests.cpp for CXX dependencies
+[2/33] Scanning /home/yann/projects/lithtech/Blood2/tests/world_tests.cpp for CXX dependencies
+[3/33] Scanning /home/yann/projects/lithtech/Blood2/tests/sound_tests.cpp for CXX dependencies
+[4/33] Scanning /home/yann/projects/lithtech/Blood2/tests/audio_stream_tests.cpp for CXX dependencies
+[5/33] Scanning /home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp for CXX dependencies
+[6/33] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[7/33] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[8/32] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[9/32] Generating CXX dyndep file tests/CMakeFiles/sound_tests.dir/CXX.dd
+[10/32] Generating CXX dyndep file tests/CMakeFiles/audio_stream_tests.dir/CXX.dd
+[11/32] Generating CXX dyndep file tests/CMakeFiles/dls_bank_tests.dir/CXX.dd
+[12/31] Generating CXX dyndep file tests/CMakeFiles/dls_sampler_tests.dir/CXX.dd
+[13/31] Generating CXX dyndep file tests/CMakeFiles/ima_style_tests.dir/CXX.dd
+[14/30] Generating CXX dyndep file tests/CMakeFiles/ima_band_tests.dir/CXX.dd
+[15/29] Building CXX object tests/CMakeFiles/object_contract_tests.dir/object_contract_tests.cpp.o
+[16/29] Building CXX object tests/CMakeFiles/world_tests.dir/world_tests.cpp.o
+[17/29] Building CXX object tests/CMakeFiles/sound_tests.dir/sound_tests.cpp.o
+[18/29] Building CXX object tests/CMakeFiles/audio_stream_tests.dir/audio_stream_tests.cpp.o
+[19/29] Building CXX object tests/CMakeFiles/dls_sampler_tests.dir/dls_sampler_tests.cpp.o
+[20/29] Linking CXX executable tests/object_contract_tests
+[21/29] Linking CXX executable tests/config_tests
+[22/29] Linking CXX executable tests/world_tests
+[23/29] Linking CXX executable tests/sound_tests
+[24/29] Linking CXX executable tests/audio_stream_tests
+[25/29] Linking CXX executable tests/dls_bank_tests
+[26/29] Linking CXX executable tests/dls_sampler_tests
+[27/29] Linking CXX executable tests/ima_style_tests
+[28/29] Linking CXX executable tests/ima_band_tests

@@ -1,0 +1,62 @@
+569/569 Testing: weapon_impacts.private
+569/569 Test: weapon_impacts.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_impact_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_impacts.private" start time: Oct 16 23:27 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+cycle=0 contacts=1 sounds=0 failed=0
+cycle=0 contacts=2 sounds=1 failed=0
+cycle=0 contacts=1 sounds=2 failed=0
+cycle=0 contacts=2 sounds=3 failed=0
+Sounds/Weapons/impacts/stone/impact1.wav frames=6728 rate=22050
+Sounds/Weapons/impacts/stone/impact1.wav frames=6728 rate=22050
+Sounds/Weapons/impacts/metal/impact2.wav frames=21823 rate=22050
+Sounds/Weapons/impacts/wood/impact3.wav frames=7601 rate=22050
+Sounds/Weapons/impacts/energy/impact3.wav frames=7216 rate=22050
+Sounds/Weapons/impacts/glass/impact1.wav frames=26322 rate=22050
+Sounds/Weapons/impacts/terrain/impact2.wav frames=3917 rate=22050
+Sounds/Weapons/impacts/cloth/impact2.wav frames=3644 rate=22050
+Sounds/Weapons/impacts/plastic/impact1.wav frames=7580 rate=22050
+Sounds/Weapons/impacts/flesh/impact3.wav frames=1704 rate=22050
+Sounds/Weapons/impacts/water/impact1.wav frames=4283 rate=22050
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+cycle=1 contacts=1 sounds=0 failed=0
+cycle=1 contacts=2 sounds=1 failed=0
+cycle=1 contacts=1 sounds=2 failed=0
+cycle=1 contacts=2 sounds=3 failed=0
+Sounds/Weapons/impacts/stone/impact1.wav frames=6728 rate=22050
+Sounds/Weapons/impacts/stone/impact1.wav frames=6728 rate=22050
+Sounds/Weapons/impacts/metal/impact2.wav frames=21823 rate=22050
+Sounds/Weapons/impacts/wood/impact3.wav frames=7601 rate=22050
+Sounds/Weapons/impacts/energy/impact3.wav frames=7216 rate=22050
+Sounds/Weapons/impacts/glass/impact1.wav frames=26322 rate=22050
+Sounds/Weapons/impacts/terrain/impact2.wav frames=3917 rate=22050
+Sounds/Weapons/impacts/cloth/impact2.wav frames=3644 rate=22050
+Sounds/Weapons/impacts/plastic/impact1.wav frames=7580 rate=22050
+Sounds/Weapons/impacts/flesh/impact3.wav frames=1704 rate=22050
+Sounds/Weapons/impacts/water/impact1.wav frames=4283 rate=22050
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+cycle=2 contacts=1 sounds=0 failed=0
+cycle=2 contacts=2 sounds=1 failed=0
+cycle=2 contacts=1 sounds=2 failed=0
+cycle=2 contacts=2 sounds=3 failed=0
+Sounds/Weapons/impacts/stone/impact1.wav frames=6728 rate=22050
+Sounds/Weapons/impacts/stone/impact1.wav frames=6728 rate=22050
+Sounds/Weapons/impacts/metal/impact2.wav frames=21823 rate=22050
+Sounds/Weapons/impacts/wood/impact3.wav frames=7601 rate=22050
+Sounds/Weapons/impacts/energy/impact3.wav frames=7216 rate=22050
+Sounds/Weapons/impacts/glass/impact1.wav frames=26322 rate=22050
+Sounds/Weapons/impacts/terrain/impact2.wav frames=3917 rate=22050
+Sounds/Weapons/impacts/cloth/impact2.wav frames=3644 rate=22050
+Sounds/Weapons/impacts/plastic/impact1.wav frames=7580 rate=22050
+Sounds/Weapons/impacts/flesh/impact3.wav frames=1704 rate=22050
+Sounds/Weapons/impacts/water/impact1.wav frames=4283 rate=22050
+<end of output>
+Test time =  66.95 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_impacts.private" end time: Oct 16 23:28 CEST
+"weapon_impacts.private" time elapsed: 00:01:06
+----------------------------------------------------------

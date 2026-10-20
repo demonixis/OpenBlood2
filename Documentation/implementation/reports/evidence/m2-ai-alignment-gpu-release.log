@@ -1,0 +1,193 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 25
+    Start  25: gpu.lifecycle
+
+25: Test command: /home/yann/projects/lithtech/Blood2/build/release/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--gpu-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/gpu.png"
+25: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+25: Test timeout computed to be: 25
+25: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+25: [info] BLOOD2.REZ: detected, 267758913 bytes
+25: [info] SOUND.REZ: detected, 204633068 bytes
+25: [info] BLOOD2P.REZ: detected, 24133434 bytes
+25: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+25: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+25: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+25: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+25: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+25: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/gpu.png
+25: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+25: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+25: [info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+25: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+1/6 Test  #25: gpu.lifecycle ....................   Passed    3.11 sec
+test 196
+    Start 196: gpu.objectives
+
+196: Test command: /home/yann/projects/lithtech/Blood2/build/release/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--objectives-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/objectives.png"
+196: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+196: Test timeout computed to be: 30
+196: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+196: [info] BLOOD2.REZ: detected, 267758913 bytes
+196: [info] SOUND.REZ: detected, 204633068 bytes
+196: [info] BLOOD2P.REZ: detected, 24133434 bytes
+196: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+196: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+196: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+196: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+196: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+196: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+196: [info] NEW_LEVEL committed: worlds/01_subwaya.dat -> worlds/02_cityhub.dat / start 01_egressa
+196: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/objectives.png
+196: [info] NEW_LEVEL committed: worlds/01_subwaya.dat -> worlds/02_cityhub.dat / start 01_egressa
+196: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+196: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+196: [info] Session playback: waiting=0 time=0.06666666666666667 npc-ready=27 npc-failed=0 npc-updates=27
+196: [info] AI paths: hidden=true, reentered=true, copied points=7
+196: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+196: [info] World smoke passed: unload/reload, source paths/progress checked before exit, CityHub creation/resource report verified
+196: [info] OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; authored ExitTrigger NEW_LEVEL commits CityHub with the retained player; 1026 source entries include one explicit missing-world-model omission; destination entry, cleanup, presentation and reload checked
+196: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+2/6 Test #196: gpu.objectives ...................   Passed    2.08 sec
+test 291
+    Start 291: gpu.character
+
+291: Test command: /home/yann/projects/lithtech/Blood2/build/release/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--skeleton-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/skeleton.png"
+291: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+291: Environment variables:
+291:  SDL_AUDIODRIVER=dummy
+291: Test timeout computed to be: 60
+291: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+291: [info] BLOOD2.REZ: detected, 267758913 bytes
+291: [info] SOUND.REZ: detected, 204633068 bytes
+291: [info] BLOOD2P.REZ: detected, 24133434 bytes
+291: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+291: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+291: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+291: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+291: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+291: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+291: [info] Movement smoke focus at frame 2: true
+291: [info] Movement smoke input at 45: enabled=true, focused=true, text=false, W=true, Ctrl=false
+291: [info] Movement smoke input at 100: enabled=true, focused=true, text=false, W=false, Ctrl=true
+291: [info] Corpse diagnostic: present=true, setup=true, complete=true, sounds=1, updates=9, time=900, error=
+291: [info] Movement: hidden distance=295.31055, jumps=1, landings=2, ground=true, forward frames=55, jump frames=10
+291: [info] Movement smoke input at 170: enabled=true, focused=true, text=false, W=false, Ctrl=true
+291: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/skeleton.png
+291: [info] Movement smoke input at 185: enabled=true, focused=true, text=false, W=false, Ctrl=true
+291: [info] Shutdown: frames=240, UI frames=0, hidden frames=240, toggles=0, resize=true, quit=true
+291: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+291: [info] Session playback: waiting=0 time=28.033333333333022 npc-ready=16 npc-failed=0 npc-updates=679
+291: [info] Character motion probe: hidden=true, reentered=true, old handle invalidated=true
+291: [info] AI model-key probe: hidden=true, reentered=true, old handle invalidated=true
+291: [info] AI target probe: hidden=true, reentered=true, old handle invalidated=true
+291: [info] AI sight probe: hidden=true, reentered=true, old handle invalidated=true
+291: [info] AI state probe: hidden=true, reentered=true, old handle invalidated=true
+291: [info] AI weapon probe: hidden=true, reentered=true, old identity invalidated=true
+291: [info] AI script interpreter: hidden=true, reentered=true, old identity invalidated=true
+291: [info] AI navigation: state=999, phase=1, z=51, updates=32, arrivals=1, failures=0, points=0, error=
+291: [info] Original NPC AI_Update + hit localization: hidden=true, reentered=true, old identity invalidated=true
+291: [info] Corpse diagnostic: present=true, setup=true, complete=true, sounds=1, updates=9, time=900, error=
+291: [info] Original corpse: hidden=true, rendered=true, reentered=true, old identity invalidated=true
+291: [info] AI escape/beg: hidden=true, reentered=true, old identity invalidated=true
+291: [info] Held attachments: hidden=true, reentered=true, old identity invalidated=true
+291: [info] Character audio: hidden=true, reentered=true, starts=1, surface=10, submitted=730400
+291: [info] AI paths: hidden=true, reentered=true, copied points=7
+291: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+291: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+291: [info] Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, unload/re-entry
+291: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+3/6 Test #291: gpu.character ....................   Passed   13.37 sec
+test 650
+    Start 650: gpu.mouse_combat
+
+650: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/player_controls_tests "gpu_combat" "/home/yann/.steam/steam/steamapps/common/Blood II"
+650: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+650: Test timeout computed to be: 120
+650: Original SubwayA camera intro expired after 12.0167 simulation seconds
+650: Approached encounter at z=-2192.09
+650: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=8, ammo=42, independent corpse verified, native=1
+650: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=0
+650: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+650: Walked past killed Cultist to z=-1861.92
+650: Original SubwayA camera intro expired after 12.0167 simulation seconds
+650: Approached encounter at z=-2192.09
+650: Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=13, ammo=37, independent corpse verified, native=1
+650: Dodge updates=12, corpse candidates=23, zero-margin search=1, swept source clearance=0
+650: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+650: Walked past killed Cultist to z=-1861.92
+4/6 Test #650: gpu.mouse_combat .................   Passed    2.14 sec
+test 651
+    Start 651: gpu.corpse_clearance
+
+651: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/player_controls_tests "gpu_clearance" "/home/yann/.steam/steam/steamapps/common/Blood II"
+651: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+651: Test timeout computed to be: 120
+651: Original SubwayA camera intro expired after 12.0167 simulation seconds
+651: Approached encounter at z=-2338.28
+651: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+651: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+651: Post-kill position=-32,170.001,-1854.18 camera=0 yaw=0
+651: Walked past killed Cultist to z=-1854.18
+651: Approached encounter at z=-1742.25
+651: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+651: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+651: Post-kill position=-32,170.001,-1340.93 camera=0 yaw=-3.72529e-09
+651: Walked past killed Cultist to z=-1340.93
+651: Original SubwayA camera intro expired after 12.0167 simulation seconds
+651: Approached encounter at z=-2341.42
+651: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+651: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+651: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+651: Walked past killed Cultist to z=-1861.92
+651: Approached encounter at z=-1745.4
+651: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+651: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+651: Post-kill position=-32,170.001,-1344.07 camera=0 yaw=3.72529e-09
+651: Walked past killed Cultist to z=-1344.07
+5/6 Test #651: gpu.corpse_clearance .............   Passed    2.64 sec
+test 816
+    Start 816: gpu.level_change
+
+816: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/level_change_gpu_tests "/home/yann/.steam/steam/steamapps/common/Blood II" "/home/yann/projects/lithtech/Blood2/build/release/tests/level-change"
+816: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+816: Test timeout computed to be: 90
+816: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+816: Destination: CityHub /
+816: Cycle 0: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+816: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+816: Destination: SubwayA /
+816: Cycle 1: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+816: Destination: CityHub /
+816: Cycle 2: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+816: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+816: Destination: SubwayA /
+816: Cycle 3: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+6/6 Test #816: gpu.level_change .................   Passed    1.50 sec
+
+The following tests passed:
+	gpu.lifecycle
+	gpu.objectives
+	gpu.character
+	gpu.mouse_combat
+	gpu.corpse_clearance
+	gpu.level_change
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+character          =  13.37 sec*proc (1 test)
+gpu                =  24.83 sec*proc (6 tests)
+objectives         =   2.08 sec*proc (1 test)
+player_controls    =   4.78 sec*proc (2 tests)
+private            =  21.73 sec*proc (5 tests)
+world              =   1.50 sec*proc (1 test)
+
+Total Test time (real) =  24.84 sec

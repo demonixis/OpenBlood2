@@ -1,0 +1,26 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 271: character.catalog
+    Start 272: character.player
+    Start 269: character.rejection
+    Start 266: character.humiliation
+1/8 Test #269: character.rejection ..............   Passed    0.00 sec
+    Start 265: character.mappings
+2/8 Test #266: character.humiliation ............   Passed    0.00 sec
+    Start 270: character.spheres
+3/8 Test #265: character.mappings ...............   Passed    0.00 sec
+    Start 268: character.transforms
+4/8 Test #270: character.spheres ................   Passed    0.00 sec
+    Start 267: character.force
+5/8 Test #268: character.transforms .............   Passed    0.00 sec
+6/8 Test #267: character.force ..................   Passed    0.00 sec
+7/8 Test #271: character.catalog ................   Passed    0.32 sec
+8/8 Test #272: character.player .................   Passed    4.49 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+character    =   4.82 sec*proc (8 tests)
+headless     =   4.82 sec*proc (8 tests)
+private      =   4.81 sec*proc (2 tests)
+
+Total Test time (real) =   4.49 sec

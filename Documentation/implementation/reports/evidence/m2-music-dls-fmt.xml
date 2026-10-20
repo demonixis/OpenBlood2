@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-c++"
+	tests="7"
+	failures="2"
+	disabled="0"
+	skipped="0"
+	hostname="gigabyte-g5"
+	time="1"
+	timestamp="2026-10-17T23:51:34"
+	>
+	<testcase name="music_assets.reader" classname="music_assets.reader" time="0.0144446" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Reader: exact ranges, padding, recursion/count limits, references and owned output verified
+</system-out>
+	</testcase>
+	<testcase name="music_assets.plan" classname="music_assets.plan" time="0.00264952" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Original plan: reverse transition loading, repeated cts.sec, playlist order and first-command parsing verified
+</system-out>
+	</testcase>
+	<testcase name="music_assets.catalog" classname="music_assets.catalog" time="0.0142581" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Catalog: deduplicated reads, explicit missing/ambiguous/symlink/oversize failures and reset verified
+</system-out>
+	</testcase>
+	<testcase name="music_assets.private" classname="music_assets.private" time="1.32576" status="fail">
+		<failure message="Failed"/>
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private music containers: 156 sections / 39 styles / 5 banks / 21513 chunks / 11986804 bytes
+01_SubwayA music directory music/cabal requests=52 files=45 bytes=2004402 error=
+279: catalog.assets.front().bank &amp;&amp; catalog.assets.front().bank_error.empty() | 
+</system-out>
+	</testcase>
+	<testcase name="dls_bank.decode" classname="dls_bank.decode" time="0.00197386" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>DLS PCM endpoints, signed values, reordered/aliased cues, region override/inheritance, layered order, raw graphs and owned lifetime verified
+</system-out>
+	</testcase>
+	<testcase name="dls_bank.malformed" classname="dls_bank.malformed" time="0.00480319" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>DLS all synthetic truncations, references/counts/ranges/duplicates/loops/formats and transactional budget failure verified
+</system-out>
+	</testcase>
+	<testcase name="dls_bank.private" classname="dls_bank.private" time="0.614277" status="fail">
+		<failure message="Failed"/>
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Ancient.dls: 12 instruments / 106 regions / 55 waves / 1131051 frames / 21 connections / 138 opaque chunks
+bloat.dls: 8 instruments / 30 regions / 28 waves / 1073503 frames / 26 connections / 76 opaque chunks
+224: read_dls_bank(bytes, bank, error) | DLS: Unsupported/out-of-range forward sample loop
+</system-out>
+	</testcase>
+</testsuite>

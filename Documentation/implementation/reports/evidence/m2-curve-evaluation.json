@@ -1,0 +1,216 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "0b15de19e023a3cbf2b8ecb906c436d61b27c4d3",
+  "status": "M2 incomplete; original style-point event expansion with explicit owner/tick; no live MUSIC",
+  "frozen_sources": {
+    "src/engine/ima_curve_event.h": "12901cf33a8d32cf22aa63352dea25807b069530f79dcc6f34a408d2d0d05e0d",
+    "src/engine/ima_curve_event.cpp": "0ff91f8e159d952c86493431a1a6f56887cba6c04d2202be569a9c5068843fa8",
+    "src/app/inspector_world_sounds.cpp": "a3aea4815d551b14fe27e21785991afbae0703a2493774f8fb00f195bef00e95",
+    "src/app/world_sound_smoke.cpp": "343a69cebb0fa0a6006268b46f595818427d8d101b4d715750f27e6f7ad50e55",
+    "tests/ima_curve_event_tests.cpp": "8422dd2f81b9a82d99d77c0c51720eda80b640d651bcd139a6d2758a1b759d51",
+    "CMakeLists.txt": "4aecdf809918de40bacf32a95efaee1481c4a56b9e6be9888e4cb94ee8cbe63a",
+    "tests/CMakeLists.txt": "e62dfffa995d4e04214f5cca8f50a484b1045d54cb960dfc7f758af417b1ad3a"
+  },
+  "results": {
+    "debug-tests": {
+      "passed": 123,
+      "wall_seconds": 18.39
+    },
+    "release-tests": {
+      "passed": 123,
+      "wall_seconds": 1.67
+    },
+    "sanitize-tests": {
+      "passed": 123,
+      "wall_seconds": 75.97
+    },
+    "debug-gpu": {
+      "passed": 2,
+      "wall_seconds": 11.1
+    },
+    "release-gpu": {
+      "passed": 2,
+      "wall_seconds": 3.73
+    }
+  },
+  "original_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "entry_rva": "0x12168 (calls 0x11ca9)",
+    "regenerated_table_entries": 772,
+    "synthetic": {
+      "decisions": 1296,
+      "messages": 39840,
+      "sha256": "7cdeccd1461329d5967a7184adf03ad46ec51c08ed61a5a15fd053f83aaa0148",
+      "fnv64": 11599925503900038861
+    },
+    "private": {
+      "decisions": 47,
+      "messages": 3194,
+      "sha256": "9286e869a76daa634fb43a4c7ef6f554284547d2f75834010953a8c30d8f61c1",
+      "fnv64": 12221266369440151417
+    },
+    "messages_by_bank": {
+      "A1": 2900,
+      "Cabal": 206,
+      "Track1": 88
+    },
+    "scope": "Explicit point owner/controller and tick; original allocation/free intercepted and send captured. No loader summary/owner fixup, admission, merged order, synth or transport claim."
+  },
+  "commands": [
+    "python /tmp/b2-curve-evaluation-validation.py {debug,release,sanitize} (three builds at -j1 each; relevant CTests at -j2)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/{debug,release} -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit /tmp/b2-curve-evaluation-{debug,release}-gpu.xml",
+    "/tmp/b2-legacy-pan-tools/bin/python Documentation/Implementation/evidence/m2-curve-evaluation-probe.py EXTERNAL_GAME_ROOT [OPTIONAL_SYNTHETIC_FIXTURE_OUTPUT]",
+    "sha256sum -c /tmp/b2-curve-evaluation-build-inputs.sha256",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror (five changed C++ files)",
+    "python /tmp/b2-npc-integrity.py; python /tmp/b2-npc-links.py; git diff --check on owned source/documentation (raw .log/.xml evidence excluded to preserve exact tool output)"
+  ],
+  "limitations": [
+    "Style-point expansion only with explicit owner/tick; no original loader fixups/admission or merged curve/note dispatch",
+    "Original isolated expansion/send probe intercepts allocation/free and captures raw output; no synth or clock parity",
+    "Regenerated tables checked on Linux; native Metal/Windows/mobile not tested",
+    "GPU smoke checks 206 Cabal messages with hidden inspection and inspector-free Release; reviewed Debug capture shows the music summary, not nested event rows",
+    "Dummy SDL audio; no listening comparison or live MUSIC"
+  ],
+  "capture": {
+    "path": "Blood2/build/debug/tests/world-sounds.png",
+    "sha256": "baa99ce8005f47e2963c9702cf0032fbfb5149401e7770158e63edc8a16ac670",
+    "committed": false
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "readme_preserved_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "files": [
+    {
+      "file": "m2-curve-evaluation-probe.py",
+      "sha256": "ebedd8764ecf4c6cfe887a89be1c6620b88e56365d1d2aef7e480f0f4c27b45e"
+    },
+    {
+      "file": "m2-curve-evaluation-probe.json",
+      "sha256": "7d28b58ee05f0825482011969a076ee3a548e6989c38cf32914c37353fcb65ab"
+    },
+    {
+      "file": "m2-curve-evaluation-probe-errors.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-curve-evaluation-validation.py",
+      "sha256": "5ca4c601c8b8e624a8100af0cf1b1f83f0dbcabfbf79bc8e1ce61c5595b48c06"
+    },
+    {
+      "file": "m2-curve-evaluation-build-inputs.sha256",
+      "sha256": "9333ea5218638812de5bb2b89f6ec7d707654220d6a8c26b0da77c359d974a4a"
+    },
+    {
+      "file": "m2-curve-evaluation-focus-build.log",
+      "sha256": "cb563cf68cdd6252c741aaeeaef987f52e53fa608e25cb34367433b04e2cf4a3"
+    },
+    {
+      "file": "m2-curve-evaluation-focus.log",
+      "sha256": "bd5a86c81ad3c9c8bfbad5283d17a398f9ad010035f4fca372accae5811c503f"
+    },
+    {
+      "file": "m2-curve-evaluation-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-curve-evaluation-hash-check.log",
+      "sha256": "54a56e0b0787362b0dc2ca94eb53a055e78fd19258798a2cf793830a398b5619"
+    },
+    {
+      "file": "m2-curve-evaluation-debug-tests.log",
+      "sha256": "aef1034ca5d919349e9ed527f3d97c7436990191f8b8f5d9a440a64e68816fec"
+    },
+    {
+      "file": "m2-curve-evaluation-debug-tests.xml",
+      "sha256": "f14c746149dcc60c6806b8ec2e0018fc433fd0dc11613e8f70e4423430f7b9fb"
+    },
+    {
+      "file": "m2-curve-evaluation-release-tests.log",
+      "sha256": "e76d91df1ace31be3909ce373f14cc1ed7cdd975ec3ed1e55701b33114b99841"
+    },
+    {
+      "file": "m2-curve-evaluation-release-tests.xml",
+      "sha256": "8d467e45a08dc9e09cf2e1ab897b885a84c168d754d8590770adfb89f413319c"
+    },
+    {
+      "file": "m2-curve-evaluation-sanitize-tests.log",
+      "sha256": "6270e23c130a436209e64a177ef3b3569b1b60c310cffd2b70c7a4ae0a950bf0"
+    },
+    {
+      "file": "m2-curve-evaluation-sanitize-tests.xml",
+      "sha256": "4b6ba04c72ad294b310626c96b515811c4ed05b8aa517ceaadbfb2cb84396d1f"
+    },
+    {
+      "file": "m2-curve-evaluation-debug-gpu.log",
+      "sha256": "9284ab27d36afec652296f8594f2f5b0a181022f1797c71864879cf170064d8a"
+    },
+    {
+      "file": "m2-curve-evaluation-debug-gpu.xml",
+      "sha256": "c33f7899c83b2cd7cf941f5d9f10eb23e2a8838d2fabba823312e9cbcd572b38"
+    },
+    {
+      "file": "m2-curve-evaluation-release-gpu.log",
+      "sha256": "269966145ac15c2e5b95cbc7eb41f0320154ff671e8f9dba67bc91cbf6d60dd0"
+    },
+    {
+      "file": "m2-curve-evaluation-release-gpu.xml",
+      "sha256": "c4cd23e49805bf1dcb0159f38f579d38303e8ce298632cee346c69b4b8b531ec"
+    },
+    {
+      "file": "m2-curve-evaluation-debug-build-final.log",
+      "sha256": "fa34f826e4cd85795ab24ae7ea861ceed43ed0c1430d64a9a36b75f83b7c5ace"
+    },
+    {
+      "file": "m2-curve-evaluation-release-build-final.log",
+      "sha256": "72a72a1ccab96e2eec45a1753fe56c13b4eab305f171ca1007b7bbce174ea632"
+    },
+    {
+      "file": "m2-curve-evaluation-sanitize-build-final.log",
+      "sha256": "23310151dba13c2bfea35b4e363438b1b72a52f2c7131d11dbc5f1e5d7ad06fb"
+    },
+    {
+      "file": "m2-curve-evaluation-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-curve-evaluation-links.log",
+      "sha256": "84216fd59f8a5c6d90b91157ebec44028a42c696f1319b8b5f1baf0916358f9a"
+    }
+  ],
+  "implementation_commit": "f37dfb1d58c25673e98d984a9ac102d82585ce0a"
+}

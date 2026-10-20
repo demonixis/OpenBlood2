@@ -1,0 +1,15 @@
+7/618 Testing: objects.handles_selection
+7/618 Test: objects.handles_selection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "handles_selection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.handles_selection" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+PASS handles_selection
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.handles_selection" end time: Oct 17 02:23 CEST
+"objects.handles_selection" time elapsed: 00:00:00
+----------------------------------------------------------

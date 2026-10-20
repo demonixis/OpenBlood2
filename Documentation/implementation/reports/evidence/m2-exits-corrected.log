@@ -1,0 +1,35 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  37: world.private
+ 1/11 Test  #37: world.private ....................   Passed    0.81 sec
+      Start  39: cli.world_modes
+ 2/11 Test  #39: cli.world_modes ..................   Passed    1.46 sec
+      Start 178: gpu.objectives
+ 3/11 Test #178: gpu.objectives ...................   Passed    3.01 sec
+      Start 500: exits.defaults
+ 4/11 Test #500: exits.defaults ...................   Passed    0.01 sec
+      Start 501: exits.delayed
+ 5/11 Test #501: exits.delayed ....................   Passed    0.01 sec
+      Start 502: exits.broadcast
+ 6/11 Test #502: exits.broadcast ..................   Passed    0.01 sec
+      Start 503: exits.blocked
+ 7/11 Test #503: exits.blocked ....................   Passed    0.01 sec
+      Start 504: exits.dead
+ 8/11 Test #504: exits.dead .......................   Passed    0.01 sec
+      Start 505: exits.queue
+ 9/11 Test #505: exits.queue ......................   Passed    0.01 sec
+      Start 506: exits.lifetime
+10/11 Test #506: exits.lifetime ...................   Passed    0.01 sec
+      Start 507: exits.catalog
+11/11 Test #507: exits.catalog ....................   Passed    2.40 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Label Time Summary:
+exits         =   2.45 sec*proc (8 tests)
+gpu           =   3.01 sec*proc (1 test)
+headless      =   4.73 sec*proc (10 tests)
+objectives    =   3.01 sec*proc (1 test)
+private       =   7.69 sec*proc (4 tests)
+world         =   2.28 sec*proc (2 tests)
+
+Total Test time (real) =   7.75 sec

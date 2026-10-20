@@ -1,0 +1,17 @@
+640/642 Testing: gideon_runtime.profile
+640/642 Test: gideon_runtime.profile
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_runtime_tests" "profile" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_runtime.profile" start time: Oct 17 03:42 CEST
+Output:
+----------------------------------------------------------
+Gideon difficulty=0 hp=1000.25 captured=1 ratio=1000.25
+Gideon difficulty=1 hp=4001 captured=1 ratio=4001
+Gideon difficulty=2 hp=6001.5 captured=1 ratio=6001.5
+<end of output>
+Test time =   1.61 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_runtime.profile" end time: Oct 17 03:43 CEST
+"gideon_runtime.profile" time elapsed: 00:00:01
+----------------------------------------------------------

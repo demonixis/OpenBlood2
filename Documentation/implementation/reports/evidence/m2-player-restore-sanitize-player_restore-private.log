@@ -1,0 +1,52 @@
+507/507 Testing: player_restore.private
+507/507 Test: player_restore.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_restore_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_restore.private" start time: Oct 16 19:20 CEST
+Output:
+----------------------------------------------------------
+cycle=0 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+cycle=1 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+cycle=2 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+<end of output>
+Test time =   6.38 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.private" end time: Oct 16 19:20 CEST
+"player_restore.private" time elapsed: 00:00:06
+----------------------------------------------------------
+
+End testing: Oct 16 19:20 CEST
+
+ai_hit =   1.01 sec*proc
+
+ai_perception =   4.79 sec*proc
+
+attachments =   5.84 sec*proc
+
+character_nodes =   6.01 sec*proc
+
+destructable_state =   5.48 sec*proc
+
+exits =  11.84 sec*proc
+
+headless =  79.62 sec*proc
+
+inventory_state =   5.44 sec*proc
+
+model_view =   4.33 sec*proc
+
+objects =   0.24 sec*proc
+
+player =  11.73 sec*proc
+
+player_restore =   6.59 sec*proc
+
+player_state =   5.50 sec*proc
+
+private =  76.47 sec*proc
+
+services =  10.66 sec*proc
+
+weapons =   0.15 sec*proc
+

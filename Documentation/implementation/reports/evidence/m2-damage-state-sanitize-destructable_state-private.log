@@ -1,0 +1,48 @@
+491/491 Testing: destructable_state.private
+491/491 Test: destructable_state.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable_state_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"destructable_state.private" start time: Oct 16 18:12 CEST
+Output:
+----------------------------------------------------------
+cycle 0: aggregate HP 68, armor 24, source-independent damage/heal; no world transfer
+cycle 1: aggregate HP 69, armor 24, source-independent damage/heal; no world transfer
+cycle 2: aggregate HP 70, armor 24, source-independent damage/heal; no world transfer
+<end of output>
+Test time =   4.85 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_state.private" end time: Oct 16 18:13 CEST
+"destructable_state.private" time elapsed: 00:00:04
+----------------------------------------------------------
+
+End testing: Oct 16 18:13 CEST
+
+ai_hit =   0.89 sec*proc
+
+brushes =  39.11 sec*proc
+
+corpses =   1.12 sec*proc
+
+destructable_state =   5.01 sec*proc
+
+exits =  10.76 sec*proc
+
+headless = 283.74 sec*proc
+
+inventory_state =   5.06 sec*proc
+
+objects =   0.23 sec*proc
+
+pickups =  14.83 sec*proc
+
+player =  11.34 sec*proc
+
+private = 280.07 sec*proc
+
+services =  10.40 sec*proc
+
+triggers =  37.45 sec*proc
+
+weapons = 147.54 sec*proc
+

@@ -1,0 +1,63 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 893
+    Start 893: blood_spurts.formulas
+
+893: Test command: <workspace>/Blood2/build/debug/tests/blood_spurt_tests "formulas" "<workspace>/Blood2/build/debug/tests/blood-spurts-formulas"
+893: Working Directory: <workspace>/Blood2/build/debug/tests
+893: Test timeout computed to be: 30
+1/5 Test #893: blood_spurts.formulas ............   Passed    0.01 sec
+test 894
+    Start 894: blood_spurts.impact
+
+894: Test command: <workspace>/Blood2/build/debug/tests/blood_spurt_tests "impact" "<workspace>/Blood2/build/debug/tests/blood-spurts-impact"
+894: Working Directory: <workspace>/Blood2/build/debug/tests
+894: Test timeout computed to be: 30
+2/5 Test #894: blood_spurts.impact ..............   Passed    0.01 sec
+test 895
+    Start 895: blood_spurts.weapon
+
+895: Test command: <workspace>/Blood2/build/debug/tests/blood_spurt_tests "weapon" "<workspace>/Blood2/build/debug/tests/blood-spurts-weapon"
+895: Working Directory: <workspace>/Blood2/build/debug/tests
+895: Test timeout computed to be: 30
+3/5 Test #895: blood_spurts.weapon ..............   Passed    0.00 sec
+test 896
+    Start 896: blood_spurts.failures
+
+896: Test command: <workspace>/Blood2/build/debug/tests/blood_spurt_tests "failures" "<workspace>/Blood2/build/debug/tests/blood-spurts-failures"
+896: Working Directory: <workspace>/Blood2/build/debug/tests
+896: Test timeout computed to be: 30
+4/5 Test #896: blood_spurts.failures ............   Passed    0.01 sec
+test 897
+    Start 897: blood_spurts.private
+
+897: Test command: <workspace>/Blood2/build/debug/tests/blood_spurt_tests "private" "<external-data-root>"
+897: Working Directory: <workspace>/Blood2/build/debug/tests
+897: Test timeout computed to be: 120
+897: Private cycle 0: original death/limb/fragment callers, peak 8064, emitter impacts 4, splats 5, three real drop textures
+897: Private cycle 1: original death/limb/fragment callers, peak 8124, emitter impacts 4, splats 5, three real drop textures
+897: Private cycle 2: original death/limb/fragment callers, peak 8124, emitter impacts 4, splats 5, three real drop textures
+5/5 Test #897: blood_spurts.private .............   Passed    1.49 sec
+
+The following tests passed:
+	blood_spurts.formulas
+	blood_spurts.impact
+	blood_spurts.weapon
+	blood_spurts.failures
+	blood_spurts.private
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+blood_spurts    =   1.51 sec*proc (5 tests)
+headless        =   1.51 sec*proc (5 tests)
+private         =   1.49 sec*proc (1 test)
+
+Total Test time (real) =   1.53 sec

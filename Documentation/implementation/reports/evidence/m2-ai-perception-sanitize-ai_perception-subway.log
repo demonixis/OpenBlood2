@@ -1,0 +1,101 @@
+334/334 Testing: ai_perception.subway
+334/334 Test: ai_perception.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_perception_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_perception.subway" start time: Oct 16 10:37 CEST
+Output:
+----------------------------------------------------------
+Subway cycle=0: original player enters both factions; acquisition/invisibility/leave/reentry checked
+Subway cycle=1: original player enters both factions; acquisition/invisibility/leave/reentry checked
+<end of output>
+Test time =   2.55 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.subway" end time: Oct 16 10:37 CEST
+"ai_perception.subway" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 16 10:37 CEST
+
+ai_keys =  21.31 sec*proc
+
+ai_perception =   3.57 sec*proc
+
+ai_sight =   3.61 sec*proc
+
+ai_target =   3.70 sec*proc
+
+attachments =   4.35 sec*proc
+
+brushes =  38.83 sec*proc
+
+cameras =  22.13 sec*proc
+
+character =  20.51 sec*proc
+
+character_audio =  25.63 sec*proc
+
+character_motion =   1.11 sec*proc
+
+cinematics =  15.21 sec*proc
+
+cli =   0.11 sec*proc
+
+config =   0.06 sec*proc
+
+containers =  31.73 sec*proc
+
+doors =  35.09 sec*proc
+
+explosions =   0.24 sec*proc
+
+headless = 628.34 sec*proc
+
+interaction =  32.84 sec*proc
+
+keyframes =  33.36 sec*proc
+
+lights =  14.32 sec*proc
+
+locomotion =  13.57 sec*proc
+
+model_view =   2.61 sec*proc
+
+movement =  36.02 sec*proc
+
+objectives =  13.71 sec*proc
+
+objects =   0.22 sec*proc
+
+paths =   3.93 sec*proc
+
+pickups =  14.33 sec*proc
+
+player =   7.65 sec*proc
+
+private = 614.98 sec*proc
+
+pushables =   0.42 sec*proc
+
+randomsound =  14.85 sec*proc
+
+sceneexplosion =  14.66 sec*proc
+
+services =   7.39 sec*proc
+
+sound =  15.21 sec*proc
+
+sprites =  33.45 sec*proc
+
+texture =   7.50 sec*proc
+
+triggers =  36.41 sec*proc
+
+weapons =  78.27 sec*proc
+
+world =   6.89 sec*proc
+
+world_view =   2.72 sec*proc
+
+worldpaths =  10.81 sec*proc
+

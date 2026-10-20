@@ -1,0 +1,14 @@
+362/372 Testing: ai_state.symbols
+362/372 Test: ai_state.symbols
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_state_tests" "symbols"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_state.symbols" start time: Oct 16 10:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.symbols" end time: Oct 16 10:57 CEST
+"ai_state.symbols" time elapsed: 00:00:00
+----------------------------------------------------------

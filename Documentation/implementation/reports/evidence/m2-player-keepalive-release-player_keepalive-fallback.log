@@ -1,0 +1,14 @@
+537/540 Testing: player_keepalive.fallback
+537/540 Test: player_keepalive.fallback
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/player_keepalive_tests" "fallback" "/home/yann/projects/lithtech/Blood2/build/release/tests/player-keepalive-fixtures/fallback"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"player_keepalive.fallback" start time: Oct 16 19:44 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"player_keepalive.fallback" end time: Oct 16 19:44 CEST
+"player_keepalive.fallback" time elapsed: 00:00:00
+----------------------------------------------------------

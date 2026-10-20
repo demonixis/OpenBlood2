@@ -1,0 +1,27 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 508: inventory_state.roundtrip
+1/5 Test #508: inventory_state.roundtrip ........   Passed    0.01 sec
+    Start 509: inventory_state.malformed
+2/5 Test #509: inventory_state.malformed ........   Passed    0.00 sec
+    Start 510: inventory_state.rollback
+3/5 Test #510: inventory_state.rollback .........   Passed    0.00 sec
+    Start 511: inventory_state.capture
+4/5 Test #511: inventory_state.capture ..........***Failed    0.01 sec
+fixture: game.initialize()
+capture:148: test_player::setup(g,root)
+
+    Start 512: inventory_state.private
+5/5 Test #512: inventory_state.private ..........   Passed    1.16 sec
+
+80% tests passed, 1 tests failed out of 5
+
+Label Time Summary:
+headless           =   1.18 sec*proc (5 tests)
+inventory_state    =   1.18 sec*proc (5 tests)
+private            =   1.16 sec*proc (1 test)
+
+Total Test time (real) =   1.19 sec
+
+The following tests FAILED:
+	511 - inventory_state.capture (Failed)                  headless inventory_state
+Errors while running CTest

@@ -1,0 +1,135 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start   1: objects.original_objects
+ 1/58 Test   #1: objects.original_objects .........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+ 2/58 Test   #2: objects.nested_creation ..........   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+ 3/58 Test   #3: objects.reasons_properties .......   Passed    0.02 sec
+      Start   4: objects.scheduling
+ 4/58 Test   #4: objects.scheduling ...............   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+ 5/58 Test   #5: objects.deferred_removal .........   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+ 6/58 Test   #6: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   7: objects.handles_selection
+ 7/58 Test   #7: objects.handles_selection ........   Passed    0.02 sec
+      Start   8: objects.links_lists
+ 8/58 Test   #8: objects.links_lists ..............   Passed    0.03 sec
+      Start   9: objects.messages_strings
+ 9/58 Test   #9: objects.messages_strings .........   Passed    0.04 sec
+      Start  10: objects.unsupported_teardown
+10/58 Test  #10: objects.unsupported_teardown .....   Passed    0.05 sec
+      Start  11: objects.creation_failures
+11/58 Test  #11: objects.creation_failures ........   Passed    0.03 sec
+      Start 235: sceneexplosion.properties
+12/58 Test #235: sceneexplosion.properties ........   Passed    0.04 sec
+      Start 236: sceneexplosion.commands
+13/58 Test #236: sceneexplosion.commands ..........   Passed    0.04 sec
+      Start 237: sceneexplosion.damage
+14/58 Test #237: sceneexplosion.damage ............   Passed    0.04 sec
+      Start 238: sceneexplosion.lifetime
+15/58 Test #238: sceneexplosion.lifetime ..........   Passed    0.04 sec
+      Start 239: sceneexplosion.failures
+16/58 Test #239: sceneexplosion.failures ..........   Passed    0.04 sec
+      Start 240: sceneexplosion.budget
+17/58 Test #240: sceneexplosion.budget ............   Passed    0.10 sec
+      Start 241: sceneexplosion.catalog
+18/58 Test #241: sceneexplosion.catalog ...........   Passed   16.03 sec
+      Start 242: sceneexplosion.subway
+19/58 Test #242: sceneexplosion.subway ............   Passed    4.52 sec
+      Start 512: sprite_view.geometry
+20/58 Test #512: sprite_view.geometry .............   Passed    0.02 sec
+      Start 513: sprite_view.failures
+21/58 Test #513: sprite_view.failures .............   Passed    0.14 sec
+      Start 514: sprite_view.subway
+22/58 Test #514: sprite_view.subway ...............   Passed    5.93 sec
+      Start 515: explosion_sprites.formulas
+23/58 Test #515: explosion_sprites.formulas .......   Passed    0.03 sec
+      Start 516: explosion_sprites.failures
+24/58 Test #516: explosion_sprites.failures .......   Passed    0.04 sec
+      Start 517: explosion_sprites.session
+25/58 Test #517: explosion_sprites.session ........   Passed    0.02 sec
+      Start 518: explosion_sprites.private
+26/58 Test #518: explosion_sprites.private ........   Passed    5.75 sec
+      Start 519: explosion_models.formulas
+27/58 Test #519: explosion_models.formulas ........   Passed    0.05 sec
+      Start 520: explosion_models.recipes
+28/58 Test #520: explosion_models.recipes .........   Passed    0.01 sec
+      Start 521: explosion_models.failures
+29/58 Test #521: explosion_models.failures ........   Passed    0.03 sec
+      Start 522: explosion_models.session
+30/58 Test #522: explosion_models.session .........   Passed    0.02 sec
+      Start 523: explosion_models.private
+31/58 Test #523: explosion_models.private .........   Passed    6.82 sec
+      Start 524: explosion_lights.lifecycle
+32/58 Test #524: explosion_lights.lifecycle .......   Passed    0.03 sec
+      Start 525: explosion_lights.recipes
+33/58 Test #525: explosion_lights.recipes .........   Passed    0.02 sec
+      Start 526: explosion_lights.failures
+34/58 Test #526: explosion_lights.failures ........   Passed    0.02 sec
+      Start 527: explosion_lights.session
+35/58 Test #527: explosion_lights.session .........   Passed    0.03 sec
+      Start 528: explosion_lights.private
+36/58 Test #528: explosion_lights.private .........   Passed   17.69 sec
+      Start 529: explosion_rings.motion
+37/58 Test #529: explosion_rings.motion ...........   Passed    0.04 sec
+      Start 530: explosion_rings.lifecycle
+38/58 Test #530: explosion_rings.lifecycle ........   Passed    0.02 sec
+      Start 531: explosion_rings.recipes
+39/58 Test #531: explosion_rings.recipes ..........   Passed    0.02 sec
+      Start 532: explosion_rings.failures
+40/58 Test #532: explosion_rings.failures .........   Passed    0.03 sec
+      Start 533: explosion_rings.session
+41/58 Test #533: explosion_rings.session ..........   Passed    0.03 sec
+      Start 534: explosion_rings.private
+42/58 Test #534: explosion_rings.private ..........   Passed   20.78 sec
+      Start 535: explosion_fragments.lifecycle
+43/58 Test #535: explosion_fragments.lifecycle ....   Passed    0.04 sec
+      Start 536: explosion_fragments.collision
+44/58 Test #536: explosion_fragments.collision ....   Passed    0.03 sec
+      Start 537: explosion_fragments.recipes
+45/58 Test #537: explosion_fragments.recipes ......   Passed    0.03 sec
+      Start 538: explosion_fragments.failures
+46/58 Test #538: explosion_fragments.failures .....   Passed    0.05 sec
+      Start 539: explosion_fragments.session
+47/58 Test #539: explosion_fragments.session ......   Passed    0.04 sec
+      Start 540: explosion_fragments.private
+48/58 Test #540: explosion_fragments.private ......   Passed   45.85 sec
+      Start 541: object_particles.emission
+49/58 Test #541: object_particles.emission ........   Passed    0.03 sec
+      Start 542: object_particles.stopping
+50/58 Test #542: object_particles.stopping ........   Passed    0.02 sec
+      Start 543: object_particles.failures
+51/58 Test #543: object_particles.failures ........   Passed    0.03 sec
+      Start 544: object_particles.session
+52/58 Test #544: object_particles.session .........   Passed    0.03 sec
+      Start 545: object_particles.private
+53/58 Test #545: object_particles.private .........   Passed   41.61 sec
+      Start 546: explosion_flames.zones
+54/58 Test #546: explosion_flames.zones ...........   Passed    0.02 sec
+      Start 547: explosion_flames.lifecycle
+55/58 Test #547: explosion_flames.lifecycle .......   Passed    0.02 sec
+      Start 548: explosion_flames.failures
+56/58 Test #548: explosion_flames.failures ........   Passed    0.03 sec
+      Start 549: explosion_flames.session
+57/58 Test #549: explosion_flames.session .........   Passed    0.03 sec
+      Start 550: explosion_flames.private
+58/58 Test #550: explosion_flames.private .........   Passed   17.92 sec
+
+100% tests passed, 0 tests failed out of 58
+
+Label Time Summary:
+explosion_flames       =  18.02 sec*proc (5 tests)
+explosion_fragments    =  46.03 sec*proc (6 tests)
+explosion_lights       =  17.78 sec*proc (5 tests)
+explosion_models       =   6.93 sec*proc (5 tests)
+explosion_rings        =  20.93 sec*proc (6 tests)
+explosion_sprites      =   5.85 sec*proc (4 tests)
+headless               = 184.52 sec*proc (58 tests)
+object_particles       =  41.72 sec*proc (5 tests)
+objects                =   0.29 sec*proc (11 tests)
+private                = 182.91 sec*proc (10 tests)
+sceneexplosion         =  20.87 sec*proc (8 tests)
+sprite_view            =   6.10 sec*proc (3 tests)
+
+Total Test time (real) = 184.54 sec

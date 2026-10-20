@@ -1,0 +1,48 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 847
+    Start 847: gpu.conversation_private
+
+847: Test command: /home/yann/projects/lithtech/Blood2/build/release/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--world" "02_cityhub" "--cinematics-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/conversations.png"
+847: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+847: Environment variables: 
+847:  SDL_AUDIODRIVER=dummy
+847: Test timeout computed to be: 90
+847: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+847: [info] BLOOD2.REZ: detected, 267758913 bytes
+847: [info] SOUND.REZ: detected, 204633068 bytes
+847: [info] BLOOD2P.REZ: detected, 24133434 bytes
+847: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+847: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+847: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+847: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+847: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+847: [info] DAT v56: 1026 source objects, 487 original instances, 100 BSP models
+847: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/conversations.png
+847: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+847: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+847: [info] Session playback: waiting=0 time=0.9366666666666672 npc-ready=27 npc-failed=0 npc-updates=27
+847: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+847: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+847: [info] CINEMATICS smoke: original cue and decoded samples submitted to SDL stream with hidden UI and reload; dry output only
+847: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+1/1 Test #847: gpu.conversation_private .........   Passed    2.01 sec
+
+The following tests passed:
+	gpu.conversation_private
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+conversation    =   2.01 sec*proc (1 test)
+gpu             =   2.01 sec*proc (1 test)
+private         =   2.01 sec*proc (1 test)
+
+Total Test time (real) =   2.02 sec

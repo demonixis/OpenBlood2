@@ -1,0 +1,16 @@
+393/393 Testing: ai_trigger.subway
+393/393 Test: ai_trigger.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_trigger.subway" start time: Oct 16 12:01 CEST
+Output:
+----------------------------------------------------------
+cycle=0 reactions=2 delivered=1 failures=0
+cycle=1 reactions=2 delivered=1 failures=0
+<end of output>
+Test time =   0.54 sec
+----------------------------------------------------------
+Test Passed.
+"ai_trigger.subway" end time: Oct 16 12:01 CEST
+"ai_trigger.subway" time elapsed: 00:00:00
+----------------------------------------------------------

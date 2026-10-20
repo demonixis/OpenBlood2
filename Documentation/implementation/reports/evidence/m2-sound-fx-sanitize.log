@@ -1,0 +1,145 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 666: soundfx.catalog
+      Start  41: world.destination_trial_private
+ 1/65 Test #666: soundfx.catalog ...................   Passed   19.64 sec
+      Start  42: world.destination_private
+ 2/65 Test  #41: world.destination_trial_private ...   Passed   32.55 sec
+      Start 234: sound.catalog
+ 3/65 Test  #42: world.destination_private .........   Passed   14.15 sec
+      Start 226: randomsound.catalog
+ 4/65 Test #234: sound.catalog .....................   Passed   15.44 sec
+      Start  54: services.private
+ 5/65 Test #226: randomsound.catalog ...............   Passed   16.25 sec
+      Start  43: world.private
+ 6/65 Test  #43: world.private .....................   Passed    4.70 sec
+      Start 235: sound.subway
+ 7/65 Test #235: sound.subway ......................   Passed    4.73 sec
+      Start 227: randomsound.subway
+ 8/65 Test  #54: services.private ..................   Passed   12.58 sec
+      Start  25: world.destination_trials
+ 9/65 Test  #25: world.destination_trials ..........   Passed    0.18 sec
+      Start  28: world.destination_lifetime
+10/65 Test  #28: world.destination_lifetime ........   Passed    0.06 sec
+      Start  37: world.mutations
+11/65 Test  #37: world.mutations ...................   Passed    0.25 sec
+      Start  46: services.model_rejection
+12/65 Test  #46: services.model_rejection ..........   Passed    0.36 sec
+      Start 665: soundfx.lifetime
+13/65 Test #665: soundfx.lifetime ..................   Passed    0.04 sec
+      Start 662: soundfx.spatial
+14/65 Test #662: soundfx.spatial ...................   Passed    0.04 sec
+      Start 663: soundfx.deadlines
+15/65 Test #663: soundfx.deadlines .................   Passed    0.04 sec
+      Start 664: soundfx.failures
+16/65 Test #664: soundfx.failures ..................   Passed    0.04 sec
+      Start 661: soundfx.ramps
+17/65 Test #661: soundfx.ramps .....................   Passed    0.04 sec
+      Start 660: soundfx.defaults
+18/65 Test #660: soundfx.defaults ..................   Passed    0.04 sec
+      Start   1: objects.builtin_model
+19/65 Test   #1: objects.builtin_model .............   Passed    0.02 sec
+      Start  30: world.sound_entries
+20/65 Test  #30: world.sound_entries ...............   Passed    0.05 sec
+      Start  29: world.sprite_entries
+21/65 Test  #29: world.sprite_entries ..............   Passed    0.04 sec
+      Start  52: services.placement_service
+22/65 Test  #52: services.placement_service ........   Passed    0.02 sec
+      Start  51: services.placement_queries
+23/65 Test  #51: services.placement_queries ........   Passed    0.02 sec
+      Start  27: world.destination_schema
+24/65 Test  #27: world.destination_schema ..........   Passed    0.02 sec
+      Start  26: world.destination_messages
+25/65 Test  #26: world.destination_messages ........   Passed    0.02 sec
+      Start  11: objects.unsupported_teardown
+26/65 Test  #11: objects.unsupported_teardown ......   Passed    0.05 sec
+      Start  36: world.world_rejection
+27/65 Test  #36: world.world_rejection .............   Passed    0.06 sec
+      Start  10: objects.messages_strings
+28/65 Test  #10: objects.messages_strings ..........   Passed    0.04 sec
+      Start  12: objects.creation_failures
+29/65 Test  #12: objects.creation_failures .........   Passed    0.03 sec
+      Start 222: randomsound.random
+30/65 Test #222: randomsound.random ................   Passed    0.06 sec
+      Start 229: sound.loops
+31/65 Test #229: sound.loops .......................   Passed    0.05 sec
+      Start   4: objects.reasons_properties
+32/65 Test   #4: objects.reasons_properties ........   Passed    0.02 sec
+      Start   2: objects.original_objects
+33/65 Test   #2: objects.original_objects ..........   Passed    0.02 sec
+      Start   9: objects.links_lists
+34/65 Test   #9: objects.links_lists ...............   Passed    0.02 sec
+      Start   6: objects.deferred_removal
+35/65 Test   #6: objects.deferred_removal ..........   Passed    0.02 sec
+      Start   3: objects.nested_creation
+36/65 Test   #3: objects.nested_creation ...........   Passed    0.02 sec
+      Start   5: objects.scheduling
+37/65 Test   #5: objects.scheduling ................   Passed    0.02 sec
+      Start  38: world.session_lifecycle
+38/65 Test  #38: world.session_lifecycle ...........   Passed    0.03 sec
+      Start 232: sound.failures
+39/65 Test #232: sound.failures ....................   Passed    0.04 sec
+      Start   8: objects.handles_selection
+40/65 Test   #8: objects.handles_selection .........   Passed    0.02 sec
+      Start 233: sound.metadata
+41/65 Test #233: sound.metadata ....................   Passed    0.04 sec
+      Start   7: objects.aggregate_dispatch
+42/65 Test   #7: objects.aggregate_dispatch ........   Passed    0.02 sec
+      Start 231: sound.lifetime
+43/65 Test #231: sound.lifetime ....................   Passed    0.04 sec
+      Start 228: sound.defaults
+44/65 Test #228: sound.defaults ....................   Passed    0.04 sec
+      Start 230: sound.resampling
+45/65 Test #230: sound.resampling ..................   Passed    0.04 sec
+      Start 224: randomsound.lifetime
+46/65 Test #224: randomsound.lifetime ..............   Passed    0.04 sec
+      Start 221: randomsound.sequence
+47/65 Test #221: randomsound.sequence ..............   Passed    0.04 sec
+      Start 225: randomsound.failures
+48/65 Test #225: randomsound.failures ..............   Passed    0.04 sec
+      Start 219: randomsound.defaults
+49/65 Test #219: randomsound.defaults ..............   Passed    0.04 sec
+      Start 223: randomsound.spatial
+50/65 Test #223: randomsound.spatial ...............   Passed    0.04 sec
+      Start 220: randomsound.commands
+51/65 Test #220: randomsound.commands ..............   Passed    0.04 sec
+      Start  40: world.original_trigger
+52/65 Test  #40: world.original_trigger ............   Passed    0.03 sec
+      Start  33: world.resource_mount
+53/65 Test  #33: world.resource_mount ..............   Passed    0.02 sec
+      Start  34: world.world_properties
+54/65 Test  #34: world.world_properties ............   Passed    0.02 sec
+      Start  35: world.world_geometry
+55/65 Test  #35: world.world_geometry ..............   Passed    0.02 sec
+      Start  32: world.rez_rejection
+56/65 Test  #32: world.rez_rejection ...............   Passed    0.02 sec
+      Start  31: world.rez_structure
+57/65 Test  #31: world.rez_structure ...............   Passed    0.02 sec
+      Start  39: world.session_messages
+58/65 Test  #39: world.session_messages ............   Passed    0.02 sec
+      Start  53: services.original_services
+59/65 Test  #53: services.original_services ........   Passed    0.02 sec
+      Start  48: services.model_callbacks
+60/65 Test  #48: services.model_callbacks ..........   Passed    0.02 sec
+      Start  45: services.model_reader
+61/65 Test  #45: services.model_reader .............   Passed    0.02 sec
+      Start  47: services.animation_events
+62/65 Test  #47: services.animation_events .........   Passed    0.02 sec
+      Start  50: services.movement_contacts
+63/65 Test  #50: services.movement_contacts ........   Passed    0.02 sec
+      Start  49: services.collision_queries
+64/65 Test  #49: services.collision_queries ........   Passed    0.02 sec
+65/65 Test #227: randomsound.subway ................   Passed    4.82 sec
+
+100% tests passed, 0 tests failed out of 65
+
+Label Time Summary:
+headless       = 127.33 sec*proc (65 tests)
+objects        =   0.31 sec*proc (12 tests)
+private        = 124.87 sec*proc (9 tests)
+randomsound    =  21.37 sec*proc (9 tests)
+services       =  13.10 sec*proc (10 tests)
+sound          =  20.42 sec*proc (8 tests)
+soundfx        =  19.89 sec*proc (7 tests)
+world          =  52.25 sec*proc (19 tests)
+
+Total Test time (real) =  64.31 sec

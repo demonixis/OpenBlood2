@@ -1,0 +1,14 @@
+467/472 Testing: corpses.failures
+467/472 Test: corpses.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.failures" start time: Oct 16 16:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.failures" end time: Oct 16 16:56 CEST
+"corpses.failures" time elapsed: 00:00:00
+----------------------------------------------------------

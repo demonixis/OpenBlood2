@@ -1,0 +1,47 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 963
+    Start 963: player_voice.pickup
+
+963: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/player_voice_tests "pickup" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-voice-fixtures/pickup"
+963: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+963: Test timeout computed to be: 30
+963: accepted pickup branches=4 group replies=1
+1/2 Test #963: player_voice.pickup ..............   Passed    0.52 sec
+test 964
+    Start 964: player_voice.private
+
+964: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/player_voice_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+964: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+964: Test timeout computed to be: 120
+964: Original SubwayA camera intro expired after 12.0167 simulation seconds
+964: retail groups=44 WAV entries=431
+964: unique 1: Missing streaming sound resource / 
+964: unique 8: Missing streaming sound resource / 
+2/2 Test #964: player_voice.private .............***Failed    1.88 sec
+
+The following tests passed:
+	player_voice.pickup
+
+50% tests passed, 1 tests failed out of 2
+
+Label Time Summary:
+audio           =   2.40 sec*proc (2 tests)
+headless        =   2.40 sec*proc (2 tests)
+player_voice    =   2.40 sec*proc (2 tests)
+private         =   1.88 sec*proc (1 test)
+
+Total Test time (real) =   2.41 sec
+
+The following tests FAILED:
+	964 - player_voice.private (Failed)                     audio headless player_voice private
+Errors while running CTest
+Output from these tests are in: /home/yann/projects/lithtech/Blood2/build/debug/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

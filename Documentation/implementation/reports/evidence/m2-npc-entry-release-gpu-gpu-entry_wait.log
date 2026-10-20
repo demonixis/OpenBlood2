@@ -1,0 +1,101 @@
+627/627 Testing: gpu.entry_wait
+627/627 Test: gpu.entry_wait
+Command: "/usr/bin/cmake" "-DAPP=/home/yann/projects/lithtech/Blood2/build/release/blood2" "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "-DDATA_DIR=/home/yann/.steam/steam/steamapps/common/Blood II" "-DCAPTURE=/home/yann/projects/lithtech/Blood2/build/release/tests/entry-wait.png" "-P" "/home/yann/projects/lithtech/Blood2/tests/entry_wait_test.cmake"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.entry_wait" start time: Oct 17 00:23 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 225 original instances, 116 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/entry-wait.png
+[info] Shutdown: frames=12, UI frames=0, hidden frames=12, toggles=0, resize=false, quit=false
+[info] Session playback: waiting=12 time=0 npc-ready=15 npc-failed=0 npc-updates=0
+
+<end of output>
+Test time =   0.96 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.entry_wait" end time: Oct 17 00:23 CEST
+"gpu.entry_wait" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 00:23 CEST
+
+brushes =   1.62 sec*proc
+
+cameras =   1.77 sec*proc
+
+character =  13.35 sec*proc
+
+cinematics =   1.66 sec*proc
+
+containers =   3.73 sec*proc
+
+doors =   1.62 sec*proc
+
+explosion_flames =   0.89 sec*proc
+
+explosion_fragments =   0.79 sec*proc
+
+explosion_models =   0.82 sec*proc
+
+explosion_rings =   0.80 sec*proc
+
+gpu = 114.00 sec*proc
+
+interaction =   2.40 sec*proc
+
+keyframes =   1.69 sec*proc
+
+lights =   1.70 sec*proc
+
+model_view =   0.93 sec*proc
+
+movement =  13.23 sec*proc
+
+object_particles =   0.82 sec*proc
+
+objectives =   1.88 sec*proc
+
+pickups =   1.83 sec*proc
+
+player =   2.08 sec*proc
+
+player_controls =   1.01 sec*proc
+
+player_keepalive =   1.85 sec*proc
+
+player_restore =   1.70 sec*proc
+
+private = 106.99 sec*proc
+
+randomsound =  12.51 sec*proc
+
+sceneexplosion =   1.67 sec*proc
+
+session_playback =   0.96 sec*proc
+
+sound =   1.73 sec*proc
+
+sprite_view =   0.89 sec*proc
+
+sprites =   1.62 sec*proc
+
+triggers =   1.79 sec*proc
+
+weapon_sprites =   0.92 sec*proc
+
+weapons =  13.53 sec*proc
+
+world_view =  13.42 sec*proc
+
+worldpaths =   1.61 sec*proc
+

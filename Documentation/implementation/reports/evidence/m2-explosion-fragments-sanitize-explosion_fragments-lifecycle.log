@@ -1,0 +1,14 @@
+535/540 Testing: explosion_fragments.lifecycle
+535/540 Test: explosion_fragments.lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_fragment_tests" "lifecycle" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-fragments-lifecycle"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_fragments.lifecycle" start time: Oct 16 21:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_fragments.lifecycle" end time: Oct 16 21:30 CEST
+"explosion_fragments.lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------

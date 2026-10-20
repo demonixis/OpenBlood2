@@ -1,0 +1,73 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 58
+    Start   58: gpu.lifecycle
+
+58: Test command: /home/yann/projects/lithtech/Blood2/build/release/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--gpu-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/gpu.png"
+58: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+58: Test timeout computed to be: 25
+58: [info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792326322724550427-0
+58: [info] OpenBlood2 0.3.0 / 725d184-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-725d184 (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+58: [info] Crash capture ready: all-thread stacks and core dump in the log session directory
+58: [info] Requested world=01_SubwayA; config=/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini; inspector=false; view=false; bench=false; headless=false; frames=0
+58: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+58: [info] BLOOD2.REZ: detected, 267758913 bytes
+58: [info] SOUND.REZ: detected, 204633068 bytes
+58: [info] BLOOD2P.REZ: detected, 24133434 bytes
+58: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+58: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+58: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+58: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+58: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+58: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/gpu.png
+58: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+58: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+58: [info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+58: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+58: [info] Session finished: exit_code=0
+1/2 Test   #58: gpu.lifecycle ....................   Passed    0.55 sec
+test 1132
+    Start 1132: gpu.menu_traversal
+
+1132: Test command: /home/yann/projects/lithtech/Blood2/build/release/blood2 "--menu-smoke" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/menu-traversal.png"
+1132: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1132: Environment variables: 
+1132:  SDL_AUDIODRIVER=dummy
+1132: Test timeout computed to be: 120
+1132: [info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792326323276779270-0
+1132: [info] OpenBlood2 0.3.0 / 725d184-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-725d184 (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+1132: [info] Crash capture ready: all-thread stacks and core dump in the log session directory
+1132: [info] Requested world=01_SubwayA; config=blood2.local.ini; inspector=false; view=false; bench=false; headless=false; frames=0
+1132: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+1132: [info] BLOOD2.REZ: detected, 267758913 bytes
+1132: [info] SOUND.REZ: detected, 204633068 bytes
+1132: [info] BLOOD2P.REZ: detected, 24133434 bytes
+1132: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+1132: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+1132: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+1132: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+1132: [info] New game requested: world=01_SubwayA; character=0; difficulty=1
+1132: [info] World ready: worlds/01_subwaya.dat
+1132: [info] Menu traversal passed: startup, pause snapshots, independent audio, options, resize, inspector, resume and quit
+1132: [info] Frontend complete: 216 frames, world worlds/01_subwaya.dat, menu audio starts 24/failures 0
+1132: [info] Session finished: exit_code=0
+2/2 Test #1132: gpu.menu_traversal ...............   Passed    2.83 sec
+
+The following tests passed:
+	gpu.lifecycle
+	gpu.menu_traversal
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+gpu        =   3.38 sec*proc (2 tests)
+menus      =   2.83 sec*proc (1 test)
+private    =   2.83 sec*proc (1 test)
+
+Total Test time (real) =   3.40 sec

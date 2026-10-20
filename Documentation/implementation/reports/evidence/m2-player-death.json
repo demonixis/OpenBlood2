@@ -1,0 +1,201 @@
+{
+  "date": "2026-10-17",
+  "milestone": "M2 incomplete",
+  "implementation_commit": "61f0be6c046131db6ebdcaad4ac02348b59a7154",
+  "source_ledger": "../../../Blood2/docs/implementation/sources/m2_player_death_sources.json",
+  "test_results": {
+    "debug-tests": {
+      "passed": 113,
+      "failed": 0,
+      "seconds": 61.75
+    },
+    "release-tests": {
+      "passed": 113,
+      "failed": 0,
+      "seconds": 9.7
+    },
+    "sanitize-tests": {
+      "passed": 113,
+      "failed": 0,
+      "seconds": 330.19
+    },
+    "debug-gpu": {
+      "passed": 4,
+      "failed": 0
+    },
+    "release-gpu": {
+      "passed": 4,
+      "failed": 0
+    },
+    "behavior": {
+      "passed": 3,
+      "failed": 0
+    }
+  },
+  "commands": {
+    "working_directory": "Blood2",
+    "build_debug": "cmake --build build/debug -j 4 --target blood2 death_effect_gpu_tests object_contract_tests player_tests player_state_tests player_restore_tests player_keepalive_tests player_voice_tests player_death_tests death_effect_tests ai_hit_tests corpse_tests conversation_tests pickup_audio_tests weapon_drop_tests screen_fade_tests world_tests train_session_tests camera_tests inventory_state_tests",
+    "build_release": "cmake --build build/release -j 4 --target blood2 death_effect_gpu_tests object_contract_tests player_tests player_state_tests player_restore_tests player_keepalive_tests player_voice_tests player_death_tests death_effect_tests ai_hit_tests corpse_tests conversation_tests pickup_audio_tests weapon_drop_tests screen_fade_tests world_tests train_session_tests camera_tests inventory_state_tests",
+    "build_sanitize": "cmake --build build/sanitize -j 4 --target object_contract_tests player_tests player_state_tests player_restore_tests player_keepalive_tests player_voice_tests player_death_tests death_effect_tests ai_hit_tests corpse_tests conversation_tests pickup_audio_tests weapon_drop_tests screen_fade_tests world_tests train_session_tests camera_tests inventory_state_tests",
+    "ctest_headless": "ctest --test-dir build/<configuration> --output-on-failure -j 2 -R '^(objects\\.|player\\.|player_state\\.|player_restore\\.|player_keepalive\\.|inventory_state\\.|cameras\\.|conversation\\.|pickup_audio\\.|weapon_drops\\.|screen_fade\\.|player_voice\\.|player_death\\.|ai_hit\\.|corpses\\.|death_effects\\.|world\\.(level_change|level_change_private|session_lifecycle|session_messages)$|train_session\\.)'",
+    "sanitizer_environment": [
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1"
+    ],
+    "gpu_environment": [
+      "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+      "SDL_AUDIODRIVER=dummy"
+    ],
+    "ctest_gpu": "ctest --test-dir build/<debug|release> -V -R '^gpu\\.(player|cameras|conversation_private|death_effects)$'",
+    "note": "Build targets were invoked in batches; Debug GPU checks were split into death_effects and the three regression cases. The final inspector-text clarification was rebuilt after tests; no behavior changed."
+  },
+  "configurations": {
+    "debug": "GCC Debug, inspector enabled",
+    "release": "GCC Release, inspector disabled",
+    "sanitize": "Clang Debug ASan/UBSan, inspector disabled"
+  },
+  "gpu_device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+  "gpu_backend": "Vulkan",
+  "private_diagnostic_deaths": {
+    "ordinary_corpses": 1,
+    "gib_paths": 3,
+    "freefall_without_corpse": 1,
+    "live_checkpoint_reassociations": 5,
+    "removed_lethal_attacker": true,
+    "flashlight_removed_first_key_only": true,
+    "weapons_ammo_retained": true,
+    "independent_corpse_lifetime": true,
+    "unload_object_records": 0,
+    "unload_voices": 0
+  },
+  "camera_gpu": {
+    "corpse_non_background_pixels": 4959,
+    "repeated_readback_identical": true,
+    "client_reset": true,
+    "image": "Ignored build/debug/tests/death-effect-gpu/player-death.png; not distributed"
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "preserved_user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "logs": [
+    {
+      "label": "debug-build",
+      "path": "m2-player-death-debug-build.log",
+      "sha256": "e720083ada27c60b17e8cc64de64507747e0281b3039080e6061fdd077eb0c1b"
+    },
+    {
+      "label": "debug-inspector-build",
+      "path": "m2-player-death-debug-inspector-build.log",
+      "sha256": "4e66117643db8e57e50119b2c2f10fe345657b3898b7006262f567dfced2420b"
+    },
+    {
+      "label": "release-base-build",
+      "path": "m2-player-death-release-base-build.log",
+      "sha256": "95716adafc7c8f720410ba3a06e1499ac0ee5b401046963b7892b9b9fdd26aad"
+    },
+    {
+      "label": "release-build",
+      "path": "m2-player-death-release-build.log",
+      "sha256": "2d56009325230ee61a6d435d08d47fc1ab93dac1baec1fc2668fdaee10897b7a"
+    },
+    {
+      "label": "sanitize-base-build",
+      "path": "m2-player-death-sanitize-base-build.log",
+      "sha256": "b0c9b6188297ca83a0c248af6e404002ba9322c5ebcf466b2ec8a6384fa71ae4"
+    },
+    {
+      "label": "sanitize-build",
+      "path": "m2-player-death-sanitize-build.log",
+      "sha256": "3f8e4cd0b5a3691902c11dcd9fb42d70f4c51dedd5d203d112b9a4c1c5141b98"
+    },
+    {
+      "label": "debug-tests",
+      "path": "m2-player-death-debug-tests.log",
+      "sha256": "018e6f8f5eafef2af6c3fdbc9201a059fec24f3408577c072be4d679a2be7b45"
+    },
+    {
+      "label": "release-tests",
+      "path": "m2-player-death-release-tests.log",
+      "sha256": "107b4547fe84c92abbedce61d721d4957c9bfa580a65a6e0893ff2b7f0877cd3"
+    },
+    {
+      "label": "sanitize-tests",
+      "path": "m2-player-death-sanitize-tests.log",
+      "sha256": "e875444b62049e16ab3447fa210d06fc05a0428849b7c247cd76b66753119264"
+    },
+    {
+      "label": "behavior",
+      "path": "m2-player-death-behavior.log",
+      "sha256": "91f91c254c814a3db40a78ef8362d86a77c1e0b1f7a6dd138eda683a03f5a5d3"
+    },
+    {
+      "label": "debug-gpu",
+      "path": "m2-player-death-debug-gpu.log",
+      "sha256": "8cca28f20c8296d1f797605022a29d4f9e89eb954f6ed22b467353b38bcf4554"
+    },
+    {
+      "label": "debug-gpu-regressions",
+      "path": "m2-player-death-debug-gpu-regressions.log",
+      "sha256": "3edc9833902af75995760225e9ec0b4e60bab0478c9431e88c3c69d124986d4b"
+    },
+    {
+      "label": "release-gpu",
+      "path": "m2-player-death-release-gpu.log",
+      "sha256": "7ddbc867fbad86a4d95fe4f79b7e6f374cae77045d0c838fe3f0e998b3a322e3"
+    },
+    {
+      "label": "links",
+      "path": "m2-player-death-links.log",
+      "sha256": "3b50d3f1448ca6fe282a4552d197b56566b86b0f492438151511dd8cb9d3504a"
+    }
+  ],
+  "limitations": [
+    "M2 acceptance remains incomplete; active-power/multiplayer death, full world saves and interactive IMA music remain unavailable.",
+    "The five private encounters use external commercial assets on a labelled diagnostic floor, not an authored player-death playthrough.",
+    "The existing continuous SubwayA-to-CityHub routes at 30/60 Hz remain regression checks, not retail parity certification.",
+    "Audio automation uses the dummy output driver; this is not human audible verification.",
+    "Native macOS/Windows execution was not verified in this run.",
+    "ASan/UBSan results are headless; the previously documented SDL/libdbus GPU-LSan residual was not retested.",
+    "The original player remains solid, and dead single-player USE keeps the source ray. No revival shortcut or full dead-player/corpse restoration was added."
+  ],
+  "verification": {
+    "source_selections_checked": 8,
+    "formatted_cpp_files": 16,
+    "local_markdown_link_targets": 3691,
+    "code_and_owned_document_whitespace": "passed; raw evidence logs excluded"
+  }
+}

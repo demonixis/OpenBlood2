@@ -6,7 +6,7 @@ namespace OpenBlood2
     // Shared original PickupObject::PickedUp sound branch, also used by KeyPickup.
     PickupReport PlayPickupSound(HOBJECT, std::string_view);
 } // namespace OpenBlood2
-// Selected original single-player pickup rules; see docs/contracts/pickup_contracts.md.
+// Selected original single-player pickup rules; see Documentation/contracts/pickup_contracts.md.
 class PickupObject : public B2BaseClass
 {
   public:

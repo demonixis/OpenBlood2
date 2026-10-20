@@ -1,0 +1,14 @@
+426/433 Testing: ai_locomotion.ledges
+426/433 Test: ai_locomotion.ledges
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_locomotion_tests" "ledges"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_locomotion.ledges" start time: Oct 16 13:45 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.ledges" end time: Oct 16 13:45 CEST
+"ai_locomotion.ledges" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,29 @@
+322/323 Testing: attachments.catalog
+322/323 Test: attachments.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"attachments.catalog" start time: Oct 16 07:33 CEST
+Output:
+----------------------------------------------------------
+models/characters/caleb.abc / right / gun node
+models/characters/caleb.abc / left / gun node
+models/enemies/m_civilian1.abc / right / origin fallback
+models/enemies/m_civilian1.abc / left / origin fallback
+models/enemies/f_civilian1.abc / right / gun node
+models/enemies/f_civilian1.abc / left / gun node
+models/enemies/labtech.abc / right / gun node
+models/enemies/labtech.abc / left / gun node
+models/enemies/m_cultist1.abc / right / gun node
+models/enemies/m_cultist1.abc / left / gun node
+models/enemies/f_cultist1.abc / right / gun node
+models/enemies/f_cultist1.abc / left / gun node
+models/enemies/gideon.abc / right / origin fallback
+models/enemies/gideon.abc / left / origin fallback
+Private held-model poses: 652, source origin fallbacks: 160
+<end of output>
+Test time =   0.27 sec
+----------------------------------------------------------
+Test Passed.
+"attachments.catalog" end time: Oct 16 07:33 CEST
+"attachments.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

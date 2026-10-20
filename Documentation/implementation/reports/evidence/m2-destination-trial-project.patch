@@ -1,0 +1,1050 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index c54dfcf..a515125 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -470,3 +470,8 @@ The [destination preparation continuation](../Documentation/Implementation/M2_DE
+ Read [contracts](docs/DESTINATION_CONTRACTS.md). Preserve separate syntax/execution policy, const schema checks, one final-request scan per pump,
+ owned report lifetime and callback refusal. Schema success never implies callback/resource readiness or authorizes teardown.
+ Automatic NEW_LEVEL, required remaining services and M2 remain incomplete.
++
++The [destination initialization continuation](../Documentation/Implementation/M2_DESTINATION_TRIAL.md) runs temporary original callbacks and named KeepAlive entry while retaining the source session.
++Read [contracts](docs/DESTINATION_TRIAL_CONTRACTS.md). Preserve fixed sentinel addresses, all seven list/count pairs, active camera, four shared AI table owners and adapter binding.
++Destroy the temporary session under its own adapter before resuming source globals; every new mutable game global needs auditing.
++No destination simulation tick, runtime promotion or transfer is implemented. Monotonic audio IDs are not rewound; M2 remains incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0d9a925..386d618 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/destination_trial.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index 6508b50..0adf22f 100644
+--- a/README.md
++++ b/README.md
+@@ -518,3 +518,6 @@ The [original explosion flame continuation](../Documentation/Implementation/M2_E
+ 
+ The [destination preparation continuation](../Documentation/Implementation/M2_DESTINATION.md) inspects destination DAT geometry, primary collision and property schemas without leaving the current session.
+ Original callbacks/resources/start triggers are still unverified; this prerequisite does not enable automatic NEW_LEVEL or close M2.
++
++The [destination initialization continuation](../Documentation/Implementation/M2_DESTINATION_TRIAL.md) now executes original destination callbacks and named player entry in a temporary session, destroys it and resumes the retained source.
++Earlier callback-validation omissions are superseded for this explicit rehearsal only; destination promotion, required services and safe NEW_LEVEL still keep M2 open.
+diff --git a/docs/AI_RUNTIME_CONTRACTS.md b/docs/AI_RUNTIME_CONTRACTS.md
+index f44ec86..b0b300d 100644
+--- a/docs/AI_RUNTIME_CONTRACTS.md
++++ b/docs/AI_RUNTIME_CONTRACTS.md
+@@ -123,3 +123,7 @@ explicit error; there is no fabricated death sequence. Skin selection is not a
+ promise that every add-on texture decodes. Engine replacement activation, resize,
+ friction and outside-bounds handling require retail comparison. Linux is the only
+ verified platform; other platforms/XR and full M2 acceptance remain pending.
++
++The [destination initialization rehearsal](DESTINATION_TRIAL_CONTRACTS.md) extends the structural scan with temporary original callbacks and copied-player named entry.
++It isolates the current original globals, destroys the temporary session and resumes the unchanged source gameplay state.
++Ordinary second-session binding remains forbidden; no automatic transfer or completed M2 acceptance is claimed.
+diff --git a/docs/DESTINATION_CONTRACTS.md b/docs/DESTINATION_CONTRACTS.md
+index 21e2af8..eda517d 100644
+--- a/docs/DESTINATION_CONTRACTS.md
++++ b/docs/DESTINATION_CONTRACTS.md
+@@ -76,3 +76,7 @@ and [source ledger](M2_DESTINATION_SOURCES.json). Safe NEW_LEVEL still needs pro
+ against destination original initialization/start-trigger failures while preserving
+ the current world, and must resolve required classes/services. Reloading the old DAT
+ would lose current NPC/world state and does not count as rollback. M2 remains open.
++
++The [destination initialization rehearsal](DESTINATION_TRIAL_CONTRACTS.md) extends the structural scan with temporary original callbacks and copied-player named entry.
++It isolates the current original globals, destroys the temporary session and resumes the unchanged source gameplay state.
++Ordinary second-session binding remains forbidden; no automatic transfer or completed M2 acceptance is claimed.
+diff --git a/docs/DESTINATION_TRIAL_CONTRACTS.md b/docs/DESTINATION_TRIAL_CONTRACTS.md
+new file mode 100644
+index 0000000..3f62686
+--- /dev/null
++++ b/docs/DESTINATION_TRIAL_CONTRACTS.md
+@@ -0,0 +1,91 @@
++# Isolated destination initialization rehearsal
++
++This extends [structural destination preparation](DESTINATION_CONTRACTS.md) with
++actual original object initialization and [named keep-alive player entry](PLAYER_KEEPALIVE_CONTRACTS.md)
++in a temporary session. It then destroys that session and resumes the source.
++**It does not execute, accept or commit a level transfer. M2 remains incomplete.**
++
++## Scope and sequence
++
++`GameSession::rehearse_destination` is a synchronous, explicit diagnostic. It
++requires the currently bound session, an idle callback dispatcher and a capturable
++supported living player. A foreign or callback invocation fails without replacing
++the last report. Request parsing and start-name limits match the existing APIs.
++No user-controlled filename reaches a shell or bypasses the resource index.
++
++The current difficulty is validated and retained. The temporary session copies the
++mounted resource index, constructs its own caches/objects/clients/audio, and uses
++normal fresh-world construction for the destination geometry and original world
++objects. It then restores the captured player through KeepAlive entry, including
++original key removal, named/fallback start selection, start triggers, ground query
++and final placement. The active source player is never respawned or replaced.
++No destination simulation tick or `RunWorld` occurs. A partial inspection world's
++successful player entry remains observable even when other source entries fail;
++that boolean is never a readiness or acceptance decision.
++
++All returns after suspension are confined to an inner scope: temporary original
++objects, shared tables, voices and adapter are destroyed before source binding
++returns. No old source handle is passed to the destination, and no destination
++handle survives in the owned report. Source object/client IDs, simulation time,
++world revision and current state remain intact. Resource index metadata is copied;
++commercial payloads stay external, although normal destination reads/decode allocate
++separate temporary CPU caches. There is no staging GPU scene or SDL audio output.
++
++## Original globals and lifetime
++
++The old game still uses process-global intrusive sentinels and tables. During this
++single-threaded diagnostic only, suspend and exchange exactly these runtime globals:
++
++- Cabal and Monster faction heads/counts;
++- destructible, smell, exit-hint, ammo-pickup and camera heads/counts;
++- active camera handle;
++- the four ported class/gender AI animation/sound table owners;
++- active server adapter binding and `g_pServerDE`.
++
++Sentinel addresses do not move. Source nodes keep their original endpoint addresses
++and are never traversed while another world is bound. Destination constructors see
++empty lists and tie off the same fixed sentinels. After destination destruction,
++restore the saved head values/counts; this reconnects the untouched source chains.
++Retain shared animation tables, including voice ownership, until source restoration.
++Destination table destructors must run under the destination adapter. Ordinary
++second-session initialization remains forbidden; this is not concurrent-session or
++thread-safe support. Every newly imported mutable game global must join this audit
++before it can run during a rehearsal. Immutable class registration/property strings
++are shared and are not exchanged.
++
++The process-wide audio ID allocator deliberately advances and is never rewound;
++resetting it would reuse IDs. Existing source voice identities/cursors are retained.
++Source gameplay clocks do not advance, but an already queued hardware audio buffer
++may continue playing while synchronous preparation runs. Queries may populate source
++capture diagnostics/caches; the contract is not a bitwise rollback of all counters.
++
++Cleanup checks binding release, all seven empty list counts and active-camera reset.
++Lifetime tests additionally compare every source intrusive node's address, previous,
++next and data pointers, all shared table owners, and a live shared Cultist voice.
++No destination failure reloads the source DAT or reconstructs its NPCs.
++
++## Inspection and evidence
++
++The Session panel provides **Rehearse destination entry; retain current session**.
++It queues execution outside UI drawing. Session and Objectives display owned source/
++destination revisions, requested/selected start, loaded/entered/cleanup observations,
++creation outcomes and details, restored stats, runtime object/attachment/voice counts
++and active-camera observation. Creation rows are captured before entry triggers;
++runtime counts follow entry. Reports remain historical after source unload/reload.
++The existing automatic blocked-exit action remains the cheaper structural scan.
++
++`world.destination_trials` covers successful entry and start-camera activation,
++missing marker/ground/resource/data, source key preservation with destination key
++removal, repeat attempts, foreign-session rejection and report lifetime. Existing
++`world.destination_lifetime` also rejects callback rehearsal. Private tests repeat
++SubwayA -> temporary CityHub/SubwayA/malformed Bridge -> unchanged SubwayA three
++times, with 15 production NPCs and a diagnostic live shared Cultist voice. The GPU
++objectives scenario executes CityHub entry and cleanup with hidden UI and reload.
++See [source ledger](M2_DESTINATION_TRIAL_SOURCES.json) and
++[implementation evidence](../../Documentation/Implementation/M2_DESTINATION_TRIAL.md).
++
++A rehearsal cannot promote the staged runtime, preserve all client presentation
++state, guarantee subsequent updates or make an incomplete destination playable.
++Automatic NEW_LEVEL, Gideon, required remaining FX/illumination and other required
++services still block M2. This isolation is new engine adaptation, not recovered
++retail transition code or proof of retail behavior equivalence.
+diff --git a/docs/M2_DESTINATION_TRIAL_SOURCES.json b/docs/M2_DESTINATION_TRIAL_SOURCES.json
+new file mode 100644
+index 0000000..81a309b
+--- /dev/null
++++ b/docs/M2_DESTINATION_TRIAL_SOURCES.json
+@@ -0,0 +1,69 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "8e000ed86bd701ba32f4ceda28094240fb621009",
++  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
++      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
++      "use": "KeepAliveSave -> LoadWorld -> KeepAliveLoad -> RunWorld and named arrival order"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "use": "Existing selected player restore and GoToStartPoint callbacks"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "use": "Original shared faction lists"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CultistAI.cpp",
++      "sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
++      "use": "Original class/gender shared animation and sound tables"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
++      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
++      "use": "Original class/gender shared tables and initialization ordering"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CameraObj.cpp",
++      "sha256": "5255f0d0efe9ba67b081f5ea8684d8ed60cf94c8f23caaad8c186c21718756ec",
++      "use": "Original static camera list and active camera"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
++      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
++      "use": "Original shared destructible list"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/SmellHint.cpp",
++      "sha256": "65989aab4012e0b67e7f13403fb59a5260f9435b8a792d40a3dfbe1d2db7241e",
++      "use": "Original shared smell list"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ExitHint.cpp",
++      "sha256": "e3939c2ad9729e960b05b3dc366769b85424de808bacb2b538204edf8b522103",
++      "use": "Original shared exit-hint list"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AmmoPickups.cpp",
++      "sha256": "3ea2f1ba0b90298563b5a97c451e4e1d60e0b10fdd666320944edb23afa50696",
++      "use": "Original shared pickup list"
++    }
++  ],
++  "adaptations": [
++    "New synchronous temporary-session rehearsal; no new original functions imported",
++    "Exchange seven fixed-address intrusive heads/counts, active camera, four AI table owners and server binding; restore only after destination destruction",
++    "Retain source difficulty, copy mounted index metadata, run existing original initialization and typed KeepAlive player entry without advancing destination simulation",
++    "Owned diagnostic outcomes only; no promotion, transfer acceptance or NEW_LEVEL execution policy change",
++    "Process-wide audio ID allocation remains monotonic, and existing source hardware output is not rewound"
++  ],
++  "remaining": [
++    "Automatic safe NEW_LEVEL and full client/session state",
++    "Destination runtime callbacks and missing source classes/services",
++    "Gideon, required remaining FX/illumination and actual M2 acceptance"
++  ]
++}
+diff --git a/docs/OBJECT_CONTRACTS.md b/docs/OBJECT_CONTRACTS.md
+index 8a80d4a..9b9df7c 100644
+--- a/docs/OBJECT_CONTRACTS.md
++++ b/docs/OBJECT_CONTRACTS.md
+@@ -98,3 +98,7 @@ Autonomous acquisition/retention and full AI behavior remain unavailable.
+ The [destination preparation continuation](DESTINATION_CONTRACTS.md) shares const property validation and structural CPU preparation with fresh loading.
+ Blocked exits now perform read-only destination lookup after refusing transfer; earlier blanket resource-lookup omissions are historical.
+ No destination callbacks run and no active session is discarded; safe automatic NEW_LEVEL and M2 remain incomplete.
++
++The [destination initialization rehearsal](DESTINATION_TRIAL_CONTRACTS.md) extends the structural scan with temporary original callbacks and copied-player named entry.
++It isolates the current original globals, destroys the temporary session and resumes the unchanged source gameplay state.
++Ordinary second-session binding remains forbidden; no automatic transfer or completed M2 acceptance is claimed.
+diff --git a/docs/PLAYER_KEEPALIVE_CONTRACTS.md b/docs/PLAYER_KEEPALIVE_CONTRACTS.md
+index 215cedc..2b29102 100644
+--- a/docs/PLAYER_KEEPALIVE_CONTRACTS.md
++++ b/docs/PLAYER_KEEPALIVE_CONTRACTS.md
+@@ -69,3 +69,7 @@ keep M2 incomplete. CityHub inspection does not imply all of its classes work.
+ The [destination preparation continuation](DESTINATION_CONTRACTS.md) shares const property validation and structural CPU preparation with fresh loading.
+ Blocked exits now perform read-only destination lookup after refusing transfer; earlier blanket resource-lookup omissions are historical.
+ No destination callbacks run and no active session is discarded; safe automatic NEW_LEVEL and M2 remain incomplete.
++
++The [destination initialization rehearsal](DESTINATION_TRIAL_CONTRACTS.md) extends the structural scan with temporary original callbacks and copied-player named entry.
++It isolates the current original globals, destroys the temporary session and resumes the unchanged source gameplay state.
++Ordinary second-session binding remains forbidden; no automatic transfer or completed M2 acceptance is claimed.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 3d84354..c6e616f 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -791,3 +791,9 @@ particle rendering are documented adaptations, not a retail engine/RNG parity cl
+ The [source ledger](M2_DESTINATION_SOURCES.json) records the original shell ordering and selected preprocessor-only classes.
+ The [read-only preparation](DESTINATION_CONTRACTS.md) is new engine code using existing DAT/collision readers and exact property schemas;
+ no new original method, reference engine dependency or commercial asset is imported. Original NEW_LEVEL execution remains refused.
++
++## Isolated destination initialization rehearsal
++
++New `destination_trial.cpp` exchanges the ported original lists, camera, shared AI tables and adapter binding to execute existing original world/KeepAlive entry callbacks in a disposable session. No new original method bodies or reference-engine code are imported.
++See [ledger](M2_DESTINATION_TRIAL_SOURCES.json), [contracts](DESTINATION_TRIAL_CONTRACTS.md) and [evidence](../../Documentation/Implementation/M2_DESTINATION_TRIAL.md).
++This is synchronous diagnostic isolation, not recovered retail staging or a completed level transfer.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 67f7352..4b1c723 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -326,6 +326,15 @@ namespace OpenBlood2
+                 world_error = "Invalid destination request";
+             inspect_destination_request = false;
+         }
++        if (trial_destination_request)
++        {
++            WorldMessage message;
++            if (original_world_request(keep_world_name, 0, LOADTYPE_NEW_LEVEL, 0, message))
++                game.rehearse_destination(message, keep_start_name, world_error);
++            else
++                world_error = "Invalid destination request";
++            trial_destination_request = false;
++        }
+         if (keep_world_request)
+         {
+             if (!game.local_client)
+@@ -1062,8 +1071,14 @@ namespace OpenBlood2
+             restore_player_request = true;
+         ImGui::EndDisabled();
+         ImGui::InputText("Destination world", keep_world_name, sizeof(keep_world_name));
++        ImGui::InputText("Destination start (empty = start)", keep_start_name, sizeof(keep_start_name));
+         if (ImGui::Button("Inspect destination without leaving"))
+             inspect_destination_request = true;
++        ImGui::BeginDisabled(!player);
++        if (ImGui::Button("Rehearse destination entry; retain current session"))
++            trial_destination_request = true;
++        ImGui::EndDisabled();
++        draw_destination_trial(game);
+         draw_destination(game);
+         ImGui::BeginDisabled(player);
+         if (ImGui::Button("Load destination for inspection"))
+@@ -1071,7 +1086,6 @@ namespace OpenBlood2
+         ImGui::EndDisabled();
+         ImGui::TextWrapped(
+             "Leave the player before loading. Loading replaces the current world; the captured player is retained.");
+-        ImGui::InputText("Destination start (empty = start)", keep_start_name, sizeof(keep_start_name));
+         ImGui::BeginDisabled(player || !game.restoration.saved || game.world_path.empty());
+         if (ImGui::Button("Enter loaded world with captured player"))
+             keep_player_request = true;
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 3e6678d..af2906c 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -88,8 +88,9 @@ namespace OpenBlood2
+         bool capture_player_request = false, restore_player_request = false, keep_player_request = false;
+         char keep_start_name[101]{};
+         char keep_world_name[256]{"02_cityhub"};
+-        bool keep_world_request = false, inspect_destination_request = false;
++        bool keep_world_request = false, inspect_destination_request = false, trial_destination_request = false;
+         void draw_destination(const GameSession&);
++        void draw_destination_trial(const GameSession&);
+         ObjectId remove_request{};
+         std::string spawn_request;
+         std::string world_error, reload_world_name = "01_SubwayA";
+diff --git a/src/app/inspector_objectives.cpp b/src/app/inspector_objectives.cpp
+index 07b7088..22f2675 100644
+--- a/src/app/inspector_objectives.cpp
++++ b/src/app/inspector_objectives.cpp
+@@ -63,6 +63,47 @@ namespace OpenBlood2
+         }
+         ImGui::TreePop();
+     }
++    void Inspector::draw_destination_trial(const GameSession& game)
++    {
++        const auto& d = game.destination_trial;
++        if (!d.attempts || !ImGui::TreeNodeEx("Destination initialization rehearsal", ImGuiTreeNodeFlags_DefaultOpen))
++            return;
++        ImGui::TextWrapped("%s -> %s / requested start %s / selected %s", d.source_world.c_str(), d.destination.c_str(),
++                           d.requested_start.c_str(), d.selected_start.c_str());
++        ImGui::Text("Attempts %llu / source revision %llu / current %llu", (unsigned long long)d.attempts,
++                    (unsigned long long)d.source_revision, (unsigned long long)game.world_revision);
++        ImGui::Text("World loaded %s / player entered %s / cleanup %s", d.world_loaded ? "yes" : "no",
++                    d.player_entered ? "yes" : "no", d.cleanup_complete ? "complete" : "not completed");
++        ImGui::Text("%zu created / %zu sounds / %zu editor / %zu filtered / %zu unknown / %zu failed", d.created,
++                    d.sounds, d.editor_only, d.filtered, d.unknown, d.failed);
++        if (d.player_entered)
++            ImGui::Text("Restored HP %.1f / armor %.1f / bullets %.1f / keys %zu / active camera %s", d.health, d.armor,
++                        d.bullets, d.keys, d.entry_camera_active ? "yes" : "no");
++        ImGui::Text("Observed %zu runtime objects / %zu attachments / %zu voices", d.runtime_objects, d.attachments,
++                    d.voices);
++        ImGui::TextWrapped(
++            "The temporary world is discarded after the observed initialization/entry steps. The current session is "
++            "retained. "
++            "No simulation tick or transfer occurs. Missing classes/services and later callbacks remain unresolved.");
++        if (!d.error.empty())
++            ImGui::TextWrapped("Failure: %s", d.error.c_str());
++        if (ImGui::TreeNode("Rehearsal source results"))
++        {
++            ImGuiListClipper clip;
++            clip.Begin((int)d.entries.size());
++            while (clip.Step())
++                for (int i = clip.DisplayStart; i < clip.DisplayEnd; ++i)
++                {
++                    const auto& row = d.entries[i];
++                    ImGui::Text("%d: %s / %s / %s", i, row.class_name.c_str(), row.name.c_str(),
++                                entry_state_name(row.state));
++                    if (ImGui::IsItemHovered() && !row.detail.empty())
++                        ImGui::SetTooltip("%s", row.detail.c_str());
++                }
++            ImGui::TreePop();
++        }
++        ImGui::TreePop();
++    }
+     void Inspector::draw_objectives(GameSession& game, ObjectSelection& selection)
+     {
+         if (ImGui::CollapsingHeader("Original level exits", ImGuiTreeNodeFlags_DefaultOpen))
+@@ -74,6 +115,7 @@ namespace OpenBlood2
+                                static_cast<unsigned>(exit.request.type), game.server_shell.start_point_name.c_str());
+             ImGui::TextWrapped("%s", exit.error.empty() ? "No transfer attempted; safe NEW_LEVEL transfer unavailable."
+                                                         : exit.error.c_str());
++            draw_destination_trial(game);
+             draw_destination(game);
+             const auto& fields = game.server_shell.player_capture;
+             ImGui::Text("Player fields: %llu / %llu captures; %s", (unsigned long long)fields.captures,
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 104a5a7..305aa72 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -1473,10 +1473,10 @@ namespace
+                 spdlog::info("CAMERAS smoke: original camera tracks player while UI hidden; selected view, movement "
+                              "gate and reload checked");
+             if (options.objectives_smoke)
+-                spdlog::info(
+-                    "OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
+-                    "ExitTrigger NEW_LEVEL refusal preserves player/inventory; read-only CityHub preparation "
+-                    "checks 1026 entries (247 schemas / 541 editor / 207 unknown / 31 invalid); unload/reload checked");
++                spdlog::info("OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
++                             "ExitTrigger NEW_LEVEL refusal preserves player/inventory; read-only CityHub preparation "
++                             "checks 1026 entries; temporary CityHub initialization/kept-player entry, cleanup and "
++                             "source restoration checked");
+             if (options.pickups_smoke)
+                 spdlog::info("PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked");
+             if (options.weapons_smoke)
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 4b90881..9ba39d8 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -78,6 +78,13 @@ namespace OpenBlood2
+             if (g.client_shell.world_exit.received != received || !g.step(.05) || trigger->last_delivery != DE_OK)
+                 return false;
+         }
++        const auto trial_before = g.destination_trial.attempts;
++        if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
++            g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 243 ||
++            g.destination_trial.unknown != 207 || g.destination_trial.failed != 35 ||
++            g.destination_trial.selected_start != "01_egressa")
++            return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+                g.client_shell.world_exit.blocked == blocked + 1 && g.server_shell.inventory_capture.valid &&
+                g.server_shell.inventory_capture.captures == captures + 1 &&
+diff --git a/src/game/destination_trial.cpp b/src/game/destination_trial.cpp
+new file mode 100644
+index 0000000..70fba67
+--- /dev/null
++++ b/src/game/destination_trial.cpp
+@@ -0,0 +1,173 @@
++#include "game/original/AI_Mgr.h"
++#include "game/original/AmmoPickups.h"
++#include "game/original/CameraObj.h"
++#include "game/original/ExitHint.h"
++#include "game/original/SmellHint.h"
++#include "game/server_adapter.h"
++#include <cmath>
++
++namespace OpenBlood2
++{
++    namespace
++    {
++        // Original intrusive-list sentinels keep their fixed addresses. Suspended
++        // endpoints still point to those addresses; they are never traversed while
++        // another world is bound. Restore only after all rehearsal objects die.
++        struct OriginalGlobals
++        {
++            std::array<DLink*, 7> heads{
++                &AI_Mgr::m_CabalHead,    &AI_Mgr::m_MonsterHead, &CDestructable::m_DestructableHead,
++                &SmellHint::m_SmellHead, &ExitHint::m_ExitHead,  &AmmoPickup::m_PickupHead,
++                &CameraObj::m_CameraHead};
++            std::array<DDWORD*, 7> counts{
++                &AI_Mgr::m_dwNumCabal,     &AI_Mgr::m_dwNumMonster, &CDestructable::m_dwNumDestructables,
++                &SmellHint::m_dwNumSmells, &ExitHint::m_dwNumExits, &AmmoPickup::m_dwNumPickups,
++                &CameraObj::m_dwNumCameras};
++            std::array<DLink, 7> saved_heads{};
++            std::array<DDWORD, 7> saved_counts{};
++            HOBJECT camera = nullptr;
++            std::array<std::shared_ptr<CAnim_Sound>, 4> tables;
++            void exchange()
++            {
++                for (std::size_t i = 0; i < heads.size(); ++i)
++                {
++                    std::swap(*heads[i], saved_heads[i]);
++                    std::swap(*counts[i], saved_counts[i]);
++                }
++                std::swap(g_hActiveCamera, camera);
++                AI_Mgr::ExchangeRuntimeTables(tables);
++            }
++            bool empty() const
++            {
++                for (auto* count : counts)
++                    if (*count)
++                        return false;
++                return !g_hActiveCamera;
++            }
++        };
++    } // namespace
++    bool GameSession::rehearse_destination(const WorldMessage& message, std::string_view start, std::string& error)
++    {
++        error.clear();
++        if (objects.busy() || ServerAdapter::active_ != &server || g_pServerDE != &server || !server.bound_)
++        {
++            error = "Destination rehearsal requires the current bound session outside callbacks";
++            return false; // Reentrant/foreign calls do not replace the outer report.
++        }
++        DestinationTrial next;
++        next.attempts = destination_trial.attempts + 1;
++        next.source_world = world_path;
++        next.source_revision = world_revision;
++        const auto fail = [&]
++        {
++            next.error = error;
++            destination_trial = std::move(next);
++            return false;
++        };
++        if (start.size() > 100 || start.find('\0') != std::string_view::npos)
++        {
++            error = "Invalid destination start-point name";
++            return fail();
++        }
++        next.requested_start = start;
++        WorldRequest request;
++        PlayerRestoreState player;
++        if (!parse_world_request(message, request, error) || !capture_player(player, error))
++            return fail();
++        next.destination = request.filename;
++        // NEW_LEVEL preserves the current difficulty, unlike a fresh-game request.
++        const float difficulty = server.GetVarValueFloat(server.GetGameConVar("GAME_DIFFICULTY"));
++        if (!std::isfinite(difficulty) || difficulty < 0 || difficulty > 3 || std::floor(difficulty) != difficulty)
++        {
++            error = "Invalid current difficulty for destination rehearsal";
++            return fail();
++        }
++        WorldMessage fresh;
++        if (!original_world_request(request.filename.c_str(), 0, LOADTYPE_NEW_GAME, static_cast<DBYTE>(difficulty),
++                                    fresh))
++        {
++            error = "Invalid normalized destination request";
++            return fail();
++        }
++        OriginalGlobals globals;
++        globals.exchange(); // Keeps source animation tables and their live voices owned.
++        server.bound_ = false;
++        ServerAdapter::active_ = nullptr;
++        g_pServerDE = nullptr;
++        // All early failures stay inside this lambda. Its session and original
++        // destructors finish under their own adapter before restoring the source.
++        const bool observed = [&]
++        {
++            GameSession trial;
++            trial.resources = resources; // Copy the mounted index, never commercial payloads into the repository.
++            if (!trial.initialize() || !trial.load_world(fresh, error))
++                return false;
++            next.world_loaded = true;
++            for (std::size_t i = 0; i < trial.entries.size(); ++i)
++            {
++                const auto& original = trial.world.objects[i];
++                const auto& result = trial.entries[i];
++                DestinationTrialEntry row;
++                row.class_name = original.class_name;
++                if (const auto* value = original.find("Name"))
++                    if (const auto* name = std::get_if<std::string>(value))
++                        row.name = *name;
++                row.state = result.state;
++                row.detail = result.detail;
++                switch (row.state)
++                {
++                    case EntryState::Created:
++                        ++next.created;
++                        break;
++                    case EntryState::WorldSound:
++                        ++next.sounds;
++                        break;
++                    case EntryState::EditorOnly:
++                        ++next.editor_only;
++                        break;
++                    case EntryState::Filtered:
++                        ++next.filtered;
++                        break;
++                    case EntryState::Unsupported:
++                        ++next.unknown;
++                        break;
++                    case EntryState::Failed:
++                        ++next.failed;
++                        break;
++                }
++                next.entries.push_back(std::move(row));
++            }
++            // This deliberately exercises original named entry even in a partial
++            // inspection world. It does NOT make missing classes/services ready.
++            next.player_entered =
++                trial.restore_player(player, error, PlayerRestoreMode::KeepAlive, next.requested_start);
++            next.selected_start = trial.restoration.selected_start;
++            next.entry_camera_active = g_hActiveCamera != nullptr;
++            if (auto* restored = trial.server_shell.Player(trial.local_client))
++            {
++                next.health = restored->m_damage.m_fHitPoints;
++                next.armor = restored->m_damage.m_fArmorPoints;
++                next.bullets = restored->m_InventoryMgr.GetAmmoCount(1);
++                next.keys = restored->m_InventoryMgr.keys.size();
++            }
++            next.runtime_objects = trial.objects.snapshot().size();
++            next.attachments = trial.objects.attachments().size();
++            next.voices = trial.server.audio.voices().size();
++            return next.player_entered;
++        }();
++        next.cleanup_complete = !ServerAdapter::active_ && !g_pServerDE && globals.empty();
++        globals.exchange();
++        ServerAdapter::active_ = &server;
++        g_pServerDE = &server;
++        server.bound_ = true;
++        if (!next.cleanup_complete)
++            error = "Destination rehearsal cleanup did not release all original globals";
++        else if (!observed && error.empty())
++            error = "Destination initialization/player entry failed";
++        next.error = error;
++        destination_trial = std::move(next);
++        // Success means initialization/entry was observed and then destroyed.
++        // It is never a completed or authorized level transfer.
++        return observed && destination_trial.cleanup_complete;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/original/AIRuntime.cpp b/src/game/original/AIRuntime.cpp
+index 633268e..3ef568e 100644
+--- a/src/game/original/AIRuntime.cpp
++++ b/src/game/original/AIRuntime.cpp
+@@ -22,6 +22,10 @@ namespace
+         return true;
+     }
+ } // namespace
++void AI_Mgr::ExchangeRuntimeTables(std::array<std::shared_ptr<CAnim_Sound>, 4>& other)
++{
++    tables.swap(other);
++}
+ void AI_Mgr::ResetRuntimeTables()
+ {
+     tables = {};
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 307d3da..5e0c450 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -103,6 +103,7 @@ class AI_Mgr : public CBaseCharacter
+         Civilian
+     };
+     static void ResetRuntimeTables();
++    static void ExchangeRuntimeTables(std::array<std::shared_ptr<CAnim_Sound>, 4>&);
+     void ConfigureRuntime(NPCType); // Original constructor defaults, selected by production factories only.
+     bool AI_Update();
+     bool RuntimeReady() const
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index e43018a..f5e3c38 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -302,6 +302,8 @@ namespace OpenBlood2
+         std::unordered_map<HMESSAGEWRITE, Message> messages_;
+         std::vector<std::unique_ptr<ObjectList>> list_tokens_;
+         std::unordered_set<ObjectList*> lists_;
++        // Only the synchronous destination rehearsal may temporarily suspend this binding.
++        friend class GameSession;
+         static ServerAdapter* active_;
+         static ServerAdapter& active();
+         HSTRING make_string(const char* text);
+@@ -348,6 +350,8 @@ namespace OpenBlood2
+             unload_world();
+         }
+         DestinationInspection destination_inspection;
++        DestinationTrial destination_trial;
++        bool rehearse_destination(const WorldMessage&, std::string_view start, std::string& error);
+         bool inspect_destination(const WorldMessage&, std::string_view start, std::string& error);
+         bool load_world(const WorldMessage& message, std::string& error);
+         bool request_world(std::string_view name, std::string& error);
+diff --git a/src/game/world_preparation.h b/src/game/world_preparation.h
+index e030ce1..afc5609 100644
+--- a/src/game/world_preparation.h
++++ b/src/game/world_preparation.h
+@@ -35,4 +35,20 @@ namespace OpenBlood2
+                     invalid = 0;
+         std::vector<DestinationEntry> entries;
+     };
++    struct DestinationTrialEntry
++    {
++        std::string class_name, name, detail;
++        EntryState state = EntryState::Unsupported;
++    };
++    struct DestinationTrial
++    {
++        std::uint64_t attempts = 0, source_revision = 0;
++        std::string source_world, destination, requested_start, selected_start, error;
++        bool world_loaded = false, player_entered = false, cleanup_complete = false, entry_camera_active = false;
++        float health = 0, armor = 0, bullets = 0;
++        std::size_t keys = 0;
++        std::size_t created = 0, sounds = 0, editor_only = 0, filtered = 0, unknown = 0, failed = 0;
++        std::size_t runtime_objects = 0, attachments = 0, voices = 0;
++        std::vector<DestinationTrialEntry> entries;
++    };
+ } // namespace OpenBlood2
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 1f01f4c..1581429 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -47,12 +47,14 @@ endif()
+ add_executable(world_tests world_tests.cpp)
+ target_link_libraries(world_tests PRIVATE blood2_game)
+ blood2_project_options(world_tests)
+-foreach(case IN ITEMS destination_messages destination_schema destination_lifetime sprite_entries sound_entries rez_structure rez_rejection resource_mount world_properties world_geometry
++foreach(case IN ITEMS destination_trials destination_messages destination_schema destination_lifetime sprite_entries sound_entries rez_structure rez_rejection resource_mount world_properties world_geometry
+         world_rejection mutations session_lifecycle session_messages original_trigger)
+     add_test(NAME world.${case} COMMAND world_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/world-fixtures/${case}")
+     set_tests_properties(world.${case} PROPERTIES LABELS "headless;world" TIMEOUT 20)
+ endforeach()
+ if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME world.destination_trial_private COMMAND world_tests destination_trial_private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(world.destination_trial_private PROPERTIES LABELS "private;headless;world" TIMEOUT 60)
+     add_test(NAME world.destination_private COMMAND world_tests destination_private "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(world.destination_private PROPERTIES LABELS "private;headless;world" TIMEOUT 60)
+     add_test(NAME world.private COMMAND world_tests private "${BLOOD2_TEST_DATA_DIR}")
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index e4968db..7b3b3bd 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -1,8 +1,12 @@
+ #include "audio_fixture.h"
+ #include "game/original/AI_Mgr.h"
++#include "game/original/AmmoPickups.h"
++#include "game/original/CameraObj.h"
++#include "game/original/ExitHint.h"
+ #include "game/original/GameStartPoint.h"
+ #include "game/original/Key.h"
+ #include "game/original/PathPoint.h"
++#include "game/original/SmellHint.h"
+ #include "game/server_adapter.h"
+ #include <bit>
+ #include <cmath>
+@@ -103,7 +107,8 @@ namespace
+         out.append(v);
+         return out;
+     }
+-    Writer dat(bool gameplay = false, bool sounds = false, bool sprites = false, bool destination = false)
++    Writer dat(bool gameplay = false, bool sounds = false, bool sprites = false, bool destination = false,
++               unsigned trial = 0)
+     {
+         Writer w;
+         w.u32(56);
+@@ -122,8 +127,23 @@ namespace
+         value.real(1.5);
+         Writer yes;
+         yes.byte(1);
+-        w.u32(destination ? 5 : sprites ? 6 : gameplay || sounds ? 4 : 1);
+-        if (destination)
++        w.u32(trial ? (trial == 2 ? 6 : 7) : destination ? 5 : sprites ? 6 : gameplay || sounds ? 4 : 1);
++        if (trial)
++        {
++            Writer arrival;
++            arrival.vec(trial == 3 ? 10000 : 0, 100, 0);
++            if (trial != 2)
++                w.append(object("GameStartPoint",
++                                {string_prop("Name", "arrival"), prop("Pos", 1, arrival),
++                                 string_prop("TriggerTarget", "entry-camera"), string_prop("TriggerMessage", "ON")}));
++            w.append(object("CameraObj", {string_prop("Name", "entry-camera")}));
++            w.append(object("PathPoint", {string_prop("Name", "WALK0"), prop("Pos", 1, arrival)}));
++            w.append(object("SmellHint", {string_prop("Name", "scent")}));
++            w.append(object("ExitHint", {string_prop("Name", "exit")}));
++            w.append(object("BulletAmmoPU", {string_prop("Name", "bullets"), prop("Pos", 1, arrival)}));
++            w.append(object("Sound", {string_prop("Filename", trial == 4 ? "absent.wav" : "cue.wav")}));
++        }
++        else if (destination)
+         {
+             w.append(object("DestinationProbe", {string_prop("Name", "owned"), prop("Pos", 1, pos)}));
+             w.append(object("DirLight", {string_prop("Name", "spot")}));
+@@ -193,7 +213,7 @@ namespace
+         w.zero(8); // Surface packed payload may contain NaN bits.
+         w.u16(0);
+         w.u32(0);
+-        w.u32(destination ? 1 : 0);
++        w.u32(destination || trial ? 1 : 0);
+         w.u32(0);
+         w.byte(0);
+         w.u16(20); // Serialized material flags, independent of surface flags.
+@@ -204,13 +224,22 @@ namespace
+             w.u16(i);
+             w.zero(3);
+         }
+-        w.vec();
+-        w.vec(10, 0, 0);
+-        w.vec(0, 0, 10);
++        if (trial)
++        {
++            w.vec(-1000, 0, -1000);
++            w.vec(1000, 0, -1000);
++            w.vec(0, 0, 1000);
++        }
++        else
++        {
++            w.vec();
++            w.vec(10, 0, 0);
++            w.vec(0, 0, 10);
++        }
+         w.patch(start, static_cast<unsigned>(w.data.size()));
+         w.u32(0); // No additional models.
+-        w.vec(-10, -10, -10);
+-        w.vec(10, 10, 10);
++        w.vec(trial ? -2000 : -10, trial ? -2000 : -10, trial ? -2000 : -10);
++        w.vec(trial ? 2000 : 10, trial ? 2000 : 10, trial ? 2000 : 10);
+         return w;
+     }
+     Writer rez(const Bytes& payload, std::string_view name = "sample", std::uint32_t extension = 0x444154)
+@@ -707,6 +736,11 @@ namespace
+                 rejected_reentrant = !destination_session->inspect_destination(message, "arrival", error) &&
+                                      error.find("callback") != std::string::npos &&
+                                      destination_session->destination_inspection.attempts == before;
++                const auto trials = destination_session->destination_trial.attempts;
++                rejected_reentrant = rejected_reentrant &&
++                                     !destination_session->rehearse_destination(message, "arrival", error) &&
++                                     error.find("callbacks") != std::string::npos &&
++                                     destination_session->destination_trial.attempts == trials;
+             }
+             return 1;
+         }
+@@ -910,6 +944,228 @@ namespace
+         }
+         return true;
+     }
++
++    struct GlobalSnapshot
++    {
++        std::array<DLink*, 7> heads{&AI_Mgr::m_CabalHead,    &AI_Mgr::m_MonsterHead, &CDestructable::m_DestructableHead,
++                                    &SmellHint::m_SmellHead, &ExitHint::m_ExitHead,  &AmmoPickup::m_PickupHead,
++                                    &CameraObj::m_CameraHead};
++        std::array<DDWORD*, 7> counts{
++            &AI_Mgr::m_dwNumCabal,     &AI_Mgr::m_dwNumMonster, &CDestructable::m_dwNumDestructables,
++            &SmellHint::m_dwNumSmells, &ExitHint::m_dwNumExits, &AmmoPickup::m_dwNumPickups,
++            &CameraObj::m_dwNumCameras};
++        std::array<DDWORD, 7> saved{};
++        std::vector<std::pair<DLink*, DLink>> links;
++        HOBJECT camera = g_hActiveCamera;
++        bool capture()
++        {
++            for (std::size_t i = 0; i < heads.size(); ++i)
++            {
++                saved[i] = *counts[i];
++                links.emplace_back(heads[i], *heads[i]);
++                auto* link = heads[i]->m_pNext;
++                unsigned walked = 0;
++                while (link && link != heads[i] && walked <= saved[i])
++                {
++                    links.emplace_back(link, *link);
++                    ++walked;
++                    link = link->m_pNext;
++                }
++                CHECK(walked == saved[i] && (!link || link == heads[i]));
++            }
++            return true;
++        }
++        bool unchanged() const
++        {
++            CHECK(camera == g_hActiveCamera);
++            for (std::size_t i = 0; i < heads.size(); ++i)
++                CHECK(*counts[i] == saved[i]);
++            for (const auto& [live, copy] : links)
++                CHECK(live->m_pPrev == copy.m_pPrev && live->m_pNext == copy.m_pNext && live->m_pData == copy.m_pData);
++            return true;
++        }
++    };
++    bool trial_fixture(GameSession& game, const std::filesystem::path& root)
++    {
++        CHECK(test_player::setup(game, root, true, true, true));
++        test_player::Directory dir;
++        for (unsigned i = 1; i <= 4; ++i)
++            dir.children["worlds"].files["trial" + std::to_string(i) + ".dat"] =
++                dat(false, false, false, false, i).data;
++        dir.children["worlds"].files["broken.dat"] = {56, 0, 0, 0};
++        dir.files["cue.wav"] = test_audio::wave();
++        test_model::Writer archive;
++        archive.b.resize(168);
++        archive.b[0] = archive.b[62] = archive.b[124] = 13;
++        archive.b[1] = archive.b[63] = archive.b[125] = 10;
++        archive.b[126] = 26;
++        archive.patch(127, 1);
++        const auto [offset, size] = test_player::write_dir(archive, dir);
++        archive.patch(131, offset);
++        archive.patch(135, size);
++        CHECK(save(root / "trial.rez", archive.b));
++        std::string error;
++        CHECK(game.resources.mount(root / "trial.rez", error) && game.enter_player(error));
++        // Populate the original source lists; destination destruction must not unlink these.
++        for (auto name : {"SmellHint", "ExitHint", "BulletAmmoPU", "CameraObj"})
++            CHECK(game.objects.create(game.objects.find_class(name), {}, Creation::World,
++                                      {{"Pos", DVector{200, 100, 200}}}));
++        CHECK(game.objects.finish_frame());
++        CHECK(game.step(.016)); // The source must already be a viable update before any rehearsal.
++        return true;
++    }
++    bool destination_trials(const std::filesystem::path& root)
++    {
++        GameSession game;
++        CHECK(trial_fixture(game, root));
++        auto* player = game.server_shell.Player(game.local_client);
++        player->m_damage.SetHitPoints(37);
++        player->m_damage.SetArmorPoints(23);
++        player->m_InventoryMgr.SetAmmoCount(1, 1234);
++        CHECK(player->m_InventoryMgr.AddKey({"old-key", "Old key", "icon", "selected", 2}) == InventoryResult::Ok);
++        const auto ids = game.objects.snapshot();
++        const auto client = game.local_client;
++        const auto revision = game.world_revision;
++        const auto time = game.objects.time();
++        const auto strings = game.server.string_count();
++        GlobalSnapshot globals;
++        CHECK(globals.capture());
++        std::string error;
++        for (auto name : {"trial1", "trial4", "trial2", "trial3", "broken", "missing", "trial1"})
++        {
++            WorldMessage message;
++            CHECK(original_world_request(name, 0, LOADTYPE_NEW_LEVEL, 0, message));
++            const bool ok = game.rehearse_destination(message, "arrival", error);
++            const auto& d = game.destination_trial;
++            std::cout << name << ": loaded=" << d.world_loaded << " entered=" << d.player_entered
++                      << " cleanup=" << d.cleanup_complete << " failed=" << d.failed << " error=" << error << '\n';
++            CHECK(d.cleanup_complete && g_pServerDE == &game.server && globals.unchanged());
++            if (std::string_view(name) == "trial1" || std::string_view(name) == "trial4")
++            {
++                CHECK(ok && d.world_loaded && d.player_entered && d.entry_camera_active &&
++                      d.selected_start == "arrival");
++                CHECK(d.created == 6 && d.sounds == (std::string_view(name) == "trial1" ? 1u : 0u));
++                CHECK(d.failed == (std::string_view(name) == "trial4" ? 1u : 0u));
++                CHECK(d.health == 37 && d.armor == 23 && d.bullets == 1234 && d.keys == 0);
++            }
++            else
++                CHECK(!ok && !d.player_entered && !error.empty());
++            CHECK(game.local_client == client && game.world_revision == revision && game.objects.time() == time);
++            CHECK(game.objects.snapshot() == ids && game.client_shell.player == player->m_hObject);
++            CHECK(player->m_damage.m_fHitPoints == 37 && player->m_InventoryMgr.GetAmmoCount(1) == 1234);
++            CHECK(player->m_InventoryMgr.keys.size() == 1 && game.server.string_count() == strings);
++            CHECK(game.server.list_count() == 0 && game.server.message_count() == 0);
++        }
++        WorldMessage message;
++        CHECK(original_world_request("trial1", 0, LOADTYPE_NEW_LEVEL, 0, message));
++        CHECK(!game.rehearse_destination(message, std::string("x\0y", 3), error));
++        CHECK(globals.unchanged() && g_pServerDE == &game.server);
++        CHECK(game.rehearse_destination(message, "arrival", error));
++        const auto attempt = game.destination_trial.attempts;
++        {
++            GameSession other;
++            CHECK(!other.initialize());
++            CHECK(!other.rehearse_destination(message, "arrival", error));
++        }
++        CHECK(globals.unchanged() && game.destination_trial.attempts == attempt && g_pServerDE == &game.server);
++        const bool resumed = game.step(.016);
++        if (!resumed)
++        {
++            for (const auto& line : game.trace)
++                std::cerr << "Source trace: " << line << '\n';
++            for (const auto& line : game.objects.diagnostics())
++                std::cerr << "Source diagnostic: " << line << '\n';
++        }
++        CHECK(resumed);
++        CHECK(game.unload_world() && game.server.string_count() == 0 && game.objects.snapshot().empty());
++        CHECK(game.destination_trial.player_entered && game.destination_trial.source_revision != game.world_revision);
++        return true;
++    }
++    bool destination_trial_private(const std::filesystem::path& root)
++    {
++        GameSession game;
++        CHECK(game.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(game.resources.mount_game(config, error));
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error));
++            CHECK(game.step(.016));
++            auto* player = game.server_shell.Player(game.local_client);
++            player->m_damage.SetHitPoints(37);
++            player->m_InventoryMgr.SetAmmoCount(1, 1234);
++            std::vector<std::pair<AI_Mgr*, const CAnim_Sound*>> tables;
++            for (auto id : game.objects.snapshot())
++                if (auto* a = dynamic_cast<AI_Mgr*>(game.objects.get(id)->game.get()))
++                    tables.emplace_back(a, a->AnimSound());
++            CHECK(tables.size() == 15);
++            CAnim_Sound* voiced_table = nullptr;
++            for (const auto& [actor, table] : tables)
++                if (table->GetSoundRoot() == "sounds/enemies/m_cultist")
++                {
++                    // Explicit diagnostic voice: exercise retained shared-table ownership during the intro.
++                    voiced_table = const_cast<CAnim_Sound*>(table);
++                    CHECK(voiced_table->PlayVoice(actor->m_hObject, "idle1.wav", 1000, 100));
++                    break;
++                }
++            CHECK(voiced_table && voiced_table->m_hVoxSound);
++            const auto voice_id = voiced_table->m_hVoxSound;
++            std::array<std::shared_ptr<CAnim_Sound>, 4> slots;
++            AI_Mgr::ExchangeRuntimeTables(slots);
++            auto original_slots = slots;
++            AI_Mgr::ExchangeRuntimeTables(slots);
++            const auto ids = game.objects.snapshot();
++            const auto client = game.local_client;
++            const auto revision = game.world_revision;
++            const auto time = game.objects.time();
++            const auto strings = game.server.string_count();
++            std::map<SoundId, double> voices;
++            for (const auto& [id, voice] : game.server.audio.voices())
++                voices[id] = voice.cursor;
++            GlobalSnapshot globals;
++            CHECK(globals.capture());
++            for (auto name : {"02_cityhub", "01_subwaya", "16_bridge"})
++            {
++                WorldMessage message;
++                CHECK(original_world_request(name, 0, LOADTYPE_NEW_LEVEL, 0, message));
++                const bool ok = game.rehearse_destination(message, "01_egressa", error);
++                const auto& d = game.destination_trial;
++                std::cout << "Cycle " << cycle << " " << name << ": loaded=" << d.world_loaded
++                          << " entered=" << d.player_entered << " cleanup=" << d.cleanup_complete
++                          << " created=" << d.created << " unknown=" << d.unknown << " failed=" << d.failed
++                          << " objects=" << d.runtime_objects << " error=" << error << '\n';
++                CHECK(globals.unchanged() && g_pServerDE == &game.server && d.cleanup_complete);
++                if (std::string_view(name) == "16_bridge")
++                    CHECK(!ok && !d.world_loaded && !d.player_entered);
++                else
++                {
++                    CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
++                    if (std::string_view(name) == "02_cityhub")
++                        CHECK(d.created == 243 && d.unknown == 207 && d.failed == 35);
++                    else
++                        CHECK(d.created == 203 && d.unknown == 1 && d.failed == 0);
++                }
++                CHECK(game.objects.snapshot() == ids && game.local_client == client && game.world_revision == revision);
++                CHECK(game.objects.time() == time && game.client_shell.player == player->m_hObject);
++                CHECK(player->m_damage.m_fHitPoints == 37 && player->m_InventoryMgr.GetAmmoCount(1) == 1234);
++                CHECK(game.server.string_count() == strings && game.server.audio.voices().size() == voices.size());
++                for (const auto& [id, cursor] : voices)
++                    CHECK(game.server.audio.get(id) && game.server.audio.get(id)->cursor == cursor);
++                for (const auto& [ai, table] : tables)
++                    CHECK(ai->AnimSound() == table);
++                CHECK(voiced_table->m_hVoxSound == voice_id && game.server.audio.get(voice_id));
++                AI_Mgr::ExchangeRuntimeTables(slots);
++                CHECK(slots == original_slots);
++                AI_Mgr::ExchangeRuntimeTables(slots);
++            }
++            CHECK(game.step(.016));
++            original_slots = {};
++            CHECK(game.unload_world() && game.server.string_count() == 0 && game.server.client_count() == 0);
++        }
++        return true;
++    }
+     bool private_world(const std::filesystem::path& root)
+     {
+         GameSession game;
+@@ -971,6 +1227,8 @@ int main(int argc, char** argv)
+     std::filesystem::path root = argc > 2 ? path_from_utf8(argv[2]) : std::filesystem::path{};
+     if (name == "private")
+         ok = private_world(root);
++    else if (name == "destination_trial_private")
++        ok = destination_trial_private(root);
+     else if (name == "destination_private")
+         ok = destination_private(root);
+     else
+@@ -980,7 +1238,9 @@ int main(int argc, char** argv)
+             std::filesystem::create_directories(root, ec);
+         if (ec)
+             return 2;
+-        if (name == "destination_messages")
++        if (name == "destination_trials")
++            ok = destination_trials(root);
++        else if (name == "destination_messages")
+             ok = destination_messages();
+         else if (name == "destination_schema")
+             ok = destination_schema();

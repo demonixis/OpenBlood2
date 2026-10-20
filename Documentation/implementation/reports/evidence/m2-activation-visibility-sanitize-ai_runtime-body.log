@@ -1,0 +1,14 @@
+449/644 Testing: ai_runtime.body
+449/644 Test: ai_runtime.body
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_runtime_tests" "body"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_runtime.body" start time: Oct 17 04:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.body" end time: Oct 17 04:04 CEST
+"ai_runtime.body" time elapsed: 00:00:00
+----------------------------------------------------------

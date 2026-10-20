@@ -1,0 +1,14 @@
+635/638 Testing: naga.ai
+635/638 Test: naga.ai
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/naga_tests" "ai" "/home/yann/projects/lithtech/Blood2/build/debug/tests/naga-ai"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"naga.ai" start time: Oct 17 00:59 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"naga.ai" end time: Oct 17 00:59 CEST
+"naga.ai" time elapsed: 00:00:00
+----------------------------------------------------------

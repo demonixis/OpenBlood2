@@ -1,0 +1,17 @@
+{
+  "name": "engine_remove_symbolization",
+  "command": [
+    "addr2line",
+    "-Cfipe",
+    "/tmp/lithtech-audit-2bVxTF/engine_contract_probe",
+    "0x4f9b72",
+    "0x4fc3cb",
+    "0x4ed9d5"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:33:14.983998+00:00",
+  "elapsed_seconds": 0.172,
+  "timeout_seconds": 20,
+  "exit_code": 0,
+  "log": "engine_remove_symbolization.log"
+}

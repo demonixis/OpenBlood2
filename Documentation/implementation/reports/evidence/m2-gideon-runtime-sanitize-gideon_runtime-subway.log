@@ -1,0 +1,29 @@
+641/642 Testing: gideon_runtime.subway
+641/642 Test: gideon_runtime.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_runtime_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_runtime.subway" start time: Oct 17 03:40 CEST
+Output:
+----------------------------------------------------------
+SubwayA created=204 unknown=0 failed=0 npcs=16 objects=227
+Entered objects=230
+First tick objects=232 attachments=11
+Boss activity=3 pings=0 animation=19
+Boss updates=2 state=101 health messages=1 error=
+SubwayA created=204 unknown=0 failed=0 npcs=16 objects=227
+Entered objects=230
+First tick objects=232 attachments=11
+Boss activity=3 pings=0 animation=19
+Boss updates=2 state=101 health messages=1 error=
+SubwayA created=204 unknown=0 failed=0 npcs=16 objects=227
+Entered objects=230
+First tick objects=232 attachments=11
+Boss activity=3 pings=0 animation=19
+Boss updates=2 state=101 health messages=1 error=
+<end of output>
+Test time =  42.71 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_runtime.subway" end time: Oct 17 03:41 CEST
+"gideon_runtime.subway" time elapsed: 00:00:42
+----------------------------------------------------------

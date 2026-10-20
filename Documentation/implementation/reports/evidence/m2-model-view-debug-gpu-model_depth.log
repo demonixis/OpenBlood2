@@ -1,0 +1,15 @@
+349/350 Testing: gpu.model_depth
+349/350 Test: gpu.model_depth
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/model_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/model-depth.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.model_depth" start time: Oct 16 09:55 CEST
+Output:
+----------------------------------------------------------
+Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+<end of output>
+Test time =   0.53 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.model_depth" end time: Oct 16 09:55 CEST
+"gpu.model_depth" time elapsed: 00:00:00
+----------------------------------------------------------

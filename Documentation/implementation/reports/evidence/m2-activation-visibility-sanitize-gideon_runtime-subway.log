@@ -1,0 +1,35 @@
+643/644 Testing: gideon_runtime.subway
+643/644 Test: gideon_runtime.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_runtime_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_runtime.subway" start time: Oct 17 04:02 CEST
+Output:
+----------------------------------------------------------
+SubwayA created=204 unknown=0 failed=0 npcs=16 objects=227
+Entered objects=230
+First tick objects=232 attachments=11
+Glass probe observer=1 visibility=1 refreshed=1 pings=3 script updates=91
+Boss activity=3 pings=13 animation=31
+Boss updates=332 state=24 health messages=331 error=
+Intro glass visibility=1 passive before camera switch=1 selections=2 script updates=293 current=PASSIVE
+SubwayA created=204 unknown=0 failed=0 npcs=16 objects=227
+Entered objects=230
+First tick objects=232 attachments=11
+Glass probe observer=1 visibility=1 refreshed=1 pings=3 script updates=91
+Boss activity=3 pings=13 animation=31
+Boss updates=332 state=24 health messages=331 error=
+Intro glass visibility=1 passive before camera switch=1 selections=2 script updates=293 current=PASSIVE
+SubwayA created=204 unknown=0 failed=0 npcs=16 objects=227
+Entered objects=230
+First tick objects=232 attachments=11
+Glass probe observer=1 visibility=1 refreshed=1 pings=3 script updates=91
+Boss activity=3 pings=13 animation=31
+Boss updates=332 state=24 health messages=331 error=
+Intro glass visibility=1 passive before camera switch=1 selections=2 script updates=293 current=PASSIVE
+<end of output>
+Test time =  93.02 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_runtime.subway" end time: Oct 17 04:03 CEST
+"gideon_runtime.subway" time elapsed: 00:01:33
+----------------------------------------------------------

@@ -1,0 +1,1174 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index db8d88b..dd85ad7 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -604,3 +604,5 @@ The [NPC animation-clearance correction](../Documentation/Implementation/M2_AI_A
+ The [original PolyGrid continuation](../Documentation/Implementation/M2_POLYGRIDS.md) connects VolumeBrush surface creation, original high-detail plasma/scale rules and actual transparent SDL_GPU rendering. Read [contracts](docs/POLYGRID_CONTRACTS.md). Preserve independent publisher lifetime, Current.y pan, hidden-clock pause, shared per-world phases, checked resource failures and revision-owned caches. Visual publishers are excluded from replacement body physics; static containers, explicit always-update timing and separate alpha sorting remain bounded policies. CityHub water now renders; underwater fog, moving volumes and the M2 gate stay open.
+ 
+ The [NPC ammunition continuation](../Documentation/Implementation/M2_AI_AMMO.md) connects original FindAmmo and MID_ADDAMMO instead of suspending an empty-ammo actor. Read [contracts](docs/AI_AMMO_CONTRACTS.md). Preserve original class selection, ray-hit visibility, empty-route escape, single integration and capped collection. Specific+AvoidTarget skips unused undefined arithmetic; removed pickup trackers retain only their owned route. Private contact/hidden-inspector tests do not prove autonomous retail pickup pursuit or resolve every idle-NPC report. M2 remains incomplete.
++
++The [service coverage continuation](../Documentation/Implementation/M2_SERVICE_COVERAGE.md) audits the bounded adapter catalogue and restored-player/exit trace scopes. Read [contracts](docs/SERVICE_COVERAGE_CONTRACTS.md). Keep implementation status separate from observed attempts, retain unknown/unexercised entries and teardown failure history, and never interpret a counted call as success. This is not the full historical SDK/client API; M2 remains incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e7b2209..745f4a7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -33,7 +33,8 @@ add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/PolyGrid
+     src/game/session.cpp
+     src/game/player_restore.cpp
+     src/game/registration.cpp
+-    src/game/server_adapter.cpp)
++    src/game/server_adapter.cpp
++    src/game/service_coverage.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp src/game/original/SoundFX.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/LightFX.cpp src/game/original/ClientLightFX.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index eed1773..832f06a 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1083,3 +1083,13 @@ Selected Weapon.cpp flags, WeaponFX.cpp flesh/metal recipes and SparksFX.cpp bur
+ [NPC animation clearance](M2_AI_ANIMATION_CLEARANCE_SOURCES.json): correct the selective original SetAnimation adaptation; see [contracts](AI_ANIMATION_CLEARANCE_CONTRACTS.md).
+ 
+ [Original NPC ammunition recovery](M2_AI_AMMO_SOURCES.json): FindAmmo phases and MID_ADDAMMO collection, with defined query/lifetime adaptations in [contracts](AI_AMMO_CONTRACTS.md).
++
++## Service coverage and lifecycle trace
++
++`service_coverage.{h,cpp}` and `service_catalog.inc` are new engine inspection code,
++not imported gameplay. The catalogue describes the existing bounded
++`legacy/server_de.h` surface, including its three explicit unsupported methods.
++Canonical instrumentation adds no original rules. Player restoration and exit
++now retain their real adapter calls through scoped tracing; unavailable history
++survives teardown. See [contracts](SERVICE_COVERAGE_CONTRACTS.md) and
++[execution evidence](../../Documentation/Implementation/M2_SERVICE_COVERAGE.md).
+diff --git a/docs/SERVICE_COVERAGE_CONTRACTS.md b/docs/SERVICE_COVERAGE_CONTRACTS.md
+new file mode 100644
+index 0000000..0d505b7
+--- /dev/null
++++ b/docs/SERVICE_COVERAGE_CONTRACTS.md
+@@ -0,0 +1,75 @@
++# Bounded service coverage
++
++M2 requires evidence of the services reached by the selected session. The
++[static catalogue](../src/game/service_catalog.inc) covers every declaration in
++[the port interface](../src/game/legacy/server_de.h), plus client connect/disconnect
++and the model-string callback boundary. It is **not** the entire historical SDK,
++all client-shell operations, or a list of completed gameplay features.
++
++## Two independent dimensions
++
++- **Implemented (bounded)**: a concrete implementation exists, subject to its
++  subsystem contracts. Invalid handles, missing resources, unsupported modes and
++  exhausted limits may still fail. This label never means every input works.
++- **Explicitly unsupported**: SaveObjects, RestoreObjects and EndHMessageRead
++  still reject their requests. Supported player KeepAlive restoration is a
++  separate typed path; it does not implement general world save files.
++- **Unclassified**: an observed name absent from the catalogue remains visible.
++  It is never silently counted as supported.
++- **Observed calls** are attempts at a boundary, including refused calls and
++  nested calls between implementations. Zero means unexercised in this trace,
++  independently of the implementation classification. Neither a positive count
++  nor the absence of a generic failure proves successful gameplay.
++
++The catalogue contains 171 ServerDE/CSBase entries and three supporting boundaries.
++Trace names are canonical method names; old descriptive suffixes and the sky
++aliases are historical. Six previously missing service boundaries now trace directly:
++GetPathManager, PlayClientSound, PublishBloodSpurt, PublishFleshGibs,
++RecordProjectile and ReportSkyFailure. Restored player entry and explicit player
++exit also gain trace scopes; these are scope corrections, not extra API entries.
++
++## Scope and ownership
++
++World loading resets counters after old-world teardown. Existing scopes cover
++loading, fresh player entry, normal session updates and object teardown. Explicit
++player exit, restored player entry, message pumping and weapon selection commands
++now have nested, noncopyable scopes that
++restore the previous tracing flag on every return. Ordinary inspection outside
++these scopes does not add calls. Diagnostic direct service calls must explicitly
++enable tracing if they are to appear; the catalogue does not fabricate activity.
++
++Counters survive unload for inspection until the next successful world load.
++Generic unavailable-request history now also survives unload; the current-world
++rejection map retains its previous reset behavior for destination validation.
++Sky and PolyGrid failures use the same historical recording path. Failure history
++is collected even outside a trace scope, so an unavailable request can coexist
++with zero traced calls. It is not an exhaustive catalogue of every possible
++validation error; return values, object diagnostics and subsystem errors remain
++necessary evidence. No errors are changed into successful return values.
++
++The Services tab separates name, boundary, implementation and observed attempts,
++including all unexercised entries. It also shows retained unavailable reasons.
++Snapshots own their strings/counts, do not mutate the session and execute no
++original callbacks. No source session pointers or counters are merged into a new
++world during NEW_LEVEL. Capture a report before replacement to retain that world.
++
++## Verification and remaining gate
++
++`coverage.catalog` checks declaration/catalogue equality, unique canonical trace
++names and a trace inside each current implementation. Its deliberately narrow
++source-format scanner is a development check, not a production C++ parser; a
++new declaration syntax requires updating that guard. The compiled catalogue is
++ordinary immutable C++ data, with no runtime parser or new dependency.
++
++`coverage.observations` distinguishes unsupported/unexercised, counts a failed
++velocity request without calling it successful, exercises all three generic
++unsupported APIs, retains unknown observations, checks pure snapshots, nested
++scope restoration, failed restoration/weapon commands/message pumping and teardown history.
++
++`coverage.private` loads SubwayA, enters the original player, advances ten seconds,
++records the typed exit request under an explicit diagnostic scope, performs real NEW_LEVEL to CityHub, checks restored-client tracing, advances ten
++seconds, then checks original player/object teardown and fresh-load reset. Reports
++include all catalogue rows and current NPC runtime failures. This stationary,
++limited-duration trace is not campaign traversal or evidence for every weapon,
++trigger, AI action, client service or future resource request. M2 remains open
++until the complete selected-slice acceptance review passes.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 628af89..10a0bad 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -422,8 +422,8 @@ namespace OpenBlood2
+         {
+             ImGui::TextColored(ImVec4(0.95f, 0.48f, 0.43f, 1),
+                                game.world_path.empty() ? "ORIGINAL OBJECT DIAGNOSTICS" : "M2  /  WORLD INSPECTION");
+-            ImGui::TextWrapped("Original objects, ABC animation and primary-world collision. Full original player "
+-                               "session remains blocked.");
++            ImGui::TextWrapped("Bounded original-code session, models and world collision. M2 acceptance remains "
++                               "incomplete; inspect observed service coverage in Services.");
+             ImGui::PushTextWrapPos(0);
+             ImGui::TextDisabled("Title arrow: fold/unfold | Drag borders: resize | F1: inspector | F3: mouse capture | "
+                                 "Esc: release/quit");
+@@ -995,9 +995,7 @@ namespace OpenBlood2
+                         }
+                         ImGui::TreePop();
+                     }
+-                    ImGui::SeparatorText("Reached engine services (original object callbacks / teardown)");
+-                    for (const auto& [name, count] : game.server.service_calls)
+-                        ImGui::Text("%s: %llu", name.c_str(), static_cast<unsigned long long>(count));
++                    ImGui::TextWrapped("Service coverage, including unexercised entries, is in the Services tab.");
+                     for (const auto& diagnostic : game.objects.diagnostics())
+                         ImGui::TextWrapped("%s", diagnostic.c_str());
+                     ImGui::EndTabItem();
+@@ -1013,8 +1011,9 @@ namespace OpenBlood2
+                     draw_models(game);
+                     ImGui::EndTabItem();
+                 }
+-                if (ImGui::BeginTabItem("Services"))
++                if (ImGui::BeginTabItem("Services", nullptr, select_services ? ImGuiTabItemFlags_SetSelected : 0))
+                 {
++                    select_services = false;
+                     draw_services(game);
+                     ImGui::EndTabItem();
+                 }
+@@ -1818,6 +1817,42 @@ namespace OpenBlood2
+     }
+     void Inspector::draw_services(const GameSession& game)
+     {
++        if (ImGui::CollapsingHeader("Service coverage", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            ImGui::TextWrapped("Current world trace: loading, player entry/restore, updates and teardown. "
++                               "Counts are attempts, not successful results. Unexercised does not mean unsupported. "
++                               "This is the bounded port interface, not the full original SDK or client API.");
++            if (ImGui::BeginTable("Service coverage table", 4,
++                                  ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
++                                  ImVec2(0, 260)))
++            {
++                ImGui::TableSetupColumn("Service");
++                ImGui::TableSetupColumn("Boundary");
++                ImGui::TableSetupColumn("Implementation");
++                ImGui::TableSetupColumn("Observed calls");
++                ImGui::TableHeadersRow();
++                for (const auto& row : service_coverage(game.server.service_calls))
++                {
++                    ImGui::TableNextRow();
++                    ImGui::TableNextColumn();
++                    ImGui::TextUnformatted(row.name.c_str());
++                    ImGui::TableNextColumn();
++                    ImGui::TextUnformatted(service_boundary_name(row.boundary));
++                    ImGui::TableNextColumn();
++                    ImGui::TextUnformatted(service_support_name(row.support));
++                    ImGui::TableNextColumn();
++                    if (row.calls)
++                        ImGui::Text("%llu", static_cast<unsigned long long>(row.calls));
++                    else
++                        ImGui::TextUnformatted("Unexercised");
++                }
++                ImGui::EndTable();
++            }
++            for (const auto& [reason, count] : game.server.unavailable_history)
++                ImGui::TextWrapped("Unavailable request (%llu): %s", static_cast<unsigned long long>(count),
++                                   reason.c_str());
++        }
++
+         ImGui::Text("Primary-world collision: %s / %zu triangles / %zu BVH nodes",
+                     game.server.collision_ready ? "indexed" : "not loaded", game.collision.triangles(),
+                     game.collision.nodes());
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index ac69c85..9fd6a18 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -23,6 +23,7 @@ namespace OpenBlood2
+         const WorldViewStats* sprite_render = nullptr;
+         const WorldViewStats* world_render = nullptr;
+         bool select_models = false;
++        bool select_services = false;
+         bool select_skeleton = false;
+         ObjectId skeleton_selection{};
+         void draw_skeleton(GameSession&, ObjectSelection&);
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 962a89b..69a1e26 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -389,6 +389,7 @@ namespace
+         inspector.world_render = &world_renderer.stats;
+         if (options.keepalive_smoke)
+             SAFE_STRCPY(inspector.keep_start_name, "01_egressa");
++        inspector.select_services = options.gpu_smoke;
+         inspector.select_models =
+             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
+         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
+@@ -901,7 +902,14 @@ namespace
+                                                        game->client_shell.view.object != nullptr));
+ #if BLOOD2_INSPECTOR
+             const bool inspector_was_visible = inspector_visible;
++            const auto coverage_before =
++                options.gpu_smoke ? game->server.service_calls : std::map<std::string, std::uint64_t>{};
+             inspector.draw(config, data, inspector_visible, frames, *game, selection);
++            if (options.gpu_smoke && coverage_before != game->server.service_calls)
++            {
++                spdlog::error("Inspector mutated service coverage");
++                return 4;
++            }
+             if (inspector_was_visible && !inspector_visible && game->client_shell.m_bInWorld && !smoke)
+             {
+                 controls.request_play(); // The window close button resumes just like F1.
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index d6c4c38..73126b7 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -248,8 +248,8 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
+     objective_messages = 0;
+     objectives_resolved = false;
+     messages = updates = 0;
+-    blocker = "Locomotion/weapon inspection: remaining container/FX and mover classes, full combat, audio and "
+-              "autosave remain unported";
++    blocker = "M2 acceptance remains open: see Services for bounded implementation/trace coverage. "
++              "Whole-world saves and unexercised gameplay paths are not validated.";
+     return true;
+ }
+ void CBloodClientShell::OnExitWorld()
+diff --git a/src/game/player_restore.cpp b/src/game/player_restore.cpp
+index 04f9a82..f42a003 100644
+--- a/src/game/player_restore.cpp
++++ b/src/game/player_restore.cpp
+@@ -98,6 +98,7 @@ namespace OpenBlood2
+     bool GameSession::restore_player(const PlayerRestoreState& s, std::string& error, PlayerRestoreMode mode,
+                                      std::string_view start_name)
+     {
++        ServiceTraceScope trace_scope(server.trace_enabled);
+         error.clear();
+         ++restoration.attempts;
+         auto failed = [&]()
+diff --git a/src/game/server_adapter.cpp b/src/game/server_adapter.cpp
+index 9e2aaf1..6440741 100644
+--- a/src/game/server_adapter.cpp
++++ b/src/game/server_adapter.cpp
+@@ -477,7 +477,7 @@ namespace OpenBlood2
+     }
+     DRESULT ServerAdapter::unsupported(const char* service)
+     {
+-        ++unavailable_services[service];
++        record_unavailable(service);
+         objects_.fail(ObjectError::Unsupported, std::string(service) + ": not implemented");
+         return DE_ERROR;
+     }
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 3b2dd1a..b7c8e49 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -21,6 +21,7 @@
+ #include "game/player_restore.h"
+ #include "game/polygrids.h"
+ #include "game/projectile_report.h"
++#include "game/service_coverage.h"
+ #include "game/session.h"
+ #include "game/sparks.h"
+ #include "game/weapon_sprites.h"
+@@ -80,6 +81,7 @@ namespace OpenBlood2
+         bool ScaleObject(HOBJECT, DVector) override;
+         PathMgr* GetPathManager() override
+         {
++            trace_service("GetPathManager");
+             return ai_paths;
+         }
+         PathMgr* ai_paths = nullptr;
+@@ -248,6 +250,13 @@ namespace OpenBlood2
+         void set_game_settings(unsigned difficulty, unsigned game_type);
+         std::map<std::string, std::uint64_t> service_calls;
+         std::map<std::string, std::uint64_t> unavailable_services;
++        // Retained through teardown; cleared alongside service_calls on the next world load.
++        std::map<std::string, std::uint64_t> unavailable_history;
++        void record_unavailable(const std::string& reason)
++        {
++            ++unavailable_services[reason];
++            ++unavailable_history[reason];
++        }
+         bool trace_enabled = false;
+         void trace_service(const char* name)
+         {
+diff --git a/src/game/server_audio.cpp b/src/game/server_audio.cpp
+index d4d415c..96836a9 100644
+--- a/src/game/server_audio.cpp
++++ b/src/game/server_audio.cpp
+@@ -48,6 +48,7 @@ namespace OpenBlood2
+     }
+     SoundId ServerAdapter::PlayClientSound(const SoundRequest& request, DVector position, std::string& error)
+     {
++        trace_service("PlayClientSound");
+         if (!client_resources || request.speaker || request.loop || request.streaming ||
+             request.space != SoundSpace::Spatial)
+         {
+diff --git a/src/game/server_cameras.cpp b/src/game/server_cameras.cpp
+index aae6200..68c27d7 100644
+--- a/src/game/server_cameras.cpp
++++ b/src/game/server_cameras.cpp
+@@ -38,7 +38,7 @@ namespace OpenBlood2
+     }
+     DRESULT ServerAdapter::AlignRotation(DRotation& rotation, DVector forward)
+     {
+-        trace_service("AlignRotation (world Y up)");
++        trace_service("AlignRotation");
+         // Shared original +Y-up convention, with deterministic vertical fallback.
+         return align_rotation(forward, rotation) ? DE_OK : DE_INVALIDPARAMS;
+     }
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index b357827..02cedb6 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -4,7 +4,7 @@ namespace OpenBlood2
+ {
+     std::uint64_t ServerAdapter::PublishSparks(HOBJECT source, const SparkSettings& settings, std::string& error)
+     {
+-        trace_service("PublishSparks (original weapon impact)");
++        trace_service("PublishSparks");
+         error.clear();
+         if (!IsObjectAlive(source) || !client_resources)
+         {
+@@ -16,7 +16,7 @@ namespace OpenBlood2
+     std::uint64_t ServerAdapter::PublishClientBloodSplat(const BloodSplatSettings& settings, std::string_view source,
+                                                          std::string& error)
+     {
+-        trace_service("PublishClientBloodSplat (detached impact)");
++        trace_service("PublishClientBloodSplat");
+         error.clear();
+         if (!objects_.sprites)
+         {
+@@ -28,7 +28,7 @@ namespace OpenBlood2
+     std::uint64_t ServerAdapter::PublishClientBloodSpurt(const BloodSpurtSettings& settings, std::string_view source,
+                                                          bool immediate, std::string& error)
+     {
+-        trace_service("PublishClientBloodSpurt (original particle explosion)");
++        trace_service("PublishClientBloodSpurt");
+         error.clear();
+         if (!client_resources)
+         {
+@@ -40,6 +40,7 @@ namespace OpenBlood2
+     std::uint64_t ServerAdapter::PublishBloodSpurt(HOBJECT source, const BloodSpurtSettings& settings,
+                                                    std::string& error)
+     {
++        trace_service("PublishBloodSpurt");
+         error.clear();
+         if (!IsObjectAlive(source))
+         {
+@@ -51,7 +52,7 @@ namespace OpenBlood2
+     std::uint64_t ServerAdapter::PublishBloodSplat(HOBJECT source, const BloodSplatSettings& settings,
+                                                    std::string& error)
+     {
+-        trace_service("PublishBloodSplat (original detached pool sprite)");
++        trace_service("PublishBloodSplat");
+         error.clear();
+         if (!IsObjectAlive(source) || !objects_.sprites)
+         {
+@@ -63,6 +64,7 @@ namespace OpenBlood2
+     std::uint64_t ServerAdapter::PublishFleshGibs(HOBJECT owner, DVector pos, DVector dir, DVector dims, float scale,
+                                                   unsigned count, std::string& error)
+     {
++        trace_service("PublishFleshGibs");
+         if (!client_resources || !objects_.models)
+         {
+             error = "Flesh-gib resources unavailable";
+@@ -73,7 +75,7 @@ namespace OpenBlood2
+     }
+     std::uint64_t ServerAdapter::PublishPolyGrid(HOBJECT owner, const PolyGridSettings& settings, std::string& error)
+     {
+-        trace_service("PublishPolyGrid (original surface)");
++        trace_service("PublishPolyGrid");
+         if (!objects_.sprites)
+         {
+             error = "PolyGrid sprite store unavailable";
+@@ -81,23 +83,23 @@ namespace OpenBlood2
+         }
+         auto id = polygrids.publish(owner, settings, *this, *objects_.sprites, objects_.time(), error);
+         if (!id)
+-            ++unavailable_services["PolyGrid: " + error];
++            record_unavailable("PolyGrid: " + error);
+         return id;
+     }
+     std::uint64_t ServerAdapter::PublishParticleStream(HOBJECT owner, const ParticleStreamSettings& settings,
+                                                        std::string& error)
+     {
+-        trace_service("PublishParticleStream (original authored emitter)");
++        trace_service("PublishParticleStream");
+         return particle_streams.publish(owner, settings, *this, client_resources, objects_.time(), error);
+     }
+     std::uint64_t ServerAdapter::PublishObjectParticles(HOBJECT owner, unsigned type, std::string& error)
+     {
+-        trace_service("PublishObjectParticles (original shield/powerup)");
++        trace_service("PublishObjectParticles");
+         return object_particles.publish(owner, type, *this, client_resources, objects_.time(), error);
+     }
+     std::uint64_t ServerAdapter::PublishLaserBeam(HOBJECT source, DVector from, DVector to, std::string& error)
+     {
+-        trace_service("PublishLaserBeam (original red small beam)");
++        trace_service("PublishLaserBeam");
+         if (!IsObjectAlive(source) || !objects_.models || !client_resources)
+         {
+             error = "Laser source/model resources unavailable";
+@@ -109,7 +111,7 @@ namespace OpenBlood2
+     std::uint64_t ServerAdapter::PublishWeaponSprites(HOBJECT source, const WeaponSpriteSettings& settings,
+                                                       std::string& error)
+     {
+-        trace_service("PublishWeaponSprites (selected impact flash/smoke)");
++        trace_service("PublishWeaponSprites");
+         if (!IsObjectAlive(source) || !objects_.sprites)
+         {
+             error = "Weapon sprite source/store unavailable";
+@@ -123,7 +125,7 @@ namespace OpenBlood2
+     std::uint64_t ServerAdapter::PublishExplosionFragments(HOBJECT source, DDWORD type, DVector pos, DVector normal,
+                                                            std::string& error)
+     {
+-        trace_service("PublishExplosionFragments (metal models and original smoke trails)");
++        trace_service("PublishExplosionFragments");
+         if (!IsObjectAlive(source) || !objects_.models || !client_resources)
+         {
+             error = "Explosion fragment source/resources unavailable";
+@@ -135,7 +137,7 @@ namespace OpenBlood2
+     std::uint64_t ServerAdapter::PublishExplosionFlames(HOBJECT source, DDWORD type, DVector position, DVector normal,
+                                                         std::string& error)
+     {
+-        trace_service("PublishExplosionFlames (selected original three-zone particles)");
++        trace_service("PublishExplosionFlames");
+         if (!IsObjectAlive(source) || !client_resources)
+         {
+             error = "Explosion flame source/resources unavailable";
+@@ -147,7 +149,7 @@ namespace OpenBlood2
+     std::uint64_t ServerAdapter::PublishExplosionRings(HOBJECT source, DDWORD type, DVector position, DVector normal,
+                                                        std::string& error)
+     {
+-        trace_service("PublishExplosionRings (selected high-detail particle systems)");
++        trace_service("PublishExplosionRings");
+         if (!IsObjectAlive(source) || !client_resources)
+         {
+             error = "Explosion ring source/resources unavailable";
+@@ -159,7 +161,7 @@ namespace OpenBlood2
+     std::uint64_t ServerAdapter::PublishExplosionLights(HOBJECT source, DDWORD type, DVector position, DVector normal,
+                                                         std::string& error)
+     {
+-        trace_service("PublishExplosionLights (evaluated point lights; illumination unavailable)");
++        trace_service("PublishExplosionLights");
+         if (!IsObjectAlive(source))
+         {
+             error = "Explosion light source unavailable";
+@@ -170,7 +172,7 @@ namespace OpenBlood2
+     std::uint64_t ServerAdapter::PublishExplosionModels(HOBJECT source, DDWORD type, DVector position, DVector normal,
+                                                         std::string& error)
+     {
+-        trace_service("PublishExplosionModels (partial high-detail composite)");
++        trace_service("PublishExplosionModels");
+         if (!IsObjectAlive(source) || !objects_.models || !client_resources)
+         {
+             error = "Explosion source/model resources unavailable";
+@@ -182,7 +184,7 @@ namespace OpenBlood2
+     std::uint64_t ServerAdapter::PublishExplosionSprites(HOBJECT source, DDWORD type, DVector position, DVector normal,
+                                                          std::string& error)
+     {
+-        trace_service("PublishExplosionSprites (partial high-detail composite)");
++        trace_service("PublishExplosionSprites");
+         if (!IsObjectAlive(source) || !objects_.sprites)
+         {
+             error = "Explosion source or sprite store unavailable";
+diff --git a/src/game/server_projectiles.cpp b/src/game/server_projectiles.cpp
+index fea3660..e76ebd7 100644
+--- a/src/game/server_projectiles.cpp
++++ b/src/game/server_projectiles.cpp
+@@ -132,6 +132,7 @@ namespace OpenBlood2
+     }
+     void ServerAdapter::RecordProjectile(const ProjectileReport& report)
+     {
++        trace_service("RecordProjectile");
+         if (projectile_reports.size() == 64)
+             projectile_reports.erase(projectile_reports.begin());
+         projectile_reports.push_back(report);
+diff --git a/src/game/server_sky.cpp b/src/game/server_sky.cpp
+index c2b5a34..8d76c23 100644
+--- a/src/game/server_sky.cpp
++++ b/src/game/server_sky.cpp
+@@ -3,7 +3,7 @@ namespace OpenBlood2
+ {
+     bool ServerAdapter::SetSkyDefinition(const SkyDefinition& d)
+     {
+-        trace_service("SetSkyDef");
++        trace_service("SetSkyDefinition");
+         if (sky.set(d))
+             return true;
+         ReportSkyFailure(sky.error);
+@@ -11,7 +11,7 @@ namespace OpenBlood2
+     }
+     bool ServerAdapter::AddSkyObject(HOBJECT h, unsigned index)
+     {
+-        trace_service("AddObjectToSky");
++        trace_service("AddSkyObject");
+         if (sky.add(objects_, h, index))
+             return true;
+         ReportSkyFailure(sky.error);
+@@ -19,8 +19,9 @@ namespace OpenBlood2
+     }
+     void ServerAdapter::ReportSkyFailure(std::string_view message)
+     {
++        trace_service("ReportSkyFailure");
+         sky.error = message;
+         objects_.fail(ObjectError::Unsupported, sky.error);
+-        ++unavailable_services["Sky: " + sky.error];
++        record_unavailable("Sky: " + sky.error);
+     }
+ } // namespace OpenBlood2
+diff --git a/src/game/server_sprites.cpp b/src/game/server_sprites.cpp
+index e487e0b..cf9e6ea 100644
+--- a/src/game/server_sprites.cpp
++++ b/src/game/server_sprites.cpp
+@@ -31,7 +31,7 @@ namespace OpenBlood2
+     } // namespace
+     SegmentResult ServerAdapter::CastRay(DVector from, DVector direction, SegmentHit& out, HOBJECT ignore)
+     {
+-        trace_service("CastRay (solid world and objects)");
++        trace_service("CastRay");
+         out = {};
+         DVector to;
+         const auto bound = ray_end(from, direction, to);
+diff --git a/src/game/service_catalog.inc b/src/game/service_catalog.inc
+new file mode 100644
+index 0000000..ec12564
+--- /dev/null
++++ b/src/game/service_catalog.inc
+@@ -0,0 +1,175 @@
++// Reviewed bounded ServerDE surface. Keep in sync with legacy/server_de.h.
++BLOOD2_SERVICE(AddObjectToList, Bounded, Interface)
++BLOOD2_SERVICE(AddSkyObject, Bounded, Interface)
++BLOOD2_SERVICE(AdvanceModelProjectile, Bounded, Interface)
++BLOOD2_SERVICE(AlignRotation, Bounded, Interface)
++BLOOD2_SERVICE(BreakInterObjectLink, Bounded, Interface)
++BLOOD2_SERVICE(CastRay, Bounded, Interface)
++BLOOD2_SERVICE(CastWorldRay, Bounded, Interface)
++BLOOD2_SERVICE(CompareStringsUpper, Bounded, Interface)
++BLOOD2_SERVICE(ConfigureCharacterBody, Bounded, Interface)
++BLOOD2_SERVICE(ConfigureModelBody, Bounded, Interface)
++BLOOD2_SERVICE(ConfigureWorldBody, Bounded, Interface)
++BLOOD2_SERVICE(CopyString, Bounded, Interface)
++BLOOD2_SERVICE(CreateAttachment, Bounded, Interface)
++BLOOD2_SERVICE(CreateInterObjectLink, Bounded, Interface)
++BLOOD2_SERVICE(CreateObject, Bounded, Interface)
++BLOOD2_SERVICE(CreateObjectList, Bounded, Interface)
++BLOOD2_SERVICE(CreateObjectProps, Bounded, Interface)
++BLOOD2_SERVICE(CreateString, Bounded, Interface)
++BLOOD2_SERVICE(EndHMessageRead, Unavailable, Interface)
++BLOOD2_SERVICE(EndHMessageWrite, Bounded, Interface)
++BLOOD2_SERVICE(EndMessage, Bounded, Interface)
++BLOOD2_SERVICE(FindAttachment, Bounded, Interface)
++BLOOD2_SERVICE(FindNamedObjects, Bounded, Interface)
++BLOOD2_SERVICE(FreeString, Bounded, Interface)
++BLOOD2_SERVICE(GetAcceleration, Bounded, Interface)
++BLOOD2_SERVICE(GetAnimIndex, Bounded, Interface)
++BLOOD2_SERVICE(GetAttachedModelNodeTransform, Bounded, Interface)
++BLOOD2_SERVICE(GetCameraView, Bounded, Interface)
++BLOOD2_SERVICE(GetClass, Bounded, Interface)
++BLOOD2_SERVICE(GetClientResourceString, Bounded, Interface)
++BLOOD2_SERVICE(GetClientUserData, Bounded, Interface)
++BLOOD2_SERVICE(GetContainers, Bounded, Interface)
++BLOOD2_SERVICE(GetFrameTime, Bounded, Interface)
++BLOOD2_SERVICE(GetGameConVar, Bounded, Interface)
++BLOOD2_SERVICE(GetGlobalForce, Bounded, Interface)
++BLOOD2_SERVICE(GetModelAnimUserDims, Bounded, Interface)
++BLOOD2_SERVICE(GetModelAnimation, Bounded, Interface)
++BLOOD2_SERVICE(GetModelAnimationName, Bounded, Interface)
++BLOOD2_SERVICE(GetModelFilenames, Bounded, Interface)
++BLOOD2_SERVICE(GetModelLooping, Bounded, Interface)
++BLOOD2_SERVICE(GetModelNodeHideStatus, Bounded, Interface)
++BLOOD2_SERVICE(GetModelNodeTransform, Bounded, Interface)
++BLOOD2_SERVICE(GetModelPlaybackState, Bounded, Interface)
++BLOOD2_SERVICE(GetMovementState, Bounded, Interface)
++BLOOD2_SERVICE(GetNextObject, Bounded, Interface)
++BLOOD2_SERVICE(GetObjectClass, Bounded, Interface)
++BLOOD2_SERVICE(GetObjectColor, Bounded, Interface)
++BLOOD2_SERVICE(GetObjectDims, Bounded, Interface)
++BLOOD2_SERVICE(GetObjectFlags, Bounded, Interface)
++BLOOD2_SERVICE(GetObjectName, Bounded, Interface)
++BLOOD2_SERVICE(GetObjectPos, Bounded, Interface)
++BLOOD2_SERVICE(GetObjectRotation, Bounded, Interface)
++BLOOD2_SERVICE(GetObjectState, Bounded, Interface)
++BLOOD2_SERVICE(GetObjectUserFlags, Bounded, Interface)
++BLOOD2_SERVICE(GetPathManager, Bounded, Interface)
++BLOOD2_SERVICE(GetPointContainerCode, Bounded, Interface)
++BLOOD2_SERVICE(GetPropBool, Bounded, Interface)
++BLOOD2_SERVICE(GetPropGeneric, Bounded, Interface)
++BLOOD2_SERVICE(GetPropReal, Bounded, Interface)
++BLOOD2_SERVICE(GetPropString, Bounded, Interface)
++BLOOD2_SERVICE(GetPropVector, Bounded, Interface)
++BLOOD2_SERVICE(GetSoundDuration, Bounded, Interface)
++BLOOD2_SERVICE(GetStringData, Bounded, Interface)
++BLOOD2_SERVICE(GetTime, Bounded, Interface)
++BLOOD2_SERVICE(GetVarValueFloat, Bounded, Interface)
++BLOOD2_SERVICE(GetVarValueString, Bounded, Interface)
++BLOOD2_SERVICE(GetVelocity, Bounded, Interface)
++BLOOD2_SERVICE(GetWorldTime, Bounded, Interface)
++BLOOD2_SERVICE(HandleToObject, Bounded, Interface)
++BLOOD2_SERVICE(InterpolateRotation, Bounded, Interface)
++BLOOD2_SERVICE(IntersectSegment, Bounded, Interface)
++BLOOD2_SERVICE(IsKindOf, Bounded, Interface)
++BLOOD2_SERVICE(IsObjectAlive, Bounded, Interface)
++BLOOD2_SERVICE(IsSoundDone, Bounded, Interface)
++BLOOD2_SERVICE(KillSound, Bounded, Interface)
++BLOOD2_SERVICE(MoveKeyframedObject, Bounded, Interface)
++BLOOD2_SERVICE(MoveObject, Bounded, Interface)
++BLOOD2_SERVICE(MoveObjectToGround, Bounded, Interface)
++BLOOD2_SERVICE(MoveWorldModel, Bounded, Interface)
++BLOOD2_SERVICE(ObjectToHandle, Bounded, Interface)
++BLOOD2_SERVICE(PingObjects, Bounded, Interface)
++BLOOD2_SERVICE(PlaceNonSolidModel, Bounded, Interface)
++BLOOD2_SERVICE(PlayCharacterSound, Bounded, Interface)
++BLOOD2_SERVICE(PlayCinematicSound, Bounded, Interface)
++BLOOD2_SERVICE(PlayClientSound, Bounded, Interface)
++BLOOD2_SERVICE(PlayDetachedSound, Bounded, Interface)
++BLOOD2_SERVICE(PlayLocalSound, Bounded, Interface)
++BLOOD2_SERVICE(PlayObjectLoopSound, Bounded, Interface)
++BLOOD2_SERVICE(PlaySoundAt, Bounded, Interface)
++BLOOD2_SERVICE(PlayWorldSound, Bounded, Interface)
++BLOOD2_SERVICE(PublishBloodSplat, Bounded, Interface)
++BLOOD2_SERVICE(PublishBloodSpurt, Bounded, Interface)
++BLOOD2_SERVICE(PublishCameraEffect, Bounded, Interface)
++BLOOD2_SERVICE(PublishClientBloodSplat, Bounded, Interface)
++BLOOD2_SERVICE(PublishClientBloodSpurt, Bounded, Interface)
++BLOOD2_SERVICE(PublishExplosionFlames, Bounded, Interface)
++BLOOD2_SERVICE(PublishExplosionFragments, Bounded, Interface)
++BLOOD2_SERVICE(PublishExplosionLights, Bounded, Interface)
++BLOOD2_SERVICE(PublishExplosionModels, Bounded, Interface)
++BLOOD2_SERVICE(PublishExplosionRings, Bounded, Interface)
++BLOOD2_SERVICE(PublishExplosionSprites, Bounded, Interface)
++BLOOD2_SERVICE(PublishFleshGibs, Bounded, Interface)
++BLOOD2_SERVICE(PublishLaserBeam, Bounded, Interface)
++BLOOD2_SERVICE(PublishLightEffect, Bounded, Interface)
++BLOOD2_SERVICE(PublishObjectParticles, Bounded, Interface)
++BLOOD2_SERVICE(PublishParticleStream, Bounded, Interface)
++BLOOD2_SERVICE(PublishPolyGrid, Bounded, Interface)
++BLOOD2_SERVICE(PublishSparks, Bounded, Interface)
++BLOOD2_SERVICE(PublishWeaponSprites, Bounded, Interface)
++BLOOD2_SERVICE(QueryModelNodeTransform, Bounded, Interface)
++BLOOD2_SERVICE(RandomFloat, Bounded, Interface)
++BLOOD2_SERVICE(RandomInt, Bounded, Interface)
++BLOOD2_SERVICE(ReadDamage, Bounded, Interface)
++BLOOD2_SERVICE(ReadFromMessageDWord, Bounded, Interface)
++BLOOD2_SERVICE(ReadFromMessageHString, Bounded, Interface)
++BLOOD2_SERVICE(ReadKeyMessage, Bounded, Interface)
++BLOOD2_SERVICE(ReadPickupMessage, Bounded, Interface)
++BLOOD2_SERVICE(RecordBrushDestruction, Bounded, Interface)
++BLOOD2_SERVICE(RecordDebrisEffect, Bounded, Interface)
++BLOOD2_SERVICE(RecordExplosionEffect, Bounded, Interface)
++BLOOD2_SERVICE(RecordPickup, Bounded, Interface)
++BLOOD2_SERVICE(RecordProjectile, Bounded, Interface)
++BLOOD2_SERVICE(RecordSceneExplosion, Bounded, Interface)
++BLOOD2_SERVICE(RecordSpawn, Bounded, Interface)
++BLOOD2_SERVICE(RelinquishList, Bounded, Interface)
++BLOOD2_SERVICE(RemoveAttachment, Bounded, Interface)
++BLOOD2_SERVICE(RemoveCameraEffect, Bounded, Interface)
++BLOOD2_SERVICE(RemoveLightEffect, Bounded, Interface)
++BLOOD2_SERVICE(RemoveObject, Bounded, Interface)
++BLOOD2_SERVICE(RemoveObjectFromList, Bounded, Interface)
++BLOOD2_SERVICE(ReportSkyFailure, Bounded, Interface)
++BLOOD2_SERVICE(ResetModelAnimation, Bounded, Interface)
++BLOOD2_SERVICE(ResetRead, Bounded, Interface)
++BLOOD2_SERVICE(ResizeObject, Bounded, Interface)
++BLOOD2_SERVICE(RestoreObjects, Unavailable, Interface)
++BLOOD2_SERVICE(RotateWorldModel, Bounded, Interface)
++BLOOD2_SERVICE(SaveObjects, Unavailable, Interface)
++BLOOD2_SERVICE(ScaleObject, Bounded, Interface)
++BLOOD2_SERVICE(SendBossHealth, Bounded, Interface)
++BLOOD2_SERVICE(SendConversation, Bounded, Interface)
++BLOOD2_SERVICE(SendObjectives, Bounded, Interface)
++BLOOD2_SERVICE(SendToClient, Bounded, Interface)
++BLOOD2_SERVICE(SendWorldExit, Bounded, Interface)
++BLOOD2_SERVICE(SetAcceleration, Bounded, Interface)
++BLOOD2_SERVICE(SetBlockingPriority, Bounded, Interface)
++BLOOD2_SERVICE(SetClientUserData, Bounded, Interface)
++BLOOD2_SERVICE(SetDeactivationTime, Bounded, Interface)
++BLOOD2_SERVICE(SetGameConVar, Bounded, Interface)
++BLOOD2_SERVICE(SetGlobalForce, Bounded, Interface)
++BLOOD2_SERVICE(SetModelAnimation, Bounded, Interface)
++BLOOD2_SERVICE(SetModelFilenames, Bounded, Interface)
++BLOOD2_SERVICE(SetModelLooping, Bounded, Interface)
++BLOOD2_SERVICE(SetModelNodeHideStatus, Bounded, Interface)
++BLOOD2_SERVICE(SetNextUpdate, Bounded, Interface)
++BLOOD2_SERVICE(SetObjectColor, Bounded, Interface)
++BLOOD2_SERVICE(SetObjectDims, Bounded, Interface)
++BLOOD2_SERVICE(SetObjectFlags, Bounded, Interface)
++BLOOD2_SERVICE(SetObjectRotation, Bounded, Interface)
++BLOOD2_SERVICE(SetObjectState, Bounded, Interface)
++BLOOD2_SERVICE(SetObjectUserFlags, Bounded, Interface)
++BLOOD2_SERVICE(SetSkyDefinition, Bounded, Interface)
++BLOOD2_SERVICE(SetVelocity, Bounded, Interface)
++BLOOD2_SERVICE(StartHMessageWrite, Bounded, Interface)
++BLOOD2_SERVICE(StartMessageToObject, Bounded, Interface)
++BLOOD2_SERVICE(TeleportObject, Bounded, Interface)
++BLOOD2_SERVICE(ValidateSpawnObject, Bounded, Interface)
++BLOOD2_SERVICE(WriteDamage, Bounded, Interface)
++BLOOD2_SERVICE(WriteKeyMessage, Bounded, Interface)
++BLOOD2_SERVICE(WritePickupMessage, Bounded, Interface)
++BLOOD2_SERVICE(WriteToMessageDWord, Bounded, Interface)
++BLOOD2_SERVICE(WriteToMessageHString, Bounded, Interface)
++BLOOD2_SERVICE(ConnectClient, Bounded, Lifecycle)
++BLOOD2_SERVICE(DisconnectClient, Bounded, Lifecycle)
++BLOOD2_SERVICE(MID_MODELSTRINGKEY, Bounded, Callback)
+diff --git a/src/game/service_coverage.cpp b/src/game/service_coverage.cpp
+new file mode 100644
+index 0000000..b901503
+--- /dev/null
++++ b/src/game/service_coverage.cpp
+@@ -0,0 +1,58 @@
++#include "game/service_coverage.h"
++#include <algorithm>
++namespace OpenBlood2
++{
++    std::span<const ServiceDefinition> service_catalog()
++    {
++        static constexpr ServiceDefinition definitions[]{
++#define BLOOD2_SERVICE(name, support, boundary) {#name, ServiceSupport::support, ServiceBoundary::boundary},
++#include "game/service_catalog.inc"
++#undef BLOOD2_SERVICE
++        };
++        return definitions;
++    }
++    std::vector<ServiceCoverage> service_coverage(const std::map<std::string, std::uint64_t>& calls)
++    {
++        std::vector<ServiceCoverage> rows;
++        rows.reserve(service_catalog().size() + calls.size());
++        for (const auto& service : service_catalog())
++        {
++            const auto found = calls.find(std::string(service.name));
++            rows.push_back({std::string(service.name), service.support, service.boundary,
++                            found == calls.end() ? 0 : found->second});
++        }
++        for (const auto& [name, count] : calls)
++            if (std::none_of(service_catalog().begin(), service_catalog().end(),
++                             [&](const auto& service) { return service.name == name; }))
++                rows.push_back({name, ServiceSupport::Unclassified, ServiceBoundary::Unknown, count});
++        return rows;
++    }
++    const char* service_support_name(ServiceSupport support)
++    {
++        switch (support)
++        {
++            case ServiceSupport::Bounded:
++                return "Implemented (bounded)";
++            case ServiceSupport::Unavailable:
++                return "Explicitly unsupported";
++            case ServiceSupport::Unclassified:
++                return "Unclassified";
++        }
++        return "Unclassified";
++    }
++    const char* service_boundary_name(ServiceBoundary boundary)
++    {
++        switch (boundary)
++        {
++            case ServiceBoundary::Interface:
++                return "ServerDE";
++            case ServiceBoundary::Lifecycle:
++                return "Lifecycle";
++            case ServiceBoundary::Callback:
++                return "Callback";
++            case ServiceBoundary::Unknown:
++                return "Unknown";
++        }
++        return "Unknown";
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/service_coverage.h b/src/game/service_coverage.h
+new file mode 100644
+index 0000000..f418d4d
+--- /dev/null
++++ b/src/game/service_coverage.h
+@@ -0,0 +1,60 @@
++#pragma once
++#include <cstdint>
++#include <map>
++#include <span>
++#include <string>
++#include <string_view>
++#include <vector>
++
++namespace OpenBlood2
++{
++    enum class ServiceSupport
++    {
++        Bounded,
++        Unavailable,
++        Unclassified
++    };
++    enum class ServiceBoundary
++    {
++        Interface,
++        Lifecycle,
++        Callback,
++        Unknown
++    };
++    struct ServiceDefinition
++    {
++        std::string_view name;
++        ServiceSupport support;
++        ServiceBoundary boundary;
++    };
++    struct ServiceCoverage
++    {
++        std::string name;
++        ServiceSupport support;
++        ServiceBoundary boundary;
++        std::uint64_t calls = 0;
++    };
++    std::span<const ServiceDefinition> service_catalog();
++    // Called by inspection/tools only. A counted attempt is never a success assertion.
++    std::vector<ServiceCoverage> service_coverage(const std::map<std::string, std::uint64_t>& calls);
++    const char* service_support_name(ServiceSupport);
++    const char* service_boundary_name(ServiceBoundary);
++    class ServiceTraceScope
++    {
++      public:
++        explicit ServiceTraceScope(bool& enabled) : enabled_(enabled), previous_(enabled)
++        {
++            enabled_ = true;
++        }
++        ~ServiceTraceScope()
++        {
++            enabled_ = previous_;
++        }
++        ServiceTraceScope(const ServiceTraceScope&) = delete;
++        ServiceTraceScope& operator=(const ServiceTraceScope&) = delete;
++
++      private:
++        bool& enabled_;
++        bool previous_;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index f1ba840..09c6664 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -62,6 +62,7 @@ namespace OpenBlood2
+         collision = std::move(next.collision);
+         server.collision_ready = true;
+         server.service_calls.clear();
++        server.unavailable_history.clear();
+         server.trace_enabled = true;
+         world = std::move(next.world);
+         world_path = request.filename;
+@@ -204,6 +205,7 @@ namespace OpenBlood2
+     }
+     bool GameSession::pump_player_messages(std::string& error)
+     {
++        ServiceTraceScope trace_scope(server.trace_enabled);
+         if (objects.busy())
+         {
+             error = "Player message pump during object callback rejected";
+@@ -323,6 +325,7 @@ namespace OpenBlood2
+     }
+     bool GameSession::leave_player()
+     {
++        ServiceTraceScope trace_scope(server.trace_enabled);
+         if (objects.busy())
+             return false;
+         pending_level_change.reset();
+@@ -338,6 +341,7 @@ namespace OpenBlood2
+     }
+     bool GameSession::command_weapon(DBYTE slot, std::string& error)
+     {
++        ServiceTraceScope trace_scope(server.trace_enabled);
+         error.clear();
+         auto* owner = server_shell.Player(local_client);
+         // Original OnCommandOn dead/movement guard, then COMMAND_WEAPON_0..9.
+@@ -356,6 +360,7 @@ namespace OpenBlood2
+     }
+     bool GameSession::select_weapon(DBYTE slot, std::string& error)
+     {
++        ServiceTraceScope trace_scope(server.trace_enabled);
+         error.clear();
+         if (objects.busy())
+         {
+@@ -404,10 +409,9 @@ namespace OpenBlood2
+         const auto missing =
+             std::count_if(entries.begin(), entries.end(), [](const auto& e)
+                           { return e.state == EntryState::Unsupported || e.state == EntryState::Failed; });
+-        error = "RunWorld blocked: " + std::to_string(missing) +
+-                " uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat "
+-                "reactions, "
+-                "audio, autosave and remaining mover classes remain unported";
++        error = "RunWorld acceptance gate not passed: " + std::to_string(missing) +
++                " uninstantiated required objects. Inspect Services for bounded implementation/trace coverage; "
++                "remaining required paths must pass M2 acceptance.";
+         if (!entry_error.empty())
+             error += "; player entry: " + entry_error;
+         if (trace.empty() || trace.back() != error)
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 579a02f..a68b3c5 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1856,3 +1856,14 @@ if(BLOOD2_GPU_TESTS)
+     add_test(NAME gpu.polygrid COMMAND polygrid_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/polygrid/gpu" ${BLOOD2_TEST_DATA_DIR})
+     set_tests_properties(gpu.polygrid PROPERTIES LABELS "gpu;polygrid;private" TIMEOUT 120 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+ endif()
++
++add_executable(service_coverage_tests service_coverage_tests.cpp)
++target_link_libraries(service_coverage_tests PRIVATE blood2_game)
++blood2_project_options(service_coverage_tests)
++add_test(NAME coverage.catalog COMMAND service_coverage_tests catalog "${PROJECT_SOURCE_DIR}")
++add_test(NAME coverage.observations COMMAND service_coverage_tests observations)
++set_tests_properties(coverage.catalog coverage.observations PROPERTIES LABELS "headless;services" TIMEOUT 20)
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME coverage.private COMMAND service_coverage_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(coverage.private PROPERTIES LABELS "headless;private;services" TIMEOUT 180)
++endif()
+diff --git a/tests/service_coverage_tests.cpp b/tests/service_coverage_tests.cpp
+new file mode 100644
+index 0000000..1a1b61b
+--- /dev/null
++++ b/tests/service_coverage_tests.cpp
+@@ -0,0 +1,225 @@
++#include "game/original/AI_Mgr.h"
++#include "game/server_adapter.h"
++#include <algorithm>
++#include <filesystem>
++#include <fstream>
++#include <iostream>
++#include <regex>
++#include <set>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x "\n";                                                                     \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    std::string read(const std::filesystem::path& path)
++    {
++        std::ifstream input(path);
++        return {std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()};
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        // Deliberately narrow source-format guard, not a C++ parser. A declaration
++        // syntax change must update this guard, never silently omit a service.
++        const auto header = read(root / "src/game/legacy/server_de.h");
++        CHECK(!header.empty());
++        std::set<std::string> declared, listed, traced;
++        for (const auto& pattern : {R"(virtual\s+[^;{}]*?\b(\w+)\s*\([^;{}]*?\)\s*=\s*0;)", R"(\(\*(\w+)\))"})
++        {
++            std::regex expression(pattern);
++            for (std::sregex_iterator i(header.begin(), header.end(), expression), end; i != end; ++i)
++                CHECK(declared.insert((*i)[1]).second);
++        }
++        CHECK(!declared.empty());
++        for (const auto& definition : service_catalog())
++        {
++            if (definition.boundary == ServiceBoundary::Interface)
++                CHECK(listed.insert(std::string(definition.name)).second);
++            const bool unavailable = definition.name == "SaveObjects" || definition.name == "RestoreObjects" ||
++                                     definition.name == "EndHMessageRead";
++            CHECK(definition.support == (unavailable ? ServiceSupport::Unavailable : ServiceSupport::Bounded));
++        }
++        CHECK(listed == declared);
++        std::string source = read(root / "src/game/server_adapter.h");
++        for (const auto& file : std::filesystem::directory_iterator(root / "src/game"))
++            if (file.path().extension() == ".cpp" && file.path().filename().string().starts_with("server_"))
++                source += read(file.path());
++        std::regex expression("trace_service\\(\"([^\"]+)\"\\)");
++        for (std::sregex_iterator i(source.begin(), source.end(), expression), end; i != end; ++i)
++            CHECK(traced.insert((*i)[1]).second); // Exactly one canonical boundary per entry.
++        listed.clear();
++        for (const auto& definition : service_catalog())
++            CHECK(listed.insert(std::string(definition.name)).second);
++        CHECK(traced == listed);
++        // Each declared service must trace in its own implementation, not merely
++        // exist elsewhere as a matching string. Accept current methods/thunks/inlines.
++        std::set<std::string> instrumented;
++        const std::regex bodies(
++            R"(ServerAdapter::(\w+)\s*\([^;{}]*?\)\s*\{|\b(\w+)\s*=\s*\[\][^{]*\{|\b(\w+)\s*\([^;{}]*?\)\s*override\s*\{)");
++        for (std::sregex_iterator i(source.begin(), source.end(), bodies), finish; i != finish; ++i)
++        {
++            const auto& match = *i;
++            const std::string name = match[1].matched   ? match[1].str()
++                                     : match[2].matched ? match[2].str()
++                                                        : match[3].str();
++            if (!declared.contains(name))
++                continue;
++            CHECK(instrumented.insert(name).second);
++            auto begin = static_cast<std::size_t>(match.position() + match.length());
++            auto end = begin;
++            int depth = 1;
++            for (; end < source.size() && depth; ++end)
++                depth += (source[end] == '{') - (source[end] == '}');
++            CHECK(!depth);
++            CHECK(source.substr(begin, end - begin).find("trace_service(\"" + name + "\")") != std::string::npos);
++        }
++        CHECK(instrumented == declared);
++        std::cout << "Catalog: " << declared.size() << " interface services / " << listed.size()
++                  << " trace boundaries\n";
++        return true;
++    }
++    const ServiceCoverage* find(const std::vector<ServiceCoverage>& rows, std::string_view name)
++    {
++        const auto found = std::find_if(rows.begin(), rows.end(), [&](const auto& row) { return row.name == name; });
++        return found == rows.end() ? nullptr : &*found;
++    }
++    bool observations()
++    {
++        GameSession game;
++        CHECK(game.initialize());
++        auto& s = game.server;
++        CHECK(!s.trace_enabled);
++        const auto empty = s.service_calls;
++        auto rows = service_coverage(empty);
++        CHECK(rows.size() == service_catalog().size());
++        CHECK(find(rows, "SaveObjects")->support == ServiceSupport::Unavailable && !find(rows, "SaveObjects")->calls);
++        CHECK(find(rows, "GetPathManager")->support == ServiceSupport::Bounded && !find(rows, "GetPathManager")->calls);
++        CHECK(s.GetPathManager() && s.service_calls == empty); // Inspection outside a traced scope.
++        {
++            ServiceTraceScope trace(s.trace_enabled);
++            s.GetPathManager();
++            DVector velocity{};
++            CHECK(s.SetVelocity(nullptr, &velocity) != DE_OK); // Counted attempt, not success.
++            {
++                ServiceTraceScope nested(s.trace_enabled);
++                CHECK(s.SaveObjects("unused", nullptr, 0, 0) == DE_ERROR);
++                CHECK(s.RestoreObjects("unused", 0, 0) == DE_ERROR);
++                s.EndHMessageRead(nullptr);
++            }
++            CHECK(s.trace_enabled);
++        }
++        CHECK(!s.trace_enabled && s.unavailable_history.size() == 3);
++        rows = service_coverage(s.service_calls);
++        CHECK(find(rows, "GetPathManager")->calls == 1 && find(rows, "SetVelocity")->calls == 1);
++        CHECK(find(rows, "SaveObjects")->calls == 1 && find(rows, "RestoreObjects")->calls == 1 &&
++              find(rows, "EndHMessageRead")->calls == 1);
++        const auto before = s.service_calls;
++        CHECK(service_coverage(s.service_calls).size() == rows.size() && s.service_calls == before);
++        auto unknown = before;
++        unknown["new-unclassified-boundary"] = 4;
++        rows = service_coverage(unknown);
++        CHECK(rows.size() == service_catalog().size() + 1);
++        CHECK(find(rows, "new-unclassified-boundary")->support == ServiceSupport::Unclassified);
++        CHECK(find(rows, "new-unclassified-boundary")->calls == 4);
++        std::string error;
++        CHECK(!game.restore_player({}, error, PlayerRestoreMode::SavedPosition, "invalid-start"));
++        CHECK(!s.trace_enabled);
++        const auto client_queries = s.service_calls["GetClientUserData"];
++        CHECK(!game.command_weapon(0, error) && !game.select_weapon(0, error));
++        CHECK(s.service_calls["GetClientUserData"] == client_queries + 2 && !s.trace_enabled);
++        CHECK(!game.pump_player_messages(error) && !s.trace_enabled);
++        const auto failures = s.unavailable_history;
++        CHECK(game.unload_world());
++        CHECK(s.unavailable_services.empty() && s.unavailable_history == failures);
++        CHECK(s.string_count() == 0 && s.message_count() == 0 && s.client_count() == 0);
++        return true;
++    }
++    bool report(const GameSession& game, std::string_view phase)
++    {
++        unsigned reached = 0, unexercised = 0;
++        for (const auto& row : service_coverage(game.server.service_calls))
++        {
++            CHECK(row.support != ServiceSupport::Unclassified);
++            if (row.support == ServiceSupport::Unavailable)
++                CHECK(row.calls == 0);
++            reached += row.calls > 0;
++            unexercised += row.calls == 0;
++            std::cout << phase << '\t' << row.name << '\t' << service_boundary_name(row.boundary) << '\t'
++                      << service_support_name(row.support) << '\t' << row.calls << '\n';
++        }
++        CHECK(game.server.unavailable_history.empty());
++        unsigned failed_ai = 0;
++        for (auto id : game.objects.snapshot())
++            if (auto* ai = dynamic_cast<AI_Mgr*>(game.objects.get(id)->game.get()); ai && !ai->runtime_error.empty())
++            {
++                ++failed_ai;
++                std::cout << "AI failure: " << ai->runtime_error << '\n';
++            }
++        std::cout << "Coverage " << phase << ": reached=" << reached << " unexercised=" << unexercised
++                  << " unavailable=0 ai_errors=" << failed_ai << '\n';
++        CHECK(failed_ai == 0);
++        return true;
++    }
++    bool private_session(const std::filesystem::path& root)
++    {
++        std::string error;
++        auto game = std::make_unique<GameSession>();
++        Config config;
++        config.data_dir = root;
++        CHECK(game->initialize() && game->resources.mount_game(config, error));
++        CHECK(game->request_world("01_SubwayA", error) && game->enter_player(error));
++        CHECK(report(*game, "SubwayA-entry"));
++        for (int i = 0; i < 600; ++i)
++            CHECK(game->step(1. / 60));
++        CHECK(report(*game, "SubwayA-10s"));
++        {
++            // This diagnostic injects the original typed exit outside a simulation
++            // callback, so explicitly include its transport in the source trace.
++            ServiceTraceScope trace(game->server.trace_enabled);
++            CHECK(game->server.SendWorldExit({"02_CityHub"}, "01_egressa") == DE_OK &&
++                  game->pump_player_messages(error));
++        }
++        CHECK(report(*game, "SubwayA-exit-request"));
++        CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Committed);
++        CHECK(!game->server.trace_enabled && game->server.service_calls.at("ConnectClient") == 1);
++        CHECK(game->restoration.restored == 1);
++        CHECK(report(*game, "CityHub-restored"));
++        for (int i = 0; i < 600; ++i)
++            CHECK(game->step(1. / 60));
++        CHECK(report(*game, "CityHub-10s"));
++        const auto previous = game->server.service_calls;
++        CHECK(game->unload_world());
++        CHECK(!game->server.trace_enabled && game->server.service_calls.at("DisconnectClient") == 1);
++        CHECK(game->server.service_calls.at("RemoveObject") > previous.at("RemoveObject"));
++        CHECK(report(*game, "CityHub-teardown"));
++        CHECK(game->objects.snapshot().empty() && !game->server.string_count() && !game->server.message_count() &&
++              !game->server.list_count() && !game->server.client_count());
++        // Deliberate failure probe after the accepted session trace, with no world loaded.
++        std::cout << "Reset probe: deliberate SaveObjects refusal outside the loaded session\n";
++        CHECK(game->server.SaveObjects("unused", nullptr, 0, 0) == DE_ERROR);
++        CHECK(!game->server.unavailable_history.empty());
++        CHECK(game->request_world("01_SubwayA", error));
++        CHECK(!game->server.service_calls.contains("ConnectClient") &&
++              !game->server.service_calls.contains("DisconnectClient"));
++        CHECK(game->server.unavailable_history.empty());
++        CHECK(game->unload_world());
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::string_view mode = argv[1];
++    const bool ok = mode == "catalog" && argc == 3   ? catalog(argv[2])
++                    : mode == "observations"         ? observations()
++                    : mode == "private" && argc == 3 ? private_session(argv[2])
++                                                     : false;
++    return ok ? 0 : 1;
++}

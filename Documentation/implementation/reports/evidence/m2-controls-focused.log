@@ -1,0 +1,54 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  75: gpu.movement
+ 1/21 Test  #75: gpu.movement .....................   Passed   14.43 sec
+      Start 131: interaction.catalog
+      Start  74: movement.private
+      Start  68: movement.world_collision
+      Start  71: movement.timing
+ 2/21 Test  #71: movement.timing ..................   Passed    0.05 sec
+      Start  65: movement.walking
+ 3/21 Test  #68: movement.world_collision .........   Passed    0.06 sec
+      Start  67: movement.collisions
+ 4/21 Test  #67: movement.collisions ..............   Passed    0.03 sec
+      Start 124: interaction.keys
+ 5/21 Test  #65: movement.walking .................   Passed    0.04 sec
+      Start  69: movement.support
+ 6/21 Test  #69: movement.support .................   Passed    0.02 sec
+      Start  66: movement.jumping
+ 7/21 Test #124: interaction.keys .................   Passed    0.02 sec
+      Start 125: interaction.state
+ 8/21 Test #125: interaction.state ................   Passed    0.01 sec
+      Start 126: interaction.geometry
+ 9/21 Test  #66: movement.jumping .................   Passed    0.02 sec
+      Start  70: movement.boundaries
+10/21 Test #126: interaction.geometry .............   Passed    0.01 sec
+      Start  72: movement.lifetime
+11/21 Test  #70: movement.boundaries ..............   Passed    0.01 sec
+      Start 127: interaction.transport
+12/21 Test #127: interaction.transport ............   Passed    0.01 sec
+      Start 122: interaction.use
+13/21 Test  #72: movement.lifetime ................   Passed    0.02 sec
+      Start 130: interaction.player_push
+14/21 Test #122: interaction.use ..................   Passed    0.01 sec
+      Start 129: interaction.lifetime
+15/21 Test #130: interaction.player_push ..........   Passed    0.01 sec
+      Start 123: interaction.input
+16/21 Test #129: interaction.lifetime .............   Passed    0.01 sec
+      Start 128: interaction.blocking
+17/21 Test #123: interaction.input ................   Passed    0.01 sec
+      Start  73: movement.controls
+18/21 Test #128: interaction.blocking .............   Passed    0.01 sec
+19/21 Test  #73: movement.controls ................   Passed    0.00 sec
+20/21 Test #131: interaction.catalog ..............   Passed    6.51 sec
+21/21 Test  #74: movement.private .................   Passed   12.19 sec
+
+100% tests passed, 0 tests failed out of 21
+
+Label Time Summary:
+gpu            =  14.43 sec*proc (1 test)
+headless       =  19.03 sec*proc (20 tests)
+interaction    =   6.60 sec*proc (10 tests)
+movement       =  26.86 sec*proc (11 tests)
+private        =  33.12 sec*proc (3 tests)
+
+Total Test time (real) =  26.63 sec

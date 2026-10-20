@@ -1,0 +1,14 @@
+336/345 Testing: ai_state.transitions
+336/345 Test: ai_state.transitions
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_state_tests" "transitions"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_state.transitions" start time: Oct 16 11:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.transitions" end time: Oct 16 11:04 CEST
+"ai_state.transitions" time elapsed: 00:00:00
+----------------------------------------------------------

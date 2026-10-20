@@ -1,0 +1,2349 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index e699cf4..6270f38 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -532,3 +532,5 @@ The [compound-shell correction](../Documentation/Implementation/M2_COMPOUND_SHEL
+ The [Flare Gun continuation](../Documentation/Implementation/M2_FLARES.md) connects original ID 3, tracking FIRE ticks, eight alternate fragments, pickup/drop and autonomous Cultist use. Read [contracts](docs/FLARE_CONTRACTS.md). Preserve strict clocks, world-space offsets, loop restart, FRAG-before-BURST ordering, one point integration and checked independent children. Sprite tint/alpha is rendered; source trails/lights/composites and fire/gib deaths remain unavailable. CityHub is 422 created / 31 transferred sounds / 31 unsupported / one failed; safe NEW_LEVEL and M2 remain open.
+ 
+ The [world-model debris continuation](../Documentation/Implementation/M2_WORLD_DEBRIS.md) connects original named-fragment activation, gravity, rotation and independent lifetime, with rendered geometry and inspection. CityHub now has 432 created / 31 transferred sounds / 21 unsupported / one failed entry. Conservative moving bounds are replacement physics; missing geometry, required services and safe NEW_LEVEL keep M2 incomplete. Read [contracts](docs/WORLD_DEBRIS_CONTRACTS.md). Preserve contiguous name traversal, flag replacement, subclass/aggregate ordering, retained acceleration and deferred independent lifetime.
++
++The [M16 continuation](../Documentation/Implementation/M2_ASSAULT.md) connects original primary fire, alternate grenade charges, pickup/drop, independent grenade lifetime and inspection. CityHub has 433 created / 31 transferred sounds / 20 unsupported / one failed. Finite inverted ABC key bounds remain visible metadata warnings. The original Cultist lacks rifle animations; direct AI firing is tested separately from unavailable autonomous M16 combat. Replacement grenade physics, required services and safe NEW_LEVEL keep M2 open. Read [contracts](docs/ASSAULT_CONTRACTS.md). Preserve distinct ammo pools, source sequential explosion passes, deferred lifetime, one model-projectile integrator and explicit missing clips.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e59a910..19522dd 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index 4f8994c..f6a2762 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [M16 continuation](../Documentation/Implementation/M2_ASSAULT.md) connects original primary fire, alternate grenade charges, pickup/drop, independent grenade lifetime and inspection. CityHub has 433 created / 31 transferred sounds / 20 unsupported / one failed. Finite inverted ABC key bounds remain visible metadata warnings. The original Cultist lacks rifle animations; direct AI firing is tested separately from unavailable autonomous M16 combat. Replacement grenade physics, required services and safe NEW_LEVEL keep M2 open.
++
+ The [world-model debris continuation](../Documentation/Implementation/M2_WORLD_DEBRIS.md) connects original named-fragment activation, gravity, rotation and independent lifetime, with rendered geometry and inspection. CityHub now has 432 created / 31 transferred sounds / 21 unsupported / one failed entry. Conservative moving bounds are replacement physics; missing geometry, required services and safe NEW_LEVEL keep M2 incomplete.
+ 
+ The [Flare Gun continuation](../Documentation/Implementation/M2_FLARES.md) connects original primary sticking/burn damage, alternate fragments, both player hands, pickup/drop and autonomous Cultist fire. CityHub now has 422 created / 31 transferred sounds / 31 unsupported / one failed entry; earlier counts below are historical. Missing geometry, required services and safe NEW_LEVEL keep M2 incomplete.
+diff --git a/docs/ASSAULT_CONTRACTS.md b/docs/ASSAULT_CONTRACTS.md
+new file mode 100644
+index 0000000..d675e6d
+--- /dev/null
++++ b/docs/ASSAULT_CONTRACTS.md
+@@ -0,0 +1,114 @@
++# Original M16 and grenade
++
++Read the [source ledger](M2_ASSAULT_SOURCES.json), [weapon](WEAPON_CONTRACTS.md),
++[projectile](ENERGY_PROJECTILE_CONTRACTS.md), [pickup/drop](WEAPON_DROP_CONTRACTS.md),
++[AI firing](AI_FIRE_CONTRACTS.md) and [model](MODEL_AND_COLLISION_CONTRACTS.md) contracts.
++See [execution evidence](../../Documentation/Implementation/M2_ASSAULT.md).
++M2 remains incomplete.
++
++## Weapon and acquisition
++
++Original weapon ID 9 retains every WeaponData field. Primary fire uses bullet
++pool 1, one round/vector, damage 10–16, range 3500, spread 75/25 and a looping
++animation. Alternate fire uses **DieBugDie pool 5**, five charges, damage 100–140,
++speed 1500, radius 200, range 400 and a nonlooping animation. GetAmmoType and
++CheckAmmo now take the original alternate-mode argument on both server and view
++paths. Having bullets cannot authorize a grenade; having charges cannot authorize
++a bullet. Insufficient charges consume none. Existing FIRE_KEY delivery, accepted
++shot accounting, hearing, retained fire sounds and deferred ownership still apply.
++
++CAssaultRifle has no dual-hand acquisition (two-hand strength requirement zero).
++AssaultRiflePU uses m16_pu, display name Assault Rifle, resource 353 and **50 bullets**,
++not five alternate charges. Full inventories/ammo refuse duplicates; partial pools
++clamp normally. NPC detached-hand transfer produces this real pickup and survives
++owner removal. KeepAlive snapshots preserve both ammo pools and reject a fabricated
++left M16. The typed pickup service accepts explicitly registered supported weapon
++IDs 1, 2, 3 and 9; IDs between them are not implicitly accepted.
++
++The original case-sensitive ASSAULTR prefix and generic AI firing service are
++connected. The installed male Cultist lacks fire_stand_rifle and
++fire_stand_autorifle. Its original animation table cannot supply this action:
++automatic AI_Update reports a missing clip instead of silently substituting pistol
++animation. Direct original AI Fire with the M16 damages a player in a labelled
++arena; that service test does **not** establish autonomous M16 combat or add Fanatic/
++Prophet classes. Current authored CityHub NPC loadouts are unchanged.
++
++## Original grenade rules
++
++CGrenade is a runtime-only OT_MODEL projectile using the original Grenade ABC/DTX,
++1-unit half-dimensions, gravity, RAYHIT, HP5, EXPLODE damage and a three-second fuse.
++It is not a point projectile or an instantaneous radius hit. World/string/save
++creation rejects. Model resource failure remains an actual creation/setup failure.
++The existing checked shooter link permits independent flight after owner removal.
++
++Update starts/retries the attached looping assault/projectile WAV, remembers the
++position, calls base Update, then changes pitch/yaw. Speed strictly below five
++zeros spin velocity and writes pitch zero without changing the stored pitch field.
++Otherwise the stored angular velocities advance with the source frame time.
++The fuse expires only when time > start + 3. Damage death and initial live-character
++contact also trigger the original explosion path on the next scheduled update.
++
++Before the first bounce, a living CBaseCharacter uses base impact handling; a dead
++character is ignored. Later contacts use the bounce branch, including characters.
++The shooter/nonsolid objects are ignored. Up to five accepted bounces consume the
++count. Polygon contacts apply the original post-engine-velocity expression
++`(v - normal * dot(v, normal) * .3) * .5`, random pitch/yaw in +/-2pi and the actual
++bounce WAV. Nonpolygon contacts zero velocity and play that WAV. The grenade
++branch does not inherit the base sky-discard rule. No sixth bounce sound/spin is
++invented. Removal and target callbacks remain checked and deferred.
++
++The source calls base Explode and then calls it again from CGrenade::Update on
++contact/death with gravity. **Both sequential explosion passes are retained**,
++including damage and audio; fuse-only expiry has one pass. A separate active-call
++guard prevents reentrant recursion. Histories retain pass count and total deliveries
++while each pass still uses the existing checked radius snapshot/falloff and source
++shooter attribution. Removal can interrupt deliveries. Original AddExplosion uses
++world-up and EXP_GRENADE (3), with the actual detached c4/explosion_1 WAV. Each
++available component is published separately; missing components are not reported
++as a complete effect. Source screen shake and object-bound SMOKETRAIL_1 remain
++explicitly unavailable. The fragment recipe with the same number is not silently
++used as a replacement trail.
++
++## Replacement gravity/collision boundary
++
++A dedicated typed AdvanceGrenade service performs at most 60 substeps at <=1/120s
++for a <=0.5s call. It sweeps the actual 1-unit box against primary geometry and
++current solid objects, excluding the shooter, then commits the accepted segment
++and runs the original contact callback. Generic model physics excludes all
++CProjectile instances, so this model has exactly one integrator. Container
++physics uses the existing original volume callbacks. Velocity/pose inputs,
++resource presence, embedded starts, unavailable queries and recursive motion fail.
++
++Air displacement uses v*dt + a*dt²/2; ground support projects inward acceleration
++and uses the existing exponential friction policy with source coefficient 18.
++Contact projects inward velocity before the original bounce calculation; no
++elastic restitution is invented. A 0.001-unit separation prevents repeat interior
++contacts. Unused travel after a contact is discarded for that bounded substep.
++This conservative box solver can stop/slide rather than recreate retail bounce
++arcs. It is **not recovered retail grenade physics**, a rigid-body solver, or a
++claim of parity. Failed movement is retained and removed with an explicit error.
++
++## ABC metadata and inspection
++
++The original M16 view model contains finite, inverted per-key bounds in the
++unused end_alt_fire_craig clip. Reference readers consume then discard those
++bounds. The new reader retains every value and marks invalid ordering on the key
++and model; it never uses per-key bounds for pose, animation dimensions or collision.
++All coordinates must still be finite and bounded; timestamps, monotonic order,
++counts, animation/node/global bounds, pose/deformation data and payload lengths
++remain strictly checked. This is a documented metadata warning, not a synthesized
++pose or a silently repaired animation. Rendering samples the actual model.
++
++Weapons shows separate primary/alternate ammo pools and diagnostic M16/charge
++grants at the existing frame boundary. Objects shows grenade fuse, motion, spin,
++remaining bounces, contacts, live loop and missing trail. Diagnostics retains
++terminal pass/delivery counts. Both the selected view weapon and world model
++inspection expose invalid-key-bound warnings. Reading or rendering advances no
++clocks. Hidden objects, deferred removal and unload/reload retain the existing
++checked resource ownership. No new dependency or mutable original global is added.
++
++Chrome, multiplayer boost, view-key sounds, recoil, muzzle illumination, full
++composite FX, supported autonomous rifle-bearing NPCs, retail physics/presentation
++parity and safe NEW_LEVEL remain open. CityHub is 433 created / 31 transferred
++sounds / 541 editor-only / 20 unsupported / one failed. Missing fallengrills geometry
++remains a failure. These counts do not close M2.
+diff --git a/docs/ENERGY_PROJECTILE_CONTRACTS.md b/docs/ENERGY_PROJECTILE_CONTRACTS.md
+index 4fcfa11..5e86e51 100644
+--- a/docs/ENERGY_PROJECTILE_CONTRACTS.md
++++ b/docs/ENERGY_PROJECTILE_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original energy projectile boundary
+ 
++The [M16/grenade continuation](ASSAULT_CONTRACTS.md) adds ID 9 and mode-specific ammo, original grenade callbacks and explicit finite key-bound metadata warnings. Earlier supported-weapon limits are historical; remaining services and M2 stay open.
++
+ The [Flare Gun continuation](FLARE_CONTRACTS.md) adds original ID 3, primary sticking/burn ticks, alternate fragments, pickup/drop and sprite tint/alpha. Earlier blanket omissions are historical for this subset; remaining effects, death services and M2 stay open.
+ 
+ Read [object lifetime](OBJECT_CONTRACTS.md), [weapon/audio](WEAPON_AUDIO_CONTRACTS.md),
+diff --git a/docs/M2_ASSAULT_SOURCES.json b/docs/M2_ASSAULT_SOURCES.json
+new file mode 100644
+index 0000000..a4bfef3
+--- /dev/null
++++ b/docs/M2_ASSAULT_SOURCES.json
+@@ -0,0 +1,100 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "f790803891661f64d7871ae8ea4047147e4a2fe0",
++  "status": "M2 incomplete; original M16, grenade and finite key-bound diagnostics",
++  "references": [
++    {
++      "source": "sources/blood2/Shared/WeaponDefs.cpp",
++      "source_sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
++      "purpose": "Complete original M16 WeaponData."
++    },
++    {
++      "source": "sources/blood2/Shared/SharedDefs.h",
++      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "purpose": "Weapon ID 9, TYPE_AUTORIFLE 1 and ammo pool 5."
++    },
++    {
++      "source": "sources/blood2/Shared/ClientRes.h",
++      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
++      "purpose": "Resource ID 353."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameWeapons.h",
++      "source_sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19",
++      "purpose": "CAssaultRifle alternate ammo override; unavailable chrome/multiplayer boost."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/GameWeapons.h",
++      "source_sha256": "c5f9176a2f6ad7c28dedb5ec24c710a16f1c2f4957d1efb793cf77e42e8378e0",
++      "purpose": "Client assault rifle alternate ammo override."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Weapon.cpp",
++      "source_sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
++      "purpose": "Alternate ammo selection, Fire and FireSpread, existing vector/audio rules."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
++      "source_sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
++      "purpose": "Mode-specific CheckAmmo and original animation transitions."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/WeaponPickups.cpp",
++      "source_sha256": "116eac417209ee2cc523044e02ff615406b597164df9df5d5f2e0be80cfbc1d4",
++      "purpose": "AssaultRiflePU definition and SpawnWeaponPickup selection."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "purpose": "Original acquisition, drop and constructor dispatch."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameProjectiles.cpp",
++      "source_sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f",
++      "purpose": "CGrenade constructor, Update and HandleTouch including sequential duplicate explosion."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameProjectiles.h",
++      "source_sha256": "9acd38645c28d90b508a0a55a02760bcea5c6c40318b6266635711d2ba1f1bc0",
++      "purpose": "CGrenade inheritance and bounce count."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Projectile.cpp",
++      "source_sha256": "52b805c67775579b5703e0ad1099a8ea44d76b245349c8f6d1fac0a1b3b74ef2",
++      "purpose": "Model initialization, setup, lifetime, explosion, radius damage and default explosion effects."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "purpose": "ASSAULTR prefix and generic Fire path."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Anim_Sound.cpp",
++      "source_sha256": "238744b904e32e418188bfdc2f74d970bb544f1a027fab1c2ae9dca2b2d9aa4f",
++      "purpose": "Strict original rifle/automatic rifle animation mapping; no fabricated pistol fallback."
++    },
++    {
++      "source": "OpenBlood2/OpenLithTech/src/formats/abc_parser.cpp",
++      "source_sha256": "f63d5312ae28d2061a9641971bb845c142f435110bf2e42bebeb93bdde870426",
++      "purpose": "Reference only: consumes/discards per-key bounds metadata."
++    },
++    {
++      "source": "NoMadEngine/tools/Research/convert_abc.py",
++      "source_sha256": "2b4e792691324a498930f4ac05ff99ee1bc0c9d79d72d44fe3a5df0ddff620b3",
++      "purpose": "Independent reference only: consumes/discards per-key bounds metadata."
++    }
++  ],
++  "adaptations": [
++    "Typed alternate ammo boundary and owned resources",
++    "Bounded 1-unit box gravity integration, projected contacts and exponential ground friction; not retail physics",
++    "Finite inverted per-key metadata retained and warned, never used for gameplay bounds",
++    "Separate repeated sequential explosion permission and reentrant guard",
++    "No new global, dependency or modified reference/commercial file"
++  ],
++  "unsupported": [
++    "Autonomous M16 Cultist firing: original rifle animation missing",
++    "Object-bound smoke trail and source screen shake",
++    "Complete composite, chrome/multiplayer boost/recoil/view-key audio",
++    "Required services, missing geometry and safe NEW_LEVEL"
++  ]
++}
+diff --git a/docs/MAC10_CONTRACTS.md b/docs/MAC10_CONTRACTS.md
+index 2de30a3..d84a87a 100644
+--- a/docs/MAC10_CONTRACTS.md
++++ b/docs/MAC10_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original Ingram Mac-10
+ 
++The [M16/grenade continuation](ASSAULT_CONTRACTS.md) adds ID 9 and mode-specific ammo, original grenade callbacks and explicit finite key-bound metadata warnings. Earlier supported-weapon limits are historical; remaining services and M2 stay open.
++
+ Read the [source ledger](M2_MAC10_SOURCES.json), [weapon](WEAPON_CONTRACTS.md),
+ [fire audio](WEAPON_AUDIO_CONTRACTS.md), [impact](WEAPON_IMPACT_CONTRACTS.md),
+ [drop](WEAPON_DROP_CONTRACTS.md), [inventory-state](INVENTORY_STATE_CONTRACTS.md)
+diff --git a/docs/MODEL_AND_COLLISION_CONTRACTS.md b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+index 85b0c7d..b2a9a67 100644
+--- a/docs/MODEL_AND_COLLISION_CONTRACTS.md
++++ b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # M2 Model and Collision Services
+ 
++The [M16/grenade continuation](ASSAULT_CONTRACTS.md) adds ID 9 and mode-specific ammo, original grenade callbacks and explicit finite key-bound metadata warnings. Earlier supported-weapon limits are historical; remaining services and M2 stay open.
++
+ > Extended by [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md): original multi-hit
+ > material rules, selected impact audio and automatic impact hearing now execute.
+ > Earlier impact-audio omissions are historical; visuals and the M2 gate remain open.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 7241704..b3e040a 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -925,3 +925,13 @@ original callbacks. The enclosing-bound motion and primary-world angular envelop
+ are explicit replacement engine policies, not recovered retail physics. The terminal
+ empty-list leak is fixed and traversal is bounded. See [ledger](M2_WORLD_DEBRIS_SOURCES.json)
+ and [contracts](WORLD_DEBRIS_CONTRACTS.md). Reference repositories/assets are unchanged.
++
++## Original M16 and grenade
++
++The original complete M16 definition, alternate ammo override, pickup and CGrenade
++callbacks are selected from Blood II. Existing typed inventory/weapon services are
++extended; bounded box flight is explicit replacement physics. The source sequential
++explosion repetition is retained with reentrant guards. Finite inverted unused ABC
++key bounds are preserved and diagnosed, following read-only donor analysis rather
++than changing private content. See [ledger](M2_ASSAULT_SOURCES.json),
++[contracts](ASSAULT_CONTRACTS.md) and [evidence](../../Documentation/Implementation/M2_ASSAULT.md).
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index c4a1eac..8999a9c 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original Inventory and Vector Weapon Boundary
+ 
++The [M16/grenade continuation](ASSAULT_CONTRACTS.md) adds ID 9 and mode-specific ammo, original grenade callbacks and explicit finite key-bound metadata warnings. Earlier supported-weapon limits are historical; remaining services and M2 stay open.
++
+ The [Flare Gun continuation](FLARE_CONTRACTS.md) adds original ID 3, primary sticking/burn ticks, alternate fragments, pickup/drop and sprite tint/alpha. Earlier blanket omissions are historical for this subset; remaining effects, death services and M2 stay open.
+ 
+ The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 44fd2b9..b49c7fd 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -8,6 +8,7 @@
+ #include "game/original/DestructableModel.h"
+ #include "game/original/Door.h"
+ #include "game/original/FlareProjectile.h"
++#include "game/original/Grenade.h"
+ #include "game/original/Key.h"
+ #include "game/original/KeyPickup.h"
+ #include "game/original/Projectile.h"
+@@ -379,6 +380,10 @@ namespace OpenBlood2
+                 player->m_InventoryMgr.ObtainWeapon(WEAP_FLAREGUN);
+             if (add_flares_request)
+                 player->m_InventoryMgr.AddAmmo(AMMO_FLARE, 20);
++            if (add_assault_request)
++                player->m_InventoryMgr.ObtainWeapon(WEAP_ASSAULTRIFLE);
++            if (add_charges_request)
++                player->m_InventoryMgr.AddAmmo(AMMO_DIEBUGDIE, 20);
+             if (add_mac10_request)
+                 player->m_InventoryMgr.ObtainWeapon(WEAP_SUBMACHINEGUN);
+             if (add_ammo_request)
+@@ -390,7 +395,8 @@ namespace OpenBlood2
+             if (movement_input_request)
+                 game.client_shell.movement_input = *movement_input_request;
+         }
+-        add_beretta_request = add_mac10_request = add_flare_request = add_flares_request = add_ammo_request = false;
++        add_beretta_request = add_mac10_request = add_flare_request = add_flares_request = add_ammo_request =
++            add_assault_request = add_charges_request = false;
+         weapon_input_request.reset();
+         weapon_aim_request.reset();
+         movement_input_request.reset();
+@@ -701,6 +707,9 @@ namespace OpenBlood2
+                             ImGui::Text("Decoded ABC: %zu nodes / %zu animations; clip %u at %.1f ms",
+                                         object->model->nodes.size(), object->model->animations.size(),
+                                         object->animation.animation, object->animation.time);
++                        if (object->model && object->model->invalid_key_bounds)
++                            ImGui::Text("ABC warning: %u unused key bounds have inverted ordering",
++                                        object->model->invalid_key_bounds);
+                         if (!object->model_error.empty())
+                             ImGui::TextWrapped("Model unavailable: %s", object->model_error.c_str());
+                         ImGui::Text("Velocity %.2f %.2f %.2f / Grounded: %s", object->velocity.x, object->velocity.y,
+@@ -719,6 +728,17 @@ namespace OpenBlood2
+                                         game.server.IsObjectAlive(projectile->m_hFiredFrom) ? "yes" : "no",
+                                         game.server.IsObjectAlive(projectile->m_hHitObject) ? "yes" : "no",
+                                         projectile->contact.polygon);
++                            if (const auto* grenade = dynamic_cast<const CGrenade*>(projectile))
++                            {
++                                ImGui::Text("Grenade: bounces left %d / contacts %llu / pitch %.3f / yaw %.3f",
++                                            grenade->bounces_left, (unsigned long long)grenade->contacts,
++                                            grenade->pitch, grenade->yaw);
++                                ImGui::Text("Loop %llu / bounce sounds %u / spin %.3f %.3f",
++                                            (unsigned long long)grenade->sound, grenade->bounce_sounds,
++                                            grenade->pitch_velocity, grenade->yaw_velocity);
++                                if (!grenade->sound_error.empty())
++                                    ImGui::TextWrapped("Audio: %s", grenade->sound_error.c_str());
++                            }
+                             if (const auto* flare = dynamic_cast<const CFlareProjectile*>(projectile))
+                             {
+                                 ImGui::Text("Flare tracking %s / start %.3f / last tick %.3f / damage deliveries %u",
+@@ -839,6 +859,10 @@ namespace OpenBlood2
+                             ImGui::Text("%.3f %s: %s at %.2f %.2f %.2f / delivered %u", report.time,
+                                         report.source.c_str(), report.outcome.c_str(), report.position.x,
+                                         report.position.y, report.position.z, report.delivered);
++                            if (report.grenade)
++                                ImGui::Text("Grenade: contacts %llu / bounces left %d / explosion passes %u",
++                                            (unsigned long long)report.contacts, report.bounces_left,
++                                            report.explosions);
+                             if (report.flare)
+                                 ImGui::Text("Flare: tracking %s / burn deliveries %u / burst children %u",
+                                             report.tracked ? "yes" : "no", report.burn_ticks, report.burst_children);
+@@ -1818,7 +1842,7 @@ namespace OpenBlood2
+     }
+     void Inspector::draw_weapons(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextUnformatted("Original inventory / Beretta 92F / Ingram Mac-10 / Flare Gun / Chosen Knife");
++        ImGui::TextUnformatted("Original inventory / Beretta 92F / Ingram Mac-10 / Flare Gun / M16 / Chosen Knife");
+         auto* player = game.server_shell.Player(game.local_client);
+         if (!player)
+         {
+@@ -1888,13 +1912,18 @@ namespace OpenBlood2
+                 add_beretta_request = true;
+             if (ImGui::Button("Obtain Mac-10 (inspection)"))
+                 add_mac10_request = true;
++            if (ImGui::Button("Obtain M16 (inspection)"))
++                add_assault_request = true;
++            ImGui::SameLine();
++            if (ImGui::Button("Add 20 M16 alternate charges (inspection)"))
++                add_charges_request = true;
+             if (ImGui::Button("Obtain Flare Gun (inspection)"))
+                 add_flare_request = true;
+             ImGui::SameLine();
+             if (ImGui::Button("Add 20 flares (inspection)"))
+                 add_flares_request = true;
+             ImGui::TextWrapped(
+-                "These diagnostic grants call inventory directly. Beretta/Mac-10/Flare Gun world pickups also use "
++                "These diagnostic grants call inventory directly. Beretta/Mac-10/Flare Gun/M16 world pickups also use "
+                 "original collection rules; chrome and muzzle flashes remain unavailable.");
+         }
+         auto aim = game.client_shell.rotation;
+@@ -1932,6 +1961,10 @@ namespace OpenBlood2
+                     definition.m_bAltLoopAnim ? "yes" : "no");
+         if (view.model && animation_index(*view.model, "alt_fire") == no_animation)
+             ImGui::TextUnformatted("Original alternate animation fallback: primary start/fire/end clips.");
++        ImGui::Text("Ammo pools: primary %u (%.0f) / alternate %u (%.0f)", weapon->GetAmmoType(), weapon->CheckAmmo(),
++                    weapon->GetAmmoType(true), weapon->CheckAmmo(true));
++        if (view.model && view.model->invalid_key_bounds)
++            ImGui::Text("ABC warning: %u unused key bounds have inverted ordering", view.model->invalid_key_bounds);
+         draw_weapon_sound(*weapon, game);
+         if (view.model && view.animation.animation < view.model->animations.size())
+         {
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 551d527..92dcc6a 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -82,7 +82,8 @@ namespace OpenBlood2
+         std::optional<DVector> player_position_request;
+         std::optional<MovementInput> movement_input_request;
+         bool select_weapons = false, add_beretta_request = false, add_mac10_request = false, add_flare_request = false,
+-             add_flares_request = false, add_ammo_request = false;
++             add_flares_request = false, add_ammo_request = false, add_assault_request = false,
++             add_charges_request = false;
+         int weapon_slot_request = -1;
+         bool weapon_left = false;
+         std::optional<WeaponInput> weapon_input_request;
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index f9b3eef..cb56ade 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -81,8 +81,8 @@ namespace OpenBlood2
+         const auto trial_before = g.destination_trial.attempts;
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+-            !g.destination_trial.player_entered || g.destination_trial.created != 432 ||
+-            g.destination_trial.unknown != 21 || g.destination_trial.failed != 1 ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 433 ||
++            g.destination_trial.unknown != 20 || g.destination_trial.failed != 1 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+@@ -100,8 +100,8 @@ namespace OpenBlood2
+                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
+                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+                g.destination_inspection.source_revision == old_revision &&
+-               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 464 &&
+-               g.destination_inspection.unknown == 21 && g.destination_inspection.invalid == 0 &&
++               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 465 &&
++               g.destination_inspection.unknown == 20 && g.destination_inspection.invalid == 0 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/engine/model.cpp b/src/engine/model.cpp
+index 508f24b..4d43543 100644
+--- a/src/engine/model.cpp
++++ b/src/engine/model.cpp
+@@ -241,9 +241,15 @@ namespace OpenBlood2
+                 key.min = a.vec();
+                 key.max = a.vec();
+                 key.text = a.string();
+-                if (!a.good() || !bounds(key.min, key.max) || key.time > anim.duration ||
++                if (!a.good() || !coordinate(key.min) || !coordinate(key.max) || key.time > anim.duration ||
+                     (j && key.time < anim.keys.back().time))
+-                    return fail("invalid animation key");
++                    return fail(("invalid animation key: clip=" + anim.name + " key=" + std::to_string(j)).c_str());
++                // M16's end_alt_fire_craig includes finite inverted per-key bounds.
++                // Donor readers discard this unused metadata. Retain it and expose
++                // its invalid ordering; animation dimensions and all pose data keep
++                // their strict validation. Never use these bounds for collision.
++                key.bounds_valid = bounds(key.min, key.max);
++                model.invalid_key_bounds += !key.bounds_valid;
+                 anim.keys.push_back(std::move(key));
+             }
+             for (const auto& node : model.nodes)
+diff --git a/src/engine/model.h b/src/engine/model.h
+index 9324d98..fb3ad5f 100644
+--- a/src/engine/model.h
++++ b/src/engine/model.h
+@@ -39,6 +39,7 @@ namespace OpenBlood2
+         std::uint32_t time = 0;
+         DVector min, max;
+         std::string text;
++        bool bounds_valid = true; // Optional per-key metadata; never used as collision/pose bounds.
+     };
+     struct NodeAnimation
+     {
+@@ -61,6 +62,7 @@ namespace OpenBlood2
+         std::string command;
+         DVector min, max;
+         std::uint32_t main_vertices = 0;
++        std::uint32_t invalid_key_bounds = 0;
+         std::vector<std::uint16_t> lod_starts;
+         std::vector<ModelVertex> vertices;
+         std::vector<ModelFace> faces;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index c6b69a5..44bcd69 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -55,6 +55,7 @@ class ServerDE : public CSBase
+     virtual DRESULT RemoveAttachment(HATTACHMENT) = 0;
+     virtual DRESULT FindAttachment(HOBJECT, HOBJECT, HATTACHMENT*) = 0;
+     virtual DRESULT GetAttachedModelNodeTransform(HATTACHMENT, const char*, DVector*, DRotation*) = 0;
++    virtual bool AdvanceGrenade(HOBJECT, double seconds) = 0;
+     virtual void RecordProjectile(const OpenBlood2::ProjectileReport&) = 0;
+     virtual bool IsObjectAlive(HOBJECT) = 0;
+     virtual bool SetDeactivationTime(HOBJECT, float) = 0;
+diff --git a/src/game/original/AIFire.cpp b/src/game/original/AIFire.cpp
+index 29496a5..2bd8b23 100644
+--- a/src/game/original/AIFire.cpp
++++ b/src/game/original/AIFire.cpp
+@@ -123,9 +123,10 @@ bool AI_Mgr::Fire(bool alternate)
+     if (!weapon)
+         return fail(FireResult::Unavailable, "AI has no current weapon");
+     if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_SUBMACHINEGUN &&
+-        weapon->data.m_nType != WEAP_FLAREGUN && weapon->data.m_nType != WEAP_MELEE &&
+-        weapon->data.m_nType != WEAP_NAGA_EYEBEAM && weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST &&
+-        weapon->data.m_nType != WEAP_GIDEON_WIND && weapon->data.m_nType != WEAP_GIDEON_SHIELD)
++        weapon->data.m_nType != WEAP_ASSAULTRIFLE && weapon->data.m_nType != WEAP_FLAREGUN &&
++        weapon->data.m_nType != WEAP_MELEE && weapon->data.m_nType != WEAP_NAGA_EYEBEAM &&
++        weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST && weapon->data.m_nType != WEAP_GIDEON_WIND &&
++        weapon->data.m_nType != WEAP_GIDEON_SHIELD)
+         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
+     DRotation rotation;
+     const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM;
+diff --git a/src/game/original/AIRuntime.cpp b/src/game/original/AIRuntime.cpp
+index 1196e55..d7df432 100644
+--- a/src/game/original/AIRuntime.cpp
++++ b/src/game/original/AIRuntime.cpp
+@@ -26,6 +26,8 @@ namespace
+             id = WEAP_NAGA_EYEBEAM;
+         else if (name.starts_with("SUBMA"))
+             id = WEAP_SUBMACHINEGUN;
++        else if (name.starts_with("ASSAULTR"))
++            id = WEAP_ASSAULTRIFLE;
+         else if (name.starts_with("FLARE"))
+             id = WEAP_FLAREGUN;
+         else if (name.starts_with("MELEE"))
+diff --git a/src/game/original/Grenade.cpp b/src/game/original/Grenade.cpp
+new file mode 100644
+index 0000000..e26eb7e
+--- /dev/null
++++ b/src/game/original/Grenade.cpp
+@@ -0,0 +1,170 @@
++#include "Grenade.h"
++#include "PlayerObj.h"
++#include "engine/collision.h"
++#include "engine/objects.h"
++#include <numbers>
++using namespace OpenBlood2;
++CGrenade::CGrenade() : CProjectile(OT_MODEL)
++{
++    m_fLifeTime = 3;
++    flags = FLAG_VISIBLE | FLAG_TOUCH_NOTIFY | FLAG_REMOVEIFOUTSIDE | FLAG_FORCECLIENTUPDATE | FLAG_SHADOW |
++            FLAG_MODELGOURAUDSHADE | FLAG_RAYHIT | FLAG_GRAVITY;
++}
++CGrenade::~CGrenade()
++{
++    StopSound();
++}
++void CGrenade::StopSound()
++{
++    if (sound)
++        g_pServerDE->KillSound(sound);
++    sound = 0;
++}
++bool CGrenade::InitialUpdate()
++{
++    if (!CProjectile::InitialUpdate())
++        return false;
++    // The existing type-1 fragment trail is not a general object-bound trail.
++    trail = g_pServerDE->PublishObjectParticles(m_hObject, 1, trail_error);
++    return true;
++}
++bool CGrenade::AdvanceFlight(double seconds)
++{
++    if (!configured || m_bExplode || failed || seconds == 0)
++        return !failed;
++    if (!g_pServerDE->AdvanceGrenade(m_hObject, seconds))
++        return failed ? false : Fail("Grenade box flight unavailable/invalid (including embedded starts)");
++    return !failed;
++}
++bool CGrenade::Update()
++{
++    if (!sound)
++    {
++        SoundRequest request;
++        request.resource = "Sounds\\Weapons\\assault\\projectile.wav";
++        request.outer_radius = 600;
++        request.inner_radius = 60;
++        request.priority = 1;
++        request.speaker = m_hObject;
++        request.space = SoundSpace::Spatial;
++        request.loop = true;
++        sound = g_pServerDE->PlayObjectLoopSound(m_hObject, request, sound_error);
++    }
++    if (g_pServerDE->GetObjectPos(m_hObject, &last_position) != DE_OK)
++        return Fail("Grenade position unavailable");
++    const bool alive = CProjectile::Update();
++    if (failed || !g_pServerDE->IsObjectAlive(m_hObject))
++        return false;
++    DVector velocity;
++    if (g_pServerDE->GetVelocity(m_hObject, &velocity) != DE_OK)
++        return Fail("Grenade velocity unavailable");
++    bool rotate = false;
++    float next_pitch = pitch;
++    if (vector_dot(velocity, velocity) < 25)
++    {
++        pitch_velocity = yaw_velocity = 0;
++        next_pitch = 0; // Original keeps the accumulated pitch field unchanged.
++        rotate = true;
++    }
++    else if (pitch_velocity != 0 || yaw_velocity != 0)
++    {
++        pitch += pitch_velocity * g_pServerDE->GetFrameTime();
++        yaw += yaw_velocity * g_pServerDE->GetFrameTime();
++        next_pitch = pitch;
++        rotate = true;
++    }
++    if (rotate)
++    {
++        const auto rotation = rotation_from_euler({next_pitch, yaw, 0});
++        if (g_pServerDE->SetObjectRotation(m_hObject, &rotation) != DE_OK)
++            return Fail("Grenade rotation rejected");
++    }
++    // Preserve source precedence: (!alive && gravity) || dead. Base contact/death
++    // already calls Explode; the source intentionally reaches a second sequential
++    // explosion pass here. Reentrant calls are still guarded by the base.
++    if ((!alive && (flags & FLAG_GRAVITY)) || m_damage.IsDead())
++    {
++        StopSound();
++        Explode(true);
++    }
++    return alive;
++}
++void CGrenade::HandleContact(const SegmentHit& hit)
++{
++    if (!configured || failed || m_bExplode || !g_pServerDE->IsObjectAlive(m_hObject))
++        return;
++    if (hit.object && (!g_pServerDE->IsObjectAlive(hit.object) || hit.object == m_hFiredFrom))
++        return;
++    auto* character = dynamic_cast<CBaseCharacter*>(g_pServerDE->HandleToObject(hit.object));
++    if (bounces_left == 5 && character)
++    {
++        if (!character->m_damage.IsDead())
++            CProjectile::HandleContact(hit);
++        return;
++    }
++    if ((hit.object && !(g_pServerDE->GetObjectFlags(hit.object) & FLAG_SOLID)) ||
++        (!hit.object && hit.polygon == UINT32_MAX) || bounces_left <= 0)
++        return;
++    DVector velocity;
++    if (g_pServerDE->GetVelocity(m_hObject, &velocity) != DE_OK)
++    {
++        Fail("Grenade bounce velocity unavailable");
++        return;
++    }
++    // Source consumes the velocity AFTER engine contact resolution. The replacement
++    // solver projects inward motion; do not invent elastic restitution here.
++    if (hit.polygon != UINT32_MAX)
++    {
++        velocity = vector_subtract(velocity, vector_scale(hit.normal, vector_dot(velocity, hit.normal) * .3f));
++        constexpr float circle = 2 * std::numbers::pi_v<float>;
++        if (!g_pServerDE->RandomFloat(-circle, circle, pitch_velocity) ||
++            !g_pServerDE->RandomFloat(-circle, circle, yaw_velocity))
++        {
++            Fail("Grenade spin randomness unavailable");
++            return;
++        }
++        velocity = vector_scale(velocity, .5f);
++    }
++    else
++        velocity = {};
++    SoundRequest request;
++    request.resource = "Sounds\\Weapons\\assault\\altbounce.wav";
++    request.outer_radius = 750;
++    request.inner_radius = 75;
++    request.priority = 1;
++    request.speaker = m_hObject;
++    request.space = SoundSpace::Spatial;
++    if (g_pServerDE->PlayCharacterSound(m_hObject, request, false, sound_error))
++        ++bounce_sounds;
++    if (g_pServerDE->SetVelocity(m_hObject, &velocity) != DE_OK)
++    {
++        Fail("Grenade bounce velocity rejected");
++        return;
++    }
++    --bounces_left;
++}
++void CGrenade::AddExplosion(DVector position, DVector)
++{
++    // Original CProjectile::AddExplosion always uses world up, not the hit normal.
++    ++explosion_passes;
++    SceneExplosionReport r;
++    r.source = g_pServerDE->GetObjectName(m_hObject);
++    r.position = position;
++    r.normal = {0, 1, 0};
++    r.type = 3;
++    r.damage = m_fDamage;
++    r.radius = static_cast<float>(m_nRadius);
++    r.model_event = g_pServerDE->PublishExplosionModels(m_hObject, r.type, position, r.normal, r.model_error);
++    r.sprite_event = g_pServerDE->PublishExplosionSprites(m_hObject, r.type, position, r.normal, r.sprite_error);
++    r.ring_event = g_pServerDE->PublishExplosionRings(m_hObject, r.type, position, r.normal, r.ring_error);
++    r.fragment_event = g_pServerDE->PublishExplosionFragments(m_hObject, r.type, position, r.normal, r.fragment_error);
++    r.flame_event = g_pServerDE->PublishExplosionFlames(m_hObject, r.type, position, r.normal, r.flame_error);
++    r.light_event = g_pServerDE->PublishExplosionLights(m_hObject, r.type, position, r.normal, r.light_error);
++    SoundRequest request;
++    r.sound = request.resource = "Sounds\\Weapons\\c4\\explosion_1.wav";
++    request.inner_radius = 100;
++    request.outer_radius = 1000;
++    request.priority = 1;
++    r.voice = g_pServerDE->PlayDetachedSound(m_hObject, request, position, r.sound_error);
++    g_pServerDE->RecordSceneExplosion(r);
++}
+diff --git a/src/game/original/Grenade.h b/src/game/original/Grenade.h
+new file mode 100644
+index 0000000..b051fb7
+--- /dev/null
++++ b/src/game/original/Grenade.h
+@@ -0,0 +1,26 @@
++#pragma once
++#include "Projectile.h"
++// Original GameProjectiles.cpp CGrenade. The bounded box flight is an engine service.
++class CGrenade final : public CProjectile
++{
++  public:
++    CGrenade();
++    ~CGrenade() override;
++    bool AdvanceFlight(double seconds) override;
++    void HandleContact(const OpenBlood2::SegmentHit&) override;
++    int bounces_left = 5;
++    float pitch = 0, yaw = 0, pitch_velocity = 0, yaw_velocity = 0;
++    DVector last_position{};
++    std::uint64_t contacts = 0, trail = 0;
++    unsigned bounce_sounds = 0, explosion_passes = 0, damage_deliveries = 0;
++    OpenBlood2::SoundId sound = 0;
++    std::string sound_error;
++
++  protected:
++    bool InitialUpdate() override;
++    bool Update() override;
++    void AddExplosion(DVector, DVector) override;
++
++  private:
++    void StopSound();
++};
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index 0d7c533..4312193 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -172,6 +172,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
+         weapon = std::make_unique<CBeretta>();
+     else if (type == WEAP_SUBMACHINEGUN)
+         weapon = std::make_unique<CSubMachineGun>();
++    else if (type == WEAP_ASSAULTRIFLE)
++        weapon = std::make_unique<CAssaultRifle>();
+     else if (type == WEAP_FLAREGUN)
+         weapon = std::make_unique<CFlareGun>();
+     else if (type == WEAP_MELEE)
+diff --git a/src/game/original/Projectile.cpp b/src/game/original/Projectile.cpp
+index 356bde8..f0b5b50 100644
+--- a/src/game/original/Projectile.cpp
++++ b/src/game/original/Projectile.cpp
+@@ -1,6 +1,7 @@
+ // Original ObjectDLL/Projectile.cpp and GameProjectiles.cpp, selected non-Zealot energy path.
+ #include "Projectile.h"
+ #include "FlareProjectile.h"
++#include "Grenade.h"
+ #include "SurfaceTypes.h"
+ #include "engine/collision.h"
+ #include "engine/objects.h"
+@@ -36,6 +37,14 @@ void CProjectile::Finish(const char* outcome)
+         report.blast_position = wave->blast_position;
+         report.blast_normal = wave->blast_normal;
+     }
++    if (const auto* grenade = dynamic_cast<const CGrenade*>(this))
++    {
++        report.grenade = true;
++        report.bounces_left = grenade->bounces_left;
++        report.contacts = grenade->contacts;
++        report.explosions = grenade->explosion_passes;
++        report.delivered = grenade->damage_deliveries;
++    }
+     if (const auto* flare = dynamic_cast<const CFlareProjectile*>(this))
+     {
+         report.flare = true;
+@@ -123,7 +132,7 @@ bool CProjectile::Setup(DVector direction, DBYTE type, float damage, float speed
+     if (g_pServerDE->SetObjectRotation(m_hObject, &rotation) != DE_OK ||
+         g_pServerDE->SetVelocity(m_hObject, &velocity) != DE_OK)
+         return Fail("Projectile transform/velocity failed");
+-    g_pServerDE->SetObjectFlags(m_hObject, flags & ~FLAG_GRAVITY); // Original CEnergyBlast override.
++    g_pServerDE->SetObjectFlags(m_hObject, flags); // Concrete classes retain their original gravity policy.
+     configured = true;
+     return true;
+ }
+@@ -202,10 +211,19 @@ bool CProjectile::AdvanceFlight(double seconds)
+     }
+     return !failed;
+ }
+-void CProjectile::Explode()
++void CProjectile::Explode(bool repeat)
+ {
+-    if (exploded || failed)
++    if ((exploded && !repeat) || exploding_ || failed || !g_pServerDE->IsObjectAlive(m_hObject))
+         return;
++    exploding_ = true;
++    struct Reset
++    {
++        bool& value;
++        ~Reset()
++        {
++            value = false;
++        }
++    } reset{exploding_};
+     exploded = true;
+     DVector position;
+     g_pServerDE->GetObjectPos(m_hObject, &position);
+@@ -227,6 +245,8 @@ void CProjectile::Explode()
+         else
+             targets.cancelled = true;
+     }
++    if (auto* grenade = dynamic_cast<CGrenade*>(this))
++        grenade->damage_deliveries += targets.delivered;
+     if (targets.cancelled)
+         error = "Projectile damage traversal interrupted or unavailable";
+     if (m_hHitObject)
+@@ -243,7 +263,7 @@ bool CProjectile::AddImpact(DVector position)
+     m_vDir = vector_scale(m_vDir, 20);
+     SegmentHit impact;
+     auto normal = vector_scale(m_vDir, -1), point = position;
+-    if (m_hHitObject || (!contact.object && contact.polygon != UINT32_MAX))
++    if (m_hHitObject || (!dynamic_cast<CGrenade*>(this) && !contact.object && contact.polygon != UINT32_MAX))
+     {
+         const auto query = g_pServerDE->IntersectSegment(from, vector_add(position, m_vDir), nullptr, impact);
+         if (query != SegmentResult::Hit && query != SegmentResult::Miss)
+diff --git a/src/game/original/Projectile.h b/src/game/original/Projectile.h
+index 79c697f..78e9095 100644
+--- a/src/game/original/Projectile.h
++++ b/src/game/original/Projectile.h
+@@ -11,7 +11,7 @@ class CProjectile : public BaseClass
+     bool Setup(DVector, DBYTE, float damage, float speed, int radius, HOBJECT);
+     virtual bool AdvanceFlight(double seconds);
+     virtual void HandleContact(const OpenBlood2::SegmentHit&);
+-    void Explode();
++    void Explode(bool repeat = false);
+     bool contacted = false;
+     OpenBlood2::DamageType damage_type = OpenBlood2::DamageType::Explode;
+     CDestructable m_damage;
+@@ -36,6 +36,7 @@ class CProjectile : public BaseClass
+     virtual bool Update();
+     virtual void AddExplosion(DVector, DVector) = 0;
+     bool AddImpact(DVector);
++    bool exploding_ = false;
+     void Finish(const char*);
+     bool Fail(const char*);
+ };
+diff --git a/src/game/original/ViewWeapon.cpp b/src/game/original/ViewWeapon.cpp
+index 23704c2..e49641f 100644
+--- a/src/game/original/ViewWeapon.cpp
++++ b/src/game/original/ViewWeapon.cpp
+@@ -90,7 +90,7 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
+         return false;
+     }
+     const auto& data = weapon->data;
+-    auto ammo = [&] { return weapon->CheckAmmo(); };
++    auto ammo = [&](bool alt) { return weapon->CheckAmmo(alt); };
+     auto fire = [&]()
+     {
+         if (!server.Player(client))
+@@ -143,9 +143,9 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
+             }
+             if (time - last_shot_time_ > (last_alt_ ? data.m_fAltReloadTime : data.m_fReloadTime))
+             {
+-                const int mode = primary && ammo() >= data.m_nAmmoUse        ? 0
+-                                 : alternate && ammo() >= data.m_nAltAmmoUse ? 1
+-                                                                             : -1;
++                const int mode = primary && ammo(false) >= data.m_nAmmoUse       ? 0
++                                 : alternate && ammo(true) >= data.m_nAltAmmoUse ? 1
++                                                                                 : -1;
+                 if (mode >= 0)
+                 {
+                     last_shot_time_ = time;
+@@ -197,19 +197,19 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
+             const auto use = alt ? data.m_nAltAmmoUse : data.m_nAmmoUse;
+             if (fire_[alt] == no_animation && !looping)
+             {
+-                if (ammo() >= use && !fire())
++                if (ammo(alt) >= use && !fire())
+                     return false;
+                 state = next;
+             }
+             else if (looping)
+             {
+-                if (!firing || ammo() < use)
++                if (!firing || ammo(alt) < use)
+                 {
+                     state = next;
+                     animation.looping = false;
+                 }
+             }
+-            else if (data.m_bSemiAuto && !alt && !last_firing_ && firing && ammo() >= use)
++            else if (data.m_bSemiAuto && !alt && !last_firing_ && firing && ammo(alt) >= use)
+                 animation.reset();
+             else if (!PlayAnimation(fire_[alt]))
+                 state = next;
+diff --git a/src/game/original/Weapon.cpp b/src/game/original/Weapon.cpp
+index 4cedbe4..32c1e40 100644
+--- a/src/game/original/Weapon.cpp
++++ b/src/game/original/Weapon.cpp
+@@ -6,10 +6,11 @@
+ #include <random>
+ 
+ using namespace OpenBlood2;
+-float CWeapon::CheckAmmo() const
++float CWeapon::CheckAmmo(bool alternate) const
+ {
+-    return data.m_nAmmoType == AMMO_NONE ? 1.0f
+-                                         : (m_pInventoryMgr ? m_pInventoryMgr->GetAmmoCount(data.m_nAmmoType) : 0.0f);
++    return GetAmmoType(alternate) == AMMO_NONE
++               ? 1.0f
++               : (m_pInventoryMgr ? m_pInventoryMgr->GetAmmoCount(GetAmmoType(alternate)) : 0.0f);
+ }
+ FireResult CWeapon::Fire(const WeaponFire& request)
+ {
+@@ -55,7 +56,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+     last_shot.damage = request.alternate ? sample(data.m_fMinAltDamage, data.m_fMaxAltDamage)
+                                          : sample(data.m_fMinDamage, data.m_fMaxDamage);
+     const auto use = request.alternate ? data.m_nAltAmmoUse : data.m_nAmmoUse;
+-    const auto ammo = CheckAmmo();
++    const auto ammo = CheckAmmo(request.alternate);
+     if (ammo < use)
+     {
+         last_shot.result = FireResult::Dry;
+@@ -77,7 +78,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+             server->GetObjectPos(m_hOwner, &eye);
+             eye.y += player->eye_level;
+             last_shot.request.position = request.position;
+-            if (data.m_nType == WEAP_FLAREGUN)
++            if (data.m_nType == WEAP_FLAREGUN || (data.m_nType == WEAP_ASSAULTRIFLE && request.alternate))
+             {
+                 SegmentHit close_hit;
+                 const auto close = server->IntersectSegment(eye, vector_add(eye, vector_scale(forward, 60)), m_hOwner,
+@@ -133,7 +134,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+     if (!trace())
+         return last_shot.result;
+     // Selected definitions emit one shot; alternate Flare Gun consumes eight rounds.
+-    m_pInventoryMgr->SetAmmoCount(data.m_nAmmoType, ammo - use);
++    m_pInventoryMgr->SetAmmoCount(GetAmmoType(request.alternate), ammo - use);
+     m_fLastShotTime = server->GetTime();
+     m_bLastFireAlt = request.alternate;
+     ++shots;
+diff --git a/src/game/original/Weapon.h b/src/game/original/Weapon.h
+index 418e77d..055cfd5 100644
+--- a/src/game/original/Weapon.h
++++ b/src/game/original/Weapon.h
+@@ -75,7 +75,11 @@ class CWeapon
+         m_pInventoryMgr = inventory;
+         m_bLeftHand = left;
+     }
+-    float CheckAmmo() const;
++    virtual DBYTE GetAmmoType(bool = false) const
++    {
++        return data.m_nAmmoType;
++    }
++    float CheckAmmo(bool alternate = false) const;
+     FireResult Fire(const OpenBlood2::WeaponFire&);
+     virtual const char* FireSound(bool alternate) const;
+     virtual FireResult FireProjectile();
+@@ -138,6 +142,15 @@ class CBeretta final : public CWeapon
+   public:
+     CBeretta() : CWeapon(WEAP_BERETTA) {}
+ };
++class CAssaultRifle final : public CWeapon
++{
++  public:
++    CAssaultRifle() : CWeapon(WEAP_ASSAULTRIFLE) {}
++    DBYTE GetAmmoType(bool alternate = false) const override
++    {
++        return alternate ? AMMO_DIEBUGDIE : data.m_nAmmoType;
++    }
++};
+ class CFlareGun final : public CWeapon
+ {
+   public:
+diff --git a/src/game/original/WeaponDefs.cpp b/src/game/original/WeaponDefs.cpp
+index 1615f60..e7f4b3c 100644
+--- a/src/game/original/WeaponDefs.cpp
++++ b/src/game/original/WeaponDefs.cpp
+@@ -2,6 +2,66 @@
+ namespace
+ {
+     constexpr WeaponData definitions[] = {
++        // M16 Assault Rifle
++        {
++            "Models\\Weapons\\M16_pv.abc",              // Model
++            "Models\\Weapons\\lh_M16_pv.abc",           // Model
++            "Skins\\Weapons\\C_M16_pv_t.dtx",           // Skin
++            "Models\\Powerups\\M16_pu.abc",             // 3rd person model
++            "Skins\\Powerups\\M16_pu.dtx",              // 3rd person skin
++            WEAP_ASSAULTRIFLE,                          // Type
++            TYPE_AUTORIFLE,                             // Fire type
++            AMMO_BULLET,                                // Ammo type
++            1,                                          // Ammo Use
++            5,                                          // Alt Ammo Use
++            10.0f,                                      // Min Damage
++            16.0f,                                      // Max Damage
++            100.0f,                                     // Min Alt damage
++            140.0f,                                     // Max Alt damage
++            0.1f,                                       // Reload time
++            0.0f,                                       // Alt reload time
++            {75.0f, 25.0f},                             // Spread
++            {50.0f, 50.0f},                             // Alt Spread
++            0.0f,                                       // Projectile Velocity
++            1500.0f,                                    // Alt Projectile Velocity
++            3500.0f,                                    // Range
++            400.0f,                                     // Alt Range
++            1,                                          // Shots per fire
++            1,                                          // Alt Shots per fire
++            3,                                          // Strength or Magic required
++            0,                                          // Two-handed Strength or Magic required
++            0,                                          // Damage Radius (projectiles)
++            200,                                        // Alt Damage Radius (projectiles)
++            DFALSE,                                     // Alt fire zoom
++            DFALSE,                                     // Semi-auto
++            "Sounds\\Weapons\\assault\\fire.wav",       // Fire sound
++            "Sounds\\Weapons\\assault\\alt.wav",        // Alt Fire sound
++            "",                                         // Empty weapon sound
++            "",                                         // Alt Empty weapon sound
++            NULL,                                       // Projectile class
++            "CGrenade",                                 // Alt Projectile class
++            100,                                        // Muzzle Flash radius
++            {1.0f, 0.68f, 0.35f},                       // Muzzle Flash color
++            "M16 Assault Rifle",                        // Name
++            IDS_WEAPON_M16,                             // Name ID (resource)
++            "Sprites\\m16flare.spr",                    // flash sprite name
++            "Sprites\\m16altflare.spr",                 // alt flash Sprite name
++            0.1f,                                       // Flash duration
++            0.125f,                                     // Flash scale
++            {0.0f, 0.0f, 0.0f},                         // 3rd person gun offset
++            {0.7f, -0.9f, 1.7f},                        // Gun Offset
++            {0.0f, 0.275f, 3.0f},                       // Muzzle Offset
++            {0.03f, 0.03f, 0.15f},                      // Recoil
++            {5.25f, -5.8f, 30.0f},                      // Flash position
++            0.625f,                                     // Eject interval
++            0.5f,                                       // View kick
++            DFALSE,                                     // View kick is Cumulative
++            DTRUE,                                      // Animation looping
++            DFALSE,                                     // Alt anim looping
++            "interface\\statusbar\\weapons\\m16.pcx",   // Icon for status bar
++            "interface\\statusbar\\weapons\\m16_h.pcx", // Highlighted icon for status bar
++        },
++
+         // Original Flare Gun (complete definition).
+         {
+             "Models\\Weapons\\Flarepistol_pv.abc",           // Model
+diff --git a/src/game/original/WeaponDefs.h b/src/game/original/WeaponDefs.h
+index 7e4d944..8da42f2 100644
+--- a/src/game/original/WeaponDefs.h
++++ b/src/game/original/WeaponDefs.h
+@@ -1,13 +1,13 @@
+ #pragma once
+ #include "basedefs_de.h"
+ // Selected original definitions; complete source fields, base-game weapon numbering.
+-inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_FLAREGUN = 3, WEAP_MELEE = 17,
+-                       WEAP_NAGA_EYEBEAM = 38, WEAP_ZEALOT_ENERGYBLAST = 27, WEAP_SOUL_HOOK = 23,
++inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_FLAREGUN = 3, WEAP_ASSAULTRIFLE = 9,
++                       WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38, WEAP_ZEALOT_ENERGYBLAST = 27, WEAP_SOUL_HOOK = 23,
+                        WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42;
+-inline constexpr DBYTE TYPE_RIFLE = 0, TYPE_PISTOL = 2, TYPE_MELEE = 4, TYPE_MAGIC = 8, AMMO_NONE = 0, AMMO_BULLET = 1,
+-                       AMMO_SHELL = 2, AMMO_BMG = 3, AMMO_FLARE = 4;
++inline constexpr DBYTE TYPE_RIFLE = 0, TYPE_AUTORIFLE = 1, TYPE_PISTOL = 2, TYPE_MELEE = 4, TYPE_MAGIC = 8,
++                       AMMO_NONE = 0, AMMO_BULLET = 1, AMMO_SHELL = 2, AMMO_BMG = 3, AMMO_FLARE = 4, AMMO_DIEBUGDIE = 5;
+ inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_MAC10 = 354, IDS_WEAPON_FLAREGUN = 355,
+-                     IDS_WEAPON_KNIFE = 366;
++                     IDS_WEAPON_KNIFE = 366, IDS_WEAPON_M16 = 353;
+ // Weapon spread structure
+ typedef struct Spread_t
+ {
+diff --git a/src/game/original/WeaponPickups.cpp b/src/game/original/WeaponPickups.cpp
+index c72c168..8cc9b56 100644
+--- a/src/game/original/WeaponPickups.cpp
++++ b/src/game/original/WeaponPickups.cpp
+@@ -15,6 +15,13 @@ SubMachineGunPU::SubMachineGunPU()
+     display_name = "Sub-machine Gun";
+     resource_id = IDS_WEAPON_MAC10;
+ }
++AssaultRiflePU::AssaultRiflePU()
++{
++    value = {OpenBlood2::PickupKind::Weapon, WEAP_ASSAULTRIFLE, 50};
++    file = "m16_pu";
++    display_name = "Assault Rifle";
++    resource_id = IDS_WEAPON_M16;
++}
+ FlareGunPU::FlareGunPU()
+ {
+     value = {OpenBlood2::PickupKind::Weapon, WEAP_FLAREGUN, 8};
+@@ -30,6 +37,8 @@ const char* WeaponPickupClass(DDWORD type)
+             return "BerettaPU";
+         case WEAP_SUBMACHINEGUN:
+             return "SubMachineGunPU";
++        case WEAP_ASSAULTRIFLE:
++            return "AssaultRiflePU";
+         case WEAP_FLAREGUN:
+             return "FlareGunPU";
+         default:
+diff --git a/src/game/original/WeaponPickups.h b/src/game/original/WeaponPickups.h
+index bc3ee23..4f53cd0 100644
+--- a/src/game/original/WeaponPickups.h
++++ b/src/game/original/WeaponPickups.h
+@@ -22,6 +22,11 @@ class SubMachineGunPU : public WeaponPickup
+   public:
+     SubMachineGunPU();
+ };
++class AssaultRiflePU : public WeaponPickup
++{
++  public:
++    AssaultRiflePU();
++};
+ class FlareGunPU : public WeaponPickup
+ {
+   public:
+diff --git a/src/game/projectile_report.h b/src/game/projectile_report.h
+index c366c41..6017766 100644
+--- a/src/game/projectile_report.h
++++ b/src/game/projectile_report.h
+@@ -13,6 +13,10 @@ namespace OpenBlood2
+         DVector query_from{}, query_to{}, blast_position{}, blast_normal{};
+         SegmentResult query = SegmentResult::Unavailable;
+         unsigned candidates = 0, in_radius = 0;
++        bool grenade = false;
++        int bounces_left = 0;
++        unsigned explosions = 0;
++        std::uint64_t contacts = 0;
+         bool flare = false, tracked = false;
+         unsigned burn_ticks = 0, burst_children = 0;
+     };
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 84cb9c5..0941884 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -17,6 +17,7 @@
+ #include "game/original/FlareProjectile.h"
+ #include "game/original/GameStartPoint.h"
+ #include "game/original/Gideon.h"
++#include "game/original/Grenade.h"
+ #include "game/original/HandWeaponModel.h"
+ #include "game/original/Key.h"
+ #include "game/original/KeyFramer.h"
+@@ -77,6 +78,7 @@ namespace OpenBlood2
+             {{"Filename", std::string{}}, {"Skin", std::string{}}, {"Flags", std::int32_t(FLAG_VISIBLE)}}};
+         const ClassInfo shockwave_projectile{
+             "CBehemothShockwaveProjectile", &base, construct<CBehemothShockwaveProjectile>, {}};
++        const ClassInfo grenade{"CGrenade", &base, construct<CGrenade>, {}};
+         const ClassInfo flare_projectile{"CFlareProjectile", &base, construct<CFlareProjectile>, {}};
+         const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {}};
+         const ClassInfo flare_burst{"CFlareBurstProjectile", &base, construct<CFlareBurstProjectile>, {}};
+@@ -454,6 +456,7 @@ namespace OpenBlood2
+                                {{"PickupTriggerTarget", std::string{}}, {"PickupTriggerMessage", std::string{}}}};
+         const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}};
+         const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
++        const ClassInfo assault_pickup{"AssaultRiflePU", &weapon_pickup, construct<AssaultRiflePU>, {}};
+         const ClassInfo flare_pickup{"FlareGunPU", &weapon_pickup, construct<FlareGunPU>, {}};
+         const ClassInfo mac10_pickup{"SubMachineGunPU", &weapon_pickup, construct<SubMachineGunPU>, {}};
+         const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}};
+@@ -759,21 +762,22 @@ namespace OpenBlood2
+                objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
+                objects.register_class(key_pickup) && objects.register_class(pickup) &&
+                objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
+-               objects.register_class(flare_pickup) && objects.register_class(mac10_pickup) &&
+-               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+-               objects.register_class(health_base) && objects.register_class(armor_base) &&
+-               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
+-               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
+-               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
+-               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
+-               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
+-               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
+-               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
+-               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+-               objects.register_class(door) && objects.register_class(rotating_door) &&
+-               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
+-               objects.register_class(rotating_brush) && objects.register_class(world_debris) &&
+-               objects.register_class(hand_model) && objects.register_class(corpse) &&
++               objects.register_class(assault_pickup) && objects.register_class(flare_pickup) &&
++               objects.register_class(mac10_pickup) && objects.register_class(ammo_pickup) &&
++               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
++               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
++               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
++               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
++               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
++               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
++               objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
++               objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
++               objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
++               objects.register_class(toggle_trigger) && objects.register_class(door) &&
++               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
++               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
++               objects.register_class(world_debris) && objects.register_class(hand_model) &&
++               objects.register_class(corpse) && objects.register_class(grenade) &&
+                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
+                objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
+                objects.register_class(shockwave_projectile);
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index a607231..362fe1b 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -251,6 +251,7 @@ namespace OpenBlood2
+         DRESULT SetAcceleration(HOBJECT, DVector*) override;
+         bool advance_physics(double seconds);
+         bool advance_projectiles(double seconds);
++        bool AdvanceGrenade(HOBJECT, double seconds) override;
+         void RecordProjectile(const ProjectileReport&) override;
+         std::vector<ProjectileReport> projectile_reports;
+         CollisionWorld* collision = nullptr;
+diff --git a/src/game/server_physics.cpp b/src/game/server_physics.cpp
+index 9b6748a..07dc9e1 100644
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -1,4 +1,5 @@
+ #include "engine/world_model.h"
++#include "game/original/Projectile.h"
+ #include "game/server_adapter.h"
+ #include <algorithm>
+ #include <cmath>
+@@ -435,7 +436,7 @@ namespace OpenBlood2
+         {
+             auto* r = objects_.get(id);
+             if (!r || r->life != Life::Alive || r->attachment || r->activity != OBJSTATE_ACTIVE || r->client_movement ||
+-                r->container || (r->world_model && !r->world_body) ||
++                r->container || dynamic_cast<CProjectile*>(r->game.get()) || (r->world_model && !r->world_body) ||
+                 (!r->world_body && r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
+                 continue;
+             ContainerState containers;
+diff --git a/src/game/server_pickups.cpp b/src/game/server_pickups.cpp
+index ef3226c..99fa9df 100644
+--- a/src/game/server_pickups.cpp
++++ b/src/game/server_pickups.cpp
+@@ -1,3 +1,4 @@
++#include "game/original/WeaponPickups.h"
+ #include "game/server_adapter.h"
+ #include <cmath>
+ namespace OpenBlood2
+@@ -57,14 +58,15 @@ namespace OpenBlood2
+         auto* m = writable(h);
+         if (!m)
+             return DE_INVALIDPARAMS;
+-        const auto limit = value.kind == PickupKind::Ammo ? 8 : value.kind == PickupKind::Weapon ? 3 : 4;
++        const auto limit = value.kind == PickupKind::Ammo ? 8 : value.kind == PickupKind::Weapon ? 255 : 4;
+         const auto request = value.kind == PickupKind::Ammo     ? add_ammo_message
+                              : value.kind == PickupKind::Weapon ? add_weapon_message
+                                                                 : add_powerup_message;
+         if (!m->routed ||
+             (value.kind != PickupKind::Ammo && value.kind != PickupKind::Powerup && value.kind != PickupKind::Weapon) ||
+             (m->id != request && m->id != picked_up_message) || !m->bytes.empty() || m->damage || m->key || m->pickup ||
+-            !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit || !std::isfinite(value.amount) ||
++            !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit ||
++            (value.kind == PickupKind::Weapon && !WeaponPickupClass(value.type)) || !std::isfinite(value.amount) ||
+             value.amount < 0 || value.amount > 1e6f)
+         {
+             m->bad = true;
+diff --git a/src/game/server_projectiles.cpp b/src/game/server_projectiles.cpp
+index 3162a57..dba4e33 100644
+--- a/src/game/server_projectiles.cpp
++++ b/src/game/server_projectiles.cpp
+@@ -1,8 +1,121 @@
++#include "game/original/Grenade.h"
+ #include "game/original/Projectile.h"
+ #include "game/server_adapter.h"
++#include <algorithm>
+ #include <cmath>
+ namespace OpenBlood2
+ {
++    bool ServerAdapter::AdvanceGrenade(HOBJECT h, double seconds)
++    {
++        trace_service("AdvanceGrenade");
++        auto* record = objects_.get(h);
++        auto* grenade = record && record->life == Life::Alive ? dynamic_cast<CGrenade*>(record->game.get()) : nullptr;
++        if (!grenade || !grenade->configured || moving_ || objects_.busy() || !collision || !collision_ready ||
++            !std::isfinite(seconds) || seconds <= 0 || seconds > .5 || record->attachment ||
++            record->state.m_ObjectType != OT_MODEL || !record->model || !physics_vector(record->velocity) ||
++            !physics_vector(record->acceleration) || !physics_vector(record->state.m_Pos) ||
++            !physics_vector(record->dimensions))
++            return false;
++        moving_ = true;
++        struct Reset
++        {
++            bool& flag;
++            ~Reset()
++            {
++                flag = false;
++            }
++        } reset{moving_};
++        const auto ids = objects_.snapshot();
++        const auto steps = static_cast<unsigned>(std::max(1.0, std::ceil(seconds * 120)));
++        const float dt = static_cast<float>(seconds / steps);
++        for (unsigned step = 0; step < steps && record->life == Life::Alive && !grenade->m_bExplode; ++step)
++        {
++            ContainerPhysics physics{
++                h,    record->velocity, record->acceleration, dt, (record->state.m_Flags & FLAG_GRAVITY) != 0, false,
++                false};
++            if (!affect_containers(h, physics))
++                return false;
++            if (record->life != Life::Alive)
++                break;
++            auto acceleration = physics.acceleration;
++            if (physics.gravity)
++                acceleration = vector_add(acceleration, gravity);
++            // Fresh support, excluding the shooter just like the travelled sweep.
++            CollisionHit support;
++            auto down = record->state.m_Pos;
++            down.y -= .02f;
++            auto supported =
++                sweep_scene(h, record->state.m_Pos, down, record->dimensions, support, ids, grenade->m_hFiredFrom);
++            if (supported == CollisionQuery::Invalid)
++                return false;
++            bool resting = physics.gravity && supported == CollisionQuery::Hit && !support.start_solid &&
++                           support.normal.y >= .5f && vector_dot(physics.velocity, support.normal) <= .01f;
++            DVector displacement, velocity = physics.velocity;
++            if (resting)
++            {
++                const auto into = vector_dot(acceleration, support.normal);
++                if (into < 0)
++                    acceleration = vector_subtract(acceleration, vector_scale(support.normal, into));
++                // Source friction coefficient 18; use the existing body's exponential
++                // ground-friction policy. This is replacement physics, not retail parity.
++                const float decay = std::exp(-18.f * dt);
++                const auto terminal = vector_scale(acceleration, 1.f / 18);
++                displacement = vector_add(vector_scale(terminal, dt),
++                                          vector_scale(vector_subtract(velocity, terminal), (1 - decay) / 18));
++                velocity = vector_add(terminal, vector_scale(vector_subtract(velocity, terminal), decay));
++                if (vector_dot(velocity, velocity) < .1f && vector_dot(acceleration, acceleration) < .1f)
++                    velocity = {};
++            }
++            else
++            {
++                displacement = vector_add(vector_scale(velocity, dt), vector_scale(acceleration, .5f * dt * dt));
++                velocity = vector_add(velocity, vector_scale(acceleration, dt));
++            }
++            const auto destination = vector_add(record->state.m_Pos, displacement);
++            CollisionHit hit;
++            const auto query =
++                sweep_scene(h, record->state.m_Pos, destination, record->dimensions, hit, ids, grenade->m_hFiredFrom);
++            if (query == CollisionQuery::Invalid || (query == CollisionQuery::Hit && hit.start_solid) ||
++                !physics_vector(destination) || !physics_vector(velocity))
++                return false;
++            record->grounded = resting;
++            record->contact_normal = resting ? support.normal : DVector{};
++            record->contact_object = resting ? support.object : nullptr;
++            record->contact_polygon = resting ? support.polygon : UINT32_MAX;
++            if (query == CollisionQuery::Hit)
++            {
++                // Commit one box segment per bounded substep, then run the original
++                // callback on post-projection velocity. No fabricated bounce impulse.
++                record->state.m_Pos = vector_add(hit.point, vector_scale(hit.normal, .001f));
++                const auto into = vector_dot(velocity, hit.normal);
++                if (into < 0)
++                    velocity = vector_subtract(velocity, vector_scale(hit.normal, into));
++                record->contact_normal = hit.normal;
++                record->contact_object = hit.object;
++                record->contact_polygon = hit.polygon;
++                record->grounded = hit.normal.y >= .5f;
++                record->velocity = velocity;
++                SegmentHit contact{hit.point, hit.normal, hit.object, hit.polygon, hit.fraction, hit.texture_flags};
++                grenade->contact = contact;
++                grenade->contacted = true;
++                ++grenade->contacts;
++                grenade->HandleContact(contact);
++                auto* target = objects_.get(hit.object);
++                if (record->life == Life::Alive && target && target->life == Life::Alive &&
++                    (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
++                    objects_.engine_message(target->handle, MID_TOUCHNOTIFY, h);
++                if (grenade->failed)
++                    return false;
++            }
++            else
++            {
++                record->state.m_Pos = destination;
++                record->velocity = velocity;
++            }
++            ++grenade->flight_steps;
++        }
++        return true;
++    }
+     void ServerAdapter::RecordProjectile(const ProjectileReport& report)
+     {
+         if (projectile_reports.size() == 64)
+@@ -25,8 +138,9 @@ namespace OpenBlood2
+                 const bool was_contact = projectile->contacted;
+                 ok = projectile->AdvanceFlight(seconds) && ok;
+                 const auto* target = objects_.get(projectile->m_hHitObject);
+-                if (!was_contact && projectile->contacted && record->life == Life::Alive && target &&
+-                    target->life == Life::Alive && (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
++                if (!dynamic_cast<CGrenade*>(projectile) && !was_contact && projectile->contacted &&
++                    record->life == Life::Alive && target && target->life == Life::Alive &&
++                    (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
+                     objects_.engine_message(target->handle, MID_TOUCHNOTIFY, record->handle);
+             }
+         }
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index fe3f1ac..16f4842 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1488,3 +1488,24 @@ if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+     add_test(NAME gpu.world_debris COMMAND world_debris_gpu_tests "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(gpu.world_debris PROPERTIES LABELS "gpu;private;world_debris" TIMEOUT 60 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+ endif()
++
++add_executable(assault_tests assault_tests.cpp)
++target_link_libraries(assault_tests PRIVATE blood2_game)
++blood2_project_options(assault_tests)
++foreach(case key_bounds modes damage motion bounce contacts rules lifetime failure drop collect restore)
++    add_test(NAME assault.${case} COMMAND assault_tests ${case} "${CMAKE_CURRENT_BINARY_DIR}/assault-fixtures/${case}")
++    set_tests_properties(assault.${case} PROPERTIES LABELS "headless;assault" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case ai private)
++        add_test(NAME assault.${case} COMMAND assault_tests ${case} "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(assault.${case} PROPERTIES LABELS "headless;private;assault" TIMEOUT 180)
++    endforeach()
++endif()
++if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
++    add_executable(assault_gpu_tests assault_gpu_tests.cpp ../src/app/model_scene.cpp)
++    target_link_libraries(assault_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(assault_gpu_tests)
++    add_test(NAME gpu.assault_private COMMAND assault_gpu_tests "${BLOOD2_TEST_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/assault-")
++    set_tests_properties(gpu.assault_private PROPERTIES LABELS "gpu;private;assault" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++endif()
+diff --git a/tests/assault_fixture.h b/tests/assault_fixture.h
+new file mode 100644
+index 0000000..4517868
+--- /dev/null
++++ b/tests/assault_fixture.h
+@@ -0,0 +1,127 @@
++#pragma once
++#include "audio_fixture.h"
++#include "camera_fixture.h"
++#include "game/original/Grenade.h"
++#include "game/original/HandWeaponModel.h"
++#include "game/original/WeaponPickups.h"
++#include "player_fixture.h"
++namespace test_assault
++{
++    using namespace OpenBlood2;
++    inline bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        if (!test_player::setup(g, root))
++            return false;
++        test_player::Directory dir;
++        dir.children["models"].children["weapons"].files["m16_pv.abc"] = test_model::abc(true).b;
++        dir.children["skins"].children["weapons"].files["c_m16_pv_t.dtx"] = {1, 2, 3};
++        dir.children["models"].children["powerups"].files["m16_pu.abc"] = test_model::abc(true).b;
++        dir.children["skins"].children["powerups"].files["m16_pu.dtx"] = {1, 2, 3};
++        dir.children["models"].children["ammo"].files["grenade.abc"] = test_model::abc(true).b;
++        dir.children["skins"].children["ammo"].files["grenade.dtx"] = {1, 2, 3};
++        for (auto name : {"fire.wav", "alt.wav", "projectile.wav", "altbounce.wav"})
++            dir.children["sounds"].children["weapons"].children["assault"].files[name] = test_audio::wave();
++        dir.children["sounds"].children["weapons"].children["c4"].files["explosion_1.wav"] = test_audio::wave();
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        const auto [offset, size] = test_player::write_dir(w, dir);
++        w.patch(131, offset);
++        w.patch(135, size);
++        auto file = root / "assault.rez";
++        std::ofstream out(file, std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        std::string error;
++        return g.resources.mount(file, error) && g.enter_player(error);
++    }
++    inline bool equip(GameSession& g)
++    {
++        auto* p = g.server_shell.Player(g.local_client);
++        if (!p || p->m_InventoryMgr.ObtainWeapon(WEAP_ASSAULTRIFLE, 2) != InventoryResult::Ok)
++            return false;
++        p->m_InventoryMgr.SetAmmoCount(1, 200);
++        p->m_InventoryMgr.SetAmmoCount(5, 100);
++        std::string error;
++        if (!g.select_weapon(2, error))
++        {
++            std::cerr << "M16 equip: " << error << "\n";
++            return false;
++        }
++        return true;
++    }
++    inline CGrenade* grenade(GameSession& g, DVector position, DVector direction = {0, 0, 1}, float speed = 100,
++                             int radius = 200)
++    {
++        ObjectCreateStruct state;
++        state.m_Pos = position;
++        SAFE_STRCPY(state.m_Name, "M16Grenade");
++        auto* p = dynamic_cast<CGrenade*>(g.server.CreateObject(g.server.GetClass("CGrenade"), &state));
++        if (!p || !p->Setup(direction, 9, 120, speed, radius, g.client_shell.player))
++        {
++            std::cerr << "Grenade creation/setup: " << (p ? p->error : "no instance") << " diagnostics=";
++            for (const auto& d : g.objects.diagnostics())
++                std::cerr << d << ';';
++            std::cerr << '\n';
++            return nullptr;
++        }
++        return p;
++    }
++    inline bool fire_modes(GameSession& g)
++    {
++        auto* p = g.server_shell.Player(g.local_client);
++        auto& inv = p->m_InventoryMgr;
++        auto* w = inv.CurrentWeapon();
++        // Move away from authored actors/doors for this labelled input/animation check.
++        // Separate tests prove combat, contacts and actual pickup creation.
++        DVector position{0, 800, 0};
++        if (g.server.TeleportObject(p->m_hObject, &position) != DE_OK)
++            return false;
++        p->m_damage.m_bGodMode = true;
++        for (bool alt : {false, true})
++        {
++            g.client_shell.weapon_input = {};
++            for (unsigned i = 0; i < 100; ++i)
++                if (!g.step(.01))
++                {
++                    for (const auto& t : g.trace)
++                        std::cerr << t << "\n";
++                    for (const auto& d : g.objects.diagnostics())
++                        std::cerr << d << "\n";
++                    return false;
++                }
++            const auto shots = w->shots, keys = g.client_shell.weapons[0].fire_keys;
++            const auto bullets = inv.GetAmmoCount(1), charges = inv.GetAmmoCount(5);
++            g.client_shell.weapon_input = {!alt, alt, false};
++            for (unsigned i = 0; i < 140; ++i)
++                if (!g.step(.01))
++                {
++                    for (const auto& t : g.trace)
++                        std::cerr << t << "\n";
++                    for (const auto& d : g.objects.diagnostics())
++                        std::cerr << d << "\n";
++                    return false;
++                }
++            const auto count = w->shots - shots;
++            std::cout << "M16 " << (alt ? "alternate" : "primary") << " shots=" << count
++                      << " keys=" << g.client_shell.weapons[0].fire_keys - keys << '\n';
++            if (!count || count != g.client_shell.weapons[0].fire_keys - keys ||
++                inv.GetAmmoCount(1) != bullets - (alt ? 0 : count) ||
++                inv.GetAmmoCount(5) != charges - (alt ? count * 5 : 0) || w->sounds_played != w->shots ||
++                w->sound_failures)
++                return false;
++        }
++        g.client_shell.weapon_input = {};
++        for (unsigned i = 0; i < 450; ++i)
++            if (!g.step(.01))
++                return false;
++        const auto shots = w->shots;
++        for (unsigned i = 0; i < 100; ++i)
++            if (!g.step(.01))
++                return false;
++        return w->shots == shots;
++    }
++} // namespace test_assault
+diff --git a/tests/assault_gpu_tests.cpp b/tests/assault_gpu_tests.cpp
+new file mode 100644
+index 0000000..febf0e7
+--- /dev/null
++++ b/tests/assault_gpu_tests.cpp
+@@ -0,0 +1,125 @@
++#include "app/model_scene.h"
++#include "assault_fixture.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x " " << error << " " << SDL_GetError() << '\n';                            \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string error;
++    Runtime runtime;
++    CHECK(runtime.initialize(true, error));
++    GameSession g;
++    CHECK(g.initialize());
++    Config cfg;
++    cfg.data_dir = argv[1];
++    CHECK(g.resources.mount_game(cfg, error));
++    WorldRenderer renderer(runtime.gpu);
++    ModelView scene;
++    for (unsigned cycle = 0; cycle < 2; ++cycle)
++    {
++        CHECK(g.request_world("01_subwaya", error) && g.enter_player(error) && test_camera::complete_subway_intro(g));
++        CHECK(test_assault::equip(g));
++        for (unsigned i = 0; i < 100; ++i)
++            CHECK(g.step(.01));
++        CHECK(update_model_scene(g, scene, error) && scene.close_draws.size() == 1);
++        unsigned close = 0;
++        for (const auto& e : scene.entries)
++            if (e.close)
++            {
++                CHECK(e.visible && e.triangles > 0 && e.error.empty() && e.skin.find("M16") != std::string::npos);
++                ++close;
++            }
++        CHECK(close == 1 && g.client_shell.weapons[0].model->invalid_key_bounds > 0);
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480));
++        CHECK(
++            renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480, error, true));
++        const auto& view = g.client_shell.view;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(commands && renderer.draw(commands, capture.texture, scene.mesh, scene.close_draws, view.position,
++                                        view.rotation, false, error));
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        CHECK(copy);
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 640;
++        region.h = 480;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 640;
++        target.rows_per_layer = 480;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        CHECK(SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(runtime.gpu));
++        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        unsigned left = 0, right = 0;
++        for (unsigned y = 0; y < 480; ++y)
++            for (unsigned x = 0; x < 640; ++x)
++            {
++                const auto* p = pixels + (y * 640 + x) * 4;
++                if (p[0] != pixels[0] || p[1] != pixels[1] || p[2] != pixels[2])
++                    (x < 320 ? left : right)++;
++            }
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        std::cout << "M16 GPU cycle=" << cycle << " left pixels=" << left << " right pixels=" << right << '\n';
++        CHECK(left + right > 100);
++        CHECK(capture.save((std::string(argv[2]) + std::to_string(cycle) + ".png").c_str()));
++        // Render the actual independent grenade model, with the rest hidden.
++        const auto camera_position = view.position;
++        const auto camera_rotation = view.rotation;
++        auto* grenade = test_assault::grenade(
++            g, vector_add(camera_position, rotate_vector(camera_rotation, {0, 0, 25})), {0, 0, 1}, 0);
++        CHECK(grenade);
++        const auto handle = grenade->m_hObject;
++        for (auto id : g.objects.snapshot())
++        {
++            auto* record = g.objects.get(id);
++            if (record->handle != handle)
++                g.server.SetObjectFlags(record->handle, record->state.m_Flags & ~FLAG_VISIBLE);
++        }
++        const auto clock = g.objects.time();
++        CHECK(update_model_scene(g, scene, error) && scene.world_draws.size() == 1);
++        CHECK(
++            renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480, error, true));
++        commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(commands && renderer.draw(commands, capture.texture, scene.mesh, scene.world_draws, camera_position,
++                                        camera_rotation, false, error));
++        copy = SDL_BeginGPUCopyPass(commands);
++        CHECK(copy);
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        CHECK(SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(runtime.gpu));
++        pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        unsigned grenade_pixels = 0;
++        for (unsigned i = 1; i < 640 * 480; ++i)
++            if (pixels[i * 4] != pixels[0] || pixels[i * 4 + 1] != pixels[1] || pixels[i * 4 + 2] != pixels[2])
++                ++grenade_pixels;
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        CHECK(grenade_pixels > 5 && g.objects.time() == clock && grenade->flight_steps == 0);
++        std::cout << "Grenade GPU cycle=" << cycle << " pixels=" << grenade_pixels << '\n';
++        CHECK(capture.save((std::string(argv[2]) + std::to_string(cycle) + "-grenade.png").c_str()));
++        g.server.SetObjectFlags(handle, g.server.GetObjectFlags(handle) & ~FLAG_VISIBLE);
++        CHECK(update_model_scene(g, scene, error) && scene.world_draws.empty());
++        CHECK(g.objects.remove(handle) && g.objects.finish_frame() && !g.objects.get(handle));
++        CHECK(g.unload_world() && update_model_scene(g, scene, error) && scene.close_draws.empty() &&
++              scene.entries.empty());
++        renderer.clear_geometry();
++        scene.clear();
++        CHECK(g.server.audio.voices().empty() && g.objects.attachments().empty());
++    }
++}
+diff --git a/tests/assault_tests.cpp b/tests/assault_tests.cpp
+new file mode 100644
+index 0000000..ec16624
+--- /dev/null
++++ b/tests/assault_tests.cpp
+@@ -0,0 +1,494 @@
++#include "assault_fixture.h"
++#include "brush_fixture.h"
++#include "game/original/CultistAI.h"
++#include <algorithm>
++#include <functional>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .003f;
++    }
++    struct Victim : CBaseCharacter
++    {
++        HOBJECT remove_on_damage = nullptr, remove_on_touch = nullptr;
++        unsigned touches = 0;
++        DDWORD EngineMessageFn(DDWORD m, void* d, float f) override
++        {
++            if (m == MID_INITIALUPDATE)
++            {
++                m_damage.Init(m_hObject);
++                m_damage.m_fHitPoints = m_damage.m_fMaxHitPoints = 1000;
++                m_damage.apply_damage_physics = false;
++            }
++            if (m == MID_TOUCHNOTIFY)
++            {
++                ++touches;
++                if (remove_on_touch)
++                    g_pServerDE->RemoveObject(remove_on_touch);
++            }
++            return BaseClass::EngineMessageFn(m, d, f);
++        }
++        DDWORD ObjectMessageFn(HOBJECT s, DDWORD m, HMESSAGEREAD r) override
++        {
++            auto value = BaseClass::ObjectMessageFn(s, m, r);
++            if (m == damage_message && remove_on_damage)
++                g_pServerDE->RemoveObject(remove_on_damage);
++            return value;
++        }
++    };
++    Victim* victim(GameSession& g, DVector position)
++    {
++        static ClassInfo type{
++            "GrenadeVictim", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Victim>(); }, {}};
++        type.parent = g.objects.find_class("CBaseCharacter");
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct state;
++        state.m_Pos = position;
++        state.m_Flags = FLAG_SOLID | FLAG_TOUCH_NOTIFY;
++        auto h = g.objects.create(&type, state);
++        if (auto* r = g.objects.get(h))
++            r->dimensions = {10, 10, 10};
++        return dynamic_cast<Victim*>(g.server.HandleToObject(h));
++    }
++    bool key_bounds(const std::filesystem::path&)
++    {
++        auto bytes = test_model::abc().b;
++        const std::string marker("\x05\0START", 7);
++        auto found = std::search(bytes.begin(), bytes.end(), marker.begin(), marker.end());
++        CHECK(found != bytes.end());
++        const auto text = std::size_t(found - bytes.begin());
++        CHECK(text > 28);
++        auto write = [&](std::size_t at, std::uint32_t v)
++        {
++            for (unsigned i = 0; i < 4; ++i)
++                bytes[at + i] = std::uint8_t(v >> (8 * i));
++        };
++        Model original, model;
++        std::string error;
++        CHECK(read_model(bytes, original, error));
++        write(text - 24, std::bit_cast<std::uint32_t>(20.f));
++        CHECK(read_model(bytes, model, error) && model.invalid_key_bounds == 1 &&
++              !model.animations[0].keys[0].bounds_valid && model.animations[0].keys[0].min.x == 20);
++        std::vector<DVector> a, b;
++        CHECK(sample_vertices(original, 0, 25, a) && sample_vertices(model, 0, 25, b) && a.size() == b.size());
++        for (std::size_t i = 0; i < a.size(); ++i)
++            CHECK(a[i].x == b[i].x && a[i].y == b[i].y && a[i].z == b[i].z);
++        write(text - 24, 0x7f800000);
++        CHECK(!read_model(bytes, model, error) && model.animations.empty());
++        write(text - 24, std::bit_cast<std::uint32_t>(20.f));
++        write(text - 28, 101);
++        CHECK(!read_model(bytes, model, error));
++        return true;
++    }
++    bool modes(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_assault::setup(g, root) && test_assault::equip(g));
++        auto& inv = g.server_shell.Player(g.local_client)->m_InventoryMgr;
++        auto* w = inv.CurrentWeapon();
++        CHECK(w->GetAmmoType() == 1 && w->GetAmmoType(true) == 5 && w->data.m_nFireType == 1 && w->data.m_bLoopAnim &&
++              !w->data.m_bAltLoopAnim);
++        CHECK(inv.ObtainWeapon(9, 2) == InventoryResult::AlreadyHave && !inv.GetWeapon(2, true));
++        CHECK(test_assault::fire_modes(g));
++        inv.SetAmmoCount(1, 0);
++        inv.SetAmmoCount(5, 4);
++        WeaponFire shot{{500, 100, 500}, {0, 0, 1}, 42, 9, true};
++        CHECK(g.server_shell.OnMessage(g.local_client, shot) == FireResult::Dry && inv.GetAmmoCount(5) == 4);
++        inv.SetAmmoCount(5, 5);
++        CHECK(g.server_shell.OnMessage(g.local_client, shot) == FireResult::Fired && inv.GetAmmoCount(5) == 0 &&
++              inv.GetAmmoCount(1) == 0);
++        auto* grenade = dynamic_cast<CGrenade*>(g.server.HandleToObject(w->projectile));
++        CHECK(grenade && grenade->m_fDamage >= 100 && grenade->m_fDamage <= 140 && grenade->m_nRadius == 200 &&
++              grenade->m_fVelocity == 1500);
++        shot.alternate = false;
++        CHECK(g.server_shell.OnMessage(g.local_client, shot) == FireResult::Dry);
++        CHECK(g.unload_world() && !g.server.message_count() && g.server.audio.voices().empty());
++        return true;
++    }
++    bool damage(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_assault::setup(g, root) && test_assault::equip(g));
++        auto* p = g.server_shell.Player(g.local_client);
++        DVector eye = g.objects.get(p->m_hObject)->state.m_Pos;
++        eye.y += p->eye_level;
++        auto* c = victim(g, vector_add(eye, {0, 0, 100}));
++        CHECK(c);
++        auto& inv = p->m_InventoryMgr;
++        auto* w = inv.CurrentWeapon();
++        WeaponFire shot{eye, {0, 0, 1}, 42, 9, false};
++        CHECK(g.server_shell.OnMessage(g.local_client, shot) == FireResult::Fired && w->last_shot.damage >= 10 &&
++              w->last_shot.damage <= 16 && w->last_shot.damage_delivered && c->m_damage.m_fHitPoints < 1000 &&
++              inv.GetAmmoCount(1) == 199 && inv.GetAmmoCount(5) == 100);
++        c->remove_on_damage = p->m_hObject;
++        CHECK(g.server_shell.OnMessage(g.local_client, shot) == FireResult::Fired);
++        CHECK(g.objects.finish_frame() && !g.objects.get(c->remove_on_damage));
++        CHECK(g.unload_world() && !g.server.message_count());
++        return true;
++    }
++    bool motion(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_assault::setup(g, root));
++        auto* p = test_assault::grenade(g, {300, 300, 300});
++        CHECK(p);
++        auto* r = g.objects.get(p->m_hObject);
++        CHECK(r->model && r->dimensions.x == 1 && (r->state.m_Flags & FLAG_GRAVITY) &&
++              !(r->state.m_Flags & FLAG_POINTCOLLIDE));
++        CHECK(g.step(.1));
++        CHECK(near(r->state.m_Pos.z, 310) && near(r->state.m_Pos.y, 300 + .5f * g.server.gravity.y * .1f * .1f));
++        CHECK(p->flight_steps == 12 && r->body_steps == 0 && p->sound && !p->trail_error.empty());
++        CHECK(near(r->velocity.y, g.server.gravity.y * .1f));
++        const auto loop = p->sound;
++        CHECK(g.objects.remove(p->m_hObject) && g.objects.finish_frame() && !g.server.audio.get(loop));
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool bounce(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_assault::setup(g, root));
++        auto* p = test_assault::grenade(g, {300, 100, 300});
++        CHECK(p);
++        auto* r = g.objects.get(p->m_hObject);
++        SegmentHit hit;
++        hit.polygon = 3;
++        hit.normal = {0, 1, 0};
++        DVector v{100, -20, 40};
++        CHECK(g.server.SetVelocity(p->m_hObject, &v) == DE_OK);
++        p->HandleContact(hit);
++        CHECK(p->bounces_left == 4 && near(r->velocity.x, 50) && near(r->velocity.y, -7) && near(r->velocity.z, 20) &&
++              p->bounce_sounds == 1);
++        CHECK(std::abs(p->pitch_velocity) <= 6.284f && std::abs(p->yaw_velocity) <= 6.284f);
++        const auto prior = p->pitch;
++        CHECK(g.step(.01) && p->pitch != prior);
++        auto* c = victim(g, {500, 100, 500});
++        CHECK(c);
++        hit.object = c->m_hObject;
++        hit.polygon = UINT32_MAX;
++        p->HandleContact(hit);
++        CHECK(p->bounces_left == 3 && !p->m_bExplode && vector_dot(r->velocity, r->velocity) == 0);
++        for (int i = 0; i < 6; ++i)
++            p->HandleContact(hit);
++        CHECK(p->bounces_left == 0 && p->bounce_sounds == 5 && !p->m_bExplode);
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool contacts(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_assault::setup(g, root));
++        auto* c = victim(g, {300, 100, 330});
++        CHECK(c);
++        auto* p = test_assault::grenade(g, {300, 100, 300}, {0, 0, 1}, 1000);
++        CHECK(p);
++        const auto h = p->m_hObject;
++        CHECK(p->AdvanceFlight(.05) && p->m_bExplode && p->bounces_left == 5 && c->touches == 1 &&
++              c->m_damage.m_fHitPoints == 1000);
++        CHECK(g.step(.01) && !g.objects.get(h) && c->m_damage.m_fHitPoints < 1000);
++        CHECK(g.server.projectile_reports.back().outcome == "exploded" &&
++              g.server.projectile_reports.back().contacts == 1 && g.server.projectile_reports.back().explosions == 2);
++        CHECK(g.server.scene_explosions.back().type == 3 && g.server.scene_explosions.back().normal.y == 1 &&
++              g.server.scene_explosions.back().voice);
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool rules(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_assault::setup(g, root));
++        auto* c = victim(g, {300, 100, 300});
++        CHECK(c);
++        auto* p = test_assault::grenade(g, {300, 100, 250});
++        CHECK(p);
++        SegmentHit hit;
++        hit.object = c->m_hObject;
++        c->m_damage.m_bDead = true;
++        p->HandleContact(hit);
++        CHECK(!p->m_bExplode && p->bounces_left == 5);
++        c->m_damage.m_bDead = false;
++        g.server.SetObjectFlags(c->m_hObject, 0);
++        p->HandleContact(hit);
++        CHECK(!p->m_bExplode && p->bounces_left == 5);
++        g.server.SetObjectFlags(c->m_hObject, FLAG_SOLID);
++        c->remove_on_damage = g.client_shell.player;
++        p->HandleContact(hit);
++        CHECK(p->m_bExplode);
++        CHECK(g.step(.01) && g.server.projectile_reports.back().outcome == "exploded" && !g.local_client);
++        CHECK(g.server.projectile_reports.back().explosions == 2 && !g.server.message_count());
++        CHECK(g.unload_world() && g.server.audio.voices().empty());
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_assault::setup(g, root));
++        auto* c = victim(g, {300, 30, 300});
++        CHECK(c);
++        auto* p = test_assault::grenade(g, {300, 100, 300}, {0, 0, 1}, 0);
++        CHECK(p);
++        auto h = p->m_hObject;
++        // No flight: exercise exact original float deadline independently of scheduler quantization.
++        p->m_fStartTime = -3;
++        CHECK(g.objects.engine_message(h, MID_UPDATE, nullptr) && g.objects.get(h) && !p->exploded);
++        p->m_fStartTime = -3.01f;
++        CHECK(g.objects.engine_message(h, MID_UPDATE, nullptr) && p->exploded && !p->sound &&
++              c->m_damage.m_fHitPoints < 1000);
++        CHECK(g.objects.finish_frame() && !g.objects.get(h));
++        CHECK(g.server.projectile_reports.size() == 1 && g.server.projectile_reports.back().delivered > 0 &&
++              g.server.projectile_reports.back().explosions == 1);
++        // Owner unlink does not cancel an independent fuse; it loses attribution.
++        p = test_assault::grenade(g, {600, 100, 600}, {0, 0, 1}, 0);
++        CHECK(p);
++        h = p->m_hObject;
++        CHECK(g.leave_player() && p->m_hFiredFrom == nullptr);
++        for (int i = 0; i < 320 && g.objects.get(h); ++i)
++            CHECK(g.step(.01));
++        CHECK(!g.objects.get(h) && g.server.projectile_reports.back().outcome == "exploded");
++        CHECK(g.unload_world() && g.server.audio.voices().empty());
++        return true;
++    }
++    bool failure(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_assault::setup(g, root));
++        CHECK(!g.objects.create(g.objects.find_class("CGrenade"), {}, Creation::World));
++        auto* p = test_assault::grenade(g, {300, 100, 300});
++        CHECK(p);
++        auto h = p->m_hObject;
++        g.server.collision_ready = false;
++        CHECK(!p->AdvanceFlight(.01) && p->failed && g.server.projectile_reports.size() == 1);
++        CHECK(g.objects.finish_frame() && !g.objects.get(h));
++        g.server.collision_ready = true;
++        p = test_assault::grenade(g, {300, 100, 300});
++        CHECK(p && !p->AdvanceFlight(.6));
++        CHECK(g.objects.finish_frame());
++        // Remove the projectile in the hit actor callback: no later substep or duplicate callback.
++        auto* c = victim(g, {300, 100, 330});
++        CHECK(c);
++        p = test_assault::grenade(g, {300, 100, 300}, {0, 0, 1}, 1000);
++        CHECK(p);
++        h = p->m_hObject;
++        c->remove_on_touch = h;
++        CHECK(p->AdvanceFlight(.2) && c->touches == 1 && g.objects.finish_frame() && !g.objects.get(h));
++        CHECK(g.unload_world() && g.objects.snapshot().empty());
++        return true;
++    }
++} // namespace
++bool drop(const std::filesystem::path& root)
++{
++    GameSession g;
++    CHECK(test_assault::setup(g, root));
++    ObjectCreateStruct state;
++    state.m_ObjectType = OT_MODEL;
++    state.m_Pos = {300, 100, 300};
++    SAFE_STRCPY(state.m_Filename, "Models/Characters/Caleb.abc");
++    auto h = g.objects.create(g.objects.find_class("CBaseCharacter"), state);
++    auto* c = dynamic_cast<CBaseCharacter*>(g.server.HandleToObject(h));
++    CHECK(c);
++    auto& inv = c->m_InventoryMgr;
++    CHECK(inv.Init(h, nullptr) && inv.ObtainWeapon(9, 1) == InventoryResult::Ok &&
++          inv.ChangeWeaponSlot(1) == InventoryResult::Ok);
++    CHECK(inv.CurrentWeapon()->ShowHandModel(true));
++    const auto hand = inv.CurrentWeapon()->m_hHandModel;
++    CHECK(inv.DropCurrentWeapon() == InventoryResult::Ok && g.objects.get(hand) &&
++          g.objects.get(hand)->attachment == 0);
++    CHECK(g.objects.remove(h) && g.objects.finish_frame() && g.objects.get(hand));
++    HOBJECT pickup = nullptr;
++    for (unsigned i = 0; i < 400 && !pickup; ++i)
++    {
++        CHECK(g.step(.01));
++        for (auto id : g.objects.snapshot())
++            if (dynamic_cast<AssaultRiflePU*>(g.server.HandleToObject(g.objects.get(id)->handle)))
++                pickup = g.objects.get(id)->handle;
++    }
++    CHECK(pickup && !g.objects.get(hand));
++    auto* p = dynamic_cast<AssaultRiflePU*>(g.server.HandleToObject(pickup));
++    CHECK(p->value.amount == 50 && g.server.spawn_reports.back().request == "AssaultRiflePU");
++    CHECK(g.unload_world());
++    return true;
++}
++bool ai(const std::filesystem::path& root)
++{
++    GameSession g;
++    CHECK(g.initialize());
++    Config cfg;
++    cfg.data_dir = root;
++    std::string error;
++    CHECK(g.resources.mount_game(cfg, error));
++    auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
++    for (auto& surface : floor.surfaces)
++        surface.flags = 1;
++    CHECK(g.collision.build(floor, error));
++    g.server.collision_ready = true;
++    g.world_path = "synthetic M16 NPC arena with original resources";
++    g.state = SessionState::Inspection;
++    CHECK(g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
++                           {{"Name", std::string("START")}, {"Pos", DVector{0, 100, 200}}}));
++    auto h = g.objects.create(g.objects.find_class("CultistAI"), {}, Creation::World,
++                              {{"Pos", DVector{0, 100, 0}}, {"AIWeapon1", std::string("ASSAULTRIFLE")}});
++    auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(h));
++    CHECK(a && a->RuntimeReady());
++    g.server_shell.PreStartWorld();
++    CHECK(g.server_shell.PostStartWorld() && g.enter_player(error));
++    auto* player = g.server_shell.Player(g.local_client);
++    // The installed Cultist has no original rifle/autorifle clip. Exercise the
++    // weapon service independently, then verify autonomous use fails explicitly.
++    CHECK(a->SetTarget(g.server.GetObjectName(player->m_hObject)));
++    auto* w = a->m_InventoryMgr.CurrentWeapon();
++    CHECK(w && w->data.m_nType == 9);
++    for (unsigned i = 0; i < 10; ++i)
++        CHECK(a->Fire(false));
++    CHECK(a->fire_shots > 0 && player->m_damage.m_fHitPoints < 100 && w->sounds_played == w->shots &&
++          !w->sound_failures);
++    const auto before = a->fire_shots;
++    for (unsigned tick = 0; tick < 120; ++tick)
++        CHECK(g.step(1.0 / 60));
++    std::cout << "M16 direct AI fire=" << before << " autonomous additional=" << a->fire_shots - before
++              << " error=" << a->runtime_error << '\n';
++    CHECK(a->runtime_failed && a->runtime_error.find("animation model/clip unavailable") != std::string::npos &&
++          a->fire_shots == before);
++    CHECK(g.server.GetAnimIndex(h, "fire_stand_rifle") == UINT32_MAX &&
++          g.server.GetAnimIndex(h, "fire_stand_autorifle") == UINT32_MAX);
++    CHECK(g.unload_world() && AI_Mgr::m_dwNumCabal == 0 && g.objects.attachments().empty());
++    return true;
++}
++
++bool collect(const std::filesystem::path& root)
++{
++    GameSession g;
++    CHECK(test_assault::setup(g, root));
++    auto& inv = g.server_shell.Player(g.local_client)->m_InventoryMgr;
++    inv.SetAmmoCount(1, 0);
++    inv.SetAmmoCount(5, 0);
++    auto h = SpawnWeaponPickup(9, g.client_shell.player, {300, 100, 300}, {}, true);
++    auto* p = dynamic_cast<AssaultRiflePU*>(g.server.HandleToObject(h));
++    CHECK(p && p->value.amount == 50 && p->resource_id == 353 && g.objects.get(h)->model);
++    CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player) && p->picked_up);
++    CHECK(inv.GetAmmoCount(1) == 50 && inv.GetAmmoCount(5) == 0 && g.objects.finish_frame() && !g.objects.get(h));
++    CHECK(inv.GetWeapon(2) && !inv.GetWeapon(2, true));
++    inv.SetAmmoCount(1, inv.MaxAmmo(1));
++    h = SpawnWeaponPickup(9, g.client_shell.player, {300, 100, 300}, {}, true);
++    p = dynamic_cast<AssaultRiflePU*>(g.server.HandleToObject(h));
++    CHECK(p && g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player) && !p->picked_up);
++    inv.SetAmmoCount(1, inv.MaxAmmo(1) - 1);
++    CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player) && p->picked_up &&
++          inv.GetAmmoCount(1) == inv.MaxAmmo(1));
++    CHECK(g.objects.finish_frame());
++    h = SpawnWeaponPickup(9, g.client_shell.player, {300, 100, 300}, {}, false);
++    p = dynamic_cast<AssaultRiflePU*>(g.server.HandleToObject(h));
++    CHECK(p && p->value.amount == 0 && g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player) &&
++          !p->picked_up);
++    auto message = g.server.StartMessageToObject(g.server.HandleToObject(h), g.client_shell.player, add_weapon_message);
++    CHECK(message && g.server.WritePickupMessage(message, {PickupKind::Weapon, 4, 12}) == DE_INVALIDPARAMS);
++    g.server.EndMessage(message);
++    CHECK(g.server.pickup_reports.size() == 2 && !g.server.message_count());
++    CHECK(g.unload_world() && !g.server.string_count());
++    return true;
++}
++bool restore(const std::filesystem::path& root)
++{
++    GameSession g;
++    CHECK(test_assault::setup(g, root) && test_assault::equip(g));
++    auto& inv = g.server_shell.Player(g.local_client)->m_InventoryMgr;
++    inv.SetAmmoCount(1, 73);
++    inv.SetAmmoCount(5, 17);
++    InventoryState snapshot;
++    std::string error;
++    CHECK(inv.Save(snapshot, error) && snapshot.right[2] == 9 && !snapshot.left[2]);
++    auto h = g.objects.create(g.objects.find_class("CPlayerObj"));
++    auto* p = dynamic_cast<CPlayerObj*>(g.server.HandleToObject(h));
++    CHECK(p);
++    CHECK(p->m_InventoryMgr.Load(snapshot, InventoryLoadType::KeepAlive, error));
++    auto& restored = p->m_InventoryMgr;
++    CHECK(restored.CurrentWeapon()->data.m_nType == 9 && restored.CurrentWeapon()->m_pInventoryMgr == &restored &&
++          restored.GetAmmoCount(1) == 73 && restored.GetAmmoCount(5) == 17 && !restored.CurrentWeapon(true));
++    snapshot.left[2] = 9;
++    CHECK(!restored.Load(snapshot, InventoryLoadType::KeepAlive, error) && restored.CurrentWeapon()->data.m_nType == 9);
++    CHECK(g.unload_world());
++    return true;
++}
++bool private_game(const std::filesystem::path& root)
++{
++    GameSession g;
++    CHECK(g.initialize());
++    Config cfg;
++    cfg.data_dir = root;
++    std::string error;
++    CHECK(g.resources.mount_game(cfg, error));
++    for (unsigned cycle = 0; cycle < 2; ++cycle)
++    {
++        CHECK(g.request_world("02_cityhub", error));
++        unsigned created = 0, unknown = 0, failed = 0, assault = 0;
++        for (std::size_t i = 0; i < g.entries.size(); ++i)
++        {
++            const auto& e = g.entries[i];
++            created += e.state == EntryState::Created;
++            unknown += e.state == EntryState::Unsupported;
++            failed += e.state == EntryState::Failed;
++            if (g.world.objects[i].class_name == "AssaultRiflePU")
++            {
++                ++assault;
++                CHECK(e.state == EntryState::Created);
++            }
++        }
++        std::cout << "CityHub M16=" << assault << " created=" << created << " unknown=" << unknown
++                  << " failed=" << failed << '\n';
++        CHECK(assault == 1 && created == 433 && unknown == 20 && failed == 1);
++        CHECK(g.unload_world());
++        // Labelled arena uses actual private models/audio, with controlled geometry.
++        auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
++        for (auto& surf : floor.surfaces)
++            surf.flags = 1;
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        g.world_path = "synthetic M16 private-asset arena";
++        g.state = SessionState::Inspection;
++        CHECK(g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
++                               {{"Name", std::string("START")}, {"Pos", DVector{0, 100, 0}}}));
++        g.server_shell.PreStartWorld();
++        CHECK(g.server_shell.PostStartWorld() && g.enter_player(error));
++        CHECK(test_assault::equip(g) && test_assault::fire_modes(g));
++        auto* p = test_assault::grenade(g, {300, 100, 300});
++        CHECK(p && g.objects.get(p->m_hObject)->model);
++        const auto h = p->m_hObject;
++        for (unsigned i = 0; i < 320 && g.objects.get(h); ++i)
++            CHECK(g.step(.01));
++        CHECK(!g.objects.get(h) && g.server.projectile_reports.back().outcome == "exploded");
++        CHECK(g.unload_world() && g.server.audio.voices().empty() && g.objects.attachments().empty());
++    }
++    return true;
++}
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{{"key_bounds", key_bounds},
++                                                                                         {"modes", modes},
++                                                                                         {"damage", damage},
++                                                                                         {"motion", motion},
++                                                                                         {"bounce", bounce},
++                                                                                         {"contacts", contacts},
++                                                                                         {"rules", rules},
++                                                                                         {"lifetime", lifetime},
++                                                                                         {"failure", failure},
++                                                                                         {"drop", drop},
++                                                                                         {"collect", collect},
++                                                                                         {"restore", restore},
++                                                                                         {"ai", ai},
++                                                                                         {"private", private_game}};
++    auto it = cases.find(argv[1]);
++    return it != cases.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/audio_stream_tests.cpp b/tests/audio_stream_tests.cpp
+index ce62821..82eb9b4 100644
+--- a/tests/audio_stream_tests.cpp
++++ b/tests/audio_stream_tests.cpp
+@@ -295,7 +295,7 @@ namespace
+             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
+                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
+                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
+-            CHECK(created == 432 && transferred == 31 && unknown == 21 && failed == 1 && fx == 5 && fx_voices == 4);
++            CHECK(created == 433 && transferred == 31 && unknown == 20 && failed == 1 && fx == 5 && fx_voices == 4);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_bytes());
+         }
+diff --git a/tests/compound_shell_tests.cpp b/tests/compound_shell_tests.cpp
+index a3da3bc..b444d96 100644
+--- a/tests/compound_shell_tests.cpp
++++ b/tests/compound_shell_tests.cpp
+@@ -229,7 +229,7 @@ namespace
+             }
+             std::cout << "CityHub: " << created << " created / " << transferred << " sounds / " << unknown
+                       << " unsupported / " << failed << " failed\n";
+-            CHECK(created == 432 && transferred == 31 && unknown == 21 && failed == 1);
++            CHECK(created == 433 && transferred == 31 && unknown == 20 && failed == 1);
+             WorldMesh mesh;
+             CHECK(mesh.build(g.world, error, &g.resources));
+             if (gpu)
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+index 238026f..e6cfc1c 100644
+--- a/tests/destructable_model_tests.cpp
++++ b/tests/destructable_model_tests.cpp
+@@ -313,7 +313,7 @@ namespace
+             std::cout << "CityHub model initialization: " << count << " models / " << pushable << " pushable / "
+                       << gravity << " gravity / " << ground_misses << " ground misses\n";
+             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
+-            CHECK(created == 432 && unknown == 21 && failed == 1);
++            CHECK(created == 433 && unknown == 20 && failed == 1);
+             CHECK(update_model_scene(g, scene, error));
+             unsigned skin_failures = 0, triangles = 0;
+             for (auto id : ids)
+diff --git a/tests/flare_tests.cpp b/tests/flare_tests.cpp
+index e991b7f..2801623 100644
+--- a/tests/flare_tests.cpp
++++ b/tests/flare_tests.cpp
+@@ -413,7 +413,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unsupported=" << unknown << " failed=" << failed
+                   << " flare NPCs=" << flare << '\n';
+-        CHECK(created == 432 && unknown == 21 && failed == 1 && flare == 1);
++        CHECK(created == 433 && unknown == 20 && failed == 1 && flare == 1);
+         CHECK(g.unload_world());
+         return true;
+     }
+diff --git a/tests/mac10_tests.cpp b/tests/mac10_tests.cpp
+index 348f842..c951a7f 100644
+--- a/tests/mac10_tests.cpp
++++ b/tests/mac10_tests.cpp
+@@ -263,7 +263,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unknown=" << unknown << " failed=" << failed << " Mac10=" << mac
+                   << '\n';
+-        CHECK(mac == 1 && created == 432 && unknown == 21 && failed == 1);
++        CHECK(mac == 1 && created == 433 && unknown == 20 && failed == 1);
+         for (auto id : g.objects.snapshot())
+             if (auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(g.objects.get(id)->handle));
+                 a && a->runtime_failed)
+diff --git a/tests/pickup_tests.cpp b/tests/pickup_tests.cpp
+index 2ab0c06..be2d394 100644
+--- a/tests/pickup_tests.cpp
++++ b/tests/pickup_tests.cpp
+@@ -396,6 +396,13 @@ namespace
+                               gun->value.amount == 8 && gun->resource_id == IDS_WEAPON_FLAREGUN);
+                         std::cout << "Authored FlareGunPU: " << path << '\n';
+                     }
++                    if (source.class_name == "AssaultRiflePU")
++                    {
++                        auto* gun = dynamic_cast<PickupObject*>(g.objects.get(h)->game.get());
++                        CHECK(gun && gun->value.kind == PickupKind::Weapon && gun->value.type == WEAP_ASSAULTRIFLE &&
++                              gun->value.amount == 50 && gun->resource_id == IDS_WEAPON_M16);
++                        std::cout << "Authored AssaultRiflePU: " << path << '\n';
++                    }
+                     missing += !g.objects.get(h)->model;
+                 }
+                 CHECK(g.objects.clear() && AmmoPickup::m_dwNumPickups == 0);
+@@ -426,8 +433,9 @@ namespace
+             CHECK(reason.ends_with("invalid property TypeAction"));
+             rejected += n;
+         }
+-        CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2);
+-        CHECK(worlds == 57 && created == 1265 && missing == 0 && rejected == 176 && spawns == 60);
++        CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2 &&
++              counts["AssaultRiflePU"] == 5);
++        CHECK(worlds == 57 && created == 1270 && missing == 0 && rejected == 176 && spawns == 60);
+         return true;
+     }
+ } // namespace
+diff --git a/tests/world_debris_tests.cpp b/tests/world_debris_tests.cpp
+index 004f705..7cd0c2f 100644
+--- a/tests/world_debris_tests.cpp
++++ b/tests/world_debris_tests.cpp
+@@ -246,7 +246,7 @@ namespace
+                 failed += e.state == EntryState::Failed;
+             }
+             std::cout << "Created=" << created << " unsupported=" << unknown << " failed=" << failed << '\n';
+-            CHECK(created == 432 && unknown == 21 && failed == 1);
++            CHECK(created == 433 && unknown == 20 && failed == 1);
+             // Exercise original destruction/name activation, not direct fragment creation.
+             auto* list = g.server.FindNamedObjects("billboard");
+             CHECK(list && list->m_pFirstLink);
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index f6fd9c9..869f013 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -923,8 +923,8 @@ namespace
+                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
+                 else
+                 {
+-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 464 && d.editor_only == 541 &&
+-                          d.unknown == 21 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
++                    CHECK(d.entries.size() == 1026 && d.schema_checked == 465 && d.editor_only == 541 &&
++                          d.unknown == 20 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                     for (const auto& e : d.entries)
+                         if (e.state == DestinationEntryState::InvalidProperties)
+                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+@@ -1168,7 +1168,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 432 && d.unknown == 21 && d.failed == 1);
++                        CHECK(d.created == 433 && d.unknown == 20 && d.failed == 1);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

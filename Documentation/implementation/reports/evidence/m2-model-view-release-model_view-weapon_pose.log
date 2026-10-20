@@ -1,0 +1,14 @@
+346/350 Testing: model_view.weapon_pose
+346/350 Test: model_view.weapon_pose
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/model_view_tests" "weapon_pose"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"model_view.weapon_pose" start time: Oct 16 10:00 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"model_view.weapon_pose" end time: Oct 16 10:00 CEST
+"model_view.weapon_pose" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,181 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 952: coverage.private
+      Start 954: train_session.private_60
+ 1/81 Test #952: coverage.private ..................   Passed   14.89 sec
+      Start 953: train_session.private_30
+ 2/81 Test #954: train_session.private_60 ..........   Passed   28.15 sec
+      Start 283: randomsound.catalog
+ 3/81 Test #283: randomsound.catalog ...............   Passed    4.23 sec
+      Start  50: world.level_change_private
+ 4/81 Test #953: train_session.private_30 ..........   Passed   23.72 sec
+      Start 795: audio_stream.city
+ 5/81 Test  #50: world.level_change_private ........   Passed    6.36 sec
+      Start 986: music_assets.private
+ 6/81 Test #795: audio_stream.city .................   Passed    2.04 sec
+      Start 989: dls_bank.private
+ 7/81 Test #986: music_assets.private ..............   Passed    2.67 sec
+      Start 292: sound.catalog
+ 8/81 Test #989: dls_bank.private ..................   Passed    1.44 sec
+      Start  12: objects.message_churn
+ 9/81 Test  #12: objects.message_churn .............   Passed    1.71 sec
+      Start 284: randomsound.subway
+10/81 Test #284: randomsound.subway ................   Passed    1.24 sec
+      Start  51: world.destination_trial_private
+11/81 Test #292: sound.catalog .....................   Passed    4.47 sec
+      Start 950: coverage.catalog
+12/81 Test #950: coverage.catalog ..................   Passed    0.65 sec
+      Start  52: world.destination_private
+13/81 Test  #52: world.destination_private .........   Passed    3.16 sec
+      Start  33: world.surface_effects
+14/81 Test  #33: world.surface_effects .............   Passed    0.39 sec
+      Start 293: sound.subway
+15/81 Test #293: sound.subway ......................   Passed    1.22 sec
+      Start 993: dls_sampler.private
+16/81 Test  #51: world.destination_trial_private ...   Passed    6.35 sec
+      Start 793: audio_stream.seams
+17/81 Test #793: audio_stream.seams ................   Passed    0.10 sec
+      Start  53: world.private
+18/81 Test #993: dls_sampler.private ...............   Passed    0.61 sec
+      Start  13: objects.message_limit
+19/81 Test  #13: objects.message_limit .............   Passed    0.11 sec
+      Start  46: world.mutations
+20/81 Test  #46: world.mutations ...................   Passed    0.07 sec
+      Start  32: world.level_change
+21/81 Test  #32: world.level_change ................   Passed    0.08 sec
+      Start  34: world.destination_trials
+22/81 Test  #34: world.destination_trials ..........   Passed    0.05 sec
+      Start 792: audio_stream.mixer
+23/81 Test #792: audio_stream.mixer ................   Passed    0.02 sec
+      Start 992: dls_sampler.lifetime
+24/81 Test #992: dls_sampler.lifetime ..............   Passed    0.10 sec
+      Start 790: audio_stream.pcm
+25/81 Test #790: audio_stream.pcm ..................   Passed    0.01 sec
+      Start  37: world.destination_lifetime
+26/81 Test  #37: world.destination_lifetime ........   Passed    0.02 sec
+      Start  45: world.world_rejection
+27/81 Test  #45: world.world_rejection .............   Passed    0.01 sec
+      Start 279: randomsound.random
+28/81 Test #279: randomsound.random ................   Passed    0.01 sec
+      Start  39: world.sound_entries
+29/81 Test  #39: world.sound_entries ...............   Passed    0.01 sec
+      Start  38: world.sprite_entries
+30/81 Test  #38: world.sprite_entries ..............   Passed    0.01 sec
+      Start 281: randomsound.lifetime
+31/81 Test #281: randomsound.lifetime ..............   Passed    0.01 sec
+      Start 794: audio_stream.truncation
+32/81 Test #794: audio_stream.truncation ...........   Passed    0.01 sec
+      Start 276: randomsound.defaults
+33/81 Test #276: randomsound.defaults ..............   Passed    0.01 sec
+      Start 985: music_assets.catalog
+34/81 Test #985: music_assets.catalog ..............   Passed    0.02 sec
+      Start 282: randomsound.failures
+35/81 Test #282: randomsound.failures ..............   Passed    0.01 sec
+      Start 278: randomsound.sequence
+36/81 Test #278: randomsound.sequence ..............   Passed    0.01 sec
+      Start 280: randomsound.spatial
+37/81 Test #280: randomsound.spatial ...............   Passed    0.01 sec
+      Start 791: audio_stream.malformed
+38/81 Test #791: audio_stream.malformed ............   Passed    0.01 sec
+      Start 983: music_assets.reader
+39/81 Test #983: music_assets.reader ...............   Passed    0.02 sec
+      Start 277: randomsound.commands
+40/81 Test #277: randomsound.commands ..............   Passed    0.01 sec
+      Start 991: dls_sampler.envelopes
+41/81 Test #991: dls_sampler.envelopes .............   Passed    0.01 sec
+      Start  47: world.session_lifecycle
+42/81 Test  #47: world.session_lifecycle ...........   Passed    0.00 sec
+      Start 988: dls_bank.malformed
+43/81 Test #988: dls_bank.malformed ................   Passed    0.01 sec
+      Start  36: world.destination_schema
+44/81 Test  #36: world.destination_schema ..........   Passed    0.00 sec
+      Start  22: config.invalid_config
+45/81 Test  #22: config.invalid_config .............   Passed    0.00 sec
+      Start  35: world.destination_messages
+46/81 Test  #35: world.destination_messages ........   Passed    0.00 sec
+      Start 951: coverage.observations
+47/81 Test #951: coverage.observations .............   Passed    0.00 sec
+      Start 287: sound.loops
+48/81 Test #287: sound.loops .......................   Passed    0.01 sec
+      Start  49: world.original_trigger
+49/81 Test  #49: world.original_trigger ............   Passed    0.00 sec
+      Start  42: world.resource_mount
+50/81 Test  #42: world.resource_mount ..............   Passed    0.00 sec
+      Start  44: world.world_geometry
+51/81 Test  #44: world.world_geometry ..............   Passed    0.00 sec
+      Start  43: world.world_properties
+52/81 Test  #43: world.world_properties ............   Passed    0.00 sec
+      Start  40: world.rez_structure
+53/81 Test  #40: world.rez_structure ...............   Passed    0.00 sec
+      Start  41: world.rez_rejection
+54/81 Test  #41: world.rez_rejection ...............   Passed    0.00 sec
+      Start  48: world.session_messages
+55/81 Test  #48: world.session_messages ............   Passed    0.00 sec
+      Start  20: config.precedence
+56/81 Test  #20: config.precedence .................   Passed    0.00 sec
+      Start  23: config.content_validation
+57/81 Test  #23: config.content_validation .........   Passed    0.00 sec
+      Start  24: config.case_lookup
+58/81 Test  #24: config.case_lookup ................   Passed    0.00 sec
+      Start  19: config.arguments
+59/81 Test  #19: config.arguments ..................   Passed    0.00 sec
+      Start 291: sound.metadata
+60/81 Test #291: sound.metadata ....................   Passed    0.01 sec
+      Start 286: sound.defaults
+61/81 Test #286: sound.defaults ....................   Passed    0.01 sec
+      Start 290: sound.failures
+62/81 Test #290: sound.failures ....................   Passed    0.01 sec
+      Start  21: config.relative_paths
+63/81 Test  #21: config.relative_paths .............   Passed    0.00 sec
+      Start 289: sound.lifetime
+64/81 Test #289: sound.lifetime ....................   Passed    0.01 sec
+      Start 288: sound.resampling
+65/81 Test #288: sound.resampling ..................   Passed    0.01 sec
+      Start 987: dls_bank.decode
+66/81 Test #987: dls_bank.decode ...................   Passed    0.00 sec
+      Start 984: music_assets.plan
+67/81 Test #984: music_assets.plan .................   Passed    0.00 sec
+      Start  14: objects.unsupported_teardown
+68/81 Test  #14: objects.unsupported_teardown ......   Passed    0.01 sec
+      Start 990: dls_sampler.pcm
+69/81 Test #990: dls_sampler.pcm ...................   Passed    0.00 sec
+      Start   2: objects.builtin_model
+70/81 Test   #2: objects.builtin_model .............   Passed    0.00 sec
+      Start  15: objects.creation_failures
+71/81 Test  #15: objects.creation_failures .........   Passed    0.01 sec
+      Start  11: objects.messages_strings
+72/81 Test  #11: objects.messages_strings ..........   Passed    0.01 sec
+      Start   5: objects.reasons_properties
+73/81 Test   #5: objects.reasons_properties ........   Passed    0.00 sec
+      Start   3: objects.original_objects
+74/81 Test   #3: objects.original_objects ..........   Passed    0.00 sec
+      Start  10: objects.links_lists
+75/81 Test  #10: objects.links_lists ...............   Passed    0.00 sec
+      Start   7: objects.deferred_removal
+76/81 Test   #7: objects.deferred_removal ..........   Passed    0.00 sec
+      Start   6: objects.scheduling
+77/81 Test   #6: objects.scheduling ................   Passed    0.00 sec
+      Start   9: objects.handles_selection
+78/81 Test   #9: objects.handles_selection .........   Passed    0.00 sec
+      Start   4: objects.nested_creation
+79/81 Test   #4: objects.nested_creation ...........   Passed    0.00 sec
+      Start   8: objects.aggregate_dispatch
+80/81 Test   #8: objects.aggregate_dispatch ........   Passed    0.00 sec
+81/81 Test  #53: world.private .....................   Passed    1.34 sec
+
+100% tests passed, 0 tests failed out of 81
+
+Label Time Summary:
+audio            =   0.73 sec*proc (4 tests)
+audio_stream     =   2.19 sec*proc (6 tests)
+config           =   0.01 sec*proc (6 tests)
+headless         = 105.51 sec*proc (81 tests)
+music_assets     =   4.89 sec*proc (11 tests)
+objects          =   1.87 sec*proc (14 tests)
+private          = 101.90 sec*proc (15 tests)
+randomsound      =   5.53 sec*proc (9 tests)
+services         =  15.55 sec*proc (3 tests)
+sound            =   5.73 sec*proc (8 tests)
+train_session    =  51.87 sec*proc (2 tests)
+world            =  17.87 sec*proc (22 tests)
+
+Total Test time (real) =  52.86 sec

@@ -1,0 +1,9 @@
+worlds=57 controllers=94 source_keys=383 copied=375 empty_paths=0 missing_targets=44 malformed=0
+TRAIN flags=8413449 dynamic=0 dims=112,136,656 pos=-32,168,4912
+KEY 0 -32,168,4912 rot=0,0,0,1
+KEY 3 -32,168,2864 rot=0,0,0,1
+KEY 5 -32,168,3376 rot=0,0,0,1
+TRAIN flags=8413449 dynamic=0 dims=112,136,656 pos=-32,168,4912
+KEY 0 -32,168,4912 rot=0,0,0,1
+KEY 3 -32,168,2864 rot=0,0,0,1
+KEY 5 -32,168,3376 rot=0,0,0,1

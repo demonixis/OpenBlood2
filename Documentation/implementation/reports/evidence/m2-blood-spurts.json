@@ -1,0 +1,482 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "933a422252e4a9eb39c23aa6267535171c173670",
+  "m2_complete": false,
+  "validation": {
+    "debug": {
+      "passed": 65,
+      "failed": 0,
+      "private": 17,
+      "seconds": 38.52
+    },
+    "release": {
+      "passed": 65,
+      "failed": 0,
+      "private": 17,
+      "seconds": 5.33
+    },
+    "sanitize": {
+      "passed": 65,
+      "failed": 0,
+      "private": 17,
+      "seconds": 194.84
+    },
+    "debug-gpu": {
+      "passed": 8,
+      "failed": 0,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "seconds": 51.67
+    },
+    "release-gpu": {
+      "passed": 8,
+      "failed": 0,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "seconds": 10.58
+    }
+  },
+  "artifacts": [
+    {
+      "file": "m2-blood-spurts-build-debug-combat.log",
+      "sha256": "b7e721fd96ec5e6993c49cfbf1bac4220013f308d93784c3e828e753e75a7a32",
+      "raw_capture_sha256": "76df44b493df1b7a2508cae55a27ed07083ad1a69f6712bda8a2ba82c71a7c45",
+      "bytes": 693
+    },
+    {
+      "file": "m2-blood-spurts-build-debug-isolated.log",
+      "sha256": "fedcd6db457d61f625c249fd7314b073dfd9b317daccd6716f966cd3665d7c19",
+      "raw_capture_sha256": "866b5161d4e0b089728b9a72157f188fce416d472954d1eb63314e021a0eb070",
+      "bytes": 26949
+    },
+    {
+      "file": "m2-blood-spurts-build-debug-ready.log",
+      "sha256": "54a63ebd0b22b9dea210934d8ee1b8bcf9d5fa6d9071d0c4288ce8c099b28590",
+      "raw_capture_sha256": "47ad102f403b4913361a17f3c987f01f591eed9975baefeca5cba8510852a3c2",
+      "bytes": 10242
+    },
+    {
+      "file": "m2-blood-spurts-build-debug-tests.log",
+      "sha256": "85dc6f77e5503c9a4037ab91c41c2d0cba5fd55508c86cf155ffd47dadac0b36",
+      "raw_capture_sha256": "dc0a0ef262ee3ab96da8b0ebc735902531dc0c8e4194f71ab249efbf7e1b61e8",
+      "bytes": 345
+    },
+    {
+      "file": "m2-blood-spurts-build-debug.log",
+      "sha256": "85108b534b33e15a173886aa8caa8b706378715c019a7413652e8b3717120deb",
+      "raw_capture_sha256": "2b4f86af6684e3cdc5cd8cd66323e6143228868ac60ea67e93f10f7a68312165",
+      "bytes": 44530
+    },
+    {
+      "file": "m2-blood-spurts-build-release-combat.log",
+      "sha256": "65c4b7dd5e91d008bfc28d0a1646581cff2e77c807d9022aaf4c2c1c81493611",
+      "raw_capture_sha256": "e7b2e73a5f1cefe137578f9f3915ac8c608036c3457755d11be813e3834aa76d",
+      "bytes": 691
+    },
+    {
+      "file": "m2-blood-spurts-build-release-isolated.log",
+      "sha256": "e2b01c8923e8aff7e3ae7c4040e4015c8238f5b06737436a359c7826bd9f868c",
+      "raw_capture_sha256": "8dfd3783404b77b6bbdd3686d81e4ecab4bc26fdf5892c2d78e8f0777deafd0c",
+      "bytes": 24612
+    },
+    {
+      "file": "m2-blood-spurts-build-release-ready.log",
+      "sha256": "db6369cc8d58acf357b67625d474f4e00cfb239d29568cd175516d8a54a74f33",
+      "raw_capture_sha256": "76e57d28667da8bb4cab56c0d4de2d49c7d9adf7a53c44b583d5cb6681ec6d02",
+      "bytes": 10279
+    },
+    {
+      "file": "m2-blood-spurts-build-release-tests.log",
+      "sha256": "85dc6f77e5503c9a4037ab91c41c2d0cba5fd55508c86cf155ffd47dadac0b36",
+      "raw_capture_sha256": "dc0a0ef262ee3ab96da8b0ebc735902531dc0c8e4194f71ab249efbf7e1b61e8",
+      "bytes": 345
+    },
+    {
+      "file": "m2-blood-spurts-build-release.log",
+      "sha256": "ed73e4c8575055834edc5e53dcdb08e044c6e84bf841f38d65d21832fca81881",
+      "raw_capture_sha256": "207f3cd3bd460d56fc6573669800f71ee05b04479e51c6384f10c0aaeea77ce7",
+      "bytes": 49982
+    },
+    {
+      "file": "m2-blood-spurts-build-sanitize-combat.log",
+      "sha256": "4ca32c053bdce8d2de41bf073250b7e99b73fb807bd8d0b7d04286118481e822",
+      "raw_capture_sha256": "eccc283104e0f42b20ce7d1d69058153055f637415fedff68d9503f218b80266",
+      "bytes": 365
+    },
+    {
+      "file": "m2-blood-spurts-build-sanitize-final.log",
+      "sha256": "1ff15f1acfba754e69dfcee58e2d967daf2741f6d671f8253c67eb479a0d3c76",
+      "raw_capture_sha256": "f5188b7cca017afbd5b9d51231b21995b48f78ba4ea8f360a21d5dfa8a07a5ae",
+      "bytes": 2542
+    },
+    {
+      "file": "m2-blood-spurts-build-sanitize-isolated.log",
+      "sha256": "4f4a3dfa4c8476a54878af9586211c88a744d5ef92ac5e7f55ca5ea23a20f106",
+      "raw_capture_sha256": "125e575b91fe8a70364b383aa3b7936a3ca5be439189fd6bfc885f16e16559ff",
+      "bytes": 22308
+    },
+    {
+      "file": "m2-blood-spurts-build-sanitize-ready.log",
+      "sha256": "46a1b17c18764f6a4107d7b299202f71841436491833767feccc7e296d0ef422",
+      "raw_capture_sha256": "7ef39193a82c860f8ad0e7d30d6f5c2bb12e428d6a9bed3bb28af63c06328e47",
+      "bytes": 9134
+    },
+    {
+      "file": "m2-blood-spurts-build-sanitize-tests.log",
+      "sha256": "85dc6f77e5503c9a4037ab91c41c2d0cba5fd55508c86cf155ffd47dadac0b36",
+      "raw_capture_sha256": "dc0a0ef262ee3ab96da8b0ebc735902531dc0c8e4194f71ab249efbf7e1b61e8",
+      "bytes": 345
+    },
+    {
+      "file": "m2-blood-spurts-build-sanitize.log",
+      "sha256": "35b8234c10b892a925055e12df0fa2a170d91cd1decbe946c41f68c8aedc9680",
+      "raw_capture_sha256": "b55824f22c1391fb8ee76100c95afb2ad9e0d81a8d27883c50dc589abd812bdc",
+      "bytes": 48087
+    },
+    {
+      "file": "m2-blood-spurts-combat-diagnostic-build.log",
+      "sha256": "4ca32c053bdce8d2de41bf073250b7e99b73fb807bd8d0b7d04286118481e822",
+      "raw_capture_sha256": "eccc283104e0f42b20ce7d1d69058153055f637415fedff68d9503f218b80266",
+      "bytes": 365
+    },
+    {
+      "file": "m2-blood-spurts-combat-diagnostic.log",
+      "sha256": "9cc482b620f148d3641a8e06134f0b68e913f21b04c015eb300a1edbcb11adcd",
+      "raw_capture_sha256": "bb9a09cd1f0a8b13e70e9d96c3353073396b204e0c2c15999cfb69e0e26ccac7",
+      "bytes": 2276
+    },
+    {
+      "file": "m2-blood-spurts-debug-combat.log",
+      "sha256": "54613f93d17806aba9a816577524e7d0e8b5c60457d9972fadcb06fede6d47a5",
+      "raw_capture_sha256": "a54d72f9d5ef3a7887e62afb3aa899272109b856847304d72e0c1adbfc14ae88",
+      "bytes": 4667
+    },
+    {
+      "file": "m2-blood-spurts-debug-final-gpu.log",
+      "sha256": "631ba5c4abfde28c4e8f89761958b81840dc5affc85bc009598dc8eadbc8ba84",
+      "raw_capture_sha256": "e9c20b1b606052f5a3fd65d1ea1118a736feeb8e066b541c22c9a606bc627bc4",
+      "bytes": 4394
+    },
+    {
+      "file": "m2-blood-spurts-debug-final-headless.log",
+      "sha256": "9e7a5390ff11e4072b3f6fa1632842c286156165fbf33383427351e6defc5591",
+      "raw_capture_sha256": "9b597f9b068a512e4aab6e451c1e9abdf0b95d672cdcd3f075f1d84fc83d49ae",
+      "bytes": 37522
+    },
+    {
+      "file": "m2-blood-spurts-debug-gpu.log",
+      "sha256": "688546cb30a4714fbdf142e8412bba430954fb6f75943ab45400cb0552dc15e5",
+      "raw_capture_sha256": "aad7a9c1648087be754e2284c2aa7a02bd12d0c562a92a02c6c8d22fd4bd904c",
+      "bytes": 6110
+    },
+    {
+      "file": "m2-blood-spurts-debug-headless.log",
+      "sha256": "54fcb1e3e0ff804bbc6b26dc94ce865e654857bffc0fbcf72079b972a6a80aef",
+      "raw_capture_sha256": "61a84409e1bf39b09dc8dcf766693cd92ae076fbec4d14d5d89a4ed29c8dc685",
+      "bytes": 32205
+    },
+    {
+      "file": "m2-blood-spurts-debug-verified-gpu.log",
+      "sha256": "211b05a1b1de31107101506f6868ec82c53f14b8d809625b229455e8500a52e6",
+      "raw_capture_sha256": "117072667766b861a6df1f922364b8ea5691674079bae4c3deb90588be051d77",
+      "bytes": 9294
+    },
+    {
+      "file": "m2-blood-spurts-first-tests.log",
+      "sha256": "ea910fe2bae0ffcb88a62fd04d44c78ee400bae4ed540b3bee94e1f734b59203",
+      "raw_capture_sha256": "34072447ddbf7ad8d28605def11814000e30d40f77d366f172ae6ef563ed48fa",
+      "bytes": 2918
+    },
+    {
+      "file": "m2-blood-spurts-format.log",
+      "sha256": "224a3817ba51827765bea6bf27257edf0fd00cbf811dd23091cc14849da0915d",
+      "raw_capture_sha256": "224a3817ba51827765bea6bf27257edf0fd00cbf811dd23091cc14849da0915d",
+      "bytes": 79
+    },
+    {
+      "file": "m2-blood-spurts-integrity.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "raw_capture_sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "bytes": 56
+    },
+    {
+      "file": "m2-blood-spurts-links.log",
+      "sha256": "bd5d539b719ccc8cdf7eb0a9b809ca9ca9a38b6275697b7b9c65fbb50544c999",
+      "raw_capture_sha256": "bd5d539b719ccc8cdf7eb0a9b809ca9ca9a38b6275697b7b9c65fbb50544c999",
+      "bytes": 40
+    },
+    {
+      "file": "m2-blood-spurts-release-combat.log",
+      "sha256": "7a5dcf3237bdbedff1c6d15afc26971cb5ce1c3d25e8042debca016748e133b8",
+      "raw_capture_sha256": "aae803738232506f000319c382a3364bec42fdb66deb076e61253836dd081193",
+      "bytes": 4703
+    },
+    {
+      "file": "m2-blood-spurts-release-final-headless.log",
+      "sha256": "8117e6f5186f6bb92c211cd67a262d80635073ea4097e406c826a45ded837bab",
+      "raw_capture_sha256": "d849b1ea506f20c9d7b5d00701d62ae856317850b0252a3d1ad334ca7d7b9c6a",
+      "bytes": 37852
+    },
+    {
+      "file": "m2-blood-spurts-release-gpu.log",
+      "sha256": "0abeb2b47ae1a5d4f2ef61fd043ce53e9e374fb657bc999a4550655ed5919e43",
+      "raw_capture_sha256": "01a36127122edced742ce3562f25f8ed6c4f3837dbbc1dea413baaa4a4392012",
+      "bytes": 6152
+    },
+    {
+      "file": "m2-blood-spurts-release-headless.log",
+      "sha256": "288fc910c0952aa156d3cad22475bacaa7ecafce361db64e5d06c59eafd9ffaa",
+      "raw_capture_sha256": "f0cb0f7f76907ca5e03603f19e83b3034dd29b61c106aaa626a2f228c62d97e2",
+      "bytes": 32507
+    },
+    {
+      "file": "m2-blood-spurts-release-verified-gpu.log",
+      "sha256": "b24f0b675cb3107e62d03343ad5a69727b27d951d1aa04f29410465281da8b57",
+      "raw_capture_sha256": "7d1e7a38c8a6d4bb5ce38d27388be8c0849eadd3d9c7c2f2e9f402014cf4b2f6",
+      "bytes": 9344
+    },
+    {
+      "file": "m2-blood-spurts-sanitize-combat.log",
+      "sha256": "c642e9d11c52b47ceb0e62c6dbfd17c6d3a697a65b618f4dd3db9374a0bd67d4",
+      "raw_capture_sha256": "3700eb162ce65d41b0cb528f7ab86571d4ae87b673a445b03108c12276500269",
+      "bytes": 4721
+    },
+    {
+      "file": "m2-blood-spurts-sanitize-final-headless.log",
+      "sha256": "eb7e685c499db6172d17ce3918ce1a3a9ec0d9b19e4821b7bdb296004ba43ad6",
+      "raw_capture_sha256": "050028ce70935ce00c22fbc748865353ca1f724d167a2b53236787060f8d82b5",
+      "bytes": 38017
+    },
+    {
+      "file": "m2-blood-spurts-sanitize-headless.log",
+      "sha256": "ec40a5fb59ada7093a5b73e213cb4bc25039c228bb0c02ae3b460d6441cd78b0",
+      "raw_capture_sha256": "f01cd5f06601a3964bd788ed8178e3efc619afd420d44911358e20eeca8fa609",
+      "bytes": 32658
+    },
+    {
+      "file": "m2-blood-spurts-second-tests.log",
+      "sha256": "6bd85879acb603b91a26fc1b5500d3b7b8970289e95cf3ff558fc5b3aa9ff8c7",
+      "raw_capture_sha256": "19a4752809a99029a7eb3c9840b5050aed751dc9e821f024b1fe58d2e0458f03",
+      "bytes": 2913
+    },
+    {
+      "file": "m2-blood-spurts-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    }
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "captures": [
+    {
+      "local_path": "build/debug/tests/blood-spurt-private/blood-drops.png",
+      "sha256": "0568b7153c1edf781ce5992b023ee7d670d09d0b78b53abb2b9e56bd9c26b1cb",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/blood-spurt-private/blood-impact.png",
+      "sha256": "aff0adefb07745d2efa25e27fb8abff72dc99181106c9e4662350671394df208",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/blood-spurt-private/blood-drops.png",
+      "sha256": "0568b7153c1edf781ce5992b023ee7d670d09d0b78b53abb2b9e56bd9c26b1cb",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/blood-spurt-private/blood-impact.png",
+      "sha256": "aff0adefb07745d2efa25e27fb8abff72dc99181106c9e4662350671394df208",
+      "committed": false
+    }
+  ],
+  "commands": [
+    "cmake --build build/<debug|release|sanitize> -j3 --target blood2_app blood_spurt_tests blood_splat_tests death_effect_tests corpse_tests weapon_impact_tests weapon_sprite_tests object_contract_tests world_tests player_controls_tests",
+    "cmake --build build/<debug|release> -j3 --target blood_spurt_gpu_tests blood_splat_gpu_tests death_effect_gpu_tests level_change_gpu_tests",
+    "ctest --test-dir build/<debug|release> -R '^(blood_spurts|blood_splats|corpses|death_effects|weapon_impacts|weapon_sprites|objects|player_controls)\\.|^world\\.(level_change.*|destination_.*)$' -V -j2",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^(blood_spurts|blood_splats|corpses|death_effects|weapon_impacts|weapon_sprites|objects|player_controls)\\.|^world\\.(level_change.*|destination_.*)$' -V -j2",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(blood_spurt|blood_spurt_private|blood_splat_alpha|blood_splat_private|death_effects|level_change|mouse_combat|corpse_clearance)$' -V"
+  ],
+  "development_findings": [
+    "Initial compilation caught namespace qualifiers, the actual TeleportObject API and a typed byte seed in the new fixture; corrected without changing services.",
+    "Initial NPC shot fixture aimed at authored coordinates instead of the actual post-initialization body center; it now reads that center.",
+    "Existing authored combat/clearance tests exposed unintended AI random-stream perturbation: 50 shots exhausted ammo with the target alive at 0.84485 HP. Selection now uses the established cosmetic stream, retaining original integer range, chance and draw-before-damage order. Existing combat assertions/fixtures are unchanged.",
+    "Private collision-mark GPU capture moved the diagnostic camera back to show its bounded silhouette, with an additional upper pixel bound.",
+    "No acceptance assertion, production physics bound or timeout was relaxed."
+  ],
+  "limitations": [
+    "Selected flesh recipe only; separate flesh SparksFX, generic/recursive debris, outside-world point classification, shared SFX eviction and full save/restore remain unavailable.",
+    "Portable isolated RNG, discrete collision/particle integration and existing fullbright sprite rasterization are not retail executable parity.",
+    "Private floor/asset diagnostics and existing authored encounter checks are not complete campaign traversal.",
+    "No native Metal run, shader/dependency/reference/asset modifications this increment."
+  ],
+  "implementation_patch_sha256": "b24fc261e9042ecf127809b4a071c0e13deb6e63c45db787f57140c6e6a7fdd5",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "90ac2f7f6ff32b2635eef23cea5cf0ea05f67af1205ff28e69bae067a0742bdb"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "39f1bda5acf932cc668017b701e2b34af7f39572948432b2834252ee69a5f11f"
+    },
+    {
+      "path": "README.md",
+      "sha256": "fc54a0e987e4efde76de7d3d232929e91f0a2595299eb410130b94e26bc2a5b9"
+    },
+    {
+      "path": "docs/BLOOD_SPLAT_CONTRACTS.md",
+      "sha256": "5e1ff0347a603c03cfb2821f66a9732f9fca8b0670fe2395ce8e7af176d04a89"
+    },
+    {
+      "path": "docs/BLOOD_SPURT_CONTRACTS.md",
+      "sha256": "3e0930115592ca25f99ed4474073bc0241c6dcc11f69fbacc654081573e62196"
+    },
+    {
+      "path": "docs/DEATH_EFFECT_CONTRACTS.md",
+      "sha256": "17c21984e5e2dae07edf0e4e50e9b7bbaf77c4b8f8ebd86195f8f7e7e6f85a48"
+    },
+    {
+      "path": "docs/M2_BLOOD_SPURT_SOURCES.json",
+      "sha256": "478ce6adbaba499b4f36843432dd6979cee655c7d4c2fbcd23b72cacfb5243f0"
+    },
+    {
+      "path": "docs/WEAPON_IMPACT_CONTRACTS.md",
+      "sha256": "ac1500d7e6a17c60fe4f2c70bb6419d7021089a0d45685d5d87f6b8c506dc9fd"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "5a9c8540af9dbd3afe7e73f55bdf3df56298422fa6a53f93a33543f7d4d19e7f"
+    },
+    {
+      "path": "src/app/inspector.h",
+      "sha256": "0a468545d584dcedef2b7a461b8374586acb7e72d9abf6e8421949a65d251b9c"
+    },
+    {
+      "path": "src/app/inspector_skeleton.cpp",
+      "sha256": "92d1863f3b32e0ca3119b57021f1309d92c0ab0c879368471f19cfe913f83fa2"
+    },
+    {
+      "path": "src/app/inspector_sprites.cpp",
+      "sha256": "ca2e0d9fd2e5e81fb857af7473ea04aa756e5e0363568ff2ff9c07292fe1635e"
+    },
+    {
+      "path": "src/app/sprite_scene.cpp",
+      "sha256": "736ccfb7062028bcf0dfb25f0d06398431a65652ea14e676a9c6a4284a52ceb3"
+    },
+    {
+      "path": "src/engine/sprite_view.h",
+      "sha256": "0d099d6434370a8e23db1a88ade0136911229e63af078d3f4e22c824c7f819bf"
+    },
+    {
+      "path": "src/game/blood_spurts.cpp",
+      "sha256": "144d120a73cc594920e60fa318509aee898d481d3261171a0f03d4ce899aec1c"
+    },
+    {
+      "path": "src/game/blood_spurts.h",
+      "sha256": "922d92da4ebc1cb586fc173a7f95e1b04f25e06afd90e02720922138291ffaa0"
+    },
+    {
+      "path": "src/game/flesh_gibs.cpp",
+      "sha256": "f357935b8d177260edde7944be84056e3bee20d3afea4978db09ab7ad75b78e3"
+    },
+    {
+      "path": "src/game/flesh_gibs.h",
+      "sha256": "b5030cc0e1826a84243ccf4329b7302bef74fbcda7740ec672685575bfc58799"
+    },
+    {
+      "path": "src/game/legacy/server_de.h",
+      "sha256": "3ca378ed960b667fdec53bd9d7d6ec85c95f1c1d94fd79f11554940a3a29253f"
+    },
+    {
+      "path": "src/game/original/Gib.cpp",
+      "sha256": "1a53499b8730c97954b5f4ac3403bdd72fcd9c1e1a07fb7e3d60f2fecca94b4e"
+    },
+    {
+      "path": "src/game/original/Gib.h",
+      "sha256": "7cc23d333d859435eae9f1b02a7b153a06b394a10a5314cada24d7f8dade906f"
+    },
+    {
+      "path": "src/game/original/ParticleExplosionFX.cpp",
+      "sha256": "35593629870a55a7aed91d3fbe9ae68348a39dc2a49d5154fca122dd3fa849ad"
+    },
+    {
+      "path": "src/game/original/ParticleExplosionFX.h",
+      "sha256": "021599779dd1cf014b3279d6d237ac0505df1b02a4daa74282fda07e24f42231"
+    },
+    {
+      "path": "src/game/original/WeaponFX.cpp",
+      "sha256": "2ab563dd5c0c283d1fa6409467b9c7256af37ed5f61b51c75c55d76d41ec4d81"
+    },
+    {
+      "path": "src/game/original/WeaponFX.h",
+      "sha256": "63b3beb9520c26f3ce0ed5ad3f5edc73a9bd8976fc98adb5dab9515436a6893d"
+    },
+    {
+      "path": "src/game/original/WeaponVector.cpp",
+      "sha256": "82038b8788083052d72c05d3e8cc207e3a975373ff511402ca9efe5106ea4021"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "a693321c6819bd2c4e18c4e4359be63fd0c8bcf9d24c51e53e10dfad2f7ba194"
+    },
+    {
+      "path": "src/game/server_effects.cpp",
+      "sha256": "1a08c3ef69e60cff9493fc013135f4e81972ee93734d71e2825741efc8e5ae40"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "fcc687a0843b39e829a422124741ecf75cf689ebdbc44562fba1963982b10353"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "6f8041802e3d2b4f3968a76e8ad835ac007e31c1cecce03bb901ed3facf00ad1"
+    },
+    {
+      "path": "tests/blood_spurt_fixture.h",
+      "sha256": "c183e5ca732d4ad0bf0a082c857dd4333b67bf962b6ddb923034faca379fd3b6"
+    },
+    {
+      "path": "tests/blood_spurt_gpu_tests.cpp",
+      "sha256": "b0cea417f87544a3a2a6de256e3b5b11cdcdb0930536eb6acfeaf8722e777667"
+    },
+    {
+      "path": "tests/blood_spurt_tests.cpp",
+      "sha256": "5a5905c3cbbdab3f6f71c16cc7476b4aa38a843dbea487a897e20a28c41614db"
+    }
+  ],
+  "unchanged_authored_combat_test_sha256": "8643d1339e982aa39b6d9e5b94197adcb1d2f70196f115f3fa338470bb6cf287",
+  "implementation_commit": "a52344adc5076b6c354f17c20316d6545c0ce582"
+}

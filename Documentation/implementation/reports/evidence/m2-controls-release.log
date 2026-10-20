@@ -1,0 +1,202 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start 237: gpu.randomsound
+ 1/84 Test #237: gpu.randomsound ..................   Passed    2.42 sec
+      Start  75: gpu.movement
+ 2/84 Test  #75: gpu.movement .....................   Passed    2.93 sec
+      Start  64: gpu.weapons
+ 3/84 Test  #64: gpu.weapons ......................   Passed    2.95 sec
+      Start 339: gpu.viewport
+ 4/84 Test #339: gpu.viewport .....................   Passed    2.97 sec
+      Start 132: gpu.interaction
+ 5/84 Test #132: gpu.interaction ..................   Passed    1.49 sec
+      Start 227: gpu.cinematics
+ 6/84 Test #227: gpu.cinematics ...................   Passed    0.86 sec
+      Start 100: gpu.containers
+ 7/84 Test #100: gpu.containers ...................   Passed    0.99 sec
+      Start 264: gpu.sceneexplosion
+ 8/84 Test #264: gpu.sceneexplosion ...............   Passed    0.86 sec
+      Start 246: gpu.sound
+ 9/84 Test #246: gpu.sound ........................   Passed    0.86 sec
+      Start 170: gpu.pickups
+10/84 Test #170: gpu.pickups ......................   Passed    0.83 sec
+      Start 207: gpu.lights
+11/84 Test #207: gpu.lights .......................   Passed    0.85 sec
+      Start 178: gpu.objectives
+12/84 Test #178: gpu.objectives ...................   Passed    0.81 sec
+      Start 186: gpu.cameras
+13/84 Test #186: gpu.cameras ......................   Passed    0.80 sec
+      Start 197: gpu.keyframes
+14/84 Test #197: gpu.keyframes ....................   Passed    0.80 sec
+      Start 217: gpu.worldpaths
+15/84 Test #217: gpu.worldpaths ...................   Passed    0.80 sec
+      Start 255: gpu.sprites
+16/84 Test #255: gpu.sprites ......................   Passed    0.84 sec
+      Start 121: gpu.triggers
+17/84 Test #121: gpu.triggers .....................   Passed    0.80 sec
+      Start 101: gpu.conveyor
+18/84 Test #101: gpu.conveyor .....................   Passed    0.82 sec
+      Start 141: gpu.brushes
+19/84 Test #141: gpu.brushes ......................   Passed    0.64 sec
+      Start 110: gpu.doors
+20/84 Test #110: gpu.doors ........................   Passed    0.64 sec
+      Start  54: gpu.player
+21/84 Test  #54: gpu.player .......................   Passed    0.82 sec
+      Start  38: gpu.world
+22/84 Test  #38: gpu.world ........................   Passed    0.63 sec
+      Start  24: gpu.lifecycle
+23/84 Test  #24: gpu.lifecycle ....................   Passed    0.53 sec
+      Start  74: movement.private
+      Start 131: interaction.catalog
+      Start 185: cameras.catalog
+      Start  83: locomotion.private
+24/84 Test  #83: locomotion.private ...............   Passed    0.51 sec
+      Start  53: player.private
+25/84 Test #131: interaction.catalog ..............   Passed    0.54 sec
+      Start 337: world_view.subway
+26/84 Test #337: world_view.subway ................   Passed    0.10 sec
+      Start  78: locomotion.limits
+27/84 Test #185: cameras.catalog ..................   Passed    0.65 sec
+      Start  68: movement.world_collision
+28/84 Test  #78: locomotion.limits ................   Passed    0.01 sec
+      Start  79: locomotion.crouch
+29/84 Test  #68: movement.world_collision .........   Passed    0.01 sec
+30/84 Test  #79: locomotion.crouch ................   Passed    0.01 sec
+      Start  71: movement.timing
+      Start  65: movement.walking
+31/84 Test  #71: movement.timing ..................   Passed    0.01 sec
+      Start 183: cameras.player
+32/84 Test  #65: movement.walking .................   Passed    0.01 sec
+      Start  67: movement.collisions
+33/84 Test #183: cameras.player ...................   Passed    0.00 sec
+      Start 124: interaction.keys
+34/84 Test  #67: movement.collisions ..............   Passed    0.00 sec
+      Start  82: locomotion.contacts
+35/84 Test #124: interaction.keys .................   Passed    0.00 sec
+      Start  77: locomotion.world_stairs
+36/84 Test  #82: locomotion.contacts ..............   Passed    0.00 sec
+      Start  76: locomotion.stairs
+37/84 Test  #77: locomotion.world_stairs ..........   Passed    0.00 sec
+      Start  80: locomotion.animations
+38/84 Test  #76: locomotion.stairs ................   Passed    0.00 sec
+      Start 125: interaction.state
+39/84 Test  #80: locomotion.animations ............   Passed    0.00 sec
+      Start 126: interaction.geometry
+40/84 Test #125: interaction.state ................   Passed    0.00 sec
+      Start  69: movement.support
+41/84 Test #126: interaction.geometry .............   Passed    0.00 sec
+      Start  66: movement.jumping
+42/84 Test  #69: movement.support .................   Passed    0.00 sec
+      Start 127: interaction.transport
+43/84 Test  #66: movement.jumping .................   Passed    0.00 sec
+      Start 122: interaction.use
+44/84 Test #127: interaction.transport ............   Passed    0.00 sec
+      Start 130: interaction.player_push
+45/84 Test #122: interaction.use ..................   Passed    0.00 sec
+      Start 129: interaction.lifetime
+46/84 Test #130: interaction.player_push ..........   Passed    0.00 sec
+      Start  81: locomotion.lifetime
+47/84 Test #129: interaction.lifetime .............   Passed    0.00 sec
+      Start  70: movement.boundaries
+48/84 Test  #81: locomotion.lifetime ..............   Passed    0.00 sec
+      Start 336: world_view.lifetime
+49/84 Test  #70: movement.boundaries ..............   Passed    0.00 sec
+      Start 334: world_view.rejects
+50/84 Test #336: world_view.lifetime ..............   Passed    0.00 sec
+      Start  72: movement.lifetime
+51/84 Test #334: world_view.rejects ...............   Passed    0.00 sec
+      Start 180: cameras.timing
+52/84 Test  #72: movement.lifetime ................   Passed    0.00 sec
+53/84 Test #180: cameras.timing ...................   Passed    0.00 sec
+      Start 179: cameras.defaults
+      Start 123: interaction.input
+54/84 Test #179: cameras.defaults .................   Passed    0.00 sec
+      Start 184: cameras.validation
+55/84 Test #123: interaction.input ................   Passed    0.00 sec
+      Start  10: objects.unsupported_teardown
+56/84 Test #184: cameras.validation ...............   Passed    0.00 sec
+      Start 333: world_view.mesh
+57/84 Test #333: world_view.mesh ..................   Passed    0.00 sec
+      Start 128: interaction.blocking
+58/84 Test  #10: objects.unsupported_teardown .....   Passed    0.00 sec
+      Start  49: player.lifecycle
+59/84 Test #128: interaction.blocking .............   Passed    0.00 sec
+      Start 182: cameras.selection
+60/84 Test  #49: player.lifecycle .................   Passed    0.00 sec
+      Start  50: player.rollback
+61/84 Test #182: cameras.selection ................   Passed    0.00 sec
+      Start  51: player.messages
+62/84 Test  #50: player.rollback ..................   Passed    0.00 sec
+      Start 181: cameras.links
+63/84 Test  #51: player.messages ..................   Passed    0.00 sec
+      Start   9: objects.messages_strings
+64/84 Test #181: cameras.links ....................   Passed    0.00 sec
+      Start  52: player.callbacks
+65/84 Test   #9: objects.messages_strings .........   Passed    0.00 sec
+      Start  48: player.handles
+66/84 Test  #52: player.callbacks .................   Passed    0.00 sec
+      Start  11: objects.creation_failures
+67/84 Test  #48: player.handles ...................   Passed    0.00 sec
+      Start   8: objects.links_lists
+68/84 Test  #11: objects.creation_failures ........   Passed    0.00 sec
+      Start  73: movement.controls
+69/84 Test   #8: objects.links_lists ..............   Passed    0.00 sec
+      Start   2: objects.nested_creation
+70/84 Test  #73: movement.controls ................   Passed    0.00 sec
+      Start   5: objects.deferred_removal
+71/84 Test   #2: objects.nested_creation ..........   Passed    0.00 sec
+      Start 335: world_view.camera
+72/84 Test   #5: objects.deferred_removal .........   Passed    0.00 sec
+      Start   1: objects.original_objects
+73/84 Test #335: world_view.camera ................   Passed    0.00 sec
+      Start   3: objects.reasons_properties
+74/84 Test   #1: objects.original_objects .........   Passed    0.00 sec
+      Start   4: objects.scheduling
+75/84 Test   #3: objects.reasons_properties .......   Passed    0.00 sec
+      Start   6: objects.aggregate_dispatch
+76/84 Test   #4: objects.scheduling ...............   Passed    0.00 sec
+      Start   7: objects.handles_selection
+77/84 Test   #6: objects.aggregate_dispatch .......   Passed    0.00 sec
+78/84 Test   #7: objects.handles_selection ........   Passed    0.00 sec
+79/84 Test  #53: player.private ...................   Passed    0.26 sec
+80/84 Test  #74: movement.private .................   Passed    1.37 sec
+      Start 273: gpu.character
+81/84 Test #273: gpu.character ....................   Passed    3.31 sec
+      Start 350: gpu.model_private
+82/84 Test #350: gpu.model_private ................   Passed    0.51 sec
+      Start 338: gpu.world_depth
+83/84 Test #338: gpu.world_depth ..................   Passed    0.43 sec
+      Start 349: gpu.model_depth
+84/84 Test #349: gpu.model_depth ..................   Passed    0.44 sec
+
+100% tests passed, 0 tests failed out of 84
+
+Label Time Summary:
+brushes           =   0.64 sec*proc (1 test)
+cameras           =   1.46 sec*proc (8 tests)
+character         =   3.31 sec*proc (1 test)
+cinematics        =   0.86 sec*proc (1 test)
+containers        =   1.80 sec*proc (2 tests)
+doors             =   0.64 sec*proc (1 test)
+gpu               =  31.64 sec*proc (27 tests)
+headless          =   3.57 sec*proc (57 tests)
+interaction       =   2.06 sec*proc (11 tests)
+keyframes         =   0.80 sec*proc (1 test)
+lights            =   0.85 sec*proc (1 test)
+locomotion        =   0.54 sec*proc (8 tests)
+model_view        =   0.95 sec*proc (2 tests)
+movement          =   4.34 sec*proc (11 tests)
+objectives        =   0.81 sec*proc (1 test)
+objects           =   0.02 sec*proc (11 tests)
+pickups           =   0.83 sec*proc (1 test)
+player            =   1.09 sec*proc (7 tests)
+private           =  33.67 sec*proc (30 tests)
+randomsound       =   2.42 sec*proc (1 test)
+sceneexplosion    =   0.86 sec*proc (1 test)
+sound             =   0.86 sec*proc (1 test)
+sprites           =   0.84 sec*proc (1 test)
+triggers          =   0.80 sec*proc (1 test)
+weapons           =   2.95 sec*proc (1 test)
+world_view        =   3.51 sec*proc (7 tests)
+worldpaths        =   0.80 sec*proc (1 test)
+
+Total Test time (real) =  33.03 sec

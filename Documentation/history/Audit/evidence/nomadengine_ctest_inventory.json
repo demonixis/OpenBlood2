@@ -1,0 +1,15 @@
+{
+  "name": "nomadengine_ctest_inventory",
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/tmp/lithtech-audit-2bVxTF/nomadengine",
+    "-N"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:22:17.459263+00:00",
+  "elapsed_seconds": 0.024,
+  "timeout_seconds": 20,
+  "exit_code": 0,
+  "log": "nomadengine_ctest_inventory.log"
+}

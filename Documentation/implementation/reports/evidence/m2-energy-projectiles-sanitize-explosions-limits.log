@@ -1,0 +1,14 @@
+143/596 Testing: explosions.limits
+143/596 Test: explosions.limits
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_tests" "limits" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-fixtures/limits"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosions.limits" start time: Oct 17 01:22 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"explosions.limits" end time: Oct 17 01:22 CEST
+"explosions.limits" time elapsed: 00:00:00
+----------------------------------------------------------

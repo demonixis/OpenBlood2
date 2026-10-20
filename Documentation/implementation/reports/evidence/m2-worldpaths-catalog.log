@@ -1,0 +1,15 @@
+194/215 Testing: keyframes.catalog
+194/215 Test: keyframes.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframer_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"keyframes.catalog" start time: Oct 16 00:46 CEST
+Output:
+----------------------------------------------------------
+worlds=57 controllers=94 source_keys=383 copied=375 empty_paths=0 missing_targets=44 malformed=0
+<end of output>
+Test time =   8.89 sec
+----------------------------------------------------------
+Test Passed.
+"keyframes.catalog" end time: Oct 16 00:46 CEST
+"keyframes.catalog" time elapsed: 00:00:08
+----------------------------------------------------------

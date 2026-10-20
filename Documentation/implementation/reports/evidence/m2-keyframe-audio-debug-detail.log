@@ -1,0 +1,3186 @@
+Start testing: Oct 17 20:57 CEST
+----------------------------------------------------------
+950/956 Testing: train_session.private_30
+950/956 Test: train_session.private_30
+Command: "<Blood2>/build/debug/tests/train_session_tests" "<external-game>" "30"
+Directory: <Blood2>/build/debug/tests
+"train_session.private_30" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walk t=0 pos=-32,170.001,-3224 HP=100 ammo=50 target=none
+Walk t=2 pos=-32,170.001,-2681.51 HP=100 ammo=50 target=none
+Walk t=4 pos=-30.8339,170.001,-2175.55 HP=100 ammo=44 target=none
+Walk t=6 pos=-30.5801,170.001,-1721.66 HP=100 ammo=41 target=noname
+Walk t=8 pos=-41.4442,170.001,-1443.05 HP=120.993 ammo=35 target=noname
+Walk t=10 pos=-25.6665,170.001,-1266.48 HP=116.986 ammo=29 target=noname
+Walk t=12 pos=-34.9978,170.001,-1059.98 HP=116.986 ammo=25 target=none
+Walk t=14 pos=-34.9998,170.001,-632.001 HP=116.986 ammo=25 target=none
+Walk t=16 pos=-34.4129,170.001,-304.17 HP=116.986 ammo=22 target=herm
+Walk t=18 pos=-56.7345,170.001,198.172 HP=116.986 ammo=16 target=pete
+Walk t=20 pos=-75.999,170.001,344.937 HP=116.986 ammo=10 target=pete
+Walk t=22 pos=-75.999,170.001,344.937 HP=116.986 ammo=4 target=pete
+Walk t=24 pos=-37.9161,170.001,593.29 HP=116.986 ammo=0 target=none
+Walk t=26 pos=-31.7809,170.001,961.6 HP=116.986 ammo=0 target=noname
+Walk t=28 pos=-32.756,170.001,1224.1 HP=112.981 ammo=0 target=noname
+Walk t=30 pos=-35.3017,170.001,1642.91 HP=100.957 ammo=0 target=noname
+Walk t=32 pos=-45.292,170.001,1802.92 HP=121.948 ammo=0 target=noname
+Walk t=34 pos=-83.6427,170.001,2040 HP=146.948 ammo=0 target=none
+Walk t=36 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=38 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=40 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=42 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=44 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=46 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=48 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Route summary: damaged=10 dead=10 ammoPickup=0 healthPickup=1 relay=1 relayStart=46.2833 fade=1 time=60.2833
+Relay slot player sent=1 pending=0
+Relay slot cinexit1 sent=1 pending=0
+Relay slot htrain1 sent=1 pending=0
+Relay slot cinhi5 sent=1 pending=0
+Relay slot exp1 sent=1 pending=0
+Relay slot exp2 sent=1 pending=0
+Relay slot exp3 sent=1 pending=0
+Relay slot exp4 sent=1 pending=0
+Relay slot exp5 sent=1 pending=0
+Relay slot exit2 sent=1 pending=0
+TRAIN_TRACE	SubwayA	AddObjectToList	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	AddSkyObject	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	AdvanceModelProjectile	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	AlignRotation	Implemented (bounded)	2908
+TRAIN_TRACE	SubwayA	BreakInterObjectLink	Implemented (bounded)	276
+TRAIN_TRACE	SubwayA	CastRay	Implemented (bounded)	6
+TRAIN_TRACE	SubwayA	CastWorldRay	Implemented (bounded)	36
+TRAIN_TRACE	SubwayA	CompareStringsUpper	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	ConfigureCharacterBody	Implemented (bounded)	26
+TRAIN_TRACE	SubwayA	ConfigureModelBody	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ConfigureWorldBody	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	CopyString	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	CreateAttachment	Implemented (bounded)	12
+TRAIN_TRACE	SubwayA	CreateInterObjectLink	Implemented (bounded)	322
+TRAIN_TRACE	SubwayA	CreateObject	Implemented (bounded)	120
+TRAIN_TRACE	SubwayA	CreateObjectList	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	CreateObjectProps	Implemented (bounded)	6
+TRAIN_TRACE	SubwayA	CreateString	Implemented (bounded)	660
+TRAIN_TRACE	SubwayA	EndHMessageRead	Explicitly unsupported	0
+TRAIN_TRACE	SubwayA	EndHMessageWrite	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	EndMessage	Implemented (bounded)	91139
+TRAIN_TRACE	SubwayA	FindAttachment	Implemented (bounded)	2744
+TRAIN_TRACE	SubwayA	FindNamedObjects	Implemented (bounded)	57
+TRAIN_TRACE	SubwayA	FreeString	Implemented (bounded)	2121
+TRAIN_TRACE	SubwayA	GetAcceleration	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	GetAnimIndex	Implemented (bounded)	2848
+TRAIN_TRACE	SubwayA	GetAttachedModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	GetCameraView	Implemented (bounded)	4339
+TRAIN_TRACE	SubwayA	GetClass	Implemented (bounded)	213
+TRAIN_TRACE	SubwayA	GetClientResourceString	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	GetClientUserData	Implemented (bounded)	56851
+TRAIN_TRACE	SubwayA	GetContainers	Implemented (bounded)	185820
+TRAIN_TRACE	SubwayA	GetFrameTime	Implemented (bounded)	4955
+TRAIN_TRACE	SubwayA	GetGameConVar	Implemented (bounded)	480
+TRAIN_TRACE	SubwayA	GetGlobalForce	Implemented (bounded)	4
+TRAIN_TRACE	SubwayA	GetModelAnimUserDims	Implemented (bounded)	2361
+TRAIN_TRACE	SubwayA	GetModelAnimation	Implemented (bounded)	1947
+TRAIN_TRACE	SubwayA	GetModelAnimationName	Implemented (bounded)	4401
+TRAIN_TRACE	SubwayA	GetModelFilenames	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	GetModelLooping	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	GetModelNodeHideStatus	Implemented (bounded)	1090
+TRAIN_TRACE	SubwayA	GetModelNodeTransform	Implemented (bounded)	2740
+TRAIN_TRACE	SubwayA	GetModelPlaybackState	Implemented (bounded)	4356
+TRAIN_TRACE	SubwayA	GetMovementState	Implemented (bounded)	93356
+TRAIN_TRACE	SubwayA	GetNextObject	Implemented (bounded)	227
+TRAIN_TRACE	SubwayA	GetObjectClass	Implemented (bounded)	299
+TRAIN_TRACE	SubwayA	GetObjectColor	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	GetObjectDims	Implemented (bounded)	1251
+TRAIN_TRACE	SubwayA	GetObjectFlags	Implemented (bounded)	90007
+TRAIN_TRACE	SubwayA	GetObjectName	Implemented (bounded)	179
+TRAIN_TRACE	SubwayA	GetObjectPos	Implemented (bounded)	33073
+TRAIN_TRACE	SubwayA	GetObjectRotation	Implemented (bounded)	4710
+TRAIN_TRACE	SubwayA	GetObjectState	Implemented (bounded)	3
+TRAIN_TRACE	SubwayA	GetObjectUserFlags	Implemented (bounded)	169
+TRAIN_TRACE	SubwayA	GetPathManager	Implemented (bounded)	1365
+TRAIN_TRACE	SubwayA	GetPointContainerCode	Implemented (bounded)	86
+TRAIN_TRACE	SubwayA	GetPropBool	Implemented (bounded)	764
+TRAIN_TRACE	SubwayA	GetPropGeneric	Implemented (bounded)	10875
+TRAIN_TRACE	SubwayA	GetPropReal	Implemented (bounded)	764
+TRAIN_TRACE	SubwayA	GetPropString	Implemented (bounded)	72
+TRAIN_TRACE	SubwayA	GetPropVector	Implemented (bounded)	64
+TRAIN_TRACE	SubwayA	GetSoundDuration	Implemented (bounded)	80
+TRAIN_TRACE	SubwayA	GetStringData	Implemented (bounded)	1570
+TRAIN_TRACE	SubwayA	GetTime	Implemented (bounded)	45223
+TRAIN_TRACE	SubwayA	GetVarValueFloat	Implemented (bounded)	478
+TRAIN_TRACE	SubwayA	GetVarValueString	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	GetVelocity	Implemented (bounded)	2577
+TRAIN_TRACE	SubwayA	GetWorldTime	Implemented (bounded)	7
+TRAIN_TRACE	SubwayA	HandleToObject	Implemented (bounded)	93302
+TRAIN_TRACE	SubwayA	InterpolateRotation	Implemented (bounded)	2854
+TRAIN_TRACE	SubwayA	IntersectSegment	Implemented (bounded)	4463
+TRAIN_TRACE	SubwayA	IsKindOf	Implemented (bounded)	312
+TRAIN_TRACE	SubwayA	IsObjectAlive	Implemented (bounded)	381719
+TRAIN_TRACE	SubwayA	IsSoundDone	Implemented (bounded)	4083
+TRAIN_TRACE	SubwayA	KillSound	Implemented (bounded)	164
+TRAIN_TRACE	SubwayA	MoveKeyframedObject	Implemented (bounded)	26669
+TRAIN_TRACE	SubwayA	MoveObject	Implemented (bounded)	139527
+TRAIN_TRACE	SubwayA	MoveObjectToGround	Implemented (bounded)	16
+TRAIN_TRACE	SubwayA	MoveWorldModel	Implemented (bounded)	262
+TRAIN_TRACE	SubwayA	ObjectToHandle	Implemented (bounded)	2775
+TRAIN_TRACE	SubwayA	PingObjects	Implemented (bounded)	114
+TRAIN_TRACE	SubwayA	PlaceNonSolidModel	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	PlayCharacterSound	Implemented (bounded)	211
+TRAIN_TRACE	SubwayA	PlayCinematicSound	Implemented (bounded)	6
+TRAIN_TRACE	SubwayA	PlayClientSound	Implemented (bounded)	36
+TRAIN_TRACE	SubwayA	PlayDetachedSound	Implemented (bounded)	76
+TRAIN_TRACE	SubwayA	PlayLocalSound	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PlayObjectLoopSound	Implemented (bounded)	14
+TRAIN_TRACE	SubwayA	PlaySoundAt	Implemented (bounded)	83
+TRAIN_TRACE	SubwayA	PlayWorldSound	Implemented (bounded)	4
+TRAIN_TRACE	SubwayA	PublishBloodSplat	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishCameraEffect	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	PublishClientBloodSplat	Implemented (bounded)	36
+TRAIN_TRACE	SubwayA	PublishClientBloodSpurt	Implemented (bounded)	36
+TRAIN_TRACE	SubwayA	PublishExplosionFlames	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionFragments	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionLights	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionModels	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionRings	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionSprites	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishFleshGibs	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishLaserBeam	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishLightEffect	Implemented (bounded)	12
+TRAIN_TRACE	SubwayA	PublishObjectParticles	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishParticleStream	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishPolyGrid	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishSparks	Implemented (bounded)	64
+TRAIN_TRACE	SubwayA	PublishWeaponSprites	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	QueryModelNodeTransform	Implemented (bounded)	954
+TRAIN_TRACE	SubwayA	RandomFloat	Implemented (bounded)	85
+TRAIN_TRACE	SubwayA	RandomInt	Implemented (bounded)	217
+TRAIN_TRACE	SubwayA	ReadDamage	Implemented (bounded)	65
+TRAIN_TRACE	SubwayA	ReadFromMessageDWord	Implemented (bounded)	1466
+TRAIN_TRACE	SubwayA	ReadFromMessageHString	Implemented (bounded)	1466
+TRAIN_TRACE	SubwayA	ReadKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ReadPickupMessage	Implemented (bounded)	6
+TRAIN_TRACE	SubwayA	RecordBrushDestruction	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RecordDebrisEffect	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RecordExplosionEffect	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RecordPickup	Implemented (bounded)	3
+TRAIN_TRACE	SubwayA	RecordProjectile	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RecordSceneExplosion	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	RecordSpawn	Implemented (bounded)	26
+TRAIN_TRACE	SubwayA	RelinquishList	Implemented (bounded)	57
+TRAIN_TRACE	SubwayA	RemoveAttachment	Implemented (bounded)	11
+TRAIN_TRACE	SubwayA	RemoveCameraEffect	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RemoveLightEffect	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RemoveObject	Implemented (bounded)	115
+TRAIN_TRACE	SubwayA	RemoveObjectFromList	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ReportSkyFailure	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ResetModelAnimation	Implemented (bounded)	195
+TRAIN_TRACE	SubwayA	ResetRead	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ResizeObject	Implemented (bounded)	2230
+TRAIN_TRACE	SubwayA	RestoreObjects	Explicitly unsupported	0
+TRAIN_TRACE	SubwayA	RotateWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	SaveObjects	Explicitly unsupported	0
+TRAIN_TRACE	SubwayA	ScaleObject	Implemented (bounded)	26
+TRAIN_TRACE	SubwayA	SendBossHealth	Implemented (bounded)	331
+TRAIN_TRACE	SubwayA	SendConversation	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	SendObjectives	Implemented (bounded)	1
+TRAIN_TRACE	SubwayA	SendToClient	Implemented (bounded)	406
+TRAIN_TRACE	SubwayA	SendWorldExit	Implemented (bounded)	1
+TRAIN_TRACE	SubwayA	SetAcceleration	Implemented (bounded)	7240
+TRAIN_TRACE	SubwayA	SetBlockingPriority	Implemented (bounded)	7354
+TRAIN_TRACE	SubwayA	SetClientUserData	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	SetDeactivationTime	Implemented (bounded)	16
+TRAIN_TRACE	SubwayA	SetGameConVar	Implemented (bounded)	32
+TRAIN_TRACE	SubwayA	SetGlobalForce	Implemented (bounded)	1
+TRAIN_TRACE	SubwayA	SetModelAnimation	Implemented (bounded)	255
+TRAIN_TRACE	SubwayA	SetModelFilenames	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	SetModelLooping	Implemented (bounded)	250
+TRAIN_TRACE	SubwayA	SetModelNodeHideStatus	Implemented (bounded)	38
+TRAIN_TRACE	SubwayA	SetNextUpdate	Implemented (bounded)	30348
+TRAIN_TRACE	SubwayA	SetObjectColor	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	SetObjectDims	Implemented (bounded)	96
+TRAIN_TRACE	SubwayA	SetObjectFlags	Implemented (bounded)	291
+TRAIN_TRACE	SubwayA	SetObjectRotation	Implemented (bounded)	30122
+TRAIN_TRACE	SubwayA	SetObjectState	Implemented (bounded)	17
+TRAIN_TRACE	SubwayA	SetObjectUserFlags	Implemented (bounded)	235
+TRAIN_TRACE	SubwayA	SetSkyDefinition	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	SetVelocity	Implemented (bounded)	8754
+TRAIN_TRACE	SubwayA	StartHMessageWrite	Implemented (bounded)	91139
+TRAIN_TRACE	SubwayA	StartMessageToObject	Implemented (bounded)	91139
+TRAIN_TRACE	SubwayA	TeleportObject	Implemented (bounded)	11
+TRAIN_TRACE	SubwayA	ValidateSpawnObject	Implemented (bounded)	15
+TRAIN_TRACE	SubwayA	WriteDamage	Implemented (bounded)	933
+TRAIN_TRACE	SubwayA	WriteKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	WritePickupMessage	Implemented (bounded)	89571
+TRAIN_TRACE	SubwayA	WriteToMessageDWord	Implemented (bounded)	635
+TRAIN_TRACE	SubwayA	WriteToMessageHString	Implemented (bounded)	635
+TRAIN_TRACE	SubwayA	ConnectClient	Implemented (bounded)	1
+TRAIN_TRACE	SubwayA	DisconnectClient	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	MID_MODELSTRINGKEY	Implemented (bounded)	148
+TRAIN_DOOR_AUDIO	SubwayA	28 decoded starts, zero failures
+Completed train at 30 Hz: 10 damaged / 10 dead authored Cultists, HP=146.948 ammo=0
+Message lifetime: 91139 created, 91139 released, peak=3
+Knife FIRE_KEY shots=20
+Reached authored NEW_LEVEL from spawn
+TRAIN_TRACE	CityHub	AddObjectToList	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	AddSkyObject	Implemented (bounded)	5
+TRAIN_TRACE	CityHub	AdvanceModelProjectile	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	AlignRotation	Implemented (bounded)	61
+TRAIN_TRACE	CityHub	BreakInterObjectLink	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CastRay	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CastWorldRay	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CompareStringsUpper	Implemented (bounded)	5
+TRAIN_TRACE	CityHub	ConfigureCharacterBody	Implemented (bounded)	27
+TRAIN_TRACE	CityHub	ConfigureModelBody	Implemented (bounded)	122
+TRAIN_TRACE	CityHub	ConfigureWorldBody	Implemented (bounded)	13
+TRAIN_TRACE	CityHub	CopyString	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CreateAttachment	Implemented (bounded)	18
+TRAIN_TRACE	CityHub	CreateInterObjectLink	Implemented (bounded)	36
+TRAIN_TRACE	CityHub	CreateObject	Implemented (bounded)	55
+TRAIN_TRACE	CityHub	CreateObjectList	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CreateObjectProps	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CreateString	Implemented (bounded)	30
+TRAIN_TRACE	CityHub	EndHMessageRead	Explicitly unsupported	0
+TRAIN_TRACE	CityHub	EndHMessageWrite	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	EndMessage	Implemented (bounded)	241
+TRAIN_TRACE	CityHub	FindAttachment	Implemented (bounded)	30
+TRAIN_TRACE	CityHub	FindNamedObjects	Implemented (bounded)	24
+TRAIN_TRACE	CityHub	FreeString	Implemented (bounded)	21
+TRAIN_TRACE	CityHub	GetAcceleration	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetAnimIndex	Implemented (bounded)	3078
+TRAIN_TRACE	CityHub	GetAttachedModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetCameraView	Implemented (bounded)	61
+TRAIN_TRACE	CityHub	GetClass	Implemented (bounded)	3191
+TRAIN_TRACE	CityHub	GetClientResourceString	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetClientUserData	Implemented (bounded)	811
+TRAIN_TRACE	CityHub	GetContainers	Implemented (bounded)	9794
+TRAIN_TRACE	CityHub	GetFrameTime	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetGameConVar	Implemented (bounded)	895
+TRAIN_TRACE	CityHub	GetGlobalForce	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	GetModelAnimUserDims	Implemented (bounded)	252
+TRAIN_TRACE	CityHub	GetModelAnimation	Implemented (bounded)	54
+TRAIN_TRACE	CityHub	GetModelAnimationName	Implemented (bounded)	84
+TRAIN_TRACE	CityHub	GetModelFilenames	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetModelLooping	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetModelNodeHideStatus	Implemented (bounded)	43
+TRAIN_TRACE	CityHub	GetModelNodeTransform	Implemented (bounded)	310
+TRAIN_TRACE	CityHub	GetModelPlaybackState	Implemented (bounded)	34
+TRAIN_TRACE	CityHub	GetMovementState	Implemented (bounded)	15552
+TRAIN_TRACE	CityHub	GetNextObject	Implemented (bounded)	487
+TRAIN_TRACE	CityHub	GetObjectClass	Implemented (bounded)	1642
+TRAIN_TRACE	CityHub	GetObjectColor	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetObjectDims	Implemented (bounded)	9
+TRAIN_TRACE	CityHub	GetObjectFlags	Implemented (bounded)	939
+TRAIN_TRACE	CityHub	GetObjectName	Implemented (bounded)	143
+TRAIN_TRACE	CityHub	GetObjectPos	Implemented (bounded)	814
+TRAIN_TRACE	CityHub	GetObjectRotation	Implemented (bounded)	478
+TRAIN_TRACE	CityHub	GetObjectState	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetObjectUserFlags	Implemented (bounded)	632
+TRAIN_TRACE	CityHub	GetPathManager	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetPointContainerCode	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetPropBool	Implemented (bounded)	994
+TRAIN_TRACE	CityHub	GetPropGeneric	Implemented (bounded)	24038
+TRAIN_TRACE	CityHub	GetPropReal	Implemented (bounded)	2061
+TRAIN_TRACE	CityHub	GetPropString	Implemented (bounded)	150
+TRAIN_TRACE	CityHub	GetPropVector	Implemented (bounded)	136
+TRAIN_TRACE	CityHub	GetSoundDuration	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetStringData	Implemented (bounded)	59
+TRAIN_TRACE	CityHub	GetTime	Implemented (bounded)	311
+TRAIN_TRACE	CityHub	GetVarValueFloat	Implemented (bounded)	893
+TRAIN_TRACE	CityHub	GetVarValueString	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	GetVelocity	Implemented (bounded)	30
+TRAIN_TRACE	CityHub	GetWorldTime	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	HandleToObject	Implemented (bounded)	1587
+TRAIN_TRACE	CityHub	InterpolateRotation	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	IntersectSegment	Implemented (bounded)	281
+TRAIN_TRACE	CityHub	IsKindOf	Implemented (bounded)	3621
+TRAIN_TRACE	CityHub	IsObjectAlive	Implemented (bounded)	3799
+TRAIN_TRACE	CityHub	IsSoundDone	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	KillSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	MoveKeyframedObject	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	MoveObject	Implemented (bounded)	15061
+TRAIN_TRACE	CityHub	MoveObjectToGround	Implemented (bounded)	143
+TRAIN_TRACE	CityHub	MoveWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ObjectToHandle	Implemented (bounded)	60
+TRAIN_TRACE	CityHub	PingObjects	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	PlaceNonSolidModel	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayCharacterSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayCinematicSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayClientSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayDetachedSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayLocalSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayObjectLoopSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlaySoundAt	Implemented (bounded)	4
+TRAIN_TRACE	CityHub	PlayWorldSound	Implemented (bounded)	31
+TRAIN_TRACE	CityHub	PublishBloodSplat	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishCameraEffect	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	PublishClientBloodSplat	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishClientBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionFlames	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionFragments	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionLights	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionModels	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionRings	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionSprites	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishFleshGibs	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishLaserBeam	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishLightEffect	Implemented (bounded)	4
+TRAIN_TRACE	CityHub	PublishObjectParticles	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishParticleStream	Implemented (bounded)	8
+TRAIN_TRACE	CityHub	PublishPolyGrid	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	PublishSparks	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishWeaponSprites	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	QueryModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RandomFloat	Implemented (bounded)	59
+TRAIN_TRACE	CityHub	RandomInt	Implemented (bounded)	35
+TRAIN_TRACE	CityHub	ReadDamage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReadFromMessageDWord	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReadFromMessageHString	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReadKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReadPickupMessage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordBrushDestruction	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordDebrisEffect	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordExplosionEffect	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordPickup	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordProjectile	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordSceneExplosion	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordSpawn	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RelinquishList	Implemented (bounded)	24
+TRAIN_TRACE	CityHub	RemoveAttachment	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RemoveCameraEffect	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RemoveLightEffect	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RemoveObject	Implemented (bounded)	50
+TRAIN_TRACE	CityHub	RemoveObjectFromList	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReportSkyFailure	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ResetModelAnimation	Implemented (bounded)	9
+TRAIN_TRACE	CityHub	ResetRead	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ResizeObject	Implemented (bounded)	59
+TRAIN_TRACE	CityHub	RestoreObjects	Explicitly unsupported	0
+TRAIN_TRACE	CityHub	RotateWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	SaveObjects	Explicitly unsupported	0
+TRAIN_TRACE	CityHub	ScaleObject	Implemented (bounded)	149
+TRAIN_TRACE	CityHub	SendBossHealth	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	SendConversation	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	SendObjectives	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	SendToClient	Implemented (bounded)	8
+TRAIN_TRACE	CityHub	SendWorldExit	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	SetAcceleration	Implemented (bounded)	122
+TRAIN_TRACE	CityHub	SetBlockingPriority	Implemented (bounded)	343
+TRAIN_TRACE	CityHub	SetClientUserData	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	SetDeactivationTime	Implemented (bounded)	149
+TRAIN_TRACE	CityHub	SetGameConVar	Implemented (bounded)	32
+TRAIN_TRACE	CityHub	SetGlobalForce	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	SetModelAnimation	Implemented (bounded)	47
+TRAIN_TRACE	CityHub	SetModelFilenames	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	SetModelLooping	Implemented (bounded)	10
+TRAIN_TRACE	CityHub	SetModelNodeHideStatus	Implemented (bounded)	19
+TRAIN_TRACE	CityHub	SetNextUpdate	Implemented (bounded)	894
+TRAIN_TRACE	CityHub	SetObjectColor	Implemented (bounded)	122
+TRAIN_TRACE	CityHub	SetObjectDims	Implemented (bounded)	276
+TRAIN_TRACE	CityHub	SetObjectFlags	Implemented (bounded)	549
+TRAIN_TRACE	CityHub	SetObjectRotation	Implemented (bounded)	31
+TRAIN_TRACE	CityHub	SetObjectState	Implemented (bounded)	28
+TRAIN_TRACE	CityHub	SetObjectUserFlags	Implemented (bounded)	358
+TRAIN_TRACE	CityHub	SetSkyDefinition	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	SetVelocity	Implemented (bounded)	123
+TRAIN_TRACE	CityHub	StartHMessageWrite	Implemented (bounded)	241
+TRAIN_TRACE	CityHub	StartMessageToObject	Implemented (bounded)	241
+TRAIN_TRACE	CityHub	TeleportObject	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	ValidateSpawnObject	Implemented (bounded)	21
+TRAIN_TRACE	CityHub	WriteDamage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	WriteKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	WritePickupMessage	Implemented (bounded)	240
+TRAIN_TRACE	CityHub	WriteToMessageDWord	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	WriteToMessageHString	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	ConnectClient	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	DisconnectClient	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	MID_MODELSTRINGKEY	Implemented (bounded)	1
+TRAIN_DOOR_AUDIO	CityHub	0 decoded starts, zero failures
+TRAIN_TRACE	teardown	AddObjectToList	Implemented (bounded)	0
+TRAIN_TRACE	teardown	AddSkyObject	Implemented (bounded)	5
+TRAIN_TRACE	teardown	AdvanceModelProjectile	Implemented (bounded)	0
+TRAIN_TRACE	teardown	AlignRotation	Implemented (bounded)	61
+TRAIN_TRACE	teardown	BreakInterObjectLink	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CastRay	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CastWorldRay	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CompareStringsUpper	Implemented (bounded)	5
+TRAIN_TRACE	teardown	ConfigureCharacterBody	Implemented (bounded)	27
+TRAIN_TRACE	teardown	ConfigureModelBody	Implemented (bounded)	122
+TRAIN_TRACE	teardown	ConfigureWorldBody	Implemented (bounded)	13
+TRAIN_TRACE	teardown	CopyString	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CreateAttachment	Implemented (bounded)	18
+TRAIN_TRACE	teardown	CreateInterObjectLink	Implemented (bounded)	36
+TRAIN_TRACE	teardown	CreateObject	Implemented (bounded)	55
+TRAIN_TRACE	teardown	CreateObjectList	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CreateObjectProps	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CreateString	Implemented (bounded)	30
+TRAIN_TRACE	teardown	EndHMessageRead	Explicitly unsupported	0
+TRAIN_TRACE	teardown	EndHMessageWrite	Implemented (bounded)	0
+TRAIN_TRACE	teardown	EndMessage	Implemented (bounded)	241
+TRAIN_TRACE	teardown	FindAttachment	Implemented (bounded)	30
+TRAIN_TRACE	teardown	FindNamedObjects	Implemented (bounded)	24
+TRAIN_TRACE	teardown	FreeString	Implemented (bounded)	30
+TRAIN_TRACE	teardown	GetAcceleration	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetAnimIndex	Implemented (bounded)	3078
+TRAIN_TRACE	teardown	GetAttachedModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetCameraView	Implemented (bounded)	61
+TRAIN_TRACE	teardown	GetClass	Implemented (bounded)	3191
+TRAIN_TRACE	teardown	GetClientResourceString	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetClientUserData	Implemented (bounded)	813
+TRAIN_TRACE	teardown	GetContainers	Implemented (bounded)	9794
+TRAIN_TRACE	teardown	GetFrameTime	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetGameConVar	Implemented (bounded)	895
+TRAIN_TRACE	teardown	GetGlobalForce	Implemented (bounded)	2
+TRAIN_TRACE	teardown	GetModelAnimUserDims	Implemented (bounded)	252
+TRAIN_TRACE	teardown	GetModelAnimation	Implemented (bounded)	54
+TRAIN_TRACE	teardown	GetModelAnimationName	Implemented (bounded)	84
+TRAIN_TRACE	teardown	GetModelFilenames	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetModelLooping	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetModelNodeHideStatus	Implemented (bounded)	43
+TRAIN_TRACE	teardown	GetModelNodeTransform	Implemented (bounded)	310
+TRAIN_TRACE	teardown	GetModelPlaybackState	Implemented (bounded)	34
+TRAIN_TRACE	teardown	GetMovementState	Implemented (bounded)	15552
+TRAIN_TRACE	teardown	GetNextObject	Implemented (bounded)	487
+TRAIN_TRACE	teardown	GetObjectClass	Implemented (bounded)	1642
+TRAIN_TRACE	teardown	GetObjectColor	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetObjectDims	Implemented (bounded)	9
+TRAIN_TRACE	teardown	GetObjectFlags	Implemented (bounded)	939
+TRAIN_TRACE	teardown	GetObjectName	Implemented (bounded)	143
+TRAIN_TRACE	teardown	GetObjectPos	Implemented (bounded)	814
+TRAIN_TRACE	teardown	GetObjectRotation	Implemented (bounded)	478
+TRAIN_TRACE	teardown	GetObjectState	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetObjectUserFlags	Implemented (bounded)	634
+TRAIN_TRACE	teardown	GetPathManager	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetPointContainerCode	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetPropBool	Implemented (bounded)	994
+TRAIN_TRACE	teardown	GetPropGeneric	Implemented (bounded)	24038
+TRAIN_TRACE	teardown	GetPropReal	Implemented (bounded)	2061
+TRAIN_TRACE	teardown	GetPropString	Implemented (bounded)	150
+TRAIN_TRACE	teardown	GetPropVector	Implemented (bounded)	136
+TRAIN_TRACE	teardown	GetSoundDuration	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetStringData	Implemented (bounded)	59
+TRAIN_TRACE	teardown	GetTime	Implemented (bounded)	311
+TRAIN_TRACE	teardown	GetVarValueFloat	Implemented (bounded)	893
+TRAIN_TRACE	teardown	GetVarValueString	Implemented (bounded)	2
+TRAIN_TRACE	teardown	GetVelocity	Implemented (bounded)	30
+TRAIN_TRACE	teardown	GetWorldTime	Implemented (bounded)	0
+TRAIN_TRACE	teardown	HandleToObject	Implemented (bounded)	1588
+TRAIN_TRACE	teardown	InterpolateRotation	Implemented (bounded)	0
+TRAIN_TRACE	teardown	IntersectSegment	Implemented (bounded)	281
+TRAIN_TRACE	teardown	IsKindOf	Implemented (bounded)	3621
+TRAIN_TRACE	teardown	IsObjectAlive	Implemented (bounded)	3823
+TRAIN_TRACE	teardown	IsSoundDone	Implemented (bounded)	0
+TRAIN_TRACE	teardown	KillSound	Implemented (bounded)	4
+TRAIN_TRACE	teardown	MoveKeyframedObject	Implemented (bounded)	0
+TRAIN_TRACE	teardown	MoveObject	Implemented (bounded)	15061
+TRAIN_TRACE	teardown	MoveObjectToGround	Implemented (bounded)	143
+TRAIN_TRACE	teardown	MoveWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ObjectToHandle	Implemented (bounded)	60
+TRAIN_TRACE	teardown	PingObjects	Implemented (bounded)	2
+TRAIN_TRACE	teardown	PlaceNonSolidModel	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayCharacterSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayCinematicSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayClientSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayDetachedSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayLocalSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayObjectLoopSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlaySoundAt	Implemented (bounded)	4
+TRAIN_TRACE	teardown	PlayWorldSound	Implemented (bounded)	31
+TRAIN_TRACE	teardown	PublishBloodSplat	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishCameraEffect	Implemented (bounded)	2
+TRAIN_TRACE	teardown	PublishClientBloodSplat	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishClientBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionFlames	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionFragments	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionLights	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionModels	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionRings	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionSprites	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishFleshGibs	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishLaserBeam	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishLightEffect	Implemented (bounded)	4
+TRAIN_TRACE	teardown	PublishObjectParticles	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishParticleStream	Implemented (bounded)	8
+TRAIN_TRACE	teardown	PublishPolyGrid	Implemented (bounded)	2
+TRAIN_TRACE	teardown	PublishSparks	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishWeaponSprites	Implemented (bounded)	0
+TRAIN_TRACE	teardown	QueryModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RandomFloat	Implemented (bounded)	59
+TRAIN_TRACE	teardown	RandomInt	Implemented (bounded)	35
+TRAIN_TRACE	teardown	ReadDamage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReadFromMessageDWord	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReadFromMessageHString	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReadKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReadPickupMessage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordBrushDestruction	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordDebrisEffect	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordExplosionEffect	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordPickup	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordProjectile	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordSceneExplosion	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordSpawn	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RelinquishList	Implemented (bounded)	24
+TRAIN_TRACE	teardown	RemoveAttachment	Implemented (bounded)	18
+TRAIN_TRACE	teardown	RemoveCameraEffect	Implemented (bounded)	2
+TRAIN_TRACE	teardown	RemoveLightEffect	Implemented (bounded)	4
+TRAIN_TRACE	teardown	RemoveObject	Implemented (bounded)	85
+TRAIN_TRACE	teardown	RemoveObjectFromList	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReportSkyFailure	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ResetModelAnimation	Implemented (bounded)	9
+TRAIN_TRACE	teardown	ResetRead	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ResizeObject	Implemented (bounded)	59
+TRAIN_TRACE	teardown	RestoreObjects	Explicitly unsupported	0
+TRAIN_TRACE	teardown	RotateWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	teardown	SaveObjects	Explicitly unsupported	0
+TRAIN_TRACE	teardown	ScaleObject	Implemented (bounded)	149
+TRAIN_TRACE	teardown	SendBossHealth	Implemented (bounded)	1
+TRAIN_TRACE	teardown	SendConversation	Implemented (bounded)	0
+TRAIN_TRACE	teardown	SendObjectives	Implemented (bounded)	0
+TRAIN_TRACE	teardown	SendToClient	Implemented (bounded)	8
+TRAIN_TRACE	teardown	SendWorldExit	Implemented (bounded)	0
+TRAIN_TRACE	teardown	SetAcceleration	Implemented (bounded)	122
+TRAIN_TRACE	teardown	SetBlockingPriority	Implemented (bounded)	343
+TRAIN_TRACE	teardown	SetClientUserData	Implemented (bounded)	2
+TRAIN_TRACE	teardown	SetDeactivationTime	Implemented (bounded)	149
+TRAIN_TRACE	teardown	SetGameConVar	Implemented (bounded)	66
+TRAIN_TRACE	teardown	SetGlobalForce	Implemented (bounded)	1
+TRAIN_TRACE	teardown	SetModelAnimation	Implemented (bounded)	47
+TRAIN_TRACE	teardown	SetModelFilenames	Implemented (bounded)	2
+TRAIN_TRACE	teardown	SetModelLooping	Implemented (bounded)	10
+TRAIN_TRACE	teardown	SetModelNodeHideStatus	Implemented (bounded)	19
+TRAIN_TRACE	teardown	SetNextUpdate	Implemented (bounded)	896
+TRAIN_TRACE	teardown	SetObjectColor	Implemented (bounded)	122
+TRAIN_TRACE	teardown	SetObjectDims	Implemented (bounded)	276
+TRAIN_TRACE	teardown	SetObjectFlags	Implemented (bounded)	549
+TRAIN_TRACE	teardown	SetObjectRotation	Implemented (bounded)	31
+TRAIN_TRACE	teardown	SetObjectState	Implemented (bounded)	28
+TRAIN_TRACE	teardown	SetObjectUserFlags	Implemented (bounded)	360
+TRAIN_TRACE	teardown	SetSkyDefinition	Implemented (bounded)	1
+TRAIN_TRACE	teardown	SetVelocity	Implemented (bounded)	123
+TRAIN_TRACE	teardown	StartHMessageWrite	Implemented (bounded)	241
+TRAIN_TRACE	teardown	StartMessageToObject	Implemented (bounded)	241
+TRAIN_TRACE	teardown	TeleportObject	Implemented (bounded)	1
+TRAIN_TRACE	teardown	ValidateSpawnObject	Implemented (bounded)	21
+TRAIN_TRACE	teardown	WriteDamage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	WriteKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	WritePickupMessage	Implemented (bounded)	240
+TRAIN_TRACE	teardown	WriteToMessageDWord	Implemented (bounded)	1
+TRAIN_TRACE	teardown	WriteToMessageHString	Implemented (bounded)	1
+TRAIN_TRACE	teardown	ConnectClient	Implemented (bounded)	1
+TRAIN_TRACE	teardown	DisconnectClient	Implemented (bounded)	1
+TRAIN_TRACE	teardown	MID_MODELSTRINGKEY	Implemented (bounded)	1
+TRAIN_DOOR_AUDIO	teardown	0 decoded starts, zero failures
+<end of output>
+Test time =  25.60 sec
+----------------------------------------------------------
+Test Passed.
+"train_session.private_30" end time: Oct 17 20:57 CEST
+"train_session.private_30" time elapsed: 00:00:25
+----------------------------------------------------------
+
+951/956 Testing: train_session.private_60
+951/956 Test: train_session.private_60
+Command: "<Blood2>/build/debug/tests/train_session_tests" "<external-game>" "60"
+Directory: <Blood2>/build/debug/tests
+"train_session.private_60" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walk t=0 pos=-32,170.001,-3224 HP=100 ammo=50 target=none
+Walk t=2 pos=-32,170.001,-2681.51 HP=100 ammo=50 target=none
+Walk t=4 pos=-32.5398,170.001,-2121.53 HP=100 ammo=45 target=none
+Walk t=6 pos=-32.0424,170.001,-1742.92 HP=100 ammo=42 target=noname
+Walk t=8 pos=-41.4027,170.001,-1438.17 HP=125 ammo=35 target=noname
+Walk t=10 pos=-10.9157,170.001,-1144.98 HP=125 ammo=28 target=noname
+Walk t=12 pos=-34.2327,170.001,-961.817 HP=125 ammo=24 target=none
+Walk t=14 pos=-34.2491,170.001,-520.001 HP=125 ammo=24 target=none
+Walk t=16 pos=-13.1251,170.001,-25.8379 HP=125 ammo=18 target=noname
+Walk t=18 pos=-75.999,170.001,339.24 HP=125 ammo=23 target=pete
+Walk t=20 pos=-29.333,170.001,611.073 HP=125 ammo=20 target=none
+Walk t=22 pos=-29.3323,170.001,841.327 HP=125 ammo=18 target=noname
+Walk t=24 pos=-30.8271,170.001,1262.49 HP=125 ammo=11 target=noname
+Walk t=26 pos=-42.5627,170.001,1671.51 HP=125 ammo=4 target=noname
+Walk t=28 pos=-33.2759,170.001,1766.19 HP=150 ammo=11 target=none
+Walk t=30 pos=-80.1816,170.001,2140 HP=175 ammo=11 target=none
+Walk t=32 pos=-80.3811,170.001,2140 HP=175 ammo=11 target=none
+Walk t=34 pos=-80.5807,170.001,2140 HP=175 ammo=11 target=none
+Walk t=36 pos=-80.7803,170.001,2140 HP=175 ammo=11 target=none
+Walk t=38 pos=-80.9799,170.001,2140 HP=175 ammo=11 target=none
+Walk t=40 pos=-81.1795,170.001,2140 HP=175 ammo=11 target=none
+Walk t=42 pos=-81.3791,170.001,2140 HP=175 ammo=11 target=none
+Route summary: damaged=10 dead=10 ammoPickup=1 healthPickup=1 relay=1 relayStart=41.2833 fade=1 time=55.2833
+Relay slot player sent=1 pending=0
+Relay slot cinexit1 sent=1 pending=0
+Relay slot htrain1 sent=1 pending=0
+Relay slot cinhi5 sent=1 pending=0
+Relay slot exp1 sent=1 pending=0
+Relay slot exp2 sent=1 pending=0
+Relay slot exp3 sent=1 pending=0
+Relay slot exp4 sent=1 pending=0
+Relay slot exp5 sent=1 pending=0
+Relay slot exit2 sent=1 pending=0
+TRAIN_TRACE	SubwayA	AddObjectToList	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	AddSkyObject	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	AdvanceModelProjectile	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	AlignRotation	Implemented (bounded)	5204
+TRAIN_TRACE	SubwayA	BreakInterObjectLink	Implemented (bounded)	480
+TRAIN_TRACE	SubwayA	CastRay	Implemented (bounded)	131
+TRAIN_TRACE	SubwayA	CastWorldRay	Implemented (bounded)	34
+TRAIN_TRACE	SubwayA	CompareStringsUpper	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	ConfigureCharacterBody	Implemented (bounded)	26
+TRAIN_TRACE	SubwayA	ConfigureModelBody	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ConfigureWorldBody	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	CopyString	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	CreateAttachment	Implemented (bounded)	15
+TRAIN_TRACE	SubwayA	CreateInterObjectLink	Implemented (bounded)	526
+TRAIN_TRACE	SubwayA	CreateObject	Implemented (bounded)	122
+TRAIN_TRACE	SubwayA	CreateObjectList	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	CreateObjectProps	Implemented (bounded)	6
+TRAIN_TRACE	SubwayA	CreateString	Implemented (bounded)	534
+TRAIN_TRACE	SubwayA	EndHMessageRead	Explicitly unsupported	0
+TRAIN_TRACE	SubwayA	EndHMessageWrite	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	EndMessage	Implemented (bounded)	65534
+TRAIN_TRACE	SubwayA	FindAttachment	Implemented (bounded)	5794
+TRAIN_TRACE	SubwayA	FindNamedObjects	Implemented (bounded)	56
+TRAIN_TRACE	SubwayA	FreeString	Implemented (bounded)	1698
+TRAIN_TRACE	SubwayA	GetAcceleration	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	GetAnimIndex	Implemented (bounded)	2851
+TRAIN_TRACE	SubwayA	GetAttachedModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	GetCameraView	Implemented (bounded)	6635
+TRAIN_TRACE	SubwayA	GetClass	Implemented (bounded)	214
+TRAIN_TRACE	SubwayA	GetClientResourceString	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	GetClientUserData	Implemented (bounded)	79062
+TRAIN_TRACE	SubwayA	GetContainers	Implemented (bounded)	293069
+TRAIN_TRACE	SubwayA	GetFrameTime	Implemented (bounded)	7794
+TRAIN_TRACE	SubwayA	GetGameConVar	Implemented (bounded)	482
+TRAIN_TRACE	SubwayA	GetGlobalForce	Implemented (bounded)	4
+TRAIN_TRACE	SubwayA	GetModelAnimUserDims	Implemented (bounded)	3510
+TRAIN_TRACE	SubwayA	GetModelAnimation	Implemented (bounded)	3536
+TRAIN_TRACE	SubwayA	GetModelAnimationName	Implemented (bounded)	7120
+TRAIN_TRACE	SubwayA	GetModelFilenames	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	GetModelLooping	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	GetModelNodeHideStatus	Implemented (bounded)	1162
+TRAIN_TRACE	SubwayA	GetModelNodeTransform	Implemented (bounded)	4757
+TRAIN_TRACE	SubwayA	GetModelPlaybackState	Implemented (bounded)	7085
+TRAIN_TRACE	SubwayA	GetMovementState	Implemented (bounded)	88160
+TRAIN_TRACE	SubwayA	GetNextObject	Implemented (bounded)	227
+TRAIN_TRACE	SubwayA	GetObjectClass	Implemented (bounded)	298
+TRAIN_TRACE	SubwayA	GetObjectColor	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	GetObjectDims	Implemented (bounded)	1310
+TRAIN_TRACE	SubwayA	GetObjectFlags	Implemented (bounded)	64545
+TRAIN_TRACE	SubwayA	GetObjectName	Implemented (bounded)	176
+TRAIN_TRACE	SubwayA	GetObjectPos	Implemented (bounded)	46689
+TRAIN_TRACE	SubwayA	GetObjectRotation	Implemented (bounded)	8145
+TRAIN_TRACE	SubwayA	GetObjectState	Implemented (bounded)	3
+TRAIN_TRACE	SubwayA	GetObjectUserFlags	Implemented (bounded)	162
+TRAIN_TRACE	SubwayA	GetPathManager	Implemented (bounded)	1939
+TRAIN_TRACE	SubwayA	GetPointContainerCode	Implemented (bounded)	79
+TRAIN_TRACE	SubwayA	GetPropBool	Implemented (bounded)	764
+TRAIN_TRACE	SubwayA	GetPropGeneric	Implemented (bounded)	10875
+TRAIN_TRACE	SubwayA	GetPropReal	Implemented (bounded)	764
+TRAIN_TRACE	SubwayA	GetPropString	Implemented (bounded)	72
+TRAIN_TRACE	SubwayA	GetPropVector	Implemented (bounded)	64
+TRAIN_TRACE	SubwayA	GetSoundDuration	Implemented (bounded)	63
+TRAIN_TRACE	SubwayA	GetStringData	Implemented (bounded)	1273
+TRAIN_TRACE	SubwayA	GetTime	Implemented (bounded)	69951
+TRAIN_TRACE	SubwayA	GetVarValueFloat	Implemented (bounded)	480
+TRAIN_TRACE	SubwayA	GetVarValueString	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	GetVelocity	Implemented (bounded)	3917
+TRAIN_TRACE	SubwayA	GetWorldTime	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	HandleToObject	Implemented (bounded)	125276
+TRAIN_TRACE	SubwayA	InterpolateRotation	Implemented (bounded)	4152
+TRAIN_TRACE	SubwayA	IntersectSegment	Implemented (bounded)	7083
+TRAIN_TRACE	SubwayA	IsKindOf	Implemented (bounded)	311
+TRAIN_TRACE	SubwayA	IsObjectAlive	Implemented (bounded)	436340
+TRAIN_TRACE	SubwayA	IsSoundDone	Implemented (bounded)	6981
+TRAIN_TRACE	SubwayA	KillSound	Implemented (bounded)	138
+TRAIN_TRACE	SubwayA	MoveKeyframedObject	Implemented (bounded)	40606
+TRAIN_TRACE	SubwayA	MoveObject	Implemented (bounded)	138887
+TRAIN_TRACE	SubwayA	MoveObjectToGround	Implemented (bounded)	16
+TRAIN_TRACE	SubwayA	MoveWorldModel	Implemented (bounded)	509
+TRAIN_TRACE	SubwayA	ObjectToHandle	Implemented (bounded)	3045
+TRAIN_TRACE	SubwayA	PingObjects	Implemented (bounded)	107
+TRAIN_TRACE	SubwayA	PlaceNonSolidModel	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	PlayCharacterSound	Implemented (bounded)	185
+TRAIN_TRACE	SubwayA	PlayCinematicSound	Implemented (bounded)	6
+TRAIN_TRACE	SubwayA	PlayClientSound	Implemented (bounded)	34
+TRAIN_TRACE	SubwayA	PlayDetachedSound	Implemented (bounded)	75
+TRAIN_TRACE	SubwayA	PlayLocalSound	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PlayObjectLoopSound	Implemented (bounded)	14
+TRAIN_TRACE	SubwayA	PlaySoundAt	Implemented (bounded)	81
+TRAIN_TRACE	SubwayA	PlayWorldSound	Implemented (bounded)	4
+TRAIN_TRACE	SubwayA	PublishBloodSplat	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	PublishBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishCameraEffect	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	PublishClientBloodSplat	Implemented (bounded)	34
+TRAIN_TRACE	SubwayA	PublishClientBloodSpurt	Implemented (bounded)	34
+TRAIN_TRACE	SubwayA	PublishExplosionFlames	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionFragments	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionLights	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionModels	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionRings	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishExplosionSprites	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	PublishFleshGibs	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishLaserBeam	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishLightEffect	Implemented (bounded)	12
+TRAIN_TRACE	SubwayA	PublishObjectParticles	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishParticleStream	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishPolyGrid	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	PublishSparks	Implemented (bounded)	60
+TRAIN_TRACE	SubwayA	PublishWeaponSprites	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	QueryModelNodeTransform	Implemented (bounded)	1026
+TRAIN_TRACE	SubwayA	RandomFloat	Implemented (bounded)	81
+TRAIN_TRACE	SubwayA	RandomInt	Implemented (bounded)	187
+TRAIN_TRACE	SubwayA	ReadDamage	Implemented (bounded)	59
+TRAIN_TRACE	SubwayA	ReadFromMessageDWord	Implemented (bounded)	1169
+TRAIN_TRACE	SubwayA	ReadFromMessageHString	Implemented (bounded)	1169
+TRAIN_TRACE	SubwayA	ReadKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ReadPickupMessage	Implemented (bounded)	10
+TRAIN_TRACE	SubwayA	RecordBrushDestruction	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RecordDebrisEffect	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RecordExplosionEffect	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RecordPickup	Implemented (bounded)	5
+TRAIN_TRACE	SubwayA	RecordProjectile	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RecordSceneExplosion	Implemented (bounded)	9
+TRAIN_TRACE	SubwayA	RecordSpawn	Implemented (bounded)	26
+TRAIN_TRACE	SubwayA	RelinquishList	Implemented (bounded)	56
+TRAIN_TRACE	SubwayA	RemoveAttachment	Implemented (bounded)	13
+TRAIN_TRACE	SubwayA	RemoveCameraEffect	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RemoveLightEffect	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	RemoveObject	Implemented (bounded)	117
+TRAIN_TRACE	SubwayA	RemoveObjectFromList	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ReportSkyFailure	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ResetModelAnimation	Implemented (bounded)	83
+TRAIN_TRACE	SubwayA	ResetRead	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	ResizeObject	Implemented (bounded)	3375
+TRAIN_TRACE	SubwayA	RestoreObjects	Explicitly unsupported	0
+TRAIN_TRACE	SubwayA	RotateWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	SaveObjects	Explicitly unsupported	0
+TRAIN_TRACE	SubwayA	ScaleObject	Implemented (bounded)	26
+TRAIN_TRACE	SubwayA	SendBossHealth	Implemented (bounded)	331
+TRAIN_TRACE	SubwayA	SendConversation	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	SendObjectives	Implemented (bounded)	1
+TRAIN_TRACE	SubwayA	SendToClient	Implemented (bounded)	415
+TRAIN_TRACE	SubwayA	SendWorldExit	Implemented (bounded)	1
+TRAIN_TRACE	SubwayA	SetAcceleration	Implemented (bounded)	6640
+TRAIN_TRACE	SubwayA	SetBlockingPriority	Implemented (bounded)	6754
+TRAIN_TRACE	SubwayA	SetClientUserData	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	SetDeactivationTime	Implemented (bounded)	16
+TRAIN_TRACE	SubwayA	SetGameConVar	Implemented (bounded)	32
+TRAIN_TRACE	SubwayA	SetGlobalForce	Implemented (bounded)	1
+TRAIN_TRACE	SubwayA	SetModelAnimation	Implemented (bounded)	151
+TRAIN_TRACE	SubwayA	SetModelFilenames	Implemented (bounded)	2
+TRAIN_TRACE	SubwayA	SetModelLooping	Implemented (bounded)	135
+TRAIN_TRACE	SubwayA	SetModelNodeHideStatus	Implemented (bounded)	38
+TRAIN_TRACE	SubwayA	SetNextUpdate	Implemented (bounded)	39572
+TRAIN_TRACE	SubwayA	SetObjectColor	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	SetObjectDims	Implemented (bounded)	99
+TRAIN_TRACE	SubwayA	SetObjectFlags	Implemented (bounded)	295
+TRAIN_TRACE	SubwayA	SetObjectRotation	Implemented (bounded)	46364
+TRAIN_TRACE	SubwayA	SetObjectState	Implemented (bounded)	17
+TRAIN_TRACE	SubwayA	SetObjectUserFlags	Implemented (bounded)	235
+TRAIN_TRACE	SubwayA	SetSkyDefinition	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	SetVelocity	Implemented (bounded)	8914
+TRAIN_TRACE	SubwayA	StartHMessageWrite	Implemented (bounded)	65534
+TRAIN_TRACE	SubwayA	StartMessageToObject	Implemented (bounded)	65534
+TRAIN_TRACE	SubwayA	TeleportObject	Implemented (bounded)	11
+TRAIN_TRACE	SubwayA	ValidateSpawnObject	Implemented (bounded)	15
+TRAIN_TRACE	SubwayA	WriteDamage	Implemented (bounded)	929
+TRAIN_TRACE	SubwayA	WriteKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	WritePickupMessage	Implemented (bounded)	64099
+TRAIN_TRACE	SubwayA	WriteToMessageDWord	Implemented (bounded)	506
+TRAIN_TRACE	SubwayA	WriteToMessageHString	Implemented (bounded)	506
+TRAIN_TRACE	SubwayA	ConnectClient	Implemented (bounded)	1
+TRAIN_TRACE	SubwayA	DisconnectClient	Implemented (bounded)	0
+TRAIN_TRACE	SubwayA	MID_MODELSTRINGKEY	Implemented (bounded)	132
+TRAIN_DOOR_AUDIO	SubwayA	28 decoded starts, zero failures
+Completed train at 60 Hz: 10 damaged / 10 dead authored Cultists, HP=175 ammo=11
+Message lifetime: 65534 created, 65534 released, peak=3
+Knife FIRE_KEY shots=0
+Reached authored NEW_LEVEL from spawn
+TRAIN_TRACE	CityHub	AddObjectToList	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	AddSkyObject	Implemented (bounded)	5
+TRAIN_TRACE	CityHub	AdvanceModelProjectile	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	AlignRotation	Implemented (bounded)	121
+TRAIN_TRACE	CityHub	BreakInterObjectLink	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CastRay	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CastWorldRay	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CompareStringsUpper	Implemented (bounded)	5
+TRAIN_TRACE	CityHub	ConfigureCharacterBody	Implemented (bounded)	27
+TRAIN_TRACE	CityHub	ConfigureModelBody	Implemented (bounded)	122
+TRAIN_TRACE	CityHub	ConfigureWorldBody	Implemented (bounded)	13
+TRAIN_TRACE	CityHub	CopyString	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CreateAttachment	Implemented (bounded)	19
+TRAIN_TRACE	CityHub	CreateInterObjectLink	Implemented (bounded)	36
+TRAIN_TRACE	CityHub	CreateObject	Implemented (bounded)	56
+TRAIN_TRACE	CityHub	CreateObjectList	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CreateObjectProps	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	CreateString	Implemented (bounded)	30
+TRAIN_TRACE	CityHub	EndHMessageRead	Explicitly unsupported	0
+TRAIN_TRACE	CityHub	EndHMessageWrite	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	EndMessage	Implemented (bounded)	241
+TRAIN_TRACE	CityHub	FindAttachment	Implemented (bounded)	120
+TRAIN_TRACE	CityHub	FindNamedObjects	Implemented (bounded)	24
+TRAIN_TRACE	CityHub	FreeString	Implemented (bounded)	21
+TRAIN_TRACE	CityHub	GetAcceleration	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetAnimIndex	Implemented (bounded)	3079
+TRAIN_TRACE	CityHub	GetAttachedModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetCameraView	Implemented (bounded)	121
+TRAIN_TRACE	CityHub	GetClass	Implemented (bounded)	3197
+TRAIN_TRACE	CityHub	GetClientResourceString	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetClientUserData	Implemented (bounded)	1411
+TRAIN_TRACE	CityHub	GetContainers	Implemented (bounded)	19351
+TRAIN_TRACE	CityHub	GetFrameTime	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetGameConVar	Implemented (bounded)	895
+TRAIN_TRACE	CityHub	GetGlobalForce	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	GetModelAnimUserDims	Implemented (bounded)	282
+TRAIN_TRACE	CityHub	GetModelAnimation	Implemented (bounded)	56
+TRAIN_TRACE	CityHub	GetModelAnimationName	Implemented (bounded)	115
+TRAIN_TRACE	CityHub	GetModelFilenames	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetModelLooping	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetModelNodeHideStatus	Implemented (bounded)	43
+TRAIN_TRACE	CityHub	GetModelNodeTransform	Implemented (bounded)	311
+TRAIN_TRACE	CityHub	GetModelPlaybackState	Implemented (bounded)	65
+TRAIN_TRACE	CityHub	GetMovementState	Implemented (bounded)	15335
+TRAIN_TRACE	CityHub	GetNextObject	Implemented (bounded)	487
+TRAIN_TRACE	CityHub	GetObjectClass	Implemented (bounded)	1645
+TRAIN_TRACE	CityHub	GetObjectColor	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetObjectDims	Implemented (bounded)	9
+TRAIN_TRACE	CityHub	GetObjectFlags	Implemented (bounded)	940
+TRAIN_TRACE	CityHub	GetObjectName	Implemented (bounded)	143
+TRAIN_TRACE	CityHub	GetObjectPos	Implemented (bounded)	1206
+TRAIN_TRACE	CityHub	GetObjectRotation	Implemented (bounded)	719
+TRAIN_TRACE	CityHub	GetObjectState	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetObjectUserFlags	Implemented (bounded)	932
+TRAIN_TRACE	CityHub	GetPathManager	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetPointContainerCode	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetPropBool	Implemented (bounded)	994
+TRAIN_TRACE	CityHub	GetPropGeneric	Implemented (bounded)	24038
+TRAIN_TRACE	CityHub	GetPropReal	Implemented (bounded)	2061
+TRAIN_TRACE	CityHub	GetPropString	Implemented (bounded)	150
+TRAIN_TRACE	CityHub	GetPropVector	Implemented (bounded)	136
+TRAIN_TRACE	CityHub	GetSoundDuration	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	GetStringData	Implemented (bounded)	59
+TRAIN_TRACE	CityHub	GetTime	Implemented (bounded)	612
+TRAIN_TRACE	CityHub	GetVarValueFloat	Implemented (bounded)	893
+TRAIN_TRACE	CityHub	GetVarValueString	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	GetVelocity	Implemented (bounded)	60
+TRAIN_TRACE	CityHub	GetWorldTime	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	HandleToObject	Implemented (bounded)	2048
+TRAIN_TRACE	CityHub	InterpolateRotation	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	IntersectSegment	Implemented (bounded)	281
+TRAIN_TRACE	CityHub	IsKindOf	Implemented (bounded)	3626
+TRAIN_TRACE	CityHub	IsObjectAlive	Implemented (bounded)	4847
+TRAIN_TRACE	CityHub	IsSoundDone	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	KillSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	MoveKeyframedObject	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	MoveObject	Implemented (bounded)	14875
+TRAIN_TRACE	CityHub	MoveObjectToGround	Implemented (bounded)	143
+TRAIN_TRACE	CityHub	MoveWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ObjectToHandle	Implemented (bounded)	60
+TRAIN_TRACE	CityHub	PingObjects	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	PlaceNonSolidModel	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayCharacterSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayCinematicSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayClientSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayDetachedSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayLocalSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlayObjectLoopSound	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PlaySoundAt	Implemented (bounded)	4
+TRAIN_TRACE	CityHub	PlayWorldSound	Implemented (bounded)	31
+TRAIN_TRACE	CityHub	PublishBloodSplat	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishCameraEffect	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	PublishClientBloodSplat	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishClientBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionFlames	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionFragments	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionLights	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionModels	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionRings	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishExplosionSprites	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishFleshGibs	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishLaserBeam	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishLightEffect	Implemented (bounded)	4
+TRAIN_TRACE	CityHub	PublishObjectParticles	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishParticleStream	Implemented (bounded)	8
+TRAIN_TRACE	CityHub	PublishPolyGrid	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	PublishSparks	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	PublishWeaponSprites	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	QueryModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RandomFloat	Implemented (bounded)	59
+TRAIN_TRACE	CityHub	RandomInt	Implemented (bounded)	35
+TRAIN_TRACE	CityHub	ReadDamage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReadFromMessageDWord	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReadFromMessageHString	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReadKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReadPickupMessage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordBrushDestruction	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordDebrisEffect	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordExplosionEffect	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordPickup	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordProjectile	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordSceneExplosion	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RecordSpawn	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RelinquishList	Implemented (bounded)	24
+TRAIN_TRACE	CityHub	RemoveAttachment	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RemoveCameraEffect	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RemoveLightEffect	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	RemoveObject	Implemented (bounded)	50
+TRAIN_TRACE	CityHub	RemoveObjectFromList	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ReportSkyFailure	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ResetModelAnimation	Implemented (bounded)	9
+TRAIN_TRACE	CityHub	ResetRead	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	ResizeObject	Implemented (bounded)	89
+TRAIN_TRACE	CityHub	RestoreObjects	Explicitly unsupported	0
+TRAIN_TRACE	CityHub	RotateWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	SaveObjects	Explicitly unsupported	0
+TRAIN_TRACE	CityHub	ScaleObject	Implemented (bounded)	149
+TRAIN_TRACE	CityHub	SendBossHealth	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	SendConversation	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	SendObjectives	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	SendToClient	Implemented (bounded)	8
+TRAIN_TRACE	CityHub	SendWorldExit	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	SetAcceleration	Implemented (bounded)	122
+TRAIN_TRACE	CityHub	SetBlockingPriority	Implemented (bounded)	343
+TRAIN_TRACE	CityHub	SetClientUserData	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	SetDeactivationTime	Implemented (bounded)	149
+TRAIN_TRACE	CityHub	SetGameConVar	Implemented (bounded)	32
+TRAIN_TRACE	CityHub	SetGlobalForce	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	SetModelAnimation	Implemented (bounded)	48
+TRAIN_TRACE	CityHub	SetModelFilenames	Implemented (bounded)	2
+TRAIN_TRACE	CityHub	SetModelLooping	Implemented (bounded)	10
+TRAIN_TRACE	CityHub	SetModelNodeHideStatus	Implemented (bounded)	19
+TRAIN_TRACE	CityHub	SetNextUpdate	Implemented (bounded)	1351
+TRAIN_TRACE	CityHub	SetObjectColor	Implemented (bounded)	122
+TRAIN_TRACE	CityHub	SetObjectDims	Implemented (bounded)	277
+TRAIN_TRACE	CityHub	SetObjectFlags	Implemented (bounded)	550
+TRAIN_TRACE	CityHub	SetObjectRotation	Implemented (bounded)	61
+TRAIN_TRACE	CityHub	SetObjectState	Implemented (bounded)	28
+TRAIN_TRACE	CityHub	SetObjectUserFlags	Implemented (bounded)	358
+TRAIN_TRACE	CityHub	SetSkyDefinition	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	SetVelocity	Implemented (bounded)	123
+TRAIN_TRACE	CityHub	StartHMessageWrite	Implemented (bounded)	241
+TRAIN_TRACE	CityHub	StartMessageToObject	Implemented (bounded)	241
+TRAIN_TRACE	CityHub	TeleportObject	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	ValidateSpawnObject	Implemented (bounded)	21
+TRAIN_TRACE	CityHub	WriteDamage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	WriteKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	WritePickupMessage	Implemented (bounded)	240
+TRAIN_TRACE	CityHub	WriteToMessageDWord	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	WriteToMessageHString	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	ConnectClient	Implemented (bounded)	1
+TRAIN_TRACE	CityHub	DisconnectClient	Implemented (bounded)	0
+TRAIN_TRACE	CityHub	MID_MODELSTRINGKEY	Implemented (bounded)	0
+TRAIN_DOOR_AUDIO	CityHub	0 decoded starts, zero failures
+TRAIN_TRACE	teardown	AddObjectToList	Implemented (bounded)	0
+TRAIN_TRACE	teardown	AddSkyObject	Implemented (bounded)	5
+TRAIN_TRACE	teardown	AdvanceModelProjectile	Implemented (bounded)	0
+TRAIN_TRACE	teardown	AlignRotation	Implemented (bounded)	121
+TRAIN_TRACE	teardown	BreakInterObjectLink	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CastRay	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CastWorldRay	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CompareStringsUpper	Implemented (bounded)	5
+TRAIN_TRACE	teardown	ConfigureCharacterBody	Implemented (bounded)	27
+TRAIN_TRACE	teardown	ConfigureModelBody	Implemented (bounded)	122
+TRAIN_TRACE	teardown	ConfigureWorldBody	Implemented (bounded)	13
+TRAIN_TRACE	teardown	CopyString	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CreateAttachment	Implemented (bounded)	19
+TRAIN_TRACE	teardown	CreateInterObjectLink	Implemented (bounded)	36
+TRAIN_TRACE	teardown	CreateObject	Implemented (bounded)	56
+TRAIN_TRACE	teardown	CreateObjectList	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CreateObjectProps	Implemented (bounded)	0
+TRAIN_TRACE	teardown	CreateString	Implemented (bounded)	30
+TRAIN_TRACE	teardown	EndHMessageRead	Explicitly unsupported	0
+TRAIN_TRACE	teardown	EndHMessageWrite	Implemented (bounded)	0
+TRAIN_TRACE	teardown	EndMessage	Implemented (bounded)	241
+TRAIN_TRACE	teardown	FindAttachment	Implemented (bounded)	120
+TRAIN_TRACE	teardown	FindNamedObjects	Implemented (bounded)	24
+TRAIN_TRACE	teardown	FreeString	Implemented (bounded)	30
+TRAIN_TRACE	teardown	GetAcceleration	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetAnimIndex	Implemented (bounded)	3079
+TRAIN_TRACE	teardown	GetAttachedModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetCameraView	Implemented (bounded)	121
+TRAIN_TRACE	teardown	GetClass	Implemented (bounded)	3197
+TRAIN_TRACE	teardown	GetClientResourceString	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetClientUserData	Implemented (bounded)	1413
+TRAIN_TRACE	teardown	GetContainers	Implemented (bounded)	19351
+TRAIN_TRACE	teardown	GetFrameTime	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetGameConVar	Implemented (bounded)	895
+TRAIN_TRACE	teardown	GetGlobalForce	Implemented (bounded)	2
+TRAIN_TRACE	teardown	GetModelAnimUserDims	Implemented (bounded)	282
+TRAIN_TRACE	teardown	GetModelAnimation	Implemented (bounded)	56
+TRAIN_TRACE	teardown	GetModelAnimationName	Implemented (bounded)	115
+TRAIN_TRACE	teardown	GetModelFilenames	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetModelLooping	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetModelNodeHideStatus	Implemented (bounded)	43
+TRAIN_TRACE	teardown	GetModelNodeTransform	Implemented (bounded)	311
+TRAIN_TRACE	teardown	GetModelPlaybackState	Implemented (bounded)	65
+TRAIN_TRACE	teardown	GetMovementState	Implemented (bounded)	15335
+TRAIN_TRACE	teardown	GetNextObject	Implemented (bounded)	487
+TRAIN_TRACE	teardown	GetObjectClass	Implemented (bounded)	1645
+TRAIN_TRACE	teardown	GetObjectColor	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetObjectDims	Implemented (bounded)	9
+TRAIN_TRACE	teardown	GetObjectFlags	Implemented (bounded)	940
+TRAIN_TRACE	teardown	GetObjectName	Implemented (bounded)	143
+TRAIN_TRACE	teardown	GetObjectPos	Implemented (bounded)	1206
+TRAIN_TRACE	teardown	GetObjectRotation	Implemented (bounded)	719
+TRAIN_TRACE	teardown	GetObjectState	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetObjectUserFlags	Implemented (bounded)	934
+TRAIN_TRACE	teardown	GetPathManager	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetPointContainerCode	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetPropBool	Implemented (bounded)	994
+TRAIN_TRACE	teardown	GetPropGeneric	Implemented (bounded)	24038
+TRAIN_TRACE	teardown	GetPropReal	Implemented (bounded)	2061
+TRAIN_TRACE	teardown	GetPropString	Implemented (bounded)	150
+TRAIN_TRACE	teardown	GetPropVector	Implemented (bounded)	136
+TRAIN_TRACE	teardown	GetSoundDuration	Implemented (bounded)	0
+TRAIN_TRACE	teardown	GetStringData	Implemented (bounded)	59
+TRAIN_TRACE	teardown	GetTime	Implemented (bounded)	612
+TRAIN_TRACE	teardown	GetVarValueFloat	Implemented (bounded)	893
+TRAIN_TRACE	teardown	GetVarValueString	Implemented (bounded)	2
+TRAIN_TRACE	teardown	GetVelocity	Implemented (bounded)	60
+TRAIN_TRACE	teardown	GetWorldTime	Implemented (bounded)	0
+TRAIN_TRACE	teardown	HandleToObject	Implemented (bounded)	2049
+TRAIN_TRACE	teardown	InterpolateRotation	Implemented (bounded)	0
+TRAIN_TRACE	teardown	IntersectSegment	Implemented (bounded)	281
+TRAIN_TRACE	teardown	IsKindOf	Implemented (bounded)	3626
+TRAIN_TRACE	teardown	IsObjectAlive	Implemented (bounded)	4872
+TRAIN_TRACE	teardown	IsSoundDone	Implemented (bounded)	0
+TRAIN_TRACE	teardown	KillSound	Implemented (bounded)	4
+TRAIN_TRACE	teardown	MoveKeyframedObject	Implemented (bounded)	0
+TRAIN_TRACE	teardown	MoveObject	Implemented (bounded)	14875
+TRAIN_TRACE	teardown	MoveObjectToGround	Implemented (bounded)	143
+TRAIN_TRACE	teardown	MoveWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ObjectToHandle	Implemented (bounded)	60
+TRAIN_TRACE	teardown	PingObjects	Implemented (bounded)	2
+TRAIN_TRACE	teardown	PlaceNonSolidModel	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayCharacterSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayCinematicSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayClientSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayDetachedSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayLocalSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlayObjectLoopSound	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PlaySoundAt	Implemented (bounded)	4
+TRAIN_TRACE	teardown	PlayWorldSound	Implemented (bounded)	31
+TRAIN_TRACE	teardown	PublishBloodSplat	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishCameraEffect	Implemented (bounded)	2
+TRAIN_TRACE	teardown	PublishClientBloodSplat	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishClientBloodSpurt	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionFlames	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionFragments	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionLights	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionModels	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionRings	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishExplosionSprites	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishFleshGibs	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishLaserBeam	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishLightEffect	Implemented (bounded)	4
+TRAIN_TRACE	teardown	PublishObjectParticles	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishParticleStream	Implemented (bounded)	8
+TRAIN_TRACE	teardown	PublishPolyGrid	Implemented (bounded)	2
+TRAIN_TRACE	teardown	PublishSparks	Implemented (bounded)	0
+TRAIN_TRACE	teardown	PublishWeaponSprites	Implemented (bounded)	0
+TRAIN_TRACE	teardown	QueryModelNodeTransform	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RandomFloat	Implemented (bounded)	59
+TRAIN_TRACE	teardown	RandomInt	Implemented (bounded)	35
+TRAIN_TRACE	teardown	ReadDamage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReadFromMessageDWord	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReadFromMessageHString	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReadKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReadPickupMessage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordBrushDestruction	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordDebrisEffect	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordExplosionEffect	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordPickup	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordProjectile	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordSceneExplosion	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RecordSpawn	Implemented (bounded)	0
+TRAIN_TRACE	teardown	RelinquishList	Implemented (bounded)	24
+TRAIN_TRACE	teardown	RemoveAttachment	Implemented (bounded)	19
+TRAIN_TRACE	teardown	RemoveCameraEffect	Implemented (bounded)	2
+TRAIN_TRACE	teardown	RemoveLightEffect	Implemented (bounded)	4
+TRAIN_TRACE	teardown	RemoveObject	Implemented (bounded)	86
+TRAIN_TRACE	teardown	RemoveObjectFromList	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ReportSkyFailure	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ResetModelAnimation	Implemented (bounded)	9
+TRAIN_TRACE	teardown	ResetRead	Implemented (bounded)	0
+TRAIN_TRACE	teardown	ResizeObject	Implemented (bounded)	89
+TRAIN_TRACE	teardown	RestoreObjects	Explicitly unsupported	0
+TRAIN_TRACE	teardown	RotateWorldModel	Implemented (bounded)	0
+TRAIN_TRACE	teardown	SaveObjects	Explicitly unsupported	0
+TRAIN_TRACE	teardown	ScaleObject	Implemented (bounded)	149
+TRAIN_TRACE	teardown	SendBossHealth	Implemented (bounded)	1
+TRAIN_TRACE	teardown	SendConversation	Implemented (bounded)	0
+TRAIN_TRACE	teardown	SendObjectives	Implemented (bounded)	0
+TRAIN_TRACE	teardown	SendToClient	Implemented (bounded)	8
+TRAIN_TRACE	teardown	SendWorldExit	Implemented (bounded)	0
+TRAIN_TRACE	teardown	SetAcceleration	Implemented (bounded)	122
+TRAIN_TRACE	teardown	SetBlockingPriority	Implemented (bounded)	343
+TRAIN_TRACE	teardown	SetClientUserData	Implemented (bounded)	2
+TRAIN_TRACE	teardown	SetDeactivationTime	Implemented (bounded)	149
+TRAIN_TRACE	teardown	SetGameConVar	Implemented (bounded)	66
+TRAIN_TRACE	teardown	SetGlobalForce	Implemented (bounded)	1
+TRAIN_TRACE	teardown	SetModelAnimation	Implemented (bounded)	48
+TRAIN_TRACE	teardown	SetModelFilenames	Implemented (bounded)	2
+TRAIN_TRACE	teardown	SetModelLooping	Implemented (bounded)	10
+TRAIN_TRACE	teardown	SetModelNodeHideStatus	Implemented (bounded)	19
+TRAIN_TRACE	teardown	SetNextUpdate	Implemented (bounded)	1353
+TRAIN_TRACE	teardown	SetObjectColor	Implemented (bounded)	122
+TRAIN_TRACE	teardown	SetObjectDims	Implemented (bounded)	277
+TRAIN_TRACE	teardown	SetObjectFlags	Implemented (bounded)	550
+TRAIN_TRACE	teardown	SetObjectRotation	Implemented (bounded)	61
+TRAIN_TRACE	teardown	SetObjectState	Implemented (bounded)	28
+TRAIN_TRACE	teardown	SetObjectUserFlags	Implemented (bounded)	360
+TRAIN_TRACE	teardown	SetSkyDefinition	Implemented (bounded)	1
+TRAIN_TRACE	teardown	SetVelocity	Implemented (bounded)	123
+TRAIN_TRACE	teardown	StartHMessageWrite	Implemented (bounded)	241
+TRAIN_TRACE	teardown	StartMessageToObject	Implemented (bounded)	241
+TRAIN_TRACE	teardown	TeleportObject	Implemented (bounded)	1
+TRAIN_TRACE	teardown	ValidateSpawnObject	Implemented (bounded)	21
+TRAIN_TRACE	teardown	WriteDamage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	WriteKeyMessage	Implemented (bounded)	0
+TRAIN_TRACE	teardown	WritePickupMessage	Implemented (bounded)	240
+TRAIN_TRACE	teardown	WriteToMessageDWord	Implemented (bounded)	1
+TRAIN_TRACE	teardown	WriteToMessageHString	Implemented (bounded)	1
+TRAIN_TRACE	teardown	ConnectClient	Implemented (bounded)	1
+TRAIN_TRACE	teardown	DisconnectClient	Implemented (bounded)	1
+TRAIN_TRACE	teardown	MID_MODELSTRINGKEY	Implemented (bounded)	0
+TRAIN_DOOR_AUDIO	teardown	0 decoded starts, zero failures
+<end of output>
+Test time =  26.48 sec
+----------------------------------------------------------
+Test Passed.
+"train_session.private_60" end time: Oct 17 20:57 CEST
+"train_session.private_60" time elapsed: 00:00:26
+----------------------------------------------------------
+
+235/956 Testing: keyframes.catalog
+235/956 Test: keyframes.catalog
+Command: "<Blood2>/build/debug/tests/keyframer_tests" "catalog" "<external-game>"
+Directory: <Blood2>/build/debug/tests
+"keyframes.catalog" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+worlds=57 controllers=94 source_keys=383 copied=375 empty_paths=0 missing_targets=44 malformed=0
+<end of output>
+Test time =   7.89 sec
+----------------------------------------------------------
+Test Passed.
+"keyframes.catalog" end time: Oct 17 20:57 CEST
+"keyframes.catalog" time elapsed: 00:00:07
+----------------------------------------------------------
+
+949/956 Testing: coverage.private
+949/956 Test: coverage.private
+Command: "<Blood2>/build/debug/tests/service_coverage_tests" "private" "<external-game>"
+Directory: <Blood2>/build/debug/tests
+"coverage.private" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+SubwayA-entry	AddObjectToList	ServerDE	Implemented (bounded)	0
+SubwayA-entry	AddSkyObject	ServerDE	Implemented (bounded)	0
+SubwayA-entry	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+SubwayA-entry	AlignRotation	ServerDE	Implemented (bounded)	0
+SubwayA-entry	BreakInterObjectLink	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CastRay	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CastWorldRay	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CompareStringsUpper	ServerDE	Implemented (bounded)	1
+SubwayA-entry	ConfigureCharacterBody	ServerDE	Implemented (bounded)	16
+SubwayA-entry	ConfigureModelBody	ServerDE	Implemented (bounded)	0
+SubwayA-entry	ConfigureWorldBody	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CopyString	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CreateAttachment	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CreateInterObjectLink	ServerDE	Implemented (bounded)	24
+SubwayA-entry	CreateObject	ServerDE	Implemented (bounded)	26
+SubwayA-entry	CreateObjectList	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CreateObjectProps	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CreateString	ServerDE	Implemented (bounded)	18
+SubwayA-entry	EndHMessageRead	ServerDE	Explicitly unsupported	0
+SubwayA-entry	EndHMessageWrite	ServerDE	Implemented (bounded)	0
+SubwayA-entry	EndMessage	ServerDE	Implemented (bounded)	6
+SubwayA-entry	FindAttachment	ServerDE	Implemented (bounded)	0
+SubwayA-entry	FindNamedObjects	ServerDE	Implemented (bounded)	7
+SubwayA-entry	FreeString	ServerDE	Implemented (bounded)	17
+SubwayA-entry	GetAcceleration	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetAnimIndex	ServerDE	Implemented (bounded)	2835
+SubwayA-entry	GetAttachedModelNodeTransform	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetCameraView	ServerDE	Implemented (bounded)	1
+SubwayA-entry	GetClass	ServerDE	Implemented (bounded)	31
+SubwayA-entry	GetClientResourceString	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetClientUserData	ServerDE	Implemented (bounded)	32
+SubwayA-entry	GetContainers	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetFrameTime	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetGameConVar	ServerDE	Implemented (bounded)	449
+SubwayA-entry	GetGlobalForce	ServerDE	Implemented (bounded)	3
+SubwayA-entry	GetModelAnimUserDims	ServerDE	Implemented (bounded)	48
+SubwayA-entry	GetModelAnimation	ServerDE	Implemented (bounded)	13
+SubwayA-entry	GetModelAnimationName	ServerDE	Implemented (bounded)	29
+SubwayA-entry	GetModelFilenames	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetModelLooping	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetModelNodeHideStatus	ServerDE	Implemented (bounded)	86
+SubwayA-entry	GetModelNodeTransform	ServerDE	Implemented (bounded)	234
+SubwayA-entry	GetModelPlaybackState	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetMovementState	ServerDE	Implemented (bounded)	20
+SubwayA-entry	GetNextObject	ServerDE	Implemented (bounded)	227
+SubwayA-entry	GetObjectClass	ServerDE	Implemented (bounded)	228
+SubwayA-entry	GetObjectColor	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetObjectDims	ServerDE	Implemented (bounded)	10
+SubwayA-entry	GetObjectFlags	ServerDE	Implemented (bounded)	345
+SubwayA-entry	GetObjectName	ServerDE	Implemented (bounded)	28
+SubwayA-entry	GetObjectPos	ServerDE	Implemented (bounded)	56
+SubwayA-entry	GetObjectRotation	ServerDE	Implemented (bounded)	16
+SubwayA-entry	GetObjectState	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetObjectUserFlags	ServerDE	Implemented (bounded)	63
+SubwayA-entry	GetPathManager	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetPointContainerCode	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetPropBool	ServerDE	Implemented (bounded)	764
+SubwayA-entry	GetPropGeneric	ServerDE	Implemented (bounded)	10699
+SubwayA-entry	GetPropReal	ServerDE	Implemented (bounded)	764
+SubwayA-entry	GetPropString	ServerDE	Implemented (bounded)	72
+SubwayA-entry	GetPropVector	ServerDE	Implemented (bounded)	64
+SubwayA-entry	GetSoundDuration	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetStringData	ServerDE	Implemented (bounded)	19
+SubwayA-entry	GetTime	ServerDE	Implemented (bounded)	44
+SubwayA-entry	GetVarValueFloat	ServerDE	Implemented (bounded)	447
+SubwayA-entry	GetVarValueString	ServerDE	Implemented (bounded)	2
+SubwayA-entry	GetVelocity	ServerDE	Implemented (bounded)	0
+SubwayA-entry	GetWorldTime	ServerDE	Implemented (bounded)	0
+SubwayA-entry	HandleToObject	ServerDE	Implemented (bounded)	41
+SubwayA-entry	InterpolateRotation	ServerDE	Implemented (bounded)	0
+SubwayA-entry	IntersectSegment	ServerDE	Implemented (bounded)	0
+SubwayA-entry	IsKindOf	ServerDE	Implemented (bounded)	230
+SubwayA-entry	IsObjectAlive	ServerDE	Implemented (bounded)	191
+SubwayA-entry	IsSoundDone	ServerDE	Implemented (bounded)	0
+SubwayA-entry	KillSound	ServerDE	Implemented (bounded)	0
+SubwayA-entry	MoveKeyframedObject	ServerDE	Implemented (bounded)	0
+SubwayA-entry	MoveObject	ServerDE	Implemented (bounded)	16
+SubwayA-entry	MoveObjectToGround	ServerDE	Implemented (bounded)	16
+SubwayA-entry	MoveWorldModel	ServerDE	Implemented (bounded)	0
+SubwayA-entry	ObjectToHandle	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PingObjects	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PlaceNonSolidModel	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PlayCharacterSound	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PlayCinematicSound	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PlayClientSound	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PlayDetachedSound	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PlayLocalSound	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PlayObjectLoopSound	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PlaySoundAt	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PlayWorldSound	ServerDE	Implemented (bounded)	4
+SubwayA-entry	PublishBloodSplat	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishBloodSpurt	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishCameraEffect	ServerDE	Implemented (bounded)	2
+SubwayA-entry	PublishClientBloodSplat	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishClientBloodSpurt	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishExplosionFlames	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishExplosionFragments	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishExplosionLights	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishExplosionModels	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishExplosionRings	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishExplosionSprites	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishFleshGibs	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishLaserBeam	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishLightEffect	ServerDE	Implemented (bounded)	12
+SubwayA-entry	PublishObjectParticles	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishParticleStream	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishPolyGrid	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishSparks	ServerDE	Implemented (bounded)	0
+SubwayA-entry	PublishWeaponSprites	ServerDE	Implemented (bounded)	0
+SubwayA-entry	QueryModelNodeTransform	ServerDE	Implemented (bounded)	0
+SubwayA-entry	RandomFloat	ServerDE	Implemented (bounded)	46
+SubwayA-entry	RandomInt	ServerDE	Implemented (bounded)	15
+SubwayA-entry	ReadDamage	ServerDE	Implemented (bounded)	0
+SubwayA-entry	ReadFromMessageDWord	ServerDE	Implemented (bounded)	6
+SubwayA-entry	ReadFromMessageHString	ServerDE	Implemented (bounded)	6
+SubwayA-entry	ReadKeyMessage	ServerDE	Implemented (bounded)	0
+SubwayA-entry	ReadPickupMessage	ServerDE	Implemented (bounded)	0
+SubwayA-entry	RecordBrushDestruction	ServerDE	Implemented (bounded)	0
+SubwayA-entry	RecordDebrisEffect	ServerDE	Implemented (bounded)	0
+SubwayA-entry	RecordExplosionEffect	ServerDE	Implemented (bounded)	0
+SubwayA-entry	RecordPickup	ServerDE	Implemented (bounded)	0
+SubwayA-entry	RecordProjectile	ServerDE	Implemented (bounded)	0
+SubwayA-entry	RecordSceneExplosion	ServerDE	Implemented (bounded)	0
+SubwayA-entry	RecordSpawn	ServerDE	Implemented (bounded)	0
+SubwayA-entry	RelinquishList	ServerDE	Implemented (bounded)	7
+SubwayA-entry	RemoveAttachment	ServerDE	Implemented (bounded)	0
+SubwayA-entry	RemoveCameraEffect	ServerDE	Implemented (bounded)	0
+SubwayA-entry	RemoveLightEffect	ServerDE	Implemented (bounded)	0
+SubwayA-entry	RemoveObject	ServerDE	Implemented (bounded)	4
+SubwayA-entry	RemoveObjectFromList	ServerDE	Implemented (bounded)	0
+SubwayA-entry	ReportSkyFailure	ServerDE	Implemented (bounded)	0
+SubwayA-entry	ResetModelAnimation	ServerDE	Implemented (bounded)	0
+SubwayA-entry	ResetRead	ServerDE	Implemented (bounded)	0
+SubwayA-entry	ResizeObject	ServerDE	Implemented (bounded)	16
+SubwayA-entry	RestoreObjects	ServerDE	Explicitly unsupported	0
+SubwayA-entry	RotateWorldModel	ServerDE	Implemented (bounded)	0
+SubwayA-entry	SaveObjects	ServerDE	Explicitly unsupported	0
+SubwayA-entry	ScaleObject	ServerDE	Implemented (bounded)	16
+SubwayA-entry	SendBossHealth	ServerDE	Implemented (bounded)	0
+SubwayA-entry	SendConversation	ServerDE	Implemented (bounded)	0
+SubwayA-entry	SendObjectives	ServerDE	Implemented (bounded)	0
+SubwayA-entry	SendToClient	ServerDE	Implemented (bounded)	8
+SubwayA-entry	SendWorldExit	ServerDE	Implemented (bounded)	0
+SubwayA-entry	SetAcceleration	ServerDE	Implemented (bounded)	5
+SubwayA-entry	SetBlockingPriority	ServerDE	Implemented (bounded)	120
+SubwayA-entry	SetClientUserData	ServerDE	Implemented (bounded)	2
+SubwayA-entry	SetDeactivationTime	ServerDE	Implemented (bounded)	0
+SubwayA-entry	SetGameConVar	ServerDE	Implemented (bounded)	32
+SubwayA-entry	SetGlobalForce	ServerDE	Implemented (bounded)	1
+SubwayA-entry	SetModelAnimation	ServerDE	Implemented (bounded)	16
+SubwayA-entry	SetModelFilenames	ServerDE	Implemented (bounded)	2
+SubwayA-entry	SetModelLooping	ServerDE	Implemented (bounded)	0
+SubwayA-entry	SetModelNodeHideStatus	ServerDE	Implemented (bounded)	38
+SubwayA-entry	SetNextUpdate	ServerDE	Implemented (bounded)	224
+SubwayA-entry	SetObjectColor	ServerDE	Implemented (bounded)	0
+SubwayA-entry	SetObjectDims	ServerDE	Implemented (bounded)	48
+SubwayA-entry	SetObjectFlags	ServerDE	Implemented (bounded)	256
+SubwayA-entry	SetObjectRotation	ServerDE	Implemented (bounded)	0
+SubwayA-entry	SetObjectState	ServerDE	Implemented (bounded)	1
+SubwayA-entry	SetObjectUserFlags	ServerDE	Implemented (bounded)	195
+SubwayA-entry	SetSkyDefinition	ServerDE	Implemented (bounded)	0
+SubwayA-entry	SetVelocity	ServerDE	Implemented (bounded)	5
+SubwayA-entry	StartHMessageWrite	ServerDE	Implemented (bounded)	6
+SubwayA-entry	StartMessageToObject	ServerDE	Implemented (bounded)	6
+SubwayA-entry	TeleportObject	ServerDE	Implemented (bounded)	1
+SubwayA-entry	ValidateSpawnObject	ServerDE	Implemented (bounded)	9
+SubwayA-entry	WriteDamage	ServerDE	Implemented (bounded)	0
+SubwayA-entry	WriteKeyMessage	ServerDE	Implemented (bounded)	0
+SubwayA-entry	WritePickupMessage	ServerDE	Implemented (bounded)	0
+SubwayA-entry	WriteToMessageDWord	ServerDE	Implemented (bounded)	6
+SubwayA-entry	WriteToMessageHString	ServerDE	Implemented (bounded)	6
+SubwayA-entry	ConnectClient	Lifecycle	Implemented (bounded)	1
+SubwayA-entry	DisconnectClient	Lifecycle	Implemented (bounded)	0
+SubwayA-entry	MID_MODELSTRINGKEY	Callback	Implemented (bounded)	0
+Coverage SubwayA-entry: reached=75 unexercised=99 unavailable=0 ai_errors=0
+SubwayA-10s	AddObjectToList	ServerDE	Implemented (bounded)	0
+SubwayA-10s	AddSkyObject	ServerDE	Implemented (bounded)	0
+SubwayA-10s	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+SubwayA-10s	AlignRotation	ServerDE	Implemented (bounded)	0
+SubwayA-10s	BreakInterObjectLink	ServerDE	Implemented (bounded)	1
+SubwayA-10s	CastRay	ServerDE	Implemented (bounded)	0
+SubwayA-10s	CastWorldRay	ServerDE	Implemented (bounded)	0
+SubwayA-10s	CompareStringsUpper	ServerDE	Implemented (bounded)	1
+SubwayA-10s	ConfigureCharacterBody	ServerDE	Implemented (bounded)	16
+SubwayA-10s	ConfigureModelBody	ServerDE	Implemented (bounded)	0
+SubwayA-10s	ConfigureWorldBody	ServerDE	Implemented (bounded)	0
+SubwayA-10s	CopyString	ServerDE	Implemented (bounded)	0
+SubwayA-10s	CreateAttachment	ServerDE	Implemented (bounded)	11
+SubwayA-10s	CreateInterObjectLink	ServerDE	Implemented (bounded)	40
+SubwayA-10s	CreateObject	ServerDE	Implemented (bounded)	38
+SubwayA-10s	CreateObjectList	ServerDE	Implemented (bounded)	0
+SubwayA-10s	CreateObjectProps	ServerDE	Implemented (bounded)	0
+SubwayA-10s	CreateString	ServerDE	Implemented (bounded)	28
+SubwayA-10s	EndHMessageRead	ServerDE	Explicitly unsupported	0
+SubwayA-10s	EndHMessageWrite	ServerDE	Implemented (bounded)	0
+SubwayA-10s	EndMessage	ServerDE	Implemented (bounded)	193
+SubwayA-10s	FindAttachment	ServerDE	Implemented (bounded)	599
+SubwayA-10s	FindNamedObjects	ServerDE	Implemented (bounded)	30
+SubwayA-10s	FreeString	ServerDE	Implemented (bounded)	37
+SubwayA-10s	GetAcceleration	ServerDE	Implemented (bounded)	0
+SubwayA-10s	GetAnimIndex	ServerDE	Implemented (bounded)	2847
+SubwayA-10s	GetAttachedModelNodeTransform	ServerDE	Implemented (bounded)	0
+SubwayA-10s	GetCameraView	ServerDE	Implemented (bounded)	1201
+SubwayA-10s	GetClass	ServerDE	Implemented (bounded)	55
+SubwayA-10s	GetClientResourceString	ServerDE	Implemented (bounded)	0
+SubwayA-10s	GetClientUserData	ServerDE	Implemented (bounded)	14564
+SubwayA-10s	GetContainers	ServerDE	Implemented (bounded)	38654
+SubwayA-10s	GetFrameTime	ServerDE	Implemented (bounded)	1306
+SubwayA-10s	GetGameConVar	ServerDE	Implemented (bounded)	449
+SubwayA-10s	GetGlobalForce	ServerDE	Implemented (bounded)	4
+SubwayA-10s	GetModelAnimUserDims	ServerDE	Implemented (bounded)	651
+SubwayA-10s	GetModelAnimation	ServerDE	Implemented (bounded)	247
+SubwayA-10s	GetModelAnimationName	ServerDE	Implemented (bounded)	1152
+SubwayA-10s	GetModelFilenames	ServerDE	Implemented (bounded)	0
+SubwayA-10s	GetModelLooping	ServerDE	Implemented (bounded)	0
+SubwayA-10s	GetModelNodeHideStatus	ServerDE	Implemented (bounded)	86
+SubwayA-10s	GetModelNodeTransform	ServerDE	Implemented (bounded)	327
+SubwayA-10s	GetModelPlaybackState	ServerDE	Implemented (bounded)	1115
+SubwayA-10s	GetMovementState	ServerDE	Implemented (bounded)	7884
+SubwayA-10s	GetNextObject	ServerDE	Implemented (bounded)	227
+SubwayA-10s	GetObjectClass	ServerDE	Implemented (bounded)	240
+SubwayA-10s	GetObjectColor	ServerDE	Implemented (bounded)	0
+SubwayA-10s	GetObjectDims	ServerDE	Implemented (bounded)	11
+SubwayA-10s	GetObjectFlags	ServerDE	Implemented (bounded)	356
+SubwayA-10s	GetObjectName	ServerDE	Implemented (bounded)	37
+SubwayA-10s	GetObjectPos	ServerDE	Implemented (bounded)	4855
+SubwayA-10s	GetObjectRotation	ServerDE	Implemented (bounded)	817
+SubwayA-10s	GetObjectState	ServerDE	Implemented (bounded)	0
+SubwayA-10s	GetObjectUserFlags	ServerDE	Implemented (bounded)	65
+SubwayA-10s	GetPathManager	ServerDE	Implemented (bounded)	459
+SubwayA-10s	GetPointContainerCode	ServerDE	Implemented (bounded)	0
+SubwayA-10s	GetPropBool	ServerDE	Implemented (bounded)	764
+SubwayA-10s	GetPropGeneric	ServerDE	Implemented (bounded)	10699
+SubwayA-10s	GetPropReal	ServerDE	Implemented (bounded)	764
+SubwayA-10s	GetPropString	ServerDE	Implemented (bounded)	72
+SubwayA-10s	GetPropVector	ServerDE	Implemented (bounded)	64
+SubwayA-10s	GetSoundDuration	ServerDE	Implemented (bounded)	0
+SubwayA-10s	GetStringData	ServerDE	Implemented (bounded)	73
+SubwayA-10s	GetTime	ServerDE	Implemented (bounded)	12850
+SubwayA-10s	GetVarValueFloat	ServerDE	Implemented (bounded)	447
+SubwayA-10s	GetVarValueString	ServerDE	Implemented (bounded)	2
+SubwayA-10s	GetVelocity	ServerDE	Implemented (bounded)	604
+SubwayA-10s	GetWorldTime	ServerDE	Implemented (bounded)	0
+SubwayA-10s	HandleToObject	ServerDE	Implemented (bounded)	22596
+SubwayA-10s	InterpolateRotation	ServerDE	Implemented (bounded)	1138
+SubwayA-10s	IntersectSegment	ServerDE	Implemented (bounded)	310
+SubwayA-10s	IsKindOf	ServerDE	Implemented (bounded)	242
+SubwayA-10s	IsObjectAlive	ServerDE	Implemented (bounded)	48983
+SubwayA-10s	IsSoundDone	ServerDE	Implemented (bounded)	598
+SubwayA-10s	KillSound	ServerDE	Implemented (bounded)	1
+SubwayA-10s	MoveKeyframedObject	ServerDE	Implemented (bounded)	7727
+SubwayA-10s	MoveObject	ServerDE	Implemented (bounded)	12007
+SubwayA-10s	MoveObjectToGround	ServerDE	Implemented (bounded)	16
+SubwayA-10s	MoveWorldModel	ServerDE	Implemented (bounded)	0
+SubwayA-10s	ObjectToHandle	ServerDE	Implemented (bounded)	180
+SubwayA-10s	PingObjects	ServerDE	Implemented (bounded)	20
+SubwayA-10s	PlaceNonSolidModel	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PlayCharacterSound	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PlayCinematicSound	ServerDE	Implemented (bounded)	2
+SubwayA-10s	PlayClientSound	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PlayDetachedSound	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PlayLocalSound	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PlayObjectLoopSound	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PlaySoundAt	ServerDE	Implemented (bounded)	1
+SubwayA-10s	PlayWorldSound	ServerDE	Implemented (bounded)	4
+SubwayA-10s	PublishBloodSplat	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishBloodSpurt	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishCameraEffect	ServerDE	Implemented (bounded)	2
+SubwayA-10s	PublishClientBloodSplat	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishClientBloodSpurt	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishExplosionFlames	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishExplosionFragments	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishExplosionLights	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishExplosionModels	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishExplosionRings	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishExplosionSprites	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishFleshGibs	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishLaserBeam	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishLightEffect	ServerDE	Implemented (bounded)	12
+SubwayA-10s	PublishObjectParticles	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishParticleStream	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishPolyGrid	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishSparks	ServerDE	Implemented (bounded)	0
+SubwayA-10s	PublishWeaponSprites	ServerDE	Implemented (bounded)	0
+SubwayA-10s	QueryModelNodeTransform	ServerDE	Implemented (bounded)	0
+SubwayA-10s	RandomFloat	ServerDE	Implemented (bounded)	51
+SubwayA-10s	RandomInt	ServerDE	Implemented (bounded)	22
+SubwayA-10s	ReadDamage	ServerDE	Implemented (bounded)	0
+SubwayA-10s	ReadFromMessageDWord	ServerDE	Implemented (bounded)	14
+SubwayA-10s	ReadFromMessageHString	ServerDE	Implemented (bounded)	14
+SubwayA-10s	ReadKeyMessage	ServerDE	Implemented (bounded)	0
+SubwayA-10s	ReadPickupMessage	ServerDE	Implemented (bounded)	0
+SubwayA-10s	RecordBrushDestruction	ServerDE	Implemented (bounded)	0
+SubwayA-10s	RecordDebrisEffect	ServerDE	Implemented (bounded)	0
+SubwayA-10s	RecordExplosionEffect	ServerDE	Implemented (bounded)	0
+SubwayA-10s	RecordPickup	ServerDE	Implemented (bounded)	0
+SubwayA-10s	RecordProjectile	ServerDE	Implemented (bounded)	0
+SubwayA-10s	RecordSceneExplosion	ServerDE	Implemented (bounded)	0
+SubwayA-10s	RecordSpawn	ServerDE	Implemented (bounded)	0
+SubwayA-10s	RelinquishList	ServerDE	Implemented (bounded)	30
+SubwayA-10s	RemoveAttachment	ServerDE	Implemented (bounded)	0
+SubwayA-10s	RemoveCameraEffect	ServerDE	Implemented (bounded)	0
+SubwayA-10s	RemoveLightEffect	ServerDE	Implemented (bounded)	0
+SubwayA-10s	RemoveObject	ServerDE	Implemented (bounded)	13
+SubwayA-10s	RemoveObjectFromList	ServerDE	Implemented (bounded)	0
+SubwayA-10s	ReportSkyFailure	ServerDE	Implemented (bounded)	0
+SubwayA-10s	ResetModelAnimation	ServerDE	Implemented (bounded)	6
+SubwayA-10s	ResetRead	ServerDE	Implemented (bounded)	0
+SubwayA-10s	ResizeObject	ServerDE	Implemented (bounded)	619
+SubwayA-10s	RestoreObjects	ServerDE	Explicitly unsupported	0
+SubwayA-10s	RotateWorldModel	ServerDE	Implemented (bounded)	0
+SubwayA-10s	SaveObjects	ServerDE	Explicitly unsupported	0
+SubwayA-10s	ScaleObject	ServerDE	Implemented (bounded)	16
+SubwayA-10s	SendBossHealth	ServerDE	Implemented (bounded)	331
+SubwayA-10s	SendConversation	ServerDE	Implemented (bounded)	0
+SubwayA-10s	SendObjectives	ServerDE	Implemented (bounded)	0
+SubwayA-10s	SendToClient	ServerDE	Implemented (bounded)	342
+SubwayA-10s	SendWorldExit	ServerDE	Implemented (bounded)	0
+SubwayA-10s	SetAcceleration	ServerDE	Implemented (bounded)	1206
+SubwayA-10s	SetBlockingPriority	ServerDE	Implemented (bounded)	1320
+SubwayA-10s	SetClientUserData	ServerDE	Implemented (bounded)	2
+SubwayA-10s	SetDeactivationTime	ServerDE	Implemented (bounded)	16
+SubwayA-10s	SetGameConVar	ServerDE	Implemented (bounded)	32
+SubwayA-10s	SetGlobalForce	ServerDE	Implemented (bounded)	1
+SubwayA-10s	SetModelAnimation	ServerDE	Implemented (bounded)	31
+SubwayA-10s	SetModelFilenames	ServerDE	Implemented (bounded)	2
+SubwayA-10s	SetModelLooping	ServerDE	Implemented (bounded)	9
+SubwayA-10s	SetModelNodeHideStatus	ServerDE	Implemented (bounded)	38
+SubwayA-10s	SetNextUpdate	ServerDE	Implemented (bounded)	10378
+SubwayA-10s	SetObjectColor	ServerDE	Implemented (bounded)	0
+SubwayA-10s	SetObjectDims	ServerDE	Implemented (bounded)	59
+SubwayA-10s	SetObjectFlags	ServerDE	Implemented (bounded)	267
+SubwayA-10s	SetObjectRotation	ServerDE	Implemented (bounded)	8493
+SubwayA-10s	SetObjectState	ServerDE	Implemented (bounded)	17
+SubwayA-10s	SetObjectUserFlags	ServerDE	Implemented (bounded)	197
+SubwayA-10s	SetSkyDefinition	ServerDE	Implemented (bounded)	0
+SubwayA-10s	SetVelocity	ServerDE	Implemented (bounded)	1376
+SubwayA-10s	StartHMessageWrite	ServerDE	Implemented (bounded)	193
+SubwayA-10s	StartMessageToObject	ServerDE	Implemented (bounded)	193
+SubwayA-10s	TeleportObject	ServerDE	Implemented (bounded)	1
+SubwayA-10s	ValidateSpawnObject	ServerDE	Implemented (bounded)	9
+SubwayA-10s	WriteDamage	ServerDE	Implemented (bounded)	182
+SubwayA-10s	WriteKeyMessage	ServerDE	Implemented (bounded)	0
+SubwayA-10s	WritePickupMessage	ServerDE	Implemented (bounded)	0
+SubwayA-10s	WriteToMessageDWord	ServerDE	Implemented (bounded)	11
+SubwayA-10s	WriteToMessageHString	ServerDE	Implemented (bounded)	11
+SubwayA-10s	ConnectClient	Lifecycle	Implemented (bounded)	1
+SubwayA-10s	DisconnectClient	Lifecycle	Implemented (bounded)	0
+SubwayA-10s	MID_MODELSTRINGKEY	Callback	Implemented (bounded)	0
+Coverage SubwayA-10s: reached=98 unexercised=76 unavailable=0 ai_errors=0
+SubwayA-exit-request	AddObjectToList	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	AddSkyObject	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	AlignRotation	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	BreakInterObjectLink	ServerDE	Implemented (bounded)	1
+SubwayA-exit-request	CastRay	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	CastWorldRay	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	CompareStringsUpper	ServerDE	Implemented (bounded)	1
+SubwayA-exit-request	ConfigureCharacterBody	ServerDE	Implemented (bounded)	16
+SubwayA-exit-request	ConfigureModelBody	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	ConfigureWorldBody	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	CopyString	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	CreateAttachment	ServerDE	Implemented (bounded)	11
+SubwayA-exit-request	CreateInterObjectLink	ServerDE	Implemented (bounded)	40
+SubwayA-exit-request	CreateObject	ServerDE	Implemented (bounded)	38
+SubwayA-exit-request	CreateObjectList	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	CreateObjectProps	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	CreateString	ServerDE	Implemented (bounded)	28
+SubwayA-exit-request	EndHMessageRead	ServerDE	Explicitly unsupported	0
+SubwayA-exit-request	EndHMessageWrite	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	EndMessage	ServerDE	Implemented (bounded)	193
+SubwayA-exit-request	FindAttachment	ServerDE	Implemented (bounded)	599
+SubwayA-exit-request	FindNamedObjects	ServerDE	Implemented (bounded)	30
+SubwayA-exit-request	FreeString	ServerDE	Implemented (bounded)	37
+SubwayA-exit-request	GetAcceleration	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	GetAnimIndex	ServerDE	Implemented (bounded)	2847
+SubwayA-exit-request	GetAttachedModelNodeTransform	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	GetCameraView	ServerDE	Implemented (bounded)	1201
+SubwayA-exit-request	GetClass	ServerDE	Implemented (bounded)	55
+SubwayA-exit-request	GetClientResourceString	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	GetClientUserData	ServerDE	Implemented (bounded)	14573
+SubwayA-exit-request	GetContainers	ServerDE	Implemented (bounded)	38654
+SubwayA-exit-request	GetFrameTime	ServerDE	Implemented (bounded)	1306
+SubwayA-exit-request	GetGameConVar	ServerDE	Implemented (bounded)	449
+SubwayA-exit-request	GetGlobalForce	ServerDE	Implemented (bounded)	4
+SubwayA-exit-request	GetModelAnimUserDims	ServerDE	Implemented (bounded)	651
+SubwayA-exit-request	GetModelAnimation	ServerDE	Implemented (bounded)	247
+SubwayA-exit-request	GetModelAnimationName	ServerDE	Implemented (bounded)	1152
+SubwayA-exit-request	GetModelFilenames	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	GetModelLooping	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	GetModelNodeHideStatus	ServerDE	Implemented (bounded)	86
+SubwayA-exit-request	GetModelNodeTransform	ServerDE	Implemented (bounded)	327
+SubwayA-exit-request	GetModelPlaybackState	ServerDE	Implemented (bounded)	1115
+SubwayA-exit-request	GetMovementState	ServerDE	Implemented (bounded)	7884
+SubwayA-exit-request	GetNextObject	ServerDE	Implemented (bounded)	227
+SubwayA-exit-request	GetObjectClass	ServerDE	Implemented (bounded)	240
+SubwayA-exit-request	GetObjectColor	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	GetObjectDims	ServerDE	Implemented (bounded)	11
+SubwayA-exit-request	GetObjectFlags	ServerDE	Implemented (bounded)	356
+SubwayA-exit-request	GetObjectName	ServerDE	Implemented (bounded)	37
+SubwayA-exit-request	GetObjectPos	ServerDE	Implemented (bounded)	4855
+SubwayA-exit-request	GetObjectRotation	ServerDE	Implemented (bounded)	817
+SubwayA-exit-request	GetObjectState	ServerDE	Implemented (bounded)	3
+SubwayA-exit-request	GetObjectUserFlags	ServerDE	Implemented (bounded)	65
+SubwayA-exit-request	GetPathManager	ServerDE	Implemented (bounded)	459
+SubwayA-exit-request	GetPointContainerCode	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	GetPropBool	ServerDE	Implemented (bounded)	764
+SubwayA-exit-request	GetPropGeneric	ServerDE	Implemented (bounded)	10699
+SubwayA-exit-request	GetPropReal	ServerDE	Implemented (bounded)	764
+SubwayA-exit-request	GetPropString	ServerDE	Implemented (bounded)	72
+SubwayA-exit-request	GetPropVector	ServerDE	Implemented (bounded)	64
+SubwayA-exit-request	GetSoundDuration	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	GetStringData	ServerDE	Implemented (bounded)	75
+SubwayA-exit-request	GetTime	ServerDE	Implemented (bounded)	12851
+SubwayA-exit-request	GetVarValueFloat	ServerDE	Implemented (bounded)	447
+SubwayA-exit-request	GetVarValueString	ServerDE	Implemented (bounded)	2
+SubwayA-exit-request	GetVelocity	ServerDE	Implemented (bounded)	604
+SubwayA-exit-request	GetWorldTime	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	HandleToObject	ServerDE	Implemented (bounded)	22600
+SubwayA-exit-request	InterpolateRotation	ServerDE	Implemented (bounded)	1138
+SubwayA-exit-request	IntersectSegment	ServerDE	Implemented (bounded)	310
+SubwayA-exit-request	IsKindOf	ServerDE	Implemented (bounded)	242
+SubwayA-exit-request	IsObjectAlive	ServerDE	Implemented (bounded)	48989
+SubwayA-exit-request	IsSoundDone	ServerDE	Implemented (bounded)	598
+SubwayA-exit-request	KillSound	ServerDE	Implemented (bounded)	1
+SubwayA-exit-request	MoveKeyframedObject	ServerDE	Implemented (bounded)	7727
+SubwayA-exit-request	MoveObject	ServerDE	Implemented (bounded)	12007
+SubwayA-exit-request	MoveObjectToGround	ServerDE	Implemented (bounded)	16
+SubwayA-exit-request	MoveWorldModel	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	ObjectToHandle	ServerDE	Implemented (bounded)	180
+SubwayA-exit-request	PingObjects	ServerDE	Implemented (bounded)	20
+SubwayA-exit-request	PlaceNonSolidModel	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PlayCharacterSound	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PlayCinematicSound	ServerDE	Implemented (bounded)	2
+SubwayA-exit-request	PlayClientSound	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PlayDetachedSound	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PlayLocalSound	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PlayObjectLoopSound	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PlaySoundAt	ServerDE	Implemented (bounded)	1
+SubwayA-exit-request	PlayWorldSound	ServerDE	Implemented (bounded)	4
+SubwayA-exit-request	PublishBloodSplat	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishBloodSpurt	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishCameraEffect	ServerDE	Implemented (bounded)	2
+SubwayA-exit-request	PublishClientBloodSplat	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishClientBloodSpurt	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishExplosionFlames	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishExplosionFragments	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishExplosionLights	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishExplosionModels	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishExplosionRings	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishExplosionSprites	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishFleshGibs	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishLaserBeam	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishLightEffect	ServerDE	Implemented (bounded)	12
+SubwayA-exit-request	PublishObjectParticles	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishParticleStream	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishPolyGrid	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishSparks	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	PublishWeaponSprites	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	QueryModelNodeTransform	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	RandomFloat	ServerDE	Implemented (bounded)	51
+SubwayA-exit-request	RandomInt	ServerDE	Implemented (bounded)	22
+SubwayA-exit-request	ReadDamage	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	ReadFromMessageDWord	ServerDE	Implemented (bounded)	14
+SubwayA-exit-request	ReadFromMessageHString	ServerDE	Implemented (bounded)	14
+SubwayA-exit-request	ReadKeyMessage	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	ReadPickupMessage	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	RecordBrushDestruction	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	RecordDebrisEffect	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	RecordExplosionEffect	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	RecordPickup	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	RecordProjectile	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	RecordSceneExplosion	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	RecordSpawn	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	RelinquishList	ServerDE	Implemented (bounded)	30
+SubwayA-exit-request	RemoveAttachment	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	RemoveCameraEffect	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	RemoveLightEffect	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	RemoveObject	ServerDE	Implemented (bounded)	13
+SubwayA-exit-request	RemoveObjectFromList	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	ReportSkyFailure	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	ResetModelAnimation	ServerDE	Implemented (bounded)	6
+SubwayA-exit-request	ResetRead	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	ResizeObject	ServerDE	Implemented (bounded)	619
+SubwayA-exit-request	RestoreObjects	ServerDE	Explicitly unsupported	0
+SubwayA-exit-request	RotateWorldModel	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	SaveObjects	ServerDE	Explicitly unsupported	0
+SubwayA-exit-request	ScaleObject	ServerDE	Implemented (bounded)	16
+SubwayA-exit-request	SendBossHealth	ServerDE	Implemented (bounded)	331
+SubwayA-exit-request	SendConversation	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	SendObjectives	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	SendToClient	ServerDE	Implemented (bounded)	343
+SubwayA-exit-request	SendWorldExit	ServerDE	Implemented (bounded)	1
+SubwayA-exit-request	SetAcceleration	ServerDE	Implemented (bounded)	1206
+SubwayA-exit-request	SetBlockingPriority	ServerDE	Implemented (bounded)	1320
+SubwayA-exit-request	SetClientUserData	ServerDE	Implemented (bounded)	2
+SubwayA-exit-request	SetDeactivationTime	ServerDE	Implemented (bounded)	16
+SubwayA-exit-request	SetGameConVar	ServerDE	Implemented (bounded)	32
+SubwayA-exit-request	SetGlobalForce	ServerDE	Implemented (bounded)	1
+SubwayA-exit-request	SetModelAnimation	ServerDE	Implemented (bounded)	31
+SubwayA-exit-request	SetModelFilenames	ServerDE	Implemented (bounded)	2
+SubwayA-exit-request	SetModelLooping	ServerDE	Implemented (bounded)	9
+SubwayA-exit-request	SetModelNodeHideStatus	ServerDE	Implemented (bounded)	38
+SubwayA-exit-request	SetNextUpdate	ServerDE	Implemented (bounded)	10378
+SubwayA-exit-request	SetObjectColor	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	SetObjectDims	ServerDE	Implemented (bounded)	59
+SubwayA-exit-request	SetObjectFlags	ServerDE	Implemented (bounded)	267
+SubwayA-exit-request	SetObjectRotation	ServerDE	Implemented (bounded)	8493
+SubwayA-exit-request	SetObjectState	ServerDE	Implemented (bounded)	17
+SubwayA-exit-request	SetObjectUserFlags	ServerDE	Implemented (bounded)	197
+SubwayA-exit-request	SetSkyDefinition	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	SetVelocity	ServerDE	Implemented (bounded)	1376
+SubwayA-exit-request	StartHMessageWrite	ServerDE	Implemented (bounded)	193
+SubwayA-exit-request	StartMessageToObject	ServerDE	Implemented (bounded)	193
+SubwayA-exit-request	TeleportObject	ServerDE	Implemented (bounded)	1
+SubwayA-exit-request	ValidateSpawnObject	ServerDE	Implemented (bounded)	9
+SubwayA-exit-request	WriteDamage	ServerDE	Implemented (bounded)	182
+SubwayA-exit-request	WriteKeyMessage	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	WritePickupMessage	ServerDE	Implemented (bounded)	0
+SubwayA-exit-request	WriteToMessageDWord	ServerDE	Implemented (bounded)	11
+SubwayA-exit-request	WriteToMessageHString	ServerDE	Implemented (bounded)	11
+SubwayA-exit-request	ConnectClient	Lifecycle	Implemented (bounded)	1
+SubwayA-exit-request	DisconnectClient	Lifecycle	Implemented (bounded)	0
+SubwayA-exit-request	MID_MODELSTRINGKEY	Callback	Implemented (bounded)	0
+Coverage SubwayA-exit-request: reached=100 unexercised=74 unavailable=0 ai_errors=0
+CityHub-restored	AddObjectToList	ServerDE	Implemented (bounded)	0
+CityHub-restored	AddSkyObject	ServerDE	Implemented (bounded)	1
+CityHub-restored	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+CityHub-restored	AlignRotation	ServerDE	Implemented (bounded)	1
+CityHub-restored	BreakInterObjectLink	ServerDE	Implemented (bounded)	0
+CityHub-restored	CastRay	ServerDE	Implemented (bounded)	0
+CityHub-restored	CastWorldRay	ServerDE	Implemented (bounded)	0
+CityHub-restored	CompareStringsUpper	ServerDE	Implemented (bounded)	5
+CityHub-restored	ConfigureCharacterBody	ServerDE	Implemented (bounded)	27
+CityHub-restored	ConfigureModelBody	ServerDE	Implemented (bounded)	122
+CityHub-restored	ConfigureWorldBody	ServerDE	Implemented (bounded)	13
+CityHub-restored	CopyString	ServerDE	Implemented (bounded)	0
+CityHub-restored	CreateAttachment	ServerDE	Implemented (bounded)	1
+CityHub-restored	CreateInterObjectLink	ServerDE	Implemented (bounded)	34
+CityHub-restored	CreateObject	ServerDE	Implemented (bounded)	37
+CityHub-restored	CreateObjectList	ServerDE	Implemented (bounded)	0
+CityHub-restored	CreateObjectProps	ServerDE	Implemented (bounded)	0
+CityHub-restored	CreateString	ServerDE	Implemented (bounded)	30
+CityHub-restored	EndHMessageRead	ServerDE	Explicitly unsupported	0
+CityHub-restored	EndHMessageWrite	ServerDE	Implemented (bounded)	0
+CityHub-restored	EndMessage	ServerDE	Implemented (bounded)	1
+CityHub-restored	FindAttachment	ServerDE	Implemented (bounded)	0
+CityHub-restored	FindNamedObjects	ServerDE	Implemented (bounded)	2
+CityHub-restored	FreeString	ServerDE	Implemented (bounded)	3
+CityHub-restored	GetAcceleration	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetAnimIndex	ServerDE	Implemented (bounded)	3061
+CityHub-restored	GetAttachedModelNodeTransform	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetCameraView	ServerDE	Implemented (bounded)	1
+CityHub-restored	GetClass	ServerDE	Implemented (bounded)	44
+CityHub-restored	GetClientResourceString	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetClientUserData	ServerDE	Implemented (bounded)	27
+CityHub-restored	GetContainers	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetFrameTime	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetGameConVar	ServerDE	Implemented (bounded)	895
+CityHub-restored	GetGlobalForce	ServerDE	Implemented (bounded)	2
+CityHub-restored	GetModelAnimUserDims	ServerDE	Implemented (bounded)	221
+CityHub-restored	GetModelAnimation	ServerDE	Implemented (bounded)	33
+CityHub-restored	GetModelAnimationName	ServerDE	Implemented (bounded)	41
+CityHub-restored	GetModelFilenames	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetModelLooping	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetModelNodeHideStatus	ServerDE	Implemented (bounded)	43
+CityHub-restored	GetModelNodeTransform	ServerDE	Implemented (bounded)	253
+CityHub-restored	GetModelPlaybackState	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetMovementState	ServerDE	Implemented (bounded)	31
+CityHub-restored	GetNextObject	ServerDE	Implemented (bounded)	487
+CityHub-restored	GetObjectClass	ServerDE	Implemented (bounded)	489
+CityHub-restored	GetObjectColor	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetObjectDims	ServerDE	Implemented (bounded)	9
+CityHub-restored	GetObjectFlags	ServerDE	Implemented (bounded)	677
+CityHub-restored	GetObjectName	ServerDE	Implemented (bounded)	129
+CityHub-restored	GetObjectPos	ServerDE	Implemented (bounded)	144
+CityHub-restored	GetObjectRotation	ServerDE	Implemented (bounded)	161
+CityHub-restored	GetObjectState	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetObjectUserFlags	ServerDE	Implemented (bounded)	212
+CityHub-restored	GetPathManager	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetPointContainerCode	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetPropBool	ServerDE	Implemented (bounded)	994
+CityHub-restored	GetPropGeneric	ServerDE	Implemented (bounded)	24038
+CityHub-restored	GetPropReal	ServerDE	Implemented (bounded)	2061
+CityHub-restored	GetPropString	ServerDE	Implemented (bounded)	150
+CityHub-restored	GetPropVector	ServerDE	Implemented (bounded)	136
+CityHub-restored	GetSoundDuration	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetStringData	ServerDE	Implemented (bounded)	3
+CityHub-restored	GetTime	ServerDE	Implemented (bounded)	37
+CityHub-restored	GetVarValueFloat	ServerDE	Implemented (bounded)	893
+CityHub-restored	GetVarValueString	ServerDE	Implemented (bounded)	2
+CityHub-restored	GetVelocity	ServerDE	Implemented (bounded)	0
+CityHub-restored	GetWorldTime	ServerDE	Implemented (bounded)	0
+CityHub-restored	HandleToObject	ServerDE	Implemented (bounded)	86
+CityHub-restored	InterpolateRotation	ServerDE	Implemented (bounded)	0
+CityHub-restored	IntersectSegment	ServerDE	Implemented (bounded)	0
+CityHub-restored	IsKindOf	ServerDE	Implemented (bounded)	492
+CityHub-restored	IsObjectAlive	ServerDE	Implemented (bounded)	454
+CityHub-restored	IsSoundDone	ServerDE	Implemented (bounded)	0
+CityHub-restored	KillSound	ServerDE	Implemented (bounded)	0
+CityHub-restored	MoveKeyframedObject	ServerDE	Implemented (bounded)	0
+CityHub-restored	MoveObject	ServerDE	Implemented (bounded)	125
+CityHub-restored	MoveObjectToGround	ServerDE	Implemented (bounded)	143
+CityHub-restored	MoveWorldModel	ServerDE	Implemented (bounded)	0
+CityHub-restored	ObjectToHandle	ServerDE	Implemented (bounded)	0
+CityHub-restored	PingObjects	ServerDE	Implemented (bounded)	0
+CityHub-restored	PlaceNonSolidModel	ServerDE	Implemented (bounded)	0
+CityHub-restored	PlayCharacterSound	ServerDE	Implemented (bounded)	0
+CityHub-restored	PlayCinematicSound	ServerDE	Implemented (bounded)	0
+CityHub-restored	PlayClientSound	ServerDE	Implemented (bounded)	0
+CityHub-restored	PlayDetachedSound	ServerDE	Implemented (bounded)	0
+CityHub-restored	PlayLocalSound	ServerDE	Implemented (bounded)	0
+CityHub-restored	PlayObjectLoopSound	ServerDE	Implemented (bounded)	0
+CityHub-restored	PlaySoundAt	ServerDE	Implemented (bounded)	4
+CityHub-restored	PlayWorldSound	ServerDE	Implemented (bounded)	31
+CityHub-restored	PublishBloodSplat	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishBloodSpurt	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishCameraEffect	ServerDE	Implemented (bounded)	2
+CityHub-restored	PublishClientBloodSplat	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishClientBloodSpurt	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishExplosionFlames	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishExplosionFragments	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishExplosionLights	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishExplosionModels	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishExplosionRings	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishExplosionSprites	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishFleshGibs	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishLaserBeam	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishLightEffect	ServerDE	Implemented (bounded)	4
+CityHub-restored	PublishObjectParticles	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishParticleStream	ServerDE	Implemented (bounded)	8
+CityHub-restored	PublishPolyGrid	ServerDE	Implemented (bounded)	2
+CityHub-restored	PublishSparks	ServerDE	Implemented (bounded)	0
+CityHub-restored	PublishWeaponSprites	ServerDE	Implemented (bounded)	0
+CityHub-restored	QueryModelNodeTransform	ServerDE	Implemented (bounded)	0
+CityHub-restored	RandomFloat	ServerDE	Implemented (bounded)	59
+CityHub-restored	RandomInt	ServerDE	Implemented (bounded)	26
+CityHub-restored	ReadDamage	ServerDE	Implemented (bounded)	0
+CityHub-restored	ReadFromMessageDWord	ServerDE	Implemented (bounded)	0
+CityHub-restored	ReadFromMessageHString	ServerDE	Implemented (bounded)	0
+CityHub-restored	ReadKeyMessage	ServerDE	Implemented (bounded)	0
+CityHub-restored	ReadPickupMessage	ServerDE	Implemented (bounded)	0
+CityHub-restored	RecordBrushDestruction	ServerDE	Implemented (bounded)	0
+CityHub-restored	RecordDebrisEffect	ServerDE	Implemented (bounded)	0
+CityHub-restored	RecordExplosionEffect	ServerDE	Implemented (bounded)	0
+CityHub-restored	RecordPickup	ServerDE	Implemented (bounded)	0
+CityHub-restored	RecordProjectile	ServerDE	Implemented (bounded)	0
+CityHub-restored	RecordSceneExplosion	ServerDE	Implemented (bounded)	0
+CityHub-restored	RecordSpawn	ServerDE	Implemented (bounded)	0
+CityHub-restored	RelinquishList	ServerDE	Implemented (bounded)	2
+CityHub-restored	RemoveAttachment	ServerDE	Implemented (bounded)	0
+CityHub-restored	RemoveCameraEffect	ServerDE	Implemented (bounded)	0
+CityHub-restored	RemoveLightEffect	ServerDE	Implemented (bounded)	0
+CityHub-restored	RemoveObject	ServerDE	Implemented (bounded)	32
+CityHub-restored	RemoveObjectFromList	ServerDE	Implemented (bounded)	0
+CityHub-restored	ReportSkyFailure	ServerDE	Implemented (bounded)	0
+CityHub-restored	ResetModelAnimation	ServerDE	Implemented (bounded)	0
+CityHub-restored	ResetRead	ServerDE	Implemented (bounded)	0
+CityHub-restored	ResizeObject	ServerDE	Implemented (bounded)	28
+CityHub-restored	RestoreObjects	ServerDE	Explicitly unsupported	0
+CityHub-restored	RotateWorldModel	ServerDE	Implemented (bounded)	0
+CityHub-restored	SaveObjects	ServerDE	Explicitly unsupported	0
+CityHub-restored	ScaleObject	ServerDE	Implemented (bounded)	149
+CityHub-restored	SendBossHealth	ServerDE	Implemented (bounded)	0
+CityHub-restored	SendConversation	ServerDE	Implemented (bounded)	0
+CityHub-restored	SendObjectives	ServerDE	Implemented (bounded)	0
+CityHub-restored	SendToClient	ServerDE	Implemented (bounded)	7
+CityHub-restored	SendWorldExit	ServerDE	Implemented (bounded)	0
+CityHub-restored	SetAcceleration	ServerDE	Implemented (bounded)	2
+CityHub-restored	SetBlockingPriority	ServerDE	Implemented (bounded)	223
+CityHub-restored	SetClientUserData	ServerDE	Implemented (bounded)	1
+CityHub-restored	SetDeactivationTime	ServerDE	Implemented (bounded)	122
+CityHub-restored	SetGameConVar	ServerDE	Implemented (bounded)	32
+CityHub-restored	SetGlobalForce	ServerDE	Implemented (bounded)	1
+CityHub-restored	SetModelAnimation	ServerDE	Implemented (bounded)	28
+CityHub-restored	SetModelFilenames	ServerDE	Implemented (bounded)	2
+CityHub-restored	SetModelLooping	ServerDE	Implemented (bounded)	0
+CityHub-restored	SetModelNodeHideStatus	ServerDE	Implemented (bounded)	19
+CityHub-restored	SetNextUpdate	ServerDE	Implemented (bounded)	324
+CityHub-restored	SetObjectColor	ServerDE	Implemented (bounded)	122
+CityHub-restored	SetObjectDims	ServerDE	Implemented (bounded)	259
+CityHub-restored	SetObjectFlags	ServerDE	Implemented (bounded)	527
+CityHub-restored	SetObjectRotation	ServerDE	Implemented (bounded)	1
+CityHub-restored	SetObjectState	ServerDE	Implemented (bounded)	1
+CityHub-restored	SetObjectUserFlags	ServerDE	Implemented (bounded)	358
+CityHub-restored	SetSkyDefinition	ServerDE	Implemented (bounded)	1
+CityHub-restored	SetVelocity	ServerDE	Implemented (bounded)	3
+CityHub-restored	StartHMessageWrite	ServerDE	Implemented (bounded)	1
+CityHub-restored	StartMessageToObject	ServerDE	Implemented (bounded)	1
+CityHub-restored	TeleportObject	ServerDE	Implemented (bounded)	1
+CityHub-restored	ValidateSpawnObject	ServerDE	Implemented (bounded)	21
+CityHub-restored	WriteDamage	ServerDE	Implemented (bounded)	0
+CityHub-restored	WriteKeyMessage	ServerDE	Implemented (bounded)	0
+CityHub-restored	WritePickupMessage	ServerDE	Implemented (bounded)	0
+CityHub-restored	WriteToMessageDWord	ServerDE	Implemented (bounded)	1
+CityHub-restored	WriteToMessageHString	ServerDE	Implemented (bounded)	1
+CityHub-restored	ConnectClient	Lifecycle	Implemented (bounded)	1
+CityHub-restored	DisconnectClient	Lifecycle	Implemented (bounded)	0
+CityHub-restored	MID_MODELSTRINGKEY	Callback	Implemented (bounded)	0
+Coverage CityHub-restored: reached=85 unexercised=89 unavailable=0 ai_errors=0
+CityHub-10s	AddObjectToList	ServerDE	Implemented (bounded)	0
+CityHub-10s	AddSkyObject	ServerDE	Implemented (bounded)	5
+CityHub-10s	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+CityHub-10s	AlignRotation	ServerDE	Implemented (bounded)	1201
+CityHub-10s	BreakInterObjectLink	ServerDE	Implemented (bounded)	0
+CityHub-10s	CastRay	ServerDE	Implemented (bounded)	0
+CityHub-10s	CastWorldRay	ServerDE	Implemented (bounded)	0
+CityHub-10s	CompareStringsUpper	ServerDE	Implemented (bounded)	5
+CityHub-10s	ConfigureCharacterBody	ServerDE	Implemented (bounded)	27
+CityHub-10s	ConfigureModelBody	ServerDE	Implemented (bounded)	122
+CityHub-10s	ConfigureWorldBody	ServerDE	Implemented (bounded)	13
+CityHub-10s	CopyString	ServerDE	Implemented (bounded)	0
+CityHub-10s	CreateAttachment	ServerDE	Implemented (bounded)	18
+CityHub-10s	CreateInterObjectLink	ServerDE	Implemented (bounded)	36
+CityHub-10s	CreateObject	ServerDE	Implemented (bounded)	55
+CityHub-10s	CreateObjectList	ServerDE	Implemented (bounded)	0
+CityHub-10s	CreateObjectProps	ServerDE	Implemented (bounded)	0
+CityHub-10s	CreateString	ServerDE	Implemented (bounded)	32
+CityHub-10s	EndHMessageRead	ServerDE	Explicitly unsupported	0
+CityHub-10s	EndHMessageWrite	ServerDE	Implemented (bounded)	0
+CityHub-10s	EndMessage	ServerDE	Implemented (bounded)	2402
+CityHub-10s	FindAttachment	ServerDE	Implemented (bounded)	600
+CityHub-10s	FindNamedObjects	ServerDE	Implemented (bounded)	27
+CityHub-10s	FreeString	ServerDE	Implemented (bounded)	26
+CityHub-10s	GetAcceleration	ServerDE	Implemented (bounded)	0
+CityHub-10s	GetAnimIndex	ServerDE	Implemented (bounded)	3079
+CityHub-10s	GetAttachedModelNodeTransform	ServerDE	Implemented (bounded)	0
+CityHub-10s	GetCameraView	ServerDE	Implemented (bounded)	1201
+CityHub-10s	GetClass	ServerDE	Implemented (bounded)	32359
+CityHub-10s	GetClientResourceString	ServerDE	Implemented (bounded)	0
+CityHub-10s	GetClientUserData	ServerDE	Implemented (bounded)	13231
+CityHub-10s	GetContainers	ServerDE	Implemented (bounded)	131110
+CityHub-10s	GetFrameTime	ServerDE	Implemented (bounded)	190
+CityHub-10s	GetGameConVar	ServerDE	Implemented (bounded)	895
+CityHub-10s	GetGlobalForce	ServerDE	Implemented (bounded)	2
+CityHub-10s	GetModelAnimUserDims	ServerDE	Implemented (bounded)	824
+CityHub-10s	GetModelAnimation	ServerDE	Implemented (bounded)	250
+CityHub-10s	GetModelAnimationName	ServerDE	Implemented (bounded)	1141
+CityHub-10s	GetModelFilenames	ServerDE	Implemented (bounded)	0
+CityHub-10s	GetModelLooping	ServerDE	Implemented (bounded)	0
+CityHub-10s	GetModelNodeHideStatus	ServerDE	Implemented (bounded)	43
+CityHub-10s	GetModelNodeTransform	ServerDE	Implemented (bounded)	310
+CityHub-10s	GetModelPlaybackState	ServerDE	Implemented (bounded)	1089
+CityHub-10s	GetMovementState	ServerDE	Implemented (bounded)	30946
+CityHub-10s	GetNextObject	ServerDE	Implemented (bounded)	487
+CityHub-10s	GetObjectClass	ServerDE	Implemented (bounded)	12446
+CityHub-10s	GetObjectColor	ServerDE	Implemented (bounded)	0
+CityHub-10s	GetObjectDims	ServerDE	Implemented (bounded)	9
+CityHub-10s	GetObjectFlags	ServerDE	Implemented (bounded)	3099
+CityHub-10s	GetObjectName	ServerDE	Implemented (bounded)	143
+CityHub-10s	GetObjectPos	ServerDE	Implemented (bounded)	10992
+CityHub-10s	GetObjectRotation	ServerDE	Implemented (bounded)	5717
+CityHub-10s	GetObjectState	ServerDE	Implemented (bounded)	0
+CityHub-10s	GetObjectUserFlags	ServerDE	Implemented (bounded)	7412
+CityHub-10s	GetPathManager	ServerDE	Implemented (bounded)	481
+CityHub-10s	GetPointContainerCode	ServerDE	Implemented (bounded)	0
+CityHub-10s	GetPropBool	ServerDE	Implemented (bounded)	994
+CityHub-10s	GetPropGeneric	ServerDE	Implemented (bounded)	24038
+CityHub-10s	GetPropReal	ServerDE	Implemented (bounded)	2061
+CityHub-10s	GetPropString	ServerDE	Implemented (bounded)	150
+CityHub-10s	GetPropVector	ServerDE	Implemented (bounded)	136
+CityHub-10s	GetSoundDuration	ServerDE	Implemented (bounded)	0
+CityHub-10s	GetStringData	ServerDE	Implemented (bounded)	64
+CityHub-10s	GetTime	ServerDE	Implemented (bounded)	4901
+CityHub-10s	GetVarValueFloat	ServerDE	Implemented (bounded)	893
+CityHub-10s	GetVarValueString	ServerDE	Implemented (bounded)	2
+CityHub-10s	GetVelocity	ServerDE	Implemented (bounded)	601
+CityHub-10s	GetWorldTime	ServerDE	Implemented (bounded)	0
+CityHub-10s	HandleToObject	ServerDE	Implemented (bounded)	17595
+CityHub-10s	InterpolateRotation	ServerDE	Implemented (bounded)	0
+CityHub-10s	IntersectSegment	ServerDE	Implemented (bounded)	2963
+CityHub-10s	IsKindOf	ServerDE	Implemented (bounded)	32789
+CityHub-10s	IsObjectAlive	ServerDE	Implemented (bounded)	39867
+CityHub-10s	IsSoundDone	ServerDE	Implemented (bounded)	277
+CityHub-10s	KillSound	ServerDE	Implemented (bounded)	2
+CityHub-10s	MoveKeyframedObject	ServerDE	Implemented (bounded)	0
+CityHub-10s	MoveObject	ServerDE	Implemented (bounded)	48357
+CityHub-10s	MoveObjectToGround	ServerDE	Implemented (bounded)	143
+CityHub-10s	MoveWorldModel	ServerDE	Implemented (bounded)	0
+CityHub-10s	ObjectToHandle	ServerDE	Implemented (bounded)	60
+CityHub-10s	PingObjects	ServerDE	Implemented (bounded)	20
+CityHub-10s	PlaceNonSolidModel	ServerDE	Implemented (bounded)	0
+CityHub-10s	PlayCharacterSound	ServerDE	Implemented (bounded)	0
+CityHub-10s	PlayCinematicSound	ServerDE	Implemented (bounded)	2
+CityHub-10s	PlayClientSound	ServerDE	Implemented (bounded)	0
+CityHub-10s	PlayDetachedSound	ServerDE	Implemented (bounded)	0
+CityHub-10s	PlayLocalSound	ServerDE	Implemented (bounded)	0
+CityHub-10s	PlayObjectLoopSound	ServerDE	Implemented (bounded)	0
+CityHub-10s	PlaySoundAt	ServerDE	Implemented (bounded)	4
+CityHub-10s	PlayWorldSound	ServerDE	Implemented (bounded)	31
+CityHub-10s	PublishBloodSplat	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishBloodSpurt	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishCameraEffect	ServerDE	Implemented (bounded)	2
+CityHub-10s	PublishClientBloodSplat	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishClientBloodSpurt	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishExplosionFlames	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishExplosionFragments	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishExplosionLights	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishExplosionModels	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishExplosionRings	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishExplosionSprites	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishFleshGibs	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishLaserBeam	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishLightEffect	ServerDE	Implemented (bounded)	4
+CityHub-10s	PublishObjectParticles	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishParticleStream	ServerDE	Implemented (bounded)	8
+CityHub-10s	PublishPolyGrid	ServerDE	Implemented (bounded)	2
+CityHub-10s	PublishSparks	ServerDE	Implemented (bounded)	0
+CityHub-10s	PublishWeaponSprites	ServerDE	Implemented (bounded)	0
+CityHub-10s	QueryModelNodeTransform	ServerDE	Implemented (bounded)	0
+CityHub-10s	RandomFloat	ServerDE	Implemented (bounded)	59
+CityHub-10s	RandomInt	ServerDE	Implemented (bounded)	35
+CityHub-10s	ReadDamage	ServerDE	Implemented (bounded)	0
+CityHub-10s	ReadFromMessageDWord	ServerDE	Implemented (bounded)	3
+CityHub-10s	ReadFromMessageHString	ServerDE	Implemented (bounded)	3
+CityHub-10s	ReadKeyMessage	ServerDE	Implemented (bounded)	0
+CityHub-10s	ReadPickupMessage	ServerDE	Implemented (bounded)	0
+CityHub-10s	RecordBrushDestruction	ServerDE	Implemented (bounded)	0
+CityHub-10s	RecordDebrisEffect	ServerDE	Implemented (bounded)	0
+CityHub-10s	RecordExplosionEffect	ServerDE	Implemented (bounded)	0
+CityHub-10s	RecordPickup	ServerDE	Implemented (bounded)	0
+CityHub-10s	RecordProjectile	ServerDE	Implemented (bounded)	0
+CityHub-10s	RecordSceneExplosion	ServerDE	Implemented (bounded)	0
+CityHub-10s	RecordSpawn	ServerDE	Implemented (bounded)	0
+CityHub-10s	RelinquishList	ServerDE	Implemented (bounded)	27
+CityHub-10s	RemoveAttachment	ServerDE	Implemented (bounded)	0
+CityHub-10s	RemoveCameraEffect	ServerDE	Implemented (bounded)	0
+CityHub-10s	RemoveLightEffect	ServerDE	Implemented (bounded)	0
+CityHub-10s	RemoveObject	ServerDE	Implemented (bounded)	51
+CityHub-10s	RemoveObjectFromList	ServerDE	Implemented (bounded)	0
+CityHub-10s	ReportSkyFailure	ServerDE	Implemented (bounded)	0
+CityHub-10s	ResetModelAnimation	ServerDE	Implemented (bounded)	9
+CityHub-10s	ResetRead	ServerDE	Implemented (bounded)	0
+CityHub-10s	ResizeObject	ServerDE	Implemented (bounded)	631
+CityHub-10s	RestoreObjects	ServerDE	Explicitly unsupported	0
+CityHub-10s	RotateWorldModel	ServerDE	Implemented (bounded)	0
+CityHub-10s	SaveObjects	ServerDE	Explicitly unsupported	0
+CityHub-10s	ScaleObject	ServerDE	Implemented (bounded)	149
+CityHub-10s	SendBossHealth	ServerDE	Implemented (bounded)	1
+CityHub-10s	SendConversation	ServerDE	Implemented (bounded)	0
+CityHub-10s	SendObjectives	ServerDE	Implemented (bounded)	0
+CityHub-10s	SendToClient	ServerDE	Implemented (bounded)	8
+CityHub-10s	SendWorldExit	ServerDE	Implemented (bounded)	0
+CityHub-10s	SetAcceleration	ServerDE	Implemented (bounded)	1202
+CityHub-10s	SetBlockingPriority	ServerDE	Implemented (bounded)	1423
+CityHub-10s	SetClientUserData	ServerDE	Implemented (bounded)	1
+CityHub-10s	SetDeactivationTime	ServerDE	Implemented (bounded)	149
+CityHub-10s	SetGameConVar	ServerDE	Implemented (bounded)	32
+CityHub-10s	SetGlobalForce	ServerDE	Implemented (bounded)	1
+CityHub-10s	SetModelAnimation	ServerDE	Implemented (bounded)	49
+CityHub-10s	SetModelFilenames	ServerDE	Implemented (bounded)	2
+CityHub-10s	SetModelLooping	ServerDE	Implemented (bounded)	12
+CityHub-10s	SetModelNodeHideStatus	ServerDE	Implemented (bounded)	19
+CityHub-10s	SetNextUpdate	ServerDE	Implemented (bounded)	10054
+CityHub-10s	SetObjectColor	ServerDE	Implemented (bounded)	122
+CityHub-10s	SetObjectDims	ServerDE	Implemented (bounded)	276
+CityHub-10s	SetObjectFlags	ServerDE	Implemented (bounded)	549
+CityHub-10s	SetObjectRotation	ServerDE	Implemented (bounded)	791
+CityHub-10s	SetObjectState	ServerDE	Implemented (bounded)	28
+CityHub-10s	SetObjectUserFlags	ServerDE	Implemented (bounded)	358
+CityHub-10s	SetSkyDefinition	ServerDE	Implemented (bounded)	1
+CityHub-10s	SetVelocity	ServerDE	Implemented (bounded)	1392
+CityHub-10s	StartHMessageWrite	ServerDE	Implemented (bounded)	2402
+CityHub-10s	StartMessageToObject	ServerDE	Implemented (bounded)	2402
+CityHub-10s	TeleportObject	ServerDE	Implemented (bounded)	1
+CityHub-10s	ValidateSpawnObject	ServerDE	Implemented (bounded)	21
+CityHub-10s	WriteDamage	ServerDE	Implemented (bounded)	0
+CityHub-10s	WriteKeyMessage	ServerDE	Implemented (bounded)	0
+CityHub-10s	WritePickupMessage	ServerDE	Implemented (bounded)	2400
+CityHub-10s	WriteToMessageDWord	ServerDE	Implemented (bounded)	2
+CityHub-10s	WriteToMessageHString	ServerDE	Implemented (bounded)	2
+CityHub-10s	ConnectClient	Lifecycle	Implemented (bounded)	1
+CityHub-10s	DisconnectClient	Lifecycle	Implemented (bounded)	0
+CityHub-10s	MID_MODELSTRINGKEY	Callback	Implemented (bounded)	2
+Coverage CityHub-10s: reached=104 unexercised=70 unavailable=0 ai_errors=0
+CityHub-teardown	AddObjectToList	ServerDE	Implemented (bounded)	0
+CityHub-teardown	AddSkyObject	ServerDE	Implemented (bounded)	5
+CityHub-teardown	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+CityHub-teardown	AlignRotation	ServerDE	Implemented (bounded)	1201
+CityHub-teardown	BreakInterObjectLink	ServerDE	Implemented (bounded)	0
+CityHub-teardown	CastRay	ServerDE	Implemented (bounded)	0
+CityHub-teardown	CastWorldRay	ServerDE	Implemented (bounded)	0
+CityHub-teardown	CompareStringsUpper	ServerDE	Implemented (bounded)	5
+CityHub-teardown	ConfigureCharacterBody	ServerDE	Implemented (bounded)	27
+CityHub-teardown	ConfigureModelBody	ServerDE	Implemented (bounded)	122
+CityHub-teardown	ConfigureWorldBody	ServerDE	Implemented (bounded)	13
+CityHub-teardown	CopyString	ServerDE	Implemented (bounded)	0
+CityHub-teardown	CreateAttachment	ServerDE	Implemented (bounded)	18
+CityHub-teardown	CreateInterObjectLink	ServerDE	Implemented (bounded)	36
+CityHub-teardown	CreateObject	ServerDE	Implemented (bounded)	55
+CityHub-teardown	CreateObjectList	ServerDE	Implemented (bounded)	0
+CityHub-teardown	CreateObjectProps	ServerDE	Implemented (bounded)	0
+CityHub-teardown	CreateString	ServerDE	Implemented (bounded)	32
+CityHub-teardown	EndHMessageRead	ServerDE	Explicitly unsupported	0
+CityHub-teardown	EndHMessageWrite	ServerDE	Implemented (bounded)	0
+CityHub-teardown	EndMessage	ServerDE	Implemented (bounded)	2402
+CityHub-teardown	FindAttachment	ServerDE	Implemented (bounded)	600
+CityHub-teardown	FindNamedObjects	ServerDE	Implemented (bounded)	27
+CityHub-teardown	FreeString	ServerDE	Implemented (bounded)	35
+CityHub-teardown	GetAcceleration	ServerDE	Implemented (bounded)	0
+CityHub-teardown	GetAnimIndex	ServerDE	Implemented (bounded)	3079
+CityHub-teardown	GetAttachedModelNodeTransform	ServerDE	Implemented (bounded)	0
+CityHub-teardown	GetCameraView	ServerDE	Implemented (bounded)	1201
+CityHub-teardown	GetClass	ServerDE	Implemented (bounded)	32359
+CityHub-teardown	GetClientResourceString	ServerDE	Implemented (bounded)	0
+CityHub-teardown	GetClientUserData	ServerDE	Implemented (bounded)	13233
+CityHub-teardown	GetContainers	ServerDE	Implemented (bounded)	131110
+CityHub-teardown	GetFrameTime	ServerDE	Implemented (bounded)	190
+CityHub-teardown	GetGameConVar	ServerDE	Implemented (bounded)	895
+CityHub-teardown	GetGlobalForce	ServerDE	Implemented (bounded)	2
+CityHub-teardown	GetModelAnimUserDims	ServerDE	Implemented (bounded)	824
+CityHub-teardown	GetModelAnimation	ServerDE	Implemented (bounded)	250
+CityHub-teardown	GetModelAnimationName	ServerDE	Implemented (bounded)	1141
+CityHub-teardown	GetModelFilenames	ServerDE	Implemented (bounded)	0
+CityHub-teardown	GetModelLooping	ServerDE	Implemented (bounded)	0
+CityHub-teardown	GetModelNodeHideStatus	ServerDE	Implemented (bounded)	43
+CityHub-teardown	GetModelNodeTransform	ServerDE	Implemented (bounded)	310
+CityHub-teardown	GetModelPlaybackState	ServerDE	Implemented (bounded)	1089
+CityHub-teardown	GetMovementState	ServerDE	Implemented (bounded)	30946
+CityHub-teardown	GetNextObject	ServerDE	Implemented (bounded)	487
+CityHub-teardown	GetObjectClass	ServerDE	Implemented (bounded)	12446
+CityHub-teardown	GetObjectColor	ServerDE	Implemented (bounded)	0
+CityHub-teardown	GetObjectDims	ServerDE	Implemented (bounded)	9
+CityHub-teardown	GetObjectFlags	ServerDE	Implemented (bounded)	3099
+CityHub-teardown	GetObjectName	ServerDE	Implemented (bounded)	143
+CityHub-teardown	GetObjectPos	ServerDE	Implemented (bounded)	10992
+CityHub-teardown	GetObjectRotation	ServerDE	Implemented (bounded)	5717
+CityHub-teardown	GetObjectState	ServerDE	Implemented (bounded)	0
+CityHub-teardown	GetObjectUserFlags	ServerDE	Implemented (bounded)	7414
+CityHub-teardown	GetPathManager	ServerDE	Implemented (bounded)	481
+CityHub-teardown	GetPointContainerCode	ServerDE	Implemented (bounded)	0
+CityHub-teardown	GetPropBool	ServerDE	Implemented (bounded)	994
+CityHub-teardown	GetPropGeneric	ServerDE	Implemented (bounded)	24038
+CityHub-teardown	GetPropReal	ServerDE	Implemented (bounded)	2061
+CityHub-teardown	GetPropString	ServerDE	Implemented (bounded)	150
+CityHub-teardown	GetPropVector	ServerDE	Implemented (bounded)	136
+CityHub-teardown	GetSoundDuration	ServerDE	Implemented (bounded)	0
+CityHub-teardown	GetStringData	ServerDE	Implemented (bounded)	64
+CityHub-teardown	GetTime	ServerDE	Implemented (bounded)	4901
+CityHub-teardown	GetVarValueFloat	ServerDE	Implemented (bounded)	893
+CityHub-teardown	GetVarValueString	ServerDE	Implemented (bounded)	2
+CityHub-teardown	GetVelocity	ServerDE	Implemented (bounded)	601
+CityHub-teardown	GetWorldTime	ServerDE	Implemented (bounded)	0
+CityHub-teardown	HandleToObject	ServerDE	Implemented (bounded)	17596
+CityHub-teardown	InterpolateRotation	ServerDE	Implemented (bounded)	0
+CityHub-teardown	IntersectSegment	ServerDE	Implemented (bounded)	2963
+CityHub-teardown	IsKindOf	ServerDE	Implemented (bounded)	32789
+CityHub-teardown	IsObjectAlive	ServerDE	Implemented (bounded)	39891
+CityHub-teardown	IsSoundDone	ServerDE	Implemented (bounded)	277
+CityHub-teardown	KillSound	ServerDE	Implemented (bounded)	6
+CityHub-teardown	MoveKeyframedObject	ServerDE	Implemented (bounded)	0
+CityHub-teardown	MoveObject	ServerDE	Implemented (bounded)	48357
+CityHub-teardown	MoveObjectToGround	ServerDE	Implemented (bounded)	143
+CityHub-teardown	MoveWorldModel	ServerDE	Implemented (bounded)	0
+CityHub-teardown	ObjectToHandle	ServerDE	Implemented (bounded)	60
+CityHub-teardown	PingObjects	ServerDE	Implemented (bounded)	20
+CityHub-teardown	PlaceNonSolidModel	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PlayCharacterSound	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PlayCinematicSound	ServerDE	Implemented (bounded)	2
+CityHub-teardown	PlayClientSound	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PlayDetachedSound	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PlayLocalSound	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PlayObjectLoopSound	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PlaySoundAt	ServerDE	Implemented (bounded)	4
+CityHub-teardown	PlayWorldSound	ServerDE	Implemented (bounded)	31
+CityHub-teardown	PublishBloodSplat	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishBloodSpurt	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishCameraEffect	ServerDE	Implemented (bounded)	2
+CityHub-teardown	PublishClientBloodSplat	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishClientBloodSpurt	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishExplosionFlames	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishExplosionFragments	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishExplosionLights	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishExplosionModels	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishExplosionRings	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishExplosionSprites	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishFleshGibs	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishLaserBeam	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishLightEffect	ServerDE	Implemented (bounded)	4
+CityHub-teardown	PublishObjectParticles	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishParticleStream	ServerDE	Implemented (bounded)	8
+CityHub-teardown	PublishPolyGrid	ServerDE	Implemented (bounded)	2
+CityHub-teardown	PublishSparks	ServerDE	Implemented (bounded)	0
+CityHub-teardown	PublishWeaponSprites	ServerDE	Implemented (bounded)	0
+CityHub-teardown	QueryModelNodeTransform	ServerDE	Implemented (bounded)	0
+CityHub-teardown	RandomFloat	ServerDE	Implemented (bounded)	59
+CityHub-teardown	RandomInt	ServerDE	Implemented (bounded)	35
+CityHub-teardown	ReadDamage	ServerDE	Implemented (bounded)	0
+CityHub-teardown	ReadFromMessageDWord	ServerDE	Implemented (bounded)	3
+CityHub-teardown	ReadFromMessageHString	ServerDE	Implemented (bounded)	3
+CityHub-teardown	ReadKeyMessage	ServerDE	Implemented (bounded)	0
+CityHub-teardown	ReadPickupMessage	ServerDE	Implemented (bounded)	0
+CityHub-teardown	RecordBrushDestruction	ServerDE	Implemented (bounded)	0
+CityHub-teardown	RecordDebrisEffect	ServerDE	Implemented (bounded)	0
+CityHub-teardown	RecordExplosionEffect	ServerDE	Implemented (bounded)	0
+CityHub-teardown	RecordPickup	ServerDE	Implemented (bounded)	0
+CityHub-teardown	RecordProjectile	ServerDE	Implemented (bounded)	0
+CityHub-teardown	RecordSceneExplosion	ServerDE	Implemented (bounded)	0
+CityHub-teardown	RecordSpawn	ServerDE	Implemented (bounded)	0
+CityHub-teardown	RelinquishList	ServerDE	Implemented (bounded)	27
+CityHub-teardown	RemoveAttachment	ServerDE	Implemented (bounded)	18
+CityHub-teardown	RemoveCameraEffect	ServerDE	Implemented (bounded)	2
+CityHub-teardown	RemoveLightEffect	ServerDE	Implemented (bounded)	4
+CityHub-teardown	RemoveObject	ServerDE	Implemented (bounded)	86
+CityHub-teardown	RemoveObjectFromList	ServerDE	Implemented (bounded)	0
+CityHub-teardown	ReportSkyFailure	ServerDE	Implemented (bounded)	0
+CityHub-teardown	ResetModelAnimation	ServerDE	Implemented (bounded)	9
+CityHub-teardown	ResetRead	ServerDE	Implemented (bounded)	0
+CityHub-teardown	ResizeObject	ServerDE	Implemented (bounded)	631
+CityHub-teardown	RestoreObjects	ServerDE	Explicitly unsupported	0
+CityHub-teardown	RotateWorldModel	ServerDE	Implemented (bounded)	0
+CityHub-teardown	SaveObjects	ServerDE	Explicitly unsupported	0
+CityHub-teardown	ScaleObject	ServerDE	Implemented (bounded)	149
+CityHub-teardown	SendBossHealth	ServerDE	Implemented (bounded)	1
+CityHub-teardown	SendConversation	ServerDE	Implemented (bounded)	0
+CityHub-teardown	SendObjectives	ServerDE	Implemented (bounded)	0
+CityHub-teardown	SendToClient	ServerDE	Implemented (bounded)	8
+CityHub-teardown	SendWorldExit	ServerDE	Implemented (bounded)	0
+CityHub-teardown	SetAcceleration	ServerDE	Implemented (bounded)	1202
+CityHub-teardown	SetBlockingPriority	ServerDE	Implemented (bounded)	1423
+CityHub-teardown	SetClientUserData	ServerDE	Implemented (bounded)	2
+CityHub-teardown	SetDeactivationTime	ServerDE	Implemented (bounded)	149
+CityHub-teardown	SetGameConVar	ServerDE	Implemented (bounded)	66
+CityHub-teardown	SetGlobalForce	ServerDE	Implemented (bounded)	1
+CityHub-teardown	SetModelAnimation	ServerDE	Implemented (bounded)	49
+CityHub-teardown	SetModelFilenames	ServerDE	Implemented (bounded)	2
+CityHub-teardown	SetModelLooping	ServerDE	Implemented (bounded)	12
+CityHub-teardown	SetModelNodeHideStatus	ServerDE	Implemented (bounded)	19
+CityHub-teardown	SetNextUpdate	ServerDE	Implemented (bounded)	10056
+CityHub-teardown	SetObjectColor	ServerDE	Implemented (bounded)	122
+CityHub-teardown	SetObjectDims	ServerDE	Implemented (bounded)	276
+CityHub-teardown	SetObjectFlags	ServerDE	Implemented (bounded)	549
+CityHub-teardown	SetObjectRotation	ServerDE	Implemented (bounded)	791
+CityHub-teardown	SetObjectState	ServerDE	Implemented (bounded)	28
+CityHub-teardown	SetObjectUserFlags	ServerDE	Implemented (bounded)	360
+CityHub-teardown	SetSkyDefinition	ServerDE	Implemented (bounded)	1
+CityHub-teardown	SetVelocity	ServerDE	Implemented (bounded)	1392
+CityHub-teardown	StartHMessageWrite	ServerDE	Implemented (bounded)	2402
+CityHub-teardown	StartMessageToObject	ServerDE	Implemented (bounded)	2402
+CityHub-teardown	TeleportObject	ServerDE	Implemented (bounded)	1
+CityHub-teardown	ValidateSpawnObject	ServerDE	Implemented (bounded)	21
+CityHub-teardown	WriteDamage	ServerDE	Implemented (bounded)	0
+CityHub-teardown	WriteKeyMessage	ServerDE	Implemented (bounded)	0
+CityHub-teardown	WritePickupMessage	ServerDE	Implemented (bounded)	2400
+CityHub-teardown	WriteToMessageDWord	ServerDE	Implemented (bounded)	2
+CityHub-teardown	WriteToMessageHString	ServerDE	Implemented (bounded)	2
+CityHub-teardown	ConnectClient	Lifecycle	Implemented (bounded)	1
+CityHub-teardown	DisconnectClient	Lifecycle	Implemented (bounded)	1
+CityHub-teardown	MID_MODELSTRINGKEY	Callback	Implemented (bounded)	2
+Coverage CityHub-teardown: reached=108 unexercised=66 unavailable=0 ai_errors=0
+Reset probe: deliberate SaveObjects refusal outside the loaded session
+<end of output>
+Test time =  13.15 sec
+----------------------------------------------------------
+Test Passed.
+"coverage.private" end time: Oct 17 20:57 CEST
+"coverage.private" time elapsed: 00:00:13
+----------------------------------------------------------
+
+270/956 Testing: cinematics.catalog
+270/956 Test: cinematics.catalog
+Command: "<Blood2>/build/debug/tests/cinematic_tests" "catalog" "<external-game>"
+Directory: <Blood2>/build/debug/tests
+"cinematics.catalog" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+SUBWAY cinexit1
+  0 sounds\enemies\gideon\laf1_gid.wav speaker=player message=door12:TRIGGER
+SUBWAY cinhi5
+  0 sounds\events\metalcrush5a.wav speaker=player message=:
+  0 sounds\events\traincrash1.wav speaker=player message=:
+SUBWAY cintrig1
+  0 sounds\chosen\caleb\e1m4_1_cal.wav speaker=player message=:
+SUBWAY cintrig2
+  0 sounds\enemies\gideon\1agid1.wav speaker=player message=:
+  0 sounds\chosen\caleb\1acaleb1.wav speaker=player message=:
+worlds/02_cityhubb.dat sound=sounds\chosen\caleb\msc12cal.wav error=Missing or oversized sound resource
+worlds/03_museum.dat sound=sounds\chosen\caleb\laugh1_calb.wav error=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sound=sounds\chosen\caleb\kill\laugh1_cal.wav error=Missing or oversized sound resource
+worlds=57 controllers=79 cues=201 missing=3 invalid=0
+encoding=1 cues=198
+<end of output>
+Test time =   3.82 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.catalog" end time: Oct 17 20:57 CEST
+"cinematics.catalog" time elapsed: 00:00:03
+----------------------------------------------------------
+
+12/956 Testing: objects.message_churn
+12/956 Test: objects.message_churn
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "message_churn"
+Directory: <Blood2>/build/debug/tests
+"objects.message_churn" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS message_churn
+<end of output>
+Test time =   1.56 sec
+----------------------------------------------------------
+Test Passed.
+"objects.message_churn" end time: Oct 17 20:57 CEST
+"objects.message_churn" time elapsed: 00:00:01
+----------------------------------------------------------
+
+242/956 Testing: keyframe_audio.private
+242/956 Test: keyframe_audio.private
+Command: "<Blood2>/build/debug/tests/keyframe_audio_tests" "private" "<external-game>"
+Directory: <Blood2>/build/debug/tests
+"keyframe_audio.private" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+Missing worlds/09_abandoned_buildings.dat pickuptruckloop1.wav error=Resource not found: pickuptruckloop1.wav
+Missing worlds/09_abandoned_buildings.dat pickuptruckloop1.wav error=Resource not found: pickuptruckloop1.wav
+Missing worlds/11_slaughter_house.dat sounds\enemies\civilian\scream2.wav error=Resource not found: sounds\enemies\civilian\scream2.wav
+Private sound keys=16 decoded=13 unresolved exact paths=3
+Authored uhoh sound=sounds\events\trainpassby1.wav key_time=6 loop=1 frames=110592 cursor=2205
+Authored uhoh sound=sounds\events\trainpassby1.wav key_time=6 loop=1 frames=110592 cursor=2205
+<end of output>
+Test time =  10.82 sec
+----------------------------------------------------------
+Test Passed.
+"keyframe_audio.private" end time: Oct 17 20:57 CEST
+"keyframe_audio.private" time elapsed: 00:00:10
+----------------------------------------------------------
+
+145/956 Testing: trigger_audio.private
+145/956 Test: trigger_audio.private
+Command: "<Blood2>/build/debug/tests/trigger_audio_tests" "private" "<external-game>"
+Directory: <Blood2>/build/debug/tests
+"trigger_audio.private" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+Authored trigger endtrigger: sounds\events\cwvoice6.wav frames=39717
+Authored trigger crutrigger: sounds\events\cwvoice6.wav frames=39717
+Authored trigger : sounds\chosen\caleb\msccaleb1.wav frames=13664
+Authored trigger endtrigger: sounds\events\cwvoice6.wav frames=39717
+Authored trigger crutrigger: sounds\events\cwvoice6.wav frames=39717
+Authored trigger : sounds\chosen\caleb\msccaleb1.wav frames=13664
+<end of output>
+Test time =   1.48 sec
+----------------------------------------------------------
+Test Passed.
+"trigger_audio.private" end time: Oct 17 20:57 CEST
+"trigger_audio.private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+271/956 Testing: cinematics.subway
+271/956 Test: cinematics.subway
+Command: "<Blood2>/build/debug/tests/cinematic_tests" "subway" "<external-game>"
+Directory: <Blood2>/build/debug/tests
+"cinematics.subway" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+cycle=0 cue=sounds\chosen\caleb\e1m4_1_cal.wav rate=22050 frames=53872 duration=2.44317
+cycle=1 cue=sounds\chosen\caleb\e1m4_1_cal.wav rate=22050 frames=53872 duration=2.44317
+two authored crash cues completed; 2 full session reloads clean
+<end of output>
+Test time =   1.04 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.subway" end time: Oct 17 20:57 CEST
+"cinematics.subway" time elapsed: 00:00:01
+----------------------------------------------------------
+
+140/956 Testing: door_audio.private
+140/956 Test: door_audio.private
+Command: "<Blood2>/build/debug/tests/door_audio_tests" "private" "<external-game>"
+Directory: <Blood2>/build/debug/tests
+"door_audio.private" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+Authored door door3: sounds\doors\hydraulicdoor1s1.wav frames=23296
+Authored door door4: sounds\doors\hydraulicdoor1s1.wav frames=23296
+Authored door door2: sounds\doors\hydraulicdoor1s1.wav frames=23296
+Authored door door9: sounds\doors\hydraulicdoor1s1.wav frames=23296
+Authored door door10: sounds\doors\hydraulicdoor1s1.wav frames=23296
+Authored door door11: sounds\doors\hydraulicdoor1s1.wav frames=23296
+Authored door door12: sounds\doors\hydraulicdoor1s1.wav frames=23296
+Authored door door3: sounds\doors\hydraulicdoor1s1.wav frames=23296
+Authored door door4: sounds\doors\hydraulicdoor1s1.wav frames=23296
+Authored door door2: sounds\doors\hydraulicdoor1s1.wav frames=23296
+Authored door door9: sounds\doors\hydraulicdoor1s1.wav frames=23296
+Authored door door10: sounds\doors\hydraulicdoor1s1.wav frames=23296
+Authored door door11: sounds\doors\hydraulicdoor1s1.wav frames=23296
+Authored door door12: sounds\doors\hydraulicdoor1s1.wav frames=23296
+<end of output>
+Test time =   1.63 sec
+----------------------------------------------------------
+Test Passed.
+"door_audio.private" end time: Oct 17 20:57 CEST
+"door_audio.private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+233/956 Testing: keyframes.limits
+233/956 Test: keyframes.limits
+Command: "<Blood2>/build/debug/tests/keyframer_tests" "limits" "<Blood2>/build/debug/tests/keyframe-fixtures/limits"
+Directory: <Blood2>/build/debug/tests
+"keyframes.limits" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.21 sec
+----------------------------------------------------------
+Test Passed.
+"keyframes.limits" end time: Oct 17 20:57 CEST
+"keyframes.limits" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/956 Testing: objects.message_limit
+13/956 Test: objects.message_limit
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "message_limit"
+Directory: <Blood2>/build/debug/tests
+"objects.message_limit" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS message_limit
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"objects.message_limit" end time: Oct 17 20:57 CEST
+"objects.message_limit" time elapsed: 00:00:00
+----------------------------------------------------------
+
+947/956 Testing: coverage.catalog
+947/956 Test: coverage.catalog
+Command: "<Blood2>/build/debug/tests/service_coverage_tests" "catalog" "<Blood2>"
+Directory: <Blood2>/build/debug/tests
+"coverage.catalog" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+Catalog: 171 interface services / 174 trace boundaries
+<end of output>
+Test time =   0.62 sec
+----------------------------------------------------------
+Test Passed.
+"coverage.catalog" end time: Oct 17 20:57 CEST
+"coverage.catalog" time elapsed: 00:00:00
+----------------------------------------------------------
+
+269/956 Testing: cinematics.device
+269/956 Test: cinematics.device
+Command: "<Blood2>/build/debug/tests/cinematic_tests" "device" "<Blood2>/build/debug/tests/cinematic-fixtures/device"
+Directory: <Blood2>/build/debug/tests
+"cinematics.device" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.device" end time: Oct 17 20:57 CEST
+"cinematics.device" time elapsed: 00:00:00
+----------------------------------------------------------
+
+137/956 Testing: door_audio.states
+137/956 Test: door_audio.states
+Command: "<Blood2>/build/debug/tests/door_audio_tests" "states" "<Blood2>/build/debug/tests/door-audio-fixtures/states"
+Directory: <Blood2>/build/debug/tests
+"door_audio.states" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"door_audio.states" end time: Oct 17 20:57 CEST
+"door_audio.states" time elapsed: 00:00:00
+----------------------------------------------------------
+
+141/956 Testing: trigger_audio.activation
+141/956 Test: trigger_audio.activation
+Command: "<Blood2>/build/debug/tests/trigger_audio_tests" "activation" "<Blood2>/build/debug/tests/trigger-audio-fixtures/activation"
+Directory: <Blood2>/build/debug/tests
+"trigger_audio.activation" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"trigger_audio.activation" end time: Oct 17 20:57 CEST
+"trigger_audio.activation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+142/956 Testing: trigger_audio.feedback
+142/956 Test: trigger_audio.feedback
+Command: "<Blood2>/build/debug/tests/trigger_audio_tests" "feedback" "<Blood2>/build/debug/tests/trigger-audio-fixtures/feedback"
+Directory: <Blood2>/build/debug/tests
+"trigger_audio.feedback" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"trigger_audio.feedback" end time: Oct 17 20:57 CEST
+"trigger_audio.feedback" time elapsed: 00:00:00
+----------------------------------------------------------
+
+268/956 Testing: cinematics.failures
+268/956 Test: cinematics.failures
+Command: "<Blood2>/build/debug/tests/cinematic_tests" "failures" "<Blood2>/build/debug/tests/cinematic-fixtures/failures"
+Directory: <Blood2>/build/debug/tests
+"cinematics.failures" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.failures" end time: Oct 17 20:57 CEST
+"cinematics.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+259/956 Testing: worldpaths.player
+259/956 Test: worldpaths.player
+Command: "<Blood2>/build/debug/tests/worldpath_tests" "player" "<Blood2>/build/debug/tests/worldpath-fixtures/player"
+Directory: <Blood2>/build/debug/tests
+"worldpaths.player" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"worldpaths.player" end time: Oct 17 20:57 CEST
+"worldpaths.player" time elapsed: 00:00:00
+----------------------------------------------------------
+
+267/956 Testing: cinematics.lifetime
+267/956 Test: cinematics.lifetime
+Command: "<Blood2>/build/debug/tests/cinematic_tests" "lifetime" "<Blood2>/build/debug/tests/cinematic-fixtures/lifetime"
+Directory: <Blood2>/build/debug/tests
+"cinematics.lifetime" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.lifetime" end time: Oct 17 20:57 CEST
+"cinematics.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+264/956 Testing: cinematics.mixer
+264/956 Test: cinematics.mixer
+Command: "<Blood2>/build/debug/tests/cinematic_tests" "mixer" "<Blood2>/build/debug/tests/cinematic-fixtures/mixer"
+Directory: <Blood2>/build/debug/tests
+"cinematics.mixer" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.mixer" end time: Oct 17 20:57 CEST
+"cinematics.mixer" time elapsed: 00:00:00
+----------------------------------------------------------
+
+139/956 Testing: door_audio.lifetime
+139/956 Test: door_audio.lifetime
+Command: "<Blood2>/build/debug/tests/door_audio_tests" "lifetime" "<Blood2>/build/debug/tests/door-audio-fixtures/lifetime"
+Directory: <Blood2>/build/debug/tests
+"door_audio.lifetime" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"door_audio.lifetime" end time: Oct 17 20:57 CEST
+"door_audio.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+138/956 Testing: door_audio.replacement
+138/956 Test: door_audio.replacement
+Command: "<Blood2>/build/debug/tests/door_audio_tests" "replacement" "<Blood2>/build/debug/tests/door-audio-fixtures/replacement"
+Directory: <Blood2>/build/debug/tests
+"door_audio.replacement" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"door_audio.replacement" end time: Oct 17 20:57 CEST
+"door_audio.replacement" time elapsed: 00:00:00
+----------------------------------------------------------
+
+144/956 Testing: trigger_audio.failures
+144/956 Test: trigger_audio.failures
+Command: "<Blood2>/build/debug/tests/trigger_audio_tests" "failures" "<Blood2>/build/debug/tests/trigger-audio-fixtures/failures"
+Directory: <Blood2>/build/debug/tests
+"trigger_audio.failures" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"trigger_audio.failures" end time: Oct 17 20:57 CEST
+"trigger_audio.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+265/956 Testing: cinematics.spatial
+265/956 Test: cinematics.spatial
+Command: "<Blood2>/build/debug/tests/cinematic_tests" "spatial" "<Blood2>/build/debug/tests/cinematic-fixtures/spatial"
+Directory: <Blood2>/build/debug/tests
+"cinematics.spatial" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.spatial" end time: Oct 17 20:57 CEST
+"cinematics.spatial" time elapsed: 00:00:00
+----------------------------------------------------------
+
+240/956 Testing: keyframe_audio.lifetime
+240/956 Test: keyframe_audio.lifetime
+Command: "<Blood2>/build/debug/tests/keyframe_audio_tests" "lifetime" "<Blood2>/build/debug/tests/keyframe-audio-fixtures/lifetime"
+Directory: <Blood2>/build/debug/tests
+"keyframe_audio.lifetime" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"keyframe_audio.lifetime" end time: Oct 17 20:57 CEST
+"keyframe_audio.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+266/956 Testing: cinematics.sequence
+266/956 Test: cinematics.sequence
+Command: "<Blood2>/build/debug/tests/cinematic_tests" "sequence" "<Blood2>/build/debug/tests/cinematic-fixtures/sequence"
+Directory: <Blood2>/build/debug/tests
+"cinematics.sequence" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.sequence" end time: Oct 17 20:57 CEST
+"cinematics.sequence" time elapsed: 00:00:00
+----------------------------------------------------------
+
+241/956 Testing: keyframe_audio.failures
+241/956 Test: keyframe_audio.failures
+Command: "<Blood2>/build/debug/tests/keyframe_audio_tests" "failures" "<Blood2>/build/debug/tests/keyframe-audio-fixtures/failures"
+Directory: <Blood2>/build/debug/tests
+"keyframe_audio.failures" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"keyframe_audio.failures" end time: Oct 17 20:57 CEST
+"keyframe_audio.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+143/956 Testing: trigger_audio.lifetime
+143/956 Test: trigger_audio.lifetime
+Command: "<Blood2>/build/debug/tests/trigger_audio_tests" "lifetime" "<Blood2>/build/debug/tests/trigger-audio-fixtures/lifetime"
+Directory: <Blood2>/build/debug/tests
+"trigger_audio.lifetime" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"trigger_audio.lifetime" end time: Oct 17 20:57 CEST
+"trigger_audio.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+239/956 Testing: keyframe_audio.replacement
+239/956 Test: keyframe_audio.replacement
+Command: "<Blood2>/build/debug/tests/keyframe_audio_tests" "replacement" "<Blood2>/build/debug/tests/keyframe-audio-fixtures/replacement"
+Directory: <Blood2>/build/debug/tests
+"keyframe_audio.replacement" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"keyframe_audio.replacement" end time: Oct 17 20:57 CEST
+"keyframe_audio.replacement" time elapsed: 00:00:00
+----------------------------------------------------------
+
+238/956 Testing: keyframe_audio.timeline
+238/956 Test: keyframe_audio.timeline
+Command: "<Blood2>/build/debug/tests/keyframe_audio_tests" "timeline" "<Blood2>/build/debug/tests/keyframe-audio-fixtures/timeline"
+Directory: <Blood2>/build/debug/tests
+"keyframe_audio.timeline" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"keyframe_audio.timeline" end time: Oct 17 20:57 CEST
+"keyframe_audio.timeline" time elapsed: 00:00:00
+----------------------------------------------------------
+
+258/956 Testing: worldpaths.validation
+258/956 Test: worldpaths.validation
+Command: "<Blood2>/build/debug/tests/worldpath_tests" "validation" "<Blood2>/build/debug/tests/worldpath-fixtures/validation"
+Directory: <Blood2>/build/debug/tests
+"worldpaths.validation" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"worldpaths.validation" end time: Oct 17 20:57 CEST
+"worldpaths.validation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+260/956 Testing: worldpaths.timeline
+260/956 Test: worldpaths.timeline
+Command: "<Blood2>/build/debug/tests/worldpath_tests" "timeline" "<Blood2>/build/debug/tests/worldpath-fixtures/timeline"
+Directory: <Blood2>/build/debug/tests
+"worldpaths.timeline" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"worldpaths.timeline" end time: Oct 17 20:57 CEST
+"worldpaths.timeline" time elapsed: 00:00:00
+----------------------------------------------------------
+
+227/956 Testing: keyframes.timeline
+227/956 Test: keyframes.timeline
+Command: "<Blood2>/build/debug/tests/keyframer_tests" "timeline" "<Blood2>/build/debug/tests/keyframe-fixtures/timeline"
+Directory: <Blood2>/build/debug/tests
+"keyframes.timeline" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"keyframes.timeline" end time: Oct 17 20:57 CEST
+"keyframes.timeline" time elapsed: 00:00:00
+----------------------------------------------------------
+
+256/956 Testing: worldpaths.push_block
+256/956 Test: worldpaths.push_block
+Command: "<Blood2>/build/debug/tests/worldpath_tests" "push_block" "<Blood2>/build/debug/tests/worldpath-fixtures/push_block"
+Directory: <Blood2>/build/debug/tests
+"worldpaths.push_block" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"worldpaths.push_block" end time: Oct 17 20:57 CEST
+"worldpaths.push_block" time elapsed: 00:00:00
+----------------------------------------------------------
+
+230/956 Testing: keyframes.events
+230/956 Test: keyframes.events
+Command: "<Blood2>/build/debug/tests/keyframer_tests" "events" "<Blood2>/build/debug/tests/keyframe-fixtures/events"
+Directory: <Blood2>/build/debug/tests
+"keyframes.events" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"keyframes.events" end time: Oct 17 20:57 CEST
+"keyframes.events" time elapsed: 00:00:00
+----------------------------------------------------------
+
+229/956 Testing: keyframes.rotation
+229/956 Test: keyframes.rotation
+Command: "<Blood2>/build/debug/tests/keyframer_tests" "rotation" "<Blood2>/build/debug/tests/keyframe-fixtures/rotation"
+Directory: <Blood2>/build/debug/tests
+"keyframes.rotation" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"keyframes.rotation" end time: Oct 17 20:57 CEST
+"keyframes.rotation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+228/956 Testing: keyframes.looping
+228/956 Test: keyframes.looping
+Command: "<Blood2>/build/debug/tests/keyframer_tests" "looping" "<Blood2>/build/debug/tests/keyframe-fixtures/looping"
+Directory: <Blood2>/build/debug/tests
+"keyframes.looping" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"keyframes.looping" end time: Oct 17 20:57 CEST
+"keyframes.looping" time elapsed: 00:00:00
+----------------------------------------------------------
+
+231/956 Testing: keyframes.reentrant
+231/956 Test: keyframes.reentrant
+Command: "<Blood2>/build/debug/tests/keyframer_tests" "reentrant" "<Blood2>/build/debug/tests/keyframe-fixtures/reentrant"
+Directory: <Blood2>/build/debug/tests
+"keyframes.reentrant" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"keyframes.reentrant" end time: Oct 17 20:57 CEST
+"keyframes.reentrant" time elapsed: 00:00:00
+----------------------------------------------------------
+
+257/956 Testing: worldpaths.lifetime
+257/956 Test: worldpaths.lifetime
+Command: "<Blood2>/build/debug/tests/worldpath_tests" "lifetime" "<Blood2>/build/debug/tests/worldpath-fixtures/lifetime"
+Directory: <Blood2>/build/debug/tests
+"worldpaths.lifetime" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"worldpaths.lifetime" end time: Oct 17 20:57 CEST
+"worldpaths.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+255/956 Testing: worldpaths.riders
+255/956 Test: worldpaths.riders
+Command: "<Blood2>/build/debug/tests/worldpath_tests" "riders" "<Blood2>/build/debug/tests/worldpath-fixtures/riders"
+Directory: <Blood2>/build/debug/tests
+"worldpaths.riders" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"worldpaths.riders" end time: Oct 17 20:57 CEST
+"worldpaths.riders" time elapsed: 00:00:00
+----------------------------------------------------------
+
+254/956 Testing: worldpaths.world_block
+254/956 Test: worldpaths.world_block
+Command: "<Blood2>/build/debug/tests/worldpath_tests" "world_block" "<Blood2>/build/debug/tests/worldpath-fixtures/world_block"
+Directory: <Blood2>/build/debug/tests
+"worldpaths.world_block" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"worldpaths.world_block" end time: Oct 17 20:57 CEST
+"worldpaths.world_block" time elapsed: 00:00:00
+----------------------------------------------------------
+
+253/956 Testing: worldpaths.translation
+253/956 Test: worldpaths.translation
+Command: "<Blood2>/build/debug/tests/worldpath_tests" "translation" "<Blood2>/build/debug/tests/worldpath-fixtures/translation"
+Directory: <Blood2>/build/debug/tests
+"worldpaths.translation" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"worldpaths.translation" end time: Oct 17 20:57 CEST
+"worldpaths.translation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+234/956 Testing: keyframes.collision
+234/956 Test: keyframes.collision
+Command: "<Blood2>/build/debug/tests/keyframer_tests" "collision" "<Blood2>/build/debug/tests/keyframe-fixtures/collision"
+Directory: <Blood2>/build/debug/tests
+"keyframes.collision" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"keyframes.collision" end time: Oct 17 20:57 CEST
+"keyframes.collision" time elapsed: 00:00:00
+----------------------------------------------------------
+
+232/956 Testing: keyframes.validation
+232/956 Test: keyframes.validation
+Command: "<Blood2>/build/debug/tests/keyframer_tests" "validation" "<Blood2>/build/debug/tests/keyframe-fixtures/validation"
+Directory: <Blood2>/build/debug/tests
+"keyframes.validation" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"keyframes.validation" end time: Oct 17 20:57 CEST
+"keyframes.validation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+263/956 Testing: cinematics.decode
+263/956 Test: cinematics.decode
+Command: "<Blood2>/build/debug/tests/cinematic_tests" "decode" "<Blood2>/build/debug/tests/cinematic-fixtures/decode"
+Directory: <Blood2>/build/debug/tests
+"cinematics.decode" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.decode" end time: Oct 17 20:57 CEST
+"cinematics.decode" time elapsed: 00:00:00
+----------------------------------------------------------
+
+226/956 Testing: keyframes.defaults
+226/956 Test: keyframes.defaults
+Command: "<Blood2>/build/debug/tests/keyframer_tests" "defaults" "<Blood2>/build/debug/tests/keyframe-fixtures/defaults"
+Directory: <Blood2>/build/debug/tests
+"keyframes.defaults" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"keyframes.defaults" end time: Oct 17 20:57 CEST
+"keyframes.defaults" time elapsed: 00:00:00
+----------------------------------------------------------
+
+948/956 Testing: coverage.observations
+948/956 Test: coverage.observations
+Command: "<Blood2>/build/debug/tests/service_coverage_tests" "observations"
+Directory: <Blood2>/build/debug/tests
+"coverage.observations" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"coverage.observations" end time: Oct 17 20:57 CEST
+"coverage.observations" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/956 Testing: objects.unsupported_teardown
+14/956 Test: objects.unsupported_teardown
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "unsupported_teardown"
+Directory: <Blood2>/build/debug/tests
+"objects.unsupported_teardown" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS unsupported_teardown
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.unsupported_teardown" end time: Oct 17 20:57 CEST
+"objects.unsupported_teardown" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/956 Testing: objects.builtin_model
+2/956 Test: objects.builtin_model
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "builtin_model"
+Directory: <Blood2>/build/debug/tests
+"objects.builtin_model" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS builtin_model
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.builtin_model" end time: Oct 17 20:57 CEST
+"objects.builtin_model" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/956 Testing: objects.creation_failures
+15/956 Test: objects.creation_failures
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "creation_failures"
+Directory: <Blood2>/build/debug/tests
+"objects.creation_failures" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS creation_failures
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"objects.creation_failures" end time: Oct 17 20:57 CEST
+"objects.creation_failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/956 Testing: objects.messages_strings
+11/956 Test: objects.messages_strings
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "messages_strings"
+Directory: <Blood2>/build/debug/tests
+"objects.messages_strings" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS messages_strings
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"objects.messages_strings" end time: Oct 17 20:57 CEST
+"objects.messages_strings" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/956 Testing: objects.links_lists
+10/956 Test: objects.links_lists
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "links_lists"
+Directory: <Blood2>/build/debug/tests
+"objects.links_lists" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS links_lists
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.links_lists" end time: Oct 17 20:57 CEST
+"objects.links_lists" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/956 Testing: objects.original_objects
+3/956 Test: objects.original_objects
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "original_objects"
+Directory: <Blood2>/build/debug/tests
+"objects.original_objects" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS original_objects
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.original_objects" end time: Oct 17 20:57 CEST
+"objects.original_objects" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/956 Testing: objects.reasons_properties
+5/956 Test: objects.reasons_properties
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "reasons_properties"
+Directory: <Blood2>/build/debug/tests
+"objects.reasons_properties" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS reasons_properties
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.reasons_properties" end time: Oct 17 20:57 CEST
+"objects.reasons_properties" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/956 Testing: objects.handles_selection
+9/956 Test: objects.handles_selection
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "handles_selection"
+Directory: <Blood2>/build/debug/tests
+"objects.handles_selection" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS handles_selection
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.handles_selection" end time: Oct 17 20:57 CEST
+"objects.handles_selection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/956 Testing: objects.aggregate_dispatch
+8/956 Test: objects.aggregate_dispatch
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "aggregate_dispatch"
+Directory: <Blood2>/build/debug/tests
+"objects.aggregate_dispatch" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS aggregate_dispatch
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.aggregate_dispatch" end time: Oct 17 20:57 CEST
+"objects.aggregate_dispatch" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/956 Testing: objects.deferred_removal
+7/956 Test: objects.deferred_removal
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "deferred_removal"
+Directory: <Blood2>/build/debug/tests
+"objects.deferred_removal" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS deferred_removal
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.deferred_removal" end time: Oct 17 20:57 CEST
+"objects.deferred_removal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/956 Testing: objects.nested_creation
+4/956 Test: objects.nested_creation
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "nested_creation"
+Directory: <Blood2>/build/debug/tests
+"objects.nested_creation" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS nested_creation
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.nested_creation" end time: Oct 17 20:57 CEST
+"objects.nested_creation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/956 Testing: objects.scheduling
+6/956 Test: objects.scheduling
+Command: "<Blood2>/build/debug/tests/object_contract_tests" "scheduling"
+Directory: <Blood2>/build/debug/tests
+"objects.scheduling" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+PASS scheduling
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"objects.scheduling" end time: Oct 17 20:57 CEST
+"objects.scheduling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+261/956 Testing: worldpaths.subway
+261/956 Test: worldpaths.subway
+Command: "<Blood2>/build/debug/tests/worldpath_tests" "subway" "<external-game>"
+Directory: <Blood2>/build/debug/tests
+"worldpaths.subway" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+blocked_time=3 primary_polygon=1209 fraction=0.560681 normal=0,0,1
+blocked_time=3.01666 primary_polygon=1209 fraction=0.896829 normal=0,0,1
+cycle=0 moves=297 blocks=2 final=-32,168,3371.74 consumed_keys=9 runtime=233
+blocked_time=3 primary_polygon=1209 fraction=0.560681 normal=0,0,1
+blocked_time=3.01666 primary_polygon=1209 fraction=0.896829 normal=0,0,1
+cycle=1 moves=297 blocks=2 final=-32,168,3371.74 consumed_keys=9 runtime=233
+<end of output>
+Test time =   2.46 sec
+----------------------------------------------------------
+Test Passed.
+"worldpaths.subway" end time: Oct 17 20:57 CEST
+"worldpaths.subway" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 17 20:57 CEST
+
+audio =  14.08 sec*proc
+
+cinematics =   4.98 sec*proc
+
+doors =   1.71 sec*proc
+
+headless =  97.28 sec*proc
+
+keyframes =  18.99 sec*proc
+
+objects =   1.72 sec*proc
+
+private =  94.39 sec*proc
+
+services =  13.77 sec*proc
+
+train_session =  52.08 sec*proc
+
+triggers =   1.52 sec*proc
+
+worldpaths =   2.51 sec*proc

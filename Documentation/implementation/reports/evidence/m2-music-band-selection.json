@@ -1,0 +1,102 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "2b9f1901115a7040baa102a082a2006dd0fd70b8",
+  "status": "M2 incomplete; effective section bands selected, no MUSIC playback",
+  "frozen_sources": {
+    "src/app/inspector_world_sounds.cpp": "ea7886a828b424f98487480ecdee30db6cb980b4776375b785124d5d22c7b311",
+    "src/app/world_sound_smoke.cpp": "83fb06a78db9bdb7f823f4c88858fe13317425746e849630c99c59015a6a9c17",
+    "src/engine/ima_band.cpp": "fcae34985db616eef7a0d4cf759cfd17dee32bc22fe80dff7e09069cdc9bb169",
+    "src/engine/ima_band.h": "35fbf44b9c97c0cd4ea6799a46cfbb32f67258788e2f9bfb3dc801741075c49f",
+    "src/game/music_catalog.cpp": "64ba3e8a68f78c5127800c07167f9b9ac42ba32040e657eaec033cc2e5b6b85e",
+    "src/game/music_catalog.h": "5693e4132e46f506ffd45091ad92a60409cd6501af522780b6ffa2ccf5ce117c",
+    "tests/CMakeLists.txt": "f9ba22ab4406e8685bd88f5ea295e1d8b8631252431e6eb5b91e11b32e56f1e6",
+    "tests/ima_band_tests.cpp": "73a662b1b3fa739d524fb09b3bf642b013c3da6e036ee8a80ff301897589db5a",
+    "tests/music_asset_tests.cpp": "a4af0bcbb65a812f700c31ef303c54284dde573f3fac39282e46c7423f92f73d"
+  },
+  "results": {
+    "debug-tests": {
+      "passed": 108,
+      "wall_seconds": 15.74
+    },
+    "debug-gpu": {
+      "passed": 2,
+      "wall_seconds": 10.8
+    },
+    "release-tests": {
+      "passed": 108,
+      "wall_seconds": 1.45
+    },
+    "release-gpu": {
+      "passed": 2,
+      "wall_seconds": 3.71
+    },
+    "sanitize-tests": {
+      "passed": 108,
+      "wall_seconds": 66.75
+    }
+  },
+  "probe": {
+    "binary_sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "synthetic_cases": 800,
+    "fnv64": 9953174249627237157,
+    "sha256": "1b74b20d16fb13fadd3904d07b4e8bb8a4750edc8378ccc6ee51252a6b9ee7a9",
+    "private_section_choices": 156,
+    "rvas": {
+      "section_assignment": [
+        "0xb37c",
+        "0xb6af"
+      ],
+      "style_prepend": [
+        "0xe93f",
+        "0xe967"
+      ],
+      "section_fallback": [
+        "0xb749",
+        "0xb791"
+      ],
+      "style_default_getter": "0xd9eb"
+    },
+    "limits": "Isolated loaded-band selection; band decoder previously verified; allocation, constructor, refcounts, critical sections and band read are intercepted. No MIDI or collection playback; absent-style GM construction excluded."
+  },
+  "commands": [
+    "python /tmp/b2-music-band-selection-validation.py debug",
+    "python /tmp/b2-music-band-selection-validation.py release",
+    "python /tmp/b2-music-band-selection-validation.py sanitize",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/{debug,release} -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit /tmp/b2-music-band-selection-{debug,release}-gpu.xml",
+    "/tmp/b2-legacy-pan-tools/bin/python Documentation/Implementation/evidence/m2-music-band-selection-probe.py EXTERNAL_CONTENT_ROOT",
+    "python /tmp/b2-npc-integrity.py",
+    "python /tmp/b2-npc-links.py",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror (eight changed C++ files)",
+    "git diff --check",
+    "cmake --build build/debug --target blood2_app -j1 (final inspector-only filter correction)",
+    "cmake --build build/release --target blood2_app -j1 (inspector-free target unchanged)"
+  ],
+  "limitations": [
+    "Dummy audio, no soundtrack listening comparison",
+    "Reviewed sound-inspector summary capture; nested band tree not visually exercised",
+    "Native macOS/Metal, Windows and mobile not exercised",
+    "Original isolated band-selection control flow only; not complete loader or synth equivalence"
+  ],
+  "evidence_sha256": {
+    "Documentation/Implementation/evidence/m2-music-band-selection-debug-tests.log": "aedeb61f9008ff00b26a51616877b53617c63b844d00ece685d4abcedfa9072f",
+    "Documentation/Implementation/evidence/m2-music-band-selection-debug-tests.xml": "0e919620fc35ee85e87864640f1da3c53cd52ba8252602334f8d31054ef8e8ac",
+    "Documentation/Implementation/evidence/m2-music-band-selection-debug-gpu.log": "b948583dc0ab80913618ae542fc96753f73d696df5489e72453886210f23e430",
+    "Documentation/Implementation/evidence/m2-music-band-selection-debug-gpu.xml": "7336f06a78a9cf51d276ec7d4610e85147115749e1d43c33cdc1014398712994",
+    "Documentation/Implementation/evidence/m2-music-band-selection-debug-build.log": "ab09205e08c05ce702d1355cf0c64367222a3ddfb82e6a58aafe48602bbc0ada",
+    "Documentation/Implementation/evidence/m2-music-band-selection-release-tests.log": "ed3d6a7ed2c2a26cbda0c6346822a4df95fec5a6f1449cba1d6f2b676cc18c8d",
+    "Documentation/Implementation/evidence/m2-music-band-selection-release-tests.xml": "18f966c1326cb8b0f1c1dafdfc265b61efc6df6bc1f85f4f9482a53b4579fcf0",
+    "Documentation/Implementation/evidence/m2-music-band-selection-release-gpu.log": "ea458b2fdc83ac6ac52141e977f8d8d041b8aa473194c3c45a818f750c336967",
+    "Documentation/Implementation/evidence/m2-music-band-selection-release-gpu.xml": "83b5fcd012203c1dc800cc99260f22008597b85a88df64366f8107b3d31d045b",
+    "Documentation/Implementation/evidence/m2-music-band-selection-release-build.log": "7279aa9a48d4f35795abcc8c1cd53e5040b708a5a002d2898ce769afea1df781",
+    "Documentation/Implementation/evidence/m2-music-band-selection-sanitize-tests.log": "1af6e7b10b12b2287ce1356235d84bda458531e24f5ece1568636abdc68d90e9",
+    "Documentation/Implementation/evidence/m2-music-band-selection-sanitize-tests.xml": "cc0f696918e07f03b9f3f48a040d8c06a9362f082d830f9f34af2f7d464d59eb",
+    "Documentation/Implementation/evidence/m2-music-band-selection-sanitize-build.log": "48d56e643ea6400dd5ce2e849e12131d63a8da960213b20359a80adf272971d4",
+    "Documentation/Implementation/evidence/m2-music-band-selection-probe.json": "c19937a9b8c478f739495638cfae16db06106d10c2dcfcec17f937374b46b2b7",
+    "Documentation/Implementation/evidence/m2-music-band-selection-reference-integrity.json": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+    "Documentation/Implementation/evidence/m2-music-band-selection-links.log": "1044cb9b1f68da125bdb629038d8edda0059e344eb08fef67b07a1b64fcb89df",
+    "Documentation/Implementation/evidence/m2-music-band-selection-probe.py": "437bb18a1ea5259948cb02d3cabb4444890b3f1b821a334535459367fb4c4e15",
+    "Documentation/Implementation/evidence/m2-music-band-selection-validation.py": "68ac713cf77bd56060689db69de123e949d26b0b8849c7b57171ba3ac541cf33"
+  },
+  "final_ui_note": "After the headless suites, an inspector-only filter excludes DLS assets from the IMA band list. Debug app rebuilt; Release target unchanged; both NVIDIA suites rerun. Headless/sanitizer input sources unchanged.",
+  "implementation_commit": "c8d122b5fd8d9bd451ff0d0671c0d44d26c4cc4c"
+}

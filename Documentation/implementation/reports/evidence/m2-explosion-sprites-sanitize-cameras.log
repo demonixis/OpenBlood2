@@ -1,0 +1,24 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 166: cameras.defaults
+1/7 Test #166: cameras.defaults .................   Passed    0.02 sec
+    Start 167: cameras.timing
+2/7 Test #167: cameras.timing ...................   Passed    0.02 sec
+    Start 168: cameras.links
+3/7 Test #168: cameras.links ....................   Passed    0.02 sec
+    Start 169: cameras.selection
+4/7 Test #169: cameras.selection ................   Passed    0.02 sec
+    Start 170: cameras.player
+5/7 Test #170: cameras.player ...................   Passed    0.16 sec
+    Start 171: cameras.validation
+6/7 Test #171: cameras.validation ...............   Passed    0.02 sec
+    Start 172: cameras.catalog
+7/7 Test #172: cameras.catalog ..................   Passed   28.15 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+cameras     =  28.40 sec*proc (7 tests)
+headless    =  28.40 sec*proc (7 tests)
+private     =  28.15 sec*proc (1 test)
+
+Total Test time (real) =  28.41 sec

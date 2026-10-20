@@ -1,0 +1,615 @@
+{
+  "date": "2026-10-15",
+  "status": "M2 incomplete; selected original VolumeBrush/liquids/ladders, body/head queries, swimming/climbing and air/damage integrated",
+  "project_commit": "80ffd8a3b0f3748f5251e7c55e9b535cd3ae8670",
+  "prior_locomotion_commit": "13b116572225ad2b445da7843645b0d126fff446",
+  "dependencies": {
+    "SDL": {
+      "branch": "main",
+      "commit": "6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1",
+      "reported_version": "3.5.0",
+      "archive_sha256": "b59f24752e8ac3322853b43d6d773dfbce4d175d9e2c1db1c4305d8fe565b4e6"
+    },
+    "imgui": {
+      "branch": "master",
+      "commit": "c1aaac65e896a45f81f47a4d68f9959e0f86c859",
+      "reported_version": "1.93.0",
+      "archive_sha256": "b3d8f99838bb3ff05e14185562345f85e00c032da4d8fc277608d7898d847114"
+    },
+    "spdlog": {
+      "tag": "v1.15.3",
+      "commit": "6fa36017cfd5731d617e1a934f0e5ea9c4445b13",
+      "archive_sha256": "5097fb362e79a2bd7247beaf1f8377ed60e274fbe83a4b33e7b73383f0279022"
+    }
+  },
+  "source_integrity": "m2-containers-source-integrity.json",
+  "validation": {
+    "debug": {
+      "synthetic": 77,
+      "private_headless": 9,
+      "gpu": 6,
+      "passed": 92
+    },
+    "release_inspector_off": {
+      "synthetic": 77,
+      "private_headless": 9,
+      "gpu": 6,
+      "passed": 92
+    },
+    "clang_asan_ubsan_leaks": {
+      "synthetic": 77,
+      "private_headless": 9,
+      "gpu": 0,
+      "passed": 86
+    }
+  },
+  "platform": "Linux x64, Wayland, SDL_GPU Vulkan; other platforms and XR untested",
+  "formatting": {
+    "tool": "clang-format 23.1.3",
+    "changed_cpp_files_checked": 35,
+    "exit_code": 0
+  },
+  "private_geometry": {
+    "available_shells": 245,
+    "nonconvex_shells": 7,
+    "rejected_shells": 0,
+    "source_entries_without_models": [
+      "worlds/multi/ctf_jam.dat Acid0",
+      "worlds/multi/ctf_jam.dat Acid1"
+    ],
+    "reader_rejections": [
+      "worlds/16_bridge.dat: typed property near byte 442114"
+    ],
+    "cityhub_created_volumes": 5,
+    "cityhub_ladder_ascent_units": 29.1666,
+    "retail_executable_parity_tested": false
+  },
+  "project_files": [
+    {
+      "path": ".clang-format",
+      "sha256": "506e157fef400ad9395a2c07a39bcfafc09d23b9a6ce172491f5a80cc68a25d0"
+    },
+    {
+      "path": ".editorconfig",
+      "sha256": "9f7de975c2bfd0cf92e0be9f3829cbd548351b6eabcbc9bc03b0f8ee49c47747"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "52af96b3f9e7e92aeff1577219ceb333b08b0404cbbebc7f84f5f3310991a36c"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "edd1d11297fb51cfbac2a140cdbdbb2b3bc3eb6580b7904d52cc68c4ccf8a7a2"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "ba239da4f4e6c12ecc687483924decfb38a37bdfdf1c72811bc0c7729e6c0481"
+    },
+    {
+      "path": "CMakePresets.json",
+      "sha256": "5f1480c97319fde9d69c45d26e1c19192f910d54169e3926c6f9ef775e8a7a5e"
+    },
+    {
+      "path": "README.md",
+      "sha256": "58ac7af0742facd7f2e900bbfe10d948830b39840e78629caccc7a5f59b7d2e5"
+    },
+    {
+      "path": "cmake/Dependencies.cmake",
+      "sha256": "f60d3dc26a31caf75f0a35faa669119d7921a204afea62de4d2943405f4969b0"
+    },
+    {
+      "path": "cmake/build_info.h.in",
+      "sha256": "3caca0bf12e5de6b56d14a25f1e251654159320f331b38c34c7f3cf71a05f639"
+    },
+    {
+      "path": "config/blood2.example.ini",
+      "sha256": "862ef06472089f0412bdbed34c9344893c44551e364f1a85c53119d4b84f0889"
+    },
+    {
+      "path": "docs/CONTAINER_CONTRACTS.md",
+      "sha256": "e9ce0f0738a1672249d1b1630aa9f8e6525ea9b390dd4c3c22dfec1091ec636e"
+    },
+    {
+      "path": "docs/LOCOMOTION_CONTRACTS.md",
+      "sha256": "bd8ea466d42a6cd3b3a50f45a89dd52eb7254e247ae906da4eb3c16549c944c3"
+    },
+    {
+      "path": "docs/M2_CONTAINER_SOURCES.json",
+      "sha256": "faf3d75bb59476524ecdeb583cc6989af51f5ab5f4f9b360e351482a17e32e66"
+    },
+    {
+      "path": "docs/M2_LOCOMOTION_SOURCES.json",
+      "sha256": "51e10e41e4cb939fadfcf2cd9ea091c824b06554407c706ca8847205b853aaa7"
+    },
+    {
+      "path": "docs/M2_MOVEMENT_SOURCES.json",
+      "sha256": "ba9ffb0fa8db4272e5345606088caf350ec80e436fe53eff54d08eb4c8707756"
+    },
+    {
+      "path": "docs/M2_PLAYER_SOURCES.json",
+      "sha256": "ed5cde6d63b8b5eed65e5c798584473cd5dc9a712f6e957122eed2663010e937"
+    },
+    {
+      "path": "docs/M2_SERVICES_SOURCES.json",
+      "sha256": "7d0ffc84003c6d84407de4e30db984bfba930a67fa213ded7f2510c21e741a7a"
+    },
+    {
+      "path": "docs/M2_SOURCES.json",
+      "sha256": "e0348bee7e6bc7a876ae085785a0dd7e6b0b00c131282372933d2a9210941104"
+    },
+    {
+      "path": "docs/M2_WEAPON_SOURCES.json",
+      "sha256": "345784fdfd5ce356598382d29091da6f8db34abecbaa4b9536f7e96f3f5435b3"
+    },
+    {
+      "path": "docs/MODEL_AND_COLLISION_CONTRACTS.md",
+      "sha256": "714a9c85b6727cc66e40c734017e3b1c661251340b073a6058940d8f7058a9eb"
+    },
+    {
+      "path": "docs/MOVEMENT_CONTRACTS.md",
+      "sha256": "eaa773b53869619b2429c508cdb1f1dd48d59da85f00bc94f60523e6810c4ae1"
+    },
+    {
+      "path": "docs/OBJECT_CONTRACTS.md",
+      "sha256": "97d6ce127de470fefcde5a3fbb8759d706de8ddedef45a24f23bf6271b954682"
+    },
+    {
+      "path": "docs/ORIGINAL_SOURCES.json",
+      "sha256": "a93a4fdce2aefb20cd2805356b63c8f26f8885730a133d9c0f47d735c81a6a76"
+    },
+    {
+      "path": "docs/PLAYER_CONTRACTS.md",
+      "sha256": "0908001f66f90396256b8d1ece49677c8dd553c386b49269f51059d3a4b0ae1c"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "1cd4a09b09b28dd40a14a081e6171873263292314e68492c3afafc3eae2793bd"
+    },
+    {
+      "path": "docs/WEAPON_CONTRACTS.md",
+      "sha256": "e5991c40449cf2b29b4a1a0a3ccf47b033c41dede7b465798765a366b70d8401"
+    },
+    {
+      "path": "docs/WORLD_CONTRACTS.md",
+      "sha256": "8357ba48ac692646193a2013d794a96605d61e50425e52ca4aaf020bd7216067"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "0d1ade1eb7e00612d2ae266b969bf9edf58680a1d38d62401b98c0a1def44e64"
+    },
+    {
+      "path": "src/app/inspector.h",
+      "sha256": "f0b7e8178591c31fedcec94636377f40b146d50d098b621b6307cccd773d0f90"
+    },
+    {
+      "path": "src/app/main.cpp",
+      "sha256": "bd3e8390740cd25bd7a99876c72336e69d59c3df045ce3b851129fb7329c4f18"
+    },
+    {
+      "path": "src/app/movement_controls.h",
+      "sha256": "1d57ecfe8c95afe5a200a53b3df4e61c2ed91816879c1eb885e9eb5061647c34"
+    },
+    {
+      "path": "src/engine/capture.cpp",
+      "sha256": "3160293a7c433953951196f25ae910d92029d8e32fee4956d012fac614701d92"
+    },
+    {
+      "path": "src/engine/capture.h",
+      "sha256": "1c1012149029c85b6cc76984cf99a12c295cbb23ab9b7f350e8808cfbc2dd09f"
+    },
+    {
+      "path": "src/engine/collision.cpp",
+      "sha256": "f09c1dbed1938ec7ca0b81730734a602f73a67cd6dfe5841ff74239b2f400e36"
+    },
+    {
+      "path": "src/engine/collision.h",
+      "sha256": "59b8e6a65ee3338d84cee30c08d50f5b6556f899abde9eb0811596bbd42b3027"
+    },
+    {
+      "path": "src/engine/config.cpp",
+      "sha256": "7e0ff02efe7de7817f7a524d7d0e7d13490f9c0da69815c8efe7e8050fa9cb60"
+    },
+    {
+      "path": "src/engine/config.h",
+      "sha256": "753336207352612e06eceb448d83697411923ef6d5492fec1ed59bb2a3b35b6a"
+    },
+    {
+      "path": "src/engine/container.cpp",
+      "sha256": "743316b9457c2ef2b4c80338482a7fd8c6b49b87e6c0235bb5be22c09f037a34"
+    },
+    {
+      "path": "src/engine/container.h",
+      "sha256": "62e0c39751cf824c005431ae0bc45f8f24d7ba517a23e3a07603b79634f953ca"
+    },
+    {
+      "path": "src/engine/formats/reader.h",
+      "sha256": "9a10634e1fe76c4aa8bbdb443c769086dcf3fc26caa79821b8d405e74377b49a"
+    },
+    {
+      "path": "src/engine/model.cpp",
+      "sha256": "e6fa3dfe8456ce4578a20a7a4860c408fa149e493d5cc3cd4c347abf9da13cae"
+    },
+    {
+      "path": "src/engine/model.h",
+      "sha256": "918f1b59dc703ee91999031247512ae657a17a01cd0f36e00daa4431a17d8e24"
+    },
+    {
+      "path": "src/engine/model_commands.h",
+      "sha256": "048407d3ba5ea899dcb9809b7d320bd3fa1eccb8b598b51bde6ef3c6e00ae5e4"
+    },
+    {
+      "path": "src/engine/model_store.cpp",
+      "sha256": "1eb0d7426b696fe924ffab340eb93ef3b4db1cd47a1995a346ac65b038c95fc6"
+    },
+    {
+      "path": "src/engine/model_store.h",
+      "sha256": "78c6c7122342ff0091a59b131512b03e2981f7dcc6dbf39c9417a7bf2dd44830"
+    },
+    {
+      "path": "src/engine/objects.cpp",
+      "sha256": "6cbd8afd9dcffe40b1bedafd8b81134a4de88d16424a38ac1eb551aa1cdf86f0"
+    },
+    {
+      "path": "src/engine/objects.h",
+      "sha256": "ee288dd608def89d5a44bc15a08f23cd1be48eb40bd9c1404fb46d24df917dd1"
+    },
+    {
+      "path": "src/engine/resources.cpp",
+      "sha256": "3bd2de2370d1b6b206293b5bdf9b34fb91f257bbbfb86ce98add46d00c23b6f8"
+    },
+    {
+      "path": "src/engine/resources.h",
+      "sha256": "1f5aef91bd93765e2463c25ac954038e5c3198191da4da80bde14efb47a37f8a"
+    },
+    {
+      "path": "src/engine/runtime.cpp",
+      "sha256": "46230a7c2641bf991d72fe80bcaf553db3e95481fec1f2b55d0ed6a5df390470"
+    },
+    {
+      "path": "src/engine/runtime.h",
+      "sha256": "62a7d4735a0522a951c61a818d861287fc24369288a1eedb5583eeed2c4e48c6"
+    },
+    {
+      "path": "src/engine/world.cpp",
+      "sha256": "68db70d11984f362d81916eb6886f92ca48ffdcdb6b1b028d2d992618cd3390e"
+    },
+    {
+      "path": "src/engine/world.h",
+      "sha256": "618ef0cad3da31dd311a329cdb063d1c2e4210c08a2bd8dd021427e335dad351"
+    },
+    {
+      "path": "src/game/container_messages.h",
+      "sha256": "3929138d2acc7d8ae983c06b64544754030250ec03524fb775d1e1fc8494b9dd"
+    },
+    {
+      "path": "src/game/game_settings.h",
+      "sha256": "e4279f3e51c3e589e7ab1a623ed37923dce7f8f24f7ac92c0984586c56ec6593"
+    },
+    {
+      "path": "src/game/legacy/basedefs_de.h",
+      "sha256": "b6d622592c02ade9188d9b0cd500b8887ec6a715635979f3d12e3fbb5cc52924"
+    },
+    {
+      "path": "src/game/legacy/cpp_aggregate_de.h",
+      "sha256": "35157c630c7eeb608337aac814101d29f58088889aa9f40a7787c9ffb03f6427"
+    },
+    {
+      "path": "src/game/legacy/cpp_engineobjects_de.h",
+      "sha256": "b01387be436080efb40228de81f5cfc972a9b6d6d2174d0d8dc5b88a6f0780fe"
+    },
+    {
+      "path": "src/game/legacy/cpp_server_de.h",
+      "sha256": "d2e00bce58146b080a5387241c4aefe46fdf1a30c0e6fd07ab7f9bb3d906a341"
+    },
+    {
+      "path": "src/game/legacy/dlink.h",
+      "sha256": "f5843f1c0863a65dbe649d732fb5be18f9f703c2d532ccb5220244d0f8ff8941"
+    },
+    {
+      "path": "src/game/legacy/engineobjects_de.h",
+      "sha256": "e49f0408ac90f4643c8ce1e4e1c04c998544abb3701abc2130d2be1c7a953044"
+    },
+    {
+      "path": "src/game/legacy/server_de.h",
+      "sha256": "335eae38a7789675e737d4fa331b9aa9bfc111612c5cba638d5fda5039d824f9"
+    },
+    {
+      "path": "src/game/legacy/serverobj_de.h",
+      "sha256": "502879637d71587ead095ed9a530b163a104a4edde1ac4574e978c0dcc80448b"
+    },
+    {
+      "path": "src/game/original/B2BaseClass.cpp",
+      "sha256": "b555bc64d38880cba1b7215a1cdc5694067b8b18b05505508d9ecaff22446341"
+    },
+    {
+      "path": "src/game/original/B2BaseClass.h",
+      "sha256": "748128354f6b79b61692802adcebf305c3b6dc6a989f34d1f9ee18cdb95fec9a"
+    },
+    {
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "f0037257498ad7fca81aa431fe37d39efca3a5457ee12632151d00ee52f3ab35"
+    },
+    {
+      "path": "src/game/original/BloodShells.h",
+      "sha256": "9e50f0d7fe872fadd7d3781416afc7f92f698e7286aa0a70e237f64b4f37714f"
+    },
+    {
+      "path": "src/game/original/CameraSpot.cpp",
+      "sha256": "92660fd78f8e38ff40737ae011891ec5b54ae009954ff4a918fd1e8e499c60c2"
+    },
+    {
+      "path": "src/game/original/CameraSpot.h",
+      "sha256": "97cfb510cbc52dfdc26a24c1a76b48b6b80269f19004d34acf8c320a3f1217ae"
+    },
+    {
+      "path": "src/game/original/GameStartPoint.cpp",
+      "sha256": "bb7deb8d052ce1bd50e217a317218322ead51c34e6bf94f0e59e746e8e53fb95"
+    },
+    {
+      "path": "src/game/original/GameStartPoint.h",
+      "sha256": "ac013e688c192e5ba36958e63abb348a7797259e8065aa90ae3d0656730bd779"
+    },
+    {
+      "path": "src/game/original/InventoryMgr.cpp",
+      "sha256": "c7bba172518a03005e38b952a10c4ffea10138f2be12b6a0cd852b945ea61854"
+    },
+    {
+      "path": "src/game/original/InventoryMgr.h",
+      "sha256": "452dce9aa7dcb8f9172e8cc49c0ff71c0307264aa7384ed4f5b94402cbf39655"
+    },
+    {
+      "path": "src/game/original/Key.cpp",
+      "sha256": "b4241a8ad61a358a98fb9de2ebe865b4ea3fc9383f78808e0e6cac0615fc70be"
+    },
+    {
+      "path": "src/game/original/Key.h",
+      "sha256": "a32e1aa1c3d44388e50bac802083f6bcacd3d699bcee78b24f907785a498a328"
+    },
+    {
+      "path": "src/game/original/MoveMgr.cpp",
+      "sha256": "16466eb092b277ee81fdca8c1ac6f613fa88f07bea8029aa69f6fbec12203981"
+    },
+    {
+      "path": "src/game/original/MoveMgr.h",
+      "sha256": "189054306bbffd1fb4b50badf326d828637c5009bb3fb6199a5751e248439e16"
+    },
+    {
+      "path": "src/game/original/PathPoint.cpp",
+      "sha256": "c1381a554ceadf2aa701cc23d0f286a5be37568f6bde5329759d33f1a20d93d3"
+    },
+    {
+      "path": "src/game/original/PathPoint.h",
+      "sha256": "ef39d5c9d576323a9f86465addda7255fa7379be40af12c32b6f833e68c31241"
+    },
+    {
+      "path": "src/game/original/PlayerContainers.cpp",
+      "sha256": "78286d7ad4655607da9f6978c06653a4c9aa3f7eb95b2caaade44654e18383f2"
+    },
+    {
+      "path": "src/game/original/PlayerLocomotion.cpp",
+      "sha256": "850d59e12bca54f506fcbeda0ddf5074e8cd0c395a5bdd7409e43e40c57a0e6a"
+    },
+    {
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "eb7f7f73d9cff07b3e5652e90d2155fa6c090b6536e63bf31577d107bd01ecfc"
+    },
+    {
+      "path": "src/game/original/PlayerObj.h",
+      "sha256": "be3bd1e8c2d98c02da0e6b1db75b2046b9c43281affd6457aaa53da75b5f5771"
+    },
+    {
+      "path": "src/game/original/SmellHint.cpp",
+      "sha256": "072f4713bc5f07c3d4a1cb05820422e773b8f6b8aea6c41db054692a71a189a9"
+    },
+    {
+      "path": "src/game/original/SmellHint.h",
+      "sha256": "77d79851955029250e2eec1bbe229ad1a595dfe3b82b4f4fc65e008cc7fc3756"
+    },
+    {
+      "path": "src/game/original/ViewWeapon.cpp",
+      "sha256": "bc356b47909501e947f17f66cb73e03cfbf6cad948f33fbbe9d073216ac24407"
+    },
+    {
+      "path": "src/game/original/ViewWeapon.h",
+      "sha256": "2b5050fc3e73af6446609a9078b73bd7aa272d09162ca940ed87fb17aa891f84"
+    },
+    {
+      "path": "src/game/original/VolumeBrush.cpp",
+      "sha256": "4e20bbef3657fb83004ff0465f1cd583d8af8351bc7835e6442017fa186c2941"
+    },
+    {
+      "path": "src/game/original/VolumeBrush.h",
+      "sha256": "18fdea0015016a6c326db6b8b634a34b74a3dfc3098fa7b06dcc86e86c29db20"
+    },
+    {
+      "path": "src/game/original/Weapon.cpp",
+      "sha256": "ae44153f96d1aed1e6119d49bf153f13ccd5de2c801864203bfe380b341595e6"
+    },
+    {
+      "path": "src/game/original/Weapon.h",
+      "sha256": "2f5d6c5886eae96a4001d3b90d0f6d3dfb0f9892affde13718f3c418e39da4ad"
+    },
+    {
+      "path": "src/game/original/WeaponDefs.cpp",
+      "sha256": "70f64acb58a1ecfaba424f5392cf6aced931d75c88e33eceac23ab41db6ee1e4"
+    },
+    {
+      "path": "src/game/original/WeaponDefs.h",
+      "sha256": "f44bea66e74afa6b1cb85cac09bbd571cf3c83b1f6b6e9a7f7c04f957bfc9d0c"
+    },
+    {
+      "path": "src/game/original/WorldProperties.cpp",
+      "sha256": "c6600bbc0bcee6ad7a1b981243e30ab677096b0bb856b5cc8af9b633cfee66b2"
+    },
+    {
+      "path": "src/game/original/WorldProperties.h",
+      "sha256": "c281b3d26794f5fe84aadb032aa433dbe844592178d2736b294fb9ee9e5b7459"
+    },
+    {
+      "path": "src/game/original/engineobjects.cpp",
+      "sha256": "6231394bf47177a71c5210d7205dc5e71a12d1e9572d9d917c18813456b68a3c"
+    },
+    {
+      "path": "src/game/original/session_load.cpp",
+      "sha256": "c832c391f75a1ec4c4590cea4c1ae810aa1a10a462191e2acf2012c93a764a94"
+    },
+    {
+      "path": "src/game/original/trigger_helpers.cpp",
+      "sha256": "8273e1c6504e0a59e17b9f5790aa2e72a2789e7ab7dfd0aa7ee37724bcb22df0"
+    },
+    {
+      "path": "src/game/original/trigger_helpers.h",
+      "sha256": "8eedb4185b3476128d02a9eb797ee130f65490081babce7a2c1b2416b2dd6e09"
+    },
+    {
+      "path": "src/game/player_messages.h",
+      "sha256": "0dd1c995a4d15edf1e8ca456864d74f2469ccd515792f767fcb9ec3fda0a97ba"
+    },
+    {
+      "path": "src/game/registration.cpp",
+      "sha256": "02fcbbeac820524d4d78ad51c6e24bb809136811b170442a0ab2a5c9b4f0d323"
+    },
+    {
+      "path": "src/game/server_adapter.cpp",
+      "sha256": "b02ddaeb0536d806563650681b29dfc61298e7edefc231ad5d444939147b4414"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "50c9b8c045ff84d5c0a81489c41d7c99490289ae11fbebf5726966d405e496fa"
+    },
+    {
+      "path": "src/game/server_clients.cpp",
+      "sha256": "d7e7b38dda83cf494f9bb9e6e5765ec2487700e392716b1170084a3e530627f7"
+    },
+    {
+      "path": "src/game/server_containers.cpp",
+      "sha256": "1f017ce80c3ca5508a1bdf9f5d17caf7d87c0544ed8afdc95ee1735682a843a2"
+    },
+    {
+      "path": "src/game/server_models.cpp",
+      "sha256": "3dc954ddbcb33a379e4512a0dc873bab353b9b209a6b88cb33069f53b3ee9829"
+    },
+    {
+      "path": "src/game/server_physics.cpp",
+      "sha256": "d1afd3c2866bfdc3ff68abfa8397f0bac81b1806b92b3b955739cda1880f49b2"
+    },
+    {
+      "path": "src/game/server_weapons.cpp",
+      "sha256": "5bfa8319a7eb9ef46032a421a8fc7b83a59e4edf5a0b32c34aeb63ea303c9c3c"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "0098ec1b2b66965af68f7194039876ffcdf20208f24556d1e0322e613dee9aab"
+    },
+    {
+      "path": "src/game/session.h",
+      "sha256": "9b0e8464be215f268528653971b4bcc24f739ec11d6614ef4880c1991912d3d8"
+    },
+    {
+      "path": "src/game/weapon_messages.h",
+      "sha256": "4bb9d9e9f325a0b806c60d7214d1dcdc742d354d1558a808d3b037f30969dbfb"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "9b9736f0064f3f4f662c2a618fda1135f9d972a885309d02a03827f69c97d1c6"
+    },
+    {
+      "path": "tests/cli_test.cmake",
+      "sha256": "5f6964f79fa31b2dd1086e4acd2401860dcf3b78dbec863e999780993b7f420b"
+    },
+    {
+      "path": "tests/config_tests.cpp",
+      "sha256": "14ec6cc565ff79a3e62b1f65cd8dcddaec7354803a52fbbf1158511cf94ebb36"
+    },
+    {
+      "path": "tests/container_tests.cpp",
+      "sha256": "fe059066fb9091cbcf1de7ebdb654c368d5a85d07d97729f87e1806068113dbf"
+    },
+    {
+      "path": "tests/locomotion_tests.cpp",
+      "sha256": "ac954894ebc848c1c008df89fe2f3b8e876a7bc9e6c65b3721943e2dfa1860cd"
+    },
+    {
+      "path": "tests/model_fixture.h",
+      "sha256": "19418788c8bcae87cc0827193d2d749e8c3482adee39274add41219915b61892"
+    },
+    {
+      "path": "tests/movement_tests.cpp",
+      "sha256": "6b2a2eec0ad90335f9197be34867a97cb23ea72bb24b811bb811c818c2cb262f"
+    },
+    {
+      "path": "tests/object_contract_tests.cpp",
+      "sha256": "d43edb45b08035b9bd6e3148e8dc15e1f8019ad7a41b838217c7304206cb9e77"
+    },
+    {
+      "path": "tests/player_fixture.h",
+      "sha256": "294402b40ff6d73e83537d12718ce18d1da786e2aedbf11a0585854767ad2d66"
+    },
+    {
+      "path": "tests/player_tests.cpp",
+      "sha256": "5bbdbce55b620cadb0a10e50528b58d8ad6ec37c816712ebcce73b9c31d46007"
+    },
+    {
+      "path": "tests/services_tests.cpp",
+      "sha256": "910f1f1f3838eb3e5b583216a8fed9707e1b3cffd3b407911e86e3b9e0755fc3"
+    },
+    {
+      "path": "tests/weapon_tests.cpp",
+      "sha256": "dc7550197854731d405788bee0ca7dccb6bcc4ab6d95169e53ea17d558f1f826"
+    },
+    {
+      "path": "tests/world_cli_test.cmake",
+      "sha256": "4296139981c0791a6b940bffee63ca2113c0c4026296a6a1bb64c376c49c1251"
+    },
+    {
+      "path": "tests/world_tests.cpp",
+      "sha256": "5d5b7280a4a972e67b7c615076f56f2ce98af425f8a36b95efbc4ba480296a78"
+    }
+  ],
+  "evidence_files": [
+    {
+      "path": "m2-containers-build-debug.log",
+      "sha256": "ebe1cb4b28f739cb570b3618299f5d320eabf219fe0f9677e351869e4bf6815e"
+    },
+    {
+      "path": "m2-containers-build-release.log",
+      "sha256": "87f350dd615f5273bc762e29339425c2c0dcd4502e7100b76b490433c280c6e0"
+    },
+    {
+      "path": "m2-containers-build-sanitize.log",
+      "sha256": "83294e6423b90cf0caea3bf7b5a174b59dd1e945caf32dd4a23fadb8cb2d0bdd"
+    },
+    {
+      "path": "m2-containers-ctest-debug.log",
+      "sha256": "6634a32ad298e34d56c49bee802bafb2995f882f7c0ef3b4e3c19d5fd958506a"
+    },
+    {
+      "path": "m2-containers-ctest-release.log",
+      "sha256": "6d10c500f83d7ffa4da5a95e957c98176431fe2bb450bfc3136db9a8323127b0"
+    },
+    {
+      "path": "m2-containers-ctest-sanitize.log",
+      "sha256": "810b3c3d1fa948b5d55be8a537f861781f5e7c8043a9c64ffb1e0edaf32c82f8"
+    },
+    {
+      "path": "m2-containers-format.log",
+      "sha256": "e21b1cde12a4653d4e195f65080780fbf9fa6bade9967bbbc08a5990863b69ed"
+    },
+    {
+      "path": "m2-containers-inspector.png",
+      "sha256": "4a5f43f93fbce40c425fcd64b6a2ac17f2607f864800dd08f069c9f16c580815"
+    },
+    {
+      "path": "m2-containers-original-adaptations.patch",
+      "sha256": "69ec79adef3b3306285dd71f4eeeea5eac1becf41624737b7f5f00e37074e8e7"
+    },
+    {
+      "path": "m2-containers-private.log",
+      "sha256": "2619c10dba81b16ffb68282af17fc10abaf20770dcde6bee0b3669fbf5b64668"
+    },
+    {
+      "path": "m2-containers-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    }
+  ]
+}

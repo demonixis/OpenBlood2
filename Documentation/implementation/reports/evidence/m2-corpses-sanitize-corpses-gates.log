@@ -1,0 +1,14 @@
+470/472 Testing: corpses.gates
+470/472 Test: corpses.gates
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "gates" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/gates"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.gates" start time: Oct 16 16:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.gates" end time: Oct 16 16:56 CEST
+"corpses.gates" time elapsed: 00:00:00
+----------------------------------------------------------

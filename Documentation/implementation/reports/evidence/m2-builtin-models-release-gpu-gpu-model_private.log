@@ -1,0 +1,18 @@
+362/707 Testing: gpu.model_private
+362/707 Test: gpu.model_private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/model_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/model-private.png" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.model_private" start time: Oct 17 04:47 CEST
+Output:
+----------------------------------------------------------
+Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+Restored original player/client association before private GPU rendering
+Private isolated Caleb/held Beretta diagnostic: 8271 non-background pixels, 40479 vertices
+Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+<end of output>
+Test time =   0.47 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.model_private" end time: Oct 17 04:47 CEST
+"gpu.model_private" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,300 @@
+Start testing: Oct 17 10:04 CEST
+----------------------------------------------------------
+25/812 Testing: gpu.lifecycle
+25/812 Test: gpu.lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/release/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--gpu-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/gpu.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.lifecycle" start time: Oct 17 10:04 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/gpu.png
+[info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+[info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+<end of output>
+Test time =   2.12 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.lifecycle" end time: Oct 17 10:04 CEST
+"gpu.lifecycle" time elapsed: 00:00:02
+----------------------------------------------------------
+
+196/812 Testing: gpu.objectives
+196/812 Test: gpu.objectives
+Command: "/home/yann/projects/lithtech/Blood2/build/release/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--objectives-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/objectives.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.objectives" start time: Oct 17 10:04 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[warning] NEW_LEVEL retained current world: Destination initialization rejected: 18 unsupported classes, 1 failed entries, 0 unavailable services
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/objectives.png
+[warning] NEW_LEVEL retained current world: Destination initialization rejected: 18 unsupported classes, 1 failed entries, 0 unavailable services
+[info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+[info] Session playback: waiting=0 time=4.483333333333323 npc-ready=16 npc-failed=0 npc-updates=112
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; ExitTrigger NEW_LEVEL refusal preserves player/inventory; read-only CityHub preparation checks 1026 entries; temporary CityHub initialization/kept-player entry, cleanup and source restoration checked
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   1.19 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.objectives" end time: Oct 17 10:04 CEST
+"gpu.objectives" time elapsed: 00:00:01
+----------------------------------------------------------
+
+357/812 Testing: gpu.world_depth
+357/812 Test: gpu.world_depth
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/world_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-depth.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.world_depth" start time: Oct 17 10:04 CEST
+Output:
+----------------------------------------------------------
+GPU readback: depth occlusion, opposite winding, near clipping, +X/+Y orientation, camera/object transforms, resize, textured repeat/row orientation/opaque sampling and reupload pass
+<end of output>
+Test time =   0.47 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.world_depth" end time: Oct 17 10:04 CEST
+"gpu.world_depth" time elapsed: 00:00:00
+----------------------------------------------------------
+
+358/812 Testing: gpu.viewport
+358/812 Test: gpu.viewport
+Command: "/home/yann/projects/lithtech/Blood2/build/release/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--viewport-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/viewport.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.viewport" start time: Oct 17 10:04 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Authored Gideon intro initial: updates=332, pings=13, probes=23, state=24, selections=2, script updates=293, command=PASSIVE, failures=0
+[info] Movement smoke focus at frame 2: true
+[info] Movement smoke focus at frame 2: true
+[info] Movement smoke input at 45: enabled=true, focused=true, text=false, W=true, Ctrl=false
+[info] Movement smoke input at 100: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Movement: hidden distance=295.31055, jumps=1, landings=2, ground=true, forward frames=55, jump frames=10
+[info] Movement smoke input at 170: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Captured view weapon: clip=static_model, time=1ms, state=0
+[info] World viewport readback: 641877 / 680000 non-background pixels (UI excluded)
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/viewport.png
+[info] Movement smoke input at 185: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Authored Gideon intro reload: updates=332, pings=13, probes=23, state=24, selections=2, script updates=293, command=PASSIVE, failures=0
+[info] Shutdown: frames=240, UI frames=0, hidden frames=240, toggles=0, resize=true, quit=true
+[info] Session playback: waiting=0 time=28.033333333333022 npc-ready=16 npc-failed=0 npc-updates=679
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] World viewport: hidden=true, unloaded=true, reloaded=true, uploads=2, frames=230, triangles=7441, draws=111, depth=1000x680
+[info] Model viewport: frames=230, world hidden=true, weapon hidden=true, instances=26, close=1, vertices=40086
+[info] World textures: decoded=52, rejected=0, RGBA bytes=1962244, prepared batches=1554
+[info] World alpha: prepared=31, submitted=31, passes=230
+[info] World Pan: 60 authored effects, 208 opaque / 0 alpha submitted batches, session clock 12.333333333332662
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, unload/re-entry
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   2.93 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.viewport" end time: Oct 17 10:04 CEST
+"gpu.viewport" time elapsed: 00:00:02
+----------------------------------------------------------
+
+370/812 Testing: gpu.model_depth
+370/812 Test: gpu.model_depth
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/model_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/model-depth.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.model_depth" start time: Oct 17 10:04 CEST
+Output:
+----------------------------------------------------------
+Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+<end of output>
+Test time =   0.38 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.model_depth" end time: Oct 17 10:04 CEST
+"gpu.model_depth" time elapsed: 00:00:00
+----------------------------------------------------------
+
+562/812 Testing: gpu.player_restore
+562/812 Test: gpu.player_restore
+Command: "/home/yann/projects/lithtech/Blood2/build/release/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--restore-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/player-restore.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.player_restore" start time: Oct 17 10:04 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/player-restore.png
+[info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   0.82 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.player_restore" end time: Oct 17 10:04 CEST
+"gpu.player_restore" time elapsed: 00:00:00
+----------------------------------------------------------
+
+567/812 Testing: gpu.player_keepalive
+567/812 Test: gpu.player_keepalive
+Command: "/home/yann/projects/lithtech/Blood2/build/release/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--keepalive-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/player-keepalive.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.player_keepalive" start time: Oct 17 10:04 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/player-keepalive.png
+[info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=27 npc-failed=0 npc-updates=27
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   1.38 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.player_keepalive" end time: Oct 17 10:04 CEST
+"gpu.player_keepalive" time elapsed: 00:00:01
+----------------------------------------------------------
+
+647/812 Testing: gpu.mouse_combat
+647/812 Test: gpu.mouse_combat
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/player_controls_tests" "gpu_combat" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.mouse_combat" start time: Oct 17 10:04 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walked from spawn to z=-2192.09
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=8, ammo=42, independent corpse verified, native=1
+Dodge updates=0, corpse candidates=30, zero-margin search=1
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walked from spawn to z=-2192.09
+Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=13, ammo=37, independent corpse verified, native=1
+Dodge updates=12, corpse candidates=23, zero-margin search=1
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+<end of output>
+Test time =   2.20 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.mouse_combat" end time: Oct 17 10:04 CEST
+"gpu.mouse_combat" time elapsed: 00:00:02
+----------------------------------------------------------
+
+653/812 Testing: gpu.world_alpha_private
+653/812 Test: gpu.world_alpha_private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/world_alpha_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-alpha-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.world_alpha_private" start time: Oct 17 10:04 CEST
+Output:
+----------------------------------------------------------
+GPU world alpha: zero/partial/full/black texels, far-to-near faces, opaque model occlusion, no depth writes, resize/reupload pass
+glass channel 0 expected=31 actual=31
+glass channel 1 expected=33 actual=33
+glass channel 2 expected=36 actual=36
+Private glass12: changed=11200 pink=0 submitted=1
+glass channel 0 expected=31 actual=31
+glass channel 1 expected=33 actual=33
+glass channel 2 expected=36 actual=36
+Private glass12: changed=11200 pink=0 submitted=1
+<end of output>
+Test time =   0.59 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.world_alpha_private" end time: Oct 17 10:04 CEST
+"gpu.world_alpha_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+812/812 Testing: gpu.level_change
+812/812 Test: gpu.level_change
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/level_change_gpu_tests" "/home/yann/.steam/steam/steamapps/common/Blood II" "/home/yann/projects/lithtech/Blood2/build/release/tests/level-change"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.level_change" start time: Oct 17 10:04 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+Cycle 0: 179200 textured pixels, no fallback; CityHub retained source, SubwayA committed, audio output transferred
+Cycle 1: 179200 textured pixels, no fallback; CityHub retained source, SubwayA committed, audio output transferred
+Cycle 2: 179200 textured pixels, no fallback; CityHub retained source, SubwayA committed, audio output transferred
+<end of output>
+Test time =   1.15 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.level_change" end time: Oct 17 10:04 CEST
+"gpu.level_change" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 17 10:04 CEST
+
+gpu =  13.22 sec*proc
+
+model_view =   0.38 sec*proc
+
+objectives =   1.19 sec*proc
+
+player_controls =   2.20 sec*proc
+
+player_keepalive =   1.38 sec*proc
+
+player_restore =   0.82 sec*proc
+
+private =  10.26 sec*proc
+
+world =   1.15 sec*proc
+
+world_view =   3.99 sec*proc
+

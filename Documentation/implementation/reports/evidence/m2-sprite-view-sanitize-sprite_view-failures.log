@@ -1,0 +1,14 @@
+513/514 Testing: sprite_view.failures
+513/514 Test: sprite_view.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sprite_view_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sprite-view-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"sprite_view.failures" start time: Oct 16 19:58 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"sprite_view.failures" end time: Oct 16 19:58 CEST
+"sprite_view.failures" time elapsed: 00:00:00
+----------------------------------------------------------

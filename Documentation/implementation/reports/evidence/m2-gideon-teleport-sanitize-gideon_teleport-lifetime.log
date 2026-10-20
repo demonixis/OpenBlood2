@@ -1,0 +1,14 @@
+624/626 Testing: gideon_teleport.lifetime
+624/626 Test: gideon_teleport.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_teleport_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-teleport-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_teleport.lifetime" start time: Oct 17 02:45 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_teleport.lifetime" end time: Oct 17 02:45 CEST
+"gideon_teleport.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

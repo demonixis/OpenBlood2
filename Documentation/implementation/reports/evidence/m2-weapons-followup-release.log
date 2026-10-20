@@ -1,0 +1,28 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 53: weapons.inventory
+1/9 Test #53: weapons.inventory ................   Passed    0.00 sec
+    Start 54: weapons.segments
+2/9 Test #54: weapons.segments .................   Passed    0.00 sec
+    Start 55: weapons.firing
+3/9 Test #55: weapons.firing ...................   Passed    0.00 sec
+    Start 56: weapons.melee
+4/9 Test #56: weapons.melee ....................   Passed    0.00 sec
+    Start 57: weapons.damage
+5/9 Test #57: weapons.damage ...................   Passed    0.00 sec
+    Start 58: weapons.animation
+6/9 Test #58: weapons.animation ................   Passed    0.00 sec
+    Start 59: weapons.lifetime
+7/9 Test #59: weapons.lifetime .................   Passed    0.00 sec
+    Start 60: weapons.rollback
+8/9 Test #60: weapons.rollback .................   Passed    0.00 sec
+    Start 61: weapons.private
+9/9 Test #61: weapons.private ..................   Passed    0.10 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Label Time Summary:
+headless    =   0.12 sec*proc (9 tests)
+private     =   0.10 sec*proc (1 test)
+weapons     =   0.12 sec*proc (9 tests)
+
+Total Test time (real) =   0.12 sec

@@ -1,0 +1,14 @@
+321/323 Testing: attachments.missing
+321/323 Test: attachments.missing
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests" "missing" "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment-fixtures/missing"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"attachments.missing" start time: Oct 16 07:33 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"attachments.missing" end time: Oct 16 07:33 CEST
+"attachments.missing" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+508/511 Testing: player_keepalive.named
+508/511 Test: player_keepalive.named
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_keepalive_tests" "named" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-keepalive-fixtures/named"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_keepalive.named" start time: Oct 16 19:38 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"player_keepalive.named" end time: Oct 16 19:38 CEST
+"player_keepalive.named" time elapsed: 00:00:00
+----------------------------------------------------------

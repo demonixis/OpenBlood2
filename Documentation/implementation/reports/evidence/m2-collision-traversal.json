@@ -1,0 +1,1001 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "bbfc2f46c5c4e8c0590379e2f1e9c9ccd63dc1aa",
+  "m2_complete": false,
+  "validation": {
+    "debug": {
+      "passed": 98,
+      "remaining_failed": 0,
+      "private": 15,
+      "initial_stale_worldpath_count": true
+    },
+    "release": {
+      "passed": 98,
+      "remaining_failed": 0,
+      "private": 15,
+      "initial_stale_worldpath_count": true
+    },
+    "sanitize": {
+      "passed": 98,
+      "remaining_failed": 0,
+      "private": 15,
+      "initial_stale_worldpath_count": false
+    },
+    "debug-gpu": {
+      "scenarios_passed": 6,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan"
+    },
+    "release-gpu": {
+      "scenarios_passed": 6,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan"
+    }
+  },
+  "artifacts": [
+    {
+      "file": "m2-collision-traversal-debug-after-1.log",
+      "sha256": "a83bd1568fbb502e958c7e46f1ac62c41f2971aef14ccdf5a2ed8982ff69a33e",
+      "raw_capture_sha256": "a83bd1568fbb502e958c7e46f1ac62c41f2971aef14ccdf5a2ed8982ff69a33e",
+      "bytes": 65816
+    },
+    {
+      "file": "m2-collision-traversal-debug-after-2.log",
+      "sha256": "1f75902b57ec695007f417d4a48340c53dd72950a888a8aaaca2f8a1c9eff4a2",
+      "raw_capture_sha256": "1f75902b57ec695007f417d4a48340c53dd72950a888a8aaaca2f8a1c9eff4a2",
+      "bytes": 65744
+    },
+    {
+      "file": "m2-collision-traversal-debug-after-3.log",
+      "sha256": "438418f49631e37eba8408fa1e074e00d1f1be8e9e0e19671f90361cba5babda",
+      "raw_capture_sha256": "438418f49631e37eba8408fa1e074e00d1f1be8e9e0e19671f90361cba5babda",
+      "bytes": 65824
+    },
+    {
+      "file": "m2-collision-traversal-debug-before-1.log",
+      "sha256": "20e2e8cbe2e35a7fc42ef4a44f55b7990ae27042c0467b7f603574906ecf75dc",
+      "raw_capture_sha256": "20e2e8cbe2e35a7fc42ef4a44f55b7990ae27042c0467b7f603574906ecf75dc",
+      "bytes": 65746
+    },
+    {
+      "file": "m2-collision-traversal-debug-before-2.log",
+      "sha256": "2d12da9ab40f279dc1b64ec2badb9d8643e806a792772e71a2b1b40817467aad",
+      "raw_capture_sha256": "2d12da9ab40f279dc1b64ec2badb9d8643e806a792772e71a2b1b40817467aad",
+      "bytes": 65755
+    },
+    {
+      "file": "m2-collision-traversal-debug-before-3.log",
+      "sha256": "fb7441b4ead12fdaa52f5fc6df9431f29a9396ec3249cc479ef003693835863d",
+      "raw_capture_sha256": "fb7441b4ead12fdaa52f5fc6df9431f29a9396ec3249cc479ef003693835863d",
+      "bytes": 65764
+    },
+    {
+      "file": "m2-collision-traversal-debug-build.log",
+      "sha256": "3d05372cf9fd88f3468316fb91bd04b69026224086b8f655c2e391624af9d16c",
+      "raw_capture_sha256": "77f567c711af25fc0569b3a4ee83f965bae9ad7f5b2a1cf57e1d1037315b90f9",
+      "bytes": 41549
+    },
+    {
+      "file": "m2-collision-traversal-debug-final-build.log",
+      "sha256": "88132832d167a10055853d6e5cbf4284f9f7d3efb6205cf61b1e740fc30ecaa6",
+      "raw_capture_sha256": "2b41bdd82863d74bf622f75bf966020d195cc313f8d85755cffacee47c1f0796",
+      "bytes": 496
+    },
+    {
+      "file": "m2-collision-traversal-debug-fixture-build.log",
+      "sha256": "ec833c0882cd70b5db775c9d07fc383cea9b83da4324f2cf68310b7ec93c5dec",
+      "raw_capture_sha256": "aba852d1ea0e62ee41047fb32ad4f7d36db038898067d1cf7d6805a82181596e",
+      "bytes": 624
+    },
+    {
+      "file": "m2-collision-traversal-debug-gpu.log",
+      "sha256": "2c047b2e0218bd5a2d975411e5d405b43608ae39ba9fb3bfec5a14e525304300",
+      "raw_capture_sha256": "666046151fa1bcf233b5537fd3e5a007061a32bef8417246057f30eebef9b4aa",
+      "bytes": 11384
+    },
+    {
+      "file": "m2-collision-traversal-debug-retest.log",
+      "sha256": "f04d23ffaaf3f396e6232d351a1d482b799ade89c9640125dfa7133888c587be",
+      "raw_capture_sha256": "0fd3b733b1bfcc73b699b51a99e06b67cb7ab9639d2d79ae52720d561ee66ab0",
+      "bytes": 2181
+    },
+    {
+      "file": "m2-collision-traversal-debug-tests.log",
+      "sha256": "f6bcf564e2123ad295e48b1edeb9583b73d75ee860da72937808f0d0691b7a34",
+      "raw_capture_sha256": "e2f72c8e6c796fb4c5004c0231e2f4a25e4841b7487ff354f9ed99ae6e10cb62",
+      "bytes": 55714
+    },
+    {
+      "file": "m2-collision-traversal-integrity.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "raw_capture_sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "bytes": 56
+    },
+    {
+      "file": "m2-collision-traversal-links.log",
+      "sha256": "ff831ce8ff7786d27f8c3869add1a735f201be554166f489a2bf04916cff6f02",
+      "raw_capture_sha256": "ff831ce8ff7786d27f8c3869add1a735f201be554166f489a2bf04916cff6f02",
+      "bytes": 32
+    },
+    {
+      "file": "m2-collision-traversal-probes-build.log",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "raw_capture_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 1
+    },
+    {
+      "file": "m2-collision-traversal-release-after.log",
+      "sha256": "1456ac1f1723fd1cee7aa9eebed44a8473d98cf762da5fe2bea50146f163bd90",
+      "raw_capture_sha256": "1456ac1f1723fd1cee7aa9eebed44a8473d98cf762da5fe2bea50146f163bd90",
+      "bytes": 808
+    },
+    {
+      "file": "m2-collision-traversal-release-before.log",
+      "sha256": "79f9f05de82da1bfa1b3bb62a9b5b857a13b9793c2aca76aa8f9697db899cfc5",
+      "raw_capture_sha256": "79f9f05de82da1bfa1b3bb62a9b5b857a13b9793c2aca76aa8f9697db899cfc5",
+      "bytes": 809
+    },
+    {
+      "file": "m2-collision-traversal-release-build.log",
+      "sha256": "e2d459ba31a23c3ea789668aa2c8f7d1e730832067c8fca64e658d05446d36be",
+      "raw_capture_sha256": "2863bd455e5ff1334a59dd2e33f0dcbaf108d9ee29f8fff005167a53e216f0cf",
+      "bytes": 31421
+    },
+    {
+      "file": "m2-collision-traversal-release-final-build.log",
+      "sha256": "40c68541d21b37ca883d942f45f853d097bf48cbf62d9299ffc0aaaf0e7f7820",
+      "raw_capture_sha256": "97330a5192d9e61b5b69eee77430e9df01e6762ecdffd7f399ca65feed66e2bc",
+      "bytes": 496
+    },
+    {
+      "file": "m2-collision-traversal-release-fixture-build.log",
+      "sha256": "c3b92410cc8f3d405359b47821895f162fbb71bf55d21389fd209016d0993019",
+      "raw_capture_sha256": "e7625e9b9048ec0ebb31158e07ca2dc203dec0111e04946cb9dbf6b32a9e66c9",
+      "bytes": 624
+    },
+    {
+      "file": "m2-collision-traversal-release-gpu.log",
+      "sha256": "c7e29e3258ff92a38c227ace731e0c15eba1bef0b8dbe74fffe640b4e7f5c848",
+      "raw_capture_sha256": "6f6c371ae70a4a9c3e88f3f584008e3c8df5096456fbe67ec307ae5f39ad9871",
+      "bytes": 11292
+    },
+    {
+      "file": "m2-collision-traversal-release-retest.log",
+      "sha256": "a6e768c00744ea511892f0d1931306db3d20d2436c4824f40f6dae35055f2f3e",
+      "raw_capture_sha256": "2f809de3605e202686302000423c6f89236f8e0570b14d11180c02d72c666d10",
+      "bytes": 2199
+    },
+    {
+      "file": "m2-collision-traversal-release-tests.log",
+      "sha256": "80284358279f5db465341a37de9411bbf9221c6d31b4f72ac1b585021e62c4e0",
+      "raw_capture_sha256": "76e6d95affa2ed969d4e7ba2b59b10e310ab8e29a223b1b553d61988672d4fa4",
+      "bytes": 56208
+    },
+    {
+      "file": "m2-collision-traversal-sanitize-build.log",
+      "sha256": "529fba32d5d8d2d71fef0a753b32d13d74b20a9fc15d0162a4b08321a634073c",
+      "raw_capture_sha256": "3a8b74c150deb1a4d0c2edd892ab7104cccd2184768ec36fb29651ee366114e0",
+      "bytes": 39176
+    },
+    {
+      "file": "m2-collision-traversal-sanitize-final-build.log",
+      "sha256": "a9ddb1d2c5f1322a6c21ae12669aa2e0736e241a496f8c501a066a31d7e24d7f",
+      "raw_capture_sha256": "730ff2ec761999940f4e93eb1d55ee1ee6941e0c00943bb728b3cd308adf5e74",
+      "bytes": 2022
+    },
+    {
+      "file": "m2-collision-traversal-sanitize-tests.log",
+      "sha256": "6f90564d2c39cdcc5ed4d6e796e25f2246947ea03f2b7915ee72a6ca75ad367c",
+      "raw_capture_sha256": "0bb41a9af8cbc8608e148ca9030558863d2f6ee3feb89fc7847b81285891aedd",
+      "bytes": 56324
+    },
+    {
+      "file": "m2-collision-traversal-test-list.log",
+      "sha256": "522806e87e3602dcdcf41c52f5158399736de28b8f7c81d2cd81116d0b49a13c",
+      "raw_capture_sha256": "46edecaaaf523ddd6ddbc58c037d817b18dad30fdaca033bee5a2aabc6033f1a",
+      "bytes": 3342
+    },
+    {
+      "file": "m2-collision-traversal-timing.log",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "raw_capture_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 1
+    },
+    {
+      "file": "m2-collision-traversal-equivalence-before.log",
+      "sha256": "93c3dbbd14e9584d66241651b6c4e5818adf5bb097e357cbfa8194dd8e63aa43",
+      "raw_capture_sha256": "93c3dbbd14e9584d66241651b6c4e5818adf5bb097e357cbfa8194dd8e63aa43",
+      "bytes": 98
+    },
+    {
+      "file": "m2-collision-traversal-equivalence-after.log",
+      "sha256": "93c3dbbd14e9584d66241651b6c4e5818adf5bb097e357cbfa8194dd8e63aa43",
+      "raw_capture_sha256": "93c3dbbd14e9584d66241651b6c4e5818adf5bb097e357cbfa8194dd8e63aa43",
+      "bytes": 98
+    },
+    {
+      "file": "m2-collision-traversal-worldpath-baseline.log",
+      "sha256": "fd3f6a937ad3b14e7d8c37f439dd5d8497d14b223f0bca2e3b4dc62188fe983e",
+      "raw_capture_sha256": "fd3f6a937ad3b14e7d8c37f439dd5d8497d14b223f0bca2e3b4dc62188fe983e",
+      "bytes": 341
+    },
+    {
+      "file": "m2-collision-traversal-worldpath-baseline-current.log",
+      "sha256": "8f628f560a2c3f502579eedf676eb6b38af0ed23dc8a2bc75627aa702a3b7483",
+      "raw_capture_sha256": "8f628f560a2c3f502579eedf676eb6b38af0ed23dc8a2bc75627aa702a3b7483",
+      "bytes": 434
+    },
+    {
+      "file": "m2-collision-traversal-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-collision-traversal-frame-probe.cpp",
+      "sha256": "dcc537cd073f63f88fb1e4886fa56be3ec48f017789e445a9bc95c59526d30c6",
+      "note": "Exact diagnostic source/recipe; no commercial assets."
+    },
+    {
+      "file": "m2-collision-traversal-equivalence.cpp",
+      "sha256": "624ec68d7438e8c4398688fa4e06259cf7280d6aa820803b523a823f15242f45",
+      "note": "Exact diagnostic source/recipe; no commercial assets."
+    },
+    {
+      "file": "m2-collision-traversal-profile.patch",
+      "sha256": "7a1b4441473bf4a0416afcfa08c7f12b3d3e0b06b0faa55e8a850c0cb07eb5e0",
+      "note": "Exact diagnostic source/recipe; no commercial assets."
+    },
+    {
+      "file": "m2-collision-traversal-compile-probes.sh",
+      "sha256": "6c608120c632870184aef1cf7520a86f908419cc88b3795fcf69ff01ccec8922",
+      "note": "Exact diagnostic source/recipe; no commercial assets."
+    }
+  ],
+  "comparison": {
+    "sweeps": 48000,
+    "equal_results": true,
+    "result_fields": [
+      "status",
+      "fraction",
+      "penetration",
+      "point",
+      "normal",
+      "polygon",
+      "start_solid",
+      "texture_flags"
+    ],
+    "digests": [
+      "01_SubwayA queries=24000 digest=bf95157f95433e36",
+      "02_CityHub queries=48000 digest=154bafa164496e9c"
+    ]
+  },
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "timing": {
+    "debug": [
+      {
+        "before": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 3.61634,
+              "p50": 3.35338,
+              "p95": 3.69795,
+              "max": 12.0079
+            },
+            "world": {
+              "mean": 1.52796,
+              "p50": 1.52407,
+              "p95": 1.57169,
+              "max": 2.11072
+            },
+            "model": {
+              "mean": 4.79651,
+              "p50": 4.79161,
+              "p95": 4.93398,
+              "max": 6.181
+            },
+            "sprite": {
+              "mean": 0.0623531,
+              "p50": 0.062684,
+              "p95": 0.072112,
+              "max": 0.117944
+            },
+            "fx": {
+              "mean": 0.000373473,
+              "p50": 0.000359,
+              "p95": 0.000699,
+              "max": 0.000944
+            },
+            "object_update_over_2ms": {
+              "samples": 10,
+              "median": 8.739695000000001,
+              "max": 9.12354
+            },
+            "counts": "COUNTS models=36 model_vertices=40479 sprites=72 voices=5"
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 26.1627,
+              "p50": 22.0652,
+              "p95": 23.1405,
+              "max": 145.458
+            },
+            "world": {
+              "mean": 0.788061,
+              "p50": 0.788946,
+              "p95": 0.840756,
+              "max": 0.934605
+            },
+            "model": {
+              "mean": 12.6964,
+              "p50": 12.6666,
+              "p95": 13.1254,
+              "max": 15.1924
+            },
+            "sprite": {
+              "mean": 0.390006,
+              "p50": 0.39504,
+              "p95": 0.480642,
+              "max": 1.04003
+            },
+            "fx": {
+              "mean": 0.000308493,
+              "p50": 0.000277,
+              "p95": 0.000565,
+              "max": 0.000961
+            },
+            "object_update_over_2ms": {
+              "samples": 10,
+              "median": 122.332,
+              "max": 123.257
+            },
+            "counts": "COUNTS models=272 model_vertices=104202 sprites=600 voices=36"
+          }
+        },
+        "after": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 3.27316,
+              "p50": 3.13037,
+              "p95": 3.38422,
+              "max": 7.1256
+            },
+            "world": {
+              "mean": 1.54321,
+              "p50": 1.5371,
+              "p95": 1.58159,
+              "max": 1.90917
+            },
+            "model": {
+              "mean": 4.79375,
+              "p50": 4.76753,
+              "p95": 4.93043,
+              "max": 5.73983
+            },
+            "sprite": {
+              "mean": 0.0581894,
+              "p50": 0.057418,
+              "p95": 0.063767,
+              "max": 0.079949
+            },
+            "fx": {
+              "mean": 0.000213593,
+              "p50": 0.0002,
+              "p95": 0.000295,
+              "max": 0.000608
+            },
+            "object_update_over_2ms": {
+              "samples": 10,
+              "median": 4.426855,
+              "max": 4.46049
+            },
+            "counts": "COUNTS models=36 model_vertices=40479 sprites=72 voices=5"
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 23.1027,
+              "p50": 21.9387,
+              "p95": 23.1844,
+              "max": 55.1225
+            },
+            "world": {
+              "mean": 0.807829,
+              "p50": 0.8033,
+              "p95": 0.826805,
+              "max": 1.19941
+            },
+            "model": {
+              "mean": 12.8163,
+              "p50": 12.7535,
+              "p95": 13.0478,
+              "max": 13.5675
+            },
+            "sprite": {
+              "mean": 0.403591,
+              "p50": 0.406618,
+              "p95": 0.494787,
+              "max": 1.04194
+            },
+            "fx": {
+              "mean": 0.000372843,
+              "p50": 0.000288,
+              "p95": 0.000682,
+              "max": 0.000985
+            },
+            "object_update_over_2ms": {
+              "samples": 10,
+              "median": 31.7435,
+              "max": 32.6608
+            },
+            "counts": "COUNTS models=272 model_vertices=104202 sprites=600 voices=36"
+          }
+        }
+      },
+      {
+        "before": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 3.58429,
+              "p50": 3.3087,
+              "p95": 3.41575,
+              "max": 11.9014
+            },
+            "world": {
+              "mean": 1.52297,
+              "p50": 1.52041,
+              "p95": 1.53062,
+              "max": 1.68807
+            },
+            "model": {
+              "mean": 4.76154,
+              "p50": 4.75711,
+              "p95": 4.80732,
+              "max": 4.91199
+            },
+            "sprite": {
+              "mean": 0.0581242,
+              "p50": 0.057741,
+              "p95": 0.06011,
+              "max": 0.104557
+            },
+            "fx": {
+              "mean": 0.000237133,
+              "p50": 0.000233,
+              "p95": 0.000294,
+              "max": 0.00034
+            },
+            "object_update_over_2ms": {
+              "samples": 10,
+              "median": 8.77614,
+              "max": 9.07268
+            },
+            "counts": "COUNTS models=36 model_vertices=40479 sprites=72 voices=5"
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 26.3477,
+              "p50": 22.2194,
+              "p95": 22.7674,
+              "max": 147.344
+            },
+            "world": {
+              "mean": 0.793087,
+              "p50": 0.790184,
+              "p95": 0.798379,
+              "max": 1.12813
+            },
+            "model": {
+              "mean": 12.785,
+              "p50": 12.7549,
+              "p95": 12.9794,
+              "max": 13.6593
+            },
+            "sprite": {
+              "mean": 0.391639,
+              "p50": 0.398056,
+              "p95": 0.476965,
+              "max": 1.02692
+            },
+            "fx": {
+              "mean": 0.00029236,
+              "p50": 0.000268,
+              "p95": 0.000481,
+              "max": 0.000895
+            },
+            "object_update_over_2ms": {
+              "samples": 10,
+              "median": 123.39099999999999,
+              "max": 125.061
+            },
+            "counts": "COUNTS models=272 model_vertices=104202 sprites=600 voices=36"
+          }
+        },
+        "after": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 3.27453,
+              "p50": 3.12781,
+              "p95": 3.38312,
+              "max": 7.08354
+            },
+            "world": {
+              "mean": 1.54623,
+              "p50": 1.53692,
+              "p95": 1.54791,
+              "max": 2.242
+            },
+            "model": {
+              "mean": 4.80172,
+              "p50": 4.76057,
+              "p95": 4.83524,
+              "max": 7.83181
+            },
+            "sprite": {
+              "mean": 0.0580914,
+              "p50": 0.057286,
+              "p95": 0.059742,
+              "max": 0.115667
+            },
+            "fx": {
+              "mean": 0.000223777,
+              "p50": 0.000212,
+              "p95": 0.000257,
+              "max": 0.001194
+            },
+            "object_update_over_2ms": {
+              "samples": 10,
+              "median": 4.424325,
+              "max": 4.45233
+            },
+            "counts": "COUNTS models=36 model_vertices=40479 sprites=72 voices=5"
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 22.9349,
+              "p50": 21.8665,
+              "p95": 22.4706,
+              "max": 53.8637
+            },
+            "world": {
+              "mean": 0.805419,
+              "p50": 0.802099,
+              "p95": 0.808628,
+              "max": 1.0862
+            },
+            "model": {
+              "mean": 12.7569,
+              "p50": 12.7255,
+              "p95": 12.9409,
+              "max": 13.6184
+            },
+            "sprite": {
+              "mean": 0.391679,
+              "p50": 0.397006,
+              "p95": 0.475641,
+              "max": 1.04052
+            },
+            "fx": {
+              "mean": 0.000275677,
+              "p50": 0.000262,
+              "p95": 0.000381,
+              "max": 0.000754
+            },
+            "object_update_over_2ms": {
+              "samples": 10,
+              "median": 31.752200000000002,
+              "max": 31.9119
+            },
+            "counts": "COUNTS models=272 model_vertices=104202 sprites=600 voices=36"
+          }
+        }
+      },
+      {
+        "before": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 3.64063,
+              "p50": 3.35553,
+              "p95": 3.58434,
+              "max": 11.8636
+            },
+            "world": {
+              "mean": 1.54608,
+              "p50": 1.52102,
+              "p95": 1.61892,
+              "max": 2.25395
+            },
+            "model": {
+              "mean": 4.87004,
+              "p50": 4.83501,
+              "p95": 4.96943,
+              "max": 7.23377
+            },
+            "sprite": {
+              "mean": 0.0596368,
+              "p50": 0.057857,
+              "p95": 0.068742,
+              "max": 0.11322
+            },
+            "fx": {
+              "mean": 0.0002416,
+              "p50": 0.000225,
+              "p95": 0.000333,
+              "max": 0.000912
+            },
+            "object_update_over_2ms": {
+              "samples": 10,
+              "median": 8.772395,
+              "max": 9.05299
+            },
+            "counts": "COUNTS models=36 model_vertices=40479 sprites=72 voices=5"
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 26.3499,
+              "p50": 22.214,
+              "p95": 22.7045,
+              "max": 147.068
+            },
+            "world": {
+              "mean": 0.790458,
+              "p50": 0.790637,
+              "p95": 0.7926,
+              "max": 0.824935
+            },
+            "model": {
+              "mean": 12.7515,
+              "p50": 12.7334,
+              "p95": 12.8724,
+              "max": 13.1362
+            },
+            "sprite": {
+              "mean": 0.391848,
+              "p50": 0.396179,
+              "p95": 0.477211,
+              "max": 1.02823
+            },
+            "fx": {
+              "mean": 0.00027271,
+              "p50": 0.00026,
+              "p95": 0.000355,
+              "max": 0.000632
+            },
+            "object_update_over_2ms": {
+              "samples": 10,
+              "median": 123.866,
+              "max": 124.741
+            },
+            "counts": "COUNTS models=272 model_vertices=104202 sprites=600 voices=36"
+          }
+        },
+        "after": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 3.38267,
+              "p50": 3.21565,
+              "p95": 4.4594,
+              "max": 7.34736
+            },
+            "world": {
+              "mean": 1.57915,
+              "p50": 1.5392,
+              "p95": 1.66943,
+              "max": 2.39
+            },
+            "model": {
+              "mean": 4.94823,
+              "p50": 4.86534,
+              "p95": 5.28749,
+              "max": 8.23061
+            },
+            "sprite": {
+              "mean": 0.0623305,
+              "p50": 0.058202,
+              "p95": 0.084158,
+              "max": 0.120436
+            },
+            "fx": {
+              "mean": 0.00025151,
+              "p50": 0.000201,
+              "p95": 0.000481,
+              "max": 0.001507
+            },
+            "object_update_over_2ms": {
+              "samples": 10,
+              "median": 4.50493,
+              "max": 4.63248
+            },
+            "counts": "COUNTS models=36 model_vertices=40479 sprites=72 voices=5"
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 23.3056,
+              "p50": 22.1041,
+              "p95": 23.2785,
+              "max": 55.2816
+            },
+            "world": {
+              "mean": 0.80698,
+              "p50": 0.804039,
+              "p95": 0.824642,
+              "max": 0.872718
+            },
+            "model": {
+              "mean": 12.8909,
+              "p50": 12.8227,
+              "p95": 13.2055,
+              "max": 14.1707
+            },
+            "sprite": {
+              "mean": 0.409369,
+              "p50": 0.413903,
+              "p95": 0.528788,
+              "max": 1.05061
+            },
+            "fx": {
+              "mean": 0.00033231,
+              "p50": 0.000256,
+              "p95": 0.000621,
+              "max": 0.001007
+            },
+            "object_update_over_2ms": {
+              "samples": 10,
+              "median": 31.98525,
+              "max": 32.8269
+            },
+            "counts": "COUNTS models=272 model_vertices=104202 sprites=600 voices=36"
+          }
+        }
+      }
+    ],
+    "release": [
+      {
+        "before": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 0.53648,
+              "p50": 0.47372,
+              "p95": 0.519088,
+              "max": 2.41315
+            },
+            "world": {
+              "mean": 0.135172,
+              "p50": 0.135121,
+              "p95": 0.139495,
+              "max": 0.179309
+            },
+            "model": {
+              "mean": 0.460672,
+              "p50": 0.460753,
+              "p95": 0.48654,
+              "max": 0.510313
+            },
+            "sprite": {
+              "mean": 0.00590623,
+              "p50": 0.005887,
+              "p95": 0.006185,
+              "max": 0.008877
+            },
+            "fx": {
+              "mean": 8.869e-05,
+              "p50": 8.4e-05,
+              "p95": 0.00013,
+              "max": 0.000155
+            },
+            "counts": "COUNTS models=36 model_vertices=40479 sprites=72 voices=5"
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 4.32534,
+              "p50": 3.44082,
+              "p95": 3.56333,
+              "max": 30.4648
+            },
+            "world": {
+              "mean": 0.0841141,
+              "p50": 0.083135,
+              "p95": 0.088042,
+              "max": 0.107466
+            },
+            "model": {
+              "mean": 1.26006,
+              "p50": 1.24834,
+              "p95": 1.30163,
+              "max": 1.36058
+            },
+            "sprite": {
+              "mean": 0.0446856,
+              "p50": 0.044497,
+              "p95": 0.054329,
+              "max": 0.093693
+            },
+            "fx": {
+              "mean": 0.000110097,
+              "p50": 0.000105,
+              "p95": 0.000161,
+              "max": 0.000229
+            },
+            "counts": "COUNTS models=272 model_vertices=104202 sprites=600 voices=36"
+          }
+        },
+        "after": {
+          "worlds/01_subwaya.dat": {
+            "step": {
+              "mean": 0.461924,
+              "p50": 0.42748,
+              "p95": 0.470369,
+              "max": 1.48818
+            },
+            "world": {
+              "mean": 0.131355,
+              "p50": 0.128895,
+              "p95": 0.149234,
+              "max": 0.171619
+            },
+            "model": {
+              "mean": 0.447766,
+              "p50": 0.441327,
+              "p95": 0.478664,
+              "max": 0.555966
+            },
+            "sprite": {
+              "mean": 0.00587217,
+              "p50": 0.005742,
+              "p95": 0.006048,
+              "max": 0.01993
+            },
+            "fx": {
+              "mean": 8.28833e-05,
+              "p50": 8.3e-05,
+              "p95": 0.0001,
+              "max": 0.000114
+            },
+            "counts": "COUNTS models=36 model_vertices=40479 sprites=72 voices=5"
+          },
+          "worlds/02_cityhub.dat": {
+            "step": {
+              "mean": 3.59365,
+              "p50": 3.3153,
+              "p95": 3.50135,
+              "max": 11.93
+            },
+            "world": {
+              "mean": 0.0817658,
+              "p50": 0.080151,
+              "p95": 0.095298,
+              "max": 0.133207
+            },
+            "model": {
+              "mean": 1.24218,
+              "p50": 1.23754,
+              "p95": 1.29952,
+              "max": 1.41595
+            },
+            "sprite": {
+              "mean": 0.0437158,
+              "p50": 0.043432,
+              "p95": 0.05326,
+              "max": 0.094266
+            },
+            "fx": {
+              "mean": 0.000117993,
+              "p50": 0.000117,
+              "p95": 0.000139,
+              "max": 0.000234
+            },
+            "counts": "COUNTS models=272 model_vertices=104202 sprites=600 voices=36"
+          }
+        }
+      }
+    ]
+  },
+  "commands": [
+    "cmake --build build/<debug|release|sanitize> -j2 --target blood2_app services_tests object_contract_tests movement_tests locomotion_tests door_tests interaction_tests worldpath_tests ai_sight_tests corpse_tests exit_tests player_controls_tests world_tests ai_runtime_tests",
+    "cmake --build build/<debug|release> -j2 --target level_change_gpu_tests",
+    "ctest --test-dir build/<debug|release|sanitize> -R '^(objects|services|movement|locomotion|doors|interaction|worldpaths|ai_sight|corpses|player_controls)\\.|^world\\.level_change|^ai_runtime\\.(activation|visibility|visibility_filter|visibility_atomic|subway)$' -V -j2",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 for sanitizer test process",
+    "ctest --test-dir build/<debug|release> -R '^services\\.(collision_traversal|collision_queries)$|^worldpaths\\.subway$' -V",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(lifecycle|level_change|mouse_combat|corpse_clearance|movement|worldpaths)$' -V",
+    "Compile the retained equivalence.cpp with -O2 -std=c++20, project src/legacy/original/generated/SDL include paths and libblood2_game.a, libengine.a, libSDL3.a, libspdlog.a, -pthread -lm at the baseline and implementation revisions; run each with the external data root.",
+    "Apply profile.patch to an out-of-tree copy of baseline/unchanged src/game/session.cpp; compile with retained compile-probes.sh. Run three paired Debug frame probes, then one Release pair with external data root and 01_SubwayA. Each probe performs NEW_LEVEL to CityHub internally."
+  ],
+  "captures": [
+    {
+      "local_path": "build/debug/tests/gpu.png",
+      "sha256": "57752a22993e4669374c33e28d7859429f6f2ba9fcccdc00d5de553d4b288078",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/level-change-1.png",
+      "sha256": "5b9756486e5e3e88e8c0affc360e3e7ca98363389ea28b819132b95b3f81b84a",
+      "committed": false
+    }
+  ],
+  "development_findings": [
+    "Clang rejected implicit narrowing to 16-bit polygon indices in the new synthetic fixture. Fixed with explicit bounded casts.",
+    "The old worldpaths.subway test expected 232 objects; the unchanged baseline collision implementation also produced 233. Exact expectation updated to 233; both implementations retain 297 moves, 2 blocks, identical final state, 11 attachments and clean unload over two cycles."
+  ],
+  "limitations": [
+    "CPU diagnostic timings exclude GPU, ImGui and real audio-device scheduling. Debug wrapper/app scene units use -O2 with actual -O0 game/engine libraries.",
+    "Fixed-step diagnostic NEW_LEVEL during SubwayA intro, not a human playthrough.",
+    "No change to CPU skinning, frustum culling, AI cadence or gameplay tuning.",
+    "Remaining user reports and required M2 services stay open. Native Metal not retested."
+  ],
+  "implementation_patch_sha256": "625c2ce31f6be32e7a1cba319e87072ba1145bda6b5eaaaa3f4182ae2cba4409",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "e01b969b1c16275dfc8b3fbeff00115acefde7df65619d9002607a056207595f"
+    },
+    {
+      "path": "README.md",
+      "sha256": "112c752154baf880984b7a7082b187b42377ade2fd7424e316767ab71ab1ba87"
+    },
+    {
+      "path": "docs/COLLISION_TRAVERSAL_CONTRACTS.md",
+      "sha256": "6027f3b3d56ed98c969dbf7a97e28f55776c02a94789012441ba79aca2bfbefc"
+    },
+    {
+      "path": "docs/M2_COLLISION_TRAVERSAL_SOURCES.json",
+      "sha256": "5864f42cba2d13eb551fa4727f220941fbb1602c241f1257b691029feec79f45"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "a52124cfc4e1cfcf1505ca77dbf48a7e8f52cc876c0d8b81c25155b519bc88a7"
+    },
+    {
+      "path": "src/engine/collision.cpp",
+      "sha256": "c044cdd8dfacafb95c97d939378926cb7046695a1d27e2ca7e5496281e9dbcb4"
+    },
+    {
+      "path": "src/engine/collision.h",
+      "sha256": "3c2bb8788b2a844927a1e97f2a050bb78b82644ae064b8aec45ebac1c485b6ad"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "23cf412177956df4b3588497208a6d5872d24a343acfac64f2c2e5530b020800"
+    },
+    {
+      "path": "tests/services_tests.cpp",
+      "sha256": "608af994d5da922b99d485edc71ecdcabb81003b6342ded341149859c0254eb3"
+    },
+    {
+      "path": "tests/worldpath_tests.cpp",
+      "sha256": "0394da0852659f480dada59457fee8417ae9cb2153bdfe1b12064e525660408a"
+    }
+  ],
+  "implementation_commit": "d1ddceb972fa0052b93abe27eaed2f786c1531df"
+}

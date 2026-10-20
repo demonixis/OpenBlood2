@@ -1,0 +1,237 @@
+{
+  "date": "2026-10-17",
+  "milestone": "M2 incomplete",
+  "implementation_commit": "ecd2b769d4956da2bd5a37e94818fe01e691be0c",
+  "source_ledger": "../../../Blood2/docs/implementation/sources/m2_movement_audio_sources.json",
+  "test_results": {
+    "debug-tests": {
+      "passed": 115,
+      "failed": 0,
+      "seconds": 69.0
+    },
+    "release-tests": {
+      "passed": 115,
+      "failed": 0,
+      "seconds": 9.32
+    },
+    "sanitize-tests": {
+      "passed": 115,
+      "failed": 0,
+      "seconds": 327.89
+    },
+    "debug-gpu": {
+      "passed": 4,
+      "failed": 0,
+      "seconds": 42.33
+    },
+    "release-gpu": {
+      "passed": 4,
+      "failed": 0,
+      "seconds": 30.21
+    },
+    "debug-behavior": {
+      "passed": 5,
+      "failed": 0,
+      "seconds": 0.75
+    },
+    "release-behavior": {
+      "passed": 5,
+      "failed": 0,
+      "seconds": 0.11
+    },
+    "sanitize-behavior": {
+      "passed": 5,
+      "failed": 0,
+      "seconds": 2.89
+    }
+  },
+  "commands": {
+    "working_directory": "Blood2",
+    "build_debug": "cmake --build build/debug -j 2 --target blood2 death_effect_gpu_tests object_contract_tests player_tests movement_tests locomotion_tests container_tests camera_tests character_audio_tests player_voice_tests player_death_tests movement_audio_tests player_state_tests player_restore_tests player_keepalive_tests inventory_state_tests world_tests train_session_tests",
+    "build_release": "cmake --build build/release -j 2 --target blood2 death_effect_gpu_tests object_contract_tests player_tests movement_tests locomotion_tests container_tests camera_tests character_audio_tests player_voice_tests player_death_tests movement_audio_tests player_state_tests player_restore_tests player_keepalive_tests inventory_state_tests world_tests train_session_tests",
+    "build_sanitize": "cmake --build build/sanitize -j 2 --target object_contract_tests player_tests movement_tests locomotion_tests container_tests camera_tests character_audio_tests player_voice_tests player_death_tests movement_audio_tests player_state_tests player_restore_tests player_keepalive_tests inventory_state_tests world_tests train_session_tests",
+    "ctest_headless": "ctest --test-dir build/<configuration> --output-on-failure -j 2 -R '^(objects\\.|player\\.|movement\\.|locomotion\\.|containers\\.|cameras\\.|character_audio\\.|player_voice\\.|player_death\\.|movement_audio\\.|player_state\\.|player_restore\\.|player_keepalive\\.|inventory_state\\.|world\\.(level_change|level_change_private|session_lifecycle|session_messages)$|train_session\\.)'",
+    "sanitizer_environment": [
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1"
+    ],
+    "gpu_environment": [
+      "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+      "SDL_AUDIODRIVER=dummy"
+    ],
+    "ctest_gpu": "ctest --test-dir build/<debug|release> -V -R '^gpu\\.(movement|character|player_restore|death_effects)$'",
+    "ctest_final_behavior": "ctest --test-dir build/<configuration> -V -R '^movement_audio\\.'",
+    "note": "After the broad run, only the movement-audio test target was rebuilt and its five cases rerun to strengthen decoded PCM-cursor and retained-handle assertions; production code did not change."
+  },
+  "configurations": {
+    "debug": "GCC Debug with inspector",
+    "release": "GCC Release without inspector",
+    "sanitize": "Clang Debug ASan/UBSan without inspector"
+  },
+  "gpu_device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+  "gpu_backend": "Vulkan",
+  "private_diagnostic_jumps": [
+    {
+      "hz": 30,
+      "jump_voice_requests": 1,
+      "jump_voice_starts": 1,
+      "landing_starts": 1,
+      "measured_fall_span": 75.0092,
+      "resource": "sounds/player/footsteps/stone/landm.wav"
+    },
+    {
+      "hz": 60,
+      "jump_voice_requests": 1,
+      "jump_voice_starts": 1,
+      "landing_starts": 1,
+      "measured_fall_span": 83.4683,
+      "resource": "sounds/player/footsteps/stone/landm.wav"
+    },
+    {
+      "hz": 120,
+      "jump_voice_requests": 1,
+      "jump_voice_starts": 1,
+      "landing_starts": 1,
+      "measured_fall_span": 87.8672,
+      "resource": "sounds/player/footsteps/stone/landm.wav"
+    }
+  ],
+  "lifetime": {
+    "jump_and_landing_pcm_cursors_advance": true,
+    "retained_audio_handles_released": true,
+    "post_unload_object_records": 0,
+    "post_unload_voices": 0
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "preserved_user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "logs": [
+    {
+      "label": "debug-base-build",
+      "path": "m2-movement-audio-debug-base-build.log",
+      "sha256": "d1f3fb06da249396e1a43cae90131497cf0f79228a75002765b0476969c38536"
+    },
+    {
+      "label": "debug-build",
+      "path": "m2-movement-audio-debug-build.log",
+      "sha256": "d018b8b04fac3a0077e89decf8327057719112a4e388fabcac44231c870f94c9"
+    },
+    {
+      "label": "release-build",
+      "path": "m2-movement-audio-release-build.log",
+      "sha256": "8dd7a6cc006817afc1d26c68967cfc681cf39167f8e7d68aabc0cff4527944b6"
+    },
+    {
+      "label": "sanitize-build",
+      "path": "m2-movement-audio-sanitize-build.log",
+      "sha256": "7482bf582ae5ccdf3faf3c2f13df18cb2a361e43604141387bca0f76eb74050a"
+    },
+    {
+      "label": "debug-tests",
+      "path": "m2-movement-audio-debug-tests.log",
+      "sha256": "a8a3896a82a60073b3078dbd5e68e8648a9369fbd4a399205b82d0d0cceb9f6d"
+    },
+    {
+      "label": "release-tests",
+      "path": "m2-movement-audio-release-tests.log",
+      "sha256": "9d0f4e28b051fced3106b5fc1c21a4dc1a7c0fc622fb3b40176f206e30c15cc7"
+    },
+    {
+      "label": "sanitize-tests",
+      "path": "m2-movement-audio-sanitize-tests.log",
+      "sha256": "6aa9e8334004fbe7cce0ec9a0b2c6f9d23dc17b43c29b321ccd4115555357f5d"
+    },
+    {
+      "label": "debug-gpu",
+      "path": "m2-movement-audio-debug-gpu.log",
+      "sha256": "68a9fcdf968b1223f501e3baa746ef39474d62012ebc9b978e408f14e763add0"
+    },
+    {
+      "label": "release-gpu",
+      "path": "m2-movement-audio-release-gpu.log",
+      "sha256": "5345f86f5f75ee44577b89767feae1cd7b285f9c39f15ae1a9c56255020e7cb3"
+    },
+    {
+      "label": "debug-behavior",
+      "path": "m2-movement-audio-debug-behavior.log",
+      "sha256": "e414b572f95df6b3e8b52140b63637858390405aa76b158f40b57392709c7d3e"
+    },
+    {
+      "label": "release-behavior",
+      "path": "m2-movement-audio-release-behavior.log",
+      "sha256": "690e53b766cf0444d4a0c5f7a5c5e8bd17e7069bdc94f4497b8774b99f1e880c"
+    },
+    {
+      "label": "sanitize-behavior",
+      "path": "m2-movement-audio-sanitize-behavior.log",
+      "sha256": "bdb40354de0b3156c7e0aa4d716b2e459078c1c3af61bc54441d000fbfc24133"
+    },
+    {
+      "label": "debug-behavior-build",
+      "path": "m2-movement-audio-debug-behavior-build.log",
+      "sha256": "685dd10555dded099cd1bfa7c64440a8173daa359aafdd5d731523fa0da50298"
+    },
+    {
+      "label": "release-behavior-build",
+      "path": "m2-movement-audio-release-behavior-build.log",
+      "sha256": "685dd10555dded099cd1bfa7c64440a8173daa359aafdd5d731523fa0da50298"
+    },
+    {
+      "label": "sanitize-behavior-build",
+      "path": "m2-movement-audio-sanitize-behavior-build.log",
+      "sha256": "685dd10555dded099cd1bfa7c64440a8173daa359aafdd5d731523fa0da50298"
+    },
+    {
+      "label": "links",
+      "path": "m2-movement-audio-links.log",
+      "sha256": "d6fed9408124c888acecef1820969617e33c945b6ae024f888f3fd8381fcaefc"
+    }
+  ],
+  "limitations": [
+    "M2 remains incomplete, including impact-force/fall damage, interactive IMA music, other voice callers and whole-world save/restore.",
+    "Private movement-audio tests use real external assets on a diagnostic stone floor; no retail traversal/physics parity is claimed.",
+    "GPU checks are existing rendering, movement, character-audio and teardown regressions; new caller assertions are headless.",
+    "Audio tests use the dummy output driver, not a human listening test. Native macOS/Windows execution was not verified.",
+    "Sanitizer results are headless. The previously recorded SDL/libdbus GPU-LSan residual was not retested."
+  ],
+  "verification": {
+    "source_selections_checked": 4,
+    "formatted_cpp_files": 12,
+    "local_markdown_links": 3721,
+    "code_and_document_whitespace": "passed; raw evidence logs excluded"
+  }
+}

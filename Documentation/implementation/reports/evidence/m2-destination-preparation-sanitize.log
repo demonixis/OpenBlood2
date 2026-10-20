@@ -1,0 +1,115 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 515: player_keepalive.private
+      Start 511: player_restore.private
+ 1/50 Test #511: player_restore.private ...........   Passed   11.31 sec
+      Start 485: exits.catalog
+ 2/50 Test #515: player_keepalive.private .........   Passed   17.46 sec
+      Start  55: player.private
+ 3/50 Test  #55: player.private ...................   Passed   17.23 sec
+      Start  40: world.private
+ 4/50 Test #485: exits.catalog ....................   Passed   24.01 sec
+      Start 513: player_keepalive.fallback
+ 5/50 Test #513: player_keepalive.fallback ........   Passed    0.37 sec
+      Start 509: player_restore.failures
+ 6/50 Test #509: player_restore.failures ..........   Passed    0.11 sec
+      Start 510: player_restore.lifetime
+ 7/50 Test #510: player_restore.lifetime ..........   Passed    0.08 sec
+      Start 514: player_keepalive.failures
+ 8/50 Test #514: player_keepalive.failures ........   Passed    0.08 sec
+      Start 508: player_restore.roundtrip
+ 9/50 Test #508: player_restore.roundtrip .........   Passed    0.05 sec
+      Start 512: player_keepalive.named
+10/50 Test #512: player_keepalive.named ...........   Passed    0.05 sec
+      Start 479: exits.delayed
+11/50 Test #479: exits.delayed ....................   Passed    0.06 sec
+      Start 483: exits.queue
+12/50 Test #483: exits.queue ......................   Passed    0.05 sec
+      Start 484: exits.lifetime
+13/50 Test #484: exits.lifetime ...................   Passed    0.05 sec
+      Start 478: exits.defaults
+14/50 Test #478: exits.defaults ...................   Passed    0.05 sec
+      Start 481: exits.blocked
+15/50 Test #481: exits.blocked ....................   Passed    0.04 sec
+      Start 482: exits.dead
+16/50 Test #482: exits.dead .......................   Passed    0.04 sec
+      Start 480: exits.broadcast
+17/50 Test #480: exits.broadcast ..................   Passed    0.03 sec
+      Start  35: world.mutations
+18/50 Test  #35: world.mutations ..................   Passed    0.23 sec
+      Start  27: world.sprite_entries
+19/50 Test  #27: world.sprite_entries .............   Passed    0.04 sec
+      Start  28: world.sound_entries
+20/50 Test  #28: world.sound_entries ..............   Passed    0.04 sec
+      Start  34: world.world_rejection
+21/50 Test  #34: world.world_rejection ............   Passed    0.06 sec
+      Start  52: player.rollback
+22/50 Test  #52: player.rollback ..................   Passed    0.05 sec
+      Start  51: player.lifecycle
+23/50 Test  #51: player.lifecycle .................   Passed    0.05 sec
+      Start  53: player.messages
+24/50 Test  #53: player.messages ..................   Passed    0.05 sec
+      Start  54: player.callbacks
+25/50 Test  #54: player.callbacks .................   Passed    0.04 sec
+      Start  10: objects.unsupported_teardown
+26/50 Test  #10: objects.unsupported_teardown .....   Passed    0.06 sec
+      Start   9: objects.messages_strings
+27/50 Test   #9: objects.messages_strings .........   Passed    0.04 sec
+      Start  50: player.handles
+28/50 Test  #50: player.handles ...................   Passed    0.03 sec
+      Start  36: world.session_lifecycle
+29/50 Test  #36: world.session_lifecycle ..........   Passed    0.02 sec
+      Start  11: objects.creation_failures
+30/50 Test  #11: objects.creation_failures ........   Passed    0.03 sec
+      Start  38: world.original_trigger
+31/50 Test  #38: world.original_trigger ...........   Passed    0.02 sec
+      Start  32: world.world_properties
+32/50 Test  #32: world.world_properties ...........   Passed    0.02 sec
+      Start  33: world.world_geometry
+33/50 Test  #33: world.world_geometry .............   Passed    0.02 sec
+      Start  31: world.resource_mount
+34/50 Test  #31: world.resource_mount .............   Passed    0.02 sec
+      Start  30: world.rez_rejection
+35/50 Test  #30: world.rez_rejection ..............   Passed    0.02 sec
+      Start   8: objects.links_lists
+36/50 Test   #8: objects.links_lists ..............   Passed    0.02 sec
+      Start  29: world.rez_structure
+37/50 Test  #29: world.rez_structure ..............   Passed    0.02 sec
+      Start  37: world.session_messages
+38/50 Test  #37: world.session_messages ...........   Passed    0.02 sec
+      Start   1: objects.original_objects
+39/50 Test   #1: objects.original_objects .........   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+40/50 Test   #6: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+41/50 Test   #3: objects.reasons_properties .......   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+42/50 Test   #5: objects.deferred_removal .........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+43/50 Test   #2: objects.nested_creation ..........   Passed    0.02 sec
+      Start   7: objects.handles_selection
+44/50 Test   #7: objects.handles_selection ........   Passed    0.02 sec
+      Start   4: objects.scheduling
+45/50 Test   #4: objects.scheduling ...............   Passed    0.02 sec
+      Start  24: world.destination_messages
+46/50 Test  #24: world.destination_messages .......   Passed    0.02 sec
+      Start  25: world.destination_schema
+47/50 Test  #25: world.destination_schema .........   Passed    0.02 sec
+      Start  26: world.destination_lifetime
+48/50 Test  #26: world.destination_lifetime .......   Passed    0.06 sec
+      Start  39: world.destination_private
+49/50 Test  #40: world.private ....................   Passed    4.71 sec
+50/50 Test  #39: world.destination_private ........   Passed   10.96 sec
+
+100% tests passed, 0 tests failed out of 50
+
+Label Time Summary:
+exits               =  24.33 sec*proc (8 tests)
+headless            =  87.85 sec*proc (50 tests)
+objects             =   0.27 sec*proc (11 tests)
+player              =  17.45 sec*proc (6 tests)
+player_keepalive    =  17.96 sec*proc (4 tests)
+player_restore      =  11.56 sec*proc (4 tests)
+private             =  85.68 sec*proc (6 tests)
+world               =  16.28 sec*proc (17 tests)
+
+Total Test time (real) =  48.47 sec

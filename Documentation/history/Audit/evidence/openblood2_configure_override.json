@@ -1,0 +1,22 @@
+{
+  "name": "openblood2_configure_override",
+  "command": [
+    "cmake",
+    "-S",
+    "OpenBlood2",
+    "-B",
+    "/tmp/lithtech-audit-2bVxTF/openblood2",
+    "-G",
+    "Ninja",
+    "-DENABLE_VR=OFF",
+    "-DBUILD_TOOLS=OFF",
+    "-DCMAKE_BUILD_TYPE=Debug",
+    "-DFETCHCONTENT_SOURCE_DIR_IMGUIZMO=/tmp/lithtech-audit-2bVxTF/openblood2/_deps/imguizmo-src/src"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:16:17.706174+00:00",
+  "elapsed_seconds": 2.588,
+  "timeout_seconds": 120,
+  "exit_code": 0,
+  "log": "openblood2_configure_override.log"
+}

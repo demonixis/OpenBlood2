@@ -1,0 +1,36 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start  98: gpu.compound_shell
+ 1/10 Test  #98: gpu.compound_shell ...............   Passed    2.90 sec
+      Start 115: gpu.containers
+ 2/10 Test #115: gpu.containers ...................   Passed    2.41 sec
+      Start 125: gpu.doors
+ 3/10 Test #125: gpu.doors ........................   Passed    1.76 sec
+      Start 147: gpu.interaction
+ 4/10 Test #147: gpu.interaction ..................   Passed    3.21 sec
+      Start 156: gpu.brushes
+ 5/10 Test #156: gpu.brushes ......................   Passed    1.83 sec
+      Start 193: gpu.objectives
+ 6/10 Test #193: gpu.objectives ...................   Passed    2.37 sec
+      Start 232: gpu.worldpaths
+ 7/10 Test #232: gpu.worldpaths ...................   Passed    2.05 sec
+      Start 354: gpu.world_depth
+ 8/10 Test #354: gpu.world_depth ..................   Passed    0.71 sec
+      Start 355: gpu.viewport
+ 9/10 Test #355: gpu.viewport .....................   Passed   14.15 sec
+      Start 645: gpu.world_alpha_private
+10/10 Test #645: gpu.world_alpha_private ..........   Passed    0.84 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+brushes        =   1.83 sec*proc (1 test)
+containers     =   5.31 sec*proc (2 tests)
+doors          =   1.76 sec*proc (1 test)
+gpu            =  32.24 sec*proc (10 tests)
+interaction    =   3.21 sec*proc (1 test)
+objectives     =   2.37 sec*proc (1 test)
+private        =  31.54 sec*proc (9 tests)
+world_view     =  15.70 sec*proc (3 tests)
+worldpaths     =   2.05 sec*proc (1 test)
+
+Total Test time (real) =  32.26 sec

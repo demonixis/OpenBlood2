@@ -1,0 +1,17 @@
+175/176 Testing: objectives.catalog
+175/176 Test: objectives.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/objectives_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"objectives.catalog" start time: Oct 15 23:11 CEST
+Output:
+----------------------------------------------------------
+cres.dll strings=790 language=1033
+worlds=57 objectives=53 created=53 rejected=0 missing_resource_pairs=0
+SubwayA objective delivered and resolved; live=152
+<end of output>
+Test time =   4.02 sec
+----------------------------------------------------------
+Test Passed.
+"objectives.catalog" end time: Oct 15 23:11 CEST
+"objectives.catalog" time elapsed: 00:00:04
+----------------------------------------------------------

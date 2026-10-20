@@ -1,0 +1,14 @@
+474/481 Testing: ai_hit.query
+474/481 Test: ai_hit.query
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_hit_tests" "query"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_hit.query" start time: Oct 16 15:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.query" end time: Oct 16 15:34 CEST
+"ai_hit.query" time elapsed: 00:00:00
+----------------------------------------------------------

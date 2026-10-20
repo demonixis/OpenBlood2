@@ -1,0 +1,1445 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index b7675b8..58ba22c 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -453,3 +453,9 @@ Read [contracts](docs/EXPLOSION_FRAGMENT_CONTRACTS.md). Preserve per-update moti
+ 1.1-velocity rays, impact angular damping and per-condition random count draws.
+ Use checked detached lifetime; unavailable collision must fail. Trails/child explosions
+ are not implemented, and replacement collision is not retail parity. M2 stays open.
++
++The [fragment smoke-trail continuation](../Documentation/Implementation/M2_OBJECT_PARTICLES.md) connects selected original CObjectParticleFX and real textured particles.
++Read [contracts](docs/OBJECT_PARTICLE_CONTRACTS.md). Preserve first-update return, absolute emission timing, distance-derived count,
++unused authored alpha/count, fixed origin, strict stopped-tail lifetime and parent removal.
++Zero-count division is skipped without emission/RNG draws. Keep bounded failures and
++replacement-engine limits explicit; other ObjectFX modes and M2 remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3b26832..3d8de4f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index e235607..e232a7c 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,9 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++Current continuation: [original fragment smoke trails](../Documentation/Implementation/M2_OBJECT_PARTICLES.md) adds
++distance-based emission, source stop/lifetime rules and actual DTX particle rendering.
++Other required FX/illumination and safe NEW_LEVEL keep M2 incomplete.
++
+ Current continuation: [original explosion metal fragments](../Documentation/Implementation/M2_EXPLOSION_FRAGMENTS.md) adds
+ launch, collision/rest, fade, real model rendering and live inspection. Trails,
+ remaining FX/illumination and safe NEW_LEVEL keep M2 incomplete.
+diff --git a/docs/EXPLOSION_FRAGMENT_CONTRACTS.md b/docs/EXPLOSION_FRAGMENT_CONTRACTS.md
+index a5284b2..82f34f0 100644
+--- a/docs/EXPLOSION_FRAGMENT_CONTRACTS.md
++++ b/docs/EXPLOSION_FRAGMENT_CONTRACTS.md
+@@ -111,3 +111,8 @@ readback checks resting-fragment half alpha and the real external model/skin.
+ Source entries remain 203 created / four transferred sounds / 372 editor-only /
+ one unsupported Gideon / zero failures. Trails, flames, illumination, safe automatic
+ NEW_LEVEL and other required services keep the actual M2 gate open.
++
++Continuation: [original fragment smoke trails](OBJECT_PARTICLE_CONTRACTS.md) supplies
++selected high-detail OBJFX_SMOKETRAIL_1 behavior. Earlier trail omissions and the
++4096 sprite-entry limit are historical; the shared renderer now holds 16384 entries.
++Other ObjectFX modes, required effects and the actual M2 gate remain open.
+diff --git a/docs/EXPLOSION_RING_CONTRACTS.md b/docs/EXPLOSION_RING_CONTRACTS.md
+index c27962d..32d09c5 100644
+--- a/docs/EXPLOSION_RING_CONTRACTS.md
++++ b/docs/EXPLOSION_RING_CONTRACTS.md
+@@ -111,3 +111,8 @@ FX/lighting and other services still block the unchanged M2 gate.
+ Continuation: [original metal fragments](EXPLOSION_FRAGMENT_CONTRACTS.md) now supplies
+ selected grenade fragment motion/collision and rendering. Earlier blanket fragment
+ omissions are historical; smoke trails, other required services and M2 remain open.
++
++Continuation: [original fragment smoke trails](OBJECT_PARTICLE_CONTRACTS.md) supplies
++selected high-detail OBJFX_SMOKETRAIL_1 behavior. Earlier trail omissions and the
++4096 sprite-entry limit are historical; the shared renderer now holds 16384 entries.
++Other ObjectFX modes, required effects and the actual M2 gate remain open.
+diff --git a/docs/M2_OBJECT_PARTICLE_SOURCES.json b/docs/M2_OBJECT_PARTICLE_SOURCES.json
+new file mode 100644
+index 0000000..fd3287d
+--- /dev/null
++++ b/docs/M2_OBJECT_PARTICLE_SOURCES.json
+@@ -0,0 +1,151 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "ff76e8858bed88da7b8d36e6a0480d2c7c3940e3",
++  "source_files": [
++    {
++      "path": "sources/blood2/ClientShellDLL/ObjectFX.cpp",
++      "sha256": "1af815cdb07c8e0fcd56bebb723e78b539cd3398221a78e3b3fcf977bf109c48",
++      "selected_lines": [
++        [
++          25,
++          92
++        ],
++        [
++          105,
++          150
++        ],
++        [
++          210,
++          290
++        ],
++        [
++          300,
++          367
++        ],
++        [
++          635,
++          642
++        ],
++        [
++          696,
++          719
++        ]
++      ],
++      "use": "Selected original single-player trail initialization/update, stream placement/color and high-detail recipe."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ObjectFX.h",
++      "sha256": "f10854489408e05859507a3b73cfbbd1ba3514988aa7caf93ec48d992bbfaffe",
++      "selected_lines": [
++        [
++          20,
++          80
++        ],
++        [
++          92,
++          180
++        ]
++      ],
++      "use": "Zeroed descriptor, flag values, initialized first-update state and unsupported mode boundary."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
++      "sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13",
++      "selected_lines": [
++        [
++          25,
++          36
++        ],
++        [
++          45,
++          109
++        ]
++      ],
++      "use": "Fixed initial system transform, no alpha assignment and radius/640 setup."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/SpecialFX.h",
++      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
++      "selected_lines": [
++        [
++          32,
++          56
++        ],
++        [
++          78,
++          97
++        ]
++      ],
++      "use": "Default cadence and WantRemove clearing parent handle."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
++      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
++      "selected_lines": [
++        [
++          1435,
++          1463
++        ],
++        [
++          1474,
++          1492
++        ],
++        [
++          1607,
++          1635
++        ],
++        [
++          1133,
++          1137
++        ],
++        [
++          1164,
++          1216
++        ]
++      ],
++      "use": "Fragment/list-4 before object-particle/list-7 update and checked removal semantics."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
++      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
++      "selected_lines": [
++        [
++          1026,
++          1057
++        ],
++        [
++          1697,
++          1717
++        ]
++      ],
++      "use": "Original fragment child request and selected smoke-trail identifier."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
++      "sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
++      "selected_lines": [
++        [
++          20,
++          51
++        ]
++      ],
++      "use": "Random range semantics; private portable generator is an adaptation."
++    },
++    {
++      "path": "sources/lithtech/runtime/client/src/particlesystem.cpp",
++      "sha256": "1efc6713379529f2a840cb15243ca4b8bdf846092ac5e7c67427df0ecbcf0d44",
++      "selected_lines": [
++        [
++          234,
++          298
++        ]
++      ],
++      "use": "Existing later-engine-informed particle ordering, not a fresh engine import or retail parity."
++    }
++  ],
++  "limitations": [
++    "Only original high-detail smoke trail 1, single player and EMITLOCATION.",
++    "Private RNG, bounded storage and later-engine-informed integration/rendering are explicit adaptations.",
++    "Other ObjectFX modes, flames, illumination, safe NEW_LEVEL and M2 remain open."
++  ]
++}
+diff --git a/docs/OBJECT_PARTICLE_CONTRACTS.md b/docs/OBJECT_PARTICLE_CONTRACTS.md
+new file mode 100644
+index 0000000..6a1d672
+--- /dev/null
++++ b/docs/OBJECT_PARTICLE_CONTRACTS.md
+@@ -0,0 +1,105 @@
++# Original fragment smoke-trail contracts
++
++Selected CObjectParticleFX Init/CreateObject/Update/AddParticles/GetRandomColor and
++CObjectGeneralFX's high-detail OBJFX_SMOKETRAIL_1 recipe now run for grenade metal
++fragments. See [fragment contracts](EXPLOSION_FRAGMENT_CONTRACTS.md),
++[source ledger](M2_OBJECT_PARTICLE_SOURCES.json) and
++[evidence](../../Documentation/Implementation/M2_OBJECT_PARTICLES.md).
++**M2 remains incomplete.** This implements one original trail recipe, not a generic
++ObjectFX service, multiplayer trails, ramps, child explosions or other emission modes.
++
++## Exact selected source rules
++
++The recipe uses radius 2000 (render half extent 2000/640), positive gravity 25,
++add delay .01, density 1, EMITLOCATION, flags 0xff, speed [20,50], lifetime [.5,.75],
++color [96,192] in all channels and SpriteTextures/smoke64_2.dtx. Offset, duration,
++ramp times/types, rotations and position radius start at zero. Authored count 12
++is **unused** by EMITLOCATION. Authored alpha .25 is also **unused**: only an enabled
++alpha ramp calls SetObjectColor. The selected white/opaque system retains alpha 1;
++DTX alpha still controls every rendered pixel. Do not silently apply the unused value.
++
++Creation retains a fixed origin and identity system rotation. MOVINGSOURCE emits
++positions relative to that origin; ROTATINGSOURCE prevents rotating old particles.
++ALIGNROTATION uses the parent's current forward direction only for new velocities.
++Parent poses are copied and checked, never retained as pointers.
++
++The first effect update resets last-add time to absolute zero and returns without
++emitting or updating last-object position. Subsequent updates compare absolute
++now-last_add >= .01. One burst runs when due; no catch-up loop is introduced. The
++1 ms effect cadence remains separate from per-session-step particle integration.
++
++Without a duration, exact zero movement since the previous parent observation
++sets moving=false and duration=elapsed+.75. This selected single-player path never
++resumes even if the parent moves again. Position freezes, and existing particles
++continue aging; their system survives through exact elapsed==duration, disappearing
++only when elapsed>duration. A removed parent ends the whole trail immediately,
++including any remaining particles, matching the cleared-server-handle update guard.
++
++At each burst, count=floor(distance(last_emission_position,current_position)/2).
++Start at current_position-origin and step backwards by
++(last_emission_position-current_position)/count. The prior endpoint is excluded.
++Short movement does not accumulate after a burst: last emission position still
++updates when count is zero. Skip the source's unused zero-count division; emit
++nothing and consume no random values. This avoids undefined/non-finite work without
++adding a particle the source loop would not have emitted.
++
++For each particle, draw speed, one shared RGB interpolation ratio, then lifetime.
++Velocity is normalized current parent forward*speed; grayscale is (96+96*ratio)/255.
++The independent deterministic RNG preserves these local draws, not the original
++global random sequence. No guessed emission randomness or particle fading is added.
++
++## Engine policy, ownership and budgets
++
++The existing [particle integrator](EXPLOSION_RING_CONTRACTS.md) retains strict
++lifetime<0 removal, position-before-gravity order and positive Y gravity. Its new
++per-particle RGB defaults to white for rings; finite [0,1] validation preflights the
++entire array. Integration and billboard sizing remain later-engine-informed
++replacement policies, not verified Blood II retail parity.
++
++Original dynamic list order is retained: explosion fragments in list 4 advance
++before object particles in list 7 (FX IDs 36 and 52). The fragment owner resolves
++trail parent IDs after movement/removal. No trail is a server object, attachment,
++damaging body or new gameplay integrator. Deleting the original emitter leaves its
++fragments/trails alive; deleting a fragment removes its associated trail on update.
++Unload releases all arrays/reports/RNG, with IDs never reused.
++
++Limits: 128 trail systems, 2048 particles per trail, 8192 particles across trails.
++A burst preflights its count/budget and endpoint bounds before allocating particles
++or consuming random values. Exhaustion fails visibly; no silent truncation or
++success-shaped empty emission is used. Update failure removes the failing trail,
++retains its error in bounded delivery reports and fails the session step. Failed
++trail creation preserves the successful metal fragment and records the missing
++component separately. Model/ring/sprite/audio siblings remain independent.
++
++A checked pose has finite bounded coordinates and a unit quaternion within .001
++squared-length tolerance. Invalid clocks, absent resources and unsupported recipe
++IDs fail. The current API exposes only recipe 1 and a nonzero checked parent ID;
++there are no accepted-but-ignored unsupported flag/ramp fields.
++
++The existing sprite pass capacity grows from 4096 to 16384 entries (98304 vertices)
++to hold these bounded trails plus rings and ordinary sprites. Private tests observe
++6304 trail particles alone. Material/decoded-image limits stay unchanged. Particle
++RGB and DTX alpha use the same depth-tested, no-depth-write alpha pass and stable
++center-depth sorting. Model/sprite cross-pass sorting and retail raster parity
++remain unverified. Rendering and inspection never advance clocks or emit particles.
++
++## Inspection and evidence
++
++The scene-explosion inspector shows trail/parent IDs, emitting/stopped state, fixed
++origin/current source position, elapsed time, stop deadline, emitted/live/prepared
++counts, actual and unused authored alpha, resource path and per-particle local
++position, velocity, lifetime and grayscale. Retained reports show creation/update
++failures after source/child removal. Hidden/reload smoke requires real trail quads
++independently from rings, sprites and metal models.
++
++Synthetic tests cover exact stream layout and RNG draws, first-update/absolute-time
++behavior, unchanged count/alpha quirks, current-forward versus fixed-origin state,
++strict stop/removal boundaries, no resumption, zero-count emissions, resource and
++budget failures, atomic color validation, parent deletion and non-reused identities.
++Three private SubwayA/player cycles at 50/60/20 Hz exercise nine emitters, 27 trails,
++real DTX decoding, complete expiry and cleanup. GPU readback validates opaque tint
++against known synthetic texels and actual external smoke64_2 alpha quads.
++
++SubwayA accounting stays 203 created / four transferred sounds / 372 editor-only /
++one unsupported Gideon / zero failures. Remaining flames, illumination, safe
++NEW_LEVEL and other required services keep the observable M2 exit gate open.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 6ec4d93..d75a6cd 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1,5 +1,15 @@
+ # Source and Dependency Provenance
+ 
++## Original fragment smoke trails
++
++Selected CObjectParticleFX methods and CObjectGeneralFX's high-detail smoke-trail 1
++recipe come from sources/blood2/ClientShellDLL/ObjectFX.{h,cpp}, reference commit
++006b4aabd3fb348f6846cad03799cf8df685ea95. Typed IDs, owned particles/colors, bounded
++failure and existing SDL_GPU billboards replace client APIs. The zero-count unused
++division is omitted; other source timing/count/alpha quirks remain. See
++[ledger](M2_OBJECT_PARTICLE_SOURCES.json), [contracts](OBJECT_PARTICLE_CONTRACTS.md)
++and [validation](../../Documentation/Implementation/M2_OBJECT_PARTICLES.md).
++
+ ## Character node visibility and player Load model setup
+ 
+ Selected AI_Shared named/extra reset loops, Destructable hide filtering and PlayerObj
+diff --git a/docs/SPRITE_VIEW_CONTRACTS.md b/docs/SPRITE_VIEW_CONTRACTS.md
+index 6eee56e..c95b85b 100644
+--- a/docs/SPRITE_VIEW_CONTRACTS.md
++++ b/docs/SPRITE_VIEW_CONTRACTS.md
+@@ -76,3 +76,8 @@ reload. These are harness observations, not a retail executable comparison.
+ Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
+ selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
+ are historical; fragments/flames, illumination and the full M2 gate remain open.
++
++Continuation: [original fragment smoke trails](OBJECT_PARTICLE_CONTRACTS.md) supplies
++selected high-detail OBJFX_SMOKETRAIL_1 behavior. Earlier trail omissions and the
++4096 sprite-entry limit are historical; the shared renderer now holds 16384 entries.
++Other ObjectFX modes, required effects and the actual M2 gate remain open.
+diff --git a/src/app/inspector_scene_explosions.cpp b/src/app/inspector_scene_explosions.cpp
+index 61b4858..f1d4017 100644
+--- a/src/app/inspector_scene_explosions.cpp
++++ b/src/app/inspector_scene_explosions.cpp
+@@ -8,7 +8,7 @@ namespace OpenBlood2
+         ImGui::TextWrapped(
+             "Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
+             "Spatial WAV playback and selected original sprite/model components are implemented. Composite "
+-            "particle flames, fragment trails and surface illumination remain unavailable. Fragment/ring/light state "
++            "particle flames and surface illumination remain unavailable. Fragment/ring/light state "
+             "is shown "
+             "below.");
+         ImGui::Text("Audio: %s | active voices %zu | submitted frames %llu",
+@@ -98,6 +98,39 @@ namespace OpenBlood2
+                     ImGui::TextWrapped("%s", r.unavailable.c_str());
+             }
+         ImGui::Separator();
++        ImGui::Text("Fragment smoke trails: %zu systems / %zu particles / %llu started / %llu expired / %llu failed",
++                    fragments.trails.size(), fragments.trail_particles(), (unsigned long long)fragments.trail_started,
++                    (unsigned long long)fragments.trail_expired, (unsigned long long)fragments.trail_failed);
++        for (const auto& t : fragments.trails)
++        {
++            ImGui::Text("Trail %llu / fragment %llu / %s / %zu particles / %llu emitted / deadline %.3f",
++                        (unsigned long long)t.id, (unsigned long long)t.parent, t.moving ? "emitting" : "stopped",
++                        t.particles.size(), (unsigned long long)t.emitted, t.duration);
++            ImGui::Text("Origin %.2f %.2f %.2f / source %.2f %.2f %.2f / elapsed %.3f", t.origin.x, t.origin.y,
++                        t.origin.z, t.position.x, t.position.y, t.position.z, t.last_time - t.start_time);
++            ImGui::TextWrapped("%s | radius/640 %.3f | alpha %.2f (authored %.2f, unused without ramps)",
++                               t.texture.c_str(), t.radius / 640.f, t.alpha, t.requested_alpha);
++            unsigned prepared = 0;
++            if (sprite_view)
++                for (const auto& e : sprite_view->entries)
++                    if (e.trail_system == t.id)
++                    {
++                        prepared += e.range != UINT32_MAX && e.error.empty();
++                        if (!e.error.empty())
++                            ImGui::TextWrapped("%s", e.error.c_str());
++                    }
++            ImGui::Text("Prepared quads %u", prepared);
++            ImGui::PushID((int)t.id);
++            if (ImGui::TreeNode("Smoke particles"))
++            {
++                for (const auto& p : t.particles)
++                    ImGui::Text("Local %.2f %.2f %.2f / velocity %.2f %.2f %.2f / life %.3f / gray %.3f", p.position.x,
++                                p.position.y, p.position.z, p.velocity.x, p.velocity.y, p.velocity.z, p.lifetime,
++                                p.color.x);
++                ImGui::TreePop();
++            }
++            ImGui::PopID();
++        }
+         const auto& rings = game.server.explosion_rings;
+         ImGui::Text("Explosion rings: %zu active / %zu reserved particles / %llu started / %llu expired / %llu failed",
+                     rings.active.size(), rings.reserved_particles(), (unsigned long long)rings.started,
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index d63b03a..cdeca8d 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -351,7 +351,8 @@ namespace
+         bool explosion_model_drawn_hidden = false, explosion_fragments_drawn_hidden = false;
+         OpenBlood2::SpriteView sprite_scene;
+         OpenBlood2::WorldRenderer sprite_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
+-        bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false, explosion_rings_drawn_hidden = false;
++        bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false, explosion_rings_drawn_hidden = false,
++             explosion_trails_drawn_hidden = false;
+         bool models_hidden = false, close_weapon_hidden = false;
+         std::uint64_t model_frames = 0;
+         std::vector<OpenBlood2::WorldDraw> world_draws;
+@@ -868,6 +869,9 @@ namespace
+                                 ++prepared;
+                         explosion_sprites_drawn_hidden |= prepared == 2;
+                         unsigned particles = 0;
++                        for (const auto& entry : sprite_scene.entries)
++                            if (entry.trail_system && entry.error.empty() && entry.range != UINT32_MAX)
++                                explosion_trails_drawn_hidden = true;
+                         for (const auto& entry : sprite_scene.entries)
+                             if (entry.particle_system && entry.error.empty() && entry.range != UINT32_MAX &&
+                                 entry.alpha < 1 && entry.alpha > 0)
+@@ -1377,6 +1381,7 @@ namespace
+                 (options.scene_explosions_smoke &&
+                  (!scene_explosion_hidden || !explosion_sprites_drawn_hidden || !explosion_model_drawn_hidden ||
+                   !explosion_rings_drawn_hidden || !explosion_fragments_drawn_hidden ||
++                  !explosion_trails_drawn_hidden ||
+                   !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
+                 (options.sprites_smoke &&
+                  (!sprite_hidden || !sprites_drawn_hidden || sprite_scene.draws.size() != 12 ||
+@@ -1439,11 +1444,12 @@ namespace
+                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
+                              "and after reload; evaluated radius/color checked; world illumination unavailable");
+             if (options.scene_explosions_smoke)
+-                spdlog::info("SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
+-                             "audio plus original explosion models/sprites/rings/fragments and evaluated point lights "
+-                             "verified hidden "
+-                             "and after reload; illumination/other composite "
+-                             "FX unavailable");
++                spdlog::info(
++                    "SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
++                    "audio plus original explosion models/sprites/rings/fragments/trails and evaluated point lights "
++                    "verified hidden "
++                    "and after reload; illumination/other composite "
++                    "FX unavailable");
+             if (options.sprites_smoke)
+                 spdlog::info("SPRITES smoke: 12 original DetailSprites, SPR manifests, frame clocks, hidden UI and "
+                              "unload/reload verified; 12 alpha-textured quads submitted with shared world depth");
+diff --git a/src/app/scene_explosion_smoke.cpp b/src/app/scene_explosion_smoke.cpp
+index d3d432e..8e52ba3 100644
+--- a/src/app/scene_explosion_smoke.cpp
++++ b/src/app/scene_explosion_smoke.cpp
+@@ -35,10 +35,12 @@ namespace OpenBlood2
+             fragments.active.size() > 5 || fragments.failed || !fragments.update_error.empty())
+             return false;
+         for (const auto& fx : fragments.active)
+-            if (!fx.model || !fx.updates || fx.trail_error.empty() || !fx.error.empty() ||
++            if (!fx.model || !fx.updates || !fx.trail_error.empty() || !fx.error.empty() ||
+                 (fx.position.x == fx.settings.position.x && fx.position.y == fx.settings.position.y &&
+                  fx.position.z == fx.settings.position.z))
+                 return false;
++        if (!fragments.trail_started || fragments.trail_failed || !fragments.trail_particles())
++            return false;
+         const auto& rings = g.server.explosion_rings;
+         if (!report.ring_event || !report.ring_error.empty() || rings.active.size() != 4 || rings.started != 4 ||
+             rings.failed || rings.reserved_particles() != 128 || !rings.update_error.empty())
+diff --git a/src/app/sprite_scene.cpp b/src/app/sprite_scene.cpp
+index 3a4df0a..b0d9327 100644
+--- a/src/app/sprite_scene.cpp
++++ b/src/app/sprite_scene.cpp
+@@ -32,6 +32,16 @@ namespace OpenBlood2
+                                         fx.id, i, game.resources, error))
+                     return false;
+             }
++        for (const auto& trail : game.server.explosion_fragments.trails)
++            for (unsigned i = 0; i < trail.particles.size(); ++i)
++            {
++                const auto& p = trail.particles[i];
++                if (!scene.add_particle(trail.texture, vector_add(trail.origin, p.position), trail.radius / 640.f,
++                                        p.color, trail.alpha, trail.id, i, game.resources, error))
++                    return false;
++                scene.entries.back().particle_system = 0;
++                scene.entries.back().trail_system = trail.id;
++            }
+         scene.sort();
+         return true;
+     }
+diff --git a/src/engine/particles.cpp b/src/engine/particles.cpp
+index c3c0f6b..c6c7112 100644
+--- a/src/engine/particles.cpp
++++ b/src/engine/particles.cpp
+@@ -18,7 +18,8 @@ namespace OpenBlood2
+         for (const auto& v : particles)
+         {
+             if (!physics_vector(v.position) || !physics_vector(v.velocity) || !std::isfinite(v.lifetime) ||
+-                v.lifetime < 0)
++                v.lifetime < 0 || !physics_vector(v.color) || v.color.x < 0 || v.color.x > 1 || v.color.y < 0 ||
++                v.color.y > 1 || v.color.z < 0 || v.color.z > 1)
+             {
+                 error = "Invalid particle state";
+                 return false;
+diff --git a/src/engine/particles.h b/src/engine/particles.h
+index 5c8c0d6..bc77537 100644
+--- a/src/engine/particles.h
++++ b/src/engine/particles.h
+@@ -8,6 +8,7 @@ namespace OpenBlood2
+     {
+         DVector position{}, velocity{};
+         float lifetime = 0;
++        DVector color{1, 1, 1};
+     };
+     // Local coordinates; no collision, implicit world gravity or callbacks.
+     bool advance_particles(std::vector<Particle>&, float gravity, double seconds, std::string&);
+diff --git a/src/engine/sprite_view.cpp b/src/engine/sprite_view.cpp
+index cb3cc63..ed38eab 100644
+--- a/src/engine/sprite_view.cpp
++++ b/src/engine/sprite_view.cpp
+@@ -56,7 +56,7 @@ namespace OpenBlood2
+                                DVector color, bool direct_extent)
+     {
+         error.clear();
+-        if (!camera_valid_ || entries.size() >= 4096)
++        if (!camera_valid_ || entries.size() >= max_entries)
+         {
+             mesh.vertices.clear();
+             mesh.ranges.clear();
+diff --git a/src/engine/sprite_view.h b/src/engine/sprite_view.h
+index b978581..eb23018 100644
+--- a/src/engine/sprite_view.h
++++ b/src/engine/sprite_view.h
+@@ -12,13 +12,14 @@ namespace OpenBlood2
+         bool visible = false, rotatable = false;
+         std::uint32_t range = UINT32_MAX;
+         float alpha = 1;
+-        std::uint64_t client_effect = 0, particle_system = 0;
++        std::uint64_t client_effect = 0, particle_system = 0, trail_system = 0;
+         unsigned particle_index = 0;
+     };
+     // Read-only presentation snapshot: owned textures/values, never a retained game pointer.
+     class SpriteView
+     {
+       public:
++        static constexpr unsigned max_entries = 16384;
+         SpriteView()
+         {
+             clear();
+diff --git a/src/game/explosion_fragments.cpp b/src/game/explosion_fragments.cpp
+index e3b970f..783eae3 100644
+--- a/src/game/explosion_fragments.cpp
++++ b/src/game/explosion_fragments.cpp
+@@ -14,7 +14,7 @@ namespace OpenBlood2
+             error = "Invalid explosion fragment source/event";
+             return 0;
+         }
+-        ExplosionFragmentReport report{next_event_++, type, std::string(source), {}, {}, {}};
++        ExplosionFragmentReport report{next_event_++, type, std::string(source), {}, {}, {}, {}};
+         if (!physics_vector(pos) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f ||
+             (type > 3 && type != 6 && type != 8))
+         {
+@@ -29,7 +29,6 @@ namespace OpenBlood2
+                 return lo + (hi - lo) * float(random_() - std::minstd_rand::min()) /
+                                 float(std::minstd_rand::max() - std::minstd_rand::min());
+             };
+-            report.unavailable = "Original fragment smoke trails unavailable";
+             // Original loop draws a NEW bound at every condition, not one count.
+             for (unsigned i = 0; i < 2 + (random_() - std::minstd_rand::min()) % 4; ++i)
+             {
+@@ -55,6 +54,25 @@ namespace OpenBlood2
+                 {
+                     fx.id = next_id_++;
+                     fx.event = report.id;
++                    CObjectParticleFX trail;
++                    std::string trail_failure;
++                    if (trails.size() >= 128 || next_trail_ == UINT64_MAX)
++                        trail_failure = "Smoke-trail system capacity exceeded";
++                    else if (trail.Init(fx.settings.trail_type, fx.id, trail_failure) &&
++                             trail.CreateObject(resources, {fx.position, fx.rotation}, now, trail_failure))
++                    {
++                        trail.id = next_trail_++;
++                        trail.event = report.id;
++                        report.trails.push_back(trail.id);
++                        trails.push_back(std::move(trail));
++                        ++trail_started;
++                    }
++                    fx.trail_error = trail_failure;
++                    if (!trail_failure.empty())
++                    {
++                        ++trail_failed;
++                        report.unavailable = trail_failure;
++                    }
+                     report.fragments.push_back(fx.id);
+                     active.push_back(std::move(fx));
+                     ++started;
+@@ -93,11 +111,55 @@ namespace OpenBlood2
+                           }
+                           return true;
+                       });
++        // Original SFX order: fragments (36) move/remove before object particles (52).
++        std::size_t total = trail_particles();
++        std::erase_if(trails,
++                      [&](auto& trail)
++                      {
++                          const auto previous = trail.particles.size();
++                          const auto parent = std::find_if(active.begin(), active.end(),
++                                                           [&](const auto& f) { return f.id == trail.parent; });
++                          NodePose pose;
++                          if (parent != active.end())
++                              pose = {parent->position, parent->rotation};
++                          const std::size_t budget =
++                              total - previous <= 8192 ? std::min<std::size_t>(2048, 8192 - (total - previous)) : 0;
++                          if (trail.Update(now, parent == active.end() ? nullptr : &pose, trail_random_, budget))
++                          {
++                              total = total - previous + trail.particles.size();
++                              return false;
++                          }
++                          total -= previous;
++                          if (trail.error.empty())
++                              ++trail_expired;
++                          else
++                          {
++                              ++trail_failed;
++                              valid = false;
++                              update_error = trail.error;
++                              for (auto& report : reports)
++                                  if (report.id == trail.event)
++                                      report.unavailable = trail.error;
++                              if (parent != active.end())
++                                  parent->trail_error = trail.error;
++                          }
++                          return true;
++                      });
+         return valid;
+     }
++    std::size_t ExplosionFragments::trail_particles() const
++    {
++        std::size_t count = 0;
++        for (const auto& t : trails)
++            count += t.particles.size();
++        return count;
++    }
+     void ExplosionFragments::clear()
+     {
+         active.clear();
++        trails.clear();
++        trail_started = trail_expired = trail_failed = 0;
++        trail_random_.seed(1);
+         reports.clear();
+         update_error.clear();
+         started = expired = failed = 0;
+diff --git a/src/game/explosion_fragments.h b/src/game/explosion_fragments.h
+index 4a87b90..ddaa7ab 100644
+--- a/src/game/explosion_fragments.h
++++ b/src/game/explosion_fragments.h
+@@ -1,5 +1,6 @@
+ #pragma once
+ #include "game/original/ExplosionFragFX.h"
++#include "game/original/ObjectParticleFX.h"
+ namespace OpenBlood2
+ {
+     struct ExplosionFragmentReport
+@@ -7,7 +8,7 @@ namespace OpenBlood2
+         std::uint64_t id = 0;
+         DDWORD type = 0;
+         std::string source, error, unavailable;
+-        std::vector<std::uint64_t> fragments;
++        std::vector<std::uint64_t> fragments, trails;
+     };
+     class ExplosionFragments
+     {
+@@ -17,12 +18,15 @@ namespace OpenBlood2
+         bool advance(double, ServerDE&);
+         void clear();
+         std::vector<CExplosionFragFX> active;
++        std::vector<CObjectParticleFX> trails;
++        std::uint64_t trail_started = 0, trail_expired = 0, trail_failed = 0;
++        std::size_t trail_particles() const;
+         std::vector<ExplosionFragmentReport> reports;
+         std::string update_error;
+         std::uint64_t started = 0, expired = 0, failed = 0;
+ 
+       private:
+-        std::minstd_rand random_{1};
+-        std::uint64_t next_id_ = 1, next_event_ = 1;
++        std::minstd_rand random_{1}, trail_random_{1};
++        std::uint64_t next_id_ = 1, next_event_ = 1, next_trail_ = 1;
+     };
+ } // namespace OpenBlood2
+diff --git a/src/game/explosion_sprites.cpp b/src/game/explosion_sprites.cpp
+index bbc39cd..62bfce1 100644
+--- a/src/game/explosion_sprites.cpp
++++ b/src/game/explosion_sprites.cpp
+@@ -44,7 +44,7 @@ namespace OpenBlood2
+                 : type == 1 ? 2.f
+                             : 2.5f,
+                 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
+-            unavailable = type == 3 ? "fragment smoke trails, light illumination" : "light illumination";
++            unavailable = type == 3 ? "light illumination" : "light illumination";
+         }
+         else if (type == 6)
+         {
+diff --git a/src/game/original/ObjectParticleFX.cpp b/src/game/original/ObjectParticleFX.cpp
+new file mode 100644
+index 0000000..b0ad7d5
+--- /dev/null
++++ b/src/game/original/ObjectParticleFX.cpp
+@@ -0,0 +1,149 @@
++#include "ObjectParticleFX.h"
++#include "engine/collision.h"
++#include <cmath>
++using namespace OpenBlood2;
++namespace
++{
++    bool pose_valid(NodePose pose)
++    {
++        return physics_vector(pose.position) && physics_vector(pose.rotation.m_Vec) &&
++               std::isfinite(pose.rotation.m_Spin) &&
++               std::abs(vector_dot(pose.rotation.m_Vec, pose.rotation.m_Vec) +
++                        pose.rotation.m_Spin * pose.rotation.m_Spin - 1) < .001f;
++    }
++    float draw(std::minstd_rand& random, float lo, float hi)
++    {
++        return lo + (hi - lo) * float(random() - std::minstd_rand::min()) /
++                        float(std::minstd_rand::max() - std::minstd_rand::min());
++    }
++} // namespace
++bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::string& failure)
++{
++    failure.clear();
++    *this = {};
++    if (type != 1 || !owner)
++    {
++        failure = "Unsupported object particle recipe or absent parent";
++        return false;
++    }
++    parent = owner;
++    initialized_ = true;
++    return true;
++}
++bool CObjectParticleFX::CreateObject(const Resources& resources, NodePose pose, double now, std::string& failure)
++{
++    failure.clear();
++    if (!initialized_ || created_ || !pose_valid(pose) || !std::isfinite(now) || now < 0)
++    {
++        failure = "Invalid object particle creation state/pose/time";
++        return false;
++    }
++    if (!resources.find(texture))
++    {
++        failure = "Smoke-trail texture is not indexed: " + texture;
++        return false;
++    }
++    origin = position = last_position = last_object_position = pose.position;
++    start_time = last_time = now;
++    // BaseParticleSystemFX creates an identity-rotation, white/opaque particle system.
++    // MOVINGSOURCE and ROTATINGSOURCE keep that system transform fixed forever.
++    created_ = true;
++    return true;
++}
++bool CObjectParticleFX::AddParticles(std::minstd_rand& random, std::size_t budget)
++{
++    const auto delta = vector_subtract(last_position, position);
++    const float distance = std::sqrt(vector_dot(delta, delta));
++    const float samples = distance / (density * radius / 1000.f);
++    if (!std::isfinite(samples) || samples > 2048 || particles.size() > budget ||
++        std::size_t(samples) > budget - particles.size())
++    {
++        error = "Smoke-trail particle capacity exceeded";
++        return false;
++    }
++    const auto count = static_cast<unsigned>(samples);
++    // Source divides by zero here for short/stopped travel, but emits no particles.
++    // Skip the unused division without manufacturing a sample or consuming RNG.
++    if (!count)
++        return true;
++    const auto step = vector_scale(delta, 1.f / count);
++    auto start = vector_subtract(position, origin);
++    auto forward = rotate_vector(source_rotation, {0, 0, 1});
++    const float length = std::sqrt(vector_dot(forward, forward));
++    if (!std::isfinite(length) || length < 1e-6f || !physics_vector(start) ||
++        !physics_vector(vector_subtract(last_position, origin)))
++    {
++        error = "Invalid smoke-trail emission direction/offset";
++        return false;
++    }
++    forward = vector_scale(forward, 1 / length);
++    particles.reserve(particles.size() + count);
++    for (unsigned i = 0; i < count; ++i)
++    {
++        const float speed = draw(random, 20, 50);
++        const float ratio = draw(random, 0, 1); // One shared color ratio, not three channel draws.
++        const float color = (96 + (192 - 96) * ratio) / 255.f;
++        const float life = draw(random, min_life, max_life);
++        particles.push_back({start, vector_scale(forward, speed), life, {color, color, color}});
++        start = vector_add(start, step);
++    }
++    emitted += count;
++    return true;
++}
++bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_rand& random, std::size_t budget)
++{
++    error.clear();
++    if (!created_ || !std::isfinite(now) || now < last_time || (owner && !pose_valid(*owner)))
++    {
++        error = "Invalid smoke-trail state, parent pose or clock";
++        return false;
++    }
++    if (!owner)
++        return false; // Checked equivalent of WantRemove clearing m_hServerObject.
++    if (!advance_particles(particles, gravity, now - last_time, error))
++        return false;
++    last_time = now;
++    if (now < next_update)
++        return true;
++    next_update = now + .001;
++    ++updates;
++    const float elapsed = static_cast<float>(now - start_time);
++    if (!std::isfinite(elapsed))
++    {
++        error = "Smoke-trail elapsed time overflow";
++        return false;
++    }
++    if (first_update)
++    {
++        last_add_time = 0;
++        first_update = false;
++        return true;
++    }
++    if (duration)
++    {
++        if (duration < elapsed)
++            return false;
++    }
++    else
++    {
++        const auto difference = vector_subtract(owner->position, last_object_position);
++        if (difference.x == 0 && difference.y == 0 && difference.z == 0)
++        {
++            moving = false;
++            duration = elapsed + max_life;
++        } // Zero ramp-down time; never resumes in single player.
++        last_object_position = owner->position;
++    }
++    if (moving)
++        position = owner->position;    // Recipe offset is zero.
++    source_rotation = owner->rotation; // ALIGNROTATION influences forward emission, not the fixed system transform.
++    if (now - last_add_time >= add_delay)
++    {
++        last_add_time = now;
++        if (!AddParticles(random, budget))
++            return false;
++        ++bursts;
++        last_position = position;
++    }
++    return true;
++}
+diff --git a/src/game/original/ObjectParticleFX.h b/src/game/original/ObjectParticleFX.h
+new file mode 100644
+index 0000000..02304b5
+--- /dev/null
++++ b/src/game/original/ObjectParticleFX.h
+@@ -0,0 +1,30 @@
++#pragma once
++#include "engine/model.h"
++#include "engine/particles.h"
++#include "engine/resources.h"
++#include <random>
++// Selected original OBJFX_SMOKETRAIL_1 / OBJPSFX_EMITLOCATION rules.
++// Other recipes, flags, ramps and multiplayer behavior are not exposed.
++class CObjectParticleFX
++{
++  public:
++    bool Init(unsigned type, std::uint64_t parent, std::string&);
++    bool CreateObject(const OpenBlood2::Resources&, OpenBlood2::NodePose, double, std::string&);
++    bool Update(double, const OpenBlood2::NodePose*, std::minstd_rand&, std::size_t particle_budget = 2048);
++    std::uint64_t id = 0, parent = 0, event = 0, updates = 0, bursts = 0, emitted = 0;
++    std::vector<OpenBlood2::Particle> particles;
++    DVector origin{}, position{}, last_position{}, last_object_position{};
++    DRotation source_rotation;
++    double start_time = 0, last_time = 0, next_update = 0, last_add_time = 0;
++    float duration = 0;
++    bool moving = true, first_update = true;
++    // Original recipe fields; alpha is authored but unused without ramp flags.
++    static constexpr float radius = 2000, gravity = 25, density = 1, add_delay = .01f, requested_alpha = .25f,
++                           alpha = 1, min_life = .5f, max_life = .75f;
++    static constexpr unsigned authored_count = 12, flags = 0xff;
++    std::string texture = "SpriteTextures\\smoke64_2.dtx", error;
++
++  private:
++    bool initialized_ = false, created_ = false;
++    bool AddParticles(std::minstd_rand&, std::size_t);
++};
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index 0fc8ef0..4fe4b6a 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -7,7 +7,7 @@ namespace OpenBlood2
+     std::uint64_t ServerAdapter::PublishExplosionFragments(HOBJECT source, DDWORD type, DVector pos, DVector normal,
+                                                            std::string& error)
+     {
+-        trace_service("PublishExplosionFragments (metal models; trails unavailable)");
++        trace_service("PublishExplosionFragments (metal models and original smoke trails)");
+         if (!IsObjectAlive(source) || !objects_.models || !client_resources)
+         {
+             error = "Explosion fragment source/resources unavailable";
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index de48788..97dea68 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1043,3 +1043,27 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.explosion_fragment_private PROPERTIES LABELS "gpu;private;explosion_fragments" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+     endif()
+ endif()
++
++add_executable(object_particle_tests object_particle_tests.cpp ../src/app/sprite_scene.cpp)
++target_link_libraries(object_particle_tests PRIVATE blood2_game)
++blood2_project_options(object_particle_tests)
++foreach(case emission stopping failures session)
++    add_test(NAME object_particles.${case} COMMAND object_particle_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/object-particles-${case}")
++    set_tests_properties(object_particles.${case} PROPERTIES LABELS "headless;object_particles" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME object_particles.private COMMAND object_particle_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(object_particles.private PROPERTIES LABELS "headless;private;object_particles" TIMEOUT 240)
++endif()
++
++if(BLOOD2_GPU_TESTS)
++    add_executable(object_particle_gpu_tests object_particle_gpu_tests.cpp)
++    target_link_libraries(object_particle_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(object_particle_gpu_tests)
++    add_test(NAME gpu.object_particle_tint COMMAND object_particle_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/object-particle-tint")
++    set_tests_properties(gpu.object_particle_tint PROPERTIES LABELS "gpu;object_particles" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.object_particle_private COMMAND object_particle_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/object-particle-private" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.object_particle_private PROPERTIES LABELS "gpu;private;object_particles" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    endif()
++endif()
+diff --git a/tests/explosion_fragment_fixture.h b/tests/explosion_fragment_fixture.h
+index d1b8119..1ed1a8f 100644
+--- a/tests/explosion_fragment_fixture.h
++++ b/tests/explosion_fragment_fixture.h
+@@ -2,7 +2,8 @@
+ #include "explosion_sprite_fixture.h"
+ namespace test_explosion_fragment
+ {
+-    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error)
++    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error,
++                      bool smoke = true)
+     {
+         if (!test_explosion_sprite::mount(resources, root, error))
+             return false;
+@@ -16,6 +17,8 @@ namespace test_explosion_fragment
+         dir.children["spritetextures"].files["waterblue.dtx"] = skin;
+         dir.children["models"].children["gibs"].files["gibmetal2.abc"] = test_model::abc().b;
+         dir.children["skins"].children["gibs"].files["gibmetal3.dtx"] = skin;
++        if (smoke)
++            dir.children["spritetextures"].files["smoke64_2.dtx"] = skin;
+         test_model::Writer w;
+         w.b.resize(168);
+         w.b[0] = w.b[62] = w.b[124] = 13;
+diff --git a/tests/explosion_fragment_tests.cpp b/tests/explosion_fragment_tests.cpp
+index 82cff34..c86c642 100644
+--- a/tests/explosion_fragment_tests.cpp
++++ b/tests/explosion_fragment_tests.cpp
+@@ -162,11 +162,12 @@ namespace
+                       near(f.angular_step.z, draw(-1, 1)));
+                 CHECK(f.settings.position.x == 10 && f.settings.normal.y == 1 && f.settings.duration == 10 &&
+                       f.settings.fade_time == 2);
+-                CHECK(f.settings.trail_type == 1 && !f.trail_error.empty() && f.settings.spawn_explosion == 0);
++                CHECK(f.settings.trail_type == 1 && f.trail_error.empty() && f.settings.spawn_explosion == 0);
+                 CHECK(near(std::sqrt(vector_dot(f.velocity, f.velocity)), f.settings.velocity));
+             }
+             CHECK(count >= 2 && count <= 5 && manager.active.size() == begin + count);
+-            CHECK(manager.reports.back().fragments.size() == count && !manager.reports.back().unavailable.empty());
++            CHECK(manager.reports.back().fragments.size() == count && manager.reports.back().unavailable.empty() &&
++                  manager.reports.back().trails.size() == count);
+         }
+         for (unsigned type : {0u, 1u, 2u, 6u, 8u})
+             CHECK(manager.publish(type, {}, {0, 1, 0}, "no branch", g.models, g.resources, 0, error) && error.empty() &&
+diff --git a/tests/explosion_sprite_tests.cpp b/tests/explosion_sprite_tests.cpp
+index 3528d71..96a6048 100644
+--- a/tests/explosion_sprite_tests.cpp
++++ b/tests/explosion_sprite_tests.cpp
+@@ -201,11 +201,13 @@ namespace
+         auto check_scene = [&]() -> bool
+         {
+             CHECK(update_sprite_scene(game, view, error));
+-            unsigned original = 0, particles = 0;
++            unsigned original = 0, particles = 0, trails = 0;
+             for (const auto& entry : view.entries)
+             {
+                 CHECK(entry.error.empty() && entry.range < view.mesh.ranges.size());
+-                if (entry.particle_system)
++                if (entry.trail_system)
++                    ++trails;
++                else if (entry.particle_system)
+                     ++particles;
+                 else
+                     ++original;
+@@ -214,7 +216,8 @@ namespace
+             for (const auto& ring : game.server.explosion_rings.active)
+                 expected_particles += ring.particles.size();
+             CHECK(original == 30 && particles == expected_particles && particles >= 288);
+-            CHECK(view.draws.size() == 30 + particles);
++            CHECK(trails == game.server.explosion_fragments.trail_particles());
++            CHECK(view.draws.size() == 30 + particles + trails);
+             return true;
+         };
+         std::uint64_t previous = 0;
+diff --git a/tests/object_particle_gpu_tests.cpp b/tests/object_particle_gpu_tests.cpp
+new file mode 100644
+index 0000000..58e9dcf
+--- /dev/null
++++ b/tests/object_particle_gpu_tests.cpp
+@@ -0,0 +1,147 @@
++#include "app/sprite_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "explosion_fragment_fixture.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << " " << error << " " << SDL_GetError() << "\n";                         \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool render(Runtime& runtime, WorldRenderer& renderer, SpriteView& scene, DVector eye, DRotation camera,
++                Capture& capture, std::vector<std::uint8_t>& pixels, std::string& error)
++    {
++        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300)) ||
++            !renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true))
++            return false;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        if (!commands)
++            return false;
++        if (!renderer.draw(commands, capture.texture, scene.mesh, scene.draws, eye, camera, false, error))
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 300;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 300;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
++            return false;
++        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        if (!data)
++            return false;
++        pixels.assign(data, data + 400 * 300 * 4);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    Runtime runtime;
++    std::string error;
++    CHECK(runtime.initialize(true, error));
++    WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
++    Resources resources;
++    SpriteView scene;
++    Capture capture;
++    CHECK(test_explosion_fragment::mount(resources, argv[1], error));
++    CObjectParticleFX trail;
++    NodePose parent{{-2, 0, 20}, {}};
++    std::minstd_rand random(1);
++    CHECK(trail.Init(1, 1, error) && trail.CreateObject(resources, parent, 0, error) &&
++          trail.Update(0, &parent, random));
++    parent.position.x = 0;
++    CHECK(trail.Update(.02, &parent, random) && trail.particles.size() == 1);
++    auto add = [&](const Resources& r, bool white = false)
++    {
++        if (!scene.begin_frame({}, {}, error))
++            return false;
++        const auto& v = trail.particles.front();
++        return scene.add_particle(trail.texture, vector_add(trail.origin, v.position), trail.radius / 640.f,
++                                  white ? DVector{1, 1, 1} : v.color, trail.alpha, 1, 0, r, error) &&
++               scene.entries.back().error.empty();
++    };
++    std::vector<std::uint8_t> white, tinted;
++    CHECK(add(resources, true) && render(runtime, renderer, scene, {}, {}, capture, white, error));
++    const auto updates = trail.updates;
++    CHECK(add(resources) && render(runtime, renderer, scene, {}, {}, capture, tinted, error) &&
++          trail.updates == updates);
++    unsigned opaque = 0, ink = 0;
++    const auto gray = trail.particles[0].color.x;
++    for (unsigned i = 0; i < 400 * 300; ++i)
++    {
++        const auto k = i * 4;
++        if (tinted[k] != 6 || tinted[k + 1] != 9 || tinted[k + 2] != 13)
++            ++ink;
++        if (white[k] == 255 && white[k + 1] == 0 && white[k + 2] == 0)
++        {
++            CHECK(std::abs(int(tinted[k]) - 255 * gray) <= 1 && tinted[k + 1] == 0 && tinted[k + 2] == 0);
++            ++opaque;
++        }
++    }
++    CHECK(ink > 50 && ink < 40000 && opaque > 10 && trail.alpha == 1 && trail.requested_alpha == .25f);
++    CHECK(capture.save((std::filesystem::path(argv[1]) / "smoke-trail-tint.png").c_str()));
++    std::cout << "Original smoke stream: " << ink << " covered pixels, " << opaque
++              << " opaque tint checks; authored alpha remains unused\n";
++    if (argc == 3)
++    {
++        Resources original;
++        Config config;
++        config.data_dir = argv[2];
++        CHECK(original.mount_game(config, error));
++        parent = {{-10, 0, 20}, {}};
++        CHECK(trail.Init(1, 2, error) && trail.CreateObject(original, parent, 0, error) &&
++              trail.Update(0, &parent, random));
++        parent.position.x = 0;
++        CHECK(trail.Update(.02, &parent, random) && trail.particles.size() == 5);
++        scene.clear();
++        renderer.clear_geometry();
++        CHECK(scene.begin_frame({}, {}, error));
++        for (unsigned i = 0; i < trail.particles.size(); ++i)
++        {
++            const auto& v = trail.particles[i];
++            CHECK(scene.add_particle(trail.texture, vector_add(trail.origin, v.position), trail.radius / 640.f, v.color,
++                                     trail.alpha, 2, i, original, error) &&
++                  scene.entries.back().error.empty());
++        }
++        scene.sort();
++        CHECK(render(runtime, renderer, scene, {}, {}, capture, tinted, error));
++        ink = 0;
++        for (unsigned i = 0; i < 400 * 300; ++i)
++            if (tinted[i * 4] != 6 || tinted[i * 4 + 1] != 9 || tinted[i * 4 + 2] != 13)
++                ++ink;
++        CHECK(ink > 50 && ink < 100000 && scene.entries[0].partial_alpha > 0);
++        CHECK(capture.save((std::filesystem::path(argv[1]) / "original-smoke-trail.png").c_str()));
++        std::cout << "Original smoke64_2: five stream quads, " << ink << " covered pixels, "
++                  << scene.entries[0].partial_alpha << " partial-alpha texels\n";
++        CHECK(!trail.Update(.03, nullptr, random) && trail.error.empty());
++        scene.clear();
++        renderer.clear_geometry();
++        CHECK(scene.draws.empty());
++    }
++    return 0;
++}
+diff --git a/tests/object_particle_tests.cpp b/tests/object_particle_tests.cpp
+new file mode 100644
+index 0000000..a56a9a7
+--- /dev/null
++++ b/tests/object_particle_tests.cpp
+@@ -0,0 +1,242 @@
++#include "app/sprite_scene.h"
++#include "brush_fixture.h"
++#include "explosion_fragment_fixture.h"
++#include "game/original/ClientExplosionSFX.h"
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ":" << __LINE__ << ": " #x << "\n";                                               \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .0002f;
++    }
++    bool setup(Resources& r, const std::filesystem::path& root)
++    {
++        std::string e;
++        return test_explosion_fragment::mount(r, root, e);
++    }
++    bool emission(const std::filesystem::path& root)
++    {
++        Resources resources;
++        CHECK(setup(resources, root));
++        std::string error;
++        CObjectParticleFX t;
++        NodePose owner{{100, 20, 30}, {}};
++        std::minstd_rand rng(17), expected(17);
++        auto draw = [&](float a, float b)
++        { return a + (b - a) * float(expected() - expected.min()) / float(expected.max() - expected.min()); };
++        CHECK(t.Init(1, 42, error) && t.CreateObject(resources, owner, 100, error));
++        CHECK(t.Update(100, &owner, rng) && t.particles.empty() && t.first_update == false);
++        owner.position.x += 10;
++        CHECK(t.Update(100.002, &owner, rng) && t.particles.size() == 5 && t.emitted == 5); // Absolute last-add zero.
++        for (unsigned i = 0; i < 5; ++i)
++        {
++            const auto& v = t.particles[i];
++            CHECK(near(v.position.x, 10 - 2.f * i) && near(v.position.y, 0) && near(v.position.z, 0));
++            CHECK(near(v.velocity.z, draw(20, 50)) && near(v.velocity.x, 0));
++            const float gray = (96 + 96 * draw(0, 1)) / 255;
++            CHECK(near(v.color.x, gray) && v.color.x == v.color.y && v.color.y == v.color.z);
++            CHECK(near(v.lifetime, draw(.5f, .75f)));
++        }
++        CHECK(rng() == expected() && t.authored_count == 12 && t.alpha == 1 && t.requested_alpha == .25f);
++        auto old = t.particles[0];
++        owner.position.x += 2;
++        owner.rotation = rotation_from_euler({0, 1.57079632679f, 0});
++        CHECK(t.Update(100.015, &owner, rng) && t.particles.size() == 6);
++        CHECK(near(t.particles[0].position.z, old.velocity.z * .013f));
++        CHECK(near(t.particles[0].velocity.y, 25 * .013f));
++        CHECK(t.particles.back().velocity.x > 19 && std::abs(t.particles.back().velocity.z) < .001f);
++        CHECK(t.origin.x == 100 && t.position.x == 112 && t.particles.back().position.x == 12);
++        return true;
++    }
++    bool stopping(const std::filesystem::path& root)
++    {
++        Resources r;
++        CHECK(setup(r, root));
++        std::string e;
++        CObjectParticleFX t;
++        NodePose p;
++        std::minstd_rand random(1);
++        CHECK(t.Init(1, 1, e) && t.CreateObject(r, p, 0, e) && t.Update(.1, &p, random));
++        p.position.x = 4;
++        CHECK(t.Update(.2, &p, random) && t.emitted == 2);
++        CHECK(t.Update(.3, &p, random) && !t.moving && near(t.duration, 1.05f));
++        p.position.x = 100;
++        CHECK(t.Update(.4, &p, random) && t.position.x == 4 && t.emitted == 2);
++        CHECK(t.Update(double(t.duration), &p, random) && t.particles.empty()); // strict duration < elapsed
++        CHECK(!t.Update(double(t.duration) + .01, &p, random) && t.error.empty());
++        CHECK(t.Init(1, 1, e) && t.CreateObject(r, {}, 0, e) && t.Update(0, &p, random));
++        p.position.x = 104;
++        CHECK(t.Update(.01, &p, random) && !t.particles.empty());
++        CHECK(!t.Update(.02, nullptr, random) && t.error.empty()); // parent removal stops even a nonempty tail
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        Resources r;
++        CHECK(setup(r, root));
++        std::string e;
++        CObjectParticleFX t;
++        NodePose p;
++        std::minstd_rand random(1);
++        CHECK(!t.Init(2, 1, e) && !t.Init(1, 0, e) && !t.CreateObject(r, p, 0, e) && !t.Update(0, &p, random));
++        CHECK(t.Init(1, 1, e));
++        Resources missing;
++        CHECK(!t.CreateObject(missing, p, 0, e));
++        CHECK(!t.CreateObject(r, p, -1, e));
++        p.rotation.m_Spin = 0;
++        CHECK(!t.CreateObject(r, p, 0, e));
++        p = {};
++        CHECK(t.CreateObject(r, p, 0, e) && !t.CreateObject(r, p, 0, e));
++        CHECK(!t.Update(-1, &p, random) && !t.Update(std::numeric_limits<double>::infinity(), &p, random));
++        CHECK(t.Update(0, &p, random));
++        p.position.x = 1.9f;
++        auto saved = random;
++        CHECK(t.Update(.02, &p, random) && t.emitted == 0 && random == saved); // No sample, no zero division or RNG.
++        p.position.x = 5000;
++        CHECK(!t.Update(.04, &p, random) && !t.error.empty() && t.particles.empty() && random == saved);
++        CHECK(t.Init(1, 1, e) && t.CreateObject(r, {}, 0, e) && t.Update(0, &p, random));
++        p.position.x = 10;
++        CHECK(!t.Update(.02, &p, random, 4) && t.particles.empty());
++        std::vector<Particle> colors{{{}, {}, 1, {1, 1, 1}}, {{}, {}, 1, {-1, 1, 1}}};
++        CHECK(!advance_particles(colors, 0, .5, e) && colors[0].lifetime == 1); // Atomic shared color validation.
++        Resources partial;
++        CHECK(test_explosion_fragment::mount(partial, root / "partial", e, false));
++        ModelStore models(partial);
++        ExplosionFragments manager;
++        CHECK(manager.publish(3, {}, {0, 1, 0}, "partial", models, partial, 0, e) && e.empty());
++        CHECK(!manager.active.empty() && manager.trails.empty() && manager.trail_failed == manager.started);
++        CHECK(!manager.reports.back().unavailable.empty() && !manager.active.front().trail_error.empty());
++        return true;
++    }
++    bool session(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string error;
++        CHECK(g.initialize() && setup(g.resources, root));
++        auto& m = g.server.explosion_fragments;
++        CHECK(m.publish(3, {0, 20, 0}, {0, 1, 0}, "detached", g.models, g.resources, 0, error) && error.empty());
++        CHECK(m.trail_started == m.started && m.trails.size() == m.active.size() && !m.trail_failed);
++        auto floor = test_brush::box("floor", {-1000, -10, -1000}, {1000, 0, 1000});
++        for (auto& surface : floor.surfaces)
++            surface.flags = 1;
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        CHECK(m.advance(0, g.server) && m.trail_particles() == 0);
++        CHECK(m.advance(.02, g.server) && m.trail_particles() > 0);
++        SpriteView view;
++        CHECK(update_sprite_scene(g, view, error));
++        unsigned count = 0;
++        for (const auto& e : view.entries)
++            if (e.trail_system)
++            {
++                CHECK(e.error.empty() && e.range < view.mesh.ranges.size());
++                ++count;
++            }
++        CHECK(count == m.trail_particles());
++        auto emitted = m.trails.front().emitted;
++        CHECK(update_sprite_scene(g, view, error) && m.trails.front().emitted == emitted);
++        auto identity = m.trails.back().id;
++        auto parent = m.trails.front().parent;
++        std::erase_if(m.active, [&](const auto& x) { return x.id == parent; });
++        CHECK(m.advance(.04, g.server));
++        for (const auto& t : m.trails)
++            CHECK(t.parent != parent);
++        CHECK(m.advance(11, g.server) && m.trails.empty() && m.trail_expired == m.trail_started);
++        m.clear();
++        CHECK(m.publish(3, {}, {0, 1, 0}, "new", g.models, g.resources, 12, error) && error.empty());
++        CHECK(m.trails.front().id > identity);
++        CHECK(g.unload_world() && m.trails.empty() && m.reports.empty());
++        return true;
++    }
++    bool private_world(const std::filesystem::path& root)
++    {
++        GameSession g;
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.initialize() && g.resources.mount_game(c, error));
++        std::uint64_t previous = 0;
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            unsigned sources = 0;
++            for (auto id : g.objects.snapshot())
++            {
++                auto* r = g.objects.get(id);
++                if (!dynamic_cast<CClientExplosionSFX*>(r->game.get()))
++                    continue;
++                auto str = g.server.CreateString("TRIGGER");
++                auto msg = g.server.StartMessageToObject(nullptr, r->handle, 1000);
++                CHECK(msg && g.server.WriteToMessageHString(msg, str) == DE_OK && g.server.EndMessage(msg) == DE_OK);
++                g.server.FreeString(str);
++                ++sources;
++            }
++            auto& m = g.server.explosion_fragments;
++            CHECK(sources == 9 && m.trails.size() == m.active.size() && !m.trail_failed);
++            CHECK(m.trails.front().id > previous);
++            previous = m.trails.back().id;
++            std::uint64_t samples = 0;
++            std::size_t peak = 0;
++            SpriteView view;
++            bool rendered = false;
++            const double dt = cycle == 0 ? .02 : cycle == 1 ? 1. / 60 : .05;
++            for (unsigned frame = 0; frame < unsigned(std::ceil(10.1 / dt)); ++frame)
++            {
++                const bool stepped = g.step(dt);
++                if (!stepped)
++                    std::cerr << m.update_error << "\n";
++                CHECK(stepped);
++                CHECK(m.update_error.empty() && !m.trail_failed && !m.failed);
++                peak = std::max(peak, m.trail_particles());
++                std::uint64_t total = 0;
++                for (const auto& t : m.trails)
++                    total += t.emitted;
++                samples = std::max(samples, total);
++                if (!rendered && m.trail_particles())
++                {
++                    CHECK(update_sprite_scene(g, view, error));
++                    unsigned count = 0;
++                    for (const auto& e : view.entries)
++                        if (e.trail_system)
++                        {
++                            CHECK(e.error.empty() && e.range < view.mesh.ranges.size());
++                            ++count;
++                        }
++                    CHECK(count == m.trail_particles());
++                    rendered = true;
++                }
++            }
++            CHECK(rendered && peak > 0 && samples > 0 && m.trails.empty() && m.active.empty() &&
++                  m.trail_expired == m.trail_started);
++            std::cout << "SubwayA cycle " << cycle << " dt=" << dt << ": " << m.trail_started << " trails, peak "
++                      << peak << " particles, observed " << samples << " emitted; all expired\n";
++            CHECK(g.unload_world() && m.trails.empty() && !m.trail_started && g.objects.snapshot().empty());
++            CHECK(!g.server.string_count() && !g.server.message_count());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::string n = argv[1];
++    return (n == "emission"   ? emission(argv[2])
++            : n == "stopping" ? stopping(argv[2])
++            : n == "failures" ? failures(argv[2])
++            : n == "session"  ? session(argv[2])
++                              : n == "private" && private_world(argv[2]))
++               ? 0
++               : 1;
++}
+diff --git a/tests/sprite_view_tests.cpp b/tests/sprite_view_tests.cpp
+index cec239e..a3a3996 100644
+--- a/tests/sprite_view_tests.cpp
++++ b/tests/sprite_view_tests.cpp
+@@ -83,7 +83,7 @@ namespace
+         CHECK(!scene.entries.back().error.empty() && scene.draws.empty());
+         CHECK(!scene.begin_frame({nan, 0, 0}, {}, error) && scene.entries.empty());
+         CHECK(scene.begin_frame({}, {}, error));
+-        for (unsigned i = 0; i < 4096; ++i)
++        for (unsigned i = 0; i < SpriteView::max_entries; ++i)
+             CHECK(scene.add(&sprite, {}, {}, {1, 1, 1}, 0, {}, resources, error));
+         CHECK(!scene.add(&sprite, {}, {}, {1, 1, 1}, 0, {}, resources, error) && scene.entries.empty() &&
+               scene.draws.empty());

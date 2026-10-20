@@ -1,0 +1,15 @@
+584/589 Testing: naga.weapon
+584/589 Test: naga.weapon
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/naga_tests" "weapon" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/naga-weapon"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"naga.weapon" start time: Oct 17 00:57 CEST
+Output:
+----------------------------------------------------------
+Visual class-family filter passes same-class target; ordinary damage hits it. Unlimited ammo, primary WAV and silent alt verified.
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"naga.weapon" end time: Oct 17 00:57 CEST
+"naga.weapon" time elapsed: 00:00:00
+----------------------------------------------------------

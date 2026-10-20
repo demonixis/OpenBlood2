@@ -1,0 +1,1 @@
+All changed C++ files pass clang-format; staged diff passes whitespace checks.

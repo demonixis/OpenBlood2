@@ -1,0 +1,14 @@
+315/318 Testing: texture.decode
+315/318 Test: texture.decode
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/texture_tests" "decode"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"texture.decode" start time: Oct 16 09:18 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"texture.decode" end time: Oct 16 09:18 CEST
+"texture.decode" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+574/577 Testing: explosion_fragments.session
+574/577 Test: explosion_fragments.session
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_fragment_tests" "session" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-fragments-session"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"explosion_fragments.session" start time: Oct 16 21:32 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_fragments.session" end time: Oct 16 21:32 CEST
+"explosion_fragments.session" time elapsed: 00:00:00
+----------------------------------------------------------

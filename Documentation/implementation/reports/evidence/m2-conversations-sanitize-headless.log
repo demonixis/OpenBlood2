@@ -1,0 +1,158 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  41: world.destination_trial_private
+      Start  42: world.destination_private
+ 1/71 Test  #42: world.destination_private .........   Passed   24.76 sec
+      Start 722: conversation.catalog
+ 2/71 Test  #41: world.destination_trial_private ...   Passed   46.89 sec
+      Start 721: conversation.private
+ 3/71 Test #722: conversation.catalog ..............   Passed   26.22 sec
+      Start 222: cinematics.catalog
+ 4/71 Test #721: conversation.private ..............   Passed   15.79 sec
+      Start 126: triggers.catalog
+ 5/71 Test #222: cinematics.catalog ................   Passed   19.31 sec
+      Start 179: objectives.catalog
+ 6/71 Test #179: objectives.catalog ................   Passed   17.23 sec
+      Start 223: cinematics.subway
+ 7/71 Test #223: cinematics.subway .................   Passed    5.31 sec
+      Start  43: world.private
+ 8/71 Test  #43: world.private .....................   Passed    4.68 sec
+      Start  60: player.private
+ 9/71 Test #126: triggers.catalog ..................   Passed   40.92 sec
+      Start 125: triggers.private
+10/71 Test #125: triggers.private ..................   Passed    8.63 sec
+      Start  25: world.destination_trials
+11/71 Test  #25: world.destination_trials ..........   Passed    0.16 sec
+      Start  37: world.mutations
+12/71 Test  #60: player.private ....................   Passed   15.05 sec
+      Start 720: conversation.lifetime
+13/71 Test  #37: world.mutations ...................   Passed    0.22 sec
+      Start  28: world.destination_lifetime
+14/71 Test #720: conversation.lifetime .............   Passed    0.06 sec
+      Start 716: conversation.sequence
+15/71 Test  #28: world.destination_lifetime ........   Passed    0.06 sec
+      Start 718: conversation.transport
+16/71 Test #716: conversation.sequence .............   Passed    0.06 sec
+      Start 719: conversation.clock
+17/71 Test #718: conversation.transport ............   Passed    0.05 sec
+      Start 717: conversation.delayed
+18/71 Test #719: conversation.clock ................   Passed    0.05 sec
+      Start  30: world.sound_entries
+19/71 Test #717: conversation.delayed ..............   Passed    0.05 sec
+      Start  29: world.sprite_entries
+20/71 Test  #30: world.sound_entries ...............   Passed    0.05 sec
+      Start 221: cinematics.device
+21/71 Test  #29: world.sprite_entries ..............   Passed    0.05 sec
+      Start   1: objects.builtin_model
+22/71 Test   #1: objects.builtin_model .............   Passed    0.02 sec
+      Start  36: world.world_rejection
+23/71 Test #221: cinematics.device .................   Passed    0.10 sec
+      Start 715: conversation.mapping
+24/71 Test  #36: world.world_rejection .............   Passed    0.06 sec
+      Start  27: world.destination_schema
+25/71 Test #715: conversation.mapping ..............   Passed    0.02 sec
+      Start  26: world.destination_messages
+26/71 Test  #26: world.destination_messages ........   Passed    0.02 sec
+      Start  11: objects.unsupported_teardown
+27/71 Test  #27: world.destination_schema ..........   Passed    0.02 sec
+      Start  10: objects.messages_strings
+28/71 Test  #10: objects.messages_strings ..........   Passed    0.04 sec
+      Start 219: cinematics.lifetime
+29/71 Test  #11: objects.unsupported_teardown ......   Passed    0.05 sec
+      Start  12: objects.creation_failures
+30/71 Test #219: cinematics.lifetime ...............   Passed    0.05 sec
+      Start 216: cinematics.mixer
+31/71 Test  #12: objects.creation_failures .........   Passed    0.04 sec
+      Start 220: cinematics.failures
+32/71 Test #216: cinematics.mixer ..................   Passed    0.04 sec
+      Start 217: cinematics.spatial
+33/71 Test #220: cinematics.failures ...............   Passed    0.05 sec
+      Start 218: cinematics.sequence
+34/71 Test #217: cinematics.spatial ................   Passed    0.04 sec
+      Start  38: world.session_lifecycle
+35/71 Test #218: cinematics.sequence ...............   Passed    0.04 sec
+      Start   4: objects.reasons_properties
+36/71 Test   #4: objects.reasons_properties ........   Passed    0.02 sec
+      Start 121: triggers.doors
+37/71 Test  #38: world.session_lifecycle ...........   Passed    0.03 sec
+      Start  40: world.original_trigger
+38/71 Test  #40: world.original_trigger ............   Passed    0.02 sec
+      Start   2: objects.original_objects
+39/71 Test   #2: objects.original_objects ..........   Passed    0.02 sec
+      Start   9: objects.links_lists
+40/71 Test   #9: objects.links_lists ...............   Passed    0.02 sec
+      Start   6: objects.deferred_removal
+41/71 Test   #6: objects.deferred_removal ..........   Passed    0.02 sec
+      Start   8: objects.handles_selection
+42/71 Test   #8: objects.handles_selection .........   Passed    0.02 sec
+      Start   3: objects.nested_creation
+43/71 Test   #3: objects.nested_creation ...........   Passed    0.02 sec
+      Start   5: objects.scheduling
+44/71 Test #121: triggers.doors ....................   Passed    0.15 sec
+      Start 215: cinematics.decode
+45/71 Test   #5: objects.scheduling ................   Passed    0.02 sec
+      Start   7: objects.aggregate_dispatch
+46/71 Test #215: cinematics.decode .................   Passed    0.03 sec
+      Start  33: world.resource_mount
+47/71 Test   #7: objects.aggregate_dispatch ........   Passed    0.02 sec
+      Start  34: world.world_properties
+48/71 Test  #33: world.resource_mount ..............   Passed    0.02 sec
+      Start  35: world.world_geometry
+49/71 Test  #34: world.world_properties ............   Passed    0.02 sec
+      Start  32: world.rez_rejection
+50/71 Test  #35: world.world_geometry ..............   Passed    0.02 sec
+      Start  31: world.rez_structure
+51/71 Test  #32: world.rez_rejection ...............   Passed    0.02 sec
+      Start  39: world.session_messages
+52/71 Test  #31: world.rez_structure ...............   Passed    0.02 sec
+      Start  56: player.lifecycle
+53/71 Test  #39: world.session_messages ............   Passed    0.02 sec
+      Start  57: player.rollback
+54/71 Test  #56: player.lifecycle ..................   Passed    0.06 sec
+      Start  58: player.messages
+55/71 Test  #57: player.rollback ...................   Passed    0.06 sec
+      Start  59: player.callbacks
+56/71 Test  #58: player.messages ...................   Passed    0.06 sec
+      Start 176: objectives.localized
+57/71 Test  #59: player.callbacks ..................   Passed    0.05 sec
+      Start 178: objectives.queue
+58/71 Test #178: objectives.queue ..................   Passed    0.05 sec
+      Start 177: objectives.missing
+59/71 Test #176: objectives.localized ..............   Passed    0.06 sec
+      Start 175: objectives.defaults
+60/71 Test #177: objectives.missing ................   Passed    0.05 sec
+      Start  55: player.handles
+61/71 Test #175: objectives.defaults ...............   Passed    0.05 sec
+      Start 120: triggers.keys
+62/71 Test  #55: player.handles ....................   Passed    0.03 sec
+      Start 119: triggers.filters
+63/71 Test #120: triggers.keys .....................   Passed    0.06 sec
+      Start 124: triggers.protocol
+64/71 Test #119: triggers.filters ..................   Passed    0.05 sec
+      Start 122: triggers.touch
+65/71 Test #124: triggers.protocol .................   Passed    0.05 sec
+      Start 117: triggers.schedule
+66/71 Test #122: triggers.touch ....................   Passed    0.04 sec
+      Start 174: objectives.malformed
+67/71 Test #174: objectives.malformed ..............   Passed    0.03 sec
+      Start 123: triggers.lifetime
+68/71 Test #117: triggers.schedule .................   Passed    0.04 sec
+      Start 118: triggers.toggle
+69/71 Test #123: triggers.lifetime .................   Passed    0.04 sec
+70/71 Test #118: triggers.toggle ...................   Passed    0.04 sec
+      Start 173: objectives.strings
+71/71 Test #173: objectives.strings ................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 71
+
+Label Time Summary:
+cinematics      =  24.98 sec*proc (9 tests)
+conversation    =  42.31 sec*proc (8 tests)
+headless        = 227.58 sec*proc (71 tests)
+objectives      =  17.49 sec*proc (7 tests)
+objects         =   0.33 sec*proc (12 tests)
+player          =  15.31 sec*proc (6 tests)
+private         = 224.81 sec*proc (11 tests)
+triggers        =  50.02 sec*proc (10 tests)
+world           =  77.14 sec*proc (19 tests)
+
+Total Test time (real) = 113.83 sec

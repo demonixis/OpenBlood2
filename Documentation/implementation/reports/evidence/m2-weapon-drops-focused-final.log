@@ -1,0 +1,51 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 169: pickups.catalog
+      Start 491: weapon_drops.catalog
+      Start 160: pickups.defaults
+      Start 168: pickups.resources
+ 1/20 Test #168: pickups.resources ................   Passed    0.02 sec
+      Start 161: pickups.ammunition
+ 2/20 Test #160: pickups.defaults .................   Passed    0.02 sec
+      Start 166: pickups.rejection
+ 3/20 Test #161: pickups.ammunition ...............   Passed    0.02 sec
+      Start 162: pickups.statistics
+ 4/20 Test #166: pickups.rejection ................   Passed    0.02 sec
+      Start 167: pickups.callbacks
+ 5/20 Test #167: pickups.callbacks ................   Passed    0.02 sec
+      Start 165: pickups.spawning
+ 6/20 Test #162: pickups.statistics ...............   Passed    0.02 sec
+      Start 164: pickups.contact
+ 7/20 Test #165: pickups.spawning .................   Passed    0.02 sec
+ 8/20 Test #164: pickups.contact ..................   Passed    0.01 sec
+      Start 163: pickups.protocol
+      Start 485: weapon_drops.falling
+ 9/20 Test #485: weapon_drops.falling .............   Passed    0.01 sec
+      Start 482: weapon_drops.collect
+10/20 Test #163: pickups.protocol .................   Passed    0.01 sec
+      Start 486: weapon_drops.guards
+11/20 Test #482: weapon_drops.collect .............   Passed    0.01 sec
+      Start 483: weapon_drops.protocol
+12/20 Test #486: weapon_drops.guards ..............   Passed    0.01 sec
+      Start 490: weapon_drops.missing_pickup
+13/20 Test #483: weapon_drops.protocol ............   Passed    0.01 sec
+      Start 489: weapon_drops.callback
+14/20 Test #490: weapon_drops.missing_pickup ......   Passed    0.01 sec
+      Start 484: weapon_drops.drop
+15/20 Test #489: weapon_drops.callback ............   Passed    0.01 sec
+      Start 487: weapon_drops.failures
+16/20 Test #484: weapon_drops.drop ................   Passed    0.01 sec
+      Start 488: weapon_drops.nosliding
+17/20 Test #487: weapon_drops.failures ............   Passed    0.01 sec
+18/20 Test #488: weapon_drops.nosliding ...........   Passed    0.01 sec
+19/20 Test #491: weapon_drops.catalog .............   Passed    0.14 sec
+20/20 Test #169: pickups.catalog ..................   Passed    3.87 sec
+
+100% tests passed, 0 tests failed out of 20
+
+Label Time Summary:
+headless        =   4.21 sec*proc (20 tests)
+pickups         =   4.02 sec*proc (10 tests)
+private         =   4.00 sec*proc (2 tests)
+weapon_drops    =   0.19 sec*proc (10 tests)
+
+Total Test time (real) =   3.87 sec

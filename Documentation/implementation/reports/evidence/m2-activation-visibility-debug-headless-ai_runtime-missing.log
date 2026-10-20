@@ -1,0 +1,14 @@
+477/701 Testing: ai_runtime.missing
+477/701 Test: ai_runtime.missing
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests" "missing"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_runtime.missing" start time: Oct 17 04:05 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.missing" end time: Oct 17 04:05 CEST
+"ai_runtime.missing" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,6 @@
+blocked_time=3 primary_polygon=1209 fraction=0.560681 normal=0,0,1
+blocked_time=3.01666 primary_polygon=1209 fraction=0.896829 normal=0,0,1
+cycle=0 moves=297 blocks=2 final=-32,168,3371.74 consumed_keys=9 runtime=233
+blocked_time=3 primary_polygon=1209 fraction=0.560681 normal=0,0,1
+blocked_time=3.01666 primary_polygon=1209 fraction=0.896829 normal=0,0,1
+cycle=1 moves=297 blocks=2 final=-32,168,3371.74 consumed_keys=9 runtime=233

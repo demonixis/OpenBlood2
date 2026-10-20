@@ -1,0 +1,1697 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "c1004fc1e98e0644f98b9df04dcd947c5090b8c0",
+  "implementation_commit": "bfa0f75a8ff2dd6ab66a7ad5883acd59dd57a7b5",
+  "scope": "Diagnostic-only SDL lifetime controls and external NVIDIA allocation attribution; no production changes. M2 remains incomplete.",
+  "environment": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+    "SDL_AUDIODRIVER": "dummy",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+    "UBSAN_OPTIONS": "halt_on_error=1",
+    "LD_DEBUG": "files only for module-attributed probes"
+  },
+  "probes": [
+    {
+      "name": "video1",
+      "command": [
+        "build/sanitize/tests/platform_lifetime_tests",
+        "video",
+        "1"
+      ],
+      "environment": {
+        "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+        "UBSAN_OPTIONS": "halt_on_error=1"
+      },
+      "returncode": 0,
+      "seconds": 0.16401795099955052,
+      "log": "/tmp/b2-gpu-lifetime-video1.log"
+    },
+    {
+      "name": "window1",
+      "command": [
+        "build/sanitize/tests/platform_lifetime_tests",
+        "window",
+        "1"
+      ],
+      "environment": {
+        "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+        "UBSAN_OPTIONS": "halt_on_error=1"
+      },
+      "returncode": 0,
+      "seconds": 0.16416257299715653,
+      "log": "/tmp/b2-gpu-lifetime-window1.log"
+    },
+    {
+      "name": "gpu1-modules",
+      "command": [
+        "build/sanitize/tests/platform_lifetime_tests",
+        "gpu",
+        "1"
+      ],
+      "environment": {
+        "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+        "UBSAN_OPTIONS": "halt_on_error=1",
+        "LD_DEBUG": "files"
+      },
+      "returncode": 1,
+      "seconds": 2.418635367997922,
+      "log": "/tmp/b2-gpu-lifetime-gpu1-modules.log"
+    },
+    {
+      "name": "video3",
+      "command": [
+        "build/sanitize/tests/platform_lifetime_tests",
+        "video",
+        "3"
+      ],
+      "environment": {
+        "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+        "UBSAN_OPTIONS": "halt_on_error=1"
+      },
+      "returncode": 0,
+      "seconds": 0.3647450389980804,
+      "log": "/tmp/b2-gpu-lifetime-video3.log"
+    },
+    {
+      "name": "gpu3",
+      "command": [
+        "build/sanitize/tests/platform_lifetime_tests",
+        "gpu",
+        "3"
+      ],
+      "environment": {
+        "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+        "UBSAN_OPTIONS": "halt_on_error=1"
+      },
+      "returncode": 1,
+      "seconds": 6.57751487600035,
+      "log": "/tmp/b2-gpu-lifetime-gpu3.log"
+    },
+    {
+      "name": "gpu1-dbus-shutdown",
+      "command": [
+        "build/sanitize/tests/platform_lifetime_tests",
+        "gpu",
+        "1"
+      ],
+      "environment": {
+        "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+        "UBSAN_OPTIONS": "halt_on_error=1",
+        "SDL_SHUTDOWN_DBUS_ON_QUIT": "1"
+      },
+      "returncode": 1,
+      "seconds": 2.3688133870018646,
+      "log": "/tmp/b2-gpu-lifetime-gpu1-dbus-shutdown.log"
+    }
+  ],
+  "final_probes": [
+    {
+      "command": [
+        "build/sanitize/tests/platform_lifetime_tests",
+        "video",
+        "3"
+      ],
+      "log": "/tmp/b2-gpu-lifetime-final-video.log",
+      "exit_code": 0,
+      "seconds": 0.3643394010141492
+    },
+    {
+      "command": [
+        "build/sanitize/tests/platform_lifetime_tests",
+        "window",
+        "3"
+      ],
+      "log": "/tmp/b2-gpu-lifetime-final-window.log",
+      "exit_code": 0,
+      "seconds": 0.36474148998968303
+    },
+    {
+      "command": [
+        "build/sanitize/tests/platform_lifetime_tests",
+        "gpu",
+        "3"
+      ],
+      "log": "/tmp/b2-gpu-lifetime-final-gpu.log",
+      "exit_code": 1,
+      "seconds": 6.5273168359999545
+    }
+  ],
+  "attribution": [
+    {
+      "name": "vulkan",
+      "bytes": 21996,
+      "allocations": 408,
+      "by_allocator_caller_module": {
+        "libnvidia-glcore.so.615.78.08": {
+          "bytes": 13018,
+          "allocations": 270
+        },
+        "libnvidia-glsi.so.615.78.08": {
+          "bytes": 6509,
+          "allocations": 135
+        },
+        "libdbus-1.so.3": {
+          "bytes": 2469,
+          "allocations": 3
+        }
+      },
+      "groups": [
+        {
+          "kind": "Direct",
+          "bytes": 3696,
+          "allocations": 66,
+          "allocator_caller": "#1 0x7bd2e41e7b8d  (<unknown module>)",
+          "module": "libnvidia-glcore.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7bd2e41e7b8d",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Direct",
+          "bytes": 1848,
+          "allocations": 33,
+          "allocator_caller": "#1 0x7fd2e8d9035c  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7fd2e8d9035c",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6a35c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Direct",
+          "bytes": 184,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7fd2e8736716 in _dbus_message_loader_get_buffer ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": [
+            {
+              "address": "0x7bd2e4219f06",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa19f06"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 6336,
+          "allocations": 66,
+          "allocator_caller": "#1 0x7bd2e41e7b8d  (<unknown module>)",
+          "module": "libnvidia-glcore.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7bd2e41e7b8d",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 3168,
+          "allocations": 33,
+          "allocator_caller": "#1 0x7fd2e8d922e9  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7fd2e8d922e9",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6c2e9"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 2986,
+          "allocations": 138,
+          "allocator_caller": "#1 0x7bd2e41e78d1  (<unknown module>)",
+          "module": "libnvidia-glcore.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7bd2e41e78d1",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e78d1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 2189,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7fd2e87462dd in dbus_realloc ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": [
+            {
+              "address": "0x7bd2e4277c23",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa77c23"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 1493,
+          "allocations": 69,
+          "allocator_caller": "#1 0x7fd2e8d8ff68  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7fd2e8d8ff68",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x69f68"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 96,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7fd2e87462dd in dbus_realloc ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": [
+            {
+              "address": "0x7bd2e4219f06",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa19f06"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "interpretation": "Allocation call-site attribution, not ownership proof. Mapping candidates retain reused address ranges."
+    },
+    {
+      "name": "gpu1-modules",
+      "bytes": 44024,
+      "allocations": 816,
+      "by_allocator_caller_module": {
+        "libnvidia-glcore.so.615.78.08": {
+          "bytes": 26036,
+          "allocations": 540
+        },
+        "libnvidia-glsi.so.615.78.08": {
+          "bytes": 13018,
+          "allocations": 270
+        },
+        "libdbus-1.so.3": {
+          "bytes": 4970,
+          "allocations": 6
+        }
+      },
+      "groups": [
+        {
+          "kind": "Direct",
+          "bytes": 7336,
+          "allocations": 131,
+          "allocator_caller": "#1 0x7b48eebe7b8d  (<unknown module>)",
+          "module": "libnvidia-glcore.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b48eebe7b8d",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Direct",
+          "bytes": 1848,
+          "allocations": 33,
+          "allocator_caller": "#1 0x7f48f6bce35c  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7f48f6bce35c",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6a35c"
+                },
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x8c35c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Direct",
+          "bytes": 1848,
+          "allocations": 33,
+          "allocator_caller": "#1 0x7f48f6bac35c  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7f48f6bac35c",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x4835c"
+                },
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6a35c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Direct",
+          "bytes": 184,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f48f7b13716 in _dbus_message_loader_get_buffer ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": [
+            {
+              "address": "0x7b48eec19f06",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa19f06"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa19f06"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Direct",
+          "bytes": 184,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f48f7b13716 in _dbus_message_loader_get_buffer ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": []
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 12728,
+          "allocations": 133,
+          "allocator_caller": "#1 0x7b48eebe7b8d  (<unknown module>)",
+          "module": "libnvidia-glcore.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b48eebe7b8d",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 5972,
+          "allocations": 276,
+          "allocator_caller": "#1 0x7b48eebe78d1  (<unknown module>)",
+          "module": "libnvidia-glcore.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b48eebe78d1",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e78d1"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e78d1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 4314,
+          "allocations": 2,
+          "allocator_caller": "#1 0x7f48f7b232dd in dbus_realloc ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": [
+            {
+              "address": "0x7b48eec77c23",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa77c23"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa77c23"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 3168,
+          "allocations": 33,
+          "allocator_caller": "#1 0x7f48f6bae2e9  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7f48f6bae2e9",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x4a2e9"
+                },
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6c2e9"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 3168,
+          "allocations": 33,
+          "allocator_caller": "#1 0x7f48f6bd02e9  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7f48f6bd02e9",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6c2e9"
+                },
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x8e2e9"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 1493,
+          "allocations": 69,
+          "allocator_caller": "#1 0x7f48f6bcdf68  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7f48f6bcdf68",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x69f68"
+                },
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x8bf68"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 1493,
+          "allocations": 69,
+          "allocator_caller": "#1 0x7f48f6babf68  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7f48f6babf68",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x47f68"
+                },
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x69f68"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 192,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f48f7b232dd in dbus_realloc ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": []
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 96,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f48f7b232dd in dbus_realloc ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": [
+            {
+              "address": "0x7b48eec19f06",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa19f06"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa19f06"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "interpretation": "Allocation call-site attribution, not ownership proof. Mapping candidates retain reused address ranges."
+    },
+    {
+      "name": "gpu1-final-modules",
+      "bytes": 44024,
+      "allocations": 816,
+      "by_allocator_caller_module": {
+        "libnvidia-glcore.so.615.78.08": {
+          "bytes": 13018,
+          "allocations": 270
+        },
+        "libnvidia-glsi.so.615.78.08": {
+          "bytes": 13018,
+          "allocations": 270
+        },
+        "ambiguous: libnvidia-glcore.so.615.78.08, libnvidia-gpucomp.so.615.78.08": {
+          "bytes": 13018,
+          "allocations": 270
+        },
+        "libdbus-1.so.3": {
+          "bytes": 4970,
+          "allocations": 6
+        }
+      },
+      "groups": [
+        {
+          "kind": "Direct",
+          "bytes": 3696,
+          "allocations": 66,
+          "allocator_caller": "#1 0x7b41443e7b8d  (<unknown module>)",
+          "module": "libnvidia-glcore.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b41443e7b8d",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Direct",
+          "bytes": 3696,
+          "allocations": 66,
+          "allocator_caller": "#1 0x7b414ab7b35c  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b414ab7b35c",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6a35c"
+                },
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6a35c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Direct",
+          "bytes": 3640,
+          "allocations": 65,
+          "allocator_caller": "#1 0x7b41419e7b8d  (<unknown module>)",
+          "module": "ambiguous: libnvidia-glcore.so.615.78.08, libnvidia-gpucomp.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b41419e7b8d",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-gpucomp.so.615.78.08",
+                  "offset": "0x55e7b8d"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Direct",
+          "bytes": 184,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f414c7c4716 in _dbus_message_loader_get_buffer ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": [
+            {
+              "address": "0x7b4144419f06",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa19f06"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Direct",
+          "bytes": 184,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f414c7c4716 in _dbus_message_loader_get_buffer ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": []
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 6392,
+          "allocations": 67,
+          "allocator_caller": "#1 0x7b41419e7b8d  (<unknown module>)",
+          "module": "ambiguous: libnvidia-glcore.so.615.78.08, libnvidia-gpucomp.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b41419e7b8d",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-gpucomp.so.615.78.08",
+                  "offset": "0x55e7b8d"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 6336,
+          "allocations": 66,
+          "allocator_caller": "#1 0x7b414ab7d2e9  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b414ab7d2e9",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6c2e9"
+                },
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6c2e9"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 6336,
+          "allocations": 66,
+          "allocator_caller": "#1 0x7b41443e7b8d  (<unknown module>)",
+          "module": "libnvidia-glcore.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b41443e7b8d",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 2986,
+          "allocations": 138,
+          "allocator_caller": "#1 0x7b414ab7af68  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b414ab7af68",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x69f68"
+                },
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x69f68"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 2986,
+          "allocations": 138,
+          "allocator_caller": "#1 0x7b41419e78d1  (<unknown module>)",
+          "module": "ambiguous: libnvidia-glcore.so.615.78.08, libnvidia-gpucomp.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b41419e78d1",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-gpucomp.so.615.78.08",
+                  "offset": "0x55e78d1"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e78d1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 2986,
+          "allocations": 138,
+          "allocator_caller": "#1 0x7b41443e78d1  (<unknown module>)",
+          "module": "libnvidia-glcore.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b41443e78d1",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e78d1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 2157,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f414c7d42dd in dbus_realloc ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": [
+            {
+              "address": "0x7b4144477c23",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa77c23"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 2157,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f414c7d42dd in dbus_realloc ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": [
+            {
+              "address": "0x7b4141a77c23",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-gpucomp.so.615.78.08",
+                  "offset": "0x5677c23"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa77c23"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 192,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f414c7d42dd in dbus_realloc ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": []
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 96,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f414c7d42dd in dbus_realloc ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": [
+            {
+              "address": "0x7b4144419f06",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa19f06"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "interpretation": "Allocation call-site attribution, not ownership proof. Mapping candidates retain reused address ranges."
+    },
+    {
+      "name": "train",
+      "bytes": 44056,
+      "allocations": 816,
+      "by_allocator_caller_module": {
+        "libnvidia-glcore.so.615.78.08": {
+          "bytes": 26036,
+          "allocations": 540
+        },
+        "libnvidia-glsi.so.615.78.08": {
+          "bytes": 13018,
+          "allocations": 270
+        },
+        "libdbus-1.so.3": {
+          "bytes": 5002,
+          "allocations": 6
+        }
+      },
+      "groups": [
+        {
+          "kind": "Direct",
+          "bytes": 7336,
+          "allocations": 131,
+          "allocator_caller": "#1 0x7b4bcc5e7b8d  (<unknown module>)",
+          "module": "libnvidia-glcore.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b4bcc5e7b8d",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Direct",
+          "bytes": 3696,
+          "allocations": 66,
+          "allocator_caller": "#1 0x7f4bd47ce35c  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7f4bd47ce35c",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6a35c"
+                },
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6a35c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Direct",
+          "bytes": 184,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f4bd4c3d716 in _dbus_message_loader_get_buffer ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": []
+        },
+        {
+          "kind": "Direct",
+          "bytes": 184,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f4bd4c3d716 in _dbus_message_loader_get_buffer ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": [
+            {
+              "address": "0x7b4bcc619f06",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa19f06"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa19f06"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 12728,
+          "allocations": 133,
+          "allocator_caller": "#1 0x7b4bcc5e7b8d  (<unknown module>)",
+          "module": "libnvidia-glcore.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b4bcc5e7b8d",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e7b8d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 6336,
+          "allocations": 66,
+          "allocator_caller": "#1 0x7f4bd47d02e9  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7f4bd47d02e9",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6c2e9"
+                },
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x6c2e9"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 5972,
+          "allocations": 276,
+          "allocator_caller": "#1 0x7b4bcc5e78d1  (<unknown module>)",
+          "module": "libnvidia-glcore.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7b4bcc5e78d1",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e78d1"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0x9e78d1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 4346,
+          "allocations": 2,
+          "allocator_caller": "#1 0x7f4bd4c4d2dd in dbus_realloc ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": [
+            {
+              "address": "0x7b4bcc677c23",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa77c23"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa77c23"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 2986,
+          "allocations": 138,
+          "allocator_caller": "#1 0x7f4bd47cdf68  (<unknown module>)",
+          "module": "libnvidia-glsi.so.615.78.08",
+          "unloaded_frames": [
+            {
+              "address": "0x7f4bd47cdf68",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x69f68"
+                },
+                {
+                  "file": "libnvidia-glsi.so.615.78.08",
+                  "offset": "0x69f68"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 192,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f4bd4c4d2dd in dbus_realloc ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": []
+        },
+        {
+          "kind": "Indirect",
+          "bytes": 96,
+          "allocations": 1,
+          "allocator_caller": "#1 0x7f4bd4c4d2dd in dbus_realloc ??:?",
+          "module": "libdbus-1.so.3",
+          "unloaded_frames": [
+            {
+              "address": "0x7b4bcc619f06",
+              "candidate_mappings": [
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa19f06"
+                },
+                {
+                  "file": "libnvidia-glcore.so.615.78.08",
+                  "offset": "0xa19f06"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "interpretation": "Allocation call-site attribution, not ownership proof. Mapping candidates retain reused address ranges."
+    }
+  ],
+  "ordinary_ctest": {
+    "debug": {
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build/debug",
+        "-R",
+        "^gpu\\.platform_",
+        "--output-on-failure",
+        "--output-junit",
+        "/tmp/b2-gpu-lifetime-debug.xml"
+      ],
+      "exit_code": 0,
+      "cases": [
+        {
+          "name": "gpu.platform_video",
+          "classname": "gpu.platform_video",
+          "time": "0.185594",
+          "status": "run"
+        },
+        {
+          "name": "gpu.platform_window",
+          "classname": "gpu.platform_window",
+          "time": "0.186511",
+          "status": "run"
+        },
+        {
+          "name": "gpu.platform_gpu",
+          "classname": "gpu.platform_gpu",
+          "time": "1.13428",
+          "status": "run"
+        }
+      ]
+    },
+    "release": {
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build/release",
+        "-R",
+        "^gpu\\.platform_",
+        "--output-on-failure",
+        "--output-junit",
+        "/tmp/b2-gpu-lifetime-release.xml"
+      ],
+      "exit_code": 0,
+      "cases": [
+        {
+          "name": "gpu.platform_video",
+          "classname": "gpu.platform_video",
+          "time": "0.159168",
+          "status": "run"
+        },
+        {
+          "name": "gpu.platform_window",
+          "classname": "gpu.platform_window",
+          "time": "0.163843",
+          "status": "run"
+        },
+        {
+          "name": "gpu.platform_gpu",
+          "classname": "gpu.platform_gpu",
+          "time": "1.0246",
+          "status": "run"
+        }
+      ]
+    }
+  },
+  "manual_commands": [
+    {
+      "command": [
+        "clang++",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "/tmp/b2-gpu-lifetime-vulkan.cpp",
+        "-lvulkan",
+        "-o",
+        "/tmp/b2-gpu-lifetime-vulkan"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/tmp/b2-gpu-lifetime-vulkan"
+      ],
+      "exit_code": 1,
+      "behavior_completed": true,
+      "leak_bytes": 21996,
+      "allocations": 408
+    },
+    {
+      "command": [
+        "build/sanitize/blood2",
+        "--config",
+        "build/sanitize/tests/empty.ini",
+        "--data-dir",
+        "/home/yann/.steam/steam/steamapps/common/Blood II/",
+        "--gpu-smoke",
+        "--capture",
+        "/tmp/b2-gpu-lifetime-smoke.png"
+      ],
+      "exit_code": 1,
+      "behavior_completed": true,
+      "leak_bytes": 44024,
+      "allocations": 816
+    },
+    {
+      "command": [
+        "build/sanitize/tests/train_session_tests",
+        "/home/yann/.steam/steam/steamapps/common/Blood II/",
+        "60",
+        "build/sanitize/tests/gpu-lifetime-train"
+      ],
+      "exit_code": 1,
+      "behavior_completed": true,
+      "leak_bytes": 44056,
+      "allocations": 816
+    },
+    {
+      "command": [
+        "build/sanitize/tests/platform_lifetime_tests",
+        "gpu",
+        "1"
+      ],
+      "log": "/tmp/b2-gpu-lifetime-gpu1-final-modules.log",
+      "exit_code": 1,
+      "leak_bytes": 44024,
+      "allocations": 816
+    },
+    {
+      "command": [
+        "build/sanitize/tests/platform_lifetime_tests",
+        "gpu",
+        "1"
+      ],
+      "extra_environment": {
+        "SDL_VIDEO_DRIVER": "x11"
+      },
+      "timeout_seconds": 90,
+      "outcome": "Killed by subprocess timeout; no unbuffered checkpoint, stall location unknown."
+    }
+  ],
+  "identities": [
+    {
+      "path": "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/platform_lifetime_tests",
+      "resolved": "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/platform_lifetime_tests",
+      "sha256": "497ccf4f92d16f5e5312fd527b64c2c6038295db7a776f3f1c63b1ef94ba57b2",
+      "build_id": "8bea7403ec4576d3e17219c96a3a43257f27c94d",
+      "readelf_warnings": "readelf: Warning: Gap in build notes detected from 0x401057 to 0x401064\nreadelf: Warning: Gap in build notes detected from 0x401117 to 0x841dff\n"
+    },
+    {
+      "path": "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/train_session_tests",
+      "resolved": "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/train_session_tests",
+      "sha256": "076129c4d8c2645ef5c6990e9ef02ac0e5b0e49e48a7add51ba4b27d698f94ee",
+      "build_id": "308f72ddba7598db081c3bd76d080129fec42e7a",
+      "readelf_warnings": "readelf: Warning: Gap in build notes detected from 0x450eb7 to 0x450ec4\nreadelf: Warning: Gap in build notes detected from 0x450f77 to 0x150a62f\n"
+    },
+    {
+      "path": "/home/yann/projects/lithtech/Blood2/build/sanitize/blood2",
+      "resolved": "/home/yann/projects/lithtech/Blood2/build/sanitize/blood2",
+      "sha256": "a399d81a747d7b9441cd19aead3ab25a246c3759a672daabc3dccd4e09579709",
+      "build_id": "e7a3b19ea37cbd84e72a4f6c95a24fdbe0514f5c",
+      "readelf_warnings": "readelf: Warning: Gap in build notes detected from 0x451197 to 0x4511a4\nreadelf: Warning: Gap in build notes detected from 0x451257 to 0x17d674f\n"
+    },
+    {
+      "path": "/tmp/b2-gpu-lifetime-vulkan",
+      "resolved": "/tmp/b2-gpu-lifetime-vulkan",
+      "sha256": "a1826ffb323eaa1827dbed1a2e6fdfeca02c4e637fa4c1c9da5b7b1d87649dbc",
+      "build_id": "f7f2c48c4897b306b4dc41ae00c19ad56e854939",
+      "readelf_warnings": "readelf: Warning: Gap in build notes detected from 0x400727 to 0x400734\nreadelf: Warning: Gap in build notes detected from 0x4007e7 to 0x4ec56f\n"
+    },
+    {
+      "path": "/lib64/libnvidia-glcore.so.615.78.08",
+      "resolved": "/usr/lib64/libnvidia-glcore.so.615.78.08",
+      "sha256": "0431aee1c9d26b85c9a4a3724de4445113273c31b94229b39ba364988ffe491a",
+      "build_id": "430f37a0477a31714631a4d0b518bb024fce202f",
+      "readelf_warnings": ""
+    },
+    {
+      "path": "/lib64/libnvidia-glsi.so.615.78.08",
+      "resolved": "/usr/lib64/libnvidia-glsi.so.615.78.08",
+      "sha256": "da8c4e3c527e0fc454e725d10a35c4c420c41a24810675fd7d66d6645f632e83",
+      "build_id": "f36ec6c64548b2912b49c1ebd12a4f14fb5e20aa",
+      "readelf_warnings": ""
+    },
+    {
+      "path": "/lib64/libnvidia-gpucomp.so.615.78.08",
+      "resolved": "/usr/lib64/libnvidia-gpucomp.so.615.78.08",
+      "sha256": "1350b9e1c3e631c5b0088561540423d7a7d9a75c73242ac2881f94bc64dd6d73",
+      "build_id": "c4ed2a9ac26ed62c354c0d849a394bf621f63b8e",
+      "readelf_warnings": ""
+    },
+    {
+      "path": "/lib64/libdbus-1.so.3",
+      "resolved": "/usr/lib64/libdbus-1.so.3.38.3",
+      "sha256": "5c6ed93ed3e31e36a45e4e52725355b5e31248bb075d495bea29aa090e5f995f",
+      "build_id": "a43a813782264d190196676cccae294b0495246f",
+      "readelf_warnings": ""
+    },
+    {
+      "path": "/lib64/libvulkan.so.1",
+      "resolved": "/usr/lib64/libvulkan.so.1.4.341",
+      "sha256": "a09dab583a4b8e50bba61d1284b46b9d6256300713aa1db6f20f06b2dbbe0696",
+      "build_id": "c72cda0b0995537f36807bdbfab2124c48e88b66",
+      "readelf_warnings": ""
+    }
+  ],
+  "files": [
+    {
+      "path": "m2-gpu-lifetime-attribution.json",
+      "sha256": "caad1860a589471fea8425b8f8fc72ee0603a6e9b226758a73c9d2bacdd39df8",
+      "bytes": 28509
+    },
+    {
+      "path": "m2-gpu-lifetime-attribution.log",
+      "sha256": "2dff26b5401861328f89ffbe4857cda764053c83e420ebd0351f738628374e58",
+      "bytes": 974
+    },
+    {
+      "path": "m2-gpu-lifetime-build-debug-final.log",
+      "sha256": "9c210d244e498fe6de25e62e0c6655c1a3d2e7de0129619b5a0b80cb324c5c47",
+      "bytes": 392
+    },
+    {
+      "path": "m2-gpu-lifetime-build-debug.log",
+      "sha256": "0f647ccc6d777eb639ac028172fd3ce1fc04afe82d16040cc74793d677f9f107",
+      "bytes": 8349
+    },
+    {
+      "path": "m2-gpu-lifetime-build-release.log",
+      "sha256": "7708c232b380338c4d7eaafd83c1bf3c3a14d16e5776c8e5b0d8fec21012e2e8",
+      "bytes": 8353
+    },
+    {
+      "path": "m2-gpu-lifetime-build-sanitize-final.log",
+      "sha256": "9c210d244e498fe6de25e62e0c6655c1a3d2e7de0129619b5a0b80cb324c5c47",
+      "bytes": 392
+    },
+    {
+      "path": "m2-gpu-lifetime-build-sanitize-fixed.log",
+      "sha256": "5ff589dd4b234777a2906e0b652cc18021c69612ed69124e4c21a5021af4ffca",
+      "bytes": 8355
+    },
+    {
+      "path": "m2-gpu-lifetime-build-sanitize.log",
+      "sha256": "ea10cf3779205e3ebb186d99e9e3b5a417a437d1c0fffd38dcd451879364b737",
+      "bytes": 8698
+    },
+    {
+      "path": "m2-gpu-lifetime-classify.py",
+      "sha256": "33fd9cc73825bb37b5d346a2479f9f30bdba53323e0543b2e4e98839e78c694f",
+      "bytes": 2644
+    },
+    {
+      "path": "m2-gpu-lifetime-code-whitespace.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "m2-gpu-lifetime-debug-tests.log",
+      "sha256": "a7d5dea5ef387306f059828b79ea21e61a803dc987f351a5a9521c722db6835b",
+      "bytes": 545
+    },
+    {
+      "path": "m2-gpu-lifetime-debug.xml",
+      "sha256": "c41a12ef93a9dbc610f23bc2ee501f43570adc4048695846887777fc905960f3",
+      "bytes": 1720
+    },
+    {
+      "path": "m2-gpu-lifetime-docs.py",
+      "sha256": "19abf03f7d5318638b403f3e964f57c1d2f3304e54129f8ee16bf5f67294615b",
+      "bytes": 12944
+    },
+    {
+      "path": "m2-gpu-lifetime-final-gpu.log",
+      "sha256": "eadd93cadbbaca75235d665fd23d03ab5ee595218833eb2d9a2305f9477ed666",
+      "bytes": 15884
+    },
+    {
+      "path": "m2-gpu-lifetime-final-probes.json",
+      "sha256": "4c7d1462a139508ffdeb599be600e81e4105152dce3813deeb161103db32e078",
+      "bytes": 653
+    },
+    {
+      "path": "m2-gpu-lifetime-final-probes.py",
+      "sha256": "9cb79ef07d22e2b07da0c6fd4b7ca54dacbc4653b070d1daab80265620d107ca",
+      "bytes": 788
+    },
+    {
+      "path": "m2-gpu-lifetime-final-video.log",
+      "sha256": "f8fdde92242c2ab5e8408126009662ff469ff608c60758ff9377fdbe155d4505",
+      "bytes": 234
+    },
+    {
+      "path": "m2-gpu-lifetime-final-window.log",
+      "sha256": "f8fdde92242c2ab5e8408126009662ff469ff608c60758ff9377fdbe155d4505",
+      "bytes": 234
+    },
+    {
+      "path": "m2-gpu-lifetime-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "m2-gpu-lifetime-gpu1-dbus-shutdown.log",
+      "sha256": "c92df1d34b0510832e2b5d401b2fc17460826514990e3dbd5d75ae7bd428f7d3",
+      "bytes": 8601
+    },
+    {
+      "path": "m2-gpu-lifetime-gpu1-final-modules.log",
+      "sha256": "ad2bd78141fa885ee682c3dd4591cbb2fd408b721b0fd05bad8e97118c3c5869",
+      "bytes": 128259
+    },
+    {
+      "path": "m2-gpu-lifetime-gpu1-modules.log",
+      "sha256": "883bd9938902f8fd591641509be406485958120c7b25f0c45135387df0d3702c",
+      "bytes": 127458
+    },
+    {
+      "path": "m2-gpu-lifetime-gpu1-x11.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "m2-gpu-lifetime-gpu3.log",
+      "sha256": "95f39fb15df01151a8d8a1c4e5a4ad77b3a18ec89a9cff6aac40843dd6933c61",
+      "bytes": 18771
+    },
+    {
+      "path": "m2-gpu-lifetime-integrity.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "bytes": 56
+    },
+    {
+      "path": "m2-gpu-lifetime-links.log",
+      "sha256": "9383043f9fb1d37f54c1719baf1ab42f2c50616c97958c13c49df3657f254c3c",
+      "bytes": 261
+    },
+    {
+      "path": "m2-gpu-lifetime-module-maps.json",
+      "sha256": "d8e8c52f3c2dd0d4a7315a7480a4cbf452092540af2576e86f84fde55f6df0e4",
+      "bytes": 5086
+    },
+    {
+      "path": "m2-gpu-lifetime-probe.py",
+      "sha256": "e5670e2b6913879319b8148e7031fc27eaa6dc6b464c60519e38f3e281661947",
+      "bytes": 1399
+    },
+    {
+      "path": "m2-gpu-lifetime-probes.json",
+      "sha256": "49411f62377ec2b18d1d7195ee24179122707c1e9fd73071ad075ce748d29662",
+      "bytes": 3020
+    },
+    {
+      "path": "m2-gpu-lifetime-release-tests.log",
+      "sha256": "d1b33defb933500a6cf090ab15f3b51d8b6efa6e886c524f60ae0394d1597c1e",
+      "bytes": 547
+    },
+    {
+      "path": "m2-gpu-lifetime-release.xml",
+      "sha256": "b2a5a61bdf42fb59415a23f8ae32f8d5c9b579ccc6cfb7eb5e20e50f09fdb368",
+      "bytes": 1719
+    },
+    {
+      "path": "m2-gpu-lifetime-smoke.log",
+      "sha256": "f9029e4fc7e961c54213dd34922ff6becacbbdabcbea4496df4b88b1eae91bdf",
+      "bytes": 8356
+    },
+    {
+      "path": "m2-gpu-lifetime-train.log",
+      "sha256": "6f1a0f3b50a4f3fb2b10a0727cbf7532e2a71fedaa396dafd5b440da983a1fd8",
+      "bytes": 161836
+    },
+    {
+      "path": "m2-gpu-lifetime-video1.log",
+      "sha256": "9280391d5f0dd33bd2de2df5582b8a2883a49120790e63c51d4bbbeed677bf9b",
+      "bytes": 69
+    },
+    {
+      "path": "m2-gpu-lifetime-video3.log",
+      "sha256": "96ad1404c28cfc458882187747793219b3d11695ec703772558c514e7819d0f0",
+      "bytes": 207
+    },
+    {
+      "path": "m2-gpu-lifetime-vulkan-build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "m2-gpu-lifetime-vulkan.cpp",
+      "sha256": "da00991865dda2f59446e65fb94e3bbad9096a56ec73ff3a207d01188c6079d8",
+      "bytes": 971
+    },
+    {
+      "path": "m2-gpu-lifetime-vulkan.log",
+      "sha256": "68c697d4691bbb3aa834c4cfcac1ff2b954d7271cc46ae20bf6f73d389657e11",
+      "bytes": 37160
+    },
+    {
+      "path": "m2-gpu-lifetime-window1.log",
+      "sha256": "9280391d5f0dd33bd2de2df5582b8a2883a49120790e63c51d4bbbeed677bf9b",
+      "bytes": 69
+    },
+    {
+      "path": "m2-gpu-lifetime-final-links.log",
+      "sha256": "faca4495287ff7f765742be662232c2299962a65fb5ac6b3cb2bb26800b1847d",
+      "bytes": 32
+    },
+    {
+      "path": "m2-gpu-lifetime-final-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "m2-gpu-lifetime-final-code-whitespace.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "m2-gpu-lifetime-source.patch",
+      "sha256": "c695b0f68b0986086c511a362413397300905dd500d24b5ef00f0fb5a968f11c",
+      "bytes": 12861
+    }
+  ],
+  "builds": [
+    {
+      "configuration": "debug",
+      "command": [
+        "cmake",
+        "--build",
+        "build/debug",
+        "--target",
+        "platform_lifetime_tests",
+        "--parallel",
+        "3"
+      ],
+      "exit_code": 0
+    },
+    {
+      "configuration": "release",
+      "command": [
+        "cmake",
+        "--build",
+        "build/release",
+        "--target",
+        "platform_lifetime_tests",
+        "--parallel",
+        "3"
+      ],
+      "exit_code": 0
+    },
+    {
+      "configuration": "sanitize",
+      "command": [
+        "cmake",
+        "--build",
+        "build/sanitize",
+        "--target",
+        "platform_lifetime_tests",
+        "--parallel",
+        "3"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "failed_attempts": [
+    "Initial CMake regeneration failed because the added conditional lacked endif; fixed before all successful builds.",
+    "X11 exploratory process timed out after 90 seconds; all Vulkan leak cases remain failures.",
+    "Initial Markdown link check ran before the evidence manifest existed; final check is recorded separately."
+  ],
+  "identity_note": "Final formatted baseline executable identity; the initial baseline differed only in allocation-tracker output text. Each attributed probe uses its own recorded loader mappings, not a later binary address map.",
+  "nvidia_kernel_version": "NVRM version: NVIDIA UNIX Open Kernel Module for x86_64  615.78.08  Release Build  (dvs-builder@U22-I3-G08-04-6)  Tue Oct  6 04:56:08 UTC 2026\nGCC version:  gcc version 16.2.1 20260819 (Red Hat 16.2.1-2) (GCC) \n",
+  "protected_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "checks": {
+    "markdown_links": 4430,
+    "changed_code_and_maintained_markdown_whitespace": "pass",
+    "format": "pass",
+    "reference_files_unchanged": 10923,
+    "reference_repositories_clean": 6,
+    "root_readme_preserved": true
+  }
+}

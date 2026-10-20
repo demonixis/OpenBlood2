@@ -1,0 +1,81 @@
+[
+  {
+    "name": "release-build",
+    "command": [
+      "cmake",
+      "--build",
+      "build/release",
+      "--target",
+      "world_tests",
+      "player_tests",
+      "blood2_app",
+      "sprite_tests",
+      "sprite_view_tests",
+      "scene_explosion_tests",
+      "sound_tests",
+      "exit_tests",
+      "gideon_runtime_tests",
+      "service_coverage_tests",
+      "train_session_tests",
+      "level_change_gpu_tests",
+      "--parallel",
+      "3"
+    ],
+    "code": 0,
+    "seconds": 74.62904613598948
+  },
+  {
+    "name": "release",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/release",
+      "-R",
+      "^(world\\.|player\\.|sound\\.|sprites?\\.|sprite_view\\.|sceneexplosion\\.|exits\\.|gideon_runtime\\.|coverage\\.|cli.world_modes|train_session\\.)",
+      "--output-on-failure",
+      "--output-junit",
+      "/tmp/b2-session-start-release.xml"
+    ],
+    "code": 0,
+    "seconds": 19.00147477898281
+  },
+  {
+    "name": "sanitize-build",
+    "command": [
+      "cmake",
+      "--build",
+      "build/sanitize",
+      "--target",
+      "world_tests",
+      "player_tests",
+      "blood2_app",
+      "sprite_tests",
+      "sprite_view_tests",
+      "scene_explosion_tests",
+      "sound_tests",
+      "exit_tests",
+      "gideon_runtime_tests",
+      "service_coverage_tests",
+      "train_session_tests",
+      "--parallel",
+      "3"
+    ],
+    "code": 0,
+    "seconds": 56.078147872991394
+  },
+  {
+    "name": "sanitize",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/sanitize",
+      "-R",
+      "^(world\\.|player\\.|sound\\.|sprites?\\.|sprite_view\\.|sceneexplosion\\.|exits\\.|gideon_runtime\\.|coverage\\.|cli.world_modes|train_session\\.)",
+      "--output-on-failure",
+      "--output-junit",
+      "/tmp/b2-session-start-sanitize.xml"
+    ],
+    "code": 0,
+    "seconds": 662.6602918080171
+  }
+]

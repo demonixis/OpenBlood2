@@ -1,0 +1,69 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 273: gpu.character
+1/9 Test #273: gpu.character ....................***Failed   21.45 sec
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 224 original instances, 116 BSP models
+[info] Movement smoke focus at frame 2: true
+[info] Movement smoke input at 45: enabled=true, focused=true, text=false, W=true, Ctrl=false
+[info] Movement smoke input at 100: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Movement: hidden distance=295.31055, jumps=1, landings=2, ground=true, forward frames=55, jump frames=10
+[info] Movement smoke input at 170: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/skeleton.png
+[info] Movement smoke input at 185: enabled=true, focused=true, text=false, W=false, Ctrl=true
+[info] Shutdown: frames=240, UI frames=120, hidden frames=120, toggles=2, resize=true, quit=true
+[info] Character motion probe: hidden=true, reentered=true, old handle invalidated=true
+[info] AI model-key probe: hidden=true, reentered=true, old handle invalidated=true
+[info] AI target probe: hidden=true, reentered=true, old handle invalidated=true
+[info] AI sight probe: hidden=true, reentered=true, old handle invalidated=true
+[info] AI state probe: hidden=true, reentered=true, old handle invalidated=true
+[info] AI weapon probe: hidden=true, reentered=true, old identity invalidated=true
+[info] AI script interpreter: hidden=true, reentered=true, old identity invalidated=true
+[info] AI navigation: state=999, phase=1, z=51, updates=32, arrivals=1, failures=0, points=0, error=
+[info] Original NPC AI_Update + hit localization: hidden=true, reentered=true, old identity invalidated=true
+[info] Original corpse: hidden=false, rendered=true, reentered=false, old identity invalidated=true
+
+    Start 492: corpses.mappings
+2/9 Test #492: corpses.mappings .................   Passed    0.01 sec
+    Start 493: corpses.transfer
+3/9 Test #493: corpses.transfer .................   Passed    0.01 sec
+    Start 494: corpses.failures
+4/9 Test #494: corpses.failures .................   Passed    0.01 sec
+    Start 495: corpses.lifetime
+5/9 Test #495: corpses.lifetime .................   Passed    0.01 sec
+    Start 496: corpses.sounds
+6/9 Test #496: corpses.sounds ...................   Passed    0.01 sec
+    Start 497: corpses.gates
+7/9 Test #497: corpses.gates ....................   Passed    0.01 sec
+    Start 498: corpses.accumulation
+8/9 Test #498: corpses.accumulation .............***Failed    0.01 sec
+accumulation:270: send(10, DamageType::Normal) && near(a->m_damage.m_fLastDamageAmount, 7) && near(a->m_damage.m_fLastDamagePercent, .07f)
+
+    Start 499: corpses.catalog
+9/9 Test #499: corpses.catalog ..................***Failed    0.10 sec
+catalog:331: g.server.WriteDamage(m, damage) == DE_OK && g.server.EndMessage(m) == DE_OK
+
+
+67% tests passed, 3 tests failed out of 9
+
+Label Time Summary:
+character    =  21.45 sec*proc (1 test)
+corpses      =   0.14 sec*proc (8 tests)
+gpu          =  21.45 sec*proc (1 test)
+headless     =   0.14 sec*proc (8 tests)
+private      =  21.55 sec*proc (2 tests)
+
+Total Test time (real) =  21.59 sec
+
+The following tests FAILED:
+	273 - gpu.character (Failed)                            character gpu private
+	498 - corpses.accumulation (Failed)                     corpses headless
+	499 - corpses.catalog (Failed)                          corpses headless private
+Errors while running CTest

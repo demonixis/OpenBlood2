@@ -1,0 +1,14 @@
+415/420 Testing: ai_recovery.search
+415/420 Test: ai_recovery.search
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_recovery_tests" "search"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_recovery.search" start time: Oct 16 14:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.search" end time: Oct 16 14:04 CEST
+"ai_recovery.search" time elapsed: 00:00:00
+----------------------------------------------------------

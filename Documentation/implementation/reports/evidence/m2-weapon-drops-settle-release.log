@@ -1,0 +1,30 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start 491: weapon_drops.catalog
+      Start 488: weapon_drops.nosliding
+      Start 485: weapon_drops.falling
+      Start 484: weapon_drops.drop
+ 1/10 Test #488: weapon_drops.nosliding ...........   Passed    0.00 sec
+      Start 486: weapon_drops.guards
+ 2/10 Test #485: weapon_drops.falling .............   Passed    0.00 sec
+      Start 482: weapon_drops.collect
+ 3/10 Test #484: weapon_drops.drop ................   Passed    0.00 sec
+      Start 489: weapon_drops.callback
+ 4/10 Test #486: weapon_drops.guards ..............   Passed    0.00 sec
+      Start 487: weapon_drops.failures
+ 5/10 Test #482: weapon_drops.collect .............   Passed    0.00 sec
+      Start 483: weapon_drops.protocol
+ 6/10 Test #489: weapon_drops.callback ............   Passed    0.00 sec
+      Start 490: weapon_drops.missing_pickup
+ 7/10 Test #487: weapon_drops.failures ............   Passed    0.00 sec
+ 8/10 Test #483: weapon_drops.protocol ............   Passed    0.00 sec
+ 9/10 Test #490: weapon_drops.missing_pickup ......   Passed    0.00 sec
+10/10 Test #491: weapon_drops.catalog .............   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+headless        =   0.04 sec*proc (10 tests)
+private         =   0.02 sec*proc (1 test)
+weapon_drops    =   0.04 sec*proc (10 tests)
+
+Total Test time (real) =   0.03 sec

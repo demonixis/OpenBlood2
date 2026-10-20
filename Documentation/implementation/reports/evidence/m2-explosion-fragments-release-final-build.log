@@ -1,0 +1,3 @@
+[0/2] Re-checking globbed directories...
+[1/6] Scanning /home/yann/projects/lithtech/Blood2/tests/explosion_fragment_tests.cpp for CXX dependencies
+[2/6] Generating CXX dyndep file tests/CMakeFiles/explosion_fragment_tests.dir/CXX.dd

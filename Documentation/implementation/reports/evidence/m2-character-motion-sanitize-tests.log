@@ -1,0 +1,573 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+        Start   1: objects.original_objects
+  1/267 Test   #1: objects.original_objects ..........   Passed    0.02 sec
+        Start   2: objects.nested_creation
+  2/267 Test   #2: objects.nested_creation ...........   Passed    0.01 sec
+        Start   3: objects.reasons_properties
+  3/267 Test   #3: objects.reasons_properties ........   Passed    0.02 sec
+        Start   4: objects.scheduling
+  4/267 Test   #4: objects.scheduling ................   Passed    0.01 sec
+        Start   5: objects.deferred_removal
+  5/267 Test   #5: objects.deferred_removal ..........   Passed    0.02 sec
+        Start   6: objects.aggregate_dispatch
+  6/267 Test   #6: objects.aggregate_dispatch ........   Passed    0.01 sec
+        Start   7: objects.handles_selection
+  7/267 Test   #7: objects.handles_selection .........   Passed    0.01 sec
+        Start   8: objects.links_lists
+  8/267 Test   #8: objects.links_lists ...............   Passed    0.02 sec
+        Start   9: objects.messages_strings
+  9/267 Test   #9: objects.messages_strings ..........   Passed    0.03 sec
+        Start  10: objects.unsupported_teardown
+ 10/267 Test  #10: objects.unsupported_teardown ......   Passed    0.04 sec
+        Start  11: objects.creation_failures
+ 11/267 Test  #11: objects.creation_failures .........   Passed    0.03 sec
+        Start  12: config.arguments
+ 12/267 Test  #12: config.arguments ..................   Passed    0.01 sec
+        Start  13: config.precedence
+ 13/267 Test  #13: config.precedence .................   Passed    0.01 sec
+        Start  14: config.relative_paths
+ 14/267 Test  #14: config.relative_paths .............   Passed    0.01 sec
+        Start  15: config.invalid_config
+ 15/267 Test  #15: config.invalid_config .............   Passed    0.01 sec
+        Start  16: config.content_validation
+ 16/267 Test  #16: config.content_validation .........   Passed    0.01 sec
+        Start  17: config.case_lookup
+ 17/267 Test  #17: config.case_lookup ................   Passed    0.01 sec
+        Start  18: cli.help
+ 18/267 Test  #18: cli.help ..........................   Passed    0.02 sec
+        Start  19: cli.unknown
+ 19/267 Test  #19: cli.unknown .......................   Passed    0.02 sec
+        Start  20: cli.missing_data
+ 20/267 Test  #20: cli.missing_data ..................   Passed    0.02 sec
+        Start  21: cli.missing_config
+ 21/267 Test  #21: cli.missing_config ................   Passed    0.02 sec
+        Start  22: cli.metadata
+ 22/267 Test  #22: cli.metadata ......................   Passed    0.02 sec
+        Start  23: content.local
+ 23/267 Test  #23: content.local .....................   Passed    0.02 sec
+        Start  24: world.sprite_entries
+ 24/267 Test  #24: world.sprite_entries ..............   Passed    0.03 sec
+        Start  25: world.sound_entries
+ 25/267 Test  #25: world.sound_entries ...............   Passed    0.03 sec
+        Start  26: world.rez_structure
+ 26/267 Test  #26: world.rez_structure ...............   Passed    0.01 sec
+        Start  27: world.rez_rejection
+ 27/267 Test  #27: world.rez_rejection ...............   Passed    0.01 sec
+        Start  28: world.resource_mount
+ 28/267 Test  #28: world.resource_mount ..............   Passed    0.01 sec
+        Start  29: world.world_properties
+ 29/267 Test  #29: world.world_properties ............   Passed    0.01 sec
+        Start  30: world.world_geometry
+ 30/267 Test  #30: world.world_geometry ..............   Passed    0.01 sec
+        Start  31: world.world_rejection
+ 31/267 Test  #31: world.world_rejection .............   Passed    0.05 sec
+        Start  32: world.mutations
+ 32/267 Test  #32: world.mutations ...................   Passed    0.20 sec
+        Start  33: world.session_lifecycle
+ 33/267 Test  #33: world.session_lifecycle ...........   Passed    0.02 sec
+        Start  34: world.session_messages
+ 34/267 Test  #34: world.session_messages ............   Passed    0.01 sec
+        Start  35: world.original_trigger
+ 35/267 Test  #35: world.original_trigger ............   Passed    0.02 sec
+        Start  36: world.private
+ 36/267 Test  #36: world.private .....................   Passed    2.28 sec
+        Start  37: cli.world_modes
+ 37/267 Test  #37: cli.world_modes ...................   Passed    4.13 sec
+        Start  38: services.model_reader
+ 38/267 Test  #38: services.model_reader .............   Passed    0.01 sec
+        Start  39: services.model_rejection
+ 39/267 Test  #39: services.model_rejection ..........   Passed    0.29 sec
+        Start  40: services.animation_events
+ 40/267 Test  #40: services.animation_events .........   Passed    0.02 sec
+        Start  41: services.model_callbacks
+ 41/267 Test  #41: services.model_callbacks ..........   Passed    0.02 sec
+        Start  42: services.collision_queries
+ 42/267 Test  #42: services.collision_queries ........   Passed    0.01 sec
+        Start  43: services.movement_contacts
+ 43/267 Test  #43: services.movement_contacts ........   Passed    0.01 sec
+        Start  44: services.original_services
+ 44/267 Test  #44: services.original_services ........   Passed    0.02 sec
+        Start  45: services.private
+ 45/267 Test  #45: services.private ..................   Passed    6.88 sec
+        Start  46: player.handles
+ 46/267 Test  #46: player.handles ....................   Passed    0.02 sec
+        Start  47: player.lifecycle
+ 47/267 Test  #47: player.lifecycle ..................   Passed    0.04 sec
+        Start  48: player.rollback
+ 48/267 Test  #48: player.rollback ...................   Passed    0.04 sec
+        Start  49: player.messages
+ 49/267 Test  #49: player.messages ...................   Passed    0.04 sec
+        Start  50: player.callbacks
+ 50/267 Test  #50: player.callbacks ..................   Passed    0.03 sec
+        Start  51: player.private
+ 51/267 Test  #51: player.private ....................   Passed    7.44 sec
+        Start  52: weapons.inventory
+ 52/267 Test  #52: weapons.inventory .................   Passed    0.03 sec
+        Start  53: weapons.segments
+ 53/267 Test  #53: weapons.segments ..................   Passed    0.03 sec
+        Start  54: weapons.firing
+ 54/267 Test  #54: weapons.firing ....................   Passed    0.03 sec
+        Start  55: weapons.melee
+ 55/267 Test  #55: weapons.melee .....................   Passed    0.03 sec
+        Start  56: weapons.damage
+ 56/267 Test  #56: weapons.damage ....................   Passed    0.03 sec
+        Start  57: weapons.animation
+ 57/267 Test  #57: weapons.animation .................   Passed    0.24 sec
+        Start  58: weapons.lifetime
+ 58/267 Test  #58: weapons.lifetime ..................   Passed    0.05 sec
+        Start  59: weapons.rollback
+ 59/267 Test  #59: weapons.rollback ..................   Passed    0.04 sec
+        Start  60: weapons.private
+ 60/267 Test  #60: weapons.private ...................   Passed   75.13 sec
+        Start  61: movement.walking
+ 61/267 Test  #61: movement.walking ..................   Passed    0.18 sec
+        Start  62: movement.jumping
+ 62/267 Test  #62: movement.jumping ..................   Passed    0.08 sec
+        Start  63: movement.collisions
+ 63/267 Test  #63: movement.collisions ...............   Passed    0.14 sec
+        Start  64: movement.world_collision
+ 64/267 Test  #64: movement.world_collision ..........   Passed    0.26 sec
+        Start  65: movement.support
+ 65/267 Test  #65: movement.support ..................   Passed    0.08 sec
+        Start  66: movement.boundaries
+ 66/267 Test  #66: movement.boundaries ...............   Passed    0.05 sec
+        Start  67: movement.timing
+ 67/267 Test  #67: movement.timing ...................   Passed    0.17 sec
+        Start  68: movement.lifetime
+ 68/267 Test  #68: movement.lifetime .................   Passed    0.04 sec
+        Start  69: movement.controls
+ 69/267 Test  #69: movement.controls .................   Passed    0.01 sec
+        Start  70: movement.private
+ 70/267 Test  #70: movement.private ..................   Passed   33.61 sec
+        Start  71: locomotion.stairs
+ 71/267 Test  #71: locomotion.stairs .................   Passed    0.08 sec
+        Start  72: locomotion.world_stairs
+ 72/267 Test  #72: locomotion.world_stairs ...........   Passed    0.10 sec
+        Start  73: locomotion.limits
+ 73/267 Test  #73: locomotion.limits .................   Passed    0.26 sec
+        Start  74: locomotion.crouch
+ 74/267 Test  #74: locomotion.crouch .................   Passed    0.18 sec
+        Start  75: locomotion.animations
+ 75/267 Test  #75: locomotion.animations .............   Passed    0.09 sec
+        Start  76: locomotion.lifetime
+ 76/267 Test  #76: locomotion.lifetime ...............   Passed    0.04 sec
+        Start  77: locomotion.contacts
+ 77/267 Test  #77: locomotion.contacts ...............   Passed    0.10 sec
+        Start  78: locomotion.private
+ 78/267 Test  #78: locomotion.private ................   Passed   11.76 sec
+        Start  79: containers.geometry
+ 79/267 Test  #79: containers.geometry ...............   Passed    0.02 sec
+        Start  80: containers.concave
+ 80/267 Test  #80: containers.concave ................   Passed    0.02 sec
+        Start  81: containers.membership
+ 81/267 Test  #81: containers.membership .............   Passed    0.04 sec
+        Start  82: containers.lifetime
+ 82/267 Test  #82: containers.lifetime ...............   Passed    0.03 sec
+        Start  83: containers.physics
+ 83/267 Test  #83: containers.physics ................   Passed    0.02 sec
+        Start  84: containers.swimming
+ 84/267 Test  #84: containers.swimming ...............   Passed    0.08 sec
+        Start  85: containers.surface
+ 85/267 Test  #85: containers.surface ................   Passed    0.03 sec
+        Start  86: containers.ladders
+ 86/267 Test  #86: containers.ladders ................   Passed    0.09 sec
+        Start  87: containers.air_damage
+ 87/267 Test  #87: containers.air_damage .............   Passed    0.03 sec
+        Start  88: containers.specialized_defaults
+ 88/267 Test  #88: containers.specialized_defaults ...   Passed    0.03 sec
+        Start  89: containers.conveyor_motion
+ 89/267 Test  #89: containers.conveyor_motion ........   Passed    0.06 sec
+        Start  90: containers.conveyor_bodies
+ 90/267 Test  #90: containers.conveyor_bodies ........   Passed    0.02 sec
+        Start  91: containers.specialized_damage
+ 91/267 Test  #91: containers.specialized_damage .....   Passed    0.03 sec
+        Start  92: containers.freefall_motion
+ 92/267 Test  #92: containers.freefall_motion ........   Passed    0.07 sec
+        Start  93: containers.specialized_private
+ 93/267 Test  #93: containers.specialized_private ....   Passed   16.50 sec
+        Start  94: containers.private
+ 94/267 Test  #94: containers.private ................   Passed   14.47 sec
+        Start  95: doors.state
+ 95/267 Test  #95: doors.state .......................   Passed    0.03 sec
+        Start  96: doors.options
+ 96/267 Test  #96: doors.options .....................   Passed    0.03 sec
+        Start  97: doors.geometry
+ 97/267 Test  #97: doors.geometry ....................   Passed    0.03 sec
+        Start  98: doors.pushing
+ 98/267 Test  #98: doors.pushing .....................   Passed    0.02 sec
+        Start  99: doors.riders
+ 99/267 Test  #99: doors.riders ......................   Passed    0.06 sec
+        Start 100: doors.lifetime
+100/267 Test #100: doors.lifetime ....................   Passed    0.02 sec
+        Start 101: doors.catalog
+101/267 Test #101: doors.catalog .....................   Passed   32.02 sec
+        Start 102: doors.private
+102/267 Test #102: doors.private .....................   Passed    3.03 sec
+        Start 103: triggers.schedule
+103/267 Test #103: triggers.schedule .................   Passed    0.03 sec
+        Start 104: triggers.toggle
+104/267 Test #104: triggers.toggle ...................   Passed    0.03 sec
+        Start 105: triggers.filters
+105/267 Test #105: triggers.filters ..................   Passed    0.03 sec
+        Start 106: triggers.keys
+106/267 Test #106: triggers.keys .....................   Passed    0.04 sec
+        Start 107: triggers.doors
+107/267 Test #107: triggers.doors ....................   Passed    0.10 sec
+        Start 108: triggers.touch
+108/267 Test #108: triggers.touch ....................   Passed    0.03 sec
+        Start 109: triggers.lifetime
+109/267 Test #109: triggers.lifetime .................   Passed    0.03 sec
+        Start 110: triggers.protocol
+110/267 Test #110: triggers.protocol .................   Passed    0.03 sec
+        Start 111: triggers.private
+111/267 Test #111: triggers.private ..................   Passed    4.56 sec
+        Start 112: triggers.catalog
+112/267 Test #112: triggers.catalog ..................   Passed   31.72 sec
+        Start 113: interaction.use
+113/267 Test #113: interaction.use ...................   Passed    0.03 sec
+        Start 114: interaction.input
+114/267 Test #114: interaction.input .................   Passed    0.03 sec
+        Start 115: interaction.keys
+115/267 Test #115: interaction.keys ..................   Passed    0.12 sec
+        Start 116: interaction.state
+116/267 Test #116: interaction.state .................   Passed    0.08 sec
+        Start 117: interaction.geometry
+117/267 Test #117: interaction.geometry ..............   Passed    0.06 sec
+        Start 118: interaction.transport
+118/267 Test #118: interaction.transport .............   Passed    0.04 sec
+        Start 119: interaction.blocking
+119/267 Test #119: interaction.blocking ..............   Passed    0.03 sec
+        Start 120: interaction.lifetime
+120/267 Test #120: interaction.lifetime ..............   Passed    0.03 sec
+        Start 121: interaction.player_push
+121/267 Test #121: interaction.player_push ...........   Passed    0.03 sec
+        Start 122: interaction.catalog
+122/267 Test #122: interaction.catalog ...............   Passed   32.34 sec
+        Start 123: brushes.state
+123/267 Test #123: brushes.state .....................   Passed    0.03 sec
+        Start 124: brushes.spin
+124/267 Test #124: brushes.spin ......................   Passed    0.03 sec
+        Start 125: brushes.geometry
+125/267 Test #125: brushes.geometry ..................   Passed    0.03 sec
+        Start 126: brushes.limits
+126/267 Test #126: brushes.limits ....................   Passed    0.03 sec
+        Start 127: brushes.transport
+127/267 Test #127: brushes.transport .................   Passed    0.03 sec
+        Start 128: brushes.destruction
+128/267 Test #128: brushes.destruction ...............   Passed    0.03 sec
+        Start 129: brushes.lifetime
+129/267 Test #129: brushes.lifetime ..................   Passed    0.03 sec
+        Start 130: brushes.catalog
+130/267 Test #130: brushes.catalog ...................   Passed   39.10 sec
+        Start 131: explosions.properties
+131/267 Test #131: explosions.properties .............   Passed    0.03 sec
+        Start 132: explosions.requests
+132/267 Test #132: explosions.requests ...............   Passed    0.03 sec
+        Start 133: explosions.radius
+133/267 Test #133: explosions.radius .................   Passed    0.02 sec
+        Start 134: explosions.chain
+134/267 Test #134: explosions.chain ..................   Passed    0.03 sec
+        Start 135: explosions.gates
+135/267 Test #135: explosions.gates ..................   Passed    0.02 sec
+        Start 136: explosions.lifetime
+136/267 Test #136: explosions.lifetime ...............   Passed    0.02 sec
+        Start 137: explosions.limits
+137/267 Test #137: explosions.limits .................   Passed    0.02 sec
+        Start 138: explosions.player
+138/267 Test #138: explosions.player .................   Passed    0.03 sec
+        Start 139: pushables.properties
+139/267 Test #139: pushables.properties ..............   Passed    0.03 sec
+        Start 140: pushables.gravity
+140/267 Test #140: pushables.gravity .................   Passed    0.03 sec
+        Start 141: pushables.friction
+141/267 Test #141: pushables.friction ................   Passed    0.03 sec
+        Start 142: pushables.impulses
+142/267 Test #142: pushables.impulses ................   Passed    0.03 sec
+        Start 143: pushables.pushing
+143/267 Test #143: pushables.pushing .................   Passed    0.03 sec
+        Start 144: pushables.player
+144/267 Test #144: pushables.player ..................   Passed    0.12 sec
+        Start 145: pushables.riders
+145/267 Test #145: pushables.riders ..................   Passed    0.05 sec
+        Start 146: pushables.contacts
+146/267 Test #146: pushables.contacts ................   Passed    0.02 sec
+        Start 147: pushables.collision
+147/267 Test #147: pushables.collision ...............   Passed    0.03 sec
+        Start 148: pushables.containers
+148/267 Test #148: pushables.containers ..............   Passed    0.03 sec
+        Start 149: pickups.defaults
+149/267 Test #149: pickups.defaults ..................   Passed    0.09 sec
+        Start 150: pickups.ammunition
+150/267 Test #150: pickups.ammunition ................   Passed    0.08 sec
+        Start 151: pickups.statistics
+151/267 Test #151: pickups.statistics ................   Passed    0.07 sec
+        Start 152: pickups.protocol
+152/267 Test #152: pickups.protocol ..................   Passed    0.06 sec
+        Start 153: pickups.contact
+153/267 Test #153: pickups.contact ...................   Passed    0.06 sec
+        Start 154: pickups.spawning
+154/267 Test #154: pickups.spawning ..................   Passed    0.06 sec
+        Start 155: pickups.rejection
+155/267 Test #155: pickups.rejection .................   Passed    0.07 sec
+        Start 156: pickups.callbacks
+156/267 Test #156: pickups.callbacks .................   Passed    0.06 sec
+        Start 157: pickups.resources
+157/267 Test #157: pickups.resources .................   Passed    0.07 sec
+        Start 158: pickups.catalog
+158/267 Test #158: pickups.catalog ...................   Passed   13.87 sec
+        Start 159: objectives.strings
+159/267 Test #159: objectives.strings ................   Passed    0.01 sec
+        Start 160: objectives.malformed
+160/267 Test #160: objectives.malformed ..............   Passed    0.02 sec
+        Start 161: objectives.defaults
+161/267 Test #161: objectives.defaults ...............   Passed    0.03 sec
+        Start 162: objectives.localized
+162/267 Test #162: objectives.localized ..............   Passed    0.04 sec
+        Start 163: objectives.missing
+163/267 Test #163: objectives.missing ................   Passed    0.03 sec
+        Start 164: objectives.queue
+164/267 Test #164: objectives.queue ..................   Passed    0.03 sec
+        Start 165: objectives.catalog
+165/267 Test #165: objectives.catalog ................   Passed   12.83 sec
+        Start 166: cameras.defaults
+166/267 Test #166: cameras.defaults ..................   Passed    0.02 sec
+        Start 167: cameras.timing
+167/267 Test #167: cameras.timing ....................   Passed    0.02 sec
+        Start 168: cameras.links
+168/267 Test #168: cameras.links .....................   Passed    0.02 sec
+        Start 169: cameras.selection
+169/267 Test #169: cameras.selection .................   Passed    0.02 sec
+        Start 170: cameras.player
+170/267 Test #170: cameras.player ....................   Passed    0.13 sec
+        Start 171: cameras.validation
+171/267 Test #171: cameras.validation ................   Passed    0.01 sec
+        Start 172: cameras.catalog
+172/267 Test #172: cameras.catalog ...................   Passed   20.97 sec
+        Start 173: keyframes.defaults
+173/267 Test #173: keyframes.defaults ................   Passed    0.02 sec
+        Start 174: keyframes.timeline
+174/267 Test #174: keyframes.timeline ................   Passed    0.03 sec
+        Start 175: keyframes.looping
+175/267 Test #175: keyframes.looping .................   Passed    0.03 sec
+        Start 176: keyframes.rotation
+176/267 Test #176: keyframes.rotation ................   Passed    0.02 sec
+        Start 177: keyframes.events
+177/267 Test #177: keyframes.events ..................   Passed    0.02 sec
+        Start 178: keyframes.reentrant
+178/267 Test #178: keyframes.reentrant ...............   Passed    0.02 sec
+        Start 179: keyframes.validation
+179/267 Test #179: keyframes.validation ..............   Passed    0.02 sec
+        Start 180: keyframes.limits
+180/267 Test #180: keyframes.limits ..................   Passed    0.74 sec
+        Start 181: keyframes.collision
+181/267 Test #181: keyframes.collision ...............   Passed    0.02 sec
+        Start 182: keyframes.catalog
+182/267 Test #182: keyframes.catalog .................   Passed   30.10 sec
+        Start 183: lights.defaults
+183/267 Test #183: lights.defaults ...................   Passed    0.02 sec
+        Start 184: lights.waves
+184/267 Test #184: lights.waves ......................   Passed    0.01 sec
+        Start 185: lights.commands
+185/267 Test #185: lights.commands ...................   Passed    0.02 sec
+        Start 186: lights.lifetime
+186/267 Test #186: lights.lifetime ...................   Passed    0.02 sec
+        Start 187: lights.damage
+187/267 Test #187: lights.damage .....................   Passed    0.06 sec
+        Start 188: lights.validation
+188/267 Test #188: lights.validation .................   Passed    0.02 sec
+        Start 189: lights.motion
+189/267 Test #189: lights.motion .....................   Passed    0.03 sec
+        Start 190: lights.teardown
+190/267 Test #190: lights.teardown ...................   Passed    0.02 sec
+        Start 191: lights.catalog
+191/267 Test #191: lights.catalog ....................   Passed   14.03 sec
+        Start 192: worldpaths.translation
+192/267 Test #192: worldpaths.translation ............   Passed    0.02 sec
+        Start 193: worldpaths.world_block
+193/267 Test #193: worldpaths.world_block ............   Passed    0.02 sec
+        Start 194: worldpaths.riders
+194/267 Test #194: worldpaths.riders .................   Passed    0.02 sec
+        Start 195: worldpaths.push_block
+195/267 Test #195: worldpaths.push_block .............   Passed    0.03 sec
+        Start 196: worldpaths.lifetime
+196/267 Test #196: worldpaths.lifetime ...............   Passed    0.02 sec
+        Start 197: worldpaths.validation
+197/267 Test #197: worldpaths.validation .............   Passed    0.03 sec
+        Start 198: worldpaths.player
+198/267 Test #198: worldpaths.player .................   Passed    0.03 sec
+        Start 199: worldpaths.timeline
+199/267 Test #199: worldpaths.timeline ...............   Passed    0.03 sec
+        Start 200: worldpaths.subway
+200/267 Test #200: worldpaths.subway .................   Passed   10.25 sec
+        Start 201: cinematics.decode
+201/267 Test #201: cinematics.decode .................   Passed    0.02 sec
+        Start 202: cinematics.mixer
+202/267 Test #202: cinematics.mixer ..................   Passed    0.03 sec
+        Start 203: cinematics.spatial
+203/267 Test #203: cinematics.spatial ................   Passed    0.03 sec
+        Start 204: cinematics.sequence
+204/267 Test #204: cinematics.sequence ...............   Passed    0.03 sec
+        Start 205: cinematics.lifetime
+205/267 Test #205: cinematics.lifetime ...............   Passed    0.03 sec
+        Start 206: cinematics.failures
+206/267 Test #206: cinematics.failures ...............   Passed    0.03 sec
+        Start 207: cinematics.device
+207/267 Test #207: cinematics.device .................   Passed    0.09 sec
+        Start 208: cinematics.catalog
+208/267 Test #208: cinematics.catalog ................   Passed   12.05 sec
+        Start 209: cinematics.subway
+209/267 Test #209: cinematics.subway .................   Passed    2.77 sec
+        Start 210: randomsound.defaults
+210/267 Test #210: randomsound.defaults ..............   Passed    0.03 sec
+        Start 211: randomsound.commands
+211/267 Test #211: randomsound.commands ..............   Passed    0.03 sec
+        Start 212: randomsound.sequence
+212/267 Test #212: randomsound.sequence ..............   Passed    0.03 sec
+        Start 213: randomsound.random
+213/267 Test #213: randomsound.random ................   Passed    0.04 sec
+        Start 214: randomsound.spatial
+214/267 Test #214: randomsound.spatial ...............   Passed    0.03 sec
+        Start 215: randomsound.lifetime
+215/267 Test #215: randomsound.lifetime ..............   Passed    0.03 sec
+        Start 216: randomsound.failures
+216/267 Test #216: randomsound.failures ..............   Passed    0.03 sec
+        Start 217: randomsound.catalog
+217/267 Test #217: randomsound.catalog ...............   Passed   12.16 sec
+        Start 218: randomsound.subway
+218/267 Test #218: randomsound.subway ................   Passed    2.47 sec
+        Start 219: sound.defaults
+219/267 Test #219: sound.defaults ....................   Passed    0.03 sec
+        Start 220: sound.loops
+220/267 Test #220: sound.loops .......................   Passed    0.04 sec
+        Start 221: sound.resampling
+221/267 Test #221: sound.resampling ..................   Passed    0.03 sec
+        Start 222: sound.lifetime
+222/267 Test #222: sound.lifetime ....................   Passed    0.03 sec
+        Start 223: sound.failures
+223/267 Test #223: sound.failures ....................   Passed    0.03 sec
+        Start 224: sound.metadata
+224/267 Test #224: sound.metadata ....................   Passed    0.03 sec
+        Start 225: sound.catalog
+225/267 Test #225: sound.catalog .....................   Passed   12.27 sec
+        Start 226: sound.subway
+226/267 Test #226: sound.subway ......................   Passed    2.32 sec
+        Start 227: sprites.reader
+227/267 Test #227: sprites.reader ....................   Passed    0.05 sec
+        Start 228: sprites.clock
+228/267 Test #228: sprites.clock .....................   Passed    0.01 sec
+        Start 229: sprites.properties
+229/267 Test #229: sprites.properties ................   Passed    0.02 sec
+        Start 230: sprites.placement
+230/267 Test #230: sprites.placement .................   Passed    0.03 sec
+        Start 231: sprites.ray
+231/267 Test #231: sprites.ray .......................   Passed    0.02 sec
+        Start 232: sprites.failures
+232/267 Test #232: sprites.failures ..................   Passed    0.03 sec
+        Start 233: sprites.catalog
+233/267 Test #233: sprites.catalog ...................   Passed   31.29 sec
+        Start 234: sprites.subway
+234/267 Test #234: sprites.subway ....................   Passed    2.35 sec
+        Start 235: sceneexplosion.properties
+235/267 Test #235: sceneexplosion.properties .........   Passed    0.03 sec
+        Start 236: sceneexplosion.commands
+236/267 Test #236: sceneexplosion.commands ...........   Passed    0.03 sec
+        Start 237: sceneexplosion.damage
+237/267 Test #237: sceneexplosion.damage .............   Passed    0.03 sec
+        Start 238: sceneexplosion.lifetime
+238/267 Test #238: sceneexplosion.lifetime ...........   Passed    0.03 sec
+        Start 239: sceneexplosion.failures
+239/267 Test #239: sceneexplosion.failures ...........   Passed    0.03 sec
+        Start 240: sceneexplosion.budget
+240/267 Test #240: sceneexplosion.budget .............   Passed    0.04 sec
+        Start 241: sceneexplosion.catalog
+241/267 Test #241: sceneexplosion.catalog ............   Passed   11.85 sec
+        Start 242: sceneexplosion.subway
+242/267 Test #242: sceneexplosion.subway .............   Passed    2.48 sec
+        Start 243: character.mappings
+243/267 Test #243: character.mappings ................   Passed    0.02 sec
+        Start 244: character.humiliation
+244/267 Test #244: character.humiliation .............   Passed    0.02 sec
+        Start 245: character.force
+245/267 Test #245: character.force ...................   Passed    0.02 sec
+        Start 246: character.transforms
+246/267 Test #246: character.transforms ..............   Passed    0.02 sec
+        Start 247: character.rejection
+247/267 Test #247: character.rejection ...............   Passed    0.02 sec
+        Start 248: character.spheres
+248/267 Test #248: character.spheres .................   Passed    0.02 sec
+        Start 249: character.catalog
+249/267 Test #249: character.catalog .................   Passed    1.09 sec
+        Start 250: character.player
+250/267 Test #250: character.player ..................   Passed   19.52 sec
+        Start 251: character_audio.paths
+251/267 Test #251: character_audio.paths .............   Passed    0.01 sec
+        Start 252: character_audio.voices
+252/267 Test #252: character_audio.voices ............   Passed    0.04 sec
+        Start 253: character_audio.lifetime
+253/267 Test #253: character_audio.lifetime ..........   Passed    0.04 sec
+        Start 254: character_audio.rejection
+254/267 Test #254: character_audio.rejection .........   Passed    0.04 sec
+        Start 255: character_audio.player
+255/267 Test #255: character_audio.player ............   Passed    0.05 sec
+        Start 256: character_audio.callbacks
+256/267 Test #256: character_audio.callbacks .........   Passed    0.05 sec
+        Start 257: character_audio.footsteps
+257/267 Test #257: character_audio.footsteps .........   Passed    0.05 sec
+        Start 258: character_audio.surfaces
+258/267 Test #258: character_audio.surfaces ..........   Passed    0.05 sec
+        Start 259: character_audio.catalog
+259/267 Test #259: character_audio.catalog ...........   Passed    1.46 sec
+        Start 260: character_audio.subway
+260/267 Test #260: character_audio.subway ............   Passed   22.75 sec
+        Start 261: character_motion.lookup
+261/267 Test #261: character_motion.lookup ...........   Passed    0.01 sec
+        Start 262: character_motion.motion
+262/267 Test #262: character_motion.motion ...........   Passed    0.01 sec
+        Start 263: character_motion.rejection
+263/267 Test #263: character_motion.rejection ........   Passed    0.02 sec
+        Start 264: character_motion.collision
+264/267 Test #264: character_motion.collision ........   Passed    0.02 sec
+        Start 265: character_motion.callbacks
+265/267 Test #265: character_motion.callbacks ........   Passed    0.02 sec
+        Start 266: character_motion.player
+266/267 Test #266: character_motion.player ...........   Passed    0.03 sec
+        Start 267: character_motion.catalog
+267/267 Test #267: character_motion.catalog ..........   Passed    0.98 sec
+
+100% tests passed, 0 tests failed out of 267
+
+Label Time Summary:
+brushes             =  39.30 sec*proc (8 tests)
+cameras             =  21.18 sec*proc (7 tests)
+character           =  20.71 sec*proc (8 tests)
+character_audio     =  24.53 sec*proc (10 tests)
+character_motion    =   1.08 sec*proc (7 tests)
+cinematics          =  15.09 sec*proc (9 tests)
+cli                 =   0.11 sec*proc (5 tests)
+config              =   0.06 sec*proc (6 tests)
+containers          =  31.54 sec*proc (16 tests)
+doors               =  35.25 sec*proc (8 tests)
+explosions          =   0.21 sec*proc (8 tests)
+headless            = 564.75 sec*proc (267 tests)
+interaction         =  32.79 sec*proc (10 tests)
+keyframes           =  31.03 sec*proc (10 tests)
+lights              =  14.22 sec*proc (9 tests)
+locomotion          =  12.62 sec*proc (8 tests)
+movement            =  34.62 sec*proc (10 tests)
+objectives          =  13.00 sec*proc (7 tests)
+objects             =   0.22 sec*proc (11 tests)
+pickups             =  14.50 sec*proc (10 tests)
+player              =   7.61 sec*proc (6 tests)
+private             = 554.83 sec*proc (37 tests)
+pushables           =   0.39 sec*proc (10 tests)
+randomsound         =  14.84 sec*proc (9 tests)
+sceneexplosion      =  14.51 sec*proc (8 tests)
+services            =   7.25 sec*proc (8 tests)
+sound               =  14.77 sec*proc (8 tests)
+sprites             =  33.80 sec*proc (8 tests)
+triggers            =  36.60 sec*proc (10 tests)
+weapons             =  75.60 sec*proc (9 tests)
+world               =   6.84 sec*proc (14 tests)
+worldpaths          =  10.46 sec*proc (9 tests)
+
+Total Test time (real) = 564.80 sec

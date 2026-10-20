@@ -1,0 +1,1640 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 8b337d3..35b5f78 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -584,3 +584,5 @@ The [original smell-trail continuation](../Documentation/Implementation/M2_AI_SM
+ 
+ 
+ The [original blood-pool continuation](../Documentation/Implementation/M2_BLOOD_SPLATS.md) connects CClientSplatFX/CBloodSplatFX with corpse ground-hit publication, persistent oriented sprites and inspection. Read [contracts](docs/BLOOD_SPLAT_CONTRACTS.md). Preserve eleven-existing-neighbor reuse, nearest-prefix/tie order, state-preserving relocation, delta-squared growth, uncapped Term clocks and detached lifetime. Blood spurts/gib impact callers, shared-list eviction and the actual M2 gate remain incomplete.
++
++The [blood-spurt continuation](../Documentation/Implementation/M2_BLOOD_SPURTS.md) connects original vector-weapon entry/exit jets, fragment launch jets and impact marks, and deferred limb impact requests. Read [contracts](docs/BLOOD_SPURT_CONTRACTS.md). Preserve random-before-damage selection, raw visual damage, emission-before-motion, separate particle/emitter gravity, strict fade, distinct splat thresholds and detached lifetime. Cosmetic child failures never cancel damage/removal. Separate flesh sparks, outside-world classification, shared SFX eviction, full save/restore and the actual M2 gate remain open. Earlier blanket blood-spurt/gib-impact omissions are superseded for this subset.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3729508..41bf89e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/blood_splats.cpp src/game/original/BloodSplatFX.cpp src/game/original/ClientSplatFX.cpp src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/blood_spurts.cpp src/game/original/ParticleExplosionFX.cpp src/game/blood_splats.cpp src/game/original/BloodSplatFX.cpp src/game/original/ClientSplatFX.cpp src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index 19a852b..be3ac38 100644
+--- a/README.md
++++ b/README.md
+@@ -623,3 +623,5 @@ The [corpse doorway correction](../Documentation/Implementation/M2_CORPSE_CLEARA
+ 
+ 
+ The [original blood-pool continuation](../Documentation/Implementation/M2_BLOOD_SPLATS.md) connects CClientSplatFX/CBloodSplatFX with corpse ground-hit publication, persistent oriented sprites and inspection. Read [contracts](docs/BLOOD_SPLAT_CONTRACTS.md). Preserve eleven-existing-neighbor reuse, nearest-prefix/tie order, state-preserving relocation, delta-squared growth, uncapped Term clocks and detached lifetime. Blood spurts/gib impact callers, shared-list eviction and the actual M2 gate remain incomplete.
++
++The [blood-spurt continuation](../Documentation/Implementation/M2_BLOOD_SPURTS.md) connects original vector-weapon entry/exit jets, fragment launch jets and impact marks, and deferred limb impact requests. Read [contracts](docs/BLOOD_SPURT_CONTRACTS.md). Preserve random-before-damage selection, raw visual damage, emission-before-motion, separate particle/emitter gravity, strict fade, distinct splat thresholds and detached lifetime. Cosmetic child failures never cancel damage/removal. Separate flesh sparks, outside-world classification, shared SFX eviction, full save/restore and the actual M2 gate remain open. Earlier blanket blood-spurt/gib-impact omissions are superseded for this subset.
+diff --git a/docs/BLOOD_SPLAT_CONTRACTS.md b/docs/BLOOD_SPLAT_CONTRACTS.md
+index 5d18536..e4d8203 100644
+--- a/docs/BLOOD_SPLAT_CONTRACTS.md
++++ b/docs/BLOOD_SPLAT_CONTRACTS.md
+@@ -87,3 +87,5 @@ position/scale, resource/frame and prepared-quad errors, including with hidden U
+ Blood-spurt particles, gib impact callers, generic/recursive gib templates, global
+ SFX-list eviction, complete save/restore and the remaining required M2 services
+ remain unavailable. This increment does not claim complete combat or M2 acceptance.
++
++The [blood-spurt continuation](BLOOD_SPURT_CONTRACTS.md) extends the selected original weapon/fragment/limb callers and impact splats. Earlier blanket omissions are historical; separate flesh sparks, generic debris and M2 remain incomplete.
+diff --git a/docs/BLOOD_SPURT_CONTRACTS.md b/docs/BLOOD_SPURT_CONTRACTS.md
+new file mode 100644
+index 0000000..c2104df
+--- /dev/null
++++ b/docs/BLOOD_SPURT_CONTRACTS.md
+@@ -0,0 +1,77 @@
++# Original blood spurts and debris impact contracts
++
++Scope: the selected flesh recipe of `CParticleExplosionFX`, original vector-weapon
++blood selection and two jets, `CGibFX` launch/impact callers, and `CGib`'s deferred
++impact request. Read [pool contracts](BLOOD_SPLAT_CONTRACTS.md),
++[death contracts](DEATH_EFFECT_CONTRACTS.md), and
++[weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md) before extending these paths.
++M2 remains incomplete.
++
++## Source rules
++
++- Flesh impact always draws the original integer range0..3, including damage >25. Request
++  blood when the draw is zero OR raw sampled damage >25. The inventory multiplier
++  does not scale the two visual recipes. Cosmetic failure never cancels damage.
++- Client impact audio precedes the two particle systems. Both share the selected
++  blooddrop texture (B2_LITE variants 1..3). The entry jet uses normal*30/50,
++  overwritten Y40/50 and X/Z spread20; the exit uses normal*(-2.5/-3)*damage,
++  Y+30/40 and the same spread. Reversed finite component endpoints are intentional.
++  Lifetimes/fade are 1/.5 and 1.2/.8 seconds. Each gets an immediate Update.
++- Each flesh fragment publishes a two-second/.5-fade jet at its initial position,
++  velocity*.6, with immediate Update. Its impact creates a .14+random(-.1,.1)
++  splat; growth .01 applies at normal.y >=.5. Position is the post-bounce point,
++  with the original .3-normal correction when opposing travel, without pool Y+.1.
++- A qualifying original CGib contact sets pending blood after reflection/damping.
++  The next Update consumes it using current position and velocity*.1, then the
++  client multiplies by .6. Decode does not immediately Update. Kicking alone does
++  not set pending blood. Only the existing flesh-limb subset is supported.
++- One non-bouncing half-gravity emitter creates six interpolated samples, two
++  particles each, BEFORE moving. Jitter is +/-.5; drift is (0,-10..-5,0); color
++  is 128/255. Lifetimes are 10 + sample*(time since emission)/6. Particle gravity
++  is -100; emitter gravity is -200 normally, -100 when initialized in liquid.
++  Contents are sampled once, using the first container including hidden ones.
++- Emitters integrate old velocity before gravity, reflect/damp .35 or .20 and
++  stop emitting on the first primary-world impact. Existing drops continue fading.
++  Their smaller splat is .05+random(-.05,.05), growing only at normal.y >.5.
++  Sound radius300 chooses gib_impact0..3.wav; a missing zero is not remapped.
++  Sound and splat failures are separate. Shared normal/normal alignment is reused.
++- First Update starts the effect clock. Fade begins strictly after fade_time;
++  exact end time remains alive at alpha zero; strictly later removes it. Initial
++  zero elapsed updates emit but avoid invalid zero-length collision rays.
++
++## Ownership, inspection and bounds
++
++`BloodSpurts` owns values per session, without source/target pointers. Server
++publication checks the live source; explicit client publication has no server
++owner. Source death/removal cannot destroy detached drops or marks. World unload
++clears all effects and histories; IDs are never reused. Preparation and inspection
++never advance clocks. Reports retain ended/failed state and child-event identities.
++Sprites inspection shows current emitter pose, velocity, liquid state, particles,
++alpha, texture failures and history; weapons/limbs/fragments expose originating IDs.
++
++Limits: 128 systems, 2048 particles/system, 16384 total, 64 retained reports,
++source labels100 bytes, textures1..3 (zero requests client selection), finite
++physics vectors, lifetime (0,10], fade [0,lifetime), update delta [0,1]. Capacity
++failure is explicit, never silent eviction. A whole 12-drop burst is checked before
++insertion. Existing particles use the shared checked integrator. The .001-second
++schedule avoids a second update in the same publication frame.
++
++The original selection happens on the server; this integration deliberately uses
++its existing per-weapon cosmetic stream for that draw. New visual availability
++must not perturb established AI/damage randomness. Probability, range and draw-before-
++damage-test order are preserved, not global/retail random ordering. Regression tests
++retain their existing authored combat and corpse-clearance assertions.
++
++The engine keeps portable per-component random streams, explicit values instead
++of packets/client handles, discrete primary-world ray collision and existing
++SDL_GPU billboard rasterization. These are documented adaptations, not retail
++bitwise parity. Textures are indexed at publication and decoded by presentation;
++missing/corrupt decode remains visible. No shader/dependency changes are required.
++
++## Still unavailable
++
++Separate flesh SparksFX, the generic particle-explosion/debris recipes,
++GetPointStatus outside-world classification, shared original SFX-list eviction,
++full save/restore and broader M2 acceptance remain open. Arterial spurt calls
++commented out in original corpse/player/living-AI code stay disabled. This
++continuation does not enable living-NPC limb loss or add collision to cosmetic FX.
+diff --git a/docs/DEATH_EFFECT_CONTRACTS.md b/docs/DEATH_EFFECT_CONTRACTS.md
+index a618cca..551a97d 100644
+--- a/docs/DEATH_EFFECT_CONTRACTS.md
++++ b/docs/DEATH_EFFECT_CONTRACTS.md
+@@ -137,3 +137,5 @@ cleanup. Inspection never advances simulation.
+ 
+ 
+ Continuation: [original corpse blood pools](BLOOD_SPLAT_CONTRACTS.md) supersedes the pool omission for corpse ground hits. Blood-spurt particles, gib impact callers, shared SFX eviction and other required services remain incomplete. The M2 exit gate is unchanged.
++
++The [blood-spurt continuation](BLOOD_SPURT_CONTRACTS.md) extends the selected original weapon/fragment/limb callers and impact splats. Earlier blanket omissions are historical; separate flesh sparks, generic debris and M2 remain incomplete.
+diff --git a/docs/M2_BLOOD_SPURT_SOURCES.json b/docs/M2_BLOOD_SPURT_SOURCES.json
+new file mode 100644
+index 0000000..aaa982b
+--- /dev/null
++++ b/docs/M2_BLOOD_SPURT_SOURCES.json
+@@ -0,0 +1,65 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "933a422252e4a9eb39c23aa6267535171c173670",
++  "status": "M2 incomplete; original blood spurts and debris impacts",
++  "references": [
++    {
++      "source": "sources/blood2/ClientShellDLL/ParticleExplosionFX.cpp",
++      "source_sha256": "68ba5c98212936d16d940834ea0d0f2967b189d338b612f48b96a55379a8f60f",
++      "purpose": "Emitter initialization, six-step emission, first collision, impact audio/splat and fade."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/ParticleExplosionFX.h",
++      "source_sha256": "2c3c36d00e6e9b528dac1ab84f45da1c72be83dbeb8c7711b70698682cf3f53f",
++      "purpose": "Original settings/defaults."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/client_physics.cpp",
++      "source_sha256": "a2d7fcae81f82df02406aa3b586897aff9c409e803e315f233fbe33e3d65de16",
++      "purpose": "Initial contents, half gravity, integration and bounce."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
++      "source_sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13",
++      "purpose": "Radius conversion and original random color."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/WeaponFX.cpp",
++      "source_sha256": "95230fcffd888751528e1a9f1d4353844ebfce5dbf5ef0a46cb0cf0a8a1b0e25",
++      "purpose": "Two entry/exit blood-spurt recipes and immediate callbacks."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Weapon.cpp",
++      "source_sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
++      "purpose": "Flesh selection, random-before-damage test and raw damage payload."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/gibfx.cpp",
++      "source_sha256": "4e448e2303e82eed903ae31a557a83963ea424f0c0a69406947ef5e6793858c5",
++      "purpose": "Launch spurt and larger impact splat."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Gib.cpp",
++      "source_sha256": "56af4e2090149c4f1deb9da33a6f64bc8f741f85b383723a766510bc13b85c0c",
++      "purpose": "Deferred blood request after qualified contact."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
++      "source_sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
++      "purpose": "Server gib decode and deferred particle update."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "purpose": "Normal and liquid client gravity."
++    }
++  ],
++  "adaptations": [
++    "Checked copied recipes and per-session values replace client object/packet ownership.",
++    "Portable independent client random streams are not retail global-random parity.",
++    "Primary-world ray/particle integration and existing SDL_GPU sprite presentation; no outside-world classification.",
++    "Explicit bounded systems/particles/reports and finite clocks; no silent shared-list eviction.",
++    "Source-independent particles and splats release on session unload; inspector is read-only.",
++    "Original server-side flesh chance uses the existing per-weapon cosmetic RNG in this integration; adding visuals must not perturb AI/damage RNG. Range/probability/order preserved, retail global stream not claimed."
++  ]
++}
+diff --git a/docs/WEAPON_IMPACT_CONTRACTS.md b/docs/WEAPON_IMPACT_CONTRACTS.md
+index 846bda8..27597ed 100644
+--- a/docs/WEAPON_IMPACT_CONTRACTS.md
++++ b/docs/WEAPON_IMPACT_CONTRACTS.md
+@@ -87,3 +87,5 @@ unavailable. Other weapons, retail parity, required world services, Gideon and s
+ NEW_LEVEL still keep the actual M2 exit gate open.
+ 
+ Continuation: [weapon impact flash/smoke](WEAPON_SPRITE_CONTRACTS.md) supersedes the earlier blanket impact-visual omission for wood/stone bullet sprites only. Other composite components and M2 remain open.
++
++The [blood-spurt continuation](BLOOD_SPURT_CONTRACTS.md) extends the selected original weapon/fragment/limb callers and impact splats. Earlier blanket omissions are historical; separate flesh sparks, generic debris and M2 remain incomplete.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index c7d514b..e82fcc5 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -1963,6 +1963,10 @@ namespace OpenBlood2
+                                 (unsigned long long)impact.effect.sprite_event);
+                     if (!impact.effect.sprite_error.empty())
+                         ImGui::TextWrapped("Visual failure: %s", impact.effect.sprite_error.c_str());
++                    ImGui::TextWrapped(
++                        "Blood roll %d / requested %d | events %llu, %llu | %s", impact.effect.blood_roll,
++                        impact.effect.blood_requested, (unsigned long long)impact.effect.blood_events[0],
++                        (unsigned long long)impact.effect.blood_events[1], impact.effect.blood_error.c_str());
+                     ImGui::Text("Impact hearing: %u deliveries / %s", impact.alert.delivered,
+                                 impact.alert.complete ? "complete" : "not completed");
+                     if (!impact.alert.error.empty())
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 8a2c2e3..2e93dd1 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -43,6 +43,7 @@ namespace OpenBlood2
+         bool select_sprites = false;
+         ObjectId sprite_selection{};
+         void draw_sprites(GameSession&, ObjectSelection&);
++        void draw_blood_spurts(const GameSession&);
+         void draw_blood_splats(const GameSession&);
+         void draw_weapon_sprites(const GameSession&);
+         bool select_world_sounds = false;
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 362a978..4fd67b8 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -30,9 +30,9 @@ namespace OpenBlood2
+     } // namespace
+     void Inspector::draw_skeleton(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextWrapped(
+-            "Original hit spheres at current ABC node poses. Initialized NPCs use them for hit "
+-            "localization. Burning corpses and dismemberment are integrated; blood-spurt/splat FX remain unavailable.");
++        ImGui::TextWrapped("Original hit spheres at current ABC node poses. Initialized NPCs use them for hit "
++                           "localization. Burning corpses and dismemberment are integrated; blood spurts and impact "
++                           "splats are inspected in Sprites.");
+         if (ImGui::CollapsingHeader("Original flesh fragments"))
+         {
+             const auto& fx = game.server.flesh_gibs;
+@@ -42,11 +42,15 @@ namespace OpenBlood2
+                                    report.source.c_str(), report.created, report.requested, report.scale,
+                                    report.error.c_str(), report.unavailable.c_str());
+             for (const auto& g : fx.active)
++            {
+                 ImGui::TextWrapped("#%llu %s | resting %d / liquid %d / impacts %llu | pos %.1f %.1f %.1f | speed %.1f "
+                                    "%.1f %.1f | %s %s",
+                                    (unsigned long long)g.id, g.model_path.c_str(), g.resting, g.liquid,
+                                    (unsigned long long)g.impacts, g.position.x, g.position.y, g.position.z,
+                                    g.velocity.x, g.velocity.y, g.velocity.z, g.error.c_str(), g.sound_error.c_str());
++                ImGui::TextWrapped("Spurt %llu / splat %llu | %s %s", (unsigned long long)g.spurt_event,
++                                   (unsigned long long)g.splat_event, g.spurt_error.c_str(), g.splat_error.c_str());
++            }
+         }
+         if (ImGui::CollapsingHeader("Live attachments"))
+         {
+@@ -138,6 +142,8 @@ namespace OpenBlood2
+                         gib->damage.m_fHitPoints, gib->kickable, (unsigned long long)gib->kicks,
+                         (unsigned long long)gib->impacts);
+             draw_placement(gib->placement);
++            ImGui::TextWrapped("Pending blood %d / spurt event %llu | %s", gib->add_blood_spurt,
++                               (unsigned long long)gib->spurt_event, gib->spurt_error.c_str());
+             ImGui::TextWrapped("%s %s", gib->error.c_str(), gib->sound_error.c_str());
+         }
+         if (const auto* player = character ? dynamic_cast<const CPlayerObj*>(character) : nullptr)
+diff --git a/src/app/inspector_sprites.cpp b/src/app/inspector_sprites.cpp
+index 0572d40..3349efe 100644
+--- a/src/app/inspector_sprites.cpp
++++ b/src/app/inspector_sprites.cpp
+@@ -9,6 +9,7 @@ namespace OpenBlood2
+         ImGui::TextWrapped("Original DetailSprite placement and SPR clock; decoded DTX alpha on world-depth quads. "
+                            "Rotatable sprites use their object pose; others face the camera. Unlit replacement "
+                            "presentation: glow, view bias, no-Z and sky modes remain unavailable.");
++        draw_blood_spurts(game);
+         draw_blood_splats(game);
+         draw_weapon_sprites(game);
+         if (sprite_view && sprite_render)
+@@ -206,7 +207,8 @@ namespace OpenBlood2
+         ImGui::Text("Active %zu | created %llu / reused %llu / expired %llu / failed %llu", effects.active.size(),
+                     (unsigned long long)effects.started, (unsigned long long)effects.reused,
+                     (unsigned long long)effects.expired, (unsigned long long)effects.failed);
+-        ImGui::TextWrapped("Detached rotatable sprites. Blood spurts, gib impact callers and general SFX-list eviction "
++        ImGui::TextWrapped("Detached rotatable sprites. Original blood spurts and gib impacts are connected; general "
++                           "SFX-list eviction "
+                            "remain unavailable.");
+         if (!effects.update_error.empty())
+             ImGui::TextWrapped("%s", effects.update_error.c_str());
+@@ -231,3 +233,49 @@ namespace OpenBlood2
+                                report.reused ? "moved existing" : "creation", report.error.c_str());
+     }
+ } // namespace OpenBlood2
++
++namespace OpenBlood2
++{
++    void Inspector::draw_blood_spurts(const GameSession& game)
++    {
++        if (!ImGui::CollapsingHeader("Original blood spurts"))
++            return;
++        const auto& effects = game.server.blood_spurts;
++        ImGui::Text("Systems %zu / 128 | drops %zu / 16384 | started %llu / ended %llu / failed %llu",
++                    effects.active.size(), effects.live_particles(), (unsigned long long)effects.started,
++                    (unsigned long long)effects.expired, (unsigned long long)effects.failed);
++        ImGui::TextWrapped("Six samples/two drops, half-gravity emitter, one impact then fade. Detached from actors. "
++                           "Outside-world classification and separate flesh sparks remain unavailable.");
++        ImGui::TextWrapped("%s", effects.update_error.c_str());
++        for (const auto& fx : effects.active)
++        {
++            ImGui::PushID(static_cast<int>(fx.id));
++            if (ImGui::TreeNode("Spurt", "#%llu %s", (unsigned long long)fx.id, fx.texture.c_str()))
++            {
++                ImGui::Text("Emitter %.2f %.2f %.2f | velocity %.2f %.2f %.2f", fx.position.x, fx.position.y,
++                            fx.position.z, fx.velocity.x, fx.velocity.y, fx.velocity.z);
++                ImGui::Text("Emitting %d / liquid %d | drops %zu | alpha %.3f | updates %llu", fx.emitting, fx.liquid,
++                            fx.particles.size(), fx.alpha, (unsigned long long)fx.updates);
++                ImGui::Text("Impact splat event %llu | lifetime %.2f / fade %.2f", (unsigned long long)fx.splat_event,
++                            fx.settings.lifetime, fx.settings.fade_time);
++                ImGui::TextWrapped("%s | %s | %s", fx.error.c_str(), fx.splat_error.c_str(), fx.sound_error.c_str());
++                if (sprite_view)
++                    for (const auto& entry : sprite_view->entries)
++                        if (entry.blood_spurt == fx.id && !entry.error.empty())
++                        {
++                            ImGui::TextWrapped("Texture: %s", entry.error.c_str());
++                            break;
++                        }
++                ImGui::TreePop();
++            }
++            ImGui::PopID();
++        }
++        for (const auto& r : effects.reports)
++            ImGui::TextWrapped("Event %llu %s -> #%llu | immediate %d / ended %d | drops %llu / impacts %llu / "
++                               "splat %llu | %s %s %s",
++                               (unsigned long long)r.id, r.source.c_str(), (unsigned long long)r.effect, r.immediate,
++                               r.ended, (unsigned long long)r.emitted, (unsigned long long)r.impacts,
++                               (unsigned long long)r.splat_event, r.error.c_str(), r.splat_error.c_str(),
++                               r.sound_error.c_str());
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/sprite_scene.cpp b/src/app/sprite_scene.cpp
+index 4f175a3..538075b 100644
+--- a/src/app/sprite_scene.cpp
++++ b/src/app/sprite_scene.cpp
+@@ -23,6 +23,16 @@ namespace OpenBlood2
+                 return false;
+             scene.entries.back().client_effect = fx.id;
+         }
++        for (const auto& fx : game.server.blood_spurts.active)
++            for (unsigned i = 0; i < fx.particles.size(); ++i)
++            {
++                const auto& p = fx.particles[i];
++                if (!scene.add_particle(fx.texture, vector_add(fx.settings.position, p.position), 200.f / 640, p.color,
++                                        fx.alpha, fx.id, i, game.resources, error))
++                    return false;
++                scene.entries.back().particle_system = 0;
++                scene.entries.back().blood_spurt = fx.id;
++            }
+         for (const auto& fx : game.server.blood_splats.active)
+         {
+             if (!scene.add(fx.sprite.get(), fx.track, {fx.position, fx.rotation}, fx.scale,
+diff --git a/src/engine/sprite_view.h b/src/engine/sprite_view.h
+index aa1f707..2506049 100644
+--- a/src/engine/sprite_view.h
++++ b/src/engine/sprite_view.h
+@@ -12,7 +12,7 @@ namespace OpenBlood2
+         bool visible = false, rotatable = false;
+         std::uint32_t range = UINT32_MAX;
+         float alpha = 1;
+-        std::uint64_t blood_splat = 0;
++        std::uint64_t blood_splat = 0, blood_spurt = 0;
+         std::uint64_t client_effect = 0, particle_system = 0, trail_system = 0, flame_system = 0, weapon_effect = 0,
+                       object_effect = 0, stream_system = 0;
+         unsigned particle_index = 0;
+diff --git a/src/game/blood_spurts.cpp b/src/game/blood_spurts.cpp
+new file mode 100644
+index 0000000..1768309
+--- /dev/null
++++ b/src/game/blood_spurts.cpp
+@@ -0,0 +1,114 @@
++#include "game/blood_spurts.h"
++#include "game/legacy/server_de.h"
++namespace OpenBlood2
++{
++    std::size_t BloodSpurts::live_particles() const
++    {
++        std::size_t count = 0;
++        for (const auto& fx : active)
++            count += fx.particles.size();
++        return count;
++    }
++    void BloodSpurts::record(const CParticleExplosionFX& fx, bool ended)
++    {
++        for (auto& r : reports)
++            if (r.id == fx.event)
++            {
++                r.emitted = fx.emitted;
++                r.impacts = fx.impacts;
++                r.splat_event = fx.splat_event;
++                r.error = fx.error;
++                r.splat_error = fx.splat_error;
++                r.sound_error = fx.sound_error;
++                r.ended = ended;
++                break;
++            }
++    }
++    std::uint64_t BloodSpurts::publish(const BloodSpurtSettings& s, std::string_view source, bool immediate,
++                                       const Resources& resources, ServerDE& server, double now, std::string& error)
++    {
++        error.clear();
++        if (source.size() > 100 || source.find('\0') != std::string_view::npos || next_event_ == UINT64_MAX)
++        {
++            error = "Invalid blood-spurt source/event";
++            return 0;
++        }
++        BloodSpurtReport r;
++        r.id = next_event_++;
++        r.settings = s;
++        r.source = source;
++        r.immediate = immediate;
++        CParticleExplosionFX fx;
++        const auto live = live_particles();
++        if (active.size() >= 128 || live > 16384 - 12 || next_id_ == UINT64_MAX)
++            error = "Blood-spurt capacity exhausted";
++        else if (fx.CreateObject(s, resources, server, now, random_, error))
++        {
++            fx.id = next_id_++;
++            fx.event = r.id;
++            r.effect = fx.id;
++            if (immediate && !fx.Update(now, server.GetFrameTime(), server, random_, 16384 - live))
++                error = fx.error;
++            if (error.empty())
++            {
++                active.push_back(std::move(fx));
++                ++started;
++            }
++        }
++        r.error = error;
++        if (!error.empty())
++        {
++            ++failed;
++            r.ended = true;
++        }
++        if (reports.size() == 64)
++            reports.erase(reports.begin());
++        const auto id = r.id;
++        reports.push_back(std::move(r));
++        if (error.empty())
++            record(active.back(), false);
++        return id;
++    }
++    bool BloodSpurts::advance(double now, ServerDE& server)
++    {
++        bool ok = true;
++        std::size_t total = live_particles();
++        for (std::size_t i = 0; i < active.size();)
++        {
++            auto& fx = active[i];
++            if (now >= fx.last_time && now < fx.next_update)
++            {
++                ++i;
++                continue;
++            }
++            const auto before = fx.particles.size();
++            bool alive = fx.Update(now, now - fx.last_time, server, random_, 16384 - total);
++            total = total - before + fx.particles.size();
++            record(fx, !alive);
++            if (alive)
++                ++i;
++            else
++            {
++                if (fx.error.empty())
++                    ++expired;
++                else
++                {
++                    update_error = fx.error;
++                    ++failed;
++                    ok = false;
++                }
++                total -= fx.particles.size();
++                active.erase(active.begin() + i);
++            }
++        }
++        return ok;
++    }
++    void BloodSpurts::clear()
++    {
++        active.clear();
++        reports.clear();
++        update_error.clear();
++        started = expired = failed = 0;
++        random_.seed(1); // IDs deliberately survive world changes.
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/blood_spurts.h b/src/game/blood_spurts.h
+new file mode 100644
+index 0000000..330c16e
+--- /dev/null
++++ b/src/game/blood_spurts.h
+@@ -0,0 +1,30 @@
++#pragma once
++#include "game/original/ParticleExplosionFX.h"
++namespace OpenBlood2
++{
++    struct BloodSpurtReport
++    {
++        std::uint64_t id = 0, effect = 0, emitted = 0, impacts = 0, splat_event = 0;
++        BloodSpurtSettings settings;
++        bool immediate = false, ended = false;
++        std::string source, error, splat_error, sound_error;
++    };
++    class BloodSpurts
++    {
++      public:
++        std::uint64_t publish(const BloodSpurtSettings&, std::string_view, bool, const Resources&, ServerDE&, double,
++                              std::string&);
++        bool advance(double, ServerDE&);
++        void clear();
++        std::size_t live_particles() const;
++        std::vector<CParticleExplosionFX> active;
++        std::vector<BloodSpurtReport> reports;
++        std::uint64_t started = 0, expired = 0, failed = 0;
++        std::string update_error;
++
++      private:
++        void record(const CParticleExplosionFX&, bool);
++        std::minstd_rand random_{1};
++        std::uint64_t next_id_ = 1, next_event_ = 1;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/flesh_gibs.cpp b/src/game/flesh_gibs.cpp
+index 4b4d27a..7f7b05b 100644
+--- a/src/game/flesh_gibs.cpp
++++ b/src/game/flesh_gibs.cpp
+@@ -2,6 +2,8 @@
+ #include "game/flesh_gibs.h"
+ #include "engine/collision.h"
+ #include "game/legacy/server_de.h"
++#include "game/original/BloodSplatFX.h"
++#include "game/original/ParticleExplosionFX.h"
+ #include <algorithm>
+ #include <cmath>
+ #include <numbers>
+@@ -111,6 +113,11 @@ namespace OpenBlood2
+                     break;
+                 }
+                 g.liquid = IsLiquid(code);
++                BloodSpurtSettings spurt;
++                spurt.position = g.position;
++                spurt.min_velocity = spurt.max_velocity = vector_scale(g.velocity, .6f);
++                spurt.texture = integer(random_, 1, 3);
++                g.spurt_event = server.PublishClientBloodSpurt(spurt, "flesh fragment launch", true, g.spurt_error);
+                 g.id = next_id_++;
+                 active.push_back(std::move(g));
+                 ++report.created;
+@@ -190,6 +197,15 @@ namespace OpenBlood2
+                 std::string sound_error;
+                 server.PlayClientSound(request, next, sound_error);
+                 g.sound_error = sound_error;
++                BloodSplatSettings splat;
++                splat.resource = "sprites/blood" + std::to_string(integer(random_, 1, 3)) + ".spr";
++                splat.position = next;
++                splat.scale = .14f + draw(random_, -.1f, .1f);
++                splat.grow_scale = hit.normal.y >= .5f ? .01f : 0;
++                if (align_rotation(hit.normal, hit.normal, splat.rotation))
++                    g.splat_event = server.PublishClientBloodSplat(splat, "flesh fragment impact", g.splat_error);
++                else
++                    g.splat_error = "Invalid flesh-fragment impact normal";
+                 g.angular_velocity = {draw(random_, -2 * std::numbers::pi_v<float>, 2 * std::numbers::pi_v<float>),
+                                       draw(random_, -2 * std::numbers::pi_v<float>, 2 * std::numbers::pi_v<float>), 0};
+             }
+diff --git a/src/game/flesh_gibs.h b/src/game/flesh_gibs.h
+index 2ebc408..6015c52 100644
+--- a/src/game/flesh_gibs.h
++++ b/src/game/flesh_gibs.h
+@@ -8,12 +8,12 @@ namespace OpenBlood2
+     // Selected original CGibFX flesh path. Client-only models never block gameplay.
+     struct FleshGib
+     {
+-        std::uint64_t id = 0, impacts = 0;
++        std::uint64_t id = 0, impacts = 0, spurt_event = 0, splat_event = 0;
+         std::shared_ptr<const Model> model;
+         AnimationTrack animation;
+         DVector position{}, velocity{}, scale{1, 1, 1}, angles{}, angular_velocity{};
+         DRotation rotation;
+-        std::string model_path, skin_path, sound_path, error, sound_error;
++        std::string model_path, skin_path, sound_path, error, sound_error, spurt_error, splat_error;
+         int bounces = 0;
+         bool resting = false, liquid = false;
+         double last_time = 0;
+@@ -25,7 +25,7 @@ namespace OpenBlood2
+         float scale = 1;
+         unsigned requested = 0, adjusted = 0, created = 0;
+         std::string source, error;
+-        std::string unavailable = "Original blood-spurt particles and impact splats are not rendered";
++        std::string unavailable = "Generic non-flesh debris and recursive templates remain unavailable";
+     };
+     class FleshGibs
+     {
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index d573a4e..c8b7c8b 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -34,6 +34,7 @@ class CSBase
+ namespace OpenBlood2
+ {
+     struct BloodSplatSettings;
++    struct BloodSpurtSettings;
+     struct WeaponSpriteSettings;
+     struct ParticleStreamSettings;
+     struct SkyDefinition;
+@@ -84,6 +85,11 @@ class ServerDE : public CSBase
+                                         unsigned failed = 0) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
+     virtual std::uint64_t PublishParticleStream(HOBJECT, const OpenBlood2::ParticleStreamSettings&, std::string&) = 0;
++    virtual std::uint64_t PublishClientBloodSplat(const OpenBlood2::BloodSplatSettings&, std::string_view,
++                                                  std::string&) = 0;
++    virtual std::uint64_t PublishClientBloodSpurt(const OpenBlood2::BloodSpurtSettings&, std::string_view, bool,
++                                                  std::string&) = 0;
++    virtual std::uint64_t PublishBloodSpurt(HOBJECT, const OpenBlood2::BloodSpurtSettings&, std::string&) = 0;
+     virtual std::uint64_t PublishBloodSplat(HOBJECT, const OpenBlood2::BloodSplatSettings&, std::string&) = 0;
+     virtual std::uint64_t PublishFleshGibs(HOBJECT, DVector, DVector, DVector, float, unsigned, std::string&) = 0;
+     virtual std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) = 0;
+diff --git a/src/game/original/Gib.cpp b/src/game/original/Gib.cpp
+index dc71d5a..f9c03b7 100644
+--- a/src/game/original/Gib.cpp
++++ b/src/game/original/Gib.cpp
+@@ -1,6 +1,7 @@
+ // Selected original AI_Shared.CPP / Gib.cpp. See DEATH_EFFECT_CONTRACTS.md.
+ #include "Gib.h"
+ #include "AI_Mgr.h"
++#include "ParticleExplosionFX.h"
+ #include "engine/collision.h"
+ #include "game/game_settings.h"
+ #include <cmath>
+@@ -172,7 +173,18 @@ bool CGib::Update()
+             axis = 3;
+         first_update = false;
+     }
+-    s->GetObjectPos(m_hObject, &last_position);
++    if (s->GetObjectPos(m_hObject, &last_position) != DE_OK)
++        return false;
++    if (add_blood_spurt)
++    {
++        OpenBlood2::BloodSpurtSettings spurt;
++        spurt.position = last_position;
++        // Server sends .1 * velocity; original client SFXMgr multiplies it by .6.
++        spurt.min_velocity = spurt.max_velocity = vector_scale(vector_scale(velocity, .1f), .6f);
++        spurt.texture = 0; // Client selection, independent of the server gameplay random stream.
++        spurt_event = s->PublishBloodSpurt(m_hObject, spurt, spurt_error);
++        add_blood_spurt = false;
++    }
+     const float dt = s->GetFrameTime();
+     rotate_time -= dt;
+     constexpr float pi = std::numbers::pi_v<float>;
+@@ -256,6 +268,7 @@ void CGib::Touch(HOBJECT other)
+     v = vector_scale(v, .5f);
+     s->SetVelocity(m_hObject, &v);
+     rotate_time = 1;
++    add_blood_spurt = true;
+     ++impacts;
+     s->SetNextUpdate(m_hObject, .01f);
+ }
+diff --git a/src/game/original/Gib.h b/src/game/original/Gib.h
+index 117b51e..9833103 100644
+--- a/src/game/original/Gib.h
++++ b/src/game/original/Gib.h
+@@ -12,10 +12,11 @@ class CGib : public B2BaseClass
+     int limb = -1, axis = 0, bounces = 0;
+     float rotate_time = 0, remove_time = 0;
+     DVector angles{}, angular_velocity{}, last_position{};
+-    std::uint64_t kicks = 0, impacts = 0;
++    std::uint64_t kicks = 0, impacts = 0, spurt_event = 0;
++    bool add_blood_spurt = false;
+     OpenBlood2::BodyPlacement placement;
+     CDestructable damage;
+-    std::string error, sound_error;
++    std::string error, sound_error, spurt_error;
+ 
+   protected:
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+diff --git a/src/game/original/ParticleExplosionFX.cpp b/src/game/original/ParticleExplosionFX.cpp
+new file mode 100644
+index 0000000..63fa0ae
+--- /dev/null
++++ b/src/game/original/ParticleExplosionFX.cpp
+@@ -0,0 +1,144 @@
++// Selected ClientShellDLL/ParticleExplosionFX.cpp and client_physics.cpp blood path.
++#include "ParticleExplosionFX.h"
++#include "BloodSplatFX.h"
++#include "engine/collision.h"
++#include "game/legacy/server_de.h"
++#include <cmath>
++using namespace OpenBlood2;
++namespace
++{
++    float draw(std::minstd_rand& r, float lo, float hi)
++    {
++        // Reversed finite velocity endpoints are intentional original recipes.
++        return lo + (hi - lo) * float(r() - r.min()) / float(r.max() - r.min());
++    }
++} // namespace
++bool CParticleExplosionFX::CreateObject(const BloodSpurtSettings& s, const Resources& resources, ServerDE& server,
++                                        double now, std::minstd_rand& rng, std::string& failure)
++{
++    failure.clear();
++    if (!physics_vector(s.position) || !physics_vector(s.min_velocity) || !physics_vector(s.max_velocity) ||
++        !std::isfinite(s.lifetime) || s.lifetime <= 0 || s.lifetime > 10 || !std::isfinite(s.fade_time) ||
++        s.fade_time < 0 || s.fade_time >= s.lifetime || s.texture > 3 || !std::isfinite(now) || now < 0)
++    {
++        failure = "Invalid blood-spurt recipe";
++        return false;
++    }
++    settings = s;
++    if (!settings.texture)
++        settings.texture = 1 + rng() % 3;
++    texture = "spritetextures/particles/blooddrop_" + std::to_string(settings.texture) + ".dtx";
++    if (!resources.find(texture))
++    {
++        failure = "Blood-drop texture not indexed: " + texture;
++        return false;
++    }
++    position = previous = s.position;
++    velocity = {draw(rng, s.min_velocity.x, s.max_velocity.x), draw(rng, s.min_velocity.y, s.max_velocity.y),
++                draw(rng, s.min_velocity.z, s.max_velocity.z)};
++    ContainerCode code = CC_NOTHING;
++    if (!server.GetPointContainerCode(position, code))
++    {
++        failure = "Blood-spurt contents query unavailable";
++        return false;
++    }
++    liquid = IsLiquid(code);
++    last_time = next_update = now;
++    return true;
++}
++bool CParticleExplosionFX::Update(double now, double dt, ServerDE& server, std::minstd_rand& rng, std::size_t available)
++{
++    if (!error.empty())
++        return false;
++    if (!std::isfinite(now) || now < last_time || !std::isfinite(dt) || dt < 0 || dt > 1)
++    {
++        error = "Invalid blood-spurt clock";
++        return false;
++    }
++    if (first_update)
++    {
++        start_time = last_emission = now;
++        first_update = false;
++    }
++    last_time = now;
++    next_update = now + .001;
++    ++updates;
++    if (now > start_time + settings.lifetime)
++        return false;
++    if (now > start_time + settings.fade_time)
++        alpha = float((start_time + settings.lifetime - now) / (settings.lifetime - settings.fade_time));
++    if (!advance_particles(particles, -100, dt, error))
++        return false;
++    if (!emitting)
++        return true;
++    if (particles.size() + 12 > 2048 || available < 12)
++    {
++        error = "Blood-spurt particle capacity exhausted";
++        return false;
++    }
++    // Original six samples, two drops each, BEFORE the emitter's current movement.
++    const auto delta = vector_scale(vector_subtract(position, previous), 1.f / 6);
++    auto point = vector_subtract(previous, settings.position);
++    const float life_step = float(now - last_emission) / 6;
++    for (int step = 0; step < 6; ++step)
++    {
++        for (int j = 0; j < 2; ++j)
++        {
++            Particle p;
++            p.velocity = {draw(rng, 0, 0), draw(rng, -10, -5), draw(rng, 0, 0)};
++            p.position = vector_add(point, {draw(rng, -.5f, .5f), draw(rng, -.5f, .5f), draw(rng, -.5f, .5f)});
++            const float gray = draw(rng, 128, 128) / 255.f;
++            p.color = {gray, gray, gray};
++            p.lifetime = 10 + step * life_step;
++            particles.push_back(p);
++        }
++        point = vector_add(point, delta);
++    }
++    emitted += 12;
++    last_emission = now;
++    if (vector_dot(velocity, velocity) < .01f)
++        velocity = {};
++    auto next = vector_add(position, vector_scale(velocity, float(dt)));
++    // HALFGRAVITY is applied AFTER InitMovingObject for this effect (.20, not .50).
++    velocity.y -= float(dt) * (liquid ? 100.f : 200.f);
++    SegmentHit hit;
++    const auto travel = vector_subtract(next, position);
++    auto result = vector_dot(travel, travel) < 1e-12f ? SegmentResult::Miss : server.CastWorldRay(position, next, hit);
++    if (result != SegmentResult::Miss && result != SegmentResult::Hit)
++    {
++        error = "Blood-spurt world collision unavailable";
++        return false;
++    }
++    if (result == SegmentResult::Hit)
++    {
++        const float dot = -2 * vector_dot(velocity, hit.normal);
++        velocity = vector_scale(vector_add(velocity, vector_scale(hit.normal, dot)), liquid ? .20f : .35f);
++        if (dot > 0)
++            next = vector_add(hit.point, vector_scale(hit.normal, .3f));
++        emitting = false; // Original bBounce=false, independent of the low-speed rest test.
++        ++impacts;
++        SoundRequest sound;
++        // Original B2_LITE GetRandom(0,NRES(5)) includes zero; do not alias a missing file.
++        sound.resource = "sounds/gibs/flesh/gib_impact" + std::to_string(rng() % 4) + ".wav";
++        sound.outer_radius = 300;
++        sound.inner_radius = 30;
++        server.PlayClientSound(sound, next, sound_error);
++        BloodSplatSettings splat;
++        splat.resource = "sprites/blood" + std::to_string(1 + rng() % 3) + ".spr";
++        splat.position = next;
++        splat.scale = .05f + draw(rng, -.05f, .05f);
++        splat.grow_scale = hit.normal.y > .5f ? .01f : 0;
++        if (align_rotation(hit.normal, hit.normal, splat.rotation))
++            splat_event = server.PublishClientBloodSplat(splat, "particle impact", splat_error);
++        else
++            splat_error = "Invalid blood-spurt impact normal";
++    }
++    if (!physics_vector(next) || !physics_vector(velocity))
++    {
++        error = "Blood-spurt motion exceeds bounds";
++        return false;
++    }
++    previous = position;
++    position = next;
++    return true;
++}
+diff --git a/src/game/original/ParticleExplosionFX.h b/src/game/original/ParticleExplosionFX.h
+new file mode 100644
+index 0000000..3c1a5f9
+--- /dev/null
++++ b/src/game/original/ParticleExplosionFX.h
+@@ -0,0 +1,30 @@
++#pragma once
++#include "engine/particles.h"
++#include "engine/resources.h"
++#include <random>
++class ServerDE;
++namespace OpenBlood2
++{
++    // The original flesh recipe only: one non-bouncing, half-gravity emitter.
++    struct BloodSpurtSettings
++    {
++        DVector position{}, min_velocity{}, max_velocity{};
++        float lifetime = 2, fade_time = .5f;
++        unsigned texture = 1;
++    };
++} // namespace OpenBlood2
++class CParticleExplosionFX
++{
++  public:
++    bool CreateObject(const OpenBlood2::BloodSpurtSettings&, const OpenBlood2::Resources&, ServerDE&, double,
++                      std::minstd_rand&, std::string&);
++    bool Update(double, double, ServerDE&, std::minstd_rand&, std::size_t);
++    OpenBlood2::BloodSpurtSettings settings;
++    std::vector<OpenBlood2::Particle> particles;
++    DVector position{}, previous{}, velocity{};
++    bool liquid = false, emitting = true, first_update = true;
++    float alpha = 1;
++    double start_time = 0, last_time = 0, last_emission = 0, next_update = 0;
++    std::uint64_t id = 0, event = 0, updates = 0, emitted = 0, impacts = 0, splat_event = 0;
++    std::string texture, error, splat_error, sound_error;
++};
+diff --git a/src/game/original/WeaponFX.cpp b/src/game/original/WeaponFX.cpp
+index a1e6f23..1bf7013 100644
+--- a/src/game/original/WeaponFX.cpp
++++ b/src/game/original/WeaponFX.cpp
+@@ -1,10 +1,12 @@
+ // Original WeaponFX.cpp PlayImpactSound (977-992), GetImpactSound (1104-1152).
+ #include "WeaponFX.h"
++#include "ParticleExplosionFX.h"
+ #include "engine/collision.h"
+ #include "game/original/Weapon.h"
+ #include "game/weapon_sprites.h"
+ #include "server_de.h"
+ #include <cmath>
++using namespace OpenBlood2;
+ std::string CWeaponFX::GetImpactSound(std::minstd_rand& random) const
+ {
+     const char* material = nullptr;
+@@ -110,3 +112,66 @@ bool CWeaponFX::CreateSprites(ServerDE& server, HOBJECT source, DVector normal,
+     sprite_event = server.PublishWeaponSprites(source, settings, sprite_error);
+     return sprite_event && sprite_error.empty();
+ }
++
++// Original Weapon::UpdateWeaponFX and CWeaponFX::CreateBloodSpurt.
++bool CWeaponFX::SelectBloodSpurt(float damage, std::minstd_rand& random)
++{
++    blood_roll = -1;
++    blood_requested = false;
++    blood_error.clear();
++    blood_events[0] = blood_events[1] = 0;
++    if (m_eSurfaceType != SURFTYPE_FLESH)
++        return true;
++    if (!std::isfinite(damage) || damage < 0)
++    {
++        blood_error = "Blood-spurt selection unavailable";
++        return false;
++    }
++    // Preserve the original draw/condition; use the existing cosmetic stream so
++    // newly connected visuals cannot perturb established AI/damage randomness.
++    blood_roll = std::uniform_int_distribution<int>(0, 3)(random);
++    // The random draw precedes the damage >25 test even for a high-damage shot.
++    blood_requested = !blood_roll || damage > 25;
++    return true;
++}
++bool CWeaponFX::CreateBloodSpurt(ServerDE& server, HOBJECT source, DVector normal, float damage,
++                                 std::minstd_rand& random)
++{
++    if (!blood_requested)
++        return blood_error.empty();
++    if (!server.IsObjectAlive(source) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f ||
++        !std::isfinite(damage) || damage < 0)
++    {
++        blood_error = "Invalid weapon blood-spurt source/normal/damage";
++        return false;
++    }
++    normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
++    OpenBlood2::BloodSpurtSettings s;
++    s.position = m_vDestPos;
++    s.min_velocity = vector_scale(normal, 30);
++    s.max_velocity = vector_scale(normal, 50);
++    s.min_velocity.y = 40;
++    s.max_velocity.y = 50;
++    s.min_velocity.x -= 20;
++    s.min_velocity.z -= 20;
++    s.max_velocity.x += 20;
++    s.max_velocity.z += 20;
++    s.lifetime = 1;
++    s.texture = std::uniform_int_distribution<int>(1, 3)(random);
++    blood_events[0] = server.PublishClientBloodSpurt(s, "weapon entry", true, blood_error);
++    s.min_velocity = vector_scale(normal, -2.5f * damage);
++    s.max_velocity = vector_scale(normal, -3 * damage);
++    s.min_velocity.y += 30;
++    s.max_velocity.y += 40;
++    s.min_velocity.x -= 20;
++    s.min_velocity.z -= 20;
++    s.max_velocity.x += 20;
++    s.max_velocity.z += 20;
++    s.lifetime = 1.2f;
++    s.fade_time = .8f;
++    std::string second_error;
++    blood_events[1] = server.PublishClientBloodSpurt(s, "weapon exit", true, second_error);
++    if (!second_error.empty())
++        blood_error = second_error;
++    return blood_error.empty();
++}
+diff --git a/src/game/original/WeaponFX.h b/src/game/original/WeaponFX.h
+index c5d0695..8e20bdb 100644
+--- a/src/game/original/WeaponFX.h
++++ b/src/game/original/WeaponFX.h
+@@ -13,6 +13,12 @@ class CWeaponFX
+     OpenBlood2::SoundId sound = 0;
+     std::string resource, error, sprite_error;
+     std::uint64_t sprite_event = 0;
++    int blood_roll = -1;
++    bool blood_requested = false;
++    std::uint64_t blood_events[2]{};
++    std::string blood_error;
++    bool SelectBloodSpurt(float damage, std::minstd_rand&);
++    bool CreateBloodSpurt(ServerDE&, HOBJECT, DVector normal, float damage, std::minstd_rand&);
+     bool CreateSprites(ServerDE&, HOBJECT, DVector normal, std::minstd_rand&);
+     bool PlayImpactSound(ServerDE&, HOBJECT source, std::minstd_rand&);
+     std::string GetImpactSound(std::minstd_rand&) const;
+diff --git a/src/game/original/WeaponVector.cpp b/src/game/original/WeaponVector.cpp
+index 4718eaf..557f07b 100644
+--- a/src/game/original/WeaponVector.cpp
++++ b/src/game/original/WeaponVector.cpp
+@@ -86,11 +86,13 @@ FireResult CWeapon::FireVector()
+             impact.effect.m_nAmmoType = data.m_nAmmoType;
+             impact.effect.m_eSurfaceType = static_cast<SurfaceType>(static_cast<DBYTE>(impact.surface));
+             impact.effect.m_vDestPos = vector_add(impact.hit.point, vector_scale(impact.hit.normal, 1.25f));
++            impact.effect.SelectBloodSpurt(last_shot.damage, impact_random);
+             impact.effect.CreateSprites(*server, m_hOwner, impact.hit.normal, impact_random);
+             if (!impact.effect.PlayImpactSound(*server, m_hOwner, impact_random))
+                 ++impact_sound_failures;
+             if (impact.effect.sound)
+                 ++impact_sounds;
++            impact.effect.CreateBloodSpurt(*server, m_hOwner, impact.hit.normal, last_shot.damage, impact_random);
+             // Remaining composite visuals/marks are unavailable; creation failures do not cancel damage/audio.
+         }
+         auto alert = [&]
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 30a97ae..73014fb 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -5,6 +5,7 @@
+ #include "engine/sky.h"
+ #include "engine/string_resources.h"
+ #include "game/blood_splats.h"
++#include "game/blood_spurts.h"
+ #include "game/explosion_flames.h"
+ #include "game/explosion_fragments.h"
+ #include "game/explosion_lights.h"
+@@ -95,6 +96,10 @@ namespace OpenBlood2
+         void RecordDebrisEffect(const DebrisEffect&) override;
+         std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         ExplosionSprites explosion_sprites;
++        BloodSpurts blood_spurts;
++        std::uint64_t PublishClientBloodSplat(const BloodSplatSettings&, std::string_view, std::string&) override;
++        std::uint64_t PublishClientBloodSpurt(const BloodSpurtSettings&, std::string_view, bool, std::string&) override;
++        std::uint64_t PublishBloodSpurt(HOBJECT, const BloodSpurtSettings&, std::string&) override;
+         BloodSplats blood_splats;
+         std::uint64_t PublishBloodSplat(HOBJECT, const BloodSplatSettings&, std::string&) override;
+         WeaponSprites weapon_sprites;
+@@ -154,6 +159,7 @@ namespace OpenBlood2
+             scene_explosions.clear();
+             projectile_reports.clear();
+             explosion_sprites.clear();
++            blood_spurts.clear();
+             blood_splats.clear();
+             weapon_sprites.clear();
+             explosion_models.clear();
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index f69586a..9d27b63 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -2,6 +2,41 @@
+ #include <cmath>
+ namespace OpenBlood2
+ {
++    std::uint64_t ServerAdapter::PublishClientBloodSplat(const BloodSplatSettings& settings, std::string_view source,
++                                                         std::string& error)
++    {
++        trace_service("PublishClientBloodSplat (detached impact)");
++        error.clear();
++        if (!objects_.sprites)
++        {
++            error = "Blood splat store unavailable";
++            return 0;
++        }
++        return blood_splats.publish(settings, source, *objects_.sprites, objects_.time(), error);
++    }
++    std::uint64_t ServerAdapter::PublishClientBloodSpurt(const BloodSpurtSettings& settings, std::string_view source,
++                                                         bool immediate, std::string& error)
++    {
++        trace_service("PublishClientBloodSpurt (original particle explosion)");
++        error.clear();
++        if (!client_resources)
++        {
++            error = "Blood spurt resources unavailable";
++            return 0;
++        }
++        return blood_spurts.publish(settings, source, immediate, *client_resources, *this, objects_.time(), error);
++    }
++    std::uint64_t ServerAdapter::PublishBloodSpurt(HOBJECT source, const BloodSpurtSettings& settings,
++                                                   std::string& error)
++    {
++        error.clear();
++        if (!IsObjectAlive(source))
++        {
++            error = "Blood spurt source unavailable";
++            return 0;
++        }
++        return PublishClientBloodSpurt(settings, GetObjectName(source), false, error);
++    }
+     std::uint64_t ServerAdapter::PublishBloodSplat(HOBJECT source, const BloodSplatSettings& settings,
+                                                    std::string& error)
+     {
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index da19e8a..7274656 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -497,6 +497,7 @@ namespace OpenBlood2
+         ok = server.explosion_rings.advance(objects.time()) && ok;
+         ok = server.explosion_flames.advance(objects.time()) && ok;
+         ok = server.flesh_gibs.advance(objects.time(), server) && ok;
++        ok = server.blood_spurts.advance(objects.time(), server) && ok;
+         ok = server.explosion_fragments.advance(objects.time(), server) && ok;
+         ok = server.object_particles.advance(objects.time(), server) && ok;
+         ok = server.particle_streams.advance(objects.time(), server) && ok;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 5914b11..121b959 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1767,3 +1767,26 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.blood_splat_private PROPERTIES LABELS "gpu;private;blood_splats" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+     endif()
+ endif()
++
++add_executable(blood_spurt_tests blood_spurt_tests.cpp ../src/app/sprite_scene.cpp)
++target_link_libraries(blood_spurt_tests PRIVATE blood2_game)
++blood2_project_options(blood_spurt_tests)
++foreach(case formulas impact weapon failures)
++    add_test(NAME blood_spurts.${case} COMMAND blood_spurt_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/blood-spurts-${case}")
++    set_tests_properties(blood_spurts.${case} PROPERTIES LABELS "headless;blood_spurts" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME blood_spurts.private COMMAND blood_spurt_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(blood_spurts.private PROPERTIES LABELS "headless;private;blood_spurts" TIMEOUT 120)
++endif()
++if(BLOOD2_GPU_TESTS)
++    add_executable(blood_spurt_gpu_tests blood_spurt_gpu_tests.cpp ../src/app/sprite_scene.cpp)
++    target_link_libraries(blood_spurt_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(blood_spurt_gpu_tests)
++    add_test(NAME gpu.blood_spurt COMMAND blood_spurt_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/blood-spurt-gpu")
++    set_tests_properties(gpu.blood_spurt PROPERTIES LABELS "gpu;blood_spurts" TIMEOUT 60 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.blood_spurt_private COMMAND blood_spurt_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/blood-spurt-private" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.blood_spurt_private PROPERTIES LABELS "gpu;private;blood_spurts" TIMEOUT 120 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    endif()
++endif()
+diff --git a/tests/blood_spurt_fixture.h b/tests/blood_spurt_fixture.h
+new file mode 100644
+index 0000000..012d85e
+--- /dev/null
++++ b/tests/blood_spurt_fixture.h
+@@ -0,0 +1,44 @@
++#pragma once
++#include "audio_fixture.h"
++#include "blood_splat_fixture.h"
++namespace test_blood_spurt
++{
++    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error)
++    {
++        if (!test_blood_splat::mount(resources, root, error))
++            return false;
++        std::vector<std::uint8_t> dtx;
++        if (!resources.read("alpha.dtx", dtx, error))
++            return false;
++        test_player::Directory dir;
++        for (int i = 1; i <= 3; ++i)
++            dir.children["spritetextures"].children["particles"].files["blooddrop_" + std::to_string(i) + ".dtx"] = dtx;
++        for (int i = 0; i <= 3; ++i)
++            dir.children["sounds"].children["gibs"].children["flesh"].files["gib_impact" + std::to_string(i) + ".wav"] =
++                test_audio::wave();
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, dir);
++        w.patch(131, off);
++        w.patch(135, size);
++        auto file = root / "blood-spurts.rez";
++        std::ofstream out(file, std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        return resources.mount(file, error);
++    }
++    inline bool floor(OpenBlood2::GameSession& g, std::string& error)
++    {
++        OpenBlood2::WorldModel floor;
++        floor.points = {{-4000, 0, -4000}, {4000, 0, -4000}, {4000, 0, 4000}, {-4000, 0, 4000}};
++        floor.surfaces.resize(1);
++        floor.surfaces[0].flags = 1;
++        floor.polygons = {{0, {0, 1, 2, 3}}};
++        g.server.collision_ready = g.collision.build(floor, error);
++        return g.server.collision_ready;
++    }
++} // namespace test_blood_spurt
+diff --git a/tests/blood_spurt_gpu_tests.cpp b/tests/blood_spurt_gpu_tests.cpp
+new file mode 100644
+index 0000000..7d1463e
+--- /dev/null
++++ b/tests/blood_spurt_gpu_tests.cpp
+@@ -0,0 +1,147 @@
++#include "app/sprite_scene.h"
++#include "blood_spurt_fixture.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "game/original/ClientSplatFX.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << " " << error << " " << SDL_GetError() << "\n";                         \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool render(Runtime& runtime, WorldRenderer& renderer, SpriteView& scene, DVector eye, DRotation camera,
++                Capture& capture, std::vector<std::uint8_t>& pixels, std::string& error)
++    {
++        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300)) ||
++            !renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true))
++            return false;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        if (!commands)
++            return false;
++        if (!renderer.draw(commands, capture.texture, scene.mesh, scene.draws, eye, camera, false, error))
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 300;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 300;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
++            return false;
++        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        if (!data)
++            return false;
++        pixels.assign(data, data + 400 * 300 * 4);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    Runtime runtime;
++    std::string error;
++    CHECK(runtime.initialize(true, error));
++    std::cout << "GPU device: "
++              << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu), SDL_PROP_GPU_DEVICE_NAME_STRING,
++                                       "unreported")
++              << " | backend " << SDL_GetGPUDeviceDriver(runtime.gpu) << "\n";
++    WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
++    Capture capture;
++    SpriteView scene;
++    GameSession g;
++    if (argc == 3)
++    {
++        Config config;
++        config.data_dir = argv[2];
++        CHECK(g.initialize() && g.resources.mount_game(config, error));
++        std::error_code ec;
++        std::filesystem::create_directories(argv[1], ec);
++        CHECK(!ec);
++    }
++    else
++        CHECK(test_player::setup(g, argv[1], false) && test_blood_spurt::mount(g.resources, argv[1], error));
++    std::uint64_t last = 0;
++    for (int cycle = 0; cycle < 3; ++cycle)
++    {
++        if (argc == 3)
++            CHECK(g.request_world("01_SubwayA", error) && g.objects.clear());
++        CHECK(test_blood_spurt::floor(g, error));
++        g.client_shell.view.position = {0, 10, -5};
++        g.client_shell.view.rotation = {};
++        for (unsigned i = 1; i <= 3; ++i)
++        {
++            BloodSpurtSettings s;
++            s.position = {float(i) - 2, 10, 0};
++            s.texture = i;
++            s.min_velocity = s.max_velocity = {0, 10, 0};
++            CHECK(g.server.PublishClientBloodSpurt(s, "GPU drop variant", true, error) && error.empty());
++        }
++        CHECK(g.server.blood_spurts.active.front().id > last);
++        last = g.server.blood_spurts.active.back().id;
++        CHECK(update_sprite_scene(g, scene, error) && scene.entries.size() == 36);
++        for (const auto& e : scene.entries)
++            CHECK(e.blood_spurt && e.error.empty());
++        const auto callbacks = g.server.blood_spurts.active.front().updates;
++        CHECK(update_sprite_scene(g, scene, error) && g.server.blood_spurts.active.front().updates == callbacks);
++        std::vector<std::uint8_t> pixels;
++        CHECK(render(runtime, renderer, scene, g.client_shell.view.position, {}, capture, pixels, error));
++        unsigned ink = 0;
++        for (unsigned k = 0; k < pixels.size(); k += 4)
++            if (pixels[k] != 6 || pixels[k + 1] != 9 || pixels[k + 2] != 13)
++                ++ink;
++        CHECK(ink > 100 && ink < 400 * 300);
++        CHECK(capture.save((std::filesystem::path(argv[1]) / "blood-drops.png").c_str()));
++        std::cout << "cycle " << cycle << " three drop textures: " << ink << " changed pixels\n";
++        g.server.blood_spurts.clear();
++        BloodSpurtSettings hit;
++        hit.position = {0, 1, 0};
++        hit.min_velocity = hit.max_velocity = {0, -20, 0};
++        CHECK(g.server.PublishClientBloodSpurt(hit, "GPU emitter collision", false, error) && error.empty());
++        CHECK(g.objects.advance(.1) && g.server.blood_spurts.advance(g.objects.time(), g.server));
++        CHECK(g.server.blood_spurts.active.front().impacts == 1 && g.server.blood_splats.active.size() == 1);
++        CHECK(g.server.blood_splats.active.front().settings.scale > 0);
++        g.server.blood_spurts.clear(); // Remaining mark must have independent GPU lifetime.
++        g.client_shell.view.position = {0, argc == 3 ? 25.f : 3.f, 0};
++        CHECK(align_rotation({0, -1, 0}, g.client_shell.view.rotation));
++        CHECK(update_sprite_scene(g, scene, error) && scene.entries.size() == 1 && scene.entries[0].blood_splat &&
++              scene.entries[0].error.empty());
++        CHECK(render(runtime, renderer, scene, g.client_shell.view.position, g.client_shell.view.rotation, capture,
++                     pixels, error));
++        ink = 0;
++        for (unsigned k = 0; k < pixels.size(); k += 4)
++            if (pixels[k] != 6 || pixels[k + 1] != 9 || pixels[k + 2] != 13)
++                ++ink;
++        CHECK(ink > 5 && ink < 400 * 300 / 2);
++        CHECK(capture.save((std::filesystem::path(argv[1]) / "blood-impact.png").c_str()));
++        std::cout << "cycle " << cycle << " original emitter collision mark: " << ink << " changed pixels\n";
++        CHECK(g.unload_world() && g.server.blood_spurts.active.empty() && g.server.blood_splats.active.empty());
++        CHECK(update_sprite_scene(g, scene, error) && scene.entries.empty());
++        renderer.clear_geometry();
++        scene.clear();
++    }
++    return 0;
++}
+diff --git a/tests/blood_spurt_tests.cpp b/tests/blood_spurt_tests.cpp
+new file mode 100644
+index 0000000..a1b9122
+--- /dev/null
++++ b/tests/blood_spurt_tests.cpp
+@@ -0,0 +1,307 @@
++#include "app/sprite_scene.h"
++#include "blood_spurt_fixture.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/Gib.h"
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .0001f;
++    }
++    bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        std::string error;
++        CHECK(test_player::setup(g, root, false));
++        CHECK(test_blood_spurt::mount(g.resources, root, error));
++        CHECK(test_blood_spurt::floor(g, error));
++        return true;
++    }
++    bool formulas(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        BloodSpurtSettings s;
++        s.position = {0, 1000, 0};
++        s.min_velocity = s.max_velocity = {60, 0, 0};
++        CParticleExplosionFX f;
++        std::minstd_rand random(1);
++        CHECK(f.CreateObject(s, g.resources, g.server, 0, random, error));
++        CHECK(f.Update(0, .1, g.server, random, 16384));
++        CHECK(f.particles.size() == 12 && f.position.x == 6 && f.position.y == 1000 && f.velocity.y == -20);
++        for (const auto& p : f.particles)
++            CHECK(std::abs(p.position.x) <= .5 && std::abs(p.position.y) <= .5 && p.lifetime == 10 &&
++                  near(p.color.x, 128.f / 255) && p.velocity.y >= -10 && p.velocity.y <= -5);
++        auto old = f.particles[0];
++        CHECK(f.Update(.1, .1, g.server, random, 16384));
++        CHECK(f.particles.size() == 24 && f.position.x == 12 && f.position.y == 998 && f.velocity.y == -40);
++        CHECK(near(f.particles[0].position.y, old.position.y + old.velocity.y * .1f) &&
++              near(f.particles[0].velocity.y, old.velocity.y - 10));
++        for (int step = 0; step < 6; ++step)
++            for (int i = 0; i < 2; ++i)
++            {
++                const auto& p = f.particles[12 + step * 2 + i];
++                CHECK(std::abs(p.position.x - step) <= .5 && near(p.lifetime, 10 + step * .1f / 6));
++            }
++        f.emitting = false;
++        CHECK(f.Update(.5, .4, g.server, random, 16384) && f.alpha == 1);
++        CHECK(f.Update(1.25, .75, g.server, random, 16384) && near(f.alpha, .5));
++        CHECK(f.Update(2, .75, g.server, random, 16384) && f.alpha == 0);
++        CHECK(!f.Update(2.001, .001, g.server, random, 16384) && f.error.empty());
++        // Source clients explicitly Update on creation; server SFX decoding waits for the manager.
++        CHECK(g.server.PublishClientBloodSpurt(s, "immediate", true, error) && error.empty());
++        CHECK(g.server.blood_spurts.active.back().updates == 1 && g.server.blood_spurts.live_particles() == 12);
++        CHECK(g.server.blood_spurts.advance(g.objects.time(), g.server) &&
++              g.server.blood_spurts.live_particles() == 12);
++        CHECK(g.server.PublishClientBloodSpurt(s, "deferred", false, error) && error.empty());
++        CHECK(g.server.blood_spurts.active.back().first_update &&
++              g.server.blood_spurts.active.back().particles.empty());
++        CHECK(g.server.blood_spurts.advance(g.objects.time(), g.server) &&
++              g.server.blood_spurts.live_particles() == 24);
++        return true;
++    }
++    bool impact(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        std::minstd_rand rng(2);
++        BloodSpurtSettings s;
++        s.position = {0, 1, 0};
++        s.min_velocity = s.max_velocity = {0, -20, 0};
++        CParticleExplosionFX fx;
++        CHECK(fx.CreateObject(s, g.resources, g.server, 0, rng, error) && fx.Update(.1, .1, g.server, rng, 16384));
++        CHECK(!fx.emitting && fx.impacts == 1 && fx.splat_event && fx.splat_error.empty() && fx.sound_error.empty());
++        CHECK(near(fx.position.y, .3f) && g.server.blood_splats.active.size() == 1);
++        const auto splat = g.server.blood_splats.active.front();
++        CHECK(splat.settings.scale >= 0 && splat.settings.scale <= .1 && splat.settings.grow_scale == .01f &&
++              near(splat.position.y, .3f));
++        CHECK(fx.Update(.2, .1, g.server, rng, 16384) && fx.emitted == 12 && fx.impacts == 1);
++        // Client fragment uses its larger original splat recipe and is never parented to the mark.
++        FleshGib fragment;
++        fragment.position = {50, 1, 0};
++        fragment.velocity = {0, -20, 0};
++        CHECK(g.models.load("models/characters/caleb.abc", fragment.model, error));
++        fragment.sound_path = "sounds/gibs/flesh/gib_impact1.wav";
++        g.server.flesh_gibs.active.push_back(fragment);
++        CHECK(g.server.flesh_gibs.advance(.1, g.server));
++        const auto& f = g.server.flesh_gibs.active.front();
++        CHECK(f.impacts == 1 && f.splat_event && f.splat_error.empty() && f.error.empty());
++        const auto& large = g.server.blood_splats.reports.back();
++        CHECK(large.settings.scale >= .04f && large.settings.scale <= .24f && large.settings.grow_scale == .01f);
++        g.server.flesh_gibs.clear();
++        CHECK(g.server.blood_splats.active.size() == 2);
++        return true;
++    }
++    bool weapon(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        std::minstd_rand random(1);
++        auto source = g.objects.create(g.objects.find_class("BaseClass"), {});
++        CHECK(source);
++        CWeaponFX fx;
++        fx.m_vDestPos = {0, 100, 0};
++        fx.m_eSurfaceType = SURFTYPE_STONE;
++        CHECK(fx.SelectBloodSpurt(100, random) && !fx.blood_requested && fx.blood_roll == -1);
++        fx.m_eSurfaceType = SURFTYPE_FLESH;
++        unsigned selected = 0, declined = 0;
++        for (int i = 0; i < 64; ++i)
++        {
++            CHECK(fx.SelectBloodSpurt(25, random));
++            CHECK(fx.blood_requested == (fx.blood_roll == 0));
++            fx.blood_requested ? ++selected : ++declined;
++        }
++        CHECK(selected && declined && fx.SelectBloodSpurt(100, random) && fx.blood_roll >= 0 && fx.blood_requested);
++        CHECK(fx.CreateBloodSpurt(g.server, source, {0, 0, 2}, 100, random));
++        CHECK(fx.blood_events[0] && fx.blood_events[1] && g.server.blood_spurts.active.size() == 2);
++        const auto& a = g.server.blood_spurts.active[0];
++        const auto& b = g.server.blood_spurts.active[1];
++        CHECK(a.texture == b.texture && a.updates == 1 && b.updates == 1);
++        CHECK(a.settings.min_velocity.x == -20 && a.settings.min_velocity.y == 40 && a.settings.min_velocity.z == 10);
++        CHECK(b.settings.min_velocity.z == -270 && b.settings.max_velocity.z == -280 && b.settings.lifetime == 1.2f &&
++              b.settings.fade_time == .8f);
++        CHECK(g.objects.remove(source) && g.objects.finish_frame() && g.server.blood_spurts.active.size() == 2);
++        CHECK(!fx.CreateBloodSpurt(g.server, source, {0, 0, 1}, 100, random) && !fx.blood_error.empty());
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        BloodSpurtSettings s;
++        s.position = {0, 1000, 0};
++        s.texture = 4;
++        CHECK(g.server.PublishClientBloodSpurt(s, "invalid", true, error) && !error.empty());
++        s.texture = 1;
++        s.fade_time = 2;
++        CHECK(g.server.PublishClientBloodSpurt(s, "fade", true, error) && !error.empty());
++        s.fade_time = .5f;
++        s.position.x = std::numeric_limits<float>::infinity();
++        CHECK(g.server.PublishClientBloodSpurt(s, "position", true, error) && !error.empty());
++        s.position.x = 0;
++        CHECK(!g.server.PublishBloodSpurt(nullptr, s, error) && !error.empty());
++        for (int i = 0; i < 128; ++i)
++            CHECK(g.server.PublishClientBloodSpurt(s, "capacity", true, error) && error.empty());
++        CHECK(g.server.PublishClientBloodSpurt(s, "overflow", true, error) && !error.empty() &&
++              g.server.blood_spurts.active.size() == 128);
++        CHECK(!g.server.blood_spurts.advance(-1, g.server) && g.server.blood_spurts.active.empty());
++        std::minstd_rand rng(1);
++        CParticleExplosionFX fx;
++        CHECK(fx.CreateObject(s, g.resources, g.server, 0, rng, error));
++        CHECK(!fx.Update(0, 0, g.server, rng, 11) && !fx.error.empty() && fx.particles.empty());
++        Resources missing;
++        BloodSpurts effects;
++        CHECK(effects.publish(s, "missing", false, missing, g.server, 0, error) && !error.empty() &&
++              effects.active.empty());
++        CHECK(g.unload_world() && g.server.blood_spurts.reports.empty() && g.server.blood_splats.reports.empty());
++        return true;
++    }
++    bool private_world(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        std::uint64_t last = 0;
++        for (int cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.objects.clear() && test_blood_spurt::floor(g, error));
++            auto h = g.objects.create(
++                g.objects.find_class("CultistAI"), {}, Creation::World,
++                {{"Pos", DVector{0, 100, 0}}, {"AIState", std::string("IDLE")}, {"AIWeapon1", std::string("BERETTA")}});
++            auto* a = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h));
++            CHECK(a && a->RuntimeReady() && a->m_MoveObj.Update());
++            // Real original weapon -> NPC contact -> damage and client blood, on a labelled diagnostic floor.
++            auto shooter_handle = g.objects.create(g.objects.find_class("CultistAI"), {}, Creation::World,
++                                                   {{"Pos", DVector{-200, 100, 0}},
++                                                    {"AIState", std::string("IDLE")},
++                                                    {"AIWeapon1", std::string("BERETTA")}});
++            auto* shooter = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(shooter_handle));
++            CHECK(shooter && shooter->RuntimeReady());
++            auto* weapon = shooter->m_InventoryMgr.CurrentWeapon();
++            CHECK(weapon);
++            shooter->m_InventoryMgr.damage_multiplier = 3;
++            a->m_damage.SetArmorPoints(0);
++            a->m_damage.SetHitPoints(10000);
++            const auto actual_target = g.objects.get(h)->state.m_Pos;
++            const auto shot_origin = vector_add(actual_target, {-200, 0, 0});
++            bool blood = false;
++            for (unsigned shot = 0; shot < 32 && !blood; ++shot)
++            {
++                CHECK(weapon->Fire({shot_origin, {1, 0, 0}, DBYTE(42 + shot), WEAP_BERETTA, false, false}) ==
++                      FireResult::Fired);
++                CHECK(weapon->last_shot.damage_delivered && !weapon->impacts.empty());
++                const auto& hit = weapon->impacts.front();
++                CHECK(hit.hit.object == h && hit.effect.blood_roll >= 0);
++                if (hit.effect.blood_requested)
++                {
++                    CHECK(hit.effect.blood_events[0] && hit.effect.blood_events[1] && hit.effect.blood_error.empty());
++                    const auto& exit = g.server.blood_spurts.active.back().settings;
++                    CHECK(near(exit.min_velocity.x, -2.5f * weapon->last_shot.damage * hit.hit.normal.x - 20));
++                    blood = true;
++                }
++            }
++            CHECK(blood && a->m_damage.m_fHitPoints < 10000);
++            a->m_damage.SetHitPoints(100);
++            CHECK(g.objects.remove(shooter_handle) && g.objects.finish_frame());
++            auto limb = CreateLimb(h, 4, {0, 0, 100}, error);
++            CHECK(limb);
++            auto* gib = dynamic_cast<CGib*>(g.server.HandleToObject(limb));
++            CHECK(gib);
++            DVector pos{200, 10, 0}, v{10, -400, 0};
++            CHECK(g.server.TeleportObject(limb, &pos) == DE_OK && g.server.SetVelocity(limb, &v) == DE_OK);
++            gib->last_position = pos;
++            gib->bounces = 2;
++            CHECK(g.objects.engine_message(limb, MID_TOUCHNOTIFY, nullptr) && gib->add_blood_spurt &&
++                  !gib->spurt_event);
++            CHECK(g.objects.engine_message(limb, MID_UPDATE, nullptr) && !gib->add_blood_spurt && gib->spurt_event &&
++                  gib->spurt_error.empty());
++            CHECK(g.server.blood_spurts.active.back().first_update);
++            DVector actual;
++            CHECK(g.server.GetVelocity(limb, &actual) == DE_OK);
++            CHECK(near(g.server.blood_spurts.active.back().settings.min_velocity.x, actual.x * .06f));
++            a->m_damage.SetArmorPoints(0);
++            auto m = g.server.StartMessageToObject(a, h, damage_message);
++            CHECK(m && g.server.WriteDamage(m, {{0, 0, 1}, {0, 100, 0}, 500, DamageType::Explode, h, true}) == DE_OK &&
++                  g.server.EndMessage(m) == DE_OK);
++            CHECK(a->m_bRemoveMe && a->gib_error.empty() && !g.server.flesh_gibs.active.empty());
++            for (const auto& f : g.server.flesh_gibs.active)
++                CHECK(f.spurt_event && f.spurt_error.empty());
++            CHECK(g.objects.engine_message(h, MID_UPDATE, nullptr) && g.objects.remove(limb) &&
++                  g.objects.finish_frame());
++            CHECK(!g.server.IsObjectAlive(h) && !g.server.IsObjectAlive(limb));
++            CHECK(g.server.blood_spurts.active.front().id > last);
++            last = g.server.blood_spurts.active.back().id;
++            std::size_t peak = 0;
++            for (int frame = 0; frame < 110; ++frame)
++            {
++                CHECK(g.objects.advance(.02) && g.server.flesh_gibs.advance(g.objects.time(), g.server) &&
++                      g.server.blood_spurts.advance(g.objects.time(), g.server) &&
++                      g.server.blood_splats.advance(g.objects.time()));
++                peak = std::max(peak, g.server.blood_spurts.live_particles());
++            }
++            CHECK(peak > 12 && g.server.blood_spurts.active.empty() && g.server.blood_splats.active.size() > 0);
++            unsigned impacts = 0;
++            for (const auto& r : g.server.blood_spurts.reports)
++            {
++                CHECK(r.error.empty() && r.splat_error.empty() && r.ended);
++                impacts += r.impacts;
++            }
++            CHECK(impacts > 0);
++            for (unsigned variant = 1; variant <= 3; ++variant)
++            {
++                BloodSpurtSettings s;
++                s.position = {0, 1000, 0};
++                s.texture = variant;
++                CHECK(g.server.PublishClientBloodSpurt(s, "private texture", true, error) && error.empty());
++            }
++            SpriteView view;
++            CHECK(update_sprite_scene(g, view, error));
++            unsigned drops = 0;
++            for (const auto& e : view.entries)
++                if (e.blood_spurt)
++                {
++                    CHECK(e.error.empty() && e.width > 0);
++                    ++drops;
++                }
++            CHECK(drops == 36);
++            std::cout << "Private cycle " << cycle << ": original death/limb/fragment callers, peak " << peak
++                      << ", emitter impacts " << impacts << ", splats " << g.server.blood_splats.active.size()
++                      << ", three real drop textures\n";
++            CHECK(g.unload_world() && g.server.blood_spurts.active.empty() && g.server.blood_splats.active.empty() &&
++                  g.server.flesh_gibs.active.empty() && !g.server.message_count() && !g.server.string_count());
++            CHECK(update_sprite_scene(g, view, error) && view.entries.empty());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string mode = argv[1];
++    return (mode == "formulas"   ? formulas(argv[2])
++            : mode == "impact"   ? impact(argv[2])
++            : mode == "weapon"   ? weapon(argv[2])
++            : mode == "failures" ? failures(argv[2])
++                                 : mode == "private" && private_world(argv[2]))
++               ? 0
++               : 1;
++}

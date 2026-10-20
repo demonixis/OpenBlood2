@@ -1,0 +1,14 @@
+453/458 Testing: ai_escape.hiding
+453/458 Test: ai_escape.hiding
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests" "hiding"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_escape.hiding" start time: Oct 16 14:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.hiding" end time: Oct 16 14:25 CEST
+"ai_escape.hiding" time elapsed: 00:00:00
+----------------------------------------------------------

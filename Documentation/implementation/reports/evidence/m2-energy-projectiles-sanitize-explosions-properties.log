@@ -1,0 +1,14 @@
+137/596 Testing: explosions.properties
+137/596 Test: explosions.properties
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_tests" "properties" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-fixtures/properties"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosions.properties" start time: Oct 17 01:22 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"explosions.properties" end time: Oct 17 01:22 CEST
+"explosions.properties" time elapsed: 00:00:00
+----------------------------------------------------------

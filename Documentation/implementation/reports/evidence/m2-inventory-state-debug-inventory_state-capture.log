@@ -1,0 +1,14 @@
+511/512 Testing: inventory_state.capture
+511/512 Test: inventory_state.capture
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/inventory_state_tests" "capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/inventory-state-fixtures/capture"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"inventory_state.capture" start time: Oct 16 17:40 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"inventory_state.capture" end time: Oct 16 17:40 CEST
+"inventory_state.capture" time elapsed: 00:00:00
+----------------------------------------------------------

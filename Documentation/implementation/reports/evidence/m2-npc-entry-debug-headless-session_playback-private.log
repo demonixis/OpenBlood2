@@ -1,0 +1,16 @@
+626/627 Testing: session_playback.private
+626/627 Test: session_playback.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/session_playback_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"session_playback.private" start time: Oct 17 00:21 CEST
+Output:
+----------------------------------------------------------
+SubwayA entry 0: waited 180 frames without ticking; shooters=1 shots=15 player HP=39.9175
+SubwayA entry 1: waited 180 frames without ticking; shooters=1 shots=15 player HP=39.9175
+<end of output>
+Test time =  11.41 sec
+----------------------------------------------------------
+Test Passed.
+"session_playback.private" end time: Oct 17 00:21 CEST
+"session_playback.private" time elapsed: 00:00:11
+----------------------------------------------------------

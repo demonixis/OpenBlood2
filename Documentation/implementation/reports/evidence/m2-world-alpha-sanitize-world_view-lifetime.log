@@ -1,0 +1,14 @@
+319/583 Testing: world_view.lifetime
+319/583 Test: world_view.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_view_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world_view.lifetime" start time: Oct 17 00:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.lifetime" end time: Oct 17 00:34 CEST
+"world_view.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

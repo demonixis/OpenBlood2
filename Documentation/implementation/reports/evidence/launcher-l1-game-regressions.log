@@ -1,0 +1,43 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start   70: world.rez_structure
+Process not started
+ /home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests
+[permission denied]
+1/8 Test   #70: world.rez_structure ..............***Not Run   0.00 sec
+    Start   71: world.rez_rejection
+Process not started
+ /home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests
+[permission denied]
+2/8 Test   #71: world.rez_rejection ..............***Not Run   0.00 sec
+    Start   72: world.resource_mount
+Process not started
+ /home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests
+[permission denied]
+3/8 Test   #72: world.resource_mount .............***Not Run   0.00 sec
+    Start 1180: menus.preferences
+4/8 Test #1180: menus.preferences ................   Passed    0.01 sec
+    Start 1199: demo.flow
+5/8 Test #1199: demo.flow ........................   Passed    0.00 sec
+    Start 1200: demo.rules
+6/8 Test #1200: demo.rules .......................   Passed    0.02 sec
+    Start 1205: demo_menu.manifest
+7/8 Test #1205: demo_menu.manifest ...............   Passed    0.00 sec
+    Start 1206: demo_menu.flow
+8/8 Test #1206: demo_menu.flow ...................   Passed    0.00 sec
+
+63% tests passed, 3 tests failed out of 8
+
+Label Time Summary:
+demo         =   0.02 sec*proc (2 tests)
+demo_menu    =   0.01 sec*proc (2 tests)
+headless     =   0.04 sec*proc (8 tests)
+menus        =   0.01 sec*proc (1 test)
+world        =   0.00 sec*proc (3 tests)
+
+Total Test time (real) =   0.08 sec
+
+The following tests FAILED:
+	 70 - world.rez_structure (BAD_COMMAND)                 headless world
+	 71 - world.rez_rejection (BAD_COMMAND)                 headless world
+	 72 - world.resource_mount (BAD_COMMAND)                headless world
+Errors while running CTest

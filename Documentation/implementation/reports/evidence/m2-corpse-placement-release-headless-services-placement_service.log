@@ -1,0 +1,14 @@
+53/703 Testing: services.placement_service
+53/703 Test: services.placement_service
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/services_tests" "placement_service"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"services.placement_service" start time: Oct 17 04:28 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"services.placement_service" end time: Oct 17 04:28 CEST
+"services.placement_service" time elapsed: 00:00:00
+----------------------------------------------------------

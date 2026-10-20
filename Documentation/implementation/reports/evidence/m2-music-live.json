@@ -1,0 +1,264 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "29dc356bac79b43963795aaec995240decea08ac",
+  "status": "M2 incomplete; original MUSIC delivery and real bounded immediate/next-song playback",
+  "frozen_sources": {
+    "src/app/inspector_world_sounds.cpp": "2931170689a0c88662bff688bf50d7e983a89a1b64f98f89e83666d559cf51ee",
+    "src/app/world_sound_smoke.cpp": "0d5059d0153d810e2c9e6b54ca1389c60c42a646bc1409c832fa9c4e8b6adf17",
+    "src/engine/audio.cpp": "6bf91152b2d5cd35e2200d6b5c355249d814b0b6950e5beb21b9e8fb95457517",
+    "src/engine/dls_sampler.cpp": "f6869b28c8835ba7dc02aebac0f1502236424355b8980032aaf0c9b7c6382efb",
+    "src/engine/dls_sampler.h": "e018cd092a8fcd69ab61bf3b193f11c73f5decc9500c90a01fd5b0c8ac544cdc",
+    "src/engine/ima_transport.cpp": "0b8a46813b9cdbdc9149707df28db3249f193e7f97d1fb94a50ca2814bba8d84",
+    "src/engine/ima_transport.h": "99f19f163f70900b532b9013a36b67a3d07ba862360112e04fc648b735927abd",
+    "src/game/music_catalog.cpp": "9417ee44fac6e72599242395d4c8d5faf37b950337128dde65c58e3e84777725",
+    "src/game/music_catalog.h": "3a6d7c6f220882b7e4a0dc487d2428dc58c600333078b8be737a5476b7bf24f1",
+    "src/game/original/BloodShells.cpp": "cb0da8c6db9b46acd498aa7c32c5cab9a9d1be619ce81fdbd3897405a08a9041",
+    "src/game/original/BloodShells.h": "916ad8a4e62a40e5b23cfb8189b9646aceb3ed4f06fed5793dbc4b6b91fe70f1",
+    "src/game/original/Music.cpp": "84aa52afcb53e0865c1d077acbd193d6bf36dc4469d206d30831ead1e020c5e4",
+    "src/game/original/Music.h": "9162cb37fee916d72b5dca321d1639617173d56f9a8ea73e9656a6f737088f11",
+    "src/game/original/PlayerContainers.cpp": "de04fe1a8fcee03a8ff82cd1923d85072b6eb81bd111599f630a43a619499700",
+    "src/game/original/PlayerObj.h": "3965df61e043aa0bd26e538599726ed2bbb1432546c0849d221c6304d10f630c",
+    "src/game/player_messages.h": "b4eae9ae4ae464c29308485919e45058fcca19c1a2aa3684c85d825aa53b84d9",
+    "src/game/server_adapter.h": "88f9a23ed526d2244c540518c11378f3025b602b9b18f11060f4ffdabdeb61bf",
+    "src/game/server_clients.cpp": "e862555943800c946988c0149c23ddcf57d7725a06504c64e19f47b3ff5cb583",
+    "tests/CMakeLists.txt": "d756b52be67619afc0d8bdd2b220b8d324b164e2e53e77dcc9d7ca91b316eafe",
+    "tests/ima_transport_tests.cpp": "a89a74c2d0ee40c7e8cf505f3629db24cd4b61cf1d133855d5e720cff34d375e",
+    "tests/music_message_tests.cpp": "a33535410ae342f307b45b81265aa5f7a6154bf029e733c93e034c05af886146",
+    "tests/screen_fade_tests.cpp": "168c63a31669a875cea7a0e5157845000ec867ac05722e429c8d5b8203a1dd4a",
+    "tests/train_session_tests.cpp": "b150570f55cf0e18aeeb31af213b436fe6d09b50e1050694715d765aaa0c8bd8"
+  },
+  "results": {
+    "debug-tests": {
+      "passed": 188,
+      "wall_seconds": 96.94
+    },
+    "release-tests": {
+      "passed": 188,
+      "wall_seconds": 20.85
+    },
+    "sanitize-tests": {
+      "passed": 188,
+      "wall_seconds": 460.56
+    },
+    "debug-gpu": {
+      "passed": 2,
+      "wall_seconds": 53.3
+    },
+    "release-gpu": {
+      "passed": 2,
+      "wall_seconds": 20.98
+    }
+  },
+  "private_music": {
+    "debug-tests": "SubwayA live music: received 6; accepted 6; committed 4; first boundary 235056; cancellations 8116",
+    "release-tests": "SubwayA live music: received 6; accepted 6; committed 4; first boundary 235056; cancellations 8116",
+    "sanitize-tests": "SubwayA live music: received 6; accepted 6; committed 4; first boundary 235056; cancellations 8116"
+  },
+  "synthetic_switching": {
+    "debug-tests": "Live replacement: exact boundary 21552; nonzero PCM 90144; 40 next-song boundaries; cancellation and stalled audio verified",
+    "release-tests": "Live replacement: exact boundary 21552; nonzero PCM 90144; 40 next-song boundaries; cancellation and stalled audio verified",
+    "sanitize-tests": "Live replacement: exact boundary 21552; nonzero PCM 90144; 40 next-song boundaries; cancellation and stalled audio verified"
+  },
+  "compiler_warnings": {
+    "debug-final": [],
+    "debug-initial": [
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:37:78: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]"
+    ],
+    "release-final": [],
+    "release-initial": [
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:37:78: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]"
+    ],
+    "sanitize-final": [],
+    "sanitize-initial": [
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:37:78: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]"
+    ]
+  },
+  "commands": [
+    "python3 Documentation/Implementation/evidence/m2-music-live-validation.py {debug,release,sanitize} (three -j1 builds; 188 selected CTests at -j2)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/{debug,release} -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit /tmp/b2-music-live-{debug,release}-gpu.xml",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror (22 changed C++ files)",
+    "python3 /tmp/b2-npc-integrity.py; python3 /tmp/b2-npc-links.py; git diff --check (raw .log/.xml excluded)"
+  ],
+  "limitations": [
+    "Original player/server/client music code supplies parsing, owned delivery, level decisions and mutation/lifetime order",
+    "NEXTSONG current-section boundary, latest accepted request, hard tail cancellation and new preroll placement are explicit replacement engine policy",
+    "Prepared variations are repeated with seed 1 per section and 20 percent gain; no retail activation/PCM/listening parity claim",
+    "Motif/break messages are original empty client methods, counted as source no-ops rather than sound playback",
+    "CD audio, music enable/volume settings, all-bank support and serialized client music restoration remain open",
+    "NVIDIA Linux with SDL dummy output; backend UI exercise, no manual clicks/listening or native Metal run",
+    "Initial build/test logs were produced while review edits were in progress; final source hashes and rerun results are authoritative"
+  ],
+  "capture": {
+    "path": "Blood2/build/debug/tests/world-sounds.png",
+    "sha256": "584dc3364834b2db84d7505334878fffad5be991a7318e0334c0332003bdfeb5",
+    "committed": false
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "readme_preserved_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "files": [
+    {
+      "file": "m2-music-live-validation.py",
+      "sha256": "9f00dfffa9be04eb8ccfafb5ba5d1e5f47518eef4050784d1017326a9cdcbb64"
+    },
+    {
+      "file": "m2-music-live-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-music-live-debug-app-final.log",
+      "sha256": "964039863677dc75059df05bb3f5299a242cc3508fc3f5ac3f664d4e07fc5318"
+    },
+    {
+      "file": "m2-music-live-release-app-final.log",
+      "sha256": "84f424a251fd74379f88c988c912499ff2aeb5b0e7e6dbf39dc0ff8fca05ec15"
+    },
+    {
+      "file": "m2-music-live-release-gpu-initial.log",
+      "sha256": "0874c6eb65c718bf90961e39070a4b58e6f0c89d6b6842e8abd89c445f09110a"
+    },
+    {
+      "file": "m2-music-live-release-gpu-startup.log",
+      "sha256": "63c0f87049ab5a553999654adbdf41f3245b3839dace462ac364b95aa5d183c2"
+    },
+    {
+      "file": "m2-music-live-release-gpu-counter.log",
+      "sha256": "27503102ab25ffe3475744ba7a4c411e699a68ebe555c2a12c0a664f79e07293"
+    },
+    {
+      "file": "m2-music-live-release-gpu-diagnostic.log",
+      "sha256": "111c404ebfbe70e3a8997558370f810720bd2e2007abf93dbda47fb193f6390b"
+    },
+    {
+      "file": "m2-music-live-debug-tests.log",
+      "sha256": "3caedd9ca266f15e81cb96bb82b0b452f8305e3bd06bf7524b718b15c840436b"
+    },
+    {
+      "file": "m2-music-live-debug-tests.xml",
+      "sha256": "3c01ec4b1b3860f7ae3f017174152c3254c2bb88d51d1891eba7a8453aef9d9e"
+    },
+    {
+      "file": "m2-music-live-release-tests.log",
+      "sha256": "e5205baa89d459a81472a27599e9a5a73d510ee83c4cb482b5e94e18e1d43547"
+    },
+    {
+      "file": "m2-music-live-release-tests.xml",
+      "sha256": "819f8efc6427d05622c4c7ede62fc4b5f8409de33a745a54e2bbaa329b88ea03"
+    },
+    {
+      "file": "m2-music-live-sanitize-tests.log",
+      "sha256": "b81e0229a37bc49b5dcb698f0b3f41bbbaa77c19bb87077ed280944b66d6c14e"
+    },
+    {
+      "file": "m2-music-live-sanitize-tests.xml",
+      "sha256": "3c753947f6ffff438e670f1df42ba007c4860f7af29b92cc344efaf1d280f68b"
+    },
+    {
+      "file": "m2-music-live-debug-gpu.log",
+      "sha256": "e08ed2639388719806fb6ab136343ff0dc0802f608b9ff930195695d7454b7d4"
+    },
+    {
+      "file": "m2-music-live-debug-gpu.xml",
+      "sha256": "8bd77be83541d64720e651c2ffbc380ab545e9c5fc86465d8104de9cf0f7ec13"
+    },
+    {
+      "file": "m2-music-live-release-gpu.log",
+      "sha256": "8b188b0df441aa82b3542538b184beab805481fb45e7522386bab5c35c5917a7"
+    },
+    {
+      "file": "m2-music-live-release-gpu.xml",
+      "sha256": "42cfbf9f9c747bd991cfde90c08d9b34c4d3e743344c889a4c7d0851a2a5f346"
+    },
+    {
+      "file": "m2-music-live-debug-build-final.log",
+      "sha256": "706176a2f1e7f963c595a2b2080aeb34faaac8b4dc2d192e3754d8afdcf70b42"
+    },
+    {
+      "file": "m2-music-live-debug-build-initial.log",
+      "sha256": "017a05593a081db75346922c4f62b5a43ebf71f7861a75f663ab5b2eda5db0aa"
+    },
+    {
+      "file": "m2-music-live-debug-tests-initial.log",
+      "sha256": "7c9dd6bcacc6ead3b0f8ffa47857ec818b09ccdcaee131c931bfb0062ae7f95f"
+    },
+    {
+      "file": "m2-music-live-release-build-final.log",
+      "sha256": "ddacd38ac3947934dfaa57fed79b1dfb3d53265f6801e9526aed64b3e6493cf9"
+    },
+    {
+      "file": "m2-music-live-release-build-initial.log",
+      "sha256": "a0172ab777bf3175851bc718f8500687371b6b9cc0888edc59dbe829451baf34"
+    },
+    {
+      "file": "m2-music-live-release-tests-initial.log",
+      "sha256": "f59e43eab9ec9fee954554effa185ec5ad8dc55ebe6d92ab0c7034aae28c6f7b"
+    },
+    {
+      "file": "m2-music-live-sanitize-build-final.log",
+      "sha256": "305a0657443d06ecde76ff9ecdc47fabce292fb97e2e24eb2027702b63fe7aac"
+    },
+    {
+      "file": "m2-music-live-sanitize-build-initial.log",
+      "sha256": "5163c612a87d3cf6fd82dfd5324700d89ca25a378301b3b1de73f478258fc974"
+    },
+    {
+      "file": "m2-music-live-sanitize-tests-initial.log",
+      "sha256": "036660bdbe7d487ebb599c72e38696095e8893a8babde3a972810daae31d531d"
+    },
+    {
+      "file": "m2-music-live-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-music-live-links.log",
+      "sha256": "c50fb0e38c13b5eda4658de08f0834c8ebe77c07291c4842a106ed3aaa15aac8"
+    }
+  ],
+  "implementation_commit": "309ae214afc9f53051076a791138a59da7731644"
+}

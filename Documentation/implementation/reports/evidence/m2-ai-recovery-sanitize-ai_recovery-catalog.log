@@ -1,0 +1,73 @@
+420/420 Testing: ai_recovery.catalog
+420/420 Test: ai_recovery.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_recovery_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_recovery.catalog" start time: Oct 16 14:04 CEST
+Output:
+----------------------------------------------------------
+m_cultist1 command=0 clip=6 available=1
+m_cultist1 command=1 clip=7 available=1
+m_cultist1 command=2 clip=8 available=1
+m_cultist1 command=3 clip=15 available=1
+f_cultist1 command=0 clip=6 available=1
+f_cultist1 command=1 clip=7 available=1
+f_cultist1 command=2 clip=8 available=1
+f_cultist1 command=3 clip=15 available=1
+m_civilian1 command=0 clip=4294967295 available=0
+m_civilian1 command=1 clip=4294967295 available=0
+m_civilian1 command=2 clip=4294967295 available=0
+m_civilian1 command=3 clip=4294967295 available=0
+f_civilian1 command=0 clip=4294967295 available=0
+f_civilian1 command=1 clip=4294967295 available=0
+f_civilian1 command=2 clip=4294967295 available=0
+f_civilian1 command=3 clip=4294967295 available=0
+labtech command=0 clip=4294967295 available=0
+labtech command=1 clip=4294967295 available=0
+labtech command=2 clip=4294967295 available=0
+labtech command=3 clip=4294967295 available=0
+gideon command=0 clip=4294967295 available=0
+gideon command=1 clip=4294967295 available=0
+gideon command=2 clip=4294967295 available=0
+gideon command=3 clip=4294967295 available=0
+<end of output>
+Test time =   0.92 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.catalog" end time: Oct 16 14:04 CEST
+"ai_recovery.catalog" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 14:04 CEST
+
+ai_fire =  12.36 sec*proc
+
+ai_follow =   3.93 sec*proc
+
+ai_locomotion =   1.07 sec*proc
+
+ai_navigation =   3.28 sec*proc
+
+ai_recovery =   1.16 sec*proc
+
+ai_script =   2.42 sec*proc
+
+ai_state =  27.30 sec*proc
+
+ai_target =   3.63 sec*proc
+
+ai_trigger =   2.87 sec*proc
+
+character_motion =   1.14 sec*proc
+
+headless =  78.84 sec*proc
+
+objects =   0.22 sec*proc
+
+paths =   3.97 sec*proc
+
+player =   7.82 sec*proc
+
+private =  74.78 sec*proc
+
+services =   7.68 sec*proc
+

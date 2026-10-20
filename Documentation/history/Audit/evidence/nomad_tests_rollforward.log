@@ -1,0 +1,64 @@
+PASS BinaryReaderEx reads primitives
+PASS LithTech coordinate conversion mirrors X
+PASS Local import policy rejects proprietary paths
+PASS LithTech reference policy keeps outputs in cache
+PASS REZ parser reads synthetic archive
+PASS ABC parser reads synthetic static model
+PASS ABC parser keeps replacement vertices
+PASS ABC parser reads sockets
+PASS ABC mesh assembler ignores invalid faces
+PASS ABC viewmodel mesh uses assembled positions
+PASS ABC mesh assembler recalculates normals
+PASS ABC animation selects idle fallback
+PASS ABC animation controller interpolates and loops
+PASS ABC animation controller applies hierarchy
+PASS ABC animation controller skins quaternion rotation
+PASS DTX decoder reads synthetic paletted texture
+PASS DTX decoder reads metadata and 32 bit texture
+PASS DTX decoder reads DXT1 block
+PASS PCX decoder reads synthetic paletted texture
+PASS Bute parser reads typed values
+PASS DAT object helpers classify scene objects
+PASS Model asset resolver handles Blood 2 implicit AI
+PASS Debug asset catalog classifies supported entries
+PASS Debug asset catalog builds level object records
+PASS DAT parser stores object scale property
+PASS Lith world query raycasts polygons
+PASS Lith combat resolver emits hitscan effects
+PASS Lith AI perception uses LOS and noise
+PASS Lith AI combat fires through shared resolver
+PASS DAT world semantics hide technical brushes
+PASS Game data locator uses project game_data only
+FAIL Game config locator resolves local extracted configs: Expected condition to be true.
+PASS App settings defaults are conservative
+PASS Game install validator checks required archives
+PASS Game session config carries campaign choices
+PASS Game content resolver detects Blood 2 Nightmare
+PASS Gameplay world extracts triggers conversations and AI
+PASS Door definition reads Blood 2 sliding door
+PASS Door definition reads Blood 2 rotating door
+PASS Door definition reads Shogo state flags
+PASS Door definition handles Shogo destructible aliases
+PASS Door runtime handles trigger and close messages
+PASS Door runtime handles waits and open flags
+PASS Trigger runtime sends delayed messages
+PASS Conversation runtime advances and repeats
+PASS Weapon runtime consumes ammo and observes cooldown
+PASS Blood 2 weapon catalog maps keyboard slots
+PASS Blood 2 weapon catalog exposes view offsets
+PASS Weapon aim math uses yaw and pitch
+PASS AI runtime chooses attack and search states
+PASS Shogo gameplay world extracts DAT objects
+PASS Shogo weapon catalog maps slots and runtime
+PASS Shogo weapon catalog exposes view offsets
+PASS Shogo trigger runtime handles weighted timed messages
+PASS Shogo dialog and transmission triggers progress
+PASS Shogo AI runtime transitions and emits triggers
+PASS Lith effect queue keeps runtime references
+PASS Material config resolves texture presets
+PASS Generated normal map keeps subtle height gradients
+PASS Local game archives parse when available
+PASS Local DAT levels parse when available
+PASS Local DAT scene semantics detect objects
+PASS Local referenced textures decode when available
+PASS Local ABC models parse when available

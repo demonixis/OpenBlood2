@@ -1,0 +1,298 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete",
+  "implementation_parent": "711893eb55c7dcd994413474c6c3e9597c8dfbc0",
+  "source_ledger": "Blood2/docs/implementation/sources/m2_player_impulse_sources.json",
+  "validation": {
+    "debug-initial-suite": {
+      "total": 214,
+      "passed": 212,
+      "failed": 2,
+      "seconds": 77.04,
+      "failed_cases": [
+        "train_session.private_60",
+        "player_death.private"
+      ]
+    },
+    "debug-recheck": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "seconds": 47.27,
+      "failed_cases": []
+    },
+    "debug-final-focused": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "seconds": 0.51,
+      "failed_cases": []
+    },
+    "debug-gpu": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "seconds": 49.46,
+      "failed_cases": []
+    },
+    "release-initial-suite": {
+      "total": 214,
+      "passed": 212,
+      "failed": 2,
+      "seconds": 12.14,
+      "failed_cases": [
+        "train_session.private_60",
+        "player_death.private"
+      ]
+    },
+    "release-recheck": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "seconds": 9.79,
+      "failed_cases": []
+    },
+    "release-final-focused": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "seconds": 0.09,
+      "failed_cases": []
+    },
+    "release-gpu": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "seconds": 22.75,
+      "failed_cases": []
+    },
+    "sanitize-initial-suite": {
+      "total": 214,
+      "passed": 212,
+      "failed": 2,
+      "seconds": 451.09,
+      "failed_cases": [
+        "ai_runtime.clearance_private",
+        "player_death.private"
+      ]
+    },
+    "sanitize-recheck": {
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "seconds": 93.29,
+      "failed_cases": []
+    }
+  },
+  "final_distinct_headless_cases_per_configuration": 214,
+  "final_unresolved_test_failures": 0,
+  "commands": {
+    "working_directory": "/home/yann/projects/lithtech/Blood2",
+    "debug_build": "cmake --build build/debug --target blood2_app object_contract_tests services_tests player_tests movement_tests locomotion_tests container_tests door_tests trigger_tests interaction_tests pushable_tests destructable_model_tests ai_runtime_tests ai_locomotion_tests death_effect_tests player_death_tests movement_audio_tests fall_damage_tests player_state_tests player_restore_tests player_keepalive_tests world_tests train_session_tests blood_spurt_tests weapon_tests destructable_state_tests player_impulse_tests -j4",
+    "release_build": "cmake --build build/release --target blood2_app object_contract_tests services_tests player_tests movement_tests locomotion_tests container_tests door_tests trigger_tests interaction_tests pushable_tests destructable_model_tests ai_runtime_tests ai_locomotion_tests death_effect_tests player_death_tests movement_audio_tests fall_damage_tests player_state_tests player_restore_tests player_keepalive_tests world_tests train_session_tests blood_spurt_tests weapon_tests destructable_state_tests player_impulse_tests -j3",
+    "sanitize_build": "cmake --build build/sanitize --target object_contract_tests services_tests player_tests movement_tests locomotion_tests container_tests door_tests trigger_tests interaction_tests pushable_tests destructable_model_tests ai_runtime_tests ai_locomotion_tests death_effect_tests player_death_tests movement_audio_tests fall_damage_tests player_state_tests player_restore_tests player_keepalive_tests world_tests train_session_tests blood_spurt_tests weapon_tests destructable_state_tests player_impulse_tests -j3",
+    "headless": "ctest --test-dir build/<config> --output-on-failure -j2 -R '^(objects\\.|services\\.|player\\.|movement\\.|locomotion\\.|containers\\.|doors\\.|triggers\\.|interaction\\.|pushables\\.|destructable_models\\.|ai_runtime\\.|ai_locomotion\\.|death_effects\\.|player_death\\.|movement_audio\\.|fall_damage\\.|player_state\\.|player_restore\\.|player_keepalive\\.|world\\.(level_change|level_change_private|session_lifecycle|session_messages)$|train_session\\.|blood_spurts\\.|weapons\\.|destructable_state\\.|player_impulse\\.)'",
+    "debug_release_recheck": "cmake --build build/<config> --target player_death_tests train_session_tests; ctest --test-dir build/<config> -V -R '^(player_death\\.private|train_session\\.)'",
+    "final_focused": "cmake --build build/<config> --target player_impulse_tests; ctest --test-dir build/<config> -V -R '^player_impulse\\.'",
+    "sanitize_recheck": "cmake --build build/sanitize --target player_death_tests player_impulse_tests -j3; ctest --test-dir build/sanitize -V -j1 -R '^(player_death\\.private|player_impulse\\.|ai_runtime\\.clearance_private$)'",
+    "gpu": "ctest --test-dir build/<debug|release> -V -R '^gpu\\.(movement|player_restore|train_session)$'",
+    "gpu_environment": [
+      "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+      "SDL_AUDIODRIVER=dummy"
+    ],
+    "sanitizer_environment": [
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1"
+    ]
+  },
+  "configurations": {
+    "debug": "GCC Debug inspector ON",
+    "release": "GCC Release inspector OFF",
+    "sanitize": "Clang Debug ASan/UBSan inspector OFF"
+  },
+  "behavior": {
+    "motion_30_60_120_hz": {
+      "initial_velocity": [
+        100,
+        0,
+        50
+      ],
+      "half_second_displacement": [
+        6.24472,
+        0,
+        3.12236
+      ],
+      "substeps": 60,
+      "wall_blocks": true
+    },
+    "diagnostic_original_cultist": {
+      "shots": 25,
+      "accepted_player_impulses": 25,
+      "final_health": 0,
+      "final_position": [
+        -2.55707,
+        42.001,
+        262.132
+      ],
+      "clean_teardown": true
+    },
+    "continuous_routes": [
+      {
+        "hz": 30,
+        "kills": 10,
+        "player_impulses": 5,
+        "destination_health": 129.974,
+        "destination_bullets": 9
+      },
+      {
+        "hz": 60,
+        "kills": 10,
+        "player_impulses": 0,
+        "destination_health": 175,
+        "destination_bullets": 11
+      }
+    ]
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "preserved_user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "logs": {
+    "initial-tests": {
+      "path": "m2-player-impulses-initial-tests.log",
+      "bytes": 1390,
+      "sha256": "cabf815bf6ea9906f9ccce4f9e960aad7a83936c224e56f64d6d2ba53c7e5fc7"
+    },
+    "debug-build": {
+      "path": "m2-player-impulses-debug-build.log",
+      "bytes": 4335,
+      "sha256": "1f6ee6c02c7308cc3a7bdcc8ecefb577816984a7f0f1e408a5810651dbe5e7fc"
+    },
+    "release-build": {
+      "path": "m2-player-impulses-release-build.log",
+      "bytes": 13089,
+      "sha256": "88e17a8c174f36105a2cd6a6c5aeb31e60ceeb7b0abe37782c52bb3f18f83c17"
+    },
+    "sanitize-build": {
+      "path": "m2-player-impulses-sanitize-build.log",
+      "bytes": 12912,
+      "sha256": "cc384c93810c6adb8a36feda248a95e3bbf26d27f64ba7b0e19004903b90d688"
+    },
+    "debug-tests": {
+      "path": "m2-player-impulses-debug-tests.log",
+      "bytes": 29049,
+      "sha256": "864d1be07fe84cb2048a248446a24b7eb887e25227f888109b8e171bce1d7082"
+    },
+    "release-tests": {
+      "path": "m2-player-impulses-release-tests.log",
+      "bytes": 29051,
+      "sha256": "9dd2df37d32d27308dd73d1e3df78de1b3d1565fd5c5c0982579b26dc167cff5"
+    },
+    "sanitize-tests": {
+      "path": "m2-player-impulses-sanitize-tests.log",
+      "bytes": 26988,
+      "sha256": "800a243f2d8def0becc825b65b81e6dc5c9f5248f8500b3eadd16a40e9082514"
+    },
+    "debug-recheck": {
+      "path": "m2-player-impulses-debug-recheck.log",
+      "bytes": 77779,
+      "sha256": "d8321a92c3e0d82ae511d1f7527ce2180e349818ef71d8d03c4e4f1ad7698f5f"
+    },
+    "release-recheck": {
+      "path": "m2-player-impulses-release-recheck.log",
+      "bytes": 77797,
+      "sha256": "f261f888dbd03e97b194b7785d1def90bf0149ce2eeb28f9583e2abcf8885913"
+    },
+    "sanitize-recheck": {
+      "path": "m2-player-impulses-sanitize-recheck.log",
+      "bytes": 4454,
+      "sha256": "c98bba6e427c8d27e465fd8a7c97138e58fba96a2f77a79464ada679dce79fec"
+    },
+    "debug-final-focused": {
+      "path": "m2-player-impulses-debug-final-focused.log",
+      "bytes": 2788,
+      "sha256": "bf8f45bf5cdfd952bb4381d7d95e4ae4270e21123c418213bc977c13f368cd91"
+    },
+    "release-final-focused": {
+      "path": "m2-player-impulses-release-final-focused.log",
+      "bytes": 2816,
+      "sha256": "4f737791224500705c69f75532ce9fd14f6e580478fe04f064c376ba03b4d20d"
+    },
+    "debug-gpu": {
+      "path": "m2-player-impulses-debug-gpu.log",
+      "bytes": 44138,
+      "sha256": "ae17b4feb6295515669017b0fa1104dda78e00d6b0f9d749a4893135498211b8"
+    },
+    "release-gpu": {
+      "path": "m2-player-impulses-release-gpu.log",
+      "bytes": 44028,
+      "sha256": "773a0711fb367e9db5f47e5de9d2bdc5b98b9c7df9226be8862ee6e7d76564d5"
+    },
+    "source-check": {
+      "path": "m2-player-impulses-source-check.log",
+      "bytes": 97,
+      "sha256": "c9d203707242ed05add0a9de3525404827fbc2a41ca539cd040f7db24e20e825"
+    },
+    "format": {
+      "path": "m2-player-impulses-format.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "integrity": {
+      "path": "m2-player-impulses-integrity.log",
+      "bytes": 56,
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6"
+    },
+    "links": {
+      "path": "m2-player-impulses-links.log",
+      "bytes": 40,
+      "sha256": "217fbe2904fa7bb28eff0a03702f4094850a7849af545352ece43060f77e18f1"
+    }
+  },
+  "initial_failures": [
+    "Generated setup omitted GameStartPoint; fixture fixed, no production entry changes.",
+    "New train assertion wrongly required enemy damage at 60 Hz; unchanged route reaches the exit unhurt. Real hits remain mandatory at 30 Hz and in the dedicated NPC test.",
+    "Prior death test assumed zero incoming velocity. It now requires passive decay with no controls, then continued immobility; original death does not erase the lethal impulse.",
+    "The sanitizer parallel clearance case reached its existing 90-second deadline. Serial recheck keeps the same timeout and leak/error options. No timeout increased or sanitizer suppression introduced."
+  ],
+  "limitations": [
+    "M2 remains incomplete; production NPC impulses/trapped behavior, already-dead damage ordering, required remaining services and IMA music are not completed.",
+    "Shared body integration replaces the original separate-body delta transport. Retail motion parity and multiplayer are not claimed.",
+    "Sanitizer checks are headless. GPU checks use NVIDIA Vulkan; native macOS/Windows and the prior libdbus GPU-LSan residual are not revalidated.",
+    "CityHub GPU capture reviewed locally; commercial captures and assets are not committed."
+  ],
+  "implementation_commit": "3d15e6ea4b892108ce3da6c8ce90dde157a36c2d"
+}

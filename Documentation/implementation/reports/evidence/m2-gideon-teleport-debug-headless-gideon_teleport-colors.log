@@ -1,0 +1,14 @@
+674/683 Testing: gideon_teleport.colors
+674/683 Test: gideon_teleport.colors
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_teleport_tests" "colors" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-teleport-colors"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_teleport.colors" start time: Oct 17 02:47 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_teleport.colors" end time: Oct 17 02:47 CEST
+"gideon_teleport.colors" time elapsed: 00:00:00
+----------------------------------------------------------

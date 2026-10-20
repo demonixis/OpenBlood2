@@ -1,0 +1,14 @@
+351/361 Testing: ai_perception.factions
+351/361 Test: ai_perception.factions
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests" "factions"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_perception.factions" start time: Oct 16 10:21 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.factions" end time: Oct 16 10:21 CEST
+"ai_perception.factions" time elapsed: 00:00:00
+----------------------------------------------------------

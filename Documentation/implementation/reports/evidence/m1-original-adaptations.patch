@@ -1,0 +1,145 @@
+--- original/ObjectDLL/B2BaseClass.cpp
++++ Blood2/src/game/original/B2BaseClass.cpp
+@@ -10,22 +10,11 @@
+ 
+ #include "cpp_engineobjects_de.h"
+ #include "B2BaseClass.h"
+-#include "BloodServerShell.h"
+-#include "SharedDefs.h"
+-
+-
+-BEGIN_CLASS(B2BaseClass)
+-	PROP_DEFINEGROUP(GameSettings, PF_GROUP6)
+-		ADD_BOOLPROP_FLAG(DifficultyEasy, DTRUE, PF_GROUP6)
+-		ADD_BOOLPROP_FLAG(DifficultyMed, DTRUE, PF_GROUP6)
+-		ADD_BOOLPROP_FLAG(DifficultyHard, DTRUE, PF_GROUP6)
+-		ADD_BOOLPROP_FLAG(TypeCustom, DTRUE, PF_GROUP6)
+-		ADD_BOOLPROP_FLAG(TypeSingle, DTRUE, PF_GROUP6)
+-		ADD_BOOLPROP_FLAG(TypeActionMode, DTRUE, PF_GROUP6)
+-		ADD_BOOLPROP_FLAG(TypeBloodBath, DTRUE, PF_GROUP6)
+-		ADD_BOOLPROP_FLAG(TypeCTF, DTRUE, PF_GROUP6)
+-		ADD_BOOLPROP_FLAG(TypeCoop, DTRUE, PF_GROUP6)
+-END_CLASS_DEFAULT_FLAGS(B2BaseClass, BaseClass, NULL, NULL, CF_HIDDEN)
++#include "game/game_settings.h"
++
++
++// Class registration and defaults: game/registration.cpp.
++
+ 
+ 
+ // Constructor
+--- original/ObjectDLL/CameraSpot.h
++++ Blood2/src/game/original/CameraSpot.h
+@@ -13,7 +13,6 @@
+ 
+ #include "cpp_engineobjects_de.h"
+ #include "cpp_server_de.h"
+-#include "PathListData.h"
+ #include "B2BaseClass.h"
+ 
+ class CameraSpot : public B2BaseClass
+--- original/ObjectDLL/CameraSpot.cpp
++++ Blood2/src/game/original/CameraSpot.cpp
+@@ -11,8 +11,8 @@
+ #include <stdio.h>
+ #include "CameraSpot.h"
+ 
+-BEGIN_CLASS(CameraSpot)
+-END_CLASS_DEFAULT_FLAGS(CameraSpot, B2BaseClass, NULL, NULL, CF_ALWAYSLOAD)
++// Class registration and defaults: game/registration.cpp.
++
+ 
+ void BPrint(char*);
+ 
+@@ -175,7 +175,7 @@
+ //
+ // ----------------------------------------------------------------------- //
+ 
+-void CameraSpot::ObjectTouch (HOBJECT hObj)
++void CameraSpot::ObjectTouch (HOBJECT)
+ {
+ 	CServerDE* pServerDE = GetServerDE();
+ 	if (!pServerDE) return;
+--- original/ObjectDLL/Key.cpp
++++ Blood2/src/game/original/Key.cpp
+@@ -8,19 +8,12 @@
+ //
+ // ----------------------------------------------------------------------- //
+ 
+-#include "key.h"
++#include "Key.h"
+ #include "cpp_server_de.h"
+ 
+ 
+-BEGIN_CLASS(Key)
+-	ADD_REALPROP(TimeStamp, 0.0f)
+-	ADD_STRINGPROP(SoundName, "")
+-	ADD_REALPROP_FLAG(SoundRadius, 0.0f,PF_RADIUS)
+-	ADD_BOOLPROP(LoopSound, DFALSE)
+-	ADD_STRINGPROP(MessageTarget, "")
+-	ADD_STRINGPROP(MessageName, "")
+-	ADD_STRINGPROP(BPrintMessage, "")
+-END_CLASS_DEFAULT_FLAGS(Key, B2BaseClass, NULL, NULL, CF_ALWAYSLOAD)
++// Class registration and defaults: game/registration.cpp.
++
+ 
+ 
+ // ----------------------------------------------------------------------- //
+@@ -142,7 +135,7 @@
+ //
+ // ----------------------------------------------------------------------- //
+ 
+-DBOOL Key::InitialUpdate(DVector* pMovement)
++DBOOL Key::InitialUpdate(DVector*)
+ {
+ 	CServerDE* pServerDE = GetServerDE();
+ 	if (!pServerDE) return DFALSE;
+--- original/AppHeaders/cpp_engineobjects_de.h
++++ Blood2/src/game/legacy/cpp_engineobjects_de.h
+@@ -31,7 +31,7 @@
+ {
+ 	public :
+ 
+-		BaseClass(DBYTE nType=OT_NORMAL) { m_nType = nType; }
++		BaseClass(DBYTE nType=OT_NORMAL) : m_pFirstAggregate(nullptr), m_hObject(nullptr), m_pInternal(nullptr), m_nType(nType) {}
+ 		virtual ~BaseClass() {}
+ 
+ 		DBYTE  GetType() const { return m_nType; }
+@@ -64,7 +64,7 @@
+ 
+ 	private :
+ 
+-		void *m_pInternal;
++		[[maybe_unused]] void *m_pInternal;
+ 		
+ 
+ 		// C++ only data...
+--- original/AppHeaders/cpp_aggregate_de.h
++++ Blood2/src/game/legacy/cpp_aggregate_de.h
+@@ -23,7 +23,7 @@
+ 		AggregateObjectMessageFn m_ObjectMessageFn;
+ 	
+ 
+-		Aggregate()
++		Aggregate() : m_pNextAggregate(nullptr)
+ 		{
+ 			m_EngineMessageFn = _EngineMessageFn;
+ 			m_ObjectMessageFn = _ObjectMessageFn;
+@@ -33,8 +33,8 @@
+ 
+ 	protected :
+ 
+-		virtual DDWORD EngineMessageFn(LPBASECLASS pObject, DDWORD messageID, void *pData, DFLOAT lData) { return 1; }
+-		virtual DDWORD ObjectMessageFn(LPBASECLASS pObject, HOBJECT hSender, DDWORD messageID, HMESSAGEREAD hRead) { return 1; }
++		virtual DDWORD EngineMessageFn(LPBASECLASS, DDWORD, void *, DFLOAT) { return 1; }
++		virtual DDWORD ObjectMessageFn(LPBASECLASS, HOBJECT, DDWORD, HMESSAGEREAD) { return 1; }
+ 	
+ 	private :
+ 
+--- original/AppHeaders/engineobjects.c (selected prefix)
++++ Blood2/src/game/original/engineobjects.cpp
+@@ -1,3 +1,4 @@
++#include "cpp_engineobjects_de.h"
+ 
+ #include "serverobj_de.h"
+ #include "engineobjects_de.h"

@@ -1,0 +1,37 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 1057: dls_sampler.midi_limits
+      Start 1055: dls_sampler.live_private
+ 1/13 Test #1057: dls_sampler.midi_limits ..........   Passed    0.00 sec
+      Start 1058: dls_sampler.midi_private
+ 2/13 Test #1058: dls_sampler.midi_private .........   Passed    0.48 sec
+      Start  996: dls_sampler.private
+ 3/13 Test #1055: dls_sampler.live_private .........   Passed    0.59 sec
+      Start  992: dls_sampler.lifetime
+ 4/13 Test  #992: dls_sampler.lifetime .............   Passed    0.09 sec
+      Start 1056: dls_sampler.midi_receiver
+ 5/13 Test #1056: dls_sampler.midi_receiver ........   Passed    0.04 sec
+      Start  991: dls_sampler.envelopes
+ 6/13 Test  #991: dls_sampler.envelopes ............   Passed    0.01 sec
+      Start 1053: dls_sampler.live_controls
+ 7/13 Test #1053: dls_sampler.live_controls ........   Passed    0.01 sec
+      Start  993: dls_sampler.legacy_pan
+ 8/13 Test  #993: dls_sampler.legacy_pan ...........   Passed    0.00 sec
+      Start 1054: dls_sampler.bend_reference
+ 9/13 Test #1054: dls_sampler.bend_reference .......   Passed    0.00 sec
+      Start  994: dls_sampler.routing
+10/13 Test  #994: dls_sampler.routing ..............   Passed    0.00 sec
+      Start  995: dls_sampler.controllers
+11/13 Test  #995: dls_sampler.controllers ..........   Passed    0.00 sec
+      Start  990: dls_sampler.pcm
+12/13 Test  #990: dls_sampler.pcm ..................   Passed    0.00 sec
+13/13 Test  #996: dls_sampler.private ..............   Passed    0.57 sec
+
+100% tests passed, 0 tests failed out of 13
+
+Label Time Summary:
+audio           =   1.21 sec*proc (10 tests)
+headless        =   1.81 sec*proc (13 tests)
+music_assets    =   1.81 sec*proc (13 tests)
+private         =   1.64 sec*proc (3 tests)
+
+Total Test time (real) =   1.07 sec

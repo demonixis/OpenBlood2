@@ -1,0 +1,14 @@
+599/603 Testing: weapon_audio.hearing
+599/603 Test: weapon_audio.hearing
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_audio_tests" "hearing" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-audio-hearing"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapon_audio.hearing" start time: Oct 16 23:02 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_audio.hearing" end time: Oct 16 23:02 CEST
+"weapon_audio.hearing" time elapsed: 00:00:00
+----------------------------------------------------------

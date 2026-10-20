@@ -1,0 +1,1895 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 1f860d0..6227018 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -441,3 +441,9 @@ Read [contracts](docs/EXPLOSION_LIGHT_CONTRACTS.md). Preserve delay overshoot di
+ linear/final updates, reused zero Radius2 and independent sibling/source lifetime.
+ These are evaluated lights, not surface illumination or scorch decals. Keep missing
+ composite/lighting services explicit; safe NEW_LEVEL and M2 remain incomplete.
++
++The [explosion particle-ring continuation](../Documentation/Implementation/M2_EXPLOSION_RINGS.md) connects original ring lifecycle/recipes and actual textured particles.
++Read [contracts](docs/EXPLOSION_RING_CONTRACTS.md). Preserve cached-right emission, delay return/overshoot, source per-update rotation,
++ordered independent RNG and detached ownership. Particle stepping/quad sizing follow
++explicit later-engine reference policies, not verified retail parity. Keep missing
++fragments/flames/illumination and safe NEW_LEVEL explicit; M2 remains incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 44d065b..7f2be4e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,13 +14,13 @@ include(CTest)
+ include(cmake/Dependencies.cmake)
+ configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+ 
+-add_library(engine STATIC src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
++add_library(engine STATIC src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+ target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
+ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index 4a0e394..3a73fee 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,9 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++Current continuation: [original explosion particle rings](../Documentation/Implementation/M2_EXPLOSION_RINGS.md) adds
++fire/smoke particle motion, real DTX alpha rendering and per-particle inspection.
++Remaining composite FX, illumination and safe NEW_LEVEL keep M2 incomplete.
++
+ The [explosion point-light continuation](../Documentation/Implementation/M2_EXPLOSION_LIGHTS.md) evaluates original flash/residual light colors, radii, delays and lifetime, independently of emitter/resource lifetime.
+ Inspection and hidden/reload checks cover all nine SubwayA emitters. Surface
+ illumination, remaining composite components, safe level transfer and M2 remain open.
+diff --git a/docs/EXPLOSION_LIGHT_CONTRACTS.md b/docs/EXPLOSION_LIGHT_CONTRACTS.md
+index 3bcaa39..5470be2 100644
+--- a/docs/EXPLOSION_LIGHT_CONTRACTS.md
++++ b/docs/EXPLOSION_LIGHT_CONTRACTS.md
+@@ -92,3 +92,7 @@ without ImGui. This proves evaluated state and inspector operation, not light pi
+ SubwayA counts remain 203 created / four transferred sounds / 372 editor-only /
+ one unsupported Gideon / zero failed sources. Other composite components,
+ illumination, safe automatic NEW_LEVEL and required services remain open.
++
++Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
++selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
++are historical; fragments/flames, illumination and the full M2 gate remain open.
+diff --git a/docs/EXPLOSION_MODEL_CONTRACTS.md b/docs/EXPLOSION_MODEL_CONTRACTS.md
+index 13a7682..609b9e1 100644
+--- a/docs/EXPLOSION_MODEL_CONTRACTS.md
++++ b/docs/EXPLOSION_MODEL_CONTRACTS.md
+@@ -110,3 +110,7 @@ private original sphere. Hidden/reloaded application smoke requires a model draw
+ World accounting stays 203 created / four transferred sounds / 372 editor-only /
+ one unsupported Gideon / zero failed sources. Safe automatic NEW_LEVEL and other
+ required FX/services keep the actual M2 gate open.
++
++Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
++selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
++are historical; fragments/flames, illumination and the full M2 gate remain open.
+diff --git a/docs/EXPLOSION_RING_CONTRACTS.md b/docs/EXPLOSION_RING_CONTRACTS.md
+new file mode 100644
+index 0000000..968a633
+--- /dev/null
++++ b/docs/EXPLOSION_RING_CONTRACTS.md
+@@ -0,0 +1,109 @@
++# Original explosion particle-ring contracts
++
++This continues [explosion sprites](EXPLOSION_SPRITE_CONTRACTS.md),
++[models](EXPLOSION_MODEL_CONTRACTS.md), [lights](EXPLOSION_LIGHT_CONTRACTS.md) and
++[sprite presentation](SPRITE_VIEW_CONTRACTS.md). See the
++[source ledger](M2_EXPLOSION_RING_SOURCES.json) and
++[validation evidence](../../Documentation/Implementation/M2_EXPLOSION_RINGS.md).
++**M2 remains incomplete.** These are actual moving, textured particles; fragments,
++flames and surface illumination remain unavailable.
++
++## Original rules and bounded engine service
++
++CExplosionRingFX retains original Init/CreateObject/Update/AddParticles rules.
++Owned typed settings, particle arrays and resource names replace client handles.
++Particles are relative to the system origin and rotation. AddParticles aligns the
++radial plane with the supplied normal when align=1, otherwise world +Y. It caches
++right/forward **before** turning the basis by 2*pi/count, then emits normalized
++right times position radius and velocity. All particles start with the system's
++duration; their white color is multiplied by the system RGB. The existing checked
++alignment helper supplies a deterministic vertical-axis fallback where the original
++passes parallel forward/up vectors. This fallback is not verified retail parity.
++
++The default texture is SpriteTextures/smoke64_2.dtx. Resource indexing is required
++at creation; DTX decoding and errors belong to presentation. A typed zero position
++is a valid origin, avoiding BaseParticleSystemFX's uninitialized local position
++when both position and server handle are absent. No server pointer is retained.
++
++Creation without delay emits immediately with initial alpha. A positive delay
++starts with zero alpha and no particles. At elapsed >= delay, reset start time to
++now, clear delay and emit; restore initial alpha **only for fade=0**. Return from
++that update without rotation/fade. Overshoot is discarded and new particles do not
++inherit the waiting time. A fading delayed ring becomes visible on its next update.
++
++Original rotate modes 1–5 use the five source formulas times pi **per effect update**,
++not dt-scaled rotation. The axis is the supplied normal when aligned, otherwise +Y.
++Fade modes 1–5 retain linear, endpoint and two-half formulas. Update interpolates
++before returning elapsed < duration. The manager removes terminal effects before
++presentation; it does not clamp final overshoot into a new gameplay rule. The
++CSFXMgr 1 ms cadence applies to effect rules. Particle integration runs each session
++step, outside that effect cadence and outside the inspector.
++
++The new engine particle integrator is deliberately small: lifetime -= dt; discard
++only when lifetime < 0; position += old velocity*dt; then velocity.y += gravity*dt.
++This ordering is supported by the later LithTech source recorded in the ledger,
++**not a verified recreation of Blood II's unavailable retail engine**. No collision,
++bounce, drag, wind or other particle flags are implemented. The selected ring caller
++uses flags=0. Validation preflights the whole array before mutation. dt is finite
++[0,60], arrays have at most 2048 particles, and positions/velocities use existing
++physics bounds. Bad clocks/state fail visibly; session failure is propagated.
++
++Settings require finite bounded position/nonzero normal, RGB/alpha [0,1], radius
++[0,640000], position radius [0,10000], speed/gravity/rotation [-10000,10000], duration
++[.001,600], delay [0,600], 1–256 particles, fade/rotate 0–5 and align 0–1. These
++explicit supported bounds reject unsupported input without silent clamping.
++
++## Selected high-detail recipes
++
++Types 0/1/2/3 each emit one 32-particle fire ring, offset 25 along normalized normal,
++position radius 10, velocity 400, gravity zero, duration .5, alpha 1, fade 1, align 0,
++Firepart64.dtx. Radius is 4000/8000/12000/8000 respectively. Type 3 also emits three
++32-particle Smoke32_4/5/6 rings: offsets 10/25/40, radius 5000, position radius 10,
++duration 1.5, alpha .5 and fade 1. In source order each draws velocity [100,150],
++gravity [0,30]/[20,50]/[40,70], then delay [0,.5]. This is nine draws per grenade.
++Types 6/8 successfully produce no rings, matching their selected high-detail branch;
++other types fail explicitly.
++
++A private deterministic minstd_rand stream preserves those per-component draw
++orders and ranges, independent of server/model RNG. It does not reproduce global
++retail RNG or fragment draw interleaving. No quality menu or generic particle ABI
++is added. The original server emits model/sprite/ring/light requests before its
++existing null-damager radius call and sound. Ring failure does not cancel siblings,
++audio or other components. Null-damager suppression remains unchanged.
++
++## Rendering, ownership and inspection
++
++BaseParticleSystemFX passes radius/640 to SetupParticleSystem. Presentation uses
++that value as camera-facing quad half extent, independent of texture dimensions.
++The later renderer references support this policy; retail pixel parity remains
++unverified. Actual DTX RGB/alpha is sampled and multiplied by system RGB/alpha.
++Particles share the existing sprite depth test, no-depth-write alpha pass and stable
++back-to-front sorting with ordinary sprites. Model/sprite passes remain separately
++sorted. There is no per-particle lighting, additive blending or invented placeholder
++texture. World revision owns material/cache lifetime; failed decoding is inspectable.
++Building/drawing a frame never advances particles or original game state.
++
++A session reserves at most 128 systems and 2048 particles, counting delayed systems'
++future particles. Reports retain the last 64 deliveries with independent event and
++system IDs; identities are never reused across unload. Partial failure preserves
++created siblings. Start, normal expiry and failure counters are distinct. Source
++removal does not kill detached particles; unload clears arrays, reports and RNG.
++
++Scene explosions displays reserved/live counts, pending delays, elapsed time, alpha,
++origin, half size, gravity, texture path, prepared quad/failure counts and expandable
++local positions/velocities/lifetimes. Delivery reports and source errors survive
++emitter removal. Missing composite components remain explicit; an accepted event is
++not a completed composite service.
++
++Tests cover radial layout, normal alignment, gravity ordering, strict particle
++expiry, atomic rejection, all fade/rotate formulas, cadence, delayed activation and
++overshoot, ordered recipe draws, capacity/partial failure, independent resources,
++source removal, read-only presentation and non-reused identities. Private tests
++exercise nine SubwayA emitters: 36 rings, 1152 reserved particles, 27 smoke rings
++after fire expiry, complete expiry and three player/world unload cycles. GPU tests
++check actual pixels, color multiplication and half-alpha blending; application
++smoke also requires particle quads while the UI is hidden and after reload.
++
++SubwayA source counts stay 203 created / four transferred sounds / 372 editor-only /
++one unsupported Gideon / zero failures. Safe automatic NEW_LEVEL, remaining required
++FX/lighting and other services still block the unchanged M2 gate.
+diff --git a/docs/EXPLOSION_SPRITE_CONTRACTS.md b/docs/EXPLOSION_SPRITE_CONTRACTS.md
+index 6bc03e8..63e4848 100644
+--- a/docs/EXPLOSION_SPRITE_CONTRACTS.md
++++ b/docs/EXPLOSION_SPRITE_CONTRACTS.md
+@@ -98,3 +98,7 @@ preparation across three load/player/unload cycles. This does not add source-wor
+ objects: counts remain 203 created, 4 transferred sounds, 372 editor-only, one
+ unsupported Gideon and zero failed sources. Safe automatic NEW_LEVEL, remaining
+ required FX/services and the actual M2 acceptance criteria remain open.
++
++Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
++selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
++are historical; fragments/flames, illumination and the full M2 gate remain open.
+diff --git a/docs/M2_EXPLOSION_RING_SOURCES.json b/docs/M2_EXPLOSION_RING_SOURCES.json
+new file mode 100644
+index 0000000..654a6c1
+--- /dev/null
++++ b/docs/M2_EXPLOSION_RING_SOURCES.json
+@@ -0,0 +1,169 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "f6b81c25606884f640d3ed711c5f232bc448f082",
++  "source_files": [
++    {
++      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
++      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
++      "selected_lines": [
++        [
++          338,
++          514
++        ],
++        [
++          1282,
++          1298
++        ],
++        [
++          1390,
++          1406
++        ],
++        [
++          1498,
++          1515
++        ],
++        [
++          1608,
++          1698
++        ]
++      ],
++      "use": "Original ring methods and selected high-detail fire/smoke recipes."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ExplosionFX.h",
++      "sha256": "2bc5a35f4da4929bdb0f10652d9014a56fdf9fe561d7ad320bf1dcf0f042dc18",
++      "selected_lines": [
++        [
++          74,
++          100
++        ],
++        [
++          326,
++          374
++        ]
++      ],
++      "use": "Original descriptor and FX constructor fields; typed settings initialize all fields instead of memset on a polymorphic descriptor."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
++      "sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13",
++      "selected_lines": [
++        [
++          22,
++          111
++        ]
++      ],
++      "use": "Typed replacement for particle object creation, radius/640 and explicit zero origin."
++    },
++    {
++      "path": "sources/blood2/AppHeaders/client_de.h",
++      "sha256": "d4bd76f15d1689a0314f832bcba0877d2bbabcdf830a8a44da9d662b4aa534e1",
++      "selected_lines": [
++        [
++          880,
++          905
++        ]
++      ],
++      "use": "Particle API position/rotation and color conventions."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
++      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
++      "selected_lines": [
++        [
++          1435,
++          1463
++        ]
++      ],
++      "use": "Effect scheduling/removal."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/SpecialFX.h",
++      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
++      "selected_lines": [
++        [
++          32,
++          56
++        ]
++      ],
++      "use": "One-millisecond effect cadence."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
++      "sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
++      "selected_lines": [
++        [
++          20,
++          51
++        ]
++      ],
++      "use": "Random float range mapping; private deterministic stream is an adaptation."
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ClientExplosionSFX.cpp",
++      "sha256": "fc51674223cf67456341d4529bc93acbe8df9365a8730b0491c7e22803c85a09",
++      "selected_lines": [
++        [
++          282,
++          304
++        ]
++      ],
++      "use": "FX-before-damage/audio publication and null-damager suppression."
++    },
++    {
++      "path": "sources/lithtech/runtime/client/src/particlesystem.cpp",
++      "sha256": "1efc6713379529f2a840cb15243ca4b8bdf846092ac5e7c67427df0ecbcf0d44",
++      "selected_lines": [
++        [
++          234,
++          298
++        ]
++      ],
++      "use": "Later-generation reference for lifetime/position/gravity order, not Blood II parity."
++    },
++    {
++      "path": "sources/lithtech/runtime/client/src/clientde_impl.cpp",
++      "sha256": "abcb1404c1a1fa3462fec343232a2387676674b677f77a9f19c7f67c714c865b",
++      "selected_lines": [
++        [
++          2726,
++          2743
++        ]
++      ],
++      "use": "Later-generation SetupParticleSystem radius storage."
++    },
++    {
++      "path": "sources/lithtech/runtime/client/src/particlesystem.h",
++      "sha256": "62f1ba3197c387430c9bd25b94412576eebabf88e50ce8018b10d7fd7fe6352d",
++      "selected_lines": [
++        [
++          73,
++          95
++        ]
++      ],
++      "use": "Later-generation particle size initialized from system radius."
++    },
++    {
++      "path": "sources/lithtech/runtime/render_a/src/sys/d3d/drawparticles.cpp",
++      "sha256": "ab49bac5ad8e60e371a24e091d5280dd0247e3fd19a839f265924a74b6db5759",
++      "selected_lines": [
++        [
++          90,
++          110
++        ],
++        [
++          255,
++          303
++        ]
++      ],
++      "use": "Later-generation camera-facing quad size, not a renderer import."
++    }
++  ],
++  "implementation": "Selected original CExplosionRingFX and high-detail recipes; bounded replacement engine particle simulation and actual alpha DTX billboards.",
++  "limitations": [
++    "Later engine references establish a replacement policy, not retail motion/raster parity.",
++    "No particle collision, fragment/flame services, illumination or full composite RNG ordering.",
++    "Private data exercises type 3; other recipes/modes use synthetic tests.",
++    "Safe automatic NEW_LEVEL and actual M2 acceptance remain open."
++  ]
++}
+diff --git a/docs/SPRITE_VIEW_CONTRACTS.md b/docs/SPRITE_VIEW_CONTRACTS.md
+index 3e20085..6eee56e 100644
+--- a/docs/SPRITE_VIEW_CONTRACTS.md
++++ b/docs/SPRITE_VIEW_CONTRACTS.md
+@@ -72,3 +72,7 @@ partial, opaque and opaque-black pixels, overlap order, world occlusion, absence
+ depth writes, resize/reupload and a real private bloodsplat at its authored pose.
+ The application smoke additionally requires all 12 quads with hidden UI and after
+ reload. These are harness observations, not a retail executable comparison.
++
++Continuation: [original explosion rings](EXPLOSION_RING_CONTRACTS.md) now supplies
++selected fire/smoke particle rings and alpha billboards. Earlier missing-ring statements
++are historical; fragments/flames, illumination and the full M2 gate remain open.
+diff --git a/src/app/inspector_scene_explosions.cpp b/src/app/inspector_scene_explosions.cpp
+index 8a57c1b..ddb7a6f 100644
+--- a/src/app/inspector_scene_explosions.cpp
++++ b/src/app/inspector_scene_explosions.cpp
+@@ -8,7 +8,7 @@ namespace OpenBlood2
+         ImGui::TextWrapped(
+             "Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
+             "Spatial WAV playback and selected original sprite/model components are implemented. Composite "
+-            "particles, fragments and surface illumination remain unavailable. Light color/radius are evaluated "
++            "particle flames, fragments and surface illumination remain unavailable. Rings and light state are shown "
+             "below.");
+         ImGui::Text("Audio: %s | active voices %zu | submitted frames %llu",
+                     game.server.audio.has_output() ? "SDL stream" : "offline clock", game.server.audio.voices().size(),
+@@ -56,6 +56,55 @@ namespace OpenBlood2
+             ImGui::PopID();
+         }
+         ImGui::Separator();
++        const auto& rings = game.server.explosion_rings;
++        ImGui::Text("Explosion rings: %zu active / %zu reserved particles / %llu started / %llu expired / %llu failed",
++                    rings.active.size(), rings.reserved_particles(), (unsigned long long)rings.started,
++                    (unsigned long long)rings.expired, (unsigned long long)rings.failed);
++        if (!rings.update_error.empty())
++            ImGui::TextWrapped("%s", rings.update_error.c_str());
++        for (const auto& fx : rings.active)
++        {
++            ImGui::Text("Ring %llu / event %llu: %zu particles, alpha %.3f / pending delay %.3f / elapsed %.3f",
++                        (unsigned long long)fx.id, (unsigned long long)fx.event, fx.particles.size(), fx.alpha,
++                        fx.delay, fx.last_time - fx.start_time);
++            ImGui::Text("Origin %.1f %.1f %.1f / half-size %.3f / gravity %.2f", fx.settings.position.x,
++                        fx.settings.position.y, fx.settings.position.z, fx.settings.radius / 640.f,
++                        fx.settings.gravity);
++            ImGui::TextWrapped("%s", fx.texture.c_str());
++            if (sprite_view)
++            {
++                std::size_t prepared = 0, failed = 0;
++                for (const auto& e : sprite_view->entries)
++                    if (e.particle_system == fx.id)
++                    {
++                        prepared += e.range != UINT32_MAX;
++                        if (!e.error.empty())
++                        {
++                            if (!failed)
++                                ImGui::TextWrapped("%s", e.error.c_str());
++                            ++failed;
++                        }
++                    }
++                ImGui::Text("%zu particle quads prepared / %zu resource or pose failures", prepared, failed);
++            }
++            ImGui::PushID(static_cast<int>(fx.id));
++            if (ImGui::TreeNode("Local particle positions / velocities / remaining life"))
++            {
++                for (unsigned i = 0; i < fx.particles.size(); ++i)
++                {
++                    const auto& v = fx.particles[i];
++                    ImGui::Text("%u: p %.2f %.2f %.2f / v %.2f %.2f %.2f / %.3f s", i, v.position.x, v.position.y,
++                                v.position.z, v.velocity.x, v.velocity.y, v.velocity.z, v.lifetime);
++                }
++                ImGui::TreePop();
++            }
++            ImGui::PopID();
++        }
++        if (ImGui::CollapsingHeader("Last 64 ring deliveries / failures"))
++            for (const auto& r : rings.reports)
++                ImGui::TextWrapped("Event %llu / type %u / %zu rings / %s", (unsigned long long)r.id, r.type,
++                                   r.rings.size(), r.error.empty() ? "accepted" : r.error.c_str());
++        ImGui::Separator();
+         const auto& lights = game.server.explosion_lights;
+         ImGui::Text("Explosion point lights: %zu active / %llu started / %llu expired / %llu failed",
+                     lights.active.size(), (unsigned long long)lights.started, (unsigned long long)lights.expired,
+@@ -155,6 +204,9 @@ namespace OpenBlood2
+                             r.targets.null_damager ? "yes (original guard)" : "no");
+                 ImGui::Text("Model event %llu | sprite event %llu", (unsigned long long)r.model_event,
+                             (unsigned long long)r.sprite_event);
++                ImGui::Text("Ring event %llu", (unsigned long long)r.ring_event);
++                if (!r.ring_error.empty())
++                    ImGui::TextWrapped("%s", r.ring_error.c_str());
+                 ImGui::Text("Light event %llu", (unsigned long long)r.light_event);
+                 if (!r.light_error.empty())
+                     ImGui::TextWrapped("%s", r.light_error.c_str());
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index a6d791c..5f27d41 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -351,7 +351,7 @@ namespace
+         bool explosion_model_drawn_hidden = false;
+         OpenBlood2::SpriteView sprite_scene;
+         OpenBlood2::WorldRenderer sprite_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
+-        bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false;
++        bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false, explosion_rings_drawn_hidden = false;
+         bool models_hidden = false, close_weapon_hidden = false;
+         std::uint64_t model_frames = 0;
+         std::vector<OpenBlood2::WorldDraw> world_draws;
+@@ -861,6 +861,12 @@ namespace
+                                 entry.alpha < 1)
+                                 ++prepared;
+                         explosion_sprites_drawn_hidden |= prepared == 2;
++                        unsigned particles = 0;
++                        for (const auto& entry : sprite_scene.entries)
++                            if (entry.particle_system && entry.error.empty() && entry.range != UINT32_MAX &&
++                                entry.alpha < 1 && entry.alpha > 0)
++                                ++particles;
++                        explosion_rings_drawn_hidden |= particles >= 32;
+                     }
+                     if (!model_scene.close_draws.empty() &&
+                         !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
+@@ -1364,6 +1370,7 @@ namespace
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+                 (options.scene_explosions_smoke &&
+                  (!scene_explosion_hidden || !explosion_sprites_drawn_hidden || !explosion_model_drawn_hidden ||
++                  !explosion_rings_drawn_hidden ||
+                   !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
+                 (options.sprites_smoke &&
+                  (!sprite_hidden || !sprites_drawn_hidden || sprite_scene.draws.size() != 12 ||
+diff --git a/src/app/scene_explosion_smoke.cpp b/src/app/scene_explosion_smoke.cpp
+index 1a4d10b..ef7010e 100644
+--- a/src/app/scene_explosion_smoke.cpp
++++ b/src/app/scene_explosion_smoke.cpp
+@@ -30,6 +30,13 @@ namespace OpenBlood2
+         if (g.objects.get(selected) || g.server.scene_explosions.size() != 1)
+             return false;
+         const auto& report = g.server.scene_explosions.back();
++        const auto& rings = g.server.explosion_rings;
++        if (!report.ring_event || !report.ring_error.empty() || rings.active.size() != 4 || rings.started != 4 ||
++            rings.failed || rings.reserved_particles() != 128 || !rings.update_error.empty())
++            return false;
++        if (rings.active[0].particles.size() != 32 || !rings.active[0].updates || rings.active[0].alpha >= 1 ||
++            rings.active[0].particles[0].position.x <= 10)
++            return false;
+         const auto& lights = g.server.explosion_lights;
+         if (!report.light_event || !report.light_error.empty() || lights.active.size() != 2 || lights.started != 2 ||
+             lights.failed || lights.reports.size() != 1 || !lights.update_error.empty())
+diff --git a/src/app/sprite_scene.cpp b/src/app/sprite_scene.cpp
+index fc80628..3a4df0a 100644
+--- a/src/app/sprite_scene.cpp
++++ b/src/app/sprite_scene.cpp
+@@ -22,6 +22,16 @@ namespace OpenBlood2
+                 return false;
+             scene.entries.back().client_effect = fx.id;
+         }
++        for (const auto& fx : game.server.explosion_rings.active)
++            for (unsigned i = 0; i < fx.particles.size(); ++i)
++            {
++                auto local = rotate_vector(fx.rotation, fx.particles[i].position);
++                const DVector position{fx.settings.position.x + local.x, fx.settings.position.y + local.y,
++                                       fx.settings.position.z + local.z};
++                if (!scene.add_particle(fx.texture, position, fx.settings.radius / 640.f, fx.settings.color, fx.alpha,
++                                        fx.id, i, game.resources, error))
++                    return false;
++            }
+         scene.sort();
+         return true;
+     }
+diff --git a/src/engine/particles.cpp b/src/engine/particles.cpp
+new file mode 100644
+index 0000000..c3c0f6b
+--- /dev/null
++++ b/src/engine/particles.cpp
+@@ -0,0 +1,50 @@
++#include "engine/particles.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++namespace OpenBlood2
++{
++    bool advance_particles(std::vector<Particle>& particles, float gravity, double seconds, std::string& error)
++    {
++        error.clear();
++        if (!std::isfinite(seconds) || seconds < 0 || seconds > 60 || !std::isfinite(gravity) ||
++            std::abs(gravity) > 10000 || particles.size() > 2048)
++        {
++            error = "Invalid particle step/budget";
++            return false;
++        }
++        const float dt = static_cast<float>(seconds);
++        // Preflight the complete step before changing any particle.
++        for (const auto& v : particles)
++        {
++            if (!physics_vector(v.position) || !physics_vector(v.velocity) || !std::isfinite(v.lifetime) ||
++                v.lifetime < 0)
++            {
++                error = "Invalid particle state";
++                return false;
++            }
++            if (v.lifetime - dt < 0)
++                continue;
++            if (!physics_vector({v.position.x + v.velocity.x * dt, v.position.y + v.velocity.y * dt,
++                                 v.position.z + v.velocity.z * dt}) ||
++                !physics_vector({v.velocity.x, v.velocity.y + gravity * dt, v.velocity.z}))
++            {
++                error = "Particle motion exceeds bounds";
++                return false;
++            }
++        }
++        // Later LithTech reference: lifetime first, position before gravity, strict <0 removal.
++        std::erase_if(particles,
++                      [&](auto& v)
++                      {
++                          v.lifetime -= dt;
++                          if (v.lifetime < 0)
++                              return true;
++                          v.position = {v.position.x + v.velocity.x * dt, v.position.y + v.velocity.y * dt,
++                                        v.position.z + v.velocity.z * dt};
++                          v.velocity.y += gravity * dt;
++                          return false;
++                      });
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/particles.h b/src/engine/particles.h
+new file mode 100644
+index 0000000..5c8c0d6
+--- /dev/null
++++ b/src/engine/particles.h
+@@ -0,0 +1,14 @@
++#pragma once
++#include "basedefs_de.h"
++#include <string>
++#include <vector>
++namespace OpenBlood2
++{
++    struct Particle
++    {
++        DVector position{}, velocity{};
++        float lifetime = 0;
++    };
++    // Local coordinates; no collision, implicit world gravity or callbacks.
++    bool advance_particles(std::vector<Particle>&, float gravity, double seconds, std::string&);
++} // namespace OpenBlood2
+diff --git a/src/engine/sprite_view.cpp b/src/engine/sprite_view.cpp
+index 462d925..cb3cc63 100644
+--- a/src/engine/sprite_view.cpp
++++ b/src/engine/sprite_view.cpp
+@@ -36,6 +36,24 @@ namespace OpenBlood2
+     }
+     bool SpriteView::add(const Sprite* sprite, const SpriteTrack& track, NodePose pose, DVector scale, DDWORD flags,
+                          ObjectId object, const Resources& resources, std::string& error, float alpha)
++    {
++        const std::string_view path =
++            sprite && track.frame < sprite->frames.size() ? sprite->frames[track.frame] : std::string_view{};
++        return add_frame(path, track.frame, pose, scale, flags, object, resources, error, alpha, {1, 1, 1}, false);
++    }
++    bool SpriteView::add_particle(std::string_view path, DVector position, float extent, DVector color, float alpha,
++                                  std::uint64_t system, unsigned index, const Resources& resources, std::string& error)
++    {
++        if (!add_frame(path, 0, {position, {}}, {extent, extent, 0}, FLAG_VISIBLE, {}, resources, error, alpha, color,
++                       true))
++            return false;
++        entries.back().particle_system = system;
++        entries.back().particle_index = index;
++        return true;
++    }
++    bool SpriteView::add_frame(std::string_view path, unsigned frame, NodePose pose, DVector scale, DDWORD flags,
++                               ObjectId object, const Resources& resources, std::string& error, float alpha,
++                               DVector color, bool direct_extent)
+     {
+         error.clear();
+         if (!camera_valid_ || entries.size() >= 4096)
+@@ -56,15 +74,15 @@ namespace OpenBlood2
+             entry.error = "Invalid sprite alpha";
+             return true;
+         }
+-        entry.frame = track.frame;
++        entry.frame = frame;
+         entry.visible = (flags & FLAG_VISIBLE) != 0;
+         entry.rotatable = (flags & FLAG_ROTATEABLESPRITE) != 0;
+-        if (!sprite || track.frame >= sprite->frames.size())
++        if (path.empty())
+         {
+             entry.error = "Sprite manifest/current frame unavailable";
+             return true;
+         }
+-        entry.frame_path = sprite->frames[track.frame];
++        entry.frame_path = path;
+         std::string key;
+         if (!resource_path(entry.frame_path, key))
+         {
+@@ -123,7 +141,14 @@ namespace OpenBlood2
+             entry.error = "Invalid sprite transform/scale";
+             return true;
+         }
+-        const float x = float(entry.width) * scale.x, y = float(entry.height) * scale.y;
++        if (!physics_vector(color) || color.x < 0 || color.x > 1 || color.y < 0 || color.y > 1 || color.z < 0 ||
++            color.z > 1)
++        {
++            entry.error = "Invalid particle color";
++            return true;
++        }
++        const float x = direct_extent ? scale.x : float(entry.width) * scale.x;
++        const float y = direct_extent ? scale.y : float(entry.height) * scale.y;
+         if (!physics_vector({x, y, 0}))
+         {
+             entry.error = "Sprite dimensions exceed presentation limits";
+@@ -133,10 +158,10 @@ namespace OpenBlood2
+             return true;
+         // Later LithTech renderer uses texture dimensions as half extents. This is
+         // replacement presentation, not a claim of verified Blood II raster parity.
+-        const WorldVertex corners[] = {{{-x, y, 0}, {1, 1, 1}, {0, 0}},
+-                                       {{x, y, 0}, {1, 1, 1}, {1, 0}},
+-                                       {{x, -y, 0}, {1, 1, 1}, {1, 1}},
+-                                       {{-x, -y, 0}, {1, 1, 1}, {0, 1}}};
++        const WorldVertex corners[] = {{{-x, y, 0}, color, {0, 0}},
++                                       {{x, y, 0}, color, {1, 0}},
++                                       {{x, -y, 0}, color, {1, 1}},
++                                       {{-x, -y, 0}, color, {0, 1}}};
+         WorldRange range;
+         range.first = static_cast<std::uint32_t>(mesh.vertices.size());
+         range.count = 6;
+diff --git a/src/engine/sprite_view.h b/src/engine/sprite_view.h
+index 08c455f..b978581 100644
+--- a/src/engine/sprite_view.h
++++ b/src/engine/sprite_view.h
+@@ -12,7 +12,8 @@ namespace OpenBlood2
+         bool visible = false, rotatable = false;
+         std::uint32_t range = UINT32_MAX;
+         float alpha = 1;
+-        std::uint64_t client_effect = 0;
++        std::uint64_t client_effect = 0, particle_system = 0;
++        unsigned particle_index = 0;
+     };
+     // Read-only presentation snapshot: owned textures/values, never a retained game pointer.
+     class SpriteView
+@@ -26,6 +27,8 @@ namespace OpenBlood2
+         bool begin_frame(DVector eye, DRotation camera, std::string& error);
+         bool add(const Sprite*, const SpriteTrack&, NodePose, DVector scale, DDWORD flags, ObjectId, const Resources&,
+                  std::string& error, float alpha = 1);
++        bool add_particle(std::string_view texture, DVector position, float half_extent, DVector color, float alpha,
++                          std::uint64_t system, unsigned index, const Resources&, std::string&);
+         void sort();
+         WorldMesh mesh;
+         std::vector<WorldDraw> draws;
+@@ -33,6 +36,8 @@ namespace OpenBlood2
+         std::uint64_t revision = 0;
+ 
+       private:
++        bool add_frame(std::string_view, unsigned frame, NodePose, DVector, DDWORD, ObjectId, const Resources&,
++                       std::string&, float alpha, DVector color, bool direct_extent);
+         struct Material
+         {
+             std::uint32_t index = 0;
+diff --git a/src/game/brush_messages.h b/src/game/brush_messages.h
+index c57ebb5..82e5b84 100644
+--- a/src/game/brush_messages.h
++++ b/src/game/brush_messages.h
+@@ -25,6 +25,8 @@ namespace OpenBlood2
+         float damage = 0, radius = 0;
+         RadiusDamageReport targets;
+         std::uint64_t voice = 0;
++        std::uint64_t ring_event = 0;
++        std::string ring_error;
+         std::uint64_t light_event = 0;
+         std::string light_error;
+         std::uint64_t model_event = 0;
+diff --git a/src/game/explosion_rings.cpp b/src/game/explosion_rings.cpp
+new file mode 100644
+index 0000000..bffe0b3
+--- /dev/null
++++ b/src/game/explosion_rings.cpp
+@@ -0,0 +1,138 @@
++#include "game/explosion_rings.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++namespace OpenBlood2
++{
++    bool original_explosion_rings(DDWORD type, DVector pos, DVector normal, std::minstd_rand& random,
++                                  std::vector<ExplosionRingSettings>& out, std::string& error)
++    {
++        out.clear();
++        error.clear();
++        if (!physics_vector(pos) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f)
++        {
++            error = "Explosion requires a finite position and nonzero normal";
++            return false;
++        }
++        if (type == 6 || type == 8)
++            return true; // No ring branch in these high-detail recipes.
++        if (type > 3)
++        {
++            error = "Explosion ring recipe unavailable";
++            return false;
++        }
++        const float length = std::sqrt(vector_dot(normal, normal));
++        normal = {normal.x / length, normal.y / length, normal.z / length};
++        auto random_float = [&](float lo, float hi)
++        {
++            return lo + (hi - lo) * float(random() - std::minstd_rand::min()) /
++                            float(std::minstd_rand::max() - std::minstd_rand::min());
++        };
++        auto position = [&](float offset)
++        { return DVector{pos.x + normal.x * offset, pos.y + normal.y * offset, pos.z + normal.z * offset}; };
++        ExplosionRingSettings s;
++        s.position = position(25);
++        s.normal = normal;
++        s.radius = type == 0 ? 4000 : type == 2 ? 12000 : 8000;
++        s.position_radius = 10;
++        s.velocity = 400;
++        s.count = 32;
++        s.duration = .5f;
++        s.fade = 1;
++        s.texture = "SpriteTextures\\Firepart64.dtx";
++        out.push_back(s);
++        if (type == 3)
++            for (unsigned i = 0; i < 3; ++i)
++            {
++                s.position = position(10 + 15 * i);
++                s.radius = 5000;
++                s.velocity = random_float(100, 150);
++                s.gravity = random_float(20 * i, 30 + 20 * i);
++                s.duration = 1.5f;
++                s.alpha = .5f;
++                s.delay = random_float(0, .5f);
++                s.texture = "SpriteTextures\\Smoke32_" + std::to_string(4 + i) + ".dtx";
++                out.push_back(s);
++            }
++        return true;
++    }
++    std::size_t ExplosionRings::reserved_particles() const
++    {
++        std::size_t count = 0;
++        for (const auto& fx : active)
++            count += fx.settings.count;
++        return count;
++    }
++    std::uint64_t ExplosionRings::publish(DDWORD type, DVector position, DVector normal, std::string_view source,
++                                          const Resources& resources, double now, std::string& error)
++    {
++        error.clear();
++        if (source.size() > 100 || source.find('\0') != std::string_view::npos || next_event_ == UINT64_MAX)
++        {
++            error = "Invalid explosion ring source/event";
++            return 0;
++        }
++        ExplosionRingReport report{next_event_++, type, std::string(source), {}, {}};
++        std::vector<ExplosionRingSettings> settings;
++        if (original_explosion_rings(type, position, normal, random_, settings, report.error))
++            for (const auto& setting : settings)
++            {
++                CExplosionRingFX fx;
++                std::string failure;
++                if (active.size() >= 128 || reserved_particles() + setting.count > 2048 || next_id_ == UINT64_MAX)
++                    failure = "Explosion ring capacity exhausted";
++                else if (fx.Init(setting, failure) && fx.CreateObject(resources, now, failure))
++                {
++                    fx.id = next_id_++;
++                    fx.event = report.id;
++                    report.rings.push_back(fx.id);
++                    active.push_back(std::move(fx));
++                    ++started;
++                }
++                if (!failure.empty())
++                {
++                    ++failed;
++                    if (!report.error.empty())
++                        report.error += "; ";
++                    report.error += failure;
++                }
++            }
++        else
++            ++failed;
++        error = report.error;
++        const auto id = report.id;
++        if (reports.size() == 64)
++            reports.erase(reports.begin());
++        reports.push_back(std::move(report));
++        return id;
++    }
++    bool ExplosionRings::advance(double now)
++    {
++        bool valid = true;
++        std::erase_if(active,
++                      [&](auto& fx)
++                      {
++                          if (fx.Update(now))
++                              return false;
++                          if (fx.error.empty())
++                              ++expired;
++                          else
++                          {
++                              ++failed;
++                              valid = false;
++                              update_error = fx.error;
++                          }
++                          return true;
++                      });
++        return valid;
++    }
++    void ExplosionRings::clear()
++    {
++        active.clear();
++        reports.clear();
++        update_error.clear();
++        started = expired = failed = 0;
++        random_.seed(1); // Client stream, independent of server and model RNG.
++        // Do not reuse client identities across world unload.
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/explosion_rings.h b/src/game/explosion_rings.h
+new file mode 100644
+index 0000000..848b64c
+--- /dev/null
++++ b/src/game/explosion_rings.h
+@@ -0,0 +1,33 @@
++#pragma once
++#include "game/original/ExplosionRingFX.h"
++#include <random>
++#include <string_view>
++#include <vector>
++namespace OpenBlood2
++{
++    bool original_explosion_rings(DDWORD, DVector, DVector, std::minstd_rand&, std::vector<ExplosionRingSettings>&,
++                                  std::string&);
++    struct ExplosionRingReport
++    {
++        std::uint64_t id = 0;
++        DDWORD type = 0;
++        std::string source, error;
++        std::vector<std::uint64_t> rings;
++    };
++    class ExplosionRings
++    {
++      public:
++        std::uint64_t publish(DDWORD, DVector, DVector, std::string_view, const Resources&, double, std::string&);
++        bool advance(double now);
++        void clear();
++        std::size_t reserved_particles() const;
++        std::vector<CExplosionRingFX> active;
++        std::vector<ExplosionRingReport> reports;
++        std::string update_error;
++        std::uint64_t started = 0, expired = 0, failed = 0;
++
++      private:
++        std::minstd_rand random_{1};
++        std::uint64_t next_id_ = 1, next_event_ = 1;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/explosion_sprites.cpp b/src/game/explosion_sprites.cpp
+index e078c0f..683f138 100644
+--- a/src/game/explosion_sprites.cpp
++++ b/src/game/explosion_sprites.cpp
+@@ -44,8 +44,7 @@ namespace OpenBlood2
+                 : type == 1 ? 2.f
+                             : 2.5f,
+                 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
+-            unavailable = type == 3 ? "particle rings, fragments/trails, light illumination"
+-                                    : "particle ring, light illumination";
++            unavailable = type == 3 ? "fragments/trails, light illumination" : "light illumination";
+         }
+         else if (type == 6)
+         {
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 765ef94..f74a336 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -63,6 +63,7 @@ class ServerDE : public CSBase
+     virtual bool SetBlockingPriority(HOBJECT, DBYTE) = 0;
+     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
++    virtual std::uint64_t PublishExplosionRings(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionLights(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionModels(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+diff --git a/src/game/original/ClientExplosionSFX.cpp b/src/game/original/ClientExplosionSFX.cpp
+index 77b95fb..cb0769b 100644
+--- a/src/game/original/ClientExplosionSFX.cpp
++++ b/src/game/original/ClientExplosionSFX.cpp
+@@ -73,6 +73,7 @@ void CClientExplosionSFX::SetupFX()
+     report.sound = sound;
+     report.model_event = g_pServerDE->PublishExplosionModels(m_hObject, type, position, normal, report.model_error);
+     report.sprite_event = g_pServerDE->PublishExplosionSprites(m_hObject, type, position, normal, report.sprite_error);
++    report.ring_event = g_pServerDE->PublishExplosionRings(m_hObject, type, position, normal, report.ring_error);
+     report.light_event = g_pServerDE->PublishExplosionLights(m_hObject, type, position, normal, report.light_error);
+     // IMPORTANT: the source passes NULL, so DamageObject's null-damager guard
+     // suppresses every delivery. Do not silently "repair" this gameplay behavior.
+diff --git a/src/game/original/ExplosionRingFX.cpp b/src/game/original/ExplosionRingFX.cpp
+new file mode 100644
+index 0000000..cf137ee
+--- /dev/null
++++ b/src/game/original/ExplosionRingFX.cpp
+@@ -0,0 +1,162 @@
++#include "ExplosionRingFX.h"
++#include "engine/collision.h"
++#include <cmath>
++#include <numbers>
++using namespace OpenBlood2;
++namespace
++{
++    void around(DRotation& r, DVector axis, float angle)
++    {
++        const float length = std::sqrt(vector_dot(axis, axis));
++        const float sine = std::sin(angle / 2) / length;
++        DRotation turn;
++        turn.m_Vec = {axis.x * sine, axis.y * sine, axis.z * sine};
++        turn.m_Spin = std::cos(angle / 2);
++        r = compose_rotation(turn, r);
++    }
++} // namespace
++bool CExplosionRingFX::Init(const ExplosionRingSettings& s, std::string& failure)
++{
++    failure.clear();
++    *this = {};
++    auto bounded = [](float v, float low, float high) { return std::isfinite(v) && v >= low && v <= high; };
++    if (!physics_vector(s.position) || !physics_vector(s.normal) || vector_dot(s.normal, s.normal) < 1e-12f ||
++        !bounded(s.color.x, 0, 1) || !bounded(s.color.y, 0, 1) || !bounded(s.color.z, 0, 1) ||
++        !bounded(s.radius, 0, 640000) || !bounded(s.position_radius, 0, 10000) || !bounded(s.velocity, -10000, 10000) ||
++        !bounded(s.gravity, -10000, 10000) || !bounded(s.duration, .001f, 600) || !bounded(s.delay, 0, 600) ||
++        !bounded(s.alpha, 0, 1) || !bounded(s.rotation, -10000, 10000) || !s.count || s.count > 256 || s.fade > 5 ||
++        s.rotate > 5 || s.align > 1 ||
++        (s.texture && (s.texture->size() > 1000 || s.texture->find('\0') != std::string::npos)))
++    {
++        failure = "Invalid explosion ring descriptor";
++        return false;
++    }
++    settings = s;
++    initialized_ = true;
++    return true;
++}
++bool CExplosionRingFX::AddParticles()
++{
++    DRotation basis;
++    if (!align_rotation(settings.align ? settings.normal : DVector{0, 1, 0}, basis))
++        return false;
++    const float step = 2 * std::numbers::pi_v<float> / settings.count;
++    particles.clear();
++    particles.reserve(settings.count);
++    for (unsigned i = 0; i < settings.count; ++i)
++    {
++        auto right = rotate_vector(basis, {1, 0, 0});
++        const auto forward = rotate_vector(basis, {0, 0, 1});
++        around(basis, forward, step); // Cache right before rotating, as original AddParticles does.
++        const float length = std::sqrt(vector_dot(right, right));
++        right = {right.x / length, right.y / length, right.z / length};
++        particles.push_back({{right.x * settings.position_radius, right.y * settings.position_radius,
++                              right.z * settings.position_radius},
++                             {right.x * settings.velocity, right.y * settings.velocity, right.z * settings.velocity},
++                             settings.duration});
++    }
++    return true;
++}
++bool CExplosionRingFX::CreateObject(const Resources& resources, double now, std::string& failure)
++{
++    failure.clear();
++    if (!initialized_ || created_ || !std::isfinite(now) || now < 0)
++    {
++        failure = "Invalid explosion ring creation state/time";
++        return false;
++    }
++    texture = settings.texture.value_or("SpriteTextures\\smoke64_2.dtx");
++    if (!resources.find(texture))
++    {
++        failure = "Explosion particle texture is not indexed: " + texture;
++        return false;
++    }
++    delay = settings.delay;
++    alpha = delay ? 0 : settings.alpha;
++    if (!delay && !AddParticles())
++    {
++        failure = "Explosion ring orientation failed";
++        return false;
++    }
++    start_time = last_time = now;
++    created_ = true;
++    return true;
++}
++bool CExplosionRingFX::Update(double now)
++{
++    error.clear();
++    if (!created_ || !std::isfinite(now) || now < last_time)
++    {
++        error = "Invalid explosion ring clock/state";
++        return false;
++    }
++    if (!advance_particles(particles, settings.gravity, now - last_time, error))
++        return false;
++    last_time = now;
++    if (now < next_update)
++        return true;
++    ++updates;
++    next_update = now + .001;
++    const float time = static_cast<float>(now - start_time), ratio = time / settings.duration;
++    if (!std::isfinite(ratio))
++    {
++        error = "Explosion ring time overflow";
++        return false;
++    }
++    if (delay)
++    {
++        if (time >= delay)
++        {
++            if (!settings.fade)
++                alpha = settings.alpha;
++            start_time = now;
++            delay = 0;
++            if (!AddParticles())
++            {
++                error = "Explosion ring orientation failed";
++                return false;
++            }
++        }
++        return true;
++    }
++    float turn = 0;
++    switch (settings.rotate)
++    {
++        case 1:
++            turn = settings.rotation;
++            break;
++        case 2:
++            turn = settings.rotation * (1 - ratio);
++            break;
++        case 3:
++            turn = 1 - (1 - settings.rotation) * ratio;
++            break;
++        case 4:
++            turn = settings.rotation * ratio;
++            break;
++        case 5:
++            turn = settings.rotation + (1 - settings.rotation) * ratio;
++            break;
++    }
++    if (settings.rotate)
++        around(rotation, settings.align ? settings.normal : DVector{0, 1, 0}, turn * std::numbers::pi_v<float>);
++    switch (settings.fade)
++    {
++        case 1:
++            alpha = settings.alpha * (1 - ratio);
++            break;
++        case 2:
++            alpha = 1 - (1 - settings.alpha) * ratio;
++            break;
++        case 3:
++            alpha = settings.alpha * ratio;
++            break;
++        case 4:
++            alpha = settings.alpha + (1 - settings.alpha) * ratio;
++            break;
++        case 5:
++            alpha = time < settings.duration / 2 ? settings.alpha * ratio * 2 : settings.alpha * 2 * (1 - ratio);
++            break;
++    }
++    return time < settings.duration;
++}
+diff --git a/src/game/original/ExplosionRingFX.h b/src/game/original/ExplosionRingFX.h
+new file mode 100644
+index 0000000..89e7a03
+--- /dev/null
++++ b/src/game/original/ExplosionRingFX.h
+@@ -0,0 +1,34 @@
++#pragma once
++#include "engine/particles.h"
++#include "engine/resources.h"
++#include <optional>
++namespace OpenBlood2
++{
++    struct ExplosionRingSettings
++    {
++        DVector position{}, normal{0, 1, 0}, color{1, 1, 1};
++        float radius = 100, position_radius = 0, velocity = 1, gravity = 0, duration = 1, rotation = 0, alpha = 1,
++              delay = 0;
++        unsigned count = 8;
++        DBYTE fade = 0, rotate = 0, align = 0;
++        std::optional<std::string> texture;
++    };
++} // namespace OpenBlood2
++class CExplosionRingFX
++{
++  public:
++    bool Init(const OpenBlood2::ExplosionRingSettings&, std::string&);
++    bool CreateObject(const OpenBlood2::Resources&, double now, std::string&);
++    bool Update(double now);
++    OpenBlood2::ExplosionRingSettings settings;
++    std::vector<OpenBlood2::Particle> particles;
++    DRotation rotation;
++    std::string texture, error;
++    float alpha = 1, delay = 0;
++    double start_time = 0, last_time = 0, next_update = 0;
++    std::uint64_t id = 0, event = 0, updates = 0;
++
++  private:
++    bool AddParticles();
++    bool initialized_ = false, created_ = false;
++};
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 9b3f1fa..c528270 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -5,6 +5,7 @@
+ #include "engine/string_resources.h"
+ #include "game/explosion_lights.h"
+ #include "game/explosion_models.h"
++#include "game/explosion_rings.h"
+ #include "game/explosion_sprites.h"
+ #include "game/original/BloodShells.h"
+ #include "game/original/LightFX.h"
+@@ -80,6 +81,8 @@ namespace OpenBlood2
+         ExplosionSprites explosion_sprites;
+         ExplosionModels explosion_models;
+         ExplosionLights explosion_lights;
++        ExplosionRings explosion_rings;
++        std::uint64_t PublishExplosionRings(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         std::uint64_t PublishExplosionLights(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         std::uint64_t PublishExplosionModels(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) override;
+@@ -111,6 +114,7 @@ namespace OpenBlood2
+             explosion_sprites.clear();
+             explosion_models.clear();
+             explosion_lights.clear();
++            explosion_rings.clear();
+             spawn_reports.clear();
+             pickup_reports.clear();
+             camera_effects.clear();
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index 7b221f4..e4c7980 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -4,6 +4,18 @@ namespace OpenBlood2
+ {
+     // These copied, bounded records expose pending client FX/audio. They do not
+     // enqueue gameplay and never retain a pointer into an original object.
++    std::uint64_t ServerAdapter::PublishExplosionRings(HOBJECT source, DDWORD type, DVector position, DVector normal,
++                                                       std::string& error)
++    {
++        trace_service("PublishExplosionRings (selected high-detail particle systems)");
++        if (!IsObjectAlive(source) || !client_resources)
++        {
++            error = "Explosion ring source/resources unavailable";
++            return 0;
++        }
++        return explosion_rings.publish(type, position, normal, GetObjectName(source), *client_resources,
++                                       objects_.time(), error);
++    }
+     std::uint64_t ServerAdapter::PublishExplosionLights(HOBJECT source, DDWORD type, DVector position, DVector normal,
+                                                         std::string& error)
+     {
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 824140a..8f9239d 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -437,6 +437,7 @@ namespace OpenBlood2
+         ok = server.explosion_sprites.advance(objects.time()) && ok;
+         ok = server.explosion_models.advance(objects.time()) && ok;
+         ok = server.explosion_lights.advance(objects.time()) && ok;
++        ok = server.explosion_rings.advance(objects.time()) && ok;
+         if (ok && preview_model && preview_playing &&
+             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
+             preview_playing = false;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index ddea020..19fcaa8 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -997,3 +997,26 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME explosion_lights.private COMMAND explosion_light_tests private "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(explosion_lights.private PROPERTIES LABELS "headless;private;explosion_lights" TIMEOUT 90)
+ endif()
++
++add_executable(explosion_ring_tests explosion_ring_tests.cpp ../src/app/sprite_scene.cpp)
++target_link_libraries(explosion_ring_tests PRIVATE blood2_game)
++blood2_project_options(explosion_ring_tests)
++foreach(case motion lifecycle recipes failures session)
++    add_test(NAME explosion_rings.${case} COMMAND explosion_ring_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/explosion-rings-${case}")
++    set_tests_properties(explosion_rings.${case} PROPERTIES LABELS "headless;explosion_rings" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME explosion_rings.private COMMAND explosion_ring_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(explosion_rings.private PROPERTIES LABELS "headless;private;explosion_rings" TIMEOUT 90)
++endif()
++if(BLOOD2_GPU_TESTS)
++    add_executable(explosion_ring_gpu_tests explosion_ring_gpu_tests.cpp)
++    target_link_libraries(explosion_ring_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(explosion_ring_gpu_tests)
++    add_test(NAME gpu.explosion_ring_alpha COMMAND explosion_ring_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/explosion-ring-alpha")
++    set_tests_properties(gpu.explosion_ring_alpha PROPERTIES LABELS "gpu;explosion_rings" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.explosion_ring_private COMMAND explosion_ring_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/explosion-ring-private" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.explosion_ring_private PROPERTIES LABELS "gpu;private;explosion_rings" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    endif()
++endif()
+diff --git a/tests/explosion_ring_fixture.h b/tests/explosion_ring_fixture.h
+new file mode 100644
+index 0000000..4cfb20e
+--- /dev/null
++++ b/tests/explosion_ring_fixture.h
+@@ -0,0 +1,32 @@
++#pragma once
++#include "explosion_sprite_fixture.h"
++namespace test_explosion_ring
++{
++    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error,
++                      bool all = true)
++    {
++        if (!test_explosion_sprite::mount(resources, root, error))
++            return false;
++        std::vector<std::uint8_t> skin;
++        if (!resources.read("alpha.dtx", skin, error))
++            return false;
++        test_player::Directory dir;
++        for (auto name : {"firepart64.dtx", "smoke32_4.dtx", "smoke32_5.dtx", "smoke32_6.dtx", "smoke64_2.dtx"})
++            if (all || std::string_view(name) == "firepart64.dtx")
++                dir.children["spritetextures"].files[name] = skin;
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, dir);
++        w.patch(131, off);
++        w.patch(135, size);
++        auto file = root / "explosion-rings.rez";
++        std::ofstream out(file, std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        return resources.mount(file, error);
++    }
++} // namespace test_explosion_ring
+diff --git a/tests/explosion_ring_gpu_tests.cpp b/tests/explosion_ring_gpu_tests.cpp
+new file mode 100644
+index 0000000..490cca1
+--- /dev/null
++++ b/tests/explosion_ring_gpu_tests.cpp
+@@ -0,0 +1,173 @@
++#include "app/sprite_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "explosion_ring_fixture.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << " " << error << " " << SDL_GetError() << "\n";                         \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool render(Runtime& runtime, WorldRenderer& renderer, SpriteView& scene, DVector eye, DRotation camera,
++                Capture& capture, std::vector<std::uint8_t>& pixels, std::string& error)
++    {
++        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300)) ||
++            !renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true))
++            return false;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        if (!commands)
++            return false;
++        if (!renderer.draw(commands, capture.texture, scene.mesh, scene.draws, eye, camera, false, error))
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 300;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 300;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
++            return false;
++        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        if (!data)
++            return false;
++        pixels.assign(data, data + 400 * 300 * 4);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    Runtime runtime;
++    std::string error;
++    CHECK(runtime.initialize(true, error));
++    WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
++    Resources resources;
++    SpriteView scene;
++    CHECK(test_explosion_ring::mount(resources, argv[1], error));
++    ExplosionRingSettings settings;
++    settings.position = {0, 0, 10};
++    settings.normal = {0, 0, 1};
++    settings.align = 1;
++    settings.position_radius = 3;
++    settings.radius = 640;
++    settings.count = 4;
++    settings.velocity = 0;
++    settings.duration = 1;
++    settings.fade = 1;
++    settings.color = {.5f, 1, .25f};
++    settings.texture = "alpha.dtx";
++    CExplosionRingFX fx;
++    CHECK(fx.Init(settings, error) && fx.CreateObject(resources, 0, error));
++    auto add = [&](const CExplosionRingFX& f, const Resources& r)
++    {
++        for (unsigned i = 0; i < f.particles.size(); ++i)
++        {
++            auto pos = rotate_vector(f.rotation, f.particles[i].position);
++            pos = {pos.x + f.settings.position.x, pos.y + f.settings.position.y, pos.z + f.settings.position.z};
++            if (!scene.add_particle(f.texture, pos, f.settings.radius / 640, f.settings.color, f.alpha, 1, i, r,
++                                    error) ||
++                !scene.entries.back().error.empty())
++                return false;
++        }
++        scene.sort();
++        return true;
++    };
++    std::vector<std::uint8_t> full, half;
++    Capture capture;
++    CHECK(scene.begin_frame({}, {}, error) && add(fx, resources) && scene.draws.size() == 4);
++    CHECK(render(runtime, renderer, scene, {}, {}, capture, full, error));
++    CHECK(fx.Update(.5) && std::abs(fx.alpha - .5f) < .0001f);
++    CHECK(scene.begin_frame({}, {}, error) && add(fx, resources));
++    CHECK(render(runtime, renderer, scene, {}, {}, capture, half, error));
++    unsigned ink = 0, red = 0;
++    const int background[] = {6, 9, 13};
++    for (unsigned i = 0; i < 400 * 300; ++i)
++    {
++        bool changed = false;
++        for (unsigned channel = 0; channel < 3; ++channel)
++        {
++            const auto index = i * 4 + channel;
++            changed |= full[index] != background[channel];
++            CHECK(std::abs(int(half[index]) - int((full[index] + background[channel]) / 2)) <= 1);
++        }
++        if (full[i * 4] >= 127 && full[i * 4] <= 128 && full[i * 4 + 1] == 0 && full[i * 4 + 2] == 0)
++            ++red;
++        if (changed)
++            ++ink;
++    }
++    CHECK(ink > 50 && ink < 40000 && red > 10);
++    CHECK(capture.save((std::filesystem::path(argv[1]) / "ring-alpha.png").c_str()));
++    std::cout << "Original ring: " << ink << " pixels, tint and half-alpha linear blend verified\n";
++    if (argc == 3)
++    {
++        GameSession game;
++        Config config;
++        config.data_dir = argv[2];
++        CHECK(game.initialize() && game.resources.mount_game(config, error));
++        ExplosionRings rings;
++        CHECK(rings.publish(3, {}, {0, 1, 0}, "GPU ring", game.resources, 0, error) && error.empty());
++        CHECK(rings.advance(.25) && rings.active.size() == 4);
++        scene.clear();
++        renderer.clear_geometry();
++        const DVector eye{0, 0, -300};
++        CHECK(scene.begin_frame(eye, {}, error));
++        for (const auto& f : rings.active)
++            CHECK(add(f, game.resources));
++        CHECK(scene.draws.size() >= 32);
++        CHECK(render(runtime, renderer, scene, eye, {}, capture, full, error));
++        ink = 0;
++        for (unsigned i = 0; i < 400 * 300; ++i)
++            if (full[i * 4] != 6 || full[i * 4 + 1] != 9 || full[i * 4 + 2] != 13)
++                ++ink;
++        CHECK(ink > 50 && ink < 100000);
++        CHECK(capture.save((std::filesystem::path(argv[1]) / "original-explosion-rings.png").c_str()));
++        std::cout << "Original Firepart64/Smoke32 particles: " << scene.draws.size() << " quads, " << ink
++                  << " pixels\n";
++        // Activate every delayed smoke ring, then run its first visible fade update.
++        CHECK(rings.advance(.6) && rings.advance(.7) && rings.active.size() == 3);
++        CHECK(scene.begin_frame(eye, {}, error));
++        for (const auto& f : rings.active)
++        {
++            CHECK(f.alpha > 0 && f.alpha < .5f && f.particles.size() == 32);
++            CHECK(add(f, game.resources));
++        }
++        CHECK(scene.draws.size() == 96);
++        CHECK(render(runtime, renderer, scene, eye, {}, capture, half, error));
++        ink = 0;
++        for (unsigned i = 0; i < 400 * 300; ++i)
++            if (half[i * 4] != 6 || half[i * 4 + 1] != 9 || half[i * 4 + 2] != 13)
++                ++ink;
++        CHECK(ink > 50 && ink < 100000 && full != half);
++        CHECK(capture.save((std::filesystem::path(argv[1]) / "original-explosion-smoke-rings.png").c_str()));
++        std::cout << "Three original Smoke32 textures after delay: 96 visible quads, " << ink << " pixels\n";
++        rings.clear();
++        scene.clear();
++        renderer.clear_geometry();
++        CHECK(scene.draws.empty());
++    }
++    return 0;
++}
+diff --git a/tests/explosion_ring_tests.cpp b/tests/explosion_ring_tests.cpp
+new file mode 100644
+index 0000000..513e13f
+--- /dev/null
++++ b/tests/explosion_ring_tests.cpp
+@@ -0,0 +1,354 @@
++#include "app/sprite_scene.h"
++#include "explosion_ring_fixture.h"
++#include "game/original/ClientExplosionSFX.h"
++#include "game/server_adapter.h"
++#include <cmath>
++#include <iostream>
++#include <limits>
++#include <numbers>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .0001f;
++    }
++    bool command(GameSession& g, HOBJECT h)
++    {
++        auto s = g.server.CreateString("TRIGGER");
++        auto m = g.server.StartMessageToObject(nullptr, h, 1000);
++        bool ok = m && g.server.WriteToMessageHString(m, s) == DE_OK && g.server.EndMessage(m) == DE_OK;
++        g.server.FreeString(s);
++        return ok;
++    }
++    bool motion()
++    {
++        std::string error;
++        std::vector<Particle> ps{{{1, 2, 3}, {4, 5, 6}, 1}};
++        CHECK(advance_particles(ps, -10, .5, error));
++        CHECK(ps.size() == 1 && near(ps[0].position.x, 3) && near(ps[0].position.y, 4.5f));
++        CHECK(near(ps[0].velocity.y, 0) && near(ps[0].lifetime, .5f));
++        CHECK(advance_particles(ps, -10, .5, error) && ps.size() == 1 && ps[0].lifetime == 0);
++        CHECK(near(ps[0].position.y, 4.5f) && ps[0].velocity.y == -5);
++        CHECK(advance_particles(ps, -10, .01, error) && ps.empty());
++        ps = {{{}, {1, 0, 0}, 1}, {{}, {}, -1}};
++        CHECK(!advance_particles(ps, 0, .1, error) && !error.empty());
++        CHECK(ps[0].position.x == 0 && ps[0].lifetime == 1); // Atomic validation.
++        ps.pop_back();
++        CHECK(!advance_particles(ps, 0, 61, error) && !advance_particles(ps, 0, -1, error));
++        CHECK(!advance_particles(ps, std::numeric_limits<float>::quiet_NaN(), .1, error));
++        return true;
++    }
++    bool lifecycle(const std::filesystem::path& root)
++    {
++        Resources r;
++        std::string error;
++        CHECK(test_explosion_ring::mount(r, root, error));
++        ExplosionRingSettings s;
++        s.count = 4;
++        s.duration = 2;
++        s.position_radius = 10;
++        s.velocity = 20;
++        s.gravity = -8;
++        CExplosionRingFX fx;
++        CHECK(fx.Init(s, error) && fx.CreateObject(r, 10, error) && fx.particles.size() == 4);
++        CHECK(near(fx.particles[0].position.x, 10));
++        for (unsigned i = 0; i < 4; ++i)
++        {
++            const auto& a = fx.particles[i];
++            const auto& b = fx.particles[(i + 1) % 4];
++            CHECK(near(a.position.y, 0) && near(vector_dot(a.position, a.position), 100));
++            CHECK(near(vector_dot(a.position, b.position), 0));
++        }
++        CHECK(fx.Update(10.5) && near(fx.particles[0].position.x, 20));
++        CHECK(near(fx.particles[0].position.y, 0) && near(fx.particles[0].velocity.y, -4));
++        CHECK(fx.Update(11) && near(fx.particles[0].position.y, -2));
++        CHECK(!fx.Update(12) && fx.error.empty());
++        s.align = 1;
++        s.normal = {0, 0, 3};
++        s.gravity = 0;
++        CHECK(fx.Init(s, error) && fx.CreateObject(r, 0, error));
++        for (const auto& a : fx.particles)
++            CHECK(near(a.position.z, 0));
++        s.delay = .5f;
++        s.fade = 1;
++        s.alpha = .6f;
++        CHECK(fx.Init(s, error) && fx.CreateObject(r, 10, error) && fx.particles.empty() && fx.alpha == 0);
++        CHECK(fx.Update(10.499) && fx.particles.empty());
++        CHECK(fx.Update(11) && fx.start_time == 11 && fx.delay == 0 && fx.particles.size() == 4 && fx.alpha == 0);
++        CHECK(near(fx.particles[0].position.x, 10) && fx.particles[0].lifetime == 2);
++        CHECK(fx.Update(11.5) && near(fx.alpha, .45f) && near(fx.particles[0].position.x, 20));
++        s.fade = 0;
++        CHECK(fx.Init(s, error) && fx.CreateObject(r, 0, error) && fx.Update(20));
++        CHECK(near(fx.alpha, .6f) && fx.start_time == 20 && fx.particles[0].lifetime == 2);
++        s.delay = 0;
++        s.alpha = .4f;
++        s.rotation = .2f;
++        s.velocity = 0;
++        const float fades[] = {.4f, .3f, .85f, .1f, .55f, .2f};
++        const float turns[] = {0, .2f, .15f, .8f, .05f, .4f};
++        for (unsigned mode = 0; mode <= 5; ++mode)
++        {
++            s.fade = s.rotate = mode;
++            CHECK(fx.Init(s, error) && fx.CreateObject(r, 0, error) && fx.Update(.5));
++            CHECK(near(fx.alpha, fades[mode]));
++            auto v = rotate_vector(fx.rotation, {1, 0, 0});
++            CHECK(near(v.x, std::cos(turns[mode] * std::numbers::pi_v<float>)));
++            CHECK(near(v.y, std::sin(turns[mode] * std::numbers::pi_v<float>)));
++            const auto updates = fx.updates;
++            CHECK(fx.Update(.5005) && fx.updates == updates);
++        }
++        s.rotate = 1;
++        s.fade = 5;
++        CHECK(fx.Init(s, error) && fx.CreateObject(r, 0, error) && fx.Update(.5) && fx.Update(1.5));
++        CHECK(near(fx.alpha, .2f));
++        CHECK(near(rotate_vector(fx.rotation, {1, 0, 0}).x, std::cos(.4f * std::numbers::pi_v<float>)));
++        return true;
++    }
++    bool recipes()
++    {
++        std::string error;
++        std::vector<ExplosionRingSettings> out;
++        for (unsigned type : {0u, 1u, 2u, 3u, 6u, 8u})
++        {
++            std::minstd_rand random(17), expected(17);
++            CHECK(original_explosion_rings(type, {10, 20, 30}, {0, 2, 0}, random, out, error));
++            CHECK(out.size() == (type == 3 ? 4u : type <= 2 ? 1u : 0u));
++            if (type <= 3)
++            {
++                CHECK(out[0].position.y == 45 && out[0].count == 32 && out[0].velocity == 400);
++                CHECK(out[0].radius == (type == 0 ? 4000 : type == 2 ? 12000 : 8000));
++                CHECK(out[0].duration == .5f && out[0].fade == 1 && out[0].align == 0);
++            }
++            if (type == 3)
++            {
++                auto draw = [&](float a, float b)
++                {
++                    return a + (b - a) * float(expected() - std::minstd_rand::min()) /
++                                   float(std::minstd_rand::max() - std::minstd_rand::min());
++                };
++                for (unsigned i = 0; i < 3; ++i)
++                {
++                    const auto& s = out[i + 1];
++                    CHECK(s.position.y == 30 + 15 * i && s.radius == 5000 && s.alpha == .5f && s.duration == 1.5f);
++                    CHECK(near(s.velocity, draw(100, 150)) && near(s.gravity, draw(20 * i, 30 + 20 * i)) &&
++                          near(s.delay, draw(0, .5f)));
++                    CHECK(s.texture == "SpriteTextures\\Smoke32_" + std::to_string(4 + i) + ".dtx");
++                }
++            }
++            CHECK(random() == expected());
++        }
++        std::minstd_rand random(1);
++        CHECK(!original_explosion_rings(24, {}, {0, 1, 0}, random, out, error) && out.empty());
++        CHECK(!original_explosion_rings(3, {}, {}, random, out, error) && out.empty());
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        Resources r;
++        std::string error;
++        CHECK(test_explosion_ring::mount(r, root, error));
++        CExplosionRingFX fx;
++        CHECK(!fx.CreateObject(r, 0, error) && !fx.Update(0));
++        for (unsigned kind = 0; kind < 15; ++kind)
++        {
++            ExplosionRingSettings s;
++            switch (kind)
++            {
++                case 0:
++                    s.count = 0;
++                    break;
++                case 1:
++                    s.count = 257;
++                    break;
++                case 2:
++                    s.duration = 0;
++                    break;
++                case 3:
++                    s.delay = -1;
++                    break;
++                case 4:
++                    s.fade = 6;
++                    break;
++                case 5:
++                    s.rotate = 6;
++                    break;
++                case 6:
++                    s.align = 2;
++                    break;
++                case 7:
++                    s.normal = {};
++                    break;
++                case 8:
++                    s.gravity = 10001;
++                    break;
++                case 9:
++                    s.color.x = 1.1f;
++                    break;
++                case 10:
++                    s.alpha = -1;
++                    break;
++                case 11:
++                    s.radius = -1;
++                    break;
++                case 12:
++                    s.texture = std::string("a\0b", 3);
++                    break;
++                case 13:
++                    s.position.x = std::numeric_limits<float>::infinity();
++                    break;
++                case 14:
++                    s.velocity = std::numeric_limits<float>::quiet_NaN();
++                    break;
++            }
++            CHECK(!fx.Init(s, error) && !error.empty());
++        }
++        ExplosionRingSettings s;
++        s.texture = "missing.dtx";
++        CHECK(fx.Init(s, error) && !fx.CreateObject(r, 0, error));
++        CHECK(fx.Init({}, error) && !fx.CreateObject(r, -1, error) && fx.CreateObject(r, 1, error));
++        CHECK(!fx.CreateObject(r, 2, error) && !fx.Update(.5) && !fx.error.empty());
++        CHECK(!fx.Update(std::numeric_limits<double>::infinity()));
++        ExplosionRings rings;
++        for (unsigned i = 0; i < 63; ++i)
++            CHECK(rings.publish(0, {}, {0, 1, 0}, "fire", r, 0, error) && error.empty());
++        CHECK(rings.publish(3, {}, {0, 1, 0}, "partial capacity", r, 0, error) && !error.empty());
++        CHECK(rings.active.size() == 64 && rings.reserved_particles() == 2048 && rings.failed == 3);
++        CHECK(rings.reports.back().rings.size() == 1 && rings.reports.size() == 64);
++        CHECK(rings.publish(0, {}, {0, 1, 0}, "full", r, 0, error) && rings.reports.size() == 64 && !error.empty());
++        const auto id = rings.active.back().id, event = rings.reports.back().id;
++        CHECK(rings.advance(.5) && rings.active.empty() && rings.expired == 64);
++        rings.clear();
++        CHECK(rings.publish(3, {}, {0, 1, 0}, "new", r, 1, error) && error.empty());
++        CHECK(rings.active.front().id > id && rings.reports.front().id > event);
++        CHECK(!rings.advance(0) && rings.active.empty() && rings.failed == 4 && !rings.update_error.empty());
++        rings.clear();
++        CHECK(rings.reports.empty() && !rings.failed && rings.update_error.empty());
++        Resources partial;
++        CHECK(test_explosion_ring::mount(partial, root / "partial", error, false));
++        CHECK(rings.publish(3, {}, {0, 1, 0}, "partial resource", partial, 0, error) && !error.empty());
++        CHECK(rings.active.size() == 1 && rings.failed == 3 && rings.started == 1);
++        return true;
++    }
++    bool session(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string error;
++        CHECK(g.initialize() && test_explosion_ring::mount(g.resources, root, error));
++        auto h = g.objects.create(g.objects.find_class("CClientExplosionSFX"), {}, Creation::World,
++                                  {{"Name", std::string("source")},
++                                   {"Pos", DVector{10, 20, 30}},
++                                   {"Direction", DVector{0, 3, 0}},
++                                   {"ExplosionType", 3}});
++        CHECK(h);
++        DVector moved{100, 200, 300};
++        CHECK(g.server.TeleportObject(h, &moved) == DE_OK && command(g, h) && command(g, h));
++        auto& rings = g.server.explosion_rings;
++        CHECK(rings.active.size() == 8 && rings.started == 8 && !rings.failed && rings.reserved_particles() == 256);
++        const auto& report = g.server.scene_explosions.back();
++        CHECK(report.ring_event && report.ring_error.empty() && !report.client_fx_available);
++        CHECK(report.targets.null_damager && !report.targets.delivered && !report.model_error.empty());
++        CHECK(rings.active[0].settings.position.x == 10 && rings.active[0].settings.position.y == 45);
++        CHECK(g.step(.11) && !g.objects.get(h) && rings.active.size() == 8);
++        CHECK(rings.active[0].particles.size() == 32 && near(rings.active[0].particles[0].position.x, 54));
++        SpriteView scene;
++        CHECK(update_sprite_scene(g, scene, error));
++        unsigned count = 0;
++        for (const auto& entry : scene.entries)
++            if (entry.particle_system)
++            {
++                CHECK(entry.error.empty() && entry.range < scene.mesh.ranges.size());
++                ++count;
++                const auto& v = scene.mesh.vertices[scene.mesh.ranges[entry.range].first];
++                CHECK(near(v.position.x, -12.5f) || near(v.position.x, -5000.f / 640));
++            }
++        CHECK(count >= 64 && count <= 256);
++        const auto updates = rings.active.front().updates;
++        CHECK(update_sprite_scene(g, scene, error) && rings.active.front().updates == updates);
++        CHECK(!g.server.PublishExplosionRings(h, 3, {}, {0, 1, 0}, error) && !error.empty());
++        CHECK(g.step(.5) && rings.active.size() == 6 && rings.expired == 2);
++        for (const auto& fx : rings.active)
++            CHECK(fx.particles.size() == 32 && !fx.delay);
++        CHECK(g.step(1.6) && rings.active.empty());
++        CHECK(g.unload_world() && rings.reports.empty() && !g.server.string_count() && !g.server.message_count());
++        return true;
++    }
++    bool private_world(const std::filesystem::path& root)
++    {
++        GameSession g;
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.initialize() && g.resources.mount_game(c, error));
++        std::uint64_t previous = 0;
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            unsigned emitters = 0;
++            for (auto id : g.objects.snapshot())
++            {
++                auto* r = g.objects.get(id);
++                if (dynamic_cast<CClientExplosionSFX*>(r->game.get()))
++                {
++                    ++emitters;
++                    CHECK(command(g, r->handle));
++                }
++            }
++            auto& rings = g.server.explosion_rings;
++            CHECK(emitters == 9 && rings.active.size() == 36 && rings.reserved_particles() == 1152 && !rings.failed);
++            CHECK(rings.active.front().id > previous);
++            previous = rings.active.back().id;
++            CHECK(g.step(.11));
++            SpriteView scene;
++            CHECK(update_sprite_scene(g, scene, error));
++            unsigned drawn = 0;
++            for (const auto& e : scene.entries)
++                if (e.particle_system)
++                {
++                    if (!e.error.empty())
++                        std::cerr << e.frame_path << ": " << e.error << '\n';
++                    CHECK(e.error.empty());
++                    ++drawn;
++                }
++            CHECK(drawn >= 288 && drawn <= 1152);
++            for (unsigned i = 0; i < 50; ++i)
++                CHECK(g.step(.01));
++            CHECK(rings.active.size() == 27 && rings.expired == 9 && rings.reserved_particles() == 864);
++            for (const auto& fx : rings.active)
++                CHECK(fx.particles.size() == 32 && fx.alpha > 0 && !fx.delay);
++            for (unsigned i = 0; i < 160; ++i)
++                CHECK(g.step(.01));
++            CHECK(rings.active.empty() && rings.expired == 36 && !rings.failed);
++            std::cout << "SubwayA cycle " << cycle
++                      << ": nine emitters, 36 rings, 1152 reserved particles; all expired, IDs through " << previous
++                      << '\n';
++            CHECK(g.unload_world() && rings.reports.empty() && g.objects.snapshot().empty());
++            CHECK(!g.server.string_count() && !g.server.message_count());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::string name = argv[1];
++    return (name == "motion"      ? motion()
++            : name == "recipes"   ? recipes()
++            : argc != 3           ? false
++            : name == "lifecycle" ? lifecycle(argv[2])
++            : name == "failures"  ? failures(argv[2])
++            : name == "session"   ? session(argv[2])
++                                  : name == "private" && private_world(argv[2]))
++               ? 0
++               : 1;
++}
+diff --git a/tests/explosion_sprite_tests.cpp b/tests/explosion_sprite_tests.cpp
+index b1295e1..3528d71 100644
+--- a/tests/explosion_sprite_tests.cpp
++++ b/tests/explosion_sprite_tests.cpp
+@@ -136,8 +136,7 @@ namespace
+         ExplosionSprites effects;
+         CHECK(effects.publish(1, {}, {0, 2, 0}, "partial", store, 0, error));
+         CHECK(effects.active.size() == 1 && effects.started == 1 && effects.failed == 1 && !error.empty());
+-        CHECK(effects.reports.back().sprites.size() == 1 &&
+-              effects.reports.back().unavailable == "particle ring, light illumination");
++        CHECK(effects.reports.back().sprites.size() == 1 && effects.reports.back().unavailable == "light illumination");
+         CHECK(effects.publish(24, {}, {0, 1, 0}, "unsupported", store, 0, error) && !error.empty());
+         CHECK(effects.publish(1, {}, {}, "zero normal", store, 0, error) && !error.empty());
+         const auto old_id = effects.active.front().id;
+@@ -199,6 +198,25 @@ namespace
+         config.data_dir = root;
+         CHECK(game.initialize() && game.resources.mount_game(config, error));
+         SpriteView view;
++        auto check_scene = [&]() -> bool
++        {
++            CHECK(update_sprite_scene(game, view, error));
++            unsigned original = 0, particles = 0;
++            for (const auto& entry : view.entries)
++            {
++                CHECK(entry.error.empty() && entry.range < view.mesh.ranges.size());
++                if (entry.particle_system)
++                    ++particles;
++                else
++                    ++original;
++            }
++            std::size_t expected_particles = 0;
++            for (const auto& ring : game.server.explosion_rings.active)
++                expected_particles += ring.particles.size();
++            CHECK(original == 30 && particles == expected_particles && particles >= 288);
++            CHECK(view.draws.size() == 30 + particles);
++            return true;
++        };
+         std::uint64_t previous = 0;
+         for (unsigned cycle = 0; cycle < 3; ++cycle)
+         {
+@@ -218,13 +236,13 @@ namespace
+                 }
+             }
+             CHECK(count == 9 && game.server.explosion_sprites.active.size() == 18 && game.step(.11));
+-            CHECK(update_sprite_scene(game, view, error) && view.draws.size() == 30);
++            CHECK(check_scene());
+             for (const auto& entry : view.entries)
+                 CHECK(entry.error.empty());
+             CHECK(game.server.explosion_sprites.active.front().id > previous);
+             previous = game.server.explosion_sprites.active.back().id;
+             CHECK(game.step(.3));
+-            CHECK(update_sprite_scene(game, view, error) && view.draws.size() == 30);
++            CHECK(check_scene());
+             CHECK(game.unload_world() && game.server.explosion_sprites.active.empty() &&
+                   game.server.explosion_sprites.reports.empty());
+             view.clear();

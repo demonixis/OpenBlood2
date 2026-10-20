@@ -1,0 +1,14 @@
+658/659 Testing: destructable_models.unnamed
+658/659 Test: destructable_models.unnamed
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable_model_tests" "unnamed" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable-model-unnamed"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"destructable_models.unnamed" start time: Oct 17 05:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_models.unnamed" end time: Oct 17 05:15 CEST
+"destructable_models.unnamed" time elapsed: 00:00:00
+----------------------------------------------------------

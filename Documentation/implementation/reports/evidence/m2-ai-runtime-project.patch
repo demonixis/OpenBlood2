@@ -1,0 +1,2835 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index b4b438b..19c19a6 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -327,3 +327,12 @@ dimensions, guard ledge order and residual velocity. Tracking is a checked non-o
+ identity, not a new engine link. Diagnostic ray-hit hints do not change authored
+ marker flags. Earlier escape/guard-body omissions are superseded; smell/recoil/death,
+ full NPC initialization/AI_Update, required FX and ExitTrigger keep M2 incomplete.
++
++The [production NPC lifecycle continuation](../Documentation/Implementation/M2_AI_RUNTIME.md) registers CultistAI/CivilianAI and connects original initialization/AI_Update.
++Read [contracts](docs/AI_RUNTIME_CONTRACTS.md). Preserve class-specific property/table quirks,
++source update ordering, deferred child lifetime and independent clocks. Runtime
++failures suspend visibly; replacement center-ray activation is not retail PVS.
++SubwayA has 202 created source entries, 4 transferred sounds, 372 editor-only,
++2 unsupported and no creation failures. Remaining actions/death, Gideon, required
++FX and ExitTrigger keep M2 open. User-reported pink train glass and direct movement
++failure after intro are retained in the evidence for later investigation.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 93506a4..4179802 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,6 +41,7 @@ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
++    src/game/server_activation.cpp src/game/original/AIRuntime.cpp
+     src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/Movement.cpp
+     src/game/original/AIState.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+diff --git a/README.md b/README.md
+index bbe66b4..cc088e4 100644
+--- a/README.md
++++ b/README.md
+@@ -1,10 +1,9 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
+-Latest gameplay continuation: [original AI commands and hearing](../Documentation/Implementation/M2_AI_TRIGGERS.md) connects
+-trigger commands, two-faction broadcasts and player sound alerts, building on
+-[weapon actions](../Documentation/Implementation/M2_AI_FIRE.md) and [perception](../Documentation/Implementation/M2_AI_PERCEPTION.md).
+-Full NPC initialization/AI_Update, required actions, client FX and ExitTrigger
+-still block the actual M2 gate.
++Latest gameplay continuation: [original Cultist/Civilian initialization and AI_Update](../Documentation/Implementation/M2_AI_RUNTIME.md)
++registers the fifteen authored SubwayA NPCs, with original properties, animation,
++inventory, activation and state dispatch. Remaining combat/death actions, required
++FX, Gideon and ExitTrigger still keep M2 incomplete.
+ 
+ A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory, KeyPickup, original player USE, RotatingDoor, RotatingBrush, selected CDestructableBrush damage/removal and original CDebris explosive area damage and BoxPhysics pushable/gravity brushes with original damage impulses are connected. Original ammo/health/armor pickups and destruction spawns extend this subset; complete player gameplay remains missing. This is not a playable game.
+ 
+@@ -39,7 +38,7 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
+ ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
+ ```
+ 
+-The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **187 source entries** create, plus **4 transferred world sounds** and **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **17 unported runtime entries**, and zero failed. Runtime counts before/after player entry are **194/197**, then **185/189** after the first update consumes nine Keys and the default player creates a held Beretta child. Every source entry remains inspectable; consumed keys retain historical load status. The [latest evidence](../Documentation/Implementation/M2_SCENE_EXPLOSIONS.md) records these counts; earlier sections below are historical snapshots.
++The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **202 source entries** create, plus **4 transferred world sounds** and **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **2 unported runtime entries** (Gideon and ExitTrigger), and zero creation failures. Runtime counts before/after player entry are **224/227**, including fifteen NPC muzzle lights. After the first update consumes nine Keys and creates ten NPC held weapons plus the player's held Beretta, the count is **229** with **11 attachments**. These are lifecycle counts, not complete gameplay acceptance. See [NPC evidence](../Documentation/Implementation/M2_AI_RUNTIME.md); earlier sections below retain historical counts.
+ 
+ The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Door audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. World textures and a complete game session remain unimplemented; cinematic, random-emitter and world-loop audio are covered by the later continuations below. Sprites shows original placement/repeats, manifest metadata and frame clocks, with a diagnostic overlay; DTX textures are indexed but not decoded.
+ 
+@@ -410,3 +409,8 @@ full NPC initialization/AI_Update, required FX and ExitTrigger keep M2 incomplet
+ AI escape/guard verification: 458/458 Debug and inspector-free Release checks
+ (27 GPU each), plus 145 targeted ASan/UBSan/leak checks.
+ See [evidence](../Documentation/Implementation/M2_AI_ESCAPE.md).
++
++Production NPC lifecycle verification: 472/472 Debug and inspector-free Release
++checks (27 GPU each), plus 179 targeted ASan/UBSan/leak checks. See
++[evidence](../Documentation/Implementation/M2_AI_RUNTIME.md) for the no-player
++self-target boundary and remaining M2 requirements.
+diff --git a/docs/AI_ESCAPE_CONTRACTS.md b/docs/AI_ESCAPE_CONTRACTS.md
+index 810bd2c..342bbfc 100644
+--- a/docs/AI_ESCAPE_CONTRACTS.md
++++ b/docs/AI_ESCAPE_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI escape, hiding and guard states
+ 
++Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
++this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
++The existing action/service limitations remain unless explicitly superseded.
++
+ Selected CultistAI/CivilianAI Escape_RunAway and Escape_Hide, AI_Mgr GuardLocation
+ and MC_Taunt_Beg execute through existing typed services. M2 remains incomplete;
+ these classes are not registered as production NPCs. See [source selections](M2_AI_ESCAPE_SOURCES.json),
+diff --git a/docs/AI_RUNTIME_CONTRACTS.md b/docs/AI_RUNTIME_CONTRACTS.md
+new file mode 100644
+index 0000000..7cda97a
+--- /dev/null
++++ b/docs/AI_RUNTIME_CONTRACTS.md
+@@ -0,0 +1,116 @@
++# Original Cultist/Civilian initialization and AI_Update
++
++CultistAI and CivilianAI are now registered for world creation. Their selected
++original constructors, properties, model selection, initialization and AI_Update
++execute through typed services. See [source selections](M2_AI_RUNTIME_SOURCES.json)
++and [execution evidence](../../Documentation/Implementation/M2_AI_RUNTIME.md).
++This supersedes earlier statements that no production NPC is registered. M2 is
++still incomplete: reachable unimplemented actions fail visibly, and this is not
++complete combat or campaign acceptance.
++
++## Construction and initialization
++
++Production factories apply the original class defaults before precreate. Diagnostic
++subclasses retain their isolated fixtures. AI properties are read for world/string
++creation; the subclass Male/LabTech/Scared/skin booleans only for world creation.
++The original base precreate chain reads placement/name and damage properties before
++subclass model selection. Source random skin draws, female-civilian skin-1 selection,
++Special8 skin-4 precedence, sorority/clown paths and class/gender sound roots are
++preserved. Add-on robe Cultists reject explicitly. Restoration is unavailable.
++
++Animation/hit-sphere tables are shared by class/gender. The source civilian
++precedence quirk rebuilds the male table for every male, and a female LabTech also
++initializes the independent female table. Shared tables survive individual actor
++removal, but are reset after world destruction to avoid cross-world clip/voice
++ownership. A rejected second session cannot reset the bound session's tables.
++A read-only candidate preflight prevents failed creation from poisoning
++an existing table; no voice ownership is copied. Missing head/model data fails.
++
++Initialization connects inventory, damage and movement aggregates; strength 5,
++unique supported weapon acquisition, source ammo order (Charges and Cells both
++feed batteries), focus 200, difficulty health/armor/damage factors and Cultist's
++0.5 damage factor are retained. NONE, BERETTA and MELEE are supported; other authored
++weapons and nonzero proximity inventory reject instead of silently substituting.
++Weapon delivery applies the multiplier without changing recorded sampled damage.
++
++Default RandomHitPoints=0 produces the source reversed Random(1,0) request. The
++adapter uses a unit draw and the linear interval formula, also seen in the other
++LithTech generation's ic_Random. This is source evidence, not retail random-sequence
++verification. RandomHP=1 has an exact +1 result. Scale varies as (1-f,1+f,1-f),
++f in [-0.05,0.1]. Guard captures the spawn position before ground placement. Model
++animation-zero centered bounds precede the existing atomic foot-anchored resize.
++World creation moves to the ground; runtime/string creation does not.
++
++Blocking priority is 50; damage mass is 250; typed character-body mass/friction are
++250/10 (source SetMass formula). The existing bounded replacement integrator applies
++ground drag and gravity once; MIN_FORCE=0 drops no nonzero forces. This does not
++claim retail physics parity or full NPC damage impulse behavior. Source flags are
++retained, including REMOVEIFOUTSIDE: a center outside the loaded DAT world bounds
++is removed deferred on the next object advance, including inactive objects.
++The inventory aggregate updates supported held models after the AI callback.
++
++## Update order and activation
++
++AI_Update preserves: removal guard; >=1-second sleep-gap random desynchronization;
++last-update/0.001 scheduling; cinematic movement restriction excluding Script,
++Passive and Idle; first-update 3-second automatic shutdown; target retention and
++current-position sampling; tracked-position refresh; health<=0 Dying selection;
++character support DONTFOLLOWSTANDING; Metacmd<=0 repair; original state dispatch.
++The existing CMovement aggregate refreshes after the callback, preserving cached
++basis timing. Physics/model clocks run once outside AI_Update. Script messages now
++prepare the owned program and force the original immediate update.
++
++SetDeactivationTime and AUTODEACTIVATE_NOW preserve pending deadlines. Player
++Update pings strictly after its 0.5-second deadline, using the active camera when
++present. PingObjects snapshots eligible active/auto-deactivated identities, checks
++actual center rays and only then refreshes visibility timers. Manual inactive
++actors remain inactive; missing collision/invalid rays fail without partial pings.
++This visibility selection is replacement code: retail PVS data is not decoded,
++so occlusion/corner activation can differ. It never depends on the inspector or
++render visibility. Expiry and wake delays use simulation time, not wall time.
++
++A live target sets HasTargeted and expands positive sensing range to seeing range.
++Dead targets clear and request Idle (which can become SearchVisual under the
++original idle deadline); occluded targets clear unless ALWAYSCLEAR. Wrong-class
++and unresolved required poses fail. Pending targets clear through checked identity
++and link handling. Nonlinked tracked-object removal clears the stale identity and
++suspends the actor with its historical coordinates available for diagnosis.
++
++Civilian exact uppercase TRIGGER preserves Hide/Script/Special guards, selects
++LabTech Hide or other Special1, and then forwards the original base message.
++Checked non-owning linking replaces the raw target assignment. Damage forwards
++once before selecting EscapeRun. Every HSTRING read owns exactly one release.
++
++## Failure and inspection
++
++Initialization rejection rolls back the actor and its inventory/attachment children.
++A required runtime failure latches its reason, stops scheduling/velocity and makes
++the still-owned actor manually inactive. This deliberately retains evidence instead
++of deleting an actor as the unchecked original error path could do. No missing
++state succeeds as a no-op. Nested update and callback removal are guarded.
++
++The Skeletons panel shows initialization/failure, state/phase, update count,
++automatic activity/deadline/pings, wake delays, camera pauses, target loss and HP/
++damage factor. Existing model, inventory, attachment, query, script, sound and
++failure panels remain available for hidden/inactive actors. The UI never advances
++AI. The attachment list starts collapsed so a populated world does not push the
++lifecycle panel out of view. Model-key/audio diagnostics remain separate from lifecycle success: availability
++of these registered classes does not assert every authored key/effect is supported.
++
++Without a player, the original enemy-list fallback can search the actor's own
++faction and sensing can select self. The existing distinct-object target/link
++contract rejects that selection. Stepping SubwayA before player entry currently
++suspends three NPCs on the first tick; the nested target failure remains visible.
++Entering a player later does not silently revive a failed actor. The successful
++SubwayA run enters the player before the first simulation tick. This is an explicit
++remaining integration boundary, not a reason to weaken the identity contract.
++
++## Remaining boundary
++
++Gideon and ExitTrigger still do not instantiate in SubwayA. NPC recoil/death,
++shade/smell/assist/pickup actions, some model keys, broader weapons, effects and
++session services remain open. A Dying or another missing action suspends with an
++explicit error; there is no fabricated death sequence. Skin selection is not a
++promise that every add-on texture decodes. Engine replacement activation, resize,
++friction and outside-bounds handling require retail comparison. Linux is the only
++verified platform; other platforms/XR and full M2 acceptance remain pending.
+diff --git a/docs/AI_SCRIPT_CONTRACTS.md b/docs/AI_SCRIPT_CONTRACTS.md
+index dfaa9ec..3d3cbbf 100644
+--- a/docs/AI_SCRIPT_CONTRACTS.md
++++ b/docs/AI_SCRIPT_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI script preparation and state dispatch
+ 
++Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
++this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
++The existing action/service limitations remain unless explicitly superseded.
++
+ [Source selections](M2_AI_SCRIPT_SOURCES.json) connect AI_Mgr's script list,
+ UpdateScriptCommand and AI_STATE_Script to the existing [movement helpers](AI_FOLLOW_CONTRACTS.md),
+ [target/state services](AI_STATE_CONTRACTS.md), animation clocks and WAV mixer.
+diff --git a/docs/AI_STATE_CONTRACTS.md b/docs/AI_STATE_CONTRACTS.md
+index 51085be..08f6886 100644
+--- a/docs/AI_STATE_CONTRACTS.md
++++ b/docs/AI_STATE_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI state decisions and stationary actions
+ 
++Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
++this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
++The existing action/service limitations remain unless explicitly superseded.
++
+ > Extended by [CMovement contracts](AI_NAVIGATION_CONTRACTS.md): original cached
+ > transforms and obstacle-path calculation are available for explicitly initialized
+ > actors. Current-transform adaptations below remain; full AI following is still absent.
+diff --git a/docs/AI_TRIGGER_CONTRACTS.md b/docs/AI_TRIGGER_CONTRACTS.md
+index 6ea7e82..9ae5d86 100644
+--- a/docs/AI_TRIGGER_CONTRACTS.md
++++ b/docs/AI_TRIGGER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI trigger commands and hearing
+ 
++Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
++this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
++The existing action/service limitations remain unless explicitly superseded.
++
+ This integrates selected `AI_Mgr::HandleTrigger`, `PlayAnimation`, its MID_TRIGGER
+ message branch and `ObjectUtilities::SendSoundTrigger`. Player sound attempts now
+ send the original alerts. Read [source selections](M2_AI_TRIGGER_SOURCES.json),
+diff --git a/docs/ATTACHMENT_CONTRACTS.md b/docs/ATTACHMENT_CONTRACTS.md
+index f4d9038..cc01f40 100644
+--- a/docs/ATTACHMENT_CONTRACTS.md
++++ b/docs/ATTACHMENT_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Held models and attachments
+ 
++Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
++this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
++The existing action/service limitations remain unless explicitly superseded.
++
+ This M2 increment connects the original CWeapon ShowHandModel/CreateHandModel,
+ CInventoryMgr current-hand branch and held CHandWeaponModel lifecycle. It adds
+ real attachment transforms through typed SDK methods. See the
+diff --git a/docs/M2_AI_RUNTIME_SOURCES.json b/docs/M2_AI_RUNTIME_SOURCES.json
+new file mode 100644
+index 0000000..a4792f5
+--- /dev/null
++++ b/docs/M2_AI_RUNTIME_SOURCES.json
+@@ -0,0 +1,167 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "b505e3399387a8180fcb2138e7cedf85830f5e3b",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          90,
++          207
++        ],
++        [
++          674,
++          751
++        ],
++        [
++          816,
++          866
++        ],
++        [
++          1150,
++          1237
++        ],
++        [
++          1985,
++          1993
++        ],
++        [
++          2022,
++          2299
++        ]
++      ],
++      "use": "Constructor/ReadProp/initialization/update, script entry, empty touch handler reference"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CultistAI.cpp",
++      "sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
++      "selected_lines": [
++        [
++          20,
++          266
++        ]
++      ],
++      "use": "Schema, constructor, model/skin and shared animation initialization"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
++      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
++      "selected_lines": [
++        [
++          20,
++          332
++        ]
++      ],
++      "use": "Schema, constructor, class-specific trigger/damage and model/table initialization"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "selected_lines": [
++        [
++          1822,
++          1870
++        ]
++      ],
++      "use": "Selected player/camera PingObjects scheduling"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "selected_lines": [
++        [
++          2538,
++          2539
++        ],
++        [
++          2654,
++          2685
++        ]
++      ],
++      "use": "Selected aggregate weapon-update chain"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/InventoryMgr.h",
++      "sha256": "a68853cfddeedae13bbf1203bc8bc791c57fbf82829771203ecdc8ffe51e0226",
++      "selected_lines": [
++        [
++          108,
++          108
++        ]
++      ],
++      "use": "Multiplicative damage factor"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
++      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
++      "selected_lines": [
++        [
++          347,
++          353
++        ],
++        [
++          1751,
++          1753
++        ]
++      ],
++      "use": "Weapon damage multiplier at delivery"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
++      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
++      "selected_lines": [
++        [
++          367,
++          384
++        ]
++      ],
++      "use": "Mass/friction formula; typed replacement character-body service"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/server_de.h",
++      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "selected_lines": [
++        [
++          60,
++          65
++        ],
++        [
++          678,
++          684
++        ]
++      ],
++      "use": "Auto-deactivation/visibility service contracts"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/basetypes_de.h",
++      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
++      "selected_lines": [
++        [
++          360,
++          368
++        ]
++      ],
++      "use": "REMOVEIFOUTSIDE flag"
++    },
++    {
++      "path": "sources/lithtech/runtime/shared/src/impl_common.cpp",
++      "sha256": "f70aefefa9ee550d5d7fbc91dcefd6bce4846af21cfcdcb68e6b60ffcb8ef5ca",
++      "selected_lines": [
++        [
++          271,
++          277
++        ]
++      ],
++      "use": "Other-generation reference for linear Random interval formula; not retail-sequence evidence"
++    }
++  ],
++  "adaptations": [
++    "Checked typed lifecycle and bounded properties; explicit unavailable weapons/restore/add-on robe",
++    "Class/gender tables reset on world teardown with failure preflight and unique voice ownership",
++    "Simulation-time auto-deactivation with replacement center-ray visibility; retail PVS unavailable",
++    "Typed character-body mass/friction and world-bounds removal; replacement physics",
++    "Runtime failures retain a quiescent inspectable actor; initialization failures roll back",
++    "Checked civilian target link and current target/tracked lifetime; no dangling raw pointers"
++  ]
++}
+diff --git a/docs/OBJECT_CONTRACTS.md b/docs/OBJECT_CONTRACTS.md
+index b74fdec..ad616f6 100644
+--- a/docs/OBJECT_CONTRACTS.md
++++ b/docs/OBJECT_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # M1 Object Boundary
+ 
++Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
++this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
++The existing action/service limitations remain unless explicitly superseded.
++
+ The later [player entry contracts](PLAYER_CONTRACTS.md) supersede this increment's statements that shell/player entry is entirely absent. Complete gameplay remains blocked; earlier limits below remain unless explicitly superseded.
+ 
+ The authoritative source interface is in [src/game/legacy](../src/game/legacy/server_de.h). It is a **bounded source-level subset**, not an implementation of the entire 1998 SDK or its DLL ABI. Game and engine compile against the same `BaseClass`, callback signatures and scalar definitions. Read-only inputs use `const char*`; Windows-sized integers use fixed-width types. `ServerAdapter` is a normally constructed C++ object implementing virtual message methods and assigning compiler-checked callback thunks.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index e844a89..30191c6 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -614,3 +614,13 @@ source rules. [Contracts](AI_ESCAPE_CONTRACTS.md) separate safety adaptations,
+ diagnostic hint flags and selected defaults from still-missing full NPC initialization.
+ [Evidence](../../Documentation/Implementation/M2_AI_ESCAPE.md) records Linux checks.
+ Reference repositories, commercial assets and pinned dependencies are unchanged.
++
++## M2 production NPC lifecycle
++
++Donor: `sources/blood2` at `006b4aabd3fb348f6846cad03799cf8df685ea95`.
++[Source ranges/hashes](M2_AI_RUNTIME_SOURCES.json) cover Cultist/Civilian construction,
++AI_Mgr initialization/AI_Update, player activation pings, inventory updates and
++damage factors. Another LithTech generation supplies only a linear Random reference.
++[Contracts](AI_RUNTIME_CONTRACTS.md) distinguish checked-lifetime/error adaptations,
++world-scoped tables, replacement visibility/physics and still-missing actions.
++No reference tree, commercial asset or dependency pin changed.
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index f63176d..f58c143 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -7,6 +7,26 @@
+ #include <limits>
+ namespace OpenBlood2
+ {
++    bool check_ai_runtime_smoke(GameSession& g, ObjectId& selection)
++    {
++        unsigned cultists = 0, civilians = 0;
++        std::uint64_t updates = 0;
++        for (auto id : g.objects.snapshot())
++        {
++            const auto* r = g.objects.get(id);
++            const auto* a = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
++            if (!a || a->npc_type == AI_Mgr::NPCType::Diagnostic)
++                continue;
++            if (!a->RuntimeReady() || !r->model)
++                return false;
++            cultists += a->npc_type == AI_Mgr::NPCType::Cultist;
++            civilians += a->npc_type == AI_Mgr::NPCType::Civilian;
++            updates += a->runtime_updates;
++            if (!g.objects.get(selection) || std::string_view(r->state.m_Name) == "spank")
++                selection = id;
++        }
++        return cultists == 10 && civilians == 5 && updates >= 15;
++    }
+     namespace
+     {
+         // Isolated original flee/hide driver. It stops scheduling once beg begins;
+diff --git a/src/app/ai_model_key_smoke.h b/src/app/ai_model_key_smoke.h
+index 977507b..07bff0e 100644
+--- a/src/app/ai_model_key_smoke.h
++++ b/src/app/ai_model_key_smoke.h
+@@ -2,6 +2,7 @@
+ #include "game/server_adapter.h"
+ namespace OpenBlood2
+ {
++    bool check_ai_runtime_smoke(GameSession&, ObjectId&);
+     bool prepare_ai_escape_smoke(GameSession&, ObjectId&);
+     bool check_ai_escape_smoke(GameSession&, ObjectId);
+     bool prepare_ai_follow_smoke(GameSession&, ObjectId&);
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index ba10598..9dc36ef 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -10,7 +10,7 @@ namespace OpenBlood2
+         ImGui::TextWrapped("Current ABC node transforms and original CAnim_Sound tables. Spheres are the original "
+                            "initialization radii, shown at live node positions; damage localization and complete AI "
+                            "behavior remain unported.");
+-        if (ImGui::CollapsingHeader("Live attachments", ImGuiTreeNodeFlags_DefaultOpen))
++        if (ImGui::CollapsingHeader("Live attachments"))
+         {
+             ImGui::TextWrapped("Held models follow current parent nodes. Physical/nested attachments and dropped "
+                                "weapons remain unavailable.");
+@@ -60,6 +60,25 @@ namespace OpenBlood2
+         const auto* r = game.objects.get(skeleton_selection);
+         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
++        if (target_ai && target_ai->npc_type != AI_Mgr::NPCType::Diagnostic &&
++            ImGui::CollapsingHeader("Original NPC lifecycle", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            const auto& a = *target_ai;
++            ImGui::Text("Initialization %s | update %s", a.runtime_initialized ? "complete" : "incomplete",
++                        a.runtime_failed ? "FAILED / suspended" : "ready");
++            ImGui::Text("AI_Update %llu | camera pauses %llu | wake delays %llu", (unsigned long long)a.runtime_updates,
++                        (unsigned long long)a.runtime_camera_pauses, (unsigned long long)a.runtime_desyncs);
++            ImGui::Text("Activity %u | pings %llu | timeout %.3f", r->activity, (unsigned long long)r->activation_pings,
++                        r->deactivate_at);
++            ImGui::Text("State %d | phase %d | targeted %s | target losses %llu", a.m_nState, a.Metacmd,
++                        a.m_bHasTargeted ? "yes" : "no", (unsigned long long)a.runtime_target_losses);
++            ImGui::Text("HP %.2f / %.2f | damage factor %.3f", a.m_damage.m_fHitPoints, a.m_damage.m_fMaxHitPoints,
++                        a.m_InventoryMgr.damage_multiplier);
++            ImGui::TextWrapped("Activation uses replacement center-ray visibility, not retail PVS. Remaining states "
++                               "may fail explicitly.");
++            if (!a.runtime_error.empty())
++                ImGui::TextWrapped("Failure: %s", a.runtime_error.c_str());
++        }
+         if (target_ai && ImGui::CollapsingHeader("Original escape and guard", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& a = *target_ai;
+@@ -78,7 +97,7 @@ namespace OpenBlood2
+         if (target_ai && ImGui::CollapsingHeader("Original navigation and recovery", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& a = *target_ai;
+-            ImGui::TextWrapped("Original jump/crouch/crawl and selected route states. Full AI_Update, smell following "
++            ImGui::TextWrapped("Original jump/crouch/crawl and selected route states. Smell following "
+                                "and shade-based detours remain unavailable.");
+             ImGui::Text("Last driven state %d | current %d | phase %d", a.navigation_state, a.m_nState, a.Metacmd);
+             ImGui::Text("Updates %llu | arrivals %llu | failures %llu", (unsigned long long)a.navigation_updates,
+@@ -97,8 +116,8 @@ namespace OpenBlood2
+         if (target_ai && ImGui::CollapsingHeader("Original autonomous locomotion", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& a = *target_ai;
+-            ImGui::TextWrapped("Original walk/run/moving fire and selected Cultist attack sequencing. Full AI_Update, "
+-                               "shade recovery and full NPC initialization remain unavailable.");
++            ImGui::TextWrapped("Original walk/run/moving fire and selected Cultist attack sequencing. Remaining "
++                               "shade recovery and death actions remain unavailable.");
+             ImGui::Text("Command %d | calls %llu | failures %llu", a.locomotion_command,
+                         (unsigned long long)a.locomotion_calls, (unsigned long long)a.locomotion_failures);
+             ImGui::Text("Obstruction %s | speed %.3f | cached vertical change %.4f | checks %llu",
+@@ -144,7 +163,7 @@ namespace OpenBlood2
+         {
+             const auto& a = *target_ai;
+             const char* outcomes[]{"None", "Prepared", "Running", "Completed", "State changed", "Failed"};
+-            ImGui::TextWrapped("Explicit script-state driver. Production SCRIPT trigger / full AI_Update unavailable.");
++            ImGui::TextWrapped("Explicit script-state driver. Production SCRIPT triggers also enter AI_Update.");
+             ImGui::Text("%s | flags %u | next index %zu | remaining %zu",
+                         outcomes[static_cast<unsigned>(a.script_outcome)], a.m_dwScriptFlags, a.script_index,
+                         a.ScriptCommands().size());
+@@ -166,8 +185,8 @@ namespace OpenBlood2
+             const auto& a = *target_ai;
+             const char* commands[]{"None", "FOLLOWPATH", "MOVETOOBJECT"};
+             const char* outcomes[]{"None", "Selected", "Moving", "Arrived", "Completed", "Failed"};
+-            ImGui::TextWrapped(
+-                "Original movement helpers; the enclosing driver owns command sequencing. Full AI_Update unavailable.");
++            ImGui::TextWrapped("Original movement helpers; the enclosing driver owns command sequencing. Runtime "
++                               "dispatch is enabled for Cultist/Civilian.");
+             ImGui::Text("%s | %s | mode %s | Metacmd %d", commands[static_cast<unsigned>(a.script_motion_command)],
+                         outcomes[static_cast<unsigned>(a.script_motion_outcome)],
+                         a.m_eScriptMovement == AI_Mgr::SM_WALK  ? "WALK"
+@@ -226,10 +245,9 @@ namespace OpenBlood2
+                 ImGui::Text("%zu: %.2f %.2f %.2f", i, m.path()[i].x, m.path()[i].y, m.path()[i].z);
+             if (!m.error.empty())
+                 ImGui::TextWrapped("%s", m.error.c_str());
+-            ImGui::TextWrapped(
+-                "Two side rays only; partial paths are not usable success. Planning does not move an "
+-                "actor. Player cache remains uninitialized, as in source. Production NPC initialization, shade-based "
+-                "position selection and full AI_Update remain unavailable.");
++            ImGui::TextWrapped("Two side rays only; partial paths are not usable success. Planning does not move an "
++                               "actor. Player cache remains uninitialized, as in source. Shade-based "
++                               "position selection remains unavailable.");
+         }
+         if (target_ai && ImGui::CollapsingHeader("Original AI commands / hearing", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+@@ -260,15 +278,15 @@ namespace OpenBlood2
+                         (unsigned long long)ai.trigger_relays);
+             if (!ai.trigger_error.empty())
+                 ImGui::TextWrapped("%s", ai.trigger_error.c_str());
+-            ImGui::TextWrapped("State selection does not execute missing search/dodge/attack actions. Full AI_Update "
+-                               "and production SCRIPT entry remain unavailable.");
++            ImGui::TextWrapped("State selection does not execute missing search/dodge/attack actions. Complete combat "
++                               "and missing recovery/death actions remain unavailable.");
+         }
+         if (target_ai && ImGui::CollapsingHeader("Original AI weapon actions", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& ai = *target_ai;
+             const auto* weapon = ai.m_InventoryMgr.CurrentWeapon();
+-            ImGui::TextWrapped("Original standing fire and weapon choice. Diagnostic driver; full NPC update, attack "
+-                               "states, navigation and death remain unavailable.");
++            ImGui::TextWrapped("Original standing fire and weapon choice, called by production Cultist updates. "
++                               "Complete combat reactions and death remain unavailable.");
+             ImGui::Text("Weapon %u | last selection: alternative %u / distance %.2f", weapon ? weapon->data.m_nType : 0,
+                         ai.best_weapon, ai.weapon_distance);
+             ImGui::Text("Attempts %llu | shots %llu | dry %llu | blocked %llu | failures %llu",
+@@ -317,8 +335,8 @@ namespace OpenBlood2
+         if (target_ai && ImGui::CollapsingHeader("Original AI state actions", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& ai = *target_ai;
+-            ImGui::TextWrapped("Selected original decisions and stationary actions. Full AI_Update, navigation, "
+-                               "full combat/death and production NPC registration remain unavailable.");
++            ImGui::TextWrapped("Original decisions and registered Cultist/Civilian updates. Remaining actions and "
++                               "full combat/death remain unavailable.");
+             ImGui::Text("State %d | last %d | requested %d | dispatched %d", ai.m_nState, ai.m_nLastState,
+                         ai.requested_state, ai.dispatched_state);
+             ImGui::Text("Authored %s | metacmd %d / current %d | animating %s", ai.m_szAIState.c_str(), ai.Metacmd,
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index c1ca65f..f6b553c 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -268,6 +268,11 @@ namespace
+         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_escape_smoke(game, smoke_ai_escape))
+             return 4;
+         const auto original_ai_escape = smoke_ai_escape;
++        OpenBlood2::ObjectId smoke_ai_runtime{};
++        if (options.skeleton_smoke)
++            OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
++        const auto original_ai_runtime = smoke_ai_runtime;
++        bool ai_runtime_hidden = false;
+         bool ai_sight_hidden = false;
+         bool ai_target_hidden = false;
+         bool hand_hidden = false;
+@@ -332,7 +337,7 @@ namespace
+         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
+         inspector.select_skeleton = options.skeleton_smoke;
+         if (options.skeleton_smoke)
+-            inspector.skeleton_selection = smoke_ai_escape;
++            inspector.skeleton_selection = smoke_ai_runtime;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
+         inspector.select_pickups = options.pickups_smoke;
+@@ -437,7 +442,9 @@ namespace
+             }
+             if (done)
+                 break;
+-            if (smoke && SDL_GetTicks() - started > 15000)
++            // The populated viewport now deforms/renders fifteen NPCs and ten held weapons.
++            // Keep the same frame/event assertions; allow Debug CPU rendering more wall time.
++            if (smoke && SDL_GetTicks() - started > (extended_smoke ? 45000u : 15000u))
+             {
+                 spdlog::error("GPU smoke timed out before completing its frames/events");
+                 return 4;
+@@ -558,6 +565,8 @@ namespace
+                 ai_follow_hidden |= OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
+             if (options.skeleton_smoke && !inspector_visible)
+                 ai_escape_hidden |= OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
++            if (options.skeleton_smoke && !inspector_visible)
++                ai_runtime_hidden |= OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
+             if (options.skeleton_smoke && !inspector_visible)
+                 ai_state_hidden |= OpenBlood2::check_ai_state_smoke(game, smoke_ai_state);
+             if (options.skeleton_smoke && !inspector_visible)
+@@ -1131,6 +1140,11 @@ namespace
+                                      a->navigation_error);
+                 if (!ai_follow_hidden || !reentered)
+                     return 4;
++                const bool runtime_reentered = OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
++                spdlog::info("Original NPC AI_Update: hidden={}, reentered={}, old identity invalidated={}",
++                             ai_runtime_hidden, runtime_reentered, !game.objects.get(original_ai_runtime));
++                if (!ai_runtime_hidden || !runtime_reentered || game.objects.get(original_ai_runtime))
++                    return 4;
+                 const bool escape_reentered = OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
+                 spdlog::info("AI escape/beg: hidden={}, reentered={}, old identity invalidated={}", ai_escape_hidden,
+                              escape_reentered, !game.objects.get(original_ai_escape));
+@@ -1178,7 +1192,7 @@ namespace
+                     "Model viewport: frames={}, world hidden={}, weapon hidden={}, instances={}, close={}, vertices={}",
+                     model_frames, models_hidden, close_weapon_hidden, model_scene.world_draws.size(),
+                     model_scene.close_draws.size(), model_scene.mesh.vertices.size());
+-                if (!close_weapon_hidden || !model_scene.world_draws.empty() ||
++                if (!close_weapon_hidden || model_scene.world_draws.size() != 25 ||
+                     model_frames != world_renderer.stats.frames)
+                     return 4;
+                 std::size_t decoded = 0, missing = 0;
+diff --git a/src/engine/objects.cpp b/src/engine/objects.cpp
+index 15b6f65..1b92b4c 100644
+--- a/src/engine/objects.cpp
++++ b/src/engine/objects.cpp
+@@ -645,6 +645,17 @@ namespace OpenBlood2
+         for (auto id : ids)
+         {
+             auto* r = get(id);
++            if (r && r->life == Life::Alive && (r->state.m_Flags & FLAG_REMOVEIFOUTSIDE) && world &&
++                !world->models.empty())
++            {
++                const auto p = r->state.m_Pos;
++                if (p.x < world->min.x || p.y < world->min.y || p.z < world->min.z || p.x > world->max.x ||
++                    p.y > world->max.y || p.z > world->max.z)
++                    remove(r->handle); // Deferred; checked identities become unavailable immediately.
++            }
++            if (r && r->life == Life::Alive && r->activity == OBJSTATE_ACTIVE && r->auto_deactivate &&
++                r->deactivation_period > 0 && time_ >= r->deactivate_at)
++                r->activity = OBJSTATE_AUTODEACTIVATE_NOW;
+             if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE || !r->scheduled || r->due > time_)
+                 continue;
+             r->scheduled = false;
+@@ -722,6 +733,8 @@ namespace OpenBlood2
+         auto* r = get(receiver);
+         if (!r || r->life != Life::Alive)
+             return fail(ObjectError::InvalidHandle, "Engine event receiver is invalid or pending removal");
++        if (id == MID_TOUCHNOTIFY && r->activity != OBJSTATE_ACTIVE && r->activity != OBJSTATE_INACTIVE_TOUCH)
++            return false; // Manual/automatic inactivity suppresses contact callbacks, not object messages.
+         if (callback_depth_ >= 128)
+             return fail(ObjectError::Limit, "Engine event recursion limit");
+         dispatch(*r, id, data, value);
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index 8b0878a..dce25af 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -106,7 +106,7 @@ namespace OpenBlood2
+         std::uint32_t contact_polygon = UINT32_MAX;
+         HOBJECT contact_object = nullptr;
+         bool grounded = false;
+-        bool world_body = false;
++        bool world_body = false, character_body = false;
+         WorldBodyProperties body_properties;
+         DBYTE blocking_priority = 0;
+         std::uint64_t body_steps = 0, body_pushes = 0;
+@@ -129,6 +129,9 @@ namespace OpenBlood2
+         std::string model_error;
+         DDWORD user_flags = 0;
+         DDWORD activity = OBJSTATE_ACTIVE;
++        bool auto_deactivate = false;
++        double deactivation_period = 0, deactivate_at = 0;
++        std::uint64_t activation_pings = 0;
+         double due = 0;
+         bool scheduled = false;
+         std::uint64_t updates = 0;
+diff --git a/src/game/legacy/basedefs_de.h b/src/game/legacy/basedefs_de.h
+index d692ef9..ae9a400 100644
+--- a/src/game/legacy/basedefs_de.h
++++ b/src/game/legacy/basedefs_de.h
+@@ -78,7 +78,7 @@ inline constexpr DDWORD FLAG_MODELGOURAUDSHADE = 1u << 3, FLAG_ANIMTRANSITION =
+ inline constexpr DDWORD FLAG_VISIBLE = 1u << 0, FLAG_SHADOW = 1u << 1, FLAG_ROTATEABLESPRITE = 1u << 3,
+                         FLAG_SPRITECHROMAKEY = 1u << 4, FLAG_SOLID = 1u << 13, FLAG_BOXPHYSICS = 1u << 14,
+                         FLAG_TOUCH_NOTIFY = 1u << 16, FLAG_GRAVITY = 1u << 17, FLAG_MODELKEYS = 1u << 19,
+-                        FLAG_RAYHIT = 1u << 22, FLAG_DONTFOLLOWSTANDING = 1u << 23;
++                        FLAG_RAYHIT = 1u << 22, FLAG_DONTFOLLOWSTANDING = 1u << 23, FLAG_REMOVEIFOUTSIDE = 1u << 27;
+ struct ObjectCreateStruct
+ {
+     D_WORD m_ObjectType = OT_NORMAL;
+@@ -112,5 +112,6 @@ struct ObjectList
+     ObjectLink* m_pFirstLink = nullptr;
+     int m_nInList = 0;
+ };
+-inline constexpr DDWORD OBJSTATE_ACTIVE = 0, OBJSTATE_INACTIVE = 1, OBJSTATE_INACTIVE_TOUCH = 2;
++inline constexpr DDWORD OBJSTATE_ACTIVE = 0, OBJSTATE_INACTIVE = 1, OBJSTATE_INACTIVE_TOUCH = 2,
++                        OBJSTATE_AUTODEACTIVATE_NOW = 3;
+ static_assert(sizeof(DDWORD) == 4 && sizeof(float) == 4);
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 7dea23e..33f8a88 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -29,6 +29,7 @@ class CSBase
+     virtual void ResetRead(HMESSAGEREAD) = 0;
+ };
+ 
++class PathMgr;
+ class ServerDE : public CSBase
+ {
+   public:
+@@ -48,6 +49,11 @@ class ServerDE : public CSBase
+     virtual DRESULT FindAttachment(HOBJECT, HOBJECT, HATTACHMENT*) = 0;
+     virtual DRESULT GetAttachedModelNodeTransform(HATTACHMENT, const char*, DVector*, DRotation*) = 0;
+     virtual bool IsObjectAlive(HOBJECT) = 0;
++    virtual bool SetDeactivationTime(HOBJECT, float) = 0;
++    virtual bool PingObjects(HOBJECT) = 0;
++    virtual bool ConfigureCharacterBody(HOBJECT, float mass, float friction) = 0;
++    virtual bool ScaleObject(HOBJECT, DVector) = 0;
++    virtual PathMgr* GetPathManager() = 0;
+     virtual bool ValidateSpawnObject(std::string_view) = 0;
+     virtual void RecordSpawn(const OpenBlood2::SpawnReport&) = 0;
+     virtual void RecordPickup(HOBJECT, const OpenBlood2::PickupMessage&, std::string_view sound) = 0;
+diff --git a/src/game/original/AIRuntime.cpp b/src/game/original/AIRuntime.cpp
+new file mode 100644
+index 0000000..7c079fd
+--- /dev/null
++++ b/src/game/original/AIRuntime.cpp
+@@ -0,0 +1,405 @@
++// Selected original AI_Mgr construction/ReadProp/InitialUpdate/AI_Update and
++// CultistAI/CivilianAI construction/model/table initialization. See AI_RUNTIME_CONTRACTS.md.
++#include "AI_Mgr.h"
++#include "CameraObj.h"
++#include "CivilianAI.h"
++#include "engine/collision.h"
++#include <cmath>
++using namespace OpenBlood2;
++namespace
++{
++    std::array<std::shared_ptr<CAnim_Sound>, 4> tables; // Reset after world objects are destroyed.
++    bool weapon(std::string_view name, DBYTE& id)
++    {
++        if (name.starts_with("NONE"))
++            id = 0;
++        else if (name.starts_with("BERET"))
++            id = WEAP_BERETTA;
++        else if (name.starts_with("MELEE"))
++            id = WEAP_MELEE;
++        else
++            return false; // Other source weapon families are not implemented; never substitute Beretta.
++        return true;
++    }
++} // namespace
++void AI_Mgr::ResetRuntimeTables()
++{
++    tables = {};
++}
++void AI_Mgr::ConfigureRuntime(NPCType type)
++{
++    npc_type = type;
++    m_fHearingDist = m_fSeeingDist = type == NPCType::Cultist ? 1500 : 2000;
++    m_fSensingDist = 200;
++    m_fSmellingDist = 0;
++    m_fWalkSpeed = 75;
++    m_fRunSpeed = 180;
++    m_fRollSpeed = type == NPCType::Cultist ? 105 : 3.5f;
++    m_dwFlags = type == NPCType::Cultist ? 0x2f : 0x20;
++    m_bCabal = true;
++    npc_weapons[0] = type == NPCType::Cultist ? "BERETTA" : "NONE";
++    npc_ammo[0] = type == NPCType::Cultist ? 150 : 0;
++    npc_ammo[2] = type == NPCType::Cultist ? 60 : 0;
++    npc_ammo[5] = type == NPCType::Cultist ? 20 : 0;
++    npc_ammo[6] = type == NPCType::Civilian ? 100 : 0;
++}
++bool AI_Mgr::RuntimeFailure(std::string_view why)
++{
++    runtime_failed = true;
++    runtime_error = why;
++    ++runtime_failures;
++    auto* s = GetServerDE();
++    if (s && s->IsObjectAlive(m_hObject))
++    {
++        s->SetNextUpdate(m_hObject, 0);
++        DVector zero{};
++        s->SetVelocity(m_hObject, &zero);
++        s->SetObjectState(m_hObject, OBJSTATE_INACTIVE);
++    }
++    return false;
++}
++bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
++{
++    if (!state || reason == PRECREATE_SAVEGAME)
++        return RuntimeFailure("NPC save restoration is not implemented");
++    auto* s = GetServerDE();
++    GenericProp prop;
++    if (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP)
++    {
++        if (s->GetPropGeneric("RandomHitPoints", &prop) == DE_OK)
++            npc_random_hp = prop.m_Float;
++        auto text = [&](const char* key, std::string& out)
++        {
++            if (s->GetPropGeneric(key, &prop) == DE_OK && prop.m_String[0])
++                out = prop.m_String;
++        };
++        text("AIState", m_szAIState);
++        for (unsigned i = 0; i < npc_weapons.size(); ++i)
++            text(("AIWeapon" + std::to_string(i + 1)).c_str(), npc_weapons[i]);
++        constexpr const char* names[]{"Bullets", "BMG",     "Shells", "Grenades", "Rockets",
++                                      "Flares",  "Charges", "Cells",  "Fuel",     "Proximity_Bombs"};
++        for (unsigned i = 0; i < npc_ammo.size(); ++i)
++            if (s->GetPropGeneric(names[i], &prop) == DE_OK)
++                npc_ammo[i] = prop.m_Float;
++        text("SpotTriggerTarget", spot_target);
++        text("SpotTriggerMessage", spot_message);
++        text("TriggerRelayTarget", trigger_relay_target);
++    }
++    // Source subclass booleans are read only for world-file creation.
++    if (reason == PRECREATE_WORLDFILE)
++    {
++        auto flag = [&](const char* key, bool& out)
++        {
++            if (s->GetPropGeneric(key, &prop) == DE_OK)
++                out = prop.m_Bool;
++        };
++        flag("Male", npc_male);
++        if (npc_type == NPCType::Cultist)
++        {
++            flag("ClownSkin", npc_clown);
++            flag("RobeSkin", npc_robe);
++        }
++        else
++        {
++            flag("LabTech", npc_labtech);
++            flag("SororitySkin", npc_sorority);
++            if (auto* c = dynamic_cast<CivilianAI*>(this))
++                flag("Scared", c->m_bScared);
++        }
++    }
++    if (!std::isfinite(npc_random_hp) || npc_random_hp < 0 || npc_random_hp > 1e6f)
++        return RuntimeFailure("Invalid NPC random health");
++    for (float value : npc_ammo)
++        if (!std::isfinite(value) || value < 0 || value > 1e6f)
++            return RuntimeFailure("Invalid NPC ammunition");
++    if (npc_ammo[9] != 0)
++        return RuntimeFailure("NPC proximity inventory weapons are not integrated");
++    for (const auto& name : npc_weapons)
++    {
++        DBYTE id;
++        if (!weapon(name, id))
++            return RuntimeFailure("NPC authored weapon unavailable: " + name);
++    }
++    int initial;
++    if (!StateStrToInt(m_szAIState, initial))
++        return RuntimeFailure("Invalid NPC authored state");
++    std::string model, skin;
++    int variant = 1;
++    if (npc_type == NPCType::Cultist)
++    {
++        if (npc_robe)
++            return RuntimeFailure("Add-on robe Cultist initialization is not integrated");
++        if (npc_clown)
++            npc_male = true;
++        if (!s->RandomInt(1, 3, variant))
++            return RuntimeFailure("NPC skin RNG failed");
++        const std::string gender = npc_male ? "m" : "f";
++        model = "Models/Enemies/" + gender + "_Cultist1.abc";
++        skin = (npc_clown ? "Skins_ao/Enemies_ao/m_Cultist" : "Skins/Enemies/" + gender + "_Cultist") +
++               std::to_string(variant + (npc_clown ? 3 : 0)) + ".dtx";
++    }
++    else
++    {
++        std::string name;
++        if (initial == StateSpecial8)
++        {
++            name = "m_civilian";
++            variant = 4;
++        }
++        else if (npc_sorority)
++        {
++            name = "f_civilian";
++            variant = 3;
++        }
++        else
++        {
++            if (!s->RandomInt(1, 3, variant))
++                return RuntimeFailure("NPC skin RNG failed");
++            name = npc_labtech ? "labtech" : npc_male ? "m_civilian" : "f_civilian";
++            if (!npc_labtech && !npc_male)
++                variant = 1; // Source consumes a draw but always selects female skin 1.
++        }
++        model = "Models/Enemies/" + name + (name == "labtech" ? "" : "1") + ".abc";
++        skin = (npc_sorority && initial != StateSpecial8 ? "Skins_ao/Enemies_ao/" : "Skins/Enemies/") + name +
++               std::to_string(variant) + ".dtx";
++    }
++    state->m_ObjectType = OT_MODEL;
++    SAFE_STRCPY(state->m_Filename, model.c_str());
++    SAFE_STRCPY(state->m_SkinName, skin.c_str());
++    return true;
++}
++bool AI_Mgr::RuntimeInitialize(int reason)
++{
++    auto* s = GetServerDE();
++    if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
++        return RuntimeFailure("Invalid or repeated NPC initialization");
++    const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
++    const auto group = (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
++    auto initialize_table = [&](unsigned slot, bool refresh, const char* root)
++    {
++        if (!refresh)
++            return true;
++        auto candidate = std::make_shared<CAnim_Sound>();
++        if (!candidate->SetAnimationIndexes(m_hObject) || !candidate->GenerateHitSpheres(m_hObject) ||
++            !candidate->SetSoundRoot(root))
++            return false; // Failed creation must not poison a shared table.
++        if (!tables[slot])
++        {
++            tables[slot] = std::move(candidate);
++            return true;
++        }
++        // Preflight above is read-only. Rebuild existing shared indexes without
++        // copying/killing its independently owned voice (no callbacks in these queries).
++        return tables[slot]->SetAnimationIndexes(m_hObject) && tables[slot]->GenerateHitSpheres(m_hObject) &&
++               tables[slot]->SetSoundRoot(root);
++    };
++    if (npc_type == NPCType::Civilian)
++    {
++        // Preserve BOTH independent source branches, including female LabTech.
++        if ((npc_male || npc_labtech) && !initialize_table(2, npc_male || !tables[2], "sounds/enemies/civilian"))
++            return RuntimeFailure("NPC male animation table initialization failed");
++        if (!npc_male && !initialize_table(3, !tables[3], "sounds/enemies/f_civ"))
++            return RuntimeFailure("NPC female animation table initialization failed");
++    }
++    else if (!initialize_table(group, !tables[group],
++                               male_group ? "sounds/enemies/m_cultist" : "sounds/enemies/f_cultist"))
++        return RuntimeFailure("NPC shared animation table initialization failed");
++    auto table = tables[group];
++    if (!InitStatics(table) || !m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
++        return RuntimeFailure("NPC aggregates unavailable");
++    m_InventoryMgr.SetStrength(5);
++    std::array<bool, 18> obtained{};
++    for (const auto& name : npc_weapons)
++    {
++        DBYTE id;
++        if (!weapon(name, id))
++            return RuntimeFailure("NPC weapon unavailable");
++        if (id && !obtained[id])
++        {
++            if (m_InventoryMgr.ObtainWeapon(id) != InventoryResult::Ok)
++                return RuntimeFailure("NPC weapon acquisition failed");
++            obtained[id] = true;
++        }
++    }
++    DBYTE first;
++    weapon(npc_weapons[0], first);
++    if (first)
++    {
++        const auto result = m_InventoryMgr.ChangeWeapon(first);
++        if (result != InventoryResult::Ok && result != InventoryResult::Current)
++            return RuntimeFailure("NPC weapon selection failed");
++    }
++    constexpr DBYTE ammo[]{1, 3, 2, 5, 6, 4, 8, 8, 7};
++    for (unsigned i = 0; i < 9; ++i)
++        if (m_InventoryMgr.AddAmmo(ammo[i], npc_ammo[i]) == InventoryResult::Invalid)
++            return RuntimeFailure("NPC ammunition initialization failed");
++    m_InventoryMgr.AddAmmo(9, 200);
++    const float difficulty = GetGameDifficulty() == 0 ? .25f : GetGameDifficulty() == 2 ? 1.5f : 1;
++    m_InventoryMgr.damage_multiplier = (npc_type == NPCType::Cultist ? .5f : 1) * difficulty;
++    float unit;
++    if (!s->RandomFloat(0, 1, unit))
++        return RuntimeFailure("NPC health RNG failed");
++    // Source Random(1, RandomHitPoints) has reversed endpoints at the default zero.
++    const float hp = (npc_hp + 1 + (npc_random_hp - 1) * unit) * difficulty;
++    m_damage.SetHitPoints(hp);
++    m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = hp;
++    m_damage.SetArmorPoints(npc_armor * difficulty);
++    m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = npc_armor * difficulty;
++    m_damage.m_fMass = 250;
++    if (!s->ConfigureCharacterBody(m_hObject, 250, 10))
++        return RuntimeFailure("NPC mass/friction configuration failed");
++    if (!s->SetBlockingPriority(m_hObject, 50) || !m_MoveObj.Init(m_hObject) || !StateStrToInt(m_szAIState, m_nState))
++        return RuntimeFailure("NPC movement/state initialization failed");
++    if (m_nState == StateGuard && s->GetObjectPos(m_hObject, &m_vGuardPos) != DE_OK)
++        return RuntimeFailure("NPC guard position unavailable");
++    s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) | FLAG_VISIBLE | FLAG_SOLID | FLAG_TOUCH_NOTIFY |
++                                     FLAG_GRAVITY | FLAG_STAIRSTEP | FLAG_SHADOW | FLAG_MODELKEYS |
++                                     FLAG_REMOVEIFOUTSIDE);
++    if (!InsertMe())
++        return RuntimeFailure("NPC faction registration failed");
++    float scale;
++    if (!s->RandomFloat(-.05f, .1f, scale))
++        return RuntimeFailure("NPC scale RNG failed");
++    m_vScale = {1 - scale, 1 + scale, 1 - scale};
++    // Supply the model's initial centered bounds before the later foot-anchored clip resize.
++    DVector dims;
++    if (s->GetModelAnimUserDims(m_hObject, &dims, 0) != DE_OK || s->SetObjectDims(m_hObject, &dims) != DE_OK ||
++        !s->ScaleObject(m_hObject, m_vScale) || !SetAnimation(0))
++        return RuntimeFailure("NPC initial model dimensions/scale/animation failed: " + state_error);
++    s->SetNextUpdate(m_hObject, .001f);
++    m_bSetShutdown = false;
++    if (reason == INITIALUPDATE_WORLDFILE && s->MoveObjectToGround(m_hObject) != DE_OK)
++        return RuntimeFailure("NPC world ground placement failed");
++    m_fLastUpdate = s->GetTime();
++    runtime_initialized = true;
++    return true;
++}
++bool AI_Mgr::AI_Update()
++{
++    if (runtime_busy)
++        return RuntimeFailure("Reentrant AI_Update rejected");
++    if (!RuntimeReady())
++        return false;
++    runtime_busy = true;
++    ++runtime_updates;
++    const bool ok = RuntimeUpdateStep();
++    runtime_busy = false;
++    return ok && !runtime_failed;
++}
++bool AI_Mgr::RuntimeUpdateStep()
++{
++    auto* s = GetServerDE();
++    if (!s->IsObjectAlive(m_hObject) || m_bRemoveMe)
++        return false;
++    const float now = s->GetTime();
++    if (now - m_fLastUpdate >= 1 && m_bSetShutdown)
++    {
++        float delay;
++        if (!s->RandomFloat(.01f, .5f, delay))
++            return RuntimeFailure("NPC wake RNG failed");
++        m_fLastUpdate = now;
++        s->SetNextUpdate(m_hObject, delay);
++        ++runtime_desyncs;
++        return true;
++    }
++    m_fLastUpdate = now;
++    s->SetNextUpdate(m_hObject, .001f);
++    if (s->IsObjectAlive(g_hActiveCamera) && m_nState != StateScript && m_nState != StatePassive &&
++        m_nState != StateIdle)
++    {
++        const auto* camera = dynamic_cast<CameraObj*>(s->HandleToObject(g_hActiveCamera));
++        if (!camera)
++            return RuntimeFailure("Active camera has wrong class");
++        if (!camera->AllowPlayerMovement())
++        {
++            ++runtime_camera_pauses;
++            return StopVelocity() || RuntimeFailure(state_error);
++        }
++    }
++    if (!m_bSetShutdown)
++    {
++        if (!s->SetDeactivationTime(m_hObject, 3))
++            return RuntimeFailure("NPC deactivation timer failed");
++        s->SetObjectState(m_hObject, OBJSTATE_AUTODEACTIVATE_NOW);
++        m_bSetShutdown = true;
++    }
++    if (m_hTarget)
++    {
++        if (!s->IsObjectAlive(m_hTarget))
++        {
++            if (!SetNewTarget(nullptr))
++                return RuntimeFailure(target_error);
++            ++runtime_target_losses;
++        }
++        else
++        {
++            m_bHasTargeted = true;
++            if (m_fSeeingDist > m_fSensingDist && m_fSensingDist > 0)
++                m_fSensingDist = m_fSeeingDist;
++            if (!RefreshTargetPosition())
++                return RuntimeFailure(target_error);
++            auto* character = dynamic_cast<CBaseCharacter*>(s->HandleToObject(m_hTarget));
++            if (!character)
++                return RuntimeFailure("AI_Update target is not a character");
++            if (character->m_damage.IsDead())
++            {
++                if (!SetNewTarget(nullptr) || !SetNewState(StateIdle))
++                    return RuntimeFailure("Dead NPC target transition failed");
++                ++runtime_target_losses;
++            }
++            else if (!(m_dwFlags & 0x100u) && !CanSee(m_hTarget))
++            {
++                if (sight.outcome == AISightOutcome::Invalid || sight.outcome == AISightOutcome::Unavailable)
++                    return RuntimeFailure("NPC target visibility unavailable");
++                if (!SetNewTarget(nullptr))
++                    return RuntimeFailure(target_error);
++                ++runtime_target_losses;
++            }
++        }
++    }
++    if (m_hTrackObject && !RefreshTrackedPosition())
++        return RuntimeFailure(target_error);
++    if (m_damage.m_fHitPoints <= 0 && m_nState != StateDying && !SetNewState(StateDying))
++        return RuntimeFailure(state_error);
++    MovementState support;
++    if (!s->GetMovementState(m_hObject, support))
++        return RuntimeFailure("NPC support unavailable");
++    if (support.ground_object && s->IsObjectAlive(support.ground_object))
++    {
++        auto flags = s->GetObjectFlags(m_hObject);
++        if (s->IsKindOf(s->GetObjectClass(support.ground_object), s->GetClass("CBaseCharacter")))
++            flags |= FLAG_DONTFOLLOWSTANDING;
++        else
++            flags &= ~FLAG_DONTFOLLOWSTANDING;
++        s->SetObjectFlags(m_hObject, flags);
++    }
++    if (Metacmd <= 0)
++        Metacmd = 1;
++    const auto perception_failures_before = perception_failures;
++    bool ok;
++    if (m_nState == StateScript)
++    {
++        auto* paths = s->GetPathManager();
++        ok = paths && AI_STATE_Script(*paths);
++    }
++    else
++        ok = DispatchState();
++    if (!s->IsObjectAlive(m_hObject))
++        return false;
++    if (!ok || runtime_failed)
++    {
++        auto detail = !navigation_error.empty()   ? navigation_error
++                      : !locomotion_error.empty() ? locomotion_error
++                      : !script_error.empty()     ? script_error
++                      : !state_error.empty()      ? state_error
++                                                  : "state action failed";
++        if (perception_failures != perception_failures_before)
++        {
++            detail += "; " + perception_error;
++            if (perception_error == "Target link acquisition failed")
++                detail += "; " + target_error;
++        }
++        return RuntimeFailure("AI_Update: " + detail);
++    }
++    return true;
++}
+diff --git a/src/game/original/AITarget.cpp b/src/game/original/AITarget.cpp
+index 61c2108..94bd4d8 100644
+--- a/src/game/original/AITarget.cpp
++++ b/src/game/original/AITarget.cpp
+@@ -114,6 +114,27 @@ bool AI_Mgr::MC_FacePos(DVector position)
+ }
+ DDWORD AI_Mgr::EngineMessageFn(DDWORD message, void* data, DFLOAT value)
+ {
++    if (npc_type != NPCType::Diagnostic)
++    {
++        if (message == MID_PRECREATE)
++        {
++            // Base reads name, placement and aggregates before subclass model selection.
++            const auto accepted = CBaseCharacter::EngineMessageFn(message, data, value);
++            return accepted && RuntimePrecreate(static_cast<ObjectCreateStruct*>(data), int(value));
++        }
++        if (message == MID_INITIALUPDATE && !RuntimeInitialize(int(value)))
++        {
++            GetServerDE()->RemoveObject(m_hObject); // Creation rollback; children remain deferred.
++            return 0;
++        }
++        if (message == MID_UPDATE)
++        {
++            if (m_bRemoveMe)
++                GetServerDE()->RemoveObject(m_hObject);
++            else
++                AI_Update(); // Required failures retain an inspectable, quiescent actor.
++        }
++    }
+     if (message == MID_LINKBROKEN && data == m_hTarget && m_hTarget)
+     {
+         m_hTarget = nullptr;
+diff --git a/src/game/original/AITrigger.cpp b/src/game/original/AITrigger.cpp
+index 15e6491..67814e8 100644
+--- a/src/game/original/AITrigger.cpp
++++ b/src/game/original/AITrigger.cpp
+@@ -257,8 +257,13 @@ bool AI_Mgr::HandleTrigger(HOBJECT sender, std::string_view text)
+             return true;
+         }
+         else if (same(command, "SCRIPT"))
+-            return TriggerFailure(
+-                "SCRIPT trigger requires the unported forced AI_Update; explicit script-state driver only");
++        {
++            if (npc_type == NPCType::Diagnostic)
++                return TriggerFailure("SCRIPT requires an initialized production AI_Update driver");
++            if (!RuntimeReady() || !PrepareScript(text) || !AI_Update())
++                return TriggerFailure("SCRIPT preparation or forced AI_Update failed");
++            return true;
++        }
+         else
+             return TriggerFailure("Unknown AI trigger command");
+     }
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 9af3e6a..b4a3e75 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -88,15 +88,39 @@ namespace OpenBlood2
+     };
+ } // namespace OpenBlood2
+ 
+-// Selective original AI_Mgr::InitStatics/OnStringKey port. No production AI class
+-// registration or complete AI_Update or MC_Extra implementation yet.
+-// Perception commands: AI_PERCEPTION_CONTRACTS.md; no automatic AI update loop.
++// Selected original AI services and production Cultist/Civilian lifecycle.
++// See AI_RUNTIME_CONTRACTS.md for remaining state/action failures.
+ // Selected CanSee and explicit target/facing commands are documented in
+ // AI_SIGHT_CONTRACTS.md and AI_TARGET_CONTRACTS.md.
+ class AI_Mgr : public CBaseCharacter
+ {
+   public:
+     AI_Mgr();
++    enum class NPCType
++    {
++        Diagnostic,
++        Cultist,
++        Civilian
++    };
++    static void ResetRuntimeTables();
++    void ConfigureRuntime(NPCType); // Original constructor defaults, selected by production factories only.
++    bool AI_Update();
++    bool RuntimeReady() const
++    {
++        return runtime_initialized && !runtime_failed;
++    }
++    NPCType npc_type = NPCType::Diagnostic;
++    bool runtime_initialized = false, runtime_failed = false, m_bSetShutdown = false, m_bRemoveMe = false;
++    bool npc_male = true, npc_labtech = false, npc_clown = false, npc_robe = false, npc_sorority = false;
++    float m_fLastUpdate = 0, npc_hp = 30, npc_random_hp = 0, npc_armor = 0;
++    std::array<std::string, 5> npc_weapons{"NONE", "NONE", "NONE", "NONE", "NONE"};
++    std::array<float, 10>
++        npc_ammo{}; // Source bullets, BMG, shells, grenades, rockets, flares, charges, cells, fuel, prox.
++    std::string spot_target, spot_message, runtime_error;
++    std::uint64_t runtime_updates = 0, runtime_failures = 0, runtime_camera_pauses = 0, runtime_desyncs = 0;
++    std::uint64_t runtime_target_losses = 0;
++    bool RuntimeFailure(std::string_view);
++
+     ~AI_Mgr() override;
+     bool InsertMe();
+     static void InsertPlayer(CPlayerObj&);
+@@ -229,7 +253,7 @@ class AI_Mgr : public CBaseCharacter
+ 
+     bool MC_Talk();
+     bool MC_Special(int);
+-    // Only the original state-dispatch portion, not AI_Update/deactivation/retention.
++    // Original state dispatch, also used by the production AI_Update loop.
+     bool DispatchState();
+     virtual bool ComputeState(int stimulus = -1);
+     virtual bool AI_STATE_Idle();
+@@ -324,8 +348,8 @@ class AI_Mgr : public CBaseCharacter
+         Failed
+     };
+     static bool ParseScript(std::string_view, DDWORD previous_flags, ScriptProgram&, std::string& error);
+-    // Preparation is separate from the original trigger's forced AI_Update,
+-    // which is not integrated. Explicit diagnostic callers drive this state.
++    // Diagnostic callers can prepare scripts separately; production triggers
++    // prepare them and force the original immediate AI_Update.
+     bool PrepareScript(std::string_view);
+     bool AI_STATE_Script(PathMgr&);
+     std::span<const ScriptInstruction> ScriptCommands() const
+@@ -414,6 +438,10 @@ class AI_Mgr : public CBaseCharacter
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+ 
+   private:
++    bool RuntimePrecreate(ObjectCreateStruct*, int);
++    bool RuntimeInitialize(int);
++    bool RuntimeUpdateStep();
++    bool runtime_busy = false;
+     bool locomotion_busy = false;
+     bool LocomotionReady();
+     bool LocomotionFailure(std::string_view);
+diff --git a/src/game/original/CivilianAI.cpp b/src/game/original/CivilianAI.cpp
+index 215c2b5..3d5655e 100644
+--- a/src/game/original/CivilianAI.cpp
++++ b/src/game/original/CivilianAI.cpp
+@@ -72,3 +72,33 @@ bool CivilianAI::AI_STATE_Special(int special)
+         return StateFailure("Civilian special random service unavailable");
+     return MC_Special(index);
+ }
++
++// Source CivilianAI::ObjectMessageFn, after class-specific state guards.
++DDWORD CivilianAI::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    if (npc_type == NPCType::Civilian && message == 1000)
++    {
++        auto* s = GetServerDE();
++        auto string = s->ReadFromMessageHString(read);
++        const char* data = string ? s->GetStringData(string) : nullptr;
++        const bool trigger = data && std::string_view(data) == "TRIGGER";
++        if (string)
++            s->FreeString(string);
++        if (trigger && m_nState != StateEscapeHide && m_nState != StateScript &&
++            !(m_nState >= StateSpecial1 && m_nState <= StateSpecial9))
++        {
++            // Checked non-owning link replaces the source raw assignment.
++            if (!SetNewTarget(sender) || !SetNewState(npc_labtech ? StateEscapeHide : StateSpecial1))
++                RuntimeFailure("Civilian trigger target/state unavailable");
++        }
++    }
++    const auto result = AI_Mgr::ObjectMessageFn(sender, message, read);
++    if (npc_type == NPCType::Civilian && message == OpenBlood2::damage_message &&
++        GetServerDE()->IsObjectAlive(m_hObject))
++    {
++        if (!SetNewState(StateEscapeRun))
++            RuntimeFailure(state_error);
++        return 0;
++    }
++    return result;
++}
+diff --git a/src/game/original/CivilianAI.h b/src/game/original/CivilianAI.h
+index 0b8c7f4..656bb86 100644
+--- a/src/game/original/CivilianAI.h
++++ b/src/game/original/CivilianAI.h
+@@ -1,7 +1,7 @@
+ #pragma once
+ #include "AI_Mgr.h"
+-// Selected original state rules only. Not registered for world creation:
+-// full initialization, damage/trigger handling and AI_Update remain open.
++// Original selected Civilian rules, registered lifecycle and update loop.
++// Remaining damage/death actions are explicit limitations in AI_RUNTIME_CONTRACTS.md.
+ class CivilianAI : public AI_Mgr
+ {
+   public:
+@@ -17,6 +17,7 @@ class CivilianAI : public AI_Mgr
+     {
+         return EscapeHide();
+     }
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
+     bool m_bScared = false;
+     bool ComputeState(int stimulus = -1) override;
+     bool AI_STATE_Idle() override;
+diff --git a/src/game/original/CultistAI.h b/src/game/original/CultistAI.h
+index 4592a9b..7b962bc 100644
+--- a/src/game/original/CultistAI.h
++++ b/src/game/original/CultistAI.h
+@@ -1,7 +1,7 @@
+ #pragma once
+ #include "AI_Mgr.h"
+-// Original decisions and close/far attack sequencing. Complete initialization,
+-// AI_Update and remaining actions are missing; no production registration.
++// Original decisions/attacks and production lifecycle; remaining action failures
++// are documented in AI_RUNTIME_CONTRACTS.md.
+ class CultistAI : public AI_Mgr
+ {
+   public:
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index 4ba3abc..1424825 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -1,4 +1,5 @@
+ #include "InventoryMgr.h"
++#include "AI_Mgr.h"
+ #include "PlayerObj.h"
+ #include <algorithm>
+ #include <cmath>
+@@ -50,6 +51,11 @@ CInventoryMgr::~CInventoryMgr()
+ }
+ DDWORD CInventoryMgr::EngineMessageFn(LPBASECLASS object, DDWORD message, void* data, DFLOAT fData)
+ {
++    if (message == MID_UPDATE)
++        if (auto* ai = dynamic_cast<AI_Mgr*>(object);
++            ai && ai->npc_type != AI_Mgr::NPCType::Diagnostic && ai->RuntimeReady())
++            if (!UpdateHandModels())
++                ai->RuntimeFailure("NPC held weapon update failed");
+     if (message == MID_LINKBROKEN && data == m_hMuzzleFlash)
+     {
+         // The engine notifies on either endpoint's removal. Release this owned
+diff --git a/src/game/original/InventoryMgr.h b/src/game/original/InventoryMgr.h
+index d55dab9..db26976 100644
+--- a/src/game/original/InventoryMgr.h
++++ b/src/game/original/InventoryMgr.h
+@@ -56,6 +56,7 @@ class CInventoryMgr : public Aggregate
+     std::array<DBYTE, 9> requested_weapons{};
+     bool m_bInfiniteAmmo = false;
+     DBYTE m_nCurWeaponSlot = 0, m_nAttribStrength = 1, m_nAttribMagic = 1;
++    float damage_multiplier = 1; // Original cumulative AddDamageMultiplier storage.
+     std::uint64_t revision = 0;
+ 
+   private:
+diff --git a/src/game/original/PlayerObj.cpp b/src/game/original/PlayerObj.cpp
+index bea3db6..f24e73b 100644
+--- a/src/game/original/PlayerObj.cpp
++++ b/src/game/original/PlayerObj.cpp
+@@ -3,6 +3,7 @@
+ // complete 7,657-line PlayerObj gameplay implementation.
+ #include "PlayerObj.h"
+ #include "AI_Mgr.h"
++#include "CameraObj.h"
+ #include "GameStartPoint.h"
+ #include <algorithm>
+ #include <cmath>
+@@ -366,6 +367,13 @@ DBOOL CPlayerObj::Update(DVector*)
+         m_bFirstUpdate = DFALSE;
+     }
+     UpdateSound();
++    if (server->GetTime() > m_fNextPingTime)
++    {
++        m_fNextPingTime = server->GetTime() + .5f;
++        const auto observer = server->IsObjectAlive(g_hActiveCamera) ? g_hActiveCamera : m_hObject;
++        if (!server->PingObjects(observer))
++            ++activation_ping_failures;
++    }
+     return UpdateStats();
+ }
+ bool CPlayerObj::UpdateStats()
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index 80cad7f..770ef58 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -57,6 +57,8 @@ class CPlayerObj : public CBaseCharacter
+     }
+     bool PlayPlayerSound(std::string_view, float radius, DBYTE volume, bool stream, DBYTE priority = 2);
+     OpenBlood2::SoundId m_hCurSound = 0;
++    float m_fNextPingTime = 0;
++    std::uint64_t activation_ping_failures = 0;
+     bool m_bDisableFootsteps = false, m_bNextFootstepLeft = true;
+     SurfaceType m_eLastSurface = SURFTYPE_UNKNOWN, footstep_surface = SURFTYPE_UNKNOWN;
+     ContainerCode footstep_container = CC_NOTHING;
+diff --git a/src/game/original/Weapon.cpp b/src/game/original/Weapon.cpp
+index 1247cd6..a5e2849 100644
+--- a/src/game/original/Weapon.cpp
++++ b/src/game/original/Weapon.cpp
+@@ -15,7 +15,9 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+ {
+     auto* server = BaseClass::GetServerDE();
+     if (!server || !m_pInventoryMgr || !server->IsObjectAlive(m_hOwner) || request.weapon != data.m_nType ||
+-        request.left != m_bLeftHand || !physics_vector(request.position) || !physics_vector(request.direction))
++        request.left != m_bLeftHand || !physics_vector(request.position) || !physics_vector(request.direction) ||
++        !std::isfinite(m_pInventoryMgr->damage_multiplier) || m_pInventoryMgr->damage_multiplier < 0 ||
++        m_pInventoryMgr->damage_multiplier > 1000)
+         return FireResult::Invalid;
+     const auto length = std::sqrt(vector_dot(request.direction, request.direction));
+     if (!std::isfinite(length) || length < 1e-6f)
+@@ -94,7 +96,8 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+     last_shot.result = FireResult::Fired;
+     if (query == SegmentResult::Hit && last_shot.hit.object)
+     {
+-        Damage damage{direction, last_shot.hit.point, last_shot.damage, damage_type, m_hOwner};
++        Damage damage{direction, last_shot.hit.point, last_shot.damage * m_pInventoryMgr->damage_multiplier,
++                      damage_type, m_hOwner};
+         auto message =
+             server->StartMessageToObject(server->HandleToObject(m_hOwner), last_shot.hit.object, damage_message);
+         if (!message)
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 6f0b14f..94a577d 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -3,8 +3,10 @@
+ #include "game/original/CameraObj.h"
+ #include "game/original/CameraSpot.h"
+ #include "game/original/CinematicTrigger.h"
++#include "game/original/CivilianAI.h"
+ #include "game/original/ClientExplosionSFX.h"
+ #include "game/original/ClientLightFX.h"
++#include "game/original/CultistAI.h"
+ #include "game/original/DetailSprite.h"
+ #include "game/original/Door.h"
+ #include "game/original/ExitHint.h"
+@@ -260,6 +262,56 @@ namespace OpenBlood2
+         const ClassInfo exit_hint{"ExitHint", &b2base, construct<ExitHint>, {}};
+         const ClassInfo smell{"SmellHint", &b2base, construct<SmellHint>, {}};
+         const ClassInfo character{"CBaseCharacter", &b2base, construct<CBaseCharacter>, {}};
++        template <class T, AI_Mgr::NPCType Type> std::unique_ptr<BaseClass> construct_npc()
++        {
++            auto actor = std::make_unique<T>();
++            actor->ConfigureRuntime(Type);
++            return actor;
++        }
++        const ClassInfo ai_manager{"AI_Mgr", &character, construct<AI_Mgr>, []
++                                   {
++                                       std::vector<PropertySpec> p{{"SpotTriggerTarget", std::string{}},
++                                                                   {"SpotTriggerMessage", std::string{}},
++                                                                   {"TriggerRelayTarget", std::string{}},
++                                                                   {"DamageTriggerTarget", std::string{}},
++                                                                   {"DamageTriggerMessage", std::string{}},
++                                                                   {"DeathTriggerTarget", std::string{}},
++                                                                   {"DeathTriggerMessage", std::string{}},
++                                                                   {"TriggerDestroyOnly", false},
++                                                                   {"SpawnObject", std::string{}},
++                                                                   {"SpawnObjectVel", DVector{}},
++                                                                   {"CanDamage", true}};
++                                       for (const auto* name :
++                                            {"Bullets", "BMG", "Shells", "Grenades", "Rockets", "Flares", "Charges",
++                                             "Cells", "Fuel", "Proximity_Bombs"})
++                                           p.push_back({name, 0.0f, false});
++                                       for (int i = 1; i <= 5; ++i)
++                                           p.push_back({"AIWeapon" + std::to_string(i), std::string{}, false, 31});
++                                       return p;
++                                   }()};
++        const ClassInfo cultist{"CultistAI",
++                                &ai_manager,
++                                construct_npc<CultistAI, AI_Mgr::NPCType::Cultist>,
++                                {{"RandomHitPoints", 0.0f},
++                                 {"AIState", std::string("IDLE"), true, 31},
++                                 {"AIWeapon1", std::string("BERETTA"), true, 31},
++                                 {"Bullets", 150.0f},
++                                 {"Flares", 20.0f},
++                                 {"Male", true},
++                                 {"Dims", DVector{19, 41, 14}},
++                                 {"ClownSkin", false},
++                                 {"RobeSkin", false}}};
++        const ClassInfo civilian{"CivilianAI",
++                                 &ai_manager,
++                                 construct_npc<CivilianAI, AI_Mgr::NPCType::Civilian>,
++                                 {{"RandomHitPoints", 0.0f},
++                                  {"AIState", std::string("IDLE"), true, 31},
++                                  {"AIWeapon1", std::string("NONE"), true, 31},
++                                  {"Male", true},
++                                  {"LabTech", false},
++                                  {"Scared", false},
++                                  {"Dims", DVector{21, 37, 21}},
++                                  {"SororitySkin", false}}};
+         const ClassInfo player{"CPlayerObj", &character, construct<CPlayerObj>, {}};
+         const ClassInfo world_properties{
+             "WorldProperties",
+@@ -590,23 +642,24 @@ namespace OpenBlood2
+                objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
+                objects.register_class(world_properties) && objects.register_class(smell) &&
+                objects.register_class(exit_hint) && objects.register_class(character) &&
+-               objects.register_class(player) && objects.register_class(volume) && objects.register_class(water) &&
+-               objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
+-               objects.register_class(conveyor) && objects.register_class(damage) && objects.register_class(freefall) &&
+-               objects.register_class(trigger) && objects.register_class(key_pickup) &&
+-               objects.register_class(pickup) && objects.register_class(ammo_pickup) &&
+-               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
+-               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
+-               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
+-               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
+-               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
+-               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
+-               objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
+-               objects.register_class(necroward_pickup) && objects.register_class(objectives_trigger) &&
+-               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+-               objects.register_class(door) && objects.register_class(rotating_door) &&
+-               objects.register_class(destructable_brush) && objects.register_class(rotating_brush) &&
+-               objects.register_class(hand_model);
++               objects.register_class(ai_manager) && objects.register_class(cultist) &&
++               objects.register_class(civilian) && objects.register_class(player) && objects.register_class(volume) &&
++               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
++               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
++               objects.register_class(freefall) && objects.register_class(trigger) &&
++               objects.register_class(key_pickup) && objects.register_class(pickup) &&
++               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
++               objects.register_class(health_base) && objects.register_class(armor_base) &&
++               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
++               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
++               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
++               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
++               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
++               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
++               objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
++               objects.register_class(toggle_trigger) && objects.register_class(door) &&
++               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
++               objects.register_class(rotating_brush) && objects.register_class(hand_model);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_activation.cpp b/src/game/server_activation.cpp
+new file mode 100644
+index 0000000..70d0a74
+--- /dev/null
++++ b/src/game/server_activation.cpp
+@@ -0,0 +1,76 @@
++#include "game/server_adapter.h"
++#include <cmath>
++namespace OpenBlood2
++{
++    bool ServerAdapter::ConfigureCharacterBody(HOBJECT h, float mass, float friction)
++    {
++        trace_service("ConfigureCharacterBody");
++        auto* r = objects_.get(h);
++        if (!r || r->life != Life::Alive || r->attachment || r->world_body || r->state.m_ObjectType != OT_MODEL ||
++            !std::isfinite(mass) || mass <= 0 || mass > 1e6f || !std::isfinite(friction) || friction < 0 ||
++            friction > 20005)
++            return false;
++        r->character_body = true;
++        r->body_properties = {mass, friction, false};
++        // Original SetMass sets MIN_FORCE=0: this integrator drops no nonzero force.
++        return true;
++    }
++    bool ServerAdapter::ScaleObject(HOBJECT h, DVector scale)
++    {
++        trace_service("ScaleObject");
++        auto* r = objects_.get(h);
++        if (!r || r->life != Life::Alive || r->attachment ||
++            (r->state.m_ObjectType != OT_MODEL && r->state.m_ObjectType != OT_SPRITE) || !physics_vector(scale) ||
++            scale.x <= 0 || scale.y <= 0 || scale.z <= 0)
++            return false;
++        r->state.m_Scale = scale;
++        return true;
++    }
++    bool ServerAdapter::SetDeactivationTime(HOBJECT h, float seconds)
++    {
++        trace_service("SetDeactivationTime");
++        auto* r = objects_.get(h);
++        if (!r || r->life != Life::Alive || !std::isfinite(seconds) || seconds < 0 || seconds > 1e6f)
++            return false;
++        r->deactivation_period = seconds;
++        r->deactivate_at = objects_.time() + seconds;
++        r->auto_deactivate = seconds > 0;
++        if (r->activity == OBJSTATE_AUTODEACTIVATE_NOW)
++            r->activity = OBJSTATE_ACTIVE;
++        return true;
++    }
++    bool ServerAdapter::PingObjects(HOBJECT observer)
++    {
++        trace_service("PingObjects");
++        auto* source = objects_.get(observer);
++        if (!source || source->life != Life::Alive || !collision || !collision_ready)
++            return false;
++        const auto from = source->state.m_Pos;
++        // Replacement visibility selection: checked center rays, independent of render/UI.
++        // Retail PVS-based activation is not reproduced by the DAT reader yet.
++        std::vector<ObjectId> visible;
++        for (auto id : objects_.snapshot())
++        {
++            auto* r = objects_.get(id);
++            if (!r || r->life != Life::Alive || !r->auto_deactivate || r->handle == observer ||
++                (r->activity != OBJSTATE_ACTIVE && r->activity != OBJSTATE_AUTODEACTIVATE_NOW))
++                continue;
++            SegmentHit hit;
++            auto result = IntersectSegment(from, r->state.m_Pos, observer, hit);
++            if (result == SegmentResult::Invalid || result == SegmentResult::Unavailable)
++                return false; // No partial refresh on failed queries.
++            if (result == SegmentResult::Miss || (result == SegmentResult::Hit && hit.object == r->handle))
++                visible.push_back(id);
++        }
++        for (auto id : visible)
++        {
++            auto* r = objects_.get(id); // No callbacks above; retain checked identities anyway.
++            if (!r || r->life != Life::Alive)
++                continue;
++            r->activity = OBJSTATE_ACTIVE;
++            r->deactivate_at = objects_.time() + r->deactivation_period;
++            ++r->activation_pings;
++        }
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/server_adapter.cpp b/src/game/server_adapter.cpp
+index f0f35f9..972d452 100644
+--- a/src/game/server_adapter.cpp
++++ b/src/game/server_adapter.cpp
+@@ -200,12 +200,15 @@ namespace OpenBlood2
+             active().trace_service("SetObjectState");
+             auto& o = active().objects_;
+             auto* r = o.get(h);
+-            if (!r || state < 0 || static_cast<unsigned>(state) > OBJSTATE_INACTIVE_TOUCH)
++            if (!r || r->life != Life::Alive || state < 0 ||
++                static_cast<unsigned>(state) > OBJSTATE_AUTODEACTIVATE_NOW ||
++                (state == OBJSTATE_AUTODEACTIVATE_NOW && r->deactivation_period <= 0))
+             {
+-                o.fail(ObjectError::Unsupported, "Invalid object state; automatic deactivation is not implemented");
++                o.fail(ObjectError::Unsupported, "Invalid object state or missing positive deactivation period");
+                 return;
+             }
+             r->activity = static_cast<DDWORD>(state);
++            r->auto_deactivate = r->deactivation_period > 0; // ACTIVE clears manual inactivity, not auto expiry.
+         };
+         GetPropGeneric = [](const char* name, GenericProp* out) -> DRESULT
+         {
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 6f70861..425e5da 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -52,6 +52,15 @@ namespace OpenBlood2
+         DRESULT FindAttachment(HOBJECT, HOBJECT, HATTACHMENT*) override;
+         DRESULT GetAttachedModelNodeTransform(HATTACHMENT, const char*, DVector*, DRotation*) override;
+         bool IsObjectAlive(HOBJECT) override;
++        bool SetDeactivationTime(HOBJECT, float) override;
++        bool PingObjects(HOBJECT) override;
++        bool ConfigureCharacterBody(HOBJECT, float mass, float friction) override;
++        bool ScaleObject(HOBJECT, DVector) override;
++        PathMgr* GetPathManager() override
++        {
++            return ai_paths;
++        }
++        PathMgr* ai_paths = nullptr;
+         bool ValidateSpawnObject(std::string_view) override;
+         void RecordSpawn(const SpawnReport&) override;
+         void RecordPickup(HOBJECT, const PickupMessage&, std::string_view) override;
+@@ -322,6 +331,7 @@ namespace OpenBlood2
+             objects.world = &world;
+             server.collision = &collision;
+             server.client_resources = &resources;
++            server.ai_paths = &server_shell.paths;
+             return server.bind() && register_original_classes(objects);
+         }
+         HOBJECT create_example(std::string_view class_name);
+diff --git a/src/game/server_physics.cpp b/src/game/server_physics.cpp
+index f00ce66..7ef26b3 100644
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -426,7 +426,7 @@ namespace OpenBlood2
+                 if (physics.gravity)
+                     acceleration = vector_add(acceleration, gravity);
+                 DVector displacement;
+-                if (r->world_body)
++                if (r->world_body || r->character_body)
+                 {
+                     ++r->body_steps;
+                     MovementState support;
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 60fc60d..9360c79 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -1,3 +1,4 @@
++#include "game/original/AI_Mgr.h"
+ #include "game/original/DetailSprite.h"
+ #include "game/original/Sound.h"
+ #include "game/server_adapter.h"
+@@ -103,6 +104,12 @@ namespace OpenBlood2
+                     entry.detail =
+                         entry.sound ? "Original Sound removed after transferring its loop to the world" : sound->error;
+                 }
++                else if (const auto* ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
++                         ai && !ai->runtime_error.empty())
++                {
++                    entry.state = EntryState::Failed;
++                    entry.detail = ai->runtime_error;
++                }
+                 else if (const auto* sprite = r ? dynamic_cast<const DetailSprite*>(r->game.get()) : nullptr;
+                          sprite && !sprite->error.empty())
+                 {
+@@ -338,6 +345,8 @@ namespace OpenBlood2
+         server.trace_enabled = was_tracing;
+         if (!cleared)
+             return false;
++        if (g_pServerDE == &server)
++            AI_Mgr::ResetRuntimeTables();
+         server.reset_world_time();
+         server_shell.PreStartWorld();
+         models.clear();
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index be9226b..5ea8e84 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -109,12 +109,17 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME weapons.private COMMAND weapon_tests private "${BLOOD2_TEST_DATA_DIR}")
+     # Three retail reloads / 4,140 simulation frames with the expanded brush scene.
+     set_tests_properties(weapons.private PROPERTIES LABELS "headless;weapons;private" TIMEOUT 90)
++    if(BLOOD2_SANITIZERS)
++        # Three full scene/intro/weapon cycles now include fifteen production NPCs.
++        # ASan/UBSan measured ~140s; retain every frame and lifetime assertion.
++        set_tests_properties(weapons.private PROPERTIES TIMEOUT 240)
++    endif()
+ endif()
+ 
+ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+     add_test(NAME gpu.weapons COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --weapons-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/weapons.png")
+-    set_tests_properties(gpu.weapons PROPERTIES LABELS "private;gpu;weapons" TIMEOUT 30 RUN_SERIAL TRUE)
++    set_tests_properties(gpu.weapons PROPERTIES LABELS "private;gpu;weapons" TIMEOUT 60 RUN_SERIAL TRUE)
+ endif()
+ 
+ add_executable(movement_tests movement_tests.cpp)
+@@ -132,7 +137,7 @@ if(BLOOD2_TEST_DATA_DIR)
+     if(BLOOD2_GPU_TESTS)
+         add_test(NAME gpu.movement COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+             --data-dir "${BLOOD2_TEST_DATA_DIR}" --movement-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/movement.png")
+-        set_tests_properties(gpu.movement PROPERTIES LABELS "gpu;movement;private" TIMEOUT 30 RUN_SERIAL TRUE)
++        set_tests_properties(gpu.movement PROPERTIES LABELS "gpu;movement;private" TIMEOUT 60 RUN_SERIAL TRUE)
+     endif()
+ endif()
+ 
+@@ -409,7 +414,7 @@ endif()
+ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+     add_test(NAME gpu.randomsound COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --random-sounds-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/random-sounds.png")
+-    set_tests_properties(gpu.randomsound PROPERTIES LABELS "private;gpu;randomsound" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
++    set_tests_properties(gpu.randomsound PROPERTIES LABELS "private;gpu;randomsound" TIMEOUT 60 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+ endif()
+ 
+ add_executable(sound_tests sound_tests.cpp)
+@@ -489,7 +494,7 @@ if(BLOOD2_TEST_DATA_DIR)
+     if(BLOOD2_GPU_TESTS)
+         add_test(NAME gpu.character COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+             --data-dir "${BLOOD2_TEST_DATA_DIR}" --skeleton-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/skeleton.png")
+-        set_tests_properties(gpu.character PROPERTIES LABELS "gpu;character;private" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
++        set_tests_properties(gpu.character PROPERTIES LABELS "gpu;character;private" TIMEOUT 60 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+     endif()
+ endif()
+ 
+@@ -607,7 +612,7 @@ if(BLOOD2_GPU_TESTS)
+     if(BLOOD2_TEST_DATA_DIR)
+         add_test(NAME gpu.viewport COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+             --data-dir "${BLOOD2_TEST_DATA_DIR}" --viewport-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/viewport.png")
+-        set_tests_properties(gpu.viewport PROPERTIES LABELS "gpu;private;world_view" TIMEOUT 30 RUN_SERIAL TRUE)
++        set_tests_properties(gpu.viewport PROPERTIES LABELS "gpu;private;world_view" TIMEOUT 60 RUN_SERIAL TRUE)
+     endif()
+ endif()
+ 
+@@ -774,3 +779,18 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME ai_escape.catalog COMMAND ai_escape_tests catalog "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(ai_escape.catalog PROPERTIES LABELS "headless;private;ai_escape" TIMEOUT 90)
+ endif()
++
++add_executable(ai_runtime_tests ai_runtime_tests.cpp)
++target_link_libraries(ai_runtime_tests PRIVATE blood2_game)
++blood2_project_options(ai_runtime_tests)
++
++foreach(case IN ITEMS activation visibility lifetime targets tracking camera spatial triggers body missing)
++    add_test(NAME ai_runtime.${case} COMMAND ai_runtime_tests "${case}")
++    set_tests_properties(ai_runtime.${case} PROPERTIES LABELS "headless;ai_runtime" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case IN ITEMS catalog failures subway arena)
++        add_test(NAME ai_runtime.${case} COMMAND ai_runtime_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(ai_runtime.${case} PROPERTIES LABELS "headless;private;ai_runtime" TIMEOUT 90)
++    endforeach()
++endif()
+diff --git a/tests/ai_fire_tests.cpp b/tests/ai_fire_tests.cpp
+index 7fc6142..f3ca902 100644
+--- a/tests/ai_fire_tests.cpp
++++ b/tests/ai_fire_tests.cpp
+@@ -480,7 +480,7 @@ namespace
+         for (int cycle = 0; cycle < 2; ++cycle)
+         {
+             CHECK(g.request_world("01_SubwayA", e) && g.enter_player(e));
+-            CHECK(!g.objects.find_class("CultistAI"));
++            CHECK(g.objects.find_class("CultistAI"));
+             auto* a = actor(g);
+             CHECK(armed(a) && !g.objects.get(old));
+             auto* r = g.objects.get(a->m_hObject);
+diff --git a/tests/ai_perception_tests.cpp b/tests/ai_perception_tests.cpp
+index 5ef0b14..497e4a8 100644
+--- a/tests/ai_perception_tests.cpp
++++ b/tests/ai_perception_tests.cpp
+@@ -400,7 +400,7 @@ namespace
+             CHECK(a);
+             auto* r = g.objects.get(a->m_hObject);
+             CHECK(g.models.load("models/enemies/m_cultist1.abc", r->model, error));
+-            CHECK(AI_Mgr::m_dwNumCabal == 2 && AI_Mgr::m_dwNumMonster == 1);
++            CHECK(AI_Mgr::m_dwNumCabal == 17 && AI_Mgr::m_dwNumMonster == 1);
+             a->m_fSensingDist = 200;
+             CHECK(a->ComputeStimuli() == 4 && a->GetTarget() == p->m_hObject);
+             CHECK(a->RefreshTargetPosition() && a->MC_FaceTarget());
+diff --git a/tests/ai_runtime_tests.cpp b/tests/ai_runtime_tests.cpp
+new file mode 100644
+index 0000000..32b9b46
+--- /dev/null
++++ b/tests/ai_runtime_tests.cpp
+@@ -0,0 +1,533 @@
++#include "brush_fixture.h"
++#include "game/original/CameraObj.h"
++#include "game/original/CivilianAI.h"
++#include "game/original/CultistAI.h"
++#include "game/server_adapter.h"
++#include "model_fixture.h"
++#include <cmath>
++#include <functional>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .003f;
++    }
++    bool setup(GameSession& g, const char* root = "")
++    {
++        CHECK(g.initialize());
++        auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
++        for (auto& s : floor.surfaces)
++            s.flags = 1;
++        std::string e;
++        CHECK(g.collision.build(floor, e));
++        g.server.collision_ready = true;
++        if (*root)
++        {
++            Config cfg;
++            cfg.data_dir = root;
++            CHECK(g.resources.mount_game(cfg, e));
++        }
++        return true;
++    }
++    HOBJECT object(GameSession& g, DVector pos = {0, 10, 40}, const char* name = "object",
++                   const char* type = "BaseClass")
++    {
++        ObjectCreateStruct s;
++        s.m_Pos = pos;
++        s.m_Flags = FLAG_SOLID;
++        SAFE_STRCPY(s.m_Name, name);
++        auto h = g.objects.create(g.objects.find_class(type), s);
++        if (h)
++            g.objects.get(h)->dimensions = {1, 2, 1};
++        return h;
++    }
++    class Probe : public CivilianAI
++    {
++      public:
++        bool remove = false, recurse = false, nested = true;
++        bool ComputeState(int = -1) override
++        {
++            if (remove)
++                GetServerDE()->RemoveObject(m_hObject);
++            if (recurse)
++                nested = AI_Update();
++            return true;
++        }
++    };
++    // A deliberately synthetic scheduler fixture: real AI_Update/state/engine services,
++    // but injected animation data/initialized flag. Catalog tests cover actual initialization.
++    Probe* actor(GameSession& g)
++    {
++        static const ClassInfo type{"RuntimeProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<Probe>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Pos = {0, 10, 0};
++        s.m_Flags = FLAG_SOLID;
++        auto h = g.objects.create(&type, s);
++        auto* r = g.objects.get(h);
++        auto* a = r ? dynamic_cast<Probe*>(r->game.get()) : nullptr;
++        if (!a)
++            return nullptr;
++        auto model = std::make_shared<Model>();
++        std::string e;
++        if (!read_model(test_model::abc().b, *model, e))
++            return nullptr;
++        model->animations[0].keys.clear();
++        model->animations[0].dimensions = {1, 2, 1};
++        r->model = model;
++        r->dimensions = {1, 2, 1};
++        auto table = std::make_shared<CAnim_Sound>();
++        for (auto& clip : table->m_nAnim_IDLE)
++            clip = 0;
++        if (!a->InitStatics(table) || !a->m_MoveObj.Init(h) || !a->m_InventoryMgr.Init(h, nullptr))
++            return nullptr;
++        a->m_damage.Init(h);
++        a->m_damage.SetHitPoints(100);
++        a->m_vDims = r->dimensions;
++        a->npc_type = AI_Mgr::NPCType::Civilian;
++        a->runtime_initialized = true;
++        a->m_nState = AI_Mgr::StateInactive;
++        g.server.SetNextUpdate(h, .001f);
++        return a;
++    }
++    bool activation(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto h = a->m_hObject;
++        auto observer = object(g, {0, 10, 50});
++        CHECK(observer);
++        CHECK(g.step(.01) && a->runtime_updates == 1 && a->m_bSetShutdown);
++        auto* r = g.objects.get(h);
++        CHECK(r->activity == OBJSTATE_AUTODEACTIVATE_NOW && r->scheduled);
++        CHECK(g.step(.5) && a->runtime_updates == 1 && g.server.PingObjects(observer));
++        CHECK(r->activity == OBJSTATE_ACTIVE && r->activation_pings == 1);
++        CHECK(g.step(.01) && a->runtime_updates == 2 && a->runtime_desyncs == 0);
++        CHECK(g.step(3) && r->activity == OBJSTATE_AUTODEACTIVATE_NOW && a->runtime_updates == 2);
++        CHECK(g.server.PingObjects(observer) && g.step(.01) && a->runtime_desyncs == 1);
++        CHECK(r->due > g.objects.time() && r->due <= g.objects.time() + .5);
++        CHECK(g.step(.5) && a->runtime_updates == 4);
++        g.server.SetObjectState(h, OBJSTATE_INACTIVE);
++        CHECK(g.server.PingObjects(observer) && r->activity == OBJSTATE_INACTIVE);
++        CHECK(!g.objects.engine_message(h, MID_TOUCHNOTIFY, observer));
++        g.server.SetObjectState(h, OBJSTATE_INACTIVE_TOUCH);
++        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, observer));
++        CHECK(g.server.SetDeactivationTime(h, .25f));
++        g.server.SetObjectState(h, OBJSTATE_ACTIVE);
++        CHECK(r->auto_deactivate && g.step(.25) && r->activity == OBJSTATE_AUTODEACTIVATE_NOW);
++        CHECK(!g.objects.engine_message(h, MID_TOUCHNOTIFY, observer));
++        CHECK(!g.server.SetDeactivationTime(h, -1) && !g.server.SetDeactivationTime(h, NAN));
++        CHECK(g.server.SetDeactivationTime(h, 0) && !r->auto_deactivate);
++        return true;
++    }
++    bool visibility(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto observer = object(g, {0, 10, 50});
++        auto h = object(g, {0, 10, 0});
++        auto blocker = object(g, {0, 10, 25});
++        CHECK(observer && h && blocker);
++        CHECK(g.server.SetDeactivationTime(h, 3));
++        g.server.SetObjectState(h, OBJSTATE_AUTODEACTIVATE_NOW);
++        CHECK(g.server.PingObjects(observer) && g.objects.get(h)->activation_pings == 0);
++        CHECK(g.objects.remove(blocker) && g.server.PingObjects(observer) && g.objects.get(h)->activation_pings == 1);
++        auto pings = g.objects.get(h)->activation_pings;
++        g.server.collision_ready = false;
++        CHECK(!g.server.PingObjects(observer) && g.objects.get(h)->activation_pings == pings);
++        CHECK(g.objects.remove(observer) && !g.server.PingObjects(observer) && g.objects.finish_frame());
++        return true;
++    }
++    bool lifetime(const char*)
++    {
++        for (bool remove : {false, true})
++        {
++            GameSession g;
++            CHECK(setup(g));
++            auto* a = actor(g);
++            CHECK(a);
++            a->m_nState = AI_Mgr::StateEscapeHide;
++            a->remove = remove;
++            a->recurse = !remove;
++            auto h = a->m_hObject;
++            CHECK(!a->AI_Update());
++            if (remove)
++                CHECK(!g.server.IsObjectAlive(h));
++            else
++                CHECK(a->runtime_failed && !a->nested && g.objects.get(h)->activity == OBJSTATE_INACTIVE &&
++                      !g.objects.get(h)->scheduled);
++            CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.string_count() == 0 &&
++                  g.server.message_count() == 0);
++        }
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto h = a->m_hObject;
++        a->m_bRemoveMe = true;
++        CHECK(g.step(.01) && !g.objects.get(h));
++        return true;
++    }
++    bool targets(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto h = object(g, {0, 10, 50}, "target", "CBaseCharacter");
++        CHECK(h);
++        auto* c = dynamic_cast<CBaseCharacter*>(g.server.HandleToObject(h));
++        CHECK(c);
++        c->m_damage.Init(h);
++        c->m_damage.SetHitPoints(100);
++        a->m_fSensingDist = 20;
++        a->m_fSeeingDist = 100;
++        CHECK(a->SetNewTarget(h) && a->AI_Update() && a->GetTarget() == h && a->target_position_valid);
++        CHECK(a->m_bHasTargeted && a->m_fSensingDist == 100 && near(a->m_vTargetPos.z, 50));
++        auto blocker = object(g, {0, 10, 25});
++        CHECK(blocker);
++        // ALWAYSCLEAR bypasses sight, but never the checked current pose/character type.
++        a->m_dwFlags |= 0x100;
++        CHECK(a->AI_Update() && a->GetTarget() == h);
++        a->m_dwFlags &= ~0x100u;
++        CHECK(a->AI_Update() && !a->GetTarget() && a->runtime_target_losses == 1);
++        CHECK(g.objects.remove(blocker) && g.objects.finish_frame());
++        a->m_dwFlags |= 0x100;
++        CHECK(a->SetNewTarget(h));
++        c->m_damage.m_bDead = DTRUE;
++        CHECK(a->AI_Update() && !a->GetTarget() && a->runtime_target_losses == 2);
++        a->m_nState = AI_Mgr::StateInactive;
++        c->m_damage.m_bDead = DFALSE;
++        CHECK(a->SetNewTarget(h) && g.objects.remove(h) && a->AI_Update() && !a->GetTarget());
++        CHECK(g.objects.finish_frame());
++        auto wrong = object(g, {10, 10, 20});
++        CHECK(wrong && a->SetNewTarget(wrong));
++        CHECK(!a->AI_Update() && a->runtime_failed && a->runtime_error.find("not a character") != std::string::npos);
++        return true;
++    }
++    bool tracking(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto h = object(g);
++        CHECK(h && a->SetTrackedObject(h) && a->AI_Update() && a->tracked_position_valid);
++        CHECK(near(a->m_vTrackObjPos.z, 40));
++        g.objects.get(h)->state.m_Pos.z = 60;
++        CHECK(a->AI_Update() && near(a->m_vTrackObjPos.z, 60));
++        CHECK(g.objects.remove(h) && !a->AI_Update() && !a->GetTrackedObject() && a->runtime_failed);
++        CHECK(g.objects.finish_frame());
++        return true;
++    }
++    bool camera(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto h = g.objects.create(g.objects.find_class("CameraObj"));
++        CHECK(h);
++        g_hActiveCamera = h;
++        a->m_nState = AI_Mgr::StateAttackFar;
++        auto* r = g.objects.get(a->m_hObject);
++        r->velocity = {4, 5, 6};
++        CHECK(a->AI_Update() && a->runtime_camera_pauses == 1 && !a->m_bSetShutdown);
++        CHECK(near(r->velocity.x, 0) && near(r->velocity.y, 5) && near(r->velocity.z, 0));
++        a->m_nState = AI_Mgr::StateIdle;
++        CHECK(a->AI_Update() && a->runtime_camera_pauses == 1 && a->m_bSetShutdown);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        g_hActiveCamera = nullptr;
++        a->m_nState = AI_Mgr::StateDying;
++        CHECK(!a->AI_Update() && a->runtime_error.find("not integrated") != std::string::npos);
++        return true;
++    }
++    bool spatial(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto h = a->m_hObject;
++        CHECK(g.server.ConfigureCharacterBody(h, 250, 10) && g.objects.get(h)->character_body);
++        CHECK(!g.server.ConfigureCharacterBody(h, 0, 10) && !g.server.ConfigureCharacterBody(h, 250, NAN));
++        CHECK(g.server.ScaleObject(h, {2, 3, 4}) && g.objects.get(h)->state.m_Scale.y == 3);
++        CHECK(!g.server.ScaleObject(h, {0, 1, 1}) && !g.server.ScaleObject(h, {1, INFINITY, 1}));
++        auto normal = object(g);
++        CHECK(normal && !g.server.ScaleObject(normal, {1, 1, 1}));
++        g.world.min = {-100, -100, -100};
++        g.world.max = {100, 100, 100};
++        g.world.models.emplace_back();
++        auto* r = g.objects.get(h);
++        r->state.m_Pos = {100, 10, 0};
++        r->state.m_Flags |= FLAG_REMOVEIFOUTSIDE;
++        CHECK(g.step(.01) && g.objects.get(h));
++        r->state.m_Pos.x = 100.1f;
++        CHECK(g.step(.01) && !g.objects.get(h));
++        return true;
++    }
++    bool body(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto h = a->m_hObject;
++        auto* r = g.objects.get(h);
++        r->state.m_Pos = {0, -7.999f, 0};
++        r->state.m_Flags |= FLAG_GRAVITY;
++        CHECK(g.server.ConfigureCharacterBody(h, 250, 10));
++        r->velocity = {100, 0, 0};
++        CHECK(g.server.advance_physics(.1));
++        CHECK(near(r->velocity.x, 100 * std::exp(-1.f)) && near(r->state.m_Pos.x, 10 * (1 - std::exp(-1.f))));
++        CHECK(r->body_steps == 12);
++        // Standing on a character changes follow policy; world support preserves it.
++        auto support = object(g, {0, 10, 0}, "support", "CBaseCharacter");
++        CHECK(support);
++        r->state.m_Pos = {0, 14.001f, 0};
++        r->velocity = {};
++        CHECK(a->AI_Update() && (r->state.m_Flags & FLAG_DONTFOLLOWSTANDING));
++        CHECK(g.objects.remove(support) && g.objects.finish_frame());
++        support = object(g, {0, 10, 0});
++        CHECK(support);
++        CHECK(a->AI_Update() && !(r->state.m_Flags & FLAG_DONTFOLLOWSTANDING));
++        auto samples = a->m_MoveObj.samples;
++        g.server.SetDeactivationTime(h, 0);
++        g.server.SetObjectState(h, OBJSTATE_ACTIVE);
++        CHECK(g.step(.01) && a->m_MoveObj.samples == samples + 1);
++        return true;
++    }
++    bool send(GameSession& g, HOBJECT from, HOBJECT to, const char* text)
++    {
++        auto s = g.server.CreateString(text);
++        auto m = g.server.StartMessageToObject(g.server.HandleToObject(from), to, 1000);
++        CHECK(s && m && g.server.WriteToMessageHString(m, s) == DE_OK);
++        g.server.FreeString(s);
++        CHECK(g.server.EndMessage(m) == DE_OK);
++        return true;
++    }
++    bool triggers(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a);
++        auto h = object(g, {0, 10, 50}, "speaker", "CBaseCharacter");
++        CHECK(h);
++        a->m_nState = AI_Mgr::StateIdle;
++        CHECK(send(g, h, a->m_hObject, "trigger") && a->m_nState == AI_Mgr::StateIdle);
++        CHECK(send(g, h, a->m_hObject, "TRIGGER") && a->m_nState == AI_Mgr::StateSpecial1 && a->GetTarget() == h);
++        a->npc_labtech = true;
++        CHECK(send(g, h, a->m_hObject, "TRIGGER") && a->m_nState == AI_Mgr::StateSpecial1);
++        a->m_nState = AI_Mgr::StateIdle;
++        CHECK(send(g, h, a->m_hObject, "TRIGGER") && a->m_nState == AI_Mgr::StateEscapeHide);
++        CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++        // Forced original SCRIPT update runs immediately, including shutdown selection.
++        CHECK(send(g, h, a->m_hObject, "SCRIPT 0; WAIT 1;") && a->m_nState == AI_Mgr::StateScript);
++        CHECK(a->runtime_updates == 1 && !a->runtime_failed && a->m_bSetShutdown);
++        return true;
++    }
++    AI_Mgr* npc(GameSession& g, const char* type, Properties p = {}, Creation reason = Creation::World)
++    {
++        p.insert_or_assign("Pos", DVector{0, 100, 0});
++        auto h = g.objects.create(g.objects.find_class(type), {}, reason, std::move(p));
++        return g.server.IsObjectAlive(h) ? dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h)) : nullptr;
++    }
++    bool missing(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        for (int i = 0; i < 2; ++i)
++        {
++            CHECK(!npc(g, "CultistAI") && !npc(g, "CivilianAI"));
++            CHECK(g.objects.finish_frame() && g.objects.snapshot().empty());
++            CHECK(AI_Mgr::m_dwNumCabal == 0 && CDestructable::m_dwNumDestructables == 0);
++        }
++        return true;
++    }
++    bool catalog(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        for (auto type : {"CultistAI", "CivilianAI"})
++            for (bool male : {true, false})
++                for (int difficulty : {0, 1, 2, 3})
++                {
++                    g.server.set_game_settings(difficulty, 0);
++                    auto* a =
++                        npc(g, type, {{"Male", male}, {"AIState", std::string("GUARD")}, {"RandomHitPoints", 1.f}});
++                    if (!a)
++                    {
++                        for (const auto& d : g.objects.diagnostics())
++                            std::cerr << d << '\n';
++                        return false;
++                    }
++                    auto h = a->m_hObject;
++                    auto* r = g.objects.get(h);
++                    float factor = difficulty == 0 ? .25f : difficulty == 2 ? 1.5f : 1.f;
++                    CHECK(a->RuntimeReady() && r->model && a->npc_male == male && a->m_nState == AI_Mgr::StateGuard);
++                    CHECK(near(a->m_damage.m_fHitPoints, 31 * factor) &&
++                          near(a->m_InventoryMgr.damage_multiplier,
++                               (type == std::string_view("CultistAI") ? .5f : 1) * factor));
++                    CHECK(a->m_vGuardPos.y == 100 && r->state.m_Pos.y < 100 && r->auto_deactivate == false);
++                    CHECK(r->state.m_Scale.y >= .95f && r->state.m_Scale.y <= 1.1f &&
++                          near(r->state.m_Scale.x, 2 - r->state.m_Scale.y));
++                    CHECK((r->state.m_Flags & FLAG_REMOVEIFOUTSIDE) && r->character_body &&
++                          r->body_properties.mass == 250 && r->body_properties.friction == 10);
++                    CHECK(a->m_MoveObj.initialized && r->scheduled && a->AnimSound());
++                    std::cout << type << " male=" << male << " difficulty=" << difficulty
++                              << " hp=" << a->m_damage.m_fHitPoints << " model=" << r->state.m_Filename << '\n';
++                    CHECK(g.objects.remove(h) && g.objects.finish_frame());
++                }
++        g.server.set_game_settings(1, 0);
++        auto* a = npc(g, "CivilianAI", {{"Male", false}, {"LabTech", true}, {"Scared", true}});
++        CHECK(a && a->npc_labtech && !a->npc_male && dynamic_cast<CivilianAI*>(a)->m_bScared);
++        CHECK(a->AnimSound()->GetSoundRoot() == "sounds/enemies/civilian");
++        CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame());
++        a = npc(g, "CultistAI", {{"Male", false}}, Creation::String);
++        CHECK(a && a->npc_male); // source world-only subclass properties
++        auto* shared_table = a->AnimSound();
++        DVector separated{300, 100, 0};
++        CHECK(g.server.TeleportObject(a->m_hObject, &separated) == DE_OK);
++        {
++            GameSession rejected;
++            CHECK(!rejected.initialize());
++        }
++        auto* other = npc(g, "CultistAI");
++        CHECK(other && other->AnimSound() == shared_table);
++        CHECK(g.unload_world() && AI_Mgr::m_dwNumCabal == 0 && AI_Mgr::m_dwNumMonster == 0);
++        return true;
++    }
++    bool failures(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        for (auto props : {Properties{{"AIWeapon1", std::string("SHOTGUN")}}, Properties{{"RobeSkin", true}},
++                           Properties{{"Proximity_Bombs", 1.f}}, Properties{{"RandomHitPoints", -1.f}}})
++        {
++            CHECK(!npc(g, "CultistAI", props));
++            CHECK(g.objects.finish_frame() && g.objects.snapshot().empty());
++        }
++        CHECK(!npc(g, "CivilianAI", {}, Creation::Restore) && g.objects.finish_frame() && g.objects.snapshot().empty());
++        CHECK(AI_Mgr::m_dwNumCabal == 0 && g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++    bool arena(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string e;
++        g.world_path = "synthetic NPC integration arena";
++        g.state = SessionState::Inspection;
++        CHECK(g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
++                               {{"Name", std::string("START")}, {"Pos", DVector{0, 100, 200}}}));
++        auto* a = dynamic_cast<CultistAI*>(npc(g, "CultistAI"));
++        CHECK(a);
++        g.server_shell.PreStartWorld();
++        CHECK(g.server_shell.PostStartWorld());
++        if (!g.enter_player(e))
++        {
++            std::cerr << e << '\n';
++            return false;
++        }
++        auto* player = g.server_shell.Player(g.local_client);
++        CHECK(player);
++        for (int tick = 0; tick < 600; ++tick)
++            CHECK(g.step(1.0 / 60));
++        std::cout << "Arena state=" << a->m_nState << " phase=" << a->Metacmd << " updates=" << a->runtime_updates
++                  << " shots=" << a->fire_shots << " error=" << a->runtime_error
++                  << " player HP=" << player->m_damage.m_fHitPoints << '\n';
++        CHECK(a->RuntimeReady() && a->runtime_updates > 15 && a->attack_updates > 0 && a->fire_shots > 0);
++        CHECK(player->m_damage.m_fHitPoints < 100);
++        CHECK(a->m_InventoryMgr.CurrentWeapon()->m_hHandModel);
++        return true;
++    }
++    bool subway(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string e;
++        ObjectId old{};
++        for (int load = 0; load < 2; ++load)
++        {
++            CHECK(g.request_world("01_SubwayA", e) && !g.objects.get(old));
++            unsigned cultists = 0, civilians = 0, failed = 0, unsupported = 0, created = 0;
++            for (auto& entry : g.entries)
++            {
++                failed += entry.state == EntryState::Failed;
++                unsupported += entry.state == EntryState::Unsupported;
++                created += entry.state == EntryState::Created;
++            }
++            for (auto id : g.objects.snapshot())
++            {
++                auto* r = g.objects.get(id);
++                auto* a = dynamic_cast<AI_Mgr*>(r->game.get());
++                if (!a)
++                    continue;
++                CHECK(a->RuntimeReady());
++                old = id;
++                cultists += a->npc_type == AI_Mgr::NPCType::Cultist;
++                civilians += a->npc_type == AI_Mgr::NPCType::Civilian;
++            }
++            CHECK(cultists == 10 && civilians == 5 && failed == 0 && unsupported == 2 && created == 202);
++            CHECK(g.objects.snapshot().size() == 224 && g.enter_player(e) && g.objects.snapshot().size() == 227);
++            for (int tick = 0; tick < 600; ++tick)
++            {
++                CHECK(g.step(1.0 / 60));
++                if (!tick)
++                    CHECK(g.objects.snapshot().size() == 229 && g.objects.attachments().size() == 11);
++            }
++            std::uint64_t updates = 0, pings = 0;
++            for (auto id : g.objects.snapshot())
++            {
++                auto* r = g.objects.get(id);
++                auto* a = dynamic_cast<AI_Mgr*>(r->game.get());
++                if (!a)
++                    continue;
++                if (a->runtime_failed)
++                    std::cerr << a->runtime_error << '\n';
++                CHECK(a->RuntimeReady() && a->runtime_updates > 0);
++                updates += a->runtime_updates;
++                pings += r->activation_pings;
++            }
++            CHECK(updates > 15 && pings > 0);
++            std::cout << "SubwayA load=" << load << " created=" << created << " unsupported=" << unsupported
++                      << " AI_Update=" << updates << " pings=" << pings << '\n';
++            CHECK(g.unload_world() && !g.objects.get(old) && g.objects.snapshot().empty());
++            CHECK(AI_Mgr::m_dwNumCabal == 0 && AI_Mgr::m_dwNumMonster == 0 && g.server.string_count() == 0 &&
++                  g.server.message_count() == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    const std::map<std::string, std::function<bool(const char*)>> tests{
++        {"body", body},         {"missing", missing},   {"activation", activation}, {"visibility", visibility},
++        {"lifetime", lifetime}, {"targets", targets},   {"tracking", tracking},     {"camera", camera},
++        {"spatial", spatial},   {"triggers", triggers}, {"arena", arena},           {"catalog", catalog},
++        {"failures", failures}, {"subway", subway}};
++    if (argc < 2)
++        return 2;
++    auto t = tests.find(argv[1]);
++    return t != tests.end() && t->second(argc > 2 ? argv[2] : "") ? 0 : 1;
++}
+diff --git a/tests/ai_state_tests.cpp b/tests/ai_state_tests.cpp
+index 0d67300..e46e7c7 100644
+--- a/tests/ai_state_tests.cpp
++++ b/tests/ai_state_tests.cpp
+@@ -456,7 +456,7 @@ namespace
+         for (int cycle = 0; cycle < 2; ++cycle)
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+-            CHECK(!g.objects.find_class("CivilianAI") && !g.objects.find_class("CultistAI"));
++            CHECK(g.objects.find_class("CivilianAI") && g.objects.find_class("CultistAI"));
+             auto* a = actor<ScheduledCivilian>(g, "ScheduledCivilianProbe", {0, 10000, 0});
+             CHECK(a && !g.objects.get(old));
+             auto* r = g.objects.get(a->m_hObject);
+diff --git a/tests/ai_trigger_tests.cpp b/tests/ai_trigger_tests.cpp
+index f597ff5..20bd6ee 100644
+--- a/tests/ai_trigger_tests.cpp
++++ b/tests/ai_trigger_tests.cpp
+@@ -307,10 +307,13 @@ namespace
+         for (int cycle = 0; cycle < 2; ++cycle)
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+-            CHECK(!g.objects.get(old) && !g.objects.find_class("CultistAI"));
++            CHECK(!g.objects.get(old) && g.objects.find_class("CultistAI"));
+             auto* player = g.server_shell.Player(g.local_client);
+             auto* a = actor(g);
+             CHECK(player && a);
++            // Keep this single-listener hearing fixture isolated from the new authored NPCs.
++            // Production acquisition/update/contacts are exercised by ai_runtime.subway/arena.
++            g.objects.get(player->m_hObject)->state.m_Pos = {0, 10000, 0};
+             DVector pos;
+             CHECK(g.server.GetObjectPos(player->m_hObject, &pos) == DE_OK);
+             g.objects.get(a->m_hObject)->state.m_Pos = vector_add(pos, {40, 0, 0});
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index 86a5c7b..a8ddf06 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -393,9 +393,9 @@ namespace
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+             ++entries[e.state];
+-        CHECK(entries[EntryState::Created] == 187 && entries[EntryState::EditorOnly] == 372 &&
+-              entries[EntryState::Unsupported] == 17 && entries[EntryState::Failed] == 0 &&
+-              g.objects.snapshot().size() == 194);
++        CHECK(entries[EntryState::Created] == 202 && entries[EntryState::EditorOnly] == 372 &&
++              entries[EntryState::Unsupported] == 2 && entries[EntryState::Failed] == 0 &&
++              g.objects.snapshot().size() == 224);
+         std::cout << "Subway instances=" << g.objects.snapshot().size() << "\n";
+         for (auto [state, n] : entries)
+             std::cout << "state=" << int(state) << " count=" << n << '\n';
+diff --git a/tests/camera_tests.cpp b/tests/camera_tests.cpp
+index ce89ddf..42a4a27 100644
+--- a/tests/camera_tests.cpp
++++ b/tests/camera_tests.cpp
+@@ -291,7 +291,7 @@ namespace
+         CHECK(worlds == 57 && entries == 61 && created == 61 && rejected == 0);
+         CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+         CHECK(CameraObj::m_dwNumCameras == 2 && g.server.camera_effects.size() == 2 &&
+-              g.objects.snapshot().size() == 197);
++              g.objects.snapshot().size() == 227);
+         CHECK(test_camera::complete_subway_intro(g));
+         for (auto id : g.objects.snapshot())
+             if (auto* r = g.objects.get(id); r && dynamic_cast<CameraObj*>(r->game.get()))
+diff --git a/tests/cinematic_tests.cpp b/tests/cinematic_tests.cpp
+index 8d65325..5b0abef 100644
+--- a/tests/cinematic_tests.cpp
++++ b/tests/cinematic_tests.cpp
+@@ -338,9 +338,9 @@ namespace
+             std::map<EntryState, unsigned> counts;
+             for (const auto& e : g.entries)
+                 ++counts[e.state];
+-            CHECK(counts[EntryState::Created] == 187 && counts[EntryState::EditorOnly] == 372 &&
+-                  counts[EntryState::Unsupported] == 17 && counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 194 && g.enter_player(error) && g.objects.snapshot().size() == 197);
++            CHECK(counts[EntryState::Created] == 202 && counts[EntryState::EditorOnly] == 372 &&
++                  counts[EntryState::Unsupported] == 2 && counts[EntryState::Failed] == 0);
++            CHECK(g.objects.snapshot().size() == 224 && g.enter_player(error) && g.objects.snapshot().size() == 227);
+             HOBJECT target = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (std::string_view(g.objects.get(id)->state.m_Name) == "cintrig1")
+@@ -359,8 +359,8 @@ namespace
+             for (unsigned i = 0; i < 6; ++i)
+                 CHECK(g.step(1.0 / 60));
+             v = g.server.audio.get(id);
+-            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 189 &&
+-                  g.objects.attachments().size() == 1);
++            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 229 &&
++                  g.objects.attachments().size() == 11);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_clips() && !g.server.audio.get(id) && !g.server.message_count() &&
+                   !g.server.list_count() && !g.server.string_count());
+diff --git a/tests/keyframer_tests.cpp b/tests/keyframer_tests.cpp
+index 3132482..44f90a1 100644
+--- a/tests/keyframer_tests.cpp
++++ b/tests/keyframer_tests.cpp
+@@ -361,14 +361,14 @@ namespace
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+             const float entered = g.server.GetTime();
+-            CHECK(g.objects.snapshot().size() == 197);
++            CHECK(g.objects.snapshot().size() == 227);
+             auto* list = g.server.FindNamedObjects("tracking1");
+             CHECK(list && list->m_pFirstLink);
+             auto h = list->m_pFirstLink->m_hObject;
+             g.server.RelinquishList(list);
+             auto* f = framer(g, h);
+             CHECK(g.step(1.0 / 60) && f->keys.size() == 2 && f->targets.size() == 1 && f->active && f->time == 0);
+-            CHECK(g.objects.snapshot().size() == 189 && g.objects.attachments().size() == 1);
++            CHECK(g.objects.snapshot().size() == 229 && g.objects.attachments().size() == 11);
+             auto camera = f->targets[0].object;
+             auto start = g.objects.get(camera)->state.m_Pos;
+             CHECK(g.step(1.0 / 60) && f->targets[0].moves == 1 && f->processed == 1 && f->unresolved_messages == 1);
+diff --git a/tests/light_tests.cpp b/tests/light_tests.cpp
+index d6cdb56..a745c1c 100644
+--- a/tests/light_tests.cpp
++++ b/tests/light_tests.cpp
+@@ -350,8 +350,8 @@ namespace
+         for (int cycle = 0; cycle < 2; ++cycle)
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+-            CHECK(g.objects.snapshot().size() == 197 && g.server.light_effects.size() == 12);
+-            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 189 && g.objects.attachments().size() == 1);
++            CHECK(g.objects.snapshot().size() == 227 && g.server.light_effects.size() == 12);
++            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 229 && g.objects.attachments().size() == 11);
+             KeyFramer* path = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (auto* f = dynamic_cast<KeyFramer*>(g.objects.get(id)->game.get());
+diff --git a/tests/model_gpu_tests.cpp b/tests/model_gpu_tests.cpp
+index e41a4e3..f26b959 100644
+--- a/tests/model_gpu_tests.cpp
++++ b/tests/model_gpu_tests.cpp
+@@ -88,7 +88,7 @@ int main(int argc, char** argv)
+         game.client_shell.weapons_visible = false;
+         ModelView scene;
+         CHECK(update_model_scene(game, scene, error));
+-        CHECK(scene.world_draws.size() == 2);
++        CHECK(scene.world_draws.size() == 27);
+         const auto* player = game.objects.get(game.client_shell.player);
+         CHECK(player);
+         DVector eye = player->state.m_Pos;
+diff --git a/tests/model_view_tests.cpp b/tests/model_view_tests.cpp
+index 770dc9c..25908a1 100644
+--- a/tests/model_view_tests.cpp
++++ b/tests/model_view_tests.cpp
+@@ -179,7 +179,7 @@ namespace
+             for (const auto& entry : scene.entries)
+                 std::cout << entry.label << " visible=" << entry.visible << " triangles=" << entry.triangles
+                           << " error=" << entry.error << '\n';
+-            CHECK(scene.world_draws.size() == 2 && scene.close_draws.empty());
++            CHECK(scene.world_draws.size() == 27 && scene.close_draws.empty());
+             std::size_t failures = 0;
+             for (const auto& entry : scene.entries)
+             {
+@@ -215,7 +215,8 @@ namespace
+             CHECK(update_model_scene(g, scene, e));
+             for (const auto& entry : scene.entries)
+                 CHECK(!(entry.object.slot == id.slot && entry.object.generation == id.generation));
+-            CHECK(scene.world_draws.size() == 1 && scene.close_draws.empty()); // Independent child until destructor.
++            CHECK(scene.world_draws.size() == 26 &&
++                  scene.close_draws.empty()); // 25 NPC draws + independent player child.
+             CHECK(g.unload_world());
+             scene.clear();
+             CHECK(scene.revision > revision);
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index 0f98ded..b2faac4 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -204,14 +204,14 @@ namespace
+             CHECK(player);
+             CHECK(game.objects.get(player->m_hObject)->model->animations.size() == 86);
+             CHECK(game.objects.snapshot().size() ==
+-                  197); // 187 source instances + 7 door children + player + muzzle light + scent.
++                  227); // 202 source + 7 door children + 15 NPC muzzle lights + player/muzzle/scent.
+             CHECK(game.client_shell.position.x == -32 && game.client_shell.position.z == -3224);
+             CHECK(std::abs(game.client_shell.position.y - 170) < .01f);
+             for (int frame = 0; frame < 120; ++frame)
+                 CHECK(game.step(1.0 / 60.0));
+             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
+             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
+-            CHECK(!game.run_world(error) && error.find("17 uninstantiated") != std::string::npos);
++            CHECK(!game.run_world(error) && error.find("2 uninstantiated") != std::string::npos);
+             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
+                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
+                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()
+diff --git a/tests/random_sound_tests.cpp b/tests/random_sound_tests.cpp
+index 771314a..4249916 100644
+--- a/tests/random_sound_tests.cpp
++++ b/tests/random_sound_tests.cpp
+@@ -318,9 +318,9 @@ namespace
+             std::map<EntryState, unsigned> counts;
+             for (const auto& e : g.entries)
+                 ++counts[e.state];
+-            CHECK(counts[EntryState::Created] == 187 && counts[EntryState::Unsupported] == 17 &&
++            CHECK(counts[EntryState::Created] == 202 && counts[EntryState::Unsupported] == 2 &&
+                   counts[EntryState::EditorOnly] == 372 && !counts[EntryState::Failed]);
+-            CHECK(g.objects.snapshot().size() == 194 && g.enter_player(error) && g.objects.snapshot().size() == 197);
++            CHECK(g.objects.snapshot().size() == 224 && g.enter_player(error) && g.objects.snapshot().size() == 227);
+             std::vector<HOBJECT> targets;
+             for (auto id : g.objects.snapshot())
+                 if (dynamic_cast<RandomSoundFX*>(g.objects.get(id)->game.get()))
+@@ -346,8 +346,8 @@ namespace
+                 std::cout << "cycle=" << cycle << " name=" << g.objects.get(h)->state.m_Name
+                           << " sound=" << v->request.resource << '\n';
+             }
+-            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 189 &&
+-                  g.objects.attachments().size() == 1);
++            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 229 &&
++                  g.objects.attachments().size() == 11);
+             CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips() &&
+                   !g.server.audio.get(last) && g.objects.snapshot().empty() && !g.server.message_count() &&
+                   !g.server.string_count() && !g.server.list_count());
+diff --git a/tests/scene_explosion_tests.cpp b/tests/scene_explosion_tests.cpp
+index 9ca4736..987a6da 100644
+--- a/tests/scene_explosion_tests.cpp
++++ b/tests/scene_explosion_tests.cpp
+@@ -312,12 +312,12 @@ namespace
+                 ++n;
+                 CHECK(e.state == EntryState::Created);
+             }
+-            CHECK(n == 9 && counts[EntryState::Created] == 187 && counts[EntryState::WorldSound] == 4 &&
+-                  counts[EntryState::EditorOnly] == 372 && counts[EntryState::Unsupported] == 17 &&
++            CHECK(n == 9 && counts[EntryState::Created] == 202 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::EditorOnly] == 372 && counts[EntryState::Unsupported] == 2 &&
+                   counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 194 && g.enter_player(error) && g.objects.snapshot().size() == 197 &&
++            CHECK(g.objects.snapshot().size() == 224 && g.enter_player(error) && g.objects.snapshot().size() == 227 &&
+                   g.step(.02));
+-            CHECK(g.objects.snapshot().size() == 189 && g.objects.attachments().size() == 1);
++            CHECK(g.objects.snapshot().size() == 229 && g.objects.attachments().size() == 11);
+             auto* player = g.server_shell.Player(g.local_client);
+             CHECK(player);
+             auto health = player->m_damage.m_fHitPoints;
+@@ -334,7 +334,7 @@ namespace
+             CHECK(g.server.scene_explosions.size() == 9 && player->m_damage.m_fHitPoints == health && g.step(.11));
+             for (auto h : emitted)
+                 CHECK(!g.objects.get(h));
+-            CHECK(!g.run_world(error) && error.find("17 uninstantiated") != std::string::npos);
++            CHECK(!g.run_world(error) && error.find("2 uninstantiated") != std::string::npos);
+             CHECK(g.unload_world() && g.server.scene_explosions.empty() && g.server.audio.voices().empty() &&
+                   g.server.string_count() == 0 && g.server.message_count() == 0 && g.server.list_count() == 0);
+             std::cout << "cycle=" << cycle
+diff --git a/tests/sound_tests.cpp b/tests/sound_tests.cpp
+index 5c6b768..820a21c 100644
+--- a/tests/sound_tests.cpp
++++ b/tests/sound_tests.cpp
+@@ -349,12 +349,12 @@ namespace
+                     CHECK(v->clip->rate == 22050 && v->clip->frames() == 198623 && v->clip->channels == 1);
+                 }
+             }
+-            CHECK(ids.size() == 4 && counts[EntryState::Created] == 187 && counts[EntryState::WorldSound] == 4 &&
+-                  counts[EntryState::Unsupported] == 17 && counts[EntryState::EditorOnly] == 372 &&
++            CHECK(ids.size() == 4 && counts[EntryState::Created] == 202 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::Unsupported] == 2 && counts[EntryState::EditorOnly] == 372 &&
+                   !counts[EntryState::Failed]);
+-            CHECK(g.objects.snapshot().size() == 194 && g.server.audio.voices().size() == 4 &&
++            CHECK(g.objects.snapshot().size() == 224 && g.server.audio.voices().size() == 4 &&
+                   g.server.audio.cached_clips() == 1);
+-            CHECK(g.enter_player(error) && g.objects.snapshot().size() == 197 && g.step(1.0 / 60));
++            CHECK(g.enter_player(error) && g.objects.snapshot().size() == 227 && g.step(1.0 / 60));
+             // Advance actual sample clocks across a full retail clip without adding unrelated physics work.
+             CHECK(g.server.advance_audio(20, {}, {}));
+             for (auto id : ids)
+@@ -366,7 +366,7 @@ namespace
+             const auto pos = g.server.audio.get(ids.front())->position;
+             CHECK(g.server.advance_audio(.02, pos, {}) && g.server.audio.peak > 0 &&
+                   g.server.audio.mixed_frames == 960);
+-            CHECK(!g.run_world(error) && error.find("17 uninstantiated") != std::string::npos);
++            CHECK(!g.run_world(error) && error.find("2 uninstantiated") != std::string::npos);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_clips());
+             for (auto id : ids)
+diff --git a/tests/sprite_tests.cpp b/tests/sprite_tests.cpp
+index 49a93e1..5bee677 100644
+--- a/tests/sprite_tests.cpp
++++ b/tests/sprite_tests.cpp
+@@ -380,10 +380,10 @@ namespace
+                       !r->sprite->translucent);
+                 weak = r->sprite;
+             }
+-            CHECK(sprites == 12 && counts[EntryState::Created] == 187 && counts[EntryState::WorldSound] == 4 &&
+-                  counts[EntryState::Unsupported] == 17 && counts[EntryState::EditorOnly] == 372 &&
++            CHECK(sprites == 12 && counts[EntryState::Created] == 202 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::Unsupported] == 2 && counts[EntryState::EditorOnly] == 372 &&
+                   counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 194 && g.enter_player(error) && g.objects.snapshot().size() == 197 &&
++            CHECK(g.objects.snapshot().size() == 224 && g.enter_player(error) && g.objects.snapshot().size() == 227 &&
+                   g.step(.02));
+             for (auto id : g.objects.snapshot())
+             {
+@@ -391,8 +391,8 @@ namespace
+                 if (r->sprite)
+                     CHECK(r->sprite_track.frame == 0 && std::abs(r->sprite_track.milliseconds - 20) < 1e-6);
+             }
+-            CHECK(g.objects.snapshot().size() == 189 && g.objects.attachments().size() == 1 && !g.run_world(error) &&
+-                  error.find("17 uninstantiated") != std::string::npos);
++            CHECK(g.objects.snapshot().size() == 229 && g.objects.attachments().size() == 11 && !g.run_world(error) &&
++                  error.find("2 uninstantiated") != std::string::npos);
+             CHECK(g.unload_world() && weak.expired() && g.objects.snapshot().empty() && g.server.string_count() == 0 &&
+                   g.server.message_count() == 0 && g.server.list_count() == 0);
+             std::cout << "cycle=" << cycle
+diff --git a/tests/weapon_tests.cpp b/tests/weapon_tests.cpp
+index 83ba863..422c495 100644
+--- a/tests/weapon_tests.cpp
++++ b/tests/weapon_tests.cpp
+@@ -165,8 +165,15 @@ namespace
+         fire.alternate = true;
+         CHECK(game.server_shell.OnMessage(game.local_client, fire) == FireResult::Fired);
+         CHECK(weapon->last_shot.damage >= 10 && weapon->last_shot.damage <= 20);
++        const auto before_factor = victim->damage.m_fHitPoints;
++        inv.damage_multiplier = .125f; // Original easy Cultist: 0.5 * 0.25.
++        CHECK(game.server_shell.OnMessage(game.local_client, fire) == FireResult::Fired);
++        CHECK(std::abs(victim->damage.m_fHitPoints - (before_factor - weapon->last_shot.damage * .125f)) < .001f);
++        inv.damage_multiplier = std::numeric_limits<float>::quiet_NaN();
++        CHECK(game.server_shell.OnMessage(game.local_client, fire) == FireResult::Invalid);
++        inv.damage_multiplier = 1;
+         fire.weapon = 17;
+-        CHECK(game.server_shell.OnMessage(game.local_client, fire) == FireResult::Invalid && inv.GetAmmoCount(1) == 47);
++        CHECK(game.server_shell.OnMessage(game.local_client, fire) == FireResult::Invalid && inv.GetAmmoCount(1) == 46);
+         fire.weapon = 1;
+         fire.direction.x = std::numeric_limits<float>::quiet_NaN();
+         CHECK(game.server_shell.OnMessage(game.local_client, fire) == FireResult::Invalid);
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index c124b25..e863020 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -1,6 +1,6 @@
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 194 original instances, 116 BSP models")
++if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 224 original instances, 116 BSP models")
+     message(FATAL_ERROR "World inspection: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-player
+@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 17" OR NOT out MATCHES "remaining mover classes")
++if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 2" OR NOT out MATCHES "remaining mover classes")
+     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 14074d3..17ebfce 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -1,4 +1,5 @@
+ #include "audio_fixture.h"
++#include "game/original/AI_Mgr.h"
+ #include "game/original/GameStartPoint.h"
+ #include "game/original/Key.h"
+ #include "game/original/PathPoint.h"
+@@ -648,13 +649,25 @@ namespace
+         CHECK(game.world.version == 56);
+         CHECK(game.world.objects.size() == 580);
+         CHECK(game.world.models.size() == 116);
+-        CHECK(game.objects.snapshot().size() == 194);
++        CHECK(game.objects.snapshot().size() == 224);
+         CHECK(game.world.models[0].points.size() == 4996);
+         CHECK(game.world.models[0].polygons.size() == 3367);
+         CHECK(game.resources.find(game.world_path)->overrides == 1);
+         CHECK(game.entries[0].state == EntryState::Created);
+         CHECK(game.step(.016));
+-        CHECK(game.server.service_calls["SetObjectDims"] == 30);
++        unsigned suspended = 0;
++        for (auto id : game.objects.snapshot())
++            if (const auto* a = dynamic_cast<const AI_Mgr*>(game.objects.get(id)->game.get()); a && a->runtime_failed)
++            {
++                // No player: original enemy-list fallback can sense self. The checked
++                // non-owning link contract rejects self; preserve the visible failure.
++                ++suspended;
++                CHECK(a->runtime_error.find("Target assignment requires distinct live objects") != std::string::npos);
++                CHECK(game.objects.get(id)->activity == OBJSTATE_INACTIVE);
++                std::cout << "No-player NPC " << game.objects.get(id)->state.m_Name << ": " << a->runtime_error << '\n';
++            }
++        CHECK(suspended == 3);
++        CHECK(game.server.service_calls["SetObjectDims"] == 53);
+         CHECK(game.server.service_calls["GetPropGeneric"] > 0);
+         for (const auto& [name, count] : game.server.service_calls)
+             std::cout << "Service " << name << ": " << count << '\n';
+diff --git a/tests/worldpath_tests.cpp b/tests/worldpath_tests.cpp
+index bde688b..31fc370 100644
+--- a/tests/worldpath_tests.cpp
++++ b/tests/worldpath_tests.cpp
+@@ -352,8 +352,8 @@ namespace
+             }
+             CHECK(moves == 297 && blocked == 2 && !f->active && f->processed == 3 && close(r->state.m_Pos, last));
+             CHECK(!close(last, initial) && !close(last, vector_add(f->keys.back().position, f->targets[0].offset)));
+-            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 189 &&
+-                  g.objects.attachments().size() == 1);
++            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 229 &&
++                  g.objects.attachments().size() == 11);
+             std::cout << "cycle=" << cycle << " moves=" << moves << " blocks=" << blocked << " final=" << last.x << ','
+                       << last.y << ',' << last.z << " consumed_keys=9 runtime=188\n";
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.server.string_count() &&

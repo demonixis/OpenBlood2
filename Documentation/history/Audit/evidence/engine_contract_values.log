@@ -1,0 +1,3 @@
+precreate_struct_x=42.00 stored_object_x=0.00 initial_reason=0
+callback_requested_delay=0.01 stored_delay=1.00
+updates_after_two_20ms_frames=1

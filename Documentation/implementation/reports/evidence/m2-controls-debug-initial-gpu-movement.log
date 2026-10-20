@@ -1,0 +1,26 @@
+75/491 Testing: gpu.movement
+75/491 Test: gpu.movement
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--movement-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.movement" start time: Oct 16 16:21 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 224 original instances, 116 BSP models
+[info] Movement: hidden distance=0, jumps=0, landings=1, ground=true, forward frames=0, jump frames=0
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/movement.png
+<end of output>
+Test time =   9.00 sec
+----------------------------------------------------------
+Test Failed.
+"gpu.movement" end time: Oct 16 16:21 CEST
+"gpu.movement" time elapsed: 00:00:08
+----------------------------------------------------------

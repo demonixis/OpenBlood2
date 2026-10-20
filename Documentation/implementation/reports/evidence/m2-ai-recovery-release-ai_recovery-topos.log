@@ -1,0 +1,14 @@
+439/447 Testing: ai_recovery.topos
+439/447 Test: ai_recovery.topos
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_recovery_tests" "topos"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_recovery.topos" start time: Oct 16 14:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.topos" end time: Oct 16 14:07 CEST
+"ai_recovery.topos" time elapsed: 00:00:00
+----------------------------------------------------------

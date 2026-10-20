@@ -1,0 +1,4 @@
+blocked_time=3 primary_polygon=1209 fraction=0.560681 normal=0,0,1
+blocked_time=3.01666 primary_polygon=1209 fraction=0.896829 normal=0,0,1
+diagnostic moves=297 blocks=2 objects=233 attachments=11
+subway:356: r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/tmp/b2-npc-links.py", line 15, in <module>
+    assert not bad,bad
+           ^^^^^^^
+AssertionError: [('/home/yann/projects/lithtech/Documentation/Implementation/m2_gpu_lifetime.md', 'evidence/m2-gpu-lifetime.json')]

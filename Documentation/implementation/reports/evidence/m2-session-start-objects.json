@@ -1,0 +1,461 @@
+[
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "builtin_model"
+    ],
+    "code": 0,
+    "seconds": 0.0035493930045049638
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "original_objects"
+    ],
+    "code": 0,
+    "seconds": 0.0034612599993124604
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "nested_creation"
+    ],
+    "code": 0,
+    "seconds": 0.003439093998167664
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "reasons_properties"
+    ],
+    "code": 0,
+    "seconds": 0.0034423869801685214
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "scheduling"
+    ],
+    "code": 0,
+    "seconds": 0.0034363470040261745
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "deferred_removal"
+    ],
+    "code": 0,
+    "seconds": 0.0033931910002138466
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "aggregate_dispatch"
+    ],
+    "code": 0,
+    "seconds": 0.00343799201073125
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "handles_selection"
+    ],
+    "code": 0,
+    "seconds": 0.0034422299941070378
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "links_lists"
+    ],
+    "code": 0,
+    "seconds": 0.003446768008871004
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "messages_strings"
+    ],
+    "code": 0,
+    "seconds": 0.007421799004077911
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "message_churn"
+    ],
+    "code": 0,
+    "seconds": 1.5663172109925654
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "message_limit"
+    ],
+    "code": 0,
+    "seconds": 0.11386943701654673
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "unsupported_teardown"
+    ],
+    "code": 0,
+    "seconds": 0.015625567990355194
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_contract_tests",
+      "creation_failures"
+    ],
+    "code": 0,
+    "seconds": 0.00778743700357154
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_snapshot_tests",
+      "membership"
+    ],
+    "code": 0,
+    "seconds": 0.0035864039964508265
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_snapshot_tests",
+      "callbacks"
+    ],
+    "code": 0,
+    "seconds": 0.003442984016146511
+  },
+  {
+    "config": "debug",
+    "command": [
+      "build/debug/tests/object_snapshot_tests",
+      "churn"
+    ],
+    "code": 0,
+    "seconds": 0.06381815500208177
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "builtin_model"
+    ],
+    "code": 0,
+    "seconds": 0.003513711999403313
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "original_objects"
+    ],
+    "code": 0,
+    "seconds": 0.0034890089882537723
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "nested_creation"
+    ],
+    "code": 0,
+    "seconds": 0.0014088639873079956
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "reasons_properties"
+    ],
+    "code": 0,
+    "seconds": 0.0034377379924990237
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "scheduling"
+    ],
+    "code": 0,
+    "seconds": 0.0013893979776185006
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "deferred_removal"
+    ],
+    "code": 0,
+    "seconds": 0.0013230319891590625
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "aggregate_dispatch"
+    ],
+    "code": 0,
+    "seconds": 0.0013802970061078668
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "handles_selection"
+    ],
+    "code": 0,
+    "seconds": 0.0034159100032411516
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "links_lists"
+    ],
+    "code": 0,
+    "seconds": 0.0013373009860515594
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "messages_strings"
+    ],
+    "code": 0,
+    "seconds": 0.0033858310198411345
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "message_churn"
+    ],
+    "code": 0,
+    "seconds": 0.11366935199475847
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "message_limit"
+    ],
+    "code": 0,
+    "seconds": 0.031711718009319156
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "unsupported_teardown"
+    ],
+    "code": 0,
+    "seconds": 0.00351315998705104
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_contract_tests",
+      "creation_failures"
+    ],
+    "code": 0,
+    "seconds": 0.003432639001403004
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_snapshot_tests",
+      "membership"
+    ],
+    "code": 0,
+    "seconds": 0.001383978989906609
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_snapshot_tests",
+      "callbacks"
+    ],
+    "code": 0,
+    "seconds": 0.0013664099969901145
+  },
+  {
+    "config": "release",
+    "command": [
+      "build/release/tests/object_snapshot_tests",
+      "churn"
+    ],
+    "code": 0,
+    "seconds": 0.00754652198520489
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "builtin_model"
+    ],
+    "code": 0,
+    "seconds": 0.031776446994626895
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "original_objects"
+    ],
+    "code": 0,
+    "seconds": 0.031722406012704596
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "nested_creation"
+    ],
+    "code": 0,
+    "seconds": 0.031679485022323206
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "reasons_properties"
+    ],
+    "code": 0,
+    "seconds": 0.03179331700084731
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "scheduling"
+    ],
+    "code": 0,
+    "seconds": 0.031748276989674196
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "deferred_removal"
+    ],
+    "code": 0,
+    "seconds": 0.0318370160239283
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "aggregate_dispatch"
+    ],
+    "code": 0,
+    "seconds": 0.031757722987094894
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "handles_selection"
+    ],
+    "code": 0,
+    "seconds": 0.03186565299984068
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "links_lists"
+    ],
+    "code": 0,
+    "seconds": 0.031780768011230975
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "messages_strings"
+    ],
+    "code": 0,
+    "seconds": 0.06422484299400821
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "message_churn"
+    ],
+    "code": 0,
+    "seconds": 5.927558995987056
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "message_limit"
+    ],
+    "code": 0,
+    "seconds": 0.4144439279916696
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "unsupported_teardown"
+    ],
+    "code": 0,
+    "seconds": 0.06396211500396021
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_contract_tests",
+      "creation_failures"
+    ],
+    "code": 0,
+    "seconds": 0.06396777098416351
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_snapshot_tests",
+      "membership"
+    ],
+    "code": 0,
+    "seconds": 0.031872864987235516
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_snapshot_tests",
+      "callbacks"
+    ],
+    "code": 0,
+    "seconds": 0.03172811900731176
+  },
+  {
+    "config": "sanitize",
+    "command": [
+      "build/sanitize/tests/object_snapshot_tests",
+      "churn"
+    ],
+    "code": 0,
+    "seconds": 0.16406886800541542
+  }
+]

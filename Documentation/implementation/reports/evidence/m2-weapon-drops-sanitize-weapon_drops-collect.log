@@ -1,0 +1,14 @@
+455/464 Testing: weapon_drops.collect
+455/464 Test: weapon_drops.collect
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_drop_tests" "collect" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-drop-fixtures/collect"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_drops.collect" start time: Oct 16 16:12 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_drops.collect" end time: Oct 16 16:12 CEST
+"weapon_drops.collect" time elapsed: 00:00:00
+----------------------------------------------------------

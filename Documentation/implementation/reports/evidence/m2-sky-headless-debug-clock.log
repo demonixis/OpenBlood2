@@ -1,0 +1,28 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start  19: cli.help
+1/8 Test  #19: cli.help .........................   Passed    0.01 sec
+    Start  20: cli.unknown
+2/8 Test  #20: cli.unknown ......................   Passed    0.01 sec
+    Start  21: cli.missing_data
+3/8 Test  #21: cli.missing_data .................   Passed    0.01 sec
+    Start  22: cli.missing_config
+4/8 Test  #22: cli.missing_config ...............   Passed    0.01 sec
+    Start  23: cli.metadata
+5/8 Test  #23: cli.metadata .....................   Passed    0.01 sec
+    Start  49: cli.world_modes
+6/8 Test  #49: cli.world_modes ..................   Passed    1.57 sec
+    Start 651: session_playback.policy
+7/8 Test #651: session_playback.policy ..........   Passed    0.00 sec
+    Start 652: session_playback.private
+8/8 Test #652: session_playback.private .........   Passed    9.65 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+cli                 =   0.05 sec*proc (5 tests)
+headless            =  11.27 sec*proc (8 tests)
+private             =  11.21 sec*proc (2 tests)
+session_playback    =   9.65 sec*proc (2 tests)
+world               =   1.57 sec*proc (1 test)
+
+Total Test time (real) =  11.28 sec

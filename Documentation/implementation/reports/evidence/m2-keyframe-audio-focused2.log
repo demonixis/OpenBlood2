@@ -1,0 +1,21 @@
+Test project <Blood2>/build/debug
+    Start 241: keyframe_audio.private
+    Start 239: keyframe_audio.lifetime
+1/5 Test #239: keyframe_audio.lifetime ..........   Passed    0.01 sec
+    Start 240: keyframe_audio.failures
+2/5 Test #240: keyframe_audio.failures ..........   Passed    0.01 sec
+    Start 238: keyframe_audio.replacement
+3/5 Test #238: keyframe_audio.replacement .......   Passed    0.01 sec
+    Start 237: keyframe_audio.timeline
+4/5 Test #237: keyframe_audio.timeline ..........   Passed    0.01 sec
+5/5 Test #241: keyframe_audio.private ...........   Passed   10.40 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+audio        =  10.42 sec*proc (5 tests)
+headless     =  10.42 sec*proc (5 tests)
+keyframes    =  10.42 sec*proc (5 tests)
+private      =  10.40 sec*proc (1 test)
+
+Total Test time (real) =  10.41 sec

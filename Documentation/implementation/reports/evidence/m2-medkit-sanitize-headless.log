@@ -1,0 +1,142 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 594: player_controls.private
+      Start 531: player_keepalive.private
+ 1/62 Test #531: player_keepalive.private .........   Passed   28.77 sec
+      Start 527: player_restore.private
+ 2/62 Test #594: player_controls.private ..........   Passed   35.79 sec
+      Start 222: cinematics.catalog
+ 3/62 Test #527: player_restore.private ...........   Passed    9.36 sec
+      Start 506: inventory_state.private
+ 4/62 Test #506: inventory_state.private ..........   Passed    9.72 sec
+      Start 223: cinematics.subway
+ 5/62 Test #223: cinematics.subway ................   Passed    6.57 sec
+      Start  60: player.private
+ 6/62 Test #222: cinematics.catalog ...............   Passed   21.16 sec
+      Start 172: pickups.catalog
+ 7/62 Test  #60: player.private ...................   Passed   15.96 sec
+      Start 529: player_keepalive.fallback
+ 8/62 Test #529: player_keepalive.fallback ........   Passed    0.15 sec
+      Start 525: player_restore.failures
+ 9/62 Test #525: player_restore.failures ..........   Passed    0.09 sec
+      Start 526: player_restore.lifetime
+10/62 Test #526: player_restore.lifetime ..........   Passed    0.08 sec
+      Start 530: player_keepalive.failures
+11/62 Test #530: player_keepalive.failures ........   Passed    0.07 sec
+      Start 524: player_restore.roundtrip
+12/62 Test #524: player_restore.roundtrip .........   Passed    0.05 sec
+      Start 528: player_keepalive.named
+13/62 Test #528: player_keepalive.named ...........   Passed    0.05 sec
+      Start 221: cinematics.device
+14/62 Test #221: cinematics.device ................   Passed    0.09 sec
+      Start   1: objects.builtin_model
+15/62 Test   #1: objects.builtin_model ............   Passed    0.02 sec
+      Start  11: objects.unsupported_teardown
+16/62 Test  #11: objects.unsupported_teardown .....   Passed    0.05 sec
+      Start 505: inventory_state.capture
+17/62 Test #505: inventory_state.capture ..........   Passed    0.04 sec
+      Start 502: inventory_state.roundtrip
+18/62 Test #502: inventory_state.roundtrip ........   Passed    0.03 sec
+      Start  10: objects.messages_strings
+19/62 Test  #10: objects.messages_strings .........   Passed    0.04 sec
+      Start 503: inventory_state.malformed
+20/62 Test #503: inventory_state.malformed ........   Passed    0.03 sec
+      Start 504: inventory_state.rollback
+21/62 Test #504: inventory_state.rollback .........   Passed    0.03 sec
+      Start 592: player_controls.mouse
+22/62 Test #592: player_controls.mouse ............   Passed    0.02 sec
+      Start 219: cinematics.lifetime
+23/62 Test #219: cinematics.lifetime ..............   Passed    0.04 sec
+      Start 591: player_controls.keys
+24/62 Test #591: player_controls.keys .............   Passed    0.01 sec
+      Start 593: player_controls.gates
+25/62 Test #593: player_controls.gates ............   Passed    0.01 sec
+      Start 216: cinematics.mixer
+26/62 Test #216: cinematics.mixer .................   Passed    0.04 sec
+      Start 220: cinematics.failures
+27/62 Test #220: cinematics.failures ..............   Passed    0.04 sec
+      Start 217: cinematics.spatial
+28/62 Test #217: cinematics.spatial ...............   Passed    0.04 sec
+      Start 218: cinematics.sequence
+29/62 Test #218: cinematics.sequence ..............   Passed    0.04 sec
+      Start  12: objects.creation_failures
+30/62 Test  #12: objects.creation_failures ........   Passed    0.03 sec
+      Start 163: pickups.defaults
+31/62 Test #163: pickups.defaults .................   Passed    0.11 sec
+      Start 164: pickups.ammunition
+32/62 Test #164: pickups.ammunition ...............   Passed    0.09 sec
+      Start 165: pickups.statistics
+33/62 Test #165: pickups.statistics ...............   Passed    0.08 sec
+      Start 171: pickups.resources
+34/62 Test #171: pickups.resources ................   Passed    0.09 sec
+      Start 169: pickups.rejection
+35/62 Test #169: pickups.rejection ................   Passed    0.09 sec
+      Start 168: pickups.spawning
+36/62 Test #168: pickups.spawning .................   Passed    0.09 sec
+      Start 215: cinematics.decode
+37/62 Test #215: cinematics.decode ................   Passed    0.02 sec
+      Start 170: pickups.callbacks
+38/62 Test #170: pickups.callbacks ................   Passed    0.08 sec
+      Start   4: objects.reasons_properties
+39/62 Test   #4: objects.reasons_properties .......   Passed    0.02 sec
+      Start 167: pickups.contact
+40/62 Test #167: pickups.contact ..................   Passed    0.08 sec
+      Start 166: pickups.protocol
+41/62 Test #166: pickups.protocol .................   Passed    0.07 sec
+      Start   2: objects.original_objects
+42/62 Test   #2: objects.original_objects .........   Passed    0.02 sec
+      Start   9: objects.links_lists
+43/62 Test   #9: objects.links_lists ..............   Passed    0.02 sec
+      Start   6: objects.deferred_removal
+44/62 Test   #6: objects.deferred_removal .........   Passed    0.02 sec
+      Start   8: objects.handles_selection
+45/62 Test   #8: objects.handles_selection ........   Passed    0.02 sec
+      Start   3: objects.nested_creation
+46/62 Test   #3: objects.nested_creation ..........   Passed    0.02 sec
+      Start   5: objects.scheduling
+47/62 Test   #5: objects.scheduling ...............   Passed    0.02 sec
+      Start   7: objects.aggregate_dispatch
+48/62 Test   #7: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start  56: player.lifecycle
+49/62 Test  #56: player.lifecycle .................   Passed    0.05 sec
+      Start  57: player.rollback
+50/62 Test  #57: player.rollback ..................   Passed    0.05 sec
+      Start  58: player.messages
+51/62 Test  #58: player.messages ..................   Passed    0.05 sec
+      Start  59: player.callbacks
+52/62 Test  #59: player.callbacks .................   Passed    0.04 sec
+      Start  55: player.handles
+53/62 Test  #55: player.handles ...................   Passed    0.03 sec
+      Start 723: medkit.rules
+54/62 Test #723: medkit.rules .....................   Passed    0.08 sec
+      Start 724: medkit.pickup
+55/62 Test #724: medkit.pickup ....................   Passed    0.08 sec
+      Start 725: medkit.commands
+56/62 Test #725: medkit.commands ..................   Passed    0.08 sec
+      Start 726: medkit.transport
+57/62 Test #726: medkit.transport .................   Passed    0.08 sec
+      Start 727: medkit.restore
+58/62 Test #727: medkit.restore ...................   Passed    0.10 sec
+      Start 728: medkit.lifetime
+59/62 Test #728: medkit.lifetime ..................   Passed    0.07 sec
+      Start 729: medkit.input
+60/62 Test #729: medkit.input .....................   Passed    0.02 sec
+      Start 730: medkit.private
+61/62 Test #172: pickups.catalog ..................   Passed   17.55 sec
+62/62 Test #730: medkit.private ...................   Passed    7.37 sec
+
+100% tests passed, 0 tests failed out of 62
+
+Label Time Summary:
+cinematics          =  28.04 sec*proc (9 tests)
+headless            = 155.02 sec*proc (62 tests)
+inventory_state     =   9.86 sec*proc (5 tests)
+medkit              =   7.88 sec*proc (8 tests)
+objects             =   0.28 sec*proc (12 tests)
+pickups             =  18.33 sec*proc (10 tests)
+player              =  16.18 sec*proc (6 tests)
+player_controls     =  35.83 sec*proc (4 tests)
+player_keepalive    =  29.04 sec*proc (4 tests)
+player_restore      =   9.58 sec*proc (4 tests)
+private             = 152.26 sec*proc (9 tests)
+
+Total Test time (real) =  80.54 sec

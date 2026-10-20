@@ -1,0 +1,17 @@
+530/530 Testing: character_nodes.private
+530/530 Test: character_nodes.private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/character_nodes_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"character_nodes.private" start time: Oct 16 18:56 CEST
+Output:
+----------------------------------------------------------
+cycle=0 Caleb triangles hidden=809 reset=941; isolated Load tail, no restored client
+cycle=1 Caleb triangles hidden=809 reset=941; isolated Load tail, no restored client
+cycle=2 Caleb triangles hidden=809 reset=941; isolated Load tail, no restored client
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"character_nodes.private" end time: Oct 16 18:56 CEST
+"character_nodes.private" time elapsed: 00:00:00
+----------------------------------------------------------

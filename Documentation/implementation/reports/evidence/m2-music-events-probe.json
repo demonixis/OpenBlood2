@@ -1,0 +1,36 @@
+{
+  "binary": "IMUSIC25.DLL",
+  "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "entry_rva": "0x173ee..0x17595",
+  "intercepted": [
+    "rand with explicit values",
+    "one bounded allocation",
+    "note-on send captured, not played"
+  ],
+  "synthetic_cases": 16,
+  "synthetic_results": [
+    "0100d003000094306490040000843064",
+    "0101d003000094306490040000843064",
+    "0101d003000094306490040000843064",
+    "0101d003000094302690040000843026",
+    "0103d103000094306592040000843065",
+    "01038f0400009430650a060000843065",
+    "0102d103000094307f9104000084307f",
+    "0103920300009430478e040000843047",
+    "0000",
+    "0103a7000000937801a8000000837801",
+    "0103a7000000930b01a8000000830b01",
+    "0103a7000000930501a8000000830501",
+    "0103a7000000937a01a8000000837a01",
+    "0103a7000000930a01a8000000830a01",
+    "0100d003000094486490040000844864",
+    "0100d0030000993d6490040000893d64"
+  ],
+  "legacy_overflow_observation": "0100fe7f0080943c64be800080843c64",
+  "notes": 7030,
+  "diagnostic_decisions": 14060,
+  "events": 28120,
+  "canonical_sha256": "204e4697dd20800d384271823e355187b284acdf91a0c44e25ee36a6a9b21008",
+  "canonical_fnv64": 7927161452939007316,
+  "scope": "Post-harmonization note timing, transpose, optional explicit percussion remap, velocity and paired messages. Private probes use raw pitch and synthetic context, not actual song pitches/times."
+}

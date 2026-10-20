@@ -1,0 +1,1053 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 1d1769e..a8c4ead 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -494,3 +494,5 @@ Read [contracts](docs/PLAYER_CONTROL_CONTRACTS.md). Preserve UI-only uncaptured
+ F3 captures, Escape releases; --view-world requests capture initially. Next priorities are non-attacking NPCs and train glass, before further cosmetic FX. M2 remains open.
+ 
+ The [NPC entry correction](../Documentation/Implementation/M2_NPC_ENTRY.md) holds interactive simulation until original player entry. Read [contracts](docs/SESSION_PLAYBACK_CONTRACTS.md). Preserve explicit diagnostic stepping, deferred removal while waiting, original intro/AI rules and visible runtime failures. Tests prove authored Cultist fire/damage after delayed application entry without forced AI targets. Broader combat remains unverified; train glass is next before more FX. M2 stays open.
++
++The [train-window correction](../Documentation/Implementation/M2_WORLD_ALPHA.md) replaces the intentional pink marker with actual DTX alpha on authored transparent world faces. Read [contracts](docs/WORLD_ALPHA_CONTRACTS.md) before extending world materials/passes. Preserve opaque failure markers, sky precedence, per-face posed sorting, shared GPU ownership, no alpha depth writes and separate submission inspection. Global translucent FX ordering and retail renderer parity remain unverified; required services, safe NEW_LEVEL and M2 stay open.
+diff --git a/README.md b/README.md
+index cf3756f..55cc34e 100644
+--- a/README.md
++++ b/README.md
+@@ -538,3 +538,5 @@ The [keyboard/mouse continuation](../Documentation/Implementation/M2_PLAYER_CONT
+ NPC attack and train-glass reports remain unresolved; M2 is still incomplete.
+ 
+ [Interactive entry correction](../Documentation/Implementation/M2_NPC_ENTRY.md): a loaded world now waits for player entry instead of advancing NPCs without a player. Use **Enter player** in the header, or launch `--view-world` for immediate entry. Session exposes NPC ready/failed/active counts. Autonomous fire/damage is verified in a labelled SubwayA encounter; train glass and complete M2 remain open.
++
++[Train-window correction](../Documentation/Implementation/M2_WORLD_ALPHA.md): the 31 transparent SubwayA faces now bind the original dirtyglass texture and blend its decoded alpha. Hidden-UI/reload/GPU checks cover the shared-depth pass; missing resources remain explicit. Lighting, global FX transparency ordering, required services and M2 remain incomplete.
+diff --git a/docs/M2_WORLD_ALPHA_SOURCES.json b/docs/M2_WORLD_ALPHA_SOURCES.json
+new file mode 100644
+index 0000000..57b10c6
+--- /dev/null
++++ b/docs/M2_WORLD_ALPHA_SOURCES.json
+@@ -0,0 +1,27 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "1eba2fc1078a31a4884d5ba4dab8ffe9722108fa",
++  "source_files": [
++    {
++      "path": "sources/lithtech/runtime/world/src/de_world.h",
++      "sha256": "04f5649e6bfbd7c67bf7f8862919cebb6ac28104a3e2f1504efc1331d639b0c5",
++      "use": "Later-generation surface bit 3 (translucent), bits 2/4 reference only; not proof of complete retail v56 parity"
++    },
++    {
++      "path": "NoMadEngine/nomadengine/src/formats/dtx_parser.cpp",
++      "sha256": "c5f02d6d927800536b85eee14671700ac670144f74fe43046386d04a22ebe461",
++      "use": "Revisited historical alpha donor; existing stricter -2 decoder retained, no code imported"
++    }
++  ],
++  "adaptations": [
++    "New engine presentation only; no original game code imported or changed.",
++    "Existing strict DTX decoder, authored DAT flags, UVs and current object transforms retained.",
++    "Existing sprite alpha shader reused with the world repeat sampler and unit modulation.",
++    "Polygon-center ordering is replacement rendering, not retail parity."
++  ],
++  "remaining": [
++    "global translucent ordering across effects/intersections",
++    "lighting, sky, liquids, generic object alpha",
++    "required original services, safe NEW_LEVEL, M2 acceptance"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 76fe113..08e6eef 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -832,3 +832,13 @@ See [ledger](M2_PLAYER_CONTROL_SOURCES.json).
+ ## Interactive NPC entry preservation
+ 
+ The [application playback policy](SESSION_PLAYBACK_CONTRACTS.md) holds a loaded world until original player entry. No new original method is imported or AI/faction rule altered; see [source context](M2_NPC_ENTRY_SOURCES.json).
++
++## Transparent world presentation
++
++New engine code binds existing decoded DTX alpha on authored bit-3 faces, reuses
++the packaged sprite shader with a world repeat sampler and sorts current posed
++polygon centers. No original game method or donor implementation is imported.
++The later LithTech surface definition is a reference, not a retail v56 renderer
++specification. See [ledger](M2_WORLD_ALPHA_SOURCES.json),
++[contracts](WORLD_ALPHA_CONTRACTS.md) and
++[evidence](../../Documentation/Implementation/M2_WORLD_ALPHA.md).
+diff --git a/docs/SPRITE_VIEW_CONTRACTS.md b/docs/SPRITE_VIEW_CONTRACTS.md
+index 8e9de9a..726ad26 100644
+--- a/docs/SPRITE_VIEW_CONTRACTS.md
++++ b/docs/SPRITE_VIEW_CONTRACTS.md
+@@ -87,3 +87,5 @@ now implements the selected Tesla component. Earlier blanket flame omissions are
+ historical for that recipe; surface illumination and the actual M2 gate remain open.
+ 
+ Continuation: [weapon impact flash/smoke](WEAPON_SPRITE_CONTRACTS.md) supersedes the earlier blanket impact-visual omission for wood/stone bullet sprites only. Other composite components and M2 remain open.
++
++The [world-alpha correction](WORLD_ALPHA_CONTRACTS.md) supersedes earlier blanket world-opacity/transparent-marker statements for resolved bit-3 surfaces. Sky and rejected resources remain opaque markers; ordinary surfaces still ignore alpha. The new sorted world pass precedes the separately sorted translucent FX passes. M2 remains incomplete.
+diff --git a/docs/TEXTURE_CONTRACTS.md b/docs/TEXTURE_CONTRACTS.md
+index 57deb3c..c56669c 100644
+--- a/docs/TEXTURE_CONTRACTS.md
++++ b/docs/TEXTURE_CONTRACTS.md
+@@ -86,3 +86,5 @@ The [sprite presentation continuation](SPRITE_VIEW_CONTRACTS.md) now draws suppo
+ original sprites with actual DTX alpha and shared world/model depth, before view
+ weapons. Earlier blanket sprite-rendering omissions are superseded for this bounded
+ subset. World/model opacity policy is unchanged; required FX and M2 remain open.
++
++The [world-alpha correction](WORLD_ALPHA_CONTRACTS.md) supersedes earlier blanket world-opacity/transparent-marker statements for resolved bit-3 surfaces. Sky and rejected resources remain opaque markers; ordinary surfaces still ignore alpha. The new sorted world pass precedes the separately sorted translucent FX passes. M2 remains incomplete.
+diff --git a/docs/WORLD_ALPHA_CONTRACTS.md b/docs/WORLD_ALPHA_CONTRACTS.md
+new file mode 100644
+index 0000000..4297123
+--- /dev/null
++++ b/docs/WORLD_ALPHA_CONTRACTS.md
+@@ -0,0 +1,82 @@
++# Transparent world surfaces
++
++This playtest correction extends [world textures](TEXTURE_CONTRACTS.md) without
++changing original objects, damage, collision, visibility, resources or dependency
++pins. See [evidence](../../Documentation/Implementation/M2_WORLD_ALPHA.md).
++M2 remains incomplete.
++
++## Selection and data
++
++SubwayA's 31 visible transparent polygons use the exact normalized resource
++`textures/greys/dirtyglass.dtx`. It already decoded successfully before this fix:
++64x64, flags 10, four-bit mask alpha 51–102 (20–40%). The old pink was a deliberate
++surface marker, not a missing file. Invisible faces on the same brushes still
++follow bit 2 exclusion; their `Invisible.dtx` name does not determine visibility.
++
++Surface bit 3 selects blending only when a real texture resolves. Bit 4 sky retains
++its opaque sky marker, even with bit 3. Missing/unsupported textures remain named
++errors and opaque magenta markers, so failure cannot turn geometry invisible.
++Texture-free synthetic diagnostics retain orientation/pink colors. Opaque surfaces
++still ignore texture alpha, including when they share an image with a transparent
++surface. No filename-based alpha or color-key rule is added. DTX decoding, generation
++boundaries, exact-path lookup, resource and vertex budgets are unchanged.
++
++One translucent batch covers one original base-ring polygon. It is never merged
++with another polygon, even with an identical material. Its center is the mean of
++the authored base-ring vertices, stored relative to the same DAT model pivot as
++geometry. UVs remain computed before subtracting that pivot. Degenerate triangles
++remain excluded; a wholly degenerate polygon creates no blend batch.
++
++## Ordering, depth and lifetime
++
++Each frame builds a far-to-near order using the current checked object's transform
++and camera-forward depth of each face center. Equal depths retain input draw/batch
++order. Translation, rotation and camera changes affect the next order; no original
++object handle is cached. Hidden, pending and removed models contribute no draw;
++inactive visible models still can. Unbound/ambiguous identities retain existing
++failures. Ordering validates finite camera/poses, triangle/range bounds, at most
++65,536 instances and one million face instances. The reusable vector needs up to
++24 MB of element storage on this 64-bit build (capacity can be larger); batches
++now occupy 28 bytes each. Existing three-million-vertex mesh limits still apply.
++
++The renderer owns a second pipeline but shares the world's existing vertex buffer,
++images, repeat sampler and depth target. There is no duplicate world upload or
++second simulation integrator. It reuses the existing alpha fragment shader:
++straight source-alpha blending, zero-alpha discard, depth LESS and **no depth
++writes**, unlit mip-zero nearest repeat sampling. Generic object tint/alpha is
++not implemented by this change; world modulation is 1. Sprites keep their existing
++clamp sampler and effect alpha.
++
++The app draws opaque world and opaque character/held models first, then sorted
++world alpha, then the existing separate translucent FX passes and close-view
++weapon. This gives ordinary opaque objects in front of/behind glass correct depth
++and compositing. Sorting is by polygon center; intersecting transparent geometry
++and interleaving with separately sorted translucent FX are not globally correct
++or retail-verified. Sky, lighting, liquid presentation and full renderer parity
++remain later work. No guessed sun or DirLight behavior is introduced.
++
++Alpha draws require `DrawLoad::Load` on a prepared opaque renderer; malformed
++orders reject before opening a render pass. Revision changes clear geometry,
++images and the prepared order; SDL deferred destruction protects in-flight GPU
++work. Pipeline/depth allocations may persist. Format changes invalidate both
++pipelines. Hidden UI and inspector-free builds use the same path.
++
++## Inspection and verification
++
++The 3D tab reports authored transparent faces separately from prepared blend faces
++and actually submitted alpha batches/passes. Its named face list includes hidden
++and unbound models; the existing object visibility and resource errors explain
++why preparation need not mean submission or on-screen visibility. The frame count
++for the ordinary world pass stays distinct from alpha pass submissions.
++
++CPU tests cover shared opaque/transparent materials, missing-resource markers,
++sky precedence, per-face ordering, stable ties, moving/rotating instances, camera
++rotation, invalid bounds/camera, inactive/hidden/pending removal and two private
++world reloads with 31 bound glass faces. GPU pixels cover zero/partial/full alpha,
++opaque black, overlap ordering, opaque geometry between/in front of panes, absent
++depth writes, posed cameras/objects, resize/reupload and rejected draw recovery.
++A real glass12 pane is checked against independent authored UV/decoded-texel
++compositing after two actual loads; full scene captures remain local. Application
++smoke requires 31 prepared/submitted faces through hidden UI and reload with no
++extra world upload. Other platforms, retail pixel parity and human playthroughs
++are not claimed.
+diff --git a/docs/WORLD_VIEW_CONTRACTS.md b/docs/WORLD_VIEW_CONTRACTS.md
+index f51ea22..53f4709 100644
+--- a/docs/WORLD_VIEW_CONTRACTS.md
++++ b/docs/WORLD_VIEW_CONTRACTS.md
+@@ -101,3 +101,5 @@ The [sprite presentation continuation](SPRITE_VIEW_CONTRACTS.md) now draws suppo
+ original sprites with actual DTX alpha and shared world/model depth, before view
+ weapons. Earlier blanket sprite-rendering omissions are superseded for this bounded
+ subset. World/model opacity policy is unchanged; required FX and M2 remain open.
++
++The [world-alpha correction](WORLD_ALPHA_CONTRACTS.md) supersedes earlier blanket world-opacity/transparent-marker statements for resolved bit-3 surfaces. Sky and rejected resources remain opaque markers; ordinary surfaces still ignore alpha. The new sorted world pass precedes the separately sorted translucent FX passes. M2 remains incomplete.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index c24d2cd..913b114 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -450,8 +450,8 @@ namespace OpenBlood2
+                         "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
+                         "the player in Session first, or launch --view-world.");
+                     ImGui::TextWrapped(
+-                        "World textures/models and alpha sprites are unlit. Lightmaps, liquid surfaces, "
+-                        "transparency and sky rendering remain unavailable. Unsupported objects stay in World.");
++                        "World textures/models, glass and alpha sprites are unlit. Lightmaps, liquid surfaces "
++                        "and sky rendering remain unavailable. World alpha uses sorted faces; FX sort separately.");
+                     if (world_mesh && world_render)
+                     {
+                         ImGui::Text("GPU: %llu frames / %llu world uploads", (unsigned long long)world_render->frames,
+@@ -461,8 +461,21 @@ namespace OpenBlood2
+                         ImGui::Text("Unbound models: %zu / excluded containers: %zu", world_render->unbound,
+                                     world_render->containers);
+                         ImGui::Text(
+-                            "Faces: %zu invisible / %zu degenerate / %zu transparent-as-opaque / %zu sky markers",
++                            "Faces: %zu invisible / %zu degenerate / %zu authored transparent / %zu sky markers",
+                             world_mesh->invisible, world_mesh->degenerate, world_mesh->transparent, world_mesh->sky);
++                        ImGui::Text("Alpha: %zu prepared faces / %zu submitted batches / %llu passes",
++                                    world_mesh->blended, world_render->alpha_batches,
++                                    (unsigned long long)world_render->alpha_frames);
++                        if (ImGui::TreeNode("Transparent world faces (including hidden/unbound models)"))
++                        {
++                            for (const auto& range : world_mesh->ranges)
++                                for (const auto& batch : range.batches)
++                                    if (batch.translucent)
++                                        ImGui::Text("%s: %s, %u triangles", range.name.c_str(),
++                                                    world_mesh->materials[batch.material].path.c_str(),
++                                                    batch.count / 3);
++                            ImGui::TreePop();
++                        }
+                         std::size_t decoded = 0, failed = 0;
+                         for (std::size_t i = 1; i < world_mesh->materials.size(); ++i)
+                             world_mesh->materials[i].error.empty() ? ++decoded : ++failed;
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index c2c01c8..8e60bea 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -859,6 +859,16 @@ namespace
+                         SDL_SubmitGPUCommandBuffer(commands);
+                         return 3;
+                     }
++                    if (world_mesh.blended &&
++                        !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
++                                             world_draws, view.position, view.rotation,
++                                             view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
++                                             nullptr, OpenBlood2::WorldPass::Translucent))
++                    {
++                        spdlog::error("Transparent world viewport: {}", error);
++                        SDL_SubmitGPUCommandBuffer(commands);
++                        return 3;
++                    }
+                     if (!explosion_model_scene.world_draws.empty())
+                     {
+                         if (!explosion_model_renderer.prepare(
+@@ -1448,6 +1458,11 @@ namespace
+                     world_mesh.materials[i].error.empty() ? ++decoded : ++missing;
+                 spdlog::info("World textures: decoded={}, rejected={}, RGBA bytes={}, prepared batches={}", decoded,
+                              missing, world_mesh.texture_bytes, world_renderer.stats.batches);
++                spdlog::info("World alpha: prepared={}, submitted={}, passes={}", world_mesh.blended,
++                             world_renderer.stats.alpha_batches, world_renderer.stats.alpha_frames);
++                if (world_mesh.blended != 31 || world_renderer.stats.alpha_batches != 31 ||
++                    world_renderer.stats.alpha_frames != world_renderer.stats.frames)
++                    return 4;
+                 if (decoded < 50 || missing || !viewport_hidden || !viewport_unloaded || !viewport_reloaded ||
+                     world_renderer.stats.uploads != 2 || world_renderer.width() != 1000 ||
+                     world_renderer.height() != 680)
+diff --git a/src/engine/world_renderer.cpp b/src/engine/world_renderer.cpp
+index 182cd90..4a91a16 100644
+--- a/src/engine/world_renderer.cpp
++++ b/src/engine/world_renderer.cpp
+@@ -16,6 +16,8 @@ namespace OpenBlood2
+             SDL_ReleaseGPUTexture(device_, depth_);
+         if (pipeline_)
+             SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
++        if (alpha_pipeline_)
++            SDL_ReleaseGPUGraphicsPipeline(device_, alpha_pipeline_);
+     }
+     void WorldRenderer::clear_geometry()
+     {
+@@ -31,12 +33,24 @@ namespace OpenBlood2
+                 SDL_ReleaseGPUTexture(device_, texture);
+         textures_.clear();
+         revision_ = UINT64_MAX;
+-        stats.triangles = stats.draws = 0;
++        stats.triangles = stats.draws = stats.alpha_batches = 0;
++        alpha_order_.clear();
+     }
+-    bool WorldRenderer::pipeline(SDL_GPUTextureFormat format, std::string& error)
++    bool WorldRenderer::pipeline(SDL_GPUTextureFormat format, std::string& error, bool translucent)
+     {
+-        if (pipeline_ && color_format_ == format)
++        if (color_format_ != format)
++        {
++            if (pipeline_)
++                SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
++            if (alpha_pipeline_)
++                SDL_ReleaseGPUGraphicsPipeline(device_, alpha_pipeline_);
++            pipeline_ = alpha_pipeline_ = nullptr;
++            color_format_ = format;
++        }
++        auto*& selected = translucent ? alpha_pipeline_ : pipeline_;
++        if (selected)
+             return true;
++        const bool alpha = translucent || style_ == DrawStyle::SpriteAlpha;
+         if (!(SDL_GetGPUShaderFormats(device_) & SDL_GPU_SHADERFORMAT_SPIRV))
+         {
+             error = "Diagnostic world renderer currently requires the Vulkan/SPIR-V backend";
+@@ -51,9 +65,9 @@ namespace OpenBlood2
+         info.num_uniform_buffers = 1;
+         auto* vertex = SDL_CreateGPUShader(device_, &info);
+         info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+-        info.code = reinterpret_cast<const Uint8*>(style_ == DrawStyle::SpriteAlpha ? sprite_frag : world_frag);
+-        info.code_size = style_ == DrawStyle::SpriteAlpha ? sizeof(sprite_frag) : sizeof(world_frag);
+-        info.num_uniform_buffers = style_ == DrawStyle::SpriteAlpha ? 1 : 0;
++        info.code = reinterpret_cast<const Uint8*>(alpha ? sprite_frag : world_frag);
++        info.code_size = alpha ? sizeof(sprite_frag) : sizeof(world_frag);
++        info.num_uniform_buffers = alpha ? 1 : 0;
+         info.num_samplers = 1;
+         auto* fragment = SDL_CreateGPUShader(device_, &info);
+         if (!vertex || !fragment)
+@@ -78,7 +92,7 @@ namespace OpenBlood2
+         attributes[2].offset = offsetof(WorldVertex, uv);
+         SDL_GPUColorTargetDescription target{};
+         target.format = format;
+-        if (style_ == DrawStyle::SpriteAlpha)
++        if (alpha)
+         {
+             target.blend_state.enable_blend = true;
+             target.blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+@@ -98,7 +112,7 @@ namespace OpenBlood2
+         create.rasterizer_state.enable_depth_clip = true;
+         create.multisample_state.sample_count = SDL_GPU_SAMPLECOUNT_1;
+         create.depth_stencil_state.enable_depth_test = true;
+-        create.depth_stencil_state.enable_depth_write = style_ == DrawStyle::Opaque;
++        create.depth_stencil_state.enable_depth_write = !alpha;
+         create.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
+         create.target_info.color_target_descriptions = &target;
+         create.target_info.num_color_targets = 1;
+@@ -112,9 +126,7 @@ namespace OpenBlood2
+             error = SDL_GetError();
+             return false;
+         }
+-        if (pipeline_)
+-            SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
+-        pipeline_ = next;
++        selected = next;
+         color_format_ = format;
+         return true;
+     }
+@@ -343,13 +355,22 @@ namespace OpenBlood2
+     }
+     bool WorldRenderer::draw(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target, const WorldMesh& mesh,
+                              std::span<const WorldDraw> draws, DVector eye, DRotation view, bool letterbox,
+-                             std::string& error, DrawLoad load, SDL_GPUTexture* shared_depth)
++                             std::string& error, DrawLoad load, SDL_GPUTexture* shared_depth, WorldPass world_pass)
+     {
+         if (!pipeline_ || !depth_ || (!vertices_ && !mesh.vertices.empty()))
+         {
+             error = "Diagnostic renderer not prepared";
+             return false;
+         }
++        const bool translucent = world_pass == WorldPass::Translucent;
++        if (translucent && (style_ != DrawStyle::Opaque || load != DrawLoad::Load))
++        {
++            error = "Transparent world pass requires loaded opaque depth";
++            return false;
++        }
++        if (translucent &&
++            (!world_alpha_order(mesh, draws, eye, view, alpha_order_, error) || !pipeline(color_format_, error, true)))
++            return false;
+         const Uint32 top = letterbox ? height_ / 6 : 0, height = height_ - 2 * top;
+         const float aspect = float(width_) / float(height);
+         WorldViewUniform uniform;
+@@ -407,16 +428,16 @@ namespace OpenBlood2
+         }
+         SDL_GPUViewport viewport{0, float(top), float(width_), float(height), 0, 1};
+         SDL_SetGPUViewport(pass, &viewport);
+-        SDL_BindGPUGraphicsPipeline(pass, pipeline_);
++        SDL_BindGPUGraphicsPipeline(pass, translucent ? alpha_pipeline_ : pipeline_);
+         if (vertices_)
+         {
+             SDL_GPUBufferBinding binding{vertices_, 0};
+             SDL_BindGPUVertexBuffers(pass, 0, &binding, 1);
+-            for (const auto& d : draws)
++            auto emit = [&](const WorldDraw& d, const WorldBatch* face)
+             {
+                 const auto& r = mesh.ranges[d.range];
+                 if (!r.count)
+-                    continue;
++                    return;
+                 world_view_uniform(eye, view, aspect, d, uniform);
+                 if (load == DrawLoad::ClearDepth)
+                 {
+@@ -425,9 +446,9 @@ namespace OpenBlood2
+                     uniform.projection[3] = -near * far / (far - near);
+                 }
+                 SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
+-                if (style_ == DrawStyle::SpriteAlpha)
++                if (translucent || style_ == DrawStyle::SpriteAlpha)
+                 {
+-                    const std::array<float, 4> modulation{d.alpha, 0, 0, 0};
++                    const std::array<float, 4> modulation{translucent ? 1.f : d.alpha, 0, 0, 0};
+                     SDL_PushGPUFragmentUniformData(commands, 0, modulation.data(), sizeof(modulation));
+                 }
+                 auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material)
+@@ -436,15 +457,33 @@ namespace OpenBlood2
+                     SDL_BindGPUFragmentSamplers(pass, 0, &texture, 1);
+                     SDL_DrawGPUPrimitives(pass, count, 1, first, 0);
+                 };
+-                if (r.batches.empty())
++                if (face)
++                    batch(face->first, face->count, face->material);
++                else if (r.batches.empty())
+                     batch(r.first, r.count, 0);
+                 else
+                     for (const auto& b : r.batches)
+-                        batch(b.first, b.count, b.material);
+-            }
++                        if (style_ == DrawStyle::SpriteAlpha || !b.translucent)
++                            batch(b.first, b.count, b.material);
++            };
++            if (translucent)
++                for (const auto& ordered : alpha_order_)
++                {
++                    const auto& d = draws[ordered.draw];
++                    emit(d, &mesh.ranges[d.range].batches[ordered.batch]);
++                }
++            else
++                for (const auto& d : draws)
++                    emit(d, nullptr);
+         }
+         SDL_EndGPURenderPass(pass);
+-        ++stats.frames;
++        if (translucent)
++        {
++            ++stats.alpha_frames;
++            stats.alpha_batches = alpha_order_.size();
++        }
++        else
++            ++stats.frames;
+         return true;
+     }
+ } // namespace OpenBlood2
+diff --git a/src/engine/world_renderer.h b/src/engine/world_renderer.h
+index 3ed9776..67cb47b 100644
+--- a/src/engine/world_renderer.h
++++ b/src/engine/world_renderer.h
+@@ -15,6 +15,11 @@ namespace OpenBlood2
+         Opaque,
+         SpriteAlpha
+     };
++    enum class WorldPass
++    {
++        Opaque,
++        Translucent
++    };
+     class WorldRenderer
+     {
+       public:
+@@ -29,7 +34,7 @@ namespace OpenBlood2
+                      std::string& error, bool dynamic = false);
+         bool draw(SDL_GPUCommandBuffer*, SDL_GPUTexture*, const WorldMesh&, std::span<const WorldDraw>, DVector eye,
+                   DRotation view, bool letterbox, std::string& error, DrawLoad = DrawLoad::Clear,
+-                  SDL_GPUTexture* shared_depth = nullptr);
++                  SDL_GPUTexture* shared_depth = nullptr, WorldPass = WorldPass::Opaque);
+         SDL_GPUTexture* depth_target() const
+         {
+             return depth_;
+@@ -49,6 +54,8 @@ namespace OpenBlood2
+         SDL_GPUDevice* device_ = nullptr;
+         DrawStyle style_;
+         SDL_GPUGraphicsPipeline* pipeline_ = nullptr;
++        SDL_GPUGraphicsPipeline* alpha_pipeline_ = nullptr;
++        std::vector<WorldAlphaBatch> alpha_order_;
+         SDL_GPUBuffer* vertices_ = nullptr;
+         SDL_GPUTransferBuffer* vertex_transfer_ = nullptr;
+         Uint32 vertex_capacity_ = 0;
+@@ -60,6 +67,6 @@ namespace OpenBlood2
+         SDL_GPUTextureFormat color_format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
+         Uint32 width_ = 0, height_ = 0;
+         std::uint64_t revision_ = UINT64_MAX;
+-        bool pipeline(SDL_GPUTextureFormat, std::string&);
++        bool pipeline(SDL_GPUTextureFormat, std::string&, bool translucent = false);
+     };
+ } // namespace OpenBlood2
+diff --git a/src/engine/world_view.cpp b/src/engine/world_view.cpp
+index 21f1139..9ee4b73 100644
+--- a/src/engine/world_view.cpp
++++ b/src/engine/world_view.cpp
+@@ -74,7 +74,7 @@ namespace OpenBlood2
+                               .18f + .5f * std::abs(normal.z / length)};
+                 if (surface.flags & (1u << 4))
+                     color = {.25f, .4f, .65f};
+-                if (surface.flags & (1u << 3))
++                if ((surface.flags & (1u << 3)) && !(surface.flags & (1u << 4)))
+                     color = {.65f, .25f, .5f};
+                 std::uint32_t material = 0;
+                 if (resources && !model.textures.empty())
+@@ -101,7 +101,7 @@ namespace OpenBlood2
+                         materials.push_back(std::move(entry));
+                         found = material_ids.emplace(key, id).first;
+                     }
+-                    if (!(surface.flags & ((1u << 3) | (1u << 4))))
++                    if (!(surface.flags & (1u << 4)))
+                     {
+                         if (materials[found->second].error.empty())
+                         {
+@@ -114,6 +114,14 @@ namespace OpenBlood2
+                 }
+                 if ((count - 2) * 3 > max_vertices - vertices.size())
+                     return fail("Diagnostic triangle budget exceeded");
++                const bool translucent = material && (surface.flags & (1u << 3)) && !(surface.flags & (1u << 4));
++                DVector center{};
++                if (translucent)
++                    for (std::size_t i = 0; i < count; ++i)
++                        center = vector_add(
++                            center,
++                            vector_scale(vector_subtract(model.points[polygon.points[i]], range.pivot), 1.f / count));
++                bool first_triangle = true;
+                 const auto a = model.points[polygon.points[0]];
+                 for (std::size_t i = 1; i + 1 < count; ++i)
+                 {
+@@ -124,8 +132,13 @@ namespace OpenBlood2
+                         ++degenerate;
+                         continue;
+                     }
+-                    if (range.batches.empty() || range.batches.back().material != material)
+-                        range.batches.push_back({static_cast<std::uint32_t>(vertices.size()), 0, material});
++                    if (range.batches.empty() || range.batches.back().material != material ||
++                        range.batches.back().translucent != translucent || (translucent && first_triangle))
++                        range.batches.push_back(
++                            {static_cast<std::uint32_t>(vertices.size()), 0, material, translucent, center});
++                    if (translucent && first_triangle)
++                        ++blended;
++                    first_triangle = false;
+                     range.batches.back().count += 3;
+                     for (auto p : {a, b, c})
+                     {
+@@ -149,6 +162,57 @@ namespace OpenBlood2
+         }
+         return true;
+     }
++    bool world_alpha_order(const WorldMesh& mesh, std::span<const WorldDraw> draws, DVector eye, DRotation view,
++                           std::vector<WorldAlphaBatch>& order, std::string& error)
++    {
++        order.clear();
++        error.clear();
++        auto fail = [&]()
++        {
++            order.clear();
++            error = "Invalid or excessive transparent world draw";
++            return false;
++        };
++        if (!physics_vector(eye) || !valid_rotation(view) || draws.size() > 65536)
++            return fail();
++        const auto forward = rotate_vector({0, 0, 1}, view);
++        for (std::size_t i = 0; i < draws.size(); ++i)
++        {
++            const auto& d = draws[i];
++            if (d.range >= mesh.ranges.size() || !physics_vector(d.position) || !valid_rotation(d.rotation))
++                return fail();
++            const auto& range = mesh.ranges[d.range];
++            for (std::size_t j = 0; j < range.batches.size(); ++j)
++            {
++                const auto& b = range.batches[j];
++                if (!b.translucent)
++                    continue;
++                if (!b.count || b.count % 3 || b.first < range.first || b.first > mesh.vertices.size() ||
++                    b.count > mesh.vertices.size() - b.first || b.first > std::size_t(range.first) + range.count ||
++                    b.count > std::size_t(range.first) + range.count - b.first || !physics_vector(b.center) ||
++                    order.size() >= 1000000)
++                    return fail();
++                const auto center = vector_add(d.position, rotate_vector(b.center, d.rotation));
++                const auto delta = vector_subtract(center, eye);
++                const double depth =
++                    double(delta.x) * forward.x + double(delta.y) * forward.y + double(delta.z) * forward.z;
++                if (!std::isfinite(depth))
++                    return fail();
++                order.push_back({i, j, depth});
++            }
++        }
++        // Explicit index tie-break preserves source order without stable_sort's temporary allocation.
++        std::sort(order.begin(), order.end(),
++                  [](const auto& a, const auto& b)
++                  {
++                      if (a.depth != b.depth)
++                          return a.depth > b.depth;
++                      if (a.draw != b.draw)
++                          return a.draw < b.draw;
++                      return a.batch < b.batch;
++                  });
++        return true;
++    }
+     bool world_draws(const WorldMesh& mesh, const Objects& objects, std::vector<WorldDraw>& draws,
+                      WorldViewStats& stats, std::string& error)
+     {
+diff --git a/src/engine/world_view.h b/src/engine/world_view.h
+index 50feed2..924f5fc 100644
+--- a/src/engine/world_view.h
++++ b/src/engine/world_view.h
+@@ -6,7 +6,7 @@
+ 
+ namespace OpenBlood2
+ {
+-    // Opaque base textures only; no baked light, sky or transparency claim.
++    // Unlit base textures; authored transparent faces use decoded DTX alpha.
+     struct WorldVertex
+     {
+         DVector position, color;
+@@ -20,6 +20,8 @@ namespace OpenBlood2
+     struct WorldBatch
+     {
+         std::uint32_t first = 0, count = 0, material = 0;
++        bool translucent = false;
++        DVector center{}; // One local-space center per translucent polygon, for sorting.
+     };
+     struct WorldRange
+     {
+@@ -35,7 +37,7 @@ namespace OpenBlood2
+         // Slot zero is white. Failed resources remain named diagnostic records.
+         std::vector<WorldMaterial> materials;
+         std::size_t texture_bytes = 0;
+-        std::size_t invisible = 0, degenerate = 0, transparent = 0, sky = 0;
++        std::size_t invisible = 0, degenerate = 0, transparent = 0, sky = 0, blended = 0;
+         bool build(const World&, std::string&, const Resources* = nullptr);
+     };
+     struct WorldDraw
+@@ -49,10 +51,19 @@ namespace OpenBlood2
+     {
+         std::size_t triangles = 0, draws = 0, hidden = 0, unbound = 0, containers = 0;
+         std::size_t batches = 0;
+-        std::uint64_t uploads = 0, frames = 0;
++        std::uint64_t uploads = 0, frames = 0, alpha_frames = 0;
++        std::size_t alpha_batches = 0;
+     };
+     // Never creates objects or advances simulation; current checked identities only.
+     bool world_draws(const WorldMesh&, const Objects&, std::vector<WorldDraw>&, WorldViewStats&, std::string&);
++    struct WorldAlphaBatch
++    {
++        std::size_t draw = 0, batch = 0;
++        double depth = 0;
++    };
++    // Stable far-to-near order of current posed faces. Does not retain object handles.
++    bool world_alpha_order(const WorldMesh&, std::span<const WorldDraw>, DVector eye, DRotation view,
++                           std::vector<WorldAlphaBatch>&, std::string&);
+     // Row vectors packed for the shader. Original +Y up / +Z forward, SDL depth [0,1].
+     struct WorldViewUniform
+     {
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index a8da5d4..6089a9a 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -599,7 +599,7 @@ endif()
+ add_executable(world_view_tests world_view_tests.cpp)
+ target_link_libraries(world_view_tests PRIVATE blood2_game)
+ blood2_project_options(world_view_tests)
+-foreach(case IN ITEMS mesh rejects camera lifetime)
++foreach(case IN ITEMS mesh rejects camera lifetime alpha_order)
+     add_test(NAME world_view.${case} COMMAND world_view_tests "${case}")
+     set_tests_properties(world_view.${case} PROPERTIES LABELS "headless;world_view" TIMEOUT 30)
+ endforeach()
+@@ -1174,3 +1174,15 @@ if(BLOOD2_TEST_DATA_DIR)
+         set_tests_properties(gpu.entry_wait PROPERTIES LABELS "gpu;private;session_playback" TIMEOUT 60 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+     endif()
+ endif()
++
++if(BLOOD2_GPU_TESTS)
++    add_executable(world_alpha_gpu_tests world_alpha_gpu_tests.cpp)
++    target_link_libraries(world_alpha_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(world_alpha_gpu_tests)
++    add_test(NAME gpu.world_alpha COMMAND world_alpha_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/world-alpha")
++    set_tests_properties(gpu.world_alpha PROPERTIES LABELS "gpu;world_view" TIMEOUT 45 RUN_SERIAL TRUE)
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.world_alpha_private COMMAND world_alpha_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/world-alpha-private" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.world_alpha_private PROPERTIES LABELS "gpu;private;world_view" TIMEOUT 90 RUN_SERIAL TRUE)
++    endif()
++endif()
+diff --git a/tests/texture_tests.cpp b/tests/texture_tests.cpp
+index 54dab58..fcfa221 100644
+--- a/tests/texture_tests.cpp
++++ b/tests/texture_tests.cpp
+@@ -148,10 +148,23 @@ namespace
+         CHECK(mesh.vertices[0].uv[0] == 2 && mesh.vertices[0].uv[1] == -1);
+         CHECK(mesh.vertices[3].uv == mesh.vertices[0].uv && mesh.vertices[3].position.x == -492);
+         CHECK(mesh.ranges[0].batches.size() == 1 && mesh.ranges[1].batches[0].material == 1);
++        world.models[0].surfaces[0].flags = 8;
++        // Shared material with opaque faces does not imply a shared blend mode.
++        world.models[0].polygons.push_back(world.models[0].polygons[0]);
++        CHECK(mesh.build(world, error, &resources));
++        CHECK(mesh.blended == 2 && mesh.ranges[0].batches.size() == 2);
++        CHECK(mesh.ranges[0].batches[0].translucent && !mesh.ranges[1].batches[0].translucent);
++        CHECK(mesh.ranges[0].batches[0].material == mesh.ranges[1].batches[0].material);
++        CHECK(mesh.vertices[0].uv[0] == 2 && mesh.vertices[0].color.y == 1);
++        world.models[0].surfaces[0].flags |= 16; // Sky remains an explicit opaque marker.
++        CHECK(mesh.build(world, error, &resources));
++        CHECK(mesh.blended == 0 && mesh.ranges[0].batches[0].material == 0);
++        world.models[0].surfaces[0].flags = 8;
+         world.models[0].textures[0] = "missing.dtx";
+         world.models[1].textures[0] = "bad.dtx";
+         CHECK(mesh.build(world, error, &resources));
+         CHECK(mesh.materials.size() == 3 && !mesh.materials[1].error.empty() && !mesh.materials[2].error.empty());
++        CHECK(mesh.blended == 0 && !mesh.ranges[0].batches[0].translucent);
+         CHECK(mesh.ranges[0].batches[0].material == 0 && mesh.vertices[0].color.x == 1 &&
+               mesh.vertices[0].color.y == 0);
+         world.models[0].textures[0] = "../a.dtx";
+diff --git a/tests/world_alpha_gpu_tests.cpp b/tests/world_alpha_gpu_tests.cpp
+new file mode 100644
+index 0000000..d3224ca
+--- /dev/null
++++ b/tests/world_alpha_gpu_tests.cpp
+@@ -0,0 +1,228 @@
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "game/server_adapter.h"
++#include <SDL3/SDL.h>
++#include <algorithm>
++#include <cmath>
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x " " << error << " " << SDL_GetError() << '\n';                            \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    void quad(WorldMesh& mesh, float z, float half, std::uint32_t material, bool alpha, DVector color = {1, 1, 1})
++    {
++        const auto first = static_cast<std::uint32_t>(mesh.vertices.size());
++        for (const auto& v : {WorldVertex{{-half, half, z}, color, {0, 0}},
++                              {{half, half, z}, color, {1, 0}},
++                              {{half, -half, z}, color, {1, 1}},
++                              {{-half, half, z}, color, {0, 0}},
++                              {{half, -half, z}, color, {1, 1}},
++                              {{-half, -half, z}, color, {0, 1}}})
++            mesh.vertices.push_back(v);
++        mesh.ranges.push_back({first, 6, {}, "quad", {{first, 6, material, alpha, {0, 0, z}}}});
++    }
++    bool readback(SDL_GPUDevice* gpu, SDL_GPUCommandBuffer* cmd, Capture& c)
++    {
++        auto* copy = SDL_BeginGPUCopyPass(cmd);
++        if (!copy)
++            return false;
++        SDL_GPUTextureRegion region{};
++        region.texture = c.texture;
++        region.w = c.width;
++        region.h = c.height;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = c.transfer;
++        target.pixels_per_row = c.width;
++        target.rows_per_layer = c.height;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        return SDL_SubmitGPUCommandBuffer(cmd) && SDL_WaitForGPUIdle(gpu);
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    std::string error;
++    Runtime runtime;
++    CHECK(runtime.initialize(true, error));
++    WorldRenderer renderer(runtime.gpu), overlay(runtime.gpu);
++    WorldMesh mesh;
++    mesh.materials = {{"white", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}},
++                      {"red alpha", "", {2, 2, 1, 0, 0, {255, 0, 0, 0, 255, 0, 0, 128, 255, 0, 0, 255, 0, 0, 0, 255}}},
++                      {"green alpha", "", {1, 1, 1, 0, 0, {0, 255, 0, 128}}}};
++    quad(mesh, 2, 1, 1, true); // Near alpha FIRST, far alpha LAST: renderer must sort faces.
++    quad(mesh, 6, 6, 0, false, {0, 0, 1});
++    quad(mesh, 3, 1.5f, 2, true);
++    std::vector<WorldDraw> draws = {{0, {}, {}}, {1, {}, {}}, {2, {}, {}}};
++    for (unsigned cycle = 0; cycle < 5; ++cycle)
++    {
++        const unsigned w = cycle == 1 ? 400 : 320, h = cycle == 1 ? 300 : 240;
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, w, h));
++        CHECK(renderer.prepare(mesh, cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, w, h, error));
++        WorldMesh solid;
++        // Separate opaque model between panes, or opaque object behind glass submitted AFTER alpha
++        // to verify the alpha pass does not write depth. Final cycle tests a foreground occluder.
++        quad(solid, cycle == 3 ? 1.5f : 2.5f, 20, 0, false, {1, 1, 0});
++        CHECK(overlay.prepare(solid, cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, w, h, error));
++        WorldDraw single;
++        DVector eye{};
++        DRotation view;
++        if (cycle == 4)
++        {
++            eye = {100, 20, -50};
++            view = rotation_from_euler({0, 1.57079632679f, 0});
++            for (auto& d : draws)
++            {
++                d.position = eye;
++                d.rotation = view;
++            }
++        }
++        auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(cmd);
++        CHECK(renderer.draw(cmd, capture.texture, mesh, draws, eye, view, false, error));
++        if (cycle == 1 || cycle == 3)
++            CHECK(overlay.draw(cmd, capture.texture, solid, std::span(&single, 1), {}, {}, false, error, DrawLoad::Load,
++                               renderer.depth_target()));
++        CHECK(renderer.draw(cmd, capture.texture, mesh, draws, eye, view, false, error, DrawLoad::Load, nullptr,
++                            WorldPass::Translucent));
++        CHECK(renderer.stats.alpha_batches == 2);
++        if (cycle == 2)
++            CHECK(overlay.draw(cmd, capture.texture, solid, std::span(&single, 1), {}, {}, false, error, DrawLoad::Load,
++                               renderer.depth_target()));
++        CHECK(readback(runtime.gpu, cmd, capture));
++        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        auto rgb = [&](int x, int y, int r, int g, int b)
++        {
++            auto* p = pixels + (y * w + x) * 4;
++            bool ok = std::abs(int(p[0]) - r) <= 1 && std::abs(int(p[1]) - g) <= 1 && std::abs(int(p[2]) - b) <= 1 &&
++                      p[3] == 255;
++            if (!ok)
++                std::cerr << "cycle=" << cycle << " pixel=" << x << ',' << y << " got=" << int(p[0]) << ',' << int(p[1])
++                          << ',' << int(p[2]) << '\n';
++            return ok;
++        };
++        bool ok = false;
++        if (cycle == 2 || cycle == 3)
++            ok = rgb(w * 3 / 8, h / 2 - w / 8, 255, 255, 0) && rgb(w * 5 / 8, h / 2 + w / 8, 255, 255, 0);
++        else
++            ok = rgb(w * 3 / 8, h / 2 - w / 8, cycle == 1 ? 255 : 0, cycle == 1 ? 255 : 128, cycle == 1 ? 0 : 127) &&
++                 rgb(w * 5 / 8, h / 2 - w / 8, cycle == 1 ? 255 : 128, cycle == 1 ? 127 : 64, cycle == 1 ? 0 : 63) &&
++                 rgb(w * 3 / 8, h / 2 + w / 8, 255, 0, 0) && rgb(w * 5 / 8, h / 2 + w / 8, 0, 0, 0);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        CHECK(capture.save((std::string(argv[1]) + "-" + std::to_string(cycle) + ".png").c_str()));
++        CHECK(ok);
++        // Invalid order/camera rejects before any render pass; subsequent clean draw can recover.
++        auto bad = draws;
++        bad[0].range = 99;
++        cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(cmd);
++        CHECK(!renderer.draw(cmd, capture.texture, mesh, bad, eye, view, false, error, DrawLoad::Load, nullptr,
++                             WorldPass::Translucent));
++        CHECK(SDL_CancelGPUCommandBuffer(cmd));
++        renderer.clear_geometry();
++    }
++    std::cout << "GPU world alpha: zero/partial/full/black texels, far-to-near faces, opaque model occlusion, no depth "
++                 "writes, resize/reupload pass\n";
++    if (argc == 3)
++    {
++        GameSession game;
++        CHECK(game.initialize());
++        Config config;
++        config.data_dir = argv[2];
++        CHECK(game.resources.mount_game(config, error));
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(game.request_world("01_SubwayA", error));
++            CHECK(game.enter_player(error));
++            WorldMesh real;
++            CHECK(real.build(game.world, error, &game.resources));
++            std::vector<WorldDraw> all;
++            WorldViewStats stats;
++            CHECK(world_draws(real, game.objects, all, stats, error));
++            auto it = std::find_if(all.begin(), all.end(),
++                                   [&](const auto& d) { return real.ranges[d.range].name == "glass12"; });
++            CHECK(it != all.end());
++            const auto& batch = real.ranges[it->range].batches[0];
++            CHECK(batch.translucent);
++            auto center = vector_add(it->position, rotate_vector(batch.center, it->rotation));
++            const auto camera = vector_add(center, {128, 0, 0});
++            const auto rotation = rotation_from_euler({0, -1.57079632679f, 0});
++            Capture capture;
++            CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240));
++            CHECK(renderer.prepare(real, 10 + cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error));
++            auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++            CHECK(cmd);
++            CHECK(renderer.draw(cmd, capture.texture, real, std::span(&*it, 1), camera, rotation, false, error));
++            CHECK(renderer.draw(cmd, capture.texture, real, std::span(&*it, 1), camera, rotation, false, error,
++                                DrawLoad::Load, nullptr, WorldPass::Translucent));
++            CHECK(readback(runtime.gpu, cmd, capture));
++            auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++            CHECK(pixels);
++            std::size_t changed = 0, pink = 0;
++            for (std::size_t i = 0; i < 320 * 240; ++i)
++            {
++                const auto* p = pixels + i * 4;
++                changed += p[0] != 6 || p[1] != 9 || p[2] != 13;
++                pink += p[0] == 166 && p[1] == 64 && p[2] == 128;
++            }
++            // Independent original surface UV + decoded texel at the central pixel ray.
++            // This authored pane is axis-aligned; +X camera looks along -X, right is +Z.
++            CHECK(it->rotation.m_Spin == 1 && it->rotation.m_Vec.x == 0 && it->rotation.m_Vec.y == 0 &&
++                  it->rotation.m_Vec.z == 0);
++            const auto& source = game.world.models[it->range];
++            const Surface* surface = nullptr;
++            for (const auto& polygon : source.polygons)
++                if ((source.surfaces[polygon.surface].flags & (4 | 8 | 16)) == 8)
++                    surface = &source.surfaces[polygon.surface];
++            CHECK(surface);
++            const auto authored = vector_add(vector_subtract(center, it->position),
++                                             vector_add(real.ranges[it->range].pivot, {0, -.4f, .4f}));
++            const auto delta = vector_subtract(authored, surface->origin);
++            const auto& texture = real.materials[batch.material].image;
++            auto wrap = [](int value, int extent) { return (value % extent + extent) % extent; };
++            const auto tx = wrap(int(std::floor(vector_dot(delta, surface->u))), texture.width);
++            const auto ty = wrap(int(std::floor(vector_dot(delta, surface->v))), texture.height);
++            const auto* texel = texture.rgba.data() + (ty * texture.width + tx) * 4;
++            const auto* actual = pixels + (120 * 320 + 160) * 4;
++            const float clear[3] = {.025f, .035f, .05f};
++            bool matched = true;
++            for (unsigned channel = 0; channel < 3; ++channel)
++            {
++                const auto expected = int(std::lround(texel[channel] * texel[3] / 255.f +
++                                                      std::round(clear[channel] * 255) * (1 - texel[3] / 255.f)));
++                matched &= std::abs(int(actual[channel]) - expected) <= 1;
++                std::cout << "glass channel " << channel << " expected=" << expected
++                          << " actual=" << int(actual[channel]) << '\n';
++            }
++            CHECK(matched);
++            SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++            CHECK(capture.save((std::string(argv[1]) + "-private-" + std::to_string(cycle) + ".png").c_str()));
++            CHECK(changed > 1000 && pink == 0 && renderer.stats.alpha_batches == 1);
++            std::cout << "Private glass12: changed=" << changed << " pink=" << pink
++                      << " submitted=" << renderer.stats.alpha_batches << '\n';
++            cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++            CHECK(cmd);
++            CHECK(renderer.draw(cmd, capture.texture, real, all, camera, rotation, false, error));
++            CHECK(renderer.draw(cmd, capture.texture, real, all, camera, rotation, false, error, DrawLoad::Load,
++                                nullptr, WorldPass::Translucent));
++            CHECK(readback(runtime.gpu, cmd, capture));
++            CHECK(capture.save((std::string(argv[1]) + "-scene-" + std::to_string(cycle) + ".png").c_str()));
++            CHECK(game.unload_world());
++            renderer.clear_geometry();
++        }
++    }
++    return 0;
++}
+diff --git a/tests/world_view_tests.cpp b/tests/world_view_tests.cpp
+index 3949d87..4ccce00 100644
+--- a/tests/world_view_tests.cpp
++++ b/tests/world_view_tests.cpp
+@@ -103,6 +103,8 @@ namespace
+         std::string error;
+         CHECK(mesh.build(w, error));
+         CHECK(mesh.vertices[6].position.x == -12 && mesh.vertices[6].position.z == -26);
++        mesh.ranges[1].batches[0].translucent = true; // Synthetic alpha surface for identity/lifetime checks.
++        std::vector<WorldAlphaBatch> order;
+         auto h = g.create_example("CameraSpot");
+         CHECK(h);
+         auto* r = g.objects.get(h);
+@@ -117,10 +119,12 @@ namespace
+         WorldViewStats stats;
+         CHECK(world_draws(mesh, g.objects, draws, stats, error));
+         CHECK(draws.size() == 2 && stats.unbound == 0);
++        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error) && order.size() == 1);
+         CHECK(draws[1].position.x == 30 && draws[1].rotation.m_Spin == r->state.m_Rotation.m_Spin);
+         r->state.m_Flags &= ~FLAG_VISIBLE;
+         CHECK(world_draws(mesh, g.objects, draws, stats, error));
+         CHECK(draws.size() == 1 && stats.hidden == 1);
++        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error) && order.empty());
+         r->state.m_Flags |= FLAG_VISIBLE;
+         mesh.ranges.push_back(mesh.ranges[1]);
+         CHECK(!world_draws(mesh, g.objects, draws, stats, error));
+@@ -129,12 +133,47 @@ namespace
+         CHECK(g.objects.remove(h));
+         CHECK(world_draws(mesh, g.objects, draws, stats, error));
+         CHECK(draws.size() == 1 && stats.unbound == 1);
++        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error) && order.empty());
+         CHECK(g.objects.finish_frame());
+         CHECK(!g.objects.get(h));
+         CHECK(world_draws(mesh, g.objects, draws, stats, error));
+         CHECK(draws.size() == 1);
+         return true;
+     }
++    bool alpha_order()
++    {
++        WorldMesh mesh;
++        mesh.vertices.resize(18);
++        mesh.ranges = {{0, 12, {}, "two faces", {{0, 6, 0, true, {0, 0, 2}}, {6, 6, 0, true, {0, 0, 4}}}},
++                       {12, 6, {}, "moving", {{12, 6, 0, true, {0, 0, 3}}}}};
++        std::vector<WorldDraw> draws = {{0, {}, {}}, {1, {}, {}}};
++        std::vector<WorldAlphaBatch> order;
++        std::string error;
++        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error));
++        CHECK(order.size() == 3 && order[0].batch == 1 && order[1].draw == 1 && order[2].batch == 0);
++        draws[1].position.z = 3;
++        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error));
++        CHECK(order[0].draw == 1 && order[0].depth == 6);
++        draws[1].position = {};
++        draws[1].rotation = rotation_from_euler({0, 3.14159265f, 0});
++        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error));
++        CHECK(order.back().draw == 1 && order.back().depth < -2.99);
++        CHECK(world_alpha_order(mesh, draws, {}, draws[1].rotation, order, error));
++        CHECK(order[0].draw == 1);
++        draws[1].rotation = {};
++        draws[1].position.z = 1; // Equal depths retain deterministic source order.
++        CHECK(world_alpha_order(mesh, draws, {}, {}, order, error));
++        CHECK(order[0].draw == 0 && order[0].batch == 1 && order[1].draw == 1);
++        mesh.ranges[1].batches[0].count = 7;
++        CHECK(!world_alpha_order(mesh, draws, {}, {}, order, error) && order.empty());
++        mesh.ranges[1].batches[0].count = 6;
++        draws[1].range = 2;
++        CHECK(!world_alpha_order(mesh, draws, {}, {}, order, error) && order.empty());
++        draws.resize(1);
++        CHECK(!world_alpha_order(mesh, draws, {std::numeric_limits<float>::quiet_NaN(), 0, 0}, {}, order, error));
++        CHECK(order.empty());
++        return true;
++    }
+     bool private_world(const char* directory)
+     {
+         GameSession g;
+@@ -154,6 +193,22 @@ namespace
+             revision = g.world_revision;
+             CHECK(mesh.build(g.world, error, &g.resources));
+             CHECK(mesh.ranges.size() == 116 && mesh.vertices.size() > 1000);
++            CHECK(mesh.transparent == 31 && mesh.blended == 31);
++            std::size_t glass_faces = 0;
++            for (const auto& range : mesh.ranges)
++                for (const auto& batch : range.batches)
++                    if (batch.translucent)
++                    {
++                        ++glass_faces;
++                        const auto& material = mesh.materials[batch.material];
++                        CHECK(material.path == "textures/greys/dirtyglass.dtx" && material.error.empty());
++                        CHECK(material.image.flags == 10 && material.image.width == 64 && material.image.height == 64);
++                        for (std::size_t i = 3; i < material.image.rgba.size(); i += 4)
++                            CHECK(material.image.rgba[i] >= 51 && material.image.rgba[i] <= 102);
++                        CHECK(batch.count == 6 && mesh.vertices[batch.first].color.x == 1);
++                    }
++            CHECK(glass_faces == 31);
++            std::cout << "SubwayA glass: 31 faces bind textures/greys/dirtyglass.dtx; 64x64, flags=10, alpha=51..102\n";
+             std::size_t decoded = 0, failed = 0;
+             for (std::size_t i = 1; i < mesh.materials.size(); ++i)
+                 mesh.materials[i].error.empty() ? ++decoded : ++failed;
+@@ -167,6 +222,12 @@ namespace
+             CHECK(g.step(1. / 60));
+             CHECK(world_draws(mesh, g.objects, draws, stats, error));
+             CHECK(stats.draws > 50 && stats.triangles > 1000);
++            std::vector<WorldAlphaBatch> order;
++            CHECK(world_alpha_order(mesh, draws, {}, {}, order, error));
++            CHECK(order.size() == 31);
++            for (std::size_t i = 1; i < order.size(); ++i)
++                CHECK(order[i - 1].depth >= order[i].depth);
++
+             std::size_t posed = 0;
+             for (auto id : g.objects.snapshot())
+             {
+@@ -217,7 +278,8 @@ int main(int argc, char** argv)
+     if (argc < 2)
+         return 2;
+     std::string_view c = argv[1];
+-    bool ok = c == "lifetime"              ? lifetime()
++    bool ok = c == "alpha_order"           ? alpha_order()
++              : c == "lifetime"            ? lifetime()
+               : c == "mesh"                ? mesh_test()
+               : c == "rejects"             ? rejects()
+               : c == "camera"              ? camera()

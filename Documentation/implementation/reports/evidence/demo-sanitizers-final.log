@@ -1,0 +1,25 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start   74: services.start_departure
+1/7 Test   #74: services.start_departure .........   Passed    0.03 sec
+    Start   77: services.contact_overlap
+2/7 Test   #77: services.contact_overlap .........   Passed    0.56 sec
+    Start   82: services.elevator_entry
+3/7 Test   #82: services.elevator_entry ..........   Passed    1.78 sec
+    Start 1081: demo.flow
+4/7 Test #1081: demo.flow ........................   Passed    0.02 sec
+    Start 1082: demo.rules
+5/7 Test #1082: demo.rules .......................   Passed    0.05 sec
+    Start 1083: demo.worlds
+6/7 Test #1083: demo.worlds ......................   Passed  117.15 sec
+    Start 1084: demo.weapon
+7/7 Test #1084: demo.weapon ......................   Passed    0.81 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+demo        = 118.03 sec*proc (4 tests)
+headless    = 120.40 sec*proc (7 tests)
+private     = 119.74 sec*proc (3 tests)
+services    =   2.37 sec*proc (3 tests)
+
+Total Test time (real) = 120.42 sec

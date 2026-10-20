@@ -1,0 +1,14 @@
+420/422 Testing: ai_script.lifetime
+420/422 Test: ai_script.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-script-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_script.lifetime" start time: Oct 16 13:17 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.lifetime" end time: Oct 16 13:17 CEST
+"ai_script.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

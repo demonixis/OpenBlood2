@@ -1,0 +1,38 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start  1: config.arguments
+ 1/13 Test  #1: config.arguments .................   Passed    0.00 sec
+      Start  2: config.precedence
+ 2/13 Test  #2: config.precedence ................   Passed    0.00 sec
+      Start  3: config.relative_paths
+ 3/13 Test  #3: config.relative_paths ............   Passed    0.00 sec
+      Start  4: config.invalid_config
+ 4/13 Test  #4: config.invalid_config ............   Passed    0.00 sec
+      Start  5: config.content_validation
+ 5/13 Test  #5: config.content_validation ........   Passed    0.00 sec
+      Start  6: config.case_lookup
+ 6/13 Test  #6: config.case_lookup ...............   Passed    0.00 sec
+      Start  7: cli.help
+ 7/13 Test  #7: cli.help .........................   Passed    0.01 sec
+      Start  8: cli.unknown
+ 8/13 Test  #8: cli.unknown ......................   Passed    0.01 sec
+      Start  9: cli.missing_data
+ 9/13 Test  #9: cli.missing_data .................   Passed    0.01 sec
+      Start 10: cli.missing_config
+10/13 Test #10: cli.missing_config ...............   Passed    0.01 sec
+      Start 11: cli.metadata
+11/13 Test #11: cli.metadata .....................   Passed    0.01 sec
+      Start 12: content.local
+12/13 Test #12: content.local ....................   Passed    0.00 sec
+      Start 13: gpu.lifecycle
+13/13 Test #13: gpu.lifecycle ....................   Passed    1.52 sec
+
+100% tests passed, 0 tests failed out of 13
+
+Label Time Summary:
+cli         =   0.04 sec*proc (5 tests)
+config      =   0.01 sec*proc (6 tests)
+gpu         =   1.52 sec*proc (1 test)
+headless    =   0.06 sec*proc (12 tests)
+private     =   0.00 sec*proc (1 test)
+
+Total Test time (real) =   1.58 sec

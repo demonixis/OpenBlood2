@@ -1,0 +1,6 @@
+{
+  "capture": "/home/yann/projects/lithtech/Blood2/build/debug/tests/objectives.png",
+  "sha256": "76e213d298e4c6f52ee4f523932f583cc65752007dd7ea1252a75b116d3ff3e4",
+  "observed": "Debug Objectives panel shows temporary CityHub player entry and complete cleanup, unchanged source/current revision 1, 243 created / 541 editor / 207 unknown / 35 failed, retained copied stats and explicit no-transfer text. New panel is readable without overlap. Source SubwayA scene stays behind inspector.",
+  "stored_in_repository": false
+}

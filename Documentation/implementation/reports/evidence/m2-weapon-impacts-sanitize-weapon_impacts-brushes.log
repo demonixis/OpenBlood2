@@ -1,0 +1,14 @@
+565/569 Testing: weapon_impacts.brushes
+565/569 Test: weapon_impacts.brushes
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_impact_tests" "brushes" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-impacts-brushes"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_impacts.brushes" start time: Oct 16 23:27 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.16 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_impacts.brushes" end time: Oct 16 23:27 CEST
+"weapon_impacts.brushes" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,26 @@
+{
+  "world_vert.h": {
+    "sha256": "5d8260a372590a0865a32c92de5cb18da62f1cc1603b0b1b3fa3848b98f68abd",
+    "bytes": 8895
+  },
+  "world_frag.h": {
+    "sha256": "ff1638c1aae70c7e00175e9c2c1144454da9cf369e0b284e1150cc47d2090d05",
+    "bytes": 2358
+  },
+  "sprite_frag.h": {
+    "sha256": "a6ad01fead2743a0d3989483003a9cce384ad63820496bf07a583696704d9645",
+    "bytes": 3922
+  },
+  "world_vert_msl.h": {
+    "sha256": "2ef4a2cfe9476ac1ba7eeab495f77ff72298ae98ba3a9219fa554b269fe99771",
+    "bytes": 1395
+  },
+  "world_frag_msl.h": {
+    "sha256": "3e950e7a872d3c389a88e826ed93c85f6b740cbcb787f148ffd77b8fc0384726",
+    "bytes": 751
+  },
+  "sprite_frag_msl.h": {
+    "sha256": "49032f5642dd03d6927dcaff8726f915cd99f280944602f729af346d12d812c3",
+    "bytes": 942
+  }
+}

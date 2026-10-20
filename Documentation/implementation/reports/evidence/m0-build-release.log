@@ -1,0 +1,10 @@
+[0/2] Re-checking globbed directories...
+[1/12] Scanning /home/yann/projects/lithtech/Blood2/tests/config_tests.cpp for CXX dependencies
+[2/12] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[3/12] Scanning /home/yann/projects/lithtech/Blood2/src/engine/config.cpp for CXX dependencies
+[4/12] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[5/10] Building CXX object tests/CMakeFiles/config_tests.dir/config_tests.cpp.o
+[6/10] Building CXX object CMakeFiles/engine.dir/src/engine/config.cpp.o
+[7/10] Linking CXX static library libengine.a
+[8/10] Linking CXX executable tests/config_tests
+[9/10] Linking CXX executable blood2

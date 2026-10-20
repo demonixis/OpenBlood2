@@ -1,0 +1,50 @@
+503/503 Testing: character_nodes.private
+503/503 Test: character_nodes.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/character_nodes_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"character_nodes.private" start time: Oct 16 18:54 CEST
+Output:
+----------------------------------------------------------
+cycle=0 Caleb triangles hidden=809 reset=941; isolated Load tail, no restored client
+cycle=1 Caleb triangles hidden=809 reset=941; isolated Load tail, no restored client
+cycle=2 Caleb triangles hidden=809 reset=941; isolated Load tail, no restored client
+<end of output>
+Test time =   6.05 sec
+----------------------------------------------------------
+Test Passed.
+"character_nodes.private" end time: Oct 16 18:55 CEST
+"character_nodes.private" time elapsed: 00:00:06
+----------------------------------------------------------
+
+End testing: Oct 16 18:55 CEST
+
+ai_hit =   1.03 sec*proc
+
+ai_perception =   4.85 sec*proc
+
+attachments =   5.88 sec*proc
+
+character_nodes =   6.14 sec*proc
+
+destructable_state =   5.67 sec*proc
+
+exits =  11.98 sec*proc
+
+headless =  74.65 sec*proc
+
+inventory_state =   5.62 sec*proc
+
+model_view =   4.35 sec*proc
+
+objects =   0.25 sec*proc
+
+player =  11.83 sec*proc
+
+player_state =   5.64 sec*proc
+
+private =  71.73 sec*proc
+
+services =  11.27 sec*proc
+
+weapons =   0.16 sec*proc
+

@@ -1,0 +1,355 @@
+{
+  "status": "verified and committed; M2 incomplete",
+  "baseline_commit": "1a8915f962768de41739a646561b33c54bfbcc31",
+  "implementation_commit": "d2527d2e89000a2e7cdc47bf244573fe2d52c162",
+  "date": "2026-10-17",
+  "scope": "Continuous actual-spawn train traversal, bounded transient messages, stale SDL property shutdown correction",
+  "checks": [
+    {
+      "configuration": "debug",
+      "kind": "headless",
+      "passed": 56,
+      "log": "m2-message-lifetime-final-tests-debug.log"
+    },
+    {
+      "configuration": "debug",
+      "kind": "SDL stale-property regression",
+      "passed": 1,
+      "log": "m2-message-lifetime-sdl-tests-debug.log"
+    },
+    {
+      "configuration": "release",
+      "kind": "headless",
+      "passed": 56,
+      "log": "m2-message-lifetime-final-tests-release.log"
+    },
+    {
+      "configuration": "release",
+      "kind": "SDL stale-property regression",
+      "passed": 1,
+      "log": "m2-message-lifetime-sdl-tests-release.log"
+    },
+    {
+      "configuration": "sanitize",
+      "kind": "headless",
+      "passed": 56,
+      "log": "m2-message-lifetime-final-tests-sanitize.log"
+    },
+    {
+      "configuration": "sanitize",
+      "kind": "SDL stale-property regression",
+      "passed": 1,
+      "log": "m2-message-lifetime-sdl-tests-sanitize.log"
+    },
+    {
+      "configuration": "debug",
+      "kind": "NVIDIA GPU",
+      "passed": 5,
+      "log": "m2-message-lifetime-final-gpu-debug.log"
+    },
+    {
+      "configuration": "release",
+      "kind": "NVIDIA GPU",
+      "passed": 5,
+      "log": "m2-message-lifetime-final-gpu-release.log"
+    }
+  ],
+  "toolchain": {
+    "debug_release": "GCC 16.2.1",
+    "sanitizers": "Clang 22.1.8 ASan/UBSan; headless leak detection enabled",
+    "cmake": "4.3.0",
+    "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU / Vulkan",
+    "release_inspector": false,
+    "native_metal": false
+  },
+  "observations": [
+    {
+      "hz": 30,
+      "killed": 10,
+      "messages_created": 91139,
+      "messages_released": 91139,
+      "peak_live": 3,
+      "refused": 0,
+      "knife_fire_keys": 20,
+      "health": 146.948,
+      "bullets": 0
+    },
+    {
+      "hz": 60,
+      "killed": 10,
+      "messages_created": 65534,
+      "messages_released": 65534,
+      "peak_live": 3,
+      "refused": 0,
+      "knife_fire_keys": 0,
+      "health": 175,
+      "bullets": 11
+    }
+  ],
+  "route": "Actual spawn and intro, production input mapping, original combat/contact/USE/pickups/relay/fade and NEW_LEVEL. Synthetic mouse aiming and aisle steering; no teleport, stat grants, NPC/trigger edits or direct damage/exit injection. Not a human or retail comparison.",
+  "trace": {
+    "catalogue_rows": 174,
+    "scopes": [
+      "SubwayA",
+      "CityHub",
+      "teardown"
+    ],
+    "unsupported_player_command": "MUSIC LEVEL 3",
+    "required_relay_sends": 10
+  },
+  "initial_failures": [
+    {
+      "log": "m2-message-lifetime-30-failure.log",
+      "reason": "65536 session-long message tokens exhausted; sends attempted but fade/exit never delivered"
+    },
+    {
+      "log": "m2-message-lifetime-debug-initial.log",
+      "reason": "New 30-Hz route failed; existing CLI assertion had obsolete diagnostic text but still requires exit 6"
+    },
+    {
+      "log": "m2-message-lifetime-debug-first-detail.log",
+      "reason": "New 30-Hz scenario originally required ammo pickup despite different drop route; final scenario requires real knife FIRE_KEY after dry ammo, with unchanged original rules"
+    },
+    {
+      "log": "m2-message-lifetime-core-backtrace.log",
+      "reason": "Debug NVIDIA shutdown crash in SDL_SetupPropertyAssignment after late Wayland HDR callback; deterministic public-API reproduction exit 139; one-character fix validated"
+    },
+    {
+      "log": "m2-message-lifetime-gpu-sanitize.log",
+      "reason": "Exploratory GPU sanitizer run completes route but fails leak checking: 44056 bytes / 816 allocations; libdbus and unloaded-module stacks, attribution incomplete; no suppression"
+    }
+  ],
+  "commands": {
+    "headless": "ctest --test-dir build/<debug|release|sanitize> -j2 -R '^(objects|train_session|world|player_restore|coverage|screen_fade|player_controls|cli.world_modes)(\\.|$)' --output-on-failure",
+    "sdl": "ctest --test-dir build/<config> -R '^platform.destroyed_properties$' --output-on-failure",
+    "gpu": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/<debug|release> -R '^gpu\\.(train_session|level_change|screen_fade|lifecycle|weapons)$' --output-on-failure",
+    "sanitizer_environment": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1"
+  },
+  "source_selections": "../../../Blood2/docs/M2_MESSAGE_LIFETIME_SOURCES.json",
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "patch": {
+    "path": "m2-message-lifetime.patch",
+    "sha256": "41055761613ae258656653c9d5948da0a157c71954078ba5bba6bc9f1dfa023e"
+  },
+  "implementation_files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "be05e9d7c2b52231ef769db0295c2754f12de0686f2c47c939b6ae98ec8351b5"
+    },
+    {
+      "path": "cmake/Dependencies.cmake",
+      "sha256": "da4967330c0ff316f36770e9030e31694012ee98b1234f9066390b60e393229d"
+    },
+    {
+      "path": "cmake/PatchSdlProperties.cmake",
+      "sha256": "eb42fc15fb90436c4ae185275c524a2b924199b6f97d52e4eac20f962a566428"
+    },
+    {
+      "path": "docs/M2_MESSAGE_LIFETIME_SOURCES.json",
+      "sha256": "cdc1526ceaf0d67232d781c0bc4bab5ec5f9ee76517181cd9ca45daef44da366"
+    },
+    {
+      "path": "docs/MESSAGE_LIFETIME_CONTRACTS.md",
+      "sha256": "161c01b968fcb2e41fe22a3b638c45d987cf11087a72aed2cbee3598ca3565d4"
+    },
+    {
+      "path": "docs/OBJECT_CONTRACTS.md",
+      "sha256": "20377b97f8a703682053a9416feeec36cad4b5e2158d9a2eafb05e8377e4f421"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "21a51a93ffb0ecf218343fc07f849e357eb67b659237d5bed1d6d20847afecfb"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "d18ec9180f6659578b14471e77f72baf46c5e66c1c737d51d59daacd0d896e54"
+    },
+    {
+      "path": "src/game/legacy/basedefs_de.h",
+      "sha256": "1db715b4270c32578614d965b470e6635d06b48b10ee9c21e81b3d5b32c4b6c8"
+    },
+    {
+      "path": "src/game/server_adapter.cpp",
+      "sha256": "4290d475a82b68f53a0daf3d1cd80b64416f748c6c03595ab0fe9c96f32f611f"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "681553d0f589442e4824d5bb9e0cd75f68343acb84095af3bec70dbf9697d158"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "401ac8c8cb37a3b58780bfabb25e292c81dff6ac42c27bb055213a1bb127ed6c"
+    },
+    {
+      "path": "tests/object_contract_tests.cpp",
+      "sha256": "aa564d5d1ae0f64711f75d20680d5f73a8812966cc94fde4103fc1805b158e59"
+    },
+    {
+      "path": "tests/sdl_properties_tests.cpp",
+      "sha256": "fd181b7dd1fdd233ca9a2998314ecc9c93add8b60f83f4247b90cc8108d02ba7"
+    },
+    {
+      "path": "tests/train_session_tests.cpp",
+      "sha256": "93268d22ddf40013bc12a5f160b71b2ecc7290b232f4e6c30c1723ec6910b984"
+    },
+    {
+      "path": "tests/world_cli_test.cmake",
+      "sha256": "2c7be89220ca62517318f9226c42e690e9bfc15d56ed7dc0ec5eeed07cee176d"
+    }
+  ],
+  "evidence_files": [
+    {
+      "path": "m2-message-lifetime-30-failure.log",
+      "sha256": "320b47bcede7d984809b9c764e0637b85886ea241eb307a523ca0efc38d621c9"
+    },
+    {
+      "path": "m2-message-lifetime-debug-initial.log",
+      "sha256": "e58d7db209b9d5218140b5dcba2b38a47076879620884b14fb7c0ad6afe687e4"
+    },
+    {
+      "path": "m2-message-lifetime-debug-first-detail.log",
+      "sha256": "212ce3747bc47d05e45ee4d0c36f92a952f112bf9f149f17200d91537f4cc81e"
+    },
+    {
+      "path": "m2-message-lifetime-gpu-debug.log",
+      "sha256": "57bb295e9dd0d28afd122688620f75ac1a5ff0057f292331bc011729b1d19798"
+    },
+    {
+      "path": "m2-message-lifetime-core-backtrace.log",
+      "sha256": "ba7c0e4a08b990438fcd7fb62ad6fae298151d500e4fee554c7e4c40b0824be5"
+    },
+    {
+      "path": "m2-message-lifetime-gpu-sanitize.log",
+      "sha256": "2e2b1663e76aa4bb3f412c81e3998185c8545f108ebb7862be9c023cbee3937e"
+    },
+    {
+      "path": "m2-message-lifetime-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "m2-message-lifetime-integrity.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6"
+    },
+    {
+      "path": "m2-message-lifetime-final-build-debug.log",
+      "sha256": "09b878102e7f5ea07a7acbbfbcf8f987dcf9c18075f78ba371b9cecbe24a795b"
+    },
+    {
+      "path": "m2-message-lifetime-final-tests-debug.log",
+      "sha256": "33ae4abb51b2057e7bf3f4aa751fe89b93e48c9f1460eb22eac8269d9444551d"
+    },
+    {
+      "path": "m2-message-lifetime-detail-debug.log",
+      "sha256": "00e9cfb18fc6e64c91711df4608bf3042bfdcfc1ea3deb974af4056a8e107741"
+    },
+    {
+      "path": "m2-message-lifetime-sdl-build-debug.log",
+      "sha256": "b70743112b8b57b7fc9d4114baad9e9444fc4392cb0d27e66d766d62ea209453"
+    },
+    {
+      "path": "m2-message-lifetime-sdl-tests-debug.log",
+      "sha256": "602bba54014b3dfc4e59651344d99d928fb70b63564c71f827ce28302f84adfc"
+    },
+    {
+      "path": "m2-message-lifetime-final-build-release.log",
+      "sha256": "bb17b5575a3a44144b5e177b36232b09be8f56fc99139c90659d45db885c800f"
+    },
+    {
+      "path": "m2-message-lifetime-final-tests-release.log",
+      "sha256": "e8ce08b1f5090ea5c5f5777d2e00fc7de3bfddd25299ca38e3b2ea3d7ed1e82f"
+    },
+    {
+      "path": "m2-message-lifetime-detail-release.log",
+      "sha256": "6b8b2e2011f6dbd2d3b5bb13b4e23aca6512291ebe69affc5fafa13c755f3f42"
+    },
+    {
+      "path": "m2-message-lifetime-sdl-build-release.log",
+      "sha256": "ac1a1f0db7d4341e1d6c6098621050482001b0968df3f42e07c98393ea8f7c78"
+    },
+    {
+      "path": "m2-message-lifetime-sdl-tests-release.log",
+      "sha256": "da5393b47a3457f458bd48140e2e4372f86871fd9850e01952895fe659ae7a72"
+    },
+    {
+      "path": "m2-message-lifetime-final-build-sanitize.log",
+      "sha256": "c6ca16e98b971c547741c018d47836ad97aa1b17307203d055bf905130098fc6"
+    },
+    {
+      "path": "m2-message-lifetime-final-tests-sanitize.log",
+      "sha256": "845cb4731e3b1fe0e47aaa51d7de62ff230459e6824633b1c1955c133588b0f1"
+    },
+    {
+      "path": "m2-message-lifetime-detail-sanitize.log",
+      "sha256": "e1fcd22def5bb7e09b005ef7e04507a267639cca81641c9fd7bc4e43417774d8"
+    },
+    {
+      "path": "m2-message-lifetime-sdl-build-sanitize.log",
+      "sha256": "2cad93d86cc870682f6cb9cc4f27e2d8425c7266d9d7ea7bf305569fef126237"
+    },
+    {
+      "path": "m2-message-lifetime-sdl-tests-sanitize.log",
+      "sha256": "ce9b383b68eec6bbb54c9bc84c4e775d5a6f3e6cd78441c36397e2e3567a4cd8"
+    },
+    {
+      "path": "m2-message-lifetime-final-gpu-debug.log",
+      "sha256": "6e7c02736a523ab166cf2ea3585a05963660a7cac33cacfb2040f244df65ddb0"
+    },
+    {
+      "path": "m2-message-lifetime-final-gpu-detail-debug.log",
+      "sha256": "f6f6572b7229d85293a673427ac2e997afc8f3d5db3bfce87786e2f19763336c"
+    },
+    {
+      "path": "m2-message-lifetime-final-gpu-release.log",
+      "sha256": "ccec3f5548a0748cb2613552744fa948b7cfdac465bf79329392c87ba0d33ae8"
+    },
+    {
+      "path": "m2-message-lifetime-final-gpu-detail-release.log",
+      "sha256": "d0b2eea87741c39e515f2d6c2bd8b4095b55c0b67d43942efb65656c6255adab"
+    },
+    {
+      "path": "m2-message-lifetime-links.log",
+      "sha256": "8194a7e720744950f3515a8a2bcffbac4dc9f5b09abb75645005bbb2c409061a"
+    }
+  ],
+  "remaining": [
+    "M2 consolidated acceptance and required unsupported player commands remain open.",
+    "CityHub traversal, original-game comparisons and later campaign/save/rendering milestones are not certified.",
+    "Exploratory GPU LeakSanitizer failure remains unattributed beyond captured stacks.",
+    "No new native Metal verification."
+  ]
+}

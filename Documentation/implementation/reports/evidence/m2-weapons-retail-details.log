@@ -1,0 +1,39 @@
+weapon 1: 463 vertices; 6 clips
+  static_model 1 ms
+  draw 333 ms
+  fire 150 ms [0:fire_key]
+  start_alt_fire 166 ms
+  alt_fire 200 ms [0:fire_key]
+  end_alt_fire 200 ms
+weapon 17: 488 vertices; 5 clips
+  alt_fire 1066 ms [613:fire_key]
+  fire2 966 ms [233:fire_key] [566:fire_key]
+  fire 566 ms [133:fire_key] [366:fire_key]
+  draw 333 ms
+  static_model 1 ms
+weapon 1: 463 vertices; 6 clips
+  static_model 1 ms
+  draw 333 ms
+  fire 150 ms [0:fire_key]
+  start_alt_fire 166 ms
+  alt_fire 200 ms [0:fire_key]
+  end_alt_fire 200 ms
+weapon 17: 488 vertices; 5 clips
+  alt_fire 1066 ms [613:fire_key]
+  fire2 966 ms [233:fire_key] [566:fire_key]
+  fire 566 ms [133:fire_key] [366:fire_key]
+  draw 333 ms
+  static_model 1 ms
+weapon 1: 463 vertices; 6 clips
+  static_model 1 ms
+  draw 333 ms
+  fire 150 ms [0:fire_key]
+  start_alt_fire 166 ms
+  alt_fire 200 ms [0:fire_key]
+  end_alt_fire 200 ms
+weapon 17: 488 vertices; 5 clips
+  alt_fire 1066 ms [613:fire_key]
+  fire2 966 ms [233:fire_key] [566:fire_key]
+  fire 566 ms [133:fire_key] [366:fire_key]
+  draw 333 ms
+  static_model 1 ms

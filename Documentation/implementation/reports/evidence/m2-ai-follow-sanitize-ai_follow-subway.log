@@ -1,0 +1,43 @@
+386/386 Testing: ai_follow.subway
+386/386 Test: ai_follow.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_follow_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_follow.subway" start time: Oct 16 12:54 CEST
+Output:
+----------------------------------------------------------
+SubwayA cycle=0 path arrival=1
+SubwayA cycle=1 path arrival=1
+<end of output>
+Test time =   2.34 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.subway" end time: Oct 16 12:54 CEST
+"ai_follow.subway" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 16 12:54 CEST
+
+ai_follow =   3.38 sec*proc
+
+ai_navigation =   2.80 sec*proc
+
+ai_state =  27.39 sec*proc
+
+ai_target =   3.83 sec*proc
+
+ai_trigger =   2.44 sec*proc
+
+character_motion =   1.16 sec*proc
+
+headless =  61.29 sec*proc
+
+objects =   0.23 sec*proc
+
+paths =   3.97 sec*proc
+
+player =   8.01 sec*proc
+
+private =  58.04 sec*proc
+
+services =   8.08 sec*proc
+

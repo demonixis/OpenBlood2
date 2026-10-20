@@ -1,0 +1,85 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 908
+    Start 908: hud.private
+
+908: Test command: <workspace>/Blood2/build/debug/tests/hud_tests "private" "<external-data-root>"
+908: Working Directory: <workspace>/Blood2/build/debug/tests
+908: Test timeout computed to be: 60
+test 907
+    Start 907: hud.session
+
+907: Test command: <workspace>/Blood2/build/debug/tests/hud_tests "session" "<workspace>/Blood2/build/debug/tests/hud-fixtures/session"
+907: Working Directory: <workspace>/Blood2/build/debug/tests
+907: Test timeout computed to be: 30
+1/8 Test #907: hud.session ......................   Passed    0.01 sec
+test 905
+    Start 905: hud.values
+
+905: Test command: <workspace>/Blood2/build/debug/tests/hud_tests "values" "<workspace>/Blood2/build/debug/tests/hud-fixtures/values"
+905: Working Directory: <workspace>/Blood2/build/debug/tests
+905: Test timeout computed to be: 30
+2/8 Test #905: hud.values .......................   Passed    0.00 sec
+test 654
+    Start 654: player_controls.keys
+
+654: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "keys"
+654: Working Directory: <workspace>/Blood2/build/debug/tests
+654: Test timeout computed to be: 30
+3/8 Test #654: player_controls.keys .............   Passed    0.00 sec
+test 655
+    Start 655: player_controls.mouse
+
+655: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "mouse"
+655: Working Directory: <workspace>/Blood2/build/debug/tests
+655: Test timeout computed to be: 30
+4/8 Test #655: player_controls.mouse ............   Passed    0.00 sec
+test 906
+    Start 906: hud.input
+
+906: Test command: <workspace>/Blood2/build/debug/tests/hud_tests "input" "<workspace>/Blood2/build/debug/tests/hud-fixtures/input"
+906: Working Directory: <workspace>/Blood2/build/debug/tests
+906: Test timeout computed to be: 30
+5/8 Test #906: hud.input ........................   Passed    0.00 sec
+test 656
+    Start 656: player_controls.gates
+
+656: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "gates"
+656: Working Directory: <workspace>/Blood2/build/debug/tests
+656: Test timeout computed to be: 30
+6/8 Test #656: player_controls.gates ............   Passed    0.00 sec
+test 657
+    Start 657: player_controls.entry
+
+657: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "entry"
+657: Working Directory: <workspace>/Blood2/build/debug/tests
+657: Test timeout computed to be: 30
+7/8 Test #657: player_controls.entry ............   Passed    0.00 sec
+8/8 Test #908: hud.private ......................   Passed    1.46 sec
+
+The following tests passed:
+	hud.session
+	hud.values
+	player_controls.keys
+	player_controls.mouse
+	hud.input
+	player_controls.gates
+	player_controls.entry
+	hud.private
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+headless           =   1.48 sec*proc (8 tests)
+hud                =   1.47 sec*proc (4 tests)
+player_controls    =   0.01 sec*proc (4 tests)
+private            =   1.46 sec*proc (1 test)
+
+Total Test time (real) =   1.47 sec

@@ -1,0 +1,66 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start   23: config.arguments
+ 1/18 Test   #23: config.arguments .................   Passed    0.00 sec
+      Start   24: config.precedence
+ 2/18 Test   #24: config.precedence ................   Passed    0.00 sec
+      Start   25: config.relative_paths
+ 3/18 Test   #25: config.relative_paths ............   Passed    0.00 sec
+      Start   26: config.invalid_config
+ 4/18 Test   #26: config.invalid_config ............   Passed    0.00 sec
+      Start   27: config.content_validation
+ 5/18 Test   #27: config.content_validation ........   Passed    0.00 sec
+      Start   28: config.case_lookup
+ 6/18 Test   #28: config.case_lookup ...............   Passed    0.00 sec
+      Start   29: config.demo
+ 7/18 Test   #29: config.demo ......................   Passed    0.00 sec
+      Start  950: remote.demo
+ 8/18 Test  #950: remote.demo ......................   Passed    0.01 sec
+      Start 1175: menus.state
+ 9/18 Test #1175: menus.state ......................   Passed    0.00 sec
+      Start 1176: menus.artwork
+10/18 Test #1176: menus.artwork ....................   Passed    0.30 sec
+      Start 1178: menus.session
+11/18 Test #1178: menus.session ....................   Passed    1.60 sec
+      Start 1179: menus.profiles
+12/18 Test #1179: menus.profiles ...................   Passed   14.60 sec
+      Start 1180: menus.preferences
+13/18 Test #1180: menus.preferences ................   Passed    0.00 sec
+      Start 1199: demo.flow
+14/18 Test #1199: demo.flow ........................   Passed    0.00 sec
+      Start 1200: demo.rules
+15/18 Test #1200: demo.rules .......................   Passed    0.01 sec
+      Start 1201: demo.worlds
+16/18 Test #1201: demo.worlds ......................   Passed    8.77 sec
+      Start 1202: demo.weapon
+17/18 Test #1202: demo.weapon ......................   Passed    0.07 sec
+      Start 1203: gpu.demo
+18/18 Test #1203: gpu.demo .........................***Failed    3.94 sec
+[info] Log session: /home/yann/projects/lithtech/Blood2/build/debug/tests/demo-gpu-logs/session-1792405100011710429-0
+[info] OpenBlood2 0.3.0 / 3a9466f-dirty / Debug / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-3a9466f (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=Demo_01; demo=true; config=blood2.local.ini; inspector=true; view=false; bench=false; headless=false; frames=0
+[info] External data: /home/yann/Games/B2Demo (--data-dir)
+[info] B2DEMO.REZ: detected, 55041396 bytes
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: Demo_01 (direct entry)
+[info] World ready: worlds/demo_01.dat
+[error] Frontend: Missing/oversized HUD resource: interface/statusbar/weapons/raidcanister.pcx
+[info] Session finished: exit_code=4
+
+
+94% tests passed, 1 tests failed out of 18
+
+Label Time Summary:
+config      =   0.01 sec*proc (7 tests)
+demo        =  12.78 sec*proc (5 tests)
+gpu         =   3.94 sec*proc (1 test)
+headless    =  25.37 sec*proc (17 tests)
+menus       =  16.50 sec*proc (5 tests)
+private     =  29.27 sec*proc (6 tests)
+remote      =   0.01 sec*proc (1 test)
+
+Total Test time (real) =  29.33 sec
+
+The following tests FAILED:
+	1203 - gpu.demo (Failed)                                 demo gpu private
+Errors while running CTest

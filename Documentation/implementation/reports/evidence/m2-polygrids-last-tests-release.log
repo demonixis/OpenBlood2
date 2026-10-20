@@ -1,0 +1,18 @@
+Test project <workspace>/Blood2/build/release
+    Start 921: polygrid.formulas
+1/4 Test #921: polygrid.formulas ................   Passed    0.00 sec
+    Start 922: polygrid.lifetime
+2/4 Test #922: polygrid.lifetime ................   Passed    0.00 sec
+    Start 923: polygrid.mesh
+3/4 Test #923: polygrid.mesh ....................   Passed    0.00 sec
+    Start 924: polygrid.private
+4/4 Test #924: polygrid.private .................   Passed    0.27 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+headless    =   0.27 sec*proc (4 tests)
+polygrid    =   0.27 sec*proc (4 tests)
+private     =   0.27 sec*proc (1 test)
+
+Total Test time (real) =   0.29 sec

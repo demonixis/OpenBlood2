@@ -1,0 +1,14 @@
+398/406 Testing: ai_locomotion.navigate
+398/406 Test: ai_locomotion.navigate
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "navigate"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.navigate" start time: Oct 16 13:42 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.navigate" end time: Oct 16 13:42 CEST
+"ai_locomotion.navigate" time elapsed: 00:00:00
+----------------------------------------------------------

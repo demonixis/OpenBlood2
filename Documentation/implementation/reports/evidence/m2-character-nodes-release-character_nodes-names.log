@@ -1,0 +1,14 @@
+527/530 Testing: character_nodes.names
+527/530 Test: character_nodes.names
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/character_nodes_tests" "names" "/home/yann/projects/lithtech/Blood2/build/release/tests/character-node-fixtures/names"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"character_nodes.names" start time: Oct 16 18:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"character_nodes.names" end time: Oct 16 18:56 CEST
+"character_nodes.names" time elapsed: 00:00:00
+----------------------------------------------------------

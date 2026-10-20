@@ -1,0 +1,14 @@
+320/583 Testing: world_view.alpha_order
+320/583 Test: world_view.alpha_order
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_view_tests" "alpha_order"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world_view.alpha_order" start time: Oct 17 00:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.alpha_order" end time: Oct 17 00:34 CEST
+"world_view.alpha_order" time elapsed: 00:00:00
+----------------------------------------------------------

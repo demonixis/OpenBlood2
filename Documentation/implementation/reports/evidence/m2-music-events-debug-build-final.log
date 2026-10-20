@@ -1,0 +1,35 @@
+[0/2] Re-checking globbed directories...
+[1/271] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[2/264] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[3/81] Scanning /home/yann/projects/lithtech/Blood2/src/app/world_sound_smoke.cpp for CXX dependencies
+[4/81] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_world_sounds.cpp for CXX dependencies
+[5/81] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[6/48] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[7/47] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[8/46] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[9/45] Generating CXX dyndep file tests/CMakeFiles/sound_tests.dir/CXX.dd
+[10/44] Generating CXX dyndep file tests/CMakeFiles/audio_stream_tests.dir/CXX.dd
+[11/43] Generating CXX dyndep file tests/CMakeFiles/music_asset_tests.dir/CXX.dd
+[12/42] Generating CXX dyndep file tests/CMakeFiles/dls_bank_tests.dir/CXX.dd
+[13/41] Generating CXX dyndep file tests/CMakeFiles/dls_sampler_tests.dir/CXX.dd
+[14/40] Generating CXX dyndep file tests/CMakeFiles/ima_style_tests.dir/CXX.dd
+[15/39] Generating CXX dyndep file tests/CMakeFiles/ima_band_tests.dir/CXX.dd
+[16/38] Generating CXX dyndep file tests/CMakeFiles/ima_section_tests.dir/CXX.dd
+[17/37] Generating CXX dyndep file tests/CMakeFiles/ima_timeline_tests.dir/CXX.dd
+[18/36] Generating CXX dyndep file tests/CMakeFiles/ima_variation_tests.dir/CXX.dd
+[19/35] Building CXX object CMakeFiles/blood2_app.dir/src/app/world_sound_smoke.cpp.o
+[20/35] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_world_sounds.cpp.o
+[21/35] Linking CXX executable blood2
+[22/35] Linking CXX executable tests/object_contract_tests
+[23/35] Linking CXX executable tests/config_tests
+[24/35] Linking CXX executable tests/world_tests
+[25/35] Linking CXX executable tests/sound_tests
+[26/35] Linking CXX executable tests/audio_stream_tests
+[27/35] Linking CXX executable tests/music_asset_tests
+[28/35] Linking CXX executable tests/dls_bank_tests
+[29/35] Linking CXX executable tests/dls_sampler_tests
+[30/35] Linking CXX executable tests/ima_style_tests
+[31/35] Linking CXX executable tests/ima_band_tests
+[32/35] Linking CXX executable tests/ima_section_tests
+[33/35] Linking CXX executable tests/ima_timeline_tests
+[34/35] Linking CXX executable tests/ima_variation_tests

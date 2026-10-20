@@ -1,0 +1,14 @@
+412/420 Testing: ai_recovery.topos
+412/420 Test: ai_recovery.topos
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_recovery_tests" "topos"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_recovery.topos" start time: Oct 16 14:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.topos" end time: Oct 16 14:04 CEST
+"ai_recovery.topos" time elapsed: 00:00:00
+----------------------------------------------------------

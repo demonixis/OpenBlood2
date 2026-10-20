@@ -1,0 +1,14 @@
+421/422 Testing: ai_script.audio
+421/422 Test: ai_script.audio
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests" "audio" "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-script-audio"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_script.audio" start time: Oct 16 13:17 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.audio" end time: Oct 16 13:17 CEST
+"ai_script.audio" time elapsed: 00:00:00
+----------------------------------------------------------

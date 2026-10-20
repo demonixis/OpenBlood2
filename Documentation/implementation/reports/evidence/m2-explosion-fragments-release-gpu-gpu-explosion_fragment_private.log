@@ -1,0 +1,79 @@
+577/577 Testing: gpu.explosion_fragment_private
+577/577 Test: gpu.explosion_fragment_private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_fragment_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-fragment-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.explosion_fragment_private" start time: Oct 16 21:34 CEST
+Output:
+----------------------------------------------------------
+Original fragment after collision/rest: 1510 pixels, half-opacity blend verified
+Original gibmetal2/gibmetal3: 12 triangles, 6830 pixels
+<end of output>
+Test time =   0.44 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_fragment_private" end time: Oct 16 21:34 CEST
+"gpu.explosion_fragment_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 21:34 CEST
+
+brushes =   1.56 sec*proc
+
+cameras =   1.61 sec*proc
+
+character =  13.33 sec*proc
+
+cinematics =   1.71 sec*proc
+
+containers =   3.47 sec*proc
+
+doors =   1.53 sec*proc
+
+explosion_fragments =   0.85 sec*proc
+
+explosion_models =   0.86 sec*proc
+
+explosion_rings =   0.87 sec*proc
+
+gpu = 105.38 sec*proc
+
+interaction =   2.12 sec*proc
+
+keyframes =   1.63 sec*proc
+
+lights =   1.70 sec*proc
+
+model_view =   1.00 sec*proc
+
+movement =  13.05 sec*proc
+
+objectives =   1.66 sec*proc
+
+pickups =   1.67 sec*proc
+
+player =   1.68 sec*proc
+
+player_keepalive =   1.85 sec*proc
+
+player_restore =   1.67 sec*proc
+
+private = 101.19 sec*proc
+
+randomsound =  12.59 sec*proc
+
+sceneexplosion =   1.71 sec*proc
+
+sound =   1.76 sec*proc
+
+sprite_view =   0.95 sec*proc
+
+sprites =   1.65 sec*proc
+
+triggers =   1.72 sec*proc
+
+weapons =  13.02 sec*proc
+
+world_view =  13.44 sec*proc
+
+worldpaths =   1.65 sec*proc
+

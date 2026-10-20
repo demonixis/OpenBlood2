@@ -1,0 +1,159 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  41: world.destination_trial_private
+      Start  42: world.destination_private
+ 1/69 Test  #42: world.destination_private .........   Passed   16.65 sec
+      Start  92: compound_shell.private
+ 2/69 Test  #92: compound_shell.private ............   Passed   14.83 sec
+      Start 144: brushes.catalog
+ 3/69 Test  #41: world.destination_trial_private ...   Passed   39.67 sec
+      Start  43: world.private
+ 4/69 Test  #43: world.private .....................   Passed    5.17 sec
+      Start  25: world.destination_trials
+ 5/69 Test  #25: world.destination_trials ..........   Passed    0.23 sec
+      Start  37: world.mutations
+ 6/69 Test  #37: world.mutations ...................   Passed    0.26 sec
+      Start  28: world.destination_lifetime
+ 7/69 Test  #28: world.destination_lifetime ........   Passed    0.07 sec
+      Start  88: compound_shell.geometry
+ 8/69 Test  #88: compound_shell.geometry ...........   Passed    0.06 sec
+      Start  91: compound_shell.ground
+ 9/69 Test  #91: compound_shell.ground .............   Passed    0.06 sec
+      Start  90: compound_shell.lifetime
+10/69 Test  #90: compound_shell.lifetime ...........   Passed    0.06 sec
+      Start 158: pushables.player
+11/69 Test #158: pushables.player ..................   Passed    0.32 sec
+      Start  30: world.sound_entries
+12/69 Test  #30: world.sound_entries ...............   Passed    0.09 sec
+      Start  29: world.sprite_entries
+13/69 Test  #29: world.sprite_entries ..............   Passed    0.08 sec
+      Start   1: objects.builtin_model
+14/69 Test   #1: objects.builtin_model .............   Passed    0.03 sec
+      Start  89: compound_shell.malformed
+15/69 Test  #89: compound_shell.malformed ..........   Passed    0.05 sec
+      Start  27: world.destination_schema
+16/69 Test  #27: world.destination_schema ..........   Passed    0.03 sec
+      Start  26: world.destination_messages
+17/69 Test  #26: world.destination_messages ........   Passed    0.03 sec
+      Start  36: world.world_rejection
+18/69 Test  #36: world.world_rejection .............   Passed    0.12 sec
+      Start  11: objects.unsupported_teardown
+19/69 Test  #11: objects.unsupported_teardown ......   Passed    0.09 sec
+      Start  10: objects.messages_strings
+20/69 Test  #10: objects.messages_strings ..........   Passed    0.08 sec
+      Start  12: objects.creation_failures
+21/69 Test  #12: objects.creation_failures .........   Passed    0.06 sec
+      Start 159: pushables.riders
+22/69 Test #159: pushables.riders ..................   Passed    0.12 sec
+      Start  38: world.session_lifecycle
+23/69 Test  #38: world.session_lifecycle ...........   Passed    0.05 sec
+      Start 154: pushables.gravity
+24/69 Test #154: pushables.gravity .................   Passed    0.08 sec
+      Start   4: objects.reasons_properties
+25/69 Test   #4: objects.reasons_properties ........   Passed    0.04 sec
+      Start   2: objects.original_objects
+26/69 Test   #2: objects.original_objects ..........   Passed    0.03 sec
+      Start   9: objects.links_lists
+27/69 Test   #9: objects.links_lists ...............   Passed    0.03 sec
+      Start 156: pushables.impulses
+28/69 Test #156: pushables.impulses ................   Passed    0.07 sec
+      Start   6: objects.deferred_removal
+29/69 Test   #6: objects.deferred_removal ..........   Passed    0.03 sec
+      Start  40: world.original_trigger
+30/69 Test  #40: world.original_trigger ............   Passed    0.03 sec
+      Start   8: objects.handles_selection
+31/69 Test   #8: objects.handles_selection .........   Passed    0.03 sec
+      Start   3: objects.nested_creation
+32/69 Test   #3: objects.nested_creation ...........   Passed    0.03 sec
+      Start   5: objects.scheduling
+33/69 Test   #5: objects.scheduling ................   Passed    0.03 sec
+      Start   7: objects.aggregate_dispatch
+34/69 Test   #7: objects.aggregate_dispatch ........   Passed    0.03 sec
+      Start 153: pushables.properties
+35/69 Test #153: pushables.properties ..............   Passed    0.07 sec
+      Start 162: pushables.containers
+36/69 Test #162: pushables.containers ..............   Passed    0.07 sec
+      Start 155: pushables.friction
+37/69 Test #155: pushables.friction ................   Passed    0.06 sec
+      Start 152: explosions.player
+38/69 Test #152: explosions.player .................   Passed    0.09 sec
+      Start 161: pushables.collision
+39/69 Test #161: pushables.collision ...............   Passed    0.06 sec
+      Start  33: world.resource_mount
+40/69 Test  #33: world.resource_mount ..............   Passed    0.03 sec
+      Start  34: world.world_properties
+41/69 Test  #34: world.world_properties ............   Passed    0.03 sec
+      Start  35: world.world_geometry
+42/69 Test  #35: world.world_geometry ..............   Passed    0.03 sec
+      Start 157: pushables.pushing
+43/69 Test #157: pushables.pushing .................   Passed    0.06 sec
+      Start 160: pushables.contacts
+44/69 Test #160: pushables.contacts ................   Passed    0.06 sec
+      Start  32: world.rez_rejection
+45/69 Test  #32: world.rez_rejection ...............   Passed    0.03 sec
+      Start  31: world.rez_structure
+46/69 Test  #31: world.rez_structure ...............   Passed    0.03 sec
+      Start  39: world.session_messages
+47/69 Test  #39: world.session_messages ............   Passed    0.03 sec
+      Start 145: explosions.properties
+48/69 Test #145: explosions.properties .............   Passed    0.07 sec
+      Start 146: explosions.requests
+49/69 Test #146: explosions.requests ...............   Passed    0.07 sec
+      Start 148: explosions.chain
+50/69 Test #148: explosions.chain ..................   Passed    0.07 sec
+      Start 149: explosions.gates
+51/69 Test #149: explosions.gates ..................   Passed    0.06 sec
+      Start 151: explosions.limits
+52/69 Test #151: explosions.limits .................   Passed    0.06 sec
+      Start 150: explosions.lifetime
+53/69 Test #150: explosions.lifetime ...............   Passed    0.07 sec
+      Start 147: explosions.radius
+54/69 Test #147: explosions.radius .................   Passed    0.06 sec
+      Start 138: brushes.spin
+55/69 Test #138: brushes.spin ......................   Passed    0.08 sec
+      Start 140: brushes.limits
+56/69 Test #140: brushes.limits ....................   Passed    0.08 sec
+      Start 143: brushes.lifetime
+57/69 Test #143: brushes.lifetime ..................   Passed    0.08 sec
+      Start 141: brushes.transport
+58/69 Test #141: brushes.transport .................   Passed    0.05 sec
+      Start 139: brushes.geometry
+59/69 Test #139: brushes.geometry ..................   Passed    0.04 sec
+      Start 142: brushes.destruction
+60/69 Test #142: brushes.destruction ...............   Passed    0.04 sec
+      Start 137: brushes.state
+61/69 Test #137: brushes.state .....................   Passed    0.04 sec
+      Start 694: world_debris.properties
+62/69 Test #694: world_debris.properties ...........   Passed    0.04 sec
+      Start 695: world_debris.naming
+63/69 Test #695: world_debris.naming ...............   Passed    0.04 sec
+      Start 696: world_debris.motion
+64/69 Test #696: world_debris.motion ...............   Passed    0.06 sec
+      Start 697: world_debris.rotation
+65/69 Test #697: world_debris.rotation .............   Passed    0.04 sec
+      Start 698: world_debris.lifetime
+66/69 Test #698: world_debris.lifetime .............   Passed    0.07 sec
+      Start 699: world_debris.contacts
+67/69 Test #699: world_debris.contacts .............   Passed    0.04 sec
+      Start 700: world_debris.private
+68/69 Test #144: brushes.catalog ...................   Passed   82.65 sec
+69/69 Test #700: world_debris.private ..............***Timeout  90.06 sec
+
+
+99% tests passed, 1 tests failed out of 69
+
+Label Time Summary:
+brushes         =  83.05 sec*proc (8 tests)
+containers      =  15.07 sec*proc (5 tests)
+explosions      =   0.56 sec*proc (8 tests)
+headless        = 253.21 sec*proc (69 tests)
+objects         =   0.53 sec*proc (12 tests)
+private         = 249.04 sec*proc (6 tests)
+pushables       =   0.97 sec*proc (10 tests)
+world           =  62.67 sec*proc (19 tests)
+world_debris    =  90.35 sec*proc (7 tests)
+
+Total Test time (real) = 139.11 sec
+
+The following tests FAILED:
+	700 - world_debris.private (Timeout)                    headless private world_debris
+Errors while running CTest

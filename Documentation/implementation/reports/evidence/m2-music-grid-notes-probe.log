@@ -1,0 +1,18 @@
+{
+  "binary": "IMUSIC25.DLL",
+  "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "rva": "0x16908",
+  "generated": {
+    "sections": 128,
+    "steps": 2799,
+    "sha256": "b578076f070506c957fd9ca9806c5587274794292381806cc668ed2c51082079",
+    "fnv64": 937667046537544111
+  },
+  "private": {
+    "sections": 132,
+    "steps": 8174,
+    "sha256": "8acaa1db032da34dd2a43eebabba07e722760883ae85cadfda0f551103ed6226",
+    "fnv64": 5880823308775508798
+  },
+  "scope": "Original normal-mode grid/chord/mute/pattern/variation decisions, admitted note pitch and paired event values. Prepared inputs come from previously verified readers/helpers. Section event list and active notes empty; notifications, metronome, MIDI sink, note allocation/registration, playlist lookahead/repeats/transitions intercepted. Active notes discarded after pair observation: no later reharmonization/note-off dispatch claim. This is not a full tick/audio equivalence claim."
+}

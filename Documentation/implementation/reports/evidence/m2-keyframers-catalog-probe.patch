@@ -1,0 +1,49 @@
+--- a/tests/keyframer_tests.cpp
++++ b/tests/keyframer_tests.cpp
+@@ -305,7 +305,7 @@
+         config.data_dir = root;
+         std::string error;
+         CHECK(g.resources.mount_game(config, error));
+-        unsigned worlds = 0, controllers = 0, key_count = 0, copied = 0, empty = 0, missing = 0, failed = 0;
++        unsigned worlds = 0, controllers = 0, key_count = 0, copied = 0, empty = 0, missing = 0, failed = 0, survivors = 0, initialized = 0;
+         for (const auto& [path, resource] : g.resources.index())
+         {
+             (void)resource;
+@@ -337,7 +337,7 @@
+             for (auto id : g.objects.snapshot())
+                 if (auto* f = dynamic_cast<KeyFramer*>(g.objects.get(id)->game.get()))
+                 {
+-                    CHECK(f->initialized);
++                    CHECK(f->initialized); ++initialized;
+                     copied += f->keys.size();
+                     if (f->keys.empty())
+                         ++empty;
+@@ -350,11 +350,14 @@
+                         std::cout << path << ": " << f->error << '\n';
+                     }
+                 }
++            for(auto id:g.objects.snapshot()) if(dynamic_cast<Key*>(g.objects.get(id)->game.get()))++survivors;
+             CHECK(g.objects.clear() && !g.server.string_count() && !g.server.list_count());
+         }
+         std::cout << "worlds=" << worlds << " controllers=" << controllers << " source_keys=" << key_count
+                   << " copied=" << copied << " empty_paths=" << empty << " missing_targets=" << missing
+                   << " malformed=" << failed << '\n';
++        std::cout << "Initialized controllers=" << initialized << " surviving Keys=" << survivors << "\n";
++        CHECK(initialized==94 && survivors==8);
+         CHECK(worlds == 57 && controllers == 94 && key_count == 383 && copied == 375 && !empty && missing == 44 &&
+               !failed);
+         for (int cycle = 0; cycle < 2; ++cycle)
+@@ -388,6 +391,13 @@
+             }
+             CHECK(second && !g.client_shell.view.object && g.server.GetTime() - entered > 12 &&
+                   g.server.GetTime() - entered < 12.1f);
++            auto* tracking = g.server.FindNamedObjects("tracking2");
++            CHECK(tracking && tracking->m_pFirstLink);
++            auto* second_path = framer(g, tracking->m_pFirstLink->m_hObject);
++            g.server.RelinquishList(tracking);
++            CHECK(second_path && second_path->targets.size()==1 && second_path->targets[0].moves>0);
++            std::cout << "SubwayA cycle=" << cycle << " camera1 reached=" << f->targets[0].moves
++                      << " camera2 reached=" << second_path->targets[0].moves << "\n";
+             auto* trains = g.server.FindNamedObjects("htrain1");
+             CHECK(trains && trains->m_pFirstLink);
+             auto train = trains->m_pFirstLink->m_hObject;

@@ -1,0 +1,117 @@
+43/707 Testing: world.destination_private
+43/707 Test: world.destination_private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/world_tests" "destination_private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"world.destination_private" start time: Oct 17 04:45 CEST
+Output:
+----------------------------------------------------------
+Cycle 0: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 0: worlds/02_cityhub.dat: 1026 entries / 295 schema / 541 editor / 159 unknown / 31 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound0: Sound: invalid property VoiceType
+Schema failure Sound / Sound0: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound1: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound2: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 1: worlds/02_cityhub.dat: 1026 entries / 295 schema / 541 editor / 159 unknown / 31 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound0: Sound: invalid property VoiceType
+Schema failure Sound / Sound0: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound1: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound2: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 2: worlds/02_cityhub.dat: 1026 entries / 295 schema / 541 editor / 159 unknown / 31 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound0: Sound: invalid property VoiceType
+Schema failure Sound / Sound0: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound1: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound2: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+PASS destination_private
+<end of output>
+Test time =   0.38 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_private" end time: Oct 17 04:45 CEST
+"world.destination_private" time elapsed: 00:00:00
+----------------------------------------------------------

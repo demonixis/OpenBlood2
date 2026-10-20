@@ -1,0 +1,34 @@
+307/307 Testing: paths.catalog
+307/307 Test: paths.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/path_manager_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"paths.catalog" start time: Oct 16 06:16 CEST
+Output:
+----------------------------------------------------------
+spank0 pos=-48,176,-2320 target=<absent> message=<absent>
+dog0 pos=-32,192,-96 target=<absent> message=<absent>
+dog1 pos=-32,192,-168 target=<absent> message=<absent>
+dog2 pos=40,192,-208 target=<absent> message=<absent>
+dog3 pos=40,192,-224 target=<absent> message=<absent>
+cat1 pos=-32,192,-232 target=<absent> message=<absent>
+spank1 pos=-88,176,-2320 target=<absent> message=<absent>
+Selected cat: cat1
+Selected dog: dog3 dog2 dog1 dog0
+Selected spank: spank1 spank0
+spank0 pos=-48,176,-2320 target=<absent> message=<absent>
+dog0 pos=-32,192,-96 target=<absent> message=<absent>
+dog1 pos=-32,192,-168 target=<absent> message=<absent>
+dog2 pos=40,192,-208 target=<absent> message=<absent>
+dog3 pos=40,192,-224 target=<absent> message=<absent>
+cat1 pos=-32,192,-232 target=<absent> message=<absent>
+spank1 pos=-88,176,-2320 target=<absent> message=<absent>
+Selected cat: cat1
+Selected dog: dog3 dog2 dog1 dog0
+Selected spank: spank1 spank0
+<end of output>
+Test time =   0.57 sec
+----------------------------------------------------------
+Test Passed.
+"paths.catalog" end time: Oct 16 06:16 CEST
+"paths.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

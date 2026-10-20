@@ -1,0 +1,57 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start 22: config.arguments
+ 1/22 Test #22: config.arguments .................   Passed    0.00 sec
+      Start 23: config.precedence
+ 2/22 Test #23: config.precedence ................   Passed    0.00 sec
+      Start 24: config.relative_paths
+ 3/22 Test #24: config.relative_paths ............   Passed    0.00 sec
+      Start 25: config.invalid_config
+ 4/22 Test #25: config.invalid_config ............   Passed    0.00 sec
+      Start 26: config.content_validation
+ 5/22 Test #26: config.content_validation ........   Passed    0.00 sec
+      Start 27: config.case_lookup
+ 6/22 Test #27: config.case_lookup ...............   Passed    0.00 sec
+      Start 28: logging.basic
+ 7/22 Test #28: logging.basic ....................   Passed    0.01 sec
+      Start 29: logging.level
+ 8/22 Test #29: logging.level ....................   Passed    0.01 sec
+      Start 30: logging.rotation
+ 9/22 Test #30: logging.rotation .................   Passed    0.01 sec
+      Start 31: logging.failure
+10/22 Test #31: logging.failure ..................   Passed    0.01 sec
+      Start 32: logging.write_failure
+11/22 Test #32: logging.write_failure ............   Passed    0.02 sec
+      Start 33: logging.retention
+12/22 Test #33: logging.retention ................   Passed    0.01 sec
+      Start 34: logging.threads
+13/22 Test #34: logging.threads ..................   Passed    0.01 sec
+      Start 35: logging.abrupt
+14/22 Test #35: logging.abrupt ...................   Passed    0.01 sec
+      Start 36: logging.crash
+15/22 Test #36: logging.crash ....................   Passed    0.07 sec
+      Start 37: logging.cli
+16/22 Test #37: logging.cli ......................   Passed    0.02 sec
+      Start 38: cli.help
+17/22 Test #38: cli.help .........................   Passed    0.01 sec
+      Start 39: cli.unknown
+18/22 Test #39: cli.unknown ......................   Passed    0.01 sec
+      Start 40: cli.missing_data
+19/22 Test #40: cli.missing_data .................   Passed    0.01 sec
+      Start 41: cli.missing_config
+20/22 Test #41: cli.missing_config ...............   Passed    0.01 sec
+      Start 42: cli.metadata
+21/22 Test #42: cli.metadata .....................   Passed    0.01 sec
+      Start 72: cli.world_modes
+22/22 Test #72: cli.world_modes ..................   Passed    0.24 sec
+
+100% tests passed, 0 tests failed out of 22
+
+Label Time Summary:
+cli         =   0.07 sec*proc (6 tests)
+config      =   0.01 sec*proc (6 tests)
+headless    =   0.48 sec*proc (22 tests)
+logging     =   0.18 sec*proc (10 tests)
+private     =   0.24 sec*proc (1 test)
+world       =   0.24 sec*proc (1 test)
+
+Total Test time (real) =   0.50 sec

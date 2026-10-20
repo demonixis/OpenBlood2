@@ -1,0 +1,41 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 46: player.handles
+ 1/15 Test #46: player.handles ...................   Passed    0.00 sec
+      Start 47: player.lifecycle
+ 2/15 Test #47: player.lifecycle .................   Passed    0.00 sec
+      Start 48: player.rollback
+ 3/15 Test #48: player.rollback ..................   Passed    0.00 sec
+      Start 49: player.messages
+ 4/15 Test #49: player.messages ..................   Passed    0.00 sec
+      Start 50: player.callbacks
+ 5/15 Test #50: player.callbacks .................   Passed    0.00 sec
+      Start 51: player.private
+ 6/15 Test #51: player.private ...................   Passed    0.45 sec
+      Start 53: weapons.inventory
+ 7/15 Test #53: weapons.inventory ................   Passed    0.00 sec
+      Start 54: weapons.segments
+ 8/15 Test #54: weapons.segments .................   Passed    0.00 sec
+      Start 55: weapons.firing
+ 9/15 Test #55: weapons.firing ...................   Passed    0.00 sec
+      Start 56: weapons.melee
+10/15 Test #56: weapons.melee ....................   Passed    0.00 sec
+      Start 57: weapons.damage
+11/15 Test #57: weapons.damage ...................   Passed    0.00 sec
+      Start 58: weapons.animation
+12/15 Test #58: weapons.animation ................   Passed    0.01 sec
+      Start 59: weapons.lifetime
+13/15 Test #59: weapons.lifetime .................   Passed    0.00 sec
+      Start 60: weapons.rollback
+14/15 Test #60: weapons.rollback .................   Passed    0.00 sec
+      Start 61: weapons.private
+15/15 Test #61: weapons.private ..................   Passed    0.65 sec
+
+100% tests passed, 0 tests failed out of 15
+
+Label Time Summary:
+headless    =   1.14 sec*proc (15 tests)
+player      =   0.46 sec*proc (6 tests)
+private     =   1.10 sec*proc (2 tests)
+weapons     =   0.68 sec*proc (9 tests)
+
+Total Test time (real) =   1.15 sec

@@ -1,0 +1,11 @@
+[0/2] Re-checking globbed directories...
+[1/41] Scanning /home/yann/projects/lithtech/Blood2/tests/player_keepalive_tests.cpp for CXX dependencies
+[2/41] Generating CXX dyndep file tests/CMakeFiles/player_keepalive_tests.dir/CXX.dd
+[3/40] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector.cpp for CXX dependencies
+[4/40] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[5/40] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[6/11] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o
+[7/11] Building CXX object tests/CMakeFiles/player_keepalive_tests.dir/player_keepalive_tests.cpp.o
+[8/11] Linking CXX executable tests/player_keepalive_tests
+[9/11] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[10/11] Linking CXX executable blood2

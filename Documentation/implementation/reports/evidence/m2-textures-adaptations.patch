@@ -1,0 +1,1451 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 35455cb..b4c8295 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -263,3 +263,5 @@ coordinates, base rings, current checked visibility, world revisions and the sin
+ player integrator. `--view-world` is navigable inspection, not the M3 playable slice;
+ texture/model/FX rendering and required NPC/ExitTrigger services remain unavailable. Current
+ world shaders support Vulkan/SPIR-V only; M2 stays incomplete.
++
++The [DTX world-texture continuation](../Documentation/Implementation/M2_TEXTURES.md) adds bounded version -2 palette decoding, exact-path material caching and opaque SDL_GPU sampling. Read [texture contracts](docs/TEXTURE_CONTRACTS.md) before extending images/materials. Preserve the -2/-5 generation boundary, strict lengths, pre-pivot UVs, world-revision ownership and explicit failed resources. Alpha/sky markers, unlit mip-zero sampling and unsupported version-0 assets remain visible limitations. Models, required original services and the M2 gate remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index aaa8405..ce6bdae 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,7 +14,7 @@ include(CTest)
+ include(cmake/Dependencies.cmake)
+ configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+ 
+-add_library(engine STATIC src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
++add_library(engine STATIC src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+ target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
+ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+diff --git a/README.md b/README.md
+index 66b96bb..e2680bc 100644
+--- a/README.md
++++ b/README.md
+@@ -6,7 +6,7 @@ The three runtime targets remain small: `engine` (resources, world/object runtim
+ 
+ The [diagnostic 3D view](docs/WORLD_VIEW_CONTRACTS.md) now renders actual level
+ geometry and current moving brushes through SDL_GPU. Run `./build/debug/blood2 --view-world` to enter the original player/cameras with
+-keyboard controls enabled. F1 opens inspection. Textures, rendered models/weapons,
++keyboard controls enabled. F1 opens inspection. [Original DTX textures](docs/TEXTURE_CONTRACTS.md) now appear as unlit opaque materials. Rendered models/weapons,
+ full combat and M2 completion remain pending. The world shader currently requires
+ Vulkan/SPIR-V; other backend artifacts remain unimplemented.
+ 
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 118376a..35937fc 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -485,3 +485,17 @@ compatibility is not claimed. SDL's pinned SDL_gpu.h defines NDC, resource bindi
+ depth clipping and GPU resource lifetime. No game rule changed. See
+ [contracts](WORLD_VIEW_CONTRACTS.md) and
+ [evidence](../../Documentation/Implementation/M2_WORLD_VIEW.md).
++
++## M2 DTX world materials
++
++`texture.cpp` is a new bounded reader informed by the C++ DTX parser in
++`OpenBlood2/OpenLithTech/src/formats/dtx_parser.cpp` and its NoMadEngine counterpart,
++then checked against the complete externally mounted retail corpus. It does not
++copy their basename/payload-size guesses, unrestricted allocations or implicit
++fallbacks. The older converter's contradictory channel order is not adopted.
++The -2 layout is measured data; later `sources/lithtech/runtime/shared/src/dtxmgr.h`
++(version -5) is a generation-boundary reference, not a compatible specification.
++UV dot products follow the reviewed world surface representation and the donor's
++resource-manager calculation, evaluated before subtracting the authored pivot.
++Shader sampling, bounded batches, upload lifetime and tests are new engine code;
++no gameplay source changed. See [contracts](TEXTURE_CONTRACTS.md).
+diff --git a/docs/TEXTURE_CONTRACTS.md b/docs/TEXTURE_CONTRACTS.md
+new file mode 100644
+index 0000000..6a4794b
+--- /dev/null
++++ b/docs/TEXTURE_CONTRACTS.md
+@@ -0,0 +1,83 @@
++# DTX textures and opaque world materials
++
++M2 remains incomplete. This extends the [world view](WORLD_VIEW_CONTRACTS.md) with
++bounded external DTX decoding and opaque base-color sampling, independent of ImGui.
++No original game rule, source-class accounting or dependency pin changed.
++
++## Data boundary
++
++`read_texture` accepts resource type 0 / signed version -2 only. Header fields are
++little-endian: 16-bit width/height/mip count/section count at offsets 8–15, 32-bit
++flags/user flags at 16–23, twelve opaque extra bytes at 24–35, and two opaque
++serialized slots at 36–43. A 256-entry palette begins at 44; mip indices begin at
++1068. Do not interpret the extra bytes as the newer -5 BPP identifiers, append a
++128-byte command string, follow serialized pointer values, guess by basename, or
++borrow another resource's palette.
++
++The selected retail corpus supports this layout with exact lengths: 3,820 version
++-2 images decode, including 1,450 with flag 2 and separate packed four-bit masks.
++Five version-0 resources are explicitly unsupported. Names do not decide format.
++Palette bytes are converted A,R,G,B to RGBA; the optional mask replaces alpha,
++high nibble first, scaled by 17. This mapping follows the reviewed C++ donor and
++recognizable retail color previews; the old Python converter contradicts its
++channel order. Mask orientation is covered by synthetic tests, not a retail alpha
++rendering comparison. World rendering deliberately ignores alpha for this increment.
++Flags other than mask presence are retained metadata, not implemented effects.
++
++Dimensions must be powers of two, 1–1,024; mip count 1–8 and no longer than the
++image chain. Sections and unknown flags outside the observed 0x2b mask reject.
++All stored mip dimensions/indices/masks and the exact ending are checked before
++allocation. Input is capped at 3 MiB; output at 4 MiB. Only mip zero is decoded;
++other mip/alpha payloads are structurally checked. Failure clears all output and
++returns a concrete error. Unknown layouts are not accepted by payload-size guesses.
++
++## World mapping and ownership
++
++The mesh requests exact normalized paths through existing REZ mount precedence.
++One owned CPU image per distinct path is shared across all world-model ranges.
++At most 4,096 named materials and 128 MiB of RGBA payload are allowed, including
++the four-byte white diagnostic slot; failed records retain names/errors. Missing,
++oversized, unsupported or malformed materials render an opaque magenta marker.
++Malformed geometry/path/UV data and exhausted aggregate budgets fail mesh building
++atomically. An intentionally texture-free synthetic mesh retains orientation colors.
++
++UVs are dot(position - surface origin, surface U/V), divided by image width/height.
++They use authored positions before subtracting a moving model's DAT pivot. Applying
++the current object transform therefore moves the surface and texture together.
++There is no global scale, axis flip or guessed fallback UV. Finite values and an
++absolute normalized UV limit of one million are checked. Base rings and invisible
++surface exclusion remain unchanged. Adjacent triangles with the same material
++share a batch within each model range; transforms still resolve from checked objects.
++
++World vertices now occupy 32 bytes (96 MB at the existing three-million limit).
++CPU capacities, the separately bounded RGBA payload, upload staging and GPU copies
++are additional storage. A single texture transfer buffer batches all image uploads.
++Images and vertices upload once per world revision, then draws bind a sampler and
++material per batch. Texture lifetime follows geometry clear/unload/reload; SDL owns
++deferred GPU destruction. Rejected GPU uploads clear the partial cache. No resource
++cache owns an original object or advances simulation. Sampler/pipeline/depth may
++persist through unload. The capture blit uses the acquired swapchain dimensions,
++which can lag a window resize request; readback dimensions remain independent.
++
++The Vulkan/SPIR-V shaders sample mip zero with nearest repeat and output unlit
++opaque RGB. Color-space/retail filtering/lightmap parity is not claimed. Transparent
++faces and sky retain explicit opaque diagnostic colors; no alpha blending, alpha
++test, animated material, fullbright pass, lighting, liquid, sprite or model rendering
++is implied. No implicit sun or DirLight behavior is inferred. Later cross-backend
++artifacts remain unavailable.
++
++## Inspection and verification
++
++The 3D tab distinguishes prepared instances and material batches, decoded/rejected
++CPU resources, dimensions, stored mip count, raw flags, byte budget and GPU world
++uploads. It does not claim that CPU decoding alone has uploaded or drawn a texture.
++Hidden UI and the inspector-free build execute the same material path.
++
++Synthetic tests check channel order/masks, every truncated prefix, invalid versions,
++flags/dimensions/counts/endings, exact-path refusal, normalized-path deduplication,
++moving-pivot UVs and atomic rejection. Private tests decode the complete mounted DTX
++corpus and rebuild/release SubwayA twice. GPU pixels check known texture colors,
++repeat, row orientation, alpha-ignored policy, reload replacement and rejected-upload
++cleanup alongside the existing depth/camera/resize checks. The real-world smoke
++retains movement, hidden UI and unload/re-entry assertions and now requires at least
++50 decoded materials and no rejected material. See [run evidence](../../Documentation/Implementation/M2_TEXTURES.md).
+diff --git a/docs/WORLD_CONTRACTS.md b/docs/WORLD_CONTRACTS.md
+index 67c9afb..d4c4a05 100644
+--- a/docs/WORLD_CONTRACTS.md
++++ b/docs/WORLD_CONTRACTS.md
+@@ -86,3 +86,5 @@ the stated limits; complete shells/CPlayerObj and moving world models remain ope
+ The [diagnostic 3D view](WORLD_VIEW_CONTRACTS.md) supersedes the absence of any world
+ rasterization: existing player/scripted cameras now drive depth-tested geometry and
+ letterbox presentation. Materials, lighting, models/FX and complete M2 remain open.
++
++The [DTX continuation](TEXTURE_CONTRACTS.md) supersedes the absence of world textures: opaque unlit base colors now render, with named rejection diagnostics and bounded cache ownership. World vertices are now 32 bytes; the three-million-vertex payload limit is 96 MB. Earlier geometry limits, current transforms and the M2 gate remain unchanged.
+diff --git a/docs/WORLD_VIEW_CONTRACTS.md b/docs/WORLD_VIEW_CONTRACTS.md
+index 27fd4d7..8924a0e 100644
+--- a/docs/WORLD_VIEW_CONTRACTS.md
++++ b/docs/WORLD_VIEW_CONTRACTS.md
+@@ -91,3 +91,5 @@ occlusion, both windings, near clipping, axis orientation, camera/object transfo
+ resize, letterbox and reupload. Headless cases cover malformed mesh inputs, base
+ rings, projection, invisible/inactive/pending lifetime and private posed geometry.
+ No pixel-identical retail comparison, optimization or additional platform is claimed.
++
++The [DTX continuation](TEXTURE_CONTRACTS.md) supersedes the absence of world textures: opaque unlit base colors now render, with named rejection diagnostics and bounded cache ownership. World vertices are now 32 bytes; the three-million-vertex payload limit is 96 MB. Earlier geometry limits, current transforms and the M2 gate remain unchanged.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 98edb52..7f89f85 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -375,24 +375,42 @@ namespace OpenBlood2
+             {
+                 if (ImGui::BeginTabItem("3D view"))
+                 {
+-                    ImGui::TextWrapped("Diagnostic solid-color geometry with depth. F1 shows the world; F2 enables "
++                    ImGui::TextWrapped("Diagnostic textured geometry with depth. F1 shows the world; F2 enables "
+                                        "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
+                                        "the player in Session first, or launch --view-world.");
+                     ImGui::TextWrapped(
+-                        "Orientation colors are not lighting. Textures/lightmaps, models, sprites, liquid surfaces, "
++                        "Opaque textures are unlit. Lightmaps, models, sprites, liquid surfaces, "
+                         "transparency and sky rendering remain unavailable. Unsupported objects stay in World.");
+                     if (world_mesh && world_render)
+                     {
+-                        ImGui::Text("GPU: %llu frames / %llu geometry uploads",
+-                                    (unsigned long long)world_render->frames,
++                        ImGui::Text("GPU: %llu frames / %llu world uploads", (unsigned long long)world_render->frames,
+                                     (unsigned long long)world_render->uploads);
+-                        ImGui::Text("Prepared: %zu triangles / %zu draws / %zu hidden instances",
++                        ImGui::Text("Prepared: %zu triangles / %zu instances / %zu hidden instances",
+                                     world_render->triangles, world_render->draws, world_render->hidden);
+                         ImGui::Text("Unbound models: %zu / excluded containers: %zu", world_render->unbound,
+                                     world_render->containers);
+                         ImGui::Text(
+                             "Faces: %zu invisible / %zu degenerate / %zu transparent-as-opaque / %zu sky markers",
+                             world_mesh->invisible, world_mesh->degenerate, world_mesh->transparent, world_mesh->sky);
++                        std::size_t decoded = 0, failed = 0;
++                        for (std::size_t i = 1; i < world_mesh->materials.size(); ++i)
++                            world_mesh->materials[i].error.empty() ? ++decoded : ++failed;
++                        ImGui::Text("Materials: %zu decoded / %zu rejected / %zu RGBA bytes / %zu batches", decoded,
++                                    failed, world_mesh->texture_bytes, world_render->batches);
++                        if (ImGui::TreeNode("Texture resources (mip zero, nearest repeat)"))
++                        {
++                            for (std::size_t i = 1; i < world_mesh->materials.size(); ++i)
++                            {
++                                const auto& material = world_mesh->materials[i];
++                                if (material.error.empty())
++                                    ImGui::Text("%s: %ux%u, %u stored mips, flags 0x%x", material.path.c_str(),
++                                                material.image.width, material.image.height, material.image.mipmaps,
++                                                material.image.flags);
++                                else
++                                    ImGui::Text("%s: %s", material.path.c_str(), material.error.c_str());
++                            }
++                            ImGui::TreePop();
++                        }
+                         ImGui::Text("Camera: %s at %.2f %.2f %.2f",
+                                     !game.client_shell.m_bInWorld   ? "no entered player"
+                                     : game.client_shell.view.object ? "original scripted camera"
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 1c1b60e..a1acef0 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -579,7 +579,7 @@ namespace
+                 world_renderer.clear_geometry();
+                 world_mesh = {};
+                 world_draws.clear();
+-                if (!game.world_path.empty() && !world_mesh.build(game.world, error))
++                if (!game.world_path.empty() && !world_mesh.build(game.world, error, &game.resources))
+                 {
+                     spdlog::error("World mesh: {}", error);
+                     return 5;
+@@ -687,7 +687,7 @@ namespace
+                     ++ui_frames;
+ #endif
+                 SDL_EndGPURenderPass(pass);
+-                if (capture_frame && !capture.enqueue(commands, swapchain))
++                if (capture_frame && !capture.enqueue(commands, swapchain, width, height))
+                 {
+                     spdlog::error("Capture copy: {}", SDL_GetError());
+                     SDL_SubmitGPUCommandBuffer(commands);
+@@ -1039,8 +1039,14 @@ namespace
+                              viewport_hidden, viewport_unloaded, viewport_reloaded, world_renderer.stats.uploads,
+                              world_renderer.stats.frames, world_renderer.stats.triangles, world_renderer.stats.draws,
+                              world_renderer.width(), world_renderer.height());
+-                if (!viewport_hidden || !viewport_unloaded || !viewport_reloaded || world_renderer.stats.uploads != 2 ||
+-                    world_renderer.width() != 1000 || world_renderer.height() != 680)
++                std::size_t decoded = 0, missing = 0;
++                for (std::size_t i = 1; i < world_mesh.materials.size(); ++i)
++                    world_mesh.materials[i].error.empty() ? ++decoded : ++missing;
++                spdlog::info("World textures: decoded={}, rejected={}, RGBA bytes={}, prepared batches={}", decoded,
++                             missing, world_mesh.texture_bytes, world_renderer.stats.batches);
++                if (decoded < 50 || missing || !viewport_hidden || !viewport_unloaded || !viewport_reloaded ||
++                    world_renderer.stats.uploads != 2 || world_renderer.width() != 1000 ||
++                    world_renderer.height() != 680)
+                     return 4;
+             }
+             const bool ui_ok =
+@@ -1084,7 +1090,12 @@ namespace
+                   game.objects.snapshot().size() != initial_objects - (options.scene_explosions_smoke ? 1 : 0) ||
+                   game.server.string_count() != initial_strings)))
+             {
+-                spdlog::error("GPU smoke failed its render/toggle/resize/quit assertions");
++                spdlog::error(
++                    "GPU smoke failed: selection={}, crouch/run frames={}/{}, skeleton reentry/hidden={}/{}, "
++                    "crouched/stood={}/{}, locomotion/walk/run/jump={}/{}/{}/{}, objects={}/{}, strings={}/{}",
++                    selection_cleared, crouch_frames, run_frames, skeleton_reentered, skeleton_hidden, crouched_hidden,
++                    stood_after_crouch, locomotion_pose, saw_walk, saw_run, saw_jump, game.objects.snapshot().size(),
++                    initial_objects, game.server.string_count(), initial_strings);
+                 return 4;
+             }
+             spdlog::info("GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and "
+diff --git a/src/engine/capture.cpp b/src/engine/capture.cpp
+index 8d31d94..08b7d6d 100644
+--- a/src/engine/capture.cpp
++++ b/src/engine/capture.cpp
+@@ -35,7 +35,8 @@ namespace OpenBlood2
+         return transfer != nullptr;
+     }
+ 
+-    bool Capture::enqueue(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* swapchain)
++    bool Capture::enqueue(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* swapchain, Uint32 target_width,
++                          Uint32 target_height)
+     {
+         SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(commands);
+         if (!copy)
+@@ -56,8 +57,8 @@ namespace OpenBlood2
+         blit.source.w = width;
+         blit.source.h = height;
+         blit.destination.texture = swapchain;
+-        blit.destination.w = width;
+-        blit.destination.h = height;
++        blit.destination.w = target_width;
++        blit.destination.h = target_height;
+         blit.load_op = SDL_GPU_LOADOP_DONT_CARE;
+         blit.filter = SDL_GPU_FILTER_NEAREST;
+         SDL_BlitGPUTexture(commands, &blit);
+diff --git a/src/engine/capture.h b/src/engine/capture.h
+index 42fd279..7cfa15a 100644
+--- a/src/engine/capture.h
++++ b/src/engine/capture.h
+@@ -19,7 +19,8 @@ namespace OpenBlood2
+         Capture& operator=(const Capture&) = delete;
+         ~Capture();
+         bool initialize(SDL_GPUDevice* gpu, SDL_GPUTextureFormat format, Uint32 w, Uint32 h);
+-        bool enqueue(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* swapchain);
++        bool enqueue(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* swapchain, Uint32 target_width,
++                     Uint32 target_height);
+         bool save(const char* filename);
+     };
+ 
+diff --git a/src/engine/shaders/world.frag b/src/engine/shaders/world.frag
+index 72150b7..ae2e49d 100644
+--- a/src/engine/shaders/world.frag
++++ b/src/engine/shaders/world.frag
+@@ -1,4 +1,7 @@
+ #version 450
+ layout(location=0) in vec3 faceColor;
+ layout(location=0) out vec4 color;
+-void main() { color=vec4(faceColor,1.0); }
++layout(location=1) in vec2 texCoord;
++layout(set=2,binding=0) uniform sampler2D albedo;
++// Opaque base-color diagnostic. Alpha/sky/lightmaps are explicitly separate work.
++void main() { color=vec4(texture(albedo,texCoord).rgb*faceColor,1.0); }
+diff --git a/src/engine/shaders/world.vert b/src/engine/shaders/world.vert
+index 47ca202..02d2d44 100644
+--- a/src/engine/shaders/world.vert
++++ b/src/engine/shaders/world.vert
+@@ -1,7 +1,9 @@
+ #version 450
+ layout(location=0) in vec3 position;
+ layout(location=1) in vec3 color;
++layout(location=2) in vec2 uv;
+ layout(location=0) out vec3 faceColor;
++layout(location=1) out vec2 texCoord;
+ layout(set=1,binding=0,std140) uniform View {
+     vec4 eye, right, up, forward, projection, translation, quaternion;
+ } u;
+@@ -14,4 +16,5 @@ void main() {
+                      dot(relative,u.up.xyz)*u.projection.y,
+                      z*u.projection.z+u.projection.w,z);
+     faceColor=color;
++    texCoord=uv;
+ }
+diff --git a/src/engine/shaders/world_frag.h b/src/engine/shaders/world_frag.h
+index a2eb025..cd1f5a6 100644
+--- a/src/engine/shaders/world_frag.h
++++ b/src/engine/shaders/world_frag.h
+@@ -1,20 +1,30 @@
+ 	// 1116.2.0
+ 	 #pragma once
+ const uint32_t world_frag[] = {
+-	0x07230203,0x00010000,0x0008000b,0x00000013,0x00000000,0x00020011,0x00000001,0x0006000b,
++	0x07230203,0x00010000,0x0008000b,0x0000001f,0x00000000,0x00020011,0x00000001,0x0006000b,
+ 	0x00000001,0x4c534c47,0x6474732e,0x3035342e,0x00000000,0x0003000e,0x00000000,0x00000001,
+-	0x0007000f,0x00000004,0x00000004,0x6e69616d,0x00000000,0x00000009,0x0000000c,0x00030010,
+-	0x00000004,0x00000007,0x00030003,0x00000002,0x000001c2,0x00040005,0x00000004,0x6e69616d,
+-	0x00000000,0x00040005,0x00000009,0x6f6c6f63,0x00000072,0x00050005,0x0000000c,0x65636166,
+-	0x6f6c6f43,0x00000072,0x00040047,0x00000009,0x0000001e,0x00000000,0x00040047,0x0000000c,
+-	0x0000001e,0x00000000,0x00020013,0x00000002,0x00030021,0x00000003,0x00000002,0x00030016,
+-	0x00000006,0x00000020,0x00040017,0x00000007,0x00000006,0x00000004,0x00040020,0x00000008,
+-	0x00000003,0x00000007,0x0004003b,0x00000008,0x00000009,0x00000003,0x00040017,0x0000000a,
+-	0x00000006,0x00000003,0x00040020,0x0000000b,0x00000001,0x0000000a,0x0004003b,0x0000000b,
+-	0x0000000c,0x00000001,0x0004002b,0x00000006,0x0000000e,0x3f800000,0x00050036,0x00000002,
+-	0x00000004,0x00000000,0x00000003,0x000200f8,0x00000005,0x0004003d,0x0000000a,0x0000000d,
+-	0x0000000c,0x00050051,0x00000006,0x0000000f,0x0000000d,0x00000000,0x00050051,0x00000006,
+-	0x00000010,0x0000000d,0x00000001,0x00050051,0x00000006,0x00000011,0x0000000d,0x00000002,
+-	0x00070050,0x00000007,0x00000012,0x0000000f,0x00000010,0x00000011,0x0000000e,0x0003003e,
+-	0x00000009,0x00000012,0x000100fd,0x00010038
++	0x0008000f,0x00000004,0x00000004,0x6e69616d,0x00000000,0x00000009,0x00000011,0x00000017,
++	0x00030010,0x00000004,0x00000007,0x00030003,0x00000002,0x000001c2,0x00040005,0x00000004,
++	0x6e69616d,0x00000000,0x00040005,0x00000009,0x6f6c6f63,0x00000072,0x00040005,0x0000000d,
++	0x65626c61,0x00006f64,0x00050005,0x00000011,0x43786574,0x64726f6f,0x00000000,0x00050005,
++	0x00000017,0x65636166,0x6f6c6f43,0x00000072,0x00040047,0x00000009,0x0000001e,0x00000000,
++	0x00040047,0x0000000d,0x00000021,0x00000000,0x00040047,0x0000000d,0x00000022,0x00000002,
++	0x00040047,0x00000011,0x0000001e,0x00000001,0x00040047,0x00000017,0x0000001e,0x00000000,
++	0x00020013,0x00000002,0x00030021,0x00000003,0x00000002,0x00030016,0x00000006,0x00000020,
++	0x00040017,0x00000007,0x00000006,0x00000004,0x00040020,0x00000008,0x00000003,0x00000007,
++	0x0004003b,0x00000008,0x00000009,0x00000003,0x00090019,0x0000000a,0x00000006,0x00000001,
++	0x00000000,0x00000000,0x00000000,0x00000001,0x00000000,0x0003001b,0x0000000b,0x0000000a,
++	0x00040020,0x0000000c,0x00000000,0x0000000b,0x0004003b,0x0000000c,0x0000000d,0x00000000,
++	0x00040017,0x0000000f,0x00000006,0x00000002,0x00040020,0x00000010,0x00000001,0x0000000f,
++	0x0004003b,0x00000010,0x00000011,0x00000001,0x00040017,0x00000014,0x00000006,0x00000003,
++	0x00040020,0x00000016,0x00000001,0x00000014,0x0004003b,0x00000016,0x00000017,0x00000001,
++	0x0004002b,0x00000006,0x0000001a,0x3f800000,0x00050036,0x00000002,0x00000004,0x00000000,
++	0x00000003,0x000200f8,0x00000005,0x0004003d,0x0000000b,0x0000000e,0x0000000d,0x0004003d,
++	0x0000000f,0x00000012,0x00000011,0x00050057,0x00000007,0x00000013,0x0000000e,0x00000012,
++	0x0008004f,0x00000014,0x00000015,0x00000013,0x00000013,0x00000000,0x00000001,0x00000002,
++	0x0004003d,0x00000014,0x00000018,0x00000017,0x00050085,0x00000014,0x00000019,0x00000015,
++	0x00000018,0x00050051,0x00000006,0x0000001b,0x00000019,0x00000000,0x00050051,0x00000006,
++	0x0000001c,0x00000019,0x00000001,0x00050051,0x00000006,0x0000001d,0x00000019,0x00000002,
++	0x00070050,0x00000007,0x0000001e,0x0000001b,0x0000001c,0x0000001d,0x0000001a,0x0003003e,
++	0x00000009,0x0000001e,0x000100fd,0x00010038
+ };
+diff --git a/src/engine/shaders/world_vert.h b/src/engine/shaders/world_vert.h
+index e53e61f..6226e75 100644
+--- a/src/engine/shaders/world_vert.h
++++ b/src/engine/shaders/world_vert.h
+@@ -1,92 +1,98 @@
+ 	// 1116.2.0
+ 	 #pragma once
+ const uint32_t world_vert[] = {
+-	0x07230203,0x00010000,0x0008000b,0x00000065,0x00000000,0x00020011,0x00000001,0x0006000b,
++	0x07230203,0x00010000,0x0008000b,0x0000006b,0x00000000,0x00020011,0x00000001,0x0006000b,
+ 	0x00000001,0x4c534c47,0x6474732e,0x3035342e,0x00000000,0x0003000e,0x00000000,0x00000001,
+-	0x0009000f,0x00000000,0x00000004,0x6e69616d,0x00000000,0x00000016,0x00000040,0x00000062,
+-	0x00000063,0x00030003,0x00000002,0x000001c2,0x00040005,0x00000004,0x6e69616d,0x00000000,
+-	0x00030005,0x00000009,0x00000071,0x00040005,0x0000000b,0x77656956,0x00000000,0x00040006,
+-	0x0000000b,0x00000000,0x00657965,0x00050006,0x0000000b,0x00000001,0x68676972,0x00000074,
+-	0x00040006,0x0000000b,0x00000002,0x00007075,0x00050006,0x0000000b,0x00000003,0x77726f66,
+-	0x00647261,0x00060006,0x0000000b,0x00000004,0x6a6f7270,0x69746365,0x00006e6f,0x00060006,
+-	0x0000000b,0x00000005,0x6e617274,0x74616c73,0x006e6f69,0x00060006,0x0000000b,0x00000006,
+-	0x74617571,0x696e7265,0x00006e6f,0x00030005,0x0000000d,0x00000075,0x00040005,0x00000014,
+-	0x6c726f77,0x00000064,0x00050005,0x00000016,0x69736f70,0x6e6f6974,0x00000000,0x00050005,
+-	0x0000002d,0x616c6572,0x65766974,0x00000000,0x00030005,0x00000035,0x0000007a,0x00060005,
+-	0x0000003e,0x505f6c67,0x65567265,0x78657472,0x00000000,0x00060006,0x0000003e,0x00000000,
+-	0x505f6c67,0x7469736f,0x006e6f69,0x00070006,0x0000003e,0x00000001,0x505f6c67,0x746e696f,
+-	0x657a6953,0x00000000,0x00070006,0x0000003e,0x00000002,0x435f6c67,0x4470696c,0x61747369,
+-	0x0065636e,0x00070006,0x0000003e,0x00000003,0x435f6c67,0x446c6c75,0x61747369,0x0065636e,
+-	0x00030005,0x00000040,0x00000000,0x00050005,0x00000062,0x65636166,0x6f6c6f43,0x00000072,
+-	0x00040005,0x00000063,0x6f6c6f63,0x00000072,0x00030047,0x0000000b,0x00000002,0x00050048,
+-	0x0000000b,0x00000000,0x00000023,0x00000000,0x00050048,0x0000000b,0x00000001,0x00000023,
+-	0x00000010,0x00050048,0x0000000b,0x00000002,0x00000023,0x00000020,0x00050048,0x0000000b,
+-	0x00000003,0x00000023,0x00000030,0x00050048,0x0000000b,0x00000004,0x00000023,0x00000040,
+-	0x00050048,0x0000000b,0x00000005,0x00000023,0x00000050,0x00050048,0x0000000b,0x00000006,
+-	0x00000023,0x00000060,0x00040047,0x0000000d,0x00000021,0x00000000,0x00040047,0x0000000d,
+-	0x00000022,0x00000001,0x00040047,0x00000016,0x0000001e,0x00000000,0x00030047,0x0000003e,
+-	0x00000002,0x00050048,0x0000003e,0x00000000,0x0000000b,0x00000000,0x00050048,0x0000003e,
+-	0x00000001,0x0000000b,0x00000001,0x00050048,0x0000003e,0x00000002,0x0000000b,0x00000003,
+-	0x00050048,0x0000003e,0x00000003,0x0000000b,0x00000004,0x00040047,0x00000062,0x0000001e,
+-	0x00000000,0x00040047,0x00000063,0x0000001e,0x00000001,0x00020013,0x00000002,0x00030021,
+-	0x00000003,0x00000002,0x00030016,0x00000006,0x00000020,0x00040017,0x00000007,0x00000006,
+-	0x00000003,0x00040020,0x00000008,0x00000007,0x00000007,0x00040017,0x0000000a,0x00000006,
+-	0x00000004,0x0009001e,0x0000000b,0x0000000a,0x0000000a,0x0000000a,0x0000000a,0x0000000a,
+-	0x0000000a,0x0000000a,0x00040020,0x0000000c,0x00000002,0x0000000b,0x0004003b,0x0000000c,
+-	0x0000000d,0x00000002,0x00040015,0x0000000e,0x00000020,0x00000001,0x0004002b,0x0000000e,
+-	0x0000000f,0x00000006,0x00040020,0x00000010,0x00000002,0x0000000a,0x00040020,0x00000015,
+-	0x00000001,0x00000007,0x0004003b,0x00000015,0x00000016,0x00000001,0x0004002b,0x00000006,
+-	0x00000018,0x40000000,0x00040015,0x0000001d,0x00000020,0x00000000,0x0004002b,0x0000001d,
+-	0x0000001e,0x00000003,0x00040020,0x0000001f,0x00000002,0x00000006,0x0004002b,0x0000000e,
+-	0x00000028,0x00000005,0x0004002b,0x0000000e,0x0000002f,0x00000000,0x00040020,0x00000034,
+-	0x00000007,0x00000006,0x0004002b,0x0000000e,0x00000037,0x00000003,0x0004002b,0x0000001d,
+-	0x0000003c,0x00000001,0x0004001c,0x0000003d,0x00000006,0x0000003c,0x0006001e,0x0000003e,
+-	0x0000000a,0x00000006,0x0000003d,0x0000003d,0x00040020,0x0000003f,0x00000003,0x0000003e,
+-	0x0004003b,0x0000003f,0x00000040,0x00000003,0x0004002b,0x0000000e,0x00000042,0x00000001,
+-	0x0004002b,0x0000000e,0x00000047,0x00000004,0x0004002b,0x0000001d,0x00000048,0x00000000,
+-	0x0004002b,0x0000000e,0x0000004d,0x00000002,0x0004002b,0x0000001d,0x00000056,0x00000002,
+-	0x00040020,0x0000005f,0x00000003,0x0000000a,0x00040020,0x00000061,0x00000003,0x00000007,
+-	0x0004003b,0x00000061,0x00000062,0x00000003,0x0004003b,0x00000015,0x00000063,0x00000001,
+-	0x00050036,0x00000002,0x00000004,0x00000000,0x00000003,0x000200f8,0x00000005,0x0004003b,
+-	0x00000008,0x00000009,0x00000007,0x0004003b,0x00000008,0x00000014,0x00000007,0x0004003b,
+-	0x00000008,0x0000002d,0x00000007,0x0004003b,0x00000034,0x00000035,0x00000007,0x00050041,
+-	0x00000010,0x00000011,0x0000000d,0x0000000f,0x0004003d,0x0000000a,0x00000012,0x00000011,
+-	0x0008004f,0x00000007,0x00000013,0x00000012,0x00000012,0x00000000,0x00000001,0x00000002,
+-	0x0003003e,0x00000009,0x00000013,0x0004003d,0x00000007,0x00000017,0x00000016,0x0004003d,
+-	0x00000007,0x00000019,0x00000009,0x0004003d,0x00000007,0x0000001a,0x00000009,0x0004003d,
+-	0x00000007,0x0000001b,0x00000016,0x0007000c,0x00000007,0x0000001c,0x00000001,0x00000044,
+-	0x0000001a,0x0000001b,0x00060041,0x0000001f,0x00000020,0x0000000d,0x0000000f,0x0000001e,
+-	0x0004003d,0x00000006,0x00000021,0x00000020,0x0004003d,0x00000007,0x00000022,0x00000016,
+-	0x0005008e,0x00000007,0x00000023,0x00000022,0x00000021,0x00050081,0x00000007,0x00000024,
+-	0x0000001c,0x00000023,0x0007000c,0x00000007,0x00000025,0x00000001,0x00000044,0x00000019,
+-	0x00000024,0x0005008e,0x00000007,0x00000026,0x00000025,0x00000018,0x00050081,0x00000007,
+-	0x00000027,0x00000017,0x00000026,0x00050041,0x00000010,0x00000029,0x0000000d,0x00000028,
+-	0x0004003d,0x0000000a,0x0000002a,0x00000029,0x0008004f,0x00000007,0x0000002b,0x0000002a,
+-	0x0000002a,0x00000000,0x00000001,0x00000002,0x00050081,0x00000007,0x0000002c,0x00000027,
+-	0x0000002b,0x0003003e,0x00000014,0x0000002c,0x0004003d,0x00000007,0x0000002e,0x00000014,
+-	0x00050041,0x00000010,0x00000030,0x0000000d,0x0000002f,0x0004003d,0x0000000a,0x00000031,
+-	0x00000030,0x0008004f,0x00000007,0x00000032,0x00000031,0x00000031,0x00000000,0x00000001,
+-	0x00000002,0x00050083,0x00000007,0x00000033,0x0000002e,0x00000032,0x0003003e,0x0000002d,
+-	0x00000033,0x0004003d,0x00000007,0x00000036,0x0000002d,0x00050041,0x00000010,0x00000038,
+-	0x0000000d,0x00000037,0x0004003d,0x0000000a,0x00000039,0x00000038,0x0008004f,0x00000007,
+-	0x0000003a,0x00000039,0x00000039,0x00000000,0x00000001,0x00000002,0x00050094,0x00000006,
+-	0x0000003b,0x00000036,0x0000003a,0x0003003e,0x00000035,0x0000003b,0x0004003d,0x00000007,
+-	0x00000041,0x0000002d,0x00050041,0x00000010,0x00000043,0x0000000d,0x00000042,0x0004003d,
+-	0x0000000a,0x00000044,0x00000043,0x0008004f,0x00000007,0x00000045,0x00000044,0x00000044,
+-	0x00000000,0x00000001,0x00000002,0x00050094,0x00000006,0x00000046,0x00000041,0x00000045,
+-	0x00060041,0x0000001f,0x00000049,0x0000000d,0x00000047,0x00000048,0x0004003d,0x00000006,
+-	0x0000004a,0x00000049,0x00050085,0x00000006,0x0000004b,0x00000046,0x0000004a,0x0004003d,
+-	0x00000007,0x0000004c,0x0000002d,0x00050041,0x00000010,0x0000004e,0x0000000d,0x0000004d,
+-	0x0004003d,0x0000000a,0x0000004f,0x0000004e,0x0008004f,0x00000007,0x00000050,0x0000004f,
+-	0x0000004f,0x00000000,0x00000001,0x00000002,0x00050094,0x00000006,0x00000051,0x0000004c,
+-	0x00000050,0x00060041,0x0000001f,0x00000052,0x0000000d,0x00000047,0x0000003c,0x0004003d,
+-	0x00000006,0x00000053,0x00000052,0x00050085,0x00000006,0x00000054,0x00000051,0x00000053,
+-	0x0004003d,0x00000006,0x00000055,0x00000035,0x00060041,0x0000001f,0x00000057,0x0000000d,
+-	0x00000047,0x00000056,0x0004003d,0x00000006,0x00000058,0x00000057,0x00050085,0x00000006,
+-	0x00000059,0x00000055,0x00000058,0x00060041,0x0000001f,0x0000005a,0x0000000d,0x00000047,
+-	0x0000001e,0x0004003d,0x00000006,0x0000005b,0x0000005a,0x00050081,0x00000006,0x0000005c,
+-	0x00000059,0x0000005b,0x0004003d,0x00000006,0x0000005d,0x00000035,0x00070050,0x0000000a,
+-	0x0000005e,0x0000004b,0x00000054,0x0000005c,0x0000005d,0x00050041,0x0000005f,0x00000060,
+-	0x00000040,0x0000002f,0x0003003e,0x00000060,0x0000005e,0x0004003d,0x00000007,0x00000064,
+-	0x00000063,0x0003003e,0x00000062,0x00000064,0x000100fd,0x00010038
++	0x000b000f,0x00000000,0x00000004,0x6e69616d,0x00000000,0x00000016,0x00000040,0x00000062,
++	0x00000063,0x00000067,0x00000069,0x00030003,0x00000002,0x000001c2,0x00040005,0x00000004,
++	0x6e69616d,0x00000000,0x00030005,0x00000009,0x00000071,0x00040005,0x0000000b,0x77656956,
++	0x00000000,0x00040006,0x0000000b,0x00000000,0x00657965,0x00050006,0x0000000b,0x00000001,
++	0x68676972,0x00000074,0x00040006,0x0000000b,0x00000002,0x00007075,0x00050006,0x0000000b,
++	0x00000003,0x77726f66,0x00647261,0x00060006,0x0000000b,0x00000004,0x6a6f7270,0x69746365,
++	0x00006e6f,0x00060006,0x0000000b,0x00000005,0x6e617274,0x74616c73,0x006e6f69,0x00060006,
++	0x0000000b,0x00000006,0x74617571,0x696e7265,0x00006e6f,0x00030005,0x0000000d,0x00000075,
++	0x00040005,0x00000014,0x6c726f77,0x00000064,0x00050005,0x00000016,0x69736f70,0x6e6f6974,
++	0x00000000,0x00050005,0x0000002d,0x616c6572,0x65766974,0x00000000,0x00030005,0x00000035,
++	0x0000007a,0x00060005,0x0000003e,0x505f6c67,0x65567265,0x78657472,0x00000000,0x00060006,
++	0x0000003e,0x00000000,0x505f6c67,0x7469736f,0x006e6f69,0x00070006,0x0000003e,0x00000001,
++	0x505f6c67,0x746e696f,0x657a6953,0x00000000,0x00070006,0x0000003e,0x00000002,0x435f6c67,
++	0x4470696c,0x61747369,0x0065636e,0x00070006,0x0000003e,0x00000003,0x435f6c67,0x446c6c75,
++	0x61747369,0x0065636e,0x00030005,0x00000040,0x00000000,0x00050005,0x00000062,0x65636166,
++	0x6f6c6f43,0x00000072,0x00040005,0x00000063,0x6f6c6f63,0x00000072,0x00050005,0x00000067,
++	0x43786574,0x64726f6f,0x00000000,0x00030005,0x00000069,0x00007675,0x00030047,0x0000000b,
++	0x00000002,0x00050048,0x0000000b,0x00000000,0x00000023,0x00000000,0x00050048,0x0000000b,
++	0x00000001,0x00000023,0x00000010,0x00050048,0x0000000b,0x00000002,0x00000023,0x00000020,
++	0x00050048,0x0000000b,0x00000003,0x00000023,0x00000030,0x00050048,0x0000000b,0x00000004,
++	0x00000023,0x00000040,0x00050048,0x0000000b,0x00000005,0x00000023,0x00000050,0x00050048,
++	0x0000000b,0x00000006,0x00000023,0x00000060,0x00040047,0x0000000d,0x00000021,0x00000000,
++	0x00040047,0x0000000d,0x00000022,0x00000001,0x00040047,0x00000016,0x0000001e,0x00000000,
++	0x00030047,0x0000003e,0x00000002,0x00050048,0x0000003e,0x00000000,0x0000000b,0x00000000,
++	0x00050048,0x0000003e,0x00000001,0x0000000b,0x00000001,0x00050048,0x0000003e,0x00000002,
++	0x0000000b,0x00000003,0x00050048,0x0000003e,0x00000003,0x0000000b,0x00000004,0x00040047,
++	0x00000062,0x0000001e,0x00000000,0x00040047,0x00000063,0x0000001e,0x00000001,0x00040047,
++	0x00000067,0x0000001e,0x00000001,0x00040047,0x00000069,0x0000001e,0x00000002,0x00020013,
++	0x00000002,0x00030021,0x00000003,0x00000002,0x00030016,0x00000006,0x00000020,0x00040017,
++	0x00000007,0x00000006,0x00000003,0x00040020,0x00000008,0x00000007,0x00000007,0x00040017,
++	0x0000000a,0x00000006,0x00000004,0x0009001e,0x0000000b,0x0000000a,0x0000000a,0x0000000a,
++	0x0000000a,0x0000000a,0x0000000a,0x0000000a,0x00040020,0x0000000c,0x00000002,0x0000000b,
++	0x0004003b,0x0000000c,0x0000000d,0x00000002,0x00040015,0x0000000e,0x00000020,0x00000001,
++	0x0004002b,0x0000000e,0x0000000f,0x00000006,0x00040020,0x00000010,0x00000002,0x0000000a,
++	0x00040020,0x00000015,0x00000001,0x00000007,0x0004003b,0x00000015,0x00000016,0x00000001,
++	0x0004002b,0x00000006,0x00000018,0x40000000,0x00040015,0x0000001d,0x00000020,0x00000000,
++	0x0004002b,0x0000001d,0x0000001e,0x00000003,0x00040020,0x0000001f,0x00000002,0x00000006,
++	0x0004002b,0x0000000e,0x00000028,0x00000005,0x0004002b,0x0000000e,0x0000002f,0x00000000,
++	0x00040020,0x00000034,0x00000007,0x00000006,0x0004002b,0x0000000e,0x00000037,0x00000003,
++	0x0004002b,0x0000001d,0x0000003c,0x00000001,0x0004001c,0x0000003d,0x00000006,0x0000003c,
++	0x0006001e,0x0000003e,0x0000000a,0x00000006,0x0000003d,0x0000003d,0x00040020,0x0000003f,
++	0x00000003,0x0000003e,0x0004003b,0x0000003f,0x00000040,0x00000003,0x0004002b,0x0000000e,
++	0x00000042,0x00000001,0x0004002b,0x0000000e,0x00000047,0x00000004,0x0004002b,0x0000001d,
++	0x00000048,0x00000000,0x0004002b,0x0000000e,0x0000004d,0x00000002,0x0004002b,0x0000001d,
++	0x00000056,0x00000002,0x00040020,0x0000005f,0x00000003,0x0000000a,0x00040020,0x00000061,
++	0x00000003,0x00000007,0x0004003b,0x00000061,0x00000062,0x00000003,0x0004003b,0x00000015,
++	0x00000063,0x00000001,0x00040017,0x00000065,0x00000006,0x00000002,0x00040020,0x00000066,
++	0x00000003,0x00000065,0x0004003b,0x00000066,0x00000067,0x00000003,0x00040020,0x00000068,
++	0x00000001,0x00000065,0x0004003b,0x00000068,0x00000069,0x00000001,0x00050036,0x00000002,
++	0x00000004,0x00000000,0x00000003,0x000200f8,0x00000005,0x0004003b,0x00000008,0x00000009,
++	0x00000007,0x0004003b,0x00000008,0x00000014,0x00000007,0x0004003b,0x00000008,0x0000002d,
++	0x00000007,0x0004003b,0x00000034,0x00000035,0x00000007,0x00050041,0x00000010,0x00000011,
++	0x0000000d,0x0000000f,0x0004003d,0x0000000a,0x00000012,0x00000011,0x0008004f,0x00000007,
++	0x00000013,0x00000012,0x00000012,0x00000000,0x00000001,0x00000002,0x0003003e,0x00000009,
++	0x00000013,0x0004003d,0x00000007,0x00000017,0x00000016,0x0004003d,0x00000007,0x00000019,
++	0x00000009,0x0004003d,0x00000007,0x0000001a,0x00000009,0x0004003d,0x00000007,0x0000001b,
++	0x00000016,0x0007000c,0x00000007,0x0000001c,0x00000001,0x00000044,0x0000001a,0x0000001b,
++	0x00060041,0x0000001f,0x00000020,0x0000000d,0x0000000f,0x0000001e,0x0004003d,0x00000006,
++	0x00000021,0x00000020,0x0004003d,0x00000007,0x00000022,0x00000016,0x0005008e,0x00000007,
++	0x00000023,0x00000022,0x00000021,0x00050081,0x00000007,0x00000024,0x0000001c,0x00000023,
++	0x0007000c,0x00000007,0x00000025,0x00000001,0x00000044,0x00000019,0x00000024,0x0005008e,
++	0x00000007,0x00000026,0x00000025,0x00000018,0x00050081,0x00000007,0x00000027,0x00000017,
++	0x00000026,0x00050041,0x00000010,0x00000029,0x0000000d,0x00000028,0x0004003d,0x0000000a,
++	0x0000002a,0x00000029,0x0008004f,0x00000007,0x0000002b,0x0000002a,0x0000002a,0x00000000,
++	0x00000001,0x00000002,0x00050081,0x00000007,0x0000002c,0x00000027,0x0000002b,0x0003003e,
++	0x00000014,0x0000002c,0x0004003d,0x00000007,0x0000002e,0x00000014,0x00050041,0x00000010,
++	0x00000030,0x0000000d,0x0000002f,0x0004003d,0x0000000a,0x00000031,0x00000030,0x0008004f,
++	0x00000007,0x00000032,0x00000031,0x00000031,0x00000000,0x00000001,0x00000002,0x00050083,
++	0x00000007,0x00000033,0x0000002e,0x00000032,0x0003003e,0x0000002d,0x00000033,0x0004003d,
++	0x00000007,0x00000036,0x0000002d,0x00050041,0x00000010,0x00000038,0x0000000d,0x00000037,
++	0x0004003d,0x0000000a,0x00000039,0x00000038,0x0008004f,0x00000007,0x0000003a,0x00000039,
++	0x00000039,0x00000000,0x00000001,0x00000002,0x00050094,0x00000006,0x0000003b,0x00000036,
++	0x0000003a,0x0003003e,0x00000035,0x0000003b,0x0004003d,0x00000007,0x00000041,0x0000002d,
++	0x00050041,0x00000010,0x00000043,0x0000000d,0x00000042,0x0004003d,0x0000000a,0x00000044,
++	0x00000043,0x0008004f,0x00000007,0x00000045,0x00000044,0x00000044,0x00000000,0x00000001,
++	0x00000002,0x00050094,0x00000006,0x00000046,0x00000041,0x00000045,0x00060041,0x0000001f,
++	0x00000049,0x0000000d,0x00000047,0x00000048,0x0004003d,0x00000006,0x0000004a,0x00000049,
++	0x00050085,0x00000006,0x0000004b,0x00000046,0x0000004a,0x0004003d,0x00000007,0x0000004c,
++	0x0000002d,0x00050041,0x00000010,0x0000004e,0x0000000d,0x0000004d,0x0004003d,0x0000000a,
++	0x0000004f,0x0000004e,0x0008004f,0x00000007,0x00000050,0x0000004f,0x0000004f,0x00000000,
++	0x00000001,0x00000002,0x00050094,0x00000006,0x00000051,0x0000004c,0x00000050,0x00060041,
++	0x0000001f,0x00000052,0x0000000d,0x00000047,0x0000003c,0x0004003d,0x00000006,0x00000053,
++	0x00000052,0x00050085,0x00000006,0x00000054,0x00000051,0x00000053,0x0004003d,0x00000006,
++	0x00000055,0x00000035,0x00060041,0x0000001f,0x00000057,0x0000000d,0x00000047,0x00000056,
++	0x0004003d,0x00000006,0x00000058,0x00000057,0x00050085,0x00000006,0x00000059,0x00000055,
++	0x00000058,0x00060041,0x0000001f,0x0000005a,0x0000000d,0x00000047,0x0000001e,0x0004003d,
++	0x00000006,0x0000005b,0x0000005a,0x00050081,0x00000006,0x0000005c,0x00000059,0x0000005b,
++	0x0004003d,0x00000006,0x0000005d,0x00000035,0x00070050,0x0000000a,0x0000005e,0x0000004b,
++	0x00000054,0x0000005c,0x0000005d,0x00050041,0x0000005f,0x00000060,0x00000040,0x0000002f,
++	0x0003003e,0x00000060,0x0000005e,0x0004003d,0x00000007,0x00000064,0x00000063,0x0003003e,
++	0x00000062,0x00000064,0x0004003d,0x00000065,0x0000006a,0x00000069,0x0003003e,0x00000067,
++	0x0000006a,0x000100fd,0x00010038
+ };
+diff --git a/src/engine/texture.cpp b/src/engine/texture.cpp
+new file mode 100644
+index 0000000..aebad7a
+--- /dev/null
++++ b/src/engine/texture.cpp
+@@ -0,0 +1,67 @@
++#include "engine/texture.h"
++#include "engine/formats/reader.h"
++#include <algorithm>
++#include <bit>
++
++namespace OpenBlood2
++{
++    bool read_texture(std::span<const std::uint8_t> bytes, Texture& out, std::string& error)
++    {
++        out = {};
++        error.clear();
++        auto fail = [&](const char* why)
++        {
++            error = why;
++            return false;
++        };
++        if (bytes.size() < 1068 || bytes.size() > 3 * 1024 * 1024)
++            return fail("DTX: truncated or oversized palette image");
++        Reader r(bytes);
++        if (r.u32() != 0 || r.u32() != 0xfffffffeu)
++            return fail("DTX: only embedded-palette version -2 is supported");
++        Texture image;
++        image.width = r.u16();
++        image.height = r.u16();
++        image.mipmaps = r.u16();
++        const auto sections = r.u16();
++        image.flags = r.u32();
++        image.user_flags = r.u32();
++        // These are not the later -5 BPP field/128-byte command string. Preserve
++        // the generation boundary. Two serialized 32-bit slots at 36..43 are opaque.
++        r.skip(20);
++        if (!std::has_single_bit(image.width) || !std::has_single_bit(image.height) || image.width > 1024 ||
++            image.height > 1024 || !image.mipmaps || image.mipmaps > 8 ||
++            image.mipmaps > static_cast<unsigned>(std::bit_width(std::max(image.width, image.height))))
++            return fail("DTX: invalid dimensions/mip count");
++        if (sections || (image.flags & ~0x2bu))
++            return fail("DTX: unsupported sections/flags");
++        std::size_t indices = 0, alpha = 0;
++        auto w = image.width, h = image.height;
++        for (unsigned i = 0; i < image.mipmaps; ++i)
++        {
++            const std::size_t pixels = w * h;
++            indices += pixels;
++            alpha += (pixels + 1) / 2;
++            w = std::max(1u, w / 2);
++            h = std::max(1u, h / 2);
++        }
++        const bool masks = (image.flags & 2) != 0;
++        if (bytes.size() != 1068 + indices + (masks ? alpha : 0))
++            return fail("DTX: inconsistent mip/alpha payload length");
++        const auto palette = r.take(1024), pixels = r.take(indices);
++        const auto masks_data = r.take(masks ? alpha : 0);
++        if (!r.good() || r.remaining())
++            return fail("DTX: invalid payload bounds");
++        image.rgba.resize(std::size_t(image.width) * image.height * 4);
++        for (std::size_t i = 0; i < image.rgba.size() / 4; ++i)
++        {
++            const auto p = std::size_t(pixels[i]) * 4;
++            image.rgba[i * 4] = palette[p + 1];
++            image.rgba[i * 4 + 1] = palette[p + 2];
++            image.rgba[i * 4 + 2] = palette[p + 3];
++            image.rgba[i * 4 + 3] = masks ? ((masks_data[i / 2] >> (i % 2 ? 0 : 4)) & 15) * 17 : palette[p];
++        }
++        out = std::move(image);
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/texture.h b/src/engine/texture.h
+new file mode 100644
+index 0000000..0041165
+--- /dev/null
++++ b/src/engine/texture.h
+@@ -0,0 +1,17 @@
++#pragma once
++#include <cstdint>
++#include <span>
++#include <string>
++#include <vector>
++
++namespace OpenBlood2
++{
++    struct Texture
++    {
++        std::uint32_t width = 0, height = 0, mipmaps = 0, flags = 0, user_flags = 0;
++        std::vector<std::uint8_t> rgba;
++    };
++    // Blood II DTX -2 only; validates all stored mip/alpha bytes, decodes mip zero.
++    // Empty output on failure. Later DTX generations and shared palettes are rejected.
++    bool read_texture(std::span<const std::uint8_t>, Texture&, std::string&);
++} // namespace OpenBlood2
+diff --git a/src/engine/world_renderer.cpp b/src/engine/world_renderer.cpp
+index ec8eb05..c58ee29 100644
+--- a/src/engine/world_renderer.cpp
++++ b/src/engine/world_renderer.cpp
+@@ -8,6 +8,8 @@ namespace OpenBlood2
+     WorldRenderer::~WorldRenderer()
+     {
+         clear_geometry();
++        if (sampler_)
++            SDL_ReleaseGPUSampler(device_, sampler_);
+         if (depth_)
+             SDL_ReleaseGPUTexture(device_, depth_);
+         if (pipeline_)
+@@ -18,6 +20,10 @@ namespace OpenBlood2
+         if (vertices_)
+             SDL_ReleaseGPUBuffer(device_, vertices_);
+         vertices_ = nullptr;
++        for (auto* texture : textures_)
++            if (texture)
++                SDL_ReleaseGPUTexture(device_, texture);
++        textures_.clear();
+         revision_ = UINT64_MAX;
+         stats.triangles = stats.draws = 0;
+     }
+@@ -42,6 +48,7 @@ namespace OpenBlood2
+         info.code = reinterpret_cast<const Uint8*>(world_frag);
+         info.code_size = sizeof(world_frag);
+         info.num_uniform_buffers = 0;
++        info.num_samplers = 1;
+         auto* fragment = SDL_CreateGPUShader(device_, &info);
+         if (!vertex || !fragment)
+         {
+@@ -55,17 +62,20 @@ namespace OpenBlood2
+         SDL_GPUVertexBufferDescription buffer{};
+         buffer.pitch = sizeof(WorldVertex);
+         buffer.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
+-        SDL_GPUVertexAttribute attributes[2]{};
++        SDL_GPUVertexAttribute attributes[3]{};
+         attributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
+         attributes[1].location = 1;
+         attributes[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
+         attributes[1].offset = offsetof(WorldVertex, color);
++        attributes[2].location = 2;
++        attributes[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
++        attributes[2].offset = offsetof(WorldVertex, uv);
+         SDL_GPUColorTargetDescription target{};
+         target.format = format;
+         SDL_GPUGraphicsPipelineCreateInfo create{};
+         create.vertex_shader = vertex;
+         create.fragment_shader = fragment;
+-        create.vertex_input_state = {&buffer, 1, attributes, 2};
++        create.vertex_input_state = {&buffer, 1, attributes, 3};
+         create.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+         create.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
+         create.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+@@ -170,10 +180,133 @@ namespace OpenBlood2
+             return false;
+         }
+         vertices_ = next;
++        if (!upload_materials(mesh, error))
++        {
++            clear_geometry();
++            return false;
++        }
+         revision_ = revision;
+         ++stats.uploads;
+         return true;
+     }
++    bool WorldRenderer::upload_materials(const WorldMesh& mesh, std::string& error)
++    {
++        if (!sampler_)
++        {
++            SDL_GPUSamplerCreateInfo info{};
++            info.min_filter = info.mag_filter = SDL_GPU_FILTER_NEAREST;
++            info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
++            info.address_mode_u = info.address_mode_v = info.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
++            sampler_ = SDL_CreateGPUSampler(device_, &info);
++            if (!sampler_)
++            {
++                error = SDL_GetError();
++                return false;
++            }
++        }
++        const Texture white{1, 1, 1, 0, 0, {255, 255, 255, 255}};
++        const auto count = std::max(std::size_t(1), mesh.materials.size());
++        if (count > 4097)
++        {
++            error = "GPU texture count limit exceeded";
++            return false;
++        }
++        std::vector<const Texture*> images(count, &white);
++        std::size_t bytes = 0;
++        for (std::size_t i = 0; i < count; ++i)
++        {
++            if (!mesh.materials.empty())
++                images[i] = mesh.materials[i].error.empty() ? &mesh.materials[i].image : nullptr;
++            if (const auto* image = images[i])
++            {
++                if (!image->width || !image->height || image->width > 1024 || image->height > 1024 ||
++                    image->rgba.size() != std::size_t(image->width) * image->height * 4 ||
++                    image->rgba.size() > 128 * 1024 * 1024 - bytes)
++                {
++                    error = "Invalid GPU texture dimensions/payload/budget";
++                    return false;
++                }
++                bytes += image->rgba.size();
++            }
++        }
++        if (!images[0])
++        {
++            error = "Missing diagnostic GPU texture";
++            return false;
++        }
++        SDL_GPUTransferBufferCreateInfo transfer_info{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, static_cast<Uint32>(bytes),
++                                                      0};
++        auto* transfer = SDL_CreateGPUTransferBuffer(device_, &transfer_info);
++        if (!transfer)
++        {
++            error = SDL_GetError();
++            return false;
++        }
++        textures_.resize(count);
++        bool success = false;
++        if (auto* mapped = static_cast<Uint8*>(SDL_MapGPUTransferBuffer(device_, transfer, false)))
++        {
++            std::size_t offset = 0;
++            bool allocated = true;
++            for (std::size_t i = 0; i < count; ++i)
++            {
++                if (const auto* image = images[i])
++                {
++                    SDL_GPUTextureCreateInfo info{};
++                    info.type = SDL_GPU_TEXTURETYPE_2D;
++                    info.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
++                    info.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
++                    info.width = image->width;
++                    info.height = image->height;
++                    info.layer_count_or_depth = 1;
++                    info.num_levels = 1;
++                    textures_[i] = SDL_CreateGPUTexture(device_, &info);
++                    if (!textures_[i])
++                    {
++                        allocated = false;
++                        break;
++                    }
++                    std::memcpy(mapped + offset, image->rgba.data(), image->rgba.size());
++                    offset += image->rgba.size();
++                }
++            }
++            SDL_UnmapGPUTransferBuffer(device_, transfer);
++            if (allocated)
++                if (auto* commands = SDL_AcquireGPUCommandBuffer(device_))
++                {
++                    if (auto* copy = SDL_BeginGPUCopyPass(commands))
++                    {
++                        Uint32 offset = 0;
++                        for (std::size_t i = 0; i < count; ++i)
++                        {
++                            if (const auto* image = images[i])
++                            {
++                                SDL_GPUTextureTransferInfo source{};
++                                source.transfer_buffer = transfer;
++                                source.offset = offset;
++                                source.pixels_per_row = image->width;
++                                source.rows_per_layer = image->height;
++                                SDL_GPUTextureRegion target{};
++                                target.texture = textures_[i];
++                                target.w = image->width;
++                                target.h = image->height;
++                                target.d = 1;
++                                SDL_UploadToGPUTexture(copy, &source, &target, false);
++                                offset += static_cast<Uint32>(image->rgba.size());
++                            }
++                        }
++                        SDL_EndGPUCopyPass(copy);
++                        success = SDL_SubmitGPUCommandBuffer(commands);
++                    }
++                    else
++                        SDL_CancelGPUCommandBuffer(commands);
++                }
++        }
++        SDL_ReleaseGPUTransferBuffer(device_, transfer);
++        if (!success)
++            error = SDL_GetError();
++        return success;
++    }
+     bool WorldRenderer::draw(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target, const WorldMesh& mesh,
+                              std::span<const WorldDraw> draws, DVector eye, DRotation view, bool letterbox,
+                              std::string& error)
+@@ -194,6 +327,20 @@ namespace OpenBlood2
+                 return false;
+             }
+             const auto& r = mesh.ranges[d.range];
++            for (const auto& b : r.batches)
++            {
++                if (b.material >= textures_.size() || !textures_[b.material] || b.first < r.first ||
++                    b.first > std::size_t(r.first) + r.count || b.count > std::size_t(r.first) + r.count - b.first)
++                {
++                    error = "Invalid diagnostic GPU material batch";
++                    return false;
++                }
++            }
++            if (r.count && (textures_.empty() || !textures_[0]))
++            {
++                error = "GPU materials not prepared";
++                return false;
++            }
+             if (r.first > mesh.vertices.size() || r.count > mesh.vertices.size() - r.first)
+             {
+                 error = "Invalid diagnostic GPU range";
+@@ -233,7 +380,17 @@ namespace OpenBlood2
+                     continue;
+                 world_view_uniform(eye, view, aspect, d, uniform);
+                 SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
+-                SDL_DrawGPUPrimitives(pass, r.count, 1, r.first, 0);
++                auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material)
++                {
++                    SDL_GPUTextureSamplerBinding texture{textures_[material], sampler_};
++                    SDL_BindGPUFragmentSamplers(pass, 0, &texture, 1);
++                    SDL_DrawGPUPrimitives(pass, count, 1, first, 0);
++                };
++                if (r.batches.empty())
++                    batch(r.first, r.count, 0);
++                else
++                    for (const auto& b : r.batches)
++                        batch(b.first, b.count, b.material);
+             }
+         }
+         SDL_EndGPURenderPass(pass);
+diff --git a/src/engine/world_renderer.h b/src/engine/world_renderer.h
+index 84c7b05..d733d76 100644
+--- a/src/engine/world_renderer.h
++++ b/src/engine/world_renderer.h
+@@ -31,6 +31,9 @@ namespace OpenBlood2
+         SDL_GPUGraphicsPipeline* pipeline_ = nullptr;
+         SDL_GPUBuffer* vertices_ = nullptr;
+         SDL_GPUTexture* depth_ = nullptr;
++        std::vector<SDL_GPUTexture*> textures_;
++        SDL_GPUSampler* sampler_ = nullptr;
++        bool upload_materials(const WorldMesh&, std::string&);
+         SDL_GPUTextureFormat color_format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
+         Uint32 width_ = 0, height_ = 0;
+         std::uint64_t revision_ = UINT64_MAX;
+diff --git a/src/engine/world_view.cpp b/src/engine/world_view.cpp
+index 424398e..5c8d036 100644
+--- a/src/engine/world_view.cpp
++++ b/src/engine/world_view.cpp
+@@ -22,7 +22,7 @@ namespace OpenBlood2
+             return {v.x, v.y, v.z, 0};
+         }
+     } // namespace
+-    bool WorldMesh::build(const World& world, std::string& error)
++    bool WorldMesh::build(const World& world, std::string& error, const Resources* resources)
+     {
+         *this = {};
+         error.clear();
+@@ -35,6 +35,9 @@ namespace OpenBlood2
+         if (world.models.empty() || world.models.size() > 4097)
+             return fail("Diagnostic mesh requires a bounded primary world");
+         constexpr std::size_t max_vertices = 3000000;
++        materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}});
++        texture_bytes = 4;
++        std::map<std::string, std::uint32_t> material_ids;
+         for (const auto& model : world.models)
+         {
+             if (model.polygons.size() > 65536 || model.points.size() > 65536 || !physics_vector(model.translation))
+@@ -73,6 +76,49 @@ namespace OpenBlood2
+                     color = {.25f, .4f, .65f};
+                 if (surface.flags & (1u << 3))
+                     color = {.65f, .25f, .5f};
++                std::uint32_t material = 0;
++                if (resources && !model.textures.empty())
++                {
++                    if (surface.texture >= model.textures.size() || !physics_vector(surface.origin) ||
++                        !physics_vector(surface.u) || !physics_vector(surface.v))
++                        return fail("Invalid world texture mapping");
++                    const auto& path = model.textures[surface.texture];
++                    std::string key;
++                    if (!resource_path(path, key))
++                        return fail("Invalid world texture resource path");
++                    auto found = material_ids.find(key);
++                    if (found == material_ids.end())
++                    {
++                        if (materials.size() >= 4097)
++                            return fail("World texture count budget exceeded");
++                        WorldMaterial entry;
++                        entry.path = key;
++                        const auto* resource = resources->find(key);
++                        std::vector<std::uint8_t> bytes;
++                        if (!resource)
++                            entry.error = "Missing exact-path resource";
++                        else if (resource->size > 3 * 1024 * 1024)
++                            entry.error = "DTX resource exceeds byte limit";
++                        else if (resources->read(key, bytes, entry.error))
++                            read_texture(bytes, entry.image, entry.error);
++                        if (entry.image.rgba.size() > 128 * 1024 * 1024 - texture_bytes)
++                            return fail("World texture memory budget exceeded");
++                        texture_bytes += entry.image.rgba.size();
++                        const auto id = static_cast<std::uint32_t>(materials.size());
++                        materials.push_back(std::move(entry));
++                        found = material_ids.emplace(key, id).first;
++                    }
++                    if (!(surface.flags & ((1u << 3) | (1u << 4))))
++                    {
++                        if (materials[found->second].error.empty())
++                        {
++                            material = found->second;
++                            color = {1, 1, 1}; // Unlit authored albedo.
++                        }
++                        else
++                            color = {1, 0, 1}; // Explicit unresolved material marker.
++                    }
++                }
+                 if ((count - 2) * 3 > max_vertices - vertices.size())
+                     return fail("Diagnostic triangle budget exceeded");
+                 const auto a = model.points[polygon.points[0]];
+@@ -85,8 +131,24 @@ namespace OpenBlood2
+                         ++degenerate;
+                         continue;
+                     }
++                    if (range.batches.empty() || range.batches.back().material != material)
++                        range.batches.push_back({static_cast<std::uint32_t>(vertices.size()), 0, material});
++                    range.batches.back().count += 3;
+                     for (auto p : {a, b, c})
+-                        vertices.push_back({vector_subtract(p, range.pivot), color});
++                    {
++                        WorldVertex vertex{vector_subtract(p, range.pivot), color};
++                        if (material)
++                        {
++                            const auto delta = vector_subtract(p, surface.origin);
++                            const auto& image = materials[material].image;
++                            vertex.uv = {vector_dot(delta, surface.u) / image.width,
++                                         vector_dot(delta, surface.v) / image.height};
++                            if (!std::isfinite(vertex.uv[0]) || !std::isfinite(vertex.uv[1]) ||
++                                std::abs(vertex.uv[0]) > 1e6f || std::abs(vertex.uv[1]) > 1e6f)
++                                return fail("World texture coordinates exceed limits");
++                        }
++                        vertices.push_back(vertex);
++                    }
+                 }
+             }
+             range.count = static_cast<std::uint32_t>(vertices.size()) - range.first;
+@@ -98,7 +160,7 @@ namespace OpenBlood2
+                      WorldViewStats& stats, std::string& error)
+     {
+         draws.clear();
+-        stats.triangles = stats.draws = stats.hidden = stats.unbound = stats.containers = 0;
++        stats.triangles = stats.draws = stats.hidden = stats.unbound = stats.containers = stats.batches = 0;
+         error.clear();
+         if (mesh.ranges.empty())
+             return true;
+@@ -152,7 +214,10 @@ namespace OpenBlood2
+         }
+         stats.unbound = std::count(bound.begin(), bound.end(), false);
+         for (const auto& draw : draws)
++        {
+             stats.triangles += mesh.ranges[draw.range].count / 3;
++            stats.batches += mesh.ranges[draw.range].batches.empty() ? 1 : mesh.ranges[draw.range].batches.size();
++        }
+         stats.draws = draws.size();
+         return true;
+     }
+diff --git a/src/engine/world_view.h b/src/engine/world_view.h
+index f7ac333..00fcc44 100644
+--- a/src/engine/world_view.h
++++ b/src/engine/world_view.h
+@@ -1,26 +1,42 @@
+ #pragma once
++#include "engine/resources.h"
++#include "engine/texture.h"
+ #include "engine/world.h"
+ #include <array>
+ 
+ namespace OpenBlood2
+ {
+-    // Diagnostic geometry only: no texture, baked light, sky or transparency claim.
++    // Opaque base textures only; no baked light, sky or transparency claim.
+     struct WorldVertex
+     {
+         DVector position, color;
++        std::array<float, 2> uv{};
++    };
++    struct WorldMaterial
++    {
++        std::string path, error;
++        Texture image;
++    };
++    struct WorldBatch
++    {
++        std::uint32_t first = 0, count = 0, material = 0;
+     };
+     struct WorldRange
+     {
+         std::uint32_t first = 0, count = 0;
+         DVector pivot{};
+         std::string name;
++        std::vector<WorldBatch> batches;
+     };
+     struct WorldMesh
+     {
+         std::vector<WorldVertex> vertices;
+         std::vector<WorldRange> ranges;
++        // Slot zero is white. Failed resources remain named diagnostic records.
++        std::vector<WorldMaterial> materials;
++        std::size_t texture_bytes = 0;
+         std::size_t invisible = 0, degenerate = 0, transparent = 0, sky = 0;
+-        bool build(const World&, std::string&);
++        bool build(const World&, std::string&, const Resources* = nullptr);
+     };
+     struct WorldDraw
+     {
+@@ -31,6 +47,7 @@ namespace OpenBlood2
+     struct WorldViewStats
+     {
+         std::size_t triangles = 0, draws = 0, hidden = 0, unbound = 0, containers = 0;
++        std::size_t batches = 0;
+         std::uint64_t uploads = 0, frames = 0;
+     };
+     // Never creates objects or advances simulation; current checked identities only.
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index d46a9c9..246e377 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -610,3 +610,15 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.viewport PROPERTIES LABELS "gpu;private;world_view" TIMEOUT 30 RUN_SERIAL TRUE)
+     endif()
+ endif()
++
++add_executable(texture_tests texture_tests.cpp)
++target_link_libraries(texture_tests PRIVATE blood2_game)
++blood2_project_options(texture_tests)
++foreach(case IN ITEMS decode malformed mapping)
++    add_test(NAME texture.${case} COMMAND texture_tests "${case}")
++    set_tests_properties(texture.${case} PROPERTIES LABELS "headless;texture" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME texture.corpus COMMAND texture_tests corpus "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(texture.corpus PROPERTIES LABELS "headless;private;texture" TIMEOUT 90)
++endif()
+diff --git a/tests/texture_tests.cpp b/tests/texture_tests.cpp
+new file mode 100644
+index 0000000..54dab58
+--- /dev/null
++++ b/tests/texture_tests.cpp
+@@ -0,0 +1,212 @@
++#include "engine/resources.h"
++#include "engine/texture.h"
++#include "engine/world_view.h"
++#include "player_fixture.h"
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x "\n";                                                                     \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    void u16(std::vector<std::uint8_t>& b, std::size_t i, unsigned v)
++    {
++        b[i] = v;
++        b[i + 1] = v >> 8;
++    }
++    void u32(std::vector<std::uint8_t>& b, std::size_t i, unsigned v)
++    {
++        u16(b, i, v);
++        u16(b, i + 2, v >> 16);
++    }
++    std::vector<std::uint8_t> fixture(bool alpha)
++    {
++        // Rectangular 4x2 -> 2x1 -> 1x1 chain: 11 indices, 6 mask bytes.
++        std::vector<std::uint8_t> b(1068 + 11 + (alpha ? 6 : 0));
++        u32(b, 4, 0xfffffffeu);
++        u16(b, 8, 4);
++        u16(b, 10, 2);
++        u16(b, 12, 3);
++        u32(b, 16, alpha ? 10 : 8);
++        u32(b, 20, 123);
++        b[26] = 236;
++        u32(b, 36, 0x12345678);
++        u32(b, 40, 0x98765432);
++        const std::uint8_t palette[] = {17, 255, 0, 0, 34, 0, 255, 0, 51, 0, 0, 255, 68, 250, 100, 50};
++        for (unsigned i = 0; i < sizeof(palette); ++i)
++            b[44 + i] = palette[i];
++        for (unsigned i = 0; i < 11; ++i)
++            b[1068 + i] = i % 4;
++        if (alpha)
++        {
++            b[1079] = 0xf0;
++            b[1080] = 0x87;
++            b[1081] = 0x12;
++            b[1082] = 0x34;
++            b[1083] = 0x56;
++            b[1084] = 0x70;
++        }
++        return b;
++    }
++    bool decode()
++    {
++        Texture t;
++        std::string e;
++        CHECK(read_texture(fixture(false), t, e));
++        CHECK(e.empty() && t.width == 4 && t.height == 2 && t.mipmaps == 3 && t.user_flags == 123 &&
++              t.rgba.size() == 32);
++        CHECK(t.rgba[0] == 255 && t.rgba[1] == 0 && t.rgba[2] == 0 && t.rgba[3] == 17);
++        CHECK(t.rgba[4] == 0 && t.rgba[5] == 255 && t.rgba[6] == 0 && t.rgba[7] == 34);
++        CHECK(t.rgba[8] == 0 && t.rgba[9] == 0 && t.rgba[10] == 255 && t.rgba[11] == 51);
++        CHECK(read_texture(fixture(true), t, e));
++        CHECK(t.rgba[3] == 255 && t.rgba[7] == 0 && t.rgba[11] == 136 && t.rgba[15] == 119 && t.rgba[31] == 68);
++        return true;
++    }
++    bool malformed()
++    {
++        Texture t;
++        std::string e;
++        for (bool alpha : {false, true})
++        {
++            auto b = fixture(alpha);
++            for (std::size_t n = 0; n < b.size(); ++n)
++            {
++                CHECK(!read_texture(std::span(b).first(n), t, e));
++                CHECK(!e.empty() && t.rgba.empty() && t.width == 0);
++            }
++        }
++        for (unsigned i = 0; i < 11; ++i)
++        {
++            auto b = fixture(false);
++            if (i == 0)
++                u32(b, 0, 1);
++            if (i == 1)
++                u32(b, 4, 0xfffffffbu);
++            if (i == 2)
++                u16(b, 8, 0);
++            if (i == 3)
++                u16(b, 8, 3);
++            if (i == 4)
++                u16(b, 8, 2048);
++            if (i == 5)
++                u16(b, 12, 0);
++            if (i == 6)
++                u16(b, 12, 4);
++            if (i == 7)
++                u16(b, 14, 1);
++            if (i == 8)
++                u32(b, 16, 0x100);
++            if (i == 9)
++                b.push_back(0);
++            if (i == 10)
++                u32(b, 16, 10);
++            CHECK(!read_texture(b, t, e) && !e.empty() && t.rgba.empty());
++        }
++        return true;
++    }
++    bool mapping()
++    {
++        test_player::Directory directory;
++        directory.files["a.dtx"] = fixture(false);
++        directory.files["bad.dtx"] = {1, 2, 3};
++        directory.children["other"].files["missing.dtx"] = fixture(false);
++        test_model::Writer writer;
++        writer.b.resize(168);
++        writer.b[0] = writer.b[62] = writer.b[124] = 13;
++        writer.b[1] = writer.b[63] = writer.b[125] = 10;
++        writer.b[126] = 26;
++        writer.patch(127, 1);
++        auto [offset, size] = test_player::write_dir(writer, directory);
++        writer.patch(131, offset);
++        writer.patch(135, size);
++        const auto path = std::filesystem::path("texture-mapping.rez");
++        std::ofstream file(path, std::ios::binary);
++        file.write(reinterpret_cast<const char*>(writer.b.data()), writer.b.size());
++        file.close();
++        Resources resources;
++        std::string error;
++        CHECK(resources.mount(path, error));
++        World world;
++        WorldModel model;
++        model.name = "primary";
++        model.translation = {500, 600, 700};
++        model.points = {{8, 2, 4}, {12, 2, 4}, {12, 4, 4}};
++        model.planes = {{{0, 0, 1}, 4}};
++        model.surfaces = {{{4, 0, 4}, {2, 0, 0}, {0, -1, 0}, 0, 0, 0, 0}};
++        model.polygons = {{0, {0, 1, 2}}};
++        model.textures = {"A.DTX"};
++        world.models = {model, model};
++        WorldMesh mesh;
++        CHECK(mesh.build(world, error, &resources));
++        CHECK(mesh.materials.size() == 2 && mesh.materials[1].error.empty() && mesh.texture_bytes == 36);
++        CHECK(mesh.vertices[0].uv[0] == 2 && mesh.vertices[0].uv[1] == -1);
++        CHECK(mesh.vertices[3].uv == mesh.vertices[0].uv && mesh.vertices[3].position.x == -492);
++        CHECK(mesh.ranges[0].batches.size() == 1 && mesh.ranges[1].batches[0].material == 1);
++        world.models[0].textures[0] = "missing.dtx";
++        world.models[1].textures[0] = "bad.dtx";
++        CHECK(mesh.build(world, error, &resources));
++        CHECK(mesh.materials.size() == 3 && !mesh.materials[1].error.empty() && !mesh.materials[2].error.empty());
++        CHECK(mesh.ranges[0].batches[0].material == 0 && mesh.vertices[0].color.x == 1 &&
++              mesh.vertices[0].color.y == 0);
++        world.models[0].textures[0] = "../a.dtx";
++        CHECK(!mesh.build(world, error, &resources) && mesh.vertices.empty() && mesh.materials.empty());
++        world.models[0].textures[0] = "a.dtx";
++        world.models[0].surfaces[0].texture = 1;
++        CHECK(!mesh.build(world, error, &resources) && mesh.ranges.empty());
++        std::error_code ec;
++        CHECK(std::filesystem::remove(path, ec) && !ec);
++        return true;
++    }
++    bool corpus(const char* root)
++    {
++        Resources resources;
++        Config c;
++        c.data_dir = root;
++        std::string e;
++        CHECK(resources.mount_game(c, e));
++        std::size_t decoded = 0, rejected = 0, alpha = 0;
++        for (const auto& [path, resource] : resources.index())
++        {
++            if (!path.ends_with(".dtx"))
++                continue;
++            std::vector<std::uint8_t> b;
++            Texture t;
++            CHECK(resources.read(path, b, e));
++            if (read_texture(b, t, e))
++            {
++                ++decoded;
++                alpha += (t.flags & 2) != 0;
++                CHECK(t.rgba.size() == t.width * t.height * 4);
++            }
++            else
++            {
++                ++rejected;
++                CHECK(b.size() >= 8 && b[4] == 0 && b[5] == 0 && b[6] == 0 && b[7] == 0);
++                CHECK(t.rgba.empty() && !e.empty());
++                std::cout << path << ": " << e << '\n';
++            }
++        }
++        std::cout << "DTX corpus: decoded=" << decoded << " rejected=" << rejected << " alpha=" << alpha << '\n';
++        CHECK(decoded > 3000 && rejected == 5 && alpha > 100);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    std::string_view c = argv[1];
++    return (c == "mapping"               ? mapping()
++            : c == "decode"              ? decode()
++            : c == "malformed"           ? malformed()
++            : c == "corpus" && argc == 3 ? corpus(argv[2])
++                                         : false)
++               ? 0
++               : 1;
++}
+diff --git a/tests/world_gpu_tests.cpp b/tests/world_gpu_tests.cpp
+index d876f24..3883b32 100644
+--- a/tests/world_gpu_tests.cpp
++++ b/tests/world_gpu_tests.cpp
+@@ -29,7 +29,7 @@ int main(int argc, char** argv)
+     triangle({-2, -2, 4}, {-2, 2, 4}, {2, 2, 4}, {0, 0, 1});            // Opposite winding is visible too.
+     triangle({-1, -1, .5f}, {1, -1, .5f}, {0, 1, .5f}, {1, 1, 0});      // Must be near-clipped.
+     triangle({1, .6f, 2}, {1.5f, .6f, 2}, {1.25f, 1.2f, 2}, {0, 1, 0}); // +X right / +Y up.
+-    mesh.ranges.push_back({0, static_cast<unsigned>(mesh.vertices.size()), {}, "synthetic"});
++    mesh.ranges.push_back({0, static_cast<unsigned>(mesh.vertices.size()), {}, "synthetic", {}});
+     WorldRenderer renderer(runtime.gpu);
+     for (int cycle = 0; cycle < 3; ++cycle)
+     {
+@@ -54,9 +54,9 @@ int main(int argc, char** argv)
+         SDL_GPUTexture* swap = nullptr;
+         Uint32 sw = 0, sh = 0;
+         CHECK(SDL_WaitAndAcquireGPUSwapchainTexture(cmd, runtime.window, &swap, &sw, &sh));
+-        CHECK(swap);
++        CHECK(swap && sw && sh); // Compositor size may lag this test's offscreen target.
+         CHECK(renderer.draw(cmd, capture.texture, mesh, std::span(&draw, 1), eye, view, false, error));
+-        CHECK(capture.enqueue(cmd, swap));
++        CHECK(capture.enqueue(cmd, swap, sw, sh));
+         CHECK(SDL_SubmitGPUCommandBuffer(cmd));
+         CHECK(SDL_WaitForGPUIdle(runtime.gpu));
+         auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
+@@ -104,7 +104,64 @@ int main(int argc, char** argv)
+         CHECK(correct);
+         renderer.clear_geometry();
+     }
++    // Known 2x2 colors, repeated twice in both directions. GPU pixels test the
++    // sampler, row direction, material binding, opaque policy and reload ownership.
++    for (int cycle = 0; cycle < 2; ++cycle)
++    {
++        WorldMesh textured;
++        textured.materials = {
++            {"white", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}},
++            {"synthetic", "", {2, 2, 1, 0, 0, {255, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255, 0, 255, 255, 255, 0}}}};
++        if (cycle)
++            textured.materials[1].image.rgba[2] = 255;
++        textured.vertices = {{{-1, 1, 2}, {1, 1, 1}, {0, 0}}, {{1, 1, 2}, {1, 1, 1}, {2, 0}},
++                             {{1, -1, 2}, {1, 1, 1}, {2, 2}}, {{-1, 1, 2}, {1, 1, 1}, {0, 0}},
++                             {{1, -1, 2}, {1, 1, 1}, {2, 2}}, {{-1, -1, 2}, {1, 1, 1}, {0, 2}}};
++        textured.ranges.push_back({0, 6, {}, "textured", {{0, 6, 1}}});
++        WorldDraw draw;
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240));
++        CHECK(renderer.prepare(textured, 10 + cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error));
++        auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(cmd);
++        CHECK(renderer.draw(cmd, capture.texture, textured, std::span(&draw, 1), {}, {}, false, error));
++        auto* copy = SDL_BeginGPUCopyPass(cmd);
++        CHECK(copy);
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 320;
++        region.h = 240;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 320;
++        target.rows_per_layer = 240;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        CHECK(SDL_SubmitGPUCommandBuffer(cmd));
++        CHECK(SDL_WaitForGPUIdle(runtime.gpu));
++        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        auto rgb = [&](int x, int y, int r, int g, int b)
++        {
++            const auto* p = pixels + (y * 320 + x) * 4;
++            return p[0] == r && p[1] == g && p[2] == b && p[3] == 255;
++        };
++        const bool correct = rgb(90, 50, 255, 0, cycle ? 255 : 0) && rgb(130, 50, 0, 255, 0) &&
++                             rgb(170, 50, 255, 0, cycle ? 255 : 0) && rgb(210, 50, 0, 255, 0) &&
++                             rgb(90, 90, 0, 0, 255) && rgb(130, 90, 255, 255, 255) &&
++                             rgb(90, 130, 255, 0, cycle ? 255 : 0);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        if (argc == 2)
++            CHECK(capture.save((std::string(argv[1]) + ".textures.png").c_str()));
++        CHECK(correct);
++        // Rejected uploads must not leave a usable stale material cache.
++        textured.materials[1].image.rgba.pop_back();
++        CHECK(!renderer.prepare(textured, 100 + cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error));
++        CHECK(!error.empty());
++        renderer.clear_geometry();
++    }
+     std::cout << "GPU readback: depth occlusion, opposite winding, near clipping, +X/+Y orientation, camera/object "
+-                 "transforms, resize and reupload pass\n";
++                 "transforms, resize, textured repeat/row orientation/opaque sampling and reupload pass\n";
+     return 0;
+ }
+diff --git a/tests/world_view_tests.cpp b/tests/world_view_tests.cpp
+index edfb7c7..3949d87 100644
+--- a/tests/world_view_tests.cpp
++++ b/tests/world_view_tests.cpp
+@@ -152,8 +152,17 @@ namespace
+             CHECK(g.request_world("01_SubwayA", error));
+             CHECK(g.world_revision > revision);
+             revision = g.world_revision;
+-            CHECK(mesh.build(g.world, error));
++            CHECK(mesh.build(g.world, error, &g.resources));
+             CHECK(mesh.ranges.size() == 116 && mesh.vertices.size() > 1000);
++            std::size_t decoded = 0, failed = 0;
++            for (std::size_t i = 1; i < mesh.materials.size(); ++i)
++                mesh.materials[i].error.empty() ? ++decoded : ++failed;
++            std::cout << "Textures: decoded=" << decoded << " failed=" << failed << " bytes=" << mesh.texture_bytes
++                      << '\n';
++            CHECK(decoded > 50);
++            for (const auto& material : mesh.materials)
++                if (!material.error.empty())
++                    std::cout << material.path << ": " << material.error << '\n';
+             CHECK(g.enter_player(error));
+             CHECK(g.step(1. / 60));
+             CHECK(world_draws(mesh, g.objects, draws, stats, error));

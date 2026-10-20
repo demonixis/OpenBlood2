@@ -1,0 +1,94 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 338: gpu.world_depth
+1/2 Test #338: gpu.world_depth ..................***Failed   14.26 sec
+Validation Error: [ VUID-vkCmdBlitImage-dstOffset-00249 ] | MessageID = 0x7a4e4265
+vkCmdBlitImage(): pRegions[0].dstOffsets[0].y is 0 and dstOffsets[1].y is 240 which exceed dstSubresource height extent (240).
+The VK_IMAGE_TYPE_2D VkImage was created with format VK_FORMAT_B8G8R8A8_UNORM and an extent of [width = 320, height = 240, depth = 1]
+The Vulkan spec states: For each element of pRegions, dstOffsets[0].y and dstOffsets[1].y must both be greater than or equal to 0 and less than or equal to the height of the specified dstSubresource of dstImage (https://docs.vulkan.org/spec/latest/chapters/copies.html#VUID-vkCmdBlitImage-dstOffset-00249)
+Objects: 2
+    [0] VkCommandBuffer 0x2c687710
+    [1] VkImage 0x2760000000276
+
+ERROR: vkDeviceWaitIdle VK_ERROR_DEVICE_LOST
+61: SDL_WaitForGPUIdle(runtime.gpu)  vkDeviceWaitIdle VK_ERROR_DEVICE_LOST
+ERROR: vkDeviceWaitIdle VK_ERROR_DEVICE_LOST
+ERROR: vkDeviceWaitIdle VK_ERROR_DEVICE_LOST
+ERROR: vkDeviceWaitIdle VK_ERROR_DEVICE_LOST
+ERROR: vkDeviceWaitIdle VK_ERROR_DEVICE_LOST
+Validation Error: [ VUID-vkDestroyDevice-device-05137 ] | MessageID = 0x4872eaa0
+vkDestroyDevice(): Object Tracking - For VkDevice 0x2c012ae0, VkBuffer 0x2690000000269 has not been destroyed.
+The Vulkan spec states: All child objects created on device that can be destroyed or freed must have been destroyed or freed prior to destroying device (https://docs.vulkan.org/spec/latest/chapters/devsandqueues.html#VUID-vkDestroyDevice-device-05137)
+Objects: 1
+    [0] VkBuffer 0x2690000000269
+
+Validation Error: [ VUID-vkDestroyDevice-device-05137 ] | MessageID = 0x4872eaa0
+vkDestroyDevice(): Object Tracking - For VkDevice 0x2c012ae0, VkBuffer 0x210000000021 has not been destroyed.
+The Vulkan spec states: All child objects created on device that can be destroyed or freed must have been destroyed or freed prior to destroying device (https://docs.vulkan.org/spec/latest/chapters/devsandqueues.html#VUID-vkDestroyDevice-device-05137)
+Objects: 1
+    [0] VkBuffer 0x210000000021
+
+Validation Error: [ VUID-vkDestroyDevice-device-05137 ] | MessageID = 0x4872eaa0
+vkDestroyDevice(): Object Tracking - For VkDevice 0x2c012ae0, VkBuffer 0x26d000000026d has not been destroyed.
+The Vulkan spec states: All child objects created on device that can be destroyed or freed must have been destroyed or freed prior to destroying device (https://docs.vulkan.org/spec/latest/chapters/devsandqueues.html#VUID-vkDestroyDevice-device-05137)
+Objects: 1
+    [0] VkBuffer 0x26d000000026d
+
+Validation Error: [ VUID-vkDestroyDevice-device-05137 ] | MessageID = 0x4872eaa0
+vkDestroyDevice(): Object Tracking - For VkDevice 0x2c012ae0, VkImage 0x2720000000272 has not been destroyed.
+The Vulkan spec states: All child objects created on device that can be destroyed or freed must have been destroyed or freed prior to destroying device (https://docs.vulkan.org/spec/latest/chapters/devsandqueues.html#VUID-vkDestroyDevice-device-05137)
+Objects: 1
+    [0] VkImage 0x2720000000272
+
+Validation Error: [ VUID-vkDestroyDevice-device-05137 ] | MessageID = 0x4872eaa0
+vkDestroyDevice(): Object Tracking - For VkDevice 0x2c012ae0, VkImage 0x2660000000266 has not been destroyed.
+The Vulkan spec states: All child objects created on device that can be destroyed or freed must have been destroyed or freed prior to destroying device (https://docs.vulkan.org/spec/latest/chapters/devsandqueues.html#VUID-vkDestroyDevice-device-05137)
+Objects: 1
+    [0] VkImage 0x2660000000266
+
+Validation Error: [ VUID-vkDestroyDevice-device-05137 ] | MessageID = 0x4872eaa0
+vkDestroyDevice(): Object Tracking - For VkDevice 0x2c012ae0, VkImage 0x26b000000026b has not been destroyed.
+The Vulkan spec states: All child objects created on device that can be destroyed or freed must have been destroyed or freed prior to destroying device (https://docs.vulkan.org/spec/latest/chapters/devsandqueues.html#VUID-vkDestroyDevice-device-05137)
+Objects: 1
+    [0] VkImage 0x26b000000026b
+
+Validation Error: [ VUID-vkDestroyDevice-device-05137 ] | MessageID = 0x4872eaa0
+vkDestroyDevice(): Object Tracking - For VkDevice 0x2c012ae0, VkFence 0x3c000000003c has not been destroyed.
+The Vulkan spec states: All child objects created on device that can be destroyed or freed must have been destroyed or freed prior to destroying device (https://docs.vulkan.org/spec/latest/chapters/devsandqueues.html#VUID-vkDestroyDevice-device-05137)
+Objects: 1
+    [0] VkFence 0x3c000000003c
+
+Validation Error: [ VUID-vkDestroyDevice-device-05137 ] | MessageID = 0x4872eaa0
+vkDestroyDevice(): Object Tracking - For VkDevice 0x2c012ae0, VkImageView 0x2730000000273 has not been destroyed.
+The Vulkan spec states: All child objects created on device that can be destroyed or freed must have been destroyed or freed prior to destroying device (https://docs.vulkan.org/spec/latest/chapters/devsandqueues.html#VUID-vkDestroyDevice-device-05137)
+Objects: 1
+    [0] VkImageView 0x2730000000273
+
+Validation Error: [ VUID-vkDestroyDevice-device-05137 ] | MessageID = 0x4872eaa0
+vkDestroyDevice(): Object Tracking - For VkDevice 0x2c012ae0, VkImageView 0x2670000000267 has not been destroyed.
+The Vulkan spec states: All child objects created on device that can be destroyed or freed must have been destroyed or freed prior to destroying device (https://docs.vulkan.org/spec/latest/chapters/devsandqueues.html#VUID-vkDestroyDevice-device-05137)
+Objects: 1
+    [0] VkImageView 0x2670000000267
+
+Validation Error: [ VUID-vkDestroyDevice-device-05137 ] | MessageID = 0x4872eaa0
+(Warning - This VUID has now been reported 10 times, which is the duplicate_message_limit value, this will be the last time reporting it).
+vkDestroyDevice(): Object Tracking - For VkDevice 0x2c012ae0, VkImageView 0x2680000000268 has not been destroyed.
+The Vulkan spec states: All child objects created on device that can be destroyed or freed must have been destroyed or freed prior to destroying device (https://docs.vulkan.org/spec/latest/chapters/devsandqueues.html#VUID-vkDestroyDevice-device-05137)
+Objects: 1
+    [0] VkImageView 0x2680000000268
+
+
+    Start 339: gpu.viewport
+2/2 Test #339: gpu.viewport .....................   Passed   10.95 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Label Time Summary:
+gpu           =  25.20 sec*proc (2 tests)
+private       =  10.95 sec*proc (1 test)
+world_view    =  25.20 sec*proc (2 tests)
+
+Total Test time (real) =  25.21 sec
+
+The following tests FAILED:
+	338 - gpu.world_depth (Failed)                          gpu world_view
+Errors while running CTest

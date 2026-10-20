@@ -1,0 +1,15 @@
+4/626 Testing: objects.scheduling
+4/626 Test: objects.scheduling
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "scheduling"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.scheduling" start time: Oct 17 02:45 CEST
+Output:
+----------------------------------------------------------
+PASS scheduling
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.scheduling" end time: Oct 17 02:45 CEST
+"objects.scheduling" time elapsed: 00:00:00
+----------------------------------------------------------

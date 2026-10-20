@@ -1,0 +1,34 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 979: player_impulse.rules
+    Start 980: player_impulse.motion
+1/4 Test #979: player_impulse.rules .............***Failed    0.01 sec
+setup:37: test_audio::setup(g, root) && g.enter_player(error)
+rules:45: setup(g, root)
+
+    Start 981: player_impulse.restore
+2/4 Test #980: player_impulse.motion ............***Failed    0.01 sec
+setup:37: test_audio::setup(g, root) && g.enter_player(error)
+motion:98: setup(g, root / std::to_string(hz))
+
+    Start 982: player_impulse.private
+3/4 Test #981: player_impulse.restore ...........***Failed    0.01 sec
+setup:37: test_audio::setup(g, root) && g.enter_player(error)
+restore:133: setup(g, root)
+
+4/4 Test #982: player_impulse.private ...........   Passed    0.38 sec
+
+25% tests passed, 3 tests failed out of 4
+
+Label Time Summary:
+headless          =   0.40 sec*proc (4 tests)
+physics           =   0.40 sec*proc (4 tests)
+player_impulse    =   0.40 sec*proc (4 tests)
+private           =   0.38 sec*proc (1 test)
+
+Total Test time (real) =   0.41 sec
+
+The following tests FAILED:
+	979 - player_impulse.rules (Failed)                     headless physics player_impulse
+	980 - player_impulse.motion (Failed)                    headless physics player_impulse
+	981 - player_impulse.restore (Failed)                   headless physics player_impulse
+Errors while running CTest

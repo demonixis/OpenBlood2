@@ -1,0 +1,43 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  61: weapons.private
+      Start  72: movement.private
+      Start  81: locomotion.private
+      Start 183: cameras.catalog
+ 1/14 Test  #81: locomotion.private ...............   Passed    2.53 sec
+      Start 181: cameras.player
+ 2/14 Test #181: cameras.player ...................   Passed    0.03 sec
+      Start 178: cameras.timing
+ 3/14 Test #178: cameras.timing ...................   Passed    0.00 sec
+      Start 177: cameras.defaults
+ 4/14 Test #177: cameras.defaults .................   Passed    0.00 sec
+      Start 180: cameras.selection
+ 5/14 Test #180: cameras.selection ................   Passed    0.00 sec
+      Start 179: cameras.links
+ 6/14 Test #179: cameras.links ....................   Passed    0.00 sec
+      Start 182: cameras.validation
+ 7/14 Test #182: cameras.validation ...............   Passed    0.00 sec
+ 8/14 Test #183: cameras.catalog ..................   Passed    5.92 sec
+ 9/14 Test  #72: movement.private .................   Passed    7.59 sec
+10/14 Test  #61: weapons.private ..................   Passed   16.40 sec
+      Start  62: gpu.weapons
+11/14 Test  #62: gpu.weapons ......................   Passed   17.99 sec
+      Start  73: gpu.movement
+12/14 Test  #73: gpu.movement .....................   Passed   16.15 sec
+      Start 130: gpu.interaction
+13/14 Test #130: gpu.interaction ..................   Passed    5.23 sec
+      Start 184: gpu.cameras
+14/14 Test #184: gpu.cameras ......................   Passed    1.95 sec
+
+100% tests passed, 0 tests failed out of 14
+
+Label Time Summary:
+cameras        =   7.91 sec*proc (8 tests)
+gpu            =  41.32 sec*proc (4 tests)
+headless       =  32.48 sec*proc (10 tests)
+interaction    =   5.23 sec*proc (1 test)
+locomotion     =   2.53 sec*proc (1 test)
+movement       =  23.74 sec*proc (2 tests)
+private        =  73.77 sec*proc (8 tests)
+weapons        =  34.39 sec*proc (2 tests)
+
+Total Test time (real) =  57.73 sec

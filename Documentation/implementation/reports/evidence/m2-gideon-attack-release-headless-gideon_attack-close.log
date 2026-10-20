@@ -1,0 +1,14 @@
+687/691 Testing: gideon_attack.close
+687/691 Test: gideon_attack.close
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon_attack_tests" "close" "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon-attack-close"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gideon_attack.close" start time: Oct 17 03:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_attack.close" end time: Oct 17 03:03 CEST
+"gideon_attack.close" time elapsed: 00:00:00
+----------------------------------------------------------

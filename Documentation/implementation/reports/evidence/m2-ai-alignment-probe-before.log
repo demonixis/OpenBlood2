@@ -1,0 +1,68 @@
+NPC CultistAI0 state=5 smell=0 pos=704,297.739,192
+NPC snot state=5 smell=0 pos=576,299.132,704
+NPC hank state=5 smell=0 pos=752,-86.5056,2992
+NPC hellboy state=5 smell=0 pos=784,-86.9287,2592
+NPC fresh state=24 smell=0 pos=480,299.027,2144
+NPC meat state=24 smell=0 pos=384,297.197,2144
+NPC CultistAI2 state=5 smell=0 pos=-112,294.033,1856
+NPC CultistAI2 state=5 smell=0 pos=-112,299.83,1920
+NPC hermit state=17 smell=0 pos=-560,299.618,1840
+NPC cletus state=5 smell=0 pos=-128,361.09,1104
+NPC CultistAI3 state=5 smell=0 pos=-176,618.801,1232
+NPC CultistAI3 state=5 smell=0 pos=0,616.631,1120
+NPC poopface state=5 smell=0 pos=-384,362.255,912
+NPC freakpoopwoman state=5 smell=0 pos=-384,437.357,1504
+NPC CultistAI5 state=5 smell=0 pos=544,296.631,-608
+NPC CultistAI6 state=5 smell=0 pos=1376,419.045,-320
+NPC CultistAI7 state=5 smell=0 pos=1440,939.107,-1632
+NPC CultistAI8 state=5 smell=0 pos=848,681.112,-2368
+NPC CultistAI8 state=5 smell=0 pos=1312,618.118,-2544
+NPC CultistAI8 state=5 smell=0 pos=1136,611.054,-2448
+NPC CultistAI8 state=5 smell=0 pos=1760,616.631,-2496
+NPC CivilianAI7 state=5 smell=0 pos=1936,456,80
+NPC CivilianAI7 state=5 smell=0 pos=1568,456.438,-144
+NPC CivilianAI7 state=5 smell=0 pos=2336,455,-128
+NPC drea state=5 smell=0 pos=1904,455,-192
+NPC Gideon state=24 smell=0 pos=160,324.758,2592
+NPC germ state=5 smell=0 pos=752,-85.8558,2912
+SPOT CultistAI0
+SPOT snot
+SPOT hank
+SPOT hellboy
+SPOT fresh
+SKIP blocked meat
+SPOT CultistAI2
+SPOT CultistAI2
+SPOT hermit
+SPOT cletus
+SPOT CultistAI3
+SPOT CultistAI3
+SPOT poopface
+SPOT freakpoopwoman
+SKIP blocked CultistAI5
+SPOT CultistAI6
+SPOT CultistAI7
+SPOT CultistAI8
+SPOT CultistAI8
+SKIP blocked CultistAI8
+SPOT CultistAI8
+CultistAI8 state=2 phase=2 dims=24.6436,36.9135,24.6436 cached=884.889,676.914,-2394.71 dest=1760,500.718,-2656 failure=AI_Update: Obstacle normal/up is degenerate
+CultistAI8 state=2 phase=2 dims=24.0261,37.8169,24.0261 cached=1312,613.818,-2544 dest=1760,446.118,-2656 failure=AI_Update: Obstacle normal/up is degenerate
+SPOT CivilianAI7
+CultistAI8 state=2 phase=2 dims=24.6436,36.9135,24.6436 cached=884.889,676.914,-2394.71 dest=1760,500.718,-2656 failure=AI_Update: Obstacle normal/up is degenerate
+CultistAI8 state=2 phase=2 dims=24.0261,37.8169,24.0261 cached=1312,613.818,-2544 dest=1760,446.118,-2656 failure=AI_Update: Obstacle normal/up is degenerate
+SPOT CivilianAI7
+CultistAI8 state=2 phase=2 dims=24.6436,36.9135,24.6436 cached=884.889,676.914,-2394.71 dest=1760,500.718,-2656 failure=AI_Update: Obstacle normal/up is degenerate
+CultistAI8 state=2 phase=2 dims=24.0261,37.8169,24.0261 cached=1312,613.818,-2544 dest=1760,446.118,-2656 failure=AI_Update: Obstacle normal/up is degenerate
+SPOT CivilianAI7
+CultistAI8 state=2 phase=2 dims=24.6436,36.9135,24.6436 cached=884.889,676.914,-2394.71 dest=1760,500.718,-2656 failure=AI_Update: Obstacle normal/up is degenerate
+CultistAI8 state=2 phase=2 dims=24.0261,37.8169,24.0261 cached=1312,613.818,-2544 dest=1760,446.118,-2656 failure=AI_Update: Obstacle normal/up is degenerate
+SPOT drea
+CultistAI8 state=2 phase=2 dims=24.6436,36.9135,24.6436 cached=884.889,676.914,-2394.71 dest=1760,500.718,-2656 failure=AI_Update: Obstacle normal/up is degenerate
+CultistAI8 state=2 phase=2 dims=24.0261,37.8169,24.0261 cached=1312,613.818,-2544 dest=1760,446.118,-2656 failure=AI_Update: Obstacle normal/up is degenerate
+SPOT Gideon
+CultistAI8 state=2 phase=2 dims=24.6436,36.9135,24.6436 cached=884.889,676.914,-2394.71 dest=1760,500.718,-2656 failure=AI_Update: Obstacle normal/up is degenerate
+CultistAI8 state=2 phase=2 dims=24.0261,37.8169,24.0261 cached=1312,613.818,-2544 dest=1760,446.118,-2656 failure=AI_Update: Obstacle normal/up is degenerate
+SPOT germ
+CultistAI8 state=2 phase=2 dims=24.6436,36.9135,24.6436 cached=884.889,676.914,-2394.71 dest=1760,500.718,-2656 failure=AI_Update: Obstacle normal/up is degenerate
+CultistAI8 state=2 phase=2 dims=24.0261,37.8169,24.0261 cached=1312,613.818,-2544 dest=1760,446.118,-2656 failure=AI_Update: Obstacle normal/up is degenerate

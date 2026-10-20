@@ -1,0 +1,18 @@
+{
+  "binary": "IMUSIC25.DLL",
+  "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "entry_rva": "0x17103..0x1759f",
+  "generated": {
+    "steps": 1024,
+    "messages": 4348,
+    "fnv64": 15334764557161491361,
+    "sha256": "56091cd26e828656bee948a47152d59e9584d99e78a26f362b00eca0afa2f62e"
+  },
+  "private": {
+    "steps": 8174,
+    "messages": 9063,
+    "fnv64": 10183239741431151107,
+    "sha256": "ef746052f946f07bbe678fec188271810e5b4189e095d9512a8cf03a86eb1dd9"
+  },
+  "scope": "Original grid mute/variation filtering, note event tail and curve expansion/send order. Explicit checked point owners, pre-resolved pitches, variations and tick. Allocation/free/rand/send intercepted. Section selection and subsequent note-off phase have separate evidence; loader owner fixups, synth and transport remain outside this probe."
+}

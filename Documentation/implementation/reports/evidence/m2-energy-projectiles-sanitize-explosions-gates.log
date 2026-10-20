@@ -1,0 +1,14 @@
+141/596 Testing: explosions.gates
+141/596 Test: explosions.gates
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_tests" "gates" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-fixtures/gates"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosions.gates" start time: Oct 17 01:22 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"explosions.gates" end time: Oct 17 01:22 CEST
+"explosions.gates" time elapsed: 00:00:00
+----------------------------------------------------------

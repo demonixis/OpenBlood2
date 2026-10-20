@@ -1,0 +1,30 @@
+Test project <Blood2>/build/debug
+    Start 141: trigger_audio.activation
+    Start 142: trigger_audio.feedback
+1/5 Test #142: trigger_audio.feedback ...........***Failed    0.01 sec
+feedback:107: p->m_InventoryMgr.AddKey({"Key", "Key", "", "", 1}) == InventoryResult::Ok
+
+    Start 143: trigger_audio.lifetime
+2/5 Test #141: trigger_audio.activation .........   Passed    0.01 sec
+    Start 144: trigger_audio.failures
+3/5 Test #143: trigger_audio.lifetime ...........   Passed    0.01 sec
+    Start 145: trigger_audio.private
+4/5 Test #144: trigger_audio.failures ...........   Passed    0.01 sec
+5/5 Test #145: trigger_audio.private ............***Failed    0.49 sec
+private_data:197: checked > 0
+
+
+60% tests passed, 2 tests failed out of 5
+
+Label Time Summary:
+audio       =   0.52 sec*proc (5 tests)
+headless    =   0.52 sec*proc (5 tests)
+private     =   0.49 sec*proc (1 test)
+triggers    =   0.52 sec*proc (5 tests)
+
+Total Test time (real) =   0.52 sec
+
+The following tests FAILED:
+	142 - trigger_audio.feedback (Failed)                   audio headless triggers
+	145 - trigger_audio.private (Failed)                    audio headless private triggers
+Errors while running CTest

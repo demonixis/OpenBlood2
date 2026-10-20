@@ -1,0 +1,78 @@
+[0/2] Re-checking globbed directories...
+[1/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Shockwave.cpp.o
+[2/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/object_particles.cpp.o
+[3/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponProjectile.cpp.o
+[4/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Projectile.cpp.o
+[5/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/EnergyBlast.cpp.o
+[6/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_projectiles.cpp.o
+[7/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/NagaEyes.cpp.o
+[8/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/LaserBeamFX.cpp.o
+[9/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SmokeImpactFX.cpp.o
+[10/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/destination_trial.cpp.o
+[11/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/world_preparation.cpp.o
+[12/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_flames.cpp.o
+[13/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionFlameFX.cpp.o
+[14/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ObjectParticleFX.cpp.o
+[15/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_fragments.cpp.o
+[16/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionFragFX.cpp.o
+[17/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionRingFX.cpp.o
+[18/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_rings.cpp.o
+[19/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionLightFX.cpp.o
+[20/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_lights.cpp.o
+[21/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionModelFX.cpp.o
+[22/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_models.cpp.o
+[23/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_sprites.cpp.o
+[24/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionSpriteFX.cpp.o
+[25/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/HandWeaponModel.cpp.o
+[26/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_attachments.cpp.o
+[27/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponHand.cpp.o
+[28/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/engineobjects.cpp.o
+[29/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/B2BaseClass.cpp.o
+[30/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CameraSpot.cpp.o
+[31/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Key.cpp.o
+[32/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/GameStartPoint.cpp.o
+[33/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PathPoint.cpp.o
+[34/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PathMgr.cpp.o
+[35/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/trigger_helpers.cpp.o
+[36/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/session_load.cpp.o
+[37/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/player_restore.cpp.o
+[38/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/session.cpp.o
+[39/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_adapter.cpp.o
+[40/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ClientExplosionSFX.cpp.o
+[41/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/registration.cpp.o
+[42/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_sprites.cpp.o
+[43/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/DetailSprite.cpp.o
+[44/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CinematicTrigger.cpp.o
+[45/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_audio.cpp.o
+[46/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/RandomSoundFX.cpp.o
+[47/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Sound.cpp.o
+[48/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SoundFX.cpp.o
+[49/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/LightFX.cpp.o
+[50/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_lights.cpp.o
+[51/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ClientLightFX.cpp.o
+[52/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_keyframes.cpp.o
+[53/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/KeyData.cpp.o
+[54/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/KeyFramer.cpp.o
+[55/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CameraObj.cpp.o
+[56/88] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_cameras.cpp.o
+[57/88] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[58/87] Generating CXX dyndep file tests/CMakeFiles/player_tests.dir/CXX.dd
+[59/86] Generating CXX dyndep file tests/CMakeFiles/pickup_tests.dir/CXX.dd
+[60/86] Generating CXX dyndep file tests/CMakeFiles/cinematic_tests.dir/CXX.dd
+[61/85] Generating CXX dyndep file tests/CMakeFiles/inventory_state_tests.dir/CXX.dd
+[62/84] Generating CXX dyndep file tests/CMakeFiles/player_restore_tests.dir/CXX.dd
+[63/82] Generating CXX dyndep file tests/CMakeFiles/player_keepalive_tests.dir/CXX.dd
+[64/80] Generating CXX dyndep file tests/CMakeFiles/player_controls_tests.dir/CXX.dd
+[65/79] Generating CXX dyndep file tests/CMakeFiles/medkit_tests.dir/CXX.dd
+[66/78] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_objectives.cpp.o
+[67/78] Linking CXX static library libblood2_game.a
+[68/78] Linking CXX executable tests/object_contract_tests
+[69/78] Building CXX object tests/CMakeFiles/pickup_tests.dir/pickup_tests.cpp.o
+[70/78] Linking CXX executable tests/player_tests
+[71/78] Linking CXX executable tests/pickup_tests
+[72/78] Linking CXX executable tests/cinematic_tests
+[73/78] Linking CXX executable tests/inventory_state_tests
+[74/78] Linking CXX executable tests/player_restore_tests
+[75/78] Linking CXX executable tests/player_keepalive_tests
+[76/78] Linking CXX executable tests/player_controls_tests
+[77/78] Linking CXX executable tests/medkit_tests

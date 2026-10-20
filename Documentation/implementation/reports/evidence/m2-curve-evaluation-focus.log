@@ -1,0 +1,16 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 1047: ima_curve_event.original
+1/3 Test #1047: ima_curve_event.original .........   Passed    0.01 sec
+    Start 1048: ima_curve_event.bounds
+2/3 Test #1048: ima_curve_event.bounds ...........   Passed    0.01 sec
+    Start 1049: ima_curve_event.private
+3/3 Test #1049: ima_curve_event.private ..........   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+headless        =   0.06 sec*proc (3 tests)
+music_assets    =   0.06 sec*proc (3 tests)
+private         =   0.05 sec*proc (1 test)
+
+Total Test time (real) =   0.08 sec

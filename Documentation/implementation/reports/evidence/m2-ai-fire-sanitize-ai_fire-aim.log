@@ -1,0 +1,14 @@
+350/357 Testing: ai_fire.aim
+350/357 Test: ai_fire.aim
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_fire_tests" "aim"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_fire.aim" start time: Oct 16 11:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_fire.aim" end time: Oct 16 11:41 CEST
+"ai_fire.aim" time elapsed: 00:00:00
+----------------------------------------------------------

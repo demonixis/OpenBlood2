@@ -1,0 +1,32 @@
+Test project <workspace>/Blood2/build/release
+    Start  28: gpu.lifecycle
+1/8 Test  #28: gpu.lifecycle ....................   Passed    3.08 sec
+    Start  82: gpu.weapons
+2/8 Test  #82: gpu.weapons ......................   Passed   13.32 sec
+    Start 136: gpu.doors
+3/8 Test #136: gpu.doors ........................   Passed    1.70 sec
+    Start 151: gpu.triggers
+4/8 Test #151: gpu.triggers .....................   Passed    1.67 sec
+    Start 162: gpu.interaction
+5/8 Test #162: gpu.interaction ..................   Passed    2.20 sec
+    Start 212: gpu.objectives
+6/8 Test #212: gpu.objectives ...................   Passed    2.22 sec
+    Start 848: gpu.level_change
+7/8 Test #848: gpu.level_change .................   Passed    1.61 sec
+    Start 941: gpu.train_session
+8/8 Test #941: gpu.train_session ................   Passed    6.99 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+doors            =   1.70 sec*proc (1 test)
+gpu              =  32.79 sec*proc (8 tests)
+interaction      =   2.20 sec*proc (1 test)
+objectives       =   2.22 sec*proc (1 test)
+private          =  29.70 sec*proc (7 tests)
+train_session    =   6.99 sec*proc (1 test)
+triggers         =   1.67 sec*proc (1 test)
+weapons          =  13.32 sec*proc (1 test)
+world            =   1.61 sec*proc (1 test)
+
+Total Test time (real) =  32.80 sec

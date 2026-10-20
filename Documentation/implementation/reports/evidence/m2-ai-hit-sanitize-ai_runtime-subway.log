@@ -1,0 +1,16 @@
+444/454 Testing: ai_runtime.subway
+444/454 Test: ai_runtime.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_runtime_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_runtime.subway" start time: Oct 16 15:37 CEST
+Output:
+----------------------------------------------------------
+SubwayA load=0 created=202 unsupported=2 AI_Update=207 pings=7
+SubwayA load=1 created=202 unsupported=2 AI_Update=207 pings=7
+<end of output>
+Test time =  26.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.subway" end time: Oct 16 15:38 CEST
+"ai_runtime.subway" time elapsed: 00:00:26
+----------------------------------------------------------

@@ -1,0 +1,26 @@
+worlds/05_cdm.dat key CRUCard model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+worlds/05_cdm.dat key LabKey model=models\powerups\key_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+worlds/05_cdm.dat key ExpressCard model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+worlds/06_airship2.dat key Parachute model=models\powerups\parachute_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+worlds/07_cathedral.dat key ApseKey model=models\powerups\skullkey_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+worlds/07_cathedral.dat key TowerKey model=models\powerups\skullkey_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+worlds/17_entrance.dat key Level3Card model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+worlds/19_lobby.dat key ExecAccess model=models\powerups\skullkey_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+worlds/21_laboratory.dat key STATUS9 model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+worlds/21_laboratory.dat key SingularityAccess model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+worlds/21_laboratory.dat key INTRAACCESS model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+worlds/21_laboratory.dat key KeyPickup0 model=models\powerups\keycard_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+worlds/22_office.dat key LevelB model=models\powerups\skullkey_pu.abc model_error= error=Localized ResourceNum display name unavailable; ObjectName shown
+worlds/multi/bb_bridge.dat Trigger0 failed Dims=64 128 256 ResetTime=4.000000 SoundRadius=200.000000 MessageName1=Trigger
+worlds/multi/bb_bridge.dat Trigger1 failed Dims=128 64 128 ResetTime=5.000000 SoundRadius=200.000000 MessageName1=Trigger
+worlds/multi/bb_midgard.dat BigTrigger0 failed Dims=16 32 4 ResetTime=7.000000 SoundRadius=200.000000 MessageName1=Trigger
+worlds/multi/bb_midgard.dat BigTrigger1 failed Dims=16 32 4 ResetTime=6.000000 SoundRadius=200.000000 MessageName1=Trigger
+worlds/multi/bb_midgard.dat BigTrigger2 failed Dims=16 32 4 ResetTime=6.000000 SoundRadius=200.000000 MessageName1=Trigger
+worlds/multi/bb_midgard.dat BigTrigger3 failed Dims=16 32 4 ResetTime=6.000000 SoundRadius=200.000000 MessageName1=Trigger
+Worlds=57 unreadable=1
+BigTrigger: 84/89 created; 1 filtered
+KeyPickup: 13/13 created; 0 filtered
+ToggleTrigger: 3/3 created; 0 filtered
+Trigger: 599/603 created; 2 filtered
+4 rejected: BigTrigger: invalid property TypeAction
+2 rejected: Trigger: invalid property TypeAction

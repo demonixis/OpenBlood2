@@ -1,0 +1,12 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 700: world_debris.private
+1/1 Test #700: world_debris.private .............   Passed  127.49 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+headless        = 127.49 sec*proc (1 test)
+private         = 127.49 sec*proc (1 test)
+world_debris    = 127.49 sec*proc (1 test)
+
+Total Test time (real) = 127.50 sec

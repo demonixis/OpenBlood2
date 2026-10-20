@@ -1,0 +1,14 @@
+333/343 Testing: world_view.mesh
+333/343 Test: world_view.mesh
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_view_tests" "mesh"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"world_view.mesh" start time: Oct 16 09:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.mesh" end time: Oct 16 09:15 CEST
+"world_view.mesh" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,213 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete",
+  "implementation_parent": "ecd2b769d4956da2bd5a37e94818fe01e691be0c",
+  "source_ledger": "Blood2/docs/implementation/sources/m2_fall_damage_sources.json",
+  "test_results": {
+    "debug-tests": {
+      "passed": 195,
+      "failed": 0,
+      "seconds": 98.4
+    },
+    "debug-gpu": {
+      "passed": 4,
+      "failed": 0,
+      "seconds": 48.56
+    },
+    "release-tests": {
+      "passed": 195,
+      "failed": 0,
+      "seconds": 11.21
+    },
+    "release-gpu": {
+      "passed": 4,
+      "failed": 0,
+      "seconds": 30.38
+    },
+    "sanitize-tests": {
+      "passed": 195,
+      "failed": 0,
+      "seconds": 392.75
+    }
+  },
+  "commands": {
+    "working_directory": "Blood2",
+    "debug_build": "cmake --build build/debug --target blood2_app death_effect_gpu_tests object_contract_tests services_tests player_tests movement_tests locomotion_tests container_tests door_tests trigger_tests interaction_tests pushable_tests destructable_model_tests ai_runtime_tests ai_locomotion_tests death_effect_tests player_death_tests movement_audio_tests fall_damage_tests player_state_tests player_restore_tests player_keepalive_tests world_tests train_session_tests blood_spurt_tests -j 4",
+    "release_build": "cmake --build build/release --target blood2_app death_effect_gpu_tests object_contract_tests services_tests player_tests movement_tests locomotion_tests container_tests door_tests trigger_tests interaction_tests pushable_tests destructable_model_tests ai_runtime_tests ai_locomotion_tests death_effect_tests player_death_tests movement_audio_tests fall_damage_tests player_state_tests player_restore_tests player_keepalive_tests world_tests train_session_tests blood_spurt_tests -j 3",
+    "sanitize_build": "cmake --build build/sanitize --target object_contract_tests services_tests player_tests movement_tests locomotion_tests container_tests door_tests trigger_tests interaction_tests pushable_tests destructable_model_tests ai_runtime_tests ai_locomotion_tests death_effect_tests player_death_tests movement_audio_tests fall_damage_tests player_state_tests player_restore_tests player_keepalive_tests world_tests train_session_tests blood_spurt_tests -j 3",
+    "headless_tests": "ctest --test-dir build/<configuration> --output-on-failure -j 2 -R '^(objects\\.|services\\.|player\\.|movement\\.|locomotion\\.|containers\\.|doors\\.|triggers\\.|interaction\\.|pushables\\.|destructable_models\\.|ai_runtime\\.|ai_locomotion\\.|death_effects\\.|player_death\\.|movement_audio\\.|fall_damage\\.|player_state\\.|player_restore\\.|player_keepalive\\.|world\\.(level_change|level_change_private|session_lifecycle|session_messages)$|train_session\\.|blood_spurts\\.)'",
+    "sanitizer_environment": [
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1"
+    ],
+    "gpu_tests": "ctest --test-dir build/<debug|release> -V -R '^gpu\\.(movement|character|player_restore|death_effects)$'",
+    "gpu_environment": [
+      "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+      "SDL_AUDIODRIVER=dummy"
+    ],
+    "focused_behavior": "ctest --test-dir build/debug -V -R '^fall_damage\\.'"
+  },
+  "configurations": {
+    "debug": "GCC Debug, inspector enabled",
+    "release": "GCC Release, inspector disabled",
+    "sanitize": "Clang Debug, ASan/UBSan, inspector disabled"
+  },
+  "gpu_device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+  "gpu_backend": "Vulkan",
+  "private_debug_falls": [
+    {
+      "hz": 30,
+      "fall_damage_deliveries": 1,
+      "force": 6008.45,
+      "incoming_y": -2403.38,
+      "raw_damage": 120.338,
+      "original_corpse": 1,
+      "death_camera": true,
+      "post_unload_object_records": 0,
+      "post_unload_audio_voices": 0
+    },
+    {
+      "hz": 60,
+      "fall_damage_deliveries": 1,
+      "force": 6008.45,
+      "incoming_y": -2403.38,
+      "raw_damage": 120.338,
+      "original_corpse": 1,
+      "death_camera": true,
+      "post_unload_object_records": 0,
+      "post_unload_audio_voices": 0
+    },
+    {
+      "hz": 120,
+      "fall_damage_deliveries": 1,
+      "force": 6008.45,
+      "incoming_y": -2403.38,
+      "raw_damage": 120.338,
+      "original_corpse": 1,
+      "death_camera": true,
+      "post_unload_object_records": 0,
+      "post_unload_audio_voices": 0
+    }
+  ],
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "preserved_user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "logs": {
+    "debug-tests": {
+      "path": "m2-fall-damage-debug-tests.log",
+      "bytes": 24260,
+      "sha256": "0ad384eadb0eb28993393d3a8c6d9912a54745ae6fa22f6a34d07fe52e6fc10b"
+    },
+    "release-tests": {
+      "path": "m2-fall-damage-release-tests.log",
+      "bytes": 24262,
+      "sha256": "c60eab75d8ece2bac91170c6a0eb72557126e047eacab366bb14bee5a637c1a7"
+    },
+    "sanitize-tests": {
+      "path": "m2-fall-damage-sanitize-tests.log",
+      "bytes": 24263,
+      "sha256": "800ff16ad92a556d3a166a4d3d7d90f5ddf564f237beeccccf40dcde2c5123a0"
+    },
+    "debug-gpu": {
+      "path": "m2-fall-damage-debug-gpu.log",
+      "bytes": 10954,
+      "sha256": "dafc59f2012d990cf3d702e628413ad897e8204dc7dfbe48c1da892163752d0f"
+    },
+    "release-gpu": {
+      "path": "m2-fall-damage-release-gpu.log",
+      "bytes": 10852,
+      "sha256": "0921e623a4f15ce332ca135b73927a1129974d25bab793d5c85daacb6cdd4e34"
+    },
+    "debug-behavior": {
+      "path": "m2-fall-damage-debug-behavior.log",
+      "bytes": 2685,
+      "sha256": "a851f719f01e7d802441cba310f46c18c106457c535802a5077ae9644ac18892"
+    },
+    "focused-tests": {
+      "path": "m2-fall-damage-focused-tests.log",
+      "bytes": 4941,
+      "sha256": "8db6b58870b836bb3ad3752c7d6c09d0c465dbff876b853a98b26bf99c1140a2"
+    },
+    "focused-build": {
+      "path": "m2-fall-damage-focused-build.log",
+      "bytes": 9347,
+      "sha256": "d3490b098444c8e3f510bbe98e2ecf2b3f94f64b2f2fb3eb3373d8ee95a98fe9"
+    },
+    "debug-targets-build": {
+      "path": "m2-fall-damage-debug-targets-build.log",
+      "bytes": 3512,
+      "sha256": "3811786a2da35447a3af34f3b689dff19e7f1bec82d841541d8724d1c102bf3f"
+    },
+    "release-build": {
+      "path": "m2-fall-damage-release-build.log",
+      "bytes": 53293,
+      "sha256": "ee47cbc4fbce43ae48944ff20a83069ec5430d8e55020ccc4d58c014e602e1a6"
+    },
+    "sanitize-build": {
+      "path": "m2-fall-damage-sanitize-build.log",
+      "bytes": 47985,
+      "sha256": "e31039fe8c187162687a6020507c93cbd3b15b5ea83fb1023d971721563c6870"
+    },
+    "format-sources": {
+      "path": "m2-fall-damage-format-sources.log",
+      "bytes": 108,
+      "sha256": "cedf723221239a808949b7a756bb1bb81f436144edf9ef5e997803efa02550a8"
+    },
+    "integrity": {
+      "path": "m2-fall-damage-integrity.log",
+      "bytes": 56,
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6"
+    },
+    "links": {
+      "path": "m2-fall-damage-links.log",
+      "bytes": 40,
+      "sha256": "826704a8a8dc2b785ad1b79c3d7b18f08b6344c86292f22cf8e4220b83841f22"
+    }
+  },
+  "limitations": [
+    "M2 incomplete: dedicated mover/body/projectile stopping-force paths, interactive IMA music, whole-world saves and other required services remain open.",
+    "Later LithTech is formula/order reference, not verified Blood II 1998 physics. The swept solver retains explicit replacement policies.",
+    "Private falls use real external Caleb resources on diagnostic geometry, not an authored retail fall trace.",
+    "GPU checks are separate existing rendering/movement/death/restore regressions. Movement capture inspected locally; no commercial image committed.",
+    "Sanitizer checks are headless; prior SDL/libdbus GPU-LSan residual not retested. No native macOS/Windows execution or human audio listening claim."
+  ],
+  "build_notes": [
+    "An initial full Debug build was intentionally interrupted to restrict work to relevant targets; the final targeted build succeeded.",
+    "Existing enum/float comparison deprecation warnings in PlayerVoice.cpp and PlayerContainers.cpp remain; no warning fix is included."
+  ],
+  "implementation_commit": "711893eb55c7dcd994413474c6c3e9597c8dfbc0"
+}

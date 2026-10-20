@@ -1,0 +1,54 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 325: texture.corpus
+      Start 321: world_view.subway
+ 1/21 Test #321: world_view.subway ................   Passed    4.31 sec
+      Start  10: objects.unsupported_teardown
+ 2/21 Test  #10: objects.unsupported_teardown .....   Passed    0.04 sec
+      Start   9: objects.messages_strings
+ 3/21 Test   #9: objects.messages_strings .........   Passed    0.04 sec
+      Start  11: objects.creation_failures
+ 4/21 Test  #11: objects.creation_failures ........   Passed    0.03 sec
+      Start 324: texture.mapping
+ 5/21 Test #324: texture.mapping ..................   Passed    0.02 sec
+      Start 323: texture.malformed
+ 6/21 Test #323: texture.malformed ................   Passed    0.02 sec
+      Start 319: world_view.lifetime
+ 7/21 Test #319: world_view.lifetime ..............   Passed    0.02 sec
+      Start   8: objects.links_lists
+ 8/21 Test   #8: objects.links_lists ..............   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+ 9/21 Test   #3: objects.reasons_properties .......   Passed    0.02 sec
+      Start   1: objects.original_objects
+10/21 Test   #1: objects.original_objects .........   Passed    0.02 sec
+      Start 322: texture.decode
+11/21 Test #322: texture.decode ...................   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+12/21 Test   #5: objects.deferred_removal .........   Passed    0.02 sec
+      Start 316: world_view.mesh
+13/21 Test #316: world_view.mesh ..................   Passed    0.02 sec
+      Start   7: objects.handles_selection
+14/21 Test   #7: objects.handles_selection ........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+15/21 Test   #2: objects.nested_creation ..........   Passed    0.02 sec
+      Start   4: objects.scheduling
+16/21 Test   #4: objects.scheduling ...............   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+17/21 Test   #6: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start 317: world_view.rejects
+18/21 Test #317: world_view.rejects ...............   Passed    0.02 sec
+      Start 318: world_view.camera
+19/21 Test #318: world_view.camera ................   Passed    0.01 sec
+      Start 320: world_view.alpha_order
+20/21 Test #320: world_view.alpha_order ...........   Passed    0.02 sec
+21/21 Test #325: texture.corpus ...................   Passed    8.33 sec
+
+100% tests passed, 0 tests failed out of 21
+
+Label Time Summary:
+headless      =  13.03 sec*proc (21 tests)
+objects       =   0.26 sec*proc (11 tests)
+private       =  12.64 sec*proc (2 tests)
+texture       =   8.38 sec*proc (4 tests)
+world_view    =   4.40 sec*proc (6 tests)
+
+Total Test time (real) =   8.33 sec

@@ -1,0 +1,28 @@
+Test project <Blood2>/build/debug
+    Start 156: gpu.triggers
+1/1 Test #156: gpu.triggers .....................***Failed    2.73 sec
+[info] External data: <external Blood II> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 1291 source objects, 489 original instances, 120 BSP models
+[error] Trigger smoke preparation failed
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+gpu         =   2.73 sec*proc (1 test)
+private     =   2.73 sec*proc (1 test)
+triggers    =   2.73 sec*proc (1 test)
+
+Total Test time (real) =   2.74 sec
+
+The following tests FAILED:
+	156 - gpu.triggers (Failed)                             gpu private triggers
+Errors while running CTest

@@ -1,0 +1,257 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/release/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 25
+      Start  25: gpu.lifecycle
+
+25: Test command: <workspace>/Blood2/build/release/blood2 "--config" "<workspace>/Blood2/build/release/tests/empty.ini" "--data-dir" "<external-data-root>" "--gpu-smoke" "--capture" "<workspace>/Blood2/build/release/tests/gpu.png"
+25: Working Directory: <workspace>/Blood2/build/release/tests
+25: Test timeout computed to be: 25
+25: [info] External data: <external-data-root> (--data-dir)
+25: [info] BLOOD2.REZ: detected, 267758913 bytes
+25: [info] SOUND.REZ: detected, 204633068 bytes
+25: [info] BLOOD2P.REZ: detected, 24133434 bytes
+25: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+25: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+25: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+25: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+25: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+25: [info] Captured GPU frame to <workspace>/Blood2/build/release/tests/gpu.png
+25: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+25: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+25: [info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+25: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+ 1/10 Test  #25: gpu.lifecycle ....................   Passed    1.49 sec
+test 68
+      Start  68: gpu.player
+
+68: Test command: <workspace>/Blood2/build/release/blood2 "--config" "<workspace>/Blood2/build/release/tests/empty.ini" "--data-dir" "<external-data-root>" "--player-smoke" "--capture" "<workspace>/Blood2/build/release/tests/player.png"
+68: Working Directory: <workspace>/Blood2/build/release/tests
+68: Test timeout computed to be: 25
+68: [info] External data: <external-data-root> (--data-dir)
+68: [info] BLOOD2.REZ: detected, 267758913 bytes
+68: [info] SOUND.REZ: detected, 204633068 bytes
+68: [info] BLOOD2P.REZ: detected, 24133434 bytes
+68: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+68: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+68: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+68: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+68: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+68: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+68: [info] Captured GPU frame to <workspace>/Blood2/build/release/tests/player.png
+68: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+68: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+68: [info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+68: [info] AI paths: hidden=true, reentered=true, copied points=7
+68: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+68: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+68: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+ 2/10 Test  #68: gpu.player .......................   Passed    1.63 sec
+test 78
+      Start  78: gpu.weapons
+
+78: Test command: <workspace>/Blood2/build/release/blood2 "--config" "<workspace>/Blood2/build/release/tests/empty.ini" "--data-dir" "<external-data-root>" "--weapons-smoke" "--capture" "<workspace>/Blood2/build/release/tests/weapons.png"
+78: Working Directory: <workspace>/Blood2/build/release/tests
+78: Test timeout computed to be: 60
+78: [info] External data: <external-data-root> (--data-dir)
+78: [info] BLOOD2.REZ: detected, 267758913 bytes
+78: [info] SOUND.REZ: detected, 204633068 bytes
+78: [info] BLOOD2P.REZ: detected, 24133434 bytes
+78: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+78: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+78: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+78: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+78: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+78: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+78: [info] Captured GPU frame to <workspace>/Blood2/build/release/tests/weapons.png
+78: [info] Weapon impacts: contacts=3, sounds=2, failures=0, hidden=true
+78: [info] Shutdown: frames=240, UI frames=0, hidden frames=240, toggles=0, resize=true, quit=true
+78: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+78: [info] Session playback: waiting=0 time=28.033333333333022 npc-ready=16 npc-failed=0 npc-updates=679
+78: [info] AI paths: hidden=true, reentered=true, copied points=7
+78: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+78: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+78: [info] Weapon smoke passed: animation-key shots, bullets consumed, knife strikes, firing while hidden, decoded fire voices submitted to SDL, unload/re-entry
+78: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+ 3/10 Test  #78: gpu.weapons ......................   Passed   13.33 sec
+test 575
+      Start 575: gpu.player_restore
+
+575: Test command: <workspace>/Blood2/build/release/blood2 "--config" "<workspace>/Blood2/build/release/tests/empty.ini" "--data-dir" "<external-data-root>" "--restore-smoke" "--capture" "<workspace>/Blood2/build/release/tests/player-restore.png"
+575: Working Directory: <workspace>/Blood2/build/release/tests
+575: Environment variables:
+575:  SDL_AUDIODRIVER=dummy
+575: Test timeout computed to be: 60
+575: [info] External data: <external-data-root> (--data-dir)
+575: [info] BLOOD2.REZ: detected, 267758913 bytes
+575: [info] SOUND.REZ: detected, 204633068 bytes
+575: [info] BLOOD2P.REZ: detected, 24133434 bytes
+575: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+575: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+575: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+575: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+575: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+575: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+575: [info] Captured GPU frame to <workspace>/Blood2/build/release/tests/player-restore.png
+575: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+575: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+575: [info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+575: [info] AI paths: hidden=true, reentered=true, copied points=7
+575: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+575: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+575: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+ 4/10 Test #575: gpu.player_restore ...............   Passed    1.72 sec
+test 580
+      Start 580: gpu.player_keepalive
+
+580: Test command: <workspace>/Blood2/build/release/blood2 "--config" "<workspace>/Blood2/build/release/tests/empty.ini" "--data-dir" "<external-data-root>" "--keepalive-smoke" "--capture" "<workspace>/Blood2/build/release/tests/player-keepalive.png"
+580: Working Directory: <workspace>/Blood2/build/release/tests
+580: Environment variables:
+580:  SDL_AUDIODRIVER=dummy
+580: Test timeout computed to be: 60
+580: [info] External data: <external-data-root> (--data-dir)
+580: [info] BLOOD2.REZ: detected, 267758913 bytes
+580: [info] SOUND.REZ: detected, 204633068 bytes
+580: [info] BLOOD2P.REZ: detected, 24133434 bytes
+580: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+580: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+580: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+580: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+580: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+580: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+580: [info] Captured GPU frame to <workspace>/Blood2/build/release/tests/player-keepalive.png
+580: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+580: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+580: [info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=27 npc-failed=0 npc-updates=27
+580: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+580: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+580: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+ 5/10 Test #580: gpu.player_keepalive .............   Passed    2.07 sec
+test 661
+      Start 661: gpu.mouse_combat
+
+661: Test command: <workspace>/Blood2/build/release/tests/player_controls_tests "gpu_combat" "<external-data-root>"
+661: Working Directory: <workspace>/Blood2/build/release/tests
+661: Test timeout computed to be: 120
+661: Original SubwayA camera intro expired after 12.0167 simulation seconds
+661: Approached encounter at z=-2192.09
+661: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=8, ammo=42, independent corpse verified, native=1
+661: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=0
+661: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+661: Walked past killed Cultist to z=-1861.92
+661: Original SubwayA camera intro expired after 12.0167 simulation seconds
+661: Approached encounter at z=-2192.09
+661: Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=13, ammo=37, independent corpse verified, native=1
+661: Dodge updates=12, corpse candidates=23, zero-margin search=1, swept source clearance=0
+661: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+661: Walked past killed Cultist to z=-1861.92
+ 6/10 Test #661: gpu.mouse_combat .................   Passed    2.27 sec
+test 662
+      Start 662: gpu.corpse_clearance
+
+662: Test command: <workspace>/Blood2/build/release/tests/player_controls_tests "gpu_clearance" "<external-data-root>"
+662: Working Directory: <workspace>/Blood2/build/release/tests
+662: Test timeout computed to be: 120
+662: Original SubwayA camera intro expired after 12.0167 simulation seconds
+662: Approached encounter at z=-2338.28
+662: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+662: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+662: Post-kill position=-32,170.001,-1854.18 camera=0 yaw=0
+662: Walked past killed Cultist to z=-1854.18
+662: Approached encounter at z=-1742.25
+662: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+662: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+662: Post-kill position=-32,170.001,-1340.93 camera=0 yaw=-3.72529e-09
+662: Walked past killed Cultist to z=-1340.93
+662: Original SubwayA camera intro expired after 12.0167 simulation seconds
+662: Approached encounter at z=-2341.42
+662: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+662: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+662: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+662: Walked past killed Cultist to z=-1861.92
+662: Approached encounter at z=-1745.4
+662: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+662: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+662: Post-kill position=-32,170.001,-1344.07 camera=0 yaw=3.72529e-09
+662: Walked past killed Cultist to z=-1344.07
+ 7/10 Test #662: gpu.corpse_clearance .............   Passed    2.94 sec
+test 663
+      Start 663: gpu.player_controls
+
+663: Test command: <workspace>/Blood2/build/release/tests/player_controls_tests "gpu" "<external-data-root>"
+663: Working Directory: <workspace>/Blood2/build/release/tests
+663: Test timeout computed to be: 120
+663: Original SubwayA camera intro expired after 12.0167 simulation seconds
+663: Original FIRE_KEY: shots=17 ammo=33 voices=17 mouse=1
+ 8/10 Test #663: gpu.player_controls ..............   Passed    1.19 sec
+test 827
+      Start 827: gpu.level_change
+
+827: Test command: <workspace>/Blood2/build/release/tests/level_change_gpu_tests "<external-data-root>" "<workspace>/Blood2/build/release/tests/level-change"
+827: Working Directory: <workspace>/Blood2/build/release/tests
+827: Test timeout computed to be: 90
+827: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+827: Destination: CityHub /
+827: Cycle 0: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+827: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+827: Destination: SubwayA /
+827: Cycle 1: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+827: Destination: CityHub /
+827: Cycle 2: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+827: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+827: Destination: SubwayA /
+827: Cycle 3: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+ 9/10 Test #827: gpu.level_change .................   Passed    1.60 sec
+test 909
+      Start 909: gpu.hud
+
+909: Test command: <workspace>/Blood2/build/release/tests/hud_tests "gpu" "<workspace>/Blood2/build/release/tests/hud-gpu"
+909: Working Directory: <workspace>/Blood2/build/release/tests
+909: Test timeout computed to be: 30
+909: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+909: cycle 0 frame 0 HUD pixels 107412
+909: cycle 0 frame 1 HUD pixels 107412
+909: cycle 0 frame 2 HUD pixels 107412
+909: cycle 0 frame 3 HUD pixels 0
+909: cycle 1 frame 0 HUD pixels 29092
+909: cycle 1 frame 1 HUD pixels 29092
+909: cycle 1 frame 2 HUD pixels 29092
+909: cycle 1 frame 3 HUD pixels 0
+909: cycle 2 frame 0 HUD pixels 15092
+909: cycle 2 frame 1 HUD pixels 15092
+909: cycle 2 frame 2 HUD pixels 15092
+909: cycle 2 frame 3 HUD pixels 0
+10/10 Test #909: gpu.hud ..........................   Passed    0.46 sec
+
+The following tests passed:
+	gpu.lifecycle
+	gpu.player
+	gpu.weapons
+	gpu.player_restore
+	gpu.player_keepalive
+	gpu.mouse_combat
+	gpu.corpse_clearance
+	gpu.player_controls
+	gpu.level_change
+	gpu.hud
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+gpu                 =  28.70 sec*proc (10 tests)
+hud                 =   0.46 sec*proc (1 test)
+player              =   1.63 sec*proc (1 test)
+player_controls     =   6.41 sec*proc (3 tests)
+player_keepalive    =   2.07 sec*proc (1 test)
+player_restore      =   1.72 sec*proc (1 test)
+private             =  26.76 sec*proc (8 tests)
+weapons             =  13.33 sec*proc (1 test)
+world               =   1.60 sec*proc (1 test)
+
+Total Test time (real) =  28.72 sec

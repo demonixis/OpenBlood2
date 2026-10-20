@@ -1,0 +1,12 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 39: cli.world_modes
+1/1 Test #39: cli.world_modes ..................   Passed    0.98 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+headless    =   0.98 sec*proc (1 test)
+private     =   0.98 sec*proc (1 test)
+world       =   0.98 sec*proc (1 test)
+
+Total Test time (real) =   0.99 sec

@@ -1,0 +1,2186 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 0d0a565..1d43439 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -195,3 +195,12 @@ mark client FX unavailable; they are not successful FX services. SubwayA now has
+ live-created entries, 4 transferred sounds, 372 editor-only and 17 unported, with no
+ failures; runtime counts are 194/197 before/after player, then 185/188 after nine Keys.
+ Required client FX, AI, ExitTrigger and other services keep M2 incomplete.
++
++The latest [character animation evidence](../Documentation/Implementation/M2_CHARACTER_ANIMATION.md) connects the full original
++CAnim_Sound animation table to player locomotion, current world-space model node
++queries and original hit-sphere measurements. Read [character contracts](docs/CHARACTER_ANIMATION_CONTRACTS.md).
++Preserve the >999 previous-slot fallback, untouched slot zero, strafe aliases,
++humiliation spelling/order and intermediate-zero ForceAnimation behavior.
++Missing head nodes fail explicitly; later-node fallback stays visible. Spheres
++are measurements, not active damage/collision services. AI, ExitTrigger, client
++FX and complete M2 remain open; SubwayA counts are unchanged.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fb21f1d..f1d6bb0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -39,7 +39,7 @@ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original
+ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+-target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp)
++target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+     src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+@@ -54,7 +54,7 @@ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/gener
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+ target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+ if(BLOOD2_INSPECTOR)
+-    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_cinematics.cpp src/app/inspector_random_sounds.cpp src/app/inspector_scene_explosions.cpp src/app/inspector_sprites.cpp src/app/inspector_world_sounds.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
++    target_sources(blood2_app PRIVATE src/app/inspector_skeleton.cpp src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_cinematics.cpp src/app/inspector_random_sounds.cpp src/app/inspector_scene_explosions.cpp src/app/inspector_sprites.cpp src/app/inspector_world_sounds.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
+     target_link_libraries(blood2_app PRIVATE imgui)
+ endif()
+ 
+diff --git a/README.md b/README.md
+index 75faf17..5b5fbfa 100644
+--- a/README.md
++++ b/README.md
+@@ -232,3 +232,8 @@ Required client FX, AI, ExitTrigger and other services keep M2 incomplete.
+ 
+ Use `--scene-explosions-smoke --capture build/debug/scene-explosions.png` for the
+ private GPU/audio check (SDL dummy output is used by CTest).
++
++Latest M2 continuation: [original character animations and model nodes](../Documentation/Implementation/M2_CHARACTER_ANIMATION.md)
++connects the original animation table to locomotion and exposes current skeletal
++transforms and original sphere measurements. AI/damage-localization consumers,
++ExitTrigger, client FX and the actual M2 exit gate remain incomplete.
+diff --git a/docs/CHARACTER_ANIMATION_CONTRACTS.md b/docs/CHARACTER_ANIMATION_CONTRACTS.md
+new file mode 100644
+index 0000000..fb03238
+--- /dev/null
++++ b/docs/CHARACTER_ANIMATION_CONTRACTS.md
+@@ -0,0 +1,119 @@
++# Original character animations and node queries
++
++This extends [locomotion](LOCOMOTION_CONTRACTS.md) and [model services](MODEL_AND_COLLISION_CONTRACTS.md).
++M2 remains incomplete. CAnim_Sound imports animation discovery, CheckAnims,
++GenerateHitSpheres and ForceAnimation from Blood II; its voice helpers, damage
++localization callers, AI states and save/load are not imported. No AI class is
++registered by this increment. See [source selections](M2_CHARACTER_ANIMATION_SOURCES.json)
++and [execution evidence](../../Documentation/Implementation/M2_CHARACTER_ANIMATION.md).
++
++## Source behavior
++
++All 219 original animation lookup assignments, including fallback lookups, retain
++their order and literal names. Animation index lookup remains exact and returns
++UINT32_MAX on failure. CheckAnims starts at index 1, replaces values above 999
++with the preceding slot, and leaves slot 0 alone. The original unsigned `< 0`
++comparison is unreachable and removed. A real clip with index 1000 also triggers
++this original threshold. Only the original sixteen arrays receive this pass;
++Talk, Special, Strafe, Humiliation and the single fields do not.
++
++The left strafe aliases still refer to right strafe names. The humiliation path
++tries death 04, then 05, then the original misspelled `humilation` variants; the
++missing second enemy humiliation falls back to correctly spelled 01. Strafe
++columns 5–8 and Humiliation columns 4–9 retain their constructor zero values.
++The inspector exposes every stored slot, including those defaults and missing
++indices; it does not claim every slot was matched to a named clip.
++
++CPlayerObj::SetCharacter calls original animation discovery and sphere generation
++after its actual model assignment, as the source does. Healthy locomotion now
++uses these stored indices rather than reproducing CheckAnims through repeated
++name searches. Requested and actual names remain separately inspectable. The
++new owned GetModelAnimationName query supplies the actual name without inventing
++an old ABI function. Each character owns its table; callers replacing a model
++must rebuild it, as SetCharacter does. The existing synthetic missing-clip test
++now explicitly rebuilds its table after directly replacing the test model.
++
++ForceAnimation retains the intermediate clip zero followed by the requested
++index. Repeating a nonzero clip resets through zero; requesting zero while
++already on zero does not restart it. Invalid targets are checked before either
++assignment, avoiding partial mutation. It is not ResetModelAnimation.
++
++## Current node transforms
++
++GetModelNodeTransform returns the current world-space position and quaternion
++of a live model node, including initial-update calls. It samples the actual track
++at its current time using the same interpolation helper as the full skeleton
++and vertex sampler, composes ancestors, applies positive object scale to model
++position, then object rotation and translation. Rotation composes object and
++node quaternions; scale does not alter orientation. There is no attachment,
++blend, skinning-normal or hidden-node service implied by this API.
++
++Names match ASCII case-insensitively; this choice follows the later LithTech
++Model::FindNode reference, not an observed Blood II retail binary. Multiple
++matching names fail rather than choosing arbitrarily. Missing/invalid nodes,
++non-models, pending/stale objects, null outputs, invalid clocks, nonpositive
++scale and transformed coordinates beyond the existing ±10-million-unit bound
++fail without changing outputs. Inactive live models remain queryable. Queries
++never advance the track or dispatch callbacks. There is no retained node cache:
++the sampler walks a bounded ancestor stack (64 entries), avoiding heap allocation
++and stale results after movement, animation reset, model replacement or unload.
++
++## ABC quaternion normalization
++
++The private male cultist has an idle1/pelvis quaternion with squared norm
++15227.486328. The female cultist has an idle2/r_gun quaternion with squared norm
++about 0.000042. Both are finite nonzero rotations; the previous reader's arbitrary
++[0.0001, 10000] squared-norm window rejected them. The reader now normalizes any
++finite nonzero float quaternion using a double-precision squared norm and length,
++which handles both subnormal and maximum finite float components without overflow
++or underflow. Runtime interpolation still uses the existing normalized float math.
++Zero and nonfinite rotations, malformed sections and all existing resource budgets
++still reject atomically. Synthetic tests assert normalized output at both numeric
++extremes and continued zero/NaN/infinity rejection. Failure diagnostics identify
++the animation, node, frame, squared norm and position. No replacement identity
++rotation or skipped frame is introduced. NoMadEngine's parser was consulted for
++its existing non-unit quaternion handling; its implementation was not imported.
++
++## Original sphere measurements
++
++GenerateHitSpheres reads the source's eighteen standard node names and computes
++its pair distances multiplied by 0.66, including copied head/neck, torso/pelvis,
++hand and foot radii. Missing later nodes copy the preceding position exactly as
++the source does; their presence bits and a diagnostic expose that fallback.
++If the first head node is missing, the source would use uninitialized data.
++The port instead clears the radii, reports failure, and marks them unavailable.
++A malformed model therefore cannot manufacture hit geometry. Unavailable
++spheres do not turn an otherwise inspectable player model into a failed entry.
++
++These radii are measured at SetCharacter's current pose, not recomputed every
++animation frame. The Skeleton panel draws those stored radii at the live node
++positions and labels them as measurements. They are **not used as collision
++shapes or damage localization yet**. Existing hitscan/body damage remains the
++previous tested implementation. The panel includes hidden/inactive/missing
++models, live world transforms and all original animation slots. Reading it has
++no gameplay side effects; Release has no ImGui dependency.
++
++## Verification boundaries
++
++Synthetic tests cover mapping/fallback quirks, invalid/missing clips, forced
++restart semantics, hierarchical interpolation plus object transforms/scale,
++missing/ambiguous nodes, unchanged failure outputs, inactive and stale lifetime,
++all original radius formulas and missing-node handling. Private checks inspect
++all clips/nodes of Caleb, male/female civilians, labtech, male/female cultists and
++Gideon, and repeat real SubwayA shell/player entry, movement and cleanup.
++The GPU scenario exercises SDL movement/crouch with the inspector hidden,
++queries the actual player head and stored radius, then unloads/re-enters;
++its visible capture uses the Skeleton panel. No retail executable or non-Linux
++platform validation is claimed. Class accounting and the M2 startup blocker
++remain unchanged.
++
++For the graphical lifecycle check and capture, run from Blood2:
++
++```sh
++./build/debug/blood2 --skeleton-smoke --capture build/skeleton.png
++```
++
++The installed corpus covers 326 clips and 6,410 node queries across the seven
++models above. All lack the two standard ankle names; Gideon also lacks the two
++upper-arm names. Their original predecessor fallback is explicit in inspection.
++The table contains 227 stored slots (219 lookups include retry assignments).
+diff --git a/docs/LOCOMOTION_CONTRACTS.md b/docs/LOCOMOTION_CONTRACTS.md
+index 729b27f..27c329c 100644
+--- a/docs/LOCOMOTION_CONTRACTS.md
++++ b/docs/LOCOMOTION_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Player Locomotion Boundary
+ 
++> Extended by [character animation contracts](CHARACTER_ANIMATION_CONTRACTS.md):
++> original CAnim_Sound tables now drive locomotion; current model node queries and
++> original sphere measurements are inspectable. AI/damage-localization callers
++> and complete M2 remain unavailable.
++
+ > Extended by [CONTAINER_CONTRACTS.md](CONTAINER_CONTRACTS.md): selected original
+ > liquids/ladders and head/body queries are now connected. Earlier pending
+ > container statements describe the dry-land increment.
+diff --git a/docs/M2_CHARACTER_ANIMATION_SOURCES.json b/docs/M2_CHARACTER_ANIMATION_SOURCES.json
+new file mode 100644
+index 0000000..812afb9
+--- /dev/null
++++ b/docs/M2_CHARACTER_ANIMATION_SOURCES.json
+@@ -0,0 +1,119 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "30c5ce0c5926e257400827e665b75ad20858af4a",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/Anim_Sound.cpp",
++      "sha256": "238744b904e32e418188bfdc2f74d970bb544f1a027fab1c2ae9dca2b2d9aa4f",
++      "selected_lines": [
++        [
++          17,
++          135
++        ],
++        [
++          151,
++          514
++        ]
++      ],
++      "use": "Original nodes, constructor defaults, full animation discovery, CheckAnims, sphere formulas and forced animation"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Anim_Sound.h",
++      "sha256": "3e42f686a5f492bdca336efdba239d61617b366221c559c8942f6e35824ccde4",
++      "selected_lines": [
++        [
++          14,
++          263
++        ],
++        [
++          307,
++          375
++        ]
++      ],
++      "use": "Original animation names and member layout; sound helpers omitted"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "selected_lines": [
++        [
++          2368,
++          2379
++        ],
++        [
++          4910,
++          5450
++        ]
++      ],
++      "use": "Character table/sphere initialization and existing locomotion column consumers"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/server_de.h",
++      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "selected_lines": [
++        [
++          791,
++          797
++        ]
++      ],
++      "use": "Original boolean current global node transform contract"
++    },
++    {
++      "path": "sources/lithtech/runtime/model/src/model.cpp",
++      "sha256": "47340a20b31acee4748dc6d171873df7560ae444bf485153cf4f86d6ac1b9cf8",
++      "selected_lines": [
++        [
++          798,
++          814
++        ]
++      ],
++      "use": "Later-generation reference for case-insensitive node lookup only; no runtime code imported"
++    },
++    {
++      "path": "OpenBlood2/OpenLithTech/src/core/game_interface.cpp",
++      "sha256": "c31ab8f6157bb1b9d4be90de2c7b615af0affd716b8af6db4bf835d6d67a9dbe",
++      "selected_lines": [
++        [
++          718,
++          722
++        ]
++      ],
++      "use": "Reviewed reference returns false; not used as implementation"
++    },
++    {
++      "path": "NoMadEngine/nomadengine/src/formats/abc_parser.cpp",
++      "sha256": "7399baf3d020a3d6b4d684c23a91c0df0bebfef39aef330bb2968b510c31539e",
++      "selected_lines": [
++        [
++          268,
++          292
++        ],
++        [
++          332,
++          353
++        ]
++      ],
++      "use": "Reference for existing non-unit quaternion normalization; no code imported"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/BaseCharacter.h",
++      "sha256": "40160424f0b03f38b2513ba34e9abb44bc27d8a92b5735470d9d995f01d1face",
++      "selected_lines": [
++        [
++          55,
++          75
++        ]
++      ],
++      "use": "Original BaseCharacter-owned animation helper member"
++    }
++  ],
++  "adaptations": [
++    "C++20 fixed-width indices, value-initialized arrays, const node names, spans instead of sizeof/4",
++    "Owned per-character table and checked explicit return values; no global AI model cache",
++    "Undefined missing first-node input now fails with zero/unavailable radii; later fallback preserved",
++    "Invalid ForceAnimation target rejected before temporary clip zero",
++    "Typed owned animation-name query; original world-space node service implemented on the existing ABC sampler",
++    "Unimplemented voices, AI and damage-localization callers remain absent, not successful stubs",
++    "Remove arbitrary source quaternion norm window: finite nonzero float inputs normalized in double precision at decode; zero/nonfinite rotations and all structural budgets still reject"
++  ]
++}
+diff --git a/docs/MODEL_AND_COLLISION_CONTRACTS.md b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+index 5238aba..4d86994 100644
+--- a/docs/MODEL_AND_COLLISION_CONTRACTS.md
++++ b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # M2 Model and Collision Services
+ 
++> Extended by [character animation contracts](CHARACTER_ANIMATION_CONTRACTS.md):
++> original CAnim_Sound tables now drive locomotion; current model node queries and
++> original sphere measurements are inspectable. AI/damage-localization callers
++> and complete M2 remain unavailable.
++
+ The later [player entry contracts](PLAYER_CONTRACTS.md) supersede this increment's statements that shell/player entry is entirely absent. Complete gameplay remains blocked; earlier limits below remain unless explicitly superseded.
+ 
+ This continuation implements engine services and two original classes. It does
+@@ -31,7 +36,7 @@ Limits include 128 MiB input, 6 sections, 65,536 vertices, 200,000 faces, 256 no
+ poses and 32 MiB packed deformation. Coordinate magnitudes are limited to 10
+ million original units. Counts are checked against remaining bytes before their
+ loops. Referenced nodes/vertices and deformation ownership are checked. Repeated references within a node retain source write order (Caleb has 189 references to 120 distinct coat vertices, sometimes with differing samples);
+-nonfinite floats, near-zero rotations, invalid bounds and decreasing/out-of-range
++nonfinite floats, zero rotations, invalid bounds and decreasing/out-of-range
+ key times fail. Output is empty on parse failure.
+ 
+ Models are read through the existing resource resolver. The weak cache uses the
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index 924f20f..4209652 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original Player Entry Boundary
+ 
++> Extended by [character animation contracts](CHARACTER_ANIMATION_CONTRACTS.md):
++> original CAnim_Sound tables now drive locomotion; current model node queries and
++> original sphere measurements are inspectable. AI/damage-localization callers
++> and complete M2 remain unavailable.
++
+ > Extended by [objective contracts](OBJECTIVES_CONTRACTS.md): original mission
+ > objective broadcasts and external localized client strings are connected.
+ > Other localization/audio/HUD and full M2 acceptance remain pending.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index b1820d3..fefc092 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -411,3 +411,13 @@ CClientExplosionSFX's authored server path, shared null-damager guard and
+ PlaySoundFromPos descriptor. [Contracts](SCENE_EXPLOSION_CONTRACTS.md) distinguish
+ actual server/audio behavior from unavailable client FX. No donor backend,
+ dependency or guessed gameplay correction was imported.
++
++## Original character animation/node continuation
++
++CAnim_Sound animation tables, CheckAnims, hit-sphere measurements and ForceAnimation
++are selectively imported; CPlayerObj consumes the actual table on character setup
++and locomotion. See [source ledger](M2_CHARACTER_ANIMATION_SOURCES.json) and
++[contracts](CHARACTER_ANIMATION_CONTRACTS.md). Node transforms use the existing
++bounded ABC sampler; later LithTech informs name matching only. OpenBlood2's
++false-returning node function was reviewed and not imported. Voice helpers,
++AI callers, damage localization, attachments and blending remain unimplemented.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 769d6c9..c096c16 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -583,6 +583,12 @@ namespace OpenBlood2
+                     draw_weapons(game, selection);
+                     ImGui::EndTabItem();
+                 }
++                if (ImGui::BeginTabItem("Skeleton", nullptr, select_skeleton ? ImGuiTabItemFlags_SetSelected : 0))
++                {
++                    select_skeleton = false;
++                    draw_skeleton(game, selection);
++                    ImGui::EndTabItem();
++                }
+                 if (ImGui::BeginTabItem("Movement", nullptr, select_movement ? ImGuiTabItemFlags_SetSelected : 0))
+                 {
+                     select_movement = false;
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 69d6f1a..fcedbaa 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -14,6 +14,9 @@ namespace OpenBlood2
+         bool platform = false;
+         bool renderer = false;
+         bool select_models = false;
++        bool select_skeleton = false;
++        ObjectId skeleton_selection{};
++        void draw_skeleton(GameSession&, ObjectSelection&);
+         bool select_session = false;
+         bool select_movement = false, keyboard_movement = false;
+         bool select_containers = false;
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+new file mode 100644
+index 0000000..2f260c2
+--- /dev/null
++++ b/src/app/inspector_skeleton.cpp
+@@ -0,0 +1,131 @@
++#include "inspector.h"
++#include <algorithm>
++#include <imgui.h>
++namespace OpenBlood2
++{
++    void Inspector::draw_skeleton(GameSession& game, ObjectSelection& selection)
++    {
++        ImGui::TextWrapped(
++            "Current ABC node transforms and original CAnim_Sound tables. Spheres are the original "
++            "initialization radii, shown at live node positions; damage localization and AI callers remain unported.");
++        if (!game.objects.get(skeleton_selection))
++        {
++            if (const auto* player = game.server_shell.Player(game.local_client))
++                skeleton_selection = game.objects.get(player->m_hObject)->id;
++        }
++        if (!ImGui::BeginTable("Skeleton inspection", 2, ImGuiTableFlags_Resizable))
++            return;
++        ImGui::TableSetupColumn("Models", ImGuiTableColumnFlags_WidthFixed, 210);
++        ImGui::TableNextColumn();
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* r = game.objects.get(id);
++            if (!r || r->state.m_ObjectType != OT_MODEL)
++                continue;
++            auto label = std::string(r->state.m_Name) + " #" + std::to_string(id.slot);
++            if (!(r->state.m_Flags & FLAG_VISIBLE))
++                label += " hidden";
++            if (r->activity != OBJSTATE_ACTIVE)
++                label += " inactive";
++            if (!r->model)
++                label += " missing model";
++            if (ImGui::Selectable(label.c_str(), skeleton_selection == id))
++                skeleton_selection = selection.id = id;
++        }
++        ImGui::TableNextColumn();
++        const auto* r = game.objects.get(skeleton_selection);
++        if (!r)
++            ImGui::TextUnformatted("No selected model");
++        else if (!r->model)
++            ImGui::TextWrapped("Model unavailable: %s", r->model_error.c_str());
++        else
++        {
++            const auto* character = dynamic_cast<const CBaseCharacter*>(r->game.get());
++            const auto& model = *r->model;
++            const auto* anim = character ? &character->m_Anim_Sound : nullptr;
++            ImGui::Text("%s | %zu nodes | %zu clips", r->state.m_Name, model.nodes.size(), model.animations.size());
++            if (r->animation.animation < model.animations.size())
++                ImGui::Text("%s / %.1f ms", model.animations[r->animation.animation].name.c_str(), r->animation.time);
++            if (anim)
++            {
++                ImGui::Text("Initial hit spheres: %s", anim->hit_spheres_valid ? "computed" : "unavailable");
++                if (!anim->hit_sphere_error.empty())
++                    ImGui::TextWrapped("%s", anim->hit_sphere_error.c_str());
++            }
++            else
++                ImGui::TextUnformatted("No original character animation table on this object");
++            std::vector<NodePose> pose;
++            if (sample_pose(model, r->animation.animation, r->animation.time, pose))
++            {
++                const auto origin = ImGui::GetCursorScreenPos();
++                const ImVec2 size{std::max(180.f, ImGui::GetContentRegionAvail().x), 220};
++                ImGui::InvisibleButton("Live skeleton front projection", size);
++                auto* draw = ImGui::GetWindowDrawList();
++                draw->AddRectFilled(origin, {origin.x + size.x, origin.y + size.y}, IM_COL32(12, 17, 23, 255));
++                draw->PushClipRect(origin, {origin.x + size.x, origin.y + size.y}, true);
++                const float scale = std::min(size.x / 160.f, size.y / 125.f);
++                auto project = [&](DVector p)
++                { return ImVec2{origin.x + size.x * .5f + p.x * scale, origin.y + size.y * .5f - p.y * scale}; };
++                for (size_t i = 0; i < pose.size(); ++i)
++                {
++                    const auto point = project(pose[i].position);
++                    const auto parent = model.nodes[i].parent;
++                    if (parent >= 0)
++                        draw->AddLine(point, project(pose[parent].position), IM_COL32(130, 200, 220, 255));
++                    draw->AddCircleFilled(point, 2, IM_COL32(200, 235, 255, 255));
++                    if (anim && anim->hit_spheres_valid)
++                        for (unsigned j = 0; j < NUM_STD_NODES; ++j)
++                            if (anim->hit_nodes_found[j] && model.nodes[i].name == szNodes[j])
++                                draw->AddCircle(point, anim->m_fHitSpheres[j] * scale, IM_COL32(255, 180, 80, 180));
++                }
++                draw->PopClipRect();
++            }
++            ImGui::TextWrapped(
++                "Local front projection. Orange radii are initialization measurements, not collision geometry.");
++            if (ImGui::CollapsingHeader("World node positions and rotations", ImGuiTreeNodeFlags_DefaultOpen))
++            {
++                if (ImGui::BeginTable("Nodes", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_ScrollY, ImVec2(0, 135)))
++                {
++                    ImGui::TableSetupColumn("Node");
++                    ImGui::TableSetupColumn("World position");
++                    ImGui::TableSetupColumn("Quaternion x y z w");
++                    ImGui::TableHeadersRow();
++                    for (const auto& node : model.nodes)
++                    {
++                        DVector p;
++                        DRotation q;
++                        const bool found = game.server.GetModelNodeTransform(r->handle, node.name.c_str(), &p, &q);
++                        ImGui::TableNextRow();
++                        ImGui::TableNextColumn();
++                        ImGui::TextUnformatted(node.name.c_str());
++                        ImGui::TableNextColumn();
++                        if (found)
++                            ImGui::Text("%.2f %.2f %.2f", p.x, p.y, p.z);
++                        else
++                            ImGui::TextUnformatted("unavailable / ambiguous");
++                        ImGui::TableNextColumn();
++                        if (found)
++                            ImGui::Text("%.2f %.2f %.2f %.2f", q.m_Vec.x, q.m_Vec.y, q.m_Vec.z, q.m_Spin);
++                    }
++                    ImGui::EndTable();
++                }
++            }
++            if (anim && ImGui::CollapsingHeader("Standard hit-sphere measurements"))
++                for (unsigned i = 0; i < NUM_STD_NODES; ++i)
++                    ImGui::Text("%s: radius %.3f | %s", szNodes[i], anim->m_fHitSpheres[i],
++                                !anim->hit_spheres_valid   ? "unavailable"
++                                : anim->hit_nodes_found[i] ? "found"
++                                                           : "previous-node fallback");
++            if (anim && ImGui::CollapsingHeader("Original animation table (including missing and default slots)"))
++                for (auto binding : anim->InspectAnimations())
++                {
++                    if (binding.index < model.animations.size())
++                        ImGui::Text("%s = %u / %s", binding.field, binding.index,
++                                    model.animations[binding.index].name.c_str());
++                    else
++                        ImGui::Text("%s = unavailable (%u)", binding.field, binding.index);
++                }
++        }
++        ImGui::EndTable();
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 466b2eb..5facd55 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -20,6 +20,7 @@
+ #include "world_sound_smoke.h"
+ 
+ #include <SDL3/SDL_main.h>
++#include <algorithm>
+ #include <cmath>
+ #include <cstdlib>
+ #include <iostream>
+@@ -247,7 +248,8 @@ namespace
+                                    !options.random_sounds_smoke && !options.world_sounds_smoke &&
+                                    !options.sprites_smoke && !options.scene_explosions_smoke;
+         inspector.select_weapons = options.weapons_smoke;
+-        inspector.select_movement = options.movement_smoke;
++        inspector.select_movement = options.movement_smoke && !options.skeleton_smoke;
++        inspector.select_skeleton = options.skeleton_smoke;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
+         inspector.select_pickups = options.pickups_smoke;
+@@ -300,6 +302,7 @@ namespace
+         DVector hidden_position{};
+         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
+         unsigned forward_frames = 0, jump_frames = 0, crouch_frames = 0, run_frames = 0;
++        bool skeleton_hidden = false;
+         bool crouched_hidden = false, stood_after_crouch = false, locomotion_pose = false;
+         bool saw_walk = false, saw_run = false, saw_jump = false;
+         bool container_hidden = false;
+@@ -472,6 +475,23 @@ namespace
+                         crouched_hidden |= player->crouched && player->eye_level == 12;
+                     if (frames > 130 && frames < 160)
+                         stood_after_crouch |= !player->crouched && player->eye_level == 36;
++                    if (frames > 105 && frames < 125 && player->crouched && record->model)
++                    {
++                        DVector head;
++                        DRotation rotation;
++                        OpenBlood2::NodePose pose;
++                        auto i = std::find_if(record->model->nodes.begin(), record->model->nodes.end(),
++                                              [](const auto& node) { return node.name == "head"; });
++                        if (i != record->model->nodes.end() && player->m_Anim_Sound.hit_spheres_valid &&
++                            game.server.GetModelNodeTransform(record->handle, "head", &head, &rotation) &&
++                            sample_node_pose(*record->model, record->animation.animation, record->animation.time,
++                                             static_cast<std::size_t>(i - record->model->nodes.begin()), pose))
++                        {
++                            const auto local = OpenBlood2::rotate_vector(record->state.m_Rotation, pose.position);
++                            skeleton_hidden = std::abs(head.y - record->state.m_Pos.y - local.y) < .001f &&
++                                              player->m_Anim_Sound.m_fHitSpheres[0] > 0;
++                        }
++                    }
+                     if (frames == 180 && record->model)
+                     {
+                         std::vector<DVector> vertices;
+@@ -805,6 +825,15 @@ namespace
+         {
+             int width = 0, height = 0;
+             SDL_GetWindowSize(runtime.window, &width, &height);
++            bool skeleton_reentered = false;
++            if (options.movement_smoke)
++                if (auto* player = game.server_shell.Player(game.local_client))
++                {
++                    DVector head;
++                    DRotation rotation;
++                    skeleton_reentered = player->m_Anim_Sound.hit_spheres_valid &&
++                                         game.server.GetModelNodeTransform(player->m_hObject, "head", &head, &rotation);
++                }
+             const bool ui_ok =
+                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
+             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
+@@ -831,7 +860,8 @@ namespace
+                 (options.movement_smoke &&
+                  (!movement_hidden || !movement_jumped || !movement_landed || !game.client_shell.move_mgr.ready() ||
+                   forward_frames != 55 || jump_frames != 10 || crouch_frames != 45 || run_frames != 20 ||
+-                  !crouched_hidden || !stood_after_crouch || !locomotion_pose || !saw_walk || !saw_run || !saw_jump)) ||
++                  !skeleton_reentered || !skeleton_hidden || !crouched_hidden || !stood_after_crouch ||
++                  !locomotion_pose || !saw_walk || !saw_run || !saw_jump)) ||
+                 (options.player_smoke && (!player_advanced_hidden || !game.client_shell.m_bInWorld ||
+                                           !game.server_shell.Player(game.local_client))) ||
+                 (options.world_smoke &&
+@@ -963,6 +993,7 @@ int main(int argc, char** argv)
+                      "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
+                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
+                      "  --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload\n"
++                     "  --skeleton-smoke    Same lifecycle with original animation/node inspection\n"
+                      "  --help              Show this help\n";
+         return 0;
+     }
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index 2ce4863..3bdfbeb 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -113,11 +113,12 @@ namespace OpenBlood2
+                 options.player_smoke = true;
+                 options.weapons_smoke = true;
+             }
+-            else if (arg == "--movement-smoke")
++            else if (arg == "--movement-smoke" || arg == "--skeleton-smoke")
+             {
+                 options.world_smoke = true;
+                 options.player_smoke = true;
+                 options.movement_smoke = true;
++                options.skeleton_smoke = arg == "--skeleton-smoke";
+             }
+             else if (arg == "--containers-smoke")
+             {
+diff --git a/src/engine/config.h b/src/engine/config.h
+index d5e9e2b..a73d8ab 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -21,6 +21,7 @@ namespace OpenBlood2
+         bool inspect_player = false;
+         bool player_smoke = false;
+         bool weapons_smoke = false;
++        bool skeleton_smoke = false;
+         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
+              interaction_smoke = false, brushes_smoke = false, pickups_smoke = false, objectives_smoke = false,
+              cameras_smoke = false, keyframes_smoke = false, worldpaths_smoke = false, lights_smoke = false,
+diff --git a/src/engine/model.cpp b/src/engine/model.cpp
+index 6b971cf..cbfde2d 100644
+--- a/src/engine/model.cpp
++++ b/src/engine/model.cpp
+@@ -252,10 +252,22 @@ namespace OpenBlood2
+                     p.position = a.vec();
+                     p.rotation.m_Vec = a.vec();
+                     p.rotation.m_Spin = a.real();
+-                    float norm = dot(p.rotation.m_Vec, p.rotation.m_Vec) + p.rotation.m_Spin * p.rotation.m_Spin;
+-                    if (!a.good() || !coordinate(p.position) || norm < 0.0001f || norm > 10000)
+-                        return fail("invalid node pose");
+-                    p.rotation = normalize(p.rotation);
++                    const auto q = p.rotation;
++                    const double norm = double(q.m_Vec.x) * q.m_Vec.x + double(q.m_Vec.y) * q.m_Vec.y +
++                                        double(q.m_Vec.z) * q.m_Vec.z + double(q.m_Spin) * q.m_Spin;
++                    if (!a.good() || !coordinate(p.position) || norm == 0)
++                        return fail(("invalid node pose: animation=" + anim.name + " node=" + node.name +
++                                     " frame=" + std::to_string(j) + " norm2=" + std::to_string(norm) +
++                                     " position=" + std::to_string(p.position.x) + "," + std::to_string(p.position.y) +
++                                     "," + std::to_string(p.position.z))
++                                        .c_str());
++                    // Exported ABC rotations need not be unit length (retail cultist
++                    // pelvis norm squared exceeds 15,000). Double precision accepts
++                    // finite float components without squaring overflow; runtime
++                    // interpolation only sees normalized quaternions.
++                    const double length = std::sqrt(norm);
++                    p.rotation = {{float(q.m_Vec.x / length), float(q.m_Vec.y / length), float(q.m_Vec.z / length)},
++                                  float(q.m_Spin / length)};
+                     na.frames.push_back(p);
+                 }
+                 auto size = static_cast<std::size_t>(frames) * node.deformed_vertices.size() * 3;
+@@ -293,28 +305,32 @@ namespace OpenBlood2
+                 return i;
+         return no_animation;
+     }
+-    bool sample_pose(const Model& model, std::uint32_t animation, double milliseconds, std::vector<NodePose>& out)
++    namespace
+     {
+-        out.clear();
+-        if (animation >= model.animations.size() || !std::isfinite(milliseconds) || milliseconds < 0)
+-            return false;
+-        const auto& a = model.animations[animation];
+-        if (a.keys.empty())
+-            return false;
+-        auto upper = std::upper_bound(a.keys.begin(), a.keys.end(), milliseconds,
+-                                      [](double time, const ModelKey& k) { return time < k.time; });
+-        std::size_t hi = static_cast<std::size_t>(upper - a.keys.begin());
+-        if (hi == a.keys.size())
+-            --hi;
+-        std::size_t lo = hi ? hi - 1 : 0;
+-        float t = a.keys[hi].time > a.keys[lo].time
+-                      ? static_cast<float>(std::clamp(
+-                            (milliseconds - a.keys[lo].time) / (a.keys[hi].time - a.keys[lo].time), 0.0, 1.0))
+-                      : 0;
+-        for (std::size_t i = 0; i < model.nodes.size(); ++i)
++        bool pose_interval(const Model& model, std::uint32_t animation, double milliseconds, std::size_t& lo,
++                           std::size_t& hi, float& t)
++        {
++            if (animation >= model.animations.size() || !std::isfinite(milliseconds) || milliseconds < 0)
++                return false;
++            const auto& a = model.animations[animation];
++            if (a.keys.empty() || a.nodes.size() != model.nodes.size())
++                return false;
++            auto upper = std::upper_bound(a.keys.begin(), a.keys.end(), milliseconds,
++                                          [](double time, const ModelKey& k) { return time < k.time; });
++            hi = static_cast<std::size_t>(upper - a.keys.begin());
++            if (hi == a.keys.size())
++                --hi;
++            lo = hi ? hi - 1 : 0;
++            t = a.keys[hi].time > a.keys[lo].time
++                    ? static_cast<float>(
++                          std::clamp((milliseconds - a.keys[lo].time) / (a.keys[hi].time - a.keys[lo].time), 0.0, 1.0))
++                    : 0;
++            return true;
++        }
++        NodePose local_pose(const ModelAnimation& a, std::size_t node, std::size_t lo, std::size_t hi, float t)
+         {
+-            const auto& x = a.nodes[i].frames[lo];
+-            auto y = a.nodes[i].frames[hi];
++            const auto& x = a.nodes[node].frames[lo];
++            auto y = a.nodes[node].frames[hi];
+             if (dot(x.rotation.m_Vec, y.rotation.m_Vec) + x.rotation.m_Spin * y.rotation.m_Spin < 0)
+             {
+                 y.rotation.m_Vec = mul(y.rotation.m_Vec, -1);
+@@ -323,6 +339,66 @@ namespace OpenBlood2
+             NodePose p{add(mul(x.position, 1 - t), mul(y.position, t)),
+                        normalize({add(mul(x.rotation.m_Vec, 1 - t), mul(y.rotation.m_Vec, t)),
+                                   x.rotation.m_Spin * (1 - t) + y.rotation.m_Spin * t})};
++            return p;
++        }
++    } // namespace
++    DRotation compose_rotation(DRotation parent, DRotation child)
++    {
++        return compose(parent, child);
++    }
++    bool sample_node_pose(const Model& model, std::uint32_t animation, double milliseconds, std::size_t node,
++                          NodePose& out)
++    {
++        std::size_t lo, hi;
++        float t;
++        if (node >= model.nodes.size() || !pose_interval(model, animation, milliseconds, lo, hi, t))
++            return false;
++        std::array<std::size_t, 64> chain{};
++        std::size_t count = 0;
++        for (;;)
++        {
++            if (count == chain.size())
++                return false;
++            chain[count++] = node;
++            const auto parent = model.nodes[node].parent;
++            if (parent < 0)
++                break;
++            if (static_cast<std::size_t>(parent) >= node)
++                return false;
++            node = static_cast<std::size_t>(parent);
++        }
++        NodePose result{};
++        const auto& a = model.animations[animation];
++        while (count)
++        {
++            node = chain[--count];
++            if (a.nodes[node].frames.size() <= hi)
++                return false;
++            const auto local = local_pose(a, node, lo, hi, t);
++            result.position = add(result.position, rotate_vector(result.rotation, local.position));
++            result.rotation = compose(result.rotation, local.rotation);
++        }
++        if (!coordinate(result.position))
++            return false;
++        out = result;
++        return true;
++    }
++    bool sample_pose(const Model& model, std::uint32_t animation, double milliseconds, std::vector<NodePose>& out)
++    {
++        out.clear();
++        std::size_t lo, hi;
++        float t;
++        if (!pose_interval(model, animation, milliseconds, lo, hi, t))
++            return false;
++        const auto& a = model.animations[animation];
++        for (std::size_t i = 0; i < model.nodes.size(); ++i)
++        {
++            if (a.nodes[i].frames.size() <= hi)
++            {
++                out.clear();
++                return false;
++            }
++            NodePose p = local_pose(a, i, lo, hi, t);
+             auto parent = model.nodes[i].parent;
+             if (parent >= 0)
+             {
+diff --git a/src/engine/model.h b/src/engine/model.h
+index 4069864..9d055c9 100644
+--- a/src/engine/model.h
++++ b/src/engine/model.h
+@@ -72,6 +72,8 @@ namespace OpenBlood2
+     bool sample_pose(const Model& model, std::uint32_t animation, double milliseconds, std::vector<NodePose>& out);
+     bool sample_vertices(const Model& model, std::uint32_t animation, double milliseconds, std::vector<DVector>& out);
+     DVector rotate_vector(DRotation q, DVector v);
++    DRotation compose_rotation(DRotation parent, DRotation child);
++    bool sample_node_pose(const Model&, std::uint32_t animation, double milliseconds, std::size_t node, NodePose&);
+ 
+     struct AnimationTrack
+     {
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 096eaf8..a85cdf4 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -127,6 +127,8 @@ class ServerDE : public CSBase
+     void (*SetModelLooping)(HOBJECT, DBOOL) = nullptr;
+     DBOOL (*GetModelLooping)(HOBJECT) = nullptr;
+     virtual DRESULT GetModelAnimUserDims(HOBJECT, DVector*, HMODELANIM) = 0;
++    virtual DBOOL GetModelNodeTransform(HOBJECT, const char*, DVector*, DRotation*) = 0;
++    virtual bool GetModelAnimationName(HOBJECT, HMODELANIM, std::string&) = 0;
+     virtual DRESULT SetGlobalForce(DVector*) = 0;
+     virtual DRESULT GetGlobalForce(DVector*) = 0;
+     virtual DRESULT GetVelocity(HOBJECT, DVector*) = 0;
+diff --git a/src/game/original/Anim_Sound.cpp b/src/game/original/Anim_Sound.cpp
+new file mode 100644
+index 0000000..4e23834
+--- /dev/null
++++ b/src/game/original/Anim_Sound.cpp
+@@ -0,0 +1,626 @@
++// Selected original Anim_Sound.cpp animation mappings and hit-sphere rules.
++#include "Anim_Sound.h"
++#include <cmath>
++const std::array<const char*, NUM_ALL_NODES> szNodes{
++    "head",   "neck",    "torso",  "pelvis", "ru_arm", "rl_arm",  "r_hand", "lu_arm", "ll_arm", "l_hand", "lu_leg",
++    "ll_leg", "l_ankle", "l_foot", "ru_leg", "rl_leg", "r_ankle", "r_foot", "obj",    "l_gun",  "r_gun"};
++void CheckAnims(std::span<DDWORD> animations)
++{
++    // DDWORD is unsigned: the original < 0 branch is unreachable. Slot zero
++    // remains untouched, including UINT32_MAX; >999 copies the previous slot.
++    for (std::size_t i = 1; i < animations.size(); ++i)
++        if (animations[i] > 999)
++            animations[i] = animations[i - 1];
++}
++bool CAnim_Sound::SetAnimationIndexes(HOBJECT m_hObject)
++{
++    ServerDE* pServerDE = BaseClass::GetServerDE();
++    std::string current_name;
++    if (!pServerDE || !m_hObject ||
++        !pServerDE->GetModelAnimationName(m_hObject, pServerDE->GetModelAnimation(m_hObject), current_name))
++        return false;
++
++    m_nAnim_IDLE[0] = pServerDE->GetAnimIndex(m_hObject, "idle1");
++    m_nAnim_IDLE[1] = pServerDE->GetAnimIndex(m_hObject, "idle2");
++    m_nAnim_IDLE[2] = pServerDE->GetAnimIndex(m_hObject, "idle3");
++    m_nAnim_IDLE[3] = pServerDE->GetAnimIndex(m_hObject, "idle4");
++
++    m_nAnim_TALK[0] = pServerDE->GetAnimIndex(m_hObject, "talk1");
++    m_nAnim_TALK[1] = pServerDE->GetAnimIndex(m_hObject, "talk2");
++    m_nAnim_TALK[2] = pServerDE->GetAnimIndex(m_hObject, "talk3");
++    m_nAnim_TALK[3] = pServerDE->GetAnimIndex(m_hObject, "talk4");
++    m_nAnim_TALK[4] = pServerDE->GetAnimIndex(m_hObject, "talk5");
++
++    m_nAnim_WALK[0] = pServerDE->GetAnimIndex(m_hObject, "walk_rifle");
++    m_nAnim_WALK[1] = pServerDE->GetAnimIndex(m_hObject, "walk_rifle");
++    m_nAnim_WALK[2] = pServerDE->GetAnimIndex(m_hObject, "walk_pistol");
++    m_nAnim_WALK[3] = pServerDE->GetAnimIndex(m_hObject, "walk_pistol");
++    m_nAnim_WALK[4] = pServerDE->GetAnimIndex(m_hObject, "walk_knife1");
++    m_nAnim_WALK[5] = pServerDE->GetAnimIndex(m_hObject, "walk_knife1");
++    m_nAnim_WALK[6] = pServerDE->GetAnimIndex(m_hObject, "walk_knife1");
++    m_nAnim_WALK[7] = pServerDE->GetAnimIndex(m_hObject, "walk_pistol");
++    m_nAnim_WALK[8] = pServerDE->GetAnimIndex(m_hObject, "walk_pistol");
++
++    m_nAnim_WALK_INJURED_RLEG_RIFLE = pServerDE->GetAnimIndex(m_hObject, "walk_irleg_rifle");
++    m_nAnim_WALK_INJURED_RLEG_PISTOL = pServerDE->GetAnimIndex(m_hObject, "walk_irleg_nogun");
++
++    m_nAnim_WALK_INJURED_LLEG_RIFLE = pServerDE->GetAnimIndex(m_hObject, "walk_illeg_rifle");
++    m_nAnim_WALK_INJURED_LLEG_PISTOL = pServerDE->GetAnimIndex(m_hObject, "walk_illeg_nogun");
++
++    m_nAnim_RUN[0] = pServerDE->GetAnimIndex(m_hObject, "run_rifle");
++    m_nAnim_RUN[1] = pServerDE->GetAnimIndex(m_hObject, "run_rifle");
++    m_nAnim_RUN[2] = pServerDE->GetAnimIndex(m_hObject, "run_pistol");
++    m_nAnim_RUN[3] = pServerDE->GetAnimIndex(m_hObject, "run_pistol");
++    m_nAnim_RUN[4] = pServerDE->GetAnimIndex(m_hObject, "run_knife1");
++    m_nAnim_RUN[5] = pServerDE->GetAnimIndex(m_hObject, "run_knife1");
++    m_nAnim_RUN[6] = pServerDE->GetAnimIndex(m_hObject, "run_knife1");
++    m_nAnim_RUN[7] = pServerDE->GetAnimIndex(m_hObject, "run_pistol");
++    m_nAnim_RUN[8] = pServerDE->GetAnimIndex(m_hObject, "run_pistol");
++
++    m_nAnim_JUMP[0] = pServerDE->GetAnimIndex(m_hObject, "jmp_rifle");
++    m_nAnim_JUMP[1] = pServerDE->GetAnimIndex(m_hObject, "jmp_rifle");
++    m_nAnim_JUMP[2] = pServerDE->GetAnimIndex(m_hObject, "jmp_pistol");
++    m_nAnim_JUMP[3] = pServerDE->GetAnimIndex(m_hObject, "jmp_pistol");
++    m_nAnim_JUMP[4] = pServerDE->GetAnimIndex(m_hObject, "jmp_knife1");
++    m_nAnim_JUMP[5] = pServerDE->GetAnimIndex(m_hObject, "jmp_knife1");
++    m_nAnim_JUMP[6] = pServerDE->GetAnimIndex(m_hObject, "jmp_knife1");
++    m_nAnim_JUMP[7] = pServerDE->GetAnimIndex(m_hObject, "jmp_pistol");
++    m_nAnim_JUMP[8] = pServerDE->GetAnimIndex(m_hObject, "jmp_pistol");
++
++    m_nAnim_CROUCH[0] = pServerDE->GetAnimIndex(m_hObject, "crouch_rifle");
++    m_nAnim_CROUCH[1] = pServerDE->GetAnimIndex(m_hObject, "crouch_rifle");
++    m_nAnim_CROUCH[2] = pServerDE->GetAnimIndex(m_hObject, "crouch_1pistol");
++    m_nAnim_CROUCH[3] = pServerDE->GetAnimIndex(m_hObject, "crouch_1pistol");
++    m_nAnim_CROUCH[4] = pServerDE->GetAnimIndex(m_hObject, "crouch_knife1");
++    m_nAnim_CROUCH[5] = pServerDE->GetAnimIndex(m_hObject, "crouch_knife1");
++    m_nAnim_CROUCH[6] = pServerDE->GetAnimIndex(m_hObject, "crouch_knife1");
++    m_nAnim_CROUCH[7] = pServerDE->GetAnimIndex(m_hObject, "crouch_1pistol");
++    m_nAnim_CROUCH[8] = pServerDE->GetAnimIndex(m_hObject, "crouch_1pistol");
++
++    m_nAnim_CRAWL[0] = pServerDE->GetAnimIndex(m_hObject, "crawl_rifle");
++    m_nAnim_CRAWL[1] = pServerDE->GetAnimIndex(m_hObject, "crawl_rifle");
++    m_nAnim_CRAWL[2] = pServerDE->GetAnimIndex(m_hObject, "crawl_1pistol");
++    m_nAnim_CRAWL[3] = pServerDE->GetAnimIndex(m_hObject, "crawl_1pistol");
++    m_nAnim_CRAWL[4] = pServerDE->GetAnimIndex(m_hObject, "crawl_knife1");
++    m_nAnim_CRAWL[5] = pServerDE->GetAnimIndex(m_hObject, "crawl_knife1");
++    m_nAnim_CRAWL[6] = pServerDE->GetAnimIndex(m_hObject, "crawl_knife1");
++    m_nAnim_CRAWL[7] = pServerDE->GetAnimIndex(m_hObject, "crawl_1pistol");
++    m_nAnim_CRAWL[8] = pServerDE->GetAnimIndex(m_hObject, "crawl_1pistol");
++
++    m_nAnim_SWIM[0] = pServerDE->GetAnimIndex(m_hObject, "swim_rifle");
++    m_nAnim_SWIM[1] = pServerDE->GetAnimIndex(m_hObject, "swim_rifle");
++    m_nAnim_SWIM[2] = pServerDE->GetAnimIndex(m_hObject, "swim_pistol");
++    m_nAnim_SWIM[3] = pServerDE->GetAnimIndex(m_hObject, "swim_pistol");
++    m_nAnim_SWIM[4] = pServerDE->GetAnimIndex(m_hObject, "swim_knife1");
++    m_nAnim_SWIM[5] = pServerDE->GetAnimIndex(m_hObject, "swim_knife1");
++    m_nAnim_SWIM[6] = pServerDE->GetAnimIndex(m_hObject, "swim_knife1");
++    m_nAnim_SWIM[7] = pServerDE->GetAnimIndex(m_hObject, "swim_pistol");
++    m_nAnim_SWIM[8] = pServerDE->GetAnimIndex(m_hObject, "swim_pistol");
++
++    m_nAnim_STRAFERIGHT[0] = pServerDE->GetAnimIndex(m_hObject, "strafe_right_rifle");
++    m_nAnim_STRAFERIGHT[1] = pServerDE->GetAnimIndex(m_hObject, "strafe_right_rifle");
++    m_nAnim_STRAFERIGHT[2] = pServerDE->GetAnimIndex(m_hObject, "strafe_right_1pistol");
++    m_nAnim_STRAFERIGHT[3] = pServerDE->GetAnimIndex(m_hObject, "strafe_right_2pistol");
++    m_nAnim_STRAFERIGHT[4] = pServerDE->GetAnimIndex(m_hObject, "strafe_right_1pistol");
++
++    m_nAnim_STRAFELEFT[0] = pServerDE->GetAnimIndex(m_hObject, "strafe_right_rifle");
++    m_nAnim_STRAFELEFT[1] = pServerDE->GetAnimIndex(m_hObject, "strafe_right_rifle");
++    m_nAnim_STRAFELEFT[2] = pServerDE->GetAnimIndex(m_hObject, "strafe_right_1pistol");
++    m_nAnim_STRAFELEFT[3] = pServerDE->GetAnimIndex(m_hObject, "strafe_right_2pistol");
++    m_nAnim_STRAFELEFT[4] = pServerDE->GetAnimIndex(m_hObject, "strafe_right_1pistol");
++
++    m_nAnim_PICKUP_WEAPON = pServerDE->GetAnimIndex(m_hObject, "pickup_weapon");
++
++    m_nAnim_SWITCH_WEAPON[0] = pServerDE->GetAnimIndex(m_hObject, "switch_weapon_rifle");
++    m_nAnim_SWITCH_WEAPON[1] = pServerDE->GetAnimIndex(m_hObject, "switch_weapon_rifle");
++    m_nAnim_SWITCH_WEAPON[2] = pServerDE->GetAnimIndex(m_hObject, "switch_weapon_2pistol");
++
++    m_nAnim_FIRE_STAND[0] = pServerDE->GetAnimIndex(m_hObject, "fire_stand_rifle");
++    m_nAnim_FIRE_STAND[1] = pServerDE->GetAnimIndex(m_hObject, "fire_stand_autorifle");
++    m_nAnim_FIRE_STAND[2] = pServerDE->GetAnimIndex(m_hObject, "fire_stand_1pistol");
++    m_nAnim_FIRE_STAND[3] = pServerDE->GetAnimIndex(m_hObject, "fire_stand_2pistol");
++    m_nAnim_FIRE_STAND[4] = pServerDE->GetAnimIndex(m_hObject, "fire_stand_knife1");
++    m_nAnim_FIRE_STAND[5] = pServerDE->GetAnimIndex(m_hObject, "fire_stand_knife2");
++    m_nAnim_FIRE_STAND[6] = pServerDE->GetAnimIndex(m_hObject, "fire_stand_knife3");
++    m_nAnim_FIRE_STAND[7] = pServerDE->GetAnimIndex(m_hObject, "fire_stand_grenade");
++    m_nAnim_FIRE_STAND[8] = pServerDE->GetAnimIndex(m_hObject, "fire_stand_magic");
++
++    m_nAnim_FIRE_WALK[0] = pServerDE->GetAnimIndex(m_hObject, "fire_walk_rifle");
++    m_nAnim_FIRE_WALK[1] = pServerDE->GetAnimIndex(m_hObject, "fire_walk_autorifle");
++    m_nAnim_FIRE_WALK[2] = pServerDE->GetAnimIndex(m_hObject, "fire_walk_1pistol");
++    m_nAnim_FIRE_WALK[3] = pServerDE->GetAnimIndex(m_hObject, "fire_walk_2pistol");
++    m_nAnim_FIRE_WALK[4] = pServerDE->GetAnimIndex(m_hObject, "fire_walk_knife1");
++    m_nAnim_FIRE_WALK[5] = pServerDE->GetAnimIndex(m_hObject, "fire_walk_knife2");
++    m_nAnim_FIRE_WALK[6] = pServerDE->GetAnimIndex(m_hObject, "fire_walk_knife3");
++    m_nAnim_FIRE_WALK[7] = pServerDE->GetAnimIndex(m_hObject, "fire_walk_grenade");
++    m_nAnim_FIRE_WALK[8] = pServerDE->GetAnimIndex(m_hObject, "fire_walk_magic");
++
++    m_nAnim_FIRE_RUN[0] = pServerDE->GetAnimIndex(m_hObject, "fire_run_rifle");
++    m_nAnim_FIRE_RUN[1] = pServerDE->GetAnimIndex(m_hObject, "fire_run_autorifle");
++    m_nAnim_FIRE_RUN[2] = pServerDE->GetAnimIndex(m_hObject, "fire_run_1pistol");
++    m_nAnim_FIRE_RUN[3] = pServerDE->GetAnimIndex(m_hObject, "fire_run_2pistol");
++    m_nAnim_FIRE_RUN[4] = pServerDE->GetAnimIndex(m_hObject, "fire_run_knife1");
++    m_nAnim_FIRE_RUN[5] = pServerDE->GetAnimIndex(m_hObject, "fire_run_knife2");
++    m_nAnim_FIRE_RUN[6] = pServerDE->GetAnimIndex(m_hObject, "fire_run_knife3");
++    m_nAnim_FIRE_RUN[7] = pServerDE->GetAnimIndex(m_hObject, "fire_run_grenade");
++    m_nAnim_FIRE_RUN[8] = pServerDE->GetAnimIndex(m_hObject, "fire_run_magic");
++
++    m_nAnim_FIRE_JUMP[0] = pServerDE->GetAnimIndex(m_hObject, "fire_jump_rifle");
++    m_nAnim_FIRE_JUMP[1] = pServerDE->GetAnimIndex(m_hObject, "fire_jump_autorifle");
++    m_nAnim_FIRE_JUMP[2] = pServerDE->GetAnimIndex(m_hObject, "fire_jump_1pistol");
++    m_nAnim_FIRE_JUMP[3] = pServerDE->GetAnimIndex(m_hObject, "fire_jump_2pistol");
++    m_nAnim_FIRE_JUMP[4] = pServerDE->GetAnimIndex(m_hObject, "fire_jump_knife1");
++    m_nAnim_FIRE_JUMP[5] = pServerDE->GetAnimIndex(m_hObject, "fire_jump_knife2");
++    m_nAnim_FIRE_JUMP[6] = pServerDE->GetAnimIndex(m_hObject, "fire_jump_knife3");
++    m_nAnim_FIRE_JUMP[7] = pServerDE->GetAnimIndex(m_hObject, "fire_jump_grenade");
++    m_nAnim_FIRE_JUMP[8] = pServerDE->GetAnimIndex(m_hObject, "fire_jump_magic");
++
++    m_nAnim_FIRE_CROUCH[0] = pServerDE->GetAnimIndex(m_hObject, "fire_crouch_rifle");
++    m_nAnim_FIRE_CROUCH[1] = pServerDE->GetAnimIndex(m_hObject, "fire_crouch_autorifle");
++    m_nAnim_FIRE_CROUCH[2] = pServerDE->GetAnimIndex(m_hObject, "fire_crouch_1pistol");
++    m_nAnim_FIRE_CROUCH[3] = pServerDE->GetAnimIndex(m_hObject, "fire_crouch_2pistol");
++    m_nAnim_FIRE_CROUCH[4] = pServerDE->GetAnimIndex(m_hObject, "fire_crouch_knife1");
++    m_nAnim_FIRE_CROUCH[5] = pServerDE->GetAnimIndex(m_hObject, "fire_crouch_knife2");
++    m_nAnim_FIRE_CROUCH[6] = pServerDE->GetAnimIndex(m_hObject, "fire_crouch_knife3");
++    m_nAnim_FIRE_CROUCH[7] = pServerDE->GetAnimIndex(m_hObject, "fire_crouch_grenade");
++    m_nAnim_FIRE_CROUCH[8] = pServerDE->GetAnimIndex(m_hObject, "fire_crouch_magic");
++
++    m_nAnim_FIRE_CRAWL[0] = pServerDE->GetAnimIndex(m_hObject, "fire_crawl_rifle");
++    m_nAnim_FIRE_CRAWL[1] = pServerDE->GetAnimIndex(m_hObject, "fire_crawl_autorifle");
++    m_nAnim_FIRE_CRAWL[2] = pServerDE->GetAnimIndex(m_hObject, "fire_crawl_1pistol");
++    m_nAnim_FIRE_CRAWL[3] = pServerDE->GetAnimIndex(m_hObject, "fire_crawl_2pistol");
++    m_nAnim_FIRE_CRAWL[4] = pServerDE->GetAnimIndex(m_hObject, "fire_crawl_knife1");
++    m_nAnim_FIRE_CRAWL[5] = pServerDE->GetAnimIndex(m_hObject, "fire_crawl_knife2");
++    m_nAnim_FIRE_CRAWL[6] = pServerDE->GetAnimIndex(m_hObject, "fire_crawl_knife3");
++    m_nAnim_FIRE_CRAWL[7] = pServerDE->GetAnimIndex(m_hObject, "fire_crawl_grenade");
++    m_nAnim_FIRE_CRAWL[8] = pServerDE->GetAnimIndex(m_hObject, "fire_crawl_magic");
++
++    m_nAnim_FALLING = pServerDE->GetAnimIndex(m_hObject, "falling");
++    m_nAnim_FALLING_UNCONTROL = pServerDE->GetAnimIndex(m_hObject, "falling_uncontrol");
++
++    m_nAnim_ROLL_FORWARD = pServerDE->GetAnimIndex(m_hObject, "roll_forward");
++    m_nAnim_ROLL_RIGHT = pServerDE->GetAnimIndex(m_hObject, "roll_right");
++    m_nAnim_ROLL_LEFT = pServerDE->GetAnimIndex(m_hObject, "roll_left");
++    m_nAnim_ROLL_BACK = pServerDE->GetAnimIndex(m_hObject, "roll_back");
++
++    m_nAnim_HANDSPRING_FORWARD = pServerDE->GetAnimIndex(m_hObject, "handspring_forward");
++    m_nAnim_HANDSPRING_RIGHT = pServerDE->GetAnimIndex(m_hObject, "handspring_right");
++    m_nAnim_HANDSPRING_LEFT = pServerDE->GetAnimIndex(m_hObject, "handspring_left");
++    m_nAnim_HANDSPRING_BACK = pServerDE->GetAnimIndex(m_hObject, "handspring_back");
++
++    m_nAnim_FLIP_FORWARD = pServerDE->GetAnimIndex(m_hObject, "flip_forward");
++    m_nAnim_FLIP_RIGHT = pServerDE->GetAnimIndex(m_hObject, "flip_right");
++    m_nAnim_FLIP_LEFT = pServerDE->GetAnimIndex(m_hObject, "flip_left");
++    m_nAnim_FLIP_BACK = pServerDE->GetAnimIndex(m_hObject, "flip_back");
++
++    m_nAnim_DODGE_RIGHT = pServerDE->GetAnimIndex(m_hObject, "dodge_right");
++    m_nAnim_DODGE_LEFT = pServerDE->GetAnimIndex(m_hObject, "dodge_left");
++
++    m_nAnim_RECOIL[0] = pServerDE->GetAnimIndex(m_hObject, "recoil_head1");
++    m_nAnim_RECOIL[1] = pServerDE->GetAnimIndex(m_hObject, "recoil_chest1");
++    m_nAnim_RECOIL[2] = pServerDE->GetAnimIndex(m_hObject, "recoil_rchest1");
++    m_nAnim_RECOIL[3] = pServerDE->GetAnimIndex(m_hObject, "recoil_lchest1");
++    m_nAnim_RECOIL[4] = pServerDE->GetAnimIndex(m_hObject, "recoil_lleg1");
++    m_nAnim_RECOIL[5] = pServerDE->GetAnimIndex(m_hObject, "recoil_rleg1");
++    m_nAnim_RECOIL[6] = pServerDE->GetAnimIndex(m_hObject, "recoil_head2");
++    m_nAnim_RECOIL[7] = pServerDE->GetAnimIndex(m_hObject, "recoil_chest2");
++    m_nAnim_RECOIL[8] = pServerDE->GetAnimIndex(m_hObject, "recoil_rchest2");
++    m_nAnim_RECOIL[9] = pServerDE->GetAnimIndex(m_hObject, "recoil_lchest2");
++    m_nAnim_RECOIL[10] = pServerDE->GetAnimIndex(m_hObject, "recoil_lleg2");
++    m_nAnim_RECOIL[11] = pServerDE->GetAnimIndex(m_hObject, "recoil_rleg2");
++
++    m_nAnim_TAUNT[0] = pServerDE->GetAnimIndex(m_hObject, "taunt_dance1");
++    m_nAnim_TAUNT[1] = pServerDE->GetAnimIndex(m_hObject, "taunt_dance2");
++    m_nAnim_TAUNT[2] = pServerDE->GetAnimIndex(m_hObject, "taunt_dance3");
++    m_nAnim_TAUNT[3] = pServerDE->GetAnimIndex(m_hObject, "taunt_dance4");
++    m_nAnim_TAUNT[4] = pServerDE->GetAnimIndex(m_hObject, "taunt_flip");
++    m_nAnim_TAUNT[5] = pServerDE->GetAnimIndex(m_hObject, "taunt_wave");
++    m_nAnim_TAUNT[6] = pServerDE->GetAnimIndex(m_hObject, "taunt_beg");
++
++    m_nAnim_SPOTPLAYER_RIGHT = pServerDE->GetAnimIndex(m_hObject, "spot_right");
++    m_nAnim_SPOTPLAYER_LEFT = pServerDE->GetAnimIndex(m_hObject, "spot_left");
++    m_nAnim_SPOTPLAYER_POINT = pServerDE->GetAnimIndex(m_hObject, "spot_point");
++
++    // Set the humiliation animations...
++
++    m_nAnim_HUMILIATION[0] = pServerDE->GetAnimIndex(m_hObject, "humiliation_01");
++    m_nAnim_HUMILIATION[1] = pServerDE->GetAnimIndex(m_hObject, "humiliation_02");
++    m_nAnim_HUMILIATION[2] = pServerDE->GetAnimIndex(m_hObject, "humiliation_03");
++    m_nAnim_HUMILIATION[3] = pServerDE->GetAnimIndex(m_hObject, "humiliation_04");
++
++    if (m_nAnim_HUMILIATION[3] == UINT32_MAX)
++    {
++        m_nAnim_HUMILIATION[3] = pServerDE->GetAnimIndex(m_hObject, "humiliation_05");
++    }
++
++    // Gabby and Ishmael's humiliation animations are spelled wrong, so deal with that here...
++
++    if (m_nAnim_HUMILIATION[0] == UINT32_MAX)
++        m_nAnim_HUMILIATION[0] = pServerDE->GetAnimIndex(m_hObject, "humilation_01");
++    if (m_nAnim_HUMILIATION[1] == UINT32_MAX)
++        m_nAnim_HUMILIATION[1] = pServerDE->GetAnimIndex(m_hObject, "humilation_02");
++    if (m_nAnim_HUMILIATION[2] == UINT32_MAX)
++        m_nAnim_HUMILIATION[2] = pServerDE->GetAnimIndex(m_hObject, "humilation_03");
++    if (m_nAnim_HUMILIATION[3] == UINT32_MAX)
++        m_nAnim_HUMILIATION[3] = pServerDE->GetAnimIndex(m_hObject, "humilation_05");
++
++    // Playable enemy characters only have 01, 03, and 05--so fill in index 1 if necessary...
++
++    if (m_nAnim_HUMILIATION[1] == UINT32_MAX)
++        m_nAnim_HUMILIATION[1] = pServerDE->GetAnimIndex(m_hObject, "humiliation_01");
++
++    // Continue...
++
++    m_nAnim_DEATH[0] = pServerDE->GetAnimIndex(m_hObject, "death_head1");
++    m_nAnim_DEATH[1] = pServerDE->GetAnimIndex(m_hObject, "death_chest1");
++    m_nAnim_DEATH[2] = pServerDE->GetAnimIndex(m_hObject, "death_rchest1");
++    m_nAnim_DEATH[3] = pServerDE->GetAnimIndex(m_hObject, "death_lchest1");
++    m_nAnim_DEATH[4] = pServerDE->GetAnimIndex(m_hObject, "death_lleg1");
++    m_nAnim_DEATH[5] = pServerDE->GetAnimIndex(m_hObject, "death_rleg1");
++    m_nAnim_DEATH[6] = pServerDE->GetAnimIndex(m_hObject, "death_head2");
++    m_nAnim_DEATH[7] = pServerDE->GetAnimIndex(m_hObject, "death_chest2");
++    m_nAnim_DEATH[8] = pServerDE->GetAnimIndex(m_hObject, "death_rchest2");
++    m_nAnim_DEATH[9] = pServerDE->GetAnimIndex(m_hObject, "death_lchest2");
++    m_nAnim_DEATH[10] = pServerDE->GetAnimIndex(m_hObject, "death_lleg2");
++    m_nAnim_DEATH[11] = pServerDE->GetAnimIndex(m_hObject, "death_rleg2");
++
++    m_nAnim_CORPSE[0] = pServerDE->GetAnimIndex(m_hObject, "corpse_head1");
++    m_nAnim_CORPSE[1] = pServerDE->GetAnimIndex(m_hObject, "corpse_chest");
++    m_nAnim_CORPSE[2] = pServerDE->GetAnimIndex(m_hObject, "corpse_rchest");
++    m_nAnim_CORPSE[3] = pServerDE->GetAnimIndex(m_hObject, "corpse_lchest");
++    m_nAnim_CORPSE[4] = pServerDE->GetAnimIndex(m_hObject, "corpse_lleg1");
++    m_nAnim_CORPSE[5] = pServerDE->GetAnimIndex(m_hObject, "corpse_rleg1");
++    m_nAnim_CORPSE[6] = pServerDE->GetAnimIndex(m_hObject, "corpse_head2");
++    m_nAnim_CORPSE[7] = pServerDE->GetAnimIndex(m_hObject, "corpse_chest2");
++    m_nAnim_CORPSE[8] = pServerDE->GetAnimIndex(m_hObject, "corpse_rchest2");
++    m_nAnim_CORPSE[9] = pServerDE->GetAnimIndex(m_hObject, "corpse_lchest2");
++    m_nAnim_CORPSE[10] = pServerDE->GetAnimIndex(m_hObject, "corpse_lleg2");
++    m_nAnim_CORPSE[11] = pServerDE->GetAnimIndex(m_hObject, "corpse_rleg2");
++
++    m_nAnim_LIMB[0] = pServerDE->GetAnimIndex(m_hObject, "limb_head");
++    m_nAnim_LIMB[1] = pServerDE->GetAnimIndex(m_hObject, "limb_arm");
++    m_nAnim_LIMB[2] = pServerDE->GetAnimIndex(m_hObject, "limb_leg");
++
++    m_nAnim_SPECIAL[0] = pServerDE->GetAnimIndex(m_hObject, "special1");
++    m_nAnim_SPECIAL[1] = pServerDE->GetAnimIndex(m_hObject, "special2");
++    m_nAnim_SPECIAL[2] = pServerDE->GetAnimIndex(m_hObject, "special3");
++    m_nAnim_SPECIAL[3] = pServerDE->GetAnimIndex(m_hObject, "special4");
++    m_nAnim_SPECIAL[4] = pServerDE->GetAnimIndex(m_hObject, "special5");
++    m_nAnim_SPECIAL[5] = pServerDE->GetAnimIndex(m_hObject, "special6");
++    m_nAnim_SPECIAL[6] = pServerDE->GetAnimIndex(m_hObject, "special7");
++    m_nAnim_SPECIAL[7] = pServerDE->GetAnimIndex(m_hObject, "special8");
++    m_nAnim_SPECIAL[8] = pServerDE->GetAnimIndex(m_hObject, "special9");
++
++    // SCHLEGZ 3/11/98 7:33:27 PM: make sure we have valid and appropriate anims
++    CheckAnims(m_nAnim_IDLE);
++    CheckAnims(m_nAnim_WALK);
++    CheckAnims(m_nAnim_RUN);
++    CheckAnims(m_nAnim_JUMP);
++    CheckAnims(m_nAnim_CROUCH);
++    CheckAnims(m_nAnim_CRAWL);
++    CheckAnims(m_nAnim_SWIM);
++    CheckAnims(m_nAnim_FIRE_STAND);
++    CheckAnims(m_nAnim_FIRE_WALK);
++    CheckAnims(m_nAnim_FIRE_RUN);
++    CheckAnims(m_nAnim_FIRE_JUMP);
++    CheckAnims(m_nAnim_FIRE_CROUCH);
++    CheckAnims(m_nAnim_FIRE_CRAWL);
++    CheckAnims(m_nAnim_RECOIL);
++    CheckAnims(m_nAnim_DEATH);
++    CheckAnims(m_nAnim_CORPSE);
++
++    return true;
++}
++
++bool CAnim_Sound::GenerateHitSpheres(HOBJECT object)
++{
++    m_fHitSpheres = {};
++    hit_nodes_found = {};
++    hit_spheres_valid = false;
++    hit_sphere_error.clear();
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !object)
++    {
++        hit_sphere_error = "Missing model object";
++        return false;
++    }
++    std::array<DVector, NUM_STD_NODES> vNodePos{};
++    DRotation rotation;
++    for (unsigned i = 0; i < NUM_STD_NODES; ++i)
++    {
++        hit_nodes_found[i] = server->GetModelNodeTransform(object, szNodes[i], &vNodePos[i], &rotation);
++        if (!hit_nodes_found[i])
++        {
++            // The source leaves node zero uninitialized on failure. Refuse
++            // that undefined case; later missing nodes still copy the predecessor.
++            if (!i)
++            {
++                hit_sphere_error = "Missing head node; no hit spheres generated";
++                return false;
++            }
++            vNodePos[i] = vNodePos[i - 1];
++            if (hit_sphere_error.empty())
++                hit_sphere_error = "Previous-node fallback: ";
++            else
++                hit_sphere_error += ", ";
++            hit_sphere_error += szNodes[i];
++        }
++    }
++    auto distance = [](DVector a, DVector b) { return std::hypot(a.x - b.x, a.y - b.y, a.z - b.z); };
++    // HEAD/NECK
++    m_fHitSpheres[0] = distance(vNodePos[0], vNodePos[1]) * 0.66f;
++    m_fHitSpheres[1] = m_fHitSpheres[0];
++
++    // TORSO/PELVIS
++    m_fHitSpheres[2] = distance(vNodePos[2], vNodePos[3]) * 0.66f;
++    m_fHitSpheres[3] = m_fHitSpheres[2];
++
++    // R_ARM
++    m_fHitSpheres[4] = distance(vNodePos[4], vNodePos[5]) * 0.66f;
++    m_fHitSpheres[5] = distance(vNodePos[5], vNodePos[6]) * 0.66f;
++    m_fHitSpheres[6] = m_fHitSpheres[5];
++
++    // L_ARM
++    m_fHitSpheres[7] = distance(vNodePos[7], vNodePos[8]) * 0.66f;
++    m_fHitSpheres[8] = distance(vNodePos[8], vNodePos[9]) * 0.66f;
++    m_fHitSpheres[9] = m_fHitSpheres[8];
++
++    // L_LEG
++    m_fHitSpheres[10] = distance(vNodePos[10], vNodePos[11]) * 0.66f;
++    m_fHitSpheres[11] = distance(vNodePos[11], vNodePos[12]) * 0.66f;
++    m_fHitSpheres[12] = distance(vNodePos[12], vNodePos[13]) * 0.66f;
++    m_fHitSpheres[13] = m_fHitSpheres[12];
++
++    // R_LEG
++    m_fHitSpheres[14] = distance(vNodePos[14], vNodePos[15]) * 0.66f;
++    m_fHitSpheres[15] = distance(vNodePos[15], vNodePos[16]) * 0.66f;
++    m_fHitSpheres[16] = distance(vNodePos[16], vNodePos[17]) * 0.66f;
++    m_fHitSpheres[17] = m_fHitSpheres[16];
++
++    hit_spheres_valid = true;
++    return true;
++}
++bool CAnim_Sound::ForceAnimation(HOBJECT object, DDWORD animation)
++{
++    auto* server = BaseClass::GetServerDE();
++    std::string name;
++    if (!server || !server->GetModelAnimationName(object, animation, name))
++        return false;
++    // Preserve the source's intermediate clip zero. Requesting zero while
++    // already on zero does not restart it; this is not ResetModelAnimation.
++    server->SetModelAnimation(object, 0);
++    server->SetModelAnimation(object, animation);
++    return true;
++}
++std::vector<CAnim_Sound::Binding> CAnim_Sound::InspectAnimations() const
++{
++    return {
++        {"m_nAnim_IDLE[0]", m_nAnim_IDLE[0]},
++        {"m_nAnim_IDLE[1]", m_nAnim_IDLE[1]},
++        {"m_nAnim_IDLE[2]", m_nAnim_IDLE[2]},
++        {"m_nAnim_IDLE[3]", m_nAnim_IDLE[3]},
++        {"m_nAnim_TALK[0]", m_nAnim_TALK[0]},
++        {"m_nAnim_TALK[1]", m_nAnim_TALK[1]},
++        {"m_nAnim_TALK[2]", m_nAnim_TALK[2]},
++        {"m_nAnim_TALK[3]", m_nAnim_TALK[3]},
++        {"m_nAnim_TALK[4]", m_nAnim_TALK[4]},
++        {"m_nAnim_WALK[0]", m_nAnim_WALK[0]},
++        {"m_nAnim_WALK[1]", m_nAnim_WALK[1]},
++        {"m_nAnim_WALK[2]", m_nAnim_WALK[2]},
++        {"m_nAnim_WALK[3]", m_nAnim_WALK[3]},
++        {"m_nAnim_WALK[4]", m_nAnim_WALK[4]},
++        {"m_nAnim_WALK[5]", m_nAnim_WALK[5]},
++        {"m_nAnim_WALK[6]", m_nAnim_WALK[6]},
++        {"m_nAnim_WALK[7]", m_nAnim_WALK[7]},
++        {"m_nAnim_WALK[8]", m_nAnim_WALK[8]},
++        {"m_nAnim_WALK_INJURED_RLEG_RIFLE", m_nAnim_WALK_INJURED_RLEG_RIFLE},
++        {"m_nAnim_WALK_INJURED_RLEG_PISTOL", m_nAnim_WALK_INJURED_RLEG_PISTOL},
++        {"m_nAnim_WALK_INJURED_LLEG_RIFLE", m_nAnim_WALK_INJURED_LLEG_RIFLE},
++        {"m_nAnim_WALK_INJURED_LLEG_PISTOL", m_nAnim_WALK_INJURED_LLEG_PISTOL},
++        {"m_nAnim_RUN[0]", m_nAnim_RUN[0]},
++        {"m_nAnim_RUN[1]", m_nAnim_RUN[1]},
++        {"m_nAnim_RUN[2]", m_nAnim_RUN[2]},
++        {"m_nAnim_RUN[3]", m_nAnim_RUN[3]},
++        {"m_nAnim_RUN[4]", m_nAnim_RUN[4]},
++        {"m_nAnim_RUN[5]", m_nAnim_RUN[5]},
++        {"m_nAnim_RUN[6]", m_nAnim_RUN[6]},
++        {"m_nAnim_RUN[7]", m_nAnim_RUN[7]},
++        {"m_nAnim_RUN[8]", m_nAnim_RUN[8]},
++        {"m_nAnim_JUMP[0]", m_nAnim_JUMP[0]},
++        {"m_nAnim_JUMP[1]", m_nAnim_JUMP[1]},
++        {"m_nAnim_JUMP[2]", m_nAnim_JUMP[2]},
++        {"m_nAnim_JUMP[3]", m_nAnim_JUMP[3]},
++        {"m_nAnim_JUMP[4]", m_nAnim_JUMP[4]},
++        {"m_nAnim_JUMP[5]", m_nAnim_JUMP[5]},
++        {"m_nAnim_JUMP[6]", m_nAnim_JUMP[6]},
++        {"m_nAnim_JUMP[7]", m_nAnim_JUMP[7]},
++        {"m_nAnim_JUMP[8]", m_nAnim_JUMP[8]},
++        {"m_nAnim_CROUCH[0]", m_nAnim_CROUCH[0]},
++        {"m_nAnim_CROUCH[1]", m_nAnim_CROUCH[1]},
++        {"m_nAnim_CROUCH[2]", m_nAnim_CROUCH[2]},
++        {"m_nAnim_CROUCH[3]", m_nAnim_CROUCH[3]},
++        {"m_nAnim_CROUCH[4]", m_nAnim_CROUCH[4]},
++        {"m_nAnim_CROUCH[5]", m_nAnim_CROUCH[5]},
++        {"m_nAnim_CROUCH[6]", m_nAnim_CROUCH[6]},
++        {"m_nAnim_CROUCH[7]", m_nAnim_CROUCH[7]},
++        {"m_nAnim_CROUCH[8]", m_nAnim_CROUCH[8]},
++        {"m_nAnim_CRAWL[0]", m_nAnim_CRAWL[0]},
++        {"m_nAnim_CRAWL[1]", m_nAnim_CRAWL[1]},
++        {"m_nAnim_CRAWL[2]", m_nAnim_CRAWL[2]},
++        {"m_nAnim_CRAWL[3]", m_nAnim_CRAWL[3]},
++        {"m_nAnim_CRAWL[4]", m_nAnim_CRAWL[4]},
++        {"m_nAnim_CRAWL[5]", m_nAnim_CRAWL[5]},
++        {"m_nAnim_CRAWL[6]", m_nAnim_CRAWL[6]},
++        {"m_nAnim_CRAWL[7]", m_nAnim_CRAWL[7]},
++        {"m_nAnim_CRAWL[8]", m_nAnim_CRAWL[8]},
++        {"m_nAnim_SWIM[0]", m_nAnim_SWIM[0]},
++        {"m_nAnim_SWIM[1]", m_nAnim_SWIM[1]},
++        {"m_nAnim_SWIM[2]", m_nAnim_SWIM[2]},
++        {"m_nAnim_SWIM[3]", m_nAnim_SWIM[3]},
++        {"m_nAnim_SWIM[4]", m_nAnim_SWIM[4]},
++        {"m_nAnim_SWIM[5]", m_nAnim_SWIM[5]},
++        {"m_nAnim_SWIM[6]", m_nAnim_SWIM[6]},
++        {"m_nAnim_SWIM[7]", m_nAnim_SWIM[7]},
++        {"m_nAnim_SWIM[8]", m_nAnim_SWIM[8]},
++        {"m_nAnim_STRAFERIGHT[0]", m_nAnim_STRAFERIGHT[0]},
++        {"m_nAnim_STRAFERIGHT[1]", m_nAnim_STRAFERIGHT[1]},
++        {"m_nAnim_STRAFERIGHT[2]", m_nAnim_STRAFERIGHT[2]},
++        {"m_nAnim_STRAFERIGHT[3]", m_nAnim_STRAFERIGHT[3]},
++        {"m_nAnim_STRAFERIGHT[4]", m_nAnim_STRAFERIGHT[4]},
++        {"m_nAnim_STRAFERIGHT[5]", m_nAnim_STRAFERIGHT[5]},
++        {"m_nAnim_STRAFERIGHT[6]", m_nAnim_STRAFERIGHT[6]},
++        {"m_nAnim_STRAFERIGHT[7]", m_nAnim_STRAFERIGHT[7]},
++        {"m_nAnim_STRAFERIGHT[8]", m_nAnim_STRAFERIGHT[8]},
++        {"m_nAnim_STRAFELEFT[0]", m_nAnim_STRAFELEFT[0]},
++        {"m_nAnim_STRAFELEFT[1]", m_nAnim_STRAFELEFT[1]},
++        {"m_nAnim_STRAFELEFT[2]", m_nAnim_STRAFELEFT[2]},
++        {"m_nAnim_STRAFELEFT[3]", m_nAnim_STRAFELEFT[3]},
++        {"m_nAnim_STRAFELEFT[4]", m_nAnim_STRAFELEFT[4]},
++        {"m_nAnim_STRAFELEFT[5]", m_nAnim_STRAFELEFT[5]},
++        {"m_nAnim_STRAFELEFT[6]", m_nAnim_STRAFELEFT[6]},
++        {"m_nAnim_STRAFELEFT[7]", m_nAnim_STRAFELEFT[7]},
++        {"m_nAnim_STRAFELEFT[8]", m_nAnim_STRAFELEFT[8]},
++        {"m_nAnim_PICKUP_WEAPON", m_nAnim_PICKUP_WEAPON},
++        {"m_nAnim_SWITCH_WEAPON[0]", m_nAnim_SWITCH_WEAPON[0]},
++        {"m_nAnim_SWITCH_WEAPON[1]", m_nAnim_SWITCH_WEAPON[1]},
++        {"m_nAnim_SWITCH_WEAPON[2]", m_nAnim_SWITCH_WEAPON[2]},
++        {"m_nAnim_FIRE_STAND[0]", m_nAnim_FIRE_STAND[0]},
++        {"m_nAnim_FIRE_STAND[1]", m_nAnim_FIRE_STAND[1]},
++        {"m_nAnim_FIRE_STAND[2]", m_nAnim_FIRE_STAND[2]},
++        {"m_nAnim_FIRE_STAND[3]", m_nAnim_FIRE_STAND[3]},
++        {"m_nAnim_FIRE_STAND[4]", m_nAnim_FIRE_STAND[4]},
++        {"m_nAnim_FIRE_STAND[5]", m_nAnim_FIRE_STAND[5]},
++        {"m_nAnim_FIRE_STAND[6]", m_nAnim_FIRE_STAND[6]},
++        {"m_nAnim_FIRE_STAND[7]", m_nAnim_FIRE_STAND[7]},
++        {"m_nAnim_FIRE_STAND[8]", m_nAnim_FIRE_STAND[8]},
++        {"m_nAnim_FIRE_WALK[0]", m_nAnim_FIRE_WALK[0]},
++        {"m_nAnim_FIRE_WALK[1]", m_nAnim_FIRE_WALK[1]},
++        {"m_nAnim_FIRE_WALK[2]", m_nAnim_FIRE_WALK[2]},
++        {"m_nAnim_FIRE_WALK[3]", m_nAnim_FIRE_WALK[3]},
++        {"m_nAnim_FIRE_WALK[4]", m_nAnim_FIRE_WALK[4]},
++        {"m_nAnim_FIRE_WALK[5]", m_nAnim_FIRE_WALK[5]},
++        {"m_nAnim_FIRE_WALK[6]", m_nAnim_FIRE_WALK[6]},
++        {"m_nAnim_FIRE_WALK[7]", m_nAnim_FIRE_WALK[7]},
++        {"m_nAnim_FIRE_WALK[8]", m_nAnim_FIRE_WALK[8]},
++        {"m_nAnim_FIRE_RUN[0]", m_nAnim_FIRE_RUN[0]},
++        {"m_nAnim_FIRE_RUN[1]", m_nAnim_FIRE_RUN[1]},
++        {"m_nAnim_FIRE_RUN[2]", m_nAnim_FIRE_RUN[2]},
++        {"m_nAnim_FIRE_RUN[3]", m_nAnim_FIRE_RUN[3]},
++        {"m_nAnim_FIRE_RUN[4]", m_nAnim_FIRE_RUN[4]},
++        {"m_nAnim_FIRE_RUN[5]", m_nAnim_FIRE_RUN[5]},
++        {"m_nAnim_FIRE_RUN[6]", m_nAnim_FIRE_RUN[6]},
++        {"m_nAnim_FIRE_RUN[7]", m_nAnim_FIRE_RUN[7]},
++        {"m_nAnim_FIRE_RUN[8]", m_nAnim_FIRE_RUN[8]},
++        {"m_nAnim_FIRE_JUMP[0]", m_nAnim_FIRE_JUMP[0]},
++        {"m_nAnim_FIRE_JUMP[1]", m_nAnim_FIRE_JUMP[1]},
++        {"m_nAnim_FIRE_JUMP[2]", m_nAnim_FIRE_JUMP[2]},
++        {"m_nAnim_FIRE_JUMP[3]", m_nAnim_FIRE_JUMP[3]},
++        {"m_nAnim_FIRE_JUMP[4]", m_nAnim_FIRE_JUMP[4]},
++        {"m_nAnim_FIRE_JUMP[5]", m_nAnim_FIRE_JUMP[5]},
++        {"m_nAnim_FIRE_JUMP[6]", m_nAnim_FIRE_JUMP[6]},
++        {"m_nAnim_FIRE_JUMP[7]", m_nAnim_FIRE_JUMP[7]},
++        {"m_nAnim_FIRE_JUMP[8]", m_nAnim_FIRE_JUMP[8]},
++        {"m_nAnim_FIRE_CROUCH[0]", m_nAnim_FIRE_CROUCH[0]},
++        {"m_nAnim_FIRE_CROUCH[1]", m_nAnim_FIRE_CROUCH[1]},
++        {"m_nAnim_FIRE_CROUCH[2]", m_nAnim_FIRE_CROUCH[2]},
++        {"m_nAnim_FIRE_CROUCH[3]", m_nAnim_FIRE_CROUCH[3]},
++        {"m_nAnim_FIRE_CROUCH[4]", m_nAnim_FIRE_CROUCH[4]},
++        {"m_nAnim_FIRE_CROUCH[5]", m_nAnim_FIRE_CROUCH[5]},
++        {"m_nAnim_FIRE_CROUCH[6]", m_nAnim_FIRE_CROUCH[6]},
++        {"m_nAnim_FIRE_CROUCH[7]", m_nAnim_FIRE_CROUCH[7]},
++        {"m_nAnim_FIRE_CROUCH[8]", m_nAnim_FIRE_CROUCH[8]},
++        {"m_nAnim_FIRE_CRAWL[0]", m_nAnim_FIRE_CRAWL[0]},
++        {"m_nAnim_FIRE_CRAWL[1]", m_nAnim_FIRE_CRAWL[1]},
++        {"m_nAnim_FIRE_CRAWL[2]", m_nAnim_FIRE_CRAWL[2]},
++        {"m_nAnim_FIRE_CRAWL[3]", m_nAnim_FIRE_CRAWL[3]},
++        {"m_nAnim_FIRE_CRAWL[4]", m_nAnim_FIRE_CRAWL[4]},
++        {"m_nAnim_FIRE_CRAWL[5]", m_nAnim_FIRE_CRAWL[5]},
++        {"m_nAnim_FIRE_CRAWL[6]", m_nAnim_FIRE_CRAWL[6]},
++        {"m_nAnim_FIRE_CRAWL[7]", m_nAnim_FIRE_CRAWL[7]},
++        {"m_nAnim_FIRE_CRAWL[8]", m_nAnim_FIRE_CRAWL[8]},
++        {"m_nAnim_FALLING", m_nAnim_FALLING},
++        {"m_nAnim_FALLING_UNCONTROL", m_nAnim_FALLING_UNCONTROL},
++        {"m_nAnim_ROLL_FORWARD", m_nAnim_ROLL_FORWARD},
++        {"m_nAnim_ROLL_RIGHT", m_nAnim_ROLL_RIGHT},
++        {"m_nAnim_ROLL_LEFT", m_nAnim_ROLL_LEFT},
++        {"m_nAnim_ROLL_BACK", m_nAnim_ROLL_BACK},
++        {"m_nAnim_HANDSPRING_FORWARD", m_nAnim_HANDSPRING_FORWARD},
++        {"m_nAnim_HANDSPRING_RIGHT", m_nAnim_HANDSPRING_RIGHT},
++        {"m_nAnim_HANDSPRING_LEFT", m_nAnim_HANDSPRING_LEFT},
++        {"m_nAnim_HANDSPRING_BACK", m_nAnim_HANDSPRING_BACK},
++        {"m_nAnim_FLIP_FORWARD", m_nAnim_FLIP_FORWARD},
++        {"m_nAnim_FLIP_RIGHT", m_nAnim_FLIP_RIGHT},
++        {"m_nAnim_FLIP_LEFT", m_nAnim_FLIP_LEFT},
++        {"m_nAnim_FLIP_BACK", m_nAnim_FLIP_BACK},
++        {"m_nAnim_DODGE_RIGHT", m_nAnim_DODGE_RIGHT},
++        {"m_nAnim_DODGE_LEFT", m_nAnim_DODGE_LEFT},
++        {"m_nAnim_RECOIL[0]", m_nAnim_RECOIL[0]},
++        {"m_nAnim_RECOIL[1]", m_nAnim_RECOIL[1]},
++        {"m_nAnim_RECOIL[2]", m_nAnim_RECOIL[2]},
++        {"m_nAnim_RECOIL[3]", m_nAnim_RECOIL[3]},
++        {"m_nAnim_RECOIL[4]", m_nAnim_RECOIL[4]},
++        {"m_nAnim_RECOIL[5]", m_nAnim_RECOIL[5]},
++        {"m_nAnim_RECOIL[6]", m_nAnim_RECOIL[6]},
++        {"m_nAnim_RECOIL[7]", m_nAnim_RECOIL[7]},
++        {"m_nAnim_RECOIL[8]", m_nAnim_RECOIL[8]},
++        {"m_nAnim_RECOIL[9]", m_nAnim_RECOIL[9]},
++        {"m_nAnim_RECOIL[10]", m_nAnim_RECOIL[10]},
++        {"m_nAnim_RECOIL[11]", m_nAnim_RECOIL[11]},
++        {"m_nAnim_TAUNT[0]", m_nAnim_TAUNT[0]},
++        {"m_nAnim_TAUNT[1]", m_nAnim_TAUNT[1]},
++        {"m_nAnim_TAUNT[2]", m_nAnim_TAUNT[2]},
++        {"m_nAnim_TAUNT[3]", m_nAnim_TAUNT[3]},
++        {"m_nAnim_TAUNT[4]", m_nAnim_TAUNT[4]},
++        {"m_nAnim_TAUNT[5]", m_nAnim_TAUNT[5]},
++        {"m_nAnim_TAUNT[6]", m_nAnim_TAUNT[6]},
++        {"m_nAnim_SPOTPLAYER_RIGHT", m_nAnim_SPOTPLAYER_RIGHT},
++        {"m_nAnim_SPOTPLAYER_LEFT", m_nAnim_SPOTPLAYER_LEFT},
++        {"m_nAnim_SPOTPLAYER_POINT", m_nAnim_SPOTPLAYER_POINT},
++        {"m_nAnim_HUMILIATION[0]", m_nAnim_HUMILIATION[0]},
++        {"m_nAnim_HUMILIATION[1]", m_nAnim_HUMILIATION[1]},
++        {"m_nAnim_HUMILIATION[2]", m_nAnim_HUMILIATION[2]},
++        {"m_nAnim_HUMILIATION[3]", m_nAnim_HUMILIATION[3]},
++        {"m_nAnim_HUMILIATION[4]", m_nAnim_HUMILIATION[4]},
++        {"m_nAnim_HUMILIATION[5]", m_nAnim_HUMILIATION[5]},
++        {"m_nAnim_HUMILIATION[6]", m_nAnim_HUMILIATION[6]},
++        {"m_nAnim_HUMILIATION[7]", m_nAnim_HUMILIATION[7]},
++        {"m_nAnim_HUMILIATION[8]", m_nAnim_HUMILIATION[8]},
++        {"m_nAnim_HUMILIATION[9]", m_nAnim_HUMILIATION[9]},
++        {"m_nAnim_DEATH[0]", m_nAnim_DEATH[0]},
++        {"m_nAnim_DEATH[1]", m_nAnim_DEATH[1]},
++        {"m_nAnim_DEATH[2]", m_nAnim_DEATH[2]},
++        {"m_nAnim_DEATH[3]", m_nAnim_DEATH[3]},
++        {"m_nAnim_DEATH[4]", m_nAnim_DEATH[4]},
++        {"m_nAnim_DEATH[5]", m_nAnim_DEATH[5]},
++        {"m_nAnim_DEATH[6]", m_nAnim_DEATH[6]},
++        {"m_nAnim_DEATH[7]", m_nAnim_DEATH[7]},
++        {"m_nAnim_DEATH[8]", m_nAnim_DEATH[8]},
++        {"m_nAnim_DEATH[9]", m_nAnim_DEATH[9]},
++        {"m_nAnim_DEATH[10]", m_nAnim_DEATH[10]},
++        {"m_nAnim_DEATH[11]", m_nAnim_DEATH[11]},
++        {"m_nAnim_CORPSE[0]", m_nAnim_CORPSE[0]},
++        {"m_nAnim_CORPSE[1]", m_nAnim_CORPSE[1]},
++        {"m_nAnim_CORPSE[2]", m_nAnim_CORPSE[2]},
++        {"m_nAnim_CORPSE[3]", m_nAnim_CORPSE[3]},
++        {"m_nAnim_CORPSE[4]", m_nAnim_CORPSE[4]},
++        {"m_nAnim_CORPSE[5]", m_nAnim_CORPSE[5]},
++        {"m_nAnim_CORPSE[6]", m_nAnim_CORPSE[6]},
++        {"m_nAnim_CORPSE[7]", m_nAnim_CORPSE[7]},
++        {"m_nAnim_CORPSE[8]", m_nAnim_CORPSE[8]},
++        {"m_nAnim_CORPSE[9]", m_nAnim_CORPSE[9]},
++        {"m_nAnim_CORPSE[10]", m_nAnim_CORPSE[10]},
++        {"m_nAnim_CORPSE[11]", m_nAnim_CORPSE[11]},
++        {"m_nAnim_LIMB[0]", m_nAnim_LIMB[0]},
++        {"m_nAnim_LIMB[1]", m_nAnim_LIMB[1]},
++        {"m_nAnim_LIMB[2]", m_nAnim_LIMB[2]},
++        {"m_nAnim_SPECIAL[0]", m_nAnim_SPECIAL[0]},
++        {"m_nAnim_SPECIAL[1]", m_nAnim_SPECIAL[1]},
++        {"m_nAnim_SPECIAL[2]", m_nAnim_SPECIAL[2]},
++        {"m_nAnim_SPECIAL[3]", m_nAnim_SPECIAL[3]},
++        {"m_nAnim_SPECIAL[4]", m_nAnim_SPECIAL[4]},
++        {"m_nAnim_SPECIAL[5]", m_nAnim_SPECIAL[5]},
++        {"m_nAnim_SPECIAL[6]", m_nAnim_SPECIAL[6]},
++        {"m_nAnim_SPECIAL[7]", m_nAnim_SPECIAL[7]},
++        {"m_nAnim_SPECIAL[8]", m_nAnim_SPECIAL[8]},
++    };
++}
+diff --git a/src/game/original/Anim_Sound.h b/src/game/original/Anim_Sound.h
+new file mode 100644
+index 0000000..839288b
+--- /dev/null
++++ b/src/game/original/Anim_Sound.h
+@@ -0,0 +1,77 @@
++#pragma once
++#include "B2BaseClass.h"
++#include <array>
++#include <span>
++#include <string>
++#include <vector>
++
++// Original animation/node subset. Voice helpers and damage localization callers
++// are not yet imported. See CHARACTER_ANIMATION_CONTRACTS.md.
++inline constexpr unsigned NUM_ALL_NODES = 21, NUM_STD_NODES = 18;
++extern const std::array<const char*, NUM_ALL_NODES> szNodes;
++void CheckAnims(std::span<DDWORD>);
++class CAnim_Sound
++{
++  public:
++    bool SetAnimationIndexes(HOBJECT);
++    bool GenerateHitSpheres(HOBJECT);
++    bool ForceAnimation(HOBJECT, DDWORD);
++    struct Binding
++    {
++        const char* field;
++        DDWORD index;
++    };
++    std::vector<Binding> InspectAnimations() const;
++    std::array<float, NUM_STD_NODES> m_fHitSpheres{};
++    std::array<bool, NUM_STD_NODES> hit_nodes_found{};
++    bool hit_spheres_valid = false;
++    std::string hit_sphere_error;
++    DDWORD m_nAnim_IDLE[4]{};
++    DDWORD m_nAnim_TALK[5]{};
++    DDWORD m_nAnim_WALK[9]{};
++    DDWORD m_nAnim_WALK_INJURED_RLEG_RIFLE{};
++    DDWORD m_nAnim_WALK_INJURED_RLEG_PISTOL{};
++    DDWORD m_nAnim_WALK_INJURED_LLEG_RIFLE{};
++    DDWORD m_nAnim_WALK_INJURED_LLEG_PISTOL{};
++    DDWORD m_nAnim_RUN[9]{};
++    DDWORD m_nAnim_JUMP[9]{};
++    DDWORD m_nAnim_CROUCH[9]{};
++    DDWORD m_nAnim_CRAWL[9]{};
++    DDWORD m_nAnim_SWIM[9]{};
++    DDWORD m_nAnim_STRAFERIGHT[9]{};
++    DDWORD m_nAnim_STRAFELEFT[9]{};
++    DDWORD m_nAnim_PICKUP_WEAPON{};
++    DDWORD m_nAnim_SWITCH_WEAPON[3]{};
++    DDWORD m_nAnim_FIRE_STAND[9]{};
++    DDWORD m_nAnim_FIRE_WALK[9]{};
++    DDWORD m_nAnim_FIRE_RUN[9]{};
++    DDWORD m_nAnim_FIRE_JUMP[9]{};
++    DDWORD m_nAnim_FIRE_CROUCH[9]{};
++    DDWORD m_nAnim_FIRE_CRAWL[9]{};
++    DDWORD m_nAnim_FALLING{};
++    DDWORD m_nAnim_FALLING_UNCONTROL{};
++    DDWORD m_nAnim_ROLL_FORWARD{};
++    DDWORD m_nAnim_ROLL_RIGHT{};
++    DDWORD m_nAnim_ROLL_LEFT{};
++    DDWORD m_nAnim_ROLL_BACK{};
++    DDWORD m_nAnim_HANDSPRING_FORWARD{};
++    DDWORD m_nAnim_HANDSPRING_RIGHT{};
++    DDWORD m_nAnim_HANDSPRING_LEFT{};
++    DDWORD m_nAnim_HANDSPRING_BACK{};
++    DDWORD m_nAnim_FLIP_FORWARD{};
++    DDWORD m_nAnim_FLIP_RIGHT{};
++    DDWORD m_nAnim_FLIP_LEFT{};
++    DDWORD m_nAnim_FLIP_BACK{};
++    DDWORD m_nAnim_DODGE_RIGHT{};
++    DDWORD m_nAnim_DODGE_LEFT{};
++    DDWORD m_nAnim_RECOIL[12]{};
++    DDWORD m_nAnim_TAUNT[7]{};
++    DDWORD m_nAnim_SPOTPLAYER_RIGHT{};
++    DDWORD m_nAnim_SPOTPLAYER_LEFT{};
++    DDWORD m_nAnim_SPOTPLAYER_POINT{};
++    DDWORD m_nAnim_HUMILIATION[10]{};
++    DDWORD m_nAnim_DEATH[12]{};
++    DDWORD m_nAnim_CORPSE[12]{};
++    DDWORD m_nAnim_LIMB[3]{};
++    DDWORD m_nAnim_SPECIAL[9]{};
++};
+diff --git a/src/game/original/PlayerLocomotion.cpp b/src/game/original/PlayerLocomotion.cpp
+index 7b6628a..9c889cc 100644
+--- a/src/game/original/PlayerLocomotion.cpp
++++ b/src/game/original/PlayerLocomotion.cpp
+@@ -77,33 +77,57 @@ bool CPlayerObj::UpdateAnim(const PlayerControls& controls)
+             name = move_state == state ? locomotion_clip : (idle_random_() % 2 ? "idle1" : "idle2");
+         }
+         locomotion_requested_clip = name;
+-        auto animation = server->GetAnimIndex(m_hObject, name.c_str());
+-        // Original CAnim_Sound::CheckAnims copies the previous valid weapon
+-        // column. Retail Caleb lacks walk_pistol/jmp_pistol and the knife clips;
+-        // retain the original fallback instead of inventing resource aliases.
+-        if (animation == UINT32_MAX && state == MoveState::Idle)
++        const unsigned column = knife ? 4 : 2;
++        DDWORD animation = UINT32_MAX;
++        switch (state)
+         {
+-            name = "idle1";
+-            animation = server->GetAnimIndex(m_hObject, name.c_str());
+-        }
+-        if (animation == UINT32_MAX && state != MoveState::StrafeLeft && state != MoveState::StrafeRight &&
+-            state != MoveState::Idle)
+-        {
+-            const bool fire = state == MoveState::FireStand || state == MoveState::FireWalk ||
+-                              state == MoveState::FireRun || state == MoveState::FireJump ||
+-                              state == MoveState::FireCrouch || state == MoveState::FireCrawl;
+-            const auto prefix = name.substr(0, name.rfind('_') + 1);
+-            const bool low = state == MoveState::Crouch || state == MoveState::Crawl;
+-            const char* columns[] = {"rifle", fire ? "autorifle" : "rifle", fire || low ? "1pistol" : "pistol",
+-                                     fire  ? "2pistol"
+-                                     : low ? "1pistol"
+-                                           : "pistol"};
+-            for (int column = knife ? 3 : 1; column >= 0 && animation == UINT32_MAX; --column)
+-            {
+-                name = prefix + columns[column];
+-                animation = server->GetAnimIndex(m_hObject, name.c_str());
+-            }
++            case MoveState::Idle:
++                animation = m_Anim_Sound.m_nAnim_IDLE[name == "idle2" ? 1 : 0];
++                break;
++            case MoveState::Walk:
++                animation = m_Anim_Sound.m_nAnim_WALK[column];
++                break;
++            case MoveState::Run:
++                animation = m_Anim_Sound.m_nAnim_RUN[column];
++                break;
++            case MoveState::Jump:
++                animation = m_Anim_Sound.m_nAnim_JUMP[column];
++                break;
++            case MoveState::Crouch:
++                animation = m_Anim_Sound.m_nAnim_CROUCH[column];
++                break;
++            case MoveState::Crawl:
++                animation = m_Anim_Sound.m_nAnim_CRAWL[column];
++                break;
++            case MoveState::StrafeRight:
++                animation = m_Anim_Sound.m_nAnim_STRAFERIGHT[column];
++                break;
++            case MoveState::StrafeLeft:
++                animation = m_Anim_Sound.m_nAnim_STRAFELEFT[column];
++                break;
++            case MoveState::FireStand:
++                animation = m_Anim_Sound.m_nAnim_FIRE_STAND[column];
++                break;
++            case MoveState::FireWalk:
++                animation = m_Anim_Sound.m_nAnim_FIRE_WALK[column];
++                break;
++            case MoveState::FireRun:
++                animation = m_Anim_Sound.m_nAnim_FIRE_RUN[column];
++                break;
++            case MoveState::FireJump:
++                animation = m_Anim_Sound.m_nAnim_FIRE_JUMP[column];
++                break;
++            case MoveState::FireCrouch:
++                animation = m_Anim_Sound.m_nAnim_FIRE_CROUCH[column];
++                break;
++            case MoveState::FireCrawl:
++                animation = m_Anim_Sound.m_nAnim_FIRE_CRAWL[column];
++                break;
++            default:
++                break;
+         }
++        if (!server->GetModelAnimationName(m_hObject, animation, name))
++            animation = UINT32_MAX;
+         DVector dimensions;
+         if (animation == UINT32_MAX || server->GetModelAnimUserDims(m_hObject, &dimensions, animation) != DE_OK)
+         {
+diff --git a/src/game/original/PlayerObj.cpp b/src/game/original/PlayerObj.cpp
+index 532630d..2237b97 100644
+--- a/src/game/original/PlayerObj.cpp
++++ b/src/game/original/PlayerObj.cpp
+@@ -91,7 +91,7 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
+ bool CPlayerObj::SetCharacter(DBYTE character)
+ {
+     // Caleb, default skin only until the other original character branches,
+-    // sound roots and hit-sphere generation are ported. Reject before mutation.
++    // sound roots are ported. Reject before mutation.
+     if (character != 0 || m_nSkin != 0)
+     {
+         entry_error = "Only Caleb's default entry profile is ported";
+@@ -103,6 +103,9 @@ bool CPlayerObj::SetCharacter(DBYTE character)
+         entry_error = "Player model could not be loaded";
+         return false;
+     }
++    if (!m_Anim_Sound.SetAnimationIndexes(m_hObject))
++        return false;
++    m_Anim_Sound.GenerateHitSpheres(m_hObject);
+     m_nCharacter = character;
+     return true;
+ }
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index 3436239..be61fdb 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -1,4 +1,5 @@
+ #pragma once
++#include "Anim_Sound.h"
+ #include "B2BaseClass.h"
+ #include "Destructable.h"
+ #include "InventoryMgr.h"
+@@ -18,6 +19,7 @@ class CBaseCharacter : public B2BaseClass
+     CBaseCharacter();
+     CInventoryMgr m_InventoryMgr;
+     CDestructable m_damage;
++    CAnim_Sound m_Anim_Sound;
+     // Retain unhandled model commands for inspection, never execute them as
+     // though sound/weapon/character animation-key services were available.
+     std::vector<std::string> pending_model_commands;
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 6c7fa45..c8e905f 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -168,6 +168,8 @@ namespace OpenBlood2
+         DRESULT EndMessage(HMESSAGEWRITE) override;
+         DRESULT MoveObject(HOBJECT, DVector*) override;
+         DRESULT GetModelAnimUserDims(HOBJECT, DVector*, HMODELANIM) override;
++        DBOOL GetModelNodeTransform(HOBJECT, const char*, DVector*, DRotation*) override;
++        bool GetModelAnimationName(HOBJECT, HMODELANIM, std::string&) override;
+         DRESULT SetGlobalForce(DVector*) override;
+         DRESULT GetGlobalForce(DVector*) override;
+         DRESULT GetVelocity(HOBJECT, DVector*) override;
+diff --git a/src/game/server_models.cpp b/src/game/server_models.cpp
+index 55cce75..c60afce 100644
+--- a/src/game/server_models.cpp
++++ b/src/game/server_models.cpp
+@@ -84,6 +84,61 @@ namespace OpenBlood2
+         *out = r->model->animations[animation].dimensions;
+         return DE_OK;
+     }
++    DBOOL ServerAdapter::GetModelNodeTransform(HOBJECT object, const char* name, DVector* position, DRotation* rotation)
++    {
++        trace_service("GetModelNodeTransform");
++        const auto* record = objects_.get(object);
++        // InitialUpdate may query the bound model; pending removals may not.
++        if (!record || record->life != Life::Alive || !record->model || record->state.m_ObjectType != OT_MODEL ||
++            !name || !*name || !position || !rotation)
++            return DFALSE;
++        const auto& model = *record->model;
++        auto equal = [](std::string_view a, std::string_view b)
++        {
++            if (a.size() != b.size())
++                return false;
++            for (std::size_t i = 0; i < a.size(); ++i)
++            {
++                auto fold = [](unsigned char c) { return c >= 'A' && c <= 'Z' ? c + ('a' - 'A') : c; };
++                if (fold(a[i]) != fold(b[i]))
++                    return false;
++            }
++            return true;
++        };
++        std::size_t found = model.nodes.size();
++        for (std::size_t i = 0; i < model.nodes.size(); ++i)
++            if (equal(model.nodes[i].name, name))
++            {
++                if (found != model.nodes.size())
++                    return DFALSE; // Ambiguous names never choose an arbitrary node.
++                found = i;
++            }
++        NodePose pose;
++        const auto scale = record->state.m_Scale;
++        if (scale.x <= 0 || scale.y <= 0 || scale.z <= 0 || !physics_vector(scale) ||
++            !sample_node_pose(model, record->animation.animation, record->animation.time, found, pose))
++            return DFALSE;
++        auto transformed =
++            rotate_vector(record->state.m_Rotation,
++                          {pose.position.x * scale.x, pose.position.y * scale.y, pose.position.z * scale.z});
++        transformed.x += record->state.m_Pos.x;
++        transformed.y += record->state.m_Pos.y;
++        transformed.z += record->state.m_Pos.z;
++        if (!physics_vector(transformed))
++            return DFALSE;
++        *position = transformed;
++        *rotation = compose_rotation(record->state.m_Rotation, pose.rotation);
++        return DTRUE;
++    }
++    bool ServerAdapter::GetModelAnimationName(HOBJECT object, HMODELANIM animation, std::string& name)
++    {
++        trace_service("GetModelAnimationName");
++        const auto* record = objects_.get(object);
++        if (!record || record->life != Life::Alive || !record->model || animation >= record->model->animations.size())
++            return false;
++        name = record->model->animations[animation].name;
++        return true;
++    }
+     bool ServerAdapter::advance_models(double seconds)
+     {
+         if (models_advancing_ || objects_.busy())
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 38ded11..2b92a14 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -473,3 +473,22 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --scene-explosions-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/scene-explosions.png")
+     set_tests_properties(gpu.sceneexplosion PROPERTIES LABELS "private;gpu;sceneexplosion" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+ endif()
++
++add_executable(character_animation_tests character_animation_tests.cpp)
++target_link_libraries(character_animation_tests PRIVATE blood2_game)
++blood2_project_options(character_animation_tests)
++foreach(case IN ITEMS mappings humiliation force transforms rejection spheres)
++    add_test(NAME character.${case} COMMAND character_animation_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/character-fixtures/${case}")
++    set_tests_properties(character.${case} PROPERTIES LABELS "headless;character" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case IN ITEMS catalog player)
++        add_test(NAME character.${case} COMMAND character_animation_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(character.${case} PROPERTIES LABELS "headless;character;private" TIMEOUT 60)
++    endforeach()
++    if(BLOOD2_GPU_TESTS)
++        add_test(NAME gpu.character COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++            --data-dir "${BLOOD2_TEST_DATA_DIR}" --skeleton-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/skeleton.png")
++        set_tests_properties(gpu.character PROPERTIES LABELS "gpu;character;private" TIMEOUT 30 RUN_SERIAL TRUE)
++    endif()
++endif()
+diff --git a/tests/character_animation_tests.cpp b/tests/character_animation_tests.cpp
+new file mode 100644
+index 0000000..efae6bb
+--- /dev/null
++++ b/tests/character_animation_tests.cpp
+@@ -0,0 +1,360 @@
++#include "camera_fixture.h"
++#include "game/original/Anim_Sound.h"
++#include "game/server_adapter.h"
++#include "model_fixture.h"
++#include <algorithm>
++#include <cmath>
++#include <functional>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b, float tolerance = .001f)
++    {
++        return std::abs(a - b) < tolerance;
++    }
++    HOBJECT bind(GameSession& game, std::shared_ptr<Model> model)
++    {
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_MODEL;
++        auto object = game.objects.create(game.objects.find_class("BaseClass"), state);
++        if (auto* r = game.objects.get(object))
++            r->model = std::move(model);
++        return object;
++    }
++    std::shared_ptr<Model> fixture()
++    {
++        auto model = std::make_shared<Model>();
++        std::string error;
++        if (!read_model(test_model::abc().b, *model, error))
++            return {};
++        return model;
++    }
++    void clips(Model& model, std::initializer_list<const char*> names)
++    {
++        const auto base = model.animations.front();
++        model.animations.clear();
++        for (auto name : names)
++        {
++            model.animations.push_back(base);
++            model.animations.back().name = name;
++        }
++    }
++    bool mappings(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto m = fixture();
++        CHECK(m);
++        clips(*m, {"idle1", "walk_rifle", "fire_stand_autorifle", "fire_stand_2pistol", "strafe_right_1pistol", "talk2",
++                   "special4", "death_head1"});
++        auto h = bind(g, m);
++        CAnim_Sound a;
++        CHECK(a.SetAnimationIndexes(h));
++        CHECK(a.m_nAnim_IDLE[3] == 0 && a.m_nAnim_WALK[8] == 1);
++        CHECK(a.m_nAnim_FIRE_STAND[0] == UINT32_MAX && a.m_nAnim_FIRE_STAND[1] == 2 && a.m_nAnim_FIRE_STAND[2] == 2);
++        CHECK(a.m_nAnim_FIRE_STAND[4] == 3 && a.m_nAnim_FIRE_STAND[8] == 3);
++        CHECK(a.m_nAnim_TALK[0] == UINT32_MAX && a.m_nAnim_TALK[1] == 5 && a.m_nAnim_TALK[2] == UINT32_MAX);
++        CHECK(a.m_nAnim_SPECIAL[3] == 6 && a.m_nAnim_SPECIAL[4] == UINT32_MAX);
++        CHECK(a.m_nAnim_DEATH[11] == 7 && a.m_nAnim_STRAFELEFT[2] == 4 && a.m_nAnim_STRAFERIGHT[4] == 4);
++        CHECK(a.m_nAnim_STRAFELEFT[5] == 0 && a.m_nAnim_HUMILIATION[9] == 0); // Untouched source constructor slots.
++        CHECK(a.m_nAnim_RUN[8] == UINT32_MAX);                                // No invented clip-zero fallback.
++        DDWORD values[]{UINT32_MAX, 1000, 999, 1001, 2, UINT32_MAX};
++        CheckAnims(values);
++        CHECK(values[0] == UINT32_MAX && values[1] == UINT32_MAX && values[2] == 999 && values[3] == 999 &&
++              values[5] == 2);
++        CHECK(!a.SetAnimationIndexes(nullptr));
++        std::cout << "animation bindings=" << a.InspectAnimations().size() << "\n";
++        return true;
++    }
++    bool humiliation(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto m = fixture();
++        CHECK(m);
++        auto h = bind(g, m);
++        CAnim_Sound a;
++        clips(*m, {"humilation_01", "humilation_02", "humilation_03", "humilation_05", "humiliation_05"});
++        CHECK(a.SetAnimationIndexes(h));
++        CHECK(a.m_nAnim_HUMILIATION[0] == 0 && a.m_nAnim_HUMILIATION[1] == 1 && a.m_nAnim_HUMILIATION[2] == 2 &&
++              a.m_nAnim_HUMILIATION[3] == 4);
++        clips(*m, {"humiliation_01", "humiliation_03", "humiliation_05"});
++        CHECK(a.SetAnimationIndexes(h));
++        CHECK(a.m_nAnim_HUMILIATION[1] == 0 && a.m_nAnim_HUMILIATION[3] == 2);
++        clips(*m, {"humiliation_01", "humiliation_04", "humiliation_05"});
++        CHECK(a.SetAnimationIndexes(h));
++        CHECK(a.m_nAnim_HUMILIATION[3] == 1);
++        clips(*m, {"humilation_05"});
++        CHECK(a.SetAnimationIndexes(h));
++        CHECK(a.m_nAnim_HUMILIATION[3] == 0);
++        return true;
++    }
++    bool force(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto m = fixture();
++        CHECK(m);
++        auto h = bind(g, m);
++        auto* r = g.objects.get(h);
++        CAnim_Sound a;
++        r->animation.time = 40;
++        const auto first = r->animation.revision;
++        CHECK(a.ForceAnimation(h, 0) && r->animation.time == 40 && r->animation.revision == first);
++        CHECK(a.ForceAnimation(h, 1));
++        r->animation.time = 20;
++        const auto before = r->animation.revision;
++        CHECK(a.ForceAnimation(h, 1) && r->animation.time == 0 && r->animation.revision == before + 2);
++        CHECK(!a.ForceAnimation(h, UINT32_MAX) && r->animation.revision == before + 2);
++        CHECK(g.objects.remove(h) && !a.ForceAnimation(h, 0) && !a.SetAnimationIndexes(h));
++        return true;
++    }
++    bool transforms(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto m = fixture();
++        CHECK(m);
++        auto h = bind(g, m);
++        auto* r = g.objects.get(h);
++        // Root rotates +90 around Z, child translates along its rotated local Y.
++        for (auto& frame : m->animations[0].nodes[0].frames)
++            frame.rotation = {{0, 0, std::sqrt(.5f)}, std::sqrt(.5f)};
++        r->animation.time = 25;
++        r->state.m_Pos = {100, 200, 300};
++        r->state.m_Scale = {2, 3, 4};
++        r->state.m_Rotation = {{0, std::sqrt(.5f), 0}, std::sqrt(.5f)};
++        DVector p{9, 9, 9};
++        DRotation q;
++        CHECK(g.server.GetModelNodeTransform(h, "HAND", &p, &q));
++        CHECK(near(p.x, 100) && near(p.y, 200) && near(p.z, 294)); // local root 5 minus child 2, scaled X=6, yaw -> -Z.
++        auto axis = rotate_vector(q, {1, 0, 0});
++        CHECK(near(axis.x, 0) && near(axis.y, 1) && near(axis.z, 0));
++        std::vector<NodePose> all;
++        NodePose one;
++        for (double ms : {0., 25., 50., 99., 100., 1000.})
++        {
++            CHECK(sample_pose(*m, 0, ms, all));
++            for (size_t i = 0; i < m->nodes.size(); ++i)
++            {
++                CHECK(sample_node_pose(*m, 0, ms, i, one));
++                CHECK(near(one.position.x, all[i].position.x) && near(one.position.y, all[i].position.y));
++            }
++        }
++        const auto revision = r->animation.revision;
++        r->activity = OBJSTATE_INACTIVE;
++        CHECK(g.server.GetModelNodeTransform(h, "hand", &p, &q) && r->animation.revision == revision &&
++              r->animation.time == 25);
++        CHECK(g.server.ResetModelAnimation(h) == DE_OK && g.server.GetModelNodeTransform(h, "hand", &p, &q) &&
++              near(p.z, 304));
++        return true;
++    }
++    bool rejection(const std::filesystem::path&)
++    {
++        for (float magnitude :
++             {1e-5f, std::numeric_limits<float>::denorm_min(), 101.f, 1e20f, std::numeric_limits<float>::max()})
++        {
++            Model model;
++            std::string error;
++            NodePose pose;
++            CHECK(read_model(test_model::abc(false, false, magnitude).b, model, error));
++            CHECK(sample_node_pose(model, 0, 25, 1, pose) && near(pose.rotation.m_Spin, 1));
++        }
++        for (float magnitude : {0.f, std::numeric_limits<float>::infinity(), std::numeric_limits<float>::quiet_NaN()})
++        {
++            Model model;
++            std::string error;
++            CHECK(!read_model(test_model::abc(false, false, magnitude).b, model, error) && model.nodes.empty());
++        }
++
++        GameSession g;
++        CHECK(g.initialize());
++        auto m = fixture();
++        CHECK(m);
++        auto h = bind(g, m);
++        auto* r = g.objects.get(h);
++        DVector p{1, 2, 3};
++        DRotation q{{.1f, .2f, .3f}, .4f};
++        CHECK(!g.server.GetModelNodeTransform(h, "absent", &p, &q) && p.x == 1 && q.m_Spin == .4f);
++        CHECK(!g.server.GetModelNodeTransform(h, nullptr, &p, &q));
++        CHECK(!g.server.GetModelNodeTransform(h, "hand", nullptr, &q));
++        CHECK(!g.server.GetModelNodeTransform(h, "hand", &p, nullptr));
++        m->nodes[0].name = "HAND";
++        CHECK(!g.server.GetModelNodeTransform(h, "hand", &p, &q));
++        m->nodes[0].name = "root";
++        r->animation.time = std::numeric_limits<double>::infinity();
++        CHECK(!g.server.GetModelNodeTransform(h, "hand", &p, &q));
++        r->animation.time = 0;
++        r->state.m_Scale = {-1, 1, 1};
++        CHECK(!g.server.GetModelNodeTransform(h, "hand", &p, &q));
++        r->state.m_Scale = {1, 1, 1};
++        r->state.m_Pos = {0, 1e7f, 0};
++        CHECK(!g.server.GetModelNodeTransform(h, "hand", &p, &q));
++        r->state.m_Pos = {};
++        NodePose pose;
++        m->nodes[1].parent = 1;
++        CHECK(!sample_node_pose(*m, 0, 0, 1, pose));
++        m->nodes[1].parent = 0;
++        const auto old_id = r->id;
++        CHECK(g.objects.remove(h) && !g.server.GetModelNodeTransform(h, "hand", &p, &q));
++        CHECK(g.objects.finish_frame() && !g.objects.get(old_id));
++        auto newer = bind(g, fixture());
++        CHECK(newer != h);
++        CHECK(!g.server.GetModelNodeTransform(h, "hand", &p, &q));
++        CHECK(g.unload_world() && !g.server.GetModelNodeTransform(newer, "hand", &p, &q));
++        return true;
++    }
++    bool spheres(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto m = fixture();
++        CHECK(m);
++        const auto node = m->nodes.front();
++        const auto track = m->animations[0].nodes[0];
++        m->nodes.clear();
++        for (auto& a : m->animations)
++            a.nodes.clear();
++        for (unsigned i = 0; i < NUM_STD_NODES; ++i)
++        {
++            m->nodes.push_back(node);
++            auto& n = m->nodes.back();
++            n.name = szNodes[i];
++            n.parent = -1;
++            n.index = i;
++            for (auto& a : m->animations)
++            {
++                a.nodes.push_back(track);
++                for (auto& f : a.nodes.back().frames)
++                    f.position = {float(i * i), 0, 0};
++            }
++        }
++        auto h = bind(g, m);
++        CAnim_Sound a;
++        CHECK(a.GenerateHitSpheres(h));
++        const float expected[]{1, 1, 5, 5, 9, 11, 11, 15, 17, 17, 21, 23, 25, 25, 29, 31, 33, 33};
++        for (unsigned i = 0; i < NUM_STD_NODES; ++i)
++            CHECK(a.hit_nodes_found[i] && near(a.m_fHitSpheres[i], expected[i] * .66f));
++        m->nodes[5].name = "missing";
++        CHECK(a.GenerateHitSpheres(h) && !a.hit_nodes_found[5]);
++        CHECK(a.m_fHitSpheres[4] == 0 && near(a.m_fHitSpheres[5], 20 * .66f) && !a.hit_sphere_error.empty());
++        m->nodes[0].name = "missing-head";
++        CHECK(!a.GenerateHitSpheres(h) && !a.hit_spheres_valid);
++        for (float radius : a.m_fHitSpheres)
++            CHECK(radius == 0);
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string error;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        CHECK(g.resources.mount_game(config, error));
++        const char* paths[]{"models/characters/caleb.abc",    "models/enemies/m_civilian1.abc",
++                            "models/enemies/f_civilian1.abc", "models/enemies/labtech.abc",
++                            "models/enemies/m_cultist1.abc",  "models/enemies/f_cultist1.abc",
++                            "models/enemies/gideon.abc"};
++        for (const auto* path : paths)
++        {
++            ObjectCreateStruct state;
++            state.m_ObjectType = OT_MODEL;
++            SAFE_STRCPY(state.m_Filename, path);
++            const auto h = g.objects.create(g.objects.find_class("BaseClass"), state);
++            auto* r = g.objects.get(h);
++            if (r && !r->model)
++                std::cerr << r->state.m_Filename << ": " << r->model_error << "\n";
++            CHECK(r && r->model);
++            CAnim_Sound a;
++            CHECK(a.SetAnimationIndexes(h) && a.GenerateHitSpheres(h));
++            const auto bindings = a.InspectAnimations();
++            size_t missing = 0, queries = 0;
++            for (auto b : bindings)
++                missing += b.index == UINT32_MAX;
++            for (std::uint32_t clip = 0; clip < r->model->animations.size(); ++clip)
++            {
++                g.server.SetModelAnimation(h, clip);
++                r->animation.time = r->model->animations[clip].duration * .5;
++                std::vector<NodePose> pose;
++                CHECK(sample_pose(*r->model, clip, r->animation.time, pose));
++                for (size_t i = 0; i < r->model->nodes.size(); ++i)
++                {
++                    DVector pos;
++                    DRotation rotation;
++                    CHECK(g.server.GetModelNodeTransform(h, r->model->nodes[i].name.c_str(), &pos, &rotation));
++                    CHECK(near(pos.x, pose[i].position.x, .01f) && near(pos.y, pose[i].position.y, .01f) &&
++                          near(pos.z, pose[i].position.z, .01f));
++                    ++queries;
++                }
++            }
++            std::cout << path << " clips=" << r->model->animations.size() << " nodes=" << r->model->nodes.size()
++                      << " queries=" << queries << " missing_bindings=" << missing << " found_standard_nodes="
++                      << std::count(a.hit_nodes_found.begin(), a.hit_nodes_found.end(), true)
++                      << " head_radius=" << a.m_fHitSpheres[0] << " missing_nodes=";
++            for (unsigned i = 0; i < NUM_STD_NODES; ++i)
++                if (!a.hit_nodes_found[i])
++                    std::cout << szNodes[i] << ',';
++            std::cout << "\n";
++            CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        }
++        return true;
++    }
++    bool player(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string error;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        CHECK(g.resources.mount_game(config, error));
++        HOBJECT previous = nullptr;
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            CHECK(test_camera::complete_subway_intro(g));
++            auto* p = g.server_shell.Player(g.local_client);
++            CHECK(p && p->m_hObject != previous && p->m_Anim_Sound.hit_spheres_valid);
++            CHECK(p->m_Anim_Sound.m_nAnim_WALK[2] == g.server.GetAnimIndex(p->m_hObject, "walk_rifle"));
++            auto* r = g.objects.get(p->m_hObject);
++            if (r && !r->model)
++                std::cerr << r->state.m_Filename << ": " << r->model_error << "\n";
++            CHECK(r && r->model);
++            DVector initial, after;
++            DRotation q;
++            CHECK(g.server.GetModelNodeTransform(p->m_hObject, "head", &initial, &q));
++            g.client_shell.movement_input.forward = true;
++            for (unsigned i = 0; i < 12; ++i)
++                CHECK(g.step(1. / 60));
++            CHECK(p->locomotion_clip == "walk_rifle" &&
++                  g.server.GetModelNodeTransform(p->m_hObject, "head", &after, &q));
++            CHECK(std::hypot(after.x - initial.x, after.y - initial.y, after.z - initial.z) > 1);
++            previous = p->m_hObject;
++            CHECK(g.leave_player() && !g.server.GetModelNodeTransform(previous, "head", &after, &q));
++            CHECK(g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);
++        }
++        std::cout << "Two real shell/player cycles: original tables, current world node transforms, cleanup verified\n";
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"mappings", mappings},   {"humiliation", humiliation}, {"force", force},     {"transforms", transforms},
++        {"rejection", rejection}, {"spheres", spheres},         {"catalog", catalog}, {"player", player}};
++    auto i = cases.find(argv[1]);
++    return i != cases.end() && i->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/locomotion_tests.cpp b/tests/locomotion_tests.cpp
+index 656d2f2..4341a0a 100644
+--- a/tests/locomotion_tests.cpp
++++ b/tests/locomotion_tests.cpp
+@@ -217,6 +217,7 @@ namespace
+         model->animations[animation_index(*model, "run_knife1")].name = "absent";
+         model->animations[animation_index(*model, "run_pistol")].name = "absent2";
+         r->model = model;
++        CHECK(p->m_Anim_Sound.SetAnimationIndexes(p->m_hObject));
+         c.weapon_input = {};
+         c.movement_input.crouch = false;
+         c.movement_input.run = true;
+diff --git a/tests/model_fixture.h b/tests/model_fixture.h
+index 70807d7..dddc285 100644
+--- a/tests/model_fixture.h
++++ b/tests/model_fixture.h
+@@ -51,7 +51,7 @@ namespace test_model
+             patch(at, last ? UINT32_MAX : static_cast<std::uint32_t>(b.size()));
+         }
+     };
+-    inline Writer abc(bool weapon = false, bool character = false)
++    inline Writer abc(bool weapon = false, bool character = false, float quaternion_w = 2)
+     {
+         Writer file, header, g, n, a, d;
+         header.str("MonolithExport Model File v6");
+@@ -154,7 +154,7 @@ namespace test_model
+                 {
+                     a.vec(node ? 0 : static_cast<float>(f * 10), node ? 2 : 0, 0);
+                     a.vec();
+-                    a.real(2);
++                    a.real(quaternion_w);
+                 }
+                 if (node)
+                 {

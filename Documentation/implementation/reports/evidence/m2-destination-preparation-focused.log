@@ -1,0 +1,18 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 25: world.destination_messages
+1/4 Test #25: world.destination_messages .......   Passed    0.00 sec
+    Start 26: world.destination_schema
+2/4 Test #26: world.destination_schema .........   Passed    0.00 sec
+    Start 27: world.destination_lifetime
+3/4 Test #27: world.destination_lifetime .......   Passed    0.01 sec
+    Start 40: world.destination_private
+4/4 Test #40: world.destination_private ........   Passed    2.33 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+headless    =   2.35 sec*proc (4 tests)
+private     =   2.33 sec*proc (1 test)
+world       =   2.35 sec*proc (4 tests)
+
+Total Test time (real) =   2.36 sec

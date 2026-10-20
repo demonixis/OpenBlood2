@@ -1,0 +1,24 @@
+[0/2] Re-checking globbed directories...
+[1/38] Scanning /home/yann/projects/lithtech/Blood2/src/engine/dls_sampler.cpp for CXX dependencies
+[2/38] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[3/10] Scanning /home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp for CXX dependencies
+[4/10] Generating CXX dyndep file tests/CMakeFiles/dls_sampler_tests.dir/CXX.dd
+[5/10] Building CXX object CMakeFiles/engine.dir/src/engine/dls_sampler.cpp.o
+[6/10] Linking CXX static library libengine.a
+[7/10] Building CXX object tests/CMakeFiles/dls_sampler_tests.dir/dls_sampler_tests.cpp.o
+FAILED: [code=1] tests/CMakeFiles/dls_sampler_tests.dir/dls_sampler_tests.cpp.o 
+/usr/bin/c++  -I/home/yann/projects/lithtech/Blood2/src -I/home/yann/projects/lithtech/Blood2/src/game/legacy -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/sdl3-build/include-revision -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/sdl3-src/include -g -std=c++20 -Wall -Wextra -Wpedantic -MD -MT tests/CMakeFiles/dls_sampler_tests.dir/dls_sampler_tests.cpp.o -MF tests/CMakeFiles/dls_sampler_tests.dir/dls_sampler_tests.cpp.o.d -fmodules-ts -fmodule-mapper=tests/CMakeFiles/dls_sampler_tests.dir/dls_sampler_tests.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o tests/CMakeFiles/dls_sampler_tests.dir/dls_sampler_tests.cpp.o -c /home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp
+/home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp: In function ‘bool {anonymous}::pcm()’:
+/home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp:79:85: error: expected ‘;’ before ‘)’ token
+   79 |               near(out[3], out[2] * std::sqrt((64.0/127 - .5)/(1-(64.0/127 - .5))))));
+      |                                                                                     ^
+/home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp:79:85: error: expected primary-expression before ‘)’ token
+/home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp: In function ‘bool {anonymous}::lifetime()’:
+/home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp:206:9: error: ‘GameSession’ was not declared in this scope
+  206 |         GameSession world;
+      |         ^~~~~~~~~~~
+/home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp:207:23: error: ‘world’ was not declared in this scope
+  207 |         auto& mixer = world.server.audio;
+      |                       ^~~~~
+[8/10] Linking CXX executable blood2
+ninja: build stopped: subcommand failed.

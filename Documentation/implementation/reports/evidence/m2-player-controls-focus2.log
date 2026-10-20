@@ -1,0 +1,24 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start  70: gpu.weapons
+1/6 Test  #70: gpu.weapons ......................   Passed   21.99 sec
+    Start 620: player_controls.keys
+2/6 Test #620: player_controls.keys .............   Passed    0.00 sec
+    Start 621: player_controls.mouse
+3/6 Test #621: player_controls.mouse ............   Passed    0.00 sec
+    Start 622: player_controls.gates
+4/6 Test #622: player_controls.gates ............   Passed    0.00 sec
+    Start 623: player_controls.private
+5/6 Test #623: player_controls.private ..........   Passed    4.73 sec
+    Start 624: gpu.player_controls
+6/6 Test #624: gpu.player_controls ..............   Passed    5.75 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+gpu                =  27.74 sec*proc (2 tests)
+headless           =   4.74 sec*proc (4 tests)
+player_controls    =  10.49 sec*proc (5 tests)
+private            =  32.47 sec*proc (3 tests)
+weapons            =  21.99 sec*proc (1 test)
+
+Total Test time (real) =  32.49 sec

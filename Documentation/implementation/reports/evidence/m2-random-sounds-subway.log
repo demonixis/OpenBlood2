@@ -1,0 +1,18 @@
+234/235 Testing: randomsound.subway
+234/235 Test: randomsound.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/random_sound_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"randomsound.subway" start time: Oct 16 01:58 CEST
+Output:
+----------------------------------------------------------
+cycle=0 name=RandomSoundFX0 sound=sounds\ambient\subway3.wav
+cycle=0 name=RandomSoundFX0 sound=sounds\events\tavoice5.wav
+cycle=1 name=RandomSoundFX0 sound=sounds\ambient\subway3.wav
+cycle=1 name=RandomSoundFX0 sound=sounds\events\tavoice5.wav
+<end of output>
+Test time =   0.58 sec
+----------------------------------------------------------
+Test Passed.
+"randomsound.subway" end time: Oct 16 01:58 CEST
+"randomsound.subway" time elapsed: 00:00:00
+----------------------------------------------------------

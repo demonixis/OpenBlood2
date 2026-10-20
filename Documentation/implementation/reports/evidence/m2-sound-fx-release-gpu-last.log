@@ -1,0 +1,176 @@
+Start testing: Oct 17 05:34 CEST
+----------------------------------------------------------
+25/725 Testing: gpu.lifecycle
+25/725 Test: gpu.lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/release/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--gpu-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/gpu.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.lifecycle" start time: Oct 17 05:34 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/gpu.png
+[info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+[info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+<end of output>
+Test time =   1.52 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.lifecycle" end time: Oct 17 05:34 CEST
+"gpu.lifecycle" time elapsed: 00:00:01
+----------------------------------------------------------
+
+187/725 Testing: gpu.objectives
+187/725 Test: gpu.objectives
+Command: "/home/yann/projects/lithtech/Blood2/build/release/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--objectives-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/objectives.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.objectives" start time: Oct 17 05:34 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/objectives.png
+[info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+[info] Session playback: waiting=0 time=4.483333333333323 npc-ready=16 npc-failed=0 npc-updates=112
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; ExitTrigger NEW_LEVEL refusal preserves player/inventory; read-only CityHub preparation checks 1026 entries; temporary CityHub initialization/kept-player entry, cleanup and source restoration checked
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   1.74 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.objectives" end time: Oct 17 05:34 CEST
+"gpu.objectives" time elapsed: 00:00:01
+----------------------------------------------------------
+
+236/725 Testing: gpu.cinematics
+236/725 Test: gpu.cinematics
+Command: "/home/yann/projects/lithtech/Blood2/build/release/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--cinematics-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/cinematics.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.cinematics" start time: Oct 17 05:34 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/cinematics.png
+[info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] CINEMATICS smoke: original cue and decoded samples submitted to SDL stream with hidden UI and reload; dry output only
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   1.70 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.cinematics" end time: Oct 17 05:34 CEST
+"gpu.cinematics" time elapsed: 00:00:01
+----------------------------------------------------------
+
+246/725 Testing: gpu.randomsound
+246/725 Test: gpu.randomsound
+Command: "/home/yann/projects/lithtech/Blood2/build/release/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--random-sounds-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/random-sounds.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.randomsound" start time: Oct 17 05:34 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/random-sounds.png
+[info] Shutdown: frames=240, UI frames=0, hidden frames=240, toggles=0, resize=true, quit=true
+[info] Session playback: waiting=0 time=4.016666666666658 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] RANDOM SOUNDS smoke: authored emitter starts original ON, fixed-position decoded voice and SDL output verified with hidden UI and reload; dry output only
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =  12.52 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.randomsound" end time: Oct 17 05:34 CEST
+"gpu.randomsound" time elapsed: 00:00:12
+----------------------------------------------------------
+
+255/725 Testing: gpu.sound
+255/725 Test: gpu.sound
+Command: "/home/yann/projects/lithtech/Blood2/build/release/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--world-sounds-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-sounds.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.sound" start time: Oct 17 05:34 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/world-sounds.png
+[info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] WORLD SOUNDS smoke: four authored loops survive consumed Sound objects, advance with hidden UI and reload; SDL PCM submission verified
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   1.72 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.sound" end time: Oct 17 05:34 CEST
+"gpu.sound" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 17 05:34 CEST
+
+cinematics =   1.70 sec*proc
+
+gpu =  19.19 sec*proc
+
+objectives =   1.74 sec*proc
+
+private =  17.67 sec*proc
+
+randomsound =  12.52 sec*proc
+
+sound =   1.72 sec*proc
+

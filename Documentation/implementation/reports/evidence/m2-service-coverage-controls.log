@@ -1,0 +1,10 @@
+unchanged source fixture exit= 0 
+Catalog: 171 interface services / 174 trace boundaries
+
+undeclared catalogue extension exit= 1 
+48: listed == declared
+
+missing service instrumentation exit= 1 
+59: traced == listed
+
+Controls changed only temporary source fixtures; active repositories were not edited.

@@ -1,0 +1,1202 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 183345f..192c91a 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -380,3 +380,10 @@ Preserve raw ammo after weapon recreation, selected-slot order, keep-alive key
+ removal, transient reset and checked staged ownership. Load refuses associated
+ clients; snapshots are inventory only. Player/damage fields, restored client
+ association and safe destination entry remain pending; NEW_LEVEL and M2 stay open.
++
++The [damage preservation continuation](../Documentation/Implementation/M2_DAMAGE_STATE.md) connects original CDestructable
++Save/Load values and death-health/delay/nigh-invulnerability rules. Read [contracts](docs/DAMAGE_STATE_CONTRACTS.md).
++Preserve CanDamage's million-HP sentinel, separate signed death health, remaining
++duration/overshoot, character-only modifier and destination/list ownership. The
++legacy location byte is initialized to zero, not inferred from hit nodes. Captures
++are aggregate-only; full player/client/destination transfer and M2 remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8a70264..36ba66c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -51,7 +51,7 @@ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original
+     src/game/original/InventoryMgr.cpp src/game/original/InventorySave.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+ target_link_libraries(blood2_game PUBLIC engine)
+ 
+-target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
++target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableSave.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+ add_executable(blood2_app src/app/path_manager_smoke.cpp src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/model_scene.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
+diff --git a/README.md b/README.md
+index 5e371b6..89cc737 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,11 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++Latest preservation continuation: [original damage Save/Load](../Documentation/Implementation/M2_DAMAGE_STATE.md)
++adds owned health/armor/death state and original death-delay/nigh-invulnerability
++rules. Exit inspection now captures inventory and damage separately; full player
++restoration, client association and safe destination entry remain pending.
++**NEW_LEVEL is still refused and M2 remains incomplete.**
++
+ Latest inventory continuation: [original Save/Load subset](../Documentation/Implementation/M2_INVENTORY_STATE.md).
+ Exit requests now capture owned inventory state; original keep-alive restoration
+ removes keys and recreates weapons. Full player preservation/client association
+diff --git a/docs/BRUSH_CONTRACTS.md b/docs/BRUSH_CONTRACTS.md
+index 2f066b8..a347188 100644
+--- a/docs/BRUSH_CONTRACTS.md
++++ b/docs/BRUSH_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Rotating and destructible world-model brushes
+ 
++> Continued by [damage state contracts](DAMAGE_STATE_CONTRACTS.md): original damage
++> Save/Load values and death counter/delay/nigh-invulnerability now execute.
++> Earlier blanket damage-save omissions are historical. Whole player restoration
++> and safe level transfer remain unavailable; M2 stays open.
++
+ > Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
+ > pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
+ 
+diff --git a/docs/DAMAGE_STATE_CONTRACTS.md b/docs/DAMAGE_STATE_CONTRACTS.md
+new file mode 100644
+index 0000000..19da0e1
+--- /dev/null
++++ b/docs/DAMAGE_STATE_CONTRACTS.md
+@@ -0,0 +1,76 @@
++# Original CDestructable state preservation
++
++Original CDestructable Save/Load value fields now have an owned typed
++`DestructableState`: health/armor and their four caps, mass/resistance, death health,
++raw dead flag, remaining death delay, nigh-invulnerability, god/trigger-only and
++physics flags, last reaction type/location/direction/accumulators, trigger strings
++and destruction spawn/velocity. This is aggregate state, **not a complete player
++checkpoint, retail save format or level transfer**. See [source ledger](M2_DAMAGE_STATE_SOURCES.json)
++and [validation](../../Documentation/Implementation/M2_DAMAGE_STATE.md).
++
++## Source rules
++
++- Save writes health 1,000,000 when CanDamage is false. Load infers CanDamage from
++  `health < 1,000,000`, retaining the raw saved health. This also means exactly
++  1,000,000 supplied as ordinary health restores invulnerability. Do not conflate
++  the aggregate's CanDamage with a brush's separate Destructable/removal flag.
++- Load assigns raw values, without pickup grants, maximum-stat clamps or attribute
++  recalculation. Death health is a separate original accumulator: it starts at 1,
++  ordinary post-armor damage subtracts from it, and Death sets it to zero. Heal and
++  MegaHeal synchronize it to the resulting HP. Source SetHitPoints does **not**
++  synchronize it. Negative death health is valid, including before ordinary death.
++- IsDead returns false while the death delay is positive, even with raw dead=true.
++  MID_UPDATE subtracts frame time only while raw dead is true and delay is positive;
++  overshoot below zero is preserved. Load restores the **remaining duration**, with
++  no world-clock offset. Raw-dead damage guards still reject further packets;
++  destruction notifications are not postponed by this getter.
++- The original nigh-invulnerable modifier multiplies ordinary damage by 0.05 for
++  CBaseCharacter owners, after localization and before impulses/armor. It does not
++  apply to generic damage owners, and Death bypasses it. The saved flag and modifier
++  are real; timed powerup collection/expiration and player powerup-array association
++  are not thereby implemented.
++- Last reaction type and saved location are separate from mapped hit node/side.
++  The source location byte is never initialized or written by hit localization in
++  the examined source; this port initializes it to zero rather than saving undefined
++  memory or inventing a node mapping. Raw bytes remain round-trippable.
++
++## Binding, validation and lifetime
++
++The destination must already have a live engine owner. Load retains that owner and
++its inventory binding; it never restores the old source handle. Original intrusive
++list insertion occurs only when the aggregate is unlinked. Repeated Load must not
++duplicate membership, and destruction removes it once. No source object, attacker,
++list node, inventory pointer or resource handle appears in the state value.
++
++Save/Load reject an active damage callback or pending/stale owner. Load also refuses
++an associated player, whose HUD/client state is not yet restored transactionally.
++Save replaces output only after validation. Load validates every field and the
++available SpawnObject grammar/class before changing existing values or list state.
++No creation, triggers, damage delivery or pickup grant is performed by Load.
++
++Health/armor/caps/mass/resistance/accumulators must be finite and nonnegative;
++death health and delay may be signed finite values. Vectors use existing finite
++physics bounds. Unknown damage types and strings over 100 bytes or with embedded
++NUL reject; empty source strings remain valid. Spawn failures preserve existing
++state. Owned strings outlive their source. Last raw damage packet and attacker
++memory are cleared; only the original saved direction/reaction fields are restored.
++The old diagnostic hit-pose report is cleared, not advertised as destination data.
++
++## Inspection and remaining gate
++
++Exit processing captures damage state alongside the previous inventory capture,
++outside callbacks and independently of UI visibility. These are separately labelled
++aggregate snapshots, not an atomic whole-player save. Only an active associated
++player is captured. Failures clear that capture candidate and retain a visible error;
++unload/PreStartWorld clears both records. NEW_LEVEL continues to refuse before
++world/player teardown, regardless of successful aggregate captures.
++
++The Objectives tab shows saved values, source sentinel meaning and missing transfer
++services. Player, NPC and brush inspection show live death health/delay and raw versus
++effective death where applicable. No UI draw mutates state or advances clocks.
++
++Player-owned timers/strings/movement, client saved data/association, engine object
++state and safe named destination entry remain unported for keep-alive. General
++saves, full NPC/brush restoration, other damage modifiers and the previously absent
++MID_UPDATE maximum-stat clamps are not implemented here. Do not treat these value
++snapshots as complete object restoration or M2 acceptance.
+diff --git a/docs/EXIT_CONTRACTS.md b/docs/EXIT_CONTRACTS.md
+index 1c6a887..ce502a6 100644
+--- a/docs/EXIT_CONTRACTS.md
++++ b/docs/EXIT_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original level-exit contracts
+ 
++> Continued by [damage state contracts](DAMAGE_STATE_CONTRACTS.md): original damage
++> Save/Load values and death counter/delay/nigh-invulnerability now execute.
++> Earlier blanket damage-save omissions are historical. Whole player restoration
++> and safe level transfer remain unavailable; M2 stays open.
++
+ > Extended by [inventory state contracts](INVENTORY_STATE_CONTRACTS.md): supported
+ > original inventory Save/Load and exit-time capture now execute. Full player
+ > preservation/association and safe destination entry remain unavailable; NEW_LEVEL
+diff --git a/docs/INVENTORY_STATE_CONTRACTS.md b/docs/INVENTORY_STATE_CONTRACTS.md
+index 6670198..4ad29ab 100644
+--- a/docs/INVENTORY_STATE_CONTRACTS.md
++++ b/docs/INVENTORY_STATE_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original inventory Save/Load subset
+ 
++> Continued by [damage state contracts](DAMAGE_STATE_CONTRACTS.md): original damage
++> Save/Load values and death counter/delay/nigh-invulnerability now execute.
++> Earlier blanket damage-save omissions are historical. Whole player restoration
++> and safe level transfer remain unavailable; M2 stays open.
++
+ This ports the supported fields and ordering of original `CInventoryMgr::Save`
+ and `Load` into an owned typed `InventoryState`. It is an inventory aggregate
+ checkpoint, **not KeepAliveSave/KeepAliveLoad, a player save or a retail save-file
+diff --git a/docs/M2_DAMAGE_STATE_SOURCES.json b/docs/M2_DAMAGE_STATE_SOURCES.json
+new file mode 100644
+index 0000000..298636b
+--- /dev/null
++++ b/docs/M2_DAMAGE_STATE_SOURCES.json
+@@ -0,0 +1,90 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "dbe2ba41570fd377fec217b257f851cabb6f02a0",
++  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
++      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
++      "selected_lines": [
++        [
++          39,
++          95
++        ],
++        [
++          151,
++          195
++        ],
++        [
++          254,
++          301
++        ],
++        [
++          395,
++          438
++        ],
++        [
++          482,
++          620
++        ],
++        [
++          988,
++          1047
++        ],
++        [
++          1134,
++          1245
++        ]
++      ],
++      "use": "Original initialization, properties, saved fields, list ownership, death counter/delay and nigh modifier"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Destructable.h",
++      "sha256": "00e289d9cca1594035c8f20d0d45a076009c765e2767ce545f22f16d33bfea45",
++      "selected_lines": [
++        [
++          60,
++          100
++        ],
++        [
++          153,
++          214
++        ]
++      ],
++      "use": "Setter/IsDead and raw saved field semantics"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
++      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
++      "selected_lines": [
++        [
++          1142,
++          1210
++        ]
++      ],
++      "use": "Active-player keep-alive enumeration; complete transfer remains unavailable"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "selected_lines": [
++        [
++          6541,
++          6865
++        ]
++      ],
++      "use": "Audited remaining player/relative-clock restoration prerequisite, not imported in this increment"
++    }
++  ],
++  "adaptations": [
++    "Owned typed values; destination binding replaces old saved object reference",
++    "Preflight rejects invalid/stale/reentrant/live-client restores before mutation",
++    "Uninitialized legacy last-location byte initialized to zero; no invented hit-node mapping",
++    "Unsaved raw packet, attacker identity and diagnostic pose cleared on Load"
++  ],
++  "remaining": [
++    "Whole player/timer/client/engine-object restoration and destination transition",
++    "General saves, full NPC/brush restore and other damage rules",
++    "Source per-update maximum-stat clamps remain outside the existing bounded update path"
++  ]
++}
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index 665e3da..61da640 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original Player Entry Boundary
+ 
++> Continued by [damage state contracts](DAMAGE_STATE_CONTRACTS.md): original damage
++> Save/Load values and death counter/delay/nigh-invulnerability now execute.
++> Earlier blanket damage-save omissions are historical. Whole player restoration
++> and safe level transfer remain unavailable; M2 stays open.
++
+ > Extended by [inventory state contracts](INVENTORY_STATE_CONTRACTS.md): supported
+ > original inventory Save/Load and exit-time capture now execute. Full player
+ > preservation/association and safe destination entry remain unavailable; NEW_LEVEL
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 93a4c25..b19aec5 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -681,3 +681,13 @@ player inventory is captured at exit, but whole-player keep-alive transfer remai
+ refused. No donor code, dependencies or commercial assets were imported. See
+ [source ledger](M2_INVENTORY_STATE_SOURCES.json), [contracts](INVENTORY_STATE_CONTRACTS.md)
+ and [evidence](../../Documentation/Implementation/M2_INVENTORY_STATE.md).
++
++## Original damage state preservation
++
++Selected CDestructable Save/Load fields, original death counter/delay and character
++nigh-invulnerability modifier are directly ported from the original Blood II source.
++Typed owned snapshots, checked destination binding and preflight replace packet
++reads; the source's uninitialized location byte starts at zero. No donor engine,
++dependency or commercial asset was imported. See [source ledger](M2_DAMAGE_STATE_SOURCES.json),
++[contracts](DAMAGE_STATE_CONTRACTS.md) and
++[evidence](../../Documentation/Implementation/M2_DAMAGE_STATE.md).
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index f1783db..2e73c04 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original Inventory and Vector Weapon Boundary
+ 
++> Continued by [damage state contracts](DAMAGE_STATE_CONTRACTS.md): original damage
++> Save/Load values and death counter/delay/nigh-invulnerability now execute.
++> Earlier blanket damage-save omissions are historical. Whole player restoration
++> and safe level transfer remain unavailable; M2 stays open.
++
+ > Extended by [inventory state contracts](INVENTORY_STATE_CONTRACTS.md): supported
+ > original inventory Save/Load and exit-time capture now execute. Full player
+ > preservation/association and safe destination entry remain unavailable; NEW_LEVEL
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 4e810c3..bd8b448 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -1061,6 +1061,9 @@ namespace OpenBlood2
+                         player->m_InventoryMgr.GetAmmoCount(1));
+             ImGui::Text("Strength %u | Speed %u | Resistance %u | Magic %u", player->m_nAttribStrength,
+                         player->m_nAttribSpeed, player->m_nAttribResistance, player->m_nAttribMagic);
++            ImGui::Text("Death HP %.2f / delay %.3fs / raw dead %d / effective dead %d / nigh-invulnerable %d",
++                        player->m_damage.m_fDeathHitPoints, player->m_damage.m_fDeathDelay, player->m_damage.m_bDead,
++                        player->m_damage.IsDead(), player->m_damage.m_bNighInvulnerable);
+             ImGui::TextWrapped("Model: %s | Skin: %s (decode status in 3D view)", record->state.m_Filename,
+                                record->state.m_SkinName);
+             ImGui::TextWrapped("Requested slot 1: %u. Current slot: %u. Original inventory owns the Beretta/knife; "
+@@ -2095,6 +2098,8 @@ namespace OpenBlood2
+             }
+             ImGui::Text("HP %.1f | dead %s | CanDamage %s", b->m_damage.m_fHitPoints,
+                         b->m_damage.IsDead() ? "yes" : "no", b->m_damage.can_damage ? "yes" : "no");
++            ImGui::Text("Death HP %.2f / delay %.3fs / raw dead %d", b->m_damage.m_fDeathHitPoints,
++                        b->m_damage.m_fDeathDelay, b->m_damage.m_bDead);
+             ImGui::Text("Destructable %s | TriggerDestroyOnly %s", b->destructable ? "yes" : "no",
+                         b->m_damage.trigger_only ? "yes" : "no");
+             ImGui::Text("Collision %s | FireThrough %s", b->box_physics ? "box" : "polygon",
+diff --git a/src/app/inspector_objectives.cpp b/src/app/inspector_objectives.cpp
+index 081da0a..74cb24b 100644
+--- a/src/app/inspector_objectives.cpp
++++ b/src/app/inspector_objectives.cpp
+@@ -49,8 +49,35 @@ namespace OpenBlood2
+                     ImGui::TreePop();
+                 }
+             }
+-            ImGui::TextWrapped("Inventory only: player health/timers, restored client association and destination "
+-                               "entry are not saved or transferred. Current inventory is unchanged.");
++            const auto& damage = game.server_shell.damage_capture;
++            ImGui::Text("Damage capture: %llu / %llu attempts; %s", (unsigned long long)damage.captures,
++                        (unsigned long long)damage.attempts, damage.valid ? "owned snapshot" : "unavailable");
++            if (!damage.error.empty())
++                ImGui::TextWrapped("%s", damage.error.c_str());
++            if (damage.valid)
++            {
++                const auto& d = damage.state;
++                ImGui::Text("Saved HP %.2f / %.2f / mega %.2f; armor %.2f / %.2f / necro %.2f", d.health, d.max_health,
++                            d.max_mega_health, d.armor, d.max_armor, d.max_necro_armor);
++                ImGui::Text("Death HP %.2f / delay %.3fs / raw dead %d / nigh-invulnerable %d", d.death_health,
++                            d.death_delay, d.dead, d.nigh_invulnerable);
++                if (ImGui::TreeNode("Saved damage contents"))
++                {
++                    ImGui::Text("Mass %.2f / resistance %.3f / physics %d / god %d / trigger only %d", d.mass,
++                                d.resistance, d.apply_damage_physics, d.god_mode, d.trigger_only);
++                    ImGui::Text("Last type %u / location byte %u / amount %.2f / fraction %.3f",
++                                static_cast<unsigned>(d.last_type), d.last_location, d.last_amount, d.last_percent);
++                    ImGui::Text("Direction %.2f %.2f %.2f", d.last_direction.x, d.last_direction.y, d.last_direction.z);
++                    ImGui::TextWrapped("Damage %s -> %s / death %s -> %s", d.damage_target.c_str(),
++                                       d.damage_message.c_str(), d.death_target.c_str(), d.death_message.c_str());
++                    ImGui::TextWrapped("Spawn %s / velocity %.2f %.2f %.2f", d.spawn_object.c_str(), d.spawn_velocity.x,
++                                       d.spawn_velocity.y, d.spawn_velocity.z);
++                    ImGui::TextUnformatted("HP >= 1000000 restores CanDamage=false (original sentinel).");
++                    ImGui::TreePop();
++                }
++            }
++            ImGui::TextWrapped("Aggregate snapshots only: full player timers, restored client association and "
++                               "destination entry remain unavailable. Current player/world are unchanged.");
+             for (auto id : game.objects.snapshot())
+             {
+                 const auto* record = game.objects.get(id);
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 3a85046..5081524 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -104,6 +104,9 @@ namespace OpenBlood2
+                         a.m_bHasTargeted ? "yes" : "no", (unsigned long long)a.runtime_target_losses);
+             ImGui::Text("HP %.2f / %.2f | damage factor %.3f", a.m_damage.m_fHitPoints, a.m_damage.m_fMaxHitPoints,
+                         a.m_InventoryMgr.damage_multiplier);
++            ImGui::Text("Death HP %.2f / delay %.3fs / raw dead %d / effective dead %d / nigh-invulnerable %d",
++                        a.m_damage.m_fDeathHitPoints, a.m_damage.m_fDeathDelay, a.m_damage.m_bDead, a.m_damage.IsDead(),
++                        a.m_damage.m_bNighInvulnerable);
+             ImGui::TextWrapped("Activation uses replacement center-ray visibility, not retail PVS. Remaining states "
+                                "may fail explicitly.");
+             if (!a.runtime_error.empty())
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 0756a54..5ed2f6b 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -44,6 +44,7 @@ namespace OpenBlood2
+         const auto received = g.client_shell.world_exit.received;
+         const auto blocked = g.client_shell.world_exit.blocked;
+         const auto captures = g.server_shell.inventory_capture.captures;
++        const auto damage_captures = g.server_shell.damage_capture.captures;
+         unsigned exits = 0;
+         for (auto id : g.objects.snapshot())
+         {
+@@ -78,7 +79,10 @@ namespace OpenBlood2
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+                g.client_shell.world_exit.blocked == blocked + 1 && g.server_shell.inventory_capture.valid &&
+                g.server_shell.inventory_capture.captures == captures + 1 &&
+-               g.server_shell.inventory_capture.state.ammo[1] == old_bullets &&
++               g.server_shell.inventory_capture.state.ammo[1] == old_bullets && g.server_shell.damage_capture.valid &&
++               g.server_shell.damage_capture.captures == damage_captures + 1 &&
++               g.server_shell.damage_capture.state.health == player->m_damage.m_fHitPoints &&
++               g.server_shell.damage_capture.state.armor == player->m_damage.m_fArmorPoints &&
+                g.client_shell.world_exit.error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+diff --git a/src/game/destructable_state.h b/src/game/destructable_state.h
+new file mode 100644
+index 0000000..8af28c7
+--- /dev/null
++++ b/src/game/destructable_state.h
+@@ -0,0 +1,21 @@
++#pragma once
++#include "game/weapon_messages.h"
++#include <string>
++
++namespace OpenBlood2
++{
++    // Original CDestructable Save/Load values; owner identity is deliberately
++    // absent. Load keeps the destination binding, as the original player path did.
++    struct DestructableState
++    {
++        bool apply_damage_physics = false, dead = false, nigh_invulnerable = false;
++        bool god_mode = false, trigger_only = false;
++        float mass = 1, max_health = 1, max_mega_health = 1, health = 1, death_health = 1;
++        float max_armor = 1, max_necro_armor = 1, armor = 0, resistance = 1;
++        DamageType last_type = DamageType::Normal;
++        DBYTE last_location = 0;
++        DVector last_direction{}, spawn_velocity{};
++        float last_amount = 0, last_percent = 0, death_delay = 0;
++        std::string damage_target, damage_message, death_target, death_message, spawn_object;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index 64744e5..b273f77 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -11,6 +11,7 @@ void CBloodServerShell::PreStartWorld()
+     world_started = false;
+     updates = 0;
+     inventory_capture = {};
++    damage_capture = {};
+     // Team setup, active cinematics, voice and multiplayer state are outside
+     // the accepted fresh single-player entry mode.
+ }
+@@ -49,6 +50,26 @@ bool CBloodServerShell::CapturePlayerInventory(HCLIENT client)
+     ++capture.captures;
+     return true;
+ }
++bool CBloodServerShell::CapturePlayerDamage(HCLIENT client)
++{
++    auto& capture = damage_capture;
++    ++capture.attempts;
++    capture.valid = false;
++    capture.state = {};
++    capture.error.clear();
++    const auto* player = Player(client);
++    if (!player || !server_.IsObjectAlive(player->m_hObject) ||
++        server_.GetObjectState(player->m_hObject) != OBJSTATE_ACTIVE)
++    {
++        capture.error = "Damage capture requires an active associated player";
++        return false;
++    }
++    if (!player->m_damage.Save(capture.state, capture.error))
++        return false;
++    capture.valid = true;
++    ++capture.captures;
++    return true;
++}
+ CPlayerObj* CBloodServerShell::CreatePlayer(HCLIENT client)
+ {
+     ObjectCreateStruct state; // Original zero position, identity rotation, no flags.
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index 8b59d59..c041948 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -30,6 +30,14 @@ class CBloodServerShell
+         std::uint64_t attempts = 0, captures = 0;
+         bool valid = false;
+     } inventory_capture; // Inventory only; never a successful KeepAliveSave.
++    bool CapturePlayerDamage(HCLIENT);
++    struct DamageCapture
++    {
++        OpenBlood2::DestructableState state;
++        std::string error;
++        std::uint64_t attempts = 0, captures = 0;
++        bool valid = false;
++    } damage_capture; // Damage aggregate only; not complete player preservation.
+     void SetStartPointName(const std::string& name)
+     {
+         start_point_name = name;
+diff --git a/src/game/original/Destructable.cpp b/src/game/original/Destructable.cpp
+index 1e66da2..1628b6a 100644
+--- a/src/game/original/Destructable.cpp
++++ b/src/game/original/Destructable.cpp
+@@ -104,7 +104,11 @@ DDWORD CDestructable::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* d
+             trigger_only = prop.m_Bool != 0;
+     }
+     if (message == MID_UPDATE)
++    {
+         m_fLastDamageAmount = m_fLastDamagePercent = 0; // Original per-update accumulators.
++        if (m_bDead && m_fDeathDelay > 0)
++            m_fDeathDelay -= BaseClass::GetServerDE()->GetFrameTime();
++    }
+     return Aggregate::EngineMessageFn(owner, message, data, reason);
+ }
+ void CDestructable::SendTrigger(const std::string& target, const std::string& message)
+@@ -157,6 +161,7 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD
+             if (damage.type == OpenBlood2::DamageType::Death)
+             {
+                 m_fArmorPoints = 0;
++                m_fDeathHitPoints = 0;
+                 amount = m_fHitPoints;
+             }
+             else if (ai_hit_localization)
+@@ -176,6 +181,9 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD
+                     m_fHitPoints = 0; // Original Cabal headshot bypasses armor before ordinary absorption.
+                 amount *= hit.multiplier;
+             }
++            if (damage.type != OpenBlood2::DamageType::Death && m_bNighInvulnerable &&
++                dynamic_cast<CBaseCharacter*>(owner))
++                amount *= .05f; // Original character modifier, before impulses and armor.
+             if (apply_damage_physics && damage.type != OpenBlood2::DamageType::Death)
+                 ApplyDamagePhysics(amount, damage.direction);
+             if (m_fArmorPoints > 0 && damage.type != OpenBlood2::DamageType::Suffocate)
+@@ -196,6 +204,8 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD
+             }
+             amount = std::max(amount, 0.0f);
+             m_fHitPoints -= amount;
++            if (damage.type != OpenBlood2::DamageType::Death)
++                m_fDeathHitPoints -= amount;
+             if (damage.type == OpenBlood2::DamageType::Death)
+             {
+                 // Source instant-death branch initializes these before adding the
+@@ -278,6 +288,7 @@ bool CDestructable::Heal(float amount)
+     if (!add_stat(m_fHitPoints, m_fMaxHitPoints, amount))
+         return false;
+     m_bDead = DFALSE;
++    m_fDeathHitPoints = m_fHitPoints;
+     return true;
+ }
+ bool CDestructable::MegaHeal(float amount)
+@@ -285,6 +296,7 @@ bool CDestructable::MegaHeal(float amount)
+     if (!add_stat(m_fHitPoints, m_fMaxMegaHitPoints, amount))
+         return false;
+     m_bDead = DFALSE;
++    m_fDeathHitPoints = m_fHitPoints;
+     return true;
+ }
+ bool CDestructable::AddWard(float amount)
+diff --git a/src/game/original/Destructable.h b/src/game/original/Destructable.h
+index d2013a9..576a2c5 100644
+--- a/src/game/original/Destructable.h
++++ b/src/game/original/Destructable.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ #include "cpp_aggregate_de.h"
+ #include "dlink.h"
++#include "game/destructable_state.h"
+ #include "game/weapon_messages.h"
+ #include <string>
+ class CInventoryMgr;
+@@ -10,6 +11,8 @@ class CDestructable : public Aggregate
+     CDestructable();
+     ~CDestructable() override;
+     DBOOL Init(HOBJECT, CInventoryMgr* = nullptr);
++    bool Save(OpenBlood2::DestructableState&, std::string&) const;
++    bool Load(const OpenBlood2::DestructableState&, std::string&);
+     void SetHitPoints(float hp)
+     {
+         m_fHitPoints = hp;
+@@ -22,7 +25,7 @@ class CDestructable : public Aggregate
+     }
+     bool IsDead() const
+     {
+-        return m_bDead != 0;
++        return m_fDeathDelay > 0 ? false : m_bDead != 0;
+     }
+     HOBJECT GetLastDamager();
+     void ClearLastDamager()
+@@ -49,6 +52,9 @@ class CDestructable : public Aggregate
+     static DDWORD m_dwNumDestructables;
+     DBOOL m_bDead = DFALSE;
+     float m_fHitPoints = 1, m_fArmorPoints = 0, m_fMass = 1, m_fResistance = 1;
++    float m_fDeathHitPoints = 1, m_fDeathDelay = 0;
++    bool m_bNighInvulnerable = false;
++    DBYTE last_damage_location = 0; // Source leaves this byte uninitialized; do not invent a node mapping.
+     bool m_bGodMode = false;
+     float m_fLastDamageAmount = 0, m_fLastDamagePercent = 0;
+     OpenBlood2::Damage last_damage;
+diff --git a/src/game/original/DestructableSave.cpp b/src/game/original/DestructableSave.cpp
+new file mode 100644
+index 0000000..aaebb1c
+--- /dev/null
++++ b/src/game/original/DestructableSave.cpp
+@@ -0,0 +1,158 @@
++// Original Destructable.cpp:1134-1245. Typed owned values replace packet reads;
++// validation precedes mutation, and no old object/attacker identity is serialized.
++#include "Destructable.h"
++#include "PlayerObj.h"
++#include "engine/collision.h"
++#include <cmath>
++
++namespace
++{
++    bool valid(const OpenBlood2::DestructableState& state, std::string& error)
++    {
++        for (float value :
++             {state.mass, state.max_health, state.max_mega_health, state.health, state.max_armor, state.max_necro_armor,
++              state.armor, state.resistance, state.last_amount, state.last_percent})
++            if (!std::isfinite(value) || value < 0)
++            {
++                error = "Invalid saved damage scalar";
++                return false;
++            }
++        // Source death-health may be negative; a delay can overshoot below zero.
++        if (!std::isfinite(state.death_health) || !std::isfinite(state.death_delay) ||
++            !OpenBlood2::physics_vector(state.last_direction) || !OpenBlood2::physics_vector(state.spawn_velocity))
++        {
++            error = "Invalid saved death counter, delay or damage vector";
++            return false;
++        }
++        using OpenBlood2::DamageType;
++        switch (state.last_type)
++        {
++            case DamageType::Normal:
++            case DamageType::Fire:
++            case DamageType::Melee:
++            case DamageType::Explode:
++            case DamageType::Suffocate:
++            case DamageType::Death:
++            case DamageType::FreeFall:
++            case DamageType::Blind:
++            case DamageType::Slow:
++            case DamageType::Acid:
++                break;
++            default:
++                error = "Unsupported saved damage type";
++                return false;
++        }
++        for (const auto* text : {&state.damage_target, &state.damage_message, &state.death_target, &state.death_message,
++                                 &state.spawn_object})
++            if (text->size() > 100 || text->find('\0') != std::string::npos)
++            {
++                error = "Invalid saved damage string";
++                return false;
++            }
++        return true;
++    }
++} // namespace
++
++bool CDestructable::Save(OpenBlood2::DestructableState& output, std::string& error) const
++{
++    error.clear();
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject) || handling_damage || !spawn_valid)
++    {
++        error = "Damage save requires a live owner, valid spawn and no active damage callback";
++        return false;
++    }
++    OpenBlood2::DestructableState state;
++    state.apply_damage_physics = apply_damage_physics;
++    state.mass = m_fMass;
++    state.max_health = m_fMaxHitPoints;
++    state.max_mega_health = m_fMaxMegaHitPoints;
++    state.health = can_damage ? m_fHitPoints : 1.0e6f;
++    state.death_health = m_fDeathHitPoints;
++    state.max_armor = m_fMaxArmorPoints;
++    state.max_necro_armor = m_fMaxNecroArmorPoints;
++    state.armor = m_fArmorPoints;
++    state.resistance = m_fResistance;
++    state.dead = m_bDead != 0;
++    state.nigh_invulnerable = m_bNighInvulnerable;
++    state.last_type = reaction_damage_type;
++    state.last_location = last_damage_location;
++    state.last_direction = last_damage.direction;
++    state.last_amount = m_fLastDamageAmount;
++    state.last_percent = m_fLastDamagePercent;
++    state.damage_target = damage_target;
++    state.damage_message = damage_message;
++    state.death_target = death_target;
++    state.death_message = death_message;
++    state.spawn_object = spawn_object;
++    state.spawn_velocity = spawn_velocity;
++    state.god_mode = m_bGodMode;
++    state.trigger_only = trigger_only;
++    state.death_delay = m_fDeathDelay;
++    if (!valid(state, error))
++        return false;
++    output = std::move(state);
++    return true;
++}
++
++bool CDestructable::Load(const OpenBlood2::DestructableState& state, std::string& error)
++{
++    error.clear();
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject) || handling_damage)
++    {
++        error = "Damage restore requires a live destination outside damage callbacks";
++        return false;
++    }
++    const auto* player = dynamic_cast<CPlayerObj*>(server->HandleToObject(m_hObject));
++    if (player && player->GetClient())
++    {
++        error = "Damage restore requires a player before client association";
++        return false;
++    }
++    if (!valid(state, error))
++        return false;
++    if (!state.spawn_object.empty() && !server->ValidateSpawnObject(state.spawn_object))
++    {
++        error = "Saved destruction spawn is unavailable";
++        return false;
++    }
++    apply_damage_physics = state.apply_damage_physics;
++    m_fMass = state.mass;
++    m_fMaxHitPoints = state.max_health;
++    m_fMaxMegaHitPoints = state.max_mega_health;
++    m_fHitPoints = state.health;
++    m_fDeathHitPoints = state.death_health;
++    m_fMaxArmorPoints = state.max_armor;
++    m_fMaxNecroArmorPoints = state.max_necro_armor;
++    m_fArmorPoints = state.armor;
++    m_fResistance = state.resistance;
++    m_bDead = state.dead;
++    m_bNighInvulnerable = state.nigh_invulnerable;
++    reaction_damage_type = state.last_type;
++    last_damage_location = state.last_location;
++    last_damage = {}; // Raw delivery/attacker/position are not original saved fields.
++    last_damage.direction = state.last_direction;
++    m_fLastDamageAmount = state.last_amount;
++    m_fLastDamagePercent = state.last_percent;
++    damage_target = state.damage_target;
++    damage_message = state.damage_message;
++    death_target = state.death_target;
++    death_message = state.death_message;
++    spawn_object = state.spawn_object;
++    spawn_velocity = state.spawn_velocity;
++    spawn_valid = true;
++    m_bGodMode = state.god_mode;
++    trigger_only = state.trigger_only;
++    m_fDeathDelay = state.death_delay;
++    can_damage = m_fHitPoints < 1.0e6f; // Original sentinel, not a clamp to maximum HP.
++    last_damager_ = nullptr;
++    hit = {}; // Old diagnostic pose queries cannot describe the restored destination.
++    if (!m_Link.m_pData)
++    {
++        dl_Insert(&m_DestructableHead, &m_Link);
++        m_Link.m_pData = this;
++        ++m_dwNumDestructables;
++    }
++    return true;
++}
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 9f14e34..9f42b04 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -201,8 +201,9 @@ namespace OpenBlood2
+                 {
+                     exit.pending = false;
+                     server_shell.CapturePlayerInventory(local_client);
++                    server_shell.CapturePlayerDamage(local_client);
+                     // NEW_LEVEL is rejected by the decoder before any teardown:
+-                    // an inventory snapshot alone is not KeepAliveSave/Load.
++                    // aggregate snapshots alone are not KeepAliveSave/Load.
+                     WorldRequest request;
+                     if (!decode_world_request(exit.load, request, exit.error))
+                         ++exit.blocked;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index fbd3b2e..b149ca1 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -854,3 +854,15 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME inventory_state.private COMMAND inventory_state_tests private "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(inventory_state.private PROPERTIES LABELS "headless;private;inventory_state" TIMEOUT 120)
+ endif()
++
++add_executable(destructable_state_tests destructable_state_tests.cpp)
++target_link_libraries(destructable_state_tests PRIVATE blood2_game)
++blood2_project_options(destructable_state_tests)
++foreach(case roundtrip behavior sentinel failures capture)
++    add_test(NAME destructable_state.${case} COMMAND destructable_state_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/destructable-state-fixtures/${case}")
++    set_tests_properties(destructable_state.${case} PROPERTIES LABELS "headless;destructable_state" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME destructable_state.private COMMAND destructable_state_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(destructable_state.private PROPERTIES LABELS "headless;private;destructable_state" TIMEOUT 120)
++endif()
+diff --git a/tests/destructable_state_tests.cpp b/tests/destructable_state_tests.cpp
+new file mode 100644
+index 0000000..ed28d97
+--- /dev/null
++++ b/tests/destructable_state_tests.cpp
+@@ -0,0 +1,395 @@
++#include "player_fixture.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .0001f;
++    }
++    CPlayerObj* detached(GameSession& g)
++    {
++        return dynamic_cast<CPlayerObj*>(
++            g.server.HandleToObject(g.objects.create(g.objects.find_class("CPlayerObj"), {})));
++    }
++    bool send(GameSession& g, HOBJECT from, HOBJECT to, float amount, DamageType type = DamageType::Normal)
++    {
++        auto message = g.server.StartMessageToObject(g.server.HandleToObject(from), to, damage_message);
++        Damage value{{0, 0, 1}, {1, 2, 3}, amount, type, from};
++        CHECK(message && g.server.WriteDamage(message, value) == DE_OK && g.server.EndMessage(message) == DE_OK);
++        return true;
++    }
++    DestructableState sample()
++    {
++        DestructableState s;
++        s.mass = 350;
++        s.max_health = 200;
++        s.max_mega_health = 350;
++        s.health = 73;
++        s.death_health = -19;
++        s.max_armor = 100;
++        s.max_necro_armor = 200;
++        s.armor = 29;
++        s.resistance = .7f;
++        s.last_type = DamageType::Melee;
++        s.last_location = 231;
++        s.last_direction = {1, 2, 3};
++        s.last_amount = 17;
++        s.last_percent = 1.75f;
++        s.death_delay = -.25f;
++        s.damage_target = "damage_sink";
++        s.damage_message = "HIT";
++        s.death_target = "death_sink";
++        s.death_message = "DEATH";
++        s.spawn_object = "HealthPU";
++        s.spawn_velocity = {4, 5, 6};
++        return s;
++    }
++    bool same(const DestructableState& a, const DestructableState& b)
++    {
++        CHECK(a.apply_damage_physics == b.apply_damage_physics && a.dead == b.dead &&
++              a.nigh_invulnerable == b.nigh_invulnerable);
++        CHECK(a.god_mode == b.god_mode && a.trigger_only == b.trigger_only);
++        CHECK(a.mass == b.mass && a.max_health == b.max_health && a.max_mega_health == b.max_mega_health &&
++              a.health == b.health);
++        CHECK(a.death_health == b.death_health && a.max_armor == b.max_armor && a.max_necro_armor == b.max_necro_armor);
++        CHECK(a.armor == b.armor && a.resistance == b.resistance && a.last_type == b.last_type &&
++              a.last_location == b.last_location);
++        CHECK(a.last_direction.x == b.last_direction.x && a.last_direction.y == b.last_direction.y &&
++              a.last_direction.z == b.last_direction.z);
++        CHECK(a.last_amount == b.last_amount && a.last_percent == b.last_percent && a.death_delay == b.death_delay);
++        CHECK(a.damage_target == b.damage_target && a.damage_message == b.damage_message &&
++              a.death_target == b.death_target && a.death_message == b.death_message);
++        CHECK(a.spawn_object == b.spawn_object && a.spawn_velocity.x == b.spawn_velocity.x &&
++              a.spawn_velocity.y == b.spawn_velocity.y && a.spawn_velocity.z == b.spawn_velocity.z);
++        return true;
++    }
++    bool roundtrip(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto* source = detached(g);
++        auto* destination = detached(g);
++        CHECK(source && destination);
++        auto& d = destination->m_damage;
++        std::string error;
++        auto s = sample();
++        s.apply_damage_physics = true;
++        s.nigh_invulnerable = true;
++        s.god_mode = true;
++        s.trigger_only = true;
++        CHECK(source->m_damage.Load(s, error));
++        DestructableState saved;
++        CHECK(source->m_damage.Save(saved, error) && same(saved, s));
++        CHECK(send(g, source->m_hObject, destination->m_hObject, 1));
++        CHECK(d.last_damage.attacker == source->m_hObject);
++        const auto count = CDestructable::m_dwNumDestructables;
++        const auto owner = d.m_hObject;
++        auto* inventory = d.m_pInventoryMgr;
++        for (int i = 0; i < 3; ++i)
++        {
++            CHECK(d.Load(saved, error));
++            DestructableState result;
++            CHECK(d.Save(result, error) && same(result, saved));
++            CHECK(d.m_hObject == owner && d.m_pInventoryMgr == inventory && d.last_damage.attacker == nullptr);
++            CHECK(d.GetLastDamager() == nullptr && CDestructable::m_dwNumDestructables == count);
++        }
++        source->m_damage.damage_target = "changed";
++        CHECK(g.objects.remove(source->m_hObject) && g.objects.finish_frame());
++        CHECK(saved.damage_target == "damage_sink" && d.damage_target == "damage_sink");
++        CHECK(g.unload_world() && CDestructable::m_dwNumDestructables == 0 && g.objects.snapshot().empty());
++        CHECK(saved.health == 73 && saved.death_health == -19);
++        auto* fresh = detached(g);
++        CHECK(fresh && fresh->m_damage.Load(saved, error));
++        CHECK(fresh->m_damage.m_hObject != owner && fresh->m_damage.m_fHitPoints == 73);
++        CHECK(g.unload_world() && CDestructable::m_dwNumDestructables == 0 && g.server.string_count() == 0);
++        return true;
++    }
++    // Test-only owner for engine-restoration binding before list insertion.
++    struct Probe : BaseClass
++    {
++        CDestructable damage;
++        Probe()
++        {
++            AddAggregate(&damage);
++        }
++        DDWORD EngineMessageFn(DDWORD message, void* data, float reason) override
++        {
++            if (message == MID_INITIALUPDATE)
++                damage.m_hObject = m_hObject;
++            return BaseClass::EngineMessageFn(message, data, reason);
++        }
++    };
++    std::unique_ptr<BaseClass> make_probe()
++    {
++        return std::make_unique<Probe>();
++    }
++    Probe* probe(GameSession& g)
++    {
++        static ClassInfo type{"SavedDamageProbe", nullptr, make_probe, {}};
++        if (!g.objects.find_class(type.name))
++        {
++            type.parent = g.objects.find_class("BaseClass");
++            if (!g.objects.register_class(type))
++                return nullptr;
++        }
++        return dynamic_cast<Probe*>(g.server.HandleToObject(g.objects.create(&type, {})));
++    }
++    bool behavior(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto* p = detached(g);
++        auto* other = probe(g);
++        CHECK(p && other);
++        auto& d = p->m_damage;
++        std::string error;
++        DestructableState s;
++        s.health = 100;
++        s.max_health = 200;
++        s.max_mega_health = 300;
++        s.armor = 40;
++        s.resistance = 1;
++        s.nigh_invulnerable = true;
++        CHECK(d.Load(s, error) && other->damage.Load(s, error));
++        const auto count = CDestructable::m_dwNumDestructables;
++        CHECK(other->damage.Load(s, error) && CDestructable::m_dwNumDestructables == count);
++        CHECK(send(g, other->m_hObject, p->m_hObject, 50));
++        CHECK(near(d.m_fHitPoints, 98.75f) && near(d.m_fArmorPoints, 38.75f) && near(d.m_fDeathHitPoints, -.25f));
++        CHECK(send(g, p->m_hObject, other->m_hObject, 50));
++        CHECK(other->damage.m_fHitPoints == 75 && other->damage.m_fArmorPoints == 15); // Modifier is character-only.
++        CHECK(d.Heal(2) && near(d.m_fDeathHitPoints, 100.75f));
++        CHECK(d.MegaHeal(500) && d.m_fDeathHitPoints == 300 && d.m_fHitPoints == 300);
++        d.SetHitPoints(100);
++        CHECK(d.m_fDeathHitPoints == 300); // Source setter does not reset the death counter.
++        d.m_fDeathDelay = 1;
++        CHECK(!d.IsDead() && g.step(.25) && d.m_fDeathDelay == 1);
++        CHECK(send(g, other->m_hObject, p->m_hObject, 10, DamageType::Death));
++        CHECK(d.m_bDead && !d.IsDead() && d.m_fHitPoints == 0 && d.m_fArmorPoints == 0 && d.m_fDeathHitPoints == 0);
++        const auto accepted = d.accepted_damage;
++        CHECK(send(g, other->m_hObject, p->m_hObject, 50) && d.accepted_damage == accepted);
++        CHECK(g.step(.75) && near(d.m_fDeathDelay, .25f) && !d.IsDead());
++        DestructableState delayed;
++        CHECK(d.Save(delayed, error) && delayed.death_delay == .25f && delayed.dead);
++        CHECK(g.step(.5) && near(d.m_fDeathDelay, -.25f) && d.IsDead());
++        auto* restored = detached(g);
++        CHECK(restored && restored->m_damage.Load(delayed, error));
++        CHECK(!restored->m_damage.IsDead() && g.step(.3) &&
++              restored->m_damage.IsDead()); // Remaining duration, no clock offset.
++        CHECK(g.unload_world() && CDestructable::m_dwNumDestructables == 0);
++        return true;
++    }
++    bool sentinel(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto* p = detached(g);
++        CHECK(p);
++        auto& d = p->m_damage;
++        std::string error;
++        DestructableState s;
++        d.can_damage = false;
++        d.m_fHitPoints = 73;
++        CHECK(d.Save(s, error) && s.health == 1e6f && d.m_fHitPoints == 73);
++        CHECK(d.Load(s, error) && !d.can_damage && d.m_fHitPoints == 1e6f);
++        CHECK(send(g, p->m_hObject, p->m_hObject, 20) && d.m_fHitPoints == 1e6f);
++        s.health = 999999;
++        CHECK(d.Load(s, error) && d.can_damage && d.m_fHitPoints == 999999);
++        CHECK(send(g, p->m_hObject, p->m_hObject, 20) && d.m_fHitPoints == 999979);
++        s.health = 1e6f;
++        CHECK(d.Load(s, error) && !d.can_damage);
++        s.health = 42;
++        s.god_mode = true;
++        CHECK(d.Load(s, error));
++        CHECK(send(g, p->m_hObject, p->m_hObject, 20, DamageType::Death) && !d.m_bDead && d.m_fHitPoints == 42);
++        s.god_mode = false;
++        s.trigger_only = true;
++        CHECK(d.Load(s, error));
++        CHECK(send(g, p->m_hObject, p->m_hObject, 20) && d.m_fHitPoints == 42);
++        CHECK(send(g, p->m_hObject, p->m_hObject, 1, DamageType::Death) && d.IsDead());
++        return true;
++    }
++    struct Receiver : BaseClass
++    {
++        CDestructable* target = nullptr;
++        DestructableState saved;
++        unsigned calls = 0;
++        bool rejected = false;
++        DDWORD ObjectMessageFn(HOBJECT, DDWORD id, HMESSAGEREAD) override
++        {
++            if (id == 1000 && target)
++            {
++                ++calls;
++                std::string error;
++                DestructableState out;
++                out.health = 987;
++                rejected = !target->Save(out, error) && out.health == 987 && !target->Load(saved, error);
++            }
++            return 1;
++        }
++    };
++    std::unique_ptr<BaseClass> make_receiver()
++    {
++        return std::make_unique<Receiver>();
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto* p = detached(g);
++        CHECK(p);
++        auto& d = p->m_damage;
++        std::string error;
++        auto state = sample();
++        CHECK(d.Load(state, error));
++        auto ids = g.objects.snapshot();
++        auto count = CDestructable::m_dwNumDestructables;
++        std::vector<std::function<void(DestructableState&)>> corrupt{
++            [](auto& s) { s.mass = -1; },
++            [](auto& s) { s.health = -1; },
++            [](auto& s) { s.max_health = -1; },
++            [](auto& s) { s.max_necro_armor = std::numeric_limits<float>::infinity(); },
++            [](auto& s) { s.death_health = std::numeric_limits<float>::quiet_NaN(); },
++            [](auto& s) { s.death_delay = std::numeric_limits<float>::infinity(); },
++            [](auto& s) { s.last_percent = -1; },
++            [](auto& s) { s.resistance = -1; },
++            [](auto& s) { s.last_direction.x = std::numeric_limits<float>::quiet_NaN(); },
++            [](auto& s) { s.spawn_velocity.z = 1e9f; },
++            [](auto& s) { s.last_type = static_cast<DamageType>(2); },
++            [](auto& s) { s.damage_target = std::string(101, 'x'); },
++            [](auto& s) { s.death_message = std::string("x\0y", 3); },
++            [](auto& s) { s.spawn_object = "UnknownSavedClass"; }};
++        for (auto& change : corrupt)
++        {
++            auto bad = state;
++            change(bad);
++            CHECK(!d.Load(bad, error) && !error.empty());
++            DestructableState after;
++            CHECK(d.Save(after, error) && same(after, state));
++            CHECK(g.objects.snapshot() == ids && CDestructable::m_dwNumDestructables == count);
++        }
++        DestructableState unchanged;
++        unchanged.health = 123;
++        d.m_fMass = -1;
++        CHECK(!d.Save(unchanged, error) && unchanged.health == 123);
++        d.m_fMass = state.mass;
++        static ClassInfo type{"SavedDamageReceiver", nullptr, make_receiver, {}};
++        type.parent = g.objects.find_class("BaseClass");
++        CHECK(g.objects.register_class(type));
++        ObjectCreateStruct spec;
++        SAFE_STRCPY(spec.m_Name, "damage_sink");
++        auto* receiver = dynamic_cast<Receiver*>(g.server.HandleToObject(g.objects.create(&type, spec)));
++        CHECK(receiver);
++        receiver->target = &d;
++        receiver->saved = state;
++        CHECK(send(g, p->m_hObject, p->m_hObject, 1) && receiver->calls == 1 && receiver->rejected);
++        CHECK(g.enter_player(error));
++        auto* client = g.server_shell.Player(g.local_client);
++        CHECK(client);
++        CHECK(!client->m_damage.Load(state, error) && client->m_damage.m_fHitPoints == 100);
++        CHECK(g.objects.remove(p->m_hObject));
++        CHECK(!d.Save(unchanged, error) && !d.Load(state, error));
++        CHECK(g.objects.finish_frame() && g.unload_world() && CDestructable::m_dwNumDestructables == 0);
++        return true;
++    }
++    bool capture(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        std::string error;
++        CHECK(!g.server_shell.CapturePlayerDamage(nullptr));
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        CHECK(p);
++        p->m_damage.SetHitPoints(73);
++        p->m_damage.SetArmorPoints(29);
++        CHECK(g.server.SendWorldExit({"next", WorldExitType::World}, "arrival") == DE_OK &&
++              g.pump_player_messages(error));
++        auto& capture = g.server_shell.damage_capture;
++        CHECK(capture.valid && capture.captures == 1 && capture.attempts == 2 && capture.state.health == 73 &&
++              capture.state.armor == 29);
++        CHECK(g.client_shell.world_exit.blocked == 1 && p->m_damage.m_fHitPoints == 73);
++        p->m_damage.m_fHitPoints = 67;
++        CHECK(capture.state.health == 73);
++        g.server.SetObjectState(p->m_hObject, OBJSTATE_INACTIVE);
++        CHECK(!g.server_shell.CapturePlayerDamage(g.local_client) && !capture.valid && !capture.error.empty());
++        CHECK(capture.state.health == 1 && capture.captures == 1);
++        CHECK(g.unload_world() && capture.attempts == 0 && !capture.valid);
++        return true;
++    }
++    bool private_data(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            auto* source = g.server_shell.Player(g.local_client);
++            CHECK(source);
++            source->m_damage.SetHitPoints(73 + cycle);
++            source->m_damage.SetArmorPoints(29);
++            CHECK(send(g, source->m_hObject, source->m_hObject, 10));
++            CHECK(g.server_shell.CapturePlayerDamage(g.local_client) &&
++                  g.server_shell.CapturePlayerInventory(g.local_client));
++            auto saved = g.server_shell.damage_capture.state;
++            auto inventory = g.server_shell.inventory_capture.state;
++            auto* restored = detached(g);
++            CHECK(restored && restored->SetCharacter(0));
++            CHECK(restored->m_damage.Load(saved, error) &&
++                  restored->m_InventoryMgr.Load(inventory, InventoryLoadType::KeepAlive, error));
++            DestructableState result;
++            CHECK(restored->m_damage.Save(result, error) && same(result, saved));
++            CHECK(restored->m_damage.m_hObject == restored->m_hObject &&
++                  restored->m_damage.m_pInventoryMgr == &restored->m_InventoryMgr);
++            CHECK(restored->m_damage.last_damage.attacker == nullptr && restored->m_InventoryMgr.UpdateHandModels());
++            CHECK(g.objects.remove(source->m_hObject) && g.objects.finish_frame());
++            CHECK(send(g, restored->m_hObject, restored->m_hObject, 10));
++            CHECK(near(restored->m_damage.m_fHitPoints,
++                       saved.health - 7)); // Saved armor=24 gives original 30% absorption on the next packet.
++            CHECK(restored->m_damage.Heal(500) && restored->m_damage.m_fHitPoints == saved.max_health);
++            CHECK(restored->m_damage.MegaHeal(500) && restored->m_damage.m_fDeathHitPoints == saved.max_mega_health);
++            CHECK(restored->m_damage.AddNecroWard(500) && restored->m_damage.m_fArmorPoints == saved.max_necro_armor);
++            std::cout << "cycle " << cycle << ": aggregate HP " << saved.health << ", armor " << saved.armor
++                      << ", source-independent damage/heal; no world transfer\n";
++            CHECK(g.unload_world() && g.objects.snapshot().empty() && g.objects.attachments().empty());
++            CHECK(g.server.string_count() == 0 && g.server.message_count() == 0 &&
++                  CDestructable::m_dwNumDestructables == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::string_view name = argv[1];
++    const auto root = path_from_utf8(argv[2]);
++    bool ok = false;
++    if (name == "roundtrip")
++        ok = roundtrip(root);
++    else if (name == "behavior")
++        ok = behavior(root);
++    else if (name == "sentinel")
++        ok = sentinel(root);
++    else if (name == "failures")
++        ok = failures(root);
++    else if (name == "capture")
++        ok = capture(root);
++    else if (name == "private")
++        ok = private_data(root);
++    return ok ? 0 : 1;
++}

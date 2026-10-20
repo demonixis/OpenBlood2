@@ -1,0 +1,24 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 284: character_motion.lookup
+    Start 285: character_motion.motion
+    Start 286: character_motion.rejection
+    Start 287: character_motion.collision
+1/7 Test #284: character_motion.lookup ..........   Passed    0.00 sec
+    Start 288: character_motion.callbacks
+2/7 Test #285: character_motion.motion ..........   Passed    0.00 sec
+3/7 Test #286: character_motion.rejection .......   Passed    0.00 sec
+    Start 289: character_motion.player
+    Start 290: character_motion.catalog
+4/7 Test #287: character_motion.collision .......   Passed    0.00 sec
+5/7 Test #288: character_motion.callbacks .......   Passed    0.00 sec
+6/7 Test #289: character_motion.player ..........   Passed    0.00 sec
+7/7 Test #290: character_motion.catalog .........   Passed    0.26 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+character_motion    =   0.27 sec*proc (7 tests)
+headless            =   0.27 sec*proc (7 tests)
+private             =   0.26 sec*proc (1 test)
+
+Total Test time (real) =   0.26 sec

@@ -1,0 +1,33 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 534: player_restore.private
+    Start 532: player_restore.failures
+    Start 533: player_restore.lifetime
+    Start 531: player_restore.roundtrip
+1/8 Test #531: player_restore.roundtrip .........   Passed    0.01 sec
+    Start 536: player_keepalive.named
+2/8 Test #533: player_restore.lifetime ..........   Passed    0.01 sec
+    Start 537: player_keepalive.fallback
+3/8 Test #532: player_restore.failures ..........   Passed    0.02 sec
+    Start 538: player_keepalive.failures
+4/8 Test #536: player_keepalive.named ...........   Passed    0.01 sec
+    Start 539: player_keepalive.private
+5/8 Test #537: player_keepalive.fallback ........***Failed    0.01 sec
+fallback:139: p->entry_start_name == (i % 2 ? "last-solo" : "start") | 
+
+6/8 Test #538: player_keepalive.failures ........   Passed    0.01 sec
+7/8 Test #534: player_restore.private ...........   Passed    1.31 sec
+8/8 Test #539: player_keepalive.private .........   Passed    2.73 sec
+
+88% tests passed, 1 tests failed out of 8
+
+Label Time Summary:
+headless            =   4.11 sec*proc (8 tests)
+player_keepalive    =   2.76 sec*proc (4 tests)
+player_restore      =   1.35 sec*proc (4 tests)
+private             =   4.04 sec*proc (2 tests)
+
+Total Test time (real) =   2.76 sec
+
+The following tests FAILED:
+	537 - player_keepalive.fallback (Failed)                headless player_keepalive
+Errors while running CTest

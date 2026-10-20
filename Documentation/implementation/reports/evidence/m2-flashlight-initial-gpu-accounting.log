@@ -1,0 +1,408 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 25
+      Start  25: gpu.lifecycle
+
+25: Test command: /home/yann/projects/lithtech/Blood2/build/release/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--gpu-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/gpu.png"
+25: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+25: Test timeout computed to be: 25
+25: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+25: [info] BLOOD2.REZ: detected, 267758913 bytes
+25: [info] SOUND.REZ: detected, 204633068 bytes
+25: [info] BLOOD2P.REZ: detected, 24133434 bytes
+25: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+25: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+25: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+25: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+25: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+25: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/gpu.png
+25: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+25: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+25: [info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+25: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+ 1/22 Test  #25: gpu.lifecycle ....................   Passed    2.16 sec
+test 188
+      Start 188: gpu.pickups
+
+188: Test command: /home/yann/projects/lithtech/Blood2/build/release/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--pickups-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/pickups.png"
+188: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+188: Test timeout computed to be: 30
+188: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+188: [info] BLOOD2.REZ: detected, 267758913 bytes
+188: [info] SOUND.REZ: detected, 204633068 bytes
+188: [info] BLOOD2P.REZ: detected, 24133434 bytes
+188: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+188: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+188: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+188: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+188: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+188: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+188: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/pickups.png
+188: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+188: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+188: [info] Session playback: waiting=0 time=24.433333333333227 npc-ready=16 npc-failed=0 npc-updates=665
+188: [info] AI paths: hidden=true, reentered=true, copied points=7
+188: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+188: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+188: [info] PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked
+188: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+ 2/22 Test #188: gpu.pickups ......................   Passed    1.65 sec
+test 196
+      Start 196: gpu.objectives
+
+196: Test command: /home/yann/projects/lithtech/Blood2/build/release/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--objectives-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/objectives.png"
+196: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+196: Test timeout computed to be: 30
+196: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+196: [info] BLOOD2.REZ: detected, 267758913 bytes
+196: [info] SOUND.REZ: detected, 204633068 bytes
+196: [info] BLOOD2P.REZ: detected, 24133434 bytes
+196: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+196: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+196: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+196: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+196: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+196: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+196: [warning] NEW_LEVEL retained current world: Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+196: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/objectives.png
+ 3/22 Test #196: gpu.objectives ...................***Failed    1.22 sec
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[warning] NEW_LEVEL retained current world: Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/objectives.png
+
+test 357
+      Start 357: gpu.world_depth
+
+357: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/world-depth.png"
+357: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+357: Test timeout computed to be: 30
+357: GPU readback: depth occlusion, opposite winding, near clipping, +X/+Y orientation, camera/object transforms, resize, textured repeat/row orientation/opaque sampling and reupload pass
+ 4/22 Test #357: gpu.world_depth ..................   Passed    0.46 sec
+test 370
+      Start 370: gpu.model_depth
+
+370: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/model_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/model-depth.png"
+370: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+370: Test timeout computed to be: 30
+370: Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+370: Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+ 5/22 Test #370: gpu.model_depth ..................   Passed    0.44 sec
+test 371
+      Start 371: gpu.model_private
+
+371: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/model_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/model-private.png" "/home/yann/.steam/steam/steamapps/common/Blood II"
+371: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+371: Test timeout computed to be: 30
+371: Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+371: Restored original player/client association before private GPU rendering
+371: Private isolated Caleb/held Beretta diagnostic: 8271 non-background pixels, 40479 vertices
+371: Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+ 6/22 Test #371: gpu.model_private ................   Passed    0.49 sec
+test 571
+      Start 571: gpu.sprite_alpha
+
+571: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/sprite_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/sprite-alpha"
+571: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+571: Test timeout computed to be: 30
+571: Pixels: zero/partial/opaque/opaque-black DTX alpha, per-instance opacity, overlap sort, world occlusion, no depth writes, resize and reupload passed
+ 7/22 Test #571: gpu.sprite_alpha .................   Passed    0.45 sec
+test 572
+      Start 572: gpu.sprite_private
+
+572: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/sprite_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/sprite-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+572: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+572: Test timeout computed to be: 30
+572: Pixels: zero/partial/opaque/opaque-black DTX alpha, per-instance opacity, overlap sort, world occlusion, no depth writes, resize and reupload passed
+572: Private authored sprite pose/scale: 1556 non-background pixels, 118444 clear; unload emptied CPU/GPU geometry
+ 8/22 Test #572: gpu.sprite_private ...............   Passed    0.48 sec
+test 648
+      Start 648: gpu.mouse_combat
+
+648: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/player_controls_tests "gpu_combat" "/home/yann/.steam/steam/steamapps/common/Blood II"
+648: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+648: Test timeout computed to be: 120
+648: Original SubwayA camera intro expired after 12.0167 simulation seconds
+648: Approached encounter at z=-2192.09
+648: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=8, ammo=42, independent corpse verified, native=1
+648: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=0
+648: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+648: Walked past killed Cultist to z=-1861.92
+648: Original SubwayA camera intro expired after 12.0167 simulation seconds
+648: Approached encounter at z=-2192.09
+648: Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=13, ammo=37, independent corpse verified, native=1
+648: Dodge updates=12, corpse candidates=23, zero-margin search=1, swept source clearance=0
+648: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+648: Walked past killed Cultist to z=-1861.92
+ 9/22 Test #648: gpu.mouse_combat .................   Passed    2.41 sec
+test 649
+      Start 649: gpu.corpse_clearance
+
+649: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/player_controls_tests "gpu_clearance" "/home/yann/.steam/steam/steamapps/common/Blood II"
+649: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+649: Test timeout computed to be: 120
+649: Original SubwayA camera intro expired after 12.0167 simulation seconds
+649: Approached encounter at z=-2338.28
+649: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+649: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+649: Post-kill position=-32,170.001,-1854.18 camera=0 yaw=0
+649: Walked past killed Cultist to z=-1854.18
+649: Approached encounter at z=-1742.25
+649: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+649: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+649: Post-kill position=-32,170.001,-1340.93 camera=0 yaw=-3.72529e-09
+649: Walked past killed Cultist to z=-1340.93
+649: Original SubwayA camera intro expired after 12.0167 simulation seconds
+649: Approached encounter at z=-2341.42
+649: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+649: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+649: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+649: Walked past killed Cultist to z=-1861.92
+649: Approached encounter at z=-1745.4
+649: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+649: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+649: Post-kill position=-32,170.001,-1344.07 camera=0 yaw=3.72529e-09
+649: Walked past killed Cultist to z=-1344.07
+10/22 Test #649: gpu.corpse_clearance .............   Passed    3.04 sec
+test 654
+      Start 654: gpu.world_alpha
+
+654: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_alpha_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/world-alpha"
+654: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+654: Test timeout computed to be: 45
+654: GPU world alpha: zero/partial/full/black texels, far-to-near faces, opaque model occlusion, no depth writes, resize/reupload pass
+11/22 Test #654: gpu.world_alpha ..................   Passed    0.47 sec
+test 655
+      Start 655: gpu.world_alpha_private
+
+655: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_alpha_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/world-alpha-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+655: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+655: Test timeout computed to be: 90
+655: GPU world alpha: zero/partial/full/black texels, far-to-near faces, opaque model occlusion, no depth writes, resize/reupload pass
+655: glass channel 0 expected=31 actual=31
+655: glass channel 1 expected=33 actual=33
+655: glass channel 2 expected=36 actual=36
+655: Private glass12: changed=11200 pink=0 submitted=1
+655: glass channel 0 expected=31 actual=31
+655: glass channel 1 expected=33 actual=33
+655: glass channel 2 expected=36 actual=36
+655: Private glass12: changed=11200 pink=0 submitted=1
+12/22 Test #655: gpu.world_alpha_private ..........   Passed    0.66 sec
+test 811
+      Start 811: gpu.surface_effect
+
+811: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/surface_effect_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/surface-effect"
+811: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+811: Test timeout computed to be: 45
+811: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+811: Pan GPU: independent static/animated shared material, opaque/alpha axes, clock repeat/reset/wrap, invalid draws, resize/reload pass
+13/22 Test #811: gpu.surface_effect ...............   Passed    0.43 sec
+test 812
+      Start 812: gpu.surface_effect_private
+
+812: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/surface_effect_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/surface-effect-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+812: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+812: Test timeout computed to be: 90
+812: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+812: SubwayA intro: 113808 pixels changed by 1/64s Pan advance with identical geometry/camera; reset exact, no extra upload
+812: SubwayA intro: 113808 pixels changed by 1/64s Pan advance with identical geometry/camera; reset exact, no extra upload
+812: Pan GPU: independent static/animated shared material, opaque/alpha axes, clock repeat/reset/wrap, invalid draws, resize/reload pass
+14/22 Test #812: gpu.surface_effect_private .......   Passed    0.97 sec
+test 814
+      Start 814: gpu.level_change
+
+814: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/level_change_gpu_tests "/home/yann/.steam/steam/steamapps/common/Blood II" "/home/yann/projects/lithtech/Blood2/build/release/tests/level-change"
+814: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+814: Test timeout computed to be: 90
+814: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+814: 102: game->level_change.unknown == 1 && game->level_change.failed == 1 && game->server.audio.has_output() | Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+15/22 Test #814: gpu.level_change .................***Failed    0.76 sec
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+102: game->level_change.unknown == 1 && game->level_change.failed == 1 && game->server.audio.has_output() | Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+
+test 829
+      Start 829: gpu.sky
+
+829: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/sky_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/sky-gpu"
+829: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+829: Test timeout computed to be: 30
+829: Sky GPU: index order, alpha, .01 near plane, no depth reads/writes, portal omission, resize/reload passed
+16/22 Test #829: gpu.sky ..........................   Passed    0.41 sec
+test 830
+      Start 830: gpu.sky_private
+
+830: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/sky_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/sky-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+830: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+830: Test timeout computed to be: 90
+830: Sky GPU: index order, alpha, .01 near plane, no depth reads/writes, portal omission, resize/reload passed
+830: City sky cycle=0 view=0 submitted=23 covered=205545
+830: City sky cycle=0 view=1 submitted=23 covered=205305
+830: City sky cycle=0 view=2 submitted=23 covered=297567
+830: City sky cycle=1 view=0 submitted=23 covered=205545
+830: City sky cycle=1 view=1 submitted=23 covered=205305
+830: City sky cycle=1 view=2 submitted=23 covered=297567
+17/22 Test #830: gpu.sky_private ..................   Passed    1.26 sec
+test 831
+      Start 831: gpu.sky_app
+
+831: Test command: /home/yann/projects/lithtech/Blood2/build/release/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--view-world" "--world" "02_cityhub" "--no-inspector" "--frames" "20" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/sky-app.png"
+831: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+831: Test timeout computed to be: 45
+831: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+831: [info] BLOOD2.REZ: detected, 267758913 bytes
+831: [info] SOUND.REZ: detected, 204633068 bytes
+831: [info] BLOOD2P.REZ: detected, 24133434 bytes
+831: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+831: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+831: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+831: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+831: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+831: [info] DAT v56: 1026 source objects, 485 original instances, 100 BSP models
+831: [info] Player mouse: captured; look / left fire / right alt (wayland)
+831: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/sky-app.png
+831: [info] Shutdown: frames=20, UI frames=0, hidden frames=20, toggles=0, resize=false, quit=false
+831: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+831: [info] Session playback: waiting=0 time=0.262143715 npc-ready=27 npc-failed=0 npc-updates=27
+18/22 Test #831: gpu.sky_app ......................   Passed    1.33 sec
+test 842
+      Start 842: gpu.proximity_private
+
+842: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/proximity_gpu_tests "/home/yann/.steam/steam/steamapps/common/Blood II" "/home/yann/projects/lithtech/Blood2/build/release/tests/proximity-"
+842: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+842: Test timeout computed to be: 90
+842: Original SubwayA camera intro expired after 12.0167 simulation seconds
+842: Proximity view GPU cycle=0 left pixels=499 right pixels=11965
+842: Proximity world GPU cycle=0 pixels=8976
+842: Original SubwayA camera intro expired after 12.0167 simulation seconds
+842: Proximity view GPU cycle=1 left pixels=499 right pixels=11965
+842: Proximity world GPU cycle=1 pixels=8976
+19/22 Test #842: gpu.proximity_private ............   Passed    1.62 sec
+test 853
+      Start 853: gpu.remote_private
+
+853: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/remote_gpu_tests "/home/yann/.steam/steam/steamapps/common/Blood II" "/home/yann/projects/lithtech/Blood2/build/release/tests/remote-"
+853: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+853: Test timeout computed to be: 90
+853: Original SubwayA camera intro expired after 12.0167 simulation seconds
+853: Remote view GPU cycle=0 left pixels=499 right pixels=11965
+853: Remote world GPU cycle=0 pixels=8976
+853: Original SubwayA camera intro expired after 12.0167 simulation seconds
+853: Remote view GPU cycle=1 left pixels=499 right pixels=11965
+853: Remote world GPU cycle=1 pixels=8976
+20/22 Test #853: gpu.remote_private ...............   Passed    1.73 sec
+test 863
+      Start 863: gpu.flashlight
+
+863: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/flashlight_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/flashlight"
+863: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+863: Test timeout computed to be: 45
+863: GPU=NVIDIA GeForce RTX 3060 Laptop GPU backend=vulkan
+863: Synthetic light cycle=0 mode=0 center=51 outside=51
+863: Synthetic light cycle=0 mode=1 center=101 outside=51
+863: Synthetic light cycle=0 mode=2 center=51 outside=51
+863: Synthetic light cycle=0 mode=3 center=51 outside=51
+863: Synthetic light cycle=0 mode=4 center=51 outside=51
+863: Synthetic light cycle=0 mode=5 center=51 outside=51
+863: Synthetic light cycle=1 mode=0 center=51 outside=51
+863: Synthetic light cycle=1 mode=1 center=102 outside=51
+863: Synthetic light cycle=1 mode=2 center=51 outside=51
+863: Synthetic light cycle=1 mode=3 center=51 outside=51
+863: Synthetic light cycle=1 mode=4 center=51 outside=51
+863: Synthetic light cycle=1 mode=5 center=51 outside=51
+863: Synthetic light cycle=2 mode=0 center=51 outside=51
+863: Synthetic light cycle=2 mode=1 center=101 outside=51
+863: Synthetic light cycle=2 mode=2 center=51 outside=51
+863: Synthetic light cycle=2 mode=3 center=51 outside=51
+863: Synthetic light cycle=2 mode=4 center=51 outside=51
+863: Synthetic light cycle=2 mode=5 center=51 outside=51
+21/22 Test #863: gpu.flashlight ...................   Passed    0.46 sec
+test 864
+      Start 864: gpu.flashlight_private
+
+864: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/flashlight_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/flashlight-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+864: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+864: Test timeout computed to be: 90
+864: GPU=NVIDIA GeForce RTX 3060 Laptop GPU backend=vulkan
+864: Synthetic light cycle=0 mode=0 center=51 outside=51
+864: Synthetic light cycle=0 mode=1 center=101 outside=51
+864: Synthetic light cycle=0 mode=2 center=51 outside=51
+864: Synthetic light cycle=0 mode=3 center=51 outside=51
+864: Synthetic light cycle=0 mode=4 center=51 outside=51
+864: Synthetic light cycle=0 mode=5 center=51 outside=51
+864: Synthetic light cycle=1 mode=0 center=51 outside=51
+864: Synthetic light cycle=1 mode=1 center=102 outside=51
+864: Synthetic light cycle=1 mode=2 center=51 outside=51
+864: Synthetic light cycle=1 mode=3 center=51 outside=51
+864: Synthetic light cycle=1 mode=4 center=51 outside=51
+864: Synthetic light cycle=1 mode=5 center=51 outside=51
+864: Synthetic light cycle=2 mode=0 center=51 outside=51
+864: Synthetic light cycle=2 mode=1 center=101 outside=51
+864: Synthetic light cycle=2 mode=2 center=51 outside=51
+864: Synthetic light cycle=2 mode=3 center=51 outside=51
+864: Synthetic light cycle=2 mode=4 center=51 outside=51
+864: Synthetic light cycle=2 mode=5 center=51 outside=51
+864: Private original ray cycle=0 distance=42 radius=16.8 brighter channels=37859 darker=0
+864: Private original ray cycle=1 distance=42 radius=16.8 brighter channels=37859 darker=0
+22/22 Test #864: gpu.flashlight_private ...........   Passed    0.64 sec
+
+The following tests passed:
+	gpu.lifecycle
+	gpu.pickups
+	gpu.world_depth
+	gpu.model_depth
+	gpu.model_private
+	gpu.sprite_alpha
+	gpu.sprite_private
+	gpu.mouse_combat
+	gpu.corpse_clearance
+	gpu.world_alpha
+	gpu.world_alpha_private
+	gpu.surface_effect
+	gpu.surface_effect_private
+	gpu.sky
+	gpu.sky_private
+	gpu.sky_app
+	gpu.proximity_private
+	gpu.remote_private
+	gpu.flashlight
+	gpu.flashlight_private
+
+91% tests passed, 2 tests failed out of 22
+
+Label Time Summary:
+flashlight         =   1.10 sec*proc (2 tests)
+gpu                =  23.53 sec*proc (22 tests)
+model_view         =   0.93 sec*proc (2 tests)
+objectives         =   1.22 sec*proc (1 test)
+pickups            =   1.65 sec*proc (1 test)
+player_controls    =   5.45 sec*proc (2 tests)
+private            =  18.25 sec*proc (14 tests)
+proximity          =   1.62 sec*proc (1 test)
+remote             =   1.73 sec*proc (1 test)
+sky                =   2.99 sec*proc (3 tests)
+sprite_view        =   0.93 sec*proc (2 tests)
+surface_effect     =   1.40 sec*proc (2 tests)
+world              =   0.76 sec*proc (1 test)
+world_view         =   2.98 sec*proc (5 tests)
+
+Total Test time (real) =  23.55 sec
+
+The following tests FAILED:
+	196 - gpu.objectives (Failed)                           gpu objectives private
+	814 - gpu.level_change (Failed)                         gpu private world
+Errors while running CTest

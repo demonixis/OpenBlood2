@@ -1,0 +1,17 @@
+627/701 Testing: player_controls.private
+627/701 Test: player_controls.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_controls_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"player_controls.private" start time: Oct 17 04:04 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Alternate input: hp=100 dead=0 ammo=38 shots=12 before=5
+Original FIRE_KEY: shots=12 ammo=38 voices=12 mouse=0
+<end of output>
+Test time =   5.24 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.private" end time: Oct 17 04:04 CEST
+"player_controls.private" time elapsed: 00:00:05
+----------------------------------------------------------

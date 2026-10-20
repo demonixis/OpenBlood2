@@ -1,0 +1,139 @@
+349/530 Testing: gpu.model_depth
+349/530 Test: gpu.model_depth
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/model_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/model-depth.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.model_depth" start time: Oct 16 18:57 CEST
+Output:
+----------------------------------------------------------
+Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+<end of output>
+Test time =   0.51 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.model_depth" end time: Oct 16 18:57 CEST
+"gpu.model_depth" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 18:57 CEST
+
+ai_escape =   0.05 sec*proc
+
+ai_fire =   0.37 sec*proc
+
+ai_follow =   0.15 sec*proc
+
+ai_hit =   0.05 sec*proc
+
+ai_keys =   0.80 sec*proc
+
+ai_locomotion =   0.05 sec*proc
+
+ai_navigation =   0.11 sec*proc
+
+ai_perception =   0.13 sec*proc
+
+ai_recovery =   0.06 sec*proc
+
+ai_runtime =   0.75 sec*proc
+
+ai_script =   0.08 sec*proc
+
+ai_sight =   0.12 sec*proc
+
+ai_state =   1.02 sec*proc
+
+ai_target =   0.13 sec*proc
+
+ai_trigger =   0.11 sec*proc
+
+attachments =   0.15 sec*proc
+
+brushes =   1.41 sec*proc
+
+cameras =   1.51 sec*proc
+
+character =   4.72 sec*proc
+
+character_audio =   1.04 sec*proc
+
+character_motion =   0.05 sec*proc
+
+character_nodes =   0.13 sec*proc
+
+cinematics =   1.46 sec*proc
+
+cli =   0.05 sec*proc
+
+config =   0.02 sec*proc
+
+containers =   2.65 sec*proc
+
+corpses =   0.05 sec*proc
+
+destructable_state =   0.13 sec*proc
+
+doors =   1.38 sec*proc
+
+exits =   0.28 sec*proc
+
+explosions =   0.02 sec*proc
+
+gpu =  36.62 sec*proc
+
+headless =  22.11 sec*proc
+
+interaction =   1.98 sec*proc
+
+inventory_state =   0.13 sec*proc
+
+keyframes =   1.92 sec*proc
+
+lights =   1.21 sec*proc
+
+locomotion =   0.51 sec*proc
+
+model_view =   1.16 sec*proc
+
+movement =   5.00 sec*proc
+
+objectives =   1.21 sec*proc
+
+objects =   0.03 sec*proc
+
+paths =   0.15 sec*proc
+
+pickups =   1.22 sec*proc
+
+player =   1.15 sec*proc
+
+player_state =   0.13 sec*proc
+
+private =  55.78 sec*proc
+
+pushables =   0.03 sec*proc
+
+randomsound =   3.55 sec*proc
+
+sceneexplosion =   1.25 sec*proc
+
+services =   0.28 sec*proc
+
+sound =   1.31 sec*proc
+
+sprites =   1.45 sec*proc
+
+texture =   0.14 sec*proc
+
+triggers =   1.58 sec*proc
+
+weapon_drops =   0.05 sec*proc
+
+weapons =   7.13 sec*proc
+
+world =   0.33 sec*proc
+
+world_view =   4.24 sec*proc
+
+worldpaths =   1.28 sec*proc
+

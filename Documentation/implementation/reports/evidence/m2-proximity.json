@@ -1,0 +1,512 @@
+{
+  "date": "2026-10-17",
+  "implementation_baseline": "6fdab8820ecdd761e09738a8fd608ee01221c673",
+  "status": "M2 incomplete; CityHub has three unsupported entries and one failed world-model binding",
+  "validation": {
+    "headless-debug": {
+      "total": 764,
+      "failed": 0,
+      "private": 125,
+      "seconds": 158.43
+    },
+    "headless-debug-refresh": {
+      "total": 65,
+      "failed": 0,
+      "private": 9,
+      "seconds": 6.71
+    },
+    "headless-release": {
+      "total": 764,
+      "failed": 0,
+      "private": 125,
+      "seconds": 26.0
+    },
+    "sanitize": {
+      "total": 49,
+      "failed": 0,
+      "private": 7,
+      "seconds": 66.96
+    },
+    "gpu-debug": {
+      "total": 10,
+      "failed": 0,
+      "private": 9,
+      "seconds": 79.11
+    },
+    "gpu-release-objectives": {
+      "total": 1,
+      "failed": 0,
+      "private": 1,
+      "seconds": 3.8
+    },
+    "gpu-release-before-final-accounting": {
+      "total": 10,
+      "failed": 1,
+      "private": 9,
+      "seconds": 18.24
+    }
+  },
+  "headless_unique_per_native_build": 764,
+  "headless_private_per_native_build": 125,
+  "final_headless_note": "Full Debug/Release suites pass; all 65 relevant Debug object, inventory, projectile, player, pickup and CLI checks pass again after final lifetime guards and reporting. The final frontend-only accounting adjustment is checked by GPU objectives in both builds.",
+  "gpu_unique_per_native_build": 10,
+  "gpu_private_per_native_build": 9,
+  "final_gpu_note": "Release passed nine of ten checks, with only unchanged old CityHub accounting failing in gpu.objectives; that one check passes after all four exact expected counters are updated. Debug passes all ten with final counters.",
+  "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU; Vulkan ICD explicitly selected",
+  "accounting": {
+    "created": 450,
+    "world_sounds": 31,
+    "editor_only": 541,
+    "unsupported": 3,
+    "failed": 1,
+    "initial_total": 1026
+  },
+  "proximity": {
+    "world_entries": 161,
+    "created": 133,
+    "unsupported_typeaction": 28,
+    "cityhub_entries": 2,
+    "weapon_id": 49,
+    "inventory_slot": 10,
+    "ammo_type": 10,
+    "item_type": 7
+  },
+  "catalog": {
+    "readable_worlds": 57,
+    "created_pickups": 1423,
+    "missing_models": 0,
+    "rejected_typeaction": 206,
+    "supported_spawns": 60
+  },
+  "commands": [
+    "cmake --build build/debug -j4",
+    "cmake --build build/release -j4",
+    "cmake --build build/sanitize --target proximity_tests assault_tests object_contract_tests inventory_state_tests player_restore_tests player_keepalive_tests -j2",
+    "ctest --test-dir build/<debug|release> -L headless -j4 --output-on-failure",
+    "ctest --test-dir build/debug -j4 -R '^(proximity|assault|objects|inventory_state|player_restore|player_keepalive|pickups|cli)\\.' --output-on-failure",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -j2 -R '^(proximity|assault|objects|inventory_state|player_restore|player_keepalive)\\.' --output-on-failure",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(proximity_private|assault_private|mouse_combat|corpse_clearance|level_change|objectives|lifecycle|pickups|world_alpha_private|sky_app)$' --output-on-failure -V",
+    "cmake --build build/release --target blood2_app -j3",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/release -R '^gpu.objectives$' --output-on-failure -V"
+  ],
+  "development_failures": [
+    "Initial compile referenced rotation_multiply and live_count; corrected to existing multiply_rotation and checked object snapshot APIs.",
+    "Initial full Debug and Release pickup catalog assertions still expected pre-proximity totals. Exact new class counts and 28 TypeAction rejections are now asserted.",
+    "An intermediate Release build preceded the ordinary-slot FindBestWeapon fix; the new regression correctly failed. Final rebuild passes without allowing bomb selection in ordinary searches.",
+    "The GPU objectives smoke retained four old CityHub counters across destination schema scan and callback rehearsal. All four now assert 450 creations, three unsupported entries and 482 checked schemas, keeping the one missing binding and strict refusal.",
+    "Two accidental overlapping Debug builds were stopped before a fresh sequential build; their mixed output is not used as final evidence."
+  ],
+  "limits": [
+    "Replacement swept one-unit box flight, not verified retail physics",
+    "No moving-surface attachment or bomb save/load",
+    "Remote bombs, flashlight and missing fallengrills world geometry still block CityHub NEW_LEVEL",
+    "Original inventory HUD/PCX list, pickup sound output and complete explosion illumination remain unavailable",
+    "No native Apple execution of this increment"
+  ],
+  "artifacts": [
+    {
+      "file": "m2-proximity-build-debug.log",
+      "sha256": "cd8fe3dc51ad018f9129750529c8d335f5202b781bf3a4c4f919dcb049aa555e",
+      "raw_capture_sha256": "fe7c40c4ca1bf4e1f4d3b398f265d6191685669ccbbfe253931a607e49a1305f",
+      "bytes": 30453
+    },
+    {
+      "file": "m2-proximity-build-debug-refresh.log",
+      "sha256": "d8f3207e472731eda90ade5e3d9e1f0cabdce6890ac37691db3f282d2b1326a6",
+      "raw_capture_sha256": "822ddd3275090551c87c72064dc6e8b0e8f4cca27a65bde5aeb27066874dba83",
+      "bytes": 25325
+    },
+    {
+      "file": "m2-proximity-build-debug-current.log",
+      "sha256": "786b50a491eeb3f69a79456da60a41ae98d5006d607577a6af81337e03f4db43",
+      "raw_capture_sha256": "786b50a491eeb3f69a79456da60a41ae98d5006d607577a6af81337e03f4db43",
+      "bytes": 7969
+    },
+    {
+      "file": "m2-proximity-build-debug-app.log",
+      "sha256": "afa0aabbb2e1c307c2ec0ec134d3ad7380002714cafed2617ca8a8bcb79c9c37",
+      "raw_capture_sha256": "afa0aabbb2e1c307c2ec0ec134d3ad7380002714cafed2617ca8a8bcb79c9c37",
+      "bytes": 329
+    },
+    {
+      "file": "m2-proximity-build-release.log",
+      "sha256": "afe542f2da29a6226df8851aab78a0156916a1f40a49fa3d956ac16bfd2a893c",
+      "raw_capture_sha256": "f9838d8ad0e02e931eff5215e0adb45fdfcb63329ad0f2ab25ab0bc0387787a8",
+      "bytes": 92711
+    },
+    {
+      "file": "m2-proximity-build-release-refresh.log",
+      "sha256": "37d80e9b0596fd9fb72a3bfa95a8e147232f1778172022269d4595650c7f2085",
+      "raw_capture_sha256": "a640fc7d82c3f7955daec7d15790e3a72d9eb9171118697fa8660f9a040a39ac",
+      "bytes": 25471
+    },
+    {
+      "file": "m2-proximity-build-release-app.log",
+      "sha256": "c044ed783a28a6df5c1a5ee6f384f856b931108aa177be61f2331389dc7c9330",
+      "raw_capture_sha256": "c044ed783a28a6df5c1a5ee6f384f856b931108aa177be61f2331389dc7c9330",
+      "bytes": 329
+    },
+    {
+      "file": "m2-proximity-build-release-objectives.log",
+      "sha256": "c044ed783a28a6df5c1a5ee6f384f856b931108aa177be61f2331389dc7c9330",
+      "raw_capture_sha256": "c044ed783a28a6df5c1a5ee6f384f856b931108aa177be61f2331389dc7c9330",
+      "bytes": 329
+    },
+    {
+      "file": "m2-proximity-build-sanitize.log",
+      "sha256": "382d0426464e412e45c3792629f25f679e61f5aa68b0ccfc9f1c0b8af3d675dd",
+      "raw_capture_sha256": "47df51ae1afa0491de6847841b2e82ef7aee5e842c8eba6608256db8cfdda998",
+      "bytes": 43928
+    },
+    {
+      "file": "m2-proximity-build-sanitize-refresh.log",
+      "sha256": "6613747f3070f1086fab8b4be99922f8d9cccb5c5e1c0c08805d9137b264556e",
+      "raw_capture_sha256": "6613747f3070f1086fab8b4be99922f8d9cccb5c5e1c0c08805d9137b264556e",
+      "bytes": 1166
+    },
+    {
+      "file": "m2-proximity-headless-debug.log",
+      "sha256": "cd3512bd11c2ab985b4ca42d5f396b12968fd43aa0234571897ce9287bebdbe7",
+      "raw_capture_sha256": "cd3512bd11c2ab985b4ca42d5f396b12968fd43aa0234571897ce9287bebdbe7",
+      "bytes": 93509
+    },
+    {
+      "file": "m2-proximity-headless-debug-refresh.log",
+      "sha256": "0922e9870734055604dd2e6dedf562119c8c5597d30c86cd68e6e57d0fb7a34d",
+      "raw_capture_sha256": "0922e9870734055604dd2e6dedf562119c8c5597d30c86cd68e6e57d0fb7a34d",
+      "bytes": 7826
+    },
+    {
+      "file": "m2-proximity-headless-release.log",
+      "sha256": "758d8ddd8644cdc87bf9fa9d17947241d746d6c5cf2e870e64b66a207791a6be",
+      "raw_capture_sha256": "758d8ddd8644cdc87bf9fa9d17947241d746d6c5cf2e870e64b66a207791a6be",
+      "bytes": 93511
+    },
+    {
+      "file": "m2-proximity-sanitize.log",
+      "sha256": "92fa9068528e12b47056d480b474ac69d3e74c3594bba5925dbf6c86f17096d5",
+      "raw_capture_sha256": "92fa9068528e12b47056d480b474ac69d3e74c3594bba5925dbf6c86f17096d5",
+      "bytes": 5984
+    },
+    {
+      "file": "m2-proximity-gpu-debug.log",
+      "sha256": "818b8b2ce0e63e196c86fd597309d34b97997c32943f2515f11a523f36adf933",
+      "raw_capture_sha256": "818b8b2ce0e63e196c86fd597309d34b97997c32943f2515f11a523f36adf933",
+      "bytes": 15857
+    },
+    {
+      "file": "m2-proximity-gpu-release.log",
+      "sha256": "996c5d518f069364b9e749ed5ca2a98959a46f1fe357e46cb0b684671d2619ab",
+      "raw_capture_sha256": "996c5d518f069364b9e749ed5ca2a98959a46f1fe357e46cb0b684671d2619ab",
+      "bytes": 15672
+    },
+    {
+      "file": "m2-proximity-gpu-release-objectives.log",
+      "sha256": "c1c43b8c08c038023bf46259ff0a28f41fedd648d830a6b972d03bb8791f0a17",
+      "raw_capture_sha256": "c1c43b8c08c038023bf46259ff0a28f41fedd648d830a6b972d03bb8791f0a17",
+      "bytes": 3378
+    },
+    {
+      "file": "m2-proximity-gpu-device.log",
+      "sha256": "cdfa50238d4fe3a792cb22a0dfb4e2d99790675e7cd3fc6b011df3b119af0524",
+      "raw_capture_sha256": "cdfa50238d4fe3a792cb22a0dfb4e2d99790675e7cd3fc6b011df3b119af0524",
+      "bytes": 3578
+    },
+    {
+      "file": "m2-proximity-headless-debug-initial-failure.log",
+      "sha256": "8a6574ff774a9baa21d2fe9bd3fffe31ccd998a0f131c4925a6b106e8a0ecfc7",
+      "raw_capture_sha256": "8a6574ff774a9baa21d2fe9bd3fffe31ccd998a0f131c4925a6b106e8a0ecfc7",
+      "bytes": 95277
+    },
+    {
+      "file": "m2-proximity-headless-release-initial-failure.log",
+      "sha256": "19116c9738d6551678ec42c0ff08f8847ad475ac1312db0e6507ecf313725aa7",
+      "raw_capture_sha256": "19116c9738d6551678ec42c0ff08f8847ad475ac1312db0e6507ecf313725aa7",
+      "bytes": 95456
+    },
+    {
+      "file": "m2-proximity-gpu-release-initial-failure.log",
+      "sha256": "8f6e62a8170e73b1192d09ffb57fa6a785218b76bb3486078df007aa5a122437",
+      "raw_capture_sha256": "8f6e62a8170e73b1192d09ffb57fa6a785218b76bb3486078df007aa5a122437",
+      "bytes": 15679
+    },
+    {
+      "file": "m2-proximity-format.log",
+      "sha256": "23bb795837d6131a932f314bd02eca350c015ec029860dd238b8840583df1137",
+      "raw_capture_sha256": "23bb795837d6131a932f314bd02eca350c015ec029860dd238b8840583df1137",
+      "bytes": 58
+    },
+    {
+      "file": "m2-proximity-reference-integrity.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "raw_capture_sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "bytes": 56
+    },
+    {
+      "file": "m2-proximity-links.log",
+      "sha256": "53b807c9fb3169a9d9b7e06542ecfc238dc8d2b40cbaadf508dc99758f6d7022",
+      "raw_capture_sha256": "53b807c9fb3169a9d9b7e06542ecfc238dc8d2b40cbaadf508dc99758f6d7022",
+      "bytes": 40
+    }
+  ],
+  "implementation_patch_sha256": "9e45722296da5215f88d6cb777c4a2fe9aafdc41c1fd53eac59885ab41fdde36",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "45d5063c15eaa7a4773b37b95e3d84a200700dc2a6e29bb39738834d96faee62"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "53e15053c26aa44dc4f9c6f93c247884bed29c80cced4b438c37e1f820a6382e"
+    },
+    {
+      "path": "README.md",
+      "sha256": "f8b81d875595e3627418d45e53cac1b5b59b38d084e7bb427562c795285bde34"
+    },
+    {
+      "path": "docs/ASSAULT_CONTRACTS.md",
+      "sha256": "70d5dabce781a2dfe2482339b8f03dc7ada545c09d6cde46a9f578df8b24a915"
+    },
+    {
+      "path": "docs/ENERGY_PROJECTILE_CONTRACTS.md",
+      "sha256": "4e72a9bcc91bb193adf71812a808cb8ca8bf8a9a1fc380054f7e381222abb6a6"
+    },
+    {
+      "path": "docs/INVENTORY_STATE_CONTRACTS.md",
+      "sha256": "ae99ed7d070f91db27a272df627a7f4a3e70cf0b1235295d17341cb2ecd8c97f"
+    },
+    {
+      "path": "docs/M2_PROXIMITY_SOURCES.json",
+      "sha256": "dccb97a2296f988dd7341b06e488a68d26283dfdab0039681dd39d18b5e65835"
+    },
+    {
+      "path": "docs/PICKUP_CONTRACTS.md",
+      "sha256": "ef01e900c9ff10e4dd312c441919f80f7c45781ab87137e4fe77bb563156f76c"
+    },
+    {
+      "path": "docs/PLAYER_CONTROL_CONTRACTS.md",
+      "sha256": "83e362d790a0c25decd35c94b2d8e8383b9ca1ceb6fc1adf50e2864672888f5d"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "fa32ea08e13ba24078aedff3d75f6df0c8afa4d88d9e3e14161667fafe5eddf2"
+    },
+    {
+      "path": "docs/PROXIMITY_CONTRACTS.md",
+      "sha256": "a57967a76d32f97175424e7511a3d2e5e6fa7f148584c5f1a05102cf97008042"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "cd608b1837f83926b3c3d1d50d1b42edb30c6508904aed62b1aa2e738baafcfc"
+    },
+    {
+      "path": "src/app/main.cpp",
+      "sha256": "02c690009ae184e5566a6dc539e5512d0b3415258b88463f70a13fe97488f320"
+    },
+    {
+      "path": "src/app/movement_controls.h",
+      "sha256": "4f5ac719d86a71f108720e135c320be18ceb3570934651ac9a89fc861c301bcd"
+    },
+    {
+      "path": "src/app/objectives_smoke.cpp",
+      "sha256": "9948df46243dc889f789e82c3268e704c0fac436069151d9ffa06c698bc5cb27"
+    },
+    {
+      "path": "src/game/inventory_state.h",
+      "sha256": "cbc636957b8b542014d13924159261dc5c1429d993cc14e4b65f4f12ca7c65f2"
+    },
+    {
+      "path": "src/game/legacy/server_de.h",
+      "sha256": "f8cfe693d9249c83b4a9ca3fb0dd031894d77f1f282b59c98f5a02d3dd4657c2"
+    },
+    {
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "246f9f76909cdb8f41cfd9c913e6aee6792c23f364fea2af09348005f074f426"
+    },
+    {
+      "path": "src/game/original/BloodShells.h",
+      "sha256": "49d89a89f7ec40291a984f947292712f2415144f9abe531c783e7dbb21898c42"
+    },
+    {
+      "path": "src/game/original/Grenade.cpp",
+      "sha256": "bcab60707237b3b3e13c7cc80d1c2b652cfb7ae176bd7d1b6879883e1fb04c63"
+    },
+    {
+      "path": "src/game/original/InventoryMgr.cpp",
+      "sha256": "98332930a21e982e0fccb65beee026cb7c2cdbf3c02e76849656d61ac53d73f6"
+    },
+    {
+      "path": "src/game/original/InventoryMgr.h",
+      "sha256": "0648e473a3e176d51a2167b058f9767411333cbb7e164afaa5320545a9688e81"
+    },
+    {
+      "path": "src/game/original/InventorySave.cpp",
+      "sha256": "760308a43b6155e4e881e5d8dca52bc09ab3d1aad2f90ef2584edaeed00fb2df"
+    },
+    {
+      "path": "src/game/original/ItemPickups.cpp",
+      "sha256": "885ab54ae2ca0ef3bfac489825858db68d3195fd741ce6a003d75f5692be65a1"
+    },
+    {
+      "path": "src/game/original/ItemPickups.h",
+      "sha256": "96441d3a2db3b684b8037f975a1121d471dd742012eb8374989aa23957fadc35"
+    },
+    {
+      "path": "src/game/original/PickupObject.cpp",
+      "sha256": "8919f6d676ebff4decbfc1a76d06377f09554908ca72f05a4f5364fb1473eb0e"
+    },
+    {
+      "path": "src/game/original/PlayerContainers.cpp",
+      "sha256": "2b51183e5ac56b50256d5a2fe8adce2d19013634548dadf910df9fafe87481b7"
+    },
+    {
+      "path": "src/game/original/PlayerSave.cpp",
+      "sha256": "877fb7791a434f29bb37da19f5ce3531b1dcf6325db14e197c29b63cd1c28749"
+    },
+    {
+      "path": "src/game/original/PlayerUse.cpp",
+      "sha256": "9279efc44ce4b98fa6c5a68bd4ab5d9c195624bf7d70b3a2340a60c9d601cd97"
+    },
+    {
+      "path": "src/game/original/Projectile.cpp",
+      "sha256": "d83d5a69403d5cb2a73f0653d69e6e60b138829e3ae392e9ca98ca508bf8fd58"
+    },
+    {
+      "path": "src/game/original/ProximityBomb.cpp",
+      "sha256": "7678366a258e82597811b6318759c8161d4ca331c684f3ee49495cbee016bf16"
+    },
+    {
+      "path": "src/game/original/ProximityBomb.h",
+      "sha256": "ed1ca61b37a2072279ecb4289fa8673cb632178da01f92475ea38f195a88a1bc"
+    },
+    {
+      "path": "src/game/original/ViewWeapon.cpp",
+      "sha256": "b0784215f778d42342067793fc04823c9a1c10f1003a596462dd8cb36afcf346"
+    },
+    {
+      "path": "src/game/original/ViewWeapon.h",
+      "sha256": "1a0ae5c1ff89b1dbd671a75bb5357ef3ae4618ecd07c7322e5ac9a555b85bb22"
+    },
+    {
+      "path": "src/game/original/Weapon.cpp",
+      "sha256": "0d3da05648ba4bff438a82585ff85cdcf91e0dca579c49dc12fddc4e9c663216"
+    },
+    {
+      "path": "src/game/original/Weapon.h",
+      "sha256": "d53a341e93dc08a579ff97ede60c867eea8e45c3b68cc02f7de3cefceee4c86a"
+    },
+    {
+      "path": "src/game/original/WeaponDefs.cpp",
+      "sha256": "2446a0d7efe3185d261edfb66259c39795f31805d9c4f4178c349f68bad9c24a"
+    },
+    {
+      "path": "src/game/original/WeaponDefs.h",
+      "sha256": "819e823c0205f4107b999ccd979cce8aaa43d932da1276d277b989e35c81c848"
+    },
+    {
+      "path": "src/game/original/WeaponProjectile.cpp",
+      "sha256": "7a09a4766bd0e9221a5f388f6493737b18eea66dfcc87767e63f453f561c7d35"
+    },
+    {
+      "path": "src/game/projectile_report.h",
+      "sha256": "202de09f61abfbe5ba823350d7d56d2b04d25f0f0b0c855f6bbe44add47ade46"
+    },
+    {
+      "path": "src/game/registration.cpp",
+      "sha256": "7ee8f29260e1be9f17c2b147d1f3234dd8b48287b1fcbde8e207d7e30ef2ed50"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "812cf4dc382a0c8543ff4d914c31cb02773e54172b047b9d5aff2dcebcd41600"
+    },
+    {
+      "path": "src/game/server_pickups.cpp",
+      "sha256": "bf4cfc7ab80301afbc7c149688b198697d536eeb1012730c2580ec77a65df8f7"
+    },
+    {
+      "path": "src/game/server_projectiles.cpp",
+      "sha256": "69c10cea12168ddff9df307e54d2384c04d25761207fc3845ac083f6460e4bff"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "153bf5d715697a8155a1c6a586de70e47bf0f3ce2d78823927c39ca1d4c9f40c"
+    },
+    {
+      "path": "src/game/weapon_messages.h",
+      "sha256": "14b4c6283a61f5b5b832c97c8b4ce9e8c41379a6647b051c3a233c6ec22ad300"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "424dad7762a27dd0abbf7222c8005273f80cd420c716f462f03233eceb7a6bd5"
+    },
+    {
+      "path": "tests/assault_tests.cpp",
+      "sha256": "172dcc52905ac0ea0cda9e1142714b09e2f4a41c2f141ae1a2d7ed3815e0749a"
+    },
+    {
+      "path": "tests/audio_stream_tests.cpp",
+      "sha256": "86c43114edf910160247bed1718052b65f06eb9ce5d12e8720496923f985569e"
+    },
+    {
+      "path": "tests/compound_shell_tests.cpp",
+      "sha256": "03a84bea1dc41d5c6935d1cf1ae2af7008b2bd537baa9dd8da3e27ecdcbb2c64"
+    },
+    {
+      "path": "tests/conversation_tests.cpp",
+      "sha256": "921d3d9a4a02f06676b454c68da9ac70072e8d89814d6b3869f39d8df2253451"
+    },
+    {
+      "path": "tests/destructable_model_tests.cpp",
+      "sha256": "73a3fe30470c6d2b6598bd63511d57eafaf07c1be4c73636610d251f4cf4ee3f"
+    },
+    {
+      "path": "tests/flare_tests.cpp",
+      "sha256": "7521eca41fb6b3df22dcea1957ece80e8927d6f16413462442013d04cfa2496a"
+    },
+    {
+      "path": "tests/level_change_gpu_tests.cpp",
+      "sha256": "38270f16df3f2eb31f4fc659cc5ec5a7ceda130cfa7df9c73963f239aa737c0d"
+    },
+    {
+      "path": "tests/mac10_tests.cpp",
+      "sha256": "c034bb4254a3c4faf0d5c2970967fbc65996c72fcbe04782661dee9d223709b9"
+    },
+    {
+      "path": "tests/medkit_tests.cpp",
+      "sha256": "b0033c96b33aa942fe7186946b5a0e0a3d336159fef394a5c2a1f209693cdfeb"
+    },
+    {
+      "path": "tests/particle_stream_tests.cpp",
+      "sha256": "1d9185940630a37ef9ca310dfe6aedfe5aec1b09649257a67f54e0eaef281198"
+    },
+    {
+      "path": "tests/pickup_tests.cpp",
+      "sha256": "ed75d677543657e669f2bd93a447b909a8e9181cce7ea7f911a4ba9969b9f47c"
+    },
+    {
+      "path": "tests/proximity_fixture.h",
+      "sha256": "7fa4c521e1921300045d39e8492ad4c8ad539b96355a284faf0b45fa340241e4"
+    },
+    {
+      "path": "tests/proximity_gpu_tests.cpp",
+      "sha256": "e630f4cdeea4bdd741d46aa584db640588235b4d68b368f68d1768b81eedd466"
+    },
+    {
+      "path": "tests/proximity_tests.cpp",
+      "sha256": "a120f09d2019806fecc52877da40ed8f4871dc1615f2562c8c863a9c54cf5cba"
+    },
+    {
+      "path": "tests/sky_tests.cpp",
+      "sha256": "e28856d59392c88a8f8a696696fdb07133c09db23116c6d4eb0c6f09f77795d3"
+    },
+    {
+      "path": "tests/world_debris_tests.cpp",
+      "sha256": "ad68021b846f0307f16edf14d892201fc33be8fa794cafab8622551324dc95c6"
+    },
+    {
+      "path": "tests/world_tests.cpp",
+      "sha256": "61496fa9ba285bf175f884adaa8e98820632c02e91ef929f4b2da1ec9c82fdb6"
+    }
+  ],
+  "implementation_commit": "e7726e99f70fadad2487885894ba8505b770dd06"
+}

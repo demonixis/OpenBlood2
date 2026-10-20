@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-18",
+  "status": "closed_with_reservation",
+  "reservation": "M2-GPU-001",
+  "reservation_status": "open_external_platform_qualification",
+  "authorization": "User explicitly requested M2 closure with a documented NVIDIA/D-Bus leak reservation, documentation commits, and disabling the M2 automation; M3 follows in a later request.",
+  "implementation_commit": "a17e3244057ee1d7cdc72e3471295f9e9aa145ed",
+  "scope": "Selected SubwayA startup, intro, combat, contacts, authored exit, preserved CityHub entry and teardown. Not full campaign or retail equivalence.",
+  "original_criteria_and_test_outcomes_changed": false,
+  "acceptance_exception": "Only the independently reproduced external NVIDIA/D-Bus GPU LeakSanitizer failure is accepted for M2 closure.",
+  "qualification_followup": "M4 graphics/platform qualification; preserve the stack pending the user-reported graphics push.",
+  "prior_evidence": {
+    "path": "m2-acceptance.json",
+    "sha256": "c74219e82d15c7d69f9b8fd7e0dd585a22cdd4f1e9593e5e5f1d41798f8e6c94"
+  },
+  "recheck": "Collected during the preceding closure-verification request, not a new test run for this documentation change.",
+  "files": [
+    {
+      "path": "m2-closure/results.json",
+      "sha256": "d415c30f0fdb5083511c22cb146b881bf57fd8c13e41f49d7bc607b79317382b"
+    },
+    {
+      "path": "m2-closure/window.log",
+      "sha256": "6c3ab8890552f9cef095e95e065a710aaab25db5d8267e38817f2e6c9203c804"
+    },
+    {
+      "path": "m2-closure/gpu.log",
+      "sha256": "d1884ea6941643ff87dbf69b0eed9d592ed778d8c393de7850bc7b3d80dc3146"
+    }
+  ],
+  "implementation_documentation_commit": "3b5882df827fae11f1f6c23e5a51187baf3a82a9",
+  "documentation_validation": {
+    "local_markdown_links": 4463,
+    "prior_evidence_hashes_verified": 46,
+    "recheck_hashes_verified": 3,
+    "m2_work_deliverables_exit_gate_unchanged": true,
+    "code_or_dependency_changes": false,
+    "tests_rerun_for_documentation": false
+  }
+}

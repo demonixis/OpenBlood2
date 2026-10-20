@@ -1,0 +1,14 @@
+526/528 Testing: explosion_lights.failures
+526/528 Test: explosion_lights.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_light_tests" "failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_lights.failures" start time: Oct 16 20:52 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_lights.failures" end time: Oct 16 20:52 CEST
+"explosion_lights.failures" time elapsed: 00:00:00
+----------------------------------------------------------

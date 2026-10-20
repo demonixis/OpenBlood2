@@ -1,0 +1,21 @@
+[0/2] Re-checking globbed directories...
+[1/232] Scanning <workspace>/Blood2/src/game/original/PolyGrid.cpp for CXX dependencies
+[2/232] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[3/225] Scanning <workspace>/Blood2/src/game/server_containers.cpp for CXX dependencies
+[4/225] Scanning <workspace>/Blood2/src/game/server_physics.cpp for CXX dependencies
+[5/225] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[6/56] Scanning <workspace>/Blood2/tests/polygrid_tests.cpp for CXX dependencies
+[7/56] Scanning <workspace>/Blood2/src/app/inspector.cpp for CXX dependencies
+[8/56] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PolyGrid.cpp.o
+[9/56] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[10/22] Generating CXX dyndep file tests/CMakeFiles/polygrid_tests.dir/CXX.dd
+[11/21] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_containers.cpp.o
+[12/21] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_physics.cpp.o
+[13/21] Linking CXX static library libblood2_game.a
+[14/21] Linking CXX executable tests/world_tests
+[15/21] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o
+[16/21] Linking CXX executable tests/container_tests
+[17/21] Building CXX object tests/CMakeFiles/polygrid_tests.dir/polygrid_tests.cpp.o
+[18/21] Linking CXX executable blood2
+[19/21] Linking CXX executable tests/polygrid_gpu_tests
+[20/21] Linking CXX executable tests/polygrid_tests

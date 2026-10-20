@@ -1,0 +1,14 @@
+316/323 Testing: attachments.root
+316/323 Test: attachments.root
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests" "root" "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment-fixtures/root"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"attachments.root" start time: Oct 16 07:33 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"attachments.root" end time: Oct 16 07:33 CEST
+"attachments.root" time elapsed: 00:00:00
+----------------------------------------------------------

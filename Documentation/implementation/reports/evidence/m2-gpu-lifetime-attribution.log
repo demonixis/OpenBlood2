@@ -1,0 +1,4 @@
+vulkan 21996 408 {'libnvidia-glcore.so.615.78.08': {'bytes': 13018, 'allocations': 270}, 'libnvidia-glsi.so.615.78.08': {'bytes': 6509, 'allocations': 135}, 'libdbus-1.so.3': {'bytes': 2469, 'allocations': 3}}
+gpu1-modules 44024 816 {'libnvidia-glcore.so.615.78.08': {'bytes': 26036, 'allocations': 540}, 'libnvidia-glsi.so.615.78.08': {'bytes': 13018, 'allocations': 270}, 'libdbus-1.so.3': {'bytes': 4970, 'allocations': 6}}
+gpu1-final-modules 44024 816 {'libnvidia-glcore.so.615.78.08': {'bytes': 13018, 'allocations': 270}, 'libnvidia-glsi.so.615.78.08': {'bytes': 13018, 'allocations': 270}, 'ambiguous: libnvidia-glcore.so.615.78.08, libnvidia-gpucomp.so.615.78.08': {'bytes': 13018, 'allocations': 270}, 'libdbus-1.so.3': {'bytes': 4970, 'allocations': 6}}
+train 44056 816 {'libnvidia-glcore.so.615.78.08': {'bytes': 26036, 'allocations': 540}, 'libnvidia-glsi.so.615.78.08': {'bytes': 13018, 'allocations': 270}, 'libdbus-1.so.3': {'bytes': 5002, 'allocations': 6}}

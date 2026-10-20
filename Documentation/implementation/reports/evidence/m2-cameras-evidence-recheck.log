@@ -1,0 +1,15 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 183: cameras.catalog
+1/2 Test #183: cameras.catalog ..................   Passed    5.17 sec
+    Start 184: gpu.cameras
+2/2 Test #184: gpu.cameras ......................   Passed    3.80 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+cameras     =   8.96 sec*proc (2 tests)
+gpu         =   3.80 sec*proc (1 test)
+headless    =   5.17 sec*proc (1 test)
+private     =   8.96 sec*proc (2 tests)
+
+Total Test time (real) =   8.97 sec

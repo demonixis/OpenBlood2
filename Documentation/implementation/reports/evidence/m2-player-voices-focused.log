@@ -1,0 +1,66 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 960
+    Start 960: player_voice.groups
+
+960: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/player_voice_tests "groups" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-voice-fixtures/groups"
+960: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+960: Test timeout computed to be: 30
+1/5 Test #960: player_voice.groups ..............   Passed    0.02 sec
+test 961
+    Start 961: player_voice.timing
+
+961: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/player_voice_tests "timing" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-voice-fixtures/timing"
+961: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+961: Test timeout computed to be: 30
+2/5 Test #961: player_voice.timing ..............   Passed    0.02 sec
+test 962
+    Start 962: player_voice.messages
+
+962: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/player_voice_tests "messages" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-voice-fixtures/messages"
+962: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+962: Test timeout computed to be: 30
+3/5 Test #962: player_voice.messages ............   Passed    0.02 sec
+test 963
+    Start 963: player_voice.pickup
+
+963: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/player_voice_tests "pickup" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-voice-fixtures/pickup"
+963: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+963: Test timeout computed to be: 30
+963: accepted pickup branches=4 group replies=1
+4/5 Test #963: player_voice.pickup ..............   Passed    0.52 sec
+test 964
+    Start 964: player_voice.private
+
+964: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/player_voice_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+964: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+964: Test timeout computed to be: 120
+964: Original SubwayA camera intro expired after 12.0167 simulation seconds
+964: retail groups=44 WAV entries=431
+964: unique 1: Missing streaming sound resource / 
+964: unique 8: Missing streaming sound resource / 
+5/5 Test #964: player_voice.private .............   Passed    2.82 sec
+
+The following tests passed:
+	player_voice.groups
+	player_voice.timing
+	player_voice.messages
+	player_voice.pickup
+	player_voice.private
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+audio           =   3.39 sec*proc (5 tests)
+headless        =   3.39 sec*proc (5 tests)
+player_voice    =   3.39 sec*proc (5 tests)
+private         =   2.82 sec*proc (1 test)
+
+Total Test time (real) =   3.41 sec

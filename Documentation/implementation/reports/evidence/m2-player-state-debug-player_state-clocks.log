@@ -1,0 +1,14 @@
+520/524 Testing: player_state.clocks
+520/524 Test: player_state.clocks
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_state_tests" "clocks" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-state-fixtures/clocks"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"player_state.clocks" start time: Oct 16 18:29 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.clocks" end time: Oct 16 18:29 CEST
+"player_state.clocks" time elapsed: 00:00:00
+----------------------------------------------------------

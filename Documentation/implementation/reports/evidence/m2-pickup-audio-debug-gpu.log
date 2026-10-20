@@ -1,0 +1,160 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 25
+    Start  25: gpu.lifecycle
+
+25: Test command: <workspace>/Blood2/build/debug/blood2 "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--gpu-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/gpu.png"
+25: Working Directory: <workspace>/Blood2/build/debug/tests
+25: Test timeout computed to be: 25
+25: [info] External data: <external-data-root> (--data-dir)
+25: [info] BLOOD2.REZ: detected, 267758913 bytes
+25: [info] SOUND.REZ: detected, 204633068 bytes
+25: [info] BLOOD2P.REZ: detected, 24133434 bytes
+25: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+25: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+25: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+25: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+25: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+25: [info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/gpu.png
+25: [info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+25: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+25: [info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+25: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+1/5 Test  #25: gpu.lifecycle ....................   Passed    2.44 sec
+test 78
+    Start  78: gpu.weapons
+
+78: Test command: <workspace>/Blood2/build/debug/blood2 "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--weapons-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/weapons.png"
+78: Working Directory: <workspace>/Blood2/build/debug/tests
+78: Test timeout computed to be: 60
+78: [info] External data: <external-data-root> (--data-dir)
+78: [info] BLOOD2.REZ: detected, 267758913 bytes
+78: [info] SOUND.REZ: detected, 204633068 bytes
+78: [info] BLOOD2P.REZ: detected, 24133434 bytes
+78: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+78: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+78: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+78: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+78: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+78: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+78: [info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/weapons.png
+78: [info] Weapon impacts: contacts=3, sounds=2, failures=0, hidden=true
+78: [info] Shutdown: frames=240, UI frames=120, hidden frames=120, toggles=2, resize=true, quit=true
+78: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+78: [info] Session playback: waiting=0 time=28.033333333333022 npc-ready=16 npc-failed=0 npc-updates=679
+78: [info] AI paths: hidden=true, reentered=true, copied points=7
+78: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+78: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+78: [info] Weapon smoke passed: animation-key shots, bullets consumed, knife strikes, firing while hidden, decoded fire voices submitted to SDL, unload/re-entry
+78: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+2/5 Test  #78: gpu.weapons ......................   Passed   25.01 sec
+test 141
+    Start 141: gpu.triggers
+
+141: Test command: <workspace>/Blood2/build/debug/blood2 "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--triggers-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/triggers.png"
+141: Working Directory: <workspace>/Blood2/build/debug/tests
+141: Test timeout computed to be: 30
+141: [info] External data: <external-data-root> (--data-dir)
+141: [info] BLOOD2.REZ: detected, 267758913 bytes
+141: [info] SOUND.REZ: detected, 204633068 bytes
+141: [info] BLOOD2P.REZ: detected, 24133434 bytes
+141: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+141: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+141: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+141: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+141: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+141: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+141: [info] Trigger smoke door: door3 key Key
+141: [info] Trigger smoke pickup:
+141: [info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/triggers.png
+141: [info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+141: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+141: [info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+141: [info] AI paths: hidden=true, reentered=true, copied points=7
+141: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+141: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+141: [info] Trigger smoke passed: missing-key denial, real key pickup, consumption/unlock while hidden, door motion, inspector, reload
+141: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+3/5 Test #141: gpu.triggers .....................   Passed    2.82 sec
+test 194
+    Start 194: gpu.pickups
+
+194: Test command: <workspace>/Blood2/build/debug/blood2 "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--pickups-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/pickups.png"
+194: Working Directory: <workspace>/Blood2/build/debug/tests
+194: Test timeout computed to be: 30
+194: [info] External data: <external-data-root> (--data-dir)
+194: [info] BLOOD2.REZ: detected, 267758913 bytes
+194: [info] SOUND.REZ: detected, 204633068 bytes
+194: [info] BLOOD2P.REZ: detected, 24133434 bytes
+194: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+194: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+194: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+194: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+194: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+194: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+194: [info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/pickups.png
+194: [info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+194: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+194: [info] Session playback: waiting=0 time=24.433333333333227 npc-ready=16 npc-failed=0 npc-updates=665
+194: [info] AI paths: hidden=true, reentered=true, copied points=7
+194: [error] GPU smoke failed: selection=true, crouch/run frames=0/0, skeleton reentry/hidden=false/false, crouched/stood=false/false, locomotion/walk/run/jump=false/false/false/false, objects=236/236, strings=5/5
+4/5 Test #194: gpu.pickups ......................***Failed    8.89 sec
+test 202
+    Start 202: gpu.objectives
+
+202: Test command: <workspace>/Blood2/build/debug/blood2 "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--objectives-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/objectives.png"
+202: Working Directory: <workspace>/Blood2/build/debug/tests
+202: Test timeout computed to be: 30
+202: [info] External data: <external-data-root> (--data-dir)
+202: [info] BLOOD2.REZ: detected, 267758913 bytes
+202: [info] SOUND.REZ: detected, 204633068 bytes
+202: [info] BLOOD2P.REZ: detected, 24133434 bytes
+202: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+202: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+202: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+202: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+202: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+202: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+202: [info] NEW_LEVEL committed: worlds/01_subwaya.dat -> worlds/02_cityhub.dat / start 01_egressa
+202: [info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/objectives.png
+202: [info] NEW_LEVEL committed: worlds/01_subwaya.dat -> worlds/02_cityhub.dat / start 01_egressa
+202: [info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+202: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+202: [info] Session playback: waiting=0 time=0.06666666666666667 npc-ready=27 npc-failed=0 npc-updates=27
+202: [info] AI paths: hidden=true, reentered=true, copied points=7
+202: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+202: [info] World smoke passed: unload/reload, source paths/progress checked before exit, CityHub creation/resource report verified
+202: [info] OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; authored ExitTrigger NEW_LEVEL commits CityHub with the retained player; 1026 source entries include one explicit missing-world-model omission; destination entry, cleanup, presentation and reload checked
+202: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+5/5 Test #202: gpu.objectives ...................   Passed   10.79 sec
+
+The following tests passed:
+	gpu.lifecycle
+	gpu.weapons
+	gpu.triggers
+	gpu.objectives
+
+80% tests passed, 1 tests failed out of 5
+
+Label Time Summary:
+gpu           =  49.95 sec*proc (5 tests)
+objectives    =  10.79 sec*proc (1 test)
+pickups       =   8.89 sec*proc (1 test)
+private       =  47.50 sec*proc (4 tests)
+triggers      =   2.82 sec*proc (1 test)
+weapons       =  25.01 sec*proc (1 test)
+
+Total Test time (real) =  49.97 sec
+
+The following tests FAILED:
+	194 - gpu.pickups (Failed)                              gpu pickups private
+Errors while running CTest
+Output from these tests are in: <workspace>/Blood2/build/debug/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

@@ -1,0 +1,14 @@
+58/189 Testing: weapons.private
+58/189 Test: weapons.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapons.private" start time: Oct 16 00:22 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =  90.03 sec
+----------------------------------------------------------
+Test Failed.
+"weapons.private" end time: Oct 16 00:24 CEST
+"weapons.private" time elapsed: 00:01:30
+----------------------------------------------------------

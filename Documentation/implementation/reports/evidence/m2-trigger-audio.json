@@ -1,0 +1,219 @@
+{
+  "date": "2026-10-17",
+  "status": "verified scoped increment; M2 remains incomplete",
+  "baseline_commits": {
+    "workspace": "307e582f5539441ce464cfad5235a5ba17665c84",
+    "Blood2": "db8170fd712440d16466605e5761cba0200e34cb"
+  },
+  "scope": "Original Trigger activation and lock/explicit-unlock attached one-shot audio; truthful in-game inspection",
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "private_assets": "External installation only; no commercial resource bytes copied",
+  "gpu": "Vulkan / NVIDIA GeForce RTX 3060 Laptop GPU; dummy SDL audio; no native Metal run",
+  "known_unresolved": "M2 incomplete; prior sanitizer clearance timeout and unsuppressed exploratory NVIDIA/libdbus leak report remain in m2-door-audio evidence",
+  "commands": [
+    {
+      "cwd": "Blood2",
+      "command": "cmake --build --preset debug -j 6",
+      "result": "completed; final focused app/test rebuild incorporates smoke-output correction"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "cmake --build --preset debug --target blood2_app trigger_audio_tests -j 4",
+      "result": "passed"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "cmake --build --preset release -j 3 --target blood2_app trigger_audio_tests trigger_tests door_tests door_audio_tests object_contract_tests interaction_tests objectives_tests cinematic_tests conversation_tests exit_tests service_coverage_tests train_session_tests level_change_gpu_tests",
+      "result": "passed; inspector disabled"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "cmake --build build/sanitize -j 2 --target trigger_audio_tests trigger_tests door_tests door_audio_tests object_contract_tests interaction_tests objectives_tests cinematic_tests conversation_tests exit_tests service_coverage_tests train_session_tests",
+      "result": "passed; existing Clang ASan/UBSan configuration"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "ctest --test-dir build/debug -R '^(trigger_audio|triggers|doors|door_audio|interaction|objectives|cinematics|conversation|exits|coverage|objects|train_session)\\.' -LE gpu --output-on-failure -j 2",
+      "result": "88/88 passed",
+      "log": "m2-trigger-audio-headless-debug.log"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "ctest --test-dir build/release -R '^(trigger_audio|triggers|doors|door_audio|interaction|objectives|cinematics|conversation|exits|coverage|objects|train_session)\\.' -LE gpu -V -j 2",
+      "result": "88/88 passed",
+      "log": "m2-trigger-audio-headless-release.log"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^(trigger_audio|triggers|doors|door_audio|interaction|objectives|cinematics|conversation|exits|coverage|objects|train_session)\\.' -LE gpu -V -j 2",
+      "result": "88/88 passed",
+      "log": "m2-trigger-audio-headless-sanitize.log"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/debug -R '^gpu\\.(triggers|doors|interaction|lifecycle|level_change)$' -V",
+      "result": "4/5 passed; trigger smoke exposed missing output initialization, then corrected below",
+      "log": "m2-trigger-audio-gpu-debug-final.log"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/release -R '^gpu\\.(triggers|doors|interaction|lifecycle|level_change)$' -V",
+      "result": "5/5 passed",
+      "log": "m2-trigger-audio-gpu-release.log"
+    },
+    {
+      "cwd": "Blood2",
+      "command": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/debug -R '^gpu.triggers$' -V",
+      "result": "1/1 passed after initialization fix; cursor 3307.5 and 7200 submitted frames",
+      "log": "m2-trigger-audio-gpu-debug-corrected.log"
+    }
+  ],
+  "initial_attempts": [
+    "Initial compilation observed an in-progress smoke signature/caller mismatch; final builds pass.",
+    "Synthetic key fixture lacked required nonempty icon names; fixed fixture, no validation bypass.",
+    "SubwayA authored SelfTriggers have empty lock cues; private diagnostic moved to CDM. A trial CDM GPU door selection did not meet the existing fixture motion filters.",
+    "GPU fixture retains SubwayA key/door behavior with an explicitly labelled borrowed CDM cue. First decoded-audio check correctly failed because this smoke did not yet open SDL output; final initialization and checks pass."
+  ],
+  "inspection": "Selected Triggers panel capture reviewed; actual audio cursor/output assertions run with UI hidden. Audio details require scrolling in the captured window. Images remain in ignored build directories.",
+  "documentation_checks": {
+    "local_markdown_links": 3590,
+    "clang_format": "passed for seven changed C++ files",
+    "diff_check": "passed",
+    "source_selection_hashes": "verified",
+    "docs_root": "four general developer guides; new contracts and source ledger in dedicated subdirectories"
+  },
+  "logs": [
+    {
+      "file": "m2-trigger-audio-build-debug-complete.log",
+      "original_sha256": "0fbdb583c52f62facd80b4e60c970c145c5e0056fc996b0c7ff72ab95c7a158c",
+      "saved_sha256": "0fbdb583c52f62facd80b4e60c970c145c5e0056fc996b0c7ff72ab95c7a158c"
+    },
+    {
+      "file": "m2-trigger-audio-build-debug-final.log",
+      "original_sha256": "dc3dd7e8b95c73bcec6d768ff8544a97428d51836f75e82c52b77a885543d2bd",
+      "saved_sha256": "c6cf921fef29b09e4105d358b81e1cc43ae3b4cf96c45da3833980fcef619b31"
+    },
+    {
+      "file": "m2-trigger-audio-build-debug-focused.log",
+      "original_sha256": "379038df73b958ddec1598a6922af84459fab42e01115cd7f05571999e2a104f",
+      "saved_sha256": "71faa5de294a9aab3cc07b6937572e31d0d04eeee8efeae269efecb599053449"
+    },
+    {
+      "file": "m2-trigger-audio-build-debug.log",
+      "original_sha256": "69891f47bbbab786be1c83b7b9d04d19ff3c2e00650dc1ed37a17de4e10fa759",
+      "saved_sha256": "b7bc85d73471e3869bdbdc5db17af046c15e7770ca68df3f73bde7be0bc1050b"
+    },
+    {
+      "file": "m2-trigger-audio-build-gpu-fixture.log",
+      "original_sha256": "9cb4a739ff59ccac8cea9745fee9b222a9e4856e371a84176cd82e162cf6602b",
+      "saved_sha256": "ee3e7a9c748f2088e9be4c3f900eec2fb5d97d44c52c7401b66f1a3913307def"
+    },
+    {
+      "file": "m2-trigger-audio-build-output-debug.log",
+      "original_sha256": "e4a8efdbb89ff5c2e6dc70e708bd6b7c08266fac316a22be084490fd123a8dc6",
+      "saved_sha256": "d40c3433564aaba7237984cc3e26ad19adaabd77ead783a9a7170eebdc4f7127"
+    },
+    {
+      "file": "m2-trigger-audio-build-release.log",
+      "original_sha256": "1febb238f9f9139cfb40719c4db0fbb560f3991867f9d15749929a7b52bed909",
+      "saved_sha256": "ff2bcf574a03f7472f8953d9781cc86e50b430d9b01033322f1c2ff7a2217070"
+    },
+    {
+      "file": "m2-trigger-audio-build-sanitize.log",
+      "original_sha256": "37f485f9ab1e0337a17cc857e7edbe446dd57bfce358af88ba500c820eb771e8",
+      "saved_sha256": "5bca299259c6548e9f91b251ef0cefd05655a363b30d40a88b3a3523c349eea3"
+    },
+    {
+      "file": "m2-trigger-audio-build-tests.log",
+      "original_sha256": "e1abdb7a1336b3e23a202c14f26282ea57e2fe946c8e1433bacbcdc87f69789a",
+      "saved_sha256": "a5c00998db55ab73aa18858bf75675a42b0be0663e1190f28995efc1902bb23e"
+    },
+    {
+      "file": "m2-trigger-audio-gpu-debug-corrected.log",
+      "original_sha256": "c3f6f9289b90aca46e058b344cee9aeefc17621cfc160631d9de052bae3aaa0b",
+      "saved_sha256": "9acef4b97f6615e4039874b5b9bdba3dc3957468b2ff0e8cfb89dec0308b0dc5"
+    },
+    {
+      "file": "m2-trigger-audio-gpu-debug-final.log",
+      "original_sha256": "c075b155a86d4a50f4e0c268ba3c4fd6b0ce5bf0137e739c3b8ec3713d2bfbbf",
+      "saved_sha256": "b22d367866df2976f87cb6bc2b0c4bd23dcab63ebe7befed82b4a0a35ec019c0"
+    },
+    {
+      "file": "m2-trigger-audio-gpu-debug-initial.log",
+      "original_sha256": "c77905172f374ba71f6129df76fb608e96232e0e48c4fbf754032a459141b5e6",
+      "saved_sha256": "de38f9b1efdf4aa9f995b448f7d2dc120c70ea0685ee9efb36be266819c8f386"
+    },
+    {
+      "file": "m2-trigger-audio-gpu-debug.log",
+      "original_sha256": "4db204c9c55cc23622d8a16b5742217596bd1f6ca948eeaf86781da357f6f08c",
+      "saved_sha256": "bf3a68a618feeb64a40c577117956f5d9c25c023f1d37525c324942ccf83800c"
+    },
+    {
+      "file": "m2-trigger-audio-gpu-release.log",
+      "original_sha256": "91060e4c17911849180db5588ee1fe13c451cc932ee20b54d01ea6a135a9c0ca",
+      "saved_sha256": "c0748b43181ab5e6af4208478c738b601eda59156f6ff7784d291cc3833090a6"
+    },
+    {
+      "file": "m2-trigger-audio-headless-debug.log",
+      "original_sha256": "73ea11b890c6c791e64da6c3d5d5a93f250da7f95b324570fd949ce593ac1c15",
+      "saved_sha256": "bc0be90ca96b5e5cef8d176034b4655403e2204bbb8fd844c89a187d4aa0b16d"
+    },
+    {
+      "file": "m2-trigger-audio-headless-release.log",
+      "original_sha256": "45eb743efa8a52ef18d2e1d9988c075e72384ebf815bf6346e1285b896d69626",
+      "saved_sha256": "62f921df492f2811c8c51f9f2bc9e01438ef61b8496ccf0f2c7e5696454e0fee"
+    },
+    {
+      "file": "m2-trigger-audio-headless-sanitize.log",
+      "original_sha256": "4e7e19d0dfb4a7a2068ad28460b922bd0d398b033f54741c1ad978bf74d533a0",
+      "saved_sha256": "feb607ab018fa4db6e2afd14d90999b5aeefd75f01d7acab9d3654fc2d4b342c"
+    },
+    {
+      "file": "m2-trigger-audio-new-debug-corrected.log",
+      "original_sha256": "4fd5a2b1a66e4fa9f1534787fd1b0772839116808dac395f720d91528336348d",
+      "saved_sha256": "d8e9eef183615d50e4b77480b4a36c801ca8f099842e28b7f599dbb66b64ea35"
+    },
+    {
+      "file": "m2-trigger-audio-new-debug.log",
+      "original_sha256": "da31a827770157e62ad3bff5e78792acd9d7c7200bb5863f94e9c0e053ca3d27",
+      "saved_sha256": "d7fbafda5ee75466ad77e38e870c55c8c91b9b05285e4bf7be21860f56c5675a"
+    }
+  ],
+  "implementation_commit": "b2319718de144511b53d1ae9e95fd7ae376481e4",
+  "log_normalization": "Replace local workspace/content-root prefixes with placeholders and trim trailing line whitespace; original and saved SHA-256 values retained."
+}

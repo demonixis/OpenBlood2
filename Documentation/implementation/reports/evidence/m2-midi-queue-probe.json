@@ -1,0 +1,10 @@
+{
+  "binary": "MSynth25.dll",
+  "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+  "unicorn": "2.1.4",
+  "queue_horizons": 700,
+  "control_patch_queries": 1400,
+  "bank_patch_cases": 900,
+  "decisions_sha256": "6ea8812d82b9553a57fac66e5a56a5b4d7ffd27abb05740ed546e056b11f994f",
+  "scope": "Original sorted insertion and equal-time stability; inclusive due extraction, last-due value lookup and submission-time bank capture. Synthetic pool only, no native DLL, OS imports, full synth, PCM or music tick-to-sample conversion."
+}

@@ -1,0 +1,14 @@
+549/550 Testing: explosion_flames.session
+549/550 Test: explosion_flames.session
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_flame_tests" "session" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-flames-session"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_flames.session" start time: Oct 16 22:02 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_flames.session" end time: Oct 16 22:02 CEST
+"explosion_flames.session" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,98 @@
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Relay reached at 2052.82 activations=1
+Before trail total=3849
+trail 6 live=1973 expire=49 dist=0
+trail 9 live=1 expire=1 dist=0
+trail 14 live=182 expire=7 dist=0
+trail 15 live=152 expire=1 dist=0
+trail 16 live=178 expire=5 dist=0
+trail 17 live=205 expire=12 dist=0
+trail 18 live=95 expire=13 dist=0
+trail 19 live=73 expire=0 dist=0
+trail 20 live=129 expire=0 dist=0
+trail 21 live=73 expire=0 dist=0
+trail 22 live=134 expire=0 dist=0
+trail 23 live=140 expire=0 dist=0
+trail 24 live=131 expire=0 dist=0
+trail 25 live=102 expire=0 dist=0
+trail 26 live=161 expire=0 dist=0
+trail 27 live=120 expire=0 dist=0
+Before trail total=3862
+trail 6 live=1986 expire=55 dist=0
+trail 9 live=0 expire=0 dist=0
+trail 14 live=175 expire=7 dist=0
+trail 15 live=151 expire=8 dist=0
+trail 16 live=173 expire=4 dist=0
+trail 17 live=195 expire=8 dist=0
+trail 18 live=82 expire=7 dist=0
+trail 19 live=77 expire=0 dist=0
+trail 20 live=131 expire=0 dist=0
+trail 21 live=78 expire=0 dist=0
+trail 22 live=137 expire=0 dist=0
+trail 23 live=143 expire=0 dist=0
+trail 24 live=133 expire=0 dist=0
+trail 25 live=105 expire=0 dist=0
+trail 26 live=167 expire=0 dist=0
+trail 27 live=129 expire=0 dist=0
+Before trail total=3874
+trail 6 live=1993 expire=50 dist=0
+trail 9 live=0 expire=0 dist=0
+trail 14 live=168 expire=6 dist=0
+trail 15 live=143 expire=6 dist=0
+trail 16 live=169 expire=7 dist=0
+trail 17 live=187 expire=8 dist=0
+trail 18 live=75 expire=9 dist=0
+trail 19 live=82 expire=0 dist=0
+trail 20 live=133 expire=0 dist=0
+trail 21 live=83 expire=0 dist=0
+trail 22 live=140 expire=0 dist=0
+trail 23 live=146 expire=0 dist=0
+trail 24 live=135 expire=0 dist=0
+trail 25 live=109 expire=0 dist=0
+trail 26 live=173 expire=0 dist=0
+trail 27 live=138 expire=0 dist=0
+Before trail total=3895
+trail 6 live=2006 expire=45 dist=0
+trail 9 live=0 expire=0 dist=0
+trail 14 live=162 expire=12 dist=0
+trail 15 live=137 expire=5 dist=0
+trail 16 live=162 expire=8 dist=0
+trail 17 live=179 expire=6 dist=0
+trail 18 live=66 expire=6 dist=0
+trail 19 live=87 expire=0 dist=0
+trail 20 live=136 expire=0 dist=0
+trail 21 live=89 expire=0 dist=0
+trail 22 live=143 expire=0 dist=0
+trail 23 live=150 expire=0 dist=0
+trail 24 live=138 expire=0 dist=0
+trail 25 live=113 expire=0 dist=0
+trail 26 live=180 expire=0 dist=0
+trail 27 live=147 expire=0 dist=0
+Before trail total=3919
+trail 6 live=2024 expire=37 dist=0
+trail 9 live=0 expire=0 dist=0
+trail 14 live=150 expire=7 dist=0
+trail 15 live=132 expire=7 dist=0
+trail 16 live=154 expire=6 dist=0
+trail 17 live=173 expire=7 dist=0
+trail 18 live=60 expire=9 dist=0
+trail 19 live=93 expire=0 dist=0
+trail 20 live=139 expire=0 dist=0
+trail 21 live=95 expire=0 dist=0
+trail 22 live=147 expire=0 dist=0
+trail 23 live=154 expire=0 dist=0
+trail 24 live=141 expire=0 dist=0
+trail 25 live=118 expire=0 dist=0
+trail 26 live=187 expire=0 dist=0
+trail 27 live=152 expire=0 dist=0
+Exit update failure after 6.78333s, stepped=0 HP=15.9025
+FX errors: Smoke-trail particle capacity exceeded |  |  |  | 
+Client StartNewWorld load-command excerpt -> CMSG_LOADWORLD (108)
+Server LoadWorld read-order excerpt -> fresh single-player settings
+REZ exact-path resolution -> DAT v56 structural validation
+World properties -> original MID_PRECREATE / MID_INITIALUPDATE
+Server PreStartWorld / PostStartWorld entry subset: path data copied; player entry available separately
+Server OnClientEnterWorld -> CreatePlayer -> CPlayerObj InitialUpdate/Respawn -> GoToStartPoint
+Client OnEnterWorld -> PLAYERINIT_SINGLEPLAYER -> SINGLEPLAYER_INIT -> original attribute/respawn subset
+M2 acceptance remains open: see Services for bounded implementation/trace coverage. Whole-world saves and unexercised gameplay paths are not validated.
+private_exit:156: stepped && !p->m_damage.IsDead()

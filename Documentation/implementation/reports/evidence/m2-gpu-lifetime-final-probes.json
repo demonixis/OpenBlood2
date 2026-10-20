@@ -1,0 +1,32 @@
+[
+  {
+    "command": [
+      "build/sanitize/tests/platform_lifetime_tests",
+      "video",
+      "3"
+    ],
+    "log": "/tmp/b2-gpu-lifetime-final-video.log",
+    "exit_code": 0,
+    "seconds": 0.3643394010141492
+  },
+  {
+    "command": [
+      "build/sanitize/tests/platform_lifetime_tests",
+      "window",
+      "3"
+    ],
+    "log": "/tmp/b2-gpu-lifetime-final-window.log",
+    "exit_code": 0,
+    "seconds": 0.36474148998968303
+  },
+  {
+    "command": [
+      "build/sanitize/tests/platform_lifetime_tests",
+      "gpu",
+      "3"
+    ],
+    "log": "/tmp/b2-gpu-lifetime-final-gpu.log",
+    "exit_code": 1,
+    "seconds": 6.5273168359999545
+  }
+]

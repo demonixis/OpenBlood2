@@ -1,0 +1,32 @@
+Test project /home/yann/projects/lithtech/Blood2/build/launcher-debug
+      Start  1: launcher.state
+ 1/11 Test  #1: launcher.state ...................   Passed    0.01 sec
+      Start  2: launcher.dialogs
+ 2/11 Test  #2: launcher.dialogs .................   Passed    0.00 sec
+      Start  3: launcher.help
+ 3/11 Test  #3: launcher.help ....................   Passed    0.00 sec
+      Start  4: launcher.protocol
+ 4/11 Test  #4: launcher.protocol ................   Passed    0.00 sec
+      Start  5: launcher.probe
+ 5/11 Test  #5: launcher.probe ...................   Passed    0.14 sec
+      Start  6: launcher.content
+ 6/11 Test  #6: launcher.content .................   Passed    0.00 sec
+      Start  7: launcher.process
+ 7/11 Test  #7: launcher.process .................   Passed    0.03 sec
+      Start  8: launcher.detach
+ 8/11 Test  #8: launcher.detach ..................   Passed    0.20 sec
+      Start  9: launcher.game_info
+ 9/11 Test  #9: launcher.game_info ...............   Passed    0.02 sec
+      Start 10: launcher.private_retail
+10/11 Test #10: launcher.private_retail ..........   Passed    0.08 sec
+      Start 11: launcher.private_demo
+11/11 Test #11: launcher.private_demo ............   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Label Time Summary:
+headless    =   0.51 sec*proc (11 tests)
+launcher    =   0.51 sec*proc (11 tests)
+private     =   0.10 sec*proc (2 tests)
+
+Total Test time (real) =   0.51 sec

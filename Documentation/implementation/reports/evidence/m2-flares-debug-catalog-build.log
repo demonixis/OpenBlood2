@@ -1,0 +1,9 @@
+[0/2] Re-checking globbed directories...
+[1/9] Scanning /home/yann/projects/lithtech/Blood2/tests/weapon_drop_tests.cpp for CXX dependencies
+[2/9] Scanning /home/yann/projects/lithtech/Blood2/tests/pickup_tests.cpp for CXX dependencies
+[3/9] Generating CXX dyndep file tests/CMakeFiles/pickup_tests.dir/CXX.dd
+[4/9] Generating CXX dyndep file tests/CMakeFiles/weapon_drop_tests.dir/CXX.dd
+[5/9] Building CXX object tests/CMakeFiles/pickup_tests.dir/pickup_tests.cpp.o
+[6/9] Building CXX object tests/CMakeFiles/weapon_drop_tests.dir/weapon_drop_tests.cpp.o
+[7/9] Linking CXX executable tests/pickup_tests
+[8/9] Linking CXX executable tests/weapon_drop_tests

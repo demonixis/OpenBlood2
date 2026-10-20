@@ -1,0 +1,32 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 253: sprites.catalog
+      Start 254: sprites.subway
+      Start 247: sprites.reader
+      Start 250: sprites.placement
+ 1/10 Test #250: sprites.placement ................   Passed    0.01 sec
+      Start 249: sprites.properties
+ 2/10 Test #247: sprites.reader ...................   Passed    0.01 sec
+      Start 252: sprites.failures
+ 3/10 Test #249: sprites.properties ...............   Passed    0.01 sec
+      Start 251: sprites.ray
+ 4/10 Test #251: sprites.ray ......................   Passed    0.01 sec
+      Start 248: sprites.clock
+ 5/10 Test #252: sprites.failures .................   Passed    0.01 sec
+      Start  12: config.arguments
+ 6/10 Test #248: sprites.clock ....................   Passed    0.00 sec
+      Start  25: world.sprite_entries
+ 7/10 Test  #12: config.arguments .................   Passed    0.00 sec
+ 8/10 Test  #25: world.sprite_entries .............   Passed    0.01 sec
+ 9/10 Test #254: sprites.subway ...................   Passed    0.88 sec
+10/10 Test #253: sprites.catalog ..................   Passed    6.75 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+config      =   0.00 sec*proc (1 test)
+headless    =   7.69 sec*proc (10 tests)
+private     =   7.63 sec*proc (2 tests)
+sprites     =   7.68 sec*proc (8 tests)
+world       =   0.01 sec*proc (1 test)
+
+Total Test time (real) =   6.75 sec

@@ -1,0 +1,14 @@
+368/372 Testing: ai_state.dispatch
+368/372 Test: ai_state.dispatch
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_state_tests" "dispatch"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_state.dispatch" start time: Oct 16 11:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.dispatch" end time: Oct 16 11:01 CEST
+"ai_state.dispatch" time elapsed: 00:00:00
+----------------------------------------------------------

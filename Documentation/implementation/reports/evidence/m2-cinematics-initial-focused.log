@@ -1,0 +1,87 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 216: cinematics.decode
+    Start 217: cinematics.mixer
+    Start 218: cinematics.spatial
+    Start 219: cinematics.sequence
+1/8 Test #216: cinematics.decode ................   Passed    0.00 sec
+    Start 220: cinematics.lifetime
+2/8 Test #217: cinematics.mixer .................   Passed    0.01 sec
+3/8 Test #218: cinematics.spatial ...............   Passed    0.01 sec
+    Start 221: cinematics.failures
+    Start 222: cinematics.device
+4/8 Test #219: cinematics.sequence ..............   Passed    0.01 sec
+    Start 223: cinematics.catalog
+5/8 Test #220: cinematics.lifetime ..............   Passed    0.01 sec
+6/8 Test #221: cinematics.failures ..............   Passed    0.01 sec
+7/8 Test #222: cinematics.device ................   Passed    0.07 sec
+8/8 Test #223: cinematics.catalog ...............***Failed    3.52 sec
+worlds/01_subwaya.dat sound=sounds\enemies\gideon\laf1_gid.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+SUBWAY cinexit1
+  0 sounds\enemies\gideon\laf1_gid.wav speaker=player message=door12:TRIGGER
+SUBWAY cinhi5
+  0 sounds\events\metalcrush5a.wav speaker=player message=:
+  0 sounds\events\traincrash1.wav speaker=player message=:
+SUBWAY cintrig1
+  0 sounds\chosen\caleb\e1m4_1_cal.wav speaker=player message=:
+SUBWAY cintrig2
+  0 sounds\enemies\gideon\1agid1.wav speaker=player message=:
+  0 sounds\chosen\caleb\1acaleb1.wav speaker=player message=:
+worlds/02_cityhub.dat sound=sounds\enemies\civilian\spot11.wav error=Truncated WAVE chunk/padding
+worlds/02_cityhubb.dat sound=sounds\chosen\caleb\msc12cal.wav error=Missing or oversized sound resource
+worlds/03_museum.dat sound=sounds\chosen\gabriella\3gab2.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/03_museum.dat sound=sounds\chosen\caleb\3caleb1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/03_museum.dat sound=sounds\chosen\gabriella\3gab3.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/03_museum.dat sound=sounds\chosen\gabriella\3gab4.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/03_museum.dat sound=sounds\enemies\gideon\tnt4_gid.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/03_museum.dat sound=sounds\chosen\caleb\laugh1_calb.wav error=Missing or oversized sound resource
+worlds/03_museum.dat sound=sounds\events\davoice1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/03_museum.dat sound=sounds\events\davoice2.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/05_cdm.dat sound=sounds\events\cwvoice11.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/05_cdm.dat sound=sounds\events\cwvoice6.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/05_cdm.dat sound=sounds\chosen\caleb\e2m5_2_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/05_cdm.dat sound=sounds\chosen\caleb\e2m5_1_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/09_abandoned_buildings.dat sound=Sounds\Enemies\Gideon\7gid1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/09_abandoned_buildings.dat sound=Sounds\Chosen\Ishmael\7Ish1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/09_abandoned_buildings.dat sound=Sounds\Chosen\Ishmael\7Ish3.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/09_abandoned_buildings.dat sound=Sounds\Chosen\Ishmael\7Ish4.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/09_abandoned_buildings.dat sound=Sounds\Chosen\Ishmael\7Ish5.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/09_abandoned_buildings.dat sound=Sounds\Chosen\Caleb\7Caleb4.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/09_abandoned_buildings.dat sound=Sounds\Chosen\Ishmael\7Ish4.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/09_abandoned_buildings.dat sound=sounds\chosen\caleb\e1m3_2_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/09_abandoned_buildings.dat sound=sounds\chosen\caleb\kill\laugh1_cal.wav error=Missing or oversized sound resource
+worlds/12_train_station.dat sound=sounds\enemies\civilian\12civ5.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/12_train_station.dat sound=sounds\enemies\civilian\12civ2.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/12_train_station.dat sound=sounds\enemies\civilian\12civ5.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/12_train_station.dat sound=sounds\enemies\civilian\12civ5.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/12_train_station.dat sound=sounds\enemies\civilian\12civ2.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/15_crypt.dat sound=sounds\chosen\ishmael\9ish1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/17_entrance.dat sound=sounds\chosen\caleb\e3m2_3_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/17_entrance.dat sound=sounds\chosen\caleb\e3m2_1_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/18_temple.dat sound=sounds\chosen\caleb\11caleb1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/18_temple.dat sound=sounds\chosen\ophelia\11Oph2.WAV error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/18_temple.dat sound=sounds\chosen\caleb\e3m5_3_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/19_lobby.dat sound=sounds\chosen\caleb\e3m3_1_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/21_laboratory.dat sound=sounds\enemies\mad scientist\12madsci1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/23_rooftop.dat sound=sounds\chosen\caleb\14Caleb1.WAV error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/24_ancientcity.dat sound=Sounds\Chosen\Caleb\Taunt\tnt5_cal.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/24_ancientcity.dat sound=Sounds\Chosen\Caleb\Kill\laugh1_calA.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/24_ancientcity.dat sound=Sounds\Enemies\Gideon\16Gid1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/24b_arena.dat sound=Sounds\Chosen\Caleb\17Caleb2.WAV error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds/25_ancientone.dat sound=Sounds\Chosen\Ishmael\20Ish1.wav error=Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)
+worlds=57 controllers=79 cues=201 missing=3 invalid=40
+encoding=1 cues=158
+catalog:383: worlds == 57 && controllers > 0 && cues > 0 && !invalid
+
+
+88% tests passed, 1 tests failed out of 8
+
+Label Time Summary:
+cinematics    =   3.62 sec*proc (8 tests)
+headless      =   3.62 sec*proc (8 tests)
+private       =   3.52 sec*proc (1 test)
+
+Total Test time (real) =   3.53 sec
+
+The following tests FAILED:
+	223 - cinematics.catalog (Failed)                       cinematics headless private
+Errors while running CTest

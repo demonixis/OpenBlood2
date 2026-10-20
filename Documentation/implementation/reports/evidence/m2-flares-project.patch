@@ -1,0 +1,2284 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index aac0550..ee54cd4 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -528,3 +528,5 @@ The [PCM streaming continuation](../Documentation/Implementation/M2_AUDIO_STREAM
+ The [Mac-10 continuation](../Documentation/Implementation/M2_MAC10.md) connects original weapon ID 2, both-hand firing, pickups, NPC drops and autonomous Cultist use. Read [contracts](docs/MAC10_CONTRACTS.md). Preserve marker-driven cadence, complete primary-sequence fallback when alt_fire is absent, typed pickup acknowledgements and checked detached-hand lifetime. Chrome/multiplayer boost and view-key audio remain unavailable. CityHub has 419 created / 31 transferred sounds / 31 unsupported / four failed; safe NEW_LEVEL and M2 remain open.
+ 
+ The [compound-shell correction](../Documentation/Implementation/M2_COMPOUND_SHELLS.md) admits independently closed DAT components sharing edges. Read [contracts](docs/COMPOUND_SHELL_CONTRACTS.md). Preserve per-component opposite-edge closure, base rings/welding/work limits, actual query geometry and authored BoxPhysics. Balanced winding alone is insufficient; unresolved non-manifold sheets still fail. Inspect topology even when hidden and retain checked removal/reload. CityHub is 421 created / 31 transferred sounds / 31 unsupported / two failed; safe NEW_LEVEL and M2 stay open.
++
++The [Flare Gun continuation](../Documentation/Implementation/M2_FLARES.md) connects original ID 3, tracking FIRE ticks, eight alternate fragments, pickup/drop and autonomous Cultist use. Read [contracts](docs/FLARE_CONTRACTS.md). Preserve strict clocks, world-space offsets, loop restart, FRAG-before-BURST ordering, one point integration and checked independent children. Sprite tint/alpha is rendered; source trails/lights/composites and fire/gib deaths remain unavailable. CityHub is 422 created / 31 transferred sounds / 31 unsupported / one failed; safe NEW_LEVEL and M2 remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 421bed1..edde027 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index a21bb90..e8be957 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [Flare Gun continuation](../Documentation/Implementation/M2_FLARES.md) connects original primary sticking/burn damage, alternate fragments, both player hands, pickup/drop and autonomous Cultist fire. CityHub now has 422 created / 31 transferred sounds / 31 unsupported / one failed entry; earlier counts below are historical. Missing geometry, required services and safe NEW_LEVEL keep M2 incomplete.
++
+ The [compound-shell correction](../Documentation/Implementation/M2_COMPOUND_SHELLS.md) validates independently closed DAT components that share edges. CityHub now creates `startfences` and `Buildings`: 421 created / 31 transferred sounds / 31 unsupported / two failed. Collision gaps, hidden/removal inspection and GPU submission are checked; earlier counts below are historical. Missing geometry, FLAREGUN, required services and safe NEW_LEVEL keep M2 incomplete.
+ 
+ The [Mac-10 continuation](../Documentation/Implementation/M2_MAC10.md) connects original automatic fire, dual inventory, pickup/NPC drop and autonomous Cultist use. Actual left-view assets exercise the restored original alternate-animation fallback. CityHub now has 419 created objects, 31 transferred sounds, 31 unsupported and four failed entries; earlier counts below are historical. Chrome, remaining required services and safe NEW_LEVEL keep M2 incomplete.
+diff --git a/docs/AI_FIRE_CONTRACTS.md b/docs/AI_FIRE_CONTRACTS.md
+index 846971c..80f4f1c 100644
+--- a/docs/AI_FIRE_CONTRACTS.md
++++ b/docs/AI_FIRE_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original AI weapon choice and standing fire
+ 
++The [Flare Gun continuation](FLARE_CONTRACTS.md) adds original ID 3, primary sticking/burn ticks, alternate fragments, pickup/drop and sprite tint/alpha. Earlier blanket omissions are historical for this subset; remaining effects, death services and M2 stay open.
++
+ The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.
+ 
+ > [Destructible model contracts](DESTRUCTABLE_MODEL_CONTRACTS.md) now implement
+diff --git a/docs/ENERGY_PROJECTILE_CONTRACTS.md b/docs/ENERGY_PROJECTILE_CONTRACTS.md
+index 9cd1966..4fcfa11 100644
+--- a/docs/ENERGY_PROJECTILE_CONTRACTS.md
++++ b/docs/ENERGY_PROJECTILE_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original energy projectile boundary
+ 
++The [Flare Gun continuation](FLARE_CONTRACTS.md) adds original ID 3, primary sticking/burn ticks, alternate fragments, pickup/drop and sprite tint/alpha. Earlier blanket omissions are historical for this subset; remaining effects, death services and M2 stay open.
++
+ Read [object lifetime](OBJECT_CONTRACTS.md), [weapon/audio](WEAPON_AUDIO_CONTRACTS.md),
+ [collision](MODEL_AND_COLLISION_CONTRACTS.md), [sprite presentation](SPRITE_VIEW_CONTRACTS.md),
+ [source ledger](M2_ENERGY_PROJECTILE_SOURCES.json) and
+diff --git a/docs/FLARE_CONTRACTS.md b/docs/FLARE_CONTRACTS.md
+new file mode 100644
+index 0000000..bfc8136
+--- /dev/null
++++ b/docs/FLARE_CONTRACTS.md
+@@ -0,0 +1,103 @@
++# Original Flare Gun and projectile family
++
++Read [weapon](WEAPON_CONTRACTS.md), [projectile](ENERGY_PROJECTILE_CONTRACTS.md),
++[audio](WEAPON_AUDIO_CONTRACTS.md), [NPC firing](AI_FIRE_CONTRACTS.md),
++[drop](WEAPON_DROP_CONTRACTS.md) and [object lifetime](OBJECT_CONTRACTS.md) contracts.
++The [source ledger](M2_FLARE_SOURCES.json) records original selections;
++[implementation evidence](../../Documentation/Implementation/M2_FLARES.md) records validation.
++M2 remains incomplete.
++
++## Weapon, acquisition and firing
++
++ID 3 retains the complete original WeaponData: pistol animation column, flare
++ammo pool 4, primary consumption 1/damage 10–15, alternate consumption 8/damage
++20–30, speed 2000, range 5000, radius 100 and reload fields .75/1.5 seconds.
++Both definitions emit one projectile. The later alternate projectile supplies
++its eight fragments; the weapon does not shoot eight full-damage flares.
++Insufficient ammunition refuses the entire shot. Existing marker-driven view
++animation, both hands, sound/hearing, checked inventory restore and active-Fire
++lifetime rules apply. Source FLARE prefix selection uses the existing original
++NPC aiming and standing-fire path. The full stored definition is immutable.
++
++The original 60-unit player-only FiringTooClose query uses the typed body-eye
++origin, since this port has client-owned view models rather than the original
++server view-model proxy. A close hit selects that eye before alignment. This is
++an explicit interface adaptation; ordinary local shots already originate there.
++The existing collision preflight prevents ammo consumption on unavailable
++queries; eligible hearing callbacks revalidate before creating a projectile.
++Portable owned randomness does not claim retail CRT bit parity.
++
++FlareGunPU keeps original FlarePistol_pu resources, display name, resource 355
++and eight rounds. The typed weapon pickup boundary now accepts IDs 1–3. Full dual
++inventories/full ammo refuse duplicates. NPC hand drops use the existing detached
++lifetime and support-to-pickup transfer. Player-initiated dropping remains absent.
++No new mutable global or dependency is added.
++
++## Primary projectile
++
++Original CFlareProjectile selects one of red, orange, yellow and white, begins
++with scale zero, then uses .25 after elapsed .01. Its sprite uses the actual
++external lensflare32 SPR/DTX. Sprite Set/GetObjectColor now accepts bounded RGB
++and alpha; sprites initialize to multiplicative white while models retain their
++separate additive-zero convention. Presentation consumes this state read-only.
++
++The flight phase remains the bounded continuous point solver, integrated once.
++Contact ignores the shooter, nonsolid objects and the exact projectile class.
++A character/player/corpse contact retains a checked target link and world-space
++position offset, resets its own start clock and lifetime to five seconds, and
++clears TOUCH_NOTIFY. It follows translation without rotating the offset. No
++second flight segment is integrated between sticking and the next Update.
++A solid target with TOUCH_NOTIFY receives one deferred original contact callback.
++Unlike base projectile contact, the primary override has no sky-discard branch.
++Other contacts schedule the original fire-type radius explosion on the next update.
++
++Tracking sets velocity zero. Damage uses the source strict condition
++`time > last_damage_time + 1`, with last_damage_time initially zero rather than
++the contact clock. Each tick sends FIRE damage with zero direction, projectile
++sender and checked shooter attribution. Target death sets the explosion flag but
++still completes that update; the next update fizzles without additional damage.
++Target unlink removes without fizzle. Lifetime expiry is strict greater-than and
++also emits no explosion. Losing the shooter preserves null-attributed primary
++damage through the existing typed projectile authorization.
++
++The attached looping projectile WAV starts/retries when no voice exists. Touch
++kills it; the next tracking Update restarts it, following the source quirk.
++Expiry, fizzle, removal and unload release it. Impact WAVs use detached lifetime.
++Callback removal remains deferred; no endpoint is accessed after tick delivery.
++
++## Alternate and fragments
++
++CFlareAltProjectile caches velocity on its first Update, scales to .5 after .01,
++and bursts only when elapsed is strictly greater than .1. Eight independent
++CFlareBurstProjectile children retain the source order/offsets, normalized
++velocity directions, half damage, full original speed/radius and parent color.
++Fragments have source god mode, scale .25 and the base ten-second lifetime.
++
++The alternate calls AddImpact while its type is still EXP_FLARE_FRAG (15), then
++sets EXP_FLARE_BURST (14), calls base Update and returns false. Thus a pending
++contact/death at the burst deadline can emit FRAG followed by BURST; a normal
++in-flight burst emits only FRAG and no parent damage. Early contact explodes as
++FRAG without children. AddImpact retains its original stored-direction magnitude
++20 and optional surface-normal query; Explode remains the damage owner.
++
++Checked Setup requires a live shooter. If the alternate loses it before splitting,
++it fails explicitly rather than inventing a shooter. Child creation/setup failure
++retains already-created independent children and records failure/count. This
++bounded adaptation differs from the original unchecked allocation/null paths.
++Runtime classes reject authored/string creation and do not claim save support.
++
++## Inspection and remaining gaps
++
++Objects exposes tracking/start/tick/voice state, contact identities, cached
++alternate velocity and child count. Terminal history retains burn deliveries,
++tracking and fragment counts after removal. Scene explosions records requested
++component types and actual WAV playback; absent components are failures, not FX.
++The diagnostic weapon grant is applied at the existing frame boundary.
++
++Original sparks trails (OBJFX_SPARKS_1/3), owner lights of radius 200/75 and flare
++explosion recipes 13–15 remain unavailable. The alternate source trail is disabled.
++No generic effect substitutes for those recipes. Chrome, muzzle illumination,
++view-key sounds, fire/gib death presentation and complete combat parity remain
++unimplemented. Replacement flight and body-eye adaptation are not verified retail
++physics/presentation parity. Safe NEW_LEVEL and remaining required world services
++still keep M2 open.
+diff --git a/docs/M2_FLARE_SOURCES.json b/docs/M2_FLARE_SOURCES.json
+new file mode 100644
+index 0000000..ce0f42d
+--- /dev/null
++++ b/docs/M2_FLARE_SOURCES.json
+@@ -0,0 +1,88 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "4b8444ac9557de0fb3c882403cb3029206429d48",
++  "status": "M2 incomplete; original Flare Gun and three projectile classes",
++  "references": [
++    {
++      "source": "sources/blood2/Shared/WeaponDefs.cpp",
++      "source_sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
++      "purpose": "Complete Flare Gun definition"
++    },
++    {
++      "source": "sources/blood2/Shared/SharedDefs.h",
++      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "purpose": "Weapon/ammo identifiers"
++    },
++    {
++      "source": "sources/blood2/Shared/ClientRes.h",
++      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
++      "purpose": "Resource 355"
++    },
++    {
++      "source": "sources/blood2/Shared/SFXMsgIds.h",
++      "source_sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f",
++      "purpose": "Flare explosion/trail IDs"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameWeapons.cpp",
++      "source_sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd",
++      "purpose": "CFlareGun::FireSpread and player-only near-wall branch"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameWeapons.h",
++      "source_sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19",
++      "purpose": "Original CFlareGun declaration"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameProjectiles.cpp",
++      "source_sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f",
++      "purpose": "CFlareProjectile, CFlareAltProjectile and CFlareBurstProjectile constructors, Update, contacts and effects"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameProjectiles.h",
++      "source_sha256": "9acd38645c28d90b508a0a55a02760bcea5c6c40318b6266635711d2ba1f1bc0",
++      "purpose": "Original projectile family fields"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Projectile.cpp",
++      "source_sha256": "52b805c67775579b5703e0ad1099a8ea44d76b245349c8f6d1fac0a1b3b74ef2",
++      "purpose": "AddImpact, explosion damage type and lifetime"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Weapon.cpp",
++      "source_sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
++      "purpose": "One-shot ammo accounting and FiringTooClose"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "purpose": "FLARE prefix and generic firing"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/WeaponPickups.cpp",
++      "source_sha256": "116eac417209ee2cc523044e02ff615406b597164df9df5d5f2e0be80cfbc1d4",
++      "purpose": "FlareGunPU eight-round pickup and spawn case"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/HandWeaponModel.cpp",
++      "source_sha256": "480adb2a0ad140120bb9ddb160cf8f8112508abdf70e218067213e0f04c8ed96",
++      "purpose": "Drop-to-pickup ownership"
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
++      "source_sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
++      "purpose": "Generic original view animation and FIRE_KEY rules"
++    }
++  ],
++  "adaptations": [
++    "Checked object identities, independent child ownership and deferred removal",
++    "Body-eye near-wall query replaces unavailable server view-model proxy",
++    "Lost alternate shooter/failed child setup explicitly fails instead of original unchecked allocation",
++    "Replacement single point-flight integrator and bounded sprite color service; no new global/dependency"
++  ],
++  "unsupported": [
++    "OBJFX_SPARKS_1/3, owner lights, flare explosion recipes 13\u201315",
++    "Chrome, muzzle illumination, view-key sounds, fire/gib death presentation",
++    "Player drops, projectile save/load, complete combat/retail parity, safe NEW_LEVEL and M2"
++  ]
++}
+diff --git a/docs/SPRITE_VIEW_CONTRACTS.md b/docs/SPRITE_VIEW_CONTRACTS.md
+index 726ad26..32961be 100644
+--- a/docs/SPRITE_VIEW_CONTRACTS.md
++++ b/docs/SPRITE_VIEW_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Sprite presentation contracts
+ 
++The [Flare Gun continuation](FLARE_CONTRACTS.md) adds original ID 3, primary sticking/burn ticks, alternate fragments, pickup/drop and sprite tint/alpha. Earlier blanket omissions are historical for this subset; remaining effects, death services and M2 stay open.
++
+ Continuation: [original explosion sprites](EXPLOSION_SPRITE_CONTRACTS.md). Client explosion sprites now join the same read-only scene and use per-instance alpha multiplied by decoded DTX alpha. This supersedes the blanket alpha-service omission only for typed client FX state, not generic object tint/alpha or other composite services.
+ 
+ M2 remains incomplete. This extends [original sprite placement/clocks](SPRITE_CONTRACTS.md)
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index 646188f..c4a1eac 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original Inventory and Vector Weapon Boundary
+ 
++The [Flare Gun continuation](FLARE_CONTRACTS.md) adds original ID 3, primary sticking/burn ticks, alternate fragments, pickup/drop and sprite tint/alpha. Earlier blanket omissions are historical for this subset; remaining effects, death services and M2 stay open.
++
+ The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.
+ 
+ > Extended by [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md): original multi-hit
+diff --git a/docs/WEAPON_DROP_CONTRACTS.md b/docs/WEAPON_DROP_CONTRACTS.md
+index a015897..650a7d9 100644
+--- a/docs/WEAPON_DROP_CONTRACTS.md
++++ b/docs/WEAPON_DROP_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original NPC weapon drops and Beretta pickups
+ 
++The [Flare Gun continuation](FLARE_CONTRACTS.md) adds original ID 3, primary sticking/burn ticks, alternate fragments, pickup/drop and sprite tint/alpha. Earlier blanket omissions are historical for this subset; remaining effects, death services and M2 stay open.
++
+ The [Mac-10 continuation](MAC10_CONTRACTS.md) adds original weapon ID 2, its pickup/drop, NPC use and both-hand view animation fallback. Earlier Beretta-only statements below are historical for this supported subset.
+ 
+ > Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 3cd7735..7c021fb 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -7,6 +7,7 @@
+ #include "game/original/ClientLightFX.h"
+ #include "game/original/DestructableModel.h"
+ #include "game/original/Door.h"
++#include "game/original/FlareProjectile.h"
+ #include "game/original/Key.h"
+ #include "game/original/KeyPickup.h"
+ #include "game/original/Projectile.h"
+@@ -373,6 +374,10 @@ namespace OpenBlood2
+         {
+             if (add_beretta_request)
+                 player->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA);
++            if (add_flare_request)
++                player->m_InventoryMgr.ObtainWeapon(WEAP_FLAREGUN);
++            if (add_flares_request)
++                player->m_InventoryMgr.AddAmmo(AMMO_FLARE, 20);
+             if (add_mac10_request)
+                 player->m_InventoryMgr.ObtainWeapon(WEAP_SUBMACHINEGUN);
+             if (add_ammo_request)
+@@ -384,7 +389,7 @@ namespace OpenBlood2
+             if (movement_input_request)
+                 game.client_shell.movement_input = *movement_input_request;
+         }
+-        add_beretta_request = add_mac10_request = add_ammo_request = false;
++        add_beretta_request = add_mac10_request = add_flare_request = add_flares_request = add_ammo_request = false;
+         weapon_input_request.reset();
+         weapon_aim_request.reset();
+         movement_input_request.reset();
+@@ -713,6 +718,21 @@ namespace OpenBlood2
+                                         game.server.IsObjectAlive(projectile->m_hFiredFrom) ? "yes" : "no",
+                                         game.server.IsObjectAlive(projectile->m_hHitObject) ? "yes" : "no",
+                                         projectile->contact.polygon);
++                            if (const auto* flare = dynamic_cast<const CFlareProjectile*>(projectile))
++                            {
++                                ImGui::Text("Flare tracking %s / start %.3f / last tick %.3f / damage deliveries %u",
++                                            flare->tracking ? "yes" : "no", flare->track_start, flare->last_damage_time,
++                                            flare->ticks);
++                                ImGui::Text("World offset %.2f %.2f %.2f / loop voice %llu (%s)", flare->offset.x,
++                                            flare->offset.y, flare->offset.z, (unsigned long long)flare->sound,
++                                            game.server.audio.get(flare->sound) ? "resolved" : "absent");
++                                if (!flare->sound_error.empty())
++                                    ImGui::TextWrapped("Loop: %s", flare->sound_error.c_str());
++                            }
++                            if (const auto* flare = dynamic_cast<const CFlareAltProjectile*>(projectile))
++                                ImGui::Text(
++                                    "Alternate flare: cached velocity %s / emitted children %u / effect type %u",
++                                    flare->get_velocity ? "pending" : "yes", flare->children, flare->explosion_type);
+                             ImGui::TextWrapped("Pending: %s", projectile->trail_error.c_str());
+                             if (!projectile->error.empty())
+                                 ImGui::TextWrapped("Failure: %s", projectile->error.c_str());
+@@ -818,6 +838,9 @@ namespace OpenBlood2
+                             ImGui::Text("%.3f %s: %s at %.2f %.2f %.2f / delivered %u", report.time,
+                                         report.source.c_str(), report.outcome.c_str(), report.position.x,
+                                         report.position.y, report.position.z, report.delivered);
++                            if (report.flare)
++                                ImGui::Text("Flare: tracking %s / burn deliveries %u / burst children %u",
++                                            report.tracked ? "yes" : "no", report.burn_ticks, report.burst_children);
+                             if (report.shockwave)
+                             {
+                                 ImGui::Text("Shockwave ground query %d: %.1f %.1f %.1f -> %.1f %.1f %.1f",
+@@ -1794,7 +1817,7 @@ namespace OpenBlood2
+     }
+     void Inspector::draw_weapons(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextUnformatted("Original inventory / Beretta 92F / Ingram Mac-10 / Chosen Knife");
++        ImGui::TextUnformatted("Original inventory / Beretta 92F / Ingram Mac-10 / Flare Gun / Chosen Knife");
+         auto* player = game.server_shell.Player(game.local_client);
+         if (!player)
+         {
+@@ -1864,8 +1887,14 @@ namespace OpenBlood2
+                 add_beretta_request = true;
+             if (ImGui::Button("Obtain Mac-10 (inspection)"))
+                 add_mac10_request = true;
+-            ImGui::TextWrapped("These diagnostic grants call inventory directly. Beretta/Mac-10 world pickups also use "
+-                               "original collection rules; chrome and muzzle flashes remain unavailable.");
++            if (ImGui::Button("Obtain Flare Gun (inspection)"))
++                add_flare_request = true;
++            ImGui::SameLine();
++            if (ImGui::Button("Add 20 flares (inspection)"))
++                add_flares_request = true;
++            ImGui::TextWrapped(
++                "These diagnostic grants call inventory directly. Beretta/Mac-10/Flare Gun world pickups also use "
++                "original collection rules; chrome and muzzle flashes remain unavailable.");
+         }
+         auto aim = game.client_shell.rotation;
+         if (ImGui::SliderAngle("Inspection yaw", &aim.yaw, -180, 180) |
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index e09820e..551d527 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -81,7 +81,8 @@ namespace OpenBlood2
+         ObjectId container_selection{}, container_toggle_request{};
+         std::optional<DVector> player_position_request;
+         std::optional<MovementInput> movement_input_request;
+-        bool select_weapons = false, add_beretta_request = false, add_mac10_request = false, add_ammo_request = false;
++        bool select_weapons = false, add_beretta_request = false, add_mac10_request = false, add_flare_request = false,
++             add_flares_request = false, add_ammo_request = false;
+         int weapon_slot_request = -1;
+         bool weapon_left = false;
+         std::optional<WeaponInput> weapon_input_request;
+diff --git a/src/app/sprite_scene.cpp b/src/app/sprite_scene.cpp
+index cec8afb..3c1a11a 100644
+--- a/src/app/sprite_scene.cpp
++++ b/src/app/sprite_scene.cpp
+@@ -12,7 +12,8 @@ namespace OpenBlood2
+             if (!record || record->life != Life::Alive || record->state.m_ObjectType != OT_SPRITE)
+                 continue;
+             if (!scene.add(record->sprite.get(), record->sprite_track, {record->state.m_Pos, record->state.m_Rotation},
+-                           record->state.m_Scale, record->state.m_Flags, id, game.resources, error))
++                           record->state.m_Scale, record->state.m_Flags, id, game.resources, error, record->alpha,
++                           record->color))
+                 return false;
+         }
+         for (const auto& fx : game.server.explosion_sprites.active)
+diff --git a/src/engine/objects.cpp b/src/engine/objects.cpp
+index 67dfcc1..3cc9b5c 100644
+--- a/src/engine/objects.cpp
++++ b/src/engine/objects.cpp
+@@ -415,6 +415,7 @@ namespace OpenBlood2
+         }
+         if (state.m_ObjectType == OT_SPRITE)
+         {
++            object->color = {1, 1, 1}; // Sprites use multiplicative RGB; models retain additive zero.
+             std::string error = "Sprite services are not attached";
+             if (!sprites || !sprites->load(state.m_Filename, object->sprite, error))
+             {
+diff --git a/src/game/original/AIFire.cpp b/src/game/original/AIFire.cpp
+index 6eea6fc..29496a5 100644
+--- a/src/game/original/AIFire.cpp
++++ b/src/game/original/AIFire.cpp
+@@ -123,9 +123,9 @@ bool AI_Mgr::Fire(bool alternate)
+     if (!weapon)
+         return fail(FireResult::Unavailable, "AI has no current weapon");
+     if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_SUBMACHINEGUN &&
+-        weapon->data.m_nType != WEAP_MELEE && weapon->data.m_nType != WEAP_NAGA_EYEBEAM &&
+-        weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST && weapon->data.m_nType != WEAP_GIDEON_WIND &&
+-        weapon->data.m_nType != WEAP_GIDEON_SHIELD)
++        weapon->data.m_nType != WEAP_FLAREGUN && weapon->data.m_nType != WEAP_MELEE &&
++        weapon->data.m_nType != WEAP_NAGA_EYEBEAM && weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST &&
++        weapon->data.m_nType != WEAP_GIDEON_WIND && weapon->data.m_nType != WEAP_GIDEON_SHIELD)
+         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
+     DRotation rotation;
+     const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM;
+diff --git a/src/game/original/AIRuntime.cpp b/src/game/original/AIRuntime.cpp
+index 3f296d3..1196e55 100644
+--- a/src/game/original/AIRuntime.cpp
++++ b/src/game/original/AIRuntime.cpp
+@@ -26,6 +26,8 @@ namespace
+             id = WEAP_NAGA_EYEBEAM;
+         else if (name.starts_with("SUBMA"))
+             id = WEAP_SUBMACHINEGUN;
++        else if (name.starts_with("FLARE"))
++            id = WEAP_FLAREGUN;
+         else if (name.starts_with("MELEE"))
+             id = WEAP_MELEE;
+         else
+diff --git a/src/game/original/FlareProjectile.cpp b/src/game/original/FlareProjectile.cpp
+new file mode 100644
+index 0000000..bc1c7f3
+--- /dev/null
++++ b/src/game/original/FlareProjectile.cpp
+@@ -0,0 +1,289 @@
++// Selected original ObjectDLL/GameProjectiles.cpp: CFlareProjectile, Alt and Burst.
++#include "FlareProjectile.h"
++#include "Corpse.h"
++#include "PlayerObj.h"
++#include "engine/collision.h"
++#include <cmath>
++using namespace OpenBlood2;
++namespace
++{
++    bool choose_color(DVector& color)
++    {
++        int index = 0;
++        if (!g_pServerDE->RandomInt(0, 3, index))
++            return false;
++        constexpr DVector colors[]{{1, 0, 0}, {1, .25f, 0}, {1, 1, 0}, {1, 1, 1}};
++        color = colors[index];
++        return true;
++    }
++    void explosion(HOBJECT owner, DDWORD type, DVector position, DVector normal, float radius)
++    {
++        SceneExplosionReport r;
++        r.source = g_pServerDE->GetObjectName(owner);
++        r.position = position;
++        r.normal = normal;
++        r.type = type;
++        r.model_event = g_pServerDE->PublishExplosionModels(owner, type, position, normal, r.model_error);
++        r.sprite_event = g_pServerDE->PublishExplosionSprites(owner, type, position, normal, r.sprite_error);
++        r.ring_event = g_pServerDE->PublishExplosionRings(owner, type, position, normal, r.ring_error);
++        r.fragment_event = g_pServerDE->PublishExplosionFragments(owner, type, position, normal, r.fragment_error);
++        r.flame_event = g_pServerDE->PublishExplosionFlames(owner, type, position, normal, r.flame_error);
++        r.light_event = g_pServerDE->PublishExplosionLights(owner, type, position, normal, r.light_error);
++        SoundRequest request;
++        r.sound = request.resource = "Sounds\\Weapons\\flare\\impact.wav";
++        request.inner_radius = radius / 10;
++        request.outer_radius = radius;
++        request.priority = 1;
++        r.voice = g_pServerDE->PlayDetachedSound(owner, request, position, r.sound_error);
++        g_pServerDE->RecordSceneExplosion(r);
++    }
++} // namespace
++CFlareProjectile::CFlareProjectile()
++{
++    filename = "Sprites\\lensflare32.spr";
++    skin = nullptr;
++    damage_type = DamageType::Fire;
++    color_ready = choose_color(color);
++    track_start = g_pServerDE->GetTime();
++    trail_error = "OBJFX_SPARKS_1 and owner light (radius 200) unavailable";
++}
++CFlareProjectile::~CFlareProjectile()
++{
++    StopSound();
++}
++void CFlareProjectile::StopSound()
++{
++    if (sound)
++        g_pServerDE->KillSound(sound);
++    sound = 0;
++}
++bool CFlareProjectile::InitialUpdate()
++{
++    return color_ready && CProjectile::InitialUpdate() && g_pServerDE->ScaleObject(m_hObject, {});
++}
++bool CFlareProjectile::AdvanceFlight(double seconds)
++{
++    // Source tracking writes position and zero velocity in Update. Never perform
++    // a second travel segment between the contact and that update.
++    return tracking ? !failed : CProjectile::AdvanceFlight(seconds);
++}
++void CFlareProjectile::HandleContact(const SegmentHit& hit)
++{
++    if (!configured || contacted || failed || !g_pServerDE->IsObjectAlive(m_hObject))
++        return;
++    if (hit.object)
++    {
++        if (hit.object == m_hFiredFrom || !g_pServerDE->IsObjectAlive(hit.object) ||
++            !(g_pServerDE->GetObjectFlags(hit.object) & FLAG_SOLID) ||
++            g_pServerDE->GetObjectClass(hit.object) == g_pServerDE->GetObjectClass(m_hObject))
++            return;
++    }
++    else if (hit.polygon == UINT32_MAX)
++        return;
++    StopSound();
++    contact = hit;
++    contacted = true;
++    m_hHitObject = hit.object;
++    auto* object = g_pServerDE->HandleToObject(hit.object);
++    if (dynamic_cast<CBaseCharacter*>(object) || dynamic_cast<CCorpse*>(object))
++    {
++        DVector target, position;
++        if (g_pServerDE->GetObjectPos(hit.object, &target) != DE_OK ||
++            g_pServerDE->GetObjectPos(m_hObject, &position) != DE_OK)
++        {
++            Fail("Flare contact pose unavailable");
++            return;
++        }
++        offset = vector_subtract(position, target);
++        tracking = true;
++        m_fLifeTime = 5;
++        track_start = g_pServerDE->GetTime();
++    }
++    else
++        m_bExplode = true; // Unlike base HandleTouch, primary flares have no SKY exclusion.
++    g_pServerDE->SetObjectFlags(m_hObject, g_pServerDE->GetObjectFlags(m_hObject) & ~FLAG_TOUCH_NOTIFY);
++    if (m_hHitObject && g_pServerDE->CreateInterObjectLink(m_hObject, m_hHitObject) != DE_OK)
++        Fail("Flare target link failed");
++}
++bool CFlareProjectile::Update()
++{
++    if (!configured)
++        return Fail("Flare never received Setup");
++    if (!sound)
++    {
++        SoundRequest request;
++        request.resource = "Sounds\\Weapons\\flare\\projectile.wav";
++        request.speaker = m_hObject;
++        request.loop = true;
++        request.reverb_requested = false;
++        request.inner_radius = 75;
++        request.outer_radius = 750;
++        request.priority = 1;
++        sound = g_pServerDE->PlayObjectLoopSound(m_hObject, request, sound_error);
++    }
++    const auto now = g_pServerDE->GetTime();
++    const float scale = now - track_start < .01f ? 0 : .25f;
++    if (!g_pServerDE->ScaleObject(m_hObject, {scale, scale, scale}) ||
++        !g_pServerDE->SetObjectColor(m_hObject, color, 1))
++        return Fail("Flare presentation state rejected");
++    g_pServerDE->SetNextUpdate(m_hObject, .001f);
++    if (m_bExplode || m_damage.IsDead())
++    {
++        StopSound();
++        if (tracking)
++        {
++            DVector position;
++            if (g_pServerDE->GetObjectPos(m_hObject, &position) != DE_OK)
++                return Fail("Tracking flare position unavailable");
++            AddExplosion(position, {0, 1, 0}); // Fizzle only: no second damage/explosion.
++            exploded = true;
++        }
++        else
++            Explode();
++        return false;
++    }
++    if (m_fLifeTime > 0 && now > track_start + m_fLifeTime)
++    {
++        StopSound();
++        return false;
++    }
++    if (!m_hHitObject)
++    {
++        if (tracking)
++            StopSound();
++        return !tracking; // Target unlink removes without fizzle.
++    }
++    if (auto* character = dynamic_cast<CBaseCharacter*>(g_pServerDE->HandleToObject(m_hHitObject));
++        character && character->m_damage.IsDead())
++        m_bExplode = true; // Source still follows/ticks this frame; fizzles on its next update.
++    if (tracking)
++    {
++        DVector position, zero{};
++        if (g_pServerDE->GetObjectPos(m_hHitObject, &position) != DE_OK)
++            return Fail("Tracked flare target unavailable");
++        position = vector_add(position, offset); // World offset, deliberately no target rotation.
++        if (g_pServerDE->SetVelocity(m_hObject, &zero) != DE_OK ||
++            g_pServerDE->TeleportObject(m_hObject, &position) != DE_OK)
++            return Fail("Tracked flare movement rejected");
++        if (now > last_damage_time + 1)
++        {
++            last_damage_time = now;
++            const auto message = g_pServerDE->StartMessageToObject(this, m_hHitObject, damage_message);
++            if (!message)
++                return Fail("Flare damage message unavailable");
++            const auto written =
++                g_pServerDE->WriteDamage(message, {zero, position, m_fDamage, DamageType::Fire, m_hFiredFrom});
++            const auto delivered = g_pServerDE->EndMessage(message);
++            if (written != DE_OK || delivered != DE_OK)
++                return Fail("Flare damage delivery failed");
++            ++ticks;
++            ++targets.delivered;
++            // Deferred destruction keeps this callback alive; no endpoint access after delivery.
++        }
++    }
++    return true;
++}
++void CFlareProjectile::AddExplosion(DVector position, DVector normal)
++{
++    explosion(m_hObject, 13, position, normal, 750);
++}
++CFlareAltProjectile::CFlareAltProjectile()
++{
++    filename = "Sprites\\lensflare32.spr";
++    skin = nullptr;
++    color_ready = choose_color(color);
++    trail_error = "Owner light (radius 200) unavailable; source alternate trail is disabled";
++}
++bool CFlareAltProjectile::InitialUpdate()
++{
++    return color_ready && CProjectile::InitialUpdate() && g_pServerDE->ScaleObject(m_hObject, {});
++}
++bool CFlareAltProjectile::Update()
++{
++    if (!configured)
++        return Fail("Alternate flare never received Setup");
++    if (get_velocity)
++    {
++        if (g_pServerDE->GetVelocity(m_hObject, &cached_velocity) != DE_OK)
++            return Fail("Flare burst velocity unavailable");
++        get_velocity = false;
++    }
++    const auto elapsed = g_pServerDE->GetTime() - m_fStartTime;
++    if (elapsed > .1f)
++    {
++        const auto speed = std::sqrt(vector_dot(cached_velocity, cached_velocity));
++        DRotation rotation;
++        DVector position;
++        if (!std::isfinite(speed) || speed < 1e-6f || g_pServerDE->AlignRotation(rotation, cached_velocity) != DE_OK ||
++            g_pServerDE->GetObjectPos(m_hObject, &position) != DE_OK || !g_pServerDE->IsObjectAlive(m_hFiredFrom))
++            return Fail("Flare burst requires cached velocity and a live shooter");
++        const auto right = rotate_vector(rotation, {1, 0, 0});
++        const auto up = rotate_vector(rotation, {0, 1, 0});
++        const auto forward = vector_scale(cached_velocity, 1 / speed);
++        constexpr float offsets[8][2]{{.135f, 0},    {-.135f, 0},   {0, -.135f},    {0, .135f},
++                                      {.06f, -.06f}, {-.06f, .06f}, {-.06f, -.06f}, {.06f, .06f}};
++        for (const auto& offset : offsets)
++        {
++            auto dir = vector_add(forward, vector_add(vector_scale(right, offset[0]), vector_scale(up, offset[1])));
++            dir = vector_scale(dir, 1 / std::sqrt(vector_dot(dir, dir)));
++            ObjectCreateStruct state;
++            state.m_Pos = position;
++            SAFE_STRCPY(state.m_Name, "Flare burst fragment");
++            auto* child = dynamic_cast<CFlareBurstProjectile*>(
++                g_pServerDE->CreateObject(g_pServerDE->GetClass("CFlareBurstProjectile"), &state));
++            if (!child || !child->Setup(dir, m_nWeaponType, m_fDamage * .5f, speed, m_nRadius, m_hFiredFrom) ||
++                !child->SetColor(color))
++            {
++                if (child)
++                    g_pServerDE->RemoveObject(child->m_hObject);
++                return Fail("Flare fragment creation/setup failed (earlier children remain independent)");
++            }
++            ++children;
++        }
++        if (!AddImpact(position)) // Source emits FRAG before changing to BURST.
++            return false;
++        explosion_type = 14;
++        CProjectile::Update(); // A pending contact/death may now explode with BURST.
++        return false;
++    }
++    const float scale = elapsed < .01f ? 0 : .5f;
++    if (!g_pServerDE->ScaleObject(m_hObject, {scale, scale, scale}) ||
++        !g_pServerDE->SetObjectColor(m_hObject, color, 1))
++        return Fail("Alternate flare presentation state rejected");
++    return CProjectile::Update();
++}
++void CFlareAltProjectile::AddExplosion(DVector position, DVector normal)
++{
++    explosion(m_hObject, explosion_type, position, normal, 500);
++}
++CFlareBurstProjectile::CFlareBurstProjectile()
++{
++    filename = "Sprites\\lensflare32.spr";
++    skin = nullptr;
++    m_damage.m_bGodMode = true;
++    trail_error = "OBJFX_SPARKS_3 and owner light (radius 75) unavailable";
++}
++bool CFlareBurstProjectile::InitialUpdate()
++{
++    return CProjectile::InitialUpdate() && g_pServerDE->ScaleObject(m_hObject, {});
++}
++bool CFlareBurstProjectile::SetColor(DVector value)
++{
++    if (!physics_vector(value) || value.x < 0 || value.y < 0 || value.z < 0 || value.x > 1 || value.y > 1 ||
++        value.z > 1)
++        return Fail("Invalid flare fragment color");
++    color = value;
++    color_ready = true;
++    return true;
++}
++bool CFlareBurstProjectile::Update()
++{
++    if (!color_ready || !g_pServerDE->ScaleObject(m_hObject, {.25f, .25f, .25f}) ||
++        !g_pServerDE->SetObjectColor(m_hObject, color, 1))
++        return Fail("Flare fragment color/presentation unavailable");
++    return CProjectile::Update();
++}
++void CFlareBurstProjectile::AddExplosion(DVector position, DVector normal)
++{
++    explosion(m_hObject, 15, position, normal, 750);
++}
+diff --git a/src/game/original/FlareProjectile.h b/src/game/original/FlareProjectile.h
+new file mode 100644
+index 0000000..9f57b42
+--- /dev/null
++++ b/src/game/original/FlareProjectile.h
+@@ -0,0 +1,50 @@
++#pragma once
++#include "Projectile.h"
++// Original GameProjectiles.cpp Flare family. No invented substitute effects.
++class CFlareProjectile final : public CProjectile
++{
++  public:
++    CFlareProjectile();
++    ~CFlareProjectile() override;
++    bool AdvanceFlight(double) override;
++    void HandleContact(const OpenBlood2::SegmentHit&) override;
++    DVector color{}, offset{};
++    float track_start = 0, last_damage_time = 0;
++    bool tracking = false, color_ready = false;
++    OpenBlood2::SoundId sound = 0;
++    std::string sound_error;
++    unsigned ticks = 0;
++
++  protected:
++    bool InitialUpdate() override;
++    bool Update() override;
++    void AddExplosion(DVector, DVector) override;
++    void StopSound();
++};
++class CFlareAltProjectile final : public CProjectile
++{
++  public:
++    CFlareAltProjectile();
++    DVector color{}, cached_velocity{};
++    bool color_ready = false, get_velocity = true;
++    unsigned children = 0;
++    DDWORD explosion_type = 15;
++
++  protected:
++    bool InitialUpdate() override;
++    bool Update() override;
++    void AddExplosion(DVector, DVector) override;
++};
++class CFlareBurstProjectile final : public CProjectile
++{
++  public:
++    CFlareBurstProjectile();
++    DVector color{};
++    bool color_ready = false;
++    bool SetColor(DVector);
++
++  protected:
++    bool InitialUpdate() override;
++    bool Update() override;
++    void AddExplosion(DVector, DVector) override;
++};
+diff --git a/src/game/original/HandWeaponModel.cpp b/src/game/original/HandWeaponModel.cpp
+index f4c9ce4..7054b8e 100644
+--- a/src/game/original/HandWeaponModel.cpp
++++ b/src/game/original/HandWeaponModel.cpp
+@@ -12,8 +12,8 @@ bool CHandWeaponModel::Drop(HATTACHMENT attachment)
+     HATTACHMENT actual = 0;
+     DVector position, dims;
+     DRotation rotation;
+-    if (!s || dropped || (type != WEAP_BERETTA && type != WEAP_SUBMACHINEGUN) || !s->IsObjectAlive(owner) ||
+-        !s->IsObjectAlive(m_hObject) || s->FindAttachment(owner, m_hObject, &actual) != DE_OK || actual != attachment ||
++    if (!s || dropped || !WeaponPickupClass(type) || !s->IsObjectAlive(owner) || !s->IsObjectAlive(m_hObject) ||
++        s->FindAttachment(owner, m_hObject, &actual) != DE_OK || actual != attachment ||
+         s->GetObjectPos(owner, &position) != DE_OK || s->GetObjectRotation(owner, &rotation) != DE_OK ||
+         s->GetModelAnimUserDims(m_hObject, &dims, s->GetModelAnimation(m_hObject)) != DE_OK || !physics_vector(dims) ||
+         dims.x <= 0 || dims.y <= 0 || dims.z <= 0)
+@@ -82,7 +82,7 @@ DDWORD CHandWeaponModel::EngineMessageFn(DDWORD message, void* data, DFLOAT reas
+                 {
+                     pickup = SpawnWeaponPickup(type, m_hObject, position, rotation, !player_owned);
+                     server->RecordSpawn({"CHandWeaponModel",
+-                                         type == WEAP_BERETTA ? "BerettaPU" : "SubMachineGunPU",
++                                         WeaponPickupClass(type),
+                                          pickup ? "Dropped weapon transferred" : "Dropped weapon pickup failed",
+                                          pickup,
+                                          position,
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index 91127d0..0d7c533 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -172,6 +172,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
+         weapon = std::make_unique<CBeretta>();
+     else if (type == WEAP_SUBMACHINEGUN)
+         weapon = std::make_unique<CSubMachineGun>();
++    else if (type == WEAP_FLAREGUN)
++        weapon = std::make_unique<CFlareGun>();
+     else if (type == WEAP_MELEE)
+         weapon = std::make_unique<CMelee>();
+     else if (type == WEAP_NAGA_EYEBEAM)
+diff --git a/src/game/original/Projectile.cpp b/src/game/original/Projectile.cpp
+index 34d9d8c..356bde8 100644
+--- a/src/game/original/Projectile.cpp
++++ b/src/game/original/Projectile.cpp
+@@ -1,5 +1,6 @@
+ // Original ObjectDLL/Projectile.cpp and GameProjectiles.cpp, selected non-Zealot energy path.
+ #include "Projectile.h"
++#include "FlareProjectile.h"
+ #include "SurfaceTypes.h"
+ #include "engine/collision.h"
+ #include "engine/objects.h"
+@@ -35,6 +36,17 @@ void CProjectile::Finish(const char* outcome)
+         report.blast_position = wave->blast_position;
+         report.blast_normal = wave->blast_normal;
+     }
++    if (const auto* flare = dynamic_cast<const CFlareProjectile*>(this))
++    {
++        report.flare = true;
++        report.tracked = flare->tracking;
++        report.burn_ticks = flare->ticks;
++    }
++    if (const auto* flare = dynamic_cast<const CFlareAltProjectile*>(this))
++    {
++        report.flare = true;
++        report.burst_children = flare->children;
++    }
+     g_pServerDE->RecordProjectile(report);
+     g_pServerDE->RemoveObject(m_hObject); // Destruction stays deferred through all callbacks.
+ }
+@@ -141,6 +153,7 @@ void CProjectile::HandleContact(const SegmentHit& hit)
+     else if (hit.polygon == UINT32_MAX)
+         return; // No invented world HOBJECT.
+     contact = hit;
++    contacted = true;
+     if (!hit.object && hit.texture_flags == SURFTYPE_SKY)
+     {
+         Finish("sky");
+@@ -196,36 +209,17 @@ void CProjectile::Explode()
+     exploded = true;
+     DVector position;
+     g_pServerDE->GetObjectPos(m_hObject, &position);
+-    // AddImpact mutates the stored source direction: normalized *2, then *10.
+-    m_vDir = vector_scale(m_vDir, 1 / std::sqrt(vector_dot(m_vDir, m_vDir)));
+-    const auto from = vector_subtract(position, vector_scale(m_vDir, 2));
+-    m_vDir = vector_scale(m_vDir, 20);
+-    SegmentHit impact;
+-    auto normal = vector_scale(m_vDir, -1), point = position;
+-    if (m_hHitObject || (!contact.object && contact.polygon != UINT32_MAX))
+-    {
+-        const auto query = g_pServerDE->IntersectSegment(from, vector_add(position, m_vDir), nullptr, impact);
+-        if (query != SegmentResult::Hit && query != SegmentResult::Miss)
+-        {
+-            Fail("Projectile impact normal query unavailable");
+-            return;
+-        }
+-        if (query == SegmentResult::Hit)
+-        {
+-            normal = impact.normal;
+-            point = impact.point;
+-        }
+-    }
+-    AddExplosion(point, normal);
++    if (!AddImpact(position))
++        return;
+     if (m_nRadius)
+-        targets = DamageObjectsInRadius(m_hFiredFrom, this, position, float(m_nRadius), m_fDamage, DamageType::Explode);
++        targets = DamageObjectsInRadius(m_hFiredFrom, this, position, float(m_nRadius), m_fDamage, damage_type);
+     else if (m_hHitObject && g_pServerDE->IsObjectAlive(m_hHitObject))
+     {
+         const auto message = g_pServerDE->StartMessageToObject(this, m_hHitObject, damage_message);
+         if (message)
+         {
+             const auto written =
+-                g_pServerDE->WriteDamage(message, {m_vDir, position, m_fDamage, DamageType::Explode, m_hFiredFrom});
++                g_pServerDE->WriteDamage(message, {m_vDir, position, m_fDamage, damage_type, m_hFiredFrom});
+             const auto delivered = g_pServerDE->EndMessage(message);
+             targets.delivered = written == DE_OK && delivered == DE_OK;
+             targets.cancelled = !targets.delivered;
+@@ -241,6 +235,31 @@ void CProjectile::Explode()
+         m_hHitObject = nullptr;
+     }
+ }
++bool CProjectile::AddImpact(DVector position)
++{
++    // AddImpact mutates the stored source direction: normalized *2, then *10.
++    m_vDir = vector_scale(m_vDir, 1 / std::sqrt(vector_dot(m_vDir, m_vDir)));
++    const auto from = vector_subtract(position, vector_scale(m_vDir, 2));
++    m_vDir = vector_scale(m_vDir, 20);
++    SegmentHit impact;
++    auto normal = vector_scale(m_vDir, -1), point = position;
++    if (m_hHitObject || (!contact.object && contact.polygon != UINT32_MAX))
++    {
++        const auto query = g_pServerDE->IntersectSegment(from, vector_add(position, m_vDir), nullptr, impact);
++        if (query != SegmentResult::Hit && query != SegmentResult::Miss)
++        {
++            return Fail("Projectile impact normal query unavailable");
++        }
++        if (query == SegmentResult::Hit)
++        {
++            normal = impact.normal;
++            point = impact.point;
++        }
++    }
++    AddExplosion(point, normal);
++    return true;
++}
++
+ bool CEnergyBlastProjectile::InitialUpdate()
+ {
+     // Source CreateObject delivers INITIALUPDATE before weapon Setup; the default
+diff --git a/src/game/original/Projectile.h b/src/game/original/Projectile.h
+index b4e7ac8..79c697f 100644
+--- a/src/game/original/Projectile.h
++++ b/src/game/original/Projectile.h
+@@ -10,8 +10,10 @@ class CProjectile : public BaseClass
+     explicit CProjectile(DBYTE type = OT_SPRITE);
+     bool Setup(DVector, DBYTE, float damage, float speed, int radius, HOBJECT);
+     virtual bool AdvanceFlight(double seconds);
+-    void HandleContact(const OpenBlood2::SegmentHit&);
++    virtual void HandleContact(const OpenBlood2::SegmentHit&);
+     void Explode();
++    bool contacted = false;
++    OpenBlood2::DamageType damage_type = OpenBlood2::DamageType::Explode;
+     CDestructable m_damage;
+     HOBJECT m_hFiredFrom = nullptr, m_hHitObject = nullptr;
+     DVector m_vDir{};
+@@ -33,6 +35,7 @@ class CProjectile : public BaseClass
+     virtual bool InitialUpdate();
+     virtual bool Update();
+     virtual void AddExplosion(DVector, DVector) = 0;
++    bool AddImpact(DVector);
+     void Finish(const char*);
+     bool Fail(const char*);
+ };
+diff --git a/src/game/original/Weapon.cpp b/src/game/original/Weapon.cpp
+index 28e72c3..4cedbe4 100644
+--- a/src/game/original/Weapon.cpp
++++ b/src/game/original/Weapon.cpp
+@@ -76,6 +76,21 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+             DVector eye;
+             server->GetObjectPos(m_hOwner, &eye);
+             eye.y += player->eye_level;
++            last_shot.request.position = request.position;
++            if (data.m_nType == WEAP_FLAREGUN)
++            {
++                SegmentHit close_hit;
++                const auto close = server->IntersectSegment(eye, vector_add(eye, vector_scale(forward, 60)), m_hOwner,
++                                                            close_hit, false, SegmentObjects::SolidOnly,
++                                                            SegmentFilter::IgnoreVolumes, SegmentStart::SkipInterior);
++                if (close == SegmentResult::Invalid || close == SegmentResult::Unavailable)
++                {
++                    last_shot.result = FireResult::Unavailable;
++                    return false;
++                }
++                if (close == SegmentResult::Hit)
++                    last_shot.request.position = eye;
++            }
+             auto aim = vector_add(eye, vector_scale(aim_direction, range));
+             SegmentHit aim_hit;
+             const auto query =
+@@ -88,7 +103,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+             }
+             if (query == SegmentResult::Hit)
+                 aim = aim_hit.point;
+-            aim_direction = vector_subtract(aim, request.position);
++            aim_direction = vector_subtract(aim, last_shot.request.position);
+             const auto aim_length = std::sqrt(vector_dot(aim_direction, aim_direction));
+             if (aim_length < 1e-6f)
+             {
+@@ -98,14 +113,14 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+             aim_direction = vector_scale(aim_direction, 1 / aim_length);
+         }
+         last_shot.direction = aim_direction;
+-        last_shot.end = vector_add(request.position, vector_scale(aim_direction, range));
++        last_shot.end = vector_add(last_shot.request.position, vector_scale(aim_direction, range));
+         if (data.m_nType == WEAP_GIDEON_SHIELD)
+         {
+             last_shot.collision = SegmentResult::Unavailable; // Visual-only source branch: no damage ray.
+             return true;
+         }
+         const auto query =
+-            server->IntersectSegment(request.position, last_shot.end, m_hOwner, last_shot.hit, false,
++            server->IntersectSegment(last_shot.request.position, last_shot.end, m_hOwner, last_shot.hit, false,
+                                      SegmentObjects::SolidOrRayHit, SegmentFilter::None, SegmentStart::SkipInterior);
+         last_shot.collision = query;
+         if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
+@@ -117,7 +132,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+     };
+     if (!trace())
+         return last_shot.result;
+-    // Selected definitions fire exactly one vector and use one unit (AMMO_NONE stays unlimited).
++    // Selected definitions emit one shot; alternate Flare Gun consumes eight rounds.
+     m_pInventoryMgr->SetAmmoCount(data.m_nAmmoType, ammo - use);
+     m_fLastShotTime = server->GetTime();
+     m_bLastFireAlt = request.alternate;
+diff --git a/src/game/original/Weapon.h b/src/game/original/Weapon.h
+index 45350a2..418e77d 100644
+--- a/src/game/original/Weapon.h
++++ b/src/game/original/Weapon.h
+@@ -138,6 +138,11 @@ class CBeretta final : public CWeapon
+   public:
+     CBeretta() : CWeapon(WEAP_BERETTA) {}
+ };
++class CFlareGun final : public CWeapon
++{
++  public:
++    CFlareGun() : CWeapon(WEAP_FLAREGUN) {}
++};
+ class CSubMachineGun final : public CWeapon
+ {
+   public:
+diff --git a/src/game/original/WeaponDefs.cpp b/src/game/original/WeaponDefs.cpp
+index 6a3bf32..1615f60 100644
+--- a/src/game/original/WeaponDefs.cpp
++++ b/src/game/original/WeaponDefs.cpp
+@@ -2,6 +2,65 @@
+ namespace
+ {
+     constexpr WeaponData definitions[] = {
++        // Original Flare Gun (complete definition).
++        {
++            "Models\\Weapons\\Flarepistol_pv.abc",           // Model
++            "Models\\Weapons\\lh_Flarepistol_pv.abc",        // Model
++            "Skins\\Weapons\\C_Flare_pv_t.dtx",              // Skin
++            "Models\\Powerups\\Flarepistol_pu.abc",          // 3rd person model
++            "Skins\\Powerups\\Flarepistol_pu.dtx",           // 3rd person skin
++            WEAP_FLAREGUN,                                   // Type
++            TYPE_PISTOL,                                     // Fire type
++            AMMO_FLARE,                                      // Ammo type
++            1,                                               // Ammo Use
++            8,                                               // Alt Ammo Use
++            10.0f,                                           // Min Damage
++            15.0f,                                           // Max Damage
++            20.0f,                                           // Min Alt damage
++            30.0f,                                           // Max Alt damage
++            0.75f,                                           // Reload time
++            1.5f,                                            // Alt reload time
++            {0.0f, 0.0f},                                    // Spread
++            {0.0f, 0.0f},                                    // Alt Spread
++            2000.0f,                                         // Projectile Velocity
++            2000.0f,                                         // Alt Projectile Velocity
++            5000.0f,                                         // Range
++            5000.0f,                                         // Alt Range
++            1,                                               // Shots per fire
++            1,                                               // Alt Shots per fire
++            2,                                               // Strength or Magic required
++            3,                                               // Two-handed Strength or Magic required
++            100,                                             // Damage Radius (projectiles)
++            100,                                             // Alt Damage Radius (projectiles)
++            DFALSE,                                          // Alt fire zoom
++            DFALSE,                                          // Semi-auto
++            "Sounds\\Weapons\\flare\\fire.wav",              // Fire sound
++            "Sounds\\Weapons\\flare\\alt.wav",               // Alt Fire sound
++            "",                                              // Empty weapon sound
++            "",                                              // Alt Empty weapon sound
++            "CFlareProjectile",                              // Projectile class
++            "CFlareAltProjectile",                           // Alt Projectile class
++            150,                                             // Muzzle Flash radius
++            {1.0f, 0.68f, 0.35f},                            // Muzzle Flash color
++            "Flare Gun",                                     // Name
++            IDS_WEAPON_FLAREGUN,                             // Name ID (resource)
++            "Sprites\\FlaregunFlare.spr",                    // flash sprite name
++            "Sprites\\FlaregunFlare.spr",                    // alt flash Sprite name
++            0.05f,                                           // Flash duration
++            0.175f,                                          // Flash scale
++            {0.0f, 0.0f, 0.0f},                              // 3rd person gun offset
++            {0.8f, -0.7f, 1.6f},                             // Gun Offset
++            {0.0f, 0.275f, 1.0f},                            // Muzzle Offset
++            {0.03f, 0.03f, 0.15f},                           // Recoil
++            {6.5f, -4.5f, 28.0f},                            // Flash position
++            0.625f,                                          // Eject interval
++            0.0f,                                            // View kick
++            DFALSE,                                          // View kick is Cumulative
++            DFALSE,                                          // Animation looping
++            DFALSE,                                          // Alt anim looping
++            "interface\\statusbar\\weapons\\flaregun.pcx",   // Icon for status bar
++            "interface\\statusbar\\weapons\\flaregun_h.pcx", // Highlighted icon for status bar
++        },
+         // Ingram Mac-10 Sub-machine Gun
+         {
+             "Models\\Weapons\\Mac10_pv.abc",              // Model
+diff --git a/src/game/original/WeaponDefs.h b/src/game/original/WeaponDefs.h
+index b8ef9db..7e4d944 100644
+--- a/src/game/original/WeaponDefs.h
++++ b/src/game/original/WeaponDefs.h
+@@ -1,12 +1,13 @@
+ #pragma once
+ #include "basedefs_de.h"
+ // Selected original definitions; complete source fields, base-game weapon numbering.
+-inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38,
+-                       WEAP_ZEALOT_ENERGYBLAST = 27, WEAP_SOUL_HOOK = 23, WEAP_GIDEON_SHIELD = 41,
+-                       WEAP_GIDEON_WIND = 42;
++inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_FLAREGUN = 3, WEAP_MELEE = 17,
++                       WEAP_NAGA_EYEBEAM = 38, WEAP_ZEALOT_ENERGYBLAST = 27, WEAP_SOUL_HOOK = 23,
++                       WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42;
+ inline constexpr DBYTE TYPE_RIFLE = 0, TYPE_PISTOL = 2, TYPE_MELEE = 4, TYPE_MAGIC = 8, AMMO_NONE = 0, AMMO_BULLET = 1,
+-                       AMMO_SHELL = 2, AMMO_BMG = 3;
+-inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_MAC10 = 354, IDS_WEAPON_KNIFE = 366;
++                       AMMO_SHELL = 2, AMMO_BMG = 3, AMMO_FLARE = 4;
++inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_MAC10 = 354, IDS_WEAPON_FLAREGUN = 355,
++                     IDS_WEAPON_KNIFE = 366;
+ // Weapon spread structure
+ typedef struct Spread_t
+ {
+diff --git a/src/game/original/WeaponPickups.cpp b/src/game/original/WeaponPickups.cpp
+index 1da7c93..c72c168 100644
+--- a/src/game/original/WeaponPickups.cpp
++++ b/src/game/original/WeaponPickups.cpp
+@@ -15,6 +15,27 @@ SubMachineGunPU::SubMachineGunPU()
+     display_name = "Sub-machine Gun";
+     resource_id = IDS_WEAPON_MAC10;
+ }
++FlareGunPU::FlareGunPU()
++{
++    value = {OpenBlood2::PickupKind::Weapon, WEAP_FLAREGUN, 8};
++    file = "FlarePistol_pu";
++    display_name = "Flare Pistol";
++    resource_id = IDS_WEAPON_FLAREGUN;
++}
++const char* WeaponPickupClass(DDWORD type)
++{
++    switch (type)
++    {
++        case WEAP_BERETTA:
++            return "BerettaPU";
++        case WEAP_SUBMACHINEGUN:
++            return "SubMachineGunPU";
++        case WEAP_FLAREGUN:
++            return "FlareGunPU";
++        default:
++            return nullptr;
++    }
++}
+ DDWORD WeaponPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+ {
+     // The source string-spawn path bounces by default; that path is not imported.
+@@ -34,15 +55,14 @@ DDWORD WeaponPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+ HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector position, DRotation rotation, bool include_ammo)
+ {
+     auto* server = BaseClass::GetServerDE();
+-    if (!server || !server->IsObjectAlive(source) || (type != WEAP_BERETTA && type != WEAP_SUBMACHINEGUN))
++    if (!server || !server->IsObjectAlive(source) || !WeaponPickupClass(type))
+         return nullptr;
+     ObjectCreateStruct state;
+     state.m_Pos = position;
+     state.m_Rotation = rotation;
+     state.m_Flags = FLAG_VISIBLE | FLAG_TOUCH_NOTIFY;
+-    SAFE_STRCPY(state.m_Name, type == WEAP_BERETTA ? "Dropped Beretta pickup" : "Dropped Mac-10 pickup");
+-    auto* pickup = dynamic_cast<WeaponPickup*>(
+-        server->CreateObject(server->GetClass(type == WEAP_BERETTA ? "BerettaPU" : "SubMachineGunPU"), &state));
++    SAFE_STRCPY(state.m_Name, WeaponPickupClass(type));
++    auto* pickup = dynamic_cast<WeaponPickup*>(server->CreateObject(server->GetClass(WeaponPickupClass(type)), &state));
+     if (!pickup)
+         return nullptr;
+     if (!server->IsObjectAlive(pickup->m_hObject) || !pickup->error.empty())
+diff --git a/src/game/original/WeaponPickups.h b/src/game/original/WeaponPickups.h
+index f9d8774..bc3ee23 100644
+--- a/src/game/original/WeaponPickups.h
++++ b/src/game/original/WeaponPickups.h
+@@ -22,4 +22,10 @@ class SubMachineGunPU : public WeaponPickup
+   public:
+     SubMachineGunPU();
+ };
++class FlareGunPU : public WeaponPickup
++{
++  public:
++    FlareGunPU();
++};
++const char* WeaponPickupClass(DDWORD type);
+ HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector, DRotation, bool include_ammo);
+diff --git a/src/game/projectile_report.h b/src/game/projectile_report.h
+index 63164e8..c366c41 100644
+--- a/src/game/projectile_report.h
++++ b/src/game/projectile_report.h
+@@ -13,5 +13,7 @@ namespace OpenBlood2
+         DVector query_from{}, query_to{}, blast_position{}, blast_normal{};
+         SegmentResult query = SegmentResult::Unavailable;
+         unsigned candidates = 0, in_radius = 0;
++        bool flare = false, tracked = false;
++        unsigned burn_ticks = 0, burst_children = 0;
+     };
+ } // namespace OpenBlood2
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 47ee450..2b0827c 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -14,6 +14,7 @@
+ #include "game/original/Door.h"
+ #include "game/original/ExitHint.h"
+ #include "game/original/ExitTrigger.h"
++#include "game/original/FlareProjectile.h"
+ #include "game/original/GameStartPoint.h"
+ #include "game/original/Gideon.h"
+ #include "game/original/HandWeaponModel.h"
+@@ -75,6 +76,9 @@ namespace OpenBlood2
+             {{"Filename", std::string{}}, {"Skin", std::string{}}, {"Flags", std::int32_t(FLAG_VISIBLE)}}};
+         const ClassInfo shockwave_projectile{
+             "CBehemothShockwaveProjectile", &base, construct<CBehemothShockwaveProjectile>, {}};
++        const ClassInfo flare_projectile{"CFlareProjectile", &base, construct<CFlareProjectile>, {}};
++        const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {}};
++        const ClassInfo flare_burst{"CFlareBurstProjectile", &base, construct<CFlareBurstProjectile>, {}};
+         const ClassInfo energy_projectile{"CEnergyBlastProjectile", &base, construct<CEnergyBlastProjectile>, {}};
+         const ClassInfo hand_model{"CHandWeaponModel", &base, construct<CHandWeaponModel>, {}};
+         const ClassInfo b2base{
+@@ -449,6 +453,7 @@ namespace OpenBlood2
+                                {{"PickupTriggerTarget", std::string{}}, {"PickupTriggerMessage", std::string{}}}};
+         const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}};
+         const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
++        const ClassInfo flare_pickup{"FlareGunPU", &weapon_pickup, construct<FlareGunPU>, {}};
+         const ClassInfo mac10_pickup{"SubMachineGunPU", &weapon_pickup, construct<SubMachineGunPU>, {}};
+         const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}};
+         const ClassInfo powerup_pickup{"PowerupPickup", &pickup, construct<PowerupPickup>, {}};
+@@ -740,20 +745,22 @@ namespace OpenBlood2
+                objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
+                objects.register_class(key_pickup) && objects.register_class(pickup) &&
+                objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
+-               objects.register_class(mac10_pickup) && objects.register_class(ammo_pickup) &&
+-               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
+-               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
+-               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
+-               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
+-               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
+-               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
+-               objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
+-               objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
+-               objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
+-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
+-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+-               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
+-               objects.register_class(hand_model) && objects.register_class(corpse) &&
++               objects.register_class(flare_pickup) && objects.register_class(mac10_pickup) &&
++               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
++               objects.register_class(health_base) && objects.register_class(armor_base) &&
++               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
++               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
++               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
++               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
++               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
++               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
++               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
++               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
++               objects.register_class(door) && objects.register_class(rotating_door) &&
++               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
++               objects.register_class(rotating_brush) && objects.register_class(hand_model) &&
++               objects.register_class(corpse) && objects.register_class(flare_projectile) &&
++               objects.register_class(flare_alt) && objects.register_class(flare_burst) &&
+                objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+diff --git a/src/game/server_adapter.cpp b/src/game/server_adapter.cpp
+index 2d2c101..a6b0806 100644
+--- a/src/game/server_adapter.cpp
++++ b/src/game/server_adapter.cpp
+@@ -17,7 +17,7 @@ namespace OpenBlood2
+     {
+         trace_service("GetObjectColor");
+         const auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL)
++        if (!r || r->life != Life::Alive || (r->state.m_ObjectType != OT_MODEL && r->state.m_ObjectType != OT_SPRITE))
+             return false;
+         color = r->color;
+         alpha = r->alpha;
+@@ -28,8 +28,8 @@ namespace OpenBlood2
+         trace_service("SetObjectColor");
+         auto* r = objects_.get(h);
+         auto channel = [](float v) { return std::isfinite(v) && v >= 0 && v <= 1; };
+-        if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL || !channel(color.x) ||
+-            !channel(color.y) || !channel(color.z) || !channel(alpha))
++        if (!r || r->life != Life::Alive || (r->state.m_ObjectType != OT_MODEL && r->state.m_ObjectType != OT_SPRITE) ||
++            !channel(color.x) || !channel(color.y) || !channel(color.z) || !channel(alpha))
+             return false;
+         r->color = color;
+         r->alpha = alpha;
+diff --git a/src/game/server_pickups.cpp b/src/game/server_pickups.cpp
+index 626116b..ef3226c 100644
+--- a/src/game/server_pickups.cpp
++++ b/src/game/server_pickups.cpp
+@@ -57,7 +57,7 @@ namespace OpenBlood2
+         auto* m = writable(h);
+         if (!m)
+             return DE_INVALIDPARAMS;
+-        const auto limit = value.kind == PickupKind::Ammo ? 8 : value.kind == PickupKind::Weapon ? 2 : 4;
++        const auto limit = value.kind == PickupKind::Ammo ? 8 : value.kind == PickupKind::Weapon ? 3 : 4;
+         const auto request = value.kind == PickupKind::Ammo     ? add_ammo_message
+                              : value.kind == PickupKind::Weapon ? add_weapon_message
+                                                                 : add_powerup_message;
+diff --git a/src/game/server_projectiles.cpp b/src/game/server_projectiles.cpp
+index fe1f7dd..3162a57 100644
+--- a/src/game/server_projectiles.cpp
++++ b/src/game/server_projectiles.cpp
+@@ -22,10 +22,10 @@ namespace OpenBlood2
+                                    : nullptr;
+             if (projectile)
+             {
+-                const bool was_contact = projectile->m_bExplode;
++                const bool was_contact = projectile->contacted;
+                 ok = projectile->AdvanceFlight(seconds) && ok;
+                 const auto* target = objects_.get(projectile->m_hHitObject);
+-                if (!was_contact && projectile->m_bExplode && record->life == Life::Alive && target &&
++                if (!was_contact && projectile->contacted && record->life == Life::Alive && target &&
+                     target->life == Life::Alive && (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
+                     objects_.engine_message(target->handle, MID_TOUCHNOTIFY, record->handle);
+             }
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 68a2ca2..e5fdd0d 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1431,3 +1431,36 @@ if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+     add_test(NAME gpu.mac10 COMMAND mac10_gpu_tests "${BLOOD2_TEST_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/mac10-")
+     set_tests_properties(gpu.mac10 PROPERTIES LABELS "gpu;private;mac10" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+ endif()
++
++add_executable(flare_tests flare_tests.cpp)
++target_link_libraries(flare_tests PRIVATE blood2_game)
++blood2_project_options(flare_tests)
++foreach(case primary alternate lifetime weapon collect drop failures)
++    add_test(NAME flare.${case} COMMAND flare_tests ${case} "${CMAKE_CURRENT_BINARY_DIR}/flare-fixtures/${case}")
++    set_tests_properties(flare.${case} PROPERTIES LABELS "headless;flare" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case private ai)
++        add_test(NAME flare.${case} COMMAND flare_tests ${case} "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(flare.${case} PROPERTIES LABELS "headless;private;flare" TIMEOUT 240)
++    endforeach()
++endif()
++if(BLOOD2_GPU_TESTS)
++    add_executable(flare_gpu_tests flare_gpu_tests.cpp ../src/app/sprite_scene.cpp)
++    target_link_libraries(flare_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(flare_gpu_tests)
++    add_test(NAME gpu.flare COMMAND flare_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/flare-gpu")
++    set_tests_properties(gpu.flare PROPERTIES LABELS "gpu;flare" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.flare_private COMMAND flare_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/flare-private-gpu" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.flare_private PROPERTIES LABELS "gpu;private;flare" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    endif()
++endif()
++
++if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
++    add_executable(flare_view_gpu_tests flare_view_gpu_tests.cpp ../src/app/model_scene.cpp)
++    target_link_libraries(flare_view_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(flare_view_gpu_tests)
++    add_test(NAME gpu.flare_views_private COMMAND flare_view_gpu_tests "${BLOOD2_TEST_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/flare-views-")
++    set_tests_properties(gpu.flare_views_private PROPERTIES LABELS "gpu;private;flare" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++endif()
+diff --git a/tests/audio_stream_tests.cpp b/tests/audio_stream_tests.cpp
+index 6e0c576..7dce83e 100644
+--- a/tests/audio_stream_tests.cpp
++++ b/tests/audio_stream_tests.cpp
+@@ -295,7 +295,7 @@ namespace
+             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
+                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
+                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
+-            CHECK(created == 421 && transferred == 31 && unknown == 31 && failed == 2 && fx == 5 && fx_voices == 4);
++            CHECK(created == 422 && transferred == 31 && unknown == 31 && failed == 1 && fx == 5 && fx_voices == 4);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_bytes());
+         }
+diff --git a/tests/compound_shell_tests.cpp b/tests/compound_shell_tests.cpp
+index f15b271..205e2ad 100644
+--- a/tests/compound_shell_tests.cpp
++++ b/tests/compound_shell_tests.cpp
+@@ -229,7 +229,7 @@ namespace
+             }
+             std::cout << "CityHub: " << created << " created / " << transferred << " sounds / " << unknown
+                       << " unsupported / " << failed << " failed\n";
+-            CHECK(created == 421 && transferred == 31 && unknown == 31 && failed == 2);
++            CHECK(created == 422 && transferred == 31 && unknown == 31 && failed == 1);
+             WorldMesh mesh;
+             CHECK(mesh.build(g.world, error, &g.resources));
+             if (gpu)
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+index 06e9bb5..450377f 100644
+--- a/tests/destructable_model_tests.cpp
++++ b/tests/destructable_model_tests.cpp
+@@ -313,7 +313,7 @@ namespace
+             std::cout << "CityHub model initialization: " << count << " models / " << pushable << " pushable / "
+                       << gravity << " gravity / " << ground_misses << " ground misses\n";
+             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
+-            CHECK(created == 421 && unknown == 31 && failed == 2);
++            CHECK(created == 422 && unknown == 31 && failed == 1);
+             CHECK(update_model_scene(g, scene, error));
+             unsigned skin_failures = 0, triangles = 0;
+             for (auto id : ids)
+diff --git a/tests/flare_fixture.h b/tests/flare_fixture.h
+new file mode 100644
+index 0000000..159d23e
+--- /dev/null
++++ b/tests/flare_fixture.h
+@@ -0,0 +1,70 @@
++#pragma once
++#include "energy_fixture.h"
++#include "game/original/FlareProjectile.h"
++#include "game/original/WeaponPickups.h"
++namespace test_flare
++{
++    using namespace OpenBlood2;
++    inline bool mount(GameSession& g, const std::filesystem::path& root)
++    {
++        test_player::Directory dir;
++        test_model::Writer sprite;
++        for (auto n : {1u, 15u, 1u, 1u, 0u})
++            sprite.u32(n);
++        std::string frame = "alpha.dtx";
++        sprite.u16(frame.size());
++        sprite.b.insert(sprite.b.end(), frame.begin(), frame.end());
++        dir.children["sprites"].files["lensflare32.spr"] = sprite.b;
++        for (auto name : {"flarepistol_pv.abc", "lh_flarepistol_pv.abc"})
++            dir.children["models"].children["weapons"].files[name] = test_model::abc(true).b;
++        dir.children["models"].children["powerups"].files["flarepistol_pu.abc"] = test_model::abc(true).b;
++        dir.children["skins"].children["weapons"].files["c_flare_pv_t.dtx"] = {1, 2, 3};
++        dir.children["skins"].children["powerups"].files["flarepistol_pu.dtx"] = {1, 2, 3};
++        for (auto name : {"fire.wav", "alt.wav", "projectile.wav", "impact.wav"})
++            dir.children["sounds"].children["weapons"].children["flare"].files[name] = test_audio::wave();
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        const auto [offset, size] = test_player::write_dir(w, dir);
++        w.patch(131, offset);
++        w.patch(135, size);
++        auto file = root / "flare.rez";
++        std::ofstream out(file, std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        std::string error;
++        return test_naga::mount(g.resources, root, error) && g.resources.mount(file, error);
++    }
++    inline bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        return test_player::setup(g, root) && mount(g, root);
++    }
++    template <class T = CFlareProjectile>
++    T* projectile(GameSession& g, HOBJECT owner, DVector pos, DVector dir = {0, 0, 1}, float speed = 2000,
++                  int radius = 100)
++    {
++        const char* name = std::is_same_v<T, CFlareProjectile>      ? "CFlareProjectile"
++                           : std::is_same_v<T, CFlareAltProjectile> ? "CFlareAltProjectile"
++                                                                    : "CFlareBurstProjectile";
++        ObjectCreateStruct state;
++        state.m_Pos = pos;
++        legacy_copy(state.m_Name, name);
++        auto* p = dynamic_cast<T*>(g.server.CreateObject(g.server.GetClass(name), &state));
++        return p && p->Setup(dir, 3, 20, speed, radius, owner) ? p : nullptr;
++    }
++    inline bool equip(GameSession& g)
++    {
++        auto* p = g.server_shell.Player(g.local_client);
++        if (!p)
++            return false;
++        auto& inv = p->m_InventoryMgr;
++        if (inv.ObtainWeapon(3, 2) != InventoryResult::Ok || inv.ObtainWeapon(3, 2) != InventoryResult::Ok)
++            return false;
++        inv.SetAmmoCount(4, 200);
++        std::string error;
++        return g.select_weapon(2, error);
++    }
++} // namespace test_flare
+diff --git a/tests/flare_gpu_tests.cpp b/tests/flare_gpu_tests.cpp
+new file mode 100644
+index 0000000..cf3fc2d
+--- /dev/null
++++ b/tests/flare_gpu_tests.cpp
+@@ -0,0 +1,113 @@
++#include "app/sprite_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "flare_fixture.h"
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x " " << error << " " << SDL_GetError() << "\n";                            \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    std::string error;
++    Runtime runtime;
++    CHECK(runtime.initialize(true, error));
++    GameSession game;
++    if (argc == 3)
++    {
++        Config c;
++        c.data_dir = argv[2];
++        CHECK(game.initialize() && game.resources.mount_game(c, error));
++        WorldModel floor;
++        floor.points = {{-1000, 0, -1000}, {1000, 0, -1000}, {1000, 0, 1000}, {-1000, 0, 1000}};
++        floor.surfaces.resize(1);
++        floor.surfaces[0].flags = 1;
++        floor.polygons = {{0, {0, 1, 2, 3}}};
++        CHECK(game.collision.build(floor, error));
++        game.server.collision_ready = true;
++    }
++    else
++        CHECK(test_flare::setup(game, argv[1]));
++    auto* owner = test_energy::actor(game, {0, 50, 0});
++    CHECK(owner);
++    auto* projectile = test_flare::projectile(game, owner->m_hObject, {0, 50, 20}, {0, 0, 1}, 100);
++    CHECK(projectile);
++    auto h = projectile->m_hObject;
++    projectile->color = {1, 0, 0}; // A source color, fixed for a pixel-level tint assertion.
++    WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
++    SpriteView scene;
++    std::vector<Uint8> blank;
++    unsigned previous = 0;
++    for (unsigned stage = 0; stage < 3; ++stage)
++    {
++        CHECK(game.objects.advance(stage == 0 ? .005 : .01));
++        if (stage == 2)
++            CHECK(game.server.advance_projectiles(.1));
++        auto* record = game.objects.get(h);
++        CHECK(record && record->sprite);
++        CHECK(scene.begin_frame({0, 50, 0}, {}, error));
++        CHECK(scene.add(record->sprite.get(), record->sprite_track, {record->state.m_Pos, record->state.m_Rotation},
++                        record->state.m_Scale, record->state.m_Flags, record->id, game.resources, error, record->alpha,
++                        record->color));
++        CHECK(scene.entries.size() == 1 && scene.entries[0].error.empty());
++        CHECK(stage == 0 ? scene.draws.empty() : scene.draws.size() == 1);
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480));
++        CHECK(
++            renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480, error, true));
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(commands);
++        CHECK(renderer.draw(commands, capture.texture, scene.mesh, scene.draws, {0, 50, 0}, {}, false, error));
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        CHECK(copy);
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 640;
++        region.h = 480;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 640;
++        target.rows_per_layer = 480;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        CHECK(SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(runtime.gpu));
++        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        unsigned changed = 0, red = 0;
++        if (stage == 0)
++            blank.assign(pixels, pixels + 640 * 480 * 4);
++        else
++            for (unsigned i = 0; i < 640 * 480; ++i)
++                if (!std::equal(pixels + i * 4, pixels + i * 4 + 3, blank.data() + i * 4))
++                {
++                    ++changed;
++                    if (pixels[i * 4] > pixels[i * 4 + 1] + 8 && pixels[i * 4] > pixels[i * 4 + 2] + 8)
++                        ++red;
++                }
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        CHECK(stage == 0 || (changed > 20 && red > 20));
++        if (stage == 2)
++            CHECK(changed < previous);
++        previous = changed;
++        std::error_code ec;
++        std::filesystem::create_directories(argv[1], ec);
++        CHECK(!ec);
++        CHECK(capture.save((std::filesystem::path(argv[1]) / ("flare-" + std::to_string(stage) + ".png")).c_str()));
++        std::cout << "Stage " << stage << ": scale " << record->state.m_Scale.x << ", z " << record->state.m_Pos.z
++                  << ", red pixels " << red << ", changed pixels " << changed << "\n";
++    }
++    CHECK(game.objects.remove(h) && game.objects.finish_frame());
++    CHECK(update_sprite_scene(game, scene, error) && scene.entries.empty());
++    renderer.clear_geometry();
++    CHECK(game.unload_world());
++    return 0;
++}
+diff --git a/tests/flare_tests.cpp b/tests/flare_tests.cpp
+new file mode 100644
+index 0000000..c3c2cc4
+--- /dev/null
++++ b/tests/flare_tests.cpp
+@@ -0,0 +1,466 @@
++#include "brush_fixture.h"
++#include "camera_fixture.h"
++#include "flare_fixture.h"
++#include "game/original/CultistAI.h"
++#include "game/original/HandWeaponModel.h"
++#include <functional>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .002f;
++    }
++    struct Target : CBaseCharacter
++    {
++        HOBJECT remove_on_damage = nullptr;
++        unsigned touches = 0;
++        DDWORD EngineMessageFn(DDWORD m, void* d, float f) override
++        {
++            if (m == MID_INITIALUPDATE)
++            {
++                m_damage.Init(m_hObject);
++                m_damage.m_fHitPoints = m_damage.m_fMaxHitPoints = 1000;
++                m_damage.apply_damage_physics = false;
++            }
++            if (m == MID_TOUCHNOTIFY)
++                ++touches;
++            return BaseClass::EngineMessageFn(m, d, f);
++        }
++        DDWORD ObjectMessageFn(HOBJECT s, DDWORD m, HMESSAGEREAD r) override
++        {
++            auto result = BaseClass::ObjectMessageFn(s, m, r);
++            if (m == damage_message && remove_on_damage)
++                GetServerDE()->RemoveObject(remove_on_damage);
++            return result;
++        }
++    };
++    Target* target(GameSession& g, DVector position)
++    {
++        static ClassInfo type{"FlareCharacterProbe",
++                              nullptr,
++                              []() -> std::unique_ptr<BaseClass> { return std::make_unique<Target>(); },
++                              {}};
++        type.parent = g.objects.find_class("CBaseCharacter");
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct state;
++        state.m_Pos = position;
++        state.m_Flags = FLAG_SOLID | FLAG_TOUCH_NOTIFY;
++        auto h = g.objects.create(&type, state);
++        if (auto* r = g.objects.get(h))
++            r->dimensions = {2, 2, 2};
++        return dynamic_cast<Target*>(g.server.HandleToObject(h));
++    }
++    bool primary(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_flare::setup(g, root));
++        auto* owner = test_energy::actor(g, {0, 50, 0});
++        auto* victim = target(g, {0, 50, 100});
++        CHECK(owner && victim);
++        auto* p = test_flare::projectile(g, owner->m_hObject, {0, 50, 0});
++        CHECK(p);
++        auto h = p->m_hObject;
++        CHECK(g.objects.get(h)->state.m_Scale.x == 0);
++        CHECK(g.objects.advance(.005) && p->sound && g.objects.get(h)->state.m_Scale.x == 0);
++        auto oldsound = p->sound;
++        CHECK(g.server.advance_projectiles(.05) && p->tracking && p->contacted && !p->m_bExplode &&
++              victim->touches == 1);
++        CHECK(!p->sound && !g.server.audio.get(oldsound) && p->m_fLifeTime == 5 && near(p->offset.z, -2));
++        CHECK(!(g.objects.get(h)->state.m_Flags & FLAG_TOUCH_NOTIFY));
++        CHECK(p->AdvanceFlight(.05) && victim->touches == 1 && near(g.objects.get(h)->state.m_Pos.z, 98));
++        DVector moved{30, 50, 110};
++        CHECK(g.server.TeleportObject(victim->m_hObject, &moved) == DE_OK);
++        DRotation rot;
++        CHECK(g.server.AlignRotation(rot, {1, 0, 0}) == DE_OK &&
++              g.server.SetObjectRotation(victim->m_hObject, &rot) == DE_OK);
++        CHECK(g.objects.advance(.01) && p->sound && p->sound != oldsound && near(g.objects.get(h)->state.m_Pos.x, 30) &&
++              near(g.objects.get(h)->state.m_Pos.z, 108));
++        CHECK(g.objects.advance(1 - g.objects.time()) && p->ticks == 0);
++        CHECK(g.objects.advance(.002) && p->ticks == 1 && victim->m_damage.m_fHitPoints == 980);
++        CHECK(victim->m_damage.last_damage.type == DamageType::Fire &&
++              victim->m_damage.last_damage.attacker == owner->m_hObject &&
++              vector_dot(victim->m_damage.last_damage.direction, victim->m_damage.last_damage.direction) == 0);
++        auto tick = p->last_damage_time;
++        CHECK(g.objects.advance(double(tick + 1) - g.objects.time()) && p->ticks == 1);
++        CHECK(g.objects.advance(.002) && p->ticks == 2);
++        victim->m_damage.m_bDead = true;
++        CHECK(g.objects.advance(.002) && p->m_bExplode && g.objects.get(h)->life == Life::Alive);
++        CHECK(g.objects.advance(.002) && g.objects.finish_frame() && !g.objects.get(h));
++        CHECK(g.server.projectile_reports.back().burn_ticks == 2 && g.server.projectile_reports.back().tracked);
++        CHECK(g.server.scene_explosions.back().type == 13 && g.server.scene_explosions.back().voice);
++        auto* brush = test_energy::actor(g, {300, 50, 100});
++        CHECK(brush);
++        p = test_flare::projectile(g, owner->m_hObject, {300, 50, 90});
++        CHECK(p);
++        h = p->m_hObject;
++        CHECK(g.server.advance_projectiles(.01) && p->m_bExplode && !p->tracking);
++        CHECK(g.objects.advance(.002) && !g.objects.get(h));
++        CHECK(brush->damage.last_damage.type == DamageType::Fire && brush->damage.last_damage.area_effect &&
++              brush->damage.m_fHitPoints < 1000);
++        p = test_flare::projectile(g, owner->m_hObject, {500, 50, 0});
++        CHECK(p);
++        h = p->m_hObject;
++        SegmentHit sky;
++        sky.polygon = 0;
++        sky.texture_flags = 110;
++        p->HandleContact(sky);
++        CHECK(g.objects.get(h)->life == Life::Alive && p->m_bExplode); // Override has no base SKY discard.
++        CHECK(g.objects.advance(.002) && !g.objects.get(h) && g.server.projectile_reports.back().outcome == "exploded");
++        CHECK(g.unload_world() && g.server.audio.voices().empty() && CDestructable::m_dwNumDestructables == 0);
++        std::cout << "Primary: contact/loop restart, world-offset following, strict periodic FIRE damage and "
++                     "next-update death fizzle verified.\n";
++        return true;
++    }
++    bool alternate(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_flare::setup(g, root));
++        auto* owner = test_energy::actor(g, {0, 50, -100});
++        CHECK(owner);
++        auto* p = test_flare::projectile<CFlareAltProjectile>(g, owner->m_hObject, {0, 50, 0});
++        CHECK(p);
++        auto h = p->m_hObject;
++        CHECK(g.objects.advance(.005) && !p->get_velocity && p->cached_velocity.z == 2000);
++        CHECK(g.objects.advance(.095) && p->children == 0); // Source float > .1 boundary.
++        CHECK(g.objects.advance(.002) && g.objects.finish_frame() && !g.objects.get(h));
++        CHECK(g.server.projectile_reports.back().burst_children == 8 &&
++              g.server.projectile_reports.back().delivered == 0);
++        CHECK(g.server.scene_explosions.back().type == 15 && g.server.scene_explosions.back().voice);
++        const float offsets[8][2]{{.135f, 0},    {-.135f, 0},   {0, -.135f},    {0, .135f},
++                                  {.06f, -.06f}, {-.06f, .06f}, {-.06f, -.06f}, {.06f, .06f}};
++        unsigned n = 0;
++        for (auto id : g.objects.snapshot())
++            if (auto* c = dynamic_cast<CFlareBurstProjectile*>(g.objects.get(id)->game.get()))
++            {
++                CHECK(n < 8 && c->m_fDamage == 10 && c->m_nRadius == 100 && c->m_fVelocity == 2000 && c->color_ready &&
++                      c->m_damage.m_bGodMode);
++                CHECK(near(c->m_vDir.x / c->m_vDir.z, offsets[n][0]) && near(c->m_vDir.y / c->m_vDir.z, offsets[n][1]));
++                CHECK(c->m_hFiredFrom == owner->m_hObject);
++                ++n;
++            }
++        CHECK(n == 8);
++        CHECK(g.objects.remove(owner->m_hObject) && g.objects.finish_frame());
++        CHECK(g.objects.advance(.002));
++        for (auto id : g.objects.snapshot())
++            if (auto* c = dynamic_cast<CFlareBurstProjectile*>(g.objects.get(id)->game.get()))
++                CHECK(!c->m_hFiredFrom && g.objects.get(id)->state.m_Scale.x == .25f);
++        for (auto id : g.objects.snapshot())
++            if (dynamic_cast<CFlareBurstProjectile*>(g.objects.get(id)->game.get()))
++                CHECK(g.objects.remove(g.objects.get(id)->handle));
++        CHECK(g.objects.finish_frame());
++        // Contact before burst explodes as FRAG. Contact on the burst update emits FRAG then BURST.
++        owner = test_energy::actor(g, {0, 50, -100});
++        CHECK(owner);
++        p = test_flare::projectile<CFlareAltProjectile>(g, owner->m_hObject, {0, 50, 0});
++        CHECK(p);
++        CHECK(g.objects.advance(.002));
++        SegmentHit wall;
++        wall.polygon = 0;
++        wall.point = {0, 50, 0};
++        p->HandleContact(wall);
++        CHECK(g.objects.advance(.002) && g.server.projectile_reports.back().outcome == "exploded" &&
++              g.server.projectile_reports.back().burst_children == 0);
++        CHECK(g.server.scene_explosions.back().type == 15 && g.objects.finish_frame());
++        p = test_flare::projectile<CFlareAltProjectile>(g, owner->m_hObject, {300, 50, 0});
++        CHECK(p);
++        CHECK(g.objects.advance(.002));
++        p->HandleContact(wall);
++        CHECK(g.objects.advance(.11) && g.server.projectile_reports.back().burst_children == 8 &&
++              g.server.projectile_reports.back().outcome == "exploded");
++        auto& reports = g.server.scene_explosions;
++        CHECK(reports.size() >= 3 && reports[reports.size() - 2].type == 15 && reports.back().type == 14);
++        CHECK(g.unload_world());
++        std::cout << "Alternate: strict burst boundary, eight source directions/half damage, independent children and "
++                     "FRAG-before-BURST ordering verified.\n";
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_flare::setup(g, root));
++        auto* owner = test_energy::actor(g, {0, 50, 0});
++        auto* victim = target(g, {0, 50, 100});
++        CHECK(owner && victim);
++        auto* p = test_flare::projectile(g, owner->m_hObject, {0, 50, 90});
++        CHECK(p);
++        auto h = p->m_hObject;
++        CHECK(g.server.advance_projectiles(.01) && p->tracking);
++        CHECK(g.objects.remove(owner->m_hObject) && g.objects.finish_frame() && !p->m_hFiredFrom);
++        CHECK(g.objects.advance(1.01) && p->ticks == 1 && !victim->m_damage.last_damage.attacker);
++        auto sound = p->sound;
++        CHECK(g.objects.remove(victim->m_hObject) && g.objects.finish_frame() && !p->m_hHitObject);
++        CHECK(g.objects.advance(.002) && g.objects.finish_frame() && !g.objects.get(h) && !g.server.audio.get(sound) &&
++              g.server.scene_explosions.empty());
++        owner = test_energy::actor(g, {0, 50, 0});
++        victim = target(g, {0, 50, 100});
++        CHECK(owner && victim);
++        p = test_flare::projectile(g, owner->m_hObject, {0, 50, 90});
++        CHECK(p);
++        h = p->m_hObject;
++        CHECK(g.server.advance_projectiles(.01));
++        victim->remove_on_damage = h;
++        CHECK(g.objects.advance(.01) && g.objects.finish_frame() && !g.objects.get(h) && g.server.message_count() == 0);
++        p = test_flare::projectile(g, owner->m_hObject, {0, 50, 90});
++        CHECK(p);
++        h = p->m_hObject;
++        CHECK(g.server.advance_projectiles(.01));
++        victim->remove_on_damage = nullptr;
++        const auto expiry = p->track_start + 5;
++        CHECK(g.objects.advance(double(expiry) - g.objects.time()) && g.objects.get(h)->life == Life::Alive);
++        CHECK(g.objects.advance(.002) && g.objects.finish_frame() && !g.objects.get(h));
++        CHECK(g.server.projectile_reports.back().outcome == "expired");
++        // Alternate child Setup rejects lost shooters explicitly, with no fabricated attacker.
++        auto* alt = test_flare::projectile<CFlareAltProjectile>(g, owner->m_hObject, {0, 50, 0});
++        CHECK(alt);
++        h = alt->m_hObject;
++        CHECK(g.objects.advance(.002) && g.objects.remove(owner->m_hObject) && g.objects.finish_frame());
++        CHECK(g.objects.advance(.11) && g.server.projectile_reports.back().outcome == "failed" &&
++              g.server.projectile_reports.back().burst_children == 0 && g.objects.finish_frame() && !g.objects.get(h));
++        CHECK(g.unload_world() && g.server.audio.voices().empty());
++        return true;
++    }
++    bool weapon(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_flare::setup(g, root));
++        auto* a = test_energy::actor(g, {0, 50, 0});
++        CHECK(a);
++        auto& inv = a->inventory;
++        CHECK(inv.Init(a->m_hObject, nullptr) && inv.ObtainWeapon(3, 0) == InventoryResult::Ok);
++        auto* w = inv.CurrentWeapon();
++        CHECK(w && w->data.m_nAmmoUse == 1 && w->data.m_nAltAmmoUse == 8 && w->data.m_fRange == 5000 &&
++              w->data.m_fProjVelocity == 2000);
++        inv.SetAmmoCount(4, 9);
++        WeaponFire f{{0, 50, 0}, {0, 0, 1}, 42, 3, false, false};
++        CHECK(w->Fire(f) == FireResult::Fired && inv.GetAmmoCount(4) == 8 &&
++              dynamic_cast<CFlareProjectile*>(g.server.HandleToObject(w->projectile)) && w->last_shot.damage >= 10 &&
++              w->last_shot.damage <= 15);
++        f.alternate = true;
++        CHECK(w->Fire(f) == FireResult::Fired && inv.GetAmmoCount(4) == 0 &&
++              dynamic_cast<CFlareAltProjectile*>(g.server.HandleToObject(w->projectile)) && w->last_shot.damage >= 20 &&
++              w->last_shot.damage <= 30);
++        CHECK(w->sounds_played == 2 && !w->sound_failures);
++        inv.SetAmmoCount(4, 7);
++        CHECK(w->Fire(f) == FireResult::Dry && inv.GetAmmoCount(4) == 7 && w->shots == 2);
++        InventoryState state;
++        std::string error;
++        CHECK(inv.Save(state, error) && state.right[0] == 3);
++        auto* b = test_energy::actor(g, {100, 50, 0});
++        CHECK(b && b->inventory.Init(b->m_hObject, nullptr) &&
++              b->inventory.Load(state, InventoryLoadType::KeepAlive, error));
++        CHECK(b->inventory.CurrentWeapon()->data.m_nType == 3 && b->inventory.CurrentWeapon()->shots == 0);
++        CHECK(g.enter_player(error) && test_flare::equip(g));
++        auto* player = g.server_shell.Player(g.local_client);
++        DVector eye;
++        CHECK(g.server.GetObjectPos(player->m_hObject, &eye) == DE_OK);
++        eye.y += player->eye_level;
++        auto* wall = test_energy::actor(g, vector_add(eye, {0, 0, 30}));
++        CHECK(wall);
++        w = player->m_InventoryMgr.CurrentWeapon();
++        f = {vector_add(eye, {0, 0, 40}), {0, 0, 1}, 42, 3, false, false};
++        CHECK(w->Fire(f) == FireResult::Fired && near(w->last_shot.request.position.z, eye.z));
++        CHECK(near(g.objects.get(w->projectile)->state.m_Pos.z, eye.z));
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto* owner = test_energy::actor(g, {0, 50, 0});
++        CHECK(owner);
++        CHECK(!test_flare::projectile(g, owner->m_hObject, {0, 50, 0})); // Actual missing SPR fails binding.
++        CHECK(g.objects.finish_frame() && test_flare::mount(g, root));
++        owner = test_energy::actor(g, {0, 50, 0});
++        CHECK(owner);
++        CHECK(!g.objects.create(g.objects.find_class("CFlareProjectile"), {}, Creation::World));
++        auto* p = test_flare::projectile(g, owner->m_hObject, {0, 50, 0});
++        CHECK(p);
++        const auto h = p->m_hObject;
++        DVector color;
++        float alpha = 0;
++        CHECK(g.server.GetObjectColor(h, color, alpha) && color.x == 1 && color.y == 1 && color.z == 1 && alpha == 1);
++        CHECK(!g.server.SetObjectColor(h, {-1, 1, 1}, 1) && !g.server.SetObjectColor(h, {1, 1, 1}, 2));
++        CHECK(g.server.GetObjectColor(h, color, alpha) && color.y == 1 && alpha == 1);
++        g.server.collision_ready = false;
++        CHECK(!p->AdvanceFlight(.01) && p->failed && g.objects.finish_frame() && !g.objects.get(h));
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool drop(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_flare::setup(g, root));
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_MODEL;
++        state.m_Pos = {300, 100, 300};
++        SAFE_STRCPY(state.m_Filename, "Models/Characters/Caleb.abc");
++        auto h = g.objects.create(g.objects.find_class("CBaseCharacter"), state);
++        auto* c = dynamic_cast<CBaseCharacter*>(g.server.HandleToObject(h));
++        CHECK(c);
++        auto& inv = c->m_InventoryMgr;
++        CHECK(inv.Init(h, nullptr) && inv.ObtainWeapon(3, 1) == InventoryResult::Ok &&
++              inv.ChangeWeaponSlot(1) == InventoryResult::Ok);
++        CHECK(inv.CurrentWeapon()->ShowHandModel(true));
++        const auto hand = inv.CurrentWeapon()->m_hHandModel;
++        CHECK(inv.DropCurrentWeapon() == InventoryResult::Ok && g.objects.get(hand)->attachment == 0);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame() && g.objects.get(hand));
++        HOBJECT pickup = nullptr;
++        for (unsigned i = 0; i < 400 && !pickup; ++i)
++        {
++            CHECK(g.step(.01));
++            for (auto id : g.objects.snapshot())
++                if (dynamic_cast<FlareGunPU*>(g.objects.get(id)->game.get()))
++                    pickup = g.objects.get(id)->handle;
++        }
++        CHECK(pickup && !g.objects.get(hand));
++        CHECK(dynamic_cast<FlareGunPU*>(g.server.HandleToObject(pickup))->value.amount == 8 &&
++              g.server.spawn_reports.back().request == "FlareGunPU");
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool collect(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_flare::setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto& inv = g.server_shell.Player(g.local_client)->m_InventoryMgr;
++        inv.SetAmmoCount(4, 0);
++        for (unsigned i = 0; i < 3; ++i)
++        {
++            auto h = SpawnWeaponPickup(3, g.client_shell.player, {300, 100, 300}, {}, true);
++            auto* p = dynamic_cast<FlareGunPU*>(g.server.HandleToObject(h));
++            CHECK(p && p->value.amount == 8 && p->resource_id == 355);
++            if (i == 2)
++                inv.SetAmmoCount(4, inv.MaxAmmo(4));
++            CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player) && p->picked_up == (i < 2));
++            if (i < 2)
++                CHECK(inv.GetAmmoCount(4) == 8 * (i + 1));
++            CHECK(g.objects.finish_frame());
++        }
++        CHECK(inv.GetWeapon(2) && inv.GetWeapon(2, true));
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool private_data(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config cfg;
++        cfg.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(cfg, error));
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_subwaya", error) && g.enter_player(error) &&
++                  test_camera::complete_subway_intro(g) && test_flare::equip(g));
++            auto* player = g.server_shell.Player(g.local_client);
++            player->m_damage.m_bGodMode = true;
++            auto& inv = player->m_InventoryMgr;
++            for (bool left : {false, true})
++                for (bool alt : {false, true})
++                {
++                    g.client_shell.weapon_input = {};
++                    for (unsigned i = 0; i < 100; ++i)
++                        CHECK(g.step(.01));
++                    inv.SetAmmoCount(4, 200);
++                    auto* w = inv.CurrentWeapon(left);
++                    auto before = w->shots;
++                    auto keys = g.client_shell.weapons[left ? 1 : 0].fire_keys;
++                    g.client_shell.weapon_input = {!alt, alt, left};
++                    for (unsigned i = 0; i < 190; ++i)
++                        CHECK(g.step(.01));
++                    const auto shots = w->shots - before;
++                    std::cout << "Retail Flare left=" << left << " alt=" << alt << " shots=" << shots
++                              << " keys=" << g.client_shell.weapons[left ? 1 : 0].fire_keys - keys
++                              << " projectile error=" << w->projectile_error << '\n';
++                    CHECK(shots > 0 && shots == g.client_shell.weapons[left ? 1 : 0].fire_keys - keys &&
++                          inv.GetAmmoCount(4) == 200 - shots * (alt ? 8 : 1));
++                    CHECK(w->sound_failures == 0 && w->projectile_error.empty() &&
++                          w->last_shot.result == FireResult::Fired);
++                }
++            CHECK(g.unload_world() && g.server.audio.voices().empty() && g.objects.attachments().empty());
++        }
++        CHECK(g.request_world("02_cityhub", error));
++        unsigned created = 0, unknown = 0, failed = 0, flare = 0;
++        for (std::size_t i = 0; i < g.entries.size(); ++i)
++        {
++            auto& e = g.entries[i];
++            created += e.state == EntryState::Created;
++            unknown += e.state == EntryState::Unsupported;
++            failed += e.state == EntryState::Failed;
++            if (auto* a =
++                    dynamic_cast<CultistAI*>(g.objects.get(e.object) ? g.objects.get(e.object)->game.get() : nullptr);
++                a && a->m_InventoryMgr.CurrentWeapon() && a->m_InventoryMgr.CurrentWeapon()->data.m_nType == 3)
++            {
++                ++flare;
++                CHECK(a->RuntimeReady());
++            }
++            if (e.state == EntryState::Failed)
++                std::cout << "Failed: " << g.world.objects[i].class_name << '\n';
++        }
++        std::cout << "CityHub created=" << created << " unsupported=" << unknown << " failed=" << failed
++                  << " flare NPCs=" << flare << '\n';
++        CHECK(created == 422 && unknown == 31 && failed == 1 && flare == 1);
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool ai(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config cfg;
++        cfg.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(cfg, error));
++        auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
++        for (auto& s : floor.surfaces)
++            s.flags = 1;
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        g.world_path = "synthetic original flare NPC arena";
++        g.state = SessionState::Inspection;
++        CHECK(g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
++                               {{"Name", std::string("START")}, {"Pos", DVector{0, 100, 200}}}));
++        auto h =
++            g.objects.create(g.objects.find_class("CultistAI"), {}, Creation::World,
++                             {{"Pos", DVector{0, 100, 0}}, {"AIWeapon1", std::string("FLAREGUN")}, {"Flares", 100.f}});
++        auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(h));
++        CHECK(a && a->RuntimeReady());
++        g.server_shell.PreStartWorld();
++        CHECK(g.server_shell.PostStartWorld() && g.enter_player(error));
++        auto* player = g.server_shell.Player(g.local_client);
++        for (unsigned i = 0; i < 600; ++i)
++            CHECK(g.step(1.0 / 60));
++        std::cout << "Flare NPC updates=" << a->runtime_updates << " shots=" << a->fire_shots
++                  << " HP=" << player->m_damage.m_fHitPoints << " error=" << a->runtime_error << '\n';
++        CHECK(a->RuntimeReady() && a->fire_shots > 0 && player->m_damage.m_fHitPoints < 100);
++        auto* w = a->m_InventoryMgr.CurrentWeapon();
++        CHECK(w && w->data.m_nType == 3 && w->projectile_error.empty() && w->m_hHandModel);
++        CHECK(g.unload_world() && AI_Mgr::m_dwNumCabal == 0);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"primary", primary},   {"alternate", alternate},  {"lifetime", lifetime},
++        {"weapon", weapon},     {"collect", collect},      {"drop", drop},
++        {"failures", failures}, {"private", private_data}, {"ai", ai}};
++    auto it = cases.find(argv[1]);
++    return it != cases.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/flare_view_gpu_tests.cpp b/tests/flare_view_gpu_tests.cpp
+new file mode 100644
+index 0000000..80f3f0b
+--- /dev/null
++++ b/tests/flare_view_gpu_tests.cpp
+@@ -0,0 +1,88 @@
++#include "app/model_scene.h"
++#include "camera_fixture.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "flare_fixture.h"
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x " " << error << " " << SDL_GetError() << '\n';                            \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string error;
++    Runtime runtime;
++    CHECK(runtime.initialize(true, error));
++    GameSession g;
++    CHECK(g.initialize());
++    Config cfg;
++    cfg.data_dir = argv[1];
++    CHECK(g.resources.mount_game(cfg, error));
++    WorldRenderer renderer(runtime.gpu);
++    ModelView scene;
++    for (unsigned cycle = 0; cycle < 2; ++cycle)
++    {
++        CHECK(g.request_world("01_subwaya", error) && g.enter_player(error) && test_camera::complete_subway_intro(g));
++        CHECK(test_flare::equip(g));
++        for (unsigned i = 0; i < 100; ++i)
++            CHECK(g.step(.01));
++        CHECK(update_model_scene(g, scene, error) && scene.close_draws.size() == 2);
++        unsigned close = 0;
++        for (const auto& e : scene.entries)
++            if (e.close)
++            {
++                CHECK(e.visible && e.triangles > 0 && e.error.empty() && e.skin.find("Flare") != std::string::npos);
++                ++close;
++            }
++        CHECK(close == 2);
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480));
++        CHECK(
++            renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480, error, true));
++        const auto& view = g.client_shell.view;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(commands && renderer.draw(commands, capture.texture, scene.mesh, scene.close_draws, view.position,
++                                        view.rotation, false, error));
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        CHECK(copy);
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 640;
++        region.h = 480;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 640;
++        target.rows_per_layer = 480;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        CHECK(SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(runtime.gpu));
++        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        unsigned left = 0, right = 0;
++        for (unsigned y = 0; y < 480; ++y)
++            for (unsigned x = 0; x < 640; ++x)
++            {
++                const auto* p = pixels + (y * 640 + x) * 4;
++                if (p[0] != pixels[0] || p[1] != pixels[1] || p[2] != pixels[2])
++                    (x < 320 ? left : right)++;
++            }
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        std::cout << "Flare GPU cycle=" << cycle << " left pixels=" << left << " right pixels=" << right << '\n';
++        CHECK(left > 100 && right > 100);
++        CHECK(capture.save((std::string(argv[2]) + std::to_string(cycle) + ".png").c_str()));
++        CHECK(g.unload_world() && update_model_scene(g, scene, error) && scene.close_draws.empty() &&
++              scene.entries.empty());
++        renderer.clear_geometry();
++        scene.clear();
++        CHECK(g.server.audio.voices().empty() && g.objects.attachments().empty());
++    }
++}
+diff --git a/tests/inventory_state_tests.cpp b/tests/inventory_state_tests.cpp
+index aa775bd..77662a3 100644
+--- a/tests/inventory_state_tests.cpp
++++ b/tests/inventory_state_tests.cpp
+@@ -97,7 +97,7 @@ namespace
+             [](auto& s) { s.strength = 0; },
+             [](auto& s) { s.magic = 7; },
+             [](auto& s) { s.current_slot = 10; },
+-            [](auto& s) { s.right[2] = 3; },
++            [](auto& s) { s.right[2] = 4; },
+             [](auto& s) { s.left[2] = WEAP_BERETTA; },
+             [](auto& s) { s.left[0] = WEAP_MELEE; },
+             [](auto& s) { s.left[7] = WEAP_MELEE; },
+diff --git a/tests/mac10_tests.cpp b/tests/mac10_tests.cpp
+index 6dd2b74..44a65ed 100644
+--- a/tests/mac10_tests.cpp
++++ b/tests/mac10_tests.cpp
+@@ -263,7 +263,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unknown=" << unknown << " failed=" << failed << " Mac10=" << mac
+                   << '\n';
+-        CHECK(mac == 1 && created == 421 && unknown == 31 && failed == 2);
++        CHECK(mac == 1 && created == 422 && unknown == 31 && failed == 1);
+         for (auto id : g.objects.snapshot())
+             if (auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(g.objects.get(id)->handle));
+                 a && a->runtime_failed)
+diff --git a/tests/pickup_tests.cpp b/tests/pickup_tests.cpp
+index 79b0b1b..2ab0c06 100644
+--- a/tests/pickup_tests.cpp
++++ b/tests/pickup_tests.cpp
+@@ -389,6 +389,13 @@ namespace
+                               gun->value.amount == 20 && gun->resource_id == IDS_WEAPON_MAC10);
+                         std::cout << "Authored SubMachineGunPU: " << path << '\n';
+                     }
++                    if (source.class_name == "FlareGunPU")
++                    {
++                        auto* gun = dynamic_cast<PickupObject*>(g.objects.get(h)->game.get());
++                        CHECK(gun && gun->value.kind == PickupKind::Weapon && gun->value.type == WEAP_FLAREGUN &&
++                              gun->value.amount == 8 && gun->resource_id == IDS_WEAPON_FLAREGUN);
++                        std::cout << "Authored FlareGunPU: " << path << '\n';
++                    }
+                     missing += !g.objects.get(h)->model;
+                 }
+                 CHECK(g.objects.clear() && AmmoPickup::m_dwNumPickups == 0);
+@@ -419,8 +426,8 @@ namespace
+             CHECK(reason.ends_with("invalid property TypeAction"));
+             rejected += n;
+         }
+-        CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4);
+-        CHECK(worlds == 57 && created == 1263 && missing == 0 && rejected == 176 && spawns == 60);
++        CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2);
++        CHECK(worlds == 57 && created == 1265 && missing == 0 && rejected == 176 && spawns == 60);
+         return true;
+     }
+ } // namespace
+diff --git a/tests/weapon_drop_tests.cpp b/tests/weapon_drop_tests.cpp
+index 6f2fda7..a9b4212 100644
+--- a/tests/weapon_drop_tests.cpp
++++ b/tests/weapon_drop_tests.cpp
+@@ -84,7 +84,7 @@ namespace
+         auto* player = g.server_shell.Player(g.local_client);
+         const auto initial = player->m_InventoryMgr.GetAmmoCount(1);
+         for (auto value : {PickupMessage{PickupKind::Weapon, 0, 12},
+-                           {PickupKind::Weapon, 3, 12},
++                           {PickupKind::Weapon, 4, 12},
+                            {PickupKind::Weapon, 1, -1},
+                            {PickupKind::Weapon, 1, std::numeric_limits<float>::infinity()}})
+         {
+diff --git a/tests/weapon_tests.cpp b/tests/weapon_tests.cpp
+index 81ce957..d85f882 100644
+--- a/tests/weapon_tests.cpp
++++ b/tests/weapon_tests.cpp
+@@ -104,7 +104,7 @@ namespace
+         CHECK(inv.ObtainWeapon(WEAP_BERETTA) == InventoryResult::Ok && inv.GetWeapon(1, true));
+         CHECK(inv.ObtainWeapon(WEAP_BERETTA) == InventoryResult::AlreadyHave);
+         CHECK(inv.ObtainWeapon(WEAP_MELEE) == InventoryResult::AlreadyHave);
+-        CHECK(inv.ObtainWeapon(3) == InventoryResult::NotAvailable &&
++        CHECK(inv.ObtainWeapon(4) == InventoryResult::NotAvailable &&
+               inv.ObtainWeapon(1, 99) == InventoryResult::Invalid);
+         CHECK(inv.ChangeWeaponSlot(99) == InventoryResult::NotAvailable && inv.m_nCurWeaponSlot == 1);
+         std::string error;
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index d9160e9..ad1b038 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -1168,7 +1168,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 421 && d.unknown == 31 && d.failed == 2);
++                        CHECK(d.created == 422 && d.unknown == 31 && d.failed == 1);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

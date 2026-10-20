@@ -1,0 +1,51 @@
+[0/2] Re-checking globbed directories...
+[1/124] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AmmoPickups.cpp for CXX dependencies
+[2/124] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PickupObject.cpp for CXX dependencies
+[3/124] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[4/117] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PowerupPickups.cpp for CXX dependencies
+[5/117] Scanning /home/yann/projects/lithtech/Blood2/src/game/registration.cpp for CXX dependencies
+[6/117] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[7/72] Scanning /home/yann/projects/lithtech/Blood2/src/app/pickup_smoke.cpp for CXX dependencies
+[8/72] Scanning /home/yann/projects/lithtech/Blood2/tests/pickup_tests.cpp for CXX dependencies
+[9/72] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_pickups.cpp for CXX dependencies
+[10/72] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PickupObject.cpp.o
+[11/72] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AmmoPickups.cpp.o
+[12/72] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[13/67] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[14/66] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[15/64] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[16/63] Generating CXX dyndep file tests/CMakeFiles/services_tests.dir/CXX.dd
+[17/62] Generating CXX dyndep file tests/CMakeFiles/player_tests.dir/CXX.dd
+[18/61] Generating CXX dyndep file tests/CMakeFiles/weapon_tests.dir/CXX.dd
+[19/60] Generating CXX dyndep file tests/CMakeFiles/movement_tests.dir/CXX.dd
+[20/59] Generating CXX dyndep file tests/CMakeFiles/locomotion_tests.dir/CXX.dd
+[21/58] Generating CXX dyndep file tests/CMakeFiles/container_tests.dir/CXX.dd
+[22/57] Generating CXX dyndep file tests/CMakeFiles/door_tests.dir/CXX.dd
+[23/56] Generating CXX dyndep file tests/CMakeFiles/trigger_tests.dir/CXX.dd
+[24/55] Generating CXX dyndep file tests/CMakeFiles/interaction_tests.dir/CXX.dd
+[25/54] Generating CXX dyndep file tests/CMakeFiles/brush_tests.dir/CXX.dd
+[26/53] Generating CXX dyndep file tests/CMakeFiles/explosion_tests.dir/CXX.dd
+[27/52] Generating CXX dyndep file tests/CMakeFiles/pushable_tests.dir/CXX.dd
+[28/51] Generating CXX dyndep file tests/CMakeFiles/pickup_tests.dir/CXX.dd
+[29/51] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PowerupPickups.cpp.o
+[30/51] Building CXX object CMakeFiles/blood2_app.dir/src/app/pickup_smoke.cpp.o
+[31/51] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_pickups.cpp.o
+[32/51] Building CXX object CMakeFiles/blood2_game.dir/src/game/registration.cpp.o
+[33/51] Linking CXX static library libblood2_game.a
+[34/51] Linking CXX executable tests/object_contract_tests
+[35/51] Linking CXX executable blood2
+[36/51] Linking CXX executable tests/world_tests
+[37/51] Linking CXX executable tests/player_tests
+[38/51] Linking CXX executable tests/services_tests
+[39/51] Linking CXX executable tests/movement_tests
+[40/51] Building CXX object tests/CMakeFiles/pickup_tests.dir/pickup_tests.cpp.o
+[41/51] Linking CXX executable tests/weapon_tests
+[42/51] Linking CXX executable tests/locomotion_tests
+[43/51] Linking CXX executable tests/container_tests
+[44/51] Linking CXX executable tests/door_tests
+[45/51] Linking CXX executable tests/trigger_tests
+[46/51] Linking CXX executable tests/interaction_tests
+[47/51] Linking CXX executable tests/brush_tests
+[48/51] Linking CXX executable tests/pushable_tests
+[49/51] Linking CXX executable tests/explosion_tests
+[50/51] Linking CXX executable tests/pickup_tests

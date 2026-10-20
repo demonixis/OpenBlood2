@@ -1,0 +1,14 @@
+288/290 Testing: character_motion.callbacks
+288/290 Test: character_motion.callbacks
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_motion_tests" "callbacks" "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-motion-fixtures/callbacks"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"character_motion.callbacks" start time: Oct 16 05:20 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"character_motion.callbacks" end time: Oct 16 05:20 CEST
+"character_motion.callbacks" time elapsed: 00:00:00
+----------------------------------------------------------

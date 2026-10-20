@@ -1,0 +1,152 @@
+178/524 Testing: gpu.objectives
+178/524 Test: gpu.objectives
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--objectives-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/objectives.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.objectives" start time: Oct 16 18:31 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 225 original instances, 116 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/objectives.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; ExitTrigger NEW_LEVEL refusal preserves player/inventory; unload/reload checked
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   3.19 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.objectives" end time: Oct 16 18:31 CEST
+"gpu.objectives" time elapsed: 00:00:03
+----------------------------------------------------------
+
+End testing: Oct 16 18:31 CEST
+
+ai_escape =   0.30 sec*proc
+
+ai_fire =   3.41 sec*proc
+
+ai_follow =   1.27 sec*proc
+
+ai_hit =   0.23 sec*proc
+
+ai_keys =   6.45 sec*proc
+
+ai_locomotion =   0.29 sec*proc
+
+ai_navigation =   0.89 sec*proc
+
+ai_perception =   1.16 sec*proc
+
+ai_recovery =   0.33 sec*proc
+
+ai_runtime =   6.24 sec*proc
+
+ai_script =   0.68 sec*proc
+
+ai_sight =   1.17 sec*proc
+
+ai_state =   8.42 sec*proc
+
+ai_target =   1.19 sec*proc
+
+ai_trigger =   0.90 sec*proc
+
+attachments =   1.39 sec*proc
+
+brushes =   9.78 sec*proc
+
+cameras =   9.12 sec*proc
+
+character =  26.45 sec*proc
+
+character_audio =   8.00 sec*proc
+
+character_motion =   0.33 sec*proc
+
+cinematics =   7.55 sec*proc
+
+cli =   0.05 sec*proc
+
+config =   0.01 sec*proc
+
+containers =  14.84 sec*proc
+
+corpses =   0.28 sec*proc
+
+destructable_state =   1.29 sec*proc
+
+doors =   9.49 sec*proc
+
+exits =   2.62 sec*proc
+
+explosions =   0.04 sec*proc
+
+gpu = 146.75 sec*proc
+
+headless = 206.61 sec*proc
+
+interaction =  13.59 sec*proc
+
+inventory_state =   1.29 sec*proc
+
+keyframes =  12.48 sec*proc
+
+lights =   6.85 sec*proc
+
+locomotion =   4.41 sec*proc
+
+model_view =   2.39 sec*proc
+
+movement =  29.87 sec*proc
+
+objectives =   7.07 sec*proc
+
+objects =   0.04 sec*proc
+
+paths =   1.41 sec*proc
+
+pickups =   6.73 sec*proc
+
+player =   5.19 sec*proc
+
+player_state =   1.35 sec*proc
+
+private = 347.31 sec*proc
+
+pushables =   0.07 sec*proc
+
+randomsound =  18.27 sec*proc
+
+sceneexplosion =   7.16 sec*proc
+
+services =   2.78 sec*proc
+
+sound =   7.36 sec*proc
+
+sprites =   8.98 sec*proc
+
+texture =   2.64 sec*proc
+
+triggers =  10.13 sec*proc
+
+weapon_drops =   0.21 sec*proc
+
+weapons =  46.92 sec*proc
+
+world =   2.55 sec*proc
+
+world_view =  19.89 sec*proc
+
+worldpaths =   5.63 sec*proc
+

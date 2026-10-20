@@ -1,0 +1,236 @@
+Start testing: Oct 15 13:55 CEST
+----------------------------------------------------------
+1/13 Testing: config.arguments
+1/13 Test: config.arguments
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/config_tests" "arguments" "/home/yann/projects/lithtech/Blood2/build/debug/tests/test-runs"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"config.arguments" start time: Oct 15 13:55 CEST
+Output:
+----------------------------------------------------------
+PASS arguments
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"config.arguments" end time: Oct 15 13:55 CEST
+"config.arguments" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/13 Testing: config.precedence
+2/13 Test: config.precedence
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/config_tests" "precedence" "/home/yann/projects/lithtech/Blood2/build/debug/tests/test-runs"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"config.precedence" start time: Oct 15 13:55 CEST
+Output:
+----------------------------------------------------------
+PASS precedence
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"config.precedence" end time: Oct 15 13:55 CEST
+"config.precedence" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/13 Testing: config.relative_paths
+3/13 Test: config.relative_paths
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/config_tests" "relative_paths" "/home/yann/projects/lithtech/Blood2/build/debug/tests/test-runs"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"config.relative_paths" start time: Oct 15 13:55 CEST
+Output:
+----------------------------------------------------------
+PASS relative_paths
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"config.relative_paths" end time: Oct 15 13:55 CEST
+"config.relative_paths" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/13 Testing: config.invalid_config
+4/13 Test: config.invalid_config
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/config_tests" "invalid_config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/test-runs"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"config.invalid_config" start time: Oct 15 13:55 CEST
+Output:
+----------------------------------------------------------
+PASS invalid_config
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"config.invalid_config" end time: Oct 15 13:55 CEST
+"config.invalid_config" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/13 Testing: config.content_validation
+5/13 Test: config.content_validation
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/config_tests" "content_validation" "/home/yann/projects/lithtech/Blood2/build/debug/tests/test-runs"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"config.content_validation" start time: Oct 15 13:55 CEST
+Output:
+----------------------------------------------------------
+PASS content_validation
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"config.content_validation" end time: Oct 15 13:55 CEST
+"config.content_validation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/13 Testing: config.case_lookup
+6/13 Test: config.case_lookup
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/config_tests" "case_lookup" "/home/yann/projects/lithtech/Blood2/build/debug/tests/test-runs"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"config.case_lookup" start time: Oct 15 13:55 CEST
+Output:
+----------------------------------------------------------
+PASS case_lookup
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"config.case_lookup" end time: Oct 15 13:55 CEST
+"config.case_lookup" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/13 Testing: cli.help
+7/13 Test: cli.help
+Command: "/usr/bin/cmake" "-DAPP=/home/yann/projects/lithtech/Blood2/build/debug/blood2" "-DCASE=help" "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/debug/tests/fixtures/Blood II" "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "-P" "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"cli.help" start time: Oct 15 13:55 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cli.help" end time: Oct 15 13:55 CEST
+"cli.help" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/13 Testing: cli.unknown
+8/13 Test: cli.unknown
+Command: "/usr/bin/cmake" "-DAPP=/home/yann/projects/lithtech/Blood2/build/debug/blood2" "-DCASE=unknown" "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/debug/tests/fixtures/Blood II" "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "-P" "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"cli.unknown" start time: Oct 15 13:55 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cli.unknown" end time: Oct 15 13:55 CEST
+"cli.unknown" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/13 Testing: cli.missing_data
+9/13 Test: cli.missing_data
+Command: "/usr/bin/cmake" "-DAPP=/home/yann/projects/lithtech/Blood2/build/debug/blood2" "-DCASE=missing_data" "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/debug/tests/fixtures/Blood II" "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "-P" "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"cli.missing_data" start time: Oct 15 13:55 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cli.missing_data" end time: Oct 15 13:55 CEST
+"cli.missing_data" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/13 Testing: cli.missing_config
+10/13 Test: cli.missing_config
+Command: "/usr/bin/cmake" "-DAPP=/home/yann/projects/lithtech/Blood2/build/debug/blood2" "-DCASE=missing_config" "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/debug/tests/fixtures/Blood II" "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "-P" "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"cli.missing_config" start time: Oct 15 13:55 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cli.missing_config" end time: Oct 15 13:55 CEST
+"cli.missing_config" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/13 Testing: cli.metadata
+11/13 Test: cli.metadata
+Command: "/usr/bin/cmake" "-DAPP=/home/yann/projects/lithtech/Blood2/build/debug/blood2" "-DCASE=metadata" "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/debug/tests/fixtures/Blood II" "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "-P" "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"cli.metadata" start time: Oct 15 13:55 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cli.metadata" end time: Oct 15 13:55 CEST
+"cli.metadata" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/13 Testing: content.local
+12/13 Test: content.local
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--check-data"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"content.local" start time: Oct 15 13:55 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] Metadata only; no archives mounted, no game objects or resources loaded
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"content.local" end time: Oct 15 13:55 CEST
+"content.local" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/13 Testing: gpu.lifecycle
+13/13 Test: gpu.lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--gpu-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gpu.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.lifecycle" start time: Oct 15 13:55 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] Metadata only; no archives mounted, no game objects or resources loaded
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/gpu.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] GPU smoke passed: presented frames, inspector mode, resize and queued quit verified
+<end of output>
+Test time =   3.13 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.lifecycle" end time: Oct 15 13:55 CEST
+"gpu.lifecycle" time elapsed: 00:00:03
+----------------------------------------------------------
+
+End testing: Oct 15 13:55 CEST
+
+cli =   0.04 sec*proc
+
+config =   0.01 sec*proc
+
+gpu =   3.13 sec*proc
+
+headless =   0.06 sec*proc
+
+private =   0.00 sec*proc
+

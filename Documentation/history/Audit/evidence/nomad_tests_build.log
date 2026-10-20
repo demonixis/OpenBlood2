@@ -1,0 +1,9 @@
+  Determining projects to restore...
+  Restored /home/yann/projects/lithtech/nomad/tests/Nomad.Tests/Nomad.Tests.csproj (in 1.52 sec).
+  Nomad.Tests -> /tmp/lithtech-audit-2bVxTF/dotnet-tests/bin/Nomad.Tests/debug/Nomad.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:06.04

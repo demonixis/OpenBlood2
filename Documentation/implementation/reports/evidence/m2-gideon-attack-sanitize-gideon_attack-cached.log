@@ -1,0 +1,14 @@
+628/634 Testing: gideon_attack.cached
+628/634 Test: gideon_attack.cached
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_attack_tests" "cached" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-attack-cached"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_attack.cached" start time: Oct 17 03:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_attack.cached" end time: Oct 17 03:03 CEST
+"gideon_attack.cached" time elapsed: 00:00:00
+----------------------------------------------------------

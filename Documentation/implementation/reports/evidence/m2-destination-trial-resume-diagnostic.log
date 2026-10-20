@@ -1,0 +1,28 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 25: world.destination_trials
+1/1 Test #25: world.destination_trials .........***Failed    0.03 sec
+trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+trial4: loaded=1 entered=1 cleanup=1 failed=1 error=
+trial2: loaded=1 entered=0 cleanup=1 failed=0 error=No single-player GameStartPoint
+trial3: loaded=1 entered=0 cleanup=1 failed=0 error=Start point has no supported ground collision
+broken: loaded=0 entered=0 cleanup=1 failed=0 error=DAT v56: invalid/unsupported section offsets near byte 4
+missing: loaded=0 entered=0 cleanup=1 failed=0 error=Resource not found: worlds/missing.dat
+trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+Source trace: Server OnClientEnterWorld -> CreatePlayer -> CPlayerObj InitialUpdate/Respawn -> GoToStartPoint
+Source trace: Client OnEnterWorld -> PLAYERINIT_SINGLEPLAYER -> SINGLEPLAYER_INIT -> original attribute/respawn subset
+Source trace: Locomotion/weapon inspection: remaining container/FX and mover classes, full combat, audio and autosave remain unported
+Source diagnostic: MoveObject starts penetrating geometry; depenetration is not implemented
+destination_trials:1077: resumed
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+headless    =   0.03 sec*proc (1 test)
+world       =   0.03 sec*proc (1 test)
+
+Total Test time (real) =   0.04 sec
+
+The following tests FAILED:
+	 25 - world.destination_trials (Failed)                 headless world
+Errors while running CTest

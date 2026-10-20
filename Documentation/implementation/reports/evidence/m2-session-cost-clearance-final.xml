@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="1"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gigabyte-g5"
+	time="87"
+	timestamp="2026-10-18T08:06:08"
+	>
+	<testcase name="ai_runtime.clearance_private" classname="ai_runtime.clearance_private" time="87.9262" status="run">
+		<properties>
+			<property name="cmake_labels" value="ai_runtime;headless;private"/>
+		</properties>
+		<system-out>SubwayA relocation cycle 0: 8 blocked resizes, 93 original AI shots; no suspended Cultist
+SubwayA relocation cycle 1: 8 blocked resizes, 93 original AI shots; no suspended Cultist
+</system-out>
+	</testcase>
+</testsuite>

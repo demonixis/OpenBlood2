@@ -1,0 +1,15 @@
+{
+  "name": "nomad_tests_synthetic_root",
+  "command": [
+    "dotnet",
+    "--roll-forward",
+    "Major",
+    "/tmp/lithtech-audit-2bVxTF/dotnet-tests/bin/Nomad.Tests/debug/Nomad.Tests.dll"
+  ],
+  "cwd": "/tmp/lithtech-audit-2bVxTF/synthetic-root",
+  "started_utc": "2026-10-15T10:18:15.472170+00:00",
+  "elapsed_seconds": 0.341,
+  "timeout_seconds": 60,
+  "exit_code": 0,
+  "log": "nomad_tests_synthetic_root.log"
+}

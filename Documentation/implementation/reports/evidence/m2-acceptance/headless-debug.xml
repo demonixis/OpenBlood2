@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-c++"
+	tests="64"
+	failures="3"
+	disabled="0"
+	skipped="0"
+	hostname="gigabyte-g5"
+	time="43"
+	timestamp="2026-10-18T09:32:19"
+	>
+	<testcase name="objects.builtin_model" classname="objects.builtin_model" time="0.00286134" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS builtin_model
+</system-out>
+	</testcase>
+	<testcase name="objects.original_objects" classname="objects.original_objects" time="0.00253036" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS original_objects
+</system-out>
+	</testcase>
+	<testcase name="objects.nested_creation" classname="objects.nested_creation" time="0.00239998" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS nested_creation
+</system-out>
+	</testcase>
+	<testcase name="objects.reasons_properties" classname="objects.reasons_properties" time="0.00254546" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS reasons_properties
+</system-out>
+	</testcase>
+	<testcase name="objects.scheduling" classname="objects.scheduling" time="0.00238025" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS scheduling
+</system-out>
+	</testcase>
+	<testcase name="objects.deferred_removal" classname="objects.deferred_removal" time="0.00243619" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS deferred_removal
+</system-out>
+	</testcase>
+	<testcase name="objects.aggregate_dispatch" classname="objects.aggregate_dispatch" time="0.00232757" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS aggregate_dispatch
+</system-out>
+	</testcase>
+	<testcase name="objects.handles_selection" classname="objects.handles_selection" time="0.00239229" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS handles_selection
+</system-out>
+	</testcase>
+	<testcase name="objects.links_lists" classname="objects.links_lists" time="0.00257539" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS links_lists
+</system-out>
+	</testcase>
+	<testcase name="objects.messages_strings" classname="objects.messages_strings" time="0.00630394" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS messages_strings
+</system-out>
+	</testcase>
+	<testcase name="objects.message_churn" classname="objects.message_churn" time="1.51262" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS message_churn
+</system-out>
+	</testcase>
+	<testcase name="objects.message_limit" classname="objects.message_limit" time="0.084002" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS message_limit
+</system-out>
+	</testcase>
+	<testcase name="objects.unsupported_teardown" classname="objects.unsupported_teardown" time="0.0134434" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS unsupported_teardown
+</system-out>
+	</testcase>
+	<testcase name="objects.creation_failures" classname="objects.creation_failures" time="0.0063447" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS creation_failures
+</system-out>
+	</testcase>
+	<testcase name="object_snapshots.membership" classname="object_snapshots.membership" time="0.00246403" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="object_snapshots.callbacks" classname="object_snapshots.callbacks" time="0.0024153" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="object_snapshots.churn" classname="object_snapshots.churn" time="0.0341638" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="world.session_start" classname="world.session_start" time="0.107296" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>Startup rejects unknown/failed entries, incomplete accounting, missing music, unavailable services, recursive exits and malformed images; foreign/report and player ownership preserved
+PASS session_start
+</system-out>
+	</testcase>
+	<testcase name="world.level_change" classname="world.level_change" time="0.124494" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>trial1: World texture t.dtx: Missing exact-path resource
+trial2: No single-player GameStartPoint
+trial3: Start point has no supported ground collision
+trial4: World initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+trial5: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+trial6: Destination start trigger requested another level during entry
+broken: DAT v56: invalid/unsupported section offsets near byte 4
+missing: Resource not found: worlds/missing.dat
+Commit 0: 
+Commit 1: 
+Commit 2: 
+PASS level_change
+</system-out>
+	</testcase>
+	<testcase name="world.surface_effects" classname="world.surface_effects" time="0.344488" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS surface_effects
+</system-out>
+	</testcase>
+	<testcase name="world.destination_trials" classname="world.destination_trials" time="0.0384097" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+trial4: loaded=1 entered=1 cleanup=1 failed=1 error=
+trial2: loaded=1 entered=0 cleanup=1 failed=0 error=No single-player GameStartPoint
+trial3: loaded=1 entered=0 cleanup=1 failed=0 error=Start point has no supported ground collision
+broken: loaded=0 entered=0 cleanup=1 failed=0 error=DAT v56: invalid/unsupported section offsets near byte 4
+missing: loaded=0 entered=0 cleanup=1 failed=0 error=Resource not found: worlds/missing.dat
+trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+PASS destination_trials
+</system-out>
+	</testcase>
+	<testcase name="world.destination_messages" classname="world.destination_messages" time="0.00227704" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS destination_messages
+</system-out>
+	</testcase>
+	<testcase name="world.destination_schema" classname="world.destination_schema" time="0.0022799" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS destination_schema
+</system-out>
+	</testcase>
+	<testcase name="world.destination_lifetime" classname="world.destination_lifetime" time="0.0123178" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS destination_lifetime
+</system-out>
+	</testcase>
+	<testcase name="world.sprite_entries" classname="world.sprite_entries" time="0.00676005" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS sprite_entries
+</system-out>
+	</testcase>
+	<testcase name="world.sound_entries" classname="world.sound_entries" time="0.00709568" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS sound_entries
+</system-out>
+	</testcase>
+	<testcase name="world.rez_structure" classname="world.rez_structure" time="0.00187557" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS rez_structure
+</system-out>
+	</testcase>
+	<testcase name="world.rez_rejection" classname="world.rez_rejection" time="0.00196846" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS rez_rejection
+</system-out>
+	</testcase>
+	<testcase name="world.resource_mount" classname="world.resource_mount" time="0.00213765" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS resource_mount
+</system-out>
+	</testcase>
+	<testcase name="world.world_properties" classname="world.world_properties" time="0.00199" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS world_properties
+</system-out>
+	</testcase>
+	<testcase name="world.world_geometry" classname="world.world_geometry" time="0.001956" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS world_geometry
+</system-out>
+	</testcase>
+	<testcase name="world.world_rejection" classname="world.world_rejection" time="0.0112534" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS world_rejection
+</system-out>
+	</testcase>
+	<testcase name="world.mutations" classname="world.mutations" time="0.0488951" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS mutations
+</system-out>
+	</testcase>
+	<testcase name="world.session_lifecycle" classname="world.session_lifecycle" time="0.00353816" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS session_lifecycle
+</system-out>
+	</testcase>
+	<testcase name="world.session_messages" classname="world.session_messages" time="0.00198547" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS session_messages
+</system-out>
+	</testcase>
+	<testcase name="world.original_trigger" classname="world.original_trigger" time="0.00230263" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS original_trigger
+</system-out>
+	</testcase>
+	<testcase name="world.session_start_private" classname="world.session_start_private" time="5.52067" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>01_SubwayA startup: 68 decoded images, 0 original missing-BSP omissions; 60 original updates
+02_CityHub startup: 275 decoded images, 1 original missing-BSP omissions; 60 original updates
+01_SubwayA startup: 68 decoded images, 0 original missing-BSP omissions; 60 original updates
+PASS session_start_private
+</system-out>
+	</testcase>
+	<testcase name="world.level_change_private" classname="world.level_change_private" time="5.67402" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>Malformed destination refusal 0: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 0: 
+SubwayA transfer 0: 
+Malformed destination refusal 1: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 1: 
+SubwayA transfer 1: 
+Malformed destination refusal 2: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 2: 
+SubwayA transfer 2: 
+PASS level_change_private
+</system-out>
+	</testcase>
+	<testcase name="world.destination_trial_private" classname="world.destination_trial_private" time="5.82137" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>Cycle 0 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=490 error=
+Cycle 0 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 0 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=490 error=
+Cycle 1 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 1 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=490 error=
+Cycle 2 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 2 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="world.destination_private" classname="world.destination_private" time="3.03063" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>Cycle 0: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 0: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 1: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 2: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unk...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="world.private" classname="world.private" time="1.18489" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>No-player suspended=0 dims calls=57
+Service ConfigureCharacterBody: 16
+Service CreateAttachment: 10
+Service CreateInterObjectLink: 39
+Service CreateObject: 33
+Service CreateString: 5
+Service FindNamedObjects: 17
+Service FreeString: 2
+Service GetAnimIndex: 2419
+Service GetClass: 44
+Service GetClientUserData: 1
+Service GetContainers: 58
+Service GetGameConVar: 449
+Service GetModelAnimUserDims: 47
+Service GetModelAnimation: 21
+Service GetModelAnimationName: 32
+Service GetModelNodeTransform: 242
+Service GetMovementState: 31
+Service GetNextObject: 227
+Service GetObjectClass: 236
+Service GetObjectDims: 7
+Service GetObjectFlags: 344
+Service GetObjectName: 37
+Service GetObjectPos: 188
+Service GetObjectRotation: 88
+Service GetObjectUserFlags: 61
+Service GetPropBool: 764
+Service GetPropGeneric: 10699
+Service GetPropReal: 764
+Service GetPropString: 72
+Service GetPropVector: 64
+Service GetStringData: 36
+Service GetTime: 74
+Service GetVarValueFloat: 447
+Service GetVarValueString: 2
+Service GetVelocity: 1
+Service HandleToOb...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="services.model_reader" classname="services.model_reader" time="0.00252058" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="services.model_rejection" classname="services.model_rejection" time="0.0658666" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="services.animation_events" classname="services.animation_events" time="0.00250738" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="services.model_callbacks" classname="services.model_callbacks" time="0.00246585" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="services.collision_queries" classname="services.collision_queries" time="0.0019485" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="services.collision_traversal" classname="services.collision_traversal" time="0.0128848" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="services.movement_contacts" classname="services.movement_contacts" time="0.00222167" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="services.placement_queries" classname="services.placement_queries" time="0.00283442" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="services.placement_service" classname="services.placement_service" time="0.0021801" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="services.original_services" classname="services.original_services" time="0.00261593" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="services.private" classname="services.private" time="1.52065" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;services"/>
+		</properties>
+		<system-out>Original start point: -32,192,-3224
+Caleb: 784 vertices, 20 nodes, 86 animations; dispatched commands: 46
+Primary world: 14300 solid triangles, 4095 BVH nodes; probe contact y=170 polygon=2549
+</system-out>
+	</testcase>
+	<testcase name="blood_spurts.formulas" classname="blood_spurts.formulas" time="0.00552614" status="run">
+		<properties>
+			<property name="cmake_labels" value="blood_spurts;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="blood_spurts.impact" classname="blood_spurts.impact" time="0.00589868" status="run">
+		<properties>
+			<property name="cmake_labels" value="blood_spurts;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="blood_spurts.weapon" classname="blood_spurts.weapon" time="0.00515631" status="run">
+		<properties>
+			<property name="cmake_labels" value="blood_spurts;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="blood_spurts.failures" classname="blood_spurts.failures" time="0.0109762" status="run">
+		<properties>
+			<property name="cmake_labels" value="blood_spurts;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="blood_spurts.missing_sound" classname="blood_spurts.missing_sound" time="0.00587623" status="fail">
+		<failure message="Failed"/>
+		<properties>
+			<property name="cmake_labels" value="blood_spurts;headless"/>
+		</properties>
+		<system-out>missing_sound:105: effects.advance(2.101, g.server) &amp;&amp; effects.active.empty()
+</system-out>
+	</testcase>
+	<testcase name="blood_spurts.private" classname="blood_spurts.private" time="1.7743" status="run">
+		<properties>
+			<property name="cmake_labels" value="blood_spurts;headless;private"/>
+		</properties>
+		<system-out>Private cycle 0: original death/limb/fragment callers, peak 8580, emitter impacts 3, splats 4, three real drop textures
+Private cycle 1: original death/limb/fragment callers, peak 8664, emitter impacts 3, splats 4, three real drop textures
+Private cycle 2: original death/limb/fragment callers, peak 8664, emitter impacts 3, splats 4, three real drop textures
+</system-out>
+	</testcase>
+	<testcase name="coverage.catalog" classname="coverage.catalog" time="0.584244" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out>Catalog: 171 interface services / 174 trace boundaries
+</system-out>
+	</testcase>
+	<testcase name="coverage.observations" classname="coverage.observations" time="0.00328836" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;services"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="coverage.private" classname="coverage.private" time="11.4912" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;services"/>
+		</properties>
+		<system-out>SubwayA-entry	AddObjectToList	ServerDE	Implemented (bounded)	0
+SubwayA-entry	AddSkyObject	ServerDE	Implemented (bounded)	0
+SubwayA-entry	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+SubwayA-entry	AlignRotation	ServerDE	Implemented (bounded)	0
+SubwayA-entry	BreakInterObjectLink	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CastRay	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CastWorldRay	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CompareStringsUpper	ServerDE	Implemented (bounded)	1
+SubwayA-entry	ConfigureCharacterBody	ServerDE	Implemented (bounded)	17
+SubwayA-entry	ConfigureModelBody	ServerDE	Implemented (bounded)	0
+SubwayA-entry	ConfigureWorldBody	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CopyString	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CreateAttachment	ServerDE	Implemented (bounded)	0
+SubwayA-entry	CreateInterObjectLink	ServerDE	Implemented (bounded)	24
+SubwayA-entry	CreateObject	ServerDE	Implemented (bounded)	26
+SubwayA-entry	CreateObjectList	ServerDE	Implemented (bounded)	0
+...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="train_session.audit" classname="train_session.audit" time="0.00245972" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;train_session"/>
+		</properties>
+		<system-out>144: error.empty() | Missing or oversized sound resource
+149: check(s.explosion_sprites) &amp;&amp; check(s.sparks) &amp;&amp; check(s.blood_spurts) &amp;&amp; check(s.blood_splats) &amp;&amp; check(s.weapon_sprites) &amp;&amp; check(s.explosion_models) &amp;&amp; check(s.laser_beams) &amp;&amp; check(s.object_particles) &amp;&amp; check(s.polygrids) &amp;&amp; check(s.particle_streams) &amp;&amp; check(s.explosion_lights) &amp;&amp; check(s.explosion_rings) &amp;&amp; check(s.explosion_flames) &amp;&amp; check(s.flesh_gibs) &amp;&amp; check(s.explosion_fragments) | Missing or oversized sound resource
+144: error.empty() | Audio decode failed
+149: check(s.explosion_sprites) &amp;&amp; check(s.sparks) &amp;&amp; check(s.blood_spurts) &amp;&amp; check(s.blood_splats) &amp;&amp; check(s.weapon_sprites) &amp;&amp; check(s.explosion_models) &amp;&amp; check(s.laser_beams) &amp;&amp; check(s.object_particles) &amp;&amp; check(s.polygrids) &amp;&amp; check(s.particle_streams) &amp;&amp; check(s.explosion_lights) &amp;&amp; check(s.explosion_rings) &amp;&amp; check(s.explosion_flames) &amp;&amp; check(s.flesh_gibs) &amp;&amp; check(s.explosion_fragments) | Audio decode failed
+115: effects.failed == 0 | 
+149: check(s.explosion_sprites) &amp;&amp;...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="train_session.private_30" classname="train_session.private_30" time="2.16935" status="fail">
+		<failure message="Failed"/>
+		<properties>
+			<property name="cmake_labels" value="headless;private;train_session"/>
+		</properties>
+		<system-out>Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walk t=0 pos=-32,170.001,-3224 HP=100 ammo=50 target=none
+168: error.empty() &amp;&amp; !client.voice_manager.failures &amp;&amp; !client.communication.sound_failures &amp;&amp; !client.music.failures | M2 acceptance remains open: see Services for bounded implementation/trace coverage. Whole-world saves and unexercised gameplay paths are not validated.
+416: check_effects(g, audit, nullptr, error) | M2 acceptance remains open: see Services for bounded implementation/trace coverage. Whole-world saves and unexercised gameplay paths are not validated.
+</system-out>
+	</testcase>
+	<testcase name="train_session.private_60" classname="train_session.private_60" time="2.19585" status="fail">
+		<failure message="Failed"/>
+		<properties>
+			<property name="cmake_labels" value="headless;private;train_session"/>
+		</properties>
+		<system-out>Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walk t=0 pos=-32,170.001,-3224 HP=100 ammo=50 target=none
+168: error.empty() &amp;&amp; !client.voice_manager.failures &amp;&amp; !client.communication.sound_failures &amp;&amp; !client.music.failures | M2 acceptance remains open: see Services for bounded implementation/trace coverage. Whole-world saves and unexercised gameplay paths are not validated.
+416: check_effects(g, audit, nullptr, error) | M2 acceptance remains open: see Services for bounded implementation/trace coverage. Whole-world saves and unexercised gameplay paths are not validated.
+</system-out>
+	</testcase>
+</testsuite>

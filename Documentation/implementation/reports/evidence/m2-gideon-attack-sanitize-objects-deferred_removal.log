@@ -1,0 +1,15 @@
+5/634 Testing: objects.deferred_removal
+5/634 Test: objects.deferred_removal
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "deferred_removal"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.deferred_removal" start time: Oct 17 03:03 CEST
+Output:
+----------------------------------------------------------
+PASS deferred_removal
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.deferred_removal" end time: Oct 17 03:03 CEST
+"objects.deferred_removal" time elapsed: 00:00:00
+----------------------------------------------------------

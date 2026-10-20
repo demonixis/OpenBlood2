@@ -1,0 +1,2388 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 2e50ae3..8d575b8 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -87,3 +87,11 @@ centers, one player integration, original DONTFOLLOWSTANDING, atomic rider/pushe
+ commit and deferred callbacks. BoxPhysics is required; polygon dynamics, stacks,
+ SpawnObject, player impulses and complete gameplay remain pending. Earlier blanket
+ pushable/gravity omissions are superseded for this bounded subset; M2 stays open.
++
++The latest [pickup evidence](../Documentation/Implementation/M2_PICKUPS.md) connects
++eight original ammo pickups, four health/armor pickups and destruction SpawnObject.
++Read [pickup contracts](docs/PICKUP_CONTRACTS.md). Preserve checked typed acknowledgements,
++normal/bonus caps, dead-player guards, independent child lifetime, death-trigger
++ordering and deferred removal. Earlier blanket SpawnObject/pickup omissions are
++superseded for this subset. Remaining inventory items, timed bonuses, old TypeAction
++schemas, audio/FX and full M2 gameplay remain pending.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1c02171..18c4d08 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -33,6 +33,8 @@ add_library(blood2_game STATIC
+     src/game/registration.cpp
+     src/game/server_adapter.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
++target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
++    src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+@@ -43,13 +45,13 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp)
++add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+ target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+ if(BLOOD2_INSPECTOR)
+-    target_sources(blood2_app PRIVATE src/app/inspector.cpp)
++    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_pickups.cpp)
+     target_link_libraries(blood2_app PRIVATE imgui)
+ endif()
+ 
+diff --git a/README.md b/README.md
+index dc65e02..b8780ed 100644
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,6 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
+-A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory, KeyPickup, original player USE, RotatingDoor, RotatingBrush, selected CDestructableBrush damage/removal and original CDebris explosive area damage and BoxPhysics pushable/gravity brushes with original damage impulses are connected; complete player gameplay remains missing. This is not a playable game.
++A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory, KeyPickup, original player USE, RotatingDoor, RotatingBrush, selected CDestructableBrush damage/removal and original CDebris explosive area damage and BoxPhysics pushable/gravity brushes with original damage impulses are connected. Original ammo/health/armor pickups and destruction spawns extend this subset; complete player gameplay remains missing. This is not a playable game.
+ 
+ The three runtime targets remain small: `engine` (resources, world/object runtime, configuration, SDL_GPU), `blood2_game` (original code and typed services) and `blood2_app` (`blood2`, optional Dear ImGui). No previous prototype is a build dependency, and no EnTT/ECS was introduced.
+ 
+@@ -47,6 +47,7 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
+ | `--inspect-player` | Headless original shell/player entry inspection, with explicit gameplay blockers |
+ | `--player-smoke` | GPU Session panel, hidden player updates, unload/re-entry checks |
+ | `--weapons-smoke` | GPU Beretta/knife firing while hidden, unload/re-entry; capture at frame 181 |
++| `--pickups-smoke` | GPU original ammo collection while hidden, Ward inspection and reload |
+ | `--brushes-smoke` | GPU original brush ON/OFF, hidden rider transport, explosive chain and dynamic box gravity/impulse, inspection and reload |
+ | `--interaction-smoke` | GPU SDL E press-edge USE, missing-key denial/unlock, synthetic rotating hinge, hidden motion and reload |
+ | `--triggers-smoke` | GPU missing-key denial, real key pickup, hidden unlock/door movement, resize and reload |
+@@ -93,7 +94,7 @@ On Windows use an MSVC Developer PowerShell and the same CMake/Ninja commands, t
+ 
+ Read [world/session contracts](docs/WORLD_CONTRACTS.md), [object contracts](docs/OBJECT_CONTRACTS.md), [provenance](docs/PROVENANCE.md) and [M2 results](../Documentation/Implementation/M2.md). The [roadmap's M2 gate](../Documentation/Roadmap/03_MILESTONES.md#m2--connect-world-session-and-gameplay-services) remains open: complete player/gameplay callbacks, required world classes, broader mover/physics behavior and remaining original services must still be connected. See the [service continuation](../Documentation/Implementation/M2_SERVICES.md) for the new tested subset. M3 has not started.
+ 
+-The [pushable continuation](../Documentation/Implementation/M2_PUSHABLES.md) is the latest evidence; read [PUSHABLE_CONTRACTS.md](docs/PUSHABLE_CONTRACTS.md) before extending body physics, pushing or impulses. The [explosion continuation](../Documentation/Implementation/M2_EXPLOSIONS.md) records the preceding stage; read [EXPLOSION_CONTRACTS.md](docs/EXPLOSION_CONTRACTS.md) before extending debris, area damage or chain reactions. Its effects are inspection requests; client FX/audio remain pending. The [brush continuation](../Documentation/Implementation/M2_BRUSHES.md) records the preceding stage; read [BRUSH_CONTRACTS.md](docs/BRUSH_CONTRACTS.md) before extending rotators, brush damage or debris. The [USE/rotation continuation](../Documentation/Implementation/M2_INTERACTION.md) records the preceding stage; read [INTERACTION_CONTRACTS.md](docs/INTERACTION_CONTRACTS.md) before extending USE, rotating collision or player door pushes. The [trigger/key continuation](../Documentation/Implementation/M2_TRIGGERS.md) records the preceding stage; read [TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending activation, keys or SelfTrigger ownership. The [door continuation](../Documentation/Implementation/M2_DOORS.md) records the previous stage; read [DOOR_CONTRACTS.md](docs/DOOR_CONTRACTS.md) before extending world-model motion or door commands. The [specialized volume continuation](../Documentation/Implementation/M2_SPECIALIZED_VOLUMES.md) records the preceding stage (Conveyor, Damage, FreeFall and level-entry damage protection). Read [SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md) before extending these branches. The [container continuation](../Documentation/Implementation/M2_CONTAINERS.md) records the preceding stage. Read [CONTAINER_CONTRACTS.md](docs/CONTAINER_CONTRACTS.md) for original VolumeBrush/MoveMgr/air rules, static shell queries and pending effects. The [locomotion continuation](../Documentation/Implementation/M2_LOCOMOTION.md) records the prior stage. Read [LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for source clip fallbacks, atomic resize and the replacement stair solver. Read [MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) for the original MoveMgr subset, shared body, timing and grounding adaptations, and the subsequent translating platform extension. The [weapon continuation](../Documentation/Implementation/M2_WEAPONS.md) retains the earlier weapon evidence. Read [WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) for ownership, original behavior and deliberate limits. Read [PLAYER_CONTRACTS.md](docs/PLAYER_CONTRACTS.md) before extending the source subsets, typed client messages or player lifetime. Entry inspection succeeds; `--start-game` still fails with missing gameplay services.
++The [pickup continuation](../Documentation/Implementation/M2_PICKUPS.md) is the latest evidence; read [PICKUP_CONTRACTS.md](docs/PICKUP_CONTRACTS.md) before extending collection or destruction spawns. The [pushable continuation](../Documentation/Implementation/M2_PUSHABLES.md) records the preceding stage; read [PUSHABLE_CONTRACTS.md](docs/PUSHABLE_CONTRACTS.md) before extending body physics, pushing or impulses. The [explosion continuation](../Documentation/Implementation/M2_EXPLOSIONS.md) records the preceding stage; read [EXPLOSION_CONTRACTS.md](docs/EXPLOSION_CONTRACTS.md) before extending debris, area damage or chain reactions. Its effects are inspection requests; client FX/audio remain pending. The [brush continuation](../Documentation/Implementation/M2_BRUSHES.md) records the preceding stage; read [BRUSH_CONTRACTS.md](docs/BRUSH_CONTRACTS.md) before extending rotators, brush damage or debris. The [USE/rotation continuation](../Documentation/Implementation/M2_INTERACTION.md) records the preceding stage; read [INTERACTION_CONTRACTS.md](docs/INTERACTION_CONTRACTS.md) before extending USE, rotating collision or player door pushes. The [trigger/key continuation](../Documentation/Implementation/M2_TRIGGERS.md) records the preceding stage; read [TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending activation, keys or SelfTrigger ownership. The [door continuation](../Documentation/Implementation/M2_DOORS.md) records the previous stage; read [DOOR_CONTRACTS.md](docs/DOOR_CONTRACTS.md) before extending world-model motion or door commands. The [specialized volume continuation](../Documentation/Implementation/M2_SPECIALIZED_VOLUMES.md) records the preceding stage (Conveyor, Damage, FreeFall and level-entry damage protection). Read [SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md) before extending these branches. The [container continuation](../Documentation/Implementation/M2_CONTAINERS.md) records the preceding stage. Read [CONTAINER_CONTRACTS.md](docs/CONTAINER_CONTRACTS.md) for original VolumeBrush/MoveMgr/air rules, static shell queries and pending effects. The [locomotion continuation](../Documentation/Implementation/M2_LOCOMOTION.md) records the prior stage. Read [LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for source clip fallbacks, atomic resize and the replacement stair solver. Read [MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) for the original MoveMgr subset, shared body, timing and grounding adaptations, and the subsequent translating platform extension. The [weapon continuation](../Documentation/Implementation/M2_WEAPONS.md) retains the earlier weapon evidence. Read [WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) for ownership, original behavior and deliberate limits. Read [PLAYER_CONTRACTS.md](docs/PLAYER_CONTRACTS.md) before extending the source subsets, typed client messages or player lifetime. Entry inspection succeeds; `--start-game` still fails with missing gameplay services.
+ 
+ ## Source conventions
+ 
+@@ -102,3 +103,5 @@ names are preserved. Follow [.clang-format](.clang-format) and
+ [.editorconfig](.editorconfig). The current formatting was applied and checked
+ with clang-format 23.1.3 (a development tool, not a runtime dependency). Commit
+ each completed implementation run with its tests and English documentation.
++
++The Pickups tab inspects all supported ammo/health/armor objects, including hidden/inactive or missing-resource entries, player pools/caps and the latest 32 pickup/spawn reports. Audio and pickup FX remain requests/metadata, not playback.
+diff --git a/docs/BRUSH_CONTRACTS.md b/docs/BRUSH_CONTRACTS.md
+index e76ba2e..2f066b8 100644
+--- a/docs/BRUSH_CONTRACTS.md
++++ b/docs/BRUSH_CONTRACTS.md
+@@ -1,5 +1,8 @@
+ # Rotating and destructible world-model brushes
+ 
++> Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
++> pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
++
+ > Extended by [PUSHABLE_CONTRACTS.md](PUSHABLE_CONTRACTS.md): selected Pushable/Gravity brushes and
+ > brush damage impulses now work with bounded box physics. Omissions and counts
+ > below describe the earlier stage; polygon dynamics and full M2 remain open.
+diff --git a/docs/EXPLOSION_CONTRACTS.md b/docs/EXPLOSION_CONTRACTS.md
+index 0fcad71..f842390 100644
+--- a/docs/EXPLOSION_CONTRACTS.md
++++ b/docs/EXPLOSION_CONTRACTS.md
+@@ -1,5 +1,8 @@
+ # Original brush explosions and debris requests
+ 
++> Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
++> pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
++
+ > Extended by [PUSHABLE_CONTRACTS.md](PUSHABLE_CONTRACTS.md): selected Pushable/Gravity brushes and
+ > brush damage impulses now work with bounded box physics. Omissions and counts
+ > below describe the earlier stage; polygon dynamics and full M2 remain open.
+diff --git a/docs/M2_PICKUP_SOURCES.json b/docs/M2_PICKUP_SOURCES.json
+new file mode 100644
+index 0000000..24b4acd
+--- /dev/null
++++ b/docs/M2_PICKUP_SOURCES.json
+@@ -0,0 +1,251 @@
++{
++  "date": "2026-10-15",
++  "status": "M2 incomplete; twelve original SP pickups and selected destruction SpawnObject",
++  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "imports": [
++    {
++      "source": "sources/blood2/ObjectDLL/PickupObject.cpp",
++      "target": "src/game/original/PickupObject.cpp",
++      "source_line_ranges": [
++        [
++          30,
++          72
++        ],
++        [
++          115,
++          218
++        ],
++        [
++          231,
++          388
++        ],
++        [
++          469,
++          503
++        ],
++        [
++          536,
++          557
++        ]
++      ],
++      "selection": "Selected single-player precreate/initial update, resource naming, flags/dimensions, world ground placement, non-bouncing SpawnItem and successful collection. Typed ack requires the current live player toucher and equal payload; named trigger precedes deferred removal so checked sender stays live. FX, localized strings, multiplayer/respawn and bouncing omitted; missing models disable touch/gravity with diagnostics.",
++      "source_sha256": "25e0388f983ec0c9e01b6deb8432f411271159a224d582e12300c10863b979da",
++      "target_sha256": "38dc81b817b00e8e254ec16840f4109e8cb0fd799373b4e48f2a84a4adc54509"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PickupObject.h",
++      "target": "src/game/original/PickupObject.h",
++      "source_line_ranges": [
++        [
++          20,
++          111
++        ]
++      ],
++      "selection": "Selected base ancestry and state, adapted to owned strings, fixed-width typed kind/type/amount and inspectable counters. Original-global class preserved; no replica of legacy packet memory layout.",
++      "source_sha256": "0fe5cf15943ebd87f0e367a5dee181721b5db29d6c7eee1f9874f46549dcb056",
++      "target_sha256": "98bd30fed6fd84eacc3db3dcf4b033ce478decb37716f55e71d463307cb7ef25"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/AmmoPickups.cpp",
++      "target": "src/game/original/AmmoPickups.cpp",
++      "source_line_ranges": [
++        [
++          27,
++          259
++        ]
++      ],
++      "selection": "Active original ammo classes, constructor amounts/resources and static list registration. Shared selected ObjectTouch implementation is in PickupObject.cpp, dispatched by typed Ammo kind. Commented ManaAmmoPU remains unregistered; multiplayer scaling/respawn omitted.",
++      "source_sha256": "3ea2f1ba0b90298563b5a97c451e4e1d60e0b10fdd666320944edb23afa50696",
++      "target_sha256": "b1e1d7b6a3e235d828abe3566c28d5e95dddeac347a5c7a0030b533003cd9c30"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/AmmoPickups.h",
++      "target": "src/game/original/AmmoPickups.h",
++      "source_line_ranges": [
++        [
++          16,
++          117
++        ]
++      ],
++      "selection": "Selected constructors/list ownership and eight active concrete classes; destructor unlink retained in AmmoPickups.cpp.",
++      "source_sha256": "c34daeb1228cad71438218097c36706c91529daed487bf2629a4253df8bd41d6",
++      "target_sha256": "a8fbde0e4cbb9c7a13ec561fc042decd4fb2fc621813036ec5b9038015dcafec"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PowerupPickups.cpp",
++      "target": "src/game/original/PowerupPickups.cpp",
++      "source_line_ranges": [
++        [
++          26,
++          47
++        ],
++        [
++          63,
++          120
++        ],
++        [
++          131,
++          143
++        ],
++        [
++          158,
++          237
++        ]
++      ],
++      "selection": "PowerupPickup/HealthBase/ArmorBase ancestry and four concrete SP health/armor constructors. Shared ObjectTouch selected in PickupObject.cpp; timed bonuses and multiplayer branches excluded.",
++      "source_sha256": "0e0d2190ea3785e7287309c0ccfe109c688a9c14b9b12779c4c5c50642f0d80c",
++      "target_sha256": "5c01bdc161bb07a25879e1a0fab557201297801298ff7d451c33df6de292cd07"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PowerupPickups.h",
++      "target": "src/game/original/PowerupPickups.h",
++      "source_line_ranges": [
++        [
++          18,
++          80
++        ]
++      ],
++      "selection": "Selected ancestry, PowerupPickup rotate request and concrete health/armor declarations; rotation is inspectable metadata/user bit 4, not rendered FX; no timed bonuses.",
++      "source_sha256": "868eeafc937d421bae5a210729d996e28fa4f95e32d2afa9ed5391b5d5364cff",
++      "target_sha256": "d6f1039219fb314f3b84183b8ab7f3083f3e3f622baad30ecc2ead204be23a7e"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "target": "src/game/original/PlayerContainers.cpp",
++      "source_line_ranges": [
++        [
++          3670,
++          3693
++        ],
++        [
++          3737,
++          3738
++        ],
++        [
++          4305,
++          4331
++        ]
++      ],
++      "selection": "Selected ammo and four powerup message branches, dead-player gate and successful MID_PICKEDUP. Extra aggregate-dead guard closes the pre-update death window. Owned typed replies use actual player sender.",
++      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "target_sha256": "1bbc80d5a2f818a30f6542305d65b6daf80720772045546dc41703a632d3e780"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
++      "target": "src/game/original/Destructable.cpp",
++      "source_line_ranges": [
++        [
++          279,
++          282
++        ],
++        [
++          936,
++          958
++        ],
++        [
++          987,
++          1048
++        ],
++        [
++          1078,
++          1112
++        ]
++      ],
++      "selection": "Spawn property/velocity read, death-trigger before spawn, Heal/MegaHeal/AddWard/AddNecroWard caps. Spawn cancellation for pending source and finite inputs are explicit adaptations. Slow-death multiplayer and unused death-hit-point metadata remain omitted.",
++      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
++      "target_sha256": "9f8ce27453c4cc1eedebde03e40a6167af4e3494afc048572e3456bb5ec14819"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Destructable.h",
++      "target": "src/game/original/Destructable.h",
++      "source_line_ranges": [
++        [
++          33,
++          34
++        ]
++      ],
++      "selection": "Source SpawnObject string and SpawnObjectVel vector properties; owned current fields replace HSTRING storage. Registration already carried these properties.",
++      "source_sha256": "00e289d9cca1594035c8f20d0d45a076009c765e2767ce545f22f16d33bfea45",
++      "target_sha256": "0676e43f82fedf5537bd8026172fd698255dba0128271fbf2875253a4dbd05bb"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Spawner.cpp",
++      "target": "src/game/original/spawn_object.cpp",
++      "source_line_ranges": [
++        [
++          274,
++          310
++        ]
++      ],
++      "selection": "Only the global class-plus-properties helper: inherit transform, CreateObjectProps, velocity after initial update. Non-mutating bounded split and supported-class preflight replace strtok. Checked failure removes child. General Spawner class is not imported.",
++      "source_sha256": "648cbcc568316ae9a99817afba1a9dd89fd15838ab61a377dc6e1d53881e77cb",
++      "target_sha256": "9ee4d44d02b7cf52ab8a6a5d91ef78e68d443fe5931b04f757325c214797c71c"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "target": "src/game/original/PlayerContainers.cpp",
++      "source_line_ranges": [
++        [
++          2402,
++          2415
++        ]
++      ],
++      "selection": "Successful pickup acknowledgement selection; moved to actual CPlayerObj to avoid invalid aggregate-to-BaseClass cast. Source default-respawn -1 is represented by the selected typed single-player acknowledgement.",
++      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "target_sha256": "1bbc80d5a2f818a30f6542305d65b6daf80720772045546dc41703a632d3e780"
++    },
++    {
++      "source": "sources/blood2/Shared/SharedDefs.h",
++      "target": "src/game/original/AmmoPickups.cpp",
++      "source_line_ranges": [
++        [
++          280,
++          293
++        ],
++        [
++          318,
++          327
++        ]
++      ],
++      "selection": "Original numeric ammo types and pickup amounts, not new balance values.",
++      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "target_sha256": "b1e1d7b6a3e235d828abe3566c28d5e95dddeac347a5c7a0030b533003cd9c30"
++    },
++    {
++      "source": "sources/blood2/Shared/ClientRes.h",
++      "target": "src/game/original/PowerupPickups.cpp",
++      "source_line_ranges": [
++        [
++          151,
++          154
++        ]
++      ],
++      "selection": "Original numeric health/armor resource IDs retained for inspection, with original English fallback names; resource localization is not implemented.",
++      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
++      "target_sha256": "5c01bdc161bb07a25879e1a0fab557201297801298ff7d451c33df6de292cd07"
++    },
++    {
++      "source": "sources/blood2/Shared/ClientRes.h",
++      "target": "src/game/original/AmmoPickups.cpp",
++      "source_line_ranges": [
++        [
++          159,
++          166
++        ]
++      ],
++      "selection": "Original numeric ammo resource IDs retained; display strings are fallback metadata.",
++      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
++      "target_sha256": "b1e1d7b6a3e235d828abe3566c28d5e95dddeac347a5c7a0030b533003cd9c30"
++    }
++  ],
++  "adaptations": [
++    "Typed owned local request/ack payload with current-toucher and player checks; source message IDs retained, no old packet ABI",
++    "SP only: no multiplayer multipliers/respawn, custom override, rotating/bouncing FX or general inventory/timed bonuses",
++    "Finite typed amounts, explicit missing resource diagnostics, bounded latest-32 reports and deferred destruction/list cleanup",
++    "Pickup trigger before removal to preserve checked sender lifetime, matching earlier KeyPickup adaptation",
++    "Non-mutating spawn split, twelve-leaf allowlist and typed property preflight; cancel if death trigger removes source",
++    "CreateObjectProps preserves supplied transform/name absent explicit overrides; post-initialization velocity failure rolls back child",
++    "Engine collisions/ground placement reuse current bounded replacement physics; no retail equivalence claim",
++    "KeyPickup stays on its earlier selected path; other ammo-consuming weapons, FX/audio and full M2 remain pending"
++  ]
++}
+diff --git a/docs/OBJECT_CONTRACTS.md b/docs/OBJECT_CONTRACTS.md
+index fde7708..3b60640 100644
+--- a/docs/OBJECT_CONTRACTS.md
++++ b/docs/OBJECT_CONTRACTS.md
+@@ -68,3 +68,11 @@ requires a loaded collision index and retains explicit unsupported cases. ABC
+ loading occurs between precreate and initial update; missing models remain
+ explicit diagnostics on inspection instances. Model/touch callbacks use the
+ existing deferred lifecycle and original BaseClass/aggregate chain.
++
++## String creation transform precedence
++
++`parse_properties` validates the existing bounded property grammar without creating
++an object. `create_props` preserves the supplied position/rotation and nonempty name
++unless the string explicitly overrides them (only for schema-declared properties).
++This is needed by the original SpawnObject helper; see [pickup contracts](PICKUP_CONTRACTS.md).
++Unknown/duplicate properties still reject; world-file creation defaults are unchanged.
+diff --git a/docs/PICKUP_CONTRACTS.md b/docs/PICKUP_CONTRACTS.md
+new file mode 100644
+index 0000000..0a2a730
+--- /dev/null
++++ b/docs/PICKUP_CONTRACTS.md
+@@ -0,0 +1,111 @@
++# Original pickups and destruction spawns
++
++This is a single-player subset of M2, not complete inventory or gameplay.
++[Source selections](M2_PICKUP_SOURCES.json) record the original functions and
++adaptations. [Implementation evidence](../../Documentation/Implementation/M2_PICKUPS.md)
++records actual content coverage and verification. The preceding
++[pushable contracts](PUSHABLE_CONTRACTS.md) still govern brush physics.
++
++## Supported original rules
++
++PickupObject derives from B2BaseClass. AmmoPickup retains its intrusive static
++list and the eight active original ammo classes. PowerupPickup, HealthBase and
++ArmorBase preserve the ancestry of the four selected health/armor classes.
++Abstract/base pickups cannot create a usable object without a concrete model.
++KeyPickup keeps its earlier, separate selected implementation.
++
++| Class | Type | Amount | Model basename | Resource ID |
++| --- | ---: | ---: | --- | ---: |
++| BulletAmmoPU | ammo 1 | 100 | BulletAmmo_pu | 317 |
++| ShellAmmoPU | ammo 2 | 20 | ShellAmmo_pu | 318 |
++| BMGAmmoPU | ammo 3 | 20 | BMGAmmo_pu | 319 |
++| FlareAmmoPU | ammo 4 | 20 | FlareAmmo_pu | 320 |
++| DieBugDieAmmoPU | ammo 5 | 20 | DieBugDieAmmo_pu | 321 |
++| HowitzerAmmoPU | ammo 6 | 5 | HowitzerAmmo_pu | 322 |
++| FuelAmmoPU | ammo 7 | 10 | FuelAmmo_pu | 323 |
++| BatteryAmmoPU | ammo 8 | 40 | BatteryAmmo_pu | 324 |
++| HealthPU | powerup 1 | 25 | Health_pu | 309 |
++| MegaHealthPU | powerup 2 | 100 | MegaHealth_pu | 310 |
++| WardPU | powerup 3 | 25 | Ward_pu | 311 |
++| NecroWardPU | powerup 4 | 100 | NecroWard_pu | 312 |
++
++Original constructors supply model/skin basenames and sound names. The current
++ABC animation supplies dimensions, with X at least 10 and Z at least X.
++World-file creation calls MoveObjectToGround; string creation follows the
++non-bouncing SpawnItem path and keeps its requested position. Visible, touch,
++gravity, no-shadow, saveable and night-goggle-glow metadata follow source rules.
++PowerupPickup also retains its constructor rotation request and bit 4. These
++flags do not implement saves or visual effects. Missing ABCs remain
++inspectable with touch/gravity disabled and an explicit diagnostic.
++
++Touches send MID_ADDAMMO (1009) or MID_ADDPOWERUP (3504). The source accepts
++contacts from any object; only the connected CPlayerObj branch changes player
++stats. Alive players accept ammo below their attribute-derived cap, truncating
++partial pickups to that cap. Health/MegaHealth and Ward/NecroWard use their
++separate original normal/bonus caps. A full reserve keeps the pickup available;
++zero amounts retain the source acceptance behavior when below the cap. Dead
++players cannot collect or revive themselves through this path.
++
++## Typed messages and lifetime
++
++PickupMessage owns kind, numeric type and amount. The adapter validates routing,
++matching message ID, live sender, type range and finite amount in [0, 1000000].
++It rejects mixed byte/damage/key/pickup payloads, multiple writes and stale or
++non-borrowed reads. Transport is local and typed, not the original packet ABI.
++The source MID_PICKEDUP (1005) float -1 means default respawn; this selected
++single-player path represents it with a matching typed acknowledgement.
++Multiplayer respawn and custom respawn overrides are not implemented.
++
++The player acknowledges only successful additions, using its actual BaseClass
++sender rather than casting the inventory aggregate to BaseClass. A pickup accepts
++that acknowledgement only during its own outstanding touch, from that live
++player, for exactly its current kind/type/amount. It marks itself consumed before
++callbacks, disables visible/touch flags, records the sound request, sends its
++named pickup trigger and requests deferred removal. As with KeyPickup, trigger
++sending moves before RemoveObject so the checked sender remains live. Reentrant
++contacts cannot consume the same object twice. Ammo list links are removed only
++at destruction; unload clears them and all typed message/string allocations.
++No callback reclaims its current object immediately.
++
++## SpawnObject
++
++The original CDestructable aggregate owns SpawnObject and SpawnObjectVel.
++First death sends DeathTrigger, then creates the object, then sends DamageTrigger;
++brush debris/removal occurs in the subsequent scheduled update. Preserve this
++order and the existing recursive-damage guard. If DeathTrigger removes the
++source, the adaptation cancels its spawn and records why.
++
++The selected global helper from Spawner.cpp splits class name from properties
++without mutating the authored string. Only the twelve supported leaves above
++are admitted; the Spawner class and arbitrary object spawning are not imported.
++The request is bounded to 100 bytes and validated against the existing typed
++property grammar before brush creation. Unknown classes/properties, repeated
++properties and malformed strings reject creation. Spawn velocity must fit the
++engine's finite vector bounds (absolute components at most 10000000).
++
++String creation receives the parent's current position/rotation. Explicit Pos
++or Rotation properties may override them; missing string properties no longer
++replace them with default zero/identity values. Velocity is applied after
++INITIALUPDATE, matching the helper. Failed velocity assignment removes the new
++object. A spawned pickup has an independent lifetime, surviving parent removal
++and being reclaimed on world unload. It is not a SelfTrigger-style owned child.
++Resource failure is reported separately from successful object allocation.
++
++## Inspection and limits
++
++The Pickups tab lists live, hidden, inactive and pending objects, type/amount,
++resource ID/fallback name, model/skin, position, velocity, dimensions, trigger,
++attempts and diagnostics. It also shows player pools/caps and the latest 32
++consumption and destruction-spawn records. Reports own strings and retain only
++checked child handle tokens. Unload clears them. The inspector does not execute
++game rules; the GPU smoke collects ammo with inspection hidden and also runs
++without Dear ImGui.
++
++This increment does not implement weapon pickups, timed bonuses, inventory items,
++multiplayer scaling/respawn, bouncing/rotating pickup FX, localized HUD strings,
++audio, AI pickup seeking, save/restore or a full original session. It does not
++make ammo-consuming weapons beyond the current Beretta/knife subset available.
++ManaAmmoPU is commented out in the source; RocketAmmoPU is not guessed as an alias.
++Legacy TypeAction schemas, missing/ambiguous world models and polygon dynamics
++remain explicit failures. Rendering, retail-executable comparisons, additional
++platforms and XR validation remain pending. M2's exit gate is unchanged.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index c978c59..52778cf 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -299,3 +299,15 @@ conservative rider/pushing limits. Later LithTech motion is an architectural
+ reference only. The preceding pushable/impulse omissions are superseded for this
+ bounded brush subset; dynamic polygon bodies, player impulses, SpawnObject,
+ WorldModelDebris and the full M2 gate remain open.
++
++## M2 pickup and destruction-spawn continuation
++
++[Source selections](M2_PICKUP_SOURCES.json) record selected PickupObject, AmmoPickup,
++PowerupPickup and concrete constructors, player message branches, CDestructable
++stat/HandleDestruction rules and the global Spawner.cpp helper. The general Spawner
++class is not imported. [Contracts](PICKUP_CONTRACTS.md) explain typed in-process
++messages, bounded non-mutating parsing, checked acknowledgement and removal,
++resource failure behavior and the intentionally omitted multiplayer/FX branches.
++Earlier ledgers remain historical; their blanket SpawnObject/general-pickup
++omissions are superseded only for the twelve supported leaf classes. No prototype
++dependency, reference modification or commercial asset was introduced.
+diff --git a/docs/PUSHABLE_CONTRACTS.md b/docs/PUSHABLE_CONTRACTS.md
+index 491d087..5dc79af 100644
+--- a/docs/PUSHABLE_CONTRACTS.md
++++ b/docs/PUSHABLE_CONTRACTS.md
+@@ -1,5 +1,8 @@
+ # Original pushable brushes and bounded box physics
+ 
++> Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
++> pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
++
+ This extends [brush](BRUSH_CONTRACTS.md), [explosion](EXPLOSION_CONTRACTS.md)
+ and [movement](MOVEMENT_CONTRACTS.md) contracts. M2 remains incomplete. Read the
+ [source ledger](M2_PUSHABLE_SOURCES.json) and
+diff --git a/docs/TRIGGER_CONTRACTS.md b/docs/TRIGGER_CONTRACTS.md
+index c80275e..4fa94c3 100644
+--- a/docs/TRIGGER_CONTRACTS.md
++++ b/docs/TRIGGER_CONTRACTS.md
+@@ -1,5 +1,8 @@
+ # Original triggers, door SelfTrigger and keys
+ 
++> Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
++> pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
++
+ > Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
+ > are connected with bounded atomic collision. Earlier omissions below describe
+ > their previous increments; the full M2 gate remains open.
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index ea08671..d1b8459 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -1,5 +1,8 @@
+ # Original Inventory and Vector Weapon Boundary
+ 
++> Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
++> pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
++
+ > Extended by [BRUSH_CONTRACTS.md](BRUSH_CONTRACTS.md): RotatingBrush and
+ > selected destructible brushes are connected. Earlier omissions/counts below
+ > describe their previous increments; the full M2 gate remains open.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index aafded4..73751c5 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -498,6 +498,12 @@ namespace OpenBlood2
+                     draw_triggers(game, selection);
+                     ImGui::EndTabItem();
+                 }
++                if (ImGui::BeginTabItem("Pickups", nullptr, select_pickups ? ImGuiTabItemFlags_SetSelected : 0))
++                {
++                    select_pickups = false;
++                    draw_pickups(game, selection);
++                    ImGui::EndTabItem();
++                }
+                 if (ImGui::BeginTabItem("Brushes", nullptr, select_brushes ? ImGuiTabItemFlags_SetSelected : 0))
+                 {
+                     select_brushes = false;
+@@ -1894,7 +1900,7 @@ namespace OpenBlood2
+             ImGui::TextUnformatted("No live brush selected.");
+         ImGui::EndTable();
+         ImGui::TextWrapped("Explosion damage is active. Debris/FX rendering, sound, world fragments, polygon dynamics, "
+-                           "SpawnObject and save/restore are pending. "
++                           "Other SpawnObject classes and save/restore are pending. "
+                            "Rotation uses replacement engine collision; M2 remains open.");
+         if (ImGui::CollapsingHeader("Explosions: damage executed / FX and audio pending",
+                                     ImGuiTreeNodeFlags_DefaultOpen))
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index d103571..f0e414d 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -21,6 +21,9 @@ namespace OpenBlood2
+         ObjectId trigger_selection{}, trigger_request{};
+         std::string trigger_command;
+         bool grant_key_request = false;
++        bool select_pickups = false;
++        ObjectId pickup_selection{};
++        void draw_pickups(GameSession&, ObjectSelection&);
+         bool select_brushes = false;
+         ObjectId brush_selection{}, brush_request{};
+         std::string brush_command;
+diff --git a/src/app/inspector_pickups.cpp b/src/app/inspector_pickups.cpp
+new file mode 100644
+index 0000000..a7f4faf
+--- /dev/null
++++ b/src/app/inspector_pickups.cpp
+@@ -0,0 +1,84 @@
++#include "app/inspector.h"
++#include "game/original/AmmoPickups.h"
++#include <imgui.h>
++namespace OpenBlood2
++{
++    void Inspector::draw_pickups(GameSession& game, ObjectSelection& selection)
++    {
++        ImGui::TextWrapped("Original single-player ammunition, health and armor. Inventory items, timed bonuses, audio "
++                           "and pickup FX remain pending.");
++        if (!ImGui::BeginTable("Pickup inspection", 2, ImGuiTableFlags_Resizable))
++            return;
++        ImGui::TableSetupColumn("Objects", ImGuiTableColumnFlags_WidthFixed, 250);
++        ImGui::TableSetupColumn("State");
++        ImGui::TableNextColumn();
++        ImGui::BeginChild("Pickup list", {0, 100});
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* r = game.objects.get(id);
++            if (!r || !dynamic_cast<const PickupObject*>(r->game.get()))
++                continue;
++            if (!game.objects.get(pickup_selection))
++                pickup_selection = id;
++            const auto label = std::string(r->state.m_Name) + " / " + r->type->name +
++                               ((r->state.m_Flags & FLAG_VISIBLE) ? "" : " [hidden]") +
++                               (r->activity == OBJSTATE_ACTIVE ? "" : " [inactive]") +
++                               (r->life == Life::Pending ? " [pending]" : "");
++            ImGui::PushID(static_cast<int>(id.slot));
++            if (ImGui::Selectable(label.c_str(), pickup_selection == id))
++                pickup_selection = selection.id = id;
++            ImGui::PopID();
++        }
++        ImGui::EndChild();
++        ImGui::Text("Ammo list: %u", AmmoPickup::m_dwNumPickups);
++        if (auto* player = game.server_shell.Player(game.local_client))
++        {
++            ImGui::TextUnformatted("Player ammo / capacity");
++            for (unsigned i = 1; i <= 8; ++i)
++                ImGui::Text("%u: %.0f / %.0f", i, player->m_InventoryMgr.GetAmmoCount(i),
++                            player->m_InventoryMgr.MaxAmmo(i));
++            const auto& d = player->m_damage;
++            ImGui::Text("Health %.0f / %.0f (mega %.0f)", d.m_fHitPoints, d.m_fMaxHitPoints, d.m_fMaxMegaHitPoints);
++            ImGui::Text("Armor %.0f / %.0f (necro %.0f)", d.m_fArmorPoints, d.m_fMaxArmorPoints,
++                        d.m_fMaxNecroArmorPoints);
++        }
++        ImGui::TableNextColumn();
++        auto* r = game.objects.get(pickup_selection);
++        auto* p = r ? dynamic_cast<const PickupObject*>(r->game.get()) : nullptr;
++        if (p)
++        {
++            ImGui::Text("%s / %s", r->state.m_Name, r->type->name.c_str());
++            ImGui::Text("%s / type %u / amount %.0f", p->value.kind == PickupKind::Ammo ? "Ammo" : "Powerup",
++                        p->value.type, p->value.amount);
++            ImGui::Text("%s (resource %d)", p->display_name.c_str(), p->resource_id);
++            ImGui::TextWrapped("Model: %s", r->state.m_Filename);
++            ImGui::TextWrapped("Skin: %s (%s)", r->state.m_SkinName,
++                               game.resources.find(r->state.m_SkinName) ? "indexed" : "missing");
++            ImGui::Text("Position %.1f %.1f %.1f", r->state.m_Pos.x, r->state.m_Pos.y, r->state.m_Pos.z);
++            ImGui::Text("Velocity %.1f %.1f %.1f", r->velocity.x, r->velocity.y, r->velocity.z);
++            ImGui::Text("Dimensions %.1f %.1f %.1f", r->dimensions.x, r->dimensions.y, r->dimensions.z);
++            ImGui::Text("Rotate FX requested: %s (not rendered)", p->rotate_fx ? "yes" : "no");
++            ImGui::Text("Attempts %llu / consumed %s", static_cast<unsigned long long>(p->attempts),
++                        p->picked_up ? "yes" : "no");
++            ImGui::TextWrapped("Trigger: %s -> %s", p->pickup_target.c_str(), p->pickup_command.c_str());
++            ImGui::TextWrapped("Pickup sound request: %s (not played)", p->pickup_sound.c_str());
++            if (!p->error.empty())
++                ImGui::TextWrapped("Pickup diagnostic: %s", p->error.c_str());
++            if (!r->model_error.empty())
++                ImGui::TextWrapped("Model diagnostic: %s", r->model_error.c_str());
++        }
++        else
++            ImGui::TextUnformatted("No live pickup selected.");
++        ImGui::SeparatorText("Recent pickups / latest 32");
++        for (const auto& v : game.server.pickup_reports)
++            ImGui::TextWrapped("%s / %s: %.0f (type %u)", v.name.c_str(), v.class_name.c_str(), v.value.amount,
++                               v.value.type);
++        ImGui::SeparatorText("Destruction spawns / latest 32");
++        for (const auto& v : game.server.spawn_reports)
++        {
++            ImGui::TextWrapped("%s -> %s: %s", v.source.c_str(), v.request.c_str(), v.outcome.c_str());
++            ImGui::Text("Child currently %s", game.server.IsObjectAlive(v.child) ? "alive" : "absent");
++        }
++        ImGui::EndTable();
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index dc41951..1745d29 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -7,6 +7,7 @@
+ #include "game/original/Door.h"
+ #include "game/server_adapter.h"
+ #include "interaction_smoke.h"
++#include "pickup_smoke.h"
+ #include "trigger_smoke.h"
+ 
+ #include <SDL3/SDL_main.h>
+@@ -148,6 +149,14 @@ namespace
+                 return 4;
+             selection.id = smoke_brush;
+         }
++        OpenBlood2::ObjectId smoke_pickup{};
++        bool pickup_hidden = false;
++        if (options.pickups_smoke)
++        {
++            if (!OpenBlood2::prepare_pickup_smoke(game, smoke_pickup))
++                return 4;
++            selection.id = smoke_pickup;
++        }
+         bool interaction_hidden = false;
+         const auto original_selection = selection.id;
+         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
+@@ -160,11 +169,13 @@ namespace
+         inspector.select_models =
+             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
+         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
+-                                   !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke;
++                                   !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke &&
++                                   !options.pickups_smoke;
+         inspector.select_weapons = options.weapons_smoke;
+         inspector.select_movement = options.movement_smoke;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
++        inspector.select_pickups = options.pickups_smoke;
+         inspector.brush_selection = smoke_body;
+         inspector.select_doors = options.doors_smoke || options.interaction_smoke;
+         inspector.keyboard_movement = options.interaction_smoke;
+@@ -272,6 +283,9 @@ namespace
+             if (options.brushes_smoke && frames == reload_frame + 1)
+                 if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
+                     return 4;
++            if (options.pickups_smoke && frames == reload_frame + 1)
++                if (!OpenBlood2::prepare_pickup_smoke(game, smoke_pickup))
++                    return 4;
+             game.client_shell.use_down = controls.sample_use(text_editing);
+             auto keyboard = controls.sample(text_editing);
+             auto& movement = game.client_shell.movement_input;
+@@ -388,7 +402,7 @@ namespace
+                 swapchain &&
+                 frames >= (extended_smoke ? 180u
+                            : (options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
+-                              options.interaction_smoke || options.brushes_smoke)
++                              options.interaction_smoke || options.brushes_smoke || options.pickups_smoke)
+                                ? 14u
+                                : 2u) &&
+                 !captured && !options.capture_file.empty();
+@@ -535,6 +549,8 @@ namespace
+                     use.key.down = frames == hide_frame;
+                     event_ok = SDL_PushEvent(&use);
+                 }
++                if (options.pickups_smoke && frames == show_frame - 1)
++                    pickup_hidden = OpenBlood2::collect_pickup_smoke(game, smoke_pickup);
+                 if (options.brushes_smoke)
+                 {
+                     if (frames == hide_frame && !OpenBlood2::command_brush_smoke(game, smoke_explosion, "KILL"))
+@@ -656,7 +672,8 @@ namespace
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+-                (options.interaction_smoke && !interaction_hidden) || (options.brushes_smoke && !brush_hidden) ||
++                (options.pickups_smoke && !pickup_hidden) || (options.interaction_smoke && !interaction_hidden) ||
++                (options.brushes_smoke && !brush_hidden) ||
+                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
+                 (options.movement_smoke &&
+                  (!movement_hidden || !movement_jumped || !movement_landed || !game.client_shell.move_mgr.ready() ||
+@@ -677,6 +694,8 @@ namespace
+             if (options.world_smoke)
+                 spdlog::info("World smoke passed: unload/reload, original instance/string counts restored, "
+                              "collision/model resources restored, preview animation advanced while hidden");
++            if (options.pickups_smoke)
++                spdlog::info("PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked");
+             if (options.weapons_smoke)
+                 spdlog::info("Weapon smoke passed: animation-key shots, bullets consumed, knife strikes, firing while "
+                              "hidden, unload/re-entry");
+@@ -746,6 +765,7 @@ int main(int argc, char** argv)
+                      "  --doors-smoke       GPU original sliding door inspection\n"
+                      "  --brushes-smoke GPU original rotating brush inspection\n"
+                      "  --interaction-smoke GPU original USE and rotating door inspection\n"
++                     "  --pickups-smoke   GPU original ammo pickup, hidden collection and reload\n"
+                      "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
+                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
+                      "  --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload\n"
+diff --git a/src/app/pickup_smoke.cpp b/src/app/pickup_smoke.cpp
+new file mode 100644
+index 0000000..c388b83
+--- /dev/null
++++ b/src/app/pickup_smoke.cpp
+@@ -0,0 +1,32 @@
++#include "pickup_smoke.h"
++#include "game/original/PickupObject.h"
++#include "game/original/spawn_object.h"
++namespace OpenBlood2
++{
++    bool prepare_pickup_smoke(GameSession& g, ObjectId& id)
++    {
++        auto h = SpawnObject("BulletAmmoPU Name smoke_ammo", {0, 10000, 0}, {}, {});
++        auto* r = g.objects.get(h);
++        if (!r || !r->model || !(r->state.m_Flags & FLAG_TOUCH_NOTIFY))
++            return false;
++        id = r->id;
++        auto second = SpawnObject("WardPU Name inspect_ward", {200, 10000, 0}, {}, {});
++        const auto* inspect = g.objects.get(second);
++        return inspect && inspect->model;
++    }
++    bool collect_pickup_smoke(GameSession& g, ObjectId id)
++    {
++        auto* player = g.server_shell.Player(g.local_client);
++        auto* r = g.objects.get(id);
++        if (!player || !r)
++            return false;
++        const auto h = r->handle;
++        player->m_InventoryMgr.SetAmmoCount(1, 0);
++        auto pos = r->state.m_Pos;
++        if (g.server.TeleportObject(player->m_hObject, &pos) != DE_OK ||
++            g.server.MoveObject(player->m_hObject, &pos) != DE_OK)
++            return false;
++        return !g.server.IsObjectAlive(h) && player->m_InventoryMgr.GetAmmoCount(1) == 100 &&
++               g.server.pickup_reports.size() == 1;
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/pickup_smoke.h b/src/app/pickup_smoke.h
+new file mode 100644
+index 0000000..6f258f0
+--- /dev/null
++++ b/src/app/pickup_smoke.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool prepare_pickup_smoke(GameSession&, ObjectId&);
++    bool collect_pickup_smoke(GameSession&, ObjectId);
++} // namespace OpenBlood2
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index 4145f5f..c955808 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -125,6 +125,10 @@ namespace OpenBlood2
+                 options.player_smoke = true;
+                 options.containers_smoke = true;
+             }
++            else if (arg == "--pickups-smoke")
++            {
++                options.world_smoke = options.player_smoke = options.pickups_smoke = true;
++            }
+             else if (arg == "--brushes-smoke")
+             {
+                 options.world_smoke = options.brushes_smoke = true;
+@@ -201,7 +205,7 @@ namespace OpenBlood2
+         }
+         if (int(options.weapons_smoke) + int(options.movement_smoke) + int(options.containers_smoke) +
+                 int(options.doors_smoke) + int(options.triggers_smoke) + int(options.interaction_smoke) +
+-                int(options.brushes_smoke) >
++                int(options.brushes_smoke) + int(options.pickups_smoke) >
+             1)
+         {
+             error = "Choose one player smoke scenario";
+diff --git a/src/engine/config.h b/src/engine/config.h
+index b2d39f2..ac00220 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -22,7 +22,7 @@ namespace OpenBlood2
+         bool player_smoke = false;
+         bool weapons_smoke = false;
+         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
+-             interaction_smoke = false, brushes_smoke = false;
++             interaction_smoke = false, brushes_smoke = false, pickups_smoke = false;
+         bool start_game = false;
+         bool explicit_config = false;
+         bool help = false;
+diff --git a/src/engine/objects.cpp b/src/engine/objects.cpp
+index c809e84..c8dca29 100644
+--- a/src/engine/objects.cpp
++++ b/src/engine/objects.cpp
+@@ -415,19 +415,19 @@ namespace OpenBlood2
+         contexts_.pop_back();
+         return handle;
+     }
+-    HOBJECT Objects::create_props(HCLASS type, ObjectCreateStruct state, std::string_view input)
++    bool Objects::parse_properties(HCLASS type, std::string_view input, Properties& props)
+     {
+         if (!knows(type))
+         {
+             fail(ObjectError::UnknownClass, "CreateObjectProps: unknown class");
+-            return nullptr;
++            return false;
+         }
+         if (input.size() > 16384)
+         {
+             fail(ObjectError::Limit, "Property string exceeds 16 KiB");
+-            return nullptr;
++            return false;
+         }
+-        Properties props;
++        props.clear();
+         std::size_t cursor = 0;
+         auto whitespace = [&]
+         {
+@@ -435,10 +435,10 @@ namespace OpenBlood2
+                    (input[cursor] == ' ' || input[cursor] == '\t' || input[cursor] == '\n' || input[cursor] == '\r'))
+                 ++cursor;
+         };
+-        auto invalid = [&]() -> HOBJECT
++        auto invalid = [&]() -> bool
+         {
+             fail(ObjectError::InvalidProperty, "Invalid property string near offset " + std::to_string(cursor));
+-            return nullptr;
++            return false;
+         };
+         while (true)
+         {
+@@ -496,6 +496,20 @@ namespace OpenBlood2
+             if (cursor < input.size())
+                 ++cursor;
+         }
++        return true;
++    }
++    HOBJECT Objects::create_props(HCLASS type, ObjectCreateStruct state, std::string_view input)
++    {
++        Properties props;
++        if (!parse_properties(type, input, props))
++            return nullptr;
++        // String properties override the supplied transform only when authored.
++        if (spec(type, "Pos"))
++            props.try_emplace("Pos", state.m_Pos);
++        if (spec(type, "Rotation"))
++            props.try_emplace("Rotation", state.m_Rotation);
++        if (state.m_Name[0] && spec(type, "Name"))
++            props.try_emplace("Name", std::string(state.m_Name));
+         return create(type, state, Creation::String, props);
+     }
+     ObjectRecord* Objects::get(ObjectId id)
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index 9261790..fd51dbc 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -136,6 +136,7 @@ namespace OpenBlood2
+         static bool is_kind_of(HCLASS type, HCLASS parent);
+         HOBJECT create(HCLASS type, ObjectCreateStruct state = {}, Creation reason = Creation::Runtime,
+                        const Properties& properties = {});
++        bool parse_properties(HCLASS, std::string_view, Properties&);
+         HOBJECT create_props(HCLASS type, ObjectCreateStruct state, std::string_view text);
+         bool remove(HOBJECT handle);
+         bool set_next_update(HOBJECT handle, float delay);
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 6b565ce..5a401eb 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -4,6 +4,7 @@
+ #include "game/container_messages.h"
+ #include "game/key_messages.h"
+ #include "game/mover_messages.h"
++#include "game/pickup_messages.h"
+ #include "game/player_messages.h"
+ #include "game/weapon_messages.h"
+ 
+@@ -29,6 +30,11 @@ class ServerDE : public CSBase
+ {
+   public:
+     virtual bool IsObjectAlive(HOBJECT) = 0;
++    virtual bool ValidateSpawnObject(std::string_view) = 0;
++    virtual void RecordSpawn(const OpenBlood2::SpawnReport&) = 0;
++    virtual void RecordPickup(HOBJECT, const OpenBlood2::PickupMessage&, std::string_view sound) = 0;
++    virtual DRESULT WritePickupMessage(HMESSAGEWRITE, const OpenBlood2::PickupMessage&) = 0;
++    virtual bool ReadPickupMessage(HMESSAGEREAD, OpenBlood2::PickupMessage&) = 0;
+     virtual bool ConfigureWorldBody(HOBJECT, const OpenBlood2::WorldBodyProperties&) = 0;
+     virtual bool SetBlockingPriority(HOBJECT, DBYTE) = 0;
+     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
+diff --git a/src/game/original/AmmoPickups.cpp b/src/game/original/AmmoPickups.cpp
+new file mode 100644
+index 0000000..a9ad9ba
+--- /dev/null
++++ b/src/game/original/AmmoPickups.cpp
+@@ -0,0 +1,83 @@
++#include "AmmoPickups.h"
++DLink AmmoPickup::m_PickupHead{};
++DDWORD AmmoPickup::m_dwNumPickups = 0;
++AmmoPickup::AmmoPickup()
++{
++    if (!m_dwNumPickups)
++        dl_TieOff(&m_PickupHead);
++    pickup_sound = "sounds\\powerups\\ammo1.wav";
++}
++AmmoPickup::~AmmoPickup()
++{
++    if (m_Link.m_pData && m_dwNumPickups)
++    {
++        dl_Remove(&m_Link);
++        --m_dwNumPickups;
++    }
++}
++DDWORD AmmoPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_INITIALUPDATE && !m_Link.m_pData)
++    {
++        dl_Insert(&m_PickupHead, &m_Link);
++        m_Link.m_pData = this;
++        ++m_dwNumPickups;
++    }
++    return PickupObject::EngineMessageFn(message, data, reason);
++}
++BulletAmmoPU::BulletAmmoPU()
++{
++    value = {OpenBlood2::PickupKind::Ammo, 1, 100};
++    file = "BulletAmmo_pu";
++    display_name = "Bullets";
++    resource_id = 317;
++}
++ShellAmmoPU::ShellAmmoPU()
++{
++    value = {OpenBlood2::PickupKind::Ammo, 2, 20};
++    file = "ShellAmmo_pu";
++    display_name = "Shells";
++    resource_id = 318;
++}
++BMGAmmoPU::BMGAmmoPU()
++{
++    value = {OpenBlood2::PickupKind::Ammo, 3, 20};
++    file = "BMGAmmo_pu";
++    display_name = "BMG Rounds";
++    resource_id = 319;
++}
++FlareAmmoPU::FlareAmmoPU()
++{
++    value = {OpenBlood2::PickupKind::Ammo, 4, 20};
++    file = "FlareAmmo_pu";
++    display_name = "Flares";
++    resource_id = 320;
++}
++DieBugDieAmmoPU::DieBugDieAmmoPU()
++{
++    value = {OpenBlood2::PickupKind::Ammo, 5, 20};
++    file = "DieBugDieAmmo_pu";
++    display_name = "DieBugDie";
++    resource_id = 321;
++}
++HowitzerAmmoPU::HowitzerAmmoPU()
++{
++    value = {OpenBlood2::PickupKind::Ammo, 6, 5};
++    file = "HowitzerAmmo_pu";
++    display_name = "Howizter Shells";
++    resource_id = 322;
++}
++FuelAmmoPU::FuelAmmoPU()
++{
++    value = {OpenBlood2::PickupKind::Ammo, 7, 10};
++    file = "FuelAmmo_pu";
++    display_name = "FuelTank";
++    resource_id = 323;
++}
++BatteryAmmoPU::BatteryAmmoPU()
++{
++    value = {OpenBlood2::PickupKind::Ammo, 8, 40};
++    file = "BatteryAmmo_pu";
++    display_name = "Chemical Batteries";
++    resource_id = 324;
++}
+diff --git a/src/game/original/AmmoPickups.h b/src/game/original/AmmoPickups.h
+new file mode 100644
+index 0000000..a42a2bf
+--- /dev/null
++++ b/src/game/original/AmmoPickups.h
+@@ -0,0 +1,55 @@
++#pragma once
++#include "PickupObject.h"
++#include "dlink.h"
++class AmmoPickup : public PickupObject
++{
++  public:
++    AmmoPickup();
++    ~AmmoPickup() override;
++    static DLink m_PickupHead;
++    static DDWORD m_dwNumPickups;
++    DLink m_Link{};
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++};
++class BulletAmmoPU : public AmmoPickup
++{
++  public:
++    BulletAmmoPU();
++};
++class ShellAmmoPU : public AmmoPickup
++{
++  public:
++    ShellAmmoPU();
++};
++class BMGAmmoPU : public AmmoPickup
++{
++  public:
++    BMGAmmoPU();
++};
++class FlareAmmoPU : public AmmoPickup
++{
++  public:
++    FlareAmmoPU();
++};
++class DieBugDieAmmoPU : public AmmoPickup
++{
++  public:
++    DieBugDieAmmoPU();
++};
++class HowitzerAmmoPU : public AmmoPickup
++{
++  public:
++    HowitzerAmmoPU();
++};
++class FuelAmmoPU : public AmmoPickup
++{
++  public:
++    FuelAmmoPU();
++};
++class BatteryAmmoPU : public AmmoPickup
++{
++  public:
++    BatteryAmmoPU();
++};
+diff --git a/src/game/original/Destructable.cpp b/src/game/original/Destructable.cpp
+index 834ef4c..da23fd7 100644
+--- a/src/game/original/Destructable.cpp
++++ b/src/game/original/Destructable.cpp
+@@ -2,6 +2,7 @@
+ #include "Destructable.h"
+ #include "engine/collision.h"
+ #include "engine/objects.h"
++#include "spawn_object.h"
+ #include "trigger_helpers.h"
+ #include <algorithm>
+ #include <cmath>
+@@ -84,6 +85,11 @@ DDWORD CDestructable::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* d
+         text("DamageTriggerMessage", damage_message);
+         text("DeathTriggerTarget", death_target);
+         text("DeathTriggerMessage", death_message);
++        text("SpawnObject", spawn_object);
++        if (server->GetPropGeneric("SpawnObjectVel", &prop) == DE_OK)
++            spawn_velocity = prop.m_Vec;
++        spawn_valid = spawn_object.empty() ||
++                      (server->ValidateSpawnObject(spawn_object) && OpenBlood2::physics_vector(spawn_velocity));
+         if (server->GetPropGeneric("CanDamage", &prop) == DE_OK)
+             can_damage = prop.m_Bool != 0;
+         if (server->GetPropGeneric("TriggerDestroyOnly", &prop) == DE_OK)
+@@ -171,7 +177,7 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD
+             {
+                 m_bDead = DTRUE;
+                 m_fHitPoints = 0;
+-                SendTrigger(death_target, death_message);
++                HandleDestruction();
+             }
+             if (BaseClass::GetServerDE()->IsObjectAlive(m_hObject))
+                 SendTrigger(damage_target, damage_message);
+@@ -180,3 +186,66 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD
+     }
+     return Aggregate::ObjectMessageFn(owner, sender, message, read);
+ }
++
++void CDestructable::HandleDestruction()
++{
++    auto* server = BaseClass::GetServerDE();
++    OpenBlood2::SpawnReport report;
++    if (!spawn_object.empty())
++    {
++        auto name = server->GetObjectName(m_hObject);
++        report.source = name ? name : "";
++        report.request = spawn_object;
++        report.velocity = spawn_velocity;
++    }
++    SendTrigger(death_target, death_message);
++    if (spawn_object.empty())
++        return;
++    DRotation rotation;
++    if (!server->IsObjectAlive(m_hObject))
++        report.outcome = "Cancelled: source removed by death trigger";
++    else
++    {
++        server->GetObjectPos(m_hObject, &report.position);
++        if (server->GetObjectRotation(m_hObject, &rotation) != DE_OK)
++            report.outcome = "Failed: source rotation unavailable";
++        else
++        {
++            report.child = SpawnObject(spawn_object, report.position, rotation, spawn_velocity);
++            report.outcome = report.child ? "Created" : "Failed: object creation or velocity";
++        }
++    }
++    server->RecordSpawn(report);
++}
++namespace
++{
++    bool add_stat(float& value, float cap, float amount)
++    {
++        if (!std::isfinite(amount) || amount < 0 || amount > 1e6f || value >= cap)
++            return false;
++        value = std::min(value + amount, cap);
++        return true;
++    }
++} // namespace
++bool CDestructable::Heal(float amount)
++{
++    if (!add_stat(m_fHitPoints, m_fMaxHitPoints, amount))
++        return false;
++    m_bDead = DFALSE;
++    return true;
++}
++bool CDestructable::MegaHeal(float amount)
++{
++    if (!add_stat(m_fHitPoints, m_fMaxMegaHitPoints, amount))
++        return false;
++    m_bDead = DFALSE;
++    return true;
++}
++bool CDestructable::AddWard(float amount)
++{
++    return add_stat(m_fArmorPoints, m_fMaxArmorPoints, amount);
++}
++bool CDestructable::AddNecroWard(float amount)
++{
++    return add_stat(m_fArmorPoints, m_fMaxNecroArmorPoints, amount);
++}
+diff --git a/src/game/original/Destructable.h b/src/game/original/Destructable.h
+index 4967f3d..485e8e6 100644
+--- a/src/game/original/Destructable.h
++++ b/src/game/original/Destructable.h
+@@ -25,6 +25,14 @@ class CDestructable : public Aggregate
+         return m_bDead != 0;
+     }
+     void CalculateResistance(DBYTE);
++    bool Heal(float);
++    bool MegaHeal(float);
++    bool AddWard(float);
++    bool AddNecroWard(float);
++    void HandleDestruction();
++    std::string spawn_object;
++    DVector spawn_velocity{};
++    bool spawn_valid = true;
+     void ApplyDamagePhysics(float, DVector);
+     bool apply_damage_physics = false, last_impulse_ok = true;
+     std::uint64_t damage_impulses = 0;
+diff --git a/src/game/original/DestructableBrush.cpp b/src/game/original/DestructableBrush.cpp
+index c810cac..95f3e90 100644
+--- a/src/game/original/DestructableBrush.cpp
++++ b/src/game/original/DestructableBrush.cpp
+@@ -38,9 +38,8 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
+                     return 0;
+                 surface = static_cast<unsigned>(prop.m_Long);
+             }
+-            server->GetPropGeneric("SpawnObject", &prop);
+-            // Do not create objects whose omitted branches change gameplay.
+-            if (prop.m_String[0])
++            // Reject unsupported spawn rules before admitting this brush.
++            if (!m_damage.spawn_valid)
+                 return 0;
+         }
+ 
+diff --git a/src/game/original/PickupObject.cpp b/src/game/original/PickupObject.cpp
+new file mode 100644
+index 0000000..888e154
+--- /dev/null
++++ b/src/game/original/PickupObject.cpp
+@@ -0,0 +1,88 @@
++#include "PickupObject.h"
++#include "trigger_helpers.h"
++#include <algorithm>
++using namespace OpenBlood2;
++DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE)
++    {
++        if (!B2BaseClass::EngineMessageFn(message, data, reason) || reason == 3 || !data || file.empty())
++            return 0;
++        auto& create = *static_cast<ObjectCreateStruct*>(data);
++        auto text = [&](const char* key, std::string& out)
++        {
++            GenericProp p;
++            if (g_pServerDE->GetPropGeneric(key, &p) == DE_OK)
++                out = p.m_String;
++        };
++        text("PickupTriggerTarget", pickup_target);
++        text("PickupTriggerMessage", pickup_command);
++        SAFE_STRCPY(create.m_Filename, ("Models/Powerups/" + file + ".abc").c_str());
++        SAFE_STRCPY(create.m_SkinName, ("Skins/Powerups/" + file + ".dtx").c_str());
++        create.m_ObjectType = OT_MODEL;
++        create.m_Flags |= FLAG_TOUCH_NOTIFY | FLAG_VISIBLE | FLAG_GRAVITY;
++        create.m_Flags &= ~FLAG_SHADOW;
++        return 1;
++    }
++    if (message == MID_INITIALUPDATE)
++    {
++        DVector dims;
++        if (g_pServerDE->GetModelAnimUserDims(m_hObject, &dims, g_pServerDE->GetModelAnimation(m_hObject)) != DE_OK)
++        {
++            error = "No usable model dimensions; touch/gravity disabled";
++            g_pServerDE->SetObjectFlags(m_hObject, FLAG_VISIBLE);
++        }
++        else
++        {
++            dims.x = std::max(dims.x, 10.0f);
++            dims.z = std::max(dims.z, dims.x);
++            g_pServerDE->SetObjectDims(m_hObject, &dims);
++            if (reason == INITIALUPDATE_WORLDFILE && g_pServerDE->MoveObjectToGround(m_hObject) != DE_OK)
++                error = "Initial pickup ground placement failed";
++        }
++        g_pServerDE->SetObjectUserFlags(m_hObject, (1u << 3) | (1u << 10) | (rotate_fx ? (1u << 4) : 0));
++        g_pServerDE->SetNextUpdate(m_hObject, 0);
++        // String creation follows SpawnItem: no bounce for these source constructors,
++        // no ground snap, and the helper applies SpawnObjectVel after initial update.
++    }
++    else if (message == MID_TOUCHNOTIFY && !touching_ && !picked_up &&
++             (g_pServerDE->GetObjectFlags(m_hObject) & FLAG_TOUCH_NOTIFY) &&
++             g_pServerDE->IsObjectAlive(static_cast<HOBJECT>(data)))
++    {
++        touching_ = static_cast<HOBJECT>(data);
++        ++attempts;
++        auto packet = g_pServerDE->StartMessageToObject(
++            this, touching_, value.kind == PickupKind::Ammo ? add_ammo_message : add_powerup_message);
++        if (packet)
++        {
++            g_pServerDE->WritePickupMessage(packet, value);
++            g_pServerDE->EndMessage(packet);
++        }
++        touching_ = nullptr;
++    }
++    return B2BaseClass::EngineMessageFn(message, data, reason);
++}
++DDWORD PickupObject::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    PickupMessage reply;
++    if (message == picked_up_message && sender && sender == touching_ && !picked_up &&
++        g_pServerDE->ReadPickupMessage(read, reply) && reply == value &&
++        g_pServerDE->IsKindOf(g_pServerDE->GetObjectClass(sender), g_pServerDE->GetClass("CPlayerObj")))
++    {
++        picked_up = true;
++        g_pServerDE->SetObjectFlags(m_hObject,
++                                    g_pServerDE->GetObjectFlags(m_hObject) & ~FLAG_VISIBLE & ~FLAG_TOUCH_NOTIFY);
++        ++sound_requests;
++        g_pServerDE->RecordPickup(m_hObject, value, pickup_sound);
++        if (!pickup_target.empty() && !pickup_command.empty())
++        {
++            auto target = g_pServerDE->CreateString(pickup_target.c_str());
++            auto command = g_pServerDE->CreateString(pickup_command.c_str());
++            SendTriggerMsgToObjects(this, target, command);
++            g_pServerDE->FreeString(target);
++            g_pServerDE->FreeString(command);
++        }
++        g_pServerDE->RemoveObject(m_hObject); // SP: no respawn. Reclaim after callbacks.
++    }
++    return B2BaseClass::ObjectMessageFn(sender, message, read);
++}
+diff --git a/src/game/original/PickupObject.h b/src/game/original/PickupObject.h
+new file mode 100644
+index 0000000..3c69db9
+--- /dev/null
++++ b/src/game/original/PickupObject.h
+@@ -0,0 +1,22 @@
++#pragma once
++#include "B2BaseClass.h"
++#include <string>
++// Selected original single-player pickup rules; see docs/PICKUP_CONTRACTS.md.
++class PickupObject : public B2BaseClass
++{
++  public:
++    PickupObject() : B2BaseClass(OT_MODEL) {}
++    OpenBlood2::PickupMessage value;
++    std::string file, display_name, pickup_sound = "sounds\\powerups\\powerup4.wav";
++    std::string pickup_target, pickup_command, error;
++    std::int32_t resource_id = 0;
++    bool picked_up = false, rotate_fx = false;
++    std::uint64_t attempts = 0, sound_requests = 0;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++
++  private:
++    HOBJECT touching_ = nullptr;
++};
+diff --git a/src/game/original/PlayerContainers.cpp b/src/game/original/PlayerContainers.cpp
+index 8606b64..c1faf73 100644
+--- a/src/game/original/PlayerContainers.cpp
++++ b/src/game/original/PlayerContainers.cpp
+@@ -37,6 +37,42 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD
+             }
+         }
+     }
++    if (!m_bDead && !m_damage.IsDead() &&
++        (message == OpenBlood2::add_ammo_message || message == OpenBlood2::add_powerup_message))
++    {
++        OpenBlood2::PickupMessage pickup;
++        if (server->ReadPickupMessage(read, pickup))
++        {
++            bool accepted = false;
++            if (message == OpenBlood2::add_ammo_message)
++                accepted = m_InventoryMgr.AddAmmo(pickup.type, pickup.amount) == InventoryResult::Ok;
++            else
++                switch (pickup.type)
++                {
++                    case 1:
++                        accepted = m_damage.Heal(pickup.amount);
++                        break;
++                    case 2:
++                        accepted = m_damage.MegaHeal(pickup.amount);
++                        break;
++                    case 3:
++                        accepted = m_damage.AddWard(pickup.amount);
++                        break;
++                    case 4:
++                        accepted = m_damage.AddNecroWard(pickup.amount);
++                        break;
++                }
++            if (accepted)
++            {
++                auto reply = server->StartMessageToObject(this, sender, OpenBlood2::picked_up_message);
++                if (reply)
++                {
++                    server->WritePickupMessage(reply, pickup);
++                    server->EndMessage(reply);
++                }
++            }
++        }
++    }
+     return CBaseCharacter::ObjectMessageFn(sender, message, read);
+ }
+ 
+diff --git a/src/game/original/PowerupPickups.cpp b/src/game/original/PowerupPickups.cpp
+new file mode 100644
+index 0000000..c71929f
+--- /dev/null
++++ b/src/game/original/PowerupPickups.cpp
+@@ -0,0 +1,33 @@
++#include "PowerupPickups.h"
++HealthPU::HealthPU()
++{
++    value = {OpenBlood2::PickupKind::Powerup, 1, 25};
++    file = "Health_pu";
++    display_name = "Life Essence";
++    resource_id = 309;
++    pickup_sound = "sounds\\powerups\\health1a.wav";
++}
++MegaHealthPU::MegaHealthPU()
++{
++    value = {OpenBlood2::PickupKind::Powerup, 2, 100};
++    file = "MegaHealth_pu";
++    display_name = "Life Seed";
++    resource_id = 310;
++    pickup_sound = "sounds\\powerups\\health2.wav";
++}
++WardPU::WardPU()
++{
++    value = {OpenBlood2::PickupKind::Powerup, 3, 25};
++    file = "Ward_pu";
++    display_name = "Ward";
++    resource_id = 311;
++    pickup_sound = "sounds\\powerups\\armour1.wav";
++}
++NecroWardPU::NecroWardPU()
++{
++    value = {OpenBlood2::PickupKind::Powerup, 4, 100};
++    file = "NecroWard_pu";
++    display_name = "NecroWard";
++    resource_id = 312;
++    pickup_sound = "sounds\\powerups\\powerup3.wav";
++}
+diff --git a/src/game/original/PowerupPickups.h b/src/game/original/PowerupPickups.h
+new file mode 100644
+index 0000000..86a1497
+--- /dev/null
++++ b/src/game/original/PowerupPickups.h
+@@ -0,0 +1,36 @@
++#pragma once
++#include "PickupObject.h"
++class PowerupPickup : public PickupObject
++{
++  public:
++    PowerupPickup()
++    {
++        rotate_fx = true;
++    }
++};
++class HealthBase : public PowerupPickup
++{
++};
++class ArmorBase : public PowerupPickup
++{
++};
++class HealthPU : public HealthBase
++{
++  public:
++    HealthPU();
++};
++class MegaHealthPU : public HealthBase
++{
++  public:
++    MegaHealthPU();
++};
++class WardPU : public ArmorBase
++{
++  public:
++    WardPU();
++};
++class NecroWardPU : public ArmorBase
++{
++  public:
++    NecroWardPU();
++};
+diff --git a/src/game/original/spawn_object.cpp b/src/game/original/spawn_object.cpp
+new file mode 100644
+index 0000000..2b318d8
+--- /dev/null
++++ b/src/game/original/spawn_object.cpp
+@@ -0,0 +1,23 @@
++// Selected global helper from ObjectDLL/Spawner.cpp; not the Spawner class.
++#include "spawn_object.h"
++#include "cpp_engineobjects_de.h"
++HOBJECT SpawnObject(std::string_view request, const DVector& position, const DRotation& rotation, DVector velocity)
++{
++    auto* server = BaseClass::GetServerDE();
++    std::string name, props;
++    if (!server || !server->ValidateSpawnObject(request) || !OpenBlood2::split_spawn(request, name, props))
++        return nullptr;
++    ObjectCreateStruct state;
++    state.m_Pos = position;
++    state.m_Rotation = rotation;
++    auto* object = server->CreateObjectProps(server->GetClass(name.c_str()), &state, props.c_str());
++    if (!object)
++        return nullptr;
++    auto handle = server->ObjectToHandle(object);
++    if (!server->IsObjectAlive(handle) || server->SetVelocity(handle, &velocity) != DE_OK)
++    {
++        server->RemoveObject(handle);
++        return nullptr;
++    }
++    return handle;
++}
+diff --git a/src/game/original/spawn_object.h b/src/game/original/spawn_object.h
+new file mode 100644
+index 0000000..76c8e4b
+--- /dev/null
++++ b/src/game/original/spawn_object.h
+@@ -0,0 +1,4 @@
++#pragma once
++#include "game/legacy/basedefs_de.h"
++#include <string_view>
++HOBJECT SpawnObject(std::string_view, const DVector&, const DRotation&, DVector velocity);
+diff --git a/src/game/pickup_messages.h b/src/game/pickup_messages.h
+new file mode 100644
+index 0000000..bfe2fd6
+--- /dev/null
++++ b/src/game/pickup_messages.h
+@@ -0,0 +1,32 @@
++#pragma once
++#include "game/legacy/basedefs_de.h"
++#include <string>
++#include <string_view>
++namespace OpenBlood2
++{
++    inline constexpr DDWORD add_ammo_message = 1009, add_powerup_message = 3504;
++    enum class PickupKind
++    {
++        Ammo,
++        Powerup
++    };
++    struct PickupMessage
++    {
++        PickupKind kind = PickupKind::Ammo;
++        DBYTE type = 0;
++        float amount = 0;
++        bool operator==(const PickupMessage&) const = default;
++    };
++    struct SpawnReport
++    {
++        std::string source, request, outcome;
++        HOBJECT child = nullptr; // Checked token only; never an owning/raw object pointer.
++        DVector position{}, velocity{};
++    };
++    struct PickupReport
++    {
++        std::string name, class_name, sound;
++        PickupMessage value;
++    };
++    bool split_spawn(std::string_view, std::string& class_name, std::string& properties);
++} // namespace OpenBlood2
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 0010701..f4515e7 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -1,3 +1,4 @@
++#include "game/original/AmmoPickups.h"
+ #include "game/original/B2BaseClass.h"
+ #include "game/original/CameraSpot.h"
+ #include "game/original/Door.h"
+@@ -5,6 +6,7 @@
+ #include "game/original/Key.h"
+ #include "game/original/KeyPickup.h"
+ #include "game/original/PathPoint.h"
++#include "game/original/PowerupPickups.h"
+ #include "game/original/RotatingBrush.h"
+ #include "game/original/RotatingDoor.h"
+ #include "game/original/SmellHint.h"
+@@ -170,6 +172,26 @@ namespace OpenBlood2
+                                 {"SurfaceColor2", DVector{}},
+                                 {"XScaleDuration", 10.0f},
+                                 {"YScaleDuration", 10.0f}}};
++        const ClassInfo pickup{"PickupObject",
++                               &b2base,
++                               construct<PickupObject>,
++                               {{"PickupTriggerTarget", std::string{}}, {"PickupTriggerMessage", std::string{}}}};
++        const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}};
++        const ClassInfo powerup_pickup{"PowerupPickup", &pickup, construct<PowerupPickup>, {}};
++        const ClassInfo health_base{"HealthBase", &powerup_pickup, construct<HealthBase>, {}};
++        const ClassInfo armor_base{"ArmorBase", &powerup_pickup, construct<ArmorBase>, {}};
++        const ClassInfo bullet_ammo{"BulletAmmoPU", &ammo_pickup, construct<BulletAmmoPU>, {}};
++        const ClassInfo shell_ammo{"ShellAmmoPU", &ammo_pickup, construct<ShellAmmoPU>, {}};
++        const ClassInfo bmg_ammo{"BMGAmmoPU", &ammo_pickup, construct<BMGAmmoPU>, {}};
++        const ClassInfo flare_ammo{"FlareAmmoPU", &ammo_pickup, construct<FlareAmmoPU>, {}};
++        const ClassInfo diebugdie_ammo{"DieBugDieAmmoPU", &ammo_pickup, construct<DieBugDieAmmoPU>, {}};
++        const ClassInfo howitzer_ammo{"HowitzerAmmoPU", &ammo_pickup, construct<HowitzerAmmoPU>, {}};
++        const ClassInfo fuel_ammo{"FuelAmmoPU", &ammo_pickup, construct<FuelAmmoPU>, {}};
++        const ClassInfo battery_ammo{"BatteryAmmoPU", &ammo_pickup, construct<BatteryAmmoPU>, {}};
++        const ClassInfo health_pickup{"HealthPU", &health_base, construct<HealthPU>, {}};
++        const ClassInfo megahealth_pickup{"MegaHealthPU", &health_base, construct<MegaHealthPU>, {}};
++        const ClassInfo ward_pickup{"WardPU", &armor_base, construct<WardPU>, {}};
++        const ClassInfo necroward_pickup{"NecroWardPU", &armor_base, construct<NecroWardPU>, {}};
+         const ClassInfo key_pickup{"KeyPickup",
+                                    &b2base,
+                                    construct<KeyPickup>,
+@@ -367,10 +389,18 @@ namespace OpenBlood2
+                objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
+                objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
+                objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
+-               objects.register_class(key_pickup) && objects.register_class(big_trigger) &&
+-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
+-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+-               objects.register_class(rotating_brush);
++               objects.register_class(key_pickup) && objects.register_class(pickup) &&
++               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
++               objects.register_class(health_base) && objects.register_class(armor_base) &&
++               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
++               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
++               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
++               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
++               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
++               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
++               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
++               objects.register_class(door) && objects.register_class(rotating_door) &&
++               objects.register_class(destructable_brush) && objects.register_class(rotating_brush);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_adapter.cpp b/src/game/server_adapter.cpp
+index 042d335..2555a31 100644
+--- a/src/game/server_adapter.cpp
++++ b/src/game/server_adapter.cpp
+@@ -559,7 +559,7 @@ namespace OpenBlood2
+         auto* m = writable(h);
+         if (!m)
+             return DE_INVALIDPARAMS;
+-        if (m->damage || m->key)
++        if (m->damage || m->key || m->pickup)
+         {
+             m->bad = true;
+             return DE_INVALIDPARAMS;
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 9d2d7da..d773fd2 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -34,6 +34,13 @@ namespace OpenBlood2
+         ServerAdapter& operator=(const ServerAdapter&) = delete;
+         bool bind();
+         bool IsObjectAlive(HOBJECT) override;
++        bool ValidateSpawnObject(std::string_view) override;
++        void RecordSpawn(const SpawnReport&) override;
++        void RecordPickup(HOBJECT, const PickupMessage&, std::string_view) override;
++        DRESULT WritePickupMessage(HMESSAGEWRITE, const PickupMessage&) override;
++        bool ReadPickupMessage(HMESSAGEREAD, PickupMessage&) override;
++        std::vector<SpawnReport> spawn_reports;
++        std::vector<PickupReport> pickup_reports;
+         bool ConfigureWorldBody(HOBJECT, const WorldBodyProperties&) override;
+         bool SetBlockingPriority(HOBJECT, DBYTE) override;
+         void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE) override;
+@@ -59,6 +66,8 @@ namespace OpenBlood2
+             brush_destructions.clear();
+             debris_effects.clear();
+             explosion_effects.clear();
++            spawn_reports.clear();
++            pickup_reports.clear();
+         }
+         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
+         bool GetMovementState(HOBJECT, MovementState&) override;
+@@ -147,6 +156,7 @@ namespace OpenBlood2
+             DDWORD id = 0;
+             std::optional<Damage> damage;
+             std::optional<KeyMessage> key;
++            std::optional<PickupMessage> pickup;
+         };
+         Objects& objects_;
+         bool bound_ = false;
+diff --git a/src/game/server_keys.cpp b/src/game/server_keys.cpp
+index 6a145b9..c974ade 100644
+--- a/src/game/server_keys.cpp
++++ b/src/game/server_keys.cpp
+@@ -21,9 +21,9 @@ namespace OpenBlood2
+         if (!m->routed ||
+             (m->id != key_pickup_message && m->id != key_query_message && m->id != key_response_message &&
+              m->id != picked_up_message) ||
+-            !m->bytes.empty() || m->damage || m->key || !IsObjectAlive(m->sender) || !valid(value.item.name) ||
+-            value.item.name.empty() || !valid(value.item.display_name) || !valid(value.item.icon) ||
+-            !valid(value.item.highlighted_icon))
++            !m->bytes.empty() || m->damage || m->key || m->pickup || !IsObjectAlive(m->sender) ||
++            !valid(value.item.name) || value.item.name.empty() || !valid(value.item.display_name) ||
++            !valid(value.item.icon) || !valid(value.item.highlighted_icon))
+         {
+             m->bad = true;
+             return DE_INVALIDPARAMS;
+diff --git a/src/game/server_pickups.cpp b/src/game/server_pickups.cpp
+new file mode 100644
+index 0000000..36685c0
+--- /dev/null
++++ b/src/game/server_pickups.cpp
+@@ -0,0 +1,89 @@
++#include "game/server_adapter.h"
++#include <cmath>
++namespace OpenBlood2
++{
++    bool split_spawn(std::string_view input, std::string& type, std::string& props)
++    {
++        type.clear();
++        props.clear();
++        if (input.empty() || input.size() > 100 || input.find('\0') != input.npos)
++            return false;
++        auto first = input.find_first_not_of(' ');
++        if (first == input.npos)
++            return false;
++        input.remove_prefix(first);
++        auto end = input.find(' ');
++        type = input.substr(0, end);
++        if (end != input.npos)
++            props = input.substr(end + 1);
++        return true;
++    }
++    bool ServerAdapter::ValidateSpawnObject(std::string_view input)
++    {
++        trace_service("ValidateSpawnObject");
++        std::string type, props;
++        if (!split_spawn(input, type, props))
++            return false;
++        bool supported = false;
++        for (auto name :
++             {"BulletAmmoPU", "ShellAmmoPU", "BMGAmmoPU", "FlareAmmoPU", "DieBugDieAmmoPU", "HowitzerAmmoPU",
++              "FuelAmmoPU", "BatteryAmmoPU", "HealthPU", "MegaHealthPU", "WardPU", "NecroWardPU"})
++            supported |= same_name(type, name);
++        Properties parsed;
++        return supported && objects_.parse_properties(objects_.find_class(type), props, parsed);
++    }
++    void ServerAdapter::RecordSpawn(const SpawnReport& report)
++    {
++        trace_service("RecordSpawn");
++        if (spawn_reports.size() == 32)
++            spawn_reports.erase(spawn_reports.begin());
++        spawn_reports.push_back(report);
++        if (auto* r = objects_.get(report.child); r && !r->model_error.empty())
++            spawn_reports.back().outcome += ": " + r->model_error;
++    }
++    void ServerAdapter::RecordPickup(HOBJECT h, const PickupMessage& value, std::string_view sound)
++    {
++        trace_service("RecordPickup");
++        auto* r = objects_.get(h);
++        if (!r)
++            return;
++        if (pickup_reports.size() == 32)
++            pickup_reports.erase(pickup_reports.begin());
++        pickup_reports.push_back({r->state.m_Name, r->type->name, std::string(sound), value});
++    }
++    DRESULT ServerAdapter::WritePickupMessage(HMESSAGEWRITE h, const PickupMessage& value)
++    {
++        trace_service("WritePickupMessage");
++        auto* m = writable(h);
++        if (!m)
++            return DE_INVALIDPARAMS;
++        const auto limit = value.kind == PickupKind::Ammo ? 8 : 4;
++        const auto request = value.kind == PickupKind::Ammo ? add_ammo_message : add_powerup_message;
++        if (!m->routed || (value.kind != PickupKind::Ammo && value.kind != PickupKind::Powerup) ||
++            (m->id != request && m->id != picked_up_message) || !m->bytes.empty() || m->damage || m->key || m->pickup ||
++            !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit || !std::isfinite(value.amount) ||
++            value.amount < 0 || value.amount > 1e6f)
++        {
++            m->bad = true;
++            return DE_INVALIDPARAMS;
++        }
++        m->pickup = value;
++        return DE_OK;
++    }
++    bool ServerAdapter::ReadPickupMessage(HMESSAGEREAD h, PickupMessage& value)
++    {
++        trace_service("ReadPickupMessage");
++        value = {};
++        auto it = messages_.find(h);
++        if (it == messages_.end())
++            return false;
++        auto& m = it->second;
++        if (!m.borrowed || m.bad || !m.pickup || !IsObjectAlive(m.sender))
++        {
++            m.bad = true;
++            return false;
++        }
++        value = *m.pickup;
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/server_weapons.cpp b/src/game/server_weapons.cpp
+index 9f21b0d..f47f53c 100644
+--- a/src/game/server_weapons.cpp
++++ b/src/game/server_weapons.cpp
+@@ -71,7 +71,7 @@ namespace OpenBlood2
+         if (!m)
+             return DE_INVALIDPARAMS;
+         auto* attacker = objects_.get(value.attacker);
+-        if (m->id != damage_message || !m->bytes.empty() || m->damage || m->key || !attacker ||
++        if (m->id != damage_message || !m->bytes.empty() || m->damage || m->key || m->pickup || !attacker ||
+             attacker->life != Life::Alive || m->sender != value.attacker || !physics_vector(value.position) ||
+             !physics_vector(value.direction) || !std::isfinite(value.amount) || value.amount < 0 ||
+             value.amount > 1e6f ||
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 412abaf..0c0d559 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -259,3 +259,21 @@ foreach(case IN ITEMS properties gravity friction impulses pushing player riders
+     add_test(NAME pushables.${case} COMMAND pushable_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/pushable-fixtures/${case}")
+     set_tests_properties(pushables.${case} PROPERTIES LABELS "headless;pushables" TIMEOUT 30)
+ endforeach()
++
++add_executable(pickup_tests pickup_tests.cpp)
++target_link_libraries(pickup_tests PRIVATE blood2_game)
++blood2_project_options(pickup_tests)
++foreach(case IN ITEMS defaults ammunition statistics protocol contact spawning rejection callbacks resources)
++    add_test(NAME pickups.${case} COMMAND pickup_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/pickup-fixtures/${case}")
++    set_tests_properties(pickups.${case} PROPERTIES LABELS "headless;pickups" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME pickups.catalog COMMAND pickup_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(pickups.catalog PROPERTIES LABELS "headless;private;pickups" TIMEOUT 90)
++endif()
++
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.pickups COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --pickups-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/pickups.png")
++    set_tests_properties(gpu.pickups PROPERTIES LABELS "private;gpu;pickups" TIMEOUT 30 RUN_SERIAL TRUE)
++endif()
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index 6c418a7..1094abf 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -248,10 +248,10 @@ namespace
+         struct Count
+         {
+             unsigned created = 0, rejected = 0, filtered = 0, moved = 0, explosive = 0, detonated = 0, dynamic = 0,
+-                     blocked = 0;
++                     blocked = 0, spawned = 0;
+         };
+         std::map<std::string, Count> counts;
+-        std::map<std::string, unsigned> failures;
++        std::map<std::string, unsigned> failures, spawns;
+         unsigned unreadable = 0;
+         for (const auto& [path, resource] : g.resources.index())
+         {
+@@ -275,6 +275,8 @@ namespace
+                 Properties props;
+                 for (const auto& p : source.properties)
+                     props.emplace(p.name, p.value);
++                if (props.contains("SpawnObject") && !std::get<std::string>(props.at("SpawnObject")).empty())
++                    ++spawns[std::get<std::string>(props.at("SpawnObject"))];
+                 auto h = g.objects.create(g.objects.find_class(source.class_name), {}, Creation::World, props);
+                 auto* r = g.objects.get(h);
+                 auto& count = counts[source.class_name];
+@@ -351,6 +353,22 @@ namespace
+                         else
+                             CHECK(g.objects.remove(h));
+                     }
++                    else if (!brush.m_damage.spawn_object.empty())
++                    {
++                        CHECK(command(g, h, "KILL"));
++                        if (brush.m_damage.can_damage)
++                        {
++                            CHECK(!g.server.spawn_reports.empty());
++                            auto child = g.server.spawn_reports.back().child;
++                            CHECK(child && g.objects.get(child)->model);
++                            CHECK(g.objects.get(child)->velocity.x == brush.m_damage.spawn_velocity.x &&
++                                  g.objects.get(child)->velocity.y == brush.m_damage.spawn_velocity.y &&
++                                  g.objects.get(child)->velocity.z == brush.m_damage.spawn_velocity.z);
++                            ++count.spawned;
++                            CHECK(g.objects.remove(child));
++                        }
++                        CHECK(g.objects.remove(h));
++                    }
+                     else
+                         CHECK(g.objects.remove(h));
+                 }
+@@ -361,14 +379,16 @@ namespace
+         for (const auto& [name, c] : counts)
+             std::cout << name << " created=" << c.created << " rejected=" << c.rejected << " filtered=" << c.filtered
+                       << " moved=" << c.moved << " explosive=" << c.explosive << " detonated=" << c.detonated
+-                      << " dynamic=" << c.dynamic << " blocked=" << c.blocked << '\n';
++                      << " dynamic=" << c.dynamic << " blocked=" << c.blocked << " spawned=" << c.spawned << '\n';
++        for (const auto& [name, n] : spawns)
++            std::cout << "SpawnObject " << name << "=" << n << '\n';
+         for (const auto& [name, n] : failures)
+             std::cout << name << "=" << n << '\n';
+         CHECK(unreadable == 1 && counts["RotatingBrush"].created == 98 && counts["RotatingBrush"].rejected == 38 &&
+               counts["RotatingBrush"].moved == 98 && counts["RotatingBrush"].filtered == 0 &&
+-              counts["CDestructableBrush"].created == 2237 && counts["CDestructableBrush"].rejected == 218 &&
++              counts["CDestructableBrush"].created == 2295 && counts["CDestructableBrush"].rejected == 160 &&
+               counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 50 &&
+-              counts["CDestructableBrush"].detonated == 50);
++              counts["CDestructableBrush"].detonated == 50 && counts["CDestructableBrush"].spawned == 58);
+         CHECK(g.request_world("01_SubwayA", error));
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+diff --git a/tests/config_tests.cpp b/tests/config_tests.cpp
+index 989abfe..bfe16a9 100644
+--- a/tests/config_tests.cpp
++++ b/tests/config_tests.cpp
+@@ -47,6 +47,11 @@ namespace
+         CHECK(options.containers_smoke && options.player_smoke && options.world_smoke && options.world == "02_CityHub");
+         const std::array<std::string_view, 2> both_scenarios{"--containers-smoke", "--movement-smoke"};
+         CHECK(!parse_options(both_scenarios, options, error));
++        const std::array<std::string_view, 1> pickups{"--pickups-smoke"};
++        CHECK(parse_options(pickups, options, error) && options.pickups_smoke && options.player_smoke &&
++              options.world_smoke);
++        const std::array<std::string_view, 2> conflicting_pickups{"--pickups-smoke", "--brushes-smoke"};
++        CHECK(!parse_options(conflicting_pickups, options, error));
+         const std::array<std::string_view, 1> missing{"--data-dir"};
+         CHECK(!parse_options(missing, options, error));
+         const std::array<std::string_view, 1> unknown{"--typo"};
+diff --git a/tests/pickup_tests.cpp b/tests/pickup_tests.cpp
+new file mode 100644
+index 0000000..91548ed
+--- /dev/null
++++ b/tests/pickup_tests.cpp
+@@ -0,0 +1,422 @@
++#include "brush_fixture.h"
++#include "game/original/AmmoPickups.h"
++#include "game/original/DestructableBrush.h"
++#include "game/original/PowerupPickups.h"
++#include "game/original/spawn_object.h"
++#include "player_fixture.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    constexpr const char* names[] = {"BulletAmmoPU",    "ShellAmmoPU",    "BMGAmmoPU",  "FlareAmmoPU",
++                                     "DieBugDieAmmoPU", "HowitzerAmmoPU", "FuelAmmoPU", "BatteryAmmoPU",
++                                     "HealthPU",        "MegaHealthPU",   "WardPU",     "NecroWardPU"};
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .01f;
++    }
++    bool setup(GameSession& g, const std::filesystem::path& root, bool assets = true)
++    {
++        CHECK(test_player::setup(g, root, true, true, assets));
++        std::string error;
++        CHECK(g.enter_player(error));
++        return true;
++    }
++    CPlayerObj& player(GameSession& g)
++    {
++        return *g.server_shell.Player(g.local_client);
++    }
++    PickupObject* item(GameSession& g, HOBJECT h)
++    {
++        auto* r = g.objects.get(h);
++        return r ? dynamic_cast<PickupObject*>(r->game.get()) : nullptr;
++    }
++    HOBJECT create(GameSession& g, const char* name = "BulletAmmoPU", Properties props = {})
++    {
++        props.try_emplace("Pos", DVector{300, 100, 300});
++        return g.objects.create(g.objects.find_class(name), {}, Creation::World, props);
++    }
++    bool touch(GameSession& g, HOBJECT h)
++    {
++        return g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player);
++    }
++    bool defaults(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        const float amounts[] = {100, 20, 20, 20, 20, 5, 10, 40, 25, 100, 25, 100};
++        for (unsigned n = 0; n < 12; ++n)
++        {
++            auto h = create(g, names[n]);
++            CHECK(h);
++            auto* p = item(g, h);
++            auto* r = g.objects.get(h);
++            CHECK(p && p->value.type == (n < 8 ? n + 1 : n - 7) && p->value.amount == amounts[n]);
++            CHECK(p->value.kind == (n < 8 ? PickupKind::Ammo : PickupKind::Powerup));
++            CHECK(p->resource_id == int(n < 8 ? 317 + n : 309 + n - 8) && p->error.empty());
++            CHECK(r->model && r->model_error.empty() && r->dimensions.x >= 10 && r->dimensions.z >= r->dimensions.x);
++            CHECK(near(r->state.m_Pos.y, r->dimensions.y + .001f));
++            CHECK(r->state.m_Flags & FLAG_TOUCH_NOTIFY);
++            CHECK(p->rotate_fx == (n >= 8) && bool(r->user_flags & (1u << 4)) == (n >= 8));
++            CHECK(Objects::is_kind_of(r->type, g.objects.find_class("PickupObject")));
++        }
++        CHECK(AmmoPickup::m_dwNumPickups == 8);
++        CHECK(!create(g, "AmmoPickup") && !create(g, "HealthBase"));
++        CHECK(!g.objects.find_class("ManaAmmoPU") && !g.objects.find_class("RocketAmmoPU"));
++        CHECK(g.unload_world() && AmmoPickup::m_dwNumPickups == 0 && g.server.message_count() == 0);
++        return true;
++    }
++    bool ammunition(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto& inv = player(g).m_InventoryMgr;
++        for (unsigned t = 1; t <= 8; ++t)
++        {
++            auto h = create(g, names[t - 1]);
++            CHECK(h);
++            inv.SetAmmoCount(t, inv.MaxAmmo(t));
++            CHECK(touch(g, h) && !item(g, h)->picked_up);
++            inv.SetAmmoCount(t, inv.MaxAmmo(t) - 1);
++            CHECK(touch(g, h) && item(g, h)->picked_up);
++            CHECK(inv.GetAmmoCount(t) == inv.MaxAmmo(t) && !g.server.IsObjectAlive(h));
++            CHECK(g.objects.finish_frame() && !g.objects.get(h));
++        }
++        CHECK(g.server.pickup_reports.size() == 8 && AmmoPickup::m_dwNumPickups == 0);
++        CHECK(g.server.message_count() == 0);
++        CHECK(g.unload_world() && g.server.string_count() == 0);
++        return true;
++    }
++    bool statistics(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto& d = player(g).m_damage;
++        d.m_fMaxHitPoints = 100;
++        d.m_fMaxMegaHitPoints = 200;
++        d.m_fMaxArmorPoints = 100;
++        d.m_fMaxNecroArmorPoints = 200;
++        for (unsigned i = 0; i < 4; ++i)
++        {
++            auto& stat = i < 2 ? d.m_fHitPoints : d.m_fArmorPoints;
++            const float cap = i % 2 ? 200 : 100;
++            stat = cap;
++            auto h = create(g, names[8 + i]);
++            CHECK(h && touch(g, h) && !item(g, h)->picked_up);
++            stat = cap - 10;
++            CHECK(touch(g, h) && item(g, h)->picked_up && stat == cap);
++            CHECK(g.objects.finish_frame());
++        }
++        d.SetHitPoints(0);
++        d.m_bDead = true;
++        auto h = create(g, "MegaHealthPU");
++        CHECK(h && touch(g, h) && d.IsDead() && !item(g, h)->picked_up);
++        d.m_bDead = false;
++        player(g).m_bDead = true;
++        CHECK(touch(g, h) && !item(g, h)->picked_up);
++        d.SetHitPoints(10);
++        CHECK(!d.Heal(-1) && !d.MegaHeal(std::numeric_limits<float>::infinity()));
++        CHECK(!d.AddWard(std::numeric_limits<float>::quiet_NaN()) && !d.AddNecroWard(1e7f));
++        return true;
++    }
++    bool protocol(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto h = create(g);
++        CHECK(h);
++        auto* p = item(g, h);
++        auto ph = g.client_shell.player;
++        auto send = [&](DDWORD id, PickupMessage value)
++        {
++            auto m = g.server.StartMessageToObject(p, ph, id);
++            auto result = g.server.WritePickupMessage(m, value);
++            g.server.EndMessage(m);
++            return result;
++        };
++        const auto before = player(g).m_InventoryMgr.GetAmmoCount(1);
++        CHECK(send(add_ammo_message, {PickupKind::Ammo, 0, 10}) == DE_INVALIDPARAMS);
++        CHECK(send(add_ammo_message, {PickupKind::Ammo, 9, 10}) == DE_INVALIDPARAMS);
++        CHECK(send(add_ammo_message, {PickupKind::Powerup, 1, 10}) == DE_INVALIDPARAMS);
++        CHECK(send(add_ammo_message, {PickupKind::Ammo, 1, -1}) == DE_INVALIDPARAMS);
++        CHECK(send(add_ammo_message, {PickupKind::Ammo, 1, std::numeric_limits<float>::quiet_NaN()}) ==
++              DE_INVALIDPARAMS);
++        auto m = g.server.StartMessageToObject(p, ph, add_ammo_message);
++        CHECK(g.server.WritePickupMessage(m, p->value) == DE_OK);
++        CHECK(g.server.WriteToMessageDWord(m, 1) == DE_INVALIDPARAMS && g.server.EndMessage(m) != DE_OK);
++        m = g.server.StartMessageToObject(&player(g), h, picked_up_message);
++        CHECK(g.server.WritePickupMessage(m, p->value) == DE_OK && g.server.EndMessage(m) == DE_OK);
++        CHECK(!p->picked_up && player(g).m_InventoryMgr.GetAmmoCount(1) == before);
++        PickupMessage value;
++        CHECK(!g.server.ReadPickupMessage(m, value));
++        auto other = g.objects.create(g.objects.find_class("BaseClass"));
++        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, other) && !p->picked_up);
++        CHECK(g.server.message_count() == 0);
++        return true;
++    }
++    bool contact(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto h = create(g);
++        CHECK(h);
++        player(g).m_InventoryMgr.SetAmmoCount(1, 0);
++        auto pos = g.objects.get(h)->state.m_Pos;
++        CHECK(g.server.TeleportObject(g.client_shell.player, &pos) == DE_OK);
++        CHECK(g.step(.02)); // Actual MoveMgr integration dispatches sensor contact.
++        CHECK(player(g).m_InventoryMgr.GetAmmoCount(1) == 100 && !g.objects.get(h));
++        CHECK(g.server.pickup_reports.size() == 1 && g.server.pickup_reports[0].sound == "sounds\\powerups\\ammo1.wav");
++        return true;
++    }
++    HOBJECT brush(GameSession& g, std::string spawn = "BulletAmmoPU", Properties props = {})
++    {
++        const auto name = "crate" + std::to_string(g.world.models.size());
++        auto model = test_brush::box(name, {200, 40, 200}, {220, 60, 220});
++        model.translation = {210, 50, 210};
++        g.world.models.push_back(std::move(model));
++        props["Name"] = name;
++        props["SpawnObject"] = spawn;
++        props.try_emplace("HitPoints", 10.0f);
++        props.try_emplace("SpawnObjectVel", DVector{10, 100, 20});
++        return g.objects.create(g.objects.find_class("CDestructableBrush"), {}, Creation::World, props);
++    }
++    bool kill(GameSession& g, HOBJECT h)
++    {
++        auto msg = g.server.StartMessageToObject(g.server.HandleToObject(h), h, damage_message);
++        CHECK(msg && g.server.WriteDamage(msg, {{}, {}, 1, DamageType::Death, h}) == DE_OK);
++        CHECK(g.server.EndMessage(msg) == DE_OK);
++        return true;
++    }
++    bool spawning(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto h = brush(g, "BulletAmmoPU Name dropped; PickupTriggerTarget target; PickupTriggerMessage GET");
++        CHECK(h);
++        CHECK(kill(g, h) && g.server.spawn_reports.size() == 1);
++        auto child = g.server.spawn_reports.back().child;
++        CHECK(child && item(g, child));
++        auto* r = g.objects.get(child);
++        CHECK(std::string(r->state.m_Name) == "dropped");
++        CHECK(near(r->state.m_Pos.x, 210) && near(r->state.m_Pos.y, 50) && near(r->state.m_Pos.z, 210));
++        DVector velocity;
++        CHECK(g.server.GetVelocity(child, &velocity) == DE_OK && velocity.y == 100 && velocity.x == 10);
++        CHECK(kill(g, h) && g.server.spawn_reports.size() == 1);
++        CHECK(g.step(.1) && !g.objects.get(h) && g.server.IsObjectAlive(child));
++        CHECK(g.unload_world() && !g.objects.get(child) && g.server.spawn_reports.empty() &&
++              AmmoPickup::m_dwNumPickups == 0);
++        return true;
++    }
++    bool rejection(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        for (auto text : {"Spawner", "RocketAmmoPU", "MedKitPU", "AmmoPickup", "  ", "BulletAmmoPU Unknown 1",
++                          "BulletAmmoPU Name \"bad", "BulletAmmoPU Name a; Name b"})
++            CHECK(!g.server.ValidateSpawnObject(text) && !brush(g, text));
++        CHECK(!brush(g, "BulletAmmoPU", {{"SpawnObjectVel", DVector{1e8f, 0, 0}}}));
++        CHECK(g.server.ValidateSpawnObject("  bulletammopu Name okay"));
++        auto h = SpawnObject("HealthPU Pos 12 100 14", {200, 300, 400}, {}, {1, 2, 3});
++        CHECK(h);
++        CHECK(near(g.objects.get(h)->state.m_Pos.x, 12) && near(g.objects.get(h)->state.m_Pos.y, 100));
++        const auto ammo_count = AmmoPickup::m_dwNumPickups;
++        CHECK(!SpawnObject("BulletAmmoPU", {100, 100, 100}, {}, {1e8f, 0, 0}));
++        CHECK(g.objects.finish_frame() && AmmoPickup::m_dwNumPickups == ammo_count);
++        DRotation q{{0, .5f, 0}, .8660254f};
++        h = SpawnObject("WardPU", {123, 321, 456}, q, {});
++        CHECK(h);
++        CHECK(near(g.objects.get(h)->state.m_Rotation.m_Vec.y, .5f));
++        return true;
++    }
++    struct Probe : BaseClass
++    {
++        std::function<void()> callback;
++        unsigned hits = 0;
++        DDWORD ObjectMessageFn(HOBJECT, DDWORD id, HMESSAGEREAD) override
++        {
++            if (id == 1000)
++            {
++                ++hits;
++                if (callback)
++                    callback();
++            }
++            return 1;
++        }
++    };
++    Probe* probe(GameSession& g)
++    {
++        static ClassInfo type{"PickupProbe",
++                              nullptr,
++                              []() -> std::unique_ptr<BaseClass> { return std::make_unique<Probe>(); },
++                              {{"Name", std::string("target")}}};
++        if (!g.objects.find_class(type.name))
++            g.objects.register_class(type);
++        auto h = g.objects.create(&type);
++        return dynamic_cast<Probe*>(g.objects.get(h)->game.get());
++    }
++    bool callbacks(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* p = probe(g);
++        CHECK(p);
++        // This test class does not read BaseClass properties; give it the target name in the creation state.
++        auto* pr = g.objects.get(p->m_hObject);
++        SAFE_STRCPY(pr->state.m_Name, "target");
++        bool death_before_spawn = false, damage_after_spawn = false;
++        auto ordered = brush(g, "BulletAmmoPU",
++                             {{"DeathTriggerTarget", std::string("target")},
++                              {"DeathTriggerMessage", std::string("DEATH")},
++                              {"DamageTriggerTarget", std::string("target")},
++                              {"DamageTriggerMessage", std::string("HIT")}});
++        CHECK(ordered);
++        p->callback = [&]
++        {
++            if (p->hits == 1)
++                death_before_spawn = g.server.spawn_reports.empty();
++            if (p->hits == 2)
++                damage_after_spawn =
++                    g.server.spawn_reports.size() == 1 && g.server.IsObjectAlive(g.server.spawn_reports.back().child);
++        };
++        CHECK(kill(g, ordered) && death_before_spawn && damage_after_spawn);
++        CHECK(g.objects.remove(g.server.spawn_reports.back().child) && g.objects.remove(ordered) &&
++              g.objects.finish_frame());
++        g.server.spawn_reports.clear();
++        p->hits = 0;
++        auto h = brush(g, "BulletAmmoPU",
++                       {{"DeathTriggerTarget", std::string("target")}, {"DeathTriggerMessage", std::string("DEATH")}});
++        CHECK(h);
++        bool before = false;
++        p->callback = [&]
++        {
++            before = g.server.spawn_reports.empty();
++            g.objects.remove(h);
++        };
++        CHECK(kill(g, h) && before && p->hits == 1 && g.server.spawn_reports.size() == 1);
++        CHECK(!g.server.spawn_reports.back().child && g.server.spawn_reports.back().outcome.starts_with("Cancelled"));
++        CHECK(g.objects.finish_frame());
++        h = create(g, "BulletAmmoPU",
++                   {{"PickupTriggerTarget", std::string("target")}, {"PickupTriggerMessage", std::string("GET")}});
++        CHECK(h);
++        player(g).m_InventoryMgr.SetAmmoCount(1, 0);
++        p->callback = [&]
++        {
++            g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player);
++            g.objects.remove(h);
++        };
++        CHECK(touch(g, h) && p->hits == 2 && player(g).m_InventoryMgr.GetAmmoCount(1) == 100);
++        CHECK(g.objects.finish_frame() && !g.objects.get(h));
++        CHECK(g.server.message_count() == 0);
++        CHECK(g.unload_world() && g.server.string_count() == 0);
++        return true;
++    }
++    bool resources(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root, false));
++        auto h = create(g);
++        CHECK(h);
++        CHECK(!item(g, h)->error.empty() && !(g.objects.get(h)->state.m_Flags & FLAG_TOUCH_NOTIFY));
++        CHECK(touch(g, h) && !item(g, h)->picked_up);
++        for (unsigned i = 0; i < 35; ++i)
++        {
++            auto b = brush(g);
++            CHECK(b && kill(g, b));
++        }
++        CHECK(g.server.spawn_reports.size() == 32 && AmmoPickup::m_dwNumPickups == 36);
++        for (auto& report : g.server.spawn_reports)
++            CHECK(report.child && !g.objects.get(report.child)->model);
++        CHECK(g.unload_world() && AmmoPickup::m_dwNumPickups == 0);
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        std::string error;
++        CHECK(g.resources.mount_game(Config{root, "private"}, error));
++        std::map<std::string, unsigned> counts, failures;
++        unsigned worlds = 0, missing = 0, spawns = 0, created = 0;
++        for (const auto& [path, resource] : g.resources.index())
++        {
++            (void)resource;
++            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
++                continue;
++            std::vector<std::uint8_t> bytes;
++            CHECK(g.resources.read(path, bytes, error));
++            if (!read_world(bytes, g.world, error))
++            {
++                CHECK(path == "worlds/16_bridge.dat");
++                continue;
++            }
++            ++worlds;
++            for (const auto& source : g.world.objects)
++            {
++                auto type = g.objects.find_class(source.class_name);
++                if (!type || !Objects::is_kind_of(type, g.objects.find_class("PickupObject")))
++                    continue;
++                ++counts[source.class_name];
++                Properties props;
++                for (const auto& p : source.properties)
++                    props.emplace(p.name, p.value);
++                auto h = g.objects.create(type, {}, Creation::World, props);
++                if (!h)
++                    ++failures[g.objects.diagnostics().back()];
++                else
++                {
++                    ++created;
++                    missing += !g.objects.get(h)->model;
++                }
++                CHECK(g.objects.clear() && AmmoPickup::m_dwNumPickups == 0);
++            }
++            for (const auto& source : g.world.objects)
++                if (source.class_name == "CDestructableBrush" || source.class_name == "RotatingBrush")
++                    for (const auto& prop : source.properties)
++                        if (prop.name == "SpawnObject" && std::holds_alternative<std::string>(prop.value))
++                        {
++                            const auto& request = std::get<std::string>(prop.value);
++                            if (request.empty() || !g.server.ValidateSpawnObject(request))
++                                continue;
++                            auto h = SpawnObject(request, {100, 100, 100}, {}, {});
++                            CHECK(h && g.objects.get(h)->model);
++                            ++spawns;
++                            CHECK(g.objects.clear() && AmmoPickup::m_dwNumPickups == 0);
++                        }
++        }
++        for (auto& [n, c] : counts)
++            std::cout << n << "=" << c << '\n';
++        for (auto& [n, c] : failures)
++            std::cout << "rejected " << n << "=" << c << '\n';
++        std::cout << "worlds=" << worlds << " created=" << created << " missing=" << missing
++                  << " supported_spawns=" << spawns << '\n';
++        unsigned rejected = 0;
++        for (auto& [reason, n] : failures)
++        {
++            CHECK(reason.ends_with("invalid property TypeAction"));
++            rejected += n;
++        }
++        CHECK(worlds == 57 && created == 1258 && missing == 0 && rejected == 176 && spawns == 60);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests = {
++        {"defaults", defaults},   {"ammunition", ammunition}, {"statistics", statistics}, {"protocol", protocol},
++        {"contact", contact},     {"spawning", spawning},     {"rejection", rejection},   {"callbacks", callbacks},
++        {"resources", resources}, {"catalog", catalog}};
++    auto it = tests.find(argv[1]);
++    return it != tests.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/player_fixture.h b/tests/player_fixture.h
+index 5780541..4df0814 100644
+--- a/tests/player_fixture.h
++++ b/tests/player_fixture.h
+@@ -64,7 +64,7 @@ namespace test_player
+         return {offset, static_cast<unsigned>(records.b.size())};
+     }
+     inline bool setup(GameSession& game, const std::filesystem::path& root, bool with_start = true,
+-                      bool weapon_assets = true)
++                      bool weapon_assets = true, bool pickup_assets = false)
+     {
+         FIXTURE_CHECK(game.initialize());
+         Directory dir;
+@@ -76,6 +76,15 @@ namespace test_player
+         if (weapon_assets)
+             for (auto path : {"c_beretta_pv_t.dtx", "c_knife_pv_t.dtx"})
+                 dir.children["skins"].children["weapons"].files[path] = {1, 2, 3};
++        if (pickup_assets)
++            for (auto name :
++                 {"bulletammo_pu", "shellammo_pu", "bmgammo_pu", "flareammo_pu", "diebugdieammo_pu", "howitzerammo_pu",
++                  "fuelammo_pu", "batteryammo_pu", "health_pu", "megahealth_pu", "ward_pu", "necroward_pu"})
++            {
++                dir.children["models"].children["powerups"].files[std::string(name) + ".abc"] =
++                    test_model::abc(false, true).b;
++                dir.children["skins"].children["powerups"].files[std::string(name) + ".dtx"] = {1, 2, 3};
++            }
+         Writer w;
+         w.b.resize(168);
+         w.b[0] = w.b[62] = w.b[124] = 13;

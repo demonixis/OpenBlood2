@@ -1,0 +1,15 @@
+644/644 Testing: gideon_runtime.arena
+644/644 Test: gideon_runtime.arena
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_runtime_tests" "arena" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_runtime.arena" start time: Oct 17 04:04 CEST
+Output:
+----------------------------------------------------------
+Arena updates=122 attack=99 shots=1 state=0 error=
+<end of output>
+Test time =   1.31 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_runtime.arena" end time: Oct 17 04:04 CEST
+"gideon_runtime.arena" time elapsed: 00:00:01
+----------------------------------------------------------

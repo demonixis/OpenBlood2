@@ -1,0 +1,253 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "cbe97b7af9ea75cfd3693ec72ed1d8417fe9b835",
+  "status": "M2 incomplete; immediate MIDI channel receiver only, no timed transport or MUSIC",
+  "frozen_sources": {
+    "src/engine/dls_sampler.h": "f23a6c5098165af1828660b9273d2f0f82a487933eae12ec2a563668ce0406fe",
+    "src/engine/dls_sampler.cpp": "865780d987289830691864b486d39c84a5234f3b272d03e2fd7dcfd468623c85",
+    "src/app/inspector_world_sounds.cpp": "7c111e3e252f77671a1e96019ffdd29987ae0e7d5962d811a6ce845cf1e6471d",
+    "src/app/world_sound_smoke.cpp": "ccd5c443458b76b143f0161174d0ef920ce6f96350ae4e3da30d818198bc71ee",
+    "tests/dls_sampler_tests.cpp": "df89285fe7cbd11f6a4436e14735808bb2d9a665086016e6aa72fec2cf62eafa",
+    "tests/CMakeLists.txt": "c1fd4870c3c8f89ef5cc1879f10d9dc8041a81a6f517ce256aca91268bb2b02d"
+  },
+  "results": {
+    "debug-tests": {
+      "passed": 132,
+      "wall_seconds": 20.26
+    },
+    "release-tests": {
+      "passed": 132,
+      "wall_seconds": 1.87
+    },
+    "sanitize-tests": {
+      "passed": 132,
+      "wall_seconds": 82.68
+    },
+    "debug-gpu": {
+      "passed": 2,
+      "wall_seconds": 10.99
+    },
+    "release-gpu": {
+      "passed": 2,
+      "wall_seconds": 5.4
+    }
+  },
+  "unchanged_source_warnings": {
+    "debug": [],
+    "release": [
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:36:78: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]"
+    ],
+    "sanitize": [
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:36:78: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]"
+    ]
+  },
+  "original_probe": {
+    "binary": "MSynth25.dll",
+    "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+    "unicorn": "2.1.4",
+    "selection_cases": 146,
+    "fast_release_cases": 18,
+    "decisions_sha256": "8cc14cadf148829ed7a27615a0f447f18ab6f83088fe0262385f62b8a4426a90",
+    "scope": "Original newest-held note-off and self-nonexclusive same-key target selection. Selection stop routines intercepted; fast release integer cap executed with envelope evaluation intercepted. No full synth, PCM, transport or native DLL execution."
+  },
+  "commands": [
+    "python /tmp/b2-midi-receiver-validation.py {debug,release,sanitize} (three builds at -j1 each; relevant CTests at -j2)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/{debug,release} -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit /tmp/b2-midi-receiver-{debug,release}-gpu.xml",
+    "/tmp/b2-legacy-pan-tools/bin/python Documentation/Implementation/evidence/m2-midi-receiver-probe.py EXTERNAL_MSYNTH25_DLL",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror (five changed C++ files)",
+    "python /tmp/b2-npc-integrity.py; python /tmp/b2-npc-links.py; git diff --check (raw .log/.xml excluded)"
+  ],
+  "limitations": [
+    "Immediate receiver/sample boundary, no timed event queue, original playlists or MUSIC acceptance",
+    "Original note selection and fast release cap executed with stop/envelope calls intercepted; no full synth/retail PCM parity",
+    "NVIDIA Linux dummy SDL audio, hidden inspector and inspector-free Release; no native Metal/Windows/mobile or listening comparison",
+    "Capture reviewed for actual receiver counters; transient held-note UI controls not manually exercised",
+    "Initial GPU smoke incorrectly required replacement for an authored self-nonexclusive region; corrected test checks exact property and ordered overlap stops",
+    "Initial lifetime assertion retained its own bank-owning snapshot; corrected test releases it; an intermediate test-scope compile error was also fixed"
+  ],
+  "capture": {
+    "path": "Blood2/build/debug/tests/world-sounds.png",
+    "sha256": "7e0f1edf5d0b4797faaf67a809a5c68662fc558f51e17f0a4b81ac1a8aca20a6",
+    "committed": false
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "readme_preserved_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "files": [
+    {
+      "file": "m2-midi-receiver-probe.py",
+      "sha256": "1d4a0ab268dda8765464640b2d6ea5e96acce599aefab9aba9950d8a352bcfc4"
+    },
+    {
+      "file": "m2-midi-receiver-probe.json",
+      "sha256": "2edcb02b9a6c6f427e66b2dfb44d2387c9053a02d96bb0cafdd6d8fcf5e496b6"
+    },
+    {
+      "file": "m2-midi-receiver-probe-errors.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-midi-receiver-validation.py",
+      "sha256": "aeabb4af6f38261a96b1ed0ec3952495adcf29aa5295b1a26a86820e0ad1869b"
+    },
+    {
+      "file": "m2-midi-receiver-focus-build.log",
+      "sha256": "c99a7f5b04a5f3ff24dbb434430225091d7ce4154d33839255fa80e77ec4899f"
+    },
+    {
+      "file": "m2-midi-receiver-focus-finish-build.log",
+      "sha256": "beac0f50692de5c6713e68c923a21a8324c4d781ecc6adc27d035292b5c900c7"
+    },
+    {
+      "file": "m2-midi-receiver-focus-fix-build.log",
+      "sha256": "21daf0be20163bbf3c4c3228aac531ec8ab879fc91e87d5be5a11fdd5f1a3cb6"
+    },
+    {
+      "file": "m2-midi-receiver-focus-fix2-build.log",
+      "sha256": "dcc0ed3e6a9535a7a2a95df54974684c3cbd8d874d4646e2e1db038ff8440779"
+    },
+    {
+      "file": "m2-midi-receiver-focus.log",
+      "sha256": "bf3be00eecf67ebaf177a474a789a2cde46d0d23c6f1d83f56fb65241cafbde4"
+    },
+    {
+      "file": "m2-midi-receiver-focus.xml",
+      "sha256": "38858fd77ef6d71f9524289768c6eeec24773003127e65cbb6bc92c9494c54b1"
+    },
+    {
+      "file": "m2-midi-receiver-focus-fixed.log",
+      "sha256": "82e2b3a885f56882571196df9086eddd0512618fb63f7a541ef14707445c606e"
+    },
+    {
+      "file": "m2-midi-receiver-focus-fixed.xml",
+      "sha256": "e6b8fc46fdfac718e021af03f43e9acd4d5aeaa80610aa9e45f082e078dcbf16"
+    },
+    {
+      "file": "m2-midi-receiver-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-midi-receiver-debug-gpu-initial.log",
+      "sha256": "f67d3cdb3c1b884d1f99954ee34a5a6932ecac59250f1cc60039edda729ab6a1"
+    },
+    {
+      "file": "m2-midi-receiver-debug-gpu-initial.xml",
+      "sha256": "f04c163429545367bcd925a5159fdda28bb60fdd775b74b7f3792399c42b64d5"
+    },
+    {
+      "file": "m2-midi-receiver-debug-gpu-fix-build.log",
+      "sha256": "964039863677dc75059df05bb3f5299a242cc3508fc3f5ac3f664d4e07fc5318"
+    },
+    {
+      "file": "m2-midi-receiver-gdb.txt",
+      "sha256": "97da961d05b6375f40fdb1eb9c133a621942157dba7595e93cf15636b960374e"
+    },
+    {
+      "file": "m2-midi-receiver-gdb.log",
+      "sha256": "61a5c187d72218b3ab82dd704377e0df56df7303067258926d7f81eb5039a40f"
+    },
+    {
+      "file": "m2-midi-receiver-debug-tests.log",
+      "sha256": "ebe790cb1449d54a60c6587575d1ae2502e91f324c60867d19edfd7b54ef1416"
+    },
+    {
+      "file": "m2-midi-receiver-debug-tests.xml",
+      "sha256": "2e2178832d77e1ea6a23028f1ddc360c38fceba6ffef3783bcbddd6c3aa69e1a"
+    },
+    {
+      "file": "m2-midi-receiver-release-tests.log",
+      "sha256": "437119cade212978194b8f529de6ba8e97a7ac3420ca0af6bb9d297beb35567f"
+    },
+    {
+      "file": "m2-midi-receiver-release-tests.xml",
+      "sha256": "3c96240bcb67d8f24cd29fcadb96f3173650c08052eb7853d088e37b8ebdf3c8"
+    },
+    {
+      "file": "m2-midi-receiver-sanitize-tests.log",
+      "sha256": "688f97992ea8a3f7e1032c722e99995b3c3395a8c288f37ac90927750f6d73f3"
+    },
+    {
+      "file": "m2-midi-receiver-sanitize-tests.xml",
+      "sha256": "e04bfefbe053248e8b87605e6cf4030b1485a51f6d06b7c9e4f6eb11cb909b88"
+    },
+    {
+      "file": "m2-midi-receiver-debug-gpu.log",
+      "sha256": "a8d68d5f2b56e46804cfb64643e13cd99cc210442ef596644ddcd9f8454fd650"
+    },
+    {
+      "file": "m2-midi-receiver-debug-gpu.xml",
+      "sha256": "97a253146831846a2f48667f0916e82030db067f9ad30ae5d19a00be2255491c"
+    },
+    {
+      "file": "m2-midi-receiver-release-gpu.log",
+      "sha256": "c7f099eb8ef530eef386842c86dbbda4816c5eb1ea18bcd317c28ed21f7fbd54"
+    },
+    {
+      "file": "m2-midi-receiver-release-gpu.xml",
+      "sha256": "f3dd9cd368ae5e9215c5d5101eee66399f7c6be7ac7370313aeaa37b44bc829e"
+    },
+    {
+      "file": "m2-midi-receiver-debug-build-final.log",
+      "sha256": "1ffd7086ef21472b95e694c14b05d93dba353fff697f55dd80120612056abbc1"
+    },
+    {
+      "file": "m2-midi-receiver-release-build-final.log",
+      "sha256": "2d0a8a31b445712ede6cfe3933771e600e78cf0094149a8f54d5bf0b004c56ad"
+    },
+    {
+      "file": "m2-midi-receiver-sanitize-build-final.log",
+      "sha256": "8b20a87bc2d11089d8d80fefd93c53b7f78de8cfa8efa6a89be2d9078acee86c"
+    },
+    {
+      "file": "m2-midi-receiver-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-midi-receiver-links.log",
+      "sha256": "f18bc465000cec2c42459f8822fbbee9d416c5af0285dea5391cb4af0991809a"
+    }
+  ],
+  "implementation_commit": "f7f7c5a9a5b2441be48a8862152f266b9d640edd"
+}

@@ -1,0 +1,14 @@
+51/646 Testing: services.placement_service
+51/646 Test: services.placement_service
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "placement_service"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.placement_service" start time: Oct 17 04:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"services.placement_service" end time: Oct 17 04:30 CEST
+"services.placement_service" time elapsed: 00:00:00
+----------------------------------------------------------

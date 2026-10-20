@@ -1,0 +1,28 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 50: weapons.inventory
+1/9 Test #50: weapons.inventory ................   Passed    0.03 sec
+    Start 51: weapons.segments
+2/9 Test #51: weapons.segments .................   Passed    0.02 sec
+    Start 52: weapons.firing
+3/9 Test #52: weapons.firing ...................   Passed    0.02 sec
+    Start 53: weapons.melee
+4/9 Test #53: weapons.melee ....................   Passed    0.03 sec
+    Start 54: weapons.damage
+5/9 Test #54: weapons.damage ...................   Passed    0.02 sec
+    Start 55: weapons.animation
+6/9 Test #55: weapons.animation ................   Passed    0.05 sec
+    Start 56: weapons.lifetime
+7/9 Test #56: weapons.lifetime .................   Passed    0.02 sec
+    Start 57: weapons.rollback
+8/9 Test #57: weapons.rollback .................   Passed    0.02 sec
+    Start 58: weapons.private
+9/9 Test #58: weapons.private ..................   Passed    4.22 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Label Time Summary:
+headless    =   4.43 sec*proc (9 tests)
+private     =   4.22 sec*proc (1 test)
+weapons     =   4.43 sec*proc (9 tests)
+
+Total Test time (real) =   4.44 sec

@@ -1,0 +1,15 @@
+2/642 Testing: objects.nested_creation
+2/642 Test: objects.nested_creation
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "nested_creation"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.nested_creation" start time: Oct 17 03:43 CEST
+Output:
+----------------------------------------------------------
+PASS nested_creation
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.nested_creation" end time: Oct 17 03:43 CEST
+"objects.nested_creation" time elapsed: 00:00:00
+----------------------------------------------------------

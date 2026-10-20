@@ -1,0 +1,19 @@
+[0/2] Re-checking globbed directories...
+[1/179] Scanning <workspace>/Blood2/src/game/original/Corpse.cpp for CXX dependencies
+[2/179] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[3/19] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Corpse.cpp.o
+[4/19] Linking CXX static library libblood2_game.a
+[5/19] Linking CXX executable tests/ai_runtime_tests
+[6/19] Linking CXX executable tests/object_contract_tests
+[7/19] Linking CXX executable blood2
+[8/19] Linking CXX executable tests/ai_hit_tests
+[9/19] Linking CXX executable tests/weapon_drop_tests
+[10/19] Linking CXX executable tests/character_nodes_tests
+[11/19] Linking CXX executable tests/corpse_tests
+[12/19] Linking CXX executable tests/object_particle_tests
+[13/19] Linking CXX executable tests/flare_tests
+[14/19] Linking CXX executable tests/player_controls_tests
+[15/19] Linking CXX executable tests/shield_tests
+[16/19] Linking CXX executable tests/level_change_gpu_tests
+[17/19] Linking CXX executable tests/death_effect_tests
+[18/19] Linking CXX executable tests/death_effect_gpu_tests

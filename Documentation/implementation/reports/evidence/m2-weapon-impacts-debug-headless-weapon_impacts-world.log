@@ -1,0 +1,14 @@
+605/610 Testing: weapon_impacts.world
+605/610 Test: weapon_impacts.world
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_impact_tests" "world" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-impacts-world"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapon_impacts.world" start time: Oct 16 23:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_impacts.world" end time: Oct 16 23:30 CEST
+"weapon_impacts.world" time elapsed: 00:00:00
+----------------------------------------------------------

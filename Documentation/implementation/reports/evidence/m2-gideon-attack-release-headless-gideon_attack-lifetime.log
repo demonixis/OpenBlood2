@@ -1,0 +1,14 @@
+690/691 Testing: gideon_attack.lifetime
+690/691 Test: gideon_attack.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon_attack_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon-attack-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gideon_attack.lifetime" start time: Oct 17 03:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_attack.lifetime" end time: Oct 17 03:03 CEST
+"gideon_attack.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

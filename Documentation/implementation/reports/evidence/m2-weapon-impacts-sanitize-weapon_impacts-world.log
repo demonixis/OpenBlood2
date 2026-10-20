@@ -1,0 +1,14 @@
+564/569 Testing: weapon_impacts.world
+564/569 Test: weapon_impacts.world
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_impact_tests" "world" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-impacts-world"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_impacts.world" start time: Oct 16 23:27 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_impacts.world" end time: Oct 16 23:27 CEST
+"weapon_impacts.world" time elapsed: 00:00:00
+----------------------------------------------------------

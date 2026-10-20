@@ -1,0 +1,12 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 255: gpu.sprites
+1/1 Test #255: gpu.sprites ......................   Passed    3.83 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+gpu        =   3.83 sec*proc (1 test)
+private    =   3.83 sec*proc (1 test)
+sprites    =   3.83 sec*proc (1 test)
+
+Total Test time (real) =   3.83 sec

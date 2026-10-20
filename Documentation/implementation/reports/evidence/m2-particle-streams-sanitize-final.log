@@ -1,0 +1,24 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 749: particle_stream.private
+    Start 748: particle_stream.budgets
+1/7 Test #748: particle_stream.budgets ..........   Passed    0.13 sec
+    Start 747: particle_stream.session
+2/7 Test #747: particle_stream.session ..........   Passed    0.03 sec
+    Start 746: particle_stream.failures
+3/7 Test #746: particle_stream.failures .........   Passed    0.02 sec
+    Start 745: particle_stream.ramps
+4/7 Test #745: particle_stream.ramps ............   Passed    0.02 sec
+    Start 743: particle_stream.rules
+5/7 Test #743: particle_stream.rules ............   Passed    0.02 sec
+    Start 744: particle_stream.clocks
+6/7 Test #744: particle_stream.clocks ...........   Passed    0.02 sec
+7/7 Test #749: particle_stream.private ..........   Passed  155.03 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+headless           = 155.27 sec*proc (7 tests)
+particle_stream    = 155.27 sec*proc (7 tests)
+private            = 155.03 sec*proc (1 test)
+
+Total Test time (real) = 155.04 sec

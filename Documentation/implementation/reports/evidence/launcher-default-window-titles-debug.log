@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/tmp/blood2-launcher-default/window_check.py", line 27, in <module>
+    assert found, ('Window title not observed',title)
+           ^^^^^
+AssertionError: ('Window title not observed', 'OpenBlood 2 Launcher')

@@ -1,0 +1,23 @@
+204/205 Testing: lights.catalog
+204/205 Test: lights.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/light_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"lights.catalog" start time: Oct 16 00:19 CEST
+Output:
+----------------------------------------------------------
+worlds=57 lights=72 initially_off=2 filtered=0
+ClientLightFX=16
+Flicker3WaveLightFX=1
+Flicker4WaveLightFX=3
+FlickerLight=9
+GlowingLight=42
+StrobeWaveLightFX=1
+Subway cycle=0 targets=12 radius=200->200 color=0.858121->0.858121 moved=1
+Subway cycle=1 targets=12 radius=200->200 color=0.858121->0.858121 moved=1
+<end of output>
+Test time =   6.76 sec
+----------------------------------------------------------
+Test Passed.
+"lights.catalog" end time: Oct 16 00:19 CEST
+"lights.catalog" time elapsed: 00:00:06
+----------------------------------------------------------

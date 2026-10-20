@@ -1,0 +1,188 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start   1: objects.original_objects
+ 1/85 Test   #1: objects.original_objects .........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+ 2/85 Test   #2: objects.nested_creation ..........   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+ 3/85 Test   #3: objects.reasons_properties .......   Passed    0.02 sec
+      Start   4: objects.scheduling
+ 4/85 Test   #4: objects.scheduling ...............   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+ 5/85 Test   #5: objects.deferred_removal .........   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+ 6/85 Test   #6: objects.aggregate_dispatch .......   Passed    0.01 sec
+      Start   7: objects.handles_selection
+ 7/85 Test   #7: objects.handles_selection ........   Passed    0.02 sec
+      Start   8: objects.links_lists
+ 8/85 Test   #8: objects.links_lists ..............   Passed    0.02 sec
+      Start   9: objects.messages_strings
+ 9/85 Test   #9: objects.messages_strings .........   Passed    0.03 sec
+      Start  10: objects.unsupported_teardown
+10/85 Test  #10: objects.unsupported_teardown .....   Passed    0.04 sec
+      Start  11: objects.creation_failures
+11/85 Test  #11: objects.creation_failures ........   Passed    0.03 sec
+      Start  38: services.model_reader
+12/85 Test  #38: services.model_reader ............   Passed    0.02 sec
+      Start  39: services.model_rejection
+13/85 Test  #39: services.model_rejection .........   Passed    0.30 sec
+      Start  40: services.animation_events
+14/85 Test  #40: services.animation_events ........   Passed    0.02 sec
+      Start  41: services.model_callbacks
+15/85 Test  #41: services.model_callbacks .........   Passed    0.02 sec
+      Start  42: services.collision_queries
+16/85 Test  #42: services.collision_queries .......   Passed    0.01 sec
+      Start  43: services.movement_contacts
+17/85 Test  #43: services.movement_contacts .......   Passed    0.02 sec
+      Start  44: services.original_services
+18/85 Test  #44: services.original_services .......   Passed    0.02 sec
+      Start  45: services.private
+19/85 Test  #45: services.private .................   Passed   10.03 sec
+      Start  46: player.handles
+20/85 Test  #46: player.handles ...................   Passed    0.03 sec
+      Start  47: player.lifecycle
+21/85 Test  #47: player.lifecycle .................   Passed    0.04 sec
+      Start  48: player.rollback
+22/85 Test  #48: player.rollback ..................   Passed    0.04 sec
+      Start  49: player.messages
+23/85 Test  #49: player.messages ..................   Passed    0.04 sec
+      Start  50: player.callbacks
+24/85 Test  #50: player.callbacks .................   Passed    0.04 sec
+      Start  51: player.private
+25/85 Test  #51: player.private ...................   Passed   10.42 sec
+      Start  52: weapons.inventory
+26/85 Test  #52: weapons.inventory ................   Passed    0.04 sec
+      Start  53: weapons.segments
+27/85 Test  #53: weapons.segments .................   Passed    0.03 sec
+      Start  54: weapons.firing
+28/85 Test  #54: weapons.firing ...................   Passed    0.03 sec
+      Start  55: weapons.melee
+29/85 Test  #55: weapons.melee ....................   Passed    0.04 sec
+      Start  56: weapons.damage
+30/85 Test  #56: weapons.damage ...................   Passed    0.03 sec
+      Start  57: weapons.animation
+31/85 Test  #57: weapons.animation ................   Passed    0.26 sec
+      Start  58: weapons.lifetime
+32/85 Test  #58: weapons.lifetime .................   Passed    0.06 sec
+      Start  59: weapons.rollback
+33/85 Test  #59: weapons.rollback .................   Passed    0.04 sec
+      Start  60: weapons.private
+34/85 Test  #60: weapons.private ..................   Passed  146.89 sec
+      Start 149: pickups.defaults
+35/85 Test #149: pickups.defaults .................   Passed    0.10 sec
+      Start 150: pickups.ammunition
+36/85 Test #150: pickups.ammunition ...............   Passed    0.09 sec
+      Start 151: pickups.statistics
+37/85 Test #151: pickups.statistics ...............   Passed    0.08 sec
+      Start 152: pickups.protocol
+38/85 Test #152: pickups.protocol .................   Passed    0.07 sec
+      Start 153: pickups.contact
+39/85 Test #153: pickups.contact ..................   Passed    0.07 sec
+      Start 154: pickups.spawning
+40/85 Test #154: pickups.spawning .................   Passed    0.07 sec
+      Start 155: pickups.rejection
+41/85 Test #155: pickups.rejection ................   Passed    0.08 sec
+      Start 156: pickups.callbacks
+42/85 Test #156: pickups.callbacks ................   Passed    0.07 sec
+      Start 157: pickups.resources
+43/85 Test #157: pickups.resources ................   Passed    0.08 sec
+      Start 158: pickups.catalog
+44/85 Test #158: pickups.catalog ..................   Passed   15.02 sec
+      Start 293: attachments.root
+45/85 Test #293: attachments.root .................   Passed    0.02 sec
+      Start 294: attachments.nodes
+46/85 Test #294: attachments.nodes ................   Passed    0.02 sec
+      Start 295: attachments.rejects
+47/85 Test #295: attachments.rejects ..............   Passed    0.38 sec
+      Start 296: attachments.lifetime
+48/85 Test #296: attachments.lifetime .............   Passed    0.02 sec
+      Start 297: attachments.held
+49/85 Test #297: attachments.held .................   Passed    0.05 sec
+      Start 298: attachments.missing
+50/85 Test #298: attachments.missing ..............   Passed    0.04 sec
+      Start 299: attachments.catalog
+51/85 Test #299: attachments.catalog ..............   Passed    1.08 sec
+      Start 300: attachments.subway
+52/85 Test #300: attachments.subway ...............   Passed    4.13 sec
+      Start 432: ai_runtime.activation
+53/85 Test #432: ai_runtime.activation ............   Passed    0.02 sec
+      Start 433: ai_runtime.visibility
+54/85 Test #433: ai_runtime.visibility ............   Passed    0.02 sec
+      Start 434: ai_runtime.lifetime
+55/85 Test #434: ai_runtime.lifetime ..............   Passed    0.02 sec
+      Start 435: ai_runtime.targets
+56/85 Test #435: ai_runtime.targets ...............   Passed    0.02 sec
+      Start 436: ai_runtime.tracking
+57/85 Test #436: ai_runtime.tracking ..............   Passed    0.02 sec
+      Start 437: ai_runtime.camera
+58/85 Test #437: ai_runtime.camera ................   Passed    0.02 sec
+      Start 438: ai_runtime.spatial
+59/85 Test #438: ai_runtime.spatial ...............   Passed    0.02 sec
+      Start 439: ai_runtime.triggers
+60/85 Test #439: ai_runtime.triggers ..............   Passed    0.02 sec
+      Start 440: ai_runtime.body
+61/85 Test #440: ai_runtime.body ..................   Passed    0.02 sec
+      Start 441: ai_runtime.missing
+62/85 Test #441: ai_runtime.missing ...............   Passed    0.02 sec
+      Start 442: ai_runtime.catalog
+63/85 Test #442: ai_runtime.catalog ...............   Passed    2.37 sec
+      Start 443: ai_runtime.failures
+64/85 Test #443: ai_runtime.failures ..............   Passed    0.29 sec
+      Start 444: ai_runtime.subway
+65/85 Test #444: ai_runtime.subway ................   Passed   26.45 sec
+      Start 445: ai_runtime.arena
+66/85 Test #445: ai_runtime.arena .................   Passed    1.56 sec
+      Start 446: ai_hit.geometry
+67/85 Test #446: ai_hit.geometry ..................   Passed    0.03 sec
+      Start 447: ai_hit.query
+68/85 Test #447: ai_hit.query .....................   Passed    0.02 sec
+      Start 448: ai_hit.modifiers
+69/85 Test #448: ai_hit.modifiers .................   Passed    0.02 sec
+      Start 449: ai_hit.reactions
+70/85 Test #449: ai_hit.reactions .................   Passed    0.02 sec
+      Start 450: ai_hit.recoil
+71/85 Test #450: ai_hit.recoil ....................   Passed    0.02 sec
+      Start 451: ai_hit.guards
+72/85 Test #451: ai_hit.guards ....................   Passed    0.02 sec
+      Start 452: ai_hit.sides
+73/85 Test #452: ai_hit.sides .....................   Passed    0.02 sec
+      Start 453: ai_hit.lifetime
+74/85 Test #453: ai_hit.lifetime ..................   Passed    0.02 sec
+      Start 454: ai_hit.catalog
+75/85 Test #454: ai_hit.catalog ...................   Passed    0.81 sec
+      Start 455: weapon_drops.collect
+76/85 Test #455: weapon_drops.collect .............   Passed    0.04 sec
+      Start 456: weapon_drops.protocol
+77/85 Test #456: weapon_drops.protocol ............   Passed    0.04 sec
+      Start 457: weapon_drops.drop
+78/85 Test #457: weapon_drops.drop ................   Passed    0.04 sec
+      Start 458: weapon_drops.falling
+79/85 Test #458: weapon_drops.falling .............   Passed    0.04 sec
+      Start 459: weapon_drops.guards
+80/85 Test #459: weapon_drops.guards ..............   Passed    0.04 sec
+      Start 460: weapon_drops.failures
+81/85 Test #460: weapon_drops.failures ............   Passed    0.04 sec
+      Start 461: weapon_drops.nosliding
+82/85 Test #461: weapon_drops.nosliding ...........   Passed    0.04 sec
+      Start 462: weapon_drops.callback
+83/85 Test #462: weapon_drops.callback ............   Passed    0.04 sec
+      Start 463: weapon_drops.missing_pickup
+84/85 Test #463: weapon_drops.missing_pickup ......   Passed    0.04 sec
+      Start 464: weapon_drops.catalog
+85/85 Test #464: weapon_drops.catalog .............   Passed    0.51 sec
+
+100% tests passed, 0 tests failed out of 85
+
+Label Time Summary:
+ai_hit          =   0.97 sec*proc (9 tests)
+ai_runtime      =  30.86 sec*proc (14 tests)
+attachments     =   5.75 sec*proc (8 tests)
+headless        = 222.84 sec*proc (85 tests)
+objects         =   0.23 sec*proc (11 tests)
+pickups         =  15.73 sec*proc (10 tests)
+player          =  10.61 sec*proc (6 tests)
+private         = 219.56 sec*proc (12 tests)
+services        =  10.42 sec*proc (8 tests)
+weapon_drops    =   0.86 sec*proc (10 tests)
+weapons         = 147.42 sec*proc (9 tests)
+
+Total Test time (real) = 222.86 sec

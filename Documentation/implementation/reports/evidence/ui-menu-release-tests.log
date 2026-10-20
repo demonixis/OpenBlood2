@@ -1,0 +1,107 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start   22: config.arguments
+ 1/45 Test   #22: config.arguments ...................   Passed    0.00 sec
+      Start   23: config.precedence
+ 2/45 Test   #23: config.precedence ..................   Passed    0.00 sec
+      Start   24: config.relative_paths
+ 3/45 Test   #24: config.relative_paths ..............   Passed    0.00 sec
+      Start   25: config.invalid_config
+ 4/45 Test   #25: config.invalid_config ..............   Passed    0.00 sec
+      Start   26: config.content_validation
+ 5/45 Test   #26: config.content_validation ..........   Passed    0.00 sec
+      Start   27: config.case_lookup
+ 6/45 Test   #27: config.case_lookup .................   Passed    0.00 sec
+      Start   35: world.session_start
+ 7/45 Test   #35: world.session_start ................   Passed    0.01 sec
+      Start   36: world.level_change
+ 8/45 Test   #36: world.level_change .................   Passed    0.01 sec
+      Start   54: world.session_start_private
+ 9/45 Test   #54: world.session_start_private ........   Passed    0.91 sec
+      Start   55: world.level_change_private
+10/45 Test   #55: world.level_change_private .........   Passed    0.63 sec
+      Start  613: player_restore.roundtrip
+11/45 Test  #613: player_restore.roundtrip ...........   Passed    0.00 sec
+      Start  614: player_restore.failures
+12/45 Test  #614: player_restore.failures ............   Passed    0.00 sec
+      Start  615: player_restore.lifetime
+13/45 Test  #615: player_restore.lifetime ............   Passed    0.00 sec
+      Start  616: player_restore.private
+14/45 Test  #616: player_restore.private .............   Passed    0.18 sec
+      Start  696: player_controls.keys
+15/45 Test  #696: player_controls.keys ...............   Passed    0.00 sec
+      Start  697: player_controls.mouse
+16/45 Test  #697: player_controls.mouse ..............   Passed    0.00 sec
+      Start  698: player_controls.gates
+17/45 Test  #698: player_controls.gates ..............   Passed    0.00 sec
+      Start  699: player_controls.entry
+18/45 Test  #699: player_controls.entry ..............   Passed    0.00 sec
+      Start  700: player_controls.combat
+19/45 Test  #700: player_controls.combat .............   Passed    1.61 sec
+      Start  701: player_controls.corpse_clearance
+20/45 Test  #701: player_controls.corpse_clearance ...   Passed    2.38 sec
+      Start  702: player_controls.private
+21/45 Test  #702: player_controls.private ............   Passed    0.61 sec
+      Start  948: hud.bitmaps
+22/45 Test  #948: hud.bitmaps ........................   Passed    0.00 sec
+      Start  949: hud.values
+23/45 Test  #949: hud.values .........................   Passed    0.00 sec
+      Start  950: hud.input
+24/45 Test  #950: hud.input ..........................   Passed    0.00 sec
+      Start  951: hud.session
+25/45 Test  #951: hud.session ........................   Passed    0.00 sec
+      Start  952: hud.private
+26/45 Test  #952: hud.private ........................   Passed    0.18 sec
+      Start 1000: dls_sampler.pcm
+27/45 Test #1000: dls_sampler.pcm ....................   Passed    0.00 sec
+      Start 1001: dls_sampler.envelopes
+28/45 Test #1001: dls_sampler.envelopes ..............   Passed    0.00 sec
+      Start 1002: dls_sampler.lifetime
+29/45 Test #1002: dls_sampler.lifetime ...............   Passed    0.01 sec
+      Start 1003: dls_sampler.legacy_pan
+30/45 Test #1003: dls_sampler.legacy_pan .............   Passed    0.00 sec
+      Start 1004: dls_sampler.routing
+31/45 Test #1004: dls_sampler.routing ................   Passed    0.00 sec
+      Start 1005: dls_sampler.controllers
+32/45 Test #1005: dls_sampler.controllers ............   Passed    0.00 sec
+      Start 1006: dls_sampler.private
+33/45 Test #1006: dls_sampler.private ................   Passed    0.14 sec
+      Start 1063: dls_sampler.live_controls
+34/45 Test #1063: dls_sampler.live_controls ..........   Passed    0.00 sec
+      Start 1064: dls_sampler.bend_reference
+35/45 Test #1064: dls_sampler.bend_reference .........   Passed    0.00 sec
+      Start 1065: dls_sampler.live_private
+36/45 Test #1065: dls_sampler.live_private ...........   Passed    0.15 sec
+      Start 1066: dls_sampler.midi_receiver
+37/45 Test #1066: dls_sampler.midi_receiver ..........   Passed    0.01 sec
+      Start 1067: dls_sampler.midi_limits
+38/45 Test #1067: dls_sampler.midi_limits ............   Passed    0.00 sec
+      Start 1068: dls_sampler.midi_private
+39/45 Test #1068: dls_sampler.midi_private ...........   Passed    0.09 sec
+      Start 1094: dls_sampler.scalar_equivalence
+40/45 Test #1094: dls_sampler.scalar_equivalence .....   Passed    0.02 sec
+      Start 1095: menus.state
+41/45 Test #1095: menus.state ........................   Passed    0.00 sec
+      Start 1096: menus.artwork
+42/45 Test #1096: menus.artwork ......................   Passed    0.04 sec
+      Start 1098: menus.session
+43/45 Test #1098: menus.session ......................   Passed    0.23 sec
+      Start 1099: menus.profiles
+44/45 Test #1099: menus.profiles .....................   Passed    2.38 sec
+      Start 1100: menus.preferences
+45/45 Test #1100: menus.preferences ..................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 45
+
+Label Time Summary:
+audio              =   0.30 sec*proc (11 tests)
+config             =   0.01 sec*proc (6 tests)
+headless           =   9.67 sec*proc (45 tests)
+hud                =   0.19 sec*proc (5 tests)
+menus              =   2.66 sec*proc (5 tests)
+music_assets       =   0.45 sec*proc (14 tests)
+player_controls    =   4.61 sec*proc (7 tests)
+player_restore     =   0.20 sec*proc (4 tests)
+private            =   9.54 sec*proc (13 tests)
+world              =   1.56 sec*proc (4 tests)
+
+Total Test time (real) =   9.70 sec

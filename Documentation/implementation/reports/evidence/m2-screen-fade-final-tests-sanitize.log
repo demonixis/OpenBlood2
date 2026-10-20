@@ -1,0 +1,63 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 586: explosion_rings.private
+      Start 844: screen_fade.private
+      Start 559: player_restore.private
+ 1/25 Test #559: player_restore.private ...........   Passed    6.28 sec
+      Start 843: screen_fade.session
+ 2/25 Test #843: screen_fade.session ..............   Passed    0.06 sec
+      Start 557: player_restore.failures
+ 3/25 Test #557: player_restore.failures ..........   Passed    0.09 sec
+      Start 558: player_restore.lifetime
+ 4/25 Test #558: player_restore.lifetime ..........   Passed    0.08 sec
+      Start 842: screen_fade.values
+ 5/25 Test #842: screen_fade.values ...............   Passed    0.01 sec
+      Start 585: explosion_rings.session
+ 6/25 Test #585: explosion_rings.session ..........   Passed    0.03 sec
+      Start 584: explosion_rings.failures
+ 7/25 Test #584: explosion_rings.failures .........   Passed    0.03 sec
+      Start 581: explosion_rings.motion
+ 8/25 Test #581: explosion_rings.motion ...........   Passed    0.02 sec
+      Start 556: player_restore.roundtrip
+ 9/25 Test #556: player_restore.roundtrip .........   Passed    0.05 sec
+      Start 582: explosion_rings.lifecycle
+10/25 Test #582: explosion_rings.lifecycle ........   Passed    0.02 sec
+      Start 583: explosion_rings.recipes
+11/25 Test #583: explosion_rings.recipes ..........   Passed    0.02 sec
+      Start   1: objects.builtin_model
+12/25 Test   #1: objects.builtin_model ............   Passed    0.02 sec
+      Start  11: objects.unsupported_teardown
+13/25 Test  #11: objects.unsupported_teardown .....   Passed    0.05 sec
+      Start  10: objects.messages_strings
+14/25 Test  #10: objects.messages_strings .........   Passed    0.04 sec
+      Start  12: objects.creation_failures
+15/25 Test  #12: objects.creation_failures ........   Passed    0.03 sec
+      Start   4: objects.reasons_properties
+16/25 Test   #4: objects.reasons_properties .......   Passed    0.02 sec
+      Start   2: objects.original_objects
+17/25 Test   #2: objects.original_objects .........   Passed    0.02 sec
+      Start   9: objects.links_lists
+18/25 Test   #9: objects.links_lists ..............   Passed    0.02 sec
+      Start   8: objects.handles_selection
+19/25 Test   #8: objects.handles_selection ........   Passed    0.02 sec
+      Start   6: objects.deferred_removal
+20/25 Test   #6: objects.deferred_removal .........   Passed    0.02 sec
+      Start   3: objects.nested_creation
+21/25 Test   #3: objects.nested_creation ..........   Passed    0.02 sec
+      Start   5: objects.scheduling
+22/25 Test   #5: objects.scheduling ...............   Passed    0.02 sec
+      Start   7: objects.aggregate_dispatch
+23/25 Test   #7: objects.aggregate_dispatch .......   Passed    0.02 sec
+24/25 Test #586: explosion_rings.private ..........   Passed   15.84 sec
+25/25 Test #844: screen_fade.private ..............   Passed  134.11 sec
+
+100% tests passed, 0 tests failed out of 25
+
+Label Time Summary:
+explosion_rings    =  15.94 sec*proc (6 tests)
+headless           = 156.92 sec*proc (25 tests)
+objects            =   0.29 sec*proc (12 tests)
+player_restore     =   6.50 sec*proc (4 tests)
+private            = 156.24 sec*proc (3 tests)
+screen_fade        = 134.19 sec*proc (3 tests)
+
+Total Test time (real) = 134.13 sec

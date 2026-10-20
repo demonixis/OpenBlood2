@@ -1,0 +1,566 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 90a8069..3829511 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -1,8 +1,6 @@
+ # Blood2 Project Instructions
+ 
+-Implementation notes below are chronological snapshots: later linked evidence
+-supersedes older missing-service statements. The current continuous SubwayA route
+-reaches CityHub; consolidated M2 acceptance is still incomplete.
++The [final M2 review](../Documentation/Implementation/m2_acceptance.md) consolidates the selected SubwayA-to-CityHub criteria. No progression blocker is reproduced in that scope; formal closure remains open for the independently reproduced NVIDIA/D-Bus GPU LeakSanitizer failure. Do not expand M2 into unrelated campaign features to address this platform failure. Graphics optimization is assigned to another computer; preserve the stack until the user reports a push. Historical notes below retain their original scope.
+ 
+ Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentation/Roadmap/readme.md).
+ 
+diff --git a/README.md b/README.md
+index a3e16f8..f5df5a2 100644
+--- a/README.md
++++ b/README.md
+@@ -10,7 +10,7 @@ code and a new, small, portable C++20 engine. The stack uses CMake, pinned SDL3
+ | --- | ---: |
+ | M0 | 100% |
+ | M1 | 100% |
+-| M2 | ~85% |
++| M2 | ~99% |
+ | M3 | ~60% |
+ | M4 | ~35% |
+ | M5 | ~10% |
+@@ -19,8 +19,9 @@ code and a new, small, portable C++20 engine. The stack uses CMake, pinned SDL3
+ | M8 | 0% |
+ 
+ The percentages above are rough task estimates, not milestone acceptance.
+-M0/M1 are complete for their documented Linux scope; **M2 remains in progress**.
+-A continuous SubwayA combat route and transition into CityHub are tested.
++M0/M1 are complete for their documented Linux scope. The [M2 acceptance review](docs/contracts/m2_acceptance_contracts.md)
++validates the selected SubwayA-to-CityHub session; **M2 remains open for the external
++NVIDIA/D-Bus GPU sanitizer failure**. This is separate from game progression.
+ Linux/NVIDIA is tested; macOS/Metal works according to user testing. The full game,
+ other platforms and later milestones remain incomplete.
+ 
+diff --git a/docs/contracts/blood_spurt_contracts.md b/docs/contracts/blood_spurt_contracts.md
+index 08c1d00..3e42938 100644
+--- a/docs/contracts/blood_spurt_contracts.md
++++ b/docs/contracts/blood_spurt_contracts.md
+@@ -77,3 +77,5 @@ commented out in original corpse/player/living-AI code stay disabled. This
+ continuation does not enable living-NPC limb loss or add collision to cosmetic FX.
+ 
+ The [original impact sparks](spark_contracts.md) continuation supersedes the flesh/metal spark omission only. Underwater bubbles, generic recipes and remaining M2 services stay unavailable.
++
++The [M2 acceptance review](m2_acceptance_contracts.md) adds the exact requested impact-sound path to live/expired inspection, checks the original absent-zero asset explicitly, and keeps unrelated failures rejecting the route.
+diff --git a/docs/contracts/readme.md b/docs/contracts/readme.md
+index fad24d8..53696e5 100644
+--- a/docs/contracts/readme.md
++++ b/docs/contracts/readme.md
+@@ -1,5 +1,7 @@
+ # Service contracts
+ 
++The [selected M2 acceptance contract](m2_acceptance_contracts.md) defines the current review scope, negative controls and separation of game failures from GPU platform qualification.
++
+ Use these references before changing a subsystem. They describe original rules,
+ replacement engine behavior, ownership and explicit limitations. Earlier
+ increment snapshots can be superseded by later linked evidence; an old omission
+diff --git a/docs/contracts/service_coverage_contracts.md b/docs/contracts/service_coverage_contracts.md
+index bd188b1..57aec0b 100644
+--- a/docs/contracts/service_coverage_contracts.md
++++ b/docs/contracts/service_coverage_contracts.md
+@@ -75,3 +75,5 @@ trigger, AI action, client service or future resource request. M2 remains open
+ until the complete selected-slice acceptance review passes.
+ 
+ The [session-cost continuation](session_cost_contracts.md) removes redundant work while preserving these ownership, timing and inspection rules.
++
++The [final M2 review](m2_acceptance_contracts.md) now consolidates this trace with continuous combat, startup, malformed-resource, callback and lifetime evidence. Its platform qualification remains open; the review itself is no longer pending.
+diff --git a/docs/contracts/weapon_audio_contracts.md b/docs/contracts/weapon_audio_contracts.md
+index af1d324..c806742 100644
+--- a/docs/contracts/weapon_audio_contracts.md
++++ b/docs/contracts/weapon_audio_contracts.md
+@@ -70,3 +70,5 @@ as gameplay through an active cinematic. Required world services, Gideon, safe
+ NEW_LEVEL and actual M2 acceptance remain open.
+ 
+ The [shield continuation](shield_weapon_contracts.md) reuses retained original WAV/hearing for both modes. Its visual-only FireVector has no damage ray or collision preflight; armor remains a separate boss action. All checked hearing/voice lifetime rules remain in force.
++
++The [final M2 review](m2_acceptance_contracts.md) confirms that the selected Beretta/knife view assets contain only FIRE_KEY events. Original OnModelKey still actively sends CMSG_WEAPON_SOUND for SOUND_KEY; only its direct local playback is commented out. Indexed-only key references do not implement that message path. Treat it as unimplemented for other view assets, not as redundant fire playback or a source no-op.
+diff --git a/docs/implementation/provenance.md b/docs/implementation/provenance.md
+index 4c19aff..e48d839 100644
+--- a/docs/implementation/provenance.md
++++ b/docs/implementation/provenance.md
+@@ -1396,3 +1396,5 @@ The original ClientShellDLL/Music.cpp request matrix is adapted into a pure sele
+ - [Original MUSIC messages](sources/m2_music_message_sources.json): selected server parsing, player dispatch and client level/lifetime rules, connected to a bounded replacement transport. See [contracts](../contracts/music_message_contracts.md); no retail tail/activation/variation parity is claimed.
+ 
+ The [session-cost audit](../../../Documentation/Implementation/m2_session_cost.md) removes temporary trace-name allocations and zero-depth audio modulation work. Read [contracts](../contracts/session_cost_contracts.md); preserve owned counters, exact scalar PCM/cursor progression and all existing session/test deadlines. The full M2 acceptance review and runtime-start guard remain open.
++
++The [M2 acceptance review](../../../Documentation/Implementation/m2_acceptance.md) changes no original rule or import. It retains the exact blood-impact sound request in inspection and strengthens the selected route audit; see [source ledger](sources/m2_acceptance_sources.json).
+diff --git a/docs/implementation/readme.md b/docs/implementation/readme.md
+index e2c84e9..8329194 100644
+--- a/docs/implementation/readme.md
++++ b/docs/implementation/readme.md
+@@ -1,5 +1,7 @@
+ # Implementation records
+ 
++Current decision and criterion matrix: [M2 acceptance review](../../../Documentation/Implementation/m2_acceptance.md). Functional checks and the open external GPU sanitizer result are distinct.
++
+ This directory holds work-in-progress history and source evidence. Start with the
+ [developer guides](../readme.md) for routine development and the
+ [contracts](../contracts/readme.md) for subsystem behavior.
+diff --git a/docs/implementation/sources/readme.md b/docs/implementation/sources/readme.md
+index ef82c75..0ce1dc8 100644
+--- a/docs/implementation/sources/readme.md
++++ b/docs/implementation/sources/readme.md
+@@ -30,3 +30,5 @@ Runtime test logs and measurements belong in the
+ - [Session startup source ledger](m2_session_start_sources.json): engine validation extraction and unchanged original shell/player call paths.
+ 
+ - [GPU lifetime diagnostic sources](m2_gpu_lifetime_sources.json): project teardown baseline, pinned SDL APIs and system Vulkan probe; no original-game import.
++
++- [M2 acceptance](m2_acceptance_sources.json): original missing-zero sound selection, inspection provenance and stronger selected-session checks; no graphics-stack change.
+diff --git a/docs/readme.md b/docs/readme.md
+index 1d364ce..2ecdbe2 100644
+--- a/docs/readme.md
++++ b/docs/readme.md
+@@ -1,7 +1,8 @@
+ # Developer documentation
+ 
+-Start here when building or changing OpenBlood2. M2 is still in progress; working
+-features and test results do not imply that the complete game is supported.
++Start here when building or changing OpenBlood2. The [M2 review](contracts/m2_acceptance_contracts.md)
++separates the tested original session from the open NVIDIA GPU sanitizer qualification.
++The complete game and later milestones are not yet supported.
+ 
+ | Guide | Contents |
+ | --- | --- |
+diff --git a/src/app/inspector_sprites.cpp b/src/app/inspector_sprites.cpp
+index b2889ef..3362d88 100644
+--- a/src/app/inspector_sprites.cpp
++++ b/src/app/inspector_sprites.cpp
+@@ -259,6 +259,7 @@ namespace OpenBlood2
+                             fx.particles.size(), fx.alpha, (unsigned long long)fx.updates);
+                 ImGui::Text("Impact splat event %llu | lifetime %.2f / fade %.2f", (unsigned long long)fx.splat_event,
+                             fx.settings.lifetime, fx.settings.fade_time);
++                ImGui::TextWrapped("Impact sound: %s", fx.sound_resource.c_str());
+                 ImGui::TextWrapped("%s | %s | %s", fx.error.c_str(), fx.splat_error.c_str(), fx.sound_error.c_str());
+                 if (sprite_view)
+                     for (const auto& entry : sprite_view->entries)
+@@ -272,12 +273,15 @@ namespace OpenBlood2
+             ImGui::PopID();
+         }
+         for (const auto& r : effects.reports)
++        {
+             ImGui::TextWrapped("Event %llu %s -> #%llu | immediate %d / ended %d | drops %llu / impacts %llu / "
+                                "splat %llu | %s %s %s",
+                                (unsigned long long)r.id, r.source.c_str(), (unsigned long long)r.effect, r.immediate,
+                                r.ended, (unsigned long long)r.emitted, (unsigned long long)r.impacts,
+                                (unsigned long long)r.splat_event, r.error.c_str(), r.splat_error.c_str(),
+                                r.sound_error.c_str());
++            ImGui::TextWrapped("Impact sound: %s", r.sound_resource.c_str());
++        }
+     }
+ } // namespace OpenBlood2
+ 
+diff --git a/src/game/blood_spurts.cpp b/src/game/blood_spurts.cpp
+index 1768309..a9e130a 100644
+--- a/src/game/blood_spurts.cpp
++++ b/src/game/blood_spurts.cpp
+@@ -19,6 +19,7 @@ namespace OpenBlood2
+                 r.splat_event = fx.splat_event;
+                 r.error = fx.error;
+                 r.splat_error = fx.splat_error;
++                r.sound_resource = fx.sound_resource;
+                 r.sound_error = fx.sound_error;
+                 r.ended = ended;
+                 break;
+diff --git a/src/game/blood_spurts.h b/src/game/blood_spurts.h
+index 330c16e..b30bae1 100644
+--- a/src/game/blood_spurts.h
++++ b/src/game/blood_spurts.h
+@@ -7,7 +7,7 @@ namespace OpenBlood2
+         std::uint64_t id = 0, effect = 0, emitted = 0, impacts = 0, splat_event = 0;
+         BloodSpurtSettings settings;
+         bool immediate = false, ended = false;
+-        std::string source, error, splat_error, sound_error;
++        std::string source, error, splat_error, sound_resource, sound_error;
+     };
+     class BloodSpurts
+     {
+diff --git a/src/game/original/ParticleExplosionFX.cpp b/src/game/original/ParticleExplosionFX.cpp
+index 63fa0ae..23e231d 100644
+--- a/src/game/original/ParticleExplosionFX.cpp
++++ b/src/game/original/ParticleExplosionFX.cpp
+@@ -120,6 +120,7 @@ bool CParticleExplosionFX::Update(double now, double dt, ServerDE& server, std::
+         SoundRequest sound;
+         // Original B2_LITE GetRandom(0,NRES(5)) includes zero; do not alias a missing file.
+         sound.resource = "sounds/gibs/flesh/gib_impact" + std::to_string(rng() % 4) + ".wav";
++        sound_resource = sound.resource;
+         sound.outer_radius = 300;
+         sound.inner_radius = 30;
+         server.PlayClientSound(sound, next, sound_error);
+diff --git a/src/game/original/ParticleExplosionFX.h b/src/game/original/ParticleExplosionFX.h
+index 3c1a5f9..90af1c5 100644
+--- a/src/game/original/ParticleExplosionFX.h
++++ b/src/game/original/ParticleExplosionFX.h
+@@ -26,5 +26,5 @@ class CParticleExplosionFX
+     float alpha = 1;
+     double start_time = 0, last_time = 0, last_emission = 0, next_update = 0;
+     std::uint64_t id = 0, event = 0, updates = 0, emitted = 0, impacts = 0, splat_event = 0;
+-    std::string texture, error, splat_error, sound_error;
++    std::string texture, error, splat_error, sound_resource, sound_error;
+ };
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 6da7d15..ca11e0f 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1849,7 +1849,7 @@ endif()
+ add_executable(blood_spurt_tests blood_spurt_tests.cpp ../src/app/sprite_scene.cpp)
+ target_link_libraries(blood_spurt_tests PRIVATE blood2_game)
+ blood2_project_options(blood_spurt_tests)
+-foreach(case formulas impact weapon failures)
++foreach(case formulas impact weapon failures missing_sound)
+     add_test(NAME blood_spurts.${case} COMMAND blood_spurt_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/blood-spurts-${case}")
+     set_tests_properties(blood_spurts.${case} PROPERTIES LABELS "headless;blood_spurts" TIMEOUT 30)
+ endforeach()
+@@ -1937,6 +1937,8 @@ endif()
+ add_executable(train_session_tests train_session_tests.cpp ../src/app/model_scene.cpp)
+ target_link_libraries(train_session_tests PRIVATE blood2_game)
+ blood2_project_options(train_session_tests)
++add_test(NAME train_session.audit COMMAND train_session_tests audit)
++set_tests_properties(train_session.audit PROPERTIES LABELS "headless;train_session" TIMEOUT 10)
+ if(BLOOD2_TEST_DATA_DIR)
+     foreach(rate IN ITEMS 30 60)
+         add_test(NAME train_session.private_${rate} COMMAND train_session_tests "${BLOOD2_TEST_DATA_DIR}" ${rate})
+diff --git a/tests/blood_spurt_fixture.h b/tests/blood_spurt_fixture.h
+index 012d85e..a538a54 100644
+--- a/tests/blood_spurt_fixture.h
++++ b/tests/blood_spurt_fixture.h
+@@ -3,7 +3,8 @@
+ #include "blood_splat_fixture.h"
+ namespace test_blood_spurt
+ {
+-    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error)
++    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error,
++                      int missing_variant = -1)
+     {
+         if (!test_blood_splat::mount(resources, root, error))
+             return false;
+@@ -14,8 +15,9 @@ namespace test_blood_spurt
+         for (int i = 1; i <= 3; ++i)
+             dir.children["spritetextures"].children["particles"].files["blooddrop_" + std::to_string(i) + ".dtx"] = dtx;
+         for (int i = 0; i <= 3; ++i)
+-            dir.children["sounds"].children["gibs"].children["flesh"].files["gib_impact" + std::to_string(i) + ".wav"] =
+-                test_audio::wave();
++            if (i != missing_variant)
++                dir.children["sounds"].children["gibs"].children["flesh"].files["gib_impact" + std::to_string(i) +
++                                                                                ".wav"] = test_audio::wave();
+         test_model::Writer w;
+         w.b.resize(168);
+         w.b[0] = w.b[62] = w.b[124] = 13;
+diff --git a/tests/blood_spurt_tests.cpp b/tests/blood_spurt_tests.cpp
+index a1b9122..306e713 100644
+--- a/tests/blood_spurt_tests.cpp
++++ b/tests/blood_spurt_tests.cpp
+@@ -20,11 +20,11 @@ namespace
+     {
+         return std::abs(a - b) < .0001f;
+     }
+-    bool setup(GameSession& g, const std::filesystem::path& root)
++    bool setup(GameSession& g, const std::filesystem::path& root, int missing_variant = -1)
+     {
+         std::string error;
+         CHECK(test_player::setup(g, root, false));
+-        CHECK(test_blood_spurt::mount(g.resources, root, error));
++        CHECK(test_blood_spurt::mount(g.resources, root, error, missing_variant));
+         CHECK(test_blood_spurt::floor(g, error));
+         return true;
+     }
+@@ -72,6 +72,51 @@ namespace
+               g.server.blood_spurts.live_particles() == 24);
+         return true;
+     }
++    bool missing_sound(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root, 0));
++        std::string error;
++        CHECK(!g.resources.find("sounds/gibs/flesh/gib_impact0.wav"));
++        BloodSpurtSettings s;
++        s.position = {0, 1, 0};
++        s.min_velocity = s.max_velocity = {0, -20, 0};
++        for (unsigned i = 0; i < 32; ++i)
++            CHECK(g.server.PublishClientBloodSpurt(s, "absent original zero", false, error) && error.empty());
++        auto& effects = g.server.blood_spurts;
++        CHECK(effects.advance(.1, g.server));
++        unsigned absent = 0, played = 0;
++        for (const auto& report : effects.reports)
++        {
++            CHECK(report.impacts == 1 && report.splat_event && report.error.empty() && report.splat_error.empty());
++            CHECK(!report.sound_resource.empty());
++            if (report.sound_resource == "sounds/gibs/flesh/gib_impact0.wav")
++            {
++                CHECK(report.sound_error == "Missing or oversized sound resource");
++                ++absent;
++            }
++            else
++            {
++                CHECK(report.sound_error.empty());
++                ++played;
++            }
++        }
++        CHECK(absent > 0 && played > 0 && g.server.audio.voices().size() == played);
++        CHECK(effects.advance(1.0, g.server) && effects.advance(1.8, g.server) && effects.advance(2.101, g.server) &&
++              effects.active.empty());
++        unsigned retained = 0;
++        for (const auto& report : effects.reports)
++        {
++            CHECK(report.ended && report.error.empty() && !report.sound_resource.empty());
++            retained += !report.sound_error.empty();
++        }
++        CHECK(retained == absent);
++        effects.clear();
++        CHECK(effects.reports.empty());
++        std::cout << "Original absent-zero requests=" << absent << ", decoded starts=" << played
++                  << "; splats survive audio refusal, history survives emitter expiry\n";
++        return true;
++    }
+     bool impact(const std::filesystem::path& root)
+     {
+         GameSession g;
+@@ -297,11 +342,12 @@ int main(int argc, char** argv)
+     if (argc != 3)
+         return 2;
+     std::string mode = argv[1];
+-    return (mode == "formulas"   ? formulas(argv[2])
+-            : mode == "impact"   ? impact(argv[2])
+-            : mode == "weapon"   ? weapon(argv[2])
+-            : mode == "failures" ? failures(argv[2])
+-                                 : mode == "private" && private_world(argv[2]))
++    return (mode == "formulas"        ? formulas(argv[2])
++            : mode == "missing_sound" ? missing_sound(argv[2])
++            : mode == "impact"        ? impact(argv[2])
++            : mode == "weapon"        ? weapon(argv[2])
++            : mode == "failures"      ? failures(argv[2])
++                                      : mode == "private" && private_world(argv[2]))
+                ? 0
+                : 1;
+ }
+diff --git a/tests/train_session_tests.cpp b/tests/train_session_tests.cpp
+index 18d1167..af6b159 100644
+--- a/tests/train_session_tests.cpp
++++ b/tests/train_session_tests.cpp
+@@ -73,8 +73,136 @@ namespace
+         std::cout << "GPU checkpoint " << path.filename() << ": " << filled << " textured pixels, no fallback\n";
+         return true;
+     }
+-    bool trace_services(const GameSession& g, const char* phase, std::string& error)
++    // Inspect failures independently of attempted-service counts. Kept in the
++    // route harness so acceptance cannot turn a positive counter into success.
++    bool check_inventory(const CInventoryMgr& inventory, std::string& error)
+     {
++        CHECK(inventory.drop_error.empty());
++        for (unsigned slot = 0; slot < inventory_weapon_slots; ++slot)
++            for (bool left : {false, true})
++                if (const auto* weapon = inventory.GetWeapon(slot, left))
++                {
++                    error =
++                        weapon->fire_sound_error + weapon->hand_error + weapon->projectile_error + weapon->impact_error;
++                    CHECK(error.empty() && !weapon->sound_failures && !weapon->sound_alert_failures &&
++                          !weapon->impact_sound_failures);
++                    for (const auto& impact : weapon->impacts)
++                    {
++                        error = impact.effect.error + impact.effect.sprite_error + impact.effect.blood_error +
++                                impact.effect.spark_error;
++                        CHECK(error.empty());
++                    }
++                }
++        return true;
++    }
++    bool check_actor(const CPlayerObj& actor, std::string& error)
++    {
++        CHECK(check_inventory(actor.m_InventoryMgr, error));
++        error = actor.motion_error + actor.m_Anim_Sound.sound_error;
++        CHECK(error.empty() && !actor.motion_failures && !actor.m_Anim_Sound.sound_failures);
++        return true;
++    }
++    struct RouteAudit
++    {
++        std::set<std::uint64_t> absent_blood_sounds;
++    };
++    bool check_effects(const GameSession& g, RouteAudit& audit, const char* phase, std::string& error)
++    {
++        std::size_t reports = 0;
++        auto check = [&](const auto& effects)
++        {
++            if constexpr (requires { effects.failed; })
++                CHECK(effects.failed == 0);
++            if constexpr (requires { effects.update_error; })
++            {
++                error = effects.update_error;
++                CHECK(error.empty());
++            }
++            for (const auto& report : effects.reports)
++            {
++                ++reports;
++                error = report.error;
++                if constexpr (requires { report.splat_error; })
++                    error += report.splat_error;
++                if constexpr (requires { report.sound_error; })
++                {
++                    if constexpr (requires { report.sound_resource; })
++                    {
++                        // Original GetRandom(0,NRES(5)) requests this absent retail
++                        // file. Preserve refusal, never count it as decoded audio.
++                        if (!report.sound_error.empty() &&
++                            report.sound_resource == "sounds/gibs/flesh/gib_impact0.wav" &&
++                            !g.resources.find(report.sound_resource) &&
++                            report.sound_error == "Missing or oversized sound resource")
++                            audit.absent_blood_sounds.insert(report.id);
++                        else
++                            error += report.sound_error;
++                    }
++                    else
++                        error += report.sound_error;
++                }
++                CHECK(error.empty());
++            }
++            return true;
++        };
++        const auto& s = g.server;
++        CHECK(check(s.explosion_sprites) && check(s.sparks) && check(s.blood_spurts) && check(s.blood_splats) &&
++              check(s.weapon_sprites) && check(s.explosion_models) && check(s.laser_beams) &&
++              check(s.object_particles) && check(s.polygrids) && check(s.particle_streams) &&
++              check(s.explosion_lights) && check(s.explosion_rings) && check(s.explosion_flames) &&
++              check(s.flesh_gibs) && check(s.explosion_fragments));
++        for (const auto& report : s.scene_explosions)
++        {
++            error = report.sound_error + report.fragment_error + report.flame_error + report.ring_error +
++                    report.light_error + report.model_error + report.sprite_error;
++            CHECK(error.empty());
++        }
++        for (const auto& [id, voice] : s.audio.voices())
++        {
++            error = voice.error;
++            CHECK(error.empty());
++        }
++        const auto& client = g.client_shell;
++        // client.blocker is a historical scope note, not a failure result.
++        error = client.objectives_error + client.item_audio_error + client.world_exit.error + s.audio.music_error +
++                s.audio.output_error;
++        CHECK(error.empty() && !client.voice_manager.failures && !client.communication.sound_failures &&
++              !client.music.failures);
++        if (phase)
++            std::cout << "TRAIN_EFFECTS\t" << phase << '\t' << reports
++                      << " retained FX reports; unexpected failures=0; original absent gib_impact0 requests="
++                      << audit.absent_blood_sounds.size() << '\n';
++        return true;
++    }
++    bool audit_rejections()
++    {
++        GameSession g;
++        RouteAudit audit;
++        std::string error;
++        CHECK(check_effects(g, audit, nullptr, error));
++        BloodSpurtReport report;
++        report.id = 1;
++        report.sound_resource = "sounds/gibs/flesh/gib_impact0.wav";
++        report.sound_error = "Missing or oversized sound resource";
++        g.server.blood_spurts.reports.push_back(report);
++        CHECK(check_effects(g, audit, nullptr, error) && audit.absent_blood_sounds.size() == 1);
++        g.server.blood_spurts.reports.back().sound_resource = "sounds/gibs/flesh/gib_impact1.wav";
++        CHECK(!check_effects(g, audit, nullptr, error));
++        g.server.blood_spurts.reports.back().sound_resource = report.sound_resource;
++        g.server.blood_spurts.reports.back().sound_error = "Audio decode failed";
++        CHECK(!check_effects(g, audit, nullptr, error));
++        g.server.blood_spurts.clear();
++        g.server.weapon_sprites.failed = 1;
++        CHECK(!check_effects(g, audit, nullptr, error));
++        g.server.weapon_sprites.clear();
++        g.client_shell.voice_manager.failures = 1;
++        CHECK(!check_effects(g, audit, nullptr, error));
++        std::cout << "Acceptance negative controls: unrelated absent sound, decode, FX and voice failures rejected\n";
++        return true;
++    }
++    bool trace_services(const GameSession& g, RouteAudit& audit, const char* phase, std::string& error)
++    {
++        CHECK(check_effects(g, audit, phase, error));
+         for (const auto& row : service_coverage(g.server.service_calls))
+         {
+             CHECK(row.support != ServiceSupport::Unclassified &&
+@@ -113,13 +241,14 @@ namespace
+             std::filesystem::create_directories(captures, ec);
+             CHECK(!ec);
+         }
++        RouteAudit audit;
+         const double dt = 1. / hz;
+         auto game = std::make_unique<GameSession>();
+         Config config;
+         config.data_dir = root;
+         auto& g = *game;
+         if (!g.initialize() || !g.resources.mount_game(config, error) || !g.request_world("01_SubwayA", error) ||
+-            !g.enter_player(error) || !test_camera::complete_subway_intro(g))
++            !g.run_world(error) || !test_camera::complete_subway_intro(g))
+             return false;
+         for (const auto& entry : g.entries)
+             CHECK(entry.state != EntryState::Unsupported && entry.state != EntryState::Failed);
+@@ -193,6 +322,12 @@ namespace
+                     std::cerr << "AI failure " << record->state.m_Name << ": " << ai->runtime_error << '\n';
+                     return false;
+                 }
++                if (ai)
++                {
++                    CHECK(check_inventory(ai->m_InventoryMgr, error));
++                    error = ai->ai_key_error + ai->gib_error + ai->death_error + ai->damage_reaction_error;
++                    CHECK(error.empty() && !ai->key_failures && !ai->unavailable_keys);
++                }
+                 if (ai && ai->npc_type == AI_Mgr::NPCType::Cultist)
+                 {
+                     health[record->handle] = ai->m_damage.m_fHitPoints;
+@@ -279,6 +414,12 @@ namespace
+                 if (damaged.contains(handle) && (!ai || ai->m_damage.IsDead()))
+                     dead.insert(handle);
+             }
++            CHECK(check_effects(g, audit, nullptr, error));
++            CHECK(check_actor(*p, error));
++            error = p->entry_error + p->locomotion_error + p->death_error + p->death_effect_error +
++                    p->player_trigger_error + p->sound_error + p->smell_error;
++            CHECK(error.empty() && !p->unsupported_triggers && !p->sound_failures && !p->voice_delivery_failures &&
++                  !p->activation_ping_failures && !p->unavailable_sound_alerts);
+             ammo_pickup |= p->m_InventoryMgr.GetAmmoCount(1) > old_ammo;
+             health_pickup |= p->m_damage.m_fHitPoints > old_health;
+             black |= g.client_shell.fade.Scale() == 0;
+@@ -318,7 +459,7 @@ namespace
+         if (hz == 30)
+             CHECK(p->m_damage.damage_impulses > 0);
+         std::cout << "Player damage impulses=" << p->m_damage.damage_impulses << '\n';
+-        CHECK(trace_services(g, "SubwayA", error));
++        CHECK(trace_services(g, audit, "SubwayA", error));
+         const float health = p->m_damage.m_fHitPoints, ammo = p->m_InventoryMgr.GetAmmoCount(1);
+         const auto revision = g.world_revision;
+         std::cout << "Completed train at " << hz << " Hz: " << damaged.size() << " damaged / " << dead.size()
+@@ -346,23 +487,30 @@ namespace
+             CHECK(controls.sync_mouse(runtime.window, true, false, error) &&
+                   !SDL_GetWindowRelativeMouseMode(runtime.window));
+         CHECK(!controls.sample_fire(false).primary && !controls.sample_use(false));
++        audit.absent_blood_sounds.clear();
++        CHECK(game->run_world(error));
+         for (unsigned tick = 0; tick < hz; ++tick)
++        {
+             CHECK(game->step(dt));
++            CHECK(check_effects(*game, audit, nullptr, error));
++        }
+         if (gpu)
+         {
+             CHECK(game->server.audio.has_output() && game->server.audio.submitted_frames > 0);
+             CHECK(capture_scene(*game, runtime, captures / "cityhub.png", error));
+         }
+-        CHECK(trace_services(*game, "CityHub", error));
++        CHECK(trace_services(*game, audit, "CityHub", error));
+         CHECK(game->unload_world() && game->objects.snapshot().empty());
+         CHECK(!game->server.string_count() && !game->server.list_count() && !game->server.message_count() &&
+               !game->server.client_count() && game->server.audio.voices().empty());
+-        CHECK(trace_services(*game, "teardown", error));
++        CHECK(trace_services(*game, audit, "teardown", error));
+         return true;
+     }
+ } // namespace
+ int main(int argc, char** argv)
+ {
++    if (argc == 2 && std::string_view(argv[1]) == "audit")
++        return audit_rejections() ? 0 : 1;
+     if (argc < 3 || argc > 4 || (std::string_view(argv[2]) != "30" && std::string_view(argv[2]) != "60"))
+         return 2;
+     return traverse(argv[1], std::string_view(argv[2]) == "30" ? 30 : 60, argc == 4 ? argv[3] : "") ? 0 : 1;

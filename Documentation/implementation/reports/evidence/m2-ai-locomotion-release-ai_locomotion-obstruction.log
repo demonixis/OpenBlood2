@@ -1,0 +1,14 @@
+423/433 Testing: ai_locomotion.obstruction
+423/433 Test: ai_locomotion.obstruction
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_locomotion_tests" "obstruction"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_locomotion.obstruction" start time: Oct 16 13:45 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.obstruction" end time: Oct 16 13:45 CEST
+"ai_locomotion.obstruction" time elapsed: 00:00:00
+----------------------------------------------------------

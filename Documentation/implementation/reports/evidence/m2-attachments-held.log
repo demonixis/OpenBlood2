@@ -1,0 +1,14 @@
+320/323 Testing: attachments.held
+320/323 Test: attachments.held
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests" "held" "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment-fixtures/held"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"attachments.held" start time: Oct 16 07:33 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"attachments.held" end time: Oct 16 07:33 CEST
+"attachments.held" time elapsed: 00:00:00
+----------------------------------------------------------

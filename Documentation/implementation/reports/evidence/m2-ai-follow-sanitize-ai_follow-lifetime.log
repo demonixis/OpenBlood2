@@ -1,0 +1,14 @@
+382/386 Testing: ai_follow.lifetime
+382/386 Test: ai_follow.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_follow_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_follow.lifetime" start time: Oct 16 12:54 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.lifetime" end time: Oct 16 12:54 CEST
+"ai_follow.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

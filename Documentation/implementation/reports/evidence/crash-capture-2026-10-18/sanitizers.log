@@ -1,0 +1,43 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 19: config.arguments
+ 1/16 Test #19: config.arguments .................   Passed    0.01 sec
+      Start 20: config.precedence
+ 2/16 Test #20: config.precedence ................   Passed    0.01 sec
+      Start 21: config.relative_paths
+ 3/16 Test #21: config.relative_paths ............   Passed    0.01 sec
+      Start 22: config.invalid_config
+ 4/16 Test #22: config.invalid_config ............   Passed    0.01 sec
+      Start 23: config.content_validation
+ 5/16 Test #23: config.content_validation ........   Passed    0.01 sec
+      Start 24: config.case_lookup
+ 6/16 Test #24: config.case_lookup ...............   Passed    0.01 sec
+      Start 25: logging.basic
+ 7/16 Test #25: logging.basic ....................   Passed    0.02 sec
+      Start 26: logging.level
+ 8/16 Test #26: logging.level ....................   Passed    0.02 sec
+      Start 27: logging.rotation
+ 9/16 Test #27: logging.rotation .................   Passed    0.03 sec
+      Start 28: logging.failure
+10/16 Test #28: logging.failure ..................   Passed    0.02 sec
+      Start 29: logging.write_failure
+11/16 Test #29: logging.write_failure ............   Passed    0.05 sec
+      Start 30: logging.retention
+12/16 Test #30: logging.retention ................   Passed    0.03 sec
+      Start 31: logging.threads
+13/16 Test #31: logging.threads ..................   Passed    0.04 sec
+      Start 32: logging.abrupt
+14/16 Test #32: logging.abrupt ...................   Passed    0.01 sec
+      Start 33: logging.crash
+15/16 Test #33: logging.crash ....................   Passed    0.06 sec
+      Start 35: crash.unavailable
+16/16 Test #35: crash.unavailable ................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 16
+
+Label Time Summary:
+config      =   0.06 sec*proc (6 tests)
+crash       =   0.02 sec*proc (1 test)
+headless    =   0.37 sec*proc (16 tests)
+logging     =   0.29 sec*proc (9 tests)
+
+Total Test time (real) =   0.39 sec

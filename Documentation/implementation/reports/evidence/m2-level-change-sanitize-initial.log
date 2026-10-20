@@ -1,0 +1,82 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  44: world.destination_trial_private
+      Start 536: player_keepalive.private
+ 1/31 Test #536: player_keepalive.private ..........   Passed   26.12 sec
+      Start 532: player_restore.private
+ 2/31 Test  #44: world.destination_trial_private ...   Passed   28.45 sec
+      Start  63: player.private
+ 3/31 Test #532: player_restore.private ............   Passed   11.76 sec
+      Start  27: world.destination_trials
+ 4/31 Test  #27: world.destination_trials ..........   Passed    0.37 sec
+      Start 534: player_keepalive.fallback
+ 5/31 Test  #63: player.private ....................***Failed    9.98 sec
+private_player:215: !game.run_world(error) && error.find("0 uninstantiated") != std::string::npos && error.find("keep-alive level transfer") != std::string::npos
+
+      Start 530: player_restore.failures
+ 6/31 Test #534: player_keepalive.fallback .........   Passed    0.31 sec
+      Start 531: player_restore.lifetime
+ 7/31 Test #530: player_restore.failures ...........   Passed    0.20 sec
+      Start  30: world.destination_lifetime
+ 8/31 Test #531: player_restore.lifetime ...........   Passed    0.12 sec
+      Start 535: player_keepalive.failures
+ 9/31 Test  #30: world.destination_lifetime ........   Passed    0.11 sec
+      Start 529: player_restore.roundtrip
+10/31 Test #529: player_restore.roundtrip ..........   Passed    0.07 sec
+      Start 533: player_keepalive.named
+11/31 Test #535: player_keepalive.failures .........   Passed    0.16 sec
+      Start   1: objects.builtin_model
+12/31 Test   #1: objects.builtin_model .............   Passed    0.07 sec
+      Start  11: objects.unsupported_teardown
+13/31 Test #533: player_keepalive.named ............   Passed    0.11 sec
+      Start  10: objects.messages_strings
+14/31 Test  #10: objects.messages_strings ..........   Passed    0.08 sec
+      Start  12: objects.creation_failures
+15/31 Test  #11: objects.unsupported_teardown ......   Passed    0.09 sec
+      Start   4: objects.reasons_properties
+16/31 Test   #4: objects.reasons_properties ........   Passed    0.02 sec
+      Start   9: objects.links_lists
+17/31 Test  #12: objects.creation_failures .........   Passed    0.06 sec
+      Start   2: objects.original_objects
+18/31 Test   #9: objects.links_lists ...............   Passed    0.03 sec
+      Start   6: objects.deferred_removal
+19/31 Test   #2: objects.original_objects ..........   Passed    0.03 sec
+      Start   8: objects.handles_selection
+20/31 Test   #6: objects.deferred_removal ..........   Passed    0.03 sec
+      Start   3: objects.nested_creation
+21/31 Test   #8: objects.handles_selection .........   Passed    0.03 sec
+      Start   5: objects.scheduling
+22/31 Test   #3: objects.nested_creation ...........   Passed    0.04 sec
+      Start   7: objects.aggregate_dispatch
+23/31 Test   #5: objects.scheduling ................   Passed    0.02 sec
+      Start  59: player.lifecycle
+24/31 Test   #7: objects.aggregate_dispatch ........   Passed    0.03 sec
+      Start  60: player.rollback
+25/31 Test  #59: player.lifecycle ..................   Passed    0.07 sec
+      Start  61: player.messages
+26/31 Test  #60: player.rollback ...................   Passed    0.11 sec
+      Start  62: player.callbacks
+27/31 Test  #61: player.messages ...................   Passed    0.07 sec
+      Start  58: player.handles
+28/31 Test  #58: player.handles ....................   Passed    0.05 sec
+      Start  25: world.level_change
+29/31 Test  #62: player.callbacks ..................   Passed    0.07 sec
+      Start  43: world.level_change_private
+30/31 Test  #25: world.level_change ................   Passed    0.48 sec
+31/31 Test  #43: world.level_change_private ........   Passed   30.83 sec
+
+97% tests passed, 1 tests failed out of 31
+
+Label Time Summary:
+headless            = 109.98 sec*proc (31 tests)
+objects             =   0.55 sec*proc (12 tests)
+player              =  10.34 sec*proc (6 tests)
+player_keepalive    =  26.69 sec*proc (4 tests)
+player_restore      =  12.15 sec*proc (4 tests)
+private             = 107.14 sec*proc (5 tests)
+world               =  60.25 sec*proc (5 tests)
+
+Total Test time (real) =  70.20 sec
+
+The following tests FAILED:
+	 63 - player.private (Failed)                           headless player private
+Errors while running CTest

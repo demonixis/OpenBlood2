@@ -1,0 +1,598 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "43aeaf8032dfb9cc7db5ad3277ce5cdc1904ec45",
+  "m2_complete": false,
+  "validation": {
+    "debug": {
+      "passed": 38,
+      "private": 7,
+      "final_results": {
+        "objects.builtin_model": "Passed",
+        "objects.original_objects": "Passed",
+        "objects.nested_creation": "Passed",
+        "objects.reasons_properties": "Passed",
+        "objects.scheduling": "Passed",
+        "objects.deferred_removal": "Passed",
+        "objects.aggregate_dispatch": "Passed",
+        "objects.handles_selection": "Passed",
+        "objects.links_lists": "Passed",
+        "objects.messages_strings": "Passed",
+        "objects.unsupported_teardown": "Passed",
+        "objects.creation_failures": "Passed",
+        "world.level_change_private": "Passed",
+        "world.destination_trial_private": "Passed",
+        "world.destination_private": "Passed",
+        "world.private": "Passed",
+        "containers.geometry": "Passed",
+        "containers.concave": "Passed",
+        "containers.membership": "Passed",
+        "containers.lifetime": "Passed",
+        "containers.index_lifetime": "Passed",
+        "containers.index_callbacks": "Passed",
+        "containers.physics": "Passed",
+        "containers.swimming": "Passed",
+        "containers.surface": "Passed",
+        "containers.ladders": "Passed",
+        "containers.air_damage": "Passed",
+        "containers.specialized_defaults": "Passed",
+        "containers.conveyor_motion": "Passed",
+        "containers.conveyor_bodies": "Passed",
+        "containers.specialized_damage": "Passed",
+        "containers.freefall_motion": "Passed",
+        "containers.specialized_private": "Passed",
+        "containers.private": "Passed",
+        "polygrid.formulas": "Passed",
+        "polygrid.lifetime": "Passed",
+        "polygrid.mesh": "Passed",
+        "polygrid.private": "Passed"
+      },
+      "final_polygrid_rerun_passed": 4
+    },
+    "release": {
+      "passed": 38,
+      "private": 7,
+      "final_results": {
+        "objects.builtin_model": "Passed",
+        "objects.original_objects": "Passed",
+        "objects.nested_creation": "Passed",
+        "objects.reasons_properties": "Passed",
+        "objects.scheduling": "Passed",
+        "objects.deferred_removal": "Passed",
+        "objects.aggregate_dispatch": "Passed",
+        "objects.handles_selection": "Passed",
+        "objects.links_lists": "Passed",
+        "objects.messages_strings": "Passed",
+        "objects.unsupported_teardown": "Passed",
+        "objects.creation_failures": "Passed",
+        "world.level_change_private": "Passed",
+        "world.destination_trial_private": "Passed",
+        "world.destination_private": "Passed",
+        "world.private": "Passed",
+        "containers.geometry": "Passed",
+        "containers.concave": "Passed",
+        "containers.membership": "Passed",
+        "containers.lifetime": "Passed",
+        "containers.index_lifetime": "Passed",
+        "containers.index_callbacks": "Passed",
+        "containers.physics": "Passed",
+        "containers.swimming": "Passed",
+        "containers.surface": "Passed",
+        "containers.ladders": "Passed",
+        "containers.air_damage": "Passed",
+        "containers.specialized_defaults": "Passed",
+        "containers.conveyor_motion": "Passed",
+        "containers.conveyor_bodies": "Passed",
+        "containers.specialized_damage": "Passed",
+        "containers.freefall_motion": "Passed",
+        "containers.specialized_private": "Passed",
+        "containers.private": "Passed",
+        "polygrid.formulas": "Passed",
+        "polygrid.lifetime": "Passed",
+        "polygrid.mesh": "Passed",
+        "polygrid.private": "Passed"
+      },
+      "final_polygrid_rerun_passed": 4
+    },
+    "sanitize": {
+      "passed": 38,
+      "private": 7,
+      "final_results": {
+        "objects.builtin_model": "Passed",
+        "objects.original_objects": "Passed",
+        "objects.nested_creation": "Passed",
+        "objects.reasons_properties": "Passed",
+        "objects.scheduling": "Passed",
+        "objects.deferred_removal": "Passed",
+        "objects.aggregate_dispatch": "Passed",
+        "objects.handles_selection": "Passed",
+        "objects.links_lists": "Passed",
+        "objects.messages_strings": "Passed",
+        "objects.unsupported_teardown": "Passed",
+        "objects.creation_failures": "Passed",
+        "world.level_change_private": "Passed",
+        "world.destination_trial_private": "Passed",
+        "world.destination_private": "Passed",
+        "world.private": "Passed",
+        "containers.geometry": "Passed",
+        "containers.concave": "Passed",
+        "containers.membership": "Passed",
+        "containers.lifetime": "Passed",
+        "containers.index_lifetime": "Passed",
+        "containers.index_callbacks": "Passed",
+        "containers.physics": "Passed",
+        "containers.swimming": "Passed",
+        "containers.surface": "Passed",
+        "containers.ladders": "Passed",
+        "containers.air_damage": "Passed",
+        "containers.specialized_defaults": "Passed",
+        "containers.conveyor_motion": "Passed",
+        "containers.conveyor_bodies": "Passed",
+        "containers.specialized_damage": "Passed",
+        "containers.freefall_motion": "Passed",
+        "containers.specialized_private": "Passed",
+        "containers.private": "Passed",
+        "polygrid.formulas": "Passed",
+        "polygrid.lifetime": "Passed",
+        "polygrid.mesh": "Passed",
+        "polygrid.private": "Passed"
+      },
+      "final_polygrid_rerun_passed": 4
+    },
+    "debug-gpu": {
+      "passed": 3,
+      "tests": [
+        "gpu.containers",
+        "gpu.level_change",
+        "gpu.polygrid"
+      ],
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "final_polygrid_rerun_passed": 1
+    },
+    "release-gpu": {
+      "passed": 3,
+      "tests": [
+        "gpu.containers",
+        "gpu.level_change",
+        "gpu.polygrid"
+      ],
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "final_polygrid_rerun_passed": 1
+    }
+  },
+  "artifacts": [
+    {
+      "file": "m2-polygrids-build-final-debug.log",
+      "sha256": "617782fb2a7a9e826505819b3519f3babe138cadac7eeece645f3eb8aa82f973",
+      "raw_sha256": "005118a82ba9e754e873a27a05d5ffb19d2bf88084c802b90b89cb85a938cd55"
+    },
+    {
+      "file": "m2-polygrids-build-final-release.log",
+      "sha256": "fe1e96686f44b9aaf4009c9ee4b4785b4fc455bc8341aa94e3fb3090b1bad86e",
+      "raw_sha256": "27e573115bd9c7a979fe69003a8b99843de414092a10af4ff497645e97ccbee0"
+    },
+    {
+      "file": "m2-polygrids-build-final-sanitize.log",
+      "sha256": "e7fef34047834a470fef5673bc6bf7f2b1f634a8b865b4f6a5b7ec36cbca429f",
+      "raw_sha256": "25f1ecd01952fef2b4fe4e16bdd78218e995863afbced786398dea6af4037e32"
+    },
+    {
+      "file": "m2-polygrids-build-release.log",
+      "sha256": "2348223cde89f5facfbbab89cc5ae5aca1d46eebbd81bdf91e8f6832e0c8d41d",
+      "raw_sha256": "923ff0f1886bed2043497742140d03f12026166424e77e4e8f9897b083ab5358"
+    },
+    {
+      "file": "m2-polygrids-build-sanitize.log",
+      "sha256": "c1dc3e2ee73ca28e8e9e4afab6f61c0bbc15305b31bcf01e90e73d5b7c4f7780",
+      "raw_sha256": "d0bcc70a1f5c7767fe00df7f90a1c77da9b69a95b1c3dc00feda3a7a9070bb41"
+    },
+    {
+      "file": "m2-polygrids-build.log",
+      "sha256": "b5bcaca73e7bcb57a76ea320e22b7a9af5361d1dc5ca9fd89539b05b9da40ad4",
+      "raw_sha256": "489c81781a13d20f249f30f35b1e5d34e33893eba0aa81c42ec6c08aadb44826"
+    },
+    {
+      "file": "m2-polygrids-build2.log",
+      "sha256": "1832f896a212ed234bffabf98843ea693a350e60ba1998d2c1d92a5379ea6dc1",
+      "raw_sha256": "89e3aab5d9921190f52afc73954d0677de8f5be57b5a9ebf535ba73ba32ef288"
+    },
+    {
+      "file": "m2-polygrids-build3.log",
+      "sha256": "20a8b716beee0c6ae846acfb07fc3bc7cd4d5259175b60bfa60a7c6015c87eb1",
+      "raw_sha256": "e22dbdf779df825bf85225e096cf08a3b30f7fb350ad8c7f373eb74b24fea01d"
+    },
+    {
+      "file": "m2-polygrids-build4.log",
+      "sha256": "972b97e9cf30a06d3c02a32fa243fcba3b6e8e054ae6435397ed321d56d12551",
+      "raw_sha256": "18d39b05965d73af207d16e1661a61d384dda74e4610992aa43b862cf37a4a13"
+    },
+    {
+      "file": "m2-polygrids-build5.log",
+      "sha256": "20a8b716beee0c6ae846acfb07fc3bc7cd4d5259175b60bfa60a7c6015c87eb1",
+      "raw_sha256": "e22dbdf779df825bf85225e096cf08a3b30f7fb350ad8c7f373eb74b24fea01d"
+    },
+    {
+      "file": "m2-polygrids-build6.log",
+      "sha256": "7d556ca62da580d13ea787a85fc4bd2e2d86bab5510790742ed4024209f2c094",
+      "raw_sha256": "3318fe626b1ba088f105c1f19d79c24a7f67a9ec4638b2b4d316eacd89e4cc75"
+    },
+    {
+      "file": "m2-polygrids-build7.log",
+      "sha256": "f53cb815fdf5f599c533345d4b69e9b72c82ab79e00109e969e4c36f4ccdc79d",
+      "raw_sha256": "a67bd2e5243d0fc55cbb4863f30d648c775bc1ff8540259b09724d587be6e0a7"
+    },
+    {
+      "file": "m2-polygrids-control.log",
+      "sha256": "28c50b135725ced9c65f2dc6f6289dba23c5a2e6dd538ddea78753bac7602c41",
+      "raw_sha256": "28c50b135725ced9c65f2dc6f6289dba23c5a2e6dd538ddea78753bac7602c41"
+    },
+    {
+      "file": "m2-polygrids-final-gpu-debug.log",
+      "sha256": "1c7ce126d21665e9f56a35e1961d99e23c297aa3b91023ecdac5055d37aa2d78",
+      "raw_sha256": "c4147647ca80e930ca5231101e1d7a3dcdeb466adc727f491933443a66efa817"
+    },
+    {
+      "file": "m2-polygrids-final-gpu-release.log",
+      "sha256": "2bf5bd6471b492c1f6e086ad7577080644e05d9cd213ece570156efab8b1db9f",
+      "raw_sha256": "8f90a91b2f7be23c22299ab92951bed86e7c645d8f5c1fa6d35649ead5154619"
+    },
+    {
+      "file": "m2-polygrids-final-tests-debug.log",
+      "sha256": "91a92c58799bef7194d1566e7ff7925038dbac9936de6f657e6149786828a60b",
+      "raw_sha256": "6331ac7a243b5af4367ff0bba48cf3fc59d786bed6505dd5c382363c6822ea5f"
+    },
+    {
+      "file": "m2-polygrids-final-tests-release.log",
+      "sha256": "a4585f076db08828b22d058877f01700a75d6103616ce4d6a461a594c92d4cd7",
+      "raw_sha256": "dfd5fa87cdce44c56a250be103bb079f80f0e1c3727b177578c629dbffa89be7"
+    },
+    {
+      "file": "m2-polygrids-final-tests-sanitize.log",
+      "sha256": "f43d802aa46985613492e41cebdd2702fa6dad3d1f8ec6e1e0e46c5981069e14",
+      "raw_sha256": "bfc5f46979429cbd20a74cbcbfa9f229420dbbae19c1beb0333c128004cf7ba6"
+    },
+    {
+      "file": "m2-polygrids-frame-build-debug.log",
+      "sha256": "bfc26668f2f3c7897cc7c0c153774e09f6d6298894db5f58ca99eefdf14b46f9",
+      "raw_sha256": "c978dcdc50d63e1ab670262a094700fcd5826af29fb42e74b186b0fd3a56f73b"
+    },
+    {
+      "file": "m2-polygrids-frame-build-release.log",
+      "sha256": "594655bd091509e7ad5f09c2eee662118441122e697be2d55198b59817a8bd10",
+      "raw_sha256": "6d597bd2dc10cd6617c6328aa38e7508f647cce2a3da8100104d893c6feb2bc0"
+    },
+    {
+      "file": "m2-polygrids-golden-build-debug.log",
+      "sha256": "20a8b716beee0c6ae846acfb07fc3bc7cd4d5259175b60bfa60a7c6015c87eb1",
+      "raw_sha256": "e22dbdf779df825bf85225e096cf08a3b30f7fb350ad8c7f373eb74b24fea01d"
+    },
+    {
+      "file": "m2-polygrids-golden-build-release.log",
+      "sha256": "20a8b716beee0c6ae846acfb07fc3bc7cd4d5259175b60bfa60a7c6015c87eb1",
+      "raw_sha256": "e22dbdf779df825bf85225e096cf08a3b30f7fb350ad8c7f373eb74b24fea01d"
+    },
+    {
+      "file": "m2-polygrids-golden-build-sanitize.log",
+      "sha256": "20a8b716beee0c6ae846acfb07fc3bc7cd4d5259175b60bfa60a7c6015c87eb1",
+      "raw_sha256": "e22dbdf779df825bf85225e096cf08a3b30f7fb350ad8c7f373eb74b24fea01d"
+    },
+    {
+      "file": "m2-polygrids-golden-tests-debug.log",
+      "sha256": "6a509a2ff45ccebee827e5501305fcedf952148c3a30cb969cbab82e625396c7",
+      "raw_sha256": "5ba5d8f01f9a34a009a926b7e45e8fe10ee328175cf85b29ede3d6839ca2afcf"
+    },
+    {
+      "file": "m2-polygrids-gpu-debug.log",
+      "sha256": "21c3eddc465f4dd2ee18c65a5b706bc5bbc27b23cbc4ca9ef02f0c88674560a5",
+      "raw_sha256": "f6731936a336191cc2a06c4cb7a7dd6a9c97d975bc1506ca242c253e6d7d844c"
+    },
+    {
+      "file": "m2-polygrids-gpu-world-debug.log",
+      "sha256": "b33b701c842869a59881947be2600ed814ad37bffea659f3d4b41fbeab0c71dc",
+      "raw_sha256": "b33b701c842869a59881947be2600ed814ad37bffea659f3d4b41fbeab0c71dc"
+    },
+    {
+      "file": "m2-polygrids-last-build-debug.log",
+      "sha256": "b820d424a7e233523b914dbc2708ff74f44b2fc7e0d7e53b248d9c68925b7d49",
+      "raw_sha256": "c34452a1c5dbc0b69768c52cc42ffe59290712a036df39d247574cb333ba8949"
+    },
+    {
+      "file": "m2-polygrids-last-build-release.log",
+      "sha256": "f251895e103888cfdb99c46af0573f7bd709f867750f95ecff71ee5ce00da630",
+      "raw_sha256": "88a94d011cd850d01677de43c6da9fc5277a17a92cea1ec8499241d446e3abfc"
+    },
+    {
+      "file": "m2-polygrids-last-build-sanitize.log",
+      "sha256": "ccb27cbc0b60deda66c0e8a5dd08f46def24dbf69b34c928639e4afcf4db4d77",
+      "raw_sha256": "67e14437efbe2ae6098f1de350a1f7c63902be08086ca5d2de273f87a8dad32d"
+    },
+    {
+      "file": "m2-polygrids-last-gpu-debug.log",
+      "sha256": "69165fed2c55acdca6c13f659224a6a233864fab2ee2f8e9245ec38eed28883b",
+      "raw_sha256": "b0c769ea3a80ad968fa9e980760768b066cc13345bb84dae6ee4b9f53cccfd90"
+    },
+    {
+      "file": "m2-polygrids-last-gpu-release.log",
+      "sha256": "0962410453c3f3a6753385fc45feedb9c32cc93202a3594d929c8ffe2f3c33e8",
+      "raw_sha256": "379d1d29fc264cb6066937d73a12c6d18472d1fe05ab0aaf0a097324c0fcfa92"
+    },
+    {
+      "file": "m2-polygrids-last-tests-debug.log",
+      "sha256": "e737a506b532676797443ccd67135c931e75447cfd2a49ccd4fe10a6722cc20d",
+      "raw_sha256": "ee17ef0a2e90b93df77d5a05e9b943fc4e7a745bd17a7fc029ff40968e3b0859"
+    },
+    {
+      "file": "m2-polygrids-last-tests-release.log",
+      "sha256": "b18c0ffdb43326df5e878d0ee3cb2a8184592b77b233245c4b04ed3c827f4379",
+      "raw_sha256": "8e877583d71be9415e27cbd9e421aa771647641edff66f25b7ab256b7eb90a4b"
+    },
+    {
+      "file": "m2-polygrids-last-tests-sanitize.log",
+      "sha256": "c2d5eb807f4fa55814645203f4895010b16def26f5e34d5bd4061918322bdbad",
+      "raw_sha256": "0a5f8d1509e0b228345c0b0905cb7965eba4bb9d407f534a68611d4d26eb4219"
+    },
+    {
+      "file": "m2-polygrids-regression-debug.log",
+      "sha256": "0b0a63dec1087a87ae6bb3ccc8a0cd21c0c183a3739d98ce611ff3553b0099a5",
+      "raw_sha256": "f40bb820d406bde693a4311d41dcf766badd29ab57e1a2f6be51dac8a2ade297"
+    },
+    {
+      "file": "m2-polygrids-regression-debug2.log",
+      "sha256": "25d7157e6aaa186b2349800a41912efc7d1a2cf194389fef4b2c1a19e6788ea0",
+      "raw_sha256": "bd2e5aee402d4a937759b6d57aeca47cc3a71dd3f7cb0f8f93218e9a5f627ec9"
+    },
+    {
+      "file": "m2-polygrids-tests-debug.log",
+      "sha256": "03b76d69b13729bafe653850fe5fb9a0082cec6158f4e951d33068ce5861ca40",
+      "raw_sha256": "185c9c0628028250ffcd5627db0221e8ce7b83cd77b6fe4ea609571844ea6818"
+    },
+    {
+      "file": "m2-polygrids-control.py",
+      "sha256": "ee34359b9a35615b6b6a8ae3efd2bd510e4881ecf32b16fd729553ae2ad47c36"
+    }
+  ],
+  "negative_control": {
+    "result": "Expected failure: previous VolumeBrush.cpp creates no surface",
+    "recipe": "m2-polygrids-control.py",
+    "scope": "Previous source against current typed interfaces/layout, not a full prior executable."
+  },
+  "private_observations": {
+    "world": "02_CityHub",
+    "surfaces": [
+      {
+        "name": "Canal1",
+        "position": [
+          0,
+          135,
+          -704
+        ]
+      },
+      {
+        "name": "Pool",
+        "position": [
+          3488,
+          399,
+          2208
+        ]
+      }
+    ],
+    "grid": [
+      8,
+      8
+    ],
+    "triangles_per_surface": 98,
+    "decoded_texture": "textures/reds/waterbrown.dtx",
+    "reload_cycles": 2,
+    "world_pixel_contribution": 65234,
+    "capture_pixels": 120000,
+    "runtime_extra_children": 2,
+    "full_retail_playthrough": false
+  },
+  "commands": [
+    "cmake --build build/<debug|release> --target polygrid_tests polygrid_gpu_tests container_tests world_tests object_contract_tests level_change_gpu_tests blood2_app -j3",
+    "cmake --build build/sanitize --target polygrid_tests container_tests world_tests object_contract_tests -j3",
+    "ctest --test-dir build/<configuration> -R '^(objects\\.|polygrid\\.|containers\\.|world\\.(private|level_change_private|destination_trial_private|destination_private))' --output-on-failure",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 for sanitizer checks",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(polygrid|containers|level_change)$' -V"
+  ],
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "patch": {
+    "file": "m2-polygrids.patch",
+    "sha256": "250dfe61f73b804bf72a86b4a0d50e88da6ced73f6be9976ec7a6d9e3b9e9263"
+  },
+  "implementation_files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "4ca7eff0cc2d9fccc21f18226f2a20373a0130d3e978be1af8a992aafd503f6d"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "24a081ea2c8f32f31af9f1ba2a2babc3d6090ce3e975d3e7064aceaf0d944a15"
+    },
+    {
+      "path": "docs/CONTAINER_CONTRACTS.md",
+      "sha256": "efc32c1320bf3990bd7ecc9ddcbf46a52656ac88901ff59b7bd19bb35212ef1d"
+    },
+    {
+      "path": "docs/M2_POLYGRID_SOURCES.json",
+      "sha256": "945d54087043cc7941db9e4a800790a6db9093851164a550c631bcdb256a7dd1"
+    },
+    {
+      "path": "docs/POLYGRID_CONTRACTS.md",
+      "sha256": "90f8aa4a770a71be46107e21d45cac1b6b5c8a104d9dd52dbbf5c887d1bac867"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "25c4859cba460485d857087c5b6a0ae7e252b64f4a8832d521fa40857f29590b"
+    },
+    {
+      "path": "docs/WORLD_VIEW_CONTRACTS.md",
+      "sha256": "d9988b38e9fbbad422e6ff826bce109ced78e7bffe4eb4959d0b8719f9eabc24"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "d3d15f1bc3f37886df54098723dae0e314d8b7d43e498eb25ff8932f5af492f6"
+    },
+    {
+      "path": "src/app/inspector.h",
+      "sha256": "863828fe6aa2bd0275d1c15c76a94febcb210a79338022059af3862b43246855"
+    },
+    {
+      "path": "src/app/main.cpp",
+      "sha256": "5f9b2e67022430751966d7eafea9ebd4cce81ad55e76a93ba921c2040f6b7fcd"
+    },
+    {
+      "path": "src/app/polygrid_scene.cpp",
+      "sha256": "75599dcc2ffd4d3ed171d611b31a42221b2c4a7da217fdc277cbd3c67cd7aca8"
+    },
+    {
+      "path": "src/app/polygrid_scene.h",
+      "sha256": "d62a9c90104ef57369dc4dcac0a7a74e8ed5ee6988a4b24c8cbf1e0ab8099fe7"
+    },
+    {
+      "path": "src/engine/polygrid_view.cpp",
+      "sha256": "81bf571c26ce7db365969b774288d13b94fa0bc46b56e154b7da866c21536f65"
+    },
+    {
+      "path": "src/engine/polygrid_view.h",
+      "sha256": "4dc4934576e40a1f729f8e29fbea6bbd0358bd55fd6c4bcc007d422dd5946a1a"
+    },
+    {
+      "path": "src/game/legacy/server_de.h",
+      "sha256": "2be0c360e0bdfa7c6bc7a2988ced07cfdc7af90815f50447b3f3c87586cd6703"
+    },
+    {
+      "path": "src/game/original/PolyGrid.cpp",
+      "sha256": "65f8820897a01b7739f00d54dc760f30c81c7400aafc9475066c93fcb8040f3a"
+    },
+    {
+      "path": "src/game/original/PolyGrid.h",
+      "sha256": "3af7aad11840a59038d136e8b4e7817aeb04104837acd8a78088209fdd030ecb"
+    },
+    {
+      "path": "src/game/original/PolyGridFX.cpp",
+      "sha256": "e14e5d20f571b04b3aca961b31656eaa2095cc2ec3e45c76d9de504e82aa0e0d"
+    },
+    {
+      "path": "src/game/original/PolyGridFX.h",
+      "sha256": "e25bc6a1a7f215c2e0c780c8a1aa2cd8f056fa9cdb4e974e16a871096081410a"
+    },
+    {
+      "path": "src/game/original/VolumeBrush.cpp",
+      "sha256": "dfbd354b3c9e11a1b29edeee32e615cb2ad85f6fbc1a6dae4c6a5eb15b38e71d"
+    },
+    {
+      "path": "src/game/original/VolumeBrush.h",
+      "sha256": "fc898d9edc8cd82e3567cb38db061f42f82259881f18c11eb934c444dfedb920"
+    },
+    {
+      "path": "src/game/polygrids.cpp",
+      "sha256": "daa59023a68f535fbd52793f1e4876d31c592328c2a5dd251dff618a2cb4e510"
+    },
+    {
+      "path": "src/game/polygrids.h",
+      "sha256": "738b62231ba6cd2c976b66c770ca6e528b38d65d4882cfe9907e7e8952e9eb48"
+    },
+    {
+      "path": "src/game/registration.cpp",
+      "sha256": "8ffed6571db784ad0718899b68c28a40096a49214b629db3d9a401ed55a7e1a4"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "f7f34c98ef4f452119450cb002fb5e0e7fee0917c2b4285da59f1e90bba505f3"
+    },
+    {
+      "path": "src/game/server_containers.cpp",
+      "sha256": "56cbf18f7188759ff5dd7e9c5f25a28538ca7602809cfb51e320486cd6f23369"
+    },
+    {
+      "path": "src/game/server_effects.cpp",
+      "sha256": "a9ee3b7b2cef6c02f8a48f8bc73c85bc53c62ee9f078d40957b0289519fc9da3"
+    },
+    {
+      "path": "src/game/server_physics.cpp",
+      "sha256": "7eb2241d2509fd9cab69d9cac9c00eb80ce08e5776a06935faa474278cb42628"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "9894f62e5d124f84a087ac55bc99530955a6657c34d6157a35fb4a24d78b3c05"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "769788abc13efbce6165d5fe1f244fedf94443a58e7d7ef186c6de148bc9f482"
+    },
+    {
+      "path": "tests/polygrid_gpu_tests.cpp",
+      "sha256": "dda295da6b8d769fea6c1f79bbe64f06abb8ddedbdc07674ee27c49c1b87b4de"
+    },
+    {
+      "path": "tests/polygrid_tests.cpp",
+      "sha256": "3316740ce27f9f0cb001d184806569483c6211acdd2857d0498c49bb6e9495ae"
+    }
+  ],
+  "private_ignored_captures": [
+    {
+      "path": "build/debug/tests/polygrid/gpu/cityhub-water-0.png",
+      "sha256": "dab3f8f71204bcc67f580600aa4e5433e24f382a3d232173b71e0bb15c97be22",
+      "committed": false
+    },
+    {
+      "path": "build/debug/tests/polygrid/gpu/cityhub-water-1.png",
+      "sha256": "dab3f8f71204bcc67f580600aa4e5433e24f382a3d232173b71e0bb15c97be22",
+      "committed": false
+    },
+    {
+      "path": "build/debug/tests/polygrid/gpu/cityhub-world-water-0.png",
+      "sha256": "4860f491cf8caebc1a0d701f9bf7c99461bdabec5a77a4892beb7e5f33c17d90",
+      "committed": false
+    },
+    {
+      "path": "build/debug/tests/polygrid/gpu/cityhub-world-water-1.png",
+      "sha256": "4860f491cf8caebc1a0d701f9bf7c99461bdabec5a77a4892beb7e5f33c17d90",
+      "committed": false
+    },
+    {
+      "path": "build/debug/tests/polygrid/gpu/polygrid-repeat-alpha.png",
+      "sha256": "0dca6f7763e5f72e5306263ad651cbae57be116b55fdd4c067d39b9acca70d1c",
+      "committed": false
+    }
+  ],
+  "implementation_commit": "e54401b654171f76419d2a5dbd8c8783cd828a04",
+  "documentation_links": "3588 local Markdown link targets checked; no missing files."
+}

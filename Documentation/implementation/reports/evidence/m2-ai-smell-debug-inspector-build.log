@@ -1,0 +1,6 @@
+[0/2] Re-checking globbed directories...
+[1/44] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[2/37] Scanning <workspace>/Blood2/src/app/inspector_skeleton.cpp for CXX dependencies
+[3/37] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[4/6] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_skeleton.cpp.o
+[5/6] Linking CXX executable blood2

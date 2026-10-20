@@ -1,0 +1,55 @@
+366/366 Testing: ai_trigger.subway
+366/366 Test: ai_trigger.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_trigger_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_trigger.subway" start time: Oct 16 12:07 CEST
+Output:
+----------------------------------------------------------
+cycle=0 reactions=2 delivered=1 failures=0
+cycle=1 reactions=2 delivered=1 failures=0
+<end of output>
+Test time =   2.31 sec
+----------------------------------------------------------
+Test Passed.
+"ai_trigger.subway" end time: Oct 16 12:07 CEST
+"ai_trigger.subway" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 16 12:07 CEST
+
+ai_fire =  10.70 sec*proc
+
+ai_keys =  20.97 sec*proc
+
+ai_perception =   3.75 sec*proc
+
+ai_sight =   3.51 sec*proc
+
+ai_state =  25.79 sec*proc
+
+ai_target =   3.63 sec*proc
+
+ai_trigger =   2.46 sec*proc
+
+attachments =   4.24 sec*proc
+
+character =  21.22 sec*proc
+
+character_audio =  24.92 sec*proc
+
+character_motion =   1.13 sec*proc
+
+headless = 230.60 sec*proc
+
+locomotion =  13.31 sec*proc
+
+objects =   0.23 sec*proc
+
+player =   8.33 sec*proc
+
+private = 226.06 sec*proc
+
+services =   7.79 sec*proc
+
+weapons =  78.64 sec*proc
+

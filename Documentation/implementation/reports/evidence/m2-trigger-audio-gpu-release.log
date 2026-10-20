@@ -1,0 +1,148 @@
+UpdateCTestConfiguration  from :<Blood2>/build/release/DartConfiguration.tcl
+Parse Config file:<Blood2>/build/release/DartConfiguration.tcl
+Test project <Blood2>/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 28
+    Start  28: gpu.lifecycle
+
+28: Test command: <Blood2>/build/release/blood2 "--config" "<Blood2>/build/release/tests/empty.ini" "--data-dir" "<external Blood II>" "--gpu-smoke" "--capture" "<Blood2>/build/release/tests/gpu.png"
+28: Working Directory: <Blood2>/build/release/tests
+28: Test timeout computed to be: 25
+28: [info] External data: <external Blood II> (--data-dir)
+28: [info] BLOOD2.REZ: detected, 267758913 bytes
+28: [info] SOUND.REZ: detected, 204633068 bytes
+28: [info] BLOOD2P.REZ: detected, 24133434 bytes
+28: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+28: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+28: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+28: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+28: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+28: [info] Captured GPU frame to <Blood2>/build/release/tests/gpu.png
+28: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+28: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+28: [info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+28: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+1/5 Test  #28: gpu.lifecycle ....................   Passed    3.13 sec
+test 136
+    Start 136: gpu.doors
+
+136: Test command: <Blood2>/build/release/blood2 "--config" "<Blood2>/build/release/tests/empty.ini" "--data-dir" "<external Blood II>" "--doors-smoke" "--capture" "<Blood2>/build/release/tests/doors.png"
+136: Working Directory: <Blood2>/build/release/tests
+136: Test timeout computed to be: 25
+136: [info] External data: <external Blood II> (--data-dir)
+136: [info] BLOOD2.REZ: detected, 267758913 bytes
+136: [info] SOUND.REZ: detected, 204633068 bytes
+136: [info] BLOOD2P.REZ: detected, 24133434 bytes
+136: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+136: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+136: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+136: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+136: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+136: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+136: [info] Door audio hidden: starts=1, failures=0, cursor=2940, submitted frames=7200, sampled attachment verified=true
+136: [info] Captured GPU frame to <Blood2>/build/release/tests/doors.png
+136: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+136: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+136: [info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+136: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+136: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+136: [info] Door smoke passed: original trigger, hidden translation and attached decoded audio/SDL output, inspection, unload/reload
+2/5 Test #136: gpu.doors ........................   Passed    1.56 sec
+test 156
+    Start 156: gpu.triggers
+
+156: Test command: <Blood2>/build/release/blood2 "--config" "<Blood2>/build/release/tests/empty.ini" "--data-dir" "<external Blood II>" "--triggers-smoke" "--capture" "<Blood2>/build/release/tests/triggers.png"
+156: Working Directory: <Blood2>/build/release/tests
+156: Test timeout computed to be: 30
+156: [info] External data: <external Blood II> (--data-dir)
+156: [info] BLOOD2.REZ: detected, 267758913 bytes
+156: [info] SOUND.REZ: detected, 204633068 bytes
+156: [info] BLOOD2P.REZ: detected, 24133434 bytes
+156: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+156: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+156: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+156: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+156: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+156: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+156: [info] Trigger smoke door: door3 key Key
+156: [info] Diagnostic SelfTrigger lock cue borrowed from CDM: sounds\events\cwvoice6.wav
+156: [info] Trigger smoke pickup:
+156: [info] Trigger denial audio hidden: voice=5, cursor=3307.5, submitted frames=7200, attached player=true
+156: [info] Captured GPU frame to <Blood2>/build/release/tests/triggers.png
+156: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+156: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+156: [info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+156: [info] AI paths: hidden=true, reentered=true, copied points=7
+156: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+156: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+156: [info] Trigger smoke passed: missing-key denial, real key pickup, consumption/unlock while hidden, door motion, inspector, reload
+156: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+3/5 Test #156: gpu.triggers .....................   Passed    1.77 sec
+test 167
+    Start 167: gpu.interaction
+
+167: Test command: <Blood2>/build/release/blood2 "--config" "<Blood2>/build/release/tests/empty.ini" "--data-dir" "<external Blood II>" "--interaction-smoke" "--capture" "<Blood2>/build/release/tests/interaction.png"
+167: Working Directory: <Blood2>/build/release/tests
+167: Test timeout computed to be: 30
+167: [info] External data: <external Blood II> (--data-dir)
+167: [info] BLOOD2.REZ: detected, 267758913 bytes
+167: [info] SOUND.REZ: detected, 204633068 bytes
+167: [info] BLOOD2P.REZ: detected, 24133434 bytes
+167: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+167: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+167: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+167: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+167: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+167: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+167: [info] Captured GPU frame to <Blood2>/build/release/tests/interaction.png
+167: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+167: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+167: [info] Session playback: waiting=0 time=24.433333333333227 npc-ready=16 npc-failed=0 npc-updates=665
+167: [info] AI paths: hidden=true, reentered=true, copied points=7
+167: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+167: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+167: [info] Interaction smoke passed: SDL E press edge, USE key denial/unlock, rotation while hidden, inspection, reload
+167: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+4/5 Test #167: gpu.interaction ..................   Passed    2.16 sec
+test 853
+    Start 853: gpu.level_change
+
+853: Test command: <Blood2>/build/release/tests/level_change_gpu_tests "<external Blood II>" "<Blood2>/build/release/tests/level-change"
+853: Working Directory: <Blood2>/build/release/tests
+853: Test timeout computed to be: 90
+853: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+853: Destination: CityHub /
+853: Cycle 0: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+853: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+853: Destination: SubwayA /
+853: Cycle 1: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+853: Destination: CityHub /
+853: Cycle 2: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+853: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+853: Destination: SubwayA /
+853: Cycle 3: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+5/5 Test #853: gpu.level_change .................   Passed    1.52 sec
+
+The following tests passed:
+	gpu.lifecycle
+	gpu.doors
+	gpu.triggers
+	gpu.interaction
+	gpu.level_change
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+doors          =   1.56 sec*proc (1 test)
+gpu            =  10.14 sec*proc (5 tests)
+interaction    =   2.16 sec*proc (1 test)
+private        =   7.01 sec*proc (4 tests)
+triggers       =   1.77 sec*proc (1 test)
+world          =   1.52 sec*proc (1 test)
+
+Total Test time (real) =  10.15 sec

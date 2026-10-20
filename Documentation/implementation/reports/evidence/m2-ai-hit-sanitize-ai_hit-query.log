@@ -1,0 +1,14 @@
+447/454 Testing: ai_hit.query
+447/454 Test: ai_hit.query
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "query"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.query" start time: Oct 16 15:38 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.query" end time: Oct 16 15:38 CEST
+"ai_hit.query" time elapsed: 00:00:00
+----------------------------------------------------------

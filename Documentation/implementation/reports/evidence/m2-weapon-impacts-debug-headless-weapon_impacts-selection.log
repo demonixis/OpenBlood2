@@ -1,0 +1,14 @@
+604/610 Testing: weapon_impacts.selection
+604/610 Test: weapon_impacts.selection
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_impact_tests" "selection" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-impacts-selection"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapon_impacts.selection" start time: Oct 16 23:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_impacts.selection" end time: Oct 16 23:30 CEST
+"weapon_impacts.selection" time elapsed: 00:00:00
+----------------------------------------------------------

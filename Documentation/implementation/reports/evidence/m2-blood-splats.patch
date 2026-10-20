@@ -1,0 +1,1538 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index fad9e11..8b337d3 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -581,3 +581,6 @@ The [scripted opportunity-fire continuation](../Documentation/Implementation/M2_
+ The [burning death and dismemberment continuation](../Documentation/Implementation/M2_DEATH_EFFECTS.md) connects original fire/gib decisions, CCorpse burning/postmortem damage, runtime CGib limbs and client flesh fragments. Read [contracts](docs/DEATH_EFFECT_CONTRACTS.md). Preserve fire priority, NEVERGIB, accumulated-damage launch speed, double negation, strict burn/smoke deadlines, named-node quirks and disabled living-NPC limb loss. Keep nonblocking children independent and cosmetic failures separate from actor removal. Zero elapsed fragment updates must not query zero-length rays. Flame/smoke count-only scaling and smoke movement samples are source rules. Blood-spurt/splat FX, generic gib templates/recursive debris, save/restore and the actual M2 gate remain incomplete.
+ 
+ The [original smell-trail continuation](../Documentation/Implementation/M2_AI_SMELL.md) connects the original periodic player trail and shared AI SearchSmellTarget state, with checked hint lifetime and inspection. Original no-target/no-cursor exits and zero NPC smell ranges are preserved; no automatic trail acquisition is invented. Required remaining services and the actual M2 gate stay open. Read [contracts](docs/AI_SMELL_CONTRACTS.md). Preserve strict cadence, global 3D spacing, source guard/phase order, balanced cursor links and deferred world-owned lifetime. Diagnostic seeded routes are not authored autonomous tracking.
++
++
++The [original blood-pool continuation](../Documentation/Implementation/M2_BLOOD_SPLATS.md) connects CClientSplatFX/CBloodSplatFX with corpse ground-hit publication, persistent oriented sprites and inspection. Read [contracts](docs/BLOOD_SPLAT_CONTRACTS.md). Preserve eleven-existing-neighbor reuse, nearest-prefix/tie order, state-preserving relocation, delta-squared growth, uncapped Term clocks and detached lifetime. Blood spurts/gib impact callers, shared-list eviction and the actual M2 gate remain incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9d47b9f..3729508 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/blood_splats.cpp src/game/original/BloodSplatFX.cpp src/game/original/ClientSplatFX.cpp src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index 4e2d3f8..19a852b 100644
+--- a/README.md
++++ b/README.md
+@@ -620,3 +620,6 @@ NEW_LEVEL remain unavailable; M2 is still incomplete.
+ The [surface panning correction](../Documentation/Implementation/M2_SURFACE_EFFECTS.md) renders SubwayA's authored tunnel/rail motion from session time, with retained metadata and inspection. Original object/collision motion is unchanged; required services and safe NEW_LEVEL keep M2 incomplete.
+ 
+ The [corpse doorway correction](../Documentation/Implementation/M2_CORPSE_CLEARANCE.md) addresses a reproduced frozen dead Cultist by adding checked source-center separation and swept living-body clearance to initial corpse placement. Original dimensions and bounded failures remain intact; in-game inspection records the extra sweep. Read [the clearance contracts](docs/CORPSE_CLEARANCE_CONTRACTS.md) before extending this policy. This does not certify every later enemy or close M2.
++
++
++The [original blood-pool continuation](../Documentation/Implementation/M2_BLOOD_SPLATS.md) connects CClientSplatFX/CBloodSplatFX with corpse ground-hit publication, persistent oriented sprites and inspection. Read [contracts](docs/BLOOD_SPLAT_CONTRACTS.md). Preserve eleven-existing-neighbor reuse, nearest-prefix/tie order, state-preserving relocation, delta-squared growth, uncapped Term clocks and detached lifetime. Blood spurts/gib impact callers, shared-list eviction and the actual M2 gate remain incomplete.
+diff --git a/docs/BLOOD_SPLAT_CONTRACTS.md b/docs/BLOOD_SPLAT_CONTRACTS.md
+new file mode 100644
+index 0000000..5d18536
+--- /dev/null
++++ b/docs/BLOOD_SPLAT_CONTRACTS.md
+@@ -0,0 +1,89 @@
++# Original corpse blood pools and client splats
++
++Selected `CClientSplatFX` and `CBloodSplatFX` now execute through typed publication,
++owned sprite state and the existing SDL_GPU sprite pass. See the
++[source ledger](M2_BLOOD_SPLAT_SOURCES.json) and
++[implementation evidence](../../Documentation/Implementation/M2_BLOOD_SPLATS.md).
++This extends [corpse death effects](DEATH_EFFECT_CONTRACTS.md) and
++[sprite presentation](SPRITE_VIEW_CONTRACTS.md). **M2 remains incomplete.**
++
++## Original caller and ownership
++
++After animation completion, CCorpse keeps its original 40-unit downward segment,
++ignores itself, and creates a pool only for a primary-world hit, not another
++object. It adds .1 to world Y and creates CClientSplatFX with scale .1 and growth
++.02. Burning corpses can request again on subsequent .1-second callbacks; do not
++invent a once-only gate. Cosmetic failure remains separate from corpse removal,
++health, collision and animation. The corpse inspector retains the ray, event ID
++and actual failure.
++
++CClientSplatFX is a runtime-only CClientSFX subclass. Its base chain supplies
++FORCECLIENTUPDATE; initial update schedules .0001 seconds and the next update
++requests deferred removal. Setup publishes immediately. A typed copied descriptor
++replaces the instant network payload; no pointer to the publisher or corpse is
++retained. The sprite survives either object's removal. World unload clears the
++store before resources; destination rehearsals own independent stores. Authored
++creation/save reconstruction remains rejected. Linked server-position overrides
++are outside this instant-message subset.
++
++The source passes the normal as both AlignRotation forward and up. The engine
++now shares the existing reviewed parallel-axis fallback with CMovement, then
++builds the matching quaternion, preserving the established +X right convention.
++The SDK documents a replacement up vector; the perturbation order is corroborated
++by later LithTech, not by an observed 1998 executable. Zero/nonfinite directions
++fail. Movement continues to use the same axis calculation and diagnostics.
++
++## Original CBloodSplatFX behavior
++
++Insertion order replaces the static raw linked list with a per-session vector.
++Before creating/loading/drawing randomness for a new sprite, scan existing
++sprites, including those shrinking. Distances are **squared**, strictly less than
++100. On the eleventh nearby existing sprite, move the nearest encountered so far
++to the requested position and discard the new effect. Ties keep the first. The
++scan stops there even if a later entry is nearer. This permits eleven nearby
++sprites; it is not a ten-element cap. Reuse changes no scale, rotation, resource,
++alpha, animation, growth/termination clock or event identity of the old effect.
++A retained request reports the reused identity separately from a new creation.
++
++With no supplied name, choose sprites/blood1.spr through blood3.spr. Null and
++explicit empty names are distinct; empty/missing SPR fails. Created flags are
++VISIBLE | ROTATEABLESPRITE, initial scale is uniform, RGB is (.1,.1,.1), alpha 1.
++The portable per-store RNG is independent of gameplay randomness; retail random
++sequence parity is not claimed. Three independent axis draws are retained.
++
++Growth starts with four seconds only when growth is nonzero. Cap frame delta at
++.25 seconds and multiply each scale axis by Random(1, 1 + growth * delta * 30 *
++delta), then subtract the capped delta. Keep the original **delta squared** and
++allow the final positive-time callback to overshoot zero. No default lifetime is
++invented; a finished pool persists.
++
++Term sets shrinking and resets the clock, returning false to keep the effect
++alive. Shrink callbacks first test clock >= 5; otherwise they multiply each axis
++by Random(1 - growth * capped_delta * 30, 1), write alpha from the previous clock,
++and add the **uncapped** frame duration. The tested explicit termination API does
++not implement the original shared SFX-list eviction policy. World unload releases
++immediately. The existing 1-ms CSpecialFX callback policy and independent SPR
++animation clock apply.
++
++## Bounds, rendering and inspection
++
++Positions/scales obey finite engine bounds; descriptor scale is [0,1000], growth
++[0,.1], rotation must be a unit quaternion, resource <=1000 bytes without NUL,
++source label <=100 bytes. Reversed/nonfinite or >60-second update intervals fail.
++These bounds cover the selected original caller and prevent negative shrink or
++unbounded arithmetic. Failed descriptors are not retained as unbounded strings.
++At most 256 active sprites and 64 request reports exist; capacity exhaustion is
++explicit, never invented eviction. IDs survive clear/reload. Reuse is checked
++before capacity, but descriptor validation always precedes mutation. Update errors
++remain visible and fail the session step.
++
++The shared pass uses actual external SPR/DTX frames, original surface rotation,
++per-instance RGB/alpha and world depth. Its half-extents, sorting and fullbright
++rasterization remain replacement presentation. No shader, dependency, platform
++selection or commercial asset is changed. Snapshots/inspection never advance
++clocks. The Sprites tab shows created/reused/failed counts, original timing,
++position/scale, resource/frame and prepared-quad errors, including with hidden UI.
++
++Blood-spurt particles, gib impact callers, generic/recursive gib templates, global
++SFX-list eviction, complete save/restore and the remaining required M2 services
++remain unavailable. This increment does not claim complete combat or M2 acceptance.
+diff --git a/docs/CORPSE_CONTRACTS.md b/docs/CORPSE_CONTRACTS.md
+index c344965..7beeecc 100644
+--- a/docs/CORPSE_CONTRACTS.md
++++ b/docs/CORPSE_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Ordinary original NPC death and CCorpse
+ 
++> Current extension: [original blood pools](BLOOD_SPLAT_CONTRACTS.md) now render primary-world corpse hits. Earlier pool omissions below are historical; blood spurts/gib impact callers and M2 remain incomplete.
++
+ > Extended by [initial placement contracts](CORPSE_PLACEMENT_CONTRACTS.md): the original raw body now receives bounded source-side clearance before transfer. Impossible placements fail visibly and roll back deferred, retaining the source; general/retail depenetration remains unavailable.
+ 
+ Selected original `AI_Mgr::HandleDamage`, `MC_Dead`, `AI_STATE_Dying`,
+diff --git a/docs/DEATH_EFFECT_CONTRACTS.md b/docs/DEATH_EFFECT_CONTRACTS.md
+index 764ddae..a618cca 100644
+--- a/docs/DEATH_EFFECT_CONTRACTS.md
++++ b/docs/DEATH_EFFECT_CONTRACTS.md
+@@ -134,3 +134,6 @@ service and does not close M2. The renderer and Skeleton inspector expose fragme
+ counts, resources, poses, velocity, liquid/rest state, impacts and errors. Corpse
+ and limb panels expose actual health, masks, clocks, attachment/effect/voice IDs and
+ cleanup. Inspection never advances simulation.
++
++
++Continuation: [original corpse blood pools](BLOOD_SPLAT_CONTRACTS.md) supersedes the pool omission for corpse ground hits. Blood-spurt particles, gib impact callers, shared SFX eviction and other required services remain incomplete. The M2 exit gate is unchanged.
+diff --git a/docs/M2_BLOOD_SPLAT_SOURCES.json b/docs/M2_BLOOD_SPLAT_SOURCES.json
+new file mode 100644
+index 0000000..00199e9
+--- /dev/null
++++ b/docs/M2_BLOOD_SPLAT_SOURCES.json
+@@ -0,0 +1,49 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "d7b744394b6a9fde0969362b3b6374bd52981f8e",
++  "status": "M2 incomplete; original corpse pools and detached client splats",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/ClientSplatFX.cpp",
++      "source_sha256": "f3fdd4b2792668d189613b250cbeb15535c070f0171b399670ded7cee00384f3",
++      "purpose": "Original instant publication and deferred publisher lifetime."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ClientSplatFX.h",
++      "source_sha256": "4a8ef4ab88d5f435b0fb8c1531fc4ae428fdfee5edacd9ae1d5699b4e5beef8e",
++      "purpose": "Original CClientSFX subclass."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/BloodSplatFX.cpp",
++      "source_sha256": "5d381f9d6af3203ad53d964e6dff497e291bd75c9605978915a499b5566cab3a",
++      "purpose": "Original region scan, resource selection, growth, Term and Update."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/BloodSplatFX.h",
++      "source_sha256": "ac0aadb1062dec0769d88932448e1b6a517899d6c3d18acd2c7600c51b7d71f7",
++      "purpose": "Static list insertion/removal and defaults."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/corpse.cpp",
++      "source_sha256": "f92ec5bd0e4175f61461aae1f5fe498b0a1d21b5f0ee7d889573d02480543fdd",
++      "purpose": "CreateBloodPool and animation-completion caller."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
++      "source_sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
++      "purpose": "Instant decode and terminating-list policy; shared eviction not integrated."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ClientSFX.cpp",
++      "source_sha256": "6e3731e0371a886cb02a22ba7aa5145f67b47080ed74805150d09206d41b6d54",
++      "purpose": "Inherited force-client-update base chain."
++    }
++  ],
++  "adaptations": [
++    "Typed copied descriptors and per-session values replace packets/client handles/static raw list.",
++    "Checked runtime-only publisher retains original deferred removal; sprites outlive source and release on unload.",
++    "Finite time/descriptor and active/report budgets fail explicitly; no automatic shared-list eviction.",
++    "Existing parallel-axis fallback shared with CMovement for original normal/normal alignment.",
++    "Portable RNG and existing sprite rasterization are not claimed retail-bit-identical."
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index b457121..cfbe626 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1059,3 +1059,6 @@ ported from original Blood II, retaining existing SmellHint timeout/list ownersh
+ [Source hashes](M2_AI_SMELL_SOURCES.json) and [contracts](AI_SMELL_CONTRACTS.md)
+ record original guards, cadence, phase quirks and the checked cursor/link repair.
+ No reference source, dependency, shader or commercial asset is modified.
++
++
++The [original blood-pool continuation](../../Documentation/Implementation/M2_BLOOD_SPLATS.md) connects CClientSplatFX/CBloodSplatFX with corpse ground-hit publication, persistent oriented sprites and inspection. Read [source hashes](M2_BLOOD_SPLAT_SOURCES.json) and [contracts](BLOOD_SPLAT_CONTRACTS.md). Preserve eleven-existing-neighbor reuse, nearest-prefix/tie order, state-preserving relocation, delta-squared growth, uncapped Term clocks and detached lifetime. Blood spurts/gib impact callers, shared-list eviction and the actual M2 gate remain incomplete.
+diff --git a/docs/SPRITE_VIEW_CONTRACTS.md b/docs/SPRITE_VIEW_CONTRACTS.md
+index 32961be..659f212 100644
+--- a/docs/SPRITE_VIEW_CONTRACTS.md
++++ b/docs/SPRITE_VIEW_CONTRACTS.md
+@@ -91,3 +91,6 @@ historical for that recipe; surface illumination and the actual M2 gate remain o
+ Continuation: [weapon impact flash/smoke](WEAPON_SPRITE_CONTRACTS.md) supersedes the earlier blanket impact-visual omission for wood/stone bullet sprites only. Other composite components and M2 remain open.
+ 
+ The [world-alpha correction](WORLD_ALPHA_CONTRACTS.md) supersedes earlier blanket world-opacity/transparent-marker statements for resolved bit-3 surfaces. Sky and rejected resources remain opaque markers; ordinary surfaces still ignore alpha. The new sorted world pass precedes the separately sorted translucent FX passes. M2 remains incomplete.
++
++
++Continuation: [original corpse blood pools](BLOOD_SPLAT_CONTRACTS.md) supersedes the pool omission for corpse ground hits. Blood-spurt particles, gib impact callers, shared SFX eviction and other required services remain incomplete. The M2 exit gate is unchanged.
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index c63d75f..8a2c2e3 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -43,6 +43,7 @@ namespace OpenBlood2
+         bool select_sprites = false;
+         ObjectId sprite_selection{};
+         void draw_sprites(GameSession&, ObjectSelection&);
++        void draw_blood_splats(const GameSession&);
+         void draw_weapon_sprites(const GameSession&);
+         bool select_world_sounds = false;
+         SoundId world_sound_selection = 0;
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 83ee75e..362a978 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -119,7 +119,8 @@ namespace OpenBlood2
+             ImGui::Text("Sound keys %llu / starts %llu | last voice %llu", (unsigned long long)c.sound_attempts,
+                         (unsigned long long)c.sound_starts, (unsigned long long)c.last_sound);
+             ImGui::TextWrapped("%s | %s", c.sound_resource.c_str(), c.sound_error.c_str());
+-            ImGui::Text("Blood-pool ray %d | request %s", int(c.pool_result), c.pool_requested ? "yes" : "no");
++            ImGui::Text("Blood-pool ray %d | request %s | event %llu", int(c.pool_result),
++                        c.pool_requested ? "yes" : "no", (unsigned long long)c.pool_event);
+             ImGui::TextWrapped("%s", c.pool_error.c_str());
+             ImGui::Text("Health %.1f | limb loss %d | hit node %d | limbs %llu / gib events %llu",
+                         c.m_damage.m_fHitPoints, c.limb_loss, c.hit_limb, (unsigned long long)c.limbs_created,
+diff --git a/src/app/inspector_sprites.cpp b/src/app/inspector_sprites.cpp
+index 91f74fb..0572d40 100644
+--- a/src/app/inspector_sprites.cpp
++++ b/src/app/inspector_sprites.cpp
+@@ -9,6 +9,7 @@ namespace OpenBlood2
+         ImGui::TextWrapped("Original DetailSprite placement and SPR clock; decoded DTX alpha on world-depth quads. "
+                            "Rotatable sprites use their object pose; others face the camera. Unlit replacement "
+                            "presentation: glow, view bias, no-Z and sky modes remain unavailable.");
++        draw_blood_splats(game);
+         draw_weapon_sprites(game);
+         if (sprite_view && sprite_render)
+             ImGui::Text("Prepared %zu quads / %zu entries | GPU passes %llu / texture uploads %llu | %zu RGBA bytes",
+@@ -194,3 +195,39 @@ namespace OpenBlood2
+         }
+     }
+ } // namespace OpenBlood2
++
++namespace OpenBlood2
++{
++    void Inspector::draw_blood_splats(const GameSession& game)
++    {
++        if (!ImGui::CollapsingHeader("Original blood splats / corpse pools"))
++            return;
++        const auto& effects = game.server.blood_splats;
++        ImGui::Text("Active %zu | created %llu / reused %llu / expired %llu / failed %llu", effects.active.size(),
++                    (unsigned long long)effects.started, (unsigned long long)effects.reused,
++                    (unsigned long long)effects.expired, (unsigned long long)effects.failed);
++        ImGui::TextWrapped("Detached rotatable sprites. Blood spurts, gib impact callers and general SFX-list eviction "
++                           "remain unavailable.");
++        if (!effects.update_error.empty())
++            ImGui::TextWrapped("%s", effects.update_error.c_str());
++        for (const auto& fx : effects.active)
++        {
++            ImGui::Text("Splat %llu / event %llu | grow clock %.3f | %s | alpha %.3f | callbacks %llu",
++                        (unsigned long long)fx.id, (unsigned long long)fx.event, fx.grow_time,
++                        fx.shrinking ? "shrinking" : "persistent", fx.alpha, (unsigned long long)fx.updates);
++            ImGui::Text("Position %.3f %.3f %.3f | scale %.3f %.3f %.3f", fx.position.x, fx.position.y, fx.position.z,
++                        fx.scale.x, fx.scale.y, fx.scale.z);
++            ImGui::TextWrapped("%s", fx.resource.c_str());
++            if (sprite_view)
++                for (const auto& entry : sprite_view->entries)
++                    if (entry.blood_splat == fx.id)
++                        ImGui::TextWrapped("Frame %s | %u x %u | %s | %s", entry.frame_path.c_str(), entry.width,
++                                           entry.height, entry.range == UINT32_MAX ? "not prepared" : "quad prepared",
++                                           entry.error.c_str());
++        }
++        for (const auto& report : effects.reports)
++            ImGui::TextWrapped("Event %llu / %s -> splat %llu (%s): %s", (unsigned long long)report.id,
++                               report.source.c_str(), (unsigned long long)report.effect,
++                               report.reused ? "moved existing" : "creation", report.error.c_str());
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/sprite_scene.cpp b/src/app/sprite_scene.cpp
+index eb2e70a..4f175a3 100644
+--- a/src/app/sprite_scene.cpp
++++ b/src/app/sprite_scene.cpp
+@@ -23,6 +23,13 @@ namespace OpenBlood2
+                 return false;
+             scene.entries.back().client_effect = fx.id;
+         }
++        for (const auto& fx : game.server.blood_splats.active)
++        {
++            if (!scene.add(fx.sprite.get(), fx.track, {fx.position, fx.rotation}, fx.scale,
++                           FLAG_VISIBLE | FLAG_ROTATEABLESPRITE, {}, game.resources, error, fx.alpha, {.1f, .1f, .1f}))
++                return false;
++            scene.entries.back().blood_splat = fx.id;
++        }
+         for (const auto& fx : game.server.weapon_sprites.flashes)
+         {
+             if (!scene.add(fx.sprite.get(), fx.track, {fx.settings.position, fx.rotation}, fx.scale, fx.flags, {},
+diff --git a/src/engine/object_pose.cpp b/src/engine/object_pose.cpp
+index 5b55618..acdca6e 100644
+--- a/src/engine/object_pose.cpp
++++ b/src/engine/object_pose.cpp
+@@ -3,6 +3,67 @@
+ #include <cmath>
+ namespace OpenBlood2
+ {
++    namespace
++    {
++        bool normalize(DVector v, DVector& out)
++        {
++            const auto length = std::hypot(v.x, v.y, v.z);
++            if (!physics_vector(v) || !std::isfinite(length) || length < 1e-6f)
++                return false;
++            out = vector_scale(v, 1 / length);
++            return true;
++        }
++    } // namespace
++    static DVector cross(DVector a, DVector b)
++    {
++        return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
++    }
++    // Blood II's AlignRotation contract supplies another up vector for parallel
++    // axes. The later gr_GetPerpendicularVector corroborates this perturbation
++    // order/threshold. Keep this engine's existing +X right convention.
++    bool alignment_axes(DVector direction, DVector up, DVector& forward, DVector& right, bool& fallback)
++    {
++        fallback = false;
++        if (!normalize(direction, forward) || !normalize(up, up))
++            return false;
++        auto parallel = [&]() { return std::abs(vector_dot(forward, up)) > .99f; };
++        if (parallel())
++        {
++            fallback = true;
++            up.z += 5;
++            if (!normalize(up, up))
++                return false;
++            if (parallel())
++            {
++                up.x += 5;
++                up.y += 5;
++                if (!normalize(up, up))
++                    return false;
++                if (parallel())
++                {
++                    up.x += 5;
++                    up.y -= 2;
++                    up.z -= 5;
++                    if (!normalize(up, up))
++                        return false;
++                }
++            }
++        }
++        return normalize(cross(up, forward), right);
++    }
++    bool align_rotation(DVector forward, DVector up, DRotation& rotation)
++    {
++        DVector f, right;
++        bool fallback = false;
++        DRotation base;
++        if (!alignment_axes(forward, up, f, right, fallback) || !align_rotation(f, base))
++            return false;
++        const auto base_right = rotate_vector(base, {1, 0, 0});
++        const auto base_up = rotate_vector(base, {0, 1, 0});
++        const float roll = std::atan2(vector_dot(right, base_up), vector_dot(right, base_right));
++        rotation = compose_rotation(base, rotation_from_euler({0, 0, roll}));
++        return true;
++    }
+     bool align_rotation(DVector forward, DRotation& rotation)
+     {
+         if (!physics_vector(forward) || vector_dot(forward, forward) < 1e-12f)
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index 0778d36..2e3e05b 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -30,6 +30,8 @@ namespace OpenBlood2
+     };
+     DRotation rotation_from_euler(DVector radians);
+     bool align_rotation(DVector forward, DRotation&);
++    bool alignment_axes(DVector direction, DVector up, DVector& forward, DVector& right, bool& fallback);
++    bool align_rotation(DVector forward, DVector up, DRotation&);
+     using PropertyValue = std::variant<std::string, float, bool, std::int32_t, DVector, DRotation, EulerAngles>;
+     using Properties = std::map<std::string, PropertyValue, CaseLess>;
+     struct PropertySpec
+diff --git a/src/engine/sprite_view.h b/src/engine/sprite_view.h
+index 5c888b1..aa1f707 100644
+--- a/src/engine/sprite_view.h
++++ b/src/engine/sprite_view.h
+@@ -12,6 +12,7 @@ namespace OpenBlood2
+         bool visible = false, rotatable = false;
+         std::uint32_t range = UINT32_MAX;
+         float alpha = 1;
++        std::uint64_t blood_splat = 0;
+         std::uint64_t client_effect = 0, particle_system = 0, trail_system = 0, flame_system = 0, weapon_effect = 0,
+                       object_effect = 0, stream_system = 0;
+         unsigned particle_index = 0;
+diff --git a/src/game/blood_splats.cpp b/src/game/blood_splats.cpp
+new file mode 100644
+index 0000000..404152f
+--- /dev/null
++++ b/src/game/blood_splats.cpp
+@@ -0,0 +1,110 @@
++#include "blood_splats.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++namespace OpenBlood2
++{
++    std::uint64_t BloodSplats::publish(const BloodSplatSettings& settings, std::string_view source, SpriteStore& store,
++                                       double now, std::string& error)
++    {
++        error.clear();
++        if (source.size() > 100 || source.find('\0') != std::string_view::npos || next_event_ == UINT64_MAX)
++        {
++            error = "Invalid blood splat source/event identity";
++            return 0;
++        }
++        BloodSplatReport report;
++        report.id = next_event_++;
++        report.source = source;
++
++        CBloodSplatFX effect;
++        if (!std::isfinite(now) || now < 0)
++            report.error = "Invalid blood splat publication clock";
++        else if (effect.Init(settings, report.error))
++        {
++            report.settings = settings;
++            // Original CreateObject list scan: stop at the eleventh EXISTING nearby
++            // object; move only the nearest seen so far, preserving all other state.
++            CBloodSplatFX* closest = nullptr;
++            float closest_distance = 100;
++            unsigned nearby = 0;
++            for (auto& old : active)
++            {
++                const auto d = vector_subtract(old.position, settings.position);
++                const float distance = vector_dot(d, d);
++                if (distance >= 100)
++                    continue;
++                if (distance < closest_distance)
++                {
++                    closest = &old;
++                    closest_distance = distance;
++                }
++                if (++nearby > 10)
++                {
++                    closest->position = settings.position;
++                    report.effect = closest->id;
++                    report.reused = true;
++                    ++reused;
++                    break;
++                }
++            }
++            if (!report.reused)
++            {
++                if (active.size() >= 256 || next_id_ == UINT64_MAX)
++                    report.error = "Blood splat capacity exhausted";
++                else if (effect.CreateObject(store, now, random_, report.error))
++                {
++                    effect.id = report.effect = next_id_++;
++                    effect.event = report.id;
++                    active.push_back(std::move(effect));
++                    ++started;
++                }
++            }
++        }
++        if (!report.error.empty())
++            ++failed;
++        error = report.error;
++        const auto event = report.id;
++        if (reports.size() == 64)
++            reports.erase(reports.begin());
++        reports.push_back(std::move(report));
++        return event; // Retained request, not an unconditional successful service.
++    }
++    bool BloodSplats::advance(double now)
++    {
++        bool ok = true;
++        std::erase_if(active,
++                      [&](auto& effect)
++                      {
++                          if (effect.Update(now, random_))
++                              return false;
++                          if (effect.error.empty())
++                              ++expired;
++                          else
++                          {
++                              ++failed;
++                              ok = false;
++                              update_error = effect.error;
++                          }
++                          return true;
++                      });
++        return ok;
++    }
++    bool BloodSplats::terminate(std::uint64_t id)
++    {
++        for (auto& effect : active)
++            if (effect.id == id)
++            {
++                effect.Term();
++                return true;
++            }
++        return false;
++    }
++    void BloodSplats::clear()
++    {
++        active.clear();
++        reports.clear();
++        update_error.clear();
++        started = reused = expired = failed = 0; // IDs deliberately survive unload.
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/blood_splats.h b/src/game/blood_splats.h
+new file mode 100644
+index 0000000..9ec61e9
+--- /dev/null
++++ b/src/game/blood_splats.h
+@@ -0,0 +1,28 @@
++#pragma once
++#include "game/original/BloodSplatFX.h"
++namespace OpenBlood2
++{
++    struct BloodSplatReport
++    {
++        std::uint64_t id = 0, effect = 0;
++        BloodSplatSettings settings;
++        bool reused = false;
++        std::string source, error;
++    };
++    class BloodSplats
++    {
++      public:
++        std::uint64_t publish(const BloodSplatSettings&, std::string_view, SpriteStore&, double, std::string&);
++        bool advance(double);
++        bool terminate(std::uint64_t);
++        void clear();
++        std::vector<CBloodSplatFX> active;
++        std::vector<BloodSplatReport> reports;
++        std::uint64_t started = 0, reused = 0, expired = 0, failed = 0;
++        std::string update_error;
++
++      private:
++        std::minstd_rand random_{1};
++        std::uint64_t next_id_ = 1, next_event_ = 1;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 4e4ea43..d573a4e 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -33,6 +33,7 @@ class CSBase
+ 
+ namespace OpenBlood2
+ {
++    struct BloodSplatSettings;
+     struct WeaponSpriteSettings;
+     struct ParticleStreamSettings;
+     struct SkyDefinition;
+@@ -83,6 +84,7 @@ class ServerDE : public CSBase
+                                         unsigned failed = 0) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
+     virtual std::uint64_t PublishParticleStream(HOBJECT, const OpenBlood2::ParticleStreamSettings&, std::string&) = 0;
++    virtual std::uint64_t PublishBloodSplat(HOBJECT, const OpenBlood2::BloodSplatSettings&, std::string&) = 0;
+     virtual std::uint64_t PublishFleshGibs(HOBJECT, DVector, DVector, DVector, float, unsigned, std::string&) = 0;
+     virtual std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) = 0;
+     virtual std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&) = 0;
+diff --git a/src/game/original/BloodSplatFX.cpp b/src/game/original/BloodSplatFX.cpp
+new file mode 100644
+index 0000000..fb32082
+--- /dev/null
++++ b/src/game/original/BloodSplatFX.cpp
+@@ -0,0 +1,93 @@
++#include "BloodSplatFX.h"
++#include "engine/collision.h"
++#include <cmath>
++using namespace OpenBlood2;
++bool CBloodSplatFX::Init(const BloodSplatSettings& input, std::string& failure)
++{
++    failure.clear();
++    *this = {};
++    const auto q = input.rotation;
++    const auto length = vector_dot(q.m_Vec, q.m_Vec) + q.m_Spin * q.m_Spin;
++    if (!physics_vector(input.position) || !std::isfinite(length) || std::abs(length - 1) > .001f ||
++        !std::isfinite(input.scale) || input.scale < 0 || input.scale > 1000 || !std::isfinite(input.grow_scale) ||
++        input.grow_scale < 0 || input.grow_scale > .1f ||
++        (input.resource && (input.resource->size() > 1000 || input.resource->find('\0') != std::string::npos)))
++    {
++        failure = "Invalid blood splat transform/growth/resource";
++        return false;
++    }
++    settings = input;
++    position = input.position;
++    rotation = input.rotation;
++    scale = {input.scale, input.scale, input.scale};
++    grow_time = input.grow_scale ? 4.f : 0.f;
++    initialized_ = true;
++    return true;
++}
++bool CBloodSplatFX::CreateObject(SpriteStore& store, double now, std::minstd_rand& random, std::string& failure)
++{
++    failure.clear();
++    if (!initialized_ || sprite || !std::isfinite(now) || now < 0)
++    {
++        failure = "Invalid blood splat creation state/time";
++        return false;
++    }
++    resource = settings.resource
++                   ? *settings.resource
++                   : "sprites/blood" + std::to_string(std::uniform_int_distribution<int>(1, 3)(random)) + ".spr";
++    if (!store.load(resource, sprite, failure))
++        return false;
++    last_time = now;
++    return true;
++}
++bool CBloodSplatFX::Term()
++{
++    shrinking = true;
++    grow_time = 0;
++    return false; // Source keeps the effect in the terminating list.
++}
++bool CBloodSplatFX::Update(double now, std::minstd_rand& random)
++{
++    error.clear();
++    if (!sprite || !std::isfinite(now) || now < last_time || now - last_time > 60 ||
++        !advance_sprite(*sprite, track, now - last_time))
++    {
++        error = "Invalid blood splat clock/state";
++        return false;
++    }
++    const float elapsed = static_cast<float>(now - last_time);
++    last_time = now;
++    if (now < next_update)
++        return true;
++    ++updates;
++    const float delta = std::min(elapsed, .25f);
++    auto multiply = [&](float lo, float hi)
++    {
++        std::uniform_real_distribution<float> draw(lo, hi);
++        scale.x *= draw(random);
++        scale.y *= draw(random);
++        scale.z *= draw(random);
++    };
++    if (settings.grow_scale && grow_time > 0 && !shrinking)
++    {
++        const float amount = settings.grow_scale * delta * 30.f;
++        multiply(1, 1 + amount * delta); // Original delta squared, independent axis draws.
++        grow_time -= delta;
++    }
++    else if (shrinking)
++    {
++        if (grow_time >= 5)
++            return false;
++        if (settings.grow_scale)
++            multiply(1 - settings.grow_scale * delta * 30.f, 1);
++        alpha = 1 - grow_time / 5; // Alpha uses the previous, uncapped termination clock.
++        grow_time += elapsed;
++    }
++    if (!physics_vector(scale))
++    {
++        error = "Blood splat growth exceeds finite bounds";
++        return false;
++    }
++    next_update = now + .001;
++    return true;
++}
+diff --git a/src/game/original/BloodSplatFX.h b/src/game/original/BloodSplatFX.h
+new file mode 100644
+index 0000000..9a790ea
+--- /dev/null
++++ b/src/game/original/BloodSplatFX.h
+@@ -0,0 +1,37 @@
++#pragma once
++#include "engine/model.h"
++#include "engine/sprite.h"
++#include <optional>
++#include <random>
++namespace OpenBlood2
++{
++    struct BloodSplatSettings
++    {
++        DVector position{};
++        DRotation rotation{};
++        float scale = .1f, grow_scale = .02f;
++        std::optional<std::string> resource;
++    };
++} // namespace OpenBlood2
++// Selected original ClientShellDLL/BloodSplatFX.cpp, owned client state.
++class CBloodSplatFX
++{
++  public:
++    bool Init(const OpenBlood2::BloodSplatSettings&, std::string&);
++    bool CreateObject(OpenBlood2::SpriteStore&, double, std::minstd_rand&, std::string&);
++    bool Update(double, std::minstd_rand&);
++    bool Term();
++    OpenBlood2::BloodSplatSettings settings;
++    std::shared_ptr<const OpenBlood2::Sprite> sprite;
++    OpenBlood2::SpriteTrack track;
++    DVector position{}, scale{};
++    DRotation rotation{};
++    float alpha = 1, grow_time = 0;
++    bool shrinking = false;
++    double last_time = 0, next_update = 0;
++    std::uint64_t id = 0, event = 0, updates = 0;
++    std::string resource, error;
++
++  private:
++    bool initialized_ = false;
++};
+diff --git a/src/game/original/ClientSplatFX.cpp b/src/game/original/ClientSplatFX.cpp
+new file mode 100644
+index 0000000..5afc930
+--- /dev/null
++++ b/src/game/original/ClientSplatFX.cpp
+@@ -0,0 +1,33 @@
++// Selected original ObjectDLL/ClientSplatFX.cpp; instant typed publication.
++#include "ClientSplatFX.h"
++#include "engine/objects.h"
++#include "game/blood_splats.h"
++using namespace OpenBlood2;
++bool CClientSplatFX::Setup(DVector position, DVector direction, float scale, float growth)
++{
++    error.clear();
++    BloodSplatSettings settings;
++    settings.position = position;
++    settings.scale = scale;
++    settings.grow_scale = growth;
++    // The source passes the same direction for forward and up.
++    if (!g_pServerDE || !align_rotation(direction, direction, settings.rotation))
++    {
++        error = "Cannot align blood splat normal";
++        return false;
++    }
++    event = g_pServerDE->PublishBloodSplat(m_hObject, settings, error);
++    return event && error.empty();
++}
++DDWORD CClientSplatFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (!g_pServerDE)
++        return 0;
++    if (message == MID_PRECREATE && (!data || reason != PRECREATE_NORMAL))
++        return 0; // Runtime-only subset: no world-file/save reconstruction.
++    if (message == MID_INITIALUPDATE)
++        g_pServerDE->SetNextUpdate(m_hObject, .0001f);
++    else if (message == MID_UPDATE)
++        g_pServerDE->RemoveObject(m_hObject);
++    return CClientSFX::EngineMessageFn(message, data, reason);
++}
+diff --git a/src/game/original/ClientSplatFX.h b/src/game/original/ClientSplatFX.h
+new file mode 100644
+index 0000000..6c37dd7
+--- /dev/null
++++ b/src/game/original/ClientSplatFX.h
+@@ -0,0 +1,12 @@
++#pragma once
++#include "ClientSFX.h"
++class CClientSplatFX : public CClientSFX
++{
++  public:
++    bool Setup(DVector position, DVector direction, float scale, float growth);
++    std::uint64_t event = 0;
++    std::string error;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++};
+diff --git a/src/game/original/Corpse.cpp b/src/game/original/Corpse.cpp
+index 14c1648..dedc87c 100644
+--- a/src/game/original/Corpse.cpp
++++ b/src/game/original/Corpse.cpp
+@@ -1,5 +1,6 @@
+ // Original ObjectDLL/corpse.cpp: selected corpse lifetime, burning and damage.
+ #include "Corpse.h"
++#include "ClientSplatFX.h"
+ #include "Gib.h"
+ #include "Sparam.h"
+ #include "engine/collision.h"
+@@ -143,7 +144,19 @@ bool CCorpse::Update()
+             {
+                 pool_hit.point.y += .1f;
+                 pool_requested = true;
+-                pool_error = "Original CClientSplatFX is unavailable; blood pool is not rendered";
++                ObjectCreateStruct create;
++                create.m_Pos = pool_hit.point;
++                const auto publisher = s->CreateObject(s->GetClass("CClientSplatFX"), &create);
++                auto* splat = dynamic_cast<CClientSplatFX*>(publisher);
++                pool_event = 0;
++                if (!splat)
++                    pool_error = "Cannot create original CClientSplatFX";
++                else
++                {
++                    splat->Setup(pool_hit.point, pool_hit.normal, .1f, .02f);
++                    pool_event = splat->event;
++                    pool_error = splat->error;
++                }
+             }
+             else if (pool_result != SegmentResult::Miss && pool_result != SegmentResult::Hit)
+                 pool_error = "Corpse blood-pool ray unavailable";
+diff --git a/src/game/original/Corpse.h b/src/game/original/Corpse.h
+index cd5059d..304b718 100644
+--- a/src/game/original/Corpse.h
++++ b/src/game/original/Corpse.h
+@@ -34,6 +34,7 @@ class CCorpse : public B2BaseClass
+     OpenBlood2::SegmentResult pool_result = OpenBlood2::SegmentResult::Invalid;
+     OpenBlood2::SegmentHit pool_hit;
+     bool pool_requested = false;
++    std::uint64_t pool_event = 0;
+     std::string pool_error;
+ 
+   protected:
+diff --git a/src/game/original/Movement.cpp b/src/game/original/Movement.cpp
+index db74a01..30ad770 100644
+--- a/src/game/original/Movement.cpp
++++ b/src/game/original/Movement.cpp
+@@ -6,51 +6,6 @@
+ using namespace OpenBlood2;
+ namespace
+ {
+-    bool normalize(DVector v, DVector& out)
+-    {
+-        const auto length = std::hypot(v.x, v.y, v.z);
+-        if (!physics_vector(v) || !std::isfinite(length) || length < 1e-6f)
+-            return false;
+-        out = vector_scale(v, 1 / length);
+-        return true;
+-    }
+-    DVector cross(DVector a, DVector b)
+-    {
+-        return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
+-    }
+-    // Blood II's AlignRotation contract supplies another up vector for parallel
+-    // axes. The later gr_GetPerpendicularVector corroborates this perturbation
+-    // order/threshold. Keep this engine's existing +X right convention.
+-    bool axes(DVector direction, DVector up, DVector& forward, DVector& right, bool& fallback)
+-    {
+-        fallback = false;
+-        if (!normalize(direction, forward) || !normalize(up, up))
+-            return false;
+-        auto parallel = [&]() { return std::abs(vector_dot(forward, up)) > .99f; };
+-        if (parallel())
+-        {
+-            fallback = true;
+-            up.z += 5;
+-            if (!normalize(up, up))
+-                return false;
+-            if (parallel())
+-            {
+-                up.x += 5;
+-                up.y += 5;
+-                if (!normalize(up, up))
+-                    return false;
+-                if (parallel())
+-                {
+-                    up.x += 5;
+-                    up.y -= 2;
+-                    up.z -= 5;
+-                    if (!normalize(up, up))
+-                        return false;
+-                }
+-            }
+-        }
+-        return normalize(cross(up, forward), right);
+-    }
+     float distance(DVector a, DVector b)
+     {
+         auto d = vector_subtract(a, b);
+@@ -60,7 +15,7 @@ namespace
+ bool CMovement::frame_axes(DVector direction, DVector& forward_axis, DVector& right_axis)
+ {
+     bool fallback = false;
+-    if (!axes(direction, up, forward_axis, right_axis, fallback))
++    if (!alignment_axes(direction, up, forward_axis, right_axis, fallback))
+         return false;
+     if (fallback)
+     {
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index d1c5b3b..5158120 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -8,6 +8,7 @@
+ #include "game/original/ClientExplosionSFX.h"
+ #include "game/original/ClientLightFX.h"
+ #include "game/original/ClientParticleStreamSFX.h"
++#include "game/original/ClientSplatFX.h"
+ #include "game/original/ConversationTrigger.h"
+ #include "game/original/Corpse.h"
+ #include "game/original/CultistAI.h"
+@@ -210,6 +211,7 @@ namespace OpenBlood2
+                                    {"StartActive", false},
+                                    {"Looping", false}}};
+         const ClassInfo client_sfx{"CClientSFX", &b2base, construct<CClientSFX>, {}};
++        const ClassInfo client_splat{"CClientSplatFX", &client_sfx, construct<CClientSplatFX>, {}};
+         const ClassInfo particle_stream{"CClientParticleStreamSFX",
+                                         &client_sfx,
+                                         construct<CClientParticleStreamSFX>,
+@@ -813,19 +815,19 @@ namespace OpenBlood2
+         return objects.register_class(base) && objects.register_class(sky_model) &&
+                objects.register_class(sky_pointer) && objects.register_class(builtin_model) &&
+                objects.register_class(b2base) && objects.register_class(camera) && objects.register_class(client_sfx) &&
+-               objects.register_class(particle_stream) && objects.register_class(scene_explosion) &&
+-               objects.register_class(client_light) && objects.register_class(light_SquareWaveLightFX) &&
+-               objects.register_class(light_SawWaveLightFX) && objects.register_class(light_RampUpWaveLightFX) &&
+-               objects.register_class(light_RampDownWaveLightFX) && objects.register_class(light_SineWaveLightFX) &&
+-               objects.register_class(light_Flicker1WaveLightFX) && objects.register_class(light_Flicker2WaveLightFX) &&
+-               objects.register_class(light_Flicker3WaveLightFX) && objects.register_class(light_Flicker4WaveLightFX) &&
+-               objects.register_class(light_StrobeWaveLightFX) && objects.register_class(light_SearchWaveLightFX) &&
+-               objects.register_class(light_FlickerLight) && objects.register_class(light_GlowingLight) &&
+-               objects.register_class(camera_object) && objects.register_class(cinematic_trigger) &&
+-               objects.register_class(random_sound) && objects.register_class(sound_fx) &&
+-               objects.register_class(detail_sprite) && objects.register_class(sound) &&
+-               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
+-               objects.register_class(game_start) && objects.register_class(path) &&
++               objects.register_class(client_splat) && objects.register_class(particle_stream) &&
++               objects.register_class(scene_explosion) && objects.register_class(client_light) &&
++               objects.register_class(light_SquareWaveLightFX) && objects.register_class(light_SawWaveLightFX) &&
++               objects.register_class(light_RampUpWaveLightFX) && objects.register_class(light_RampDownWaveLightFX) &&
++               objects.register_class(light_SineWaveLightFX) && objects.register_class(light_Flicker1WaveLightFX) &&
++               objects.register_class(light_Flicker2WaveLightFX) && objects.register_class(light_Flicker3WaveLightFX) &&
++               objects.register_class(light_Flicker4WaveLightFX) && objects.register_class(light_StrobeWaveLightFX) &&
++               objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
++               objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
++               objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
++               objects.register_class(sound_fx) && objects.register_class(detail_sprite) &&
++               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
++               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
+                objects.register_class(world_properties) && objects.register_class(smell) &&
+                objects.register_class(exit_hint) && objects.register_class(character) &&
+                objects.register_class(ai_manager) && objects.register_class(cultist) &&
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 7234984..30a97ae 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -4,6 +4,7 @@
+ #include "engine/objects.h"
+ #include "engine/sky.h"
+ #include "engine/string_resources.h"
++#include "game/blood_splats.h"
+ #include "game/explosion_flames.h"
+ #include "game/explosion_fragments.h"
+ #include "game/explosion_lights.h"
+@@ -94,6 +95,8 @@ namespace OpenBlood2
+         void RecordDebrisEffect(const DebrisEffect&) override;
+         std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         ExplosionSprites explosion_sprites;
++        BloodSplats blood_splats;
++        std::uint64_t PublishBloodSplat(HOBJECT, const BloodSplatSettings&, std::string&) override;
+         WeaponSprites weapon_sprites;
+         std::uint64_t PublishWeaponSprites(HOBJECT, const WeaponSpriteSettings&, std::string&) override;
+         ExplosionModels explosion_models;
+@@ -151,6 +154,7 @@ namespace OpenBlood2
+             scene_explosions.clear();
+             projectile_reports.clear();
+             explosion_sprites.clear();
++            blood_splats.clear();
+             weapon_sprites.clear();
+             explosion_models.clear();
+             laser_beams.clear();
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index d9e86a5..f69586a 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -2,6 +2,18 @@
+ #include <cmath>
+ namespace OpenBlood2
+ {
++    std::uint64_t ServerAdapter::PublishBloodSplat(HOBJECT source, const BloodSplatSettings& settings,
++                                                   std::string& error)
++    {
++        trace_service("PublishBloodSplat (original detached pool sprite)");
++        error.clear();
++        if (!IsObjectAlive(source) || !objects_.sprites)
++        {
++            error = "Blood splat source/store unavailable";
++            return 0;
++        }
++        return blood_splats.publish(settings, GetObjectName(source), *objects_.sprites, objects_.time(), error);
++    }
+     std::uint64_t ServerAdapter::PublishFleshGibs(HOBJECT owner, DVector pos, DVector dir, DVector dims, float scale,
+                                                   unsigned count, std::string& error)
+     {
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 53c3ab4..da19e8a 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -489,6 +489,7 @@ namespace OpenBlood2
+                                             flash_owner ? flash_owner->m_hObject : nullptr) &&
+              ok;
+         ok = server.explosion_sprites.advance(objects.time()) && ok;
++        ok = server.blood_splats.advance(objects.time()) && ok;
+         ok = server.weapon_sprites.advance(objects.time()) && ok;
+         ok = server.explosion_models.advance(objects.time()) && ok;
+         ok = server.laser_beams.advance(objects.time()) && ok;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index ef934de..5914b11 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1744,3 +1744,26 @@ if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+     add_test(NAME gpu.death_effects COMMAND death_effect_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/death-effect-gpu" "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(gpu.death_effects PROPERTIES LABELS "gpu;private;death_effects" TIMEOUT 120 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+ endif()
++
++add_executable(blood_splat_tests blood_splat_tests.cpp ../src/app/sprite_scene.cpp)
++target_link_libraries(blood_splat_tests PRIVATE blood2_game)
++blood2_project_options(blood_splat_tests)
++foreach(case IN ITEMS formulas region failures session)
++    add_test(NAME blood_splats.${case} COMMAND blood_splat_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/blood-splats-${case}")
++    set_tests_properties(blood_splats.${case} PROPERTIES LABELS "headless;blood_splats" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME blood_splats.private COMMAND blood_splat_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(blood_splats.private PROPERTIES LABELS "headless;private;blood_splats" TIMEOUT 120)
++endif()
++if(BLOOD2_GPU_TESTS)
++    add_executable(blood_splat_gpu_tests blood_splat_gpu_tests.cpp ../src/app/sprite_scene.cpp)
++    target_link_libraries(blood_splat_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(blood_splat_gpu_tests)
++    add_test(NAME gpu.blood_splat_alpha COMMAND blood_splat_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/blood-splat-alpha")
++    set_tests_properties(gpu.blood_splat_alpha PROPERTIES LABELS "gpu;blood_splats" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.blood_splat_private COMMAND blood_splat_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/blood-splat-private" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.blood_splat_private PROPERTIES LABELS "gpu;private;blood_splats" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    endif()
++endif()
+diff --git a/tests/blood_splat_fixture.h b/tests/blood_splat_fixture.h
+new file mode 100644
+index 0000000..dcd22e7
+--- /dev/null
++++ b/tests/blood_splat_fixture.h
+@@ -0,0 +1,45 @@
++#pragma once
++#include "sprite_view_fixture.h"
++namespace test_blood_splat
++{
++    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error,
++                      bool flash = true, bool smoke = true)
++    {
++        if (!test_sprite_view::mount(resources, root, error))
++            return false;
++        test_model::Writer spr;
++        spr.u32(2);
++        spr.u32(10);
++        spr.u32(1);
++        spr.u32(0);
++        spr.u32(0);
++        for (int i = 0; i < 2; ++i)
++        {
++            const std::string path = "alpha.dtx";
++            spr.u16(path.size());
++            spr.b.insert(spr.b.end(), path.begin(), path.end());
++        }
++        test_player::Directory dir;
++        for (int i = 1; i <= 3; ++i)
++        {
++            if (flash)
++                dir.children["sprites"].files["blood" + std::to_string(i) + ".spr"] = spr.b;
++            if (smoke)
++                dir.children["sprites"].files["smokepuff" + std::to_string(i) + ".spr"] = spr.b;
++        }
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, dir);
++        w.patch(131, off);
++        w.patch(135, size);
++        auto file = root / "blood-splats.rez";
++        std::ofstream out(file, std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        return resources.mount(file, error);
++    }
++} // namespace test_blood_splat
+diff --git a/tests/blood_splat_gpu_tests.cpp b/tests/blood_splat_gpu_tests.cpp
+new file mode 100644
+index 0000000..9dd8413
+--- /dev/null
++++ b/tests/blood_splat_gpu_tests.cpp
+@@ -0,0 +1,159 @@
++#include "app/sprite_scene.h"
++#include "blood_splat_fixture.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "game/original/ClientSplatFX.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << " " << error << " " << SDL_GetError() << "\n";                         \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool render(Runtime& runtime, WorldRenderer& renderer, SpriteView& scene, DVector eye, DRotation camera,
++                Capture& capture, std::vector<std::uint8_t>& pixels, std::string& error)
++    {
++        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300)) ||
++            !renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true))
++            return false;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        if (!commands)
++            return false;
++        if (!renderer.draw(commands, capture.texture, scene.mesh, scene.draws, eye, camera, false, error))
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 300;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 300;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
++            return false;
++        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        if (!data)
++            return false;
++        pixels.assign(data, data + 400 * 300 * 4);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    Runtime runtime;
++    std::string error;
++    CHECK(runtime.initialize(true, error));
++    std::cout << "GPU device: "
++              << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu), SDL_PROP_GPU_DEVICE_NAME_STRING,
++                                       "unreported")
++              << " | backend " << SDL_GetGPUDeviceDriver(runtime.gpu) << "\n";
++    WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
++    Capture capture;
++    SpriteView scene;
++    Resources resources;
++    CHECK(test_blood_splat::mount(resources, argv[1], error));
++    SpriteStore store(resources);
++    BloodSplatSettings settings;
++    settings.position = {0, 0, 2};
++    settings.scale = .5f;
++    settings.grow_scale = 0;
++    settings.resource = "sprites/blood1.spr";
++    CBloodSplatFX effect;
++    std::minstd_rand random(1);
++    CHECK(effect.Init(settings, error) && effect.CreateObject(store, 0, random, error));
++    CHECK(!effect.Term() && effect.Update(2, random) && effect.Update(3, random));
++    std::vector<std::uint8_t> white, tinted;
++    for (bool tint : {false, true})
++    {
++        CHECK(scene.begin_frame({}, {}, error) &&
++              scene.add(effect.sprite.get(), effect.track, {effect.position, effect.rotation}, effect.scale,
++                        FLAG_VISIBLE | FLAG_ROTATEABLESPRITE, {}, resources, error, tint ? effect.alpha : 1,
++                        tint ? DVector{.1f, .1f, .1f} : DVector{1, 1, 1}));
++        CHECK(scene.entries[0].error.empty() &&
++              render(runtime, renderer, scene, {}, {}, capture, tint ? tinted : white, error));
++    }
++    unsigned verified = 0;
++    for (unsigned k = 0; k < white.size(); k += 4)
++        if (white[k] == 255 && white[k + 1] == 0 && white[k + 2] == 0)
++        {
++            CHECK(std::abs(int(tinted[k]) - (25.5f * effect.alpha + 6 * (1 - effect.alpha))) <= 2);
++            CHECK(std::abs(int(tinted[k + 1]) - 9 * (1 - effect.alpha)) <= 2 &&
++                  std::abs(int(tinted[k + 2]) - 13 * (1 - effect.alpha)) <= 2);
++            ++verified;
++        }
++    CHECK(verified > 100 && capture.save((std::filesystem::path(argv[1]) / "splat-tint-alpha.png").c_str()));
++    std::cout << "Original blood splat tint/Term alpha: " << verified << " exact opaque-texel blends\n";
++    if (argc == 3)
++    {
++        GameSession g;
++        Config config;
++        config.data_dir = argv[2];
++        CHECK(g.initialize() && g.resources.mount_game(config, error));
++        std::uint64_t last = 0;
++        for (int cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error));
++            auto h = g.objects.create(g.objects.find_class("CClientSplatFX"), {});
++            auto* publisher = dynamic_cast<CClientSplatFX*>(g.server.HandleToObject(h));
++            CHECK(publisher && publisher->Setup({0, 5000, 0}, {0, 1, 0}, .1f, .02f));
++            CHECK(g.objects.advance(.001) && !g.server.IsObjectAlive(h) && g.server.blood_splats.active.size() == 1);
++            CHECK(g.server.blood_splats.active.front().id > last);
++            last = g.server.blood_splats.active.front().id;
++            for (int variant = 1; variant <= 3; ++variant)
++            {
++                auto& pool = g.server.blood_splats.active.front();
++                auto s = pool.settings;
++                s.resource = "sprites/blood" + std::to_string(variant) + ".spr";
++                CBloodSplatFX f;
++                CHECK(f.Init(s, error) && f.CreateObject(g.sprites, 0, random, error) && f.Update(.25, random));
++                // Top-down view of original normal-aligned pool; no billboard substitution.
++                const auto eye = vector_add(f.position, {0, 35, 0});
++                DRotation camera;
++                CHECK(align_rotation({0, -1, 0}, camera));
++                CHECK(scene.begin_frame(eye, camera, error) &&
++                      scene.add(f.sprite.get(), f.track, {f.position, f.rotation}, f.scale,
++                                FLAG_VISIBLE | FLAG_ROTATEABLESPRITE, {}, g.resources, error, f.alpha,
++                                {.1f, .1f, .1f}));
++                CHECK(scene.entries[0].error.empty() && scene.draws.size() == 1);
++                std::vector<std::uint8_t> pixels;
++                CHECK(render(runtime, renderer, scene, eye, camera, capture, pixels, error));
++                unsigned ink = 0;
++                for (unsigned k = 0; k < pixels.size(); k += 4)
++                    if (pixels[k] != 6 || pixels[k + 1] != 9 || pixels[k + 2] != 13)
++                        ++ink;
++                CHECK(ink > 50 && ink < 400 * 300);
++                CHECK(capture.save(
++                    (std::filesystem::path(argv[1]) / ("private-blood" + std::to_string(variant) + ".png")).c_str()));
++                std::cout << "Private cycle " << cycle << " variant " << variant << " " << scene.entries[0].frame_path
++                          << " changed pixels " << ink << "\n";
++            }
++            CHECK(g.unload_world() && g.server.blood_splats.active.empty());
++            scene.clear();
++            renderer.clear_geometry();
++            CHECK(update_sprite_scene(g, scene, error) && scene.entries.empty());
++        }
++    }
++    return 0;
++}
+diff --git a/tests/blood_splat_tests.cpp b/tests/blood_splat_tests.cpp
+new file mode 100644
+index 0000000..956b7da
+--- /dev/null
++++ b/tests/blood_splat_tests.cpp
+@@ -0,0 +1,267 @@
++#include "app/sprite_scene.h"
++#include "blood_splat_fixture.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/ClientSplatFX.h"
++#include "game/original/Corpse.h"
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .0001f;
++    }
++    bool alignment()
++    {
++        for (auto forward :
++             {DVector{0, 1, 0}, DVector{0, -1, 0}, DVector{0, 0, 1}, DVector{0, 0, -1}, DVector{1, 2, 3}})
++        {
++            DVector f, right;
++            bool fallback = false;
++            DRotation q;
++            CHECK(alignment_axes(forward, forward, f, right, fallback) && fallback &&
++                  align_rotation(forward, forward, q));
++            auto actual = rotate_vector(q, {0, 0, 1}), r = rotate_vector(q, {1, 0, 0});
++            CHECK(near(vector_dot(actual, f), 1) && near(vector_dot(r, right), 1));
++        }
++        DRotation q;
++        CHECK(!align_rotation({}, {0, 1, 0}, q) && !align_rotation({1, 0, 0}, {}, q));
++        return true;
++    }
++    bool formulas(const std::filesystem::path& root)
++    {
++        Resources resources;
++        std::string error;
++        CHECK(test_blood_splat::mount(resources, root, error));
++        SpriteStore store(resources);
++        BloodSplatSettings s;
++        s.resource = "sprites/blood1.spr";
++        CBloodSplatFX f;
++        std::minstd_rand random(1), expected(1);
++        CHECK(f.Init(s, error) && f.CreateObject(store, 0, random, error) && f.grow_time == 4);
++        CHECK(f.Update(.1, random));
++        std::uniform_real_distribution<float> grow(1, 1 + .02f * .1f * 30 * .1f);
++        CHECK(near(f.scale.x, .1f * grow(expected)) && near(f.scale.y, .1f * grow(expected)) &&
++              near(f.scale.z, .1f * grow(expected)));
++        CHECK(near(f.grow_time, 3.9f));
++        const auto before = f.scale;
++        CHECK(f.Update(1.1, random));
++        std::uniform_real_distribution<float> capped(1, 1 + .02f * .25f * 30 * .25f);
++        CHECK(near(f.scale.x, before.x * capped(expected)) && near(f.scale.y, before.y * capped(expected)) &&
++              near(f.scale.z, before.z * capped(expected)));
++        CHECK(near(f.grow_time, 3.65f) && !f.Term() && f.shrinking && f.grow_time == 0);
++        CHECK(f.Update(3.1, random) && f.alpha == 1 && near(f.grow_time, 2));
++        CHECK(f.Update(6.1, random) && near(f.alpha, .6f) && near(f.grow_time, 5));
++        CHECK(!f.Update(6.2, random) && f.error.empty());
++        s.grow_scale = 0;
++        CHECK(f.Init(s, error) && f.CreateObject(store, 0, random, error) && f.Update(50, random) &&
++              f.Update(100, random) && f.scale.x == .1f && f.alpha == 1);
++        CHECK(!f.Term() && f.Update(101, random) && f.scale.x == .1f && f.alpha == 1 && f.Update(102, random) &&
++              near(f.alpha, .8f));
++        s.grow_scale = .02f;
++        CHECK(f.Init(s, error) && f.CreateObject(store, 0, random, error));
++        for (int i = 1; i <= 17; ++i)
++            CHECK(f.Update(i * .25, random));
++        auto stopped = f.scale;
++        CHECK(f.grow_time <= 0 && f.Update(6, random) && f.scale.x == stopped.x);
++        return alignment();
++    }
++    bool region(const std::filesystem::path& root)
++    {
++        Resources resources;
++        std::string error;
++        CHECK(test_blood_splat::mount(resources, root, error));
++        SpriteStore store(resources);
++        BloodSplats effects;
++        BloodSplatSettings s;
++        s.resource = "sprites/blood1.spr";
++        for (unsigned i = 0; i < 11; ++i)
++        {
++            s.position = {float(i) * .5f, 0, 0};
++            CHECK(effects.publish(s, "region", store, 0, error) && error.empty());
++        }
++        CHECK(effects.active.size() == 11 && effects.started == 11 && effects.reused == 0);
++        CHECK(effects.advance(.1));
++        const auto original = effects.active[2];
++        s.position = {1.1f, 0, 0};
++        s.scale = 1;
++        s.grow_scale = 0;
++        s.resource = "missing.spr";
++        CHECK(effects.publish(s, "reuse", store, .1, error) && error.empty() && effects.active.size() == 11);
++        CHECK(effects.reports.back().reused && effects.reports.back().effect == original.id && effects.reused == 1);
++        auto& moved = effects.active[2];
++        CHECK(moved.position.x == 1.1f && moved.scale.x == original.scale.x && moved.resource == original.resource &&
++              moved.grow_time == original.grow_time && moved.updates == original.updates);
++        // Exactly 10 units away is outside (squared distance strictly <100).
++        effects.clear();
++        s = {};
++        s.resource = "sprites/blood1.spr";
++        for (int i = 0; i < 11; ++i)
++            CHECK(effects.publish(s, "same", store, 0, error) && error.empty());
++        s.position = {10, 0, 0};
++        CHECK(effects.publish(s, "boundary", store, 0, error) && error.empty() && effects.active.size() == 12);
++        // Scan stops at 11, although the twelfth object is now the nearest.
++        s.position = {9, 0, 0};
++        CHECK(effects.publish(s, "early", store, 0, error) &&
++              effects.reports.back().effect == effects.active.front().id);
++        CHECK(effects.active.front().position.x == 9 && effects.active.back().position.x == 10);
++        CHECK(effects.terminate(effects.active.front().id));
++        s.position = {9, 0, 0};
++        CHECK(effects.publish(s, "shrinking reuse", store, 0, error) && effects.active.front().shrinking);
++        auto id = effects.active.back().id;
++        effects.clear();
++        CHECK(effects.publish(s, "reload", store, 0, error) && effects.active.front().id > id);
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        Resources resources;
++        std::string error;
++        CHECK(test_blood_splat::mount(resources, root, error));
++        SpriteStore store(resources);
++        BloodSplats effects;
++        BloodSplatSettings s;
++        s.position.x = std::numeric_limits<float>::infinity();
++        CHECK(effects.publish(s, "invalid", store, 0, error) && !error.empty() && effects.active.empty());
++        s = {};
++        s.resource = "";
++        CHECK(effects.publish(s, "empty", store, 0, error) && !error.empty());
++        s.resource = "missing.spr";
++        CHECK(effects.publish(s, "missing", store, 0, error) && !error.empty());
++        s = {};
++        s.rotation.m_Spin = 0;
++        CHECK(effects.publish(s, "rotation", store, 0, error) && !error.empty());
++        s = {};
++        s.grow_scale = .2f;
++        CHECK(effects.publish(s, "growth", store, 0, error) && !error.empty());
++        s = {};
++        CHECK(!effects.publish(s, std::string(101, 'x'), store, 0, error) && !error.empty());
++        for (unsigned i = 0; i < 256; ++i)
++        {
++            s.position = {float(i) * 30, 0, 0};
++            CHECK(effects.publish(s, "capacity", store, 0, error) && error.empty());
++        }
++        s.position.x += 30;
++        CHECK(effects.publish(s, "overflow", store, 0, error) && !error.empty() && effects.active.size() == 256 &&
++              effects.reports.size() == 64);
++        CHECK(!effects.advance(-1) && effects.active.empty() && !effects.update_error.empty());
++        return true;
++    }
++    bool session(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        std::string error;
++        CHECK(test_blood_splat::mount(g.resources, root, error));
++        auto h = g.objects.create(g.objects.find_class("CClientSplatFX"), {});
++        auto* splat = dynamic_cast<CClientSplatFX*>(g.server.HandleToObject(h));
++        CHECK(splat && splat->Setup({0, 1, 0}, {0, 1, 0}, .1f, .02f) && splat->event &&
++              g.server.blood_splats.started == 1);
++        CHECK(g.objects.get(h)->state.m_Flags & FLAG_FORCECLIENTUPDATE);
++        const auto id = g.server.blood_splats.active.front().id;
++        CHECK(g.objects.advance(.001) && !g.server.IsObjectAlive(h) && g.server.blood_splats.active.size() == 1);
++        BloodSplatSettings s;
++        CHECK(!g.server.PublishBloodSplat(h, s, error) && !error.empty());
++        CHECK(!g.objects.create(g.objects.find_class("CClientSplatFX"), {}, Creation::World));
++        CHECK(g.server.blood_splats.advance(g.objects.time()));
++        SpriteView view;
++        auto callbacks = g.server.blood_splats.active.front().updates;
++        CHECK(update_sprite_scene(g, view, error) && view.entries.size() == 1 && view.entries[0].error.empty() &&
++              view.entries[0].blood_splat == id);
++        CHECK(update_sprite_scene(g, view, error) && g.server.blood_splats.active.front().updates == callbacks);
++        CHECK(g.unload_world() && g.server.blood_splats.active.empty() && g.server.blood_splats.reports.empty());
++        CHECK(update_sprite_scene(g, view, error) && view.entries.empty() && g.server.message_count() == 0 &&
++              g.server.string_count() == 0);
++        return true;
++    }
++    bool private_world(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        std::uint64_t last = 0;
++        for (int cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error));
++            // Real model/death code on labelled diagnostic primary-world floor.
++            CHECK(g.objects.clear());
++            WorldModel floor;
++            floor.points = {{-4000, 0, -4000}, {4000, 0, -4000}, {4000, 0, 4000}, {-4000, 0, 4000}};
++            floor.surfaces.resize(1);
++            floor.surfaces[0].flags = 1;
++            floor.polygons = {{0, {0, 1, 2, 3}}};
++            CHECK(g.collision.build(floor, error));
++            g.server.collision_ready = true;
++            auto h = g.objects.create(
++                g.objects.find_class("CultistAI"), {}, Creation::World,
++                {{"Pos", DVector{0, 100, 0}}, {"AIState", std::string("IDLE")}, {"AIWeapon1", std::string("BERETTA")}});
++            auto* a = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h));
++            CHECK(a && a->RuntimeReady() && a->m_MoveObj.Update());
++            a->m_dwFlags |= 0x800;
++            a->m_damage.SetHitPoints(0);
++            a->m_damage.node_hit = 2;
++            CHECK(a->SetNewState(AI_Mgr::StateDying) && a->DispatchState() && a->DispatchState() && a->last_corpse);
++            auto body = a->last_corpse;
++            auto* corpse = dynamic_cast<CCorpse*>(g.server.HandleToObject(body));
++            CHECK(corpse);
++            CHECK(g.objects.remove(h) && g.objects.finish_frame());
++            for (int frame = 0; frame < 600 && !corpse->animation_done; ++frame)
++                CHECK(g.server.advance_models(.02) && g.server.advance_physics(.02) && g.objects.advance(.02) &&
++                      g.server.blood_splats.advance(g.objects.time()));
++            CHECK(corpse->animation_done && corpse->pool_requested && corpse->pool_event &&
++                  corpse->pool_error.empty() && g.server.blood_splats.active.size() == 1);
++            const auto pool = g.server.blood_splats.active.front();
++            CHECK(pool.id > last && near(pool.position.y, .1f));
++            last = pool.id;
++            CHECK(g.objects.remove(body) && g.objects.advance(.01) && g.server.blood_splats.active.size() == 1);
++            // Each original random choice has a real SPR and DTX frame.
++            for (int variant = 1; variant <= 3; ++variant)
++            {
++                BloodSplatSettings s;
++                s.position = {float(variant) * 30, .1f, 0};
++                s.resource = "sprites/blood" + std::to_string(variant) + ".spr";
++                CHECK(g.server.blood_splats.publish(s, "private variant", g.sprites, g.objects.time(), error) &&
++                      error.empty());
++            }
++            SpriteView view;
++            CHECK(update_sprite_scene(g, view, error) && view.entries.size() == 4 && view.draws.size() == 4);
++            for (const auto& e : view.entries)
++                CHECK(e.error.empty() && e.width > 0 && e.height > 0 && e.rotatable);
++            for (int frame = 0; frame < 210; ++frame)
++                CHECK(g.objects.advance(.02) && g.server.blood_splats.advance(g.objects.time()));
++            CHECK(g.server.blood_splats.active.size() == 4 && g.server.blood_splats.active.front().grow_time <= 0);
++            std::cout << "Private cycle " << cycle
++                      << ": original Cultist death -> corpse -> pool, real 3 SPR/DTX variants, source-independent "
++                         "growth and unload\n";
++            CHECK(g.unload_world() && g.server.blood_splats.active.empty() && !g.server.message_count() &&
++                  !g.server.string_count());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::string mode = argv[1];
++    return (mode == "formulas"   ? formulas(argv[2])
++            : mode == "region"   ? region(argv[2])
++            : mode == "failures" ? failures(argv[2])
++            : mode == "session"  ? session(argv[2])
++                                 : mode == "private" && private_world(argv[2]))
++               ? 0
++               : 1;
++}

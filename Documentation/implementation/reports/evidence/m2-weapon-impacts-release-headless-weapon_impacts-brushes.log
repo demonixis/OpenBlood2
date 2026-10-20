@@ -1,0 +1,14 @@
+606/610 Testing: weapon_impacts.brushes
+606/610 Test: weapon_impacts.brushes
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon_impact_tests" "brushes" "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon-impacts-brushes"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"weapon_impacts.brushes" start time: Oct 16 23:31 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_impacts.brushes" end time: Oct 16 23:31 CEST
+"weapon_impacts.brushes" time elapsed: 00:00:00
+----------------------------------------------------------

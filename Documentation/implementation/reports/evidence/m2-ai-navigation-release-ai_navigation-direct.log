@@ -1,0 +1,14 @@
+397/402 Testing: ai_navigation.direct
+397/402 Test: ai_navigation.direct
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_navigation_tests" "direct"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_navigation.direct" start time: Oct 16 12:29 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_navigation.direct" end time: Oct 16 12:29 CEST
+"ai_navigation.direct" time elapsed: 00:00:00
+----------------------------------------------------------

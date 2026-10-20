@@ -1,0 +1,26 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 155: brushes.catalog
+    Start 723: destructable_models.city
+1/7 Test #723: destructable_models.city .........   Passed    1.88 sec
+    Start  97: compound_shell.private
+2/7 Test  #97: compound_shell.private ...........   Passed    1.69 sec
+    Start  95: compound_shell.lifetime
+3/7 Test  #95: compound_shell.lifetime ..........   Passed    0.00 sec
+    Start  93: compound_shell.geometry
+4/7 Test  #93: compound_shell.geometry ..........   Passed    0.00 sec
+    Start  94: compound_shell.malformed
+5/7 Test  #94: compound_shell.malformed .........   Passed    0.00 sec
+    Start  96: compound_shell.ground
+6/7 Test  #96: compound_shell.ground ............   Passed    0.00 sec
+7/7 Test #155: brushes.catalog ..................   Passed    7.58 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+brushes                =   7.58 sec*proc (1 test)
+containers             =   1.70 sec*proc (5 tests)
+destructable_models    =   1.88 sec*proc (1 test)
+headless               =  11.17 sec*proc (7 tests)
+private                =  11.15 sec*proc (3 tests)
+
+Total Test time (real) =   7.59 sec

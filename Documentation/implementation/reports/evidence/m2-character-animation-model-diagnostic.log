@@ -1,0 +1,6 @@
+models/characters/caleb.abc clips=86 nodes=20 queries=1720 missing_bindings=56 found_standard_nodes=16 head_radius=2.32597
+models/enemies/m_civilian1.abc clips=48 nodes=19 queries=912 missing_bindings=153 found_standard_nodes=16 head_radius=1.0906
+models/enemies/f_civilian1.abc clips=47 nodes=19 queries=893 missing_bindings=156 found_standard_nodes=16 head_radius=2.4427
+models/enemies/labtech.abc clips=17 nodes=21 queries=357 missing_bindings=171 found_standard_nodes=16 head_radius=1.77636
+models/enemies/m_cultist1.abc: ABC v6: invalid node pose: animation=idle1 node=pelvis frame=0 norm2=15227.486328 position=-11.594849,56.454025,-18.390503
+catalog:263: r && r->model

@@ -1,0 +1,22 @@
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <ima:enforcing>
+  <https://debuginfod.fedoraproject.org/>
+  <ima:ignore>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Program received signal SIGSEGV, Segmentation fault.
+0x000000000041c6d8 in std::__uniq_ptr_impl<BaseClass, std::default_delete<BaseClass> >::_M_ptr (this=0x18) at /usr/include/c++/16/bits/unique_ptr.h:192
+192	      pointer    _M_ptr() const noexcept { return std::get<0>(_M_t); }
+#0  0x000000000041c6d8 in std::__uniq_ptr_impl<BaseClass, std::default_delete<BaseClass> >::_M_ptr (this=0x18) at /usr/include/c++/16/bits/unique_ptr.h:192
+#1  0x0000000000415f4a in std::unique_ptr<BaseClass, std::default_delete<BaseClass> >::get (this=0x18) at /usr/include/c++/16/bits/unique_ptr.h:491
+#2  0x00000000004095e9 in (anonymous namespace)::private_data (root=filesystem::path "/home/yann/.steam/steam/steamapps/common/Blood II/" = {...}) at /home/yann/projects/lithtech/Blood2/tests/door_tests.cpp:393
+#3  0x0000000000426928 in std::__invoke_impl<bool, bool (*&)(std::filesystem::__cxx11::path const&), std::filesystem::__cxx11::path const&> (__f=@0x5ad8b0: 0x4091d5 <(anonymous namespace)::private_data(std::filesystem::__cxx11::path const&)>) at /usr/include/c++/16/bits/invoke.h:63
+#4  0x0000000000422e72 in std::__invoke_r<bool, bool (*&)(std::filesystem::__cxx11::path const&), std::filesystem::__cxx11::path const&> (__fn=@0x5ad8b0: 0x4091d5 <(anonymous namespace)::private_data(std::filesystem::__cxx11::path const&)>) at /usr/include/c++/16/bits/invoke.h:116
+#5  0x000000000041cedc in std::_Function_handler<bool(std::filesystem::__cxx11::path const&), bool (*)(std::filesystem::__cxx11::path const&)>::_M_invoke (__functor=..., __args#0=filesystem::path "/home/yann/.steam/steam/steamapps/common/Blood II/" = {...}) at /usr/include/c++/16/bits/std_function.h:295
+#6  0x0000000000416f69 in std::function<bool(std::filesystem::__cxx11::path const&)>::operator() (this=0x5ad8b0, __args#0=filesystem::path "/home/yann/.steam/steam/steamapps/common/Blood II/" = {...}) at /usr/include/c++/16/bits/std_function.h:581
+#7  0x0000000000409f9f in main (argc=3, argv=0x7fffffffdb28) at /home/yann/projects/lithtech/Blood2/tests/door_tests.cpp:422

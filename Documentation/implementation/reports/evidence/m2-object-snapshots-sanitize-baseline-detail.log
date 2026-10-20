@@ -1,0 +1,26 @@
+Start testing: Oct 17 21:06 CEST
+----------------------------------------------------------
+513/863 Testing: ai_runtime.clearance_private
+513/863 Test: ai_runtime.clearance_private
+Command: "<workspace>/Blood2/build/sanitize/tests/ai_runtime_tests" "clearance_private" "<external-content>"
+Directory: <workspace>/Blood2/build/sanitize/tests
+"ai_runtime.clearance_private" start time: Oct 17 21:06 CEST
+Output:
+----------------------------------------------------------
+SubwayA relocation cycle 0: 8 blocked resizes, 93 original AI shots; no suspended Cultist
+SubwayA relocation cycle 1: 8 blocked resizes, 93 original AI shots; no suspended Cultist
+<end of output>
+Test time =  88.90 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.clearance_private" end time: Oct 17 21:08 CEST
+"ai_runtime.clearance_private" time elapsed: 00:01:28
+----------------------------------------------------------
+
+End testing: Oct 17 21:08 CEST
+
+ai_runtime =  88.90 sec*proc
+
+headless =  88.90 sec*proc
+
+private =  88.90 sec*proc

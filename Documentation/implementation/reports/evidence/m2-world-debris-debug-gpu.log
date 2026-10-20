@@ -1,0 +1,26 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start  25: gpu.lifecycle
+1/6 Test  #25: gpu.lifecycle ....................   Passed    3.25 sec
+    Start  98: gpu.compound_shell
+2/6 Test  #98: gpu.compound_shell ...............   Passed    2.94 sec
+    Start 147: gpu.interaction
+3/6 Test #147: gpu.interaction ..................   Passed    9.62 sec
+    Start 156: gpu.brushes
+4/6 Test #156: gpu.brushes ......................   Passed    2.54 sec
+    Start 193: gpu.objectives
+5/6 Test #193: gpu.objectives ...................   Passed    5.49 sec
+    Start 765: gpu.world_debris
+6/6 Test #765: gpu.world_debris .................   Passed    7.34 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+brushes         =   2.54 sec*proc (1 test)
+containers      =   2.94 sec*proc (1 test)
+gpu             =  31.17 sec*proc (6 tests)
+interaction     =   9.62 sec*proc (1 test)
+objectives      =   5.49 sec*proc (1 test)
+private         =  27.93 sec*proc (5 tests)
+world_debris    =   7.34 sec*proc (1 test)
+
+Total Test time (real) =  31.19 sec

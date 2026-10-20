@@ -1,0 +1,14 @@
+466/472 Testing: ai_runtime.triggers
+466/472 Test: ai_runtime.triggers
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests" "triggers"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_runtime.triggers" start time: Oct 16 15:09 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.triggers" end time: Oct 16 15:09 CEST
+"ai_runtime.triggers" time elapsed: 00:00:00
+----------------------------------------------------------

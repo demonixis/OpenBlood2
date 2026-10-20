@@ -1,0 +1,20 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+        Start  58: weapons.private
+        Start  68: movement.private
+  1/170 Test  #68: movement.private ..................***Timeout  30.05 sec
+
+        Start  76: locomotion.private
+  2/170 Test  #76: locomotion.private ................   Passed   11.84 sec
+        Start 170: cameras.catalog
+  3/170 Test #170: cameras.catalog ...................   Passed   21.56 sec
+        Start 128: brushes.catalog
+  4/170 Test  #58: weapons.private ...................   Passed   76.51 sec
+        Start  99: doors.catalog
+  5/170 Test #128: brushes.catalog ...................   Passed   37.91 sec
+        Start 120: interaction.catalog
+  6/170 Test  #99: doors.catalog .....................   Passed   31.24 sec
+        Start 110: triggers.catalog
+  7/170 Test #120: interaction.catalog ...............   Passed   31.36 sec
+        Start  91: containers.specialized_private
+  8/170 Test #110: triggers.catalog ..................   Passed   31.38 sec
+        Start  92: containers.private

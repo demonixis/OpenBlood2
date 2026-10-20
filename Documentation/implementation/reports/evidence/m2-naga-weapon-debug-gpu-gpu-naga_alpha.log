@@ -1,0 +1,16 @@
+637/638 Testing: gpu.naga_alpha
+637/638 Test: gpu.naga_alpha
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/naga_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/naga-gpu"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.naga_alpha" start time: Oct 17 01:02 CEST
+Output:
+----------------------------------------------------------
+Whole model pixels 1040; selected face 1040; mismatched channels 0
+Synthetic red beam: 1 triangles, 1040 pixels, source alpha .5 -> .25 verified
+<end of output>
+Test time =   0.42 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.naga_alpha" end time: Oct 17 01:02 CEST
+"gpu.naga_alpha" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+441/445 Testing: ai_runtime.missing
+441/445 Test: ai_runtime.missing
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_runtime_tests" "missing"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_runtime.missing" start time: Oct 16 15:12 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.missing" end time: Oct 16 15:12 CEST
+"ai_runtime.missing" time elapsed: 00:00:00
+----------------------------------------------------------

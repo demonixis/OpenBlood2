@@ -1,0 +1,8 @@
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+cycle=0 scale=1 expected RGB=204 HUD=89000 inspector=12847
+cycle=0 scale=0.5 expected RGB=102 HUD=89000 inspector=13190
+cycle=0 scale=0 expected RGB=0 HUD=2407 inspector=6728
+cycle=0 scale=1 expected RGB=204 HUD=89000 inspector=13202
+cycle=1 scale=1 expected RGB=204 HUD=56960 inspector=12847
+cycle=1 scale=0.5 expected RGB=102 HUD=56960 inspector=13190
+125: hud_lit > 1000 && inspector_lit > 1000

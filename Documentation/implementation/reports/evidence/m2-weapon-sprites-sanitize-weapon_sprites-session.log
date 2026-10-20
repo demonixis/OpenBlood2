@@ -1,0 +1,14 @@
+575/576 Testing: weapon_sprites.session
+575/576 Test: weapon_sprites.session
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_sprite_tests" "session" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-sprites-session"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_sprites.session" start time: Oct 16 23:52 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_sprites.session" end time: Oct 16 23:52 CEST
+"weapon_sprites.session" time elapsed: 00:00:00
+----------------------------------------------------------

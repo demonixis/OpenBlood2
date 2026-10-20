@@ -1,0 +1,3 @@
+Existing source omission Demo_01 #674 CDestructableBrush / SecScreen: SecScreen: Missing named world model; engine rejected creation before initial update; world loading continues
+Spawn pose -1888 2137.86 -2387; nudge 0 -6.13501 -3.00098
+spawned_overlap:185: child->state.m_Pos.x == authored.x && child->state.m_Pos.y == authored.y | 

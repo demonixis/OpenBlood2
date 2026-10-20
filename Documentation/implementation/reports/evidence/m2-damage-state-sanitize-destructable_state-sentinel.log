@@ -1,0 +1,14 @@
+488/491 Testing: destructable_state.sentinel
+488/491 Test: destructable_state.sentinel
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable_state_tests" "sentinel" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable-state-fixtures/sentinel"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"destructable_state.sentinel" start time: Oct 16 18:12 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_state.sentinel" end time: Oct 16 18:12 CEST
+"destructable_state.sentinel" time elapsed: 00:00:00
+----------------------------------------------------------

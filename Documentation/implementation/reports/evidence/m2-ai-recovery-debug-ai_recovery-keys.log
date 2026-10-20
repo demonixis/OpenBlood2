@@ -1,0 +1,14 @@
+445/447 Testing: ai_recovery.keys
+445/447 Test: ai_recovery.keys
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests" "keys"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_recovery.keys" start time: Oct 16 14:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.keys" end time: Oct 16 14:04 CEST
+"ai_recovery.keys" time elapsed: 00:00:00
+----------------------------------------------------------

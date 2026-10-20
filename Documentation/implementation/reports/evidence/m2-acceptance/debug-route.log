@@ -1,0 +1,99 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 958: train_session.private_30
+1/2 Test #958: train_session.private_30 .........***Failed   18.22 sec
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walk t=0 pos=-32,170.001,-3224 HP=100 ammo=50 target=none
+Walk t=2 pos=-32,170.001,-2681.51 HP=100 ammo=50 target=none
+Walk t=4 pos=-30.8339,170.001,-2175.55 HP=100 ammo=44 target=none
+Walk t=6 pos=-30.5801,170.001,-1721.66 HP=100 ammo=41 target=noname
+Walk t=8 pos=-41.6618,170.001,-1445.53 HP=120.993 ammo=35 target=noname
+Walk t=10 pos=-24.1948,170.001,-1262.2 HP=116.99 ammo=29 target=noname
+Walk t=12 pos=-33.3093,170.001,-1149.02 HP=116.99 ammo=24 target=none
+Walk t=14 pos=-33.5281,170.001,-632.001 HP=116.99 ammo=24 target=none
+Walk t=16 pos=-36.793,170.001,-304.768 HP=116.99 ammo=21 target=noname
+Walk t=18 pos=-71.1363,170.001,252.583 HP=116.99 ammo=15 target=pete
+Walk t=20 pos=-29.3611,170.001,550.656 HP=116.99 ammo=11 target=none
+Walk t=22 pos=-29.3323,170.001,841.327 HP=116.99 ammo=9 target=noname
+Walk t=24 pos=-39.8892,170.001,1252.88 HP=116.99 ammo=2 target=noname
+Walk t=26 pos=-41.372,170.001,1691.1 HP=104.974 ammo=11 target=noname
+Walk t=28 pos=-89.3213,170.001,2040 HP=129.974 ammo=9 target=none
+Walk t=30 pos=-78.5464,170.001,2140 HP=129.974 ammo=9 target=none
+Walk t=32 pos=-78.3615,170.001,2140 HP=129.974 ammo=9 target=none
+Walk t=34 pos=-78.1765,170.001,2140 HP=129.974 ammo=9 target=none
+Walk t=36 pos=-77.9916,170.001,2140 HP=129.974 ammo=9 target=none
+Walk t=38 pos=-77.8067,170.001,2140 HP=129.974 ammo=9 target=none
+Walk t=40 pos=-77.6217,170.001,2140 HP=129.974 ammo=9 target=none
+Walk t=42 pos=-77.4368,170.001,2140 HP=129.974 ammo=9 target=none
+Route summary: damaged=10 dead=10 ammoPickup=1 healthPickup=1 relay=1 relayStart=40.3167 fade=1 time=54.3167
+Relay slot player sent=1 pending=0
+Relay slot cinexit1 sent=1 pending=0
+Relay slot htrain1 sent=1 pending=0
+Relay slot cinhi5 sent=1 pending=0
+Relay slot exp1 sent=1 pending=0
+Relay slot exp2 sent=1 pending=0
+Relay slot exp3 sent=1 pending=0
+Relay slot exp4 sent=1 pending=0
+Relay slot exp5 sent=1 pending=0
+Relay slot exit2 sent=1 pending=0
+Player damage impulses=5
+119: error.empty() | Missing or oversized sound resource
+124: check(s.explosion_sprites) && check(s.sparks) && check(s.blood_spurts) && check(s.blood_splats) && check(s.weapon_sprites) && check(s.explosion_models) && check(s.laser_beams) && check(s.object_particles) && check(s.polygrids) && check(s.particle_streams) && check(s.explosion_lights) && check(s.explosion_rings) && check(s.explosion_flames) && check(s.flesh_gibs) && check(s.explosion_fragments) | Missing or oversized sound resource
+150: check_effects(g, phase, error) | Missing or oversized sound resource
+405: trace_services(g, "SubwayA", error) | Missing or oversized sound resource
+
+    Start 959: train_session.private_60
+2/2 Test #959: train_session.private_60 .........***Failed   20.54 sec
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walk t=0 pos=-32,170.001,-3224 HP=100 ammo=50 target=none
+Walk t=2 pos=-32,170.001,-2681.51 HP=100 ammo=50 target=none
+Walk t=4 pos=-32.5398,170.001,-2121.53 HP=100 ammo=45 target=none
+Walk t=6 pos=-32.0424,170.001,-1742.92 HP=100 ammo=42 target=noname
+Walk t=8 pos=-41.4027,170.001,-1438.17 HP=125 ammo=35 target=noname
+Walk t=10 pos=-10.9157,170.001,-1144.98 HP=125 ammo=28 target=noname
+Walk t=12 pos=-34.2327,170.001,-961.817 HP=125 ammo=24 target=none
+Walk t=14 pos=-34.2491,170.001,-520.001 HP=125 ammo=24 target=none
+Walk t=16 pos=-13.1251,170.001,-25.8379 HP=125 ammo=18 target=noname
+Walk t=18 pos=-75.999,170.001,339.24 HP=125 ammo=23 target=pete
+Walk t=20 pos=-29.333,170.001,611.073 HP=125 ammo=20 target=none
+Walk t=22 pos=-29.3323,170.001,841.327 HP=125 ammo=18 target=noname
+Walk t=24 pos=-30.8271,170.001,1262.49 HP=125 ammo=11 target=noname
+Walk t=26 pos=-42.5627,170.001,1671.51 HP=125 ammo=4 target=noname
+Walk t=28 pos=-33.2759,170.001,1766.19 HP=150 ammo=11 target=none
+Walk t=30 pos=-80.1816,170.001,2140 HP=175 ammo=11 target=none
+Walk t=32 pos=-80.3811,170.001,2140 HP=175 ammo=11 target=none
+Walk t=34 pos=-80.5807,170.001,2140 HP=175 ammo=11 target=none
+Walk t=36 pos=-80.7803,170.001,2140 HP=175 ammo=11 target=none
+Walk t=38 pos=-80.9799,170.001,2140 HP=175 ammo=11 target=none
+Walk t=40 pos=-81.1795,170.001,2140 HP=175 ammo=11 target=none
+Walk t=42 pos=-81.3791,170.001,2140 HP=175 ammo=11 target=none
+Route summary: damaged=10 dead=10 ammoPickup=1 healthPickup=1 relay=1 relayStart=41.2833 fade=1 time=55.2833
+Relay slot player sent=1 pending=0
+Relay slot cinexit1 sent=1 pending=0
+Relay slot htrain1 sent=1 pending=0
+Relay slot cinhi5 sent=1 pending=0
+Relay slot exp1 sent=1 pending=0
+Relay slot exp2 sent=1 pending=0
+Relay slot exp3 sent=1 pending=0
+Relay slot exp4 sent=1 pending=0
+Relay slot exp5 sent=1 pending=0
+Relay slot exit2 sent=1 pending=0
+Player damage impulses=0
+119: error.empty() | Missing or oversized sound resource
+124: check(s.explosion_sprites) && check(s.sparks) && check(s.blood_spurts) && check(s.blood_splats) && check(s.weapon_sprites) && check(s.explosion_models) && check(s.laser_beams) && check(s.object_particles) && check(s.polygrids) && check(s.particle_streams) && check(s.explosion_lights) && check(s.explosion_rings) && check(s.explosion_flames) && check(s.flesh_gibs) && check(s.explosion_fragments) | Missing or oversized sound resource
+150: check_effects(g, phase, error) | Missing or oversized sound resource
+405: trace_services(g, "SubwayA", error) | Missing or oversized sound resource
+
+
+0% tests passed, 2 tests failed out of 2
+
+Label Time Summary:
+headless         =  38.76 sec*proc (2 tests)
+private          =  38.76 sec*proc (2 tests)
+train_session    =  38.76 sec*proc (2 tests)
+
+Total Test time (real) =  38.78 sec
+
+The following tests FAILED:
+	958 - train_session.private_30 (Failed)                 headless private train_session
+	959 - train_session.private_60 (Failed)                 headless private train_session
+Errors while running CTest

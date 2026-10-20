@@ -1,0 +1,16 @@
+{
+  "capture": "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapons.png",
+  "sha256": "3d5e426c6e09b5a8727507a9097506d717e241ef25d322cef4125d473233b235",
+  "reviewed": true,
+  "observed": [
+    "Readable foldable inspector over the textured world, Weapons selected",
+    "Inactive Beretta shows 3 impacts / 2 sounds / 0 failures; selected knife reports no contacts truthfully",
+    "Original vector impacts and fire audio trees visible with wrapped status/limitation text",
+    "Current knife shot/animation counters and original fire-audio resource visible"
+  ],
+  "limits": [
+    "Capture remains ignored and contains external commercial content; not copied to evidence",
+    "Capture is not proof of audio playback; behavioral, mixer and SDL-submission checks supply that evidence",
+    "Per-contact details are expandable; this capture shows the current knife with no contacts"
+  ]
+}

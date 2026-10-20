@@ -1,0 +1,465 @@
+{
+  "date": "2026-10-17",
+  "implementation_baseline": "d9a83f0b7c1b4d79643fc2b70e15b456416cf728",
+  "status": "M2 incomplete; CityHub NEW_LEVEL committed with explicit absent-world-model omission and animated world SPR materials",
+  "validation": {
+    "headless-debug": {
+      "total": 783,
+      "failed": 0,
+      "private": 128,
+      "seconds": 192.48
+    },
+    "headless-release": {
+      "total": 783,
+      "failed": 0,
+      "private": 128,
+      "seconds": 20.29
+    },
+    "focused": {
+      "total": 17,
+      "failed": 0,
+      "private": 2,
+      "seconds": 6.6
+    },
+    "sanitize": {
+      "total": 47,
+      "failed": 0,
+      "private": 7,
+      "seconds": 110.26
+    },
+    "gpu-debug": {
+      "total": 23,
+      "failed": 0,
+      "private": 14,
+      "seconds": 97.57
+    },
+    "gpu-release": {
+      "total": 23,
+      "failed": 0,
+      "private": 14,
+      "seconds": 26.21
+    },
+    "debug-assertion-test": {
+      "total": 1,
+      "failed": 0,
+      "private": 0,
+      "seconds": 0.07
+    },
+    "release-assertion-test": {
+      "total": 1,
+      "failed": 0,
+      "private": 0,
+      "seconds": 0.02
+    },
+    "sanitize-assertion-test": {
+      "total": 1,
+      "failed": 0,
+      "private": 0,
+      "seconds": 0.27
+    }
+  },
+  "accounting": {
+    "source_entries": 1026,
+    "created": 453,
+    "world_sounds": 31,
+    "editor_only": 541,
+    "omitted_missing_world_model": 1,
+    "unsupported": 0,
+    "failed": 0
+  },
+  "source_basis": "Blood II Name-to-BSP binding and SDK missing-model error23, corroborated by later LithTech loader; not a 1998 executable trace",
+  "world_sprite": {
+    "path": "sprites/motelhell.spr",
+    "frames": 11,
+    "fps": 15,
+    "width": 128,
+    "height": 64,
+    "phase": "read-only simulation time; integer 1000/fps millisecond period"
+  },
+  "live_probe": {
+    "ticks": 600,
+    "simulated_seconds": 10,
+    "health": 100,
+    "unavailable_service_names": 0
+  },
+  "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU; Vulkan ICD selected explicitly and runtime device logged",
+  "commands": [
+    "cmake --build build/<debug|release|sanitize> --target world_tests -j2; ctest --test-dir build/<debug|release|sanitize> -R ^world\\.level_change$ --output-on-failure (final strengthened assertion; sanitizer environment as below)",
+    "cmake --build build/debug -j4",
+    "cmake --build build/release -j2",
+    "ctest --test-dir build/<debug|release> -L headless -j3 --output-on-failure",
+    "cmake --build build/sanitize --target world_tests object_contract_tests texture_tests container_tests player_keepalive_tests player_restore_tests -j2",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -j2 -R '^objects\\.|^texture\\.|^player_restore\\.|^player_keepalive\\.|^world\\.(level_change|level_change_private|destination_trials|destination_trial_private|destination_lifetime|world_rejection|mutations)$|^containers\\.' --output-on-failure",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(world_sprite|flashlight|flashlight_private|world_depth|model_depth|model_private|world_alpha|world_alpha_private|surface_effect|surface_effect_private|sky|sky_private|sky_app|sprite_alpha|sprite_private|mouse_combat|corpse_clearance|level_change|lifecycle|pickups|objectives|remote_private|proximity_private)$' --output-on-failure -V"
+  ],
+  "development_failures": [
+    "After the absent-BSP correction, the first private transfer correctly retained SubwayA because sprites/motelhell.spr was sent to the DTX decoder. Required SPR material support was implemented; no preflight check was bypassed.",
+    "GPU objective fixtures assumed refusal, same-world reload and cross-session raw handle comparison. They now verify source hidden progress and path values before exit, explicit source reload, current revision and CityHub creation/resource checks. SubwayA has one noname start and intentionally uses the original fallback; the GPU return test asserts it.",
+    "The new GPU fixture initially called a nonexistent clear method; it now uses the existing clear_geometry lifetime boundary."
+  ],
+  "limits": [
+    "Later-engine loader evidence is not an observed retail1998 runtime trace",
+    "No geometry substitution for omitted named BSPs; runtime creation still fails",
+    "Animated world SPR requires equal frame dimensions and uses shared simulation phase, not retail per-section render timing",
+    "Private ten-second post-entry execution is not complete CityHub/campaign traversal",
+    "No native macOS validation of this increment; shader artifacts unchanged",
+    "M2 remains incomplete"
+  ],
+  "artifacts": [
+    {
+      "file": "m2-cityhub-entry-build-debug.log",
+      "sha256": "5f97a1989fc496a077948d7dea154cb4857a145cdaa7441e8263ebb606414463",
+      "raw_capture_sha256": "5f97a1989fc496a077948d7dea154cb4857a145cdaa7441e8263ebb606414463",
+      "bytes": 62387
+    },
+    {
+      "file": "m2-cityhub-entry-build-release.log",
+      "sha256": "5543fcca6fb1cc72d5cf24695b49f77e1d857e2e332527c19b2c9ff3173b24ea",
+      "raw_capture_sha256": "2a00cee01c9cb7ff5c4d1ce797015b695b324990d50e1d930db32c60b30f4816",
+      "bytes": 69676
+    },
+    {
+      "file": "m2-cityhub-entry-app-build-debug.log",
+      "sha256": "32e551d9cd44779b150dac2982a2b6c20c09cc5959ee07c5e875d8035d0a1900",
+      "raw_capture_sha256": "32e551d9cd44779b150dac2982a2b6c20c09cc5959ee07c5e875d8035d0a1900",
+      "bytes": 653
+    },
+    {
+      "file": "m2-cityhub-entry-app-build-release.log",
+      "sha256": "4d633c6b94e07df7e9b5c212e335b5b35c6374077f06ac16db22a75e4f1ecafb",
+      "raw_capture_sha256": "4d633c6b94e07df7e9b5c212e335b5b35c6374077f06ac16db22a75e4f1ecafb",
+      "bytes": 496
+    },
+    {
+      "file": "m2-cityhub-entry-initial-gpu.log",
+      "sha256": "f397961a61c7b9ac8e26eca0c81cf47f75d2d333e603d423184d0be2ee367ce2",
+      "raw_capture_sha256": "37759b7c85fd8b3925b58239e5ee73d5e4013b1095057e9c9191487a28a916bc",
+      "bytes": 26911
+    },
+    {
+      "file": "m2-cityhub-entry-initial-gpu-recheck.log",
+      "sha256": "9d8043abf0f346fa5ee0e080840265834d10d47bed2a3edc2c1e7c68b7d9514d",
+      "raw_capture_sha256": "963b7434c43b767d9055eb77b12b8f15ff53516d4879d762311b8373fd6fae21",
+      "bytes": 50865
+    },
+    {
+      "file": "m2-cityhub-entry-build-sanitize.log",
+      "sha256": "9fb9ded6cf44822a4cef75add3ee18e43277742fdaf3cc3340522249137938a0",
+      "raw_capture_sha256": "b4579bd238b180084c34c03a241c3ad6985c8dedda5fe685e66e8af97c607628",
+      "bytes": 20487
+    },
+    {
+      "file": "m2-cityhub-entry-focused.log",
+      "sha256": "a79dfe1e87b5fc027350ddb0e610ffe16778dc95348cb2111306369de5933639",
+      "raw_capture_sha256": "a79dfe1e87b5fc027350ddb0e610ffe16778dc95348cb2111306369de5933639",
+      "bytes": 2264
+    },
+    {
+      "file": "m2-cityhub-entry-headless-debug.log",
+      "sha256": "fcc2d6a5f3e511ae383ef34461b5c684651b6c59453b5da887a6c4766d93675a",
+      "raw_capture_sha256": "fcc2d6a5f3e511ae383ef34461b5c684651b6c59453b5da887a6c4766d93675a",
+      "bytes": 95758
+    },
+    {
+      "file": "m2-cityhub-entry-headless-release.log",
+      "sha256": "9a5260255be167ad9d10bb27db486bb8782e25da4c59a1e86fc4a25198b59626",
+      "raw_capture_sha256": "9a5260255be167ad9d10bb27db486bb8782e25da4c59a1e86fc4a25198b59626",
+      "bytes": 95760
+    },
+    {
+      "file": "m2-cityhub-entry-sanitize.log",
+      "sha256": "b6521a4283b7d61a2a65b13e99bb0eb7be9df42ebbdd75ea75b0d2070f4ef52a",
+      "raw_capture_sha256": "b6521a4283b7d61a2a65b13e99bb0eb7be9df42ebbdd75ea75b0d2070f4ef52a",
+      "bytes": 5927
+    },
+    {
+      "file": "m2-cityhub-entry-gpu-debug.log",
+      "sha256": "cff098b24e121aecc44eea98ac7a88f80d86e69bc0d3be4a0d353cf4d3ccca68",
+      "raw_capture_sha256": "6a7f2afa021046487d108f2faa489d54cf44f0541232bd79379ac3fce6f35c2d",
+      "bytes": 27155
+    },
+    {
+      "file": "m2-cityhub-entry-gpu-release.log",
+      "sha256": "ce8f11f104f7cae07bc2384d00ee3dbae62fc8e9b4dc8f8e31a924aab04314ab",
+      "raw_capture_sha256": "9eebd790214f6278134806eb43b7c0e897b8f20f38dee48b93a5f1e8ea74a930",
+      "bytes": 27293
+    },
+    {
+      "file": "m2-cityhub-entry-initial-spr-refusal.log",
+      "sha256": "10dc2bd5646f8ab14f8262d7476cdd5048c3181fb090dde3f5dc8f5492f50e89",
+      "raw_capture_sha256": "10dc2bd5646f8ab14f8262d7476cdd5048c3181fb090dde3f5dc8f5492f50e89",
+      "bytes": 311
+    },
+    {
+      "file": "m2-cityhub-entry-private-transitions.log",
+      "sha256": "51b8e781581001726958afd5bc83ef67c680dbad9fa917ad495960a01b4af836",
+      "raw_capture_sha256": "5ac55b8d1c6823716bc626116d5f9a26c61448704af3e0462965775e007a5f07",
+      "bytes": 428
+    },
+    {
+      "file": "m2-cityhub-entry-live.log",
+      "sha256": "2292a1d3fa46b69b5e2cec9be5067f99dc0d75bf679f20b868b1b3b75e99ede9",
+      "raw_capture_sha256": "2292a1d3fa46b69b5e2cec9be5067f99dc0d75bf679f20b868b1b3b75e99ede9",
+      "bytes": 223
+    },
+    {
+      "file": "m2-cityhub-entry-inspection.log",
+      "sha256": "95e4c3fcd50b70a41b46a5633f94343f6f01b2306594745c69f21d0ed1c530b4",
+      "raw_capture_sha256": "95e4c3fcd50b70a41b46a5633f94343f6f01b2306594745c69f21d0ed1c530b4",
+      "bytes": 2610
+    },
+    {
+      "file": "m2-cityhub-entry-format.log",
+      "sha256": "fca5678cd617ad72bb1125fb5dec0da1cf87e4f9fe54859e953805d8675829dd",
+      "raw_capture_sha256": "fca5678cd617ad72bb1125fb5dec0da1cf87e4f9fe54859e953805d8675829dd",
+      "bytes": 86
+    },
+    {
+      "file": "m2-cityhub-entry-links.log",
+      "sha256": "38d1ed23a25fbcac531891877e38c9639b6215776f63ca456fc38098204dd2e4",
+      "raw_capture_sha256": "38d1ed23a25fbcac531891877e38c9639b6215776f63ca456fc38098204dd2e4",
+      "bytes": 32
+    },
+    {
+      "file": "m2-cityhub-entry-reference-integrity.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "raw_capture_sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "bytes": 56
+    },
+    {
+      "file": "m2-cityhub-entry-debug-assertion-build.log",
+      "sha256": "3fa08bab4d504e5b9c58493daa12da3bcd44ed40882de31024836c51aec2d0bb",
+      "raw_capture_sha256": "3fa08bab4d504e5b9c58493daa12da3bcd44ed40882de31024836c51aec2d0bb",
+      "bytes": 332
+    },
+    {
+      "file": "m2-cityhub-entry-debug-assertion-test.log",
+      "sha256": "f773645c524960c0ee428da6c9df2ea37a3996c6ed0e81794469ae207d05e5e6",
+      "raw_capture_sha256": "f773645c524960c0ee428da6c9df2ea37a3996c6ed0e81794469ae207d05e5e6",
+      "bytes": 344
+    },
+    {
+      "file": "m2-cityhub-entry-release-assertion-build.log",
+      "sha256": "3fa08bab4d504e5b9c58493daa12da3bcd44ed40882de31024836c51aec2d0bb",
+      "raw_capture_sha256": "3fa08bab4d504e5b9c58493daa12da3bcd44ed40882de31024836c51aec2d0bb",
+      "bytes": 332
+    },
+    {
+      "file": "m2-cityhub-entry-release-assertion-test.log",
+      "sha256": "f24072577a1a33293ab43006d27f2384019735482ca1b406088a1e232586f501",
+      "raw_capture_sha256": "f24072577a1a33293ab43006d27f2384019735482ca1b406088a1e232586f501",
+      "bytes": 346
+    },
+    {
+      "file": "m2-cityhub-entry-sanitize-assertion-build.log",
+      "sha256": "3fa08bab4d504e5b9c58493daa12da3bcd44ed40882de31024836c51aec2d0bb",
+      "raw_capture_sha256": "3fa08bab4d504e5b9c58493daa12da3bcd44ed40882de31024836c51aec2d0bb",
+      "bytes": 332
+    },
+    {
+      "file": "m2-cityhub-entry-sanitize-assertion-test.log",
+      "sha256": "49477b21ff37694de0310b3434703c6b57f5197ea948f861397da4a7442741bc",
+      "raw_capture_sha256": "49477b21ff37694de0310b3434703c6b57f5197ea948f861397da4a7442741bc",
+      "bytes": 347
+    },
+    {
+      "file": "m2-cityhub-entry-content.json",
+      "sha256": "ba2c656a3c61eae265e0afabf2fe3f756c0b615a6f01c186f50da14afa8ffa5b",
+      "bytes": 308
+    },
+    {
+      "file": "m2-cityhub-entry-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+      "bytes": 831
+    },
+    {
+      "file": "m2-cityhub-entry-live-probe.cpp",
+      "sha256": "23293a2311be0c7f4aebc3ab5621f01e3d1b6c815a9a063676a81e09cc9d047c",
+      "bytes": 1537
+    }
+  ],
+  "implementation_patch_sha256": "183d5b406546c915d27e99c438930ca71c91cc7a8cf9b9c556e9642a39dfc22b",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "e69c7daf0fe53e19e875c8401e76d6f02b50c868f1d3c8796f6c3fd5fce2c460"
+    },
+    {
+      "path": "README.md",
+      "sha256": "328d2808fbad8a8b13dff0ab059a8605f9a2ca5edd7af6cbecf65bfd8b38c9f3"
+    },
+    {
+      "path": "docs/CITYHUB_ENTRY_CONTRACTS.md",
+      "sha256": "33eca46b10285337285f2982ef05527d1a142c9c7200fb57a9ec83b9ffa4c3be"
+    },
+    {
+      "path": "docs/DESTINATION_TRIAL_CONTRACTS.md",
+      "sha256": "8e49b216129b8520b80fc7c06a3ffbf20516a72588e634adbd9c899b10722e3f"
+    },
+    {
+      "path": "docs/LEVEL_CHANGE_CONTRACTS.md",
+      "sha256": "f8c459ea4a5e73f4c2beffea9c30a12d24f7acf38e9cb4ca596ef006a5c877f9"
+    },
+    {
+      "path": "docs/M2_CITYHUB_ENTRY_SOURCES.json",
+      "sha256": "194c05fec269ac7973f9c6b600196019a1c71dbf64868ed61530d1254e5e40ef"
+    },
+    {
+      "path": "docs/OBJECT_CONTRACTS.md",
+      "sha256": "84aeb298dd1c1c049a9e2bc777ceceae5bbc03fd872841774ebb5773e759caaf"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "5f7ff5d1f931ae369b2296093a00abd04868dcec7830e09655e451a253b2d20f"
+    },
+    {
+      "path": "docs/TEXTURE_CONTRACTS.md",
+      "sha256": "79daf32941134f7dd535e7fa59067deda664561279840a39ded4deb00515a55c"
+    },
+    {
+      "path": "docs/WORLD_CONTRACTS.md",
+      "sha256": "034d7e73184d9cc85ba4529cfcb08579180cce081b5bba36b9dc1cf6d2ac4ba8"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "a6323c7d6263133d294abeb5fad866af0bbd8bda9cd3e24e8cd669918d68928e"
+    },
+    {
+      "path": "src/app/inspector_objectives.cpp",
+      "sha256": "c0d41df885aa3c389b01803816a17f533b9779939e2f41068c59b3d205517a17"
+    },
+    {
+      "path": "src/app/main.cpp",
+      "sha256": "aefaa3695606f3853efbaac4721ad5358df3766fe91fdcdae83fed1024f1f3e6"
+    },
+    {
+      "path": "src/app/objectives_smoke.cpp",
+      "sha256": "b6575df0457fc2c4eaf82b3ceff3b67a31d55bfaad1519f8bb2e92bb43a42f54"
+    },
+    {
+      "path": "src/engine/objects.cpp",
+      "sha256": "b87d6865992877a20aba4fc5057eb8db960f01b662208e93dd020b04fa49771b"
+    },
+    {
+      "path": "src/engine/objects.h",
+      "sha256": "f195b5d43d944c86f5fdd875d93251d6ef0fdee8f16363d913dbb00b07f3d1c5"
+    },
+    {
+      "path": "src/engine/world_renderer.cpp",
+      "sha256": "416ed304f37ba030eb6126ac566060fc3d508a617df474c7dc310cd6080162a7"
+    },
+    {
+      "path": "src/engine/world_view.cpp",
+      "sha256": "301ac2663f27e3948046438ac12ff501b0cea5f310f07f24e84418c691413458"
+    },
+    {
+      "path": "src/engine/world_view.h",
+      "sha256": "d1018543e44e3aa416ed7ea0d1d9ca73a9e9b8d94c0462931689deee17a7a99d"
+    },
+    {
+      "path": "src/game/destination_trial.cpp",
+      "sha256": "b22bb97286641be261453a8e59d16d56f55c59b8fbed4c5315f02276f74b1a12"
+    },
+    {
+      "path": "src/game/level_change.cpp",
+      "sha256": "6d9f24c7735af10afdc68b53cb52370982acb3d92c84af3e3a3583f42f5310b9"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "ed88968f71b0041ca1914767ca83e608666a3147cfd8549ce79d631a148522dc"
+    },
+    {
+      "path": "src/game/session.h",
+      "sha256": "550dceada2163efcdfa75f415d66e56a4cf867127a0e2c8730664dac2e5bee98"
+    },
+    {
+      "path": "src/game/world_preparation.h",
+      "sha256": "f9b36f425ef9c6a8ca0c21bcc59df73c60a7a213baf4278c8b6d9f5bff0c9a1b"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "c85ad55b821ae4ea6aef1d9fc2a502f4c3261f8f86455c7867d87cf179b2602c"
+    },
+    {
+      "path": "tests/assault_tests.cpp",
+      "sha256": "4f318a8a4e412e9aca9aac3bd80f3986a79bab141310b23161ec290500c8e9da"
+    },
+    {
+      "path": "tests/audio_stream_tests.cpp",
+      "sha256": "4d35a552cff8ba459a5cbeb0f729ba2bd73e8d599fa122f0b59a3a34cf9a0ffb"
+    },
+    {
+      "path": "tests/compound_shell_tests.cpp",
+      "sha256": "b63f0be74abbba6c33ab39d16fad85f413c31e1603a5c37ae2f3b813a5ce46a2"
+    },
+    {
+      "path": "tests/container_tests.cpp",
+      "sha256": "aa57537fa7364713d967ca196f31d00804d028df784684859bd40104a59958f7"
+    },
+    {
+      "path": "tests/conversation_tests.cpp",
+      "sha256": "632e3362cec8312276d1c1af994b7daefbd22aa967b3e54738e8ebfaa3d60775"
+    },
+    {
+      "path": "tests/destructable_model_tests.cpp",
+      "sha256": "b8a459979e0e96e5423668ba3311e6568c4392c0122a98c745431703af6e51f6"
+    },
+    {
+      "path": "tests/flare_tests.cpp",
+      "sha256": "9ebd881307ee15afa161c0c777d2423be680dd82d38b18c9471f881d5865c27d"
+    },
+    {
+      "path": "tests/flashlight_tests.cpp",
+      "sha256": "3b4f09d1c801e8f734a5122734b8f7da9117f4f8a953b17be26acb5685d1f64b"
+    },
+    {
+      "path": "tests/level_change_gpu_tests.cpp",
+      "sha256": "af37d54991cf1c076e05326447f3b047fff3f5dad109d99f345208064d45f80a"
+    },
+    {
+      "path": "tests/mac10_tests.cpp",
+      "sha256": "b54f010ecf4aecdae5df8c0f2f4818e483a222454a83ed88721944f64c6661b8"
+    },
+    {
+      "path": "tests/medkit_tests.cpp",
+      "sha256": "623afc8cea312f96f85370601284553779f706ebf6c2dd314d6ba15a8c9dbbdb"
+    },
+    {
+      "path": "tests/object_contract_tests.cpp",
+      "sha256": "9cb1b425d3f2bdf4739c5684c4f294f85345d8fe880c8b05a4dad56618f51aea"
+    },
+    {
+      "path": "tests/particle_stream_tests.cpp",
+      "sha256": "170b756b1a704bfc8edca60a2afb0e7e8e7ba7106a35ee323144e8714b2820ec"
+    },
+    {
+      "path": "tests/proximity_tests.cpp",
+      "sha256": "2f0257da04699bdb886fef0b21701773d93a27a50e7163fbcdfe8febaef88e94"
+    },
+    {
+      "path": "tests/remote_tests.cpp",
+      "sha256": "abf7de7da9b08af0f6c97ccd342dda2be32c3e2c98489fb4db21eb970dc4033b"
+    },
+    {
+      "path": "tests/sky_tests.cpp",
+      "sha256": "1957910c1de2753bba785a341ba4189cd90e3c37c9fbc393b0b15d3ec0fe11d7"
+    },
+    {
+      "path": "tests/texture_tests.cpp",
+      "sha256": "22bf3ad583d953090bb20ab0b9d149af91aa705e07c65624e3d62b43e35a7175"
+    },
+    {
+      "path": "tests/world_debris_tests.cpp",
+      "sha256": "b262e1f5473c9ab77541075194a629d0d29a514e5c45548eaff3296e5bc43db7"
+    },
+    {
+      "path": "tests/world_sprite_gpu_tests.cpp",
+      "sha256": "4ff92fedabf51c6bfba4b55e5b4a1cc7ce159f7e3384d31c72eaeaf1bbc92c09"
+    },
+    {
+      "path": "tests/world_tests.cpp",
+      "sha256": "bc493eed6291a6b541cf0435895a092caf5d9ac741ab7c72c5a2e6c151ba5928"
+    }
+  ],
+  "implementation_commit": "b7313c194fb1d3ba2406dd19b1c0fa11bfce8ccb"
+}

@@ -1,0 +1,49 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 196
+    Start 196: gpu.objectives
+
+196: Test command: /home/yann/projects/lithtech/Blood2/build/release/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/release/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--objectives-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/release/tests/objectives.png"
+196: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+196: Test timeout computed to be: 30
+196: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+196: [info] BLOOD2.REZ: detected, 267758913 bytes
+196: [info] SOUND.REZ: detected, 204633068 bytes
+196: [info] BLOOD2P.REZ: detected, 24133434 bytes
+196: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+196: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+196: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+196: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+196: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+196: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+196: [warning] NEW_LEVEL retained current world: Destination initialization rejected: 3 unsupported classes, 1 failed entries, 0 unavailable services
+196: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/objectives.png
+196: [warning] NEW_LEVEL retained current world: Destination initialization rejected: 3 unsupported classes, 1 failed entries, 0 unavailable services
+196: [info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+196: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+196: [info] Session playback: waiting=0 time=4.483333333333323 npc-ready=16 npc-failed=0 npc-updates=112
+196: [info] AI paths: hidden=true, reentered=true, copied points=7
+196: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+196: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+196: [info] OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; ExitTrigger NEW_LEVEL refusal preserves player/inventory; read-only CityHub preparation checks 1026 entries; temporary CityHub initialization/kept-player entry, cleanup and source restoration checked
+196: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+1/1 Test #196: gpu.objectives ...................   Passed    3.77 sec
+
+The following tests passed:
+	gpu.objectives
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+gpu           =   3.77 sec*proc (1 test)
+objectives    =   3.77 sec*proc (1 test)
+private       =   3.77 sec*proc (1 test)
+
+Total Test time (real) =   3.80 sec

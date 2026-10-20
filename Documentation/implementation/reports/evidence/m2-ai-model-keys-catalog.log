@@ -1,0 +1,21 @@
+299/300 Testing: ai_keys.catalog
+299/300 Test: ai_keys.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_model_key_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_keys.catalog" start time: Oct 16 05:50 CEST
+Output:
+----------------------------------------------------------
+m_civilian1 keys=35 sound_keys=35 starts=35 busy=0 no_target=0 unavailable=0 failures=0
+f_civilian1 keys=33 sound_keys=33 starts=33 busy=0 no_target=0 unavailable=0 failures=0
+labtech keys=2 sound_keys=2 starts=2 busy=0 no_target=0 unavailable=0 failures=0
+m_cultist1 keys=33 sound_keys=33 starts=33 busy=0 no_target=0 unavailable=0 failures=0
+f_cultist1 keys=33 sound_keys=33 starts=33 busy=0 no_target=0 unavailable=0 failures=0
+gideon keys=11 sound_keys=4 starts=4 busy=0 no_target=6 unavailable=1 failures=1
+TOTAL keys=147 starts=140 failures=1
+<end of output>
+Test time =   0.25 sec
+----------------------------------------------------------
+Test Passed.
+"ai_keys.catalog" end time: Oct 16 05:50 CEST
+"ai_keys.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

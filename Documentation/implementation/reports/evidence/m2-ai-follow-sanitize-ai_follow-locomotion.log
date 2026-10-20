@@ -1,0 +1,14 @@
+377/386 Testing: ai_follow.locomotion
+377/386 Test: ai_follow.locomotion
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_follow_tests" "locomotion"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_follow.locomotion" start time: Oct 16 12:54 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.locomotion" end time: Oct 16 12:54 CEST
+"ai_follow.locomotion" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,37 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 63: movement.walking
+ 1/10 Test #63: movement.walking .................   Passed    0.02 sec
+      Start 64: movement.jumping
+ 2/10 Test #64: movement.jumping .................   Passed    0.01 sec
+      Start 65: movement.collisions
+ 3/10 Test #65: movement.collisions ..............   Passed    0.01 sec
+      Start 66: movement.world_collision
+ 4/10 Test #66: movement.world_collision .........***Failed    0.01 sec
+world_collision:103: client.position.z>start.z+90 && client.position.y>start.y+20 && client.move_mgr.m_bOnGround
+
+      Start 67: movement.support
+ 5/10 Test #67: movement.support .................   Passed    0.01 sec
+      Start 68: movement.boundaries
+ 6/10 Test #68: movement.boundaries ..............   Passed    0.01 sec
+      Start 69: movement.lifetime
+ 7/10 Test #69: movement.lifetime ................   Passed    0.00 sec
+      Start 70: movement.controls
+ 8/10 Test #70: movement.controls ................   Passed    0.00 sec
+      Start 71: movement.private
+ 9/10 Test #71: movement.private .................   Passed    0.61 sec
+      Start 72: gpu.movement
+10/10 Test #72: gpu.movement .....................   Passed    5.86 sec
+
+90% tests passed, 1 tests failed out of 10
+
+Label Time Summary:
+gpu         =   5.86 sec*proc (1 test)
+headless    =   0.68 sec*proc (9 tests)
+movement    =   6.55 sec*proc (10 tests)
+private     =   6.48 sec*proc (2 tests)
+
+Total Test time (real) =   6.55 sec
+
+The following tests FAILED:
+	 66 - movement.world_collision (Failed)                 headless movement
+Errors while running CTest

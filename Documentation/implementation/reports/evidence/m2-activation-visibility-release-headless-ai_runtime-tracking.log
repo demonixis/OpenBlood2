@@ -1,0 +1,14 @@
+472/701 Testing: ai_runtime.tracking
+472/701 Test: ai_runtime.tracking
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_runtime_tests" "tracking"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_runtime.tracking" start time: Oct 17 04:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.tracking" end time: Oct 17 04:03 CEST
+"ai_runtime.tracking" time elapsed: 00:00:00
+----------------------------------------------------------

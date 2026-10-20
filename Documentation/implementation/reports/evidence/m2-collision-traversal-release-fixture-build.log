@@ -1,0 +1,9 @@
+[0/2] Re-checking globbed directories...
+[1/9] Scanning <workspace>/Blood2/tests/worldpath_tests.cpp for CXX dependencies
+[2/9] Scanning <workspace>/Blood2/tests/services_tests.cpp for CXX dependencies
+[3/9] Generating CXX dyndep file tests/CMakeFiles/worldpath_tests.dir/CXX.dd
+[4/9] Generating CXX dyndep file tests/CMakeFiles/services_tests.dir/CXX.dd
+[5/9] Building CXX object tests/CMakeFiles/services_tests.dir/services_tests.cpp.o
+[6/9] Linking CXX executable tests/services_tests
+[7/9] Building CXX object tests/CMakeFiles/worldpath_tests.dir/worldpath_tests.cpp.o
+[8/9] Linking CXX executable tests/worldpath_tests

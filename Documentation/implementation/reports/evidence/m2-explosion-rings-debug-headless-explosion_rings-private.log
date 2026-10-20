@@ -1,0 +1,17 @@
+567/569 Testing: explosion_rings.private
+567/569 Test: explosion_rings.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_ring_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"explosion_rings.private" start time: Oct 16 21:14 CEST
+Output:
+----------------------------------------------------------
+SubwayA cycle 0: nine emitters, 36 rings, 1152 reserved particles; all expired, IDs through 36
+SubwayA cycle 1: nine emitters, 36 rings, 1152 reserved particles; all expired, IDs through 72
+SubwayA cycle 2: nine emitters, 36 rings, 1152 reserved particles; all expired, IDs through 108
+<end of output>
+Test time =   4.11 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_rings.private" end time: Oct 16 21:14 CEST
+"explosion_rings.private" time elapsed: 00:00:04
+----------------------------------------------------------

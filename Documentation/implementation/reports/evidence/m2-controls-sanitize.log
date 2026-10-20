@@ -1,0 +1,51 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  61: movement.walking
+ 1/20 Test  #61: movement.walking .................   Passed    0.20 sec
+      Start  62: movement.jumping
+ 2/20 Test  #62: movement.jumping .................   Passed    0.09 sec
+      Start  63: movement.collisions
+ 3/20 Test  #63: movement.collisions ..............   Passed    0.16 sec
+      Start  64: movement.world_collision
+ 4/20 Test  #64: movement.world_collision .........   Passed    0.29 sec
+      Start  65: movement.support
+ 5/20 Test  #65: movement.support .................   Passed    0.09 sec
+      Start  66: movement.boundaries
+ 6/20 Test  #66: movement.boundaries ..............   Passed    0.06 sec
+      Start  67: movement.timing
+ 7/20 Test  #67: movement.timing ..................   Passed    0.21 sec
+      Start  68: movement.lifetime
+ 8/20 Test  #68: movement.lifetime ................   Passed    0.05 sec
+      Start  69: movement.controls
+ 9/20 Test  #69: movement.controls ................   Passed    0.01 sec
+      Start  70: movement.private
+10/20 Test  #70: movement.private .................   Passed   57.12 sec
+      Start 113: interaction.use
+11/20 Test #113: interaction.use ..................   Passed    0.04 sec
+      Start 114: interaction.input
+12/20 Test #114: interaction.input ................   Passed    0.03 sec
+      Start 115: interaction.keys
+13/20 Test #115: interaction.keys .................   Passed    0.13 sec
+      Start 116: interaction.state
+14/20 Test #116: interaction.state ................   Passed    0.08 sec
+      Start 117: interaction.geometry
+15/20 Test #117: interaction.geometry .............   Passed    0.06 sec
+      Start 118: interaction.transport
+16/20 Test #118: interaction.transport ............   Passed    0.04 sec
+      Start 119: interaction.blocking
+17/20 Test #119: interaction.blocking .............   Passed    0.03 sec
+      Start 120: interaction.lifetime
+18/20 Test #120: interaction.lifetime .............   Passed    0.03 sec
+      Start 121: interaction.player_push
+19/20 Test #121: interaction.player_push ..........   Passed    0.04 sec
+      Start 122: interaction.catalog
+20/20 Test #122: interaction.catalog ..............   Passed   32.65 sec
+
+100% tests passed, 0 tests failed out of 20
+
+Label Time Summary:
+headless       =  91.41 sec*proc (20 tests)
+interaction    =  33.14 sec*proc (10 tests)
+movement       =  58.27 sec*proc (10 tests)
+private        =  89.76 sec*proc (2 tests)
+
+Total Test time (real) =  91.43 sec

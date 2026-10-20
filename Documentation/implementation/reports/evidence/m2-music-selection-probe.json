@@ -1,0 +1,23 @@
+{
+  "binary": "IMUSIC25.DLL",
+  "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "rvas": [
+    "0x16afc..0x16b1a",
+    "0x16970..0x16996",
+    "0x17b33",
+    "0x17a4f"
+  ],
+  "generated": {
+    "cases": 4096,
+    "sha256": "7b8a629fa84cca632c63c8bf37babf7bf8c995edcf5ba7326295ee92b1ddda01",
+    "fnv64": 12281621980575432131
+  },
+  "private": {
+    "cases": 1188,
+    "sha256": "a1c4ad7fa377894e2a1bd6890095f6dd074439575a27508297238611b0082e83",
+    "fnv64": 2704444894253380274
+  },
+  "bound_sections": 132,
+  "missing_style_sections": 24,
+  "scope": "Original current chord/mute lookup, normal section pattern request, and pattern selection only; no global fallback, seek, activation or playback"
+}

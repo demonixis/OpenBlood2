@@ -1,0 +1,1669 @@
+Start testing: Oct 17 05:55 CEST
+----------------------------------------------------------
+666/672 Testing: soundfx.catalog
+666/672 Test: soundfx.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_fx_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"soundfx.catalog" start time: Oct 17 05:55 CEST
+Output:
+----------------------------------------------------------
+worlds/02_cityhub.dat created: ericsparkssound state=off stream=1 error=
+worlds/02_cityhub.dat created: fleshwashwav state=on stream=1 error=
+worlds/02_cityhub.dat created: neonloop state=on stream=1 error=
+worlds/02_cityhub.dat created: phonering state=on stream=1 error=
+worlds/02_cityhub.dat created: firesound state=on stream=1 error=
+worlds/02_cityhubb.dat created: ericsparkssound state=off stream=1 error=
+worlds/02_cityhubb.dat created: phonering state=on stream=1 error=
+worlds/02_cityhubb.dat created: neonloop state=on stream=1 error=
+worlds/02_cityhubc.dat created: ericsparkssound state=off stream=1 error=
+worlds/03_museum.dat created: phonering state=on stream=1 error=
+worlds/03_museum.dat created: firesound state=on stream=1 error=
+worlds/03_museum.dat created: firesound2 state=on stream=1 error=
+worlds/04_steamtunnels.dat created: firesound state=on stream=1 error=
+worlds/05_cdm.dat created: soundcomp4 state=on stream=1 error=
+worlds/05_cdm.dat created: soundcomp4 state=on stream=1 error=
+worlds/05_cdmb.dat created: muzak state=on stream=1 error=
+worlds/05_cdmb.dat created: chopperloop2 state=on stream=1 error=
+worlds/05_cdmb.dat created: chopperloop state=on stream=1 error=
+worlds/06_airship2.dat created: klaxon state=off stream=1 error=
+worlds/09_abandoned_buildings.dat created: Soundfx-Helicopter state=on stream=0 error=
+worlds/09_abandoned_buildings.dat created: phonering state=on stream=1 error=
+worlds/11_slaughter_house.dat created: phonering state=on stream=1 error=
+worlds/12_train_station.dat created: SoundFX0 state=on stream=0 error=
+worlds/12_train_station.dat created: phonering state=on stream=1 error=
+worlds/12_train_stationb.dat created: phonering state=on stream=1 error=
+worlds/17_entrance.dat created: SoundFX0 state=on stream=0 error=
+worlds/17_entrance.dat created: SoundFX1 state=on stream=0 error=
+worlds/17_entrance.dat created: SoundFX2 state=on stream=0 error=
+worlds/17_entrance.dat created: SoundFX3 state=on stream=0 error=
+worlds/17_entrance.dat created: SoundFX4 state=on stream=0 error=
+worlds/17_entrance.dat created: SoundFX5 state=on stream=0 error=
+worlds/17_entrance.dat created: hummer state=on stream=0 error=
+worlds/17_entrance.dat created: hummer state=on stream=0 error=
+worlds/17_entrance.dat created: hummer state=on stream=0 error=
+worlds/17_entrance.dat created: hummer state=on stream=0 error=
+worlds/19_lobby.dat created: SoundFX0 state=on stream=0 error=
+worlds/19_lobby.dat created: SoundFX0 state=on stream=0 error=
+worlds/19_lobby.dat created: SoundFX0 state=on stream=0 error=
+worlds/19_lobby.dat created: SoundFX0 state=on stream=0 error=
+worlds/19_lobby.dat created: peesound state=on stream=0 error=
+worlds/19_lobby.dat created: SoundFX1 state=on stream=0 error=
+worlds/19_lobby.dat created: SoundFX1 state=on stream=0 error=
+worlds/19_lobby.dat created: SoundFX1 state=on stream=0 error=
+worlds/19_lobbyc.dat created: SoundFX0 state=on stream=0 error=
+worlds/20_powerstation.dat created: SoundFX0 state=on stream=0 error=
+worlds/20_powerstation.dat created: SoundFX0 state=on stream=0 error=
+worlds/20_powerstation.dat created: SoundFX0 state=on stream=0 error=
+worlds/20_powerstation.dat created: SoundFX0 state=on stream=0 error=
+worlds/20_powerstation.dat created: SoundFX0 state=on stream=0 error=
+worlds/20_powerstation.dat created: SoundFX0 state=on stream=0 error=
+worlds/20_powerstation.dat created: SoundFX0 state=on stream=0 error=
+worlds/20_powerstation.dat created: SoundFX0 state=on stream=0 error=
+worlds/20_powerstation.dat created: SoundFX0 state=on stream=0 error=
+worlds/20_powerstation.dat created: SoundFX0 state=on stream=0 error=
+worlds/20_powerstation.dat created: SoundFX0 state=on stream=0 error=
+worlds/20_powerstation.dat created: SoundFX0 state=on stream=0 error=
+worlds/21_laboratory.dat created: SoundFX0 state=on stream=0 error=
+worlds/21_laboratory.dat created: SoundFX0 state=on stream=0 error=
+worlds/21_laboratory.dat created: SoundFX1 state=on stream=0 error=
+worlds/21_laboratory.dat created: SoundFX2 state=on stream=0 error=
+worlds/21_laboratory.dat created: SoundFX3 state=on stream=0 error=
+worlds/21_laboratory.dat created: hummer state=on stream=0 error=
+worlds/multi/bb_bloodkeep.dat created: Gust3 state=off stream=0 error=
+worlds/multi/bb_bloodkeep.dat created: lighting2 state=off stream=0 error=
+worlds/multi/bb_bloodkeep.dat created: furnace state=off stream=0 error=
+worlds/multi/bb_bloodkeep.dat created: Rats state=off stream=0 error=
+worlds/multi/bb_bridge.dat rejected: SoundFX: invalid property TypeAction
+worlds/multi/bb_bridge.dat rejected: SoundFX: invalid property TypeAction
+worlds/multi/bb_bridge.dat rejected: SoundFX: invalid property TypeAction
+worlds/multi/bb_brownstar.dat created: gust1 state=off stream=0 error=
+worlds/multi/bb_brownstar.dat created: motorboatrev1 state=off stream=0 error=
+worlds/multi/bb_brownstar.dat created: warp1 state=off stream=0 error=
+worlds/multi/bb_condemned.dat created: siren5 state=off stream=0 error=
+worlds/multi/bb_condemned.dat created: train1 state=off stream=0 error=
+worlds/multi/bb_condemned.dat created: helicopter1 state=off stream=0 error=
+worlds/multi/bb_condemned.dat created: siren1 state=off stream=0 error=
+worlds/multi/bb_crypt.dat created: ratsscury1 state=off stream=0 error=
+worlds/multi/bb_crypt.dat resource sounds\ambient\ratsscury1.wav: Missing or oversized sound resource
+worlds/multi/bb_crypt.dat created: thun1 state=off stream=0 error=
+worlds/multi/bb_crypt.dat created: speakerroar2 state=off stream=0 error=
+worlds/multi/bb_crypt.dat created: drawbridgec1 state=off stream=0 error=
+worlds/multi/bb_crypt.dat created: buildingcreak1 state=off stream=0 error=
+worlds/multi/bb_dustbowl.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_dustbowl.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_dustbowl.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_dustbowl.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX0 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX1 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX1 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX1 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX1 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX1 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX1 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX1 state=on stream=0 error=
+worlds/multi/bb_power.dat created: SoundFX1 state=on stream=0 error=
+SoundFX catalog worlds=57 entries=124 created=121 rejected=3 starts=100 failures=0 references=124 unreadable=1 city=5 VoiceType=0 TypeAction=3
+<end of output>
+Test time =  17.11 sec
+----------------------------------------------------------
+Test Passed.
+"soundfx.catalog" end time: Oct 17 05:55 CEST
+"soundfx.catalog" time elapsed: 00:00:17
+----------------------------------------------------------
+
+41/672 Testing: world.destination_trial_private
+41/672 Test: world.destination_trial_private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "destination_trial_private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.destination_trial_private" start time: Oct 17 05:55 CEST
+Output:
+----------------------------------------------------------
+Cycle 0 02_cityhub: loaded=1 entered=1 cleanup=1 created=418 unknown=32 failed=4 objects=452 error=
+Cycle 0 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 0 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1 02_cityhub: loaded=1 entered=1 cleanup=1 created=418 unknown=32 failed=4 objects=452 error=
+Cycle 1 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 1 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2 02_cityhub: loaded=1 entered=1 cleanup=1 created=418 unknown=32 failed=4 objects=452 error=
+Cycle 2 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 2 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+PASS destination_trial_private
+<end of output>
+Test time =  26.97 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_trial_private" end time: Oct 17 05:55 CEST
+"world.destination_trial_private" time elapsed: 00:00:26
+----------------------------------------------------------
+
+42/672 Testing: world.destination_private
+42/672 Test: world.destination_private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "destination_private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.destination_private" start time: Oct 17 05:55 CEST
+Output:
+----------------------------------------------------------
+Cycle 0: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 0: worlds/02_cityhub.dat: 1026 entries / 453 schema / 541 editor / 32 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 1: worlds/02_cityhub.dat: 1026 entries / 453 schema / 541 editor / 32 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 2: worlds/02_cityhub.dat: 1026 entries / 453 schema / 541 editor / 32 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+PASS destination_private
+<end of output>
+Test time =  15.47 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_private" end time: Oct 17 05:55 CEST
+"world.destination_private" time elapsed: 00:00:15
+----------------------------------------------------------
+
+672/672 Testing: audio_stream.city
+672/672 Test: audio_stream.city
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/audio_stream_tests" "city" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"audio_stream.city" start time: Oct 17 05:55 CEST
+Output:
+----------------------------------------------------------
+city created=418 transferred=31 unknown=32 failed=4 SoundFX=5 active=4 streams=35 cached_bytes=393216
+city created=418 transferred=31 unknown=32 failed=4 SoundFX=5 active=4 streams=35 cached_bytes=393216
+<end of output>
+Test time =   9.33 sec
+----------------------------------------------------------
+Test Passed.
+"audio_stream.city" end time: Oct 17 05:55 CEST
+"audio_stream.city" time elapsed: 00:00:09
+----------------------------------------------------------
+
+234/672 Testing: sound.catalog
+234/672 Test: sound.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"sound.catalog" start time: Oct 17 05:55 CEST
+Output:
+----------------------------------------------------------
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=1 frames=198623 rate=22050
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=2 frames=198623 rate=22050
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=3 frames=198623 rate=22050
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=4 frames=198623 rate=22050
+worlds/04_steamtunnels.dat sounds\ambient\amb16.wav playback=Invalid or over-limit sound request
+worlds/06_airship1.dat sounds\ambient\wind1.wav playback=Invalid or over-limit sound request
+worlds/06_airship1.dat sounds\ambient\wind1.wav playback=Invalid or over-limit sound request
+worlds/09_abandoned_buildings.dat sounds\ambients\amb1.wav decode=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\amb1.wav playback=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav decode=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav playback=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav decode=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav playback=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav decode=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav playback=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\outside1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat  decode=Invalid sound resource path
+worlds/12_train_station.dat  playback=Invalid sound resource path
+worlds/12_train_station.dat sounds\ambient\ratsscurry1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\ratsscurry1.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\amb8.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\amb8.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\amb7.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\amb7.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\amb7.wav playback=Invalid or over-limit sound request
+worlds/12_train_station.dat sounds\ambient\amb3.wav playback=Invalid or over-limit sound request
+worlds/12_train_stationb.dat  decode=Invalid sound resource path
+worlds/12_train_stationb.dat  playback=Invalid sound resource path
+worlds/13_downtown.dat sounds\ambient\sewerdrip1.wav decode=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\sewerdrip1.wav playback=Missing streaming sound resource
+worlds/15_crypt.dat sounds\ambient\amb4.wav playback=Invalid or over-limit sound request
+worlds/15_crypt.dat sounds\ambient\chains.wav playback=Invalid or over-limit sound request
+worlds/15_crypt.dat sounds\ambient\chains.wav playback=Invalid or over-limit sound request
+worlds/17_entrance.dat sounds\hum.wav decode=Missing or oversized sound resource
+worlds/17_entrance.dat sounds\hum.wav playback=Missing or oversized sound resource
+worlds/21_laboratory.dat sounds\ambient\amb7.wav playback=Invalid or over-limit sound request
+worlds/21_laboratory.dat sounds\ambient\comp3.wav playback=Invalid or over-limit sound request
+worlds/21_laboratory.dat sounds\ambient\amb7.wav playback=Invalid or over-limit sound request
+worlds/21_laboratory.dat sounds\ambient\amb7.wav playback=Invalid or over-limit sound request
+worlds/21_laboratory.dat sounds\ambient\amb7.wav playback=Invalid or over-limit sound request
+worlds/21_laboratory.dat sounds\ambient\amb7.wav playback=Invalid or over-limit sound request
+worlds/21_laboratory.dat sounds\ambient\comp3.wav playback=Invalid or over-limit sound request
+worlds/21_laboratory.dat sounds\ambient\amb3.wav playback=Invalid or over-limit sound request
+worlds/23_rooftop.dat sounds\ambient\amb10.wav playback=Invalid or over-limit sound request
+worlds/23_rooftop.dat sounds\ambient\amb10.wav playback=Invalid or over-limit sound request
+worlds/multi/bb_bloodkeep.dat sounds\ambient\chantloop2.wav decode=Missing or oversized sound resource
+worlds/multi/bb_bloodkeep.dat sounds\ambient\chantloop2.wav playback=Missing or oversized sound resource
+worlds/multi/bb_condemned.dat sounds\ambient\neonlight1.wavt decode=Missing or oversized sound resource
+worlds/multi/bb_condemned.dat sounds\ambient\neonlight1.wavt playback=Missing or oversized sound resource
+worlds/multi/bb_condemned.dat sounds\ambient\neonlight2.wavt decode=Missing or oversized sound resource
+worlds/multi/bb_condemned.dat sounds\ambient\neonlight2.wavt playback=Missing or oversized sound resource
+worlds/multi/bb_crypt.dat sounds\ambient\amb4.wav playback=Invalid or over-limit sound request
+worlds/multi/bb_crypt.dat sounds\ambient\chains.wav playback=Invalid or over-limit sound request
+worlds/multi/bb_crypt.dat sounds\ambient\chains.wav playback=Invalid or over-limit sound request
+worlds/multi/bb_jgrave.dat  decode=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  playback=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  decode=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  playback=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  decode=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  playback=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  decode=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  playback=Invalid sound resource path
+worlds/multi/bb_rooftop.dat sounds\ambient\amb10.wav playback=Invalid or over-limit sound request
+worlds=57 sounds=792 streams=302 missing=15 invalid=0 metadata=0 started=696 rejected=0 failed=96
+<end of output>
+Test time =  16.43 sec
+----------------------------------------------------------
+Test Passed.
+"sound.catalog" end time: Oct 17 05:55 CEST
+"sound.catalog" time elapsed: 00:00:16
+----------------------------------------------------------
+
+226/672 Testing: randomsound.catalog
+226/672 Test: randomsound.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random_sound_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"randomsound.catalog" start time: Oct 17 05:55 CEST
+Output:
+----------------------------------------------------------
+SUBWAY RandomSoundFX0 on=1 positional=0 sequential=0 loop=0 waits=6,15 range=0 radius=5000 volume=100
+  sounds\ambient\subway1.wav rate=22050 frames=55296 duration=2.50776
+  sounds\ambient\subway2.wav rate=22050 frames=61440 duration=2.78639
+  sounds\ambient\subway3.wav rate=22050 frames=73728 duration=3.34367
+  sounds\ambient\subway4.wav rate=22050 frames=65536 duration=2.97215
+  sounds\ambient\subway5.wav rate=22050 frames=81920 duration=3.71519
+SUBWAY RandomSoundFX0 on=1 positional=0 sequential=0 loop=0 waits=20,35 range=0 radius=5000 volume=100
+  sounds\events\tavoice1.wav rate=22050 frames=172393 duration=7.81828
+  sounds\events\tavoice2a.wav rate=22050 frames=374913 duration=17.0029
+  sounds\events\tavoice3.wav rate=22050 frames=99515 duration=4.51315
+  sounds\events\tavoice4.wav rate=22050 frames=72737 duration=3.29873
+  sounds\events\tavoice5.wav rate=22050 frames=50817 duration=2.30463
+  sounds\events\tavoice6.wav rate=22050 frames=49281 duration=2.23497
+worlds/05_cdm.dat sounds\enemies\souldrudge\pain1.wav failure=Missing or oversized sound resource
+worlds/05_cdm.dat sounds\enemies\souldrudge\pain2.wav failure=Missing or oversized sound resource
+worlds/05_cdm.dat sounds\enemies\souldrudge\pain3.wav failure=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambient\steam3.wav failure=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambient\steam3.wav failure=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambient\steam3.wav failure=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambient\steam3.wav failure=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\enemies\thief\TH_walk_2.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\crowcaw.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\thun7.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\crowcaw.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\thun7.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\crowcaw.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\thun7.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\crowcaw.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\thun7.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\crowcaw.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\thun7.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun1.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun2.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun3.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun3.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun2.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun1.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun1.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun2.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun3.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun1.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun2.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun3.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun1.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun2.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun3.wav failure=Missing or oversized sound resource
+worlds/21_laboratory.dat sounds\enemies\civilian\scream3.wav failure=Missing or oversized sound resource
+worlds=57 controllers=54 refs=223 missing=35 invalid=0 rejected=0
+<end of output>
+Test time =  16.27 sec
+----------------------------------------------------------
+Test Passed.
+"randomsound.catalog" end time: Oct 17 05:55 CEST
+"randomsound.catalog" time elapsed: 00:00:16
+----------------------------------------------------------
+
+54/672 Testing: services.private
+54/672 Test: services.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.private" start time: Oct 17 05:55 CEST
+Output:
+----------------------------------------------------------
+Original start point: -32,192,-3224
+Caleb: 784 vertices, 20 nodes, 86 animations; dispatched commands: 46
+Primary world: 14300 solid triangles, 4095 BVH nodes; probe contact y=170 polygon=2549
+<end of output>
+Test time =  14.59 sec
+----------------------------------------------------------
+Test Passed.
+"services.private" end time: Oct 17 05:56 CEST
+"services.private" time elapsed: 00:00:14
+----------------------------------------------------------
+
+217/672 Testing: cinematics.catalog
+217/672 Test: cinematics.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.catalog" start time: Oct 17 05:55 CEST
+Output:
+----------------------------------------------------------
+SUBWAY cinexit1
+  0 sounds\enemies\gideon\laf1_gid.wav speaker=player message=door12:TRIGGER
+SUBWAY cinhi5
+  0 sounds\events\metalcrush5a.wav speaker=player message=:
+  0 sounds\events\traincrash1.wav speaker=player message=:
+SUBWAY cintrig1
+  0 sounds\chosen\caleb\e1m4_1_cal.wav speaker=player message=:
+SUBWAY cintrig2
+  0 sounds\enemies\gideon\1agid1.wav speaker=player message=:
+  0 sounds\chosen\caleb\1acaleb1.wav speaker=player message=:
+worlds/02_cityhubb.dat sound=sounds\chosen\caleb\msc12cal.wav error=Missing or oversized sound resource
+worlds/03_museum.dat sound=sounds\chosen\caleb\laugh1_calb.wav error=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sound=sounds\chosen\caleb\kill\laugh1_cal.wav error=Missing or oversized sound resource
+worlds=57 controllers=79 cues=201 missing=3 invalid=0
+encoding=1 cues=198
+<end of output>
+Test time =  18.27 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.catalog" end time: Oct 17 05:56 CEST
+"cinematics.catalog" time elapsed: 00:00:18
+----------------------------------------------------------
+
+235/672 Testing: sound.subway
+235/672 Test: sound.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"sound.subway" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+cycle=0 4 world loops survived source removal, wrapped twice, produced PCM and unloaded
+cycle=1 4 world loops survived source removal, wrapped twice, produced PCM and unloaded
+<end of output>
+Test time =   5.38 sec
+----------------------------------------------------------
+Test Passed.
+"sound.subway" end time: Oct 17 05:56 CEST
+"sound.subway" time elapsed: 00:00:05
+----------------------------------------------------------
+
+227/672 Testing: randomsound.subway
+227/672 Test: randomsound.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random_sound_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"randomsound.subway" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+cycle=0 name=RandomSoundFX0 sound=sounds\ambient\subway1.wav
+cycle=0 name=RandomSoundFX0 sound=sounds\events\tavoice4.wav
+cycle=1 name=RandomSoundFX0 sound=sounds\ambient\subway1.wav
+cycle=1 name=RandomSoundFX0 sound=sounds\events\tavoice4.wav
+<end of output>
+Test time =   5.59 sec
+----------------------------------------------------------
+Test Passed.
+"randomsound.subway" end time: Oct 17 05:56 CEST
+"randomsound.subway" time elapsed: 00:00:05
+----------------------------------------------------------
+
+43/672 Testing: world.private
+43/672 Test: world.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.private" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+No-player suspended=0 dims calls=57
+Service ConfigureCharacterBody: 16
+Service CreateAttachment: 10
+Service CreateInterObjectLink: 39
+Service CreateObject: 33
+Service CreateString: 5
+Service FindNamedObjects: 17
+Service FreeString: 2
+Service GetAnimIndex: 2419
+Service GetClass: 44
+Service GetContainers: 58
+Service GetGameConVar: 449
+Service GetModelAnimUserDims: 47
+Service GetModelAnimation: 21
+Service GetModelAnimationName: 32
+Service GetModelNodeTransform: 242
+Service GetMovementState: 31
+Service GetNextObject: 227
+Service GetObjectClass: 236
+Service GetObjectDims: 7
+Service GetObjectFlags: 344
+Service GetObjectName: 37
+Service GetObjectPos: 188
+Service GetObjectRotation: 88
+Service GetObjectUserFlags: 61
+Service GetPropBool: 764
+Service GetPropGeneric: 10664
+Service GetPropReal: 734
+Service GetPropString: 72
+Service GetPropVector: 54
+Service GetStringData: 36
+Service GetTime: 74
+Service GetVarValueFloat: 447
+Service GetVarValueString: 2
+Service GetVelocity: 1
+Service HandleToObject: 63
+Service IntersectSegment: 2
+Service IsKindOf: 236
+Service IsObjectAlive: 506
+Service MoveObject: 19
+Service MoveObjectToGround: 15
+Service ObjectToHandle: 60
+Service PlayWorldSound: 4
+Service PublishCameraEffect: 2
+Service PublishLightEffect: 12
+Service RandomFloat: 46
+Service RandomInt: 20
+Service RelinquishList: 17
+Service RemoveObject: 13
+Service ResetModelAnimation: 5
+Service ResizeObject: 16
+Service ScaleObject: 16
+Service SendBossHealth: 1
+Service SetBlockingPriority: 119
+Service SetDeactivationTime: 16
+Service SetGameConVar: 31
+Service SetGlobalForce: 1
+Service SetModelAnimation: 26
+Service SetModelLooping: 5
+Service SetNextUpdate: 270
+Service SetObjectDims: 57
+Service SetObjectFlags: 253
+Service SetObjectState: 17
+Service SetObjectUserFlags: 193
+Service SetVelocity: 1
+Service ValidateSpawnObject: 9
+Missing Sounds\Thunder.wav
+Resource references: 77; missing: 1
+RunWorld blocked: 0 uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat reactions, audio, autosave, keep-alive level transfer and remaining mover classes remain unported
+PASS private
+<end of output>
+Test time =   5.07 sec
+----------------------------------------------------------
+Test Passed.
+"world.private" end time: Oct 17 05:56 CEST
+"world.private" time elapsed: 00:00:05
+----------------------------------------------------------
+
+670/672 Testing: audio_stream.seams
+670/672 Test: audio_stream.seams
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/audio_stream_tests" "seams" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/audio-stream-seams"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"audio_stream.seams" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.39 sec
+----------------------------------------------------------
+Test Passed.
+"audio_stream.seams" end time: Oct 17 05:56 CEST
+"audio_stream.seams" time elapsed: 00:00:00
+----------------------------------------------------------
+
+25/672 Testing: world.destination_trials
+25/672 Test: world.destination_trials
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "destination_trials" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/destination_trials"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.destination_trials" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+trial4: loaded=1 entered=1 cleanup=1 failed=1 error=
+trial2: loaded=1 entered=0 cleanup=1 failed=0 error=No single-player GameStartPoint
+trial3: loaded=1 entered=0 cleanup=1 failed=0 error=Start point has no supported ground collision
+broken: loaded=0 entered=0 cleanup=1 failed=0 error=DAT v56: invalid/unsupported section offsets near byte 4
+missing: loaded=0 entered=0 cleanup=1 failed=0 error=Resource not found: worlds/missing.dat
+trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+PASS destination_trials
+<end of output>
+Test time =   0.19 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_trials" end time: Oct 17 05:56 CEST
+"world.destination_trials" time elapsed: 00:00:00
+----------------------------------------------------------
+
+669/672 Testing: audio_stream.mixer
+669/672 Test: audio_stream.mixer
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/audio_stream_tests" "mixer" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/audio-stream-mixer"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"audio_stream.mixer" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.10 sec
+----------------------------------------------------------
+Test Passed.
+"audio_stream.mixer" end time: Oct 17 05:56 CEST
+"audio_stream.mixer" time elapsed: 00:00:00
+----------------------------------------------------------
+
+667/672 Testing: audio_stream.pcm
+667/672 Test: audio_stream.pcm
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/audio_stream_tests" "pcm" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/audio-stream-pcm"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"audio_stream.pcm" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"audio_stream.pcm" end time: Oct 17 05:56 CEST
+"audio_stream.pcm" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/672 Testing: world.destination_lifetime
+28/672 Test: world.destination_lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "destination_lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/destination_lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.destination_lifetime" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS destination_lifetime
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_lifetime" end time: Oct 17 05:56 CEST
+"world.destination_lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+37/672 Testing: world.mutations
+37/672 Test: world.mutations
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "mutations" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/mutations"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.mutations" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS mutations
+<end of output>
+Test time =   0.30 sec
+----------------------------------------------------------
+Test Passed.
+"world.mutations" end time: Oct 17 05:56 CEST
+"world.mutations" time elapsed: 00:00:00
+----------------------------------------------------------
+
+46/672 Testing: services.model_rejection
+46/672 Test: services.model_rejection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "model_rejection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.model_rejection" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"services.model_rejection" end time: Oct 17 05:56 CEST
+"services.model_rejection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+665/672 Testing: soundfx.lifetime
+665/672 Test: soundfx.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_fx_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound-fx-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"soundfx.lifetime" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"soundfx.lifetime" end time: Oct 17 05:56 CEST
+"soundfx.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+663/672 Testing: soundfx.deadlines
+663/672 Test: soundfx.deadlines
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_fx_tests" "deadlines" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound-fx-deadlines"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"soundfx.deadlines" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"soundfx.deadlines" end time: Oct 17 05:56 CEST
+"soundfx.deadlines" time elapsed: 00:00:00
+----------------------------------------------------------
+
+664/672 Testing: soundfx.failures
+664/672 Test: soundfx.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_fx_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound-fx-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"soundfx.failures" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"soundfx.failures" end time: Oct 17 05:56 CEST
+"soundfx.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+662/672 Testing: soundfx.spatial
+662/672 Test: soundfx.spatial
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_fx_tests" "spatial" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound-fx-spatial"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"soundfx.spatial" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"soundfx.spatial" end time: Oct 17 05:56 CEST
+"soundfx.spatial" time elapsed: 00:00:00
+----------------------------------------------------------
+
+661/672 Testing: soundfx.ramps
+661/672 Test: soundfx.ramps
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_fx_tests" "ramps" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound-fx-ramps"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"soundfx.ramps" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"soundfx.ramps" end time: Oct 17 05:56 CEST
+"soundfx.ramps" time elapsed: 00:00:00
+----------------------------------------------------------
+
+660/672 Testing: soundfx.defaults
+660/672 Test: soundfx.defaults
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_fx_tests" "defaults" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound-fx-defaults"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"soundfx.defaults" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"soundfx.defaults" end time: Oct 17 05:56 CEST
+"soundfx.defaults" time elapsed: 00:00:00
+----------------------------------------------------------
+
+671/672 Testing: audio_stream.truncation
+671/672 Test: audio_stream.truncation
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/audio_stream_tests" "truncation" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/audio-stream-truncation"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"audio_stream.truncation" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"audio_stream.truncation" end time: Oct 17 05:56 CEST
+"audio_stream.truncation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+668/672 Testing: audio_stream.malformed
+668/672 Test: audio_stream.malformed
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/audio_stream_tests" "malformed" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/audio-stream-malformed"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"audio_stream.malformed" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"audio_stream.malformed" end time: Oct 17 05:56 CEST
+"audio_stream.malformed" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/672 Testing: world.sprite_entries
+29/672 Test: world.sprite_entries
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "sprite_entries" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/sprite_entries"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.sprite_entries" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS sprite_entries
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"world.sprite_entries" end time: Oct 17 05:56 CEST
+"world.sprite_entries" time elapsed: 00:00:00
+----------------------------------------------------------
+
+218/672 Testing: cinematics.subway
+218/672 Test: cinematics.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.subway" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+cycle=0 cue=sounds\chosen\caleb\e1m4_1_cal.wav rate=22050 frames=53872 duration=2.44317
+cycle=1 cue=sounds\chosen\caleb\e1m4_1_cal.wav rate=22050 frames=53872 duration=2.44317
+two authored crash cues completed; 2 full session reloads clean
+<end of output>
+Test time =   7.11 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.subway" end time: Oct 17 05:56 CEST
+"cinematics.subway" time elapsed: 00:00:07
+----------------------------------------------------------
+
+30/672 Testing: world.sound_entries
+30/672 Test: world.sound_entries
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "sound_entries" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/sound_entries"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.sound_entries" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS sound_entries
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"world.sound_entries" end time: Oct 17 05:56 CEST
+"world.sound_entries" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1/672 Testing: objects.builtin_model
+1/672 Test: objects.builtin_model
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "builtin_model"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.builtin_model" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS builtin_model
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"objects.builtin_model" end time: Oct 17 05:56 CEST
+"objects.builtin_model" time elapsed: 00:00:00
+----------------------------------------------------------
+
+52/672 Testing: services.placement_service
+52/672 Test: services.placement_service
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "placement_service"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.placement_service" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"services.placement_service" end time: Oct 17 05:56 CEST
+"services.placement_service" time elapsed: 00:00:00
+----------------------------------------------------------
+
+51/672 Testing: services.placement_queries
+51/672 Test: services.placement_queries
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "placement_queries"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.placement_queries" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"services.placement_queries" end time: Oct 17 05:56 CEST
+"services.placement_queries" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/672 Testing: world.destination_schema
+27/672 Test: world.destination_schema
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "destination_schema" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/destination_schema"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.destination_schema" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS destination_schema
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_schema" end time: Oct 17 05:56 CEST
+"world.destination_schema" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/672 Testing: world.destination_messages
+26/672 Test: world.destination_messages
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "destination_messages" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/destination_messages"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.destination_messages" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS destination_messages
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_messages" end time: Oct 17 05:56 CEST
+"world.destination_messages" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/672 Testing: objects.unsupported_teardown
+11/672 Test: objects.unsupported_teardown
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "unsupported_teardown"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.unsupported_teardown" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS unsupported_teardown
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"objects.unsupported_teardown" end time: Oct 17 05:56 CEST
+"objects.unsupported_teardown" time elapsed: 00:00:00
+----------------------------------------------------------
+
+216/672 Testing: cinematics.device
+216/672 Test: cinematics.device
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "device" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/device"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.device" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.15 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.device" end time: Oct 17 05:56 CEST
+"cinematics.device" time elapsed: 00:00:00
+----------------------------------------------------------
+
+36/672 Testing: world.world_rejection
+36/672 Test: world.world_rejection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "world_rejection" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/world_rejection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.world_rejection" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS world_rejection
+<end of output>
+Test time =   0.11 sec
+----------------------------------------------------------
+Test Passed.
+"world.world_rejection" end time: Oct 17 05:56 CEST
+"world.world_rejection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+229/672 Testing: sound.loops
+229/672 Test: sound.loops
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_tests" "loops" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound-fixtures/loops"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"sound.loops" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"sound.loops" end time: Oct 17 05:56 CEST
+"sound.loops" time elapsed: 00:00:00
+----------------------------------------------------------
+
+222/672 Testing: randomsound.random
+222/672 Test: randomsound.random
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random_sound_tests" "random" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random-sound-fixtures/random"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"randomsound.random" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.10 sec
+----------------------------------------------------------
+Test Passed.
+"randomsound.random" end time: Oct 17 05:56 CEST
+"randomsound.random" time elapsed: 00:00:00
+----------------------------------------------------------
+
+233/672 Testing: sound.metadata
+233/672 Test: sound.metadata
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_tests" "metadata" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound-fixtures/metadata"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"sound.metadata" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"sound.metadata" end time: Oct 17 05:56 CEST
+"sound.metadata" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/672 Testing: objects.messages_strings
+10/672 Test: objects.messages_strings
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "messages_strings"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.messages_strings" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS messages_strings
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"objects.messages_strings" end time: Oct 17 05:56 CEST
+"objects.messages_strings" time elapsed: 00:00:00
+----------------------------------------------------------
+
+231/672 Testing: sound.lifetime
+231/672 Test: sound.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound-fixtures/lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"sound.lifetime" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"sound.lifetime" end time: Oct 17 05:56 CEST
+"sound.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+232/672 Testing: sound.failures
+232/672 Test: sound.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"sound.failures" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"sound.failures" end time: Oct 17 05:56 CEST
+"sound.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+230/672 Testing: sound.resampling
+230/672 Test: sound.resampling
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_tests" "resampling" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound-fixtures/resampling"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"sound.resampling" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"sound.resampling" end time: Oct 17 05:56 CEST
+"sound.resampling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+228/672 Testing: sound.defaults
+228/672 Test: sound.defaults
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound_tests" "defaults" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sound-fixtures/defaults"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"sound.defaults" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"sound.defaults" end time: Oct 17 05:56 CEST
+"sound.defaults" time elapsed: 00:00:00
+----------------------------------------------------------
+
+221/672 Testing: randomsound.sequence
+221/672 Test: randomsound.sequence
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random_sound_tests" "sequence" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random-sound-fixtures/sequence"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"randomsound.sequence" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"randomsound.sequence" end time: Oct 17 05:56 CEST
+"randomsound.sequence" time elapsed: 00:00:00
+----------------------------------------------------------
+
+224/672 Testing: randomsound.lifetime
+224/672 Test: randomsound.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random_sound_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random-sound-fixtures/lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"randomsound.lifetime" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"randomsound.lifetime" end time: Oct 17 05:56 CEST
+"randomsound.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+219/672 Testing: randomsound.defaults
+219/672 Test: randomsound.defaults
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random_sound_tests" "defaults" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random-sound-fixtures/defaults"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"randomsound.defaults" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"randomsound.defaults" end time: Oct 17 05:56 CEST
+"randomsound.defaults" time elapsed: 00:00:00
+----------------------------------------------------------
+
+225/672 Testing: randomsound.failures
+225/672 Test: randomsound.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random_sound_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random-sound-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"randomsound.failures" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"randomsound.failures" end time: Oct 17 05:56 CEST
+"randomsound.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+220/672 Testing: randomsound.commands
+220/672 Test: randomsound.commands
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random_sound_tests" "commands" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random-sound-fixtures/commands"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"randomsound.commands" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"randomsound.commands" end time: Oct 17 05:56 CEST
+"randomsound.commands" time elapsed: 00:00:00
+----------------------------------------------------------
+
+223/672 Testing: randomsound.spatial
+223/672 Test: randomsound.spatial
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random_sound_tests" "spatial" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/random-sound-fixtures/spatial"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"randomsound.spatial" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"randomsound.spatial" end time: Oct 17 05:56 CEST
+"randomsound.spatial" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/672 Testing: objects.creation_failures
+12/672 Test: objects.creation_failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "creation_failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.creation_failures" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS creation_failures
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"objects.creation_failures" end time: Oct 17 05:56 CEST
+"objects.creation_failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+215/672 Testing: cinematics.failures
+215/672 Test: cinematics.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.failures" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.failures" end time: Oct 17 05:56 CEST
+"cinematics.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+211/672 Testing: cinematics.mixer
+211/672 Test: cinematics.mixer
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "mixer" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/mixer"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.mixer" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.mixer" end time: Oct 17 05:56 CEST
+"cinematics.mixer" time elapsed: 00:00:00
+----------------------------------------------------------
+
+214/672 Testing: cinematics.lifetime
+214/672 Test: cinematics.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.lifetime" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.lifetime" end time: Oct 17 05:56 CEST
+"cinematics.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+212/672 Testing: cinematics.spatial
+212/672 Test: cinematics.spatial
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "spatial" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/spatial"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.spatial" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.spatial" end time: Oct 17 05:56 CEST
+"cinematics.spatial" time elapsed: 00:00:00
+----------------------------------------------------------
+
+213/672 Testing: cinematics.sequence
+213/672 Test: cinematics.sequence
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "sequence" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/sequence"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.sequence" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.sequence" end time: Oct 17 05:56 CEST
+"cinematics.sequence" time elapsed: 00:00:00
+----------------------------------------------------------
+
+38/672 Testing: world.session_lifecycle
+38/672 Test: world.session_lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "session_lifecycle" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/session_lifecycle"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.session_lifecycle" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS session_lifecycle
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"world.session_lifecycle" end time: Oct 17 05:56 CEST
+"world.session_lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/672 Testing: objects.reasons_properties
+4/672 Test: objects.reasons_properties
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "reasons_properties"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.reasons_properties" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS reasons_properties
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.reasons_properties" end time: Oct 17 05:56 CEST
+"objects.reasons_properties" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/672 Testing: objects.original_objects
+2/672 Test: objects.original_objects
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "original_objects"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.original_objects" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS original_objects
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.original_objects" end time: Oct 17 05:56 CEST
+"objects.original_objects" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/672 Testing: objects.links_lists
+9/672 Test: objects.links_lists
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "links_lists"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.links_lists" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS links_lists
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.links_lists" end time: Oct 17 05:56 CEST
+"objects.links_lists" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/672 Testing: objects.deferred_removal
+6/672 Test: objects.deferred_removal
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "deferred_removal"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.deferred_removal" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS deferred_removal
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.deferred_removal" end time: Oct 17 05:56 CEST
+"objects.deferred_removal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/672 Testing: objects.nested_creation
+3/672 Test: objects.nested_creation
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "nested_creation"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.nested_creation" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS nested_creation
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.nested_creation" end time: Oct 17 05:56 CEST
+"objects.nested_creation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/672 Testing: objects.scheduling
+5/672 Test: objects.scheduling
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "scheduling"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.scheduling" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS scheduling
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.scheduling" end time: Oct 17 05:56 CEST
+"objects.scheduling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/672 Testing: objects.handles_selection
+8/672 Test: objects.handles_selection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "handles_selection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.handles_selection" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS handles_selection
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.handles_selection" end time: Oct 17 05:56 CEST
+"objects.handles_selection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/672 Testing: objects.aggregate_dispatch
+7/672 Test: objects.aggregate_dispatch
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "aggregate_dispatch"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.aggregate_dispatch" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS aggregate_dispatch
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.aggregate_dispatch" end time: Oct 17 05:56 CEST
+"objects.aggregate_dispatch" time elapsed: 00:00:00
+----------------------------------------------------------
+
+40/672 Testing: world.original_trigger
+40/672 Test: world.original_trigger
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "original_trigger" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/original_trigger"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.original_trigger" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS original_trigger
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"world.original_trigger" end time: Oct 17 05:56 CEST
+"world.original_trigger" time elapsed: 00:00:00
+----------------------------------------------------------
+
+33/672 Testing: world.resource_mount
+33/672 Test: world.resource_mount
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "resource_mount" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/resource_mount"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.resource_mount" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS resource_mount
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"world.resource_mount" end time: Oct 17 05:56 CEST
+"world.resource_mount" time elapsed: 00:00:00
+----------------------------------------------------------
+
+34/672 Testing: world.world_properties
+34/672 Test: world.world_properties
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "world_properties" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/world_properties"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.world_properties" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS world_properties
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"world.world_properties" end time: Oct 17 05:56 CEST
+"world.world_properties" time elapsed: 00:00:00
+----------------------------------------------------------
+
+35/672 Testing: world.world_geometry
+35/672 Test: world.world_geometry
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "world_geometry" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/world_geometry"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.world_geometry" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS world_geometry
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"world.world_geometry" end time: Oct 17 05:56 CEST
+"world.world_geometry" time elapsed: 00:00:00
+----------------------------------------------------------
+
+32/672 Testing: world.rez_rejection
+32/672 Test: world.rez_rejection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "rez_rejection" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/rez_rejection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.rez_rejection" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS rez_rejection
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"world.rez_rejection" end time: Oct 17 05:56 CEST
+"world.rez_rejection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+31/672 Testing: world.rez_structure
+31/672 Test: world.rez_structure
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "rez_structure" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/rez_structure"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.rez_structure" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS rez_structure
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"world.rez_structure" end time: Oct 17 05:56 CEST
+"world.rez_structure" time elapsed: 00:00:00
+----------------------------------------------------------
+
+39/672 Testing: world.session_messages
+39/672 Test: world.session_messages
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "session_messages" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/session_messages"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.session_messages" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+PASS session_messages
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"world.session_messages" end time: Oct 17 05:56 CEST
+"world.session_messages" time elapsed: 00:00:00
+----------------------------------------------------------
+
+210/672 Testing: cinematics.decode
+210/672 Test: cinematics.decode
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic_tests" "decode" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/cinematic-fixtures/decode"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cinematics.decode" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"cinematics.decode" end time: Oct 17 05:56 CEST
+"cinematics.decode" time elapsed: 00:00:00
+----------------------------------------------------------
+
+53/672 Testing: services.original_services
+53/672 Test: services.original_services
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "original_services"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.original_services" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"services.original_services" end time: Oct 17 05:56 CEST
+"services.original_services" time elapsed: 00:00:00
+----------------------------------------------------------
+
+45/672 Testing: services.model_reader
+45/672 Test: services.model_reader
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "model_reader"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.model_reader" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"services.model_reader" end time: Oct 17 05:56 CEST
+"services.model_reader" time elapsed: 00:00:00
+----------------------------------------------------------
+
+48/672 Testing: services.model_callbacks
+48/672 Test: services.model_callbacks
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "model_callbacks"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.model_callbacks" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"services.model_callbacks" end time: Oct 17 05:56 CEST
+"services.model_callbacks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+50/672 Testing: services.movement_contacts
+50/672 Test: services.movement_contacts
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "movement_contacts"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.movement_contacts" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"services.movement_contacts" end time: Oct 17 05:56 CEST
+"services.movement_contacts" time elapsed: 00:00:00
+----------------------------------------------------------
+
+47/672 Testing: services.animation_events
+47/672 Test: services.animation_events
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "animation_events"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.animation_events" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"services.animation_events" end time: Oct 17 05:56 CEST
+"services.animation_events" time elapsed: 00:00:00
+----------------------------------------------------------
+
+49/672 Testing: services.collision_queries
+49/672 Test: services.collision_queries
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "collision_queries"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.collision_queries" start time: Oct 17 05:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"services.collision_queries" end time: Oct 17 05:56 CEST
+"services.collision_queries" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 05:56 CEST
+
+audio_stream =   9.99 sec*proc
+
+cinematics =  25.89 sec*proc
+
+headless = 162.05 sec*proc
+
+objects =   0.45 sec*proc
+
+private = 157.59 sec*proc
+
+randomsound =  22.30 sec*proc
+
+services =  15.22 sec*proc
+
+sound =  22.12 sec*proc
+
+soundfx =  17.47 sec*proc
+
+world =  48.61 sec*proc
+

@@ -1,0 +1,14 @@
+573/576 Testing: weapon_sprites.selection
+573/576 Test: weapon_sprites.selection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_sprite_tests" "selection" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-sprites-selection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_sprites.selection" start time: Oct 16 23:52 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_sprites.selection" end time: Oct 16 23:52 CEST
+"weapon_sprites.selection" time elapsed: 00:00:00
+----------------------------------------------------------

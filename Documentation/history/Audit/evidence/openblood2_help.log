@@ -1,0 +1,16 @@
+[2026-10-15 12:19:37.656] [info] OpenBlood2 - Blood 2: The Chosen reimplementation
+[2026-10-15 12:19:37.657] [info] 
+[2026-10-15 12:19:37.657] [info] Usage: /tmp/lithtech-audit-2bVxTF/openblood2/game/OpenBlood2 [options]
+[2026-10-15 12:19:37.657] [info] 
+[2026-10-15 12:19:37.657] [info] Options:
+[2026-10-15 12:19:37.657] [info]   -w, --width <pixels>     Screen width (default: 1280)
+[2026-10-15 12:19:37.657] [info]   -h, --height <pixels>    Screen height (default: 720)
+[2026-10-15 12:19:37.657] [info]   -f, --fullscreen         Run in fullscreen mode
+[2026-10-15 12:19:37.657] [info]   -v, --verbose            Enable console logging (disabled by default)
+[2026-10-15 12:19:37.657] [info]   --assets <path>          Assets directory (default: .)
+[2026-10-15 12:19:37.657] [info]   --rez <filename>         REZ file to load (default: BLOOD2.REZ)
+[2026-10-15 12:19:37.657] [info]   -m, --mod <path>         Load custom REZ file (repeatable, highest priority)
+[2026-10-15 12:19:37.657] [info]   --vr                     Enable VR mode (requires OpenXR runtime)
+[2026-10-15 12:19:37.657] [info]   --help                   Show this help message
+[2026-10-15 12:19:37.657] [info] 
+[2026-10-15 12:19:37.657] [info] Mods can also be listed in 'mods.txt' (one path per line, # for comments)

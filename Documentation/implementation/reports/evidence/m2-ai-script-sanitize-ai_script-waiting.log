@@ -1,0 +1,14 @@
+389/395 Testing: ai_script.waiting
+389/395 Test: ai_script.waiting
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_script_tests" "waiting" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-script-waiting"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_script.waiting" start time: Oct 16 13:16 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.waiting" end time: Oct 16 13:16 CEST
+"ai_script.waiting" time elapsed: 00:00:00
+----------------------------------------------------------

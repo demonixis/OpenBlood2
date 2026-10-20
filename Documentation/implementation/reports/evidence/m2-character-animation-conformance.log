@@ -1,0 +1,3 @@
+219 original animation lookup assignments and order match exactly.
+16 CheckAnims target arrays and order match exactly.
+18 original hit-sphere formula assignments match after vector-distance spelling adaptation.

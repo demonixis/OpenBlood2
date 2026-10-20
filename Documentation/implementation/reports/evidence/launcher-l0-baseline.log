@@ -1,0 +1,36 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start  20: config.arguments
+ 1/12 Test  #20: config.arguments .................   Passed    0.00 sec
+      Start  21: config.precedence
+ 2/12 Test  #21: config.precedence ................   Passed    0.00 sec
+      Start  22: config.relative_paths
+ 3/12 Test  #22: config.relative_paths ............   Passed    0.00 sec
+      Start  23: config.invalid_config
+ 4/12 Test  #23: config.invalid_config ............   Passed    0.00 sec
+      Start  24: config.content_validation
+ 5/12 Test  #24: config.content_validation ........   Passed    0.00 sec
+      Start  25: config.case_lookup
+ 6/12 Test  #25: config.case_lookup ...............   Passed    0.00 sec
+      Start  26: config.demo
+ 7/12 Test  #26: config.demo ......................   Passed    0.00 sec
+      Start 863: menus.preferences
+ 8/12 Test #863: menus.preferences ................   Passed    0.00 sec
+      Start 875: demo.flow
+ 9/12 Test #875: demo.flow ........................   Passed    0.00 sec
+      Start 876: demo.rules
+10/12 Test #876: demo.rules .......................   Passed    0.00 sec
+      Start 877: demo_menu.manifest
+11/12 Test #877: demo_menu.manifest ...............   Passed    0.00 sec
+      Start 878: demo_menu.flow
+12/12 Test #878: demo_menu.flow ...................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 12
+
+Label Time Summary:
+config       =   0.01 sec*proc (7 tests)
+demo         =   0.00 sec*proc (2 tests)
+demo_menu    =   0.00 sec*proc (2 tests)
+headless     =   0.03 sec*proc (12 tests)
+menus        =   0.00 sec*proc (1 test)
+
+Total Test time (real) =   0.04 sec

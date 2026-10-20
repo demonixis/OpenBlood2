@@ -1,0 +1,15 @@
+605/609 Testing: shield.failures
+605/609 Test: shield.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/shield_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/shield-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"shield.failures" start time: Oct 17 02:03 CEST
+Output:
+----------------------------------------------------------
+Invalid recipe/owner/pose/clock/resources and preflight budgets fail; history bounded, pending owners rejected, no live overflow.
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"shield.failures" end time: Oct 17 02:03 CEST
+"shield.failures" time elapsed: 00:00:00
+----------------------------------------------------------

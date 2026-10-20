@@ -1,0 +1,89 @@
+Test project <workspace>/Blood2/build/debug
+      Start   1: objects.builtin_model
+ 1/38 Test   #1: objects.builtin_model .............   Passed    0.01 sec
+      Start   2: objects.original_objects
+ 2/38 Test   #2: objects.original_objects ..........   Passed    0.01 sec
+      Start   3: objects.nested_creation
+ 3/38 Test   #3: objects.nested_creation ...........   Passed    0.00 sec
+      Start   4: objects.reasons_properties
+ 4/38 Test   #4: objects.reasons_properties ........   Passed    0.01 sec
+      Start   5: objects.scheduling
+ 5/38 Test   #5: objects.scheduling ................   Passed    0.00 sec
+      Start   6: objects.deferred_removal
+ 6/38 Test   #6: objects.deferred_removal ..........   Passed    0.00 sec
+      Start   7: objects.aggregate_dispatch
+ 7/38 Test   #7: objects.aggregate_dispatch ........   Passed    0.00 sec
+      Start   8: objects.handles_selection
+ 8/38 Test   #8: objects.handles_selection .........   Passed    0.00 sec
+      Start   9: objects.links_lists
+ 9/38 Test   #9: objects.links_lists ...............   Passed    0.01 sec
+      Start  10: objects.messages_strings
+10/38 Test  #10: objects.messages_strings ..........   Passed    0.01 sec
+      Start  11: objects.unsupported_teardown
+11/38 Test  #11: objects.unsupported_teardown ......   Passed    0.02 sec
+      Start  12: objects.creation_failures
+12/38 Test  #12: objects.creation_failures .........   Passed    0.01 sec
+      Start  44: world.level_change_private
+13/38 Test  #44: world.level_change_private ........   Passed    7.73 sec
+      Start  45: world.destination_trial_private
+14/38 Test  #45: world.destination_trial_private ...   Passed    7.68 sec
+      Start  46: world.destination_private
+15/38 Test  #46: world.destination_private .........   Passed    3.48 sec
+      Start  47: world.private
+16/38 Test  #47: world.private .....................   Passed    1.37 sec
+      Start 105: containers.geometry
+17/38 Test #105: containers.geometry ...............   Passed    0.00 sec
+      Start 106: containers.concave
+18/38 Test #106: containers.concave ................   Passed    0.00 sec
+      Start 107: containers.membership
+19/38 Test #107: containers.membership .............   Passed    0.01 sec
+      Start 108: containers.lifetime
+20/38 Test #108: containers.lifetime ...............   Passed    0.01 sec
+      Start 109: containers.index_lifetime
+21/38 Test #109: containers.index_lifetime .........   Passed    0.01 sec
+      Start 110: containers.index_callbacks
+22/38 Test #110: containers.index_callbacks ........   Passed    0.01 sec
+      Start 111: containers.physics
+23/38 Test #111: containers.physics ................   Passed    0.01 sec
+      Start 112: containers.swimming
+24/38 Test #112: containers.swimming ...............   Passed    0.04 sec
+      Start 113: containers.surface
+25/38 Test #113: containers.surface ................   Passed    0.01 sec
+      Start 114: containers.ladders
+26/38 Test #114: containers.ladders ................   Passed    0.04 sec
+      Start 115: containers.air_damage
+27/38 Test #115: containers.air_damage .............   Passed    0.01 sec
+      Start 116: containers.specialized_defaults
+28/38 Test #116: containers.specialized_defaults ...   Passed    0.01 sec
+      Start 117: containers.conveyor_motion
+29/38 Test #117: containers.conveyor_motion ........   Passed    0.02 sec
+      Start 118: containers.conveyor_bodies
+30/38 Test #118: containers.conveyor_bodies ........   Passed    0.01 sec
+      Start 119: containers.specialized_damage
+31/38 Test #119: containers.specialized_damage .....   Passed    0.01 sec
+      Start 120: containers.freefall_motion
+32/38 Test #120: containers.freefall_motion ........   Passed    0.03 sec
+      Start 121: containers.specialized_private
+33/38 Test #121: containers.specialized_private ....   Passed    6.28 sec
+      Start 122: containers.private
+34/38 Test #122: containers.private ................   Passed    5.74 sec
+      Start 921: polygrid.formulas
+35/38 Test #921: polygrid.formulas .................   Passed    0.00 sec
+      Start 922: polygrid.lifetime
+36/38 Test #922: polygrid.lifetime .................   Passed    0.00 sec
+      Start 923: polygrid.mesh
+37/38 Test #923: polygrid.mesh .....................   Passed    0.00 sec
+      Start 924: polygrid.private
+38/38 Test #924: polygrid.private ..................   Passed    2.20 sec
+
+100% tests passed, 0 tests failed out of 38
+
+Label Time Summary:
+containers    =  12.28 sec*proc (18 tests)
+headless      =  34.85 sec*proc (38 tests)
+objects       =   0.09 sec*proc (12 tests)
+polygrid      =   2.21 sec*proc (4 tests)
+private       =  34.49 sec*proc (7 tests)
+world         =  20.27 sec*proc (4 tests)
+
+Total Test time (real) =  34.89 sec

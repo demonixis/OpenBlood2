@@ -1,0 +1,634 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/sanitize
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 601
+      Start 601: weapon_impacts.private
+
+601: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_impact_tests "private" "<external-data-root>"
+601: Working Directory: <workspace>/Blood2/build/sanitize/tests
+601: Test timeout computed to be: 180
+test 43
+      Start  43: world.level_change_private
+
+43: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "level_change_private" "<external-data-root>"
+43: Working Directory: <workspace>/Blood2/build/sanitize/tests
+43: Test timeout computed to be: 120
+43: Malformed destination refusal 0: DAT v56: invalid/unsupported typed property near byte 442114
+43: CityHub transfer 0:
+43: SubwayA transfer 0:
+43: Malformed destination refusal 1: DAT v56: invalid/unsupported typed property near byte 442114
+43: CityHub transfer 1:
+43: SubwayA transfer 1:
+43: Malformed destination refusal 2: DAT v56: invalid/unsupported typed property near byte 442114
+43: CityHub transfer 2:
+43: SubwayA transfer 2:
+43: PASS level_change_private
+ 1/58 Test  #43: world.level_change_private ........   Passed   25.59 sec
+test 44
+      Start  44: world.destination_trial_private
+
+44: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "destination_trial_private" "<external-data-root>"
+44: Working Directory: <workspace>/Blood2/build/sanitize/tests
+44: Test timeout computed to be: 60
+44: Cycle 0 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=488 error=
+44: Cycle 0 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+44: Cycle 0 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+44: Cycle 1 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=488 error=
+44: Cycle 1 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+44: Cycle 1 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+44: Cycle 2 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=488 error=
+44: Cycle 2 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+44: Cycle 2 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+44: PASS destination_trial_private
+ 2/58 Test  #44: world.destination_trial_private ...   Passed   23.76 sec
+test 45
+      Start  45: world.destination_private
+
+45: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "destination_private" "<external-data-root>"
+45: Working Directory: <workspace>/Blood2/build/sanitize/tests
+45: Test timeout computed to be: 60
+601: Original SubwayA camera intro expired after 12.0167 simulation seconds
+601: cycle=0 contacts=1 sounds=0 failed=0
+601: cycle=0 contacts=2 sounds=1 failed=0
+601: cycle=0 contacts=1 sounds=2 failed=0
+601: cycle=0 contacts=2 sounds=3 failed=0
+601: Sounds/Weapons/impacts/stone/impact1.wav frames=6728 rate=22050
+601: Sounds/Weapons/impacts/stone/impact1.wav frames=6728 rate=22050
+601: Sounds/Weapons/impacts/metal/impact2.wav frames=21823 rate=22050
+601: Sounds/Weapons/impacts/wood/impact3.wav frames=7601 rate=22050
+601: Sounds/Weapons/impacts/energy/impact3.wav frames=7216 rate=22050
+601: Sounds/Weapons/impacts/glass/impact1.wav frames=26322 rate=22050
+601: Sounds/Weapons/impacts/terrain/impact2.wav frames=3917 rate=22050
+601: Sounds/Weapons/impacts/cloth/impact2.wav frames=3644 rate=22050
+601: Sounds/Weapons/impacts/plastic/impact1.wav frames=7580 rate=22050
+601: Sounds/Weapons/impacts/flesh/impact3.wav frames=1704 rate=22050
+601: Sounds/Weapons/impacts/water/impact1.wav frames=4283 rate=22050
+601: Original SubwayA camera intro expired after 12.0167 simulation seconds
+601: cycle=1 contacts=1 sounds=0 failed=0
+601: cycle=1 contacts=2 sounds=1 failed=0
+601: cycle=1 contacts=1 sounds=2 failed=0
+601: cycle=1 contacts=2 sounds=3 failed=0
+601: Sounds/Weapons/impacts/stone/impact1.wav frames=6728 rate=22050
+601: Sounds/Weapons/impacts/stone/impact1.wav frames=6728 rate=22050
+601: Sounds/Weapons/impacts/metal/impact2.wav frames=21823 rate=22050
+601: Sounds/Weapons/impacts/wood/impact3.wav frames=7601 rate=22050
+601: Sounds/Weapons/impacts/energy/impact3.wav frames=7216 rate=22050
+601: Sounds/Weapons/impacts/glass/impact1.wav frames=26322 rate=22050
+601: Sounds/Weapons/impacts/terrain/impact2.wav frames=3917 rate=22050
+601: Sounds/Weapons/impacts/cloth/impact2.wav frames=3644 rate=22050
+601: Sounds/Weapons/impacts/plastic/impact1.wav frames=7580 rate=22050
+601: Sounds/Weapons/impacts/flesh/impact3.wav frames=1704 rate=22050
+601: Sounds/Weapons/impacts/water/impact1.wav frames=4283 rate=22050
+601: Original SubwayA camera intro expired after 12.0167 simulation seconds
+601: cycle=2 contacts=1 sounds=0 failed=0
+601: cycle=2 contacts=2 sounds=1 failed=0
+601: cycle=2 contacts=1 sounds=2 failed=0
+601: cycle=2 contacts=2 sounds=3 failed=0
+601: Sounds/Weapons/impacts/stone/impact1.wav frames=6728 rate=22050
+601: Sounds/Weapons/impacts/stone/impact1.wav frames=6728 rate=22050
+601: Sounds/Weapons/impacts/metal/impact2.wav frames=21823 rate=22050
+601: Sounds/Weapons/impacts/wood/impact3.wav frames=7601 rate=22050
+601: Sounds/Weapons/impacts/energy/impact3.wav frames=7216 rate=22050
+601: Sounds/Weapons/impacts/glass/impact1.wav frames=26322 rate=22050
+601: Sounds/Weapons/impacts/terrain/impact2.wav frames=3917 rate=22050
+601: Sounds/Weapons/impacts/cloth/impact2.wav frames=3644 rate=22050
+601: Sounds/Weapons/impacts/plastic/impact1.wav frames=7580 rate=22050
+601: Sounds/Weapons/impacts/flesh/impact3.wav frames=1704 rate=22050
+601: Sounds/Weapons/impacts/water/impact1.wav frames=4283 rate=22050
+ 3/58 Test #601: weapon_impacts.private ............   Passed   58.52 sec
+test 608
+      Start 608: weapon_sprites.private
+
+608: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_sprite_tests "private" "<external-data-root>"
+608: Working Directory: <workspace>/Blood2/build/sanitize/tests
+608: Test timeout computed to be: 120
+45: Cycle 0: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+45: Cycle 0: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+45: Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+45: Cycle 1: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+45: Cycle 1: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+45: Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+45: Cycle 2: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+45: Cycle 2: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+45: Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+45: PASS destination_private
+ 4/58 Test  #45: world.destination_private .........   Passed   13.89 sec
+test 807
+      Start 807: blood_splats.private
+
+807: Test command: <workspace>/Blood2/build/sanitize/tests/blood_splat_tests "private" "<external-data-root>"
+807: Working Directory: <workspace>/Blood2/build/sanitize/tests
+807: Test timeout computed to be: 120
+807: Private cycle 0: original Cultist death -> corpse -> pool, real 3 SPR/DTX variants, source-independent growth and unload
+807: Private cycle 1: original Cultist death -> corpse -> pool, real 3 SPR/DTX variants, source-independent growth and unload
+807: Private cycle 2: original Cultist death -> corpse -> pool, real 3 SPR/DTX variants, source-independent growth and unload
+ 5/58 Test #807: blood_splats.private ..............   Passed    7.46 sec
+test 798
+      Start 798: death_effects.gibs
+
+798: Test command: <workspace>/Blood2/build/sanitize/tests/death_effect_tests "gibs" "<external-data-root>"
+798: Working Directory: <workspace>/Blood2/build/sanitize/tests
+798: Test timeout computed to be: 90
+798: gib cycle=0 count=7 impacts=2 final id=7
+798: gib cycle=1 count=7 impacts=2 final id=14
+798: gib cycle=2 count=7 impacts=2 final id=21
+ 6/58 Test #798: death_effects.gibs ................   Passed    1.84 sec
+test 802
+      Start 802: death_effects.lifetime
+
+802: Test command: <workspace>/Blood2/build/sanitize/tests/death_effect_tests "lifetime" "<external-data-root>"
+802: Working Directory: <workspace>/Blood2/build/sanitize/tests
+802: Test timeout computed to be: 90
+ 7/58 Test #802: death_effects.lifetime ............   Passed    1.42 sec
+test 797
+      Start 797: death_effects.burn
+
+797: Test command: <workspace>/Blood2/build/sanitize/tests/death_effect_tests "burn" "<external-data-root>"
+797: Working Directory: <workspace>/Blood2/build/sanitize/tests
+797: Test timeout computed to be: 90
+797: CultistAI burned: particles=142 smoke start=5.07 independent corpse complete
+797: CivilianAI burned: particles=142 smoke start=5.07 independent corpse complete
+ 8/58 Test #797: death_effects.burn ................   Passed    1.34 sec
+test 511
+      Start 511: corpses.catalog
+
+511: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "catalog" "<external-data-root>"
+511: Working Directory: <workspace>/Blood2/build/sanitize/tests
+511: Test timeout computed to be: 90
+511: Death clip 32 duration 900
+511: Death clip 33 duration 7000
+511: Death clip 34 duration 1700
+511: Death clip 35 duration 2100
+511: Death clip 36 duration 1900
+511: Death clip 37 duration 1900
+511: Death clip 38 duration 1500
+511: Death clip 39 duration 1600
+511: Death clip 40 duration 6000
+511: Death clip 41 duration 2000
+511: Death clip 42 duration 5500
+511: Death clip 43 duration 7000
+511: CultistAI cycle 0: source removed; corpse clip 33, sound starts 1, pool request 1
+511: CivilianAI cycle 0: source removed; corpse clip 34, sound starts 1, pool request 1
+511: CultistAI cycle 1: source removed; corpse clip 32, sound starts 1, pool request 1
+511: CivilianAI cycle 1: source removed; corpse clip 34, sound starts 1, pool request 1
+ 9/58 Test #511: corpses.catalog ...................   Passed    1.09 sec
+test 800
+      Start 800: death_effects.damage
+
+800: Test command: <workspace>/Blood2/build/sanitize/tests/death_effect_tests "damage" "<external-data-root>"
+800: Working Directory: <workspace>/Blood2/build/sanitize/tests
+800: Test timeout computed to be: 90
+10/58 Test #800: death_effects.damage ..............   Passed    0.48 sec
+test 799
+      Start 799: death_effects.limbs
+
+799: Test command: <workspace>/Blood2/build/sanitize/tests/death_effect_tests "limbs" "<external-data-root>"
+799: Working Directory: <workspace>/Blood2/build/sanitize/tests
+799: Test timeout computed to be: 90
+608: Private cycle 0: 32 original diagnostic wood recipes, 64 actual SPR/DTX quads; source removal and unload passed
+608: Private cycle 1: 32 original diagnostic wood recipes, 64 actual SPR/DTX quads; source removal and unload passed
+608: Private cycle 2: 32 original diagnostic wood recipes, 64 actual SPR/DTX quads; source removal and unload passed
+11/58 Test #608: weapon_sprites.private ............   Passed   18.64 sec
+test 801
+      Start 801: death_effects.particles
+
+801: Test command: <workspace>/Blood2/build/sanitize/tests/death_effect_tests "particles" "<external-data-root>"
+801: Working Directory: <workspace>/Blood2/build/sanitize/tests
+801: Test timeout computed to be: 90
+12/58 Test #799: death_effects.limbs ...............   Passed    0.48 sec
+test 599
+      Start 599: weapon_impacts.hearing
+
+599: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_impact_tests "hearing" "<workspace>/Blood2/build/sanitize/tests/weapon-impacts-hearing"
+599: Working Directory: <workspace>/Blood2/build/sanitize/tests
+599: Test timeout computed to be: 30
+13/58 Test #801: death_effects.particles ...........   Passed    0.33 sec
+test 27
+      Start  27: world.destination_trials
+
+27: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "destination_trials" "<workspace>/Blood2/build/sanitize/tests/world-fixtures/destination_trials"
+27: Working Directory: <workspace>/Blood2/build/sanitize/tests
+27: Test timeout computed to be: 20
+14/58 Test #599: weapon_impacts.hearing ............   Passed    0.25 sec
+test 600
+      Start 600: weapon_impacts.limits
+
+600: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_impact_tests "limits" "<workspace>/Blood2/build/sanitize/tests/weapon-impacts-limits"
+600: Working Directory: <workspace>/Blood2/build/sanitize/tests
+600: Test timeout computed to be: 30
+27: trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+27: trial4: loaded=1 entered=1 cleanup=1 failed=1 error=
+27: trial2: loaded=1 entered=0 cleanup=1 failed=0 error=No single-player GameStartPoint
+27: trial3: loaded=1 entered=0 cleanup=1 failed=0 error=Start point has no supported ground collision
+27: broken: loaded=0 entered=0 cleanup=1 failed=0 error=DAT v56: invalid/unsupported section offsets near byte 4
+27: missing: loaded=0 entered=0 cleanup=1 failed=0 error=Resource not found: worlds/missing.dat
+27: trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+27: PASS destination_trials
+15/58 Test  #27: world.destination_trials ..........   Passed    0.19 sec
+test 597
+      Start 597: weapon_impacts.brushes
+
+597: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_impact_tests "brushes" "<workspace>/Blood2/build/sanitize/tests/weapon-impacts-brushes"
+597: Working Directory: <workspace>/Blood2/build/sanitize/tests
+597: Test timeout computed to be: 30
+16/58 Test #600: weapon_impacts.limits .............   Passed    0.19 sec
+test 25
+      Start  25: world.level_change
+
+25: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "level_change" "<workspace>/Blood2/build/sanitize/tests/world-fixtures/level_change"
+25: Working Directory: <workspace>/Blood2/build/sanitize/tests
+25: Test timeout computed to be: 20
+17/58 Test #597: weapon_impacts.brushes ............   Passed    0.17 sec
+test 598
+      Start 598: weapon_impacts.volumes
+
+598: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_impact_tests "volumes" "<workspace>/Blood2/build/sanitize/tests/weapon-impacts-volumes"
+598: Working Directory: <workspace>/Blood2/build/sanitize/tests
+598: Test timeout computed to be: 30
+18/58 Test #598: weapon_impacts.volumes ............   Passed    0.07 sec
+test 596
+      Start 596: weapon_impacts.world
+
+596: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_impact_tests "world" "<workspace>/Blood2/build/sanitize/tests/weapon-impacts-world"
+596: Working Directory: <workspace>/Blood2/build/sanitize/tests
+596: Test timeout computed to be: 30
+19/58 Test #596: weapon_impacts.world ..............   Passed    0.07 sec
+test 30
+      Start  30: world.destination_lifetime
+
+30: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "destination_lifetime" "<workspace>/Blood2/build/sanitize/tests/world-fixtures/destination_lifetime"
+30: Working Directory: <workspace>/Blood2/build/sanitize/tests
+30: Test timeout computed to be: 20
+30: PASS destination_lifetime
+20/58 Test  #30: world.destination_lifetime ........   Passed    0.06 sec
+test 607
+      Start 607: weapon_sprites.session
+
+607: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_sprite_tests "session" "<workspace>/Blood2/build/sanitize/tests/weapon-sprites-session"
+607: Working Directory: <workspace>/Blood2/build/sanitize/tests
+607: Test timeout computed to be: 30
+25: trial1: Destination world texture t.dtx: Missing exact-path resource
+25: trial2: No single-player GameStartPoint
+25: trial3: Start point has no supported ground collision
+25: trial4: Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+25: trial5: Destination initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+25: trial6: Destination start trigger requested another level during entry
+25: broken: DAT v56: invalid/unsupported section offsets near byte 4
+25: missing: Resource not found: worlds/missing.dat
+25: Commit 0:
+25: Commit 1:
+25: Commit 2:
+25: PASS level_change
+21/58 Test  #25: world.level_change ................   Passed    0.30 sec
+test 604
+      Start 604: weapon_sprites.failures
+
+604: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_sprite_tests "failures" "<workspace>/Blood2/build/sanitize/tests/weapon-sprites-failures"
+604: Working Directory: <workspace>/Blood2/build/sanitize/tests
+604: Test timeout computed to be: 30
+22/58 Test #607: weapon_sprites.session ............   Passed    0.05 sec
+test 606
+      Start 606: weapon_sprites.containers
+
+606: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_sprite_tests "containers" "<workspace>/Blood2/build/sanitize/tests/weapon-sprites-containers"
+606: Working Directory: <workspace>/Blood2/build/sanitize/tests
+606: Test timeout computed to be: 30
+23/58 Test #604: weapon_sprites.failures ...........   Passed    0.05 sec
+test 605
+      Start 605: weapon_sprites.selection
+
+605: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_sprite_tests "selection" "<workspace>/Blood2/build/sanitize/tests/weapon-sprites-selection"
+605: Working Directory: <workspace>/Blood2/build/sanitize/tests
+605: Test timeout computed to be: 30
+24/58 Test #606: weapon_sprites.containers .........   Passed    0.05 sec
+test 805
+      Start 805: blood_splats.failures
+
+805: Test command: <workspace>/Blood2/build/sanitize/tests/blood_splat_tests "failures" "<workspace>/Blood2/build/sanitize/tests/blood-splats-failures"
+805: Working Directory: <workspace>/Blood2/build/sanitize/tests
+805: Test timeout computed to be: 30
+25/58 Test #605: weapon_sprites.selection ..........   Passed    0.05 sec
+test 510
+      Start 510: corpses.accumulation
+
+510: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "accumulation" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/accumulation"
+510: Working Directory: <workspace>/Blood2/build/sanitize/tests
+510: Test timeout computed to be: 30
+26/58 Test #805: blood_splats.failures .............   Passed    0.05 sec
+test 507
+      Start 507: corpses.lifetime
+
+507: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "lifetime" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/lifetime"
+507: Working Directory: <workspace>/Blood2/build/sanitize/tests
+507: Test timeout computed to be: 30
+27/58 Test #510: corpses.accumulation ..............   Passed    0.04 sec
+test 505
+      Start 505: corpses.transfer
+
+505: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "transfer" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/transfer"
+505: Working Directory: <workspace>/Blood2/build/sanitize/tests
+505: Test timeout computed to be: 30
+28/58 Test #507: corpses.lifetime ..................   Passed    0.04 sec
+test 506
+      Start 506: corpses.failures
+
+506: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "failures" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/failures"
+506: Working Directory: <workspace>/Blood2/build/sanitize/tests
+506: Test timeout computed to be: 30
+29/58 Test #505: corpses.transfer ..................   Passed    0.04 sec
+test 504
+      Start 504: corpses.mappings
+
+504: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "mappings" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/mappings"
+504: Working Directory: <workspace>/Blood2/build/sanitize/tests
+504: Test timeout computed to be: 30
+30/58 Test #506: corpses.failures ..................   Passed    0.04 sec
+test 508
+      Start 508: corpses.sounds
+
+508: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "sounds" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/sounds"
+508: Working Directory: <workspace>/Blood2/build/sanitize/tests
+508: Test timeout computed to be: 30
+31/58 Test #504: corpses.mappings ..................   Passed    0.04 sec
+test 509
+      Start 509: corpses.gates
+
+509: Test command: <workspace>/Blood2/build/sanitize/tests/corpse_tests "gates" "<workspace>/Blood2/build/sanitize/tests/corpse-fixtures/gates"
+509: Working Directory: <workspace>/Blood2/build/sanitize/tests
+509: Test timeout computed to be: 30
+32/58 Test #508: corpses.sounds ....................   Passed    0.04 sec
+test 806
+      Start 806: blood_splats.session
+
+806: Test command: <workspace>/Blood2/build/sanitize/tests/blood_splat_tests "session" "<workspace>/Blood2/build/sanitize/tests/blood-splats-session"
+806: Working Directory: <workspace>/Blood2/build/sanitize/tests
+806: Test timeout computed to be: 30
+33/58 Test #509: corpses.gates .....................   Passed    0.04 sec
+test 1
+      Start   1: objects.builtin_model
+
+1: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "builtin_model"
+1: Working Directory: <workspace>/Blood2/build/sanitize/tests
+1: Test timeout computed to be: 10
+1: PASS builtin_model
+34/58 Test #806: blood_splats.session ..............   Passed    0.04 sec
+test 11
+      Start  11: objects.unsupported_teardown
+
+11: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "unsupported_teardown"
+11: Working Directory: <workspace>/Blood2/build/sanitize/tests
+11: Test timeout computed to be: 10
+35/58 Test   #1: objects.builtin_model .............   Passed    0.02 sec
+test 595
+      Start 595: weapon_impacts.selection
+
+595: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_impact_tests "selection" "<workspace>/Blood2/build/sanitize/tests/weapon-impacts-selection"
+595: Working Directory: <workspace>/Blood2/build/sanitize/tests
+595: Test timeout computed to be: 30
+36/58 Test #595: weapon_impacts.selection ..........   Passed    0.02 sec
+test 602
+      Start 602: weapon_sprites.formulas
+
+602: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_sprite_tests "formulas" "<workspace>/Blood2/build/sanitize/tests/weapon-sprites-formulas"
+602: Working Directory: <workspace>/Blood2/build/sanitize/tests
+602: Test timeout computed to be: 30
+11: PASS unsupported_teardown
+37/58 Test #602: weapon_sprites.formulas ...........   Passed    0.02 sec
+test 804
+      Start 804: blood_splats.region
+
+804: Test command: <workspace>/Blood2/build/sanitize/tests/blood_splat_tests "region" "<workspace>/Blood2/build/sanitize/tests/blood-splats-region"
+804: Working Directory: <workspace>/Blood2/build/sanitize/tests
+804: Test timeout computed to be: 30
+38/58 Test  #11: objects.unsupported_teardown ......   Passed    0.06 sec
+test 29
+      Start  29: world.destination_schema
+
+29: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "destination_schema" "<workspace>/Blood2/build/sanitize/tests/world-fixtures/destination_schema"
+29: Working Directory: <workspace>/Blood2/build/sanitize/tests
+29: Test timeout computed to be: 20
+29: PASS destination_schema
+39/58 Test #804: blood_splats.region ...............   Passed    0.02 sec
+test 10
+      Start  10: objects.messages_strings
+
+10: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "messages_strings"
+10: Working Directory: <workspace>/Blood2/build/sanitize/tests
+10: Test timeout computed to be: 10
+40/58 Test  #29: world.destination_schema ..........   Passed    0.02 sec
+test 603
+      Start 603: weapon_sprites.delay
+
+603: Test command: <workspace>/Blood2/build/sanitize/tests/weapon_sprite_tests "delay" "<workspace>/Blood2/build/sanitize/tests/weapon-sprites-delay"
+603: Working Directory: <workspace>/Blood2/build/sanitize/tests
+603: Test timeout computed to be: 30
+41/58 Test #603: weapon_sprites.delay ..............   Passed    0.02 sec
+test 803
+      Start 803: blood_splats.formulas
+
+803: Test command: <workspace>/Blood2/build/sanitize/tests/blood_splat_tests "formulas" "<workspace>/Blood2/build/sanitize/tests/blood-splats-formulas"
+803: Working Directory: <workspace>/Blood2/build/sanitize/tests
+803: Test timeout computed to be: 30
+10: PASS messages_strings
+42/58 Test  #10: objects.messages_strings ..........   Passed    0.04 sec
+test 28
+      Start  28: world.destination_messages
+
+28: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "destination_messages" "<workspace>/Blood2/build/sanitize/tests/world-fixtures/destination_messages"
+28: Working Directory: <workspace>/Blood2/build/sanitize/tests
+28: Test timeout computed to be: 20
+43/58 Test #803: blood_splats.formulas .............   Passed    0.02 sec
+test 12
+      Start  12: objects.creation_failures
+
+12: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "creation_failures"
+12: Working Directory: <workspace>/Blood2/build/sanitize/tests
+12: Test timeout computed to be: 10
+28: PASS destination_messages
+44/58 Test  #28: world.destination_messages ........   Passed    0.02 sec
+test 4
+      Start   4: objects.reasons_properties
+
+4: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "reasons_properties"
+4: Working Directory: <workspace>/Blood2/build/sanitize/tests
+4: Test timeout computed to be: 10
+12: PASS creation_failures
+4: PASS reasons_properties
+45/58 Test  #12: objects.creation_failures .........   Passed    0.04 sec
+test 9
+      Start   9: objects.links_lists
+
+9: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "links_lists"
+9: Working Directory: <workspace>/Blood2/build/sanitize/tests
+9: Test timeout computed to be: 10
+46/58 Test   #4: objects.reasons_properties ........   Passed    0.02 sec
+test 2
+      Start   2: objects.original_objects
+
+2: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "original_objects"
+2: Working Directory: <workspace>/Blood2/build/sanitize/tests
+2: Test timeout computed to be: 10
+9: PASS links_lists
+2: PASS original_objects
+47/58 Test   #9: objects.links_lists ...............   Passed    0.02 sec
+test 3
+      Start   3: objects.nested_creation
+
+3: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "nested_creation"
+3: Working Directory: <workspace>/Blood2/build/sanitize/tests
+3: Test timeout computed to be: 10
+48/58 Test   #2: objects.original_objects ..........   Passed    0.02 sec
+test 6
+      Start   6: objects.deferred_removal
+
+6: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "deferred_removal"
+6: Working Directory: <workspace>/Blood2/build/sanitize/tests
+6: Test timeout computed to be: 10
+3: PASS nested_creation
+6: PASS deferred_removal
+49/58 Test   #3: objects.nested_creation ...........   Passed    0.02 sec
+test 8
+      Start   8: objects.handles_selection
+
+8: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "handles_selection"
+8: Working Directory: <workspace>/Blood2/build/sanitize/tests
+8: Test timeout computed to be: 10
+50/58 Test   #6: objects.deferred_removal ..........   Passed    0.02 sec
+test 7
+      Start   7: objects.aggregate_dispatch
+
+7: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "aggregate_dispatch"
+7: Working Directory: <workspace>/Blood2/build/sanitize/tests
+7: Test timeout computed to be: 10
+7: PASS aggregate_dispatch
+8: PASS handles_selection
+51/58 Test   #7: objects.aggregate_dispatch ........   Passed    0.02 sec
+test 5
+      Start   5: objects.scheduling
+
+5: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "scheduling"
+5: Working Directory: <workspace>/Blood2/build/sanitize/tests
+5: Test timeout computed to be: 10
+52/58 Test   #8: objects.handles_selection .........   Passed    0.02 sec
+test 808
+      Start 808: blood_spurts.formulas
+
+808: Test command: <workspace>/Blood2/build/sanitize/tests/blood_spurt_tests "formulas" "<workspace>/Blood2/build/sanitize/tests/blood-spurts-formulas"
+808: Working Directory: <workspace>/Blood2/build/sanitize/tests
+808: Test timeout computed to be: 30
+5: PASS scheduling
+53/58 Test   #5: objects.scheduling ................   Passed    0.02 sec
+test 809
+      Start 809: blood_spurts.impact
+
+809: Test command: <workspace>/Blood2/build/sanitize/tests/blood_spurt_tests "impact" "<workspace>/Blood2/build/sanitize/tests/blood-spurts-impact"
+809: Working Directory: <workspace>/Blood2/build/sanitize/tests
+809: Test timeout computed to be: 30
+54/58 Test #808: blood_spurts.formulas .............   Passed    0.04 sec
+test 810
+      Start 810: blood_spurts.weapon
+
+810: Test command: <workspace>/Blood2/build/sanitize/tests/blood_spurt_tests "weapon" "<workspace>/Blood2/build/sanitize/tests/blood-spurts-weapon"
+810: Working Directory: <workspace>/Blood2/build/sanitize/tests
+810: Test timeout computed to be: 30
+55/58 Test #809: blood_spurts.impact ...............   Passed    0.04 sec
+test 811
+      Start 811: blood_spurts.failures
+
+811: Test command: <workspace>/Blood2/build/sanitize/tests/blood_spurt_tests "failures" "<workspace>/Blood2/build/sanitize/tests/blood-spurts-failures"
+811: Working Directory: <workspace>/Blood2/build/sanitize/tests
+811: Test timeout computed to be: 30
+56/58 Test #810: blood_spurts.weapon ...............   Passed    0.04 sec
+test 812
+      Start 812: blood_spurts.private
+
+812: Test command: <workspace>/Blood2/build/sanitize/tests/blood_spurt_tests "private" "<external-data-root>"
+812: Working Directory: <workspace>/Blood2/build/sanitize/tests
+812: Test timeout computed to be: 120
+57/58 Test #811: blood_spurts.failures .............   Passed    0.06 sec
+812: Private cycle 0: original death/limb/fragment callers, peak 8064, emitter impacts 4, splats 5, three real drop textures
+812: Private cycle 1: original death/limb/fragment callers, peak 8124, emitter impacts 4, splats 5, three real drop textures
+812: Private cycle 2: original death/limb/fragment callers, peak 8124, emitter impacts 4, splats 5, three real drop textures
+58/58 Test #812: blood_spurts.private ..............   Passed    7.16 sec
+
+The following tests passed:
+	world.level_change_private
+	world.destination_trial_private
+	weapon_impacts.private
+	world.destination_private
+	blood_splats.private
+	death_effects.gibs
+	death_effects.lifetime
+	death_effects.burn
+	corpses.catalog
+	death_effects.damage
+	weapon_sprites.private
+	death_effects.limbs
+	death_effects.particles
+	weapon_impacts.hearing
+	world.destination_trials
+	weapon_impacts.limits
+	weapon_impacts.brushes
+	weapon_impacts.volumes
+	weapon_impacts.world
+	world.destination_lifetime
+	world.level_change
+	weapon_sprites.session
+	weapon_sprites.failures
+	weapon_sprites.containers
+	weapon_sprites.selection
+	blood_splats.failures
+	corpses.accumulation
+	corpses.lifetime
+	corpses.transfer
+	corpses.failures
+	corpses.mappings
+	corpses.sounds
+	corpses.gates
+	blood_splats.session
+	objects.builtin_model
+	weapon_impacts.selection
+	weapon_sprites.formulas
+	objects.unsupported_teardown
+	blood_splats.region
+	world.destination_schema
+	weapon_sprites.delay
+	objects.messages_strings
+	blood_splats.formulas
+	world.destination_messages
+	objects.creation_failures
+	objects.reasons_properties
+	objects.links_lists
+	objects.original_objects
+	objects.nested_creation
+	objects.deferred_removal
+	objects.aggregate_dispatch
+	objects.handles_selection
+	objects.scheduling
+	blood_spurts.formulas
+	blood_spurts.impact
+	blood_spurts.weapon
+	blood_spurts.failures
+	blood_spurts.private
+
+100% tests passed, 0 tests failed out of 58
+
+Label Time Summary:
+blood_splats      =   7.60 sec*proc (5 tests)
+blood_spurts      =   7.33 sec*proc (5 tests)
+corpses           =   1.39 sec*proc (8 tests)
+death_effects     =   5.90 sec*proc (6 tests)
+headless          = 164.54 sec*proc (58 tests)
+objects           =   0.33 sec*proc (12 tests)
+private           = 162.00 sec*proc (14 tests)
+weapon_impacts    =  59.29 sec*proc (7 tests)
+weapon_sprites    =  18.88 sec*proc (7 tests)
+world             =  63.83 sec*proc (8 tests)
+
+Total Test time (real) =  85.85 sec

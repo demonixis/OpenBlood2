@@ -1,0 +1,28 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start  25: gpu.lifecycle
+1/7 Test  #25: gpu.lifecycle ....................   Passed    3.15 sec
+    Start 193: gpu.objectives
+2/7 Test #193: gpu.objectives ...................   Passed    1.75 sec
+    Start 661: gpu.energy
+3/7 Test #661: gpu.energy .......................   Passed    0.44 sec
+    Start 662: gpu.energy_private
+4/7 Test #662: gpu.energy_private ...............   Passed    0.49 sec
+    Start 745: gpu.mac10
+5/7 Test #745: gpu.mac10 ........................   Passed    3.04 sec
+    Start 757: gpu.flare_views_private
+6/7 Test #757: gpu.flare_views_private ..........   Passed    1.53 sec
+    Start 780: gpu.assault_private
+7/7 Test #780: gpu.assault_private ..............   Passed    1.67 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+assault       =   1.67 sec*proc (1 test)
+energy        =   0.94 sec*proc (2 tests)
+flare         =   1.53 sec*proc (1 test)
+gpu           =  12.07 sec*proc (7 tests)
+mac10         =   3.04 sec*proc (1 test)
+objectives    =   1.75 sec*proc (1 test)
+private       =   8.48 sec*proc (5 tests)
+
+Total Test time (real) =  12.08 sec

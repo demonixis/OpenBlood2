@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-18",
+  "status": "M2 incomplete; prepared harmony, MUSIC unsupported",
+  "implementation_parent": "835668e3afcc2a7ae35b0c0338241317edf9e767",
+  "runs": [
+    {
+      "configuration": "debug",
+      "tests": 98,
+      "passed": 98,
+      "wall_seconds": 17.95
+    },
+    {
+      "configuration": "release",
+      "tests": 98,
+      "passed": 98,
+      "wall_seconds": 1.41
+    },
+    {
+      "configuration": "sanitize",
+      "tests": 98,
+      "passed": 98,
+      "wall_seconds": 68.6
+    },
+    {
+      "configuration": "debug NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 11.93
+    },
+    {
+      "configuration": "release NVIDIA Vulkan",
+      "tests": 2,
+      "passed": 2,
+      "wall_seconds": 5.41
+    }
+  ],
+  "original_harmony_probe": {
+    "fixtures": 6,
+    "headers": 5,
+    "generated": {
+      "cases": 4096,
+      "sha256": "c9429a640d80e7e0018a6f2ef4be1aa61f95d3245fc280cf1ba7a2bca14da2f5",
+      "fnv64": 12106312165928785022
+    },
+    "private": {
+      "cases": 156,
+      "sha256": "2e631dc91e08ead5586d39526db135eee7bac03944b674ff2ef50f7ffa881b9a",
+      "fnv64": 11061850450855354925
+    }
+  },
+  "gpu_environment": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+    "SDL_AUDIODRIVER": "dummy"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1"
+  },
+  "commands": [
+    "python3 m2-music-harmony-validation.py <debug|release|sanitize>",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/<debug|release> -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit <result.xml>",
+    "<tool-venv>/bin/python m2-music-harmony-probe.py <external-content-root>",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror <nine changed C++ files>"
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "limitations": [
+    "Personality graph payloads opaque; metadata success is not full graph validity",
+    "Header emulator skips opaque graph traversal",
+    "Filename/name binding only for zero personality identities; no general UUID resolver",
+    "Standalone 156-section chord test uses explicit 4/4; session catalog uses actual bound styles",
+    "No current-chord activation/selection, sequence scheduling or MUSIC playback",
+    "GPU capture reviewed: summary reaches viewport bottom; nested prepared-chord fields not visually captured",
+    "Dummy audio; no listening parity or native Metal/Windows/mobile test",
+    "Required services and actual M2 gate remain open"
+  ],
+  "artifacts": {
+    "Documentation/Implementation/evidence/m2-music-harmony-debug-build-final.log": "58efbb7cc85a3e9609668918b9a9f3cd1b2614ce08bc57ca3d320d51f331d464",
+    "Documentation/Implementation/evidence/m2-music-harmony-debug-gpu.log": "8dcd054cfe8fc61703cec477c0a94cb0487109486095a9536bba89b5a4007e6e",
+    "Documentation/Implementation/evidence/m2-music-harmony-debug-gpu.xml": "32517aec73f57467148c0ccd0653f3776b07a0b7a6b2406e72d5219d09f4fe3c",
+    "Documentation/Implementation/evidence/m2-music-harmony-debug-tests.log": "155ff52fc2da7d9e8e918a6c2281abf690ca8f594bfa8578252cc137ee9c1794",
+    "Documentation/Implementation/evidence/m2-music-harmony-debug-tests.xml": "73f108f817b6cb3aeb4514173043105b1f92b3416e6f542095fad6f66e24f717",
+    "Documentation/Implementation/evidence/m2-music-harmony-integrity.json": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+    "Documentation/Implementation/evidence/m2-music-harmony-links.log": "bcc729fe6a430946605031005d6916a75d60471ffd5f897482ff5b767c95fe7a",
+    "Documentation/Implementation/evidence/m2-music-harmony-probe.json": "82c8f2397939e10eff324ba4e00d3aa300b21f8b2d8be25126b1ebf1b46c26fb",
+    "Documentation/Implementation/evidence/m2-music-harmony-probe.py": "c132c423959e2a777b4dd95cb6fd219cfccba580336cc394148af23f9c43e444",
+    "Documentation/Implementation/evidence/m2-music-harmony-release-build-final.log": "a27f47b5d361f68dc9de161ab2c66b5a0dce18672901da53f2df92d49b13ce85",
+    "Documentation/Implementation/evidence/m2-music-harmony-release-gpu.log": "ffea6e36fcdcd8467c01420f4b7eb2a152285b3ba1fd4256f49ce91565cec7c5",
+    "Documentation/Implementation/evidence/m2-music-harmony-release-gpu.xml": "2b43970695a0206f13dbcc0166537ddf04b0539da99443df8ad129120372d570",
+    "Documentation/Implementation/evidence/m2-music-harmony-release-tests.log": "81a0bf9d58bbba1c56d6354bf0890320ce3692eeed5a985cd958c54ed84300f2",
+    "Documentation/Implementation/evidence/m2-music-harmony-release-tests.xml": "1f0c6a6f4c040043dfca10cb1b5ada9211952d40b77b207099b6d85f748cb68b",
+    "Documentation/Implementation/evidence/m2-music-harmony-sanitize-build-final.log": "74de91ba29b15ca12bfc195727bbb066855409b518c722e5c727b8ec2d69cf98",
+    "Documentation/Implementation/evidence/m2-music-harmony-sanitize-tests.log": "67a91e44b9b8b5dd4255025b226942c6931d328dcc582c4c2e7b89564f8837d5",
+    "Documentation/Implementation/evidence/m2-music-harmony-sanitize-tests.xml": "533f7827ac1fba9dc464f67c80680ae4314a5302db5b2f3496700a14034b51b4",
+    "Documentation/Implementation/evidence/m2-music-harmony-validation.py": "65d97b3ffb5291f202f6b123d2ac8e18e7ae7d051d6762a16cec681cac2b7f08"
+  },
+  "implementation_commit": "08e3978f76c4de977a00e20497b41ff17f5fa00f"
+}

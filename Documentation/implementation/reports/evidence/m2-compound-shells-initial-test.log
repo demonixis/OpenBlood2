@@ -1,0 +1,107 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 121: doors.catalog
+    Start  93: compound_shell.geometry
+1/5 Test  #93: compound_shell.geometry ..........   Passed    0.00 sec
+    Start  94: compound_shell.malformed
+2/5 Test  #94: compound_shell.malformed .........   Passed    0.00 sec
+    Start  95: compound_shell.lifetime
+3/5 Test  #95: compound_shell.lifetime ..........   Passed    0.00 sec
+    Start  96: compound_shell.private
+4/5 Test  #96: compound_shell.private ...........   Passed    1.45 sec
+5/5 Test #121: doors.catalog ....................***Failed    5.74 sec
+worlds/04_steamtunnels.dat noname rejected: noname: Missing named world model
+worlds/06_airship1.dat girder1 rejected: girder1: Missing named world model
+worlds/06_airship1.dat forcefield1 rejected: forcefield1: Ambiguous named world model
+worlds/06_airship1.dat forcefield1 rejected: forcefield1: Ambiguous named world model
+worlds/13_downtown.dat Clouds1 rejected: Clouds1: Ambiguous named world model
+worlds/13_downtown.dat Moon1 rejected: Moon1: Ambiguous named world model
+worlds/13_downtown.dat Stars1 rejected: Stars1: Ambiguous named world model
+worlds/13_downtown.dat Buildings rejected: Buildings: Ambiguous named world model
+worlds/13_downtown.dat Clouds2 rejected: Clouds2: Ambiguous named world model
+worlds/13_downtown.dat Clouds1 rejected: Clouds1: Ambiguous named world model
+worlds/13_downtown.dat Moon1 rejected: Moon1: Ambiguous named world model
+worlds/13_downtown.dat Stars1 rejected: Stars1: Ambiguous named world model
+worlds/13_downtown.dat Buildings rejected: Buildings: Ambiguous named world model
+worlds/13_downtown.dat Clouds2 rejected: Clouds2: Ambiguous named world model
+worlds/17_entrance.dat lock1 rejected: lock1: Missing named world model
+worlds/17_entrance.dat lock2 rejected: lock2: Missing named world model
+worlds/17_entrance.dat goo2 rejected: goo2: Missing named world model
+worlds/17_entrance.dat goo3 rejected: goo3: Missing named world model
+worlds/17_entrance.dat Door0 rejected: Door0: Missing named world model
+worlds/19_lobby.dat messedup2 rejected: messedup2: Missing named world model
+worlds/19_lobbyb.dat messedup rejected: messedup: Missing named world model
+worlds/19_lobbyb.dat messedup2 rejected: messedup2: Missing named world model
+worlds/19_lobbyc.dat messedup rejected: messedup: Missing named world model
+worlds/19_lobbyc.dat messedup2 rejected: messedup2: Missing named world model
+worlds/22_office.dat Door1 rejected: Door1: Ambiguous named world model
+worlds/multi/bb_bloodarena.dat Clouds1 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat Horizon rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat Moon rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat grill1 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat grill2 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat lift5 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat lift6 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat lift7 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder1v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder2v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder3v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder4v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder5v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder6v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder7v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder8v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder9v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder10v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder11v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder12v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder13v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat ladder14v rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat lift1 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bloodarena.dat lift2 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bodies.dat window2 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bodies.dat window3 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bodies.dat Clouds1 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bodies.dat Horizon rejected: Door: invalid property TypeAction
+worlds/multi/bb_bodies.dat Moon rejected: Door: invalid property TypeAction
+worlds/multi/bb_bodies.dat window3 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bodies.dat lift rejected: Door: invalid property TypeAction
+worlds/multi/bb_bodies.dat Door0 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bridge.dat Clouds1 rejected: Door: invalid property TypeAction
+worlds/multi/bb_bridge.dat Moon rejected: Door: invalid property TypeAction
+worlds/multi/bb_bridge.dat Horizon rejected: Door: invalid property TypeAction
+worlds/multi/bb_condemned.dat ladder1 rejected: ladder1: Ambiguous named world model
+worlds/multi/bb_condemned.dat ladder2 rejected: ladder2: Ambiguous named world model
+worlds/multi/bb_condemned.dat Buildings rejected: Buildings: Open or non-manifold container shell: 4 edges / balance 0 in component 3 at -7488 -1986 -1568 -> -7488 -2048 -1568
+worlds/multi/bb_jgrave.dat door12 rejected: door12: Ambiguous named world model
+worlds/multi/bb_jgrave.dat door13 rejected: door13: Ambiguous named world model
+worlds/multi/bb_jgrave.dat Door12 rejected: Door12: Ambiguous named world model
+worlds/multi/bb_jgrave.dat Door13 rejected: Door13: Ambiguous named world model
+worlds/multi/bb_midgard.dat lift1 rejected: Door: invalid property TypeAction
+worlds/multi/bb_midgard.dat Clouds1 rejected: Door: invalid property TypeAction
+worlds/multi/bb_midgard.dat Horizon rejected: Door: invalid property TypeAction
+worlds/multi/bb_midgard.dat Moon rejected: Door: invalid property TypeAction
+worlds/multi/bb_midgard.dat switch1 rejected: Door: invalid property TypeAction
+worlds/multi/bb_midgard.dat powerlift rejected: Door: invalid property TypeAction
+worlds/multi/bb_midgard.dat switch2 rejected: Door: invalid property TypeAction
+worlds/multi/bb_midgard.dat maindoor rejected: Door: invalid property TypeAction
+worlds/multi/bb_midgard.dat switch3 rejected: Door: invalid property TypeAction
+worlds/multi/bb_midgard.dat lift3 rejected: Door: invalid property TypeAction
+worlds/multi/bb_midgard.dat switch4 rejected: Door: invalid property TypeAction
+worlds/multi/bb_midgard.dat lift2 rejected: Door: invalid property TypeAction
+Door catalog: created=619, rejected=79, unreadable=1, SelfTrigger=149, polygon=114
+catalog:363: created == 605 && rejected == 93 && skipped == 1 && self_triggers == 146 && polygon == 113
+
+
+80% tests passed, 1 tests failed out of 5
+
+Label Time Summary:
+containers    =   1.46 sec*proc (4 tests)
+doors         =   5.74 sec*proc (1 test)
+headless      =   7.20 sec*proc (5 tests)
+private       =   7.19 sec*proc (2 tests)
+
+Total Test time (real) =   5.75 sec
+
+The following tests FAILED:
+	121 - doors.catalog (Failed)                            doors headless private
+Errors while running CTest

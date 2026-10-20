@@ -1,0 +1,94 @@
+655/655 Testing: gpu.wind_private
+655/655 Test: gpu.wind_private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/wind_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/wind-private-gpu" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.wind_private" start time: Oct 17 01:45 CEST
+Output:
+----------------------------------------------------------
+Original shockwave scale850 alpha.375: 168 triangles, 2330 changed pixels
+<end of output>
+Test time =   0.43 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.wind_private" end time: Oct 17 01:45 CEST
+"gpu.wind_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 01:45 CEST
+
+brushes =   1.78 sec*proc
+
+cameras =   1.99 sec*proc
+
+character =  13.46 sec*proc
+
+cinematics =   1.85 sec*proc
+
+containers =   4.19 sec*proc
+
+doors =   1.82 sec*proc
+
+energy =   0.79 sec*proc
+
+explosion_flames =   0.89 sec*proc
+
+explosion_fragments =   0.81 sec*proc
+
+explosion_models =   0.81 sec*proc
+
+explosion_rings =   0.83 sec*proc
+
+gpu = 123.20 sec*proc
+
+interaction =   3.14 sec*proc
+
+keyframes =   2.00 sec*proc
+
+lights =   1.85 sec*proc
+
+model_view =   0.95 sec*proc
+
+movement =  14.15 sec*proc
+
+naga =   0.83 sec*proc
+
+object_particles =   0.82 sec*proc
+
+objectives =   2.31 sec*proc
+
+pickups =   2.03 sec*proc
+
+player =   2.08 sec*proc
+
+player_controls =   1.05 sec*proc
+
+player_keepalive =   1.85 sec*proc
+
+player_restore =   1.68 sec*proc
+
+private = 114.46 sec*proc
+
+randomsound =  12.72 sec*proc
+
+sceneexplosion =   1.74 sec*proc
+
+session_playback =   0.96 sec*proc
+
+sound =   1.77 sec*proc
+
+sprite_view =   0.92 sec*proc
+
+sprites =   1.71 sec*proc
+
+triggers =   2.03 sec*proc
+
+weapon_sprites =   0.93 sec*proc
+
+weapons =  14.06 sec*proc
+
+wind =   0.84 sec*proc
+
+world_view =  14.50 sec*proc
+
+worldpaths =   1.94 sec*proc
+

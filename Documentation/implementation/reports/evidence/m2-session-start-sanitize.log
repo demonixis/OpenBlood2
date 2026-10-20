@@ -1,0 +1,181 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  31: world.session_start
+ 1/81 Test  #31: world.session_start ...............   Passed    0.18 sec
+      Start  32: world.level_change
+ 2/81 Test  #32: world.level_change ................   Passed    0.28 sec
+      Start  33: world.surface_effects
+ 3/81 Test  #33: world.surface_effects .............   Passed    0.93 sec
+      Start  34: world.destination_trials
+ 4/81 Test  #34: world.destination_trials ..........   Passed    0.18 sec
+      Start  35: world.destination_messages
+ 5/81 Test  #35: world.destination_messages ........   Passed    0.02 sec
+      Start  36: world.destination_schema
+ 6/81 Test  #36: world.destination_schema ..........   Passed    0.02 sec
+      Start  37: world.destination_lifetime
+ 7/81 Test  #37: world.destination_lifetime ........   Passed    0.07 sec
+      Start  38: world.sprite_entries
+ 8/81 Test  #38: world.sprite_entries ..............   Passed    0.04 sec
+      Start  39: world.sound_entries
+ 9/81 Test  #39: world.sound_entries ...............   Passed    0.04 sec
+      Start  40: world.rez_structure
+10/81 Test  #40: world.rez_structure ...............   Passed    0.02 sec
+      Start  41: world.rez_rejection
+11/81 Test  #41: world.rez_rejection ...............   Passed    0.02 sec
+      Start  42: world.resource_mount
+12/81 Test  #42: world.resource_mount ..............   Passed    0.02 sec
+      Start  43: world.world_properties
+13/81 Test  #43: world.world_properties ............   Passed    0.02 sec
+      Start  44: world.world_geometry
+14/81 Test  #44: world.world_geometry ..............   Passed    0.02 sec
+      Start  45: world.world_rejection
+15/81 Test  #45: world.world_rejection .............   Passed    0.06 sec
+      Start  46: world.mutations
+16/81 Test  #46: world.mutations ...................   Passed    0.22 sec
+      Start  47: world.session_lifecycle
+17/81 Test  #47: world.session_lifecycle ...........   Passed    0.03 sec
+      Start  48: world.session_messages
+18/81 Test  #48: world.session_messages ............   Passed    0.02 sec
+      Start  49: world.original_trigger
+19/81 Test  #49: world.original_trigger ............   Passed    0.02 sec
+      Start  50: world.session_start_private
+20/81 Test  #50: world.session_start_private .......   Passed   31.10 sec
+      Start  51: world.level_change_private
+21/81 Test  #51: world.level_change_private ........   Passed   24.53 sec
+      Start  52: world.destination_trial_private
+22/81 Test  #52: world.destination_trial_private ...   Passed   25.19 sec
+      Start  53: world.destination_private
+23/81 Test  #53: world.destination_private .........   Passed   13.94 sec
+      Start  54: world.private
+24/81 Test  #54: world.private .....................   Passed    4.84 sec
+      Start  55: cli.world_modes
+25/81 Test  #55: cli.world_modes ...................   Passed    8.41 sec
+      Start  67: player.handles
+26/81 Test  #67: player.handles ....................   Passed    0.03 sec
+      Start  68: player.lifecycle
+27/81 Test  #68: player.lifecycle ..................   Passed    0.05 sec
+      Start  69: player.rollback
+28/81 Test  #69: player.rollback ...................   Passed    0.05 sec
+      Start  70: player.messages
+29/81 Test  #70: player.messages ...................   Passed    0.05 sec
+      Start  71: player.callbacks
+30/81 Test  #71: player.callbacks ..................   Passed    0.04 sec
+      Start  72: player.smell
+31/81 Test  #72: player.smell ......................   Passed    0.05 sec
+      Start  73: player.smell_private
+32/81 Test  #73: player.smell_private ..............   Passed   30.22 sec
+      Start  74: player.private
+33/81 Test  #74: player.private ....................   Passed   12.00 sec
+      Start 267: sound.defaults
+34/81 Test #267: sound.defaults ....................   Passed    0.04 sec
+      Start 268: sound.loops
+35/81 Test #268: sound.loops .......................   Passed    0.04 sec
+      Start 269: sound.resampling
+36/81 Test #269: sound.resampling ..................   Passed    0.04 sec
+      Start 270: sound.lifetime
+37/81 Test #270: sound.lifetime ....................   Passed    0.04 sec
+      Start 271: sound.failures
+38/81 Test #271: sound.failures ....................   Passed    0.04 sec
+      Start 272: sound.metadata
+39/81 Test #272: sound.metadata ....................   Passed    0.04 sec
+      Start 273: sound.catalog
+40/81 Test #273: sound.catalog .....................   Passed   12.66 sec
+      Start 274: sound.subway
+41/81 Test #274: sound.subway ......................   Passed    5.96 sec
+      Start 275: sprites.reader
+42/81 Test #275: sprites.reader ....................   Passed    0.05 sec
+      Start 276: sprites.clock
+43/81 Test #276: sprites.clock .....................   Passed    0.02 sec
+      Start 277: sprites.properties
+44/81 Test #277: sprites.properties ................   Passed    0.03 sec
+      Start 278: sprites.placement
+45/81 Test #278: sprites.placement .................   Passed    0.03 sec
+      Start 279: sprites.ray
+46/81 Test #279: sprites.ray .......................   Passed    0.03 sec
+      Start 280: sprites.failures
+47/81 Test #280: sprites.failures ..................   Passed    0.03 sec
+      Start 281: sprites.catalog
+48/81 Test #281: sprites.catalog ...................   Passed   30.64 sec
+      Start 282: sprites.subway
+49/81 Test #282: sprites.subway ....................   Passed    5.29 sec
+      Start 283: sceneexplosion.properties
+50/81 Test #283: sceneexplosion.properties .........   Passed    0.04 sec
+      Start 284: sceneexplosion.commands
+51/81 Test #284: sceneexplosion.commands ...........   Passed    0.04 sec
+      Start 285: sceneexplosion.damage
+52/81 Test #285: sceneexplosion.damage .............   Passed    0.03 sec
+      Start 286: sceneexplosion.lifetime
+53/81 Test #286: sceneexplosion.lifetime ...........   Passed    0.04 sec
+      Start 287: sceneexplosion.failures
+54/81 Test #287: sceneexplosion.failures ...........   Passed    0.04 sec
+      Start 288: sceneexplosion.budget
+55/81 Test #288: sceneexplosion.budget .............   Passed    0.08 sec
+      Start 289: sceneexplosion.catalog
+56/81 Test #289: sceneexplosion.catalog ............   Passed   11.87 sec
+      Start 290: sceneexplosion.subway
+57/81 Test #290: sceneexplosion.subway .............   Passed    5.47 sec
+      Start 548: exits.defaults
+58/81 Test #548: exits.defaults ....................   Passed    0.04 sec
+      Start 549: exits.delayed
+59/81 Test #549: exits.delayed .....................   Passed    0.06 sec
+      Start 550: exits.broadcast
+60/81 Test #550: exits.broadcast ...................   Passed    0.03 sec
+      Start 551: exits.blocked
+61/81 Test #551: exits.blocked .....................   Passed    0.04 sec
+      Start 552: exits.dead
+62/81 Test #552: exits.dead ........................   Passed    0.04 sec
+      Start 553: exits.queue
+63/81 Test #553: exits.queue .......................   Passed    0.06 sec
+      Start 554: exits.lifetime
+64/81 Test #554: exits.lifetime ....................   Passed    0.05 sec
+      Start 555: exits.catalog
+65/81 Test #555: exits.catalog .....................   Passed   15.71 sec
+      Start 586: sprite_view.geometry
+66/81 Test #586: sprite_view.geometry ..............   Passed    0.02 sec
+      Start 587: sprite_view.failures
+67/81 Test #587: sprite_view.failures ..............   Passed    0.27 sec
+      Start 588: sprite_view.subway
+68/81 Test #588: sprite_view.subway ................   Passed    7.07 sec
+      Start 704: gideon_runtime.defaults
+69/81 Test #704: gideon_runtime.defaults ...........   Passed    0.03 sec
+      Start 705: gideon_runtime.health
+70/81 Test #705: gideon_runtime.health .............   Passed    0.03 sec
+      Start 706: gideon_runtime.client
+71/81 Test #706: gideon_runtime.client .............   Passed    0.04 sec
+      Start 707: gideon_runtime.damage
+72/81 Test #707: gideon_runtime.damage .............   Passed    0.03 sec
+      Start 708: gideon_runtime.lifetime
+73/81 Test #708: gideon_runtime.lifetime ...........   Passed    0.04 sec
+      Start 709: gideon_runtime.profile
+74/81 Test #709: gideon_runtime.profile ............   Passed    1.08 sec
+      Start 710: gideon_runtime.subway
+75/81 Test #710: gideon_runtime.subway .............   Passed   41.39 sec
+      Start 711: gideon_runtime.arena
+76/81 Test #711: gideon_runtime.arena ..............   Passed    0.69 sec
+      Start 861: coverage.catalog
+77/81 Test #861: coverage.catalog ..................   Passed    4.17 sec
+      Start 862: coverage.observations
+78/81 Test #862: coverage.observations .............   Passed    0.02 sec
+      Start 863: coverage.private
+79/81 Test #863: coverage.private ..................   Passed   74.01 sec
+      Start 864: train_session.private_30
+80/81 Test #864: train_session.private_30 ..........   Passed  139.77 sec
+      Start 865: train_session.private_60
+81/81 Test #865: train_session.private_60 ..........   Passed  152.65 sec
+
+100% tests passed, 0 tests failed out of 81
+
+Label Time Summary:
+exits             =  16.03 sec*proc (8 tests)
+gideon_runtime    =  43.34 sec*proc (8 tests)
+headless          = 662.62 sec*proc (81 tests)
+player            =  42.49 sec*proc (8 tests)
+private           = 654.50 sec*proc (22 tests)
+sceneexplosion    =  17.60 sec*proc (8 tests)
+services          =  78.20 sec*proc (3 tests)
+sound             =  18.84 sec*proc (8 tests)
+sprite_view       =   7.36 sec*proc (3 tests)
+sprites           =  36.14 sec*proc (8 tests)
+train_session     = 292.42 sec*proc (2 tests)
+world             = 110.20 sec*proc (25 tests)
+
+Total Test time (real) = 662.65 sec

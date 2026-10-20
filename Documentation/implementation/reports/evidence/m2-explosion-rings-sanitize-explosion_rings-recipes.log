@@ -1,0 +1,14 @@
+531/534 Testing: explosion_rings.recipes
+531/534 Test: explosion_rings.recipes
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_ring_tests" "recipes" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-rings-recipes"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_rings.recipes" start time: Oct 16 21:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_rings.recipes" end time: Oct 16 21:15 CEST
+"explosion_rings.recipes" time elapsed: 00:00:00
+----------------------------------------------------------

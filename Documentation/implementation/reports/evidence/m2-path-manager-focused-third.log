@@ -1,0 +1,55 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  54: gpu.player
+ 1/21 Test  #54: gpu.player .......................   Passed    3.86 sec
+      Start 307: paths.catalog
+      Start 306: paths.limits
+      Start  37: world.private
+      Start  33: world.mutations
+ 2/21 Test  #33: world.mutations ..................   Passed    0.05 sec
+      Start  32: world.world_rejection
+ 3/21 Test  #32: world.world_rejection ............   Passed    0.01 sec
+      Start  25: world.sprite_entries
+ 4/21 Test  #25: world.sprite_entries .............   Passed    0.01 sec
+      Start  26: world.sound_entries
+ 5/21 Test  #26: world.sound_entries ..............   Passed    0.01 sec
+      Start 304: paths.lifetime
+ 6/21 Test #304: paths.lifetime ...................   Passed    0.00 sec
+      Start 302: paths.selection
+ 7/21 Test #302: paths.selection ..................   Passed    0.00 sec
+      Start 301: paths.copy
+ 8/21 Test #301: paths.copy .......................   Passed    0.00 sec
+      Start  34: world.session_lifecycle
+ 9/21 Test  #34: world.session_lifecycle ..........   Passed    0.00 sec
+      Start 303: paths.failure
+10/21 Test #303: paths.failure ....................   Passed    0.00 sec
+      Start 305: paths.enumeration
+11/21 Test #305: paths.enumeration ................   Passed    0.00 sec
+      Start  29: world.resource_mount
+12/21 Test  #29: world.resource_mount .............   Passed    0.00 sec
+      Start  36: world.original_trigger
+13/21 Test  #36: world.original_trigger ...........   Passed    0.00 sec
+      Start  31: world.world_geometry
+14/21 Test  #31: world.world_geometry .............   Passed    0.00 sec
+      Start  28: world.rez_rejection
+15/21 Test  #28: world.rez_rejection ..............   Passed    0.00 sec
+      Start  30: world.world_properties
+16/21 Test  #30: world.world_properties ...........   Passed    0.00 sec
+      Start  35: world.session_messages
+17/21 Test  #35: world.session_messages ...........   Passed    0.00 sec
+      Start  27: world.rez_structure
+18/21 Test  #27: world.rez_structure ..............   Passed    0.00 sec
+19/21 Test #306: paths.limits .....................   Passed    0.46 sec
+20/21 Test  #37: world.private ....................   Passed    0.53 sec
+21/21 Test #307: paths.catalog ....................   Passed    0.56 sec
+
+100% tests passed, 0 tests failed out of 21
+
+Label Time Summary:
+gpu         =   3.86 sec*proc (1 test)
+headless    =   1.65 sec*proc (20 tests)
+paths       =   1.02 sec*proc (7 tests)
+player      =   3.86 sec*proc (1 test)
+private     =   4.95 sec*proc (3 tests)
+world       =   0.62 sec*proc (13 tests)
+
+Total Test time (real) =   4.42 sec

@@ -1,0 +1,14 @@
+494/497 Testing: player_state.initialization
+494/497 Test: player_state.initialization
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_state_tests" "initialization" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-state-fixtures/initialization"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_state.initialization" start time: Oct 16 18:33 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.initialization" end time: Oct 16 18:33 CEST
+"player_state.initialization" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,1031 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index dd85ad7..bd33432 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -606,3 +606,5 @@ The [original PolyGrid continuation](../Documentation/Implementation/M2_POLYGRID
+ The [NPC ammunition continuation](../Documentation/Implementation/M2_AI_AMMO.md) connects original FindAmmo and MID_ADDAMMO instead of suspending an empty-ammo actor. Read [contracts](docs/AI_AMMO_CONTRACTS.md). Preserve original class selection, ray-hit visibility, empty-route escape, single integration and capped collection. Specific+AvoidTarget skips unused undefined arithmetic; removed pickup trackers retain only their owned route. Private contact/hidden-inspector tests do not prove autonomous retail pickup pursuit or resolve every idle-NPC report. M2 remains incomplete.
+ 
+ The [service coverage continuation](../Documentation/Implementation/M2_SERVICE_COVERAGE.md) audits the bounded adapter catalogue and restored-player/exit trace scopes. Read [contracts](docs/SERVICE_COVERAGE_CONTRACTS.md). Keep implementation status separate from observed attempts, retain unknown/unexercised entries and teardown failure history, and never interpret a counted call as success. This is not the full historical SDK/client API; M2 remains incomplete.
++
++The [original exit-fade continuation](../Documentation/Implementation/M2_SCREEN_FADE.md) connects player FADEIN/FADEOUT and tests the full authored SubwayA exit relay through contact, combat and NEW_LEVEL. Read [contracts](docs/SCREEN_FADE_CONTRACTS.md). Preserve literal-space parsing, source no-op versus unsupported commands, strict 100-unit/second endpoints, black hold and fresh-world reset. Drawing never advances clocks. Measured smoke budgets now admit the original final explosions without truncating emission; default particle limits and explicit failures remain. Composited scene darkening is not full retail global lighting. M2 remains incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 745f4a7..2e08c3a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/PolyGrid.cpp src/game/original/PolyGridFX.cpp src/game/sparks.cpp src/game/original/SparksFX.cpp src/game/blood_spurts.cpp src/game/original/ParticleExplosionFX.cpp src/game/blood_splats.cpp src/game/original/BloodSplatFX.cpp src/game/original/ClientSplatFX.cpp src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/ScreenFade.cpp src/game/original/PolyGrid.cpp src/game/original/PolyGridFX.cpp src/game/sparks.cpp src/game/original/SparksFX.cpp src/game/blood_spurts.cpp src/game/original/ParticleExplosionFX.cpp src/game/blood_splats.cpp src/game/original/BloodSplatFX.cpp src/game/original/ClientSplatFX.cpp src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/docs/M2_SCREEN_FADE_SOURCES.json b/docs/M2_SCREEN_FADE_SOURCES.json
+new file mode 100644
+index 0000000..1d465f5
+--- /dev/null
++++ b/docs/M2_SCREEN_FADE_SOURCES.json
+@@ -0,0 +1,44 @@
++{
++  "baseline": "original Blood II sources, read-only",
++  "files": [
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "selections": [
++        "ProcessTriggerMsg 4464-4526",
++        "SendFadeMsg 3177-3187",
++        "MID_TRIGGER 4258-4264"
++      ]
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "selections": [
++        "constructor 412-414",
++        "world entry 1512",
++        "light scale update 2623-2685",
++        "SMSG_SCREENFADE 5048-5064"
++      ]
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
++      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
++      "selections": [
++        "CExplosionFragFX::Update 1056-1189: unchanged per-update falling motion"
++      ]
++    }
++  ],
++  "adaptations": [
++    "Typed owned ScreenFade event instead of legacy packet byte; checked existing client queue.",
++    "Simulation-owned clock independent of rendering and inspector; existing 60-second diagnostic session bound (100 ms interactive frontend cap).",
++    "Black compositing layer instead of full original global-light-scale material pipeline; HUD/editor excluded.",
++    "Other player trigger commands counted as unsupported; no inferred Music/VoiceMgr/CTF behavior.",
++    "Measured authored exit requires 10,240 particles; bounded smoke pool 16,384, default other pools 2,048, sprite snapshot 32,768 quads. No emission/lifetime changes or silent truncation."
++  ],
++  "not_claimed": [
++    "Full retail lighting and blindness/item precedence",
++    "Native Metal execution in this run",
++    "Whole-world save state",
++    "Full level traversal or M2 completion"
++  ]
++}
+diff --git a/docs/OBJECT_PARTICLE_CONTRACTS.md b/docs/OBJECT_PARTICLE_CONTRACTS.md
+index ff710eb..7547576 100644
+--- a/docs/OBJECT_PARTICLE_CONTRACTS.md
++++ b/docs/OBJECT_PARTICLE_CONTRACTS.md
+@@ -1,3 +1,10 @@
++# Current budget continuation
++
++The [authored exit-fade validation](SCREEN_FADE_CONTRACTS.md) supersedes the old
++smoke-only 2,048/8,192 budgets below: a measured 10,240-particle trail now fits
++explicit 16,384 per-system/aggregate limits, with a 32,768-quad sprite snapshot.
++Other recipes retain their limits; emission, RNG, lifetime and failures are unchanged.
++
+ # Original fragment smoke-trail contracts
+ 
+ Selected CObjectParticleFX Init/CreateObject/Update/AddParticles/GetRandomColor and
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 832f06a..efe2932 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1093,3 +1093,7 @@ Canonical instrumentation adds no original rules. Player restoration and exit
+ now retain their real adapter calls through scoped tracing; unavailable history
+ survives teardown. See [contracts](SERVICE_COVERAGE_CONTRACTS.md) and
+ [execution evidence](../../Documentation/Implementation/M2_SERVICE_COVERAGE.md).
++
++## Original player exit fades and measured smoke budgets
++
++Selected PlayerObj ProcessTriggerMsg/SendFadeMsg and BloodClientShell screen-fade message/update rules now use owned local events and simulation-owned state. The full authored train exit exposed a 2,048-particle smoke cap; bounded capacity now covers its measured 10,240-particle peak without changing original emission. See [contracts](SCREEN_FADE_CONTRACTS.md), [source selections](M2_SCREEN_FADE_SOURCES.json) and [evidence](../../Documentation/Implementation/M2_SCREEN_FADE.md). Composed darkening is a replacement presentation; Music/VoiceMgr/flag commands and full lighting remain separate.
+diff --git a/docs/SCREEN_FADE_CONTRACTS.md b/docs/SCREEN_FADE_CONTRACTS.md
+new file mode 100644
+index 0000000..9d44635
+--- /dev/null
++++ b/docs/SCREEN_FADE_CONTRACTS.md
+@@ -0,0 +1,91 @@
++# Original player screen fades
++
++The authored SubwayA exit relay (`Trigger2`) sends `player FADEOUT` after seven
++seconds, then `exit2 TRIGGER` after twelve. ExitTrigger adds its original two-second
++delay. Previously the player ignored MID_TRIGGER entirely; the stationary service
++trace and direct-exit diagnostics did not exercise this command. This continuation
++connects the original fade branches and tests the actual relay through contact.
++
++## Original rules and typed ownership
++
++`CPlayerObj::ProcessTriggerMsg` reads and releases its message string once. As in
++the source, only literal spaces delimit the first token; comparisons ignore ASCII
++case, and trailing fade arguments are ignored. Tabs are not space separators.
++Dispatch has no dead-player guard and continues to the original base callback.
++An owned ScreenFade event replaces SMSG_SCREENFADE's byte for this local boundary.
++The existing checked client queue rejects stale recipients and drops queued events
++on disconnect; no sender/string pointer survives delivery.
++
++Receipt starts fade-in at zero or fade-out at 255, replacing any previous fade.
++Each simulation update changes the value by `100 * float(frame_seconds)`. Despite
++the source's “4 second” comments, full travel takes 2.55 seconds. Fade-in clears its
++flag only above 255, clamps to 255 and returns to normal scale. Fade-out clamps at
++zero but retains its flag, holding black. Zero-time updates preserve the source's
++strict endpoints. Invalid/nonfinite deltas fail without mutation. Direct diagnostic
++steps retain the session’s existing 60-second validation bound;
++interactive input remains capped at 100 ms by the frontend. Fades use the accepted
++delta without introducing another clamp. Inspection/drawing never advances time.
++Fresh/restored world entry and client exit clear fade state. KeepAlive does not
++transfer a source fade into the destination; this is not whole-world save support.
++
++The inspector shows mode, value, scale, received fades and player command/delivery
++counts, including the last unsupported-command reason. Music, sound/VoiceMgr and
++multiplayer flag commands are **not** implemented by this change. They now increment
++an explicit unsupported-player-command counter and retain their last command; receiving
++them is not successful execution. Unknown tokens take the original no-op branch
++and have a separate ignored counter. They are separate from the server-interface
++service catalogue, whose
++scope does not cover every game command. Empty commands do nothing.
++
++## Presentation boundary
++
++The original client applies the value through SetGlobalLightScale. The current
++unlit diagnostic renderer instead multiplies the composed scene by drawing a black
++SDL_GPU/ImGui background layer with alpha `1 - scale`, before the HUD and inspector.
++This supplies a visible fade in Vulkan and bundled Metal-capable UI builds without
++new shaders/dependencies. It also darkens sky/FX as a composed image; it does **not**
++claim original per-material lighting, additive-effect, blindness/night-vision or
++seeing-eye precedence. Those lighting modes remain separate. HUD and inspection
++stay legible and usable; inspector-free builds use the same UI runtime.
++
++## Verification scope
++
++Synthetic tests cover strict endpoints, hold/restart/reversal, invalid time,
++message parsing, unsupported commands, dead-player dispatch, single string release,
++queued-message disposal and reentry. A private diagnostic completes the actual
++intro, relocates the player to the final carriage, then uses normal movement/USE
++and contact to activate Trigger2. It edits no trigger/NPC, grants no health/ammo,
++and uses neither direct exit injection nor invulnerability. A diagnostic aiming
++loop fights visible Cultists through original view-weapon
++FIRE_KEY rather than making this uncleared carriage harmless. The delayed slots
++run, including cinematic/explosion requests and the original ExitTrigger. It checks
++fade timing/hold, actual NEW_LEVEL, retained health/ammo, fresh destination fade and
++teardown across two runs. The relocation means this is **not** a complete level
++playthrough. Existing independent mouse-combat/corpse tests cover earlier encounters.
++
++GPU readback checks full brightness, half brightness, black and world-reset output,
++UI ordering and two runtime sizes. Rendering must leave simulation state untouched.
++Linux NVIDIA results do not certify a new native Metal run. M2 remains incomplete;
++this resolves a reached command and exposes other command omissions rather than
++assuming the earlier server-service trace was exhaustive.
++
++## Reached smoke-budget failure
++
++The full staggered exit initially failed at 6.783 seconds with one trail at 2,024
++live particles before its next burst (3,919 total). The 2,048 per-system budget
++could not retain the original emission of a continuing falling fragment. Advancing
++the same authored sequence with unchanged fragment motion, emission/RNG, lifetimes
++and contacts measures 10,240 live particles at peak at 60 Hz. The previous simultaneous
++emitter probes did not reach this case.
++
++The smoke-only pool now admits at most 16,384 live particles per system and 16,384
++across explosion trails. The particle integrator takes an explicit bounded capacity;
++ordinary callers retain their existing 2,048 default, and capacities above 16,384
++fail before mutation. Per-burst sample limits (2,048), 128-system limits, endpoint
++bounds, atomic validation, RNG order and visible capacity failures remain intact.
++No particles are silently dropped and no effect failure is reclassified as success.
++The shared sprite snapshot limit becomes 32,768 quads (196,608 vertices), allowing
++bounded smoke plus other existing effects. These are replacement engine budgets,
++not limits found in the original game. They allocate on demand, not at world entry.
++Higher-rate or longer untested paths can still exhaust explicit limits; this is not
++unbounded resource support or a general particle-performance claim.
+diff --git a/src/app/hud.cpp b/src/app/hud.cpp
+index 6aa5bbf..f9bd5c0 100644
+--- a/src/app/hud.cpp
++++ b/src/app/hud.cpp
+@@ -30,6 +30,17 @@ namespace OpenBlood2
+         h.weapon = w->m_szWeaponName;
+         return h;
+     }
++    bool draw_screen_fade(float scale, bool in_world)
++    {
++        if (!in_world || !std::isfinite(scale) || scale < 0 || scale >= 1)
++            return false;
++        const auto* viewport = ImGui::GetMainViewport();
++        const auto alpha = static_cast<int>(std::lround((1.f - scale) * 255.f));
++        ImGui::GetBackgroundDrawList()->AddRectFilled(
++            viewport->Pos, {viewport->Pos.x + viewport->Size.x, viewport->Pos.y + viewport->Size.y},
++            IM_COL32(0, 0, 0, alpha));
++        return true;
++    }
+     bool draw_hud(const HudState& h)
+     {
+         if (!h.visible)
+diff --git a/src/app/hud.h b/src/app/hud.h
+index 155b3ab..c56b61b 100644
+--- a/src/app/hud.h
++++ b/src/app/hud.h
+@@ -15,4 +15,5 @@ namespace OpenBlood2
+     };
+     HudState hud_state(const PlayerStats&, bool in_world, bool external_camera);
+     bool draw_hud(const HudState&);
++    bool draw_screen_fade(float scale, bool in_world);
+ } // namespace OpenBlood2
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 10a0bad..1ebe9bd 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -1519,6 +1519,19 @@ namespace OpenBlood2
+                         static_cast<unsigned long long>(player->use_commands),
+                         static_cast<unsigned long long>(player->use_messages), player->use_door_refused ? "yes" : "no");
+             constexpr const char* ray_results[] = {"invalid", "miss", "hit", "unavailable"};
++            const auto& fade = game.client_shell.fade;
++            ImGui::Text("Screen fade: %s | value %.2f / 255 | scale %.3f | messages %llu",
++                        fade.fade_in    ? "in"
++                        : fade.fade_out ? "out (holds black)"
++                                        : "inactive",
++                        fade.value, fade.Scale(), (unsigned long long)fade.messages);
++            ImGui::Text("Player triggers %llu | delivered fades %llu | unsupported %llu",
++                        (unsigned long long)player->trigger_messages, (unsigned long long)player->fade_messages,
++                        (unsigned long long)player->unsupported_triggers);
++            ImGui::Text("Unknown commands ignored by source: %llu", (unsigned long long)player->ignored_triggers);
++            ImGui::TextWrapped("Last unsupported: %s", player->last_unsupported_player_trigger.c_str());
++            ImGui::TextWrapped("Last command: %s | %s", player->last_player_trigger.c_str(),
++                               player->player_trigger_error.c_str());
+             const auto* use_target = game.objects.get(player->use_hit.object);
+             ImGui::Text(
+                 "Ray %s | target %s | distance %.2f / 82", ray_results[static_cast<unsigned>(player->use_result)],
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 69a1e26..7e356ef 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -898,6 +898,7 @@ namespace
+                 inspector_controls_smoke.before_frame(frames);
+ #endif
+             ImGui::NewFrame();
++            OpenBlood2::draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
+             OpenBlood2::draw_hud(OpenBlood2::hud_state(game->client_shell.stats, game->client_shell.m_bInWorld,
+                                                        game->client_shell.view.object != nullptr));
+ #if BLOOD2_INSPECTOR
+diff --git a/src/engine/particles.cpp b/src/engine/particles.cpp
+index c6c7112..bfcc006 100644
+--- a/src/engine/particles.cpp
++++ b/src/engine/particles.cpp
+@@ -4,11 +4,12 @@
+ #include <cmath>
+ namespace OpenBlood2
+ {
+-    bool advance_particles(std::vector<Particle>& particles, float gravity, double seconds, std::string& error)
++    bool advance_particles(std::vector<Particle>& particles, float gravity, double seconds, std::string& error,
++                           std::size_t capacity)
+     {
+         error.clear();
+         if (!std::isfinite(seconds) || seconds < 0 || seconds > 60 || !std::isfinite(gravity) ||
+-            std::abs(gravity) > 10000 || particles.size() > 2048)
++            std::abs(gravity) > 10000 || capacity > max_particle_capacity || particles.size() > capacity)
+         {
+             error = "Invalid particle step/budget";
+             return false;
+diff --git a/src/engine/particles.h b/src/engine/particles.h
+index bc77537..54b1cd6 100644
+--- a/src/engine/particles.h
++++ b/src/engine/particles.h
+@@ -11,5 +11,7 @@ namespace OpenBlood2
+         DVector color{1, 1, 1};
+     };
+     // Local coordinates; no collision, implicit world gravity or callbacks.
+-    bool advance_particles(std::vector<Particle>&, float gravity, double seconds, std::string&);
++    inline constexpr std::size_t max_particle_capacity = 16384;
++    bool advance_particles(std::vector<Particle>&, float gravity, double seconds, std::string&,
++                           std::size_t capacity = 2048);
+ } // namespace OpenBlood2
+diff --git a/src/engine/sprite_view.h b/src/engine/sprite_view.h
+index ee6db9a..e562db9 100644
+--- a/src/engine/sprite_view.h
++++ b/src/engine/sprite_view.h
+@@ -21,7 +21,7 @@ namespace OpenBlood2
+     class SpriteView
+     {
+       public:
+-        static constexpr unsigned max_entries = 16384;
++        static constexpr unsigned max_entries = 32768;
+         SpriteView()
+         {
+             clear();
+diff --git a/src/game/explosion_fragments.cpp b/src/game/explosion_fragments.cpp
+index 783eae3..666b694 100644
+--- a/src/game/explosion_fragments.cpp
++++ b/src/game/explosion_fragments.cpp
+@@ -122,8 +122,12 @@ namespace OpenBlood2
+                           NodePose pose;
+                           if (parent != active.end())
+                               pose = {parent->position, parent->rotation};
++                          // The authored staggered train exit exceeds the old 2048-particle
++                          // per-trail cap. Keep a bounded pool without dropping source emissions.
+                           const std::size_t budget =
+-                              total - previous <= 8192 ? std::min<std::size_t>(2048, 8192 - (total - previous)) : 0;
++                              total - previous <= 16384
++                                  ? std::min<std::size_t>(max_particle_capacity, 16384 - (total - previous))
++                                  : 0;
+                           if (trail.Update(now, parent == active.end() ? nullptr : &pose, trail_random_, budget))
+                           {
+                               total = total - previous + trail.particles.size();
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index 73126b7..76f3af0 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -243,6 +243,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
+     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
+     item_actions = item_sounds = item_voice = 0;
+     item_audio_error.clear();
++    fade = {};
+     objectives = {};
+     objectives_error.clear();
+     objective_messages = 0;
+@@ -286,6 +287,7 @@ void CBloodClientShell::OnExitWorld()
+     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
+     item_actions = item_sounds = item_voice = 0;
+     item_audio_error.clear();
++    fade = {};
+     objectives = {};
+     objectives_error.clear();
+     objective_messages = 0;
+@@ -311,6 +313,11 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
+     ++messages;
+     if (std::holds_alternative<OpenBlood2::PlayerInitRequest>(event))
+         return InitSinglePlayer(server);
++    if (const auto* value = std::get_if<OpenBlood2::ScreenFade>(&event))
++    {
++        fade.Begin(value->in);
++        return true;
++    }
+     if (const auto* value = std::get_if<OpenBlood2::InventoryAction>(&event))
+     {
+         if (value->type != 1 && value->type != 2)
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index f39feb2..ba18a07 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -3,6 +3,7 @@
+ #include "MoveMgr.h"
+ #include "PathMgr.h"
+ #include "PlayerObj.h"
++#include "ScreenFade.h"
+ #include "ViewWeapon.h"
+ #include "game/session.h"
+ 
+@@ -85,6 +86,7 @@ class CBloodClientShell
+     std::uint64_t item_actions = 0, item_sounds = 0;
+     OpenBlood2::SoundId item_voice = 0; // Checked inspection token, not owned.
+     std::string item_audio_error;
++    CScreenFade fade;
+     CMoveMgr move_mgr;
+     OpenBlood2::MovementInput movement_input;
+     bool SyncWeapons(OpenBlood2::ModelStore&, OpenBlood2::Resources&, CBloodServerShell&, std::string&);
+diff --git a/src/game/original/ObjectParticleFX.cpp b/src/game/original/ObjectParticleFX.cpp
+index bdb8818..74c344d 100644
+--- a/src/game/original/ObjectParticleFX.cpp
++++ b/src/game/original/ObjectParticleFX.cpp
+@@ -212,7 +212,7 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
+     }
+     if (!owner)
+         return false; // Checked equivalent of WantRemove clearing m_hServerObject.
+-    if (!advance_particles(particles, gravity, now - last_time, error))
++    if (!advance_particles(particles, gravity, now - last_time, error, recipe == 1 ? max_particle_capacity : 2048))
+         return false;
+     last_time = now;
+     if (now < next_update)
+diff --git a/src/game/original/PlayerContainers.cpp b/src/game/original/PlayerContainers.cpp
+index d2ccac0..1f7d02b 100644
+--- a/src/game/original/PlayerContainers.cpp
++++ b/src/game/original/PlayerContainers.cpp
+@@ -1,12 +1,52 @@
+ #include "game/game_settings.h"
+ // Selected PlayerObj::UpdateClientPhysics and UpdateAirLevel source rules.
+ #include "PlayerObj.h"
++#include "game/key_messages.h"
+ #include <algorithm>
+ #include <cmath>
+ 
++// Original ProcessTriggerMsg uses only a space-delimited first token. Fade
++// suffixes are ignored, and dispatch has no dead-player guard. Other command
++// families remain explicitly inspectable rather than pretending they ran.
++void CPlayerObj::ProcessTriggerMsg(HMESSAGEREAD read)
++{
++    auto* server = GetServerDE();
++    auto text = server->ReadFromMessageHString(read);
++    const auto* raw = server->GetStringData(text);
++    last_player_trigger = raw ? raw : "";
++    server->FreeString(text);
++    ++trigger_messages;
++    player_trigger_error.clear();
++    const auto begin = last_player_trigger.find_first_not_of(' ');
++    if (begin == std::string::npos)
++        return;
++    const auto end = last_player_trigger.find(' ', begin);
++    const auto token = last_player_trigger.substr(begin, end - begin);
++    const bool in = OpenBlood2::same_name(token, "fadein");
++    if (in || OpenBlood2::same_name(token, "fadeout"))
++    {
++        if (server->SendToClient(m_hClient, OpenBlood2::ScreenFade{in}) == DE_OK)
++            ++fade_messages;
++        else
++            player_trigger_error = "Screen fade client delivery failed";
++    }
++    else if (OpenBlood2::same_name(token, "music") || OpenBlood2::same_name(token, "sound") ||
++             OpenBlood2::same_name(token, "flaggrab") || OpenBlood2::same_name(token, "flaggive") ||
++             OpenBlood2::same_name(token, "flagdrop"))
++    {
++        ++unsupported_triggers;
++        last_unsupported_player_trigger = last_player_trigger;
++        player_trigger_error = "Player trigger command is not integrated";
++    }
++    else
++        ++ignored_triggers; // Original ProcessTriggerMsg has no branch for this token.
++}
++
+ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
+ {
+     auto* server = GetServerDE();
++    if (message == 1000 /* MID_TRIGGER */)
++        ProcessTriggerMsg(read);
+     // Original PlayerObj.cpp 4266-4280: ignore volume damage during the first
+     // two level seconds. The explicit level clock survives delayed player entry
+     // without restarting the grace period, and resets on world replacement.
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index 0d7fdef..13c6b2c 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -51,6 +51,9 @@ class CPlayerObj : public CBaseCharacter
+ {
+   public:
+     ~CPlayerObj() override;
++    void ProcessTriggerMsg(HMESSAGEREAD);
++    std::uint64_t trigger_messages = 0, fade_messages = 0, unsupported_triggers = 0, ignored_triggers = 0;
++    std::string last_player_trigger, last_unsupported_player_trigger, player_trigger_error;
+     bool AddRemoteBomb(HOBJECT);
+     void RemoveRemoteBomb(HOBJECT);
+     void ClearRemoteBombs();
+diff --git a/src/game/original/ScreenFade.cpp b/src/game/original/ScreenFade.cpp
+new file mode 100644
+index 0000000..b08d32b
+--- /dev/null
++++ b/src/game/original/ScreenFade.cpp
+@@ -0,0 +1,36 @@
++#include "ScreenFade.h"
++#include <cmath>
++
++void CScreenFade::Begin(bool in)
++{
++    fade_in = in;
++    fade_out = !in;
++    value = in ? 0.f : 255.f;
++    ++messages;
++}
++bool CScreenFade::Update(double seconds)
++{
++    if (!std::isfinite(seconds) || seconds < 0 || seconds > 60)
++        return false;
++    if (fade_in)
++    {
++        value += 100.f * static_cast<float>(seconds);
++        if (value > 255.f)
++        {
++            value = 255.f;
++            fade_in = false;
++        }
++    }
++    else if (fade_out)
++    {
++        value -= 100.f * static_cast<float>(seconds);
++        if (value < 0)
++            value = 0;
++        // Source deliberately retains fade_out: black holds until a new message/world.
++    }
++    return true;
++}
++float CScreenFade::Scale() const
++{
++    return fade_in || fade_out ? value / 255.f : 1.f;
++}
+diff --git a/src/game/original/ScreenFade.h b/src/game/original/ScreenFade.h
+new file mode 100644
+index 0000000..ba8f3e6
+--- /dev/null
++++ b/src/game/original/ScreenFade.h
+@@ -0,0 +1,14 @@
++#pragma once
++#include <cstdint>
++
++// Selected BloodClientShell SMSG_SCREENFADE/update rules; see SCREEN_FADE_CONTRACTS.md.
++class CScreenFade
++{
++  public:
++    void Begin(bool in);
++    bool Update(double seconds);
++    float Scale() const;
++    bool fade_in = false, fade_out = false;
++    float value = 0;
++    std::uint64_t messages = 0;
++};
+diff --git a/src/game/player_messages.h b/src/game/player_messages.h
+index f828eb6..e531850 100644
+--- a/src/game/player_messages.h
++++ b/src/game/player_messages.h
+@@ -92,6 +92,10 @@ namespace OpenBlood2
+         std::array<DBYTE, 10> weapon_slots{};
+         bool operator==(const PlayerStats&) const = default;
+     };
++    struct ScreenFade
++    {
++        bool in = false;
++    };
+     struct BossHealth
+     {
+         float fraction = 0;
+@@ -117,6 +121,7 @@ namespace OpenBlood2
+         std::string next_world; // Empty represents the source null HSTRING.
+         WorldExitType type = WorldExitType::World;
+     };
+-    using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
+-                                     MissionObjectives, WorldExit, BossHealth, Conversation, InventoryAction>;
++    using PlayerEvent =
++        std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats, MissionObjectives,
++                     WorldExit, BossHealth, Conversation, InventoryAction, ScreenFade>;
+ } // namespace OpenBlood2
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 09c6664..6889b4c 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -482,7 +482,8 @@ namespace OpenBlood2
+                 std::string error;
+                 const bool updated = pump_player_messages(error) &&
+                                      client_shell.UpdateMovement(server_shell, seconds, error) &&
+-                                     client_shell.Update() && client_shell.UpdateUse(server_shell) &&
++                                     client_shell.Update() && client_shell.fade.Update(seconds) &&
++                                     client_shell.UpdateUse(server_shell) &&
+                                      client_shell.SyncWeapons(models, resources, server_shell, error) &&
+                                      client_shell.UpdateWeapons(server_shell, seconds, error) &&
+                                      (!server_shell.Player(local_client) ||
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index a68b3c5..8e9b80c 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1867,3 +1867,21 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME coverage.private COMMAND service_coverage_tests private "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(coverage.private PROPERTIES LABELS "headless;private;services" TIMEOUT 180)
+ endif()
++
++add_executable(screen_fade_tests screen_fade_tests.cpp ../src/app/sprite_scene.cpp)
++target_link_libraries(screen_fade_tests PRIVATE blood2_game)
++blood2_project_options(screen_fade_tests)
++add_test(NAME screen_fade.values COMMAND screen_fade_tests values)
++add_test(NAME screen_fade.session COMMAND screen_fade_tests session "${CMAKE_CURRENT_BINARY_DIR}/screen_fade")
++set_tests_properties(screen_fade.values screen_fade.session PROPERTIES LABELS "headless;screen_fade" TIMEOUT 30)
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME screen_fade.private COMMAND screen_fade_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(screen_fade.private PROPERTIES LABELS "headless;screen_fade;private" TIMEOUT 180)
++endif()
++if(BLOOD2_GPU_TESTS)
++    add_executable(screen_fade_gpu_tests screen_fade_gpu_tests.cpp ../src/app/hud.cpp ../src/app/ui_runtime.cpp)
++    target_link_libraries(screen_fade_gpu_tests PRIVATE blood2_game imgui)
++    blood2_project_options(screen_fade_gpu_tests)
++    add_test(NAME gpu.screen_fade COMMAND screen_fade_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/screen-fade-gpu")
++    set_tests_properties(gpu.screen_fade PROPERTIES LABELS "gpu;screen_fade" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++endif()
+diff --git a/tests/object_particle_tests.cpp b/tests/object_particle_tests.cpp
+index a56a9a7..eaf9e9f 100644
+--- a/tests/object_particle_tests.cpp
++++ b/tests/object_particle_tests.cpp
+@@ -83,6 +83,17 @@ namespace
+     }
+     bool failures(const std::filesystem::path& root)
+     {
++        // Existing callers retain 2048; explicitly bounded smoke pools can be larger.
++        std::string capacity_error;
++        std::vector<Particle> pool(2049);
++        for (auto& particle : pool)
++            particle.lifetime = 1;
++        CHECK(!advance_particles(pool, 0, .1, capacity_error) && pool.front().lifetime == 1);
++        CHECK(advance_particles(pool, 0, .1, capacity_error, max_particle_capacity));
++        CHECK(near(pool.front().lifetime, .9f));
++        CHECK(!advance_particles(pool, 0, .1, capacity_error, max_particle_capacity + 1));
++        pool.resize(max_particle_capacity + 1);
++        CHECK(!advance_particles(pool, 0, .1, capacity_error, max_particle_capacity));
+         Resources r;
+         CHECK(setup(r, root));
+         std::string e;
+diff --git a/tests/screen_fade_gpu_tests.cpp b/tests/screen_fade_gpu_tests.cpp
+new file mode 100644
+index 0000000..684c3fc
+--- /dev/null
++++ b/tests/screen_fade_gpu_tests.cpp
+@@ -0,0 +1,138 @@
++#include "app/hud.h"
++#include "app/ui_runtime.h"
++#include "engine/capture.h"
++#include "game/original/ScreenFade.h"
++#include <cmath>
++#include <filesystem>
++#include <imgui.h>
++#include <imgui_impl_sdl3.h>
++#include <imgui_impl_sdlgpu3.h>
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x "\n";                                                                     \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool run(const std::filesystem::path& root)
++    {
++        Runtime runtime;
++        std::string error;
++        CHECK(runtime.initialize(true, error));
++        std::cout << "GPU device: "
++                  << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu), SDL_PROP_GPU_DEVICE_NAME_STRING,
++                                           "unreported")
++                  << '\n';
++        std::filesystem::create_directories(root);
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            UiRuntime ui(runtime);
++            CHECK(ui.initialize(error));
++            const Uint32 width = cycle ? 640 : 1000, height = cycle ? 400 : 680;
++            Capture capture;
++            CHECK(capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
++                                     height));
++            CScreenFade fade;
++            for (int frame = 0; frame < 4; ++frame)
++            {
++                if (frame == 1)
++                {
++                    fade.Begin(false);
++                    for (int i = 0; i < 12; ++i)
++                        CHECK(fade.Update(.1));
++                    CHECK(fade.Update(.075));
++                }
++                if (frame == 2)
++                    for (int i = 0; i < 13; ++i)
++                        CHECK(fade.Update(.1));
++                if (frame == 3)
++                    fade = {}; // New world resets fade before its first presentation.
++                const auto value = fade.value;
++                const auto messages = fade.messages;
++                ImGui_ImplSDLGPU3_NewFrame();
++                ImGui_ImplSDL3_NewFrame();
++                ImGui::GetIO().DisplaySize = {float(width), float(height)};
++                ImGui::GetIO().DisplayFramebufferScale = {1, 1};
++                ImGui::NewFrame();
++                CHECK(draw_screen_fade(fade.Scale(), true) == (frame == 1 || frame == 2));
++                // UI is intentionally above the scene multiplication.
++                HudState hud;
++                hud.visible = true;
++                hud.health = 100;
++                hud.armor = 20;
++                hud.weapon = "Beretta";
++                CHECK(draw_hud(hud));
++                ImGui::SetNextWindowPos({20, 20});
++                ImGui::SetNextWindowSize({230, 70});
++                ImGui::Begin("Fade inspection", nullptr, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs);
++                ImGui::Text("Scene scale %.3f", fade.Scale());
++                ImGui::End();
++                ImGui::Render();
++                CHECK(fade.value == value && fade.messages == messages);
++                auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++                CHECK(commands);
++                ImGui_ImplSDLGPU3_PrepareDrawData(ImGui::GetDrawData(), commands);
++                SDL_GPUColorTargetInfo color{};
++                color.texture = capture.texture;
++                color.clear_color = {.8f, .8f, .8f, 1};
++                color.load_op = SDL_GPU_LOADOP_CLEAR;
++                color.store_op = SDL_GPU_STOREOP_STORE;
++                auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, nullptr);
++                CHECK(pass);
++                ImGui_ImplSDLGPU3_RenderDrawData(ImGui::GetDrawData(), commands, pass);
++                SDL_EndGPURenderPass(pass);
++                auto* copy = SDL_BeginGPUCopyPass(commands);
++                CHECK(copy);
++                SDL_GPUTextureRegion region{};
++                region.texture = capture.texture;
++                region.w = width;
++                region.h = height;
++                region.d = 1;
++                SDL_GPUTextureTransferInfo target{};
++                target.transfer_buffer = capture.transfer;
++                target.pixels_per_row = width;
++                target.rows_per_layer = height;
++                SDL_DownloadFromGPUTexture(copy, &region, &target);
++                SDL_EndGPUCopyPass(copy);
++                CHECK(SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(runtime.gpu));
++                auto* data =
++                    static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++                CHECK(data);
++                const auto center = (height / 2 * width + width / 2) * 4;
++                const int expected = int(std::lround(204 * fade.Scale()));
++                for (int channel = 0; channel < 3; ++channel)
++                    CHECK(std::abs(int(data[center + channel]) - expected) <= 2);
++                unsigned hud_lit = 0, inspector_lit = 0;
++                for (Uint32 y = 0; y < height; ++y)
++                    for (Uint32 x = 0; x < width; ++x)
++                    {
++                        const auto i = (y * width + x) * 4;
++                        if (data[i] > 30 || data[i + 1] > 30 || data[i + 2] > 30)
++                        {
++                            if (y > height - 90)
++                                ++hud_lit;
++                            if (y < 90 && x < 250)
++                                ++inspector_lit;
++                        }
++                    }
++                SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++                CHECK(hud_lit > width && inspector_lit > 1000); // Text area scales with viewport width.
++                CHECK(capture.save(
++                    (root / ("fade-" + std::to_string(cycle) + "-" + std::to_string(frame) + ".png")).c_str()));
++                std::cout << "cycle=" << cycle << " scale=" << fade.Scale() << " expected RGB=" << expected
++                          << " HUD=" << hud_lit << " inspector=" << inspector_lit << '\n';
++            }
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    return argc == 2 && run(argv[1]) ? 0 : 1;
++}
+diff --git a/tests/screen_fade_tests.cpp b/tests/screen_fade_tests.cpp
+new file mode 100644
+index 0000000..0dbe9f8
+--- /dev/null
++++ b/tests/screen_fade_tests.cpp
+@@ -0,0 +1,268 @@
++#include "app/sprite_scene.h"
++#include "camera_fixture.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/ExitTrigger.h"
++#include "player_fixture.h"
++#include <algorithm>
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool values()
++    {
++        CScreenFade fade;
++        CHECK(fade.Scale() == 1 && fade.Update(0));
++        fade.Begin(false);
++        for (int i = 0; i < 25; ++i)
++            CHECK(fade.Update(.1));
++        CHECK(fade.value == 5 && fade.fade_out);
++        CHECK(fade.Update(.05) && fade.value == 0 && fade.fade_out);
++        CHECK(fade.Update(.1) && fade.Scale() == 0 && fade.fade_out);
++        fade.Begin(true);
++        for (int i = 0; i < 25; ++i)
++            CHECK(fade.Update(.1));
++        CHECK(fade.Update(.05) && fade.value == 255 && fade.fade_in); // Strict >, not >=.
++        CHECK(fade.Update(0) && fade.fade_in);
++        CHECK(fade.Update(.01) && !fade.fade_in && fade.Scale() == 1);
++        fade.Begin(false);
++        CHECK(fade.Update(.1) && fade.value == 245);
++        fade.Begin(false);
++        CHECK(fade.value == 255); // Retrigger starts again, never reverses current value.
++        fade.Begin(true);
++        CHECK(fade.value == 0);
++        CHECK(!fade.Update(-1) && !fade.Update(60.01) && !fade.Update(std::numeric_limits<double>::quiet_NaN()));
++        CHECK(fade.value == 0 && fade.fade_in && fade.messages == 5);
++        return true;
++    }
++    bool send(GameSession& g, HOBJECT sender, const char* command)
++    {
++        auto text = g.server.CreateString(command);
++        auto msg = g.server.StartMessageToObject(g.server.HandleToObject(sender), g.client_shell.player, 1000);
++        const bool ok = msg && g.server.WriteToMessageHString(msg, text) == DE_OK && g.server.EndMessage(msg) == DE_OK;
++        g.server.FreeString(text);
++        return ok;
++    }
++    bool session(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string error;
++        CHECK(test_player::setup(g, root) && g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        CHECK(p);
++        const auto strings = g.server.string_count();
++        CHECK(send(g, p->m_hObject, "  FaDeOuT ignored suffix") && p->fade_messages == 1);
++        CHECK(g.client_shell.fade.messages == 0 && g.pump_player_messages(error));
++        CHECK(g.client_shell.fade.fade_out && g.step(.1) && g.client_shell.fade.value == 245);
++        CHECK(send(g, p->m_hObject, "fadeout") && g.pump_player_messages(error) && g.client_shell.fade.value == 255);
++        CHECK(send(g, p->m_hObject, "fadein") && g.pump_player_messages(error) && g.client_shell.fade.value == 0);
++        CHECK(g.step(.1) && g.client_shell.fade.value == 10);
++        CHECK(send(g, p->m_hObject, "fadeout\t") && p->ignored_triggers == 1 && p->player_trigger_error.empty());
++        CHECK(send(g, p->m_hObject, "Music LEVEL 3") && p->unsupported_triggers == 1);
++        CHECK(send(g, p->m_hObject, "   ") && p->unsupported_triggers == 1 && p->player_trigger_error.empty());
++        CHECK(g.client_shell.fade.messages == 3 && g.server.string_count() == strings);
++        p->m_bDead = true; // Source trigger dispatch is not under its pickup/dead guard.
++        CHECK(send(g, p->m_hObject, "fadeout") && g.pump_player_messages(error) && g.client_shell.fade.messages == 4);
++        p->m_bDead = false;
++        CHECK(send(g, p->m_hObject, "fadein")); // Queued event must not survive client/world lifetime.
++        const auto client = g.local_client;
++        CHECK(g.leave_player() && g.client_shell.fade.messages == 0 && g.client_shell.fade.Scale() == 1);
++        CHECK(g.server.SendToClient(client, ScreenFade{false}) == DE_INVALIDPARAMS);
++        CHECK(g.enter_player(error) && g.client_shell.fade.Scale() == 1 && !g.client_shell.fade.messages);
++        CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.server.client_count() && !g.server.string_count());
++        return true;
++    }
++    bool private_exit(const std::filesystem::path& root)
++    {
++        std::string error;
++        Config config;
++        config.data_dir = root;
++        auto game = std::make_unique<GameSession>();
++        CHECK(game->initialize() && game->resources.mount_game(config, error));
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            auto& g = *game;
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error) &&
++                  test_camera::complete_subway_intro(g));
++            auto* p = g.server_shell.Player(g.local_client);
++            CHECK(p);
++            HOBJECT relay = nullptr, exit = nullptr;
++            for (auto id : g.objects.snapshot())
++            {
++                const auto* r = g.objects.get(id);
++                if (std::string_view(r->state.m_Name) == "Trigger2")
++                    relay = r->handle;
++                if (dynamic_cast<ExitTrigger*>(r->game.get()))
++                    exit = r->handle;
++            }
++            CHECK(relay && exit);
++            auto* t = dynamic_cast<Trigger*>(g.server.HandleToObject(relay));
++            auto* x = dynamic_cast<ExitTrigger*>(g.server.HandleToObject(exit));
++            CHECK(t && x && !t->activations && t->touch_activate && t->slots[0].delay == 7 && t->slots[9].delay == 12);
++            // Diagnostic relocation to the final carriage, then normal MoveMgr/USE/contact.
++            // No trigger rearming, message injection, NPC editing, health/ammo grants, or invulnerability.
++            DVector position{-80, 170, 2000};
++            CHECK(g.server.TeleportObject(p->m_hObject, &position) == DE_OK && p->TeleportClientToServerPos());
++            CHECK(g.pump_player_messages(error));
++            g.client_shell.rotation = {0, 0};
++            g.client_shell.movement_input.forward = true;
++            for (int tick = 0; tick < 300 && !t->activations; ++tick)
++            {
++                g.client_shell.use_down = tick % 60 == 0;
++                CHECK(g.step(1. / 60) && !p->m_damage.IsDead());
++            }
++            std::cout << "Relay reached at " << g.objects.get(p->m_hObject)->state.m_Pos.z
++                      << " activations=" << t->activations << '\n';
++            CHECK(t->activations == 1 && t->last_sender == p->m_hObject && !x->attempts);
++            g.client_shell.movement_input = {};
++            g.client_shell.use_down = false;
++            const auto began = t->delay_start;
++            bool faded = false, black = false;
++            std::size_t peak_trail = 0, peak_total = 0;
++            std::uint64_t combat_hits = 0;
++            bool large_scene_prepared = false;
++            for (int tick = 0; tick < 1000 && !g.pending_level_change; ++tick)
++            {
++                // The relocation leaves the carriage uncleared. Fight visible authored
++                // Cultists through normal aiming/FIRE_KEY, rather than granting immunity.
++                HOBJECT target = nullptr;
++                float closest = 1e20f, target_health = 0;
++                DVector aim{};
++                for (auto identity : g.objects.snapshot())
++                {
++                    const auto* record = g.objects.get(identity);
++                    const auto* ai = record ? dynamic_cast<const AI_Mgr*>(record->game.get()) : nullptr;
++                    if (!ai || ai->npc_type != AI_Mgr::NPCType::Cultist || ai->m_damage.IsDead())
++                        continue;
++                    DVector head;
++                    DRotation rotation;
++                    CHECK(g.server.GetModelNodeTransform(record->handle, "head", &head, &rotation));
++                    SegmentHit hit;
++                    const auto delta = vector_subtract(head, g.client_shell.view.position);
++                    const auto distance = vector_dot(delta, delta);
++                    if (distance < closest &&
++                        g.server.IntersectSegment(g.client_shell.view.position, head, p->m_hObject, hit, false,
++                                                  SegmentObjects::SolidOrRayHit, SegmentFilter::IgnoreVolumes,
++                                                  SegmentStart::SkipInterior) == SegmentResult::Hit &&
++                        hit.object == record->handle)
++                    {
++                        target = record->handle;
++                        closest = distance;
++                        aim = delta;
++                        target_health = ai->m_damage.m_fHitPoints;
++                    }
++                }
++                g.client_shell.weapon_input = {target != nullptr, false, false};
++                if (target)
++                    g.client_shell.rotation = {-std::atan2(aim.y, std::hypot(aim.x, aim.z)), std::atan2(aim.x, aim.z)};
++                const bool stepped = g.step(1. / 60);
++                if (target)
++                {
++                    const auto* record = g.objects.get(target);
++                    const auto* ai = record ? dynamic_cast<const AI_Mgr*>(record->game.get()) : nullptr;
++                    combat_hits += !ai || ai->m_damage.m_fHitPoints < target_health;
++                }
++                if (!stepped || p->m_damage.IsDead())
++                {
++                    std::cerr << "Exit update failure after " << g.server.GetTime() - began << "s, stepped=" << stepped
++                              << " HP=" << p->m_damage.m_fHitPoints << "\n";
++                    std::cerr << "FX errors: " << g.server.explosion_fragments.update_error << " | "
++                              << g.server.explosion_flames.update_error << " | "
++                              << g.server.object_particles.update_error << " | " << g.server.blood_spurts.update_error
++                              << " | " << g.server.sparks.update_error << "\n";
++                    for (const auto& line : g.objects.diagnostics())
++                        std::cerr << "Objects: " << line << "\n";
++                    for (const auto& line : g.trace)
++                        std::cerr << line << "\n";
++                    for (auto id : g.objects.snapshot())
++                        if (auto* ai = dynamic_cast<AI_Mgr*>(g.objects.get(id)->game.get()); ai && ai->runtime_failed)
++                            std::cerr << "AI " << g.objects.get(id)->state.m_Name << ": " << ai->runtime_error << "\n";
++                }
++                CHECK(stepped && !p->m_damage.IsDead());
++                peak_total = std::max(peak_total, g.server.explosion_fragments.trail_particles());
++                for (const auto& trail : g.server.explosion_fragments.trails)
++                    peak_trail = std::max(peak_trail, trail.particles.size());
++                if (!large_scene_prepared && g.server.explosion_fragments.trail_particles() > 8192)
++                {
++                    SpriteView large_scene;
++                    CHECK(update_sprite_scene(g, large_scene, error));
++                    std::size_t prepared = 0;
++                    for (const auto& entry : large_scene.entries)
++                        if (entry.trail_system)
++                        {
++                            CHECK(entry.error.empty());
++                            ++prepared;
++                        }
++                    CHECK(prepared == g.server.explosion_fragments.trail_particles());
++                    large_scene_prepared = true;
++                }
++                const auto elapsed = g.server.GetTime() - began;
++                if (elapsed < 7)
++                    CHECK(!g.client_shell.fade.messages);
++                faded |= g.client_shell.fade.messages == 1 && g.client_shell.fade.Scale() < 1;
++                black |= g.client_shell.fade.Scale() == 0;
++                if (elapsed < 14)
++                    CHECK(!g.pending_level_change);
++            }
++            std::cout << "Trail peaks: " << peak_trail << " per system, " << peak_total << " total\n";
++            SpriteView scene;
++            CHECK(update_sprite_scene(g, scene, error));
++            CHECK(g.server.explosion_fragments.trail_failed == 0 && peak_trail > 2048 && peak_total <= 16384);
++            CHECK(large_scene_prepared && combat_hits > 0 && g.client_shell.weapons.front().fire_keys > 0);
++            g.client_shell.weapon_input = {};
++            CHECK(faded && black && g.pending_level_change && x->deliveries == 1 && p->fade_messages == 1);
++            CHECK(t->slots[0].sent == 1 && t->slots[9].sent == 1 && g.client_shell.fade.fade_out);
++            for (const auto& slot : t->slots)
++                CHECK(slot.sent == 1);
++            for (const auto& row : service_coverage(g.server.service_calls))
++            {
++                CHECK(row.support != ServiceSupport::Unclassified &&
++                      (row.support != ServiceSupport::Unavailable || row.calls == 0));
++                std::cout << "EXIT_TRACE\t" << cycle << '\t' << row.name << '\t' << service_support_name(row.support)
++                          << '\t' << row.calls << '\n';
++            }
++            std::cout << "Authored exit cycle " << cycle << ": fade at 7s, held black, original exit at "
++                      << g.server.GetTime() - began << "s; unsupported player commands=" << p->unsupported_triggers
++                      << '\n';
++            CHECK(g.server.unavailable_history.empty());
++            for (auto id : g.objects.snapshot())
++                if (auto* ai = dynamic_cast<AI_Mgr*>(g.objects.get(id)->game.get()); ai && ai->runtime_failed)
++                {
++                    std::cerr << ai->runtime_error << '\n';
++                    return false;
++                }
++            const auto health = p->m_damage.m_fHitPoints, ammo = p->m_InventoryMgr.GetAmmoCount(1);
++            CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Committed);
++            CHECK(game->world_path == "worlds/02_cityhub.dat" && game->restoration.restored == 1);
++            CHECK(game->client_shell.fade.messages == 0 && game->client_shell.fade.Scale() == 1);
++            p = game->server_shell.Player(game->local_client);
++            CHECK(p && p->m_damage.m_fHitPoints == health && p->m_InventoryMgr.GetAmmoCount(1) == ammo);
++            for (int tick = 0; tick < 60; ++tick)
++                CHECK(game->step(1. / 60));
++            CHECK(game->unload_world() && game->objects.snapshot().empty() && !game->server.string_count() &&
++                  !game->server.message_count() && !game->server.client_count());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    std::string_view mode = argv[1];
++    return (mode == "values"                 ? values()
++            : argc == 3 && mode == "session" ? session(argv[2])
++            : argc == 3 && mode == "private" ? private_exit(argv[2])
++                                             : false)
++               ? 0
++               : 1;
++}

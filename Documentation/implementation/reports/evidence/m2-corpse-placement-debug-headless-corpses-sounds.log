@@ -1,0 +1,14 @@
+509/703 Testing: corpses.sounds
+509/703 Test: corpses.sounds
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse_tests" "sounds" "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse-fixtures/sounds"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"corpses.sounds" start time: Oct 17 04:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.sounds" end time: Oct 17 04:30 CEST
+"corpses.sounds" time elapsed: 00:00:00
+----------------------------------------------------------

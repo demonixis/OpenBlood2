@@ -1,0 +1,10 @@
+Reviewed local sources/blood2/ObjectDLL source and the current typed ports.
+AI_Mgr.cpp:2304-2433: query sight/smell/sense; assign smell/sense/sight; use body distance for strengths; smell has no target assignment; dead target returns without a second candidate; retaliation preserves previous strengths.
+AI_Mgr.cpp:2438-2486: opportunity query preserves current-weapon early guard and sight-only selection.
+AI_Mgr.cpp:2914-3069: head origin, inclusive range, faction-list fallback, reversed specific-class IsKindOf, forward hemisphere, observer-minus-target avoid test, visibility-only player invisibility, first-in-list equal-distance selection.
+PlayerObj.cpp:614-622: player enters both faction lists; source destructor removes both.
+BaseCharacter.h:37: IsDead uses the damage aggregate.
+Destructable.cpp:438-484: last attacker is an AI-only pre-damage branch. The current bounded damage path imports identity memory but does not claim hit-limb localization/multipliers.
+Adaptations: typed list selector; current checked pose in place of MoveObj cache; bounded traversal; pending/stale exclusion; double intermediates; explicit undefined/service failure; idempotent membership; checked attacker token avoids breaking overlapping target link.
+Next-state hazard: derived ComputeState uses -1 as recompute sentinel, then stimulus truthiness. Future integration must guard failed ComputeStimuli before state selection.
+No NPC factory or automatic state loop was registered. ExitHint is a complete small marker; ExitTrigger remains unavailable.

@@ -1,0 +1,14 @@
+466/472 Testing: corpses.transfer
+466/472 Test: corpses.transfer
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "transfer" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/transfer"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.transfer" start time: Oct 16 16:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.transfer" end time: Oct 16 16:56 CEST
+"corpses.transfer" time elapsed: 00:00:00
+----------------------------------------------------------

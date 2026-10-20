@@ -1,0 +1,14 @@
+621/626 Testing: gideon_teleport.teleport
+621/626 Test: gideon_teleport.teleport
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_teleport_tests" "teleport" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-teleport-teleport"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_teleport.teleport" start time: Oct 17 02:45 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_teleport.teleport" end time: Oct 17 02:45 CEST
+"gideon_teleport.teleport" time elapsed: 00:00:00
+----------------------------------------------------------

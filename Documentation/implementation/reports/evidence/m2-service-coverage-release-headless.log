@@ -1,0 +1,1555 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 931
+      Start 931: coverage.private
+
+931: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/service_coverage_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+931: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+931: Test timeout computed to be: 180
+test 44
+      Start  44: world.level_change_private
+
+44: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "level_change_private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+44: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+44: Test timeout computed to be: 120
+test 929
+      Start 929: coverage.catalog
+
+929: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/service_coverage_tests "catalog" "/home/yann/projects/lithtech/Blood2"
+929: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+929: Test timeout computed to be: 20
+929: Catalog: 171 interface services / 174 trace boundaries
+ 1/41 Test #929: coverage.catalog ..................   Passed    0.07 sec
+test 45
+      Start  45: world.destination_trial_private
+
+45: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "destination_trial_private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+45: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+45: Test timeout computed to be: 60
+931: SubwayA-entry	AddObjectToList	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	AddSkyObject	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	AlignRotation	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	BreakInterObjectLink	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	CastRay	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	CastWorldRay	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	CompareStringsUpper	ServerDE	Implemented (bounded)	1
+931: SubwayA-entry	ConfigureCharacterBody	ServerDE	Implemented (bounded)	16
+931: SubwayA-entry	ConfigureModelBody	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	ConfigureWorldBody	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	CopyString	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	CreateAttachment	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	CreateInterObjectLink	ServerDE	Implemented (bounded)	24
+931: SubwayA-entry	CreateObject	ServerDE	Implemented (bounded)	26
+931: SubwayA-entry	CreateObjectList	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	CreateObjectProps	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	CreateString	ServerDE	Implemented (bounded)	18
+931: SubwayA-entry	EndHMessageRead	ServerDE	Explicitly unsupported	0
+931: SubwayA-entry	EndHMessageWrite	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	EndMessage	ServerDE	Implemented (bounded)	6
+931: SubwayA-entry	FindAttachment	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	FindNamedObjects	ServerDE	Implemented (bounded)	7
+931: SubwayA-entry	FreeString	ServerDE	Implemented (bounded)	16
+931: SubwayA-entry	GetAcceleration	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetAnimIndex	ServerDE	Implemented (bounded)	2835
+931: SubwayA-entry	GetAttachedModelNodeTransform	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetCameraView	ServerDE	Implemented (bounded)	1
+931: SubwayA-entry	GetClass	ServerDE	Implemented (bounded)	31
+931: SubwayA-entry	GetClientResourceString	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetClientUserData	ServerDE	Implemented (bounded)	32
+931: SubwayA-entry	GetContainers	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetFrameTime	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetGameConVar	ServerDE	Implemented (bounded)	449
+931: SubwayA-entry	GetGlobalForce	ServerDE	Implemented (bounded)	3
+931: SubwayA-entry	GetModelAnimUserDims	ServerDE	Implemented (bounded)	48
+931: SubwayA-entry	GetModelAnimation	ServerDE	Implemented (bounded)	13
+931: SubwayA-entry	GetModelAnimationName	ServerDE	Implemented (bounded)	29
+931: SubwayA-entry	GetModelFilenames	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetModelLooping	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetModelNodeHideStatus	ServerDE	Implemented (bounded)	86
+931: SubwayA-entry	GetModelNodeTransform	ServerDE	Implemented (bounded)	234
+931: SubwayA-entry	GetModelPlaybackState	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetMovementState	ServerDE	Implemented (bounded)	20
+931: SubwayA-entry	GetNextObject	ServerDE	Implemented (bounded)	227
+931: SubwayA-entry	GetObjectClass	ServerDE	Implemented (bounded)	228
+931: SubwayA-entry	GetObjectColor	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetObjectDims	ServerDE	Implemented (bounded)	10
+931: SubwayA-entry	GetObjectFlags	ServerDE	Implemented (bounded)	345
+931: SubwayA-entry	GetObjectName	ServerDE	Implemented (bounded)	28
+931: SubwayA-entry	GetObjectPos	ServerDE	Implemented (bounded)	56
+931: SubwayA-entry	GetObjectRotation	ServerDE	Implemented (bounded)	16
+931: SubwayA-entry	GetObjectState	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetObjectUserFlags	ServerDE	Implemented (bounded)	63
+931: SubwayA-entry	GetPathManager	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetPointContainerCode	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetPropBool	ServerDE	Implemented (bounded)	764
+931: SubwayA-entry	GetPropGeneric	ServerDE	Implemented (bounded)	10699
+931: SubwayA-entry	GetPropReal	ServerDE	Implemented (bounded)	764
+931: SubwayA-entry	GetPropString	ServerDE	Implemented (bounded)	72
+931: SubwayA-entry	GetPropVector	ServerDE	Implemented (bounded)	64
+931: SubwayA-entry	GetSoundDuration	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetStringData	ServerDE	Implemented (bounded)	18
+931: SubwayA-entry	GetTime	ServerDE	Implemented (bounded)	44
+931: SubwayA-entry	GetVarValueFloat	ServerDE	Implemented (bounded)	447
+931: SubwayA-entry	GetVarValueString	ServerDE	Implemented (bounded)	2
+931: SubwayA-entry	GetVelocity	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	GetWorldTime	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	HandleToObject	ServerDE	Implemented (bounded)	41
+931: SubwayA-entry	InterpolateRotation	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	IntersectSegment	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	IsKindOf	ServerDE	Implemented (bounded)	230
+931: SubwayA-entry	IsObjectAlive	ServerDE	Implemented (bounded)	191
+931: SubwayA-entry	IsSoundDone	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	KillSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	MoveKeyframedObject	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	MoveObject	ServerDE	Implemented (bounded)	16
+931: SubwayA-entry	MoveObjectToGround	ServerDE	Implemented (bounded)	16
+931: SubwayA-entry	MoveWorldModel	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	ObjectToHandle	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PingObjects	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PlaceNonSolidModel	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PlayCharacterSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PlayCinematicSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PlayClientSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PlayDetachedSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PlayLocalSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PlayObjectLoopSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PlaySoundAt	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PlayWorldSound	ServerDE	Implemented (bounded)	4
+931: SubwayA-entry	PublishBloodSplat	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishBloodSpurt	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishCameraEffect	ServerDE	Implemented (bounded)	2
+931: SubwayA-entry	PublishClientBloodSplat	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishClientBloodSpurt	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishExplosionFlames	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishExplosionFragments	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishExplosionLights	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishExplosionModels	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishExplosionRings	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishExplosionSprites	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishFleshGibs	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishLaserBeam	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishLightEffect	ServerDE	Implemented (bounded)	12
+931: SubwayA-entry	PublishObjectParticles	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishParticleStream	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishPolyGrid	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishSparks	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	PublishWeaponSprites	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	QueryModelNodeTransform	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	RandomFloat	ServerDE	Implemented (bounded)	46
+931: SubwayA-entry	RandomInt	ServerDE	Implemented (bounded)	15
+931: SubwayA-entry	ReadDamage	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	ReadFromMessageDWord	ServerDE	Implemented (bounded)	5
+931: SubwayA-entry	ReadFromMessageHString	ServerDE	Implemented (bounded)	5
+931: SubwayA-entry	ReadKeyMessage	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	ReadPickupMessage	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	RecordBrushDestruction	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	RecordDebrisEffect	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	RecordExplosionEffect	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	RecordPickup	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	RecordProjectile	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	RecordSceneExplosion	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	RecordSpawn	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	RelinquishList	ServerDE	Implemented (bounded)	7
+931: SubwayA-entry	RemoveAttachment	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	RemoveCameraEffect	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	RemoveLightEffect	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	RemoveObject	ServerDE	Implemented (bounded)	4
+931: SubwayA-entry	RemoveObjectFromList	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	ReportSkyFailure	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	ResetModelAnimation	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	ResetRead	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	ResizeObject	ServerDE	Implemented (bounded)	16
+931: SubwayA-entry	RestoreObjects	ServerDE	Explicitly unsupported	0
+931: SubwayA-entry	RotateWorldModel	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	SaveObjects	ServerDE	Explicitly unsupported	0
+931: SubwayA-entry	ScaleObject	ServerDE	Implemented (bounded)	16
+931: SubwayA-entry	SendBossHealth	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	SendConversation	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	SendObjectives	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	SendToClient	ServerDE	Implemented (bounded)	8
+931: SubwayA-entry	SendWorldExit	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	SetAcceleration	ServerDE	Implemented (bounded)	5
+931: SubwayA-entry	SetBlockingPriority	ServerDE	Implemented (bounded)	120
+931: SubwayA-entry	SetClientUserData	ServerDE	Implemented (bounded)	2
+931: SubwayA-entry	SetDeactivationTime	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	SetGameConVar	ServerDE	Implemented (bounded)	32
+931: SubwayA-entry	SetGlobalForce	ServerDE	Implemented (bounded)	1
+931: SubwayA-entry	SetModelAnimation	ServerDE	Implemented (bounded)	16
+931: SubwayA-entry	SetModelFilenames	ServerDE	Implemented (bounded)	2
+931: SubwayA-entry	SetModelLooping	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	SetModelNodeHideStatus	ServerDE	Implemented (bounded)	38
+931: SubwayA-entry	SetNextUpdate	ServerDE	Implemented (bounded)	224
+931: SubwayA-entry	SetObjectColor	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	SetObjectDims	ServerDE	Implemented (bounded)	48
+931: SubwayA-entry	SetObjectFlags	ServerDE	Implemented (bounded)	256
+931: SubwayA-entry	SetObjectRotation	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	SetObjectState	ServerDE	Implemented (bounded)	1
+931: SubwayA-entry	SetObjectUserFlags	ServerDE	Implemented (bounded)	195
+931: SubwayA-entry	SetSkyDefinition	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	SetVelocity	ServerDE	Implemented (bounded)	5
+931: SubwayA-entry	StartHMessageWrite	ServerDE	Implemented (bounded)	6
+931: SubwayA-entry	StartMessageToObject	ServerDE	Implemented (bounded)	6
+931: SubwayA-entry	TeleportObject	ServerDE	Implemented (bounded)	1
+931: SubwayA-entry	ValidateSpawnObject	ServerDE	Implemented (bounded)	9
+931: SubwayA-entry	WriteDamage	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	WriteKeyMessage	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	WritePickupMessage	ServerDE	Implemented (bounded)	0
+931: SubwayA-entry	WriteToMessageDWord	ServerDE	Implemented (bounded)	6
+931: SubwayA-entry	WriteToMessageHString	ServerDE	Implemented (bounded)	6
+931: SubwayA-entry	ConnectClient	Lifecycle	Implemented (bounded)	1
+931: SubwayA-entry	DisconnectClient	Lifecycle	Implemented (bounded)	0
+931: SubwayA-entry	MID_MODELSTRINGKEY	Callback	Implemented (bounded)	0
+931: Coverage SubwayA-entry: reached=75 unexercised=99 unavailable=0 ai_errors=0
+931: SubwayA-10s	AddObjectToList	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	AddSkyObject	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	AlignRotation	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	BreakInterObjectLink	ServerDE	Implemented (bounded)	1
+931: SubwayA-10s	CastRay	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	CastWorldRay	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	CompareStringsUpper	ServerDE	Implemented (bounded)	1
+931: SubwayA-10s	ConfigureCharacterBody	ServerDE	Implemented (bounded)	16
+931: SubwayA-10s	ConfigureModelBody	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	ConfigureWorldBody	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	CopyString	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	CreateAttachment	ServerDE	Implemented (bounded)	11
+931: SubwayA-10s	CreateInterObjectLink	ServerDE	Implemented (bounded)	40
+931: SubwayA-10s	CreateObject	ServerDE	Implemented (bounded)	38
+931: SubwayA-10s	CreateObjectList	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	CreateObjectProps	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	CreateString	ServerDE	Implemented (bounded)	28
+931: SubwayA-10s	EndHMessageRead	ServerDE	Explicitly unsupported	0
+931: SubwayA-10s	EndHMessageWrite	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	EndMessage	ServerDE	Implemented (bounded)	193
+931: SubwayA-10s	FindAttachment	ServerDE	Implemented (bounded)	599
+931: SubwayA-10s	FindNamedObjects	ServerDE	Implemented (bounded)	30
+931: SubwayA-10s	FreeString	ServerDE	Implemented (bounded)	36
+931: SubwayA-10s	GetAcceleration	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	GetAnimIndex	ServerDE	Implemented (bounded)	2847
+931: SubwayA-10s	GetAttachedModelNodeTransform	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	GetCameraView	ServerDE	Implemented (bounded)	1201
+931: SubwayA-10s	GetClass	ServerDE	Implemented (bounded)	55
+931: SubwayA-10s	GetClientResourceString	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	GetClientUserData	ServerDE	Implemented (bounded)	14564
+931: SubwayA-10s	GetContainers	ServerDE	Implemented (bounded)	38654
+931: SubwayA-10s	GetFrameTime	ServerDE	Implemented (bounded)	1306
+931: SubwayA-10s	GetGameConVar	ServerDE	Implemented (bounded)	449
+931: SubwayA-10s	GetGlobalForce	ServerDE	Implemented (bounded)	4
+931: SubwayA-10s	GetModelAnimUserDims	ServerDE	Implemented (bounded)	651
+931: SubwayA-10s	GetModelAnimation	ServerDE	Implemented (bounded)	247
+931: SubwayA-10s	GetModelAnimationName	ServerDE	Implemented (bounded)	1152
+931: SubwayA-10s	GetModelFilenames	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	GetModelLooping	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	GetModelNodeHideStatus	ServerDE	Implemented (bounded)	86
+931: SubwayA-10s	GetModelNodeTransform	ServerDE	Implemented (bounded)	327
+931: SubwayA-10s	GetModelPlaybackState	ServerDE	Implemented (bounded)	1115
+931: SubwayA-10s	GetMovementState	ServerDE	Implemented (bounded)	7884
+931: SubwayA-10s	GetNextObject	ServerDE	Implemented (bounded)	227
+931: SubwayA-10s	GetObjectClass	ServerDE	Implemented (bounded)	240
+931: SubwayA-10s	GetObjectColor	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	GetObjectDims	ServerDE	Implemented (bounded)	11
+931: SubwayA-10s	GetObjectFlags	ServerDE	Implemented (bounded)	356
+931: SubwayA-10s	GetObjectName	ServerDE	Implemented (bounded)	37
+931: SubwayA-10s	GetObjectPos	ServerDE	Implemented (bounded)	4855
+931: SubwayA-10s	GetObjectRotation	ServerDE	Implemented (bounded)	817
+931: SubwayA-10s	GetObjectState	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	GetObjectUserFlags	ServerDE	Implemented (bounded)	65
+931: SubwayA-10s	GetPathManager	ServerDE	Implemented (bounded)	459
+931: SubwayA-10s	GetPointContainerCode	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	GetPropBool	ServerDE	Implemented (bounded)	764
+931: SubwayA-10s	GetPropGeneric	ServerDE	Implemented (bounded)	10699
+931: SubwayA-10s	GetPropReal	ServerDE	Implemented (bounded)	764
+931: SubwayA-10s	GetPropString	ServerDE	Implemented (bounded)	72
+931: SubwayA-10s	GetPropVector	ServerDE	Implemented (bounded)	64
+931: SubwayA-10s	GetSoundDuration	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	GetStringData	ServerDE	Implemented (bounded)	72
+931: SubwayA-10s	GetTime	ServerDE	Implemented (bounded)	12850
+931: SubwayA-10s	GetVarValueFloat	ServerDE	Implemented (bounded)	447
+931: SubwayA-10s	GetVarValueString	ServerDE	Implemented (bounded)	2
+931: SubwayA-10s	GetVelocity	ServerDE	Implemented (bounded)	604
+931: SubwayA-10s	GetWorldTime	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	HandleToObject	ServerDE	Implemented (bounded)	22596
+931: SubwayA-10s	InterpolateRotation	ServerDE	Implemented (bounded)	1138
+931: SubwayA-10s	IntersectSegment	ServerDE	Implemented (bounded)	310
+931: SubwayA-10s	IsKindOf	ServerDE	Implemented (bounded)	242
+931: SubwayA-10s	IsObjectAlive	ServerDE	Implemented (bounded)	48983
+931: SubwayA-10s	IsSoundDone	ServerDE	Implemented (bounded)	598
+931: SubwayA-10s	KillSound	ServerDE	Implemented (bounded)	1
+931: SubwayA-10s	MoveKeyframedObject	ServerDE	Implemented (bounded)	7727
+931: SubwayA-10s	MoveObject	ServerDE	Implemented (bounded)	12007
+931: SubwayA-10s	MoveObjectToGround	ServerDE	Implemented (bounded)	16
+931: SubwayA-10s	MoveWorldModel	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	ObjectToHandle	ServerDE	Implemented (bounded)	180
+931: SubwayA-10s	PingObjects	ServerDE	Implemented (bounded)	20
+931: SubwayA-10s	PlaceNonSolidModel	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PlayCharacterSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PlayCinematicSound	ServerDE	Implemented (bounded)	2
+931: SubwayA-10s	PlayClientSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PlayDetachedSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PlayLocalSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PlayObjectLoopSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PlaySoundAt	ServerDE	Implemented (bounded)	1
+931: SubwayA-10s	PlayWorldSound	ServerDE	Implemented (bounded)	4
+931: SubwayA-10s	PublishBloodSplat	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishBloodSpurt	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishCameraEffect	ServerDE	Implemented (bounded)	2
+931: SubwayA-10s	PublishClientBloodSplat	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishClientBloodSpurt	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishExplosionFlames	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishExplosionFragments	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishExplosionLights	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishExplosionModels	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishExplosionRings	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishExplosionSprites	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishFleshGibs	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishLaserBeam	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishLightEffect	ServerDE	Implemented (bounded)	12
+931: SubwayA-10s	PublishObjectParticles	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishParticleStream	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishPolyGrid	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishSparks	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	PublishWeaponSprites	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	QueryModelNodeTransform	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	RandomFloat	ServerDE	Implemented (bounded)	51
+931: SubwayA-10s	RandomInt	ServerDE	Implemented (bounded)	22
+931: SubwayA-10s	ReadDamage	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	ReadFromMessageDWord	ServerDE	Implemented (bounded)	13
+931: SubwayA-10s	ReadFromMessageHString	ServerDE	Implemented (bounded)	13
+931: SubwayA-10s	ReadKeyMessage	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	ReadPickupMessage	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	RecordBrushDestruction	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	RecordDebrisEffect	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	RecordExplosionEffect	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	RecordPickup	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	RecordProjectile	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	RecordSceneExplosion	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	RecordSpawn	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	RelinquishList	ServerDE	Implemented (bounded)	30
+931: SubwayA-10s	RemoveAttachment	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	RemoveCameraEffect	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	RemoveLightEffect	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	RemoveObject	ServerDE	Implemented (bounded)	13
+931: SubwayA-10s	RemoveObjectFromList	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	ReportSkyFailure	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	ResetModelAnimation	ServerDE	Implemented (bounded)	6
+931: SubwayA-10s	ResetRead	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	ResizeObject	ServerDE	Implemented (bounded)	619
+931: SubwayA-10s	RestoreObjects	ServerDE	Explicitly unsupported	0
+931: SubwayA-10s	RotateWorldModel	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	SaveObjects	ServerDE	Explicitly unsupported	0
+931: SubwayA-10s	ScaleObject	ServerDE	Implemented (bounded)	16
+931: SubwayA-10s	SendBossHealth	ServerDE	Implemented (bounded)	331
+931: SubwayA-10s	SendConversation	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	SendObjectives	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	SendToClient	ServerDE	Implemented (bounded)	342
+931: SubwayA-10s	SendWorldExit	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	SetAcceleration	ServerDE	Implemented (bounded)	1206
+931: SubwayA-10s	SetBlockingPriority	ServerDE	Implemented (bounded)	1320
+931: SubwayA-10s	SetClientUserData	ServerDE	Implemented (bounded)	2
+931: SubwayA-10s	SetDeactivationTime	ServerDE	Implemented (bounded)	16
+931: SubwayA-10s	SetGameConVar	ServerDE	Implemented (bounded)	32
+931: SubwayA-10s	SetGlobalForce	ServerDE	Implemented (bounded)	1
+931: SubwayA-10s	SetModelAnimation	ServerDE	Implemented (bounded)	31
+931: SubwayA-10s	SetModelFilenames	ServerDE	Implemented (bounded)	2
+931: SubwayA-10s	SetModelLooping	ServerDE	Implemented (bounded)	9
+931: SubwayA-10s	SetModelNodeHideStatus	ServerDE	Implemented (bounded)	38
+931: SubwayA-10s	SetNextUpdate	ServerDE	Implemented (bounded)	10378
+931: SubwayA-10s	SetObjectColor	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	SetObjectDims	ServerDE	Implemented (bounded)	59
+931: SubwayA-10s	SetObjectFlags	ServerDE	Implemented (bounded)	267
+931: SubwayA-10s	SetObjectRotation	ServerDE	Implemented (bounded)	8493
+931: SubwayA-10s	SetObjectState	ServerDE	Implemented (bounded)	17
+931: SubwayA-10s	SetObjectUserFlags	ServerDE	Implemented (bounded)	197
+931: SubwayA-10s	SetSkyDefinition	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	SetVelocity	ServerDE	Implemented (bounded)	1376
+931: SubwayA-10s	StartHMessageWrite	ServerDE	Implemented (bounded)	193
+931: SubwayA-10s	StartMessageToObject	ServerDE	Implemented (bounded)	193
+931: SubwayA-10s	TeleportObject	ServerDE	Implemented (bounded)	1
+931: SubwayA-10s	ValidateSpawnObject	ServerDE	Implemented (bounded)	9
+931: SubwayA-10s	WriteDamage	ServerDE	Implemented (bounded)	182
+931: SubwayA-10s	WriteKeyMessage	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	WritePickupMessage	ServerDE	Implemented (bounded)	0
+931: SubwayA-10s	WriteToMessageDWord	ServerDE	Implemented (bounded)	11
+931: SubwayA-10s	WriteToMessageHString	ServerDE	Implemented (bounded)	11
+931: SubwayA-10s	ConnectClient	Lifecycle	Implemented (bounded)	1
+931: SubwayA-10s	DisconnectClient	Lifecycle	Implemented (bounded)	0
+931: SubwayA-10s	MID_MODELSTRINGKEY	Callback	Implemented (bounded)	0
+931: Coverage SubwayA-10s: reached=98 unexercised=76 unavailable=0 ai_errors=0
+931: SubwayA-exit-request	AddObjectToList	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	AddSkyObject	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	AlignRotation	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	BreakInterObjectLink	ServerDE	Implemented (bounded)	1
+931: SubwayA-exit-request	CastRay	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	CastWorldRay	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	CompareStringsUpper	ServerDE	Implemented (bounded)	1
+931: SubwayA-exit-request	ConfigureCharacterBody	ServerDE	Implemented (bounded)	16
+931: SubwayA-exit-request	ConfigureModelBody	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	ConfigureWorldBody	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	CopyString	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	CreateAttachment	ServerDE	Implemented (bounded)	11
+931: SubwayA-exit-request	CreateInterObjectLink	ServerDE	Implemented (bounded)	40
+931: SubwayA-exit-request	CreateObject	ServerDE	Implemented (bounded)	38
+931: SubwayA-exit-request	CreateObjectList	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	CreateObjectProps	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	CreateString	ServerDE	Implemented (bounded)	28
+931: SubwayA-exit-request	EndHMessageRead	ServerDE	Explicitly unsupported	0
+931: SubwayA-exit-request	EndHMessageWrite	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	EndMessage	ServerDE	Implemented (bounded)	193
+931: SubwayA-exit-request	FindAttachment	ServerDE	Implemented (bounded)	599
+931: SubwayA-exit-request	FindNamedObjects	ServerDE	Implemented (bounded)	30
+931: SubwayA-exit-request	FreeString	ServerDE	Implemented (bounded)	36
+931: SubwayA-exit-request	GetAcceleration	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	GetAnimIndex	ServerDE	Implemented (bounded)	2847
+931: SubwayA-exit-request	GetAttachedModelNodeTransform	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	GetCameraView	ServerDE	Implemented (bounded)	1201
+931: SubwayA-exit-request	GetClass	ServerDE	Implemented (bounded)	55
+931: SubwayA-exit-request	GetClientResourceString	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	GetClientUserData	ServerDE	Implemented (bounded)	14573
+931: SubwayA-exit-request	GetContainers	ServerDE	Implemented (bounded)	38654
+931: SubwayA-exit-request	GetFrameTime	ServerDE	Implemented (bounded)	1306
+931: SubwayA-exit-request	GetGameConVar	ServerDE	Implemented (bounded)	449
+931: SubwayA-exit-request	GetGlobalForce	ServerDE	Implemented (bounded)	4
+931: SubwayA-exit-request	GetModelAnimUserDims	ServerDE	Implemented (bounded)	651
+931: SubwayA-exit-request	GetModelAnimation	ServerDE	Implemented (bounded)	247
+931: SubwayA-exit-request	GetModelAnimationName	ServerDE	Implemented (bounded)	1152
+931: SubwayA-exit-request	GetModelFilenames	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	GetModelLooping	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	GetModelNodeHideStatus	ServerDE	Implemented (bounded)	86
+931: SubwayA-exit-request	GetModelNodeTransform	ServerDE	Implemented (bounded)	327
+931: SubwayA-exit-request	GetModelPlaybackState	ServerDE	Implemented (bounded)	1115
+931: SubwayA-exit-request	GetMovementState	ServerDE	Implemented (bounded)	7884
+931: SubwayA-exit-request	GetNextObject	ServerDE	Implemented (bounded)	227
+931: SubwayA-exit-request	GetObjectClass	ServerDE	Implemented (bounded)	240
+931: SubwayA-exit-request	GetObjectColor	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	GetObjectDims	ServerDE	Implemented (bounded)	11
+931: SubwayA-exit-request	GetObjectFlags	ServerDE	Implemented (bounded)	356
+931: SubwayA-exit-request	GetObjectName	ServerDE	Implemented (bounded)	37
+931: SubwayA-exit-request	GetObjectPos	ServerDE	Implemented (bounded)	4855
+931: SubwayA-exit-request	GetObjectRotation	ServerDE	Implemented (bounded)	817
+931: SubwayA-exit-request	GetObjectState	ServerDE	Implemented (bounded)	3
+931: SubwayA-exit-request	GetObjectUserFlags	ServerDE	Implemented (bounded)	65
+931: SubwayA-exit-request	GetPathManager	ServerDE	Implemented (bounded)	459
+931: SubwayA-exit-request	GetPointContainerCode	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	GetPropBool	ServerDE	Implemented (bounded)	764
+931: SubwayA-exit-request	GetPropGeneric	ServerDE	Implemented (bounded)	10699
+931: SubwayA-exit-request	GetPropReal	ServerDE	Implemented (bounded)	764
+931: SubwayA-exit-request	GetPropString	ServerDE	Implemented (bounded)	72
+931: SubwayA-exit-request	GetPropVector	ServerDE	Implemented (bounded)	64
+931: SubwayA-exit-request	GetSoundDuration	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	GetStringData	ServerDE	Implemented (bounded)	74
+931: SubwayA-exit-request	GetTime	ServerDE	Implemented (bounded)	12851
+931: SubwayA-exit-request	GetVarValueFloat	ServerDE	Implemented (bounded)	447
+931: SubwayA-exit-request	GetVarValueString	ServerDE	Implemented (bounded)	2
+931: SubwayA-exit-request	GetVelocity	ServerDE	Implemented (bounded)	604
+931: SubwayA-exit-request	GetWorldTime	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	HandleToObject	ServerDE	Implemented (bounded)	22600
+931: SubwayA-exit-request	InterpolateRotation	ServerDE	Implemented (bounded)	1138
+931: SubwayA-exit-request	IntersectSegment	ServerDE	Implemented (bounded)	310
+931: SubwayA-exit-request	IsKindOf	ServerDE	Implemented (bounded)	242
+931: SubwayA-exit-request	IsObjectAlive	ServerDE	Implemented (bounded)	48989
+931: SubwayA-exit-request	IsSoundDone	ServerDE	Implemented (bounded)	598
+931: SubwayA-exit-request	KillSound	ServerDE	Implemented (bounded)	1
+931: SubwayA-exit-request	MoveKeyframedObject	ServerDE	Implemented (bounded)	7727
+931: SubwayA-exit-request	MoveObject	ServerDE	Implemented (bounded)	12007
+931: SubwayA-exit-request	MoveObjectToGround	ServerDE	Implemented (bounded)	16
+931: SubwayA-exit-request	MoveWorldModel	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	ObjectToHandle	ServerDE	Implemented (bounded)	180
+931: SubwayA-exit-request	PingObjects	ServerDE	Implemented (bounded)	20
+931: SubwayA-exit-request	PlaceNonSolidModel	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PlayCharacterSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PlayCinematicSound	ServerDE	Implemented (bounded)	2
+931: SubwayA-exit-request	PlayClientSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PlayDetachedSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PlayLocalSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PlayObjectLoopSound	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PlaySoundAt	ServerDE	Implemented (bounded)	1
+931: SubwayA-exit-request	PlayWorldSound	ServerDE	Implemented (bounded)	4
+931: SubwayA-exit-request	PublishBloodSplat	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishBloodSpurt	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishCameraEffect	ServerDE	Implemented (bounded)	2
+931: SubwayA-exit-request	PublishClientBloodSplat	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishClientBloodSpurt	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishExplosionFlames	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishExplosionFragments	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishExplosionLights	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishExplosionModels	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishExplosionRings	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishExplosionSprites	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishFleshGibs	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishLaserBeam	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishLightEffect	ServerDE	Implemented (bounded)	12
+931: SubwayA-exit-request	PublishObjectParticles	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishParticleStream	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishPolyGrid	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishSparks	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	PublishWeaponSprites	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	QueryModelNodeTransform	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	RandomFloat	ServerDE	Implemented (bounded)	51
+931: SubwayA-exit-request	RandomInt	ServerDE	Implemented (bounded)	22
+931: SubwayA-exit-request	ReadDamage	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	ReadFromMessageDWord	ServerDE	Implemented (bounded)	13
+931: SubwayA-exit-request	ReadFromMessageHString	ServerDE	Implemented (bounded)	13
+931: SubwayA-exit-request	ReadKeyMessage	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	ReadPickupMessage	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	RecordBrushDestruction	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	RecordDebrisEffect	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	RecordExplosionEffect	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	RecordPickup	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	RecordProjectile	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	RecordSceneExplosion	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	RecordSpawn	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	RelinquishList	ServerDE	Implemented (bounded)	30
+931: SubwayA-exit-request	RemoveAttachment	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	RemoveCameraEffect	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	RemoveLightEffect	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	RemoveObject	ServerDE	Implemented (bounded)	13
+931: SubwayA-exit-request	RemoveObjectFromList	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	ReportSkyFailure	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	ResetModelAnimation	ServerDE	Implemented (bounded)	6
+931: SubwayA-exit-request	ResetRead	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	ResizeObject	ServerDE	Implemented (bounded)	619
+931: SubwayA-exit-request	RestoreObjects	ServerDE	Explicitly unsupported	0
+931: SubwayA-exit-request	RotateWorldModel	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	SaveObjects	ServerDE	Explicitly unsupported	0
+931: SubwayA-exit-request	ScaleObject	ServerDE	Implemented (bounded)	16
+931: SubwayA-exit-request	SendBossHealth	ServerDE	Implemented (bounded)	331
+931: SubwayA-exit-request	SendConversation	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	SendObjectives	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	SendToClient	ServerDE	Implemented (bounded)	343
+931: SubwayA-exit-request	SendWorldExit	ServerDE	Implemented (bounded)	1
+931: SubwayA-exit-request	SetAcceleration	ServerDE	Implemented (bounded)	1206
+931: SubwayA-exit-request	SetBlockingPriority	ServerDE	Implemented (bounded)	1320
+931: SubwayA-exit-request	SetClientUserData	ServerDE	Implemented (bounded)	2
+931: SubwayA-exit-request	SetDeactivationTime	ServerDE	Implemented (bounded)	16
+931: SubwayA-exit-request	SetGameConVar	ServerDE	Implemented (bounded)	32
+931: SubwayA-exit-request	SetGlobalForce	ServerDE	Implemented (bounded)	1
+931: SubwayA-exit-request	SetModelAnimation	ServerDE	Implemented (bounded)	31
+931: SubwayA-exit-request	SetModelFilenames	ServerDE	Implemented (bounded)	2
+931: SubwayA-exit-request	SetModelLooping	ServerDE	Implemented (bounded)	9
+931: SubwayA-exit-request	SetModelNodeHideStatus	ServerDE	Implemented (bounded)	38
+931: SubwayA-exit-request	SetNextUpdate	ServerDE	Implemented (bounded)	10378
+931: SubwayA-exit-request	SetObjectColor	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	SetObjectDims	ServerDE	Implemented (bounded)	59
+931: SubwayA-exit-request	SetObjectFlags	ServerDE	Implemented (bounded)	267
+931: SubwayA-exit-request	SetObjectRotation	ServerDE	Implemented (bounded)	8493
+931: SubwayA-exit-request	SetObjectState	ServerDE	Implemented (bounded)	17
+931: SubwayA-exit-request	SetObjectUserFlags	ServerDE	Implemented (bounded)	197
+931: SubwayA-exit-request	SetSkyDefinition	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	SetVelocity	ServerDE	Implemented (bounded)	1376
+931: SubwayA-exit-request	StartHMessageWrite	ServerDE	Implemented (bounded)	193
+931: SubwayA-exit-request	StartMessageToObject	ServerDE	Implemented (bounded)	193
+931: SubwayA-exit-request	TeleportObject	ServerDE	Implemented (bounded)	1
+931: SubwayA-exit-request	ValidateSpawnObject	ServerDE	Implemented (bounded)	9
+931: SubwayA-exit-request	WriteDamage	ServerDE	Implemented (bounded)	182
+931: SubwayA-exit-request	WriteKeyMessage	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	WritePickupMessage	ServerDE	Implemented (bounded)	0
+931: SubwayA-exit-request	WriteToMessageDWord	ServerDE	Implemented (bounded)	11
+931: SubwayA-exit-request	WriteToMessageHString	ServerDE	Implemented (bounded)	11
+931: SubwayA-exit-request	ConnectClient	Lifecycle	Implemented (bounded)	1
+931: SubwayA-exit-request	DisconnectClient	Lifecycle	Implemented (bounded)	0
+931: SubwayA-exit-request	MID_MODELSTRINGKEY	Callback	Implemented (bounded)	0
+931: Coverage SubwayA-exit-request: reached=100 unexercised=74 unavailable=0 ai_errors=0
+931: CityHub-restored	AddObjectToList	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	AddSkyObject	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	AlignRotation	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	BreakInterObjectLink	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	CastRay	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	CastWorldRay	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	CompareStringsUpper	ServerDE	Implemented (bounded)	5
+931: CityHub-restored	ConfigureCharacterBody	ServerDE	Implemented (bounded)	27
+931: CityHub-restored	ConfigureModelBody	ServerDE	Implemented (bounded)	122
+931: CityHub-restored	ConfigureWorldBody	ServerDE	Implemented (bounded)	13
+931: CityHub-restored	CopyString	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	CreateAttachment	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	CreateInterObjectLink	ServerDE	Implemented (bounded)	34
+931: CityHub-restored	CreateObject	ServerDE	Implemented (bounded)	37
+931: CityHub-restored	CreateObjectList	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	CreateObjectProps	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	CreateString	ServerDE	Implemented (bounded)	30
+931: CityHub-restored	EndHMessageRead	ServerDE	Explicitly unsupported	0
+931: CityHub-restored	EndHMessageWrite	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	EndMessage	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	FindAttachment	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	FindNamedObjects	ServerDE	Implemented (bounded)	2
+931: CityHub-restored	FreeString	ServerDE	Implemented (bounded)	3
+931: CityHub-restored	GetAcceleration	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetAnimIndex	ServerDE	Implemented (bounded)	3061
+931: CityHub-restored	GetAttachedModelNodeTransform	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetCameraView	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	GetClass	ServerDE	Implemented (bounded)	44
+931: CityHub-restored	GetClientResourceString	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetClientUserData	ServerDE	Implemented (bounded)	27
+931: CityHub-restored	GetContainers	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetFrameTime	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetGameConVar	ServerDE	Implemented (bounded)	895
+931: CityHub-restored	GetGlobalForce	ServerDE	Implemented (bounded)	2
+931: CityHub-restored	GetModelAnimUserDims	ServerDE	Implemented (bounded)	221
+931: CityHub-restored	GetModelAnimation	ServerDE	Implemented (bounded)	33
+931: CityHub-restored	GetModelAnimationName	ServerDE	Implemented (bounded)	41
+931: CityHub-restored	GetModelFilenames	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetModelLooping	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetModelNodeHideStatus	ServerDE	Implemented (bounded)	43
+931: CityHub-restored	GetModelNodeTransform	ServerDE	Implemented (bounded)	253
+931: CityHub-restored	GetModelPlaybackState	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetMovementState	ServerDE	Implemented (bounded)	31
+931: CityHub-restored	GetNextObject	ServerDE	Implemented (bounded)	487
+931: CityHub-restored	GetObjectClass	ServerDE	Implemented (bounded)	489
+931: CityHub-restored	GetObjectColor	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetObjectDims	ServerDE	Implemented (bounded)	9
+931: CityHub-restored	GetObjectFlags	ServerDE	Implemented (bounded)	677
+931: CityHub-restored	GetObjectName	ServerDE	Implemented (bounded)	129
+931: CityHub-restored	GetObjectPos	ServerDE	Implemented (bounded)	144
+931: CityHub-restored	GetObjectRotation	ServerDE	Implemented (bounded)	161
+931: CityHub-restored	GetObjectState	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetObjectUserFlags	ServerDE	Implemented (bounded)	212
+931: CityHub-restored	GetPathManager	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetPointContainerCode	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetPropBool	ServerDE	Implemented (bounded)	994
+931: CityHub-restored	GetPropGeneric	ServerDE	Implemented (bounded)	24038
+931: CityHub-restored	GetPropReal	ServerDE	Implemented (bounded)	2061
+931: CityHub-restored	GetPropString	ServerDE	Implemented (bounded)	150
+931: CityHub-restored	GetPropVector	ServerDE	Implemented (bounded)	136
+931: CityHub-restored	GetSoundDuration	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetStringData	ServerDE	Implemented (bounded)	3
+931: CityHub-restored	GetTime	ServerDE	Implemented (bounded)	37
+931: CityHub-restored	GetVarValueFloat	ServerDE	Implemented (bounded)	893
+931: CityHub-restored	GetVarValueString	ServerDE	Implemented (bounded)	2
+931: CityHub-restored	GetVelocity	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	GetWorldTime	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	HandleToObject	ServerDE	Implemented (bounded)	86
+931: CityHub-restored	InterpolateRotation	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	IntersectSegment	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	IsKindOf	ServerDE	Implemented (bounded)	492
+931: CityHub-restored	IsObjectAlive	ServerDE	Implemented (bounded)	454
+931: CityHub-restored	IsSoundDone	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	KillSound	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	MoveKeyframedObject	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	MoveObject	ServerDE	Implemented (bounded)	125
+931: CityHub-restored	MoveObjectToGround	ServerDE	Implemented (bounded)	143
+931: CityHub-restored	MoveWorldModel	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	ObjectToHandle	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PingObjects	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PlaceNonSolidModel	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PlayCharacterSound	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PlayCinematicSound	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PlayClientSound	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PlayDetachedSound	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PlayLocalSound	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PlayObjectLoopSound	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PlaySoundAt	ServerDE	Implemented (bounded)	4
+931: CityHub-restored	PlayWorldSound	ServerDE	Implemented (bounded)	31
+931: CityHub-restored	PublishBloodSplat	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishBloodSpurt	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishCameraEffect	ServerDE	Implemented (bounded)	2
+931: CityHub-restored	PublishClientBloodSplat	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishClientBloodSpurt	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishExplosionFlames	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishExplosionFragments	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishExplosionLights	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishExplosionModels	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishExplosionRings	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishExplosionSprites	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishFleshGibs	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishLaserBeam	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishLightEffect	ServerDE	Implemented (bounded)	4
+931: CityHub-restored	PublishObjectParticles	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishParticleStream	ServerDE	Implemented (bounded)	8
+931: CityHub-restored	PublishPolyGrid	ServerDE	Implemented (bounded)	2
+931: CityHub-restored	PublishSparks	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	PublishWeaponSprites	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	QueryModelNodeTransform	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	RandomFloat	ServerDE	Implemented (bounded)	59
+931: CityHub-restored	RandomInt	ServerDE	Implemented (bounded)	26
+931: CityHub-restored	ReadDamage	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	ReadFromMessageDWord	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	ReadFromMessageHString	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	ReadKeyMessage	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	ReadPickupMessage	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	RecordBrushDestruction	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	RecordDebrisEffect	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	RecordExplosionEffect	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	RecordPickup	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	RecordProjectile	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	RecordSceneExplosion	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	RecordSpawn	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	RelinquishList	ServerDE	Implemented (bounded)	2
+931: CityHub-restored	RemoveAttachment	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	RemoveCameraEffect	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	RemoveLightEffect	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	RemoveObject	ServerDE	Implemented (bounded)	32
+931: CityHub-restored	RemoveObjectFromList	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	ReportSkyFailure	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	ResetModelAnimation	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	ResetRead	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	ResizeObject	ServerDE	Implemented (bounded)	28
+931: CityHub-restored	RestoreObjects	ServerDE	Explicitly unsupported	0
+931: CityHub-restored	RotateWorldModel	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	SaveObjects	ServerDE	Explicitly unsupported	0
+931: CityHub-restored	ScaleObject	ServerDE	Implemented (bounded)	149
+931: CityHub-restored	SendBossHealth	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	SendConversation	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	SendObjectives	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	SendToClient	ServerDE	Implemented (bounded)	7
+931: CityHub-restored	SendWorldExit	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	SetAcceleration	ServerDE	Implemented (bounded)	2
+931: CityHub-restored	SetBlockingPriority	ServerDE	Implemented (bounded)	223
+931: CityHub-restored	SetClientUserData	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	SetDeactivationTime	ServerDE	Implemented (bounded)	122
+931: CityHub-restored	SetGameConVar	ServerDE	Implemented (bounded)	32
+931: CityHub-restored	SetGlobalForce	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	SetModelAnimation	ServerDE	Implemented (bounded)	28
+931: CityHub-restored	SetModelFilenames	ServerDE	Implemented (bounded)	2
+931: CityHub-restored	SetModelLooping	ServerDE	Implemented (bounded)	0
+45: Cycle 0 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=490 error=
+45: Cycle 0 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+45: Cycle 0 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+45: Cycle 1 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=490 error=
+45: Cycle 1 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+45: Cycle 1 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+45: Cycle 2 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=490 error=
+45: Cycle 2 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+45: Cycle 2 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+45: PASS destination_trial_private
+ 2/41 Test  #45: world.destination_trial_private ...   Passed    0.80 sec
+test 27
+      Start  27: world.surface_effects
+
+27: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "surface_effects" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/surface_effects"
+27: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+27: Test timeout computed to be: 20
+44: Malformed destination refusal 0: DAT v56: invalid/unsupported typed property near byte 442114
+44: CityHub transfer 0: 
+44: SubwayA transfer 0: 
+44: Malformed destination refusal 1: DAT v56: invalid/unsupported typed property near byte 442114
+44: CityHub transfer 1: 
+44: SubwayA transfer 1: 
+44: Malformed destination refusal 2: DAT v56: invalid/unsupported typed property near byte 442114
+44: CityHub transfer 2: 
+44: SubwayA transfer 2: 
+44: PASS level_change_private
+ 3/41 Test  #44: world.level_change_private ........   Passed    0.88 sec
+test 46
+      Start  46: world.destination_private
+
+46: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "destination_private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+46: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+46: Test timeout computed to be: 60
+27: PASS surface_effects
+ 4/41 Test  #27: world.surface_effects .............   Passed    0.03 sec
+test 28
+      Start  28: world.destination_trials
+
+28: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "destination_trials" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/destination_trials"
+28: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+28: Test timeout computed to be: 20
+28: trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+28: trial4: loaded=1 entered=1 cleanup=1 failed=1 error=
+28: trial2: loaded=1 entered=0 cleanup=1 failed=0 error=No single-player GameStartPoint
+28: trial3: loaded=1 entered=0 cleanup=1 failed=0 error=Start point has no supported ground collision
+28: broken: loaded=0 entered=0 cleanup=1 failed=0 error=DAT v56: invalid/unsupported section offsets near byte 4
+28: missing: loaded=0 entered=0 cleanup=1 failed=0 error=Resource not found: worlds/missing.dat
+28: trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+28: PASS destination_trials
+ 5/41 Test  #28: world.destination_trials ..........   Passed    0.01 sec
+test 588
+      Start 588: player_restore.private
+
+588: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/player_restore_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+588: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+588: Test timeout computed to be: 120
+588: cycle=0 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+588: cycle=1 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+588: cycle=2 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+ 6/41 Test #588: player_restore.private ............   Passed    0.26 sec
+test 26
+      Start  26: world.level_change
+
+26: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "level_change" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/level_change"
+26: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+26: Test timeout computed to be: 20
+26: trial1: Destination world texture t.dtx: Missing exact-path resource
+26: trial2: No single-player GameStartPoint
+26: trial3: Start point has no supported ground collision
+26: trial4: Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+26: trial5: Destination initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+26: trial6: Destination start trigger requested another level during entry
+26: broken: DAT v56: invalid/unsupported section offsets near byte 4
+26: missing: Resource not found: worlds/missing.dat
+26: Commit 0: 
+26: Commit 1: 
+26: Commit 2: 
+26: PASS level_change
+ 7/41 Test  #26: world.level_change ................   Passed    0.02 sec
+test 31
+      Start  31: world.destination_lifetime
+
+31: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "destination_lifetime" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/destination_lifetime"
+31: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+31: Test timeout computed to be: 20
+31: PASS destination_lifetime
+ 8/41 Test  #31: world.destination_lifetime ........   Passed    0.01 sec
+test 40
+      Start  40: world.mutations
+
+40: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "mutations" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/mutations"
+40: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+40: Test timeout computed to be: 20
+40: PASS mutations
+ 9/41 Test  #40: world.mutations ...................   Passed    0.01 sec
+test 32
+      Start  32: world.sprite_entries
+
+32: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "sprite_entries" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/sprite_entries"
+32: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+32: Test timeout computed to be: 20
+32: PASS sprite_entries
+10/41 Test  #32: world.sprite_entries ..............   Passed    0.00 sec
+test 33
+      Start  33: world.sound_entries
+
+33: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "sound_entries" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/sound_entries"
+33: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+33: Test timeout computed to be: 20
+33: PASS sound_entries
+11/41 Test  #33: world.sound_entries ...............   Passed    0.00 sec
+test 30
+      Start  30: world.destination_schema
+
+30: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "destination_schema" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/destination_schema"
+30: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+30: Test timeout computed to be: 20
+30: PASS destination_schema
+12/41 Test  #30: world.destination_schema ..........   Passed    0.00 sec
+test 29
+      Start  29: world.destination_messages
+
+29: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "destination_messages" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/destination_messages"
+29: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+29: Test timeout computed to be: 20
+29: PASS destination_messages
+13/41 Test  #29: world.destination_messages ........   Passed    0.00 sec
+test 41
+      Start  41: world.session_lifecycle
+
+41: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "session_lifecycle" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/session_lifecycle"
+41: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+41: Test timeout computed to be: 20
+41: PASS session_lifecycle
+14/41 Test  #41: world.session_lifecycle ...........   Passed    0.00 sec
+test 36
+      Start  36: world.resource_mount
+
+36: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "resource_mount" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/resource_mount"
+36: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+36: Test timeout computed to be: 20
+36: PASS resource_mount
+15/41 Test  #36: world.resource_mount ..............   Passed    0.00 sec
+test 43
+      Start  43: world.original_trigger
+
+43: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "original_trigger" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/original_trigger"
+43: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+43: Test timeout computed to be: 20
+43: PASS original_trigger
+16/41 Test  #43: world.original_trigger ............   Passed    0.00 sec
+test 39
+      Start  39: world.world_rejection
+
+39: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "world_rejection" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/world_rejection"
+39: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+39: Test timeout computed to be: 20
+39: PASS world_rejection
+17/41 Test  #39: world.world_rejection .............   Passed    0.00 sec
+test 38
+      Start  38: world.world_geometry
+
+38: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "world_geometry" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/world_geometry"
+38: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+38: Test timeout computed to be: 20
+38: PASS world_geometry
+18/41 Test  #38: world.world_geometry ..............   Passed    0.00 sec
+test 37
+      Start  37: world.world_properties
+
+37: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "world_properties" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/world_properties"
+37: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+37: Test timeout computed to be: 20
+37: PASS world_properties
+19/41 Test  #37: world.world_properties ............   Passed    0.00 sec
+test 35
+      Start  35: world.rez_rejection
+
+35: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "rez_rejection" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/rez_rejection"
+35: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+35: Test timeout computed to be: 20
+35: PASS rez_rejection
+20/41 Test  #35: world.rez_rejection ...............   Passed    0.00 sec
+test 42
+      Start  42: world.session_messages
+
+42: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "session_messages" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/session_messages"
+42: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+42: Test timeout computed to be: 20
+42: PASS session_messages
+21/41 Test  #42: world.session_messages ............   Passed    0.00 sec
+test 34
+      Start  34: world.rez_structure
+
+34: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "rez_structure" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/rez_structure"
+34: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+34: Test timeout computed to be: 20
+34: PASS rez_structure
+22/41 Test  #34: world.rez_structure ...............   Passed    0.00 sec
+test 47
+      Start  47: world.private
+
+47: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/world_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+47: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+47: Test timeout computed to be: 30
+46: Cycle 0: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+46: Cycle 0: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+46: Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+46: Cycle 1: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+46: Cycle 1: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+46: Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+46: Cycle 2: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+46: Cycle 2: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+46: Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+46: PASS destination_private
+23/41 Test  #46: world.destination_private .........   Passed    0.39 sec
+test 930
+      Start 930: coverage.observations
+
+930: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/service_coverage_tests "observations"
+930: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+930: Test timeout computed to be: 20
+24/41 Test #930: coverage.observations .............   Passed    0.00 sec
+test 585
+      Start 585: player_restore.roundtrip
+
+585: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/player_restore_tests "roundtrip" "/home/yann/projects/lithtech/Blood2/build/release/tests/player-restore-fixtures/roundtrip"
+585: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+585: Test timeout computed to be: 30
+25/41 Test #585: player_restore.roundtrip ..........   Passed    0.00 sec
+test 586
+      Start 586: player_restore.failures
+
+586: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/player_restore_tests "failures" "/home/yann/projects/lithtech/Blood2/build/release/tests/player-restore-fixtures/failures"
+586: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+586: Test timeout computed to be: 30
+26/41 Test #586: player_restore.failures ...........   Passed    0.01 sec
+test 587
+      Start 587: player_restore.lifetime
+
+587: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/player_restore_tests "lifetime" "/home/yann/projects/lithtech/Blood2/build/release/tests/player-restore-fixtures/lifetime"
+587: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+587: Test timeout computed to be: 30
+27/41 Test #587: player_restore.lifetime ...........   Passed    0.01 sec
+test 1
+      Start   1: objects.builtin_model
+
+1: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/object_contract_tests "builtin_model"
+1: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1: Test timeout computed to be: 10
+1: PASS builtin_model
+28/41 Test   #1: objects.builtin_model .............   Passed    0.00 sec
+test 11
+      Start  11: objects.unsupported_teardown
+
+11: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/object_contract_tests "unsupported_teardown"
+11: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+11: Test timeout computed to be: 10
+11: PASS unsupported_teardown
+29/41 Test  #11: objects.unsupported_teardown ......   Passed    0.00 sec
+test 12
+      Start  12: objects.creation_failures
+
+12: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/object_contract_tests "creation_failures"
+12: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+12: Test timeout computed to be: 10
+12: PASS creation_failures
+30/41 Test  #12: objects.creation_failures .........   Passed    0.00 sec
+test 10
+      Start  10: objects.messages_strings
+
+10: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/object_contract_tests "messages_strings"
+10: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+10: Test timeout computed to be: 10
+10: PASS messages_strings
+31/41 Test  #10: objects.messages_strings ..........   Passed    0.00 sec
+test 2
+      Start   2: objects.original_objects
+
+2: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/object_contract_tests "original_objects"
+2: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+2: Test timeout computed to be: 10
+2: PASS original_objects
+32/41 Test   #2: objects.original_objects ..........   Passed    0.00 sec
+test 4
+      Start   4: objects.reasons_properties
+
+4: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/object_contract_tests "reasons_properties"
+4: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+4: Test timeout computed to be: 10
+4: PASS reasons_properties
+33/41 Test   #4: objects.reasons_properties ........   Passed    0.00 sec
+test 7
+      Start   7: objects.aggregate_dispatch
+
+7: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/object_contract_tests "aggregate_dispatch"
+7: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+7: Test timeout computed to be: 10
+7: PASS aggregate_dispatch
+34/41 Test   #7: objects.aggregate_dispatch ........   Passed    0.00 sec
+test 8
+      Start   8: objects.handles_selection
+
+8: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/object_contract_tests "handles_selection"
+8: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+8: Test timeout computed to be: 10
+8: PASS handles_selection
+35/41 Test   #8: objects.handles_selection .........   Passed    0.00 sec
+test 5
+      Start   5: objects.scheduling
+
+5: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/object_contract_tests "scheduling"
+5: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+5: Test timeout computed to be: 10
+5: PASS scheduling
+36/41 Test   #5: objects.scheduling ................   Passed    0.00 sec
+test 3
+      Start   3: objects.nested_creation
+
+3: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/object_contract_tests "nested_creation"
+3: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+3: Test timeout computed to be: 10
+3: PASS nested_creation
+37/41 Test   #3: objects.nested_creation ...........   Passed    0.00 sec
+test 9
+      Start   9: objects.links_lists
+
+9: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/object_contract_tests "links_lists"
+9: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+9: Test timeout computed to be: 10
+9: PASS links_lists
+38/41 Test   #9: objects.links_lists ...............   Passed    0.00 sec
+test 6
+      Start   6: objects.deferred_removal
+
+6: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/object_contract_tests "deferred_removal"
+6: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+6: Test timeout computed to be: 10
+6: PASS deferred_removal
+39/41 Test   #6: objects.deferred_removal ..........   Passed    0.00 sec
+47: No-player suspended=0 dims calls=57
+47: Service ConfigureCharacterBody: 16
+47: Service CreateAttachment: 10
+47: Service CreateInterObjectLink: 39
+47: Service CreateObject: 33
+47: Service CreateString: 5
+47: Service FindNamedObjects: 17
+47: Service FreeString: 2
+47: Service GetAnimIndex: 2419
+47: Service GetClass: 44
+47: Service GetClientUserData: 1
+47: Service GetContainers: 58
+47: Service GetGameConVar: 449
+47: Service GetModelAnimUserDims: 47
+47: Service GetModelAnimation: 21
+47: Service GetModelAnimationName: 32
+47: Service GetModelNodeTransform: 242
+47: Service GetMovementState: 31
+47: Service GetNextObject: 227
+47: Service GetObjectClass: 236
+47: Service GetObjectDims: 7
+47: Service GetObjectFlags: 344
+47: Service GetObjectName: 37
+47: Service GetObjectPos: 188
+47: Service GetObjectRotation: 88
+47: Service GetObjectUserFlags: 61
+47: Service GetPropBool: 764
+47: Service GetPropGeneric: 10699
+47: Service GetPropReal: 764
+47: Service GetPropString: 72
+47: Service GetPropVector: 64
+47: Service GetStringData: 36
+47: Service GetTime: 74
+47: Service GetVarValueFloat: 447
+47: Service GetVarValueString: 2
+47: Service GetVelocity: 1
+47: Service HandleToObject: 63
+47: Service IntersectSegment: 2
+47: Service IsKindOf: 236
+47: Service IsObjectAlive: 506
+47: Service MoveObject: 19
+47: Service MoveObjectToGround: 15
+47: Service ObjectToHandle: 60
+47: Service PlayWorldSound: 4
+47: Service PublishCameraEffect: 2
+47: Service PublishLightEffect: 12
+47: Service RandomFloat: 46
+47: Service RandomInt: 20
+47: Service RelinquishList: 17
+47: Service RemoveObject: 13
+47: Service ResetModelAnimation: 5
+47: Service ResizeObject: 16
+47: Service ScaleObject: 16
+47: Service SendBossHealth: 1
+47: Service SetBlockingPriority: 119
+47: Service SetDeactivationTime: 16
+47: Service SetGameConVar: 31
+47: Service SetGlobalForce: 1
+47: Service SetModelAnimation: 26
+47: Service SetModelLooping: 5
+47: Service SetNextUpdate: 270
+47: Service SetObjectDims: 57
+47: Service SetObjectFlags: 253
+47: Service SetObjectState: 17
+47: Service SetObjectUserFlags: 193
+47: Service SetVelocity: 1
+47: Service ValidateSpawnObject: 9
+47: Missing Sounds\Thunder.wav
+47: Resource references: 77; missing: 1
+47: RunWorld acceptance gate not passed: 0 uninstantiated required objects. Inspect Services for bounded implementation/trace coverage; remaining required paths must pass M2 acceptance.
+47: PASS private
+40/41 Test  #47: world.private .....................   Passed    0.16 sec
+931: CityHub-restored	SetModelNodeHideStatus	ServerDE	Implemented (bounded)	19
+931: CityHub-restored	SetNextUpdate	ServerDE	Implemented (bounded)	324
+931: CityHub-restored	SetObjectColor	ServerDE	Implemented (bounded)	122
+931: CityHub-restored	SetObjectDims	ServerDE	Implemented (bounded)	259
+931: CityHub-restored	SetObjectFlags	ServerDE	Implemented (bounded)	527
+931: CityHub-restored	SetObjectRotation	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	SetObjectState	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	SetObjectUserFlags	ServerDE	Implemented (bounded)	358
+931: CityHub-restored	SetSkyDefinition	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	SetVelocity	ServerDE	Implemented (bounded)	3
+931: CityHub-restored	StartHMessageWrite	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	StartMessageToObject	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	TeleportObject	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	ValidateSpawnObject	ServerDE	Implemented (bounded)	21
+931: CityHub-restored	WriteDamage	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	WriteKeyMessage	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	WritePickupMessage	ServerDE	Implemented (bounded)	0
+931: CityHub-restored	WriteToMessageDWord	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	WriteToMessageHString	ServerDE	Implemented (bounded)	1
+931: CityHub-restored	ConnectClient	Lifecycle	Implemented (bounded)	1
+931: CityHub-restored	DisconnectClient	Lifecycle	Implemented (bounded)	0
+931: CityHub-restored	MID_MODELSTRINGKEY	Callback	Implemented (bounded)	0
+931: Coverage CityHub-restored: reached=85 unexercised=89 unavailable=0 ai_errors=0
+931: CityHub-10s	AddObjectToList	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	AddSkyObject	ServerDE	Implemented (bounded)	5
+931: CityHub-10s	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	AlignRotation	ServerDE	Implemented (bounded)	1201
+931: CityHub-10s	BreakInterObjectLink	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	CastRay	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	CastWorldRay	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	CompareStringsUpper	ServerDE	Implemented (bounded)	5
+931: CityHub-10s	ConfigureCharacterBody	ServerDE	Implemented (bounded)	27
+931: CityHub-10s	ConfigureModelBody	ServerDE	Implemented (bounded)	122
+931: CityHub-10s	ConfigureWorldBody	ServerDE	Implemented (bounded)	13
+931: CityHub-10s	CopyString	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	CreateAttachment	ServerDE	Implemented (bounded)	18
+931: CityHub-10s	CreateInterObjectLink	ServerDE	Implemented (bounded)	36
+931: CityHub-10s	CreateObject	ServerDE	Implemented (bounded)	55
+931: CityHub-10s	CreateObjectList	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	CreateObjectProps	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	CreateString	ServerDE	Implemented (bounded)	32
+931: CityHub-10s	EndHMessageRead	ServerDE	Explicitly unsupported	0
+931: CityHub-10s	EndHMessageWrite	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	EndMessage	ServerDE	Implemented (bounded)	2402
+931: CityHub-10s	FindAttachment	ServerDE	Implemented (bounded)	600
+931: CityHub-10s	FindNamedObjects	ServerDE	Implemented (bounded)	27
+931: CityHub-10s	FreeString	ServerDE	Implemented (bounded)	26
+931: CityHub-10s	GetAcceleration	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	GetAnimIndex	ServerDE	Implemented (bounded)	3079
+931: CityHub-10s	GetAttachedModelNodeTransform	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	GetCameraView	ServerDE	Implemented (bounded)	1201
+931: CityHub-10s	GetClass	ServerDE	Implemented (bounded)	32359
+931: CityHub-10s	GetClientResourceString	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	GetClientUserData	ServerDE	Implemented (bounded)	13231
+931: CityHub-10s	GetContainers	ServerDE	Implemented (bounded)	131110
+931: CityHub-10s	GetFrameTime	ServerDE	Implemented (bounded)	190
+931: CityHub-10s	GetGameConVar	ServerDE	Implemented (bounded)	895
+931: CityHub-10s	GetGlobalForce	ServerDE	Implemented (bounded)	2
+931: CityHub-10s	GetModelAnimUserDims	ServerDE	Implemented (bounded)	824
+931: CityHub-10s	GetModelAnimation	ServerDE	Implemented (bounded)	250
+931: CityHub-10s	GetModelAnimationName	ServerDE	Implemented (bounded)	1141
+931: CityHub-10s	GetModelFilenames	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	GetModelLooping	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	GetModelNodeHideStatus	ServerDE	Implemented (bounded)	43
+931: CityHub-10s	GetModelNodeTransform	ServerDE	Implemented (bounded)	310
+931: CityHub-10s	GetModelPlaybackState	ServerDE	Implemented (bounded)	1089
+931: CityHub-10s	GetMovementState	ServerDE	Implemented (bounded)	30946
+931: CityHub-10s	GetNextObject	ServerDE	Implemented (bounded)	487
+931: CityHub-10s	GetObjectClass	ServerDE	Implemented (bounded)	12446
+931: CityHub-10s	GetObjectColor	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	GetObjectDims	ServerDE	Implemented (bounded)	9
+931: CityHub-10s	GetObjectFlags	ServerDE	Implemented (bounded)	3099
+931: CityHub-10s	GetObjectName	ServerDE	Implemented (bounded)	143
+931: CityHub-10s	GetObjectPos	ServerDE	Implemented (bounded)	10992
+931: CityHub-10s	GetObjectRotation	ServerDE	Implemented (bounded)	5717
+931: CityHub-10s	GetObjectState	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	GetObjectUserFlags	ServerDE	Implemented (bounded)	7412
+931: CityHub-10s	GetPathManager	ServerDE	Implemented (bounded)	481
+931: CityHub-10s	GetPointContainerCode	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	GetPropBool	ServerDE	Implemented (bounded)	994
+931: CityHub-10s	GetPropGeneric	ServerDE	Implemented (bounded)	24038
+931: CityHub-10s	GetPropReal	ServerDE	Implemented (bounded)	2061
+931: CityHub-10s	GetPropString	ServerDE	Implemented (bounded)	150
+931: CityHub-10s	GetPropVector	ServerDE	Implemented (bounded)	136
+931: CityHub-10s	GetSoundDuration	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	GetStringData	ServerDE	Implemented (bounded)	64
+931: CityHub-10s	GetTime	ServerDE	Implemented (bounded)	4901
+931: CityHub-10s	GetVarValueFloat	ServerDE	Implemented (bounded)	893
+931: CityHub-10s	GetVarValueString	ServerDE	Implemented (bounded)	2
+931: CityHub-10s	GetVelocity	ServerDE	Implemented (bounded)	601
+931: CityHub-10s	GetWorldTime	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	HandleToObject	ServerDE	Implemented (bounded)	17595
+931: CityHub-10s	InterpolateRotation	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	IntersectSegment	ServerDE	Implemented (bounded)	2963
+931: CityHub-10s	IsKindOf	ServerDE	Implemented (bounded)	32789
+931: CityHub-10s	IsObjectAlive	ServerDE	Implemented (bounded)	39867
+931: CityHub-10s	IsSoundDone	ServerDE	Implemented (bounded)	277
+931: CityHub-10s	KillSound	ServerDE	Implemented (bounded)	2
+931: CityHub-10s	MoveKeyframedObject	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	MoveObject	ServerDE	Implemented (bounded)	48357
+931: CityHub-10s	MoveObjectToGround	ServerDE	Implemented (bounded)	143
+931: CityHub-10s	MoveWorldModel	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	ObjectToHandle	ServerDE	Implemented (bounded)	60
+931: CityHub-10s	PingObjects	ServerDE	Implemented (bounded)	20
+931: CityHub-10s	PlaceNonSolidModel	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PlayCharacterSound	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PlayCinematicSound	ServerDE	Implemented (bounded)	2
+931: CityHub-10s	PlayClientSound	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PlayDetachedSound	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PlayLocalSound	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PlayObjectLoopSound	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PlaySoundAt	ServerDE	Implemented (bounded)	4
+931: CityHub-10s	PlayWorldSound	ServerDE	Implemented (bounded)	31
+931: CityHub-10s	PublishBloodSplat	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishBloodSpurt	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishCameraEffect	ServerDE	Implemented (bounded)	2
+931: CityHub-10s	PublishClientBloodSplat	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishClientBloodSpurt	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishExplosionFlames	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishExplosionFragments	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishExplosionLights	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishExplosionModels	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishExplosionRings	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishExplosionSprites	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishFleshGibs	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishLaserBeam	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishLightEffect	ServerDE	Implemented (bounded)	4
+931: CityHub-10s	PublishObjectParticles	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishParticleStream	ServerDE	Implemented (bounded)	8
+931: CityHub-10s	PublishPolyGrid	ServerDE	Implemented (bounded)	2
+931: CityHub-10s	PublishSparks	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	PublishWeaponSprites	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	QueryModelNodeTransform	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	RandomFloat	ServerDE	Implemented (bounded)	59
+931: CityHub-10s	RandomInt	ServerDE	Implemented (bounded)	35
+931: CityHub-10s	ReadDamage	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	ReadFromMessageDWord	ServerDE	Implemented (bounded)	3
+931: CityHub-10s	ReadFromMessageHString	ServerDE	Implemented (bounded)	3
+931: CityHub-10s	ReadKeyMessage	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	ReadPickupMessage	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	RecordBrushDestruction	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	RecordDebrisEffect	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	RecordExplosionEffect	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	RecordPickup	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	RecordProjectile	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	RecordSceneExplosion	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	RecordSpawn	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	RelinquishList	ServerDE	Implemented (bounded)	27
+931: CityHub-10s	RemoveAttachment	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	RemoveCameraEffect	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	RemoveLightEffect	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	RemoveObject	ServerDE	Implemented (bounded)	51
+931: CityHub-10s	RemoveObjectFromList	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	ReportSkyFailure	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	ResetModelAnimation	ServerDE	Implemented (bounded)	9
+931: CityHub-10s	ResetRead	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	ResizeObject	ServerDE	Implemented (bounded)	631
+931: CityHub-10s	RestoreObjects	ServerDE	Explicitly unsupported	0
+931: CityHub-10s	RotateWorldModel	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	SaveObjects	ServerDE	Explicitly unsupported	0
+931: CityHub-10s	ScaleObject	ServerDE	Implemented (bounded)	149
+931: CityHub-10s	SendBossHealth	ServerDE	Implemented (bounded)	1
+931: CityHub-10s	SendConversation	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	SendObjectives	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	SendToClient	ServerDE	Implemented (bounded)	8
+931: CityHub-10s	SendWorldExit	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	SetAcceleration	ServerDE	Implemented (bounded)	1202
+931: CityHub-10s	SetBlockingPriority	ServerDE	Implemented (bounded)	1423
+931: CityHub-10s	SetClientUserData	ServerDE	Implemented (bounded)	1
+931: CityHub-10s	SetDeactivationTime	ServerDE	Implemented (bounded)	149
+931: CityHub-10s	SetGameConVar	ServerDE	Implemented (bounded)	32
+931: CityHub-10s	SetGlobalForce	ServerDE	Implemented (bounded)	1
+931: CityHub-10s	SetModelAnimation	ServerDE	Implemented (bounded)	49
+931: CityHub-10s	SetModelFilenames	ServerDE	Implemented (bounded)	2
+931: CityHub-10s	SetModelLooping	ServerDE	Implemented (bounded)	12
+931: CityHub-10s	SetModelNodeHideStatus	ServerDE	Implemented (bounded)	19
+931: CityHub-10s	SetNextUpdate	ServerDE	Implemented (bounded)	10054
+931: CityHub-10s	SetObjectColor	ServerDE	Implemented (bounded)	122
+931: CityHub-10s	SetObjectDims	ServerDE	Implemented (bounded)	276
+931: CityHub-10s	SetObjectFlags	ServerDE	Implemented (bounded)	549
+931: CityHub-10s	SetObjectRotation	ServerDE	Implemented (bounded)	791
+931: CityHub-10s	SetObjectState	ServerDE	Implemented (bounded)	28
+931: CityHub-10s	SetObjectUserFlags	ServerDE	Implemented (bounded)	358
+931: CityHub-10s	SetSkyDefinition	ServerDE	Implemented (bounded)	1
+931: CityHub-10s	SetVelocity	ServerDE	Implemented (bounded)	1392
+931: CityHub-10s	StartHMessageWrite	ServerDE	Implemented (bounded)	2402
+931: CityHub-10s	StartMessageToObject	ServerDE	Implemented (bounded)	2402
+931: CityHub-10s	TeleportObject	ServerDE	Implemented (bounded)	1
+931: CityHub-10s	ValidateSpawnObject	ServerDE	Implemented (bounded)	21
+931: CityHub-10s	WriteDamage	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	WriteKeyMessage	ServerDE	Implemented (bounded)	0
+931: CityHub-10s	WritePickupMessage	ServerDE	Implemented (bounded)	2400
+931: CityHub-10s	WriteToMessageDWord	ServerDE	Implemented (bounded)	2
+931: CityHub-10s	WriteToMessageHString	ServerDE	Implemented (bounded)	2
+931: CityHub-10s	ConnectClient	Lifecycle	Implemented (bounded)	1
+931: CityHub-10s	DisconnectClient	Lifecycle	Implemented (bounded)	0
+931: CityHub-10s	MID_MODELSTRINGKEY	Callback	Implemented (bounded)	2
+931: Coverage CityHub-10s: reached=104 unexercised=70 unavailable=0 ai_errors=0
+931: CityHub-teardown	AddObjectToList	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	AddSkyObject	ServerDE	Implemented (bounded)	5
+931: CityHub-teardown	AdvanceModelProjectile	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	AlignRotation	ServerDE	Implemented (bounded)	1201
+931: CityHub-teardown	BreakInterObjectLink	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	CastRay	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	CastWorldRay	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	CompareStringsUpper	ServerDE	Implemented (bounded)	5
+931: CityHub-teardown	ConfigureCharacterBody	ServerDE	Implemented (bounded)	27
+931: CityHub-teardown	ConfigureModelBody	ServerDE	Implemented (bounded)	122
+931: CityHub-teardown	ConfigureWorldBody	ServerDE	Implemented (bounded)	13
+931: CityHub-teardown	CopyString	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	CreateAttachment	ServerDE	Implemented (bounded)	18
+931: CityHub-teardown	CreateInterObjectLink	ServerDE	Implemented (bounded)	36
+931: CityHub-teardown	CreateObject	ServerDE	Implemented (bounded)	55
+931: CityHub-teardown	CreateObjectList	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	CreateObjectProps	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	CreateString	ServerDE	Implemented (bounded)	32
+931: CityHub-teardown	EndHMessageRead	ServerDE	Explicitly unsupported	0
+931: CityHub-teardown	EndHMessageWrite	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	EndMessage	ServerDE	Implemented (bounded)	2402
+931: CityHub-teardown	FindAttachment	ServerDE	Implemented (bounded)	600
+931: CityHub-teardown	FindNamedObjects	ServerDE	Implemented (bounded)	27
+931: CityHub-teardown	FreeString	ServerDE	Implemented (bounded)	35
+931: CityHub-teardown	GetAcceleration	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	GetAnimIndex	ServerDE	Implemented (bounded)	3079
+931: CityHub-teardown	GetAttachedModelNodeTransform	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	GetCameraView	ServerDE	Implemented (bounded)	1201
+931: CityHub-teardown	GetClass	ServerDE	Implemented (bounded)	32359
+931: CityHub-teardown	GetClientResourceString	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	GetClientUserData	ServerDE	Implemented (bounded)	13233
+931: CityHub-teardown	GetContainers	ServerDE	Implemented (bounded)	131110
+931: CityHub-teardown	GetFrameTime	ServerDE	Implemented (bounded)	190
+931: CityHub-teardown	GetGameConVar	ServerDE	Implemented (bounded)	895
+931: CityHub-teardown	GetGlobalForce	ServerDE	Implemented (bounded)	2
+931: CityHub-teardown	GetModelAnimUserDims	ServerDE	Implemented (bounded)	824
+931: CityHub-teardown	GetModelAnimation	ServerDE	Implemented (bounded)	250
+931: CityHub-teardown	GetModelAnimationName	ServerDE	Implemented (bounded)	1141
+931: CityHub-teardown	GetModelFilenames	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	GetModelLooping	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	GetModelNodeHideStatus	ServerDE	Implemented (bounded)	43
+931: CityHub-teardown	GetModelNodeTransform	ServerDE	Implemented (bounded)	310
+931: CityHub-teardown	GetModelPlaybackState	ServerDE	Implemented (bounded)	1089
+931: CityHub-teardown	GetMovementState	ServerDE	Implemented (bounded)	30946
+931: CityHub-teardown	GetNextObject	ServerDE	Implemented (bounded)	487
+931: CityHub-teardown	GetObjectClass	ServerDE	Implemented (bounded)	12446
+931: CityHub-teardown	GetObjectColor	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	GetObjectDims	ServerDE	Implemented (bounded)	9
+931: CityHub-teardown	GetObjectFlags	ServerDE	Implemented (bounded)	3099
+931: CityHub-teardown	GetObjectName	ServerDE	Implemented (bounded)	143
+931: CityHub-teardown	GetObjectPos	ServerDE	Implemented (bounded)	10992
+931: CityHub-teardown	GetObjectRotation	ServerDE	Implemented (bounded)	5717
+931: CityHub-teardown	GetObjectState	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	GetObjectUserFlags	ServerDE	Implemented (bounded)	7414
+931: CityHub-teardown	GetPathManager	ServerDE	Implemented (bounded)	481
+931: CityHub-teardown	GetPointContainerCode	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	GetPropBool	ServerDE	Implemented (bounded)	994
+931: CityHub-teardown	GetPropGeneric	ServerDE	Implemented (bounded)	24038
+931: CityHub-teardown	GetPropReal	ServerDE	Implemented (bounded)	2061
+931: CityHub-teardown	GetPropString	ServerDE	Implemented (bounded)	150
+931: CityHub-teardown	GetPropVector	ServerDE	Implemented (bounded)	136
+931: CityHub-teardown	GetSoundDuration	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	GetStringData	ServerDE	Implemented (bounded)	64
+931: CityHub-teardown	GetTime	ServerDE	Implemented (bounded)	4901
+931: CityHub-teardown	GetVarValueFloat	ServerDE	Implemented (bounded)	893
+931: CityHub-teardown	GetVarValueString	ServerDE	Implemented (bounded)	2
+931: CityHub-teardown	GetVelocity	ServerDE	Implemented (bounded)	601
+931: CityHub-teardown	GetWorldTime	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	HandleToObject	ServerDE	Implemented (bounded)	17596
+931: CityHub-teardown	InterpolateRotation	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	IntersectSegment	ServerDE	Implemented (bounded)	2963
+931: CityHub-teardown	IsKindOf	ServerDE	Implemented (bounded)	32789
+931: CityHub-teardown	IsObjectAlive	ServerDE	Implemented (bounded)	39891
+931: CityHub-teardown	IsSoundDone	ServerDE	Implemented (bounded)	277
+931: CityHub-teardown	KillSound	ServerDE	Implemented (bounded)	6
+931: CityHub-teardown	MoveKeyframedObject	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	MoveObject	ServerDE	Implemented (bounded)	48357
+931: CityHub-teardown	MoveObjectToGround	ServerDE	Implemented (bounded)	143
+931: CityHub-teardown	MoveWorldModel	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	ObjectToHandle	ServerDE	Implemented (bounded)	60
+931: CityHub-teardown	PingObjects	ServerDE	Implemented (bounded)	20
+931: CityHub-teardown	PlaceNonSolidModel	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PlayCharacterSound	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PlayCinematicSound	ServerDE	Implemented (bounded)	2
+931: CityHub-teardown	PlayClientSound	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PlayDetachedSound	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PlayLocalSound	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PlayObjectLoopSound	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PlaySoundAt	ServerDE	Implemented (bounded)	4
+931: CityHub-teardown	PlayWorldSound	ServerDE	Implemented (bounded)	31
+931: CityHub-teardown	PublishBloodSplat	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishBloodSpurt	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishCameraEffect	ServerDE	Implemented (bounded)	2
+931: CityHub-teardown	PublishClientBloodSplat	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishClientBloodSpurt	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishExplosionFlames	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishExplosionFragments	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishExplosionLights	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishExplosionModels	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishExplosionRings	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishExplosionSprites	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishFleshGibs	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishLaserBeam	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishLightEffect	ServerDE	Implemented (bounded)	4
+931: CityHub-teardown	PublishObjectParticles	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishParticleStream	ServerDE	Implemented (bounded)	8
+931: CityHub-teardown	PublishPolyGrid	ServerDE	Implemented (bounded)	2
+931: CityHub-teardown	PublishSparks	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	PublishWeaponSprites	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	QueryModelNodeTransform	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	RandomFloat	ServerDE	Implemented (bounded)	59
+931: CityHub-teardown	RandomInt	ServerDE	Implemented (bounded)	35
+931: CityHub-teardown	ReadDamage	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	ReadFromMessageDWord	ServerDE	Implemented (bounded)	3
+931: CityHub-teardown	ReadFromMessageHString	ServerDE	Implemented (bounded)	3
+931: CityHub-teardown	ReadKeyMessage	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	ReadPickupMessage	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	RecordBrushDestruction	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	RecordDebrisEffect	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	RecordExplosionEffect	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	RecordPickup	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	RecordProjectile	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	RecordSceneExplosion	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	RecordSpawn	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	RelinquishList	ServerDE	Implemented (bounded)	27
+931: CityHub-teardown	RemoveAttachment	ServerDE	Implemented (bounded)	18
+931: CityHub-teardown	RemoveCameraEffect	ServerDE	Implemented (bounded)	2
+931: CityHub-teardown	RemoveLightEffect	ServerDE	Implemented (bounded)	4
+931: CityHub-teardown	RemoveObject	ServerDE	Implemented (bounded)	86
+931: CityHub-teardown	RemoveObjectFromList	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	ReportSkyFailure	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	ResetModelAnimation	ServerDE	Implemented (bounded)	9
+931: CityHub-teardown	ResetRead	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	ResizeObject	ServerDE	Implemented (bounded)	631
+931: CityHub-teardown	RestoreObjects	ServerDE	Explicitly unsupported	0
+931: CityHub-teardown	RotateWorldModel	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	SaveObjects	ServerDE	Explicitly unsupported	0
+931: CityHub-teardown	ScaleObject	ServerDE	Implemented (bounded)	149
+931: CityHub-teardown	SendBossHealth	ServerDE	Implemented (bounded)	1
+931: CityHub-teardown	SendConversation	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	SendObjectives	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	SendToClient	ServerDE	Implemented (bounded)	8
+931: CityHub-teardown	SendWorldExit	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	SetAcceleration	ServerDE	Implemented (bounded)	1202
+931: CityHub-teardown	SetBlockingPriority	ServerDE	Implemented (bounded)	1423
+931: CityHub-teardown	SetClientUserData	ServerDE	Implemented (bounded)	2
+931: CityHub-teardown	SetDeactivationTime	ServerDE	Implemented (bounded)	149
+931: CityHub-teardown	SetGameConVar	ServerDE	Implemented (bounded)	66
+931: CityHub-teardown	SetGlobalForce	ServerDE	Implemented (bounded)	1
+931: CityHub-teardown	SetModelAnimation	ServerDE	Implemented (bounded)	49
+931: CityHub-teardown	SetModelFilenames	ServerDE	Implemented (bounded)	2
+931: CityHub-teardown	SetModelLooping	ServerDE	Implemented (bounded)	12
+931: CityHub-teardown	SetModelNodeHideStatus	ServerDE	Implemented (bounded)	19
+931: CityHub-teardown	SetNextUpdate	ServerDE	Implemented (bounded)	10056
+931: CityHub-teardown	SetObjectColor	ServerDE	Implemented (bounded)	122
+931: CityHub-teardown	SetObjectDims	ServerDE	Implemented (bounded)	276
+931: CityHub-teardown	SetObjectFlags	ServerDE	Implemented (bounded)	549
+931: CityHub-teardown	SetObjectRotation	ServerDE	Implemented (bounded)	791
+931: CityHub-teardown	SetObjectState	ServerDE	Implemented (bounded)	28
+931: CityHub-teardown	SetObjectUserFlags	ServerDE	Implemented (bounded)	360
+931: CityHub-teardown	SetSkyDefinition	ServerDE	Implemented (bounded)	1
+931: CityHub-teardown	SetVelocity	ServerDE	Implemented (bounded)	1392
+931: CityHub-teardown	StartHMessageWrite	ServerDE	Implemented (bounded)	2402
+931: CityHub-teardown	StartMessageToObject	ServerDE	Implemented (bounded)	2402
+931: CityHub-teardown	TeleportObject	ServerDE	Implemented (bounded)	1
+931: CityHub-teardown	ValidateSpawnObject	ServerDE	Implemented (bounded)	21
+931: CityHub-teardown	WriteDamage	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	WriteKeyMessage	ServerDE	Implemented (bounded)	0
+931: CityHub-teardown	WritePickupMessage	ServerDE	Implemented (bounded)	2400
+931: CityHub-teardown	WriteToMessageDWord	ServerDE	Implemented (bounded)	2
+931: CityHub-teardown	WriteToMessageHString	ServerDE	Implemented (bounded)	2
+931: CityHub-teardown	ConnectClient	Lifecycle	Implemented (bounded)	1
+931: CityHub-teardown	DisconnectClient	Lifecycle	Implemented (bounded)	1
+931: CityHub-teardown	MID_MODELSTRINGKEY	Callback	Implemented (bounded)	2
+931: Coverage CityHub-teardown: reached=108 unexercised=66 unavailable=0 ai_errors=0
+931: Reset probe: deliberate SaveObjects refusal outside the loaded session
+41/41 Test #931: coverage.private ..................   Passed    2.94 sec
+
+The following tests passed:
+	coverage.catalog
+	world.destination_trial_private
+	world.level_change_private
+	world.surface_effects
+	world.destination_trials
+	player_restore.private
+	world.level_change
+	world.destination_lifetime
+	world.mutations
+	world.sprite_entries
+	world.sound_entries
+	world.destination_schema
+	world.destination_messages
+	world.session_lifecycle
+	world.resource_mount
+	world.original_trigger
+	world.world_rejection
+	world.world_geometry
+	world.world_properties
+	world.rez_rejection
+	world.session_messages
+	world.rez_structure
+	world.destination_private
+	coverage.observations
+	player_restore.roundtrip
+	player_restore.failures
+	player_restore.lifetime
+	objects.builtin_model
+	objects.unsupported_teardown
+	objects.creation_failures
+	objects.messages_strings
+	objects.original_objects
+	objects.reasons_properties
+	objects.aggregate_dispatch
+	objects.handles_selection
+	objects.scheduling
+	objects.nested_creation
+	objects.links_lists
+	objects.deferred_removal
+	world.private
+	coverage.private
+
+100% tests passed, 0 tests failed out of 41
+
+Label Time Summary:
+headless          =   5.67 sec*proc (41 tests)
+objects           =   0.04 sec*proc (12 tests)
+player_restore    =   0.27 sec*proc (4 tests)
+private           =   5.43 sec*proc (6 tests)
+services          =   3.02 sec*proc (3 tests)
+world             =   2.34 sec*proc (22 tests)
+
+Total Test time (real) =   2.96 sec

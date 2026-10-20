@@ -1,0 +1,1028 @@
+[
+  {
+    "name": "vulkan",
+    "bytes": 21996,
+    "allocations": 408,
+    "by_allocator_caller_module": {
+      "libnvidia-glcore.so.615.78.08": {
+        "bytes": 13018,
+        "allocations": 270
+      },
+      "libnvidia-glsi.so.615.78.08": {
+        "bytes": 6509,
+        "allocations": 135
+      },
+      "libdbus-1.so.3": {
+        "bytes": 2469,
+        "allocations": 3
+      }
+    },
+    "groups": [
+      {
+        "kind": "Direct",
+        "bytes": 3696,
+        "allocations": 66,
+        "allocator_caller": "#1 0x7bd2e41e7b8d  (<unknown module>)",
+        "module": "libnvidia-glcore.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7bd2e41e7b8d",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Direct",
+        "bytes": 1848,
+        "allocations": 33,
+        "allocator_caller": "#1 0x7fd2e8d9035c  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7fd2e8d9035c",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6a35c"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Direct",
+        "bytes": 184,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7fd2e8736716 in _dbus_message_loader_get_buffer ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": [
+          {
+            "address": "0x7bd2e4219f06",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa19f06"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 6336,
+        "allocations": 66,
+        "allocator_caller": "#1 0x7bd2e41e7b8d  (<unknown module>)",
+        "module": "libnvidia-glcore.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7bd2e41e7b8d",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 3168,
+        "allocations": 33,
+        "allocator_caller": "#1 0x7fd2e8d922e9  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7fd2e8d922e9",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6c2e9"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 2986,
+        "allocations": 138,
+        "allocator_caller": "#1 0x7bd2e41e78d1  (<unknown module>)",
+        "module": "libnvidia-glcore.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7bd2e41e78d1",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e78d1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 2189,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7fd2e87462dd in dbus_realloc ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": [
+          {
+            "address": "0x7bd2e4277c23",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa77c23"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 1493,
+        "allocations": 69,
+        "allocator_caller": "#1 0x7fd2e8d8ff68  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7fd2e8d8ff68",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x69f68"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 96,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7fd2e87462dd in dbus_realloc ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": [
+          {
+            "address": "0x7bd2e4219f06",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa19f06"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "interpretation": "Allocation call-site attribution, not ownership proof. Mapping candidates retain reused address ranges."
+  },
+  {
+    "name": "gpu1-modules",
+    "bytes": 44024,
+    "allocations": 816,
+    "by_allocator_caller_module": {
+      "libnvidia-glcore.so.615.78.08": {
+        "bytes": 26036,
+        "allocations": 540
+      },
+      "libnvidia-glsi.so.615.78.08": {
+        "bytes": 13018,
+        "allocations": 270
+      },
+      "libdbus-1.so.3": {
+        "bytes": 4970,
+        "allocations": 6
+      }
+    },
+    "groups": [
+      {
+        "kind": "Direct",
+        "bytes": 7336,
+        "allocations": 131,
+        "allocator_caller": "#1 0x7b48eebe7b8d  (<unknown module>)",
+        "module": "libnvidia-glcore.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b48eebe7b8d",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Direct",
+        "bytes": 1848,
+        "allocations": 33,
+        "allocator_caller": "#1 0x7f48f6bce35c  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7f48f6bce35c",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6a35c"
+              },
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x8c35c"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Direct",
+        "bytes": 1848,
+        "allocations": 33,
+        "allocator_caller": "#1 0x7f48f6bac35c  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7f48f6bac35c",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x4835c"
+              },
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6a35c"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Direct",
+        "bytes": 184,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f48f7b13716 in _dbus_message_loader_get_buffer ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": [
+          {
+            "address": "0x7b48eec19f06",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa19f06"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa19f06"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Direct",
+        "bytes": 184,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f48f7b13716 in _dbus_message_loader_get_buffer ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": []
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 12728,
+        "allocations": 133,
+        "allocator_caller": "#1 0x7b48eebe7b8d  (<unknown module>)",
+        "module": "libnvidia-glcore.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b48eebe7b8d",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 5972,
+        "allocations": 276,
+        "allocator_caller": "#1 0x7b48eebe78d1  (<unknown module>)",
+        "module": "libnvidia-glcore.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b48eebe78d1",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e78d1"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e78d1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 4314,
+        "allocations": 2,
+        "allocator_caller": "#1 0x7f48f7b232dd in dbus_realloc ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": [
+          {
+            "address": "0x7b48eec77c23",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa77c23"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa77c23"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 3168,
+        "allocations": 33,
+        "allocator_caller": "#1 0x7f48f6bae2e9  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7f48f6bae2e9",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x4a2e9"
+              },
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6c2e9"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 3168,
+        "allocations": 33,
+        "allocator_caller": "#1 0x7f48f6bd02e9  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7f48f6bd02e9",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6c2e9"
+              },
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x8e2e9"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 1493,
+        "allocations": 69,
+        "allocator_caller": "#1 0x7f48f6bcdf68  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7f48f6bcdf68",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x69f68"
+              },
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x8bf68"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 1493,
+        "allocations": 69,
+        "allocator_caller": "#1 0x7f48f6babf68  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7f48f6babf68",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x47f68"
+              },
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x69f68"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 192,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f48f7b232dd in dbus_realloc ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": []
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 96,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f48f7b232dd in dbus_realloc ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": [
+          {
+            "address": "0x7b48eec19f06",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa19f06"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa19f06"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "interpretation": "Allocation call-site attribution, not ownership proof. Mapping candidates retain reused address ranges."
+  },
+  {
+    "name": "gpu1-final-modules",
+    "bytes": 44024,
+    "allocations": 816,
+    "by_allocator_caller_module": {
+      "libnvidia-glcore.so.615.78.08": {
+        "bytes": 13018,
+        "allocations": 270
+      },
+      "libnvidia-glsi.so.615.78.08": {
+        "bytes": 13018,
+        "allocations": 270
+      },
+      "ambiguous: libnvidia-glcore.so.615.78.08, libnvidia-gpucomp.so.615.78.08": {
+        "bytes": 13018,
+        "allocations": 270
+      },
+      "libdbus-1.so.3": {
+        "bytes": 4970,
+        "allocations": 6
+      }
+    },
+    "groups": [
+      {
+        "kind": "Direct",
+        "bytes": 3696,
+        "allocations": 66,
+        "allocator_caller": "#1 0x7b41443e7b8d  (<unknown module>)",
+        "module": "libnvidia-glcore.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b41443e7b8d",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Direct",
+        "bytes": 3696,
+        "allocations": 66,
+        "allocator_caller": "#1 0x7b414ab7b35c  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b414ab7b35c",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6a35c"
+              },
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6a35c"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Direct",
+        "bytes": 3640,
+        "allocations": 65,
+        "allocator_caller": "#1 0x7b41419e7b8d  (<unknown module>)",
+        "module": "ambiguous: libnvidia-glcore.so.615.78.08, libnvidia-gpucomp.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b41419e7b8d",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-gpucomp.so.615.78.08",
+                "offset": "0x55e7b8d"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Direct",
+        "bytes": 184,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f414c7c4716 in _dbus_message_loader_get_buffer ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": [
+          {
+            "address": "0x7b4144419f06",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa19f06"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Direct",
+        "bytes": 184,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f414c7c4716 in _dbus_message_loader_get_buffer ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": []
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 6392,
+        "allocations": 67,
+        "allocator_caller": "#1 0x7b41419e7b8d  (<unknown module>)",
+        "module": "ambiguous: libnvidia-glcore.so.615.78.08, libnvidia-gpucomp.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b41419e7b8d",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-gpucomp.so.615.78.08",
+                "offset": "0x55e7b8d"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 6336,
+        "allocations": 66,
+        "allocator_caller": "#1 0x7b414ab7d2e9  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b414ab7d2e9",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6c2e9"
+              },
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6c2e9"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 6336,
+        "allocations": 66,
+        "allocator_caller": "#1 0x7b41443e7b8d  (<unknown module>)",
+        "module": "libnvidia-glcore.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b41443e7b8d",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 2986,
+        "allocations": 138,
+        "allocator_caller": "#1 0x7b414ab7af68  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b414ab7af68",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x69f68"
+              },
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x69f68"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 2986,
+        "allocations": 138,
+        "allocator_caller": "#1 0x7b41419e78d1  (<unknown module>)",
+        "module": "ambiguous: libnvidia-glcore.so.615.78.08, libnvidia-gpucomp.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b41419e78d1",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-gpucomp.so.615.78.08",
+                "offset": "0x55e78d1"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e78d1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 2986,
+        "allocations": 138,
+        "allocator_caller": "#1 0x7b41443e78d1  (<unknown module>)",
+        "module": "libnvidia-glcore.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b41443e78d1",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e78d1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 2157,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f414c7d42dd in dbus_realloc ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": [
+          {
+            "address": "0x7b4144477c23",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa77c23"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 2157,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f414c7d42dd in dbus_realloc ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": [
+          {
+            "address": "0x7b4141a77c23",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-gpucomp.so.615.78.08",
+                "offset": "0x5677c23"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa77c23"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 192,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f414c7d42dd in dbus_realloc ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": []
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 96,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f414c7d42dd in dbus_realloc ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": [
+          {
+            "address": "0x7b4144419f06",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa19f06"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "interpretation": "Allocation call-site attribution, not ownership proof. Mapping candidates retain reused address ranges."
+  },
+  {
+    "name": "train",
+    "bytes": 44056,
+    "allocations": 816,
+    "by_allocator_caller_module": {
+      "libnvidia-glcore.so.615.78.08": {
+        "bytes": 26036,
+        "allocations": 540
+      },
+      "libnvidia-glsi.so.615.78.08": {
+        "bytes": 13018,
+        "allocations": 270
+      },
+      "libdbus-1.so.3": {
+        "bytes": 5002,
+        "allocations": 6
+      }
+    },
+    "groups": [
+      {
+        "kind": "Direct",
+        "bytes": 7336,
+        "allocations": 131,
+        "allocator_caller": "#1 0x7b4bcc5e7b8d  (<unknown module>)",
+        "module": "libnvidia-glcore.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b4bcc5e7b8d",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Direct",
+        "bytes": 3696,
+        "allocations": 66,
+        "allocator_caller": "#1 0x7f4bd47ce35c  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7f4bd47ce35c",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6a35c"
+              },
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6a35c"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Direct",
+        "bytes": 184,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f4bd4c3d716 in _dbus_message_loader_get_buffer ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": []
+      },
+      {
+        "kind": "Direct",
+        "bytes": 184,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f4bd4c3d716 in _dbus_message_loader_get_buffer ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": [
+          {
+            "address": "0x7b4bcc619f06",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa19f06"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa19f06"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 12728,
+        "allocations": 133,
+        "allocator_caller": "#1 0x7b4bcc5e7b8d  (<unknown module>)",
+        "module": "libnvidia-glcore.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b4bcc5e7b8d",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e7b8d"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 6336,
+        "allocations": 66,
+        "allocator_caller": "#1 0x7f4bd47d02e9  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7f4bd47d02e9",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6c2e9"
+              },
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x6c2e9"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 5972,
+        "allocations": 276,
+        "allocator_caller": "#1 0x7b4bcc5e78d1  (<unknown module>)",
+        "module": "libnvidia-glcore.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7b4bcc5e78d1",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e78d1"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0x9e78d1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 4346,
+        "allocations": 2,
+        "allocator_caller": "#1 0x7f4bd4c4d2dd in dbus_realloc ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": [
+          {
+            "address": "0x7b4bcc677c23",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa77c23"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa77c23"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 2986,
+        "allocations": 138,
+        "allocator_caller": "#1 0x7f4bd47cdf68  (<unknown module>)",
+        "module": "libnvidia-glsi.so.615.78.08",
+        "unloaded_frames": [
+          {
+            "address": "0x7f4bd47cdf68",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x69f68"
+              },
+              {
+                "file": "libnvidia-glsi.so.615.78.08",
+                "offset": "0x69f68"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 192,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f4bd4c4d2dd in dbus_realloc ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": []
+      },
+      {
+        "kind": "Indirect",
+        "bytes": 96,
+        "allocations": 1,
+        "allocator_caller": "#1 0x7f4bd4c4d2dd in dbus_realloc ??:?",
+        "module": "libdbus-1.so.3",
+        "unloaded_frames": [
+          {
+            "address": "0x7b4bcc619f06",
+            "candidate_mappings": [
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa19f06"
+              },
+              {
+                "file": "libnvidia-glcore.so.615.78.08",
+                "offset": "0xa19f06"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "interpretation": "Allocation call-site attribution, not ownership proof. Mapping candidates retain reused address ranges."
+  }
+]

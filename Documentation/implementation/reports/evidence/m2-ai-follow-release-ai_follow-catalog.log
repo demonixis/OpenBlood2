@@ -1,0 +1,38 @@
+412/413 Testing: ai_follow.catalog
+412/413 Test: ai_follow.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_follow_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_follow.catalog" start time: Oct 16 13:00 CEST
+Output:
+----------------------------------------------------------
+m_cultist1 mode=0 clip=4 available=1
+m_cultist1 mode=1 clip=5 available=1
+m_cultist1 mode=2 clip=4294967295 available=0
+m_cultist1 mode=3 clip=4294967295 available=0
+f_cultist1 mode=0 clip=4 available=1
+f_cultist1 mode=1 clip=5 available=1
+f_cultist1 mode=2 clip=4294967295 available=0
+f_cultist1 mode=3 clip=4294967295 available=0
+m_civilian1 mode=0 clip=2 available=1
+m_civilian1 mode=1 clip=4 available=1
+m_civilian1 mode=2 clip=4294967295 available=0
+m_civilian1 mode=3 clip=4294967295 available=0
+f_civilian1 mode=0 clip=3 available=1
+f_civilian1 mode=1 clip=4294967295 available=0
+f_civilian1 mode=2 clip=4294967295 available=0
+f_civilian1 mode=3 clip=4294967295 available=0
+labtech mode=0 clip=2 available=1
+labtech mode=1 clip=4 available=1
+labtech mode=2 clip=4294967295 available=0
+labtech mode=3 clip=4294967295 available=0
+gideon mode=0 clip=4294967295 available=0
+gideon mode=1 clip=4294967295 available=0
+gideon mode=2 clip=4294967295 available=0
+gideon mode=3 clip=4294967295 available=0
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.catalog" end time: Oct 16 13:00 CEST
+"ai_follow.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

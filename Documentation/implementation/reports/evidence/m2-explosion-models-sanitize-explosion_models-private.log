@@ -1,0 +1,68 @@
+523/523 Testing: explosion_models.private
+523/523 Test: explosion_models.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_model_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_models.private" start time: Oct 16 20:39 CEST
+Output:
+----------------------------------------------------------
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+Models\Explosions\exp_sphere.abc triangles=168 skin=Skins\Explosions\Explosion_1.dtx alpha=0.585 error=
+<end of output>
+Test time =   6.20 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_models.private" end time: Oct 16 20:39 CEST
+"explosion_models.private" time elapsed: 00:00:06
+----------------------------------------------------------
+
+End testing: Oct 16 20:39 CEST
+
+attachments =   8.62 sec*proc
+
+explosion_models =   6.31 sec*proc
+
+explosion_sprites =   6.38 sec*proc
+
+headless = 103.42 sec*proc
+
+model_view =   4.67 sec*proc
+
+objects =   0.23 sec*proc
+
+private = 101.53 sec*proc
+
+sceneexplosion =  17.73 sec*proc
+
+sprite_view =   6.07 sec*proc
+
+sprites =  34.45 sec*proc
+
+texture =  12.44 sec*proc
+
+world_view =   6.53 sec*proc
+

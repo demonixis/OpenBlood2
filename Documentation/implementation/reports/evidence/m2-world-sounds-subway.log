@@ -1,0 +1,16 @@
+244/245 Testing: sound.subway
+244/245 Test: sound.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"sound.subway" start time: Oct 16 02:20 CEST
+Output:
+----------------------------------------------------------
+cycle=0 4 world loops survived source removal, wrapped twice, produced PCM and unloaded
+cycle=1 4 world loops survived source removal, wrapped twice, produced PCM and unloaded
+<end of output>
+Test time =   0.65 sec
+----------------------------------------------------------
+Test Passed.
+"sound.subway" end time: Oct 16 02:20 CEST
+"sound.subway" time elapsed: 00:00:00
+----------------------------------------------------------

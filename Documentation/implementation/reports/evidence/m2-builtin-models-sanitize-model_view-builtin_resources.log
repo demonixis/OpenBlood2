@@ -1,0 +1,14 @@
+329/649 Testing: model_view.builtin_resources
+329/649 Test: model_view.builtin_resources
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/model_view_tests" "builtin_resources" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/builtin-model-fixture"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"model_view.builtin_resources" start time: Oct 17 04:45 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"model_view.builtin_resources" end time: Oct 17 04:45 CEST
+"model_view.builtin_resources" time elapsed: 00:00:00
+----------------------------------------------------------

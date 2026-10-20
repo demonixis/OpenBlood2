@@ -1,0 +1,82 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 831
+    Start 831: gpu.sky_app
+
+831: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--view-world" "--world" "02_cityhub" "--no-inspector" "--frames" "20" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/sky-app.png"
+831: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+831: Test timeout computed to be: 45
+831: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+831: [info] BLOOD2.REZ: detected, 267758913 bytes
+831: [info] SOUND.REZ: detected, 204633068 bytes
+831: [info] BLOOD2P.REZ: detected, 24133434 bytes
+831: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+831: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+831: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+831: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+831: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+831: [info] DAT v56: 1026 source objects, 480 original instances, 100 BSP models
+831: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/sky-app.png
+831: [info] Shutdown: frames=20, UI frames=0, hidden frames=20, toggles=0, resize=false, quit=false
+831: [info] Interactive clock: limited frames=16, discarded wall seconds=3.1387819660000003
+831: [info] Session playback: waiting=0 time=1.6001003330000005 npc-ready=27 npc-failed=0 npc-updates=33
+    Test #831: gpu.sky_app ......................   Passed    9.55 sec
+    Start 831: gpu.sky_app
+
+831: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--view-world" "--world" "02_cityhub" "--no-inspector" "--frames" "20" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/sky-app.png"
+831: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+831: Test timeout computed to be: 45
+831: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+831: [info] BLOOD2.REZ: detected, 267758913 bytes
+831: [info] SOUND.REZ: detected, 204633068 bytes
+831: [info] BLOOD2P.REZ: detected, 24133434 bytes
+831: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+831: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+831: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+831: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+831: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+831: [info] DAT v56: 1026 source objects, 480 original instances, 100 BSP models
+831: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/sky-app.png
+831: [info] Shutdown: frames=20, UI frames=0, hidden frames=20, toggles=0, resize=false, quit=false
+831: [info] Interactive clock: limited frames=16, discarded wall seconds=3.270506147
+831: [info] Session playback: waiting=0 time=1.6001081410000004 npc-ready=27 npc-failed=0 npc-updates=33
+    Test #831: gpu.sky_app ......................   Passed    8.09 sec
+    Start 831: gpu.sky_app
+
+831: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--view-world" "--world" "02_cityhub" "--no-inspector" "--frames" "20" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/sky-app.png"
+831: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+831: Test timeout computed to be: 45
+831: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+831: [info] BLOOD2.REZ: detected, 267758913 bytes
+831: [info] SOUND.REZ: detected, 204633068 bytes
+831: [info] BLOOD2P.REZ: detected, 24133434 bytes
+831: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+831: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+831: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+831: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+831: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+831: [info] DAT v56: 1026 source objects, 480 original instances, 100 BSP models
+831: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/sky-app.png
+831: [info] Shutdown: frames=20, UI frames=0, hidden frames=20, toggles=0, resize=false, quit=false
+831: [info] Interactive clock: limited frames=16, discarded wall seconds=2.9868642109999994
+831: [info] Session playback: waiting=0 time=1.6001014800000006 npc-ready=27 npc-failed=0 npc-updates=33
+1/1 Test #831: gpu.sky_app ......................   Passed    7.83 sec
+
+The following tests passed:
+	gpu.sky_app
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+gpu        =   7.83 sec*proc (1 test)
+private    =   7.83 sec*proc (1 test)
+sky        =   7.83 sec*proc (1 test)
+
+Total Test time (real) =  25.48 sec

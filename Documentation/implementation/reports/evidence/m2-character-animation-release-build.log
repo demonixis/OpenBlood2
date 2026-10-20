@@ -1,0 +1,43 @@
+[0/2] Re-checking globbed directories...
+[1/135] Scanning /home/yann/projects/lithtech/Blood2/src/engine/model.cpp for CXX dependencies
+[2/135] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[3/122] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Anim_Sound.cpp for CXX dependencies
+[4/122] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[5/56] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[6/56] Scanning /home/yann/projects/lithtech/Blood2/tests/character_animation_tests.cpp for CXX dependencies
+[7/56] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[8/43] Generating CXX dyndep file tests/CMakeFiles/character_animation_tests.dir/CXX.dd
+[9/43] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Anim_Sound.cpp.o
+[10/43] Building CXX object CMakeFiles/engine.dir/src/engine/model.cpp.o
+[11/43] Linking CXX static library libengine.a
+[12/43] Linking CXX static library libblood2_game.a
+[13/43] Linking CXX executable tests/object_contract_tests
+[14/43] Linking CXX executable tests/config_tests
+[15/43] Linking CXX executable tests/world_tests
+[16/43] Linking CXX executable tests/services_tests
+[17/43] Linking CXX executable tests/player_tests
+[18/43] Linking CXX executable tests/weapon_tests
+[19/43] Linking CXX executable tests/movement_tests
+[20/43] Linking CXX executable tests/locomotion_tests
+[21/43] Linking CXX executable tests/container_tests
+[22/43] Linking CXX executable tests/door_tests
+[23/43] Linking CXX executable tests/trigger_tests
+[24/43] Linking CXX executable tests/interaction_tests
+[25/43] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[26/43] Linking CXX executable tests/brush_tests
+[27/43] Linking CXX executable blood2
+[28/43] Linking CXX executable tests/explosion_tests
+[29/43] Linking CXX executable tests/pushable_tests
+[30/43] Linking CXX executable tests/pickup_tests
+[31/43] Linking CXX executable tests/objectives_tests
+[32/43] Linking CXX executable tests/camera_tests
+[33/43] Linking CXX executable tests/keyframer_tests
+[34/43] Linking CXX executable tests/light_tests
+[35/43] Linking CXX executable tests/worldpath_tests
+[36/43] Linking CXX executable tests/cinematic_tests
+[37/43] Linking CXX executable tests/random_sound_tests
+[38/43] Linking CXX executable tests/sound_tests
+[39/43] Linking CXX executable tests/sprite_tests
+[40/43] Linking CXX executable tests/scene_explosion_tests
+[41/43] Building CXX object tests/CMakeFiles/character_animation_tests.dir/character_animation_tests.cpp.o
+[42/43] Linking CXX executable tests/character_animation_tests

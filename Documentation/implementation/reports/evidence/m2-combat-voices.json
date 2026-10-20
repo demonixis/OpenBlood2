@@ -1,0 +1,195 @@
+{
+  "date": "2026-10-17",
+  "milestone": "M2 incomplete",
+  "implementation_commit": "c9e4ec39f6c2f6e8901ed994d453dcf56709f600",
+  "source_ledger": "../../../Blood2/docs/implementation/sources/m2_combat_voice_sources.json",
+  "test_results": {
+    "debug-tests": {
+      "passed": 98,
+      "failed": 0
+    },
+    "release-tests": {
+      "passed": 98,
+      "failed": 0
+    },
+    "sanitize-tests": {
+      "passed": 98,
+      "failed": 0
+    },
+    "debug-gpu": {
+      "passed": 3,
+      "failed": 0
+    },
+    "release-gpu": {
+      "passed": 3,
+      "failed": 0
+    },
+    "behavior": {
+      "passed": 2,
+      "failed": 0
+    }
+  },
+  "commands": {
+    "build_debug": "cmake --build build/debug -j 4 --target blood2 object_contract_tests player_tests player_state_tests player_restore_tests player_keepalive_tests player_voice_tests death_effect_tests ai_hit_tests corpse_tests conversation_tests pickup_audio_tests weapon_drop_tests screen_fade_tests world_tests train_session_tests death_effect_gpu_tests",
+    "build_release": "cmake --build build/release -j 4 --target blood2 object_contract_tests player_tests player_state_tests player_restore_tests player_keepalive_tests player_voice_tests death_effect_tests ai_hit_tests corpse_tests conversation_tests pickup_audio_tests weapon_drop_tests screen_fade_tests world_tests train_session_tests death_effect_gpu_tests",
+    "build_sanitize": "cmake --build build/sanitize -j 4 --target object_contract_tests player_tests player_state_tests player_restore_tests player_keepalive_tests player_voice_tests death_effect_tests ai_hit_tests corpse_tests conversation_tests pickup_audio_tests weapon_drop_tests screen_fade_tests world_tests train_session_tests",
+    "ctest_headless": "ctest --test-dir build/<configuration> --output-on-failure -j 2 -R ^(objects\\.|player\\.|player_state\\.|player_restore\\.|player_keepalive\\.|conversation\\.|pickup_audio\\.|weapon_drops\\.|screen_fade\\.|player_voice\\.|ai_hit\\.|corpses\\.|death_effects\\.|world\\.(level_change|level_change_private|session_lifecycle|session_messages)$|train_session\\.)",
+    "sanitizer_environment": [
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1"
+    ],
+    "gpu_environment": [
+      "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+      "SDL_AUDIODRIVER=dummy"
+    ],
+    "ctest_gpu": "ctest --test-dir build/<debug|release> -V -R '^gpu\\.(player|death_effects|conversation_private)$'"
+  },
+  "gpu_device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+  "gpu_backend": "Vulkan",
+  "isolated_private_encounters": {
+    "ordinary_npc_deaths": 64,
+    "npc_gib_deaths": 64,
+    "ordinary_deaths_then_corpse_damage": 64,
+    "instant_deaths_with_distinct_prior_attacker": 128,
+    "instant_death_kill_replies": 2,
+    "missing_hit_node_early_returns": 3,
+    "kill_replies": 4,
+    "big_gib_replies": 3,
+    "corpse_replies": 6,
+    "simultaneous_qualifying_npc_replies": 0,
+    "actual_stream_pcm_cursor_asserted": true,
+    "actor_destroyed_before_client_delivery": true
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "logs": [
+    {
+      "label": "debug-build",
+      "path": "m2-combat-voices-debug-build.log",
+      "sha256": "c84f07cb3fbb87f98712aa6de02a2b675d48290fe230b01ff6e46734215e5e7f"
+    },
+    {
+      "label": "release-build",
+      "path": "m2-combat-voices-release-build.log",
+      "sha256": "04f185a2039dea03d9094ecfd7ec7ed451410a4d36c24061b7fca6ebf2e22e8b"
+    },
+    {
+      "label": "sanitize-build",
+      "path": "m2-combat-voices-sanitize-build.log",
+      "sha256": "9510acd4da0090e7b0630faab65cfadf9ff77358fe352f004635b4ad32635e7a"
+    },
+    {
+      "label": "debug-tests",
+      "path": "m2-combat-voices-debug-tests.log",
+      "sha256": "7fbff7c0502b456601d80d78ceffb6a8e2b0642167d3f12269ecc4789703b13b"
+    },
+    {
+      "label": "release-tests",
+      "path": "m2-combat-voices-release-tests.log",
+      "sha256": "62357f62bafbd86f32d5fdc06c24ac4e830e0deabf8625b3e83e3a9e0de92e2e"
+    },
+    {
+      "label": "sanitize-tests",
+      "path": "m2-combat-voices-sanitize-tests.log",
+      "sha256": "1e5b86c19f8ce77394bbbbecd32a12153c77f7bf21e2e5df3bf5e4d0c8a8ad52"
+    },
+    {
+      "label": "debug-gpu",
+      "path": "m2-combat-voices-debug-gpu.log",
+      "sha256": "96bebe00490ea4afa72ab65d26012fba0f8be6898c1ffa934c8ed001c5dee363"
+    },
+    {
+      "label": "release-gpu",
+      "path": "m2-combat-voices-release-gpu.log",
+      "sha256": "00c9170ce00706a4972edb494a49ad272d96290f42457b7f455151c1000e6567"
+    },
+    {
+      "label": "behavior",
+      "path": "m2-combat-voices-behavior.log",
+      "sha256": "195f2c9a3ba99872f71a66368d0d7be5ca94eb72b249aef65fcb50a039b6f4ec"
+    },
+    {
+      "label": "integrity",
+      "path": "m2-combat-voices-integrity.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6"
+    },
+    {
+      "label": "links",
+      "path": "m2-combat-voices-links.log",
+      "sha256": "01f45104ff2b3975d99bd4fd2db1305340a88fc80eec4213b26fb68c796c9a16"
+    },
+    {
+      "label": "debug-base-build",
+      "path": "m2-combat-voices-debug-base-build.log",
+      "sha256": "51454ea67989b637f61b6f96a5d57f6113809a0890542a9a1f3927d559b44080"
+    },
+    {
+      "label": "debug-fixture-build",
+      "path": "m2-combat-voices-debug-fixture-build.log",
+      "sha256": "e0e25415dd34e475996b4c2f94672be0c930b6fd1d6a3a2ab651963721c8061c"
+    },
+    {
+      "label": "release-base-build",
+      "path": "m2-combat-voices-release-base-build.log",
+      "sha256": "35758d2115b03e11f8f5d533fae52dfa4290de74dc4a26a7ae0862e2cc2e14d6"
+    },
+    {
+      "label": "release-fixture-build",
+      "path": "m2-combat-voices-release-fixture-build.log",
+      "sha256": "e0e25415dd34e475996b4c2f94672be0c930b6fd1d6a3a2ab651963721c8061c"
+    },
+    {
+      "label": "sanitize-base-build",
+      "path": "m2-combat-voices-sanitize-base-build.log",
+      "sha256": "db1ca41c89b95de16618f294672e274d3c1c8f7f2df863f3110662632c68c0a1"
+    },
+    {
+      "label": "sanitize-fixture-build",
+      "path": "m2-combat-voices-sanitize-fixture-build.log",
+      "sha256": "e0e25415dd34e475996b4c2f94672be0c930b6fd1d6a3a2ab651963721c8061c"
+    }
+  ],
+  "limitations": [
+    "M2 acceptance remains incomplete; this is a bounded original caller increment.",
+    "Isolated diagnostic floor encounters are not authored playthrough or retail-random parity evidence.",
+    "Pain/Burning net-health semantics use generated WAV fixtures; private encounters exercise installed Kill/BigGib streams.",
+    "GPU checks are existing presentation/audio/lifetime regressions; combat caller assertions are headless.",
+    "Native macOS/Windows and human audible playback were not verified here.",
+    "Previous SDL/libdbus GPU-LSan residual not retested.",
+    "Other original voice callers and interactive IMA music remain unavailable."
+  ]
+}

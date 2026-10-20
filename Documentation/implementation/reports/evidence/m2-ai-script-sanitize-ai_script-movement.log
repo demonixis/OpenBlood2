@@ -1,0 +1,14 @@
+392/395 Testing: ai_script.movement
+392/395 Test: ai_script.movement
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_script_tests" "movement" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-script-movement"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_script.movement" start time: Oct 16 13:16 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.movement" end time: Oct 16 13:16 CEST
+"ai_script.movement" time elapsed: 00:00:00
+----------------------------------------------------------

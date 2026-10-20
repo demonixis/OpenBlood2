@@ -1,0 +1,14 @@
+503/507 Testing: exits.blocked
+503/507 Test: exits.blocked
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit_tests" "blocked" "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit-fixtures/blocked"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"exits.blocked" start time: Oct 16 17:21 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"exits.blocked" end time: Oct 16 17:21 CEST
+"exits.blocked" time elapsed: 00:00:00
+----------------------------------------------------------

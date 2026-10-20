@@ -1,0 +1,430 @@
+{
+  "date": "2026-10-17",
+  "implementation_baseline": "724484c5c8f43d333f03386f2de579a6c469a22e",
+  "status": "M2 incomplete; CityHub has five unsupported entries and one failed world-model binding",
+  "validation": {
+    "headless-debug": {
+      "total": 754,
+      "failed": 0,
+      "private": 123,
+      "seconds": 128.15
+    },
+    "headless-release": {
+      "total": 754,
+      "failed": 0,
+      "private": 123,
+      "seconds": 14.83
+    },
+    "headless-debug-clock": {
+      "total": 8,
+      "failed": 0,
+      "private": 2,
+      "seconds": 11.28
+    },
+    "headless-release-clock": {
+      "total": 8,
+      "failed": 0,
+      "private": 2,
+      "seconds": 1.54
+    },
+    "sanitize": {
+      "total": 41,
+      "failed": 0,
+      "private": 6,
+      "seconds": 70.1
+    },
+    "sanitize-clock": {
+      "total": 1,
+      "failed": 0,
+      "private": 0,
+      "seconds": 0.03
+    },
+    "gpu-debug": {
+      "total": 14,
+      "failed": 0,
+      "private": 8,
+      "seconds": 71.41
+    },
+    "gpu-release": {
+      "total": 14,
+      "failed": 0,
+      "private": 8,
+      "seconds": 13.95
+    },
+    "gpu-app-repeated": {
+      "total": 1,
+      "failed": 0,
+      "private": 1,
+      "seconds": 25.48
+    }
+  },
+  "unique_sanitizer_cases": 42,
+  "headless_unique_per_native_build": 754,
+  "final_headless_note": "Full suites pass; eight relevant CLI/session cases were refreshed after the final frontend clock correction.",
+  "repeated_application_runs": 3,
+  "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU; Vulkan ICD explicitly selected",
+  "accounting": {
+    "created": 448,
+    "world_sounds": 31,
+    "editor_only": 541,
+    "unsupported": 5,
+    "failed": 1,
+    "initial_total": 1026
+  },
+  "sky": {
+    "source_entries": 5,
+    "slots_after_first_update": 5,
+    "removed_pointers": 4,
+    "triangles": 172,
+    "batches": 23,
+    "alpha_batches": 12
+  },
+  "commands": [
+    "cmake --build --preset debug -j5",
+    "cmake --build --preset release -j4",
+    "cmake --build build/sanitize -j3 --target sky_tests world_tests object_contract_tests services_tests texture_tests",
+    "ctest --test-dir build/debug -L headless --output-on-failure -j4",
+    "ctest --test-dir build/release -L headless --output-on-failure -j4",
+    "ctest --test-dir build/debug -R '^(session_playback\\.|cli\\.)' --output-on-failure",
+    "ctest --test-dir build/release -R '^(session_playback\\.|cli\\.)' --output-on-failure",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^(sky\\.|objects\\.|world\\.(level_change|destination|session)|services\\.|texture\\.)' --output-on-failure -j2",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^session_playback.policy$' --output-on-failure",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/debug -R '^gpu\\.(sky|sky_private|sky_app|world_alpha|world_alpha_private|world_depth|level_change|objectives|lifecycle|corpse_clearance|mouse_combat|particle_stream_alpha|particle_stream_private|explosion_flame_alpha)$' --output-on-failure -V",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/release -R '^gpu\\.(sky|sky_private|sky_app|world_alpha|world_alpha_private|world_depth|level_change|objectives|lifecycle|corpse_clearance|mouse_combat|particle_stream_alpha|particle_stream_private|explosion_flame_alpha)$' --output-on-failure -V",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/debug -R '^gpu.sky_app$' --repeat until-fail:3 --output-on-failure -V",
+    "cmake --build --preset debug -j4 --target blood2_app session_playback_tests",
+    "cmake --build --preset release -j4 --target blood2_app session_playback_tests",
+    "cmake --build build/sanitize -j3 --target session_playback_tests"
+  ],
+  "development_failures": [
+    "Initial compile used a file-local valid_rotation helper; replaced with the shared checked world_view_uniform path.",
+    "An ASan build command named nonexistent object_tests; corrected to object_contract_tests.",
+    "Initial full Debug GPU run passed 13/14, with sky_app failing the unchanged 0.5-second physics catch-up bound.",
+    "Pausing resource/capture stalls alone did not fix subsequent CPU simulation feedback. Timing instrumentation identified about 0.40 seconds feeding 1.28 seconds of simulation work; temporary profiling was removed.",
+    "A scripted UI field insertion missed a combined declaration and caused compile errors; explicit fields were added before final validation.",
+    "Frontend interactive time is capped at 100 ms, with discarded time exposed. Explicit diagnostic stepping, the core guard, private content and acceptance assertions were not weakened."
+  ],
+  "limits": [
+    "No native Apple execution of this increment",
+    "Later LithTech projection/depth is reference, not proven retail parity",
+    "Full-viewport background replaces historical portal-extent culling",
+    "Only world-model sky targets are accepted",
+    "Slow interactive execution may slow simulation time; discarded wall time is visible"
+  ],
+  "artifacts": [
+    {
+      "file": "m2-sky-build-debug.log",
+      "sha256": "51b358f4c947d6380f3ead6954310ea8aab2cc3a24a991bddfd33bc10b81a539",
+      "raw_capture_sha256": "51b358f4c947d6380f3ead6954310ea8aab2cc3a24a991bddfd33bc10b81a539",
+      "bytes": 7412
+    },
+    {
+      "file": "m2-sky-build-release.log",
+      "sha256": "3f997ea71accd4bb401213481d09a8fac1202cc8a982e8f356bc07370c9e7340",
+      "raw_capture_sha256": "3f35cc54878327fd64175807a6e5896e082ff91a8639aa5011b3acb3ee922a39",
+      "bytes": 25317
+    },
+    {
+      "file": "m2-sky-build-sanitize.log",
+      "sha256": "52764554920de1bb15b5eaac9f12303466511519c75f519a3eba125ee57e88f3",
+      "raw_capture_sha256": "52764554920de1bb15b5eaac9f12303466511519c75f519a3eba125ee57e88f3",
+      "bytes": 1356
+    },
+    {
+      "file": "m2-sky-build-debug-clock.log",
+      "sha256": "aaf25ff499cb7b60dd8d46a7e2c2592b7435f3f3cdc4985ba73ac2ae6fe0fc8d",
+      "raw_capture_sha256": "aaf25ff499cb7b60dd8d46a7e2c2592b7435f3f3cdc4985ba73ac2ae6fe0fc8d",
+      "bytes": 3162
+    },
+    {
+      "file": "m2-sky-build-release-clock.log",
+      "sha256": "2a08170e59e71f5f398b38313b7b1257c38f7199ee581d4fa33a2ea3784b18a2",
+      "raw_capture_sha256": "2a08170e59e71f5f398b38313b7b1257c38f7199ee581d4fa33a2ea3784b18a2",
+      "bytes": 653
+    },
+    {
+      "file": "m2-sky-build-sanitize-clock.log",
+      "sha256": "da9b73a6f97701d2912a8b9467819048b5a8d1579cefd868c9348b81523800e2",
+      "raw_capture_sha256": "da9b73a6f97701d2912a8b9467819048b5a8d1579cefd868c9348b81523800e2",
+      "bytes": 387
+    },
+    {
+      "file": "m2-sky-headless-debug.log",
+      "sha256": "e2c314fcbfb0ce2dc711e3ee9ece54dbb11fbe948db0231d2400911e81e73a4e",
+      "raw_capture_sha256": "e2c314fcbfb0ce2dc711e3ee9ece54dbb11fbe948db0231d2400911e81e73a4e",
+      "bytes": 92308
+    },
+    {
+      "file": "m2-sky-headless-release.log",
+      "sha256": "df4ccafafabde0da79aaeebee5c660100d61e744da3790e1e6b35039d60fdb94",
+      "raw_capture_sha256": "df4ccafafabde0da79aaeebee5c660100d61e744da3790e1e6b35039d60fdb94",
+      "bytes": 92310
+    },
+    {
+      "file": "m2-sky-headless-debug-clock.log",
+      "sha256": "0d2e2c0b2d2defe5f2fc825141edb04bb91c323c9a01b6d77a30414a9134371c",
+      "raw_capture_sha256": "0d2e2c0b2d2defe5f2fc825141edb04bb91c323c9a01b6d77a30414a9134371c",
+      "bytes": 1225
+    },
+    {
+      "file": "m2-sky-headless-release-clock.log",
+      "sha256": "809577a9b596ec391d662bd432ca1de7a2226ffbcd1b3a2f4c1db59b41a07d7c",
+      "raw_capture_sha256": "809577a9b596ec391d662bd432ca1de7a2226ffbcd1b3a2f4c1db59b41a07d7c",
+      "bytes": 1227
+    },
+    {
+      "file": "m2-sky-sanitize.log",
+      "sha256": "8a9bc4a5f17fc2cf179dff4af6357fbd9fe6706f7cd5b0421b2dfc086a623ac8",
+      "raw_capture_sha256": "8a9bc4a5f17fc2cf179dff4af6357fbd9fe6706f7cd5b0421b2dfc086a623ac8",
+      "bytes": 5109
+    },
+    {
+      "file": "m2-sky-sanitize-clock.log",
+      "sha256": "b7c24c8895e5fe132256cda251103c7e37aa1abb0f3daf8b41481f7cd6e19750",
+      "raw_capture_sha256": "b7c24c8895e5fe132256cda251103c7e37aa1abb0f3daf8b41481f7cd6e19750",
+      "bytes": 370
+    },
+    {
+      "file": "m2-sky-gpu-debug.log",
+      "sha256": "1cc2a7824110785a146b5759dc0b17e7c972aace3f741a4fec2a220a6f86adf1",
+      "raw_capture_sha256": "1cc2a7824110785a146b5759dc0b17e7c972aace3f741a4fec2a220a6f86adf1",
+      "bytes": 16375
+    },
+    {
+      "file": "m2-sky-gpu-release.log",
+      "sha256": "f2c4c347be6aa07185e1ef92813fc46c403e7438e2aa86c932c5ea32ac293469",
+      "raw_capture_sha256": "f2c4c347be6aa07185e1ef92813fc46c403e7438e2aa86c932c5ea32ac293469",
+      "bytes": 16456
+    },
+    {
+      "file": "m2-sky-gpu-app-repeated.log",
+      "sha256": "b0c95bc971edbb9ca1ac3f15850db9c9b8b3bf378a196c79e7cee7e137c49b42",
+      "raw_capture_sha256": "b0c95bc971edbb9ca1ac3f15850db9c9b8b3bf378a196c79e7cee7e137c49b42",
+      "bytes": 5578
+    },
+    {
+      "file": "m2-sky-gpu-initial-failure.log",
+      "sha256": "d3a91c2376ad8cc89f00ef5baf20f32b468b3c105515f66c0c53c3dd53c22fe5",
+      "raw_capture_sha256": "d3a91c2376ad8cc89f00ef5baf20f32b468b3c105515f66c0c53c3dd53c22fe5",
+      "bytes": 16545
+    },
+    {
+      "file": "m2-sky-gpu-failed-pause-attempt.log",
+      "sha256": "6f19dcac7b49e56f30692758e8df5a7f433af7437605e90e57af1d2a1ace555f",
+      "raw_capture_sha256": "6f19dcac7b49e56f30692758e8df5a7f433af7437605e90e57af1d2a1ace555f",
+      "bytes": 4898
+    },
+    {
+      "file": "m2-sky-gpu-timing-diagnosis.log",
+      "sha256": "66d18fdc58b806b0a7280ccbc1e6cc6e03e24d933f5306ba016fdc84f01c94b2",
+      "raw_capture_sha256": "66d18fdc58b806b0a7280ccbc1e6cc6e03e24d933f5306ba016fdc84f01c94b2",
+      "bytes": 6498
+    },
+    {
+      "file": "m2-sky-gpu-device.log",
+      "sha256": "cdfa50238d4fe3a792cb22a0dfb4e2d99790675e7cd3fc6b011df3b119af0524",
+      "raw_capture_sha256": "cdfa50238d4fe3a792cb22a0dfb4e2d99790675e7cd3fc6b011df3b119af0524",
+      "bytes": 3578
+    },
+    {
+      "file": "m2-sky-format.log",
+      "sha256": "28b168e35b45edb688ceffcfd02bf2c0031a6b56bb03e0b535f661c969077759",
+      "raw_capture_sha256": "28b168e35b45edb688ceffcfd02bf2c0031a6b56bb03e0b535f661c969077759",
+      "bytes": 34
+    },
+    {
+      "file": "m2-sky-links.log",
+      "sha256": "6f4cac9e5c3c0b8861a7ce0597849c21ba055a8b747598d31163c01029071655",
+      "raw_capture_sha256": "6f4cac9e5c3c0b8861a7ce0597849c21ba055a8b747598d31163c01029071655",
+      "bytes": 40
+    }
+  ],
+  "implementation_patch_sha256": "2f6ca588addf2a82930a722527ff7985c1e750104b8d2d6331858e54edbf09f9",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "a7d32ff91fb0b4ab12f4cce1058e4fcd239197d8db874fad62a7623ce9d07ba2"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "7b263a242a49fafb1886dfa7f177f5509d42b7bb50a93a9040b6d8771b975a2b"
+    },
+    {
+      "path": "README.md",
+      "sha256": "3eb17d3feb1dcc9db7ef3685862c76ff8a0ee4c7d73cbca569a70a5efb54dad5"
+    },
+    {
+      "path": "docs/M2_SKY_SOURCES.json",
+      "sha256": "b86c8e8a50bf52f411e65e8b75f5b1d462f491df5c21c8bef650ce46bb8475d1"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "16d29c0968804268a85dfbdce67c14f9e228323e842431886981121a287ab4ac"
+    },
+    {
+      "path": "docs/SESSION_PLAYBACK_CONTRACTS.md",
+      "sha256": "a0b48510814ddeece722c74fcc959930d88c7693ba95b7283b97eed59130e321"
+    },
+    {
+      "path": "docs/SKY_CONTRACTS.md",
+      "sha256": "31514c15899b03a9bf4397372338030ce7075b996f0d44d6ae964189ef9bd6e3"
+    },
+    {
+      "path": "docs/TEXTURE_CONTRACTS.md",
+      "sha256": "12ecfc68624d3f6af663d082cd7d27408fcea96dbd6cf6d666e21aed98cae34d"
+    },
+    {
+      "path": "docs/WORLD_ALPHA_CONTRACTS.md",
+      "sha256": "05a55859ba4e34bed9a97efe6ebb8c8a932f33e6ecb443beeec65f0eedb71768"
+    },
+    {
+      "path": "docs/WORLD_VIEW_CONTRACTS.md",
+      "sha256": "d3a1f20fc62735c4add819cc7b16cf51279a3a84d8191994a420d1b0f22e3f5a"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "4271d7c2f24d42f9262fd040bfe9d30e9b2a49b741d8bf0ef1d77c62997d2fcd"
+    },
+    {
+      "path": "src/app/inspector.h",
+      "sha256": "6b6f30a64aee9da99e00f324cf7fcb7b7e841c5fc4e2a0debe58db9620dcd78c"
+    },
+    {
+      "path": "src/app/main.cpp",
+      "sha256": "155b22daac08114157a4acb515331f5925dbb5dfa834086cd779158dd6709b9c"
+    },
+    {
+      "path": "src/app/objectives_smoke.cpp",
+      "sha256": "81d75c5fbe81530b777231769b10ce59b0717420d1c91aa1f0517dce217a5881"
+    },
+    {
+      "path": "src/app/session_playback.h",
+      "sha256": "7b1e77737b7e1a65d265854bad71312d95d0a54ec2673ed04edcb51e5a5cf8ac"
+    },
+    {
+      "path": "src/engine/sky.cpp",
+      "sha256": "43736b90f5b1fb87853f64354a5d4a5c55ebba2ef8c18f96f5916acefef4cbab"
+    },
+    {
+      "path": "src/engine/sky.h",
+      "sha256": "381b6911d879b0edde76384b0dd885d51533bc08154ca2a584807cc3f62c0fcd"
+    },
+    {
+      "path": "src/engine/world_renderer.cpp",
+      "sha256": "74f0bd4c3ab90ad7500e95f06d100c3289eecb6dc3e267e398f2c1da66b365dc"
+    },
+    {
+      "path": "src/engine/world_renderer.h",
+      "sha256": "b2a41734ff4ec6b33c5ee963a4ee5e04d99363dc06f81165eb7b350281bad032"
+    },
+    {
+      "path": "src/engine/world_view.cpp",
+      "sha256": "7fcf6f2d1dd814f9ebd73d072ae1a8a096451e6ab42000e4c49465dae9420b10"
+    },
+    {
+      "path": "src/engine/world_view.h",
+      "sha256": "95ee54a804aa22d7cabf773bd22ad78b30446cbc83f5cc28f0b23bc13cf818c2"
+    },
+    {
+      "path": "src/game/legacy/basedefs_de.h",
+      "sha256": "d17723a4a02d4ce02b88b07e920fc8e41dcf8124e25434e34236a2416fdaeb67"
+    },
+    {
+      "path": "src/game/legacy/server_de.h",
+      "sha256": "4bdb757462dcd257b1ebfe41c87db71f940b06e21dd90485a59a9db6853519c2"
+    },
+    {
+      "path": "src/game/level_change.cpp",
+      "sha256": "5a460b9ff62b104ba5748d0a9d3409ff616ef147d042dfab783e78aa5bc839f9"
+    },
+    {
+      "path": "src/game/original/SkyObjects.cpp",
+      "sha256": "2d9b31f85e090f9c03342ac2bb663aa71099038e6e91be2043e388dc8804a4a0"
+    },
+    {
+      "path": "src/game/original/SkyObjects.h",
+      "sha256": "27e2d30e805ce7df7122f8af189bdd55e3c4566a9273ce09690c05f81b2fb388"
+    },
+    {
+      "path": "src/game/registration.cpp",
+      "sha256": "755533dee0a03723693c374df0ea0e56c8bc426751894396a9d4059893ddab9c"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "94982d8e8f2e7a44da361d9bc790dd618859ad47c79daf60720d4dbd0229b217"
+    },
+    {
+      "path": "src/game/server_sky.cpp",
+      "sha256": "750fdcd6aa27a3cf8ad7e2b00c672077cacbcfbd61f467c8ab9235a87b164e80"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "88702836b928f5834025c4b7b8c85cf1feca12b1ff2173e8beab69673306e509"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "c5920cc2ab26f6b578bd23b8c6016a5b516a00f371634f32d99c1374cbdb51be"
+    },
+    {
+      "path": "tests/assault_tests.cpp",
+      "sha256": "fc1bce1db0750f917890d87f53bf97fb7c4c54b9651347699d1fa90994cf2462"
+    },
+    {
+      "path": "tests/audio_stream_tests.cpp",
+      "sha256": "5993d1b62d77281801b92bd88c5b659a8c1e761f2c65f0fc937b22f53db15d34"
+    },
+    {
+      "path": "tests/compound_shell_tests.cpp",
+      "sha256": "caf26949a8f32e0d79fce13302601e96dd191e65b0a38d493728db907b193ac4"
+    },
+    {
+      "path": "tests/conversation_tests.cpp",
+      "sha256": "596a215175cf49b5c0065291af7e88e697df7ca2e0d80df4775f6be0aa65f7cb"
+    },
+    {
+      "path": "tests/destructable_model_tests.cpp",
+      "sha256": "d6ae039737f43e22fceaeb8940883df6b15c8742d7b93910e26dbd5881de4621"
+    },
+    {
+      "path": "tests/flare_tests.cpp",
+      "sha256": "dbb0c9e66f8e89bd3804551fa8fa5d5c8cd30804f50e2a5c8d25a30fac5f10d9"
+    },
+    {
+      "path": "tests/level_change_gpu_tests.cpp",
+      "sha256": "a56e8f03beb5819fdfbd1d2a1b0e7efde900eee1df7aeb5ddead4580f9d761eb"
+    },
+    {
+      "path": "tests/mac10_tests.cpp",
+      "sha256": "d3aaa4b6b1fe2b68d53e9419bbd5fa3f2e335d69e05d69b6005b14c0229e1d63"
+    },
+    {
+      "path": "tests/medkit_tests.cpp",
+      "sha256": "45513fbd8159a47e45488abddafb3d2a9aabd77747ff5df76a07554aba56603f"
+    },
+    {
+      "path": "tests/particle_stream_tests.cpp",
+      "sha256": "d27aac7adb25e03cf36b9852da69587c568df491abbed7e1f40c9df952398e52"
+    },
+    {
+      "path": "tests/session_playback_tests.cpp",
+      "sha256": "bd7e03bd729f5dec5323b21073ed8c9505f1447de47013438eadcc054109bceb"
+    },
+    {
+      "path": "tests/sky_gpu_tests.cpp",
+      "sha256": "77ec1ad2042aadd7b62ee3fff05a46df678c9eef663beebe0e9537de39e6ef0d"
+    },
+    {
+      "path": "tests/sky_tests.cpp",
+      "sha256": "b998451ce8d1b408808af839f431800e5172258d85c041ba39c73d4425c36190"
+    },
+    {
+      "path": "tests/world_debris_tests.cpp",
+      "sha256": "a7a4f237b826bc9a9c5289aa939d0f8c8e67d5abc8f2338f9ffd0b585510495a"
+    },
+    {
+      "path": "tests/world_tests.cpp",
+      "sha256": "6e3447f3edb1e7222e1916fc2f2131d6a6b1a66a0a40168168a87c8ed7edf0aa"
+    }
+  ],
+  "implementation_commit": "6fdab8820ecdd761e09738a8fd608ee01221c673"
+}

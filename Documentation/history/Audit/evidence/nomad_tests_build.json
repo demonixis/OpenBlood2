@@ -1,0 +1,17 @@
+{
+  "name": "nomad_tests_build",
+  "command": [
+    "dotnet",
+    "build",
+    "nomad/tests/Nomad.Tests/Nomad.Tests.csproj",
+    "--artifacts-path",
+    "/tmp/lithtech-audit-2bVxTF/dotnet-tests",
+    "--nologo"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:10:13.133570+00:00",
+  "elapsed_seconds": 6.26,
+  "timeout_seconds": 180,
+  "exit_code": 0,
+  "log": "nomad_tests_build.log"
+}

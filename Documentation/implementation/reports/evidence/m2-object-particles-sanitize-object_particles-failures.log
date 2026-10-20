@@ -1,0 +1,14 @@
+543/545 Testing: object_particles.failures
+543/545 Test: object_particles.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_particle_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object-particles-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"object_particles.failures" start time: Oct 16 21:44 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"object_particles.failures" end time: Oct 16 21:44 CEST
+"object_particles.failures" time elapsed: 00:00:00
+----------------------------------------------------------

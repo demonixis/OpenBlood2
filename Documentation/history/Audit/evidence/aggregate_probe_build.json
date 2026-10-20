@@ -1,0 +1,29 @@
+{
+  "name": "aggregate_probe_build",
+  "command": [
+    "c++",
+    "-std=c++17",
+    "-g",
+    "-O0",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-fpermissive",
+    "-include",
+    "OpenBlood2/blood2/Shared/LithTechCompat.h",
+    "-I",
+    "OpenBlood2/blood2/AppHeaders",
+    "-I",
+    "OpenBlood2/blood2/Shared",
+    "Documentation/Audit/probes/aggregate_dispatch_probe.cpp",
+    "OpenBlood2/blood2/AppHeaders/cpp_engineobjects_de.cpp",
+    "-Wl,--gc-sections",
+    "-o",
+    "/tmp/lithtech-audit-2bVxTF/aggregate_dispatch_probe"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:20:31.666137+00:00",
+  "elapsed_seconds": 0.478,
+  "timeout_seconds": 60,
+  "exit_code": 1,
+  "log": "aggregate_probe_build.log"
+}

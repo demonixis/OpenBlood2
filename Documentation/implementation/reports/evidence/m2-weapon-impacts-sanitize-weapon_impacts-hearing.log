@@ -1,0 +1,14 @@
+567/569 Testing: weapon_impacts.hearing
+567/569 Test: weapon_impacts.hearing
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_impact_tests" "hearing" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-impacts-hearing"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_impacts.hearing" start time: Oct 16 23:27 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_impacts.hearing" end time: Oct 16 23:27 CEST
+"weapon_impacts.hearing" time elapsed: 00:00:00
+----------------------------------------------------------

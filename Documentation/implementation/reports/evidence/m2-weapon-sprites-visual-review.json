@@ -1,0 +1,14 @@
+{
+  "images": [
+    {
+      "path": "build/debug/tests/weapon-sprite-private/private-flash.png",
+      "sha256": "174d01d132d67cfe942db43c101cbba5905b6db427cea8ba75e2304454938c04"
+    },
+    {
+      "path": "build/debug/tests/weapon-sprite-private/private-smoke.png",
+      "sha256": "e7b3c542385e9cf53f144992f2d5f19a47672c97ef9fdab13e99c91eb2435519"
+    }
+  ],
+  "review": "Inspected both private GPU captures: centered bright yellow flash and brown translucent smoke on dark clear background, with no unexpected full-screen quad. These are isolated diagnostic effect captures, not a gameplay or inspector screenshot.",
+  "ui_visual_review": false
+}

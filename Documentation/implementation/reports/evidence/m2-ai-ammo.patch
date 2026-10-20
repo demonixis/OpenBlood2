@@ -1,0 +1,782 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 4b70279..db8d88b 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -602,3 +602,5 @@ The [model preparation optimization](../Documentation/Implementation/M2_MODEL_PR
+ The [NPC animation-clearance correction](../Documentation/Implementation/M2_AI_ANIMATION_CLEARANCE.md) restores original SetAnimation continuation when physical resizing is blocked. Read [contracts](docs/AI_ANIMATION_CLEARANCE_CONTRACTS.md). Preserve the retained physical body, actual cached AI dimensions, separately inspected request, same-clip reset behavior and explicit invalid/unavailable failures. Inspector counters expose blocked resizes; no forced activation or balance changes are added. The collision solver remains a replacement and M2 stays incomplete.
+ 
+ The [original PolyGrid continuation](../Documentation/Implementation/M2_POLYGRIDS.md) connects VolumeBrush surface creation, original high-detail plasma/scale rules and actual transparent SDL_GPU rendering. Read [contracts](docs/POLYGRID_CONTRACTS.md). Preserve independent publisher lifetime, Current.y pan, hidden-clock pause, shared per-world phases, checked resource failures and revision-owned caches. Visual publishers are excluded from replacement body physics; static containers, explicit always-update timing and separate alpha sorting remain bounded policies. CityHub water now renders; underwater fog, moving volumes and the M2 gate stay open.
++
++The [NPC ammunition continuation](../Documentation/Implementation/M2_AI_AMMO.md) connects original FindAmmo and MID_ADDAMMO instead of suspending an empty-ammo actor. Read [contracts](docs/AI_AMMO_CONTRACTS.md). Preserve original class selection, ray-hit visibility, empty-route escape, single integration and capped collection. Specific+AvoidTarget skips unused undefined arithmetic; removed pickup trackers retain only their owned route. Private contact/hidden-inspector tests do not prove autonomous retail pickup pursuit or resolve every idle-NPC report. M2 remains incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 59b0447..e7b2209 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -43,7 +43,7 @@ target_sources(blood2_game PRIVATE src/game/original/WeaponPickups.cpp src/game/
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+     src/game/server_activation.cpp src/game/original/AIRuntime.cpp
+-    src/game/original/AISmell.cpp src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIDodge.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/AIScriptFire.cpp src/game/original/Movement.cpp
++    src/game/original/AIAmmo.cpp src/game/original/AISmell.cpp src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIDodge.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/AIScriptFire.cpp src/game/original/Movement.cpp
+     src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AIDeath.cpp src/game/original/Gib.cpp src/game/flesh_gibs.cpp src/game/original/Corpse.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/Gideon.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+diff --git a/docs/AI_AMMO_CONTRACTS.md b/docs/AI_AMMO_CONTRACTS.md
+new file mode 100644
+index 0000000..095728e
+--- /dev/null
++++ b/docs/AI_AMMO_CONTRACTS.md
+@@ -0,0 +1,85 @@
++# Original NPC ammunition recovery
++
++`AI_Mgr::AI_STATE_FindAmmo` and the original `MID_ADDAMMO` receiver are now
++connected. M2 remains incomplete. See [source hashes](M2_AI_AMMO_SOURCES.json),
++[execution evidence](../../Documentation/Implementation/M2_AI_AMMO.md),
++[navigation contracts](AI_NAVIGATION_CONTRACTS.md) and
++[pickup contracts](PICKUP_CONTRACTS.md).
++
++## Original decisions and phases
++
++`MC_BestWeapon` already selected FindAmmo when the current ordinary weapon had
++an empty raw ammo pool. AI_Update previously suspended on the missing dispatcher
++case. The state now runs through the existing original navigation/animation calls:
++
++1. With no current weapon, request Idle. Otherwise select the original ammo class,
++   search the ammo intrusive list using AvoidTarget, Visible and Specific flags,
++   and escape when no candidate exists. Preserve the original `RocketAmmoPU`
++   spelling for Howitzer ammo; the absent class is an empty search, not an alias
++   for `HowitzerAmmoPU`. Unsupported ammo types likewise have no candidate.
++2. Face the selected pickup and calculate a path, then face its first point on
++   the next call. An empty path requests EscapeRun.
++3. Run toward the flattened point using the original inclusive half-diagonal
++   arrival threshold. Preserve the first ledge check, short-circuited second
++   check after consuming a point, phase 2 for further points and facing the
++   cached combat target at the last point. Movement sets velocity only; normal
++   engine integration remains single.
++4. Recompute the original subclass state. An empty phase-3 route also recomputes.
++
++The source ignores CalculatePath failure. The port clears partial points on an
++ordinary blocked result so the next phase uses its original empty-route escape.
++Invalid input, unavailable collision and exhausted bounds remain failures.
++No rejected partial route becomes successful navigation.
++
++Specific class selection leaves `fObjectDp` equal to zero in the original
++FindObjectInRadius. Its AvoidTarget predicate can therefore never reject, but
++it reads an uninitialized forward vector before reaching that result. The port
++skips that unused computation. It preserves the reversed IsKindOf arguments,
++list order, ties, distance and visibility checks; other avoidance queries retain
++their sampled-target validation. This supersedes the earlier blanket rejection
++of Specific+AvoidTarget. It is a defined safety adaptation, not a retail binary
++random-stack-behavior claim.
++
++Original CanSee still requires a target ray hit. Ordinary nonsolid ammo pickups
++are not made solid or ray-hittable by this increment, so a search may legitimately
++find nothing and choose escape. The positive route test explicitly adds RAYHIT
++to a synthetic pickup; that is branch coverage, not proof of retail pickup vision.
++
++## Collection and checked lifetime
++
++The original AI message receiver accepts ammo only while alive and without
++NOAMMOCOLLECT (0x200). AddAmmo retains its attribute cap and full-reserve refusal.
++Only accepted amounts produce the typed picked-up acknowledgement. The pickup
++accepts the AI acknowledgement only for ammo, during its matching active contact.
++Player health, weapon, item and key handling retain their existing restrictions.
++No NPC powerup collection or invented health-pickup list is introduced.
++
++The typed receiver additionally checks a live AmmoPickup sender, matching payload
++and active offer to this actor. Replayed/out-of-contact packets cannot grant ammo.
++Removal remains deferred. Sound and authored trigger dispatch keep the existing
++sound-before-trigger order; the detached voice outlives pickup and actor removal.
++No borrowed sender access occurs after the acknowledgement callback.
++
++A pickup tracked during FindAmmo may disappear because this actor or another
++collector removes it. AI_Update identifies that exact selected pickup even after a state change and
++clears its stale non-owning tracker while
++retaining the owned route and historical coordinates, then continues the state.
++It does not dereference the dead object or suspend the actor. This is a bounded
++lifetime adaptation to the original unchecked tracked-position query. Other
++tracked-object failure contracts remain unchanged; no general resurrection or
++silent failure recovery is added.
++
++## Inspection and limits
++
++The Skeletons navigation section shows search count, ammo type/class, accepted
++and refused offers, removed tracked pickups, and the last checked collection
++source. Existing phase/path/target/query/error inspection remains available for
++hidden and inactive actors. Counters advance through gameplay, never UI drawing.
++
++Private tests use real Cultist/player/pickup models and WAVs in an explicitly
++synthetic arena, repeated through unload/re-entry. The NVIDIA pickup smoke also
++collects through MoveObject contact with the inspector hidden and removes both
++participants before checking audio. Neither test claims autonomous authored
++pickup pursuit, full campaign traversal, or a fix for every reported idle NPC.
++FindHealth/AssistAlly and other missing selected services remain separate. No
++shaders, dependencies, commercial assets or reference sources are changed.
+diff --git a/docs/AI_PERCEPTION_CONTRACTS.md b/docs/AI_PERCEPTION_CONTRACTS.md
+index 3547880..03476f5 100644
+--- a/docs/AI_PERCEPTION_CONTRACTS.md
++++ b/docs/AI_PERCEPTION_CONTRACTS.md
+@@ -57,8 +57,10 @@ Specific preserves the original **reversed** IsKindOf(requested, candidateClass)
+ comparison, and skips direction computation; FaceObject then observes its source
+ zero dot product. AvoidTarget uses normalized observer-minus-cached-target, and
+ rejects only when both target and candidate dots are positive. It requires a live,
+-sampled target. Specific+AvoidTarget rejects because the source reads an
+-uninitialized forward vector there. Nonfinite or coincident directions also reject
++sampled target. [NPC ammo recovery](AI_AMMO_CONTRACTS.md) now permits
++Specific+AvoidTarget by skipping its unused uninitialized-forward computation:
++the source's zero object dot prevents that branch from rejecting a candidate.
++Other nonfinite or coincident directions still reject
+ instead of propagating invalid normalization. Nonpositive finite ranges return a
+ successful empty query. Unknown flags, invalid poses, corrupt lists and unavailable
+ collision are failures, not an absence of enemies. Last reports are read-only;
+diff --git a/docs/M2_AI_AMMO_SOURCES.json b/docs/M2_AI_AMMO_SOURCES.json
+new file mode 100644
+index 0000000..1831fdc
+--- /dev/null
++++ b/docs/M2_AI_AMMO_SOURCES.json
+@@ -0,0 +1,39 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "e54401b654171f76419d2a5dbd8c8783cd828a04",
++  "status": "M2 incomplete; original NPC ammunition search and collection",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "purpose": "MID_ADDAMMO:784-798; FindObjectInRadius:2918-3066; AI_STATE_FindAmmo:6081-6172; original dispatch and CanSee."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/AI_Mgr.h",
++      "source_sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
++      "purpose": "NOAMMOCOLLECT=0x200 and original state IDs."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/AmmoPickups.cpp",
++      "source_sha256": "3ea2f1ba0b90298563b5a97c451e4e1d60e0b10fdd666320944edb23afa50696",
++      "purpose": "AmmoPickup::ObjectTouch:76-86 sends MID_ADDAMMO to touched objects; original ammo classes."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PickupObject.cpp",
++      "source_sha256": "25e0388f983ec0c9e01b6deb8432f411271159a224d582e12300c10863b979da",
++      "purpose": "MID_PICKEDUP acknowledgement, independent sound and deferred single-player removal."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/CultistAI.cpp",
++      "source_sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
++      "purpose": "FindAmmo decision after completion returns to the previous state when no stimulus exists."
++    }
++  ],
++  "adaptations": [
++    "Typed checked pickup offer/acknowledgement, bounded messages and deferred lifetime.",
++    "Specific+AvoidTarget skips unused uninitialized-forward arithmetic: original object-dot is zero.",
++    "Blocked paths discard partial points; invalid/unavailable/budget failures remain explicit.",
++    "FindAmmo tolerates disappearance of its non-owning pickup tracker without dereferencing it; owned route remains.",
++    "No pickup collision/visibility changes, ammo class aliases or health collection."
++  ]
++}
+diff --git a/docs/PICKUP_CONTRACTS.md b/docs/PICKUP_CONTRACTS.md
+index 0ec1c37..59af43d 100644
+--- a/docs/PICKUP_CONTRACTS.md
++++ b/docs/PICKUP_CONTRACTS.md
+@@ -47,8 +47,9 @@ flags do not implement saves or visual effects. Missing ABCs remain
+ inspectable with touch/gravity disabled and an explicit diagnostic.
+ 
+ Touches send MID_ADDAMMO (1009) or MID_ADDPOWERUP (3504). The source accepts
+-contacts from any object; only the connected CPlayerObj branch changes player
+-stats. Alive players accept ammo below their attribute-derived cap, truncating
++contacts from any object. The connected CPlayerObj branch changes player stats;
++[original NPC ammo recovery](AI_AMMO_CONTRACTS.md) additionally accepts ammo
++through a checked active offer and matching acknowledgement. Alive players accept ammo below their attribute-derived cap, truncating
+ partial pickups to that cap. Health/MegaHealth and Ward/NecroWard use their
+ separate original normal/bonus caps. A full reserve keeps the pickup available;
+ zero amounts retain the source acceptance behavior when below the cap. Dead
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index e62255b..eed1773 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1081,3 +1081,5 @@ Selected Weapon.cpp flags, WeaponFX.cpp flesh/metal recipes and SparksFX.cpp bur
+ [HUD contracts](HUD_CONTRACTS.md) and [source hashes](M2_HUD_SOURCES.json) record the selected original player stats, command-slot mapping and client visibility rules. The compact ImGui presentation and shared UI lifetime are new engine/application code; original PCX artwork is not ported.
+ 
+ [NPC animation clearance](M2_AI_ANIMATION_CLEARANCE_SOURCES.json): correct the selective original SetAnimation adaptation; see [contracts](AI_ANIMATION_CLEARANCE_CONTRACTS.md).
++
++[Original NPC ammunition recovery](M2_AI_AMMO_SOURCES.json): FindAmmo phases and MID_ADDAMMO collection, with defined query/lifetime adaptations in [contracts](AI_AMMO_CONTRACTS.md).
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 65c19f8..7fde57f 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -293,6 +293,13 @@ namespace OpenBlood2
+             ImGui::Text("Last driven state %d | current %d | phase %d", a.navigation_state, a.m_nState, a.Metacmd);
+             ImGui::Text("Updates %llu | arrivals %llu | failures %llu", (unsigned long long)a.navigation_updates,
+                         (unsigned long long)a.navigation_arrivals, (unsigned long long)a.navigation_failures);
++            ImGui::Text("Ammo searches %llu | accepted %llu | refused %llu | removed targets %llu",
++                        (unsigned long long)a.ammo_searches, (unsigned long long)a.ammo_collections,
++                        (unsigned long long)a.ammo_refusals, (unsigned long long)a.ammo_target_losses);
++            ImGui::Text("Sought ammo %u | class %s", unsigned(a.searched_ammo),
++                        a.searched_ammo_class.empty() ? "none" : a.searched_ammo_class.c_str());
++            const auto* ammo_source = game.objects.get(a.last_ammo_source);
++            ImGui::Text("Last collection source %s", ammo_source ? ammo_source->state.m_Name : "removed / none");
+             ImGui::Text("ToPos destination (%.2f %.2f %.2f)", a.m_vDestPos.x, a.m_vDestPos.y, a.m_vDestPos.z);
+             ImGui::Text("Last distance %.3f / threshold %.3f | jump speed %.2f", a.navigation_distance,
+                         a.navigation_threshold, a.m_fJumpSpeed);
+diff --git a/src/app/pickup_smoke.cpp b/src/app/pickup_smoke.cpp
+index 68e6515..37e32af 100644
+--- a/src/app/pickup_smoke.cpp
++++ b/src/app/pickup_smoke.cpp
+@@ -1,8 +1,10 @@
+ #include "pickup_smoke.h"
++#include "game/original/AI_Mgr.h"
+ #include "game/original/PickupObject.h"
+ #include "game/original/WeaponPickups.h"
+ #include "game/original/spawn_object.h"
+ #include "movement_controls.h"
++#include <spdlog/spdlog.h>
+ namespace OpenBlood2
+ {
+     bool prepare_pickup_smoke(GameSession& g, ObjectId& id)
+@@ -68,6 +70,25 @@ namespace OpenBlood2
+         g.client_shell.medkit_down = false;
+         if (!g.client_shell.UpdateUse(g.server_shell))
+             return false;
++        // Actual original NPC/pickup, deliberately isolated contact placement.
++        auto npc = g.objects.create(g.objects.find_class("CultistAI"), {}, Creation::String,
++                                    {{"Name", std::string("NPC ammunition smoke")},
++                                     {"Pos", DVector{1000, 10000, 0}},
++                                     {"AIState", std::string("IDLE")}});
++        auto* ai = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(npc));
++        auto ammo = SpawnObject("BulletAmmoPU Name npc_smoke_ammo", {1000, 10000, 0}, {}, {});
++        if (!ai || !ai->RuntimeReady() || !ammo)
++            return false;
++        ai->m_InventoryMgr.SetAmmoCount(1, 0);
++        pos = g.objects.get(ammo)->state.m_Pos;
++        if (g.server.MoveObject(npc, &pos) != DE_OK || ai->ammo_collections != 1 ||
++            ai->m_InventoryMgr.GetAmmoCount(1) != 100 || g.server.IsObjectAlive(ammo))
++            return false;
++        spdlog::info("NPC ammunition smoke: original collection={}, bullets={}", ai->ammo_collections,
++                     ai->m_InventoryMgr.GetAmmoCount(1));
++        // Source-independent sound must survive removal of both participants.
++        if (!g.objects.remove(npc))
++            return false;
+         for (const auto& report : g.server.pickup_reports)
+         {
+             const auto* voice = g.server.audio.get(report.voice);
+@@ -85,6 +106,6 @@ namespace OpenBlood2
+         return g.server.audio.has_output() && g.server.audio.submitted_frames > 0 &&
+                g.server.audio.output_error.empty() && player->m_damage.m_fHitPoints == 100 &&
+                player->m_InventoryMgr.medkit->count == 25 && g.client_shell.item_sounds == 1 &&
+-               g.server.audio.get(g.client_shell.item_voice) && g.server.pickup_reports.size() == 3;
++               g.server.audio.get(g.client_shell.item_voice) && g.server.pickup_reports.size() == 4;
+     }
+ } // namespace OpenBlood2
+diff --git a/src/game/original/AIAmmo.cpp b/src/game/original/AIAmmo.cpp
+new file mode 100644
+index 0000000..5ebcbdc
+--- /dev/null
++++ b/src/game/original/AIAmmo.cpp
+@@ -0,0 +1,132 @@
++// Original AI_Mgr.cpp:784-798,6081-6172. See AI_AMMO_CONTRACTS.md.
++#include "AI_Mgr.h"
++#include "AmmoPickups.h"
++#include "engine/collision.h"
++#include <cmath>
++using namespace OpenBlood2;
++
++void AI_Mgr::ReceiveAmmo(HOBJECT sender, HMESSAGEREAD read)
++{
++    auto* s = GetServerDE();
++    PickupMessage pickup;
++    // Source MID_ADDAMMO: death and NOAMMOCOLLECT guard the inventory mutation.
++    // The typed boundary additionally authenticates the live ammo publisher.
++    const auto* source = s && s->IsObjectAlive(sender) ? dynamic_cast<AmmoPickup*>(s->HandleToObject(sender)) : nullptr;
++    if (!s || !s->IsObjectAlive(m_hObject) || m_damage.IsDead() || (m_dwFlags & 0x200u) || !source ||
++        !source->IsOfferingTo(m_hObject) || !s->ReadPickupMessage(read, pickup) || pickup.kind != PickupKind::Ammo ||
++        pickup != source->value || m_InventoryMgr.AddAmmo(pickup.type, pickup.amount) != InventoryResult::Ok)
++    {
++        ++ammo_refusals;
++        return;
++    }
++    ++ammo_collections;
++    last_ammo_source = sender;
++    auto reply = s->StartMessageToObject(this, sender, picked_up_message);
++    if (reply)
++    {
++        s->WritePickupMessage(reply, pickup);
++        s->EndMessage(reply); // May remove source or actor; no borrowed source access afterwards.
++    }
++}
++bool AI_Mgr::AI_STATE_FindAmmo()
++{
++    return NavigationState(StateFindAmmo);
++}
++bool AI_Mgr::AmmoStep()
++{
++    auto* s = GetServerDE();
++    navigation_threshold = (std::hypot(m_vDims.x, m_vDims.z) + .1f) / 2;
++    switch (Metacmd)
++    {
++        case 1:
++        {
++            ++ammo_searches;
++            searched_ammo = 0;
++            searched_ammo_class.clear();
++            const auto* weapon = m_InventoryMgr.CurrentWeapon();
++            if (!weapon)
++                return SetNewState(StateIdle) || NavigationFailure(state_error);
++            searched_ammo = weapon->data.m_nAmmoType;
++            // Preserve the original RocketAmmoPU spelling. The actual class is
++            // HowitzerAmmoPU; an absent class yields no candidate, never an alias.
++            static constexpr const char* classes[]{"",
++                                                   "BulletAmmoPU",
++                                                   "ShellAmmoPU",
++                                                   "BMGAmmoPU",
++                                                   "FlareAmmoPU",
++                                                   "DieBugDieAmmoPU",
++                                                   "RocketAmmoPU",
++                                                   "FuelAmmoPU",
++                                                   "BatteryAmmoPU"};
++            if (searched_ammo < std::size(classes))
++                searched_ammo_class = classes[searched_ammo];
++            const auto type = searched_ammo_class.empty() ? nullptr : s->GetClass(searched_ammo_class.c_str());
++            searched_ammo_target = nullptr;
++            m_hTrackObject = nullptr;
++            tracked_position_valid = false;
++            if (type)
++            {
++                m_hTrackObject = FindObjectInRadius(AIFindList::Ammo, m_fSeeingDist,
++                                                    FindAvoidTarget | FindVisible | FindSpecific, type);
++                if (!find.valid)
++                    return NavigationFailure(find.error);
++            }
++            searched_ammo_target = m_hTrackObject;
++            if (!m_hTrackObject)
++                return SetNewState(StateEscapeRun) || NavigationFailure(state_error);
++            if (!RefreshTrackedPosition() || !MC_FacePos(m_vTrackObjPos))
++                return NavigationFailure(target_error);
++            // Source ignores a failed CalculatePath. Keep its empty-route escape,
++            // but never follow partial points after a rejected bounded plan.
++            navigation_plan_failed = !m_MoveObj.CalculatePath(m_vTrackObjPos);
++            if (navigation_plan_failed)
++            {
++                if (m_MoveObj.outcome == CMovement::Outcome::Blocked)
++                {
++                    m_MoveObj.Term();
++                    return true;
++                }
++                return NavigationFailure(m_MoveObj.error);
++            }
++            return true;
++        }
++        case 2:
++        {
++            DVector point;
++            if (!m_MoveObj.GetNextPathPoint(point))
++                return SetNewState(StateEscapeRun) || NavigationFailure(state_error);
++            return MC_FacePos(point) || NavigationFailure(target_error);
++        }
++        case 3:
++        {
++            DVector point;
++            if (!m_MoveObj.GetNextPathPoint(point))
++                return NavigationDecision();
++            point.y = m_MoveObj.GetPos().y;
++            const auto delta = vector_subtract(point, m_MoveObj.GetPos());
++            navigation_distance = std::hypot(delta.x, delta.y, delta.z);
++            bool edge = false;
++            if (!IsLedge(m_MoveObj.GetForwardVector(), edge))
++                return NavigationFailure(locomotion_error);
++            if (edge)
++                ++Metacmd;
++            else if (navigation_distance <= navigation_threshold)
++            {
++                const bool another = m_MoveObj.MoveToNextPathPoint();
++                ++navigation_arrivals;
++                if (another && !IsLedge(m_MoveObj.GetForwardVector(), edge))
++                    return NavigationFailure(locomotion_error);
++                if (!another || edge)
++                    return MC_FacePos(m_vTargetPos) || NavigationFailure(target_error);
++                Metacmd = 2;
++            }
++            else
++                return MC_Run() || NavigationFailure(locomotion_error);
++            return true;
++        }
++        case 4:
++            return NavigationDecision();
++        default:
++            return true;
++    }
++}
+diff --git a/src/game/original/AINavigationStates.cpp b/src/game/original/AINavigationStates.cpp
+index 8a99dcb..93ec002 100644
+--- a/src/game/original/AINavigationStates.cpp
++++ b/src/game/original/AINavigationStates.cpp
+@@ -50,6 +50,8 @@ bool AI_Mgr::NavigationStep(int state)
+                                                            : MC_Crawl();
+         return ok || NavigationFailure(locomotion_error);
+     }
++    if (state == StateFindAmmo)
++        return AmmoStep();
+     if (state == StateSearchSmell)
+         return SmellStep();
+     if (state == StateGuard)
+diff --git a/src/game/original/AIPerception.cpp b/src/game/original/AIPerception.cpp
+index d62f0d2..9a4ce9d 100644
+--- a/src/game/original/AIPerception.cpp
++++ b/src/game/original/AIPerception.cpp
+@@ -95,8 +95,8 @@ HOBJECT AI_Mgr::FindObjectInRadius(OpenBlood2::AIFindList list, float range, uns
+         return nullptr;
+     };
+     if (!server || !server->IsObjectAlive(m_hObject) || !std::isfinite(range) || (flags & ~15u) ||
+-        ((flags & FindSpecific) && (!specific || (flags & FindAvoidTarget))))
+-        return fail("Invalid radius request; specific+avoid uses uninitialized forward in original code");
++        ((flags & FindSpecific) && !specific))
++        return fail("Invalid radius request or missing specific class");
+     find.valid = true;
+     if (range <= 0)
+         return nullptr;
+@@ -171,7 +171,10 @@ HOBJECT AI_Mgr::FindObjectInRadius(OpenBlood2::AIFindList list, float range, uns
+         }
+         else if (!dot_direction(find.origin, position, object_dot))
+             return fail("Coincident candidate has undefined original normalization");
+-        if ((flags & FindAvoidTarget) && m_hTarget)
++        // The specific-class branch leaves fObjectDp at zero in the source:
++        // its avoidance test cannot reject. Skip the unused uninitialized-forward
++        // dot product instead of importing undefined behavior (AI_AMMO_CONTRACTS).
++        if ((flags & FindAvoidTarget) && !(flags & FindSpecific) && m_hTarget)
+         {
+             double target_dot = 0;
+             if (!server->IsObjectAlive(m_hTarget) || !target_position_valid ||
+diff --git a/src/game/original/AIRuntime.cpp b/src/game/original/AIRuntime.cpp
+index d7df432..ff157f6 100644
+--- a/src/game/original/AIRuntime.cpp
++++ b/src/game/original/AIRuntime.cpp
+@@ -396,6 +396,14 @@ bool AI_Mgr::RuntimeUpdateStep()
+             }
+         }
+     }
++    // A sought pickup may be collected by this actor or another player. Retain
++    // the owned route, but never query its removed object on a later update.
++    if (m_hTrackObject && m_hTrackObject == searched_ammo_target && !s->IsObjectAlive(m_hTrackObject))
++    {
++        m_hTrackObject = nullptr;
++        tracked_position_valid = false;
++        ++ammo_target_losses;
++    }
+     if (m_hTrackObject && !RefreshTrackedPosition())
+         return RuntimeFailure(target_error);
+     if (m_damage.m_fHitPoints <= 0 && m_nState != StateDying && !SetNewState(StateDying))
+diff --git a/src/game/original/AIState.cpp b/src/game/original/AIState.cpp
+index 668cda8..5c1177c 100644
+--- a/src/game/original/AIState.cpp
++++ b/src/game/original/AIState.cpp
+@@ -289,6 +289,8 @@ bool AI_Mgr::DispatchState()
+             return AI_STATE_RunToPos();
+         case StateSearchVisual:
+             return AI_STATE_SearchVisualTarget();
++        case StateFindAmmo:
++            return AI_STATE_FindAmmo();
+         case StateSearchSmell:
+             return AI_STATE_SearchSmellTarget();
+         default:
+diff --git a/src/game/original/AITrigger.cpp b/src/game/original/AITrigger.cpp
+index ec7252c..0c76166 100644
+--- a/src/game/original/AITrigger.cpp
++++ b/src/game/original/AITrigger.cpp
+@@ -282,6 +282,8 @@ DDWORD AI_Mgr::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read
+             RuntimeFailure(damage_reaction_error.empty() ? state_error : damage_reaction_error);
+         return result;
+     }
++    if (message == OpenBlood2::add_ammo_message)
++        ReceiveAmmo(sender, read);
+     if (message == 1000 /* MID_TRIGGER */)
+     {
+         auto* server = GetServerDE();
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index d92f79b..4e37b99 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -211,6 +211,13 @@ class AI_Mgr : public CBaseCharacter
+     bool AI_STATE_RunToPos();
+     bool AI_STATE_SearchVisualTarget();
+     bool AI_STATE_SearchSmellTarget();
++    bool AI_STATE_FindAmmo();
++    void ReceiveAmmo(HOBJECT, HMESSAGEREAD);
++    std::uint64_t ammo_searches = 0, ammo_collections = 0, ammo_refusals = 0, ammo_target_losses = 0;
++    DBYTE searched_ammo = 0;
++    std::string searched_ammo_class;
++    HOBJECT searched_ammo_target = nullptr; // Last selected identity; may outlive the FindAmmo state.
++    HOBJECT last_ammo_source = nullptr;     // Checked historical identity, never ownership.
+     bool SetSmellCursor(HOBJECT);
+     HOBJECT smell_cursor = nullptr;
+     DVector smell_position{};
+@@ -522,6 +529,7 @@ class AI_Mgr : public CBaseCharacter
+     bool EscapeHideStep();
+     bool GuardStep();
+     bool SmellStep();
++    bool AmmoStep();
+     bool NavigationDecision(int stimulus = -1);
+     bool NavigationFailure(std::string_view);
+     bool script_busy = false;
+diff --git a/src/game/original/PickupObject.cpp b/src/game/original/PickupObject.cpp
+index 93d6c1b..6bb355a 100644
+--- a/src/game/original/PickupObject.cpp
++++ b/src/game/original/PickupObject.cpp
+@@ -1,4 +1,5 @@
+ #include "PickupObject.h"
++#include "AI_Mgr.h"
+ #include "trigger_helpers.h"
+ #include <algorithm>
+ using namespace OpenBlood2;
+@@ -90,7 +91,8 @@ DDWORD PickupObject::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREA
+     PickupMessage reply;
+     if (message == picked_up_message && sender && sender == touching_ && !picked_up &&
+         g_pServerDE->ReadPickupMessage(read, reply) && reply == value &&
+-        g_pServerDE->IsKindOf(g_pServerDE->GetObjectClass(sender), g_pServerDE->GetClass("CPlayerObj")))
++        (g_pServerDE->IsKindOf(g_pServerDE->GetObjectClass(sender), g_pServerDE->GetClass("CPlayerObj")) ||
++         (value.kind == PickupKind::Ammo && dynamic_cast<AI_Mgr*>(g_pServerDE->HandleToObject(sender)))))
+     {
+         picked_up = true;
+         g_pServerDE->SetObjectFlags(m_hObject,
+diff --git a/src/game/original/PickupObject.h b/src/game/original/PickupObject.h
+index 8020e34..ef23601 100644
+--- a/src/game/original/PickupObject.h
++++ b/src/game/original/PickupObject.h
+@@ -17,6 +17,10 @@ class PickupObject : public B2BaseClass
+     std::int32_t resource_id = 0;
+     bool picked_up = false, rotate_fx = false;
+     std::uint64_t attempts = 0, sound_requests = 0;
++    bool IsOfferingTo(HOBJECT receiver) const
++    {
++        return touching_ == receiver && !picked_up;
++    }
+ 
+   protected:
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 00e4c5e..579a02f 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -832,12 +832,12 @@ add_executable(ai_runtime_tests ai_runtime_tests.cpp)
+ target_link_libraries(ai_runtime_tests PRIVATE blood2_game)
+ blood2_project_options(ai_runtime_tests)
+ 
+-foreach(case IN ITEMS activation animation_clearance visibility visibility_filter visibility_atomic lifetime targets tracking camera spatial triggers body missing)
++foreach(case IN ITEMS ammo_receive ammo_search activation animation_clearance visibility visibility_filter visibility_atomic lifetime targets tracking camera spatial triggers body missing)
+     add_test(NAME ai_runtime.${case} COMMAND ai_runtime_tests "${case}")
+     set_tests_properties(ai_runtime.${case} PROPERTIES LABELS "headless;ai_runtime" TIMEOUT 30)
+ endforeach()
+ if(BLOOD2_TEST_DATA_DIR)
+-    foreach(case IN ITEMS catalog failures subway arena sparse_weapons clearance_private)
++    foreach(case IN ITEMS catalog failures subway arena sparse_weapons clearance_private ammo_private)
+         add_test(NAME ai_runtime.${case} COMMAND ai_runtime_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
+         set_tests_properties(ai_runtime.${case} PROPERTIES LABELS "headless;private;ai_runtime" TIMEOUT 90)
+     endforeach()
+diff --git a/tests/ai_perception_tests.cpp b/tests/ai_perception_tests.cpp
+index a0e953e..adbccd0 100644
+--- a/tests/ai_perception_tests.cpp
++++ b/tests/ai_perception_tests.cpp
+@@ -190,6 +190,9 @@ namespace
+               a->find.valid);
+         auto target = object(g, "BaseClass", {0, 10, -30});
+         CHECK(a->SetNewTarget(target) && a->RefreshTargetPosition());
++        CHECK(a->FindObjectInRadius(AIFindList::Ammo, 100, FindSpecific | FindAvoidTarget,
++                                    g.objects.find_class("BulletAmmoPU")) == ammo &&
++              a->find.valid);
+         CHECK(!a->FindObjectInRadius(AIFindList::Exits, 100, FindAvoidTarget) &&
+               a->find.valid); // source uses observer-target, not reverse
+         g.objects.get(target)->state.m_Pos = {0, 10, 30};
+@@ -296,8 +299,10 @@ namespace
+             CHECK(!a->FindObjectInRadius(AIFindList::Enemies, f) && !a->find.valid);
+         CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 0) && a->find.valid);
+         CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 100, 16) && !a->find.valid);
+-        CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 100, FindSpecific | FindAvoidTarget,
+-                                     g.objects.find_class("CPlayerObj")) &&
++        a->FindObjectInRadius(AIFindList::Enemies, 100, FindSpecific | FindAvoidTarget,
++                              g.objects.find_class("CPlayerObj"));
++        CHECK(a->find.valid); // Source zero object-dot makes the unused avoidance branch ineffective.
++        CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 100, FindSpecific | FindAvoidTarget, nullptr) &&
+               !a->find.valid);
+         auto getter = g.server.GetObjectPos;
+         g.server.GetObjectPos = [](HOBJECT, DVector*) -> DRESULT { return DE_ERROR; };
+diff --git a/tests/ai_runtime_tests.cpp b/tests/ai_runtime_tests.cpp
+index c812c7e..c92eadb 100644
+--- a/tests/ai_runtime_tests.cpp
++++ b/tests/ai_runtime_tests.cpp
+@@ -1,4 +1,5 @@
+ #include "brush_fixture.h"
++#include "game/original/AmmoPickups.h"
+ #include "game/original/CameraObj.h"
+ #include "game/original/CivilianAI.h"
+ #include "game/original/CultistAI.h"
+@@ -28,7 +29,7 @@ namespace
+     }
+     bool setup(GameSession& g, const char* root = "")
+     {
+-        CHECK(g.initialize());
++        CHECK(g.objects.find_class("BaseClass") || g.initialize());
+         auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
+         for (auto& s : floor.surfaces)
+             s.flags = 1;
+@@ -109,6 +110,98 @@ namespace
+         g.server.SetNextUpdate(h, .001f);
+         return a;
+     }
++    HOBJECT ammo_fixture(GameSession& g, DVector pos = {0, 10, 80}, const char* type = "BulletAmmoPU")
++    {
++        ObjectCreateStruct state;
++        state.m_Pos = pos;
++        auto h = g.objects.create(g.objects.find_class(type), state);
++        if (auto* r = g.objects.get(h))
++        {
++            // Labelled synthetic pickup bounds; private case uses actual retail ABCs.
++            r->state.m_Flags = FLAG_TOUCH_NOTIFY | FLAG_VISIBLE;
++            r->dimensions = {2, 2, 2};
++        }
++        return h;
++    }
++    bool ammo_receive(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        auto h = ammo_fixture(g);
++        CHECK(a && h);
++        auto* pickup = dynamic_cast<AmmoPickup*>(g.objects.get(h)->game.get());
++        CHECK(pickup);
++        // Forged/replayed offers outside the pickup's active contact cannot grant ammo.
++        auto packet = g.server.StartMessageToObject(pickup, a->m_hObject, add_ammo_message);
++        CHECK(packet && g.server.WritePickupMessage(packet, pickup->value) == DE_OK);
++        g.server.EndMessage(packet);
++        CHECK(a->ammo_refusals == 1 && a->m_InventoryMgr.GetAmmoCount(1) == 0);
++        a->m_dwFlags |= 0x200;
++        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, a->m_hObject));
++        CHECK(a->ammo_refusals == 2 && !pickup->picked_up);
++        a->m_dwFlags &= ~0x200u;
++        a->m_damage.m_bDead = true;
++        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, a->m_hObject));
++        CHECK(a->ammo_refusals == 3 && !pickup->picked_up);
++        a->m_damage.m_bDead = false;
++        a->m_InventoryMgr.SetAmmoCount(1, a->m_InventoryMgr.MaxAmmo(1));
++        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, a->m_hObject));
++        CHECK(a->ammo_refusals == 4 && !pickup->picked_up);
++        a->m_InventoryMgr.SetAmmoCount(1, a->m_InventoryMgr.MaxAmmo(1) - 7);
++        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, a->m_hObject));
++        CHECK(a->ammo_collections == 1 && pickup->picked_up && a->last_ammo_source == h);
++        CHECK(a->m_InventoryMgr.GetAmmoCount(1) == a->m_InventoryMgr.MaxAmmo(1));
++        CHECK(!g.server.IsObjectAlive(h) && AmmoPickup::m_dwNumPickups == 1);
++        CHECK(g.objects.finish_frame() && !g.objects.get(h) && AmmoPickup::m_dwNumPickups == 0);
++        CHECK(g.server.message_count() == 0 && g.server.string_count() == 0);
++        auto health = ammo_fixture(g, {100, 10, 0}, "HealthPU");
++        CHECK(health && g.objects.engine_message(health, MID_TOUCHNOTIFY, a->m_hObject));
++        CHECK(g.server.IsObjectAlive(health)); // Original AI does not receive powerups.
++        return true;
++    }
++    bool ammo_search(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a && a->SetNewState(AI_Mgr::StateFindAmmo) && a->AI_Update());
++        CHECK(a->m_nState == AI_Mgr::StateIdle && a->ammo_searches == 1);
++        CHECK(a->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA, 1) == InventoryResult::Ok);
++        CHECK(a->m_InventoryMgr.ChangeWeaponSlot(1) == InventoryResult::Ok);
++        a->m_fSeeingDist = 500;
++        a->m_vTargetPos = {0, 10, -100};
++        CHECK(a->MC_BestWeapon() && a->m_nState == AI_Mgr::StateFindAmmo);
++        CHECK(a->AI_Update() && !a->runtime_failed && a->m_nState == AI_Mgr::StateEscapeRun);
++        CHECK(a->searched_ammo == 1 && a->searched_ammo_class == "BulletAmmoPU");
++        auto h = ammo_fixture(g);
++        CHECK(h && a->SetNewState(AI_Mgr::StateFindAmmo) && a->AI_Update());
++        // Original CanSee ignores nonsolid pickups. Do not invent pickup vision.
++        CHECK(a->m_nState == AI_Mgr::StateEscapeRun && a->find.valid && !a->find.selected);
++        g.objects.get(h)->state.m_Flags |= FLAG_RAYHIT; // Explicit branch fixture, not retail pickup flags.
++        CHECK(a->SetNewState(AI_Mgr::StateFindAmmo) && a->AI_Update());
++        CHECK(a->m_nState == AI_Mgr::StateFindAmmo && a->Metacmd == 2 && a->GetTrackedObject() == h);
++        CHECK(a->m_MoveObj.path().size() == 1 && a->AI_Update() && a->Metacmd == 3);
++        g.objects.get(a->m_hObject)->state.m_Flags &= ~FLAG_VISIBLE;
++        CHECK(a->AI_Update() && a->velocity_commands > 0 && !a->runtime_failed);
++        // A removed pickup no longer freezes the actor; its value-owned route remains.
++        CHECK(g.objects.remove(h) && a->AI_Update() && !a->runtime_failed && !a->GetTrackedObject());
++        CHECK(a->ammo_target_losses == 1 && a->m_MoveObj.path().size() == 1);
++        // Reacquire through the real state, then interrupt it before another collector removes the pickup.
++        auto next = ammo_fixture(g, {0, 10, 80});
++        CHECK(next && g.objects.finish_frame());
++        g.objects.get(next)->state.m_Flags |= FLAG_RAYHIT;
++        CHECK(a->SetNewState(AI_Mgr::StateFindAmmo) && a->AI_Update() && a->searched_ammo_target == next);
++        CHECK(a->SetNewState(AI_Mgr::StateInactive) && g.objects.remove(next) && g.objects.finish_frame());
++        CHECK(a->AI_Update() && !a->runtime_failed && a->ammo_target_losses == 2 && !a->GetTrackedObject());
++        a->m_nState = AI_Mgr::StateFindAmmo;
++        a->Metacmd = 3; // Continue the retained synthetic route, without reacquiring a dead object.
++        g.objects.get(a->m_hObject)->state.m_Pos = {0, 10, 80}; // Labelled arrival, not navigation proof.
++        CHECK(a->m_MoveObj.Update() && a->AI_Update() && a->Metacmd == 4);
++        CHECK(a->m_MoveObj.path().empty() && a->navigation_arrivals == 1 && a->AI_Update());
++        CHECK(g.objects.finish_frame() && g.unload_world() && AmmoPickup::m_dwNumPickups == 0);
++        return true;
++    }
+     bool animation_clearance(const char*)
+     {
+         GameSession g;
+@@ -592,6 +685,54 @@ namespace
+         auto h = g.objects.create(g.objects.find_class(type), {}, reason, std::move(p));
+         return g.server.IsObjectAlive(h) ? dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h)) : nullptr;
+     }
++    bool ammo_private(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        ObjectId old{};
++        for (int reload = 0; reload < 2; ++reload)
++        {
++            CHECK(!g.objects.get(old));
++            g.world_path = "synthetic NPC ammunition arena (retail resources)";
++            g.state = SessionState::Inspection;
++            CHECK(g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
++                                   {{"Name", std::string("START")}, {"Pos", DVector{0, 100, 200}}}));
++            g.server_shell.PreStartWorld();
++            std::string error;
++            CHECK(g.server_shell.PostStartWorld() && g.enter_player(error));
++            auto* a = npc(g, "CultistAI", {{"AIState", std::string("IDLE")}});
++            CHECK(a && a->RuntimeReady());
++            old = g.objects.get(a->m_hObject)->id;
++            auto& inventory = a->m_InventoryMgr;
++            inventory.SetAmmoCount(AMMO_BULLET, 0);
++            auto target = g.client_shell.player;
++            CHECK(target && a->SetNewTarget(target) && a->RefreshTargetPosition());
++            CHECK(a->MC_BestWeapon() && a->m_nState == AI_Mgr::StateFindAmmo);
++            CHECK(a->AI_Update() && !a->runtime_failed && a->m_nState == AI_Mgr::StateEscapeRun);
++            auto pos = g.objects.get(a->m_hObject)->state.m_Pos;
++            pos.z += 5; // Deliberate overlapping placement for actual contact dispatch.
++            auto ammo = g.objects.create(g.objects.find_class("BulletAmmoPU"), {}, Creation::World,
++                                         {{"Pos", pos}, {"Name", std::string("NPC ammo contact fixture")}});
++            auto* r = g.objects.get(ammo);
++            CHECK(r && r->model && r->model_error.empty());
++            CHECK(a->SetTrackedObject(ammo) && a->SetNewState(AI_Mgr::StateFindAmmo));
++            a->searched_ammo_target = ammo; // Labelled completed-route fixture, not autonomous retail pursuit.
++            a->Metacmd = 4;                 // Preserve completed route semantics after a contact removes its pickup.
++            CHECK(g.server.advance_physics(.02));
++            CHECK(a->ammo_collections == 1 && inventory.GetAmmoCount(1) == 100);
++            CHECK(!g.server.IsObjectAlive(ammo) && a->AI_Update() && !a->runtime_failed);
++            CHECK(a->ammo_target_losses == 1 && !a->GetTrackedObject());
++            CHECK(g.objects.finish_frame() && !g.objects.get(ammo));
++            CHECK(!g.server.pickup_reports.empty() && g.server.pickup_reports.back().voice != 0);
++            std::cout << "Retail NPC/ammo arena reload=" << reload << " searches=" << a->ammo_searches
++                      << " collections=" << a->ammo_collections << " bullets=" << inventory.GetAmmoCount(1)
++                      << " voice=" << g.server.pickup_reports.back().voice << '\n';
++            CHECK(g.unload_world() && g.objects.snapshot().empty() && AmmoPickup::m_dwNumPickups == 0);
++            CHECK(g.server.message_count() == 0 && g.server.string_count() == 0);
++            CHECK(setup(g, root));
++        }
++        return true;
++    }
+     bool missing(const char*)
+     {
+         GameSession g;
+@@ -785,6 +926,9 @@ namespace
+ int main(int argc, char** argv)
+ {
+     const std::map<std::string, std::function<bool(const char*)>> tests{{"body", body},
++                                                                        {"ammo_receive", ammo_receive},
++                                                                        {"ammo_search", ammo_search},
++                                                                        {"ammo_private", ammo_private},
+                                                                         {"missing", missing},
+                                                                         {"activation", activation},
+                                                                         {"animation_clearance", animation_clearance},

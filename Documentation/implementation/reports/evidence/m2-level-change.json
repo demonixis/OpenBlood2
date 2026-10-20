@@ -1,0 +1,130 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "01eb4e84e824cae3d4a9a4bd755078d9d4188922",
+  "status": "M2 incomplete",
+  "scope": "Owning NEW_LEVEL transaction, original supported player KeepAlive/client association, source retention on rejection, SDL output transfer and in-game reports",
+  "platform": "Linux/Wayland/Vulkan/NVIDIA executed. User separately confirmed macOS execution of prior Metal increment; no automated native Apple results/hardware/OS/SDK supplied.",
+  "validation": {
+    "debug-headless": {
+      "passed": 741,
+      "private": 120,
+      "seconds": 163.52
+    },
+    "release-headless": {
+      "passed": 741,
+      "private": 120,
+      "seconds": 13.38
+    },
+    "sanitize-headless": {
+      "passed": 39,
+      "private": 6,
+      "seconds": 99.93
+    },
+    "debug-gpu": {
+      "passed": 10,
+      "private": 7,
+      "seconds": 64.09,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU"
+    },
+    "release-gpu": {
+      "passed": 10,
+      "private": 7,
+      "seconds": 13.23,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU"
+    },
+    "format": {
+      "tool": "clang-format 23.1.3 --dry-run --Werror",
+      "authored_cpp_files": 23
+    },
+    "reference_integrity": {
+      "files": 10923,
+      "changed": 0,
+      "clean_repositories": 6
+    },
+    "git_diff_check": "Authored trees pass; raw logs and patch retain original whitespace",
+    "local_markdown_links": 3113
+  },
+  "commands": [
+    "cmake --build build/debug -j4",
+    "cmake --build build/release -j3",
+    "ctest --test-dir build/{debug,release} -L headless -j4 --output-on-failure",
+    "cmake --build build/sanitize -j3 --target world_tests object_contract_tests player_tests player_restore_tests player_keepalive_tests exit_tests",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -j2 --output-on-failure -R ^(world\\.(level_change|level_change_private|destination_trials|destination_trial_private|destination_lifetime)|objects\\.|player\\.|player_restore\\.|player_keepalive\\.|exits\\.)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/{debug,release} --output-on-failure -R ^gpu\\.(level_change|objectives|player_restore|player_keepalive|lifecycle|viewport|world_depth|model_depth|world_alpha_private|mouse_combat)$"
+  ],
+  "observed": {
+    "synthetic_keepalive": {
+      "health": 37,
+      "armor": 23,
+      "bullets": 1234,
+      "medkit_charges": 43,
+      "speed_attribute": 6,
+      "keys": 0,
+      "current_difficulty": 3,
+      "commits": 3
+    },
+    "private_cityhub_refusal": {
+      "created": 435,
+      "world_sounds": 31,
+      "editor_only": 541,
+      "unsupported": 18,
+      "failed": 1
+    },
+    "private_subway_promotions": 3,
+    "gpu_cycles": 3,
+    "gpu_non_background_pixels_per_cycle": 179200,
+    "gpu_magenta_pixels": 0
+  },
+  "development_findings": [
+    "A player gate test expected the old keep-alive omission in RunWorld. It now checks the still-unavailable autosave gate; RunWorld remains blocked. Initial failed sanitizer result is retained separately.",
+    "Synthetic transition fixtures now provide generated decodable DTX and hidden PathPoint ABC/skin resources; the production resource gate was not weakened.",
+    "Extracted original-global isolation from the existing rehearsal; all seven lists and five AI table owners retain their original fixed addresses/ownership boundary."
+  ],
+  "limits": [
+    "Authored SubwayA -> CityHub still rejects unsupported/failed entries; repeat SubwayA transfer is not campaign progression.",
+    "Initialization validation cannot certify all later original actions/services, complete saved state, autosave or device failure after CPU promotion.",
+    "Intermittent frozen dead Cultists reported by the user remain open; deterministic combat checks do not disprove this report."
+  ],
+  "project_commit": "ee60428a0091ce450230ab0de4f6daf58eb252db",
+  "project_patch_sha256": "47d8791a81daa76569b1ab5dc77ff28c3b4e16e81b4a2d281e2d3eb34e6de973",
+  "project_files": {
+    "AGENTS.md": "dc2268e39a101c69c10ce6b4d92f960776bd64fa4d04a99d3aa6e690ecb0f157",
+    "CMakeLists.txt": "053c4ef26c54b5cf79318147340fdf01ccfeb4a859d8facf4e6a590cc67afb6f",
+    "README.md": "7ba1078ef42354c17cb69b9e06f6e36f5f6175d970c7c7aa4693d40c71590c21",
+    "docs/DESTINATION_CONTRACTS.md": "1f0f88bebdad327cd940475987958b0b702ea36affd6828b8e896a4f8a123ae6",
+    "docs/DESTINATION_TRIAL_CONTRACTS.md": "3fb1f9df94cd258d1ccc71fee3436b98af4d1ffaace96694748a9fffe811148f",
+    "docs/EXIT_CONTRACTS.md": "29238255c87a5ccbe9e5eabfd966b2a04c12a5f0a8a57691bc1702c501c4a223",
+    "docs/LEVEL_CHANGE_CONTRACTS.md": "5fd5b0b2b74b89c320f63de087ca6a099739e674b0c58733718975d2b7230347",
+    "docs/M2_LEVEL_CHANGE_SOURCES.json": "cb3e6495993c24e70fa9f53f660deea15e5e7a3829ca4f12448c5ef537033d88",
+    "docs/METAL_SHADER_CONTRACTS.md": "9715f555347c6025a3dbfa97c4eda64a8c43f826f591a27deee4e02205915f2a",
+    "docs/OBJECT_CONTRACTS.md": "a536954b86448d37581c4ca5b289f32932fcfef9220ce10b317fd752d3bdb491",
+    "docs/PLAYER_KEEPALIVE_CONTRACTS.md": "6bad07f743c0007c8f2376d5e64d716e5ece77879aca88a138f5281b34843e41",
+    "docs/PLAYER_RESTORE_CONTRACTS.md": "8d210dd1ca25e1543993a80339d8747eb50e20b3aed57f9fa4277a012fe469bf",
+    "docs/PLAYTEST_INPUT_CONTRACTS.md": "875bb13e39bd79b629efd7a9123c662ffaa27d5ff4c2775e6005547610bc18c4",
+    "docs/WORLD_VIEW_CONTRACTS.md": "1eaf20c29692e6665046e03d39383dc0c0c5f22e797b881792763f508983bcce",
+    "src/app/inspector.cpp": "68f42d93ded56e678c95b8ebdb6c2ebccceefc5dc17bd745518d8969c1c7cda4",
+    "src/app/inspector.h": "2485f04b2c823c94c741fecc4e7a92bb978ffa4f1366e2cd6290a00da4823160",
+    "src/app/inspector_objectives.cpp": "aba025cf7f7043a8208445a4cee1131372765b3cd6b74ee6c446a4ada3bdce4d",
+    "src/app/main.cpp": "0e5f03ac64a6adb262a95c95a53faa5c79e926e3661cebce84b7a3d009fc7482",
+    "src/app/objectives_smoke.cpp": "ee3acad111675710f327c89d02337630d72781deda5d92f28e2e6815f00b4c38",
+    "src/engine/audio.cpp": "3a1305aa0073fa64ff459535cd97c530b4ba006dd2fe68a27f3e4aa43ca4edc9",
+    "src/engine/audio.h": "a4b95463fe653dc8127130cc7ba2b35fd0936f4f056acfda1052776b00ff7d6b",
+    "src/game/destination_trial.cpp": "0aa51bccea379f3602ab02a6c6dc019eca93a67033f40d797d6687795f7246de",
+    "src/game/level_change.cpp": "10365c8bc5489404f8070de4b8db00a84c5ce77646a61d31f24e8a6edd3adfa3",
+    "src/game/original/BloodShells.h": "e0abe6d910fedf76e05e31ccce4aa503ef10cf2346e4ec1b0b7d2cae68e3af04",
+    "src/game/original/session_load.cpp": "e176c007e495789344ecdb3457f684ec7f82ba3bdafd8b8b61817a1c093e43be",
+    "src/game/original_globals.h": "c272f2e4be1a5807dc929ddb0823638f8f23a768d6af63f9e249c37be49076e5",
+    "src/game/server_adapter.cpp": "86d48ced8e5ebb44411307c1cefdd5868a22dee65216e0e34502a2d2890212fe",
+    "src/game/server_adapter.h": "c435301f8f7a6eb29c40c809768b49a723571fe255b9bf1a399e53e629f4d126",
+    "src/game/session.cpp": "eb4573a297049e09cecdbae9b4ce966185395929d7a84742ebf86dcff4130e58",
+    "src/game/world_preparation.h": "d9a99df6465169fe73d30b1305c8f14cafe05ad10c50ebadf1200c5684e4c565",
+    "tests/CMakeLists.txt": "bf14d1474132c91a7a2405c00b5a05ab1cf492bd99f3a33171cc10835cda1be0",
+    "tests/destructable_state_tests.cpp": "36ebba17688d2e4a5ff28e9190d98d7d106ce69ed1fb6ea947889301fba5d8f1",
+    "tests/exit_tests.cpp": "72ff471dff17f7ab675f08543a26d6fb246cfa296d470083c688d406c73e771a",
+    "tests/inventory_state_tests.cpp": "56f7a5f9b4302b992cad7f0dce26b11829d0aae5cb5c1e9e53a9ab4ed2e305db",
+    "tests/level_change_gpu_tests.cpp": "68eb98de7c827cfe0467dd68831061f6ceb9ecf2bde56492506f2f01600f250f",
+    "tests/player_state_tests.cpp": "dec9f3162ca908f92a5c1cc5cc571d0f6124bcdb1249162c82c1c915998f4538",
+    "tests/player_tests.cpp": "4da6f18bc10288fe6cfa215ec77fe81aaed705f328d3fe6181ae5daa6a2ac698",
+    "tests/world_tests.cpp": "f49fced324c5ea603c98c7a6e434a57191ce67ebe4c23f2bf4f6189c6aa6b30d"
+  }
+}

@@ -1,0 +1,48 @@
+[0/2] Re-checking globbed directories...
+[1/275] Scanning /home/yann/projects/lithtech/Blood2/src/engine/audio.cpp for CXX dependencies
+[2/275] Scanning /home/yann/projects/lithtech/Blood2/src/engine/ima_transport.cpp for CXX dependencies
+[3/275] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[4/231] Scanning /home/yann/projects/lithtech/Blood2/src/game/music_catalog.cpp for CXX dependencies
+[5/231] Building CXX object CMakeFiles/engine.dir/src/engine/audio.cpp.o
+[6/231] Building CXX object CMakeFiles/engine.dir/src/engine/ima_transport.cpp.o
+[7/231] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[8/50] Scanning /home/yann/projects/lithtech/Blood2/tests/ima_transport_tests.cpp for CXX dependencies
+[9/50] Scanning /home/yann/projects/lithtech/Blood2/tests/music_message_tests.cpp for CXX dependencies
+[10/50] Linking CXX static library libengine.a
+[11/50] Building CXX object CMakeFiles/blood2_game.dir/src/game/music_catalog.cpp.o
+[12/50] Generating CXX dyndep file tests/CMakeFiles/ima_transport_tests.dir/CXX.dd
+[13/49] Generating CXX dyndep file tests/CMakeFiles/music_message_tests.dir/CXX.dd
+[14/48] Linking CXX static library libblood2_game.a
+[15/48] Linking CXX executable tests/object_contract_tests
+[16/48] Linking CXX executable tests/config_tests
+[17/48] Linking CXX executable tests/world_tests
+[18/48] Linking CXX executable tests/player_tests
+[19/48] Linking CXX executable tests/sound_tests
+[20/48] Linking CXX executable tests/player_restore_tests
+[21/48] Linking CXX executable tests/player_keepalive_tests
+[22/48] Linking CXX executable tests/audio_stream_tests
+[23/48] Linking CXX executable tests/service_coverage_tests
+[24/48] Linking CXX executable tests/train_session_tests
+[25/48] Linking CXX executable tests/screen_fade_tests
+[26/48] Linking CXX executable tests/player_voice_tests
+[27/48] Linking CXX executable tests/music_asset_tests
+[28/48] Linking CXX executable tests/dls_bank_tests
+[29/48] Linking CXX executable tests/dls_sampler_tests
+[30/48] Linking CXX executable tests/ima_style_tests
+[31/48] Linking CXX executable tests/ima_band_tests
+[32/48] Linking CXX executable tests/ima_section_tests
+[33/48] Linking CXX executable tests/ima_timeline_tests
+[34/48] Linking CXX executable tests/ima_variation_tests
+[35/48] Linking CXX executable tests/ima_note_event_tests
+[36/48] Linking CXX executable tests/ima_note_pitch_tests
+[37/48] Linking CXX executable tests/ima_harmony_tests
+[38/48] Linking CXX executable tests/ima_selection_tests
+[39/48] Linking CXX executable tests/ima_cursor_tests
+[40/48] Linking CXX executable tests/ima_curve_tests
+[41/48] Linking CXX executable tests/ima_curve_event_tests
+[42/48] Linking CXX executable tests/dls_timing_tests
+[43/48] Linking CXX executable tests/ima_clock_tests
+[44/48] Linking CXX executable tests/ima_program_tests
+[45/48] Linking CXX executable tests/ima_playlist_tests
+[46/48] Linking CXX executable tests/ima_transport_tests
+[47/48] Linking CXX executable tests/music_message_tests

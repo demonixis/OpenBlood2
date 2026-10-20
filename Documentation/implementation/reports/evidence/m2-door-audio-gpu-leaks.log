@@ -1,0 +1,166 @@
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Captured GPU frame to build/sanitize/tests/platform-leak.png
+[info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+
+=================================================================
+==1512679==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 3696 byte(s) in 66 object(s) allocated from:
+    #0 0x0000004f73dd  (<workspace>/Blood2/build/sanitize/blood2+0x4f73dd) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7b17623e7b8d  (<unknown module>)
+
+Direct leak of 3696 byte(s) in 66 object(s) allocated from:
+    #0 0x0000004f73dd  (<workspace>/Blood2/build/sanitize/blood2+0x4f73dd) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7b175f9e7b8d  (<unknown module>)
+
+Direct leak of 3696 byte(s) in 66 object(s) allocated from:
+    #0 0x0000004f73dd  (<workspace>/Blood2/build/sanitize/blood2+0x4f73dd) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7f176a1ce35c  (<unknown module>)
+
+Direct leak of 184 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004f73dd  (<workspace>/Blood2/build/sanitize/blood2+0x4f73dd) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7f176a7a2716  (/lib64/libdbus-1.so.3+0x1c716) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #2 0x7f176a7a3aa7  (/lib64/libdbus-1.so.3+0x1daa7) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #3 0x7f176a7b04b0  (/lib64/libdbus-1.so.3+0x2a4b0) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #4 0x7f176a7b06af  (/lib64/libdbus-1.so.3+0x2a6af) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #5 0x7f176a7b09d2  (/lib64/libdbus-1.so.3+0x2a9d2) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #6 0x7f176a7b0f11  (/lib64/libdbus-1.so.3+0x2af11) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #7 0x7f176a7925d5  (/lib64/libdbus-1.so.3+0xc5d5) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #8 0x7f176a7a917f  (/lib64/libdbus-1.so.3+0x2317f) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #9 0x7f176a79457b  (/lib64/libdbus-1.so.3+0xe57b) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #10 0x7f176a79485b  (/lib64/libdbus-1.so.3+0xe85b) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #11 0x7f176a794c39  (/lib64/libdbus-1.so.3+0xec39) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #12 0x7b1762419f06  (<unknown module>)
+
+Direct leak of 184 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004f73dd  (<workspace>/Blood2/build/sanitize/blood2+0x4f73dd) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7f176a7a2716  (/lib64/libdbus-1.so.3+0x1c716) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #2 0x7f176a7a3aa7  (/lib64/libdbus-1.so.3+0x1daa7) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #3 0x7f176a7b04b0  (/lib64/libdbus-1.so.3+0x2a4b0) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #4 0x7f176a7b06af  (/lib64/libdbus-1.so.3+0x2a6af) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #5 0x7f176a7b09d2  (/lib64/libdbus-1.so.3+0x2a9d2) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #6 0x7f176a7b0f11  (/lib64/libdbus-1.so.3+0x2af11) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #7 0x7f176a7925d5  (/lib64/libdbus-1.so.3+0xc5d5) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #8 0x7f176a7a917f  (/lib64/libdbus-1.so.3+0x2317f) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #9 0x7f176a79457b  (/lib64/libdbus-1.so.3+0xe57b) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #10 0x7f176a79485b  (/lib64/libdbus-1.so.3+0xe85b) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #11 0x7f176a794c39  (/lib64/libdbus-1.so.3+0xec39) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #12 0x00000140d525  (<workspace>/Blood2/build/sanitize/blood2+0x140d525) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #13 0x000001456e20  (<workspace>/Blood2/build/sanitize/blood2+0x1456e20) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #14 0x000001457812  (<workspace>/Blood2/build/sanitize/blood2+0x1457812) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #15 0x00000126e537  (<workspace>/Blood2/build/sanitize/blood2+0x126e537) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #16 0x0000010a00ba  (<workspace>/Blood2/build/sanitize/blood2+0x10a00ba) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #17 0x0000005bc522  (<workspace>/Blood2/build/sanitize/blood2+0x5bc522) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #18 0x0000005ba765  (<workspace>/Blood2/build/sanitize/blood2+0x5ba765) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #19 0x7f176addd680  (/lib64/libc.so.6+0x3680) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #20 0x7f176addd797  (/lib64/libc.so.6+0x3797) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #21 0x000000451154  (<workspace>/Blood2/build/sanitize/blood2+0x451154) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+
+Indirect leak of 6336 byte(s) in 66 object(s) allocated from:
+    #0 0x0000004f73dd  (<workspace>/Blood2/build/sanitize/blood2+0x4f73dd) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7b17623e7b8d  (<unknown module>)
+
+Indirect leak of 6336 byte(s) in 66 object(s) allocated from:
+    #0 0x0000004f73dd  (<workspace>/Blood2/build/sanitize/blood2+0x4f73dd) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7b175f9e7b8d  (<unknown module>)
+
+Indirect leak of 6336 byte(s) in 66 object(s) allocated from:
+    #0 0x0000004f73dd  (<workspace>/Blood2/build/sanitize/blood2+0x4f73dd) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7f176a1d02e9  (<unknown module>)
+
+Indirect leak of 2986 byte(s) in 138 object(s) allocated from:
+    #0 0x0000004f7208  (<workspace>/Blood2/build/sanitize/blood2+0x4f7208) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7f176a1cdf68  (<unknown module>)
+
+Indirect leak of 2986 byte(s) in 138 object(s) allocated from:
+    #0 0x0000004f7208  (<workspace>/Blood2/build/sanitize/blood2+0x4f7208) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7b175f9e78d1  (<unknown module>)
+
+Indirect leak of 2986 byte(s) in 138 object(s) allocated from:
+    #0 0x0000004f7208  (<workspace>/Blood2/build/sanitize/blood2+0x4f7208) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7b17623e78d1  (<unknown module>)
+
+Indirect leak of 2189 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004f7610  (<workspace>/Blood2/build/sanitize/blood2+0x4f7610) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7f176a7b22dd  (/lib64/libdbus-1.so.3+0x2c2dd) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #2 0x7f176a7b31c7  (/lib64/libdbus-1.so.3+0x2d1c7) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #3 0x7f176a7b3f04  (/lib64/libdbus-1.so.3+0x2df04) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #4 0x7f176a7a4291  (/lib64/libdbus-1.so.3+0x1e291) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #5 0x7f176a7b04b0  (/lib64/libdbus-1.so.3+0x2a4b0) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #6 0x7f176a7b06af  (/lib64/libdbus-1.so.3+0x2a6af) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #7 0x7f176a7b09d2  (/lib64/libdbus-1.so.3+0x2a9d2) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #8 0x7f176a7b0f11  (/lib64/libdbus-1.so.3+0x2af11) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #9 0x7f176a7925d5  (/lib64/libdbus-1.so.3+0xc5d5) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #10 0x7f176a7a917f  (/lib64/libdbus-1.so.3+0x2317f) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #11 0x7f176a79457b  (/lib64/libdbus-1.so.3+0xe57b) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #12 0x7b1762477c23  (<unknown module>)
+
+Indirect leak of 2189 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004f7610  (<workspace>/Blood2/build/sanitize/blood2+0x4f7610) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7f176a7b22dd  (/lib64/libdbus-1.so.3+0x2c2dd) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #2 0x7f176a7b31c7  (/lib64/libdbus-1.so.3+0x2d1c7) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #3 0x7f176a7b3f04  (/lib64/libdbus-1.so.3+0x2df04) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #4 0x7f176a7a4291  (/lib64/libdbus-1.so.3+0x1e291) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #5 0x7f176a7b04b0  (/lib64/libdbus-1.so.3+0x2a4b0) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #6 0x7f176a7b06af  (/lib64/libdbus-1.so.3+0x2a6af) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #7 0x7f176a7b09d2  (/lib64/libdbus-1.so.3+0x2a9d2) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #8 0x7f176a7b0f11  (/lib64/libdbus-1.so.3+0x2af11) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #9 0x7f176a7925d5  (/lib64/libdbus-1.so.3+0xc5d5) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #10 0x7f176a7a917f  (/lib64/libdbus-1.so.3+0x2317f) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #11 0x7f176a79457b  (/lib64/libdbus-1.so.3+0xe57b) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #12 0x7b175fa77c23  (<unknown module>)
+
+Indirect leak of 192 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004f7610  (<workspace>/Blood2/build/sanitize/blood2+0x4f7610) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7f176a7b22dd  (/lib64/libdbus-1.so.3+0x2c2dd) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #2 0x7f176a79ca35  (/lib64/libdbus-1.so.3+0x16a35) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #3 0x7f176a79cddf  (/lib64/libdbus-1.so.3+0x16ddf) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #4 0x7f176a79d24a  (/lib64/libdbus-1.so.3+0x1724a) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #5 0x7f176a79e235  (/lib64/libdbus-1.so.3+0x18235) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #6 0x7f176a79e3b2  (/lib64/libdbus-1.so.3+0x183b2) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #7 0x7f176a7a0fd7  (/lib64/libdbus-1.so.3+0x1afd7) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #8 0x7f176a7a356a  (/lib64/libdbus-1.so.3+0x1d56a) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #9 0x7f176a794147  (/lib64/libdbus-1.so.3+0xe147) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #10 0x7f176a79455e  (/lib64/libdbus-1.so.3+0xe55e) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #11 0x7f176a79485b  (/lib64/libdbus-1.so.3+0xe85b) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #12 0x7f176a794c39  (/lib64/libdbus-1.so.3+0xec39) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #13 0x00000140d56e  (<workspace>/Blood2/build/sanitize/blood2+0x140d56e) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #14 0x000001456e20  (<workspace>/Blood2/build/sanitize/blood2+0x1456e20) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #15 0x000001457812  (<workspace>/Blood2/build/sanitize/blood2+0x1457812) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #16 0x00000126e537  (<workspace>/Blood2/build/sanitize/blood2+0x126e537) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #17 0x0000010a00ba  (<workspace>/Blood2/build/sanitize/blood2+0x10a00ba) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #18 0x0000005bc522  (<workspace>/Blood2/build/sanitize/blood2+0x5bc522) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #19 0x0000005ba765  (<workspace>/Blood2/build/sanitize/blood2+0x5ba765) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #20 0x7f176addd680  (/lib64/libc.so.6+0x3680) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #21 0x7f176addd797  (/lib64/libc.so.6+0x3797) (BuildId: 85075e2ae2e13352a1413d41c327dacf6461526c)
+    #22 0x000000451154  (<workspace>/Blood2/build/sanitize/blood2+0x451154) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+
+Indirect leak of 96 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004f7610  (<workspace>/Blood2/build/sanitize/blood2+0x4f7610) (BuildId: 5c874bbe5269a07c3fdb551dc13ae764034f6311)
+    #1 0x7f176a7b22dd  (/lib64/libdbus-1.so.3+0x2c2dd) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #2 0x7f176a7b31c7  (/lib64/libdbus-1.so.3+0x2d1c7) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #3 0x7f176a7b3f04  (/lib64/libdbus-1.so.3+0x2df04) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #4 0x7f176a7a3ae6  (/lib64/libdbus-1.so.3+0x1dae6) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #5 0x7f176a7b04b0  (/lib64/libdbus-1.so.3+0x2a4b0) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #6 0x7f176a7b06af  (/lib64/libdbus-1.so.3+0x2a6af) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #7 0x7f176a7b09d2  (/lib64/libdbus-1.so.3+0x2a9d2) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #8 0x7f176a7b0f11  (/lib64/libdbus-1.so.3+0x2af11) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #9 0x7f176a7925d5  (/lib64/libdbus-1.so.3+0xc5d5) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #10 0x7f176a7a917f  (/lib64/libdbus-1.so.3+0x2317f) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #11 0x7f176a79457b  (/lib64/libdbus-1.so.3+0xe57b) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #12 0x7f176a79485b  (/lib64/libdbus-1.so.3+0xe85b) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #13 0x7f176a794c39  (/lib64/libdbus-1.so.3+0xec39) (BuildId: a43a813782264d190196676cccae294b0495246f)
+    #14 0x7b1762419f06  (<unknown module>)
+
+SUMMARY: AddressSanitizer: 44088 byte(s) leaked in 816 allocation(s).

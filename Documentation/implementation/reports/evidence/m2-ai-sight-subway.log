@@ -1,0 +1,16 @@
+315/315 Testing: ai_sight.subway
+315/315 Test: ai_sight.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_sight_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_sight.subway" start time: Oct 16 06:49 CEST
+Output:
+----------------------------------------------------------
+cycle=0 body visible from cultist head at player position; fraction=0
+cycle=1 body visible from cultist head at player position; fraction=0
+<end of output>
+Test time =   0.73 sec
+----------------------------------------------------------
+Test Passed.
+"ai_sight.subway" end time: Oct 16 06:49 CEST
+"ai_sight.subway" time elapsed: 00:00:00
+----------------------------------------------------------

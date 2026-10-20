@@ -1,0 +1,2 @@
+debug: all game SDL cache entries unchanged; child compiler/build type/sanitizers match parent; SDL_DIALOG=OFF in game, ON in isolated launcher; HTTP dependencies absent from parent cache.
+release: all game SDL cache entries unchanged; child compiler/build type/sanitizers match parent; SDL_DIALOG=OFF in game, ON in isolated launcher; HTTP dependencies absent from parent cache.

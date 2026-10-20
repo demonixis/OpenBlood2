@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-15",
+  "method": "Code-category files matched by exact relative path; compare raw bytes and bytes with CRLF replaced by LF. No case folding, rename detection, or semantic comparison.",
+  "comparisons": [
+    {
+      "left": "sources/blood2/",
+      "right": "sources/lithtech/Blood2/",
+      "matching_paths": 606,
+      "byte_identical": 0,
+      "identical_after_crlf_normalization": 606,
+      "different_after_crlf_normalization": 0,
+      "left_only_paths": [],
+      "right_only_paths": []
+    },
+    {
+      "left": "sources/blood2/",
+      "right": "OpenBlood2/blood2/",
+      "matching_paths": 602,
+      "byte_identical": 0,
+      "identical_after_crlf_normalization": 375,
+      "different_after_crlf_normalization": 227,
+      "left_only_paths": [
+        "AppHeaders/engineobjects.c",
+        "Blood2Serv/Res/CoolServ.rc2",
+        "ObjectDLL/AI_Shared.CPP",
+        "ObjectDLL/pathpoint.h"
+      ],
+      "right_only_paths": [
+        "AppHeaders/engineobjects.cpp",
+        "Blood2Serv/GameSpyMgrStubs.cpp",
+        "ClassRegistration.cpp",
+        "ClassRegistration.h",
+        "ClientShellDLL/NetStartStubs.cpp",
+        "DirectX-SDK/dplay.h",
+        "DirectX-SDK/dplobby.h",
+        "Misc/BareList.cpp",
+        "Misc/Blood2Stubs.cpp",
+        "Misc/CoolFont.cpp",
+        "Misc/LTGUICommandHandler.cpp",
+        "Misc/LTGUICtrl.cpp",
+        "Misc/LTGUIFont.cpp",
+        "ObjectDLL/AI_Shared.cpp",
+        "ObjectDLL/PathPoint.h",
+        "Shared/LithTechCompat.h",
+        "StubClasses.h"
+      ]
+    },
+    {
+      "left": "OpenBlood2/tools/",
+      "right": "NoMadEngine/tools/",
+      "matching_paths": 20,
+      "byte_identical": 13,
+      "identical_after_crlf_normalization": 13,
+      "different_after_crlf_normalization": 7,
+      "left_only_paths": [],
+      "right_only_paths": []
+    }
+  ]
+}

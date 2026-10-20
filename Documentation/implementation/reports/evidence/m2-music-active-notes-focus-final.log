@@ -1,0 +1,30 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 1033: ima_cursor.behavior
+ 1/10 Test #1033: ima_cursor.behavior ..............   Passed    0.00 sec
+      Start 1034: ima_cursor.bounds_lifetime
+ 2/10 Test #1034: ima_cursor.bounds_lifetime .......   Passed    0.01 sec
+      Start 1035: ima_cursor.generated
+ 3/10 Test #1035: ima_cursor.generated .............   Passed    0.06 sec
+      Start 1036: ima_cursor.private
+ 4/10 Test #1036: ima_cursor.private ...............   Passed    0.45 sec
+      Start 1037: ima_cursor.notes_generated
+ 5/10 Test #1037: ima_cursor.notes_generated .......   Passed    0.08 sec
+      Start 1038: ima_cursor.notes_behavior
+ 6/10 Test #1038: ima_cursor.notes_behavior ........   Passed    0.00 sec
+      Start 1039: ima_cursor.notes_private
+ 7/10 Test #1039: ima_cursor.notes_private .........   Passed    0.69 sec
+      Start 1040: ima_cursor.active_generated
+ 8/10 Test #1040: ima_cursor.active_generated ......   Passed    0.10 sec
+      Start 1041: ima_cursor.active_behavior
+ 9/10 Test #1041: ima_cursor.active_behavior .......   Passed    1.49 sec
+      Start 1042: ima_cursor.active_private
+10/10 Test #1042: ima_cursor.active_private ........   Passed    0.71 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+headless        =   3.59 sec*proc (10 tests)
+music_assets    =   3.59 sec*proc (10 tests)
+private         =   1.85 sec*proc (3 tests)
+
+Total Test time (real) =   3.61 sec

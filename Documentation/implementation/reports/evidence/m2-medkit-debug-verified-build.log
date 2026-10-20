@@ -1,0 +1,13 @@
+[0/2] Re-checking globbed directories...
+[1/50] Scanning /home/yann/projects/lithtech/Blood2/tests/pickup_tests.cpp for CXX dependencies
+[2/50] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_pickups.cpp for CXX dependencies
+[3/50] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector.cpp for CXX dependencies
+[4/50] Generating CXX dyndep file tests/CMakeFiles/pickup_tests.dir/CXX.dd
+[5/48] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[6/48] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[7/17] Scanning /home/yann/projects/lithtech/Blood2/tests/inventory_state_tests.cpp for CXX dependencies
+[8/17] Generating CXX dyndep file tests/CMakeFiles/inventory_state_tests.dir/CXX.dd
+[9/15] Scanning /home/yann/projects/lithtech/Blood2/tests/medkit_tests.cpp for CXX dependencies
+[10/15] Generating CXX dyndep file tests/CMakeFiles/medkit_tests.dir/CXX.dd
+[11/13] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[12/13] Linking CXX executable blood2

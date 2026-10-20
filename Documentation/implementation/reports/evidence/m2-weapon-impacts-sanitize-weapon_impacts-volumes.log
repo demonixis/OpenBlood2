@@ -1,0 +1,14 @@
+566/569 Testing: weapon_impacts.volumes
+566/569 Test: weapon_impacts.volumes
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_impact_tests" "volumes" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-impacts-volumes"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_impacts.volumes" start time: Oct 16 23:27 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_impacts.volumes" end time: Oct 16 23:27 CEST
+"weapon_impacts.volumes" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+335/345 Testing: ai_state.symbols
+335/345 Test: ai_state.symbols
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_state_tests" "symbols"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_state.symbols" start time: Oct 16 11:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.symbols" end time: Oct 16 11:04 CEST
+"ai_state.symbols" time elapsed: 00:00:00
+----------------------------------------------------------

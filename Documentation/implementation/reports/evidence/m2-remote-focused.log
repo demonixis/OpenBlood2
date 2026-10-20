@@ -1,0 +1,54 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 187: pickups.catalog
+      Start 841: proximity.private_fire
+      Start 852: remote.private_fire
+ 1/21 Test #187: pickups.catalog ..................   Passed    4.24 sec
+      Start 840: proximity.private
+ 2/21 Test #852: remote.private_fire ..............   Passed    5.65 sec
+      Start 837: proximity.restore
+ 3/21 Test #837: proximity.restore ................   Passed    0.02 sec
+      Start 836: proximity.inventory
+ 4/21 Test #836: proximity.inventory ..............   Passed    0.01 sec
+      Start 833: proximity.contacts
+ 5/21 Test #833: proximity.contacts ...............   Passed    0.01 sec
+      Start 835: proximity.lifetime
+ 6/21 Test #835: proximity.lifetime ...............   Passed    0.01 sec
+      Start 832: proximity.rules
+ 7/21 Test #832: proximity.rules ..................   Passed    0.01 sec
+      Start 834: proximity.motion
+ 8/21 Test #834: proximity.motion .................   Passed    0.01 sec
+      Start 838: proximity.ai_delay
+ 9/21 Test #838: proximity.ai_delay ...............   Passed    0.01 sec
+      Start 839: proximity.reentrant
+10/21 Test #839: proximity.reentrant ..............   Passed    0.01 sec
+      Start 843: remote.rules
+11/21 Test #843: remote.rules .....................   Passed    0.01 sec
+      Start 845: remote.motion
+12/21 Test #845: remote.motion ....................   Passed    0.01 sec
+      Start 847: remote.damage
+13/21 Test #847: remote.damage ....................   Passed    0.01 sec
+      Start 844: remote.contacts
+14/21 Test #844: remote.contacts ..................   Passed    0.01 sec
+      Start 846: remote.ownership
+15/21 Test #841: proximity.private_fire ...........   Passed    5.80 sec
+      Start 848: remote.reentrant
+16/21 Test #846: remote.ownership .................   Passed    0.01 sec
+      Start 849: remote.inventory
+17/21 Test #848: remote.reentrant .................   Passed    0.01 sec
+      Start 850: remote.restore
+18/21 Test #840: proximity.private ................   Passed    1.58 sec
+      Start 851: remote.private
+19/21 Test #849: remote.inventory .................   Passed    0.01 sec
+20/21 Test #850: remote.restore ...................   Passed    0.02 sec
+21/21 Test #851: remote.private ...................   Passed    1.53 sec
+
+100% tests passed, 0 tests failed out of 21
+
+Label Time Summary:
+headless     =  18.98 sec*proc (21 tests)
+pickups      =   4.24 sec*proc (1 test)
+private      =  18.79 sec*proc (5 tests)
+proximity    =   7.47 sec*proc (10 tests)
+remote       =   7.27 sec*proc (10 tests)
+
+Total Test time (real) =   7.36 sec

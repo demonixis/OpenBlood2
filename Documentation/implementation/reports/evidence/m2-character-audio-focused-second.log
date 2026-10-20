@@ -1,0 +1,87 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 282: character_audio.catalog
+      Start 283: character_audio.subway
+      Start  80: locomotion.animations
+      Start 278: character_audio.player
+ 1/12 Test #278: character_audio.player ...........   Passed    0.01 sec
+      Start 279: character_audio.callbacks
+ 2/12 Test  #80: locomotion.animations ............   Passed    0.02 sec
+      Start 276: character_audio.lifetime
+ 3/12 Test #279: character_audio.callbacks ........   Passed    0.01 sec
+      Start 277: character_audio.rejection
+ 4/12 Test #276: character_audio.lifetime .........   Passed    0.01 sec
+      Start 275: character_audio.voices
+ 5/12 Test #277: character_audio.rejection ........   Passed    0.01 sec
+      Start 274: character_audio.paths
+ 6/12 Test #274: character_audio.paths ............   Passed    0.00 sec
+      Start  31: world.world_geometry
+ 7/12 Test  #31: world.world_geometry .............   Passed    0.00 sec
+      Start 280: character_audio.footsteps
+ 8/12 Test #275: character_audio.voices ...........   Passed    0.01 sec
+      Start 281: character_audio.surfaces
+ 9/12 Test #280: character_audio.footsteps ........   Passed    0.01 sec
+10/12 Test #281: character_audio.surfaces .........   Passed    0.01 sec
+11/12 Test #282: character_audio.catalog ..........***Failed    0.36 sec
+sounds/player/footsteps/carpet/leftf.wav frames=7673 rate=22050
+sounds/player/footsteps/carpet/leftm.wav unavailable=Missing or oversized sound resource
+sounds/player/footsteps/carpet/rightf.wav frames=7673 rate=22050
+sounds/player/footsteps/carpet/rightm.wav unavailable=Missing or oversized sound resource
+sounds/player/footsteps/flesh/leftf.wav frames=9956 rate=22050
+sounds/player/footsteps/flesh/leftm.wav frames=9956 rate=22050
+sounds/player/footsteps/flesh/rightf.wav frames=6016 rate=22050
+sounds/player/footsteps/flesh/rightm.wav frames=8841 rate=22050
+sounds/player/footsteps/glass/leftf.wav frames=6662 rate=22050
+sounds/player/footsteps/glass/leftm.wav frames=6662 rate=22050
+sounds/player/footsteps/glass/rightf.wav frames=6662 rate=22050
+sounds/player/footsteps/glass/rightm.wav frames=6662 rate=22050
+sounds/player/footsteps/metal/leftf.wav frames=8851 rate=22050
+sounds/player/footsteps/metal/leftm.wav frames=8851 rate=22050
+sounds/player/footsteps/metal/rightf.wav frames=8851 rate=22050
+sounds/player/footsteps/metal/rightm.wav frames=8825 rate=22050
+sounds/player/footsteps/plastic/leftf.wav frames=7680 rate=22050
+sounds/player/footsteps/plastic/leftm.wav frames=5957 rate=22050
+sounds/player/footsteps/plastic/rightf.wav frames=7680 rate=22050
+sounds/player/footsteps/plastic/rightm.wav frames=6656 rate=22050
+sounds/player/footsteps/stone/leftf.wav frames=6686 rate=22050
+sounds/player/footsteps/stone/leftm.wav frames=6667 rate=22050
+sounds/player/footsteps/stone/rightf.wav frames=6667 rate=22050
+sounds/player/footsteps/stone/rightm.wav frames=6667 rate=22050
+sounds/player/footsteps/terrain/leftf.wav frames=8840 rate=22050
+sounds/player/footsteps/terrain/leftm.wav frames=8951 rate=22050
+sounds/player/footsteps/terrain/rightf.wav frames=8760 rate=22050
+sounds/player/footsteps/terrain/rightm.wav frames=11174 rate=22050
+sounds/player/footsteps/water/leftf.wav frames=8862 rate=22050
+sounds/player/footsteps/water/leftm.wav frames=8916 rate=22050
+sounds/player/footsteps/water/rightf.wav frames=9387 rate=22050
+sounds/player/footsteps/water/rightm.wav frames=8892 rate=22050
+sounds/player/footsteps/wood/leftf.wav frames=6662 rate=22050
+sounds/player/footsteps/wood/leftm.wav frames=6667 rate=22050
+sounds/player/footsteps/wood/rightf.wav frames=6662 rate=22050
+sounds/player/footsteps/wood/rightm.wav frames=6681 rate=22050
+Caleb sound keys=46 footsteps=46 unique_resources=36 decoded=34 missing=2
+Subway surface=0 count=870
+Subway surface=10 count=4
+Subway surface=20 count=1438
+Subway surface=30 count=128
+Subway surface=50 count=32
+Subway surface=80 count=244
+Subway surface=90 count=7
+DAT material / DTX user flags comparisons=2723 matched=2163
+catalog:261: compared>0 && matched==compared
+
+12/12 Test #283: character_audio.subway ...........   Passed    4.80 sec
+
+92% tests passed, 1 tests failed out of 12
+
+Label Time Summary:
+character_audio    =   5.22 sec*proc (10 tests)
+headless           =   5.24 sec*proc (12 tests)
+locomotion         =   0.02 sec*proc (1 test)
+private            =   5.16 sec*proc (2 tests)
+world              =   0.00 sec*proc (1 test)
+
+Total Test time (real) =   4.80 sec
+
+The following tests FAILED:
+	282 - character_audio.catalog (Failed)                  character_audio headless private
+Errors while running CTest

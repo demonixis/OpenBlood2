@@ -1,0 +1,9 @@
+{
+  "source": "sources/blood2/ClientShellDLL/Music.cpp",
+  "source_sha256": "1024e355e8da92ba670b96fc7cec5a57f301ea45e18f0a43f910a914f6e24ee0",
+  "cases": 65536,
+  "accepted_requests": 13,
+  "decision_fnv1a64": "17078631686421749893",
+  "scope": "Unchanged original PlayMusicLevel and TransitionToLevel decision branches; initialized IMA, recorded PlayList sink returns true. No audio/engine call success inferred.",
+  "compiler": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)"
+}

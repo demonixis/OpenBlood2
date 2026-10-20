@@ -1,0 +1,47 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start   23: cli.launcher_info
+ 1/16 Test   #23: cli.launcher_info ................   Passed    0.02 sec
+      Start   24: config.arguments
+ 2/16 Test   #24: config.arguments .................   Passed    0.00 sec
+      Start   25: config.precedence
+ 3/16 Test   #25: config.precedence ................   Passed    0.00 sec
+      Start   26: config.relative_paths
+ 4/16 Test   #26: config.relative_paths ............   Passed    0.00 sec
+      Start   27: config.invalid_config
+ 5/16 Test   #27: config.invalid_config ............   Passed    0.00 sec
+      Start   28: config.content_validation
+ 6/16 Test   #28: config.content_validation ........   Passed    0.00 sec
+      Start   29: config.case_lookup
+ 7/16 Test   #29: config.case_lookup ...............   Passed    0.00 sec
+      Start   30: config.demo
+ 8/16 Test   #30: config.demo ......................   Passed    0.00 sec
+      Start   71: world.rez_structure
+ 9/16 Test   #71: world.rez_structure ..............   Passed    0.00 sec
+      Start   72: world.rez_rejection
+10/16 Test   #72: world.rez_rejection ..............   Passed    0.00 sec
+      Start   73: world.resource_mount
+11/16 Test   #73: world.resource_mount .............   Passed    0.00 sec
+      Start 1181: menus.preferences
+12/16 Test #1181: menus.preferences ................   Passed    0.00 sec
+      Start 1200: demo.flow
+13/16 Test #1200: demo.flow ........................   Passed    0.00 sec
+      Start 1201: demo.rules
+14/16 Test #1201: demo.rules .......................   Passed    0.00 sec
+      Start 1206: demo_menu.manifest
+15/16 Test #1206: demo_menu.manifest ...............   Passed    0.00 sec
+      Start 1207: demo_menu.flow
+16/16 Test #1207: demo_menu.flow ...................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 16
+
+Label Time Summary:
+cli          =   0.02 sec*proc (1 test)
+config       =   0.01 sec*proc (7 tests)
+demo         =   0.00 sec*proc (2 tests)
+demo_menu    =   0.00 sec*proc (2 tests)
+headless     =   0.05 sec*proc (16 tests)
+launcher     =   0.02 sec*proc (1 test)
+menus        =   0.00 sec*proc (1 test)
+world        =   0.01 sec*proc (3 tests)
+
+Total Test time (real) =   0.07 sec

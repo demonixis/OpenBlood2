@@ -1,0 +1,15 @@
+639/647 Testing: energy.weapon
+639/647 Test: energy.weapon
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/energy_tests" "weapon" "/home/yann/projects/lithtech/Blood2/build/release/tests/energy-weapon"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"energy.weapon" start time: Oct 17 01:23 CEST
+Output:
+----------------------------------------------------------
+Original ID27/25..50 damage, 1000-unit flight, radius175, primary Gideon/alt Zealot audio, deferred explosion and separate sender/attacker verified.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"energy.weapon" end time: Oct 17 01:23 CEST
+"energy.weapon" time elapsed: 00:00:00
+----------------------------------------------------------

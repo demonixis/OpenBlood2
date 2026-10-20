@@ -1,0 +1,14 @@
+541/545 Testing: sprite_view.geometry
+541/545 Test: sprite_view.geometry
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/sprite_view_tests" "geometry" "/home/yann/projects/lithtech/Blood2/build/release/tests/sprite-view-geometry"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"sprite_view.geometry" start time: Oct 16 19:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"sprite_view.geometry" end time: Oct 16 19:57 CEST
+"sprite_view.geometry" time elapsed: 00:00:00
+----------------------------------------------------------

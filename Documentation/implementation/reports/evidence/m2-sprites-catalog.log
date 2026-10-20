@@ -1,0 +1,22 @@
+253/255 Testing: sprites.catalog
+253/255 Test: sprites.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"sprites.catalog" start time: Oct 16 02:49 CEST
+Output:
+----------------------------------------------------------
+worlds/04_steamtunnels.dat rejected=noname: Missing, oversized or non-SPR sprite resource: sprites\bloodsplat1.dtx
+worlds/04_steamtunnels.dat rejected=noname: Missing, oversized or non-SPR sprite resource: sprites\bloodsplat2.dtx
+worlds/04_steamtunnels.dat rejected=noname: Missing, oversized or non-SPR sprite resource: sprites\bloodsplat3.dtx
+worlds/17_entrance.dat flush=2 y=-544
+worlds/17_entrance.dat flush=2 y=-544
+worlds/18_temple.dat rejected=sprites\redlight1.spr: Missing, oversized or non-SPR sprite resource: 
+worlds/multi/bb_bridge.dat rejected=DetailSprite: invalid property TypeAction
+worlds=57 sources=124 manifests=120 missing=4 invalid=0 rejected=5 flush=2 repeat=0
+<end of output>
+Test time =   5.49 sec
+----------------------------------------------------------
+Test Passed.
+"sprites.catalog" end time: Oct 16 02:49 CEST
+"sprites.catalog" time elapsed: 00:00:05
+----------------------------------------------------------

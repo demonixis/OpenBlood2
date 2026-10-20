@@ -1,0 +1,122 @@
+Start testing: Oct 19 12:34 CEST
+----------------------------------------------------------
+74/1084 Testing: services.start_departure
+74/1084 Test: services.start_departure
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "start_departure"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.start_departure" start time: Oct 19 12:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"services.start_departure" end time: Oct 19 12:34 CEST
+"services.start_departure" time elapsed: 00:00:00
+----------------------------------------------------------
+
+77/1084 Testing: services.contact_overlap
+77/1084 Test: services.contact_overlap
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "contact_overlap"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.contact_overlap" start time: Oct 19 12:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.56 sec
+----------------------------------------------------------
+Test Passed.
+"services.contact_overlap" end time: Oct 19 12:34 CEST
+"services.contact_overlap" time elapsed: 00:00:00
+----------------------------------------------------------
+
+82/1084 Testing: services.elevator_entry
+82/1084 Test: services.elevator_entry
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "elevator_entry" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.elevator_entry" start time: Oct 19 12:34 CEST
+Output:
+----------------------------------------------------------
+05_CDMB entry at -5526, feet -5567, departed faces 2
+<end of output>
+Test time =   1.78 sec
+----------------------------------------------------------
+Test Passed.
+"services.elevator_entry" end time: Oct 19 12:34 CEST
+"services.elevator_entry" time elapsed: 00:00:01
+----------------------------------------------------------
+
+1081/1084 Testing: demo.flow
+1081/1084 Test: demo.flow
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/demo_tests" "flow"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"demo.flow" start time: Oct 19 12:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"demo.flow" end time: Oct 19 12:34 CEST
+"demo.flow" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1082/1084 Testing: demo.rules
+1082/1084 Test: demo.rules
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/demo_tests" "rules" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/demo-rules"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"demo.rules" start time: Oct 19 12:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"demo.rules" end time: Oct 19 12:34 CEST
+"demo.rules" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1083/1084 Testing: demo.worlds
+1083/1084 Test: demo.worlds
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/demo_tests" "worlds" "/home/yann/Games/B2Demo"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"demo.worlds" start time: Oct 19 12:34 CEST
+Output:
+----------------------------------------------------------
+Existing source omission Demo_01 #674 CDestructableBrush / SecScreen: SecScreen: Missing named world model; engine rejected creation before initial update; world loading continues
+Demo_02 authored elevator: state=3, rider rise=9920, requested travel=9920
+Demo worlds: start, 3s first world/full second-world elevator, authored exits, rollback, Voodoo/Focus transfer, end PCX, direct Demo_02
+<end of output>
+Test time = 117.15 sec
+----------------------------------------------------------
+Test Passed.
+"demo.worlds" end time: Oct 19 12:36 CEST
+"demo.worlds" time elapsed: 00:01:57
+----------------------------------------------------------
+
+1084/1084 Testing: demo.weapon
+1084/1084 Test: demo.weapon
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/demo_tests" "weapon" "/home/yann/Games/B2Demo"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"demo.weapon" start time: Oct 19 12:36 CEST
+Output:
+----------------------------------------------------------
+Voodoo: actual pickup/view assets, five hit variants, closest/all targets, Focus, self damage, six cylinder effects
+<end of output>
+Test time =   0.81 sec
+----------------------------------------------------------
+Test Passed.
+"demo.weapon" end time: Oct 19 12:36 CEST
+"demo.weapon" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 19 12:36 CEST
+
+demo = 118.03 sec*proc
+
+headless = 120.40 sec*proc
+
+private = 119.74 sec*proc
+
+services =   2.37 sec*proc
+

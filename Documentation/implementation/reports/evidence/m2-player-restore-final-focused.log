@@ -1,0 +1,44 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 534: player_restore.private
+    Start 532: player_restore.failures
+1/6 Test #532: player_restore.failures ..........   Passed    0.02 sec
+    Start 533: player_restore.lifetime
+2/6 Test #533: player_restore.lifetime ..........   Passed    0.02 sec
+    Start 531: player_restore.roundtrip
+3/6 Test #531: player_restore.roundtrip .........   Passed    0.01 sec
+4/6 Test #534: player_restore.private ...........   Passed    1.35 sec
+    Start 350: gpu.model_private
+5/6 Test #350: gpu.model_private ................   Passed    1.05 sec
+    Start 535: gpu.player_restore
+6/6 Test #535: gpu.player_restore ...............***Failed    2.21 sec
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 225 original instances, 116 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/player-restore.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[error] Smoke object delta SmellHint:: -1
+[error] GPU smoke failed: selection=true, crouch/run frames=0/0, skeleton reentry/hidden=false/false, crouched/stood=false/false, locomotion/walk/run/jump=false/false/false/false, objects=229/230, strings=5/5
+
+
+83% tests passed, 1 tests failed out of 6
+
+Label Time Summary:
+gpu               =   3.27 sec*proc (2 tests)
+headless          =   1.40 sec*proc (4 tests)
+model_view        =   1.05 sec*proc (1 test)
+player_restore    =   3.61 sec*proc (5 tests)
+private           =   4.62 sec*proc (3 tests)
+
+Total Test time (real) =   4.63 sec
+
+The following tests FAILED:
+	535 - gpu.player_restore (Failed)                       gpu player_restore private
+Errors while running CTest

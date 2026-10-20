@@ -1,0 +1,170 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 588: session_playback.private
+      Start 455: ai_runtime.subway
+ 1/76 Test #455: ai_runtime.subway .................   Passed   34.23 sec
+      Start  40: world.destination_trial_private
+ 2/76 Test  #40: world.destination_trial_private ...   Passed   22.77 sec
+      Start 586: player_controls.private
+ 3/76 Test #588: session_playback.private ..........   Passed   67.84 sec
+      Start 354: ai_state.subway
+ 4/76 Test #586: player_controls.private ...........   Passed   30.19 sec
+      Start 453: ai_runtime.catalog
+ 5/76 Test #453: ai_runtime.catalog ................   Passed    2.29 sec
+      Start 456: ai_runtime.arena
+ 6/76 Test #456: ai_runtime.arena ..................   Passed    1.68 sec
+      Start 457: ai_runtime.sparse_weapons
+ 7/76 Test #457: ai_runtime.sparse_weapons .........   Passed    0.62 sec
+      Start 485: corpses.catalog
+ 8/76 Test #485: corpses.catalog ...................   Passed    0.92 sec
+      Start  53: services.private
+ 9/76 Test  #53: services.private ..................   Passed   10.45 sec
+      Start 467: ai_hit.catalog
+10/76 Test #467: ai_hit.catalog ....................   Passed    0.79 sec
+      Start 454: ai_runtime.failures
+11/76 Test #454: ai_runtime.failures ...............   Passed    0.30 sec
+      Start  24: world.destination_trials
+12/76 Test  #24: world.destination_trials ..........   Passed    0.16 sec
+      Start  27: world.destination_lifetime
+13/76 Test  #27: world.destination_lifetime ........   Passed    0.05 sec
+      Start 353: ai_state.catalog
+14/76 Test #353: ai_state.catalog ..................   Passed    0.94 sec
+      Start 443: ai_runtime.visibility_filter
+15/76 Test #443: ai_runtime.visibility_filter ......   Passed    0.02 sec
+      Start 481: corpses.lifetime
+16/76 Test #481: corpses.lifetime ..................   Passed    0.04 sec
+      Start 444: ai_runtime.visibility_atomic
+17/76 Test #444: ai_runtime.visibility_atomic ......   Passed    0.02 sec
+      Start 479: corpses.transfer
+18/76 Test #479: corpses.transfer ..................   Passed    0.04 sec
+      Start 482: corpses.sounds
+19/76 Test #482: corpses.sounds ....................   Passed    0.04 sec
+      Start 480: corpses.failures
+20/76 Test #480: corpses.failures ..................   Passed    0.04 sec
+      Start 484: corpses.accumulation
+21/76 Test #484: corpses.accumulation ..............   Passed    0.04 sec
+      Start 478: corpses.mappings
+22/76 Test #478: corpses.mappings ..................   Passed    0.04 sec
+      Start 483: corpses.gates
+23/76 Test #483: corpses.gates .....................   Passed    0.04 sec
+      Start 445: ai_runtime.lifetime
+24/76 Test #445: ai_runtime.lifetime ...............   Passed    0.02 sec
+      Start 452: ai_runtime.missing
+25/76 Test #452: ai_runtime.missing ................   Passed    0.02 sec
+      Start 451: ai_runtime.body
+26/76 Test #451: ai_runtime.body ...................   Passed    0.02 sec
+      Start 441: ai_runtime.activation
+27/76 Test #441: ai_runtime.activation .............   Passed    0.02 sec
+      Start 450: ai_runtime.triggers
+28/76 Test #450: ai_runtime.triggers ...............   Passed    0.02 sec
+      Start  45: services.model_rejection
+29/76 Test  #45: services.model_rejection ..........   Passed    0.32 sec
+      Start 446: ai_runtime.targets
+30/76 Test #446: ai_runtime.targets ................   Passed    0.02 sec
+      Start 449: ai_runtime.spatial
+31/76 Test #449: ai_runtime.spatial ................   Passed    0.02 sec
+      Start 447: ai_runtime.tracking
+32/76 Test #447: ai_runtime.tracking ...............   Passed    0.02 sec
+      Start 448: ai_runtime.camera
+33/76 Test #448: ai_runtime.camera .................   Passed    0.02 sec
+      Start 442: ai_runtime.visibility
+34/76 Test #442: ai_runtime.visibility .............   Passed    0.02 sec
+      Start 466: ai_hit.hidden
+35/76 Test #466: ai_hit.hidden .....................   Passed    0.02 sec
+      Start 587: session_playback.policy
+36/76 Test #587: session_playback.policy ...........   Passed    0.02 sec
+      Start 458: ai_hit.geometry
+37/76 Test #458: ai_hit.geometry ...................   Passed    0.03 sec
+      Start  10: objects.unsupported_teardown
+38/76 Test  #10: objects.unsupported_teardown ......   Passed    0.04 sec
+      Start 584: player_controls.mouse
+39/76 Test #584: player_controls.mouse .............   Passed    0.01 sec
+      Start 583: player_controls.keys
+40/76 Test #583: player_controls.keys ..............   Passed    0.01 sec
+      Start 460: ai_hit.modifiers
+41/76 Test #460: ai_hit.modifiers ..................   Passed    0.03 sec
+      Start 585: player_controls.gates
+42/76 Test #585: player_controls.gates .............   Passed    0.01 sec
+      Start 461: ai_hit.reactions
+43/76 Test #461: ai_hit.reactions ..................   Passed    0.02 sec
+      Start 465: ai_hit.lifetime
+44/76 Test #465: ai_hit.lifetime ...................   Passed    0.02 sec
+      Start   9: objects.messages_strings
+45/76 Test   #9: objects.messages_strings ..........   Passed    0.04 sec
+      Start 459: ai_hit.query
+46/76 Test #459: ai_hit.query ......................   Passed    0.02 sec
+      Start 463: ai_hit.guards
+47/76 Test #463: ai_hit.guards .....................   Passed    0.02 sec
+      Start 464: ai_hit.sides
+48/76 Test #464: ai_hit.sides ......................   Passed    0.02 sec
+      Start 462: ai_hit.recoil
+49/76 Test #462: ai_hit.recoil .....................   Passed    0.02 sec
+      Start  11: objects.creation_failures
+50/76 Test  #11: objects.creation_failures .........   Passed    0.03 sec
+      Start   3: objects.reasons_properties
+51/76 Test   #3: objects.reasons_properties ........   Passed    0.02 sec
+      Start   1: objects.original_objects
+52/76 Test   #1: objects.original_objects ..........   Passed    0.02 sec
+      Start   8: objects.links_lists
+53/76 Test   #8: objects.links_lists ...............   Passed    0.02 sec
+      Start   2: objects.nested_creation
+54/76 Test   #2: objects.nested_creation ...........   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+55/76 Test   #5: objects.deferred_removal ..........   Passed    0.02 sec
+      Start   4: objects.scheduling
+56/76 Test   #4: objects.scheduling ................   Passed    0.02 sec
+      Start   7: objects.handles_selection
+57/76 Test   #7: objects.handles_selection .........   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+58/76 Test   #6: objects.aggregate_dispatch ........   Passed    0.02 sec
+      Start 352: ai_state.lifetime
+59/76 Test #352: ai_state.lifetime .................   Passed    0.02 sec
+      Start 350: ai_state.dispatch
+60/76 Test #350: ai_state.dispatch .................   Passed    0.02 sec
+      Start 347: ai_state.resize
+61/76 Test #347: ai_state.resize ...................   Passed    0.02 sec
+      Start 346: ai_state.commands
+62/76 Test #346: ai_state.commands .................   Passed    0.02 sec
+      Start 349: ai_state.civilian
+63/76 Test #349: ai_state.civilian .................   Passed    0.02 sec
+      Start 348: ai_state.decisions
+64/76 Test #348: ai_state.decisions ................   Passed    0.02 sec
+      Start 351: ai_state.failures
+65/76 Test #351: ai_state.failures .................   Passed    0.02 sec
+      Start 345: ai_state.transitions
+66/76 Test #345: ai_state.transitions ..............   Passed    0.02 sec
+      Start  44: services.model_reader
+67/76 Test  #44: services.model_reader .............   Passed    0.02 sec
+      Start  52: services.original_services
+68/76 Test  #52: services.original_services ........   Passed    0.02 sec
+      Start  47: services.model_callbacks
+69/76 Test  #47: services.model_callbacks ..........   Passed    0.02 sec
+      Start  46: services.animation_events
+70/76 Test  #46: services.animation_events .........   Passed    0.02 sec
+      Start  49: services.movement_contacts
+71/76 Test  #49: services.movement_contacts ........   Passed    0.02 sec
+      Start  48: services.collision_queries
+72/76 Test  #48: services.collision_queries ........   Passed    0.02 sec
+      Start 344: ai_state.symbols
+73/76 Test #344: ai_state.symbols ..................   Passed    0.01 sec
+      Start  50: services.placement_queries
+74/76 Test  #50: services.placement_queries ........   Passed    0.02 sec
+      Start  51: services.placement_service
+75/76 Test  #51: services.placement_service ........   Passed    0.02 sec
+76/76 Test #354: ai_state.subway ...................   Passed   47.16 sec
+
+100% tests passed, 0 tests failed out of 76
+
+Label Time Summary:
+ai_hit              =   0.99 sec*proc (10 tests)
+ai_runtime          =  39.35 sec*proc (17 tests)
+ai_state            =  48.27 sec*proc (11 tests)
+corpses             =   1.19 sec*proc (8 tests)
+headless            = 222.03 sec*proc (76 tests)
+objects             =   0.25 sec*proc (11 tests)
+player_controls     =  30.23 sec*proc (4 tests)
+private             = 220.17 sec*proc (13 tests)
+services            =  10.91 sec*proc (10 tests)
+session_playback    =  67.86 sec*proc (2 tests)
+world               =  22.98 sec*proc (3 tests)
+
+Total Test time (real) = 115.01 sec

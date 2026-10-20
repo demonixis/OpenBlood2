@@ -1,0 +1,66 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 264: gpu.sceneexplosion
+ 1/25 Test #264: gpu.sceneexplosion ...............   Passed    4.29 sec
+      Start 541: sprite_view.geometry
+ 2/25 Test #541: sprite_view.geometry .............   Passed    0.00 sec
+      Start 542: sprite_view.failures
+ 3/25 Test #542: sprite_view.failures .............   Passed    0.03 sec
+      Start 543: sprite_view.subway
+ 4/25 Test #543: sprite_view.subway ...............   Passed    1.18 sec
+      Start 546: explosion_sprites.formulas
+ 5/25 Test #546: explosion_sprites.formulas .......   Passed    0.00 sec
+      Start 547: explosion_sprites.failures
+ 6/25 Test #547: explosion_sprites.failures .......   Passed    0.01 sec
+      Start 548: explosion_sprites.session
+ 7/25 Test #548: explosion_sprites.session ........   Passed    0.00 sec
+      Start 549: explosion_sprites.private
+ 8/25 Test #549: explosion_sprites.private ........   Passed    1.26 sec
+      Start 562: explosion_rings.motion
+ 9/25 Test #562: explosion_rings.motion ...........   Passed    0.00 sec
+      Start 563: explosion_rings.lifecycle
+10/25 Test #563: explosion_rings.lifecycle ........   Passed    0.00 sec
+      Start 564: explosion_rings.recipes
+11/25 Test #564: explosion_rings.recipes ..........   Passed    0.00 sec
+      Start 565: explosion_rings.failures
+12/25 Test #565: explosion_rings.failures .........   Passed    0.00 sec
+      Start 566: explosion_rings.session
+13/25 Test #566: explosion_rings.session ..........   Passed    0.00 sec
+      Start 567: explosion_rings.private
+14/25 Test #567: explosion_rings.private ..........   Passed    3.34 sec
+      Start 570: explosion_fragments.lifecycle
+15/25 Test #570: explosion_fragments.lifecycle ....   Passed    0.00 sec
+      Start 571: explosion_fragments.collision
+16/25 Test #571: explosion_fragments.collision ....   Passed    0.00 sec
+      Start 572: explosion_fragments.recipes
+17/25 Test #572: explosion_fragments.recipes ......   Passed    0.00 sec
+      Start 573: explosion_fragments.failures
+18/25 Test #573: explosion_fragments.failures .....   Passed    0.01 sec
+      Start 574: explosion_fragments.session
+19/25 Test #574: explosion_fragments.session ......   Passed    0.00 sec
+      Start 575: explosion_fragments.private
+20/25 Test #575: explosion_fragments.private ......   Passed    5.27 sec
+      Start 578: object_particles.emission
+21/25 Test #578: object_particles.emission ........   Passed    0.00 sec
+      Start 579: object_particles.stopping
+22/25 Test #579: object_particles.stopping ........   Passed    0.00 sec
+      Start 580: object_particles.failures
+23/25 Test #580: object_particles.failures ........   Passed    0.00 sec
+      Start 581: object_particles.session
+24/25 Test #581: object_particles.session .........   Passed    0.00 sec
+      Start 582: object_particles.private
+25/25 Test #582: object_particles.private .........   Passed    6.58 sec
+
+100% tests passed, 0 tests failed out of 25
+
+Label Time Summary:
+explosion_fragments    =   5.29 sec*proc (6 tests)
+explosion_rings        =   3.35 sec*proc (6 tests)
+explosion_sprites      =   1.27 sec*proc (4 tests)
+gpu                    =   4.29 sec*proc (1 test)
+headless               =  17.72 sec*proc (24 tests)
+object_particles       =   6.59 sec*proc (5 tests)
+private                =  21.92 sec*proc (6 tests)
+sceneexplosion         =   4.29 sec*proc (1 test)
+sprite_view            =   1.21 sec*proc (3 tests)
+
+Total Test time (real) =  22.03 sec

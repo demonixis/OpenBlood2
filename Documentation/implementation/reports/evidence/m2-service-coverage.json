@@ -1,0 +1,337 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete",
+  "implementation_base": "44e1f55c06eb2fb174c0459bc1f96e62b8ab7ad1",
+  "implementation_commit": "23743a40b3db3bf1dcf597319895b00d6ae071d4",
+  "patch_sha256": "bc67ee9a095d5920adf3b2d0140415fb5ad3846deddddf47609be0a38de415e8",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "aee5a83b1d6aad3ae64327002dea27e6a0aedfd676b5e3d1cc3f24cf0c164cb7"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "5895035097fec1b69c5e774449def71a42712c846fc8f8db1e3e1d9a1a080e7d"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "798eda8b3435beb25c49f58455a369cfa3979829627036ab10f0831b34a2bdfc"
+    },
+    {
+      "path": "docs/SERVICE_COVERAGE_CONTRACTS.md",
+      "sha256": "cbc60d2e6683382ceede652656e72b7848f7f9c8dd22b8b71efcaa8434468c19"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "3df7bc6f2f6c9f0574da165d0d1fc50e1009fe116ac3626f39c17b41b446af14"
+    },
+    {
+      "path": "src/app/inspector.h",
+      "sha256": "4628bc1c92722ad93a2e1b355fa8434b72667d8fa6c276984cbf4773d6ac67da"
+    },
+    {
+      "path": "src/app/main.cpp",
+      "sha256": "5f94f05b5b9fe0460e49281cfcac278134381c64f0e800f745baa4bff386c3cb"
+    },
+    {
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "d5b1319762927b68891b8a73f1df2884ac6e80b33025b810a9bb5f122db509fd"
+    },
+    {
+      "path": "src/game/player_restore.cpp",
+      "sha256": "9199d2753196f96454199e96ebe73f4ea7d897e8d4e91e38d10bea760e2fd2ff"
+    },
+    {
+      "path": "src/game/server_adapter.cpp",
+      "sha256": "cea3184b3285312115e4bbbbb069ca926c7f56bc4a5e3bafcbbc9fde23190288"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "d1a84e6e0f1575dace399d5e539d96c119eeb47947c6708887b4bde1b926d96e"
+    },
+    {
+      "path": "src/game/server_audio.cpp",
+      "sha256": "6de3ce655c4433e7993eea97bc5daef2be5f89da2e4885ec30ea1d516b9b1081"
+    },
+    {
+      "path": "src/game/server_cameras.cpp",
+      "sha256": "5aee1e3eb59f59e2b4de6c2fafa76c332cb82d7312620815a9393b3c4ee7aa99"
+    },
+    {
+      "path": "src/game/server_effects.cpp",
+      "sha256": "6066a0a5dd141765daee2ab78caa93898a530b2b862a47fa6cc3863ddca6f5ad"
+    },
+    {
+      "path": "src/game/server_projectiles.cpp",
+      "sha256": "aa52eee4dd4ba1cda6f216b15c129b8130feca0bd0d567574c8a08541afad7e4"
+    },
+    {
+      "path": "src/game/server_sky.cpp",
+      "sha256": "dca6ba69a88118bc1ac013f82ec37f6bb5f727785217fd3ffd9e74c263571a32"
+    },
+    {
+      "path": "src/game/server_sprites.cpp",
+      "sha256": "de5aab7a6c60beb320edf414c766b3837d4259b2091a7fff0aa999a620903d00"
+    },
+    {
+      "path": "src/game/service_catalog.inc",
+      "sha256": "41697a831d4435bd788b4a756740c71a3b3ae49df0e9d23c82086386510e5f25"
+    },
+    {
+      "path": "src/game/service_coverage.cpp",
+      "sha256": "905083606a4f0460ee33341548ba7c83cbacbca33b717f56fa10141087c47e1c"
+    },
+    {
+      "path": "src/game/service_coverage.h",
+      "sha256": "4978f004a84f00c71bb0836747f46b6d9dec265c03d28489d200f746f16e605a"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "b57a12ebd8b56bf33eeef49b6e15173c6609124e2366dfc7cf2cfe3da6d08acc"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "45b6ea7ebbd449ce4d540a5d985ac6b2942ec7eb5b738e17d15d522cbb7bf18a"
+    },
+    {
+      "path": "tests/service_coverage_tests.cpp",
+      "sha256": "dde52ccfedc62ad119ee8d92557f17c88421a4dca0608a8fa43bc8ff8be225c3"
+    }
+  ],
+  "verification": [
+    {
+      "configuration": "debug",
+      "command": "ctest --test-dir build/debug -R '^(coverage\\.|objects\\.|player_restore\\.|world\\.)' -V -j3",
+      "unique_tests": 41,
+      "private_tests": 6,
+      "result": "passed"
+    },
+    {
+      "configuration": "release",
+      "command": "ctest --test-dir build/release -R '^(coverage\\.|objects\\.|player_restore\\.|world\\.)' -V -j3",
+      "unique_tests": 41,
+      "private_tests": 6,
+      "result": "passed"
+    },
+    {
+      "configuration": "sanitize",
+      "command": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^(coverage\\.|objects\\.|player_restore\\.|world\\.)' -V -j3",
+      "unique_tests": 41,
+      "private_tests": 6,
+      "result": "passed"
+    },
+    {
+      "configuration": "debug",
+      "command": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/debug -R '^gpu\\.(lifecycle|level_change)$' -V",
+      "unique_tests": 2,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "result": "passed"
+    },
+    {
+      "configuration": "release",
+      "command": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/release -R '^gpu\\.(lifecycle|level_change)$' -V",
+      "unique_tests": 2,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "result": "passed"
+    }
+  ],
+  "logs": [
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-debug-headless.log",
+      "sha256": "9115ece0f02df65d98ab8e05c33cf090368394b985596bc22a849c937fe9a64b"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-release-headless.log",
+      "sha256": "f1af705e99ac20ee42932857c3962ffe13b920aba84182d1d9ecb772283992c8"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-sanitize-headless.log",
+      "sha256": "3ea380645749014a15b4e8d20114b7bdd501a259d8ab32ec49a342dfc0d72dc9"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-debug-nvidia.log",
+      "sha256": "0a1c609f19b2c601fe6724bd44c28c0338aadb7545eb3fc8721f0880b5e81d84"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-release-nvidia.log",
+      "sha256": "77056a53477077cbd7ead3b01e8018b37667bd0e4d152b0ebbc214ed7ebb17b8"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-initial-build-failure.log",
+      "sha256": "f126efb829b25a5808c9e41118463ac84306c1116e2f0ec1041475d719a32df9"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-initial-corrected-build.log",
+      "sha256": "eb2fd35f61cb45fdbf2a7452d6ecc6f320bee04998b6b33ecbb3d47c3897067c"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-release-build.log",
+      "sha256": "bcf0e26f50cf181292e57c66865e06291b14578d2b47e1b0e29b9aafe0e16967"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-sanitize-build.log",
+      "sha256": "0029e398c2ec56a793833063d543ade6ef5084eb21178baadf20d60f489e13df"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-debug-final-build.log",
+      "sha256": "99edfbc6b4f14ef116f16d27160ed886e6a9d0d24304005e5415e866bb3286be"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-release-final-build.log",
+      "sha256": "d0f36d9a0934cc32f8135d5bd7326d1dff9f04227fe03da92c9a20c1aa75b9f6"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-sanitize-final-build.log",
+      "sha256": "2b95ab6308d7c130033b47b55a286b12dd62f4f7dc432eae539785449e79e70d"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-debug-exit-trace-build.log",
+      "sha256": "f40bbc32ce3248a4421bc1276e901479b118b95ae15db35dbcd823a08c16e183"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-release-exit-trace-build.log",
+      "sha256": "f40bbc32ce3248a4421bc1276e901479b118b95ae15db35dbcd823a08c16e183"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-sanitize-exit-trace-build.log",
+      "sha256": "f40bbc32ce3248a4421bc1276e901479b118b95ae15db35dbcd823a08c16e183"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-controls.log",
+      "sha256": "a0c8eac3b37dc4329675bbeaa37af6eadb91694b915714a32472ca04964163e6"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-format.log",
+      "sha256": "7bd1ef906aae2f973f36a303fce5d74ea8b64fba1c5d6113e94f6e53f196611f"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-links-final.log",
+      "sha256": "656c95a42f8a843f0271a9048134ac9b8375522dbb04d4e24ec00bc7670de21c"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-service-coverage-configurations.json",
+      "sha256": "bd39b454feadd965036d34f6a3a7eda6e79b396d1f482d68f72c916caf18dd9b"
+    }
+  ],
+  "trace": {
+    "path": "Documentation/Implementation/evidence/m2-service-coverage-trace.tsv",
+    "sha256": "b6cabef654f1dd9f608bf7a83a0757a7c33624f4bfca4d54ae35eb1595af8966",
+    "rows": 1044
+  },
+  "controls": {
+    "recipe": "Documentation/Implementation/evidence/m2-service-coverage-controls.py",
+    "sha256": "75afb8851903751ab9da93b123b7db62892dfd888aa105945b877cc23666bb73",
+    "results": "Unchanged fixture exits 0; added uncatalogued declaration and missing real instrumentation each exit 1."
+  },
+  "catalog": {
+    "interface_entries": 171,
+    "lifecycle_entries": 2,
+    "callback_entries": 1,
+    "unconditional_unsupported": [
+      "EndHMessageRead",
+      "RestoreObjects",
+      "SaveObjects"
+    ]
+  },
+  "checkpoints": {
+    "SubwayA-entry": {
+      "reached": 75,
+      "unexercised": 99,
+      "generic_unavailable": 0,
+      "npc_runtime_errors": 0
+    },
+    "SubwayA-10s": {
+      "reached": 98,
+      "unexercised": 76,
+      "generic_unavailable": 0,
+      "npc_runtime_errors": 0
+    },
+    "SubwayA-exit-request": {
+      "reached": 100,
+      "unexercised": 74,
+      "generic_unavailable": 0,
+      "npc_runtime_errors": 0
+    },
+    "CityHub-restored": {
+      "reached": 85,
+      "unexercised": 89,
+      "generic_unavailable": 0,
+      "npc_runtime_errors": 0
+    },
+    "CityHub-10s": {
+      "reached": 104,
+      "unexercised": 70,
+      "generic_unavailable": 0,
+      "npc_runtime_errors": 0
+    },
+    "CityHub-teardown": {
+      "reached": 108,
+      "unexercised": 66,
+      "generic_unavailable": 0,
+      "npc_runtime_errors": 0
+    }
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "screenshots": [
+    {
+      "path": "/home/yann/projects/lithtech/Blood2/build/debug/tests/gpu.png",
+      "sha256": "40f1825352c141923a5dcb1f5eb43e9585efec45ed44b561197e89b381454128",
+      "reviewed": true,
+      "committed": false,
+      "content": "Services table, unexercised bounded catalogue, updated M2 status; no loaded commercial world."
+    }
+  ],
+  "limits": [
+    "Attempts are not successful outcomes; generic unavailable history does not replace subsystem failures.",
+    "Only bounded ServerDE/CSBase plus three named supporting boundaries; not the entire historical SDK or all direct client API activity.",
+    "Stationary ten-second updates per level and NEW_LEVEL/teardown are not campaign traversal or all weapons/AI paths.",
+    "Scope changes do not change original gameplay or acceptance gates; M2 remains incomplete.",
+    "Native macOS/mobile/VR execution not added.",
+    "Raw build logs and exact source patches retain original whitespace."
+  ],
+  "initial_failures": [
+    "First new test compilation used nonexistent Restoration.completed; corrected to actual restored counter.",
+    "Initial links validation preceded manifest creation; rerun after evidence generation."
+  ],
+  "build_commands": {
+    "debug": "cmake --build build/debug --target service_coverage_tests world_tests object_contract_tests player_restore_tests blood2_app level_change_gpu_tests -j3",
+    "release": "cmake --build build/release --target service_coverage_tests world_tests object_contract_tests player_restore_tests blood2_app level_change_gpu_tests -j3",
+    "sanitize": "cmake --build build/sanitize --target service_coverage_tests world_tests object_contract_tests player_restore_tests -j3"
+  },
+  "local_markdown_links_validated": 3623
+}

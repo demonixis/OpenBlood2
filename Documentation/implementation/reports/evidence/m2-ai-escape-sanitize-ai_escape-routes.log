@@ -1,0 +1,14 @@
+424/431 Testing: ai_escape.routes
+424/431 Test: ai_escape.routes
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_escape_tests" "routes"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_escape.routes" start time: Oct 16 14:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.routes" end time: Oct 16 14:25 CEST
+"ai_escape.routes" time elapsed: 00:00:00
+----------------------------------------------------------

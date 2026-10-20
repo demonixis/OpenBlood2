@@ -1,0 +1,18 @@
+717/718 Testing: destructable_models.city
+717/718 Test: destructable_models.city
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable_model_tests" "city" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"destructable_models.city" start time: Oct 17 05:14 CEST
+Output:
+----------------------------------------------------------
+CityHub cycle 0: created 413, unsupported 37, failed 35; models 122, pushable 51, gravity 98, ground no-hit 18, skin failures 0, triangles 7450
+Initial bounded physics: 47 bodies reporting a collision block (includes floor contacts; no depenetration)
+CityHub cycle 1: created 413, unsupported 37, failed 35; models 122, pushable 51, gravity 98, ground no-hit 18, skin failures 0, triangles 7450
+Initial bounded physics: 47 bodies reporting a collision block (includes floor contacts; no depenetration)
+<end of output>
+Test time =   2.32 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_models.city" end time: Oct 17 05:14 CEST
+"destructable_models.city" time elapsed: 00:00:02
+----------------------------------------------------------

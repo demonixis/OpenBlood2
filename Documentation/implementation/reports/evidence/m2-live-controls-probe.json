@@ -1,0 +1,11 @@
+{
+  "binary": "MSynth25.dll",
+  "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+  "unicorn": "2.1.4",
+  "decode_cases": 645,
+  "pitch_cases": 32768,
+  "pitch_fnv64": 10930475445258237893,
+  "fnv64": 13983738688242496418,
+  "decisions_sha256": "a6d7e0d61c5774764656402d8fa4c8ff8eda73bc58fe2886e3fecec0e85f9847",
+  "scope": "Original CC7/10/11 and pitch-byte decoding with queue insertion intercepted; original default-range signed floor pitch arithmetic. No timing-list scheduling, PCM, OS calls or native DLL execution."
+}

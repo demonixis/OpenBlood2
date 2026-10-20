@@ -1,0 +1,135 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start   1: objects.original_objects
+ 1/59 Test   #1: objects.original_objects .........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+ 2/59 Test   #2: objects.nested_creation ..........   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+ 3/59 Test   #3: objects.reasons_properties .......   Passed    0.02 sec
+      Start   4: objects.scheduling
+ 4/59 Test   #4: objects.scheduling ...............   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+ 5/59 Test   #5: objects.deferred_removal .........   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+ 6/59 Test   #6: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   7: objects.handles_selection
+ 7/59 Test   #7: objects.handles_selection ........   Passed    0.02 sec
+      Start   8: objects.links_lists
+ 8/59 Test   #8: objects.links_lists ..............   Passed    0.02 sec
+      Start   9: objects.messages_strings
+ 9/59 Test   #9: objects.messages_strings .........   Passed    0.03 sec
+      Start  10: objects.unsupported_teardown
+10/59 Test  #10: objects.unsupported_teardown .....   Passed    0.04 sec
+      Start  11: objects.creation_failures
+11/59 Test  #11: objects.creation_failures ........   Passed    0.03 sec
+      Start  38: services.model_reader
+12/59 Test  #38: services.model_reader ............   Passed    0.02 sec
+      Start  39: services.model_rejection
+13/59 Test  #39: services.model_rejection .........   Passed    0.30 sec
+      Start  40: services.animation_events
+14/59 Test  #40: services.animation_events ........   Passed    0.02 sec
+      Start  41: services.model_callbacks
+15/59 Test  #41: services.model_callbacks .........   Passed    0.02 sec
+      Start  42: services.collision_queries
+16/59 Test  #42: services.collision_queries .......   Passed    0.01 sec
+      Start  43: services.movement_contacts
+17/59 Test  #43: services.movement_contacts .......   Passed    0.02 sec
+      Start  44: services.original_services
+18/59 Test  #44: services.original_services .......   Passed    0.02 sec
+      Start  45: services.private
+19/59 Test  #45: services.private .................   Passed   10.18 sec
+      Start  46: player.handles
+20/59 Test  #46: player.handles ...................   Passed    0.03 sec
+      Start  47: player.lifecycle
+21/59 Test  #47: player.lifecycle .................   Passed    0.04 sec
+      Start  48: player.rollback
+22/59 Test  #48: player.rollback ..................   Passed    0.05 sec
+      Start  49: player.messages
+23/59 Test  #49: player.messages ..................   Passed    0.04 sec
+      Start  50: player.callbacks
+24/59 Test  #50: player.callbacks .................   Passed    0.04 sec
+      Start  51: player.private
+25/59 Test  #51: player.private ...................   Passed   11.27 sec
+      Start  52: weapons.inventory
+26/59 Test  #52: weapons.inventory ................   Passed    0.04 sec
+      Start  58: weapons.lifetime
+27/59 Test  #58: weapons.lifetime .................   Passed    0.06 sec
+      Start  59: weapons.rollback
+28/59 Test  #59: weapons.rollback .................   Passed    0.04 sec
+      Start 103: triggers.schedule
+29/59 Test #103: triggers.schedule ................   Passed    0.03 sec
+      Start 104: triggers.toggle
+30/59 Test #104: triggers.toggle ..................   Passed    0.03 sec
+      Start 105: triggers.filters
+31/59 Test #105: triggers.filters .................   Passed    0.04 sec
+      Start 106: triggers.keys
+32/59 Test #106: triggers.keys ....................   Passed    0.04 sec
+      Start 107: triggers.doors
+33/59 Test #107: triggers.doors ...................   Passed    0.11 sec
+      Start 108: triggers.touch
+34/59 Test #108: triggers.touch ...................   Passed    0.04 sec
+      Start 109: triggers.lifetime
+35/59 Test #109: triggers.lifetime ................   Passed    0.03 sec
+      Start 110: triggers.protocol
+36/59 Test #110: triggers.protocol ................   Passed    0.04 sec
+      Start 111: triggers.private
+37/59 Test #111: triggers.private .................   Passed    6.17 sec
+      Start 112: triggers.catalog
+38/59 Test #112: triggers.catalog .................   Passed   32.72 sec
+      Start 293: attachments.root
+39/59 Test #293: attachments.root .................   Passed    0.02 sec
+      Start 294: attachments.nodes
+40/59 Test #294: attachments.nodes ................   Passed    0.02 sec
+      Start 295: attachments.rejects
+41/59 Test #295: attachments.rejects ..............   Passed    0.37 sec
+      Start 296: attachments.lifetime
+42/59 Test #296: attachments.lifetime .............   Passed    0.02 sec
+      Start 297: attachments.held
+43/59 Test #297: attachments.held .................   Passed    0.05 sec
+      Start 298: attachments.missing
+44/59 Test #298: attachments.missing ..............   Passed    0.04 sec
+      Start 299: attachments.catalog
+45/59 Test #299: attachments.catalog ..............   Passed    1.06 sec
+      Start 300: attachments.subway
+46/59 Test #300: attachments.subway ...............   Passed    4.12 sec
+      Start 473: exits.defaults
+47/59 Test #473: exits.defaults ...................   Passed    0.04 sec
+      Start 474: exits.delayed
+48/59 Test #474: exits.delayed ....................   Passed    0.05 sec
+      Start 475: exits.broadcast
+49/59 Test #475: exits.broadcast ..................   Passed    0.03 sec
+      Start 476: exits.blocked
+50/59 Test #476: exits.blocked ....................   Passed    0.04 sec
+      Start 477: exits.dead
+51/59 Test #477: exits.dead .......................   Passed    0.03 sec
+      Start 478: exits.queue
+52/59 Test #478: exits.queue ......................   Passed    0.04 sec
+      Start 479: exits.lifetime
+53/59 Test #479: exits.lifetime ...................   Passed    0.04 sec
+      Start 480: exits.catalog
+54/59 Test #480: exits.catalog ....................   Passed   11.00 sec
+      Start 481: inventory_state.roundtrip
+55/59 Test #481: inventory_state.roundtrip ........   Passed    0.03 sec
+      Start 482: inventory_state.malformed
+56/59 Test #482: inventory_state.malformed ........   Passed    0.03 sec
+      Start 483: inventory_state.rollback
+57/59 Test #483: inventory_state.rollback .........   Passed    0.03 sec
+      Start 484: inventory_state.capture
+58/59 Test #484: inventory_state.capture ..........   Passed    0.04 sec
+      Start 485: inventory_state.private
+59/59 Test #485: inventory_state.private ..........   Passed    5.21 sec
+
+100% tests passed, 0 tests failed out of 59
+
+Label Time Summary:
+attachments        =   5.69 sec*proc (8 tests)
+exits              =  11.27 sec*proc (8 tests)
+headless           =  83.97 sec*proc (59 tests)
+inventory_state    =   5.34 sec*proc (5 tests)
+objects            =   0.23 sec*proc (11 tests)
+player             =  11.47 sec*proc (6 tests)
+private            =  81.73 sec*proc (8 tests)
+services           =  10.58 sec*proc (8 tests)
+triggers           =  39.25 sec*proc (10 tests)
+weapons            =   0.14 sec*proc (3 tests)
+
+Total Test time (real) =  83.99 sec

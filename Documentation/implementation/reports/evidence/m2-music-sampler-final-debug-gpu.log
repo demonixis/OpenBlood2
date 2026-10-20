@@ -1,0 +1,49 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 294
+    Start 294: gpu.sound
+
+294: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--world-sounds-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-sounds.png"
+294: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+294: Environment variables: 
+294:  SDL_AUDIODRIVER=dummy
+294: Test timeout computed to be: 30
+294: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+294: [info] BLOOD2.REZ: detected, 267758913 bytes
+294: [info] SOUND.REZ: detected, 204633068 bytes
+294: [info] BLOOD2P.REZ: detected, 24133434 bytes
+294: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+294: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+294: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+294: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+294: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+294: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+294: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/world-sounds.png
+294: [info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+294: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+294: [info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+294: [info] AI paths: hidden=true, reentered=true, copied points=7
+294: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+294: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+294: [info] WORLD SOUNDS smoke: four authored loops survive consumed Sound objects, advance with hidden UI and reload; SDL PCM submission verified
+294: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+1/1 Test #294: gpu.sound ........................   Passed    5.19 sec
+
+The following tests passed:
+	gpu.sound
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+gpu        =   5.19 sec*proc (1 test)
+private    =   5.19 sec*proc (1 test)
+sound      =   5.19 sec*proc (1 test)
+
+Total Test time (real) =   5.21 sec

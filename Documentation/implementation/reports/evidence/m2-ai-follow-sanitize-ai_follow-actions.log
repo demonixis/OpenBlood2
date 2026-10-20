@@ -1,0 +1,14 @@
+381/386 Testing: ai_follow.actions
+381/386 Test: ai_follow.actions
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_follow_tests" "actions"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_follow.actions" start time: Oct 16 12:54 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.actions" end time: Oct 16 12:54 CEST
+"ai_follow.actions" time elapsed: 00:00:00
+----------------------------------------------------------

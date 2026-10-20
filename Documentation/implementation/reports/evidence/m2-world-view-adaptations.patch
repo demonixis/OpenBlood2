@@ -1,0 +1,1639 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 87ee694..35455cb 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -255,3 +255,11 @@ Preserve same-target no-op, SetTarget's net-zero Metacmd change, local-up yaw,
+ deferred non-owning target lifetime and checked pose failures. Explicit commands
+ are not autonomous acquisition or an AI state machine. Source counts and the
+ actual M2 gate remain unchanged; NPCs, ExitTrigger and required FX remain open.
++
++The [diagnostic 3D world view](../Documentation/Implementation/M2_WORLD_VIEW.md) now renders actual DAT geometry and
++current world-model transforms through SDL_GPU. Read [view contracts](docs/WORLD_VIEW_CONTRACTS.md)
++before extending rendering, camera presentation or GPU lifetime. Preserve original
++coordinates, base rings, current checked visibility, world revisions and the single
++player integrator. `--view-world` is navigable inspection, not the M3 playable slice;
++texture/model/FX rendering and required NPC/ExitTrigger services remain unavailable. Current
++world shaders support Vulkan/SPIR-V only; M2 stays incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b4e8712..aaa8405 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,7 +14,7 @@ include(CTest)
+ include(cmake/Dependencies.cmake)
+ configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+ 
+-add_library(engine STATIC src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
++add_library(engine STATIC src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+ target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
+ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+diff --git a/README.md b/README.md
+index 6d8e8c8..66b96bb 100644
+--- a/README.md
++++ b/README.md
+@@ -4,6 +4,12 @@ A new, independent C++20 implementation. **M0/M1 are complete for their document
+ 
+ The three runtime targets remain small: `engine` (resources, world/object runtime, configuration, SDL_GPU), `blood2_game` (original code and typed services) and `blood2_app` (`blood2`, optional Dear ImGui). No previous prototype is a build dependency, and no EnTT/ECS was introduced.
+ 
++The [diagnostic 3D view](docs/WORLD_VIEW_CONTRACTS.md) now renders actual level
++geometry and current moving brushes through SDL_GPU. Run `./build/debug/blood2 --view-world` to enter the original player/cameras with
++keyboard controls enabled. F1 opens inspection. Textures, rendered models/weapons,
++full combat and M2 completion remain pending. The world shader currently requires
++Vulkan/SPIR-V; other backend artifacts remain unimplemented.
++
+ ## Build and Run
+ 
+ Requirements: CMake 3.28+, Ninja, a C++20 compiler and SDL's platform development dependencies. Only Linux/Wayland/Vulkan has been tested. Windows/D3D12 and macOS/Metal remain target configurations, not verified platforms.
+@@ -20,13 +26,14 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
+ 
+ ```sh
+ ./build/debug/blood2
++./build/debug/blood2 --view-world
+ ./build/debug/blood2 --inspect-world
+ ./build/debug/blood2 --inspect-player
+ ./build/debug/blood2 --world 02_CityHub
+ ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
+ ```
+ 
+-The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **187 source entries** create, plus **4 transferred world sounds** and **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **17 unported runtime entries**, and zero failed. Runtime counts before/after player entry are **194/197**, then **185/188** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain historical load status. The [latest evidence](../Documentation/Implementation/M2_SCENE_EXPLOSIONS.md) records these counts; earlier sections below are historical snapshots.
++The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **187 source entries** create, plus **4 transferred world sounds** and **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **17 unported runtime entries**, and zero failed. Runtime counts before/after player entry are **194/197**, then **185/189** after the first update consumes nine Keys and the default player creates a held Beretta child. Every source entry remains inspectable; consumed keys retain historical load status. The [latest evidence](../Documentation/Implementation/M2_SCENE_EXPLOSIONS.md) records these counts; earlier sections below are historical snapshots.
+ 
+ The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Door audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. World textures and a complete game session remain unimplemented; cinematic, random-emitter and world-loop audio are covered by the later continuations below. Sprites shows original placement/repeats, manifest metadata and frame clocks, with a diagnostic overlay; DTX textures are indexed but not decoded.
+ 
+@@ -36,6 +43,8 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
+ 
+ | Option | Behavior |
+ | --- | --- |
++| `--view-world` | Enter diagnostic 3D with original player/cameras, hidden inspector and keyboard controls |
++| `--viewport-smoke` | Check actual world rendering, movement, hidden UI, resize and reload |
+ | `--check-data` | File metadata/readability only; no parser or GPU |
+ | `--inspect-world` | Headless REZ/DAT parsing and original subset creation/teardown |
+ | `--world NAME` | Resource name, default `01_SubwayA`; exact normalized lookup, no traversal/basename fallback |
+diff --git a/cmake/GenerateWorldShaders.cmake b/cmake/GenerateWorldShaders.cmake
+new file mode 100644
+index 0000000..d9e44c9
+--- /dev/null
++++ b/cmake/GenerateWorldShaders.cmake
+@@ -0,0 +1,8 @@
++# Explicit offline regeneration; normal builds use the checked-in SPIR-V headers.
++find_program(GLSLANG glslangValidator REQUIRED)
++set(shader_dir "${CMAKE_CURRENT_LIST_DIR}/../src/engine/shaders")
++foreach(stage vert frag)
++    execute_process(COMMAND "${GLSLANG}" -V --target-env vulkan1.0
++        --vn "world_${stage}" -o "${shader_dir}/world_${stage}.h" "${shader_dir}/world.${stage}"
++        COMMAND_ERROR_IS_FATAL ANY)
++endforeach()
+diff --git a/docs/CAMERA_CONTRACTS.md b/docs/CAMERA_CONTRACTS.md
+index 433e212..42c1992 100644
+--- a/docs/CAMERA_CONTRACTS.md
++++ b/docs/CAMERA_CONTRACTS.md
+@@ -116,3 +116,7 @@ and [cinematic/audio](CINEMATIC_CONTRACTS.md) continuations supersede the blanke
+ omissions above for their bounded subsets. CinematicTrigger now uses real WAV
+ voices and dry SDL output; KeyData sound requests, reverb, angular/container paths,
+ general audio/rendering and complete M2 acceptance still remain unavailable.
++
++The [diagnostic 3D view](WORLD_VIEW_CONTRACTS.md) supersedes the absence of any world
++rasterization: existing player/scripted cameras now drive depth-tested geometry and
++letterbox presentation. Materials, lighting, models/FX and complete M2 remain open.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 4942526..118376a 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -473,3 +473,15 @@ list-first selection, cached targets and Metacmd rules are retained. No producti
+ NPC registration, perception/state machine or script scheduler is imported.
+ See [contracts](AI_TARGET_CONTRACTS.md) and
+ [execution evidence](../../Documentation/Implementation/M2_AI_TARGETS.md).
++
++## M2 diagnostic world rasterization
++
++WorldMesh, WorldRenderer, projection and GLSL shaders are new replacement engine
++code. They reuse the existing v56 reader, container transform convention and
++original CBloodClientShell camera view without importing a donor renderer.
++The later-generation `sources/lithtech/runtime/world/src/de_world.h` surface bits
++(59–63) informed invisible/transparent/sky diagnostics only; complete material
++compatibility is not claimed. SDL's pinned SDL_gpu.h defines NDC, resource binding,
++depth clipping and GPU resource lifetime. No game rule changed. See
++[contracts](WORLD_VIEW_CONTRACTS.md) and
++[evidence](../../Documentation/Implementation/M2_WORLD_VIEW.md).
+diff --git a/docs/WORLD_CONTRACTS.md b/docs/WORLD_CONTRACTS.md
+index 2b875ec..67c9afb 100644
+--- a/docs/WORLD_CONTRACTS.md
++++ b/docs/WORLD_CONTRACTS.md
+@@ -82,3 +82,7 @@ SubwayA accounting is 18 original instances, 372 preprocessor-only entries and
+ 190 unported runtime objects. WorldProperties is now original executable code.
+ Primary-world collision and model playback/deformation are implemented within
+ the stated limits; complete shells/CPlayerObj and moving world models remain open.
++
++The [diagnostic 3D view](WORLD_VIEW_CONTRACTS.md) supersedes the absence of any world
++rasterization: existing player/scripted cameras now drive depth-tested geometry and
++letterbox presentation. Materials, lighting, models/FX and complete M2 remain open.
+diff --git a/docs/WORLD_VIEW_CONTRACTS.md b/docs/WORLD_VIEW_CONTRACTS.md
+new file mode 100644
+index 0000000..27fd4d7
+--- /dev/null
++++ b/docs/WORLD_VIEW_CONTRACTS.md
+@@ -0,0 +1,93 @@
++# Diagnostic 3D world view
++
++M2 remains incomplete. This is the first real world rasterization in the new SDL_GPU
++runtime. It renders existing DAT geometry and current world-model transforms with
++the existing original player/camera selection. It is not the M3 playable slice or
++the complete M4 renderer. See [evidence](../../Documentation/Implementation/M2_WORLD_VIEW.md).
++
++## Geometry and identity
++
++`WorldMesh` owns CPU vertices and one range per DAT model. The primary model stays
++in original world coordinates. Additional models store vertices relative to their
++DAT translation pivot; each live OT_WORLDMODEL draws with its current object position
++and quaternion. This matches the existing posed collision shell, including authored
++rotation and subsequent translation/rotation; DAT min/max are not added to positions.
++No second scene graph, ECS or donor renderer was imported.
++
++The v56 base ring is triangulated as a fan; serialized extra ring vertices are not
++appended as another fan. BSP convex-face semantics are assumed, not a general
++concave-polygon tessellator. Indices, finite positions/normals, ring size (3–512),
++model count (4,097), per-model points/polygons (65,536) and emitted vertices
++(3,000,000 / 72 MB of vertex payload) are checked. Vector capacity, staging and
++GPU copies require additional bounded storage. Failure empties the mesh. Degenerate triangles are
++counted and omitted. The existing bounded DAT reader remains the data boundary.
++
++Invisible surface bit 2 is omitted. Bit 3 transparency and bit 4 sky are counted and
++shown as opaque colored diagnostic surfaces. Their values were checked against
++later-generation LithTech definitions, not claimed to prove complete v56 material
++parity. Ordinary face colors encode absolute normal components; they do not infer
++a directional light. The user's DirLight/implicit-main-light observation remains
++unresolved. There are no textures, lightmaps, dynamic illumination or shadows yet.
++
++Every frame resolves current checked records. Alive inactive objects remain visible;
++FLAG_VISIBLE=false and pending/removed records do not draw. Exact case-folded named
++world-model matches must be unique and backed by the existing collision shell.
++Containers are excluded; unbound DAT models are counted, never drawn at guessed
++locations. Models, held/view weapons, sprites, liquid surfaces, particle FX and
++unsupported source objects are not rendered. The existing World/Objects tabs retain
++all those records and their diagnostics.
++
++A monotonic `GameSession::world_revision` changes after successful teardown, including
++reloads completed between two presented frames. Diagnostic harnesses that append
++world geometry also increment it; geometry is otherwise immutable after loading. GPU geometry is cleared/rebuilt on
++revision change. Rejected world reads preserve the old revision/world. CPU/GPU caches
++own no original object pointer or handle and never create objects, call game commands,
++advance clocks or integrate physics. Static vertices upload once per loaded revision;
++per-frame world transforms are small uniform blocks. SDL owns deferred GPU release.
++Depth/pipeline allocations can persist through unload; geometry cannot.
++
++## Camera and GPU
++
++The existing `CBloodClientShell::view` supplies the selected original CameraObj pose
++or player eye and pitch/yaw. No new movement or camera simulation is introduced.
++Camera type 1 uses the source one-sixth top/bottom letterbox request. The diagnostic
++projection is explicitly 90 degrees horizontal, near 1, far 65,536 original units;
++retail FOV, bob/recoil/death views and zoom are not claimed.
++
++Original +Y up / +Z forward are projected to SDL's left-handed NDC with Z in [0,1].
++SDL performs backend orientation conversion. D32 depth uses LESS, writes and clipping;
++both windings draw to aid inspection. Swapchain dimensions recreate depth targets,
++bounded to 8,192 per axis. The world pass precedes a separate ImGui color-load pass.
++UI visibility has no effect on rendering or simulation; no-ImGui Release uses the
++same world path. Presentation without an entered player remains inspection-only.
++
++The current packaged world shaders support Vulkan/SPIR-V. Other SDL backends report
++an explicit unsupported renderer error when entering this view; D3D12/Metal shader
++artifacts and platform validation remain M4 work. The pinned SDL/ImGui/spdlog stack is
++unchanged. GLSL sources and generated SPIR-V word headers are checked in; ordinary
++builds need no shader compiler or runtime shader-file paths. Regenerate explicitly:
++
++```sh
++cmake -P cmake/GenerateWorldShaders.cmake
++```
++
++The checked headers were produced with glslangValidator 16.2.0, targeting Vulkan 1.0.
++The shader compiler is an offline tool, not a new runtime dependency.
++
++## Use and evidence
++
++`--view-world` mounts the selected world and enters the existing original player
++subset, starts with the inspector hidden and keyboard controls enabled, and retains
++the authored intro. F1 toggles the inspector; F2 toggles movement. Physical WASD/ZQSD,
++arrows, Shift, Space, Ctrl and E retain existing movement/look/USE rules and focus/text
++input handling. Mouse-look, weapon mouse bindings and rendered view weapons are not
++added by this increment. `--start-game` still exits 6 for required missing services.
++
++The 3D view tab reports previous-presented-frame GPU counts, prepared draw lists, source mesh omissions,
++current bindings and selected camera. `--viewport-smoke` exercises original SDL
++walk/run/jump/crouch, hidden UI, unload/re-entry and resize; its capture excludes UI
++and requires at least 25% non-background pixels. Synthetic GPU readback checks real
++occlusion, both windings, near clipping, axis orientation, camera/object transforms,
++resize, letterbox and reupload. Headless cases cover malformed mesh inputs, base
++rings, projection, invisible/inactive/pending lifetime and private posed geometry.
++No pixel-identical retail comparison, optimization or additional platform is claimed.
+diff --git a/src/app/brush_smoke.cpp b/src/app/brush_smoke.cpp
+index 99388ea..49b0c62 100644
+--- a/src/app/brush_smoke.cpp
++++ b/src/app/brush_smoke.cpp
+@@ -31,6 +31,7 @@ namespace OpenBlood2
+             model.polygons.push_back(std::move(polygon));
+         }
+         g.world.models.push_back(std::move(model));
++        ++g.world_revision; // Invalidate diagnostic GPU geometry after fixture insertion.
+ 
+         auto h = g.objects.create(g.objects.find_class("RotatingBrush"), {}, Creation::World,
+                                   {{"Name", std::string("brush_smoke_platform")},
+@@ -64,6 +65,7 @@ namespace OpenBlood2
+                 plane.distance += vector_dot(plane.normal, offset);
+             const auto name = fragment.name;
+             g.world.models.push_back(std::move(fragment));
++            ++g.world_revision;
+             auto source = g.objects.create(g.objects.find_class("CDestructableBrush"), {}, Creation::World,
+                                            {{"Name", name},
+                                             {"HitPoints", 50.0f},
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 629f9d8..98edb52 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -373,6 +373,35 @@ namespace OpenBlood2
+             ImGui::Separator();
+             if (ImGui::BeginTabBar("Inspection"))
+             {
++                if (ImGui::BeginTabItem("3D view"))
++                {
++                    ImGui::TextWrapped("Diagnostic solid-color geometry with depth. F1 shows the world; F2 enables "
++                                       "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
++                                       "the player in Session first, or launch --view-world.");
++                    ImGui::TextWrapped(
++                        "Orientation colors are not lighting. Textures/lightmaps, models, sprites, liquid surfaces, "
++                        "transparency and sky rendering remain unavailable. Unsupported objects stay in World.");
++                    if (world_mesh && world_render)
++                    {
++                        ImGui::Text("GPU: %llu frames / %llu geometry uploads",
++                                    (unsigned long long)world_render->frames,
++                                    (unsigned long long)world_render->uploads);
++                        ImGui::Text("Prepared: %zu triangles / %zu draws / %zu hidden instances",
++                                    world_render->triangles, world_render->draws, world_render->hidden);
++                        ImGui::Text("Unbound models: %zu / excluded containers: %zu", world_render->unbound,
++                                    world_render->containers);
++                        ImGui::Text(
++                            "Faces: %zu invisible / %zu degenerate / %zu transparent-as-opaque / %zu sky markers",
++                            world_mesh->invisible, world_mesh->degenerate, world_mesh->transparent, world_mesh->sky);
++                        ImGui::Text("Camera: %s at %.2f %.2f %.2f",
++                                    !game.client_shell.m_bInWorld   ? "no entered player"
++                                    : game.client_shell.view.object ? "original scripted camera"
++                                                                    : "player eye",
++                                    game.client_shell.view.position.x, game.client_shell.view.position.y,
++                                    game.client_shell.view.position.z);
++                    }
++                    ImGui::EndTabItem();
++                }
+                 if ((!game.resources.mounts().empty()) && ImGui::BeginTabItem("World"))
+                 {
+                     draw_world(game, selection);
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index ff9706f..1e0ce3b 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -2,6 +2,7 @@
+ 
+ #include "engine/config.h"
+ #include "engine/runtime.h"
++#include "engine/world_view.h"
+ #include "game/server_adapter.h"
+ 
+ namespace OpenBlood2
+@@ -10,6 +11,8 @@ namespace OpenBlood2
+     struct Inspector
+     {
+         Runtime& runtime;
++        const WorldMesh* world_mesh = nullptr;
++        const WorldViewStats* world_render = nullptr;
+         bool context = false;
+         bool platform = false;
+         bool renderer = false;
+diff --git a/src/app/interaction_smoke.cpp b/src/app/interaction_smoke.cpp
+index fb1c704..91fa988 100644
+--- a/src/app/interaction_smoke.cpp
++++ b/src/app/interaction_smoke.cpp
+@@ -38,6 +38,7 @@ namespace OpenBlood2
+             model.polygons.push_back(std::move(polygon));
+         }
+         g.world.models.push_back(std::move(model));
++        ++g.world_revision; // Invalidate diagnostic GPU geometry after fixture insertion.
+         auto h = g.objects.create(g.objects.find_class("RotatingDoor"), {}, Creation::World,
+                                   {{"Name", std::string("interaction_smoke_hinge")},
+                                    {"Speed", 90.0f},
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 58a6f93..1c1b60e 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -8,6 +8,7 @@
+ #include "engine/capture.h"
+ #include "engine/config.h"
+ #include "engine/runtime.h"
++#include "engine/world_renderer.h"
+ #include "game/original/Door.h"
+ #include "game/server_adapter.h"
+ #include "interaction_smoke.h"
+@@ -114,7 +115,7 @@ namespace
+                 }
+             spdlog::info("DAT v{}: {} source objects, {} original instances, {} BSP models", game.world.version,
+                          game.world.objects.size(), game.objects.snapshot().size(), game.world.models.size());
+-            if (options.player_smoke)
++            if (options.player_smoke || options.view_world)
+             {
+                 if (!game.enter_player(error))
+                 {
+@@ -273,9 +274,16 @@ namespace
+         bool selection_cleared = false, world_unloaded = false;
+         const auto initial_objects = game.objects.snapshot().size(), initial_strings = game.server.string_count();
+         const bool smoke = options.gpu_smoke || options.world_smoke;
+-        bool inspector_visible = BLOOD2_INSPECTOR && options.inspector;
++        bool inspector_visible = BLOOD2_INSPECTOR && options.inspector && !options.view_world;
++        OpenBlood2::WorldMesh world_mesh;
++        OpenBlood2::WorldRenderer world_renderer(runtime.gpu);
++        std::vector<OpenBlood2::WorldDraw> world_draws;
++        std::uint64_t mesh_revision = UINT64_MAX;
++        bool viewport_hidden = false, viewport_reloaded = false, viewport_unloaded = false;
+ #if BLOOD2_INSPECTOR
+         OpenBlood2::Inspector inspector(runtime);
++        inspector.world_mesh = &world_mesh;
++        inspector.world_render = &world_renderer.stats;
+         inspector.select_models =
+             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
+         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
+@@ -285,7 +293,7 @@ namespace
+                                    !options.random_sounds_smoke && !options.world_sounds_smoke &&
+                                    !options.sprites_smoke && !options.scene_explosions_smoke;
+         inspector.select_weapons = options.weapons_smoke;
+-        inspector.select_movement = options.movement_smoke && !options.skeleton_smoke;
++        inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
+         inspector.select_skeleton = options.skeleton_smoke;
+         if (options.skeleton_smoke)
+             inspector.skeleton_selection = smoke_ai_key;
+@@ -308,7 +316,7 @@ namespace
+         inspector.keyframe_selection = smoke_keyframe;
+         inspector.brush_selection = smoke_body;
+         inspector.select_doors = options.doors_smoke || options.interaction_smoke;
+-        inspector.keyboard_movement = options.interaction_smoke;
++        inspector.keyboard_movement = options.interaction_smoke || options.view_world;
+         inspector.select_triggers = options.triggers_smoke;
+         inspector.trigger_selection = smoke_trigger;
+         inspector.door_selection = smoke_door;
+@@ -336,7 +344,7 @@ namespace
+         bool weapons_fired = false, weapon_advanced_hidden = false;
+         std::uint64_t hidden_weapon_shots = 0;
+         OpenBlood2::MovementControls controls;
+-        controls.enabled = options.interaction_smoke;
++        controls.enabled = options.interaction_smoke || options.view_world;
+         controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
+         DVector hidden_position{};
+         bool movement_hidden = false, movement_jumped = false, movement_landed = false;
+@@ -566,6 +574,27 @@ namespace
+                 }
+             }
+             selection.refresh(game.objects);
++            if (mesh_revision != game.world_revision)
++            {
++                world_renderer.clear_geometry();
++                world_mesh = {};
++                world_draws.clear();
++                if (!game.world_path.empty() && !world_mesh.build(game.world, error))
++                {
++                    spdlog::error("World mesh: {}", error);
++                    return 5;
++                }
++                mesh_revision = game.world_revision;
++                if (game.world_path.empty())
++                    viewport_unloaded = true;
++            }
++            const bool render_world = game.client_shell.m_bInWorld && !world_mesh.ranges.empty();
++            if (!OpenBlood2::world_draws(world_mesh, game.objects, world_draws, world_renderer.stats, error))
++            {
++                spdlog::error("World draw bindings: {}", error);
++                return 5;
++            }
++
+             if (options.world_smoke && frames >= unload_frame && game.world_path.empty() &&
+                 game.server.string_count() == 0)
+                 world_unloaded = true;
+@@ -618,13 +647,31 @@ namespace
+             }
+             if (swapchain)
+             {
++                if (render_world)
++                {
++                    const auto& view = game.client_shell.view;
++                    if (!world_renderer.prepare(world_mesh, mesh_revision,
++                                                SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
++                                                height, error) ||
++                        !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
++                                             world_draws, view.position, view.rotation,
++                                             view.object && view.settings.type == 1, error))
++                    {
++                        spdlog::error("World viewport: {}", error);
++                        SDL_SubmitGPUCommandBuffer(commands);
++                        return 3;
++                    }
++                    viewport_hidden |= !inspector_visible && world_renderer.stats.triangles > 0;
++                    viewport_reloaded |=
++                        viewport_unloaded && world_renderer.stats.uploads >= 2 && world_renderer.stats.triangles > 0;
++                }
+ #if BLOOD2_INSPECTOR
+                 ImGui_ImplSDLGPU3_PrepareDrawData(ImGui::GetDrawData(), commands);
+ #endif
+                 SDL_GPUColorTargetInfo color{};
+                 color.texture = capture_frame ? capture.texture : swapchain;
+                 color.clear_color = {0.025f, 0.035f, 0.05f, 1.0f};
+-                color.load_op = SDL_GPU_LOADOP_CLEAR;
++                color.load_op = render_world ? SDL_GPU_LOADOP_LOAD : SDL_GPU_LOADOP_CLEAR;
+                 color.store_op = SDL_GPU_STOREOP_STORE;
+                 SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(commands, &color, 1, nullptr);
+                 if (!pass)
+@@ -634,7 +681,8 @@ namespace
+                     return 3;
+                 }
+ #if BLOOD2_INSPECTOR
+-                ImGui_ImplSDLGPU3_RenderDrawData(ImGui::GetDrawData(), commands, pass);
++                if (!(options.viewport_smoke && capture_frame))
++                    ImGui_ImplSDLGPU3_RenderDrawData(ImGui::GetDrawData(), commands, pass);
+                 if (ImGui::GetDrawData()->TotalVtxCount > 0)
+                     ++ui_frames;
+ #endif
+@@ -663,6 +711,21 @@ namespace
+                     spdlog::error("Capture save: {}", SDL_GetError());
+                     return 3;
+                 }
++                if (options.viewport_smoke)
++                {
++                    const auto* pixels =
++                        static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++                    if (!pixels)
++                        return 3;
++                    std::size_t covered = 0;
++                    for (std::size_t i = 0; i < std::size_t(width) * height; ++i)
++                        covered += pixels[i * 4] > 32 || pixels[i * 4 + 1] > 32 || pixels[i * 4 + 2] > 32;
++                    SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++                    spdlog::info("World viewport readback: {} / {} non-background pixels (UI excluded)", covered,
++                                 std::size_t(width) * height);
++                    if (covered < std::size_t(width) * height / 4)
++                        return 4;
++                }
+                 captured = true;
+                 spdlog::info("Captured GPU frame to {}", OpenBlood2::path_text(options.capture_file));
+             }
+@@ -969,6 +1032,17 @@ namespace
+             if (path_smoke)
+                 spdlog::info("AI paths: hidden={}, reentered={}, copied points={}", paths_hidden, paths_reentered,
+                              smoke_paths.size());
++            if (options.viewport_smoke)
++            {
++                spdlog::info("World viewport: hidden={}, unloaded={}, reloaded={}, uploads={}, frames={}, "
++                             "triangles={}, draws={}, depth={}x{}",
++                             viewport_hidden, viewport_unloaded, viewport_reloaded, world_renderer.stats.uploads,
++                             world_renderer.stats.frames, world_renderer.stats.triangles, world_renderer.stats.draws,
++                             world_renderer.width(), world_renderer.height());
++                if (!viewport_hidden || !viewport_unloaded || !viewport_reloaded || world_renderer.stats.uploads != 2 ||
++                    world_renderer.width() != 1000 || world_renderer.height() != 680)
++                    return 4;
++            }
+             const bool ui_ok =
+                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
+             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
+@@ -1109,6 +1183,9 @@ int main(int argc, char** argv)
+                      "  --world NAME        World resource (default: 01_SubwayA)\n"
+                      "  --inspect-world     Parse/mount/create original subset headlessly; does not run a game\n"
+                      "  --inspect-player    Exercise original shell/player entry headlessly; not playable\n"
++                     "  --view-world        Enter diagnostic 3D view with original player/cameras; F1 inspector, F2 "
++                     "controls\n"
++                     "  --viewport-smoke    GPU 3D depth view, movement and unload/reload checks\n"
+                      "  --start-game        Check session startup; fails explicitly on missing M2 services\n"
+                      "  --no-inspector      Start with the inspector hidden\n"
+                      "  --frames N          Exit after N presented frames\n"
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index 3bdfbeb..db68fd6 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -107,6 +107,10 @@ namespace OpenBlood2
+                 options.inspect_world = true;
+                 options.inspect_player = true;
+             }
++            else if (arg == "--view-world")
++                options.view_world = true;
++            else if (arg == "--viewport-smoke")
++                options.world_smoke = options.player_smoke = options.movement_smoke = options.viewport_smoke = true;
+             else if (arg == "--weapons-smoke")
+             {
+                 options.world_smoke = true;
+@@ -229,6 +233,12 @@ namespace OpenBlood2
+                 return false;
+             }
+         }
++        if (options.view_world && (options.inspect_world || options.start_game || options.check_data ||
++                                   options.gpu_smoke || options.world_smoke))
++        {
++            error = "--view-world is a separate interactive inspection mode";
++            return false;
++        }
+         if (options.world_smoke && options.gpu_smoke)
+         {
+             error = "Choose one GPU smoke mode";
+diff --git a/src/engine/config.h b/src/engine/config.h
+index a73d8ab..c65fcbe 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -27,6 +27,7 @@ namespace OpenBlood2
+              cameras_smoke = false, keyframes_smoke = false, worldpaths_smoke = false, lights_smoke = false,
+              cinematics_smoke = false, random_sounds_smoke = false, world_sounds_smoke = false, sprites_smoke = false,
+              scene_explosions_smoke = false;
++        bool view_world = false, viewport_smoke = false;
+         bool start_game = false;
+         bool explicit_config = false;
+         bool help = false;
+diff --git a/src/engine/runtime.cpp b/src/engine/runtime.cpp
+index 55f3fb9..dc6677f 100644
+--- a/src/engine/runtime.cpp
++++ b/src/engine/runtime.cpp
+@@ -12,7 +12,7 @@ namespace OpenBlood2
+             return false;
+         }
+         sdl_initialized = true;
+-        window = SDL_CreateWindow("Blood II - M0 Inspector", 1200, 780,
++        window = SDL_CreateWindow("Blood II - Reconstruction", 1200, 780,
+                                   SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+         if (!window)
+         {
+diff --git a/src/engine/shaders/world.frag b/src/engine/shaders/world.frag
+new file mode 100644
+index 0000000..72150b7
+--- /dev/null
++++ b/src/engine/shaders/world.frag
+@@ -0,0 +1,4 @@
++#version 450
++layout(location=0) in vec3 faceColor;
++layout(location=0) out vec4 color;
++void main() { color=vec4(faceColor,1.0); }
+diff --git a/src/engine/shaders/world.vert b/src/engine/shaders/world.vert
+new file mode 100644
+index 0000000..47ca202
+--- /dev/null
++++ b/src/engine/shaders/world.vert
+@@ -0,0 +1,17 @@
++#version 450
++layout(location=0) in vec3 position;
++layout(location=1) in vec3 color;
++layout(location=0) out vec3 faceColor;
++layout(set=1,binding=0,std140) uniform View {
++    vec4 eye, right, up, forward, projection, translation, quaternion;
++} u;
++void main() {
++    vec3 q=u.quaternion.xyz;
++    vec3 world=position+2.0*cross(q,cross(q,position)+u.quaternion.w*position)+u.translation.xyz;
++    vec3 relative=world-u.eye.xyz;
++    float z=dot(relative,u.forward.xyz);
++    gl_Position=vec4(dot(relative,u.right.xyz)*u.projection.x,
++                     dot(relative,u.up.xyz)*u.projection.y,
++                     z*u.projection.z+u.projection.w,z);
++    faceColor=color;
++}
+diff --git a/src/engine/shaders/world_frag.h b/src/engine/shaders/world_frag.h
+new file mode 100644
+index 0000000..a2eb025
+--- /dev/null
++++ b/src/engine/shaders/world_frag.h
+@@ -0,0 +1,20 @@
++	// 1116.2.0
++	 #pragma once
++const uint32_t world_frag[] = {
++	0x07230203,0x00010000,0x0008000b,0x00000013,0x00000000,0x00020011,0x00000001,0x0006000b,
++	0x00000001,0x4c534c47,0x6474732e,0x3035342e,0x00000000,0x0003000e,0x00000000,0x00000001,
++	0x0007000f,0x00000004,0x00000004,0x6e69616d,0x00000000,0x00000009,0x0000000c,0x00030010,
++	0x00000004,0x00000007,0x00030003,0x00000002,0x000001c2,0x00040005,0x00000004,0x6e69616d,
++	0x00000000,0x00040005,0x00000009,0x6f6c6f63,0x00000072,0x00050005,0x0000000c,0x65636166,
++	0x6f6c6f43,0x00000072,0x00040047,0x00000009,0x0000001e,0x00000000,0x00040047,0x0000000c,
++	0x0000001e,0x00000000,0x00020013,0x00000002,0x00030021,0x00000003,0x00000002,0x00030016,
++	0x00000006,0x00000020,0x00040017,0x00000007,0x00000006,0x00000004,0x00040020,0x00000008,
++	0x00000003,0x00000007,0x0004003b,0x00000008,0x00000009,0x00000003,0x00040017,0x0000000a,
++	0x00000006,0x00000003,0x00040020,0x0000000b,0x00000001,0x0000000a,0x0004003b,0x0000000b,
++	0x0000000c,0x00000001,0x0004002b,0x00000006,0x0000000e,0x3f800000,0x00050036,0x00000002,
++	0x00000004,0x00000000,0x00000003,0x000200f8,0x00000005,0x0004003d,0x0000000a,0x0000000d,
++	0x0000000c,0x00050051,0x00000006,0x0000000f,0x0000000d,0x00000000,0x00050051,0x00000006,
++	0x00000010,0x0000000d,0x00000001,0x00050051,0x00000006,0x00000011,0x0000000d,0x00000002,
++	0x00070050,0x00000007,0x00000012,0x0000000f,0x00000010,0x00000011,0x0000000e,0x0003003e,
++	0x00000009,0x00000012,0x000100fd,0x00010038
++};
+diff --git a/src/engine/shaders/world_vert.h b/src/engine/shaders/world_vert.h
+new file mode 100644
+index 0000000..e53e61f
+--- /dev/null
++++ b/src/engine/shaders/world_vert.h
+@@ -0,0 +1,92 @@
++	// 1116.2.0
++	 #pragma once
++const uint32_t world_vert[] = {
++	0x07230203,0x00010000,0x0008000b,0x00000065,0x00000000,0x00020011,0x00000001,0x0006000b,
++	0x00000001,0x4c534c47,0x6474732e,0x3035342e,0x00000000,0x0003000e,0x00000000,0x00000001,
++	0x0009000f,0x00000000,0x00000004,0x6e69616d,0x00000000,0x00000016,0x00000040,0x00000062,
++	0x00000063,0x00030003,0x00000002,0x000001c2,0x00040005,0x00000004,0x6e69616d,0x00000000,
++	0x00030005,0x00000009,0x00000071,0x00040005,0x0000000b,0x77656956,0x00000000,0x00040006,
++	0x0000000b,0x00000000,0x00657965,0x00050006,0x0000000b,0x00000001,0x68676972,0x00000074,
++	0x00040006,0x0000000b,0x00000002,0x00007075,0x00050006,0x0000000b,0x00000003,0x77726f66,
++	0x00647261,0x00060006,0x0000000b,0x00000004,0x6a6f7270,0x69746365,0x00006e6f,0x00060006,
++	0x0000000b,0x00000005,0x6e617274,0x74616c73,0x006e6f69,0x00060006,0x0000000b,0x00000006,
++	0x74617571,0x696e7265,0x00006e6f,0x00030005,0x0000000d,0x00000075,0x00040005,0x00000014,
++	0x6c726f77,0x00000064,0x00050005,0x00000016,0x69736f70,0x6e6f6974,0x00000000,0x00050005,
++	0x0000002d,0x616c6572,0x65766974,0x00000000,0x00030005,0x00000035,0x0000007a,0x00060005,
++	0x0000003e,0x505f6c67,0x65567265,0x78657472,0x00000000,0x00060006,0x0000003e,0x00000000,
++	0x505f6c67,0x7469736f,0x006e6f69,0x00070006,0x0000003e,0x00000001,0x505f6c67,0x746e696f,
++	0x657a6953,0x00000000,0x00070006,0x0000003e,0x00000002,0x435f6c67,0x4470696c,0x61747369,
++	0x0065636e,0x00070006,0x0000003e,0x00000003,0x435f6c67,0x446c6c75,0x61747369,0x0065636e,
++	0x00030005,0x00000040,0x00000000,0x00050005,0x00000062,0x65636166,0x6f6c6f43,0x00000072,
++	0x00040005,0x00000063,0x6f6c6f63,0x00000072,0x00030047,0x0000000b,0x00000002,0x00050048,
++	0x0000000b,0x00000000,0x00000023,0x00000000,0x00050048,0x0000000b,0x00000001,0x00000023,
++	0x00000010,0x00050048,0x0000000b,0x00000002,0x00000023,0x00000020,0x00050048,0x0000000b,
++	0x00000003,0x00000023,0x00000030,0x00050048,0x0000000b,0x00000004,0x00000023,0x00000040,
++	0x00050048,0x0000000b,0x00000005,0x00000023,0x00000050,0x00050048,0x0000000b,0x00000006,
++	0x00000023,0x00000060,0x00040047,0x0000000d,0x00000021,0x00000000,0x00040047,0x0000000d,
++	0x00000022,0x00000001,0x00040047,0x00000016,0x0000001e,0x00000000,0x00030047,0x0000003e,
++	0x00000002,0x00050048,0x0000003e,0x00000000,0x0000000b,0x00000000,0x00050048,0x0000003e,
++	0x00000001,0x0000000b,0x00000001,0x00050048,0x0000003e,0x00000002,0x0000000b,0x00000003,
++	0x00050048,0x0000003e,0x00000003,0x0000000b,0x00000004,0x00040047,0x00000062,0x0000001e,
++	0x00000000,0x00040047,0x00000063,0x0000001e,0x00000001,0x00020013,0x00000002,0x00030021,
++	0x00000003,0x00000002,0x00030016,0x00000006,0x00000020,0x00040017,0x00000007,0x00000006,
++	0x00000003,0x00040020,0x00000008,0x00000007,0x00000007,0x00040017,0x0000000a,0x00000006,
++	0x00000004,0x0009001e,0x0000000b,0x0000000a,0x0000000a,0x0000000a,0x0000000a,0x0000000a,
++	0x0000000a,0x0000000a,0x00040020,0x0000000c,0x00000002,0x0000000b,0x0004003b,0x0000000c,
++	0x0000000d,0x00000002,0x00040015,0x0000000e,0x00000020,0x00000001,0x0004002b,0x0000000e,
++	0x0000000f,0x00000006,0x00040020,0x00000010,0x00000002,0x0000000a,0x00040020,0x00000015,
++	0x00000001,0x00000007,0x0004003b,0x00000015,0x00000016,0x00000001,0x0004002b,0x00000006,
++	0x00000018,0x40000000,0x00040015,0x0000001d,0x00000020,0x00000000,0x0004002b,0x0000001d,
++	0x0000001e,0x00000003,0x00040020,0x0000001f,0x00000002,0x00000006,0x0004002b,0x0000000e,
++	0x00000028,0x00000005,0x0004002b,0x0000000e,0x0000002f,0x00000000,0x00040020,0x00000034,
++	0x00000007,0x00000006,0x0004002b,0x0000000e,0x00000037,0x00000003,0x0004002b,0x0000001d,
++	0x0000003c,0x00000001,0x0004001c,0x0000003d,0x00000006,0x0000003c,0x0006001e,0x0000003e,
++	0x0000000a,0x00000006,0x0000003d,0x0000003d,0x00040020,0x0000003f,0x00000003,0x0000003e,
++	0x0004003b,0x0000003f,0x00000040,0x00000003,0x0004002b,0x0000000e,0x00000042,0x00000001,
++	0x0004002b,0x0000000e,0x00000047,0x00000004,0x0004002b,0x0000001d,0x00000048,0x00000000,
++	0x0004002b,0x0000000e,0x0000004d,0x00000002,0x0004002b,0x0000001d,0x00000056,0x00000002,
++	0x00040020,0x0000005f,0x00000003,0x0000000a,0x00040020,0x00000061,0x00000003,0x00000007,
++	0x0004003b,0x00000061,0x00000062,0x00000003,0x0004003b,0x00000015,0x00000063,0x00000001,
++	0x00050036,0x00000002,0x00000004,0x00000000,0x00000003,0x000200f8,0x00000005,0x0004003b,
++	0x00000008,0x00000009,0x00000007,0x0004003b,0x00000008,0x00000014,0x00000007,0x0004003b,
++	0x00000008,0x0000002d,0x00000007,0x0004003b,0x00000034,0x00000035,0x00000007,0x00050041,
++	0x00000010,0x00000011,0x0000000d,0x0000000f,0x0004003d,0x0000000a,0x00000012,0x00000011,
++	0x0008004f,0x00000007,0x00000013,0x00000012,0x00000012,0x00000000,0x00000001,0x00000002,
++	0x0003003e,0x00000009,0x00000013,0x0004003d,0x00000007,0x00000017,0x00000016,0x0004003d,
++	0x00000007,0x00000019,0x00000009,0x0004003d,0x00000007,0x0000001a,0x00000009,0x0004003d,
++	0x00000007,0x0000001b,0x00000016,0x0007000c,0x00000007,0x0000001c,0x00000001,0x00000044,
++	0x0000001a,0x0000001b,0x00060041,0x0000001f,0x00000020,0x0000000d,0x0000000f,0x0000001e,
++	0x0004003d,0x00000006,0x00000021,0x00000020,0x0004003d,0x00000007,0x00000022,0x00000016,
++	0x0005008e,0x00000007,0x00000023,0x00000022,0x00000021,0x00050081,0x00000007,0x00000024,
++	0x0000001c,0x00000023,0x0007000c,0x00000007,0x00000025,0x00000001,0x00000044,0x00000019,
++	0x00000024,0x0005008e,0x00000007,0x00000026,0x00000025,0x00000018,0x00050081,0x00000007,
++	0x00000027,0x00000017,0x00000026,0x00050041,0x00000010,0x00000029,0x0000000d,0x00000028,
++	0x0004003d,0x0000000a,0x0000002a,0x00000029,0x0008004f,0x00000007,0x0000002b,0x0000002a,
++	0x0000002a,0x00000000,0x00000001,0x00000002,0x00050081,0x00000007,0x0000002c,0x00000027,
++	0x0000002b,0x0003003e,0x00000014,0x0000002c,0x0004003d,0x00000007,0x0000002e,0x00000014,
++	0x00050041,0x00000010,0x00000030,0x0000000d,0x0000002f,0x0004003d,0x0000000a,0x00000031,
++	0x00000030,0x0008004f,0x00000007,0x00000032,0x00000031,0x00000031,0x00000000,0x00000001,
++	0x00000002,0x00050083,0x00000007,0x00000033,0x0000002e,0x00000032,0x0003003e,0x0000002d,
++	0x00000033,0x0004003d,0x00000007,0x00000036,0x0000002d,0x00050041,0x00000010,0x00000038,
++	0x0000000d,0x00000037,0x0004003d,0x0000000a,0x00000039,0x00000038,0x0008004f,0x00000007,
++	0x0000003a,0x00000039,0x00000039,0x00000000,0x00000001,0x00000002,0x00050094,0x00000006,
++	0x0000003b,0x00000036,0x0000003a,0x0003003e,0x00000035,0x0000003b,0x0004003d,0x00000007,
++	0x00000041,0x0000002d,0x00050041,0x00000010,0x00000043,0x0000000d,0x00000042,0x0004003d,
++	0x0000000a,0x00000044,0x00000043,0x0008004f,0x00000007,0x00000045,0x00000044,0x00000044,
++	0x00000000,0x00000001,0x00000002,0x00050094,0x00000006,0x00000046,0x00000041,0x00000045,
++	0x00060041,0x0000001f,0x00000049,0x0000000d,0x00000047,0x00000048,0x0004003d,0x00000006,
++	0x0000004a,0x00000049,0x00050085,0x00000006,0x0000004b,0x00000046,0x0000004a,0x0004003d,
++	0x00000007,0x0000004c,0x0000002d,0x00050041,0x00000010,0x0000004e,0x0000000d,0x0000004d,
++	0x0004003d,0x0000000a,0x0000004f,0x0000004e,0x0008004f,0x00000007,0x00000050,0x0000004f,
++	0x0000004f,0x00000000,0x00000001,0x00000002,0x00050094,0x00000006,0x00000051,0x0000004c,
++	0x00000050,0x00060041,0x0000001f,0x00000052,0x0000000d,0x00000047,0x0000003c,0x0004003d,
++	0x00000006,0x00000053,0x00000052,0x00050085,0x00000006,0x00000054,0x00000051,0x00000053,
++	0x0004003d,0x00000006,0x00000055,0x00000035,0x00060041,0x0000001f,0x00000057,0x0000000d,
++	0x00000047,0x00000056,0x0004003d,0x00000006,0x00000058,0x00000057,0x00050085,0x00000006,
++	0x00000059,0x00000055,0x00000058,0x00060041,0x0000001f,0x0000005a,0x0000000d,0x00000047,
++	0x0000001e,0x0004003d,0x00000006,0x0000005b,0x0000005a,0x00050081,0x00000006,0x0000005c,
++	0x00000059,0x0000005b,0x0004003d,0x00000006,0x0000005d,0x00000035,0x00070050,0x0000000a,
++	0x0000005e,0x0000004b,0x00000054,0x0000005c,0x0000005d,0x00050041,0x0000005f,0x00000060,
++	0x00000040,0x0000002f,0x0003003e,0x00000060,0x0000005e,0x0004003d,0x00000007,0x00000064,
++	0x00000063,0x0003003e,0x00000062,0x00000064,0x000100fd,0x00010038
++};
+diff --git a/src/engine/world_renderer.cpp b/src/engine/world_renderer.cpp
+new file mode 100644
+index 0000000..ec8eb05
+--- /dev/null
++++ b/src/engine/world_renderer.cpp
+@@ -0,0 +1,243 @@
++#include "engine/world_renderer.h"
++#include "engine/shaders/world_frag.h"
++#include "engine/shaders/world_vert.h"
++#include <cstring>
++
++namespace OpenBlood2
++{
++    WorldRenderer::~WorldRenderer()
++    {
++        clear_geometry();
++        if (depth_)
++            SDL_ReleaseGPUTexture(device_, depth_);
++        if (pipeline_)
++            SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
++    }
++    void WorldRenderer::clear_geometry()
++    {
++        if (vertices_)
++            SDL_ReleaseGPUBuffer(device_, vertices_);
++        vertices_ = nullptr;
++        revision_ = UINT64_MAX;
++        stats.triangles = stats.draws = 0;
++    }
++    bool WorldRenderer::pipeline(SDL_GPUTextureFormat format, std::string& error)
++    {
++        if (pipeline_ && color_format_ == format)
++            return true;
++        if (!(SDL_GetGPUShaderFormats(device_) & SDL_GPU_SHADERFORMAT_SPIRV))
++        {
++            error = "Diagnostic world renderer currently requires the Vulkan/SPIR-V backend";
++            return false;
++        }
++        SDL_GPUShaderCreateInfo info{};
++        info.entrypoint = "main";
++        info.format = SDL_GPU_SHADERFORMAT_SPIRV;
++        info.stage = SDL_GPU_SHADERSTAGE_VERTEX;
++        info.code = reinterpret_cast<const Uint8*>(world_vert);
++        info.code_size = sizeof(world_vert);
++        info.num_uniform_buffers = 1;
++        auto* vertex = SDL_CreateGPUShader(device_, &info);
++        info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
++        info.code = reinterpret_cast<const Uint8*>(world_frag);
++        info.code_size = sizeof(world_frag);
++        info.num_uniform_buffers = 0;
++        auto* fragment = SDL_CreateGPUShader(device_, &info);
++        if (!vertex || !fragment)
++        {
++            error = SDL_GetError();
++            if (vertex)
++                SDL_ReleaseGPUShader(device_, vertex);
++            if (fragment)
++                SDL_ReleaseGPUShader(device_, fragment);
++            return false;
++        }
++        SDL_GPUVertexBufferDescription buffer{};
++        buffer.pitch = sizeof(WorldVertex);
++        buffer.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
++        SDL_GPUVertexAttribute attributes[2]{};
++        attributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
++        attributes[1].location = 1;
++        attributes[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
++        attributes[1].offset = offsetof(WorldVertex, color);
++        SDL_GPUColorTargetDescription target{};
++        target.format = format;
++        SDL_GPUGraphicsPipelineCreateInfo create{};
++        create.vertex_shader = vertex;
++        create.fragment_shader = fragment;
++        create.vertex_input_state = {&buffer, 1, attributes, 2};
++        create.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
++        create.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
++        create.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
++        create.rasterizer_state.enable_depth_clip = true;
++        create.multisample_state.sample_count = SDL_GPU_SAMPLECOUNT_1;
++        create.depth_stencil_state.enable_depth_test = true;
++        create.depth_stencil_state.enable_depth_write = true;
++        create.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
++        create.target_info.color_target_descriptions = &target;
++        create.target_info.num_color_targets = 1;
++        create.target_info.has_depth_stencil_target = true;
++        create.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
++        auto* next = SDL_CreateGPUGraphicsPipeline(device_, &create);
++        SDL_ReleaseGPUShader(device_, vertex);
++        SDL_ReleaseGPUShader(device_, fragment);
++        if (!next)
++        {
++            error = SDL_GetError();
++            return false;
++        }
++        if (pipeline_)
++            SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
++        pipeline_ = next;
++        color_format_ = format;
++        return true;
++    }
++    bool WorldRenderer::prepare(const WorldMesh& mesh, std::uint64_t revision, SDL_GPUTextureFormat format,
++                                Uint32 width, Uint32 height, std::string& error)
++    {
++        error.clear();
++        if (!width || !height || width > 8192 || height > 8192 || mesh.vertices.size() > 3000000)
++        {
++            error = "Diagnostic GPU dimensions/geometry exceed limits";
++            return false;
++        }
++        if (!pipeline(format, error))
++            return false;
++        if (!depth_ || width_ != width || height_ != height)
++        {
++            SDL_GPUTextureCreateInfo info{};
++            info.type = SDL_GPU_TEXTURETYPE_2D;
++            info.format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
++            info.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
++            info.width = width;
++            info.height = height;
++            info.layer_count_or_depth = 1;
++            info.num_levels = 1;
++            auto* next = SDL_CreateGPUTexture(device_, &info);
++            if (!next)
++            {
++                error = SDL_GetError();
++                return false;
++            }
++            if (depth_)
++                SDL_ReleaseGPUTexture(device_, depth_);
++            depth_ = next;
++            width_ = width;
++            height_ = height;
++        }
++        if (revision_ == revision)
++            return true;
++        clear_geometry();
++        if (mesh.vertices.empty())
++        {
++            revision_ = revision;
++            return true;
++        }
++        const auto bytes = static_cast<Uint32>(mesh.vertices.size() * sizeof(WorldVertex));
++        SDL_GPUBufferCreateInfo info{SDL_GPU_BUFFERUSAGE_VERTEX, bytes, 0};
++        auto* next = SDL_CreateGPUBuffer(device_, &info);
++        SDL_GPUTransferBufferCreateInfo transfer_info{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, bytes, 0};
++        auto* transfer = SDL_CreateGPUTransferBuffer(device_, &transfer_info);
++        bool success = false;
++        if (next && transfer)
++        {
++            if (auto* data = SDL_MapGPUTransferBuffer(device_, transfer, false))
++            {
++                std::memcpy(data, mesh.vertices.data(), bytes);
++                SDL_UnmapGPUTransferBuffer(device_, transfer);
++                if (auto* commands = SDL_AcquireGPUCommandBuffer(device_))
++                {
++                    if (auto* copy = SDL_BeginGPUCopyPass(commands))
++                    {
++                        SDL_GPUTransferBufferLocation source{transfer, 0};
++                        SDL_GPUBufferRegion target{next, 0, bytes};
++                        SDL_UploadToGPUBuffer(copy, &source, &target, false);
++                        SDL_EndGPUCopyPass(copy);
++                        success = SDL_SubmitGPUCommandBuffer(commands);
++                    }
++                    else
++                        SDL_CancelGPUCommandBuffer(commands);
++                }
++            }
++        }
++        if (transfer)
++            SDL_ReleaseGPUTransferBuffer(device_, transfer);
++        if (!success)
++        {
++            error = SDL_GetError();
++            if (next)
++                SDL_ReleaseGPUBuffer(device_, next);
++            return false;
++        }
++        vertices_ = next;
++        revision_ = revision;
++        ++stats.uploads;
++        return true;
++    }
++    bool WorldRenderer::draw(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target, const WorldMesh& mesh,
++                             std::span<const WorldDraw> draws, DVector eye, DRotation view, bool letterbox,
++                             std::string& error)
++    {
++        if (!pipeline_ || !depth_ || (!vertices_ && !mesh.vertices.empty()))
++        {
++            error = "Diagnostic renderer not prepared";
++            return false;
++        }
++        const Uint32 top = letterbox ? height_ / 6 : 0, height = height_ - 2 * top;
++        const float aspect = float(width_) / float(height);
++        WorldViewUniform uniform;
++        for (const auto& d : draws)
++        {
++            if (d.range >= mesh.ranges.size() || !world_view_uniform(eye, view, aspect, d, uniform))
++            {
++                error = "Invalid diagnostic draw/camera";
++                return false;
++            }
++            const auto& r = mesh.ranges[d.range];
++            if (r.first > mesh.vertices.size() || r.count > mesh.vertices.size() - r.first)
++            {
++                error = "Invalid diagnostic GPU range";
++                return false;
++            }
++        }
++        SDL_GPUColorTargetInfo color{};
++        color.texture = target;
++        color.clear_color = {.025f, .035f, .05f, 1};
++        color.load_op = SDL_GPU_LOADOP_CLEAR;
++        color.store_op = SDL_GPU_STOREOP_STORE;
++        SDL_GPUDepthStencilTargetInfo depth{};
++        depth.texture = depth_;
++        depth.clear_depth = 1;
++        depth.load_op = SDL_GPU_LOADOP_CLEAR;
++        depth.store_op = SDL_GPU_STOREOP_DONT_CARE;
++        depth.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
++        depth.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
++        depth.cycle = true;
++        auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
++        if (!pass)
++        {
++            error = SDL_GetError();
++            return false;
++        }
++        SDL_GPUViewport viewport{0, float(top), float(width_), float(height), 0, 1};
++        SDL_SetGPUViewport(pass, &viewport);
++        SDL_BindGPUGraphicsPipeline(pass, pipeline_);
++        if (vertices_)
++        {
++            SDL_GPUBufferBinding binding{vertices_, 0};
++            SDL_BindGPUVertexBuffers(pass, 0, &binding, 1);
++            for (const auto& d : draws)
++            {
++                const auto& r = mesh.ranges[d.range];
++                if (!r.count)
++                    continue;
++                world_view_uniform(eye, view, aspect, d, uniform);
++                SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
++                SDL_DrawGPUPrimitives(pass, r.count, 1, r.first, 0);
++            }
++        }
++        SDL_EndGPURenderPass(pass);
++        ++stats.frames;
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/world_renderer.h b/src/engine/world_renderer.h
+new file mode 100644
+index 0000000..84c7b05
+--- /dev/null
++++ b/src/engine/world_renderer.h
+@@ -0,0 +1,39 @@
++#pragma once
++#include "engine/world_view.h"
++#include <SDL3/SDL_gpu.h>
++
++namespace OpenBlood2
++{
++    class WorldRenderer
++    {
++      public:
++        explicit WorldRenderer(SDL_GPUDevice* device) : device_(device) {}
++        ~WorldRenderer();
++        WorldRenderer(const WorldRenderer&) = delete;
++        WorldRenderer& operator=(const WorldRenderer&) = delete;
++        bool prepare(const WorldMesh&, std::uint64_t revision, SDL_GPUTextureFormat, Uint32 width, Uint32 height,
++                     std::string& error);
++        bool draw(SDL_GPUCommandBuffer*, SDL_GPUTexture*, const WorldMesh&, std::span<const WorldDraw>, DVector eye,
++                  DRotation view, bool letterbox, std::string& error);
++        void clear_geometry();
++        WorldViewStats stats;
++        Uint32 width() const
++        {
++            return width_;
++        }
++        Uint32 height() const
++        {
++            return height_;
++        }
++
++      private:
++        SDL_GPUDevice* device_ = nullptr;
++        SDL_GPUGraphicsPipeline* pipeline_ = nullptr;
++        SDL_GPUBuffer* vertices_ = nullptr;
++        SDL_GPUTexture* depth_ = nullptr;
++        SDL_GPUTextureFormat color_format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
++        Uint32 width_ = 0, height_ = 0;
++        std::uint64_t revision_ = UINT64_MAX;
++        bool pipeline(SDL_GPUTextureFormat, std::string&);
++    };
++} // namespace OpenBlood2
+diff --git a/src/engine/world_view.cpp b/src/engine/world_view.cpp
+new file mode 100644
+index 0000000..424398e
+--- /dev/null
++++ b/src/engine/world_view.cpp
+@@ -0,0 +1,175 @@
++#include "engine/world_view.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++
++namespace OpenBlood2
++{
++    namespace
++    {
++        DVector cross(DVector a, DVector b)
++        {
++            return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
++        }
++        bool valid_rotation(DRotation q)
++        {
++            const double n = double(q.m_Spin) * q.m_Spin + double(q.m_Vec.x) * q.m_Vec.x +
++                             double(q.m_Vec.y) * q.m_Vec.y + double(q.m_Vec.z) * q.m_Vec.z;
++            return std::isfinite(n) && std::abs(n - 1) < .001;
++        }
++        std::array<float, 4> packed(DVector v)
++        {
++            return {v.x, v.y, v.z, 0};
++        }
++    } // namespace
++    bool WorldMesh::build(const World& world, std::string& error)
++    {
++        *this = {};
++        error.clear();
++        auto fail = [&](const char* why)
++        {
++            *this = {};
++            error = why;
++            return false;
++        };
++        if (world.models.empty() || world.models.size() > 4097)
++            return fail("Diagnostic mesh requires a bounded primary world");
++        constexpr std::size_t max_vertices = 3000000;
++        for (const auto& model : world.models)
++        {
++            if (model.polygons.size() > 65536 || model.points.size() > 65536 || !physics_vector(model.translation))
++                return fail("Diagnostic model exceeds geometry limits");
++            WorldRange range;
++            range.first = static_cast<std::uint32_t>(vertices.size());
++            range.name = model.name;
++            range.pivot = ranges.empty() ? DVector{} : model.translation;
++            for (const auto& polygon : model.polygons)
++            {
++                const auto count = polygon.base_points == UINT16_MAX ? polygon.points.size() : polygon.base_points;
++                if (polygon.surface >= model.surfaces.size() || count < 3 || count > 512 ||
++                    count > polygon.points.size())
++                    return fail("Invalid diagnostic polygon/ring");
++                const auto& surface = model.surfaces[polygon.surface];
++                if (surface.plane >= model.planes.size())
++                    return fail("Invalid diagnostic surface plane");
++                for (auto index : polygon.points)
++                    if (index >= model.points.size() || !physics_vector(model.points[index]))
++                        return fail("Invalid diagnostic vertex");
++                if (surface.flags & (1u << 2))
++                {
++                    ++invisible;
++                    continue;
++                }
++                transparent += (surface.flags & (1u << 3)) != 0;
++                sky += (surface.flags & (1u << 4)) != 0;
++                const auto normal = model.planes[surface.plane].normal;
++                const auto length = std::sqrt(vector_dot(normal, normal));
++                if (!std::isfinite(length) || length < .001f)
++                    return fail("Invalid diagnostic face normal");
++                // Orientation colors, not an inferred sun or a light service.
++                DVector color{.18f + .5f * std::abs(normal.x / length), .18f + .5f * std::abs(normal.y / length),
++                              .18f + .5f * std::abs(normal.z / length)};
++                if (surface.flags & (1u << 4))
++                    color = {.25f, .4f, .65f};
++                if (surface.flags & (1u << 3))
++                    color = {.65f, .25f, .5f};
++                if ((count - 2) * 3 > max_vertices - vertices.size())
++                    return fail("Diagnostic triangle budget exceeded");
++                const auto a = model.points[polygon.points[0]];
++                for (std::size_t i = 1; i + 1 < count; ++i)
++                {
++                    const auto b = model.points[polygon.points[i]], c = model.points[polygon.points[i + 1]];
++                    const auto area = cross(vector_subtract(b, a), vector_subtract(c, a));
++                    if (vector_dot(area, area) < 1e-10f)
++                    {
++                        ++degenerate;
++                        continue;
++                    }
++                    for (auto p : {a, b, c})
++                        vertices.push_back({vector_subtract(p, range.pivot), color});
++                }
++            }
++            range.count = static_cast<std::uint32_t>(vertices.size()) - range.first;
++            ranges.push_back(std::move(range));
++        }
++        return true;
++    }
++    bool world_draws(const WorldMesh& mesh, const Objects& objects, std::vector<WorldDraw>& draws,
++                     WorldViewStats& stats, std::string& error)
++    {
++        draws.clear();
++        stats.triangles = stats.draws = stats.hidden = stats.unbound = stats.containers = 0;
++        error.clear();
++        if (mesh.ranges.empty())
++            return true;
++        draws.push_back({0, {}, {}});
++        std::vector<bool> bound(mesh.ranges.size());
++        bound[0] = true;
++        for (auto id : objects.snapshot())
++        {
++            const auto* r = objects.get(id);
++            if (!r || r->life != Life::Alive)
++                continue;
++            if (r->state.m_ObjectType == OT_CONTAINER)
++            {
++                ++stats.containers;
++                continue;
++            }
++            if (r->state.m_ObjectType != OT_WORLDMODEL)
++                continue;
++            std::size_t match = 0;
++            for (std::size_t i = 1; i < mesh.ranges.size(); ++i)
++                if (!CaseLess{}(mesh.ranges[i].name, r->state.m_Filename) &&
++                    !CaseLess{}(r->state.m_Filename, mesh.ranges[i].name))
++                {
++                    if (match)
++                    {
++                        error = "Ambiguous diagnostic world model";
++                        draws.clear();
++                        return false;
++                    }
++                    match = i;
++                }
++            if (!match || !r->world_model)
++            {
++                error = "Missing diagnostic world model binding";
++                draws.clear();
++                return false;
++            }
++            bound[match] = true;
++            if (!(r->state.m_Flags & FLAG_VISIBLE))
++            {
++                ++stats.hidden;
++                continue;
++            }
++            if (!physics_vector(r->state.m_Pos) || !valid_rotation(r->state.m_Rotation))
++            {
++                error = "Invalid diagnostic world model transform";
++                draws.clear();
++                return false;
++            }
++            draws.push_back({static_cast<std::uint32_t>(match), r->state.m_Pos, r->state.m_Rotation});
++        }
++        stats.unbound = std::count(bound.begin(), bound.end(), false);
++        for (const auto& draw : draws)
++            stats.triangles += mesh.ranges[draw.range].count / 3;
++        stats.draws = draws.size();
++        return true;
++    }
++    bool world_view_uniform(DVector eye, DRotation view, float aspect, const WorldDraw& draw, WorldViewUniform& out)
++    {
++        out = {};
++        if (!physics_vector(eye) || !physics_vector(draw.position) || !valid_rotation(view) ||
++            !valid_rotation(draw.rotation) || !std::isfinite(aspect) || aspect <= 0 || aspect > 128)
++            return false;
++        out.eye = packed(eye);
++        out.right = packed(rotate_vector(DVector{1, 0, 0}, view));
++        out.up = packed(rotate_vector(DVector{0, 1, 0}, view));
++        out.forward = packed(rotate_vector(DVector{0, 0, 1}, view));
++        constexpr float near = 1, far = 65536;
++        out.projection = {1, aspect, far / (far - near), -near * far / (far - near)};
++        out.position = packed(draw.position);
++        out.quaternion = {draw.rotation.m_Vec.x, draw.rotation.m_Vec.y, draw.rotation.m_Vec.z, draw.rotation.m_Spin};
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/world_view.h b/src/engine/world_view.h
+new file mode 100644
+index 0000000..f7ac333
+--- /dev/null
++++ b/src/engine/world_view.h
+@@ -0,0 +1,44 @@
++#pragma once
++#include "engine/world.h"
++#include <array>
++
++namespace OpenBlood2
++{
++    // Diagnostic geometry only: no texture, baked light, sky or transparency claim.
++    struct WorldVertex
++    {
++        DVector position, color;
++    };
++    struct WorldRange
++    {
++        std::uint32_t first = 0, count = 0;
++        DVector pivot{};
++        std::string name;
++    };
++    struct WorldMesh
++    {
++        std::vector<WorldVertex> vertices;
++        std::vector<WorldRange> ranges;
++        std::size_t invisible = 0, degenerate = 0, transparent = 0, sky = 0;
++        bool build(const World&, std::string&);
++    };
++    struct WorldDraw
++    {
++        std::uint32_t range = 0;
++        DVector position{};
++        DRotation rotation;
++    };
++    struct WorldViewStats
++    {
++        std::size_t triangles = 0, draws = 0, hidden = 0, unbound = 0, containers = 0;
++        std::uint64_t uploads = 0, frames = 0;
++    };
++    // Never creates objects or advances simulation; current checked identities only.
++    bool world_draws(const WorldMesh&, const Objects&, std::vector<WorldDraw>&, WorldViewStats&, std::string&);
++    // Row vectors packed for the shader. Original +Y up / +Z forward, SDL depth [0,1].
++    struct WorldViewUniform
++    {
++        std::array<float, 4> eye{}, right{}, up{}, forward{}, projection{}, position{}, quaternion{};
++    };
++    bool world_view_uniform(DVector eye, DRotation view, float aspect, const WorldDraw&, WorldViewUniform&);
++} // namespace OpenBlood2
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index c9e14fb..997a2b7 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -293,6 +293,7 @@ namespace OpenBlood2
+         std::vector<ResourceUse> resource_uses;
+         std::vector<std::string> trace;
+         std::string world_path;
++        std::uint64_t world_revision = 0; // Changes on teardown; diagnostic geometry edits must also increment it.
+         // Inspection resource, not a CPlayerObj or a replacement player controller.
+         std::shared_ptr<const Model> preview_model;
+         AnimationTrack preview_animation;
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 0a4af9e..60fc60d 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -353,6 +353,7 @@ namespace OpenBlood2
+         entries.clear();
+         resource_uses.clear();
+         world = {};
++        ++world_revision;
+         world_path.clear();
+         trace.clear();
+         state = SessionState::Empty;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index b502e87..d46a9c9 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -586,3 +586,27 @@ if(BLOOD2_TEST_DATA_DIR)
+         set_tests_properties(ai_target.${case} PROPERTIES LABELS "headless;private;ai_target" TIMEOUT 90)
+     endforeach()
+ endif()
++
++add_executable(world_view_tests world_view_tests.cpp)
++target_link_libraries(world_view_tests PRIVATE blood2_game)
++blood2_project_options(world_view_tests)
++foreach(case IN ITEMS mesh rejects camera lifetime)
++    add_test(NAME world_view.${case} COMMAND world_view_tests "${case}")
++    set_tests_properties(world_view.${case} PROPERTIES LABELS "headless;world_view" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME world_view.subway COMMAND world_view_tests subway "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(world_view.subway PROPERTIES LABELS "headless;private;world_view" TIMEOUT 90)
++endif()
++if(BLOOD2_GPU_TESTS)
++    add_executable(world_gpu_tests world_gpu_tests.cpp)
++    target_link_libraries(world_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(world_gpu_tests)
++    add_test(NAME gpu.world_depth COMMAND world_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/world-depth.png")
++    set_tests_properties(gpu.world_depth PROPERTIES LABELS "gpu;world_view" TIMEOUT 30 RUN_SERIAL TRUE)
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.viewport COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++            --data-dir "${BLOOD2_TEST_DATA_DIR}" --viewport-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/viewport.png")
++        set_tests_properties(gpu.viewport PROPERTIES LABELS "gpu;private;world_view" TIMEOUT 30 RUN_SERIAL TRUE)
++    endif()
++endif()
+diff --git a/tests/world_gpu_tests.cpp b/tests/world_gpu_tests.cpp
+new file mode 100644
+index 0000000..d876f24
+--- /dev/null
++++ b/tests/world_gpu_tests.cpp
+@@ -0,0 +1,110 @@
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include <SDL3/SDL.h>
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x " " << error << " " << SDL_GetError() << '\n';                            \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++int main(int argc, char** argv)
++{
++    std::string error;
++    Runtime runtime;
++    CHECK(runtime.initialize(true, error));
++    WorldMesh mesh;
++    auto triangle = [&](DVector a, DVector b, DVector c, DVector color)
++    {
++        for (auto p : {a, b, c})
++            mesh.vertices.push_back({p, color});
++    };
++    triangle({-1, -1, 2}, {1, -1, 2}, {0, 1, 2}, {1, 0, 0}); // Near red, submitted before far blue.
++    triangle({-2, -2, 4}, {2, -2, 4}, {2, 2, 4}, {0, 0, 1});
++    triangle({-2, -2, 4}, {-2, 2, 4}, {2, 2, 4}, {0, 0, 1});            // Opposite winding is visible too.
++    triangle({-1, -1, .5f}, {1, -1, .5f}, {0, 1, .5f}, {1, 1, 0});      // Must be near-clipped.
++    triangle({1, .6f, 2}, {1.5f, .6f, 2}, {1.25f, 1.2f, 2}, {0, 1, 0}); // +X right / +Y up.
++    mesh.ranges.push_back({0, static_cast<unsigned>(mesh.vertices.size()), {}, "synthetic"});
++    WorldRenderer renderer(runtime.gpu);
++    for (int cycle = 0; cycle < 3; ++cycle)
++    {
++        const Uint32 w = cycle == 1 ? 240 : 320, h = cycle == 1 ? 320 : 240;
++        CHECK(SDL_SetWindowSize(runtime.window, int(w), int(h)));
++        SDL_PumpEvents();
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, w, h));
++        CHECK(renderer.prepare(mesh, cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, w, h, error));
++        CHECK(renderer.prepare(mesh, cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, w, h, error));
++        CHECK(renderer.stats.uploads == unsigned(cycle + 1));
++        WorldDraw draw;
++        DVector eye{};
++        DRotation view;
++        if (cycle == 2)
++        {
++            eye = draw.position = {100, 20, -50};
++            view = draw.rotation = rotation_from_euler({0, 1.57079632679f, 0});
++        }
++        auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(cmd);
++        SDL_GPUTexture* swap = nullptr;
++        Uint32 sw = 0, sh = 0;
++        CHECK(SDL_WaitAndAcquireGPUSwapchainTexture(cmd, runtime.window, &swap, &sw, &sh));
++        CHECK(swap);
++        CHECK(renderer.draw(cmd, capture.texture, mesh, std::span(&draw, 1), eye, view, false, error));
++        CHECK(capture.enqueue(cmd, swap));
++        CHECK(SDL_SubmitGPUCommandBuffer(cmd));
++        CHECK(SDL_WaitForGPUIdle(runtime.gpu));
++        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        auto rgb = [&](int x, int y, int r, int g, int b)
++        {
++            auto* p = pixels + (y * w + x) * 4;
++            bool ok = p[0] == r && p[1] == g && p[2] == b && p[3] == 255;
++            if (!ok)
++                std::cerr << "cycle " << cycle << " pixel " << x << "," << y << " = " << int(p[0]) << "," << int(p[1])
++                          << "," << int(p[2]) << "," << int(p[3]) << "\n";
++            return ok;
++        };
++        bool correct = rgb(w / 2, h / 2, 255, 0, 0) && rgb(w * 3 / 10, h / 2, 0, 0, 255) &&
++                       rgb(w * 13 / 16, int(h / 2 - w * .2f), 0, 255, 0);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        if (!correct && argc == 2)
++            capture.save(argv[1]);
++        CHECK(correct);
++        if (cycle == 2 && argc == 2)
++            CHECK(capture.save(argv[1]));
++        // The original camera type-1 viewport leaves one-sixth bars above/below.
++        auto* bars = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(bars);
++        CHECK(renderer.draw(bars, capture.texture, mesh, std::span(&draw, 1), eye, view, true, error));
++        SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(bars);
++        CHECK(copy);
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = w;
++        region.h = h;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo destination{};
++        destination.transfer_buffer = capture.transfer;
++        destination.pixels_per_row = w;
++        destination.rows_per_layer = h;
++        SDL_DownloadFromGPUTexture(copy, &region, &destination);
++        SDL_EndGPUCopyPass(copy);
++        CHECK(SDL_SubmitGPUCommandBuffer(bars));
++        CHECK(SDL_WaitForGPUIdle(runtime.gpu));
++        pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        correct = rgb(w / 2, 1, 6, 9, 13) && rgb(w / 2, h - 2, 6, 9, 13) && rgb(w / 2, h / 2, 255, 0, 0);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        CHECK(correct);
++        renderer.clear_geometry();
++    }
++    std::cout << "GPU readback: depth occlusion, opposite winding, near clipping, +X/+Y orientation, camera/object "
++                 "transforms, resize and reupload pass\n";
++    return 0;
++}
+diff --git a/tests/world_view_tests.cpp b/tests/world_view_tests.cpp
+new file mode 100644
+index 0000000..edfb7c7
+--- /dev/null
++++ b/tests/world_view_tests.cpp
+@@ -0,0 +1,218 @@
++#include "engine/collision.h"
++#include "engine/container.h"
++#include "engine/world_view.h"
++#include "game/server_adapter.h"
++#include <algorithm>
++#include <cmath>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x "\n";                                                                     \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    World fixture()
++    {
++        World w;
++        WorldModel m;
++        m.name = "primary";
++        m.points = {{-2, -2, 4}, {2, -2, 4}, {2, 2, 4}, {-2, 2, 4}};
++        m.planes = {{{0, 0, -1}, -4}};
++        m.surfaces.resize(1);
++        m.polygons = {{0, {0, 1, 2, 3, 0, 2, 3}, 4}};
++        w.models.push_back(m);
++        return w;
++    }
++    bool mesh_test()
++    {
++        auto w = fixture();
++        WorldMesh mesh;
++        std::string error;
++        CHECK(mesh.build(w, error));
++        CHECK(mesh.vertices.size() == 6 && mesh.ranges.size() == 1);
++        CHECK(mesh.vertices[0].position.x == -2 && mesh.vertices[0].position.z == 4);
++        w.models[0].surfaces[0].flags = 4;
++        CHECK(mesh.build(w, error));
++        CHECK(mesh.vertices.empty() && mesh.invisible == 1);
++        w.models[0].surfaces[0].flags = 8 | 16;
++        CHECK(mesh.build(w, error));
++        CHECK(mesh.transparent == 1 && mesh.sky == 1);
++        w.models[0].points[1] = w.models[0].points[0];
++        CHECK(mesh.build(w, error));
++        CHECK(mesh.degenerate == 1 && mesh.vertices.size() == 3);
++        return true;
++    }
++    bool rejects()
++    {
++        WorldMesh mesh;
++        std::string error;
++        for (int i = 0; i < 7; ++i)
++        {
++            auto w = fixture();
++            if (i == 0)
++                w.models.clear();
++            if (i == 1)
++                w.models[0].polygons[0].points[2] = 99;
++            if (i == 2)
++                w.models[0].polygons[0].base_points = 2;
++            if (i == 3)
++                w.models[0].polygons[0].surface = 1;
++            if (i == 4)
++                w.models[0].surfaces[0].plane = 1;
++            if (i == 5)
++                w.models[0].planes[0].normal.x = std::numeric_limits<float>::infinity();
++            if (i == 6)
++                w.models[0].points[0].x = std::numeric_limits<float>::quiet_NaN();
++            CHECK(!mesh.build(w, error));
++            CHECK(!error.empty() && mesh.vertices.empty() && mesh.ranges.empty());
++        }
++        return true;
++    }
++    bool camera()
++    {
++        WorldViewUniform u;
++        WorldDraw d;
++        CHECK(world_view_uniform({10, 20, 30}, {}, 2, d, u));
++        CHECK(u.eye[0] == 10 && u.right[0] == 1 && u.up[1] == 1 && u.forward[2] == 1 && u.projection[1] == 2);
++        CHECK(std::abs(u.projection[2] + u.projection[3]) < 1e-6);
++        CHECK(std::abs((65536 * u.projection[2] + u.projection[3]) / 65536 - 1) < 1e-6);
++        auto q = rotation_from_euler({0, 1.57079632679f, 0});
++        CHECK(world_view_uniform({}, q, 1, d, u));
++        CHECK(std::abs(u.forward[0] - 1) < 1e-5 && std::abs(u.right[2] + 1) < 1e-5);
++        CHECK(!world_view_uniform({}, q, 0, d, u));
++        q.m_Spin = 5;
++        CHECK(!world_view_uniform({}, q, 1, d, u));
++        return true;
++    }
++    bool lifetime()
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto w = fixture();
++        w.models.push_back(w.models[0]);
++        w.models[1].name = "moving";
++        w.models[1].translation = {10, 20, 30};
++        WorldMesh mesh;
++        std::string error;
++        CHECK(mesh.build(w, error));
++        CHECK(mesh.vertices[6].position.x == -12 && mesh.vertices[6].position.z == -26);
++        auto h = g.create_example("CameraSpot");
++        CHECK(h);
++        auto* r = g.objects.get(h);
++        r->state.m_ObjectType = OT_WORLDMODEL;
++        SAFE_STRCPY(r->state.m_Filename, "moving");
++        r->state.m_Pos = {30, 40, 50};
++        r->state.m_Rotation = rotation_from_euler({0, 1, 0});
++        r->world_model = std::make_shared<ContainerShape>();
++        r->state.m_Flags |= FLAG_VISIBLE;
++        r->activity = OBJSTATE_INACTIVE;
++        std::vector<WorldDraw> draws;
++        WorldViewStats stats;
++        CHECK(world_draws(mesh, g.objects, draws, stats, error));
++        CHECK(draws.size() == 2 && stats.unbound == 0);
++        CHECK(draws[1].position.x == 30 && draws[1].rotation.m_Spin == r->state.m_Rotation.m_Spin);
++        r->state.m_Flags &= ~FLAG_VISIBLE;
++        CHECK(world_draws(mesh, g.objects, draws, stats, error));
++        CHECK(draws.size() == 1 && stats.hidden == 1);
++        r->state.m_Flags |= FLAG_VISIBLE;
++        mesh.ranges.push_back(mesh.ranges[1]);
++        CHECK(!world_draws(mesh, g.objects, draws, stats, error));
++        CHECK(draws.empty());
++        mesh.ranges.pop_back();
++        CHECK(g.objects.remove(h));
++        CHECK(world_draws(mesh, g.objects, draws, stats, error));
++        CHECK(draws.size() == 1 && stats.unbound == 1);
++        CHECK(g.objects.finish_frame());
++        CHECK(!g.objects.get(h));
++        CHECK(world_draws(mesh, g.objects, draws, stats, error));
++        CHECK(draws.size() == 1);
++        return true;
++    }
++    bool private_world(const char* directory)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = directory;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        WorldMesh mesh;
++        std::vector<WorldDraw> draws;
++        WorldViewStats stats;
++        auto revision = g.world_revision;
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error));
++            CHECK(g.world_revision > revision);
++            revision = g.world_revision;
++            CHECK(mesh.build(g.world, error));
++            CHECK(mesh.ranges.size() == 116 && mesh.vertices.size() > 1000);
++            CHECK(g.enter_player(error));
++            CHECK(g.step(1. / 60));
++            CHECK(world_draws(mesh, g.objects, draws, stats, error));
++            CHECK(stats.draws > 50 && stats.triangles > 1000);
++            std::size_t posed = 0;
++            for (auto id : g.objects.snapshot())
++            {
++                auto* r = g.objects.get(id);
++                if (!r || !r->world_model || !(r->state.m_Flags & FLAG_VISIBLE))
++                    continue;
++                auto it = std::find_if(draws.begin(), draws.end(),
++                                       [&](const auto& d) { return mesh.ranges[d.range].name == r->state.m_Filename; });
++                CHECK(it != draws.end());
++                const auto& range = mesh.ranges[it->range];
++                if (!range.count)
++                    continue;
++                auto point = vector_add(it->position, rotate_vector(mesh.vertices[range.first].position, it->rotation));
++                bool found = false;
++                const auto offset = vector_subtract(r->state.m_Pos, r->world_model->origin);
++                for (const auto& t : r->world_model->triangles)
++                    for (auto p : t)
++                    {
++                        auto delta = vector_subtract(point, vector_add(p, offset));
++                        if (vector_dot(delta, delta) < .01f)
++                            found = true;
++                    }
++                CHECK(found);
++                ++posed;
++            }
++            CHECK(posed > 50);
++            auto time = g.objects.time();
++            auto before = g.objects.snapshot().size();
++            CHECK(world_draws(mesh, g.objects, draws, stats, error));
++            CHECK(g.objects.time() == time && g.objects.snapshot().size() == before);
++            std::cout << "SubwayA: vertices=" << mesh.vertices.size() << " draws=" << stats.draws
++                      << " triangles=" << stats.triangles << " unbound=" << stats.unbound
++                      << " invisible=" << mesh.invisible << " posed=" << posed << '\n';
++            CHECK(g.unload_world());
++            CHECK(g.world_revision > revision);
++            revision = g.world_revision;
++            CHECK(world_draws(mesh, g.objects, draws, stats, error));
++            CHECK(draws.size() == 1); // CPU cache owns no object identity.
++            mesh = {};
++            CHECK(world_draws(mesh, g.objects, draws, stats, error));
++            CHECK(draws.empty());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    std::string_view c = argv[1];
++    bool ok = c == "lifetime"              ? lifetime()
++              : c == "mesh"                ? mesh_test()
++              : c == "rejects"             ? rejects()
++              : c == "camera"              ? camera()
++              : c == "subway" && argc == 3 ? private_world(argv[2])
++                                           : false;
++    return ok ? 0 : 1;
++}

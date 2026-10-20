@@ -1,0 +1,456 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index bdc95cf..1d1769e 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -492,3 +492,5 @@ Other impact components remain unavailable. User playtest fixes (mouse look/fire
+ The [keyboard/mouse control fix](../Documentation/Implementation/M2_PLAYER_CONTROLS.md) connects F/G and captured mouse firing plus relative mouse look to existing original gameplay.
+ Read [contracts](docs/PLAYER_CONTROL_CONTRACTS.md). Preserve UI-only uncaptured clicks, one-time delta consumption, focus/player-change resets and original FIRE_KEY/camera gates.
+ F3 captures, Escape releases; --view-world requests capture initially. Next priorities are non-attacking NPCs and train glass, before further cosmetic FX. M2 remains open.
++
++The [NPC entry correction](../Documentation/Implementation/M2_NPC_ENTRY.md) holds interactive simulation until original player entry. Read [contracts](docs/SESSION_PLAYBACK_CONTRACTS.md). Preserve explicit diagnostic stepping, deferred removal while waiting, original intro/AI rules and visible runtime failures. Tests prove authored Cultist fire/damage after delayed application entry without forced AI targets. Broader combat remains unverified; train glass is next before more FX. M2 stays open.
+diff --git a/README.md b/README.md
+index 9cd8e8a..cf3756f 100644
+--- a/README.md
++++ b/README.md
+@@ -536,3 +536,5 @@ Other impact components remain unavailable. User playtest fixes (mouse look/fire
+ 
+ The [keyboard/mouse continuation](../Documentation/Implementation/M2_PLAYER_CONTROLS.md) adds F/G primary/alternate fire, F3 mouse capture, mouse look and left/right button fire. Escape releases the cursor for inspection.
+ NPC attack and train-glass reports remain unresolved; M2 is still incomplete.
++
++[Interactive entry correction](../Documentation/Implementation/M2_NPC_ENTRY.md): a loaded world now waits for player entry instead of advancing NPCs without a player. Use **Enter player** in the header, or launch `--view-world` for immediate entry. Session exposes NPC ready/failed/active counts. Autonomous fire/damage is verified in a labelled SubwayA encounter; train glass and complete M2 remain open.
+diff --git a/docs/AI_RUNTIME_CONTRACTS.md b/docs/AI_RUNTIME_CONTRACTS.md
+index b0b300d..716775d 100644
+--- a/docs/AI_RUNTIME_CONTRACTS.md
++++ b/docs/AI_RUNTIME_CONTRACTS.md
+@@ -127,3 +127,5 @@ verified platform; other platforms/XR and full M2 acceptance remain pending.
+ The [destination initialization rehearsal](DESTINATION_TRIAL_CONTRACTS.md) extends the structural scan with temporary original callbacks and copied-player named entry.
+ It isolates the current original globals, destroys the temporary session and resumes the unchanged source gameplay state.
+ Ordinary second-session binding remains forbidden; no automatic transfer or completed M2 acceptance is claimed.
++
++The [interactive entry correction](SESSION_PLAYBACK_CONTRACTS.md) now holds application simulation until player entry, preventing the reproduced pre-player NPC suspension. Raw diagnostic stepping retains that boundary; broader combat and M2 remain incomplete.
+diff --git a/docs/M2_NPC_ENTRY_SOURCES.json b/docs/M2_NPC_ENTRY_SOURCES.json
+new file mode 100644
+index 0000000..7b2a970
+--- /dev/null
++++ b/docs/M2_NPC_ENTRY_SOURCES.json
+@@ -0,0 +1,27 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "a4d010c588830a606163a84be3d98d803158a012",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "use": "FindObjectInRadius empty-opponent-list fallback; left unchanged"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
++      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
++      "use": "Existing OnClientEnterWorld original entry path, no new import"
++    }
++  ],
++  "adaptations": [
++    "New application-only pre-player playback policy; no new original method imported.",
++    "GameSession::step and original AI/faction/link/activation rules remain unchanged.",
++    "Explicit encounter placement is test-only; no forced attack state, target, weapon or NPC movement."
++  ],
++  "remaining": [
++    "broader interactive combat and retail activation parity",
++    "train-window material",
++    "required services and safe NEW_LEVEL",
++    "M2 acceptance"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 3d9dddf..76fe113 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -828,3 +828,7 @@ The [application controls](PLAYER_CONTROL_CONTRACTS.md) are new SDL mapping/curs
+ ownership code. They feed the already ported original weapon state machine, FIRE_KEY
+ and player rotation; no new game method or reference engine is imported.
+ See [ledger](M2_PLAYER_CONTROL_SOURCES.json).
++
++## Interactive NPC entry preservation
++
++The [application playback policy](SESSION_PLAYBACK_CONTRACTS.md) holds a loaded world until original player entry. No new original method is imported or AI/faction rule altered; see [source context](M2_NPC_ENTRY_SOURCES.json).
+diff --git a/docs/SESSION_PLAYBACK_CONTRACTS.md b/docs/SESSION_PLAYBACK_CONTRACTS.md
+new file mode 100644
+index 0000000..f303021
+--- /dev/null
++++ b/docs/SESSION_PLAYBACK_CONTRACTS.md
+@@ -0,0 +1,63 @@
++# Interactive world entry and NPC preservation
++
++The application now holds a loaded world's simulation until the original local
++player enters. This is an application playback policy, not an alteration of the
++original AI rules. See [evidence](../../Documentation/Implementation/M2_NPC_ENTRY.md)
++and [source ledger](M2_NPC_ENTRY_SOURCES.json). **M2 remains incomplete.**
++
++## Reproduced boundary and policy
++
++The ordinary inspector previously advanced GameSession before the user pressed
++Enter player. In SubwayA, the original empty-enemy-list fallback then searches the
++Cabal list. Three actors select themselves; the existing distinct-object link
++contract refuses this and permanently suspends them. Other NPCs can acquire
++unintended same-faction targets. Entering a player does not undo these failures.
++An immediate-entry session has different initial conditions. This explains a
++reproducible part of the reported non-attacking NPC behavior, not every encounter.
++
++`app/session_playback.h` is the single interactive-frame policy used by main.
++A loaded world with no entered client waits; its simulation, animation, physics,
++audio and effect clocks do not advance. Each frame still polls events, applies
++explicit editor commands, drains deferred object removals, draws inspection and
++presents the GPU frame. Removal callbacks retain their normal ownership rules.
++Previously queued SDL audio samples may finish; this is not an audio-device pause.
++No waiting wall time is accumulated for subsequent simulation. Empty diagnostics
++and explicit GPU smoke modes retain their existing simulation behavior.
++
++The new Enter player button queues the same existing original shell/player entry
++as the Session panel. Successful entry resumes on the next ordinary frame; failed
++entry stays in inspection and exposes its error. `--view-world` still enters the
++player immediately, before the first tick. Leaving the player or loading another
++world returns to waiting; original restoration/keep-alive entry can also resume it.
++Once entered, folding/hiding the inspector does not pause gameplay. Dead players
++remain entered and therefore do not pause their world.
++
++Direct GameSession::step remains an explicit simulation API for diagnostics/tests;
++it is intentionally not globally gated. Existing no-player tests still reproduce
++and assert the source fallback failure. No self-links are permitted, no faction
++rule is changed, and no failed NPC is silently revived. This policy preserves a
++fresh interactive session; it does not repair an already failed diagnostic world.
++
++## Inspection and verification
++
++The header shows waiting status and entry errors beside the entry button. Session
++shows ready/failed/active NPC counts; ready does not mean currently active or
++attacking. Existing Skeleton details retain runtime error, camera gate, target,
++activity/pings, weapon attempts and shots. The shutdown log records waiting frames,
++simulation time, NPC readiness/failures and update totals. Reading these counters
++does not run AI or alter activation.
++
++A real application GPU check presents 12 pre-entry frames with time zero, all 15
++SubwayA NPCs ready, no failed actors and no AI_Update calls. A private regression
++waits 180 interactive frames, enters normally, runs the complete original intro,
++then places only the player at a labelled encounter inside the actual train.
++Authored NPC transforms, states, inventory, activation and targeting are untouched.
++Autonomous acquisition, original attack/fire commands and actual damage must occur.
++The scenario repeats after unload/reload, checks waiting after leave and verifies
++old identity/resource cleanup. A synthetic check also exercises pending removal
++while waiting and opt-in diagnostic time advancement.
++
++This is not a human walkthrough, a recreation of the retail server pause mechanism
++or proof of all combat. Center-ray activation (rather than retail PVS), missing
++states/services and safe NEW_LEVEL remain documented limitations. The train-window
++material report remains unresolved and is the next playtest priority before more FX.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 3616ec3..c24d2cd 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -2,6 +2,7 @@
+ #include "build_info.h"
+ #include "engine/container.h"
+ #include "engine/world_model.h"
++#include "game/original/AI_Mgr.h"
+ #include "game/original/ClientLightFX.h"
+ #include "game/original/Door.h"
+ #include "game/original/Key.h"
+@@ -426,7 +427,16 @@ namespace OpenBlood2
+             ImGui::Text("Mouse: %s", mouse_captured ? "captured" : "released for UI");
+             if (!mouse_error.empty())
+                 ImGui::TextWrapped("Mouse capture failed: %s", mouse_error.c_str());
+-            if (!game.client_shell.m_bInWorld)
++            if (waiting_for_player)
++            {
++                ImGui::TextWrapped(
++                    "Simulation waiting for player entry. NPCs and world clocks are held at their current state.");
++                if (ImGui::Button("Enter player"))
++                    enter_player_request = true;
++                if (!world_error.empty())
++                    ImGui::TextWrapped("Player entry: %s", world_error.c_str());
++            }
++            else if (!game.client_shell.m_bInWorld)
+                 ImGui::TextDisabled("Enter the player in Session to use game controls.");
+             else if (game.client_shell.view.object && !game.client_shell.view.settings.player_movement)
+                 ImGui::TextDisabled("The original cinematic currently blocks movement. Controls return when it ends.");
+@@ -1049,6 +1059,23 @@ namespace OpenBlood2
+         ImGui::TextWrapped(
+             "Original shell/player state and copied AI paths. Complete AI behavior, remaining combat/FX, audio "
+             "callers and save support are still unavailable.");
++        unsigned ready = 0, failed = 0, active = 0;
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* r = game.objects.get(id);
++            const auto* ai = dynamic_cast<const AI_Mgr*>(r->game.get());
++            if (!ai || ai->npc_type == AI_Mgr::NPCType::Diagnostic)
++                continue;
++            ready += ai->RuntimeReady();
++            failed += ai->runtime_failed;
++            active += r->activity == OBJSTATE_ACTIVE;
++        }
++        ImGui::Text("NPCs: %u ready / %u failed / %u active", ready, failed, active);
++        ImGui::TextWrapped("%s", waiting_for_player ? "Simulation waits for player entry; no world time is consumed."
++                                                    : "Simulation runs independently of inspector visibility.");
++        if (failed)
++            ImGui::TextWrapped("Failed NPCs remain suspended. Select them in Skeleton to inspect the cause; entry does "
++                               "not reset failures.");
+         auto* player = game.server_shell.Player(game.local_client);
+         if (!player)
+         {
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 723cad0..bc71192 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -29,7 +29,7 @@ namespace OpenBlood2
+         bool select_session = false;
+         bool select_movement = false, keyboard_movement = true, mouse_captured = false;
+         std::string mouse_error;
+-        bool collapsed = false;
++        bool collapsed = false, waiting_for_player = false;
+         bool select_containers = false;
+         bool select_triggers = false;
+         ObjectId trigger_selection{}, trigger_request{};
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index de3c5e8..c2c01c8 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -1,6 +1,7 @@
+ #include "ai_model_key_smoke.h"
+ #include "app/model_scene.h"
+ #include "app/movement_controls.h"
++#include "app/session_playback.h"
+ #include "app/sprite_scene.h"
+ #include "brush_smoke.h"
+ #include "build_info.h"
+@@ -422,7 +423,7 @@ namespace
+         bool quit_received = false;
+         bool captured = false;
+         std::uint32_t toggles = 0;
+-        std::uint64_t frames = 0, ui_frames = 0, hidden_frames = 0;
++        std::uint64_t frames = 0, ui_frames = 0, hidden_frames = 0, waiting_frames = 0;
+         const auto started = SDL_GetTicks();
+         auto previous_tick = SDL_GetTicksNS();
+         double hidden_model_time = 0;
+@@ -634,7 +635,12 @@ namespace
+                 inspector.container_selection = game.objects.get(player->containers.body[0].object)->id;
+ #endif
+             }
+-            if (!game.step(delta))
++            const bool waiting = OpenBlood2::waiting_for_player(game, smoke);
++            waiting_frames += waiting;
++#if BLOOD2_INSPECTOR
++            inspector.waiting_for_player = waiting;
++#endif
++            if (!OpenBlood2::step_app_session(game, delta, smoke))
+             {
+                 spdlog::error("Object simulation step failed");
+                 return 4;
+@@ -1264,6 +1270,18 @@ namespace
+         }
+         spdlog::info("Shutdown: frames={}, UI frames={}, hidden frames={}, toggles={}, resize={}, quit={}", frames,
+                      ui_frames, hidden_frames, toggles, resized, quit_received);
++        unsigned npc_ready = 0, npc_failed = 0;
++        std::uint64_t npc_updates = 0;
++        for (auto id : game.objects.snapshot())
++            if (const auto* a = dynamic_cast<const AI_Mgr*>(game.objects.get(id)->game.get());
++                a && a->npc_type != AI_Mgr::NPCType::Diagnostic)
++            {
++                npc_ready += a->RuntimeReady();
++                npc_failed += a->runtime_failed;
++                npc_updates += a->runtime_updates;
++            }
++        spdlog::info("Session playback: waiting={} time={} npc-ready={} npc-failed={} npc-updates={}", waiting_frames,
++                     game.objects.time(), npc_ready, npc_failed, npc_updates);
+         if (smoke)
+         {
+             int width = 0, height = 0;
+diff --git a/src/app/session_playback.h b/src/app/session_playback.h
+new file mode 100644
+index 0000000..427f82a
+--- /dev/null
++++ b/src/app/session_playback.h
+@@ -0,0 +1,18 @@
++#pragma once
++#include "game/server_adapter.h"
++
++namespace OpenBlood2
++{
++    // Interactive inspection must not run the original single-player world
++    // before its player exists. Explicit diagnostic simulations remain opt-in.
++    inline bool waiting_for_player(const GameSession& game, bool diagnostic_simulation = false)
++    {
++        return !diagnostic_simulation && !game.world_path.empty() && !game.client_shell.m_bInWorld;
++    }
++    inline bool step_app_session(GameSession& game, double seconds, bool diagnostic_simulation = false)
++    {
++        if (waiting_for_player(game, diagnostic_simulation))
++            return game.objects.finish_frame(); // Explicit editor removals still drain; no clock/update advance.
++        return game.step(seconds);
++    }
++} // namespace OpenBlood2
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index f6f314d..a8da5d4 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1158,3 +1158,19 @@ if(BLOOD2_TEST_DATA_DIR)
+         set_tests_properties(gpu.player_controls PROPERTIES LABELS "gpu;private;player_controls" TIMEOUT 120 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+     endif()
+ endif()
++
++add_executable(session_playback_tests session_playback_tests.cpp)
++target_link_libraries(session_playback_tests PRIVATE blood2_game)
++blood2_project_options(session_playback_tests)
++add_test(NAME session_playback.policy COMMAND session_playback_tests policy)
++set_tests_properties(session_playback.policy PROPERTIES LABELS "headless;session_playback" TIMEOUT 30)
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME session_playback.private COMMAND session_playback_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(session_playback.private PROPERTIES LABELS "headless;private;session_playback" TIMEOUT 240)
++    if(BLOOD2_GPU_TESTS)
++        add_test(NAME gpu.entry_wait COMMAND ${CMAKE_COMMAND} -DAPP=$<TARGET_FILE:blood2_app>
++            -DCONFIG=${CMAKE_CURRENT_BINARY_DIR}/empty.ini -DDATA_DIR=${BLOOD2_TEST_DATA_DIR}
++            -DCAPTURE=${CMAKE_CURRENT_BINARY_DIR}/entry-wait.png -P "${CMAKE_CURRENT_SOURCE_DIR}/entry_wait_test.cmake")
++        set_tests_properties(gpu.entry_wait PROPERTIES LABELS "gpu;private;session_playback" TIMEOUT 60 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
++    endif()
++endif()
+diff --git a/tests/entry_wait_test.cmake b/tests/entry_wait_test.cmake
+new file mode 100644
+index 0000000..d319121
+--- /dev/null
++++ b/tests/entry_wait_test.cmake
+@@ -0,0 +1,16 @@
++execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --frames 12 --capture "${CAPTURE}"
++    RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
++message("${out}${err}")
++if(NOT status EQUAL 0 OR NOT out MATCHES "Session playback: waiting=12 time=0 npc-ready=15 npc-failed=0 npc-updates=0")
++    message(FATAL_ERROR "Interactive world advanced before player entry: ${status}")
++endif()
++if(out MATCHES "Validation Error|VUID-" OR err MATCHES "Validation Error|VUID-")
++    message(FATAL_ERROR "GPU validation failed")
++endif()
++if(NOT EXISTS "${CAPTURE}")
++    message(FATAL_ERROR "No inspection capture")
++endif()
++file(SIZE "${CAPTURE}" bytes)
++if(bytes LESS 1000)
++    message(FATAL_ERROR "Inspection capture is empty")
++endif()
+diff --git a/tests/session_playback_tests.cpp b/tests/session_playback_tests.cpp
+new file mode 100644
+index 0000000..40778a0
+--- /dev/null
++++ b/tests/session_playback_tests.cpp
+@@ -0,0 +1,115 @@
++#include "app/session_playback.h"
++#include "game/original/AI_Mgr.h"
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool policy()
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        CHECK(!waiting_for_player(g) && step_app_session(g, .1) && g.objects.time() == .1);
++        g.world_path = "synthetic policy fixture";
++        CHECK(waiting_for_player(g));
++        for (int frame = 0; frame < 120; ++frame)
++            CHECK(step_app_session(g, .1));
++        CHECK(g.objects.time() == .1);
++        const auto h = g.objects.create(g.objects.find_class("BaseClass"));
++        CHECK(h && g.objects.remove(h) && g.objects.get(h));
++        CHECK(step_app_session(g, .1) && !g.objects.get(h) && g.objects.time() == .1);
++        CHECK(!waiting_for_player(g, true) && step_app_session(g, .1, true) && g.objects.time() == .2);
++        return true;
++    }
++    bool npcs_ready(GameSession& g, bool untouched)
++    {
++        unsigned count = 0;
++        for (auto id : g.objects.snapshot())
++            if (const auto* a = dynamic_cast<AI_Mgr*>(g.objects.get(id)->game.get()))
++            {
++                if (a->runtime_failed)
++                    std::cerr << a->runtime_error << '\n';
++                CHECK(a->RuntimeReady() && (!untouched || !a->runtime_updates));
++                ++count;
++            }
++        CHECK(count == 15);
++        return true;
++    }
++    bool private_entry(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        ObjectId previous{};
++        for (int load = 0; load < 2; ++load)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && !g.objects.get(previous));
++            const auto time = g.objects.time();
++            const auto before = g.objects.snapshot();
++            for (int frame = 0; frame < 180; ++frame)
++                CHECK(waiting_for_player(g) && step_app_session(g, 1. / 60));
++            CHECK(g.objects.time() == time && g.objects.snapshot() == before && npcs_ready(g, true));
++            CHECK(g.enter_player(error) && !waiting_for_player(g));
++            auto* player = g.server_shell.Player(g.local_client);
++            CHECK(player);
++            previous = g.objects.get(player->m_hObject)->id;
++            // Run the real camera sequence; do not disable its gameplay gate.
++            CHECK(g.client_shell.view.object && !g.client_shell.view.settings.player_movement);
++            bool second_camera = false;
++            for (int frame = 0; frame < 780; ++frame)
++            {
++                CHECK(step_app_session(g, 1. / 60));
++                if (const auto* camera = g.objects.get(g.client_shell.view.object))
++                    second_camera |= std::string_view(camera->state.m_Name) == "camera2";
++            }
++            CHECK(second_camera && !g.client_shell.view.object && npcs_ready(g, false));
++            // Explicit encounter fixture within the real train: move only the player.
++            // Authored NPC positions, weapons, states, perception and activation stay intact.
++            DVector encounter{-32, 170, -1880};
++            CHECK(g.server.TeleportObject(player->m_hObject, &encounter) == DE_OK &&
++                  player->TeleportClientToServerPos());
++            const float hp = player->m_damage.m_fHitPoints;
++            for (int frame = 0; frame < 300; ++frame)
++                CHECK(step_app_session(g, 1. / 60));
++            unsigned shooters = 0;
++            std::uint64_t shots = 0;
++            for (auto id : g.objects.snapshot())
++                if (const auto* a = dynamic_cast<AI_Mgr*>(g.objects.get(id)->game.get()))
++                {
++                    shooters += a->fire_shots > 0;
++                    shots += a->fire_shots;
++                }
++            CHECK(npcs_ready(g, false) && shooters > 0 && shots > 0 && player->m_damage.m_fHitPoints < hp);
++            std::cout << "SubwayA entry " << load << ": waited 180 frames without ticking; shooters=" << shooters
++                      << " shots=" << shots << " player HP=" << player->m_damage.m_fHitPoints << '\n';
++            CHECK(g.leave_player());
++            const double left_at = g.objects.time();
++            for (int frame = 0; frame < 60; ++frame)
++                CHECK(waiting_for_player(g) && step_app_session(g, 1. / 60));
++            CHECK(g.objects.time() == left_at && npcs_ready(g, false));
++            CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.objects.get(previous));
++            CHECK(!AI_Mgr::m_dwNumCabal && !AI_Mgr::m_dwNumMonster && !g.server.client_count() &&
++                  !g.server.string_count() && !g.server.message_count());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc == 2 && std::string_view(argv[1]) == "policy")
++        return policy() ? 0 : 1;
++    if (argc == 3 && std::string_view(argv[1]) == "private")
++        return private_entry(argv[2]) ? 0 : 1;
++    return 2;
++}

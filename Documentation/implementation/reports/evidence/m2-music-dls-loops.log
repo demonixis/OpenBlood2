@@ -1,0 +1,33 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 983: music_assets.reader
+1/7 Test #983: music_assets.reader ..............   Passed    0.01 sec
+    Start 984: music_assets.plan
+2/7 Test #984: music_assets.plan ................   Passed    0.00 sec
+    Start 985: music_assets.catalog
+3/7 Test #985: music_assets.catalog .............   Passed    0.01 sec
+    Start 986: music_assets.private
+4/7 Test #986: music_assets.private .............   Passed    2.23 sec
+    Start 987: dls_bank.decode
+5/7 Test #987: dls_bank.decode ..................   Passed    0.00 sec
+    Start 988: dls_bank.malformed
+6/7 Test #988: dls_bank.malformed ...............   Passed    0.00 sec
+    Start 989: dls_bank.private
+7/7 Test #989: dls_bank.private .................***Failed    0.89 sec
+Ancient.dls: 12 instruments / 106 regions / 55 waves / 1131051 frames / 21 connections / 138 opaque chunks
+bloat.dls: 8 instruments / 30 regions / 28 waves / 1073503 frames / 26 connections / 76 opaque chunks
+Cabal.dls: 14 instruments / 38 regions / 35 waves / 913403 frames / 44 connections / 102 opaque chunks
+244: !decoded && error.starts_with("DLS: Effective region loop exceeds linked wave frames:") | DLS: Effective region loop exceeds linked wave frames
+
+
+86% tests passed, 1 tests failed out of 7
+
+Label Time Summary:
+headless        =   3.15 sec*proc (7 tests)
+music_assets    =   3.15 sec*proc (7 tests)
+private         =   3.12 sec*proc (2 tests)
+
+Total Test time (real) =   3.17 sec
+
+The following tests FAILED:
+	989 - dls_bank.private (Failed)                         headless music_assets private
+Errors while running CTest

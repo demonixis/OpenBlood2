@@ -1,0 +1,28 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start  12: objects.message_churn
+1/8 Test  #12: objects.message_churn ............   Passed    5.61 sec
+    Start 255: cinematics.device
+2/8 Test #255: cinematics.device ................   Passed    0.10 sec
+    Start 833: death_effects.burn
+3/8 Test #833: death_effects.burn ...............   Passed    1.13 sec
+    Start 834: death_effects.gibs
+4/8 Test #834: death_effects.gibs ...............   Passed    1.72 sec
+    Start 835: death_effects.limbs
+5/8 Test #835: death_effects.limbs ..............   Passed    0.41 sec
+    Start 836: death_effects.damage
+6/8 Test #836: death_effects.damage .............   Passed    0.41 sec
+    Start 837: death_effects.particles
+7/8 Test #837: death_effects.particles ..........   Passed    0.28 sec
+    Start 838: death_effects.lifetime
+8/8 Test #838: death_effects.lifetime ...........   Passed    1.21 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+cinematics       =   0.10 sec*proc (1 test)
+death_effects    =   5.15 sec*proc (6 tests)
+headless         =  10.86 sec*proc (8 tests)
+objects          =   5.61 sec*proc (1 test)
+private          =   5.15 sec*proc (6 tests)
+
+Total Test time (real) =  10.88 sec

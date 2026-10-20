@@ -1,0 +1,1 @@
+Reviewed actual Debug Vulkan capture: labelled civilian action probe, State 18 / authored SPECIAL4, 181 dispatches, 2 transitions, clip 39, 2 starts / 1 finish, 0 failures, half extents 29/80/29. Diagnostic scope and missing full AI_Update are explicit. The GPU assertions, not the screenshot, establish hidden/reentered execution and invalidation of the old identity.

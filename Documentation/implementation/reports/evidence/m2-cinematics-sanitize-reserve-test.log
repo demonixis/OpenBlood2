@@ -1,0 +1,12 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 58: weapons.private
+1/1 Test #58: weapons.private ..................   Passed   84.16 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+headless    =  84.16 sec*proc (1 test)
+private     =  84.16 sec*proc (1 test)
+weapons     =  84.16 sec*proc (1 test)
+
+Total Test time (real) =  84.17 sec

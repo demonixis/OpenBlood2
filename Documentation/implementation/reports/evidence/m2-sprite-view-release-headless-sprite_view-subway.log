@@ -1,0 +1,144 @@
+543/545 Testing: sprite_view.subway
+543/545 Test: sprite_view.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/sprite_view_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"sprite_view.subway" start time: Oct 16 19:57 CEST
+Output:
+----------------------------------------------------------
+SubwayA frame=SpriteTextures\bloodsplat3.dtx 128x128 zero=14828 partial=1556
+SubwayA frame=SpriteTextures\bloodsplat3.dtx 128x128 zero=14828 partial=1556
+SubwayA frame=SpriteTextures\bloodsplat3.dtx 128x128 zero=14828 partial=1556
+<end of output>
+Test time =   0.11 sec
+----------------------------------------------------------
+Test Passed.
+"sprite_view.subway" end time: Oct 16 19:57 CEST
+"sprite_view.subway" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 19:57 CEST
+
+ai_escape =   0.04 sec*proc
+
+ai_fire =   0.34 sec*proc
+
+ai_follow =   0.13 sec*proc
+
+ai_hit =   0.04 sec*proc
+
+ai_keys =   0.74 sec*proc
+
+ai_locomotion =   0.04 sec*proc
+
+ai_navigation =   0.10 sec*proc
+
+ai_perception =   0.12 sec*proc
+
+ai_recovery =   0.05 sec*proc
+
+ai_runtime =   0.69 sec*proc
+
+ai_script =   0.07 sec*proc
+
+ai_sight =   0.11 sec*proc
+
+ai_state =   1.02 sec*proc
+
+ai_target =   0.12 sec*proc
+
+ai_trigger =   0.09 sec*proc
+
+attachments =   0.14 sec*proc
+
+brushes =   0.68 sec*proc
+
+cameras =   0.56 sec*proc
+
+character =   0.75 sec*proc
+
+character_audio =   0.98 sec*proc
+
+character_motion =   0.04 sec*proc
+
+character_nodes =   0.13 sec*proc
+
+cinematics =   0.41 sec*proc
+
+cli =   0.04 sec*proc
+
+config =   0.01 sec*proc
+
+containers =   0.67 sec*proc
+
+corpses =   0.04 sec*proc
+
+destructable_state =   0.12 sec*proc
+
+doors =   0.62 sec*proc
+
+exits =   0.25 sec*proc
+
+explosions =   0.02 sec*proc
+
+headless =  21.34 sec*proc
+
+interaction =   0.51 sec*proc
+
+inventory_state =   0.12 sec*proc
+
+keyframes =   0.99 sec*proc
+
+lights =   0.30 sec*proc
+
+locomotion =   0.50 sec*proc
+
+model_view =   0.10 sec*proc
+
+movement =   1.35 sec*proc
+
+objectives =   0.26 sec*proc
+
+objects =   0.02 sec*proc
+
+paths =   0.13 sec*proc
+
+pickups =   0.29 sec*proc
+
+player =   0.25 sec*proc
+
+player_keepalive =   0.27 sec*proc
+
+player_restore =   0.14 sec*proc
+
+player_state =   0.12 sec*proc
+
+private =  20.30 sec*proc
+
+pushables =   0.02 sec*proc
+
+randomsound =   0.35 sec*proc
+
+sceneexplosion =   0.31 sec*proc
+
+services =   0.27 sec*proc
+
+sound =   0.37 sec*proc
+
+sprite_view =   0.11 sec*proc
+
+sprites =   0.53 sec*proc
+
+texture =   0.13 sec*proc
+
+triggers =   0.63 sec*proc
+
+weapon_drops =   0.04 sec*proc
+
+weapons =   3.41 sec*proc
+
+world =   0.29 sec*proc
+
+world_view =   0.09 sec*proc
+
+worldpaths =   0.33 sec*proc
+

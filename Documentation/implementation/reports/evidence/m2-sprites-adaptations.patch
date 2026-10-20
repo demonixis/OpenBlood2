@@ -1,0 +1,2017 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 634859e..f28cb5e 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -175,3 +175,14 @@ remain unavailable. SubwayA has 166 live-created source entries, 4 transferred
+ world sounds, 7 SelfTriggers, 372 editor-only and 38 unported entries. Runtime
+ counts remain 173/176 before/after player, 164/167 after nine Keys are consumed.
+ Earlier blanket Sound-loop omissions are superseded only for this subset; M2 stays open.
++
++The latest [sprite evidence](../Documentation/Implementation/M2_SPRITES.md) integrates original DetailSprite with bounded
++SPR manifests, frame clocks, flush placement and independent runtime repeats.
++Read [sprite contracts](docs/SPRITE_CONTRACTS.md). Preserve the source's unchanged rotation,
++flush-only repeat branch, column order and post-repeat difficulty filtering.
++DTX resources are indexed, not decoded or rendered; the overlay is diagnostic.
++SubwayA has 178 live-created entries, 4 transferred world sounds, 7 SelfTriggers,
++372 editor-only and 26 unported entries, with no failures. Runtime counts are
++185/188 before/after player entry, then 176/179 after nine Keys are consumed.
++M2 remains incomplete; earlier DetailSprite omissions are superseded only for
++this bounded subset.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 827f925..2c01c2f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -15,7 +15,7 @@ include(cmake/Dependencies.cmake)
+ configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+ 
+ add_library(engine STATIC src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+-target_sources(engine PRIVATE src/engine/audio.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
++target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
+ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+@@ -32,7 +32,7 @@ add_library(blood2_game STATIC
+     src/game/session.cpp
+     src/game/registration.cpp
+     src/game/server_adapter.cpp)
+-target_sources(blood2_game PRIVATE src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp)
++target_sources(blood2_game PRIVATE src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/LightFX.cpp src/game/original/ClientLightFX.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+@@ -48,13 +48,13 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp)
++add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+ target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+ if(BLOOD2_INSPECTOR)
+-    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_cinematics.cpp src/app/inspector_random_sounds.cpp src/app/inspector_world_sounds.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
++    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_cinematics.cpp src/app/inspector_random_sounds.cpp src/app/inspector_sprites.cpp src/app/inspector_world_sounds.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
+     target_link_libraries(blood2_app PRIVATE imgui)
+ endif()
+ 
+diff --git a/README.md b/README.md
+index c6724fc..8b98466 100644
+--- a/README.md
++++ b/README.md
+@@ -26,9 +26,9 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
+ ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
+ ```
+ 
+-The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **166 source entries** create, including two original RandomSoundFX emitters, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **42 unported runtime entries**, zero failed. Runtime counts before/after player entry are **173/176**, then **164/167** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_RANDOM_SOUNDS.md) records these counts; earlier increment sections below are historical snapshots.
++The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **178 source entries** create, plus **4 transferred world sounds** and **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **26 unported runtime entries**, and zero failed. Runtime counts before/after player entry are **185/188**, then **176/179** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain historical load status. The [latest evidence](../Documentation/Implementation/M2_SPRITES.md) records these counts; earlier sections below are historical snapshots.
+ 
+-The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
++The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Door audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. World textures and a complete game session remain unimplemented; cinematic, random-emitter and world-loop audio are covered by the later continuations below. Sprites shows original placement/repeats, manifest metadata and frame clocks, with a diagnostic overlay; DTX textures are indexed but not decoded.
+ 
+ ## Configuration and Modes
+ 
+@@ -195,10 +195,28 @@ SDL_AUDIODRIVER=dummy ./build/debug/blood2 --random-sounds-smoke --capture build
+ 
+ The [world sound continuation](../Documentation/Implementation/M2_WORLD_SOUNDS.md) adds original built-in Sound loops that
+ outlive their consumed source objects, plus inspection and bounded playback checks.
+-SubwayA now has 166 live-created entries, 4 world-owned sound entries, 372 editor-only
+-and 38 unported entries; runtime counts stay 173/176 before/after player. Streaming
++At that increment, SubwayA had 166 live-created entries, 4 world-owned sound entries, 372 editor-only
++and 38 unported entries; runtime counts were 173/176 before/after player. Streaming
+ and historical VoiceType schemas remain unsupported. M2 remains incomplete.
+ 
+ Use `--world-sounds-smoke --capture build/debug/world-sounds.png` with the configured
+ content root for the loop ownership/output GPU scenario (silent validation:
+ `SDL_AUDIODRIVER=dummy`). Contracts: [world-owned sound](docs/WORLD_SOUND_CONTRACTS.md).
++
++## Original DetailSprite and SPR inspection
++
++The latest [sprite evidence](../Documentation/Implementation/M2_SPRITES.md) integrates original DetailSprite with bounded
++SPR manifests, frame clocks, flush placement and independent runtime repeats.
++Read [sprite contracts](docs/SPRITE_CONTRACTS.md). Preserve the source's unchanged rotation,
++flush-only repeat branch, column order and post-repeat difficulty filtering.
++DTX resources are indexed, not decoded or rendered; the overlay is diagnostic.
++SubwayA has 178 live-created entries, 4 transferred world sounds, 7 SelfTriggers,
++372 editor-only and 26 unported entries, with no failures. Runtime counts are
++185/188 before/after player entry, then 176/179 after nine Keys are consumed.
++M2 remains incomplete; earlier DetailSprite omissions are superseded only for
++this bounded subset.
++
++Use `--sprites-smoke --capture build/debug/sprites.png` with the configured external
++content root to verify the twelve authored sprites, hidden-inspector clocks and
++unload/reload. SPR frames resolve exactly; DTX decoding and world rendering remain
++unavailable. Full gameplay still exits with the explicit M2 gate failure.
+diff --git a/docs/M2_SPRITE_SOURCES.json b/docs/M2_SPRITE_SOURCES.json
+new file mode 100644
+index 0000000..5bd64a6
+--- /dev/null
++++ b/docs/M2_SPRITE_SOURCES.json
+@@ -0,0 +1,104 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "452676e1eba9e19ba37e757cf471090949e68070",
++  "status": "M2 incomplete; original DetailSprite and bounded SPR manifest clocks, no DTX rendering",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/DetailSprite.cpp",
++      "source_line_ranges": [
++        [
++          17,
++          280
++        ]
++      ],
++      "source_sha256": "2a98ed394d5a50ae46a216f929c79ec0ad0434f1ad3bfa1c2035689b43da4f7b",
++      "purpose": "Selected original properties, callbacks, flush ray and independent repeat creation; no save/load."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/DetailSprite.h",
++      "source_line_ranges": [
++        [
++          1,
++          67
++        ]
++      ],
++      "source_sha256": "2c80caebde118277c2b007d112ac1ce2232cb745c53f74956b49ca262528c728",
++      "purpose": "Original class and member defaults; value-owned filename and inspection diagnostics adaptation."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/basetypes_de.h",
++      "source_line_ranges": [
++        [
++          388,
++          400
++        ]
++      ],
++      "source_sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
++      "purpose": "Original OT_SPRITE numeric type."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/de_codes.h",
++      "source_line_ranges": [
++        [
++          117,
++          125
++        ]
++      ],
++      "source_sha256": "75c0fda0c3ea746ff91d05354c7d177d97bbdccb95a22b6955c51d6592f9e21e",
++      "purpose": "Ray flags: IGNORE_NONSOLID without INTERSECT_OBJECTS."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/server_de.h",
++      "source_line_ranges": [
++        [
++          297,
++          304
++        ],
++        [
++          684,
++          700
++        ]
++      ],
++      "source_sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "purpose": "Ray and equivalent SetObjectPos/TeleportObject contracts."
++    },
++    {
++      "source": "sources/lithtech/tools/shared/world/SpriteFile.cpp",
++      "source_line_ranges": [
++        [
++          1,
++          160
++        ]
++      ],
++      "source_sha256": "3221ce13de5023d85e7bee9455d3fb139f9482ab22694b344e3e48601c1821b8",
++      "purpose": "Read-only later-generation SPR layout; verified against actual Blood II manifest bytes, no code import."
++    },
++    {
++      "source": "sources/lithtech/runtime/client/src/sprite.cpp",
++      "source_line_ranges": [
++        [
++          1,
++          182
++        ]
++      ],
++      "source_sha256": "3a1d267c831f4c597ba841eb95e5684fb555a75d02aae2e333d027a4b18d29a7",
++      "purpose": "Read-only later-generation integer millisecond playback reference; not claimed retail Blood II timing."
++    }
++  ],
++  "ports": [
++    "src/game/original/DetailSprite.h",
++    "src/game/original/DetailSprite.cpp"
++  ],
++  "adaptations": [
++    "Value-owned filenames; fixed-width counts with explicit work limits",
++    "Typed solid-primary-world ray with bounded domain and explicit failure",
++    "Bounded SPR parser/cache with exact frame presence; no texture decoder",
++    "Per-instance looping integer-period clock with fractional tick carry",
++    "Durable load failures, independent repeat ownership and truthful inspection"
++  ],
++  "unsupported": [
++    "DTX decoding and sprite world rendering",
++    "Full SpriteControl API, clipping, save/restore",
++    "Retail timing/visual/physics parity and complete M2 acceptance"
++  ]
++}
+diff --git a/docs/MODEL_AND_COLLISION_CONTRACTS.md b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+index 43ecb2d..5238aba 100644
+--- a/docs/MODEL_AND_COLLISION_CONTRACTS.md
++++ b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+@@ -149,3 +149,11 @@ changes, and grounded FLAG_STAIRSTEP movement uses an up/forward/down sweep.
+ The local GetMovementState support query and weapon IntersectSegment are also
+ implemented; this does not provide every original PhysicsLT query or moving BSP
+ collision. Keep source rules and replacement-solver limitations distinct.
++
++## Sprite resource continuation
++
++[Sprite contracts](SPRITE_CONTRACTS.md) add bounded SPR manifests and per-instance
++frame clocks to the existing active-object animation traversal. No model events
++are synthesized for sprites. CastWorldRay uses the solid primary-world index for
++original DetailSprite flush placement; dynamic objects are excluded by its source
++query flags. DTX decoding/rendering and verified retail ray/timing parity remain open.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index a319908..38ea620 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -395,3 +395,11 @@ bounded full-clip resampling, loader disposition and inspection. Runtime filenam
+ initialization is safe; streaming and region metadata explicitly reject playback.
+ Later-generation LithTech region-loop code was reviewed only, not imported.
+ No prototype backend or dependency was added. M2 remains incomplete.
++
++## DetailSprite and SPR continuation
++
++[Selected original files and hashes](M2_SPRITE_SOURCES.json) document DetailSprite
++properties, initialization and independent repeats. [Contracts](SPRITE_CONTRACTS.md)
++separate original rules from bounded ray/parser/clock adaptations. Later-generation
++SPR references were consulted and checked against Blood II manifests; no donor
++reader or DTX decoder was imported. Save/restore and sprite rendering remain open.
+diff --git a/docs/SPRITE_CONTRACTS.md b/docs/SPRITE_CONTRACTS.md
+new file mode 100644
+index 0000000..b3bb0d2
+--- /dev/null
++++ b/docs/SPRITE_CONTRACTS.md
+@@ -0,0 +1,90 @@
++# Original DetailSprite and SPR resources
++
++M2 remains incomplete. Read [object lifetime](OBJECT_CONTRACTS.md),
++[world loading](WORLD_CONTRACTS.md), [collision](MODEL_AND_COLLISION_CONTRACTS.md),
++[source selections](M2_SPRITE_SOURCES.json) and
++[implementation evidence](../../Documentation/Implementation/M2_SPRITES.md).
++
++## Source behavior
++
++DetailSprite retains the original B2BaseClass callback chain and OT_SPRITE=3.
++World/string precreate reads Filename, ScaleX/Y, FlushWithWorld, Rotatable,
++Chromakey, Repeat, RepeatX/Y and SpacingX/Y; runtime creation retains the supplied
++creation structure. The registered Rotatable default is true, but the runtime
++constructor's member is false. Precreate clears the skin, sets the scale and
++visible/rotateable/chromakey flags; BaseClass property overrides still run after
++these writes. Initial update disables the 0.1-second schedule and marks saveable.
++The saveable flag does not imply save/restore support.
++
++Flush uses the authored forward vector with IGNORE_NONSOLID and without
++INTERSECT_OBJECTS. The typed CastWorldRay queries only solid primary-world
++triangles. It excludes dynamic objects/world models and clips an infinite ray to
++the existing +/-10,000,000 collision domain. Invalid/unavailable differs from a
++miss. A hit moves the object to point + normal * 0.25 using TeleportObject, the
++SDK-documented equivalent of SetObjectPos. Rotation stays unchanged: the source
++only assigns a local forward variable. This is replacement collision, not a
++verified recreation of retail ray semantics or backface behavior.
++
++Repeats execute only inside the flush branch, including on a ray miss. Creation
++order is the remaining first Y column, then each X column with all Y rows. Offsets
++use the original up/right vectors, not the hit normal. RepeatX=0 retains the first
++Y column; RepeatY=0 creates no children. Runtime children inherit position,
++rotation, scale, flags and filename, while their own Repeat/Flush members remain
++false. They never recursively repeat. Children are independent; parent removal
++does not remove them. Source B2 difficulty filtering runs after child creation,
++so filtering a parent can leave its runtime children alive.
++
++Filename is value-owned; diagnostic child handles do not own objects. Signed
++counts cast to unsigned as in the source, then reject outside 0..1024 or when
++max(1, RepeatX)*RepeatY exceeds 1024. Nonfinite/out-of-domain scale, spacing and
++child positions fail. These are explicit safety bounds; negative counts do not
++produce huge unsigned loops. Partial repeat failures remove the failed parent
++but retain already created independent children, with an explicit error. Unknown
++properties, restore, missing SPR and missing frame resources fail creation.
++
++## Manifest and playback services
++
++SPR has five little-endian uint32 fields: frame count, frame rate, transparency,
++translucency and color key; each frame has a uint16 byte length and texture path.
++The later-generation SpriteFile/runtime readers confirm this layout; the actual
++Blood II resources independently pass it. No donor implementation is imported.
++The reader accepts 1..4096 frames, 1..1000 fps, boolean flags, paths up to 1000 bytes,
++and at most 1 MiB. Truncation, NULs, unsafe/empty paths, non-DTX frames and trailing
++bytes reject without changing the previous decoded manifest.
++
++SpriteStore resolves exact mounted SPR/frame paths, caches shared immutable
++manifests by archive and byte range, rechecks frame presence on cache hits and
++releases cache entries on world unload. It does not decode DTX or infer aliases.
++A resource being indexed is not evidence of valid texture pixels. The manifest
++binds after original precreate and before initial update. A failed binding retains
++a durable Failed world entry, never a successful placeholder instance.
++
++Each live active object has its own looping frame clock. It uses the integer
++1000/fps millisecond period visible in the later-generation runtime reference,
++with fractional milliseconds retained across simulation steps. This timing policy
++is an explicit adaptation, not verified Blood II retail timing. Visibility and
++inspector state do not stop it; explicit inactive state pauses it. The existing
++model-update traversal advances sprites without a separate per-frame snapshot.
++No model-string events are invented for sprites. Invalid deltas leave clocks
++unchanged; unload releases instances/manifests and invalidates inspection IDs.
++
++## Inspection and limits
++
++The Sprites tab shows authored source dispositions, failures, live and runtime
++repeat instances, hidden/inactive state, transform, flags, original properties,
++flush result/polygon, repeat handles, manifest metadata and current frame presence.
++Object IDs distinguish unnamed/repeated instances. The XZ overlay shows positions
++and authored forward axes only. DTX decoding,
++textured world drawing, billboards, transparency/depth behavior, clipping,
++SpriteControl APIs, save/restore and verified retail visual/timing parity remain
++unavailable. The ordinary World view retains all rejected source properties.
++
++SubwayA's twelve authored blood splats all bind sprites\bloodsplat3.spr: one
++frame, 15 fps, transparency true, translucency false, color key 0, referencing
++SpriteTextures\bloodsplat3.dtx. Scale is 0.5, Y=129, Rotatable/Chromakey true,
++Flush/Repeat false. Across 57 readable worlds, 124 DetailSprite entries contain
++120 valid referenced manifests, four missing/empty references, and one old
++TypeAction schema rejection. The two accepted flush placements hit real Temple
++entrance geometry. No catalog entry repeats; synthetic tests cover that branch.
++The known 16_bridge.dat structural rejection remains unchanged. No commercial
++resource bytes are copied into the repository.
+diff --git a/docs/WORLD_CONTRACTS.md b/docs/WORLD_CONTRACTS.md
+index dbbb8ee..0c41b7e 100644
+--- a/docs/WORLD_CONTRACTS.md
++++ b/docs/WORLD_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Resource, World and Session Contracts
+ 
++The later [sprite contracts](SPRITE_CONTRACTS.md) add original DetailSprite,
++strict SPR manifest/frame-reference binding and durable creation failures. DTX
++pixels remain undecoded; the complete M2 gate stays open.
++
+ The later [world sound contracts](WORLD_SOUND_CONTRACTS.md) add the selected built-in
+ Sound whole-clip loops and consumed-source accounting. Earlier blanket loop/world
+ ownership omissions below are historical; streaming and the M2 gate remain open.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 986ad83..f4ab4a6 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -585,6 +585,12 @@ namespace OpenBlood2
+                     draw_lights(game, selection);
+                     ImGui::EndTabItem();
+                 }
++                if (ImGui::BeginTabItem("Sprites", nullptr, select_sprites ? ImGuiTabItemFlags_SetSelected : 0))
++                {
++                    select_sprites = false;
++                    draw_sprites(game, selection);
++                    ImGui::EndTabItem();
++                }
+                 if (ImGui::BeginTabItem("World sounds", nullptr,
+                                         select_world_sounds ? ImGuiTabItemFlags_SetSelected : 0))
+                 {
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index ae30427..849e8aa 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -21,6 +21,9 @@ namespace OpenBlood2
+         ObjectId trigger_selection{}, trigger_request{};
+         std::string trigger_command;
+         bool grant_key_request = false;
++        bool select_sprites = false;
++        ObjectId sprite_selection{};
++        void draw_sprites(GameSession&, ObjectSelection&);
+         bool select_world_sounds = false;
+         SoundId world_sound_selection = 0;
+         void draw_world_sounds(GameSession&);
+diff --git a/src/app/inspector_sprites.cpp b/src/app/inspector_sprites.cpp
+new file mode 100644
+index 0000000..9586f0a
+--- /dev/null
++++ b/src/app/inspector_sprites.cpp
+@@ -0,0 +1,122 @@
++#include "game/original/DetailSprite.h"
++#include "inspector.h"
++#include <algorithm>
++#include <imgui.h>
++namespace OpenBlood2
++{
++    void Inspector::draw_sprites(GameSession& game, ObjectSelection& selection)
++    {
++        ImGui::TextWrapped("Original DetailSprite placement and real SPR frame clock. DTX resources are indexed, "
++                           "not decoded. Texture rendering and billboard geometry remain unavailable.");
++        if (ImGui::CollapsingHeader("Authored sources (including failed / filtered / removed)"))
++            for (size_t i = 0; i < game.entries.size(); ++i)
++                if (game.world.objects[i].class_name == "DetailSprite")
++                {
++                    const auto& e = game.entries[i];
++                    ImGui::Text("Source %zu: %s", i, entry_state_name(e.state));
++                    if (!e.detail.empty())
++                        ImGui::TextWrapped("%s", e.detail.c_str());
++                }
++        if (!ImGui::BeginTable("Sprites", 2, ImGuiTableFlags_Resizable))
++            return;
++        ImGui::TableSetupColumn("Instances", ImGuiTableColumnFlags_WidthFixed, 220);
++        ImGui::TableSetupColumn("State");
++        ImGui::TableNextColumn();
++        std::vector<const ObjectRecord*> sprites;
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* r = game.objects.get(id);
++            if (!r || !r->sprite)
++                continue;
++            sprites.push_back(r);
++            if (!game.objects.get(sprite_selection))
++                sprite_selection = id;
++            ImGui::PushID(int(id.slot));
++            auto label = std::string(r->state.m_Name) + " #" + std::to_string(id.slot);
++            if (r->reason == Creation::Runtime)
++                label += " (runtime)";
++            if (!(r->state.m_Flags & FLAG_VISIBLE))
++                label += " hidden";
++            if (r->activity != OBJSTATE_ACTIVE)
++                label += " inactive";
++            if (ImGui::Selectable(label.c_str(), sprite_selection == id))
++                sprite_selection = selection.id = id;
++            ImGui::PopID();
++        }
++        ImGui::TableNextColumn();
++        if (const auto* r = game.objects.get(sprite_selection); r && r->sprite)
++        {
++            const auto& s = *r->sprite;
++            const auto pos = r->state.m_Pos;
++            const auto scale = r->state.m_Scale;
++            ImGui::Text("%s / %s", creation_name(r->reason), life_name(r->life));
++            ImGui::Text("Position %.2f %.2f %.2f", pos.x, pos.y, pos.z);
++            ImGui::Text("Scale %.3f %.3f %.3f | flags 0x%x", scale.x, scale.y, scale.z, r->state.m_Flags);
++            const auto q = r->state.m_Rotation;
++            ImGui::Text("Rotation quaternion %.3f %.3f %.3f %.3f", q.m_Vec.x, q.m_Vec.y, q.m_Vec.z, q.m_Spin);
++            ImGui::Text("SPR %u fps / %zu frames | frame %u | %.3f ms", s.fps, s.frames.size(), r->sprite_track.frame,
++                        r->sprite_track.milliseconds);
++            ImGui::Text("Transparent %d / translucent %d / color key 0x%x", s.transparent, s.translucent, s.color_key);
++            ImGui::TextWrapped("Manifest: %s", r->state.m_Filename);
++            const auto& path = s.frames[r->sprite_track.frame];
++            ImGui::TextWrapped("Frame: %s [%s; not decoded]", path.c_str(),
++                               game.resources.find(path) ? "indexed" : "missing");
++            if (const auto* d = dynamic_cast<const DetailSprite*>(r->game.get()))
++            {
++                ImGui::Text("Flush %d / rotatable %d / chromakey %d / repeat %d", d->flush, d->rotatable, d->chromakey,
++                            d->repeat);
++                ImGui::Text("Repeat %u x %u | spacing %.2f %.2f | generated %zu", d->repeat_x, d->repeat_y,
++                            d->spacing_x, d->spacing_y, d->children.size());
++                if (d->flush)
++                    ImGui::Text("Ray: %s | polygon %u",
++                                d->flush_result == SegmentResult::Hit    ? "hit"
++                                : d->flush_result == SegmentResult::Miss ? "miss"
++                                                                         : "failed",
++                                d->flush_hit.polygon);
++                if (!d->error.empty())
++                    ImGui::TextWrapped("%s", d->error.c_str());
++                if (!d->children.empty() && ImGui::CollapsingHeader("Independent repeat instances"))
++                    for (auto h : d->children)
++                    {
++                        auto* child = game.objects.get(h);
++                        if (child)
++                            ImGui::Text("#%u:%u / %s / %.1f %.1f %.1f", child->id.slot, child->id.generation,
++                                        life_name(child->life), child->state.m_Pos.x, child->state.m_Pos.y,
++                                        child->state.m_Pos.z);
++                        else
++                            ImGui::TextUnformatted("removed");
++                    }
++            }
++            ImGui::TextUnformatted("XZ placement and authored forward axes (diagnostic overlay)");
++            const auto origin = ImGui::GetCursorScreenPos();
++            const auto available = ImGui::GetContentRegionAvail();
++            ImVec2 size(std::max(100.0f, available.x), std::clamp(available.y - 15, 80.0f, 180.0f));
++            DVector low = pos, high = pos;
++            for (auto* v : sprites)
++            {
++                low.x = std::min(low.x, v->state.m_Pos.x);
++                low.z = std::min(low.z, v->state.m_Pos.z);
++                high.x = std::max(high.x, v->state.m_Pos.x);
++                high.z = std::max(high.z, v->state.m_Pos.z);
++            }
++            const float factor = std::min((size.x - 30) / std::max(1.0f, high.x - low.x),
++                                          (size.y - 30) / std::max(1.0f, high.z - low.z));
++            auto point = [&](DVector p)
++            { return ImVec2(origin.x + 15 + (p.x - low.x) * factor, origin.y + 15 + (p.z - low.z) * factor); };
++            auto* draw = ImGui::GetWindowDrawList();
++            draw->PushClipRect(origin, ImVec2(origin.x + size.x, origin.y + size.y), true);
++            draw->AddRectFilled(origin, ImVec2(origin.x + size.x, origin.y + size.y), IM_COL32(20, 24, 30, 255));
++            for (auto* v : sprites)
++            {
++                auto p = point(v->state.m_Pos);
++                auto dir = rotate_vector({0, 0, 1}, v->state.m_Rotation);
++                draw->AddCircleFilled(p, v == r ? 5 : 3,
++                                      v == r ? IM_COL32(240, 170, 50, 255) : IM_COL32(120, 180, 210, 255));
++                draw->AddLine(p, ImVec2(p.x + dir.x * 18, p.y + dir.z * 18), IM_COL32(150, 190, 210, 255));
++            }
++            draw->PopClipRect();
++            ImGui::Dummy(size);
++        }
++        ImGui::EndTable();
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 26f8474..5abe703 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -14,6 +14,7 @@
+ #include "objectives_smoke.h"
+ #include "pickup_smoke.h"
+ #include "random_sound_smoke.h"
++#include "sprite_smoke.h"
+ #include "trigger_smoke.h"
+ #include "world_sound_smoke.h"
+ 
+@@ -187,7 +188,7 @@ namespace
+             selection.id = smoke_camera;
+         }
+         OpenBlood2::ObjectId smoke_random_sound{};
+-        bool random_sound_hidden = false, world_sound_hidden = false;
++        bool random_sound_hidden = false, world_sound_hidden = false, sprite_hidden = false;
+         if (options.random_sounds_smoke)
+         {
+             if (!OpenBlood2::prepare_random_sound_smoke(game, smoke_random_sound))
+@@ -237,7 +238,8 @@ namespace
+                                    !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke &&
+                                    !options.pickups_smoke && !options.objectives_smoke && !options.cameras_smoke &&
+                                    !options.keyframes_smoke && !options.lights_smoke && !options.cinematics_smoke &&
+-                                   !options.random_sounds_smoke && !options.world_sounds_smoke;
++                                   !options.random_sounds_smoke && !options.world_sounds_smoke &&
++                                   !options.sprites_smoke;
+         inspector.select_weapons = options.weapons_smoke;
+         inspector.select_movement = options.movement_smoke;
+         inspector.select_containers = options.containers_smoke;
+@@ -247,6 +249,7 @@ namespace
+         inspector.select_cameras = options.cameras_smoke;
+         inspector.select_random_sounds = options.random_sounds_smoke;
+         inspector.select_world_sounds = options.world_sounds_smoke;
++        inspector.select_sprites = options.sprites_smoke;
+         inspector.random_sound_selection = smoke_random_sound;
+         inspector.select_cinematics = options.cinematics_smoke;
+         inspector.cinematic_selection = smoke_cinematic;
+@@ -503,8 +506,8 @@ namespace
+                            : (options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
+                               options.interaction_smoke || options.brushes_smoke || options.pickups_smoke ||
+                               options.objectives_smoke || options.cameras_smoke || options.keyframes_smoke ||
+-                              options.lights_smoke || options.cinematics_smoke || options.world_sounds_smoke ||
+-                              options.random_sounds_smoke)
++                              options.sprites_smoke || options.lights_smoke || options.cinematics_smoke ||
++                              options.world_sounds_smoke || options.random_sounds_smoke)
+                                ? 14u
+                                : 2u) &&
+                 !captured && !options.capture_file.empty();
+@@ -651,6 +654,8 @@ namespace
+                     use.key.down = frames == hide_frame;
+                     event_ok = SDL_PushEvent(&use);
+                 }
++                if (options.sprites_smoke && frames == show_frame - 1)
++                    sprite_hidden = OpenBlood2::check_sprite_smoke(game);
+                 if (options.world_sounds_smoke && frames == show_frame - 1)
+                     world_sound_hidden = OpenBlood2::check_world_sound_smoke(game);
+                 if (options.random_sounds_smoke && frames == show_frame - 1)
+@@ -788,6 +793,7 @@ namespace
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
++                (options.sprites_smoke && (!sprite_hidden || !OpenBlood2::check_sprite_smoke(game))) ||
+                 (options.world_sounds_smoke && (!world_sound_hidden || !OpenBlood2::check_world_sound_smoke(game))) ||
+                 (options.random_sounds_smoke &&
+                  (!random_sound_hidden || !OpenBlood2::check_random_sound_smoke(game, smoke_random_sound))) ||
+@@ -823,6 +829,9 @@ namespace
+             if (options.lights_smoke)
+                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
+                              "and after reload; evaluated radius/color checked; world illumination unavailable");
++            if (options.sprites_smoke)
++                spdlog::info("SPRITES smoke: 12 original DetailSprites, SPR manifests, frame clocks, hidden UI and "
++                             "unload/reload verified; textures indexed, not rendered");
+             if (options.world_sounds_smoke)
+                 spdlog::info("WORLD SOUNDS smoke: four authored loops survive consumed Sound objects, advance with "
+                              "hidden UI and reload; SDL PCM submission verified");
+@@ -918,6 +927,7 @@ int main(int argc, char** argv)
+                      "  --interaction-smoke GPU original USE and rotating door inspection\n"
+                      "  --pickups-smoke   GPU original ammo pickup, hidden collection and reload\n"
+                      "  --objectives-smoke GPU original objectives and localized text, hidden delivery/reload\n"
++                     "  --sprites-smoke    GPU original sprite placement, SPR clocks and reload\n"
+                      "  --random-sounds-smoke  GPU original random sound, PCM output and reload\n"
+                      "  --cinematics-smoke  GPU original cue, WAV mixing, SDL output and reload\n"
+                      "  --lights-smoke      GPU original light state, keyframe placement and reload\n"
+diff --git a/src/app/sprite_smoke.cpp b/src/app/sprite_smoke.cpp
+new file mode 100644
+index 0000000..2526d92
+--- /dev/null
++++ b/src/app/sprite_smoke.cpp
+@@ -0,0 +1,21 @@
++#include "sprite_smoke.h"
++#include "game/original/DetailSprite.h"
++namespace OpenBlood2
++{
++    bool check_sprite_smoke(GameSession& g)
++    {
++        unsigned count = 0;
++        for (const auto& e : g.entries)
++        {
++            const auto* r = g.objects.get(e.object);
++            if (!r || !dynamic_cast<const DetailSprite*>(r->game.get()))
++                continue;
++            if (e.state != EntryState::Created || !r->sprite || r->sprite->frames.size() != 1 || r->sprite->fps != 15 ||
++                r->sprite_track.milliseconds <= 0 || r->sprite_track.frame != 0 ||
++                !g.resources.find(r->sprite->frames[0]) || r->state.m_Pos.y != 129 || r->state.m_Scale.x != .5f)
++                return false;
++            ++count;
++        }
++        return count == 12;
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/sprite_smoke.h b/src/app/sprite_smoke.h
+new file mode 100644
+index 0000000..a2879f5
+--- /dev/null
++++ b/src/app/sprite_smoke.h
+@@ -0,0 +1,6 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool check_sprite_smoke(GameSession&);
++}
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index 99c78e0..33c1fce 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -125,6 +125,8 @@ namespace OpenBlood2
+                 options.player_smoke = true;
+                 options.containers_smoke = true;
+             }
++            else if (arg == "--sprites-smoke")
++                options.world_smoke = options.player_smoke = options.sprites_smoke = true;
+             else if (arg == "--world-sounds-smoke")
+                 options.world_smoke = options.player_smoke = options.world_sounds_smoke = true;
+             else if (arg == "--random-sounds-smoke")
+@@ -233,7 +235,8 @@ namespace OpenBlood2
+                 int(options.doors_smoke) + int(options.triggers_smoke) + int(options.interaction_smoke) +
+                 int(options.brushes_smoke) + int(options.pickups_smoke) + int(options.objectives_smoke) +
+                 int(options.cameras_smoke) + int(options.keyframes_smoke) + int(options.lights_smoke) +
+-                int(options.cinematics_smoke) + int(options.random_sounds_smoke) + int(options.world_sounds_smoke) >
++                int(options.cinematics_smoke) + int(options.random_sounds_smoke) + int(options.world_sounds_smoke) +
++                int(options.sprites_smoke) >
+             1)
+         {
+             error = "Choose one player smoke scenario";
+diff --git a/src/engine/config.h b/src/engine/config.h
+index ce346bd..e011d8e 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -24,7 +24,7 @@ namespace OpenBlood2
+         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
+              interaction_smoke = false, brushes_smoke = false, pickups_smoke = false, objectives_smoke = false,
+              cameras_smoke = false, keyframes_smoke = false, worldpaths_smoke = false, lights_smoke = false,
+-             cinematics_smoke = false, random_sounds_smoke = false, world_sounds_smoke = false;
++             cinematics_smoke = false, random_sounds_smoke = false, world_sounds_smoke = false, sprites_smoke = false;
+         bool start_game = false;
+         bool explicit_config = false;
+         bool help = false;
+diff --git a/src/engine/objects.cpp b/src/engine/objects.cpp
+index 2099828..f5a1bc1 100644
+--- a/src/engine/objects.cpp
++++ b/src/engine/objects.cpp
+@@ -395,6 +395,17 @@ namespace OpenBlood2
+                 object->world_model_basis = object->state.m_Rotation;
+             }
+         }
++        if (state.m_ObjectType == OT_SPRITE)
++        {
++            std::string error = "Sprite services are not attached";
++            if (!sprites || !sprites->load(state.m_Filename, object->sprite, error))
++            {
++                contexts_.pop_back();
++                remove(handle);
++                fail(ObjectError::Unsupported, std::string(state.m_Name) + ": " + error);
++                return nullptr;
++            }
++        }
+         if (state.m_ObjectType == OT_MODEL && state.m_Filename[0])
+         {
+             if (models)
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index fd51dbc..bc895c4 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ 
+ #include "engine/model.h"
++#include "engine/sprite.h"
+ #include "game/legacy/cpp_engineobjects_de.h"
+ #include "game/mover_messages.h"
+ #include <map>
+@@ -103,6 +104,8 @@ namespace OpenBlood2
+         MoverResult body_result = MoverResult::Moved;
+         bool client_movement = false; // Local MoveMgr owns integration while associated.
+         std::shared_ptr<const Model> model;
++        std::shared_ptr<const Sprite> sprite;
++        SpriteTrack sprite_track;
+         std::shared_ptr<const ContainerShape> container;
+         // Current posed shell plus immutable authored basis for drift-free rotation.
+         std::shared_ptr<const ContainerShape> world_model_base;
+@@ -125,6 +128,7 @@ namespace OpenBlood2
+     {
+       public:
+         const World* world = nullptr;
++        SpriteStore* sprites = nullptr;
+         ModelStore* models = nullptr; // Optional decoded resources, attached before creation.
+         Objects() = default;
+         ~Objects();
+diff --git a/src/engine/sprite.cpp b/src/engine/sprite.cpp
+new file mode 100644
+index 0000000..1483625
+--- /dev/null
++++ b/src/engine/sprite.cpp
+@@ -0,0 +1,91 @@
++#include "engine/sprite.h"
++#include "engine/formats/reader.h"
++#include <cmath>
++namespace OpenBlood2
++{
++    bool read_sprite(std::span<const std::uint8_t> bytes, Sprite& out, std::string& error)
++    {
++        error.clear();
++        Reader r(bytes);
++        Sprite s;
++        const auto count = r.u32();
++        s.fps = r.u32();
++        const auto transparent = r.u32(), translucent = r.u32();
++        s.color_key = r.u32();
++        if (bytes.size() > 1024 * 1024 || !r.good() || count == 0 || count > 4096 || s.fps == 0 || s.fps > 1000 ||
++            transparent > 1 || translucent > 1)
++        {
++            error = "Invalid SPR header/count/rate/flags";
++            return false;
++        }
++        s.transparent = transparent != 0;
++        s.translucent = translucent != 0;
++        for (unsigned i = 0; i < count; ++i)
++        {
++            auto name = r.string(1000);
++            std::string canonical;
++            if (!r.good() || !resource_path(name, canonical) || !canonical.ends_with(".dtx"))
++            {
++                error = "Invalid SPR frame resource";
++                return false;
++            }
++            s.frames.push_back(std::move(name));
++        }
++        if (!r.good() || r.remaining())
++        {
++            error = "Trailing or truncated SPR bytes";
++            return false;
++        }
++        out = std::move(s);
++        return true;
++    }
++    bool advance_sprite(const Sprite& s, SpriteTrack& track, double seconds)
++    {
++        if (!std::isfinite(seconds) || seconds < 0 || seconds > 60 || s.fps == 0 || s.fps > 1000 || s.frames.empty() ||
++            s.frames.size() > 4096 || !std::isfinite(track.milliseconds) || track.milliseconds < 0)
++            return false;
++        // Later LithTech SPR clock uses integer milliseconds per frame. Fractional
++        // milliseconds are retained here across simulation ticks, independent of UI.
++        const auto period = 1000 / s.fps;
++        const double duration = period * s.frames.size();
++        track.milliseconds = std::fmod(track.milliseconds + seconds * 1000, duration);
++        track.frame = static_cast<unsigned>(track.milliseconds / period);
++        return true;
++    }
++    bool SpriteStore::load(std::string_view path, std::shared_ptr<const Sprite>& out, std::string& error)
++    {
++        out.reset();
++        error.clear();
++        const auto* resource = resources_.find(path);
++        std::string canonical;
++        if (!resource || !resource_path(path, canonical) || !canonical.ends_with(".spr") ||
++            resource->size > 1024 * 1024)
++        {
++            error = "Missing, oversized or non-SPR sprite resource: " + std::string(path);
++            return false;
++        }
++        const auto key = path_text(resource->archive) + ":" + std::to_string(resource->offset) + ":" +
++                         std::to_string(resource->size);
++        std::shared_ptr<const Sprite> loaded;
++        if (auto it = cache_.find(key); it != cache_.end())
++            loaded = it->second.lock();
++        if (!loaded)
++        {
++            std::vector<std::uint8_t> bytes;
++            auto decoded = std::make_shared<Sprite>();
++            if (!resources_.read(path, bytes, error) || !read_sprite(bytes, *decoded, error))
++                return false;
++            loaded = std::move(decoded);
++        }
++        // Recheck exact mount resolution even on a cache hit. Presence is not decoding.
++        for (const auto& frame : loaded->frames)
++            if (!resources_.find(frame))
++            {
++                error = "SPR frame resource not mounted: " + frame;
++                return false;
++            }
++        cache_[key] = loaded;
++        out = std::move(loaded);
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/sprite.h b/src/engine/sprite.h
+new file mode 100644
+index 0000000..a30addd
+--- /dev/null
++++ b/src/engine/sprite.h
+@@ -0,0 +1,34 @@
++#pragma once
++#include "engine/resources.h"
++#include <memory>
++namespace OpenBlood2
++{
++    struct Sprite
++    {
++        unsigned fps = 0;
++        bool transparent = false, translucent = false;
++        std::uint32_t color_key = 0;
++        std::vector<std::string> frames; // Resource names, NOT decoded textures.
++    };
++    struct SpriteTrack
++    {
++        double milliseconds = 0;
++        unsigned frame = 0;
++    };
++    bool read_sprite(std::span<const std::uint8_t>, Sprite&, std::string&);
++    bool advance_sprite(const Sprite&, SpriteTrack&, double seconds);
++    class SpriteStore
++    {
++      public:
++        explicit SpriteStore(Resources& resources) : resources_(resources) {}
++        bool load(std::string_view, std::shared_ptr<const Sprite>&, std::string&);
++        void clear()
++        {
++            cache_.clear();
++        }
++
++      private:
++        Resources& resources_;
++        std::map<std::string, std::weak_ptr<const Sprite>> cache_;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/legacy/basedefs_de.h b/src/game/legacy/basedefs_de.h
+index 5b530a4..fbb44be 100644
+--- a/src/game/legacy/basedefs_de.h
++++ b/src/game/legacy/basedefs_de.h
+@@ -69,7 +69,7 @@ template <std::size_t N> void legacy_copy(char (&to)[N], const char* from)
+ #define SAFE_STRCPY(dest, src) legacy_copy(dest, src)
+ inline constexpr int MAX_CS_FILENAME_LEN = 100;
+ inline constexpr int MAX_GP_STRING_LEN = 200;
+-inline constexpr DBYTE OT_NORMAL = 0, OT_MODEL = 1, OT_WORLDMODEL = 2, OT_LIGHT = 4, OT_CONTAINER = 9;
++inline constexpr DBYTE OT_NORMAL = 0, OT_MODEL = 1, OT_WORLDMODEL = 2, OT_SPRITE = 3, OT_LIGHT = 4, OT_CONTAINER = 9;
+ inline constexpr DDWORD FLAG_FULLPOSITIONRES = 1u << 8, FLAG_GOTHRUWORLD = 1u << 21, FLAG_FORCECLIENTUPDATE = 1u << 24;
+ inline constexpr DDWORD FLAG_MODELGOURAUDSHADE = 1u << 3, FLAG_ANIMTRANSITION = 1u << 7, FLAG_YROTATION = 1u << 11,
+                         FLAG_STAIRSTEP = 1u << 18;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 2a09af8..c33d9ba 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -59,6 +59,7 @@ class ServerDE : public CSBase
+     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
+     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
+     virtual float GetWorldTime() = 0;
++    virtual OpenBlood2::SegmentResult CastWorldRay(DVector, DVector, OpenBlood2::SegmentHit&) = 0;
+     virtual OpenBlood2::SegmentResult IntersectSegment(
+         DVector from, DVector to, HOBJECT ignore, OpenBlood2::SegmentHit&, bool fire_through = false,
+         OpenBlood2::SegmentObjects objects = OpenBlood2::SegmentObjects::SolidOnly) = 0;
+diff --git a/src/game/original/DetailSprite.cpp b/src/game/original/DetailSprite.cpp
+new file mode 100644
+index 0000000..8eba068
+--- /dev/null
++++ b/src/game/original/DetailSprite.cpp
+@@ -0,0 +1,134 @@
++// Selected original ObjectDLL/DetailSprite.cpp. Value-owned filename; bounded repeat work.
++#include "DetailSprite.h"
++#include "engine/collision.h"
++#include <algorithm>
++using namespace OpenBlood2;
++bool DetailSprite::ReadProp()
++{
++    GenericProp p;
++    if (g_pServerDE->GetPropGeneric("Filename", &p) == DE_OK)
++        filename = p.m_String;
++    g_pServerDE->GetPropReal("ScaleX", &scale.x);
++    g_pServerDE->GetPropReal("ScaleY", &scale.y);
++    g_pServerDE->GetPropReal("SpacingX", &spacing_x);
++    g_pServerDE->GetPropReal("SpacingY", &spacing_y);
++    auto boolean = [&](const char* name, bool& out)
++    {
++        if (g_pServerDE->GetPropGeneric(name, &p) == DE_OK)
++            out = p.m_Bool != 0;
++    };
++    boolean("Rotatable", rotatable);
++    boolean("FlushWithWorld", flush);
++    boolean("Chromakey", chromakey);
++    boolean("Repeat", repeat);
++    if (g_pServerDE->GetPropGeneric("RepeatX", &p) == DE_OK)
++        repeat_x = static_cast<DDWORD>(p.m_Long);
++    if (g_pServerDE->GetPropGeneric("RepeatY", &p) == DE_OK)
++        repeat_y = static_cast<DDWORD>(p.m_Long);
++    // Source signed-to-unsigned counts can otherwise produce unbounded creation.
++    return repeat_x <= 1024 && repeat_y <= 1024 && std::uint64_t(std::max(1u, repeat_x)) * repeat_y <= 1024 &&
++           physics_vector(scale) && physics_vector({spacing_x, spacing_y, 0});
++}
++DDWORD DetailSprite::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE)
++    {
++        if (!data || reason == 3)
++            return 0;
++        if (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP)
++        {
++            if (!ReadProp())
++                return 0;
++            auto& state = *static_cast<ObjectCreateStruct*>(data);
++            state.m_SkinName[0] = 0;
++            state.m_NextUpdate = .1f;
++            state.m_Scale = scale;
++            state.m_Flags |= FLAG_VISIBLE;
++            if (rotatable || flush)
++                state.m_Flags |= FLAG_ROTATEABLESPRITE;
++            if (chromakey)
++                state.m_Flags |= FLAG_SPRITECHROMAKEY;
++            if (!filename.empty())
++                legacy_copy(state.m_Filename, filename.c_str());
++        }
++    }
++    else if (message == MID_INITIALUPDATE && !InitialUpdate())
++        g_pServerDE->RemoveObject(m_hObject);
++    return B2BaseClass::EngineMessageFn(message, data, reason);
++}
++bool DetailSprite::InitialUpdate()
++{
++    g_pServerDE->SetNextUpdate(m_hObject, 0);
++    g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3));
++    if (!flush)
++        return true;
++    DVector pos;
++    DRotation rotation;
++    g_pServerDE->GetObjectPos(m_hObject, &pos);
++    g_pServerDE->GetObjectRotation(m_hObject, &rotation);
++    auto up = rotate_vector({0, 1, 0}, rotation), right = rotate_vector({1, 0, 0}, rotation);
++    flush_result = g_pServerDE->CastWorldRay(pos, rotate_vector({0, 0, 1}, rotation), flush_hit);
++    if (flush_result == SegmentResult::Unavailable || flush_result == SegmentResult::Invalid)
++    {
++        error = "DetailSprite flush ray unavailable/invalid";
++        return false;
++    }
++    if (flush_result == SegmentResult::Hit)
++    {
++        pos = vector_add(flush_hit.point, vector_scale(flush_hit.normal, .25f));
++        if (g_pServerDE->TeleportObject(m_hObject, &pos) != DE_OK)
++        {
++            error = "DetailSprite flush placement rejected";
++            return false;
++        }
++        // Original assigns a local forward vector, but never changes object rotation.
++    }
++    if (!repeat)
++        return true;
++    up = vector_scale(up, spacing_y);
++    right = vector_scale(right, spacing_x);
++    auto column = pos;
++    for (unsigned y = 1; y < repeat_y; ++y)
++    {
++        column = vector_add(column, up);
++        if (!CreateAnotherSprite(column, rotation))
++            return false;
++    }
++    column = pos;
++    for (unsigned x = 1; x < repeat_x; ++x)
++    {
++        column = vector_add(column, right);
++        auto row = column;
++        for (unsigned y = 0; y < repeat_y; ++y)
++        {
++            if (!CreateAnotherSprite(row, rotation))
++                return false;
++            row = vector_add(row, up);
++        }
++    }
++    return true;
++}
++bool DetailSprite::CreateAnotherSprite(DVector position, DRotation rotation)
++{
++    if (filename.empty())
++        return true;
++    if (!physics_vector(position))
++    {
++        error = "DetailSprite repeat position outside physics bounds";
++        return false;
++    }
++    ObjectCreateStruct state;
++    legacy_copy(state.m_Filename, filename.c_str());
++    state.m_Pos = position;
++    state.m_Rotation = rotation;
++    state.m_Scale = scale;
++    state.m_Flags = g_pServerDE->GetObjectFlags(m_hObject);
++    auto* child = g_pServerDE->CreateObject(g_pServerDE->GetClass("DetailSprite"), &state);
++    if (!child)
++    {
++        error = "DetailSprite repeat creation failed";
++        return false;
++    }
++    children.push_back(child->m_hObject);
++    return true;
++}
+diff --git a/src/game/original/DetailSprite.h b/src/game/original/DetailSprite.h
+new file mode 100644
+index 0000000..489ffd2
+--- /dev/null
++++ b/src/game/original/DetailSprite.h
+@@ -0,0 +1,26 @@
++#pragma once
++#include "B2BaseClass.h"
++#include "game/weapon_messages.h"
++#include <string>
++#include <vector>
++// Selected original ObjectDLL/DetailSprite; save/load remain unavailable.
++class DetailSprite : public B2BaseClass
++{
++  public:
++    DetailSprite() : B2BaseClass(OT_SPRITE) {}
++    DVector scale{1, 1, 1};
++    bool flush = false, rotatable = false, chromakey = false, repeat = false;
++    unsigned repeat_x = 1, repeat_y = 1;
++    float spacing_x = 0, spacing_y = 0;
++    std::string filename, error;
++    OpenBlood2::SegmentResult flush_result = OpenBlood2::SegmentResult::Miss;
++    OpenBlood2::SegmentHit flush_hit;
++    std::vector<HOBJECT> children; // Diagnostic handles; original repeats have independent lifetimes.
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++
++  private:
++    bool ReadProp();
++    bool InitialUpdate();
++    bool CreateAnotherSprite(DVector, DRotation);
++};
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index ed8fc5f..b937bae 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -4,6 +4,7 @@
+ #include "game/original/CameraSpot.h"
+ #include "game/original/CinematicTrigger.h"
+ #include "game/original/ClientLightFX.h"
++#include "game/original/DetailSprite.h"
+ #include "game/original/Door.h"
+ #include "game/original/GameStartPoint.h"
+ #include "game/original/Key.h"
+@@ -81,6 +82,20 @@ namespace OpenBlood2
+                                        {"IsListener", true},
+                                        {"HidePlayer", false},
+                                        {"TypeActionMode", false}}};
++        const ClassInfo detail_sprite{"DetailSprite",
++                                      &b2base,
++                                      construct<DetailSprite>,
++                                      {{"Filename", std::string{}},
++                                       {"ScaleX", 1.0f},
++                                       {"ScaleY", 1.0f},
++                                       {"FlushWithWorld", false},
++                                       {"Rotatable", true},
++                                       {"Chromakey", false},
++                                       {"Repeat", false},
++                                       {"RepeatX", std::int32_t(1)},
++                                       {"RepeatY", std::int32_t(1)},
++                                       {"SpacingX", 0.0f},
++                                       {"SpacingY", 0.0f}}};
+         const ClassInfo sound{"Sound",
+                               &base,
+                               construct<Sound>,
+@@ -557,8 +572,9 @@ namespace OpenBlood2
+                objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
+                objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
+                objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
+-               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
+-               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
++               objects.register_class(detail_sprite) && objects.register_class(sound) &&
++               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
++               objects.register_class(game_start) && objects.register_class(path) &&
+                objects.register_class(world_properties) && objects.register_class(smell) &&
+                objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
+                objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index a0e2520..4d7f462 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -90,6 +90,7 @@ namespace OpenBlood2
+         }
+         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
+         bool GetMovementState(HOBJECT, MovementState&) override;
++        SegmentResult CastWorldRay(DVector, DVector, SegmentHit&) override;
+         SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false,
+                                        SegmentObjects objects = SegmentObjects::SolidOnly) override;
+         DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
+@@ -266,6 +267,7 @@ namespace OpenBlood2
+       public:
+         Resources resources;
+         ModelStore models{resources};
++        SpriteStore sprites{resources};
+         CollisionWorld collision;
+         Objects objects;
+         ServerAdapter server{objects};
+@@ -300,6 +302,7 @@ namespace OpenBlood2
+         bool initialize()
+         {
+             objects.models = &models;
++            objects.sprites = &sprites;
+             objects.world = &world;
+             server.collision = &collision;
+             server.client_resources = &resources;
+diff --git a/src/game/server_models.cpp b/src/game/server_models.cpp
+index 1bbb8e7..55cce75 100644
+--- a/src/game/server_models.cpp
++++ b/src/game/server_models.cpp
+@@ -95,7 +95,11 @@ namespace OpenBlood2
+         for (auto id : objects_.snapshot())
+         {
+             auto* r = objects_.get(id);
+-            if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE || !r->model)
++            if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE)
++                continue;
++            if (r->sprite && !advance_sprite(*r->sprite, r->sprite_track, seconds))
++                ok = objects_.fail(ObjectError::InvalidTime, "Invalid sprite clock");
++            if (!r->model)
+                 continue;
+             std::vector<std::uint32_t> events;
+             std::string error;
+diff --git a/src/game/server_sprites.cpp b/src/game/server_sprites.cpp
+new file mode 100644
+index 0000000..ce9de09
+--- /dev/null
++++ b/src/game/server_sprites.cpp
+@@ -0,0 +1,41 @@
++#include "game/server_adapter.h"
++#include <algorithm>
++#include <cmath>
++#include <limits>
++namespace OpenBlood2
++{
++    SegmentResult ServerAdapter::CastWorldRay(DVector from, DVector direction, SegmentHit& out)
++    {
++        trace_service("CastWorldRay");
++        out = {};
++        if (!physics_vector(from) || !physics_vector(direction))
++            return SegmentResult::Invalid;
++        const double length = std::sqrt(double(direction.x) * direction.x + double(direction.y) * direction.y +
++                                        double(direction.z) * direction.z);
++        if (length < 1e-8)
++            return SegmentResult::Invalid;
++        if (!collision || !collision_ready)
++            return SegmentResult::Unavailable;
++        // Clip an infinite ray to the same finite domain accepted by collision.
++        // The original query omits INTERSECT_OBJECTS, so dynamic objects are excluded.
++        double distance = std::numeric_limits<double>::infinity();
++        const double d[3]{direction.x / length, direction.y / length, direction.z / length};
++        const double f[3]{from.x, from.y, from.z};
++        for (unsigned i = 0; i < 3; ++i)
++            if (d[i] != 0)
++                distance = std::min(distance, ((d[i] > 0 ? 1e7 : -1e7) - f[i]) / d[i]);
++        if (!(distance > 0))
++            return SegmentResult::Miss;
++        DVector to{float(std::clamp(f[0] + distance * d[0], -1e7, 1e7)),
++                   float(std::clamp(f[1] + distance * d[1], -1e7, 1e7)),
++                   float(std::clamp(f[2] + distance * d[2], -1e7, 1e7))};
++        CollisionHit hit;
++        const auto result = collision->sweep(from, to, {}, hit);
++        if (result == CollisionQuery::Invalid)
++            return SegmentResult::Invalid;
++        if (result == CollisionQuery::Miss)
++            return SegmentResult::Miss;
++        out = {hit.point, hit.normal, nullptr, hit.polygon, hit.fraction};
++        return SegmentResult::Hit;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 20ef998..682c6ce 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -1,3 +1,4 @@
++#include "game/original/DetailSprite.h"
+ #include "game/original/Sound.h"
+ #include "game/server_adapter.h"
+ #include <algorithm>
+@@ -102,6 +103,12 @@ namespace OpenBlood2
+                     entry.detail =
+                         entry.sound ? "Original Sound removed after transferring its loop to the world" : sound->error;
+                 }
++                else if (const auto* sprite = r ? dynamic_cast<const DetailSprite*>(r->game.get()) : nullptr;
++                         sprite && !sprite->error.empty())
++                {
++                    entry.state = EntryState::Failed;
++                    entry.detail = sprite->error;
++                }
+                 else if (r && dynamic_cast<const B2BaseClass*>(r->game.get()) &&
+                          static_cast<const B2BaseClass*>(r->game.get())->filtered)
+                 {
+@@ -334,6 +341,7 @@ namespace OpenBlood2
+         server.reset_world_time();
+         server_shell.PreStartWorld();
+         models.clear();
++        sprites.clear();
+         collision.clear();
+         server.collision_ready = false;
+         server.gravity = {0, -2000, 0};
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index d3c868f..eb3a54e 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -47,7 +47,7 @@ endif()
+ add_executable(world_tests world_tests.cpp)
+ target_link_libraries(world_tests PRIVATE blood2_game)
+ blood2_project_options(world_tests)
+-foreach(case IN ITEMS sound_entries rez_structure rez_rejection resource_mount world_properties world_geometry
++foreach(case IN ITEMS sprite_entries sound_entries rez_structure rez_rejection resource_mount world_properties world_geometry
+         world_rejection mutations session_lifecycle session_messages original_trigger)
+     add_test(NAME world.${case} COMMAND world_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/world-fixtures/${case}")
+     set_tests_properties(world.${case} PROPERTIES LABELS "headless;world" TIMEOUT 20)
+@@ -432,3 +432,24 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --world-sounds-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/world-sounds.png")
+     set_tests_properties(gpu.sound PROPERTIES LABELS "private;gpu;sound" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+ endif()
++
++add_executable(sprite_tests sprite_tests.cpp)
++target_link_libraries(sprite_tests PRIVATE blood2_game)
++blood2_project_options(sprite_tests)
++
++foreach(case reader clock properties placement ray failures)
++    add_test(NAME sprites.${case} COMMAND sprite_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/sprite-fixtures/${case}")
++    set_tests_properties(sprites.${case} PROPERTIES LABELS "headless;sprites" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case catalog subway)
++        add_test(NAME sprites.${case} COMMAND sprite_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(sprites.${case} PROPERTIES LABELS "headless;private;sprites" TIMEOUT 90)
++    endforeach()
++endif()
++
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.sprites COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --sprites-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/sprites.png")
++    set_tests_properties(gpu.sprites PROPERTIES LABELS "private;gpu;sprites" TIMEOUT 30 RUN_SERIAL TRUE)
++endif()
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index 5e45be0..22fb437 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -393,9 +393,9 @@ namespace
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+             ++entries[e.state];
+-        CHECK(entries[EntryState::Created] == 166 && entries[EntryState::EditorOnly] == 372 &&
+-              entries[EntryState::Unsupported] == 38 && entries[EntryState::Failed] == 0 &&
+-              g.objects.snapshot().size() == 173);
++        CHECK(entries[EntryState::Created] == 178 && entries[EntryState::EditorOnly] == 372 &&
++              entries[EntryState::Unsupported] == 26 && entries[EntryState::Failed] == 0 &&
++              g.objects.snapshot().size() == 185);
+         std::cout << "Subway instances=" << g.objects.snapshot().size() << "\n";
+         for (auto [state, n] : entries)
+             std::cout << "state=" << int(state) << " count=" << n << '\n';
+diff --git a/tests/camera_tests.cpp b/tests/camera_tests.cpp
+index a1faff5..0a0b5f0 100644
+--- a/tests/camera_tests.cpp
++++ b/tests/camera_tests.cpp
+@@ -291,7 +291,7 @@ namespace
+         CHECK(worlds == 57 && entries == 61 && created == 61 && rejected == 0);
+         CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+         CHECK(CameraObj::m_dwNumCameras == 2 && g.server.camera_effects.size() == 2 &&
+-              g.objects.snapshot().size() == 176);
++              g.objects.snapshot().size() == 188);
+         CHECK(test_camera::complete_subway_intro(g));
+         for (auto id : g.objects.snapshot())
+             if (auto* r = g.objects.get(id); r && dynamic_cast<CameraObj*>(r->game.get()))
+diff --git a/tests/cinematic_tests.cpp b/tests/cinematic_tests.cpp
+index 0153b22..358990e 100644
+--- a/tests/cinematic_tests.cpp
++++ b/tests/cinematic_tests.cpp
+@@ -338,9 +338,9 @@ namespace
+             std::map<EntryState, unsigned> counts;
+             for (const auto& e : g.entries)
+                 ++counts[e.state];
+-            CHECK(counts[EntryState::Created] == 166 && counts[EntryState::EditorOnly] == 372 &&
+-                  counts[EntryState::Unsupported] == 38 && counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 173 && g.enter_player(error) && g.objects.snapshot().size() == 176);
++            CHECK(counts[EntryState::Created] == 178 && counts[EntryState::EditorOnly] == 372 &&
++                  counts[EntryState::Unsupported] == 26 && counts[EntryState::Failed] == 0);
++            CHECK(g.objects.snapshot().size() == 185 && g.enter_player(error) && g.objects.snapshot().size() == 188);
+             HOBJECT target = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (std::string_view(g.objects.get(id)->state.m_Name) == "cintrig1")
+@@ -359,7 +359,7 @@ namespace
+             for (unsigned i = 0; i < 6; ++i)
+                 CHECK(g.step(1.0 / 60));
+             v = g.server.audio.get(id);
+-            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 167);
++            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 179);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_clips() && !g.server.audio.get(id) && !g.server.message_count() &&
+                   !g.server.list_count() && !g.server.string_count());
+diff --git a/tests/config_tests.cpp b/tests/config_tests.cpp
+index bfe16a9..49cdc69 100644
+--- a/tests/config_tests.cpp
++++ b/tests/config_tests.cpp
+@@ -47,6 +47,11 @@ namespace
+         CHECK(options.containers_smoke && options.player_smoke && options.world_smoke && options.world == "02_CityHub");
+         const std::array<std::string_view, 2> both_scenarios{"--containers-smoke", "--movement-smoke"};
+         CHECK(!parse_options(both_scenarios, options, error));
++        const std::array<std::string_view, 1> sprites{"--sprites-smoke"};
++        CHECK(parse_options(sprites, options, error) && options.sprites_smoke && options.player_smoke &&
++              options.world_smoke);
++        const std::array<std::string_view, 2> conflict_sprites{"--sprites-smoke", "--world-sounds-smoke"};
++        CHECK(!parse_options(conflict_sprites, options, error));
+         const std::array<std::string_view, 1> pickups{"--pickups-smoke"};
+         CHECK(parse_options(pickups, options, error) && options.pickups_smoke && options.player_smoke &&
+               options.world_smoke);
+diff --git a/tests/keyframer_tests.cpp b/tests/keyframer_tests.cpp
+index c7ca261..78b4478 100644
+--- a/tests/keyframer_tests.cpp
++++ b/tests/keyframer_tests.cpp
+@@ -361,14 +361,14 @@ namespace
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+             const float entered = g.server.GetTime();
+-            CHECK(g.objects.snapshot().size() == 176);
++            CHECK(g.objects.snapshot().size() == 188);
+             auto* list = g.server.FindNamedObjects("tracking1");
+             CHECK(list && list->m_pFirstLink);
+             auto h = list->m_pFirstLink->m_hObject;
+             g.server.RelinquishList(list);
+             auto* f = framer(g, h);
+             CHECK(g.step(1.0 / 60) && f->keys.size() == 2 && f->targets.size() == 1 && f->active && f->time == 0);
+-            CHECK(g.objects.snapshot().size() == 167);
++            CHECK(g.objects.snapshot().size() == 179);
+             auto camera = f->targets[0].object;
+             auto start = g.objects.get(camera)->state.m_Pos;
+             CHECK(g.step(1.0 / 60) && f->targets[0].moves == 1 && f->processed == 1 && f->unresolved_messages == 1);
+diff --git a/tests/light_tests.cpp b/tests/light_tests.cpp
+index 076fbd0..56fdf4c 100644
+--- a/tests/light_tests.cpp
++++ b/tests/light_tests.cpp
+@@ -350,8 +350,8 @@ namespace
+         for (int cycle = 0; cycle < 2; ++cycle)
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+-            CHECK(g.objects.snapshot().size() == 176 && g.server.light_effects.size() == 12);
+-            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 167);
++            CHECK(g.objects.snapshot().size() == 188 && g.server.light_effects.size() == 12);
++            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 179);
+             KeyFramer* path = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (auto* f = dynamic_cast<KeyFramer*>(g.objects.get(id)->game.get());
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index 19c9f80..28dad19 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -204,14 +204,14 @@ namespace
+             CHECK(player);
+             CHECK(game.objects.get(player->m_hObject)->model->animations.size() == 86);
+             CHECK(game.objects.snapshot().size() ==
+-                  176); // 166 source instances + 7 door children + player + muzzle light + scent.
++                  188); // 178 source instances + 7 door children + player + muzzle light + scent.
+             CHECK(game.client_shell.position.x == -32 && game.client_shell.position.z == -3224);
+             CHECK(std::abs(game.client_shell.position.y - 170) < .01f);
+             for (int frame = 0; frame < 120; ++frame)
+                 CHECK(game.step(1.0 / 60.0));
+             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
+             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
+-            CHECK(!game.run_world(error) && error.find("38 uninstantiated") != std::string::npos);
++            CHECK(!game.run_world(error) && error.find("26 uninstantiated") != std::string::npos);
+             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
+                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
+                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()
+diff --git a/tests/random_sound_tests.cpp b/tests/random_sound_tests.cpp
+index abcd7d7..7a1d404 100644
+--- a/tests/random_sound_tests.cpp
++++ b/tests/random_sound_tests.cpp
+@@ -318,9 +318,9 @@ namespace
+             std::map<EntryState, unsigned> counts;
+             for (const auto& e : g.entries)
+                 ++counts[e.state];
+-            CHECK(counts[EntryState::Created] == 166 && counts[EntryState::Unsupported] == 38 &&
++            CHECK(counts[EntryState::Created] == 178 && counts[EntryState::Unsupported] == 26 &&
+                   counts[EntryState::EditorOnly] == 372 && !counts[EntryState::Failed]);
+-            CHECK(g.objects.snapshot().size() == 173 && g.enter_player(error) && g.objects.snapshot().size() == 176);
++            CHECK(g.objects.snapshot().size() == 185 && g.enter_player(error) && g.objects.snapshot().size() == 188);
+             std::vector<HOBJECT> targets;
+             for (auto id : g.objects.snapshot())
+                 if (dynamic_cast<RandomSoundFX*>(g.objects.get(id)->game.get()))
+@@ -346,7 +346,7 @@ namespace
+                 std::cout << "cycle=" << cycle << " name=" << g.objects.get(h)->state.m_Name
+                           << " sound=" << v->request.resource << '\n';
+             }
+-            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 167);
++            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 179);
+             CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips() &&
+                   !g.server.audio.get(last) && g.objects.snapshot().empty() && !g.server.message_count() &&
+                   !g.server.string_count() && !g.server.list_count());
+diff --git a/tests/sound_tests.cpp b/tests/sound_tests.cpp
+index 9dd68fb..d0b3d49 100644
+--- a/tests/sound_tests.cpp
++++ b/tests/sound_tests.cpp
+@@ -349,12 +349,12 @@ namespace
+                     CHECK(v->clip->rate == 22050 && v->clip->frames() == 198623 && v->clip->channels == 1);
+                 }
+             }
+-            CHECK(ids.size() == 4 && counts[EntryState::Created] == 166 && counts[EntryState::WorldSound] == 4 &&
+-                  counts[EntryState::Unsupported] == 38 && counts[EntryState::EditorOnly] == 372 &&
++            CHECK(ids.size() == 4 && counts[EntryState::Created] == 178 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::Unsupported] == 26 && counts[EntryState::EditorOnly] == 372 &&
+                   !counts[EntryState::Failed]);
+-            CHECK(g.objects.snapshot().size() == 173 && g.server.audio.voices().size() == 4 &&
++            CHECK(g.objects.snapshot().size() == 185 && g.server.audio.voices().size() == 4 &&
+                   g.server.audio.cached_clips() == 1);
+-            CHECK(g.enter_player(error) && g.objects.snapshot().size() == 176 && g.step(1.0 / 60));
++            CHECK(g.enter_player(error) && g.objects.snapshot().size() == 188 && g.step(1.0 / 60));
+             // Advance actual sample clocks across a full retail clip without adding unrelated physics work.
+             CHECK(g.server.advance_audio(20, {}, {}));
+             for (auto id : ids)
+@@ -366,7 +366,7 @@ namespace
+             const auto pos = g.server.audio.get(ids.front())->position;
+             CHECK(g.server.advance_audio(.02, pos, {}) && g.server.audio.peak > 0 &&
+                   g.server.audio.mixed_frames == 960);
+-            CHECK(!g.run_world(error) && error.find("38") != std::string::npos);
++            CHECK(!g.run_world(error) && error.find("26") != std::string::npos);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_clips());
+             for (auto id : ids)
+diff --git a/tests/sprite_tests.cpp b/tests/sprite_tests.cpp
+new file mode 100644
+index 0000000..6934754
+--- /dev/null
++++ b/tests/sprite_tests.cpp
+@@ -0,0 +1,414 @@
++#include "game/original/DetailSprite.h"
++#include "player_fixture.h"
++#include <cmath>
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    std::vector<std::uint8_t> spr(unsigned count = 3, unsigned fps = 10, std::string name = "frame.dtx")
++    {
++        test_model::Writer w;
++        w.u32(count);
++        w.u32(fps);
++        w.u32(1);
++        w.u32(0);
++        w.u32(0xff00ff);
++        for (unsigned i = 0; i < count; ++i)
++        {
++            w.u16(name.size());
++            for (char c : name)
++                w.u8(c);
++        }
++        return w.b;
++    }
++    bool setup(GameSession& g, const std::filesystem::path& root, std::string archive = "sprite.rez", unsigned fps = 10)
++    {
++        if (g.resources.mounts().empty() && !test_player::setup(g, root, false))
++            return false;
++        test_player::Directory dir;
++        dir.files["sprite.spr"] = spr(3, fps);
++        dir.files["missing.spr"] = spr(1, 10, "absent.dtx");
++        dir.files["bad.spr"] = {0, 1, 2};
++        dir.files["frame.dtx"] = {0}; // Presence only, no decoder is claimed.
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, dir);
++        w.patch(131, off);
++        w.patch(135, size);
++        std::ofstream f(root / archive, std::ios::binary);
++        f.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        f.close();
++        std::string error;
++        return g.resources.mount(root / archive, error);
++    }
++    HOBJECT make(GameSession& g, Properties props = {})
++    {
++        props.try_emplace("Filename", std::string("sprite.spr"));
++        return g.objects.create(g.objects.find_class("DetailSprite"), {}, Creation::World, props);
++    }
++    DetailSprite* get(GameSession& g, HOBJECT h)
++    {
++        auto* r = g.objects.get(h);
++        return r ? dynamic_cast<DetailSprite*>(r->game.get()) : nullptr;
++    }
++    bool reader(const std::filesystem::path&)
++    {
++        auto b = spr();
++        Sprite s;
++        std::string error;
++        CHECK(read_sprite(b, s, error));
++        CHECK(s.frames.size() == 3 && s.fps == 10 && s.transparent && !s.translucent && s.color_key == 0xff00ff);
++        for (size_t n = 0; n < b.size(); ++n)
++        {
++            CHECK(!read_sprite(std::span(b).first(n), s, error));
++            CHECK(s.frames.size() == 3);
++        }
++        b.push_back(0);
++        CHECK(!read_sprite(b, s, error));
++        for (auto count : {0u, 4097u})
++            CHECK(!read_sprite(spr(count), s, error));
++        for (auto fps : {0u, 1001u})
++            CHECK(!read_sprite(spr(1, fps), s, error));
++        for (auto name : {"", "../bad.dtx", "/abs.dtx", "a/../../bad.dtx", "a.wav"})
++            CHECK(!read_sprite(spr(1, 10, name), s, error));
++        b = spr();
++        b[8] = 2;
++        CHECK(!read_sprite(b, s, error));
++        b = spr();
++        b[12] = 2;
++        CHECK(!read_sprite(b, s, error));
++        b = spr();
++        b[22] = 0;
++        CHECK(!read_sprite(b, s, error));
++        CHECK(!read_sprite(spr(1, 10, std::string(1001, 'a') + ".dtx"), s, error));
++        b.resize(1024 * 1024 + 1);
++        CHECK(!read_sprite(b, s, error));
++        CHECK(read_sprite(spr(4096, 1000), s, error));
++        return true;
++    }
++    bool clock_test(const std::filesystem::path&)
++    {
++        Sprite s;
++        std::string error;
++        CHECK(read_sprite(spr(), s, error));
++        SpriteTrack t;
++        CHECK(advance_sprite(s, t, .099) && t.frame == 0);
++        CHECK(advance_sprite(s, t, .002) && t.frame == 1 && std::abs(t.milliseconds - 101) < 1e-8);
++        CHECK(advance_sprite(s, t, .2) && t.frame == 0 && std::abs(t.milliseconds - 1) < 1e-8);
++        CHECK(advance_sprite(s, t, 60) && t.frame == 0 && std::abs(t.milliseconds - 1) < 1e-8);
++        CHECK(!advance_sprite(s, t, -1) && !advance_sprite(s, t, 61) && t.milliseconds == 1);
++        CHECK(!advance_sprite(s, t, std::numeric_limits<double>::quiet_NaN()));
++        CHECK(!advance_sprite(s, t, std::numeric_limits<double>::infinity()) && t.milliseconds == 1);
++        CHECK(read_sprite(spr(3, 15), s, error));
++        t = {};
++        for (unsigned i = 0; i < 60; ++i)
++            CHECK(advance_sprite(s, t, 1.0 / 60));
++        CHECK(t.frame == 0 && std::abs(t.milliseconds - 10) < 1e-7); // 3*66ms, preserving fractional ticks.
++        return true;
++    }
++    bool properties(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto h = make(g);
++        auto* r = g.objects.get(h);
++        auto* c = get(g, h);
++        CHECK(r && c && r->state.m_ObjectType == OT_SPRITE && r->sprite && !r->scheduled && (r->user_flags & 8));
++        CHECK(c->rotatable && !c->flush && r->state.m_Scale.x == 1 && (r->state.m_Flags & FLAG_ROTATEABLESPRITE));
++        auto other = make(g, {{"ScaleX", -2.0f},
++                              {"ScaleY", 0.0f},
++                              {"Chromakey", true},
++                              {"Rotatable", false},
++                              {"Repeat", true},
++                              {"RepeatX", std::int32_t(3)}});
++        r = g.objects.get(other);
++        CHECK(r && r->state.m_Scale.x == -2 && r->state.m_Scale.y == 0 && !(r->state.m_Flags & FLAG_ROTATEABLESPRITE) &&
++              (r->state.m_Flags & FLAG_SPRITECHROMAKEY));
++        CHECK(get(g, other)->children.empty() && r->sprite == g.objects.get(h)->sprite);
++        ObjectCreateStruct state;
++        legacy_copy(state.m_Filename, "sprite.spr");
++        state.m_Scale = {2, 3, 4};
++        auto runtime = g.objects.create(g.objects.find_class("DetailSprite"), state, Creation::Runtime);
++        CHECK(runtime && !get(g, runtime)->rotatable && get(g, runtime)->filename.empty() &&
++              g.objects.get(runtime)->state.m_Scale.z == 4);
++        auto str = g.objects.create_props(g.objects.find_class("DetailSprite"), {},
++                                          "Filename sprite.spr; ScaleY 4; Rotatable false");
++        CHECK(str && g.objects.get(str)->state.m_Scale.y == 4 && !get(g, str)->rotatable);
++        CHECK(g.server.advance_models(.15) && g.objects.get(h)->sprite_track.frame == 1);
++        g.objects.get(h)->state.m_Flags = 0;
++        CHECK(g.server.advance_models(.1) && g.objects.get(h)->sprite_track.frame == 2);
++        g.objects.get(h)->activity = OBJSTATE_INACTIVE;
++        CHECK(g.server.advance_models(.1) && g.objects.get(h)->sprite_track.frame == 2);
++        CHECK(g.objects.remove(h) && g.server.advance_models(.1) && !g.objects.get(h));
++        return true;
++    }
++    bool placement(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto rotation = EulerAngles{{1.5707963268f, 0, 0}};
++        auto h = make(g, {{"Pos", DVector{0, 10, 0}},
++                          {"Rotation", rotation},
++                          {"FlushWithWorld", true},
++                          {"Repeat", true},
++                          {"RepeatX", std::int32_t(2)},
++                          {"RepeatY", std::int32_t(3)},
++                          {"SpacingX", 2.0f},
++                          {"SpacingY", 3.0f},
++                          {"ScaleX", .5f}});
++        auto* c = get(g, h);
++        auto* r = g.objects.get(h);
++        CHECK(c && c->error.empty());
++        CHECK(c->flush_result == SegmentResult::Hit && std::abs(r->state.m_Pos.y - .25f) < .001f &&
++              c->children.size() == 5);
++        CHECK(r->state.m_Rotation.m_Vec.x == rotation_from_euler(rotation.radians).m_Vec.x);
++        auto origin = r->state.m_Pos;
++        auto up = rotate_vector({0, 3, 0}, r->state.m_Rotation);
++        auto right = rotate_vector({2, 0, 0}, r->state.m_Rotation);
++        std::vector<DVector> expected{vector_add(origin, up), vector_add(origin, vector_scale(up, 2)),
++                                      vector_add(origin, right), vector_add(vector_add(origin, right), up),
++                                      vector_add(vector_add(origin, right), vector_scale(up, 2))};
++        auto children = c->children;
++        for (size_t i = 0; i < children.size(); ++i)
++        {
++            auto* cr = g.objects.get(children[i]);
++            auto* d = get(g, children[i]);
++            CHECK(cr && d && !d->flush && !d->repeat && d->filename.empty() && cr->reason == Creation::Runtime &&
++                  cr->state.m_Scale.x == .5f && cr->sprite == r->sprite);
++            auto delta = vector_subtract(cr->state.m_Pos, expected[i]);
++            CHECK(vector_dot(delta, delta) < .00001f);
++        }
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        for (auto child : children)
++            CHECK(g.objects.get(child));
++        // Source repeats even when the ray misses, and RepeatX=0 retains the first Y column.
++        h = make(g, {{"Pos", DVector{2000, 10, 0}},
++                     {"FlushWithWorld", true},
++                     {"Repeat", true},
++                     {"RepeatX", std::int32_t(0)},
++                     {"RepeatY", std::int32_t(3)}});
++        CHECK(get(g, h)->flush_result == SegmentResult::Miss && get(g, h)->children.size() == 2);
++        h = make(
++            g,
++            {{"FlushWithWorld", true}, {"Repeat", true}, {"RepeatX", std::int32_t(3)}, {"RepeatY", std::int32_t(0)}});
++        CHECK(get(g, h)->children.empty());
++        // B2 filtering runs AFTER DetailSprite creates independent runtime children.
++        h = make(g,
++                 {{"FlushWithWorld", true}, {"Repeat", true}, {"RepeatY", std::int32_t(2)}, {"DifficultyMed", false}});
++        c = get(g, h);
++        CHECK(c && c->filtered && c->children.size() == 1);
++        auto child = c->children[0];
++        CHECK(g.objects.finish_frame() && !g.objects.get(h) && g.objects.get(child));
++        return true;
++    }
++    bool ray(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        SegmentHit hit;
++        ObjectCreateStruct state;
++        state.m_Pos = {0, 5, 0};
++        state.m_Flags = FLAG_SOLID;
++        auto h = g.objects.create(g.objects.find_class("BaseClass"), state);
++        g.objects.get(h)->dimensions = {2, 2, 2};
++        CHECK(g.server.CastWorldRay({0, 10, 0}, {0, -2, 0}, hit) == SegmentResult::Hit && !hit.object &&
++              std::abs(hit.point.y) < .001f && hit.normal.y > 0);
++        CHECK(g.server.CastWorldRay({0, 10, 0}, {0, 1, 0}, hit) == SegmentResult::Miss);
++        CHECK(g.server.CastWorldRay({0, 10, 0}, {}, hit) == SegmentResult::Invalid);
++        CHECK(g.server.CastWorldRay({1e8f, 0, 0}, {1, 0, 0}, hit) == SegmentResult::Invalid);
++        WorldModel nonsolid;
++        nonsolid.points = {{-1000, 0, -1000}, {1000, 0, -1000}, {1000, 0, 1000}, {-1000, 0, 1000}};
++        nonsolid.surfaces.resize(1);
++        nonsolid.polygons = {{0, {0, 1, 2, 3}}};
++        std::string error;
++        CHECK(g.collision.build(nonsolid, error));
++        CHECK(g.server.CastWorldRay({0, 10, 0}, {0, -1, 0}, hit) == SegmentResult::Miss);
++        g.server.collision_ready = false;
++        CHECK(g.server.CastWorldRay({0, 10, 0}, {0, -1, 0}, hit) == SegmentResult::Unavailable);
++        h = make(g, {{"FlushWithWorld", true}});
++        CHECK(h && !get(g, h)->error.empty() && g.objects.get(h)->life == Life::Pending);
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        for (auto name : {"", "absent.spr", "missing.spr", "bad.spr", "frame.dtx"})
++        {
++            CHECK(!make(g, {{"Filename", std::string(name)}}));
++            CHECK(g.objects.finish_frame());
++        }
++        for (auto n : {-1, 1025})
++            CHECK(!make(g, {{"RepeatY", std::int32_t(n)}}));
++        CHECK(!make(g, {{"RepeatX", std::int32_t(33)}, {"RepeatY", std::int32_t(33)}}));
++        CHECK(!make(g, {{"TypeAction", true}}));
++        CHECK(!g.objects.create(g.objects.find_class("DetailSprite"), {}, Creation::Restore));
++        CHECK(g.objects.finish_frame() && g.objects.snapshot().empty());
++        auto failed = make(g, {{"FlushWithWorld", true},
++                               {"Repeat", true},
++                               {"RepeatX", std::int32_t(3)},
++                               {"SpacingX", 1e7f},
++                               {"Pos", DVector{0, 10, 0}}});
++        auto* partial = get(g, failed);
++        CHECK(partial && !partial->error.empty() && partial->children.size() == 1);
++        auto survivor = partial->children[0];
++        CHECK(g.objects.finish_frame() && !g.objects.get(failed) && g.objects.get(survivor));
++        auto a = make(g);
++        CHECK(a);
++        auto sprite = g.objects.get(a)->sprite;
++        CHECK(setup(g, root, "override.rez", 20));
++        auto b = make(g);
++        CHECK(b && g.objects.get(b)->sprite != sprite && g.objects.get(b)->sprite->fps == 20 && sprite->fps == 10);
++        ObjectSelection selected{g.objects.get(a)->id};
++        std::weak_ptr<const Sprite> weak = g.objects.get(b)->sprite;
++        CHECK(g.unload_world());
++        selected.refresh(g.objects);
++        CHECK(!selected.id && weak.expired() && !g.objects.get(a));
++        CHECK(g.server.string_count() == 0 && g.server.message_count() == 0 && g.server.list_count() == 0);
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        unsigned worlds = 0, count = 0, loaded = 0, missing = 0, rejected = 0, flush = 0, repeat = 0, invalid = 0;
++        for (const auto& [path, res] : g.resources.index())
++        {
++            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
++                continue;
++            std::vector<uint8_t> b;
++            World w;
++            CHECK(g.resources.read(path, b, error));
++            if (!read_world(b, w, error))
++            {
++                CHECK(path == "worlds/16_bridge.dat");
++                continue;
++            }
++            ++worlds;
++            CHECK(g.collision.build(w.models[0], error));
++            g.server.collision_ready = true;
++            for (const auto& o : w.objects)
++                if (o.class_name == "DetailSprite")
++                {
++                    ++count;
++                    Properties p;
++                    for (const auto& v : o.properties)
++                        p.emplace(v.name, v.value);
++                    auto name = std::get<std::string>(p.at("Filename"));
++                    std::shared_ptr<const Sprite> sprite;
++                    if (!g.resources.find(name))
++                        ++missing;
++                    else if (g.sprites.load(name, sprite, error))
++                        ++loaded;
++                    else
++                    {
++                        ++invalid;
++                        std::cout << path << " resource=" << name << " error=" << error << '\n';
++                    }
++                    auto h = g.objects.create(g.objects.find_class("DetailSprite"), {}, Creation::World, p);
++                    if (!h)
++                    {
++                        ++rejected;
++                        std::cout << path << " rejected=" << g.objects.diagnostics().back() << '\n';
++                    }
++                    else
++                    {
++                        auto* d = get(g, h);
++                        CHECK(d && d->error.empty());
++                        flush += d->flush;
++                        repeat += d->repeat;
++                        if (d->flush)
++                            std::cout << path << " flush=" << int(d->flush_result)
++                                      << " y=" << g.objects.get(h)->state.m_Pos.y << '\n';
++                        CHECK(g.objects.remove(h));
++                    }
++                    CHECK(g.objects.finish_frame());
++                }
++        }
++        std::cout << "worlds=" << worlds << " sources=" << count << " manifests=" << loaded << " missing=" << missing
++                  << " invalid=" << invalid << " rejected=" << rejected << " flush=" << flush << " repeat=" << repeat
++                  << '\n';
++        CHECK(worlds == 57 && count == 124 && missing == 4 && invalid == 0 && rejected == 5 && loaded == 120 &&
++              flush == 2 && repeat == 0);
++        return true;
++    }
++    bool subway(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error));
++            unsigned sprites = 0;
++            std::map<EntryState, unsigned> counts;
++            std::weak_ptr<const Sprite> weak;
++            for (size_t i = 0; i < g.entries.size(); ++i)
++            {
++                const auto& e = g.entries[i];
++                ++counts[e.state];
++                if (g.world.objects[i].class_name != "DetailSprite")
++                    continue;
++                ++sprites;
++                CHECK(e.state == EntryState::Created);
++                auto* r = g.objects.get(e.object);
++                auto* d = dynamic_cast<DetailSprite*>(r->game.get());
++                CHECK(d && !d->flush && d->children.empty() && d->chromakey && d->rotatable &&
++                      r->state.m_Scale.x == .5f && r->state.m_Pos.y == 129 && r->sprite &&
++                      r->sprite->frames.size() == 1 && r->sprite->fps == 15 && r->sprite->transparent &&
++                      !r->sprite->translucent);
++                weak = r->sprite;
++            }
++            CHECK(sprites == 12 && counts[EntryState::Created] == 178 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::Unsupported] == 26 && counts[EntryState::EditorOnly] == 372 &&
++                  counts[EntryState::Failed] == 0);
++            CHECK(g.objects.snapshot().size() == 185 && g.enter_player(error) && g.objects.snapshot().size() == 188 &&
++                  g.step(.02));
++            for (auto id : g.objects.snapshot())
++            {
++                auto* r = g.objects.get(id);
++                if (r->sprite)
++                    CHECK(r->sprite_track.frame == 0 && std::abs(r->sprite_track.milliseconds - 20) < 1e-6);
++            }
++            CHECK(g.objects.snapshot().size() == 179 && !g.run_world(error) &&
++                  error.find("26 uninstantiated") != std::string::npos);
++            CHECK(g.unload_world() && weak.expired() && g.objects.snapshot().empty() && g.server.string_count() == 0 &&
++                  g.server.message_count() == 0 && g.server.list_count() == 0);
++            std::cout << "cycle=" << cycle
++                      << " 12 DetailSprite source instances, exact SPR frame resources, hidden-independent clocks and "
++                         "unload verified; M2 blocked (26)\n";
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"reader", reader}, {"clock", clock_test},  {"properties", properties}, {"placement", placement},
++        {"ray", ray},       {"failures", failures}, {"catalog", catalog},       {"subway", subway}};
++    auto it = cases.find(argv[1]);
++    return it != cases.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index 27cd3bf..299ab61 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -1,6 +1,6 @@
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 173 original instances, 116 BSP models")
++if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 185 original instances, 116 BSP models")
+     message(FATAL_ERROR "World inspection: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-player
+@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 38" OR NOT out MATCHES "remaining mover classes")
++if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 26" OR NOT out MATCHES "remaining mover classes")
+     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 2dbe1d2..ac278ef 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -102,7 +102,7 @@ namespace
+         out.append(v);
+         return out;
+     }
+-    Writer dat(bool gameplay = false, bool sounds = false)
++    Writer dat(bool gameplay = false, bool sounds = false, bool sprites = false)
+     {
+         Writer w;
+         w.u32(56);
+@@ -121,8 +121,19 @@ namespace
+         value.real(1.5);
+         Writer yes;
+         yes.byte(1);
+-        w.u32(gameplay || sounds ? 4 : 1);
+-        if (sounds)
++        w.u32(sprites ? 6 : gameplay || sounds ? 4 : 1);
++        if (sprites)
++        {
++            Writer no;
++            no.byte(0);
++            w.append(object("DetailSprite", {string_prop("Filename", "valid.spr"), prop("Pos", 1, pos)}));
++            w.append(object("DetailSprite", {string_prop("Filename", "missing.spr")}));
++            w.append(object("DetailSprite", {string_prop("Filename", "bad.spr")}));
++            w.append(object("DetailSprite", {string_prop("Filename", "valid.spr"), prop("DifficultyMed", 5, no)}));
++            w.append(object("DetailSprite", {string_prop("Filename", "valid.spr"), prop("TypeAction", 5, yes)}));
++            w.append(object("DetailSprite", {string_prop("Filename", "frame-missing.spr")}));
++        }
++        else if (sounds)
+         {
+             w.append(object("Sound", {string_prop("Filename", "cue.wav"), prop("Pos", 1, pos)}));
+             w.append(object("Sound", {string_prop("Filename", "missing.wav")}));
+@@ -448,6 +459,57 @@ namespace
+         CHECK(game.server.list_count() == 0);
+         return true;
+     }
++    bool sprite_entries(const std::filesystem::path& root)
++    {
++        GameSession game;
++        CHECK(test_player::setup(game, root, false));
++        test_player::Directory dir;
++        dir.children["worlds"].files["sprites.dat"] = dat(false, false, true).data;
++        auto spr = [](std::string_view frame)
++        {
++            Writer w;
++            w.u32(1);
++            w.u32(15);
++            w.u32(1);
++            w.u32(0);
++            w.u32(0);
++            w.str(frame);
++            return w.data;
++        };
++        dir.files["valid.spr"] = spr("frame.dtx");
++        dir.files["frame-missing.spr"] = spr("absent.dtx");
++        dir.files["bad.spr"] = {0, 1};
++        dir.files["frame.dtx"] = {0};
++        test_model::Writer archive;
++        archive.b.resize(168);
++        archive.b[0] = archive.b[62] = archive.b[124] = 13;
++        archive.b[1] = archive.b[63] = archive.b[125] = 10;
++        archive.b[126] = 26;
++        archive.patch(127, 1);
++        auto [offset, size] = test_player::write_dir(archive, dir);
++        archive.patch(131, offset);
++        archive.patch(135, size);
++        CHECK(save(root / "spriteworld.rez", archive.b));
++        std::string error;
++        CHECK(game.resources.mount(root / "spriteworld.rez", error));
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(game.request_world("sprites", error));
++            CHECK(game.entries.size() == 6 && game.objects.snapshot().size() == 1);
++            CHECK(game.entries[0].state == EntryState::Created && game.entries[3].state == EntryState::Filtered);
++            auto* r = game.objects.get(game.entries[0].object);
++            CHECK(r && r->sprite && r->state.m_Pos.y == 6);
++            std::weak_ptr<const Sprite> weak = r->sprite;
++            for (auto i : {1u, 2u, 4u, 5u})
++                CHECK(game.entries[i].state == EntryState::Failed && !game.entries[i].object &&
++                      !game.entries[i].detail.empty());
++            CHECK(game.entries[4].detail.find("TypeAction") != std::string::npos);
++            CHECK(game.entries[5].detail.find("frame resource") != std::string::npos);
++            CHECK(game.step(.02) && r->sprite_track.milliseconds == 20);
++            CHECK(game.unload_world() && weak.expired());
++        }
++        return true;
++    }
+     bool sound_entries(const std::filesystem::path& root)
+     {
+         GameSession game;
+@@ -585,7 +647,7 @@ namespace
+         CHECK(game.world.version == 56);
+         CHECK(game.world.objects.size() == 580);
+         CHECK(game.world.models.size() == 116);
+-        CHECK(game.objects.snapshot().size() == 173);
++        CHECK(game.objects.snapshot().size() == 185);
+         CHECK(game.world.models[0].points.size() == 4996);
+         CHECK(game.world.models[0].polygons.size() == 3367);
+         CHECK(game.resources.find(game.world_path)->overrides == 1);
+@@ -645,6 +707,8 @@ int main(int argc, char** argv)
+             ok = mutations();
+         else if (name == "session_lifecycle")
+             ok = session_lifecycle(root);
++        else if (name == "sprite_entries")
++            ok = sprite_entries(root);
+         else if (name == "sound_entries")
+             ok = sound_entries(root);
+         else if (name == "session_messages")
+diff --git a/tests/worldpath_tests.cpp b/tests/worldpath_tests.cpp
+index 35a2d41..7613fd5 100644
+--- a/tests/worldpath_tests.cpp
++++ b/tests/worldpath_tests.cpp
+@@ -352,9 +352,9 @@ namespace
+             }
+             CHECK(moves == 297 && blocked == 2 && !f->active && f->processed == 3 && close(r->state.m_Pos, last));
+             CHECK(!close(last, initial) && !close(last, vector_add(f->keys.back().position, f->targets[0].offset)));
+-            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 167);
++            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 179);
+             std::cout << "cycle=" << cycle << " moves=" << moves << " blocks=" << blocked << " final=" << last.x << ','
+-                      << last.y << ',' << last.z << " consumed_keys=9 runtime=167\n";
++                      << last.y << ',' << last.z << " consumed_keys=9 runtime=179\n";
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.server.string_count() &&
+                   !g.server.list_count() && !g.server.message_count());
+         }

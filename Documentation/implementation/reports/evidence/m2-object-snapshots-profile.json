@@ -1,0 +1,467 @@
+{
+  "samples": 500,
+  "inclusive": [
+    [
+      "std::_Function_handler<bool(char const*), bool (*)(char const*)>::_M_invoke",
+      500
+    ],
+    [
+      "std::__invoke_r<bool, bool (*&)(char const*), char const*>",
+      500
+    ],
+    [
+      "main",
+      500
+    ],
+    [
+      "(anonymous namespace)::clearance_private",
+      500
+    ],
+    [
+      "std::function<bool(char const*)>::operator()",
+      500
+    ],
+    [
+      "std::__invoke_impl<bool, bool (*&)(char const*), char const*>",
+      500
+    ],
+    [
+      "OpenBlood2::GameSession::step",
+      465
+    ],
+    [
+      "OpenBlood2::ServerAdapter::MoveObject",
+      214
+    ],
+    [
+      "OpenBlood2::ServerAdapter::advance_physics",
+      181
+    ],
+    [
+      "OpenBlood2::ServerAdapter::sweep_scene",
+      173
+    ],
+    [
+      "OpenBlood2::ServerAdapter::GetMovementState",
+      164
+    ],
+    [
+      "OpenBlood2::CollisionWorld::sweep",
+      144
+    ],
+    [
+      "BaseClass::_EngineMsgFn",
+      140
+    ],
+    [
+      "OpenBlood2::Objects::dispatch",
+      140
+    ],
+    [
+      "OpenBlood2::sweep_object",
+      140
+    ],
+    [
+      "OpenBlood2::Objects::advance",
+      138
+    ],
+    [
+      "OpenBlood2::CollisionWorld::query",
+      124
+    ],
+    [
+      "CBloodClientShell::UpdateMovement",
+      116
+    ],
+    [
+      "CMoveMgr::Update",
+      114
+    ],
+    [
+      "CMoveMgr::MoveLocalSolidObject",
+      92
+    ],
+    [
+      "OpenBlood2::Objects::snapshot",
+      80
+    ],
+    [
+      "CBloodServerShell::OnMessage",
+      80
+    ],
+    [
+      "operator()",
+      74
+    ],
+    [
+      "CPlayerObj::HandlePlayerPositionMessage",
+      74
+    ],
+    [
+      "OpenBlood2::ContainerShape::sweep",
+      66
+    ],
+    [
+      "AI_Mgr::EngineMessageFn",
+      63
+    ],
+    [
+      "AI_Mgr::RuntimeUpdateStep",
+      58
+    ],
+    [
+      "AI_Mgr::AI_Update",
+      58
+    ],
+    [
+      "KeyFramer::Update",
+      56
+    ],
+    [
+      "KeyFramer::EngineMessageFn",
+      56
+    ],
+    [
+      "OpenBlood2::ServerAdapter::MoveKeyframedObject",
+      52
+    ],
+    [
+      "OpenBlood2::Objects::get",
+      51
+    ],
+    [
+      "OpenBlood2::(anonymous namespace)::broadphase",
+      45
+    ],
+    [
+      "OpenBlood2::sweep_box",
+      44
+    ],
+    [
+      "OpenBlood2::ServerAdapter::IntersectSegment",
+      42
+    ],
+    [
+      "std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::get",
+      41
+    ],
+    [
+      "OpenBlood2::(anonymous namespace)::triangle_hit",
+      35
+    ],
+    [
+      "OpenBlood2::(anonymous namespace)::Sweep::axis",
+      34
+    ],
+    [
+      "std::vector<OpenBlood2::ObjectId, std::allocator<OpenBlood2::ObjectId> >::push_back",
+      33
+    ],
+    [
+      "OpenBlood2::GameSession::load_world",
+      32
+    ],
+    [
+      "OpenBlood2::GameSession::request_world",
+      32
+    ],
+    [
+      "OpenBlood2::ServerAdapter::trace_service",
+      30
+    ],
+    [
+      "std::__uniq_ptr_impl<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::_M_ptr",
+      30
+    ],
+    [
+      "std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned long, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> > >::operator[]",
+      25
+    ],
+    [
+      "OpenBlood2::vector_subtract",
+      25
+    ],
+    [
+      "AI_Mgr::DispatchState",
+      25
+    ],
+    [
+      "OpenBlood2::physics_vector",
+      23
+    ],
+    [
+      "std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned long, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> > >::lower_bound",
+      23
+    ],
+    [
+      "OpenBlood2::Objects::create",
+      22
+    ],
+    [
+      "construct_at<OpenBlood2::ObjectId, OpenBlood2::ObjectId const&>",
+      22
+    ],
+    [
+      "std::allocator_traits<std::allocator<OpenBlood2::ObjectId> >::construct<OpenBlood2::ObjectId, OpenBlood2::ObjectId const&>",
+      22
+    ],
+    [
+      "std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> > >::lower_bound",
+      22
+    ],
+    [
+      "std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> > >::_M_lower_bound",
+      22
+    ],
+    [
+      "std::get<0ul, OpenBlood2::ObjectRecord*, std::default_delete<OpenBlood2::ObjectRecord> >",
+      21
+    ],
+    [
+      "OpenBlood2::Objects::refresh_attachment",
+      20
+    ],
+    [
+      "OpenBlood2::ServerAdapter::GetContainers",
+      19
+    ],
+    [
+      "std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::operator bool",
+      19
+    ],
+    [
+      "OpenBlood2::Objects::refresh_attachments",
+      19
+    ],
+    [
+      "std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::operator->",
+      19
+    ],
+    [
+      "std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> > >::_M_key_compare<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >",
+      17
+    ],
+    [
+      "_FUN",
+      16
+    ],
+    [
+      "OpenBlood2::ServerAdapter::PingObjects",
+      16
+    ],
+    [
+      "CPlayerObj::Update",
+      16
+    ],
+    [
+      "CPlayerObj::EngineMessageFn",
+      16
+    ],
+    [
+      "OpenBlood2::object_node_transform",
+      16
+    ],
+    [
+      "OpenBlood2::read_model",
+      15
+    ],
+    [
+      "OpenBlood2::ModelStore::load",
+      15
+    ],
+    [
+      "OpenBlood2::(anonymous namespace)::extents",
+      15
+    ],
+    [
+      "std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::operator[]",
+      15
+    ],
+    [
+      "AI_Mgr::CanSee",
+      15
+    ]
+  ],
+  "leaf": [
+    [
+      "OpenBlood2::vector_subtract",
+      25
+    ],
+    [
+      "OpenBlood2::(anonymous namespace)::Sweep::axis",
+      20
+    ],
+    [
+      "construct_at<OpenBlood2::ObjectId, OpenBlood2::ObjectId const&>",
+      19
+    ],
+    [
+      "OpenBlood2::CollisionWorld::query",
+      18
+    ],
+    [
+      "OpenBlood2::(anonymous namespace)::broadphase",
+      15
+    ],
+    [
+      "OpenBlood2::ServerAdapter::MoveObject",
+      14
+    ],
+    [
+      "std::abs",
+      13
+    ],
+    [
+      "operator()",
+      12
+    ],
+    [
+      "std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::size",
+      12
+    ],
+    [
+      "std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::get",
+      11
+    ],
+    [
+      "std::vector<OpenBlood2::ObjectId, std::allocator<OpenBlood2::ObjectId> >::push_back",
+      11
+    ],
+    [
+      "OpenBlood2::sweep_object",
+      10
+    ],
+    [
+      "OpenBlood2::ServerAdapter::sweep_scene",
+      10
+    ],
+    [
+      "OpenBlood2::vector_add",
+      9
+    ],
+    [
+      "std::get<0ul, OpenBlood2::ObjectRecord*, std::default_delete<OpenBlood2::ObjectRecord> >",
+      9
+    ],
+    [
+      "std::vector<OpenBlood2::Objects::Slot, std::allocator<OpenBlood2::Objects::Slot> >::operator[]",
+      9
+    ],
+    [
+      "OpenBlood2::Objects::get",
+      9
+    ],
+    [
+      "std::__uniq_ptr_impl<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::_M_ptr",
+      9
+    ],
+    [
+      "OpenBlood2::(anonymous namespace)::maxv",
+      8
+    ],
+    [
+      "std::isfinite",
+      8
+    ],
+    [
+      "operator==",
+      7
+    ],
+    [
+      "OpenBlood2::Objects::snapshot",
+      7
+    ],
+    [
+      "OpenBlood2::CollisionWorld::sweep",
+      7
+    ],
+    [
+      "OpenBlood2::sweep_box",
+      7
+    ],
+    [
+      "OpenBlood2::(anonymous namespace)::precise_dot",
+      7
+    ],
+    [
+      "OpenBlood2::physics_vector",
+      6
+    ],
+    [
+      "OpenBlood2::(anonymous namespace)::add",
+      6
+    ],
+    [
+      "std::span<unsigned char const, 18446744073709551615ul>::size",
+      5
+    ],
+    [
+      "OpenBlood2::(anonymous namespace)::extents",
+      5
+    ],
+    [
+      "std::__get_helper<0ul, OpenBlood2::ObjectRecord*, std::default_delete<OpenBlood2::ObjectRecord> >",
+      5
+    ],
+    [
+      "std::unique_ptr<OpenBlood2::ObjectRecord, std::default_delete<OpenBlood2::ObjectRecord> >::operator->",
+      5
+    ],
+    [
+      "std::vector<OpenBlood2::CollisionWorld::Node, std::allocator<OpenBlood2::CollisionWorld::Node> >::size",
+      4
+    ],
+    [
+      "std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> > >::_M_lower_bound",
+      4
+    ],
+    [
+      "std::_Head_base<0ul, OpenBlood2::ObjectRecord*, false>::_M_head",
+      4
+    ],
+    [
+      "OpenBlood2::(anonymous namespace)::minv",
+      4
+    ],
+    [
+      "__dynamic_cast",
+      4
+    ],
+    [
+      "std::_Hashtable<DObject*, std::pair<DObject* const, OpenBlood2::ObjectId>, std::allocator<std::pair<DObject* const, OpenBlood2::ObjectId> >, std::__detail::_Select1st, std::equal_to<DObject*>, std::hash<DObject*>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<false, false, true> >::_M_find_before_node_tr<DObject*>",
+      3
+    ],
+    [
+      "OpenBlood2::vector_scale",
+      3
+    ],
+    [
+      "std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> > >::_M_key_compare<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >",
+      3
+    ],
+    [
+      "std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::size",
+      3
+    ],
+    [
+      "std::max<float>",
+      3
+    ],
+    [
+      "std::_Tuple_impl<0ul, OpenBlood2::ObjectRecord*, std::default_delete<OpenBlood2::ObjectRecord> >::_M_head",
+      3
+    ],
+    [
+      "OpenBlood2::(anonymous namespace)::cross",
+      3
+    ],
+    [
+      "OpenBlood2::ObjectRecord::container",
+      3
+    ],
+    [
+      "std::__shared_ptr<OpenBlood2::ContainerShape const, (__gnu_cxx::_Lock_policy)2>::get",
+      3
+    ]
+  ]
+}

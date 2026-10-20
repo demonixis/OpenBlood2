@@ -1,0 +1,14 @@
+572/577 Testing: explosion_fragments.recipes
+572/577 Test: explosion_fragments.recipes
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_fragment_tests" "recipes" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-fragments-recipes"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"explosion_fragments.recipes" start time: Oct 16 21:32 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_fragments.recipes" end time: Oct 16 21:32 CEST
+"explosion_fragments.recipes" time elapsed: 00:00:00
+----------------------------------------------------------

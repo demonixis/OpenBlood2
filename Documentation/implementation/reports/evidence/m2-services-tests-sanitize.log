@@ -1,0 +1,720 @@
+Start testing: Oct 15 15:56 CEST
+----------------------------------------------------------
+1/43 Testing: objects.original_objects
+1/43 Test: objects.original_objects
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "original_objects"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.original_objects" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS original_objects
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"objects.original_objects" end time: Oct 15 15:56 CEST
+"objects.original_objects" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/43 Testing: objects.nested_creation
+2/43 Test: objects.nested_creation
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "nested_creation"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.nested_creation" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS nested_creation
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"objects.nested_creation" end time: Oct 15 15:56 CEST
+"objects.nested_creation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/43 Testing: objects.reasons_properties
+3/43 Test: objects.reasons_properties
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "reasons_properties"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.reasons_properties" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS reasons_properties
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"objects.reasons_properties" end time: Oct 15 15:56 CEST
+"objects.reasons_properties" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/43 Testing: objects.scheduling
+4/43 Test: objects.scheduling
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "scheduling"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.scheduling" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS scheduling
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"objects.scheduling" end time: Oct 15 15:56 CEST
+"objects.scheduling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/43 Testing: objects.deferred_removal
+5/43 Test: objects.deferred_removal
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "deferred_removal"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.deferred_removal" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS deferred_removal
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"objects.deferred_removal" end time: Oct 15 15:56 CEST
+"objects.deferred_removal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/43 Testing: objects.aggregate_dispatch
+6/43 Test: objects.aggregate_dispatch
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "aggregate_dispatch"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.aggregate_dispatch" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS aggregate_dispatch
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"objects.aggregate_dispatch" end time: Oct 15 15:56 CEST
+"objects.aggregate_dispatch" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/43 Testing: objects.handles_selection
+7/43 Test: objects.handles_selection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "handles_selection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.handles_selection" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS handles_selection
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"objects.handles_selection" end time: Oct 15 15:56 CEST
+"objects.handles_selection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/43 Testing: objects.links_lists
+8/43 Test: objects.links_lists
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "links_lists"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.links_lists" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS links_lists
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"objects.links_lists" end time: Oct 15 15:56 CEST
+"objects.links_lists" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/43 Testing: objects.messages_strings
+9/43 Test: objects.messages_strings
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "messages_strings"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.messages_strings" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS messages_strings
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.messages_strings" end time: Oct 15 15:56 CEST
+"objects.messages_strings" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/43 Testing: objects.unsupported_teardown
+10/43 Test: objects.unsupported_teardown
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "unsupported_teardown"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.unsupported_teardown" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS unsupported_teardown
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.unsupported_teardown" end time: Oct 15 15:56 CEST
+"objects.unsupported_teardown" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/43 Testing: objects.creation_failures
+11/43 Test: objects.creation_failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "creation_failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.creation_failures" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS creation_failures
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.creation_failures" end time: Oct 15 15:56 CEST
+"objects.creation_failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/43 Testing: config.arguments
+12/43 Test: config.arguments
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/config_tests" "arguments" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/test-runs"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"config.arguments" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS arguments
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"config.arguments" end time: Oct 15 15:56 CEST
+"config.arguments" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/43 Testing: config.precedence
+13/43 Test: config.precedence
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/config_tests" "precedence" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/test-runs"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"config.precedence" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS precedence
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"config.precedence" end time: Oct 15 15:56 CEST
+"config.precedence" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/43 Testing: config.relative_paths
+14/43 Test: config.relative_paths
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/config_tests" "relative_paths" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/test-runs"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"config.relative_paths" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS relative_paths
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"config.relative_paths" end time: Oct 15 15:56 CEST
+"config.relative_paths" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/43 Testing: config.invalid_config
+15/43 Test: config.invalid_config
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/config_tests" "invalid_config" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/test-runs"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"config.invalid_config" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS invalid_config
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"config.invalid_config" end time: Oct 15 15:56 CEST
+"config.invalid_config" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/43 Testing: config.content_validation
+16/43 Test: config.content_validation
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/config_tests" "content_validation" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/test-runs"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"config.content_validation" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS content_validation
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"config.content_validation" end time: Oct 15 15:56 CEST
+"config.content_validation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/43 Testing: config.case_lookup
+17/43 Test: config.case_lookup
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/config_tests" "case_lookup" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/test-runs"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"config.case_lookup" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS case_lookup
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"config.case_lookup" end time: Oct 15 15:56 CEST
+"config.case_lookup" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/43 Testing: cli.help
+18/43 Test: cli.help
+Command: "/usr/bin/cmake" "-DAPP=/home/yann/projects/lithtech/Blood2/build/sanitize/blood2" "-DCASE=help" "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/sanitize/tests/fixtures/Blood II" "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/sanitize/tests/empty.ini" "-P" "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cli.help" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"cli.help" end time: Oct 15 15:56 CEST
+"cli.help" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/43 Testing: cli.unknown
+19/43 Test: cli.unknown
+Command: "/usr/bin/cmake" "-DAPP=/home/yann/projects/lithtech/Blood2/build/sanitize/blood2" "-DCASE=unknown" "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/sanitize/tests/fixtures/Blood II" "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/sanitize/tests/empty.ini" "-P" "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cli.unknown" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"cli.unknown" end time: Oct 15 15:56 CEST
+"cli.unknown" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/43 Testing: cli.missing_data
+20/43 Test: cli.missing_data
+Command: "/usr/bin/cmake" "-DAPP=/home/yann/projects/lithtech/Blood2/build/sanitize/blood2" "-DCASE=missing_data" "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/sanitize/tests/fixtures/Blood II" "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/sanitize/tests/empty.ini" "-P" "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cli.missing_data" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"cli.missing_data" end time: Oct 15 15:56 CEST
+"cli.missing_data" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/43 Testing: cli.missing_config
+21/43 Test: cli.missing_config
+Command: "/usr/bin/cmake" "-DAPP=/home/yann/projects/lithtech/Blood2/build/sanitize/blood2" "-DCASE=missing_config" "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/sanitize/tests/fixtures/Blood II" "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/sanitize/tests/empty.ini" "-P" "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cli.missing_config" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"cli.missing_config" end time: Oct 15 15:56 CEST
+"cli.missing_config" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/43 Testing: cli.metadata
+22/43 Test: cli.metadata
+Command: "/usr/bin/cmake" "-DAPP=/home/yann/projects/lithtech/Blood2/build/sanitize/blood2" "-DCASE=metadata" "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/sanitize/tests/fixtures/Blood II" "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/sanitize/tests/empty.ini" "-P" "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cli.metadata" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"cli.metadata" end time: Oct 15 15:56 CEST
+"cli.metadata" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/43 Testing: content.local
+23/43 Test: content.local
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--check-data"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"content.local" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] Metadata only; no archives mounted, no game objects or resources loaded
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"content.local" end time: Oct 15 15:56 CEST
+"content.local" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/43 Testing: world.rez_structure
+24/43 Test: world.rez_structure
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "rez_structure" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/rez_structure"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.rez_structure" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS rez_structure
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"world.rez_structure" end time: Oct 15 15:56 CEST
+"world.rez_structure" time elapsed: 00:00:00
+----------------------------------------------------------
+
+25/43 Testing: world.rez_rejection
+25/43 Test: world.rez_rejection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "rez_rejection" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/rez_rejection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.rez_rejection" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS rez_rejection
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"world.rez_rejection" end time: Oct 15 15:56 CEST
+"world.rez_rejection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/43 Testing: world.resource_mount
+26/43 Test: world.resource_mount
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "resource_mount" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/resource_mount"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.resource_mount" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS resource_mount
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"world.resource_mount" end time: Oct 15 15:56 CEST
+"world.resource_mount" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/43 Testing: world.world_properties
+27/43 Test: world.world_properties
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "world_properties" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/world_properties"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.world_properties" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS world_properties
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"world.world_properties" end time: Oct 15 15:56 CEST
+"world.world_properties" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/43 Testing: world.world_geometry
+28/43 Test: world.world_geometry
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "world_geometry" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/world_geometry"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.world_geometry" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS world_geometry
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"world.world_geometry" end time: Oct 15 15:56 CEST
+"world.world_geometry" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/43 Testing: world.world_rejection
+29/43 Test: world.world_rejection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "world_rejection" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/world_rejection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.world_rejection" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS world_rejection
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"world.world_rejection" end time: Oct 15 15:56 CEST
+"world.world_rejection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+30/43 Testing: world.mutations
+30/43 Test: world.mutations
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "mutations" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/mutations"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.mutations" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS mutations
+<end of output>
+Test time =   0.20 sec
+----------------------------------------------------------
+Test Passed.
+"world.mutations" end time: Oct 15 15:56 CEST
+"world.mutations" time elapsed: 00:00:00
+----------------------------------------------------------
+
+31/43 Testing: world.session_lifecycle
+31/43 Test: world.session_lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "session_lifecycle" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/session_lifecycle"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.session_lifecycle" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS session_lifecycle
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"world.session_lifecycle" end time: Oct 15 15:56 CEST
+"world.session_lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------
+
+32/43 Testing: world.session_messages
+32/43 Test: world.session_messages
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "session_messages" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/session_messages"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.session_messages" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS session_messages
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"world.session_messages" end time: Oct 15 15:56 CEST
+"world.session_messages" time elapsed: 00:00:00
+----------------------------------------------------------
+
+33/43 Testing: world.original_trigger
+33/43 Test: world.original_trigger
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "original_trigger" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/original_trigger"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.original_trigger" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+PASS original_trigger
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"world.original_trigger" end time: Oct 15 15:56 CEST
+"world.original_trigger" time elapsed: 00:00:00
+----------------------------------------------------------
+
+34/43 Testing: world.private
+34/43 Test: world.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.private" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+Service CreateString: 5
+Service GetGameConVar: 41
+Service GetObjectFlags: 17
+Service GetObjectName: 14
+Service GetPropBool: 12
+Service GetPropGeneric: 467
+Service GetPropReal: 27
+Service GetPropString: 63
+Service GetPropVector: 4
+Service GetVarValueFloat: 41
+Service SetGameConVar: 30
+Service SetGlobalForce: 1
+Service SetNextUpdate: 23
+Service SetObjectDims: 7
+Service SetObjectFlags: 17
+Service SetObjectState: 1
+Resource references: 58; missing: 0
+RunWorld blocked: 190 uninstantiated required objects; full original shells/CPlayerObj, moving world-model collision and remaining gameplay services are not connected
+PASS private
+<end of output>
+Test time =   1.38 sec
+----------------------------------------------------------
+Test Passed.
+"world.private" end time: Oct 15 15:56 CEST
+"world.private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+35/43 Testing: cli.world_modes
+35/43 Test: cli.world_modes
+Command: "/usr/bin/cmake" "-DAPP=/home/yann/projects/lithtech/Blood2/build/sanitize/blood2" "-DDATA_DIR=/home/yann/.steam/steam/steamapps/common/Blood II" "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/sanitize/tests/empty.ini" "-P" "/home/yann/projects/lithtech/Blood2/tests/world_cli_test.cmake"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"cli.world_modes" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   1.97 sec
+----------------------------------------------------------
+Test Passed.
+"cli.world_modes" end time: Oct 15 15:56 CEST
+"cli.world_modes" time elapsed: 00:00:01
+----------------------------------------------------------
+
+36/43 Testing: services.model_reader
+36/43 Test: services.model_reader
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "model_reader"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.model_reader" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"services.model_reader" end time: Oct 15 15:56 CEST
+"services.model_reader" time elapsed: 00:00:00
+----------------------------------------------------------
+
+37/43 Testing: services.model_rejection
+37/43 Test: services.model_rejection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "model_rejection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.model_rejection" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.29 sec
+----------------------------------------------------------
+Test Passed.
+"services.model_rejection" end time: Oct 15 15:56 CEST
+"services.model_rejection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+38/43 Testing: services.animation_events
+38/43 Test: services.animation_events
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "animation_events"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.animation_events" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"services.animation_events" end time: Oct 15 15:56 CEST
+"services.animation_events" time elapsed: 00:00:00
+----------------------------------------------------------
+
+39/43 Testing: services.model_callbacks
+39/43 Test: services.model_callbacks
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "model_callbacks"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.model_callbacks" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"services.model_callbacks" end time: Oct 15 15:56 CEST
+"services.model_callbacks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+40/43 Testing: services.collision_queries
+40/43 Test: services.collision_queries
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "collision_queries"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.collision_queries" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"services.collision_queries" end time: Oct 15 15:56 CEST
+"services.collision_queries" time elapsed: 00:00:00
+----------------------------------------------------------
+
+41/43 Testing: services.movement_contacts
+41/43 Test: services.movement_contacts
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "movement_contacts"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.movement_contacts" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"services.movement_contacts" end time: Oct 15 15:56 CEST
+"services.movement_contacts" time elapsed: 00:00:00
+----------------------------------------------------------
+
+42/43 Testing: services.original_services
+42/43 Test: services.original_services
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "original_services"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.original_services" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"services.original_services" end time: Oct 15 15:56 CEST
+"services.original_services" time elapsed: 00:00:00
+----------------------------------------------------------
+
+43/43 Testing: services.private
+43/43 Test: services.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.private" start time: Oct 15 15:56 CEST
+Output:
+----------------------------------------------------------
+Original start point: -32,192,-3224
+Caleb: 784 vertices, 20 nodes, 86 animations; dispatched commands: 46
+Primary world: 14300 solid triangles, 4095 BVH nodes; probe contact y=170 polygon=2549
+<end of output>
+Test time =   0.92 sec
+----------------------------------------------------------
+Test Passed.
+"services.private" end time: Oct 15 15:56 CEST
+"services.private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 15 15:56 CEST
+
+cli =   0.09 sec*proc
+
+config =   0.06 sec*proc
+
+headless =   5.29 sec*proc
+
+objects =   0.17 sec*proc
+
+private =   4.28 sec*proc
+
+services =   1.28 sec*proc
+
+world =   3.68 sec*proc
+

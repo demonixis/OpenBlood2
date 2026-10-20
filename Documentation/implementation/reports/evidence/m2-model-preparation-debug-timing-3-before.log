@@ -1,0 +1,767 @@
+WORLD worlds/01_subwaya.dat mesh_ms=34.3874 objects=230
+SLOW 0.0166667 objects.advance(seconds) 7.21244
+SLOW 0.533333 objects.advance(seconds) 4.67837
+SLOW 1.05 objects.advance(seconds) 4.57515
+SLOW 1.56667 objects.advance(seconds) 4.813
+SLOW 2.08333 objects.advance(seconds) 4.71065
+SLOW 2.6 objects.advance(seconds) 4.73962
+SLOW 3.11667 objects.advance(seconds) 4.59956
+SLOW 3.63333 objects.advance(seconds) 4.74838
+SLOW 4.15 objects.advance(seconds) 4.67159
+SLOW 4.66667 objects.advance(seconds) 4.81111
+SLOW 5.18333 objects.advance(seconds) 4.78121
+SLOW 5.7 objects.advance(seconds) 4.64896
+step mean=2.3977 p50=2.25482 p95=2.45023 max=6.48826
+world mean=1.66832 p50=1.65411 p95=1.71969 max=2.57362
+model mean=5.04026 p50=5.00399 p95=5.28255 max=7.76191
+sprite mean=0.0732266 p50=0.068728 p95=0.093301 max=0.124884
+fx mean=0.000488223 p50=0.00043 p95=0.000838 max=0.001689
+COUNTS models=36 model_vertices=40479 sprites=72 voices=5
+WORLD worlds/02_cityhub.dat mesh_ms=147.152 objects=488
+SLOW 0 server.advance_audio(seconds, listener, listener_rotation) 2.75318
+SLOW 0.0166667 objects.advance(seconds) 28.5991
+SLOW 0.0166667 server.advance_physics(seconds) 42.3074
+SLOW 0.0166667 server.advance_audio(seconds, listener, listener_rotation) 2.85349
+SLOW 0.0333333 server.advance_physics(seconds) 42.9338
+SLOW 0.0333333 server.advance_audio(seconds, listener, listener_rotation) 2.72224
+SLOW 0.05 server.advance_physics(seconds) 42.4919
+SLOW 0.05 server.advance_audio(seconds, listener, listener_rotation) 2.73146
+SLOW 0.0666667 server.advance_physics(seconds) 42.4312
+SLOW 0.0666667 server.advance_audio(seconds, listener, listener_rotation) 2.69709
+SLOW 0.0833333 server.advance_physics(seconds) 42.6191
+SLOW 0.0833333 server.advance_audio(seconds, listener, listener_rotation) 2.69257
+SLOW 0.1 server.advance_physics(seconds) 42.437
+SLOW 0.1 server.advance_audio(seconds, listener, listener_rotation) 2.76986
+SLOW 0.116667 server.advance_physics(seconds) 42.5123
+SLOW 0.116667 server.advance_audio(seconds, listener, listener_rotation) 2.70618
+SLOW 0.133333 server.advance_physics(seconds) 42.4809
+SLOW 0.133333 server.advance_audio(seconds, listener, listener_rotation) 2.71532
+SLOW 0.15 server.advance_physics(seconds) 42.3924
+SLOW 0.15 server.advance_audio(seconds, listener, listener_rotation) 2.73512
+SLOW 0.166667 server.advance_physics(seconds) 42.7412
+SLOW 0.166667 server.advance_audio(seconds, listener, listener_rotation) 2.72808
+SLOW 0.183333 server.advance_physics(seconds) 42.4561
+SLOW 0.183333 server.advance_audio(seconds, listener, listener_rotation) 2.85792
+SLOW 0.2 server.advance_physics(seconds) 42.8871
+SLOW 0.2 server.advance_audio(seconds, listener, listener_rotation) 2.80859
+SLOW 0.216667 server.advance_physics(seconds) 42.5701
+SLOW 0.216667 server.advance_audio(seconds, listener, listener_rotation) 2.82625
+SLOW 0.233333 server.advance_physics(seconds) 42.3571
+SLOW 0.233333 server.advance_audio(seconds, listener, listener_rotation) 2.85399
+SLOW 0.25 server.advance_physics(seconds) 42.4455
+SLOW 0.25 server.advance_audio(seconds, listener, listener_rotation) 2.82305
+SLOW 0.266667 server.advance_physics(seconds) 42.9049
+SLOW 0.266667 server.advance_audio(seconds, listener, listener_rotation) 3.05697
+SLOW 0.283333 server.advance_physics(seconds) 42.5583
+SLOW 0.283333 server.advance_audio(seconds, listener, listener_rotation) 2.8505
+SLOW 0.3 server.advance_physics(seconds) 42.8389
+SLOW 0.3 server.advance_audio(seconds, listener, listener_rotation) 2.81829
+SLOW 0.316667 server.advance_physics(seconds) 42.801
+SLOW 0.316667 server.advance_audio(seconds, listener, listener_rotation) 2.81626
+SLOW 0.333333 server.advance_physics(seconds) 42.5807
+SLOW 0.333333 server.advance_audio(seconds, listener, listener_rotation) 3.00398
+SLOW 0.35 server.advance_physics(seconds) 43.1815
+SLOW 0.35 server.advance_audio(seconds, listener, listener_rotation) 2.82108
+SLOW 0.366667 server.advance_physics(seconds) 42.3999
+SLOW 0.366667 server.advance_audio(seconds, listener, listener_rotation) 2.83025
+SLOW 0.383333 server.advance_physics(seconds) 42.7834
+SLOW 0.383333 server.advance_audio(seconds, listener, listener_rotation) 2.78694
+SLOW 0.4 server.advance_physics(seconds) 43.4692
+SLOW 0.4 server.advance_audio(seconds, listener, listener_rotation) 2.76023
+SLOW 0.416667 server.advance_physics(seconds) 43.9307
+SLOW 0.416667 server.advance_audio(seconds, listener, listener_rotation) 2.75942
+SLOW 0.433333 server.advance_physics(seconds) 43.4193
+SLOW 0.433333 server.advance_audio(seconds, listener, listener_rotation) 2.82646
+SLOW 0.45 server.advance_physics(seconds) 42.3811
+SLOW 0.45 server.advance_audio(seconds, listener, listener_rotation) 2.89086
+SLOW 0.466667 server.advance_physics(seconds) 42.349
+SLOW 0.466667 server.advance_audio(seconds, listener, listener_rotation) 2.75092
+SLOW 0.483333 server.advance_physics(seconds) 42.3809
+SLOW 0.483333 server.advance_audio(seconds, listener, listener_rotation) 2.7907
+SLOW 0.5 server.advance_physics(seconds) 42.2816
+SLOW 0.5 server.advance_audio(seconds, listener, listener_rotation) 2.77479
+SLOW 0.516667 server.advance_physics(seconds) 42.6455
+SLOW 0.516667 server.advance_audio(seconds, listener, listener_rotation) 2.74104
+SLOW 0.533333 objects.advance(seconds) 35.1507
+SLOW 0.533333 server.advance_physics(seconds) 43.0945
+SLOW 0.533333 server.advance_audio(seconds, listener, listener_rotation) 2.69696
+SLOW 0.55 server.advance_physics(seconds) 43.5162
+SLOW 0.55 server.advance_audio(seconds, listener, listener_rotation) 2.82858
+SLOW 0.566667 server.advance_physics(seconds) 42.8677
+SLOW 0.566667 server.advance_audio(seconds, listener, listener_rotation) 2.84185
+SLOW 0.583333 server.advance_physics(seconds) 43.3752
+SLOW 0.583333 server.advance_audio(seconds, listener, listener_rotation) 2.84258
+SLOW 0.6 server.advance_physics(seconds) 43.4347
+SLOW 0.6 server.advance_audio(seconds, listener, listener_rotation) 3.0469
+SLOW 0.616667 server.advance_physics(seconds) 43.5026
+SLOW 0.616667 server.advance_audio(seconds, listener, listener_rotation) 2.83493
+SLOW 0.633333 server.advance_physics(seconds) 44.1768
+SLOW 0.633333 server.advance_audio(seconds, listener, listener_rotation) 2.81084
+SLOW 0.65 server.advance_physics(seconds) 42.5127
+SLOW 0.65 server.advance_audio(seconds, listener, listener_rotation) 2.82407
+SLOW 0.666667 server.advance_physics(seconds) 42.9939
+SLOW 0.666667 server.advance_audio(seconds, listener, listener_rotation) 3.07262
+SLOW 0.683333 server.advance_physics(seconds) 43.1985
+SLOW 0.683333 server.advance_audio(seconds, listener, listener_rotation) 2.84644
+SLOW 0.7 server.advance_physics(seconds) 42.6947
+SLOW 0.7 server.advance_audio(seconds, listener, listener_rotation) 2.85284
+SLOW 0.716667 server.advance_physics(seconds) 43.2408
+SLOW 0.716667 server.advance_audio(seconds, listener, listener_rotation) 2.87593
+SLOW 0.733333 server.advance_physics(seconds) 43.2957
+SLOW 0.733333 server.advance_audio(seconds, listener, listener_rotation) 2.83668
+SLOW 0.75 server.advance_physics(seconds) 42.923
+SLOW 0.75 server.advance_audio(seconds, listener, listener_rotation) 2.91414
+SLOW 0.766667 server.advance_physics(seconds) 42.6048
+SLOW 0.766667 server.advance_audio(seconds, listener, listener_rotation) 2.70555
+SLOW 0.783333 server.advance_physics(seconds) 42.779
+SLOW 0.783333 server.advance_audio(seconds, listener, listener_rotation) 2.6985
+SLOW 0.8 server.advance_physics(seconds) 43.0483
+SLOW 0.8 server.advance_audio(seconds, listener, listener_rotation) 2.72287
+SLOW 0.816667 server.advance_physics(seconds) 42.307
+SLOW 0.816667 server.advance_audio(seconds, listener, listener_rotation) 2.72054
+SLOW 0.833333 server.advance_physics(seconds) 41.6136
+SLOW 0.833333 server.advance_audio(seconds, listener, listener_rotation) 2.82841
+SLOW 0.85 server.advance_physics(seconds) 46.3165
+SLOW 0.85 client_shell.UpdateMovement(server_shell, seconds, error) 2.38784
+SLOW 0.85 server.advance_audio(seconds, listener, listener_rotation) 3.18302
+SLOW 0.866667 server.advance_physics(seconds) 44.673
+SLOW 0.866667 server.advance_audio(seconds, listener, listener_rotation) 4.30154
+SLOW 0.883333 server.advance_physics(seconds) 62.9055
+SLOW 0.883333 client_shell.UpdateMovement(server_shell, seconds, error) 2.31996
+SLOW 0.883333 server.advance_audio(seconds, listener, listener_rotation) 4.06918
+SLOW 0.9 server.advance_physics(seconds) 62.8739
+SLOW 0.9 client_shell.UpdateMovement(server_shell, seconds, error) 2.366
+SLOW 0.9 server.advance_audio(seconds, listener, listener_rotation) 4.22464
+SLOW 0.916667 server.advance_physics(seconds) 62.9726
+SLOW 0.916667 client_shell.UpdateMovement(server_shell, seconds, error) 2.36791
+SLOW 0.916667 server.advance_audio(seconds, listener, listener_rotation) 4.28029
+SLOW 0.933333 server.advance_physics(seconds) 62.9505
+SLOW 0.933333 client_shell.UpdateMovement(server_shell, seconds, error) 2.4483
+SLOW 0.933333 server.advance_audio(seconds, listener, listener_rotation) 2.98204
+SLOW 0.95 server.advance_physics(seconds) 50.9174
+SLOW 0.95 client_shell.UpdateMovement(server_shell, seconds, error) 2.16387
+SLOW 0.95 server.advance_audio(seconds, listener, listener_rotation) 2.88994
+SLOW 0.966667 server.advance_physics(seconds) 42.5017
+SLOW 0.966667 server.advance_audio(seconds, listener, listener_rotation) 3.34186
+SLOW 0.983333 server.advance_physics(seconds) 63.5832
+SLOW 0.983333 client_shell.UpdateMovement(server_shell, seconds, error) 2.41756
+SLOW 0.983333 server.advance_audio(seconds, listener, listener_rotation) 2.82313
+SLOW 1 server.advance_physics(seconds) 9.25364
+SLOW 1 server.advance_audio(seconds, listener, listener_rotation) 2.81141
+SLOW 1.01667 server.advance_physics(seconds) 9.29064
+SLOW 1.01667 server.advance_audio(seconds, listener, listener_rotation) 2.80337
+SLOW 1.03333 server.advance_physics(seconds) 9.30002
+SLOW 1.03333 server.advance_audio(seconds, listener, listener_rotation) 2.83073
+SLOW 1.05 objects.advance(seconds) 33.1157
+SLOW 1.05 server.advance_physics(seconds) 9.29498
+SLOW 1.05 server.advance_audio(seconds, listener, listener_rotation) 2.85068
+SLOW 1.06667 server.advance_physics(seconds) 9.75675
+SLOW 1.06667 server.advance_audio(seconds, listener, listener_rotation) 3.15705
+SLOW 1.08333 server.advance_physics(seconds) 9.78362
+SLOW 1.08333 server.advance_audio(seconds, listener, listener_rotation) 2.81685
+SLOW 1.1 server.advance_physics(seconds) 10.035
+SLOW 1.1 server.advance_audio(seconds, listener, listener_rotation) 3.03601
+SLOW 1.11667 server.advance_physics(seconds) 9.70952
+SLOW 1.11667 server.advance_audio(seconds, listener, listener_rotation) 2.70935
+SLOW 1.13333 server.advance_physics(seconds) 9.84533
+SLOW 1.13333 server.advance_audio(seconds, listener, listener_rotation) 2.76964
+SLOW 1.15 server.advance_physics(seconds) 9.89232
+SLOW 1.15 server.advance_audio(seconds, listener, listener_rotation) 2.91301
+SLOW 1.16667 server.advance_physics(seconds) 9.65572
+SLOW 1.16667 server.advance_audio(seconds, listener, listener_rotation) 2.7595
+SLOW 1.18333 server.advance_physics(seconds) 9.86625
+SLOW 1.18333 server.advance_audio(seconds, listener, listener_rotation) 2.71519
+SLOW 1.2 server.advance_physics(seconds) 9.68224
+SLOW 1.2 server.advance_audio(seconds, listener, listener_rotation) 2.7267
+SLOW 1.21667 server.advance_physics(seconds) 9.31647
+SLOW 1.21667 server.advance_audio(seconds, listener, listener_rotation) 2.72241
+SLOW 1.23333 server.advance_physics(seconds) 9.38418
+SLOW 1.23333 server.advance_audio(seconds, listener, listener_rotation) 2.70077
+SLOW 1.25 server.advance_physics(seconds) 9.34848
+SLOW 1.25 server.advance_audio(seconds, listener, listener_rotation) 2.71185
+SLOW 1.26667 server.advance_physics(seconds) 9.44139
+SLOW 1.26667 server.advance_audio(seconds, listener, listener_rotation) 2.707
+SLOW 1.28333 server.advance_physics(seconds) 9.42022
+SLOW 1.28333 server.advance_audio(seconds, listener, listener_rotation) 2.69805
+SLOW 1.3 server.advance_physics(seconds) 9.37212
+SLOW 1.3 server.advance_audio(seconds, listener, listener_rotation) 2.88259
+SLOW 1.31667 server.advance_physics(seconds) 9.35623
+SLOW 1.31667 server.advance_audio(seconds, listener, listener_rotation) 2.81886
+SLOW 1.33333 server.advance_physics(seconds) 9.26811
+SLOW 1.33333 server.advance_audio(seconds, listener, listener_rotation) 2.90247
+SLOW 1.35 server.advance_physics(seconds) 9.30967
+SLOW 1.35 server.advance_audio(seconds, listener, listener_rotation) 2.8404
+SLOW 1.36667 server.advance_physics(seconds) 9.31719
+SLOW 1.36667 server.advance_audio(seconds, listener, listener_rotation) 2.80956
+SLOW 1.38333 server.advance_physics(seconds) 9.30902
+SLOW 1.38333 server.advance_audio(seconds, listener, listener_rotation) 2.79973
+SLOW 1.4 server.advance_physics(seconds) 9.29912
+SLOW 1.4 server.advance_audio(seconds, listener, listener_rotation) 2.83128
+SLOW 1.41667 server.advance_physics(seconds) 9.32652
+SLOW 1.41667 server.advance_audio(seconds, listener, listener_rotation) 2.85758
+SLOW 1.43333 server.advance_physics(seconds) 9.29902
+SLOW 1.43333 server.advance_audio(seconds, listener, listener_rotation) 2.82171
+SLOW 1.45 server.advance_physics(seconds) 9.28335
+SLOW 1.45 server.advance_audio(seconds, listener, listener_rotation) 2.83537
+SLOW 1.46667 server.advance_physics(seconds) 9.2345
+SLOW 1.46667 server.advance_audio(seconds, listener, listener_rotation) 2.8405
+SLOW 1.48333 server.advance_physics(seconds) 9.35525
+SLOW 1.48333 server.advance_audio(seconds, listener, listener_rotation) 2.76802
+SLOW 1.5 server.advance_physics(seconds) 9.3883
+SLOW 1.5 server.advance_audio(seconds, listener, listener_rotation) 2.72412
+SLOW 1.51667 server.advance_physics(seconds) 9.34276
+SLOW 1.51667 server.advance_audio(seconds, listener, listener_rotation) 2.69983
+SLOW 1.53333 server.advance_physics(seconds) 9.2571
+SLOW 1.53333 server.advance_audio(seconds, listener, listener_rotation) 2.69863
+SLOW 1.55 server.advance_physics(seconds) 9.25409
+SLOW 1.55 server.advance_audio(seconds, listener, listener_rotation) 2.69401
+SLOW 1.56667 objects.advance(seconds) 33.0489
+SLOW 1.56667 server.advance_physics(seconds) 9.23722
+SLOW 1.56667 server.advance_audio(seconds, listener, listener_rotation) 2.71686
+SLOW 1.58333 server.advance_physics(seconds) 9.2332
+SLOW 1.58333 server.advance_audio(seconds, listener, listener_rotation) 2.71226
+SLOW 1.6 server.advance_physics(seconds) 9.31077
+SLOW 1.6 server.advance_audio(seconds, listener, listener_rotation) 2.69125
+SLOW 1.61667 server.advance_physics(seconds) 9.36419
+SLOW 1.61667 server.advance_audio(seconds, listener, listener_rotation) 2.69176
+SLOW 1.63333 server.advance_physics(seconds) 9.37634
+SLOW 1.63333 server.advance_audio(seconds, listener, listener_rotation) 2.68931
+SLOW 1.65 server.advance_physics(seconds) 9.30139
+SLOW 1.65 server.advance_audio(seconds, listener, listener_rotation) 2.6995
+SLOW 1.66667 server.advance_physics(seconds) 9.23693
+SLOW 1.66667 server.advance_audio(seconds, listener, listener_rotation) 2.88506
+SLOW 1.68333 server.advance_physics(seconds) 9.27235
+SLOW 1.68333 server.advance_audio(seconds, listener, listener_rotation) 2.81955
+SLOW 1.7 server.advance_physics(seconds) 9.22261
+SLOW 1.7 server.advance_audio(seconds, listener, listener_rotation) 2.83325
+SLOW 1.71667 server.advance_physics(seconds) 9.3092
+SLOW 1.71667 server.advance_audio(seconds, listener, listener_rotation) 2.83639
+SLOW 1.73333 server.advance_physics(seconds) 9.32413
+SLOW 1.73333 server.advance_audio(seconds, listener, listener_rotation) 2.80789
+SLOW 1.75 server.advance_physics(seconds) 9.3426
+SLOW 1.75 server.advance_audio(seconds, listener, listener_rotation) 2.80737
+SLOW 1.76667 server.advance_physics(seconds) 9.23427
+SLOW 1.76667 server.advance_audio(seconds, listener, listener_rotation) 2.93513
+SLOW 1.78333 server.advance_physics(seconds) 9.28043
+SLOW 1.78333 server.advance_audio(seconds, listener, listener_rotation) 2.82599
+SLOW 1.8 server.advance_physics(seconds) 9.24993
+SLOW 1.8 server.advance_audio(seconds, listener, listener_rotation) 2.81933
+SLOW 1.81667 server.advance_physics(seconds) 9.22797
+SLOW 1.81667 server.advance_audio(seconds, listener, listener_rotation) 2.81297
+SLOW 1.83333 server.advance_physics(seconds) 9.25127
+SLOW 1.83333 server.advance_audio(seconds, listener, listener_rotation) 2.8323
+SLOW 1.85 server.advance_physics(seconds) 9.35317
+SLOW 1.85 server.advance_audio(seconds, listener, listener_rotation) 2.77947
+SLOW 1.86667 server.advance_physics(seconds) 9.44979
+SLOW 1.86667 server.advance_audio(seconds, listener, listener_rotation) 2.61321
+SLOW 1.88333 server.advance_physics(seconds) 9.27465
+SLOW 1.88333 server.advance_audio(seconds, listener, listener_rotation) 2.80537
+SLOW 1.9 server.advance_physics(seconds) 9.28318
+SLOW 1.9 server.advance_audio(seconds, listener, listener_rotation) 2.77352
+SLOW 1.91667 server.advance_physics(seconds) 9.31209
+SLOW 1.91667 server.advance_audio(seconds, listener, listener_rotation) 2.68811
+SLOW 1.93333 server.advance_physics(seconds) 9.22279
+SLOW 1.93333 server.advance_audio(seconds, listener, listener_rotation) 2.6937
+SLOW 1.95 server.advance_physics(seconds) 9.2643
+SLOW 1.95 server.advance_audio(seconds, listener, listener_rotation) 2.70626
+SLOW 1.96667 server.advance_physics(seconds) 9.36975
+SLOW 1.96667 server.advance_audio(seconds, listener, listener_rotation) 2.68511
+SLOW 1.98333 server.advance_physics(seconds) 9.30133
+SLOW 1.98333 server.advance_audio(seconds, listener, listener_rotation) 2.74579
+SLOW 2 server.advance_physics(seconds) 9.38714
+SLOW 2 server.advance_audio(seconds, listener, listener_rotation) 2.76375
+SLOW 2.01667 server.advance_physics(seconds) 9.00791
+SLOW 2.01667 server.advance_audio(seconds, listener, listener_rotation) 2.67088
+SLOW 2.03333 server.advance_physics(seconds) 9.16817
+SLOW 2.03333 server.advance_audio(seconds, listener, listener_rotation) 2.84097
+SLOW 2.05 server.advance_physics(seconds) 10.4419
+SLOW 2.05 server.advance_audio(seconds, listener, listener_rotation) 2.82507
+SLOW 2.06667 server.advance_physics(seconds) 9.22691
+SLOW 2.06667 server.advance_audio(seconds, listener, listener_rotation) 2.88322
+SLOW 2.08333 objects.advance(seconds) 33.2044
+SLOW 2.08333 server.advance_physics(seconds) 9.23828
+SLOW 2.08333 server.advance_audio(seconds, listener, listener_rotation) 2.81642
+SLOW 2.1 server.advance_physics(seconds) 9.31422
+SLOW 2.1 server.advance_audio(seconds, listener, listener_rotation) 2.84497
+SLOW 2.11667 server.advance_physics(seconds) 9.68328
+SLOW 2.11667 server.advance_audio(seconds, listener, listener_rotation) 2.8145
+SLOW 2.13333 server.advance_physics(seconds) 9.38516
+SLOW 2.13333 server.advance_audio(seconds, listener, listener_rotation) 2.8048
+SLOW 2.15 server.advance_physics(seconds) 9.27148
+SLOW 2.15 server.advance_audio(seconds, listener, listener_rotation) 2.81633
+SLOW 2.16667 server.advance_physics(seconds) 9.25487
+SLOW 2.16667 server.advance_audio(seconds, listener, listener_rotation) 2.88911
+SLOW 2.18333 server.advance_physics(seconds) 9.29342
+SLOW 2.18333 server.advance_audio(seconds, listener, listener_rotation) 2.82072
+SLOW 2.2 server.advance_physics(seconds) 9.22629
+SLOW 2.2 server.advance_audio(seconds, listener, listener_rotation) 2.81523
+SLOW 2.21667 server.advance_physics(seconds) 9.24259
+SLOW 2.21667 server.advance_audio(seconds, listener, listener_rotation) 2.82943
+SLOW 2.23333 server.advance_physics(seconds) 9.30865
+SLOW 2.23333 server.advance_audio(seconds, listener, listener_rotation) 2.68775
+SLOW 2.25 server.advance_physics(seconds) 9.40523
+SLOW 2.25 server.advance_audio(seconds, listener, listener_rotation) 2.69005
+SLOW 2.26667 server.advance_physics(seconds) 9.57525
+SLOW 2.26667 server.advance_audio(seconds, listener, listener_rotation) 2.74228
+SLOW 2.28333 server.advance_physics(seconds) 9.2746
+SLOW 2.28333 server.advance_audio(seconds, listener, listener_rotation) 2.69187
+SLOW 2.3 server.advance_physics(seconds) 9.26911
+SLOW 2.3 server.advance_audio(seconds, listener, listener_rotation) 2.68382
+SLOW 2.31667 server.advance_physics(seconds) 9.28558
+SLOW 2.31667 server.advance_audio(seconds, listener, listener_rotation) 2.69313
+SLOW 2.33333 server.advance_physics(seconds) 9.3536
+SLOW 2.33333 server.advance_audio(seconds, listener, listener_rotation) 2.7635
+SLOW 2.35 server.advance_physics(seconds) 9.31459
+SLOW 2.35 server.advance_audio(seconds, listener, listener_rotation) 2.98414
+SLOW 2.36667 server.advance_physics(seconds) 9.37563
+SLOW 2.36667 server.advance_audio(seconds, listener, listener_rotation) 2.6871
+SLOW 2.38333 server.advance_physics(seconds) 9.60413
+SLOW 2.38333 server.advance_audio(seconds, listener, listener_rotation) 2.68408
+SLOW 2.4 server.advance_physics(seconds) 9.69726
+SLOW 2.4 server.advance_audio(seconds, listener, listener_rotation) 2.76688
+SLOW 2.41667 server.advance_physics(seconds) 9.81565
+SLOW 2.41667 server.advance_audio(seconds, listener, listener_rotation) 2.85692
+SLOW 2.43333 server.advance_physics(seconds) 9.30975
+SLOW 2.43333 server.advance_audio(seconds, listener, listener_rotation) 2.81043
+SLOW 2.45 server.advance_physics(seconds) 9.45808
+SLOW 2.45 server.advance_audio(seconds, listener, listener_rotation) 2.80856
+SLOW 2.46667 server.advance_physics(seconds) 9.50428
+SLOW 2.46667 server.advance_audio(seconds, listener, listener_rotation) 2.86116
+SLOW 2.48333 server.advance_physics(seconds) 9.48206
+SLOW 2.48333 server.advance_audio(seconds, listener, listener_rotation) 2.87012
+SLOW 2.5 server.advance_physics(seconds) 9.28966
+SLOW 2.5 server.advance_audio(seconds, listener, listener_rotation) 2.83148
+SLOW 2.51667 server.advance_physics(seconds) 9.30109
+SLOW 2.51667 server.advance_audio(seconds, listener, listener_rotation) 2.79969
+SLOW 2.53333 server.advance_physics(seconds) 9.28387
+SLOW 2.53333 server.advance_audio(seconds, listener, listener_rotation) 2.80032
+SLOW 2.55 server.advance_physics(seconds) 9.25527
+SLOW 2.55 server.advance_audio(seconds, listener, listener_rotation) 2.80828
+SLOW 2.56667 server.advance_physics(seconds) 9.24672
+SLOW 2.56667 server.advance_audio(seconds, listener, listener_rotation) 2.81844
+SLOW 2.58333 server.advance_physics(seconds) 9.24222
+SLOW 2.58333 server.advance_audio(seconds, listener, listener_rotation) 2.81142
+SLOW 2.6 objects.advance(seconds) 33.0234
+SLOW 2.6 server.advance_physics(seconds) 9.23345
+SLOW 2.6 server.advance_audio(seconds, listener, listener_rotation) 2.75799
+SLOW 2.61667 server.advance_physics(seconds) 9.25492
+SLOW 2.61667 server.advance_audio(seconds, listener, listener_rotation) 2.70503
+SLOW 2.63333 server.advance_physics(seconds) 9.315
+SLOW 2.63333 server.advance_audio(seconds, listener, listener_rotation) 2.83095
+SLOW 2.65 server.advance_physics(seconds) 9.52401
+SLOW 2.65 server.advance_audio(seconds, listener, listener_rotation) 2.6869
+SLOW 2.66667 server.advance_physics(seconds) 9.4065
+SLOW 2.66667 server.advance_audio(seconds, listener, listener_rotation) 2.74985
+SLOW 2.68333 server.advance_physics(seconds) 9.45106
+SLOW 2.68333 server.advance_audio(seconds, listener, listener_rotation) 2.75078
+SLOW 2.7 server.advance_physics(seconds) 9.38625
+SLOW 2.7 server.advance_audio(seconds, listener, listener_rotation) 2.8029
+SLOW 2.71667 server.advance_physics(seconds) 9.83186
+SLOW 2.71667 server.advance_audio(seconds, listener, listener_rotation) 2.75894
+SLOW 2.73333 server.advance_physics(seconds) 9.69123
+SLOW 2.73333 server.advance_audio(seconds, listener, listener_rotation) 2.82631
+SLOW 2.75 server.advance_physics(seconds) 9.5494
+SLOW 2.75 server.advance_audio(seconds, listener, listener_rotation) 2.7222
+SLOW 2.76667 server.advance_physics(seconds) 9.77886
+SLOW 2.76667 server.advance_audio(seconds, listener, listener_rotation) 2.72216
+SLOW 2.78333 server.advance_physics(seconds) 9.73099
+SLOW 2.78333 server.advance_audio(seconds, listener, listener_rotation) 3.02651
+SLOW 2.8 server.advance_physics(seconds) 9.60585
+SLOW 2.8 server.advance_audio(seconds, listener, listener_rotation) 2.82615
+SLOW 2.81667 server.advance_physics(seconds) 9.52464
+SLOW 2.81667 server.advance_audio(seconds, listener, listener_rotation) 2.80869
+SLOW 2.83333 server.advance_physics(seconds) 9.66428
+SLOW 2.83333 server.advance_audio(seconds, listener, listener_rotation) 2.81041
+SLOW 2.85 server.advance_physics(seconds) 9.40017
+SLOW 2.85 server.advance_audio(seconds, listener, listener_rotation) 2.90705
+SLOW 2.86667 server.advance_physics(seconds) 9.40799
+SLOW 2.86667 server.advance_audio(seconds, listener, listener_rotation) 2.81209
+SLOW 2.88333 server.advance_physics(seconds) 9.38344
+SLOW 2.88333 server.advance_audio(seconds, listener, listener_rotation) 2.82367
+SLOW 2.9 server.advance_physics(seconds) 9.41698
+SLOW 2.9 server.advance_audio(seconds, listener, listener_rotation) 2.94839
+SLOW 2.91667 server.advance_physics(seconds) 9.68432
+SLOW 2.91667 server.advance_audio(seconds, listener, listener_rotation) 2.88956
+SLOW 2.93333 server.advance_physics(seconds) 9.9027
+SLOW 2.93333 server.advance_audio(seconds, listener, listener_rotation) 3.0304
+SLOW 2.95 server.advance_physics(seconds) 9.46383
+SLOW 2.95 server.advance_audio(seconds, listener, listener_rotation) 2.94496
+SLOW 2.96667 server.advance_physics(seconds) 11.0335
+SLOW 2.96667 server.advance_audio(seconds, listener, listener_rotation) 2.91568
+SLOW 2.98333 server.advance_physics(seconds) 10.7436
+SLOW 2.98333 server.advance_audio(seconds, listener, listener_rotation) 3.07653
+SLOW 3 server.advance_physics(seconds) 10.6026
+SLOW 3 server.advance_audio(seconds, listener, listener_rotation) 2.7716
+SLOW 3.01667 server.advance_physics(seconds) 9.40633
+SLOW 3.01667 server.advance_audio(seconds, listener, listener_rotation) 2.70331
+SLOW 3.03333 server.advance_physics(seconds) 9.44442
+SLOW 3.03333 server.advance_audio(seconds, listener, listener_rotation) 2.79891
+SLOW 3.05 server.advance_physics(seconds) 12.5703
+SLOW 3.05 client_shell.UpdateMovement(server_shell, seconds, error) 2.27682
+SLOW 3.05 server.advance_audio(seconds, listener, listener_rotation) 2.70895
+SLOW 3.06667 server.advance_physics(seconds) 10.176
+SLOW 3.06667 server.advance_audio(seconds, listener, listener_rotation) 2.86252
+SLOW 3.08333 server.advance_physics(seconds) 9.51268
+SLOW 3.08333 server.advance_audio(seconds, listener, listener_rotation) 2.81465
+SLOW 3.1 server.advance_physics(seconds) 9.72727
+SLOW 3.1 server.advance_audio(seconds, listener, listener_rotation) 2.72986
+SLOW 3.11667 objects.advance(seconds) 33.6306
+SLOW 3.11667 server.advance_physics(seconds) 9.42014
+SLOW 3.11667 server.advance_audio(seconds, listener, listener_rotation) 2.90232
+SLOW 3.13333 server.advance_physics(seconds) 9.8035
+SLOW 3.13333 server.advance_audio(seconds, listener, listener_rotation) 2.80462
+SLOW 3.15 server.advance_physics(seconds) 9.41118
+SLOW 3.15 server.advance_audio(seconds, listener, listener_rotation) 2.89665
+SLOW 3.16667 server.advance_physics(seconds) 9.78393
+SLOW 3.16667 server.advance_audio(seconds, listener, listener_rotation) 2.86918
+SLOW 3.18333 server.advance_physics(seconds) 9.7049
+SLOW 3.18333 server.advance_audio(seconds, listener, listener_rotation) 2.87075
+SLOW 3.2 server.advance_physics(seconds) 9.61431
+SLOW 3.2 server.advance_audio(seconds, listener, listener_rotation) 2.85755
+SLOW 3.21667 server.advance_physics(seconds) 9.72768
+SLOW 3.21667 server.advance_audio(seconds, listener, listener_rotation) 2.83907
+SLOW 3.23333 server.advance_physics(seconds) 9.6026
+SLOW 3.23333 server.advance_audio(seconds, listener, listener_rotation) 2.92415
+SLOW 3.25 server.advance_physics(seconds) 9.78109
+SLOW 3.25 server.advance_audio(seconds, listener, listener_rotation) 2.90197
+SLOW 3.26667 server.advance_physics(seconds) 9.76084
+SLOW 3.26667 server.advance_audio(seconds, listener, listener_rotation) 2.8488
+SLOW 3.28333 server.advance_physics(seconds) 9.90636
+SLOW 3.28333 server.advance_audio(seconds, listener, listener_rotation) 2.92652
+SLOW 3.3 server.advance_physics(seconds) 9.75108
+SLOW 3.3 server.advance_audio(seconds, listener, listener_rotation) 2.87136
+SLOW 3.31667 server.advance_physics(seconds) 9.56325
+SLOW 3.31667 server.advance_audio(seconds, listener, listener_rotation) 2.97092
+SLOW 3.33333 server.advance_physics(seconds) 10.3564
+SLOW 3.33333 server.advance_audio(seconds, listener, listener_rotation) 3.40878
+SLOW 3.35 server.advance_physics(seconds) 10.7455
+SLOW 3.35 server.advance_audio(seconds, listener, listener_rotation) 2.83148
+SLOW 3.36667 server.advance_physics(seconds) 10.1042
+SLOW 3.36667 server.advance_audio(seconds, listener, listener_rotation) 2.78954
+SLOW 3.38333 server.advance_physics(seconds) 9.90892
+SLOW 3.38333 server.advance_audio(seconds, listener, listener_rotation) 2.78703
+SLOW 3.4 server.advance_physics(seconds) 10.4098
+SLOW 3.4 server.advance_audio(seconds, listener, listener_rotation) 2.91687
+SLOW 3.41667 server.advance_physics(seconds) 9.85242
+SLOW 3.41667 server.advance_audio(seconds, listener, listener_rotation) 2.75965
+SLOW 3.43333 server.advance_physics(seconds) 11.115
+SLOW 3.43333 server.advance_audio(seconds, listener, listener_rotation) 2.77055
+SLOW 3.45 server.advance_physics(seconds) 9.93047
+SLOW 3.45 server.advance_audio(seconds, listener, listener_rotation) 2.85112
+SLOW 3.46667 server.advance_physics(seconds) 11.1635
+SLOW 3.46667 server.advance_audio(seconds, listener, listener_rotation) 2.81467
+SLOW 3.48333 server.advance_physics(seconds) 9.90049
+SLOW 3.48333 server.advance_audio(seconds, listener, listener_rotation) 2.93665
+SLOW 3.5 server.advance_physics(seconds) 9.73429
+SLOW 3.5 server.advance_audio(seconds, listener, listener_rotation) 2.87395
+SLOW 3.51667 server.advance_physics(seconds) 9.7455
+SLOW 3.51667 server.advance_audio(seconds, listener, listener_rotation) 2.92215
+SLOW 3.53333 server.advance_physics(seconds) 9.37689
+SLOW 3.53333 server.advance_audio(seconds, listener, listener_rotation) 2.89402
+SLOW 3.55 server.advance_physics(seconds) 9.50727
+SLOW 3.55 server.advance_audio(seconds, listener, listener_rotation) 2.94425
+SLOW 3.56667 server.advance_physics(seconds) 9.30678
+SLOW 3.56667 server.advance_audio(seconds, listener, listener_rotation) 2.9485
+SLOW 3.58333 server.advance_physics(seconds) 9.48706
+SLOW 3.58333 server.advance_audio(seconds, listener, listener_rotation) 2.96608
+SLOW 3.6 server.advance_physics(seconds) 9.5409
+SLOW 3.6 server.advance_audio(seconds, listener, listener_rotation) 2.87169
+SLOW 3.61667 server.advance_physics(seconds) 9.57729
+SLOW 3.61667 server.advance_audio(seconds, listener, listener_rotation) 2.89332
+SLOW 3.63333 objects.advance(seconds) 33.6545
+SLOW 3.63333 server.advance_physics(seconds) 9.55261
+SLOW 3.63333 server.advance_audio(seconds, listener, listener_rotation) 2.80776
+SLOW 3.65 server.advance_physics(seconds) 9.3111
+SLOW 3.65 server.advance_audio(seconds, listener, listener_rotation) 3.33595
+SLOW 3.66667 server.advance_physics(seconds) 9.97367
+SLOW 3.66667 server.advance_audio(seconds, listener, listener_rotation) 2.97481
+SLOW 3.68333 server.advance_physics(seconds) 9.71391
+SLOW 3.68333 server.advance_audio(seconds, listener, listener_rotation) 2.87602
+SLOW 3.7 server.advance_physics(seconds) 9.62862
+SLOW 3.7 server.advance_audio(seconds, listener, listener_rotation) 2.97629
+SLOW 3.71667 server.advance_physics(seconds) 9.65679
+SLOW 3.71667 server.advance_audio(seconds, listener, listener_rotation) 2.74555
+SLOW 3.73333 server.advance_physics(seconds) 9.38265
+SLOW 3.73333 server.advance_audio(seconds, listener, listener_rotation) 2.71539
+SLOW 3.75 server.advance_physics(seconds) 9.36645
+SLOW 3.75 server.advance_audio(seconds, listener, listener_rotation) 2.78854
+SLOW 3.76667 server.advance_physics(seconds) 9.40071
+SLOW 3.76667 server.advance_audio(seconds, listener, listener_rotation) 2.69735
+SLOW 3.78333 server.advance_physics(seconds) 9.35295
+SLOW 3.78333 server.advance_audio(seconds, listener, listener_rotation) 2.69746
+SLOW 3.8 server.advance_physics(seconds) 9.32577
+SLOW 3.8 server.advance_audio(seconds, listener, listener_rotation) 2.69517
+SLOW 3.81667 server.advance_physics(seconds) 9.39989
+SLOW 3.81667 server.advance_audio(seconds, listener, listener_rotation) 2.73171
+SLOW 3.83333 server.advance_physics(seconds) 9.33127
+SLOW 3.83333 server.advance_audio(seconds, listener, listener_rotation) 2.7298
+SLOW 3.85 server.advance_physics(seconds) 9.3594
+SLOW 3.85 server.advance_audio(seconds, listener, listener_rotation) 2.70594
+SLOW 3.86667 server.advance_physics(seconds) 9.31823
+SLOW 3.86667 server.advance_audio(seconds, listener, listener_rotation) 2.74456
+SLOW 3.88333 server.advance_physics(seconds) 9.71164
+SLOW 3.88333 server.advance_audio(seconds, listener, listener_rotation) 2.75641
+SLOW 3.9 server.advance_physics(seconds) 9.53115
+SLOW 3.9 server.advance_audio(seconds, listener, listener_rotation) 2.89826
+SLOW 3.91667 server.advance_physics(seconds) 9.25263
+SLOW 3.91667 server.advance_audio(seconds, listener, listener_rotation) 2.81017
+SLOW 3.93333 server.advance_physics(seconds) 9.26286
+SLOW 3.93333 server.advance_audio(seconds, listener, listener_rotation) 2.82205
+SLOW 3.95 server.advance_physics(seconds) 9.24059
+SLOW 3.95 server.advance_audio(seconds, listener, listener_rotation) 2.80858
+SLOW 3.96667 server.advance_physics(seconds) 9.19454
+SLOW 3.96667 server.advance_audio(seconds, listener, listener_rotation) 2.79584
+SLOW 3.98333 server.advance_physics(seconds) 9.34253
+SLOW 3.98333 server.advance_audio(seconds, listener, listener_rotation) 2.79371
+SLOW 4 server.advance_physics(seconds) 9.16767
+SLOW 4 server.advance_audio(seconds, listener, listener_rotation) 2.83673
+SLOW 4.01667 server.advance_physics(seconds) 9.26808
+SLOW 4.01667 server.advance_audio(seconds, listener, listener_rotation) 2.86256
+SLOW 4.03333 server.advance_physics(seconds) 9.27655
+SLOW 4.03333 server.advance_audio(seconds, listener, listener_rotation) 2.84464
+SLOW 4.05 server.advance_physics(seconds) 9.27544
+SLOW 4.05 server.advance_audio(seconds, listener, listener_rotation) 2.88837
+SLOW 4.06667 server.advance_physics(seconds) 9.33195
+SLOW 4.06667 server.advance_audio(seconds, listener, listener_rotation) 2.84934
+SLOW 4.08333 server.advance_physics(seconds) 9.19801
+SLOW 4.08333 server.advance_audio(seconds, listener, listener_rotation) 2.79478
+SLOW 4.1 server.advance_physics(seconds) 9.2017
+SLOW 4.1 server.advance_audio(seconds, listener, listener_rotation) 2.754
+SLOW 4.11667 server.advance_physics(seconds) 9.47745
+SLOW 4.11667 server.advance_audio(seconds, listener, listener_rotation) 2.73984
+SLOW 4.13333 server.advance_physics(seconds) 9.22274
+SLOW 4.13333 server.advance_audio(seconds, listener, listener_rotation) 2.73802
+SLOW 4.15 objects.advance(seconds) 33.0761
+SLOW 4.15 server.advance_physics(seconds) 9.24042
+SLOW 4.15 server.advance_audio(seconds, listener, listener_rotation) 2.76953
+SLOW 4.16667 server.advance_physics(seconds) 9.23557
+SLOW 4.16667 server.advance_audio(seconds, listener, listener_rotation) 2.73556
+SLOW 4.18333 server.advance_physics(seconds) 9.50097
+SLOW 4.18333 server.advance_audio(seconds, listener, listener_rotation) 2.66415
+SLOW 4.2 server.advance_physics(seconds) 9.4788
+SLOW 4.2 server.advance_audio(seconds, listener, listener_rotation) 2.90954
+SLOW 4.21667 server.advance_physics(seconds) 9.70742
+SLOW 4.21667 server.advance_audio(seconds, listener, listener_rotation) 2.78688
+SLOW 4.23333 server.advance_physics(seconds) 9.21275
+SLOW 4.23333 server.advance_audio(seconds, listener, listener_rotation) 2.73538
+SLOW 4.25 server.advance_physics(seconds) 9.21044
+SLOW 4.25 server.advance_audio(seconds, listener, listener_rotation) 2.96199
+SLOW 4.26667 server.advance_physics(seconds) 9.36754
+SLOW 4.26667 server.advance_audio(seconds, listener, listener_rotation) 2.86789
+SLOW 4.28333 server.advance_physics(seconds) 9.30548
+SLOW 4.28333 server.advance_audio(seconds, listener, listener_rotation) 2.89166
+SLOW 4.3 server.advance_physics(seconds) 9.21506
+SLOW 4.3 server.advance_audio(seconds, listener, listener_rotation) 2.85982
+SLOW 4.31667 server.advance_physics(seconds) 9.51953
+SLOW 4.31667 server.advance_audio(seconds, listener, listener_rotation) 2.87269
+SLOW 4.33333 server.advance_physics(seconds) 9.93856
+SLOW 4.33333 server.advance_audio(seconds, listener, listener_rotation) 2.88116
+SLOW 4.35 server.advance_physics(seconds) 9.3259
+SLOW 4.35 server.advance_audio(seconds, listener, listener_rotation) 2.85257
+SLOW 4.36667 server.advance_physics(seconds) 9.21573
+SLOW 4.36667 server.advance_audio(seconds, listener, listener_rotation) 2.85927
+SLOW 4.38333 server.advance_physics(seconds) 9.46226
+SLOW 4.38333 server.advance_audio(seconds, listener, listener_rotation) 2.86196
+SLOW 4.4 server.advance_physics(seconds) 9.21898
+SLOW 4.4 server.advance_audio(seconds, listener, listener_rotation) 2.84793
+SLOW 4.41667 server.advance_physics(seconds) 9.28395
+SLOW 4.41667 server.advance_audio(seconds, listener, listener_rotation) 2.8819
+SLOW 4.43333 server.advance_physics(seconds) 9.22915
+SLOW 4.43333 server.advance_audio(seconds, listener, listener_rotation) 2.84227
+SLOW 4.45 server.advance_physics(seconds) 9.33156
+SLOW 4.45 server.advance_audio(seconds, listener, listener_rotation) 2.81876
+SLOW 4.46667 server.advance_physics(seconds) 9.30601
+SLOW 4.46667 server.advance_audio(seconds, listener, listener_rotation) 2.7393
+SLOW 4.48333 server.advance_physics(seconds) 9.24298
+SLOW 4.48333 server.advance_audio(seconds, listener, listener_rotation) 2.94439
+SLOW 4.5 server.advance_physics(seconds) 9.32989
+SLOW 4.5 server.advance_audio(seconds, listener, listener_rotation) 2.74428
+SLOW 4.51667 server.advance_physics(seconds) 9.24035
+SLOW 4.51667 server.advance_audio(seconds, listener, listener_rotation) 2.82561
+SLOW 4.53333 server.advance_physics(seconds) 9.2496
+SLOW 4.53333 server.advance_audio(seconds, listener, listener_rotation) 2.76785
+SLOW 4.55 server.advance_physics(seconds) 9.17414
+SLOW 4.55 server.advance_audio(seconds, listener, listener_rotation) 2.8914
+SLOW 4.56667 server.advance_physics(seconds) 9.31114
+SLOW 4.56667 server.advance_audio(seconds, listener, listener_rotation) 2.93465
+SLOW 4.58333 server.advance_physics(seconds) 9.79772
+SLOW 4.58333 server.advance_audio(seconds, listener, listener_rotation) 2.70779
+SLOW 4.6 server.advance_physics(seconds) 9.52757
+SLOW 4.6 server.advance_audio(seconds, listener, listener_rotation) 2.81261
+SLOW 4.61667 server.advance_physics(seconds) 9.41654
+SLOW 4.61667 server.advance_audio(seconds, listener, listener_rotation) 2.71911
+SLOW 4.63333 server.advance_physics(seconds) 9.14319
+SLOW 4.63333 server.advance_audio(seconds, listener, listener_rotation) 2.84109
+SLOW 4.65 server.advance_physics(seconds) 9.24077
+SLOW 4.65 server.advance_audio(seconds, listener, listener_rotation) 2.88372
+SLOW 4.66667 objects.advance(seconds) 33.1922
+SLOW 4.66667 server.advance_physics(seconds) 9.23417
+SLOW 4.66667 server.advance_audio(seconds, listener, listener_rotation) 2.87545
+SLOW 4.68333 server.advance_physics(seconds) 9.36063
+SLOW 4.68333 server.advance_audio(seconds, listener, listener_rotation) 2.85655
+SLOW 4.7 server.advance_physics(seconds) 9.29972
+SLOW 4.7 server.advance_audio(seconds, listener, listener_rotation) 2.85989
+SLOW 4.71667 server.advance_physics(seconds) 9.33907
+SLOW 4.71667 server.advance_audio(seconds, listener, listener_rotation) 2.89956
+SLOW 4.73333 server.advance_physics(seconds) 9.36781
+SLOW 4.73333 server.advance_audio(seconds, listener, listener_rotation) 2.87167
+SLOW 4.75 server.advance_physics(seconds) 9.37323
+SLOW 4.75 server.advance_audio(seconds, listener, listener_rotation) 2.87293
+SLOW 4.76667 server.advance_physics(seconds) 9.35472
+SLOW 4.76667 server.advance_audio(seconds, listener, listener_rotation) 2.85448
+SLOW 4.78333 server.advance_physics(seconds) 9.97896
+SLOW 4.78333 server.advance_audio(seconds, listener, listener_rotation) 2.89089
+SLOW 4.8 server.advance_physics(seconds) 9.27395
+SLOW 4.8 server.advance_audio(seconds, listener, listener_rotation) 2.90157
+SLOW 4.81667 server.advance_physics(seconds) 9.45897
+SLOW 4.81667 server.advance_audio(seconds, listener, listener_rotation) 3.09904
+SLOW 4.83333 server.advance_physics(seconds) 9.81544
+SLOW 4.83333 client_shell.UpdateMovement(server_shell, seconds, error) 2.05083
+SLOW 4.83333 server.advance_audio(seconds, listener, listener_rotation) 2.86544
+SLOW 4.85 server.advance_physics(seconds) 9.53296
+SLOW 4.85 server.advance_audio(seconds, listener, listener_rotation) 2.78269
+SLOW 4.86667 server.advance_physics(seconds) 9.51205
+SLOW 4.86667 server.advance_audio(seconds, listener, listener_rotation) 2.80676
+SLOW 4.88333 server.advance_physics(seconds) 10.7168
+SLOW 4.88333 server.advance_audio(seconds, listener, listener_rotation) 2.78141
+SLOW 4.9 server.advance_physics(seconds) 9.67114
+SLOW 4.9 server.advance_audio(seconds, listener, listener_rotation) 2.7457
+SLOW 4.91667 server.advance_physics(seconds) 9.63027
+SLOW 4.91667 server.advance_audio(seconds, listener, listener_rotation) 2.76038
+SLOW 4.93333 server.advance_physics(seconds) 9.35224
+SLOW 4.93333 server.advance_audio(seconds, listener, listener_rotation) 2.74228
+SLOW 4.95 server.advance_physics(seconds) 9.2073
+SLOW 4.95 server.advance_audio(seconds, listener, listener_rotation) 2.75434
+SLOW 4.96667 server.advance_physics(seconds) 9.21642
+SLOW 4.96667 server.advance_audio(seconds, listener, listener_rotation) 2.75674
+SLOW 4.98333 server.advance_physics(seconds) 9.36915
+SLOW 4.98333 server.advance_audio(seconds, listener, listener_rotation) 2.76382
+SLOW 5 server.advance_physics(seconds) 9.40937
+SLOW 5 server.advance_audio(seconds, listener, listener_rotation) 2.82819
+SLOW 5.01667 server.advance_physics(seconds) 9.37851
+SLOW 5.01667 server.advance_audio(seconds, listener, listener_rotation) 3.12579
+SLOW 5.03333 server.advance_physics(seconds) 9.40187
+SLOW 5.03333 server.advance_audio(seconds, listener, listener_rotation) 2.85214
+SLOW 5.05 server.advance_physics(seconds) 9.61851
+SLOW 5.05 server.advance_audio(seconds, listener, listener_rotation) 2.91652
+SLOW 5.06667 server.advance_physics(seconds) 9.55071
+SLOW 5.06667 server.advance_audio(seconds, listener, listener_rotation) 2.8645
+SLOW 5.08333 server.advance_physics(seconds) 9.24861
+SLOW 5.08333 server.advance_audio(seconds, listener, listener_rotation) 2.89262
+SLOW 5.1 server.advance_physics(seconds) 9.2794
+SLOW 5.1 server.advance_audio(seconds, listener, listener_rotation) 2.84145
+SLOW 5.11667 server.advance_physics(seconds) 9.29015
+SLOW 5.11667 server.advance_audio(seconds, listener, listener_rotation) 2.88845
+SLOW 5.13333 server.advance_physics(seconds) 9.31409
+SLOW 5.13333 server.advance_audio(seconds, listener, listener_rotation) 2.90399
+SLOW 5.15 server.advance_physics(seconds) 9.36112
+SLOW 5.15 server.advance_audio(seconds, listener, listener_rotation) 2.87968
+SLOW 5.16667 server.advance_physics(seconds) 9.30177
+SLOW 5.16667 server.advance_audio(seconds, listener, listener_rotation) 2.82802
+SLOW 5.18333 objects.advance(seconds) 33.4575
+SLOW 5.18333 server.advance_physics(seconds) 9.61545
+SLOW 5.18333 server.advance_audio(seconds, listener, listener_rotation) 2.83354
+SLOW 5.2 server.advance_physics(seconds) 9.64287
+SLOW 5.2 server.advance_audio(seconds, listener, listener_rotation) 2.83247
+SLOW 5.21667 server.advance_physics(seconds) 9.52686
+SLOW 5.21667 server.advance_audio(seconds, listener, listener_rotation) 2.73466
+SLOW 5.23333 server.advance_physics(seconds) 9.23958
+SLOW 5.23333 server.advance_audio(seconds, listener, listener_rotation) 2.76173
+SLOW 5.25 server.advance_physics(seconds) 9.25671
+SLOW 5.25 server.advance_audio(seconds, listener, listener_rotation) 2.74857
+SLOW 5.26667 server.advance_physics(seconds) 9.26753
+SLOW 5.26667 server.advance_audio(seconds, listener, listener_rotation) 2.75827
+SLOW 5.28333 server.advance_physics(seconds) 9.31603
+SLOW 5.28333 server.advance_audio(seconds, listener, listener_rotation) 2.77186
+SLOW 5.3 server.advance_physics(seconds) 9.83202
+SLOW 5.3 server.advance_audio(seconds, listener, listener_rotation) 2.86128
+SLOW 5.31667 server.advance_physics(seconds) 9.54778
+SLOW 5.31667 server.advance_audio(seconds, listener, listener_rotation) 2.82325
+SLOW 5.33333 server.advance_physics(seconds) 9.29852
+SLOW 5.33333 server.advance_audio(seconds, listener, listener_rotation) 2.76052
+SLOW 5.35 server.advance_physics(seconds) 9.32985
+SLOW 5.35 server.advance_audio(seconds, listener, listener_rotation) 2.78282
+SLOW 5.36667 server.advance_physics(seconds) 9.47335
+SLOW 5.36667 server.advance_audio(seconds, listener, listener_rotation) 2.78429
+SLOW 5.38333 server.advance_physics(seconds) 9.26852
+SLOW 5.38333 server.advance_audio(seconds, listener, listener_rotation) 2.86719
+SLOW 5.4 server.advance_physics(seconds) 9.24193
+SLOW 5.4 server.advance_audio(seconds, listener, listener_rotation) 2.86972
+SLOW 5.41667 server.advance_physics(seconds) 9.37845
+SLOW 5.41667 server.advance_audio(seconds, listener, listener_rotation) 3.38587
+SLOW 5.43333 server.advance_physics(seconds) 10.5099
+SLOW 5.43333 server.advance_audio(seconds, listener, listener_rotation) 2.88621
+SLOW 5.45 server.advance_physics(seconds) 9.3756
+SLOW 5.45 server.advance_audio(seconds, listener, listener_rotation) 2.87006
+SLOW 5.46667 server.advance_physics(seconds) 9.37586
+SLOW 5.46667 server.advance_audio(seconds, listener, listener_rotation) 2.85519
+SLOW 5.48333 server.advance_physics(seconds) 12.382
+SLOW 5.48333 server.advance_audio(seconds, listener, listener_rotation) 3.86661
+SLOW 5.5 server.advance_physics(seconds) 9.52483
+SLOW 5.5 server.advance_audio(seconds, listener, listener_rotation) 2.85692
+SLOW 5.51667 server.advance_physics(seconds) 10.0782
+SLOW 5.51667 server.advance_audio(seconds, listener, listener_rotation) 2.86066
+SLOW 5.53333 server.advance_physics(seconds) 9.62053
+SLOW 5.53333 server.advance_audio(seconds, listener, listener_rotation) 2.8846
+SLOW 5.55 server.advance_physics(seconds) 9.32573
+SLOW 5.55 server.advance_audio(seconds, listener, listener_rotation) 2.84564
+SLOW 5.56667 server.advance_physics(seconds) 9.96671
+SLOW 5.56667 server.advance_audio(seconds, listener, listener_rotation) 2.883
+SLOW 5.58333 server.advance_physics(seconds) 9.40121
+SLOW 5.58333 server.advance_audio(seconds, listener, listener_rotation) 2.90299
+SLOW 5.6 server.advance_physics(seconds) 9.86082
+SLOW 5.6 server.advance_audio(seconds, listener, listener_rotation) 2.78421
+SLOW 5.61667 server.advance_physics(seconds) 9.50424
+SLOW 5.61667 server.advance_audio(seconds, listener, listener_rotation) 2.8181
+SLOW 5.63333 server.advance_physics(seconds) 9.26827
+SLOW 5.63333 server.advance_audio(seconds, listener, listener_rotation) 2.88903
+SLOW 5.65 server.advance_physics(seconds) 9.51501
+SLOW 5.65 server.advance_audio(seconds, listener, listener_rotation) 2.94183
+SLOW 5.66667 server.advance_physics(seconds) 9.34644
+SLOW 5.66667 server.advance_audio(seconds, listener, listener_rotation) 2.74891
+SLOW 5.68333 server.advance_physics(seconds) 10.7752
+SLOW 5.68333 server.advance_audio(seconds, listener, listener_rotation) 2.80126
+SLOW 5.7 objects.advance(seconds) 33.3039
+SLOW 5.7 server.advance_physics(seconds) 9.23424
+SLOW 5.7 server.advance_audio(seconds, listener, listener_rotation) 2.77975
+SLOW 5.71667 server.advance_physics(seconds) 9.28384
+SLOW 5.71667 server.advance_audio(seconds, listener, listener_rotation) 2.76419
+SLOW 5.73333 server.advance_physics(seconds) 9.2119
+SLOW 5.73333 server.advance_audio(seconds, listener, listener_rotation) 2.77883
+SLOW 5.75 server.advance_physics(seconds) 9.23267
+SLOW 5.75 server.advance_audio(seconds, listener, listener_rotation) 2.84504
+SLOW 5.76667 server.advance_physics(seconds) 9.21509
+SLOW 5.76667 server.advance_audio(seconds, listener, listener_rotation) 2.88363
+SLOW 5.78333 server.advance_physics(seconds) 9.22125
+SLOW 5.78333 server.advance_audio(seconds, listener, listener_rotation) 2.81677
+SLOW 5.8 server.advance_physics(seconds) 9.28063
+SLOW 5.8 server.advance_audio(seconds, listener, listener_rotation) 2.78242
+SLOW 5.81667 server.advance_physics(seconds) 9.21275
+SLOW 5.81667 server.advance_audio(seconds, listener, listener_rotation) 2.78639
+SLOW 5.83333 server.advance_physics(seconds) 9.21162
+SLOW 5.83333 server.advance_audio(seconds, listener, listener_rotation) 2.79393
+SLOW 5.85 server.advance_physics(seconds) 9.37098
+SLOW 5.85 server.advance_audio(seconds, listener, listener_rotation) 2.79171
+SLOW 5.86667 server.advance_physics(seconds) 9.21181
+SLOW 5.86667 server.advance_audio(seconds, listener, listener_rotation) 2.79104
+SLOW 5.88333 server.advance_physics(seconds) 9.20424
+SLOW 5.88333 server.advance_audio(seconds, listener, listener_rotation) 2.81224
+SLOW 5.9 server.advance_physics(seconds) 9.21469
+SLOW 5.9 server.advance_audio(seconds, listener, listener_rotation) 2.81326
+SLOW 5.91667 server.advance_physics(seconds) 9.28061
+SLOW 5.91667 server.advance_audio(seconds, listener, listener_rotation) 2.79991
+SLOW 5.93333 server.advance_physics(seconds) 9.28118
+SLOW 5.93333 server.advance_audio(seconds, listener, listener_rotation) 2.78809
+SLOW 5.95 server.advance_physics(seconds) 9.24794
+SLOW 5.95 server.advance_audio(seconds, listener, listener_rotation) 2.74518
+SLOW 5.96667 server.advance_physics(seconds) 9.22719
+SLOW 5.96667 server.advance_audio(seconds, listener, listener_rotation) 2.78998
+SLOW 5.98333 server.advance_physics(seconds) 9.21018
+SLOW 5.98333 server.advance_audio(seconds, listener, listener_rotation) 2.79773
+SLOW 6 server.advance_physics(seconds) 9.198
+step mean=15.9187 p50=14.6877 p95=16.6998 max=48.3353
+world mean=0.854365 p50=0.836835 p95=0.963228 max=1.41456
+model mean=13.417 p50=13.2962 p95=14.1306 max=18.5238
+sprite mean=0.464308 p50=0.46962 p95=0.57329 max=1.1297
+fx mean=0.000703167 p50=0.000684 p95=0.001055 max=0.001954
+COUNTS models=272 model_vertices=104202 sprites=600 voices=36

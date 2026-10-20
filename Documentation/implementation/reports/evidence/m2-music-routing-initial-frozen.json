@@ -1,0 +1,11 @@
+{
+  "src/app/inspector_world_sounds.cpp": "1f5f5fdaafa196e6a017af378c0b78a2ccac3bdbc4feb6012fdf058eef757766",
+  "src/app/world_sound_smoke.cpp": "92e45a865ee5b3084f963f1d1cc23d0fe96c50f470c4901877c02cea7ac8acff",
+  "src/engine/dls_sampler.cpp": "f67b7def9fb86d28aa56631e46b7c68194e22389a92eb39845b8c200462aab4c",
+  "src/engine/dls_sampler.h": "f3cb462bcd3248988851f1f08bb472febe40e24c569a78b5e31717d7d993b18d",
+  "src/game/music_catalog.cpp": "a7084fba6342b90ea87c1fca41ac714478e44b2045da6267c5690f463e0f3de1",
+  "src/game/music_catalog.h": "bdaf6529b56a59d7655daddeba6a4db8537efa9c59cd1f89b58376e59cec341e",
+  "tests/CMakeLists.txt": "4631cf21f77d768435dd80effac680697467cecabdeedd9c9f693fd6b8b3413d",
+  "tests/dls_sampler_tests.cpp": "5c1c708a39d03d374e16a62d125ccd255f3f2b3a822c287c17da55fe961b3a87",
+  "tests/music_asset_tests.cpp": "31ed164e4572ae0776a8e6d4513f6e5a8d34e340d8d75c29048ad2e7d028eddb"
+}

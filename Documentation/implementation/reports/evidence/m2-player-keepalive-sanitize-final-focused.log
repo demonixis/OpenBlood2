@@ -1,0 +1,18 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 508: player_keepalive.named
+1/4 Test #508: player_keepalive.named ...........   Passed    0.05 sec
+    Start 509: player_keepalive.fallback
+2/4 Test #509: player_keepalive.fallback ........   Passed    0.13 sec
+    Start 510: player_keepalive.failures
+3/4 Test #510: player_keepalive.failures ........   Passed    0.07 sec
+    Start 511: player_keepalive.private
+4/4 Test #511: player_keepalive.private .........   Passed   14.81 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+headless            =  15.05 sec*proc (4 tests)
+player_keepalive    =  15.05 sec*proc (4 tests)
+private             =  14.81 sec*proc (1 test)
+
+Total Test time (real) =  15.06 sec

@@ -1,0 +1,159 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 939: flesh_gib_collision.fragments
+      Start 940: flesh_gib_collision.ceiling
+      Start 941: flesh_gib_collision.particles
+      Start 280: cinematics.catalog
+ 1/67 Test #940: flesh_gib_collision.ceiling ......   Passed    0.02 sec
+      Start 281: cinematics.subway
+ 2/67 Test #941: flesh_gib_collision.particles ....   Passed    0.03 sec
+      Start 968: coverage.private
+ 3/67 Test #939: flesh_gib_collision.fragments ....   Passed    0.04 sec
+      Start 925: death_effects.gibs
+ 4/67 Test #925: death_effects.gibs ...............   Passed    0.88 sec
+      Start 660: explosion_fragments.private
+ 5/67 Test #281: cinematics.subway ................   Passed    2.37 sec
+      Start 929: death_effects.lifetime
+ 6/67 Test #929: death_effects.lifetime ...........   Passed    0.57 sec
+      Start 924: death_effects.burn
+ 7/67 Test #924: death_effects.burn ...............   Passed    0.47 sec
+      Start 947: blood_spurts.private
+ 8/67 Test #947: blood_spurts.private .............   Passed    3.36 sec
+      Start 986: player_death.private
+ 9/67 Test #280: cinematics.catalog ...............   Passed    7.04 sec
+      Start 926: death_effects.limbs
+10/67 Test #926: death_effects.limbs ..............   Passed    0.19 sec
+      Start 927: death_effects.damage
+11/67 Test #927: death_effects.damage .............   Passed    0.20 sec
+      Start 928: death_effects.particles
+12/67 Test #928: death_effects.particles ..........   Passed    0.14 sec
+      Start 308: sprites.catalog
+13/67 Test #986: player_death.private .............   Passed    1.66 sec
+      Start  15: objects.message_churn
+14/67 Test #660: explosion_fragments.private ......   Passed    9.60 sec
+      Start 966: coverage.catalog
+15/67 Test  #15: objects.message_churn ............   Passed    2.78 sec
+      Start 585: corpses.catalog
+16/67 Test #585: corpses.catalog ..................   Passed    0.39 sec
+      Start 309: sprites.subway
+17/67 Test #966: coverage.catalog .................   Passed    1.13 sec
+      Start 278: cinematics.failures
+18/67 Test #278: cinematics.failures ..............   Passed    0.01 sec
+      Start 277: cinematics.lifetime
+19/67 Test #277: cinematics.lifetime ..............   Passed    0.01 sec
+      Start 274: cinematics.mixer
+20/67 Test #274: cinematics.mixer .................   Passed    0.01 sec
+      Start 275: cinematics.spatial
+21/67 Test #275: cinematics.spatial ...............   Passed    0.01 sec
+      Start 276: cinematics.sequence
+22/67 Test #276: cinematics.sequence ..............   Passed    0.01 sec
+      Start 946: blood_spurts.missing_sound
+23/67 Test #946: blood_spurts.missing_sound .......   Passed    0.01 sec
+      Start 938: flesh_gib_collision.query
+24/67 Test #938: flesh_gib_collision.query ........   Passed    0.01 sec
+      Start 273: cinematics.decode
+25/67 Test #273: cinematics.decode ................   Passed    0.01 sec
+      Start  16: objects.message_limit
+26/67 Test  #16: objects.message_limit ............   Passed    0.16 sec
+      Start 985: player_death.guards
+27/67 Test #985: player_death.guards ..............   Passed    0.02 sec
+      Start 984: player_death.camera
+28/67 Test #984: player_death.camera ..............   Passed    0.01 sec
+      Start 945: blood_spurts.failures
+29/67 Test #945: blood_spurts.failures ............   Passed    0.02 sec
+      Start 578: corpses.mappings
+30/67 Test #578: corpses.mappings .................   Passed    0.01 sec
+      Start 658: explosion_fragments.failures
+31/67 Test #658: explosion_fragments.failures .....   Passed    0.02 sec
+      Start 581: corpses.lifetime
+32/67 Test #581: corpses.lifetime .................   Passed    0.01 sec
+      Start 583: corpses.gates
+33/67 Test #583: corpses.gates ....................   Passed    0.01 sec
+      Start 584: corpses.accumulation
+34/67 Test #584: corpses.accumulation .............   Passed    0.01 sec
+      Start 579: corpses.transfer
+35/67 Test #579: corpses.transfer .................   Passed    0.01 sec
+      Start 580: corpses.failures
+36/67 Test #580: corpses.failures .................   Passed    0.01 sec
+      Start 582: corpses.sounds
+37/67 Test #582: corpses.sounds ...................   Passed    0.01 sec
+      Start 279: cinematics.device
+38/67 Test #279: cinematics.device ................***Failed    0.01 sec
+device:312: SDL_SetHint(SDL_HINT_AUDIO_DRIVER, "dummy")
+
+      Start 943: blood_spurts.impact
+39/67 Test #943: blood_spurts.impact ..............   Passed    0.01 sec
+      Start 942: blood_spurts.formulas
+40/67 Test #942: blood_spurts.formulas ............   Passed    0.01 sec
+      Start 944: blood_spurts.weapon
+41/67 Test #944: blood_spurts.weapon ..............   Passed    0.01 sec
+      Start 657: explosion_fragments.recipes
+42/67 Test #657: explosion_fragments.recipes ......   Passed    0.01 sec
+      Start 659: explosion_fragments.session
+43/67 Test #659: explosion_fragments.session ......   Passed    0.01 sec
+      Start 655: explosion_fragments.lifecycle
+44/67 Test #655: explosion_fragments.lifecycle ....   Passed    0.01 sec
+      Start 656: explosion_fragments.collision
+45/67 Test #656: explosion_fragments.collision ....   Passed    0.01 sec
+      Start 967: coverage.observations
+46/67 Test #967: coverage.observations ............   Passed    0.01 sec
+      Start  17: objects.unsupported_teardown
+47/67 Test  #17: objects.unsupported_teardown .....   Passed    0.02 sec
+      Start 302: sprites.reader
+48/67 Test #302: sprites.reader ...................   Passed    0.02 sec
+      Start 307: sprites.failures
+49/67 Test #307: sprites.failures .................   Passed    0.01 sec
+      Start 305: sprites.placement
+50/67 Test #305: sprites.placement ................   Passed    0.01 sec
+      Start  18: objects.creation_failures
+51/67 Test  #18: objects.creation_failures ........   Passed    0.01 sec
+      Start   5: objects.builtin_model
+52/67 Test   #5: objects.builtin_model ............   Passed    0.01 sec
+      Start  14: objects.messages_strings
+53/67 Test  #14: objects.messages_strings .........   Passed    0.01 sec
+      Start 304: sprites.properties
+54/67 Test #304: sprites.properties ...............   Passed    0.01 sec
+      Start 306: sprites.ray
+55/67 Test #306: sprites.ray ......................   Passed    0.01 sec
+      Start  11: objects.aggregate_dispatch
+56/67 Test  #11: objects.aggregate_dispatch .......   Passed    0.01 sec
+      Start   8: objects.reasons_properties
+57/67 Test   #8: objects.reasons_properties .......   Passed    0.01 sec
+      Start  10: objects.deferred_removal
+58/67 Test  #10: objects.deferred_removal .........   Passed    0.01 sec
+      Start  13: objects.links_lists
+59/67 Test  #13: objects.links_lists ..............   Passed    0.01 sec
+      Start   9: objects.scheduling
+60/67 Test   #9: objects.scheduling ...............   Passed    0.01 sec
+      Start   6: objects.original_objects
+61/67 Test   #6: objects.original_objects .........   Passed    0.01 sec
+      Start   7: objects.nested_creation
+62/67 Test   #7: objects.nested_creation ..........   Passed    0.01 sec
+      Start 303: sprites.clock
+63/67 Test #303: sprites.clock ....................   Passed    0.00 sec
+      Start  12: objects.handles_selection
+64/67 Test  #12: objects.handles_selection ........   Passed    0.01 sec
+65/67 Test #309: sprites.subway ...................   Passed    2.31 sec
+66/67 Test #308: sprites.catalog ..................   Passed    9.01 sec
+67/67 Test #968: coverage.private .................   Passed   23.73 sec
+
+99% tests passed, 1 tests failed out of 67
+
+Label Time Summary:
+audio                  =   0.09 sec*proc (4 tests)
+blood_spurts           =   3.51 sec*proc (10 tests)
+cinematics             =   9.48 sec*proc (9 tests)
+corpses                =   0.47 sec*proc (8 tests)
+death_effects          =   2.55 sec*proc (10 tests)
+explosion_fragments    =   9.65 sec*proc (6 tests)
+headless               =  66.56 sec*proc (67 tests)
+objects                =   3.04 sec*proc (14 tests)
+player_death           =   1.69 sec*proc (3 tests)
+private                =  61.92 sec*proc (15 tests)
+services               =  24.87 sec*proc (3 tests)
+sprites                =  11.38 sec*proc (8 tests)
+
+Total Test time (real) =  23.80 sec
+
+The following tests FAILED:
+	279 - cinematics.device (Failed)                        cinematics headless
+Errors while running CTest

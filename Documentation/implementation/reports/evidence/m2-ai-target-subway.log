@@ -1,0 +1,16 @@
+332/332 Testing: ai_target.subway
+332/332 Test: ai_target.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_target.subway" start time: Oct 16 08:07 CEST
+Output:
+----------------------------------------------------------
+Subway cycle=0: player leave/reentry clears/rebinds original target link
+Subway cycle=1: player leave/reentry clears/rebinds original target link
+<end of output>
+Test time =   0.64 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.subway" end time: Oct 16 08:07 CEST
+"ai_target.subway" time elapsed: 00:00:00
+----------------------------------------------------------

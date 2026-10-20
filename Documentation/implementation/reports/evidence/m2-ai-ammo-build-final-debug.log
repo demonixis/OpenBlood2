@@ -1,0 +1,17 @@
+[0/2] Re-checking globbed directories...
+[1/51] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[2/44] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_runtime_tests.cpp for CXX dependencies
+[3/44] Generating CXX dyndep file tests/CMakeFiles/ai_runtime_tests.dir/CXX.dd
+[4/44] Scanning /home/yann/projects/lithtech/Blood2/src/app/pickup_smoke.cpp for CXX dependencies
+[5/44] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[6/10] Building CXX object CMakeFiles/blood2_app.dir/src/app/pickup_smoke.cpp.o
+FAILED: [code=1] CMakeFiles/blood2_app.dir/src/app/pickup_smoke.cpp.o 
+/usr/bin/c++ -DBLOOD2_INSPECTOR=1 -DSPDLOG_COMPILED_LIB -I/home/yann/projects/lithtech/Blood2/build/debug/generated -I/home/yann/projects/lithtech/Blood2/src -I/home/yann/projects/lithtech/Blood2/src/game/legacy -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/sdl3-build/include-revision -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/sdl3-src/include -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/spdlog-src/include -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/imgui_source-src -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/imgui_source-src/backends -g -std=c++20 -Wall -Wextra -Wpedantic -MD -MT CMakeFiles/blood2_app.dir/src/app/pickup_smoke.cpp.o -MF CMakeFiles/blood2_app.dir/src/app/pickup_smoke.cpp.o.d -fmodules-ts -fmodule-mapper=CMakeFiles/blood2_app.dir/src/app/pickup_smoke.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/blood2_app.dir/src/app/pickup_smoke.cpp.o -c /home/yann/projects/lithtech/Blood2/src/app/pickup_smoke.cpp
+/home/yann/projects/lithtech/Blood2/src/app/pickup_smoke.cpp: In function ‘bool OpenBlood2::collect_pickup_smoke(GameSession&, ObjectId)’:
+/home/yann/projects/lithtech/Blood2/src/app/pickup_smoke.cpp:90:40: error: invalid operands of types ‘void’ and ‘const DRESULT’ {aka ‘const int’} to binary ‘operator!=’
+   90 |         if (g.server.RemoveObject(npc) != DE_OK)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~ ~~~~~
+      |                                  |        |
+      |                                  void     const DRESULT {aka const int}
+[7/10] Building CXX object tests/CMakeFiles/ai_runtime_tests.dir/ai_runtime_tests.cpp.o
+ninja: build stopped: subcommand failed.

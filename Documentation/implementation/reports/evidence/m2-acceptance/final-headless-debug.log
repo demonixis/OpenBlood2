@@ -1,0 +1,142 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start   5: objects.builtin_model
+ 1/64 Test   #5: objects.builtin_model .............   Passed    0.00 sec
+      Start   6: objects.original_objects
+ 2/64 Test   #6: objects.original_objects ..........   Passed    0.00 sec
+      Start   7: objects.nested_creation
+ 3/64 Test   #7: objects.nested_creation ...........   Passed    0.00 sec
+      Start   8: objects.reasons_properties
+ 4/64 Test   #8: objects.reasons_properties ........   Passed    0.00 sec
+      Start   9: objects.scheduling
+ 5/64 Test   #9: objects.scheduling ................   Passed    0.00 sec
+      Start  10: objects.deferred_removal
+ 6/64 Test  #10: objects.deferred_removal ..........   Passed    0.00 sec
+      Start  11: objects.aggregate_dispatch
+ 7/64 Test  #11: objects.aggregate_dispatch ........   Passed    0.00 sec
+      Start  12: objects.handles_selection
+ 8/64 Test  #12: objects.handles_selection .........   Passed    0.00 sec
+      Start  13: objects.links_lists
+ 9/64 Test  #13: objects.links_lists ...............   Passed    0.00 sec
+      Start  14: objects.messages_strings
+10/64 Test  #14: objects.messages_strings ..........   Passed    0.01 sec
+      Start  15: objects.message_churn
+11/64 Test  #15: objects.message_churn .............   Passed    1.52 sec
+      Start  16: objects.message_limit
+12/64 Test  #16: objects.message_limit .............   Passed    0.08 sec
+      Start  17: objects.unsupported_teardown
+13/64 Test  #17: objects.unsupported_teardown ......   Passed    0.01 sec
+      Start  18: objects.creation_failures
+14/64 Test  #18: objects.creation_failures .........   Passed    0.01 sec
+      Start  19: object_snapshots.membership
+15/64 Test  #19: object_snapshots.membership .......   Passed    0.00 sec
+      Start  20: object_snapshots.callbacks
+16/64 Test  #20: object_snapshots.callbacks ........   Passed    0.00 sec
+      Start  21: object_snapshots.churn
+17/64 Test  #21: object_snapshots.churn ............   Passed    0.03 sec
+      Start  35: world.session_start
+18/64 Test  #35: world.session_start ...............   Passed    0.04 sec
+      Start  36: world.level_change
+19/64 Test  #36: world.level_change ................   Passed    0.06 sec
+      Start  37: world.surface_effects
+20/64 Test  #37: world.surface_effects .............   Passed    0.34 sec
+      Start  38: world.destination_trials
+21/64 Test  #38: world.destination_trials ..........   Passed    0.04 sec
+      Start  39: world.destination_messages
+22/64 Test  #39: world.destination_messages ........   Passed    0.00 sec
+      Start  40: world.destination_schema
+23/64 Test  #40: world.destination_schema ..........   Passed    0.00 sec
+      Start  41: world.destination_lifetime
+24/64 Test  #41: world.destination_lifetime ........   Passed    0.01 sec
+      Start  42: world.sprite_entries
+25/64 Test  #42: world.sprite_entries ..............   Passed    0.01 sec
+      Start  43: world.sound_entries
+26/64 Test  #43: world.sound_entries ...............   Passed    0.01 sec
+      Start  44: world.rez_structure
+27/64 Test  #44: world.rez_structure ...............   Passed    0.00 sec
+      Start  45: world.rez_rejection
+28/64 Test  #45: world.rez_rejection ...............   Passed    0.00 sec
+      Start  46: world.resource_mount
+29/64 Test  #46: world.resource_mount ..............   Passed    0.00 sec
+      Start  47: world.world_properties
+30/64 Test  #47: world.world_properties ............   Passed    0.00 sec
+      Start  48: world.world_geometry
+31/64 Test  #48: world.world_geometry ..............   Passed    0.00 sec
+      Start  49: world.world_rejection
+32/64 Test  #49: world.world_rejection .............   Passed    0.01 sec
+      Start  50: world.mutations
+33/64 Test  #50: world.mutations ...................   Passed    0.05 sec
+      Start  51: world.session_lifecycle
+34/64 Test  #51: world.session_lifecycle ...........   Passed    0.00 sec
+      Start  52: world.session_messages
+35/64 Test  #52: world.session_messages ............   Passed    0.00 sec
+      Start  53: world.original_trigger
+36/64 Test  #53: world.original_trigger ............   Passed    0.00 sec
+      Start  54: world.session_start_private
+37/64 Test  #54: world.session_start_private .......   Passed    5.53 sec
+      Start  55: world.level_change_private
+38/64 Test  #55: world.level_change_private ........   Passed    5.64 sec
+      Start  56: world.destination_trial_private
+39/64 Test  #56: world.destination_trial_private ...   Passed    5.72 sec
+      Start  57: world.destination_private
+40/64 Test  #57: world.destination_private .........   Passed    3.05 sec
+      Start  58: world.private
+41/64 Test  #58: world.private .....................   Passed    1.23 sec
+      Start  61: services.model_reader
+42/64 Test  #61: services.model_reader .............   Passed    0.00 sec
+      Start  62: services.model_rejection
+43/64 Test  #62: services.model_rejection ..........   Passed    0.07 sec
+      Start  63: services.animation_events
+44/64 Test  #63: services.animation_events .........   Passed    0.00 sec
+      Start  64: services.model_callbacks
+45/64 Test  #64: services.model_callbacks ..........   Passed    0.00 sec
+      Start  65: services.collision_queries
+46/64 Test  #65: services.collision_queries ........   Passed    0.00 sec
+      Start  66: services.collision_traversal
+47/64 Test  #66: services.collision_traversal ......   Passed    0.01 sec
+      Start  67: services.movement_contacts
+48/64 Test  #67: services.movement_contacts ........   Passed    0.00 sec
+      Start  68: services.placement_queries
+49/64 Test  #68: services.placement_queries ........   Passed    0.00 sec
+      Start  69: services.placement_service
+50/64 Test  #69: services.placement_service ........   Passed    0.00 sec
+      Start  70: services.original_services
+51/64 Test  #70: services.original_services ........   Passed    0.00 sec
+      Start  71: services.private
+52/64 Test  #71: services.private ..................   Passed    1.54 sec
+      Start 933: blood_spurts.formulas
+53/64 Test #933: blood_spurts.formulas .............   Passed    0.01 sec
+      Start 934: blood_spurts.impact
+54/64 Test #934: blood_spurts.impact ...............   Passed    0.01 sec
+      Start 935: blood_spurts.weapon
+55/64 Test #935: blood_spurts.weapon ...............   Passed    0.01 sec
+      Start 936: blood_spurts.failures
+56/64 Test #936: blood_spurts.failures .............   Passed    0.01 sec
+      Start 937: blood_spurts.missing_sound
+57/64 Test #937: blood_spurts.missing_sound ........   Passed    0.01 sec
+      Start 938: blood_spurts.private
+58/64 Test #938: blood_spurts.private ..............   Passed    1.83 sec
+      Start 956: coverage.catalog
+59/64 Test #956: coverage.catalog ..................   Passed    0.58 sec
+      Start 957: coverage.observations
+60/64 Test #957: coverage.observations .............   Passed    0.00 sec
+      Start 958: coverage.private
+61/64 Test #958: coverage.private ..................   Passed   11.58 sec
+      Start 959: train_session.audit
+62/64 Test #959: train_session.audit ...............   Passed    0.00 sec
+      Start 960: train_session.private_30
+63/64 Test #960: train_session.private_30 ..........   Passed   20.68 sec
+      Start 961: train_session.private_60
+64/64 Test #961: train_session.private_60 ..........   Passed   22.89 sec
+
+100% tests passed, 0 tests failed out of 64
+
+Label Time Summary:
+blood_spurts     =   1.86 sec*proc (6 tests)
+headless         =  82.69 sec*proc (64 tests)
+objects          =   1.68 sec*proc (17 tests)
+private          =  79.69 sec*proc (10 tests)
+services         =  13.81 sec*proc (14 tests)
+train_session    =  43.57 sec*proc (3 tests)
+world            =  21.76 sec*proc (24 tests)
+
+Total Test time (real) =  82.71 sec

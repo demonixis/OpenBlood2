@@ -1,0 +1,50 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 223: cinematics.catalog
+      Start 224: cinematics.subway
+      Start 222: cinematics.device
+      Start 221: cinematics.failures
+ 1/19 Test #221: cinematics.failures ..............   Passed    0.01 sec
+      Start 217: cinematics.mixer
+ 2/19 Test #217: cinematics.mixer .................   Passed    0.01 sec
+      Start 220: cinematics.lifetime
+ 3/19 Test #220: cinematics.lifetime ..............   Passed    0.01 sec
+      Start 218: cinematics.spatial
+ 4/19 Test #218: cinematics.spatial ...............   Passed    0.01 sec
+      Start 219: cinematics.sequence
+ 5/19 Test #219: cinematics.sequence ..............   Passed    0.01 sec
+      Start 216: cinematics.decode
+ 6/19 Test #216: cinematics.decode ................   Passed    0.00 sec
+      Start 226: randomsound.defaults
+ 7/19 Test #226: randomsound.defaults .............   Passed    0.00 sec
+      Start 227: randomsound.commands
+ 8/19 Test #227: randomsound.commands .............   Passed    0.00 sec
+      Start 228: randomsound.sequence
+ 9/19 Test #228: randomsound.sequence .............   Passed    0.00 sec
+      Start 229: randomsound.random
+10/19 Test #229: randomsound.random ...............   Passed    0.01 sec
+      Start 230: randomsound.spatial
+11/19 Test #230: randomsound.spatial ..............   Passed    0.00 sec
+      Start 231: randomsound.lifetime
+12/19 Test #231: randomsound.lifetime .............   Passed    0.00 sec
+      Start 232: randomsound.failures
+13/19 Test #222: cinematics.device ................   Passed    0.07 sec
+      Start 233: randomsound.catalog
+14/19 Test #232: randomsound.failures .............   Passed    0.00 sec
+      Start 234: randomsound.subway
+15/19 Test #234: randomsound.subway ...............   Passed    0.56 sec
+16/19 Test #224: cinematics.subway ................   Passed    0.64 sec
+17/19 Test #223: cinematics.catalog ...............   Passed    3.60 sec
+18/19 Test #233: randomsound.catalog ..............   Passed    3.56 sec
+      Start 235: gpu.randomsound
+19/19 Test #235: gpu.randomsound ..................   Passed   14.74 sec
+
+100% tests passed, 0 tests failed out of 19
+
+Label Time Summary:
+cinematics     =   4.34 sec*proc (9 tests)
+gpu            =  14.74 sec*proc (1 test)
+headless       =   8.49 sec*proc (18 tests)
+private        =  23.10 sec*proc (5 tests)
+randomsound    =  18.90 sec*proc (10 tests)
+
+Total Test time (real) =  18.37 sec

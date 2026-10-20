@@ -1,0 +1,42 @@
+545/545 Testing: object_particles.private
+545/545 Test: object_particles.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_particle_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"object_particles.private" start time: Oct 16 21:44 CEST
+Output:
+----------------------------------------------------------
+SubwayA cycle 0 dt=0.02: 27 trails, peak 5872 particles, observed 6819 emitted; all expired
+SubwayA cycle 1 dt=0.0166667: 27 trails, peak 6304 particles, observed 6819 emitted; all expired
+SubwayA cycle 2 dt=0.05: 27 trails, peak 2936 particles, observed 6716 emitted; all expired
+<end of output>
+Test time =  64.48 sec
+----------------------------------------------------------
+Test Passed.
+"object_particles.private" end time: Oct 16 21:45 CEST
+"object_particles.private" time elapsed: 00:01:04
+----------------------------------------------------------
+
+End testing: Oct 16 21:45 CEST
+
+explosion_fragments =  45.73 sec*proc
+
+explosion_lights =  16.29 sec*proc
+
+explosion_models =   6.93 sec*proc
+
+explosion_rings =  21.09 sec*proc
+
+explosion_sprites =   7.28 sec*proc
+
+headless = 188.02 sec*proc
+
+object_particles =  64.65 sec*proc
+
+objects =   0.28 sec*proc
+
+private = 186.50 sec*proc
+
+sceneexplosion =  19.40 sec*proc
+
+sprite_view =   6.36 sec*proc
+

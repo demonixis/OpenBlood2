@@ -1,0 +1,221 @@
+{
+  "date": "2026-10-17",
+  "milestone": "M2 incomplete",
+  "implementation_commit": "cf5a39a13767d3ff7b1b1f0c74a422be61ab945d",
+  "final_results": {
+    "debug_headless": 58,
+    "release_headless": 58,
+    "clang_asan_ubsan_headless": 58,
+    "debug_nvidia": 2,
+    "release_nvidia": 2
+  },
+  "suites": {
+    "debug": {
+      "passed": 58,
+      "failed": 0
+    },
+    "release": {
+      "passed": 48,
+      "failed": 0
+    },
+    "release-drops": {
+      "passed": 10,
+      "failed": 0
+    },
+    "sanitize": {
+      "passed": 48,
+      "failed": 0
+    },
+    "sanitize-drops": {
+      "passed": 10,
+      "failed": 0
+    },
+    "focused": {
+      "passed": 5,
+      "failed": 0
+    },
+    "gpu-debug-conversation": {
+      "passed": 1,
+      "failed": 0
+    },
+    "gpu-release-conversation": {
+      "passed": 1,
+      "failed": 0
+    }
+  },
+  "logs": [
+    {
+      "name": "debug-build",
+      "path": "m2-player-voices-debug-build.log",
+      "sha256": "4974768024c4c4430818ae49f3768cc55a38da3e7e959b5ff17567f6e22fc569"
+    },
+    {
+      "name": "debug-incremental-build",
+      "path": "m2-player-voices-debug-incremental-build.log",
+      "sha256": "19227245015224702ca9b97aa7bb5ff9835256ae337e8fa1d3f0d2c999705fd7"
+    },
+    {
+      "name": "debug-test-build",
+      "path": "m2-player-voices-debug-test-build.log",
+      "sha256": "3c6aaa8224968e306399170b163712e8593370244d513125e32efa6763f4d62c"
+    },
+    {
+      "name": "debug-gpu-build",
+      "path": "m2-player-voices-debug-gpu-build.log",
+      "sha256": "ae82a40aa65b53f966a6ee60afe1c2d20985dec7d5466e75b761fc2633bb7824"
+    },
+    {
+      "name": "release-build",
+      "path": "m2-player-voices-release-build.log",
+      "sha256": "738c37ec7677bae4e4c82fd8ca822892a3eb234aee6cfc77dbfc6b8359f9c82c"
+    },
+    {
+      "name": "release-test-build",
+      "path": "m2-player-voices-release-test-build.log",
+      "sha256": "393d71ab1e8d453afa83dbc1ddcdf521971d9b06bbd2356b64bc9ecf3f943989"
+    },
+    {
+      "name": "release-gpu-build",
+      "path": "m2-player-voices-release-gpu-build.log",
+      "sha256": "6e3cd5c66828fa19fa3289d2f2effb7deba4db8dc518fa33a2fb91e2a02ad00f"
+    },
+    {
+      "name": "sanitize-build",
+      "path": "m2-player-voices-sanitize-build.log",
+      "sha256": "2ee38f671e499f34f299386e25dbbc308ba0b060eda0c0b7679bb488c1051dd9"
+    },
+    {
+      "name": "sanitize-test-build",
+      "path": "m2-player-voices-sanitize-test-build.log",
+      "sha256": "e0e25415dd34e475996b4c2f94672be0c930b6fd1d6a3a2ab651963721c8061c"
+    },
+    {
+      "name": "debug",
+      "path": "m2-player-voices-debug.log",
+      "sha256": "4733758c6bb897abac94124662016578ca5fd9a900478429d89cd2343df1e972"
+    },
+    {
+      "name": "release",
+      "path": "m2-player-voices-release.log",
+      "sha256": "a90c88f75c73cc7b9c2e2b3091aaccbc13c5c97f8453223f8ddbd4fe70751729"
+    },
+    {
+      "name": "release-drops",
+      "path": "m2-player-voices-release-drops.log",
+      "sha256": "7494695a10924a637ef0da71b263f0a4d67d4b8a5b70c5911925364c623bdcd7"
+    },
+    {
+      "name": "sanitize",
+      "path": "m2-player-voices-sanitize.log",
+      "sha256": "f68143e208c934554cc995fb4f395eb57b205c3f6dc12af0e2c183de0d3f5aed"
+    },
+    {
+      "name": "sanitize-drops",
+      "path": "m2-player-voices-sanitize-drops.log",
+      "sha256": "4a7dad07ab62b2de697da329b5a69200a0fc6ae126c35cac50684d9716160dad"
+    },
+    {
+      "name": "focused",
+      "path": "m2-player-voices-focused.log",
+      "sha256": "7b0f7fc12f0e00f2e54e519f5eab0fc73a195efee9517f723b644408c20a3246"
+    },
+    {
+      "name": "gpu-debug-player-and-initial-conversation",
+      "path": "m2-player-voices-gpu-debug-player-and-initial-conversation.log",
+      "sha256": "59e02d45880fa17b08114df680f75699f1869bf67dcecbbfaffe8f82145ffffb"
+    },
+    {
+      "name": "gpu-debug-conversation",
+      "path": "m2-player-voices-gpu-debug-conversation.log",
+      "sha256": "814312e8a119d6331759bfac8ebfc37f4afdb44d5e48616931ab087e5542537d"
+    },
+    {
+      "name": "gpu-release-player-and-initial-conversation",
+      "path": "m2-player-voices-gpu-release-player-and-initial-conversation.log",
+      "sha256": "e325de99f21b8b26dda025487b4e7bbb7ca3f9bd1dfa3abf27badc4db547b4d2"
+    },
+    {
+      "name": "gpu-release-conversation",
+      "path": "m2-player-voices-gpu-release-conversation.log",
+      "sha256": "ceef76f6aff054a125544bbdd55a2055eac4c90d6605a2a5d77be9a9a7ac9ed0"
+    },
+    {
+      "name": "initial-tests",
+      "path": "m2-player-voices-initial-tests.log",
+      "sha256": "b82c48150ab534a33401540aa9dafb9b9adcdfcbf4c08909462ebae8f3a3b6d8"
+    },
+    {
+      "name": "catalog-probe",
+      "path": "m2-player-voices-catalog-probe.log",
+      "sha256": "e624c5c7c52b5c035b9920398728d4d4a856244b05b1f8277f6d81d56b0e8df9"
+    }
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "installed_data": {
+    "nonempty_voice_groups": 44,
+    "wav_entries": 431,
+    "streamed_unique_successes": 7,
+    "missing_unique_references": [
+      "sounds/chosen/caleb/unique/msc2_cal.wav",
+      "sounds/chosen/caleb/unique/msc9_cal.wav"
+    ]
+  },
+  "behavior": {
+    "pickup_trials": 40,
+    "optional_pickup_branches": 4,
+    "actual_group_replies": 1,
+    "new_level": "real SubwayA -> CityHub; reject missing destination retains source voice; committed transfer copies history without handle/deadline",
+    "train_route": "Unchanged continuous 30/60 Hz tests pass, without teleports/stat edits",
+    "gpu": "NVIDIA Vulkan, real retained streaming PCM then original conversation interruption; hidden/reentry; Release inspector disabled"
+  },
+  "limitations": [
+    "Other VoiceMgr callers and addon characters remain unported",
+    "Interactive IMA music remains unavailable",
+    "No native macOS/Windows run for this increment",
+    "No GPU sanitizer rerun: previously documented SDL/libdbus LSan residual remains unresolved",
+    "Headless ASan/UBSan run uses detect_leaks=1:halt_on_error=1 and halt_on_error=1; no suppressions",
+    "Existing test timeouts unchanged"
+  ],
+  "initial_failures": [
+    "Synthetic pickup probe used a null sender and was rejected; final test uses original SpawnWeaponPickup touch dispatch",
+    "Installed data lacks two original unique references; final tests require failure and false played flags for both",
+    "GPU smoke initially chose missing Shotgun unique; diagnostic now uses present Howitzer unique",
+    "GPU check originally treated lifetime start count as a fresh-world count; now requires exactly one new start per preparation and tests retained history after reload"
+  ],
+  "documentation_check": "3645 local Markdown targets exist; C++ formatting and source/target ledger hashes pass. Code/document whitespace checks pass with raw logs excluded. Unmodified CMake/CTest logs intentionally retain tool-emitted trailing spaces."
+}

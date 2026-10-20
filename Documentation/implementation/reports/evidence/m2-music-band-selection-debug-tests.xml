@@ -1,0 +1,849 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-c++"
+	tests="108"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gigabyte-g5"
+	time="15"
+	timestamp="2026-10-18T03:29:08"
+	>
+	<testcase name="objects.builtin_model" classname="objects.builtin_model" time="0.00300543" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS builtin_model
+</system-out>
+	</testcase>
+	<testcase name="objects.original_objects" classname="objects.original_objects" time="0.00312201" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS original_objects
+</system-out>
+	</testcase>
+	<testcase name="objects.nested_creation" classname="objects.nested_creation" time="0.00248015" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS nested_creation
+</system-out>
+	</testcase>
+	<testcase name="objects.reasons_properties" classname="objects.reasons_properties" time="0.00296438" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS reasons_properties
+</system-out>
+	</testcase>
+	<testcase name="objects.scheduling" classname="objects.scheduling" time="0.00252999" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS scheduling
+</system-out>
+	</testcase>
+	<testcase name="objects.deferred_removal" classname="objects.deferred_removal" time="0.00253234" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS deferred_removal
+</system-out>
+	</testcase>
+	<testcase name="objects.aggregate_dispatch" classname="objects.aggregate_dispatch" time="0.00250691" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS aggregate_dispatch
+</system-out>
+	</testcase>
+	<testcase name="objects.handles_selection" classname="objects.handles_selection" time="0.00254201" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS handles_selection
+</system-out>
+	</testcase>
+	<testcase name="objects.links_lists" classname="objects.links_lists" time="0.00312763" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS links_lists
+</system-out>
+	</testcase>
+	<testcase name="objects.messages_strings" classname="objects.messages_strings" time="0.00591555" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS messages_strings
+</system-out>
+	</testcase>
+	<testcase name="objects.message_churn" classname="objects.message_churn" time="1.5718" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS message_churn
+</system-out>
+	</testcase>
+	<testcase name="objects.message_limit" classname="objects.message_limit" time="0.0868214" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS message_limit
+</system-out>
+	</testcase>
+	<testcase name="objects.unsupported_teardown" classname="objects.unsupported_teardown" time="0.0124352" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS unsupported_teardown
+</system-out>
+	</testcase>
+	<testcase name="objects.creation_failures" classname="objects.creation_failures" time="0.00676884" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;objects"/>
+		</properties>
+		<system-out>PASS creation_failures
+</system-out>
+	</testcase>
+	<testcase name="config.arguments" classname="config.arguments" time="0.00152754" status="run">
+		<properties>
+			<property name="cmake_labels" value="config;headless"/>
+		</properties>
+		<system-out>PASS arguments
+</system-out>
+	</testcase>
+	<testcase name="config.precedence" classname="config.precedence" time="0.00168497" status="run">
+		<properties>
+			<property name="cmake_labels" value="config;headless"/>
+		</properties>
+		<system-out>PASS precedence
+</system-out>
+	</testcase>
+	<testcase name="config.relative_paths" classname="config.relative_paths" time="0.00146885" status="run">
+		<properties>
+			<property name="cmake_labels" value="config;headless"/>
+		</properties>
+		<system-out>PASS relative_paths
+</system-out>
+	</testcase>
+	<testcase name="config.invalid_config" classname="config.invalid_config" time="0.00236271" status="run">
+		<properties>
+			<property name="cmake_labels" value="config;headless"/>
+		</properties>
+		<system-out>PASS invalid_config
+</system-out>
+	</testcase>
+	<testcase name="config.content_validation" classname="config.content_validation" time="0.0018204" status="run">
+		<properties>
+			<property name="cmake_labels" value="config;headless"/>
+		</properties>
+		<system-out>PASS content_validation
+</system-out>
+	</testcase>
+	<testcase name="config.case_lookup" classname="config.case_lookup" time="0.0017542" status="run">
+		<properties>
+			<property name="cmake_labels" value="config;headless"/>
+		</properties>
+		<system-out>PASS case_lookup
+</system-out>
+	</testcase>
+	<testcase name="world.level_change" classname="world.level_change" time="0.0637182" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>trial1: Destination world texture t.dtx: Missing exact-path resource
+trial2: No single-player GameStartPoint
+trial3: Start point has no supported ground collision
+trial4: Destination initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+trial5: Destination initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+trial6: Destination start trigger requested another level during entry
+broken: DAT v56: invalid/unsupported section offsets near byte 4
+missing: Resource not found: worlds/missing.dat
+Commit 0: 
+Commit 1: 
+Commit 2: 
+PASS level_change
+</system-out>
+	</testcase>
+	<testcase name="world.surface_effects" classname="world.surface_effects" time="0.356914" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS surface_effects
+</system-out>
+	</testcase>
+	<testcase name="world.destination_trials" classname="world.destination_trials" time="0.0390788" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+trial4: loaded=1 entered=1 cleanup=1 failed=1 error=
+trial2: loaded=1 entered=0 cleanup=1 failed=0 error=No single-player GameStartPoint
+trial3: loaded=1 entered=0 cleanup=1 failed=0 error=Start point has no supported ground collision
+broken: loaded=0 entered=0 cleanup=1 failed=0 error=DAT v56: invalid/unsupported section offsets near byte 4
+missing: loaded=0 entered=0 cleanup=1 failed=0 error=Resource not found: worlds/missing.dat
+trial1: loaded=1 entered=1 cleanup=1 failed=0 error=
+PASS destination_trials
+</system-out>
+	</testcase>
+	<testcase name="world.destination_messages" classname="world.destination_messages" time="0.00246139" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS destination_messages
+</system-out>
+	</testcase>
+	<testcase name="world.destination_schema" classname="world.destination_schema" time="0.00283827" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS destination_schema
+</system-out>
+	</testcase>
+	<testcase name="world.destination_lifetime" classname="world.destination_lifetime" time="0.0130865" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS destination_lifetime
+</system-out>
+	</testcase>
+	<testcase name="world.sprite_entries" classname="world.sprite_entries" time="0.00758593" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS sprite_entries
+</system-out>
+	</testcase>
+	<testcase name="world.sound_entries" classname="world.sound_entries" time="0.00790229" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS sound_entries
+</system-out>
+	</testcase>
+	<testcase name="world.rez_structure" classname="world.rez_structure" time="0.00221812" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS rez_structure
+</system-out>
+	</testcase>
+	<testcase name="world.rez_rejection" classname="world.rez_rejection" time="0.00249756" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS rez_rejection
+</system-out>
+	</testcase>
+	<testcase name="world.resource_mount" classname="world.resource_mount" time="0.00273961" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS resource_mount
+</system-out>
+	</testcase>
+	<testcase name="world.world_properties" classname="world.world_properties" time="0.00247932" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS world_properties
+</system-out>
+	</testcase>
+	<testcase name="world.world_geometry" classname="world.world_geometry" time="0.00242314" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS world_geometry
+</system-out>
+	</testcase>
+	<testcase name="world.world_rejection" classname="world.world_rejection" time="0.0119786" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS world_rejection
+</system-out>
+	</testcase>
+	<testcase name="world.mutations" classname="world.mutations" time="0.0502286" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS mutations
+</system-out>
+	</testcase>
+	<testcase name="world.session_lifecycle" classname="world.session_lifecycle" time="0.00392572" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS session_lifecycle
+</system-out>
+	</testcase>
+	<testcase name="world.session_messages" classname="world.session_messages" time="0.00222303" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS session_messages
+</system-out>
+	</testcase>
+	<testcase name="world.original_trigger" classname="world.original_trigger" time="0.00297849" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;world"/>
+		</properties>
+		<system-out>PASS original_trigger
+</system-out>
+	</testcase>
+	<testcase name="world.level_change_private" classname="world.level_change_private" time="5.85263" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>Malformed destination refusal 0: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 0: 
+SubwayA transfer 0: 
+Malformed destination refusal 1: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 1: 
+SubwayA transfer 1: 
+Malformed destination refusal 2: DAT v56: invalid/unsupported typed property near byte 442114
+CityHub transfer 2: 
+SubwayA transfer 2: 
+PASS level_change_private
+</system-out>
+	</testcase>
+	<testcase name="world.destination_trial_private" classname="world.destination_trial_private" time="5.94523" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>Cycle 0 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=490 error=
+Cycle 0 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 0 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=490 error=
+Cycle 1 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 1 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2 02_cityhub: loaded=1 entered=1 cleanup=1 created=453 unknown=0 failed=0 objects=490 error=
+Cycle 2 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 2 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="world.destination_private" classname="world.destination_private" time="2.95154" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>Cycle 0: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 0: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 1: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 2: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unk...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="world.private" classname="world.private" time="1.16717" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;world"/>
+		</properties>
+		<system-out>No-player suspended=0 dims calls=57
+Service ConfigureCharacterBody: 16
+Service CreateAttachment: 10
+Service CreateInterObjectLink: 39
+Service CreateObject: 33
+Service CreateString: 5
+Service FindNamedObjects: 17
+Service FreeString: 2
+Service GetAnimIndex: 2419
+Service GetClass: 44
+Service GetClientUserData: 1
+Service GetContainers: 58
+Service GetGameConVar: 449
+Service GetModelAnimUserDims: 47
+Service GetModelAnimation: 21
+Service GetModelAnimationName: 32
+Service GetModelNodeTransform: 242
+Service GetMovementState: 31
+Service GetNextObject: 227
+Service GetObjectClass: 236
+Service GetObjectDims: 7
+Service GetObjectFlags: 344
+Service GetObjectName: 37
+Service GetObjectPos: 188
+Service GetObjectRotation: 88
+Service GetObjectUserFlags: 61
+Service GetPropBool: 764
+Service GetPropGeneric: 10699
+Service GetPropReal: 764
+Service GetPropString: 72
+Service GetPropVector: 64
+Service GetStringData: 36
+Service GetTime: 74
+Service GetVarValueFloat: 447
+Service GetVarValueString: 2
+Service GetVelocity: 1
+Service HandleToOb...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="sound.defaults" classname="sound.defaults" time="0.00626478" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sound"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sound.loops" classname="sound.loops" time="0.00810042" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sound"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sound.resampling" classname="sound.resampling" time="0.00606571" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sound"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sound.lifetime" classname="sound.lifetime" time="0.00621731" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sound"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sound.failures" classname="sound.failures" time="0.00640849" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sound"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sound.metadata" classname="sound.metadata" time="0.00658152" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;sound"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="sound.catalog" classname="sound.catalog" time="4.05367" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;sound"/>
+		</properties>
+		<system-out>worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=1 frames=198623 rate=22050
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=2 frames=198623 rate=22050
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=3 frames=198623 rate=22050
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=4 frames=198623 rate=22050
+worlds/04_steamtunnels.dat sounds\ambient\amb16.wav playback=Invalid or over-limit sound request
+worlds/06_airship1.dat sounds\ambient\wind1.wav playback=Invalid or over-limit sound request
+worlds/06_airship1.dat sounds\ambient\wind1.wav playback=Invalid or over-limit sound request
+worlds/09_abandoned_buildings.dat sounds\ambients\amb1.wav decode=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\amb1.wav playback=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav decode=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="sound.subway" classname="sound.subway" time="1.17042" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;private;sound"/>
+		</properties>
+		<system-out>cycle=0 4 world loops survived source removal, wrapped twice, produced PCM and unloaded
+cycle=1 4 world loops survived source removal, wrapped twice, produced PCM and unloaded
+</system-out>
+	</testcase>
+	<testcase name="audio_stream.pcm" classname="audio_stream.pcm" time="0.0108169" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio_stream;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="audio_stream.malformed" classname="audio_stream.malformed" time="0.00489731" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio_stream;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="audio_stream.mixer" classname="audio_stream.mixer" time="0.0196135" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio_stream;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="audio_stream.seams" classname="audio_stream.seams" time="0.0907534" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio_stream;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="audio_stream.truncation" classname="audio_stream.truncation" time="0.00538017" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio_stream;headless"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="audio_stream.city" classname="audio_stream.city" time="1.82526" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio_stream;headless;private"/>
+		</properties>
+		<system-out>city created=453 transferred=31 unknown=0 failed=0 SoundFX=5 active=4 streams=35 cached_bytes=393216
+city created=453 transferred=31 unknown=0 failed=0 SoundFX=5 active=4 streams=35 cached_bytes=393216
+</system-out>
+	</testcase>
+	<testcase name="music_assets.reader" classname="music_assets.reader" time="0.0139222" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Reader: exact ranges, padding, recursion/count limits, references and owned output verified
+</system-out>
+	</testcase>
+	<testcase name="music_assets.plan" classname="music_assets.plan" time="0.00279966" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Original plan: reverse transition loading, repeated cts.sec, playlist order and first-command parsing verified
+</system-out>
+	</testcase>
+	<testcase name="music_assets.catalog" classname="music_assets.catalog" time="0.0687224" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Catalog: deduplicated reads, explicit missing/ambiguous/symlink/oversize failures and reset verified
+</system-out>
+	</testcase>
+	<testcase name="music_assets.private" classname="music_assets.private" time="2.38486" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private music containers: 156 sections / 39 styles / 5 banks / 21513 chunks / 11986804 bytes
+01_SubwayA music directory music/cabal requests=52 files=45 bytes=2005696 error=
+02_CityHub music directory music/cabal requests=52 files=45 bytes=2005696 error=
+</system-out>
+	</testcase>
+	<testcase name="dls_bank.decode" classname="dls_bank.decode" time="0.00231437" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>DLS PCM endpoints, signed values, reordered/aliased cues, region override/inheritance, layered order, raw graphs and owned lifetime verified
+</system-out>
+	</testcase>
+	<testcase name="dls_bank.malformed" classname="dls_bank.malformed" time="0.00538444" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>DLS all synthetic truncations, references/counts/ranges/duplicates/loops/formats and transactional budget failure verified
+</system-out>
+	</testcase>
+	<testcase name="dls_bank.private" classname="dls_bank.private" time="1.21733" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Ancient.dls: 12 instruments / 106 regions / 55 waves / 1131051 frames / 21 connections / 138 opaque chunks
+bloat.dls: 8 instruments / 30 regions / 28 waves / 1073503 frames / 26 connections / 76 opaque chunks
+Cabal.dls: 14 instruments / 38 regions / 35 waves / 913403 frames / 44 connections / 102 opaque chunks
+crudux.dls: explicitly refused: DLS: Effective region loop exceeds linked wave frames: wave 12, start 0, length 664633, frames 64633
+track1.dls: explicitly refused: DLS: Effective region loop exceeds linked wave frames: wave 2, start 0, length 32025, frames 23025
+Private totals: 3 decoded banks / 2 refused banks / 34 instruments / 174 regions / 118 waves / 3117957 frames / 91 raw connections; all PCM samples independently checked
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.pcm" classname="dls_sampler.pcm" time="0.00219267" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>PCM interpolation, loop seam/tail exclusion, tuning, velocity, gain, pan and one-shot completion verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.envelopes" classname="dls_sampler.envelopes" time="0.0114085" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>Linear amplitude attack, logarithmic decay/release, early note-off, absorbing zero, EG2/LFO pitch and /128 scaling verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.lifetime" classname="dls_sampler.lifetime" time="0.0847636" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>Block partition, muted advance, bounded refusal, stale IDs, shared PCM, output transfer and world cleanup verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.legacy_pan" classname="dls_sampler.legacy_pan" time="0.00239854" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>Legacy integer/standard fixed pan, signed PCM gains, ordered aliases, invalid graphs, failure atomicity and local precedence verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.private" classname="dls_sampler.private" time="0.572899" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets;private"/>
+		</properties>
+		<system-out>Cabal region notes: 38 synthesized/nonzero, 5 with legacy pan; no refused regions; hidden clocks and release cleanup verified
+</system-out>
+	</testcase>
+	<testcase name="ima_style.reader" classname="ima_style.reader" time="0.00172352" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>IMA records: signed fields, order, repeated names, empty grids, opaque curves and owned data
+</system-out>
+	</testcase>
+	<testcase name="ima_style.malformed" classname="ima_style.malformed" time="0.103753" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>IMA malformed: truncations, singleton/header/stride/name errors and whole-style budgets
+</system-out>
+	</testcase>
+	<testcase name="ima_style.private" classname="ima_style.private" time="0.0734136" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private IMA: 39 styles / 131 patterns / 7166 grids / 7030 exact original-order notes / 42 opaque curves
+</system-out>
+	</testcase>
+	<testcase name="ima_band.reader" classname="ima_band.reader" time="0.00145316" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>IMA bands: exact fields, signed bytes, duplicate names, ordered direct scope and owned ranges
+</system-out>
+	</testcase>
+	<testcase name="ima_band.malformed" classname="ima_band.malformed" time="0.0099707" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>IMA bands malformed: truncation, scope/header/name errors, fixed size and whole-file budgets
+</system-out>
+	</testcase>
+	<testcase name="ima_band.setup" classname="ima_band.setup" time="0.00140935" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>IMA setup: original ordered controllers, bank flags, fallback, channel wrap and checked MIDI ranges
+</system-out>
+	</testcase>
+	<testcase name="ima_band.selection" classname="ima_band.selection" time="0.00152821" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Band selection: section priority, reverse style defaults, early bands, missing defaults, bounds/lifetime
+</system-out>
+	</testcase>
+	<testcase name="ima_band.selection_generated" classname="ima_band.selection_generated" time="0.0884975" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Band selection generated: 800 cases / FNV64 9953174249627237157
+</system-out>
+	</testcase>
+	<testcase name="ima_band.private" classname="ima_band.private" time="0.0616797" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private IMA bands: 195 / setup messages 15600 / FNV64 7277285548350807734
+</system-out>
+	</testcase>
+	<testcase name="ima_section.reader" classname="ima_section.reader" time="0.0013507" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>IMA section: signed fields, raw masks/tails, ordered records, labels and owned direct scope
+</system-out>
+	</testcase>
+	<testcase name="ima_section.malformed" classname="ima_section.malformed" time="0.00594224" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>IMA section malformed: truncation, headers, stride, scope, labels and aggregate budgets
+</system-out>
+	</testcase>
+	<testcase name="ima_section.timing" classname="ima_section.timing" time="0.00180193" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>IMA authored timing: original tempo quantization, duration, signed division/wrap and zero guards
+</system-out>
+	</testcase>
+	<testcase name="ima_section.private" classname="ima_section.private" time="0.017351" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private IMA sections: 156 / commands 156 / mutes 3290 / chords 156 / original reader FNV64 17214005195151465368
+</system-out>
+	</testcase>
+	<testcase name="ima_timeline.timing" classname="ima_timeline.timing" time="0.00144791" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Timeline: original style override/default, truncation, signed/wrapped command measures, unsorted chord times and discarded beats
+</system-out>
+	</testcase>
+	<testcase name="ima_timeline.mutes" classname="ima_timeline.mutes" time="0.00161747" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Timeline mutes: initial future value, authored unsorted/duplicate traversal, beat boundaries, strict end and empty input
+</system-out>
+	</testcase>
+	<testcase name="ima_timeline.bounds" classname="ima_timeline.bounds" time="0.00151044" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Timeline bounds: unsafe divisors/meters/lengths, overflow, raw and expanded budgets, atomic clearing
+</system-out>
+	</testcase>
+	<testcase name="ima_timeline.private" classname="ima_timeline.private" time="0.281577" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private timelines: 132 bound / 24 missing style / 132 commands / 3030 mutes / 132 chords / original FNV64 4011438205292846879
+</system-out>
+	</testcase>
+	<testcase name="ima_variation.reader" classname="ima_variation.reader" time="0.00141821" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>All 573 pattern-tail bytes round trip; row-local defaults and authored modes preserved
+</system-out>
+	</testcase>
+	<testcase name="ima_variation.selection" classname="ima_variation.selection" time="0.00135705" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Original filter/fallback, random precedence and draw order, cycle wrap/zero/multi-bit and hold
+</system-out>
+	</testcase>
+	<testcase name="ima_variation.bounds" classname="ima_variation.bounds" time="0.00165948" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Explicit RNG count/range preflight; no partial output or input mutation
+</system-out>
+	</testcase>
+	<testcase name="ima_variation.private" classname="ima_variation.private" time="0.0703381" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private original equivalence: 39 styles / 131 patterns / 786 choices; FNV64 7572323464032181405
+</system-out>
+	</testcase>
+	<testcase name="ima_note_event.behavior" classname="ima_note_event.behavior" time="0.00145746" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Original event tail: signed ranges/velocity, exact draw order, suppression, octave folding, remap and paired routing
+</system-out>
+	</testcase>
+	<testcase name="ima_note_event.bounds" classname="ima_note_event.bounds" time="0.00144479" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Unsupported type/channel/map, unsafe map index, RNG count/range, tick overflow and atomic clearing
+</system-out>
+	</testcase>
+	<testcase name="ima_note_event.private" classname="ima_note_event.private" time="0.0705735" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private original tail equivalence: 7030 notes / 28120 event messages; FNV64 7927161452939007316
+</system-out>
+	</testcase>
+	<testcase name="ima_note_pitch.behavior" classname="ima_note_pitch.behavior" time="0.00129344" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ima_note_pitch.generated" classname="ima_note_pitch.generated" time="0.00240152" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Generated original pitch observations: FNV64 15763711143549854140; refused 25
+</system-out>
+	</testcase>
+	<testcase name="ima_note_pitch.bounds" classname="ima_note_pitch.bounds" time="0.00153796" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ima_note_pitch.private" classname="ima_note_pitch.private" time="0.0635086" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private explicit harmony: 7030 notes; FNV64 809768487747410926; pairs 21070
+</system-out>
+	</testcase>
+	<testcase name="ima_harmony.reader" classname="ima_harmony.reader" time="0.00304971" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ima_harmony.behavior" classname="ima_harmony.behavior" time="0.00188104" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ima_harmony.generated" classname="ima_harmony.generated" time="0.013772" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Original chord cases: 4096; FNV64 12106312165928785022
+</system-out>
+	</testcase>
+	<testcase name="ima_harmony.private" classname="ima_harmony.private" time="0.0318484" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private chord sections 156; FNV64 11061850450855354925
+</system-out>
+	</testcase>
+	<testcase name="ima_selection.behavior" classname="ima_selection.behavior" time="0.00181435" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ima_selection.generated" classname="ima_selection.generated" time="0.0395855" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Original section/pattern cases: 4096; FNV64 12281621980575432131
+</system-out>
+	</testcase>
+	<testcase name="ima_selection.bounds" classname="ima_selection.bounds" time="0.00322603" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ima_selection.private" classname="ima_selection.private" time="0.283793" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private selections 1188; bound/missing 132/24; FNV64 2704444894253380274
+</system-out>
+	</testcase>
+	<testcase name="ima_cursor.behavior" classname="ima_cursor.behavior" time="0.00177203" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ima_cursor.bounds_lifetime" classname="ima_cursor.bounds_lifetime" time="0.00927759" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ima_cursor.generated" classname="ima_cursor.generated" time="0.0278959" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Generated cursor steps 2799; FNV64 10075978454587385952
+</system-out>
+	</testcase>
+	<testcase name="ima_cursor.private" classname="ima_cursor.private" time="0.335527" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private cursor steps 8174; bound/missing 132/24; FNV64 14793402716944126194
+</system-out>
+	</testcase>
+</testsuite>

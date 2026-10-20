@@ -1,0 +1,205 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start 654: player_controls.corpse_clearance
+      Start 653: player_controls.combat
+      Start 505: ai_runtime.subway
+ 1/94 Test #505: ai_runtime.subway ..................   Passed    0.82 sec
+      Start 655: player_controls.private
+ 2/94 Test #655: player_controls.private ............   Passed    0.69 sec
+      Start 411: ai_fire.subway
+ 3/94 Test #411: ai_fire.subway .....................   Passed    0.43 sec
+      Start 443: ai_follow.subway
+ 4/94 Test #653: player_controls.combat .............   Passed    1.97 sec
+      Start 350: ai_target.subway
+ 5/94 Test #443: ai_follow.subway ...................   Passed    0.10 sec
+      Start 383: ai_perception.subway
+ 6/94 Test #350: ai_target.subway ...................   Passed    0.10 sec
+      Start 452: ai_script.catalog
+ 7/94 Test #383: ai_perception.subway ...............   Passed    0.10 sec
+      Start 506: ai_runtime.arena
+ 8/94 Test #452: ai_script.catalog ..................   Passed    0.07 sec
+      Start 503: ai_runtime.catalog
+ 9/94 Test #503: ai_runtime.catalog .................   Passed    0.04 sec
+      Start 410: ai_fire.catalog
+10/94 Test #506: ai_runtime.arena ...................   Passed    0.05 sec
+      Start 442: ai_follow.catalog
+11/94 Test #442: ai_follow.catalog ..................   Passed    0.03 sec
+      Start 349: ai_target.catalog
+12/94 Test #410: ai_fire.catalog ....................   Passed    0.03 sec
+      Start 382: ai_perception.catalog
+13/94 Test #349: ai_target.catalog ..................   Passed    0.03 sec
+      Start 507: ai_runtime.sparse_weapons
+14/94 Test #382: ai_perception.catalog ..............   Passed    0.03 sec
+      Start 504: ai_runtime.failures
+15/94 Test #504: ai_runtime.failures ................   Passed    0.02 sec
+      Start   1: objects.builtin_model
+16/94 Test   #1: objects.builtin_model ..............   Passed    0.00 sec
+      Start 493: ai_runtime.visibility_filter
+17/94 Test #507: ai_runtime.sparse_weapons ..........   Passed    0.02 sec
+      Start  11: objects.unsupported_teardown
+18/94 Test #493: ai_runtime.visibility_filter .......   Passed    0.00 sec
+      Start 342: ai_target.named
+19/94 Test #342: ai_target.named ....................   Passed    0.00 sec
+      Start 441: ai_follow.physics
+20/94 Test  #11: objects.unsupported_teardown .......   Passed    0.00 sec
+      Start 451: ai_script.audio
+21/94 Test #441: ai_follow.physics ..................   Passed    0.00 sec
+      Start 494: ai_runtime.visibility_atomic
+22/94 Test #451: ai_script.audio ....................   Passed    0.00 sec
+      Start 450: ai_script.lifetime
+23/94 Test #494: ai_runtime.visibility_atomic .......   Passed    0.00 sec
+      Start 439: ai_follow.lifetime
+24/94 Test #450: ai_script.lifetime .................   Passed    0.00 sec
+      Start 495: ai_runtime.lifetime
+25/94 Test #439: ai_follow.lifetime .................   Passed    0.00 sec
+      Start 502: ai_runtime.missing
+26/94 Test #495: ai_runtime.lifetime ................   Passed    0.00 sec
+      Start 447: ai_script.animations
+27/94 Test #502: ai_runtime.missing .................   Passed    0.00 sec
+      Start 446: ai_script.waiting
+28/94 Test #447: ai_script.animations ...............   Passed    0.00 sec
+      Start 399: ai_fire.aim
+29/94 Test #446: ai_script.waiting ..................   Passed    0.00 sec
+      Start 374: ai_perception.selection
+30/94 Test #399: ai_fire.aim ........................   Passed    0.00 sec
+      Start 398: ai_fire.head
+31/94 Test #374: ai_perception.selection ............   Passed    0.00 sec
+      Start 445: ai_script.sequencing
+32/94 Test #398: ai_fire.head .......................   Passed    0.00 sec
+      Start 373: ai_perception.factions
+33/94 Test #445: ai_script.sequencing ...............   Passed    0.00 sec
+      Start 449: ai_script.movement
+34/94 Test #373: ai_perception.factions .............   Passed    0.00 sec
+      Start 438: ai_follow.actions
+35/94 Test #449: ai_script.movement .................   Passed    0.00 sec
+      Start 497: ai_runtime.tracking
+36/94 Test #438: ai_follow.actions ..................   Passed    0.00 sec
+      Start 404: ai_fire.lifetime
+37/94 Test #497: ai_runtime.tracking ................   Passed    0.00 sec
+      Start 651: player_controls.gates
+38/94 Test #404: ai_fire.lifetime ...................   Passed    0.00 sec
+      Start 396: ai_fire.clearance
+39/94 Test #651: player_controls.gates ..............   Passed    0.00 sec
+      Start 500: ai_runtime.triggers
+40/94 Test #396: ai_fire.clearance ..................   Passed    0.00 sec
+      Start  12: objects.creation_failures
+41/94 Test #500: ai_runtime.triggers ................   Passed    0.00 sec
+      Start 401: ai_fire.cadence
+42/94 Test  #12: objects.creation_failures ..........   Passed    0.00 sec
+      Start 436: ai_follow.cached
+43/94 Test #401: ai_fire.cadence ....................   Passed    0.00 sec
+      Start 499: ai_runtime.spatial
+44/94 Test #436: ai_follow.cached ...................   Passed    0.00 sec
+      Start 433: ai_follow.velocity
+45/94 Test #499: ai_runtime.spatial .................   Passed    0.00 sec
+      Start 376: ai_perception.hints
+46/94 Test #433: ai_follow.velocity .................   Passed    0.00 sec
+      Start 496: ai_runtime.targets
+47/94 Test #376: ai_perception.hints ................   Passed    0.00 sec
+      Start 395: ai_fire.selection
+48/94 Test #496: ai_runtime.targets .................   Passed    0.00 sec
+      Start 402: ai_fire.recovery
+49/94 Test #395: ai_fire.selection ..................   Passed    0.00 sec
+      Start 403: ai_fire.failures
+50/94 Test #402: ai_fire.recovery ...................   Passed    0.00 sec
+      Start 400: ai_fire.keys
+51/94 Test #403: ai_fire.failures ...................   Passed    0.00 sec
+      Start 649: player_controls.keys
+52/94 Test #400: ai_fire.keys .......................   Passed    0.00 sec
+      Start 381: ai_perception.lifetime
+53/94 Test #649: player_controls.keys ...............   Passed    0.00 sec
+      Start 434: ai_follow.locomotion
+54/94 Test #381: ai_perception.lifetime .............   Passed    0.00 sec
+      Start 440: ai_follow.failures
+55/94 Test #434: ai_follow.locomotion ...............   Passed    0.00 sec
+      Start  10: objects.messages_strings
+56/94 Test #440: ai_follow.failures .................   Passed    0.00 sec
+      Start 501: ai_runtime.body
+57/94 Test  #10: objects.messages_strings ...........   Passed    0.00 sec
+      Start 397: ai_fire.filters
+58/94 Test #501: ai_runtime.body ....................   Passed    0.00 sec
+      Start 448: ai_script.state_target
+59/94 Test #397: ai_fire.filters ....................   Passed    0.00 sec
+      Start 435: ai_follow.follow
+60/94 Test #448: ai_script.state_target .............   Passed    0.00 sec
+      Start 437: ai_follow.moveto
+61/94 Test #435: ai_follow.follow ...................   Passed    0.00 sec
+      Start 498: ai_runtime.camera
+62/94 Test #437: ai_follow.moveto ...................   Passed    0.00 sec
+      Start 380: ai_perception.failures
+63/94 Test #498: ai_runtime.camera ..................   Passed    0.00 sec
+      Start 343: ai_target.cached
+64/94 Test #380: ai_perception.failures .............   Passed    0.00 sec
+      Start 375: ai_perception.visibility
+65/94 Test #343: ai_target.cached ...................   Passed    0.00 sec
+      Start 377: ai_perception.stimuli
+66/94 Test #375: ai_perception.visibility ...........   Passed    0.00 sec
+      Start 345: ai_target.failures
+67/94 Test #377: ai_perception.stimuli ..............   Passed    0.00 sec
+      Start 348: ai_target.services
+68/94 Test #345: ai_target.failures .................   Passed    0.00 sec
+      Start   9: objects.links_lists
+69/94 Test #348: ai_target.services .................   Passed    0.00 sec
+      Start 346: ai_target.lifetime
+70/94 Test   #9: objects.links_lists ................   Passed    0.00 sec
+      Start 650: player_controls.mouse
+71/94 Test #346: ai_target.lifetime .................   Passed    0.00 sec
+      Start 652: player_controls.entry
+72/94 Test #650: player_controls.mouse ..............   Passed    0.00 sec
+      Start 378: ai_perception.retaliation
+73/94 Test #652: player_controls.entry ..............   Passed    0.00 sec
+      Start 344: ai_target.facing
+74/94 Test #378: ai_perception.retaliation ..........   Passed    0.00 sec
+      Start 379: ai_perception.opportunity
+75/94 Test #344: ai_target.facing ...................   Passed    0.00 sec
+      Start 347: ai_target.callbacks
+76/94 Test #379: ai_perception.opportunity ..........   Passed    0.00 sec
+      Start   6: objects.deferred_removal
+77/94 Test #347: ai_target.callbacks ................   Passed    0.00 sec
+      Start 444: ai_script.parsing
+78/94 Test   #6: objects.deferred_removal ...........   Passed    0.00 sec
+      Start   4: objects.reasons_properties
+79/94 Test #444: ai_script.parsing ..................   Passed    0.00 sec
+      Start   8: objects.handles_selection
+80/94 Test   #4: objects.reasons_properties .........   Passed    0.00 sec
+      Start   2: objects.original_objects
+81/94 Test   #8: objects.handles_selection ..........   Passed    0.00 sec
+      Start   7: objects.aggregate_dispatch
+82/94 Test   #2: objects.original_objects ...........   Passed    0.00 sec
+      Start   3: objects.nested_creation
+83/94 Test   #7: objects.aggregate_dispatch .........   Passed    0.00 sec
+      Start   5: objects.scheduling
+84/94 Test   #3: objects.nested_creation ............   Passed    0.00 sec
+      Start 492: ai_runtime.visibility
+85/94 Test   #5: objects.scheduling .................   Passed    0.00 sec
+      Start 491: ai_runtime.activation
+86/94 Test #492: ai_runtime.visibility ..............   Passed    0.00 sec
+      Start 405: ai_fire.script_stand
+87/94 Test #491: ai_runtime.activation ..............   Passed    0.00 sec
+      Start 406: ai_fire.script_moving
+88/94 Test #405: ai_fire.script_stand ...............   Passed    0.00 sec
+      Start 407: ai_fire.script_refusal
+89/94 Test #406: ai_fire.script_moving ..............   Passed    0.00 sec
+      Start 408: ai_fire.script_lifetime
+90/94 Test #407: ai_fire.script_refusal .............   Passed    0.00 sec
+      Start 409: ai_fire.script_routes
+91/94 Test #408: ai_fire.script_lifetime ............   Passed    0.00 sec
+      Start 412: ai_fire.script_private
+92/94 Test #409: ai_fire.script_routes ..............   Passed    0.00 sec
+93/94 Test #654: player_controls.corpse_clearance ...   Passed    2.73 sec
+94/94 Test #412: ai_fire.script_private .............   Passed    0.51 sec
+
+100% tests passed, 0 tests failed out of 94
+
+Label Time Summary:
+ai_fire            =   0.99 sec*proc (18 tests)
+ai_follow          =   0.15 sec*proc (11 tests)
+ai_perception      =   0.14 sec*proc (11 tests)
+ai_runtime         =   0.96 sec*proc (17 tests)
+ai_script          =   0.09 sec*proc (9 tests)
+ai_target          =   0.14 sec*proc (9 tests)
+headless           =   7.90 sec*proc (94 tests)
+objects            =   0.03 sec*proc (12 tests)
+player_controls    =   5.40 sec*proc (7 tests)
+private            =   7.75 sec*proc (18 tests)
+
+Total Test time (real) =   2.86 sec

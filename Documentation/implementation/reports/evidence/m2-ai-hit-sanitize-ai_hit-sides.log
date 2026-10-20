@@ -1,0 +1,14 @@
+452/454 Testing: ai_hit.sides
+452/454 Test: ai_hit.sides
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "sides"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.sides" start time: Oct 16 15:38 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.sides" end time: Oct 16 15:38 CEST
+"ai_hit.sides" time elapsed: 00:00:00
+----------------------------------------------------------

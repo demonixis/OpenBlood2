@@ -1,0 +1,2212 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index a60445b..1509339 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -145,3 +145,14 @@ this is replacement physics, not verified retail parity. Angular paths, dynamic
+ world bodies and containers remain unavailable. Class counts stay 160 created,
+ 372 editor-only and 48 unported. Earlier blanket world-path omissions are superseded
+ only for this translation subset; M2 stays open.
++
++The latest [cinematic evidence](../Documentation/Implementation/M2_CINEMATICS.md) connects original CinematicTrigger with
++real bounded WAV decoding, typed voice completion and dry SDL playback. Read
++[cinematic contracts](docs/CINEMATIC_CONTRACTS.md). Preserve any-payload rearming without reset,
++message-before-sound order, missing-file retry, checked speaker/owner lifetime and
++sample-count clocks independent of UI. Terminal odd-data padding exceptions are
++bounded; three missing catalog references remain failures. Reverb is requested but
++not rendered. General sound emitters/music and complete M2 acceptance remain open.
++SubwayA now has 164 created source entries, 7 SelfTriggers, 372 editor-only and
++44 unported (171/174 runtime before/after player, 162/165 after consuming nine Keys).
++Earlier CinematicTrigger/audio omissions are superseded only for this subset.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 64a8175..38064be 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -15,7 +15,7 @@ include(cmake/Dependencies.cmake)
+ configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+ 
+ add_library(engine STATIC src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+-target_sources(engine PRIVATE src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
++target_sources(engine PRIVATE src/engine/audio.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
+ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+@@ -32,6 +32,7 @@ add_library(blood2_game STATIC
+     src/game/session.cpp
+     src/game/registration.cpp
+     src/game/server_adapter.cpp)
++target_sources(blood2_game PRIVATE src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/LightFX.cpp src/game/original/ClientLightFX.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+@@ -47,13 +48,13 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp)
++add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+ target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+ if(BLOOD2_INSPECTOR)
+-    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
++    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_cinematics.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
+     target_link_libraries(blood2_app PRIVATE imgui)
+ endif()
+ 
+diff --git a/README.md b/README.md
+index b23876d..ea7c6c7 100644
+--- a/README.md
++++ b/README.md
+@@ -26,7 +26,7 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
+ ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
+ ```
+ 
+-The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **160 source entries** create, including original KeyFramer and twelve GlowingLight objects, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **48 unported runtime entries**, zero failed. Runtime counts before/after player entry are **167/170**, then **158/161** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_WORLDPATHS.md) records these counts; earlier increment sections below are historical snapshots.
++The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **164 source entries** create, including four original CinematicTriggers, plus **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **44 unported runtime entries**, zero failed. Runtime counts before/after player entry are **171/174**, then **162/165** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain their historical load status. The [latest evidence](../Documentation/Implementation/M2_CINEMATICS.md) records these counts; earlier increment sections below are historical snapshots.
+ 
+ The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
+ 
+@@ -47,6 +47,7 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
+ | `--inspect-player` | Headless original shell/player entry inspection, with explicit gameplay blockers |
+ | `--player-smoke` | GPU Session panel, hidden player updates, unload/re-entry checks |
+ | `--weapons-smoke` | GPU Beretta/knife firing while hidden, unload/re-entry; capture at frame 181 |
++| `--cinematics-smoke` | GPU original cue, decoded PCM/SDL output, hidden UI and reload (tests use dummy audio) |
+ | `--worldpaths-smoke` | GPU original SubwayA train translation, collision and reload with UI hidden |
+ | `--lights-smoke` | GPU original dynamic-light state/KeyFramer placement while hidden, Lights inspection and reload |
+ | `--cameras-smoke` | GPU original camera tracking, client view/player gates while hidden, inspection and reload |
+@@ -165,3 +166,13 @@ plan view. `./build/debug/blood2 --worldpaths-smoke` checks SubwayA's train whil
+ hidden and after reload. Two full paths record 297 moves and two primary-world
+ blocks each; this is replacement physics, not verified retail train behavior.
+ Angular paths, moving containers, other required classes/services and M2 remain open.
++
++## Original cinematic cues and audio
++
++[Cinematic contracts](docs/CINEMATIC_CONTRACTS.md) connect original cue sequencing
++to actual WAV sample duration, dry local/attached mixing and SDL playback. The
++Cinematics tab inspects inactive controllers, all cues, voices, PCM and failures.
++Interactive runs open the default audio device; output failure is visible and
++leaves offline timing. Headless tests avoid output; the device/GPU checks use SDL's
++dummy driver. Reverb, general Sound/RandomSoundFX emitters, other audio callers and
++music remain unavailable. This is not complete cinematic rendering or M2 acceptance.
+diff --git a/docs/CAMERA_CONTRACTS.md b/docs/CAMERA_CONTRACTS.md
+index 0730e09..433e212 100644
+--- a/docs/CAMERA_CONTRACTS.md
++++ b/docs/CAMERA_CONTRACTS.md
+@@ -66,6 +66,7 @@ weapon path. Remote-camera firing never substitutes the camera's position for
+ the player's shot origin. Viewport type, player visibility, weapon visibility
+ and listener position are explicit **presentation requests**; the cinematic world
+ renderer, letterbox/FOV presentation and audio listener are not implemented.
++The later [cinematic/audio continuation](CINEMATIC_CONTRACTS.md) implements the bounded audio listener path; cinematic rendering remains unavailable.
+ Type 1 requests the source letterbox (top/bottom one-sixth); types 0/2 follow the
+ source fullscreen branch. A non-listener view requests the default player-body
+ listener position. Other camera modes/gadgets and third-person/death views remain
+@@ -109,3 +110,9 @@ executable comparison, additional-platform or XR validation is claimed.
+ The later [keyframe continuation](KEYFRAMER_CONTRACTS.md) supersedes the blanket
+ KeyFramer omission above for camera/ordinary-object paths. CinematicTrigger,
+ keyframed world/container motion, rendering/audio and the full M2 gate remain open.
++
++Later [light](LIGHT_CONTRACTS.md), [translating world-path](WORLDPATH_CONTRACTS.md)
++and [cinematic/audio](CINEMATIC_CONTRACTS.md) continuations supersede the blanket
++omissions above for their bounded subsets. CinematicTrigger now uses real WAV
++voices and dry SDL output; KeyData sound requests, reverb, angular/container paths,
++general audio/rendering and complete M2 acceptance still remain unavailable.
+diff --git a/docs/CINEMATIC_CONTRACTS.md b/docs/CINEMATIC_CONTRACTS.md
+new file mode 100644
+index 0000000..3b4f1c8
+--- /dev/null
++++ b/docs/CINEMATIC_CONTRACTS.md
+@@ -0,0 +1,98 @@
++# Original cinematic cues and bounded audio
++
++M2 remains incomplete. Read [camera](CAMERA_CONTRACTS.md), [trigger](TRIGGER_CONTRACTS.md)
++and [object](OBJECT_CONTRACTS.md) contracts with the [source ledger](M2_CINEMATIC_SOURCES.json)
++and [implementation evidence](../../Documentation/Implementation/M2_CINEMATICS.md).
++
++## Original sequence
++
++CinematicTrigger retains ten Delay/Sound/WhoPlaysSound/StartSoundTriggerTarget/Msg
++properties, TypeActionMode=false, inherited B2BaseClass filters and callback chain.
++It starts unscheduled. Every MID_TRIGGER payload rearms Delay1 + 0.0001; ON/OFF are
++not new commands and neither index nor active voice resets. Each cue sends its
++paired target/message before playing. The next cue delay starts only after the
++active sound reports completion. An empty sound ends and removes the controller;
++a missing/failed sound retries the same cue (including its message) at the source
++0.001 update interval. No fabricated duration or successful placeholder advances it.
++
++The case-insensitive speaker name `player` selects local playback. Empty or missing
++named speakers fall back to the controller; named lookup uses the first object.
++Attached voices follow the speaker on subsequent ticks. Removing the speaker marks
++the voice done; removing the owner releases it. This speaker-removal policy is new
++engine behavior, not verified retail parity. Named lists always release, fixing the
++source's early-return leak. After a synchronous cue message, pending owners cannot
++start audio. Destruction remains deferred. Values own strings; stale monotonic
++64-bit voice IDs never resolve after removal/reload or in a later mixer instance.
++Restore and save/load are unavailable. Invalid delays (nonfinite, negative or over
++1,000,000 seconds) reject precreate. These are deliberate validation adaptations.
++
++## Resource and output service
++
++PlayCinematicSound requires a live owner, mounted resources and a live attached
++speaker. It decodes real resource bytes; failures expose an error and allocate no
++voice. The selected typed API is not general legacy PlaySound compatibility.
++There are at most 128 owned voices and 128 cached clips / 256 MiB decoded cache.
++Each encoded WAV is at most 16 MiB, decoded float samples at most 64 MiB, with
++1–2 channels, 8–96 kHz and at most 1,024 chunks. Supported encodings are PCM8/16,
++MS ADPCM and IMA ADPCM with complete validated blocks. Unsupported encodings,
++duplicate/missing format or data chunks, invalid layouts and truncated payloads fail explicitly.
++SDL's pinned WAV decoder and float conversion provide samples; engine preflight
++bounds allocations. Read failures preserve the previous output value.
++
++Observed retail PCM8 variants permit only a **final odd data** pad to be missing,
++or present but excluded from RIFF's length. Every payload must still fit exactly;
++other chunk padding, arbitrary trailing bytes and mismatched envelope lengths
++remain errors. No commercial bytes are committed. Of 201 authored cue references
++in 57 readable worlds, 198 decode (all PCM); three genuinely missing paths remain
++failures. `16_bridge.dat` retains the existing strict world-reader failure.
++
++The simulation owns voice clocks. Before original-object updates, the service
++advances cursors in 48 kHz frame units with fractional-frame carry; completion
++uses actual decoded sample count. New voices begin advancing next tick. Offline
++runs advance the same clocks without producing PCM unless explicitly inspected.
++The listener uses the preceding completed client pose: camera pose only when its
++published listener flag is true; otherwise player-body position and player view
++rotation. The existing retail-world suppression of camera listeners is retained.
++
++The dry mixer uses linear resampling, linear distance attenuation between original
++250/1000 radii, constant-power left/right panning and clamping. Local stereo keeps
++its channels. These are replacement engine policies, not claimed retail mixing.
++The source reverb request is inspectable **but not implemented**. Occlusion,
++Doppler, priority arbitration, general emitters, music and other audio callers are
++also pending. Do not infer their availability from CinematicTrigger playback.
++
++Interactive application runs open SDL's default playback stream (48 kHz stereo
++float); failure is visible and leaves offline clocks operating. Each update renders
++at most 250 ms and records dropped frames beyond that bound. A queued backlog over
++250 ms is cleared and counted. Stream errors are retained for inspection; submitted
++frames mean SDL accepted PCM, not proof that a person heard it. Headless and normal
++GPU tests are silent; the cinematic device/GPU tests use SDL's dummy driver.
++Unload clears voices/cache/queued PCM/counters after original object destruction;
++the device remains open until session destruction, before global SDL shutdown.
++
++## Inspection and validation
++
++The Cinematics tab includes hidden/inactive controllers, all authored cues, current
++index, schedule, commands/messages/starts/failures, active voice format/duration,
++cursor, speaker/position/gains, PCM plot, cache and output/drop diagnostics.
++Start/message counters count attempts/requests, not successful playback or recipient
++deliveries; the active voice and submitted-sample counters provide separate evidence.
++Every cue shows archive presence (including missing paths), separately from decode success.
++TRIGGER queues the same checked original message independently of visibility.
++World retains missing and rejected entries. The inspector does not implement game
++rules or make audio completion depend on rendering.
++
++Synthetic tests cover PCM/ADPCM, truncation/layout/padding, timing and channel output,
++spatial motion/rotation, exact cue order/delays/retrigger, removal during a cue message,
++owner/speaker lifetime, stale handles, missing sounds, budgets and dummy output.
++Private tests decode the complete cinematic catalog, reload full SubwayA/player twice
++and run its authored two-cue crash sequence to completion in isolation. GPU checks
++verify actual decoded samples submitted to SDL with hidden UI and after reload.
++These tests do not establish audible-device quality, retail executable parity,
++additional-platform support or the M2 exit gate.
++
++The expanded source-object population exposed a tight existing ASan weapon-test
++timeout. `Objects::snapshot` now reserves its slot-count capacity before gathering
++IDs, avoiding repeated vector growth without changing membership/order or callback
++lifetime. The unchanged scenario and 90-second limit pass after this allocation-only
++correction; full regression evidence includes the original two timeout attempts.
+diff --git a/docs/KEYFRAMER_CONTRACTS.md b/docs/KEYFRAMER_CONTRACTS.md
+index 5f328f9..8465e71 100644
+--- a/docs/KEYFRAMER_CONTRACTS.md
++++ b/docs/KEYFRAMER_CONTRACTS.md
+@@ -111,3 +111,9 @@ CinematicTrigger, GlowingLight, Gideon/AI, keyframed world/container physics, so
+ world transitions, attachment/rendering coverage, persistence and remaining required
+ classes/services keep M2 open. No retail executable, other-platform or XR parity is
+ claimed. Existing SDL/dependency pins and commercial assets are unchanged.
++
++Later [light](LIGHT_CONTRACTS.md), [translating world-path](WORLDPATH_CONTRACTS.md)
++and [cinematic/audio](CINEMATIC_CONTRACTS.md) continuations supersede the blanket
++omissions above for their bounded subsets. CinematicTrigger now uses real WAV
++voices and dry SDL output; KeyData sound requests, reverb, angular/container paths,
++general audio/rendering and complete M2 acceptance still remain unavailable.
+diff --git a/docs/M2_CINEMATIC_SOURCES.json b/docs/M2_CINEMATIC_SOURCES.json
+new file mode 100644
+index 0000000..0a398b9
+--- /dev/null
++++ b/docs/M2_CINEMATIC_SOURCES.json
+@@ -0,0 +1,61 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "193862806f45efa1aef996a1328aee7718148e8d",
++  "status": "M2 incomplete; selected original CinematicTrigger with real bounded WAV voices",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/CinematicTrigger.cpp",
++      "source_line_ranges": [
++        [
++          23,
++          455
++        ]
++      ],
++      "source_sha256": "9cdfcc8740afae0dbb0ab3b9ffcc9d770df72234a090a157c6d893d1867a05af",
++      "purpose": "Original ten-cue properties, callback chain, trigger scheduling, message-before-sound order, completion polling, local/attached selection and named-speaker fallback. Save/load and precache callbacks are excluded."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/CinematicTrigger.h",
++      "source_line_ranges": [
++        [
++          1,
++          54
++        ]
++      ],
++      "source_sha256": "9cfb6cdd89fc2058b836ceca1695bda1263e5d44285758a9e2a105cf7a331b39",
++      "purpose": "Original class shape, ten messages and owned sound lifetime."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/server_de.h",
++      "source_line_ranges": [
++        [
++          562,
++          596
++        ]
++      ],
++      "source_sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "purpose": "Sound playback, completion and release contract; direct typed implementation replaces the old function-pointer/handle ABI."
++    }
++  ],
++  "ports": [
++    "src/game/original/CinematicTrigger.h",
++    "src/game/original/CinematicTrigger.cpp"
++  ],
++  "adaptations": [
++    "Value-owned cue strings and typed monotonic sound IDs instead of pointer-like sound ABI",
++    "Relinquish named-object list on successful speaker lookup (original early return leaks it)",
++    "Reject nonfinite/negative/over-limit delays and restore creation; preserve original any-payload trigger, missing-file retry and empty-cue termination",
++    "Check owner after synchronous cue message; destruction and speaker removal are handle-checked/deferred",
++    "SDL pinned decoder plus bounded RIFF preflight, cache, dry stereo mixer, spatial attenuation, output and diagnostics are new engine code; not recovered retail audio"
++  ],
++  "retail_quirks": [
++    "39 cue occurrences exclude terminal odd PCM data padding from RIFF size",
++    "One cue occurrence omits the terminal odd data padding entirely; full payload is present"
++  ],
++  "unsupported": [
++    "Reverb, occlusion, Doppler, general Sound/RandomSoundFX and other caller audio",
++    "Save/restore, music/codecs outside PCM8/16 and MS/IMA ADPCM",
++    "Complete M2 original session acceptance"
++  ],
++  "engine_performance": "Objects::snapshot reserves slot-count capacity once, preserving snapshot membership/order/lifetime. The expanded private weapon scenario exceeded the unchanged 90 s ASan limit twice; this allocation-only correction passed the same test in 84.16 s before full regression."
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index b33f6f2..980c922 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -364,3 +364,12 @@ pusher/rider service. The observed two train blocks and all-or-nothing rejection
+ are replacement physics, not claimed retail behavior. Earlier blanket world-path
+ omissions are superseded only for static translation; no dependency or reference
+ repository changed.
++
++## M2 cinematic cue audio
++
++[Original source selections](M2_CINEMATIC_SOURCES.json) identify the CinematicTrigger
++properties/callbacks/sequencer and legacy sound lifetime contract. [Cinematic
++contracts](CINEMATIC_CONTRACTS.md) separate original timing/messages from owned
++strings, checked IDs, a source list-leak fix, malformed-data validation and new
++bounded SDL decoding/dry mixing/output. No prototype audio backend or dependency
++was imported. Missing audio remains failure; reverb is explicitly unavailable.
+diff --git a/src/app/cinematic_smoke.cpp b/src/app/cinematic_smoke.cpp
+new file mode 100644
+index 0000000..62dc765
+--- /dev/null
++++ b/src/app/cinematic_smoke.cpp
+@@ -0,0 +1,31 @@
++#include "cinematic_smoke.h"
++#include "game/original/CinematicTrigger.h"
++namespace OpenBlood2
++{
++    bool prepare_cinematic_smoke(GameSession& g, ObjectId& selected)
++    {
++        for (auto id : g.objects.snapshot())
++        {
++            const auto* r = g.objects.get(id);
++            if (std::string_view(r->state.m_Name) != "cintrig1" ||
++                !dynamic_cast<const CinematicTrigger*>(r->game.get()))
++                continue;
++            selected = id;
++            auto text = g.server.CreateString("TRIGGER");
++            auto msg = g.server.StartMessageToObject(nullptr, r->handle, 1000);
++            bool ok = msg && g.server.WriteToMessageHString(msg, text) == DE_OK && g.server.EndMessage(msg) == DE_OK;
++            g.server.FreeString(text);
++            return ok;
++        }
++        return false;
++    }
++    bool check_cinematic_smoke(GameSession& g, ObjectId selected)
++    {
++        const auto* r = g.objects.get(selected);
++        const auto* c = r ? dynamic_cast<const CinematicTrigger*>(r->game.get()) : nullptr;
++        const auto* v = c ? g.server.audio.get(c->sound) : nullptr;
++        return c && c->starts == 1 && !c->failures && c->current == 0 && v && !v->done && v->cursor > 0 &&
++               v->request.local && v->clip->duration() > .2 && g.server.audio.has_output() &&
++               g.server.audio.submitted_frames > 0 && g.server.audio.output_error.empty();
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/cinematic_smoke.h b/src/app/cinematic_smoke.h
+new file mode 100644
+index 0000000..a577eea
+--- /dev/null
++++ b/src/app/cinematic_smoke.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool prepare_cinematic_smoke(GameSession&, ObjectId&);
++    bool check_cinematic_smoke(GameSession&, ObjectId);
++} // namespace OpenBlood2
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index aa3a510..a2ef9bd 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -78,6 +78,22 @@ namespace OpenBlood2
+ 
+     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
+     {
++        if (cinematic_request)
++        {
++            if (const auto* r = game.objects.get(cinematic_request);
++                r && r->life == Life::Alive && r->type->name == "CinematicTrigger")
++            {
++                auto text = game.server.CreateString("TRIGGER");
++                auto message = game.server.StartMessageToObject(nullptr, r->handle, 1000);
++                if (message)
++                {
++                    game.server.WriteToMessageHString(message, text);
++                    game.server.EndMessage(message);
++                }
++                game.server.FreeString(text);
++            }
++            cinematic_request = {};
++        }
+         if (keyframe_request)
+         {
+             if (const auto* r = game.objects.get(keyframe_request);
+@@ -553,6 +569,12 @@ namespace OpenBlood2
+                     draw_lights(game, selection);
+                     ImGui::EndTabItem();
+                 }
++                if (ImGui::BeginTabItem("Cinematics", nullptr, select_cinematics ? ImGuiTabItemFlags_SetSelected : 0))
++                {
++                    select_cinematics = false;
++                    draw_cinematics(game, selection);
++                    ImGui::EndTabItem();
++                }
+                 if (ImGui::BeginTabItem("Keyframes", nullptr, select_keyframes ? ImGuiTabItemFlags_SetSelected : 0))
+                 {
+                     select_keyframes = false;
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index d1ed249..3e5f924 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -21,6 +21,9 @@ namespace OpenBlood2
+         ObjectId trigger_selection{}, trigger_request{};
+         std::string trigger_command;
+         bool grant_key_request = false;
++        bool select_cinematics = false;
++        ObjectId cinematic_selection{}, cinematic_request{};
++        void draw_cinematics(GameSession&, ObjectSelection&);
+         bool select_lights = false;
+         ObjectId light_selection{}, light_request{};
+         std::string light_command;
+diff --git a/src/app/inspector_cameras.cpp b/src/app/inspector_cameras.cpp
+index 4fae6e5..ab0da55 100644
+--- a/src/app/inspector_cameras.cpp
++++ b/src/app/inspector_cameras.cpp
+@@ -96,7 +96,8 @@ namespace OpenBlood2
+         ImGui::TextWrapped(
+             "Client selection uses the first active camera descriptor; server listener selection follows "
+             "the original camera list. Retail worlds suppress the client IsListener flag. Camera "
+-            "controls are diagnostic; Keyframes inspects path motion. CinematicTrigger remains pending.");
++            "controls are diagnostic; Keyframes inspects path motion. Cinematics inspects original cue sequences and "
++            "bounded dry audio.");
+         ImGui::EndTable();
+     }
+ } // namespace OpenBlood2
+diff --git a/src/app/inspector_cinematics.cpp b/src/app/inspector_cinematics.cpp
+new file mode 100644
+index 0000000..f7d6be0
+--- /dev/null
++++ b/src/app/inspector_cinematics.cpp
+@@ -0,0 +1,83 @@
++#include "game/original/CinematicTrigger.h"
++#include "inspector.h"
++#include <imgui.h>
++namespace OpenBlood2
++{
++    void Inspector::draw_cinematics(GameSession& game, ObjectSelection& selection)
++    {
++        auto& audio = game.server.audio;
++        ImGui::TextWrapped("Original CinematicTrigger sequences: cue message precedes sound; decoded sample completion "
++                           "advances the next delay. TRIGGER rearms cue 1's delay without resetting playback.");
++        ImGui::Text("Output: %s | voices %zu | cached clips %zu (%.1f MiB)",
++                    audio.has_output() ? "SDL stream" : "offline clock", audio.voices().size(), audio.cached_clips(),
++                    audio.cached_bytes() / 1048576.0);
++        ImGui::Text("PCM frames mixed / submitted / dropped: %llu / %llu / %llu",
++                    (unsigned long long)audio.mixed_frames, (unsigned long long)audio.submitted_frames,
++                    (unsigned long long)audio.dropped_frames);
++        ImGui::TextWrapped("Dry stereo output only: original reverb request is retained but not rendered. Spatial "
++                           "gains are replacement linear attenuation/panning, without occlusion or Doppler.");
++        if (!audio.output_error.empty())
++            ImGui::TextWrapped("Output failure: %s", audio.output_error.c_str());
++        ImGui::Text("Last PCM peak %.4f | listener %.1f %.1f %.1f", audio.peak, game.client_shell.listener_position.x,
++                    game.client_shell.listener_position.y, game.client_shell.listener_position.z);
++        if (!audio.mixed.empty())
++            ImGui::PlotLines("Left PCM", audio.mixed.data(), int(audio.mixed.size() / 2), 0, nullptr, -1, 1,
++                             ImVec2(0, 40), 2 * sizeof(float));
++        ImGui::Separator();
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* r = game.objects.get(id);
++            const auto* c = dynamic_cast<const CinematicTrigger*>(r->game.get());
++            if (!c)
++                continue;
++            if (!game.objects.get(cinematic_selection))
++                cinematic_selection = id;
++            const auto label = std::string(r->state.m_Name) + " [cue " + std::to_string(c->current + 1) + "]##" +
++                               std::to_string(id.slot);
++            if (ImGui::Selectable(label.c_str(), cinematic_selection == id))
++                cinematic_selection = selection.id = id;
++        }
++        const auto* r = game.objects.get(cinematic_selection);
++        const auto* c = r ? dynamic_cast<const CinematicTrigger*>(r->game.get()) : nullptr;
++        if (!c)
++            return;
++        ImGui::Text("%s | %s | scheduled %s", r->state.m_Name, r->life == Life::Alive ? "alive" : "pending removal",
++                    r->scheduled ? "yes" : "no");
++        ImGui::Text("Commands %llu | starts %llu | messages %llu | failed starts %llu", (unsigned long long)c->commands,
++                    (unsigned long long)c->starts, (unsigned long long)c->messages, (unsigned long long)c->failures);
++        if (r->life == Life::Alive && ImGui::Button("Send original TRIGGER"))
++            cinematic_request = r->id;
++        if (!c->error.empty())
++            ImGui::TextWrapped("Cue diagnostic: %s", c->error.c_str());
++        if (const auto* v = audio.get(c->sound))
++        {
++            ImGui::Separator();
++            ImGui::Text("Voice %llu | %s | %s", (unsigned long long)v->id, v->request.local ? "local" : "attached 3D",
++                        v->done ? "done" : "playing");
++            ImGui::Text("WAV encoding %u | %u Hz / %u channels | %.3f / %.3f s", v->clip->encoding, v->clip->rate,
++                        v->clip->channels, v->cursor / v->clip->rate, v->clip->duration());
++            ImGui::Text("Gains L/R %.3f / %.3f | radii %.0f / %.0f | speaker lost %s", v->left, v->right,
++                        v->request.inner_radius, v->request.outer_radius, v->speaker_lost ? "yes" : "no");
++            const auto* speaker = game.objects.get(v->request.speaker);
++            ImGui::Text("Speaker %s | position %.1f %.1f %.1f", speaker ? speaker->state.m_Name : "none", v->position.x,
++                        v->position.y, v->position.z);
++        }
++        for (std::size_t i = 0; i < c->cues.size(); ++i)
++        {
++            const auto& cue = c->cues[i];
++            if (ImGui::TreeNode(
++                    (std::to_string(i + 1) + (i == c->current ? " (current) " : " ") +
++                     (cue.sound.empty() ? "[empty: ends sequence]"
++                                        : cue.sound + (game.resources.find(cue.sound) ? " [present]" : " [MISSING]")))
++                        .c_str()))
++            {
++                ImGui::Text("Delay %.4f s | speaker %s", cue.delay, cue.speaker.empty() ? "self" : cue.speaker.c_str());
++                ImGui::TextWrapped("Message %s -> %s", cue.target.c_str(), cue.message.c_str());
++                ImGui::TreePop();
++            }
++        }
++        ImGui::TextWrapped("Inactive and hidden controllers are included. Cue presence does not imply successful "
++                           "decoding; World lists missing classes. This "
++                           "subset does not complete M2 or implement general game audio/music.");
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 57ff563..d2d17bc 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -2,6 +2,7 @@
+ #include "brush_smoke.h"
+ #include "build_info.h"
+ #include "camera_smoke.h"
++#include "cinematic_smoke.h"
+ #include "engine/capture.h"
+ #include "engine/config.h"
+ #include "engine/runtime.h"
+@@ -70,6 +71,13 @@ namespace
+             spdlog::error("Original game boundary initialization failed");
+             return 4;
+         }
++        if ((options.cinematics_smoke || (!options.gpu_smoke && !options.world_smoke)) &&
++            !game.server.audio.open_output(error))
++        {
++            spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
++            if (options.cinematics_smoke)
++                return 4;
++        }
+         HOBJECT key = nullptr;
+         OpenBlood2::ObjectSelection selection;
+         if (options.gpu_smoke)
+@@ -175,6 +183,14 @@ namespace
+                 return 4;
+             selection.id = smoke_camera;
+         }
++        OpenBlood2::ObjectId smoke_cinematic{};
++        bool cinematic_hidden = false;
++        if (options.cinematics_smoke)
++        {
++            if (!OpenBlood2::prepare_cinematic_smoke(game, smoke_cinematic))
++                return 4;
++            selection.id = smoke_cinematic;
++        }
+         OpenBlood2::ObjectId smoke_light{};
+         bool light_hidden = false;
+         if (options.lights_smoke)
+@@ -209,7 +225,7 @@ namespace
+         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
+                                    !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke &&
+                                    !options.pickups_smoke && !options.objectives_smoke && !options.cameras_smoke &&
+-                                   !options.keyframes_smoke && !options.lights_smoke;
++                                   !options.keyframes_smoke && !options.lights_smoke && !options.cinematics_smoke;
+         inspector.select_weapons = options.weapons_smoke;
+         inspector.select_movement = options.movement_smoke;
+         inspector.select_containers = options.containers_smoke;
+@@ -217,6 +233,8 @@ namespace
+         inspector.select_pickups = options.pickups_smoke;
+         inspector.select_objectives = options.objectives_smoke;
+         inspector.select_cameras = options.cameras_smoke;
++        inspector.select_cinematics = options.cinematics_smoke;
++        inspector.cinematic_selection = smoke_cinematic;
+         inspector.select_lights = options.lights_smoke;
+         inspector.light_selection = smoke_light;
+         inspector.select_keyframes = options.keyframes_smoke;
+@@ -332,6 +350,9 @@ namespace
+             if (options.brushes_smoke && frames == reload_frame + 1)
+                 if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
+                     return 4;
++            if (options.cinematics_smoke && frames == reload_frame + 1 &&
++                !OpenBlood2::prepare_cinematic_smoke(game, smoke_cinematic))
++                return 4;
+             if (options.lights_smoke && frames == reload_frame + 1 &&
+                 !OpenBlood2::prepare_light_smoke(game, smoke_light))
+                 return 4;
+@@ -464,7 +485,7 @@ namespace
+                            : (options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
+                               options.interaction_smoke || options.brushes_smoke || options.pickups_smoke ||
+                               options.objectives_smoke || options.cameras_smoke || options.keyframes_smoke ||
+-                              options.lights_smoke)
++                              options.lights_smoke || options.cinematics_smoke)
+                                ? 14u
+                                : 2u) &&
+                 !captured && !options.capture_file.empty();
+@@ -611,6 +632,8 @@ namespace
+                     use.key.down = frames == hide_frame;
+                     event_ok = SDL_PushEvent(&use);
+                 }
++                if (options.cinematics_smoke && frames == show_frame - 1)
++                    cinematic_hidden = OpenBlood2::check_cinematic_smoke(game, smoke_cinematic);
+                 if (options.lights_smoke && frames == show_frame - 1)
+                     light_hidden = OpenBlood2::check_light_smoke(game, smoke_light);
+                 if (options.keyframes_smoke && frames == show_frame - 1)
+@@ -742,6 +765,8 @@ namespace
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
++                (options.cinematics_smoke &&
++                 (!cinematic_hidden || !OpenBlood2::check_cinematic_smoke(game, smoke_cinematic))) ||
+                 (options.lights_smoke && (!light_hidden || !OpenBlood2::check_light_smoke(game, smoke_light))) ||
+                 (options.keyframes_smoke &&
+                  (!keyframe_hidden ||
+@@ -772,6 +797,9 @@ namespace
+             if (options.lights_smoke)
+                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
+                              "and after reload; evaluated radius/color checked; world illumination unavailable");
++            if (options.cinematics_smoke)
++                spdlog::info("CINEMATICS smoke: original cue and decoded samples submitted to SDL stream with hidden "
++                             "UI and reload; dry output only");
+             if (options.worldpaths_smoke)
+                 spdlog::info(
+                     "WORLDPATHS smoke: original SubwayA train follows keys, posed collision checked while UI hidden "
+@@ -858,6 +886,7 @@ int main(int argc, char** argv)
+                      "  --interaction-smoke GPU original USE and rotating door inspection\n"
+                      "  --pickups-smoke   GPU original ammo pickup, hidden collection and reload\n"
+                      "  --objectives-smoke GPU original objectives and localized text, hidden delivery/reload\n"
++                     "  --cinematics-smoke  GPU original cue, WAV mixing, SDL output and reload\n"
+                      "  --lights-smoke      GPU original light state, keyframe placement and reload\n"
+                      "  --worldpaths-smoke  GPU original translating train path, collision and reload\n"
+                      "  --keyframes-smoke   GPU original camera key path, key lifetime and reload\n"
+diff --git a/src/engine/audio.cpp b/src/engine/audio.cpp
+new file mode 100644
+index 0000000..334d07a
+--- /dev/null
++++ b/src/engine/audio.cpp
+@@ -0,0 +1,360 @@
++#include "engine/audio.h"
++#include "engine/collision.h"
++#include <SDL3/SDL.h>
++#include <algorithm>
++#include <cmath>
++#include <cstring>
++#include <limits>
++namespace OpenBlood2
++{
++    namespace
++    {
++        std::uint16_t u16(std::span<const std::uint8_t> b, std::size_t p)
++        {
++            return b[p] | (unsigned(b[p + 1]) << 8);
++        }
++        std::uint32_t u32(std::span<const std::uint8_t> b, std::size_t p)
++        {
++            return u16(b, p) | (unsigned(u16(b, p + 2)) << 16);
++        }
++        constexpr std::size_t max_clip_bytes = 64 * 1024 * 1024;
++        SoundId next_sound = 1; // Simulation thread only; never reset on unload/reload or a new mixer.
++    } // namespace
++    bool read_wave(std::span<const std::uint8_t> bytes, AudioClip& out, std::string& error)
++    {
++        error.clear();
++        auto fail = [&](const char* why)
++        {
++            error = why;
++            return false;
++        };
++        if (bytes.size() < 12 || bytes.size() > 16 * 1024 * 1024 || std::memcmp(bytes.data(), "RIFF", 4) ||
++            std::memcmp(bytes.data() + 8, "WAVE", 4) ||
++            (std::uint64_t(u32(bytes, 4)) + 8 != bytes.size() && std::uint64_t(u32(bytes, 4)) + 9 != bytes.size()))
++            return fail("Invalid/bounded RIFF WAVE envelope (16 MiB encoded limit)");
++        std::span<const std::uint8_t> fmt, data;
++        const auto riff_end = std::uint64_t(u32(bytes, 4)) + 8;
++        bool final_odd_data = false;
++        unsigned chunks = 0;
++        bool seen_fmt = false, seen_data = false;
++        for (std::size_t pos = 12; pos < bytes.size();)
++        {
++            if (++chunks > 1024 || bytes.size() - pos < 8)
++                return fail("Invalid WAVE chunk list");
++            auto n = u32(bytes, pos + 4);
++            const auto payload_end = std::uint64_t(pos) + 8 + n;
++            const bool is_data = !std::memcmp(bytes.data() + pos, "data", 4);
++            const bool last_odd_data =
++                is_data && (n & 1) && (payload_end == bytes.size() || payload_end + 1 == bytes.size());
++            // Retail PCM8 files may omit the terminal data pad, or exclude it from RIFF size.
++            // Only this final odd data byte is exceptional; payloads and other chunks remain complete.
++            const auto end = payload_end + ((last_odd_data && payload_end == bytes.size()) ? 0 : (n & 1));
++            final_odd_data = last_odd_data;
++            if (end > bytes.size())
++                return fail("Truncated WAVE chunk/padding");
++            auto chunk = bytes.subspan(pos + 8, n);
++            if (!std::memcmp(bytes.data() + pos, "fmt ", 4))
++            {
++                if (seen_fmt)
++                    return fail("Duplicate WAVE format");
++                seen_fmt = true;
++                fmt = chunk;
++            }
++            if (!std::memcmp(bytes.data() + pos, "data", 4))
++            {
++                if (seen_data)
++                    return fail("Duplicate WAVE data");
++                seen_data = true;
++                data = chunk;
++            }
++            pos = std::size_t(end);
++        }
++        if (riff_end != bytes.size() && (!final_odd_data || riff_end + 1 != bytes.size()))
++            return fail("RIFF length differs outside terminal odd data padding");
++        if (fmt.size() < 16 || data.empty())
++            return fail("Missing WAVE format/data");
++        const auto encoding = u16(fmt, 0), channels = u16(fmt, 2), block = u16(fmt, 12), bits = u16(fmt, 14);
++        const auto rate = u32(fmt, 4);
++        if (channels < 1 || channels > 2 || rate < 8000 || rate > 96000 || !block || block > 16384)
++            return fail("Unsupported WAVE rate/channels/block alignment");
++        std::uint64_t frames = 0;
++        if (encoding == 1)
++        {
++            if ((bits != 8 && bits != 16) || block != channels * (bits / 8) || data.size() % block ||
++                u32(fmt, 8) != rate * block)
++                return fail("Invalid/unsupported PCM layout");
++            frames = data.size() / block;
++        }
++        else if (encoding == 2 || encoding == 17)
++        {
++            if (bits != 4 || fmt.size() < 20 || u16(fmt, 16) < 2 || u16(fmt, 16) > fmt.size() - 18 ||
++                data.size() % block || block < channels * (encoding == 2 ? 7 : 4))
++                return fail("Invalid ADPCM block layout");
++            const auto samples = u16(fmt, 18);
++            const auto expected =
++                encoding == 2 ? (block - 7 * channels) * 2 / channels + 2 : (block - 4 * channels) * 2 / channels + 1;
++            if (samples != expected ||
++                (encoding == 2 && (fmt.size() < 22 || !u16(fmt, 20) || u16(fmt, 20) > 256 ||
++                                   (fmt.size() < 22 + 4u * u16(fmt, 20) || u16(fmt, 16) < 4 + 4u * u16(fmt, 20)))))
++                return fail("Invalid ADPCM samples/coefficient table");
++            frames = std::uint64_t(data.size() / block) * samples;
++        }
++        else
++            return fail("Unsupported WAVE encoding (PCM8/16, MS/IMA ADPCM only)");
++        if (!frames || frames * channels * sizeof(float) > max_clip_bytes)
++            return fail("Decoded clip exceeds 64 MiB");
++        auto* io = SDL_IOFromConstMem(bytes.data(), bytes.size());
++        if (!io)
++        {
++            error = SDL_GetError();
++            return false;
++        }
++        SDL_AudioSpec source{};
++        Uint8* decoded = nullptr;
++        Uint32 length = 0;
++        if (!SDL_LoadWAV_IO(io, true, &source, &decoded, &length))
++        {
++            error = SDL_GetError();
++            return false;
++        }
++        if (source.freq != int(rate) || source.channels != channels || length > max_clip_bytes ||
++            length > std::numeric_limits<int>::max())
++        {
++            SDL_free(decoded);
++            return fail("Unexpected decoded WAVE layout");
++        }
++        SDL_AudioSpec dest{SDL_AUDIO_F32, int(channels), int(rate)};
++        Uint8* converted = nullptr;
++        int converted_length = 0;
++        const bool converted_ok =
++            SDL_ConvertAudioSamples(&source, decoded, int(length), &dest, &converted, &converted_length);
++        SDL_free(decoded);
++        if (!converted_ok)
++        {
++            error = SDL_GetError();
++            return false;
++        }
++        if (converted_length <= 0 || std::size_t(converted_length) > max_clip_bytes ||
++            converted_length % (channels * sizeof(float)))
++        {
++            SDL_free(converted);
++            return fail("Invalid converted PCM length");
++        }
++        AudioClip value;
++        value.rate = rate;
++        value.channels = channels;
++        value.encoding = encoding;
++        value.samples.resize(std::size_t(converted_length) / sizeof(float));
++        std::memcpy(value.samples.data(), converted, converted_length);
++        SDL_free(converted);
++        if (!std::all_of(value.samples.begin(), value.samples.end(), [](float f) { return std::isfinite(f); }))
++            return fail("Nonfinite decoded samples");
++        out = std::move(value);
++        return true;
++    }
++    bool AudioMixer::load(const Resources& resources, std::string_view path, std::shared_ptr<const AudioClip>& out,
++                          std::string& error)
++    {
++        std::string name;
++        if (!resource_path(path, name))
++        {
++            error = "Invalid sound resource path";
++            return false;
++        }
++        if (auto it = clips_.find(name); it != clips_.end())
++        {
++            out = it->second;
++            return true;
++        }
++        const auto* resource = resources.find(name);
++        if (!resource || resource->size > 16 * 1024 * 1024)
++        {
++            error = "Missing or oversized sound resource";
++            return false;
++        }
++        if (clips_.size() >= 128)
++        {
++            error = "Sound cache exceeds 128 clips";
++            return false;
++        }
++        std::vector<std::uint8_t> bytes;
++        auto clip = std::make_shared<AudioClip>();
++        if (!resources.read(name, bytes, error) || !read_wave(bytes, *clip, error))
++            return false;
++        const auto size = clip->samples.size() * sizeof(float);
++        if (size > 256 * 1024 * 1024 - cached_bytes_)
++        {
++            error = "Sound cache exceeds 256 MiB";
++            return false;
++        }
++        cached_bytes_ += size;
++        clips_.emplace(name, clip);
++        out = std::move(clip);
++        return true;
++    }
++    SoundId AudioMixer::play(const Resources& resources, HOBJECT owner, const SoundRequest& request, DVector position,
++                             std::string& error)
++    {
++        error.clear();
++        if (voices_.size() >= 128 || !next_sound || next_sound == std::numeric_limits<SoundId>::max() ||
++            !physics_vector(position) || !std::isfinite(request.volume) || request.volume < 0 || request.volume > 1 ||
++            !std::isfinite(request.inner_radius) || !std::isfinite(request.outer_radius) || request.inner_radius < 0 ||
++            request.outer_radius <= request.inner_radius || request.outer_radius > 1e6f ||
++            request.resource.size() > 100)
++        {
++            error = "Invalid or over-limit sound request";
++            return 0;
++        }
++        std::shared_ptr<const AudioClip> clip;
++        if (!load(resources, request.resource, clip, error))
++            return 0;
++        const auto id = next_sound++;
++        voices_.emplace(id, AudioVoice{id, owner, request, std::move(clip), position});
++        return id;
++    }
++    const AudioVoice* AudioMixer::get(SoundId id) const
++    {
++        auto it = voices_.find(id);
++        return it == voices_.end() ? nullptr : &it->second;
++    }
++    AudioVoice* AudioMixer::get(SoundId id)
++    {
++        auto it = voices_.find(id);
++        return it == voices_.end() ? nullptr : &it->second;
++    }
++    bool AudioMixer::kill(SoundId id)
++    {
++        return voices_.erase(id) != 0;
++    }
++    bool AudioMixer::advance(double seconds, DVector listener, DRotation rotation)
++    {
++        if (!std::isfinite(seconds) || seconds < 0 || seconds > 60 || !physics_vector(listener) ||
++            !physics_vector(rotation.m_Vec) || !std::isfinite(rotation.m_Spin))
++            return false;
++        const float norm = vector_dot(rotation.m_Vec, rotation.m_Vec) + rotation.m_Spin * rotation.m_Spin;
++        if (!std::isfinite(norm) || std::abs(norm - 1) > 0.001f)
++            return false;
++        const double total = seconds * rate + remainder_;
++        const auto frames = std::uint64_t(std::floor(total + 1e-8));
++        remainder_ = std::max(0.0, total - double(frames));
++        const bool rendering = inspect_pcm || output_;
++        const auto count =
++            rendering ? std::min<std::uint64_t>(frames, 12000) : 0; // 250 ms bounded mixer/output work after a stall.
++        mixed.assign(count * 2, 0);
++        peak = 0;
++        const auto right = rotate_vector({1, 0, 0}, rotation);
++        for (auto& [id, v] : voices_)
++        {
++            (void)id;
++            if (v.done)
++                continue;
++            float gain = v.request.volume, pan = 0;
++            if (!v.request.local)
++            {
++                const auto direction = vector_subtract(v.position, listener);
++                const auto distance = std::sqrt(vector_dot(direction, direction));
++                gain *=
++                    std::clamp((v.request.outer_radius - distance) / (v.request.outer_radius - v.request.inner_radius),
++                               0.0f, 1.0f);
++                if (distance > 1e-6f)
++                    pan = std::clamp(vector_dot(direction, right) / distance, -1.0f, 1.0f);
++            }
++            v.left = gain * (v.request.local ? 1 : std::sqrt((1 - pan) * .5f));
++            v.right = gain * (v.request.local ? 1 : std::sqrt((1 + pan) * .5f));
++            const auto& clip = *v.clip;
++            const double increment = double(clip.rate) / rate;
++            for (std::size_t frame = 0; frame < count; ++frame)
++            {
++                const auto cursor = v.cursor + frame * increment;
++                if (cursor >= clip.frames())
++                    break;
++                const auto a = std::size_t(cursor), b = std::min(a + 1, clip.frames() - 1);
++                const float blend = float(cursor - a);
++                auto sample = [&](unsigned channel)
++                {
++                    auto x = clip.samples[a * clip.channels + channel], y = clip.samples[b * clip.channels + channel];
++                    return x + (y - x) * blend;
++                };
++                mixed[frame * 2] += sample(0) * v.left;
++                mixed[frame * 2 + 1] += sample(clip.channels - 1) * v.right;
++            }
++            v.cursor = std::min(double(clip.frames()), v.cursor + frames * increment);
++            v.done = v.cursor >= clip.frames();
++        }
++        for (auto& value : mixed)
++        {
++            value = std::clamp(value, -1.0f, 1.0f);
++            peak = std::max(peak, std::abs(value));
++        }
++        mixed_frames += count;
++        if (rendering)
++            dropped_frames += frames - count;
++        if (output_ && count)
++        {
++            const auto queued = SDL_GetAudioStreamQueued(output_);
++            if (queued < 0)
++            {
++                output_error = SDL_GetError();
++                return true;
++            }
++            if (queued > int(rate * 2 * sizeof(float) / 4))
++            {
++                dropped_frames += std::uint64_t(queued) / (2 * sizeof(float));
++                if (!SDL_ClearAudioStream(output_))
++                {
++                    output_error = SDL_GetError();
++                    return true;
++                }
++            }
++            if (!SDL_PutAudioStreamData(output_, mixed.data(), int(mixed.size() * sizeof(float))))
++                output_error = SDL_GetError();
++            else
++                submitted_frames += count;
++        }
++        return true;
++    }
++    bool AudioMixer::open_output(std::string& error)
++    {
++        if (output_)
++            return true;
++        if (!SDL_InitSubSystem(SDL_INIT_AUDIO))
++        {
++            error = output_error = SDL_GetError();
++            return false;
++        }
++        audio_initialized_ = true;
++        SDL_AudioSpec spec{SDL_AUDIO_F32, 2, int(rate)};
++        output_ = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, nullptr, nullptr);
++        if (!output_ || !SDL_ResumeAudioStreamDevice(output_))
++        {
++            error = output_error = SDL_GetError();
++            if (output_)
++                SDL_DestroyAudioStream(output_);
++            output_ = nullptr;
++            SDL_QuitSubSystem(SDL_INIT_AUDIO);
++            audio_initialized_ = false;
++            return false;
++        }
++        output_error.clear();
++        return true;
++    }
++    void AudioMixer::clear()
++    {
++        voices_.clear();
++        clips_.clear();
++        cached_bytes_ = 0;
++        mixed.clear();
++        remainder_ = 0;
++        peak = 0;
++        mixed_frames = submitted_frames = dropped_frames = 0;
++        if (output_ && !SDL_ClearAudioStream(output_))
++            output_error = SDL_GetError();
++    }
++    AudioMixer::~AudioMixer()
++    {
++        if (output_)
++            SDL_DestroyAudioStream(output_);
++        if (audio_initialized_)
++            SDL_QuitSubSystem(SDL_INIT_AUDIO);
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/audio.h b/src/engine/audio.h
+new file mode 100644
+index 0000000..df83f01
+--- /dev/null
++++ b/src/engine/audio.h
+@@ -0,0 +1,88 @@
++#pragma once
++#include "basedefs_de.h"
++#include "engine/resources.h"
++#include <SDL3/SDL_audio.h>
++#include <memory>
++namespace OpenBlood2
++{
++    using SoundId = std::uint64_t;
++    struct AudioClip
++    {
++        unsigned rate = 0, channels = 0, encoding = 0;
++        std::vector<float> samples;
++        std::size_t frames() const
++        {
++            return channels ? samples.size() / channels : 0;
++        }
++        double duration() const
++        {
++            return rate ? double(frames()) / rate : 0;
++        }
++    };
++    bool read_wave(std::span<const std::uint8_t>, AudioClip&, std::string&);
++    struct SoundRequest
++    {
++        std::string resource;
++        HOBJECT speaker = nullptr;
++        bool local = false;
++        float inner_radius = 250, outer_radius = 1000, volume = 1;
++        bool reverb_requested = true; // Original cinematic flag; dry output currently only.
++    };
++    struct AudioVoice
++    {
++        SoundId id = 0;
++        HOBJECT owner = nullptr;
++        SoundRequest request;
++        std::shared_ptr<const AudioClip> clip;
++        DVector position{};
++        double cursor = 0;
++        float left = 1, right = 1;
++        bool done = false, speaker_lost = false;
++    };
++    class AudioMixer
++    {
++      public:
++        static constexpr unsigned rate = 48000;
++        AudioMixer() = default;
++        AudioMixer(const AudioMixer&) = delete;
++        AudioMixer& operator=(const AudioMixer&) = delete;
++        ~AudioMixer();
++        bool open_output(std::string& error);
++        bool has_output() const
++        {
++            return output_ != nullptr;
++        }
++        bool load(const Resources&, std::string_view, std::shared_ptr<const AudioClip>&, std::string&);
++        SoundId play(const Resources&, HOBJECT owner, const SoundRequest&, DVector, std::string&);
++        bool kill(SoundId);
++        const AudioVoice* get(SoundId) const;
++        AudioVoice* get(SoundId);
++        const auto& voices() const
++        {
++            return voices_;
++        }
++        std::size_t cached_clips() const
++        {
++            return clips_.size();
++        }
++        std::size_t cached_bytes() const
++        {
++            return cached_bytes_;
++        }
++        bool advance(double, DVector listener, DRotation rotation);
++        void clear();
++        bool inspect_pcm = false; // Headless simulation can advance exact sample cursors without rendering blocks.
++        std::vector<float> mixed;
++        std::uint64_t mixed_frames = 0, submitted_frames = 0, dropped_frames = 0;
++        float peak = 0;
++        std::string output_error;
++
++      private:
++        std::map<std::string, std::shared_ptr<const AudioClip>> clips_;
++        std::map<SoundId, AudioVoice> voices_;
++        std::size_t cached_bytes_ = 0;
++        double remainder_ = 0;
++        SDL_AudioStream* output_ = nullptr;
++        bool audio_initialized_ = false;
++    };
++} // namespace OpenBlood2
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index eb6e0f6..c746921 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -125,6 +125,8 @@ namespace OpenBlood2
+                 options.player_smoke = true;
+                 options.containers_smoke = true;
+             }
++            else if (arg == "--cinematics-smoke")
++                options.world_smoke = options.player_smoke = options.cinematics_smoke = true;
+             else if (arg == "--lights-smoke")
+             {
+                 options.world_smoke = options.player_smoke = options.lights_smoke = true;
+@@ -226,7 +228,8 @@ namespace OpenBlood2
+         if (int(options.weapons_smoke) + int(options.movement_smoke) + int(options.containers_smoke) +
+                 int(options.doors_smoke) + int(options.triggers_smoke) + int(options.interaction_smoke) +
+                 int(options.brushes_smoke) + int(options.pickups_smoke) + int(options.objectives_smoke) +
+-                int(options.cameras_smoke) + int(options.keyframes_smoke) + int(options.lights_smoke) >
++                int(options.cameras_smoke) + int(options.keyframes_smoke) + int(options.lights_smoke) +
++                int(options.cinematics_smoke) >
+             1)
+         {
+             error = "Choose one player smoke scenario";
+diff --git a/src/engine/config.h b/src/engine/config.h
+index 1ffc51f..1b49b67 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -23,7 +23,8 @@ namespace OpenBlood2
+         bool weapons_smoke = false;
+         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
+              interaction_smoke = false, brushes_smoke = false, pickups_smoke = false, objectives_smoke = false,
+-             cameras_smoke = false, keyframes_smoke = false, worldpaths_smoke = false, lights_smoke = false;
++             cameras_smoke = false, keyframes_smoke = false, worldpaths_smoke = false, lights_smoke = false,
++             cinematics_smoke = false;
+         bool start_game = false;
+         bool explicit_config = false;
+         bool help = false;
+diff --git a/src/engine/objects.cpp b/src/engine/objects.cpp
+index c8dca29..2099828 100644
+--- a/src/engine/objects.cpp
++++ b/src/engine/objects.cpp
+@@ -541,6 +541,7 @@ namespace OpenBlood2
+     std::vector<ObjectId> Objects::snapshot() const
+     {
+         std::vector<ObjectId> ids;
++        ids.reserve(slots_.size()); // One bounded allocation for hot-path snapshots, preserving slot order.
+         for (const auto& slot : slots_)
+             if (slot.object)
+                 ids.push_back(slot.object->id);
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 0a6bbb5..4031cd3 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -1,5 +1,6 @@
+ #pragma once
+ #include "basedefs_de.h"
++#include "engine/audio.h"
+ #include "game/brush_messages.h"
+ #include "game/camera_messages.h"
+ #include "game/container_messages.h"
+@@ -31,6 +32,10 @@ class CSBase
+ class ServerDE : public CSBase
+ {
+   public:
++    virtual OpenBlood2::SoundId PlayCinematicSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
++    virtual bool IsSoundDone(OpenBlood2::SoundId, bool&) = 0;
++    virtual bool KillSound(OpenBlood2::SoundId) = 0;
++
+     virtual bool IsObjectAlive(HOBJECT) = 0;
+     virtual bool ValidateSpawnObject(std::string_view) = 0;
+     virtual void RecordSpawn(const OpenBlood2::SpawnReport&) = 0;
+diff --git a/src/game/original/CinematicTrigger.cpp b/src/game/original/CinematicTrigger.cpp
+new file mode 100644
+index 0000000..6db744b
+--- /dev/null
++++ b/src/game/original/CinematicTrigger.cpp
+@@ -0,0 +1,141 @@
++// Selected original ObjectDLL/CinematicTrigger.cpp; owned cues and checked audio handles.
++#include "CinematicTrigger.h"
++#include "engine/objects.h"
++#include "trigger_helpers.h"
++#include <cmath>
++using namespace OpenBlood2;
++CinematicTrigger::~CinematicTrigger()
++{
++    if (g_pServerDE && sound)
++        g_pServerDE->KillSound(sound);
++}
++bool CinematicTrigger::ReadProp()
++{
++    for (std::size_t i = 0; i < cues.size(); ++i)
++    {
++        auto& cue = cues[i];
++        const auto suffix = std::to_string(i + 1);
++        g_pServerDE->GetPropReal(("Delay" + suffix).c_str(), &cue.delay);
++        auto string = [&](const char* name, std::string& out)
++        {
++            GenericProp p;
++            if (g_pServerDE->GetPropGeneric((name + suffix).c_str(), &p) == DE_OK)
++                out = p.m_String;
++        };
++        string("Sound", cue.sound);
++        string("WhoPlaysSound", cue.speaker);
++        string("StartSoundTriggerTarget", cue.target);
++        string("StartSoundTriggerMsg", cue.message);
++        if (!std::isfinite(cue.delay) || cue.delay < 0 || cue.delay > 1e6f)
++            return false;
++    }
++    return true;
++}
++DDWORD CinematicTrigger::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE)
++    {
++        if (!data || reason == 3)
++            return 0;
++        if ((reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP) && !ReadProp())
++            return 0;
++    }
++    else if (message == MID_INITIALUPDATE)
++    {
++        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3));
++        g_pServerDE->SetNextUpdate(m_hObject, 0);
++    }
++    else if (message == MID_UPDATE && !Update())
++    {
++        g_pServerDE->RemoveObject(m_hObject);
++        return 0;
++    }
++    return B2BaseClass::EngineMessageFn(message, data, reason);
++}
++DDWORD CinematicTrigger::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    if (message == 1000)
++    {
++        ++commands;
++        // Every trigger payload rearms delay zero; neither index nor sound resets.
++        g_pServerDE->SetNextUpdate(m_hObject, cues[0].delay + .0001f);
++    }
++    return B2BaseClass::ObjectMessageFn(sender, message, read);
++}
++bool CinematicTrigger::Update()
++{
++    if (sound)
++    {
++        bool done = false;
++        if (!g_pServerDE->IsSoundDone(sound, done) || done)
++        {
++            g_pServerDE->KillSound(sound);
++            sound = 0;
++            ++current;
++            if (current < cues.size())
++            {
++                g_pServerDE->SetNextUpdate(m_hObject, cues[current].delay + .0001f);
++                return true;
++            }
++            return false;
++        }
++    }
++    else
++    {
++        if (current >= cues.size() || cues[current].sound.empty())
++            return false;
++        StartSound();
++        if (!g_pServerDE->IsObjectAlive(m_hObject))
++            return false;
++    }
++    g_pServerDE->SetNextUpdate(m_hObject, .001f);
++    return true;
++}
++HOBJECT CinematicTrigger::PlayedBy(const std::string& name)
++{
++    if (name.empty())
++        return m_hObject;
++    auto* list = g_pServerDE->FindNamedObjects(name.c_str());
++    HOBJECT found = m_hObject;
++    if (list)
++    {
++        if (list->m_pFirstLink && g_pServerDE->IsObjectAlive(list->m_pFirstLink->m_hObject))
++            found = list->m_pFirstLink->m_hObject;
++        g_pServerDE->RelinquishList(list); // Fix source's early-return list leak.
++    }
++    return found;
++}
++void CinematicTrigger::StartSound()
++{
++    if (current >= cues.size())
++        return;
++    if (sound)
++    {
++        g_pServerDE->KillSound(sound);
++        sound = 0;
++    }
++    const auto& cue = cues[current];
++    if (!cue.target.empty() && !cue.message.empty())
++    {
++        ++messages;
++        auto target = g_pServerDE->CreateString(cue.target.c_str()),
++             message = g_pServerDE->CreateString(cue.message.c_str());
++        if (target && message)
++            SendTriggerMsgToObjects(this, target, message);
++        else
++            error = "Cinematic message allocation failed";
++        g_pServerDE->FreeString(target);
++        g_pServerDE->FreeString(message);
++    }
++    if (!g_pServerDE->IsObjectAlive(m_hObject))
++        return;
++    SoundRequest request;
++    request.resource = cue.sound;
++    request.local = same_name(cue.speaker, "player");
++    request.speaker = request.local ? nullptr : PlayedBy(cue.speaker);
++    last_speaker = request.speaker;
++    sound = g_pServerDE->PlayCinematicSound(m_hObject, request, error);
++    ++starts;
++    if (!sound)
++        ++failures; // Original retries on next update, resending its cue message.
++}
+diff --git a/src/game/original/CinematicTrigger.h b/src/game/original/CinematicTrigger.h
+new file mode 100644
+index 0000000..6cc8fa4
+--- /dev/null
++++ b/src/game/original/CinematicTrigger.h
+@@ -0,0 +1,30 @@
++#pragma once
++#include "B2BaseClass.h"
++#include "engine/audio.h"
++#include <array>
++class CinematicTrigger : public B2BaseClass
++{
++  public:
++    struct Cue
++    {
++        float delay = 0;
++        std::string sound, speaker, target, message;
++    };
++    std::array<Cue, 10> cues;
++    std::size_t current = 0;
++    OpenBlood2::SoundId sound = 0;
++    std::uint64_t starts = 0, messages = 0, failures = 0, commands = 0;
++    HOBJECT last_speaker = nullptr;
++    std::string error;
++    ~CinematicTrigger() override;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++
++  private:
++    bool ReadProp();
++    bool Update();
++    void StartSound();
++    HOBJECT PlayedBy(const std::string&);
++};
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 83248fb..2ef6cae 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -2,6 +2,7 @@
+ #include "game/original/B2BaseClass.h"
+ #include "game/original/CameraObj.h"
+ #include "game/original/CameraSpot.h"
++#include "game/original/CinematicTrigger.h"
+ #include "game/original/ClientLightFX.h"
+ #include "game/original/Door.h"
+ #include "game/original/GameStartPoint.h"
+@@ -78,6 +79,20 @@ namespace OpenBlood2
+                                        {"IsListener", true},
+                                        {"HidePlayer", false},
+                                        {"TypeActionMode", false}}};
++        const ClassInfo cinematic_trigger{
++            "CinematicTrigger", &b2base, construct<CinematicTrigger>, []
++            {
++                std::vector<PropertySpec> p{{"TypeActionMode", false}};
++                for (unsigned i = 1; i <= 10; ++i)
++                {
++                    const auto n = std::to_string(i);
++                    p.push_back({"Delay" + n, 0.0f});
++                    for (const char* name :
++                         {"Sound", "WhoPlaysSound", "StartSoundTriggerTarget", "StartSoundTriggerMsg"})
++                        p.push_back({name + n, std::string{}});
++                }
++                return p;
++            }()};
+         const ClassInfo keyframer{"KeyFramer",
+                                   &b2base,
+                                   construct<KeyFramer>,
+@@ -517,13 +532,13 @@ namespace OpenBlood2
+                objects.register_class(light_Flicker4WaveLightFX) && objects.register_class(light_StrobeWaveLightFX) &&
+                objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
+                objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
+-               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
+-               objects.register_class(game_start) && objects.register_class(path) &&
+-               objects.register_class(world_properties) && objects.register_class(smell) &&
+-               objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
+-               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
+-               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
+-               objects.register_class(freefall) && objects.register_class(trigger) &&
++               objects.register_class(cinematic_trigger) && objects.register_class(keyframer) &&
++               objects.register_class(key) && objects.register_class(start) && objects.register_class(game_start) &&
++               objects.register_class(path) && objects.register_class(world_properties) &&
++               objects.register_class(smell) && objects.register_class(character) && objects.register_class(player) &&
++               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
++               objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
++               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
+                objects.register_class(key_pickup) && objects.register_class(pickup) &&
+                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+                objects.register_class(health_base) && objects.register_class(armor_base) &&
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index fb81971..6eb9fb4 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -31,6 +31,11 @@ namespace OpenBlood2
+     class ServerAdapter final : public ServerDE
+     {
+       public:
++        AudioMixer audio;
++        SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
++        bool IsSoundDone(SoundId, bool&) override;
++        bool KillSound(SoundId) override;
++        bool advance_audio(double, DVector, DRotation);
+         explicit ServerAdapter(Objects& objects);
+         ~ServerAdapter() override;
+         ServerAdapter(const ServerAdapter&) = delete;
+@@ -65,6 +70,7 @@ namespace OpenBlood2
+         }
+         void reset_world_time()
+         {
++            audio.clear();
+             world_time_origin_ = objects_.time();
+             brush_destructions.clear();
+             debris_effects.clear();
+diff --git a/src/game/server_audio.cpp b/src/game/server_audio.cpp
+new file mode 100644
+index 0000000..f04551b
+--- /dev/null
++++ b/src/game/server_audio.cpp
+@@ -0,0 +1,54 @@
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    SoundId ServerAdapter::PlayCinematicSound(HOBJECT owner, const SoundRequest& request, std::string& error)
++    {
++        trace_service("PlayCinematicSound");
++        if (!IsObjectAlive(owner) || !client_resources || (!request.local && !IsObjectAlive(request.speaker)))
++        {
++            error = "Cinematic sound owner/speaker unavailable";
++            return 0;
++        }
++        DVector position{};
++        if (!request.local)
++            GetObjectPos(request.speaker, &position);
++        return audio.play(*client_resources, owner, request, position, error);
++    }
++    bool ServerAdapter::IsSoundDone(SoundId id, bool& done)
++    {
++        trace_service("IsSoundDone");
++        const auto* voice = audio.get(id);
++        if (!voice)
++            return false;
++        done = voice->done;
++        return true;
++    }
++    bool ServerAdapter::KillSound(SoundId id)
++    {
++        trace_service("KillSound");
++        return audio.kill(id);
++    }
++    bool ServerAdapter::advance_audio(double seconds, DVector listener, DRotation rotation)
++    {
++        std::vector<SoundId> removed;
++        for (const auto& [id, entry] : audio.voices())
++        {
++            if (!IsObjectAlive(entry.owner))
++            {
++                removed.push_back(id);
++                continue;
++            }
++            if (!entry.request.local)
++            {
++                auto* voice = audio.get(id);
++                if (!IsObjectAlive(voice->request.speaker))
++                    voice->done = voice->speaker_lost = true;
++                else
++                    GetObjectPos(voice->request.speaker, &voice->position);
++            }
++        }
++        for (auto id : removed)
++            audio.kill(id);
++        return audio.advance(seconds, listener, rotation);
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 4e619cc..972760b 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -350,7 +350,13 @@ namespace OpenBlood2
+         const bool was_tracing = server.trace_enabled;
+         server.trace_enabled = true;
+         server_shell.Update(static_cast<float>(seconds));
+-        bool ok = objects.advance(seconds) && server.advance_physics(seconds) && server.advance_models(seconds);
++        const auto listener = client_shell.listener_position;
++        const auto listener_rotation =
++            client_shell.view.object && client_shell.view.settings.listener
++                ? client_shell.view.rotation
++                : rotation_from_euler({client_shell.rotation.pitch, client_shell.rotation.yaw, 0});
++        bool ok = server.advance_audio(seconds, listener, listener_rotation) && objects.advance(seconds) &&
++                  server.advance_physics(seconds) && server.advance_models(seconds);
+         if (local_client)
+         {
+             if (!server.GetClientUserData(local_client))
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 2e7239c..7454f49 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -369,3 +369,25 @@ if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --worldpaths-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/worldpaths.png")
+     set_tests_properties(gpu.worldpaths PROPERTIES LABELS "private;gpu;worldpaths" TIMEOUT 30 RUN_SERIAL TRUE)
+ endif()
++
++add_executable(cinematic_tests cinematic_tests.cpp)
++target_link_libraries(cinematic_tests PRIVATE blood2_game)
++blood2_project_options(cinematic_tests)
++foreach(case decode mixer spatial sequence lifetime failures device)
++    add_test(NAME cinematics.${case} COMMAND cinematic_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/cinematic-fixtures/${case}")
++    set_tests_properties(cinematics.${case} PROPERTIES LABELS "headless;cinematics" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME cinematics.catalog COMMAND cinematic_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(cinematics.catalog PROPERTIES LABELS "headless;private;cinematics" TIMEOUT 90)
++endif()
++
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME cinematics.subway COMMAND cinematic_tests subway "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(cinematics.subway PROPERTIES LABELS "headless;private;cinematics" TIMEOUT 90)
++endif()
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.cinematics COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --cinematics-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/cinematics.png")
++    set_tests_properties(gpu.cinematics PROPERTIES LABELS "private;gpu;cinematics" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
++endif()
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index ce5bc87..98c75a7 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -393,9 +393,9 @@ namespace
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+             ++entries[e.state];
+-        CHECK(entries[EntryState::Created] == 160 && entries[EntryState::EditorOnly] == 372 &&
+-              entries[EntryState::Unsupported] == 48 && entries[EntryState::Failed] == 0 &&
+-              g.objects.snapshot().size() == 167);
++        CHECK(entries[EntryState::Created] == 164 && entries[EntryState::EditorOnly] == 372 &&
++              entries[EntryState::Unsupported] == 44 && entries[EntryState::Failed] == 0 &&
++              g.objects.snapshot().size() == 171);
+         std::cout << "Subway instances=" << g.objects.snapshot().size() << "\n";
+         for (auto [state, n] : entries)
+             std::cout << "state=" << int(state) << " count=" << n << '\n';
+diff --git a/tests/camera_tests.cpp b/tests/camera_tests.cpp
+index f636d95..2c17111 100644
+--- a/tests/camera_tests.cpp
++++ b/tests/camera_tests.cpp
+@@ -291,7 +291,7 @@ namespace
+         CHECK(worlds == 57 && entries == 61 && created == 61 && rejected == 0);
+         CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+         CHECK(CameraObj::m_dwNumCameras == 2 && g.server.camera_effects.size() == 2 &&
+-              g.objects.snapshot().size() == 170);
++              g.objects.snapshot().size() == 174);
+         CHECK(test_camera::complete_subway_intro(g));
+         for (auto id : g.objects.snapshot())
+             if (auto* r = g.objects.get(id); r && dynamic_cast<CameraObj*>(r->game.get()))
+diff --git a/tests/cinematic_tests.cpp b/tests/cinematic_tests.cpp
+new file mode 100644
+index 0000000..7c4ed1e
+--- /dev/null
++++ b/tests/cinematic_tests.cpp
+@@ -0,0 +1,532 @@
++#include "game/game_settings.h"
++#include "game/original/CinematicTrigger.h"
++#include "player_fixture.h"
++#include <SDL3/SDL.h>
++#include <algorithm>
++#include <functional>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    std::vector<std::uint8_t> wave(unsigned channels = 1, unsigned bits = 16, unsigned rate = 8000,
++                                   unsigned frames = 800)
++    {
++        test_model::Writer w;
++        for (char c : std::string("RIFF"))
++            w.u8(c);
++        w.u32(36 + frames * channels * (bits / 8));
++        for (char c : std::string("WAVEfmt "))
++            w.u8(c);
++        w.u32(16);
++        w.u16(1);
++        w.u16(channels);
++        w.u32(rate);
++        w.u32(rate * channels * (bits / 8));
++        w.u16(channels * (bits / 8));
++        w.u16(bits);
++        for (char c : std::string("data"))
++            w.u8(c);
++        w.u32(frames * channels * (bits / 8));
++        for (unsigned i = 0; i < frames * channels; ++i)
++        {
++            if (bits == 8)
++                w.u8(192);
++            else
++                w.u16(16384);
++        }
++        return w.b;
++    }
++    bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        CHECK(test_player::setup(g, root, false));
++        test_player::Directory d;
++        d.files["cue.wav"] = wave();
++        d.files["long.wav"] = wave(1, 16, 8000, 8000);
++        d.files["stereo.wav"] = wave(2);
++        auto w = test_model::Writer{};
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, d);
++        w.patch(131, off);
++        w.patch(135, size);
++        std::ofstream out(root / "sound.rez", std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        std::string error;
++        CHECK(g.resources.mount(root / "sound.rez", error));
++        return true;
++    }
++    HOBJECT cine(GameSession& g, Properties p = {})
++    {
++        return g.objects.create(g.objects.find_class("CinematicTrigger"), {}, Creation::World, p);
++    }
++    CinematicTrigger* get(GameSession& g, HOBJECT h)
++    {
++        return dynamic_cast<CinematicTrigger*>(g.server.HandleToObject(h));
++    }
++    bool trigger(GameSession& g, HOBJECT h, const char* cmd = "TRIGGER")
++    {
++        auto str = g.server.CreateString(cmd);
++        auto msg = g.server.StartMessageToObject(nullptr, h, 1000);
++        bool ok = msg && g.server.WriteToMessageHString(msg, str) == DE_OK && g.server.EndMessage(msg) == DE_OK;
++        g.server.FreeString(str);
++        return ok;
++    }
++    bool decode(const std::filesystem::path&)
++    {
++        std::string error;
++        AudioClip clip;
++        for (unsigned channels : {1u, 2u})
++            for (unsigned bits : {8u, 16u})
++            {
++                auto bytes = wave(channels, bits);
++                CHECK(read_wave(bytes, clip, error));
++                CHECK(clip.rate == 8000 && clip.channels == channels && clip.frames() == 800 && clip.duration() == .1);
++                CHECK(std::abs(clip.samples[100] - .5f) < .005f);
++            }
++        // Observed retail PCM8 terminal padding variants; arbitrary trailing bytes still reject.
++        auto odd = wave(1, 8, 8000, 801);
++        CHECK(read_wave(odd, clip, error) && clip.frames() == 801);
++        odd.push_back(0);
++        CHECK(read_wave(odd, clip, error) && clip.frames() == 801);
++        ++odd[4];
++        CHECK(read_wave(odd, clip, error) && clip.frames() == 801);
++        odd.push_back(0);
++        CHECK(!read_wave(odd, clip, error));
++        // A missing required inter-chunk pad never becomes an accepted terminal-pad variant.
++        odd = wave(1, 8, 8000, 801);
++        odd.insert(odd.end(), {'J', 'U', 'N', 'K', 0, 0, 0, 0});
++        unsigned riff = unsigned(odd.size() - 8);
++        for (unsigned i = 0; i < 4; ++i)
++            odd[4 + i] = riff >> (8 * i);
++        CHECK(!read_wave(odd, clip, error));
++        CHECK(read_wave(wave(), clip, error));
++        auto valid = wave();
++        for (std::size_t size = 0; size < valid.size(); ++size)
++            CHECK(!read_wave(std::span(valid).first(size), clip, error));
++        CHECK(clip.frames() == 800); // Failure leaves the previous decoded resource intact.
++        for (auto [pos, value] : std::vector<std::pair<unsigned, unsigned>>{
++                 {20, 3}, {22, 0}, {22, 3}, {24, 1}, {32, 0}, {34, 24}, {16, 15}, {40, 255}})
++        {
++            auto bytes = valid;
++            bytes[pos] = value;
++            CHECK(!read_wave(bytes, clip, error));
++        }
++        // Real IMA ADPCM: one mono eight-byte block, predictor 0/index 0 and zero nibbles => nine zero samples.
++        test_model::Writer w;
++        for (char c : std::string("RIFF"))
++            w.u8(c);
++        w.u32(48);
++        for (char c : std::string("WAVEfmt "))
++            w.u8(c);
++        w.u32(20);
++        w.u16(17);
++        w.u16(1);
++        w.u32(8000);
++        w.u32(7111);
++        w.u16(8);
++        w.u16(4);
++        w.u16(2);
++        w.u16(9);
++        for (char c : std::string("data"))
++            w.u8(c);
++        w.u32(8);
++        for (unsigned i = 0; i < 8; ++i)
++            w.u8(0);
++        CHECK(read_wave(w.b, clip, error) && clip.frames() == 9 && clip.encoding == 17);
++        CHECK(std::all_of(clip.samples.begin(), clip.samples.end(), [](float x) { return x == 0; }));
++        w.b[38] = 0;
++        CHECK(!read_wave(w.b, clip, error));
++        // MS ADPCM: first standard predictor, delta 16, zero seed samples and zero nibbles.
++        w.b.clear();
++        for (char c : std::string("RIFF"))
++            w.u8(c);
++        w.u32(78);
++        for (char c : std::string("WAVEfmt "))
++            w.u8(c);
++        w.u32(50);
++        w.u16(2);
++        w.u16(1);
++        w.u32(8000);
++        w.u32(16000);
++        w.u16(8);
++        w.u16(4);
++        w.u16(32);
++        w.u16(4);
++        w.u16(7);
++        for (auto [a, b] : std::vector<std::pair<int, int>>{
++                 {256, 0}, {512, -256}, {0, 0}, {192, 64}, {240, 0}, {460, -208}, {392, -232}})
++        {
++            w.u16(a);
++            w.u16(b);
++        }
++        for (char c : std::string("data"))
++            w.u8(c);
++        w.u32(8);
++        w.u8(0);
++        w.u16(16);
++        w.u16(0);
++        w.u16(0);
++        w.u8(0);
++        CHECK(read_wave(w.b, clip, error) && clip.frames() == 4 && clip.encoding == 2);
++        CHECK(std::all_of(clip.samples.begin(), clip.samples.end(), [](float x) { return x == 0; }));
++        w.b[36] = 2;
++        CHECK(!read_wave(w.b, clip, error));
++        w.b[36] = 32;
++        w.b[40] = 0;
++        CHECK(!read_wave(w.b, clip, error));
++
++        return true;
++    }
++    bool mixer(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto h = cine(g);
++        CHECK(h);
++        SoundRequest r;
++        r.resource = "cue.wav";
++        r.local = true;
++        std::string error;
++        g.server.audio.inspect_pcm = true;
++        auto id = g.server.PlayCinematicSound(h, r, error);
++        CHECK(id && g.server.audio.cached_clips() == 1);
++        bool done = true;
++        CHECK(g.server.IsSoundDone(id, done) && !done);
++        CHECK(g.server.audio.advance(.05, {}, {}));
++        CHECK(g.server.audio.mixed.size() == 4800 && std::abs(g.server.audio.peak - .5f) < .005f);
++        CHECK(g.server.IsSoundDone(id, done) && !done);
++        CHECK(g.server.audio.advance(.05, {}, {}));
++        CHECK(g.server.IsSoundDone(id, done) && done);
++        CHECK(g.server.KillSound(id) && !g.server.KillSound(id) && !g.server.IsSoundDone(id, done));
++        auto next = g.server.PlayCinematicSound(h, r, error);
++        CHECK(next > id);
++        CHECK(g.unload_world() && !g.server.audio.cached_clips() && g.server.audio.voices().empty() &&
++              !g.server.audio.get(next));
++        CHECK(cine(g));
++        AudioMixer other;
++        auto fresh = other.play(g.resources, nullptr, r, {}, error);
++        CHECK(fresh > next && !other.get(next));
++        return true;
++    }
++    bool spatial(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto h = cine(g);
++        CHECK(h);
++        auto speaker =
++            g.objects.create(g.objects.find_class("BaseClass"), {}, Creation::World, {{"Pos", DVector{500, 0, 0}}});
++        CHECK(speaker);
++        SoundRequest r;
++        r.resource = "long.wav";
++        r.speaker = speaker;
++        std::string error;
++        auto id = g.server.PlayCinematicSound(h, r, error);
++        CHECK(id);
++        g.server.audio.inspect_pcm = true;
++        CHECK(g.server.advance_audio(.01, {}, {}));
++        auto* v = g.server.audio.get(id);
++        CHECK(v && v->left == 0 && v->right > .66f && v->right < .67f);
++        DVector pos{-500, 0, 0};
++        CHECK(g.server.TeleportObject(speaker, &pos) == DE_OK);
++        CHECK(g.server.advance_audio(.01, {}, {}));
++        CHECK(v->right == 0 && v->left > .66f && v->position.x == -500);
++        CHECK(g.server.advance_audio(.01, {}, rotation_from_euler({0, 3.14159265f, 0})));
++        CHECK(v->right > .66f && v->left < .001f);
++        CHECK(g.server.advance_audio(.01, {-500, 0, 0}, {}));
++        CHECK(std::abs(v->left - .7071067f) < .001f);
++        CHECK(g.objects.remove(speaker));
++        CHECK(g.server.advance_audio(.01, {}, {}));
++        CHECK(v->done && v->speaker_lost);
++        CHECK(g.objects.finish_frame() && g.unload_world() && g.server.audio.voices().empty());
++        return true;
++    }
++    bool sequence(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto target =
++            g.objects.create(g.objects.find_class("CameraObj"), {}, Creation::World, {{"Name", std::string("camera")}});
++        CHECK(target);
++        auto h = cine(g, {{"Sound1", std::string("cue.wav")},
++                          {"Delay1", .05f},
++                          {"WhoPlaysSound1", std::string("PlAyEr")},
++                          {"StartSoundTriggerTarget1", std::string("camera")},
++                          {"StartSoundTriggerMsg1", std::string("ON")},
++                          {"Sound2", std::string("cue.wav")},
++                          {"Delay2", .2f},
++                          {"WhoPlaysSound2", std::string("missing")}});
++        auto* c = get(g, h);
++        CHECK(c && !g.objects.get(h)->scheduled && c->current == 0);
++        CHECK(trigger(g, h, "OFF")); // Payload is intentionally ignored in original code.
++        CHECK(g.step(.05) && !c->sound && !c->starts);
++        CHECK(g.step(.001) && c->sound && c->current == 0 && c->starts == 1 && c->messages == 1);
++        CHECK(g.server.audio.get(c->sound)->request.local);
++        const auto voice = c->sound;
++        CHECK(trigger(g, h, "ON") && c->sound == voice && c->current == 0);
++        CHECK(g.step(.1) && !c->sound && c->current == 1);
++        CHECK(g.step(.2) && !c->sound);
++        CHECK(g.step(.001) && c->sound && c->starts == 2 && c->last_speaker == h);
++        CHECK(!g.server.list_count() && !g.server.string_count());
++        CHECK(g.step(.1) && c->current == 2 && !c->sound);
++        CHECK(g.step(.001) && !g.objects.get(h) && g.server.audio.voices().empty());
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto h = cine(g, {{"Name", std::string("self")},
++                          {"Sound1", std::string("cue.wav")},
++                          {"StartSoundTriggerTarget1", std::string("self")},
++                          {"StartSoundTriggerMsg1", std::string("REMOVE")}});
++        CHECK(h && trigger(g, h) && g.step(.01) && !g.objects.get(h) && g.server.audio.voices().empty());
++        auto speaker = g.objects.create(g.objects.find_class("BaseClass"), {}, Creation::World,
++                                        {{"Name", std::string("speaker")}});
++        CHECK(speaker);
++        h = cine(g, {{"Sound1", std::string("long.wav")}, {"WhoPlaysSound1", std::string("speaker")}});
++        CHECK(h && trigger(g, h) && g.step(.01));
++        auto* c = get(g, h);
++        auto id = c->sound;
++        CHECK(id && c->last_speaker == speaker && !g.server.list_count());
++        CHECK(g.objects.remove(speaker) && g.step(.01) && !c->sound && c->current == 1);
++        CHECK(g.step(.01) && !g.objects.get(h) && !g.server.audio.get(id));
++        h = cine(g, {{"Sound1", std::string("long.wav")}});
++        CHECK(h && trigger(g, h) && g.step(.01));
++        id = get(g, h)->sound;
++        CHECK(id);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame() && !g.server.audio.get(id));
++        CHECK(g.unload_world() && !g.server.message_count() && !g.server.list_count() && !g.server.string_count());
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto h = cine(g, {{"Sound1", std::string("missing.wav")}});
++        CHECK(h && trigger(g, h));
++        auto* c = get(g, h);
++        CHECK(g.step(.01) && c->starts == 1 && c->failures == 1 && !c->sound && c->current == 0 && !c->error.empty());
++        CHECK(g.step(.01) && c->starts == 2 && c->failures == 2 &&
++              c->current == 0); // No fabricated duration/advancement.
++        CHECK(!cine(g, {{"Delay1", -1.0f}}));
++        CHECK(!g.objects.create(g.objects.find_class("CinematicTrigger"), {}, Creation::Restore));
++        g.server.set_game_settings(1, GAMETYPE_ACTION);
++        auto filtered = cine(g);
++        CHECK(filtered && g.objects.get(filtered)->life == Life::Pending && g.step(0) && !g.objects.get(filtered));
++        SoundRequest r;
++        r.resource = "cue.wav";
++        r.local = true;
++        std::string error;
++        CHECK(!g.server.PlayCinematicSound(nullptr, r, error));
++        r.volume = NAN;
++        CHECK(!g.server.PlayCinematicSound(h, r, error));
++        r.volume = 1;
++        std::vector<SoundId> ids;
++        for (unsigned i = 0; i < 128; ++i)
++        {
++            auto id = g.server.PlayCinematicSound(h, r, error);
++            CHECK(id);
++            ids.push_back(id);
++        }
++        CHECK(!g.server.PlayCinematicSound(h, r, error) && g.server.audio.voices().size() == 128);
++        for (auto id : ids)
++            CHECK(g.server.KillSound(id));
++        CHECK(g.server.audio.advance(1, {}, {}) && g.server.audio.mixed.empty());
++        g.server.audio.inspect_pcm = true;
++        CHECK(g.server.audio.advance(1, {}, {}) && g.server.audio.mixed.size() == 24000 &&
++              g.server.audio.dropped_frames == 36000);
++        CHECK(!g.server.audio.advance(NAN, {}, {}));
++        return true;
++    }
++    bool device(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        CHECK(SDL_SetHint(SDL_HINT_AUDIO_DRIVER, "dummy"));
++        std::string error;
++        CHECK(g.server.audio.open_output(error));
++        auto h = cine(g);
++        SoundRequest r;
++        r.resource = "cue.wav";
++        r.local = true;
++        CHECK(g.server.PlayCinematicSound(h, r, error));
++        CHECK(g.server.advance_audio(.01, {}, {}));
++        CHECK(g.server.audio.has_output() && g.server.audio.submitted_frames == 480 && g.server.audio.peak > .49f &&
++              g.server.audio.output_error.empty());
++        CHECK(g.unload_world() && g.server.audio.voices().empty() && g.server.audio.submitted_frames == 0);
++        return true;
++    }
++    bool subway(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        SoundId previous = 0;
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error));
++            std::map<EntryState, unsigned> counts;
++            for (const auto& e : g.entries)
++                ++counts[e.state];
++            CHECK(counts[EntryState::Created] == 164 && counts[EntryState::EditorOnly] == 372 &&
++                  counts[EntryState::Unsupported] == 44 && counts[EntryState::Failed] == 0);
++            CHECK(g.objects.snapshot().size() == 171 && g.enter_player(error) && g.objects.snapshot().size() == 174);
++            HOBJECT target = nullptr;
++            for (auto id : g.objects.snapshot())
++                if (std::string_view(g.objects.get(id)->state.m_Name) == "cintrig1")
++                    target = g.objects.get(id)->handle;
++            CHECK(target && trigger(g, target) && g.step(1.0 / 60));
++            auto* c = get(g, target);
++            CHECK(c && c->sound && c->starts == 1 && !c->failures);
++            auto id = c->sound;
++            CHECK(id > previous && !g.server.audio.get(previous));
++            previous = id;
++            const auto* v = g.server.audio.get(id);
++            CHECK(v && v->request.local && v->clip->duration() > 0);
++            std::cout << "cycle=" << cycle << " cue=" << v->request.resource << " rate=" << v->clip->rate
++                      << " frames=" << v->clip->frames() << " duration=" << v->clip->duration() << '\n';
++            g.server.audio.inspect_pcm = true;
++            for (unsigned i = 0; i < 6; ++i)
++                CHECK(g.step(1.0 / 60));
++            v = g.server.audio.get(id);
++            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 165);
++            CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
++                  !g.server.audio.cached_clips() && !g.server.audio.get(id) && !g.server.message_count() &&
++                  !g.server.list_count() && !g.server.string_count());
++            g.server.audio.inspect_pcm = false;
++        }
++        // Run the two authored crash cues to completion in isolation, preserving their exact DAT properties.
++        std::vector<std::uint8_t> bytes;
++        World world;
++        CHECK(g.resources.read("worlds/01_subwaya.dat", bytes, error) && read_world(bytes, world, error));
++        HOBJECT target = nullptr;
++        for (const auto& o : world.objects)
++            if (o.class_name == "CinematicTrigger")
++            {
++                Properties props;
++                for (const auto& prop : o.properties)
++                    props.emplace(prop.name, prop.value);
++                auto h = cine(g, props);
++                CHECK(h);
++                if (std::string_view(g.objects.get(h)->state.m_Name) == "cinhi5")
++                    target = h;
++            }
++        CHECK(target && trigger(g, target));
++        unsigned cue_changes = 0;
++        std::size_t last = 0;
++        for (unsigned i = 0; i < 2400 && g.objects.get(target); ++i)
++        {
++            CHECK(g.step(.05));
++            if (auto* c = get(g, target))
++            {
++                CHECK(!c->failures);
++                if (c->current != last)
++                {
++                    last = c->current;
++                    ++cue_changes;
++                }
++            }
++        }
++        CHECK(!g.objects.get(target) && cue_changes == 2 && g.server.audio.voices().empty());
++        CHECK(g.unload_world());
++        std::cout << "two authored crash cues completed; 2 full session reloads clean\n";
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        unsigned worlds = 0, controllers = 0, cues = 0, missing = 0, invalid = 0;
++        std::map<unsigned, unsigned> encodings;
++        for (const auto& [path, resource] : g.resources.index())
++        {
++            (void)resource;
++            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
++                continue;
++            std::vector<std::uint8_t> bytes;
++            World w;
++            CHECK(g.resources.read(path, bytes, error));
++            if (!read_world(bytes, w, error))
++            {
++                CHECK(path == "worlds/16_bridge.dat");
++                continue;
++            }
++            ++worlds;
++            for (const auto& o : w.objects)
++                if (o.class_name == "CinematicTrigger")
++                {
++                    ++controllers;
++                    Properties props;
++                    for (const auto& prop : o.properties)
++                        props.emplace(prop.name, prop.value);
++                    auto h = cine(g, props);
++                    CHECK(h);
++                    auto* c = get(g, h);
++                    CHECK(c);
++                    for (const auto& cue : c->cues)
++                        if (!cue.sound.empty())
++                        {
++                            ++cues;
++                            std::shared_ptr<const AudioClip> clip;
++                            if (!g.server.audio.load(g.resources, cue.sound, clip, error))
++                            {
++                                if (!g.resources.find(cue.sound))
++                                    ++missing;
++                                else
++                                    ++invalid;
++                                std::cout << path << " sound=" << cue.sound << " error=" << error << '\n';
++                            }
++                            else
++                                ++encodings[clip->encoding];
++                        }
++                    if (path == "worlds/01_subwaya.dat")
++                    {
++                        std::cout << "SUBWAY " << g.objects.get(h)->state.m_Name << '\n';
++                        for (const auto& cue : c->cues)
++                            if (!cue.sound.empty())
++                                std::cout << "  " << cue.delay << ' ' << cue.sound << " speaker=" << cue.speaker
++                                          << " message=" << cue.target << ':' << cue.message << '\n';
++                    }
++                }
++            CHECK(g.objects.clear());
++            g.server.audio.clear();
++        }
++        std::cout << "worlds=" << worlds << " controllers=" << controllers << " cues=" << cues << " missing=" << missing
++                  << " invalid=" << invalid << '\n';
++        for (auto [type, count] : encodings)
++            std::cout << "encoding=" << type << " cues=" << count << '\n';
++        CHECK(worlds == 57 && controllers == 79 && cues == 201 && missing == 3 && !invalid && encodings[1] == 198);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"decode", decode},     {"mixer", mixer},       {"spatial", spatial},
++        {"sequence", sequence}, {"lifetime", lifetime}, {"failures", failures},
++        {"device", device},     {"catalog", catalog},   {"subway", subway}};
++    auto it = cases.find(argv[1]);
++    return it != cases.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/keyframer_tests.cpp b/tests/keyframer_tests.cpp
+index 92c84ea..541cf21 100644
+--- a/tests/keyframer_tests.cpp
++++ b/tests/keyframer_tests.cpp
+@@ -361,14 +361,14 @@ namespace
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+             const float entered = g.server.GetTime();
+-            CHECK(g.objects.snapshot().size() == 170);
++            CHECK(g.objects.snapshot().size() == 174);
+             auto* list = g.server.FindNamedObjects("tracking1");
+             CHECK(list && list->m_pFirstLink);
+             auto h = list->m_pFirstLink->m_hObject;
+             g.server.RelinquishList(list);
+             auto* f = framer(g, h);
+             CHECK(g.step(1.0 / 60) && f->keys.size() == 2 && f->targets.size() == 1 && f->active && f->time == 0);
+-            CHECK(g.objects.snapshot().size() == 161);
++            CHECK(g.objects.snapshot().size() == 165);
+             auto camera = f->targets[0].object;
+             auto start = g.objects.get(camera)->state.m_Pos;
+             CHECK(g.step(1.0 / 60) && f->targets[0].moves == 1 && f->processed == 1 && f->unresolved_messages == 1);
+diff --git a/tests/light_tests.cpp b/tests/light_tests.cpp
+index 77a1b17..603ada9 100644
+--- a/tests/light_tests.cpp
++++ b/tests/light_tests.cpp
+@@ -350,8 +350,8 @@ namespace
+         for (int cycle = 0; cycle < 2; ++cycle)
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+-            CHECK(g.objects.snapshot().size() == 170 && g.server.light_effects.size() == 12);
+-            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 161);
++            CHECK(g.objects.snapshot().size() == 174 && g.server.light_effects.size() == 12);
++            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 165);
+             KeyFramer* path = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (auto* f = dynamic_cast<KeyFramer*>(g.objects.get(id)->game.get());
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index 012c62c..c17a950 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -204,14 +204,14 @@ namespace
+             CHECK(player);
+             CHECK(game.objects.get(player->m_hObject)->model->animations.size() == 86);
+             CHECK(game.objects.snapshot().size() ==
+-                  170); // 160 source instances + 7 door children + player + muzzle light + scent.
++                  174); // 164 source instances + 7 door children + player + muzzle light + scent.
+             CHECK(game.client_shell.position.x == -32 && game.client_shell.position.z == -3224);
+             CHECK(std::abs(game.client_shell.position.y - 170) < .01f);
+             for (int frame = 0; frame < 120; ++frame)
+                 CHECK(game.step(1.0 / 60.0));
+             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
+             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
+-            CHECK(!game.run_world(error) && error.find("48 uninstantiated") != std::string::npos);
++            CHECK(!game.run_world(error) && error.find("44 uninstantiated") != std::string::npos);
+             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
+                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
+                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index 3d4fe1a..f4aacfa 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -1,6 +1,6 @@
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 167 original instances, 116 BSP models")
++if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 171 original instances, 116 BSP models")
+     message(FATAL_ERROR "World inspection: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-player
+@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 48" OR NOT out MATCHES "remaining mover classes")
++if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 44" OR NOT out MATCHES "remaining mover classes")
+     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 7569659..1164825 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -538,7 +538,7 @@ namespace
+         CHECK(game.world.version == 56);
+         CHECK(game.world.objects.size() == 580);
+         CHECK(game.world.models.size() == 116);
+-        CHECK(game.objects.snapshot().size() == 167);
++        CHECK(game.objects.snapshot().size() == 171);
+         CHECK(game.world.models[0].points.size() == 4996);
+         CHECK(game.world.models[0].polygons.size() == 3367);
+         CHECK(game.resources.find(game.world_path)->overrides == 1);
+diff --git a/tests/worldpath_tests.cpp b/tests/worldpath_tests.cpp
+index 3f87cf6..0b56366 100644
+--- a/tests/worldpath_tests.cpp
++++ b/tests/worldpath_tests.cpp
+@@ -352,9 +352,9 @@ namespace
+             }
+             CHECK(moves == 297 && blocked == 2 && !f->active && f->processed == 3 && close(r->state.m_Pos, last));
+             CHECK(!close(last, initial) && !close(last, vector_add(f->keys.back().position, f->targets[0].offset)));
+-            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 161);
++            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 165);
+             std::cout << "cycle=" << cycle << " moves=" << moves << " blocks=" << blocked << " final=" << last.x << ','
+-                      << last.y << ',' << last.z << " consumed_keys=9 runtime=161\n";
++                      << last.y << ',' << last.z << " consumed_keys=9 runtime=165\n";
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.server.string_count() &&
+                   !g.server.list_count() && !g.server.message_count());
+         }

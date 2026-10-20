@@ -1,0 +1,13 @@
+[0/2] Re-checking globbed directories...
+[1/22] Generating CXX dyndep file tests/CMakeFiles/ai_runtime_tests.dir/CXX.dd
+[2/20] Generating CXX dyndep file tests/CMakeFiles/weapon_tests.dir/CXX.dd
+[3/18] Generating CXX dyndep file tests/CMakeFiles/inventory_state_tests.dir/CXX.dd
+[4/16] Generating CXX dyndep file tests/CMakeFiles/energy_tests.dir/CXX.dd
+[5/13] Scanning /home/yann/projects/lithtech/Blood2/tests/mac10_tests.cpp for CXX dependencies
+[6/13] Generating CXX dyndep file tests/CMakeFiles/mac10_tests.dir/CXX.dd
+[7/13] Scanning /home/yann/projects/lithtech/Blood2/tests/flare_tests.cpp for CXX dependencies
+[8/13] Generating CXX dyndep file tests/CMakeFiles/flare_tests.dir/CXX.dd
+[9/13] Building CXX object tests/CMakeFiles/mac10_tests.dir/mac10_tests.cpp.o
+[10/13] Building CXX object tests/CMakeFiles/flare_tests.dir/flare_tests.cpp.o
+[11/13] Linking CXX executable tests/mac10_tests
+[12/13] Linking CXX executable tests/flare_tests

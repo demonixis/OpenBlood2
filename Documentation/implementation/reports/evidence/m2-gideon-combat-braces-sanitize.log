@@ -1,0 +1,26 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 618: gideon_combat.private
+    Start 613: gideon_combat.choices
+1/8 Test #613: gideon_combat.choices ............   Passed    0.02 sec
+    Start 614: gideon_combat.aim
+2/8 Test #614: gideon_combat.aim ................   Passed    0.02 sec
+    Start 615: gideon_combat.keys
+3/8 Test #615: gideon_combat.keys ...............   Passed    0.02 sec
+    Start 611: gideon_combat.decisions
+4/8 Test #611: gideon_combat.decisions ..........   Passed    0.02 sec
+    Start 616: gideon_combat.failures
+5/8 Test #616: gideon_combat.failures ...........   Passed    0.02 sec
+    Start 612: gideon_combat.shield
+6/8 Test #612: gideon_combat.shield .............   Passed    0.02 sec
+    Start 617: gideon_combat.lifetime
+7/8 Test #617: gideon_combat.lifetime ...........   Passed    0.02 sec
+8/8 Test #618: gideon_combat.private ............   Passed    0.82 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+gideon_combat    =   0.96 sec*proc (8 tests)
+headless         =   0.96 sec*proc (8 tests)
+private          =   0.82 sec*proc (1 test)
+
+Total Test time (real) =   0.83 sec

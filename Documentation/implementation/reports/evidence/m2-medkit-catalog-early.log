@@ -1,0 +1,44 @@
+Authored SubMachineGunPU: worlds/02_cityhub.dat
+Authored AssaultRiflePU: worlds/02_cityhub.dat
+Authored SubMachineGunPU: worlds/02_cityhubb.dat
+Authored SubMachineGunPU: worlds/02_cityhubc.dat
+Authored BerettaPU: worlds/05_cdm.dat
+Authored AssaultRiflePU: worlds/06_airship2.dat
+Authored FlareGunPU: worlds/06_airship2.dat
+Authored AssaultRiflePU: worlds/10_sewagetreatmentplant.dat
+Authored FlareGunPU: worlds/11_slaughter_house.dat
+Authored AssaultRiflePU: worlds/14_subwayc.dat
+Authored SubMachineGunPU: worlds/20_powerstation.dat
+Authored AssaultRiflePU: worlds/25_ancientone.dat
+AssaultRiflePU=5
+BMGAmmoPU=76
+BatteryAmmoPU=150
+BerettaPU=1
+BulletAmmoPU=243
+DieBugDieAmmoPU=105
+FlareAmmoPU=117
+FlareGunPU=2
+FuelAmmoPU=108
+HealthPU=209
+HowitzerAmmoPU=100
+MedKitPU=22
+MegaHealthPU=49
+NecroWardPU=33
+ShellAmmoPU=186
+SubMachineGunPU=4
+WardPU=58
+rejected BMGAmmoPU: invalid property TypeAction=8
+rejected BatteryAmmoPU: invalid property TypeAction=17
+rejected BulletAmmoPU: invalid property TypeAction=35
+rejected DieBugDieAmmoPU: invalid property TypeAction=12
+rejected FlareAmmoPU: invalid property TypeAction=17
+rejected FuelAmmoPU: invalid property TypeAction=17
+rejected HealthPU: invalid property TypeAction=21
+rejected HowitzerAmmoPU: invalid property TypeAction=12
+rejected MedKitPU: invalid property TypeAction=2
+rejected MegaHealthPU: invalid property TypeAction=4
+rejected NecroWardPU: invalid property TypeAction=3
+rejected ShellAmmoPU: invalid property TypeAction=24
+rejected WardPU: invalid property TypeAction=6
+worlds=57 created=1290 missing=0 supported_spawns=60
+catalog:438: worlds == 57 && created == 1270 && missing == 0 && rejected == 176 && spawns == 60

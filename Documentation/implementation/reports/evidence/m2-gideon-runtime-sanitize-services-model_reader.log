@@ -1,0 +1,14 @@
+44/642 Testing: services.model_reader
+44/642 Test: services.model_reader
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "model_reader"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.model_reader" start time: Oct 17 03:43 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"services.model_reader" end time: Oct 17 03:43 CEST
+"services.model_reader" time elapsed: 00:00:00
+----------------------------------------------------------

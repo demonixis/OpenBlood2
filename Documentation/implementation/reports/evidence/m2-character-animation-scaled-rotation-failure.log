@@ -1,0 +1,75 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 271: character.catalog
+      Start 272: character.player
+      Start  83: locomotion.private
+      Start  47: services.private
+ 1/25 Test #271: character.catalog ................***Failed    0.40 sec
+models/characters/caleb.abc clips=86 nodes=20 queries=1720 missing_bindings=56 found_standard_nodes=16 head_radius=2.32597
+models/enemies/m_civilian1.abc clips=48 nodes=19 queries=912 missing_bindings=153 found_standard_nodes=16 head_radius=1.0906
+models/enemies/f_civilian1.abc clips=47 nodes=19 queries=893 missing_bindings=156 found_standard_nodes=16 head_radius=2.4427
+models/enemies/labtech.abc clips=17 nodes=21 queries=357 missing_bindings=171 found_standard_nodes=16 head_radius=1.77636
+models/enemies/m_cultist1.abc clips=48 nodes=19 queries=912 missing_bindings=105 found_standard_nodes=16 head_radius=1.85149
+models/enemies/f_cultist1.abc: ABC v6: invalid node pose: animation=idle2 node=r_gun frame=0 norm2=0.000042 position=-0.120010,-2.099990,-0.319934
+catalog:279: r && r->model
+
+      Start  41: services.model_rejection
+ 2/25 Test  #41: services.model_rejection .........   Passed    0.11 sec
+      Start  78: locomotion.limits
+ 3/25 Test  #78: locomotion.limits ................   Passed    0.08 sec
+      Start  79: locomotion.crouch
+ 4/25 Test  #79: locomotion.crouch ................   Passed    0.05 sec
+      Start  82: locomotion.contacts
+ 5/25 Test  #82: locomotion.contacts ..............   Passed    0.03 sec
+      Start  77: locomotion.world_stairs
+ 6/25 Test  #77: locomotion.world_stairs ..........   Passed    0.03 sec
+      Start  80: locomotion.animations
+ 7/25 Test  #80: locomotion.animations ............   Passed    0.03 sec
+      Start  76: locomotion.stairs
+ 8/25 Test  #76: locomotion.stairs ................   Passed    0.03 sec
+      Start  81: locomotion.lifetime
+ 9/25 Test  #81: locomotion.lifetime ..............   Passed    0.01 sec
+      Start 266: character.humiliation
+10/25 Test #266: character.humiliation ............   Passed    0.00 sec
+      Start 265: character.mappings
+11/25 Test #265: character.mappings ...............   Passed    0.00 sec
+      Start 269: character.rejection
+12/25 Test #269: character.rejection ..............   Passed    0.00 sec
+      Start 270: character.spheres
+13/25 Test #270: character.spheres ................   Passed    0.00 sec
+      Start 267: character.force
+14/25 Test #267: character.force ..................   Passed    0.00 sec
+      Start 268: character.transforms
+15/25 Test #268: character.transforms .............   Passed    0.00 sec
+      Start  46: services.original_services
+16/25 Test  #46: services.original_services .......   Passed    0.00 sec
+      Start  43: services.model_callbacks
+17/25 Test  #43: services.model_callbacks .........   Passed    0.00 sec
+      Start  45: services.movement_contacts
+18/25 Test  #45: services.movement_contacts .......   Passed    0.00 sec
+      Start  42: services.animation_events
+19/25 Test  #42: services.animation_events ........   Passed    0.00 sec
+      Start  40: services.model_reader
+20/25 Test  #40: services.model_reader ............   Passed    0.00 sec
+      Start  44: services.collision_queries
+21/25 Test  #44: services.collision_queries .......   Passed    0.00 sec
+22/25 Test  #47: services.private .................   Passed    2.54 sec
+23/25 Test  #83: locomotion.private ...............   Passed    3.02 sec
+24/25 Test #272: character.player .................   Passed    4.81 sec
+      Start 273: gpu.character
+25/25 Test #273: gpu.character ....................   Passed   18.52 sec
+
+96% tests passed, 1 tests failed out of 25
+
+Label Time Summary:
+character     =  23.75 sec*proc (9 tests)
+gpu           =  18.52 sec*proc (1 test)
+headless      =  11.18 sec*proc (24 tests)
+locomotion    =   3.29 sec*proc (8 tests)
+private       =  29.28 sec*proc (5 tests)
+services      =   2.67 sec*proc (8 tests)
+
+Total Test time (real) =  23.34 sec
+
+The following tests FAILED:
+	271 - character.catalog (Failed)                        character headless private
+Errors while running CTest

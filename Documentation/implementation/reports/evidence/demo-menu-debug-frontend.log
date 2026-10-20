@@ -1,0 +1,17 @@
+[2026-10-19T10:56:09.777Z] [info] [pid 60580] [thread 60580] Log session: /home/yann/projects/lithtech/Blood2/build/debug/tests/demo-menu-logs/session-1792407369776957344-0
+[2026-10-19T10:56:09.777Z] [info] [pid 60580] [thread 60580] OpenBlood2 0.3.0 / 47d4f87-dirty / Debug / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-47d4f87 (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[2026-10-19T10:56:09.779Z] [info] [pid 60580] [thread 60580] Crash capture ready: all-thread stacks and core dump in the log session directory
+[2026-10-19T10:56:09.779Z] [info] [pid 60580] [thread 60580] Requested world=Demo_01; demo=true; config=blood2.local.ini; inspector=true; view=false; bench=false; headless=false; frames=0
+[2026-10-19T10:56:09.779Z] [info] [pid 60580] [thread 60580] External data: /home/yann/Games/B2Demo (--data-dir)
+[2026-10-19T10:56:09.779Z] [info] [pid 60580] [thread 60580] B2DEMO.REZ: detected, 55041396 bytes
+[2026-10-19T10:56:10.160Z] [info] [pid 60580] [thread 60580] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[2026-10-19T10:56:12.312Z] [info] [pid 60580] [thread 60580] New game requested: world=Demo_01; character=0; difficulty=2
+[2026-10-19T10:56:13.565Z] [info] [pid 60580] [thread 60580] World ready: worlds/demo_01.dat
+[2026-10-19T10:56:18.447Z] [info] [pid 60580] [thread 60580] Demo restarted with initial Caleb equipment: worlds/demo_01.dat
+[2026-10-19T10:56:19.690Z] [info] [pid 60580] [thread 60580] NEW_LEVEL committed: worlds/demo_01.dat -> worlds/demo_02.dat / start 05_egress
+[2026-10-19T10:56:19.925Z] [info] [pid 60580] [thread 60580] Demo completed: original EndGame / screens/info.pcx / return to menu
+[2026-10-19T10:56:20.479Z] [info] [pid 60580] [thread 60580] New game requested: world=Demo_01; character=0; difficulty=0
+[2026-10-19T10:56:21.718Z] [info] [pid 60580] [thread 60580] World ready: worlds/demo_01.dat
+[2026-10-19T10:56:22.436Z] [info] [pid 60580] [thread 60580] Demo menu traversal passed: source pages/promotions, supported options, pause/audio/focus, death/Enter retry, transfer, EndGame return, new game after end, quit promotion
+[2026-10-19T10:56:22.436Z] [info] [pid 60580] [thread 60580] Frontend complete: 251 frames, world worlds/demo_01.dat, menu audio starts 48/failures 0
+[2026-10-19T10:56:22.705Z] [info] [pid 60580] [thread 60580] Session finished: exit_code=0

@@ -1,0 +1,57 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 979
+    Start 979: player_impulse.rules
+
+979: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/player_impulse_tests "rules" "/home/yann/projects/lithtech/Blood2/build/release/tests/player-impulse-fixtures/rules"
+979: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+979: Test timeout computed to be: 30
+1/4 Test #979: player_impulse.rules .............   Passed    0.00 sec
+test 980
+    Start 980: player_impulse.motion
+
+980: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/player_impulse_tests "motion" "/home/yann/projects/lithtech/Blood2/build/release/tests/player-impulse-fixtures/motion"
+980: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+980: Test timeout computed to be: 30
+980: 30 Hz: displacement=6.24472,0,3.12236 velocity=0,0,0
+980: 60 Hz: displacement=6.24472,0,3.12236 velocity=0,0,0
+980: 120 Hz: displacement=6.24472,0,3.12236 velocity=0,0,0
+2/4 Test #980: player_impulse.motion ............   Passed    0.01 sec
+test 981
+    Start 981: player_impulse.restore
+
+981: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/player_impulse_tests "restore" "/home/yann/projects/lithtech/Blood2/build/release/tests/player-impulse-fixtures/restore"
+981: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+981: Test timeout computed to be: 30
+3/4 Test #981: player_impulse.restore ...........   Passed    0.00 sec
+test 982
+    Start 982: player_impulse.private
+
+982: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/player_impulse_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+982: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+982: Test timeout computed to be: 120
+982: Original Cultist shots=25 impulses=25 player HP=0 position=-2.55707,42.001,262.132
+4/4 Test #982: player_impulse.private ...........   Passed    0.06 sec
+
+The following tests passed:
+	player_impulse.rules
+	player_impulse.motion
+	player_impulse.restore
+	player_impulse.private
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+headless          =   0.08 sec*proc (4 tests)
+physics           =   0.08 sec*proc (4 tests)
+player_impulse    =   0.08 sec*proc (4 tests)
+private           =   0.06 sec*proc (1 test)
+
+Total Test time (real) =   0.09 sec

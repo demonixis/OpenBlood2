@@ -1,0 +1,12 @@
+[0/2] Re-checking globbed directories...
+[1/5] Scanning /home/yann/projects/lithtech/Blood2/tests/music_asset_tests.cpp for CXX dependencies
+[2/5] Generating CXX dyndep file tests/CMakeFiles/music_asset_tests.dir/CXX.dd
+[3/5] Building CXX object tests/CMakeFiles/music_asset_tests.dir/music_asset_tests.cpp.o
+/home/yann/projects/lithtech/Blood2/tests/music_asset_tests.cpp: In function ‘bool {anonymous}::private_test(const std::filesystem::__cxx11::path&)’:
+/home/yann/projects/lithtech/Blood2/tests/music_asset_tests.cpp:444:22: warning: variable ‘routed_notes’ set but not used [-Wunused-but-set-variable=]
+  444 |             unsigned routed_notes = 0, missing_routes = 0;
+      |                      ^~~~~~~~~~~~
+/home/yann/projects/lithtech/Blood2/tests/music_asset_tests.cpp:444:40: warning: variable ‘missing_routes’ set but not used [-Wunused-but-set-variable=]
+  444 |             unsigned routed_notes = 0, missing_routes = 0;
+      |                                        ^~~~~~~~~~~~~~
+[4/5] Linking CXX executable tests/music_asset_tests

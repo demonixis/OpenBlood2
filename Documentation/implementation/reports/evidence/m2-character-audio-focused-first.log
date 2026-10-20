@@ -1,0 +1,39 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start  80: locomotion.animations
+    Start 274: character_audio.paths
+    Start 275: character_audio.voices
+    Start 276: character_audio.lifetime
+1/9 Test #274: character_audio.paths ............   Passed    0.00 sec
+    Start 277: character_audio.rejection
+2/9 Test #275: character_audio.voices ...........   Passed    0.01 sec
+    Start 278: character_audio.player
+3/9 Test #276: character_audio.lifetime .........   Passed    0.01 sec
+    Start 279: character_audio.callbacks
+4/9 Test #277: character_audio.rejection ........   Passed    0.01 sec
+    Start 280: character_audio.catalog
+5/9 Test #278: character_audio.player ...........   Passed    0.01 sec
+    Start 281: character_audio.subway
+6/9 Test #279: character_audio.callbacks ........   Passed    0.01 sec
+7/9 Test  #80: locomotion.animations ............   Passed    0.02 sec
+8/9 Test #280: character_audio.catalog ..........***Failed    0.11 sec
+Caleb sound keys=46 footsteps=46 unique_other=0 decoded=0 missing=0
+catalog:185: keys>0 && decoded>0
+
+9/9 Test #281: character_audio.subway ...........***Failed    0.30 sec
+subway:215: played && p->unavailable_sound_alerts==p->sound_attempts
+
+
+78% tests passed, 2 tests failed out of 9
+
+Label Time Summary:
+character_audio    =   0.45 sec*proc (8 tests)
+headless           =   0.46 sec*proc (9 tests)
+locomotion         =   0.02 sec*proc (1 test)
+private            =   0.41 sec*proc (2 tests)
+
+Total Test time (real) =   0.32 sec
+
+The following tests FAILED:
+	280 - character_audio.catalog (Failed)                  character_audio headless private
+	281 - character_audio.subway (Failed)                   character_audio headless private
+Errors while running CTest

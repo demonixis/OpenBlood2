@@ -1,0 +1,23 @@
+Test project <Blood2>/build/debug
+    Start  28: gpu.lifecycle
+1/5 Test  #28: gpu.lifecycle ....................   Passed    3.18 sec
+    Start 236: gpu.keyframes
+2/5 Test #236: gpu.keyframes ....................   Passed    2.82 sec
+    Start 237: gpu.keyframe_audio
+3/5 Test #237: gpu.keyframe_audio ...............   Passed   13.31 sec
+    Start 262: gpu.worldpaths
+4/5 Test #262: gpu.worldpaths ...................   Passed    2.74 sec
+    Start 859: gpu.level_change
+5/5 Test #859: gpu.level_change .................   Passed    6.31 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+audio         =  13.31 sec*proc (1 test)
+gpu           =  28.36 sec*proc (5 tests)
+keyframes     =  16.13 sec*proc (2 tests)
+private       =  25.18 sec*proc (4 tests)
+world         =   6.31 sec*proc (1 test)
+worldpaths    =   2.74 sec*proc (1 test)
+
+Total Test time (real) =  28.38 sec

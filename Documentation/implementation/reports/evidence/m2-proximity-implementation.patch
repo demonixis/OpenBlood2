@@ -1,0 +1,2430 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index adb9c58..3a0e040 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -562,3 +562,6 @@ The [authored particle-stream continuation](../Documentation/Implementation/M2_P
+ The [original sky continuation](../Documentation/Implementation/M2_SKY.md) integrates built-in DemoSkyWorldModel/SkyPointer with checked sky slots, first-update lookup, camera parallax and actual SDL_GPU world-model backgrounds. Read [sky contracts](docs/SKY_CONTRACTS.md). Preserve deferred pointer removal, empty-list release, index order, unchanged simulation/collision and explicit unsupported types/duplicate slots. The projection/depth reference is later LithTech, not verified retail parity. CityHub has 448 created / 31 sounds / 541 editor-only / five unsupported / one failed entry. M2 and CityHub NEW_LEVEL remain incomplete.
+ 
+ Interactive input/simulation frames are capped at 100 ms by `app_frame_delta`; discarded wall time is inspectable. Resource preparation and diagnostic capture are paused tool work. Keep direct diagnostic stepping and core physics safety bounds unchanged; this is a frontend catch-up policy, not a retail timing claim.
++
++
++The [proximity-bomb continuation](../Documentation/Implementation/M2_PROXIMITY.md) connects original ProximitiesPU, reserved inventory slot10, charged throws, sticking/detection/detonation, independent lifetime and inspection. CityHub now has 450 created / 31 transferred sounds / 541 editor-only / three unsupported / one failed entry. Remote bombs, flashlight and missing `fallengrills` geometry still block CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical. Read [contracts](docs/PROXIMITY_CONTRACTS.md). Preserve reserved-slot ownership, source hold/overhold boundaries, shooter-inclusive detection, no inherited fuse, death-delay ordering and checked deferred lifetime. The shared model-projectile solver is replacement physics; do not claim retail parity. P is the application selection binding.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3abf0a7..a50e70b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index a680dfb..532ae31 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [proximity-bomb continuation](../Documentation/Implementation/M2_PROXIMITY.md) connects original ProximitiesPU, reserved inventory slot10, charged throws, sticking/detection/detonation, independent lifetime and inspection. CityHub now has 450 created / 31 transferred sounds / 541 editor-only / three unsupported / one failed entry. Remote bombs, flashlight and missing `fallengrills` geometry still block CityHub NEW_LEVEL; M2 remains incomplete. Earlier counts below are historical.
++
+ The [original sky continuation](../Documentation/Implementation/M2_SKY.md) connects DemoSkyWorldModel and deferred SkyPointer lookup to checked sky slots, parallax and SDL_GPU world-model background rendering. CityHub now has 448 created / 31 transferred sounds / 541 editor-only / five unsupported / one failed entry; four pointers remove themselves on their first update. Earlier counts below are historical. Missing pickups and `fallengrills` geometry still reject CityHub NEW_LEVEL; M2 remains incomplete.
+ 
+ The [authored particle-stream continuation](../Documentation/Implementation/M2_PARTICLE_STREAMS.md) connects original server toggles and client ramps, current-owner emission and SDL_GPU particle rendering, with inspection. All eight CityHub streams create; the level now has 443 created / 31 transferred sounds / 541 editor-only / 10 unsupported / one failed entry. Original unread sound fields remain metadata. CityHub NEW_LEVEL still refuses; M2 remains incomplete.
+diff --git a/docs/ASSAULT_CONTRACTS.md b/docs/ASSAULT_CONTRACTS.md
+index d675e6d..00ca162 100644
+--- a/docs/ASSAULT_CONTRACTS.md
++++ b/docs/ASSAULT_CONTRACTS.md
+@@ -112,3 +112,5 @@ composite FX, supported autonomous rifle-bearing NPCs, retail physics/presentati
+ parity and safe NEW_LEVEL remain open. CityHub is 433 created / 31 transferred
+ sounds / 541 editor-only / 20 unsupported / one failed. Missing fallengrills geometry
+ remains a failure. These counts do not close M2.
++
++The [proximity continuation](PROXIMITY_CONTRACTS.md) adds original weapon49 in reserved slot10, item7 collection, P selection, charged/secondary throws and independent CProximityBomb lifecycle. Owned snapshots now contain thirteen slots, with only the first reserved slot implemented. The shared grenade/bomb service is named AdvanceModelProjectile. Earlier omissions/counts remain historical; M2 stays incomplete.
+diff --git a/docs/ENERGY_PROJECTILE_CONTRACTS.md b/docs/ENERGY_PROJECTILE_CONTRACTS.md
+index 5e86e51..a9a2f20 100644
+--- a/docs/ENERGY_PROJECTILE_CONTRACTS.md
++++ b/docs/ENERGY_PROJECTILE_CONTRACTS.md
+@@ -116,3 +116,5 @@ objects, voices and histories. No mutable process-global state was added; isolat
+ destination rehearsal preserves the source projectile and aggregate lists.
+ 
+ The [wind/shockwave continuation](WIND_WEAPON_CONTRACTS.md) extends the runtime-only projectile subset with OT_NORMAL scale metadata and the original type20 model/light recipe. Earlier type/resource restrictions are superseded only for this bounded subset; production Gideon and M2 remain incomplete.
++
++The [proximity continuation](PROXIMITY_CONTRACTS.md) adds original weapon49 in reserved slot10, item7 collection, P selection, charged/secondary throws and independent CProximityBomb lifecycle. Owned snapshots now contain thirteen slots, with only the first reserved slot implemented. The shared grenade/bomb service is named AdvanceModelProjectile. Earlier omissions/counts remain historical; M2 stays incomplete.
+diff --git a/docs/INVENTORY_STATE_CONTRACTS.md b/docs/INVENTORY_STATE_CONTRACTS.md
+index f74c87c..0aa936d 100644
+--- a/docs/INVENTORY_STATE_CONTRACTS.md
++++ b/docs/INVENTORY_STATE_CONTRACTS.md
+@@ -102,3 +102,5 @@ The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisitio
+ CInvMedkit recharge/healing, H direct-item input, local activation audio and owned
+ charge preservation through Restore/KeepAlive. Other items, original inventory HUD,
+ pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.
++
++The [proximity continuation](PROXIMITY_CONTRACTS.md) adds original weapon49 in reserved slot10, item7 collection, P selection, charged/secondary throws and independent CProximityBomb lifecycle. Owned snapshots now contain thirteen slots, with only the first reserved slot implemented. The shared grenade/bomb service is named AdvanceModelProjectile. Earlier omissions/counts remain historical; M2 stays incomplete.
+diff --git a/docs/M2_PROXIMITY_SOURCES.json b/docs/M2_PROXIMITY_SOURCES.json
+new file mode 100644
+index 0000000..fc3707f
+--- /dev/null
++++ b/docs/M2_PROXIMITY_SOURCES.json
+@@ -0,0 +1,82 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "6fdab8820ecdd761e09738a8fd608ee01221c673",
++  "status": "M2 incomplete; original proximity pickup/weapon/projectile subset",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/GameProjectiles.cpp",
++      "source_sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f",
++      "purpose": "CProximityBomb constructor, Update, HandleTouch and AddExplosion."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Projectile.cpp",
++      "source_sha256": "52b805c67775579b5703e0ad1099a8ea44d76b245349c8f6d1fac0a1b3b74ef2",
++      "purpose": "Base model flags, Setup/InitialUpdate, typed base damage/impact and callback order."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameWeapons.cpp",
++      "source_sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd",
++      "purpose": "CWeapProximityBomb FireProjectile charged, overheld and secondary branches."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameWeapons.h",
++      "source_sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19",
++      "purpose": "Proximity special-float assignment."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "purpose": "Reserved slots, AddInventoryWeapon, SelectInventoryWeapon, SelectNextWeapon and Save/Load."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
++      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
++      "purpose": "ProximitiesPU and ItemPickupWeapon single-player initial callback."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ItemPickups.h",
++      "source_sha256": "ce1dacd1cf4829c39cfdfbeb27ae4873e1f2b6a4895b532b820d587ab7eaa17e",
++      "purpose": "Ancestry, ammo2.wav and quantity one."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "purpose": "MID_INVENTORYITEMTOUCH branch and COMMAND_PROXIMITIES."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameInvItems.cpp",
++      "source_sha256": "b2a72cdf5bd9e23ec496c6f6af3ed5bd4449e3b84d8cc088c33c1e1bbe081ee8",
++      "purpose": "CInvProxBomb activation; menu-node ownership compressed into weapon/pool."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/GameWeapons.cpp",
++      "source_sha256": "292753e7a91be363aa955731d552f967845c6a783dd6aeec954db59e2d2128d7",
++      "purpose": "Client before/after base update and charged throw float."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/GameWeapons.h",
++      "source_sha256": "c5f9176a2f6ad7c28dedb5ec24c710a16f1c2f4957d1efb793cf77e42e8378e0",
++      "purpose": "Hold/distance times and velocity constants."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
++      "source_sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
++      "purpose": "Base animation/state and FIRE_KEY-driven fire."
++    },
++    {
++      "source": "sources/blood2/Shared/WeaponDefs.cpp",
++      "source_sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
++      "purpose": "Complete original proximity WeaponData entry."
++    },
++    {
++      "source": "sources/blood2/Shared/SharedDefs.h",
++      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "purpose": "Base-game weapon49, item7, ammo10 and original reserved slot10."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PickupObject.cpp",
++      "source_sha256": "25e0388f983ec0c9e01b6deb8432f411271159a224d582e12300c10863b979da",
++      "purpose": "Preserve existing user bits when applying pickup initial-update flags."
++    }
++  ]
++}
+diff --git a/docs/PICKUP_CONTRACTS.md b/docs/PICKUP_CONTRACTS.md
+index 1eb4876..14ee365 100644
+--- a/docs/PICKUP_CONTRACTS.md
++++ b/docs/PICKUP_CONTRACTS.md
+@@ -118,3 +118,5 @@ The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisitio
+ CInvMedkit recharge/healing, H direct-item input, local activation audio and owned
+ charge preservation through Restore/KeepAlive. Other items, original inventory HUD,
+ pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.
++
++The [proximity continuation](PROXIMITY_CONTRACTS.md) adds original weapon49 in reserved slot10, item7 collection, P selection, charged/secondary throws and independent CProximityBomb lifecycle. Owned snapshots now contain thirteen slots, with only the first reserved slot implemented. The shared grenade/bomb service is named AdvanceModelProjectile. Earlier omissions/counts remain historical; M2 stays incomplete.
+diff --git a/docs/PLAYER_CONTROL_CONTRACTS.md b/docs/PLAYER_CONTROL_CONTRACTS.md
+index 1a83205..a29e5b8 100644
+--- a/docs/PLAYER_CONTROL_CONTRACTS.md
++++ b/docs/PLAYER_CONTROL_CONTRACTS.md
+@@ -68,3 +68,5 @@ The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisitio
+ CInvMedkit recharge/healing, H direct-item input, local activation audio and owned
+ charge preservation through Restore/KeepAlive. Other items, original inventory HUD,
+ pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.
++
++The [proximity continuation](PROXIMITY_CONTRACTS.md) adds original weapon49 in reserved slot10, item7 collection, P selection, charged/secondary throws and independent CProximityBomb lifecycle. Owned snapshots now contain thirteen slots, with only the first reserved slot implemented. The shared grenade/bomb service is named AdvanceModelProjectile. Earlier omissions/counts remain historical; M2 stays incomplete.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 3dc2a45..f7ed510 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -988,3 +988,7 @@ interactive-frame bound, paused resource/capture work and visible discarded time
+ This is new frontend scheduling policy, not an imported original gameplay rule;
+ see [session playback](SESSION_PLAYBACK_CONTRACTS.md). Diagnostic/core timing and
+ physics rejection bounds remain unchanged.
++
++## Original proximity bombs
++
++Selected original pickup, inventory, weapon and client charge/projectile rules are integrated with typed transport and checked ownership. [Contracts](PROXIMITY_CONTRACTS.md) and [source hashes](M2_PROXIMITY_SOURCES.json) distinguish source behavior from the shared replacement box solver, menu-node compression and bounded validation. No donor codebase, dependency or commercial asset is imported.
+diff --git a/docs/PROXIMITY_CONTRACTS.md b/docs/PROXIMITY_CONTRACTS.md
+new file mode 100644
+index 0000000..ca8aa5b
+--- /dev/null
++++ b/docs/PROXIMITY_CONTRACTS.md
+@@ -0,0 +1,120 @@
++# Original proximity bombs
++
++Read [object lifetime](OBJECT_CONTRACTS.md), [weapon rules](WEAPON_CONTRACTS.md),
++[M16 model-projectile physics](ASSAULT_CONTRACTS.md), [pickup transport](PICKUP_CONTRACTS.md),
++[inventory preservation](INVENTORY_STATE_CONTRACTS.md) and [device input](PLAYER_CONTROL_CONTRACTS.md).
++The [source ledger](M2_PROXIMITY_SOURCES.json) and
++[implementation evidence](../../Documentation/Implementation/M2_PROXIMITY.md) record this bounded port.
++M2 remains incomplete.
++
++## Acquisition and selection
++
++`ProximitiesPU` retains ItemPickupWeapon/ItemPickup ancestry, `Proximities_pu`
++model/skin, item ID 7, resource 306, quantity one and `ammo2.wav` pickup request.
++The weapon-pickup glow bit is set before the base initial update; the base now
++preserves preexisting user bits as the original does. Single-player world creation
++is supported. String-spawn bounce, multiplayer respawn/scaling and actual pickup
++sound output remain unavailable; unsupported schemas still reject.
++
++Original AddInventoryWeapon creates weapon 49 in reserved slot 10, distinct from
++the ten ordinary slots. Later pickups add ammo pool 10, capped at ten independently
++of attributes. A full pool refuses the checked pickup acknowledgement; removal
++is deferred. First creation keeps the original ignored AddAmmo result. The simple
++owned weapon/pool representation replaces the separate CInvProxBomb menu-list
++node; localized menu names and PCX inventory icons are not implemented.
++
++P selects a collected bomb through the typed client command and original
++SelectInventoryWeapon branch. It respects focus, text editing, dead-player and
++camera/movement restrictions. Unlike the medkit direct-item command, the original
++bomb command is not blocked by RUN. Empty ammo cannot select a different bomb
++slot, but an already selected weapon returns CURRENT before the ammo test.
++The inspector can also select slot 10. Normal exhaustion follows original
++SelectNextWeapon: reset an inventory slot to zero, search ordinary slots starting
++at one, wrap, then switch. The overheld early-return branch deliberately does not
++perform this fallback. No weapon is deleted while its Fire callback is active.
++Ordinary ChangeWeapon/FindBestWeapon searches remain restricted to slots 0..9.
++Inventory-bomb acquisition and selection reject an owner pending removal before
++changing ammo or selection.
++
++Typed inventory snapshots contain thirteen slots; only slot 10 accepts proximity
++weapon 49, only in the right hand. Slots 11/12 remain reserved and empty; other
++weapons stay in 0..9. An empty selected reserved slot rejects before mutation.
++Restore/KeepAlive reconstruct the weapon and preserve raw ammo and selection,
++including zero ammo; key removal remains unchanged. The bomb menu entry is derived
++from the weapon/pool, with no serialized pointer. Throw charge, active projectiles,
++full inventory menus and retail save-file ABI are not captured.
++
++## Throwing and contact rules
++
++All original WeaponData fields are retained, including the unusual resource 368
++in the flash-radius column and zero name-ID field. Each mode consumes one bomb,
++uses damage 80–120 and radius 250. The client subclass preserves its before/after
++base-state ordering: primary loops while held, release reaches end_fire's FIRE_KEY,
++then redraws. Holding charge yields `250 + 1500 * min(held/.75, 1)` units/s;
++strictly more than 1.25 seconds sets special speed zero and finishes the throw.
++The typed special float is finite and bounded to 0..1750 before consumption.
++Power-bar state is inspectable; the original power-bar HUD is unavailable.
++
++Speed zero takes the original in-hand branch: EXP_DEFAULT_SMALL, actual
++`time/explode.wav`, NORMAL damage to the owner only and no projectile/radius pass.
++A normal throw creates CProximityBomb with the charged speed. Secondary places
++it at the owner's body center, directed downward, with original alternate speed
++zero; gravity supplies the motion. Both retain original fire WAVs and existing
++hearing. The secondary body/down branch does not execute an invalid zero-length
++hitscan query. Primary uses the existing player eye alignment/close obstruction
++check. FIRE_KEY on end_fire is accepted specifically for this inventory weapon.
++A selection change during a callback prevents later markers from firing the old
++weapon. No damage is produced merely by rendering the view model.
++
++CProximityBomb uses actual c4.abc/c4_prox.dtx, HP5, 1-unit dimensions, model/RAYHIT/
++gravity flags and a 0.25-second death delay. Source constructor spin consumes two
++random draws in +/-2pi. Runtime creation only; missing models fail. Its Update
++never calls base Update, so the inherited ten-second lifetime is **not** a fuse.
++Original subclass-before-aggregate ordering also applies to death-delay countdown.
++
++An unarmed bomb ignores its shooter, nonsolid objects and dead characters. A
++living character uses base contact, then bypasses the detection delay. Other
++solid/world contacts align to the plane normal plus a local-right quarter turn,
++clear gravity, start the arming clock and play stick.wav at the cached update
++position. The cached position starts at zero as an explicit initialization repair.
++Already armed contacts do nothing. Bombs are not parented to moving surfaces.
++
++Armed Update zeros velocity. A still-valid AI shooter changes getaway time from
++0.75 to two seconds; the value remains two if that shooter later disappears.
++At the deadline it plays arm.wav once and scans the original destructible list
++in order for a living CBaseCharacter within **inclusive** center distance 225.
++The shooter is eligible; there is no faction, solid, visibility or wall filter.
++Detection latches the explosion even if the target subsequently moves or vanishes.
++The next callback plays detect.wav once while time < detection + .5; at that
++boundary the bomb explodes. Death bypasses detection delay once IsDead is true.
++The original medium explosion uses actual proximities/explode.wav, independent
++available FX components and existing original squared-distance radius damage.
++Unavailable composite/illumination components remain explicit.
++
++## Engine boundary and inspection
++
++The grenade solver is now named `AdvanceModelProjectile` and accepts only the
++implemented CGrenade/CProximityBomb classes. Existing swept-box gravity, bounded
++substeps, shooter exclusion, post-contact velocity projection and deferred target
++callbacks are unchanged. Bomb flight stops after a sticking contact; generic
++object physics still excludes all CProjectile instances. This is replacement
++1-unit-box collision, not recovered retail physics, moving-surface attachment or
++verified original-game parity. Embedded/invalid starts and excessive catch-up fail.
++
++The original shooter link clears on either-end removal; projectiles remain
++independent. Detection stores a checked historical token and does not own the
++character. Detonation damage uses the existing checked callback snapshot and
++reentrancy guard. Deferred removal never frees a C++ object inside its callback.
++Sound failures are retained; flags still prevent invented retries. Unload frees
++owned resources and voices. Destination rehearsal adds no mutable game global.
++
++Objects shows arming/detection, contacts, spin, delay/radius, sound status and
++current resources, including hidden/inactive instances. Weapons exposes slot10,
++ammo, held duration, speed and firing state. Terminal projectile history retains
++arming/contact/detection scans and failures after removal. Model rendering uses
++existing SDL_GPU buffers/shaders and does not advance gameplay. No dependency,
++shader, reference repository or commercial asset is added.
++
++Remote bombs, flashlight, missing fallengrills geometry, full composite lighting,
++bomb projectile save/restore, original item HUD and complete M2 acceptance remain
++open. This increment is not a completed CityHub playthrough or campaign transfer.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index a004362..80a53ee 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -12,6 +12,7 @@
+ #include "game/original/Key.h"
+ #include "game/original/KeyPickup.h"
+ #include "game/original/Projectile.h"
++#include "game/original/ProximityBomb.h"
+ #include "game/original/RotatingBrush.h"
+ #include "game/original/RotatingDoor.h"
+ #include "game/original/SoundFX.h"
+@@ -841,6 +842,20 @@ namespace OpenBlood2
+                                         game.server.IsObjectAlive(projectile->m_hFiredFrom) ? "yes" : "no",
+                                         game.server.IsObjectAlive(projectile->m_hHitObject) ? "yes" : "no",
+                                         projectile->contact.polygon);
++                            if (const auto* bomb = dynamic_cast<const CProximityBomb*>(projectile))
++                            {
++                                ImGui::Text("Proximity: armed %d / direct contact %d / scans %llu / contacts %llu",
++                                            bomb->armed, bomb->hit_character, (unsigned long long)bomb->scans,
++                                            (unsigned long long)bomb->contacts);
++                                ImGui::Text("Detect %.1f / getaway %.2f / delay %.2f / sounds %u", bomb->detect_radius,
++                                            bomb->get_away, bomb->explode_delay, bomb->sounds);
++                                ImGui::Text("Detected identity alive: %d / inherited fuse unused",
++                                            game.server.IsObjectAlive(bomb->detected));
++                                ImGui::Text("Pitch %.3f / yaw %.3f / spin %.3f %.3f", bomb->pitch, bomb->yaw,
++                                            bomb->pitch_velocity, bomb->yaw_velocity);
++                                if (!bomb->sound_error.empty())
++                                    ImGui::TextWrapped("Audio: %s", bomb->sound_error.c_str());
++                            }
+                             if (const auto* grenade = dynamic_cast<const CGrenade*>(projectile))
+                             {
+                                 ImGui::Text("Grenade: bounces left %d / contacts %llu / pitch %.3f / yaw %.3f",
+@@ -972,6 +987,11 @@ namespace OpenBlood2
+                             ImGui::Text("%.3f %s: %s at %.2f %.2f %.2f / delivered %u", report.time,
+                                         report.source.c_str(), report.outcome.c_str(), report.position.x,
+                                         report.position.y, report.position.z, report.delivered);
++                            if (report.proximity)
++                                ImGui::Text(
++                                    "Proximity: armed %d / character impact %d / scans %llu / contacts %llu / audio %s",
++                                    report.armed, report.hit_character, (unsigned long long)report.scans,
++                                    (unsigned long long)report.contacts, report.audio_error.c_str());
+                             if (report.grenade)
+                                 ImGui::Text("Grenade: contacts %llu / bounces left %d / explosion passes %u",
+                                             (unsigned long long)report.contacts, report.bounces_left,
+@@ -1960,7 +1980,7 @@ namespace OpenBlood2
+     }
+     void Inspector::draw_weapons(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextUnformatted("Original inventory / Beretta 92F / Ingram Mac-10 / Flare Gun / M16 / Chosen Knife");
++        ImGui::TextUnformatted("Original inventory / Beretta / Mac-10 / Flare / M16 / Knife / Proximity Bomb");
+         auto* player = game.server_shell.Player(game.local_client);
+         if (!player)
+         {
+@@ -1969,6 +1989,11 @@ namespace OpenBlood2
+             return;
+         }
+         auto& inventory = player->m_InventoryMgr;
++        ImGui::TextWrapped("P selects collected proximity bombs. Hold primary to charge, then release; holding over "
++                           "1.25 seconds explodes in hand. Secondary drops a bomb.");
++        if (game.client_shell.weapons[0].type == WEAP_PROXIMITYBOMB)
++            ImGui::Text("Bomb charge %.3f s / speed %.1f / ammo %.0f", game.client_shell.weapons[0].bomb_held,
++                        game.client_shell.weapons[0].bomb_speed, inventory.GetAmmoCount(10));
+         ImGui::TextWrapped("Hold a fire button to drive original animation, shots, decoded fire sounds and AI hearing. "
+                            "The model preview is diagnostic; remaining impact FX and audio reverb are unavailable.");
+         if (!world_error.empty())
+@@ -1984,7 +2009,7 @@ namespace OpenBlood2
+             ImGui::TableSetupColumn("Left hand");
+             ImGui::TableSetupColumn("Select");
+             ImGui::TableHeadersRow();
+-            for (unsigned slot = 0; slot < 10; ++slot)
++            for (unsigned slot = 0; slot < inventory_weapon_slots; ++slot)
+             {
+                 const auto* right = inventory.GetWeapon(slot);
+                 const auto* left = inventory.GetWeapon(slot, true);
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 892355e..57d5892 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -612,6 +612,7 @@ namespace
+                 game->client_shell.weapon_input = {};
+             game->client_shell.use_down = controls.sample_use(text_editing);
+             game->client_shell.medkit_down = controls.sample_medkit(text_editing);
++            game->client_shell.proximity_down = controls.sample_proximity(text_editing);
+             auto keyboard = controls.sample(text_editing);
+             auto& movement = game->client_shell.movement_input;
+             movement.forward |= keyboard.forward;
+diff --git a/src/app/movement_controls.h b/src/app/movement_controls.h
+index d9850b9..3e60d07 100644
+--- a/src/app/movement_controls.h
++++ b/src/app/movement_controls.h
+@@ -17,7 +17,7 @@ namespace OpenBlood2
+     {
+         std::array<bool, SDL_SCANCODE_COUNT> keys{};
+         bool focused = false, enabled = true, use_suppressed = false;
+-        bool medkit_suppressed = false;
++        bool medkit_suppressed = false, proximity_suppressed = false;
+         bool mouse_requested = false, mouse_captured = false;
+         std::array<bool, 2> mouse_buttons{}, fire_suppressed{};
+         float mouse_x = 0, mouse_y = 0;
+@@ -40,7 +40,7 @@ namespace OpenBlood2
+         void player_changed(bool play = false)
+         {
+             keys = {};
+-            use_suppressed = medkit_suppressed = false;
++            use_suppressed = medkit_suppressed = proximity_suppressed = false;
+             release_mouse();
+             if (play)
+                 request_play();
+@@ -87,6 +87,7 @@ namespace OpenBlood2
+                 case SDL_SCANCODE_RCTRL:
+                 case SDL_SCANCODE_F:
+                 case SDL_SCANCODE_G:
++                case SDL_SCANCODE_P:
+                 case SDL_SCANCODE_H:
+                 case SDL_SCANCODE_E:
+                 case SDL_SCANCODE_SPACE:
+@@ -131,8 +132,8 @@ namespace OpenBlood2
+                 if (!focused && event.type == SDL_EVENT_KEY_DOWN)
+                     return;
+                 const int code = event.key.scancode;
+-                if ((code == SDL_SCANCODE_H || code == SDL_SCANCODE_E || code == SDL_SCANCODE_F ||
+-                     code == SDL_SCANCODE_G) &&
++                if ((code == SDL_SCANCODE_P || code == SDL_SCANCODE_H || code == SDL_SCANCODE_E ||
++                     code == SDL_SCANCODE_F || code == SDL_SCANCODE_G) &&
+                     event.type == SDL_EVENT_KEY_DOWN && event.key.repeat && !keys[static_cast<unsigned>(code)])
+                     return; // A held key after focus loss is not a fresh USE press.
+                 if (code > SDL_SCANCODE_UNKNOWN && code < SDL_SCANCODE_COUNT)
+@@ -165,6 +166,17 @@ namespace OpenBlood2
+                     keys[SDL_SCANCODE_SPACE],
+                     keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL]};
+         }
++        bool sample_proximity(bool text_editing)
++        {
++            if (!keys[SDL_SCANCODE_P])
++                proximity_suppressed = false;
++            if (!focused || !enabled || text_editing)
++            {
++                proximity_suppressed = keys[SDL_SCANCODE_P];
++                return false;
++            }
++            return keys[SDL_SCANCODE_P] && !proximity_suppressed;
++        }
+         bool sample_medkit(bool text_editing)
+         {
+             if (!keys[SDL_SCANCODE_H])
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 687152b..72ef9f8 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -81,8 +81,8 @@ namespace OpenBlood2
+         const auto trial_before = g.destination_trial.attempts;
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+-            !g.destination_trial.player_entered || g.destination_trial.created != 448 ||
+-            g.destination_trial.unknown != 5 || g.destination_trial.failed != 1 ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 450 ||
++            g.destination_trial.unknown != 3 || g.destination_trial.failed != 1 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+@@ -100,8 +100,8 @@ namespace OpenBlood2
+                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
+                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+                g.destination_inspection.source_revision == old_revision &&
+-               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 480 &&
+-               g.destination_inspection.unknown == 5 && g.destination_inspection.invalid == 0 &&
++               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 482 &&
++               g.destination_inspection.unknown == 3 && g.destination_inspection.invalid == 0 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/game/inventory_state.h b/src/game/inventory_state.h
+index 2404422..745e62c 100644
+--- a/src/game/inventory_state.h
++++ b/src/game/inventory_state.h
+@@ -10,7 +10,7 @@ namespace OpenBlood2
+     // No engine handles, weapon pointers, client views or resource references.
+     struct InventoryState
+     {
+-        std::array<DBYTE, 10> right{}, left{};
++        std::array<DBYTE, 13> right{}, left{};
+         std::array<float, 13> ammo{};
+         std::vector<KeyItem> keys;
+         std::optional<DBYTE> medkit_charge;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 2c8ff52..8441dfe 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -61,7 +61,7 @@ class ServerDE : public CSBase
+     virtual DRESULT RemoveAttachment(HATTACHMENT) = 0;
+     virtual DRESULT FindAttachment(HOBJECT, HOBJECT, HATTACHMENT*) = 0;
+     virtual DRESULT GetAttachedModelNodeTransform(HATTACHMENT, const char*, DVector*, DRotation*) = 0;
+-    virtual bool AdvanceGrenade(HOBJECT, double seconds) = 0;
++    virtual bool AdvanceModelProjectile(HOBJECT, double seconds) = 0;
+     virtual void RecordProjectile(const OpenBlood2::ProjectileReport&) = 0;
+     virtual bool IsObjectAlive(HOBJECT) = 0;
+     virtual bool SetDeactivationTime(HOBJECT, float) = 0;
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index 750c4c8..1132248 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -237,6 +237,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
+     boss_health_visible = false;
+     communication.Reset(server_);
+     medkit_down = medkit_was_down = false;
++    proximity_down = proximity_was_down = false;
+     item_actions = item_sounds = item_voice = 0;
+     item_audio_error.clear();
+     objectives = {};
+@@ -276,6 +277,7 @@ void CBloodClientShell::OnExitWorld()
+     boss_health_visible = false;
+     communication.Reset(server_);
+     medkit_down = medkit_was_down = false;
++    proximity_down = proximity_was_down = false;
+     item_actions = item_sounds = item_voice = 0;
+     item_audio_error.clear();
+     objectives = {};
+@@ -477,6 +479,10 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerItemCo
+ }
+ bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
+ {
++    const bool proximity_pressed = proximity_down && !proximity_was_down;
++    proximity_was_down = proximity_down;
++    if (proximity_pressed)
++        server.OnMessage(client_, OpenBlood2::PlayerItemCommand{7});
+     const bool item_pressed = medkit_down && !medkit_was_down;
+     medkit_was_down = medkit_down;
+     if (item_pressed)
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index 30fae0d..665148b 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -77,6 +77,7 @@ class CBloodClientShell
+     bool UpdateUse(CBloodServerShell&);
+     bool use_down = false, use_was_down = false;
+     bool medkit_down = false, medkit_was_down = false;
++    bool proximity_down = false, proximity_was_down = false;
+     std::uint64_t item_actions = 0, item_sounds = 0;
+     OpenBlood2::SoundId item_voice = 0; // Checked inspection token, not owned.
+     std::string item_audio_error;
+diff --git a/src/game/original/Grenade.cpp b/src/game/original/Grenade.cpp
+index e26eb7e..56be90f 100644
+--- a/src/game/original/Grenade.cpp
++++ b/src/game/original/Grenade.cpp
+@@ -32,7 +32,7 @@ bool CGrenade::AdvanceFlight(double seconds)
+ {
+     if (!configured || m_bExplode || failed || seconds == 0)
+         return !failed;
+-    if (!g_pServerDE->AdvanceGrenade(m_hObject, seconds))
++    if (!g_pServerDE->AdvanceModelProjectile(m_hObject, seconds))
+         return failed ? false : Fail("Grenade box flight unavailable/invalid (including embedded starts)");
+     return !failed;
+ }
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index af3663f..e87342e 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -123,12 +123,21 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
+     const auto* definition = weapon_definition(type);
+     if (!definition)
+         return InventoryResult::NotAvailable;
+-    if (!m_hOwner || !BaseClass::GetServerDE()->HandleToObject(m_hOwner) || slot < -1 || slot >= 10)
++    if (!m_hOwner || !BaseClass::GetServerDE()->HandleToObject(m_hOwner) || slot < -1 ||
++        slot >= int(inventory_weapon_slots))
+         return InventoryResult::Invalid;
+     if ((type == WEAP_NAGA_EYEBEAM || type == WEAP_ZEALOT_ENERGYBLAST || type == WEAP_GIDEON_WIND ||
+          type == WEAP_GIDEON_SHIELD) &&
+         dynamic_cast<CPlayerObj*>(BaseClass::GetServerDE()->HandleToObject(m_hOwner)))
+         return InventoryResult::NotAvailable; // Player view/save support is a separate contract.
++    if (type == WEAP_PROXIMITYBOMB)
++    {
++        if (slot != -1 && slot != 10)
++            return InventoryResult::Invalid;
++        slot = 10;
++    }
++    else if (slot >= 10)
++        return InventoryResult::Invalid;
+     int empty = -1;
+     bool left = false;
+     if (slot >= 0)
+@@ -147,7 +156,7 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
+                 return InventoryResult::AlreadyHave;
+         }
+     }
+-    if (empty < 0)
++    if (empty < 0 && type != WEAP_PROXIMITYBOMB)
+         for (unsigned i = 0; i < 10; ++i)
+         {
+             auto* weapon = GetWeapon(i);
+@@ -168,7 +177,9 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
+         return InventoryResult::Full;
+     // Original strength gate was commented out; do not introduce a new one.
+     std::unique_ptr<CWeapon> weapon;
+-    if (type == WEAP_BERETTA)
++    if (type == WEAP_PROXIMITYBOMB)
++        weapon = std::make_unique<CWeapProximityBomb>();
++    else if (type == WEAP_BERETTA)
+         weapon = std::make_unique<CBeretta>();
+     else if (type == WEAP_SUBMACHINEGUN)
+         weapon = std::make_unique<CSubMachineGun>();
+@@ -278,7 +289,7 @@ InventoryResult CInventoryMgr::ChangeWeapon(DBYTE type)
+         return InventoryResult::Invalid;
+     if (CurrentWeapon() && CurrentWeapon()->data.m_nType == type)
+         return InventoryResult::Current;
+-    for (unsigned i = 0; i < m_Weapons.size(); ++i)
++    for (unsigned i = 0; i < 10; ++i)
+         if (m_Weapons[i] && m_Weapons[i]->data.m_nType == type)
+             return ChangeWeaponSlot(static_cast<DBYTE>(i));
+     return InventoryResult::NotAvailable;
+@@ -290,9 +301,9 @@ bool CInventoryMgr::FindBestWeapon(float distance, CWeapon*& alternative) const
+     if (!server || !server->IsObjectAlive(m_hOwner) || !std::isfinite(distance) || distance < 0)
+         return false;
+     auto* best = CurrentWeapon();
+-    for (const auto& slot : m_Weapons)
++    for (unsigned i = 0; i < 10; ++i)
+     {
+-        auto* candidate = slot.get();
++        auto* candidate = m_Weapons[i].get();
+         if (!candidate)
+             continue;
+         const auto damage = best ? static_cast<DDWORD>(best->data.m_fMaxDamage) : 0;
+@@ -370,6 +381,8 @@ InventoryResult CInventoryMgr::AddItem(DBYTE type, DBYTE value)
+ }
+ InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
+ {
++    if (type == 7)
++        return SelectInventoryWeapon(WEAP_PROXIMITYBOMB);
+     if (type != 1 || !medkit)
+         return InventoryResult::NotAvailable;
+     const auto before = medkit->count;
+@@ -379,3 +392,47 @@ InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
+     // Original localized console item-name message / inventory HUD remain unavailable.
+     return activated ? InventoryResult::Ok : InventoryResult::NotAvailable;
+ }
++
++// Original AddInventoryWeapon/SelectInventoryWeapon and exhaustion fallback.
++InventoryResult CInventoryMgr::AddInventoryWeapon(DBYTE type, DBYTE count)
++{
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hOwner))
++        return InventoryResult::Invalid;
++    if (type != 7)
++        return InventoryResult::NotAvailable;
++    if (GetWeapon(10))
++        return AddAmmo(AMMO_PROXIMITYBOMB, count);
++    auto result = ObtainWeapon(WEAP_PROXIMITYBOMB, 10);
++    if (result != InventoryResult::Ok)
++        return result;
++    AddAmmo(AMMO_PROXIMITYBOMB, count); // Source ignores the first addition's return.
++    return InventoryResult::Ok;
++}
++InventoryResult CInventoryMgr::SelectInventoryWeapon(DBYTE type)
++{
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hOwner))
++        return InventoryResult::Invalid;
++    if (type != WEAP_PROXIMITYBOMB || !GetWeapon(10))
++        return InventoryResult::NotAvailable;
++    if (m_nCurWeaponSlot == 10)
++        return InventoryResult::Current;
++    if (!GetAmmoCount(AMMO_PROXIMITYBOMB))
++        return InventoryResult::NotAvailable;
++    return ChangeWeaponSlot(10);
++}
++InventoryResult CInventoryMgr::SelectNextWeapon()
++{
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hOwner))
++        return InventoryResult::Invalid;
++    if (m_nCurWeaponSlot >= 10)
++        m_nCurWeaponSlot = 0; // Original resets before searching from slot1.
++    unsigned slot = (m_nCurWeaponSlot + 1) % 10;
++    while (slot != m_nCurWeaponSlot && !GetWeapon(slot))
++        slot = (slot + 1) % 10;
++    if (slot == m_nCurWeaponSlot)
++        return InventoryResult::Current;
++    return ChangeWeaponSlot(static_cast<DBYTE>(slot));
++}
+diff --git a/src/game/original/InventoryMgr.h b/src/game/original/InventoryMgr.h
+index 1978224..59b3266 100644
+--- a/src/game/original/InventoryMgr.h
++++ b/src/game/original/InventoryMgr.h
+@@ -27,6 +27,9 @@ class CInventoryMgr : public Aggregate
+     // separate player-transfer responsibility, never silently bypassed here.
+     bool Load(const OpenBlood2::InventoryState&, OpenBlood2::InventoryLoadType, std::string&);
+     InventoryResult AddItem(DBYTE, DBYTE);
++    InventoryResult AddInventoryWeapon(DBYTE, DBYTE);
++    InventoryResult SelectInventoryWeapon(DBYTE);
++    InventoryResult SelectNextWeapon();
+     InventoryResult SetActiveItem(DBYTE);
+     std::optional<CInvMedkit> medkit;
+     InventoryResult AddKey(const OpenBlood2::KeyItem&);
+@@ -58,7 +61,7 @@ class CInventoryMgr : public Aggregate
+     bool FindBestWeapon(float target_distance, CWeapon*& alternative) const;
+     CWeapon* GetWeapon(unsigned slot, bool left = false) const
+     {
+-        return slot < 10 ? (left ? m_LWeapons[slot].get() : m_Weapons[slot].get()) : nullptr;
++        return slot < inventory_weapon_slots ? (left ? m_LWeapons[slot].get() : m_Weapons[slot].get()) : nullptr;
+     }
+     CWeapon* CurrentWeapon(bool left = false) const
+     {
+@@ -75,6 +78,6 @@ class CInventoryMgr : public Aggregate
+     std::uint64_t revision = 0;
+ 
+   private:
+-    std::array<std::unique_ptr<CWeapon>, 10> m_Weapons{}, m_LWeapons{};
++    std::array<std::unique_ptr<CWeapon>, inventory_weapon_slots> m_Weapons{}, m_LWeapons{};
+     DDWORD EngineMessageFn(LPBASECLASS, DDWORD, void*, DFLOAT) override;
+ };
+diff --git a/src/game/original/InventorySave.cpp b/src/game/original/InventorySave.cpp
+index 4eb288b..c1965a5 100644
+--- a/src/game/original/InventorySave.cpp
++++ b/src/game/original/InventorySave.cpp
+@@ -8,7 +8,8 @@ namespace
+     bool valid(const OpenBlood2::InventoryState& state, std::string& error)
+     {
+         if (state.strength < 1 || state.strength > 6 || state.magic < 1 || state.magic > 6 ||
+-            state.current_slot >= state.right.size() || !std::isfinite(state.damage_multiplier) ||
++            state.current_slot >= state.right.size() ||
++            (state.current_slot >= 10 && !state.right[state.current_slot]) || !std::isfinite(state.damage_multiplier) ||
+             state.damage_multiplier < 0 || state.damage_multiplier > 1000 || state.keys.size() > 256 ||
+             (state.medkit_charge && *state.medkit_charge > 100))
+         {
+@@ -24,7 +25,9 @@ namespace
+         for (unsigned i = 0; i < state.right.size(); ++i)
+         {
+             const auto* right = weapon_definition(state.right[i]);
+-            if ((state.right[i] && !right) ||
++            if ((i >= 10 && ((i != 10 && state.right[i]) || (state.right[i] && state.right[i] != WEAP_PROXIMITYBOMB) ||
++                             state.left[i])) ||
++                (i < 10 && state.right[i] == WEAP_PROXIMITYBOMB) || (state.right[i] && !right) ||
+                 (state.left[i] && (!right || state.left[i] != state.right[i] || !right->m_dwTwoHandStrengthReq)))
+             {
+                 error = "Unsupported weapon or invalid dual-hand inventory slot";
+diff --git a/src/game/original/ItemPickups.cpp b/src/game/original/ItemPickups.cpp
+index 42cb874..35f0c81 100644
+--- a/src/game/original/ItemPickups.cpp
++++ b/src/game/original/ItemPickups.cpp
+@@ -17,3 +17,11 @@ MedKitPU::MedKitPU()
+     display_name = "Medkit";
+     resource_id = 302;
+ }
++
++ProximitiesPU::ProximitiesPU()
++{
++    value = {OpenBlood2::PickupKind::Item, 7, 1};
++    file = "Proximities_pu";
++    display_name = "Proximity Bomb";
++    resource_id = 306;
++}
+diff --git a/src/game/original/ItemPickups.h b/src/game/original/ItemPickups.h
+index 404351f..c93419a 100644
+--- a/src/game/original/ItemPickups.h
++++ b/src/game/original/ItemPickups.h
+@@ -19,3 +19,25 @@ class MedKitPU : public ItemPickupCharged
+   public:
+     MedKitPU();
+ };
++
++class ItemPickupWeapon : public ItemPickup
++{
++  public:
++    ItemPickupWeapon()
++    {
++        pickup_sound = "sounds/powerups/ammo2.wav";
++    }
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD message, void* data, DFLOAT reason) override
++    {
++        if (message == MID_INITIALUPDATE)
++            g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 7));
++        return ItemPickup::EngineMessageFn(message, data, reason);
++    }
++};
++class ProximitiesPU : public ItemPickupWeapon
++{
++  public:
++    ProximitiesPU();
++};
+diff --git a/src/game/original/PickupObject.cpp b/src/game/original/PickupObject.cpp
+index 7eb0f21..04cd74a 100644
+--- a/src/game/original/PickupObject.cpp
++++ b/src/game/original/PickupObject.cpp
+@@ -40,7 +40,8 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+             if (reason == INITIALUPDATE_WORLDFILE && g_pServerDE->MoveObjectToGround(m_hObject) != DE_OK)
+                 error = "Initial pickup ground placement failed";
+         }
+-        g_pServerDE->SetObjectUserFlags(m_hObject, (1u << 3) | (1u << 10) | (rotate_fx ? (1u << 4) : 0));
++        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3) | (1u << 10) |
++                                                       (rotate_fx ? (1u << 4) : 0));
+         g_pServerDE->SetNextUpdate(m_hObject, 0);
+         // String creation follows SpawnItem: no bounce for these source constructors,
+         // no ground snap, and the helper applies SpawnObjectVel after initial update.
+diff --git a/src/game/original/PlayerContainers.cpp b/src/game/original/PlayerContainers.cpp
+index 7cd24f6..ac800fa 100644
+--- a/src/game/original/PlayerContainers.cpp
++++ b/src/game/original/PlayerContainers.cpp
+@@ -49,8 +49,10 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD
+             if (message == OpenBlood2::add_ammo_message)
+                 accepted = m_InventoryMgr.AddAmmo(pickup.type, pickup.amount) == InventoryResult::Ok;
+             else if (message == OpenBlood2::add_item_message)
+-                accepted =
+-                    m_InventoryMgr.AddItem(pickup.type, static_cast<DBYTE>(pickup.amount)) == InventoryResult::Ok;
++                accepted = (pickup.type == 7
++                                ? m_InventoryMgr.AddInventoryWeapon(pickup.type, static_cast<DBYTE>(pickup.amount))
++                                : m_InventoryMgr.AddItem(pickup.type, static_cast<DBYTE>(pickup.amount))) ==
++                           InventoryResult::Ok;
+             else if (message == OpenBlood2::add_weapon_message)
+             {
+                 if (server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) !=
+diff --git a/src/game/original/PlayerSave.cpp b/src/game/original/PlayerSave.cpp
+index 7365bf4..ef62a43 100644
+--- a/src/game/original/PlayerSave.cpp
++++ b/src/game/original/PlayerSave.cpp
+@@ -50,7 +50,7 @@ namespace
+             error = "Active player powers require unported saved expiration timers";
+             return false;
+         }
+-        for (unsigned slot = 0; slot < 10; ++slot)
++        for (unsigned slot = 0; slot < inventory_weapon_slots; ++slot)
+             for (bool left : {false, true})
+                 if (const auto* weapon = player.m_InventoryMgr.GetWeapon(slot, left); weapon && weapon->firing)
+                 {
+diff --git a/src/game/original/PlayerUse.cpp b/src/game/original/PlayerUse.cpp
+index 68c645d..479b907 100644
+--- a/src/game/original/PlayerUse.cpp
++++ b/src/game/original/PlayerUse.cpp
+@@ -72,7 +72,7 @@ bool CPlayerObj::OnCommandItem(DBYTE type)
+ {
+     // Original OnCommandOn COMMAND_INVITEM_1, including its run-key exclusion.
+     if (!g_pServerDE->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() || movement_blocked ||
+-        camera_movement_blocked || command_run)
++        camera_movement_blocked || (type != 7 && command_run))
+         return false;
+     return m_InventoryMgr.SetActiveItem(type) == InventoryResult::Ok;
+ }
+diff --git a/src/game/original/Projectile.cpp b/src/game/original/Projectile.cpp
+index f0b5b50..f071f0b 100644
+--- a/src/game/original/Projectile.cpp
++++ b/src/game/original/Projectile.cpp
+@@ -2,6 +2,7 @@
+ #include "Projectile.h"
+ #include "FlareProjectile.h"
+ #include "Grenade.h"
++#include "ProximityBomb.h"
+ #include "SurfaceTypes.h"
+ #include "engine/collision.h"
+ #include "engine/objects.h"
+@@ -23,8 +24,13 @@ void CProjectile::Finish(const char* outcome)
+ {
+     DVector position;
+     g_pServerDE->GetObjectPos(m_hObject, &position);
+-    ProjectileReport report{
+-        g_pServerDE->GetObjectName(m_hObject), outcome, error, position, g_pServerDE->GetTime(), targets.delivered};
++    ProjectileReport report;
++    report.source = g_pServerDE->GetObjectName(m_hObject);
++    report.outcome = outcome;
++    report.error = error;
++    report.position = position;
++    report.time = g_pServerDE->GetTime();
++    report.delivered = targets.delivered;
+     report.cancelled = targets.cancelled;
+     report.candidates = targets.candidates;
+     report.in_radius = targets.in_radius;
+@@ -37,6 +43,15 @@ void CProjectile::Finish(const char* outcome)
+         report.blast_position = wave->blast_position;
+         report.blast_normal = wave->blast_normal;
+     }
++    if (const auto* bomb = dynamic_cast<const CProximityBomb*>(this))
++    {
++        report.proximity = true;
++        report.armed = bomb->armed;
++        report.hit_character = bomb->hit_character;
++        report.contacts = bomb->contacts;
++        report.scans = bomb->scans;
++        report.audio_error = bomb->sound_error;
++    }
+     if (const auto* grenade = dynamic_cast<const CGrenade*>(this))
+     {
+         report.grenade = true;
+@@ -263,7 +278,8 @@ bool CProjectile::AddImpact(DVector position)
+     m_vDir = vector_scale(m_vDir, 20);
+     SegmentHit impact;
+     auto normal = vector_scale(m_vDir, -1), point = position;
+-    if (m_hHitObject || (!dynamic_cast<CGrenade*>(this) && !contact.object && contact.polygon != UINT32_MAX))
++    if (m_hHitObject || (!dynamic_cast<CGrenade*>(this) && !dynamic_cast<CProximityBomb*>(this) && !contact.object &&
++                         contact.polygon != UINT32_MAX))
+     {
+         const auto query = g_pServerDE->IntersectSegment(from, vector_add(position, m_vDir), nullptr, impact);
+         if (query != SegmentResult::Hit && query != SegmentResult::Miss)
+diff --git a/src/game/original/ProximityBomb.cpp b/src/game/original/ProximityBomb.cpp
+new file mode 100644
+index 0000000..d391bce
+--- /dev/null
++++ b/src/game/original/ProximityBomb.cpp
+@@ -0,0 +1,208 @@
++#include "ProximityBomb.h"
++#include "AI_Mgr.h"
++#include "InventoryMgr.h"
++#include "PlayerObj.h"
++#include "engine/collision.h"
++#include <numbers>
++using namespace OpenBlood2;
++namespace
++{
++    // Existing component publishers preserve independent failures and detached lifetimes.
++    void explosion(HOBJECT source, DVector p, DVector n, unsigned type, const char* sound, float damage, float radius)
++    {
++        SceneExplosionReport r;
++        r.source = g_pServerDE->GetObjectName(source);
++        r.position = p;
++        r.normal = n;
++        r.type = type;
++        r.damage = damage;
++        r.radius = radius;
++        r.model_event = g_pServerDE->PublishExplosionModels(source, type, p, n, r.model_error);
++        r.sprite_event = g_pServerDE->PublishExplosionSprites(source, type, p, n, r.sprite_error);
++        r.ring_event = g_pServerDE->PublishExplosionRings(source, type, p, n, r.ring_error);
++        r.fragment_event = g_pServerDE->PublishExplosionFragments(source, type, p, n, r.fragment_error);
++        r.flame_event = g_pServerDE->PublishExplosionFlames(source, type, p, n, r.flame_error);
++        r.light_event = g_pServerDE->PublishExplosionLights(source, type, p, n, r.light_error);
++        SoundRequest request;
++        r.sound = request.resource = sound;
++        request.inner_radius = 100;
++        request.outer_radius = 1000;
++        request.priority = 1;
++        r.voice = g_pServerDE->PlayDetachedSound(source, request, p, r.sound_error);
++        g_pServerDE->RecordSceneExplosion(r);
++    }
++} // namespace
++CProximityBomb::CProximityBomb() : CProjectile(OT_MODEL)
++{
++    filename = "Models\\Ammo\\c4.abc";
++    skin = "Skins\\Ammo\\c4_prox.dtx";
++    flags = FLAG_VISIBLE | FLAG_TOUCH_NOTIFY | FLAG_REMOVEIFOUTSIDE | FLAG_FORCECLIENTUPDATE | FLAG_SHADOW |
++            FLAG_MODELGOURAUDSHADE | FLAG_RAYHIT | FLAG_GRAVITY;
++    m_damage.m_fDeathDelay = .25f;
++    constexpr float circle = 2 * std::numbers::pi_v<float>;
++    g_pServerDE->RandomFloat(-circle, circle, pitch_velocity);
++    g_pServerDE->RandomFloat(-circle, circle, yaw_velocity);
++}
++void CProximityBomb::Sound(const char* name)
++{
++    SoundRequest request;
++    request.resource = std::string("Sounds\\Weapons\\proximities\\") + name;
++    request.outer_radius = 500;
++    request.inner_radius = 50;
++    request.priority = 1;
++    if (g_pServerDE->PlayDetachedSound(m_hObject, request, last_position, sound_error))
++        ++sounds;
++}
++bool CProximityBomb::AdvanceFlight(double seconds)
++{
++    if (armed || !configured || m_bExplode || failed || seconds == 0)
++        return !failed;
++    if (!g_pServerDE->AdvanceModelProjectile(m_hObject, seconds))
++        return failed ? false : Fail("Proximity bomb box flight unavailable/invalid");
++    return !failed;
++}
++bool CProximityBomb::Update()
++{
++    g_pServerDE->SetNextUpdate(m_hObject, .001f);
++    if (!configured || g_pServerDE->GetObjectPos(m_hObject, &last_position) != DE_OK)
++        return Fail("Proximity bomb setup/position unavailable");
++    const auto time = g_pServerDE->GetTime();
++    if (m_bExplode || m_damage.IsDead())
++    {
++        if (!hit_character && time < m_fStartTime + explode_delay && !m_damage.IsDead())
++        {
++            if (play_detect)
++            {
++                Sound("detect.wav");
++                play_detect = false;
++            }
++            return true;
++        }
++        Explode();
++        return false;
++    }
++    if (armed)
++    {
++        DVector zero{};
++        if (g_pServerDE->SetVelocity(m_hObject, &zero) != DE_OK)
++            return Fail("Bomb velocity unavailable");
++        if (g_pServerDE->IsObjectAlive(m_hFiredFrom) &&
++            dynamic_cast<AI_Mgr*>(g_pServerDE->HandleToObject(m_hFiredFrom)))
++            get_away = 2;
++        if (time < m_fStartTime + get_away)
++            return true;
++        if (play_arm)
++        {
++            Sound("arm.wav");
++            play_arm = false;
++        }
++        ++scans;
++        // Read-only original destructible list order, no callbacks in this traversal.
++        // The shooter is deliberately eligible. No visibility/faction/solid filter.
++        auto& head = CDestructable::m_DestructableHead;
++        for (auto* link = head.m_pNext; link && link != &head; link = link->m_pNext)
++        {
++            const auto h = static_cast<CDestructable*>(link->m_pData)->m_hObject;
++            if (!h)
++                break;
++            if (!g_pServerDE->IsObjectAlive(h))
++                continue;
++            const auto* character = dynamic_cast<CBaseCharacter*>(g_pServerDE->HandleToObject(h));
++            if (!character || character->m_damage.IsDead())
++                continue;
++            DVector p;
++            if (g_pServerDE->GetObjectPos(h, &p) != DE_OK)
++                return Fail("Bomb detection pose unavailable");
++            const auto delta = vector_subtract(p, last_position);
++            if (vector_dot(delta, delta) <= detect_radius * detect_radius)
++            {
++                detected = h;
++                m_bExplode = true;
++                m_fStartTime = time;
++                break;
++            }
++        }
++    }
++    else if (pitch_velocity != 0 || yaw_velocity != 0)
++    {
++        pitch += pitch_velocity * g_pServerDE->GetFrameTime();
++        yaw += yaw_velocity * g_pServerDE->GetFrameTime();
++        auto rotation = rotation_from_euler({pitch, yaw, 0});
++        if (g_pServerDE->SetObjectRotation(m_hObject, &rotation) != DE_OK)
++            return Fail("Bomb rotation rejected");
++    }
++    // Original override never calls base Update: no inherited ten-second expiry.
++    return true;
++}
++void CProximityBomb::HandleContact(const SegmentHit& hit)
++{
++    if (!configured || armed || failed || !g_pServerDE->IsObjectAlive(m_hObject))
++        return;
++    if (hit.object && (hit.object == m_hFiredFrom || !g_pServerDE->IsObjectAlive(hit.object) ||
++                       !(g_pServerDE->GetObjectFlags(hit.object) & FLAG_SOLID)))
++        return;
++    if (!hit.object && hit.polygon == UINT32_MAX)
++        return;
++    if (auto* character = dynamic_cast<CBaseCharacter*>(g_pServerDE->HandleToObject(hit.object)))
++    {
++        if (character->m_damage.IsDead())
++            return;
++        CProjectile::HandleContact(hit);
++        hit_character = true;
++        return;
++    }
++    DRotation rotation;
++    if (g_pServerDE->AlignRotation(rotation, hit.normal) != DE_OK)
++    {
++        Fail("Bomb contact normal unavailable");
++        return;
++    }
++    // Source aligns local forward to the plane normal, then rotates around local right by pi/2.
++    rotation = multiply_rotation(rotation, rotation_from_euler({std::numbers::pi_v<float> * .5f, 0, 0}));
++    if (g_pServerDE->SetObjectRotation(m_hObject, &rotation) != DE_OK)
++    {
++        Fail("Bomb sticking rotation rejected");
++        return;
++    }
++    g_pServerDE->SetObjectFlags(m_hObject, g_pServerDE->GetObjectFlags(m_hObject) & ~FLAG_GRAVITY);
++    armed = true;
++    m_fStartTime = g_pServerDE->GetTime();
++    Sound("stick.wav"); // Source cached last position, not the collision point.
++}
++void CProximityBomb::AddExplosion(DVector p, DVector n)
++{
++    explosion(m_hObject, p, n, 1, "Sounds\\Weapons\\proximities\\explode.wav", m_fDamage,
++              static_cast<float>(m_nRadius));
++}
++FireResult CWeapProximityBomb::FireProjectile()
++{
++    projectile = nullptr;
++    projectile_error.clear();
++    if (!last_shot.request.projectile_speed)
++    {
++        DVector p;
++        if (g_pServerDE->GetObjectPos(m_hOwner, &p) != DE_OK)
++            return last_shot.result = FireResult::Unavailable;
++        explosion(m_hOwner, p, {0, 1, 0}, 0, "Sounds\\Weapons\\time\\explode.wav",
++                  last_shot.damage * m_pInventoryMgr->damage_multiplier, 0);
++        if (!g_pServerDE->IsObjectAlive(m_hOwner))
++            return last_shot.result = FireResult::Fired;
++        auto* owner = g_pServerDE->HandleToObject(m_hOwner);
++        auto message = g_pServerDE->StartMessageToObject(owner, m_hOwner, damage_message);
++        if (!message)
++            return last_shot.result = FireResult::DeliveryFailed;
++        // Original SendDamageMsg: this weapon's NORMAL damage type, no radius pass.
++        auto written = g_pServerDE->WriteDamage(
++            message, {{0, 1, 0}, p, last_shot.damage * m_pInventoryMgr->damage_multiplier, damage_type, m_hOwner});
++        auto delivered = g_pServerDE->EndMessage(message);
++        return last_shot.result =
++                   written == DE_OK && delivered == DE_OK ? FireResult::Fired : FireResult::DeliveryFailed;
++    }
++    auto result = CWeapon::FireProjectile();
++    if (!m_pInventoryMgr->GetAmmoCount(GetAmmoType(last_shot.request.alternate)))
++    {
++        ShowHandModel(false);
++        m_pInventoryMgr->SelectNextWeapon();
++    }
++    return result;
++}
+diff --git a/src/game/original/ProximityBomb.h b/src/game/original/ProximityBomb.h
+new file mode 100644
+index 0000000..ab3b9e8
+--- /dev/null
++++ b/src/game/original/ProximityBomb.h
+@@ -0,0 +1,26 @@
++#pragma once
++#include "Projectile.h"
++// Selected original GameProjectiles.cpp CProximityBomb. Shared bounded box flight
++// is replacement engine code; arming/detection/delay/contact rules remain original.
++class CProximityBomb final : public CProjectile
++{
++  public:
++    CProximityBomb();
++    bool AdvanceFlight(double) override;
++    void HandleContact(const OpenBlood2::SegmentHit&) override;
++    bool armed = false, hit_character = false, play_arm = true, play_detect = true;
++    float get_away = .75f, detect_radius = 225, explode_delay = .5f;
++    float pitch = 0, yaw = 0, pitch_velocity = 0, yaw_velocity = 0;
++    DVector last_position{};
++    HOBJECT detected = nullptr; // Historical checked identity, not an owning target.
++    std::uint64_t contacts = 0, scans = 0;
++    unsigned sounds = 0;
++    std::string sound_error;
++
++  protected:
++    bool Update() override;
++    void AddExplosion(DVector, DVector) override;
++
++  private:
++    void Sound(const char*);
++};
+diff --git a/src/game/original/ViewWeapon.cpp b/src/game/original/ViewWeapon.cpp
+index e49641f..362afc9 100644
+--- a/src/game/original/ViewWeapon.cpp
++++ b/src/game/original/ViewWeapon.cpp
+@@ -95,11 +95,15 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
+     {
+         if (!server.Player(client))
+             return true;
+-        if (state != WS_FIRING && state != WS_ALT_FIRING)
++        if (state != WS_FIRING && state != WS_ALT_FIRING &&
++            !(type == WEAP_PROXIMITYBOMB && (state == WS_STOP_FIRING || state == WS_STOP_ALT_FIRING)))
++            return true;
++        const bool alternate = state == WS_ALT_FIRING || state == WS_STOP_ALT_FIRING;
++        if (player->m_InventoryMgr.CurrentWeapon(left) != weapon)
+             return true;
+-        const bool alternate = state == WS_ALT_FIRING;
+         next_seed_ = static_cast<DBYTE>(2 + random_() % 254);
+-        auto result = server.OnMessage(client, WeaponFire{position, direction, next_seed_, type, alternate, left});
++        auto result =
++            server.OnMessage(client, WeaponFire{position, direction, next_seed_, type, alternate, left, bomb_speed});
+         last_result = result;
+         if (result == FireResult::Fired)
+         {
+@@ -117,6 +121,15 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
+     };
+     const float time = engine.GetTime();
+     const bool primary = input.primary && input.left == left, alternate = input.alternate && input.left == left;
++    if (type == WEAP_PROXIMITYBOMB && state == WS_STOP_FIRING)
++    {
++        if (!PlayAnimation(stop_[0]))
++        {
++            PlayAnimation(draw_);
++            state = WS_DRAW;
++        }
++        idle_start_ = time;
++    }
+     // Client CMelee::UpdateFiringState chooses fire/fire2 while resting.
+     if (type == WEAP_MELEE && state == WS_REST)
+         fire_[0] = animation_index(*model, random_() % 2 ? "fire" : "fire2");
+@@ -229,6 +242,25 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
+         default:
+             break;
+     }
++    if (type == WEAP_PROXIMITYBOMB)
++    {
++        if (state == WS_START_FIRING)
++            bomb_start = time;
++        if (state == WS_FIRING)
++        {
++            bomb_held = time - bomb_start;
++            bomb_speed = 250 + 1500 * std::min(bomb_held / .75f, 1.f);
++            if (bomb_held > 1.25f)
++            {
++                bomb_speed = 0;
++                bomb_held = 0;
++                state = WS_STOP_FIRING;
++                animation.looping = false;
++            }
++        }
++        else
++            animation.looping = false;
++    }
+     last_firing_ = primary || alternate;
+     if (animation.animation == no_animation)
+         return true; // Original missing-animation fallback above.
+diff --git a/src/game/original/ViewWeapon.h b/src/game/original/ViewWeapon.h
+index 923a56c..a123237 100644
+--- a/src/game/original/ViewWeapon.h
++++ b/src/game/original/ViewWeapon.h
+@@ -30,6 +30,7 @@ class CViewWeapon
+     std::string last_key, pending_sound;
+     bool sound_indexed = false; // Request only; audio output is not ported.
+     std::uint64_t fire_keys = 0, shots = 0;
++    float bomb_start = 0, bomb_held = 0, bomb_speed = 1000;
+     FireResult last_result = FireResult::Invalid;
+ 
+   private:
+diff --git a/src/game/original/Weapon.cpp b/src/game/original/Weapon.cpp
+index 32c1e40..765e150 100644
+--- a/src/game/original/Weapon.cpp
++++ b/src/game/original/Weapon.cpp
+@@ -27,7 +27,10 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+     } reset{firing};
+     auto* server = BaseClass::GetServerDE();
+     if (!server || !m_pInventoryMgr || !server->IsObjectAlive(m_hOwner) || request.weapon != data.m_nType ||
+-        request.left != m_bLeftHand || !physics_vector(request.position) || !physics_vector(request.direction) ||
++        request.left != m_bLeftHand ||
++        (data.m_nType == WEAP_PROXIMITYBOMB && (!std::isfinite(request.projectile_speed) ||
++                                                request.projectile_speed < 0 || request.projectile_speed > 1750)) ||
++        !physics_vector(request.position) || !physics_vector(request.direction) ||
+         !std::isfinite(m_pInventoryMgr->damage_multiplier) || m_pInventoryMgr->damage_multiplier < 0 ||
+         m_pInventoryMgr->damage_multiplier > 1000)
+         return FireResult::Invalid;
+@@ -70,6 +73,12 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+     const auto trace = [&]()
+     {
+         auto aim_direction = direction;
++        if (data.m_nType == WEAP_PROXIMITYBOMB && request.alternate)
++        {
++            last_shot.direction = {0, -1, 0};
++            last_shot.collision = SegmentResult::Miss;
++            return server->GetObjectPos(m_hOwner, &last_shot.request.position) == DE_OK;
++        }
+         // Source FireSpread aligns the eye only for a player. NPCs fire the
+         // spread direction from their actual gun node (or body fallback).
+         if (const auto* player = dynamic_cast<CPlayerObj*>(server->HandleToObject(m_hOwner)))
+@@ -78,7 +87,8 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+             server->GetObjectPos(m_hOwner, &eye);
+             eye.y += player->eye_level;
+             last_shot.request.position = request.position;
+-            if (data.m_nType == WEAP_FLAREGUN || (data.m_nType == WEAP_ASSAULTRIFLE && request.alternate))
++            if (data.m_nType == WEAP_PROXIMITYBOMB || data.m_nType == WEAP_FLAREGUN ||
++                (data.m_nType == WEAP_ASSAULTRIFLE && request.alternate))
+             {
+                 SegmentHit close_hit;
+                 const auto close = server->IntersectSegment(eye, vector_add(eye, vector_scale(forward, 60)), m_hOwner,
+diff --git a/src/game/original/Weapon.h b/src/game/original/Weapon.h
+index 055cfd5..f29f288 100644
+--- a/src/game/original/Weapon.h
++++ b/src/game/original/Weapon.h
+@@ -137,6 +137,12 @@ class CGideonWind final : public CWeapon
+         return last_shot.result = FireResult::Unavailable;
+     }
+ };
++class CWeapProximityBomb final : public CWeapon
++{
++  public:
++    CWeapProximityBomb() : CWeapon(WEAP_PROXIMITYBOMB) {}
++    FireResult FireProjectile() override;
++};
+ class CBeretta final : public CWeapon
+ {
+   public:
+diff --git a/src/game/original/WeaponDefs.cpp b/src/game/original/WeaponDefs.cpp
+index e7f4b3c..af2ecda 100644
+--- a/src/game/original/WeaponDefs.cpp
++++ b/src/game/original/WeaponDefs.cpp
+@@ -2,6 +2,66 @@
+ namespace
+ {
+     constexpr WeaponData definitions[] = {
++        // ProximityBomb
++        {
++            "Models\\Weapons\\C4proximity_pv.abc",    // Model
++            "Models\\Weapons\\C4proximity_pv.abc",    // Model
++            "Skins\\Weapons\\C_C4prox_pv_t.dtx",      // Skin
++            "Models\\Powerups\\proximities_pu.abc",   // 3rd person model
++            "Skins\\Powerups\\proximities_pu.dtx",    // 3rd person skin
++            WEAP_PROXIMITYBOMB,                       // Type
++            TYPE_MELEE,                               // Fire type
++            AMMO_PROXIMITYBOMB,                       // Ammo type
++            1,                                        // Ammo Use
++            1,                                        // Alt Ammo Use
++            80.0f,                                    // Min Damage
++            120.0f,                                   // Max Damage
++            80.0f,                                    // Min Alt damage
++            120.0f,                                   // Max Alt damage
++            1.0f,                                     // Reload time
++            1.0f,                                     // Alt reload time
++            {0.0f, 0.0f},                             // Spread
++            {0.0f, 0.0f},                             // Alt Spread
++            1000.0f,                                  // Projectile Velocity
++            0.0f,                                     // Alt Projectile Velocity
++            2000.0f,                                  // Range
++            0.0f,                                     // Alt Range
++            1,                                        // Shots per fire
++            1,                                        // Alt Shots per fire
++            1,                                        // Strength or Magic required
++            0,                                        // Two-handed Strength or Magic required
++            250,                                      // Damage Radius (projectiles)
++            250,                                      // Alt Damage Radius (projectiles)
++            DFALSE,                                   // Alt fire zoom
++            DFALSE,                                   // Semi-auto
++            "Sounds\\Weapons\\proximities\\fire.wav", // Fire sound
++            "Sounds\\Weapons\\proximities\\alt.wav",  // Alt Fire sound
++            "",                                       // Empty weapon sound
++            "",                                       // Alt Empty weapon sound
++            "CProximityBomb",                         // Projectile class
++            "CProximityBomb",                         // Alt Projectile class
++            368,                                      // Muzzle Flash radius
++            {0.0f, 0.0f, 0.0f},                       // Muzzle Flash color
++            "Proximity Bomb",                         // Name
++            0,                                        // Name ID (resource)
++            "",                                       // flash sprite name
++            "",                                       // alt flash Sprite name
++            0.25f,                                    // Flash duration
++            0.0f,                                     // Flash scale
++            {0.0f, 0.0f, 0.0f},                       // 3rd person gun offset
++            {-0.7f, 0.0f, 2.4f},                      // Gun Offset
++            {0.0f, 0.375f, 12.0f},                    // Muzzle Offset
++            {0.03f, 0.03f, 0.15f},                    // Recoil
++            {3.0f, -7.5f, 5.0f},                      // Flash position
++            0.0f,                                     // Eject interval
++            0.0f,                                     // View kick
++            DFALSE,                                   // View kick is Cumulative
++            DTRUE,                                    // Animation looping
++            DFALSE,                                   // Alt anim looping
++            nullptr,                                  // Icon for status bar
++            nullptr,                                  // Highlighted icon for status bar
++        },
++
+         // M16 Assault Rifle
+         {
+             "Models\\Weapons\\M16_pv.abc",              // Model
+diff --git a/src/game/original/WeaponDefs.h b/src/game/original/WeaponDefs.h
+index 8da42f2..13010cb 100644
+--- a/src/game/original/WeaponDefs.h
++++ b/src/game/original/WeaponDefs.h
+@@ -3,7 +3,9 @@
+ // Selected original definitions; complete source fields, base-game weapon numbering.
+ inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_FLAREGUN = 3, WEAP_ASSAULTRIFLE = 9,
+                        WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38, WEAP_ZEALOT_ENERGYBLAST = 27, WEAP_SOUL_HOOK = 23,
+-                       WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42;
++                       WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42, WEAP_PROXIMITYBOMB = 49;
++inline constexpr DBYTE AMMO_PROXIMITYBOMB = 10;
++inline constexpr unsigned inventory_weapon_slots = 13;
+ inline constexpr DBYTE TYPE_RIFLE = 0, TYPE_AUTORIFLE = 1, TYPE_PISTOL = 2, TYPE_MELEE = 4, TYPE_MAGIC = 8,
+                        AMMO_NONE = 0, AMMO_BULLET = 1, AMMO_SHELL = 2, AMMO_BMG = 3, AMMO_FLARE = 4, AMMO_DIEBUGDIE = 5;
+ inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_MAC10 = 354, IDS_WEAPON_FLAREGUN = 355,
+diff --git a/src/game/original/WeaponProjectile.cpp b/src/game/original/WeaponProjectile.cpp
+index b4775c6..eba817c 100644
+--- a/src/game/original/WeaponProjectile.cpp
++++ b/src/game/original/WeaponProjectile.cpp
+@@ -23,7 +23,9 @@ FireResult CWeapon::FireProjectile()
+         return last_shot.result = FireResult::Unavailable;
+     }
+     if (!instance->Setup(last_shot.direction, data.m_nType, last_shot.damage * m_pInventoryMgr->damage_multiplier,
+-                         alt ? data.m_fAltProjVelocity : data.m_fProjVelocity,
++                         data.m_nType == WEAP_PROXIMITYBOMB
++                             ? (alt ? data.m_fAltProjVelocity : last_shot.request.projectile_speed)
++                             : (alt ? data.m_fAltProjVelocity : data.m_fProjVelocity),
+                          alt ? data.m_nAltDamageRadius : data.m_nDamageRadius, m_hOwner))
+     {
+         projectile_error = instance->error;
+diff --git a/src/game/projectile_report.h b/src/game/projectile_report.h
+index 6017766..254325c 100644
+--- a/src/game/projectile_report.h
++++ b/src/game/projectile_report.h
+@@ -13,7 +13,9 @@ namespace OpenBlood2
+         DVector query_from{}, query_to{}, blast_position{}, blast_normal{};
+         SegmentResult query = SegmentResult::Unavailable;
+         unsigned candidates = 0, in_radius = 0;
+-        bool grenade = false;
++        bool grenade = false, proximity = false, armed = false, hit_character = false;
++        std::uint64_t scans = 0;
++        std::string audio_error;
+         int bounces_left = 0;
+         unsigned explosions = 0;
+         std::uint64_t contacts = 0;
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 4400c4e..bd3ccf1 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -29,6 +29,7 @@
+ #include "game/original/PathPoint.h"
+ #include "game/original/PowerupPickups.h"
+ #include "game/original/Projectile.h"
++#include "game/original/ProximityBomb.h"
+ #include "game/original/RandomSoundFX.h"
+ #include "game/original/RotatingBrush.h"
+ #include "game/original/RotatingDoor.h"
+@@ -97,6 +98,7 @@ namespace OpenBlood2
+             {{"Filename", std::string{}}, {"Skin", std::string{}}, {"Flags", std::int32_t(FLAG_VISIBLE)}}};
+         const ClassInfo shockwave_projectile{
+             "CBehemothShockwaveProjectile", &base, construct<CBehemothShockwaveProjectile>, {}};
++        const ClassInfo proximity{"CProximityBomb", &base, construct<CProximityBomb>, {}};
+         const ClassInfo grenade{"CGrenade", &base, construct<CGrenade>, {}};
+         const ClassInfo flare_projectile{"CFlareProjectile", &base, construct<CFlareProjectile>, {}};
+         const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {}};
+@@ -502,6 +504,8 @@ namespace OpenBlood2
+                                {{"PickupTriggerTarget", std::string{}}, {"PickupTriggerMessage", std::string{}}}};
+         const ClassInfo item_pickup{"ItemPickup", &pickup, construct<ItemPickup>, {}};
+         const ClassInfo charged_pickup{"ItemPickupCharged", &item_pickup, construct<ItemPickupCharged>, {}};
++        const ClassInfo item_weapon{"ItemPickupWeapon", &item_pickup, construct<ItemPickupWeapon>, {}};
++        const ClassInfo proximity_pickup{"ProximitiesPU", &item_weapon, construct<ProximitiesPU>, {}};
+         const ClassInfo medkit_pickup{"MedKitPU", &charged_pickup, construct<MedKitPU>, {}};
+         const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}};
+         const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
+@@ -824,7 +828,8 @@ namespace OpenBlood2
+                objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
+                objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
+                objects.register_class(key_pickup) && objects.register_class(pickup) &&
+-               objects.register_class(item_pickup) && objects.register_class(charged_pickup) &&
++               objects.register_class(item_pickup) && objects.register_class(item_weapon) &&
++               objects.register_class(proximity_pickup) && objects.register_class(charged_pickup) &&
+                objects.register_class(medkit_pickup) && objects.register_class(weapon_pickup) &&
+                objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
+                objects.register_class(flare_pickup) && objects.register_class(mac10_pickup) &&
+@@ -842,7 +847,7 @@ namespace OpenBlood2
+                objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+                objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
+                objects.register_class(world_debris) && objects.register_class(hand_model) &&
+-               objects.register_class(corpse) && objects.register_class(grenade) &&
++               objects.register_class(corpse) && objects.register_class(proximity) && objects.register_class(grenade) &&
+                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
+                objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
+                objects.register_class(shockwave_projectile);
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 91a30ca..d56c33d 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -269,7 +269,7 @@ namespace OpenBlood2
+         DRESULT SetAcceleration(HOBJECT, DVector*) override;
+         bool advance_physics(double seconds);
+         bool advance_projectiles(double seconds);
+-        bool AdvanceGrenade(HOBJECT, double seconds) override;
++        bool AdvanceModelProjectile(HOBJECT, double seconds) override;
+         void RecordProjectile(const ProjectileReport&) override;
+         std::vector<ProjectileReport> projectile_reports;
+         CollisionWorld* collision = nullptr;
+diff --git a/src/game/server_pickups.cpp b/src/game/server_pickups.cpp
+index beb525e..c4e651d 100644
+--- a/src/game/server_pickups.cpp
++++ b/src/game/server_pickups.cpp
+@@ -60,7 +60,7 @@ namespace OpenBlood2
+             return DE_INVALIDPARAMS;
+         const auto limit = value.kind == PickupKind::Ammo     ? 8
+                            : value.kind == PickupKind::Weapon ? 255
+-                           : value.kind == PickupKind::Item   ? 1
++                           : value.kind == PickupKind::Item   ? 7
+                                                               : 4;
+         const auto request = value.kind == PickupKind::Ammo     ? add_ammo_message
+                              : value.kind == PickupKind::Weapon ? add_weapon_message
+@@ -73,7 +73,8 @@ namespace OpenBlood2
+             !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit ||
+             (value.kind == PickupKind::Weapon && !WeaponPickupClass(value.type)) || !std::isfinite(value.amount) ||
+             value.amount < 0 || value.amount > 1e6f ||
+-            (value.kind == PickupKind::Item && (value.amount > 255 || std::floor(value.amount) != value.amount)))
++            (value.kind == PickupKind::Item &&
++             ((value.type != 1 && value.type != 7) || value.amount > 255 || std::floor(value.amount) != value.amount)))
+         {
+             m->bad = true;
+             return DE_INVALIDPARAMS;
+diff --git a/src/game/server_projectiles.cpp b/src/game/server_projectiles.cpp
+index dba4e33..c6c7476 100644
+--- a/src/game/server_projectiles.cpp
++++ b/src/game/server_projectiles.cpp
+@@ -1,15 +1,20 @@
+ #include "game/original/Grenade.h"
+ #include "game/original/Projectile.h"
++#include "game/original/ProximityBomb.h"
+ #include "game/server_adapter.h"
+ #include <algorithm>
+ #include <cmath>
+ namespace OpenBlood2
+ {
+-    bool ServerAdapter::AdvanceGrenade(HOBJECT h, double seconds)
++    bool ServerAdapter::AdvanceModelProjectile(HOBJECT h, double seconds)
+     {
+-        trace_service("AdvanceGrenade");
++        trace_service("AdvanceModelProjectile");
+         auto* record = objects_.get(h);
+-        auto* grenade = record && record->life == Life::Alive ? dynamic_cast<CGrenade*>(record->game.get()) : nullptr;
++        auto* grenade =
++            record && record->life == Life::Alive ? dynamic_cast<CProjectile*>(record->game.get()) : nullptr;
++        auto* bomb = dynamic_cast<CProximityBomb*>(grenade);
++        if (!dynamic_cast<CGrenade*>(grenade) && !bomb)
++            return false;
+         if (!grenade || !grenade->configured || moving_ || objects_.busy() || !collision || !collision_ready ||
+             !std::isfinite(seconds) || seconds <= 0 || seconds > .5 || record->attachment ||
+             record->state.m_ObjectType != OT_MODEL || !record->model || !physics_vector(record->velocity) ||
+@@ -28,7 +33,8 @@ namespace OpenBlood2
+         const auto ids = objects_.snapshot();
+         const auto steps = static_cast<unsigned>(std::max(1.0, std::ceil(seconds * 120)));
+         const float dt = static_cast<float>(seconds / steps);
+-        for (unsigned step = 0; step < steps && record->life == Life::Alive && !grenade->m_bExplode; ++step)
++        for (unsigned step = 0;
++             step < steps && record->life == Life::Alive && !grenade->m_bExplode && (!bomb || !bomb->armed); ++step)
+         {
+             ContainerPhysics physics{
+                 h,    record->velocity, record->acceleration, dt, (record->state.m_Flags & FLAG_GRAVITY) != 0, false,
+@@ -98,7 +104,10 @@ namespace OpenBlood2
+                 SegmentHit contact{hit.point, hit.normal, hit.object, hit.polygon, hit.fraction, hit.texture_flags};
+                 grenade->contact = contact;
+                 grenade->contacted = true;
+-                ++grenade->contacts;
++                if (auto* g = dynamic_cast<CGrenade*>(grenade))
++                    ++g->contacts;
++                if (bomb)
++                    ++bomb->contacts;
+                 grenade->HandleContact(contact);
+                 auto* target = objects_.get(hit.object);
+                 if (record->life == Life::Alive && target && target->life == Life::Alive &&
+@@ -138,9 +147,9 @@ namespace OpenBlood2
+                 const bool was_contact = projectile->contacted;
+                 ok = projectile->AdvanceFlight(seconds) && ok;
+                 const auto* target = objects_.get(projectile->m_hHitObject);
+-                if (!dynamic_cast<CGrenade*>(projectile) && !was_contact && projectile->contacted &&
+-                    record->life == Life::Alive && target && target->life == Life::Alive &&
+-                    (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
++                if (!dynamic_cast<CGrenade*>(projectile) && !dynamic_cast<CProximityBomb*>(projectile) &&
++                    !was_contact && projectile->contacted && record->life == Life::Alive && target &&
++                    target->life == Life::Alive && (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
+                     objects_.engine_message(target->handle, MID_TOUCHNOTIFY, record->handle);
+             }
+         }
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index c80fb2b..19caba9 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -344,7 +344,13 @@ namespace OpenBlood2
+         }
+         auto& inventory = player->m_InventoryMgr;
+         const auto previous = inventory.m_nCurWeaponSlot;
+-        inventory.ChangeWeaponSlot(slot);
++        const auto changed =
++            slot == 10 ? inventory.SelectInventoryWeapon(WEAP_PROXIMITYBOMB) : inventory.ChangeWeaponSlot(slot);
++        if (changed != InventoryResult::Ok && changed != InventoryResult::Current)
++        {
++            error = "Inventory weapon has no ammo";
++            return false;
++        }
+         if (!client_shell.SyncWeapons(models, resources, server_shell, error))
+         {
+             inventory.ChangeWeaponSlot(previous);
+diff --git a/src/game/weapon_messages.h b/src/game/weapon_messages.h
+index 9c7043c..bfda67e 100644
+--- a/src/game/weapon_messages.h
++++ b/src/game/weapon_messages.h
+@@ -9,6 +9,7 @@ namespace OpenBlood2
+         DVector position{}, direction{0, 0, 1};
+         DBYTE seed = 2, weapon = 1;
+         bool alternate = false, left = false;
++        float projectile_speed = 1000; // Original FIREMSG_SPECIAL_FLOAT for inventory bombs only.
+     };
+     enum class DamageType : DBYTE
+     {
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 4671073..8e2d122 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1643,3 +1643,25 @@ if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+         --frames 20 --capture "${CMAKE_CURRENT_BINARY_DIR}/sky-app.png")
+     set_tests_properties(gpu.sky_app PROPERTIES LABELS "gpu;private;sky" TIMEOUT 45 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+ endif()
++
++add_executable(proximity_tests proximity_tests.cpp)
++target_link_libraries(proximity_tests PRIVATE blood2_game)
++blood2_project_options(proximity_tests)
++foreach(case rules contacts motion lifetime inventory restore ai_delay reentrant)
++    add_test(NAME proximity.${case} COMMAND proximity_tests ${case} "${CMAKE_CURRENT_BINARY_DIR}/proximity-fixtures/${case}")
++    set_tests_properties(proximity.${case} PROPERTIES LABELS "headless;proximity" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case private private_fire)
++        add_test(NAME proximity.${case} COMMAND proximity_tests ${case} "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(proximity.${case} PROPERTIES LABELS "headless;private;proximity" TIMEOUT 180)
++    endforeach()
++endif()
++
++if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
++    add_executable(proximity_gpu_tests proximity_gpu_tests.cpp ../src/app/model_scene.cpp)
++    target_link_libraries(proximity_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(proximity_gpu_tests)
++    add_test(NAME gpu.proximity_private COMMAND proximity_gpu_tests "${BLOOD2_TEST_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/proximity-")
++    set_tests_properties(gpu.proximity_private PROPERTIES LABELS "gpu;private;proximity" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++endif()
+diff --git a/tests/assault_tests.cpp b/tests/assault_tests.cpp
+index 60be17b..10397ba 100644
+--- a/tests/assault_tests.cpp
++++ b/tests/assault_tests.cpp
+@@ -446,7 +446,7 @@ bool private_game(const std::filesystem::path& root)
+         }
+         std::cout << "CityHub M16=" << assault << " created=" << created << " unknown=" << unknown
+                   << " failed=" << failed << '\n';
+-        CHECK(assault == 1 && created == 448 && unknown == 5 && failed == 1);
++        CHECK(assault == 1 && created == 450 && unknown == 3 && failed == 1);
+         CHECK(g.unload_world());
+         // Labelled arena uses actual private models/audio, with controlled geometry.
+         auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
+diff --git a/tests/audio_stream_tests.cpp b/tests/audio_stream_tests.cpp
+index 90b90ae..a761ef6 100644
+--- a/tests/audio_stream_tests.cpp
++++ b/tests/audio_stream_tests.cpp
+@@ -295,7 +295,7 @@ namespace
+             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
+                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
+                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
+-            CHECK(created == 448 && transferred == 31 && unknown == 5 && failed == 1 && fx == 5 && fx_voices == 4);
++            CHECK(created == 450 && transferred == 31 && unknown == 3 && failed == 1 && fx == 5 && fx_voices == 4);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_bytes());
+         }
+diff --git a/tests/compound_shell_tests.cpp b/tests/compound_shell_tests.cpp
+index 00615f1..dde8ec2 100644
+--- a/tests/compound_shell_tests.cpp
++++ b/tests/compound_shell_tests.cpp
+@@ -229,7 +229,7 @@ namespace
+             }
+             std::cout << "CityHub: " << created << " created / " << transferred << " sounds / " << unknown
+                       << " unsupported / " << failed << " failed\n";
+-            CHECK(created == 448 && transferred == 31 && unknown == 5 && failed == 1);
++            CHECK(created == 450 && transferred == 31 && unknown == 3 && failed == 1);
+             WorldMesh mesh;
+             CHECK(mesh.build(g.world, error, &g.resources));
+             if (gpu)
+diff --git a/tests/conversation_tests.cpp b/tests/conversation_tests.cpp
+index 51cd46d..be3775d 100644
+--- a/tests/conversation_tests.cpp
++++ b/tests/conversation_tests.cpp
+@@ -257,7 +257,7 @@ namespace
+             for (auto id : g.objects.snapshot())
+                 if (auto* c = dynamic_cast<ConversationTrigger*>(g.objects.get(id)->game.get()))
+                     conversation = c;
+-            CHECK(created == 448 && unknown == 5 && failed == 1 && conversation);
++            CHECK(created == 450 && unknown == 3 && failed == 1 && conversation);
+             std::cout << "CityHub conversation count=" << conversation->count << " file=" << conversation->waves[0]
+                       << " mapped=" << bool(conversation_text(conversation->waves[0])) << '\n';
+             g.server_shell.start_point_name = "01_egressa";
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+index bb142b1..70e0a7c 100644
+--- a/tests/destructable_model_tests.cpp
++++ b/tests/destructable_model_tests.cpp
+@@ -313,7 +313,7 @@ namespace
+             std::cout << "CityHub model initialization: " << count << " models / " << pushable << " pushable / "
+                       << gravity << " gravity / " << ground_misses << " ground misses\n";
+             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
+-            CHECK(created == 448 && unknown == 5 && failed == 1);
++            CHECK(created == 450 && unknown == 3 && failed == 1);
+             CHECK(update_model_scene(g, scene, error));
+             unsigned skin_failures = 0, triangles = 0;
+             for (auto id : ids)
+diff --git a/tests/flare_tests.cpp b/tests/flare_tests.cpp
+index 382bea7..b7b9d25 100644
+--- a/tests/flare_tests.cpp
++++ b/tests/flare_tests.cpp
+@@ -413,7 +413,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unsupported=" << unknown << " failed=" << failed
+                   << " flare NPCs=" << flare << '\n';
+-        CHECK(created == 448 && unknown == 5 && failed == 1 && flare == 1);
++        CHECK(created == 450 && unknown == 3 && failed == 1 && flare == 1);
+         CHECK(g.unload_world());
+         return true;
+     }
+diff --git a/tests/level_change_gpu_tests.cpp b/tests/level_change_gpu_tests.cpp
+index 97c3f44..85f40e6 100644
+--- a/tests/level_change_gpu_tests.cpp
++++ b/tests/level_change_gpu_tests.cpp
+@@ -99,7 +99,7 @@ int main(int argc, char** argv)
+         CHECK(game->server.SendWorldExit({"02_CityHub"}, "01_egressa") == DE_OK && game->pump_player_messages(error));
+         CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+         CHECK(game.get() == before && game->client_shell.player == old_player && game->world_revision == revision);
+-        CHECK(game->level_change.unknown == 5 && game->level_change.failed == 1 && game->server.audio.has_output());
++        CHECK(game->level_change.unknown == 3 && game->level_change.failed == 1 && game->server.audio.has_output());
+         CHECK(game->server.SendWorldExit({"01_SubwayA"}, "start") == DE_OK && game->pump_player_messages(error));
+         CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Committed);
+         CHECK(game.get() != before && game->client_shell.player != old_player && game->server.audio.has_output());
+diff --git a/tests/mac10_tests.cpp b/tests/mac10_tests.cpp
+index 4b08580..3a82035 100644
+--- a/tests/mac10_tests.cpp
++++ b/tests/mac10_tests.cpp
+@@ -263,7 +263,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unknown=" << unknown << " failed=" << failed << " Mac10=" << mac
+                   << '\n';
+-        CHECK(mac == 1 && created == 448 && unknown == 5 && failed == 1);
++        CHECK(mac == 1 && created == 450 && unknown == 3 && failed == 1);
+         for (auto id : g.objects.snapshot())
+             if (auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(g.objects.get(id)->handle));
+                 a && a->runtime_failed)
+diff --git a/tests/medkit_tests.cpp b/tests/medkit_tests.cpp
+index 999efb3..0fed3ea 100644
+--- a/tests/medkit_tests.cpp
++++ b/tests/medkit_tests.cpp
+@@ -291,7 +291,7 @@ namespace
+                 unknown += entry.state == EntryState::Unsupported;
+                 failed += entry.state == EntryState::Failed;
+             }
+-            CHECK(created == 448 && unknown == 5 && failed == 1);
++            CHECK(created == 450 && unknown == 3 && failed == 1);
+             for (auto id : g.objects.snapshot())
+                 if (dynamic_cast<MedKitPU*>(g.objects.get(id)->game.get()))
+                     h = g.objects.get(id)->handle;
+diff --git a/tests/particle_stream_tests.cpp b/tests/particle_stream_tests.cpp
+index 1088c60..6129fc7 100644
+--- a/tests/particle_stream_tests.cpp
++++ b/tests/particle_stream_tests.cpp
+@@ -296,7 +296,7 @@ namespace
+                 unknown += entry.state == EntryState::Unsupported;
+                 failed += entry.state == EntryState::Failed;
+             }
+-            CHECK(created == 448 && unknown == 5 && failed == 1);
++            CHECK(created == 450 && unknown == 3 && failed == 1);
+             auto& streams = g.server.particle_streams;
+             CHECK(streams.active.size() == 8 && !streams.failed);
+             unsigned initial = 0;
+diff --git a/tests/pickup_tests.cpp b/tests/pickup_tests.cpp
+index b5ad7c5..7173644 100644
+--- a/tests/pickup_tests.cpp
++++ b/tests/pickup_tests.cpp
+@@ -403,6 +403,12 @@ namespace
+                               gun->value.amount == 50 && gun->resource_id == IDS_WEAPON_M16);
+                         std::cout << "Authored AssaultRiflePU: " << path << '\n';
+                     }
++                    if (source.class_name == "ProximitiesPU")
++                    {
++                        auto* bomb = dynamic_cast<PickupObject*>(g.objects.get(h)->game.get());
++                        CHECK(bomb && bomb->value.kind == PickupKind::Item && bomb->value.type == 7 &&
++                              bomb->value.amount == 1 && bomb->resource_id == 306);
++                    }
+                     missing += !g.objects.get(h)->model;
+                 }
+                 CHECK(g.objects.clear() && AmmoPickup::m_dwNumPickups == 0);
+@@ -434,8 +440,9 @@ namespace
+             rejected += n;
+         }
+         CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2 &&
+-              counts["AssaultRiflePU"] == 5 && counts["MedKitPU"] == 22);
+-        CHECK(worlds == 57 && created == 1290 && missing == 0 && rejected == 178 && spawns == 60);
++              counts["AssaultRiflePU"] == 5 && counts["MedKitPU"] == 22 && counts["ProximitiesPU"] == 161);
++        CHECK(failures["ProximitiesPU: invalid property TypeAction"] == 28);
++        CHECK(worlds == 57 && created == 1423 && missing == 0 && rejected == 206 && spawns == 60);
+         return true;
+     }
+ } // namespace
+diff --git a/tests/proximity_fixture.h b/tests/proximity_fixture.h
+new file mode 100644
+index 0000000..e6da6a3
+--- /dev/null
++++ b/tests/proximity_fixture.h
+@@ -0,0 +1,60 @@
++#pragma once
++#include "assault_fixture.h"
++#include "game/original/ItemPickups.h"
++#include "game/original/ProximityBomb.h"
++namespace test_proximity
++{
++    using namespace OpenBlood2;
++    inline bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        if (!test_assault::setup(g, root))
++            return false;
++        test_player::Directory dir;
++        for (auto name : {"c4proximity_pv.abc"})
++            dir.children["models"].children["weapons"].files[name] = test_model::abc(true).b;
++        dir.children["skins"].children["weapons"].files["c_c4prox_pv_t.dtx"] = {1, 2, 3};
++        dir.children["models"].children["powerups"].files["proximities_pu.abc"] = test_model::abc(true).b;
++        dir.children["skins"].children["powerups"].files["proximities_pu.dtx"] = {1, 2, 3};
++        dir.children["models"].children["ammo"].files["c4.abc"] = test_model::abc(true).b;
++        dir.children["skins"].children["ammo"].files["c4_prox.dtx"] = {1, 2, 3};
++        for (auto name : {"fire.wav", "alt.wav", "arm.wav", "detect.wav", "stick.wav", "explode.wav"})
++            dir.children["sounds"].children["weapons"].children["proximities"].files[name] = test_audio::wave();
++        dir.children["sounds"].children["weapons"].children["time"].files["explode.wav"] = test_audio::wave();
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [offset, size] = test_player::write_dir(w, dir);
++        w.patch(131, offset);
++        w.patch(135, size);
++        auto file = root / "proximity.rez";
++        std::ofstream out(file, std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        std::string error;
++        return g.resources.mount(file, error);
++    }
++    inline CProximityBomb* bomb(GameSession& g, DVector p, DVector direction = {0, 0, 1}, float speed = 0,
++                                HOBJECT owner = nullptr)
++    {
++        ObjectCreateStruct s;
++        s.m_Pos = p;
++        legacy_copy(s.m_Name, "Proximity probe");
++        auto* b = dynamic_cast<CProximityBomb*>(g.server.CreateObject(g.server.GetClass("CProximityBomb"), &s));
++        if (!b || !b->Setup(direction, 49, 100, speed, 250, owner ? owner : g.client_shell.player))
++            return nullptr;
++        return b;
++    }
++    inline bool equip(GameSession& g, unsigned count = 3)
++    {
++        auto* p = g.server_shell.Player(g.local_client);
++        if (!p)
++            return false;
++        if (p->m_InventoryMgr.AddInventoryWeapon(7, static_cast<DBYTE>(count)) != InventoryResult::Ok)
++            return false;
++        std::string error;
++        return g.select_weapon(10, error);
++    }
++} // namespace test_proximity
+diff --git a/tests/proximity_gpu_tests.cpp b/tests/proximity_gpu_tests.cpp
+new file mode 100644
+index 0000000..15d9307
+--- /dev/null
++++ b/tests/proximity_gpu_tests.cpp
+@@ -0,0 +1,126 @@
++#include "app/model_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "proximity_fixture.h"
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x " " << error << " " << SDL_GetError() << '\n';                            \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string error;
++    Runtime runtime;
++    CHECK(runtime.initialize(true, error));
++    GameSession g;
++    CHECK(g.initialize());
++    Config cfg;
++    cfg.data_dir = argv[1];
++    CHECK(g.resources.mount_game(cfg, error));
++    WorldRenderer renderer(runtime.gpu);
++    ModelView scene;
++    for (unsigned cycle = 0; cycle < 2; ++cycle)
++    {
++        CHECK(g.request_world("01_subwaya", error) && g.enter_player(error) && test_camera::complete_subway_intro(g));
++        CHECK(test_proximity::equip(g));
++        for (unsigned i = 0; i < 100; ++i)
++            CHECK(g.step(.01));
++        CHECK(update_model_scene(g, scene, error) && scene.close_draws.size() == 1);
++        unsigned close = 0;
++        for (const auto& e : scene.entries)
++            if (e.close)
++            {
++                CHECK(e.visible && e.triangles > 0 && e.error.empty() && e.skin.find("C4prox") != std::string::npos);
++                ++close;
++            }
++        CHECK(close == 1);
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480));
++        CHECK(
++            renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480, error, true));
++        const auto& view = g.client_shell.view;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(commands && renderer.draw(commands, capture.texture, scene.mesh, scene.close_draws, view.position,
++                                        view.rotation, false, error));
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        CHECK(copy);
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 640;
++        region.h = 480;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 640;
++        target.rows_per_layer = 480;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        CHECK(SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(runtime.gpu));
++        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        unsigned left = 0, right = 0;
++        for (unsigned y = 0; y < 480; ++y)
++            for (unsigned x = 0; x < 640; ++x)
++            {
++                const auto* p = pixels + (y * 640 + x) * 4;
++                if (p[0] != pixels[0] || p[1] != pixels[1] || p[2] != pixels[2])
++                    (x < 320 ? left : right)++;
++            }
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        std::cout << "Proximity view GPU cycle=" << cycle << " left pixels=" << left << " right pixels=" << right
++                  << '\n';
++        CHECK(left + right > 100);
++        CHECK(capture.save((std::string(argv[2]) + std::to_string(cycle) + ".png").c_str()));
++        // Render the actual independent grenade model, with the rest hidden.
++        const auto camera_position = view.position;
++        const auto camera_rotation = view.rotation;
++        auto* grenade = test_proximity::bomb(g, vector_add(camera_position, rotate_vector(camera_rotation, {0, 0, 25})),
++                                             {0, 0, 1}, 0);
++        CHECK(grenade);
++        const auto handle = grenade->m_hObject;
++        for (auto id : g.objects.snapshot())
++        {
++            auto* record = g.objects.get(id);
++            if (record->handle != handle)
++                g.server.SetObjectFlags(record->handle, record->state.m_Flags & ~FLAG_VISIBLE);
++        }
++        const auto clock = g.objects.time();
++        CHECK(update_model_scene(g, scene, error) && scene.world_draws.size() == 1);
++        CHECK(
++            renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480, error, true));
++        commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(commands && renderer.draw(commands, capture.texture, scene.mesh, scene.world_draws, camera_position,
++                                        camera_rotation, false, error));
++        copy = SDL_BeginGPUCopyPass(commands);
++        CHECK(copy);
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        CHECK(SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(runtime.gpu));
++        pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        unsigned grenade_pixels = 0;
++        for (unsigned i = 1; i < 640 * 480; ++i)
++            if (pixels[i * 4] != pixels[0] || pixels[i * 4 + 1] != pixels[1] || pixels[i * 4 + 2] != pixels[2])
++                ++grenade_pixels;
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        CHECK(grenade_pixels > 5 && g.objects.time() == clock && grenade->flight_steps == 0);
++        std::cout << "Proximity world GPU cycle=" << cycle << " pixels=" << grenade_pixels << '\n';
++        CHECK(capture.save((std::string(argv[2]) + std::to_string(cycle) + "-bomb.png").c_str()));
++        g.server.SetObjectFlags(handle, g.server.GetObjectFlags(handle) & ~FLAG_VISIBLE);
++        CHECK(update_model_scene(g, scene, error) && scene.world_draws.empty());
++        CHECK(g.objects.remove(handle) && g.objects.finish_frame() && !g.objects.get(handle));
++        CHECK(g.unload_world() && update_model_scene(g, scene, error) && scene.close_draws.empty() &&
++              scene.entries.empty());
++        renderer.clear_geometry();
++        scene.clear();
++        CHECK(g.server.audio.voices().empty() && g.objects.attachments().empty());
++    }
++}
+diff --git a/tests/proximity_tests.cpp b/tests/proximity_tests.cpp
+new file mode 100644
+index 0000000..4411cff
+--- /dev/null
++++ b/tests/proximity_tests.cpp
+@@ -0,0 +1,401 @@
++#include "app/movement_controls.h"
++#include "brush_fixture.h"
++#include "game/original/CultistAI.h"
++#include "proximity_fixture.h"
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ":" << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool advance(GameSession& g, double t)
++    {
++        return g.objects.advance(t) && g.objects.finish_frame();
++    }
++    void place(GameSession& g, HOBJECT h, DVector p)
++    {
++        g.server.TeleportObject(h, &p);
++    }
++    struct OwnerProbe : AI_Mgr
++    {
++        DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
++        {
++            if (m == MID_INITIALUPDATE)
++                m_damage.Init(m_hObject);
++            return BaseClass::EngineMessageFn(m, d, f);
++        }
++    };
++    bool ai_delay(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_proximity::setup(g, root));
++        static const ClassInfo type{"BombAIProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<OwnerProbe>(); },
++                                    {}};
++        CHECK(g.objects.register_class(type));
++        ObjectCreateStruct state;
++        state.m_Pos = {1000, 300, 0};
++        auto owner = g.objects.create(&type, state);
++        CHECK(owner);
++        place(g, g.client_shell.player, {0, 300, 225});
++        auto* b = test_proximity::bomb(g, {0, 300, 0}, {0, 0, 1}, 0, owner);
++        CHECK(b);
++        b->HandleContact({{}, {0, 1, 0}, nullptr, 0});
++        CHECK(advance(g, 1.99) && b->get_away == 2 && !b->m_bExplode);
++        CHECK(advance(g, .02) && b->m_bExplode);
++        auto child = b->m_hObject;
++        CHECK(g.objects.remove(owner) && g.objects.remove(g.client_shell.player) && g.objects.finish_frame());
++        CHECK(g.objects.get(child) && b->m_hFiredFrom == nullptr);
++        CHECK(advance(g, .51) && !g.objects.get(child) && g.server.projectile_reports.back().outcome == "exploded");
++        return true;
++    }
++    struct RemovingCharacter : CBaseCharacter
++    {
++        DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
++        {
++            if (m == MID_INITIALUPDATE)
++            {
++                m_damage.Init(m_hObject);
++                m_damage.SetHitPoints(1000);
++            }
++            return BaseClass::EngineMessageFn(m, d, f);
++        }
++        DDWORD ObjectMessageFn(HOBJECT sender, DDWORD m, HMESSAGEREAD read) override
++        {
++            auto result = BaseClass::ObjectMessageFn(sender, m, read);
++            if (m == damage_message)
++            {
++                g_pServerDE->RemoveObject(sender);
++                g_pServerDE->RemoveObject(m_hObject);
++            }
++            return result;
++        }
++    };
++    bool reentrant(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_proximity::setup(g, root));
++        auto* b = test_proximity::bomb(g, {0, 300, 0});
++        CHECK(b);
++        const auto h = b->m_hObject;
++        static const ClassInfo type{"BombRemovalProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass>
++                                    { return std::make_unique<RemovingCharacter>(); },
++                                    {}};
++        CHECK(g.objects.register_class(type));
++        ObjectCreateStruct state;
++        state.m_Pos = {0, 300, 0};
++        const auto target = g.objects.create(&type, state);
++        CHECK(target);
++        b->m_bExplode = b->hit_character = true;
++        CHECK(advance(g, .002) && !g.objects.get(h) && !g.objects.get(target));
++        CHECK(!g.server.projectile_reports.empty() && g.server.projectile_reports.back().cancelled);
++        CHECK(g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++    bool rules(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_proximity::setup(g, root));
++        auto* b = test_proximity::bomb(g, {0, 300, 0});
++        CHECK(b);
++        auto h = b->m_hObject;
++        place(g, g.client_shell.player, {1000, 300, 0});
++        CHECK(advance(g, 11) && g.objects.get(h)); // override has no base ten-second fuse
++        b->HandleContact({{0, 300, 0}, {0, 1, 0}, nullptr, 0});
++        CHECK(b->armed && !(g.server.GetObjectFlags(h) & FLAG_GRAVITY) && b->sounds == 1);
++        CHECK(advance(g, .749) && b->scans == 0);
++        CHECK(advance(g, .002) && b->scans == 1 && b->sounds == 2 && !b->m_bExplode);
++        place(g, g.client_shell.player, {225.01f, 300, 0});
++        CHECK(advance(g, .01) && !b->m_bExplode);
++        place(g, g.client_shell.player, {225, 300, 0});
++        CHECK(advance(g, .01) && b->m_bExplode && b->detected == g.client_shell.player);
++        CHECK(advance(g, .49) && g.objects.get(h) && b->sounds == 3);
++        CHECK(advance(g, .02) && !g.objects.get(h));
++        CHECK(g.server.projectile_reports.back().proximity && g.server.projectile_reports.back().outcome == "exploded");
++        CHECK(g.server.scene_explosions.back().damage == 100 && g.server.scene_explosions.back().radius == 250);
++        return true;
++    }
++    bool contacts(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_proximity::setup(g, root));
++        auto* b = test_proximity::bomb(g, {0, 300, 0});
++        CHECK(b);
++        b->HandleContact({{}, {0, 1, 0}, g.client_shell.player});
++        CHECK(!b->armed && !b->m_bExplode);
++        auto dummy = g.objects.create(g.objects.find_class("BaseClass"));
++        CHECK(dummy);
++        b->HandleContact({{}, {0, 1, 0}, dummy});
++        CHECK(!b->armed);
++        g.server.SetObjectFlags(dummy, FLAG_SOLID);
++        b->HandleContact({{}, {1, 0, 0}, dummy});
++        CHECK(b->armed && !b->hit_character);
++        auto rot = g.objects.get(b->m_hObject)->state.m_Rotation;
++        const auto up = rotate_vector(rot, {0, 1, 0});
++        CHECK(std::abs(up.x - 1) < .001f);
++        auto* c = test_proximity::bomb(g, {0, 400, 0}, {0, 0, 1}, 0, dummy);
++        CHECK(c);
++        c->HandleContact({{}, {0, 1, 0}, g.client_shell.player});
++        CHECK(c->m_bExplode && c->hit_character);
++        auto h = c->m_hObject;
++        CHECK(advance(g, .002) && !g.objects.get(h));
++        // Dead characters do not stick/detonate.
++        auto* d = test_proximity::bomb(g, {0, 500, 0}, {0, 0, 1}, 0, dummy);
++        CHECK(d);
++        g.server_shell.Player(g.local_client)->m_damage.m_bDead = true;
++        d->HandleContact({{}, {0, 1, 0}, g.client_shell.player});
++        CHECK(!d->armed && !d->m_bExplode);
++        return true;
++    }
++    bool motion(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_proximity::setup(g, root));
++        auto* b = test_proximity::bomb(g, {0, 120, 0}, {0, -1, 0}, 100);
++        CHECK(b);
++        auto h = b->m_hObject;
++        for (int i = 0; i < 100 && !b->armed; ++i)
++            CHECK(g.server.advance_projectiles(.01));
++        CHECK(b->armed && b->contacts == 1 && b->flight_steps > 0);
++        auto p = g.objects.get(h)->state.m_Pos;
++        CHECK(g.server.advance_projectiles(.4));
++        auto q = g.objects.get(h)->state.m_Pos;
++        CHECK(p.x == q.x && p.y == q.y && p.z == q.z);
++        auto* bad = test_proximity::bomb(g, {100, 300, 0});
++        CHECK(bad && !bad->AdvanceFlight(.6) && bad->failed);
++        return true;
++    }
++    bool damage_lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_proximity::setup(g, root));
++        auto* b = test_proximity::bomb(g, {0, 300, 0});
++        CHECK(b);
++        auto h = b->m_hObject;
++        b->m_damage.m_bDead = true;
++        b->m_damage.m_fHitPoints = 0;
++        CHECK(advance(g, .2) && g.objects.get(h));
++        CHECK(advance(g, .06) && g.objects.get(h));
++        CHECK(advance(g, .002) && !g.objects.get(h)); // source subclass before aggregate decrement
++        auto* c = test_proximity::bomb(g, {0, 300, 0});
++        CHECK(c);
++        auto child = c->m_hObject;
++        CHECK(g.leave_player());
++        CHECK(g.objects.get(child) && c->m_hFiredFrom == nullptr);
++        CHECK(advance(g, 12) && g.objects.get(child));
++        CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.list_count() == 0);
++        return true;
++    }
++    bool inventory(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_proximity::setup(g, root));
++        auto* p = g.server_shell.Player(g.local_client);
++        auto& inv = p->m_InventoryMgr;
++        for (int i = 0; i < 11; ++i)
++        {
++            auto h = g.objects.create(g.objects.find_class("ProximitiesPU"), {}, Creation::World,
++                                      {{"Name", std::string("BombPickup")}});
++            CHECK(h);
++            auto* pu = dynamic_cast<ProximitiesPU*>(g.server.HandleToObject(h));
++            CHECK(pu && pu->pickup_sound == "sounds/powerups/ammo2.wav");
++            CHECK(g.server.GetObjectUserFlags(h) & (1u << 7));
++            CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p->m_hObject));
++            CHECK(pu->picked_up == (i < 10));
++            CHECK(g.objects.finish_frame());
++        }
++        CHECK(inv.GetWeapon(10) && inv.GetAmmoCount(10) == 10 && inv.CurrentWeapon()->data.m_nType != 49);
++        CWeapon* best = nullptr;
++        CHECK(inv.FindBestWeapon(500, best) && (!best || best->data.m_nType != WEAP_PROXIMITYBOMB));
++        g.client_shell.proximity_down = true;
++        CHECK(g.client_shell.UpdateUse(g.server_shell));
++        CHECK(inv.m_nCurWeaponSlot == 10);
++        std::string e;
++        CHECK(g.client_shell.SyncWeapons(g.models, g.resources, g.server_shell, e));
++        auto* w = inv.CurrentWeapon();
++        auto hp = p->m_damage.m_fHitPoints;
++        WeaponFire request{{0, 200, 0}, {0, 0, 1}, 2, 49, false, false, 0};
++        CHECK(w->Fire(request) == FireResult::Fired && !w->projectile && inv.GetAmmoCount(10) == 9 &&
++              p->m_damage.m_fHitPoints < hp);
++        p->m_damage.m_bDead = false;
++        p->m_damage.SetHitPoints(1000);
++        p->m_bDead = false;
++        request.projectile_speed = std::numeric_limits<float>::quiet_NaN();
++        CHECK(w->Fire(request) == FireResult::Invalid && inv.GetAmmoCount(10) == 9);
++        request.projectile_speed = 250;
++        request.alternate = true;
++        CHECK(w->Fire(request) == FireResult::Fired);
++        auto* b = dynamic_cast<CProximityBomb*>(g.server.HandleToObject(w->projectile));
++        CHECK(b && b->m_vDir.y == -1 && b->m_fVelocity == 0);
++        inv.SetAmmoCount(10, 1);
++        request.alternate = false;
++        CHECK(w->Fire(request) == FireResult::Fired && inv.GetAmmoCount(10) == 0 && inv.m_nCurWeaponSlot == 1);
++        CHECK(inv.SelectInventoryWeapon(49) == InventoryResult::NotAvailable);
++        CHECK(g.objects.remove(p->m_hObject));
++        CHECK(inv.AddInventoryWeapon(7, 1) == InventoryResult::Invalid &&
++              inv.SelectInventoryWeapon(49) == InventoryResult::Invalid &&
++              inv.SelectNextWeapon() == InventoryResult::Invalid && inv.GetAmmoCount(10) == 0);
++        CHECK(g.objects.finish_frame());
++        return true;
++    }
++    bool restore(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_proximity::setup(g, root) && test_proximity::equip(g));
++        PlayerRestoreState snapshot;
++        std::string error;
++        CHECK(g.capture_player(snapshot, error));
++        CHECK(snapshot.inventory.right[10] == 49 && snapshot.inventory.current_slot == 10 &&
++              snapshot.inventory.ammo[10] == 3);
++        CHECK(g.leave_player() && g.restore_player(snapshot, error));
++        auto* p = g.server_shell.Player(g.local_client);
++        CHECK(p && p->m_InventoryMgr.CurrentWeapon()->data.m_nType == 49);
++        CHECK(g.capture_player(snapshot, error));
++        auto bad = snapshot;
++        bad.inventory.right[11] = 49;
++        CHECK(g.leave_player() && !g.restore_player(bad, error) && g.restore_player(snapshot, error));
++        CHECK(g.capture_player(snapshot, error));
++        CHECK(g.leave_player() && g.restore_player(snapshot, error, PlayerRestoreMode::KeepAlive));
++        CHECK(g.server_shell.Player(g.local_client)->m_InventoryMgr.GetWeapon(10)->data.m_nType == 49 &&
++              g.server_shell.Player(g.local_client)->m_InventoryMgr.GetAmmoCount(10) == 3);
++        MovementControls c;
++        c.focused = true;
++        SDL_Event e{};
++        e.type = SDL_EVENT_KEY_DOWN;
++        e.key.windowID = 1;
++        e.key.scancode = SDL_SCANCODE_P;
++        c.event(e, 1);
++        CHECK(c.sample_proximity(false) && !c.sample_proximity(true) && !c.sample_proximity(false));
++        c.player_changed();
++        CHECK(!c.sample_proximity(false));
++        return true;
++    }
++    bool private_world(const char* path)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = path;
++        std::string e;
++        CHECK(g.resources.mount_game(c, e));
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_cityhub", e));
++            unsigned made = 0, unknown = 0, failed = 0, pickups = 0;
++            std::vector<HOBJECT> authored;
++            for (const auto& row : g.entries)
++            {
++                made += row.state == EntryState::Created;
++                unknown += row.state == EntryState::Unsupported;
++                failed += row.state == EntryState::Failed;
++            }
++            CHECK(made == 450 && unknown == 3 && failed == 1);
++            for (auto id : g.objects.snapshot())
++                if (auto* pu = dynamic_cast<ProximitiesPU*>(g.objects.get(id)->game.get()))
++                {
++                    ++pickups;
++                    authored.push_back(pu->m_hObject);
++                    CHECK(pu->error.empty() && g.objects.get(id)->model);
++                }
++            CHECK(pickups == 2);
++            std::cout << "CityHub cycle=" << cycle << " created=" << made << " unknown=" << unknown
++                      << " failed=" << failed << " proximity=" << pickups << '\n';
++            g.server_shell.start_point_name = "01_egressa";
++            CHECK(g.enter_player(e));
++            auto* p = g.server_shell.Player(g.local_client);
++            for (auto h : authored)
++                CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p->m_hObject));
++            CHECK(p->m_InventoryMgr.GetAmmoCount(10) == 2);
++            g.client_shell.proximity_down = true;
++            CHECK(g.client_shell.UpdateUse(g.server_shell));
++            CHECK(p->m_InventoryMgr.m_nCurWeaponSlot == 10 &&
++                  g.client_shell.SyncWeapons(g.models, g.resources, g.server_shell, e));
++            CHECK(g.objects.finish_frame());
++            for (auto h : authored)
++                CHECK(!g.objects.get(h));
++            CHECK(g.unload_world());
++        }
++        return true;
++    }
++    bool private_fire(const char* path)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = path;
++        std::string e;
++        CHECK(g.resources.mount_game(c, e));
++        CHECK(g.request_world("01_subwaya", e) && g.enter_player(e) && test_camera::complete_subway_intro(g));
++        CHECK(test_proximity::equip(g, 5));
++        auto* p = g.server_shell.Player(g.local_client);
++        p->m_damage.m_bGodMode = true;
++        place(g, p->m_hObject, {0, 800, 0});
++        auto* w = p->m_InventoryMgr.GetWeapon(10);
++        auto step = [&](unsigned n)
++        {
++            for (unsigned i = 0; i < n; ++i)
++                if (!g.step(.01))
++                {
++                    std::cerr << e << '\n';
++                    return false;
++                }
++            return true;
++        };
++        CHECK(step(120));
++        g.client_shell.weapon_input.primary = true;
++        CHECK(step(40));
++        g.client_shell.weapon_input.primary = false;
++        CHECK(step(90));
++        CHECK(w->shots == 1 && p->m_InventoryMgr.GetAmmoCount(10) == 4 && w->projectile);
++        auto* b = dynamic_cast<CProximityBomb*>(g.server.HandleToObject(w->projectile));
++        CHECK(b && b->m_fVelocity >= 250 && b->m_fVelocity <= 1750);
++        std::cout << "Actual bomb throw speed=" << b->m_fVelocity << " keys=" << g.client_shell.weapons[0].fire_keys
++                  << '\n';
++        g.client_shell.weapon_input.alternate = true;
++        CHECK(step(100));
++        g.client_shell.weapon_input.alternate = false;
++        CHECK(step(100));
++        CHECK(w->shots >= 2);
++        CHECK(w->sound_failures == 0);
++        g.client_shell.weapon_input.primary = true;
++        const auto old = w->shots;
++        CHECK(step(220));
++        g.client_shell.weapon_input.primary = false;
++        CHECK(step(40));
++        CHECK(w->shots == old + 1 && w->last_shot.request.projectile_speed == 0 && !w->projectile);
++        std::cout << "Original bomb sequence shots=" << w->shots << " remaining=" << p->m_InventoryMgr.GetAmmoCount(10)
++                  << '\n';
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string mode = argv[1];
++    std::filesystem::path root = argv[2];
++    if (mode != "private" && mode != "private_fire")
++        std::filesystem::create_directories(root);
++    return (mode == "reentrant"   ? reentrant(root)
++            : mode == "ai_delay"  ? ai_delay(root)
++            : mode == "rules"     ? rules(root)
++            : mode == "contacts"  ? contacts(root)
++            : mode == "motion"    ? motion(root)
++            : mode == "lifetime"  ? damage_lifetime(root)
++            : mode == "inventory" ? inventory(root)
++            : mode == "restore"   ? restore(root)
++            : mode == "private"   ? private_world(argv[2])
++                                  : mode == "private_fire" && private_fire(argv[2]))
++               ? 0
++               : 1;
++}
+diff --git a/tests/sky_tests.cpp b/tests/sky_tests.cpp
+index 2731927..925bf1a 100644
+--- a/tests/sky_tests.cpp
++++ b/tests/sky_tests.cpp
+@@ -166,7 +166,7 @@ namespace
+                 failed += entry.state == EntryState::Failed;
+                 unknown += entry.state == EntryState::Unsupported;
+             }
+-            CHECK(created == 448 && failed == 1 && unknown == 5);
++            CHECK(created == 450 && failed == 1 && unknown == 3);
+             for (const auto& use : g.resource_uses)
+                 CHECK(use.path != "Clouds1Pointer" && use.path != "Moon1Pointer" && use.path != "Star1Pointer" &&
+                       use.path != "BuildingsPointer");
+diff --git a/tests/world_debris_tests.cpp b/tests/world_debris_tests.cpp
+index 4925b1c..5279716 100644
+--- a/tests/world_debris_tests.cpp
++++ b/tests/world_debris_tests.cpp
+@@ -246,7 +246,7 @@ namespace
+                 failed += e.state == EntryState::Failed;
+             }
+             std::cout << "Created=" << created << " unsupported=" << unknown << " failed=" << failed << '\n';
+-            CHECK(created == 448 && unknown == 5 && failed == 1);
++            CHECK(created == 450 && unknown == 3 && failed == 1);
+             // Exercise original destruction/name activation, not direct fragment creation.
+             auto* list = g.server.FindNamedObjects("billboard");
+             CHECK(list && list->m_pFirstLink);
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 6e3e5a9..9b025cf 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -988,8 +988,8 @@ namespace
+                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
+                 else
+                 {
+-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 480 && d.editor_only == 541 &&
+-                          d.unknown == 5 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
++                    CHECK(d.entries.size() == 1026 && d.schema_checked == 482 && d.editor_only == 541 &&
++                          d.unknown == 3 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                     for (const auto& e : d.entries)
+                         if (e.state == DestinationEntryState::InvalidProperties)
+                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+@@ -1325,7 +1325,7 @@ namespace
+             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+             std::cout << "CityHub refusal " << cycle << ": " << error << '\n';
+             CHECK(game.get() == owner && game->objects.snapshot() == ids && globals.unchanged());
+-            CHECK(game->level_change.unknown == 5 && game->level_change.failed == 1);
++            CHECK(game->level_change.unknown == 3 && game->level_change.failed == 1);
+             CHECK(game->level_change.cleanup_complete && game->level_change.source_retained);
+             CHECK(game->world_revision == revision && game->objects.time() == time);
+             CHECK(game->server.audio.voices().size() == voices.size());
+@@ -1426,7 +1426,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 448 && d.unknown == 5 && d.failed == 1);
++                        CHECK(d.created == 450 && d.unknown == 3 && d.failed == 1);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

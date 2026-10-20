@@ -1,0 +1,210 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 360: ai_fire.filters
+      Start  41: world.destination_trial_private
+ 1/96 Test #360: ai_fire.filters ...................   Passed    0.04 sec
+      Start 659: destructable_models.city
+ 2/96 Test #659: destructable_models.city ..........   Passed   21.05 sec
+      Start  42: world.destination_private
+ 3/96 Test  #42: world.destination_private .........   Passed   17.57 sec
+      Start 369: ai_fire.subway
+ 4/96 Test  #41: world.destination_trial_private ...   Passed   43.73 sec
+      Start 335: model_view.builtin_city
+ 5/96 Test #335: model_view.builtin_city ...........   Passed    8.73 sec
+      Start 334: model_view.subway
+ 6/96 Test #369: ai_fire.subway ....................   Passed   18.07 sec
+      Start  54: services.private
+ 7/96 Test #334: model_view.subway .................   Passed    5.59 sec
+      Start 301: ai_sight.subway
+ 8/96 Test #301: ai_sight.subway ...................   Passed    4.64 sec
+      Start  43: world.private
+ 9/96 Test  #43: world.private .....................   Passed    4.66 sec
+      Start 368: ai_fire.catalog
+10/96 Test #368: ai_fire.catalog ...................   Passed    1.08 sec
+      Start 309: attachments.subway
+11/96 Test  #54: services.private ..................   Passed   12.39 sec
+      Start 300: ai_sight.catalog
+12/96 Test #300: ai_sight.catalog ..................   Passed    1.06 sec
+      Start 308: attachments.catalog
+13/96 Test #308: attachments.catalog ...............   Passed    1.70 sec
+      Start  25: world.destination_trials
+14/96 Test  #25: world.destination_trials ..........   Passed    0.21 sec
+      Start 653: destructable_models.cascade
+15/96 Test #653: destructable_models.cascade .......   Passed    0.08 sec
+      Start 652: destructable_models.damage
+16/96 Test #652: destructable_models.damage ........   Passed    0.05 sec
+      Start 651: destructable_models.rejects
+17/96 Test #651: destructable_models.rejects .......   Passed    0.04 sec
+      Start 657: destructable_models.audio
+18/96 Test #657: destructable_models.audio .........   Passed    0.05 sec
+      Start 655: destructable_models.physics
+19/96 Test #655: destructable_models.physics .......   Passed    0.04 sec
+      Start  28: world.destination_lifetime
+20/96 Test  #28: world.destination_lifetime ........   Passed    0.06 sec
+      Start 650: destructable_models.properties
+21/96 Test #650: destructable_models.properties ....   Passed    0.04 sec
+      Start 654: destructable_models.fade
+22/96 Test #654: destructable_models.fade ..........   Passed    0.04 sec
+      Start 656: destructable_models.filters
+23/96 Test #656: destructable_models.filters .......   Passed    0.04 sec
+      Start 304: attachments.rejects
+24/96 Test #304: attachments.rejects ...............   Passed    0.43 sec
+      Start  37: world.mutations
+25/96 Test  #37: world.mutations ...................   Passed    0.25 sec
+      Start 329: model_view.builtin_resources
+26/96 Test #329: model_view.builtin_resources ......   Passed    0.05 sec
+      Start  46: services.model_rejection
+27/96 Test  #46: services.model_rejection ..........   Passed    0.42 sec
+      Start 658: destructable_models.unnamed
+28/96 Test #658: destructable_models.unnamed .......   Passed    0.02 sec
+      Start   1: objects.builtin_model
+29/96 Test   #1: objects.builtin_model .............   Passed    0.03 sec
+      Start  51: services.placement_queries
+30/96 Test  #51: services.placement_queries ........   Passed    0.02 sec
+      Start  52: services.placement_service
+31/96 Test  #52: services.placement_service ........   Passed    0.02 sec
+      Start  29: world.sprite_entries
+32/96 Test  #29: world.sprite_entries ..............   Passed    0.05 sec
+      Start  30: world.sound_entries
+33/96 Test  #30: world.sound_entries ...............   Passed    0.05 sec
+      Start  27: world.destination_schema
+34/96 Test  #27: world.destination_schema ..........   Passed    0.02 sec
+      Start 367: ai_fire.lifetime
+35/96 Test #367: ai_fire.lifetime ..................   Passed    0.03 sec
+      Start  26: world.destination_messages
+36/96 Test #309: attachments.subway ................   Passed    5.51 sec
+      Start 153: pushables.player
+37/96 Test  #26: world.destination_messages ........   Passed    0.02 sec
+      Start 365: ai_fire.recovery
+38/96 Test #365: ai_fire.recovery ..................   Passed    0.03 sec
+      Start 361: ai_fire.head
+39/96 Test #361: ai_fire.head ......................   Passed    0.02 sec
+      Start 359: ai_fire.clearance
+40/96 Test #359: ai_fire.clearance .................   Passed    0.02 sec
+      Start 362: ai_fire.aim
+41/96 Test #362: ai_fire.aim .......................   Passed    0.02 sec
+      Start 364: ai_fire.cadence
+42/96 Test #364: ai_fire.cadence ...................   Passed    0.02 sec
+      Start  11: objects.unsupported_teardown
+43/96 Test  #11: objects.unsupported_teardown ......   Passed    0.05 sec
+      Start 363: ai_fire.keys
+44/96 Test #153: pushables.player ..................   Passed    0.17 sec
+      Start 366: ai_fire.failures
+45/96 Test #363: ai_fire.keys ......................   Passed    0.02 sec
+      Start 358: ai_fire.selection
+46/96 Test #366: ai_fire.failures ..................   Passed    0.02 sec
+      Start  10: objects.messages_strings
+47/96 Test #358: ai_fire.selection .................   Passed    0.02 sec
+      Start  36: world.world_rejection
+48/96 Test  #10: objects.messages_strings ..........   Passed    0.04 sec
+      Start 306: attachments.held
+49/96 Test  #36: world.world_rejection .............   Passed    0.06 sec
+      Start  12: objects.creation_failures
+50/96 Test #306: attachments.held ..................   Passed    0.06 sec
+      Start 307: attachments.missing
+51/96 Test  #12: objects.creation_failures .........   Passed    0.04 sec
+      Start 296: ai_sight.filters
+52/96 Test #296: ai_sight.filters ..................   Passed    0.03 sec
+      Start 299: ai_sight.lifetime
+53/96 Test #307: attachments.missing ...............   Passed    0.05 sec
+      Start 154: pushables.riders
+54/96 Test #299: ai_sight.lifetime .................   Passed    0.03 sec
+      Start 294: ai_sight.body
+55/96 Test #294: ai_sight.body .....................   Passed    0.02 sec
+      Start 333: model_view.legacy_pose
+56/96 Test #333: model_view.legacy_pose ............   Passed    0.02 sec
+      Start 331: model_view.rejects
+57/96 Test #154: pushables.riders ..................   Passed    0.07 sec
+      Start 295: ai_sight.head
+58/96 Test #331: model_view.rejects ................   Passed    0.02 sec
+      Start   4: objects.reasons_properties
+59/96 Test #295: ai_sight.head .....................   Passed    0.02 sec
+      Start 297: ai_sight.world
+60/96 Test   #4: objects.reasons_properties ........   Passed    0.02 sec
+      Start 330: model_view.sample
+61/96 Test #297: ai_sight.world ....................   Passed    0.02 sec
+      Start   2: objects.original_objects
+62/96 Test #330: model_view.sample .................   Passed    0.02 sec
+      Start   9: objects.links_lists
+63/96 Test   #2: objects.original_objects ..........   Passed    0.02 sec
+      Start 298: ai_sight.failures
+64/96 Test   #9: objects.links_lists ...............   Passed    0.02 sec
+      Start   6: objects.deferred_removal
+65/96 Test #298: ai_sight.failures .................   Passed    0.03 sec
+      Start   3: objects.nested_creation
+66/96 Test   #6: objects.deferred_removal ..........   Passed    0.02 sec
+      Start   5: objects.scheduling
+67/96 Test   #3: objects.nested_creation ...........   Passed    0.02 sec
+      Start   8: objects.handles_selection
+68/96 Test   #5: objects.scheduling ................   Passed    0.02 sec
+      Start   7: objects.aggregate_dispatch
+69/96 Test   #8: objects.handles_selection .........   Passed    0.02 sec
+      Start 332: model_view.weapon_pose
+70/96 Test   #7: objects.aggregate_dispatch ........   Passed    0.02 sec
+      Start  38: world.session_lifecycle
+71/96 Test #332: model_view.weapon_pose ............   Passed    0.02 sec
+      Start 149: pushables.gravity
+72/96 Test  #38: world.session_lifecycle ...........   Passed    0.03 sec
+      Start 151: pushables.impulses
+73/96 Test #149: pushables.gravity .................   Passed    0.04 sec
+      Start  40: world.original_trigger
+74/96 Test #151: pushables.impulses ................   Passed    0.04 sec
+      Start 148: pushables.properties
+75/96 Test  #40: world.original_trigger ............   Passed    0.02 sec
+      Start  33: world.resource_mount
+76/96 Test  #33: world.resource_mount ..............   Passed    0.02 sec
+      Start 157: pushables.containers
+77/96 Test #148: pushables.properties ..............   Passed    0.04 sec
+      Start 156: pushables.collision
+78/96 Test #157: pushables.containers ..............   Passed    0.04 sec
+      Start 150: pushables.friction
+79/96 Test #156: pushables.collision ...............   Passed    0.04 sec
+      Start  34: world.world_properties
+80/96 Test  #34: world.world_properties ............   Passed    0.02 sec
+      Start  35: world.world_geometry
+81/96 Test #150: pushables.friction ................   Passed    0.04 sec
+      Start 152: pushables.pushing
+82/96 Test  #35: world.world_geometry ..............   Passed    0.02 sec
+      Start 155: pushables.contacts
+83/96 Test #152: pushables.pushing .................   Passed    0.04 sec
+      Start  32: world.rez_rejection
+84/96 Test #155: pushables.contacts ................   Passed    0.03 sec
+      Start  31: world.rez_structure
+85/96 Test  #32: world.rez_rejection ...............   Passed    0.02 sec
+      Start  39: world.session_messages
+86/96 Test  #31: world.rez_structure ...............   Passed    0.02 sec
+      Start 303: attachments.nodes
+87/96 Test  #39: world.session_messages ............   Passed    0.02 sec
+      Start 305: attachments.lifetime
+88/96 Test #303: attachments.nodes .................   Passed    0.02 sec
+      Start 302: attachments.root
+89/96 Test #305: attachments.lifetime ..............   Passed    0.02 sec
+      Start  53: services.original_services
+90/96 Test #302: attachments.root ..................   Passed    0.02 sec
+      Start  48: services.model_callbacks
+91/96 Test  #53: services.original_services ........   Passed    0.02 sec
+      Start  45: services.model_reader
+92/96 Test  #48: services.model_callbacks ..........   Passed    0.02 sec
+      Start  47: services.animation_events
+93/96 Test  #45: services.model_reader .............   Passed    0.02 sec
+      Start  50: services.movement_contacts
+94/96 Test  #47: services.animation_events .........   Passed    0.02 sec
+      Start  49: services.collision_queries
+95/96 Test  #50: services.movement_contacts ........   Passed    0.02 sec
+96/96 Test  #49: services.collision_queries ........   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 96
+
+Label Time Summary:
+ai_fire                =  19.39 sec*proc (12 tests)
+ai_sight               =   5.84 sec*proc (8 tests)
+attachments            =   7.80 sec*proc (8 tests)
+destructable_models    =  21.44 sec*proc (10 tests)
+headless               = 149.59 sec*proc (96 tests)
+model_view             =  14.45 sec*proc (7 tests)
+objects                =   0.31 sec*proc (12 tests)
+private                = 145.76 sec*proc (13 tests)
+pushables              =   0.54 sec*proc (10 tests)
+services               =  12.97 sec*proc (10 tests)
+world                  =  66.83 sec*proc (19 tests)
+
+Total Test time (real) =  74.83 sec

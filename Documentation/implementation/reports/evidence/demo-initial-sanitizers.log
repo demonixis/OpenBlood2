@@ -1,0 +1,54 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start   20: config.arguments
+ 1/17 Test   #20: config.arguments .................   Passed    0.01 sec
+      Start   21: config.precedence
+ 2/17 Test   #21: config.precedence ................   Passed    0.01 sec
+      Start   22: config.relative_paths
+ 3/17 Test   #22: config.relative_paths ............   Passed    0.01 sec
+      Start   23: config.invalid_config
+ 4/17 Test   #23: config.invalid_config ............   Passed    0.01 sec
+      Start   24: config.content_validation
+ 5/17 Test   #24: config.content_validation ........   Passed    0.01 sec
+      Start   25: config.case_lookup
+ 6/17 Test   #25: config.case_lookup ...............   Passed    0.01 sec
+      Start   26: config.demo
+ 7/17 Test   #26: config.demo ......................   Passed    0.01 sec
+      Start  850: remote.demo
+ 8/17 Test  #850: remote.demo ......................   Passed    0.05 sec
+      Start 1059: menus.state
+ 9/17 Test #1059: menus.state ......................   Passed    0.02 sec
+      Start 1060: menus.artwork
+10/17 Test #1060: menus.artwork ....................   Passed    1.53 sec
+      Start 1061: menus.session
+11/17 Test #1061: menus.session ....................   Passed    6.49 sec
+      Start 1062: menus.profiles
+12/17 Test #1062: menus.profiles ...................   Passed   81.84 sec
+      Start 1063: menus.preferences
+13/17 Test #1063: menus.preferences ................   Passed    0.02 sec
+      Start 1081: demo.flow
+14/17 Test #1081: demo.flow ........................   Passed    0.02 sec
+      Start 1082: demo.rules
+15/17 Test #1082: demo.rules .......................   Passed    0.05 sec
+      Start 1083: demo.worlds
+16/17 Test #1083: demo.worlds ......................   Passed   59.22 sec
+      Start 1084: demo.weapon
+17/17 Test #1084: demo.weapon ......................***Failed    0.34 sec
+Object particles: Invalid object particle state, parent pose or clock
+weapon:333: advance(g, 150) | 
+
+
+94% tests passed, 1 tests failed out of 17
+
+Label Time Summary:
+config      =   0.07 sec*proc (7 tests)
+demo        =  59.62 sec*proc (4 tests)
+headless    = 149.65 sec*proc (17 tests)
+menus       =  89.90 sec*proc (5 tests)
+private     = 149.42 sec*proc (5 tests)
+remote      =   0.05 sec*proc (1 test)
+
+Total Test time (real) = 149.67 sec
+
+The following tests FAILED:
+	1084 - demo.weapon (Failed)                              demo headless private
+Errors while running CTest

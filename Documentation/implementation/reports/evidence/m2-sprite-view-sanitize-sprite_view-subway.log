@@ -1,0 +1,38 @@
+514/514 Testing: sprite_view.subway
+514/514 Test: sprite_view.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/sprite_view_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"sprite_view.subway" start time: Oct 16 19:58 CEST
+Output:
+----------------------------------------------------------
+SubwayA frame=SpriteTextures\bloodsplat3.dtx 128x128 zero=14828 partial=1556
+SubwayA frame=SpriteTextures\bloodsplat3.dtx 128x128 zero=14828 partial=1556
+SubwayA frame=SpriteTextures\bloodsplat3.dtx 128x128 zero=14828 partial=1556
+<end of output>
+Test time =   5.25 sec
+----------------------------------------------------------
+Test Passed.
+"sprite_view.subway" end time: Oct 16 19:58 CEST
+"sprite_view.subway" time elapsed: 00:00:05
+----------------------------------------------------------
+
+End testing: Oct 16 19:58 CEST
+
+attachments =   5.32 sec*proc
+
+headless =  60.35 sec*proc
+
+model_view =   3.96 sec*proc
+
+objects =   0.24 sec*proc
+
+private =  59.20 sec*proc
+
+sprite_view =   5.32 sec*proc
+
+sprites =  34.10 sec*proc
+
+texture =   7.62 sec*proc
+
+world_view =   3.79 sec*proc
+

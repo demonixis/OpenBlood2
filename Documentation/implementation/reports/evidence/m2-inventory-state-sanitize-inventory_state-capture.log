@@ -1,0 +1,14 @@
+484/485 Testing: inventory_state.capture
+484/485 Test: inventory_state.capture
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory_state_tests" "capture" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory-state-fixtures/capture"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"inventory_state.capture" start time: Oct 16 17:45 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"inventory_state.capture" end time: Oct 16 17:45 CEST
+"inventory_state.capture" time elapsed: 00:00:00
+----------------------------------------------------------

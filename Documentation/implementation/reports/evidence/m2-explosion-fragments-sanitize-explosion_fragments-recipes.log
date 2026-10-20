@@ -1,0 +1,14 @@
+537/540 Testing: explosion_fragments.recipes
+537/540 Test: explosion_fragments.recipes
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_fragment_tests" "recipes" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-fragments-recipes"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_fragments.recipes" start time: Oct 16 21:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_fragments.recipes" end time: Oct 16 21:30 CEST
+"explosion_fragments.recipes" time elapsed: 00:00:00
+----------------------------------------------------------

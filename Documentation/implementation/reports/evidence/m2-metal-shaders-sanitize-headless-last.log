@@ -1,0 +1,126 @@
+Start testing: Oct 17 09:41 CEST
+----------------------------------------------------------
+329/739 Testing: world_view.alpha_order
+329/739 Test: world_view.alpha_order
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_view_tests" "alpha_order"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world_view.alpha_order" start time: Oct 17 09:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.alpha_order" end time: Oct 17 09:41 CEST
+"world_view.alpha_order" time elapsed: 00:00:00
+----------------------------------------------------------
+
+328/739 Testing: world_view.lifetime
+328/739 Test: world_view.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_view_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world_view.lifetime" start time: Oct 17 09:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.lifetime" end time: Oct 17 09:41 CEST
+"world_view.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+326/739 Testing: world_view.rejects
+326/739 Test: world_view.rejects
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_view_tests" "rejects"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world_view.rejects" start time: Oct 17 09:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.rejects" end time: Oct 17 09:41 CEST
+"world_view.rejects" time elapsed: 00:00:00
+----------------------------------------------------------
+
+325/739 Testing: world_view.mesh
+325/739 Test: world_view.mesh
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_view_tests" "mesh"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world_view.mesh" start time: Oct 17 09:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.mesh" end time: Oct 17 09:41 CEST
+"world_view.mesh" time elapsed: 00:00:00
+----------------------------------------------------------
+
+327/739 Testing: world_view.camera
+327/739 Test: world_view.camera
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_view_tests" "camera"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world_view.camera" start time: Oct 17 09:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.camera" end time: Oct 17 09:41 CEST
+"world_view.camera" time elapsed: 00:00:00
+----------------------------------------------------------
+
+739/739 Testing: world_shaders.formats
+739/739 Test: world_shaders.formats
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_shader_tests"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world_shaders.formats" start time: Oct 17 09:41 CEST
+Output:
+----------------------------------------------------------
+Shader selection: SPIR-V/MSL stages, generated entry points, reflected bindings, static lifetime and unsupported formats pass; native Metal compilation not exercised
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"world_shaders.formats" end time: Oct 17 09:41 CEST
+"world_shaders.formats" time elapsed: 00:00:00
+----------------------------------------------------------
+
+330/739 Testing: world_view.subway
+330/739 Test: world_view.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_view_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world_view.subway" start time: Oct 17 09:41 CEST
+Output:
+----------------------------------------------------------
+SubwayA Pan: 60 effects, 42 negative/18 positive Q speeds; all origins move -Z at 1024/s; 208 prepared batches
+SubwayA glass: 31 faces bind textures/greys/dirtyglass.dtx; 64x64, flags=10, alpha=51..102
+Textures: decoded=52 failed=0 bytes=1962244
+SubwayA: vertices=25287 draws=111 triangles=7441 unbound=5 invisible=442 posed=110
+SubwayA Pan: 60 effects, 42 negative/18 positive Q speeds; all origins move -Z at 1024/s; 208 prepared batches
+SubwayA glass: 31 faces bind textures/greys/dirtyglass.dtx; 64x64, flags=10, alpha=51..102
+Textures: decoded=52 failed=0 bytes=1962244
+SubwayA: vertices=25287 draws=111 triangles=7441 unbound=5 invisible=442 posed=110
+<end of output>
+Test time =   9.46 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.subway" end time: Oct 17 09:41 CEST
+"world_view.subway" time elapsed: 00:00:09
+----------------------------------------------------------
+
+End testing: Oct 17 09:41 CEST
+
+headless =   9.68 sec*proc
+
+private =   9.46 sec*proc
+
+shaders =   0.03 sec*proc
+
+world_view =   9.68 sec*proc
+

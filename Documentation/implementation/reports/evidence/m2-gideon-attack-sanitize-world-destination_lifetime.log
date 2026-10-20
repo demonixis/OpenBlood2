@@ -1,0 +1,15 @@
+27/634 Testing: world.destination_lifetime
+27/634 Test: world.destination_lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_tests" "destination_lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world-fixtures/destination_lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world.destination_lifetime" start time: Oct 17 03:03 CEST
+Output:
+----------------------------------------------------------
+PASS destination_lifetime
+<end of output>
+Test time =   0.12 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_lifetime" end time: Oct 17 03:03 CEST
+"world.destination_lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

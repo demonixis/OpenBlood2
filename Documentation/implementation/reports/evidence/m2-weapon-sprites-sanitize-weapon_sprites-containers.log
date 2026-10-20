@@ -1,0 +1,14 @@
+574/576 Testing: weapon_sprites.containers
+574/576 Test: weapon_sprites.containers
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_sprite_tests" "containers" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-sprites-containers"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_sprites.containers" start time: Oct 16 23:52 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_sprites.containers" end time: Oct 16 23:52 CEST
+"weapon_sprites.containers" time elapsed: 00:00:00
+----------------------------------------------------------

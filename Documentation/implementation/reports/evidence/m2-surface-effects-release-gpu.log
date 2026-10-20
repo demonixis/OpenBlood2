@@ -1,0 +1,31 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start  25: gpu.lifecycle
+1/9 Test  #25: gpu.lifecycle ....................   Passed    2.28 sec
+    Start 355: gpu.world_depth
+2/9 Test #355: gpu.world_depth ..................   Passed    1.03 sec
+    Start 356: gpu.viewport
+3/9 Test #356: gpu.viewport .....................   Passed    3.93 sec
+    Start 368: gpu.model_depth
+4/9 Test #368: gpu.model_depth ..................   Passed    0.67 sec
+    Start 569: gpu.sprite_alpha
+5/9 Test #569: gpu.sprite_alpha .................   Passed    0.58 sec
+    Start 650: gpu.world_alpha
+6/9 Test #650: gpu.world_alpha ..................   Passed    0.62 sec
+    Start 651: gpu.world_alpha_private
+7/9 Test #651: gpu.world_alpha_private ..........   Passed    0.98 sec
+    Start 807: gpu.surface_effect
+8/9 Test #807: gpu.surface_effect ...............   Passed    0.58 sec
+    Start 808: gpu.surface_effect_private
+9/9 Test #808: gpu.surface_effect_private .......   Passed    1.42 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Label Time Summary:
+gpu               =  12.08 sec*proc (9 tests)
+model_view        =   0.67 sec*proc (1 test)
+private           =   6.32 sec*proc (3 tests)
+sprite_view       =   0.58 sec*proc (1 test)
+surface_effect    =   2.00 sec*proc (2 tests)
+world_view        =   8.55 sec*proc (6 tests)
+
+Total Test time (real) =  12.10 sec

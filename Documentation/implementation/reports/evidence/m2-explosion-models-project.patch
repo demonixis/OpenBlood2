@@ -1,0 +1,1696 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 5dd60fb..f4f29e0 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -428,3 +428,10 @@ Read [contracts](docs/EXPLOSION_SPRITE_CONTRACTS.md). Preserve normal offsets, s
+ Per-instance alpha only extends the sprite pass. Reports explicitly retain missing
+ composite components; these sprites do not complete the FX service or M2 gate.
+ Safe NEW_LEVEL and other required services remain open; source counts are unchanged.
++
++The [explosion model continuation](../Documentation/Implementation/M2_EXPLOSION_MODELS.md) connects original CExplosionModelFX and selected high-detail model recipes.
++Read [contracts](docs/EXPLOSION_MODEL_CONTRACTS.md). Preserve cached-axis/per-update rotation, wave/fade
++formulas, explicit RNG ordering, final-update removal and independent model/sprite
++failure/lifetime. Fullbright alpha rendering is bounded diagnostic presentation;
++separate model/sprite sorting is not retail parity. Required remaining composite
++FX, safe NEW_LEVEL and M2 stay open; world-source counts do not change.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3da8cff..7cdfe68 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index 4a701f2..2e01445 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,10 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [explosion model continuation](../Documentation/Implementation/M2_EXPLOSION_MODELS.md) adds original ABC effects,
++growth, rotation, alpha and independent lifetime to the existing fire/smoke sprites.
++The nine SubwayA emitters and GPU model opacity are tested and inspectable. Required
++particle/light/fragment services, safe automatic level transfer and M2 remain open.
++
+ The [explosion sprite continuation](../Documentation/Implementation/M2_EXPLOSION_SPRITES.md) connects original fire/smoke
+ recipes and lifecycle to real alpha-textured rendering and in-game inspection.
+ Nine SubwayA emitters are exercised through creation, removal and reload. Composite
+diff --git a/docs/EXPLOSION_MODEL_CONTRACTS.md b/docs/EXPLOSION_MODEL_CONTRACTS.md
+new file mode 100644
+index 0000000..1c55e0d
+--- /dev/null
++++ b/docs/EXPLOSION_MODEL_CONTRACTS.md
+@@ -0,0 +1,107 @@
++# Original explosion model contracts
++
++This extends [sprite effects](EXPLOSION_SPRITE_CONTRACTS.md) and
++[scene explosions](SCENE_EXPLOSION_CONTRACTS.md). See
++[evidence](../../Documentation/Implementation/M2_EXPLOSION_MODELS.md) and
++[source selections](M2_EXPLOSION_MODEL_SOURCES.json). **M2 remains incomplete.**
++
++## Original behavior
++
++CExplosionModelFX retains selected original Init/CreateObject/Update behavior:
++scale interpolation, fade modes, initial orientation, incremental rotation, full
++bright flags and end duration. It owns an immutable decoded ABC, an animation track,
++strings and checked visual identity instead of a legacy client HOBJECT/HSTRING.
++The uninitialized false case of m_bScale is explicitly initialized.
++
++Scale waves are linear, square root, square and triangular versions of those three
++(waves 3, 4, 5). Other bytes retain linear fallback. Fades 0..5 match the existing
++sprite formulas. Initial object alpha precedes the first Update; fade 2 then starts
++at one and fade 3 at zero. The final scale/rotation/fade update runs before the
++strict time < duration result. Overshooting triangular-square-root scale can be
++nonfinite in that final source calculation; the expired object is removed before
++presentation, never submitted to the GPU.
++
++Random rotation 0 preserves identity. Mode 1 draws pitch, yaw, roll in that order
++from [-pi,pi]. Mode 2 aligns to the normal using +Y up, then rotates around the
++resulting forward axis by a draw from [0,pi]. Each Update caches **all three axes
++before rotating**, then applies rotations.x around up, rotations.y around right,
++and rotations.z around forward. Source angles are per update, **not multiplied by
++delta time**. The existing quaternion convention supplies these engine operations;
++this is not verified retail matrix parity. The source 1 ms effect-update cadence
++is preserved; ABC animation advances by elapsed simulation time independently of
++whether an effect update is due. Visual keys do not dispatch gameplay callbacks.
++
++Original ClientUtilities integer modulo and float range formulas use a separate
++portable minstd_rand client-effects stream. One recipe waveform draw precedes the
++three Euler draws. The stream resets to seed 1 on world unload without reusing IDs
++and never consumes server gameplay RNG. The generator differs from platform rand;
++retail random sequences and draws of unported composite components are not claimed.
++
++Null model/skin settings select original defaults exp_sphere.abc and Explosion_1.dtx;
++empty strings fail. Position, normal, rotations and nonnegative scales obey existing
++finite physics limits; duration is (0,600], alpha [0,1], fade 0..5 and random mode
++0..2. Paths are at most 1,000 bytes with no embedded NUL. Alignment mode 2 and
++composite recipes reject a zero normal. Invalid/backward clocks fail explicitly.
++
++## Selected recipes and delivery
++
++The same high-detail composite subset as sprite effects is routed from original
++CClientExplosionSFX, before sprite publication, original null-damager damage and
++sound. Direction normalizes once per selected recipe. Models are independent
++children; their failure cannot cancel sibling sprites or sound.
++
++| Type | Normal offset | Uniform scale | Duration | Model / skin |
++| --- | --- | --- | --- | --- |
++| 0 small | 10 | 25 to 200 | .5 s | Original defaults |
++| 1 medium / 3 grenade | 10 | 50 to 400 | .5 s | Original defaults |
++| 2 large | 10 | 100 to 600 | .5 s | Original defaults |
++| 8 Tesla alternate | 30 | 50 to 1000 | 3 s | duel_sphere.abc / SpriteTextures\waterblue.dtx |
++
++All use alpha .75, fade 1 and random orientation 1. Types 0..3 choose waveform
++0..2 with the original integer rule; type 8 uses linear. Type 6 has **no authored
++model branch**: its report succeeds with no created model, not a fabricated effect.
++Other types, including RIFT_2, still reject. No generic brush/weapon FX routing or
++quality menu is introduced. Complete-composite availability stays false: rings,
++particle flames, fragments/trails and lights are still missing.
++
++At most 128 models and 64 retained model-delivery reports are owned by the session.
++IDs are never reused, including across unload. Model/event IDs and failure strings
++are copied into inspection, with no retained emitter pointer. Source removal leaves
++models alive; expiry counts separately from failure. Update failure retains a
++message and fails the session step. Unload clears models, reports and RNG state.
++Missing or malformed ABC fails creation; an indexed skin can still fail decoding
++later, which remains a separate visible presentation failure.
++
++## Presentation and inspection
++
++A separate read-only ModelView snapshot reuses the bounded ABC/DTX readers and
++geometry sampler. Optional per-draw alpha extends ModelView without changing opaque
++world/character/view-weapon behavior. FX require a valid decoded skin; missing skins
++emit no guessed magenta model. Zero scale retains inspection but emits no triangles.
++The existing source-alpha shader/pipeline (named SpriteAlpha) draws these textured
++triangles with shared world/model depth, without writing depth. Fullbright/no-light
++flags use the existing unlit policy; global light scale is not implemented.
++
++FX models sort stably by camera-center depth and draw before the sprite pass and
++close weapons. Cross-type model/sprite ordering, per-triangle sorting, two-sided
++self-overlap and global lighting are **not retail transparency parity**. This is
++bounded diagnostic presentation of real original effects, not a complete renderer.
++Resources and GPU buffers clear on world revision; simulation and presentation run
++outside ImGui. No extra player integration or server world object is created.
++
++The Scene explosions panel shows model identity/event, time, scale, alpha, waveform,
++model/skin names, triangles/preparation/failure, totals and retained reports. Model
++and sprite failures have distinct delivery IDs. Sprite reports list missing
++particle/light/fragment components; model availability is reported separately.
++
++All nine SubwayA emitters are type 3. Three load/player/unload cycles verify nine
++168-triangle exp_sphere models, valid Explosion_1 skins, alpha .585 after .11 s,
++independent source removal and expiry at .5 s while sprites continue. Synthetic
++checks cover the other recipes, all wave/fade modes, mixed cached-axis rotations,
++RNG draw counts, resource/clock/budget failures and non-reused IDs. GPU readback
++verifies linear half-opacity with real model triangles and separately captures the
++private original sphere. Hidden/reloaded application smoke requires a model draw.
++
++World accounting stays 203 created / four transferred sounds / 372 editor-only /
++one unsupported Gideon / zero failed sources. Safe automatic NEW_LEVEL and other
++required FX/services keep the actual M2 gate open.
+diff --git a/docs/EXPLOSION_SPRITE_CONTRACTS.md b/docs/EXPLOSION_SPRITE_CONTRACTS.md
+index 6dd33b7..fda393f 100644
+--- a/docs/EXPLOSION_SPRITE_CONTRACTS.md
++++ b/docs/EXPLOSION_SPRITE_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original explosion sprite contracts
+ 
++Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supply
++selected model components with independent lifetime and alpha rendering. The earlier
++model omission is superseded only for that subset; complete composite FX remain unavailable.
++
+ M2 remains incomplete. This extends [scene emitters](SCENE_EXPLOSION_CONTRACTS.md)
+ and [sprite presentation](SPRITE_VIEW_CONTRACTS.md). See
+ [evidence](../../Documentation/Implementation/M2_EXPLOSION_SPRITES.md) and
+@@ -35,8 +39,9 @@ CExplosionFX detail >= 2 recipe normalizes the direction and creates these sprit
+ 
+ Paths are original `Sprites\*.spr`, all recipe Z scales are zero and fade mode is
+ 1. These are deterministic sprite branches, not the full CExplosionFX switch or
+-a quality-setting implementation. Unimplemented model/particle/light/fragment
+-branches consume no random draws; full composite random ordering is not claimed.
++a quality-setting implementation. Selected model branches now use their own
++documented client RNG stream; unimplemented particle/light/fragment branches
++consume no random draws. Full composite random ordering is not claimed.
+ Other preset types fail explicitly, including type 24 RIFT_2 (which has no sprite
+ branch here). Brush ExplosionEffect, weapon and other FX callers are not routed.
+ The complete-composite availability flag remains false even after sprite success.
+diff --git a/docs/M2_EXPLOSION_MODEL_SOURCES.json b/docs/M2_EXPLOSION_MODEL_SOURCES.json
+new file mode 100644
+index 0000000..8e181b8
+--- /dev/null
++++ b/docs/M2_EXPLOSION_MODEL_SOURCES.json
+@@ -0,0 +1,115 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "e3e9a5241e6d89c66750d7116a69bcb7ccadc900",
++  "source_files": [
++    {
++      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
++      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
++      "selected_lines": [
++        [
++          25,
++          195
++        ],
++        [
++          1248,
++          1268
++        ],
++        [
++          1356,
++          1376
++        ],
++        [
++          1467,
++          1485
++        ],
++        [
++          1574,
++          1594
++        ],
++        [
++          2149,
++          2177
++        ]
++      ],
++      "use": "Original model lifecycle, scale/fade/cached-axis rules and selected high-detail model recipes."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ExplosionFX.h",
++      "sha256": "2bc5a35f4da4929bdb0f10652d9014a56fdf9fe561d7ad320bf1dcf0f042dc18",
++      "selected_lines": [
++        [
++          21,
++          44
++        ],
++        [
++          236,
++          279
++        ]
++      ],
++      "use": "Original descriptor and class; explicit false initialization repairs indeterminate scale state."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
++      "sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
++      "selected_lines": [
++        [
++          20,
++          51
++        ]
++      ],
++      "use": "Original modulo/range formulas and ordered random draws; portable private generator replaces platform rand."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
++      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
++      "selected_lines": [
++        [
++          1435,
++          1463
++        ]
++      ],
++      "use": "Original absolute next-update cadence and removal."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/SpecialFX.h",
++      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
++      "selected_lines": [
++        [
++          32,
++          56
++        ]
++      ],
++      "use": "1 ms update interval and independent client-object destruction."
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ClientExplosionSFX.cpp",
++      "sha256": "fc51674223cf67456341d4529bc93acbe8df9365a8730b0491c7e22803c85a09",
++      "selected_lines": [
++        [
++          282,
++          304
++        ]
++      ],
++      "use": "FX before null-damager radius call and detached sound."
++    },
++    {
++      "path": "sources/blood2/AppHeaders/basetypes_de.h",
++      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
++      "selected_lines": [
++        [
++          285,
++          325
++        ]
++      ],
++      "use": "Gouraud/no-light flags and their original meanings."
++    }
++  ],
++  "implementation": "Selected original CExplosionModelFX methods and CExplosionFX model recipes; typed independent client visual lifetime and existing ModelView/SDL_GPU alpha presentation.",
++  "limitations": [
++    "Private visual validation covers the authored grenade/default sphere branch.",
++    "Portable RNG stream differs from retail platform rand; no full composite random parity.",
++    "Particles, fragments, lights, other effect callers and types remain missing.",
++    "Unlit separate alpha-model/sprite passes are not retail transparency parity.",
++    "Safe automatic NEW_LEVEL and M2 remain incomplete."
++  ]
++}
+diff --git a/docs/MODEL_VIEW_CONTRACTS.md b/docs/MODEL_VIEW_CONTRACTS.md
+index 4609342..2d4338d 100644
+--- a/docs/MODEL_VIEW_CONTRACTS.md
++++ b/docs/MODEL_VIEW_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Animated model presentation
+ 
++Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supplies
++selected model components with independent lifetime and alpha rendering. The earlier
++model omission is superseded only for that subset; complete composite FX remain unavailable.
++
+ > Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
+ > original named resets now affect rendering/hit candidates, and the selected Load
+ > model/flags/velocity tail is available before client association. Earlier blanket
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 514b340..0d41319 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -749,3 +749,13 @@ handles; bounded capacity, explicit resource failures and initialized scale stat
+ are adaptations. Shared alignment and per-draw SDL_GPU alpha extend the existing
+ small engine. Composite components and random alignment are not replaced with
+ placeholders. See [contracts](EXPLOSION_SPRITE_CONTRACTS.md); references/assets stay external.
++
++## Original explosion model effects
++
++[Source ledger](M2_EXPLOSION_MODEL_SOURCES.json) records CExplosionModelFX methods,
++high-detail CExplosionFX model recipes, ClientUtilities random formulas and source
++update/delivery order. Typed ownership, finite budgets, private portable RNG and
++explicit failures adapt engine services; original wave/fade/per-update rotations
++remain. Existing ABC/DTX/ModelView and the SDL_GPU alpha shader supply presentation.
++No reference engine, dependency or commercial asset is imported. See
++[contracts](EXPLOSION_MODEL_CONTRACTS.md) for remaining composite/rendering limits.
+diff --git a/docs/SCENE_EXPLOSION_CONTRACTS.md b/docs/SCENE_EXPLOSION_CONTRACTS.md
+index 18ec07e..cd1e6d3 100644
+--- a/docs/SCENE_EXPLOSION_CONTRACTS.md
++++ b/docs/SCENE_EXPLOSION_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original scene explosion emitters
+ 
++Continuation: [original explosion models](EXPLOSION_MODEL_CONTRACTS.md) now supplies
++selected model components with independent lifetime and alpha rendering. The earlier
++model omission is superseded only for that subset; complete composite FX remain unavailable.
++
+ Continuation: [original explosion sprites](EXPLOSION_SPRITE_CONTRACTS.md). Selected original fire/smoke components now render and outlive their emitter. The complete-composite flag remains false; model/particle/light/fragment services are still unavailable. Original null-damager damage and audio behavior stay unchanged.
+ 
+ M2 remains incomplete. This extends [object contracts](OBJECT_CONTRACTS.md),
+@@ -67,8 +71,8 @@ CExplosionSpriteFX methods; see [sprite contracts](EXPLOSION_SPRITE_CONTRACTS.md
+ The original binary client packet/complete manager is not recreated. Up to 32 owned
+ SceneExplosionReports retain type, initial position/direction, configured damage,
+ actual radius-delivery counters, sound ID/failure and client sprite event ID/failure.
+-Sprite success does not set complete-composite availability. Models, particles,
+-fragments and dynamic illumination remain absent. A loaded emitter is still a
++Sprite success does not set complete-composite availability. Selected model components now render; particles, fragments and dynamic
++illumination remain absent. A loaded emitter is still a
+ partial system; required missing services keep M2 open.
+ 
+ ## Inspection and verification
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index b790059..8c8e53d 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -15,6 +15,7 @@ namespace OpenBlood2
+         Runtime& runtime;
+         const WorldMesh* world_mesh = nullptr;
+         const ModelView* model_view = nullptr;
++        const ModelView* explosion_model_view = nullptr;
+         const SpriteView* sprite_view = nullptr;
+         const WorldViewStats* sprite_render = nullptr;
+         const WorldViewStats* world_render = nullptr;
+diff --git a/src/app/inspector_scene_explosions.cpp b/src/app/inspector_scene_explosions.cpp
+index 58b8aa0..2ecd174 100644
+--- a/src/app/inspector_scene_explosions.cpp
++++ b/src/app/inspector_scene_explosions.cpp
+@@ -5,9 +5,10 @@ namespace OpenBlood2
+ {
+     void Inspector::draw_scene_explosions(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextWrapped("Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
+-                           "Spatial WAV playback and selected original sprite components are implemented. Composite "
+-                           "models, particles and lights remain unavailable.");
++        ImGui::TextWrapped(
++            "Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
++            "Spatial WAV playback and selected original sprite/model components are implemented. Composite "
++            "particles, fragments and lights remain unavailable.");
+         ImGui::Text("Audio: %s | active voices %zu | submitted frames %llu",
+                     game.server.audio.has_output() ? "SDL stream" : "offline clock", game.server.audio.voices().size(),
+                     (unsigned long long)game.server.audio.submitted_frames);
+@@ -54,6 +55,34 @@ namespace OpenBlood2
+             ImGui::PopID();
+         }
+         ImGui::Separator();
++        const auto& models = game.server.explosion_models;
++        ImGui::Text("Client explosion models: %zu active / %llu started / %llu expired / %llu failed",
++                    models.active.size(), (unsigned long long)models.started, (unsigned long long)models.expired,
++                    (unsigned long long)models.failed);
++        if (!models.update_error.empty())
++            ImGui::TextWrapped("%s", models.update_error.c_str());
++        for (const auto& fx : models.active)
++        {
++            ImGui::Text("Model FX %llu / event %llu: %.3f s, alpha %.3f, scale %.2f %.2f %.2f / wave %u",
++                        (unsigned long long)fx.id, (unsigned long long)fx.event, fx.last_time - fx.start_time, fx.alpha,
++                        fx.scale.x, fx.scale.y, fx.scale.z, fx.settings.waveform);
++            ImGui::TextWrapped("%s | %s", fx.model_path.c_str(), fx.skin_path.c_str());
++            if (explosion_model_view)
++                for (const auto& entry : explosion_model_view->entries)
++                    if (entry.client_effect == fx.id)
++                    {
++                        ImGui::Text("%zu triangles | %s", entry.triangles,
++                                    entry.range == UINT32_MAX ? "not drawn" : "prepared");
++                        if (!entry.error.empty())
++                            ImGui::TextWrapped("%s", entry.error.c_str());
++                    }
++        }
++        if (ImGui::CollapsingHeader("Last 64 model deliveries / failures"))
++            for (const auto& r : models.reports)
++                ImGui::TextWrapped("Event %llu / type %u / model %llu / %s", (unsigned long long)r.id, r.type,
++                                   (unsigned long long)r.model,
++                                   r.error.empty() ? (r.model ? "created" : "no model branch authored")
++                                                   : r.error.c_str());
+         const auto& effects = game.server.explosion_sprites;
+         ImGui::Text("Client explosion sprites: %zu active / %llu started / %llu expired / %llu failed",
+                     effects.active.size(), (unsigned long long)effects.started, (unsigned long long)effects.expired,
+@@ -95,7 +124,10 @@ namespace OpenBlood2
+                             r.targets.candidates, r.targets.in_radius, r.targets.delivered);
+                 ImGui::Text("Null damager: %s | complete composite unavailable",
+                             r.targets.null_damager ? "yes (original guard)" : "no");
+-                ImGui::Text("Sprite delivery event %llu", (unsigned long long)r.sprite_event);
++                ImGui::Text("Model event %llu | sprite event %llu", (unsigned long long)r.model_event,
++                            (unsigned long long)r.sprite_event);
++                if (!r.model_error.empty())
++                    ImGui::TextWrapped("%s", r.model_error.c_str());
+                 if (!r.sprite_error.empty())
+                     ImGui::TextWrapped("%s", r.sprite_error.c_str());
+                 if (const auto* v = game.server.audio.get(r.voice))
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 0d375d7..19b8e4e 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -346,7 +346,9 @@ namespace
+         bool inspector_visible = BLOOD2_INSPECTOR && options.inspector && !options.view_world;
+         OpenBlood2::WorldMesh world_mesh;
+         OpenBlood2::WorldRenderer world_renderer(runtime.gpu), model_renderer(runtime.gpu);
+-        OpenBlood2::ModelView model_scene;
++        OpenBlood2::ModelView model_scene, explosion_model_scene;
++        OpenBlood2::WorldRenderer explosion_model_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
++        bool explosion_model_drawn_hidden = false;
+         OpenBlood2::SpriteView sprite_scene;
+         OpenBlood2::WorldRenderer sprite_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
+         bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false;
+@@ -359,6 +361,7 @@ namespace
+         OpenBlood2::Inspector inspector(runtime);
+         inspector.world_mesh = &world_mesh;
+         inspector.model_view = &model_scene;
++        inspector.explosion_model_view = &explosion_model_scene;
+         inspector.sprite_view = &sprite_scene;
+         inspector.sprite_render = &sprite_renderer.stats;
+         inspector.world_render = &world_renderer.stats;
+@@ -684,6 +687,8 @@ namespace
+                 world_renderer.clear_geometry();
+                 model_renderer.clear_geometry();
+                 model_scene.clear();
++                explosion_model_scene.clear();
++                explosion_model_renderer.clear_geometry();
+                 sprite_scene.clear();
+                 sprite_renderer.clear_geometry();
+                 world_mesh = {};
+@@ -710,6 +715,11 @@ namespace
+                 return 5;
+             }
+ 
++            if (!OpenBlood2::update_explosion_model_scene(game, explosion_model_scene, error))
++            {
++                spdlog::error("Explosion model presentation: {}", error);
++                return 5;
++            }
+             if (!OpenBlood2::update_sprite_scene(game, sprite_scene, error))
+             {
+                 spdlog::error("Sprite presentation: {}", error);
+@@ -809,6 +819,27 @@ namespace
+                         SDL_SubmitGPUCommandBuffer(commands);
+                         return 3;
+                     }
++                    if (!explosion_model_scene.world_draws.empty())
++                    {
++                        if (!explosion_model_renderer.prepare(
++                                explosion_model_scene.mesh, explosion_model_scene.revision,
++                                SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width, height, error,
++                                true) ||
++                            !explosion_model_renderer.draw(commands, capture_frame ? capture.texture : swapchain,
++                                                           explosion_model_scene.mesh,
++                                                           explosion_model_scene.world_draws, view.position,
++                                                           view.rotation, view.object && view.settings.type == 1, error,
++                                                           OpenBlood2::DrawLoad::Load, world_renderer.depth_target()))
++                        {
++                            spdlog::error("Explosion model viewport: {}", error);
++                            SDL_SubmitGPUCommandBuffer(commands);
++                            return 3;
++                        }
++                        if (!inspector_visible && options.scene_explosions_smoke)
++                            for (const auto& entry : explosion_model_scene.entries)
++                                explosion_model_drawn_hidden |= entry.error.empty() && entry.range != UINT32_MAX &&
++                                                                entry.triangles > 0 && entry.alpha < .75f;
++                    }
+                     if (!sprite_renderer.prepare(sprite_scene.mesh, sprite_scene.revision,
+                                                  SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
+                                                  height, error, true) ||
+@@ -1332,7 +1363,7 @@ namespace
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+                 (options.scene_explosions_smoke &&
+-                 (!scene_explosion_hidden || !explosion_sprites_drawn_hidden ||
++                 (!scene_explosion_hidden || !explosion_sprites_drawn_hidden || !explosion_model_drawn_hidden ||
+                   !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
+                 (options.sprites_smoke &&
+                  (!sprite_hidden || !sprites_drawn_hidden || sprite_scene.draws.size() != 12 ||
+@@ -1395,9 +1426,10 @@ namespace
+                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
+                              "and after reload; evaluated radius/color checked; world illumination unavailable");
+             if (options.scene_explosions_smoke)
+-                spdlog::info("SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
+-                             "audio plus original explosion sprites verified hidden and after reload; other composite "
+-                             "FX unavailable");
++                spdlog::info(
++                    "SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
++                    "audio plus original explosion models/sprites verified hidden and after reload; other composite "
++                    "FX unavailable");
+             if (options.sprites_smoke)
+                 spdlog::info("SPRITES smoke: 12 original DetailSprites, SPR manifests, frame clocks, hidden UI and "
+                              "unload/reload verified; 12 alpha-textured quads submitted with shared world depth");
+diff --git a/src/app/model_scene.cpp b/src/app/model_scene.cpp
+index c56cd42..a52f19e 100644
+--- a/src/app/model_scene.cpp
++++ b/src/app/model_scene.cpp
+@@ -1,6 +1,29 @@
+ #include "app/model_scene.h"
++#include <algorithm>
+ namespace OpenBlood2
+ {
++    bool update_explosion_model_scene(const GameSession& game, ModelView& scene, std::string& error)
++    {
++        scene.begin_frame();
++        for (const auto& fx : game.server.explosion_models.active)
++        {
++            const bool visible = fx.scale.x > 0 && fx.scale.y > 0 && fx.scale.z > 0;
++            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.settings.position, fx.rotation}, fx.scale,
++                           visible, false, {}, fx.model_path, game.resources, error, {}, fx.alpha, true))
++                return false;
++            scene.entries.back().client_effect = fx.id;
++        }
++        const auto& camera = game.client_shell.view;
++        const auto forward = rotate_vector(camera.rotation, {0, 0, 1});
++        auto depth = [&](const WorldDraw& d)
++        {
++            return (d.position.x - camera.position.x) * forward.x + (d.position.y - camera.position.y) * forward.y +
++                   (d.position.z - camera.position.z) * forward.z;
++        };
++        std::stable_sort(scene.world_draws.begin(), scene.world_draws.end(),
++                         [&](const auto& a, const auto& b) { return depth(a) > depth(b); });
++        return true;
++    }
+     bool update_model_scene(GameSession& game, ModelView& scene, std::string& error)
+     {
+         scene.begin_frame();
+diff --git a/src/app/model_scene.h b/src/app/model_scene.h
+index af41907..ecfd070 100644
+--- a/src/app/model_scene.h
++++ b/src/app/model_scene.h
+@@ -3,5 +3,6 @@
+ #include "game/server_adapter.h"
+ namespace OpenBlood2
+ {
++    bool update_explosion_model_scene(const GameSession&, ModelView&, std::string&);
+     bool update_model_scene(GameSession&, ModelView&, std::string&);
+-}
++} // namespace OpenBlood2
+diff --git a/src/app/scene_explosion_smoke.cpp b/src/app/scene_explosion_smoke.cpp
+index 0580cb7..beedd16 100644
+--- a/src/app/scene_explosion_smoke.cpp
++++ b/src/app/scene_explosion_smoke.cpp
+@@ -30,6 +30,11 @@ namespace OpenBlood2
+         if (g.objects.get(selected) || g.server.scene_explosions.size() != 1)
+             return false;
+         const auto& report = g.server.scene_explosions.back();
++        const auto& models = g.server.explosion_models;
++        if (!report.model_event || !report.model_error.empty() || models.active.size() != 1 || models.started != 1 ||
++            models.failed || models.reports.size() != 1 || !models.active[0].updates ||
++            models.active[0].alpha >= .75f || !models.active[0].error.empty())
++            return false;
+         const auto& sprites = g.server.explosion_sprites;
+         if (!report.sprite_event || !report.sprite_error.empty() || sprites.active.size() != 2 ||
+             sprites.started != 2 || sprites.failed || sprites.reports.size() != 1)
+diff --git a/src/engine/model_view.cpp b/src/engine/model_view.cpp
+index af2bbfe..385b723 100644
+--- a/src/engine/model_view.cpp
++++ b/src/engine/model_view.cpp
+@@ -23,7 +23,8 @@ namespace OpenBlood2
+     }
+     bool ModelView::add(const Model* model, const AnimationTrack& track, std::string_view skin, NodePose pose,
+                         DVector scale, bool visible, bool close, ObjectId object, std::string_view label,
+-                        const Resources& resources, std::string& error, std::span<const std::uint8_t> hidden_nodes)
++                        const Resources& resources, std::string& error, std::span<const std::uint8_t> hidden_nodes,
++                        float alpha, bool require_skin)
+     {
+         error.clear();
+         auto fail = [&](const char* reason)
+@@ -38,6 +39,9 @@ namespace OpenBlood2
+         }
+         entries.push_back({object, std::string(label), std::string(skin), {}, visible, close, 0});
+         auto& entry = entries.back();
++        entry.alpha = alpha;
++        if (!std::isfinite(alpha) || alpha < 0 || alpha > 1)
++            return fail("Invalid model alpha");
+         if (!model)
+         {
+             entry.error = "Model is missing or not decoded";
+@@ -77,14 +81,14 @@ namespace OpenBlood2
+             if (entry.error.empty())
+                 material = found->second;
+         }
+-        if (!visible)
++        if (!visible || (require_skin && !entry.error.empty()))
+             return true;
+         if (!physics_vector(scale) || scale.x <= 0 || scale.y <= 0 || scale.z <= 0 || model->vertices.size() > 65536 ||
+             model->faces.size() > 200000 || model->faces.size() * 3 > 1000000 - mesh.vertices.size())
+         {
+             return fail("Invalid model scale/geometry budget");
+         }
+-        WorldDraw draw{static_cast<std::uint32_t>(mesh.ranges.size()), pose.position, pose.rotation};
++        WorldDraw draw{static_cast<std::uint32_t>(mesh.ranges.size()), pose.position, pose.rotation, alpha};
+         WorldViewUniform uniform;
+         if (!world_view_uniform({}, {}, 1, draw, uniform))
+         {
+diff --git a/src/engine/model_view.h b/src/engine/model_view.h
+index 2f09763..9c58227 100644
+--- a/src/engine/model_view.h
++++ b/src/engine/model_view.h
+@@ -10,6 +10,8 @@ namespace OpenBlood2
+         std::size_t triangles = 0;
+         std::size_t hidden_nodes = 0, hidden_triangles = 0;
+         std::uint32_t range = UINT32_MAX;
++        float alpha = 1;
++        std::uint64_t client_effect = 0;
+     };
+     // Presentation-only snapshot. No original object pointer survives add().
+     class ModelView
+@@ -23,7 +25,7 @@ namespace OpenBlood2
+         void begin_frame();
+         bool add(const Model*, const AnimationTrack&, std::string_view skin, NodePose, DVector scale, bool visible,
+                  bool close, ObjectId, std::string_view label, const Resources&, std::string&,
+-                 std::span<const std::uint8_t> hidden_nodes = {});
++                 std::span<const std::uint8_t> hidden_nodes = {}, float alpha = 1, bool require_skin = false);
+         WorldMesh mesh;
+         std::vector<WorldDraw> world_draws, close_draws;
+         std::vector<ModelViewEntry> entries;
+diff --git a/src/game/brush_messages.h b/src/game/brush_messages.h
+index 891c0be..d89cf81 100644
+--- a/src/game/brush_messages.h
++++ b/src/game/brush_messages.h
+@@ -25,6 +25,8 @@ namespace OpenBlood2
+         float damage = 0, radius = 0;
+         RadiusDamageReport targets;
+         std::uint64_t voice = 0;
++        std::uint64_t model_event = 0;
++        std::string model_error;
+         std::uint64_t sprite_event = 0;
+         std::string sprite_error;
+         // Sprite components are now real; the complete composite remains unavailable.
+diff --git a/src/game/explosion_models.cpp b/src/game/explosion_models.cpp
+new file mode 100644
+index 0000000..89e5974
+--- /dev/null
++++ b/src/game/explosion_models.cpp
+@@ -0,0 +1,109 @@
++#include "game/explosion_models.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++namespace OpenBlood2
++{
++    bool original_explosion_model(DDWORD type, DVector position, DVector normal, std::minstd_rand& random,
++                                  std::optional<ExplosionModelSettings>& output, std::string& error)
++    {
++        output.reset();
++        error.clear();
++        if (!physics_vector(position) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f)
++        {
++            error = "Explosion requires a finite position and nonzero normal";
++            return false;
++        }
++        if (type == 6)
++            return true; // Original napalm fireball has no model component.
++        if (type > 3 && type != 8)
++        {
++            error = "Explosion model recipe is unavailable";
++            return false;
++        }
++        const float length = std::sqrt(vector_dot(normal, normal));
++        normal = {normal.x / length, normal.y / length, normal.z / length};
++        ExplosionModelSettings s;
++        const float offset = type == 8 ? 30.f : 10.f;
++        s.position = {position.x + normal.x * offset, position.y + normal.y * offset, position.z + normal.z * offset};
++        s.normal = normal;
++        const float first = type == 0 ? 25.f : type == 2 ? 100.f : 50.f;
++        const float last = type == 0 ? 200.f : type == 2 ? 600.f : type == 8 ? 1000.f : 400.f;
++        s.scale1 = {first, first, first};
++        s.scale2 = {last, last, last};
++        s.duration = type == 8 ? 3.f : .5f;
++        s.alpha = .75f;
++        s.waveform = type == 8 ? 0 : (random() - std::minstd_rand::min()) % 3;
++        s.fade = 1;
++        s.random_rotation = 1;
++        if (type == 8)
++        {
++            s.model = "Models\\Explosions\\duel_sphere.abc";
++            s.skin = "Spritetextures\\waterblue.dtx";
++        }
++        output = std::move(s);
++        return true;
++    }
++    std::uint64_t ExplosionModels::publish(DDWORD type, DVector position, DVector normal, std::string_view source,
++                                           ModelStore& models, const Resources& resources, double now,
++                                           std::string& error)
++    {
++        error.clear();
++        if (source.size() > 100 || source.find('\0') != std::string_view::npos || next_event_ == UINT64_MAX)
++        {
++            error = "Invalid explosion model source/event";
++            return 0;
++        }
++        ExplosionModelReport report{next_event_++, 0, type, std::string(source), {}};
++        std::optional<ExplosionModelSettings> setting;
++        if (original_explosion_model(type, position, normal, random_, setting, report.error) && setting)
++        {
++            CExplosionModelFX fx;
++            if (active.size() >= 128 || next_id_ == UINT64_MAX)
++                report.error = "Explosion model capacity exhausted";
++            else if (fx.Init(*setting, report.error) && fx.CreateObject(models, resources, now, random_, report.error))
++            {
++                report.model = fx.id = next_id_++;
++                fx.event = report.id;
++                active.push_back(std::move(fx));
++                ++started;
++            }
++        }
++        if (!report.error.empty())
++            ++failed;
++        error = report.error;
++        const auto id = report.id;
++        if (reports.size() == 64)
++            reports.erase(reports.begin());
++        reports.push_back(std::move(report));
++        return id;
++    }
++    bool ExplosionModels::advance(double now)
++    {
++        bool valid = true;
++        std::erase_if(active,
++                      [&](auto& fx)
++                      {
++                          if (fx.Update(now))
++                              return false;
++                          if (fx.error.empty())
++                              ++expired;
++                          else
++                          {
++                              ++failed;
++                              valid = false;
++                              update_error = fx.error;
++                          }
++                          return true;
++                      });
++        return valid;
++    }
++    void ExplosionModels::clear()
++    {
++        active.clear();
++        reports.clear();
++        update_error.clear();
++        started = expired = failed = 0;
++        random_.seed(1); // Reset level visual RNG, never identity tokens.
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/explosion_models.h b/src/game/explosion_models.h
+new file mode 100644
+index 0000000..c8c09b6
+--- /dev/null
++++ b/src/game/explosion_models.h
+@@ -0,0 +1,29 @@
++#pragma once
++#include "game/original/ExplosionModelFX.h"
++namespace OpenBlood2
++{
++    bool original_explosion_model(DDWORD, DVector, DVector, std::minstd_rand&, std::optional<ExplosionModelSettings>&,
++                                  std::string&);
++    struct ExplosionModelReport
++    {
++        std::uint64_t id = 0, model = 0;
++        DDWORD type = 0;
++        std::string source, error;
++    };
++    class ExplosionModels
++    {
++      public:
++        std::uint64_t publish(DDWORD, DVector, DVector, std::string_view, ModelStore&, const Resources&, double,
++                              std::string&);
++        bool advance(double);
++        void clear();
++        std::vector<CExplosionModelFX> active;
++        std::vector<ExplosionModelReport> reports;
++        std::string update_error;
++        std::uint64_t started = 0, expired = 0, failed = 0;
++
++      private:
++        std::minstd_rand random_{1}; // Client visual stream, separate from original server gameplay RNG.
++        std::uint64_t next_id_ = 1, next_event_ = 1;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/explosion_sprites.cpp b/src/game/explosion_sprites.cpp
+index 273f675..ae5f9ab 100644
+--- a/src/game/explosion_sprites.cpp
++++ b/src/game/explosion_sprites.cpp
+@@ -44,8 +44,7 @@ namespace OpenBlood2
+                 : type == 1 ? 2.f
+                             : 2.5f,
+                 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
+-            unavailable =
+-                type == 3 ? "model, particle rings, fragments/trails, lights" : "model, particle ring, lights";
++            unavailable = type == 3 ? "particle rings, fragments/trails, lights" : "particle ring, lights";
+         }
+         else if (type == 6)
+         {
+@@ -56,7 +55,7 @@ namespace OpenBlood2
+         else if (type == 8)
+         {
+             add(30, .1f, .75f, 3, .75f, 0, 0, "Sprites\\TesAltLoop.spr");
+-            unavailable = "model, particle flame, light";
++            unavailable = "particle flame, light";
+         }
+         else
+         {
+diff --git a/src/game/legacy/basedefs_de.h b/src/game/legacy/basedefs_de.h
+index 89d52a6..9a562c8 100644
+--- a/src/game/legacy/basedefs_de.h
++++ b/src/game/legacy/basedefs_de.h
+@@ -73,6 +73,7 @@ inline constexpr int MAX_CS_FILENAME_LEN = 100;
+ inline constexpr int MAX_GP_STRING_LEN = 200;
+ inline constexpr DBYTE OT_NORMAL = 0, OT_MODEL = 1, OT_WORLDMODEL = 2, OT_SPRITE = 3, OT_LIGHT = 4, OT_CONTAINER = 9;
+ inline constexpr DDWORD FLAG_FULLPOSITIONRES = 1u << 8, FLAG_GOTHRUWORLD = 1u << 21, FLAG_FORCECLIENTUPDATE = 1u << 24;
++inline constexpr DDWORD FLAG_NOLIGHT = 1u << 9;
+ inline constexpr DDWORD FLAG_MODELGOURAUDSHADE = 1u << 3, FLAG_ANIMTRANSITION = 1u << 7, FLAG_YROTATION = 1u << 11,
+                         FLAG_STAIRSTEP = 1u << 18;
+ inline constexpr DDWORD FLAG_VISIBLE = 1u << 0, FLAG_SHADOW = 1u << 1, FLAG_ROTATEABLESPRITE = 1u << 3,
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 5389039..420282b 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -63,6 +63,7 @@ class ServerDE : public CSBase
+     virtual bool SetBlockingPriority(HOBJECT, DBYTE) = 0;
+     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
++    virtual std::uint64_t PublishExplosionModels(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) = 0;
+     virtual void RecordExplosionEffect(const OpenBlood2::ExplosionEffect&) = 0;
+diff --git a/src/game/original/ClientExplosionSFX.cpp b/src/game/original/ClientExplosionSFX.cpp
+index e929745..78539a4 100644
+--- a/src/game/original/ClientExplosionSFX.cpp
++++ b/src/game/original/ClientExplosionSFX.cpp
+@@ -71,6 +71,7 @@ void CClientExplosionSFX::SetupFX()
+     report.damage = damage;
+     report.radius = radius;
+     report.sound = sound;
++    report.model_event = g_pServerDE->PublishExplosionModels(m_hObject, type, position, normal, report.model_error);
+     report.sprite_event = g_pServerDE->PublishExplosionSprites(m_hObject, type, position, normal, report.sprite_error);
+     // IMPORTANT: the source passes NULL, so DamageObject's null-damager guard
+     // suppresses every delivery. Do not silently "repair" this gameplay behavior.
+diff --git a/src/game/original/ExplosionModelFX.cpp b/src/game/original/ExplosionModelFX.cpp
+new file mode 100644
+index 0000000..a2e6de6
+--- /dev/null
++++ b/src/game/original/ExplosionModelFX.cpp
+@@ -0,0 +1,168 @@
++#include "ExplosionModelFX.h"
++#include "engine/collision.h"
++#include "engine/objects.h"
++#include <cmath>
++#include <numbers>
++using namespace OpenBlood2;
++namespace
++{
++    float random_float(std::minstd_rand& random, float low, float high)
++    {
++        // Original ClientUtilities formula and one draw, on a private portable client stream.
++        const float fraction = static_cast<float>(random() - std::minstd_rand::min()) /
++                               static_cast<float>(std::minstd_rand::max() - std::minstd_rand::min());
++        return low + (high - low) * fraction;
++    }
++    void around(DRotation& rotation, DVector axis, float angle)
++    {
++        const float sine = std::sin(angle / 2);
++        DRotation turn;
++        turn.m_Vec = {axis.x * sine, axis.y * sine, axis.z * sine};
++        turn.m_Spin = std::cos(angle / 2);
++        rotation = compose_rotation(turn, rotation);
++    }
++} // namespace
++bool CExplosionModelFX::Init(const ExplosionModelSettings& input, std::string& failure)
++{
++    failure.clear();
++    *this = {};
++    auto valid_scale = [](DVector v) { return physics_vector(v) && v.x >= 0 && v.y >= 0 && v.z >= 0; };
++    auto valid_path = [](const std::optional<std::string>& v)
++    { return !v || (v->size() <= 1000 && v->find('\0') == std::string::npos); };
++    if (!physics_vector(input.position) || !physics_vector(input.normal) || !physics_vector(input.rotations) ||
++        !valid_scale(input.scale1) || !valid_scale(input.scale2) || !std::isfinite(input.duration) ||
++        input.duration <= 0 || input.duration > 600 || !std::isfinite(input.alpha) || input.alpha < 0 ||
++        input.alpha > 1 || input.fade > 5 || input.random_rotation > 2 || !valid_path(input.model) ||
++        !valid_path(input.skin))
++    {
++        failure = "Invalid explosion model descriptor";
++        return false;
++    }
++    settings = input;
++    scale_changes_ =
++        input.scale1.x != input.scale2.x || input.scale1.y != input.scale2.y || input.scale1.z != input.scale2.z;
++    initialized_ = true;
++    return true;
++}
++bool CExplosionModelFX::CreateObject(ModelStore& models, const Resources& resources, double now,
++                                     std::minstd_rand& random, std::string& failure)
++{
++    failure.clear();
++    if (!initialized_ || model || !std::isfinite(now) || now < 0)
++    {
++        failure = "Invalid explosion model creation state/time";
++        return false;
++    }
++    constexpr auto pi = std::numbers::pi_v<float>;
++    if (settings.random_rotation == 1)
++    {
++        const float pitch = random_float(random, -pi, pi);
++        const float yaw = random_float(random, -pi, pi);
++        const float roll = random_float(random, -pi, pi);
++        rotation = rotation_from_euler({pitch, yaw, roll});
++    }
++    else if (settings.random_rotation == 2)
++    {
++        if (!align_rotation(settings.normal, rotation))
++        {
++            failure = "Cannot align explosion model to a zero/invalid normal";
++            return false;
++        }
++        around(rotation, rotate_vector(rotation, {0, 0, 1}), random_float(random, 0, pi));
++    }
++    model_path = settings.model.value_or("Models\\Explosions\\exp_sphere.abc");
++    skin_path = settings.skin.value_or("Skins\\Explosions\\Explosion_1.dtx");
++    if (!models.load(model_path, model, failure))
++        return false;
++    if (!resources.find(skin_path))
++    {
++        model.reset();
++        failure = "Explosion model skin is not indexed: " + skin_path;
++        return false;
++    }
++    scale = settings.scale1;
++    alpha = settings.alpha;
++    animation = {};
++    start_time = last_time = now;
++    return true;
++}
++bool CExplosionModelFX::Update(double now)
++{
++    error.clear();
++    if (!model || !std::isfinite(now) || now < last_time)
++    {
++        error = "Invalid explosion model clock/state";
++        return false;
++    }
++    const float time = static_cast<float>(now - start_time), ratio = time / settings.duration;
++    std::vector<std::uint32_t> keys;
++    if (!std::isfinite(ratio) || !advance_animation(*model, animation, now - last_time, keys, error))
++    {
++        if (error.empty())
++            error = "Explosion model animation clock failed";
++        return false;
++    }
++    last_time = now;
++    if (now < next_update)
++        return true;
++    ++updates;
++    if (scale_changes_)
++    {
++        float amount = ratio;
++        const float triangle = time < settings.duration / 2 ? ratio * 2 : (1 - ratio) * 2;
++        switch (settings.waveform)
++        {
++            case 1:
++                amount = std::sqrt(ratio);
++                break;
++            case 2:
++                amount = ratio * ratio;
++                break;
++            case 3:
++                amount = triangle;
++                break;
++            case 4:
++                amount = std::sqrt(triangle);
++                break;
++            case 5:
++                amount = triangle * triangle;
++                break;
++        }
++        scale = {settings.scale1.x + (settings.scale2.x - settings.scale1.x) * amount,
++                 settings.scale1.y + (settings.scale2.y - settings.scale1.y) * amount,
++                 settings.scale1.z + (settings.scale2.z - settings.scale1.z) * amount};
++    }
++    if (settings.rotations.x || settings.rotations.y || settings.rotations.z)
++    {
++        // Source caches all three axes before any rotation and does NOT multiply by frame time.
++        const auto up = rotate_vector(rotation, {0, 1, 0}), right = rotate_vector(rotation, {1, 0, 0}),
++                   forward = rotate_vector(rotation, {0, 0, 1});
++        around(rotation, up, settings.rotations.x);
++        around(rotation, right, settings.rotations.y);
++        around(rotation, forward, settings.rotations.z);
++    }
++    switch (settings.fade)
++    {
++        case 1:
++            alpha = settings.alpha * (1 - ratio);
++            break;
++        case 2:
++            alpha = 1 - (1 - settings.alpha) * ratio;
++            break;
++        case 3:
++            alpha = settings.alpha * ratio;
++            break;
++        case 4:
++            alpha = settings.alpha + (1 - settings.alpha) * ratio;
++            break;
++        case 5:
++            alpha = time < settings.duration / 2 ? settings.alpha * ratio * 2 : settings.alpha * 2 * (1 - ratio);
++            break;
++    }
++    if (time < settings.duration)
++    {
++        next_update = now + .001;
++        return true;
++    }
++    return false;
++}
+diff --git a/src/game/original/ExplosionModelFX.h b/src/game/original/ExplosionModelFX.h
+new file mode 100644
+index 0000000..2f07508
+--- /dev/null
++++ b/src/game/original/ExplosionModelFX.h
+@@ -0,0 +1,35 @@
++#pragma once
++#include "engine/model_store.h"
++#include <optional>
++#include <random>
++namespace OpenBlood2
++{
++    struct ExplosionModelSettings
++    {
++        DVector position{}, normal{0, 1, 0}, scale1{}, scale2{1, 1, 1}, rotations{};
++        float duration = 1, alpha = 1;
++        DBYTE waveform = 0, fade = 0, random_rotation = 0;
++        std::optional<std::string> model, skin;
++    };
++} // namespace OpenBlood2
++// Selected original ExplosionFX.cpp model methods; typed client visual ownership.
++class CExplosionModelFX
++{
++  public:
++    bool Init(const OpenBlood2::ExplosionModelSettings&, std::string&);
++    bool CreateObject(OpenBlood2::ModelStore&, const OpenBlood2::Resources&, double, std::minstd_rand&, std::string&);
++    bool Update(double);
++    OpenBlood2::ExplosionModelSettings settings;
++    std::shared_ptr<const OpenBlood2::Model> model;
++    OpenBlood2::AnimationTrack animation;
++    std::string model_path, skin_path, error;
++    DRotation rotation;
++    DVector scale{};
++    float alpha = 1;
++    double start_time = 0, last_time = 0, next_update = 0;
++    std::uint64_t id = 0, event = 0, updates = 0;
++    DDWORD flags = FLAG_VISIBLE | FLAG_MODELGOURAUDSHADE | FLAG_NOLIGHT;
++
++  private:
++    bool initialized_ = false, scale_changes_ = false;
++};
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 615880b..221167b 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -3,6 +3,7 @@
+ #include "engine/model_store.h"
+ #include "engine/objects.h"
+ #include "engine/string_resources.h"
++#include "game/explosion_models.h"
+ #include "game/explosion_sprites.h"
+ #include "game/original/BloodShells.h"
+ #include "game/original/LightFX.h"
+@@ -76,6 +77,8 @@ namespace OpenBlood2
+         void RecordDebrisEffect(const DebrisEffect&) override;
+         std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         ExplosionSprites explosion_sprites;
++        ExplosionModels explosion_models;
++        std::uint64_t PublishExplosionModels(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) override;
+         void RecordExplosionEffect(const ExplosionEffect&) override;
+         std::vector<DebrisEffect> debris_effects;
+@@ -103,6 +106,7 @@ namespace OpenBlood2
+             explosion_effects.clear();
+             scene_explosions.clear();
+             explosion_sprites.clear();
++            explosion_models.clear();
+             spawn_reports.clear();
+             pickup_reports.clear();
+             camera_effects.clear();
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index 3eb4080..98d1d25 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -4,6 +4,18 @@ namespace OpenBlood2
+ {
+     // These copied, bounded records expose pending client FX/audio. They do not
+     // enqueue gameplay and never retain a pointer into an original object.
++    std::uint64_t ServerAdapter::PublishExplosionModels(HOBJECT source, DDWORD type, DVector position, DVector normal,
++                                                        std::string& error)
++    {
++        trace_service("PublishExplosionModels (partial high-detail composite)");
++        if (!IsObjectAlive(source) || !objects_.models || !client_resources)
++        {
++            error = "Explosion source/model resources unavailable";
++            return 0;
++        }
++        return explosion_models.publish(type, position, normal, GetObjectName(source), *objects_.models,
++                                        *client_resources, objects_.time(), error);
++    }
+     std::uint64_t ServerAdapter::PublishExplosionSprites(HOBJECT source, DDWORD type, DVector position, DVector normal,
+                                                          std::string& error)
+     {
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index dd2fce9..fa2e111 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -435,6 +435,7 @@ namespace OpenBlood2
+         ok = objects.refresh_attachments() && ok;
+         ok = server.advance_lights() && ok;
+         ok = server.explosion_sprites.advance(objects.time()) && ok;
++        ok = server.explosion_models.advance(objects.time()) && ok;
+         if (ok && preview_model && preview_playing &&
+             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
+             preview_playing = false;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 924047f..516b9ec 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -961,3 +961,27 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME explosion_sprites.private COMMAND explosion_sprite_tests private "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(explosion_sprites.private PROPERTIES LABELS "headless;private;explosion_sprites" TIMEOUT 90)
+ endif()
++
++add_executable(explosion_model_tests explosion_model_tests.cpp ../src/app/model_scene.cpp)
++target_link_libraries(explosion_model_tests PRIVATE blood2_game)
++blood2_project_options(explosion_model_tests)
++foreach(case formulas recipes failures session)
++    add_test(NAME explosion_models.${case} COMMAND explosion_model_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/explosion-models-${case}")
++    set_tests_properties(explosion_models.${case} PROPERTIES LABELS "headless;explosion_models" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME explosion_models.private COMMAND explosion_model_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(explosion_models.private PROPERTIES LABELS "headless;private;explosion_models" TIMEOUT 90)
++endif()
++
++if(BLOOD2_GPU_TESTS)
++    add_executable(explosion_model_gpu_tests explosion_model_gpu_tests.cpp)
++    target_link_libraries(explosion_model_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(explosion_model_gpu_tests)
++    add_test(NAME gpu.explosion_model_alpha COMMAND explosion_model_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/explosion-model-alpha")
++    set_tests_properties(gpu.explosion_model_alpha PROPERTIES LABELS "gpu;explosion_models" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.explosion_model_private COMMAND explosion_model_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/explosion-model-private" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.explosion_model_private PROPERTIES LABELS "gpu;private;explosion_models" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    endif()
++endif()
+diff --git a/tests/explosion_model_fixture.h b/tests/explosion_model_fixture.h
+new file mode 100644
+index 0000000..a08f012
+--- /dev/null
++++ b/tests/explosion_model_fixture.h
+@@ -0,0 +1,32 @@
++#pragma once
++#include "explosion_sprite_fixture.h"
++namespace test_explosion_model
++{
++    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error)
++    {
++        if (!test_explosion_sprite::mount(resources, root, error))
++            return false;
++        std::vector<std::uint8_t> skin;
++        if (!resources.read("alpha.dtx", skin, error))
++            return false;
++        test_player::Directory dir;
++        for (auto name : {"exp_sphere.abc", "duel_sphere.abc"})
++            dir.children["models"].children["explosions"].files[name] = test_model::abc().b;
++        dir.children["skins"].children["explosions"].files["explosion_1.dtx"] = skin;
++        dir.children["spritetextures"].files["waterblue.dtx"] = skin;
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, dir);
++        w.patch(131, off);
++        w.patch(135, size);
++        auto file = root / "explosion-models.rez";
++        std::ofstream out(file, std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        return resources.mount(file, error);
++    }
++} // namespace test_explosion_model
+diff --git a/tests/explosion_model_gpu_tests.cpp b/tests/explosion_model_gpu_tests.cpp
+new file mode 100644
+index 0000000..635aed0
+--- /dev/null
++++ b/tests/explosion_model_gpu_tests.cpp
+@@ -0,0 +1,159 @@
++#include "app/model_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "explosion_model_fixture.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << " " << error << " " << SDL_GetError() << "\n";                         \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    DVector sub(DVector a, DVector b)
++    {
++        return {a.x - b.x, a.y - b.y, a.z - b.z};
++    }
++    DVector cross(DVector a, DVector b)
++    {
++        return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
++    }
++    bool render(Runtime& runtime, WorldRenderer& renderer, ModelView& scene, DVector eye, DRotation camera,
++                Capture& capture, std::vector<std::uint8_t>& pixels, std::string& error)
++    {
++        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300)) ||
++            !renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true))
++            return false;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        if (!commands)
++            return false;
++        if (!renderer.draw(commands, capture.texture, scene.mesh, scene.world_draws, eye, camera, false, error))
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 300;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 300;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
++            return false;
++        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        if (!data)
++            return false;
++        pixels.assign(data, data + 400 * 300 * 4);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    Runtime runtime;
++    std::string error;
++    CHECK(runtime.initialize(true, error));
++    WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
++    Resources resources;
++    ModelStore models(resources);
++    ModelView scene;
++    CHECK(test_explosion_model::mount(resources, argv[1], error));
++    ExplosionModelSettings settings;
++    settings.scale1 = settings.scale2 = {1, 1, 1};
++    settings.duration = 1;
++    settings.fade = 1;
++    CExplosionModelFX fx;
++    std::minstd_rand random(1);
++    CHECK(fx.Init(settings, error) && fx.CreateObject(models, resources, 0, random, error));
++    std::vector<std::uint8_t> full, half;
++    Capture capture;
++    CHECK(scene.add(fx.model.get(), fx.animation, fx.skin_path, {}, fx.scale, true, false, {}, "alpha model", resources,
++                    error, {}, fx.alpha, true));
++    CHECK(scene.world_draws.size() == 1 && scene.entries[0].error.empty());
++    const auto a = scene.mesh.vertices[0].position, b = scene.mesh.vertices[1].position,
++               c = scene.mesh.vertices[2].position;
++    auto normal = cross(sub(b, a), sub(c, a));
++    const float length = std::sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
++    CHECK(length > 0);
++    normal = {normal.x / length, normal.y / length, normal.z / length};
++    DRotation camera;
++    CHECK(align_rotation(normal, camera));
++    DVector center{(a.x + b.x + c.x) / 3, (a.y + b.y + c.y) / 3, (a.z + b.z + c.z) / 3};
++    const DVector eye{center.x - normal.x * 10, center.y - normal.y * 10, center.z - normal.z * 10};
++    CHECK(render(runtime, renderer, scene, eye, camera, capture, full, error));
++    // Same pose/material, half alpha from the original Update formula.
++    CHECK(fx.Update(.5) && std::abs(fx.alpha - .5f) < .0001f);
++    scene.begin_frame();
++    AnimationTrack original_pose;
++    CHECK(scene.add(fx.model.get(), original_pose, fx.skin_path, {}, fx.scale, true, false, {}, "half alpha model",
++                    resources, error, {}, fx.alpha, true));
++    CHECK(render(runtime, renderer, scene, eye, camera, capture, half, error));
++    unsigned ink = 0;
++    const int background[] = {6, 9, 13};
++    for (unsigned i = 0; i < 400 * 300; ++i)
++    {
++        bool changed = false;
++        for (unsigned channel = 0; channel < 3; ++channel)
++        {
++            const auto index = i * 4 + channel;
++            changed |= full[index] != background[channel];
++            CHECK(std::abs(int(half[index]) - int((full[index] + background[channel]) / 2)) <= 1);
++        }
++        if (changed)
++            ++ink;
++    }
++    CHECK(ink > 50 && ink < 40000);
++    CHECK(capture.save((std::filesystem::path(argv[1]) / "model-alpha.png").c_str()));
++    std::cout << "Original model opacity: " << ink << " covered pixels, half-opacity linear blend verified\n";
++    if (argc == 3)
++    {
++        GameSession game;
++        Config config;
++        config.data_dir = argv[2];
++        CHECK(game.initialize() && game.resources.mount_game(config, error));
++        // Isolated original default model recipe, without copying any commercial resource.
++        ExplosionModels effects;
++        CHECK(effects.publish(3, {}, {0, 1, 0}, "GPU model", game.models, game.resources, 0, error) && error.empty());
++        CHECK(effects.advance(.25) && effects.active.size() == 1);
++        const auto& model = effects.active.front();
++        scene.clear();
++        renderer.clear_geometry();
++        CHECK(scene.add(model.model.get(), model.animation, model.skin_path, {model.settings.position, model.rotation},
++                        model.scale, true, false, {}, model.model_path, game.resources, error, {}, model.alpha, true));
++        CHECK(scene.world_draws.size() == 1 && scene.entries[0].error.empty() && scene.entries[0].triangles > 0);
++        CHECK(render(runtime, renderer, scene, {0, 10, -800}, {}, capture, full, error));
++        ink = 0;
++        for (unsigned i = 0; i < 400 * 300; ++i)
++            if (full[i * 4] != 6 || full[i * 4 + 1] != 9 || full[i * 4 + 2] != 13)
++                ++ink;
++        CHECK(ink > 50 && ink < 100000);
++        CHECK(capture.save((std::filesystem::path(argv[1]) / "original-explosion-model.png").c_str()));
++        std::cout << "Original exp_sphere/Explosion_1: " << scene.entries[0].triangles << " triangles, " << ink
++                  << " pixels, alpha " << model.alpha << "\n";
++        CHECK(effects.advance(.5) && effects.active.empty());
++        effects.clear();
++        scene.clear();
++        renderer.clear_geometry();
++        CHECK(scene.world_draws.empty());
++    }
++    return 0;
++}
+diff --git a/tests/explosion_model_tests.cpp b/tests/explosion_model_tests.cpp
+new file mode 100644
+index 0000000..5329510
+--- /dev/null
++++ b/tests/explosion_model_tests.cpp
+@@ -0,0 +1,274 @@
++#include "app/model_scene.h"
++#include "explosion_model_fixture.h"
++#include "game/original/ClientExplosionSFX.h"
++#include <cmath>
++#include <limits>
++#include <numbers>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ":" << __LINE__ << ": " #x << "\n";                                               \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .0001f;
++    }
++    bool command(GameSession& game, HOBJECT h)
++    {
++        auto s = game.server.CreateString("TRIGGER");
++        auto m = game.server.StartMessageToObject(nullptr, h, 1000);
++        bool ok = m && game.server.WriteToMessageHString(m, s) == DE_OK && game.server.EndMessage(m) == DE_OK;
++        game.server.FreeString(s);
++        return ok;
++    }
++    bool formulas(const std::filesystem::path& root)
++    {
++        Resources resources;
++        ModelStore store(resources);
++        std::string error;
++        std::minstd_rand random(1);
++        CHECK(test_explosion_model::mount(resources, root, error));
++        for (unsigned wave : {0u, 1u, 2u, 3u, 4u, 5u, 255u})
++            for (unsigned fade = 0; fade < 6; ++fade)
++            {
++                ExplosionModelSettings s;
++                s.scale1 = {1, 2, 3};
++                s.scale2 = {5, 6, 7};
++                s.duration = 1;
++                s.alpha = .4f;
++                s.waveform = wave;
++                s.fade = fade;
++                CExplosionModelFX fx;
++                CHECK(fx.Init(s, error) && fx.CreateObject(store, resources, 10, random, error));
++                CHECK(fx.flags & FLAG_NOLIGHT);
++                CHECK(near(fx.alpha, .4f));
++                CHECK(fx.Update(10));
++                CHECK(near(fx.alpha, fade == 2 ? 1.f : fade == 3 || fade == 5 ? 0.f : .4f));
++                CHECK(fx.Update(10.25));
++                const float alphas[] = {.4f, .3f, .85f, .1f, .55f, .2f};
++                CHECK(near(fx.alpha, alphas[fade]));
++                const float amount = wave == 1   ? .5f
++                                     : wave == 2 ? .0625f
++                                     : wave == 3 ? .5f
++                                     : wave == 4 ? std::sqrt(.5f)
++                                     : wave == 5 ? .25f
++                                                 : .25f;
++                CHECK(near(fx.scale.x, 1 + 4 * amount));
++                CHECK(near(fx.scale.y, fx.scale.x + 1));
++                CHECK(fx.Update(10.75));
++                if (wave >= 3 && wave <= 5)
++                    CHECK(near(fx.scale.x, 1 + 4 * amount));
++                CHECK(!fx.Update(11) && fx.error.empty());
++                CHECK(near(fx.scale.x, wave >= 3 && wave <= 5 ? 1.f : 5.f));
++                CHECK(near(fx.alpha, fade == 0 || fade == 2 || fade == 3 ? .4f : fade == 4 ? 1.f : 0.f));
++            }
++        ExplosionModelSettings s;
++        s.scale1 = s.scale2 = {1, 1, 1};
++        s.rotations = {std::numbers::pi_v<float> / 2, 0, 0};
++        CExplosionModelFX fx;
++        CHECK(fx.Init(s, error) && fx.CreateObject(store, resources, 0, random, error));
++        CHECK(fx.Update(0));
++        auto f = rotate_vector(fx.rotation, {0, 0, 1});
++        CHECK(near(f.x, 1) && near(f.z, 0));
++        CHECK(fx.Update(.0005) && fx.updates == 1);
++        CHECK(fx.Update(.01) && fx.updates == 2);
++        f = rotate_vector(fx.rotation, {0, 0, 1});
++        CHECK(near(f.z, -1));
++        s.rotations = {std::numbers::pi_v<float> / 2, std::numbers::pi_v<float> / 2, std::numbers::pi_v<float> / 2};
++        CHECK(fx.Init(s, error) && fx.CreateObject(store, resources, 0, random, error) && fx.Update(0));
++        f = rotate_vector(fx.rotation, {0, 0, 1});
++        CHECK(near(f.x, 0) && near(f.y, 1) && near(f.z, 0));
++        s.rotations = {};
++        s.random_rotation = 2;
++        s.normal = {2, 0, 0};
++        CHECK(fx.Init(s, error) && fx.CreateObject(store, resources, 0, random, error));
++        f = rotate_vector(fx.rotation, {0, 0, 1});
++        CHECK(near(f.x, 1) && near(f.y, 0) && near(f.z, 0));
++        s.random_rotation = 1;
++        std::minstd_rand a(7), b(7);
++        CExplosionModelFX one, two;
++        CHECK(one.Init(s, error) && two.Init(s, error) && one.CreateObject(store, resources, 0, a, error) &&
++              two.CreateObject(store, resources, 0, b, error));
++        std::minstd_rand expected(7);
++        expected();
++        expected();
++        expected(); // Source random Euler orientation consumes exactly three draws.
++        CHECK(a == expected && b == expected);
++        CHECK(one.rotation.m_Vec.x == two.rotation.m_Vec.x && a() == b());
++        return true;
++    }
++    bool recipes(const std::filesystem::path&)
++    {
++        std::minstd_rand random(1);
++        std::string error;
++        std::optional<ExplosionModelSettings> s;
++        for (unsigned type : {0u, 1u, 2u, 3u, 6u, 8u})
++        {
++            CHECK(original_explosion_model(type, {10, 20, 30}, {0, 2, 0}, random, s, error));
++            if (type == 6)
++            {
++                CHECK(!s);
++                continue;
++            }
++            CHECK(s && near(s->position.y, type == 8 ? 50.f : 30.f));
++            CHECK(near(s->scale1.x, type == 0 ? 25.f : type == 2 ? 100.f : 50.f));
++            CHECK(near(s->scale2.x, type == 0 ? 200.f : type == 2 ? 600.f : type == 8 ? 1000.f : 400.f));
++            CHECK(s->waveform <= 2 && s->fade == 1 && s->random_rotation == 1 && near(s->alpha, .75f));
++            CHECK(s->model.has_value() == (type == 8));
++        }
++        CHECK(!original_explosion_model(24, {}, {0, 1, 0}, random, s, error) && !s && !error.empty());
++        CHECK(!original_explosion_model(3, {}, {}, random, s, error));
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        Resources resources;
++        ModelStore store(resources);
++        std::string error;
++        std::minstd_rand random(1);
++        CHECK(test_explosion_model::mount(resources, root, error));
++        for (unsigned kind = 0; kind < 7; ++kind)
++        {
++            CExplosionModelFX fx;
++            ExplosionModelSettings s;
++            if (kind == 0)
++                s.duration = 0;
++            if (kind == 1)
++                s.duration = 601;
++            if (kind == 2)
++                s.alpha = 2;
++            if (kind == 3)
++                s.fade = 6;
++            if (kind == 4)
++                s.random_rotation = 3;
++            if (kind == 5)
++                s.scale1.x = -1;
++            if (kind == 6)
++                s.model = std::string("a\0b", 3);
++            CHECK(!fx.Init(s, error));
++        }
++        ExplosionModelSettings s;
++        CExplosionModelFX fx;
++        s.model = "";
++        CHECK(fx.Init(s, error) && !fx.CreateObject(store, resources, 0, random, error));
++        s.model.reset();
++        s.skin = "absent.dtx";
++        CHECK(fx.Init(s, error) && !fx.CreateObject(store, resources, 0, random, error));
++        s.skin.reset();
++        s.random_rotation = 2;
++        s.normal = {};
++        CHECK(fx.Init(s, error) && !fx.CreateObject(store, resources, 0, random, error));
++        s.random_rotation = 0;
++        CHECK(fx.Init(s, error) && fx.CreateObject(store, resources, 1, random, error));
++        CHECK(!fx.Update(.9) && !fx.error.empty());
++        ExplosionModels effects;
++        CHECK(effects.publish(6, {}, {0, 1, 0}, "none", store, resources, 0, error) && error.empty() &&
++              effects.active.empty());
++        for (unsigned i = 0; i < 128; ++i)
++            CHECK(effects.publish(3, {}, {0, 1, 0}, "budget", store, resources, 0, error) && error.empty());
++        CHECK(effects.active.size() == 128 && effects.reports.size() == 64);
++        CHECK(effects.publish(3, {}, {0, 1, 0}, "full", store, resources, 0, error) && !error.empty() &&
++              effects.failed == 1);
++        auto previous = effects.active.back().id;
++        CHECK(effects.advance(.5) && effects.active.empty() && effects.expired == 128);
++        effects.clear();
++        CHECK(effects.publish(3, {}, {0, 1, 0}, "new", store, resources, 1, error) && error.empty());
++        CHECK(effects.active[0].id > previous);
++        CHECK(!effects.advance(.5) && effects.active.empty() && !effects.update_error.empty());
++        return true;
++    }
++    bool session(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string error;
++        CHECK(g.initialize() && test_explosion_model::mount(g.resources, root, error));
++        auto h = g.objects.create(g.objects.find_class("CClientExplosionSFX"), {}, Creation::World,
++                                  {{"Name", std::string("emitter")},
++                                   {"Pos", DVector{10, 20, 30}},
++                                   {"Direction", DVector{0, 3, 0}},
++                                   {"ExplosionType", 3},
++                                   {"WaveFile", std::string("")}});
++        CHECK(h && command(g, h) && command(g, h));
++        auto& effects = g.server.explosion_models;
++        CHECK(effects.active.size() == 2 && effects.started == 2 && g.server.explosion_sprites.active.size() == 4);
++        CHECK(g.server.scene_explosions.back().model_error.empty() &&
++              !g.server.scene_explosions.back().client_fx_available);
++        CHECK(g.step(.11) && !g.objects.get(h) && effects.active.size() == 2);
++        ModelView scene;
++        CHECK(update_explosion_model_scene(g, scene, error) && scene.world_draws.size() == 2);
++        for (const auto& e : scene.entries)
++            CHECK(e.error.empty() && e.client_effect && e.triangles == 1 && near(e.alpha, .75f * (1 - .11f / .5f)));
++        auto clock = effects.active[0].animation.time;
++        CHECK(update_explosion_model_scene(g, scene, error) && clock == effects.active[0].animation.time);
++        CHECK(g.step(.39) && effects.active.empty() && effects.expired == 2 &&
++              g.server.explosion_sprites.active.size() == 4);
++        CHECK(update_explosion_model_scene(g, scene, error) && scene.entries.empty());
++        CHECK(g.unload_world() && effects.reports.empty() && g.server.string_count() == 0 &&
++              g.server.message_count() == 0);
++        return true;
++    }
++    bool private_world(const std::filesystem::path& root)
++    {
++        GameSession g;
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.initialize() && g.resources.mount_game(c, error));
++        ModelView scene;
++        std::uint64_t previous = 0;
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            unsigned n = 0;
++            for (auto id : g.objects.snapshot())
++            {
++                auto* r = g.objects.get(id);
++                if (dynamic_cast<CClientExplosionSFX*>(r->game.get()))
++                {
++                    CHECK(command(g, r->handle));
++                    ++n;
++                }
++            }
++            auto& effects = g.server.explosion_models;
++            if (effects.failed)
++                for (const auto& report : effects.reports)
++                    std::cerr << report.error << "\n";
++            CHECK(n == 9 && effects.started == 9 && effects.failed == 0 && g.step(.11));
++            CHECK(update_explosion_model_scene(g, scene, error) && scene.world_draws.size() == 9);
++            for (const auto& e : scene.entries)
++            {
++                std::cout << e.label << " triangles=" << e.triangles << " skin=" << e.skin << " alpha=" << e.alpha
++                          << " error=" << e.error << "\n";
++                CHECK(e.error.empty() && e.triangles > 0 && e.alpha < .75f);
++            }
++            CHECK(effects.active.front().id > previous);
++            previous = effects.active.back().id;
++            CHECK(g.step(.4) && effects.active.empty() && effects.expired == 9);
++            CHECK(g.unload_world() && effects.reports.empty());
++            scene.clear();
++            CHECK(g.server.string_count() == 0 && g.server.message_count() == 0 &&
++                  update_explosion_model_scene(g, scene, error) && scene.entries.empty());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string name = argv[1];
++    return (name == "formulas"   ? formulas(argv[2])
++            : name == "recipes"  ? recipes(argv[2])
++            : name == "failures" ? failures(argv[2])
++            : name == "session"  ? session(argv[2])
++                                 : name == "private" && private_world(argv[2]))
++               ? 0
++               : 1;
++}
+diff --git a/tests/explosion_sprite_tests.cpp b/tests/explosion_sprite_tests.cpp
+index 78b490b..961d8d9 100644
+--- a/tests/explosion_sprite_tests.cpp
++++ b/tests/explosion_sprite_tests.cpp
+@@ -137,7 +137,7 @@ namespace
+         CHECK(effects.publish(1, {}, {0, 2, 0}, "partial", store, 0, error));
+         CHECK(effects.active.size() == 1 && effects.started == 1 && effects.failed == 1 && !error.empty());
+         CHECK(effects.reports.back().sprites.size() == 1 &&
+-              effects.reports.back().unavailable == "model, particle ring, lights");
++              effects.reports.back().unavailable == "particle ring, lights");
+         CHECK(effects.publish(24, {}, {0, 1, 0}, "unsupported", store, 0, error) && !error.empty());
+         CHECK(effects.publish(1, {}, {}, "zero normal", store, 0, error) && !error.empty());
+         const auto old_id = effects.active.front().id;
+@@ -172,6 +172,9 @@ namespace
+         CHECK(near(effects.active[0].settings.position.y, 45) && near(effects.active[0].settings.normal.y, 1));
+         CHECK(game.server.scene_explosions.back().sprite_error.empty() &&
+               !game.server.scene_explosions.back().client_fx_available);
++        // This fixture intentionally has no ABC model: failed model creation cannot cancel sibling sprites.
++        CHECK(!game.server.scene_explosions.back().model_error.empty() && game.server.explosion_models.active.empty() &&
++              game.server.explosion_models.failed == 2);
+         CHECK(game.server.scene_explosions.back().targets.delivered == 0);
+         CHECK(game.step(.11) && !game.objects.get(h) && effects.active.size() == 4);
+         CHECK(effects.active[0].track.frame == 1 && near(effects.active[0].alpha, 1 - .11f / 1.5f));

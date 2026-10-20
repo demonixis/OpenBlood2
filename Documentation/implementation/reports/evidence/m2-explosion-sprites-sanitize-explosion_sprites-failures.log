@@ -1,0 +1,14 @@
+516/518 Testing: explosion_sprites.failures
+516/518 Test: explosion_sprites.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_sprite_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-sprites-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_sprites.failures" start time: Oct 16 20:20 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_sprites.failures" end time: Oct 16 20:20 CEST
+"explosion_sprites.failures" time elapsed: 00:00:00
+----------------------------------------------------------

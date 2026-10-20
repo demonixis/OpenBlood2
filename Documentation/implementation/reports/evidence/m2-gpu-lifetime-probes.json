@@ -1,0 +1,106 @@
+[
+  {
+    "name": "video1",
+    "command": [
+      "build/sanitize/tests/platform_lifetime_tests",
+      "video",
+      "1"
+    ],
+    "environment": {
+      "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+      "SDL_AUDIODRIVER": "dummy",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    },
+    "returncode": 0,
+    "seconds": 0.16401795099955052,
+    "log": "/tmp/b2-gpu-lifetime-video1.log"
+  },
+  {
+    "name": "window1",
+    "command": [
+      "build/sanitize/tests/platform_lifetime_tests",
+      "window",
+      "1"
+    ],
+    "environment": {
+      "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+      "SDL_AUDIODRIVER": "dummy",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    },
+    "returncode": 0,
+    "seconds": 0.16416257299715653,
+    "log": "/tmp/b2-gpu-lifetime-window1.log"
+  },
+  {
+    "name": "gpu1-modules",
+    "command": [
+      "build/sanitize/tests/platform_lifetime_tests",
+      "gpu",
+      "1"
+    ],
+    "environment": {
+      "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+      "SDL_AUDIODRIVER": "dummy",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+      "UBSAN_OPTIONS": "halt_on_error=1",
+      "LD_DEBUG": "files"
+    },
+    "returncode": 1,
+    "seconds": 2.418635367997922,
+    "log": "/tmp/b2-gpu-lifetime-gpu1-modules.log"
+  },
+  {
+    "name": "video3",
+    "command": [
+      "build/sanitize/tests/platform_lifetime_tests",
+      "video",
+      "3"
+    ],
+    "environment": {
+      "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+      "SDL_AUDIODRIVER": "dummy",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    },
+    "returncode": 0,
+    "seconds": 0.3647450389980804,
+    "log": "/tmp/b2-gpu-lifetime-video3.log"
+  },
+  {
+    "name": "gpu3",
+    "command": [
+      "build/sanitize/tests/platform_lifetime_tests",
+      "gpu",
+      "3"
+    ],
+    "environment": {
+      "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+      "SDL_AUDIODRIVER": "dummy",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    },
+    "returncode": 1,
+    "seconds": 6.57751487600035,
+    "log": "/tmp/b2-gpu-lifetime-gpu3.log"
+  },
+  {
+    "name": "gpu1-dbus-shutdown",
+    "command": [
+      "build/sanitize/tests/platform_lifetime_tests",
+      "gpu",
+      "1"
+    ],
+    "environment": {
+      "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+      "SDL_AUDIODRIVER": "dummy",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:allow_addr2line=1",
+      "UBSAN_OPTIONS": "halt_on_error=1",
+      "SDL_SHUTDOWN_DBUS_ON_QUIT": "1"
+    },
+    "returncode": 1,
+    "seconds": 2.3688133870018646,
+    "log": "/tmp/b2-gpu-lifetime-gpu1-dbus-shutdown.log"
+  }
+]

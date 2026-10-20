@@ -1,0 +1,12 @@
+{
+  "name": "engine_contract_values",
+  "command": [
+    "/tmp/lithtech-audit-2bVxTF/engine_contract_probe"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:18:53.779484+00:00",
+  "elapsed_seconds": 0.013,
+  "timeout_seconds": 20,
+  "exit_code": 0,
+  "log": "engine_contract_values.log"
+}

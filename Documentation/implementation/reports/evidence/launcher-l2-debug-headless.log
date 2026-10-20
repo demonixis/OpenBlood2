@@ -1,0 +1,115 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/launcher-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+      Start  1: launcher.state
+
+1: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_tests "state" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/state"
+1: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+1: Test timeout computed to be: 20
+ 1/12 Test  #1: launcher.state ...................   Passed    0.01 sec
+test 2
+      Start  2: launcher.dialogs
+
+2: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_tests "dialogs" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/dialogs"
+2: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+2: Test timeout computed to be: 20
+ 2/12 Test  #2: launcher.dialogs .................   Passed    0.00 sec
+test 3
+      Start  3: launcher.help
+
+3: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/blood2-launcher "--help"
+3: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+3: Test timeout computed to be: 10000000
+3: OpenBlood2 Launcher
+3:   --state-dir ABS_PATH  Isolated launcher state
+3:   --game ABS_PATH       Development game executable
+3:   --data-dir ABS_PATH   Initial data directory
+3:   --demo                Initial demo edition
+3:   --frames N            Quit after 3..10000 frames
+3:   --capture ABS_FILE    Capture settled UI
+3:   --ui-scale SCALE      0.75..3 diagnostic scale
+3:   --smoke               Isolated UI/resize smoke (requires --state-dir, --frames >= 12)
+3:   --launch-smoke        Drive Play and return (requires --smoke, --game, --data-dir)
+ 3/12 Test  #3: launcher.help ....................   Passed    0.00 sec
+test 4
+      Start  4: launcher.protocol
+
+4: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_process_tests "protocol" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/protocol" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_game_fixture"
+4: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+4: Test timeout computed to be: 30
+ 4/12 Test  #4: launcher.protocol ................   Passed    0.00 sec
+test 5
+      Start  5: launcher.probe
+
+5: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_process_tests "probe" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/probe" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_game_fixture"
+5: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+5: Test timeout computed to be: 30
+ 5/12 Test  #5: launcher.probe ...................   Passed    0.15 sec
+test 6
+      Start  6: launcher.content
+
+6: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_process_tests "content" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/content" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_game_fixture"
+6: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+6: Test timeout computed to be: 30
+ 6/12 Test  #6: launcher.content .................   Passed    0.00 sec
+test 7
+      Start  7: launcher.process
+
+7: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_process_tests "process" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/process" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_game_fixture"
+7: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+7: Test timeout computed to be: 30
+7: Controller: REZ: invalid/truncated v1 header
+7: Controller: Game exited with code 17. See game logs.
+ 7/12 Test  #7: launcher.process .................   Passed    0.18 sec
+test 8
+      Start  8: launcher.detach
+
+8: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_process_tests "detach" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/detach" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_game_fixture"
+8: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+8: Test timeout computed to be: 30
+ 8/12 Test  #8: launcher.detach ..................   Passed    0.20 sec
+test 9
+      Start  9: launcher.game_info
+
+9: Test command: /usr/bin/cmake "-DGAME=/home/yann/projects/lithtech/Blood2/build/debug/blood2" "-DROOT=/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/game-info" "-P" "/home/yann/projects/lithtech/Blood2/tests/launcher/info_test.cmake"
+9: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+9: Test timeout computed to be: 20
+ 9/12 Test  #9: launcher.game_info ...............   Passed    0.02 sec
+test 10
+      Start 10: launcher.private_retail
+
+10: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_process_tests "private" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/private-retail" "/home/yann/projects/lithtech/Blood2/build/debug/blood2" "/home/yann/.steam/steam/steamapps/common/Blood II" "retail"
+10: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+10: Test timeout computed to be: 30
+10: Private retail: 7446 resources, 4 mounts; game query bbc7ef4-dirty
+10/12 Test #10: launcher.private_retail ..........   Passed    0.08 sec
+test 11
+      Start 11: launcher.private_demo
+
+11: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_process_tests "private" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/private-demo" "/home/yann/projects/lithtech/Blood2/build/debug/blood2" "/home/yann/Games/B2Demo" "demo"
+11: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+11: Test timeout computed to be: 30
+11: Private demo: 1364 resources, 1 mounts; game query bbc7ef4-dirty
+11/12 Test #11: launcher.private_demo ............   Passed    0.02 sec
+test 12
+      Start 12: launcher.ui_fixture
+
+12: Test command: /home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_process_tests "prepare_ui" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/ui-process" "/home/yann/projects/lithtech/Blood2/build/launcher-debug/tests/launcher/launcher_game_fixture"
+12: Working Directory: /home/yann/projects/lithtech/Blood2/build/launcher-debug/src/launcher/../../tests/launcher
+12: Test timeout computed to be: 10000000
+12/12 Test #12: launcher.ui_fixture ..............   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 12
+
+Label Time Summary:
+headless    =   0.66 sec*proc (12 tests)
+launcher    =   0.66 sec*proc (12 tests)
+private     =   0.10 sec*proc (2 tests)
+
+Total Test time (real) =   0.67 sec

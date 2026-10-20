@@ -1,0 +1,14 @@
+636/642 Testing: gideon_runtime.health
+636/642 Test: gideon_runtime.health
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_runtime_tests" "health" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-runtime-health"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_runtime.health" start time: Oct 17 03:43 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_runtime.health" end time: Oct 17 03:43 CEST
+"gideon_runtime.health" time elapsed: 00:00:00
+----------------------------------------------------------

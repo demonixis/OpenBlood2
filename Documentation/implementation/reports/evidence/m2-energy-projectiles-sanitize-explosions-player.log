@@ -1,0 +1,14 @@
+144/596 Testing: explosions.player
+144/596 Test: explosions.player
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_tests" "player" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-fixtures/player"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosions.player" start time: Oct 17 01:22 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.12 sec
+----------------------------------------------------------
+Test Passed.
+"explosions.player" end time: Oct 17 01:22 CEST
+"explosions.player" time elapsed: 00:00:00
+----------------------------------------------------------

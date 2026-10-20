@@ -1,0 +1,14 @@
+510/512 Testing: inventory_state.rollback
+510/512 Test: inventory_state.rollback
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/inventory_state_tests" "rollback" "/home/yann/projects/lithtech/Blood2/build/release/tests/inventory-state-fixtures/rollback"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"inventory_state.rollback" start time: Oct 16 17:47 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"inventory_state.rollback" end time: Oct 16 17:47 CEST
+"inventory_state.rollback" time elapsed: 00:00:00
+----------------------------------------------------------

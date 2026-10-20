@@ -1,0 +1,30 @@
+Test project <workspace>/Blood2/build/debug
+    Start 137: door_audio.states
+1/5 Test #137: door_audio.states ................   Passed    0.04 sec
+    Start 138: door_audio.replacement
+2/5 Test #138: door_audio.replacement ...........   Passed    0.01 sec
+    Start 139: door_audio.lifetime
+3/5 Test #139: door_audio.lifetime ..............   Passed    0.01 sec
+    Start 140: door_audio.private
+4/5 Test #140: door_audio.private ...............   Passed    1.60 sec
+    Start 569: exits.catalog
+5/5 Test #569: exits.catalog ....................***Failed    1.00 sec
+Authored exit2 -> 02_cityhub / start 01_egressa
+Player smell drops=2 hints=2 error=
+catalog:239: player && player->smell_drops == 1 && player->smell_error.empty()
+
+
+80% tests passed, 1 tests failed out of 5
+
+Label Time Summary:
+audio       =   1.65 sec*proc (4 tests)
+doors       =   1.65 sec*proc (4 tests)
+exits       =   1.00 sec*proc (1 test)
+headless    =   2.65 sec*proc (5 tests)
+private     =   2.60 sec*proc (2 tests)
+
+Total Test time (real) =   2.66 sec
+
+The following tests FAILED:
+	569 - exits.catalog (Failed)                            exits headless private
+Errors while running CTest

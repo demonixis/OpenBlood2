@@ -1,0 +1,14 @@
+538/540 Testing: explosion_fragments.failures
+538/540 Test: explosion_fragments.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_fragment_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-fragments-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_fragments.failures" start time: Oct 16 21:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_fragments.failures" end time: Oct 16 21:30 CEST
+"explosion_fragments.failures" time elapsed: 00:00:00
+----------------------------------------------------------

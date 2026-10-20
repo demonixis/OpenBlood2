@@ -1,0 +1,14 @@
+473/481 Testing: ai_hit.geometry
+473/481 Test: ai_hit.geometry
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_hit_tests" "geometry"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_hit.geometry" start time: Oct 16 15:37 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.geometry" end time: Oct 16 15:37 CEST
+"ai_hit.geometry" time elapsed: 00:00:00
+----------------------------------------------------------

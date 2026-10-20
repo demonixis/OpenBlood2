@@ -1,0 +1,14 @@
+479/481 Testing: ai_hit.sides
+479/481 Test: ai_hit.sides
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_hit_tests" "sides"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_hit.sides" start time: Oct 16 15:37 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.sides" end time: Oct 16 15:37 CEST
+"ai_hit.sides" time elapsed: 00:00:00
+----------------------------------------------------------

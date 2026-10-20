@@ -1,0 +1,14 @@
+479/480 Testing: exits.lifetime
+479/480 Test: exits.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/exit-fixtures/lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"exits.lifetime" start time: Oct 16 17:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"exits.lifetime" end time: Oct 16 17:25 CEST
+"exits.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

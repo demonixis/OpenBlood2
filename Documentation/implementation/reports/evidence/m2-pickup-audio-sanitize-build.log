@@ -1,0 +1,617 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- dynamic libasound -> libasound.so.2
+-- dynamic libjack -> libjack.so.0
+-- dynamic libpipewire-0.3 -> libpipewire-0.3.so.0
+-- dynamic libpulse -> libpulse.so.0
+-- Checking for module 'sndio'
+--   Package 'sndio' not found
+-- dynamic libX11 -> libX11.so.6
+-- dynamic libXext -> libXext.so.6
+-- dynamic libXcursor -> libXcursor.so.1
+-- dynamic libXi -> libXi.so.6
+-- dynamic libXfixes -> libXfixes.so.3
+-- dynamic libXrandr -> libXrandr.so.2
+-- dynamic libXrender -> libXrender.so.1
+-- dynamic libXss -> libXss.so.1
+-- dynamic libXtst -> libXtst.so.6
+-- dynamic libfribidi -> libfribidi.so.0
+-- dynamic libthai -> libthai.so.0
+-- dynamic libdrm -> libdrm.so.2
+-- dynamic libgbm -> libgbm.so.1
+-- dynamic libwayland-client -> libwayland-client.so.0
+-- dynamic libwayland-egl -> libwayland-egl.so.1
+-- dynamic libwayland-cursor -> libwayland-cursor.so.0
+-- dynamic libxkbcommon -> libxkbcommon.so.0
+-- dynamic libdecor-0 -> libdecor-0.so.0
+-- dynamic libudev -> libudev.so.1
+-- Checking for one of the modules 'liburing-ffi'
+--
+-- SDL3 was configured with the following options:
+--
+-- Platform: Linux-7.2.10-200.fc44.x86_64
+-- 64-bit:   TRUE
+-- Compiler: /usr/bin/clang
+-- Revision: SDL-3.5.0-cc329c6
+-- Vendor:
+--
+-- Subsystems:
+--   Audio:        ON
+--   Video:        ON
+--   GPU:          ON
+--   Render:       ON
+--   Camera:       ON
+--   Joystick:     ON
+--   Haptic:       ON
+--   Hidapi:       ON
+--   Power:        ON
+--   Sensor:       ON
+--   Dialog:       ON
+--   Tray:         ON
+--   Notification: ON
+--
+-- Options:
+--   SDL_ALSA                    (Wanted: ON): ON
+--   SDL_ALSA_SHARED             (Wanted: ON): ON
+--   SDL_ALTIVEC                 (Wanted: OFF): OFF
+--   SDL_ARMNEON                 (Wanted: OFF): OFF
+--   SDL_ARMSVE2                 (Wanted: OFF): OFF
+--   SDL_ASAN                    (Wanted: OFF): OFF
+--   SDL_ASSEMBLY                (Wanted: ON): ON
+--   SDL_ASSERTIONS              (Wanted: auto): auto
+--   SDL_AVX                     (Wanted: ON): ON
+--   SDL_AVX2                    (Wanted: ON): ON
+--   SDL_AVX512F                 (Wanted: ON): ON
+--   SDL_BACKGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_CCACHE                  (Wanted: OFF): OFF
+--   SDL_CLANG_TIDY              (Wanted: OFF): OFF
+--   SDL_CLOCK_GETTIME           (Wanted: ON): ON
+--   SDL_COCOA                   (Wanted: OFF): OFF
+--   SDL_DBUS                    (Wanted: ON): ON
+--   SDL_DEPS_SHARED             (Wanted: ON): OFF
+--   SDL_DIRECTX                 (Wanted: OFF): OFF
+--   SDL_DISKAUDIO               (Wanted: ON): ON
+--   SDL_DLOPEN_NOTES            (Wanted: ON): ON
+--   SDL_DUMMYAUDIO              (Wanted: ON): ON
+--   SDL_DUMMYCAMERA             (Wanted: ON): ON
+--   SDL_DUMMYVIDEO              (Wanted: ON): ON
+--   SDL_EXAMPLES                (Wanted: OFF): OFF
+--   SDL_EXAMPLES_LINK_SHARED    (Wanted: OFF): OFF
+--   SDL_FOREGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_FRIBIDI                 (Wanted: ON): ON
+--   SDL_FRIBIDI_SHARED          (Wanted: ON): ON
+--   SDL_GCC_ATOMICS             (Wanted: ON): ON
+--   SDL_GPU_OPENXR              (Wanted: ON): ON
+--   SDL_HIDAPI                  (Wanted: ON): ON
+--   SDL_HIDAPI_JOYSTICK         (Wanted: ON): ON
+--   SDL_HIDAPI_LIBUSB           (Wanted: ON): ON
+--   SDL_HIDAPI_LIBUSB_SHARED    (Wanted: ON): ON
+--   SDL_IBUS                    (Wanted: ON): ON
+--   SDL_INSTALL                 (Wanted: OFF): OFF
+--   SDL_INSTALL_TESTS           (Wanted: OFF): OFF
+--   SDL_JACK                    (Wanted: ON): ON
+--   SDL_JACK_SHARED             (Wanted: ON): ON
+--   SDL_KMSDRM                  (Wanted: ON): ON
+--   SDL_KMSDRM_SHARED           (Wanted: ON): ON
+--   SDL_LASX                    (Wanted: OFF): OFF
+--   SDL_LEAN_AND_MEAN           (Wanted: OFF): OFF
+--   SDL_LIBC                    (Wanted: ON): ON
+--   SDL_LIBICONV                (Wanted: OFF): OFF
+--   SDL_LIBTHAI                 (Wanted: ON): ON
+--   SDL_LIBTHAI_SHARED          (Wanted: ON): ON
+--   SDL_LIBUDEV                 (Wanted: ON): ON
+--   SDL_LIBUDEV_SHARED          (Wanted: ON): ON
+--   SDL_LIBURING                (Wanted: ON): OFF
+--   SDL_LSX                     (Wanted: OFF): OFF
+--   SDL_METAL                   (Wanted: OFF): OFF
+--   SDL_MMX                     (Wanted: ON): ON
+--   SDL_OFFSCREEN               (Wanted: ON): ON
+--   SDL_OPENGL                  (Wanted: ON): ON
+--   SDL_OPENGLES                (Wanted: ON): ON
+--   SDL_OPENVR                  (Wanted: OFF): OFF
+--   SDL_OSS                     (Wanted: OFF): OFF
+--   SDL_PIPEWIRE                (Wanted: ON): ON
+--   SDL_PIPEWIRE_SHARED         (Wanted: ON): ON
+--   SDL_PTHREADS                (Wanted: ON): ON
+--   SDL_PTHREADS_SEM            (Wanted: ON): ON
+--   SDL_PULSEAUDIO              (Wanted: ON): ON
+--   SDL_PULSEAUDIO_SHARED       (Wanted: ON): ON
+--   SDL_RENDER_D3D              (Wanted: OFF): OFF
+--   SDL_RENDER_D3D11            (Wanted: OFF): OFF
+--   SDL_RENDER_D3D12            (Wanted: OFF): OFF
+--   SDL_RENDER_GPU              (Wanted: ON): ON
+--   SDL_RENDER_METAL            (Wanted: OFF): OFF
+--   SDL_RENDER_VULKAN           (Wanted: ON): ON
+--   SDL_ROCKCHIP                (Wanted: OFF): OFF
+--   SDL_RPATH                   (Wanted: ON): OFF
+--   SDL_RPI                     (Wanted: OFF): OFF
+--   SDL_SNDIO                   (Wanted: ON): OFF
+--   SDL_SNDIO_SHARED            (Wanted: ON): OFF
+--   SDL_SSE                     (Wanted: ON): ON
+--   SDL_SSE2                    (Wanted: ON): ON
+--   SDL_SSE3                    (Wanted: ON): ON
+--   SDL_SSE4_1                  (Wanted: ON): ON
+--   SDL_SSE4_2                  (Wanted: ON): ON
+--   SDL_SYSTEM_ICONV            (Wanted: ON): ON
+--   SDL_TESTS                   (Wanted: OFF): OFF
+--   SDL_TESTS_LINK_SHARED       (Wanted: OFF): OFF
+--   SDL_UNINSTALL               (Wanted: OFF): OFF
+--   SDL_VIRTUAL_JOYSTICK        (Wanted: ON): ON
+--   SDL_VIVANTE                 (Wanted: OFF): OFF
+--   SDL_VULKAN                  (Wanted: ON): ON
+--   SDL_WASAPI                  (Wanted: OFF): OFF
+--   SDL_WAYLAND                 (Wanted: ON): ON
+--   SDL_WAYLAND_LIBDECOR        (Wanted: ON): ON
+--   SDL_WAYLAND_LIBDECOR_SHARED (Wanted: ON): ON
+--   SDL_WAYLAND_SHARED          (Wanted: ON): ON
+--   SDL_X11                     (Wanted: ON): ON
+--   SDL_X11_SHARED              (Wanted: ON): ON
+--   SDL_X11_XCURSOR             (Wanted: ON): ON
+--   SDL_X11_XDBE                (Wanted: ON): ON
+--   SDL_X11_XFIXES              (Wanted: ON): ON
+--   SDL_X11_XINPUT              (Wanted: ON): ON
+--   SDL_X11_XRANDR              (Wanted: ON): ON
+--   SDL_X11_XSCRNSAVER          (Wanted: ON): ON
+--   SDL_X11_XSHAPE              (Wanted: ON): ON
+--   SDL_X11_XSYNC               (Wanted: ON): ON
+--   SDL_X11_XTEST               (Wanted: ON): ON
+--   SDL_XINPUT                  (Wanted: OFF): OFF
+--
+--  Build Shared Library: OFF
+--  Build Static Library: ON
+--
+-- Enabled backends:
+--   Video drivers: dummy kmsdrm(dynamic) offscreen wayland(dynamic) x11(dynamic)
+--   X11 libraries: xcursor xdbe xfixes xinput2 xrandr xscrnsaver xshape xsync xtest
+--   Render drivers: gpu ogl ogl_es ogl_es2 vulkan
+--   GPU drivers: openxr vulkan
+--   Audio drivers: alsa(dynamic) disk dummy jack(dynamic) pipewire(dynamic) pulseaudio(dynamic)
+--   Joystick drivers: hidapi linux virtual
+--   Camera drivers: dummy pipewire(dynamic) v4l2
+--
+-- If something was not detected, although the libraries
+-- were installed, then make sure you have set the
+-- CMAKE_C_FLAGS and CMAKE_PREFIX_PATH CMake variables correctly.
+--
+-- Build spdlog: 1.15.3
+-- Build type: Debug
+-- Configuring done (0.6s)
+-- Generating done (0.2s)
+-- Build files have been written to: <workspace>/Blood2/build/sanitize
+[0/4] Re-checking globbed directories...
+[1/455] Scanning <workspace>/Blood2/src/engine/sky.cpp for CXX dependencies
+[2/455] Scanning <workspace>/Blood2/src/engine/particles.cpp for CXX dependencies
+[3/455] Scanning <workspace>/Blood2/src/engine/sprite_view.cpp for CXX dependencies
+[4/455] Scanning <workspace>/Blood2/src/engine/model_view.cpp for CXX dependencies
+[5/455] Scanning <workspace>/Blood2/src/engine/world_view.cpp for CXX dependencies
+[6/455] Scanning <workspace>/Blood2/src/engine/world_renderer.cpp for CXX dependencies
+[7/455] Scanning <workspace>/Blood2/src/engine/attachments.cpp for CXX dependencies
+[8/455] Scanning <workspace>/Blood2/src/engine/object_pose.cpp for CXX dependencies
+[9/455] Scanning <workspace>/Blood2/src/engine/objects.cpp for CXX dependencies
+[10/455] Scanning <workspace>/Blood2/src/engine/world.cpp for CXX dependencies
+[11/455] Scanning <workspace>/Blood2/src/engine/audio.cpp for CXX dependencies
+[12/455] Scanning <workspace>/Blood2/src/engine/collision.cpp for CXX dependencies
+[13/455] Scanning <workspace>/Blood2/src/engine/container.cpp for CXX dependencies
+[14/455] Scanning <workspace>/Blood2/src/engine/world_model.cpp for CXX dependencies
+[15/455] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[16/444] Scanning <workspace>/Blood2/src/game/original/SparksFX.cpp for CXX dependencies
+[17/444] Scanning <workspace>/Blood2/src/game/blood_spurts.cpp for CXX dependencies
+[18/444] Scanning <workspace>/Blood2/src/game/original/ParticleExplosionFX.cpp for CXX dependencies
+[19/444] Scanning <workspace>/Blood2/src/game/blood_splats.cpp for CXX dependencies
+[20/444] Scanning <workspace>/Blood2/src/game/original/BloodSplatFX.cpp for CXX dependencies
+[21/444] Scanning <workspace>/Blood2/src/game/original/ClientSplatFX.cpp for CXX dependencies
+[22/444] Scanning <workspace>/Blood2/src/game/original/RemoteBomb.cpp for CXX dependencies
+[23/444] Scanning <workspace>/Blood2/src/game/original/BombExplosion.cpp for CXX dependencies
+[24/444] Scanning <workspace>/Blood2/src/game/original/PlayerRemoteBombs.cpp for CXX dependencies
+[25/444] Scanning <workspace>/Blood2/src/game/original/ProximityBomb.cpp for CXX dependencies
+[26/444] Scanning <workspace>/Blood2/src/game/server_sky.cpp for CXX dependencies
+[27/444] Scanning <workspace>/Blood2/src/game/original/SkyObjects.cpp for CXX dependencies
+[28/444] Scanning <workspace>/Blood2/src/game/original/ParticleStreamFX.cpp for CXX dependencies
+[29/444] Scanning <workspace>/Blood2/src/game/particle_streams.cpp for CXX dependencies
+[30/444] Scanning <workspace>/Blood2/src/game/original/Grenade.cpp for CXX dependencies
+[31/444] Scanning <workspace>/Blood2/src/game/original/ClientParticleStreamSFX.cpp for CXX dependencies
+[32/444] Scanning <workspace>/Blood2/src/game/original/FlareProjectile.cpp for CXX dependencies
+[33/444] Scanning <workspace>/Blood2/src/game/original/GideonShield.cpp for CXX dependencies
+[34/444] Scanning <workspace>/Blood2/src/game/object_particles.cpp for CXX dependencies
+[35/444] Scanning <workspace>/Blood2/src/game/original/Shockwave.cpp for CXX dependencies
+[36/444] Scanning <workspace>/Blood2/src/game/original/WeaponProjectile.cpp for CXX dependencies
+[37/444] Scanning <workspace>/Blood2/src/game/original/Projectile.cpp for CXX dependencies
+[38/444] Scanning <workspace>/Blood2/src/game/original/EnergyBlast.cpp for CXX dependencies
+[39/444] Scanning <workspace>/Blood2/src/game/server_projectiles.cpp for CXX dependencies
+[40/444] Scanning <workspace>/Blood2/src/game/original/NagaEyes.cpp for CXX dependencies
+[41/444] Scanning <workspace>/Blood2/src/game/original/LaserBeamFX.cpp for CXX dependencies
+[42/444] Scanning <workspace>/Blood2/src/game/original/SmokeImpactFX.cpp for CXX dependencies
+[43/444] Scanning <workspace>/Blood2/src/game/level_change.cpp for CXX dependencies
+[44/444] Scanning <workspace>/Blood2/src/game/destination_trial.cpp for CXX dependencies
+[45/444] Scanning <workspace>/Blood2/src/game/world_preparation.cpp for CXX dependencies
+[46/444] Scanning <workspace>/Blood2/src/game/explosion_flames.cpp for CXX dependencies
+[47/444] Scanning <workspace>/Blood2/src/game/original/ExplosionFlameFX.cpp for CXX dependencies
+[48/444] Scanning <workspace>/Blood2/src/game/original/ObjectParticleFX.cpp for CXX dependencies
+[49/444] Scanning <workspace>/Blood2/src/game/original/ExplosionFragFX.cpp for CXX dependencies
+[50/444] Scanning <workspace>/Blood2/src/game/explosion_fragments.cpp for CXX dependencies
+[51/444] Scanning <workspace>/Blood2/src/game/explosion_rings.cpp for CXX dependencies
+[52/444] Scanning <workspace>/Blood2/src/game/original/ExplosionRingFX.cpp for CXX dependencies
+[53/444] Scanning <workspace>/Blood2/src/game/original/ExplosionLightFX.cpp for CXX dependencies
+[54/444] Scanning <workspace>/Blood2/src/game/explosion_lights.cpp for CXX dependencies
+[55/444] Scanning <workspace>/Blood2/src/game/explosion_models.cpp for CXX dependencies
+[56/444] Scanning <workspace>/Blood2/src/game/explosion_sprites.cpp for CXX dependencies
+[57/444] Scanning <workspace>/Blood2/src/game/original/ExplosionModelFX.cpp for CXX dependencies
+[58/444] Scanning <workspace>/Blood2/src/game/original/ExplosionSpriteFX.cpp for CXX dependencies
+[59/444] Scanning <workspace>/Blood2/src/game/server_attachments.cpp for CXX dependencies
+[60/444] Scanning <workspace>/Blood2/src/game/original/HandWeaponModel.cpp for CXX dependencies
+[61/444] Scanning <workspace>/Blood2/src/game/original/WeaponHand.cpp for CXX dependencies
+[62/444] Scanning <workspace>/Blood2/src/game/original/engineobjects.cpp for CXX dependencies
+[63/444] Scanning <workspace>/Blood2/src/game/original/B2BaseClass.cpp for CXX dependencies
+[64/444] Scanning <workspace>/Blood2/src/game/original/Key.cpp for CXX dependencies
+[65/444] Scanning <workspace>/Blood2/src/game/original/CameraSpot.cpp for CXX dependencies
+[66/444] Scanning <workspace>/Blood2/src/game/original/GameStartPoint.cpp for CXX dependencies
+[67/444] Scanning <workspace>/Blood2/src/game/original/PathPoint.cpp for CXX dependencies
+[68/444] Scanning <workspace>/Blood2/src/game/original/PathMgr.cpp for CXX dependencies
+[69/444] Scanning <workspace>/Blood2/src/game/original/trigger_helpers.cpp for CXX dependencies
+[70/444] Scanning <workspace>/Blood2/src/game/original/session_load.cpp for CXX dependencies
+[71/444] Scanning <workspace>/Blood2/src/game/player_restore.cpp for CXX dependencies
+[72/444] Scanning <workspace>/Blood2/src/game/session.cpp for CXX dependencies
+[73/444] Scanning <workspace>/Blood2/src/game/registration.cpp for CXX dependencies
+[74/444] Scanning <workspace>/Blood2/src/game/server_adapter.cpp for CXX dependencies
+[75/444] Scanning <workspace>/Blood2/src/game/original/ClientExplosionSFX.cpp for CXX dependencies
+[76/444] Scanning <workspace>/Blood2/src/game/server_sprites.cpp for CXX dependencies
+[77/444] Scanning <workspace>/Blood2/src/game/original/DetailSprite.cpp for CXX dependencies
+[78/444] Scanning <workspace>/Blood2/src/game/original/CinematicTrigger.cpp for CXX dependencies
+[79/444] Scanning <workspace>/Blood2/src/game/server_audio.cpp for CXX dependencies
+[80/444] Scanning <workspace>/Blood2/src/game/original/Sound.cpp for CXX dependencies
+[81/444] Scanning <workspace>/Blood2/src/game/original/RandomSoundFX.cpp for CXX dependencies
+[82/444] Scanning <workspace>/Blood2/src/game/original/SoundFX.cpp for CXX dependencies
+[83/444] Scanning <workspace>/Blood2/src/game/original/LightFX.cpp for CXX dependencies
+[84/444] Scanning <workspace>/Blood2/src/game/server_lights.cpp for CXX dependencies
+[85/444] Scanning <workspace>/Blood2/src/game/original/ClientLightFX.cpp for CXX dependencies
+[86/444] Scanning <workspace>/Blood2/src/game/server_keyframes.cpp for CXX dependencies
+[87/444] Scanning <workspace>/Blood2/src/game/original/KeyData.cpp for CXX dependencies
+[88/444] Scanning <workspace>/Blood2/src/game/original/KeyFramer.cpp for CXX dependencies
+[89/444] Scanning <workspace>/Blood2/src/game/server_cameras.cpp for CXX dependencies
+[90/444] Scanning <workspace>/Blood2/src/game/original/CameraObj.cpp for CXX dependencies
+[91/444] Scanning <workspace>/Blood2/src/game/server_objectives.cpp for CXX dependencies
+[92/444] Scanning <workspace>/Blood2/src/game/original/ObjectivesTrigger.cpp for CXX dependencies
+[93/444] Scanning <workspace>/Blood2/src/game/original/ConversationTrigger.cpp for CXX dependencies
+[94/444] Scanning <workspace>/Blood2/src/game/original/ConversationStrings.cpp for CXX dependencies
+[95/444] Scanning <workspace>/Blood2/src/game/original/CommLink.cpp for CXX dependencies
+[96/444] Scanning <workspace>/Blood2/src/game/server_models.cpp for CXX dependencies
+[97/444] Scanning <workspace>/Blood2/src/game/original/WorldProperties.cpp for CXX dependencies
+[98/444] Scanning <workspace>/Blood2/src/game/original/SmellHint.cpp for CXX dependencies
+[99/444] Scanning <workspace>/Blood2/src/game/original/WeaponPickups.cpp for CXX dependencies
+[100/444] Scanning <workspace>/Blood2/src/game/server_pickups.cpp for CXX dependencies
+[101/444] Scanning <workspace>/Blood2/src/game/original/PickupObject.cpp for CXX dependencies
+[102/444] Scanning <workspace>/Blood2/src/game/original/ItemPickups.cpp for CXX dependencies
+[103/444] Scanning <workspace>/Blood2/src/game/original/GameInvItems.cpp for CXX dependencies
+[104/444] Scanning <workspace>/Blood2/src/game/original/Flashlight.cpp for CXX dependencies
+[105/444] Scanning <workspace>/Blood2/src/game/original/AmmoPickups.cpp for CXX dependencies
+[106/444] Scanning <workspace>/Blood2/src/game/original/PowerupPickups.cpp for CXX dependencies
+[107/444] Scanning <workspace>/Blood2/src/game/original/spawn_object.cpp for CXX dependencies
+[108/444] Scanning <workspace>/Blood2/src/game/server_physics.cpp for CXX dependencies
+[109/444] Scanning <workspace>/Blood2/src/game/server_movers.cpp for CXX dependencies
+[110/444] Scanning <workspace>/Blood2/src/game/original/RotatingDoor.cpp for CXX dependencies
+[111/444] Scanning <workspace>/Blood2/src/game/server_rotation.cpp for CXX dependencies
+[112/444] Scanning <workspace>/Blood2/src/game/original/PlayerUse.cpp for CXX dependencies
+[113/444] Scanning <workspace>/Blood2/src/game/original/Door.cpp for CXX dependencies
+[114/444] Scanning <workspace>/Blood2/src/game/original/Trigger.cpp for CXX dependencies
+[115/444] Scanning <workspace>/Blood2/src/game/original/KeyPickup.cpp for CXX dependencies
+[116/444] Scanning <workspace>/Blood2/src/game/server_keys.cpp for CXX dependencies
+[117/444] Scanning <workspace>/Blood2/src/game/server_containers.cpp for CXX dependencies
+[118/444] Scanning <workspace>/Blood2/src/game/original/VolumeBrush.cpp for CXX dependencies
+[119/444] Scanning <workspace>/Blood2/src/game/original/PlayerContainers.cpp for CXX dependencies
+[120/444] Scanning <workspace>/Blood2/src/game/original/PlayerLocomotion.cpp for CXX dependencies
+[121/444] Scanning <workspace>/Blood2/src/game/original/MoveMgr.cpp for CXX dependencies
+[122/444] Scanning <workspace>/Blood2/src/game/original/Anim_Sound.cpp for CXX dependencies
+[123/444] Scanning <workspace>/Blood2/src/game/original/CharacterSound.cpp for CXX dependencies
+[124/444] Scanning <workspace>/Blood2/src/game/original/AI_Mgr.cpp for CXX dependencies
+[125/444] Scanning <workspace>/Blood2/src/game/original/AISight.cpp for CXX dependencies
+[126/444] Scanning <workspace>/Blood2/src/game/original/AIPerception.cpp for CXX dependencies
+[127/444] Scanning <workspace>/Blood2/src/game/original/AIFire.cpp for CXX dependencies
+[128/444] Scanning <workspace>/Blood2/src/game/server_activation.cpp for CXX dependencies
+[129/444] Scanning <workspace>/Blood2/src/game/original/AIRuntime.cpp for CXX dependencies
+[130/444] Scanning <workspace>/Blood2/src/game/original/AISmell.cpp for CXX dependencies
+[131/444] Scanning <workspace>/Blood2/src/game/original/AINavigationStates.cpp for CXX dependencies
+[132/444] Scanning <workspace>/Blood2/src/game/original/AIEscape.cpp for CXX dependencies
+[133/444] Scanning <workspace>/Blood2/src/game/original/AILocomotion.cpp for CXX dependencies
+[134/444] Scanning <workspace>/Blood2/src/game/original/CultistAttack.cpp for CXX dependencies
+[135/444] Scanning <workspace>/Blood2/src/game/original/AIDodge.cpp for CXX dependencies
+[136/444] Scanning <workspace>/Blood2/src/game/original/AIScriptMovement.cpp for CXX dependencies
+[137/444] Scanning <workspace>/Blood2/src/game/original/AIScript.cpp for CXX dependencies
+[138/444] Scanning <workspace>/Blood2/src/game/original/AIScriptFire.cpp for CXX dependencies
+[139/444] Scanning <workspace>/Blood2/src/game/original/Movement.cpp for CXX dependencies
+[140/444] Scanning <workspace>/Blood2/src/game/original/AIState.cpp for CXX dependencies
+[141/444] Scanning <workspace>/Blood2/src/game/original/AIDeath.cpp for CXX dependencies
+[142/444] Scanning <workspace>/Blood2/src/game/original/AIHitReaction.cpp for CXX dependencies
+[143/444] Scanning <workspace>/Blood2/src/game/original/Gib.cpp for CXX dependencies
+[144/444] Scanning <workspace>/Blood2/src/game/flesh_gibs.cpp for CXX dependencies
+[145/444] Scanning <workspace>/Blood2/src/game/original/Corpse.cpp for CXX dependencies
+[146/444] Scanning <workspace>/Blood2/src/game/original/AISound.cpp for CXX dependencies
+[147/444] Scanning <workspace>/Blood2/src/game/original/AITrigger.cpp for CXX dependencies
+[148/444] Scanning <workspace>/Blood2/src/game/original/CivilianAI.cpp for CXX dependencies
+[149/444] Scanning <workspace>/Blood2/src/game/original/CultistAI.cpp for CXX dependencies
+[150/444] Scanning <workspace>/Blood2/src/game/original/ExitHint.cpp for CXX dependencies
+[151/444] Scanning <workspace>/Blood2/src/game/original/Gideon.cpp for CXX dependencies
+[152/444] Scanning <workspace>/Blood2/src/game/original/AITarget.cpp for CXX dependencies
+[153/444] Scanning <workspace>/Blood2/src/game/original/CharacterMotion.cpp for CXX dependencies
+[154/444] Scanning <workspace>/Blood2/src/game/server_exits.cpp for CXX dependencies
+[155/444] Scanning <workspace>/Blood2/src/game/original/ExitTrigger.cpp for CXX dependencies
+[156/444] Scanning <workspace>/Blood2/src/game/server_clients.cpp for CXX dependencies
+[157/444] Scanning <workspace>/Blood2/src/game/original/PlayerObj.cpp for CXX dependencies
+[158/444] Scanning <workspace>/Blood2/src/game/original/PlayerSave.cpp for CXX dependencies
+[159/444] Scanning <workspace>/Blood2/src/game/original/CharacterNodes.cpp for CXX dependencies
+[160/444] Scanning <workspace>/Blood2/src/game/original/BloodShells.cpp for CXX dependencies
+[161/444] Scanning <workspace>/Blood2/src/game/server_weapons.cpp for CXX dependencies
+[162/444] Scanning <workspace>/Blood2/src/game/original/InventoryMgr.cpp for CXX dependencies
+[163/444] Scanning <workspace>/Blood2/src/game/original/InventorySave.cpp for CXX dependencies
+[164/444] Scanning <workspace>/Blood2/src/game/original/Weapon.cpp for CXX dependencies
+[165/444] Scanning <workspace>/Blood2/src/game/original/WeaponSound.cpp for CXX dependencies
+[166/444] Scanning <workspace>/Blood2/src/game/original/WeaponVector.cpp for CXX dependencies
+[167/444] Scanning <workspace>/Blood2/src/game/original/WeaponFX.cpp for CXX dependencies
+[168/444] Scanning <workspace>/Blood2/src/game/original/ViewWeapon.cpp for CXX dependencies
+[169/444] Scanning <workspace>/Blood2/src/game/original/Destructable.cpp for CXX dependencies
+[170/444] Scanning <workspace>/Blood2/src/game/original/DestructableSave.cpp for CXX dependencies
+[171/444] Scanning <workspace>/Blood2/src/game/original/DestructableBrush.cpp for CXX dependencies
+[172/444] Scanning <workspace>/Blood2/src/game/original/DestructableModel.cpp for CXX dependencies
+[173/444] Scanning <workspace>/Blood2/src/game/original/Rotating.cpp for CXX dependencies
+[174/444] Scanning <workspace>/Blood2/src/game/original/WorldModelDebris.cpp for CXX dependencies
+[175/444] Scanning <workspace>/Blood2/src/game/original/RotatingBrush.cpp for CXX dependencies
+[176/444] Scanning <workspace>/Blood2/src/game/original/Debris.cpp for CXX dependencies
+[177/444] Scanning <workspace>/Blood2/src/game/original/radius_damage.cpp for CXX dependencies
+[178/444] Scanning <workspace>/Blood2/src/game/server_effects.cpp for CXX dependencies
+[179/444] Scanning <workspace>/Blood2/src/game/server_world_bodies.cpp for CXX dependencies
+[180/444] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[181/437] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL.c.o
+[182/437] Building CXX object CMakeFiles/engine.dir/src/engine/particles.cpp.o
+[183/437] Building CXX object CMakeFiles/engine.dir/src/engine/sky.cpp.o
+[184/437] Building CXX object CMakeFiles/engine.dir/src/engine/model_view.cpp.o
+[185/437] Building CXX object CMakeFiles/engine.dir/src/engine/sprite_view.cpp.o
+[186/437] Building CXX object CMakeFiles/engine.dir/src/engine/world_renderer.cpp.o
+[187/437] Building CXX object CMakeFiles/engine.dir/src/engine/world_view.cpp.o
+[188/437] Building CXX object CMakeFiles/engine.dir/src/engine/attachments.cpp.o
+[189/437] Building CXX object CMakeFiles/engine.dir/src/engine/object_pose.cpp.o
+[190/437] Building CXX object CMakeFiles/engine.dir/src/engine/world.cpp.o
+[191/437] Building CXX object CMakeFiles/engine.dir/src/engine/objects.cpp.o
+[192/437] Building CXX object CMakeFiles/engine.dir/src/engine/audio.cpp.o
+[193/437] Building CXX object CMakeFiles/engine.dir/src/engine/collision.cpp.o
+[194/437] Building CXX object CMakeFiles/engine.dir/src/engine/world_model.cpp.o
+[195/437] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[196/432] Scanning <workspace>/Blood2/src/app/path_manager_smoke.cpp for CXX dependencies
+[197/432] Building CXX object CMakeFiles/engine.dir/src/engine/container.cpp.o
+[198/432] Scanning <workspace>/Blood2/src/app/character_motion_smoke.cpp for CXX dependencies
+[199/432] Scanning <workspace>/Blood2/src/app/ai_model_key_smoke.cpp for CXX dependencies
+[200/432] Scanning <workspace>/Blood2/src/app/model_scene.cpp for CXX dependencies
+[201/432] Scanning <workspace>/Blood2/src/app/main.cpp for CXX dependencies
+[202/432] Scanning <workspace>/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[203/432] Scanning <workspace>/Blood2/src/app/trigger_smoke.cpp for CXX dependencies
+[204/432] Scanning <workspace>/Blood2/src/app/interaction_smoke.cpp for CXX dependencies
+[205/432] Scanning <workspace>/Blood2/src/app/brush_smoke.cpp for CXX dependencies
+[206/432] Scanning <workspace>/Blood2/src/app/pickup_smoke.cpp for CXX dependencies
+[207/432] Scanning <workspace>/Blood2/src/app/objectives_smoke.cpp for CXX dependencies
+[208/432] Scanning <workspace>/Blood2/src/app/camera_smoke.cpp for CXX dependencies
+[209/432] Scanning <workspace>/Blood2/src/app/keyframe_smoke.cpp for CXX dependencies
+[210/432] Scanning <workspace>/Blood2/src/app/light_smoke.cpp for CXX dependencies
+[211/432] Scanning <workspace>/Blood2/src/app/random_sound_smoke.cpp for CXX dependencies
+[212/432] Scanning <workspace>/Blood2/src/app/cinematic_smoke.cpp for CXX dependencies
+[213/432] Scanning <workspace>/Blood2/src/app/world_sound_smoke.cpp for CXX dependencies
+[214/432] Scanning <workspace>/Blood2/src/app/sprite_smoke.cpp for CXX dependencies
+[215/432] Scanning <workspace>/Blood2/src/app/scene_explosion_smoke.cpp for CXX dependencies
+[216/432] Scanning <workspace>/Blood2/tests/object_contract_tests.cpp for CXX dependencies
+[217/432] Linking C static library _deps/sdl3-build/libSDL3.a
+[218/432] Scanning <workspace>/Blood2/tests/world_tests.cpp for CXX dependencies
+[219/432] Scanning <workspace>/Blood2/tests/weapon_tests.cpp for CXX dependencies
+[220/432] Scanning <workspace>/Blood2/tests/trigger_tests.cpp for CXX dependencies
+[221/432] Scanning <workspace>/Blood2/tests/pickup_audio_tests.cpp for CXX dependencies
+[222/432] Scanning <workspace>/Blood2/tests/pickup_tests.cpp for CXX dependencies
+[223/432] Linking CXX static library libengine.a
+[224/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SparksFX.cpp.o
+[225/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/blood_spurts.cpp.o
+[226/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ParticleExplosionFX.cpp.o
+[227/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/blood_splats.cpp.o
+[228/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/BloodSplatFX.cpp.o
+[229/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ClientSplatFX.cpp.o
+[230/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerRemoteBombs.cpp.o
+[231/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/RemoteBomb.cpp.o
+[232/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/BombExplosion.cpp.o
+[233/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ProximityBomb.cpp.o
+[234/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SkyObjects.cpp.o
+[235/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_sky.cpp.o
+[236/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/particle_streams.cpp.o
+[237/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ParticleStreamFX.cpp.o
+[238/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ClientParticleStreamSFX.cpp.o
+[239/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/FlareProjectile.cpp.o
+[240/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Grenade.cpp.o
+[241/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/GideonShield.cpp.o
+[242/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/object_particles.cpp.o
+[243/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Shockwave.cpp.o
+[244/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponProjectile.cpp.o
+[245/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Projectile.cpp.o
+[246/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/EnergyBlast.cpp.o
+[247/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_projectiles.cpp.o
+[248/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/NagaEyes.cpp.o
+[249/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/LaserBeamFX.cpp.o
+[250/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SmokeImpactFX.cpp.o
+[251/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/destination_trial.cpp.o
+[252/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/level_change.cpp.o
+[253/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_flames.cpp.o
+[254/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/world_preparation.cpp.o
+[255/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ObjectParticleFX.cpp.o
+[256/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionFlameFX.cpp.o
+[257/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionFragFX.cpp.o
+[258/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_fragments.cpp.o
+[259/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionRingFX.cpp.o
+[260/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_rings.cpp.o
+[261/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionLightFX.cpp.o
+[262/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_lights.cpp.o
+[263/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionModelFX.cpp.o
+[264/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_models.cpp.o
+[265/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExplosionSpriteFX.cpp.o
+[266/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_sprites.cpp.o
+[267/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/HandWeaponModel.cpp.o
+[268/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_attachments.cpp.o
+[269/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponHand.cpp.o
+[270/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/engineobjects.cpp.o
+[271/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/B2BaseClass.cpp.o
+[272/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CameraSpot.cpp.o
+[273/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Key.cpp.o
+[274/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/GameStartPoint.cpp.o
+[275/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PathPoint.cpp.o
+[276/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PathMgr.cpp.o
+[277/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/trigger_helpers.cpp.o
+[278/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/session_load.cpp.o
+[279/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/session.cpp.o
+[280/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/player_restore.cpp.o
+[281/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_adapter.cpp.o
+[282/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ClientExplosionSFX.cpp.o
+[283/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/registration.cpp.o
+[284/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_sprites.cpp.o
+[285/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/DetailSprite.cpp.o
+[286/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_audio.cpp.o
+[287/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CinematicTrigger.cpp.o
+[288/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Sound.cpp.o
+[289/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/RandomSoundFX.cpp.o
+[290/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SoundFX.cpp.o
+[291/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_lights.cpp.o
+[292/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/LightFX.cpp.o
+[293/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ClientLightFX.cpp.o
+[294/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_keyframes.cpp.o
+[295/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/KeyData.cpp.o
+[296/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/KeyFramer.cpp.o
+[297/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_cameras.cpp.o
+[298/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CameraObj.cpp.o
+[299/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ObjectivesTrigger.cpp.o
+[300/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_objectives.cpp.o
+[301/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ConversationTrigger.cpp.o
+[302/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ConversationStrings.cpp.o
+[303/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CommLink.cpp.o
+[304/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WorldProperties.cpp.o
+[305/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SmellHint.cpp.o
+[306/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_models.cpp.o
+[307/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponPickups.cpp.o
+[308/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_pickups.cpp.o
+[309/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PickupObject.cpp.o
+[310/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ItemPickups.cpp.o
+<workspace>/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]
+    9 |          g_pServerDE->GetVarValueFloat(g_pServerDE->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE))
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^  ~~~~~~~~~~~~~~~
+1 warning generated.
+[311/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/GameInvItems.cpp.o
+[312/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AmmoPickups.cpp.o
+[313/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Flashlight.cpp.o
+[314/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PowerupPickups.cpp.o
+[315/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/spawn_object.cpp.o
+[316/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_movers.cpp.o
+[317/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_physics.cpp.o
+[318/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/RotatingDoor.cpp.o
+[319/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_rotation.cpp.o
+[320/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerUse.cpp.o
+[321/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Door.cpp.o
+[322/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Trigger.cpp.o
+[323/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/KeyPickup.cpp.o
+[324/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_keys.cpp.o
+[325/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_containers.cpp.o
+[326/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/VolumeBrush.cpp.o
+[327/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerContainers.cpp.o
+[328/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/MoveMgr.cpp.o
+[329/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerLocomotion.cpp.o
+[330/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Anim_Sound.cpp.o
+[331/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CharacterSound.cpp.o
+[332/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AISight.cpp.o
+[333/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AI_Mgr.cpp.o
+[334/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIFire.cpp.o
+[335/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIPerception.cpp.o
+[336/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_activation.cpp.o
+[337/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIRuntime.cpp.o
+[338/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AISmell.cpp.o
+[339/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIEscape.cpp.o
+[340/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AINavigationStates.cpp.o
+[341/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AILocomotion.cpp.o
+[342/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CultistAttack.cpp.o
+[343/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIDodge.cpp.o
+[344/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIScript.cpp.o
+[345/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIScriptMovement.cpp.o
+[346/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIScriptFire.cpp.o
+[347/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Movement.cpp.o
+[348/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIState.cpp.o
+[349/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIHitReaction.cpp.o
+[350/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIDeath.cpp.o
+[351/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Gib.cpp.o
+[352/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/flesh_gibs.cpp.o
+[353/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Corpse.cpp.o
+[354/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AITrigger.cpp.o
+[355/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AISound.cpp.o
+[356/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CivilianAI.cpp.o
+[357/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CultistAI.cpp.o
+[358/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExitHint.cpp.o
+[359/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Gideon.cpp.o
+[360/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AITarget.cpp.o
+[361/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CharacterMotion.cpp.o
+[362/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ExitTrigger.cpp.o
+[363/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_exits.cpp.o
+[364/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerObj.cpp.o
+[365/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_clients.cpp.o
+[366/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CharacterNodes.cpp.o
+[367/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerSave.cpp.o
+[368/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/BloodShells.cpp.o
+[369/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_weapons.cpp.o
+[370/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/InventorySave.cpp.o
+[371/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/InventoryMgr.cpp.o
+[372/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponSound.cpp.o
+[373/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Weapon.cpp.o
+[374/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponVector.cpp.o
+[375/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponFX.cpp.o
+[376/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ViewWeapon.cpp.o
+[377/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Destructable.cpp.o
+[378/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/DestructableBrush.cpp.o
+[379/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/DestructableSave.cpp.o
+[380/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Rotating.cpp.o
+[381/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/DestructableModel.cpp.o
+[382/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/RotatingBrush.cpp.o
+[383/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WorldModelDebris.cpp.o
+[384/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Debris.cpp.o
+[385/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/radius_damage.cpp.o
+[386/432] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_effects.cpp.o
+[387/432] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[388/430] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[389/430] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[390/430] Generating CXX dyndep file tests/CMakeFiles/weapon_tests.dir/CXX.dd
+[391/430] Generating CXX dyndep file tests/CMakeFiles/trigger_tests.dir/CXX.dd
+[392/430] Generating CXX dyndep file tests/CMakeFiles/pickup_audio_tests.dir/CXX.dd
+[393/430] Generating CXX dyndep file tests/CMakeFiles/pickup_tests.dir/CXX.dd
+[394/430] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_world_bodies.cpp.o
+[395/430] Linking CXX static library libblood2_game.a
+[396/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/path_manager_smoke.cpp.o
+[397/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/character_motion_smoke.cpp.o
+[398/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/ai_model_key_smoke.cpp.o
+[399/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/model_scene.cpp.o
+[400/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/sprite_scene.cpp.o
+[401/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[402/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/trigger_smoke.cpp.o
+[403/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/interaction_smoke.cpp.o
+[404/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/brush_smoke.cpp.o
+[405/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/pickup_smoke.cpp.o
+[406/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/objectives_smoke.cpp.o
+[407/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/camera_smoke.cpp.o
+[408/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/keyframe_smoke.cpp.o
+[409/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/light_smoke.cpp.o
+[410/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/cinematic_smoke.cpp.o
+[411/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/random_sound_smoke.cpp.o
+[412/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/world_sound_smoke.cpp.o
+[413/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/sprite_smoke.cpp.o
+[414/430] Building CXX object CMakeFiles/blood2_app.dir/src/app/scene_explosion_smoke.cpp.o
+[415/430] Building CXX object tests/CMakeFiles/object_contract_tests.dir/object_contract_tests.cpp.o
+[416/430] Building CXX object tests/CMakeFiles/world_tests.dir/world_tests.cpp.o
+[417/430] Building CXX object tests/CMakeFiles/weapon_tests.dir/weapon_tests.cpp.o
+[418/430] Building CXX object tests/CMakeFiles/pickup_audio_tests.dir/pickup_audio_tests.cpp.o
+[419/430] Building CXX object tests/CMakeFiles/trigger_tests.dir/trigger_tests.cpp.o
+[420/430] Linking CXX executable blood2
+[421/430] Linking CXX executable tests/object_contract_tests
+[422/430] Building CXX object tests/CMakeFiles/pickup_tests.dir/pickup_tests.cpp.o
+[423/430] Linking CXX executable tests/world_tests
+[424/430] Linking CXX executable tests/weapon_tests
+[425/430] Linking CXX executable tests/trigger_tests
+[426/430] Linking CXX executable tests/pickup_audio_tests
+[427/430] Linking CXX executable tests/pickup_tests
+[0/2] Re-checking globbed directories...
+[1/183] Scanning <workspace>/Blood2/src/game/original/KeyPickup.cpp for CXX dependencies
+[2/183] Scanning <workspace>/Blood2/tests/pickup_audio_tests.cpp for CXX dependencies
+[3/183] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[4/7] Generating CXX dyndep file tests/CMakeFiles/pickup_audio_tests.dir/CXX.dd

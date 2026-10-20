@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-c++"
+	tests="3"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gigabyte-g5"
+	time="1"
+	timestamp="2026-10-18T09:19:29"
+	>
+	<testcase name="gpu.platform_video" classname="gpu.platform_video" time="0.159168" status="run">
+		<properties>
+			<property name="cmake_labels" value="gpu;platform"/>
+		</properties>
+		<system-out>Video driver: wayland
+SDL teardown complete; allocation tracking: unavailable
+Video driver: wayland
+SDL teardown complete; allocation tracking: unavailable
+Video driver: wayland
+SDL teardown complete; allocation tracking: unavailable
+</system-out>
+	</testcase>
+	<testcase name="gpu.platform_window" classname="gpu.platform_window" time="0.163843" status="run">
+		<properties>
+			<property name="cmake_labels" value="gpu;platform"/>
+		</properties>
+		<system-out>Video driver: wayland
+SDL teardown complete; allocation tracking: unavailable
+Video driver: wayland
+SDL teardown complete; allocation tracking: unavailable
+Video driver: wayland
+SDL teardown complete; allocation tracking: unavailable
+</system-out>
+	</testcase>
+	<testcase name="gpu.platform_gpu" classname="gpu.platform_gpu" time="1.0246" status="run">
+		<properties>
+			<property name="cmake_labels" value="gpu;platform"/>
+		</properties>
+		<system-out>Video driver: wayland
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+SDL teardown complete; allocation tracking: unavailable
+Video driver: wayland
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+SDL teardown complete; allocation tracking: unavailable
+Video driver: wayland
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+SDL teardown complete; allocation tracking: unavailable
+</system-out>
+	</testcase>
+</testsuite>

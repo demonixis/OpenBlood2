@@ -1,0 +1,180 @@
+681/683 Testing: gideon_teleport.private
+681/683 Test: gideon_teleport.private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon_teleport_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gideon_teleport.private" start time: Oct 17 02:46 CEST
+Output:
+----------------------------------------------------------
+External Gideon cycle 0: 1100 triangles, real teleport WAV, fade/move/reappear
+External Gideon cycle 1: 1100 triangles, real teleport WAV, fade/move/reappear
+External Gideon cycle 2: 1100 triangles, real teleport WAV, fade/move/reappear
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_teleport.private" end time: Oct 17 02:46 CEST
+"gideon_teleport.private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 02:46 CEST
+
+ai_escape =   0.07 sec*proc
+
+ai_fire =   0.72 sec*proc
+
+ai_follow =   0.26 sec*proc
+
+ai_hit =   0.06 sec*proc
+
+ai_keys =   1.40 sec*proc
+
+ai_locomotion =   0.07 sec*proc
+
+ai_navigation =   0.15 sec*proc
+
+ai_perception =   0.18 sec*proc
+
+ai_recovery =   0.09 sec*proc
+
+ai_runtime =   1.36 sec*proc
+
+ai_script =   0.10 sec*proc
+
+ai_sight =   0.19 sec*proc
+
+ai_state =   1.31 sec*proc
+
+ai_target =   0.18 sec*proc
+
+ai_trigger =   0.13 sec*proc
+
+attachments =   0.25 sec*proc
+
+brushes =   0.88 sec*proc
+
+cameras =   0.72 sec*proc
+
+character =   1.01 sec*proc
+
+character_audio =   1.95 sec*proc
+
+character_motion =   0.05 sec*proc
+
+character_nodes =   0.18 sec*proc
+
+cinematics =   0.73 sec*proc
+
+cli =   0.07 sec*proc
+
+config =   0.02 sec*proc
+
+containers =   1.14 sec*proc
+
+corpses =   0.06 sec*proc
+
+destructable_state =   0.24 sec*proc
+
+doors =   1.13 sec*proc
+
+energy =   0.30 sec*proc
+
+exits =   0.41 sec*proc
+
+explosion_flames =   0.74 sec*proc
+
+explosion_fragments =   1.08 sec*proc
+
+explosion_lights =   0.70 sec*proc
+
+explosion_models =   0.26 sec*proc
+
+explosion_rings =   0.55 sec*proc
+
+explosion_sprites =   0.19 sec*proc
+
+explosions =   0.03 sec*proc
+
+gideon_combat =   0.07 sec*proc
+
+gideon_teleport =   0.05 sec*proc
+
+headless =  47.95 sec*proc
+
+interaction =   0.65 sec*proc
+
+inventory_state =   0.15 sec*proc
+
+keyframes =   1.88 sec*proc
+
+lights =   0.38 sec*proc
+
+locomotion =   0.65 sec*proc
+
+model_view =   0.20 sec*proc
+
+movement =   1.86 sec*proc
+
+naga =   0.43 sec*proc
+
+object_particles =   1.76 sec*proc
+
+objectives =   0.44 sec*proc
+
+objects =   0.04 sec*proc
+
+paths =   0.24 sec*proc
+
+pickups =   0.59 sec*proc
+
+player =   0.43 sec*proc
+
+player_controls =   1.14 sec*proc
+
+player_keepalive =   0.53 sec*proc
+
+player_restore =   0.28 sec*proc
+
+player_state =   0.24 sec*proc
+
+private =  45.67 sec*proc
+
+pushables =   0.04 sec*proc
+
+randomsound =   0.58 sec*proc
+
+sceneexplosion =   0.62 sec*proc
+
+services =   0.54 sec*proc
+
+session_playback =   1.78 sec*proc
+
+shield =   0.45 sec*proc
+
+sound =   0.73 sec*proc
+
+sprite_view =   0.25 sec*proc
+
+sprites =   0.97 sec*proc
+
+texture =   0.16 sec*proc
+
+triggers =   0.89 sec*proc
+
+weapon_audio =   0.19 sec*proc
+
+weapon_drops =   0.07 sec*proc
+
+weapon_impacts =   2.22 sec*proc
+
+weapon_sprites =   0.34 sec*proc
+
+weapons =   4.35 sec*proc
+
+wind =   0.45 sec*proc
+
+world =   1.52 sec*proc
+
+world_view =   0.13 sec*proc
+
+worldpaths =   0.70 sec*proc
+

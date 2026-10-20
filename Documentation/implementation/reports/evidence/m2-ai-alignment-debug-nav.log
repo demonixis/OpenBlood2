@@ -1,0 +1,32 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 416: ai_navigation.sample
+ 1/11 Test #416: ai_navigation.sample .............   Passed    0.00 sec
+      Start 417: ai_navigation.clearance
+ 2/11 Test #417: ai_navigation.clearance ..........   Passed    0.00 sec
+      Start 418: ai_navigation.parallel_axes
+ 3/11 Test #418: ai_navigation.parallel_axes ......   Passed    0.00 sec
+      Start 419: ai_navigation.rays
+ 4/11 Test #419: ai_navigation.rays ...............   Passed    0.00 sec
+      Start 420: ai_navigation.direct
+ 5/11 Test #420: ai_navigation.direct .............   Passed    0.00 sec
+      Start 421: ai_navigation.detour
+ 6/11 Test #421: ai_navigation.detour .............   Passed    0.00 sec
+      Start 422: ai_navigation.blocked
+ 7/11 Test #422: ai_navigation.blocked ............   Passed    0.00 sec
+      Start 423: ai_navigation.limits
+ 8/11 Test #423: ai_navigation.limits .............   Passed    0.02 sec
+      Start 424: ai_navigation.lifetime
+ 9/11 Test #424: ai_navigation.lifetime ...........   Passed    0.01 sec
+      Start 425: ai_navigation.subway
+10/11 Test #425: ai_navigation.subway .............   Passed    0.89 sec
+      Start 426: ai_navigation.cityhub_parallel
+11/11 Test #426: ai_navigation.cityhub_parallel ...   Passed    1.49 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Label Time Summary:
+ai_navigation    =   2.43 sec*proc (11 tests)
+headless         =   2.43 sec*proc (11 tests)
+private          =   2.39 sec*proc (2 tests)
+
+Total Test time (real) =   2.44 sec

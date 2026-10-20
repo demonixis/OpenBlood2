@@ -1,0 +1,25 @@
+[0/2] Re-checking globbed directories...
+[1/155] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ObjectParticleFX.cpp for CXX dependencies
+[2/155] Scanning /home/yann/projects/lithtech/Blood2/src/engine/particles.cpp for CXX dependencies
+[3/155] Scanning /home/yann/projects/lithtech/Blood2/tests/object_particle_tests.cpp for CXX dependencies
+[4/155] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[5/134] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[6/19] Generating CXX dyndep file tests/CMakeFiles/object_particle_tests.dir/CXX.dd
+[7/18] Building CXX object CMakeFiles/engine.dir/src/engine/particles.cpp.o
+[8/18] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ObjectParticleFX.cpp.o
+[9/18] Linking CXX static library libengine.a
+[10/18] Linking CXX static library libblood2_game.a
+[11/18] Linking CXX executable tests/sprite_view_tests
+[12/18] Linking CXX executable blood2
+[13/18] Building CXX object tests/CMakeFiles/object_particle_tests.dir/object_particle_tests.cpp.o
+/home/yann/projects/lithtech/Blood2/tests/object_particle_tests.cpp: In function ‘int main(int, char**)’:
+/home/yann/projects/lithtech/Blood2/tests/object_particle_tests.cpp:151:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  151 |  if(argc!=3)return 2;const std::string n=argv[1];
+      |  ^~
+/home/yann/projects/lithtech/Blood2/tests/object_particle_tests.cpp:151:22: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  151 |  if(argc!=3)return 2;const std::string n=argv[1];
+      |                      ^~~~~
+[14/18] Linking CXX executable tests/explosion_sprite_tests
+[15/18] Linking CXX executable tests/explosion_ring_tests
+[16/18] Linking CXX executable tests/explosion_fragment_tests
+[17/18] Linking CXX executable tests/object_particle_tests

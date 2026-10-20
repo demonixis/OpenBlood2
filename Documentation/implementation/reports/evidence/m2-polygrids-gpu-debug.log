@@ -1,0 +1,12 @@
+Test project <workspace>/Blood2/build/debug
+    Start 925: gpu.polygrid
+1/1 Test #925: gpu.polygrid .....................   Passed    4.31 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+gpu         =   4.31 sec*proc (1 test)
+polygrid    =   4.31 sec*proc (1 test)
+private     =   4.31 sec*proc (1 test)
+
+Total Test time (real) =   4.32 sec

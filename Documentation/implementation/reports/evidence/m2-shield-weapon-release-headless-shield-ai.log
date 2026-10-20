@@ -1,0 +1,15 @@
+661/664 Testing: shield.ai
+661/664 Test: shield.ai
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/shield_tests" "ai" "/home/yann/projects/lithtech/Blood2/build/release/tests/shield-ai"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"shield.ai" start time: Oct 17 02:03 CEST
+Output:
+----------------------------------------------------------
+Original generic AI FIRE_KEY reaches actual shield publication with no target damage; boss AI not claimed.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"shield.ai" end time: Oct 17 02:03 CEST
+"shield.ai" time elapsed: 00:00:00
+----------------------------------------------------------

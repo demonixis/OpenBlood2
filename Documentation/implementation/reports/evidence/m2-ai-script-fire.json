@@ -1,0 +1,247 @@
+{
+  "date": "2026-10-17",
+  "baseline": "6aeb63750107c064c1b612d9be1399f0e19a8e17",
+  "status": "M2 incomplete; original scripted standing/walking/running opportunity fire integrated",
+  "validation": {
+    "headless-debug": {
+      "total": 94,
+      "failed": 0,
+      "private": 18,
+      "seconds": 23.32
+    },
+    "headless-release": {
+      "total": 94,
+      "failed": 0,
+      "private": 18,
+      "seconds": 2.86
+    },
+    "sanitize": {
+      "total": 70,
+      "failed": 0,
+      "private": 10,
+      "seconds": 37.27
+    },
+    "gpu-debug": {
+      "total": 6,
+      "failed": 0,
+      "private": 5,
+      "seconds": 78.44
+    },
+    "gpu-release": {
+      "total": 6,
+      "failed": 0,
+      "private": 5,
+      "seconds": 24.79
+    }
+  },
+  "private_diagnostic": {
+    "world": "01_SubwayA",
+    "model": "models/enemies/m_cultist1.abc",
+    "placement": "Isolated diagnostic actors at Y=10000; not authored encounter",
+    "steps_per_mode": 240,
+    "dt": "1/60",
+    "shots": [
+      15,
+      12,
+      12
+    ],
+    "target_hp": [
+      9879.87,
+      9903.9,
+      9903.9
+    ],
+    "distance_z": [
+      0,
+      79.9999,
+      160
+    ],
+    "reload_and_unload_each_mode": true
+  },
+  "commands": [
+    "cmake --build build/<debug|release> --target blood2_app ai_fire_tests ai_follow_tests ai_script_tests ai_perception_tests ai_runtime_tests ai_target_tests object_contract_tests player_controls_tests level_change_gpu_tests -j3 (Debug used -j4)",
+    "ctest --test-dir build/<debug|release> -j3 -R '^ai_(fire|follow|script|perception|runtime|target)\\.|^objects\\.|^player_controls\\.' --output-on-failure",
+    "cmake --build build/sanitize --target ai_fire_tests ai_follow_tests ai_script_tests ai_perception_tests ai_target_tests object_contract_tests -j2",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -j2 -R '^ai_(fire|follow|script|perception|target)\\.|^objects\\.' --output-on-failure",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(character|lifecycle|mouse_combat|corpse_clearance|objectives|level_change)$' --output-on-failure -V",
+    "build/release/tests/ai_fire_tests script_private <external-data-root>"
+  ],
+  "development_failures": [
+    "Initial compile qualified the existing global FireResult enum with an incorrect namespace; corrected.",
+    "Initial one-unit synthetic target could miss normal spread; use an explicit ten-unit target without changing fire rules.",
+    "Initial script-route fixture advanced one second, exceeding the existing half-second movement bound; corrected to a valid half-second frame."
+  ],
+  "limits": [
+    "Real-model script scenarios are diagnostic placements, not authored world encounters",
+    "GPU checks are rendering/lifetime/combat/transition regressions, not visual certification of a new scripted encounter",
+    "Preserve shared-target and stale moving-aim source quirks; no new navigation or physics implementation",
+    "Fire/gib death and other required services remain incomplete",
+    "No shader/dependency/reference/commercial-asset changes or native macOS validation",
+    "M2 remains incomplete"
+  ],
+  "artifacts": [
+    {
+      "file": "m2-ai-script-fire-headless-debug.log",
+      "sha256": "f33d360508be53b7d9c8ce8cafc8f8b4e7abb782b39a3499eec3258199c918d5",
+      "raw_capture_sha256": "f33d360508be53b7d9c8ce8cafc8f8b4e7abb782b39a3499eec3258199c918d5",
+      "bytes": 11217
+    },
+    {
+      "file": "m2-ai-script-fire-headless-release.log",
+      "sha256": "67da566014dd3a98059ee929c74a44bd9c05c5b5b14011bcb494893a1ce6ced6",
+      "raw_capture_sha256": "67da566014dd3a98059ee929c74a44bd9c05c5b5b14011bcb494893a1ce6ced6",
+      "bytes": 11219
+    },
+    {
+      "file": "m2-ai-script-fire-sanitize.log",
+      "sha256": "dba812dbc4c84a7d75e4dae217d677c099e58887f84afd6dc02ac612a77c6b6f",
+      "raw_capture_sha256": "dba812dbc4c84a7d75e4dae217d677c099e58887f84afd6dc02ac612a77c6b6f",
+      "bytes": 8241
+    },
+    {
+      "file": "m2-ai-script-fire-gpu-debug.log",
+      "sha256": "8f566e5b3d5eb939cecc7228627b6e8827cdecdaa6376d9a8cf5cbfcba8b1c23",
+      "raw_capture_sha256": "22cb64cc8bed77e79616afe2638a0eea03a9721b039ff96599989959193be95e",
+      "bytes": 13742
+    },
+    {
+      "file": "m2-ai-script-fire-gpu-release.log",
+      "sha256": "334e3f4c802c01e18452c1473020cbe93ec20d725d7d0ee9faecae092544a813",
+      "raw_capture_sha256": "7b94c44c1a8b8b8859f74059f50e1b81526fe5eb6341982ddbae69dbf1c33887",
+      "bytes": 13790
+    },
+    {
+      "file": "m2-ai-script-fire-private.log",
+      "sha256": "4f3cd08b34bd2e54347f0a8e6bab55e27c4f11a4a0af45f8db79ed9eb957a1c0",
+      "raw_capture_sha256": "4f3cd08b34bd2e54347f0a8e6bab55e27c4f11a4a0af45f8db79ed9eb957a1c0",
+      "bytes": 237
+    },
+    {
+      "file": "m2-ai-script-fire-format.log",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "raw_capture_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 1
+    },
+    {
+      "file": "m2-ai-script-fire-reference-integrity.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "raw_capture_sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+      "bytes": 56
+    },
+    {
+      "file": "m2-ai-script-fire-focused.log",
+      "sha256": "fd2e4dff1658ebf0c5dd8e8a7e4a2337aa2593ac20b9b25bc1407ce24b4d466f",
+      "raw_capture_sha256": "fd2e4dff1658ebf0c5dd8e8a7e4a2337aa2593ac20b9b25bc1407ce24b4d466f",
+      "bytes": 4174
+    },
+    {
+      "file": "m2-ai-script-fire-focused2.log",
+      "sha256": "e40e64603a75b75a5094d3b519dfb80d1815952810b305ebf16b66a0f3614d82",
+      "raw_capture_sha256": "e40e64603a75b75a5094d3b519dfb80d1815952810b305ebf16b66a0f3614d82",
+      "bytes": 3568
+    },
+    {
+      "file": "m2-ai-script-fire-debug-build.log",
+      "sha256": "0779488738f0834583123449b1ed48920e82725d3b0a9a5b06d3a56cac07d090",
+      "raw_capture_sha256": "9483125fd40c98747356ba3ecdc22643e40da946e3421dd8f5df62c4d254f247",
+      "bytes": 14735
+    },
+    {
+      "file": "m2-ai-script-fire-debug-build2.log",
+      "sha256": "e156d8dd21224d48b21bdebdfe0b4f063443c71c002f2b7ebddbd579f57654e0",
+      "raw_capture_sha256": "e234f725507147b27d43b1c617fbd74d105c7b70db6912218aab90debe23033b",
+      "bytes": 9561
+    },
+    {
+      "file": "m2-ai-script-fire-debug-final-build.log",
+      "sha256": "b2f1da765b10d94d5d3aaa79a522e23fb38772b550409043e5a1a8f96c2ce005",
+      "raw_capture_sha256": "b2f1da765b10d94d5d3aaa79a522e23fb38772b550409043e5a1a8f96c2ce005",
+      "bytes": 3740
+    },
+    {
+      "file": "m2-ai-script-fire-release-build.log",
+      "sha256": "6cc3ba970bd2a4205f8da370f1d31b9027c3138784aed3855533cc79d34982f5",
+      "raw_capture_sha256": "1ef546722f509ac2dd6f83e6a2e95a1142cb44a6902045891f0d33cf559ea9df",
+      "bytes": 17154
+    },
+    {
+      "file": "m2-ai-script-fire-sanitize-build.log",
+      "sha256": "c1620a82f2533d082561c0bc818575077a18d94e7c51912328411caae6adbb47",
+      "raw_capture_sha256": "1719737d0f78f4f0cc3ae427382f7c55108e8e3791efa32f4e6fa2fa7437f0fb",
+      "bytes": 15800
+    },
+    {
+      "file": "m2-ai-script-fire-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+      "bytes": 831
+    },
+    {
+      "file": "m2-ai-script-fire-links.log",
+      "sha256": "e7c846b109a97fe3abfc1b5a9830693eac0b80cca395e288097612f56587848d",
+      "bytes": 32
+    }
+  ],
+  "implementation_patch_sha256": "36259a7adcade5349a4cf5720359588508028af1c59e5c7a0928a2249c0fdcf2",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "238a0ddd57088f6366f3ba98404fff502620f5ec2cd6a8780b00e5b69a0a437b"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "ce6655aecc0c986b4ea8b4f2b41470dd5eb5fe9cae1ece20c6d9f0309de4feb1"
+    },
+    {
+      "path": "README.md",
+      "sha256": "ad8fc31bc20d6caa8850301095a7812aebcb30fa3a4bc9298333efc3f8d9d7b6"
+    },
+    {
+      "path": "docs/AI_FOLLOW_CONTRACTS.md",
+      "sha256": "75b3ef253e07f9eeb9d9592e23be6d8d7b2c3a9cd9af6be03903fc34e43b7904"
+    },
+    {
+      "path": "docs/AI_SCRIPT_CONTRACTS.md",
+      "sha256": "5ef84414ce91d77d4031cb7892cce81e9de7b3359fe66548e9c87cc4f6aae5b1"
+    },
+    {
+      "path": "docs/AI_SCRIPT_FIRE_CONTRACTS.md",
+      "sha256": "d985adecc97097c499cc9a5fda7d96262e2b807f8b423ab7b89625240a05aa6b"
+    },
+    {
+      "path": "docs/M2_AI_SCRIPT_FIRE_SOURCES.json",
+      "sha256": "cdc93c76a6b16987062bf1d81318f1e0468a1c8d77899870f69c7d322f964f6b"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "3cfb6e69e535c78f5a443f82e5739898262f2a0c9f20d814ac0a38608f4bbde7"
+    },
+    {
+      "path": "src/app/inspector_skeleton.cpp",
+      "sha256": "aa1b3c2c5793d66837d795f2cf045d0046e54eab5e39958d4615105f1622894c"
+    },
+    {
+      "path": "src/game/original/AIScriptFire.cpp",
+      "sha256": "071d004bf7d13a40f8a4d5af06dc61e5ba804583739bc88fb813827931ce4cd4"
+    },
+    {
+      "path": "src/game/original/AIScriptMovement.cpp",
+      "sha256": "c8138acc7e327579640c507bf2882db38d4a2a3fa1484d452527aa092bab9df4"
+    },
+    {
+      "path": "src/game/original/AI_Mgr.h",
+      "sha256": "4455625661268809eaedb718b9d4974af245867354ab42f0f34400eae8c45378"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "c3669b0eecd8a56c1627cbe987f2347e92d931569a5755d3d180f78f1f3c02c3"
+    },
+    {
+      "path": "tests/ai_fire_tests.cpp",
+      "sha256": "bfbf4544b997373035497af22050c03b573c5434c1b938f446ec4e2561d38923"
+    },
+    {
+      "path": "tests/ai_follow_tests.cpp",
+      "sha256": "3787d53a53764c7631186161b3b25080bf00d04441f3c6582895f0056f5b53aa"
+    }
+  ],
+  "implementation_commit": "79a2cef1891b0f10b9ab83b076cd19867352e305"
+}

@@ -1,0 +1,7 @@
+[1/1] cd /home/yann/projects/lithtech/Blood2/build/shader-tools && /usr/bin/cmake -DSHADERCROSS=/home/yann/projects/lithtech/Blood2/build/shader-tools/_deps/shadercross-build/shadercross -P /home/yann/projects/lithtech/Blood2/cmake/GenerateWorldShaders.cmake
+/home/yann/projects/lithtech/Blood2/cmake/../src/engine/shaders/world.vert
+/home/yann/projects/lithtech/Blood2/cmake/../src/engine/shaders/world.vert
+/home/yann/projects/lithtech/Blood2/cmake/../src/engine/shaders/world.frag
+/home/yann/projects/lithtech/Blood2/cmake/../src/engine/shaders/world.frag
+/home/yann/projects/lithtech/Blood2/cmake/../src/engine/shaders/sprite.frag
+/home/yann/projects/lithtech/Blood2/cmake/../src/engine/shaders/sprite.frag

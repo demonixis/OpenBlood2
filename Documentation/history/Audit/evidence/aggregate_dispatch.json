@@ -1,0 +1,12 @@
+{
+  "name": "aggregate_dispatch",
+  "command": [
+    "/tmp/lithtech-audit-2bVxTF/aggregate_dispatch_probe"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:21:18.115372+00:00",
+  "elapsed_seconds": 0.002,
+  "timeout_seconds": 10,
+  "exit_code": 1,
+  "log": "aggregate_dispatch.log"
+}

@@ -1,0 +1,674 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index c6a6756..d84d465 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -516,3 +516,5 @@ The [Gideon lifecycle continuation](../Documentation/Implementation/M2_GIDEON_RU
+ The [NPC activation correction](../Documentation/Implementation/M2_ACTIVATION_VISIBILITY.md) reuses the original AI glass/volume filter for replacement visibility pings and completes Gideon's authored intro script. Read [contracts](docs/ACTIVATION_VISIBILITY_CONTRACTS.md). Preserve manual inactivity, strict original ping cadence, atomic refresh and checked historical inspection. Center rays are not retail PVS; complete encounters, safe NEW_LEVEL and M2 remain open.
+ 
+ The [corpse placement correction](../Documentation/Implementation/M2_CORPSE_PLACEMENT.md) preserves original raw death dimensions and fits the new body locally against primary-world geometry. Read [contracts](docs/CORPSE_PLACEMENT_CONTRACTS.md). Preserve the clear cached anchor, same-side corrections, bounded distance/work, final box/center-path validation and deferred failure cleanup. Reports retain actual attempted/committed state without advancing simulation. This is replacement triangle collision, not retail depenetration; safe NEW_LEVEL, required services and M2 remain open.
++
++The [built-in Model continuation](../Documentation/Implementation/M2_BUILTIN_MODELS.md) integrates the original engine Model callback and 47 actual CityHub instances. Read [contracts](docs/BUILTIN_MODEL_CONTRACTS.md). Preserve forced OT_MODEL, BaseClass defaults/property order, empty/missing resource distinctions, shared immutable assets and deferred lifetime. Do not conflate Model with CModelObject/CDestructableModel or infer lighting/physical bodies. CityHub remains 159 unsupported / 35 failed; safe NEW_LEVEL and M2 remain open.
+diff --git a/README.md b/README.md
+index 2aeb6e3..dabf799 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [original built-in Model continuation](../Documentation/Implementation/M2_BUILTIN_MODELS.md) renders 47 authored CityHub lamps with real ABC/DTX resources and inspection. CityHub now has 291 created, 159 unsupported and 35 failed entries; the source session remains intact during rehearsal. Destructible models, safe NEW_LEVEL and M2 remain incomplete.
++
+ Current continuation: [original fragment smoke trails](../Documentation/Implementation/M2_OBJECT_PARTICLES.md) adds
+ distance-based emission, source stop/lifetime rules and actual DTX particle rendering.
+ Other required FX/illumination and safe NEW_LEVEL keep M2 incomplete.
+diff --git a/docs/BUILTIN_MODEL_CONTRACTS.md b/docs/BUILTIN_MODEL_CONTRACTS.md
+new file mode 100644
+index 0000000..c6a048f
+--- /dev/null
++++ b/docs/BUILTIN_MODEL_CONTRACTS.md
+@@ -0,0 +1,71 @@
++# Original built-in Model
++
++The registered `Model` class now runs the original `mdl_MessageFn` from
++`sources/blood2/AppHeaders/engineobjects.c`. `BuiltinModel` is only its C++ adapter
++name, avoiding a collision with the engine's decoded ABC `Model` structure.
++This is distinct from `CModelObject` and `CDestructableModel`; neither is imported
++or replaced by this class. No new mutable game global or dependency is added.
++
++## Source behavior
++
++PRECREATE unconditionally assigns OT_MODEL before delegating to the original
++`bc_EngineMessageFn`. World and string creation read inherited Name, Pos, Rotation,
++Flags and optional boolean flags in their existing order, then Filename and Skin.
++The registration defaults are empty Filename/Skin and FLAG_VISIBLE. Runtime and
++restore creation keep their supplied structure fields except the forced type.
++The parent is BaseClass, so there are no B2 difficulty filters, damage aggregate,
++initial-update actions, scripted updates or light emission. Aggregate engine and
++object messages still receive one dispatch. Static registration supplies the
++source CF_ALWAYSLOAD intent without retaining a DLL loader.
++
++The source callback does not select a clip, infer collision dimensions or start a
++physics body. Existing engine defaults provide clip zero, looping, identity scale
++and zero collision half dimensions. The verified CityHub subset contains 47 visible,
++non-solid models with Flags=1. Preserving other authored flag bits does not implement
++missing shadow, lighting or physical-body behavior. Do not infer a collider from
++visible geometry or claim physical Model compatibility from these objects.
++
++## Resource, rendering and lifetime
++
++The existing resource path loads bounded ABC data after precreate, before initial
++update. Immutable ABC objects share a weak cache by resolved archive/range. Each
++instance owns its transform and animation track. Missing/malformed ABC files retain
++an inspectable instance with `model_error`, no usable animation and no model draw;
++this is the existing inspection policy, not a successful resource load or a ready
++level. An empty authored Filename requests no asset and remains visible as such.
++
++The existing ModelView resolves exact DTX paths, reports missing/malformed skins,
++and uses its explicit magenta fallback. Rendering snapshots do not advance clocks.
++Hidden instances remain listed and their active animation continues without UI.
++Pending instances stop drawing immediately; deferred destruction releases their
++model ownership. World unload also clears caches; old IDs remain stale after reload.
++See [model/resource contracts](MODEL_AND_COLLISION_CONTRACTS.md) and
++[presentation contracts](MODEL_VIEW_CONTRACTS.md).
++
++Objects identifies built-in Model semantics, current half dimensions, resource
++status, original properties and animation. Skeleton and 3D view retain normal
++pose/skin/visibility inspection. CityHub's 35 light bulbs and 12 red lamps are actual
++textured geometry, not simulated light emitters. No lighting or retail-renderer
++parity is claimed.
++
++## Destination evidence and limits
++
++Private CityHub creation changes from 244 to 291 created entries and 206 to 159
++unsupported entries; its 541 editor-only entries and 35 failures remain. Structural
++preparation has 295 schema-checked, 159 unknown and 31 invalid entries. Rehearsal
++still creates/destroys its temporary session and resumes the unchanged source; the
++new class owns no global state requiring additional exchange. It never promotes the
++destination. SubwayA accounting is unchanged.
++
++Tests cover forced type, runtime/default/property ordering, schema refusal,
++aggregate dispatch, missing ABC, malformed ABC/DTX, hidden clocks, removal, shared
++resources, actual CityHub properties/poses/textures and two unload/reload cycles.
++GPU tests isolate one authored instance of each asset using a diagnostic camera,
++read pixels, verify texture success, omit/restore submissions and repeat after reload.
++This is asset rendering evidence, not a full CityHub playthrough. Existing destination
++isolation and objectives GPU smoke check the increased coverage without accepting
++remaining failures. [Implementation evidence](../../Documentation/Implementation/M2_BUILTIN_MODELS.md)
++and [source ledger](M2_BUILTIN_MODEL_SOURCES.json) record verification.
++
++CDestructableModel and the other unknown/failed destination classes, safe automatic
++NEW_LEVEL, required services/FX and the actual M2 acceptance gate remain incomplete.
+diff --git a/docs/M2_BUILTIN_MODEL_SOURCES.json b/docs/M2_BUILTIN_MODEL_SOURCES.json
+new file mode 100644
+index 0000000..4988e3a
+--- /dev/null
++++ b/docs/M2_BUILTIN_MODEL_SOURCES.json
+@@ -0,0 +1,22 @@
++{
++  "baseline_commit": "996ebbdbadb344239f113ba0c9746de209bdbb9a",
++  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/AppHeaders/engineobjects.c",
++      "sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
++      "use": "Model registration and mdl_MessageFn (153-176); existing bc_EngineMessageFn ordering (20-121)."
++    },
++    {
++      "path": "sources/blood2/AppHeaders/cpp_engineobjects_de.h",
++      "sha256": "f4b59f4e7fb11c0704a23ab4144aa06d90b6e55c584173da2f291b22045ee10b",
++      "use": "Original C++ BaseClass and aggregate dispatch boundary, adapted previously."
++    }
++  ],
++  "adaptations": [
++    "C Model callback expressed as a typed C++ BuiltinModel override; original registered name and BaseClass parent retained.",
++    "Static registration replaces CF_ALWAYSLOAD DLL intent; no new dependency or mutable global.",
++    "Existing ABC/DTX cache, animation, rendering, diagnostic failure and deferred lifetime policies reused.",
++    "No invented collision dimensions, damage behavior, light emission or destination promotion."
++  ]
++}
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index f439456..4a83730 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -595,6 +595,15 @@ namespace OpenBlood2
+                         if (state.m_ObjectType == OT_MODEL)
+                             ImGui::Text("Model additive RGB (lighting pending) %.3f %.3f %.3f | alpha %.3f",
+                                         object->color.x, object->color.y, object->color.z, object->alpha);
++                        if (object->type->name == "Model")
++                        {
++                            ImGui::TextWrapped("Original built-in Model: BaseClass properties and engine animation. "
++                                               "No destructible-object rules or light emission.");
++                            ImGui::Text("Collision half dimensions %.2f %.2f %.2f (no automatic model body)",
++                                        object->dimensions.x, object->dimensions.y, object->dimensions.z);
++                            if (!object->model && object->model_error.empty())
++                                ImGui::TextUnformatted("No ABC resource requested.");
++                        }
+                         if (state.m_Filename[0] || state.m_SkinName[0])
+                             ImGui::TextWrapped("Model: %s / Skin (decode status in 3D view): %s", state.m_Filename,
+                                                state.m_SkinName);
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 80ebfac..851a931 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -81,8 +81,8 @@ namespace OpenBlood2
+         const auto trial_before = g.destination_trial.attempts;
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+-            !g.destination_trial.player_entered || g.destination_trial.created != 244 ||
+-            g.destination_trial.unknown != 206 || g.destination_trial.failed != 35 ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 291 ||
++            g.destination_trial.unknown != 159 || g.destination_trial.failed != 35 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+@@ -100,8 +100,8 @@ namespace OpenBlood2
+                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
+                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+                g.destination_inspection.source_revision == old_revision &&
+-               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 248 &&
+-               g.destination_inspection.unknown == 206 && g.destination_inspection.invalid == 31 &&
++               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 295 &&
++               g.destination_inspection.unknown == 159 && g.destination_inspection.invalid == 31 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/game/original/BuiltinModel.h b/src/game/original/BuiltinModel.h
+new file mode 100644
+index 0000000..e7bb517
+--- /dev/null
++++ b/src/game/original/BuiltinModel.h
+@@ -0,0 +1,13 @@
++#pragma once
++#include "cpp_engineobjects_de.h"
++
++namespace OpenBlood2
++{
++    // AppHeaders/engineobjects.c Model / mdl_MessageFn. The C++ name avoids
++    // colliding with the decoded ABC asset; the registered class stays "Model".
++    class BuiltinModel : public BaseClass
++    {
++      protected:
++        DDWORD EngineMessageFn(DDWORD message, void* data, float reason) override;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/original/engineobjects.cpp b/src/game/original/engineobjects.cpp
+index 30cfcb6..65be7e7 100644
+--- a/src/game/original/engineobjects.cpp
++++ b/src/game/original/engineobjects.cpp
+@@ -1,8 +1,17 @@
+ #include "cpp_engineobjects_de.h"
++#include "game/original/BuiltinModel.h"
+ 
+ #include "engineobjects_de.h"
+ #include "serverobj_de.h"
+ 
++DDWORD OpenBlood2::BuiltinModel::EngineMessageFn(DDWORD message, void* data, float reason)
++{
++    // Original mdl_MessageFn forces the type even for a non-normal incoming type.
++    if (message == MID_PRECREATE)
++        static_cast<ObjectCreateStruct*>(data)->m_ObjectType = OT_MODEL;
++    return bc_EngineMessageFn(this, message, data, reason);
++}
++
+ void bc_AddAggregate(LPBASECLASS pObject, LPAGGREGATE pAggregate)
+ {
+     pAggregate->m_pNextAggregate = pObject->m_pFirstAggregate;
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 3b22998..0e7bd7f 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -1,5 +1,6 @@
+ #include "game/original/AmmoPickups.h"
+ #include "game/original/B2BaseClass.h"
++#include "game/original/BuiltinModel.h"
+ #include "game/original/CameraObj.h"
+ #include "game/original/CameraSpot.h"
+ #include "game/original/CinematicTrigger.h"
+@@ -65,6 +66,11 @@ namespace OpenBlood2
+                               {"Gravity", false, false},
+                               {"TouchNotify", false, false},
+                               {"Rayhit", false, false}}};
++        const ClassInfo builtin_model{
++            "Model",
++            &base,
++            construct<BuiltinModel>,
++            {{"Filename", std::string{}}, {"Skin", std::string{}}, {"Flags", std::int32_t(FLAG_VISIBLE)}}};
+         const ClassInfo shockwave_projectile{
+             "CBehemothShockwaveProjectile", &base, construct<CBehemothShockwaveProjectile>, {}};
+         const ClassInfo energy_projectile{"CEnergyBlastProjectile", &base, construct<CEnergyBlastProjectile>, {}};
+@@ -653,19 +659,20 @@ namespace OpenBlood2
+     } // namespace
+     bool register_original_classes(Objects& objects)
+     {
+-        return objects.register_class(base) && objects.register_class(b2base) && objects.register_class(camera) &&
+-               objects.register_class(client_sfx) && objects.register_class(scene_explosion) &&
+-               objects.register_class(client_light) && objects.register_class(light_SquareWaveLightFX) &&
+-               objects.register_class(light_SawWaveLightFX) && objects.register_class(light_RampUpWaveLightFX) &&
+-               objects.register_class(light_RampDownWaveLightFX) && objects.register_class(light_SineWaveLightFX) &&
+-               objects.register_class(light_Flicker1WaveLightFX) && objects.register_class(light_Flicker2WaveLightFX) &&
+-               objects.register_class(light_Flicker3WaveLightFX) && objects.register_class(light_Flicker4WaveLightFX) &&
+-               objects.register_class(light_StrobeWaveLightFX) && objects.register_class(light_SearchWaveLightFX) &&
+-               objects.register_class(light_FlickerLight) && objects.register_class(light_GlowingLight) &&
+-               objects.register_class(camera_object) && objects.register_class(cinematic_trigger) &&
+-               objects.register_class(random_sound) && objects.register_class(detail_sprite) &&
+-               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
+-               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
++        return objects.register_class(base) && objects.register_class(builtin_model) &&
++               objects.register_class(b2base) && objects.register_class(camera) && objects.register_class(client_sfx) &&
++               objects.register_class(scene_explosion) && objects.register_class(client_light) &&
++               objects.register_class(light_SquareWaveLightFX) && objects.register_class(light_SawWaveLightFX) &&
++               objects.register_class(light_RampUpWaveLightFX) && objects.register_class(light_RampDownWaveLightFX) &&
++               objects.register_class(light_SineWaveLightFX) && objects.register_class(light_Flicker1WaveLightFX) &&
++               objects.register_class(light_Flicker2WaveLightFX) && objects.register_class(light_Flicker3WaveLightFX) &&
++               objects.register_class(light_Flicker4WaveLightFX) && objects.register_class(light_StrobeWaveLightFX) &&
++               objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
++               objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
++               objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
++               objects.register_class(detail_sprite) && objects.register_class(sound) &&
++               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
++               objects.register_class(game_start) && objects.register_class(path) &&
+                objects.register_class(world_properties) && objects.register_class(smell) &&
+                objects.register_class(exit_hint) && objects.register_class(character) &&
+                objects.register_class(ai_manager) && objects.register_class(cultist) &&
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index aca56e7..71ae374 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ add_executable(object_contract_tests object_contract_tests.cpp)
+ target_link_libraries(object_contract_tests PRIVATE blood2_game)
+ blood2_project_options(object_contract_tests)
+-foreach(case IN ITEMS original_objects nested_creation reasons_properties scheduling deferred_removal
++foreach(case IN ITEMS builtin_model original_objects nested_creation reasons_properties scheduling deferred_removal
+         aggregate_dispatch handles_selection links_lists messages_strings unsupported_teardown creation_failures)
+     add_test(NAME objects.${case} COMMAND object_contract_tests "${case}")
+     set_tests_properties(objects.${case} PROPERTIES LABELS "headless;objects" TIMEOUT 10)
+@@ -635,12 +635,16 @@ endif()
+ add_executable(model_view_tests model_view_tests.cpp ../src/app/model_scene.cpp)
+ target_link_libraries(model_view_tests PRIVATE blood2_game)
+ blood2_project_options(model_view_tests)
++add_test(NAME model_view.builtin_resources COMMAND model_view_tests builtin_resources "${CMAKE_CURRENT_BINARY_DIR}/builtin-model-fixture")
++set_tests_properties(model_view.builtin_resources PROPERTIES LABELS "headless;model_view" TIMEOUT 30)
+ foreach(case IN ITEMS sample rejects weapon_pose legacy_pose)
+     add_test(NAME model_view.${case} COMMAND model_view_tests "${case}")
+     set_tests_properties(model_view.${case} PROPERTIES LABELS "headless;model_view" TIMEOUT 30)
+ endforeach()
+ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME model_view.subway COMMAND model_view_tests subway "${BLOOD2_TEST_DATA_DIR}")
++    add_test(NAME model_view.builtin_city COMMAND model_view_tests builtin_city "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(model_view.builtin_city PROPERTIES LABELS "headless;private;model_view" TIMEOUT 90)
+     set_tests_properties(model_view.subway PROPERTIES LABELS "headless;private;model_view" TIMEOUT 90)
+ endif()
+ if(BLOOD2_GPU_TESTS)
+@@ -653,6 +657,8 @@ endif()
+ 
+ if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+     add_test(NAME gpu.model_private COMMAND model_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/model-private.png" "${BLOOD2_TEST_DATA_DIR}")
++    add_test(NAME gpu.model_builtin_city COMMAND model_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/model-city" "${BLOOD2_TEST_DATA_DIR}" builtin_city)
++    set_tests_properties(gpu.model_builtin_city PROPERTIES LABELS "gpu;private;model_view" TIMEOUT 60 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+     set_tests_properties(gpu.model_private PROPERTIES LABELS "gpu;private;model_view" TIMEOUT 30 RUN_SERIAL TRUE)
+ endif()
+ 
+diff --git a/tests/model_gpu_tests.cpp b/tests/model_gpu_tests.cpp
+index f93fd84..bd1b382 100644
+--- a/tests/model_gpu_tests.cpp
++++ b/tests/model_gpu_tests.cpp
+@@ -2,6 +2,7 @@
+ #include "engine/capture.h"
+ #include "engine/runtime.h"
+ #include "engine/world_renderer.h"
++#include <algorithm>
+ #include <iostream>
+ using namespace OpenBlood2;
+ #define CHECK(x)                                                                                                       \
+@@ -218,6 +219,95 @@ int main(int argc, char** argv)
+         scene.clear();
+         models.clear_geometry();
+     }
++    if (argc == 4 && std::string_view(argv[3]) == "builtin_city")
++    {
++        GameSession game;
++        CHECK(game.initialize());
++        Config config;
++        config.data_dir = argv[2];
++        CHECK(game.resources.mount_game(config, error));
++        ModelView scene;
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(game.request_world("02_CityHub", error));
++            CHECK(update_model_scene(game, scene, error));
++            for (auto asset : {"lightbulb1.abc", "redlight.abc"})
++            {
++                auto selected = std::find_if(scene.entries.begin(), scene.entries.end(),
++                                             [&](const auto& entry)
++                                             {
++                                                 const auto* r = game.objects.get(entry.object);
++                                                 return r && r->type->name == "Model" && entry.label.ends_with(asset);
++                                             });
++                CHECK(selected != scene.entries.end() && selected->error.empty());
++                auto* r = game.objects.get(selected->object);
++                CHECK(r && r->model && selected->triangles > 0);
++                auto draw = scene.world_draws[selected->range];
++                // Diagnostic camera only: keep the authored model transform/scale.
++                const auto& clip = r->model->animations[r->animation.animation];
++                const auto center =
++                    rotate_vector(r->state.m_Rotation, {(clip.min.x + clip.max.x) / 2, (clip.min.y + clip.max.y) / 2,
++                                                        (clip.min.z + clip.max.z) / 2});
++                const float span =
++                    std::max({clip.max.x - clip.min.x, clip.max.y - clip.min.y, clip.max.z - clip.min.z, 1.f});
++                const DVector eye{r->state.m_Pos.x + center.x, r->state.m_Pos.y + center.y,
++                                  r->state.m_Pos.z + center.z - span * 2};
++                Capture capture;
++                CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300));
++                std::vector<std::uint8_t> visible_pixels;
++                for (unsigned frame = 0; frame < 3; ++frame)
++                {
++                    CHECK(models.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300,
++                                         error, true));
++                    auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++                    CHECK(commands);
++                    const std::span<const WorldDraw> draws =
++                        frame == 1 ? std::span<const WorldDraw>{} : std::span(&draw, 1);
++                    CHECK(models.draw(commands, capture.texture, scene.mesh, draws, eye, {}, false, error));
++                    auto* copy = SDL_BeginGPUCopyPass(commands);
++                    CHECK(copy);
++                    SDL_GPUTextureRegion region{};
++                    region.texture = capture.texture;
++                    region.w = 400;
++                    region.h = 300;
++                    region.d = 1;
++                    SDL_GPUTextureTransferInfo target{};
++                    target.transfer_buffer = capture.transfer;
++                    target.pixels_per_row = 400;
++                    target.rows_per_layer = 300;
++                    SDL_DownloadFromGPUTexture(copy, &region, &target);
++                    SDL_EndGPUCopyPass(copy);
++                    CHECK(SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(runtime.gpu));
++                    auto* pixels =
++                        static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++                    CHECK(pixels);
++                    std::size_t filled = 0, magenta = 0;
++                    for (std::size_t i = 0; i < 400 * 300; ++i)
++                    {
++                        filled += pixels[i * 4] != 6 || pixels[i * 4 + 1] != 9 || pixels[i * 4 + 2] != 13;
++                        magenta += pixels[i * 4] == 255 && pixels[i * 4 + 1] == 0 && pixels[i * 4 + 2] == 255;
++                    }
++                    const bool restored =
++                        frame != 2 || std::equal(visible_pixels.begin(), visible_pixels.end(), pixels);
++                    if (frame == 0)
++                        visible_pixels.assign(pixels, pixels + 400 * 300 * 4);
++                    SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++                    CHECK(restored && magenta == 0 && (frame == 1 ? filled == 0 : filled > 100));
++                    if (frame == 0)
++                    {
++                        const auto path = std::string(argv[1]) + "-" + asset + ".png";
++                        CHECK(capture.save(path.c_str()));
++                        std::cout << "CityHub Model " << asset << " cycle " << cycle << ": " << filled
++                                  << " textured pixels, no fallback; hidden/restored checked\n";
++                    }
++                }
++            }
++            CHECK(game.unload_world());
++            scene.clear();
++            models.clear_geometry();
++            CHECK(update_model_scene(game, scene, error) && scene.entries.empty());
++        }
++    }
+     models.clear_geometry();
+     world.clear_geometry();
+     std::cout << "Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view "
+diff --git a/tests/model_view_tests.cpp b/tests/model_view_tests.cpp
+index 3b730a5..47c6402 100644
+--- a/tests/model_view_tests.cpp
++++ b/tests/model_view_tests.cpp
+@@ -1,5 +1,7 @@
+ #include "app/model_scene.h"
+ #include "model_fixture.h"
++#include "player_fixture.h"
++#include <algorithm>
+ #include <cmath>
+ #include <iostream>
+ #include <limits>
+@@ -131,6 +133,106 @@ namespace
+         CHECK(!weapon.AdjustAngleAndSetPos(0, 0, {}, pose));
+         return true;
+     }
++    bool builtin_resources(const char* root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        std::string error;
++        ModelView scene;
++        auto h = g.objects.create_props(g.objects.find_class("Model"), {},
++                                        "Filename models/characters/caleb.abc; Skin skins/characters/caleb1.dtx");
++        auto* record = g.objects.get(h);
++        CHECK(record && record->model && record->model_error.empty());
++        std::weak_ptr<const Model> retained = record->model;
++        CHECK(update_model_scene(g, scene, error));
++        CHECK(scene.entries.size() == 1 && !scene.entries[0].error.empty()); // Malformed synthetic DTX.
++        CHECK(scene.world_draws.size() == 1);                                // Existing explicit magenta fallback.
++        record->state.m_Flags &= ~FLAG_VISIBLE;
++        CHECK(g.server.advance_models(.025));
++        const auto time = record->animation.time;
++        CHECK(time == 25 && update_model_scene(g, scene, error));
++        CHECK(scene.entries.size() == 1 && !scene.entries[0].visible && scene.world_draws.empty());
++        CHECK(record->animation.time == time); // Rendering is read-only even when hidden.
++        auto bad = g.objects.create_props(g.objects.find_class("Model"), {},
++                                          "Filename skins/characters/caleb1.dtx; Skin missing.dtx");
++        auto* missing = g.objects.get(bad);
++        CHECK(missing && !missing->model && !missing->model_error.empty());
++        CHECK(update_model_scene(g, scene, error) && scene.entries.size() == 2 && !scene.entries.back().error.empty() &&
++              scene.world_draws.empty());
++        const auto id = record->id;
++        CHECK(g.objects.remove(h) && update_model_scene(g, scene, error) && scene.entries.size() == 1);
++        CHECK(!retained.expired() && g.objects.finish_frame() && retained.expired() && !g.objects.get(id));
++        CHECK(g.objects.remove(bad) && g.objects.finish_frame());
++        CHECK(update_model_scene(g, scene, error) && scene.entries.empty());
++        return true;
++    }
++    bool builtin_city(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        ModelView scene;
++        ObjectId old;
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_CityHub", error) && !g.objects.get(old));
++            std::map<std::string, std::weak_ptr<const Model>> models;
++            std::vector<ObjectId> ids;
++            for (std::size_t i = 0; i < g.world.objects.size(); ++i)
++            {
++                const auto& source = g.world.objects[i];
++                if (source.class_name != "Model")
++                    continue;
++                const auto& entry = g.entries[i];
++                auto* r = g.objects.get(entry.object);
++                CHECK(entry.state == EntryState::Created && r && r->model && r->model_error.empty());
++                CHECK(r->state.m_ObjectType == OT_MODEL && r->state.m_Flags == FLAG_VISIBLE && !r->scheduled);
++                CHECK(near(r->state.m_Pos, std::get<DVector>(*source.find("Pos"))));
++                CHECK(std::string(r->state.m_Filename) == std::get<std::string>(*source.find("Filename")));
++                CHECK(std::string(r->state.m_SkinName) == std::get<std::string>(*source.find("Skin")));
++                CHECK(near(r->dimensions, {}) && !r->world_body && !r->character_body);
++                auto [it, inserted] = models.emplace(r->state.m_Filename, r->model);
++                CHECK(inserted || it->second.lock() == r->model);
++                ids.push_back(r->id);
++            }
++            CHECK(ids.size() == 47 && models.size() == 2);
++            CHECK(g.server.advance_models(.025)); // No NPC tick, exercise engine clocks without UI.
++            CHECK(update_model_scene(g, scene, error));
++            std::size_t triangles = 0;
++            for (auto id : ids)
++            {
++                const auto* r = g.objects.get(id);
++                const auto found = std::find_if(scene.entries.begin(), scene.entries.end(),
++                                                [&](const auto& e) { return e.object == id; });
++                CHECK(found != scene.entries.end() && found->visible && found->error.empty());
++                CHECK(found->triangles == r->model->faces.size() && found->triangles > 0);
++                CHECK(found->range < scene.world_draws.size());
++                const auto& draw = scene.world_draws[found->range];
++                CHECK(near(draw.position, r->state.m_Pos));
++                CHECK(near(rotate_vector(draw.rotation, {0, 0, 1}), rotate_vector(r->state.m_Rotation, {0, 0, 1})));
++                triangles += found->triangles;
++            }
++            std::cout << "CityHub cycle " << cycle << ": " << ids.size() << " built-in Models / " << models.size()
++                      << " shared ABC assets / " << triangles << " triangles / zero model or skin failures\n";
++            old = ids.front();
++            auto* hidden = g.objects.get(old);
++            const auto time = hidden->animation.time;
++            hidden->state.m_Flags &= ~FLAG_VISIBLE;
++            CHECK(update_model_scene(g, scene, error) && hidden->animation.time == time);
++            const auto found = std::find_if(scene.entries.begin(), scene.entries.end(),
++                                            [&](const auto& e) { return e.object == old; });
++            CHECK(found != scene.entries.end() && !found->visible && found->error.empty());
++            CHECK(g.unload_world() && !g.objects.get(old));
++            for (const auto& [path, model] : models)
++                CHECK(model.expired());
++            scene.clear();
++            CHECK(update_model_scene(g, scene, error) && scene.entries.empty() && scene.world_draws.empty());
++        }
++        return true;
++    }
+     bool private_world(const char* root)
+     {
+         GameSession g;
+@@ -231,12 +333,14 @@ int main(int argc, char** argv)
+     if (argc < 2)
+         return 2;
+     std::string_view c = argv[1];
+-    return (c == "legacy_pose"           ? legacy_pose()
+-            : c == "sample"              ? sample()
+-            : c == "rejects"             ? rejects()
+-            : c == "weapon_pose"         ? weapon_pose()
+-            : c == "subway" && argc == 3 ? private_world(argv[2])
+-                                         : false)
++    return (c == "legacy_pose"                      ? legacy_pose()
++            : c == "builtin_resources" && argc == 3 ? builtin_resources(argv[2])
++            : c == "builtin_city" && argc == 3      ? builtin_city(argv[2])
++            : c == "sample"                         ? sample()
++            : c == "rejects"                        ? rejects()
++            : c == "weapon_pose"                    ? weapon_pose()
++            : c == "subway" && argc == 3            ? private_world(argv[2])
++                                                    : false)
+                ? 0
+                : 1;
+ }
+diff --git a/tests/object_contract_tests.cpp b/tests/object_contract_tests.cpp
+index 4738544..7d473ce 100644
+--- a/tests/object_contract_tests.cpp
++++ b/tests/object_contract_tests.cpp
+@@ -1,3 +1,4 @@
++#include "game/original/BuiltinModel.h"
+ #include "game/original/CameraSpot.h"
+ #include "game/original/Key.h"
+ #include "game/server_adapter.h"
+@@ -132,6 +133,56 @@ namespace
+         CHECK(std::string(s.objects.get(string_key)->state.m_Name) == "string key");
+         return true;
+     }
++    bool builtin_model()
++    {
++        GameSession s;
++        CHECK(setup(s));
++        const auto* type = s.objects.find_class("Model");
++        CHECK(type && type->parent == s.objects.find_class("BaseClass"));
++        ObjectCreateStruct input;
++        input.m_ObjectType = OT_SPRITE; // The source callback unconditionally replaces this.
++        input.m_Flags = FLAG_SHADOW;
++        input.m_Pos = {7, 8, 9};
++        SAFE_STRCPY(input.m_Name, "runtime");
++        SAFE_STRCPY(input.m_Filename, "missing.abc");
++        SAFE_STRCPY(input.m_SkinName, "missing.dtx");
++        const auto runtime = s.objects.create(type, input);
++        auto* r = s.objects.get(runtime);
++        CHECK(r && dynamic_cast<BuiltinModel*>(r->game.get()));
++        CHECK(r->state.m_ObjectType == OT_MODEL && r->state.m_Flags == FLAG_SHADOW);
++        CHECK(r->state.m_Pos.x == 7 && std::string(r->state.m_Name) == "runtime");
++        CHECK(std::string(r->state.m_Filename) == "missing.abc" && !r->model_error.empty() && !r->model);
++        s.server.SetModelAnimation(runtime, 0);
++        CHECK(r->animation.animation == no_animation && s.objects.error() == ObjectError::InvalidProperty);
++        for (auto reason : {Creation::World, Creation::String})
++        {
++            auto h = s.objects.create(type, input, reason);
++            auto* o = s.objects.get(h);
++            CHECK(o && o->state.m_ObjectType == OT_MODEL && o->state.m_Flags == FLAG_VISIBLE);
++            CHECK(o->state.m_Pos.x == 0 && std::string(o->state.m_Name) == "noname");
++            CHECK(!o->state.m_Filename[0] && !o->state.m_SkinName[0] && !o->model);
++            CHECK(o->model_error.empty() && !o->scheduled);
++        }
++        auto h = s.objects.create_props(type, input,
++                                        "Name lamp; Flags 3; Visible false; Shadow false; Pos \"1 2 3\"; "
++                                        "Filename absent.abc; Skin absent.dtx");
++        const auto* o = s.objects.get(h);
++        CHECK(o && o->state.m_Flags == 0 && o->state.m_ObjectType == OT_MODEL && o->state.m_Pos.y == 2);
++        CHECK(std::string(o->state.m_Filename) == "absent.abc" && !o->model_error.empty());
++        CHECK(!s.objects.create(type, {}, Creation::World, {{"DifficultyMed", false}}));
++        CHECK(!s.objects.create(type, {}, Creation::World, {{"Flags", std::string("wrong type")}}));
++        // The original C callback delegates to the aggregate chain exactly once.
++        ProbeAggregate aggregate;
++        bc_AddAggregate(r->game.get(), &aggregate);
++        const auto engine_calls = context.aggregates, message_calls = context.aggregate_messages;
++        CHECK(BaseClass::_EngineMsgFn(r->game.get(), MID_UPDATE, nullptr, 0) == 1);
++        CHECK(BaseClass::_ObjectMsgFn(r->game.get(), nullptr, 999, nullptr) == 1);
++        CHECK(context.aggregates == engine_calls + 1 && context.aggregate_messages == message_calls + 1);
++        r->game->m_pFirstAggregate = nullptr; // Stack-owned probe, not an engine-owned aggregate.
++        const auto id = r->id;
++        CHECK(s.objects.remove(runtime) && s.objects.finish_frame() && !s.objects.get(id));
++        return true;
++    }
+     bool nested_creation()
+     {
+         GameSession s;
+@@ -472,13 +523,18 @@ namespace
+ } // namespace
+ int main(int argc, char** argv)
+ {
+-    const std::pair<const char*, bool (*)()> cases[] = {
+-        {"original_objects", original_objects},     {"nested_creation", nested_creation},
+-        {"reasons_properties", reasons_properties}, {"scheduling", scheduling},
+-        {"deferred_removal", deferred_removal},     {"aggregate_dispatch", aggregate_dispatch},
+-        {"handles_selection", handles_selection},   {"links_lists", links_lists},
+-        {"messages_strings", messages_strings},     {"unsupported_teardown", unsupported_teardown},
+-        {"creation_failures", creation_failures}};
++    const std::pair<const char*, bool (*)()> cases[] = {{"builtin_model", builtin_model},
++                                                        {"original_objects", original_objects},
++                                                        {"nested_creation", nested_creation},
++                                                        {"reasons_properties", reasons_properties},
++                                                        {"scheduling", scheduling},
++                                                        {"deferred_removal", deferred_removal},
++                                                        {"aggregate_dispatch", aggregate_dispatch},
++                                                        {"handles_selection", handles_selection},
++                                                        {"links_lists", links_lists},
++                                                        {"messages_strings", messages_strings},
++                                                        {"unsupported_teardown", unsupported_teardown},
++                                                        {"creation_failures", creation_failures}};
+     if (argc != 2)
+         return 2;
+     for (const auto& [name, test] : cases)
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 95fe040..1c11a3c 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -916,8 +916,8 @@ namespace
+                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
+                 else
+                 {
+-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 248 && d.editor_only == 541 &&
+-                          d.unknown == 206 && d.invalid == 31 && d.models == 100 && d.triangles == 39724);
++                    CHECK(d.entries.size() == 1026 && d.schema_checked == 295 && d.editor_only == 541 &&
++                          d.unknown == 159 && d.invalid == 31 && d.models == 100 && d.triangles == 39724);
+                     for (const auto& e : d.entries)
+                         if (e.state == DestinationEntryState::InvalidProperties)
+                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+@@ -1161,7 +1161,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 244 && d.unknown == 206 && d.failed == 35);
++                        CHECK(d.created == 291 && d.unknown == 159 && d.failed == 35);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

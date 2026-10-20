@@ -1,0 +1,165 @@
+343/630 Testing: world_view.alpha_order
+343/630 Test: world_view.alpha_order
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/world_view_tests" "alpha_order"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"world_view.alpha_order" start time: Oct 17 00:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.alpha_order" end time: Oct 17 00:36 CEST
+"world_view.alpha_order" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 00:36 CEST
+
+ai_escape =   0.08 sec*proc
+
+ai_fire =   0.70 sec*proc
+
+ai_follow =   0.26 sec*proc
+
+ai_hit =   0.07 sec*proc
+
+ai_keys =   1.54 sec*proc
+
+ai_locomotion =   0.07 sec*proc
+
+ai_navigation =   0.19 sec*proc
+
+ai_perception =   0.19 sec*proc
+
+ai_recovery =   0.09 sec*proc
+
+ai_runtime =   1.07 sec*proc
+
+ai_script =   0.14 sec*proc
+
+ai_sight =   0.22 sec*proc
+
+ai_state =   2.01 sec*proc
+
+ai_target =   0.23 sec*proc
+
+ai_trigger =   0.19 sec*proc
+
+attachments =   0.27 sec*proc
+
+brushes =   1.38 sec*proc
+
+cameras =   1.17 sec*proc
+
+character =   1.54 sec*proc
+
+character_audio =   2.01 sec*proc
+
+character_motion =   0.07 sec*proc
+
+character_nodes =   0.18 sec*proc
+
+cinematics =   0.78 sec*proc
+
+cli =   0.08 sec*proc
+
+config =   0.02 sec*proc
+
+containers =   1.32 sec*proc
+
+corpses =   0.06 sec*proc
+
+destructable_state =   0.23 sec*proc
+
+doors =   1.21 sec*proc
+
+exits =   0.41 sec*proc
+
+explosion_flames =   0.47 sec*proc
+
+explosion_fragments =   1.47 sec*proc
+
+explosion_lights =   0.67 sec*proc
+
+explosion_models =   0.17 sec*proc
+
+explosion_rings =   0.54 sec*proc
+
+explosion_sprites =   0.27 sec*proc
+
+explosions =   0.03 sec*proc
+
+headless =  48.93 sec*proc
+
+interaction =   0.65 sec*proc
+
+inventory_state =   0.24 sec*proc
+
+keyframes =   1.23 sec*proc
+
+lights =   0.52 sec*proc
+
+locomotion =   1.02 sec*proc
+
+model_view =   0.14 sec*proc
+
+movement =   1.70 sec*proc
+
+object_particles =   1.84 sec*proc
+
+objectives =   0.46 sec*proc
+
+objects =   0.05 sec*proc
+
+paths =   0.27 sec*proc
+
+pickups =   0.59 sec*proc
+
+player =   0.52 sec*proc
+
+player_controls =   1.12 sec*proc
+
+player_keepalive =   0.54 sec*proc
+
+player_restore =   0.28 sec*proc
+
+player_state =   0.24 sec*proc
+
+private =  46.75 sec*proc
+
+pushables =   0.04 sec*proc
+
+randomsound =   0.67 sec*proc
+
+sceneexplosion =   0.61 sec*proc
+
+services =   0.34 sec*proc
+
+session_playback =   1.58 sec*proc
+
+sound =   0.58 sec*proc
+
+sprite_view =   0.20 sec*proc
+
+sprites =   1.01 sec*proc
+
+texture =   0.23 sec*proc
+
+triggers =   1.18 sec*proc
+
+weapon_audio =   0.25 sec*proc
+
+weapon_drops =   0.07 sec*proc
+
+weapon_impacts =   1.49 sec*proc
+
+weapon_sprites =   0.35 sec*proc
+
+weapons =   5.04 sec*proc
+
+world =   1.60 sec*proc
+
+world_view =   0.19 sec*proc
+
+worldpaths =   0.70 sec*proc
+

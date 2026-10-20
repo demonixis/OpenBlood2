@@ -1,0 +1,527 @@
+{
+  "gpu_device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+  "gpu_device_selections_verified": 10,
+  "captures": [
+    {
+      "path": "Blood2/build/debug/tests/train-session-gpu/cityhub.png",
+      "sha256": "352b39473eb8e4da46bb638fe0f3e3bb9e33681f73cf945c1190da19c4489eca",
+      "visually_inspected": true,
+      "committed": false
+    },
+    {
+      "path": "Blood2/build/debug/tests/player-keepalive.png",
+      "sha256": "c8db401723fc2cdefd94d1eef0fd0901c8f3de25be04bdb7bbcd5b1bf15d1afa",
+      "visually_inspected": true,
+      "committed": false
+    }
+  ],
+  "date": "2026-10-18",
+  "implementation_parent": "309ae214afc9f53051076a791138a59da7731644",
+  "scope": "Repeated service trace lookup and zero-depth audio arithmetic; unchanged original game code and M2 exit criteria.",
+  "results": [
+    {
+      "name": "debug-build-final",
+      "command": [
+        "cmake",
+        "--build",
+        "build/debug",
+        "--parallel",
+        "1"
+      ],
+      "cwd": "/home/yann/projects/lithtech/Blood2",
+      "exit_code": 0,
+      "seconds": 5.47,
+      "log": "evidence/m2-session-cost-debug-build-final.log",
+      "environment": {
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1"
+      }
+    },
+    {
+      "name": "debug-all-headless",
+      "command": [
+        "ctest",
+        "--no-tests=error",
+        "--test-dir",
+        "build/debug",
+        "-LE",
+        "gpu",
+        "-j",
+        "2",
+        "-V",
+        "--output-junit",
+        "/tmp/b2-m2-audit-debug-all-headless.xml"
+      ],
+      "cwd": "/home/yann/projects/lithtech/Blood2",
+      "exit_code": 8,
+      "seconds": 334.36,
+      "log": "evidence/m2-session-cost-debug-all-headless.log",
+      "environment": {
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1"
+      },
+      "tests": 991,
+      "failures": 1,
+      "disabled": 0,
+      "junit": "evidence/m2-session-cost-debug-all-headless.xml",
+      "failed_cases": [
+        "cinematics.device"
+      ]
+    },
+    {
+      "name": "release-build-final",
+      "command": [
+        "cmake",
+        "--build",
+        "build/release",
+        "--parallel",
+        "1"
+      ],
+      "cwd": "/home/yann/projects/lithtech/Blood2",
+      "exit_code": 0,
+      "seconds": 9.66,
+      "log": "evidence/m2-session-cost-release-build-final.log",
+      "environment": {
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1"
+      }
+    },
+    {
+      "name": "release-all-headless",
+      "command": [
+        "ctest",
+        "--no-tests=error",
+        "--test-dir",
+        "build/release",
+        "-LE",
+        "gpu",
+        "-j",
+        "2",
+        "-V",
+        "--output-junit",
+        "/tmp/b2-m2-audit-release-all-headless.xml"
+      ],
+      "cwd": "/home/yann/projects/lithtech/Blood2",
+      "exit_code": 8,
+      "seconds": 53.65,
+      "log": "evidence/m2-session-cost-release-all-headless.log",
+      "environment": {
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1"
+      },
+      "tests": 991,
+      "failures": 1,
+      "disabled": 0,
+      "junit": "evidence/m2-session-cost-release-all-headless.xml",
+      "failed_cases": [
+        "cinematics.device"
+      ]
+    },
+    {
+      "name": "sanitize-build-final",
+      "command": [
+        "cmake",
+        "--build",
+        "build/sanitize",
+        "--parallel",
+        "1"
+      ],
+      "cwd": "/home/yann/projects/lithtech/Blood2",
+      "exit_code": 0,
+      "seconds": 6.3,
+      "log": "evidence/m2-session-cost-sanitize-build-final.log",
+      "environment": {
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1"
+      }
+    },
+    {
+      "name": "sanitize-all-remaining",
+      "command": [
+        "ctest",
+        "--no-tests=error",
+        "--test-dir",
+        "build/sanitize",
+        "-LE",
+        "gpu",
+        "-j",
+        "2",
+        "-V",
+        "--output-junit",
+        "/tmp/b2-m2-audit-sanitize-all-remaining.xml",
+        "-E",
+        "^ai_runtime\\.clearance_private$"
+      ],
+      "cwd": "/home/yann/projects/lithtech/Blood2",
+      "exit_code": 8,
+      "seconds": 1674.55,
+      "log": "evidence/m2-session-cost-sanitize-all-remaining.log",
+      "environment": {
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1"
+      },
+      "tests": 990,
+      "failures": 1,
+      "disabled": 0,
+      "junit": "evidence/m2-session-cost-sanitize-all-remaining.xml",
+      "failed_cases": [
+        "cinematics.device"
+      ]
+    },
+    {
+      "name": "debug-gpu",
+      "command": [
+        "ctest",
+        "--no-tests=error",
+        "--test-dir",
+        "build/debug",
+        "-R",
+        "^gpu\\.(lifecycle|cinematics|level_change|train_session|player_keepalive)$",
+        "-j",
+        "1",
+        "-V",
+        "--output-junit",
+        "/tmp/b2-m2-audit-debug-gpu.xml"
+      ],
+      "cwd": "/home/yann/projects/lithtech/Blood2",
+      "exit_code": 0,
+      "seconds": 50.69,
+      "log": "evidence/m2-session-cost-debug-gpu.log",
+      "environment": {
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1",
+        "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json"
+      },
+      "tests": 5,
+      "failures": 0,
+      "disabled": 0,
+      "junit": "evidence/m2-session-cost-debug-gpu.xml",
+      "failed_cases": []
+    },
+    {
+      "name": "release-gpu",
+      "command": [
+        "ctest",
+        "--no-tests=error",
+        "--test-dir",
+        "build/release",
+        "-R",
+        "^gpu\\.(lifecycle|cinematics|level_change|train_session|player_keepalive)$",
+        "-j",
+        "1",
+        "-V",
+        "--output-junit",
+        "/tmp/b2-m2-audit-release-gpu.xml"
+      ],
+      "cwd": "/home/yann/projects/lithtech/Blood2",
+      "exit_code": 0,
+      "seconds": 17.02,
+      "log": "evidence/m2-session-cost-release-gpu.log",
+      "environment": {
+        "SDL_AUDIODRIVER": "dummy",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1",
+        "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json"
+      },
+      "tests": 5,
+      "failures": 0,
+      "disabled": 0,
+      "junit": "evidence/m2-session-cost-release-gpu.xml",
+      "failed_cases": []
+    }
+  ],
+  "corrected_environment_tests": [
+    {
+      "name": "debug-device-clean-env",
+      "command": [
+        "ctest",
+        "--no-tests=error",
+        "--test-dir",
+        "build/debug",
+        "-R",
+        "^cinematics\\.device$",
+        "-V",
+        "--output-junit",
+        "/tmp/b2-m2-audit-debug-device-clean-env.xml"
+      ],
+      "cwd": "/home/yann/projects/lithtech/Blood2",
+      "exit_code": 0,
+      "seconds": 0.09,
+      "log": "evidence/m2-session-cost-debug-device-clean-env.log",
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1"
+      },
+      "environment_unset": [
+        "SDL_AUDIODRIVER",
+        "SDL_AUDIO_DRIVER"
+      ],
+      "tests": 1,
+      "failures": 0,
+      "disabled": 0,
+      "junit": "evidence/m2-session-cost-debug-device-clean-env.xml",
+      "failed_cases": []
+    },
+    {
+      "name": "release-device-clean-env",
+      "command": [
+        "ctest",
+        "--no-tests=error",
+        "--test-dir",
+        "build/release",
+        "-R",
+        "^cinematics\\.device$",
+        "-V",
+        "--output-junit",
+        "/tmp/b2-m2-audit-release-device-clean-env.xml"
+      ],
+      "cwd": "/home/yann/projects/lithtech/Blood2",
+      "exit_code": 0,
+      "seconds": 0.1,
+      "log": "evidence/m2-session-cost-release-device-clean-env.log",
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1"
+      },
+      "environment_unset": [
+        "SDL_AUDIODRIVER",
+        "SDL_AUDIO_DRIVER"
+      ],
+      "tests": 1,
+      "failures": 0,
+      "disabled": 0,
+      "junit": "evidence/m2-session-cost-release-device-clean-env.xml",
+      "failed_cases": []
+    },
+    {
+      "name": "sanitize-device-clean-env",
+      "command": [
+        "ctest",
+        "--no-tests=error",
+        "--test-dir",
+        "build/sanitize",
+        "-R",
+        "^cinematics\\.device$",
+        "-V",
+        "--output-junit",
+        "/tmp/b2-m2-audit-sanitize-device-clean-env.xml"
+      ],
+      "cwd": "/home/yann/projects/lithtech/Blood2",
+      "exit_code": 0,
+      "seconds": 0.14,
+      "log": "evidence/m2-session-cost-sanitize-device-clean-env.log",
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1"
+      },
+      "environment_unset": [
+        "SDL_AUDIODRIVER",
+        "SDL_AUDIO_DRIVER"
+      ],
+      "tests": 1,
+      "failures": 0,
+      "disabled": 0,
+      "junit": "evidence/m2-session-cost-sanitize-device-clean-env.xml",
+      "failed_cases": []
+    }
+  ],
+  "unique_headless_cases_validated_per_configuration": 991,
+  "report_recheck": {
+    "name": "sanitize-particle-report",
+    "command": [
+      "timeout",
+      "360s",
+      "build/sanitize/tests/particle_stream_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II/"
+    ],
+    "cwd": "/home/yann/projects/lithtech/Blood2",
+    "exit_code": 0,
+    "seconds": 182.05,
+    "log": "evidence/m2-session-cost-sanitize-particle-report.log",
+    "environment": {
+      "SDL_AUDIODRIVER": "dummy",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    }
+  },
+  "isolated_sanitizer": {
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/sanitize",
+      "-R",
+      "^ai_runtime.clearance_private$",
+      "--output-on-failure",
+      "--output-junit",
+      "/tmp/b2-m2-audit-clearance-final.xml"
+    ],
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    },
+    "tests": 1,
+    "failures": 0,
+    "seconds": 87.9262,
+    "log": "evidence/m2-session-cost-clearance-final.log",
+    "note": "Unchanged 90-second CTest, isolated without competing build/test; same game/engine sources as the final builds. The later main.cpp qualification fix is confined to the inspector branch."
+  },
+  "initial_observations": {
+    "particle-log-build": "evidence/m2-session-cost-particle-log-build.log",
+    "sanitize-build": "evidence/m2-session-cost-sanitize-build.log",
+    "clearance": "evidence/m2-session-cost-clearance.log",
+    "clearance-baseline": "evidence/m2-session-cost-clearance-baseline.log",
+    "debug-build": "evidence/m2-session-cost-debug-build.log",
+    "profile": "evidence/m2-session-cost-profile.log",
+    "trace-build": "evidence/m2-session-cost-trace-build.log",
+    "trace-tests": "evidence/m2-session-cost-trace-tests.log",
+    "audio-build": "evidence/m2-session-cost-audio-build.log",
+    "equivalence": "evidence/m2-session-cost-equivalence.log",
+    "clearance-final": "evidence/m2-session-cost-clearance-final.log",
+    "debug-build-all": "evidence/m2-session-cost-debug-build-all.log",
+    "debug-build-fixed": "evidence/m2-session-cost-debug-build-fixed.log",
+    "release-build-all": "evidence/m2-session-cost-release-build-all.log",
+    "sanitize-build-all": "evidence/m2-session-cost-sanitize-build-all.log"
+  },
+  "failed_attempts": [
+    "The validation wrapper globally forced SDL_AUDIODRIVER=dummy; cinematics.device intentionally calls SDL_SetHint itself and rejects environment priority. Each initial full suite retains this one failure; exact case rechecks unset both legacy/current audio driver environment names without any test/source change.",
+    "Baseline configured clearance test exceeded its unchanged 90-second deadline (90.12 seconds).",
+    "Separate 180-second diagnostic finished in 90.36 seconds with both lifetimes; not a replacement pass.",
+    "Transparent lookup alone still exceeded 90 seconds; retained trace-tests log.",
+    "Initial sanitizer particle_stream.private output retained obsolete hardcoded CityHub counts even though existing assertions require 453 created / 0 unsupported / 0 failed / 1 missing-world-model. The final direct recheck uses measured counters; assertions unchanged.",
+    "Initial Debug full build missed the OpenBlood2 qualification of ServiceCalls in the inspector smoke snapshot; repaired before final build and graphics checks."
+  ],
+  "profile": {
+    "samples": 500,
+    "inclusive_service_trace": 33,
+    "inclusive_voice_advance": 46,
+    "note": "GDB interruptions in one Debug scenario, not precise CPU percentages or a frame-rate benchmark."
+  },
+  "checks": {
+    "frozen_cpp_files": 9,
+    "frozen_scalar_helpers_and_loop_match_parent": true,
+    "reference_inventory_files": 10923,
+    "reference_repositories_clean": 6,
+    "user_root_readme_unchanged": true
+  },
+  "frozen_sources": {
+    "src/app/main.cpp": "2b2b00a9b41281ddb81f00ca8dcfa6c65fe420bffbb1bfe7d780d98dac36b449",
+    "src/engine/dls_sampler.cpp": "d5a4e267da57fe9030d5f0fb544184ca265c88d2834ff1cd8d86a002c7700b01",
+    "src/game/server_adapter.h": "a8366ea2bfee1133738429594c5859e66273e159d3d986c470bc434caef49762",
+    "src/game/service_coverage.cpp": "69acbed7d351c25ff12ba034eb626f733c0d001f95c96f3c4d278254c50f187f",
+    "src/game/service_coverage.h": "9cb99be16fb61490e7019056dff966209513fb3b98d8894dab21793cf98f738b",
+    "tests/CMakeLists.txt": "fd7807c12ffa1cba37cba4b57bd12707f4c625e1df790a6fd251505f31cf6878",
+    "tests/dls_sampler_tests.cpp": "344af2f9493ff16e0b29455166f29f123b762e21bc433176ed3cb7099e9940d6",
+    "tests/service_coverage_tests.cpp": "4f5bf9f7aa318cb099efc71c8b60fcfbb793d803d9ff12c1ca0cf31242a2596d",
+    "tests/dls_scalar_reference.h": "3b3eb94507443205dd55459d7b5777e0523f47e64a5c8670c032546d307c20fc",
+    "tests/particle_stream_tests.cpp": "72af000b795e36abd6f7494be133b36d127b8036c7f875172091e187c7d23cf9"
+  },
+  "evidence_sha256": {
+    "m2-session-cost-debug-build-final.log": "8ffdb15c665c4edc2b031a1fbb06886afccba9489fc87278c17a1633381d8ae8",
+    "m2-session-cost-debug-all-headless.log": "9c5f1bde2b50a3e9075cf2b27748de0bcdb68cd3989203a2f97c70fd5d15d4e5",
+    "m2-session-cost-debug-all-headless.xml": "09941706ddbed7def57e87ae530a851d146d9b35e91c86d8e6e1c4c0997732cb",
+    "m2-session-cost-release-build-final.log": "17c0f3f6714d8b5c913ecb8e12bdf3e47504367313631880d3ab12d744b60731",
+    "m2-session-cost-release-all-headless.log": "c33e6a0706a47a98b563de8a7de12f305597d2982c356bc6d932cd5e7b75429d",
+    "m2-session-cost-release-all-headless.xml": "945eadd42e56314b1f9dcabeb5828abaab5d852645710d7fa01fc02c233b82b3",
+    "m2-session-cost-sanitize-build-final.log": "b7ca514772687fe17c13caa640407977b15440c84f74679124d200262bfcd9f6",
+    "m2-session-cost-sanitize-all-remaining.log": "f075ba5804e980dba039d06a528946cc17d5d9d21c83e6ddd536c758178987d5",
+    "m2-session-cost-sanitize-all-remaining.xml": "aeb97aa22682f0ff6e1696bc85d6993a02ec5ae6411d4426430d4e8347661200",
+    "m2-session-cost-debug-gpu.log": "5f4c4eec2f564308d87ba34c214f04435e26a24d6958510fe1f3b209c39dae88",
+    "m2-session-cost-debug-gpu.xml": "527ef116369f5af5f84ae29e15191deb767a7711829e888b0bdaccd4fd3f095f",
+    "m2-session-cost-release-gpu.log": "ee7a491f68aadf2530b3c8d883ae8abe59e4f6e15c1daa5b0c80b4adb94e1374",
+    "m2-session-cost-release-gpu.xml": "2fa9e53cab5cfba5257e7fe01a1b18f4ef717d8d3f49a579322d05e66155e529",
+    "m2-session-cost-debug-device-clean-env.log": "3f6186e5ab7c562e5e3181d87e278d5c4fb91b4a04d891d7d770e734c987d187",
+    "m2-session-cost-debug-device-clean-env.xml": "e57683afc418c3286c33737262d1519369e1fb2da1e012f9efd724fe24a173c1",
+    "m2-session-cost-release-device-clean-env.log": "c8399fa9d72e50b92322a4701d66eb5849b74a186dabead9a06f2226b6b22621",
+    "m2-session-cost-release-device-clean-env.xml": "fd902c62b5365dcc3686b7c68ad3faa14823e955d2e50b30228598af5a0f7c47",
+    "m2-session-cost-sanitize-device-clean-env.log": "464f62eb691cf3273107a820cc2ff4f0aa2fbf2cd4ed985c7e818d2f5bb80805",
+    "m2-session-cost-sanitize-device-clean-env.xml": "61cb2c2d9883198d94d31406fb076ccd9170f395900590a5bbbb487d1d2af6fa",
+    "m2-session-cost-sanitize-particle-report.log": "c86c99526bd74e45fddddc823d88e9d7829065703285ef1e81e7f1a613001cd6",
+    "m2-session-cost-particle-log-build.log": "8ffdb15c665c4edc2b031a1fbb06886afccba9489fc87278c17a1633381d8ae8",
+    "m2-session-cost-sanitize-build.log": "9aef6efbc7d869b6b60072573cbbc89740a5e866b5a607d467ef9a50a31c9d3e",
+    "m2-session-cost-clearance.log": "a1322d7e18ae3ad1759be0406d43d895be411e451f0cf711c2db169db9df530e",
+    "m2-session-cost-clearance-baseline.log": "f51db1c16e3a56d0c9c73e793caabf03356eada835b03901f9285f8e9b11b7a3",
+    "m2-session-cost-debug-build.log": "e546ed804b3090c6ebc1a7c0492b0ed9251849b78f4f89cec633009834391492",
+    "m2-session-cost-profile.log": "63373bf4e5539dac604cf651b1fa8aaa2f12ae6d9abfd0dfa6cf75c715f58084",
+    "m2-session-cost-trace-build.log": "1b54fc5b8dcd0c76852c4eb78e714bae40f45310868a7199f487a20f70e31d9e",
+    "m2-session-cost-trace-tests.log": "0c239ffa582d8f2657c0fad7e8811a31446ed4b23956f37b1e7f87ab417199c1",
+    "m2-session-cost-audio-build.log": "b615363774740a801be24720924ce91ba94f3abd8ee6ae9f28b6a211e1e442b4",
+    "m2-session-cost-equivalence.log": "ac43a562012966155c533eb32b1348f1da85fea6acaf27f9d3dd327e1e829067",
+    "m2-session-cost-clearance-final.log": "8911bd5e1ef8d5831378a88fab6ba9bf784ac57db8b7ef1ac42b572501cffc3b",
+    "m2-session-cost-debug-build-all.log": "fd216b1f82bb920fb8b816c341ca69eb81711a447bfe27c37e58a1847d28f3fb",
+    "m2-session-cost-debug-build-fixed.log": "fbfd425f2a1115832739ae3cbb4481646f9bf1db7da2426b5386cee1f28b8889",
+    "m2-session-cost-release-build-all.log": "435d23742607d3fabed8c11c6b6e5a20142149bef68fc9817c8946d21e269526",
+    "m2-session-cost-sanitize-build-all.log": "0e3e1e4d44c95359b3aea9be6b978e8725c9e6fcb43e9c1f4529072dd8e359af",
+    "m2-session-cost-clearance.xml": "a0e5322cc4f67799f06013b430394f54dfeb45d63d67e79f7708d60deeb2eb09",
+    "m2-session-cost-trace-tests.xml": "5d1814c5b52534e2064524d84e1d69068e0508299f2d7abc48ce899fc825e24a",
+    "m2-session-cost-equivalence.xml": "56daf262e9109d96ad603d685b106fc08b3ccbbd965fcd02141d2e3b07d99c59",
+    "m2-session-cost-clearance-final.xml": "7eb8fb14ac15f5e8524e596f5c713ced10697b16f1b97e9c9d75159b67adb2bf",
+    "m2-session-cost-profile.json": "cc1c04fa6eefc771b8c56520a3e88ab357ed909c975640028d25287588f8dd10",
+    "m2-session-cost-profile.py": "9d7683bb8e51a43679e6d13da3e0dd421042d48aa1c18f626ae1c224a0170152",
+    "m2-session-cost-check.py": "e956751373b9780a64bfc7ef79a5760ed8d87d37e150c4eeb99ecd3ccdc46cdf",
+    "m2-session-cost-build-all.py": "6c19b26bf89b7d335935966015692be961af5b8e2053f55733be978b30fdc86d",
+    "m2-session-cost-source-integrity.json": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+    "m2-session-cost-links.log": "f03412d234816224fd3ffd29a501c2819c8b154b7201b1899009865f8d4de800"
+  },
+  "limits": [
+    "The 87.93-second isolated sanitizer pass leaves only about two seconds before the existing deadline; no dependable headroom or cross-machine speedup is claimed.",
+    "Scalar/reference equality establishes unchanged project audio samples/state, not retail synthesis parity.",
+    "Headless/private tests use external commercial content; GPU tests use NVIDIA and dummy audio, not listening comparison.",
+    "Native Metal/Windows/mobile were not run.",
+    "Existing external NVIDIA/libdbus GPU LeakSanitizer failure remains unsuppressed; headless sanitizer results do not supersede it.",
+    "Public run_world acceptance refusal and the consolidated M2 readiness review remain open."
+  ],
+  "diagnostic_commands": {
+    "initial_clearance": [
+      "ctest",
+      "--test-dir",
+      "build/sanitize",
+      "-R",
+      "^ai_runtime.clearance_private$",
+      "--output-on-failure",
+      "--output-junit",
+      "/tmp/b2-m2-audit-clearance.xml"
+    ],
+    "extended_baseline": [
+      "/usr/bin/time",
+      "-p",
+      "timeout",
+      "180s",
+      "env",
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1",
+      "build/sanitize/tests/ai_runtime_tests",
+      "clearance_private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II/"
+    ],
+    "profile": [
+      "gdb",
+      "-q",
+      "-batch",
+      "-ex",
+      "set pagination off",
+      "-ex",
+      "set debuginfod enabled off",
+      "-ex",
+      "break OpenBlood2::GameSession::step",
+      "-ex",
+      "run",
+      "-ex",
+      "delete breakpoints",
+      "-ex",
+      "source /tmp/b2-m2-audit-profile.py",
+      "--args",
+      "build/debug/tests/ai_runtime_tests",
+      "clearance_private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II/"
+    ]
+  },
+  "implementation_commit": "8a0db703cde22a96d8f1d7ca84e94938432d49ce"
+}

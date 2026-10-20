@@ -1,0 +1,14 @@
+501/503 Testing: character_nodes.rendering
+501/503 Test: character_nodes.rendering
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/character_nodes_tests" "rendering" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/character-node-fixtures/rendering"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"character_nodes.rendering" start time: Oct 16 18:54 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"character_nodes.rendering" end time: Oct 16 18:54 CEST
+"character_nodes.rendering" time elapsed: 00:00:00
+----------------------------------------------------------

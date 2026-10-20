@@ -1,0 +1,25 @@
+Test project /home/yann/projects/lithtech/Blood2/build/launcher-sanitize
+    Start 1: launcher.state
+1/8 Test #1: launcher.state ...................   Passed    0.03 sec
+    Start 2: launcher.dialogs
+2/8 Test #2: launcher.dialogs .................   Passed    0.01 sec
+    Start 3: launcher.help
+3/8 Test #3: launcher.help ....................   Passed    0.01 sec
+    Start 4: launcher.protocol
+4/8 Test #4: launcher.protocol ................   Passed    0.01 sec
+    Start 5: launcher.probe
+5/8 Test #5: launcher.probe ...................   Passed    0.18 sec
+    Start 6: launcher.content
+6/8 Test #6: launcher.content .................   Passed    0.01 sec
+    Start 7: launcher.process
+7/8 Test #7: launcher.process .................   Passed    0.24 sec
+    Start 8: launcher.detach
+8/8 Test #8: launcher.detach ..................   Passed    0.22 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+headless    =   0.71 sec*proc (8 tests)
+launcher    =   0.71 sec*proc (8 tests)
+
+Total Test time (real) =   0.72 sec

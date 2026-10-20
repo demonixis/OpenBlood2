@@ -1,0 +1,14 @@
+578/584 Testing: object_particles.emission
+578/584 Test: object_particles.emission
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/object_particle_tests" "emission" "/home/yann/projects/lithtech/Blood2/build/release/tests/object-particles-emission"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"object_particles.emission" start time: Oct 16 21:46 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"object_particles.emission" end time: Oct 16 21:46 CEST
+"object_particles.emission" time elapsed: 00:00:00
+----------------------------------------------------------

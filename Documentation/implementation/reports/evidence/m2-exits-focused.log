@@ -1,0 +1,32 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 500: exits.defaults
+1/8 Test #500: exits.defaults ...................   Passed    0.01 sec
+    Start 501: exits.delayed
+2/8 Test #501: exits.delayed ....................   Passed    0.01 sec
+    Start 502: exits.broadcast
+3/8 Test #502: exits.broadcast ..................   Passed    0.00 sec
+    Start 503: exits.blocked
+4/8 Test #503: exits.blocked ....................   Passed    0.01 sec
+    Start 504: exits.dead
+5/8 Test #504: exits.dead .......................   Passed    0.01 sec
+    Start 505: exits.queue
+6/8 Test #505: exits.queue ......................   Passed    0.01 sec
+    Start 506: exits.lifetime
+7/8 Test #506: exits.lifetime ...................   Passed    0.01 sec
+    Start 507: exits.catalog
+8/8 Test #507: exits.catalog ....................***Failed    0.45 sec
+catalog:214: t->exit.next_world == "01_SubwayB" && t->start_point == "start"
+
+
+88% tests passed, 1 tests failed out of 8
+
+Label Time Summary:
+exits       =   0.50 sec*proc (8 tests)
+headless    =   0.50 sec*proc (8 tests)
+private     =   0.45 sec*proc (1 test)
+
+Total Test time (real) =   0.51 sec
+
+The following tests FAILED:
+	507 - exits.catalog (Failed)                            exits headless private
+Errors while running CTest

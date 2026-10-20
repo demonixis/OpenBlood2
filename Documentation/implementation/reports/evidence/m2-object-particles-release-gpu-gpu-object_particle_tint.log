@@ -1,0 +1,15 @@
+583/584 Testing: gpu.object_particle_tint
+583/584 Test: gpu.object_particle_tint
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/object_particle_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/object-particle-tint"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.object_particle_tint" start time: Oct 16 21:50 CEST
+Output:
+----------------------------------------------------------
+Original smoke stream: 2914 covered pixels, 992 opaque tint checks; authored alpha remains unused
+<end of output>
+Test time =   0.42 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.object_particle_tint" end time: Oct 16 21:50 CEST
+"gpu.object_particle_tint" time elapsed: 00:00:00
+----------------------------------------------------------

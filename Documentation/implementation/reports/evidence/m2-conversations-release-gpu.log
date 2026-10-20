@@ -1,0 +1,20 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start  25: gpu.lifecycle
+1/4 Test  #25: gpu.lifecycle ....................   Passed    3.14 sec
+    Start 193: gpu.objectives
+2/4 Test #193: gpu.objectives ...................   Passed    1.69 sec
+    Start 242: gpu.cinematics
+3/4 Test #242: gpu.cinematics ...................   Passed    1.69 sec
+    Start 789: gpu.conversation_private
+4/4 Test #789: gpu.conversation_private .........   Passed    1.98 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+cinematics      =   1.69 sec*proc (1 test)
+conversation    =   1.98 sec*proc (1 test)
+gpu             =   8.50 sec*proc (4 tests)
+objectives      =   1.69 sec*proc (1 test)
+private         =   5.35 sec*proc (3 tests)
+
+Total Test time (real) =   8.51 sec

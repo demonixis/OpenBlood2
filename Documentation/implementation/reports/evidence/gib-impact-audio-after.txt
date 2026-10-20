@@ -1,0 +1,15 @@
+940/1108 Test: flesh_gib_collision.ceiling
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/flesh_gib_collision_tests" "ceiling" "/home/yann/projects/lithtech/Blood2/build/release/tests/flesh-gib-collision-ceiling"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"flesh_gib_collision.ceiling" start time: Oct 18 13:31 CEST
+Output:
+----------------------------------------------------------
+Falling fragment: impacts=0, voices=0, splats=0
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"flesh_gib_collision.ceiling" end time: Oct 18 13:31 CEST
+"flesh_gib_collision.ceiling" time elapsed: 00:00:00
+----------------------------------------------------------
+

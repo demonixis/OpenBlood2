@@ -1,0 +1,14 @@
+588/589 Testing: naga.ai
+588/589 Test: naga.ai
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/naga_tests" "ai" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/naga-ai"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"naga.ai" start time: Oct 17 00:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"naga.ai" end time: Oct 17 00:57 CEST
+"naga.ai" time elapsed: 00:00:00
+----------------------------------------------------------

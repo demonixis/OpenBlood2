@@ -1,0 +1,19 @@
+[0/2] Re-checking globbed directories...
+[1/96] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[2/84] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[3/77] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[4/43] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[5/41] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[6/39] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[7/35] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[8/33] Generating CXX dyndep file tests/CMakeFiles/services_tests.dir/CXX.dd
+[9/31] Generating CXX dyndep file tests/CMakeFiles/player_tests.dir/CXX.dd
+[10/29] Generating CXX dyndep file tests/CMakeFiles/weapon_tests.dir/CXX.dd
+[11/27] Generating CXX dyndep file tests/CMakeFiles/movement_tests.dir/CXX.dd
+[12/25] Generating CXX dyndep file tests/CMakeFiles/locomotion_tests.dir/CXX.dd
+[13/23] Generating CXX dyndep file tests/CMakeFiles/container_tests.dir/CXX.dd
+[14/21] Generating CXX dyndep file tests/CMakeFiles/door_tests.dir/CXX.dd
+[15/19] Scanning /home/yann/projects/lithtech/Blood2/tests/trigger_tests.cpp for CXX dependencies
+[16/19] Generating CXX dyndep file tests/CMakeFiles/trigger_tests.dir/CXX.dd
+[17/19] Building CXX object tests/CMakeFiles/trigger_tests.dir/trigger_tests.cpp.o
+[18/19] Linking CXX executable tests/trigger_tests

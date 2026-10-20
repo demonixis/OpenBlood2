@@ -1,0 +1,42 @@
+602/602 Testing: wind.private
+602/602 Test: wind.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/wind_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"wind.private" start time: Oct 17 01:44 CEST
+Output:
+----------------------------------------------------------
+Private loop 0: actual windfire/explode WAV, 168 model triangles, deliveries 17, rehearsal retains shooter/projectile.
+Private loop 1: actual windfire/explode WAV, 168 model triangles, deliveries 17, rehearsal retains shooter/projectile.
+Private loop 2: actual windfire/explode WAV, 168 model triangles, deliveries 17, rehearsal retains shooter/projectile.
+<end of output>
+Test time =  11.75 sec
+----------------------------------------------------------
+Test Passed.
+"wind.private" end time: Oct 17 01:44 CEST
+"wind.private" time elapsed: 00:00:11
+----------------------------------------------------------
+
+End testing: Oct 17 01:44 CEST
+
+ai_fire =  18.81 sec*proc
+
+ai_runtime =  40.25 sec*proc
+
+energy =  13.73 sec*proc
+
+explosion_lights =  17.53 sec*proc
+
+explosion_models =   8.29 sec*proc
+
+headless = 145.92 sec*proc
+
+naga =  13.63 sec*proc
+
+objects =   0.31 sec*proc
+
+private = 143.98 sec*proc
+
+wind =  12.03 sec*proc
+
+world =  21.35 sec*proc
+

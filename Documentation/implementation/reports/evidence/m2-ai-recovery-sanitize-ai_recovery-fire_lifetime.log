@@ -1,0 +1,14 @@
+419/420 Testing: ai_recovery.fire_lifetime
+419/420 Test: ai_recovery.fire_lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_recovery_tests" "fire_lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_recovery.fire_lifetime" start time: Oct 16 14:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.fire_lifetime" end time: Oct 16 14:04 CEST
+"ai_recovery.fire_lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

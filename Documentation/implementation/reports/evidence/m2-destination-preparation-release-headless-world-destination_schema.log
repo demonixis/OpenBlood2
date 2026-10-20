@@ -1,0 +1,15 @@
+26/595 Testing: world.destination_schema
+26/595 Test: world.destination_schema
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/world_tests" "destination_schema" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-fixtures/destination_schema"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"world.destination_schema" start time: Oct 16 22:22 CEST
+Output:
+----------------------------------------------------------
+PASS destination_schema
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_schema" end time: Oct 16 22:22 CEST
+"world.destination_schema" time elapsed: 00:00:00
+----------------------------------------------------------

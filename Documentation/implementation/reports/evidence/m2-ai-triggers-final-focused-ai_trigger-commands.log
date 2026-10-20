@@ -1,0 +1,14 @@
+388/393 Testing: ai_trigger.commands
+388/393 Test: ai_trigger.commands
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests" "commands" "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-trigger-commands"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_trigger.commands" start time: Oct 16 12:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_trigger.commands" end time: Oct 16 12:01 CEST
+"ai_trigger.commands" time elapsed: 00:00:00
+----------------------------------------------------------

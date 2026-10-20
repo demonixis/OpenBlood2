@@ -1,0 +1,11 @@
+[0/2] Re-checking globbed directories...
+[1/56] Scanning /home/yann/projects/lithtech/Blood2/src/engine/world_renderer.cpp for CXX dependencies
+[2/56] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[3/39] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[4/39] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector.cpp for CXX dependencies
+[5/39] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[6/11] Building CXX object CMakeFiles/engine.dir/src/engine/world_renderer.cpp.o
+[7/11] Linking CXX static library libengine.a
+[8/11] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o
+[9/11] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[10/11] Linking CXX executable blood2

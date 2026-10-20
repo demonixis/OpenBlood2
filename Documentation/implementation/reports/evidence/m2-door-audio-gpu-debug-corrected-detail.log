@@ -1,0 +1,71 @@
+Start testing: Oct 17 20:05 CEST
+----------------------------------------------------------
+28/945 Testing: gpu.lifecycle
+28/945 Test: gpu.lifecycle
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--gpu-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/gpu.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.lifecycle" start time: Oct 17 20:05 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/gpu.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+<end of output>
+Test time =   3.08 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.lifecycle" end time: Oct 17 20:05 CEST
+"gpu.lifecycle" time elapsed: 00:00:03
+----------------------------------------------------------
+
+136/945 Testing: gpu.doors
+136/945 Test: gpu.doors
+Command: "<workspace>/Blood2/build/debug/blood2" "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--doors-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/doors.png"
+Directory: <workspace>/Blood2/build/debug/tests
+"gpu.doors" start time: Oct 17 20:05 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-data-root> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Door audio hidden: starts=1, failures=0, cursor=2940, submitted frames=7200, sampled attachment verified=true
+[info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/doors.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Door smoke passed: original trigger, hidden translation and attached decoded audio/SDL output, inspection, unload/reload
+<end of output>
+Test time =   2.59 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.doors" end time: Oct 17 20:05 CEST
+"gpu.doors" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 17 20:05 CEST
+
+doors =   2.59 sec*proc
+
+gpu =   5.68 sec*proc
+
+private =   2.59 sec*proc

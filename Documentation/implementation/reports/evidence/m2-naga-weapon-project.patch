@@ -1,0 +1,1434 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index a8c4ead..1e49f11 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -496,3 +496,5 @@ F3 captures, Escape releases; --view-world requests capture initially. Next prio
+ The [NPC entry correction](../Documentation/Implementation/M2_NPC_ENTRY.md) holds interactive simulation until original player entry. Read [contracts](docs/SESSION_PLAYBACK_CONTRACTS.md). Preserve explicit diagnostic stepping, deferred removal while waiting, original intro/AI rules and visible runtime failures. Tests prove authored Cultist fire/damage after delayed application entry without forced AI targets. Broader combat remains unverified; train glass is next before more FX. M2 stays open.
+ 
+ The [train-window correction](../Documentation/Implementation/M2_WORLD_ALPHA.md) replaces the intentional pink marker with actual DTX alpha on authored transparent world faces. Read [contracts](docs/WORLD_ALPHA_CONTRACTS.md) before extending world materials/passes. Preserve opaque failure markers, sky precedence, per-face posed sorting, shared GPU ownership, no alpha depth writes and separate submission inspection. Global translucent FX ordering and retail renderer parity remain unverified; required services, safe NEW_LEVEL and M2 stay open.
++
++The [Naga weapon continuation](../Documentation/Implementation/M2_NAGA_WEAPON.md) adds the original eye weapon and red-small model beam. Read [contracts](docs/NAGA_WEAPON_CONTRACTS.md). Preserve different visual/damage filters, no-ammo semantics, silent alt, head_gun failure and null held models. Beam lifetime begins on first update and survives source removal; publication failures stay visible. The eye-impact composite and Gideon remain unavailable; M2 stays open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f1fd4e4..c747376 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index 55cc34e..a048795 100644
+--- a/README.md
++++ b/README.md
+@@ -540,3 +540,5 @@ NPC attack and train-glass reports remain unresolved; M2 is still incomplete.
+ [Interactive entry correction](../Documentation/Implementation/M2_NPC_ENTRY.md): a loaded world now waits for player entry instead of advancing NPCs without a player. Use **Enter player** in the header, or launch `--view-world` for immediate entry. Session exposes NPC ready/failed/active counts. Autonomous fire/damage is verified in a labelled SubwayA encounter; train glass and complete M2 remain open.
+ 
+ [Train-window correction](../Documentation/Implementation/M2_WORLD_ALPHA.md): the 31 transparent SubwayA faces now bind the original dirtyglass texture and blend its decoded alpha. Hidden-UI/reload/GPU checks cover the shared-depth pass; missing resources remain explicit. Lighting, global FX transparency ordering, required services and M2 remain incomplete.
++
++The [Naga weapon continuation](../Documentation/Implementation/M2_NAGA_WEAPON.md) connects original eye-beam damage, AI fire-key aiming and the real red beam model as a prerequisite for Gideon. Its impact composite, Gideon itself and the actual M2 exit gate remain incomplete.
+diff --git a/docs/AI_FIRE_CONTRACTS.md b/docs/AI_FIRE_CONTRACTS.md
+index 72bc563..55ea089 100644
+--- a/docs/AI_FIRE_CONTRACTS.md
++++ b/docs/AI_FIRE_CONTRACTS.md
+@@ -101,3 +101,5 @@ The [autonomous locomotion continuation](AI_LOCOMOTION_CONTRACTS.md) now supplie
+ walk/run/moving fire, obstruction/ledge probes and Cultist close/far attack sequencing.
+ Earlier blanket omissions are superseded only for this subset. Full initialization,
+ AI_Update/deactivation, remaining states and shade recovery stay unavailable.
++
++The [Naga weapon continuation](NAGA_WEAPON_CONTRACTS.md) extends the supported NPC weapon subset with original eye-beam damage, head_gun aiming and red-small beam presentation. Gideon and the eye impact composite remain unavailable; earlier blanket weapon omissions are superseded only for this subset.
+diff --git a/docs/AI_RUNTIME_CONTRACTS.md b/docs/AI_RUNTIME_CONTRACTS.md
+index 716775d..e637dff 100644
+--- a/docs/AI_RUNTIME_CONTRACTS.md
++++ b/docs/AI_RUNTIME_CONTRACTS.md
+@@ -129,3 +129,5 @@ It isolates the current original globals, destroys the temporary session and res
+ Ordinary second-session binding remains forbidden; no automatic transfer or completed M2 acceptance is claimed.
+ 
+ The [interactive entry correction](SESSION_PLAYBACK_CONTRACTS.md) now holds application simulation until player entry, preventing the reproduced pre-player NPC suspension. Raw diagnostic stepping retains that boundary; broader combat and M2 remain incomplete.
++
++The [Naga weapon continuation](NAGA_WEAPON_CONTRACTS.md) extends the supported NPC weapon subset with original eye-beam damage, head_gun aiming and red-small beam presentation. Gideon and the eye impact composite remain unavailable; earlier blanket weapon omissions are superseded only for this subset.
+diff --git a/docs/M2_NAGA_WEAPON_SOURCES.json b/docs/M2_NAGA_WEAPON_SOURCES.json
+new file mode 100644
+index 0000000..9a9512b
+--- /dev/null
++++ b/docs/M2_NAGA_WEAPON_SOURCES.json
+@@ -0,0 +1,68 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "97b5a352fda85ac7b91019a27185d5a42c236721",
++  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/GameWeapons.cpp",
++      "sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd",
++      "use": "IgnoreTypeFilterFn / CNagaEyes::FireVector: separate class-filtered visual ray, laser then explosion then base damage"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/GameWeapons.h",
++      "sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19",
++      "use": "CNagaEyes constructor; normal damage and zero effect flags"
++    },
++    {
++      "path": "sources/blood2/Shared/WeaponDefs.cpp",
++      "sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f",
++      "use": "Complete Naga Eye Beam WeaponData entry"
++    },
++    {
++      "path": "sources/blood2/Shared/SharedDefs.h",
++      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "use": "Base-game ID 17 + 21; add-on IDs deliberately excluded"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "use": "NAGA_BLAST prefix selection and head_gun aiming branch"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
++      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
++      "use": "CreateHandModel null-path guard; existing base vector/audio implementation retained"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/LaserBeamFX.cpp",
++      "sha256": "7f729e2e2b79fc9111b9b16e152ace1a274177d280ed9c0ac12e3535665a87d1",
++      "use": "Red-small SetupBeam, CreateObject, Update, UpdateBeam"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
++      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342",
++      "use": "Reviewed eye impact composite only; not implemented or substituted"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
++      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
++      "use": "Reviewed dependency and distinct rr_gun/extra aiming; no Gideon implementation claimed"
++    },
++    {
++      "path": "sources/blood2/Shared/SFXMsgIds.h",
++      "sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f",
++      "use": "LASER_RED_SMALL=0 and EXP_NAGA_EYE_BEAM=28; latter remains explicit unavailable request"
++    }
++  ],
++  "adaptations": [
++    "Typed visual publication and filter enum replace original packets/raw callback user data",
++    "Checked missing node, degenerate endpoints and bounded client ownership",
++    "Player acquisition remains unavailable for this NPC weapon",
++    "Existing portable shot RNG, collision and model rendering; no retail parity claim"
++  ],
++  "remaining": [
++    "Gideon production initialization/states/other weapons",
++    "EXP_NAGA_EYE_BEAM composite",
++    "safe NEW_LEVEL and remaining required services; M2 incomplete"
++  ]
++}
+diff --git a/docs/NAGA_WEAPON_CONTRACTS.md b/docs/NAGA_WEAPON_CONTRACTS.md
+new file mode 100644
+index 0000000..c871027
+--- /dev/null
++++ b/docs/NAGA_WEAPON_CONTRACTS.md
+@@ -0,0 +1,77 @@
++# Original Naga eye weapon and red laser beam
++
++This ports `CNagaEyes::FireVector`, the complete base-game Naga weapon definition,
++`NAGA_BLAST` name selection, the `head_gun` AI aiming branch and the red-small
++`CLaserBeamFX` model. Gideon uses this weapon, but **Gideon itself is not registered**.
++Its other weapons and state/lifecycle services remain required. M2 stays incomplete.
++See [source selections](M2_NAGA_WEAPON_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_NAGA_WEAPON.md).
++
++## Combat and two different rays
++
++Base-game ID 38 is `WEAP_LASTPLAYERWEAPON` (17) + 21; add-on numbering is not used.
++The definition retains every field: no-ammo pool, one vector, 30–45 normal damage,
++2,000-unit range, primary/alternate reload 0.2/0.05 seconds, zero spread, primary
++laser WAV and intentionally empty alternate WAV. `CheckAmmo` returns one for
++AMMO_NONE; no pool is consumed. Existing shot sampling, damage multiplier,
++[fire sound](WEAPON_AUDIO_CONTRACTS.md), [impact continuation](WEAPON_IMPACT_CONTRACTS.md)
++and deferred callback guards remain in force. No new timer suppresses FIRE_KEYs.
++
++The additional visual ray selects solid objects only and excludes the owner's
++class **and derived classes** through original `IsKindOf`. Its destination is the
++first remaining hit or the original full-range endpoint. It does not replace the
++ordinary damage ray: that ray includes SOLID or RAYHIT objects and excludes only
++the owner. A same-class actor may therefore take damage while the visible beam
++continues beyond it. Baked world geometry remains eligible in both queries.
++`IgnoreOwnerClass` requires a checked live owner; invalid/unavailable queries fail.
++
++The visual beam is requested before the base vector damage. Missing beam resources
++record failure without suppressing damage, as original client SFX are independent
++of server damage. The additional original `EXP_NAGA_EYE_BEAM` composite is still
++unavailable and explicitly reported for each shot. The source supplies its endpoint
++as **both position and normal**, including on misses. No normal correction or
++unrelated explosion is substituted. Success of `Fire` is not complete FX support.
++
++Original AI `NAGA_BLAST` prefix selection acquires this actual weapon. Generic AI
++Fire uses `head_gun` and the cached target position, then ordinary clearance and
++FIRE_KEY delivery. Missing head_gun fails explicitly instead of using the source's
++unchecked output. Gideon's own `rr_gun`/extra-key aiming override is not implemented
++by this branch. The weapon's null hand-model/skin deliberately creates no child,
++as in original CreateHandModel. Player acquisition refuses this NPC-only weapon;
++player view/profile support is not silently broadened. Other unknown weapons still
++reject and are never instantiated as the knife.
++
++## Client model and ownership
++
++The beam loads external `Models/Ammo/beam.abc` and `Skins/Ammo/beamred.dtx`, uses
++existing normalized model coordinates and aligns local +Z from source to endpoint.
++Its first Update sets the source position, fixed length and lifetime origin.
++Width grows from 0.05 to 1 during 0.25 seconds; alpha stays 0.5 until 0.25 seconds,
++then reaches zero at the strict 0.5-second expiry. A delayed first update does not
++consume the effect lifetime. Model animation follows the existing engine clock;
++rendering never advances it. No gameplay collision body or damage is attached.
++
++Session-owned beams detach from the shooter/weapon and continue after deferred
++removal. There are at most 128 active beams and 64 owned historical reports.
++Successful IDs are monotonic across unloads. Failed publication has no success ID;
++capacity, resource, endpoint and clock failures are explicit. Zero-length beams
++reject rather than aligning a degenerate vector. Backward clocks remove the failed
++instance and retain its update diagnostic. Unload destroys beams before caches.
++No process-global mutable game state is added, so destination rehearsal retains
++its original-global isolation contract.
++
++The existing translucent model pass draws beams with actual DTX alpha, shared
++world depth and no depth writes. Unupdated beams are hidden until their first
++source update. All beam reports/clocks are inspectable independently of UI state;
++per-weapon inspection exposes the distinct visual endpoint and unavailable impact
++composite. Model/skin decode errors remain visible instead of a success placeholder.
++The model effect pass still lacks global ordering with world glass and other FX.
++
++## Boundaries
++
++This is a tested weapon dependency for later Gideon integration, not a new
++production Naga/Gideon actor or proof of an authored boss fight. Broader weapons,
++Gideon shield/wind/projectiles, eye-impact composite, lighting, safe NEW_LEVEL and
++the actual M2 gate remain open. Portable RNG, current hit shapes and rendering are
++replacement-engine policies, not verified retail parity. No commercial resource
++is copied into either repository.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 08e6eef..d8d79f7 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -842,3 +842,7 @@ The later LithTech surface definition is a reference, not a retail v56 renderer
+ specification. See [ledger](M2_WORLD_ALPHA_SOURCES.json),
+ [contracts](WORLD_ALPHA_CONTRACTS.md) and
+ [evidence](../../Documentation/Implementation/M2_WORLD_ALPHA.md).
++
++## Naga eye weapon and red beam
++
++Original CNagaEyes, complete Naga Eye Beam definition, AI name/head-node branches and selected CLaserBeamFX are integrated as a Gideon dependency. See [source ledger](M2_NAGA_WEAPON_SOURCES.json) and [contracts](NAGA_WEAPON_CONTRACTS.md). The original eye impact composite and Gideon class remain unavailable; no generic replacement is claimed.
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index 1792ac3..2b78a4a 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -168,3 +168,5 @@ and attachment omissions are superseded for this bounded subset. Dropping, physi
+ attachments, client visibility SFX and complete M2 remain unavailable.
+ 
+ The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.
++
++The [Naga weapon continuation](NAGA_WEAPON_CONTRACTS.md) extends the supported NPC weapon subset with original eye-beam damage, head_gun aiming and red-small beam presentation. Gideon and the eye impact composite remain unavailable; earlier blanket weapon omissions are superseded only for this subset.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 913b114..acf176d 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -1531,6 +1531,17 @@ namespace OpenBlood2
+ {
+     void Inspector::draw_weapon_sound(const CWeapon& weapon, const GameSession& game)
+     {
++        if (const auto* naga = dynamic_cast<const CNagaEyes*>(&weapon))
++        {
++            ImGui::Text("Original Naga beam: %llu | visual ray %d | endpoint %.2f %.2f %.2f",
++                        (unsigned long long)naga->beam, int(naga->beam_collision), naga->beam_end.x, naga->beam_end.y,
++                        naga->beam_end.z);
++            ImGui::TextWrapped("Visual ray ignores owner class; ordinary damage ray does not.");
++            if (!naga->beam_error.empty())
++                ImGui::TextWrapped("Beam failure: %s", naga->beam_error.c_str());
++            if (!naga->explosion_error.empty())
++                ImGui::TextWrapped("Pending: %s", naga->explosion_error.c_str());
++        }
+         if (ImGui::TreeNodeEx("Original vector impacts", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             ImGui::TextWrapped("Last shot %zu contacts | total %llu | sounds %llu | failed %llu", weapon.impacts.size(),
+diff --git a/src/app/inspector_scene_explosions.cpp b/src/app/inspector_scene_explosions.cpp
+index 91031f2..f67ecb8 100644
+--- a/src/app/inspector_scene_explosions.cpp
++++ b/src/app/inspector_scene_explosions.cpp
+@@ -250,6 +250,36 @@ namespace OpenBlood2
+                                    r.source.c_str(), r.lights.size(),
+                                    r.error.empty() ? "created; illumination unavailable" : r.error.c_str());
+         ImGui::Separator();
++        const auto& beams = game.server.laser_beams;
++        if (ImGui::TreeNode("Original laser beams"))
++        {
++            ImGui::Text("Active %zu | started %llu | expired %llu | failed %llu", beams.active.size(),
++                        (unsigned long long)beams.started, (unsigned long long)beams.expired,
++                        (unsigned long long)beams.failed);
++            for (const auto& beam : beams.active)
++            {
++                ImGui::Text("%llu: updates %llu | scale %.3f %.3f %.3f | alpha %.3f", (unsigned long long)beam.id,
++                            (unsigned long long)beam.updates, beam.scale.x, beam.scale.y, beam.scale.z, beam.alpha);
++                ImGui::TextWrapped("Models/Ammo/beam.abc | %s", beam.skin_path.c_str());
++                if (explosion_model_view)
++                    for (const auto& entry : explosion_model_view->entries)
++                        if (entry.laser_effect == beam.id)
++                        {
++                            ImGui::Text("%zu triangles | %s", entry.triangles,
++                                        entry.range == UINT32_MAX ? "not drawn" : "prepared");
++                            if (!entry.error.empty())
++                                ImGui::TextWrapped("%s", entry.error.c_str());
++                        }
++            }
++            for (const auto& report : beams.reports)
++                ImGui::TextWrapped("%llu [%s] %.1f %.1f %.1f -> %.1f %.1f %.1f | %s", (unsigned long long)report.id,
++                                   report.source.c_str(), report.from.x, report.from.y, report.from.z, report.to.x,
++                                   report.to.y, report.to.z,
++                                   report.error.empty() ? "created (historical)" : report.error.c_str());
++            if (!beams.update_error.empty())
++                ImGui::TextWrapped("Update: %s", beams.update_error.c_str());
++            ImGui::TreePop();
++        }
+         const auto& models = game.server.explosion_models;
+         ImGui::Text("Client explosion models: %zu active / %llu started / %llu expired / %llu failed",
+                     models.active.size(), (unsigned long long)models.started, (unsigned long long)models.expired,
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 3b79882..65d1543 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -393,8 +393,10 @@ namespace OpenBlood2
+             }
+             ImGui::Text("Last attempt: %s", ai.fire_calls ? result : "none");
+             ImGui::Text("Origin %s: %.2f %.2f %.2f | cadence %.3f / last %.3f",
+-                        ai.fire_gun_node ? "r_gun" : "body fallback", ai.fire_origin.x, ai.fire_origin.y,
+-                        ai.fire_origin.z, ai.m_fAttackLoadTime, ai.m_fLoadTimeStart);
++                        ai.fire_gun_node ? (weapon && weapon->data.m_nType == WEAP_NAGA_EYEBEAM ? "head_gun" : "r_gun")
++                                         : "body fallback",
++                        ai.fire_origin.x, ai.fire_origin.y, ai.fire_origin.z, ai.m_fAttackLoadTime,
++                        ai.m_fLoadTimeStart);
+             ImGui::Text("Clearance: %s | rays %u | head retry %s", ai_clear_outcome_name(ai.clear_shot.outcome),
+                         ai.clear_shot.rays, ai.clear_shot.retried_head ? "yes" : "no");
+             if (weapon)
+diff --git a/src/app/model_scene.cpp b/src/app/model_scene.cpp
+index e4dc983..1745429 100644
+--- a/src/app/model_scene.cpp
++++ b/src/app/model_scene.cpp
+@@ -22,6 +22,13 @@ namespace OpenBlood2
+                 return false;
+             scene.entries.back().fragment_effect = fx.id;
+         }
++        for (const auto& fx : game.server.laser_beams.active)
++        {
++            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale,
++                           fx.updates != 0, false, {}, "Original red beam", game.resources, error, {}, fx.alpha, true))
++                return false;
++            scene.entries.back().laser_effect = fx.id;
++        }
+         const auto& camera = game.client_shell.view;
+         const auto forward = rotate_vector(camera.rotation, {0, 0, 1});
+         auto depth = [&](const WorldDraw& d)
+diff --git a/src/engine/model_view.h b/src/engine/model_view.h
+index d5bd996..8d035b5 100644
+--- a/src/engine/model_view.h
++++ b/src/engine/model_view.h
+@@ -13,6 +13,7 @@ namespace OpenBlood2
+         float alpha = 1;
+         std::uint64_t client_effect = 0;
+         std::uint64_t fragment_effect = 0;
++        std::uint64_t laser_effect = 0;
+     };
+     // Presentation-only snapshot. No original object pointer survives add().
+     class ModelView
+diff --git a/src/game/laser_beams.cpp b/src/game/laser_beams.cpp
+new file mode 100644
+index 0000000..02b84a7
+--- /dev/null
++++ b/src/game/laser_beams.cpp
+@@ -0,0 +1,63 @@
++#include "game/laser_beams.h"
++#include <algorithm>
++namespace OpenBlood2
++{
++    std::uint64_t LaserBeams::publish(DVector from, DVector to, std::string_view source, ModelStore& models,
++                                      const Resources& resources, double now, std::string& error)
++    {
++        error.clear();
++        LaserBeamReport report;
++        if (source.size() > 100 || source.find('\0') != std::string_view::npos)
++            error = "Invalid laser source name";
++        else
++        {
++            report.source = source;
++            report.from = from;
++            report.to = to;
++            CLaserBeamFX fx;
++            if (active.size() >= 128 || next_id_ == UINT64_MAX)
++                error = "Laser capacity exhausted";
++            else if (fx.CreateObject(models, resources, from, to, now, error))
++            {
++                report.id = fx.id = next_id_++;
++                active.push_back(std::move(fx));
++                ++started;
++            }
++        }
++        if (!error.empty())
++            ++failed;
++        report.error = error;
++        const auto id = report.id;
++        if (reports.size() == 64)
++            reports.erase(reports.begin());
++        reports.push_back(std::move(report));
++        return id;
++    }
++    bool LaserBeams::advance(double now)
++    {
++        bool valid = true;
++        std::erase_if(active,
++                      [&](auto& fx)
++                      {
++                          if (fx.Update(now))
++                              return false;
++                          if (fx.error.empty())
++                              ++expired;
++                          else
++                          {
++                              ++failed;
++                              valid = false;
++                              update_error = fx.error;
++                          }
++                          return true;
++                      });
++        return valid;
++    }
++    void LaserBeams::clear()
++    {
++        active.clear();
++        reports.clear();
++        started = expired = failed = 0;
++        update_error.clear(); // IDs are never reused across a world unload.
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/laser_beams.h b/src/game/laser_beams.h
+new file mode 100644
+index 0000000..ffe804a
+--- /dev/null
++++ b/src/game/laser_beams.h
+@@ -0,0 +1,25 @@
++#pragma once
++#include "game/original/LaserBeamFX.h"
++namespace OpenBlood2
++{
++    struct LaserBeamReport
++    {
++        std::uint64_t id = 0;
++        std::string source, error;
++        DVector from{}, to{};
++    };
++    class LaserBeams
++    {
++      public:
++        std::uint64_t publish(DVector, DVector, std::string_view, ModelStore&, const Resources&, double, std::string&);
++        bool advance(double);
++        void clear();
++        std::vector<CLaserBeamFX> active;
++        std::vector<LaserBeamReport> reports;
++        std::uint64_t started = 0, expired = 0, failed = 0;
++        std::string update_error;
++
++      private:
++        std::uint64_t next_id_ = 1;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 9dbd571..c1fe44c 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -68,6 +68,7 @@ class ServerDE : public CSBase
+     virtual bool SetBlockingPriority(HOBJECT, DBYTE) = 0;
+     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
++    virtual std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionFragments(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionFlames(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionRings(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+diff --git a/src/game/original/AIFire.cpp b/src/game/original/AIFire.cpp
+index c161e5c..feb3fbe 100644
+--- a/src/game/original/AIFire.cpp
++++ b/src/game/original/AIFire.cpp
+@@ -123,10 +123,14 @@ bool AI_Mgr::Fire(bool alternate)
+     auto* weapon = m_InventoryMgr.CurrentWeapon();
+     if (!weapon)
+         return fail(FireResult::Unavailable, "AI has no current weapon");
+-    if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_MELEE)
++    if (weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_MELEE &&
++        weapon->data.m_nType != WEAP_NAGA_EYEBEAM)
+         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
+     DRotation rotation;
+-    fire_gun_node = server->GetModelNodeTransform(m_hObject, "r_gun", &fire_origin, &rotation);
++    const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM;
++    fire_gun_node = server->GetModelNodeTransform(m_hObject, naga ? "head_gun" : "r_gun", &fire_origin, &rotation);
++    if (naga && !fire_gun_node)
++        return fail(FireResult::Unavailable, "Naga beam head_gun node unavailable");
+     if (fire_gun_node)
+         fire_direction = vector_subtract(m_vTargetPos, fire_origin);
+     else
+diff --git a/src/game/original/AIRuntime.cpp b/src/game/original/AIRuntime.cpp
+index 3ef568e..ef0e636 100644
+--- a/src/game/original/AIRuntime.cpp
++++ b/src/game/original/AIRuntime.cpp
+@@ -15,6 +15,8 @@ namespace
+             id = 0;
+         else if (name.starts_with("BERET"))
+             id = WEAP_BERETTA;
++        else if (name.starts_with("NAGA_BLAST"))
++            id = WEAP_NAGA_EYEBEAM;
+         else if (name.starts_with("MELEE"))
+             id = WEAP_MELEE;
+         else
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index 4d26e4b..b0c127c 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -122,6 +122,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
+         return InventoryResult::NotAvailable;
+     if (!m_hOwner || !BaseClass::GetServerDE()->HandleToObject(m_hOwner) || slot < -1 || slot >= 10)
+         return InventoryResult::Invalid;
++    if (type == WEAP_NAGA_EYEBEAM && dynamic_cast<CPlayerObj*>(BaseClass::GetServerDE()->HandleToObject(m_hOwner)))
++        return InventoryResult::NotAvailable; // Player view/save support is a separate contract.
+     int empty = -1;
+     bool left = false;
+     if (slot >= 0)
+@@ -163,8 +165,12 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
+     std::unique_ptr<CWeapon> weapon;
+     if (type == WEAP_BERETTA)
+         weapon = std::make_unique<CBeretta>();
+-    else
++    else if (type == WEAP_MELEE)
+         weapon = std::make_unique<CMelee>();
++    else if (type == WEAP_NAGA_EYEBEAM)
++        weapon = std::make_unique<CNagaEyes>();
++    else
++        return InventoryResult::NotAvailable;
+     weapon->Init(m_hOwner, this, left);
+     (left ? m_LWeapons : m_Weapons)[static_cast<unsigned>(empty)] = std::move(weapon);
+     ++revision;
+diff --git a/src/game/original/LaserBeamFX.cpp b/src/game/original/LaserBeamFX.cpp
+new file mode 100644
+index 0000000..2f387be
+--- /dev/null
++++ b/src/game/original/LaserBeamFX.cpp
+@@ -0,0 +1,56 @@
++// LaserBeamFX.cpp Init/CreateObject/Update/SetupBeam/UpdateBeam: red-small branch.
++#include "LaserBeamFX.h"
++#include "engine/collision.h"
++#include "engine/objects.h"
++#include <cmath>
++using namespace OpenBlood2;
++bool CLaserBeamFX::CreateObject(ModelStore& models, const Resources& resources, DVector from, DVector to, double now,
++                                std::string& failure)
++{
++    failure.clear();
++    if (model || !physics_vector(from) || !physics_vector(to) || !std::isfinite(now) || now < 0 ||
++        std::sqrt(vector_dot(vector_subtract(to, from), vector_subtract(to, from))) > 1e7f ||
++        !align_rotation(vector_subtract(to, from), rotation))
++    {
++        failure = "Invalid/zero-length laser endpoints or creation state";
++        return false;
++    }
++    if (!models.load("Models\\Ammo\\beam.abc", model, failure))
++        return false;
++    if (!resources.find(skin_path))
++    {
++        model.reset();
++        failure = "Laser skin is not indexed: " + skin_path;
++        return false;
++    }
++    source = from;
++    destination = to;
++    last_time = now;
++    return true;
++}
++bool CLaserBeamFX::Update(double now)
++{
++    error.clear();
++    if (!model || !std::isfinite(now) || now < last_time)
++    {
++        error = "Invalid laser clock/state";
++        return false;
++    }
++    std::vector<std::uint32_t> keys;
++    if (!advance_animation(*model, animation, now - last_time, keys, error))
++        return false;
++    last_time = now;
++    if (!updates)
++    {
++        start_time = now; // Source starts the lifetime on first Update, not publication.
++        position = source;
++        const auto delta = vector_subtract(destination, source);
++        scale = {.05f, .05f, std::sqrt(vector_dot(delta, delta))};
++    }
++    ++updates;
++    const auto time = now - start_time;
++    const float width = time <= .25 ? .05f + .95f * static_cast<float>(time / .25) : 1.f;
++    scale.x = scale.y = width;
++    alpha = time >= .25 ? .5f - .5f * static_cast<float>((time - .25) / .25) : .5f;
++    return time < .5; // Expired state is removed before presentation; never render negative alpha.
++}
+diff --git a/src/game/original/LaserBeamFX.h b/src/game/original/LaserBeamFX.h
+new file mode 100644
+index 0000000..ed80355
+--- /dev/null
++++ b/src/game/original/LaserBeamFX.h
+@@ -0,0 +1,18 @@
++#pragma once
++#include "engine/model_store.h"
++
++// Selected original LASER_RED_SMALL; source-owned endpoints, detached client lifetime.
++class CLaserBeamFX
++{
++  public:
++    bool CreateObject(OpenBlood2::ModelStore&, const OpenBlood2::Resources&, DVector, DVector, double, std::string&);
++    bool Update(double);
++    std::shared_ptr<const OpenBlood2::Model> model;
++    OpenBlood2::AnimationTrack animation;
++    std::string skin_path = "Skins\\Ammo\\beamred.dtx", error;
++    DVector source{}, destination{}, position{}, scale{};
++    DRotation rotation;
++    float alpha = .5f;
++    double start_time = 0, last_time = 0;
++    std::uint64_t id = 0, updates = 0;
++};
+diff --git a/src/game/original/NagaEyes.cpp b/src/game/original/NagaEyes.cpp
+new file mode 100644
+index 0000000..668e115
+--- /dev/null
++++ b/src/game/original/NagaEyes.cpp
+@@ -0,0 +1,34 @@
++// Original GameWeapons.cpp CNagaEyes::FireVector and IgnoreTypeFilterFn.
++#include "B2BaseClass.h"
++#include "Weapon.h"
++#include "server_de.h"
++using namespace OpenBlood2;
++FireResult CNagaEyes::FireVector()
++{
++    auto* server = BaseClass::GetServerDE();
++    beam = 0;
++    beam_error.clear();
++    explosion_error.clear();
++    beam_hit = {};
++    beam_end = last_shot.end;
++    beam_collision = SegmentResult::Unavailable;
++    if (!server || !firing || !server->IsObjectAlive(m_hOwner))
++        return last_shot.result = FireResult::Invalid;
++    // This separate visual query ignores the owner's complete class family.
++    // The base FireVector retains its ordinary damage/continuation query.
++    beam_collision = server->IntersectSegment(last_shot.request.position, last_shot.end, m_hOwner, beam_hit, false,
++                                              SegmentObjects::SolidOnly, SegmentFilter::IgnoreOwnerClass);
++    if (beam_collision != SegmentResult::Hit && beam_collision != SegmentResult::Miss)
++    {
++        beam_error = "Original Naga visual ray unavailable";
++        return last_shot.result = FireResult::Unavailable;
++    }
++    if (beam_collision == SegmentResult::Hit)
++        beam_end = beam_hit.point;
++    beam = server->PublishLaserBeam(m_hOwner, last_shot.request.position, beam_end, beam_error);
++    // Original sends EXP_NAGA_EYE_BEAM at vDest, with vDest again as normal,
++    // even on a miss. Preserve the request in inspection; do not replace it with
++    // a different explosion or silently claim the unported composite succeeded.
++    explosion_error = "EXP_NAGA_EYE_BEAM composite unavailable (position and normal are both beam endpoint)";
++    return CWeapon::FireVector(); // Visual failures never suppress original vector damage.
++}
+diff --git a/src/game/original/Weapon.cpp b/src/game/original/Weapon.cpp
+index b02661e..b2364fc 100644
+--- a/src/game/original/Weapon.cpp
++++ b/src/game/original/Weapon.cpp
+@@ -112,7 +112,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
+     };
+     if (!trace())
+         return last_shot.result;
+-    // Both selected definitions fire exactly one vector and use one unit.
++    // Selected definitions fire exactly one vector and use one unit (AMMO_NONE stays unlimited).
+     m_pInventoryMgr->SetAmmoCount(data.m_nAmmoType, ammo - use);
+     m_fLastShotTime = server->GetTime();
+     m_bLastFireAlt = request.alternate;
+diff --git a/src/game/original/Weapon.h b/src/game/original/Weapon.h
+index 436c085..6995489 100644
+--- a/src/game/original/Weapon.h
++++ b/src/game/original/Weapon.h
+@@ -77,7 +77,7 @@ class CWeapon
+     }
+     float CheckAmmo() const;
+     FireResult Fire(const OpenBlood2::WeaponFire&);
+-    FireResult FireVector();
++    virtual FireResult FireVector();
+     std::vector<WeaponImpact> impacts; // Latest validated shot attempt, bounded to 64 contacts.
+     std::string impact_error;
+     std::uint64_t impact_contacts = 0, impact_sounds = 0, impact_sound_failures = 0;
+@@ -92,6 +92,18 @@ class CWeapon
+     std::uint64_t shots = 0;
+     WeaponShot last_shot;
+ };
++// Original visual ray and ordinary damage ray deliberately have different filters.
++class CNagaEyes final : public CWeapon
++{
++  public:
++    CNagaEyes() : CWeapon(WEAP_NAGA_EYEBEAM) {}
++    FireResult FireVector() override;
++    OpenBlood2::SegmentResult beam_collision = OpenBlood2::SegmentResult::Unavailable;
++    DVector beam_end{};
++    OpenBlood2::SegmentHit beam_hit;
++    std::uint64_t beam = 0;
++    std::string beam_error, explosion_error;
++};
+ class CBeretta final : public CWeapon
+ {
+   public:
+diff --git a/src/game/original/WeaponDefs.cpp b/src/game/original/WeaponDefs.cpp
+index 807e3e7..6e83952 100644
+--- a/src/game/original/WeaponDefs.cpp
++++ b/src/game/original/WeaponDefs.cpp
+@@ -121,6 +121,66 @@ namespace
+             "interface\\statusbar\\weapons\\c_knife.pcx",   // Icon for status bar
+             "interface\\statusbar\\weapons\\c_knife_h.pcx", // Highlighted icon for status bar
+         },
++        // Naga Eye Beam
++        {
++            "Models\\Weapons\\Laserrifle_pv.abc",  // Model
++            "Models\\Weapons\\Laserrifle_pv.abc",  // Model
++            "Skins\\Weapons\\C_DeathRay_pv_t.dtx", // Skin
++            nullptr,                               // Model
++            nullptr,                               // Skin
++            WEAP_NAGA_EYEBEAM,                     // Type
++            TYPE_MELEE,                            // Fire type
++            AMMO_NONE,                             // Ammo type
++            1,                                     // Ammo Use
++            1,                                     // Alt Ammo Use
++            30.0f,                                 // Min Damage
++            45.0f,                                 // Max Damage
++            30.0f,                                 // Min Alt damage
++            45.0f,                                 // Max Alt damage
++            0.2f,                                  // Reload time
++            0.05f,                                 // Alt reload time
++            {0.0f, 0.0f},                          // Spread
++            {0.0f, 0.0f},                          // Alt Spread
++            0.0f,                                  // Projectile Velocity
++            0.0f,                                  // Alt Projectile Velocity
++            2000.0f,                               // Range
++            2000.0f,                               // Alt Range
++            1,                                     // Shots per fire
++            1,                                     // Alt Shots per fire
++            1,                                     // Strength or Magic required
++            0,                                     // Two-handed Strength or Magic required
++            0,                                     // Damage Radius (projectiles)
++            0,                                     // Alt Damage Radius (projectiles)
++            DFALSE,                                // Alt fire zoom
++            DFALSE,                                // Semi-auto
++            "Sounds\\Weapons\\laser\\fire.wav",    // Fire sound
++            "",                                    // Alt Fire sound
++                                                   //		"Sounds\\Weapons\\laser\\fire.wav",	// Alt Fire sound
++            "",                                    // Empty weapon sound
++            "",                                    // Alt Empty weapon sound
++            NULL,                                  // Projectile class
++            NULL,                                  // Alt Projectile class
++            0,                                     // Muzzle Flash radius
++            {0.0f, 0.0f, 0.0f},                    // Muzzle Flash color
++            "Naga_Beam",                           // Name
++            0,                                     // Name ID (resource)
++            "",                                    // flash sprite name
++            "",                                    // alt flash Sprite name
++            0.25f,                                 // Flash duration
++            0.10f,                                 // Flash scale
++            {0.0f, 0.0f, 0.0f},                    // 3rd person gun offset
++            {0.7f, -0.9f, 2.1f},                   // Gun Offset
++            {0.0f, 0.0f, 0.0f},                    // Muzzle Offset
++            {0.03f, 0.03f, 0.15f},                 // Recoil
++            {4.25f, -4.25f, 25.0f},                // Flash position
++            0.625f,                                // Eject interval
++            0.0f,                                  // View kick
++            DFALSE,                                // View kick is Cumulative
++            DFALSE,                                // Animation looping
++            DTRUE,                                 // Alt anim looping
++            nullptr,                               // Icon for status bar
++            nullptr,                               // Highlighted icon for status bar
++        },
+     };
+ }
+ const WeaponData* weapon_definition(DBYTE type)
+diff --git a/src/game/original/WeaponDefs.h b/src/game/original/WeaponDefs.h
+index abba14e..10d9d1d 100644
+--- a/src/game/original/WeaponDefs.h
++++ b/src/game/original/WeaponDefs.h
+@@ -1,7 +1,7 @@
+ #pragma once
+ #include "basedefs_de.h"
+-// Selected original definitions; the two table entries retain every source field.
+-inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_MELEE = 17;
++// Selected original definitions; complete source fields, base-game weapon numbering.
++inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38;
+ inline constexpr DBYTE TYPE_PISTOL = 2, TYPE_MELEE = 4, AMMO_NONE = 0, AMMO_BULLET = 1, AMMO_SHELL = 2, AMMO_BMG = 3;
+ inline constexpr int IDS_WEAPON_BERETTA = 350, IDS_WEAPON_KNIFE = 366;
+ // Weapon spread structure
+diff --git a/src/game/original/WeaponHand.cpp b/src/game/original/WeaponHand.cpp
+index 924602b..b01915a 100644
+--- a/src/game/original/WeaponHand.cpp
++++ b/src/game/original/WeaponHand.cpp
+@@ -25,8 +25,8 @@ bool CWeapon::ShowHandModel(DBOOL show)
+         server->RemoveObject(m_hHandModel);
+     m_hHandModel = nullptr;
+     hand_error.clear();
+-    if (!show)
+-        return true;
++    if (!show || !data.m_szHandModelFilename || !data.m_szHandModelSkin)
++        return true; // Original CreateHandModel intentionally omits model-less monster weapons.
+     if (!server->IsObjectAlive(m_hOwner))
+     {
+         hand_error = "Hand model requires a live weapon owner";
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 3b76e46..f43acc2 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -9,6 +9,7 @@
+ #include "game/explosion_models.h"
+ #include "game/explosion_rings.h"
+ #include "game/explosion_sprites.h"
++#include "game/laser_beams.h"
+ #include "game/original/BloodShells.h"
+ #include "game/original/LightFX.h"
+ #include "game/player_restore.h"
+@@ -87,6 +88,8 @@ namespace OpenBlood2
+         WeaponSprites weapon_sprites;
+         std::uint64_t PublishWeaponSprites(HOBJECT, const WeaponSpriteSettings&, std::string&) override;
+         ExplosionModels explosion_models;
++        LaserBeams laser_beams;
++        std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&) override;
+         ExplosionLights explosion_lights;
+         ExplosionRings explosion_rings;
+         ExplosionFlames explosion_flames;
+@@ -125,6 +128,7 @@ namespace OpenBlood2
+             explosion_sprites.clear();
+             weapon_sprites.clear();
+             explosion_models.clear();
++            laser_beams.clear();
+             explosion_lights.clear();
+             explosion_rings.clear();
+             explosion_flames.clear();
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index fb8c112..f1cc75e 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -2,6 +2,17 @@
+ #include <cmath>
+ namespace OpenBlood2
+ {
++    std::uint64_t ServerAdapter::PublishLaserBeam(HOBJECT source, DVector from, DVector to, std::string& error)
++    {
++        trace_service("PublishLaserBeam (original red small beam)");
++        if (!IsObjectAlive(source) || !objects_.models || !client_resources)
++        {
++            error = "Laser source/model resources unavailable";
++            return 0;
++        }
++        return laser_beams.publish(from, to, GetObjectName(source), *objects_.models, *client_resources,
++                                   objects_.time(), error);
++    }
+     std::uint64_t ServerAdapter::PublishWeaponSprites(HOBJECT source, const WeaponSpriteSettings& settings,
+                                                       std::string& error)
+     {
+diff --git a/src/game/server_weapons.cpp b/src/game/server_weapons.cpp
+index 7f52741..8e3c4cc 100644
+--- a/src/game/server_weapons.cpp
++++ b/src/game/server_weapons.cpp
+@@ -17,11 +17,13 @@ namespace OpenBlood2
+         out = {};
+         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
+         if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility &&
+-             filter != SegmentFilter::IgnoreCharacters && filter != SegmentFilter::IgnoreVolumes) ||
++             filter != SegmentFilter::IgnoreCharacters && filter != SegmentFilter::IgnoreVolumes &&
++             filter != SegmentFilter::IgnoreOwnerClass) ||
+             (start != SegmentStart::IncludeInterior && start != SegmentStart::SkipInterior) ||
+             (objects != SegmentObjects::SolidOnly && objects != SegmentObjects::SolidOrRayHit &&
+              objects != SegmentObjects::All) ||
+-            !physics_vector(from) || !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
++            (filter == SegmentFilter::IgnoreOwnerClass && !owner) || !physics_vector(from) || !physics_vector(to) ||
++            (ignore && (!owner || owner->life != Life::Alive)) ||
+             vector_dot(vector_subtract(to, from), vector_subtract(to, from)) < 1e-12f)
+             return SegmentResult::Invalid;
+         if (!collision || !collision_ready)
+@@ -55,6 +57,8 @@ namespace OpenBlood2
+                 continue;
+             if (filter == SegmentFilter::IgnoreCharacters && dynamic_cast<const CBaseCharacter*>(record->game.get()))
+                 continue;
++            if (filter == SegmentFilter::IgnoreOwnerClass && Objects::is_kind_of(record->type, owner->type))
++                continue;
+             if (fire_through && ((door && door->fire_through) || (brush && brush->fire_through)))
+                 continue;
+             CollisionHit hit;
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index b4a7e4b..81db07e 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -447,6 +447,7 @@ namespace OpenBlood2
+         ok = server.explosion_sprites.advance(objects.time()) && ok;
+         ok = server.weapon_sprites.advance(objects.time()) && ok;
+         ok = server.explosion_models.advance(objects.time()) && ok;
++        ok = server.laser_beams.advance(objects.time()) && ok;
+         ok = server.explosion_lights.advance(objects.time()) && ok;
+         ok = server.explosion_rings.advance(objects.time()) && ok;
+         ok = server.explosion_flames.advance(objects.time()) && ok;
+diff --git a/src/game/weapon_messages.h b/src/game/weapon_messages.h
+index 586d54b..fc3c74d 100644
+--- a/src/game/weapon_messages.h
++++ b/src/game/weapon_messages.h
+@@ -56,7 +56,8 @@ namespace OpenBlood2
+         None,
+         AIVisibility,     // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
+         IgnoreCharacters, // Original CMovement clearance filter.
+-        IgnoreVolumes     // Original LiquidFilterFn excludes every VolumeBrush subclass.
++        IgnoreVolumes,    // Original LiquidFilterFn excludes every VolumeBrush subclass.
++        IgnoreOwnerClass  // Original IgnoreTypeFilterFn: owner class and derived classes, visual beam only.
+     };
+     enum class SegmentResult
+     {
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 6089a9a..0cbf13d 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1186,3 +1186,26 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.world_alpha_private PROPERTIES LABELS "gpu;private;world_view" TIMEOUT 90 RUN_SERIAL TRUE)
+     endif()
+ endif()
++
++add_executable(naga_tests naga_tests.cpp ../src/app/model_scene.cpp)
++target_link_libraries(naga_tests PRIVATE blood2_game)
++blood2_project_options(naga_tests)
++foreach(case weapon failures clocks lifetime ai)
++    add_test(NAME naga.${case} COMMAND naga_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/naga-${case}")
++    set_tests_properties(naga.${case} PROPERTIES LABELS "headless;naga" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME naga.private COMMAND naga_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(naga.private PROPERTIES LABELS "headless;private;naga" TIMEOUT 90)
++endif()
++if(BLOOD2_GPU_TESTS)
++    add_executable(naga_gpu_tests naga_gpu_tests.cpp ../src/app/model_scene.cpp)
++    target_link_libraries(naga_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(naga_gpu_tests)
++    add_test(NAME gpu.naga_alpha COMMAND naga_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/naga-gpu")
++    set_tests_properties(gpu.naga_alpha PROPERTIES LABELS "gpu;naga" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.naga_private COMMAND naga_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/naga-private-gpu" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.naga_private PROPERTIES LABELS "gpu;private;naga" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    endif()
++endif()
+diff --git a/tests/naga_fixture.h b/tests/naga_fixture.h
+new file mode 100644
+index 0000000..d2c278f
+--- /dev/null
++++ b/tests/naga_fixture.h
+@@ -0,0 +1,32 @@
++#pragma once
++#include "audio_fixture.h"
++#include "sprite_view_fixture.h"
++namespace test_naga
++{
++    inline bool mount(OpenBlood2::Resources& resources, const std::filesystem::path& root, std::string& error)
++    {
++        if (!test_sprite_view::mount(resources, root, error))
++            return false;
++        std::vector<std::uint8_t> skin;
++        if (!resources.read("alpha.dtx", skin, error))
++            return false;
++        test_player::Directory dir;
++        dir.children["models"].children["ammo"].files["beam.abc"] = test_model::abc().b;
++        dir.children["skins"].children["ammo"].files["beamred.dtx"] = skin;
++        dir.children["sounds"].children["weapons"].children["laser"].files["fire.wav"] = test_audio::wave();
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [offset, size] = test_player::write_dir(w, dir);
++        w.patch(131, offset);
++        w.patch(135, size);
++        auto file = root / "naga.rez";
++        std::ofstream out(file, std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        return resources.mount(file, error);
++    }
++} // namespace test_naga
+diff --git a/tests/naga_gpu_tests.cpp b/tests/naga_gpu_tests.cpp
+new file mode 100644
+index 0000000..f83269d
+--- /dev/null
++++ b/tests/naga_gpu_tests.cpp
+@@ -0,0 +1,162 @@
++#include "app/model_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "naga_fixture.h"
++#include <algorithm>
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << " " << error << " " << SDL_GetError() << "\n";                         \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    DVector sub(DVector a, DVector b)
++    {
++        return {a.x - b.x, a.y - b.y, a.z - b.z};
++    }
++    DVector cross(DVector a, DVector b)
++    {
++        return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
++    }
++    bool render(Runtime& runtime, WorldRenderer& renderer, ModelView& scene, DVector eye, DRotation camera,
++                Capture& capture, std::vector<std::uint8_t>& pixels, std::string& error)
++    {
++        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300)) ||
++            !renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true))
++            return false;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        if (!commands)
++            return false;
++        if (!renderer.draw(commands, capture.texture, scene.mesh, scene.world_draws, eye, camera, false, error))
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 300;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 300;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
++            return false;
++        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        if (!data)
++            return false;
++        pixels.assign(data, data + 400 * 300 * 4);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    Runtime runtime;
++    std::string error;
++    CHECK(runtime.initialize(true, error));
++    WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
++    GameSession game;
++    CHECK(game.initialize());
++    if (argc == 3)
++    {
++        Config config;
++        config.data_dir = argv[2];
++        CHECK(game.resources.mount_game(config, error));
++    }
++    else
++        CHECK(test_naga::mount(game.resources, argv[1], error));
++    auto& beams = game.server.laser_beams;
++    CHECK(beams.publish({}, {0, 0, argc == 3 ? 100.f : 2.f}, "GPU beam", game.models, game.resources, 0, error));
++    CHECK(beams.advance(0) && beams.advance(.25));
++    ModelView scene;
++    CHECK(update_explosion_model_scene(game, scene, error));
++    CHECK(scene.entries.size() == 1 && scene.entries[0].error.empty() && scene.entries[0].laser_effect);
++    CHECK(scene.world_draws.size() == 1 && scene.entries[0].triangles > 0);
++    // Face framing avoids zooming out for the length of a beam seen end-on.
++    const auto a = scene.mesh.vertices[0].position, b = scene.mesh.vertices[1].position,
++               c = scene.mesh.vertices[2].position;
++    auto normal = cross(sub(b, a), sub(c, a));
++    const auto length = std::sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
++    CHECK(length > 0);
++    normal = {normal.x / length, normal.y / length, normal.z / length};
++    DRotation camera;
++    CHECK(align_rotation(normal, camera));
++    const DVector center{(a.x + b.x + c.x) / 3, (a.y + b.y + c.y) / 3, (a.z + b.z + c.z) / 3};
++    float extent = 1;
++    for (const auto vertex : {a, b, c})
++    {
++        const auto delta = sub(vertex, center);
++        extent = std::max(extent, std::sqrt(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z));
++    }
++    DVector eye{center.x - normal.x * extent * 2, center.y - normal.y * extent * 2, center.z - normal.z * extent * 2};
++    Capture capture;
++    std::vector<std::uint8_t> full, half;
++    CHECK(render(runtime, renderer, scene, eye, camera, capture, full, error));
++    std::filesystem::create_directories(argv[1]);
++    CHECK(capture.save((std::filesystem::path(argv[1]) / "laser-full.png").c_str()));
++    unsigned full_ink = 0;
++    for (unsigned i = 0; i < 400 * 300; ++i)
++        full_ink += full[i * 4] != 6 || full[i * 4 + 1] != 9 || full[i * 4 + 2] != 13;
++    CHECK(full_ink > 10);
++    // A transparent tube has overlapping faces: its whole-model blend is not linear
++    // in alpha. Check the exact pixel equation on one actual face of that same model.
++    auto single_face = [&]
++    {
++        scene.mesh.ranges[0].count = 3;
++        scene.mesh.ranges[0].batches.resize(1);
++        scene.mesh.ranges[0].batches[0].count = 3;
++        ++scene.revision;
++    };
++    single_face();
++    CHECK(render(runtime, renderer, scene, eye, camera, capture, full, error));
++    const auto pose = beams.active[0].animation;
++    CHECK(beams.advance(.375));
++    // Fixed pose isolates original alpha from model animation in the pixel comparison.
++    beams.active[0].animation = pose;
++    CHECK(update_explosion_model_scene(game, scene, error));
++    single_face();
++    CHECK(render(runtime, renderer, scene, eye, camera, capture, half, error));
++    unsigned ink = 0, mismatch = 0;
++    const int bg[]{6, 9, 13};
++    for (unsigned i = 0; i < 400 * 300; ++i)
++    {
++        bool changed = false;
++        for (unsigned c = 0; c < 3; ++c)
++        {
++            const auto j = i * 4 + c;
++            changed |= full[j] != bg[c];
++            mismatch += std::abs(int(half[j]) - int((full[j] + bg[c]) / 2)) > 1;
++        }
++        ink += changed;
++    }
++    std::cout << "Whole model pixels " << full_ink << "; selected face " << ink << "; mismatched channels " << mismatch
++              << "\n";
++    CHECK(ink > 10 && ink < 100000 && !mismatch);
++    std::filesystem::create_directories(argv[1]);
++    CHECK(capture.save((std::filesystem::path(argv[1]) / "laser-beam.png").c_str()));
++    std::cout << (argc == 3 ? "Private" : "Synthetic") << " red beam: " << scene.entries[0].triangles << " triangles, "
++              << ink << " pixels, source alpha .5 -> .25 verified\n";
++    CHECK(beams.advance(.5) && update_explosion_model_scene(game, scene, error) && scene.world_draws.empty());
++    CHECK(game.unload_world() && beams.reports.empty());
++    renderer.clear_geometry();
++    return 0;
++}
+diff --git a/tests/naga_tests.cpp b/tests/naga_tests.cpp
+new file mode 100644
+index 0000000..d98b0d2
+--- /dev/null
++++ b/tests/naga_tests.cpp
+@@ -0,0 +1,299 @@
++#include "app/model_scene.h"
++#include "game/original/AI_Mgr.h"
++#include "naga_fixture.h"
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .001f;
++    }
++    struct Actor : BaseClass
++    {
++        CDestructable damage;
++        CInventoryMgr inventory;
++        bool remove_sender = false;
++        Actor()
++        {
++            AddAggregate(&damage);
++        }
++        DDWORD EngineMessageFn(DDWORD m, void* d, float f) override
++        {
++            if (m == MID_INITIALUPDATE)
++            {
++                damage.Init(m_hObject);
++                damage.m_fHitPoints = damage.m_fMaxHitPoints = 1000;
++            }
++            return BaseClass::EngineMessageFn(m, d, f);
++        }
++        DDWORD ObjectMessageFn(HOBJECT sender, DDWORD m, HMESSAGEREAD r) override
++        {
++            const auto value = BaseClass::ObjectMessageFn(sender, m, r);
++            if (m == damage_message && remove_sender)
++                GetServerDE()->RemoveObject(sender);
++            return value;
++        }
++    };
++    Actor* actor(GameSession& g, DVector pos, unsigned kind = 0, DDWORD flags = FLAG_SOLID)
++    {
++        static ClassInfo base{
++            "NagaProbe", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
++        static ClassInfo child{
++            "NagaProbeChild", &base, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
++        static ClassInfo other{
++            "NagaTarget", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Actor>(); }, {}};
++        base.parent = other.parent = g.objects.find_class("BaseClass");
++        for (const auto* type : {&base, &child, &other})
++            if (!g.objects.find_class(type->name) && !g.objects.register_class(*type))
++                return nullptr;
++        ObjectCreateStruct state;
++        state.m_Pos = pos;
++        state.m_Flags = flags;
++        auto h = g.objects.create(kind == 0 ? &base : kind == 1 ? &child : &other, state);
++        if (auto* record = g.objects.get(h))
++            record->dimensions = {2, 2, 2};
++        return dynamic_cast<Actor*>(g.server.HandleToObject(h));
++    }
++    bool setup(GameSession& g, const std::filesystem::path& root, bool assets = true)
++    {
++        CHECK(test_player::setup(g, root));
++        std::string error;
++        if (assets)
++            CHECK(test_naga::mount(g.resources, root, error));
++        return true;
++    }
++    CNagaEyes* equip(Actor* a)
++    {
++        if (!a || !a->inventory.Init(a->m_hObject, nullptr) ||
++            a->inventory.ObtainWeapon(WEAP_NAGA_EYEBEAM, 0) != InventoryResult::Ok)
++            return nullptr;
++        return dynamic_cast<CNagaEyes*>(a->inventory.CurrentWeapon());
++    }
++    WeaponFire shot(bool alternate = false)
++    {
++        return {{0, 50, 0}, {0, 0, 1}, 42, WEAP_NAGA_EYEBEAM, alternate, false};
++    }
++    bool weapon(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* owner = actor(g, {0, 50, 0});
++        auto* w = equip(owner);
++        CHECK(w);
++        CHECK(w->data.m_nType == 38 && w->data.m_nAmmoType == AMMO_NONE && w->data.m_fRange == 2000);
++        CHECK(w->data.m_fMinDamage == 30 && w->data.m_fMaxDamage == 45);
++        CHECK(near(w->data.m_fReloadTime, .2f) && near(w->data.m_fAltReloadTime, .05f));
++        CHECK(w->ShowHandModel(true) && !w->m_hHandModel && !w->m_hHandAttachment);
++        auto* same = actor(g, {0, 50, 30}, 1);
++        auto* different = actor(g, {0, 50, 70}, 2);
++        CHECK(same && different);
++        CHECK(w->Fire(shot()) == FireResult::Fired);
++        CHECK(w->beam_collision == SegmentResult::Hit && w->beam_hit.object == different->m_hObject);
++        CHECK(w->last_shot.hit.object == same->m_hObject && near(w->beam_end.z, 68));
++        CHECK(near(same->damage.m_fHitPoints, 1000 - w->last_shot.damage) && different->damage.m_fHitPoints == 1000);
++        CHECK(w->beam && w->beam_error.empty() && !w->explosion_error.empty() && w->sounds_played == 1);
++        CHECK(w->last_shot.damage >= 30 && w->last_shot.damage <= 45 && w->CheckAmmo() == 1);
++        CHECK(g.objects.remove(same->m_hObject) && g.objects.remove(different->m_hObject) && g.objects.finish_frame());
++        CHECK(w->Fire(shot(true)) == FireResult::Fired && w->beam_collision == SegmentResult::Miss);
++        CHECK(near(w->beam_end.z, 2000) && w->sounds_played == 1 && !w->last_fire_sound && w->shots == 2);
++        CHECK(g.enter_player(w->beam_error));
++        CHECK(g.server_shell.Player(g.local_client)->m_InventoryMgr.ObtainWeapon(38) == InventoryResult::NotAvailable);
++        std::cout << "Visual class-family filter passes same-class target; ordinary damage hits it. Unlimited ammo, "
++                     "primary WAV and silent alt verified.\n";
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root, false));
++        auto* w = equip(actor(g, {0, 50, 0}));
++        CHECK(w);
++        auto* target = actor(g, {0, 50, 70}, 2, FLAG_RAYHIT);
++        CHECK(target);
++        g.server.collision_ready = false;
++        CHECK(w->Fire(shot()) == FireResult::Unavailable && w->shots == 0 && g.server.laser_beams.reports.empty());
++        g.server.collision_ready = true;
++        CHECK(w->Fire(shot()) == FireResult::Fired && !w->beam && !w->beam_error.empty());
++        CHECK(w->beam_collision == SegmentResult::Miss && w->last_shot.damage_delivered &&
++              target->damage.m_fHitPoints < 1000);
++        SegmentHit hit;
++        CHECK(g.server.IntersectSegment({0, 50, 0}, {0, 50, 100}, nullptr, hit, false, SegmentObjects::SolidOnly,
++                                        SegmentFilter::IgnoreOwnerClass) == SegmentResult::Invalid);
++        std::string error;
++        CHECK(test_naga::mount(g.resources, root, error));
++        auto& beams = g.server.laser_beams;
++        for (unsigned i = 0; i < 128; ++i)
++            CHECK(beams.publish({0, 50, 0}, {0, 50, 100}, "bounded", g.models, g.resources, 0, error));
++        CHECK(!beams.publish({0, 50, 0}, {0, 50, 100}, "overflow", g.models, g.resources, 0, error) && !error.empty());
++        CHECK(beams.active.size() == 128 && beams.reports.size() == 64);
++        CHECK(beams.advance(0) && beams.advance(.5) && beams.active.empty());
++        CHECK(!beams.publish({}, {}, "zero", g.models, g.resources, 0, error) && !error.empty());
++        CHECK(!beams.publish({}, {0, 0, 1}, std::string(101, 'x'), g.models, g.resources, 0, error));
++        return true;
++    }
++    bool clocks(const std::filesystem::path& root)
++    {
++        Resources r;
++        ModelStore m(r);
++        std::string error;
++        CHECK(test_naga::mount(r, root, error));
++        CLaserBeamFX fx;
++        CHECK(fx.CreateObject(m, r, {10, 20, 30}, {110, 20, 30}, 2, error));
++        CHECK(fx.Update(10) && fx.start_time == 10 && near(fx.scale.x, .05f) && near(fx.scale.z, 100));
++        CHECK(near(fx.position.x, 10));
++        const auto f = rotate_vector(fx.rotation, {0, 0, 1});
++        CHECK(near(f.x, 1));
++        CHECK(fx.Update(10.125) && near(fx.scale.x, .525f) && near(fx.alpha, .5f));
++        CHECK(fx.Update(10.25) && near(fx.scale.x, 1) && near(fx.alpha, .5f));
++        CHECK(fx.Update(10.375) && near(fx.alpha, .25f));
++        CHECK(!fx.Update(10.5) && fx.error.empty() && near(fx.alpha, 0));
++        CHECK(!fx.Update(10.4) && !fx.error.empty());
++        CLaserBeamFX invalid;
++        CHECK(!invalid.CreateObject(m, r, {}, {0, 0, 1}, std::numeric_limits<double>::quiet_NaN(), error));
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* owner = actor(g, {0, 50, 0});
++        auto* w = equip(owner);
++        CHECK(w);
++        auto* t = actor(g, {0, 50, 70}, 2);
++        CHECK(t);
++        t->remove_sender = true;
++        auto h = owner->m_hObject;
++        CHECK(w->Fire(shot()) == FireResult::Fired && w->last_shot.interrupted && !g.server.IsObjectAlive(h));
++        const auto id = w->beam;
++        CHECK(id && g.objects.finish_frame() && !g.objects.get(h));
++        auto& beams = g.server.laser_beams;
++        CHECK(beams.active.size() == 1);
++        CHECK(g.step(.01));
++        ModelView view;
++        std::string error;
++        CHECK(update_explosion_model_scene(g, view, error) && view.entries.size() == 1 &&
++              view.entries[0].error.empty());
++        CHECK(view.entries[0].laser_effect == id && view.world_draws.size() == 1);
++        const auto updates = beams.active[0].updates;
++        CHECK(update_explosion_model_scene(g, view, error) && updates == beams.active[0].updates);
++        CHECK(g.step(.5) && beams.active.empty());
++        CHECK(g.unload_world() && beams.reports.empty() && g.server.audio.voices().empty());
++        CHECK(beams.publish({}, {0, 0, 100}, "after unload", g.models, g.resources, g.objects.time(), error) > id);
++        CHECK(g.unload_world() && beams.active.empty());
++        CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++    bool ai(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        static ClassInfo type{
++            "NagaAIProbe", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<AI_Mgr>(); }, {}};
++        type.parent = g.objects.find_class("CBaseCharacter");
++        CHECK(g.objects.register_class(type));
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Pos = {0, 50, 0};
++        s.m_Flags = FLAG_MODELKEYS;
++        auto h = g.objects.create(&type, s);
++        auto* a = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h));
++        CHECK(a);
++        CHECK(a->m_InventoryMgr.Init(h, nullptr) && a->m_InventoryMgr.ObtainWeapon(38, 0) == InventoryResult::Ok);
++        auto model = std::make_shared<Model>();
++        std::string error;
++        CHECK(read_model(test_model::abc().b, *model, error));
++        for (auto& anim : model->animations)
++        {
++            for (auto& key : anim.keys)
++                key.text.clear();
++            for (auto& node : anim.nodes)
++                for (auto& frame : node.frames)
++                    frame.position = {};
++        }
++        model->nodes[1].name = "head_gun";
++        model->animations[0].keys = {{0, {}, {}, "[fire_key:1]"}, {100, {}, {}, ""}};
++        g.objects.get(h)->model = model;
++        g.server.SetModelAnimation(h, 0);
++        auto* t = actor(g, {0, 50, 70}, 2);
++        CHECK(t && a->SetNewTarget(t->m_hObject));
++        a->m_vTargetPos = {0, 50, 70};
++        CHECK(g.server.advance_models(.01) && a->fire_shots == 1 && a->fire_gun_node);
++        CHECK(t->damage.m_fHitPoints < 1000 && g.server.laser_beams.active.size() == 1);
++        model->nodes[1].name = "missing";
++        CHECK(!a->Fire() && a->fire_result == FireResult::Unavailable && a->fire_shots == 1);
++        return true;
++    }
++    bool private_data(const std::filesystem::path& root)
++    {
++        GameSession g;
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.initialize() && g.resources.mount_game(c, error));
++        std::uint64_t previous = 0;
++        for (unsigned iteration = 0; iteration < 3; ++iteration)
++        {
++            WorldMessage message;
++            CHECK(original_world_request("01_SubwayA", 0, 1, 1, message));
++            CHECK(g.load_world(message, error) && g.enter_player(error));
++            auto* owner = actor(g, {0, 5000, 0});
++            auto* w = equip(owner);
++            CHECK(w);
++            CHECK(w->Fire(shot()) == FireResult::Fired && w->beam && w->beam_error.empty() && w->sounds_played == 1);
++            auto& beams = g.server.laser_beams;
++            CHECK(w->beam > previous);
++            previous = w->beam;
++            // Isolated emission above the level exercises the real beam model/skin without changing an authored NPC.
++            CHECK(beams.publish({0, 5000, 0}, {0, 5000, 100}, "private beam", g.models, g.resources, g.objects.time(),
++                                error));
++            CHECK(beams.advance(g.objects.time()));
++            ModelView view;
++            CHECK(update_explosion_model_scene(g, view, error));
++            unsigned count = 0;
++            for (const auto& row : view.entries)
++                if (row.laser_effect)
++                {
++                    CHECK(row.error.empty() && row.triangles > 0);
++                    ++count;
++                }
++            CHECK(count == 2);
++            const auto laser_id = beams.active.front().id;
++            const auto laser_updates = beams.active.front().updates;
++            const auto laser_time = beams.active.front().last_time;
++            CHECK(g.rehearse_destination(message, "", error));
++            CHECK(beams.active.size() == 2 && beams.active.front().id == laser_id &&
++                  beams.active.front().updates == laser_updates && beams.active.front().last_time == laser_time);
++            std::cout << "Private loop " << iteration << ": " << count << " decoded beam models, " << w->sounds_played
++                      << " original WAV, shot damage " << w->last_shot.damage << "\n";
++            CHECK(g.unload_world() && beams.active.empty() && beams.reports.empty() && g.server.audio.voices().empty());
++            CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string name = argv[1];
++    return (name == "weapon"     ? weapon(argv[2])
++            : name == "failures" ? failures(argv[2])
++            : name == "clocks"   ? clocks(argv[2])
++            : name == "lifetime" ? lifetime(argv[2])
++            : name == "ai"       ? ai(argv[2])
++            : name == "private"  ? private_data(argv[2])
++                                 : false)
++               ? 0
++               : 1;
++}

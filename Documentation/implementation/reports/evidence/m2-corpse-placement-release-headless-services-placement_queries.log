@@ -1,0 +1,14 @@
+52/703 Testing: services.placement_queries
+52/703 Test: services.placement_queries
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/services_tests" "placement_queries"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"services.placement_queries" start time: Oct 17 04:28 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"services.placement_queries" end time: Oct 17 04:28 CEST
+"services.placement_queries" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,17 @@
+47/264 Testing: services.private
+47/264 Test: services.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/services_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"services.private" start time: Oct 16 03:36 CEST
+Output:
+----------------------------------------------------------
+Original start point: -32,192,-3224
+Caleb: 784 vertices, 20 nodes, 86 animations; dispatched commands: 46
+Primary world: 14300 solid triangles, 4095 BVH nodes; probe contact y=170 polygon=2549
+<end of output>
+Test time =   1.94 sec
+----------------------------------------------------------
+Test Passed.
+"services.private" end time: Oct 16 03:36 CEST
+"services.private" time elapsed: 00:00:01
+----------------------------------------------------------

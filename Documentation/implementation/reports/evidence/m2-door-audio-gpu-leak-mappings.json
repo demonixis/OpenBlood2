@@ -1,0 +1,135 @@
+{
+  "pid": 1512679,
+  "mapping_source": "LD_DEBUG=files",
+  "unresolved_frames": [
+    {
+      "address": "0x7b175f9e78d1",
+      "mappings": [
+        {
+          "library": "libnvidia-glcore.so.615.78.08",
+          "base": "0x7b175f000000",
+          "offset": "0x9e78d1",
+          "size": "0x2816050"
+        },
+        {
+          "library": "libnvidia-gpucomp.so.615.78.08",
+          "base": "0x7b175a400000",
+          "offset": "0x55e78d1",
+          "size": "0x74cc2c0"
+        }
+      ]
+    },
+    {
+      "address": "0x7b175f9e7b8d",
+      "mappings": [
+        {
+          "library": "libnvidia-glcore.so.615.78.08",
+          "base": "0x7b175f000000",
+          "offset": "0x9e7b8d",
+          "size": "0x2816050"
+        },
+        {
+          "library": "libnvidia-gpucomp.so.615.78.08",
+          "base": "0x7b175a400000",
+          "offset": "0x55e7b8d",
+          "size": "0x74cc2c0"
+        }
+      ]
+    },
+    {
+      "address": "0x7b175fa77c23",
+      "mappings": [
+        {
+          "library": "libnvidia-gpucomp.so.615.78.08",
+          "base": "0x7b175a400000",
+          "offset": "0x5677c23",
+          "size": "0x74cc2c0"
+        },
+        {
+          "library": "libnvidia-glcore.so.615.78.08",
+          "base": "0x7b175f000000",
+          "offset": "0xa77c23",
+          "size": "0x2816050"
+        }
+      ]
+    },
+    {
+      "address": "0x7b17623e78d1",
+      "mappings": [
+        {
+          "library": "libnvidia-glcore.so.615.78.08",
+          "base": "0x7b1761a00000",
+          "offset": "0x9e78d1",
+          "size": "0x2816050"
+        }
+      ]
+    },
+    {
+      "address": "0x7b17623e7b8d",
+      "mappings": [
+        {
+          "library": "libnvidia-glcore.so.615.78.08",
+          "base": "0x7b1761a00000",
+          "offset": "0x9e7b8d",
+          "size": "0x2816050"
+        }
+      ]
+    },
+    {
+      "address": "0x7b1762419f06",
+      "mappings": [
+        {
+          "library": "libnvidia-glcore.so.615.78.08",
+          "base": "0x7b1761a00000",
+          "offset": "0xa19f06",
+          "size": "0x2816050"
+        }
+      ]
+    },
+    {
+      "address": "0x7b1762477c23",
+      "mappings": [
+        {
+          "library": "libnvidia-glcore.so.615.78.08",
+          "base": "0x7b1761a00000",
+          "offset": "0xa77c23",
+          "size": "0x2816050"
+        }
+      ]
+    },
+    {
+      "address": "0x7f176a1cdf68",
+      "mappings": [
+        {
+          "library": "libnvidia-glsi.so.615.78.08",
+          "base": "0x7f176a164000",
+          "offset": "0x69f68",
+          "size": "0x9bb58"
+        }
+      ]
+    },
+    {
+      "address": "0x7f176a1ce35c",
+      "mappings": [
+        {
+          "library": "libnvidia-glsi.so.615.78.08",
+          "base": "0x7f176a164000",
+          "offset": "0x6a35c",
+          "size": "0x9bb58"
+        }
+      ]
+    },
+    {
+      "address": "0x7f176a1d02e9",
+      "mappings": [
+        {
+          "library": "libnvidia-glsi.so.615.78.08",
+          "base": "0x7f176a164000",
+          "offset": "0x6c2e9",
+          "size": "0x9bb58"
+        }
+      ]
+    }
+  ],
+  "limitation": "Dynamic-loader history includes addresses reused after unload. Candidates refer to all load intervals; ambiguous entries are all NVIDIA libraries, not game mappings."
+}

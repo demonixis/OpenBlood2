@@ -1,0 +1,98 @@
+338/343 Testing: gpu.world_depth
+338/343 Test: gpu.world_depth
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/world_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-depth.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.world_depth" start time: Oct 16 09:17 CEST
+Output:
+----------------------------------------------------------
+GPU readback: depth occlusion, opposite winding, near clipping, +X/+Y orientation, camera/object transforms, resize, textured repeat/row orientation/opaque sampling and reupload pass
+<end of output>
+Test time =   0.46 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.world_depth" end time: Oct 16 09:17 CEST
+"gpu.world_depth" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 09:17 CEST
+
+ai_keys =   0.56 sec*proc
+
+ai_sight =   0.11 sec*proc
+
+ai_target =   0.11 sec*proc
+
+attachments =   0.13 sec*proc
+
+brushes =   1.34 sec*proc
+
+cameras =   1.21 sec*proc
+
+character =   3.27 sec*proc
+
+character_audio =   0.70 sec*proc
+
+character_motion =   0.04 sec*proc
+
+cinematics =   1.26 sec*proc
+
+cli =   0.05 sec*proc
+
+config =   0.01 sec*proc
+
+containers =   2.38 sec*proc
+
+doors =   1.23 sec*proc
+
+explosions =   0.02 sec*proc
+
+gpu =  29.31 sec*proc
+
+headless =  14.22 sec*proc
+
+interaction =   1.57 sec*proc
+
+keyframes =   1.48 sec*proc
+
+lights =   1.09 sec*proc
+
+locomotion =   0.33 sec*proc
+
+movement =   3.40 sec*proc
+
+objectives =   1.05 sec*proc
+
+objects =   0.03 sec*proc
+
+paths =   0.13 sec*proc
+
+pickups =   1.10 sec*proc
+
+player =   0.96 sec*proc
+
+private =  41.69 sec*proc
+
+pushables =   0.02 sec*proc
+
+randomsound =   4.53 sec*proc
+
+sceneexplosion =   1.13 sec*proc
+
+services =   0.22 sec*proc
+
+sound =   1.20 sec*proc
+
+sprites =   1.37 sec*proc
+
+texture =   0.13 sec*proc
+
+triggers =   1.47 sec*proc
+
+weapons =   4.35 sec*proc
+
+world =   0.25 sec*proc
+
+world_view =   3.12 sec*proc
+
+worldpaths =   1.02 sec*proc
+

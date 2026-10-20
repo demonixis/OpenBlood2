@@ -1,0 +1,2452 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 529ad57..afbedb0 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -577,3 +577,5 @@ The [CityHub entry continuation](../Documentation/Implementation/M2_CITYHUB_ENTR
+ The [AI alignment correction](../Documentation/Implementation/M2_AI_ALIGNMENT.md) honors the original SDK fallback for parallel movement/obstacle axes. Read [contracts](docs/AI_ALIGNMENT_CONTRACTS.md). Preserve valid-frame versus blocked-route distinction, failed partial-route guards, query budgets and the existing right-axis convention. The perturbation policy is corroborated by later LithTech, not a retail1998 trace. Per-owner historical axes are inspectable. Diagnostic relocation evidence does not prove full CityHub traversal; M2 stays incomplete.
+ 
+ The [scripted opportunity-fire continuation](../Documentation/Implementation/M2_AI_SCRIPT_FIRE.md) connects original standing/walking/running fire to path/object movement. Read [contracts](docs/AI_SCRIPT_FIRE_CONTRACTS.md). Preserve strict cadence, source cached moving aim and shared target, standing residual velocity, distinct blocked-shot/phase rules, one integration and checked post-shot lifetime. No-target decisions must stay distinct from failed services. Inspector values are last-call history; diagnostic encounters do not complete M2.
++
++The [burning death and dismemberment continuation](../Documentation/Implementation/M2_DEATH_EFFECTS.md) connects original fire/gib decisions, CCorpse burning/postmortem damage, runtime CGib limbs and client flesh fragments. Read [contracts](docs/DEATH_EFFECT_CONTRACTS.md). Preserve fire priority, NEVERGIB, accumulated-damage launch speed, double negation, strict burn/smoke deadlines, named-node quirks and disabled living-NPC limb loss. Keep nonblocking children independent and cosmetic failures separate from actor removal. Zero elapsed fragment updates must not query zero-length rays. Flame/smoke count-only scaling and smoke movement samples are source rules. Blood-spurt/splat FX, generic gib templates/recursive debris, save/restore and the actual M2 gate remain incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7a1078b..b1c92bd 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -44,7 +44,7 @@ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_m
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+     src/game/server_activation.cpp src/game/original/AIRuntime.cpp
+     src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIDodge.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/AIScriptFire.cpp src/game/original/Movement.cpp
+-    src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AIDeath.cpp src/game/original/Corpse.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
++    src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AIDeath.cpp src/game/original/Gib.cpp src/game/flesh_gibs.cpp src/game/original/Corpse.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/Gideon.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_exits.cpp src/game/original/ExitTrigger.cpp src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/PlayerSave.cpp src/game/original/CharacterNodes.cpp src/game/original/BloodShells.cpp)
+diff --git a/README.md b/README.md
+index 5c37de7..6bacd81 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [burning death and dismemberment continuation](../Documentation/Implementation/M2_DEATH_EFFECTS.md) connects original lethal fire/gib decisions, burning corpses, postmortem limb loss and visible client flesh fragments, with checked cleanup and in-game inspection. These paths no longer fail solely because fire/gib services were missing. Blood-spurt/splat effects, generic gib/save services and the actual M2 gate remain open. Earlier blanket fire/gib omissions are historical.
++
+ The [scripted opportunity-fire continuation](../Documentation/Implementation/M2_AI_SCRIPT_FIRE.md) connects original standing/walking/running fire to FOLLOWPATH and MOVETOOBJECT, with inspection and checked lifetime. Real Cultist model diagnostics verify shots, damage and movement through reloads; these are not authored encounter or traversal proofs. M2 remains incomplete.
+ 
+ The [AI alignment correction](../Documentation/Implementation/M2_AI_ALIGNMENT.md) restores the original parallel-axis fallback used by CMovement. Two reproduced CityHub Cultist update failures now become ordinary blocked-path decisions; inspection exposes the resolved axes. A 120-second relocation diagnostic reports no suspended NPCs after the correction, but is not a playthrough. M2 remains incomplete.
+diff --git a/docs/AI_HIT_CONTRACTS.md b/docs/AI_HIT_CONTRACTS.md
+index e4370ec..709e3d8 100644
+--- a/docs/AI_HIT_CONTRACTS.md
++++ b/docs/AI_HIT_CONTRACTS.md
+@@ -111,3 +111,8 @@ inspectable with zero HP and an error, not a fabricated corpse or completed kill
+ sequence. This boundary, Gideon, ExitTrigger, required client FX and other missing
+ session/state services keep M2 open. The earlier no-player self-target boundary
+ also remains. Only the documented Linux configurations have been verified.
++
++The [burning death/dismemberment continuation](DEATH_EFFECT_CONTRACTS.md) supersedes
++blanket fire/gib/corpse-damage omissions for its selected original paths. Real
++flame/smoke particles, burned corpses, runtime limbs and flesh models now run with
++inspection. Blood-spurt/splat FX, generic gib/save services and full M2 remain open.
+diff --git a/docs/CHARACTER_NODE_CONTRACTS.md b/docs/CHARACTER_NODE_CONTRACTS.md
+index 63d3dc2..f789ccc 100644
+--- a/docs/CHARACTER_NODE_CONTRACTS.md
++++ b/docs/CHARACTER_NODE_CONTRACTS.md
+@@ -91,3 +91,8 @@ KeepAliveLoad and NEW_LEVEL. The three existing exit captures remain separate pa
+ records. General saves, dismemberment/limb spawning, gibs, corpse visibility transfer,
+ required FX and Gideon remain unavailable. M2 stays incomplete; source-class counts
+ and normal runtime-instance accounting are unchanged.
++
++The [burning death/dismemberment continuation](DEATH_EFFECT_CONTRACTS.md) supersedes
++blanket fire/gib/corpse-damage omissions for its selected original paths. Real
++flame/smoke particles, burned corpses, runtime limbs and flesh models now run with
++inspection. Blood-spurt/splat FX, generic gib/save services and full M2 remain open.
+diff --git a/docs/CORPSE_CONTRACTS.md b/docs/CORPSE_CONTRACTS.md
+index 693a21f..c344965 100644
+--- a/docs/CORPSE_CONTRACTS.md
++++ b/docs/CORPSE_CONTRACTS.md
+@@ -93,3 +93,8 @@ Corpses are dynamic instances, not extra authored coverage. Required FX,
+ corpse/fire/gib services, safe NEW_LEVEL and complete original session acceptance
+ keep M2 open. Linux-only tests and synthetic diagnostics do not establish
+ original-executable or platform parity.
++
++The [burning death/dismemberment continuation](DEATH_EFFECT_CONTRACTS.md) supersedes
++blanket fire/gib/corpse-damage omissions for its selected original paths. Real
++flame/smoke particles, burned corpses, runtime limbs and flesh models now run with
++inspection. Blood-spurt/splat FX, generic gib/save services and full M2 remain open.
+diff --git a/docs/DEATH_EFFECT_CONTRACTS.md b/docs/DEATH_EFFECT_CONTRACTS.md
+new file mode 100644
+index 0000000..764ddae
+--- /dev/null
++++ b/docs/DEATH_EFFECT_CONTRACTS.md
+@@ -0,0 +1,136 @@
++# Original burning deaths and dismemberment
++
++Selected original AI_Mgr, CCorpse, AI_Shared, CGib, CGibFX and ObjectFX paths now
++execute with typed objects, owned audio, visible models/particles and inspection.
++See [source hashes](M2_DEATH_EFFECTS_SOURCES.json) and
++[implementation evidence](../../Documentation/Implementation/M2_DEATH_EFFECTS.md).
++**M2 remains incomplete.** This extends the [ordinary corpse](CORPSE_CONTRACTS.md),
++[node visibility](CHARACTER_NODE_CONTRACTS.md), [hit](AI_HIT_CONTRACTS.md) and
++[object-particle](OBJECT_PARTICLE_CONTRACTS.md) contracts.
++
++## Original decisions
++
++Fire takes precedence unless ALWAYSGIB is set, including with NEVERGIB. Other
++lethal hits gib for EXPLODE, ALWAYSGIB or accumulated frame damage fraction >= .90,
++unless NEVERGIB. Preserve the unused initial limb random draw, then strict >80,
++>70, >50, >70, >50 thresholds for neck/right arm/left arm/right leg/left leg.
++The source's optional seven-percent big-gib and six-percent kill voice draws remain
++ordered; the VoiceMgr events are inspection requests, not played voice groups.
++The commented-out living-NPC limb-loss branch stays disabled.
++
++AI gib launch uses the last direction with Y+2, normalization and speed
++50 + 2 * accumulated frame damage. AI_Mgr and SetupClientGibFX negate the same
++vector twice; the final vector is also passed to limb creation. Count is integer
++mass >> 5; scale is original AI mass / 250 only when positive and below 250.
++Current production classes retain the source default AI mass. Corpse gib launch
++instead negates the incoming packet, subtracts one from Y, normalizes, scales by
++50 + packet damage, then negates through SetupClientGibFX. Do not unify these rules.
++Zero-length normalization is a finite zero-velocity safety adaptation.
++
++A failed visual fragment/limb request records its failure but does not prevent the
++original NPC removal. Failed core corpse placement still retains the actor and
++its diagnostic as before. This fixes the prior blanket fire/gib refusal, without
++claiming that every possible frozen actor has the same cause.
++
++## Burning corpse ownership
++
++The AI creates a normal force-update source at its current torso. On corpse
++creation, Fire selects skins/enemies/burned.dtx and a random death slot before the
++existing fallback check. Setup transfers the source to the corpse, attaches it to
++torso, starts original ObjectFX24 with scale 3 / SCALENUMPARTICLES, and plays
++sounds/weapons/fireloop.wav at volume .6, radii 200/1000, AI-medium priority and
++requested reverb. Output remains dry. A separate smoke source is created at setup.
++
++On an update strictly more than five seconds after burn start, detach/remove fire,
++kill its loop, publish ObjectFX21 and attach the smoke source. Strictly more than
++five seconds after smoke start, detach/remove smoke. Animation completion keeps
++.1-second updates while the attachment exists; otherwise the existing single-player
++persistent / multiplayer deadline rules apply. The smoke particle system itself
++lasts two seconds, independently from its five-second source lifetime.
++
++Ownership transfers once. Source deletion before transfer cleans its fire object;
++corpse deletion, gibbing, failed setup and world unload release both sources,
++attachment and loop. This fixes the original destructor's repeated wrong-handle
++KillSound calls and avoids its dangling smoke objects. Child identities are checked
++and never reused within the session; they are not C++ owner pointers.
++
++## Flame and smoke recipes
++
++The existing particle system renders actual external DTX alpha quads. Fire uses
++15 particles per .05-second burst, radius 2500, position radius 12.5, gravity +275,
++speed 0..25, lifetime .25..75 and red-to-white color. Smoke uses nine particles per
++stream sample, .1-second bursts, radius 2500, position radius 12.5, gravity +125,
++lifetime .5..1.5 and gray-to-white color. Only particle count is scaled by three.
++
++Both use filled-sphere emission and MOVINGSOURCE: old particles stay relative to
++a fixed origin. Smoke also uses MOVINGSTREAM; sample count is floor(distance/25),
++so a stationary source emits nothing. Each stream sample emits nine particles,
++stepping backward toward the preceding emission position. Skip the unused divide
++by zero when count is zero. Preserve the source's cached right axis before each
++random basis rotation, speed/radius/color/lifetime draw order, first-update return,
++absolute last-add clock, no catch-up loop and strict duration expiry.
++Neither recipe enables alpha ramp flags: authored .75/.25 alpha is not applied.
++Particle budgets, independent deterministic client RNG, gravity integration and
++billboard raster policy remain the existing replacement engine policies.
++
++## Detached limbs and postmortem damage
++
++CreateLimb copies the original model/skin, samples the limb node position but uses
++the parent's object rotation. It selects limb_head/limb_arm/limb_leg, applies the
++original named-node mask and raw clip dimensions, then sets velocity after creation.
++Y is replaced with one before normalization and a 200..500 speed draw. Limbs do
++not inherit parent visual scale. Only heads remain kickable. Masks address named
++nodes plus consecutive _extraN names, not skeletal descendants. Preserve the
++source arm +3 hide, which can already hide the neighboring root, and the original
++arm/leg loop-index skips when isolating a limb. Corpse transfer copies hidden limbs.
++
++CCorpse now delegates damage to CDestructable, then performs its separate current
++pose/sphere segment lookup. There is no random fallback for a missed corpse limb.
++Preserve the source's bitwise EXPLODE guard (not enum equality), .5 limb-loss chance,
++health mutation before that guard, and delayed .1-second removal after gibbing.
++Visible corpse neck always creates a head; visible arms/legs use 80/60 percent.
++Already hidden limbs never duplicate. Corpse head hits do not reuse living-NPC
++instant-headshot rules. Reentrant aggregate damage retains existing deferred
++lifetime checks; removed owners do not continue spawning.
++
++The runtime-only CGib limb selection uses 10 HP, mass 3, nonlooping animation,
++VISIBLE/RAYHIT/GRAVITY/TOUCH_NOTIFY and the existing nonsolid body integrator.
++Head contacts with moving characters use original doubled velocity plus upward
++kick, two bounces, spin reset and impact sound. Preserve first-update axis selection,
++zero initial spin deadline, source bounce thresholds and multiplayer removal timing.
++These bodies are nonblocking. Limb node positions can put their raw clip boxes
++inside the train floor/walls. Creation therefore reuses the bounded nonsolid-body
++placement service with the parent as its anchor before physics begins; failure
++removes the child and reports it. Requested/resolved placement is inspectable.
++Collision/friction and this placement remain replacement physics.
++Authored general CGib templates, generic-material child gibs on limb destruction,
++its blood-spurt effect and save/restore are not implemented by this runtime subset.
++A destroyed limb is removed; no successful recursive-gib effect is claimed.
++
++## Client flesh fragments
++
++Typed publication creates client models separate from server collision/damage
++objects, with retained reports after source removal. The selected high-detail
++SFXMgr rule doubles count with 20 percent probability; otherwise the source's
++(DBYTE)1.5 multiplier equals one. B2_LITE model/sound variants are 1..3. Preserve
++.8 dimensions for random starting positions, asymmetric Y placement, independent
++.8..1.35 scale axes, near-cardinal launch basis special cases and per-axis velocity
++ranges. SIZE_SMALL is unused in this selected CGibFX source body.
++
++InitMovingObject zeroes the earlier HALFGRAVITY/STICKY flags: use .5 of original
++client gravity (-1000 normal / -500 liquid), position-before-gravity integration,
++.35/.20 reflection damping, floor bounce count and spin changes. Container sampling
++is at creation, as in the source. Collision uses the existing primary-world ray.
++A resting model remains until unload; general SFX-list eviction/fade and retail
++outside-world classification are not reproduced. Capacity is 256 models and 64
++retained reports, with conservative space reserved for doubled requests. Exhaustion
++and resource/query failures remain visible. IDs survive manager clear; no shader
++or dependency change is required. Detached positional impact WAVs are world-owned
++one-shots and release on completion/unload.
++
++Blood-spurt particles, blood impact splats/pools and their child-effect random
++sequences remain explicitly unavailable. Their absence is not a successful FX
++service and does not close M2. The renderer and Skeleton inspector expose fragment
++counts, resources, poses, velocity, liquid/rest state, impacts and errors. Corpse
++and limb panels expose actual health, masks, clocks, attachment/effect/voice IDs and
++cleanup. Inspection never advances simulation.
+diff --git a/docs/M2_DEATH_EFFECTS_SOURCES.json b/docs/M2_DEATH_EFFECTS_SOURCES.json
+new file mode 100644
+index 0000000..fee80cf
+--- /dev/null
++++ b/docs/M2_DEATH_EFFECTS_SOURCES.json
+@@ -0,0 +1,81 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "79a2cef1891b0f10b9ab83b076cd19867352e305",
++  "status": "M2 incomplete; selected original burning and dismemberment paths",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "purpose": "Lethal decisions, burning source, corpse transfer, gib launch and random limb selection."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/corpse.cpp",
++      "source_sha256": "f92ec5bd0e4175f61461aae1f5fe498b0a1d21b5f0ee7d889573d02480543fdd",
++      "purpose": "Burn setup/update, damage, hit limbs, limb/gib requests and timing."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/corpse.h",
++      "source_sha256": "a3b9b0feda537fe7cccb6dfcb65d13437bdab288c93ef7beeb62e8d04c1fe6dc",
++      "purpose": "Initial state and original erroneous destructor cleanup."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/AI_Shared.CPP",
++      "source_sha256": "a9ebccf2ae68c1b6256e699991658e6a9aab54714fda3ad7748f9de7c4aa955f",
++      "purpose": "CreateLimb, HideLimb and named subnode rules."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Gib.cpp",
++      "source_sha256": "56af4e2090149c4f1deb9da33a6f64bc8f741f85b383723a766510bc13b85c0c",
++      "purpose": "Selected runtime limb initialization, update, kick and bounce."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PhysicalAttributes.h",
++      "source_sha256": "bb58c0afd5e3175a9007063a64fbe31089a1a595851c61e3bfee7a19f72dda55",
++      "purpose": "Original AI_DEFAULT_MASS 250."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ClientGibFX.cpp",
++      "source_sha256": "df9438b10d31a49c787dde9a1f3795e11fc436dd37c34799ffa30de519f305ba",
++      "purpose": "In/out direction negation and request fields."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/gibfx.cpp",
++      "source_sha256": "4e448e2303e82eed903ae31a557a83963ea424f0c0a69406947ef5e6793858c5",
++      "purpose": "Selected flesh model creation, velocity, bounce and sound."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/client_physics.cpp",
++      "source_sha256": "a2d7fcae81f82df02406aa3b586897aff9c409e803e315f233fbe33e3d65de16",
++      "purpose": "InitMovingObject resets flags; integration/reflection and contents."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "purpose": "Normal/liquid client gravity and damping."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
++      "source_sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
++      "purpose": "High-detail flesh count adjustment."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/ObjectFX.cpp",
++      "source_sha256": "1af815cdb07c8e0fcd56bebb723e78b539cd3398221a78e3b3fcf977bf109c48",
++      "purpose": "High-detail flame/smoke recipes, filled sphere, streaming and scale flags."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/ObjectFX.h",
++      "source_sha256": "f10854489408e05859507a3b73cfbbd1ba3514988aa7caf93ec48d992bbfaffe",
++      "purpose": "Exact original particle flags."
++    }
++  ],
++  "adaptations": [
++    "Typed objects, checked IDs and explicit ownership replace raw SDK handles and pointer-sized userdata.",
++    "Original decisions and quirks remain; numeric/asset/capacity failures are visible.",
++    "Finite zero-direction normalization and skipped zero-emission divisions avoid undefined arithmetic.",
++    "Existing replacement nonsolid-body and world-ray collision, independent client RNG and bounded effect storage.",
++    "Actual burned skin, limb/flesh models, alpha particles and WAV playback; blood-spurt/splat child FX remain unavailable.",
++    "Cleanup repairs wrong-handle original destructor behavior; no source, assets, dependency or shader changes.",
++    "Bounded nonsolid limb placement uses the parent as its anchor to avoid initial floor/wall penetration; this is replacement physics, not claimed retail parity."
++  ]
++}
+diff --git a/docs/OBJECT_PARTICLE_CONTRACTS.md b/docs/OBJECT_PARTICLE_CONTRACTS.md
+index 18fe545..ff710eb 100644
+--- a/docs/OBJECT_PARTICLE_CONTRACTS.md
++++ b/docs/OBJECT_PARTICLE_CONTRACTS.md
+@@ -109,3 +109,8 @@ now implements the selected Tesla component. Earlier blanket flame omissions are
+ historical for that recipe; surface illumination and the actual M2 gate remain open.
+ 
+ The [shield/powerup continuation](SHIELD_WEAPON_CONTRACTS.md) now implements original CGideonShield and owner-bound ObjectFX19/36. Earlier blanket shield/ramp/object-particle omissions are superseded only for these selected recipes. Boss actions, required remaining services and M2 stay open.
++
++The [burning death/dismemberment continuation](DEATH_EFFECT_CONTRACTS.md) supersedes
++blanket fire/gib/corpse-damage omissions for its selected original paths. Real
++flame/smoke particles, burned corpses, runtime limbs and flesh models now run with
++inspection. Blood-spurt/splat FX, generic gib/save services and full M2 remain open.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 080784d..a92d059 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1042,3 +1042,12 @@ preserved. [Source hashes](M2_REMOTE_SOURCES.json) cover fourteen consulted file
+ checked identities, the existing replacement box solver and the pending-owner
+ link notification adaptation. The shared explosion publisher preserves proximity
+ behavior. No source repository, commercial resource or dependency pin changes.
++
++## Original burning deaths and dismemberment
++
++Selected AI_Mgr/CCorpse lethal decisions, AI_Shared limb masks/spawning, runtime
++CGib limbs, client flesh CGibFX/client_physics and ObjectFX21/24 are ported from
++Blood II source. [Hashes](M2_DEATH_EFFECTS_SOURCES.json) and
++[contracts](DEATH_EFFECT_CONTRACTS.md) separate source rules, typed ownership,
++replacement physics, bounded client storage and remaining blood/generic-gib FX.
++No source repository, commercial asset, dependency pin or shader artifact changes.
+diff --git a/docs/WEAPON_DROP_CONTRACTS.md b/docs/WEAPON_DROP_CONTRACTS.md
+index 650a7d9..7a694d4 100644
+--- a/docs/WEAPON_DROP_CONTRACTS.md
++++ b/docs/WEAPON_DROP_CONTRACTS.md
+@@ -103,3 +103,8 @@ SubwayA source-entry accounting stays 202 created, four transferred sounds,
+ 372 editor-only, two unsupported, zero failed. Dynamic pickups/hands are runtime
+ objects, not additional supported authored entries. Linux tests do not establish
+ other-platform, XR, retail timing or original-executable parity.
++
++The [burning death/dismemberment continuation](DEATH_EFFECT_CONTRACTS.md) supersedes
++blanket fire/gib/corpse-damage omissions for its selected original paths. Real
++flame/smoke particles, burned corpses, runtime limbs and flesh models now run with
++inspection. Blood-spurt/splat FX, generic gib/save services and full M2 remain open.
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 09ae648..eda0566 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -1,6 +1,7 @@
+ #include "game/original/AI_Mgr.h"
+ #include "game/original/Corpse.h"
+ #include "game/original/CultistAI.h"
++#include "game/original/Gib.h"
+ #include "game/original/Gideon.h"
+ #include "inspector.h"
+ #include <algorithm>
+@@ -30,7 +31,22 @@ namespace OpenBlood2
+     {
+         ImGui::TextWrapped(
+             "Original hit spheres at current ABC node poses. Initialized NPCs use them for hit "
+-            "localization. Ordinary corpse animation is integrated; fire/gibs and blood-pool FX remain unavailable.");
++            "localization. Burning corpses and dismemberment are integrated; blood-spurt/splat FX remain unavailable.");
++        if (ImGui::CollapsingHeader("Original flesh fragments"))
++        {
++            const auto& fx = game.server.flesh_gibs;
++            ImGui::Text("Client models %zu / 256; independent from dead actors", fx.active.size());
++            for (const auto& report : fx.reports)
++                ImGui::TextWrapped("Event %llu %s: %u / %u created; scale %.2f; %s | %s", (unsigned long long)report.id,
++                                   report.source.c_str(), report.created, report.requested, report.scale,
++                                   report.error.c_str(), report.unavailable.c_str());
++            for (const auto& g : fx.active)
++                ImGui::TextWrapped("#%llu %s | resting %d / liquid %d / impacts %llu | pos %.1f %.1f %.1f | speed %.1f "
++                                   "%.1f %.1f | %s %s",
++                                   (unsigned long long)g.id, g.model_path.c_str(), g.resting, g.liquid,
++                                   (unsigned long long)g.impacts, g.position.x, g.position.y, g.position.z,
++                                   g.velocity.x, g.velocity.y, g.velocity.z, g.error.c_str(), g.sound_error.c_str());
++        }
+         if (ImGui::CollapsingHeader("Live attachments"))
+         {
+             ImGui::TextWrapped("Held models follow current parent nodes. Physical/nested attachments and dropped "
+@@ -104,10 +120,23 @@ namespace OpenBlood2
+             ImGui::TextWrapped("%s | %s", c.sound_resource.c_str(), c.sound_error.c_str());
+             ImGui::Text("Blood-pool ray %d | request %s", int(c.pool_result), c.pool_requested ? "yes" : "no");
+             ImGui::TextWrapped("%s", c.pool_error.c_str());
+-            ImGui::Text("Damage refused %llu | limb-loss requested %s", (unsigned long long)c.damage_refusals,
+-                        c.limb_loss ? "yes" : "no");
+-            ImGui::TextWrapped("Corpse damage, limb hiding, gibs, fire and splat FX remain unavailable. %s %s",
+-                               c.error.c_str(), c.damage_error.c_str());
++            ImGui::Text("Health %.1f | limb loss %d | hit node %d | limbs %llu / gib events %llu",
++                        c.m_damage.m_fHitPoints, c.limb_loss, c.hit_limb, (unsigned long long)c.limbs_created,
++                        (unsigned long long)c.gib_events);
++            ImGui::Text("Burn %.3f / smoke %.3f | attached %llu | fire FX %llu / smoke FX %llu | loop %llu",
++                        c.burn_start, c.smoke_start, (unsigned long long)c.burn_attachment,
++                        (unsigned long long)c.fire_effect, (unsigned long long)c.smoke_effect,
++                        (unsigned long long)c.burn_sound);
++            ImGui::TextWrapped("%s %s %s %s", c.error.c_str(), c.damage_error.c_str(), c.burn_error.c_str(),
++                               c.gib_error.c_str());
++        }
++        if (const auto* gib = r ? dynamic_cast<const CGib*>(r->game.get()) : nullptr)
++        {
++            ImGui::Text("Original limb node %d | HP %.1f | kickable %d | kicks %llu / impacts %llu", gib->limb,
++                        gib->damage.m_fHitPoints, gib->kickable, (unsigned long long)gib->kicks,
++                        (unsigned long long)gib->impacts);
++            draw_placement(gib->placement);
++            ImGui::TextWrapped("%s %s", gib->error.c_str(), gib->sound_error.c_str());
+         }
+         if (const auto* player = character ? dynamic_cast<const CPlayerObj*>(character) : nullptr)
+         {
+@@ -129,7 +158,9 @@ namespace OpenBlood2
+                         (unsigned long long)a.corpses_created, a.death_slot, a.m_nCorpseType);
+             ImGui::Text("Frame damage fraction %.3f | optional kill-voice requests %llu (unavailable)",
+                         a.m_damage.m_fLastDamagePercent, (unsigned long long)a.kill_voice_requests);
+-            ImGui::TextWrapped("%s", a.death_error.c_str());
++            ImGui::Text("Gib events %llu | detached limbs %llu | burning source %s", (unsigned long long)a.gib_events,
++                        (unsigned long long)a.limbs_created, a.fire_source ? "owned" : "none/transferred");
++            ImGui::TextWrapped("%s %s", a.death_error.c_str(), a.gib_error.c_str());
+             draw_placement(a.corpse_placement);
+         }
+         if (target_ai && target_ai->npc_type != AI_Mgr::NPCType::Diagnostic &&
+@@ -212,7 +243,7 @@ namespace OpenBlood2
+             if (!a.damage_reaction_error.empty())
+                 ImGui::TextWrapped("Reaction failure: %s", a.damage_reaction_error.c_str());
+             ImGui::TextWrapped(
+-                "Visible-node hit spheres; no limb hiding. Death/corpses/gibs and NPC impulses remain unavailable.");
++                "Visible-node hit spheres; living limb-loss branch remains disabled as in the original source.");
+         }
+         if (target_ai && ImGui::CollapsingHeader("Original escape and guard", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+diff --git a/src/app/model_scene.cpp b/src/app/model_scene.cpp
+index c381499..0884256 100644
+--- a/src/app/model_scene.cpp
++++ b/src/app/model_scene.cpp
+@@ -22,6 +22,12 @@ namespace OpenBlood2
+                 return false;
+             scene.entries.back().fragment_effect = fx.id;
+         }
++        for (const auto& fx : game.server.flesh_gibs.active)
++        {
++            if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, true,
++                           false, {}, fx.model_path, game.resources, error))
++                return false;
++        }
+         for (const auto& fx : game.server.laser_beams.active)
+         {
+             if (!scene.add(fx.model.get(), fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale,
+diff --git a/src/game/flesh_gibs.cpp b/src/game/flesh_gibs.cpp
+new file mode 100644
+index 0000000..4b4d27a
+--- /dev/null
++++ b/src/game/flesh_gibs.cpp
+@@ -0,0 +1,220 @@
++// Original ClientShellDLL/gibfx.cpp and client_physics.cpp, flesh-only selection.
++#include "game/flesh_gibs.h"
++#include "engine/collision.h"
++#include "game/legacy/server_de.h"
++#include <algorithm>
++#include <cmath>
++#include <numbers>
++namespace OpenBlood2
++{
++    namespace
++    {
++        float draw(std::minstd_rand& rng, float lo, float hi)
++        {
++            return lo + (hi - lo) * float(rng() - std::minstd_rand::min()) /
++                            float(std::minstd_rand::max() - std::minstd_rand::min());
++        }
++        int integer(std::minstd_rand& rng, int lo, int hi)
++        {
++            return lo + int(rng() % unsigned(hi - lo + 1));
++        }
++    } // namespace
++    std::uint64_t FleshGibs::publish(HOBJECT owner, DVector pos, DVector dir, DVector dims, float scale, unsigned count,
++                                     ServerDE& server, ModelStore& models, const Resources& resources, double now,
++                                     std::string& error)
++    {
++        error.clear();
++        FleshGibReport report;
++        if (const auto* name = server.GetObjectName(owner))
++            report.source = name;
++        report.position = pos;
++        report.velocity = dir;
++        report.dimensions = dims;
++        report.scale = scale;
++        report.requested = count;
++        if (!server.IsObjectAlive(owner) || !physics_vector(pos) || !physics_vector(dir) || !physics_vector(dims) ||
++            dims.x < 0 || dims.y < 0 || dims.z < 0 || !std::isfinite(scale) || scale <= 0 || scale > 100 ||
++            count > 64 || active.size() + count * 2 > 256 || !std::isfinite(now) || now < 0)
++            error = "Invalid flesh-gib request or capacity exhausted";
++        else
++        {
++            // Selected high detail: the source's (DBYTE)1.5 is exactly one.
++            if (integer(random_, 0, 99) < 20)
++                count *= 2;
++            report.id = next_event_++;
++            report.adjusted = count;
++            for (unsigned i = 0; i < count; ++i)
++            {
++                FleshGib g;
++                g.position = pos;
++                g.last_time = now;
++                const auto half = vector_scale(dims, .8f);
++                if (half.x)
++                    g.position.x += draw(random_, -half.x, half.x);
++                if (half.z)
++                    g.position.z += draw(random_, -half.z, half.z);
++                if (half.y)
++                    g.position.y += draw(random_, -half.y / 2, half.y);
++                const float speed = std::sqrt(vector_dot(dir, dir));
++                auto forward =
++                    speed > 0 ? vector_scale(dir, 1 / speed) : DVector{0, 1, 0}; // finite zero-speed adaptation
++                DRotation basis;
++                if (!align_rotation(forward, basis))
++                {
++                    error = "Invalid flesh-gib alignment";
++                    break;
++                }
++                auto right = rotate_vector(basis, {1, 0, 0}), up = rotate_vector(basis, {0, 1, 0});
++                g.angular_velocity = {draw(random_, -2 * std::numbers::pi_v<float>, 2 * std::numbers::pi_v<float>),
++                                      draw(random_, -2 * std::numbers::pi_v<float>, 2 * std::numbers::pi_v<float>), 0};
++                // B2_LITE NRES limits model and sound choices to 1..3.
++                const int model = integer(random_, 1, 3);
++                g.bounces = integer(random_, 0, 4) == 4 ? 1 : 0;
++                const int sound = integer(random_, 1, 3);
++                g.model_path = "models/gibs/flesh/gib" + std::to_string(model) + ".abc";
++                g.skin_path = "skins/gibs/flesh/gib" + std::to_string(model) + ".dtx";
++                g.sound_path = "sounds/gibs/flesh/gib_impact" + std::to_string(sound) + ".wav";
++                g.scale = {draw(random_, .8f, 1.35f) * scale, draw(random_, .8f, 1.35f) * scale,
++                           draw(random_, .8f, 1.35f) * scale};
++                if (!models.load(g.model_path, g.model, error) || !resources.find(g.skin_path))
++                {
++                    if (error.empty())
++                        error = "Flesh-gib skin not indexed";
++                    break;
++                }
++                if (std::abs(forward.y) >= .95f)
++                {
++                    forward.y = forward.y > 0 ? 1.f : -1.f;
++                    right = {1, 0, 0};
++                    up = {0, 0, 1};
++                }
++                else if (std::abs(forward.x) >= .95f)
++                {
++                    forward.x = forward.x > 0 ? 1.f : -1.f;
++                    right = {0, 1, 0};
++                    up = {0, 0, 1};
++                }
++                else if (std::abs(forward.z) >= .95f)
++                {
++                    forward.z = forward.z > 0 ? 1.f : -1.f;
++                    right = {1, 0, 0};
++                    up = {0, 1, 0};
++                }
++                const auto lo = vector_scale(vector_add(right, up), -speed);
++                const auto hi =
++                    vector_add(vector_scale(forward, 4 * speed), vector_scale(vector_add(right, up), speed));
++                g.velocity = {draw(random_, lo.x, hi.x), draw(random_, lo.y, hi.y), draw(random_, lo.z, hi.z)};
++                ContainerCode code = CC_NOTHING;
++                if (!server.GetPointContainerCode(g.position, code))
++                {
++                    error = "Flesh-gib contents query unavailable";
++                    break;
++                }
++                g.liquid = IsLiquid(code);
++                g.id = next_id_++;
++                active.push_back(std::move(g));
++                ++report.created;
++            }
++        }
++        report.error = error;
++        if (reports.size() == 64)
++            reports.erase(reports.begin());
++        const auto id = report.id;
++        reports.push_back(std::move(report));
++        return error.empty() ? id : 0;
++    }
++    bool FleshGibs::advance(double now, ServerDE& server)
++    {
++        bool ok = true;
++        for (auto& g : active)
++        {
++            if (!g.error.empty())
++            {
++                ok = false;
++                continue;
++            }
++            const auto dt = now - g.last_time;
++            if (!std::isfinite(dt) || dt < 0 || dt > 1)
++            {
++                g.error = "Invalid flesh-gib clock";
++                ok = false;
++                continue;
++            }
++            g.last_time = now;
++            std::vector<std::uint32_t> keys;
++            if (!advance_animation(*g.model, g.animation, dt, keys, g.error))
++            {
++                ok = false;
++                continue;
++            }
++            if (g.resting || dt == 0)
++                continue;
++            if (vector_dot(g.velocity, g.velocity) < .01f)
++                g.velocity = {};
++            auto next = vector_add(g.position, vector_scale(g.velocity, float(dt)));
++            // InitMovingObject memset clears the HALFGRAVITY/STICKY bits set by CreateObject.
++            g.velocity.y -= float(dt) * (g.liquid ? 250.f : 500.f);
++            SegmentHit hit;
++            const auto delta = vector_subtract(next, g.position);
++            const auto result =
++                vector_dot(delta, delta) < 1e-12f ? SegmentResult::Miss : server.CastWorldRay(g.position, next, hit);
++            if (result != SegmentResult::Hit && result != SegmentResult::Miss)
++            {
++                g.error = "Flesh-gib world collision unavailable";
++                ok = false;
++                continue;
++            }
++            if (result == SegmentResult::Hit)
++            {
++                const float dot = -2 * vector_dot(g.velocity, hit.normal);
++                g.velocity =
++                    vector_scale(vector_add(g.velocity, vector_scale(hit.normal, dot)), g.liquid ? .20f : .35f);
++                if (dot > 0)
++                    next = vector_add(hit.point, vector_scale(hit.normal, .3f));
++                if (hit.normal.y > .6f && vector_dot(g.velocity, g.velocity) < 250)
++                    g.resting = true;
++                if (hit.normal.y > 0)
++                {
++                    if (g.bounces <= 0)
++                        g.resting = true;
++                    --g.bounces;
++                }
++                else
++                    g.resting = false;
++                ++g.impacts;
++                // Client sounds have no server owner: the adapter accepts world-owned playback below.
++                SoundRequest request;
++                request.resource = g.sound_path;
++                request.outer_radius = 750;
++                request.inner_radius = 75;
++                std::string sound_error;
++                server.PlayClientSound(request, next, sound_error);
++                g.sound_error = sound_error;
++                g.angular_velocity = {draw(random_, -2 * std::numbers::pi_v<float>, 2 * std::numbers::pi_v<float>),
++                                      draw(random_, -2 * std::numbers::pi_v<float>, 2 * std::numbers::pi_v<float>), 0};
++            }
++            else
++            {
++                g.angles = vector_add(g.angles, vector_scale(g.angular_velocity, float(dt)));
++                g.rotation = rotation_from_euler(g.angles);
++            }
++            if (!physics_vector(next) || !physics_vector(g.velocity))
++            {
++                g.error = "Flesh-gib motion exceeds bounds";
++                ok = false;
++                continue;
++            }
++            g.position = next;
++        }
++        if (!ok)
++            update_error = "Flesh-gib update failed; inspect individual fragment";
++        return ok;
++    }
++    void FleshGibs::clear()
++    {
++        active.clear();
++        reports.clear();
++        update_error.clear();
++        random_.seed(1);
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/flesh_gibs.h b/src/game/flesh_gibs.h
+new file mode 100644
+index 0000000..2ebc408
+--- /dev/null
++++ b/src/game/flesh_gibs.h
+@@ -0,0 +1,45 @@
++#pragma once
++#include "engine/model_store.h"
++#include "game/weapon_messages.h"
++#include <random>
++class ServerDE;
++namespace OpenBlood2
++{
++    // Selected original CGibFX flesh path. Client-only models never block gameplay.
++    struct FleshGib
++    {
++        std::uint64_t id = 0, impacts = 0;
++        std::shared_ptr<const Model> model;
++        AnimationTrack animation;
++        DVector position{}, velocity{}, scale{1, 1, 1}, angles{}, angular_velocity{};
++        DRotation rotation;
++        std::string model_path, skin_path, sound_path, error, sound_error;
++        int bounces = 0;
++        bool resting = false, liquid = false;
++        double last_time = 0;
++    };
++    struct FleshGibReport
++    {
++        std::uint64_t id = 0;
++        DVector position{}, velocity{}, dimensions{};
++        float scale = 1;
++        unsigned requested = 0, adjusted = 0, created = 0;
++        std::string source, error;
++        std::string unavailable = "Original blood-spurt particles and impact splats are not rendered";
++    };
++    class FleshGibs
++    {
++      public:
++        std::uint64_t publish(HOBJECT, DVector, DVector, DVector, float, unsigned, ServerDE&, ModelStore&,
++                              const Resources&, double, std::string&);
++        bool advance(double, ServerDE&);
++        void clear();
++        std::vector<FleshGib> active;
++        std::vector<FleshGibReport> reports;
++        std::string update_error;
++
++      private:
++        std::minstd_rand random_{1};
++        std::uint64_t next_id_ = 1, next_event_ = 1;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index a1aad51..4e4ea43 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -49,6 +49,7 @@ class ServerDE : public CSBase
+     virtual OpenBlood2::SoundId PlayCinematicSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
+     virtual OpenBlood2::SoundId PlayLocalSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
+     virtual OpenBlood2::SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
++    virtual OpenBlood2::SoundId PlayClientSound(const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
+     virtual OpenBlood2::SoundId PlaySoundAt(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
+     virtual OpenBlood2::SoundId PlayWorldSound(HOBJECT, const OpenBlood2::SoundRequest&, bool file_stream,
+                                                std::string&) = 0;
+@@ -82,6 +83,7 @@ class ServerDE : public CSBase
+                                         unsigned failed = 0) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
+     virtual std::uint64_t PublishParticleStream(HOBJECT, const OpenBlood2::ParticleStreamSettings&, std::string&) = 0;
++    virtual std::uint64_t PublishFleshGibs(HOBJECT, DVector, DVector, DVector, float, unsigned, std::string&) = 0;
+     virtual std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) = 0;
+     virtual std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionFragments(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+diff --git a/src/game/object_particles.cpp b/src/game/object_particles.cpp
+index 35a7191..6a615a0 100644
+--- a/src/game/object_particles.cpp
++++ b/src/game/object_particles.cpp
+@@ -17,7 +17,7 @@ namespace OpenBlood2
+             if (!resources || server.GetObjectPos(owner, &pose.position) != DE_OK ||
+                 server.GetObjectRotation(owner, &pose.rotation) != DE_OK)
+                 error = "Object particle resources/pose unavailable";
+-            else if (recipe != 19 && recipe != 36)
++            else if (recipe != 19 && recipe != 36 && recipe != 21 && recipe != 24)
+                 error = "Object-bound particle recipe unavailable";
+             else if (active.size() >= 128 || next_id_ == UINT64_MAX)
+                 error = "Object particle system capacity exhausted";
+diff --git a/src/game/original/AIDeath.cpp b/src/game/original/AIDeath.cpp
+index 1fe5793..c47df1e 100644
+--- a/src/game/original/AIDeath.cpp
++++ b/src/game/original/AIDeath.cpp
+@@ -1,7 +1,9 @@
+ // Original AI_Mgr MC_Dead/AI_STATE_Dying/CreateCorpse, ordinary death only.
+ #include "AI_Mgr.h"
+ #include "Corpse.h"
++#include "Gib.h"
+ #include "engine/collision.h"
++#include <cmath>
+ #include <cstring>
+ 
+ bool AI_Mgr::MC_Dead()
+@@ -73,12 +75,19 @@ bool AI_Mgr::CreateCorpse()
+         return StateFailure(why);
+     };
+     if (!s || !s->IsObjectAlive(m_hObject) || !m_pAnim_Sound || !m_MoveObj.initialized || !m_MoveObj.sampled ||
+-        !physics_vector(m_vDims) || m_damage.reaction_damage_type == DamageType::Fire)
+-        return fail("Corpse owner/cache/table unavailable or fire death unsupported");
++        !physics_vector(m_vDims))
++        return fail("Corpse owner/cache/table unavailable");
+     std::string model, skin, clip_name;
+     auto type = s->GetClass("CCorpse");
+     if (!type || !s->GetModelFilenames(m_hObject, model, skin))
+         return fail("Corpse class/model filenames unavailable");
++    if (m_damage.reaction_damage_type == DamageType::Fire)
++    {
++        skin = "skins\\enemies\\burned.dtx";
++        if (!s->RandomInt(0, 11, death_slot))
++            return fail("Burned corpse RNG unavailable");
++        m_nCorpseType = m_pAnim_Sound->m_nAnim_DEATH[death_slot];
++    }
+     if (m_nCorpseType < m_pAnim_Sound->m_nAnim_DEATH[0])
+     {
+         int slot;
+@@ -107,8 +116,10 @@ bool AI_Mgr::CreateCorpse()
+     report.child = h;
+     auto position = state.m_Pos;
+     position.y -= (m_vDims.y - dims.y) - .001f;
+-    const bool configured =
+-        s->IsObjectAlive(m_hObject) && s->IsObjectAlive(h) && corpse->Setup(m_pAnim_Sound->GetSoundRoot(), m_bCabal);
++    const bool configured = s->IsObjectAlive(m_hObject) && s->IsObjectAlive(h) &&
++                            corpse->Setup(m_pAnim_Sound->GetSoundRoot(), m_bCabal, fire_source);
++    if (configured)
++        fire_source = nullptr; // Ownership transfers once, including failure rollback.
+     if (configured)
+     {
+         s->SetModelAnimation(h, m_nCorpseType);
+@@ -127,7 +138,12 @@ bool AI_Mgr::CreateCorpse()
+         return fail("Corpse setup failed; incomplete child removed");
+     }
+     corpse->placement = corpse_placement;
+-    // All supported NPC nodes are visible; per-limb hiding remains unavailable.
++    for (int node : {1, 4, 7, 10, 14})
++    {
++        DBOOL hidden = false;
++        if (s->GetModelNodeHideStatus(m_hObject, szNodes[node], &hidden) == DE_OK && hidden)
++            HideLimb(h, node, death_error);
++    }
+     last_corpse = h;
+     ++corpses_created;
+     report.position = corpse_placement.candidate;
+@@ -135,3 +151,68 @@ bool AI_Mgr::CreateCorpse()
+     s->RecordSpawn(report);
+     return true;
+ }
++
++bool AI_Mgr::StartBurnDeath()
++{
++    auto* s = GetServerDE();
++    if (fire_source && s->IsObjectAlive(fire_source))
++        return true;
++    ObjectCreateStruct state;
++    state.m_ObjectType = OT_NORMAL;
++    state.m_Flags = FLAG_FORCECLIENTUPDATE;
++    if (s->QueryModelNodeTransform(m_hObject, "torso", &state.m_Pos, &state.m_Rotation) != ServerDE::NodeQuery::Found)
++    {
++        damage_reaction_error = "Burning death torso unavailable";
++        return false;
++    }
++    std::strcpy(state.m_Name, "Corpse fire source");
++    auto* object = s->CreateObject(s->GetClass("BaseClass"), &state);
++    if (!object)
++    {
++        damage_reaction_error = "Burning death source creation failed";
++        return false;
++    }
++    fire_source = object->m_hObject;
++    return true;
++}
++bool AI_Mgr::CreateDeathGibs()
++{
++    using namespace OpenBlood2;
++    auto* s = GetServerDE();
++    gib_error.clear();
++    auto direction = m_damage.last_damage.direction;
++    direction.y += 2;
++    const float length = std::sqrt(vector_dot(direction, direction));
++    // CreateGibs negates, then SetupClientGibFX negates its IN/OUT argument again.
++    direction = length > 0 ? vector_scale(direction, (50 + 2 * m_damage.m_fLastDamageAmount) / length) : DVector{};
++    const float scale = m_fAIMass > 0 && m_fAIMass < 250 ? m_fAIMass / 250 : 1;
++    if (!std::isfinite(m_damage.m_fMass) || m_damage.m_fMass < 0 || m_damage.m_fMass > 2048)
++    {
++        gib_error = "AI gib mass exceeds bounded fragment request";
++        return false;
++    }
++    const unsigned count = static_cast<unsigned>(m_damage.m_fMass) / 32;
++    const auto event = s->PublishFleshGibs(m_hObject, m_MoveObj.GetPos(), direction, m_vDims, scale, count, gib_error);
++    gib_events += event != 0;
++    if (m_bCabal)
++    {
++        int roll;
++        if (!s->RandomInt(0, 100, roll))
++            return false; // Source's unused initial draw.
++        constexpr int nodes[]{1, 4, 7, 14, 10}, thresholds[]{80, 70, 50, 70, 50};
++        for (int i = 0; i < 5; ++i)
++        {
++            if (!s->RandomInt(0, 100, roll))
++                return false;
++            if (roll > thresholds[i])
++            {
++                std::string error;
++                if (CreateLimb(m_hObject, nodes[i], direction, error))
++                    ++limbs_created;
++                else if (gib_error.empty())
++                    gib_error = error;
++            }
++        }
++    }
++    return event != 0;
++}
+diff --git a/src/game/original/AIHitReaction.cpp b/src/game/original/AIHitReaction.cpp
+index 33ffff0..0baa6e2 100644
+--- a/src/game/original/AIHitReaction.cpp
++++ b/src/game/original/AIHitReaction.cpp
+@@ -136,14 +136,20 @@ bool AI_Mgr::HandleDamage()
+         const auto type = m_damage.reaction_damage_type;
+         if (type == OpenBlood2::DamageType::Fire && !(m_dwFlags & 0x40u))
+         {
+-            damage_reaction_error = "NPC fire death requires original burning services";
+-            return false;
++            if (!StartBurnDeath())
++                return false;
+         }
+-        if (!(m_dwFlags & 0x800u) &&
+-            (type == OpenBlood2::DamageType::Explode || (m_dwFlags & 0x40u) || m_damage.m_fLastDamagePercent >= .9f))
++        else if (!(m_dwFlags & 0x800u) && (type == OpenBlood2::DamageType::Explode || (m_dwFlags & 0x40u) ||
++                                           m_damage.m_fLastDamagePercent >= .9f))
+         {
+-            damage_reaction_error = "NPC gib death requires original gib services";
+-            return false;
++            CreateDeathGibs(); // Original removal is independent of client FX/limb success.
++            m_bRemoveMe = true;
++            if (!s->RandomInt(0, 99, big_gib_voice_roll))
++                return false;
++            const auto attacker = m_damage.GetLastDamager();
++            if (big_gib_voice_roll < 7 && attacker &&
++                s->IsKindOf(s->GetObjectClass(attacker), s->GetClass("CPlayerObj")))
++                ++big_gib_voice_requests;
+         }
+         if (!s->RandomInt(0, 99, kill_voice_roll))
+         {
+diff --git a/src/game/original/AIPerception.cpp b/src/game/original/AIPerception.cpp
+index a3ff1c3..d62f0d2 100644
+--- a/src/game/original/AIPerception.cpp
++++ b/src/game/original/AIPerception.cpp
+@@ -23,6 +23,8 @@ AI_Mgr::AI_Mgr()
+ }
+ AI_Mgr::~AI_Mgr()
+ {
++    if (fire_source && GetServerDE())
++        GetServerDE()->RemoveObject(fire_source);
+     if (m_hCurSound && GetServerDE())
+         GetServerDE()->KillSound(m_hCurSound);
+     if (m_Link.m_pData)
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 0eaf915..8720041 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -254,6 +254,13 @@ class AI_Mgr : public CBaseCharacter
+     bool MC_Dead();
+     bool AI_STATE_Dying();
+     bool CreateCorpse();
++    bool StartBurnDeath();
++    bool CreateDeathGibs();
++    float m_fAIMass = 250; // Original AI_DEFAULT_MASS, distinct from aggregate overrides.
++    HOBJECT fire_source = nullptr;
++    std::uint64_t gib_events = 0, limbs_created = 0, big_gib_voice_requests = 0;
++    int big_gib_voice_roll = -1;
++    std::string gib_error;
+     DDWORD m_nCorpseType = 0;
+     OpenBlood2::SoundId m_hCurSound = 0; // Original per-actor retained sound, distinct from shared table voice.
+     int death_slot = -1, kill_voice_roll = -1;
+diff --git a/src/game/original/Corpse.cpp b/src/game/original/Corpse.cpp
+index 16cd529..14c1648 100644
+--- a/src/game/original/Corpse.cpp
++++ b/src/game/original/Corpse.cpp
+@@ -1,5 +1,6 @@
+-// Original ObjectDLL/corpse.cpp: selected ordinary corpse branch.
++// Original ObjectDLL/corpse.cpp: selected corpse lifetime, burning and damage.
+ #include "Corpse.h"
++#include "Gib.h"
+ #include "Sparam.h"
+ #include "engine/collision.h"
+ #include "game/game_settings.h"
+@@ -11,13 +12,56 @@ CCorpse::CCorpse() : B2BaseClass(OT_MODEL)
+ {
+     AddAggregate(&m_damage);
+ }
+-bool CCorpse::Setup(std::string_view root, bool limbs)
++bool CCorpse::Setup(std::string_view root, bool limbs, HOBJECT fire)
+ {
+     if (!initialized || configured || !measurements.SetSoundRoot(root))
+         return false;
+     sound_root = root; // Replaces the source's pointer truncated into m_UserData.
+     limb_loss = limbs;
+     configured = true;
++    if (fire)
++    {
++        auto* s = GetServerDE();
++        fire_source = fire;
++        burn_start = s->GetTime();
++        DVector offset{};
++        DRotation rotation;
++        if (s->CreateAttachment(m_hObject, fire, "torso", &offset, &rotation, &burn_attachment) != DE_OK)
++        {
++            error = "Corpse flame attachment failed";
++            return false;
++        }
++        fire_effect = s->PublishObjectParticles(fire, 24, burn_error);
++        SoundRequest request;
++        request.resource = "sounds/weapons/fireloop.wav";
++        request.speaker = m_hObject;
++        request.outer_radius = 1000;
++        request.inner_radius = 200;
++        request.volume = .6f;
++        request.loop = true;
++        request.reverb_requested = true;
++        request.priority = 3;
++        std::string failure;
++        burn_sound = s->PlayObjectLoopSound(m_hObject, request, failure);
++        if (!failure.empty())
++            burn_error += failure;
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_NORMAL;
++        state.m_Flags = FLAG_FORCECLIENTUPDATE;
++        if (s->QueryModelNodeTransform(m_hObject, "torso", &state.m_Pos, &state.m_Rotation) !=
++            ServerDE::NodeQuery::Found)
++        {
++            error = "Corpse smoke torso unavailable";
++            return false;
++        }
++        auto* smoke = s->CreateObject(s->GetClass("BaseClass"), &state);
++        if (!smoke)
++        {
++            error = "Corpse smoke source unavailable";
++            return false;
++        }
++        smoke_source = smoke->m_hObject;
++    }
+     return true;
+ }
+ DDWORD CCorpse::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+@@ -75,6 +119,13 @@ bool CCorpse::Update()
+         return true; // Failed service remains visible; never claims animation completion.
+     }
+     const auto now = s->GetTime();
++    if (dead)
++        return false;
++    if (!UpdateBurn())
++    {
++        s->SetNextUpdate(m_hObject, 0);
++        return true;
++    }
+     if (remove_time && remove_time <= now)
+         return false;
+     if (s->GetModelPlaybackState(m_hObject) & MS_PLAYDONE)
+@@ -100,7 +151,7 @@ bool CCorpse::Update()
+         const bool multiplayer = GetGameType() != GAMETYPE_SINGLE;
+         if (multiplayer)
+             remove_time = now + 30.f - .1f;
+-        s->SetNextUpdate(m_hObject, multiplayer ? 30.f : 0.f);
++        s->SetNextUpdate(m_hObject, burn_attachment ? .1f : multiplayer ? 30.f : 0.f);
+     }
+     else
+         s->SetNextUpdate(m_hObject, .1f);
+@@ -108,13 +159,13 @@ bool CCorpse::Update()
+ }
+ DDWORD CCorpse::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
+ {
+-    if (message == damage_message || message == 1000)
++    if (message == damage_message)
+     {
+-        // Do not mutate health through the aggregate while its required corpse
+-        // hit/limb/gib response is unavailable, including a generic KILL trigger.
+-        ++damage_refusals;
+-        damage_error = "Corpse damage/limb/gib services unavailable";
+-        return 0;
++        Damage damage;
++        if (!GetServerDE()->ReadDamage(read, damage))
++            return 0;
++        B2BaseClass::ObjectMessageFn(sender, message, read);
++        return GetServerDE()->IsObjectAlive(m_hObject) && !dead && HandleDamage(damage);
+     }
+     return B2BaseClass::ObjectMessageFn(sender, message, read);
+ }
+@@ -188,3 +239,175 @@ bool CCorpse::OnStringKey(ArgList* args)
+     sound_starts += last_sound != 0;
+     return last_sound != 0; // No GETHANDLE: auto release; repeated keys may overlap.
+ }
++
++CCorpse::~CCorpse()
++{
++    ClearBurn();
++}
++void CCorpse::ClearBurn()
++{
++    auto* s = GetServerDE();
++    if (!s)
++        return;
++    if (burn_attachment)
++        s->RemoveAttachment(burn_attachment);
++    if (fire_source)
++        s->RemoveObject(fire_source);
++    if (smoke_source)
++        s->RemoveObject(smoke_source);
++    if (burn_sound)
++        s->KillSound(burn_sound);
++    burn_attachment = 0;
++    fire_source = smoke_source = nullptr;
++    burn_sound = 0;
++}
++bool CCorpse::UpdateBurn()
++{
++    auto* s = GetServerDE();
++    const float now = s->GetTime();
++    if (!smoke_start && fire_source && now - burn_start > 5)
++    {
++        s->RemoveAttachment(burn_attachment);
++        burn_attachment = 0;
++        s->RemoveObject(fire_source);
++        fire_source = nullptr;
++        if (burn_sound)
++            s->KillSound(burn_sound);
++        burn_sound = 0;
++        smoke_effect = s->PublishObjectParticles(smoke_source, 21, burn_error);
++        DVector offset{};
++        DRotation rotation;
++        if (s->CreateAttachment(m_hObject, smoke_source, "torso", &offset, &rotation, &burn_attachment) != DE_OK)
++        {
++            error = "Corpse smoke attachment failed";
++            return false;
++        }
++        smoke_start = now;
++    }
++    else if (!fire_source && smoke_source && now - smoke_start > 5)
++    {
++        s->RemoveAttachment(burn_attachment);
++        burn_attachment = 0;
++        s->RemoveObject(smoke_source);
++        smoke_source = nullptr;
++    }
++    return true;
++}
++int CCorpse::CalculateHitLimb(DVector direction, DVector position)
++{
++    auto* s = GetServerDE();
++    DVector dims;
++    if (!measurements.hit_spheres_valid ||
++        s->GetModelAnimUserDims(m_hObject, &dims, s->GetModelAnimation(m_hObject)) != DE_OK)
++        return -1;
++    const DVector absolute{std::abs(direction.x), std::abs(direction.y), std::abs(direction.z)};
++    float length = 0;
++    if (absolute.x > absolute.y && absolute.x > absolute.z)
++        length = dims.x / absolute.x;
++    else if (absolute.y > absolute.x && absolute.y > absolute.z)
++        length = dims.y / absolute.y;
++    else if (absolute.z > absolute.x && absolute.z > absolute.y)
++        length = dims.z / absolute.z;
++    const auto segment = vector_scale(direction, length);
++    const float squared = vector_dot(segment, segment);
++    if (squared == 0)
++        return -1; // Original tied/zero direction yields no candidate.
++    int node = -1;
++    float nearest = 999;
++    DBOOL hidden = false;
++    DVector pose{};
++    DRotation rotation;
++    bool have = false;
++    for (unsigned i = 0; i < NUM_STD_NODES; ++i)
++    {
++        const auto status = s->GetModelNodeHideStatus(m_hObject, szNodes[i], &hidden);
++        if (status != DE_OK && status != DE_NOTFOUND)
++            return -1;
++        if (hidden)
++            continue;
++        const auto found = s->QueryModelNodeTransform(m_hObject, szNodes[i], &pose, &rotation);
++        if (found == ServerDE::NodeQuery::Unavailable || (!have && found != ServerDE::NodeQuery::Found))
++            return -1;
++        have = true;
++        const float t = vector_dot(segment, pose) / squared - vector_dot(segment, position) / squared;
++        if (t < 0 || t > 1)
++            continue;
++        const auto delta = vector_subtract(pose, vector_add(position, vector_scale(segment, t)));
++        const float distance = std::sqrt(vector_dot(delta, delta));
++        if (distance < nearest && distance <= measurements.m_fHitSpheres[i])
++        {
++            nearest = distance;
++            node = int(i);
++        }
++    }
++    return CDestructable::SetProperNode(node);
++}
++bool CCorpse::HandleDamage(const Damage& hit)
++{
++    auto* s = GetServerDE();
++    damage_error.clear();
++    auto direction = vector_scale(hit.direction, -1);
++    hit_limb = -1;
++    if (limb_loss)
++    {
++        hit_limb = CalculateHitLimb(direction, hit.position);
++        // Preserve source bitwise test, not equality: Fire (1) passes EXPLODE (5).
++        if (hit_limb == -1 && !(unsigned(hit.type) & unsigned(DamageType::Explode)))
++            return false;
++    }
++    if (m_damage.IsDead())
++    {
++        dead = true;
++        direction.y -= 1;
++        const float length = std::sqrt(vector_dot(direction, direction));
++        // SetupClientGibFX reverses the same vector subsequently passed to limbs.
++        direction = length > 0 ? vector_scale(direction, -(50 + hit.amount) / length) : DVector{};
++        DVector pos, dims;
++        s->GetObjectPos(m_hObject, &pos);
++        s->GetObjectDims(m_hObject, &dims);
++        if (!std::isfinite(m_damage.m_fMass) || m_damage.m_fMass < 0 || m_damage.m_fMass > 2048)
++            gib_error = "Corpse gib mass exceeds bounded fragment request";
++        else
++            gib_events += s->PublishFleshGibs(m_hObject, pos, direction, dims, 1, unsigned(m_damage.m_fMass) / 32,
++                                              gib_error) != 0;
++        if (limb_loss)
++        {
++            constexpr int nodes[]{1, 4, 7, 14, 10}, chance[]{100, 80, 80, 60, 60};
++            for (int i = 0; i < 5; ++i)
++            {
++                DBOOL hidden = true;
++                if (s->GetModelNodeHideStatus(m_hObject, szNodes[nodes[i]], &hidden) != DE_OK || hidden)
++                    continue;
++                int roll = 0;
++                if (i && !s->RandomInt(0, 99, roll))
++                    continue;
++                if (roll < chance[i])
++                {
++                    std::string failure;
++                    const auto h = CreateLimb(m_hObject, nodes[i], direction, failure);
++                    if (h)
++                    {
++                        last_limb = h;
++                        ++limbs_created;
++                    }
++                    else if (gib_error.empty())
++                        gib_error = failure;
++                }
++            }
++        }
++        ClearBurn();
++        s->SetNextUpdate(m_hObject, .1f);
++        int roll;
++        s->RandomInt(0, 99, roll); // Original optional VME_BIGGIB voice draw.
++    }
++    else if (hit_limb >= 0 && hit_limb < int(NUM_ALL_NODES) && limb_loss)
++    {
++        int roll;
++        if (s->RandomInt(0, 99, roll) && roll < 50 && HideLimb(m_hObject, hit_limb, damage_error))
++        {
++            last_limb = CreateLimb(m_hObject, hit_limb, direction, damage_error);
++            limbs_created += last_limb != nullptr;
++        }
++    }
++    return true;
++}
+diff --git a/src/game/original/Corpse.h b/src/game/original/Corpse.h
+index 4c5344e..cd5059d 100644
+--- a/src/game/original/Corpse.h
++++ b/src/game/original/Corpse.h
+@@ -2,14 +2,25 @@
+ #include "Anim_Sound.h"
+ #include "Destructable.h"
+ 
+-// Selected original CCorpse lifetime/animation/audio. Damage, limbs and fire are
+-// explicit unavailable branches; see CORPSE_CONTRACTS.md.
++// Original corpse lifetime, damage, limb loss and burning; see DEATH_EFFECT_CONTRACTS.md.
+ class CCorpse : public B2BaseClass
+ {
+   public:
+     CCorpse();
+-    ~CCorpse() override = default;
+-    bool Setup(std::string_view sound_root, bool limb_loss);
++    ~CCorpse() override;
++    bool Setup(std::string_view sound_root, bool limb_loss, HOBJECT fire = nullptr);
++    void ClearBurn();
++    bool UpdateBurn();
++    bool HandleDamage(const OpenBlood2::Damage&);
++    int CalculateHitLimb(DVector, DVector);
++    bool dead = false;
++    HOBJECT fire_source = nullptr, smoke_source = nullptr, last_limb = nullptr;
++    HATTACHMENT burn_attachment = 0;
++    OpenBlood2::SoundId burn_sound = 0;
++    float burn_start = 0, smoke_start = 0;
++    std::uint64_t fire_effect = 0, smoke_effect = 0, gib_events = 0, limbs_created = 0;
++    int hit_limb = -1;
++    std::string burn_error, gib_error;
+     bool OnStringKey(ArgList*);
+     bool initialized = false, configured = false, animation_done = false;
+     bool limb_loss = true;
+@@ -18,7 +29,7 @@ class CCorpse : public B2BaseClass
+     CDestructable m_damage;
+     CAnim_Sound measurements;
+     OpenBlood2::SoundId last_sound = 0; // Inspection only; original key omits GETHANDLE.
+-    std::uint64_t updates = 0, sound_attempts = 0, sound_starts = 0, damage_refusals = 0;
++    std::uint64_t updates = 0, sound_attempts = 0, sound_starts = 0;
+     std::string sound_root, sound_resource, sound_error, error, damage_error;
+     OpenBlood2::SegmentResult pool_result = OpenBlood2::SegmentResult::Invalid;
+     OpenBlood2::SegmentHit pool_hit;
+diff --git a/src/game/original/Gib.cpp b/src/game/original/Gib.cpp
+new file mode 100644
+index 0000000..dc71d5a
+--- /dev/null
++++ b/src/game/original/Gib.cpp
+@@ -0,0 +1,272 @@
++// Selected original AI_Shared.CPP / Gib.cpp. See DEATH_EFFECT_CONTRACTS.md.
++#include "Gib.h"
++#include "AI_Mgr.h"
++#include "engine/collision.h"
++#include "game/game_settings.h"
++#include <cmath>
++#include <cstring>
++#include <numbers>
++using namespace OpenBlood2;
++bool HideLimb(HOBJECT object, int node, std::string& error)
++{
++    auto* s = BaseClass::GetServerDE();
++    if (node != 1 && node != 4 && node != 7 && node != 10 && node != 14)
++        return false;
++    DBOOL hidden = false;
++    if (!s || s->GetModelNodeHideStatus(object, szNodes[node], &hidden) != DE_OK || hidden)
++        return false;
++    if (!hide_character_node(object, node, true, error))
++        return false;
++    if (node == 1)
++        return hide_character_node(object, 0, true, error);
++    // Includes the source's extra +3 node for arms; do not replace with a guessed hierarchy.
++    for (int i = 1; i <= 3; ++i)
++        if (!hide_character_node(object, node + i, true, error))
++            return false;
++    return true;
++}
++HOBJECT CreateLimb(HOBJECT owner, int node, DVector direction, std::string& error)
++{
++    auto* s = BaseClass::GetServerDE();
++    error.clear();
++    ObjectCreateStruct state;
++    state.m_ObjectType = OT_MODEL;
++    std::string model, skin;
++    const char* clip = node == 1                    ? "limb_head"
++                       : (node == 4 || node == 7)   ? "limb_arm"
++                       : (node == 10 || node == 14) ? "limb_leg"
++                                                    : nullptr;
++    if (!s || !clip || !s->IsObjectAlive(owner) || !physics_vector(direction) ||
++        s->QueryModelNodeTransform(owner, szNodes[node], &state.m_Pos, &state.m_Rotation) !=
++            ServerDE::NodeQuery::Found ||
++        s->GetObjectRotation(owner, &state.m_Rotation) != DE_OK || !s->GetModelFilenames(owner, model, skin))
++    {
++        error = "Limb source/node/model unavailable";
++        return nullptr;
++    }
++    if (model.size() >= sizeof(state.m_Filename) || skin.size() >= sizeof(state.m_SkinName))
++    {
++        error = "Limb model path exceeds buffer";
++        return nullptr;
++    }
++    const auto animation = s->GetAnimIndex(owner, clip);
++    DVector dims;
++    if (animation == UINT32_MAX || s->GetModelAnimUserDims(owner, &dims, animation) != DE_OK)
++    {
++        error = "Limb animation unavailable";
++        return nullptr;
++    }
++    direction.y = 1;
++    float speed;
++    if (!s->RandomFloat(200, 500, speed))
++        return nullptr;
++    direction = vector_scale(direction, speed / std::sqrt(vector_dot(direction, direction)));
++    std::strcpy(state.m_Filename, model.c_str());
++    std::strcpy(state.m_SkinName, skin.c_str());
++    std::strcpy(state.m_Name, "Original detached limb");
++    auto* gib = dynamic_cast<CGib*>(s->CreateObject(s->GetClass("CGib"), &state));
++    if (!gib)
++    {
++        error = "Limb creation failed";
++        return nullptr;
++    }
++    const auto h = gib->m_hObject;
++    gib->limb = node;
++    gib->kickable = node == 1;
++    s->SetModelAnimation(h, animation);
++    s->SetModelLooping(h, false);
++    bool ok = gib->initialized && s->GetModelAnimation(h) == animation;
++    for (int i = 0; i < int(NUM_ALL_NODES) && ok; ++i)
++    {
++        if (node == 1 && i <= 1)
++            i = 2;
++        else if ((node == 4 || node == 7) && i == 7)
++            i = 9;
++        else if ((node == 10 || node == 14) && i == 10)
++            i = 14;
++        ok = hide_character_node(h, i, true, error);
++    }
++    // Animation nodes can lie closer to the floor/walls than the limb's raw
++    // clip box permits. Reuse the bounded nonsolid-body placement policy before
++    // the first physics step; never leave a penetrating body in the session.
++    DVector anchor, anchor_half;
++    if (!ok || s->SetObjectDims(h, &dims) != DE_OK || s->GetObjectPos(owner, &anchor) != DE_OK ||
++        s->GetObjectDims(owner, &anchor_half) != DE_OK ||
++        !s->PlaceNonSolidModel(h, state.m_Pos, anchor, anchor_half, gib->placement) ||
++        s->SetVelocity(h, &direction) != DE_OK)
++    {
++        s->RemoveObject(h);
++        if (error.empty())
++            error = "Limb setup failed";
++        return nullptr;
++    }
++    return h;
++}
++CGib::CGib() : B2BaseClass(OT_MODEL)
++{
++    AddAggregate(&damage);
++    RandomRotation();
++}
++void CGib::RandomRotation()
++{
++    auto* s = GetServerDE();
++    const float circle = 2 * std::numbers::pi_v<float>;
++    if (s)
++    {
++        s->RandomFloat(-circle, circle, angular_velocity.x);
++        s->RandomFloat(-circle, circle, angular_velocity.y);
++        s->RandomFloat(-circle, circle, angular_velocity.z);
++        angular_velocity = vector_scale(angular_velocity, 1.f / 3);
++    }
++}
++DDWORD CGib::EngineMessageFn(DDWORD msg, void* data, DFLOAT reason)
++{
++    auto* s = GetServerDE();
++    if (msg == MID_PRECREATE)
++    {
++        auto ret = B2BaseClass::EngineMessageFn(msg, data, reason);
++        auto* state = static_cast<ObjectCreateStruct*>(data);
++        if (!ret || !state || reason != PRECREATE_NORMAL || !state->m_Filename[0])
++            return 0;
++        state->m_Flags = FLAG_VISIBLE | FLAG_RAYHIT | FLAG_GRAVITY | FLAG_TOUCH_NOTIFY;
++        state->m_ObjectType = OT_MODEL;
++        return ret;
++    }
++    if (msg == MID_INITIALUPDATE)
++    {
++        initialized = damage.Init(m_hObject) && s->ConfigureCharacterBody(m_hObject, 3, 9);
++        damage.SetHitPoints(10);
++        damage.m_fMaxHitPoints = 10;
++        damage.SetArmorPoints(0);
++        damage.m_fMass = 3;
++        damage.apply_damage_physics = true;
++        s->SetModelLooping(m_hObject, false);
++        s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) | (100u << 24));
++        if (GetGameType() != GAMETYPE_SINGLE)
++            remove_time = s->GetTime() + 29.9f;
++        s->SetNextUpdate(m_hObject, .1f);
++    }
++    else if (msg == MID_UPDATE && (!initialized || damage.IsDead() || !Update()))
++        s->RemoveObject(m_hObject);
++    else if (msg == MID_TOUCHNOTIFY)
++        Touch(static_cast<HOBJECT>(data));
++    return B2BaseClass::EngineMessageFn(msg, data, reason);
++}
++bool CGib::Update()
++{
++    auto* s = GetServerDE();
++    if (remove_time && remove_time < s->GetTime())
++        return false;
++    DVector velocity, dims;
++    if (s->GetVelocity(m_hObject, &velocity) != DE_OK)
++        return false;
++    if (first_update)
++    {
++        if (s->GetObjectDims(m_hObject, &dims) != DE_OK)
++            return false;
++        if (dims.y < dims.x * .7f)
++            axis = 2;
++        if (dims.x < dims.y * .7f)
++            axis = 1;
++        if (dims.z < dims.y * .7f)
++            axis = 3;
++        first_update = false;
++    }
++    s->GetObjectPos(m_hObject, &last_position);
++    const float dt = s->GetFrameTime();
++    rotate_time -= dt;
++    constexpr float pi = std::numbers::pi_v<float>;
++    if (vector_dot(velocity, velocity) <= 50 || rotate_time <= 0)
++    {
++        angular_velocity = {};
++        auto snap = [](float a)
++        {
++            constexpr float p = std::numbers::pi_v<float>;
++            return a > p / 2 && a < p * 1.5f ? p : 0.f;
++        };
++        if (axis == 1)
++            angles.y = snap(angles.y);
++        if (axis == 2)
++            angles.x = snap(angles.x);
++        if (axis == 3)
++            angles.z = snap(angles.z);
++        s->SetNextUpdate(m_hObject, GetGameType() != GAMETYPE_SINGLE ? .01f : 0.f);
++    }
++    else
++    {
++        angles = vector_add(angles, vector_scale(angular_velocity, dt));
++        if (angles.x > 2 * pi)
++            angles.x -= 2 * pi;
++        if (angles.y > 2 * pi)
++            angles.y -= 2 * pi;
++        if (angles.z > 2 * pi)
++            angles.z -= 2 * pi;
++        s->SetNextUpdate(m_hObject, .01f);
++    }
++    auto rotation = rotation_from_euler(angles);
++    s->SetObjectRotation(m_hObject, &rotation);
++    return true;
++}
++void CGib::BounceSound()
++{
++    int variant;
++    auto* s = GetServerDE();
++    if (!s->RandomInt(1, 3, variant))
++        return;
++    SoundRequest request;
++    request.speaker = m_hObject;
++    request.resource = "sounds/gibs/flesh/gib_impact" + std::to_string(variant) + ".wav";
++    request.outer_radius = 1000;
++    request.inner_radius = 100;
++    s->PlayCharacterSound(m_hObject, request, false, sound_error);
++}
++void CGib::Touch(HOBJECT other)
++{
++    auto* s = GetServerDE();
++    DVector v;
++    if (kickable && other && s->IsKindOf(s->GetObjectClass(other), s->GetClass("CBaseCharacter")) &&
++        s->GetVelocity(other, &v) == DE_OK && vector_dot(v, v) > 25)
++    {
++        v.y += 300;
++        v = vector_scale(v, 2);
++        s->SetVelocity(m_hObject, &v);
++        bounces = 2;
++        RandomRotation();
++        BounceSound();
++        rotate_time = 1;
++        s->SetNextUpdate(m_hObject, .01f);
++        ++kicks;
++        return;
++    }
++    if (other && !(s->GetObjectFlags(other) & FLAG_SOLID))
++        return;
++    if (s->GetVelocity(m_hObject, &v) != DE_OK || int(v.x) + int(v.z) == 0 || --bounces < 0)
++        return;
++    SegmentHit hit;
++    if (s->IntersectSegment(last_position, vector_add(last_position, vector_scale(v, 1.1f)), m_hObject, hit, false,
++                            SegmentObjects::SolidOnly) != SegmentResult::Hit)
++        return;
++    const float r = vector_dot(v, hit.normal) * .3f;
++    if (r <= -100)
++    {
++        BounceSound();
++        v = vector_subtract(v, vector_scale(hit.normal, r));
++        RandomRotation();
++    }
++    v = vector_scale(v, .5f);
++    s->SetVelocity(m_hObject, &v);
++    rotate_time = 1;
++    ++impacts;
++    s->SetNextUpdate(m_hObject, .01f);
++}
++DDWORD CGib::ObjectMessageFn(HOBJECT sender, DDWORD msg, HMESSAGEREAD read)
++{
++    const auto result = B2BaseClass::ObjectMessageFn(sender, msg, read);
++    if (msg == damage_message && damage.IsDead())
++    {
++        // The limb's original GIB_SMALL descendants remove themselves on first update.
++        // Do not invent durable extra fragments for that branch.
++        GetServerDE()->RemoveObject(m_hObject);
++    }
++    return result;
++}
+diff --git a/src/game/original/Gib.h b/src/game/original/Gib.h
+new file mode 100644
+index 0000000..117b51e
+--- /dev/null
++++ b/src/game/original/Gib.h
+@@ -0,0 +1,27 @@
++#pragma once
++#include "CharacterNodes.h"
++#include "Destructable.h"
++// Original AI_Shared limb creation and runtime CGib limb subset.
++bool HideLimb(HOBJECT, int, std::string&);
++HOBJECT CreateLimb(HOBJECT, int, DVector, std::string&);
++class CGib : public B2BaseClass
++{
++  public:
++    CGib();
++    bool initialized = false, kickable = true, first_update = true;
++    int limb = -1, axis = 0, bounces = 0;
++    float rotate_time = 0, remove_time = 0;
++    DVector angles{}, angular_velocity{}, last_position{};
++    std::uint64_t kicks = 0, impacts = 0;
++    OpenBlood2::BodyPlacement placement;
++    CDestructable damage;
++    std::string error, sound_error;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++    bool Update();
++    void Touch(HOBJECT);
++    void BounceSound();
++    void RandomRotation();
++};
+diff --git a/src/game/original/ObjectParticleFX.cpp b/src/game/original/ObjectParticleFX.cpp
+index 8e6c082..bdb8818 100644
+--- a/src/game/original/ObjectParticleFX.cpp
++++ b/src/game/original/ObjectParticleFX.cpp
+@@ -45,13 +45,34 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
+         return Init(type, owner, failure);
+     failure.clear();
+     *this = {};
+-    if ((type != 19 && type != 36) || !owner)
++    if ((type != 19 && type != 36 && type != 21 && type != 24) || !owner)
+     {
+         failure = "Unsupported object particle recipe or absent parent";
+         return false;
+     }
+     recipe = type;
+     parent = owner;
++    if (type == 21 || type == 24)
++    {
++        // CCorpse requests scale=3, SCALENUMPARTICLES only. Other fields stay unscaled.
++        radius = 2500;
++        position_radius = 12.5f;
++        ramp_down = .25f;
++        duration = type == 21 ? 2.f : 0.f;
++        add_delay = type == 21 ? .1f : .05f;
++        gravity = type == 21 ? 125.f : 275.f;
++        density = type == 21 ? 10.f : 7.5f;
++        authored_count = type == 21 ? 9 : 15;
++        requested_alpha = type == 21 ? .25f : .75f;
++        min_life = type == 21 ? .5f : .25f;
++        max_life = type == 21 ? 1.5f : .75f;
++        min_color = type == 21 ? DVector{192, 192, 192} : DVector{192, 0, 0};
++        max_color = {255, 255, 255};
++        flags = type == 21 ? 0x0cu : 0x04u;
++        texture = type == 21 ? "SpriteTextures\\smoke64_2.dtx" : "SpriteTextures\\Firepart64.dtx";
++        initialized_ = true;
++        return true;
++    }
+     const bool shield = type == 19;
+     radius = shield ? 500.f : 1750.f;
+     gravity = shield ? 0.f : 150.f;
+@@ -138,31 +159,47 @@ bool CObjectParticleFX::AddParticles(std::minstd_rand& random, std::size_t budge
+ }
+ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t budget)
+ {
+-    if (particles.size() > budget || authored_count > budget - particles.size() ||
+-        particles.size() + authored_count > 2048)
++    const auto delta = vector_subtract(last_position, position);
++    const float distance = std::sqrt(vector_dot(delta, delta));
++    const float samples = recipe == 21 ? distance / (density * radius / 1000.f) : 1.f;
++    if (!std::isfinite(samples) || samples > 2048)
++    {
++        error = "Object particle stream capacity exceeded";
++        return false;
++    }
++    const unsigned copies = static_cast<unsigned>(samples), count = copies * authored_count;
++    if (particles.size() > budget || count > budget - particles.size() || particles.size() + count > 2048)
+     {
+         error = "Object particle burst capacity exceeded";
+         return false;
+     }
+     auto basis = source_rotation;
+-    particles.reserve(particles.size() + authored_count);
+-    for (unsigned i = 0; i < authored_count; ++i)
++    if (!count)
++        return true; // Source's unused zero-count division is skipped.
++    const auto step = vector_scale(delta, 1.f / copies);
++    particles.reserve(particles.size() + count);
++    for (unsigned i = 0; i < count; ++i)
+     {
+         // Cache axes BEFORE rotating. The source uses the preceding right axis
+         // for this particle, and carries the rotated basis into the next one.
+         auto right = rotate_vector(basis, {1, 0, 0});
+         const auto forward = rotate_vector(basis, {0, 0, 1});
+         around(basis, forward, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
+-        if (recipe == 19)
++        if (recipe == 19 || recipe == 21 || recipe == 24)
+             around(basis, right, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
+         right = vector_scale(right, 1 / std::sqrt(vector_dot(right, right)));
+-        const float speed = draw(random, 0, 0); // Original zero-speed draw still consumes RNG.
++        const float speed =
++            draw(random, 0, recipe == 21 || recipe == 24 ? 25.f : 0.f); // Original zero-speed draw still consumes RNG.
++        auto start =
++            vector_scale(right, recipe == 21 || recipe == 24 ? draw(random, 0, position_radius) : position_radius);
++        if (recipe == 21 || recipe == 24)
++            start = vector_add(
++                start, vector_add(vector_subtract(position, origin), vector_scale(step, float(i / authored_count))));
+         const auto color = vector_scale(
+             vector_add(min_color, vector_scale(vector_subtract(max_color, min_color), draw(random, 0, 1))), 1 / 255.f);
+-        particles.push_back({vector_scale(right, position_radius), vector_scale(right, speed),
+-                             draw(random, min_life, max_life), color});
++        particles.push_back({start, vector_scale(right, speed), draw(random, min_life, max_life), color});
+     }
+-    emitted += authored_count;
++    emitted += count;
+     return true;
+ }
+ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_rand& random, std::size_t budget)
+@@ -199,7 +236,7 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
+         if (duration < elapsed)
+             return false;
+     }
+-    else
++    else if (recipe == 1)
+     {
+         const auto difference = vector_subtract(owner->position, last_object_position);
+         if (difference.x == 0 && difference.y == 0 && difference.z == 0)
+@@ -216,6 +253,12 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
+         // ALIGNROTATION affects emission, not the fixed smoke system transform.
+         source_rotation = owner->rotation;
+     }
++    else if (recipe == 21 || recipe == 24)
++    {
++        position = owner->position;
++        // Both recipes use MOVINGSOURCE; smoke also streams backward between samples.
++        // Neither recipe enables alpha ramp flags: authored alpha remains unused.
++    }
+     else
+     {
+         position = vector_add(owner->position, rotate_vector(owner->rotation, {offset.y, offset.x, offset.z}));
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 8237be1..d1c5b3b 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -18,6 +18,7 @@
+ #include "game/original/ExitTrigger.h"
+ #include "game/original/FlareProjectile.h"
+ #include "game/original/GameStartPoint.h"
++#include "game/original/Gib.h"
+ #include "game/original/Gideon.h"
+ #include "game/original/Grenade.h"
+ #include "game/original/HandWeaponModel.h"
+@@ -124,6 +125,7 @@ namespace OpenBlood2
+                 {"TypeCoop", true},
+                 {"DifficultyInsane", true, false} // Read by original code, absent from its class registration.
+             }};
++        const ClassInfo gib{"CGib", &b2base, construct<CGib>, {}};
+         const ClassInfo corpse{"CCorpse", &b2base, construct<CCorpse>, {}};
+         const ClassInfo camera_object{"CameraObj",
+                                       &b2base,
+@@ -852,10 +854,11 @@ namespace OpenBlood2
+                objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+                objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
+                objects.register_class(world_debris) && objects.register_class(hand_model) &&
+-               objects.register_class(corpse) && objects.register_class(proximity) && objects.register_class(remote) &&
+-               objects.register_class(grenade) && objects.register_class(flare_projectile) &&
+-               objects.register_class(flare_alt) && objects.register_class(flare_burst) &&
+-               objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
++               objects.register_class(gib) && objects.register_class(corpse) && objects.register_class(proximity) &&
++               objects.register_class(remote) && objects.register_class(grenade) &&
++               objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
++               objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
++               objects.register_class(shockwave_projectile);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index a01ff44..7234984 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -10,6 +10,7 @@
+ #include "game/explosion_models.h"
+ #include "game/explosion_rings.h"
+ #include "game/explosion_sprites.h"
++#include "game/flesh_gibs.h"
+ #include "game/laser_beams.h"
+ #include "game/object_particles.h"
+ #include "game/original/BloodShells.h"
+@@ -50,6 +51,7 @@ namespace OpenBlood2
+         SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
+         SoundId PlayLocalSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) override;
+         SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) override;
++        SoundId PlayClientSound(const SoundRequest&, DVector, std::string&) override;
+         SoundId PlaySoundAt(HOBJECT, const SoundRequest&, DVector, std::string&) override;
+         SoundId PlayWorldSound(HOBJECT, const SoundRequest&, bool file_stream, std::string&) override;
+         bool RandomInt(int, int, int&) override;
+@@ -109,6 +111,8 @@ namespace OpenBlood2
+         ExplosionRings explosion_rings;
+         ExplosionFlames explosion_flames;
+         std::uint64_t PublishExplosionFlames(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
++        FleshGibs flesh_gibs;
++        std::uint64_t PublishFleshGibs(HOBJECT, DVector, DVector, DVector, float, unsigned, std::string&) override;
+         ExplosionFragments explosion_fragments;
+         std::uint64_t PublishExplosionFragments(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         std::uint64_t PublishExplosionRings(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+@@ -157,6 +161,7 @@ namespace OpenBlood2
+             explosion_rings.clear();
+             explosion_flames.clear();
+             explosion_fragments.clear();
++            flesh_gibs.clear();
+             spawn_reports.clear();
+             pickup_reports.clear();
+             camera_effects.clear();
+diff --git a/src/game/server_audio.cpp b/src/game/server_audio.cpp
+index d7fa8da..d4d415c 100644
+--- a/src/game/server_audio.cpp
++++ b/src/game/server_audio.cpp
+@@ -46,6 +46,22 @@ namespace OpenBlood2
+             GetObjectPos(request.speaker, &position);
+         return audio.play(*client_resources, owner, request, position, error);
+     }
++    SoundId ServerAdapter::PlayClientSound(const SoundRequest& request, DVector position, std::string& error)
++    {
++        if (!client_resources || request.speaker || request.loop || request.streaming ||
++            request.space != SoundSpace::Spatial)
++        {
++            error = "Client sound requires a buffered spatial one-shot";
++            return 0;
++        }
++        const auto id = audio.play(*client_resources, nullptr, request, position, error);
++        if (auto* voice = audio.get(id))
++        {
++            voice->world_owned = true;
++            voice->auto_remove = true;
++        }
++        return id;
++    }
+     SoundId ServerAdapter::PlaySoundAt(HOBJECT owner, const SoundRequest& request, DVector position, std::string& error)
+     {
+         trace_service("PlaySoundAt");
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index 09ebac4..d9e86a5 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -2,6 +2,17 @@
+ #include <cmath>
+ namespace OpenBlood2
+ {
++    std::uint64_t ServerAdapter::PublishFleshGibs(HOBJECT owner, DVector pos, DVector dir, DVector dims, float scale,
++                                                  unsigned count, std::string& error)
++    {
++        if (!client_resources || !objects_.models)
++        {
++            error = "Flesh-gib resources unavailable";
++            return 0;
++        }
++        return flesh_gibs.publish(owner, pos, dir, dims, scale, count, *this, *objects_.models, *client_resources,
++                                  objects_.time(), error);
++    }
+     std::uint64_t ServerAdapter::PublishParticleStream(HOBJECT owner, const ParticleStreamSettings& settings,
+                                                        std::string& error)
+     {
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index c00414e..53c3ab4 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -495,6 +495,7 @@ namespace OpenBlood2
+         ok = server.explosion_lights.advance(objects.time()) && ok;
+         ok = server.explosion_rings.advance(objects.time()) && ok;
+         ok = server.explosion_flames.advance(objects.time()) && ok;
++        ok = server.flesh_gibs.advance(objects.time(), server) && ok;
+         ok = server.explosion_fragments.advance(objects.time(), server) && ok;
+         ok = server.object_particles.advance(objects.time(), server) && ok;
+         ok = server.particle_streams.advance(objects.time(), server) && ok;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index cac8ba9..f05a3c9 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1719,3 +1719,21 @@ if(BLOOD2_GPU_TESTS)
+     add_test(NAME gpu.world_sprite COMMAND world_sprite_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/world-sprite")
+     set_tests_properties(gpu.world_sprite PROPERTIES LABELS "gpu;world_view;sprite" TIMEOUT 45 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+ endif()
++
++add_executable(death_effect_tests death_effect_tests.cpp)
++target_link_libraries(death_effect_tests PRIVATE blood2_game)
++blood2_project_options(death_effect_tests)
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case IN ITEMS burn gibs limbs damage particles lifetime)
++        add_test(NAME death_effects.${case} COMMAND death_effect_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(death_effects.${case} PROPERTIES LABELS "headless;private;death_effects" TIMEOUT 90)
++    endforeach()
++endif()
++
++if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
++    add_executable(death_effect_gpu_tests death_effect_gpu_tests.cpp ../src/app/model_scene.cpp ../src/app/sprite_scene.cpp)
++    target_link_libraries(death_effect_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(death_effect_gpu_tests)
++    add_test(NAME gpu.death_effects COMMAND death_effect_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/death-effect-gpu" "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(gpu.death_effects PROPERTIES LABELS "gpu;private;death_effects" TIMEOUT 120 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++endif()
+diff --git a/tests/corpse_tests.cpp b/tests/corpse_tests.cpp
+index 682d77b..6e2874c 100644
+--- a/tests/corpse_tests.cpp
++++ b/tests/corpse_tests.cpp
+@@ -169,7 +169,7 @@ namespace
+         std::string model = "unchanged", skin = "unchanged";
+         CHECK(!g.server.GetModelFilenames(nullptr, model, skin) && model == "unchanged" && skin == "unchanged");
+         a->m_damage.reaction_damage_type = DamageType::Fire;
+-        CHECK(!a->CreateCorpse() && a->corpses_created == 1);
++        CHECK(!a->StartBurnDeath() && !a->damage_reaction_error.empty()); // Synthetic model has no torso.
+         CHECK(!g.objects.create(g.objects.find_class("CCorpse"), {}, Creation::World));
+         return true;
+     }
+@@ -240,28 +240,29 @@ namespace
+         auto* a = actor(g);
+         CHECK(a);
+         a->m_bCabal = false;
+-        for (auto type : {DamageType::Fire, DamageType::Explode})
+-        {
+-            a->m_damage.reaction_damage_type = type;
+-            CHECK(!a->HandleDamage() && !a->damage_reaction_error.empty());
+-        }
++        a->m_damage.reaction_damage_type = DamageType::Fire;
++        CHECK(!a->HandleDamage() && !a->damage_reaction_error.empty()); // No synthetic torso.
++        a->m_damage.reaction_damage_type = DamageType::Explode;
++        CHECK(a->HandleDamage() && a->m_bRemoveMe); // Missing cosmetic resource must not freeze the actor.
++        a->m_bRemoveMe = false;
+         a->m_damage.reaction_damage_type = DamageType::Normal;
+         a->m_damage.m_fLastDamagePercent = .9f;
+-        CHECK(!a->HandleDamage());
++        CHECK(a->HandleDamage() && a->m_bRemoveMe);
++        a->m_bRemoveMe = false;
+         a->m_damage.m_fLastDamagePercent = .899f;
+-        CHECK(a->HandleDamage() && a->kill_voice_roll >= 0 && a->m_nState == AI_Mgr::StateRecoil);
++        CHECK(a->HandleDamage() && !a->m_bRemoveMe && a->kill_voice_roll >= 0);
+         a->m_damage.m_fLastDamagePercent = 100;
+         a->m_dwFlags = 0x800;
+-        CHECK(a->HandleDamage());
++        CHECK(a->HandleDamage() && !a->m_bRemoveMe);
+         auto* c = corpse(g);
+         CHECK(c);
+         auto m = g.server.StartMessageToObject(a, c->m_hObject, damage_message);
+         CHECK(g.server.WriteDamage(m, {{0, 0, 1}, {0, 30, 0}, 100, DamageType::Death, a->m_hObject}) == DE_OK &&
+               g.server.EndMessage(m) == DE_OK);
+         CHECK(c->placement.result == BodyPlacementResult::Unqueried); // Direct diagnostic construction, no transfer.
+-        CHECK(c->m_damage.m_fHitPoints == 50 && c->damage_refusals == 1 && !c->damage_error.empty() &&
+-              c->error.empty());
+-        CHECK(g.server.advance_models(.2) && g.objects.advance(.2) && c->animation_done);
++        CHECK(c->m_damage.IsDead() && c->dead && c->error.empty());
++        const auto child = c->m_hObject;
++        CHECK(g.objects.advance(.2) && !g.server.IsObjectAlive(child));
+         return true;
+     }
+     bool accumulation(const std::filesystem::path& path)
+diff --git a/tests/death_effect_gpu_tests.cpp b/tests/death_effect_gpu_tests.cpp
+new file mode 100644
+index 0000000..7b4a2de
+--- /dev/null
++++ b/tests/death_effect_gpu_tests.cpp
+@@ -0,0 +1,185 @@
++#include "app/model_scene.h"
++#include "app/sprite_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/Corpse.h"
++#include "game/original/Gib.h"
++#include <algorithm>
++#include <cmath>
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << " " << error << " " << SDL_GetError() << "\n";                         \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool render(Runtime& runtime, WorldRenderer& renderer, const WorldMesh& mesh, std::uint64_t revision,
++                const std::vector<WorldDraw>& draws, DVector eye, DRotation camera, Capture& capture,
++                std::vector<std::uint8_t>& pixels, std::string& error)
++    {
++        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300)) ||
++            !renderer.prepare(mesh, revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true))
++            return false;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        if (!commands)
++            return false;
++        if (!renderer.draw(commands, capture.texture, mesh, draws, eye, camera, false, error))
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 300;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 300;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
++            return false;
++        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        if (!data)
++            return false;
++        pixels.assign(data, data + 400 * 300 * 4);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string error;
++    Runtime runtime;
++    CHECK(runtime.initialize(true, error));
++    std::cout << "GPU device: "
++              << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu), SDL_PROP_GPU_DEVICE_NAME_STRING,
++                                       "unknown")
++              << "\n";
++    WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
++    GameSession game;
++    CHECK(game.initialize());
++    Config config;
++    config.data_dir = argv[2];
++    CHECK(game.resources.mount_game(config, error));
++    WorldModel floor;
++    floor.points = {{-4000, 0, -4000}, {4000, 0, -4000}, {4000, 0, 4000}, {-4000, 0, 4000}};
++    floor.surfaces.resize(1);
++    floor.surfaces[0].flags = 1;
++    floor.polygons = {{0, {0, 1, 2, 3}}};
++    CHECK(game.collision.build(floor, error));
++    game.server.collision_ready = true;
++    std::filesystem::create_directories(argv[1]);
++    Capture capture;
++    std::vector<std::uint8_t> pixels, again;
++    auto ink = [&]()
++    {
++        unsigned n = 0;
++        for (unsigned i = 0; i < 400 * 300; ++i)
++            if (pixels[i * 4] != 6 || pixels[i * 4 + 1] != 9 || pixels[i * 4 + 2] != 13)
++                ++n;
++        return n;
++    };
++    for (int cycle = 0; cycle < 2; ++cycle)
++    {
++        auto h = game.objects.create(game.objects.find_class("CultistAI"), {}, Creation::World,
++                                     {{"Pos", DVector{0, 100, 100}}, {"AIState", std::string("IDLE")}});
++        auto* ai = dynamic_cast<AI_Mgr*>(game.server.HandleToObject(h));
++        CHECK(ai && ai->RuntimeReady() && ai->m_MoveObj.Update());
++        CHECK(ai->StartBurnDeath());
++        ai->m_damage.reaction_damage_type = DamageType::Fire;
++        CHECK(ai->SetNewState(AI_Mgr::StateDying) && ai->DispatchState() && ai->DispatchState());
++        auto* corpse = dynamic_cast<CCorpse*>(game.server.HandleToObject(ai->last_corpse));
++        CHECK(corpse && corpse->fire_effect);
++        CHECK(game.objects.remove(h) && game.objects.finish_frame());
++        SpriteView sprites;
++        const auto now = game.objects.time();
++        CHECK(game.server.object_particles.advance(now, game.server) &&
++              game.server.object_particles.advance(now + .11, game.server));
++        CHECK(update_sprite_scene(game, sprites, error));
++        CHECK(sprites.entries.size() == 15);
++        const auto* body = game.objects.get(corpse->m_hObject);
++        CHECK(body);
++        DVector torso;
++        DRotation rot;
++        CHECK(game.server.GetModelNodeTransform(corpse->m_hObject, "torso", &torso, &rot));
++        auto eye = vector_subtract(torso, {0, 0, 75});
++        CHECK(
++            render(runtime, renderer, sprites.mesh, sprites.revision, sprites.draws, eye, {}, capture, pixels, error));
++        CHECK(ink() > 25);
++        const auto fire_pixels = ink();
++        CHECK(
++            render(runtime, renderer, sprites.mesh, sprites.revision, sprites.draws, eye, {}, capture, again, error) &&
++            again == pixels);
++        CHECK(capture.save((std::filesystem::path(argv[1]) / ("flame-" + std::to_string(cycle) + ".png")).c_str()));
++        corpse->ClearBurn();
++        CHECK(game.server.object_particles.advance(now + .12, game.server));
++        auto limb = CreateLimb(corpse->m_hObject, 1, {0, 0, 1}, error);
++        CHECK(limb);
++        ModelView models;
++        const auto* detached = game.objects.get(limb);
++        CHECK(detached);
++        models.begin_frame();
++        CHECK(models.add(detached->model.get(), detached->animation, detached->state.m_SkinName,
++                         {detached->state.m_Pos, detached->state.m_Rotation}, detached->state.m_Scale, true, false,
++                         detached->id, detached->state.m_Filename, game.resources, error, detached->hidden_nodes));
++        CHECK(models.entries.size() == 1 && models.entries.front().error.empty() &&
++              models.entries.front().triangles > 0);
++        CHECK(render(runtime, renderer, models.mesh, models.revision, models.world_draws,
++                     vector_subtract(detached->state.m_Pos, {0, 0, 50}), {}, capture, pixels, error));
++        CHECK(ink() > 25);
++        const auto limb_pixels = ink();
++        ObjectCreateStruct smoke_state;
++        smoke_state.m_Pos = {0, 100, 100};
++        auto smoke = game.objects.create(game.objects.find_class("BaseClass"), smoke_state);
++        CHECK(smoke);
++        CHECK(game.server.PublishObjectParticles(smoke, 21, error));
++        CHECK(game.server.object_particles.advance(now + .13, game.server));
++        smoke_state.m_Pos.x += 26;
++        CHECK(game.server.TeleportObject(smoke, &smoke_state.m_Pos) == DE_OK);
++        CHECK(game.server.object_particles.advance(now + .24, game.server));
++        CHECK(update_sprite_scene(game, sprites, error) && sprites.entries.size() == 9);
++        CHECK(render(runtime, renderer, sprites.mesh, sprites.revision, sprites.draws, {26, 100, 25}, {}, capture,
++                     pixels, error));
++        CHECK(ink() > 25);
++        const auto smoke_pixels = ink();
++        CHECK(game.objects.remove(smoke) && game.objects.finish_frame());
++        CHECK(game.server.PublishFleshGibs(corpse->m_hObject, {0, 100, 100}, {0, 100, 0}, {10, 10, 10}, 1, 8, error));
++        CHECK(update_explosion_model_scene(game, models, error) &&
++              models.entries.size() == game.server.flesh_gibs.active.size() && models.entries.size() >= 8);
++        for (const auto& e : models.entries)
++            CHECK(e.error.empty() && e.triangles > 0);
++        CHECK(render(runtime, renderer, models.mesh, models.revision, models.world_draws, {0, 100, 40}, {}, capture,
++                     pixels, error));
++        CHECK(ink() > 25);
++        CHECK(capture.save((std::filesystem::path(argv[1]) / ("flesh-" + std::to_string(cycle) + ".png")).c_str()));
++        std::cout << "death FX cycle=" << cycle << " flame pixels=" << fire_pixels << " smoke pixels=" << smoke_pixels
++                  << " limb pixels=" << limb_pixels << " flesh pixels=" << ink()
++                  << "; hidden UI, repeated readback unchanged\n";
++        CHECK(game.unload_world());
++        sprites.clear();
++        models.clear();
++        renderer.clear_geometry();
++        CHECK(game.resources.mount_game(config, error) && game.collision.build(floor, error));
++        game.server.collision_ready = true;
++    }
++    return 0;
++}
+diff --git a/tests/death_effect_tests.cpp b/tests/death_effect_tests.cpp
+new file mode 100644
+index 0000000..9d8412d
+--- /dev/null
++++ b/tests/death_effect_tests.cpp
+@@ -0,0 +1,304 @@
++#include "engine/collision.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/Corpse.h"
++#include "game/original/Gib.h"
++#include "game/server_adapter.h"
++#include <algorithm>
++#include <cmath>
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << "\n";                                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool setup(GameSession& g, const char* root, bool initialize = true)
++    {
++        if (initialize)
++            CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        WorldModel floor;
++        floor.points = {{-4000, 0, -4000}, {4000, 0, -4000}, {4000, 0, 4000}, {-4000, 0, 4000}};
++        floor.surfaces.resize(1);
++        floor.surfaces[0].flags = 1;
++        floor.polygons = {{0, {0, 1, 2, 3}}};
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        return true;
++    }
++    AI_Mgr* actor(GameSession& g, const char* type = "CultistAI", DVector position = {0, 100, 0})
++    {
++        auto h = g.objects.create(
++            g.objects.find_class(type), {}, Creation::World,
++            {{"Pos", position}, {"AIState", std::string("IDLE")}, {"AIWeapon1", std::string("BERETTA")}});
++        auto* a = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h));
++        if (!a || !a->RuntimeReady() || !a->m_MoveObj.Update())
++            return nullptr;
++        return a;
++    }
++    bool step(GameSession& g, double dt)
++    {
++        CHECK(g.server.advance_models(dt) && g.server.advance_physics(dt) && g.objects.advance(dt));
++        CHECK(g.server.object_particles.advance(g.objects.time(), g.server));
++        CHECK(g.server.flesh_gibs.advance(g.objects.time(), g.server));
++        CHECK(g.server.advance_audio(dt, {}, {}));
++        return true;
++    }
++    bool hit(GameSession& g, HOBJECT owner, Damage damage)
++    {
++        auto m = g.server.StartMessageToObject(g.server.HandleToObject(owner), owner, damage_message);
++        CHECK(m && g.server.WriteDamage(m, damage) == DE_OK && g.server.EndMessage(m) == DE_OK);
++        return true;
++    }
++    bool burn(const char* root)
++    {
++        for (auto type : {"CultistAI", "CivilianAI"})
++        {
++            GameSession g;
++            CHECK(setup(g, root));
++            auto* a = actor(g, type);
++            CHECK(a);
++            const auto source = a->m_hObject;
++            a->m_dwFlags |= 0x800; // NEVERGIB does not suppress burning.
++            a->m_damage.SetArmorPoints(0);
++            CHECK(hit(g, source, {{0, 0, 1}, {0, 100, 0}, 500, DamageType::Fire, source, true}));
++            CHECK(a->m_damage.IsDead() && a->fire_source && !a->runtime_failed && !a->m_bRemoveMe);
++            const auto flame = a->fire_source;
++            CHECK(a->AI_Update() && a->AI_Update() && a->last_corpse);
++            const auto h = a->last_corpse;
++            auto* c = dynamic_cast<CCorpse*>(g.server.HandleToObject(h));
++            CHECK(c && c->fire_effect && c->burn_sound && c->burn_attachment && c->smoke_source && !a->fire_source);
++            const auto smoke = c->smoke_source;
++            const auto* record = g.objects.get(h);
++            CHECK(std::string_view(record->state.m_SkinName) == "skins\\enemies\\burned.dtx");
++            CHECK(!(record->state.m_Flags & FLAG_SOLID));
++            CHECK(g.objects.remove(source) && g.objects.finish_frame() && g.server.IsObjectAlive(flame));
++            std::size_t peak = 0;
++            while (g.objects.time() < 4.95)
++            {
++                CHECK(step(g, .01));
++                peak = std::max(peak, g.server.object_particles.particle_count());
++            }
++            CHECK(c->fire_source == flame && !c->smoke_start && c->burn_sound && peak > 0);
++            while (g.objects.time() < 5.2)
++                CHECK(step(g, .01));
++            CHECK(!c->fire_source && c->smoke_start > 5 && c->smoke_effect && !c->burn_sound &&
++                  !g.server.IsObjectAlive(flame));
++            const auto smoke_start = c->smoke_start;
++            while (g.objects.time() < smoke_start + 2.2)
++                CHECK(step(g, .01));
++            CHECK(g.server.object_particles.active.empty() && g.server.IsObjectAlive(smoke)); // FX lasts 2s, source 5s.
++            while (g.objects.time() < smoke_start + 5.2)
++                CHECK(step(g, .01));
++            CHECK(!c->smoke_source && !c->burn_attachment && c->animation_done && c->error.empty() &&
++                  c->burn_error.empty());
++            CHECK(!g.server.IsObjectAlive(smoke));
++            std::cout << type << " burned: particles=" << peak << " smoke start=" << smoke_start
++                      << " independent corpse complete\n";
++            CHECK(g.unload_world() && g.server.audio.voices().empty() && g.objects.attachments().empty());
++        }
++        return true;
++    }
++    bool gibs(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        for (int cycle = 0; cycle < 3; ++cycle)
++        {
++            auto* a = actor(g);
++            CHECK(a);
++            const auto h = a->m_hObject;
++            a->m_damage.SetArmorPoints(0);
++            CHECK(hit(g, h,
++                      {{0, 0, 1}, {0, 100, 0}, 500, cycle == 0 ? DamageType::Explode : DamageType::Normal, h, true}));
++            CHECK(a->m_damage.IsDead() && a->m_bRemoveMe && !a->runtime_failed && a->gib_events == 1 &&
++                  a->gib_error.empty());
++            const auto count = g.server.flesh_gibs.active.size();
++            CHECK(count >= 7);
++            const auto initial_position = g.server.flesh_gibs.active.front().position;
++            CHECK(g.server.flesh_gibs.advance(g.objects.time(), g.server)); // Publication frame has zero elapsed time.
++            CHECK(g.server.flesh_gibs.active.front().position.x == initial_position.x &&
++                  g.server.flesh_gibs.active.front().position.y == initial_position.y);
++            CHECK(g.objects.engine_message(h, MID_UPDATE, nullptr) && g.objects.finish_frame() && !g.objects.get(h));
++            CHECK(g.server.flesh_gibs.active.size() == count);
++            for (int i = 0; i < 400; ++i)
++                CHECK(step(g, .02));
++            unsigned impacts = 0;
++            for (const auto& f : g.server.flesh_gibs.active)
++            {
++                CHECK(f.error.empty() && f.sound_error.empty());
++                impacts += f.impacts;
++            }
++            CHECK(impacts > 0);
++            const auto id = g.server.flesh_gibs.active.back().id;
++            std::string error;
++            CHECK(!g.server.PublishFleshGibs(nullptr, {}, {}, {1, 1, 1}, 1, 2, error) && !error.empty());
++            CHECK(g.unload_world() && g.server.flesh_gibs.active.empty() && g.server.object_particles.active.empty());
++            std::cout << "gib cycle=" << cycle << " count=" << count << " impacts=" << impacts << " final id=" << id
++                      << "\n";
++            CHECK(setup(g, root, false));
++        }
++        return true;
++    }
++    bool limbs(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = actor(g);
++        CHECK(a);
++        std::string error;
++        std::vector<HOBJECT> limbs;
++        for (int node : {1, 4, 7, 10, 14})
++        {
++            auto h = CreateLimb(a->m_hObject, node, {0, 0, 100}, error);
++            if (!h)
++                std::cerr << error << "\n";
++            CHECK(h);
++            limbs.push_back(h);
++            auto* limb = dynamic_cast<CGib*>(g.server.HandleToObject(h));
++            CHECK(limb && limb->initialized && placement_succeeded(limb->placement));
++            CHECK(limb->kickable == (node == 1) && !(g.server.GetObjectFlags(h) & FLAG_SOLID));
++            const auto* r = g.objects.get(h);
++            CHECK(r->model && std::count(r->hidden_nodes.begin(), r->hidden_nodes.end(), 1) > 0);
++            DBOOL already = false;
++            CHECK(g.server.GetModelNodeHideStatus(a->m_hObject, szNodes[node], &already) == DE_OK);
++            CHECK(HideLimb(a->m_hObject, node, error) == !already); // Original arm +3 may already hide its neighbor.
++            CHECK(!HideLimb(a->m_hObject, node, error));
++        }
++        a->m_damage.node_hit = 2;
++        CHECK(a->SetNewState(AI_Mgr::StateDying) && a->DispatchState() && a->DispatchState());
++        auto corpse = a->last_corpse;
++        auto* c = dynamic_cast<CCorpse*>(g.server.HandleToObject(corpse));
++        CHECK(c);
++        for (int node : {1, 4, 7, 10, 14})
++        {
++            DBOOL hidden = false;
++            CHECK(g.server.GetModelNodeHideStatus(corpse, szNodes[node], &hidden) == DE_OK && hidden);
++        }
++        const auto owner = a->m_hObject;
++        CHECK(g.objects.remove(owner) && g.objects.finish_frame());
++        CHECK(!g.server.IsObjectAlive(owner) && g.server.IsObjectAlive(corpse));
++        for (auto limb : limbs)
++            CHECK(g.server.IsObjectAlive(limb));
++        CHECK(hit(g, corpse, {{0, 0, 1}, {0, 100, 0}, 100, DamageType::Explode, corpse, true}));
++        CHECK(c->dead && c->gib_events == 1 &&
++              c->limbs_created == 0); // Hidden limbs never duplicate on corpse gibbing.
++        CHECK(step(g, .2) && !g.server.IsObjectAlive(corpse));
++        CHECK(g.unload_world() && g.objects.attachments().empty());
++        return true;
++    }
++    bool damage(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = actor(g);
++        CHECK(a);
++        a->m_damage.node_hit = 1;
++        CHECK(a->SetNewState(AI_Mgr::StateDying) && a->DispatchState() && a->DispatchState());
++        const auto h = a->last_corpse;
++        auto* c = dynamic_cast<CCorpse*>(g.server.HandleToObject(h));
++        CHECK(c);
++        for (int i = 0; i < 20 && !c->limbs_created; ++i)
++        {
++            DVector head;
++            DRotation rotation;
++            CHECK(g.server.GetModelNodeTransform(h, "head", &head, &rotation));
++            head.z += 1;
++            CHECK(hit(g, h, {{0, 0, 1}, head, 1, DamageType::Normal, h}));
++        }
++        CHECK(c->limbs_created == 1 && c->hit_limb == 1 && !c->dead && c->m_damage.m_fHitPoints < 50);
++        CHECK(g.server.IsObjectAlive(c->last_limb));
++        DBOOL hidden = false;
++        CHECK(g.server.GetModelNodeHideStatus(h, "head", &hidden) == DE_OK && hidden);
++        CHECK(hit(g, h, {{0, 0, 1}, {0, 100, 0}, 100, DamageType::Explode, h, true}));
++        CHECK(c->dead && c->gib_events == 1 && c->gib_error.empty());
++        CHECK(step(g, .2) && !g.server.IsObjectAlive(h));
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool particles(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        std::minstd_rand rng(17);
++        NodePose pose{{0, 100, 0}, {}};
++        CObjectParticleFX fire, smoke;
++        CHECK(fire.Init(24, 1, rng, error) && smoke.Init(21, 2, rng, error));
++        CHECK(fire.authored_count == 15 && smoke.authored_count == 9 && fire.duration == 0 && smoke.duration == 2);
++        CHECK(fire.CreateObject(g.resources, pose, 10, error) && smoke.CreateObject(g.resources, pose, 10, error));
++        CHECK(fire.Update(10, &pose, rng) && smoke.Update(10, &pose, rng));
++        CHECK(fire.Update(10.11, &pose, rng) && smoke.Update(10.11, &pose, rng));
++        CHECK(fire.particles.size() == 15 && smoke.particles.empty() && fire.alpha == 1 && smoke.alpha == 1);
++        pose.position.x += 26;
++        CHECK(smoke.Update(10.22, &pose, rng) && smoke.particles.size() == 9 && smoke.origin.x == 0);
++        CHECK(fire.Update(10.22, &pose, rng) && fire.origin.x == 0);
++        const auto old = smoke.emitted;
++        CHECK(smoke.Update(10.33, &pose, rng) && smoke.emitted == old);
++        CHECK(smoke.Update(12, &pose, rng) && !smoke.Update(12.001, &pose, rng) && smoke.error.empty());
++        CHECK(!fire.Update(12.001, nullptr, rng) && fire.error.empty());
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool lifetime(const char* root)
++    {
++        for (int phase = 0; phase < 3; ++phase)
++        {
++            GameSession g;
++            CHECK(setup(g, root));
++            auto* a = actor(g);
++            CHECK(a);
++            const auto h = a->m_hObject;
++            CHECK(a->StartBurnDeath());
++            const auto fire = a->fire_source;
++            if (phase)
++            {
++                a->m_damage.reaction_damage_type = DamageType::Fire;
++                CHECK(a->SetNewState(AI_Mgr::StateDying) && a->DispatchState() && a->DispatchState());
++                auto c = a->last_corpse;
++                auto* body = dynamic_cast<CCorpse*>(g.server.HandleToObject(c));
++                CHECK(body);
++                if (phase == 2)
++                    for (int i = 0; i < 270; ++i)
++                        CHECK(step(g, .02));
++                CHECK(g.objects.remove(c) && g.objects.finish_frame());
++            }
++            CHECK(g.objects.remove(h) || !g.server.IsObjectAlive(h));
++            CHECK(g.objects.finish_frame());
++            CHECK(!g.server.IsObjectAlive(fire) && g.objects.attachments().empty());
++            CHECK(g.server.object_particles.advance(g.objects.time(), g.server) &&
++                  g.server.object_particles.active.empty());
++            CHECK(g.server.advance_audio(.01, {}, {}));
++            CHECK(g.unload_world() && g.server.audio.voices().empty());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::string mode = argv[1];
++    if (mode == "burn")
++        return burn(argv[2]) ? 0 : 1;
++    if (mode == "gibs")
++        return gibs(argv[2]) ? 0 : 1;
++    if (mode == "limbs")
++        return limbs(argv[2]) ? 0 : 1;
++    if (mode == "damage")
++        return damage(argv[2]) ? 0 : 1;
++    if (mode == "particles")
++        return particles(argv[2]) ? 0 : 1;
++    if (mode == "lifetime")
++        return lifetime(argv[2]) ? 0 : 1;
++    return 2;
++}
+diff --git a/tests/weapon_drop_tests.cpp b/tests/weapon_drop_tests.cpp
+index a9b4212..e1f9f4e 100644
+--- a/tests/weapon_drop_tests.cpp
++++ b/tests/weapon_drop_tests.cpp
+@@ -319,8 +319,8 @@ namespace
+             auto m = g.server.StartMessageToObject(a, h, damage_message);
+             CHECK(g.server.WriteDamage(m, {{0, 0, 1}, {0, 150, 0}, 10000, DamageType::Death, h}) == DE_OK &&
+                   g.server.EndMessage(m) == DE_OK);
+-            CHECK(a->m_damage.IsDead() && a->runtime_failed && a->m_InventoryMgr.drops == 1 &&
+-                  !a->m_InventoryMgr.CurrentWeapon());
++            CHECK(a->m_damage.IsDead() && !a->runtime_failed && a->m_bRemoveMe && a->gib_events == 1 &&
++                  a->m_InventoryMgr.drops == 1 && !a->m_InventoryMgr.CurrentWeapon());
+             CHECK(g.objects.remove(h) && g.objects.finish_frame() && g.server.IsObjectAlive(hand));
+             for (int i = 0; i < 130 && g.server.IsObjectAlive(hand); ++i)
+                 CHECK(g.server.advance_physics(.01) && g.objects.advance(.01));
+@@ -334,7 +334,7 @@ namespace
+             MovementState landed;
+             CHECK(g.server.GetMovementState(ph, landed) && landed.standing);
+             std::cout << "Retail Cultist lethal drop cycle " << load
+-                      << ": detached Beretta -> original pickup (death remains unavailable)\n";
++                      << ": detached Beretta -> original pickup (original gib death accepted)\n";
+             CHECK(g.objects.clear() && !g.objects.get(hand) && g.objects.attachments().empty() &&
+                   !g.server.message_count());
+             g.server.spawn_reports.clear();

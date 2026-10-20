@@ -1,0 +1,14 @@
+363/372 Testing: ai_state.transitions
+363/372 Test: ai_state.transitions
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_state_tests" "transitions"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_state.transitions" start time: Oct 16 11:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.transitions" end time: Oct 16 11:01 CEST
+"ai_state.transitions" time elapsed: 00:00:00
+----------------------------------------------------------

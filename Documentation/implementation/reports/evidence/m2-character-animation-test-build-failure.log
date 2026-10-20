@@ -1,0 +1,88 @@
+[0/2] Re-checking globbed directories...
+[1/154] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_models.cpp for CXX dependencies
+[2/154] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[3/88] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[4/88] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[5/85] Building CXX object tests/CMakeFiles/config_tests.dir/config_tests.cpp.o
+[6/85] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_models.cpp.o
+[7/85] Linking CXX static library libblood2_game.a
+[8/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/pickup_smoke.cpp.o
+[9/85] Building CXX object tests/CMakeFiles/object_contract_tests.dir/object_contract_tests.cpp.o
+[10/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[11/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/objectives_smoke.cpp.o
+[12/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/camera_smoke.cpp.o
+[13/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/keyframe_smoke.cpp.o
+[14/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/light_smoke.cpp.o
+[15/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/cinematic_smoke.cpp.o
+[16/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/random_sound_smoke.cpp.o
+[17/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/world_sound_smoke.cpp.o
+[18/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/sprite_smoke.cpp.o
+[19/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/scene_explosion_smoke.cpp.o
+[20/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_skeleton.cpp.o
+[21/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o
+[22/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_cameras.cpp.o
+[23/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_keyframes.cpp.o
+[24/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_lights.cpp.o
+[25/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_cinematics.cpp.o
+[26/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_random_sounds.cpp.o
+[27/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_scene_explosions.cpp.o
+[28/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_sprites.cpp.o
+[29/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_world_sounds.cpp.o
+[30/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_objectives.cpp.o
+[31/85] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_pickups.cpp.o
+[32/85] Building CXX object tests/CMakeFiles/world_tests.dir/world_tests.cpp.o
+[33/85] Building CXX object tests/CMakeFiles/services_tests.dir/services_tests.cpp.o
+[34/85] Building CXX object tests/CMakeFiles/player_tests.dir/player_tests.cpp.o
+[35/85] Building CXX object tests/CMakeFiles/weapon_tests.dir/weapon_tests.cpp.o
+[36/85] Building CXX object tests/CMakeFiles/movement_tests.dir/movement_tests.cpp.o
+[37/85] Building CXX object tests/CMakeFiles/locomotion_tests.dir/locomotion_tests.cpp.o
+[38/85] Building CXX object tests/CMakeFiles/door_tests.dir/door_tests.cpp.o
+[39/85] Building CXX object tests/CMakeFiles/container_tests.dir/container_tests.cpp.o
+[40/85] Building CXX object tests/CMakeFiles/trigger_tests.dir/trigger_tests.cpp.o
+[41/85] Building CXX object tests/CMakeFiles/interaction_tests.dir/interaction_tests.cpp.o
+[42/85] Building CXX object tests/CMakeFiles/explosion_tests.dir/explosion_tests.cpp.o
+[43/85] Building CXX object tests/CMakeFiles/brush_tests.dir/brush_tests.cpp.o
+[44/85] Building CXX object tests/CMakeFiles/pushable_tests.dir/pushable_tests.cpp.o
+[45/85] Building CXX object tests/CMakeFiles/pickup_tests.dir/pickup_tests.cpp.o
+[46/85] Building CXX object tests/CMakeFiles/objectives_tests.dir/objectives_tests.cpp.o
+[47/85] Building CXX object tests/CMakeFiles/camera_tests.dir/camera_tests.cpp.o
+[48/85] Building CXX object tests/CMakeFiles/keyframer_tests.dir/keyframer_tests.cpp.o
+[49/85] Building CXX object tests/CMakeFiles/light_tests.dir/light_tests.cpp.o
+[50/85] Building CXX object tests/CMakeFiles/worldpath_tests.dir/worldpath_tests.cpp.o
+[51/85] Building CXX object tests/CMakeFiles/cinematic_tests.dir/cinematic_tests.cpp.o
+[52/85] Building CXX object tests/CMakeFiles/random_sound_tests.dir/random_sound_tests.cpp.o
+[53/85] Building CXX object tests/CMakeFiles/sound_tests.dir/sound_tests.cpp.o
+[54/85] Building CXX object tests/CMakeFiles/sprite_tests.dir/sprite_tests.cpp.o
+[55/85] Building CXX object tests/CMakeFiles/character_animation_tests.dir/character_animation_tests.cpp.o
+FAILED: [code=1] tests/CMakeFiles/character_animation_tests.dir/character_animation_tests.cpp.o 
+/usr/bin/c++  -I/home/yann/projects/lithtech/Blood2/src -I/home/yann/projects/lithtech/Blood2/src/game/legacy -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/sdl3-build/include-revision -isystem /home/yann/projects/lithtech/Blood2/build/debug/_deps/sdl3-src/include -g -std=c++20 -Wall -Wextra -Wpedantic -MD -MT tests/CMakeFiles/character_animation_tests.dir/character_animation_tests.cpp.o -MF tests/CMakeFiles/character_animation_tests.dir/character_animation_tests.cpp.o.d -fmodules-ts -fmodule-mapper=tests/CMakeFiles/character_animation_tests.dir/character_animation_tests.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o tests/CMakeFiles/character_animation_tests.dir/character_animation_tests.cpp.o -c /home/yann/projects/lithtech/Blood2/tests/character_animation_tests.cpp
+/home/yann/projects/lithtech/Blood2/tests/character_animation_tests.cpp: In function ‘bool {anonymous}::catalog(const std::filesystem::__cxx11::path&)’:
+/home/yann/projects/lithtech/Blood2/tests/character_animation_tests.cpp:245:35: error: ‘class OpenBlood2::GameSession’ has no member named ‘mount_data’
+  245 |         CHECK(g.initialize() && g.mount_data(root, error));
+      |                                   ^~~~~~~~~~
+/home/yann/projects/lithtech/Blood2/tests/character_animation_tests.cpp:13:15: note: in definition of macro ‘CHECK’
+   13 |         if (!(x))                                                                                                      \
+      |               ^
+/home/yann/projects/lithtech/Blood2/tests/character_animation_tests.cpp: In function ‘bool {anonymous}::player(const std::filesystem::__cxx11::path&)’:
+/home/yann/projects/lithtech/Blood2/tests/character_animation_tests.cpp:292:35: error: ‘class OpenBlood2::GameSession’ has no member named ‘mount_data’
+  292 |         CHECK(g.initialize() && g.mount_data(root, error));
+      |                                   ^~~~~~~~~~
+/home/yann/projects/lithtech/Blood2/tests/character_animation_tests.cpp:13:15: note: in definition of macro ‘CHECK’
+   13 |         if (!(x))                                                                                                      \
+      |               ^
+/home/yann/projects/lithtech/Blood2/tests/character_animation_tests.cpp:296:32: error: cannot convert ‘const char [11]’ to ‘const OpenBlood2::WorldMessage&’
+  296 |             CHECK(g.load_world("01_SubwayA", error) && g.enter_player(error));
+      |                                ^~~~~~~~~~~~
+      |                                |
+      |                                const char [11]
+/home/yann/projects/lithtech/Blood2/tests/character_animation_tests.cpp:13:15: note: in definition of macro ‘CHECK’
+   13 |         if (!(x))                                                                                                      \
+      |               ^
+In file included from /home/yann/projects/lithtech/Blood2/tests/character_animation_tests.cpp:2:
+/home/yann/projects/lithtech/Blood2/src/game/server_adapter.h:299:45: note: initializing argument 1 of ‘bool OpenBlood2::GameSession::load_world(const OpenBlood2::WorldMessage&, std::string&)’
+  299 |         bool load_world(const WorldMessage& message, std::string& error);
+      |                         ~~~~~~~~~~~~~~~~~~~~^~~~~~~
+[56/85] Building CXX object tests/CMakeFiles/scene_explosion_tests.dir/scene_explosion_tests.cpp.o
+[57/85] Linking CXX executable blood2
+[58/85] Linking CXX executable tests/object_contract_tests
+ninja: build stopped: subcommand failed.

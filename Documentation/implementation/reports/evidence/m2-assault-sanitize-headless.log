@@ -1,0 +1,223 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+        Start 692: flare.private
+        Start 683: mac10.private
+  1/102 Test #692: flare.private .....................   Passed  160.72 sec
+        Start  69: weapons.private
+  2/102 Test #683: mac10.private .....................   Passed  172.12 sec
+        Start  41: world.destination_trial_private
+  3/102 Test  #41: world.destination_trial_private ...   Passed   27.09 sec
+        Start  42: world.destination_private
+  4/102 Test  #42: world.destination_private .........   Passed   14.06 sec
+        Start 609: energy.private
+  5/102 Test #609: energy.private ....................   Passed   13.84 sec
+        Start  54: services.private
+  6/102 Test  #54: services.private ..................   Passed   13.03 sec
+        Start 693: flare.ai
+  7/102 Test #693: flare.ai ..........................   Passed    2.05 sec
+        Start 506: inventory_state.private
+  8/102 Test #506: inventory_state.private ...........   Passed    7.37 sec
+        Start 684: mac10.ai
+  9/102 Test #684: mac10.ai ..........................   Passed    1.96 sec
+        Start  43: world.private
+ 10/102 Test  #43: world.private .....................   Passed    4.75 sec
+        Start 679: mac10.automatic
+ 11/102 Test #679: mac10.automatic ...................   Passed    1.18 sec
+        Start 485: weapon_drops.catalog
+ 12/102 Test #485: weapon_drops.catalog ..............   Passed    0.66 sec
+        Start  25: world.destination_trials
+ 13/102 Test  #25: world.destination_trials ..........   Passed    0.19 sec
+        Start 682: mac10.drop
+ 14/102 Test #682: mac10.drop ........................   Passed    0.15 sec
+        Start 690: flare.drop
+ 15/102 Test #690: flare.drop ........................   Passed    0.06 sec
+        Start 688: flare.weapon
+ 16/102 Test #688: flare.weapon ......................   Passed    0.06 sec
+        Start  37: world.mutations
+ 17/102 Test  #37: world.mutations ...................   Passed    0.33 sec
+        Start 689: flare.collect
+ 18/102 Test #689: flare.collect .....................   Passed    0.08 sec
+        Start  46: services.model_rejection
+ 19/102 Test  #46: services.model_rejection ..........   Passed    0.51 sec
+        Start  28: world.destination_lifetime
+ 20/102 Test  #28: world.destination_lifetime ........   Passed    0.06 sec
+        Start 686: flare.alternate
+ 21/102 Test #686: flare.alternate ...................   Passed    0.05 sec
+        Start 603: energy.weapon
+ 22/102 Test #603: energy.weapon .....................   Passed    0.05 sec
+        Start 685: flare.primary
+ 23/102 Test #685: flare.primary .....................   Passed    0.05 sec
+        Start 687: flare.lifetime
+ 24/102 Test #687: flare.lifetime ....................   Passed    0.04 sec
+        Start 691: flare.failures
+ 25/102 Test #691: flare.failures ....................   Passed    0.04 sec
+        Start 678: mac10.collect
+ 26/102 Test #678: mac10.collect .....................   Passed    0.06 sec
+        Start  66: weapons.animation
+ 27/102 Test  #66: weapons.animation .................   Passed    0.34 sec
+        Start 680: mac10.damage
+ 28/102 Test #680: mac10.damage ......................   Passed    0.06 sec
+        Start 681: mac10.restore
+ 29/102 Test #681: mac10.restore .....................   Passed    0.05 sec
+        Start 605: energy.lifetime
+ 30/102 Test #605: energy.lifetime ...................   Passed    0.04 sec
+        Start 606: energy.callbacks
+ 31/102 Test #606: energy.callbacks ..................   Passed    0.04 sec
+        Start 608: energy.ai
+ 32/102 Test #608: energy.ai .........................   Passed    0.04 sec
+        Start 604: energy.filters
+ 33/102 Test #604: energy.filters ....................   Passed    0.04 sec
+        Start 607: energy.failures
+ 34/102 Test #607: energy.failures ...................   Passed    0.04 sec
+        Start 479: weapon_drops.falling
+ 35/102 Test #479: weapon_drops.falling ..............   Passed    0.06 sec
+        Start  30: world.sound_entries
+ 36/102 Test  #30: world.sound_entries ...............   Passed    0.05 sec
+        Start  29: world.sprite_entries
+ 37/102 Test  #29: world.sprite_entries ..............   Passed    0.05 sec
+        Start 476: weapon_drops.collect
+ 38/102 Test #476: weapon_drops.collect ..............   Passed    0.05 sec
+        Start 480: weapon_drops.guards
+ 39/102 Test #480: weapon_drops.guards ...............   Passed    0.05 sec
+        Start 483: weapon_drops.callback
+ 40/102 Test #483: weapon_drops.callback .............   Passed    0.05 sec
+        Start 484: weapon_drops.missing_pickup
+ 41/102 Test #484: weapon_drops.missing_pickup .......   Passed    0.05 sec
+        Start 477: weapon_drops.protocol
+ 42/102 Test #477: weapon_drops.protocol .............   Passed    0.05 sec
+        Start 478: weapon_drops.drop
+ 43/102 Test #478: weapon_drops.drop .................   Passed    0.05 sec
+        Start 481: weapon_drops.failures
+ 44/102 Test #481: weapon_drops.failures .............   Passed    0.05 sec
+        Start   1: objects.builtin_model
+ 45/102 Test   #1: objects.builtin_model .............   Passed    0.03 sec
+        Start 482: weapon_drops.nosliding
+ 46/102 Test #482: weapon_drops.nosliding ............   Passed    0.05 sec
+        Start  52: services.placement_service
+ 47/102 Test  #52: services.placement_service ........   Passed    0.02 sec
+        Start  51: services.placement_queries
+ 48/102 Test  #51: services.placement_queries ........   Passed    0.02 sec
+        Start  27: world.destination_schema
+ 49/102 Test  #27: world.destination_schema ..........   Passed    0.02 sec
+        Start  36: world.world_rejection
+ 50/102 Test  #36: world.world_rejection .............   Passed    0.06 sec
+        Start  26: world.destination_messages
+ 51/102 Test  #26: world.destination_messages ........   Passed    0.02 sec
+        Start  11: objects.unsupported_teardown
+ 52/102 Test  #11: objects.unsupported_teardown ......   Passed    0.05 sec
+        Start 505: inventory_state.capture
+ 53/102 Test #505: inventory_state.capture ...........   Passed    0.05 sec
+        Start  10: objects.messages_strings
+ 54/102 Test  #10: objects.messages_strings ..........   Passed    0.04 sec
+        Start 502: inventory_state.roundtrip
+ 55/102 Test #502: inventory_state.roundtrip .........   Passed    0.04 sec
+        Start 503: inventory_state.malformed
+ 56/102 Test #503: inventory_state.malformed .........   Passed    0.04 sec
+        Start 504: inventory_state.rollback
+ 57/102 Test #504: inventory_state.rollback ..........   Passed    0.04 sec
+        Start  12: objects.creation_failures
+ 58/102 Test  #12: objects.creation_failures .........   Passed    0.04 sec
+        Start  67: weapons.lifetime
+ 59/102 Test  #67: weapons.lifetime ..................   Passed    0.07 sec
+        Start  38: world.session_lifecycle
+ 60/102 Test  #38: world.session_lifecycle ...........   Passed    0.03 sec
+        Start  61: weapons.inventory
+ 61/102 Test  #61: weapons.inventory .................   Passed    0.05 sec
+        Start   4: objects.reasons_properties
+ 62/102 Test   #4: objects.reasons_properties ........   Passed    0.02 sec
+        Start  64: weapons.melee
+ 63/102 Test  #64: weapons.melee .....................   Passed    0.05 sec
+        Start  68: weapons.rollback
+ 64/102 Test  #68: weapons.rollback ..................   Passed    0.05 sec
+        Start  40: world.original_trigger
+ 65/102 Test  #40: world.original_trigger ............   Passed    0.02 sec
+        Start   2: objects.original_objects
+ 66/102 Test   #2: objects.original_objects ..........   Passed    0.02 sec
+        Start   9: objects.links_lists
+ 67/102 Test   #9: objects.links_lists ...............   Passed    0.02 sec
+        Start   6: objects.deferred_removal
+ 68/102 Test   #6: objects.deferred_removal ..........   Passed    0.02 sec
+        Start  63: weapons.firing
+ 69/102 Test  #63: weapons.firing ....................   Passed    0.05 sec
+        Start   8: objects.handles_selection
+ 70/102 Test   #8: objects.handles_selection .........   Passed    0.02 sec
+        Start   3: objects.nested_creation
+ 71/102 Test   #3: objects.nested_creation ...........   Passed    0.02 sec
+        Start  65: weapons.damage
+ 72/102 Test  #65: weapons.damage ....................   Passed    0.04 sec
+        Start  62: weapons.segments
+ 73/102 Test  #62: weapons.segments ..................   Passed    0.04 sec
+        Start   5: objects.scheduling
+ 74/102 Test   #5: objects.scheduling ................   Passed    0.02 sec
+        Start   7: objects.aggregate_dispatch
+ 75/102 Test   #7: objects.aggregate_dispatch ........   Passed    0.02 sec
+        Start  33: world.resource_mount
+ 76/102 Test  #33: world.resource_mount ..............   Passed    0.02 sec
+        Start  34: world.world_properties
+ 77/102 Test  #34: world.world_properties ............   Passed    0.02 sec
+        Start  35: world.world_geometry
+ 78/102 Test  #35: world.world_geometry ..............   Passed    0.02 sec
+        Start  32: world.rez_rejection
+ 79/102 Test  #32: world.rez_rejection ...............   Passed    0.02 sec
+        Start  31: world.rez_structure
+ 80/102 Test  #31: world.rez_structure ...............   Passed    0.02 sec
+        Start  39: world.session_messages
+ 81/102 Test  #39: world.session_messages ............   Passed    0.02 sec
+        Start  48: services.model_callbacks
+ 82/102 Test  #48: services.model_callbacks ..........   Passed    0.02 sec
+        Start  53: services.original_services
+ 83/102 Test  #53: services.original_services ........   Passed    0.02 sec
+        Start  47: services.animation_events
+ 84/102 Test  #47: services.animation_events .........   Passed    0.02 sec
+        Start  45: services.model_reader
+ 85/102 Test  #45: services.model_reader .............   Passed    0.02 sec
+        Start  50: services.movement_contacts
+ 86/102 Test  #50: services.movement_contacts ........   Passed    0.02 sec
+        Start  49: services.collision_queries
+ 87/102 Test  #49: services.collision_queries ........   Passed    0.02 sec
+        Start 701: assault.key_bounds
+ 88/102 Test #701: assault.key_bounds ................   Passed    0.04 sec
+        Start 702: assault.modes
+ 89/102 Test #702: assault.modes .....................   Passed    1.09 sec
+        Start 703: assault.damage
+ 90/102 Test #703: assault.damage ....................   Passed    0.06 sec
+        Start 704: assault.motion
+ 91/102 Test #704: assault.motion ....................   Passed    0.06 sec
+        Start 705: assault.bounce
+ 92/102 Test #705: assault.bounce ....................   Passed    0.06 sec
+        Start 706: assault.contacts
+ 93/102 Test #706: assault.contacts ..................   Passed    0.06 sec
+        Start 707: assault.rules
+ 94/102 Test #707: assault.rules .....................   Passed    0.06 sec
+        Start 708: assault.lifetime
+ 95/102 Test #708: assault.lifetime ..................   Passed    0.11 sec
+        Start 709: assault.failure
+ 96/102 Test #709: assault.failure ...................   Passed    0.06 sec
+        Start 710: assault.drop
+ 97/102 Test #710: assault.drop ......................   Passed    0.15 sec
+        Start 711: assault.collect
+ 98/102 Test #711: assault.collect ...................   Passed    0.06 sec
+        Start 712: assault.restore
+ 99/102 Test #712: assault.restore ...................   Passed    0.05 sec
+        Start 713: assault.ai
+100/102 Test #713: assault.ai ........................   Passed    0.85 sec
+        Start 714: assault.private
+101/102 Test #714: assault.private ...................   Passed   13.66 sec
+102/102 Test  #69: weapons.private ...................   Passed  170.90 sec
+
+100% tests passed, 0 tests failed out of 102
+
+Label Time Summary:
+assault            =  16.36 sec*proc (14 tests)
+energy             =  14.08 sec*proc (7 tests)
+flare              = 163.16 sec*proc (9 tests)
+headless           = 610.27 sec*proc (102 tests)
+inventory_state    =   7.53 sec*proc (5 tests)
+mac10              = 175.58 sec*proc (7 tests)
+objects            =   0.33 sec*proc (12 tests)
+private            = 603.06 sec*proc (14 tests)
+services           =  13.70 sec*proc (10 tests)
+weapon_drops       =   1.09 sec*proc (10 tests)
+weapons            = 171.60 sec*proc (9 tests)
+world              =  46.85 sec*proc (19 tests)
+
+Total Test time (real) = 331.65 sec

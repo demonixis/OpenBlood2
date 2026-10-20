@@ -1,0 +1,6 @@
+[0/2] Re-checking globbed directories...
+[1/40] Scanning <Blood2>/src/app/keyframe_smoke.cpp for CXX dependencies
+[2/40] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[3/6] Linking CXX executable tests/worldpath_tests
+[4/6] Building CXX object CMakeFiles/blood2_app.dir/src/app/keyframe_smoke.cpp.o
+[5/6] Linking CXX executable blood2

@@ -1,0 +1,14 @@
+570/576 Testing: weapon_sprites.formulas
+570/576 Test: weapon_sprites.formulas
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon_sprite_tests" "formulas" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/weapon-sprites-formulas"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"weapon_sprites.formulas" start time: Oct 16 23:52 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_sprites.formulas" end time: Oct 16 23:52 CEST
+"weapon_sprites.formulas" time elapsed: 00:00:00
+----------------------------------------------------------

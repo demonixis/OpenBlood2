@@ -1,0 +1,38 @@
+348/350 Testing: model_view.subway
+348/350 Test: model_view.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/model_view_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"model_view.subway" start time: Oct 16 09:54 CEST
+Output:
+----------------------------------------------------------
+Prepared world=2 close=0 entries=10
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Characters\Caleb.abc visible=1 triangles=941 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+right view weapon visible=0 triangles=0 error=
+Models: world=2 entries=10 vertices=3027 diagnostics=0 skin bytes=557060
+Prepared world=2 close=0 entries=10
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Characters\Caleb.abc visible=1 triangles=941 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+right view weapon visible=0 triangles=0 error=
+Models: world=2 entries=10 vertices=3027 diagnostics=0 skin bytes=557060
+<end of output>
+Test time =   0.59 sec
+----------------------------------------------------------
+Test Passed.
+"model_view.subway" end time: Oct 16 09:54 CEST
+"model_view.subway" time elapsed: 00:00:00
+----------------------------------------------------------

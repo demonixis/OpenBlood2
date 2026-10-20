@@ -1,0 +1,5 @@
+[0/2] Re-checking globbed directories...
+[1/5] Scanning <workspace>/Blood2/tests/object_contract_tests.cpp for CXX dependencies
+[2/5] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[3/5] Building CXX object tests/CMakeFiles/object_contract_tests.dir/object_contract_tests.cpp.o
+[4/5] Linking CXX executable tests/object_contract_tests

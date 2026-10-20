@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-c++"
+	tests="13"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname="gigabyte-g5"
+	time="1"
+	timestamp="2026-10-18T05:35:18"
+	>
+	<testcase name="dls_sampler.pcm" classname="dls_sampler.pcm" time="0.00189886" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>PCM interpolation, loop seam/tail exclusion, tuning, velocity, gain, pan and one-shot completion verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.envelopes" classname="dls_sampler.envelopes" time="0.0117523" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>Linear amplitude attack, logarithmic decay/release, early note-off, absorbing zero, EG2/LFO pitch and /128 scaling verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.lifetime" classname="dls_sampler.lifetime" time="0.0929692" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>Block partition, muted advance, bounded refusal, stale IDs, shared PCM, output transfer and world cleanup verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.legacy_pan" classname="dls_sampler.legacy_pan" time="0.00213168" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>Legacy integer/standard fixed pan, signed PCM gains, ordered aliases, invalid graphs, failure atomicity and local precedence verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.routing" classname="dls_sampler.routing" time="0.00191397" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>Original routing fingerprint: 6386313400906083943
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.controllers" classname="dls_sampler.controllers" time="0.0018453" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>Controller PCM endpoints, squared volume/expression, clamping, silence clock, failure atomicity and lifetime verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.private" classname="dls_sampler.private" time="0.572011" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets;private"/>
+		</properties>
+		<system-out>Cabal region notes: 38 synthesized/nonzero, 5 with legacy pan; no refused regions; hidden clocks and release cleanup verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.live_controls" classname="dls_sampler.live_controls" time="0.00783558" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Live controls preserve clocks, note-on snapshots, release and peer voices; zero-gain recovery, raw bend, atomic bounds and stale identities verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.bend_reference" classname="dls_sampler.bend_reference" time="0.00217827" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets"/>
+		</properties>
+		<system-out>Original 32768 pitch values FNV64 10930475445258237893
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.live_private" classname="dls_sampler.live_private" time="0.565028" status="run">
+		<properties>
+			<property name="cmake_labels" value="headless;music_assets;private"/>
+		</properties>
+		<system-out>Private live controller updates 444
+Cabal region notes: 38 synthesized/nonzero, 5 with legacy pan; no refused regions; hidden clocks and release cleanup verified
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.midi_receiver" classname="dls_sampler.midi_receiver" time="0.0418666" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="dls_sampler.midi_limits" classname="dls_sampler.midi_limits" time="0.00200359" status="fail">
+		<failure message="Failed"/>
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets"/>
+		</properties>
+		<system-out>144: sampler.advance(2, {}) &amp;&amp; weak.expired() | 
+</system-out>
+	</testcase>
+	<testcase name="dls_sampler.midi_private" classname="dls_sampler.midi_private" time="0.47694" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio;headless;music_assets;private"/>
+		</properties>
+		<system-out>38 Cabal regions: channel note/control/stop, finite PCM, hidden clocks, release cleanup verified
+</system-out>
+	</testcase>
+</testsuite>

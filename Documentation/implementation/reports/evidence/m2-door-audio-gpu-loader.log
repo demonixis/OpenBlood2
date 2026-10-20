@@ -1,0 +1,1567 @@
+   1512679:
+   1512679:	file=libm.so.6 [0];  needed by build/sanitize/blood2 [0]
+   1512679:	file=libm.so.6 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176b3ffb98  base: 0x00007f176b2ea000   size: 0x0000000000116010
+   1512679:	    entry: 0x00007f176b2ea000  phdr: 0x00007f176b2ea040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libstdc++.so.6 [0];  needed by build/sanitize/blood2 [0]
+   1512679:	file=libstdc++.so.6 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176b2a99e8  base: 0x00007f176b000000   size: 0x00000000002b12c0
+   1512679:	    entry: 0x00007f176b000000  phdr: 0x00007f176b000040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libresolv.so.2 [0];  needed by build/sanitize/blood2 [0]
+   1512679:	file=libresolv.so.2 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176b2e6b68  base: 0x00007f176b2d7000   size: 0x0000000000012888
+   1512679:	    entry: 0x00007f176b2d7000  phdr: 0x00007f176b2d7040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libgcc_s.so.1 [0];  needed by build/sanitize/blood2 [0]
+   1512679:	file=libgcc_s.so.1 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176affebe0  base: 0x00007f176afd3000   size: 0x000000000002c1c8
+   1512679:	    entry: 0x00007f176afd3000  phdr: 0x00007f176afd3040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libc.so.6 [0];  needed by build/sanitize/blood2 [0]
+   1512679:	file=libc.so.6 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176afc8920  base: 0x00007f176adda000   size: 0x00000000001f8b70
+   1512679:	    entry: 0x00007f176addd8a0  phdr: 0x00007f176adda040  phnum:                 14
+   1512679:
+   1512679:
+   1512679:	calling preinit: build/sanitize/blood2
+   1512679:
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: __isoc99_printf (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: __isoc99_sprintf (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: __isoc99_snprintf (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: __isoc99_fprintf (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: __isoc99_vprintf (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: __isoc99_vsprintf (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: __isoc99_vsnprintf (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: __isoc99_vfprintf (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: pthread_mutexattr_getrobust_np (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdrmem_create (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdrstdio_create (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_short (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_u_short (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_int (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_u_int (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_long (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_u_long (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_hyper (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_u_hyper (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_longlong_t (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_u_longlong_t (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_int8_t (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_uint8_t (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_int16_t (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_uint16_t (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_int32_t (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_uint32_t (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_int64_t (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_uint64_t (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_quad_t (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_u_quad_t (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_bool (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_enum (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_char (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_u_char (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_float (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_double (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_bytes (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_string (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdrrec_create (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: xdr_destroy (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: __cxa_rethrow_primary_exception (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: swift_demangle (fatal)
+   1512679:
+   1512679:	calling init: /lib64/ld-linux-x86-64.so.2
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libc.so.6
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libgcc_s.so.1
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libresolv.so.2
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libm.so.6
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libstdc++.so.6
+   1512679:
+   1512679:
+   1512679:	initialize program: build/sanitize/blood2
+   1512679:
+   1512679:
+   1512679:	transferring control: build/sanitize/blood2
+   1512679:
+   1512679:
+   1512679:	file=libdbus-1.so.3 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libdbus-1.so.3 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a7dbdb8  base: 0x00007f176a786000   size: 0x00000000000572d0
+   1512679:	    entry: 0x00007f176a786000  phdr: 0x00007f176a786040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libsystemd.so.0 [0];  needed by /lib64/libdbus-1.so.3 [0]
+   1512679:	file=libsystemd.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007b1768ae37f0  base: 0x00007b17689ad000   size: 0x0000000000139850
+   1512679:	    entry: 0x00007b17689ad000  phdr: 0x00007b17689ad040  phnum:                 12
+   1512679:
+   1512679:	activating NODELETE for /lib64/libsystemd.so.0 [0]
+   1512679:
+   1512679:	calling init: /lib64/libsystemd.so.0
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libdbus-1.so.3
+   1512679:
+   1512679:	opening file=/lib64/libdbus-1.so.3 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libwayland-client.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libwayland-client.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a91ab08  base: 0x00007f176a90c000   size: 0x000000000000f350
+   1512679:	    entry: 0x00007f176a90c000  phdr: 0x00007f176a90c040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libffi.so.8 [0];  needed by /lib64/libwayland-client.so.0 [0]
+   1512679:	file=libffi.so.8 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a784bd8  base: 0x00007f176a776000   size: 0x000000000000f550
+   1512679:	    entry: 0x00007f176a776000  phdr: 0x00007f176a776040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libffi.so.8
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libwayland-client.so.0
+   1512679:
+   1512679:	opening file=/lib64/libwayland-client.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libwayland-egl.so.1 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libwayland-egl.so.1 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a90ad90  base: 0x00007f176a908000   size: 0x0000000000003008
+   1512679:	    entry: 0x00007f176a908000  phdr: 0x00007f176a908040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libwayland-egl.so.1
+   1512679:
+   1512679:	opening file=/lib64/libwayland-egl.so.1 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libwayland-cursor.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libwayland-cursor.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a771c48  base: 0x00007f176a76c000   size: 0x0000000000009248
+   1512679:	    entry: 0x00007f176a76c000  phdr: 0x00007f176a76c040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libwayland-cursor.so.0
+   1512679:
+   1512679:	opening file=/lib64/libwayland-cursor.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libxkbcommon.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libxkbcommon.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a76aaa8  base: 0x00007f176a70d000   size: 0x000000000005e098
+   1512679:	    entry: 0x00007f176a70d000  phdr: 0x00007f176a70d040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libxkbcommon.so.0
+   1512679:
+   1512679:	opening file=/lib64/libxkbcommon.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libdecor-0.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libdecor-0.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a70bbe8  base: 0x00007f176a704000   size: 0x00000000000081a8
+   1512679:	    entry: 0x00007f176a704000  phdr: 0x00007f176a704040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libdecor-0.so.0
+   1512679:
+   1512679:	opening file=/lib64/libdecor-0.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: wl_egl_window_create (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _wl_egl_window_create (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: wl_egl_window_destroy (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _wl_egl_window_destroy (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: wl_egl_window_resize (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _wl_egl_window_resize (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: wl_egl_window_get_attached_size (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _wl_egl_window_get_attached_size (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: wl_cursor_theme_load (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _wl_cursor_theme_load (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: wl_cursor_theme_load (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _wl_cursor_theme_load (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: wl_cursor_theme_destroy (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _wl_cursor_theme_destroy (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: wl_cursor_theme_destroy (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _wl_cursor_theme_destroy (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: wl_cursor_theme_get_cursor (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _wl_cursor_theme_get_cursor (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: wl_cursor_theme_get_cursor (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _wl_cursor_theme_get_cursor (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: wl_cursor_image_get_buffer (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _wl_cursor_image_get_buffer (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: wl_cursor_image_get_buffer (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _wl_cursor_image_get_buffer (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: wl_cursor_frame (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _wl_cursor_frame (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: wl_cursor_frame (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _wl_cursor_frame (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_state_key_get_syms (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_state_key_get_syms (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_state_key_get_syms (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_state_key_get_syms (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_state_key_get_syms (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_state_key_get_syms (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_keysym_to_utf8 (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_keysym_to_utf8 (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_keysym_to_utf8 (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_keysym_to_utf8 (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_keysym_to_utf8 (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_keysym_to_utf8 (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_new_from_string (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_new_from_string (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_keymap_new_from_string (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_keymap_new_from_string (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_new_from_string (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_new_from_string (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_state_new (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_state_new (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_state_new (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_state_new (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_state_new (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_state_new (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_key_repeats (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_key_repeats (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_keymap_key_repeats (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_keymap_key_repeats (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_key_repeats (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_key_repeats (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_keymap_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_keymap_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_state_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_state_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_state_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_state_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_state_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_state_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_context_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_context_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_context_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_context_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_context_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_context_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_context_new (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_context_new (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_context_new (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_context_new (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_context_new (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_context_new (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_state_update_mask (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_state_update_mask (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_state_update_mask (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_state_update_mask (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_state_update_mask (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_state_update_mask (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_compose_table_new_from_locale (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_table_new_from_locale (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_compose_table_new_from_locale (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_compose_table_new_from_locale (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_compose_table_new_from_locale (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_table_new_from_locale (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_compose_state_reset (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_state_reset (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_compose_state_reset (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_compose_state_reset (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_compose_state_reset (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_state_reset (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_compose_table_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_table_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_compose_table_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_compose_table_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_compose_table_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_table_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_compose_state_new (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_state_new (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_compose_state_new (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_compose_state_new (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_compose_state_new (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_state_new (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_compose_state_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_state_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_compose_state_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_compose_state_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_compose_state_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_state_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_compose_state_feed (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_state_feed (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_compose_state_feed (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_compose_state_feed (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_compose_state_feed (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_state_feed (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_compose_state_get_status (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_state_get_status (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_compose_state_get_status (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_compose_state_get_status (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_compose_state_get_status (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_state_get_status (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_compose_state_get_one_sym (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_state_get_one_sym (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_compose_state_get_one_sym (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_compose_state_get_one_sym (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_compose_state_get_one_sym (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_compose_state_get_one_sym (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_key_for_each (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_key_for_each (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_keymap_key_for_each (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_keymap_key_for_each (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_key_for_each (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_key_for_each (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_num_layouts (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_num_layouts (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_keymap_num_layouts (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_keymap_num_layouts (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_num_layouts (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_num_layouts (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_key_get_syms_by_level (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_key_get_syms_by_level (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_keymap_key_get_syms_by_level (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_keymap_key_get_syms_by_level (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_key_get_syms_by_level (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_key_get_syms_by_level (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_num_levels_for_key (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_num_levels_for_key (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_keymap_num_levels_for_key (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_keymap_num_levels_for_key (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_num_levels_for_key (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_num_levels_for_key (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_keysym_to_utf32 (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_keysym_to_utf32 (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_keysym_to_utf32 (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_keysym_to_utf32 (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_keysym_to_utf32 (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_keysym_to_utf32 (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_mod_get_index (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_mod_get_index (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_keymap_mod_get_index (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_keymap_mod_get_index (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_mod_get_index (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_mod_get_index (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_layout_get_name (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_layout_get_name (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_keymap_layout_get_name (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_keymap_layout_get_name (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_layout_get_name (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_layout_get_name (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_key_get_mods_for_level (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_key_get_mods_for_level (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_keymap_key_get_mods_for_level (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_keymap_key_get_mods_for_level (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_key_get_mods_for_level (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_key_get_mods_for_level (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_mod_get_mask (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_mod_get_mask (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: xkb_keymap_mod_get_mask (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _xkb_keymap_mod_get_mask (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: xkb_keymap_mod_get_mask (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _xkb_keymap_mod_get_mask (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_unref (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_unref (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_new (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_new (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_new (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_new (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_new (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_new (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_new (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_new (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_decorate (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_decorate (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_decorate (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_decorate (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_decorate (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_decorate (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_decorate (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_decorate (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_unref (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_unref (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_unref (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_unref (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_unref (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_title (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_title (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_set_title (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_set_title (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_title (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_title (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_title (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_title (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_app_id (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_app_id (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_set_app_id (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_set_app_id (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_app_id (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_app_id (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_app_id (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_app_id (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_max_content_size (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_max_content_size (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_set_max_content_size (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_set_max_content_size (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_max_content_size (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_max_content_size (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_max_content_size (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_max_content_size (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_min_content_size (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_min_content_size (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_set_min_content_size (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_set_min_content_size (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_min_content_size (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_min_content_size (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_min_content_size (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_min_content_size (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_resize (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_resize (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_resize (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_resize (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_resize (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_resize (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_resize (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_resize (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_move (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_move (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_move (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_move (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_move (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_move (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_move (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_move (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_commit (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_commit (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_commit (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_commit (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_commit (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_commit (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_commit (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_commit (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_minimized (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_minimized (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_set_minimized (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_set_minimized (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_minimized (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_minimized (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_minimized (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_minimized (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_maximized (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_maximized (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_set_maximized (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_set_maximized (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_maximized (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_maximized (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_maximized (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_maximized (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_unset_maximized (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_unset_maximized (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_unset_maximized (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_unset_maximized (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_unset_maximized (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_unset_maximized (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_unset_maximized (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_unset_maximized (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_fullscreen (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_fullscreen (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_set_fullscreen (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_set_fullscreen (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_fullscreen (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_fullscreen (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_fullscreen (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_fullscreen (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_unset_fullscreen (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_unset_fullscreen (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_unset_fullscreen (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_unset_fullscreen (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_unset_fullscreen (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_unset_fullscreen (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_unset_fullscreen (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_unset_fullscreen (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_capabilities (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_capabilities (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_set_capabilities (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_set_capabilities (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_capabilities (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_capabilities (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_capabilities (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_capabilities (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_unset_capabilities (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_unset_capabilities (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_unset_capabilities (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_unset_capabilities (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_unset_capabilities (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_unset_capabilities (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_unset_capabilities (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_unset_capabilities (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_has_capability (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_has_capability (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_has_capability (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_has_capability (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_has_capability (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_has_capability (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_has_capability (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_has_capability (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_visibility (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_visibility (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_set_visibility (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_set_visibility (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_visibility (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_visibility (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_visibility (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_visibility (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_is_visible (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_is_visible (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_is_visible (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_is_visible (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_is_visible (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_is_visible (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_is_visible (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_is_visible (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_is_floating (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_is_floating (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_is_floating (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_is_floating (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_is_floating (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_is_floating (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_is_floating (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_is_floating (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_parent (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_parent (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_set_parent (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_set_parent (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_parent (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_parent (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_set_parent (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_set_parent (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_show_window_menu (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_show_window_menu (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_show_window_menu (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_show_window_menu (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_show_window_menu (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_show_window_menu (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_show_window_menu (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_show_window_menu (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_xdg_surface (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_xdg_surface (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_get_xdg_surface (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_get_xdg_surface (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_xdg_surface (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_xdg_surface (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_xdg_surface (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_xdg_surface (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_xdg_toplevel (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_xdg_toplevel (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_get_xdg_toplevel (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_get_xdg_toplevel (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_xdg_toplevel (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_xdg_toplevel (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_xdg_toplevel (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_xdg_toplevel (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_translate_coordinate (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_translate_coordinate (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_translate_coordinate (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_translate_coordinate (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_translate_coordinate (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_translate_coordinate (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_translate_coordinate (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_translate_coordinate (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_map (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_map (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_map (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_map (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_map (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_map (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_map (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_map (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_state_new (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_state_new (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_state_new (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_state_new (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_state_new (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_state_new (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_state_new (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_state_new (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_state_free (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_state_free (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_state_free (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_state_free (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_state_free (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_state_free (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_state_free (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_state_free (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_configuration_get_content_size (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_configuration_get_content_size (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_configuration_get_content_size (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_configuration_get_content_size (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_configuration_get_content_size (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_configuration_get_content_size (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_configuration_get_content_size (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_configuration_get_content_size (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_configuration_get_window_state (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_configuration_get_window_state (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_configuration_get_window_state (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_configuration_get_window_state (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_configuration_get_window_state (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_configuration_get_window_state (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_configuration_get_window_state (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_configuration_get_window_state (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_dispatch (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_dispatch (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_dispatch (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_dispatch (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_dispatch (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_dispatch (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_dispatch (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_dispatch (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_min_content_size (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_min_content_size (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_get_min_content_size (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_get_min_content_size (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_min_content_size (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_min_content_size (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_min_content_size (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_min_content_size (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_max_content_size (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_max_content_size (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_get_max_content_size (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_get_max_content_size (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_max_content_size (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_max_content_size (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_max_content_size (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_max_content_size (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_wm_capabilities (fatal)
+   1512679:	/lib64/libwayland-client.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_wm_capabilities (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: libdecor_frame_get_wm_capabilities (fatal)
+   1512679:	/lib64/libwayland-egl.so.1: error: symbol lookup error: undefined symbol: _libdecor_frame_get_wm_capabilities (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_wm_capabilities (fatal)
+   1512679:	/lib64/libwayland-cursor.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_wm_capabilities (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_wm_capabilities (fatal)
+   1512679:	/lib64/libxkbcommon.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_wm_capabilities (fatal)
+   1512679:	/lib64/libdecor-0.so.0: error: symbol lookup error: undefined symbol: libdecor_frame_get_wm_capabilities (fatal)
+   1512679:	/lib64/libdecor-0.so.0: error: symbol lookup error: undefined symbol: _libdecor_frame_get_wm_capabilities (fatal)
+   1512679:
+   1512679:	file=libusb-1.0.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libusb-1.0.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a5dc970  base: 0x00007f176a5bd000   size: 0x0000000000020188
+   1512679:	    entry: 0x00007f176a5bd000  phdr: 0x00007f176a5bd040  phnum:                 12
+   1512679:
+   1512679:
+   1512679:	file=libudev.so.1 [0];  needed by /lib64/libusb-1.0.so.0 [0]
+   1512679:	file=libudev.so.1 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a564840  base: 0x00007f176a51a000   size: 0x000000000004b920
+   1512679:	    entry: 0x00007f176a51a000  phdr: 0x00007f176a51a040  phnum:                 12
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libudev.so.1
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libusb-1.0.so.0
+   1512679:
+   1512679:	opening file=/lib64/libusb-1.0.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: udev_device_get_action (fatal)
+   1512679:	build/sanitize/blood2: error: symbol lookup error: undefined symbol: _udev_device_get_action (fatal)
+   1512679:	opening file=/lib64/libudev.so.1 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libvulkan.so.1 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libvulkan.so.1 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a3dc348  base: 0x00007f176a355000   size: 0x00000000000881d0
+   1512679:	    entry: 0x00007f176a355000  phdr: 0x00007f176a355040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libvulkan.so.1
+   1512679:
+   1512679:	opening file=/lib64/libvulkan.so.1 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=/usr/lib64/libGLX_nvidia.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=/usr/lib64/libGLX_nvidia.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007b17644aad28  base: 0x00007b1764387000   size: 0x000000000012a578
+   1512679:	    entry: 0x00007b17643d8660  phdr: 0x00007b1764387040  phnum:                  9
+   1512679:
+   1512679:
+   1512679:	file=libnvidia-glsi.so.615.78.08 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:	file=libnvidia-glsi.so.615.78.08 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a1f6db0  base: 0x00007f176a164000   size: 0x000000000009bb58
+   1512679:	    entry: 0x00007f176a1747f0  phdr: 0x00007f176a164040  phnum:                  9
+   1512679:
+   1512679:
+   1512679:	file=libnvidia-tls.so.615.78.08 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:	file=libnvidia-tls.so.615.78.08 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a906e00  base: 0x00007f176a902000   size: 0x0000000000005280
+   1512679:	    entry: 0x00007f176a903050  phdr: 0x00007f176a902040  phnum:                 10
+   1512679:
+   1512679:
+   1512679:	file=libnvidia-glcore.so.615.78.08 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:	file=libnvidia-glcore.so.615.78.08 [0];  generating link map
+   1512679:	  dynamic: 0x00007b1764193d28  base: 0x00007b1761a00000   size: 0x0000000002816050
+   1512679:	    entry: 0x00007b1761c72000  phdr: 0x00007b1761a00040  phnum:                  7
+   1512679:
+   1512679:
+   1512679:	file=libX11.so.6 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:	file=libX11.so.6 [0];  generating link map
+   1512679:	  dynamic: 0x00007b17643815f0  base: 0x00007b1764232000   size: 0x00000000001548a8
+   1512679:	    entry: 0x00007b1764232000  phdr: 0x00007b1764232040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libXext.so.6 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:	file=libXext.so.6 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a518b80  base: 0x00007f176a506000   size: 0x0000000000013720
+   1512679:	    entry: 0x00007f176a506000  phdr: 0x00007f176a506040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libdl.so.2 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:	file=libdl.so.2 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a7e1d40  base: 0x00007f176a7df000   size: 0x0000000000003008
+   1512679:	    entry: 0x00007f176a7df000  phdr: 0x00007f176a7df040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libpthread.so.0 [0];  needed by /lib64/libnvidia-glsi.so.615.78.08 [0]
+   1512679:	file=libpthread.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a702d40  base: 0x00007f176a700000   size: 0x0000000000003008
+   1512679:	    entry: 0x00007f176a700000  phdr: 0x00007f176a700040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=librt.so.1 [0];  needed by /lib64/libnvidia-glsi.so.615.78.08 [0]
+   1512679:	file=librt.so.1 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a5e1d30  base: 0x00007f176a5df000   size: 0x0000000000003008
+   1512679:	    entry: 0x00007f176a5df000  phdr: 0x00007f176a5df040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libnvidia-gpucomp.so.615.78.08 [0];  needed by /lib64/libnvidia-glcore.so.615.78.08 [0]
+   1512679:	file=libnvidia-gpucomp.so.615.78.08 [0];  generating link map
+   1512679:	  dynamic: 0x00007b17616245b0  base: 0x00007b175a400000   size: 0x00000000074cc2c0
+   1512679:	    entry: 0x00007b175a798ff0  phdr: 0x00007b175a400040  phnum:                 10
+   1512679:
+   1512679:
+   1512679:	file=libxcb.so.1 [0];  needed by /lib64/libX11.so.6 [0]
+   1512679:	file=libxcb.so.1 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a3539e8  base: 0x00007f176a32b000   size: 0x00000000000290a8
+   1512679:	    entry: 0x00007f176a32b000  phdr: 0x00007f176a32b040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libXau.so.6 [0];  needed by /lib64/libxcb.so.1 [0]
+   1512679:	file=libXau.so.6 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a59ecc0  base: 0x00007f176a59b000   size: 0x0000000000004020
+   1512679:	    entry: 0x00007f176a59b000  phdr: 0x00007f176a59b040  phnum:                 11
+   1512679:
+   1512679:	activating NODELETE for /lib64/librt.so.1 [0]
+   1512679:
+   1512679:	calling init: /lib64/libXau.so.6
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libxcb.so.1
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libpthread.so.0
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/librt.so.1
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libdl.so.2
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libnvidia-gpucomp.so.615.78.08
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libX11.so.6
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libXext.so.6
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libnvidia-tls.so.615.78.08
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libnvidia-glcore.so.615.78.08
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libnvidia-glsi.so.615.78.08
+   1512679:
+   1512679:
+   1512679:	calling init: /usr/lib64/libGLX_nvidia.so.0
+   1512679:
+   1512679:	opening file=/lib64/libc.so.6 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	closing file=/lib64/libc.so.6; direct_opencount=0
+   1512679:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: __malloc_hook (fatal)
+   1512679:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: __realloc_hook (fatal)
+   1512679:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: __free_hook (fatal)
+   1512679:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: __memalign_hook (fatal)
+   1512679:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: ErrorF (fatal)
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:	opening file=/lib64/libpthread.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:	opening file=/usr/lib64/libGLX_nvidia.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:	opening file=/lib64/libxcb.so.1 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libxcb-glx.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libxcb-glx.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a3fed48  base: 0x00007f176a3e4000   size: 0x000000000001b018
+   1512679:	    entry: 0x00007f176a3e4000  phdr: 0x00007f176a3e4040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libxcb-glx.so.0
+   1512679:
+   1512679:	opening file=/lib64/libxcb-glx.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libxcb-randr.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libxcb-randr.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a577c68  base: 0x00007f176a567000   size: 0x0000000000011018
+   1512679:	    entry: 0x00007f176a567000  phdr: 0x00007f176a567040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libxcb-randr.so.0
+   1512679:
+   1512679:	opening file=/lib64/libxcb-randr.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libxcb-dri3.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libxcb-dri3.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a504d38  base: 0x00007f176a500000   size: 0x0000000000005018
+   1512679:	    entry: 0x00007f176a500000  phdr: 0x00007f176a500040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libxcb-dri3.so.0
+   1512679:
+   1512679:	opening file=/lib64/libxcb-dri3.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libX11-xcb.so.1 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libX11-xcb.so.1 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a3e2de0  base: 0x00007f176a3e0000   size: 0x0000000000003008
+   1512679:	    entry: 0x00007f176a3e0000  phdr: 0x00007f176a3e0040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libX11-xcb.so.1
+   1512679:
+   1512679:	opening file=/lib64/libX11-xcb.so.1 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libxcb-present.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libxcb-present.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a329d68  base: 0x00007f176a326000   size: 0x0000000000004018
+   1512679:	    entry: 0x00007f176a326000  phdr: 0x00007f176a326040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libxcb-present.so.0
+   1512679:
+   1512679:	opening file=/lib64/libxcb-present.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libxcb-sync.so.1 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libxcb-sync.so.1 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a324d08  base: 0x00007f176a31e000   size: 0x0000000000007018
+   1512679:	    entry: 0x00007f176a31e000  phdr: 0x00007f176a31e040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libxcb-sync.so.1
+   1512679:
+   1512679:	opening file=/lib64/libxcb-sync.so.1 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libxcb-xfixes.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libxcb-xfixes.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a31cd58  base: 0x00007f176a315000   size: 0x0000000000008018
+   1512679:	    entry: 0x00007f176a315000  phdr: 0x00007f176a315040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libxcb-xfixes.so.0
+   1512679:
+   1512679:	opening file=/lib64/libxcb-xfixes.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:	opening file=/lib64/libdbus-1.so.3 [0]; direct_opencount=2
+   1512679:
+   1512679:	marking /lib64/libdbus-1.so.3 [0] as NODELETE
+   1512679:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: dbus_bus_get (fatal)
+   1512679:
+   1512679:	file=libdrm.so.2 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libdrm.so.2 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a114aa8  base: 0x00007f176a100000   size: 0x00000000000159f8
+   1512679:	    entry: 0x00007f176a100000  phdr: 0x00007f176a100040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libdrm.so.2
+   1512679:
+   1512679:	opening file=/lib64/libdrm.so.2 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libnvidia-allocator.so.1 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libnvidia-allocator.so.1 [0];  generating link map
+   1512679:	  dynamic: 0x00007b1768940e08  base: 0x00007b176891c000   size: 0x0000000000027150
+   1512679:	    entry: 0x00007b1768920530  phdr: 0x00007b176891c040  phnum:                  9
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libnvidia-allocator.so.1
+   1512679:
+   1512679:	opening file=/lib64/libnvidia-allocator.so.1 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	closing file=/usr/lib64/libGLX_nvidia.so.0; direct_opencount=1
+   1512679:
+   1512679:	closing file=/usr/lib64/libGLX_nvidia.so.0; direct_opencount=1
+   1512679:
+   1512679:	closing file=/usr/lib64/libGLX_nvidia.so.0; direct_opencount=1
+   1512679:
+   1512679:	closing file=/usr/lib64/libGLX_nvidia.so.0; direct_opencount=1
+   1512679:
+   1512679:	file=libVkLayer_khronos_validation.so [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libVkLayer_khronos_validation.so [0];  generating link map
+   1512679:	  dynamic: 0x00007b1749cb95e8  base: 0x00007b1748a00000   size: 0x00000000012d7968
+   1512679:	    entry: 0x00007b1748a00000  phdr: 0x00007b1748a00040  phnum:                 12
+   1512679:
+   1512679:
+   1512679:	file=libSPIRV-Tools-opt.so [0];  needed by /lib64/libVkLayer_khronos_validation.so [0]
+   1512679:	file=libSPIRV-Tools-opt.so [0];  generating link map
+   1512679:	  dynamic: 0x00007b1755c3fba0  base: 0x00007b1755a00000   size: 0x0000000000243038
+   1512679:	    entry: 0x00007b1755a00000  phdr: 0x00007b1755a00040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libSPIRV-Tools.so [0];  needed by /lib64/libVkLayer_khronos_validation.so [0]
+   1512679:	file=libSPIRV-Tools.so [0];  generating link map
+   1512679:	  dynamic: 0x00007b17559fdba0  base: 0x00007b1755861000   size: 0x000000000019e408
+   1512679:	    entry: 0x00007b1755861000  phdr: 0x00007b1755861040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libSPIRV-Tools-opt.so [0];  needed by /lib64/libSPIRV-Tools.so [0] (relocation dependency)
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libSPIRV-Tools.so
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libSPIRV-Tools-opt.so
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libVkLayer_khronos_validation.so
+   1512679:
+   1512679:	opening file=/lib64/libVkLayer_khronos_validation.so [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libVkLayer_MESA_device_select.so [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libVkLayer_MESA_device_select.so [0];  generating link map
+   1512679:	  dynamic: 0x00007b1768918950  base: 0x00007b1768902000   size: 0x00000000000191d0
+   1512679:	    entry: 0x00007b1768902000  phdr: 0x00007b1768902040  phnum:                 12
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libVkLayer_MESA_device_select.so
+   1512679:
+   1512679:	opening file=/lib64/libVkLayer_MESA_device_select.so [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libnvidia-glvkspirv.so.615.78.08 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libnvidia-glvkspirv.so.615.78.08 [0];  generating link map
+   1512679:	  dynamic: 0x00007b174c16d848  base: 0x00007b174b800000   size: 0x0000000000a0e320
+   1512679:	    entry: 0x00007b174b834c30  phdr: 0x00007b174b800040  phnum:                 10
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libnvidia-glvkspirv.so.615.78.08
+   1512679:
+   1512679:	opening file=/lib64/libnvidia-glvkspirv.so.615.78.08 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	closing file=/lib64/libwayland-client.so.0; direct_opencount=1
+   1512679:
+   1512679:	closing file=/usr/lib64/libGLX_nvidia.so.0; direct_opencount=1
+   1512679:
+   1512679:	calling fini: /lib64/libVkLayer_MESA_device_select.so [0]
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libVkLayer_MESA_device_select.so [0];  destroying link map
+   1512679:
+   1512679:	calling fini: /lib64/libVkLayer_khronos_validation.so [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libSPIRV-Tools-opt.so [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libSPIRV-Tools.so [0]
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libVkLayer_khronos_validation.so [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libSPIRV-Tools-opt.so [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libSPIRV-Tools.so [0];  destroying link map
+   1512679:
+   1512679:	calling fini: /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	closing file=/lib64/libnvidia-glvkspirv.so.615.78.08; direct_opencount=0
+   1512679:
+   1512679:	closing file=/lib64/libxcb.so.1; direct_opencount=1
+   1512679:
+   1512679:	closing file=/lib64/libX11-xcb.so.1; direct_opencount=1
+   1512679:
+   1512679:	closing file=/lib64/libxcb.so.1; direct_opencount=0
+   1512679:
+   1512679:	closing file=/lib64/libxcb-dri3.so.0; direct_opencount=1
+   1512679:
+   1512679:	closing file=/lib64/libxcb-present.so.0; direct_opencount=0
+   1512679:
+   1512679:	closing file=/lib64/libxcb-sync.so.1; direct_opencount=0
+   1512679:
+   1512679:	closing file=/lib64/libxcb-xfixes.so.0; direct_opencount=0
+   1512679:
+   1512679:	closing file=/lib64/libdrm.so.2; direct_opencount=1
+   1512679:
+   1512679:	closing file=/lib64/libnvidia-allocator.so.1; direct_opencount=0
+   1512679:
+   1512679:	closing file=/lib64/libdrm.so.2; direct_opencount=0
+   1512679:
+   1512679:	calling fini: /lib64/libnvidia-glsi.so.615.78.08 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libnvidia-glcore.so.615.78.08 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libnvidia-tls.so.615.78.08 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libXext.so.6 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libX11.so.6 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libnvidia-gpucomp.so.615.78.08 [0]
+   1512679:
+   1512679:
+   1512679:	file=/usr/lib64/libGLX_nvidia.so.0 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libnvidia-glsi.so.615.78.08 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libnvidia-glcore.so.615.78.08 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libnvidia-tls.so.615.78.08 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libXext.so.6 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libX11.so.6 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libnvidia-gpucomp.so.615.78.08 [0];  destroying link map
+   1512679:
+   1512679:	calling fini: /lib64/libxcb-present.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libxcb-sync.so.1 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libxcb-xfixes.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libdrm.so.2 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libnvidia-allocator.so.1 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libnvidia-glvkspirv.so.615.78.08 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libdl.so.2 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libpthread.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libxcb-present.so.0 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libxcb-sync.so.1 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libxcb-xfixes.so.0 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libdrm.so.2 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libnvidia-allocator.so.1 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libnvidia-glvkspirv.so.615.78.08 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libdl.so.2 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libpthread.so.0 [0];  destroying link map
+   1512679:
+   1512679:	file=/usr/lib64/libGLX_nvidia.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=/usr/lib64/libGLX_nvidia.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007b17644aad28  base: 0x00007b1764387000   size: 0x000000000012a578
+   1512679:	    entry: 0x00007b17643d8660  phdr: 0x00007b1764387040  phnum:                  9
+   1512679:
+   1512679:
+   1512679:	file=libnvidia-glsi.so.615.78.08 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:	file=libnvidia-glsi.so.615.78.08 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a1f6db0  base: 0x00007f176a164000   size: 0x000000000009bb58
+   1512679:	    entry: 0x00007f176a1747f0  phdr: 0x00007f176a164040  phnum:                  9
+   1512679:
+   1512679:
+   1512679:	file=libnvidia-tls.so.615.78.08 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:	file=libnvidia-tls.so.615.78.08 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a906e00  base: 0x00007f176a902000   size: 0x0000000000005280
+   1512679:	    entry: 0x00007f176a903050  phdr: 0x00007f176a902040  phnum:                 10
+   1512679:
+   1512679:
+   1512679:	file=libnvidia-glcore.so.615.78.08 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:	file=libnvidia-glcore.so.615.78.08 [0];  generating link map
+   1512679:	  dynamic: 0x00007b1761793d28  base: 0x00007b175f000000   size: 0x0000000002816050
+   1512679:	    entry: 0x00007b175f272000  phdr: 0x00007b175f000040  phnum:                  7
+   1512679:
+   1512679:
+   1512679:	file=libX11.so.6 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:	file=libX11.so.6 [0];  generating link map
+   1512679:	  dynamic: 0x00007b17643815f0  base: 0x00007b1764232000   size: 0x00000000001548a8
+   1512679:	    entry: 0x00007b1764232000  phdr: 0x00007b1764232040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libXext.so.6 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:	file=libXext.so.6 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a518b80  base: 0x00007f176a506000   size: 0x0000000000013720
+   1512679:	    entry: 0x00007f176a506000  phdr: 0x00007f176a506040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libdl.so.2 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:	file=libdl.so.2 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a7e1d40  base: 0x00007f176a7df000   size: 0x0000000000003008
+   1512679:	    entry: 0x00007f176a7df000  phdr: 0x00007f176a7df040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libpthread.so.0 [0];  needed by /lib64/libnvidia-glsi.so.615.78.08 [0]
+   1512679:	file=libpthread.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a702d40  base: 0x00007f176a700000   size: 0x0000000000003008
+   1512679:	    entry: 0x00007f176a700000  phdr: 0x00007f176a700040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libnvidia-gpucomp.so.615.78.08 [0];  needed by /lib64/libnvidia-glcore.so.615.78.08 [0]
+   1512679:	file=libnvidia-gpucomp.so.615.78.08 [0];  generating link map
+   1512679:	  dynamic: 0x00007b1749a245b0  base: 0x00007b1742800000   size: 0x00000000074cc2c0
+   1512679:	    entry: 0x00007b1742b98ff0  phdr: 0x00007b1742800040  phnum:                 10
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libpthread.so.0
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libdl.so.2
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libnvidia-gpucomp.so.615.78.08
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libX11.so.6
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libXext.so.6
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libnvidia-tls.so.615.78.08
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libnvidia-glcore.so.615.78.08
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libnvidia-glsi.so.615.78.08
+   1512679:
+   1512679:
+   1512679:	calling init: /usr/lib64/libGLX_nvidia.so.0
+   1512679:
+   1512679:
+   1512679:	closing file=/lib64/libc.so.6; direct_opencount=0
+   1512679:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: __malloc_hook (fatal)
+   1512679:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: __realloc_hook (fatal)
+   1512679:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: __free_hook (fatal)
+   1512679:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: __memalign_hook (fatal)
+   1512679:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: ErrorF (fatal)
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:	opening file=/lib64/libpthread.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:	opening file=/usr/lib64/libGLX_nvidia.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libxcb-present.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libxcb-present.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a329d68  base: 0x00007f176a326000   size: 0x0000000000004018
+   1512679:	    entry: 0x00007f176a326000  phdr: 0x00007f176a326040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libxcb-present.so.0
+   1512679:
+   1512679:	opening file=/lib64/libxcb-present.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libxcb-sync.so.1 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libxcb-sync.so.1 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a324d08  base: 0x00007f176a31e000   size: 0x0000000000007018
+   1512679:	    entry: 0x00007f176a31e000  phdr: 0x00007f176a31e040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libxcb-sync.so.1
+   1512679:
+   1512679:	opening file=/lib64/libxcb-sync.so.1 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libxcb-xfixes.so.0 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libxcb-xfixes.so.0 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a31cd58  base: 0x00007f176a315000   size: 0x0000000000008018
+   1512679:	    entry: 0x00007f176a315000  phdr: 0x00007f176a315040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libxcb-xfixes.so.0
+   1512679:
+   1512679:	opening file=/lib64/libxcb-xfixes.so.0 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:
+   1512679:	closing file=; direct_opencount=1
+   1512679:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: dbus_bus_get (fatal)
+   1512679:
+   1512679:	file=libdrm.so.2 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libdrm.so.2 [0];  generating link map
+   1512679:	  dynamic: 0x00007f176a114aa8  base: 0x00007f176a100000   size: 0x00000000000159f8
+   1512679:	    entry: 0x00007f176a100000  phdr: 0x00007f176a100040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libdrm.so.2
+   1512679:
+   1512679:	opening file=/lib64/libdrm.so.2 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libnvidia-allocator.so.1 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libnvidia-allocator.so.1 [0];  generating link map
+   1512679:	  dynamic: 0x00007b1768940e08  base: 0x00007b176891c000   size: 0x0000000000027150
+   1512679:	    entry: 0x00007b1768920530  phdr: 0x00007b176891c040  phnum:                  9
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libnvidia-allocator.so.1
+   1512679:
+   1512679:	opening file=/lib64/libnvidia-allocator.so.1 [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	closing file=/usr/lib64/libGLX_nvidia.so.0; direct_opencount=1
+   1512679:
+   1512679:	closing file=/usr/lib64/libGLX_nvidia.so.0; direct_opencount=1
+   1512679:
+   1512679:	file=libVkLayer_khronos_validation.so [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libVkLayer_khronos_validation.so [0];  generating link map
+   1512679:	  dynamic: 0x00007b17512b95e8  base: 0x00007b1750000000   size: 0x00000000012d7968
+   1512679:	    entry: 0x00007b1750000000  phdr: 0x00007b1750000040  phnum:                 12
+   1512679:
+   1512679:
+   1512679:	file=libSPIRV-Tools-opt.so [0];  needed by /lib64/libVkLayer_khronos_validation.so [0]
+   1512679:	file=libSPIRV-Tools-opt.so [0];  generating link map
+   1512679:	  dynamic: 0x00007b1757a3fba0  base: 0x00007b1757800000   size: 0x0000000000243038
+   1512679:	    entry: 0x00007b1757800000  phdr: 0x00007b1757800040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=libSPIRV-Tools.so [0];  needed by /lib64/libVkLayer_khronos_validation.so [0]
+   1512679:	file=libSPIRV-Tools.so [0];  generating link map
+   1512679:	  dynamic: 0x00007b17577fdba0  base: 0x00007b1757661000   size: 0x000000000019e408
+   1512679:	    entry: 0x00007b1757661000  phdr: 0x00007b1757661040  phnum:                 11
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libSPIRV-Tools-opt.so [0];  needed by /lib64/libSPIRV-Tools.so [0] (relocation dependency)
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libSPIRV-Tools.so
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libSPIRV-Tools-opt.so
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libVkLayer_khronos_validation.so
+   1512679:
+   1512679:	opening file=/lib64/libVkLayer_khronos_validation.so [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libVkLayer_MESA_device_select.so [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libVkLayer_MESA_device_select.so [0];  generating link map
+   1512679:	  dynamic: 0x00007b1768918950  base: 0x00007b1768902000   size: 0x00000000000191d0
+   1512679:	    entry: 0x00007b1768902000  phdr: 0x00007b1768902040  phnum:                 12
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libVkLayer_MESA_device_select.so
+   1512679:
+   1512679:	opening file=/lib64/libVkLayer_MESA_device_select.so [0]; direct_opencount=1
+   1512679:
+   1512679:
+   1512679:	file=libnvidia-glvkspirv.so.615.78.08 [0];  dynamically loaded by build/sanitize/blood2 [0]
+   1512679:	file=libnvidia-glvkspirv.so.615.78.08 [0];  generating link map
+   1512679:	  dynamic: 0x00007b175756d848  base: 0x00007b1756c00000   size: 0x0000000000a0e320
+   1512679:	    entry: 0x00007b1756c34c30  phdr: 0x00007b1756c00040  phnum:                 10
+   1512679:
+   1512679:
+   1512679:	calling init: /lib64/libnvidia-glvkspirv.so.615.78.08
+   1512679:
+   1512679:	opening file=/lib64/libnvidia-glvkspirv.so.615.78.08 [0]; direct_opencount=1
+   1512679:
+   1512679:	/lib64/libVkLayer_MESA_device_select.so: error: symbol lookup error: undefined symbol: vkGetDeviceProcAddr (fatal)
+   1512679:
+   1512679:	closing file=/lib64/libwayland-client.so.0; direct_opencount=1
+   1512679:
+   1512679:	closing file=/usr/lib64/libGLX_nvidia.so.0; direct_opencount=1
+   1512679:
+   1512679:	calling fini: /lib64/libVkLayer_MESA_device_select.so [0]
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libVkLayer_MESA_device_select.so [0];  destroying link map
+   1512679:
+   1512679:	calling fini: /lib64/libVkLayer_khronos_validation.so [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libSPIRV-Tools-opt.so [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libSPIRV-Tools.so [0]
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libVkLayer_khronos_validation.so [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libSPIRV-Tools-opt.so [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libSPIRV-Tools.so [0];  destroying link map
+   1512679:
+   1512679:	calling fini: /usr/lib64/libGLX_nvidia.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	closing file=/lib64/libnvidia-glvkspirv.so.615.78.08; direct_opencount=0
+   1512679:
+   1512679:	closing file=/lib64/libxcb.so.1; direct_opencount=1
+   1512679:
+   1512679:	closing file=/lib64/libX11-xcb.so.1; direct_opencount=2
+   1512679:
+   1512679:	closing file=/lib64/libxcb.so.1; direct_opencount=0
+   1512679:
+   1512679:	closing file=/lib64/libxcb-dri3.so.0; direct_opencount=2
+   1512679:
+   1512679:	closing file=/lib64/libxcb-present.so.0; direct_opencount=0
+   1512679:
+   1512679:	closing file=/lib64/libxcb-sync.so.1; direct_opencount=0
+   1512679:
+   1512679:	closing file=/lib64/libxcb-xfixes.so.0; direct_opencount=0
+   1512679:
+   1512679:	closing file=/lib64/libdrm.so.2; direct_opencount=1
+   1512679:
+   1512679:	closing file=/lib64/libnvidia-allocator.so.1; direct_opencount=0
+   1512679:
+   1512679:	closing file=/lib64/libdrm.so.2; direct_opencount=0
+   1512679:
+   1512679:	calling fini: /lib64/libnvidia-glsi.so.615.78.08 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libnvidia-glcore.so.615.78.08 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libnvidia-tls.so.615.78.08 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libXext.so.6 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libX11.so.6 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libnvidia-gpucomp.so.615.78.08 [0]
+   1512679:
+   1512679:
+   1512679:	file=/usr/lib64/libGLX_nvidia.so.0 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libnvidia-glsi.so.615.78.08 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libnvidia-glcore.so.615.78.08 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libnvidia-tls.so.615.78.08 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libXext.so.6 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libX11.so.6 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libnvidia-gpucomp.so.615.78.08 [0];  destroying link map
+   1512679:
+   1512679:	calling fini: /lib64/libxcb-present.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libxcb-sync.so.1 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libxcb-xfixes.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libdrm.so.2 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libnvidia-allocator.so.1 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libnvidia-glvkspirv.so.615.78.08 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libdl.so.2 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libpthread.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libxcb-present.so.0 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libxcb-sync.so.1 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libxcb-xfixes.so.0 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libdrm.so.2 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libnvidia-allocator.so.1 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libnvidia-glvkspirv.so.615.78.08 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libdl.so.2 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libpthread.so.0 [0];  destroying link map
+   1512679:
+   1512679:	calling fini: /lib64/libusb-1.0.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libudev.so.1 [0]
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libusb-1.0.so.0 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libudev.so.1 [0];  destroying link map
+   1512679:
+   1512679:	calling fini: /lib64/libvulkan.so.1 [0]
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libvulkan.so.1 [0];  destroying link map
+   1512679:
+   1512679:	calling fini: /lib64/libwayland-egl.so.1 [0]
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libwayland-egl.so.1 [0];  destroying link map
+   1512679:
+   1512679:	calling fini: /lib64/libwayland-cursor.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libwayland-cursor.so.0 [0];  destroying link map
+   1512679:
+   1512679:	calling fini: /lib64/libxkbcommon.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libxkbcommon.so.0 [0];  destroying link map
+   1512679:
+   1512679:	calling fini: /lib64/libdecor-0.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libwayland-client.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libffi.so.8 [0]
+   1512679:
+   1512679:
+   1512679:	file=/lib64/libdecor-0.so.0 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libwayland-client.so.0 [0];  destroying link map
+   1512679:
+   1512679:	file=/lib64/libffi.so.8 [0];  destroying link map
+   1512679:
+   1512679:	calling fini:  [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libstdc++.so.6 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libresolv.so.2 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libdbus-1.so.3 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libsystemd.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libgcc_s.so.1 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libm.so.6 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/librt.so.1 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libxcb-glx.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libxcb-randr.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libxcb-dri3.so.0 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libxcb.so.1 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libXau.so.6 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libc.so.6 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/ld-linux-x86-64.so.2 [0]
+   1512679:
+   1512679:
+   1512679:	calling fini: /lib64/libX11-xcb.so.1 [0]
+   1512679:

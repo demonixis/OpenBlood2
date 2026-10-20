@@ -1,0 +1,14 @@
+321/323 Testing: model_view.weapon_pose
+321/323 Test: model_view.weapon_pose
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/model_view_tests" "weapon_pose"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"model_view.weapon_pose" start time: Oct 16 10:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"model_view.weapon_pose" end time: Oct 16 10:04 CEST
+"model_view.weapon_pose" time elapsed: 00:00:00
+----------------------------------------------------------

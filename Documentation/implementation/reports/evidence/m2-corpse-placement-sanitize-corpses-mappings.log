@@ -1,0 +1,14 @@
+478/646 Testing: corpses.mappings
+478/646 Test: corpses.mappings
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "mappings" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/mappings"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.mappings" start time: Oct 17 04:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.mappings" end time: Oct 17 04:30 CEST
+"corpses.mappings" time elapsed: 00:00:00
+----------------------------------------------------------

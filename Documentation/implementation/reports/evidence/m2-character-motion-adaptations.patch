@@ -1,0 +1,1022 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 991aaee..c8495e0 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -212,3 +212,11 @@ player interrupt-before-failure, source 3D speed threshold and left/right altern
+ raw first-container liquid precedence and distinct baked material flags. Typed
+ movement keeps stale surface messages rejected. AI sound alerts remain explicitly
+ unavailable; no new AI class or complete M2 gate is claimed.
++
++The latest [character motion evidence](../Documentation/Implementation/M2_CHARACTER_MOTION.md) connects original BaseCharacter model-key motion
++and bounded Sparam lookup. Read [motion-key contracts](docs/CHARACTER_MOTION_CONTRACTS.md). Preserve local-up yaw,
++source overwrite/order, world-space AddXYZ, centered raw dimensions and the player's
++base-handler exclusion. Validate complete numeric groups before mutation; stop on
++service failure and preserve deferred touch removal. The seven examined character
++assets contain no motion keys; synthetic probes are explicitly labelled, not AI.
++AI states/hearing/fire, ExitTrigger, client FX and the actual M2 gate remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8d5f74a..cb6e715 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -39,7 +39,7 @@ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original
+ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+-target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp)
++target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+     src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+@@ -48,7 +48,7 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
++add_executable(blood2_app src/app/character_motion_smoke.cpp src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+diff --git a/README.md b/README.md
+index f06d7d1..cbb9a6e 100644
+--- a/README.md
++++ b/README.md
+@@ -241,3 +241,11 @@ ExitTrigger, client FX and the actual M2 exit gate remain incomplete.
+ Latest M2 continuation: [original character audio and footsteps](../Documentation/Implementation/M2_CHARACTER_AUDIO.md)
+ adds attached voices, original animation-key playback and material/liquid selection.
+ AI hearing, remaining classes/services and the M2 acceptance gate are still open.
++
++Latest M2 continuation: [original character motion keys](../Documentation/Implementation/M2_CHARACTER_MOTION.md)
++adds bounded bracket parameters, source-ordered rotation/velocity/displacement/dimensions
++and truthful inspection. Synthetic motion and actual private-key coverage are
++separate; remaining AI/classes/services keep M2 incomplete.
++
++This increment passed 290/290 tests in both Debug and inspector-free Release,
++and 267/267 sequential headless tests with Clang ASan/UBSan/leak checks on Linux.
+diff --git a/docs/CHARACTER_MOTION_CONTRACTS.md b/docs/CHARACTER_MOTION_CONTRACTS.md
+new file mode 100644
+index 0000000..fdb6576
+--- /dev/null
++++ b/docs/CHARACTER_MOTION_CONTRACTS.md
+@@ -0,0 +1,110 @@
++# Original character motion keys
++
++M2 remains incomplete. This imports the motion branch of original
++CBaseCharacter::OnStringKey and a bounded Sparam_Get lookup. It is a prerequisite
++for character integration, not a new AI implementation. CMovement path steering,
++AI_Mgr states, hearing, fire/extra keys, attachments and ExitTrigger remain absent.
++See [source ledger](M2_CHARACTER_MOTION_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_CHARACTER_MOTION.md).
++The [object](OBJECT_CONTRACTS.md), [model/collision](MODEL_AND_COLLISION_CONTRACTS.md)
++and [character audio](CHARACTER_AUDIO_CONTRACTS.md) contracts still apply.
++
++## Source rules
++
++Only argv[0] is examined. Sparam looks for the first exact, case-sensitive
++`[name:value]` substring and takes the bytes through the first closing bracket.
++Repeated names retain the first value; lowercase aliases are not invented.
++Existing model command tokenization remains unchanged: semicolons separate
++callbacks, quotes preserve a word with spaces, and unquoted extra words are not
++merged into argv[0]. The source's six independent branches execute in this order,
++regardless of their textual order:
++
++| Branch | Observable action |
++| --- | --- |
++| RotY | Rotate around the character's current local up axis, in radians |
++| ForwVel | Replace velocity with current forward times the value |
++| RightVel | Replace velocity with current right times the value |
++| UpVel | Replace velocity with current up times the value |
++| AddX, AddY, AddZ | Add a world-space position delta through checked MoveObject |
++| DimsX, DimsY, DimsZ | Set half dimensions, preserving the object center |
++
++Velocity branches overwrite rather than add. Rotation precedes velocity selection.
++The existing engine quaternion/vector helpers replace the old math API calls;
++later LithTech EulerRotateY/RotateAroundAxis and matrix math confirm local-up
++composition and positive-angle convention. This is a source comparison, not a
++Blood II retail executable comparison. No second integrator is introduced.
++The established session order remains physics, then animation callbacks: a velocity
++key affects subsequent physics, while AddXYZ invokes collision immediately.
++
++AddXYZ preserves the existing swept/slide solver. A successful clipped movement
++counts as an applied action; actual position/contact shows how far it moved.
++DimsXYZ uses the existing raw SetObjectDims operation, not player ResizeObject:
++it neither anchors the feet nor checks new-shape clearance. Zero dimensions are
++allowed; negative/nonfinite/out-of-range dimensions fail. Collision response and
++raw resize behavior are not claimed retail-equivalent.
++
++CPlayerObj's override continues to handle its own play_sound/footstep keys and
++**does not forward to the base motion handler**, matching the commented-out base
++call in the original player source. Existing MoveMgr movement remains unchanged.
++Unknown commands remain bounded inspection records, never successful services.
++
++## Bounded adaptations and failures
++
++Sparam_Get now returns Missing, Found or Invalid and a borrowed string_view on
++success. Output remains unchanged on failure. Input is limited to 4096 bytes,
++IDs to 252, values to 255; embedded NULs, missing/empty closing values and oversized
++inputs fail. A fixed stack marker replaces Windows formatting/substring functions
++and unbounded destination copies. Unused Sparam_Add/Remove are not imported.
++
++Motion numbers have a 31-byte bound matching the old 32-byte scalar buffer.
++Locale-independent parsing accepts finite signed decimal/scientific values,
++including a leading plus and whitespace within a quoted word. It rejects junk
++suffixes, NaN/infinity, overflow and magnitudes beyond ten million original units.
++This deliberately replaces atof's permissive fallback and the source's buffer
++writes. AddXYZ and DimsXYZ require all three components; the source could otherwise
++read uninitialized Y/Z buffers. All present motion parameters are validated before
++any action, including nonnegative dimensions. Malformed bundles apply nothing.
++
++Successful actions retain source order. A service failure stops subsequent actions
++and leaves earlier successful actions in place; there is no rollback across touch
++callbacks. SetObjectDims now returns a checked DRESULT and rejects pending/stale,
++container/world-model and invalid dimension requests. Existing callers may ignore
++that return; creation initialization still succeeds on an Alive object. If AddXYZ
++triggers removal, dimensions and later animation commands cannot mutate the dying
++object. Destruction remains deferred until the callback chain finishes.
++
++The inspector retains the last bounded key, applied bit mask (bits 0–5 in the
++above order), total keys/actions/failures, explicit failure text, current position,
++velocity and dimensions. A recognized failed key is visible as a failure; it is
++not counted as an unknown command. Inspection has no execution side effects.
++Hidden/inactive character records remain selectable; inactive objects do not
++advance model clocks. No UI is needed for dispatch or cleanup.
++
++## Verified content and tests
++
++The seven required-character assets examined contain 326 clips and 193 nonempty
++keys: 46 plain Caleb footstep keys and 147 bracket keys in civilians, cultists,
++labtech and Gideon. **None contains a motion key.** Private tests dispatch every
++actual marker through the base character callback, retain each unavailable key,
++and verify zero motion mutations and clean destruction. This does not make the
++AI sound/fire/extra handlers available or replace the player's sound path.
++
++Synthetic tests cover duplicate/case lookup, bounded malformed values, order and
++velocity replacement, tilted local-yaw rotation, collision clipping and overlap,
++centered dimension changes, partial service failure, touch-driven self-removal,
++subsequent-key cancellation, hidden/inactive lifetime, immutable model data and
++the original player override exclusion.
++
++`--skeleton-smoke` retains the existing real player locomotion, node, audio and
++unload/re-entry assertions. It also creates one explicitly labelled **Synthetic
++motion probe (not AI)**, using a private in-memory model copy with synthetic keys
++far from world actors. No archive or cached model changes. Restarting that probe
++at UI hide must deliver a second motion key while hidden; reload must invalidate
++its old identity and run a newly created probe. Its extra runtime object is only
++in this smoke scenario, not source-entry accounting or normal startup.
++
++The SubwayA gate is unchanged: 187 created, 4 transferred sounds, 372 editor-only,
++17 unsupported, zero failed, plus 7 SelfTriggers. The missing source instances
++remain 5 CivilianAI, 10 CultistAI, Gideon and ExitTrigger. Required client FX and
++other services remain unavailable. --start-game must still exit 6. Other platforms,
++XR and retail gameplay/physics parity are not validated by this increment.
+diff --git a/docs/M2_CHARACTER_MOTION_SOURCES.json b/docs/M2_CHARACTER_MOTION_SOURCES.json
+new file mode 100644
+index 0000000..a75d173
+--- /dev/null
++++ b/docs/M2_CHARACTER_MOTION_SOURCES.json
+@@ -0,0 +1,84 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "9dc89ec673be67d0ecc31044983b27019c8ce41b",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/BaseCharacter.cpp",
++      "sha256": "0002f599c46971e006829e2c41405d872e8fbb08d8ff7590cadd50d91e14aa95",
++      "selected_lines": [
++        [
++          108,
++          219
++        ]
++      ],
++      "use": "Original model-key motion rule order and operations"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Sparam.cpp",
++      "sha256": "40e8649ee44134c528154cc4224be32ec492efc3b2173c7a32921c08f01d8962",
++      "selected_lines": [
++        [
++          1,
++          78
++        ]
++      ],
++      "use": "Original case-sensitive first bracket parameter lookup, bounded adaptation"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Sparam.h",
++      "sha256": "bd225fd9b2096c22afe0d1ee9cc43f6f7c923257a85066e870a6d15154956d24",
++      "selected_lines": [
++        [
++          1,
++          35
++        ]
++      ],
++      "use": "Original lookup declaration; unused writer functions not imported"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "selected_lines": [
++        [
++          3114,
++          3144
++        ]
++      ],
++      "use": "Player sound override does not forward base motion keys"
++    },
++    {
++      "path": "sources/lithtech/runtime/shared/src/mathlt_impl.cpp",
++      "sha256": "d629bcbede04219aa9d9486491aa37f2233ba714b674517a6cc9d6c57a874564",
++      "selected_lines": [
++        [
++          107,
++          144
++        ]
++      ],
++      "use": "Later engine local Euler rotation semantics only, no engine code import"
++    },
++    {
++      "path": "sources/lithtech/sdk/inc/ltmatrix.h",
++      "sha256": "d832d4191bc156bc61d54ad5c4424f4df4e01626dab89530dcbee58709e9bb21",
++      "selected_lines": [
++        [
++          470,
++          505
++        ]
++      ],
++      "use": "Later engine positive axis-angle matrix reference"
++    }
++  ],
++  "adaptations": [
++    "Bounded borrowed Sparam values, explicit missing/invalid status, no Windows API",
++    "Strict finite locale-independent numbers and prevalidation of complete XYZ groups",
++    "Existing centralized quaternion/vector math replaces old SDK math calls",
++    "Checked SetObjectDims result, range and pending-object rejection",
++    "Explicit partial service failure and per-character inspection"
++  ],
++  "not_implemented": [
++    "CMovement path steering and AI_Mgr behavior",
++    "AI sound/hearing, fire and extra callbacks",
++    "Attachments, ExitTrigger, client FX and full M2 gate"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 9731b4b..2258cae 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -425,3 +425,8 @@ AI callers, damage localization, attachments and blending remain unimplemented.
+ Character audio continuation: [source ledger](M2_CHARACTER_AUDIO_SOURCES.json),
+ [contracts](CHARACTER_AUDIO_CONTRACTS.md). Original Anim_Sound and PlayerObj sound
+ rules are integrated selectively; no reference repository is a build dependency.
++
++Character motion continuation: [source ledger](M2_CHARACTER_MOTION_SOURCES.json),
++[contracts](CHARACTER_MOTION_CONTRACTS.md). BaseCharacter and Sparam rules are
++selectively adapted; existing math services replace SDK calls. Later LithTech
++rotation code informs semantics only. No reference repository is a dependency.
+diff --git a/src/app/character_motion_smoke.cpp b/src/app/character_motion_smoke.cpp
+new file mode 100644
+index 0000000..874e6a9
+--- /dev/null
++++ b/src/app/character_motion_smoke.cpp
+@@ -0,0 +1,36 @@
++#include "character_motion_smoke.h"
++namespace OpenBlood2
++{
++    bool prepare_character_motion_smoke(GameSession& g, ObjectId& id)
++    {
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_MODEL;
++        state.m_Pos = {100000, 100000, 100000};
++        state.m_Flags = FLAG_MODELKEYS; // No collision/gravity: isolated inspection probe, never an AI actor.
++        SAFE_STRCPY(state.m_Name, "Synthetic motion probe (not AI)");
++        SAFE_STRCPY(state.m_Filename, "models/characters/caleb.abc");
++        const auto h = g.objects.create(g.objects.find_class("CBaseCharacter"), state);
++        auto* r = g.objects.get(h);
++        auto* c = r ? dynamic_cast<CBaseCharacter*>(r->game.get()) : nullptr;
++        if (!c || !r->model || r->model->animations.empty() || r->model->animations[0].keys.empty())
++            return false;
++        // Only the in-memory probe receives synthetic markers; archive/cache remains immutable.
++        auto model = std::make_shared<Model>(*r->model);
++        for (auto& a : model->animations)
++            for (auto& key : a.keys)
++                key.text.clear();
++        model->animations[0].keys[0].text =
++            "[RotY:0.25][ForwVel:12][AddX:2][AddY:0][AddZ:0][DimsX:2][DimsY:3][DimsZ:4]";
++        r->model = model;
++        id = r->id;
++        return c->m_Anim_Sound.SetAnimationIndexes(h) && c->m_Anim_Sound.GenerateHitSpheres(h);
++    }
++    bool check_character_motion_smoke(GameSession& g, ObjectId id)
++    {
++        const auto* r = g.objects.get(id);
++        const auto* c = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
++        return c && c->motion_keys > 0 && c->motion_actions == c->motion_keys * 4 && c->motion_applied == 51 &&
++               c->motion_failures == 0 && c->motion_error.empty() && r->dimensions.y == 3 &&
++               r->state.m_Pos.x > 100000 && r->state.m_Pos.y == 100000;
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/character_motion_smoke.h b/src/app/character_motion_smoke.h
+new file mode 100644
+index 0000000..52bb1cf
+--- /dev/null
++++ b/src/app/character_motion_smoke.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool prepare_character_motion_smoke(GameSession&, ObjectId&);
++    bool check_character_motion_smoke(GameSession&, ObjectId);
++} // namespace OpenBlood2
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index fee32aa..9fe8c02 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -54,6 +54,22 @@ namespace OpenBlood2
+             }
+             else
+                 ImGui::TextUnformatted("No original character animation table on this object");
++            if (character && ImGui::CollapsingHeader("Character motion keys", ImGuiTreeNodeFlags_DefaultOpen))
++            {
++                ImGui::Text("Keys %llu | applied actions %llu | failures %llu | last mask 0x%02x",
++                            (unsigned long long)character->motion_keys, (unsigned long long)character->motion_actions,
++                            (unsigned long long)character->motion_failures, character->motion_applied);
++                ImGui::TextWrapped("Last key: %s", character->motion_key.c_str());
++                ImGui::Text("Position %.2f %.2f %.2f | velocity %.2f %.2f %.2f", r->state.m_Pos.x, r->state.m_Pos.y,
++                            r->state.m_Pos.z, r->velocity.x, r->velocity.y, r->velocity.z);
++                ImGui::Text("Half dimensions %.2f %.2f %.2f", r->dimensions.x, r->dimensions.y, r->dimensions.z);
++                if (!character->motion_error.empty())
++                    ImGui::TextWrapped("%s", character->motion_error.c_str());
++                ImGui::TextWrapped(dynamic_cast<const CPlayerObj*>(character)
++                                       ? "Player override excludes base motion keys, as in the source."
++                                       : "Source order: local yaw, forward/right/up velocity overwrite, world delta, "
++                                         "centered dimensions.");
++            }
+             if (anim && ImGui::CollapsingHeader("Character audio", ImGuiTreeNodeFlags_DefaultOpen))
+             {
+                 ImGui::TextWrapped("Root: %s | silent flag: %s (source helper does not test it)",
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 6dde939..d6a6ce2 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -2,6 +2,7 @@
+ #include "brush_smoke.h"
+ #include "build_info.h"
+ #include "camera_smoke.h"
++#include "character_motion_smoke.h"
+ #include "cinematic_smoke.h"
+ #include "engine/capture.h"
+ #include "engine/config.h"
+@@ -231,6 +232,11 @@ namespace
+         // and consume their Key objects on the first normal simulation update.
+         if (options.world_smoke && !game.step(1.0 / 60))
+             return 4;
++        OpenBlood2::ObjectId smoke_motion{};
++        bool character_motion_hidden = false;
++        if (options.skeleton_smoke && !OpenBlood2::prepare_character_motion_smoke(game, smoke_motion))
++            return 4;
++        const auto original_motion = smoke_motion;
+         bool interaction_hidden = false;
+         const auto original_selection = selection.id;
+         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
+@@ -251,6 +257,8 @@ namespace
+         inspector.select_weapons = options.weapons_smoke;
+         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke;
+         inspector.select_skeleton = options.skeleton_smoke;
++        if (options.skeleton_smoke)
++            inspector.skeleton_selection = smoke_motion;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
+         inspector.select_pickups = options.pickups_smoke;
+@@ -463,6 +471,11 @@ namespace
+                 spdlog::error("Object simulation step failed");
+                 return 4;
+             }
++            if (options.skeleton_smoke && !inspector_visible)
++                if (const auto* r = game.objects.get(smoke_motion))
++                    if (const auto* c = dynamic_cast<const CBaseCharacter*>(r->game.get()))
++                        character_motion_hidden |=
++                            c->motion_keys >= 2 && OpenBlood2::check_character_motion_smoke(game, smoke_motion);
+             if (options.movement_smoke && game.local_client)
+             {
+                 const auto* player = game.server_shell.Player(game.local_client);
+@@ -695,6 +708,12 @@ namespace
+                     use.key.down = frames == hide_frame;
+                     event_ok = SDL_PushEvent(&use);
+                 }
++                if (options.skeleton_smoke && frames == hide_frame)
++                {
++                    const auto* r = game.objects.get(smoke_motion);
++                    if (!r || game.server.ResetModelAnimation(r->handle) != DE_OK)
++                        return 4;
++                }
+                 if (options.scene_explosions_smoke && frames == hide_frame &&
+                     !OpenBlood2::activate_scene_explosion_smoke(game, smoke_scene_explosion))
+                     return 4;
+@@ -841,6 +860,16 @@ namespace
+                     skeleton_reentered = player->m_Anim_Sound.hit_spheres_valid &&
+                                          game.server.GetModelNodeTransform(player->m_hObject, "head", &head, &rotation);
+                 }
++            bool character_motion_reentered = !options.skeleton_smoke;
++            if (options.skeleton_smoke)
++            {
++                if (game.objects.get(original_motion) ||
++                    !OpenBlood2::prepare_character_motion_smoke(game, smoke_motion) || !game.server.advance_models(0))
++                    return 4;
++                character_motion_reentered = OpenBlood2::check_character_motion_smoke(game, smoke_motion);
++                spdlog::info("Character motion probe: hidden={}, reentered={}, old handle invalidated={}",
++                             character_motion_hidden, character_motion_reentered, !game.objects.get(original_motion));
++            }
+             bool character_audio_reentered = !options.skeleton_smoke;
+             if (options.skeleton_smoke)
+             {
+@@ -864,7 +893,8 @@ namespace
+                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
+             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
+                 !selection_cleared ||
+-                (options.skeleton_smoke && (!character_audio_hidden || !character_audio_reentered)) ||
++                (options.skeleton_smoke && (!character_audio_hidden || !character_audio_reentered ||
++                                            !character_motion_hidden || !character_motion_reentered)) ||
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 7094e58..a8fe1a7 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -105,7 +105,7 @@ class ServerDE : public CSBase
+     HOBJECT (*ObjectToHandle)(LPBASECLASS) = nullptr;
+     DDWORD (*GetObjectFlags)(HOBJECT) = nullptr;
+     void (*SetObjectFlags)(HOBJECT, DDWORD) = nullptr;
+-    void (*SetObjectDims)(HOBJECT, DVector*) = nullptr;
++    DRESULT (*SetObjectDims)(HOBJECT, DVector*) = nullptr;
+     void (*SetObjectUserFlags)(HOBJECT, DDWORD) = nullptr;
+     HOBJECT (*GetNextObject)(HOBJECT) = nullptr;
+     char* (*GetObjectName)(HOBJECT) = nullptr;
+diff --git a/src/game/original/CharacterMotion.cpp b/src/game/original/CharacterMotion.cpp
+new file mode 100644
+index 0000000..752de6e
+--- /dev/null
++++ b/src/game/original/CharacterMotion.cpp
+@@ -0,0 +1,125 @@
++// Original BaseCharacter.cpp:108-219; bounded numeric parsing and explicit
++// service outcomes replace unsafe fixed buffers/atof. See CHARACTER_MOTION_CONTRACTS.md.
++#include "PlayerObj.h"
++#include "Sparam.h"
++#include "engine/collision.h"
++#include <charconv>
++#include <cmath>
++
++namespace
++{
++    bool number(std::string_view text, float& value)
++    {
++        constexpr std::string_view spaces = " \t\r\n\f\v";
++        const auto first = text.find_first_not_of(spaces);
++        if (first == text.npos || text.size() > 31)
++            return false;
++        text = text.substr(first, text.find_last_not_of(spaces) - first + 1);
++        if (text.front() == '+')
++        {
++            text.remove_prefix(1);
++            if (!text.empty() && text.front() == '-')
++                return false;
++        }
++        if (text.empty() || text.front() == '+')
++            return false;
++        const auto [end, ec] = std::from_chars(text.data(), text.data() + text.size(), value);
++        return ec == std::errc{} && end == text.data() + text.size() && std::isfinite(value) && std::abs(value) <= 1e7f;
++    }
++} // namespace
++
++bool CBaseCharacter::OnStringKey(ArgList* args)
++{
++    auto* server = GetServerDE();
++    if (!server || !args || args->argc < 1 || !args->argv || !args->argv[0])
++        return false;
++    // The original handler examines argv[0] only; do not merge separate words.
++    const std::string_view key(args->argv[0]);
++    constexpr const char* names[]{"RotY", "ForwVel", "RightVel", "UpVel", "AddX", "DimsX"};
++    std::array<bool, 6> present{};
++    std::array<float, 6> values{};
++    DVector add{}, dims{};
++    bool recognized = false, valid = true;
++    for (unsigned i = 0; i < 6; ++i)
++    {
++        std::string_view value;
++        const auto status = Sparam_Get(key, names[i], value);
++        present[i] = status != SparamStatus::Missing;
++        recognized |= present[i];
++        if (present[i] && (status != SparamStatus::Found || !number(value, values[i])))
++            valid = false;
++    }
++    if (!recognized)
++        return false;
++    ++motion_keys;
++    motion_key.assign(key.substr(0, 4096));
++    motion_error.clear();
++    motion_applied = 0;
++    auto fail = [&](const char* error)
++    {
++        ++motion_failures;
++        motion_error = error;
++        return true; // Recognized failure, never reported as an unavailable unknown key.
++    };
++    auto component = [&](const char* name, float& out)
++    {
++        std::string_view value;
++        return Sparam_Get(key, name, value) == SparamStatus::Found && number(value, out);
++    };
++    if (present[4])
++    {
++        add.x = values[4];
++        valid &= component("AddY", add.y) && component("AddZ", add.z);
++    }
++    if (present[5])
++    {
++        dims.x = values[5];
++        valid &= component("DimsY", dims.y) && component("DimsZ", dims.z);
++        valid &= dims.x >= 0 && dims.y >= 0 && dims.z >= 0;
++    }
++    if (!valid)
++        return fail("Invalid/missing motion parameter; no motion action applied");
++    auto applied = [&](unsigned i)
++    {
++        motion_applied |= 1u << i;
++        ++motion_actions;
++    };
++    DRotation rotation;
++    if (server->GetObjectRotation(m_hObject, &rotation) != DE_OK)
++        return fail("Character rotation unavailable");
++    if (present[0])
++    {
++        // EulerRotateY rotates around the current local up axis (later LithTech
++        // math reference). Compose on the right, not around fixed world Y.
++        const float half = values[0] * .5f;
++        rotation = OpenBlood2::compose_rotation(rotation, {{0, std::sin(half), 0}, std::cos(half)});
++        if (server->SetObjectRotation(m_hObject, &rotation) != DE_OK)
++            return fail("Character rotation rejected");
++        applied(0);
++    }
++    constexpr DVector axes[]{{0, 0, 1}, {1, 0, 0}, {0, 1, 0}};
++    for (unsigned i = 1; i <= 3; ++i)
++        if (present[i])
++        {
++            auto velocity = OpenBlood2::vector_scale(OpenBlood2::rotate_vector(rotation, axes[i - 1]), values[i]);
++            if (server->SetVelocity(m_hObject, &velocity) != DE_OK)
++                return fail("Character velocity rejected");
++            applied(i); // Original independent setters overwrite; they do not add.
++        }
++    if (present[4])
++    {
++        DVector position;
++        server->GetObjectPos(m_hObject, &position);
++        position = OpenBlood2::vector_add(position, add); // World-space delta, not rotated.
++        if (server->MoveObject(m_hObject, &position) != DE_OK)
++            return fail("Character displacement failed; earlier actions remain applied");
++        applied(4); // Success can be collision-clipped; inspect actual position/contact.
++    }
++    if (present[5])
++    {
++        if (server->SetObjectDims(m_hObject, &dims) != DE_OK)
++            return fail("Character dimensions rejected; earlier actions remain applied");
++        applied(5); // Source SetObjectDims keeps the center; not player foot-anchored ResizeObject.
++    }
++    return true;
++}
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index 03facab..d2e10fe 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -21,15 +21,15 @@ class CBaseCharacter : public B2BaseClass
+     CInventoryMgr m_InventoryMgr;
+     CDestructable m_damage;
+     CAnim_Sound m_Anim_Sound;
+-    // Retain commands outside the selected original player sound-key path.
++    std::uint64_t motion_keys = 0, motion_actions = 0, motion_failures = 0;
++    unsigned motion_applied = 0; // RotY, ForwVel, RightVel, UpVel, AddXYZ, DimsXYZ bits.
++    std::string motion_key, motion_error;
++    // Retain commands outside the selected original character/player key paths.
+     // Recording a key never claims its missing service was executed.
+     std::vector<std::string> pending_model_commands;
+ 
+   protected:
+-    virtual bool OnStringKey(ArgList*)
+-    {
+-        return false;
+-    }
++    virtual bool OnStringKey(ArgList*);
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+ };
+ class CPlayerObj : public CBaseCharacter
+diff --git a/src/game/original/Sparam.cpp b/src/game/original/Sparam.cpp
+new file mode 100644
+index 0000000..ccf4e81
+--- /dev/null
++++ b/src/game/original/Sparam.cpp
+@@ -0,0 +1,24 @@
++#include "Sparam.h"
++#include <algorithm>
++#include <array>
++
++SparamStatus Sparam_Get(std::string_view source, std::string_view id, std::string_view& value)
++{
++    if (source.size() > 4096 || source.find('\0') != source.npos || id.empty() || id.size() > 252 ||
++        id.find_first_of("[]:") != id.npos || id.find('\0') != id.npos)
++        return SparamStatus::Invalid;
++    std::array<char, 256> storage{};
++    storage[0] = '[';
++    std::copy(id.begin(), id.end(), storage.begin() + 1);
++    storage[id.size() + 1] = ':';
++    const std::string_view marker(storage.data(), id.size() + 2);
++    const auto at = source.find(marker);
++    if (at == source.npos)
++        return SparamStatus::Missing;
++    const auto start = at + marker.size();
++    const auto end = source.find(']', start);
++    if (end == source.npos || end == start || end - start > 255)
++        return SparamStatus::Invalid;
++    value = source.substr(start, end - start);
++    return SparamStatus::Found;
++}
+diff --git a/src/game/original/Sparam.h b/src/game/original/Sparam.h
+new file mode 100644
+index 0000000..9308f2f
+--- /dev/null
++++ b/src/game/original/Sparam.h
+@@ -0,0 +1,13 @@
++// Bounded source-level adaptation of ObjectDLL/Sparam.cpp (1996 Monolith).
++#pragma once
++#include <string_view>
++
++enum class SparamStatus
++{
++    Missing,
++    Found,
++    Invalid
++};
++// Original case-sensitive first "[id:value]" lookup. Output is borrowed and is
++// unchanged on failure. No Windows/locale API or unbounded destination buffer.
++SparamStatus Sparam_Get(std::string_view source, std::string_view id, std::string_view& value);
+diff --git a/src/game/server_adapter.cpp b/src/game/server_adapter.cpp
+index 2555a31..00549f9 100644
+--- a/src/game/server_adapter.cpp
++++ b/src/game/server_adapter.cpp
+@@ -122,18 +122,19 @@ namespace OpenBlood2
+             active().trace_service("GetNextObject");
+             return active().objects_.next_alive(previous);
+         };
+-        SetObjectDims = [](HOBJECT h, DVector* dims)
++        SetObjectDims = [](HOBJECT h, DVector* dims) -> DRESULT
+         {
+             active().trace_service("SetObjectDims");
+             auto& o = active().objects_;
+             auto* r = o.get(h);
+-            if (!r || (r->container || r->world_model) || !dims || !std::isfinite(dims->x) || !std::isfinite(dims->y) ||
+-                !std::isfinite(dims->z) || dims->x < 0 || dims->y < 0 || dims->z < 0)
++            if (!r || r->life != Life::Alive || (r->container || r->world_model) || !dims || !physics_vector(*dims) ||
++                dims->x < 0 || dims->y < 0 || dims->z < 0)
+             {
+                 o.fail(ObjectError::InvalidProperty, "Invalid object dimensions");
+-                return;
++                return DE_INVALIDPARAMS;
+             }
+             r->dimensions = *dims;
++            return DE_OK;
+         };
+         SetObjectUserFlags = [](HOBJECT h, DDWORD flags)
+         {
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 7f337dc..3ffcb5c 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -506,3 +506,15 @@ if(BLOOD2_TEST_DATA_DIR)
+         set_tests_properties(character_audio.${case} PROPERTIES LABELS "headless;private;character_audio" TIMEOUT 60)
+     endforeach()
+ endif()
++
++add_executable(character_motion_tests character_motion_tests.cpp)
++target_link_libraries(character_motion_tests PRIVATE blood2_game)
++blood2_project_options(character_motion_tests)
++foreach(case IN ITEMS lookup motion rejection collision callbacks player)
++    add_test(NAME character_motion.${case} COMMAND character_motion_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/character-motion-fixtures/${case}")
++    set_tests_properties(character_motion.${case} PROPERTIES LABELS "headless;character_motion" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME character_motion.catalog COMMAND character_motion_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(character_motion.catalog PROPERTIES LABELS "headless;private;character_motion" TIMEOUT 60)
++endif()
+diff --git a/tests/character_motion_tests.cpp b/tests/character_motion_tests.cpp
+new file mode 100644
+index 0000000..da6550b
+--- /dev/null
++++ b/tests/character_motion_tests.cpp
+@@ -0,0 +1,310 @@
++#include "brush_fixture.h"
++#include "engine/model_commands.h"
++#include "game/original/Sparam.h"
++#include "player_fixture.h"
++#include <cmath>
++#include <functional>
++#include <set>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .002f;
++    }
++    CBaseCharacter* character(GameSession& g, DVector pos = {})
++    {
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Pos = pos;
++        s.m_Flags = FLAG_MODELKEYS | FLAG_SOLID;
++        auto h = g.objects.create(g.objects.find_class("CBaseCharacter"), s);
++        return h ? dynamic_cast<CBaseCharacter*>(g.objects.get(h)->game.get()) : nullptr;
++    }
++    bool key(GameSession& g, HOBJECT h, std::string text)
++    {
++        std::vector<std::vector<std::string>> commands;
++        if (!model_commands(text, commands))
++            return false;
++        for (auto& command : commands)
++        {
++            std::vector<char*> args;
++            for (auto& a : command)
++                args.push_back(a.data());
++            ArgList list{args.data(), int(args.size())};
++            if (!g.objects.engine_message(h, MID_MODELSTRINGKEY, &list))
++                return false;
++        }
++        return true;
++    }
++    bool world(GameSession& g)
++    {
++        auto m = test_brush::box("wall", {10, -100, -100}, {20, 100, 100});
++        for (auto& s : m.surfaces)
++            s.flags = 1;
++        std::string error;
++        CHECK(g.collision.build(m, error));
++        g.server.collision_ready = true;
++        return true;
++    }
++    bool lookup(const std::filesystem::path&)
++    {
++        std::string_view v = "unchanged";
++        CHECK(Sparam_Get("x[RotY:2][RotY:9]", "RotY", v) == SparamStatus::Found && v == "2");
++        CHECK(Sparam_Get("[roty:2]", "RotY", v) == SparamStatus::Missing && v == "2");
++        CHECK(Sparam_Get("[x: leading ; spaces ]", "x", v) == SparamStatus::Found && v == " leading ; spaces ");
++        const auto old = v;
++        for (auto s : {"[x:]", "[x:2", "[x:"})
++            CHECK(Sparam_Get(s, "x", v) == SparamStatus::Invalid && v == old);
++        CHECK(Sparam_Get(std::string(4097, 'x'), "x", v) == SparamStatus::Invalid);
++        CHECK(Sparam_Get(std::string("[x:2]\0[x:3]", 11), "x", v) == SparamStatus::Invalid);
++        CHECK(Sparam_Get("[x:" + std::string(256, 'a') + "]", "x", v) == SparamStatus::Invalid);
++        CHECK(Sparam_Get("[x:2]", "x:", v) == SparamStatus::Invalid);
++        return true;
++    }
++    bool motion(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto* c = character(g);
++        CHECK(c);
++        auto* r = g.objects.get(c->m_hObject);
++        CHECK(key(g, c->m_hObject, "[RotY:1.57079632679][ForwVel:120]"));
++        CHECK(near(r->velocity.x, 120) && near(r->velocity.z, 0) && c->motion_applied == 3);
++        CHECK(key(g, c->m_hObject, "[UpVel:3][RightVel:20][ForwVel:100]"));
++        CHECK(near(r->velocity.x, 0) && near(r->velocity.y, 3) && near(r->velocity.z, 0) && c->motion_applied == 14);
++        CHECK(key(g, c->m_hObject, "[RightVel:-20][RightVel:90]"));
++        CHECK(near(r->velocity.z, 20));
++        auto tilted = rotation_from_euler({0, 0, 1.57079632679f});
++        CHECK(g.server.SetObjectRotation(c->m_hObject, &tilted) == DE_OK);
++        CHECK(key(g, c->m_hObject, "[RotY:1.57079632679][ForwVel:10]"));
++        CHECK(near(r->velocity.x, 0) && near(r->velocity.y, 10) &&
++              near(r->velocity.z, 0)); // local up axis, not world yaw
++        CHECK(key(g, c->m_hObject, "[UpVel:+1e2]"));
++        CHECK(near(r->velocity.x, -100));
++        CHECK(c->motion_failures == 0 && c->motion_keys == 5 && c->motion_actions == 9);
++        CHECK(key(g, c->m_hObject, "unknown [ForwVel:8]")); // Source only sees argv[0].
++        CHECK(near(r->velocity.x, -100) && c->pending_model_commands.size() == 1);
++        return true;
++    }
++    bool rejection(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto* c = character(g);
++        CHECK(c);
++        auto* r = g.objects.get(c->m_hObject);
++        for (const auto* value : {"nan", "inf", "1e100", "1bad", "", "--1", "++1", "+-1", "10000001"})
++        {
++            CHECK(key(g, c->m_hObject, "[RotY:1][ForwVel:" + std::string(value) + "]"));
++            CHECK(c->motion_applied == 0 && r->state.m_Rotation.m_Spin == 1 && !c->motion_error.empty());
++        }
++        for (const auto* text : {"[RotY:1][AddX:3]", "[DimsX:2][DimsY:3]", "[DimsX:2][DimsY:-1][DimsZ:2]"})
++        {
++            CHECK(key(g, c->m_hObject, text));
++            CHECK(c->motion_applied == 0 && r->state.m_Rotation.m_Spin == 1);
++        }
++        CHECK(c->motion_failures == 12);
++        CHECK(key(g, c->m_hObject, "[ForwVel:4][AddX:5][AddY:0][AddZ:0][DimsX:3][DimsY:4][DimsZ:5]"));
++        CHECK(c->motion_applied == 2 && r->velocity.z == 4 && r->dimensions.x == 0 && r->state.m_Pos.x == 0);
++        CHECK(!c->motion_error.empty()); // Missing world fails actual displacement, not successful stub.
++        CHECK(g.objects.remove(c->m_hObject));
++        DVector dims{1, 2, 3};
++        CHECK(g.server.SetObjectDims(c->m_hObject, &dims) != DE_OK && r->dimensions.x == 0);
++        CHECK(!key(g, c->m_hObject, "[DimsX:1][DimsY:2][DimsZ:3]"));
++        CHECK(g.objects.finish_frame());
++        return true;
++    }
++    bool collision(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize() && world(g));
++        auto* c = character(g, {0, 5, 0});
++        CHECK(c);
++        auto* r = g.objects.get(c->m_hObject);
++        DVector dims{1, 1, 1};
++        CHECK(g.server.SetObjectDims(c->m_hObject, &dims) == DE_OK);
++        CHECK(key(g, c->m_hObject, "[AddX:30][AddY:0][AddZ:0][DimsX:2][DimsY:3][DimsZ:4]"));
++        CHECK(r->state.m_Pos.x > 8.9f && r->state.m_Pos.x <= 9.001f && r->contact_polygon != UINT32_MAX);
++        CHECK(r->state.m_Pos.y == 5 && r->dimensions.x == 2 && r->dimensions.y == 3 && c->motion_applied == 48);
++        // Raw SetObjectDims preserves center and permits overlap, unlike player ResizeObject.
++        CHECK(c->motion_failures == 0);
++        CHECK(key(g, c->m_hObject, "[AddX:1][AddY:0][AddZ:0][DimsX:1][DimsY:1][DimsZ:1]"));
++        CHECK(c->motion_applied == 0 && c->motion_failures == 1 && r->dimensions.x == 2);
++        return true;
++    }
++    unsigned removed_keys = 0, removed_actions = 0, removed_failures = 0;
++    class RemovingCharacter : public CBaseCharacter
++    {
++      public:
++        ~RemovingCharacter() override
++        {
++            removed_keys = motion_keys;
++            removed_actions = motion_actions;
++            removed_failures = motion_failures;
++        }
++
++      private:
++        DDWORD EngineMessageFn(DDWORD m, void* p, DFLOAT f) override
++        {
++            if (m == MID_TOUCHNOTIFY)
++            {
++                g_pServerDE->RemoveObject(m_hObject);
++            }
++            return CBaseCharacter::EngineMessageFn(m, p, f);
++        }
++    };
++    bool callbacks(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize() && world(g));
++        ClassInfo type{"RemovingCharacter",
++                       g.objects.find_class("CBaseCharacter"),
++                       []() -> std::unique_ptr<BaseClass> { return std::make_unique<RemovingCharacter>(); },
++                       {}};
++        CHECK(g.objects.register_class(type));
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_MODEL;
++        state.m_Flags = FLAG_MODELKEYS | FLAG_TOUCH_NOTIFY;
++        const auto h = g.objects.create(&type, state);
++        auto* r = g.objects.get(h);
++        CHECK(r);
++        auto* c = dynamic_cast<CBaseCharacter*>(r->game.get());
++        CHECK(c);
++        auto m = std::make_shared<Model>();
++        std::string error;
++        CHECK(read_model(test_model::abc().b, *m, error));
++        m->animations[0].keys[0].text = "[ForwVel:5];[AddX:4][AddY:0][AddZ:0][DimsX:2][DimsY:3][DimsZ:4];[UpVel:99]";
++        for (size_t i = 1; i < m->animations[0].keys.size(); ++i)
++            m->animations[0].keys[i].text.clear();
++        r->model = m;
++        ObjectCreateStruct sensor;
++        sensor.m_Pos = {2, 0, 0};
++        sensor.m_Flags = FLAG_TOUCH_NOTIFY;
++        auto other = g.objects.create(g.objects.find_class("BaseClass"), sensor);
++        CHECK(other);
++        DVector dims{.5f, .5f, .5f};
++        CHECK(g.server.SetObjectDims(other, &dims) == DE_OK);
++        CHECK(g.server.advance_models(0));
++        CHECK(!g.objects.get(h)); // Touch removed owner; later action/key may not write pending/stale state.
++        CHECK(removed_keys == 2 && removed_actions == 2 && removed_failures == 1);
++        CHECK(g.objects.get(other));
++        auto* live = character(g, {0, 10, 0});
++        CHECK(live);
++        r = g.objects.get(live->m_hObject);
++        r->model = m;
++        r->activity = OBJSTATE_INACTIVE;
++        CHECK(g.server.advance_models(0) && live->motion_keys == 0);
++        r->activity = OBJSTATE_ACTIVE;
++        CHECK(g.server.advance_models(0));
++        CHECK(live->motion_keys == 3 && live->motion_actions == 4 && r->velocity.y == 99 && r->dimensions.y == 3);
++        CHECK(m->animations[0].keys[0].text.find("[UpVel:99]") != std::string::npos); // Immutable resource.
++        const auto old = live->m_hObject;
++        CHECK(g.unload_world() && !g.objects.get(old));
++        CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++    bool player(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        CHECK(g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
++                               {{"Name", std::string("start")}, {"Pos", DVector{32, 100, 64}}}));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        CHECK(p);
++        const auto pos = g.objects.get(p->m_hObject)->state.m_Pos;
++        CHECK(key(g, p->m_hObject, "[RotY:1][ForwVel:99][DimsX:9][DimsY:9][DimsZ:9]"));
++        CHECK(p->motion_keys == 0 && p->pending_model_commands.size() == 1);
++        CHECK(g.objects.get(p->m_hObject)->state.m_Pos.x == pos.x);
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        const char* paths[]{"models/characters/caleb.abc",    "models/enemies/m_civilian1.abc",
++                            "models/enemies/f_civilian1.abc", "models/enemies/labtech.abc",
++                            "models/enemies/m_cultist1.abc",  "models/enemies/f_cultist1.abc",
++                            "models/enemies/gideon.abc"};
++        size_t total_clips = 0, total_keys = 0, total_brackets = 0;
++        for (auto path : paths)
++        {
++            std::shared_ptr<const Model> m;
++            CHECK(g.models.load(path, m, error));
++            std::map<std::string, unsigned> keys;
++            size_t count = 0;
++            for (const auto& a : m->animations)
++                for (const auto& k : a.keys)
++                    if (!k.text.empty())
++                    {
++                        ++keys[k.text];
++                        ++count;
++                    }
++            std::cout << path << " clips=" << m->animations.size() << " keys=" << count << " unique=" << keys.size()
++                      << "\n";
++            for (const auto& [k, n] : keys)
++                std::cout << n << " " << k << "\n";
++            auto* c = character(g);
++            CHECK(c);
++            auto* r = g.objects.get(c->m_hObject);
++            r->model = m;
++            size_t delivered = 0;
++            for (unsigned i = 0; i < m->animations.size(); ++i)
++            {
++                r->animation.animation = i;
++                r->animation.reset();
++                r->animation.looping = false;
++                c->pending_model_commands.clear();
++                CHECK(g.server.advance_models(m->animations[i].duration / 1000.0));
++                size_t expected = 0;
++                for (const auto& k : m->animations[i].keys)
++                    if (!k.text.empty())
++                    {
++                        ++expected;
++                        total_brackets += k.text.front() == '[';
++                        std::string_view v;
++                        for (const auto* name : {"RotY", "ForwVel", "RightVel", "UpVel", "AddX", "DimsX"})
++                            CHECK(Sparam_Get(k.text, name, v) == SparamStatus::Missing);
++                    }
++                CHECK(expected <= 32 && c->pending_model_commands.size() == expected);
++                delivered += expected;
++            }
++            CHECK(c->motion_keys == 0 && c->motion_failures == 0 && delivered == count);
++            total_clips += m->animations.size();
++            total_keys += delivered;
++            const auto old = c->m_hObject;
++            CHECK(g.objects.remove(old) && g.objects.finish_frame() && !g.objects.get(old));
++        }
++        CHECK(total_clips == 326 && total_keys == 193 && total_brackets == 147);
++        std::cout << "Actual callbacks: clips=" << total_clips << " keys=" << total_keys
++                  << " bracket keys=" << total_brackets
++                  << " motion keys=0 (AI sound/fire/extra keys remain unavailable)\n";
++        CHECK(g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"lookup", lookup},       {"motion", motion}, {"rejection", rejection}, {"collision", collision},
++        {"callbacks", callbacks}, {"player", player}, {"catalog", catalog}};
++    auto i = cases.find(argv[1]);
++    return i != cases.end() && i->second(argv[2]) ? 0 : 1;
++}

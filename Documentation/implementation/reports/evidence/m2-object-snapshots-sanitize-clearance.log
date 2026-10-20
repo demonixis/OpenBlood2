@@ -1,0 +1,12 @@
+Test project <workspace>/Blood2/build/sanitize
+    Start 516: ai_runtime.clearance_private
+1/1 Test #516: ai_runtime.clearance_private .....   Passed   88.16 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+ai_runtime    =  88.16 sec*proc (1 test)
+headless      =  88.16 sec*proc (1 test)
+private       =  88.16 sec*proc (1 test)
+
+Total Test time (real) =  88.18 sec

@@ -1,0 +1,70 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 293
+    Start 293: gpu.character
+
+293: Test command: <workspace>/Blood2/build/debug/blood2 "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--skeleton-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/skeleton.png"
+293: Working Directory: <workspace>/Blood2/build/debug/tests
+293: Environment variables:
+293:  SDL_AUDIODRIVER=dummy
+293: Test timeout computed to be: 60
+293: [info] External data: <external-data-root> (--data-dir)
+293: [info] BLOOD2.REZ: detected, 267758913 bytes
+293: [info] SOUND.REZ: detected, 204633068 bytes
+293: [info] BLOOD2P.REZ: detected, 24133434 bytes
+293: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+293: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+293: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+293: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+293: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+293: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+293: [info] Movement smoke focus at frame 2: true
+293: [info] Movement smoke input at 45: enabled=true, focused=true, text=false, W=true, Ctrl=false
+293: [info] Movement smoke input at 100: enabled=true, focused=true, text=false, W=false, Ctrl=true
+293: [info] Corpse diagnostic: present=true, setup=true, complete=true, sounds=1, updates=9, time=900, error=
+293: [info] Movement: hidden distance=295.31055, jumps=1, landings=2, ground=true, forward frames=55, jump frames=10
+293: [info] Movement smoke input at 170: enabled=true, focused=true, text=false, W=false, Ctrl=true
+293: [info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/skeleton.png
+293: [info] Movement smoke input at 185: enabled=true, focused=true, text=false, W=false, Ctrl=true
+293: [info] Shutdown: frames=240, UI frames=120, hidden frames=120, toggles=2, resize=true, quit=true
+293: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+293: [info] Session playback: waiting=0 time=28.033333333333022 npc-ready=16 npc-failed=0 npc-updates=679
+293: [info] Character motion probe: hidden=true, reentered=true, old handle invalidated=true
+293: [info] AI model-key probe: hidden=true, reentered=true, old handle invalidated=true
+293: [info] AI target probe: hidden=true, reentered=true, old handle invalidated=true
+293: [info] AI sight probe: hidden=true, reentered=true, old handle invalidated=true
+293: [info] AI state probe: hidden=true, reentered=true, old handle invalidated=true
+293: [info] AI weapon probe: hidden=true, reentered=true, old identity invalidated=true
+293: [info] AI script interpreter: hidden=true, reentered=true, old identity invalidated=true
+293: [info] AI navigation: state=999, phase=1, z=51, updates=32, arrivals=1, failures=0, points=0, error=
+293: [info] Original NPC AI_Update + hit localization: hidden=true, reentered=true, old identity invalidated=true
+293: [info] Corpse diagnostic: present=true, setup=true, complete=true, sounds=1, updates=9, time=900, error=
+293: [info] Original corpse: hidden=true, rendered=true, reentered=true, old identity invalidated=true
+293: [info] AI escape/beg: hidden=true, reentered=true, old identity invalidated=true
+293: [info] Held attachments: hidden=true, reentered=true, old identity invalidated=true
+293: [info] Character audio: hidden=true, reentered=true, starts=1, surface=10, submitted=730400
+293: [info] AI paths: hidden=true, reentered=true, copied points=7
+293: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+293: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+293: [info] Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, unload/re-entry
+293: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+1/1 Test #293: gpu.character ....................   Passed   21.83 sec
+
+The following tests passed:
+	gpu.character
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+character    =  21.83 sec*proc (1 test)
+gpu          =  21.83 sec*proc (1 test)
+private      =  21.83 sec*proc (1 test)
+
+Total Test time (real) =  21.84 sec

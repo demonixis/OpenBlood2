@@ -1,0 +1,14 @@
+404/406 Testing: ai_locomotion.lifetime
+404/406 Test: ai_locomotion.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.lifetime" start time: Oct 16 13:42 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.lifetime" end time: Oct 16 13:42 CEST
+"ai_locomotion.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

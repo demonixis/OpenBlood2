@@ -1,0 +1,109 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  43: world.level_change_private
+      Start  44: world.destination_trial_private
+ 1/47 Test  #44: world.destination_trial_private ...   Passed   40.46 sec
+      Start 536: player_keepalive.private
+ 2/47 Test  #43: world.level_change_private ........   Passed   41.28 sec
+      Start 532: player_restore.private
+ 3/47 Test #532: player_restore.private ............   Passed    9.84 sec
+      Start 336: texture.corpus
+ 4/47 Test #336: texture.corpus ....................   Passed   16.00 sec
+      Start 110: containers.specialized_private
+ 5/47 Test #536: player_keepalive.private ..........   Passed   37.29 sec
+      Start 111: containers.private
+ 6/47 Test #110: containers.specialized_private ....   Passed   34.18 sec
+      Start  25: world.level_change
+ 7/47 Test  #25: world.level_change ................   Passed    0.33 sec
+      Start  27: world.destination_trials
+ 8/47 Test  #27: world.destination_trials ..........   Passed    0.20 sec
+      Start 534: player_keepalive.fallback
+ 9/47 Test #534: player_keepalive.fallback .........   Passed    0.17 sec
+      Start 530: player_restore.failures
+10/47 Test #530: player_restore.failures ...........   Passed    0.11 sec
+      Start 531: player_restore.lifetime
+11/47 Test #531: player_restore.lifetime ...........   Passed    0.09 sec
+      Start  39: world.mutations
+12/47 Test  #39: world.mutations ...................   Passed    0.25 sec
+      Start 535: player_keepalive.failures
+13/47 Test #535: player_keepalive.failures .........   Passed    0.09 sec
+      Start  30: world.destination_lifetime
+14/47 Test  #30: world.destination_lifetime ........   Passed    0.06 sec
+      Start 529: player_restore.roundtrip
+15/47 Test #529: player_restore.roundtrip ..........   Passed    0.06 sec
+      Start 533: player_keepalive.named
+16/47 Test #533: player_keepalive.named ............   Passed    0.06 sec
+      Start   1: objects.builtin_model
+17/47 Test   #1: objects.builtin_model .............   Passed    0.03 sec
+      Start  11: objects.unsupported_teardown
+18/47 Test  #11: objects.unsupported_teardown ......   Passed    0.06 sec
+      Start  38: world.world_rejection
+19/47 Test  #38: world.world_rejection .............   Passed    0.06 sec
+      Start  10: objects.messages_strings
+20/47 Test  #10: objects.messages_strings ..........   Passed    0.04 sec
+      Start  12: objects.creation_failures
+21/47 Test  #12: objects.creation_failures .........   Passed    0.04 sec
+      Start 335: texture.mapping
+22/47 Test #335: texture.mapping ...................   Passed    1.02 sec
+      Start 334: texture.malformed
+23/47 Test #334: texture.malformed .................   Passed    0.02 sec
+      Start   4: objects.reasons_properties
+24/47 Test   #4: objects.reasons_properties ........   Passed    0.02 sec
+      Start   9: objects.links_lists
+25/47 Test   #9: objects.links_lists ...............   Passed    0.02 sec
+      Start   2: objects.original_objects
+26/47 Test   #2: objects.original_objects ..........   Passed    0.02 sec
+      Start   3: objects.nested_creation
+27/47 Test   #3: objects.nested_creation ...........   Passed    0.02 sec
+      Start   6: objects.deferred_removal
+28/47 Test   #6: objects.deferred_removal ..........   Passed    0.02 sec
+      Start   8: objects.handles_selection
+29/47 Test   #8: objects.handles_selection .........   Passed    0.02 sec
+      Start   7: objects.aggregate_dispatch
+30/47 Test   #7: objects.aggregate_dispatch ........   Passed    0.02 sec
+      Start   5: objects.scheduling
+31/47 Test   #5: objects.scheduling ................   Passed    0.02 sec
+      Start 333: texture.decode
+32/47 Test #333: texture.decode ....................   Passed    0.02 sec
+      Start 103: containers.ladders
+33/47 Test #103: containers.ladders ................   Passed    0.13 sec
+      Start 101: containers.swimming
+34/47 Test #101: containers.swimming ...............   Passed    0.11 sec
+      Start 109: containers.freefall_motion
+35/47 Test #109: containers.freefall_motion ........   Passed    0.10 sec
+      Start 106: containers.conveyor_motion
+36/47 Test #106: containers.conveyor_motion ........   Passed    0.08 sec
+      Start 105: containers.specialized_defaults
+37/47 Test #105: containers.specialized_defaults ...   Passed    0.05 sec
+      Start  98: containers.membership
+38/47 Test  #98: containers.membership .............   Passed    0.05 sec
+      Start 108: containers.specialized_damage
+39/47 Test #108: containers.specialized_damage .....   Passed    0.05 sec
+      Start 102: containers.surface
+40/47 Test #102: containers.surface ................   Passed    0.05 sec
+      Start 104: containers.air_damage
+41/47 Test #104: containers.air_damage .............   Passed    0.05 sec
+      Start  99: containers.lifetime
+42/47 Test  #99: containers.lifetime ...............   Passed    0.05 sec
+      Start 107: containers.conveyor_bodies
+43/47 Test #107: containers.conveyor_bodies ........   Passed    0.04 sec
+      Start 100: containers.physics
+44/47 Test #100: containers.physics ................   Passed    0.04 sec
+      Start  96: containers.geometry
+45/47 Test  #96: containers.geometry ...............   Passed    0.02 sec
+      Start  97: containers.concave
+46/47 Test  #97: containers.concave ................   Passed    0.02 sec
+47/47 Test #111: containers.private ................   Passed   32.49 sec
+
+100% tests passed, 0 tests failed out of 47
+
+Label Time Summary:
+containers          =  67.50 sec*proc (16 tests)
+headless            = 215.26 sec*proc (47 tests)
+objects             =   0.34 sec*proc (12 tests)
+player_keepalive    =  37.61 sec*proc (4 tests)
+player_restore      =  10.10 sec*proc (4 tests)
+private             = 211.55 sec*proc (7 tests)
+texture             =  17.06 sec*proc (4 tests)
+world               =  82.65 sec*proc (7 tests)
+
+Total Test time (real) = 110.26 sec

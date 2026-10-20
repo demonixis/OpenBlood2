@@ -1,0 +1,31 @@
+{
+  "name": "engine_probe_build_clang17",
+  "command": [
+    "clang++",
+    "-std=c++17",
+    "-g",
+    "-O0",
+    "-fsanitize=address,undefined",
+    "-fno-omit-frame-pointer",
+    "-I",
+    "OpenBlood2/OpenLithTech/include",
+    "-I",
+    "OpenBlood2/OpenLithTech/src/core",
+    "-I",
+    "/tmp/lithtech-audit-2bVxTF/openblood2/_deps/spdlog-src/include",
+    "Documentation/Audit/probes/engine_contract_probe.cpp",
+    "OpenBlood2/OpenLithTech/src/core/engine.cpp",
+    "OpenBlood2/OpenLithTech/src/core/object.cpp",
+    "OpenBlood2/OpenLithTech/src/core/class_manager.cpp",
+    "OpenBlood2/OpenLithTech/src/core/string_manager.cpp",
+    "OpenBlood2/OpenLithTech/src/core/baseclass.cpp",
+    "-o",
+    "/tmp/lithtech-audit-2bVxTF/engine_contract_probe"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:17:18.562299+00:00",
+  "elapsed_seconds": 26.988,
+  "timeout_seconds": 120,
+  "exit_code": 0,
+  "log": "engine_probe_build_clang17.log"
+}

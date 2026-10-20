@@ -1,0 +1,14 @@
+426/431 Testing: ai_escape.hiding
+426/431 Test: ai_escape.hiding
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_escape_tests" "hiding"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_escape.hiding" start time: Oct 16 14:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.hiding" end time: Oct 16 14:25 CEST
+"ai_escape.hiding" time elapsed: 00:00:00
+----------------------------------------------------------

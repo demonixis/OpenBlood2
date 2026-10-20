@@ -1,0 +1,14 @@
+502/503 Testing: character_nodes.restore
+502/503 Test: character_nodes.restore
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/character_nodes_tests" "restore" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/character-node-fixtures/restore"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"character_nodes.restore" start time: Oct 16 18:54 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"character_nodes.restore" end time: Oct 16 18:54 CEST
+"character_nodes.restore" time elapsed: 00:00:00
+----------------------------------------------------------

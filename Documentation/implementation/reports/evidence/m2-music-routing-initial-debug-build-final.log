@@ -1,0 +1,47 @@
+[0/2] Re-checking globbed directories...
+[1/58] Scanning /home/yann/projects/lithtech/Blood2/tests/object_contract_tests.cpp for CXX dependencies
+[2/58] Scanning /home/yann/projects/lithtech/Blood2/tests/world_tests.cpp for CXX dependencies
+[3/58] Scanning /home/yann/projects/lithtech/Blood2/tests/sound_tests.cpp for CXX dependencies
+[4/58] Scanning /home/yann/projects/lithtech/Blood2/tests/audio_stream_tests.cpp for CXX dependencies
+[5/58] Scanning /home/yann/projects/lithtech/Blood2/tests/music_asset_tests.cpp for CXX dependencies
+[6/58] Scanning /home/yann/projects/lithtech/Blood2/tests/ima_cursor_tests.cpp for CXX dependencies
+[7/58] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[8/58] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[9/57] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[10/57] Generating CXX dyndep file tests/CMakeFiles/sound_tests.dir/CXX.dd
+[11/57] Generating CXX dyndep file tests/CMakeFiles/audio_stream_tests.dir/CXX.dd
+[12/57] Generating CXX dyndep file tests/CMakeFiles/music_asset_tests.dir/CXX.dd
+[13/57] Generating CXX dyndep file tests/CMakeFiles/dls_bank_tests.dir/CXX.dd
+[14/56] Generating CXX dyndep file tests/CMakeFiles/ima_style_tests.dir/CXX.dd
+[15/55] Generating CXX dyndep file tests/CMakeFiles/ima_band_tests.dir/CXX.dd
+[16/54] Generating CXX dyndep file tests/CMakeFiles/ima_section_tests.dir/CXX.dd
+[17/53] Generating CXX dyndep file tests/CMakeFiles/ima_timeline_tests.dir/CXX.dd
+[18/52] Generating CXX dyndep file tests/CMakeFiles/ima_variation_tests.dir/CXX.dd
+[19/51] Generating CXX dyndep file tests/CMakeFiles/ima_note_event_tests.dir/CXX.dd
+[20/50] Generating CXX dyndep file tests/CMakeFiles/ima_note_pitch_tests.dir/CXX.dd
+[21/49] Generating CXX dyndep file tests/CMakeFiles/ima_harmony_tests.dir/CXX.dd
+[22/48] Generating CXX dyndep file tests/CMakeFiles/ima_selection_tests.dir/CXX.dd
+[23/47] Generating CXX dyndep file tests/CMakeFiles/ima_cursor_tests.dir/CXX.dd
+[24/47] Building CXX object tests/CMakeFiles/object_contract_tests.dir/object_contract_tests.cpp.o
+[25/47] Building CXX object tests/CMakeFiles/world_tests.dir/world_tests.cpp.o
+[26/47] Building CXX object tests/CMakeFiles/sound_tests.dir/sound_tests.cpp.o
+[27/47] Building CXX object tests/CMakeFiles/audio_stream_tests.dir/audio_stream_tests.cpp.o
+[28/47] Building CXX object tests/CMakeFiles/music_asset_tests.dir/music_asset_tests.cpp.o
+[29/47] Building CXX object tests/CMakeFiles/ima_cursor_tests.dir/ima_cursor_tests.cpp.o
+[30/47] Linking CXX executable tests/object_contract_tests
+[31/47] Linking CXX executable tests/config_tests
+[32/47] Linking CXX executable tests/world_tests
+[33/47] Linking CXX executable tests/sound_tests
+[34/47] Linking CXX executable tests/audio_stream_tests
+[35/47] Linking CXX executable tests/music_asset_tests
+[36/47] Linking CXX executable tests/dls_bank_tests
+[37/47] Linking CXX executable tests/ima_style_tests
+[38/47] Linking CXX executable tests/ima_band_tests
+[39/47] Linking CXX executable tests/ima_section_tests
+[40/47] Linking CXX executable tests/ima_timeline_tests
+[41/47] Linking CXX executable tests/ima_variation_tests
+[42/47] Linking CXX executable tests/ima_note_event_tests
+[43/47] Linking CXX executable tests/ima_note_pitch_tests
+[44/47] Linking CXX executable tests/ima_harmony_tests
+[45/47] Linking CXX executable tests/ima_selection_tests
+[46/47] Linking CXX executable tests/ima_cursor_tests

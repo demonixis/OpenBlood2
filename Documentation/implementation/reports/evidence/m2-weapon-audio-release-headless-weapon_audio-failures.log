@@ -1,0 +1,14 @@
+600/603 Testing: weapon_audio.failures
+600/603 Test: weapon_audio.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon_audio_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon-audio-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"weapon_audio.failures" start time: Oct 16 23:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_audio.failures" end time: Oct 16 23:03 CEST
+"weapon_audio.failures" time elapsed: 00:00:00
+----------------------------------------------------------

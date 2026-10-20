@@ -1,0 +1,14 @@
+316/318 Testing: texture.malformed
+316/318 Test: texture.malformed
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/texture_tests" "malformed"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"texture.malformed" start time: Oct 16 09:18 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"texture.malformed" end time: Oct 16 09:18 CEST
+"texture.malformed" time elapsed: 00:00:00
+----------------------------------------------------------

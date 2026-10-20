@@ -1,0 +1,14 @@
+353/361 Testing: ai_perception.visibility
+353/361 Test: ai_perception.visibility
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests" "visibility"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_perception.visibility" start time: Oct 16 10:21 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.visibility" end time: Oct 16 10:21 CEST
+"ai_perception.visibility" time elapsed: 00:00:00
+----------------------------------------------------------

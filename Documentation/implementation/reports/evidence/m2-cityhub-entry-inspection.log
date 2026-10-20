@@ -1,0 +1,57 @@
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] World worlds/02_cityhub.dat from BLOOD2.REZ (0 overrides)
+[info] 7446 resources in 4 mounts; DAT v56: 1026 objects, 485 original instances, 100 BSP models
+[info] AssaultRiflePU / Original instance: 1
+[info] BigTrigger / Original instance: 3
+[info] BulletAmmoPU / Original instance: 6
+[info] CClientParticleStreamSFX / Original instance: 8
+[info] CDestructableBrush / Omitted: missing world model: 1
+[info] CDestructableBrush / Original instance: 64
+[info] CDestructableModel / Original instance: 122
+[info] CameraObj / Original instance: 2
+[info] CinematicTrigger / Original instance: 8
+[info] CivilianAI / Original instance: 9
+[info] ConversationTrigger / Original instance: 1
+[info] Conveyor / Original instance: 6
+[info] CultistAI / Original instance: 17
+[info] DemoSkyWorldModel / Original instance: 1
+[info] DetailSprite / Original instance: 6
+[info] DirLight / Preprocessor only: 225
+[info] Door / Original instance: 5
+[info] ExitTrigger / Original instance: 3
+[info] FlareAmmoPU / Original instance: 2
+[info] FlashlightPU / Original instance: 1
+[info] Flicker4WaveLightFX / Original instance: 1
+[info] FlickerLight / Original instance: 3
+[info] GameStartPoint / Original instance: 5
+[info] Gideon / Original instance: 1
+[info] Key / Original instance: 14
+[info] KeyFramer / Original instance: 2
+[info] Ladder / Original instance: 3
+[info] Light / Preprocessor only: 315
+[info] MedKitPU / Original instance: 1
+[info] Model / Original instance: 47
+[info] ObjectivesTrigger / Original instance: 8
+[info] OutsideDef / Preprocessor only: 1
+[info] PathPoint / Original instance: 38
+[info] ProximitiesPU / Original instance: 2
+[info] RandomSoundFX / Original instance: 1
+[info] RemotesPU / Original instance: 2
+[info] RotatingDoor / Original instance: 8
+[info] SkyPointer / Original instance: 4
+[info] Sound / World-owned sound: 31
+[info] SoundFX / Original instance: 5
+[info] StartPoint / Original instance: 1
+[info] SubMachineGunPU / Original instance: 1
+[info] Trigger / Original instance: 26
+[info] WardPU / Original instance: 2
+[info] Water / Original instance: 2
+[info] WorldModelDebris / Original instance: 10
+[info] WorldProperties / Original instance: 1
+[info] World inspection succeeded; full gameplay remains blocked

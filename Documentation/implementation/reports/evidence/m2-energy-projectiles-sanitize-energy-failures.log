@@ -1,0 +1,14 @@
+594/596 Testing: energy.failures
+594/596 Test: energy.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/energy_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/energy-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"energy.failures" start time: Oct 17 01:22 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"energy.failures" end time: Oct 17 01:22 CEST
+"energy.failures" time elapsed: 00:00:00
+----------------------------------------------------------

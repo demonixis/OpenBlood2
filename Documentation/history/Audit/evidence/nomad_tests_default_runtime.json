@@ -1,0 +1,13 @@
+{
+  "name": "nomad_tests_default_runtime",
+  "command": [
+    "dotnet",
+    "/tmp/lithtech-audit-2bVxTF/dotnet-tests/bin/Nomad.Tests/debug/Nomad.Tests.dll"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:13:39.093215+00:00",
+  "elapsed_seconds": 0.003,
+  "timeout_seconds": 60,
+  "exit_code": 150,
+  "log": "nomad_tests_default_runtime.log"
+}

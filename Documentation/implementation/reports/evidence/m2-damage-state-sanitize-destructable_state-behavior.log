@@ -1,0 +1,14 @@
+487/491 Testing: destructable_state.behavior
+487/491 Test: destructable_state.behavior
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable_state_tests" "behavior" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable-state-fixtures/behavior"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"destructable_state.behavior" start time: Oct 16 18:12 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_state.behavior" end time: Oct 16 18:12 CEST
+"destructable_state.behavior" time elapsed: 00:00:00
+----------------------------------------------------------

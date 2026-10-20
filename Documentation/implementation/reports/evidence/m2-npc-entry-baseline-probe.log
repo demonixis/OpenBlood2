@@ -1,0 +1,96 @@
+PROBE delayed=0 tick=0 player=-32,170,-3224 hp=100 camera=1
+noname pos=-112,168.569,-1792 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+dog pos=0,168,8 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+spank pos=-48,168,-3024 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+noname pos=40,170.858,-2352 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+noname pos=-32,171.944,-1536 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+noname pos=-48,166.375,-1248 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+noname pos=16,172.083,-912 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+herm pos=-32,172.461,192 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+noname pos=40,166.061,536 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+pete pos=-104,169.128,536 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+noname pos=-80,168.374,1200 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+noname pos=-32,169.918,992 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+noname pos=-64,170.315,1888 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+noname pos=-32,165.735,1736 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+gak pos=-32,166.072,-1992 state=5 phase=1 activity=0 pings=0 updates=0 target=0 shots=0 error=
+PROBE delayed=0 tick=720 player=-32,170.001,-3224 hp=100 camera=1
+noname pos=-112,168.569,-1792 state=5 phase=1 activity=3 pings=0 updates=1 target=0 shots=0 error=
+dog pos=0,168,8 state=5 phase=1 activity=3 pings=0 updates=1 target=0 shots=0 error=
+spank pos=-66.6736,166.538,-2694.7 state=101 phase=287 activity=0 pings=10 updates=288 target=0 shots=0 error=
+noname pos=40,170.858,-2352 state=5 phase=1 activity=3 pings=1 updates=28 target=0 shots=0 error=
+noname pos=-32,171.944,-1536 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=-48,166.375,-1248 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=16,172.083,-912 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+herm pos=-32,172.461,192 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=40,166.061,536 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+pete pos=-104,169.128,536 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=-80,168.374,1200 state=5 phase=1 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=-32,169.918,992 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=-64,170.315,1888 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=-32,165.735,1736 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+gak pos=-32,166.072,-1992 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+PROBE delayed=0 tick=1800 player=-32,170.001,-3224 hp=100 camera=0
+noname pos=-112,168.569,-1792 state=5 phase=1 activity=3 pings=0 updates=1 target=0 shots=0 error=
+dog pos=0,168,8 state=5 phase=1 activity=3 pings=0 updates=1 target=0 shots=0 error=
+spank pos=-73.4871,166.538,-2406.51 state=101 phase=1367 activity=0 pings=45 updates=1368 target=0 shots=0 error=
+noname pos=40,170.858,-2352 state=5 phase=1 activity=3 pings=1 updates=28 target=0 shots=0 error=
+noname pos=-32,171.944,-1536 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=-48,166.375,-1248 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=16,172.083,-912 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+herm pos=-32,172.461,192 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=40,166.061,536 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+pete pos=-104,169.128,536 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=-80,168.374,1200 state=5 phase=1 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=-32,169.918,992 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=-64,170.315,1888 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+noname pos=-32,165.735,1736 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+gak pos=-32,166.072,-1992 state=5 phase=2 activity=3 pings=0 updates=1 target=0 shots=0 error=
+PROBE delayed=1 tick=0 player=-32,170,-3224 hp=100 camera=1
+noname pos=-112,168.569,-1792 state=4 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+dog pos=0,168,8 state=4 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+spank pos=-48,168,-3024 state=4 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=40,170.858,-2352 state=5 phase=1 activity=1 pings=0 updates=1 target=0 shots=0 error=AI_Update: Civilian idle perception failed; Target link acquisition failed; Target assignment requires distinct live objects
+noname pos=-32,171.944,-1536 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=-48,166.375,-1248 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=16,172.083,-912 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+herm pos=-32,172.461,192 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=40,166.061,536 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+pete pos=-104,169.128,536 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=-80,168.374,1200 state=4 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=-32,169.918,992 state=5 phase=1 activity=1 pings=0 updates=1 target=0 shots=0 error=AI_Update: Idle perception failed; no state selected; Target link acquisition failed; Target assignment requires distinct live objects
+noname pos=-64,170.315,1888 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=-32,165.735,1736 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+gak pos=-32,166.072,-1992 state=5 phase=1 activity=1 pings=0 updates=1 target=0 shots=0 error=AI_Update: Idle perception failed; no state selected; Target link acquisition failed; Target assignment requires distinct live objects
+PROBE delayed=1 tick=720 player=-32,170.001,-3224 hp=100 camera=1
+noname pos=-112,168.569,-1792 state=4 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+dog pos=0,168,8 state=4 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+spank pos=-65.6634,166.538,-2712.51 state=101 phase=272 activity=0 pings=10 updates=273 target=1 shots=0 error=
+noname pos=40,170.858,-2352 state=5 phase=1 activity=1 pings=0 updates=1 target=0 shots=0 error=AI_Update: Civilian idle perception failed; Target link acquisition failed; Target assignment requires distinct live objects
+noname pos=-32,171.944,-1536 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=-48,166.375,-1248 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=16,172.083,-912 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+herm pos=-32,172.461,192 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=40,166.061,536 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+pete pos=-104,169.128,536 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=-80,168.374,1200 state=4 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=-32,169.918,992 state=5 phase=1 activity=1 pings=0 updates=1 target=0 shots=0 error=AI_Update: Idle perception failed; no state selected; Target link acquisition failed; Target assignment requires distinct live objects
+noname pos=-64,170.315,1888 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=-32,165.735,1736 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+gak pos=-32,166.072,-1992 state=5 phase=1 activity=1 pings=0 updates=1 target=0 shots=0 error=AI_Update: Idle perception failed; no state selected; Target link acquisition failed; Target assignment requires distinct live objects
+PROBE delayed=1 tick=1800 player=-32,170.001,-3224 hp=100 camera=0
+noname pos=-112,168.569,-1792 state=4 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+dog pos=0,168,8 state=4 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+spank pos=-73.4871,166.538,-2406.51 state=101 phase=1352 activity=0 pings=45 updates=1353 target=0 shots=0 error=
+noname pos=40,170.858,-2352 state=5 phase=1 activity=1 pings=0 updates=1 target=0 shots=0 error=AI_Update: Civilian idle perception failed; Target link acquisition failed; Target assignment requires distinct live objects
+noname pos=-32,171.944,-1536 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=-48,166.375,-1248 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=16,172.083,-912 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+herm pos=-32,172.461,192 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=40,166.061,536 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+pete pos=-104,169.128,536 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=-80,168.374,1200 state=4 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=-32,169.918,992 state=5 phase=1 activity=1 pings=0 updates=1 target=0 shots=0 error=AI_Update: Idle perception failed; no state selected; Target link acquisition failed; Target assignment requires distinct live objects
+noname pos=-64,170.315,1888 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+noname pos=-32,165.735,1736 state=1 phase=1 activity=3 pings=0 updates=1 target=1 shots=0 error=
+gak pos=-32,166.072,-1992 state=5 phase=1 activity=1 pings=0 updates=1 target=0 shots=0 error=AI_Update: Idle perception failed; no state selected; Target link acquisition failed; Target assignment requires distinct live objects

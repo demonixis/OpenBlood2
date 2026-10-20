@@ -1,0 +1,15 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 107: doors.private
+1/2 Test #107: doors.private ....................   Passed    0.69 sec
+    Start 186: keyframes.timeline
+2/2 Test #186: keyframes.timeline ...............   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+doors        =   0.69 sec*proc (1 test)
+headless     =   0.70 sec*proc (2 tests)
+keyframes    =   0.00 sec*proc (1 test)
+private      =   0.69 sec*proc (1 test)
+
+Total Test time (real) =   0.70 sec

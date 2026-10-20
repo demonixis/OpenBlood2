@@ -1,0 +1,190 @@
+{
+  "date": "2026-10-17",
+  "status": "M2 incomplete",
+  "implementation_base": "e54401b654171f76419d2a5dbd8c8783cd828a04",
+  "implementation_commit": "44e1f55c06eb2fb174c0459bc1f96e62b8ab7ad1",
+  "patch_sha256": "9495ea4036cee59d3e949564227fab7d621f3b4849e311422c3ff6d8666e52d9",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "6534b4aaefc08de592ef9d434d070ec4dc9cef1d927a344ba94ad600fe69116a"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "6561e513f0c01e1e76b563aefc866059e9603d11311a2f84a931661988bd37df"
+    },
+    {
+      "path": "docs/AI_AMMO_CONTRACTS.md",
+      "sha256": "d6d712aff471ef9ffa4c40bd57e31fed0ddfea11b3c09ce02f825be83c8490c2"
+    },
+    {
+      "path": "docs/AI_PERCEPTION_CONTRACTS.md",
+      "sha256": "bf05de75fcc085bb161f09c1ad2743cfb2b69410fe935be1db8aca15b5332dd5"
+    },
+    {
+      "path": "docs/M2_AI_AMMO_SOURCES.json",
+      "sha256": "703dbae7c6fad2d89697792c649a76e040d19acaaf26fc20987c3429f92b00d3"
+    },
+    {
+      "path": "docs/PICKUP_CONTRACTS.md",
+      "sha256": "6649b1a7b2ab792ea238b2a51905c6bdee843d8891a0adbc62b5b155b310c9aa"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "350b715ea63d306bb8637f562feb47a03225297177851f6f633631d716ebde0a"
+    },
+    {
+      "path": "src/app/inspector_skeleton.cpp",
+      "sha256": "d1d623ba051d744e99ea4795edc13235be5ae66d0d3777e02a95f0239948a10b"
+    },
+    {
+      "path": "src/app/pickup_smoke.cpp",
+      "sha256": "89d8befc8f1ed7562267673d4898e0f9d2d80f2ca31d7bf17590c0ebbdfb6291"
+    },
+    {
+      "path": "src/game/original/AIAmmo.cpp",
+      "sha256": "baafb5d4895f0e4fbdcf46d92f5590b5d372aa962eb9c298c0ec392181c087b7"
+    },
+    {
+      "path": "src/game/original/AINavigationStates.cpp",
+      "sha256": "09ebd4c18569278eb69bfabbae98493b5c49761ed342f55edb0025739ebfe5bd"
+    },
+    {
+      "path": "src/game/original/AIPerception.cpp",
+      "sha256": "2ac5c41bad47de8c57ae74fb9e8cd81a7d03ec54b4a9b4bba60d47a6f04c52ad"
+    },
+    {
+      "path": "src/game/original/AIRuntime.cpp",
+      "sha256": "e2fc8f4d6e62702b0b16dfac67b6c89b720634c83a3d40959b9d681859ab0464"
+    },
+    {
+      "path": "src/game/original/AIState.cpp",
+      "sha256": "1c9936999d1cfbcf16bc4448d75cf1cd80a3cadc97b4880b6103bd630e21d4de"
+    },
+    {
+      "path": "src/game/original/AITrigger.cpp",
+      "sha256": "d9ca96a38a231607f360f65fa1a94277ba7749c356114423cb9d631af18a9812"
+    },
+    {
+      "path": "src/game/original/AI_Mgr.h",
+      "sha256": "1c0d7b1425702d82d1b7c3a169e78744706b743d48d0737f07212ce27ea9a6f0"
+    },
+    {
+      "path": "src/game/original/PickupObject.cpp",
+      "sha256": "783d31453b3d35c22b31317c7de649c76dc1003ddbcf6d16131770f77a987ddd"
+    },
+    {
+      "path": "src/game/original/PickupObject.h",
+      "sha256": "8d9a090b9d1e9bb77ab03b756e17820e23159ac1ea9c9d507fa6e7a2a0ea1f7b"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "a09fdbccae96857080f69378b4f3a72702ecc42ca5aeee88845ddf5db5eac2d5"
+    },
+    {
+      "path": "tests/ai_perception_tests.cpp",
+      "sha256": "174df34eb5eafded917668812f59e4e2c577fa49ef76edfdfc2ab0cc4340f796"
+    },
+    {
+      "path": "tests/ai_runtime_tests.cpp",
+      "sha256": "14afdc951550c0d7f8775b491762ffdb38bbbd2e6d6e7c59b2e0457108838bd8"
+    }
+  ],
+  "commands": [
+    "cmake --build build/<debug|release|sanitize> --target ai_runtime_tests ai_perception_tests pickup_tests pickup_audio_tests ai_fire_tests ai_recovery_tests object_contract_tests [blood2_app for debug/release] -j2 (debug final rebuild -j3)",
+    "ctest --test-dir build/<configuration> --output-on-failure -R '^(objects\\.|ai_runtime\\.|ai_perception\\.|ai_fire\\.|ai_recovery\\.|pickups\\.|pickup_audio\\.)'",
+    "Sanitizers: ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/<debug|release> --output-on-failure -V -R '^gpu\\.(pickups|character)$'",
+    "python /tmp/b2-ai-ammo-control.py (old AIState.cpp against current headers: expected exit 1)",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror <13 changed C++ files>",
+    "python /tmp/b2-npc-integrity.py; python /tmp/b2-npc-links.py; git diff --check"
+  ],
+  "validation": {
+    "headless_per_configuration": 94,
+    "private_headless_per_configuration": 15,
+    "configurations": [
+      "Debug",
+      "Release inspector OFF",
+      "Clang ASan/UBSan/LSan"
+    ],
+    "gpu_per_configuration": 2,
+    "gpu_configurations": [
+      "Debug",
+      "Release inspector OFF"
+    ],
+    "gpu_device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+    "negative_control": "Old dispatch fails ammo_search at AI_Update; not a complete old build",
+    "private_scope": "Real original NPC/player/pickup code and resources in a labelled synthetic arena; two unload/re-entry cycles. No authored campaign pursuit claim.",
+    "whitespace": "Changed C++ formatting and source/docs checks pass. Raw logs and the exact binary diff retain their original trailing/context spaces; root Markdown/JSON/Python whitespace checks pass."
+  },
+  "artifacts": [
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-tests-final-debug.log",
+      "sha256": "3397cca7c0e8387ef2584112369eba821946b55d423733cf8a796833801d4df3"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-build-final2-debug.log",
+      "sha256": "acdf085f0ef3023fa1f33795a5848275845a7a290854c1661a0cdb6b596d8bfd"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-tests-final-release.log",
+      "sha256": "ff58dbb7a15d61fa62e9d9d560fbeb52d73670bf3cd16d411e207bb1928936c3"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-build-final2-release.log",
+      "sha256": "85a65c16eca274d2b636e273f520f04c8803e5988339dc9303c1b1baaaa75ace"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-tests-final-sanitize.log",
+      "sha256": "47f8144a7c4d349a9a734eb5889dc9b51706d4f8cf4a83a3c9f3998ff9250665"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-build-final2-sanitize.log",
+      "sha256": "193e826028c89ac2f4359c2bddb59ca86f2c7c9fe8da30267451a75b2ad18672"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-gpu-final-debug.log",
+      "sha256": "ebab18939bfb63d515a3b304d0ec1eef79bab24f9e46c3c7333e3b810fce9781"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-gpu-final-release.log",
+      "sha256": "71222a3ff2e92f050af97270927fa6dbd10334819370fa4f15f87d41283aa19c"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-control-final.log",
+      "sha256": "f07ad4247bd3dafbe205252f90b02a51a44e2006eb13e4ad0bee793a7a21305b"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-control.py",
+      "sha256": "df0d282f72b53951d93b318d154365fd7e476a5eaf7300a7b7f41ed62d370ca9"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-initial-tests.log",
+      "sha256": "4673cfa57d3cc5bb106e36c0c3d1bc603d1802cc308843d3ec05b780d67a315c"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-focused.log",
+      "sha256": "9c0baa1ce334bb7f9c1a42af32269be12c21f79ef2f1ba6e64bee7f5036323dc"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-focused-final2.log",
+      "sha256": "0e002d578679a89e03159889b1ba76f7e79fc0fe58da48f64d599b87b39cd194"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-build-final-debug.log",
+      "sha256": "9da5c86fba07d425d2044597c2d319bcfbbac37868340e6388e1dc1c1919c109"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-integrity.log",
+      "sha256": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-reference-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "path": "Documentation/Implementation/evidence/m2-ai-ammo-links.log",
+      "sha256": "940fc09142e76182a3040708937a90957752c25c07310b5b33948b8e58359959"
+    }
+  ]
+}

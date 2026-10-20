@@ -1,0 +1,9 @@
+{
+  "binary": "MSynth25.dll",
+  "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+  "unicorn": "2.1.4",
+  "selection_cases": 146,
+  "fast_release_cases": 18,
+  "decisions_sha256": "8cc14cadf148829ed7a27615a0f447f18ab6f83088fe0262385f62b8a4426a90",
+  "scope": "Original newest-held note-off and self-nonexclusive same-key target selection. Selection stop routines intercepted; fast release integer cap executed with envelope evaluation intercepted. No full synth, PCM, transport or native DLL execution."
+}

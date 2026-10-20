@@ -1,0 +1,5 @@
+[0/2] Re-checking globbed directories...
+[1/214] Scanning /home/yann/projects/lithtech/Blood2/tests/demo_tests.cpp for CXX dependencies
+[2/214] Generating CXX dyndep file tests/CMakeFiles/demo_tests.dir/CXX.dd
+[3/213] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIRuntime.cpp for CXX dependencies
+[4/213] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd

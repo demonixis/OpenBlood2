@@ -1,0 +1,14 @@
+613/619 Testing: weapon_sprites.failures
+613/619 Test: weapon_sprites.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_sprite_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-sprites-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapon_sprites.failures" start time: Oct 16 23:50 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_sprites.failures" end time: Oct 16 23:50 CEST
+"weapon_sprites.failures" time elapsed: 00:00:00
+----------------------------------------------------------

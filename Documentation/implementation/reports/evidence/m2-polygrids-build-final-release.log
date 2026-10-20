@@ -1,0 +1,11 @@
+[0/2] Re-checking globbed directories...
+[1/11] Scanning <workspace>/Blood2/tests/object_contract_tests.cpp for CXX dependencies
+[2/11] Scanning <workspace>/Blood2/src/app/model_scene.cpp for CXX dependencies
+[3/11] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[4/11] Scanning <workspace>/Blood2/tests/level_change_gpu_tests.cpp for CXX dependencies
+[5/11] Generating CXX dyndep file tests/CMakeFiles/level_change_gpu_tests.dir/CXX.dd
+[6/11] Building CXX object tests/CMakeFiles/level_change_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[7/11] Building CXX object tests/CMakeFiles/level_change_gpu_tests.dir/level_change_gpu_tests.cpp.o
+[8/11] Linking CXX executable tests/level_change_gpu_tests
+[9/11] Building CXX object tests/CMakeFiles/object_contract_tests.dir/object_contract_tests.cpp.o
+[10/11] Linking CXX executable tests/object_contract_tests

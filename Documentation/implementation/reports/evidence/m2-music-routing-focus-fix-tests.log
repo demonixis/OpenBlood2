@@ -1,0 +1,12 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 986: music_assets.private
+1/1 Test #986: music_assets.private .............   Passed    2.61 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+headless        =   2.61 sec*proc (1 test)
+music_assets    =   2.61 sec*proc (1 test)
+private         =   2.61 sec*proc (1 test)
+
+Total Test time (real) =   2.62 sec

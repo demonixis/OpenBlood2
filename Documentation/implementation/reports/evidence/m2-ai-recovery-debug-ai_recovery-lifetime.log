@@ -1,0 +1,14 @@
+443/447 Testing: ai_recovery.lifetime
+443/447 Test: ai_recovery.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_recovery.lifetime" start time: Oct 16 14:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.lifetime" end time: Oct 16 14:04 CEST
+"ai_recovery.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

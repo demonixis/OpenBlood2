@@ -1,0 +1,23 @@
+[0/2] Re-checking globbed directories...
+[1/66] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerObj.cpp for CXX dependencies
+[2/66] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[3/23] Scanning /home/yann/projects/lithtech/Blood2/tests/pushable_tests.cpp for CXX dependencies
+[4/23] Generating CXX dyndep file tests/CMakeFiles/pushable_tests.dir/CXX.dd
+[5/23] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerObj.cpp.o
+[6/23] Linking CXX static library libblood2_game.a
+[7/23] Linking CXX executable tests/object_contract_tests
+[8/23] Linking CXX executable tests/world_tests
+[9/23] Linking CXX executable tests/services_tests
+[10/23] Linking CXX executable tests/player_tests
+[11/23] Linking CXX executable blood2
+[12/23] Linking CXX executable tests/weapon_tests
+[13/23] Linking CXX executable tests/movement_tests
+[14/23] Linking CXX executable tests/locomotion_tests
+[15/23] Linking CXX executable tests/door_tests
+[16/23] Linking CXX executable tests/container_tests
+[17/23] Linking CXX executable tests/trigger_tests
+[18/23] Linking CXX executable tests/interaction_tests
+[19/23] Linking CXX executable tests/brush_tests
+[20/23] Linking CXX executable tests/explosion_tests
+[21/23] Building CXX object tests/CMakeFiles/pushable_tests.dir/pushable_tests.cpp.o
+[22/23] Linking CXX executable tests/pushable_tests

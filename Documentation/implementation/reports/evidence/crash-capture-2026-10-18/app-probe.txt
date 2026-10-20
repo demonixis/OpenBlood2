@@ -1,0 +1,7 @@
+Release frontend + NVIDIA: PASS
+Injected SIGABRT after menu frame capture
+Original signal exit preserved; no completion marker
+Core reopened with copied executable; main.cpp source locations present
+core_bytes=678503264
+thread_stacks=10
+session=/home/yann/projects/lithtech/Blood2/build/release/crash-app-probe/1792326364873889151/sessions/session-1792326364875680555-0

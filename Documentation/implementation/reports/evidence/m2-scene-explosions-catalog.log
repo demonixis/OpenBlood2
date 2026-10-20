@@ -1,0 +1,64 @@
+262/264 Testing: sceneexplosion.catalog
+262/264 Test: sceneexplosion.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene_explosion_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"sceneexplosion.catalog" start time: Oct 16 03:36 CEST
+Output:
+----------------------------------------------------------
+worlds/01_subwaya.dat name=exp1 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp1 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp2 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp3 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp3 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp4 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp4 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp5 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/01_subwaya.dat name=exp5 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/07_cathedral.dat name=lightningexplosion1 type=8 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/07_cathedral.dat name=lightningexplosion2 type=8 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/07_cathedral.dat name=lightningexplosion3 type=8 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/08_subwayb.dat name=exp1 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/08_subwayb.dat name=exp1 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/08_subwayb.dat name=exp2 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/08_subwayb.dat name=exp3 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/08_subwayb.dat name=exp3 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/08_subwayb.dat name=exp4 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/08_subwayb.dat name=exp4 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/08_subwayb.dat name=exp5 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/08_subwayb.dat name=exp5 type=3 damage=0 radius=200 normal=0,1,0 sound=sounds\weapons\howitzer\impact.wav voice=decoded
+worlds/12_train_station.dat name=exp4 type=3 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/12_train_station.dat name=exp3 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/12_train_station.dat name=exp2 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/12_train_station.dat name=exp2 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/12_train_station.dat name=exp1 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/24b_arena.dat name=Explosion1 type=1 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/24b_arena.dat name=Explosion1 type=1 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/24b_arena.dat name=Explosion1 type=1 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=ExplosionSFX1 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=ExplosionSFX1 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=ExplosionSFX1 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=ExplosionSFX2 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=ExplosionSFX2 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=ExplosionSFX2 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=ExplosionSFX3 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=ExplosionSFX3 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=ExplosionSFX4 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=ExplosionSFX4 type=6 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=ExplosionSFX5 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=ExplosionSFX5 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=ExplosionSFX5 type=2 damage=50 radius=200 normal=0,1,0 sound=Sounds\exp_tnt.wav voice=absent
+worlds/25_ancientone.dat name=Vortex-AncientOne type=24 damage=0 radius=1000 normal=0,1,0 sound=Sounds\enemies\Ancientone\vortex.wav voice=decoded
+worlds=57 sources=43 accepted=43 rejected=0 decoded=19 missing=24
+type=1 count=3
+type=2 count=10
+type=3 count=19
+type=6 count=7
+type=8 count=3
+type=24 count=1
+<end of output>
+Test time =   3.50 sec
+----------------------------------------------------------
+Test Passed.
+"sceneexplosion.catalog" end time: Oct 16 03:36 CEST
+"sceneexplosion.catalog" time elapsed: 00:00:03
+----------------------------------------------------------

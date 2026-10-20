@@ -1,0 +1,14 @@
+341/343 Testing: texture.malformed
+341/343 Test: texture.malformed
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/texture_tests" "malformed"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"texture.malformed" start time: Oct 16 09:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"texture.malformed" end time: Oct 16 09:15 CEST
+"texture.malformed" time elapsed: 00:00:00
+----------------------------------------------------------

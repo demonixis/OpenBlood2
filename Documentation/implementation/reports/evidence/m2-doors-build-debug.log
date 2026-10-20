@@ -1,0 +1,126 @@
+[0/2] Re-checking globbed directories...
+[1/128] Scanning /home/yann/projects/lithtech/Blood2/src/engine/world.cpp for CXX dependencies
+[2/128] Scanning /home/yann/projects/lithtech/Blood2/src/engine/config.cpp for CXX dependencies
+[3/128] Scanning /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp for CXX dependencies
+[4/128] Scanning /home/yann/projects/lithtech/Blood2/src/engine/resources.cpp for CXX dependencies
+[5/128] Scanning /home/yann/projects/lithtech/Blood2/src/engine/model_store.cpp for CXX dependencies
+[6/128] Scanning /home/yann/projects/lithtech/Blood2/src/engine/model.cpp for CXX dependencies
+[7/128] Scanning /home/yann/projects/lithtech/Blood2/src/engine/collision.cpp for CXX dependencies
+[8/128] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/engineobjects.cpp for CXX dependencies
+[9/128] Scanning /home/yann/projects/lithtech/Blood2/src/engine/world_model.cpp for CXX dependencies
+[10/128] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/B2BaseClass.cpp for CXX dependencies
+[11/128] Scanning /home/yann/projects/lithtech/Blood2/src/engine/container.cpp for CXX dependencies
+[12/128] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CameraSpot.cpp for CXX dependencies
+[13/128] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[14/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Key.cpp for CXX dependencies
+[15/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/GameStartPoint.cpp for CXX dependencies
+[16/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PathPoint.cpp for CXX dependencies
+[17/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/trigger_helpers.cpp for CXX dependencies
+[18/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/session_load.cpp for CXX dependencies
+[19/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/session.cpp for CXX dependencies
+[20/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/registration.cpp for CXX dependencies
+[21/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/WorldProperties.cpp for CXX dependencies
+[22/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_adapter.cpp for CXX dependencies
+[23/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/SmellHint.cpp for CXX dependencies
+[24/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_models.cpp for CXX dependencies
+[25/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp for CXX dependencies
+[26/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Door.cpp for CXX dependencies
+[27/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_movers.cpp for CXX dependencies
+[28/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_containers.cpp for CXX dependencies
+[29/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/VolumeBrush.cpp for CXX dependencies
+[30/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp for CXX dependencies
+[31/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerLocomotion.cpp for CXX dependencies
+[32/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/MoveMgr.cpp for CXX dependencies
+[33/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerObj.cpp for CXX dependencies
+[34/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/WeaponDefs.cpp for CXX dependencies
+[35/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_clients.cpp for CXX dependencies
+[36/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/BloodShells.cpp for CXX dependencies
+[37/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/server_weapons.cpp for CXX dependencies
+[38/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/InventoryMgr.cpp for CXX dependencies
+[39/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Weapon.cpp for CXX dependencies
+[40/126] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ViewWeapon.cpp for CXX dependencies
+[41/126] Building CXX object CMakeFiles/engine.dir/src/engine/config.cpp.o
+[42/126] Building CXX object CMakeFiles/engine.dir/src/engine/resources.cpp.o
+[43/126] Building CXX object CMakeFiles/engine.dir/src/engine/world.cpp.o
+[44/126] Building CXX object CMakeFiles/engine.dir/src/engine/model.cpp.o
+[45/126] Building CXX object CMakeFiles/engine.dir/src/engine/objects.cpp.o
+[46/126] Building CXX object CMakeFiles/engine.dir/src/engine/model_store.cpp.o
+[47/126] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[48/126] Building CXX object CMakeFiles/engine.dir/src/engine/collision.cpp.o
+[49/126] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector.cpp for CXX dependencies
+[50/126] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[51/126] Scanning /home/yann/projects/lithtech/Blood2/tests/object_contract_tests.cpp for CXX dependencies
+[52/126] Scanning /home/yann/projects/lithtech/Blood2/tests/world_tests.cpp for CXX dependencies
+[53/126] Scanning /home/yann/projects/lithtech/Blood2/tests/services_tests.cpp for CXX dependencies
+[54/126] Scanning /home/yann/projects/lithtech/Blood2/tests/player_tests.cpp for CXX dependencies
+[55/126] Building CXX object CMakeFiles/engine.dir/src/engine/world_model.cpp.o
+[56/126] Scanning /home/yann/projects/lithtech/Blood2/tests/weapon_tests.cpp for CXX dependencies
+[57/126] Scanning /home/yann/projects/lithtech/Blood2/tests/movement_tests.cpp for CXX dependencies
+[58/126] Scanning /home/yann/projects/lithtech/Blood2/tests/locomotion_tests.cpp for CXX dependencies
+[59/126] Scanning /home/yann/projects/lithtech/Blood2/tests/container_tests.cpp for CXX dependencies
+[60/126] Scanning /home/yann/projects/lithtech/Blood2/tests/door_tests.cpp for CXX dependencies
+[61/126] Building CXX object CMakeFiles/engine.dir/src/engine/container.cpp.o
+[62/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/engineobjects.cpp.o
+[63/126] Linking CXX static library libengine.a
+[64/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/B2BaseClass.cpp.o
+[65/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CameraSpot.cpp.o
+[66/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Key.cpp.o
+[67/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/GameStartPoint.cpp.o
+[68/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PathPoint.cpp.o
+[69/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/trigger_helpers.cpp.o
+[70/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/session_load.cpp.o
+[71/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/session.cpp.o
+[72/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WorldProperties.cpp.o
+[73/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_models.cpp.o
+[74/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/registration.cpp.o
+[75/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_adapter.cpp.o
+[76/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/SmellHint.cpp.o
+[77/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Door.cpp.o
+[78/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_movers.cpp.o
+[79/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_containers.cpp.o
+[80/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_physics.cpp.o
+[81/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/VolumeBrush.cpp.o
+[82/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerContainers.cpp.o
+[83/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerLocomotion.cpp.o
+[84/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/MoveMgr.cpp.o
+[85/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerObj.cpp.o
+[86/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/WeaponDefs.cpp.o
+[87/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/BloodShells.cpp.o
+[88/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_clients.cpp.o
+[89/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/InventoryMgr.cpp.o
+[90/126] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[91/126] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[92/126] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[93/126] Generating CXX dyndep file tests/CMakeFiles/services_tests.dir/CXX.dd
+[94/126] Generating CXX dyndep file tests/CMakeFiles/player_tests.dir/CXX.dd
+[95/126] Generating CXX dyndep file tests/CMakeFiles/weapon_tests.dir/CXX.dd
+[96/126] Generating CXX dyndep file tests/CMakeFiles/movement_tests.dir/CXX.dd
+[97/126] Generating CXX dyndep file tests/CMakeFiles/locomotion_tests.dir/CXX.dd
+[98/126] Generating CXX dyndep file tests/CMakeFiles/container_tests.dir/CXX.dd
+[99/126] Generating CXX dyndep file tests/CMakeFiles/door_tests.dir/CXX.dd
+[100/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/server_weapons.cpp.o
+[101/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Weapon.cpp.o
+[102/126] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ViewWeapon.cpp.o
+[103/126] Linking CXX static library libblood2_game.a
+[104/126] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o
+[105/126] Building CXX object tests/CMakeFiles/object_contract_tests.dir/object_contract_tests.cpp.o
+[106/126] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[107/126] Building CXX object tests/CMakeFiles/world_tests.dir/world_tests.cpp.o
+[108/126] Building CXX object tests/CMakeFiles/services_tests.dir/services_tests.cpp.o
+[109/126] Building CXX object tests/CMakeFiles/player_tests.dir/player_tests.cpp.o
+[110/126] Building CXX object tests/CMakeFiles/weapon_tests.dir/weapon_tests.cpp.o
+[111/126] Building CXX object tests/CMakeFiles/movement_tests.dir/movement_tests.cpp.o
+[112/126] Linking CXX executable blood2
+[113/126] Linking CXX executable tests/object_contract_tests
+[114/126] Linking CXX executable tests/config_tests
+[115/126] Linking CXX executable tests/world_tests
+[116/126] Linking CXX executable tests/services_tests
+[117/126] Building CXX object tests/CMakeFiles/locomotion_tests.dir/locomotion_tests.cpp.o
+[118/126] Linking CXX executable tests/player_tests
+[119/126] Linking CXX executable tests/weapon_tests
+[120/126] Linking CXX executable tests/movement_tests
+[121/126] Linking CXX executable tests/locomotion_tests
+[122/126] Building CXX object tests/CMakeFiles/container_tests.dir/container_tests.cpp.o
+[123/126] Building CXX object tests/CMakeFiles/door_tests.dir/door_tests.cpp.o
+[124/126] Linking CXX executable tests/container_tests
+[125/126] Linking CXX executable tests/door_tests

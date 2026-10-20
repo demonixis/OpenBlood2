@@ -1,0 +1,14 @@
+553/556 Testing: explosion_models.session
+553/556 Test: explosion_models.session
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_model_tests" "session" "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-models-session"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"explosion_models.session" start time: Oct 16 20:39 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_models.session" end time: Oct 16 20:39 CEST
+"explosion_models.session" time elapsed: 00:00:00
+----------------------------------------------------------

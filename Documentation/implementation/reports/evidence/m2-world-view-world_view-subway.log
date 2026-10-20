@@ -1,0 +1,16 @@
+337/339 Testing: world_view.subway
+337/339 Test: world_view.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_view_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"world_view.subway" start time: Oct 16 08:44 CEST
+Output:
+----------------------------------------------------------
+SubwayA: vertices=25287 draws=111 triangles=7441 unbound=5 invisible=442 posed=110
+SubwayA: vertices=25287 draws=111 triangles=7441 unbound=5 invisible=442 posed=110
+<end of output>
+Test time =   0.67 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.subway" end time: Oct 16 08:44 CEST
+"world_view.subway" time elapsed: 00:00:00
+----------------------------------------------------------

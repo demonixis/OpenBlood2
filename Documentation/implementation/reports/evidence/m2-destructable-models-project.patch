@@ -1,0 +1,1730 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index d84d465..556fff9 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -518,3 +518,5 @@ The [NPC activation correction](../Documentation/Implementation/M2_ACTIVATION_VI
+ The [corpse placement correction](../Documentation/Implementation/M2_CORPSE_PLACEMENT.md) preserves original raw death dimensions and fits the new body locally against primary-world geometry. Read [contracts](docs/CORPSE_PLACEMENT_CONTRACTS.md). Preserve the clear cached anchor, same-side corrections, bounded distance/work, final box/center-path validation and deferred failure cleanup. Reports retain actual attempted/committed state without advancing simulation. This is replacement triangle collision, not retail depenetration; safe NEW_LEVEL, required services and M2 remain open.
+ 
+ The [built-in Model continuation](../Documentation/Implementation/M2_BUILTIN_MODELS.md) integrates the original engine Model callback and 47 actual CityHub instances. Read [contracts](docs/BUILTIN_MODEL_CONTRACTS.md). Preserve forced OT_MODEL, BaseClass defaults/property order, empty/missing resource distinctions, shared immutable assets and deferred lifetime. Do not conflate Model with CModelObject/CDestructableModel or infer lighting/physical bodies. CityHub remains 159 unsupported / 35 failed; safe NEW_LEVEL and M2 remain open.
++
++The [destructible-model continuation](../Documentation/Implementation/M2_DESTRUCTABLE_MODELS.md) connects original CDestructableModel rules and 122 CityHub objects. Read [contracts](docs/DESTRUCTABLE_MODEL_CONTRACTS.md). Preserve authored versus automatic dimensions, replacement non-rotation, cascade/base callback order, exact destroyed flags and deferred destruction. Models reuse the bounded atomic box solver; no contact forces or depenetration are invented. Unnamed ABC clips remain unnamed. CheckClearShot's destructible filter is separate from CanSee. Chrome/save/partial destroy pairs remain explicit failures. CityHub is 413 created / 37 unsupported / 35 failed; safe NEW_LEVEL and M2 stay open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 511c42e..9b8d4cd 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -52,7 +52,7 @@ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original
+     src/game/original/InventoryMgr.cpp src/game/original/InventorySave.cpp src/game/original/Weapon.cpp src/game/original/WeaponSound.cpp src/game/original/WeaponVector.cpp src/game/original/WeaponFX.cpp src/game/original/ViewWeapon.cpp)
+ target_link_libraries(blood2_game PUBLIC engine)
+ 
+-target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableSave.cpp src/game/original/DestructableBrush.cpp
++target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableSave.cpp src/game/original/DestructableBrush.cpp src/game/original/DestructableModel.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+ add_executable(blood2_app src/app/path_manager_smoke.cpp src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/model_scene.cpp src/app/sprite_scene.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
+diff --git a/README.md b/README.md
+index dabf799..61851b9 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [original destructible-model continuation](../Documentation/Implementation/M2_DESTRUCTABLE_MODELS.md) connects 122 CityHub objects to original damage, model replacement, fading and bounded box physics. CityHub now has 413 created, 37 unsupported and 35 failed entries; earlier counts below are historical. Contact-force sliding audio, required remaining services, safe NEW_LEVEL and M2 remain incomplete.
++
+ The [original built-in Model continuation](../Documentation/Implementation/M2_BUILTIN_MODELS.md) renders 47 authored CityHub lamps with real ABC/DTX resources and inspection. CityHub now has 291 created, 159 unsupported and 35 failed entries; the source session remains intact during rehearsal. Destructible models, safe NEW_LEVEL and M2 remain incomplete.
+ 
+ Current continuation: [original fragment smoke trails](../Documentation/Implementation/M2_OBJECT_PARTICLES.md) adds
+diff --git a/docs/AI_FIRE_CONTRACTS.md b/docs/AI_FIRE_CONTRACTS.md
+index 620adf7..9759ec6 100644
+--- a/docs/AI_FIRE_CONTRACTS.md
++++ b/docs/AI_FIRE_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI weapon choice and standing fire
+ 
++> [Destructible model contracts](DESTRUCTABLE_MODEL_CONTRACTS.md) now implement
++> the CDestructableModel-only IGNORE_DESTRUCTABLE branch in CheckClearShot.
++> Earlier absence statements below are historical; CanSee keeps its own filter.
++
+ This selective source port connects `FindBestWeapon`, type-based `ChangeWeapon`,
+ `MC_BestWeapon`, the Beretta/knife default `Fire` aiming branch, `CheckClearShot`,
+ `MC_Fire_Stand` and AI `fire_key` dispatch. [Source ranges](M2_AI_FIRE_SOURCES.json)
+diff --git a/docs/DESTRUCTABLE_MODEL_CONTRACTS.md b/docs/DESTRUCTABLE_MODEL_CONTRACTS.md
+new file mode 100644
+index 0000000..7e1a53b
+--- /dev/null
++++ b/docs/DESTRUCTABLE_MODEL_CONTRACTS.md
+@@ -0,0 +1,102 @@
++# Original destructible models
++
++`CDestructableModel` is a selective direct port of original
++`ObjectDLL/DestructableModel.cpp`, registered under B2BaseClass. It reuses
++CDestructable, CDebris, ABC/DTX resources and the existing model renderer.
++[Source ledger](M2_DESTRUCTABLE_MODEL_SOURCES.json) records the import and
++[implementation evidence](../../Documentation/Implementation/M2_DESTRUCTABLE_MODELS.md)
++records verification. CityHub's ceilingfan2.abc has one unnamed clip, 19 keys and duration599. The ABC
++reader accepts the empty authored name, preserves its ordinal and validates every
++other count/key/pose normally. No synthetic name, animation or geometry is supplied.
++No dependency or new mutable game global is introduced;
++the existing destructible intrusive list remains covered by destination isolation.
++
++## Source rules and lifetime
++
++Precreate calls the base/aggregates once before reading model properties. Nonempty
++InitFilename/InitSkin override inherited resource fields. Pushable forces gravity
++and touch notification; string creation additionally forces the original solid,
++visible, shadow and Gouraud flags. Difficulty filtering precedes initialization.
++Chrome, save/restore, world-bypassing bodies, invalid numeric properties and partial
++destroy-resource pairs reject creation. A lone damage filename or skin is retained
++but disables the damage threshold, as in the source. Missing required ABC data fails
++initialization and is reported as a failed world entry, never successful geometry.
++
++Initialization sets original HP/max HP, mass, friction `5 + mass * 10 / 500`,
++priority 40/100, damage impulses only for Pushable, and SAVEABLE/MOVEABLE/
++SINGULARITY_ATTRACT plus authored surface bits. SAVEABLE is metadata, not a save
++implementation. Auto dimensions use clip zero, the eight rotated corners, then
++ModelScale. Authored nonzero dimensions are neither rotated nor scaled. Initial
++small-shadow removal uses squared dimensions <1000; damage/destroy replacements
++use <8000. Replacement auto dimensions are scaled but **not rotated**. Visibility,
++shadow and additive tint flags do not implement missing lighting/shadows.
++
++The original SFX_DESTRUCTABLEMODEL client handler only sets physics dimensions and
++CF_DONTSETDIMS. This direct integration shares one checked body between client and
++server; each successful dimension assignment is the actual publication, counted
++in inspection. There is no fabricated network/SFX acknowledgement.
++
++World gravity objects call the existing downward ground-placement helper. A
++no-hit/start-inside ray leaves position unchanged as the original helper does;
++its DE_NOTFOUND remains visible. Collision-clipped movement is not a placement
++success guarantee. There is no automatic depenetration of authored overlaps.
++
++Damage dispatch reaches CDestructable once, including CanDamage, trigger-only,
++impulses, death trigger and supported SpawnObject. Destructable gates the model's
++reaction, separately from aggregate HP loss. Crossing the positive damage threshold
++changes resources/dimensions once. Lethal damage schedules .001 updates; exploding
++models retain the original .25 cascade delay, decremented by the aggregate after
++the model's update. Existing CDebris keeps fixed effective damage100/radius200,
++squared-distance area falloff and material order. Gib records remain diagnostic
++requests, not rendered gibs or a complete explosion composite.
++
++No destroy resource removes the model; a complete pair replaces it and assigns
++exact DestroyVisible/Solid/Gravity flags. A lifetime adaptation emits CDebris while
++the source is still checked alive, then requests deferred removal; the original
++requested removal first and continued using its engine handle. Reentrant destruction
++is guarded, and callbacks cannot access reclaimed objects. Source repeated destruction
++on a later scheduled update of a surviving destroyed model is retained. Runtime
++resource/support failures stop scheduling and freeze the inspectable object; initial
++failures remove it and leave their error in world accounting. Owned C++ strings
++replace five legacy string handles; message-read handles are released once.
++
++## Replacement physics and sound
++
++ConfigureModelBody marks an ordinary model body separately from characters and world
++meshes. Its half dimensions are the game's dimensions, not inferred visual bounds.
++The existing box planner now accepts these bodies: bounded sliding, analytic gravity/
++ground friction, higher-priority single-box pushes, atomic body/rider paths, deferred
++touches and checked lifetime. A configured body cannot become an attached visual
++child or character body. Models require no world-mesh BoxPhysics flag. There is one
++integration per body; client-associated players still use MoveMgr only.
++
++This is replacement physics, not retail parity. Initial overlaps, recursive stacks,
++crushing, torque and collision-force magnitudes remain unavailable. TouchNotify keeps
++the original two-frame sliding/standing grace and movement-distance test. Production
++touches carry force zero; consequently they do not establish the force-dependent
++standing flag or start a sliding loop. Explicit nonzero-force test callbacks exercise
++the original branch without claiming production force support. PlayObjectLoopSound
++uses real decoded, spatial, owner-following whole-clip loops, retained until stop or
++owner destruction. The original material fallback path, radius1000 and priority0
++are preserved. Missing WAVs fail visibly; priority arbitration and reverb remain
++unimplemented.
++
++## Alpha, AI and inspection
++
++Alpha commands preserve case-insensitive matching, exactly-three-argument fade time,
++positive-rate instant snap and elapsed-time interpolation. The source repeatedly
++parsed its initial pointer for multi-command text. Bounded parsing advances through
++all commands and validates finite supported alpha/rate values before any mutation;
++malformed text retains the previous fade and an explicit diagnostic.
++
++AI CheckClearShot uses IGNORE_LIQUID | IGNORE_GLASS | IGNORE_DESTRUCTABLE: the last
++flag excludes only destructible CDestructableModel objects. CanSee retains its
++separate visibility filter; it does not ignore these models even when their debris
++is glass. Ordinary weapon collision/damage still hits them.
++
++Objects displays current damage/death/replacement state, shared dimensions, body
++mass/friction/priority/velocity/counts, fade, ground result, loop and failures for
++hidden/inactive as well as visible instances. Existing model/skeleton/resource views
++show ABC/skin/pose state without advancing simulation. Readiness and source-entry
++counts do not imply a playable CityHub or safe automatic NEW_LEVEL. Required
++remaining classes/services, world transfer and M2 remain incomplete.
+diff --git a/docs/M2_DESTRUCTABLE_MODEL_SOURCES.json b/docs/M2_DESTRUCTABLE_MODEL_SOURCES.json
+new file mode 100644
+index 0000000..d7dbe31
+--- /dev/null
++++ b/docs/M2_DESTRUCTABLE_MODEL_SOURCES.json
+@@ -0,0 +1,55 @@
++{
++  "baseline_commit": "24ae2d4d627d297ebc84ebd145e8a3d615af3cad",
++  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/DestructableModel.cpp",
++      "sha256": "220ccdb45e7ff287cde5cb9a416d14e99e95b01eb11666b94214b9d120e91f54",
++      "use": "Registration, property/initialization/update/damage/destruction/fade/sliding rules; save/load excluded."
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/DestructableModel.h",
++      "sha256": "9812c402961f9b68ebc349e5b317fe378185a7940d1b1cd27dfb669303ce244a",
++      "use": "Original class members and aggregate ownership."
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "use": "CheckClearShot requests IGNORE_DESTRUCTABLE in addition to liquid/glass."
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
++      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
++      "use": "GlobalFilterFn destructible model exclusion and source ground-placement helper."
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "use": "SFX_DESTRUCTABLEMODEL sets client physics dimensions, sharing one body in this integration."
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
++      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
++      "use": "Existing shared damage/mass/friction/cascade rules reused."
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Debris.cpp",
++      "sha256": "65cd8053b79a6ae5c9107d8997fb4a157debc1427afb2c5ba26acc7bbf60575b",
++      "use": "Existing debris and area-damage requests reused."
++    },
++    {
++      "path": "sources/blood2/Shared/SoundTypes.h",
++      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
++      "use": "MISC_LOW priority zero."
++    }
++  ],
++  "adaptations": [
++    "Owned strings and typed direct service calls; callback/aggregate order preserved.",
++    "Model bodies reuse bounded box motion and atomic push/rider solver; no invented contact forces.",
++    "Shared client/server dimensions replace dimension-only client SFX.",
++    "Debris before deferred removal maintains checked callback lifetime; nested destruction guarded.",
++    "Bounded command parser repairs repeated initial pointer; malformed numeric groups reject before mutation.",
++    "Chrome, partial destroy pairs, save/restore and invalid properties fail explicitly; runtime failures remain inspectable.",
++    "Real ceilingfan2.abc contains an unnamed clip; accept empty authored clip names without changing count/pose/length validation or supplying an invented name."
++  ]
++}
+diff --git a/docs/MODEL_AND_COLLISION_CONTRACTS.md b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+index c31ff21..85b0c7d 100644
+--- a/docs/MODEL_AND_COLLISION_CONTRACTS.md
++++ b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+@@ -174,3 +174,12 @@ and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
+ Visibility queries do not implement target selection, AI states or complete M2.
+ 
+ The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.
++
++## Destructible model continuation
++
++[Destructible-model contracts](DESTRUCTABLE_MODEL_CONTRACTS.md) add original authored
++model dimensions and a separate typed model-body flag reusing bounded box motion.
++Models do not become character bodies or world meshes. Real ceilingfan2.abc has an
++empty animation name; the reader preserves that name and its ordinal while retaining
++all structural, key-count, pose and payload validation. This is not an absent clip
++or a synthesized bind pose. Required services and M2 remain incomplete.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 700991a..79b0b85 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -880,3 +880,12 @@ See [contracts](ACTIVATION_VISIBILITY_CONTRACTS.md) and [source ledger](M2_ACTIV
+ ## Initial corpse placement
+ 
+ The [source ledger](M2_CORPSE_PLACEMENT_SOURCES.json) records original CreateCorpse/CCorpse references. Cached transforms, raw death dimensions, scale and foot offset remain source-driven. [Bounded initial placement](CORPSE_PLACEMENT_CONTRACTS.md) is new replacement-engine SAT clearance, not imported or recovered retail physics. No reference file or commercial asset was changed.
++
++## Original destructible models
++
++CDestructableModel property, initialization, damage/model replacement, destruction,
++alpha and sliding rules are adapted from the original ObjectDLL. Shared typed model
++bodies reuse the existing atomic box solver; source contact forces remain absent.
++AI CheckClearShot now includes the original model-only destructible exclusion.
++See [ledger](M2_DESTRUCTABLE_MODEL_SOURCES.json) and [contracts](DESTRUCTABLE_MODEL_CONTRACTS.md).
++No new dependency or mutable global is introduced.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 4a83730..4245256 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -4,6 +4,7 @@
+ #include "engine/world_model.h"
+ #include "game/original/AI_Mgr.h"
+ #include "game/original/ClientLightFX.h"
++#include "game/original/DestructableModel.h"
+ #include "game/original/Door.h"
+ #include "game/original/Key.h"
+ #include "game/original/KeyPickup.h"
+@@ -595,6 +596,42 @@ namespace OpenBlood2
+                         if (state.m_ObjectType == OT_MODEL)
+                             ImGui::Text("Model additive RGB (lighting pending) %.3f %.3f %.3f | alpha %.3f",
+                                         object->color.x, object->color.y, object->color.z, object->alpha);
++                        if (const auto* model = dynamic_cast<const CDestructableModel*>(object->game.get()))
++                        {
++                            ImGui::SeparatorText("Original destructible model");
++                            ImGui::Text("HP %.2f / %.2f | damage threshold %.2f | dead %s | destructible %s",
++                                        model->m_damage.m_fHitPoints, model->hit_points, model->damage_hit_points,
++                                        model->dead_state ? "yes" : "no", model->destructable ? "yes" : "no");
++                            ImGui::Text("Body %s | pushable %s | mass %.2f | friction %.2f | priority %u",
++                                        object->model_body ? "configured" : "unavailable",
++                                        model->pushable ? "yes" : "no", object->body_properties.mass,
++                                        object->body_properties.friction, object->blocking_priority);
++                            ImGui::Text("Dimensions %.2f %.2f %.2f | shared client/body publications %u",
++                                        object->dimensions.x, object->dimensions.y, object->dimensions.z,
++                                        model->dimensions_publications);
++                            ImGui::Text("Velocity %.2f %.2f %.2f | body steps %llu | pushes %llu | blocks %llu",
++                                        object->velocity.x, object->velocity.y, object->velocity.z,
++                                        static_cast<unsigned long long>(object->body_steps),
++                                        static_cast<unsigned long long>(object->body_pushes),
++                                        static_cast<unsigned long long>(object->mover_blocks));
++                            ImGui::Text("Alpha %.3f -> %.3f | cascade delay %.3f | destruction callbacks %u",
++                                        model->alpha, model->target_alpha, model->m_damage.m_fDeathDelay,
++                                        model->destructions);
++                            ImGui::Text("Ground placement result %d | sliding %s / standing %s | loop %llu",
++                                        model->ground_result, model->sliding ? "yes" : "no",
++                                        model->standing ? "yes" : "no",
++                                        static_cast<unsigned long long>(model->sliding_sound));
++                            ImGui::TextWrapped("Replacement models: damage %s / %s; destroyed %s / %s",
++                                               model->damage_model.c_str(), model->damage_skin.c_str(),
++                                               model->destroy_model.c_str(), model->destroy_skin.c_str());
++                            ImGui::TextWrapped(
++                                "Sliding WAV: %s. Contact forces are unavailable; ordinary zero-force touches do not "
++                                "start a sliding loop. Gib requests are not rendered debris.",
++                                model->sliding_path.c_str());
++                            for (const auto* detail : {&model->error, &model->trigger_error, &model->sound_error})
++                                if (!detail->empty())
++                                    ImGui::TextWrapped("%s", detail->c_str());
++                        }
+                         if (object->type->name == "Model")
+                         {
+                             ImGui::TextWrapped("Original built-in Model: BaseClass properties and engine animation. "
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 851a931..5e49712 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -81,8 +81,8 @@ namespace OpenBlood2
+         const auto trial_before = g.destination_trial.attempts;
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+-            !g.destination_trial.player_entered || g.destination_trial.created != 291 ||
+-            g.destination_trial.unknown != 159 || g.destination_trial.failed != 35 ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 413 ||
++            g.destination_trial.unknown != 37 || g.destination_trial.failed != 35 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+@@ -100,8 +100,8 @@ namespace OpenBlood2
+                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
+                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+                g.destination_inspection.source_revision == old_revision &&
+-               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 295 &&
+-               g.destination_inspection.unknown == 159 && g.destination_inspection.invalid == 31 &&
++               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 417 &&
++               g.destination_inspection.unknown == 37 && g.destination_inspection.invalid == 31 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/engine/attachments.cpp b/src/engine/attachments.cpp
+index e28354b..4d375c6 100644
+--- a/src/engine/attachments.cpp
++++ b/src/engine/attachments.cpp
+@@ -17,7 +17,7 @@ namespace OpenBlood2
+         if (!std::isfinite(norm) || norm < 1e-6f)
+             return DE_INVALIDPARAMS;
+         // Bounded visual children only. Do not silently replace physics or permit cycles/chains.
+-        if (p->attachment || c->attachment || c->container || c->world_model || c->client_movement ||
++        if (p->attachment || c->attachment || c->container || c->world_model || c->client_movement || c->model_body ||
+             (c->state.m_ObjectType != OT_MODEL && c->state.m_ObjectType != OT_NORMAL &&
+              c->state.m_ObjectType != OT_SPRITE) ||
+             (c->state.m_Flags & (FLAG_SOLID | FLAG_GRAVITY | FLAG_RAYHIT | FLAG_TOUCH_NOTIFY)) ||
+diff --git a/src/engine/model.cpp b/src/engine/model.cpp
+index b0507e1..508f24b 100644
+--- a/src/engine/model.cpp
++++ b/src/engine/model.cpp
+@@ -230,8 +230,9 @@ namespace OpenBlood2
+             anim.max = a.vec();
+             auto frames = a.u32();
+             pose_count += static_cast<std::size_t>(frames) * model.nodes.size();
+-            if (!a.good() || anim.name.empty() || !bounds(anim.min, anim.max) || !frames || frames > 65536 ||
+-                frames > a.remaining() / 30 || pose_count > 3000000)
++            // Retail ceilingfan2.abc has an unnamed clip; its ordinal and poses remain valid.
++            if (!a.good() || !bounds(anim.min, anim.max) || !frames || frames > 65536 || frames > a.remaining() / 30 ||
++                pose_count > 3000000)
+                 return fail("invalid animation/key count");
+             for (std::uint32_t j = 0; j < frames; ++j)
+             {
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index 04f4ffc..e962b26 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -127,7 +127,7 @@ namespace OpenBlood2
+         std::uint32_t contact_polygon = UINT32_MAX;
+         HOBJECT contact_object = nullptr;
+         bool grounded = false;
+-        bool world_body = false, character_body = false;
++        bool world_body = false, character_body = false, model_body = false;
+         WorldBodyProperties body_properties;
+         DBYTE blocking_priority = 0;
+         std::uint64_t body_steps = 0, body_pushes = 0;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 6c84728..e74e6c3 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -68,6 +68,8 @@ class ServerDE : public CSBase
+     virtual DRESULT WritePickupMessage(HMESSAGEWRITE, const OpenBlood2::PickupMessage&) = 0;
+     virtual bool ReadPickupMessage(HMESSAGEREAD, OpenBlood2::PickupMessage&) = 0;
+     virtual bool ConfigureWorldBody(HOBJECT, const OpenBlood2::WorldBodyProperties&) = 0;
++    virtual bool ConfigureModelBody(HOBJECT, const OpenBlood2::WorldBodyProperties&) = 0;
++    virtual OpenBlood2::SoundId PlayObjectLoopSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
+     virtual bool SetBlockingPriority(HOBJECT, DBYTE) = 0;
+     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
+diff --git a/src/game/original/AIFire.cpp b/src/game/original/AIFire.cpp
+index 7272e5f..35b80bd 100644
+--- a/src/game/original/AIFire.cpp
++++ b/src/game/original/AIFire.cpp
+@@ -54,10 +54,9 @@ bool AI_Mgr::CheckClearShot(DVector origin, DVector& direction, bool alternate)
+     auto query = [&](DVector ray, SegmentHit& hit, SegmentResult& result)
+     {
+         ++clear_shot.rays;
+-        // Same liquid/glass rules as CanSee. Original IGNORE_DESTRUCTABLE
+-        // concerns CDestructableModel, which is not registered in this port.
++        // Original IGNORE_LIQUID | IGNORE_GLASS | IGNORE_DESTRUCTABLE.
+         result = server->IntersectSegment(origin, vector_add(origin, vector_scale(ray, range)), m_hObject, hit, false,
+-                                          SegmentObjects::SolidOrRayHit, SegmentFilter::AIVisibility);
++                                          SegmentObjects::SolidOrRayHit, SegmentFilter::AIShot);
+         if (result == SegmentResult::Invalid)
+             clear_shot.outcome = AIClearOutcome::Invalid;
+         else if (result == SegmentResult::Unavailable)
+diff --git a/src/game/original/DestructableModel.cpp b/src/game/original/DestructableModel.cpp
+new file mode 100644
+index 0000000..312b636
+--- /dev/null
++++ b/src/game/original/DestructableModel.cpp
+@@ -0,0 +1,446 @@
++// Selective original-source port. See DESTRUCTABLE_MODEL_CONTRACTS.md for boundaries.
++#include "DestructableModel.h"
++#include "PlayerObj.h"
++#include "engine/collision.h"
++#include "engine/model_commands.h"
++#include <algorithm>
++#include <charconv>
++#include <cmath>
++
++using namespace OpenBlood2;
++namespace
++{
++    bool number(std::string_view text, float& out)
++    {
++        if (text.starts_with('+'))
++        {
++            text.remove_prefix(1);
++            if (text.starts_with('-'))
++                return false;
++        }
++        if (text.empty() || text.starts_with('+'))
++            return false;
++        const auto [end, ec] = std::from_chars(text.data(), text.data() + text.size(), out);
++        return ec == std::errc{} && end == text.data() + text.size() && std::isfinite(out);
++    }
++    bool dimensions(DVector value)
++    {
++        return physics_vector(value) && value.x >= 0 && value.y >= 0 && value.z >= 0;
++    }
++} // namespace
++CDestructableModel::CDestructableModel() : B2BaseClass(OT_MODEL)
++{
++    AddAggregate(&m_damage);
++    AddAggregate(&debris);
++}
++CDestructableModel::~CDestructableModel()
++{
++    if (sliding_sound && GetServerDE())
++        GetServerDE()->KillSound(sliding_sound);
++}
++bool CDestructableModel::Fail(const char* detail)
++{
++    if (error.empty())
++        error = detail;
++    auto* s = GetServerDE();
++    s->SetNextUpdate(m_hObject, 0);
++    if (!initialized)
++        s->RemoveObject(m_hObject);
++    else
++    {
++        DVector zero{};
++        s->SetVelocity(m_hObject, &zero);
++        s->SetObjectState(m_hObject, OBJSTATE_INACTIVE);
++    }
++    return false;
++}
++bool CDestructableModel::ReadProp(ObjectCreateStruct& create)
++{
++    auto* s = GetServerDE();
++    GenericProp p;
++    auto text = [&](const char* key, std::string& value)
++    {
++        if (s->GetPropGeneric(key, &p) == DE_OK)
++            value = p.m_String;
++    };
++    auto vec = [&](const char* key, DVector& value)
++    {
++        if (s->GetPropGeneric(key, &p) == DE_OK)
++            value = p.m_Vec;
++    };
++    auto flag = [&](const char* key, bool& value)
++    {
++        if (s->GetPropGeneric(key, &p) == DE_OK)
++            value = p.m_Bool != 0;
++    };
++    std::string model, skin;
++    text("InitFilename", model);
++    text("InitSkin", skin);
++    if (!model.empty())
++        SAFE_STRCPY(create.m_Filename, model.c_str());
++    if (!skin.empty())
++        SAFE_STRCPY(create.m_SkinName, skin.c_str());
++    text("DamageFilename", damage_model);
++    text("DamageSkin", damage_skin);
++    text("DestroyFilename", destroy_model);
++    text("DestroySkin", destroy_skin);
++    text("SlidingSound", sliding_path);
++    vec("InitDims", init_dims);
++    vec("DamageDims", damage_dims);
++    vec("DestroyDims", destroy_dims);
++    vec("TintColor", tint);
++    bool visible = true, solid = true, gravity = true, chrome = false;
++    flag("DestroyVisible", visible);
++    flag("DestroySolid", solid);
++    flag("DestroyGravity", gravity);
++    destroy_flags = (visible ? FLAG_VISIBLE : 0) | (solid ? FLAG_SOLID : 0) | (gravity ? FLAG_GRAVITY : 0);
++    flag("Pushable", pushable);
++    flag("Destructable", destructable);
++    flag("Chrome", chrome);
++    s->GetPropReal("HitPoints", &hit_points);
++    s->GetPropReal("DamageHitPoints", &damage_hit_points);
++    s->GetPropReal("ObjectMass", &mass);
++    s->GetPropReal("ModelScale", &scale);
++    s->GetPropReal("Alpha", &alpha);
++    target_alpha = alpha;
++    if (s->GetPropGeneric("SurfaceType", &p) == DE_OK)
++    {
++        if (p.m_Long < 0 || p.m_Long > 255)
++            return false;
++        surface = static_cast<unsigned>(p.m_Long);
++    }
++    // Environment mapping and partial replacement pairs are not silently rendered as opaque skins.
++    return !chrome && model.size() <= MAX_CS_FILENAME_LEN && skin.size() <= MAX_CS_FILENAME_LEN &&
++           damage_model.size() <= MAX_CS_FILENAME_LEN && damage_skin.size() <= MAX_CS_FILENAME_LEN &&
++           destroy_model.size() <= MAX_CS_FILENAME_LEN && destroy_skin.size() <= MAX_CS_FILENAME_LEN &&
++           destroy_model.empty() == destroy_skin.empty() && m_damage.spawn_valid && debris.valid &&
++           dimensions(init_dims) && dimensions(damage_dims) && dimensions(destroy_dims) && physics_vector(tint) &&
++           tint.x >= 0 && tint.y >= 0 && tint.z >= 0 && tint.x <= 255 && tint.y <= 255 && tint.z <= 255 &&
++           std::isfinite(hit_points) && std::abs(hit_points) <= 1e6f && std::isfinite(damage_hit_points) &&
++           std::abs(damage_hit_points) <= 1e6f && std::isfinite(mass) && mass >= 0 && mass <= 1e6f &&
++           std::isfinite(scale) && scale > 0 && scale <= 1e6f && std::isfinite(alpha) && alpha >= 0 && alpha <= 1;
++}
++bool CDestructableModel::SetDimensions(DVector& dims, bool rotate, float shadow_limit)
++{
++    auto* s = GetServerDE();
++    if (vector_dot(dims, dims) == 0)
++    {
++        if (s->GetModelAnimUserDims(m_hObject, &dims, 0) != DE_OK)
++            return Fail("Model clip-zero dimensions unavailable");
++        if (rotate)
++        {
++            DRotation rotation;
++            if (s->GetObjectRotation(m_hObject, &rotation) != DE_OK)
++                return Fail("Model rotation unavailable");
++            DVector bounds{};
++            for (int x : {-1, 1})
++                for (int y : {-1, 1})
++                    for (int z : {-1, 1})
++                    {
++                        const auto point = rotate_vector(rotation, {dims.x * x, dims.y * y, dims.z * z});
++                        bounds.x = std::max(bounds.x, std::abs(point.x));
++                        bounds.y = std::max(bounds.y, std::abs(point.y));
++                        bounds.z = std::max(bounds.z, std::abs(point.z));
++                    }
++            dims = bounds;
++        }
++        dims = vector_scale(dims, scale);
++    }
++    if (!dimensions(dims) || s->SetObjectDims(m_hObject, &dims) != DE_OK)
++        return Fail("Model dimensions rejected");
++    if (vector_dot(dims, dims) < shadow_limit)
++        s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) & ~FLAG_SHADOW);
++    // SFX_DESTRUCTABLEMODEL only sets client physics dimensions. Direct integration shares this body.
++    ++dimensions_publications;
++    return true;
++}
++bool CDestructableModel::InitialUpdate(float reason)
++{
++    auto* s = GetServerDE();
++    if (!s->SetObjectColor(m_hObject, vector_scale(tint, 1.f / 255), alpha) || !m_damage.Init(m_hObject) ||
++        !debris.Init(m_hObject))
++        return Fail("Model damage/color initialization failed");
++    m_damage.m_fMaxHitPoints = hit_points;
++    m_damage.SetHitPoints(hit_points);
++    m_damage.m_fMass = mass;
++    m_damage.apply_damage_physics = pushable;
++    if (damage_model.empty() || damage_skin.empty())
++        damage_hit_points = 0;
++    if (!s->SetBlockingPriority(m_hObject, pushable ? 40 : 100) || !s->ScaleObject(m_hObject, {scale, scale, scale}) ||
++        !SetDimensions(init_dims, true, 1000) ||
++        !s->ConfigureModelBody(m_hObject, {mass, 5 + mass * 10 / 500, pushable}))
++        return Fail("Model resource/body initialization failed");
++    s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) | (1u << 3) |
++                                         (pushable ? (1u << 4) | (1u << 5) : 0) | (surface << 24));
++    s->SetDeactivationTime(m_hObject, 1);
++    if (sliding_path.empty())
++    {
++        const char* material = "wood";
++        const char* materials[] = {"stone", "metal", "wood",   "terrain", "plastic",
++                                   "glass", "flesh", "liquid", "energy"};
++        for (unsigned i = 0; i < CDebris::surfaces.size(); ++i)
++            if (debris.GetType() == CDebris::surfaces[i])
++                material = materials[i];
++        sliding_path = std::string("sounds/events/push") + material + ".wav";
++    }
++    if (debris.exploding)
++        m_damage.m_fDeathDelay = .25f;
++    if (reason == INITIALUPDATE_WORLDFILE && (s->GetObjectFlags(m_hObject) & FLAG_GRAVITY))
++    {
++        ground_result = s->MoveObjectToGround(m_hObject);
++        if (ground_result != DE_OK && ground_result != DE_NOTFOUND)
++            return Fail("Model ground placement unavailable");
++        // The source helper also leaves a no-hit position unchanged. Retain that result for inspection.
++    }
++    initialized = true;
++    return true;
++}
++bool CDestructableModel::ChangeModel(const std::string& model, const std::string& skin, DVector& dims, bool destroyed)
++{
++    auto* s = GetServerDE();
++    if (s->SetModelFilenames(m_hObject, model.c_str(), skin.c_str()) != DE_OK ||
++        !s->ScaleObject(m_hObject, {scale, scale, scale}))
++        return Fail("Replacement model unavailable");
++    if (destroyed)
++        s->SetObjectFlags(m_hObject, destroy_flags);
++    return SetDimensions(dims, false, 8000);
++}
++void CDestructableModel::HandleDamage()
++{
++    if (dead_state || !destructable || !error.empty() || !GetServerDE()->IsObjectAlive(m_hObject))
++        return;
++    if (m_damage.m_fHitPoints <= 0)
++        GetServerDE()->SetNextUpdate(m_hObject, .001f);
++    else if (damage_hit_points > 0 && m_damage.m_fHitPoints <= damage_hit_points &&
++             ChangeModel(damage_model, damage_skin, damage_dims, false))
++        damage_hit_points = 0;
++}
++void CDestructableModel::HandleDestruction()
++{
++    if (destroying_)
++        return;
++    destroying_ = true;
++    dead_state = true;
++    const bool remove = destroy_model.empty() && destroy_skin.empty();
++    if (remove || ChangeModel(destroy_model, destroy_skin, destroy_dims, true))
++    {
++        ++destructions;
++        // Keep checked source ownership through area-damage callbacks; commit deferred removal afterwards.
++        debris.Create(m_damage.last_damage.direction, m_damage.m_fLastDamageAmount);
++        if (remove)
++            GetServerDE()->RemoveObject(m_hObject);
++    }
++    destroying_ = false;
++}
++void CDestructableModel::Update()
++{
++    auto* s = GetServerDE();
++    if (!initialized || !error.empty())
++        return;
++    bool again = false;
++    if (m_damage.m_fHitPoints <= 0)
++    {
++        if (m_damage.IsDead())
++            HandleDestruction();
++        else
++            s->SetNextUpdate(m_hObject, .001f);
++        if (!s->IsObjectAlive(m_hObject) || !error.empty())
++            return;
++    }
++    if (sliding_frames)
++        --sliding_frames;
++    if (standing_frames)
++        --standing_frames;
++    if (sliding)
++    {
++        DVector position{};
++        s->GetObjectPos(m_hObject, &position);
++        bool slid = false;
++        auto delta = vector_subtract(position, last_position);
++        if (vector_dot(delta, delta) > .1f)
++        {
++            last_position = position;
++            if (standing)
++            {
++                if (!sliding_sound)
++                {
++                    SoundRequest request;
++                    request.resource = sliding_path;
++                    request.speaker = m_hObject;
++                    request.loop = true;
++                    request.space = SoundSpace::Spatial;
++                    request.outer_radius = 1000;
++                    request.inner_radius = 250;
++                    sliding_sound = s->PlayObjectLoopSound(m_hObject, request, sound_error);
++                }
++                slid = true;
++                sliding_frames = 2;
++                again = true;
++            }
++        }
++        if (!slid && !sliding_frames)
++        {
++            sliding = false;
++            if (sliding_sound)
++                s->KillSound(sliding_sound);
++            sliding_sound = 0;
++        }
++        else
++            again = true;
++    }
++    if (standing)
++    {
++        MovementState support;
++        if (!s->GetMovementState(m_hObject, support))
++        {
++            Fail("Model support query unavailable");
++            return;
++        }
++        if (!support.standing && !standing_frames)
++            standing = false;
++    }
++    if (std::abs(alpha - target_alpha) > .0001f)
++    {
++        const auto now = s->GetTime();
++        const float adjust = fade_rate * (now - last_time);
++        last_time = now;
++        if (std::abs(adjust) >= std::abs(target_alpha - alpha))
++            alpha = target_alpha;
++        else
++        {
++            alpha += adjust;
++            again = true;
++        }
++        if (!s->SetObjectColor(m_hObject, vector_scale(tint, 1.f / 255), alpha))
++        {
++            Fail("Model fade rejected");
++            return;
++        }
++    }
++    if (again)
++    {
++        s->SetNextUpdate(m_hObject, .001f);
++        s->SetDeactivationTime(m_hObject, 1);
++    }
++}
++void CDestructableModel::TouchNotify(HOBJECT other, float force)
++{
++    auto* s = GetServerDE();
++    bool again = false;
++    if (!sliding && dynamic_cast<CBaseCharacter*>(s->HandleToObject(other)))
++    {
++        sliding = true;
++        sliding_frames = 2;
++        again = true;
++    }
++    MovementState support;
++    if (!s->GetMovementState(m_hObject, support))
++    {
++        Fail("Model contact support unavailable");
++        return;
++    }
++    if (std::isfinite(force) && std::abs(force) > 0 && support.standing)
++    {
++        standing = true;
++        standing_frames = 2;
++        again = true;
++    }
++    if (again)
++    {
++        s->SetNextUpdate(m_hObject, .001f);
++        s->SetDeactivationTime(m_hObject, 1);
++    }
++}
++bool CDestructableModel::HandleTriggerMessage(std::string_view text)
++{
++    trigger_error.clear();
++    std::vector<std::vector<std::string>> commands;
++    if (text.size() > 4096 || text.find('\0') != text.npos || !model_commands(text, commands))
++    {
++        trigger_error = "Invalid model command text";
++        return false;
++    }
++    auto alpha_command = [](const auto& a)
++    { return a.size() > 1 && !CaseLess{}(a[0], "Alpha") && !CaseLess{}("Alpha", a[0]); };
++    // Validate the whole group before mutation, then advance each parsed command (source reused pMsg).
++    for (const auto& a : commands)
++        if (alpha_command(a))
++        {
++            float value, duration = 0;
++            if (!number(a[1], value) || value < 0 || value > 1 || (a.size() == 3 && !number(a[2], duration)) ||
++                (duration > 0 && !std::isfinite((value - alpha) / duration)))
++            {
++                trigger_error = "Invalid Alpha value or fade duration";
++                return false;
++            }
++        }
++    for (const auto& a : commands)
++        if (alpha_command(a))
++        {
++            float duration = 0;
++            number(a[1], target_alpha);
++            if (a.size() == 3)
++                number(a[2], duration);
++            fade_rate = duration > 0 ? (target_alpha - alpha) / duration : 1e10f;
++            last_time = GetServerDE()->GetTime();
++            GetServerDE()->SetNextUpdate(m_hObject, .01f);
++            GetServerDE()->SetDeactivationTime(m_hObject, 1);
++        }
++    return true;
++}
++DDWORD CDestructableModel::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_SAVEOBJECT || message == MID_LOADOBJECT)
++    {
++        trigger_error = "Destructible model save/restore is unavailable";
++        return 0;
++    }
++    if (message == MID_PRECREATE)
++    {
++        const auto result = B2BaseClass::EngineMessageFn(message, data, reason);
++        if (!result || !data || reason == PRECREATE_SAVEGAME)
++            return 0;
++        auto& create = *static_cast<ObjectCreateStruct*>(data);
++        create.m_ObjectType = OT_MODEL;
++        if ((reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP) && !ReadProp(create))
++            return 0;
++        if (pushable)
++            create.m_Flags |= FLAG_TOUCH_NOTIFY | FLAG_GRAVITY;
++        if (reason == PRECREATE_STRINGPROP)
++            create.m_Flags |=
++                FLAG_GRAVITY | FLAG_SOLID | FLAG_SHADOW | FLAG_VISIBLE | FLAG_TOUCH_NOTIFY | FLAG_MODELGOURAUDSHADE;
++        return !(create.m_Flags & FLAG_GOTHRUWORLD);
++    }
++    if (message == MID_INITIALUPDATE)
++    {
++        const auto result = B2BaseClass::EngineMessageFn(message, data, reason);
++        if (GetServerDE()->IsObjectAlive(m_hObject))
++            InitialUpdate(reason);
++        return result;
++    }
++    if (message == MID_UPDATE)
++        Update();
++    if (message == MID_TOUCHNOTIFY && initialized && error.empty())
++        TouchNotify(static_cast<HOBJECT>(data), reason);
++    return B2BaseClass::EngineMessageFn(message, data, reason);
++}
++DDWORD CDestructableModel::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    if (message == damage_message)
++    {
++        const auto result = B2BaseClass::ObjectMessageFn(sender, message, read);
++        HandleDamage();
++        return result;
++    }
++    if (message == 1000)
++    {
++        auto* s = GetServerDE();
++        auto text = s->ReadFromMessageHString(read);
++        const char* value = text ? s->GetStringData(text) : nullptr;
++        if (value && error.empty())
++            HandleTriggerMessage(value);
++        if (text)
++            s->FreeString(text);
++    }
++    return B2BaseClass::ObjectMessageFn(sender, message, read);
++}
+diff --git a/src/game/original/DestructableModel.h b/src/game/original/DestructableModel.h
+new file mode 100644
+index 0000000..fdb9229
+--- /dev/null
++++ b/src/game/original/DestructableModel.h
+@@ -0,0 +1,43 @@
++#pragma once
++#include "B2BaseClass.h"
++#include "Debris.h"
++#include "Destructable.h"
++
++// Original ObjectDLL/DestructableModel.cpp, typed direct-integration adaptation.
++class CDestructableModel : public B2BaseClass
++{
++  public:
++    CDestructableModel();
++    ~CDestructableModel() override;
++    CDestructable m_damage;
++    CDebris debris;
++    bool destructable = true, pushable = false, dead_state = false, initialized = false;
++    float hit_points = 100, damage_hit_points = 50, mass = 100, scale = 1;
++    float alpha = 1, target_alpha = 1, fade_rate = 0, last_time = 0;
++    DVector init_dims{}, damage_dims{}, destroy_dims{}, tint{}, last_position{};
++    DDWORD destroy_flags = FLAG_VISIBLE | FLAG_SOLID | FLAG_GRAVITY;
++    unsigned surface = 0, dimensions_publications = 0, destructions = 0;
++    std::string damage_model, damage_skin, destroy_model, destroy_skin, sliding_path;
++    std::string error, trigger_error, sound_error;
++    bool sliding = false, standing = false;
++    unsigned sliding_frames = 0, standing_frames = 0;
++    OpenBlood2::SoundId sliding_sound = 0;
++    DRESULT ground_result = DE_NOTFOUND;
++    bool HandleTriggerMessage(std::string_view);
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++
++  private:
++    bool destroying_ = false;
++    bool ReadProp(ObjectCreateStruct&);
++    bool InitialUpdate(float);
++    bool SetDimensions(DVector&, bool rotate, float shadow_limit);
++    bool ChangeModel(const std::string&, const std::string&, DVector&, bool destroyed);
++    void HandleDamage();
++    void HandleDestruction();
++    void Update();
++    void TouchNotify(HOBJECT, float);
++    bool Fail(const char*);
++};
+diff --git a/src/game/player_restore.cpp b/src/game/player_restore.cpp
+index 75912bd..04f9a82 100644
+--- a/src/game/player_restore.cpp
++++ b/src/game/player_restore.cpp
+@@ -61,8 +61,9 @@ namespace OpenBlood2
+         const auto* record = player ? objects.get(player->m_hObject) : nullptr;
+         if (objects.busy() || !record || record->life != Life::Alive || !record->client_movement ||
+             !player->attributes_received || !client_shell.m_bInWorld || client_shell.player != record->handle ||
+-            record->attachment || record->world_body || record->character_body || record->activity != OBJSTATE_ACTIVE ||
+-            record->auto_deactivate || !record->scheduled || !std::isfinite(record->due) || player->door_push_pending)
++            record->attachment || record->world_body || record->character_body || record->model_body ||
++            record->activity != OBJSTATE_ACTIVE || record->auto_deactivate || !record->scheduled ||
++            !std::isfinite(record->due) || player->door_push_pending)
+         {
+             error = "Player capture requires an active associated player outside callbacks/pending pushes";
+             return false;
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 0e7bd7f..114f524 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -9,6 +9,7 @@
+ #include "game/original/ClientLightFX.h"
+ #include "game/original/Corpse.h"
+ #include "game/original/CultistAI.h"
++#include "game/original/DestructableModel.h"
+ #include "game/original/DetailSprite.h"
+ #include "game/original/Door.h"
+ #include "game/original/ExitHint.h"
+@@ -588,6 +589,46 @@ namespace OpenBlood2
+                     p.push_back({name, false});
+                 return p;
+             }()};
++        const ClassInfo destructable_model{
++            "CDestructableModel", &b2base, construct<CDestructableModel>, []
++            {
++                std::vector<PropertySpec> p{{"DebrisStuff", std::int32_t(0), false},
++                                            {"Visible", true},
++                                            {"Solid", true},
++                                            {"Gravity", true},
++                                            {"Shadow", true},
++                                            {"DestroyVisible", true},
++                                            {"DestroySolid", true},
++                                            {"DestroyGravity", true},
++                                            {"HitPoints", 100.0f},
++                                            {"DamageHitPoints", 50.0f},
++                                            {"ObjectMass", 100.0f},
++                                            {"Alpha", 1.0f},
++                                            {"Destructable", true},
++                                            {"Pushable", false},
++                                            {"SurfaceType", std::int32_t(0)},
++                                            {"ModelScale", 1.0f},
++                                            {"TintColor", DVector{}},
++                                            {"Chrome", false},
++                                            {"TriggerDestroyOnly", false},
++                                            {"CanDamage", true},
++                                            {"SpawnObjectVel", DVector{}},
++                                            {"Amount", std::int32_t(10)},
++                                            {"Scale", 1.0f},
++                                            {"ExplodeDamage", 100.0f},
++                                            {"DamageRadius", 200.0f}};
++                for (auto name : {"InitDims", "DamageDims", "DestroyDims"})
++                    p.push_back({name, DVector{}});
++                for (auto name :
++                     {"InitFilename", "InitSkin", "DamageFilename", "DamageSkin", "DestroyFilename", "DestroySkin",
++                      "SlidingSound", "DamageTriggerTarget", "DamageTriggerMessage", "DeathTriggerTarget",
++                      "DeathTriggerMessage", "SpawnObject", "CustomTexture", "CustomSound", "CustomModel"})
++                    p.push_back({name, std::string{}});
++                for (auto name : {"Stone", "Metal", "Wood", "Energy", "Glass", "Terrain", "Plastic", "Flesh", "Liquid",
++                                  "Exploding", "Custom"})
++                    p.push_back({name, false});
++                return p;
++            }()};
+         const ClassInfo rotating_brush{"RotatingBrush", &destructable_brush, construct<RotatingBrush>, []
+                                        {
+                                            std::vector<PropertySpec> p{{"RotatingStuff", std::int32_t(0), false},
+@@ -693,9 +734,10 @@ namespace OpenBlood2
+                objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
+                objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+                objects.register_class(door) && objects.register_class(rotating_door) &&
+-               objects.register_class(destructable_brush) && objects.register_class(rotating_brush) &&
+-               objects.register_class(hand_model) && objects.register_class(corpse) &&
+-               objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
++               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
++               objects.register_class(rotating_brush) && objects.register_class(hand_model) &&
++               objects.register_class(corpse) && objects.register_class(energy_projectile) &&
++               objects.register_class(shockwave_projectile);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_activation.cpp b/src/game/server_activation.cpp
+index e59fa5a..4e229fe 100644
+--- a/src/game/server_activation.cpp
++++ b/src/game/server_activation.cpp
+@@ -6,9 +6,9 @@ namespace OpenBlood2
+     {
+         trace_service("ConfigureCharacterBody");
+         auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || r->attachment || r->world_body || r->state.m_ObjectType != OT_MODEL ||
+-            !std::isfinite(mass) || mass <= 0 || mass > 1e6f || !std::isfinite(friction) || friction < 0 ||
+-            friction > 20005)
++        if (!r || r->life != Life::Alive || r->attachment || r->world_body || r->model_body ||
++            r->state.m_ObjectType != OT_MODEL || !std::isfinite(mass) || mass <= 0 || mass > 1e6f ||
++            !std::isfinite(friction) || friction < 0 || friction > 20005)
+             return false;
+         r->character_body = true;
+         r->body_properties = {mass, friction, false};
+diff --git a/src/game/server_adapter.cpp b/src/game/server_adapter.cpp
+index b754a51..2d2c101 100644
+--- a/src/game/server_adapter.cpp
++++ b/src/game/server_adapter.cpp
+@@ -136,6 +136,11 @@ namespace OpenBlood2
+                                            "Dynamic world body requires BoxPhysics without GOTHRUWORLD");
+                     return;
+                 }
++                if (r->model_body && (flags & FLAG_GOTHRUWORLD))
++                {
++                    active().objects_.fail(ObjectError::Unsupported, "Model body cannot bypass world collision");
++                    return;
++                }
+                 if (r->world_model && !r->world_body && ((flags ^ r->state.m_Flags) & FLAG_GRAVITY))
+                 {
+                     active().objects_.fail(ObjectError::Unsupported,
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 78981f0..b8dee33 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -82,6 +82,8 @@ namespace OpenBlood2
+         std::vector<SpawnReport> spawn_reports;
+         std::vector<PickupReport> pickup_reports;
+         bool ConfigureWorldBody(HOBJECT, const WorldBodyProperties&) override;
++        bool ConfigureModelBody(HOBJECT, const WorldBodyProperties&) override;
++        SoundId PlayObjectLoopSound(HOBJECT, const SoundRequest&, std::string&) override;
+         bool SetBlockingPriority(HOBJECT, DBYTE) override;
+         void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE) override;
+         void RecordDebrisEffect(const DebrisEffect&) override;
+diff --git a/src/game/server_audio.cpp b/src/game/server_audio.cpp
+index 23e02c9..27e0bc3 100644
+--- a/src/game/server_audio.cpp
++++ b/src/game/server_audio.cpp
+@@ -1,6 +1,19 @@
+ #include "game/server_adapter.h"
+ namespace OpenBlood2
+ {
++    SoundId ServerAdapter::PlayObjectLoopSound(HOBJECT owner, const SoundRequest& request, std::string& error)
++    {
++        trace_service("PlayObjectLoopSound");
++        if (!IsObjectAlive(owner) || !client_resources || request.speaker != owner ||
++            request.space != SoundSpace::Spatial || !request.loop)
++        {
++            error = "Object loop requires a live attached owner and a spatial looping request";
++            return 0;
++        }
++        DVector position{};
++        GetObjectPos(owner, &position);
++        return audio.play(*client_resources, owner, request, position, error);
++    }
+     SoundId ServerAdapter::PlayCharacterSound(HOBJECT object, const SoundRequest& request, bool retain,
+                                               std::string& error)
+     {
+diff --git a/src/game/server_physics.cpp b/src/game/server_physics.cpp
+index 196b82c..9b6748a 100644
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -204,7 +204,7 @@ namespace OpenBlood2
+             objects_.fail(ObjectError::Busy, "Recursive MoveObject during contact dispatch");
+             return DE_ERROR;
+         }
+-        if (r->world_body)
++        if (r->world_body || r->model_body)
+             return move_world_body(*r, *destination);
+         if (r->world_model)
+             return MoveWorldModel(h, *destination) == MoverResult::Moved ? DE_OK : DE_ERROR;
+@@ -247,7 +247,7 @@ namespace OpenBlood2
+             const bool found = query == CollisionQuery::Hit;
+             auto* obstacle = found ? objects_.get(nearest.object) : nullptr;
+             if (found && !nearest.start_solid && std::abs(nearest.normal.y) < .01f && obstacle &&
+-                obstacle->world_body && obstacle->body_properties.pushable &&
++                (obstacle->world_body || obstacle->model_body) && obstacle->body_properties.pushable &&
+                 r->blocking_priority > obstacle->blocking_priority)
+             {
+                 const auto into = vector_dot(remaining, nearest.normal);
+@@ -461,7 +461,7 @@ namespace OpenBlood2
+                 if (physics.gravity)
+                     acceleration = vector_add(acceleration, gravity);
+                 DVector displacement;
+-                if (r->world_body || r->character_body)
++                if (r->world_body || r->character_body || r->model_body)
+                 {
+                     ++r->body_steps;
+                     MovementState support;
+diff --git a/src/game/server_weapons.cpp b/src/game/server_weapons.cpp
+index 545f4bc..643cdd3 100644
+--- a/src/game/server_weapons.cpp
++++ b/src/game/server_weapons.cpp
+@@ -1,5 +1,6 @@
+ #include "engine/world_model.h"
+ #include "game/original/DestructableBrush.h"
++#include "game/original/DestructableModel.h"
+ #include "game/original/Door.h"
+ #include "game/original/PlayerObj.h"
+ #include "game/original/Projectile.h"
+@@ -18,8 +19,9 @@ namespace OpenBlood2
+         out = {};
+         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
+         if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility &&
+-             filter != SegmentFilter::IgnoreCharacters && filter != SegmentFilter::IgnoreVolumes &&
+-             filter != SegmentFilter::IgnoreOwnerClass && filter != SegmentFilter::ProjectileContact) ||
++             filter != SegmentFilter::AIShot && filter != SegmentFilter::IgnoreCharacters &&
++             filter != SegmentFilter::IgnoreVolumes && filter != SegmentFilter::IgnoreOwnerClass &&
++             filter != SegmentFilter::ProjectileContact) ||
+             (start != SegmentStart::IncludeInterior && start != SegmentStart::SkipInterior) ||
+             (objects != SegmentObjects::SolidOnly && objects != SegmentObjects::SolidOrRayHit &&
+              objects != SegmentObjects::All) ||
+@@ -53,10 +55,13 @@ namespace OpenBlood2
+             // IGNORE_LIQUID excludes every VolumeBrush subclass, not just liquids.
+             // Glass only passes when the object is a destructible brush. Baked
+             // world polygons, doors, CanDamage and FireThrough do not define this filter.
+-            if (filter == SegmentFilter::AIVisibility &&
++            if ((filter == SegmentFilter::AIVisibility || filter == SegmentFilter::AIShot) &&
+                 (dynamic_cast<const VolumeBrush*>(record->game.get()) ||
+                  (brush && brush->destructable && brush->GetSurfaceType() == SURFTYPE_GLASS)))
+                 continue;
++            const auto* model = dynamic_cast<const CDestructableModel*>(record->game.get());
++            if (filter == SegmentFilter::AIShot && model && model->destructable)
++                continue;
+             if (filter == SegmentFilter::IgnoreVolumes && dynamic_cast<const VolumeBrush*>(record->game.get()))
+                 continue;
+             if (filter == SegmentFilter::IgnoreCharacters && dynamic_cast<const CBaseCharacter*>(record->game.get()))
+diff --git a/src/game/server_world_bodies.cpp b/src/game/server_world_bodies.cpp
+index 18bf8ac..d655c3d 100644
+--- a/src/game/server_world_bodies.cpp
++++ b/src/game/server_world_bodies.cpp
+@@ -17,6 +17,21 @@ namespace OpenBlood2
+         r->body_properties = properties;
+         return true;
+     }
++    bool ServerAdapter::ConfigureModelBody(HOBJECT handle, const WorldBodyProperties& properties)
++    {
++        trace_service("ConfigureModelBody");
++        auto* r = objects_.get(handle);
++        if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL || !r->model || r->attachment ||
++            r->client_movement || r->world_model || r->container || r->world_body || r->character_body ||
++            r->model_body || (r->state.m_Flags & FLAG_GOTHRUWORLD) || !physics_vector(r->dimensions) ||
++            r->dimensions.x < 0 || r->dimensions.y < 0 || r->dimensions.z < 0 || !std::isfinite(properties.mass) ||
++            properties.mass < 0 || properties.mass > 1e6f || !std::isfinite(properties.friction) ||
++            properties.friction < 0 || properties.friction > 20005)
++            return objects_.fail(ObjectError::Unsupported, "Invalid model-body configuration");
++        r->model_body = true;
++        r->body_properties = properties;
++        return true;
++    }
+     bool ServerAdapter::SetBlockingPriority(HOBJECT handle, DBYTE priority)
+     {
+         trace_service("SetBlockingPriority");
+@@ -34,7 +49,7 @@ namespace OpenBlood2
+         plan.initiator = ignore;
+         plan.origin = plan.destination = body.state.m_Pos;
+         plan.velocity = body.velocity;
+-        if (!body.world_body || !physics_vector(destination) || !physics_vector(plan.velocity))
++        if ((!body.world_body && !body.model_body) || !physics_vector(destination) || !physics_vector(plan.velocity))
+             return MoverResult::Invalid;
+         const auto offset = vector_subtract(object_bounds_center(body), body.state.m_Pos);
+         auto position = object_bounds_center(body);
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 31bf961..0cbadb3 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -1,4 +1,5 @@
+ #include "game/original/AI_Mgr.h"
++#include "game/original/DestructableModel.h"
+ #include "game/original/DetailSprite.h"
+ #include "game/original/Sound.h"
+ #include "game/server_adapter.h"
+@@ -109,6 +110,14 @@ namespace OpenBlood2
+                     entry.state = EntryState::Failed;
+                     entry.detail = sprite->error;
+                 }
++                else if (const auto* model = r ? dynamic_cast<const CDestructableModel*>(r->game.get()) : nullptr;
++                         model && !model->error.empty())
++                {
++                    entry.state = EntryState::Failed;
++                    entry.detail = model->error;
++                    if (!r->model_error.empty())
++                        entry.detail += ": " + r->model_error;
++                }
+                 else if (r && dynamic_cast<const B2BaseClass*>(r->game.get()) &&
+                          static_cast<const B2BaseClass*>(r->game.get())->filtered)
+                 {
+@@ -147,8 +156,10 @@ namespace OpenBlood2
+             for (const auto& path : model.textures)
+                 use(path, "BSP texture");
+         for (const auto& source : world.objects)
+-            for (auto key : {"Filename", "Skin", "SoundName", "SpriteSurfaceName", "OpenBusySound", "OpenStopSound",
+-                             "CloseBusySound", "CloseStopSound", "LockedSound", "UnlockedSound"})
++            for (auto key :
++                 {"Filename", "Skin", "SoundName", "SpriteSurfaceName", "OpenBusySound", "OpenStopSound",
++                  "CloseBusySound", "CloseStopSound", "LockedSound", "UnlockedSound", "InitFilename", "InitSkin",
++                  "DamageFilename", "DamageSkin", "DestroyFilename", "DestroySkin", "SlidingSound"})
+                 if (const auto* p = source.find(key))
+                     if (const auto* path = std::get_if<std::string>(p))
+                         use(*path, key);
+diff --git a/src/game/weapon_messages.h b/src/game/weapon_messages.h
+index 04374fb..9c7043c 100644
+--- a/src/game/weapon_messages.h
++++ b/src/game/weapon_messages.h
+@@ -54,6 +54,7 @@ namespace OpenBlood2
+     enum class SegmentFilter
+     {
+         None,
++        AIShot,            // Original visibility filter plus IGNORE_DESTRUCTABLE models.
+         AIVisibility,      // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
+         IgnoreCharacters,  // Original CMovement clearance filter.
+         IgnoreVolumes,     // Original LiquidFilterFn excludes every VolumeBrush subclass.
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 71ae374..547568e 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1346,3 +1346,20 @@ if(BLOOD2_TEST_DATA_DIR)
+         set_tests_properties(gideon_runtime.${case} PROPERTIES LABELS "headless;private;gideon_runtime" TIMEOUT 120)
+     endforeach()
+ endif()
++
++add_executable(destructable_model_tests destructable_model_tests.cpp ../src/app/model_scene.cpp)
++target_link_libraries(destructable_model_tests PRIVATE blood2_game)
++blood2_project_options(destructable_model_tests)
++foreach(case properties rejects damage cascade fade physics filters audio unnamed)
++    add_test(NAME destructable_models.${case} COMMAND destructable_model_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/destructable-model-${case}")
++    set_tests_properties(destructable_models.${case} PROPERTIES LABELS "headless;destructable_models" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME destructable_models.city COMMAND destructable_model_tests city "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(destructable_models.city PROPERTIES LABELS "headless;private;destructable_models" TIMEOUT 90)
++endif()
++
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.destructable_models COMMAND model_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/destructable-model-city" "${BLOOD2_TEST_DATA_DIR}" destructable_city)
++    set_tests_properties(gpu.destructable_models PROPERTIES LABELS "gpu;private;destructable_models" TIMEOUT 90)
++endif()
+diff --git a/tests/ai_fire_tests.cpp b/tests/ai_fire_tests.cpp
+index dded7d6..64f0763 100644
+--- a/tests/ai_fire_tests.cpp
++++ b/tests/ai_fire_tests.cpp
+@@ -237,7 +237,8 @@ namespace
+         g.server.SetObjectFlags(h, FLAG_SOLID);
+         DVector direction{0, 0, 1};
+         CHECK(a->CheckClearShot({0, 10, 0}, direction) && a->clear_shot.first_hit.object == t->m_hObject);
+-        CHECK(!g.objects.find_class("CDestructableModel")); // That original filter category remains unported.
++        CHECK(g.objects.find_class(
++            "CDestructableModel")); // Its filter behavior is covered by destructable_models.filters.
+         return true;
+     }
+     bool head(const char*)
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+new file mode 100644
+index 0000000..1e2cc1a
+--- /dev/null
++++ b/tests/destructable_model_tests.cpp
+@@ -0,0 +1,377 @@
++#include "app/model_scene.h"
++#include "audio_fixture.h"
++#include "game/original/DestructableModel.h"
++#include <algorithm>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .02f;
++    }
++    HOBJECT model(GameSession& g, Properties props = {}, Creation reason = Creation::World)
++    {
++        props.try_emplace("InitFilename", std::string("models/characters/caleb.abc"));
++        props.try_emplace("InitSkin", std::string("skins/characters/caleb1.dtx"));
++        props.try_emplace("Pos", DVector{0, 100, 0});
++        props.try_emplace("Gravity", false);
++        return g.objects.create(g.objects.find_class("CDestructableModel"), {}, reason, props);
++    }
++    CDestructableModel* get(GameSession& g, HOBJECT h)
++    {
++        return dynamic_cast<CDestructableModel*>(g.server.HandleToObject(h));
++    }
++    bool hit(GameSession& g, HOBJECT h, float amount, DamageType type = DamageType::Normal)
++    {
++        auto m = g.server.StartMessageToObject(g.server.HandleToObject(h), h, damage_message);
++        CHECK(m && g.server.WriteDamage(m, {{1, 0, 0}, {}, amount, type, h}) == DE_OK);
++        CHECK(g.server.EndMessage(m) == DE_OK);
++        return true;
++    }
++    HOBJECT box(GameSession& g, DVector position, DVector dims)
++    {
++        ObjectCreateStruct state;
++        state.m_Pos = position;
++        state.m_Flags = FLAG_SOLID;
++        auto h = g.objects.create(g.objects.find_class("BaseClass"), state);
++        if (h)
++            g.server.SetObjectDims(h, &dims);
++        return h;
++    }
++    bool unnamed()
++    {
++        Model m;
++        std::string error;
++        auto bytes = test_model::abc(false, false, 2, 0, -1, 0, true);
++        CHECK(read_model(bytes.b, m, error) && m.animations[0].name.empty());
++        CHECK(animation_index(m, "") == 0 && animation_index(m, "walk") == no_animation);
++        CHECK(m.animations[0].keys.size() == 3 && m.animations[0].dimensions.y == 2);
++        std::vector<DVector> vertices;
++        CHECK(sample_vertices(m, 0, 50, vertices) && vertices.size() == 3);
++        // An empty name is valid; a zero key count remains malformed.
++        for (std::size_t at = 0; at < bytes.b.size();)
++        {
++            const unsigned len = bytes.b[at] | (unsigned(bytes.b[at + 1]) << 8);
++            const std::string name(bytes.b.begin() + at + 2, bytes.b.begin() + at + 2 + len);
++            const auto next = at + 2 + len;
++            if (name == "Animation")
++            {
++                bytes.patch(next + 4 + 4 + 2 + 4 + 24, 0);
++                break;
++            }
++            at = bytes.b[next] | (unsigned(bytes.b[next + 1]) << 8) | (unsigned(bytes.b[next + 2]) << 16) |
++                 (unsigned(bytes.b[next + 3]) << 24);
++        }
++        CHECK(!read_model(bytes.b, m, error) && m.animations.empty());
++        return true;
++    }
++    bool properties(const char* root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = model(g, {{"Pushable", true},
++                           {"ObjectMass", 750.f},
++                           {"ModelScale", 2.f},
++                           {"Rotation", EulerAngles{{0, .78539816f, 0}}},
++                           {"Metal", true},
++                           {"SurfaceType", std::int32_t(20)}});
++        auto* r = g.objects.get(h);
++        auto* m = get(g, h);
++        CHECK(r && m && m->initialized && r->model_body && !r->character_body && !r->world_body);
++        CHECK(near(r->dimensions.x, 33.94112f) && near(r->dimensions.z, 33.94112f) && near(r->dimensions.y, 82));
++        CHECK(near(r->state.m_Pos.y, 82) && m->ground_result == DE_OK);
++        CHECK(r->blocking_priority == 40 && r->body_properties.friction == 20 && m->m_damage.apply_damage_physics);
++        CHECK(r->user_flags == ((20u << 24) | (1u << 3) | (1u << 4) | (1u << 5)));
++        CHECK(m->sliding_path == "sounds/events/pushmetal.wav" && m->damage_hit_points == 0 &&
++              m->dimensions_publications == 1);
++        auto fixed = model(g, {{"Pos", DVector{300, 100, 0}}, {"InitDims", DVector{1, 2, 3}}, {"ModelScale", 5.f}});
++        CHECK(fixed && g.objects.get(fixed)->dimensions.y == 2 && !(g.objects.get(fixed)->state.m_Flags & FLAG_SHADOW));
++        CHECK(g.objects.get(fixed)->blocking_priority == 100 && !get(g, fixed)->m_damage.apply_damage_physics);
++        auto string = model(g, {{"Pos", DVector{500, 100, 0}}, {"Visible", false}, {"Solid", false}}, Creation::String);
++        CHECK(string &&
++              (g.objects.get(string)->state.m_Flags & (FLAG_SOLID | FLAG_GRAVITY | FLAG_VISIBLE)) ==
++                  (FLAG_SOLID | FLAG_GRAVITY | FLAG_VISIBLE) &&
++              near(g.objects.get(string)->state.m_Pos.y, 100));
++        CHECK(!g.server.ConfigureCharacterBody(h, 100, 7) && !g.server.ConfigureModelBody(h, {100, 7, true}));
++        auto flags = r->state.m_Flags;
++        g.server.SetObjectFlags(h, flags | FLAG_GOTHRUWORLD);
++        CHECK(r->state.m_Flags == flags);
++        return true;
++    }
++    bool rejects(const char* root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        for (const auto& p : std::vector<Properties>{{{"Chrome", true}},
++                                                     {{"InitDims", DVector{-1, 0, 0}}},
++                                                     {{"ObjectMass", -1.f}},
++                                                     {{"ModelScale", 0.f}},
++                                                     {{"Alpha", 2.f}},
++                                                     {{"SurfaceType", std::int32_t(256)}},
++                                                     {{"SpawnObject", std::string("Missing")}},
++                                                     {{"DestroyFilename", std::string("missing.abc")}}})
++            CHECK(!model(g, p));
++        auto missing = model(g, {{"InitFilename", std::string("missing.abc")}});
++        CHECK(!missing || !g.server.IsObjectAlive(missing));
++        CHECK(!model(g, {}, Creation::Restore));
++        CHECK(g.objects.finish_frame() && CDestructable::m_dwNumDestructables == 0);
++        CHECK(!g.server.string_count() && !g.server.message_count());
++        auto replacement =
++            model(g, {{"DamageFilename", std::string("missing.abc")}, {"DamageSkin", std::string("missing.dtx")}});
++        auto* m = get(g, replacement);
++        CHECK(m && hit(g, replacement, 60) && !m->error.empty());
++        CHECK(g.server.IsObjectAlive(replacement) && g.objects.get(replacement)->activity == OBJSTATE_INACTIVE);
++        CHECK(std::string(g.objects.get(replacement)->state.m_Filename) == "models/characters/caleb.abc");
++        CHECK(!g.objects.get(replacement)->scheduled);
++        return true;
++    }
++    bool damage(const char* root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = model(g, {{"DamageFilename", std::string("models/weapons/beretta_pv.abc")},
++                           {"DamageSkin", std::string("skins/weapons/c_beretta_pv_t.dtx")},
++                           {"DamageDims", DVector{3, 4, 5}},
++                           {"DestroyFilename", std::string("models/weapons/c_knife_pv.abc")},
++                           {"DestroySkin", std::string("skins/weapons/c_knife_pv_t.dtx")},
++                           {"DestroyGravity", false},
++                           {"Wood", true}});
++        auto* m = get(g, h);
++        CHECK(m && hit(g, h, 55) && near(m->m_damage.m_fHitPoints, 45));
++        CHECK(m->damage_hit_points == 0 && m->dimensions_publications == 2 && g.objects.get(h)->dimensions.y == 4);
++        CHECK(std::string(g.objects.get(h)->state.m_Filename) == "models/weapons/beretta_pv.abc");
++        CHECK(hit(g, h, 50) && !m->dead_state && g.objects.get(h)->scheduled);
++        CHECK(g.step(.01) && g.server.IsObjectAlive(h) && m->dead_state && m->destructions == 1);
++        CHECK(m->dimensions_publications == 3 && g.objects.get(h)->dimensions.y == 2 &&
++              g.server.debris_effects.size() == 1);
++        CHECK(g.objects.get(h)->state.m_Flags == (FLAG_VISIBLE | FLAG_SOLID));
++        // The source revisits destruction on a later scheduled update of a surviving replacement.
++        CHECK(m->HandleTriggerMessage("Alpha .5") && g.step(.02) && m->destructions == 2);
++        auto inert = model(g, {{"Pos", DVector{200, 100, 0}}, {"Destructable", false}});
++        CHECK(inert && hit(g, inert, 150) && g.step(.02) && g.server.IsObjectAlive(inert) &&
++              !get(g, inert)->dead_state);
++        auto immune = model(g, {{"Pos", DVector{300, 100, 0}}, {"CanDamage", false}});
++        CHECK(immune && hit(g, immune, 150) && get(g, immune)->m_damage.m_fHitPoints == 100);
++        return true;
++    }
++    bool cascade(const char* root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false, true, true));
++        auto h = model(g, {{"Exploding", true}, {"Metal", true}, {"SpawnObject", std::string("HealthPU")}});
++        auto neighbor = model(g, {{"Pos", DVector{60, 100, 0}}, {"HitPoints", 10.f}, {"Wood", true}});
++        CHECK(h && neighbor && hit(g, h, 120));
++        CHECK(g.server.spawn_reports.size() == 1 && g.server.IsObjectAlive(h));
++        CHECK(g.step(.1) && g.server.IsObjectAlive(h) && g.server.explosion_effects.empty());
++        CHECK(g.step(.1) && g.step(.1) && g.server.IsObjectAlive(h));
++        CHECK(g.step(.01) && !g.server.IsObjectAlive(h) && g.server.explosion_effects.size() == 1);
++        CHECK(get(g, neighbor)->m_damage.m_fHitPoints <= 0 && g.step(.01) && !g.server.IsObjectAlive(neighbor));
++        CHECK(g.server.debris_effects.size() == 2 && !g.server.message_count());
++        CHECK(g.unload_world() && CDestructable::m_dwNumDestructables == 0 && !g.server.string_count());
++        return true;
++    }
++    bool fade(const char* root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = model(g, {{"TintColor", DVector{255, 128, 0}}});
++        auto* m = get(g, h);
++        CHECK(m && m->HandleTriggerMessage("Alpha .2 1"));
++        CHECK(g.step(.25) && near(m->alpha, .8) && near(g.objects.get(h)->alpha, .8));
++        CHECK(near(g.objects.get(h)->color.y, 128.f / 255));
++        CHECK(!m->HandleTriggerMessage("Alpha .3; Alpha nan") && near(m->target_alpha, .2));
++        CHECK(!m->HandleTriggerMessage("Alpha 2") && !m->trigger_error.empty());
++        CHECK(m->HandleTriggerMessage("Alpha .9; aLPHa .4") && g.step(.02) && near(m->alpha, .4));
++        CHECK(m->HandleTriggerMessage("Alpha .1 1") && g.step(.5) && near(m->alpha, .25));
++        auto id = g.objects.get(h)->id;
++        CHECK(g.objects.remove(h) && g.objects.finish_frame() && !g.objects.get(id));
++        CHECK(!g.server.string_count());
++        return true;
++    }
++    bool physics(const char* root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = model(g, {{"Pushable", true}, {"InitDims", DVector{10, 10, 10}}}, Creation::String);
++        auto* r = g.objects.get(h);
++        CHECK(r && g.step(.1) && near(r->state.m_Pos.y, 90) && near(r->velocity.y, -200));
++        for (int i = 0; i < 10; ++i)
++            CHECK(g.step(.05));
++        CHECK(near(r->state.m_Pos.y, 10) && near(r->velocity.y, 0) && r->body_steps > 0);
++        auto actor = box(g, {-15, 10, 0}, {2, 8, 2});
++        CHECK(actor && g.server.SetBlockingPriority(actor, 50));
++        DVector to{0, 10, 0};
++        CHECK(g.server.MoveObject(actor, &to) == DE_OK && g.objects.get(actor)->state.m_Pos.x > -.1f);
++        CHECK(r->state.m_Pos.x > 11 && r->body_pushes == 1);
++        const float before = r->state.m_Pos.x;
++        CHECK(box(g, {before + 14, 10, 0}, {2, 10, 10}));
++        to.x = 30;
++        CHECK(g.server.MoveObject(actor, &to) == DE_OK && near(r->state.m_Pos.x, before));
++        CHECK(hit(g, h, 1) && get(g, h)->m_damage.damage_impulses == 1 && near(r->velocity.x, 25));
++        auto carried = model(g, {{"Pos", DVector{300, 100, 0}}, {"Pushable", true}, {"InitDims", DVector{10, 10, 10}}});
++        auto rider = box(g, {300, g.objects.get(carried)->state.m_Pos.y + 11.001f, 0}, {1, 1, 1});
++        CHECK(carried && rider);
++        DVector carry_to{320, g.objects.get(carried)->state.m_Pos.y, 0};
++        auto moved = g.server.MoveObject(carried, &carry_to);
++        CHECK(moved == DE_OK && near(g.objects.get(rider)->state.m_Pos.x, 320));
++        CHECK(g.objects.get(carried)->mover_riders == 1);
++        r->state.m_Flags &= ~FLAG_VISIBLE;
++        CHECK(g.step(.05) && r->body_steps > 0);
++        return true;
++    }
++    bool filters(const char* root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = model(g, {{"InitDims", DVector{10, 10, 10}}});
++        CHECK(h);
++        SegmentHit out;
++        CHECK(g.server.IntersectSegment({-30, 100, 0}, {30, 100, 0}, nullptr, out, false, SegmentObjects::SolidOrRayHit,
++                                        SegmentFilter::AIVisibility) == SegmentResult::Hit &&
++              out.object == h);
++        CHECK(g.server.IntersectSegment({-30, 100, 0}, {30, 100, 0}, nullptr, out, false, SegmentObjects::SolidOrRayHit,
++                                        SegmentFilter::AIShot) == SegmentResult::Miss);
++        get(g, h)->destructable = false;
++        CHECK(g.server.IntersectSegment({-30, 100, 0}, {30, 100, 0}, nullptr, out, false, SegmentObjects::SolidOrRayHit,
++                                        SegmentFilter::AIShot) == SegmentResult::Hit);
++        CHECK(g.objects.remove(h));
++        CHECK(g.server.IntersectSegment({-30, 100, 0}, {30, 100, 0}, nullptr, out) == SegmentResult::Miss);
++        return true;
++    }
++    bool audio(const char* root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto h = model(g, {{"Pushable", true}, {"SlidingSound", std::string("cue.wav")}});
++        ObjectCreateStruct state;
++        state.m_Pos = {200, 100, 0};
++        auto actor = g.objects.create(g.objects.find_class("CBaseCharacter"), state);
++        auto* m = get(g, h);
++        CHECK(m && actor && g.objects.engine_message(h, MID_TOUCHNOTIFY, actor));
++        CHECK(m->sliding && !m->standing && g.step(.01) && !m->sliding_sound);
++        // Explicit nonzero force probe: the production solver does not manufacture contact force.
++        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, actor, 1));
++        DVector to{5, 10, 0};
++        CHECK(g.server.MoveObject(h, &to) == DE_OK && g.step(.01));
++        CHECK(m->sliding_sound && g.server.audio.get(m->sliding_sound));
++        auto sound = m->sliding_sound;
++        CHECK(g.server.audio.get(sound)->request.loop);
++        CHECK(g.step(.01) && g.step(.01) && !m->sliding_sound && !g.server.audio.get(sound));
++        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, actor, 1));
++        to.x = 10;
++        CHECK(g.server.MoveObject(h, &to) == DE_OK && g.step(.01) && m->sliding_sound);
++        sound = m->sliding_sound;
++        CHECK(g.objects.remove(h) && g.objects.finish_frame() && !g.server.audio.get(sound));
++        CHECK(!g.server.string_count());
++        return true;
++    }
++    bool city(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_CityHub", error));
++            unsigned count = 0, pushable = 0, gravity = 0, failed = 0, unknown = 0, created = 0, ground_misses = 0;
++            std::vector<ObjectId> ids;
++            ModelView scene;
++            for (std::size_t i = 0; i < g.entries.size(); ++i)
++            {
++                auto& e = g.entries[i];
++                created += e.state == EntryState::Created;
++                unknown += e.state == EntryState::Unsupported;
++                failed += e.state == EntryState::Failed;
++                if (g.world.objects[i].class_name != "CDestructableModel")
++                    continue;
++                auto* r = g.objects.get(e.object);
++                auto* m = r ? get(g, r->handle) : nullptr;
++                if (!m)
++                    std::cerr << "Model failed " << i << ": " << e.detail << " "
++                              << std::get<std::string>(*g.world.objects[i].find("InitFilename")) << '\n';
++                CHECK(e.state == EntryState::Created && r && r->model && m && m->initialized && m->error.empty());
++                ++count;
++                pushable += m->pushable;
++                gravity += bool(r->state.m_Flags & FLAG_GRAVITY);
++                ground_misses += (r->state.m_Flags & FLAG_GRAVITY) && m->ground_result == DE_NOTFOUND;
++                CHECK(r->model_body && r->model_error.empty() && m->damage_hit_points == 0 && m->destroy_model.empty());
++                ids.push_back(r->id);
++            }
++            CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
++            CHECK(created == 413 && unknown == 37 && failed == 35);
++            CHECK(update_model_scene(g, scene, error));
++            unsigned skin_failures = 0, triangles = 0;
++            for (auto id : ids)
++            {
++                auto it =
++                    std::find_if(scene.entries.begin(), scene.entries.end(), [&](auto& e) { return e.object == id; });
++                CHECK(it != scene.entries.end() && it->visible && it->triangles > 0);
++                skin_failures += !it->error.empty();
++                triangles += it->triangles;
++            }
++            std::cout << "CityHub cycle " << cycle << ": created " << created << ", unsupported " << unknown
++                      << ", failed " << failed << "; models " << count << ", pushable " << pushable << ", gravity "
++                      << gravity << ", ground no-hit " << ground_misses << ", skin failures " << skin_failures
++                      << ", triangles " << triangles << '\n';
++            CHECK(skin_failures == 0 && triangles == 7450);
++            for (auto id : ids)
++            {
++                auto* r = g.objects.get(id);
++                if (std::string_view(r->state.m_Filename).ends_with("ceilingfan2.abc"))
++                {
++                    CHECK(r->model->animations.size() == 1 && r->model->animations[0].name.empty());
++                    CHECK(r->model->animations[0].keys.size() == 19 && r->model->animations[0].duration == 599);
++                    std::vector<DVector> a, b;
++                    CHECK(sample_vertices(*r->model, 0, 0, a) && sample_vertices(*r->model, 0, 100, b));
++                    bool changed = false;
++                    for (std::size_t i = 0; i < a.size(); ++i)
++                        changed |= !near(a[i].x, b[i].x) || !near(a[i].y, b[i].y) || !near(a[i].z, b[i].z);
++                    CHECK(changed);
++                }
++            }
++            CHECK(g.server.advance_physics(.05));
++            unsigned blocked = 0;
++            for (auto id : ids)
++            {
++                auto* r = g.objects.get(id);
++                CHECK(r && get(g, r->handle)->error.empty());
++                blocked += r->mover_blocks > 0;
++            }
++            std::cout << "Initial bounded physics: " << blocked
++                      << " bodies reporting a collision block (includes floor contacts; no depenetration)\n";
++            CHECK(g.unload_world() && !g.objects.get(ids.front()) && CDestructable::m_dwNumDestructables == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::string test = argv[1];
++    const bool ok = test == "unnamed"      ? unnamed()
++                    : test == "properties" ? properties(argv[2])
++                    : test == "rejects"    ? rejects(argv[2])
++                    : test == "damage"     ? damage(argv[2])
++                    : test == "cascade"    ? cascade(argv[2])
++                    : test == "fade"       ? fade(argv[2])
++                    : test == "physics"    ? physics(argv[2])
++                    : test == "filters"    ? filters(argv[2])
++                    : test == "audio"      ? audio(argv[2])
++                    : test == "city"       ? city(argv[2])
++                                           : false;
++    return ok ? 0 : 1;
++}
+diff --git a/tests/model_fixture.h b/tests/model_fixture.h
+index 206d4d6..cb7311d 100644
+--- a/tests/model_fixture.h
++++ b/tests/model_fixture.h
+@@ -52,7 +52,7 @@ namespace test_model
+         }
+     };
+     inline Writer abc(bool weapon = false, bool character = false, float quaternion_w = 2, float quaternion_z = 0,
+-                      int transform_flags = -1, float quaternion_y = 0)
++                      int transform_flags = -1, float quaternion_y = 0, bool unnamed_first_clip = false)
+     {
+         Writer file, header, g, n, a, d;
+         header.str("MonolithExport Model File v6");
+@@ -134,7 +134,11 @@ namespace test_model
+         for (int clip = 0; clip < count; ++clip)
+         {
+             const bool single = !weapon && !character && clip;
+-            a.str(character ? character_names[clip] : weapon ? names[clip] : clip ? "static" : "walk");
++            a.str(unnamed_first_clip && clip == 0 ? ""
++                  : character                     ? character_names[clip]
++                  : weapon                        ? names[clip]
++                  : clip                          ? "static"
++                                                  : "walk");
+             a.u32(single ? 0 : 100);
+             a.vec(-10, -10, -10);
+             a.vec(10, 10, 10);
+diff --git a/tests/model_gpu_tests.cpp b/tests/model_gpu_tests.cpp
+index bd1b382..3f3cf85 100644
+--- a/tests/model_gpu_tests.cpp
++++ b/tests/model_gpu_tests.cpp
+@@ -219,7 +219,7 @@ int main(int argc, char** argv)
+         scene.clear();
+         models.clear_geometry();
+     }
+-    if (argc == 4 && std::string_view(argv[3]) == "builtin_city")
++    if (argc == 4 && (std::string_view(argv[3]) == "builtin_city" || std::string_view(argv[3]) == "destructable_city"))
+     {
+         GameSession game;
+         CHECK(game.initialize());
+@@ -231,14 +231,18 @@ int main(int argc, char** argv)
+         {
+             CHECK(game.request_world("02_CityHub", error));
+             CHECK(update_model_scene(game, scene, error));
+-            for (auto asset : {"lightbulb1.abc", "redlight.abc"})
++            const bool destructable = std::string_view(argv[3]) == "destructable_city";
++            for (auto asset : destructable ? std::vector{"garbagecan2.abc", "barrel.abc", "ceilingfan2.abc"}
++                                           : std::vector{"lightbulb1.abc", "redlight.abc"})
+             {
+-                auto selected = std::find_if(scene.entries.begin(), scene.entries.end(),
+-                                             [&](const auto& entry)
+-                                             {
+-                                                 const auto* r = game.objects.get(entry.object);
+-                                                 return r && r->type->name == "Model" && entry.label.ends_with(asset);
+-                                             });
++                auto selected =
++                    std::find_if(scene.entries.begin(), scene.entries.end(),
++                                 [&](const auto& entry)
++                                 {
++                                     const auto* r = game.objects.get(entry.object);
++                                     return r && r->type->name == (destructable ? "CDestructableModel" : "Model") &&
++                                            entry.label.ends_with(asset);
++                                 });
+                 CHECK(selected != scene.entries.end() && selected->error.empty());
+                 auto* r = game.objects.get(selected->object);
+                 CHECK(r && r->model && selected->triangles > 0);
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 1c11a3c..aa68271 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -916,8 +916,8 @@ namespace
+                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
+                 else
+                 {
+-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 295 && d.editor_only == 541 &&
+-                          d.unknown == 159 && d.invalid == 31 && d.models == 100 && d.triangles == 39724);
++                    CHECK(d.entries.size() == 1026 && d.schema_checked == 417 && d.editor_only == 541 &&
++                          d.unknown == 37 && d.invalid == 31 && d.models == 100 && d.triangles == 39724);
+                     for (const auto& e : d.entries)
+                         if (e.state == DestinationEntryState::InvalidProperties)
+                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+@@ -1161,7 +1161,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 291 && d.unknown == 159 && d.failed == 35);
++                        CHECK(d.created == 413 && d.unknown == 37 && d.failed == 35);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

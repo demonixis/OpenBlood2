@@ -1,0 +1,14 @@
+557/561 Testing: explosion_lights.lifecycle
+557/561 Test: explosion_lights.lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_light_tests" "lifecycle"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"explosion_lights.lifecycle" start time: Oct 16 20:52 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_lights.lifecycle" end time: Oct 16 20:52 CEST
+"explosion_lights.lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------

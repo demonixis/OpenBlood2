@@ -1,0 +1,14 @@
+442/447 Testing: ai_recovery.search
+442/447 Test: ai_recovery.search
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_recovery_tests" "search"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_recovery.search" start time: Oct 16 14:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.search" end time: Oct 16 14:07 CEST
+"ai_recovery.search" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+633/638 Testing: naga.clocks
+633/638 Test: naga.clocks
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/naga_tests" "clocks" "/home/yann/projects/lithtech/Blood2/build/debug/tests/naga-clocks"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"naga.clocks" start time: Oct 17 00:59 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"naga.clocks" end time: Oct 17 00:59 CEST
+"naga.clocks" time elapsed: 00:00:00
+----------------------------------------------------------

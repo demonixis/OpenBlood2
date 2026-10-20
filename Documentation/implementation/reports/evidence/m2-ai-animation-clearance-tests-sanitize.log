@@ -1,0 +1,1419 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/sanitize
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+        Start   1: objects.builtin_model
+
+1: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "builtin_model"
+1: Working Directory: <workspace>/Blood2/build/sanitize/tests
+1: Test timeout computed to be: 10
+1: PASS builtin_model
+  1/149 Test   #1: objects.builtin_model ............   Passed    0.03 sec
+test 2
+        Start   2: objects.original_objects
+
+2: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "original_objects"
+2: Working Directory: <workspace>/Blood2/build/sanitize/tests
+2: Test timeout computed to be: 10
+2: PASS original_objects
+  2/149 Test   #2: objects.original_objects .........   Passed    0.02 sec
+test 3
+        Start   3: objects.nested_creation
+
+3: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "nested_creation"
+3: Working Directory: <workspace>/Blood2/build/sanitize/tests
+3: Test timeout computed to be: 10
+3: PASS nested_creation
+  3/149 Test   #3: objects.nested_creation ..........   Passed    0.02 sec
+test 4
+        Start   4: objects.reasons_properties
+
+4: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "reasons_properties"
+4: Working Directory: <workspace>/Blood2/build/sanitize/tests
+4: Test timeout computed to be: 10
+4: PASS reasons_properties
+  4/149 Test   #4: objects.reasons_properties .......   Passed    0.02 sec
+test 5
+        Start   5: objects.scheduling
+
+5: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "scheduling"
+5: Working Directory: <workspace>/Blood2/build/sanitize/tests
+5: Test timeout computed to be: 10
+5: PASS scheduling
+  5/149 Test   #5: objects.scheduling ...............   Passed    0.02 sec
+test 6
+        Start   6: objects.deferred_removal
+
+6: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "deferred_removal"
+6: Working Directory: <workspace>/Blood2/build/sanitize/tests
+6: Test timeout computed to be: 10
+6: PASS deferred_removal
+  6/149 Test   #6: objects.deferred_removal .........   Passed    0.02 sec
+test 7
+        Start   7: objects.aggregate_dispatch
+
+7: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "aggregate_dispatch"
+7: Working Directory: <workspace>/Blood2/build/sanitize/tests
+7: Test timeout computed to be: 10
+7: PASS aggregate_dispatch
+  7/149 Test   #7: objects.aggregate_dispatch .......   Passed    0.02 sec
+test 8
+        Start   8: objects.handles_selection
+
+8: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "handles_selection"
+8: Working Directory: <workspace>/Blood2/build/sanitize/tests
+8: Test timeout computed to be: 10
+8: PASS handles_selection
+  8/149 Test   #8: objects.handles_selection ........   Passed    0.02 sec
+test 9
+        Start   9: objects.links_lists
+
+9: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "links_lists"
+9: Working Directory: <workspace>/Blood2/build/sanitize/tests
+9: Test timeout computed to be: 10
+9: PASS links_lists
+  9/149 Test   #9: objects.links_lists ..............   Passed    0.02 sec
+test 10
+        Start  10: objects.messages_strings
+
+10: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "messages_strings"
+10: Working Directory: <workspace>/Blood2/build/sanitize/tests
+10: Test timeout computed to be: 10
+10: PASS messages_strings
+ 10/149 Test  #10: objects.messages_strings .........   Passed    0.04 sec
+test 11
+        Start  11: objects.unsupported_teardown
+
+11: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "unsupported_teardown"
+11: Working Directory: <workspace>/Blood2/build/sanitize/tests
+11: Test timeout computed to be: 10
+11: PASS unsupported_teardown
+ 11/149 Test  #11: objects.unsupported_teardown .....   Passed    0.05 sec
+test 12
+        Start  12: objects.creation_failures
+
+12: Test command: <workspace>/Blood2/build/sanitize/tests/object_contract_tests "creation_failures"
+12: Working Directory: <workspace>/Blood2/build/sanitize/tests
+12: Test timeout computed to be: 10
+12: PASS creation_failures
+ 12/149 Test  #12: objects.creation_failures ........   Passed    0.03 sec
+test 43
+        Start  43: world.level_change_private
+
+43: Test command: <workspace>/Blood2/build/sanitize/tests/world_tests "level_change_private" "<external-data-root>"
+43: Working Directory: <workspace>/Blood2/build/sanitize/tests
+43: Test timeout computed to be: 120
+43: Malformed destination refusal 0: DAT v56: invalid/unsupported typed property near byte 442114
+43: CityHub transfer 0:
+43: SubwayA transfer 0:
+43: Malformed destination refusal 1: DAT v56: invalid/unsupported typed property near byte 442114
+43: CityHub transfer 1:
+43: SubwayA transfer 1:
+43: Malformed destination refusal 2: DAT v56: invalid/unsupported typed property near byte 442114
+43: CityHub transfer 2:
+43: SubwayA transfer 2:
+43: PASS level_change_private
+ 13/149 Test  #43: world.level_change_private .......   Passed   21.80 sec
+test 366
+        Start 366: ai_state.symbols
+
+366: Test command: <workspace>/Blood2/build/sanitize/tests/ai_state_tests "symbols"
+366: Working Directory: <workspace>/Blood2/build/sanitize/tests
+366: Test timeout computed to be: 30
+ 14/149 Test #366: ai_state.symbols .................   Passed    0.02 sec
+test 367
+        Start 367: ai_state.transitions
+
+367: Test command: <workspace>/Blood2/build/sanitize/tests/ai_state_tests "transitions"
+367: Working Directory: <workspace>/Blood2/build/sanitize/tests
+367: Test timeout computed to be: 30
+ 15/149 Test #367: ai_state.transitions .............   Passed    0.02 sec
+test 368
+        Start 368: ai_state.commands
+
+368: Test command: <workspace>/Blood2/build/sanitize/tests/ai_state_tests "commands"
+368: Working Directory: <workspace>/Blood2/build/sanitize/tests
+368: Test timeout computed to be: 30
+ 16/149 Test #368: ai_state.commands ................   Passed    0.02 sec
+test 369
+        Start 369: ai_state.resize
+
+369: Test command: <workspace>/Blood2/build/sanitize/tests/ai_state_tests "resize"
+369: Working Directory: <workspace>/Blood2/build/sanitize/tests
+369: Test timeout computed to be: 30
+369: resize:226: g.server.advance_models(.025) && near(r->animation.time, .025f)
+ 17/149 Test #369: ai_state.resize ..................***Failed    0.02 sec
+test 370
+        Start 370: ai_state.decisions
+
+370: Test command: <workspace>/Blood2/build/sanitize/tests/ai_state_tests "decisions"
+370: Working Directory: <workspace>/Blood2/build/sanitize/tests
+370: Test timeout computed to be: 30
+ 18/149 Test #370: ai_state.decisions ...............   Passed    0.02 sec
+test 371
+        Start 371: ai_state.civilian
+
+371: Test command: <workspace>/Blood2/build/sanitize/tests/ai_state_tests "civilian"
+371: Working Directory: <workspace>/Blood2/build/sanitize/tests
+371: Test timeout computed to be: 30
+ 19/149 Test #371: ai_state.civilian ................   Passed    0.02 sec
+test 372
+        Start 372: ai_state.dispatch
+
+372: Test command: <workspace>/Blood2/build/sanitize/tests/ai_state_tests "dispatch"
+372: Working Directory: <workspace>/Blood2/build/sanitize/tests
+372: Test timeout computed to be: 30
+ 20/149 Test #372: ai_state.dispatch ................   Passed    0.02 sec
+test 373
+        Start 373: ai_state.failures
+
+373: Test command: <workspace>/Blood2/build/sanitize/tests/ai_state_tests "failures"
+373: Working Directory: <workspace>/Blood2/build/sanitize/tests
+373: Test timeout computed to be: 30
+ 21/149 Test #373: ai_state.failures ................   Passed    0.02 sec
+test 374
+        Start 374: ai_state.lifetime
+
+374: Test command: <workspace>/Blood2/build/sanitize/tests/ai_state_tests "lifetime"
+374: Working Directory: <workspace>/Blood2/build/sanitize/tests
+374: Test timeout computed to be: 30
+ 22/149 Test #374: ai_state.lifetime ................   Passed    0.03 sec
+test 375
+        Start 375: ai_state.catalog
+
+375: Test command: <workspace>/Blood2/build/sanitize/tests/ai_state_tests "catalog" "<external-data-root>"
+375: Working Directory: <workspace>/Blood2/build/sanitize/tests
+375: Test timeout computed to be: 90
+375: m_civilian1 special1 duration=9166
+375: m_civilian1 special2 duration=6000
+375: m_civilian1 special3 duration=6000
+375: m_civilian1 special4 duration=2866
+375: m_civilian1 special5 duration=5466
+375: m_civilian1 special6 duration=4133
+375: m_civilian1 special7 duration=7533
+375: m_civilian1 special8 duration=9533
+375: m_civilian1 special9 duration=5300
+375: f_civilian1 special1 duration=9166
+375: f_civilian1 special2 duration=6000
+375: f_civilian1 special3 duration=6000
+375: f_civilian1 special4 duration=2033
+375: f_civilian1 special5 duration=5466
+375: f_civilian1 special6 duration=4133
+375: f_civilian1 special7 duration=7533
+375: f_civilian1 special8 duration=9533
+375: labtech special1 duration=9166
+375: labtech special5 duration=5466
+375: Private NPC animation changes/resets=240; available special slots=19
+ 23/149 Test #375: ai_state.catalog .................   Passed    0.90 sec
+test 376
+        Start 376: ai_state.subway
+
+376: Test command: <workspace>/Blood2/build/sanitize/tests/ai_state_tests "subway" "<external-data-root>"
+376: Working Directory: <workspace>/Blood2/build/sanitize/tests
+376: Test timeout computed to be: 90
+376: Subway diagnostic cycle=0 starts=3 finishes=2 dispatches=960
+376: Subway diagnostic cycle=1 starts=3 finishes=2 dispatches=960
+ 24/149 Test #376: ai_state.subway ..................   Passed   34.23 sec
+test 377
+        Start 377: ai_fire.selection
+
+377: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "selection"
+377: Working Directory: <workspace>/Blood2/build/sanitize/tests
+377: Test timeout computed to be: 30
+ 25/149 Test #377: ai_fire.selection ................   Passed    0.03 sec
+test 378
+        Start 378: ai_fire.clearance
+
+378: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "clearance"
+378: Working Directory: <workspace>/Blood2/build/sanitize/tests
+378: Test timeout computed to be: 30
+ 26/149 Test #378: ai_fire.clearance ................   Passed    0.02 sec
+test 379
+        Start 379: ai_fire.filters
+
+379: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "filters"
+379: Working Directory: <workspace>/Blood2/build/sanitize/tests
+379: Test timeout computed to be: 30
+ 27/149 Test #379: ai_fire.filters ..................   Passed    0.02 sec
+test 380
+        Start 380: ai_fire.head
+
+380: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "head"
+380: Working Directory: <workspace>/Blood2/build/sanitize/tests
+380: Test timeout computed to be: 30
+ 28/149 Test #380: ai_fire.head .....................   Passed    0.02 sec
+test 381
+        Start 381: ai_fire.aim
+
+381: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "aim"
+381: Working Directory: <workspace>/Blood2/build/sanitize/tests
+381: Test timeout computed to be: 30
+ 29/149 Test #381: ai_fire.aim ......................   Passed    0.02 sec
+test 382
+        Start 382: ai_fire.keys
+
+382: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "keys"
+382: Working Directory: <workspace>/Blood2/build/sanitize/tests
+382: Test timeout computed to be: 30
+ 30/149 Test #382: ai_fire.keys .....................   Passed    0.02 sec
+test 383
+        Start 383: ai_fire.cadence
+
+383: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "cadence"
+383: Working Directory: <workspace>/Blood2/build/sanitize/tests
+383: Test timeout computed to be: 30
+ 31/149 Test #383: ai_fire.cadence ..................   Passed    0.02 sec
+test 384
+        Start 384: ai_fire.recovery
+
+384: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "recovery"
+384: Working Directory: <workspace>/Blood2/build/sanitize/tests
+384: Test timeout computed to be: 30
+ 32/149 Test #384: ai_fire.recovery .................   Passed    0.02 sec
+test 385
+        Start 385: ai_fire.failures
+
+385: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "failures"
+385: Working Directory: <workspace>/Blood2/build/sanitize/tests
+385: Test timeout computed to be: 30
+ 33/149 Test #385: ai_fire.failures .................   Passed    0.02 sec
+test 386
+        Start 386: ai_fire.lifetime
+
+386: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "lifetime"
+386: Working Directory: <workspace>/Blood2/build/sanitize/tests
+386: Test timeout computed to be: 30
+ 34/149 Test #386: ai_fire.lifetime .................   Passed    0.02 sec
+test 387
+        Start 387: ai_fire.script_stand
+
+387: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "script_stand"
+387: Working Directory: <workspace>/Blood2/build/sanitize/tests
+387: Test timeout computed to be: 30
+ 35/149 Test #387: ai_fire.script_stand .............   Passed    0.02 sec
+test 388
+        Start 388: ai_fire.script_moving
+
+388: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "script_moving"
+388: Working Directory: <workspace>/Blood2/build/sanitize/tests
+388: Test timeout computed to be: 30
+ 36/149 Test #388: ai_fire.script_moving ............   Passed    0.02 sec
+test 389
+        Start 389: ai_fire.script_refusal
+
+389: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "script_refusal"
+389: Working Directory: <workspace>/Blood2/build/sanitize/tests
+389: Test timeout computed to be: 30
+ 37/149 Test #389: ai_fire.script_refusal ...........   Passed    0.02 sec
+test 390
+        Start 390: ai_fire.script_lifetime
+
+390: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "script_lifetime"
+390: Working Directory: <workspace>/Blood2/build/sanitize/tests
+390: Test timeout computed to be: 30
+ 38/149 Test #390: ai_fire.script_lifetime ..........   Passed    0.03 sec
+test 391
+        Start 391: ai_fire.script_routes
+
+391: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "script_routes"
+391: Working Directory: <workspace>/Blood2/build/sanitize/tests
+391: Test timeout computed to be: 30
+ 39/149 Test #391: ai_fire.script_routes ............   Passed    0.02 sec
+test 392
+        Start 392: ai_fire.catalog
+
+392: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "catalog" "<external-data-root>"
+392: Working Directory: <workspace>/Blood2/build/sanitize/tests
+392: Test timeout computed to be: 90
+392: m_cultist1 pistol clip=11 available=1 duration=500 fire_keys=0
+392: f_cultist1 pistol clip=11 available=1 duration=500 fire_keys=0
+392: m_civilian1 pistol clip=4294967295 available=0
+392: f_civilian1 pistol clip=4294967295 available=0
+392: labtech pistol clip=4294967295 available=0
+392: gideon pistol clip=4 available=1 duration=2333 fire_keys=1
+ 40/149 Test #392: ai_fire.catalog ..................   Passed    0.86 sec
+test 393
+        Start 393: ai_fire.subway
+
+393: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "subway" "<external-data-root>"
+393: Working Directory: <workspace>/Blood2/build/sanitize/tests
+393: Test timeout computed to be: 90
+393: cycle=0 shots=18 keys=10 completed=9 audio=0 suppressed=10 key_error= fire_error= key_failures=0 target_hp=855.824
+393: cycle=1 shots=19 keys=10 completed=9 audio=0 suppressed=10 key_error= fire_error= key_failures=0 target_hp=847.81
+ 41/149 Test #393: ai_fire.subway ...................   Passed   11.37 sec
+test 394
+        Start 394: ai_fire.script_private
+
+394: Test command: <workspace>/Blood2/build/sanitize/tests/ai_fire_tests "script_private" "<external-data-root>"
+394: Working Directory: <workspace>/Blood2/build/sanitize/tests
+394: Test timeout computed to be: 90
+394: Script fire mode=1 shots=15 target HP=9879.87 position Z=0 failures=0 error=
+394: Script fire mode=2 shots=12 target HP=9903.9 position Z=79.9999 failures=0 error=
+394: Script fire mode=3 shots=12 target HP=9903.9 position Z=160 failures=0 error=
+ 42/149 Test #394: ai_fire.script_private ...........   Passed   15.27 sec
+test 404
+        Start 404: ai_navigation.sample
+
+404: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "sample"
+404: Working Directory: <workspace>/Blood2/build/sanitize/tests
+404: Test timeout computed to be: 30
+ 43/149 Test #404: ai_navigation.sample .............   Passed    0.03 sec
+test 405
+        Start 405: ai_navigation.clearance
+
+405: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "clearance"
+405: Working Directory: <workspace>/Blood2/build/sanitize/tests
+405: Test timeout computed to be: 30
+ 44/149 Test #405: ai_navigation.clearance ..........   Passed    0.02 sec
+test 406
+        Start 406: ai_navigation.parallel_axes
+
+406: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "parallel_axes"
+406: Working Directory: <workspace>/Blood2/build/sanitize/tests
+406: Test timeout computed to be: 30
+ 45/149 Test #406: ai_navigation.parallel_axes ......   Passed    0.02 sec
+test 407
+        Start 407: ai_navigation.rays
+
+407: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "rays"
+407: Working Directory: <workspace>/Blood2/build/sanitize/tests
+407: Test timeout computed to be: 30
+ 46/149 Test #407: ai_navigation.rays ...............   Passed    0.02 sec
+test 408
+        Start 408: ai_navigation.direct
+
+408: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "direct"
+408: Working Directory: <workspace>/Blood2/build/sanitize/tests
+408: Test timeout computed to be: 30
+ 47/149 Test #408: ai_navigation.direct .............   Passed    0.02 sec
+test 409
+        Start 409: ai_navigation.detour
+
+409: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "detour"
+409: Working Directory: <workspace>/Blood2/build/sanitize/tests
+409: Test timeout computed to be: 30
+ 48/149 Test #409: ai_navigation.detour .............   Passed    0.02 sec
+test 410
+        Start 410: ai_navigation.blocked
+
+410: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "blocked"
+410: Working Directory: <workspace>/Blood2/build/sanitize/tests
+410: Test timeout computed to be: 30
+ 49/149 Test #410: ai_navigation.blocked ............   Passed    0.02 sec
+test 411
+        Start 411: ai_navigation.limits
+
+411: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "limits"
+411: Working Directory: <workspace>/Blood2/build/sanitize/tests
+411: Test timeout computed to be: 30
+411: bounded search: 8193 ray attempts, 4095 iterations
+ 50/149 Test #411: ai_navigation.limits .............   Passed    0.12 sec
+test 412
+        Start 412: ai_navigation.lifetime
+
+412: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "lifetime"
+412: Working Directory: <workspace>/Blood2/build/sanitize/tests
+412: Test timeout computed to be: 30
+ 51/149 Test #412: ai_navigation.lifetime ...........   Passed    0.07 sec
+test 413
+        Start 413: ai_navigation.subway
+
+413: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "subway" "<external-data-root>"
+413: Working Directory: <workspace>/Blood2/build/sanitize/tests
+413: Test timeout computed to be: 90
+413: cycle=0 real SubwayA local clearance at -32 170 -3224
+413: cycle=1 real SubwayA local clearance at -32 170 -3224
+ 52/149 Test #413: ai_navigation.subway .............   Passed    3.90 sec
+test 414
+        Start 414: ai_navigation.cityhub_parallel
+
+414: Test command: <workspace>/Blood2/build/sanitize/tests/ai_navigation_tests "cityhub_parallel" "<external-data-root>"
+414: Working Directory: <workspace>/Blood2/build/sanitize/tests
+414: Test timeout computed to be: 90
+414: CityHub parallel contact 0 cycle 0: planned=0 outcome=3 fallback=1 rays=14 reason=No source lateral turn found
+414: CityHub parallel contact 1 cycle 0: planned=0 outcome=3 fallback=1 rays=13 reason=No source lateral turn found
+414: CityHub parallel contact 0 cycle 1: planned=0 outcome=3 fallback=1 rays=14 reason=No source lateral turn found
+414: CityHub parallel contact 1 cycle 1: planned=0 outcome=3 fallback=1 rays=13 reason=No source lateral turn found
+ 53/149 Test #414: ai_navigation.cityhub_parallel ...   Passed    6.50 sec
+test 415
+        Start 415: ai_follow.velocity
+
+415: Test command: <workspace>/Blood2/build/sanitize/tests/ai_follow_tests "velocity"
+415: Working Directory: <workspace>/Blood2/build/sanitize/tests
+415: Test timeout computed to be: 30
+ 54/149 Test #415: ai_follow.velocity ...............   Passed    0.03 sec
+test 416
+        Start 416: ai_follow.locomotion
+
+416: Test command: <workspace>/Blood2/build/sanitize/tests/ai_follow_tests "locomotion"
+416: Working Directory: <workspace>/Blood2/build/sanitize/tests
+416: Test timeout computed to be: 30
+ 55/149 Test #416: ai_follow.locomotion .............   Passed    0.02 sec
+test 417
+        Start 417: ai_follow.follow
+
+417: Test command: <workspace>/Blood2/build/sanitize/tests/ai_follow_tests "follow"
+417: Working Directory: <workspace>/Blood2/build/sanitize/tests
+417: Test timeout computed to be: 30
+ 56/149 Test #417: ai_follow.follow .................   Passed    0.02 sec
+test 418
+        Start 418: ai_follow.cached
+
+418: Test command: <workspace>/Blood2/build/sanitize/tests/ai_follow_tests "cached"
+418: Working Directory: <workspace>/Blood2/build/sanitize/tests
+418: Test timeout computed to be: 30
+ 57/149 Test #418: ai_follow.cached .................   Passed    0.02 sec
+test 419
+        Start 419: ai_follow.moveto
+
+419: Test command: <workspace>/Blood2/build/sanitize/tests/ai_follow_tests "moveto"
+419: Working Directory: <workspace>/Blood2/build/sanitize/tests
+419: Test timeout computed to be: 30
+ 58/149 Test #419: ai_follow.moveto .................   Passed    0.02 sec
+test 420
+        Start 420: ai_follow.actions
+
+420: Test command: <workspace>/Blood2/build/sanitize/tests/ai_follow_tests "actions"
+420: Working Directory: <workspace>/Blood2/build/sanitize/tests
+420: Test timeout computed to be: 30
+ 59/149 Test #420: ai_follow.actions ................   Passed    0.02 sec
+test 421
+        Start 421: ai_follow.lifetime
+
+421: Test command: <workspace>/Blood2/build/sanitize/tests/ai_follow_tests "lifetime"
+421: Working Directory: <workspace>/Blood2/build/sanitize/tests
+421: Test timeout computed to be: 30
+ 60/149 Test #421: ai_follow.lifetime ...............   Passed    0.03 sec
+test 422
+        Start 422: ai_follow.failures
+
+422: Test command: <workspace>/Blood2/build/sanitize/tests/ai_follow_tests "failures"
+422: Working Directory: <workspace>/Blood2/build/sanitize/tests
+422: Test timeout computed to be: 30
+ 61/149 Test #422: ai_follow.failures ...............   Passed    0.02 sec
+test 423
+        Start 423: ai_follow.physics
+
+423: Test command: <workspace>/Blood2/build/sanitize/tests/ai_follow_tests "physics"
+423: Working Directory: <workspace>/Blood2/build/sanitize/tests
+423: Test timeout computed to be: 30
+ 62/149 Test #423: ai_follow.physics ................   Passed    0.04 sec
+test 424
+        Start 424: ai_follow.catalog
+
+424: Test command: <workspace>/Blood2/build/sanitize/tests/ai_follow_tests "catalog" "<external-data-root>"
+424: Working Directory: <workspace>/Blood2/build/sanitize/tests
+424: Test timeout computed to be: 90
+424: m_cultist1 mode=0 clip=4 available=1
+424: m_cultist1 mode=1 clip=5 available=1
+424: m_cultist1 mode=2 clip=4294967295 available=0
+424: m_cultist1 mode=3 clip=4294967295 available=0
+424: f_cultist1 mode=0 clip=4 available=1
+424: f_cultist1 mode=1 clip=5 available=1
+424: f_cultist1 mode=2 clip=4294967295 available=0
+424: f_cultist1 mode=3 clip=4294967295 available=0
+424: m_civilian1 mode=0 clip=2 available=1
+424: m_civilian1 mode=1 clip=4 available=1
+424: m_civilian1 mode=2 clip=4294967295 available=0
+424: m_civilian1 mode=3 clip=4294967295 available=0
+424: f_civilian1 mode=0 clip=3 available=1
+424: f_civilian1 mode=1 clip=4294967295 available=0
+424: f_civilian1 mode=2 clip=4294967295 available=0
+424: f_civilian1 mode=3 clip=4294967295 available=0
+424: labtech mode=0 clip=2 available=1
+424: labtech mode=1 clip=4 available=1
+424: labtech mode=2 clip=4294967295 available=0
+424: labtech mode=3 clip=4294967295 available=0
+424: gideon mode=0 clip=4294967295 available=0
+424: gideon mode=1 clip=4294967295 available=0
+424: gideon mode=2 clip=4294967295 available=0
+424: gideon mode=3 clip=4294967295 available=0
+ 63/149 Test #424: ai_follow.catalog ................   Passed    0.87 sec
+test 425
+        Start 425: ai_follow.subway
+
+425: Test command: <workspace>/Blood2/build/sanitize/tests/ai_follow_tests "subway" "<external-data-root>"
+425: Working Directory: <workspace>/Blood2/build/sanitize/tests
+425: Test timeout computed to be: 90
+425: SubwayA cycle=0 path arrival=1
+425: SubwayA cycle=1 path arrival=1
+ 64/149 Test #425: ai_follow.subway .................   Passed    3.96 sec
+test 426
+        Start 426: ai_script.parsing
+
+426: Test command: <workspace>/Blood2/build/sanitize/tests/ai_script_tests "parsing" "<workspace>/Blood2/build/sanitize/tests/ai-script-parsing"
+426: Working Directory: <workspace>/Blood2/build/sanitize/tests
+426: Test timeout computed to be: 30
+ 65/149 Test #426: ai_script.parsing ................   Passed    0.02 sec
+test 427
+        Start 427: ai_script.sequencing
+
+427: Test command: <workspace>/Blood2/build/sanitize/tests/ai_script_tests "sequencing" "<workspace>/Blood2/build/sanitize/tests/ai-script-sequencing"
+427: Working Directory: <workspace>/Blood2/build/sanitize/tests
+427: Test timeout computed to be: 30
+ 66/149 Test #427: ai_script.sequencing .............   Passed    0.02 sec
+test 428
+        Start 428: ai_script.waiting
+
+428: Test command: <workspace>/Blood2/build/sanitize/tests/ai_script_tests "waiting" "<workspace>/Blood2/build/sanitize/tests/ai-script-waiting"
+428: Working Directory: <workspace>/Blood2/build/sanitize/tests
+428: Test timeout computed to be: 30
+ 67/149 Test #428: ai_script.waiting ................   Passed    0.02 sec
+test 429
+        Start 429: ai_script.animations
+
+429: Test command: <workspace>/Blood2/build/sanitize/tests/ai_script_tests "animations" "<workspace>/Blood2/build/sanitize/tests/ai-script-animations"
+429: Working Directory: <workspace>/Blood2/build/sanitize/tests
+429: Test timeout computed to be: 30
+ 68/149 Test #429: ai_script.animations .............   Passed    0.02 sec
+test 430
+        Start 430: ai_script.state_target
+
+430: Test command: <workspace>/Blood2/build/sanitize/tests/ai_script_tests "state_target" "<workspace>/Blood2/build/sanitize/tests/ai-script-state_target"
+430: Working Directory: <workspace>/Blood2/build/sanitize/tests
+430: Test timeout computed to be: 30
+ 69/149 Test #430: ai_script.state_target ...........   Passed    0.02 sec
+test 431
+        Start 431: ai_script.movement
+
+431: Test command: <workspace>/Blood2/build/sanitize/tests/ai_script_tests "movement" "<workspace>/Blood2/build/sanitize/tests/ai-script-movement"
+431: Working Directory: <workspace>/Blood2/build/sanitize/tests
+431: Test timeout computed to be: 30
+ 70/149 Test #431: ai_script.movement ...............   Passed    0.02 sec
+test 432
+        Start 432: ai_script.lifetime
+
+432: Test command: <workspace>/Blood2/build/sanitize/tests/ai_script_tests "lifetime" "<workspace>/Blood2/build/sanitize/tests/ai-script-lifetime"
+432: Working Directory: <workspace>/Blood2/build/sanitize/tests
+432: Test timeout computed to be: 30
+ 71/149 Test #432: ai_script.lifetime ...............   Passed    0.02 sec
+test 433
+        Start 433: ai_script.audio
+
+433: Test command: <workspace>/Blood2/build/sanitize/tests/ai_script_tests "audio" "<workspace>/Blood2/build/sanitize/tests/ai-script-audio"
+433: Working Directory: <workspace>/Blood2/build/sanitize/tests
+433: Test timeout computed to be: 30
+ 72/149 Test #433: ai_script.audio ..................   Passed    0.03 sec
+test 434
+        Start 434: ai_script.catalog
+
+434: Test command: <workspace>/Blood2/build/sanitize/tests/ai_script_tests "catalog" "<external-data-root>"
+434: Working Directory: <workspace>/Blood2/build/sanitize/tests
+434: Test timeout computed to be: 90
+434: Key.MessageName parsed=1 commands=2 error=
+434: Trigger.MessageName7 parsed=1 commands=2 error=
+434: Trigger.MessageName1 parsed=1 commands=3 error=
+434: Trigger.MessageName2 parsed=1 commands=3 error=
+434: Trigger.MessageName3 parsed=1 commands=1 error=
+434: Trigger.MessageName4 parsed=1 commands=1 error=
+434: SubwayA authored scripts=6 rejected=0 parsed instructions=12
+434: m_cultist1 clip=idle1 completed=1
+434: f_cultist1 clip=idle1 completed=1
+434: m_civilian1 clip=idle1 completed=1
+434: f_civilian1 clip=idle1 completed=1
+434: labtech clip=idle1 completed=1
+434: gideon clip=run_knife1 completed=1
+ 73/149 Test #434: ai_script.catalog ................   Passed    2.70 sec
+test 435
+        Start 435: ai_locomotion.dodge
+
+435: Test command: <workspace>/Blood2/build/sanitize/tests/ai_locomotion_tests "dodge"
+435: Working Directory: <workspace>/Blood2/build/sanitize/tests
+435: Test timeout computed to be: 30
+ 74/149 Test #435: ai_locomotion.dodge ..............   Passed    0.02 sec
+test 436
+        Start 436: ai_locomotion.rolls
+
+436: Test command: <workspace>/Blood2/build/sanitize/tests/ai_locomotion_tests "rolls"
+436: Working Directory: <workspace>/Blood2/build/sanitize/tests
+436: Test timeout computed to be: 30
+ 75/149 Test #436: ai_locomotion.rolls ..............   Passed    0.02 sec
+test 437
+        Start 437: ai_locomotion.obstruction
+
+437: Test command: <workspace>/Blood2/build/sanitize/tests/ai_locomotion_tests "obstruction"
+437: Working Directory: <workspace>/Blood2/build/sanitize/tests
+437: Test timeout computed to be: 30
+ 76/149 Test #437: ai_locomotion.obstruction ........   Passed    0.02 sec
+test 438
+        Start 438: ai_locomotion.rays
+
+438: Test command: <workspace>/Blood2/build/sanitize/tests/ai_locomotion_tests "rays"
+438: Working Directory: <workspace>/Blood2/build/sanitize/tests
+438: Test timeout computed to be: 30
+ 77/149 Test #438: ai_locomotion.rays ...............   Passed    0.02 sec
+test 439
+        Start 439: ai_locomotion.navigate
+
+439: Test command: <workspace>/Blood2/build/sanitize/tests/ai_locomotion_tests "navigate"
+439: Working Directory: <workspace>/Blood2/build/sanitize/tests
+439: Test timeout computed to be: 30
+ 78/149 Test #439: ai_locomotion.navigate ...........   Passed    0.02 sec
+test 440
+        Start 440: ai_locomotion.ledges
+
+440: Test command: <workspace>/Blood2/build/sanitize/tests/ai_locomotion_tests "ledges"
+440: Working Directory: <workspace>/Blood2/build/sanitize/tests
+440: Test timeout computed to be: 30
+ 79/149 Test #440: ai_locomotion.ledges .............   Passed    0.02 sec
+test 441
+        Start 441: ai_locomotion.walking
+
+441: Test command: <workspace>/Blood2/build/sanitize/tests/ai_locomotion_tests "walking"
+441: Working Directory: <workspace>/Blood2/build/sanitize/tests
+441: Test timeout computed to be: 30
+ 80/149 Test #441: ai_locomotion.walking ............   Passed    0.02 sec
+test 442
+        Start 442: ai_locomotion.physics
+
+442: Test command: <workspace>/Blood2/build/sanitize/tests/ai_locomotion_tests "physics"
+442: Working Directory: <workspace>/Blood2/build/sanitize/tests
+442: Test timeout computed to be: 30
+ 81/149 Test #442: ai_locomotion.physics ............   Passed    0.02 sec
+test 443
+        Start 443: ai_locomotion.moving_fire
+
+443: Test command: <workspace>/Blood2/build/sanitize/tests/ai_locomotion_tests "moving_fire"
+443: Working Directory: <workspace>/Blood2/build/sanitize/tests
+443: Test timeout computed to be: 30
+ 82/149 Test #443: ai_locomotion.moving_fire ........   Passed    0.02 sec
+test 444
+        Start 444: ai_locomotion.keys
+
+444: Test command: <workspace>/Blood2/build/sanitize/tests/ai_locomotion_tests "keys"
+444: Working Directory: <workspace>/Blood2/build/sanitize/tests
+444: Test timeout computed to be: 30
+ 83/149 Test #444: ai_locomotion.keys ...............   Passed    0.02 sec
+test 445
+        Start 445: ai_locomotion.lifetime
+
+445: Test command: <workspace>/Blood2/build/sanitize/tests/ai_locomotion_tests "lifetime"
+445: Working Directory: <workspace>/Blood2/build/sanitize/tests
+445: Test timeout computed to be: 30
+ 84/149 Test #445: ai_locomotion.lifetime ...........   Passed    0.02 sec
+test 446
+        Start 446: ai_locomotion.attacks
+
+446: Test command: <workspace>/Blood2/build/sanitize/tests/ai_locomotion_tests "attacks"
+446: Working Directory: <workspace>/Blood2/build/sanitize/tests
+446: Test timeout computed to be: 30
+ 85/149 Test #446: ai_locomotion.attacks ............   Passed    0.02 sec
+test 447
+        Start 447: ai_locomotion.catalog
+
+447: Test command: <workspace>/Blood2/build/sanitize/tests/ai_locomotion_tests "catalog" "<external-data-root>"
+447: Working Directory: <workspace>/Blood2/build/sanitize/tests
+447: Test timeout computed to be: 90
+447: m_cultist1 command=0 clip=4 available=1
+447: m_cultist1 command=1 clip=5 available=1
+447: m_cultist1 command=2 clip=12 available=1
+447: m_cultist1 command=3 clip=13 available=1
+447: f_cultist1 command=0 clip=4 available=1
+447: f_cultist1 command=1 clip=5 available=1
+447: f_cultist1 command=2 clip=12 available=1
+447: f_cultist1 command=3 clip=13 available=1
+447: m_civilian1 command=0 clip=2 available=1
+447: m_civilian1 command=1 clip=4 available=1
+447: m_civilian1 command=2 clip=4294967295 available=0
+447: m_civilian1 command=3 clip=4294967295 available=0
+447: f_civilian1 command=0 clip=3 available=1
+447: f_civilian1 command=1 clip=2 available=1
+447: f_civilian1 command=2 clip=4294967295 available=0
+447: f_civilian1 command=3 clip=4294967295 available=0
+447: labtech command=0 clip=2 available=1
+447: labtech command=1 clip=4 available=1
+447: labtech command=2 clip=4294967295 available=0
+447: labtech command=3 clip=4294967295 available=0
+447: gideon command=0 clip=1 available=1
+447: gideon command=1 clip=0 available=1
+447: gideon command=2 clip=4294967295 available=0
+447: gideon command=3 clip=4294967295 available=0
+ 86/149 Test #447: ai_locomotion.catalog ............   Passed    0.88 sec
+test 448
+        Start 448: ai_recovery.jump
+
+448: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "jump"
+448: Working Directory: <workspace>/Blood2/build/sanitize/tests
+448: Test timeout computed to be: 30
+ 87/149 Test #448: ai_recovery.jump .................   Passed    0.02 sec
+test 449
+        Start 449: ai_recovery.jump_physics
+
+449: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "jump_physics"
+449: Working Directory: <workspace>/Blood2/build/sanitize/tests
+449: Test timeout computed to be: 30
+ 88/149 Test #449: ai_recovery.jump_physics .........   Passed    0.02 sec
+test 450
+        Start 450: ai_recovery.crouch
+
+450: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "crouch"
+450: Working Directory: <workspace>/Blood2/build/sanitize/tests
+450: Test timeout computed to be: 30
+ 89/149 Test #450: ai_recovery.crouch ...............   Passed    0.02 sec
+test 451
+        Start 451: ai_recovery.crawling
+
+451: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "crawling"
+451: Working Directory: <workspace>/Blood2/build/sanitize/tests
+451: Test timeout computed to be: 30
+ 90/149 Test #451: ai_recovery.crawling .............   Passed    0.02 sec
+test 452
+        Start 452: ai_recovery.clearance
+
+452: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "clearance"
+452: Working Directory: <workspace>/Blood2/build/sanitize/tests
+452: Test timeout computed to be: 30
+ 91/149 Test #452: ai_recovery.clearance ............   Passed    0.02 sec
+test 453
+        Start 453: ai_recovery.topos
+
+453: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "topos"
+453: Working Directory: <workspace>/Blood2/build/sanitize/tests
+453: Test timeout computed to be: 30
+ 92/149 Test #453: ai_recovery.topos ................   Passed    0.02 sec
+test 454
+        Start 454: ai_recovery.plans
+
+454: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "plans"
+454: Working Directory: <workspace>/Blood2/build/sanitize/tests
+454: Test timeout computed to be: 30
+ 93/149 Test #454: ai_recovery.plans ................   Passed    0.02 sec
+test 455
+        Start 455: ai_recovery.around
+
+455: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "around"
+455: Working Directory: <workspace>/Blood2/build/sanitize/tests
+455: Test timeout computed to be: 30
+ 94/149 Test #455: ai_recovery.around ...............   Passed    0.02 sec
+test 456
+        Start 456: ai_recovery.search
+
+456: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "search"
+456: Working Directory: <workspace>/Blood2/build/sanitize/tests
+456: Test timeout computed to be: 30
+ 95/149 Test #456: ai_recovery.search ...............   Passed    0.02 sec
+test 457
+        Start 457: ai_recovery.lifetime
+
+457: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "lifetime"
+457: Working Directory: <workspace>/Blood2/build/sanitize/tests
+457: Test timeout computed to be: 30
+ 96/149 Test #457: ai_recovery.lifetime .............   Passed    0.02 sec
+test 458
+        Start 458: ai_recovery.moving_fire
+
+458: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "moving_fire"
+458: Working Directory: <workspace>/Blood2/build/sanitize/tests
+458: Test timeout computed to be: 30
+ 97/149 Test #458: ai_recovery.moving_fire ..........   Passed    0.02 sec
+test 459
+        Start 459: ai_recovery.keys
+
+459: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "keys"
+459: Working Directory: <workspace>/Blood2/build/sanitize/tests
+459: Test timeout computed to be: 30
+ 98/149 Test #459: ai_recovery.keys .................   Passed    0.02 sec
+test 460
+        Start 460: ai_recovery.fire_lifetime
+
+460: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "fire_lifetime"
+460: Working Directory: <workspace>/Blood2/build/sanitize/tests
+460: Test timeout computed to be: 30
+ 99/149 Test #460: ai_recovery.fire_lifetime ........   Passed    0.02 sec
+test 461
+        Start 461: ai_recovery.smell_guards
+
+461: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "smell_guards"
+461: Working Directory: <workspace>/Blood2/build/sanitize/tests
+461: Test timeout computed to be: 30
+100/149 Test #461: ai_recovery.smell_guards .........   Passed    0.02 sec
+test 462
+        Start 462: ai_recovery.smell_route
+
+462: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "smell_route"
+462: Working Directory: <workspace>/Blood2/build/sanitize/tests
+462: Test timeout computed to be: 30
+101/149 Test #462: ai_recovery.smell_route ..........   Passed    0.02 sec
+test 463
+        Start 463: ai_recovery.smell_lifetime
+
+463: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "smell_lifetime"
+463: Working Directory: <workspace>/Blood2/build/sanitize/tests
+463: Test timeout computed to be: 30
+102/149 Test #463: ai_recovery.smell_lifetime .......   Passed    0.02 sec
+test 464
+        Start 464: ai_recovery.catalog
+
+464: Test command: <workspace>/Blood2/build/sanitize/tests/ai_recovery_tests "catalog" "<external-data-root>"
+464: Working Directory: <workspace>/Blood2/build/sanitize/tests
+464: Test timeout computed to be: 90
+464: m_cultist1 command=0 clip=6 available=1
+464: m_cultist1 command=1 clip=7 available=1
+464: m_cultist1 command=2 clip=8 available=1
+464: m_cultist1 command=3 clip=15 available=1
+464: f_cultist1 command=0 clip=6 available=1
+464: f_cultist1 command=1 clip=7 available=1
+464: f_cultist1 command=2 clip=8 available=1
+464: f_cultist1 command=3 clip=15 available=1
+464: m_civilian1 command=0 clip=4294967295 available=0
+464: m_civilian1 command=1 clip=4294967295 available=0
+464: m_civilian1 command=2 clip=4294967295 available=0
+464: m_civilian1 command=3 clip=4294967295 available=0
+464: f_civilian1 command=0 clip=4294967295 available=0
+464: f_civilian1 command=1 clip=4294967295 available=0
+464: f_civilian1 command=2 clip=4294967295 available=0
+464: f_civilian1 command=3 clip=4294967295 available=0
+464: labtech command=0 clip=4294967295 available=0
+464: labtech command=1 clip=4294967295 available=0
+464: labtech command=2 clip=4294967295 available=0
+464: labtech command=3 clip=4294967295 available=0
+464: gideon command=0 clip=4294967295 available=0
+464: gideon command=1 clip=4294967295 available=0
+464: gideon command=2 clip=4294967295 available=0
+464: gideon command=3 clip=4294967295 available=0
+103/149 Test #464: ai_recovery.catalog ..............   Passed    0.87 sec
+test 465
+        Start 465: ai_escape.beg
+
+465: Test command: <workspace>/Blood2/build/sanitize/tests/ai_escape_tests "beg"
+465: Working Directory: <workspace>/Blood2/build/sanitize/tests
+465: Test timeout computed to be: 30
+104/149 Test #465: ai_escape.beg ....................   Passed    0.02 sec
+test 466
+        Start 466: ai_escape.selection
+
+466: Test command: <workspace>/Blood2/build/sanitize/tests/ai_escape_tests "selection"
+466: Working Directory: <workspace>/Blood2/build/sanitize/tests
+466: Test timeout computed to be: 30
+105/149 Test #466: ai_escape.selection ..............   Passed    0.02 sec
+test 467
+        Start 467: ai_escape.facing
+
+467: Test command: <workspace>/Blood2/build/sanitize/tests/ai_escape_tests "facing"
+467: Working Directory: <workspace>/Blood2/build/sanitize/tests
+467: Test timeout computed to be: 30
+106/149 Test #467: ai_escape.facing .................   Passed    0.02 sec
+test 468
+        Start 468: ai_escape.routes
+
+468: Test command: <workspace>/Blood2/build/sanitize/tests/ai_escape_tests "routes"
+468: Working Directory: <workspace>/Blood2/build/sanitize/tests
+468: Test timeout computed to be: 30
+107/149 Test #468: ai_escape.routes .................   Passed    0.02 sec
+test 469
+        Start 469: ai_escape.perception
+
+469: Test command: <workspace>/Blood2/build/sanitize/tests/ai_escape_tests "perception"
+469: Working Directory: <workspace>/Blood2/build/sanitize/tests
+469: Test timeout computed to be: 30
+108/149 Test #469: ai_escape.perception .............   Passed    0.02 sec
+test 470
+        Start 470: ai_escape.hiding
+
+470: Test command: <workspace>/Blood2/build/sanitize/tests/ai_escape_tests "hiding"
+470: Working Directory: <workspace>/Blood2/build/sanitize/tests
+470: Test timeout computed to be: 30
+109/149 Test #470: ai_escape.hiding .................   Passed    0.02 sec
+test 471
+        Start 471: ai_escape.guard
+
+471: Test command: <workspace>/Blood2/build/sanitize/tests/ai_escape_tests "guard"
+471: Working Directory: <workspace>/Blood2/build/sanitize/tests
+471: Test timeout computed to be: 30
+110/149 Test #471: ai_escape.guard ..................   Passed    0.02 sec
+test 472
+        Start 472: ai_escape.failures
+
+472: Test command: <workspace>/Blood2/build/sanitize/tests/ai_escape_tests "failures"
+472: Working Directory: <workspace>/Blood2/build/sanitize/tests
+472: Test timeout computed to be: 30
+111/149 Test #472: ai_escape.failures ...............   Passed    0.02 sec
+test 473
+        Start 473: ai_escape.tracking
+
+473: Test command: <workspace>/Blood2/build/sanitize/tests/ai_escape_tests "tracking"
+473: Working Directory: <workspace>/Blood2/build/sanitize/tests
+473: Test timeout computed to be: 30
+112/149 Test #473: ai_escape.tracking ...............   Passed    0.02 sec
+test 474
+        Start 474: ai_escape.lifetime
+
+474: Test command: <workspace>/Blood2/build/sanitize/tests/ai_escape_tests "lifetime"
+474: Working Directory: <workspace>/Blood2/build/sanitize/tests
+474: Test timeout computed to be: 30
+113/149 Test #474: ai_escape.lifetime ...............   Passed    0.02 sec
+test 475
+        Start 475: ai_escape.catalog
+
+475: Test command: <workspace>/Blood2/build/sanitize/tests/ai_escape_tests "catalog" "<external-data-root>"
+475: Working Directory: <workspace>/Blood2/build/sanitize/tests
+475: Test timeout computed to be: 90
+475: m_cultist1 TAUNT[6]=47 available=1 duration=5000
+475: f_cultist1 TAUNT[6]=47 available=1 duration=5000
+475: m_civilian1 TAUNT[6]=5 available=1 duration=5000
+475: f_civilian1 TAUNT[6]=5 available=1 duration=4067
+475: labtech TAUNT[6]=5 available=1 duration=5000
+475: gideon TAUNT[6]=4294967295 available=0 duration=0
+114/149 Test #475: ai_escape.catalog ................   Passed    0.87 sec
+test 476
+        Start 476: ai_runtime.activation
+
+476: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "activation"
+476: Working Directory: <workspace>/Blood2/build/sanitize/tests
+476: Test timeout computed to be: 30
+115/149 Test #476: ai_runtime.activation ............   Passed    0.02 sec
+test 477
+        Start 477: ai_runtime.animation_clearance
+
+477: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "animation_clearance"
+477: Working Directory: <workspace>/Blood2/build/sanitize/tests
+477: Test timeout computed to be: 30
+116/149 Test #477: ai_runtime.animation_clearance ...   Passed    0.02 sec
+test 478
+        Start 478: ai_runtime.visibility
+
+478: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "visibility"
+478: Working Directory: <workspace>/Blood2/build/sanitize/tests
+478: Test timeout computed to be: 30
+117/149 Test #478: ai_runtime.visibility ............   Passed    0.02 sec
+test 479
+        Start 479: ai_runtime.visibility_filter
+
+479: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "visibility_filter"
+479: Working Directory: <workspace>/Blood2/build/sanitize/tests
+479: Test timeout computed to be: 30
+118/149 Test #479: ai_runtime.visibility_filter .....   Passed    0.02 sec
+test 480
+        Start 480: ai_runtime.visibility_atomic
+
+480: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "visibility_atomic"
+480: Working Directory: <workspace>/Blood2/build/sanitize/tests
+480: Test timeout computed to be: 30
+119/149 Test #480: ai_runtime.visibility_atomic .....   Passed    0.02 sec
+test 481
+        Start 481: ai_runtime.lifetime
+
+481: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "lifetime"
+481: Working Directory: <workspace>/Blood2/build/sanitize/tests
+481: Test timeout computed to be: 30
+120/149 Test #481: ai_runtime.lifetime ..............   Passed    0.02 sec
+test 482
+        Start 482: ai_runtime.targets
+
+482: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "targets"
+482: Working Directory: <workspace>/Blood2/build/sanitize/tests
+482: Test timeout computed to be: 30
+121/149 Test #482: ai_runtime.targets ...............   Passed    0.02 sec
+test 483
+        Start 483: ai_runtime.tracking
+
+483: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "tracking"
+483: Working Directory: <workspace>/Blood2/build/sanitize/tests
+483: Test timeout computed to be: 30
+122/149 Test #483: ai_runtime.tracking ..............   Passed    0.02 sec
+test 484
+        Start 484: ai_runtime.camera
+
+484: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "camera"
+484: Working Directory: <workspace>/Blood2/build/sanitize/tests
+484: Test timeout computed to be: 30
+123/149 Test #484: ai_runtime.camera ................   Passed    0.02 sec
+test 485
+        Start 485: ai_runtime.spatial
+
+485: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "spatial"
+485: Working Directory: <workspace>/Blood2/build/sanitize/tests
+485: Test timeout computed to be: 30
+124/149 Test #485: ai_runtime.spatial ...............   Passed    0.02 sec
+test 486
+        Start 486: ai_runtime.triggers
+
+486: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "triggers"
+486: Working Directory: <workspace>/Blood2/build/sanitize/tests
+486: Test timeout computed to be: 30
+125/149 Test #486: ai_runtime.triggers ..............   Passed    0.02 sec
+test 487
+        Start 487: ai_runtime.body
+
+487: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "body"
+487: Working Directory: <workspace>/Blood2/build/sanitize/tests
+487: Test timeout computed to be: 30
+126/149 Test #487: ai_runtime.body ..................   Passed    0.02 sec
+test 488
+        Start 488: ai_runtime.missing
+
+488: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "missing"
+488: Working Directory: <workspace>/Blood2/build/sanitize/tests
+488: Test timeout computed to be: 30
+127/149 Test #488: ai_runtime.missing ...............   Passed    0.02 sec
+test 489
+        Start 489: ai_runtime.catalog
+
+489: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "catalog" "<external-data-root>"
+489: Working Directory: <workspace>/Blood2/build/sanitize/tests
+489: Test timeout computed to be: 90
+489: CultistAI male=1 difficulty=0 hp=7.75 model=Models/Enemies/m_Cultist1.abc
+489: CultistAI male=1 difficulty=1 hp=31 model=Models/Enemies/m_Cultist1.abc
+489: CultistAI male=1 difficulty=2 hp=46.5 model=Models/Enemies/m_Cultist1.abc
+489: CultistAI male=1 difficulty=3 hp=31 model=Models/Enemies/m_Cultist1.abc
+489: CultistAI male=0 difficulty=0 hp=7.75 model=Models/Enemies/f_Cultist1.abc
+489: CultistAI male=0 difficulty=1 hp=31 model=Models/Enemies/f_Cultist1.abc
+489: CultistAI male=0 difficulty=2 hp=46.5 model=Models/Enemies/f_Cultist1.abc
+489: CultistAI male=0 difficulty=3 hp=31 model=Models/Enemies/f_Cultist1.abc
+489: CivilianAI male=1 difficulty=0 hp=7.75 model=Models/Enemies/m_civilian1.abc
+489: CivilianAI male=1 difficulty=1 hp=31 model=Models/Enemies/m_civilian1.abc
+489: CivilianAI male=1 difficulty=2 hp=46.5 model=Models/Enemies/m_civilian1.abc
+489: CivilianAI male=1 difficulty=3 hp=31 model=Models/Enemies/m_civilian1.abc
+489: CivilianAI male=0 difficulty=0 hp=7.75 model=Models/Enemies/f_civilian1.abc
+489: CivilianAI male=0 difficulty=1 hp=31 model=Models/Enemies/f_civilian1.abc
+489: CivilianAI male=0 difficulty=2 hp=46.5 model=Models/Enemies/f_civilian1.abc
+489: CivilianAI male=0 difficulty=3 hp=31 model=Models/Enemies/f_civilian1.abc
+128/149 Test #489: ai_runtime.catalog ...............   Passed    2.21 sec
+test 490
+        Start 490: ai_runtime.failures
+
+490: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "failures" "<external-data-root>"
+490: Working Directory: <workspace>/Blood2/build/sanitize/tests
+490: Test timeout computed to be: 90
+129/149 Test #490: ai_runtime.failures ..............   Passed    0.27 sec
+test 491
+        Start 491: ai_runtime.subway
+
+491: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "subway" "<external-data-root>"
+491: Working Directory: <workspace>/Blood2/build/sanitize/tests
+491: Test timeout computed to be: 90
+491: SubwayA load=0 created=204 unsupported=0 AI_Update=537 pings=20
+491: SubwayA load=1 created=204 unsupported=0 AI_Update=537 pings=20
+130/149 Test #491: ai_runtime.subway ................   Passed   20.79 sec
+test 492
+        Start 492: ai_runtime.arena
+
+492: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "arena" "<external-data-root>"
+492: Working Directory: <workspace>/Blood2/build/sanitize/tests
+492: Test timeout computed to be: 90
+492: Arena state=2 phase=1 updates=522 shots=25 error= player HP=0
+131/149 Test #492: ai_runtime.arena .................   Passed    1.60 sec
+test 493
+        Start 493: ai_runtime.sparse_weapons
+
+493: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "sparse_weapons" "<external-data-root>"
+493: Working Directory: <workspace>/Blood2/build/sanitize/tests
+493: Test timeout computed to be: 90
+493: Sparse IDs 41/27/38/42 and duplicate fifth slot initialized three times through original NPC lifecycle.
+132/149 Test #493: ai_runtime.sparse_weapons ........   Passed    0.59 sec
+test 494
+        Start 494: ai_runtime.clearance_private
+
+494: Test command: <workspace>/Blood2/build/sanitize/tests/ai_runtime_tests "clearance_private" "<external-data-root>"
+494: Working Directory: <workspace>/Blood2/build/sanitize/tests
+494: Test timeout computed to be: 90
+494: SubwayA relocation cycle 0: 8 blocked resizes, 93 original AI shots; no suspended Cultist
+494: SubwayA relocation cycle 1: 8 blocked resizes, 93 original AI shots; no suspended Cultist
+133/149 Test #494: ai_runtime.clearance_private .....   Passed   86.06 sec
+test 495
+        Start 495: ai_hit.geometry
+
+495: Test command: <workspace>/Blood2/build/sanitize/tests/ai_hit_tests "geometry"
+495: Working Directory: <workspace>/Blood2/build/sanitize/tests
+495: Test timeout computed to be: 30
+134/149 Test #495: ai_hit.geometry ..................   Passed    0.03 sec
+test 496
+        Start 496: ai_hit.query
+
+496: Test command: <workspace>/Blood2/build/sanitize/tests/ai_hit_tests "query"
+496: Working Directory: <workspace>/Blood2/build/sanitize/tests
+496: Test timeout computed to be: 30
+135/149 Test #496: ai_hit.query .....................   Passed    0.02 sec
+test 497
+        Start 497: ai_hit.modifiers
+
+497: Test command: <workspace>/Blood2/build/sanitize/tests/ai_hit_tests "modifiers"
+497: Working Directory: <workspace>/Blood2/build/sanitize/tests
+497: Test timeout computed to be: 30
+136/149 Test #497: ai_hit.modifiers .................   Passed    0.03 sec
+test 498
+        Start 498: ai_hit.reactions
+
+498: Test command: <workspace>/Blood2/build/sanitize/tests/ai_hit_tests "reactions"
+498: Working Directory: <workspace>/Blood2/build/sanitize/tests
+498: Test timeout computed to be: 30
+137/149 Test #498: ai_hit.reactions .................   Passed    0.02 sec
+test 499
+        Start 499: ai_hit.recoil
+
+499: Test command: <workspace>/Blood2/build/sanitize/tests/ai_hit_tests "recoil"
+499: Working Directory: <workspace>/Blood2/build/sanitize/tests
+499: Test timeout computed to be: 30
+138/149 Test #499: ai_hit.recoil ....................   Passed    0.02 sec
+test 500
+        Start 500: ai_hit.guards
+
+500: Test command: <workspace>/Blood2/build/sanitize/tests/ai_hit_tests "guards"
+500: Working Directory: <workspace>/Blood2/build/sanitize/tests
+500: Test timeout computed to be: 30
+139/149 Test #500: ai_hit.guards ....................   Passed    0.02 sec
+test 501
+        Start 501: ai_hit.sides
+
+501: Test command: <workspace>/Blood2/build/sanitize/tests/ai_hit_tests "sides"
+501: Working Directory: <workspace>/Blood2/build/sanitize/tests
+501: Test timeout computed to be: 30
+140/149 Test #501: ai_hit.sides .....................   Passed    0.02 sec
+test 502
+        Start 502: ai_hit.lifetime
+
+502: Test command: <workspace>/Blood2/build/sanitize/tests/ai_hit_tests "lifetime"
+502: Working Directory: <workspace>/Blood2/build/sanitize/tests
+502: Test timeout computed to be: 30
+141/149 Test #502: ai_hit.lifetime ..................   Passed    0.02 sec
+test 503
+        Start 503: ai_hit.hidden
+
+503: Test command: <workspace>/Blood2/build/sanitize/tests/ai_hit_tests "hidden"
+503: Working Directory: <workspace>/Blood2/build/sanitize/tests
+503: Test timeout computed to be: 30
+142/149 Test #503: ai_hit.hidden ....................   Passed    0.02 sec
+test 504
+        Start 504: ai_hit.catalog
+
+504: Test command: <workspace>/Blood2/build/sanitize/tests/ai_hit_tests "catalog" "<external-data-root>"
+504: Working Directory: <workspace>/Blood2/build/sanitize/tests
+504: Test timeout computed to be: 90
+504: recoil private error= phase=2 finishes=1 updates=20 clip=21 time=300
+504: CultistAI male=1 hit=2 missing=2 reactions=1 recoil=1 hp=30
+504: recoil private error= phase=2 finishes=1 updates=20 clip=21 time=300
+504: CultistAI male=0 hit=2 missing=2 reactions=1 recoil=1 hp=30
+504: CivilianAI male=1 hit=2 missing=2 reactions=1 recoil=0 hp=30
+504: CivilianAI male=0 hit=2 missing=2 reactions=1 recoil=0 hp=30
+143/149 Test #504: ai_hit.catalog ...................   Passed    0.74 sec
+test 553
+        Start 553: player_restore.roundtrip
+
+553: Test command: <workspace>/Blood2/build/sanitize/tests/player_restore_tests "roundtrip" "<workspace>/Blood2/build/sanitize/tests/player-restore-fixtures/roundtrip"
+553: Working Directory: <workspace>/Blood2/build/sanitize/tests
+553: Test timeout computed to be: 30
+144/149 Test #553: player_restore.roundtrip .........   Passed    0.05 sec
+test 554
+        Start 554: player_restore.failures
+
+554: Test command: <workspace>/Blood2/build/sanitize/tests/player_restore_tests "failures" "<workspace>/Blood2/build/sanitize/tests/player-restore-fixtures/failures"
+554: Working Directory: <workspace>/Blood2/build/sanitize/tests
+554: Test timeout computed to be: 30
+145/149 Test #554: player_restore.failures ..........   Passed    0.08 sec
+test 555
+        Start 555: player_restore.lifetime
+
+555: Test command: <workspace>/Blood2/build/sanitize/tests/player_restore_tests "lifetime" "<workspace>/Blood2/build/sanitize/tests/player-restore-fixtures/lifetime"
+555: Working Directory: <workspace>/Blood2/build/sanitize/tests
+555: Test timeout computed to be: 30
+146/149 Test #555: player_restore.lifetime ..........   Passed    0.08 sec
+test 556
+        Start 556: player_restore.private
+
+556: Test command: <workspace>/Blood2/build/sanitize/tests/player_restore_tests "private" "<external-data-root>"
+556: Working Directory: <workspace>/Blood2/build/sanitize/tests
+556: Test timeout computed to be: 120
+556: cycle=0 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+556: cycle=1 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+556: cycle=2 restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload
+147/149 Test #556: player_restore.private ...........   Passed    6.20 sec
+test 627
+        Start 627: session_playback.policy
+
+627: Test command: <workspace>/Blood2/build/sanitize/tests/session_playback_tests "policy"
+627: Working Directory: <workspace>/Blood2/build/sanitize/tests
+627: Test timeout computed to be: 30
+148/149 Test #627: session_playback.policy ..........   Passed    0.02 sec
+test 628
+        Start 628: session_playback.private
+
+628: Test command: <workspace>/Blood2/build/sanitize/tests/session_playback_tests "private" "<external-data-root>"
+628: Working Directory: <workspace>/Blood2/build/sanitize/tests
+628: Test timeout computed to be: 240
+628: SubwayA entry 0: waited 180 frames without ticking; shooters=1 shots=15 player HP=39.9413
+628: SubwayA entry 1: waited 180 frames without ticking; shooters=1 shots=15 player HP=39.9413
+149/149 Test #628: session_playback.private .........   Passed   39.63 sec
+
+The following tests passed:
+	objects.builtin_model
+	objects.original_objects
+	objects.nested_creation
+	objects.reasons_properties
+	objects.scheduling
+	objects.deferred_removal
+	objects.aggregate_dispatch
+	objects.handles_selection
+	objects.links_lists
+	objects.messages_strings
+	objects.unsupported_teardown
+	objects.creation_failures
+	world.level_change_private
+	ai_state.symbols
+	ai_state.transitions
+	ai_state.commands
+	ai_state.decisions
+	ai_state.civilian
+	ai_state.dispatch
+	ai_state.failures
+	ai_state.lifetime
+	ai_state.catalog
+	ai_state.subway
+	ai_fire.selection
+	ai_fire.clearance
+	ai_fire.filters
+	ai_fire.head
+	ai_fire.aim
+	ai_fire.keys
+	ai_fire.cadence
+	ai_fire.recovery
+	ai_fire.failures
+	ai_fire.lifetime
+	ai_fire.script_stand
+	ai_fire.script_moving
+	ai_fire.script_refusal
+	ai_fire.script_lifetime
+	ai_fire.script_routes
+	ai_fire.catalog
+	ai_fire.subway
+	ai_fire.script_private
+	ai_navigation.sample
+	ai_navigation.clearance
+	ai_navigation.parallel_axes
+	ai_navigation.rays
+	ai_navigation.direct
+	ai_navigation.detour
+	ai_navigation.blocked
+	ai_navigation.limits
+	ai_navigation.lifetime
+	ai_navigation.subway
+	ai_navigation.cityhub_parallel
+	ai_follow.velocity
+	ai_follow.locomotion
+	ai_follow.follow
+	ai_follow.cached
+	ai_follow.moveto
+	ai_follow.actions
+	ai_follow.lifetime
+	ai_follow.failures
+	ai_follow.physics
+	ai_follow.catalog
+	ai_follow.subway
+	ai_script.parsing
+	ai_script.sequencing
+	ai_script.waiting
+	ai_script.animations
+	ai_script.state_target
+	ai_script.movement
+	ai_script.lifetime
+	ai_script.audio
+	ai_script.catalog
+	ai_locomotion.dodge
+	ai_locomotion.rolls
+	ai_locomotion.obstruction
+	ai_locomotion.rays
+	ai_locomotion.navigate
+	ai_locomotion.ledges
+	ai_locomotion.walking
+	ai_locomotion.physics
+	ai_locomotion.moving_fire
+	ai_locomotion.keys
+	ai_locomotion.lifetime
+	ai_locomotion.attacks
+	ai_locomotion.catalog
+	ai_recovery.jump
+	ai_recovery.jump_physics
+	ai_recovery.crouch
+	ai_recovery.crawling
+	ai_recovery.clearance
+	ai_recovery.topos
+	ai_recovery.plans
+	ai_recovery.around
+	ai_recovery.search
+	ai_recovery.lifetime
+	ai_recovery.moving_fire
+	ai_recovery.keys
+	ai_recovery.fire_lifetime
+	ai_recovery.smell_guards
+	ai_recovery.smell_route
+	ai_recovery.smell_lifetime
+	ai_recovery.catalog
+	ai_escape.beg
+	ai_escape.selection
+	ai_escape.facing
+	ai_escape.routes
+	ai_escape.perception
+	ai_escape.hiding
+	ai_escape.guard
+	ai_escape.failures
+	ai_escape.tracking
+	ai_escape.lifetime
+	ai_escape.catalog
+	ai_runtime.activation
+	ai_runtime.animation_clearance
+	ai_runtime.visibility
+	ai_runtime.visibility_filter
+	ai_runtime.visibility_atomic
+	ai_runtime.lifetime
+	ai_runtime.targets
+	ai_runtime.tracking
+	ai_runtime.camera
+	ai_runtime.spatial
+	ai_runtime.triggers
+	ai_runtime.body
+	ai_runtime.missing
+	ai_runtime.catalog
+	ai_runtime.failures
+	ai_runtime.subway
+	ai_runtime.arena
+	ai_runtime.sparse_weapons
+	ai_runtime.clearance_private
+	ai_hit.geometry
+	ai_hit.query
+	ai_hit.modifiers
+	ai_hit.reactions
+	ai_hit.recoil
+	ai_hit.guards
+	ai_hit.sides
+	ai_hit.lifetime
+	ai_hit.hidden
+	ai_hit.catalog
+	player_restore.roundtrip
+	player_restore.failures
+	player_restore.lifetime
+	player_restore.private
+	session_playback.policy
+	session_playback.private
+
+99% tests passed, 1 tests failed out of 149
+
+Label Time Summary:
+ai_escape           =   1.08 sec*proc (11 tests)
+ai_fire             =  27.83 sec*proc (18 tests)
+ai_follow           =   5.05 sec*proc (11 tests)
+ai_hit              =   0.94 sec*proc (10 tests)
+ai_locomotion       =   1.13 sec*proc (13 tests)
+ai_navigation       =  10.73 sec*proc (11 tests)
+ai_recovery         =   1.21 sec*proc (17 tests)
+ai_runtime          = 111.79 sec*proc (19 tests)
+ai_script           =   2.89 sec*proc (9 tests)
+ai_state            =  35.31 sec*proc (11 tests)
+headless            = 266.10 sec*proc (149 tests)
+objects             =   0.29 sec*proc (12 tests)
+player_restore      =   6.40 sec*proc (4 tests)
+private             = 263.05 sec*proc (23 tests)
+session_playback    =  39.64 sec*proc (2 tests)
+world               =  21.80 sec*proc (1 test)
+
+Total Test time (real) = 266.14 sec
+
+The following tests FAILED:
+	369 - ai_state.resize (Failed)                          ai_state headless
+Errors while running CTest
+Output from these tests are in: <workspace>/Blood2/build/sanitize/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

@@ -1,0 +1,124 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  66: weapons.private
+      Start  76: movement.private
+ 1/52 Test  #76: movement.private .................***Timeout  60.09 sec
+
+      Start 128: interaction.catalog
+ 2/52 Test #128: interaction.catalog ..............   Passed   35.85 sec
+      Start  84: locomotion.private
+ 3/52 Test  #84: locomotion.private ...............   Passed   20.34 sec
+      Start  63: weapons.animation
+ 4/52 Test  #63: weapons.animation ................   Passed    0.28 sec
+      Start  70: movement.world_collision
+ 5/52 Test  #70: movement.world_collision .........   Passed    0.29 sec
+      Start  79: locomotion.limits
+ 6/52 Test  #79: locomotion.limits ................   Passed    0.32 sec
+      Start  64: weapons.lifetime
+ 7/52 Test  #64: weapons.lifetime .................   Passed    0.06 sec
+      Start  73: movement.timing
+ 8/52 Test  #73: movement.timing ..................   Passed    0.20 sec
+      Start  67: movement.walking
+ 9/52 Test  #67: movement.walking .................   Passed    0.21 sec
+      Start  10: objects.unsupported_teardown
+10/52 Test  #10: objects.unsupported_teardown .....   Passed    0.04 sec
+      Start  80: locomotion.crouch
+11/52 Test  #80: locomotion.crouch ................   Passed    0.22 sec
+      Start 121: interaction.keys
+12/52 Test #121: interaction.keys .................   Passed    0.13 sec
+      Start  69: movement.collisions
+13/52 Test  #69: movement.collisions ..............   Passed    0.17 sec
+      Start  58: weapons.inventory
+14/52 Test  #58: weapons.inventory ................   Passed    0.04 sec
+      Start  61: weapons.melee
+15/52 Test  #61: weapons.melee ....................   Passed    0.04 sec
+      Start  65: weapons.rollback
+16/52 Test  #65: weapons.rollback .................   Passed    0.04 sec
+      Start  60: weapons.firing
+17/52 Test  #60: weapons.firing ...................   Passed    0.04 sec
+      Start   9: objects.messages_strings
+18/52 Test   #9: objects.messages_strings .........   Passed    0.04 sec
+      Start  59: weapons.segments
+19/52 Test  #59: weapons.segments .................   Passed    0.04 sec
+      Start  62: weapons.damage
+20/52 Test  #62: weapons.damage ...................   Passed    0.04 sec
+      Start  11: objects.creation_failures
+21/52 Test  #11: objects.creation_failures ........   Passed    0.03 sec
+      Start 122: interaction.state
+22/52 Test #122: interaction.state ................   Passed    0.08 sec
+      Start  78: locomotion.world_stairs
+23/52 Test  #78: locomotion.world_stairs ..........   Passed    0.12 sec
+      Start  83: locomotion.contacts
+24/52 Test  #83: locomotion.contacts ..............   Passed    0.12 sec
+      Start  81: locomotion.animations
+25/52 Test  #81: locomotion.animations ............   Passed    0.11 sec
+      Start  77: locomotion.stairs
+26/52 Test  #77: locomotion.stairs ................   Passed    0.10 sec
+      Start  71: movement.support
+27/52 Test  #71: movement.support .................   Passed    0.10 sec
+      Start 123: interaction.geometry
+28/52 Test #123: interaction.geometry .............   Passed    0.07 sec
+      Start  68: movement.jumping
+29/52 Test  #68: movement.jumping .................   Passed    0.09 sec
+      Start   8: objects.links_lists
+30/52 Test   #8: objects.links_lists ..............   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+31/52 Test   #3: objects.reasons_properties .......   Passed    0.02 sec
+      Start   1: objects.original_objects
+32/52 Test   #1: objects.original_objects .........   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+33/52 Test   #5: objects.deferred_removal .........   Passed    0.02 sec
+      Start   7: objects.handles_selection
+34/52 Test   #7: objects.handles_selection ........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+35/52 Test   #2: objects.nested_creation ..........   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+36/52 Test   #6: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   4: objects.scheduling
+37/52 Test   #4: objects.scheduling ...............   Passed    0.02 sec
+      Start 124: interaction.transport
+38/52 Test #124: interaction.transport ............   Passed    0.05 sec
+      Start  72: movement.boundaries
+39/52 Test  #72: movement.boundaries ..............   Passed    0.06 sec
+      Start 119: interaction.use
+40/52 Test #119: interaction.use ..................   Passed    0.04 sec
+      Start  74: movement.lifetime
+41/52 Test  #74: movement.lifetime ................   Passed    0.05 sec
+      Start 127: interaction.player_push
+42/52 Test #127: interaction.player_push ..........   Passed    0.04 sec
+      Start 126: interaction.lifetime
+43/52 Test #126: interaction.lifetime .............   Passed    0.04 sec
+      Start 120: interaction.input
+44/52 Test #120: interaction.input ................   Passed    0.04 sec
+      Start 125: interaction.blocking
+45/52 Test #125: interaction.blocking .............   Passed    0.03 sec
+      Start  82: locomotion.lifetime
+46/52 Test  #82: locomotion.lifetime ..............   Passed    0.05 sec
+      Start  75: movement.controls
+47/52 Test  #75: movement.controls ................   Passed    0.01 sec
+      Start 577: player_controls.keys
+48/52 Test #577: player_controls.keys .............   Passed    0.01 sec
+      Start 578: player_controls.mouse
+49/52 Test #578: player_controls.mouse ............   Passed    0.01 sec
+      Start 579: player_controls.gates
+50/52 Test #579: player_controls.gates ............   Passed    0.01 sec
+      Start 580: player_controls.private
+51/52 Test #580: player_controls.private ..........   Passed   24.94 sec
+52/52 Test  #66: weapons.private ..................   Passed  165.10 sec
+
+98% tests passed, 1 tests failed out of 52
+
+Label Time Summary:
+headless           = 309.92 sec*proc (52 tests)
+interaction        =  36.37 sec*proc (10 tests)
+locomotion         =  21.39 sec*proc (8 tests)
+movement           =  61.27 sec*proc (10 tests)
+objects            =   0.24 sec*proc (11 tests)
+player_controls    =  24.98 sec*proc (4 tests)
+private            = 306.32 sec*proc (5 tests)
+weapons            = 165.67 sec*proc (9 tests)
+
+Total Test time (real) = 165.11 sec
+
+The following tests FAILED:
+	 76 - movement.private (Timeout)                        headless movement private
+Errors while running CTest

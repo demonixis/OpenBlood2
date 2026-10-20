@@ -1,0 +1,309 @@
+{
+  "date": "2026-10-18",
+  "started_utc": "2026-10-17T22:02:07Z",
+  "status": "M2 incomplete; diagnostic note synthesis, no successful original MUSIC service",
+  "blood2_parent": "2b6b6a8fa842d28f920c5135e1dfbc1a32bc8d30",
+  "root_parent": "9ecf6073a06c2b6a4498a98dd034fa504649c21b",
+  "headless": [
+    {
+      "configuration": "debug",
+      "cases": 81,
+      "failures": 0,
+      "junit": "m2-music-sampler-final-debug-tests.xml",
+      "command": "python3 /tmp/b2-sampler-final-check.py debug",
+      "wall_seconds": 52.86
+    },
+    {
+      "configuration": "release",
+      "cases": 81,
+      "failures": 0,
+      "junit": "m2-music-sampler-final-release-tests.xml",
+      "command": "python3 /tmp/b2-sampler-final-check.py release",
+      "wall_seconds": 7.93
+    },
+    {
+      "configuration": "sanitize",
+      "cases": 81,
+      "failures": 0,
+      "junit": "m2-music-sampler-final-sanitize-tests.xml",
+      "command": "python3 /tmp/b2-sampler-final-check.py sanitize",
+      "wall_seconds": 261.74
+    }
+  ],
+  "gpu": [
+    {
+      "configuration": "debug",
+      "cases": 3,
+      "failures": 0,
+      "junit": "m2-music-sampler-debug-gpu.xml",
+      "wall_seconds": 46.05
+    },
+    {
+      "configuration": "final-debug",
+      "cases": 1,
+      "failures": 0,
+      "junit": "m2-music-sampler-final-debug-gpu.xml",
+      "wall_seconds": 5.21
+    },
+    {
+      "configuration": "final-release",
+      "cases": 3,
+      "failures": 0,
+      "junit": "m2-music-sampler-final-release-gpu.xml",
+      "wall_seconds": 11.84
+    }
+  ],
+  "gpu_environment": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+    "SDL_AUDIODRIVER": "dummy",
+    "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+    "backend": "Vulkan"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1"
+  },
+  "private_result": {
+    "bank": "Cabal",
+    "regions": 38,
+    "synthesized_nonzero_midpoint_notes": 33,
+    "refused_destination_2": 5,
+    "velocity": 100,
+    "gate_seconds": 1,
+    "gain": 0.2,
+    "rendered_offline_cursor_comparison": true,
+    "release_cleanup": true
+  },
+  "private_input_hashes": [
+    {
+      "path": "A1/Ancient.dls",
+      "bytes": 2278742,
+      "sha256": "adcd73be00b59acbff6d26f870f1a529d7f13fa04d0a6d010eaf38d7f75e0127"
+    },
+    {
+      "path": "Bloat/bloat.dls",
+      "bytes": 2154634,
+      "sha256": "d10d0e21f0b29b0305046acfde9d2ca6651745847915c0888207cd4eed1e4427"
+    },
+    {
+      "path": "Cabal/Cabal.dls",
+      "bytes": 1836424,
+      "sha256": "06eef25eed6b503c06a97c4ce9e0e56a5700a33f043c53bc19cc6c1cfbcc0ed5"
+    },
+    {
+      "path": "Crudux/crudux.dls",
+      "bytes": 2129488,
+      "sha256": "4a9fdeee91c370b2c3e7b99a19129b30df02f6a42e15d37bf096980b36fa5add"
+    },
+    {
+      "path": "Track1/track1.dls",
+      "bytes": 3054646,
+      "sha256": "c3dfa3c5c0e46b464c08c00e5791753499e0fe41c3b42bb2a1b802de98155f07"
+    }
+  ],
+  "final_code": {
+    "src/engine/dls_sampler.cpp": "79291214919e29d0d9605464daa02d42884082d03cec55d7bb1d81289d038370",
+    "src/engine/dls_sampler.h": "e5d6d89c85aeaad1b5814810c8f31b69d374a518fe52c9823708dc878a1ee9db",
+    "src/engine/audio.cpp": "1c17c2d4eaee96402b26ee2c71432154d189c1d30166f2437f69b58d2f13e960",
+    "src/engine/audio.h": "2bbfb3e581709489f107e591c38e5631c321332acbb08a36316d2bf58faa5a69",
+    "src/app/inspector_world_sounds.cpp": "8f4ebd1e470347535ccbb157a33cdaf1f05311750940bf19a9669a0f1be99802",
+    "src/app/world_sound_smoke.cpp": "4eb171e1a587ab66371806b8602470a05c7aa57d216db2f4a807746352531f9e",
+    "tests/dls_sampler_tests.cpp": "08ade9b0a5bd57c00f84d2aeb32b30af82ccd6674ed48c7dacb439f80a70bc8e"
+  },
+  "format_checked_files": 7,
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "user_readme_sha256_unchanged": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "capture": {
+    "path": "Blood2/build/debug/tests/world-sounds.png",
+    "sha256": "5f7176e6dec641e9198a022497deadf67b39b23467e803e47d518b587853244c",
+    "review": "Diagnostic voice counts and sequence-playback-unavailable text readable; bank tree expandable. Local commercial image not committed."
+  },
+  "initial_failures": [
+    "New test initially linked only the engine, then linked the game archive without using its object boundary; the lifetime test now uses an actual GameSession and unload.",
+    "Initial test edits had a path-case/header/parenthesis error and a pan-related text replacement in the independent pitch oracle; corrected without relaxing numerical tolerances.",
+    "An intermediate Release run paired the updated zero-attack transient assertion with a library built before that correction. Final consistent rebuilds rerun all 81 cases in each configuration."
+  ],
+  "limitations": [
+    "Selected suites only, not all registered project tests",
+    "GPU audio uses dummy output; no human listening validation",
+    "No native macOS/Windows/mobile test for this increment",
+    "No full DLS/MIDI compliance or retail music fidelity claim",
+    "Unknown articulation records, sequence/style/personality scheduling and MUSIC remain unsupported"
+  ],
+  "raw_evidence": [
+    {
+      "file": "m2-music-sampler-debug-build-final.log",
+      "sha256": "045de95559dd9f5efd237f7eba204d2f617ecdf6d749945cfb9250710224db26"
+    },
+    {
+      "file": "m2-music-sampler-debug-build-initial.log",
+      "sha256": "358af8f3266ff76f94831963309260084730f8bff5f61dce878f40d346e4b0fd"
+    },
+    {
+      "file": "m2-music-sampler-debug-build.log",
+      "sha256": "a1d2f1da85671418cb74f8f561f004e86436c648c6d79ce03fc00fa5ad0349a6"
+    },
+    {
+      "file": "m2-music-sampler-debug-build2.log",
+      "sha256": "409dad33c50796f98b1d50a5d97559047bec606cfc6f2e69931f53f3abe319c4"
+    },
+    {
+      "file": "m2-music-sampler-debug-build3.log",
+      "sha256": "dcc0ed3e6a9535a7a2a95df54974684c3cbd8d874d4646e2e1db038ff8440779"
+    },
+    {
+      "file": "m2-music-sampler-debug-build4.log",
+      "sha256": "a7c0df2906a41cab8663b60e4ec0701e185d8150ec7c6f72f840518938a20621"
+    },
+    {
+      "file": "m2-music-sampler-debug-final2-build.log",
+      "sha256": "932db03d1eab89346b9f95c06252ddc4984a2816315e08f448c2620f96002659"
+    },
+    {
+      "file": "m2-music-sampler-debug-final2-focused.log",
+      "sha256": "b51fe7affb22a2ae4b52482d724566e801994d505710132588480e80424e022c"
+    },
+    {
+      "file": "m2-music-sampler-debug-gpu.log",
+      "sha256": "ad3356c3f03a74a9c3747752d202d81f2c3e76b0f4e9e73bf1e5dab3e04c17ff"
+    },
+    {
+      "file": "m2-music-sampler-debug-tests.log",
+      "sha256": "79a93770f426657187eabba3f7d582c8c5c5fcea13c0ecfdc3c1282f7af7facc"
+    },
+    {
+      "file": "m2-music-sampler-final-debug-build-final.log",
+      "sha256": "6ef28ae90b153973554efc455e2ab7fcf5519d7a182df2768e3c21fc43e5307e"
+    },
+    {
+      "file": "m2-music-sampler-final-debug-gpu.log",
+      "sha256": "72c2ca14f029c58d15c78990d0f89b312152bc80c45894412d9bd513a136f913"
+    },
+    {
+      "file": "m2-music-sampler-final-debug-tests.log",
+      "sha256": "4d5b4d97116698b87929c94c09d2f6238aa12d84be847c534c151213405ecc7b"
+    },
+    {
+      "file": "m2-music-sampler-final-release-build-final.log",
+      "sha256": "e03ad39fd7c0413829e79b4eb9db0cfbb6ae2ba35b768e9dd45b8bac0762c3f3"
+    },
+    {
+      "file": "m2-music-sampler-final-release-gpu.log",
+      "sha256": "d252e492bfd07548a8493748cab7d2b4590b722680cf6fe96e9bf7e8bc7cf49c"
+    },
+    {
+      "file": "m2-music-sampler-final-release-tests.log",
+      "sha256": "95be21412c5e9dc9c13f93b454f71ec24c3bf96751a21476231ed36592559d34"
+    },
+    {
+      "file": "m2-music-sampler-final-sanitize-build-final.log",
+      "sha256": "3bafe4f76b9089dc8b4f0299ac47a9fb6f02ced6d86d2b6082befd5d84beb5dc"
+    },
+    {
+      "file": "m2-music-sampler-final-sanitize-tests.log",
+      "sha256": "474e9275c48e3d255659d9bd353a1c6432f91fcc98860bd53450fbc08f390c41"
+    },
+    {
+      "file": "m2-music-sampler-focused-tests.log",
+      "sha256": "2137c4a37933ac0f4ab74dd7b6eced8ce3df88d8297ebb37aa903c0215109303"
+    },
+    {
+      "file": "m2-music-sampler-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-music-sampler-initial-tests.log",
+      "sha256": "fc815a29880a7aef07204d2f0e3821ee2886788417e7ce4972903e73b7e7c883"
+    },
+    {
+      "file": "m2-music-sampler-release-build-final.log",
+      "sha256": "b3259a447a00be8a310cee92081e5a0f273a92a79fbbc3dafc72ad19d6921f87"
+    },
+    {
+      "file": "m2-music-sampler-release-tests.log",
+      "sha256": "2484f688c09df9cf954b30eaadedb704a622a2efc26f504e4f6a866f09fda546"
+    },
+    {
+      "file": "m2-music-sampler-sanitize-build-final.log",
+      "sha256": "c15928d147ab13a49aeda5238ca0c6c35219e1ca2e49b4e36b3608dbcf697519"
+    },
+    {
+      "file": "m2-music-sampler-sanitize-tests.log",
+      "sha256": "c3f08c10e58e35cb09974c5ae0a37af69227afe8f07baa14fd2f737d0cf85b4f"
+    },
+    {
+      "file": "m2-music-sampler-debug-gpu.xml",
+      "sha256": "1f8d5c2a29301ceb4286924851e5b5926fd8d28f8837f7ec6d61ff3c5b164e3c"
+    },
+    {
+      "file": "m2-music-sampler-debug-tests.xml",
+      "sha256": "2d8c45255f4706e07d955fa729b558c9f6d805696dd77012639974e21a8bc158"
+    },
+    {
+      "file": "m2-music-sampler-final-debug-gpu.xml",
+      "sha256": "4a07e6832f9474ce135b8f15c9af39e4c031382660b1d080b922e03adde197f2"
+    },
+    {
+      "file": "m2-music-sampler-final-debug-tests.xml",
+      "sha256": "ef23b461da8d6bc5f9c40a5586fe0f27fd6c32b578dca94734521044e6020f95"
+    },
+    {
+      "file": "m2-music-sampler-final-release-gpu.xml",
+      "sha256": "f59574281b05c37db88066e40121465eb4daeb2320db3f3d373912265ae8968f"
+    },
+    {
+      "file": "m2-music-sampler-final-release-tests.xml",
+      "sha256": "2c401c122c90012c7e10ba1d19414faee3ec33dee09f98c19b35bc16e7739499"
+    },
+    {
+      "file": "m2-music-sampler-final-sanitize-tests.xml",
+      "sha256": "b482f4d9c75672c07a2c8482d380b58b3c4f0d34663fc983d929fa79c1eb69ee"
+    },
+    {
+      "file": "m2-music-sampler-release-tests.xml",
+      "sha256": "20d3ac00ca7aabc086c29ae1eb68f7cbd91ee02e790ac298be8f2051f2c604fd"
+    },
+    {
+      "file": "m2-music-sampler-sanitize-tests.xml",
+      "sha256": "32943e6959995b8e981c2e0d641bc7bee0e7949df4dd6e9e38c0b79cc45e14d7"
+    }
+  ],
+  "implementation_commit": "ee0cd4a78b49d75e050db606bbfb11177265cbcf",
+  "local_markdown_links_checked": 3821,
+  "local_markdown_link_failures": []
+}

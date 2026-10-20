@@ -1,0 +1,21 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 629: player_controls.private
+1/1 Test #629: player_controls.private ..........***Failed    0.57 sec
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Alternate input: hp=100 dead=0 ammo=38 shots=12 before=5
+Death placement failure: blocked corrections=1 distance=10.003 candidate=-73.1721,122.999,-2412.32 polygon=2176 error=Corpse setup failed; incomplete child removed
+private_input:276: corrected_corpses > 0
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+headless           =   0.57 sec*proc (1 test)
+player_controls    =   0.57 sec*proc (1 test)
+private            =   0.57 sec*proc (1 test)
+
+Total Test time (real) =   0.58 sec
+
+The following tests FAILED:
+	629 - player_controls.private (Failed)                  headless player_controls private
+Errors while running CTest

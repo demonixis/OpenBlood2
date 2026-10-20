@@ -1,0 +1,31 @@
+582/582 Testing: session_playback.private
+582/582 Test: session_playback.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/session_playback_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"session_playback.private" start time: Oct 17 00:21 CEST
+Output:
+----------------------------------------------------------
+SubwayA entry 0: waited 180 frames without ticking; shooters=1 shots=15 player HP=39.9175
+SubwayA entry 1: waited 180 frames without ticking; shooters=1 shots=15 player HP=39.9175
+<end of output>
+Test time =  60.04 sec
+----------------------------------------------------------
+Test Passed.
+"session_playback.private" end time: Oct 17 00:22 CEST
+"session_playback.private" time elapsed: 00:01:00
+----------------------------------------------------------
+
+End testing: Oct 17 00:22 CEST
+
+ai_perception =   6.24 sec*proc
+
+ai_runtime =  43.97 sec*proc
+
+headless = 110.54 sec*proc
+
+objects =   0.27 sec*proc
+
+private = 109.90 sec*proc
+
+session_playback =  60.06 sec*proc
+

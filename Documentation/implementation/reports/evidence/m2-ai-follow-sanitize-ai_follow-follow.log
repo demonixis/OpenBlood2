@@ -1,0 +1,14 @@
+378/386 Testing: ai_follow.follow
+378/386 Test: ai_follow.follow
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_follow_tests" "follow"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_follow.follow" start time: Oct 16 12:54 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.follow" end time: Oct 16 12:54 CEST
+"ai_follow.follow" time elapsed: 00:00:00
+----------------------------------------------------------

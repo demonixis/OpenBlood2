@@ -1,0 +1,74 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 831
+    Start 831: gpu.sky_app
+
+831: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--view-world" "--world" "02_cityhub" "--no-inspector" "--frames" "20" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/sky-app.png"
+831: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+831: Test timeout computed to be: 45
+831: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+831: [info] BLOOD2.REZ: detected, 267758913 bytes
+831: [info] SOUND.REZ: detected, 204633068 bytes
+831: [info] BLOOD2P.REZ: detected, 24133434 bytes
+831: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+831: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+831: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+831: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+831: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+831: [info] DAT v56: 1026 source objects, 480 original instances, 100 BSP models
+831: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/sky-app.png
+831: [error] Object simulation step failed (frame=6, delta=1.351476064, time=1.965275072)
+831: [error] Object: fallengrills: Missing named world model
+831: [error] Object: Physics catch-up exceeds 0.5 seconds
+831: [error] Session: Client StartNewWorld load-command excerpt -> CMSG_LOADWORLD (108)
+831: [error] Session: Server LoadWorld read-order excerpt -> fresh single-player settings
+831: [error] Session: REZ exact-path resolution -> DAT v56 structural validation
+831: [error] Session: World properties -> original MID_PRECREATE / MID_INITIALUPDATE
+831: [error] Session: Server PreStartWorld / PostStartWorld entry subset: path data copied; player entry available separately
+831: [error] Session: Server OnClientEnterWorld -> CreatePlayer -> CPlayerObj InitialUpdate/Respawn -> GoToStartPoint
+831: [error] Session: Client OnEnterWorld -> PLAYERINIT_SINGLEPLAYER -> SINGLEPLAYER_INIT -> original attribute/respawn subset
+831: [error] Session: Locomotion/weapon inspection: remaining container/FX and mover classes, full combat, audio and autosave remain unported
+    Test #831: gpu.sky_app ......................***Failed    6.51 sec
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 1026 source objects, 480 original instances, 100 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/sky-app.png
+[error] Object simulation step failed (frame=6, delta=1.351476064, time=1.965275072)
+[error] Object: fallengrills: Missing named world model
+[error] Object: Physics catch-up exceeds 0.5 seconds
+[error] Session: Client StartNewWorld load-command excerpt -> CMSG_LOADWORLD (108)
+[error] Session: Server LoadWorld read-order excerpt -> fresh single-player settings
+[error] Session: REZ exact-path resolution -> DAT v56 structural validation
+[error] Session: World properties -> original MID_PRECREATE / MID_INITIALUPDATE
+[error] Session: Server PreStartWorld / PostStartWorld entry subset: path data copied; player entry available separately
+[error] Session: Server OnClientEnterWorld -> CreatePlayer -> CPlayerObj InitialUpdate/Respawn -> GoToStartPoint
+[error] Session: Client OnEnterWorld -> PLAYERINIT_SINGLEPLAYER -> SINGLEPLAYER_INIT -> original attribute/respawn subset
+[error] Session: Locomotion/weapon inspection: remaining container/FX and mover classes, full combat, audio and autosave remain unported
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+gpu        =   6.51 sec*proc (1 test)
+private    =   6.51 sec*proc (1 test)
+sky        =   6.51 sec*proc (1 test)
+
+Total Test time (real) =   6.52 sec
+
+The following tests FAILED:
+	831 - gpu.sky_app (Failed)                              gpu private sky
+Errors while running CTest

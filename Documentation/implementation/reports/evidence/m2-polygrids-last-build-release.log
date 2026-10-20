@@ -1,0 +1,13 @@
+[0/2] Re-checking globbed directories...
+[1/36] Scanning <workspace>/Blood2/src/app/polygrid_scene.cpp for CXX dependencies
+[2/36] Generating CXX dyndep file tests/CMakeFiles/polygrid_tests.dir/CXX.dd
+[3/35] Scanning <workspace>/Blood2/src/app/polygrid_scene.cpp for CXX dependencies
+[4/35] Scanning <workspace>/Blood2/src/app/polygrid_scene.cpp for CXX dependencies
+[5/35] Generating CXX dyndep file tests/CMakeFiles/polygrid_gpu_tests.dir/CXX.dd
+[6/34] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[7/13] Building CXX object CMakeFiles/blood2_app.dir/src/app/polygrid_scene.cpp.o
+[8/13] Building CXX object tests/CMakeFiles/polygrid_tests.dir/__/src/app/polygrid_scene.cpp.o
+[9/13] Linking CXX executable blood2
+[10/13] Linking CXX executable tests/polygrid_tests
+[11/13] Building CXX object tests/CMakeFiles/polygrid_gpu_tests.dir/__/src/app/polygrid_scene.cpp.o
+[12/13] Linking CXX executable tests/polygrid_gpu_tests

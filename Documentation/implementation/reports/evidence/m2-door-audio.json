@@ -1,0 +1,318 @@
+{
+  "date": "2026-10-17",
+  "status": "Door audio behavior verified; M2 incomplete; sanitizer CTest timeout and exploratory GPU leak failures retained",
+  "baseline_commit": "5520fa7483ad5a7af6a1eb2b800b455eae9018fa",
+  "scope": "Original Door busy/stop attached audio, inspection, whole-suite regression audit and unsuppressed GPU leak attribution",
+  "checks": [
+    {
+      "configuration": "debug",
+      "kind": "all non-GPU tests",
+      "status": "passed",
+      "passed": 853,
+      "total": 853,
+      "command": "ctest --preset debug -E '^gpu\\.' --output-on-failure -j 3",
+      "log": "m2-door-audio-headless-debug.log",
+      "selected_details": "m2-door-audio-detail-debug.log"
+    },
+    {
+      "configuration": "release",
+      "kind": "all non-GPU tests",
+      "status": "passed",
+      "passed": 853,
+      "total": 853,
+      "command": "ctest --preset release -E '^gpu\\.' --output-on-failure -j 3",
+      "log": "m2-door-audio-headless-release.log",
+      "selected_details": "m2-door-audio-detail-release.log"
+    },
+    {
+      "configuration": "debug",
+      "kind": "all NVIDIA GPU tests before smoke timing correction",
+      "status": "91 passed; new gpu.doors assertion failed",
+      "passed": 91,
+      "total": 92,
+      "command": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --preset debug -L gpu -j 1",
+      "log": "m2-door-audio-gpu-debug-initial.log",
+      "detail": "m2-door-audio-gpu-debug-complete-detail.log"
+    },
+    {
+      "configuration": "debug",
+      "kind": "NVIDIA corrected gpu.doors and lifecycle regression",
+      "status": "passed",
+      "passed": 2,
+      "total": 2,
+      "command": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --preset debug -R '^gpu\\.(doors|lifecycle)$' -j 1",
+      "log": "m2-door-audio-gpu-debug-corrected.log",
+      "detail": "m2-door-audio-gpu-debug-corrected-detail.log",
+      "scope": "Only the door smoke assertion/log changed after the full GPU run; no production simulation/render/audio behavior changed."
+    },
+    {
+      "configuration": "release",
+      "kind": "NVIDIA relevant GPU regressions without inspector",
+      "status": "passed",
+      "passed": 8,
+      "total": 8,
+      "command": "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --preset release -R '^gpu\\.(lifecycle|doors|triggers|interaction|objectives|weapons|level_change|train_session)$' -j 1",
+      "log": "m2-door-audio-gpu-release.log",
+      "detail": "m2-door-audio-gpu-release-detail.log"
+    },
+    {
+      "configuration": "sanitize",
+      "kind": "all non-GPU tests with ASan/UBSan and leak checking",
+      "status": "852 passed; ai_runtime.clearance_private timeout at 90.04 seconds",
+      "passed": 852,
+      "total": 853,
+      "command": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -E '^gpu\\.' --output-on-failure -j 3",
+      "log": "m2-door-audio-headless-sanitize.log",
+      "selected_details": "m2-door-audio-detail-sanitize.log",
+      "elapsed_seconds": 1053.55
+    },
+    {
+      "configuration": "sanitize",
+      "kind": "isolated CTest rerun of ai_runtime.clearance_private",
+      "status": "failed: existing 90-second timeout",
+      "passed": 0,
+      "total": 1,
+      "elapsed_seconds": 90.13,
+      "command": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^ai_runtime\\.clearance_private$' --output-on-failure -j 1",
+      "log": "m2-door-audio-clearance-sanitize.log"
+    },
+    {
+      "configuration": "sanitize",
+      "kind": "diagnostic execution of unchanged clearance_private test body",
+      "status": "passed; separate diagnostic, not a passing CTest timeout",
+      "elapsed_seconds": 91.98,
+      "exit_code": 0,
+      "command": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 /usr/bin/time -v timeout 180 build/sanitize/tests/ai_runtime_tests clearance_private '<external-data-root>'",
+      "log": "m2-door-audio-clearance-sanitize-diagnostic.log",
+      "observations": "Two cycles: eight blocked resizes and 93 original AI shots each, no suspended Cultist; all corpse/removal/unload assertions pass; no sanitizer report."
+    },
+    {
+      "kind": "documentation and source integrity",
+      "status": "passed",
+      "reference_files": 10923,
+      "reference_repositories_clean": 6,
+      "markdown_links": 3386,
+      "source_ledger_hashes": "verified",
+      "clang_format": "modified C++ files pass dry-run --Werror",
+      "git_diff_check": "implementation and documentation pass; archived unified patch preserves context whitespace"
+    }
+  ],
+  "gpu_leak_baseline": {
+    "status": "failed, unsuppressed",
+    "world_or_player_loaded": false,
+    "reported_bytes": 44088,
+    "allocations": 816,
+    "attribution": "NVIDIA driver mappings and libdbus via SDL_DBus_Init/driver; historical reused address intervals are explicitly ambiguous",
+    "debug_shutdown_hint": "Same failure; no production hint or suppression added",
+    "log": "m2-door-audio-gpu-leaks.log",
+    "loader": "m2-door-audio-gpu-loader.log",
+    "mapping": "m2-door-audio-gpu-leak-mappings.json",
+    "hint_log": "m2-door-audio-gpu-dbus-shutdown-leaks.log",
+    "command": "LD_DEBUG=files LD_DEBUG_OUTPUT=/tmp/b2-gpu-platform-loader ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy build/sanitize/blood2 --config build/sanitize/tests/empty.ini --data-dir '<external-data-root>' --gpu-smoke --capture build/sanitize/tests/platform-leak.png",
+    "debug_hint_environment": "SDL_SHUTDOWN_DBUS_ON_QUIT=1 (diagnosis only)"
+  },
+  "limits": [
+    "M2 acceptance remains unmet; player MUSIC LEVEL 3 command is explicitly unsupported",
+    "Dry audio; requested reverb and priority are metadata, no arbitration",
+    "Trigger lock/unlock audio and portals remain separate",
+    "Linux NVIDIA/dummy audio checks do not prove human listening or native Metal execution",
+    "Synthetic direct-trigger checks are separate from the continuous authored train route",
+    "The full sanitizer CTest suite retains one 90-second timeout; unchanged test body passes separately in 91.98 seconds. No test timeout or assertions changed."
+  ],
+  "source_integrity": "m2-door-audio-source-integrity.json",
+  "toolchain": {
+    "gcc": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)",
+    "clang": "clang version 22.1.8 (Fedora 22.1.8-4.fc44)",
+    "cmake": "cmake version 4.3.0",
+    "ninja": "1.13.2"
+  },
+  "initial_audit": [
+    {
+      "log": "m2-door-audio-initial-debug.log",
+      "passed": 848,
+      "total": 849,
+      "failure": "exits.catalog old object count; exact live smell trail now verified"
+    },
+    {
+      "log": "m2-door-audio-initial-gpu-debug.log",
+      "passed": 91,
+      "total": 92,
+      "failure": "gpu.objectives timed out under concurrent builds; passed in subsequent complete GPU run with unchanged timeout"
+    },
+    {
+      "log": "m2-door-audio-initial-release.log",
+      "passed": 852,
+      "total": 853,
+      "failure": "player.private obsolete autosave diagnostic; current gate refusal/state now explicitly verified"
+    },
+    {
+      "log": "m2-door-audio-initial-new-tests.log",
+      "failure": "New fixtures used rotating property on sliding class; initial smell drop expectation missed entry drop"
+    },
+    {
+      "log": "m2-door-audio-fixture-refinement.log",
+      "failure": "Initial smell count refinement missed initial entry drop; final tests require both drops and teardown"
+    }
+  ],
+  "observations": [
+    "Seven authored SubwayA hydraulic doors decoded across two world lifetimes",
+    "Both 30 Hz and 60 Hz continuous train routes record 28 decoded Door starts, zero failures and ten Cultist deaths",
+    "Headless tests preserve exact population, attachments, explicit RunWorld refusal and balanced smell list; no behavior weakened",
+    "Audio sampled attachment is compared at the existing pre-motion stage, not the later render pose"
+  ],
+  "patch": {
+    "file": "m2-door-audio.patch",
+    "sha256": "0adde903e636615900c4d33cb6da147562034d4947f5c9a34f8d5861c6b7774f"
+  },
+  "timing_control": {
+    "status": "test body passed, diagnostic control only",
+    "elapsed_seconds": 92.69,
+    "current_elapsed_seconds": 91.98,
+    "exit_code": 0,
+    "log": "m2-door-audio-clearance-control.log",
+    "commands": "m2-door-audio-clearance-control-commands.json",
+    "scope": "Same current test object and libraries/class layout; only Door.cpp relinked from baseline commit, so this is not a complete baseline rebuild. No door playback overhead is demonstrated by this one comparison.",
+    "command": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 /usr/bin/time -v timeout 180 /tmp/b2-door-baseline-control/ai_runtime_tests clearance_private '<external-data-root>'"
+  },
+  "evidence_normalization": {
+    "policy": "Log text keeps all output; trailing terminal whitespace is removed and workspace/external-content prefixes are replaced. No stack addresses, counts, timings or failure messages are omitted. The implementation patch is not normalized. Extra terminal blank lines at EOF are removed.",
+    "files": [
+      {
+        "file": "m2-door-audio-build-debug.log",
+        "before_sha256": "46a73b23ae7fc92b4386c429c952b4a3a8d4e9beedb595a7b064c0d2b402837d",
+        "saved_sha256": "f23341e5b454e0e5d9d02ba48f243e97196b2f09016d0823fd510335224c3fb5"
+      },
+      {
+        "file": "m2-door-audio-build-release.log",
+        "before_sha256": "27c48db82a5260c9377ddc40fb1dd6f0c729ef972c24bd22663363223659a8e1",
+        "saved_sha256": "f3ae3fa6b979349f1316d44a1ca49fc46f0be6ee552a277087d8dc0fda47f34b"
+      },
+      {
+        "file": "m2-door-audio-build-sanitize.log",
+        "before_sha256": "fdf89e52703f7322f4023665186aeb56edd5e503f385f03431f6fc11f7649479",
+        "saved_sha256": "500986dc1ad2efc3dd99a8937ac774bb8bb7a6e1f669a5a7a4672ff4bdc95895"
+      },
+      {
+        "file": "m2-door-audio-clearance-control.log",
+        "before_sha256": "3561cb392de9d6f3e06f4fc3cfab99c2d02bd3f8701f830df41e718731d338d0",
+        "saved_sha256": "e4eba963a21ef64808d8a3bcb0cb45e6cf1bfed139a91dd77276141680a884a6"
+      },
+      {
+        "file": "m2-door-audio-clearance-sanitize-diagnostic.log",
+        "before_sha256": "63c840025fa347dfd1ca1efb3ac81713f4cf2735e946464589e6931ba49c9e89",
+        "saved_sha256": "b785ec1fc984707790194ed29250e0e0249c2230dca4b188e275716c06b84fa5"
+      },
+      {
+        "file": "m2-door-audio-clearance-sanitize.log",
+        "before_sha256": "cb0924e507ad2b1630b9ba8c68c679d1b69314fa6e9143e52f4c69daf2aea0ad",
+        "saved_sha256": "2fd77a8e2ba7e07d16c8557a6d898cca0a4289daaf80a5cb89f4742242b18d42"
+      },
+      {
+        "file": "m2-door-audio-detail-debug.log",
+        "before_sha256": "ff7d1e879fe413aa051504c0ac7d87a4ec7cea66fda2a3c468cf2f2272d73c41",
+        "saved_sha256": "fb5213944885404b310ff36c991bb79e6834a662cc6d2012c689e67f96184d20"
+      },
+      {
+        "file": "m2-door-audio-detail-release.log",
+        "before_sha256": "5a1f6080eed95cb76b4f36b00b3ec76b25faa9b5a9ba853f8b0be7f8e9d33531",
+        "saved_sha256": "39ddb3730d92781decef363132db6b259b04314af682617a308493aaeb043a92"
+      },
+      {
+        "file": "m2-door-audio-detail-sanitize.log",
+        "before_sha256": "75ca237eb6aaf8f34b9485eca26d26d013c65f711d515f277ce5c60ee2473207",
+        "saved_sha256": "c427f851561714a78a9cfe3c6931307f549a67889c492ff154817d2fe319a47f"
+      },
+      {
+        "file": "m2-door-audio-fixture-refinement.log",
+        "before_sha256": "524a9357807aba85e8b0b6ff7e19716fcf8c43801fd8f05b37ef80169d61bc9b",
+        "saved_sha256": "f489f66952ca302c51b7d66643d691d354f720a034bc994b4bc9e81ee6f9f560"
+      },
+      {
+        "file": "m2-door-audio-gpu-dbus-shutdown-leaks.log",
+        "before_sha256": "eac80a76a52a3cd240987549957a49776a6884bcc1955a4d39e92088bbae1829",
+        "saved_sha256": "4b0b1642210bb7bd15cba72f3b86c33842460da7386c035873614434bfd84ced"
+      },
+      {
+        "file": "m2-door-audio-gpu-debug-complete-detail.log",
+        "before_sha256": "ee992d559a3a21c812be1e1bdd8811dee6b431d0372fa14075f7d0bbf62f8f6a",
+        "saved_sha256": "c7ced4a9f23b5d00eef484bf48aa42769c0b0413a88f802f3e1e78e94a7adf45"
+      },
+      {
+        "file": "m2-door-audio-gpu-debug-corrected-detail.log",
+        "before_sha256": "39b994741cd0031b035fd8a8727e7805c8ea7ff3acf21d458e4002a3d38469c4",
+        "saved_sha256": "7e9822c414f8b24a427e21a3039e45487a9b889071ea9fc86f8d3400dbb25535"
+      },
+      {
+        "file": "m2-door-audio-gpu-debug-corrected.log",
+        "before_sha256": "af2c40cb2bfe094eb14e67945a2f0622370f6b0f19f3454578339b1abad48cfc",
+        "saved_sha256": "bda9956c87cb5167ee06b44a621d7f326f94f0bc6da0eb61ddb87f1d7975f0e2"
+      },
+      {
+        "file": "m2-door-audio-gpu-debug-initial.log",
+        "before_sha256": "8b97f175f3843e9e1f8abfce238b5455af615208a724570934cf67ba7b19b1cb",
+        "saved_sha256": "a0641d5f913d605e8d90eda00be83b953ca4a3e1933802cb10b0da42af0f54f4"
+      },
+      {
+        "file": "m2-door-audio-gpu-leaks.log",
+        "before_sha256": "25864452138c2f113e7925c9cd7308b4a8c8aae35e72fa169e490fb6f49531ab",
+        "saved_sha256": "f9a1aeb3d9a0d0b196fdc810cc11dc4a9965b7d07bb02e88dea4e5cb02a67e85"
+      },
+      {
+        "file": "m2-door-audio-gpu-loader.log",
+        "before_sha256": "0b75620a66be3da6c0a57959715b8f981ded4e351d7071d0ebbee9a757296d33",
+        "saved_sha256": "386130c867671bfc6f0b36dce6bc1061aa843a6cbfd9b100045aa6af0b09bb16"
+      },
+      {
+        "file": "m2-door-audio-gpu-release-detail.log",
+        "before_sha256": "0ad5f146d1f2c4125bdc11d4251b35da91fe05e6b0ef1e168c977d60c6a19bf8",
+        "saved_sha256": "ea130323294f475ce2837aa125ae80745c7d92a52978d593402fe043174c0744"
+      },
+      {
+        "file": "m2-door-audio-gpu-release.log",
+        "before_sha256": "ad607d53e98f2230aa6c4fb6e71a57628a1ce47091499ba836a71531aedb47a3",
+        "saved_sha256": "cf05e7044e79d0cb528421cc133603a106868436ef84768f9e8bc478838d90e1"
+      },
+      {
+        "file": "m2-door-audio-headless-debug.log",
+        "before_sha256": "c06666aadcbef839469a24961eb9daafa656c27c871cfb32c92bb9d57df6cfd9",
+        "saved_sha256": "00121fd240e630ec079df408fd997663f49eb42b553bcef462d21a301f094840"
+      },
+      {
+        "file": "m2-door-audio-headless-release.log",
+        "before_sha256": "758fd1df311d7cc6fe0d79e8bbe31b16283dd29c3226c0a1f15579b4348393d2",
+        "saved_sha256": "150236147c23adbcd865e456f66eac366889c9ba4eeb0ed0ef9fdaa182a2a479"
+      },
+      {
+        "file": "m2-door-audio-headless-sanitize.log",
+        "before_sha256": "ec9a459657bf1ab95c45bf4e47884b3aa889dc31938726b8b6d86ed0a974e74c",
+        "saved_sha256": "369877edc43f87069c47f2461274f5c68ceb1ca87e99c6a66b6ffbcc279a7a79"
+      },
+      {
+        "file": "m2-door-audio-initial-debug.log",
+        "before_sha256": "d1c46a5e87f8de7d64b1e90b749c5ede3231c939fdcbcad2685b13764f3679e6",
+        "saved_sha256": "18c0742a9b51deaf7872020818a1a94080ffab52de909353e2f56af286e443f4"
+      },
+      {
+        "file": "m2-door-audio-initial-gpu-debug.log",
+        "before_sha256": "7a860814381dc87b81b832076f2544f91033dc8c1dcb55b3f9f26a810a892e9e",
+        "saved_sha256": "ad25feba18f14de2758468f12648948d855c4e84812d50464771fceefeff7a57"
+      },
+      {
+        "file": "m2-door-audio-initial-new-tests.log",
+        "before_sha256": "580c7805f62c915143e93cdf35d1bb87908a8100820042b7aed0ab62ea82d4aa",
+        "saved_sha256": "59f42a9812fe02d913ba8901222dcc83515c68f02d7ded23f14a3459a4e3307a"
+      },
+      {
+        "file": "m2-door-audio-initial-release.log",
+        "before_sha256": "3cec2e1e2066ad51a8267ca7abd29eacf22adc955d52bf86ba8c66892bd6f107",
+        "saved_sha256": "94c7262826ca7a70c631b328f376c301e8e02f58543f6c80e9faf4758424abb6"
+      },
+      {
+        "file": "m2-door-audio-links.log",
+        "before_sha256": "cb5c12dcd7c5c83247437d6f88ce760909dda7ea8ca410f6c911a811e18bd571",
+        "saved_sha256": "cb5c12dcd7c5c83247437d6f88ce760909dda7ea8ca410f6c911a811e18bd571"
+      }
+    ]
+  },
+  "implementation_commit": "ff631744ca511648e40c30a1be35f0c636dad882"
+}

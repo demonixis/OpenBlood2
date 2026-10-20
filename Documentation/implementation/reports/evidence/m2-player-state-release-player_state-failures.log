@@ -1,0 +1,14 @@
+522/524 Testing: player_state.failures
+522/524 Test: player_state.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/player_state_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/release/tests/player-state-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"player_state.failures" start time: Oct 16 18:36 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.failures" end time: Oct 16 18:36 CEST
+"player_state.failures" time elapsed: 00:00:00
+----------------------------------------------------------

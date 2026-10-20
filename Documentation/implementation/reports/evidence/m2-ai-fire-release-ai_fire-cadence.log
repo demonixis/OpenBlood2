@@ -1,0 +1,14 @@
+379/384 Testing: ai_fire.cadence
+379/384 Test: ai_fire.cadence
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_fire_tests" "cadence"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_fire.cadence" start time: Oct 16 11:37 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_fire.cadence" end time: Oct 16 11:37 CEST
+"ai_fire.cadence" time elapsed: 00:00:00
+----------------------------------------------------------

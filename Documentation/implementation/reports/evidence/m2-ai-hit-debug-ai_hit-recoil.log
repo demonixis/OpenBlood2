@@ -1,0 +1,14 @@
+477/481 Testing: ai_hit.recoil
+477/481 Test: ai_hit.recoil
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_hit_tests" "recoil"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_hit.recoil" start time: Oct 16 15:34 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.recoil" end time: Oct 16 15:34 CEST
+"ai_hit.recoil" time elapsed: 00:00:00
+----------------------------------------------------------

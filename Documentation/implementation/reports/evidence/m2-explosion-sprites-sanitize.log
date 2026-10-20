@@ -1,0 +1,149 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start   1: objects.original_objects
+ 1/65 Test   #1: objects.original_objects .........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+ 2/65 Test   #2: objects.nested_creation ..........   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+ 3/65 Test   #3: objects.reasons_properties .......   Passed    0.02 sec
+      Start   4: objects.scheduling
+ 4/65 Test   #4: objects.scheduling ...............   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+ 5/65 Test   #5: objects.deferred_removal .........   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+ 6/65 Test   #6: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   7: objects.handles_selection
+ 7/65 Test   #7: objects.handles_selection ........   Passed    0.02 sec
+      Start   8: objects.links_lists
+ 8/65 Test   #8: objects.links_lists ..............   Passed    0.02 sec
+      Start   9: objects.messages_strings
+ 9/65 Test   #9: objects.messages_strings .........   Passed    0.04 sec
+      Start  10: objects.unsupported_teardown
+10/65 Test  #10: objects.unsupported_teardown .....   Passed    0.04 sec
+      Start  11: objects.creation_failures
+11/65 Test  #11: objects.creation_failures ........   Passed    0.03 sec
+      Start 183: lights.defaults
+12/65 Test #183: lights.defaults ..................   Passed    0.03 sec
+      Start 184: lights.waves
+13/65 Test #184: lights.waves .....................   Passed    0.02 sec
+      Start 185: lights.commands
+14/65 Test #185: lights.commands ..................   Passed    0.02 sec
+      Start 186: lights.lifetime
+15/65 Test #186: lights.lifetime ..................   Passed    0.02 sec
+      Start 187: lights.damage
+16/65 Test #187: lights.damage ....................   Passed    0.07 sec
+      Start 188: lights.validation
+17/65 Test #188: lights.validation ................   Passed    0.02 sec
+      Start 189: lights.motion
+18/65 Test #189: lights.motion ....................   Passed    0.03 sec
+      Start 190: lights.teardown
+19/65 Test #190: lights.teardown ..................   Passed    0.02 sec
+      Start 191: lights.catalog
+20/65 Test #191: lights.catalog ...................   Passed   17.22 sec
+      Start 227: sprites.reader
+21/65 Test #227: sprites.reader ...................   Passed    0.06 sec
+      Start 228: sprites.clock
+22/65 Test #228: sprites.clock ....................   Passed    0.02 sec
+      Start 229: sprites.properties
+23/65 Test #229: sprites.properties ...............   Passed    0.03 sec
+      Start 230: sprites.placement
+24/65 Test #230: sprites.placement ................   Passed    0.03 sec
+      Start 231: sprites.ray
+25/65 Test #231: sprites.ray ......................   Passed    0.03 sec
+      Start 232: sprites.failures
+26/65 Test #232: sprites.failures .................   Passed    0.04 sec
+      Start 233: sprites.catalog
+27/65 Test #233: sprites.catalog ..................   Passed   33.60 sec
+      Start 234: sprites.subway
+28/65 Test #234: sprites.subway ...................   Passed    3.57 sec
+      Start 235: sceneexplosion.properties
+29/65 Test #235: sceneexplosion.properties ........   Passed    0.04 sec
+      Start 236: sceneexplosion.commands
+30/65 Test #236: sceneexplosion.commands ..........   Passed    0.04 sec
+      Start 237: sceneexplosion.damage
+31/65 Test #237: sceneexplosion.damage ............   Passed    0.04 sec
+      Start 238: sceneexplosion.lifetime
+32/65 Test #238: sceneexplosion.lifetime ..........   Passed    0.04 sec
+      Start 239: sceneexplosion.failures
+33/65 Test #239: sceneexplosion.failures ..........   Passed    0.04 sec
+      Start 240: sceneexplosion.budget
+34/65 Test #240: sceneexplosion.budget ............   Passed    0.06 sec
+      Start 241: sceneexplosion.catalog
+35/65 Test #241: sceneexplosion.catalog ...........   Passed   12.69 sec
+      Start 242: sceneexplosion.subway
+36/65 Test #242: sceneexplosion.subway ............   Passed    3.77 sec
+      Start 293: attachments.root
+37/65 Test #293: attachments.root .................   Passed    0.02 sec
+      Start 294: attachments.nodes
+38/65 Test #294: attachments.nodes ................   Passed    0.02 sec
+      Start 295: attachments.rejects
+39/65 Test #295: attachments.rejects ..............   Passed    0.37 sec
+      Start 296: attachments.lifetime
+40/65 Test #296: attachments.lifetime .............   Passed    0.02 sec
+      Start 297: attachments.held
+41/65 Test #297: attachments.held .................   Passed    0.05 sec
+      Start 298: attachments.missing
+42/65 Test #298: attachments.missing ..............   Passed    0.04 sec
+      Start 299: attachments.catalog
+43/65 Test #299: attachments.catalog ..............   Passed    1.05 sec
+      Start 300: attachments.subway
+44/65 Test #300: attachments.subway ...............   Passed    3.99 sec
+      Start 310: world_view.mesh
+45/65 Test #310: world_view.mesh ..................   Passed    0.01 sec
+      Start 311: world_view.rejects
+46/65 Test #311: world_view.rejects ...............   Passed    0.01 sec
+      Start 312: world_view.camera
+47/65 Test #312: world_view.camera ................   Passed    0.01 sec
+      Start 313: world_view.lifetime
+48/65 Test #313: world_view.lifetime ..............   Passed    0.02 sec
+      Start 314: world_view.subway
+49/65 Test #314: world_view.subway ................   Passed    3.93 sec
+      Start 315: texture.decode
+50/65 Test #315: texture.decode ...................   Passed    0.01 sec
+      Start 316: texture.malformed
+51/65 Test #316: texture.malformed ................   Passed    0.02 sec
+      Start 317: texture.mapping
+52/65 Test #317: texture.mapping ..................   Passed    0.02 sec
+      Start 318: texture.corpus
+53/65 Test #318: texture.corpus ...................   Passed    7.87 sec
+      Start 319: model_view.sample
+54/65 Test #319: model_view.sample ................   Passed    0.02 sec
+      Start 320: model_view.rejects
+55/65 Test #320: model_view.rejects ...............   Passed    0.02 sec
+      Start 321: model_view.weapon_pose
+56/65 Test #321: model_view.weapon_pose ...........   Passed    0.01 sec
+      Start 322: model_view.legacy_pose
+57/65 Test #322: model_view.legacy_pose ...........   Passed    0.02 sec
+      Start 323: model_view.subway
+58/65 Test #323: model_view.subway ................   Passed    3.99 sec
+      Start 512: sprite_view.geometry
+59/65 Test #512: sprite_view.geometry .............   Passed    0.02 sec
+      Start 513: sprite_view.failures
+60/65 Test #513: sprite_view.failures .............   Passed    0.05 sec
+      Start 514: sprite_view.subway
+61/65 Test #514: sprite_view.subway ...............   Passed    4.94 sec
+      Start 515: explosion_sprites.formulas
+62/65 Test #515: explosion_sprites.formulas .......   Passed    0.02 sec
+      Start 516: explosion_sprites.failures
+63/65 Test #516: explosion_sprites.failures .......   Passed    0.04 sec
+      Start 517: explosion_sprites.session
+64/65 Test #517: explosion_sprites.session ........   Passed    0.02 sec
+      Start 518: explosion_sprites.private
+65/65 Test #518: explosion_sprites.private ........   Passed    5.43 sec
+
+100% tests passed, 0 tests failed out of 65
+
+Label Time Summary:
+attachments          =   5.55 sec*proc (8 tests)
+explosion_sprites    =   5.51 sec*proc (4 tests)
+headless             = 103.79 sec*proc (65 tests)
+lights               =  17.44 sec*proc (9 tests)
+model_view           =   4.06 sec*proc (5 tests)
+objects              =   0.25 sec*proc (11 tests)
+private              = 102.05 sec*proc (12 tests)
+sceneexplosion       =  16.69 sec*proc (8 tests)
+sprite_view          =   5.00 sec*proc (3 tests)
+sprites              =  37.38 sec*proc (8 tests)
+texture              =   7.92 sec*proc (4 tests)
+world_view           =   3.99 sec*proc (5 tests)
+
+Total Test time (real) = 103.81 sec

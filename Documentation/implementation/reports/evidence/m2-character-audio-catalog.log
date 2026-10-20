@@ -1,0 +1,87 @@
+282/283 Testing: character_audio.catalog
+282/283 Test: character_audio.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_audio_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"character_audio.catalog" start time: Oct 16 04:49 CEST
+Output:
+----------------------------------------------------------
+sounds/player/footsteps/carpet/leftf.wav frames=7673 rate=22050
+sounds/player/footsteps/carpet/leftm.wav unavailable=Missing or oversized sound resource
+sounds/player/footsteps/carpet/rightf.wav frames=7673 rate=22050
+sounds/player/footsteps/carpet/rightm.wav unavailable=Missing or oversized sound resource
+sounds/player/footsteps/flesh/leftf.wav frames=9956 rate=22050
+sounds/player/footsteps/flesh/leftm.wav frames=9956 rate=22050
+sounds/player/footsteps/flesh/rightf.wav frames=6016 rate=22050
+sounds/player/footsteps/flesh/rightm.wav frames=8841 rate=22050
+sounds/player/footsteps/glass/leftf.wav frames=6662 rate=22050
+sounds/player/footsteps/glass/leftm.wav frames=6662 rate=22050
+sounds/player/footsteps/glass/rightf.wav frames=6662 rate=22050
+sounds/player/footsteps/glass/rightm.wav frames=6662 rate=22050
+sounds/player/footsteps/metal/leftf.wav frames=8851 rate=22050
+sounds/player/footsteps/metal/leftm.wav frames=8851 rate=22050
+sounds/player/footsteps/metal/rightf.wav frames=8851 rate=22050
+sounds/player/footsteps/metal/rightm.wav frames=8825 rate=22050
+sounds/player/footsteps/plastic/leftf.wav frames=7680 rate=22050
+sounds/player/footsteps/plastic/leftm.wav frames=5957 rate=22050
+sounds/player/footsteps/plastic/rightf.wav frames=7680 rate=22050
+sounds/player/footsteps/plastic/rightm.wav frames=6656 rate=22050
+sounds/player/footsteps/stone/leftf.wav frames=6686 rate=22050
+sounds/player/footsteps/stone/leftm.wav frames=6667 rate=22050
+sounds/player/footsteps/stone/rightf.wav frames=6667 rate=22050
+sounds/player/footsteps/stone/rightm.wav frames=6667 rate=22050
+sounds/player/footsteps/terrain/leftf.wav frames=8840 rate=22050
+sounds/player/footsteps/terrain/leftm.wav frames=8951 rate=22050
+sounds/player/footsteps/terrain/rightf.wav frames=8760 rate=22050
+sounds/player/footsteps/terrain/rightm.wav frames=11174 rate=22050
+sounds/player/footsteps/water/leftf.wav frames=8862 rate=22050
+sounds/player/footsteps/water/leftm.wav frames=8916 rate=22050
+sounds/player/footsteps/water/rightf.wav frames=9387 rate=22050
+sounds/player/footsteps/water/rightm.wav frames=8892 rate=22050
+sounds/player/footsteps/wood/leftf.wav frames=6662 rate=22050
+sounds/player/footsteps/wood/leftm.wav frames=6667 rate=22050
+sounds/player/footsteps/wood/rightf.wav frames=6662 rate=22050
+sounds/player/footsteps/wood/rightm.wav frames=6681 rate=22050
+Caleb sound keys=46 footsteps=46 unique_resources=36 decoded=34 missing=2
+Subway surface=0 count=870
+Subway surface=10 count=4
+Subway surface=20 count=1438
+Subway surface=30 count=128
+Subway surface=50 count=32
+Subway surface=80 count=244
+Subway surface=90 count=7
+DAT material / DTX user flags comparisons=2723 matched=2163
+Textures\BlueYellow\Ftrainmap3.dtx baked=0 dtx=20 surfaces=8
+Textures\BlueYellow\nospitting2.dtx baked=0 dtx=20 surfaces=7
+Textures\BlueYellow\pipedetail.dtx baked=0 dtx=20 surfaces=3
+Textures\BlueYellow\posterbugs.dtx baked=0 dtx=90 surfaces=1
+Textures\BlueYellow\posterdogfood.dtx baked=0 dtx=90 surfaces=4
+Textures\BlueYellow\posterdrink.dtx baked=0 dtx=90 surfaces=1
+Textures\BlueYellow\posterdrink2.dtx baked=0 dtx=20 surfaces=3
+Textures\BlueYellow\posterpork.dtx baked=0 dtx=90 surfaces=2
+Textures\BlueYellow\posterpork2.dtx baked=0 dtx=20 surfaces=4
+Textures\BlueYellow\posterroids.dtx baked=0 dtx=90 surfaces=2
+Textures\BlueYellow\postersausage.dtx baked=0 dtx=90 surfaces=3
+Textures\BlueYellow\postersausage2.dtx baked=0 dtx=20 surfaces=4
+Textures\Greys\bridgedeck.dtx baked=0 dtx=20 surfaces=4
+Textures\Greys\dirtyglass.dtx baked=0 dtx=50 surfaces=31
+Textures\Greys\dull1.dtx baked=0 dtx=20 surfaces=355
+Textures\Greys\rivets2.dtx baked=0 dtx=20 surfaces=17
+Textures\Greys\subdoors3.dtx baked=0 dtx=20 surfaces=42
+Textures\Greys\trainwheels.dtx baked=0 dtx=20 surfaces=5
+Textures\Reds\emergency1.dtx baked=0 dtx=20 surfaces=4
+Textures\Reds\emergency3.dtx baked=0 dtx=20 surfaces=5
+Textures\Reds\firearms.dtx baked=0 dtx=20 surfaces=7
+Textures\Reds\init69.dtx baked=0 dtx=30 surfaces=2
+Textures\Reds\nosmoking.dtx baked=0 dtx=90 surfaces=12
+Textures\Reds\rules.dtx baked=0 dtx=20 surfaces=1
+Textures\Reds\stop.dtx baked=0 dtx=20 surfaces=1
+Textures\Reds\subcar1.dtx baked=0 dtx=20 surfaces=18
+Textures\Reds\subcar4.dtx baked=0 dtx=20 surfaces=8
+Textures\Reds\subdoors.dtx baked=0 dtx=20 surfaces=6
+<end of output>
+Test time =   0.35 sec
+----------------------------------------------------------
+Test Passed.
+"character_audio.catalog" end time: Oct 16 04:49 CEST
+"character_audio.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

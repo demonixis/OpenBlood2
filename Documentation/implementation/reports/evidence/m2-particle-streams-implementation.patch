@@ -1,0 +1,1747 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index c16efca..51e6e40 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -556,3 +556,5 @@ The [Metal shader continuation](../Documentation/Implementation/M2_METAL.md) pac
+ The [safe NEW_LEVEL continuation](../Documentation/Implementation/M2_LEVEL_CHANGE.md) promotes a prepared destination with the supported player and a new client, retaining the source on refusal. Read [contracts](docs/LEVEL_CHANGE_CONTRACTS.md). Preserve the owning frame boundary, seven list/count pairs, active camera, five AI table owners, destruction under each owning adapter, type-1 key removal and monotonic revisions. Never move a GameSession or replay source state as rollback. Clear old UI/input identities; transfer only audio output, not source voices. CityHub still rejects 18 unsupported/one failed entry; M2 stays open. The user confirms macOS execution, but automated Apple coverage is pending. Intermittent frozen dead Cultists blocking the train (including later enemies) remain a priority after this increment; existing deterministic checks do not establish a fix.
+ 
+ The [corpse doorway correction](../Documentation/Implementation/M2_CORPSE_CLEARANCE.md) addresses a reproduced frozen dead Cultist by adding checked source-center separation and swept living-body clearance to initial corpse placement. Original dimensions and bounded failures remain intact; in-game inspection records the extra sweep. Read [the clearance contracts](docs/CORPSE_CLEARANCE_CONTRACTS.md) before extending this policy. This does not certify every later enemy or close M2.
++
++The [authored particle-stream continuation](../Documentation/Implementation/M2_PARTICLE_STREAMS.md) connects original CClientParticleStreamSFX/CParticleStreamFX toggles, ramps, particles and inspection. Read [contracts](docs/PARTICLE_STREAM_CONTRACTS.md). Preserve strict burst deadlines, original red-derived colors, moving system origins, publish-before-filter order and checked owner lifetime. The original client never reads the server sound tail; do not invent playback. Limits fail explicitly. CityHub is now 443 created / 31 transferred sounds / 541 editor-only / 10 unsupported / one failed; NEW_LEVEL still refuses and M2 remains open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7bd1e17..a07f4be 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index 911a20c..9336e8d 100644
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,8 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
+-The [safe NEW_LEVEL continuation](../Documentation/Implementation/M2_LEVEL_CHANGE.md) prepares an isolated destination, restores the supported player and client, then replaces ownership at a frame boundary. Failed preparation retains the current session. Real SubwayA transfers and NVIDIA rendering/audio are tested; CityHub still refuses with 18 unsupported and one failed entry. M2 remains incomplete; earlier blanket transfer omissions below are historical.
++The [authored particle-stream continuation](../Documentation/Implementation/M2_PARTICLE_STREAMS.md) connects original server toggles and client ramps, current-owner emission and SDL_GPU particle rendering, with inspection. All eight CityHub streams create; the level now has 443 created / 31 transferred sounds / 541 editor-only / 10 unsupported / one failed entry. Original unread sound fields remain metadata. CityHub NEW_LEVEL still refuses; M2 remains incomplete.
++
++The [safe NEW_LEVEL continuation](../Documentation/Implementation/M2_LEVEL_CHANGE.md) prepares an isolated destination, restores the supported player and client, then replaces ownership at a frame boundary. Failed preparation retains the current session. Real SubwayA transfers and NVIDIA rendering/audio are tested; CityHub now refuses with 10 unsupported and one failed entry after the particle-stream continuation. M2 remains incomplete; earlier blanket transfer omissions below are historical.
+ 
+ The [Metal shader continuation](../Documentation/Implementation/M2_METAL.md) removes Vulkan-only world entry by bundling SDL_shadercross-generated MSL for world/model/FX rendering. Shader tools remain optional and offline. Linux NVIDIA validation is recorded; the user confirmed macOS execution on 17 October, with native automated coverage still pending. M2 stays incomplete.
+ 
+diff --git a/docs/M2_PARTICLE_STREAM_SOURCES.json b/docs/M2_PARTICLE_STREAM_SOURCES.json
+new file mode 100644
+index 0000000..02590d1
+--- /dev/null
++++ b/docs/M2_PARTICLE_STREAM_SOURCES.json
+@@ -0,0 +1,50 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "e55601320386d604546367cca6402a69f33d0647",
++  "status": "M2 incomplete; selected original authored streams",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/ClientParticleStreamSFX.cpp",
++      "sha256": "1471bf63a677a68dbfa7ea6efb909dcf45a2cf2c1ae231cc840ea9aa2b7b287f",
++      "purpose": "Original defaults, property reading, initial flags, trigger prefixes and server sound tail."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ClientParticleStreamSFX.h",
++      "sha256": "358b38ee00eaff5fd975cdd048b2ddbce7affbf582cc7c1e3ea61c6831594436",
++      "purpose": "Original state fields and string ownership; owned values replace strings."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/ParticleStreamFX.cpp",
++      "sha256": "3ee43cbf08fda7abc3697cd9b6b8811f3fed9bde7bd82cd3af5d3556007404c0",
++      "purpose": "Original Init/CreateObject/Update/AddParticles, state transitions and RNG order."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/ParticleStreamFX.h",
++      "sha256": "e516dc9b20acbc5f16a526c97f679fa41f6572c6743b3817f81b38058c2edf40",
++      "purpose": "Original settings, states, ramp flags; uninitialized clocks set to zero."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
++      "sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13",
++      "purpose": "Identity system rotation, radius/640 and exact color range formula."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
++      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
++      "purpose": "PARTICLESTREAM delivery reads only through texture; sound tail never reaches client."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/SpecialFX.h",
++      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
++      "purpose": "Original .001 second effect cadence."
++    }
++  ],
++  "adaptations": [
++    "Typed value-owned descriptor replaces packet/HSTRING ownership.",
++    "World creation only; unsupported creation reasons reject explicitly.",
++    "Deterministic zero clocks and zero-vector normalization, checked bounded numeric/resource budgets.",
++    "Existing replacement particle integration and SDL_GPU alpha billboards; independent RNG.",
++    "Original sound tail remains unconsumed client metadata."
++  ],
++  "original_reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95"
++}
+diff --git a/docs/PARTICLE_STREAM_CONTRACTS.md b/docs/PARTICLE_STREAM_CONTRACTS.md
+new file mode 100644
+index 0000000..db686c6
+--- /dev/null
++++ b/docs/PARTICLE_STREAM_CONTRACTS.md
+@@ -0,0 +1,89 @@
++# Original authored particle streams
++
++Selected original `CClientParticleStreamSFX` and `CParticleStreamFX` now execute
++through an owned typed descriptor and the existing particle/billboard services.
++See [provenance](M2_PARTICLE_STREAM_SOURCES.json) and
++[validation](../../Documentation/Implementation/M2_PARTICLE_STREAMS.md).
++**M2 remains incomplete.** CityHub still has ten unsupported entries and one
++missing world model; its NEW_LEVEL transition continues to refuse safely.
++
++## Source rules
++
++World-file creation reads the original registration defaults and authored values.
++Initial update disables server scheduling, clears gravity, sets FORCECLIENTUPDATE
++and SAVEABLE, and publishes the effect before inherited difficulty filtering.
++USRFLG_VISIBLE alone controls emission. The server's whole command uses
++case-sensitive prefix comparisons: TOGGLE (six characters), ON (two), OFF (three).
++Unknown commands still reapply the current state. The copied trigger string is
++released exactly once. Source strings become owned values, without packet ABI or
++borrowed client pointers. Runtime/string/save creation rejects explicitly because
++the original only initializes these fields on world-file creation.
++
++An initially enabled stream starts directly in state 2 and emits immediately;
++it does not ramp up. An initially disabled stream starts empty. Client states are
++0 off, 1 ramp up, 2 on, 3 ramp down. Visibility reversals reset trigger time and
++restart a whole ramp. Zero ramp time switches immediately. Ramp completion is
++checked only when a burst is due, using strict `time > last_add + delay`.
++No catch-up loop is added. Off and completed ramp-down leave last-add unchanged.
++A zero-count ramp burst still advances last-add. Amount truncates toward zero;
++offset, velocity/spread and lifetime scale only under their respective four bits.
++
++Each particle draws lifetime, X/Y/Z offset, X/Y/Z spread, speed, then red color.
++Velocity is normalized (forward * maxVelocity + spread) * sampled speed. The
++original BaseParticleSystemFX color formula clamps negative channel ranges to
++zero, samples red, then uses rangeY*red/rangeX and rangeZ*red/rangeX **without adding
++the minimum green/blue**. If the red range is zero, the complete minimum color is
++used, including CityHub's always-yellow spark particles. RGB is normalized and
++saturated for the existing renderer. The independent seeded RNG preserves this
++local sequence, not the retail global RNG.
++
++The system translates with its current checked owner. Existing particles retain
++local offsets and world-oriented velocities; owner rotation only changes new
++emission directions. System rotation stays identity. Positive gravity increases
++Y velocity. Existing particles age even when off; removing the owner destroys
++the entire system. Rendering/inspection never advance simulation. System alpha
++is constant; no invented per-particle fade, collision, damage or lighting exists.
++
++The original server writes SoundRadius and three sound strings, but the original
++SFXMgr PARTICLESTREAM branch stops reading after ParticleFile. Consequently no
++sound reaches this client effect. Preserve and inspect the unused tail; do not
++claim playback or invent a sound path. Texture precaching is replaced by checked
++external DTX loading. An empty authored texture remains a failure.
++
++## Engine adaptations and lifetime
++
++Uninitialized original trigger/last-add clocks are initialized to zero. A zero
++velocity vector remains zero instead of normalizing into non-finite values. These
++are explicit deterministic portability adaptations. Other numeric fields,
++coordinates, rotations, resource names and clocks are checked before use.
++
++One source has at most one effect. Limits are 128 systems, 256 particles per burst,
++2048 per system, 8192 across streams, 600-second lifetime/ramp/delay and bounded
++positions/velocities. Burst capacity is checked before allocation/random draws.
++Failures retain named reports and fail creation or the session update; no silent
++particle truncation or success-shaped empty effect is substituted. Reports retain
++the latest 128 deliveries and their failure/removal state; the latest update error
++also survives report eviction. IDs are not reused on reload.
++
++The shared particle integrator preserves lifetime-first, position-before-gravity,
++strict negative-lifetime removal, with a maximum 60-second step. The separate
++original effect cadence is 1 ms, at most one callback per session step. These are
++replacement engine policies, not verified retail physics/raster equivalence.
++
++Pending/deleted owner handles never render, and the next simulation update removes
++their effects. Difficulty filtering retains original publish-before-filter order;
++the filtered owner cannot keep particles alive. World unload clears effects,
++reports and random state. Session isolation/NEW_LEVEL preserves source-owned arrays
++and destroys candidates under their own adapter. Initial destination validation
++also counts stream textures against its shared image budget, including off streams.
++The existing global sprite mesh limit remains 16384 quads, with explicit overflow.
++
++## Inspection
++
++The Scene explosions panel includes an Original particle streams tree with owner
++identity, live/user visibility, off/ramping/on state, emission clocks, bounds,
++resources, authored sound tail, emitted/live/prepared counts and every particle's
++position/velocity/lifetime/color. General object properties expose all original
++fields and difficulty settings. Named failures survive object deletion. Hidden UI
++and inspector-free builds run the same simulation; presentation counters indicate
++prepared geometry, not GPU visibility or gameplay success.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index d934038..8e315aa 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -965,3 +965,11 @@ pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.
+ ## Playtest input and Cultist combat correction
+ 
+ [Source ledger](M2_PLAYTEST_INPUT_SOURCES.json) records original CultistAI::AI_STATE_Dodge and AI_Mgr::CalculateDodge/MC_Roll_Left/Right. Typed queries, undefined-input failures and checked lifetime are adaptations; mouse ownership and alternative-axis corpse placement are new engine/application policy. See [contracts](PLAYTEST_INPUT_CONTRACTS.md). Original fire/damage and commercial content remain unchanged.
++
++## Original authored particle streams
++
++`CClientParticleStreamSFX` and `CParticleStreamFX` are selective imports from the
++original Blood II baseline, with typed ownership, checked resources and the existing
++particle renderer. See [source hashes](M2_PARTICLE_STREAM_SOURCES.json) and
++[contracts](PARTICLE_STREAM_CONTRACTS.md). Original ramp/color/trigger rules and the
++unread audio tail are retained. CityHub still refuses NEW_LEVEL; M2 is incomplete.
+diff --git a/src/app/inspector_scene_explosions.cpp b/src/app/inspector_scene_explosions.cpp
+index 0a68240..522a94f 100644
+--- a/src/app/inspector_scene_explosions.cpp
++++ b/src/app/inspector_scene_explosions.cpp
+@@ -131,6 +131,68 @@ namespace OpenBlood2
+             }
+             ImGui::PopID();
+         }
++        const auto& streams = game.server.particle_streams;
++        if (ImGui::CollapsingHeader("Original particle streams"))
++        {
++            if (!streams.update_error.empty())
++                ImGui::TextWrapped("Latest update failure: %s", streams.update_error.c_str());
++            ImGui::Text("%zu systems / %zu particles / %llu started / %llu removed / %llu failed",
++                        streams.active.size(), streams.particle_count(), (unsigned long long)streams.started,
++                        (unsigned long long)streams.expired, (unsigned long long)streams.failed);
++            for (const auto& instance : streams.active)
++            {
++                const auto& fx = instance.effect;
++                const auto* owner = game.objects.get(instance.owner);
++                ImGui::PushID((int)fx.id);
++                if (ImGui::TreeNode("Stream", "%s / stream %llu / state %u",
++                                    owner ? owner->state.m_Name : "removed owner", (unsigned long long)fx.id, fx.state))
++                {
++                    ImGui::Text("Owner alive %s / visible flag %s / %zu particles / %llu bursts / %llu emitted",
++                                owner && owner->life == Life::Alive ? "yes" : "no",
++                                owner && (owner->user_flags & 1) ? "on" : "off", fx.particles.size(),
++                                (unsigned long long)fx.bursts, (unsigned long long)fx.emitted);
++                    ImGui::Text("Origin %.1f %.1f %.1f / direction %.3f %.3f %.3f", fx.position.x, fx.position.y,
++                                fx.position.z, fx.direction.x, fx.direction.y, fx.direction.z);
++                    ImGui::Text("Last burst %.3f / delay %.3f / trigger %.3f / ramp %.3f flags %u", fx.last_add,
++                                fx.settings.delay, fx.trigger_time, fx.settings.ramp_time, fx.settings.ramp_flags);
++                    ImGui::TextWrapped("%s / half-size %.3f / alpha %.3f / gravity %.2f", fx.texture.c_str(),
++                                       fx.settings.radius / 640.f, fx.settings.alpha, fx.settings.gravity);
++                    ImGui::Text("Count %u / offset %.2f / velocity %.2f..%.2f / spread %.2f / life %.2f..%.2f",
++                                fx.settings.count, fx.settings.position_radius, fx.settings.min_velocity,
++                                fx.settings.max_velocity, fx.settings.spread, fx.settings.min_life,
++                                fx.settings.max_life);
++                    unsigned prepared = 0;
++                    if (sprite_view)
++                        for (const auto& e : sprite_view->entries)
++                            if (e.stream_system == fx.id)
++                            {
++                                prepared += e.range != UINT32_MAX && e.error.empty();
++                                if (!e.error.empty())
++                                    ImGui::TextWrapped("%s", e.error.c_str());
++                            }
++                    ImGui::Text("Prepared quads %u (presentation only)", prepared);
++                    ImGui::TextWrapped("Original SFXMgr does not read this stream's sound tail (radius %.1f):",
++                                       fx.settings.sound_radius);
++                    for (const auto& sound : fx.settings.sounds)
++                        ImGui::TextWrapped("%s", sound.empty() ? "(empty)" : sound.c_str());
++                    if (ImGui::TreeNode("Particles"))
++                    {
++                        for (const auto& p : fx.particles)
++                            ImGui::Text(
++                                "Local %.2f %.2f %.2f / velocity %.2f %.2f %.2f / life %.3f / RGB %.3f %.3f %.3f",
++                                p.position.x, p.position.y, p.position.z, p.velocity.x, p.velocity.y, p.velocity.z,
++                                p.lifetime, p.color.x, p.color.y, p.color.z);
++                        ImGui::TreePop();
++                    }
++                    ImGui::TreePop();
++                }
++                ImGui::PopID();
++            }
++            for (const auto& r : streams.reports)
++                if (!r.error.empty() || r.removed)
++                    ImGui::TextWrapped("%s / stream %llu / %s", r.source.c_str(), (unsigned long long)r.id,
++                                       r.error.empty() ? "owner removed" : r.error.c_str());
++        }
+         const auto& flames = game.server.explosion_flames;
+         ImGui::Text("Explosion flames: %zu systems / %zu particles / %llu started / %llu expired / %llu failed",
+                     flames.active.size(), flames.live_particles(), (unsigned long long)flames.started,
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 720f4a1..0cc2424 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -81,8 +81,8 @@ namespace OpenBlood2
+         const auto trial_before = g.destination_trial.attempts;
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+-            !g.destination_trial.player_entered || g.destination_trial.created != 435 ||
+-            g.destination_trial.unknown != 18 || g.destination_trial.failed != 1 ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 443 ||
++            g.destination_trial.unknown != 10 || g.destination_trial.failed != 1 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+@@ -100,8 +100,8 @@ namespace OpenBlood2
+                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
+                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+                g.destination_inspection.source_revision == old_revision &&
+-               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 467 &&
+-               g.destination_inspection.unknown == 18 && g.destination_inspection.invalid == 0 &&
++               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 475 &&
++               g.destination_inspection.unknown == 10 && g.destination_inspection.invalid == 0 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/app/sprite_scene.cpp b/src/app/sprite_scene.cpp
+index 3c1a11a..eb2e70a 100644
+--- a/src/app/sprite_scene.cpp
++++ b/src/app/sprite_scene.cpp
+@@ -81,6 +81,21 @@ namespace OpenBlood2
+                 scene.entries.back().object_effect = fx.id;
+             }
+         }
++        for (const auto& instance : game.server.particle_streams.active)
++        {
++            if (!game.objects.get(instance.owner) || game.objects.get(instance.owner)->life != Life::Alive)
++                continue;
++            const auto& fx = instance.effect;
++            for (unsigned i = 0; i < fx.particles.size(); ++i)
++            {
++                const auto& p = fx.particles[i];
++                if (!scene.add_particle(fx.texture, vector_add(fx.position, p.position), fx.settings.radius / 640.f,
++                                        p.color, fx.settings.alpha, fx.id, i, game.resources, error))
++                    return false;
++                scene.entries.back().particle_system = 0;
++                scene.entries.back().stream_system = fx.id;
++            }
++        }
+         scene.sort();
+         return true;
+     }
+diff --git a/src/engine/sprite_view.h b/src/engine/sprite_view.h
+index 544f467..5c888b1 100644
+--- a/src/engine/sprite_view.h
++++ b/src/engine/sprite_view.h
+@@ -13,7 +13,7 @@ namespace OpenBlood2
+         std::uint32_t range = UINT32_MAX;
+         float alpha = 1;
+         std::uint64_t client_effect = 0, particle_system = 0, trail_system = 0, flame_system = 0, weapon_effect = 0,
+-                      object_effect = 0;
++                      object_effect = 0, stream_system = 0;
+         unsigned particle_index = 0;
+     };
+     // Read-only presentation snapshot: owned textures/values, never a retained game pointer.
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index f9dc12b..9814cbb 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -34,7 +34,8 @@ class CSBase
+ namespace OpenBlood2
+ {
+     struct WeaponSpriteSettings;
+-}
++    struct ParticleStreamSettings;
++} // namespace OpenBlood2
+ class PathMgr;
+ class ServerDE : public CSBase
+ {
+@@ -76,6 +77,7 @@ class ServerDE : public CSBase
+     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount, unsigned started = 0,
+                                         unsigned failed = 0) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
++    virtual std::uint64_t PublishParticleStream(HOBJECT, const OpenBlood2::ParticleStreamSettings&, std::string&) = 0;
+     virtual std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) = 0;
+     virtual std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&) = 0;
+     virtual std::uint64_t PublishExplosionFragments(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+diff --git a/src/game/level_change.cpp b/src/game/level_change.cpp
+index f7059a6..96ae40b 100644
+--- a/src/game/level_change.cpp
++++ b/src/game/level_change.cpp
+@@ -99,6 +99,9 @@ namespace OpenBlood2
+                         if (!image(frame))
+                             return false;
+             }
++            for (const auto& instance : game.server.particle_streams.active)
++                if (game.server.IsObjectAlive(instance.owner) && !image(instance.effect.texture))
++                    return false;
+             // First-person models are client-owned, outside the server object table.
+             for (const auto& weapon : game.client_shell.weapons)
+                 if (weapon.model)
+diff --git a/src/game/original/ClientParticleStreamSFX.cpp b/src/game/original/ClientParticleStreamSFX.cpp
+new file mode 100644
+index 0000000..695140a
+--- /dev/null
++++ b/src/game/original/ClientParticleStreamSFX.cpp
+@@ -0,0 +1,88 @@
++// Selected original ObjectDLL/ClientParticleStreamSFX.cpp. See PARTICLE_STREAM_CONTRACTS.md.
++#include "ClientParticleStreamSFX.h"
++using namespace OpenBlood2;
++bool CClientParticleStreamSFX::ReadProp()
++{
++    GenericProp p;
++    auto real = [&](const char* name, float& value)
++    {
++        if (g_pServerDE->GetPropGeneric(name, &p) == DE_OK)
++            value = p.m_Float;
++    };
++    real("SystemRadius", settings.radius);
++    real("PositionRadius", settings.position_radius);
++    real("MinVelocity", settings.min_velocity);
++    real("MaxVelocity", settings.max_velocity);
++    real("VelSpread", settings.spread);
++    real("SystemAlpha", settings.alpha);
++    real("MinLifetime", settings.min_life);
++    real("MaxLifetime", settings.max_life);
++    real("RampTime", settings.ramp_time);
++    real("AddDelay", settings.delay);
++    real("Gravity", settings.gravity);
++    real("SoundRadius", settings.sound_radius);
++    if (g_pServerDE->GetPropGeneric("NumParticles", &p) == DE_OK)
++        settings.count = unsigned(p.m_Long);
++    if (g_pServerDE->GetPropGeneric("MinColor", &p) == DE_OK)
++        settings.min_color = p.m_Color;
++    if (g_pServerDE->GetPropGeneric("MaxColor", &p) == DE_OK)
++        settings.max_color = p.m_Color;
++    if (g_pServerDE->GetPropGeneric("InitiallyOn", &p) == DE_OK)
++        settings.on = p.m_Bool;
++    if (g_pServerDE->GetPropGeneric("ParticleFile", &p) == DE_OK)
++        settings.texture = p.m_String;
++    const char* flags[]{"RampAmount", "RampOffset", "RampVelocity", "RampLifetime"};
++    const char* sounds[]{"RampUpSound", "LoopSound", "RampDownSound"};
++    settings.ramp_flags = 0;
++    for (unsigned i = 0; i < 4; ++i)
++        if (g_pServerDE->GetPropGeneric(flags[i], &p) == DE_OK && p.m_Bool)
++            settings.ramp_flags |= 1u << i;
++    for (unsigned i = 0; i < 3; ++i)
++        if (g_pServerDE->GetPropGeneric(sounds[i], &p) == DE_OK)
++            settings.sounds[i] = p.m_String;
++    return valid_particle_stream(settings);
++}
++DDWORD CClientParticleStreamSFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (!g_pServerDE)
++        return 0;
++    if (message == MID_PRECREATE)
++    {
++        // Source only initialized its fields for world-file creation. Reject other reasons explicitly.
++        if (!data || reason != PRECREATE_WORLDFILE || !ReadProp())
++            return 0;
++    }
++    else if (message == MID_INITIALUPDATE)
++    {
++        g_pServerDE->SetNextUpdate(m_hObject, 0);
++        g_pServerDE->SetObjectFlags(m_hObject,
++                                    (g_pServerDE->GetObjectFlags(m_hObject) & ~FLAG_GRAVITY) | FLAG_FORCECLIENTUPDATE);
++        auto flags = g_pServerDE->GetObjectUserFlags(m_hObject) | 8u;
++        flags = settings.on ? flags | 1u : flags & ~1u;
++        g_pServerDE->SetObjectUserFlags(m_hObject, flags);
++        effect = g_pServerDE->PublishParticleStream(m_hObject, settings, error);
++        if (!effect)
++            g_pServerDE->RemoveObject(m_hObject);
++    }
++    return CClientSFX::EngineMessageFn(message, data, reason);
++}
++DDWORD CClientParticleStreamSFX::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    if (message == 1000)
++    {
++        const auto text = g_pServerDE->ReadFromMessageHString(read);
++        const auto* value = g_pServerDE->GetStringData(text);
++        last_command = value ? value : "";
++        g_pServerDE->FreeString(text);
++        ++commands;
++        if (last_command.starts_with("TOGGLE"))
++            settings.on = !settings.on;
++        else if (last_command.starts_with("ON"))
++            settings.on = true;
++        else if (last_command.starts_with("OFF"))
++            settings.on = false;
++        auto flags = g_pServerDE->GetObjectUserFlags(m_hObject);
++        g_pServerDE->SetObjectUserFlags(m_hObject, settings.on ? flags | 1u : flags & ~1u);
++    }
++    return CClientSFX::ObjectMessageFn(sender, message, read);
++}
+diff --git a/src/game/original/ClientParticleStreamSFX.h b/src/game/original/ClientParticleStreamSFX.h
+new file mode 100644
+index 0000000..e8b7344
+--- /dev/null
++++ b/src/game/original/ClientParticleStreamSFX.h
+@@ -0,0 +1,17 @@
++#pragma once
++#include "ClientSFX.h"
++#include "ParticleStreamFX.h"
++class CClientParticleStreamSFX : public CClientSFX
++{
++  public:
++    OpenBlood2::ParticleStreamSettings settings;
++    std::uint64_t effect = 0, commands = 0;
++    std::string last_command, error;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++
++  private:
++    bool ReadProp();
++};
+diff --git a/src/game/original/ParticleStreamFX.cpp b/src/game/original/ParticleStreamFX.cpp
+new file mode 100644
+index 0000000..cac37f8
+--- /dev/null
++++ b/src/game/original/ParticleStreamFX.cpp
+@@ -0,0 +1,178 @@
++#include "ParticleStreamFX.h"
++#include "engine/collision.h"
++#include "engine/texture.h"
++#include <algorithm>
++#include <cmath>
++using namespace OpenBlood2;
++namespace
++{
++    bool pose_valid(NodePose pose)
++    {
++        return physics_vector(pose.position) && physics_vector(pose.rotation.m_Vec) &&
++               std::isfinite(pose.rotation.m_Spin) &&
++               std::abs(vector_dot(pose.rotation.m_Vec, pose.rotation.m_Vec) +
++                        pose.rotation.m_Spin * pose.rotation.m_Spin - 1) < .001f;
++    }
++    float draw(std::minstd_rand& r, float lo, float hi)
++    {
++        return lo + (hi - lo) * float(r() - std::minstd_rand::min()) /
++                        float(std::minstd_rand::max() - std::minstd_rand::min());
++    }
++} // namespace
++bool OpenBlood2::valid_particle_stream(const ParticleStreamSettings& s)
++{
++    auto bound = [](float v, float lo, float hi) { return std::isfinite(v) && v >= lo && v <= hi; };
++    auto color = [&](DVector v) { return bound(v.x, 0, 255) && bound(v.y, 0, 255) && bound(v.z, 0, 255); };
++    auto path = [](const std::string& p) { return p.size() <= 1000 && p.find('\0') == p.npos; };
++    return bound(s.radius, 0, 640000) && bound(s.position_radius, 0, 10000) && bound(s.min_velocity, 0, 10000) &&
++           bound(s.max_velocity, s.min_velocity, 10000) && bound(s.spread, 0, 10000) && s.count <= 256 &&
++           color(s.min_color) && color(s.max_color) && bound(s.alpha, 0, 1) && bound(s.min_life, 0, 600) &&
++           bound(s.max_life, s.min_life, 600) && bound(s.ramp_time, 0, 600) && bound(s.delay, 0, 600) &&
++           bound(s.gravity, -10000, 10000) && s.ramp_flags <= 15 && path(s.texture) &&
++           bound(s.sound_radius, 0, 100000) && std::all_of(s.sounds.begin(), s.sounds.end(), path);
++}
++bool CParticleStreamFX::Init(const ParticleStreamSettings& s, std::string& failure)
++{
++    failure.clear();
++    *this = {};
++    if (!valid_particle_stream(s))
++    {
++        failure = "Invalid particle stream descriptor";
++        return false;
++    }
++    settings = s;
++    state = s.on ? 2 : 0;
++    initialized_ = true;
++    return true;
++}
++bool CParticleStreamFX::AddParticles(float now, std::minstd_rand& random, std::size_t budget, std::string& failure)
++{
++    if (!state)
++        return true; // Source does not advance last-add time while off.
++    unsigned count = settings.count;
++    float offset = settings.position_radius, min_vel = settings.min_velocity, max_vel = settings.max_velocity,
++          min_life = settings.min_life, max_life = settings.max_life, spread = settings.spread;
++    if (state == 1 || state == 3)
++    {
++        float ratio;
++        if (state == 1)
++        {
++            ratio = (now - trigger_time) / settings.ramp_time;
++            if (ratio >= 1)
++            {
++                ratio = 1;
++                state = 2;
++            }
++        }
++        else
++        {
++            ratio = 1 - (now - trigger_time) / settings.ramp_time;
++            if (ratio <= 0)
++            {
++                state = 0;
++                return true;
++            }
++        }
++        if (settings.ramp_flags & 1)
++            count = unsigned(count * ratio);
++        if (settings.ramp_flags & 2)
++            offset *= ratio;
++        if (settings.ramp_flags & 4)
++        {
++            min_vel *= ratio;
++            max_vel *= ratio;
++            spread *= ratio;
++        }
++        if (settings.ramp_flags & 8)
++        {
++            min_life *= ratio;
++            max_life *= ratio;
++        }
++    }
++    budget = std::min<std::size_t>(2048, budget);
++    if (particles.size() > budget || count > budget - particles.size())
++    {
++        failure = "Particle stream particle capacity exhausted";
++        return false;
++    }
++    for (unsigned i = 0; i < count; ++i)
++    {
++        Particle p;
++        p.lifetime = draw(random, min_life, max_life);
++        p.position = {draw(random, -offset, offset), draw(random, -offset, offset), draw(random, -offset, offset)};
++        DVector jitter{draw(random, -spread, spread), draw(random, -spread, spread), draw(random, -spread, spread)};
++        p.velocity = vector_add(vector_scale(direction, max_vel), jitter);
++        const auto length = std::sqrt(vector_dot(p.velocity, p.velocity));
++        const auto speed = draw(random, min_vel, max_vel);
++        // A zero vector stays zero, avoiding the original normalize(0) undefined result.
++        if (length > 0)
++            p.velocity = vector_scale(p.velocity, speed / length);
++        const auto red = draw(random, settings.min_color.x, settings.max_color.x);
++        auto range = vector_subtract(settings.max_color, settings.min_color);
++        range = {std::max(range.x, 0.f), std::max(range.y, 0.f), std::max(range.z, 0.f)};
++        p.color = range.x <= 0 ? settings.min_color : DVector{red, range.y * red / range.x, range.z * red / range.x};
++        p.color = {std::clamp(p.color.x / 255, 0.f, 1.f), std::clamp(p.color.y / 255, 0.f, 1.f),
++                   std::clamp(p.color.z / 255, 0.f, 1.f)};
++        particles.push_back(p);
++    }
++    last_add = now;
++    ++bursts;
++    emitted += count;
++    return true;
++}
++bool CParticleStreamFX::CreateObject(const Resources& resources, NodePose pose, double now, std::minstd_rand& random,
++                                     std::string& failure, std::size_t budget)
++{
++    failure.clear();
++    if (!initialized_ || created_ || !pose_valid(pose) || !std::isfinite(now) || now < 0 || now > 1e7)
++    {
++        failure = "Invalid particle stream creation";
++        return false;
++    }
++    // An authored empty HSTRING is not the null-HSTRING default texture branch.
++    Texture image;
++    if (!read_texture_resource(resources, settings.texture, image, failure))
++        return false;
++    texture = settings.texture;
++    position = pose.position;
++    direction = rotate_vector(pose.rotation, {0, 0, 1});
++    last_time = now;
++    if (state && !AddParticles(float(now), random, budget, failure))
++        return false;
++    created_ = true;
++    return true;
++}
++bool CParticleStreamFX::Update(double now, const NodePose* pose, bool visible, std::minstd_rand& random,
++                               std::size_t budget)
++{
++    error.clear();
++    if (!created_ || !std::isfinite(now) || now < last_time || now > 1e7 || (pose && !pose_valid(*pose)))
++    {
++        error = "Invalid particle stream update";
++        return false;
++    }
++    if (!pose)
++        return false;
++    if (!advance_particles(particles, settings.gravity, now - last_time, error))
++        return false;
++    last_time = now;
++    if (now < next_update)
++        return true;
++    next_update = now + .001;
++    ++updates;
++    position = pose->position;
++    direction = rotate_vector(pose->rotation, {0, 0, 1});
++    const float time = float(now);
++    if (visible && (state == 0 || state == 3))
++    {
++        trigger_time = time;
++        state = settings.ramp_time ? 1 : 2;
++    }
++    else if (!visible && (state == 1 || state == 2))
++    {
++        trigger_time = time;
++        state = settings.ramp_time ? 3 : 0;
++    }
++    // The original SFXMgr never reads the sound tail; no sound enters this client effect.
++    return time <= last_add + settings.delay || AddParticles(time, random, budget, error);
++}
+diff --git a/src/game/original/ParticleStreamFX.h b/src/game/original/ParticleStreamFX.h
+new file mode 100644
+index 0000000..2728664
+--- /dev/null
++++ b/src/game/original/ParticleStreamFX.h
+@@ -0,0 +1,44 @@
++#pragma once
++#include "engine/model.h"
++#include "engine/particles.h"
++#include "engine/resources.h"
++#include <array>
++#include <random>
++namespace OpenBlood2
++{
++    struct ParticleStreamSettings
++    {
++        float radius = 1000, position_radius = 1, min_velocity = 0, max_velocity = 25, spread = 0;
++        unsigned count = 1;
++        DVector min_color{255, 255, 255}, max_color{255, 255, 255};
++        float alpha = 1, min_life = 1, max_life = 2, ramp_time = 0, delay = .1f, gravity = 15;
++        DBYTE ramp_flags = 0;
++        bool on = false;
++        std::string texture = "SpriteTextures\\drop32_1.dtx";
++        // Sent by the original server, but never read by its SFXMgr client branch.
++        float sound_radius = 200;
++        std::array<std::string, 3> sounds;
++    };
++    bool valid_particle_stream(const ParticleStreamSettings&);
++} // namespace OpenBlood2
++// Selected original ClientShellDLL/ParticleStreamFX, with checked value-owned services.
++class CParticleStreamFX
++{
++  public:
++    bool Init(const OpenBlood2::ParticleStreamSettings&, std::string&);
++    bool CreateObject(const OpenBlood2::Resources&, OpenBlood2::NodePose, double, std::minstd_rand&, std::string&,
++                      std::size_t budget = 2048);
++    bool Update(double, const OpenBlood2::NodePose*, bool visible, std::minstd_rand&, std::size_t budget = 2048);
++    OpenBlood2::ParticleStreamSettings settings;
++    std::vector<OpenBlood2::Particle> particles;
++    DVector position{}, direction{0, 0, 1};
++    std::string texture, error;
++    unsigned state = 0; // original 0=off, 1=ramp up, 2=on, 3=ramp down
++    float trigger_time = 0, last_add = 0;
++    double last_time = 0, next_update = 0;
++    std::uint64_t id = 0, updates = 0, bursts = 0, emitted = 0;
++
++  private:
++    bool AddParticles(float, std::minstd_rand&, std::size_t, std::string&);
++    bool initialized_ = false, created_ = false;
++};
+diff --git a/src/game/particle_streams.cpp b/src/game/particle_streams.cpp
+new file mode 100644
+index 0000000..a1b11d9
+--- /dev/null
++++ b/src/game/particle_streams.cpp
+@@ -0,0 +1,96 @@
++#include "game/particle_streams.h"
++#include "server_de.h"
++#include <algorithm>
++namespace OpenBlood2
++{
++    std::size_t ParticleStreams::particle_count() const
++    {
++        std::size_t n = 0;
++        for (const auto& i : active)
++            n += i.effect.particles.size();
++        return n;
++    }
++    std::uint64_t ParticleStreams::publish(HOBJECT owner, const ParticleStreamSettings& settings, ServerDE& server,
++                                           const Resources* resources, double now, std::string& error)
++    {
++        error.clear();
++        ParticleStreamReport report;
++        NodePose pose;
++        if (!server.IsObjectAlive(owner) || !resources || server.GetObjectPos(owner, &pose.position) != DE_OK ||
++            server.GetObjectRotation(owner, &pose.rotation) != DE_OK)
++            error = "Particle stream owner/resources/pose unavailable";
++        else if (active.size() >= 128 || next_id_ == UINT64_MAX ||
++                 std::any_of(active.begin(), active.end(), [&](const auto& i) { return i.owner == owner; }))
++            error = "Particle stream capacity exhausted or duplicate owner";
++        else
++        {
++            report.source = server.GetObjectName(owner);
++            CParticleStreamFX fx;
++            const auto count = particle_count();
++            if (fx.Init(settings, error) &&
++                fx.CreateObject(*resources, pose, now, random_, error, count < 8192 ? 8192 - count : 0))
++            {
++                report.id = fx.id = next_id_++;
++                active.push_back({owner, std::move(fx)});
++                ++started;
++            }
++        }
++        if (!error.empty())
++            ++failed;
++        report.error = error;
++        const auto id = report.id;
++        if (reports.size() == 128)
++            reports.erase(reports.begin());
++        reports.push_back(std::move(report));
++        return id;
++    }
++    bool ParticleStreams::advance(double now, ServerDE& server)
++    {
++        bool valid = true;
++        auto total = particle_count();
++        for (auto it = active.begin(); it != active.end();)
++        {
++            auto& fx = it->effect;
++            const auto others = total - fx.particles.size();
++            NodePose pose;
++            const bool live = server.IsObjectAlive(it->owner);
++            const bool pose_ok = !live || (server.GetObjectPos(it->owner, &pose.position) == DE_OK &&
++                                           server.GetObjectRotation(it->owner, &pose.rotation) == DE_OK);
++            const auto flags = live ? server.GetObjectUserFlags(it->owner) : 0;
++            if (pose_ok &&
++                fx.Update(now, live ? &pose : nullptr, flags & 1u, random_, others < 8192 ? 8192 - others : 0))
++            {
++                total = others + fx.particles.size();
++                ++it;
++                continue;
++            }
++            total = others;
++            if (!pose_ok)
++                fx.error = "Particle stream owner pose unavailable";
++            if (fx.error.empty())
++                ++expired;
++            else
++            {
++                ++failed;
++                valid = false;
++                update_error = fx.error;
++            }
++            for (auto& report : reports)
++                if (report.id == fx.id)
++                {
++                    report.error = fx.error;
++                    report.removed = true;
++                }
++            it = active.erase(it);
++        }
++        return valid;
++    }
++    void ParticleStreams::clear()
++    {
++        active.clear();
++        reports.clear();
++        update_error.clear();
++        started = expired = failed = 0;
++        random_.seed(1); // IDs survive reload.
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/particle_streams.h b/src/game/particle_streams.h
+new file mode 100644
+index 0000000..fddb486
+--- /dev/null
++++ b/src/game/particle_streams.h
+@@ -0,0 +1,34 @@
++#pragma once
++#include "game/original/ParticleStreamFX.h"
++class ServerDE;
++namespace OpenBlood2
++{
++    struct ParticleStreamInstance
++    {
++        HOBJECT owner = nullptr;
++        CParticleStreamFX effect;
++    };
++    struct ParticleStreamReport
++    {
++        std::uint64_t id = 0;
++        std::string source, error;
++        bool removed = false;
++    };
++    class ParticleStreams
++    {
++      public:
++        std::uint64_t publish(HOBJECT, const ParticleStreamSettings&, ServerDE&, const Resources*, double,
++                              std::string&);
++        bool advance(double, ServerDE&);
++        void clear();
++        std::size_t particle_count() const;
++        std::vector<ParticleStreamInstance> active;
++        std::vector<ParticleStreamReport> reports;
++        std::uint64_t started = 0, expired = 0, failed = 0;
++        std::string update_error;
++
++      private:
++        std::uint64_t next_id_ = 1;
++        std::minstd_rand random_{1};
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index deba224..5d6d7a4 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -7,6 +7,7 @@
+ #include "game/original/CivilianAI.h"
+ #include "game/original/ClientExplosionSFX.h"
+ #include "game/original/ClientLightFX.h"
++#include "game/original/ClientParticleStreamSFX.h"
+ #include "game/original/ConversationTrigger.h"
+ #include "game/original/Corpse.h"
+ #include "game/original/CultistAI.h"
+@@ -187,6 +188,33 @@ namespace OpenBlood2
+                                    {"StartActive", false},
+                                    {"Looping", false}}};
+         const ClassInfo client_sfx{"CClientSFX", &b2base, construct<CClientSFX>, {}};
++        const ClassInfo particle_stream{"CClientParticleStreamSFX",
++                                        &client_sfx,
++                                        construct<CClientParticleStreamSFX>,
++                                        {{"SystemRadius", 1000.f},
++                                         {"PositionRadius", 1.f},
++                                         {"MinVelocity", 0.f},
++                                         {"MaxVelocity", 25.f},
++                                         {"NumParticles", std::int32_t(1)},
++                                         {"VelSpread", 0.f},
++                                         {"MinColor", DVector{255, 255, 255}},
++                                         {"MaxColor", DVector{255, 255, 255}},
++                                         {"SystemAlpha", 1.f},
++                                         {"MinLifetime", 1.f},
++                                         {"MaxLifetime", 2.f},
++                                         {"RampTime", 0.f},
++                                         {"AddDelay", .1f},
++                                         {"Gravity", 15.f},
++                                         {"RampAmount", false},
++                                         {"RampOffset", false},
++                                         {"RampVelocity", false},
++                                         {"RampLifetime", false},
++                                         {"InitiallyOn", false},
++                                         {"ParticleFile", std::string("SpriteTextures\\drop32_1.dtx")},
++                                         {"SoundRadius", 200.f},
++                                         {"RampUpSound", std::string{}},
++                                         {"LoopSound", std::string{}},
++                                         {"RampDownSound", std::string{}}}};
+         const ClassInfo scene_explosion{"CClientExplosionSFX",
+                                         &client_sfx,
+                                         construct<CClientExplosionSFX>,
+@@ -758,18 +786,19 @@ namespace OpenBlood2
+     {
+         return objects.register_class(base) && objects.register_class(builtin_model) &&
+                objects.register_class(b2base) && objects.register_class(camera) && objects.register_class(client_sfx) &&
+-               objects.register_class(scene_explosion) && objects.register_class(client_light) &&
+-               objects.register_class(light_SquareWaveLightFX) && objects.register_class(light_SawWaveLightFX) &&
+-               objects.register_class(light_RampUpWaveLightFX) && objects.register_class(light_RampDownWaveLightFX) &&
+-               objects.register_class(light_SineWaveLightFX) && objects.register_class(light_Flicker1WaveLightFX) &&
+-               objects.register_class(light_Flicker2WaveLightFX) && objects.register_class(light_Flicker3WaveLightFX) &&
+-               objects.register_class(light_Flicker4WaveLightFX) && objects.register_class(light_StrobeWaveLightFX) &&
+-               objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
+-               objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
+-               objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
+-               objects.register_class(sound_fx) && objects.register_class(detail_sprite) &&
+-               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
+-               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
++               objects.register_class(particle_stream) && objects.register_class(scene_explosion) &&
++               objects.register_class(client_light) && objects.register_class(light_SquareWaveLightFX) &&
++               objects.register_class(light_SawWaveLightFX) && objects.register_class(light_RampUpWaveLightFX) &&
++               objects.register_class(light_RampDownWaveLightFX) && objects.register_class(light_SineWaveLightFX) &&
++               objects.register_class(light_Flicker1WaveLightFX) && objects.register_class(light_Flicker2WaveLightFX) &&
++               objects.register_class(light_Flicker3WaveLightFX) && objects.register_class(light_Flicker4WaveLightFX) &&
++               objects.register_class(light_StrobeWaveLightFX) && objects.register_class(light_SearchWaveLightFX) &&
++               objects.register_class(light_FlickerLight) && objects.register_class(light_GlowingLight) &&
++               objects.register_class(camera_object) && objects.register_class(cinematic_trigger) &&
++               objects.register_class(random_sound) && objects.register_class(sound_fx) &&
++               objects.register_class(detail_sprite) && objects.register_class(sound) &&
++               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
++               objects.register_class(game_start) && objects.register_class(path) &&
+                objects.register_class(world_properties) && objects.register_class(smell) &&
+                objects.register_class(exit_hint) && objects.register_class(character) &&
+                objects.register_class(ai_manager) && objects.register_class(cultist) &&
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 096ada2..05d501c 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -13,6 +13,7 @@
+ #include "game/object_particles.h"
+ #include "game/original/BloodShells.h"
+ #include "game/original/LightFX.h"
++#include "game/particle_streams.h"
+ #include "game/player_restore.h"
+ #include "game/projectile_report.h"
+ #include "game/session.h"
+@@ -95,6 +96,8 @@ namespace OpenBlood2
+         ExplosionModels explosion_models;
+         LaserBeams laser_beams;
+         ObjectParticles object_particles;
++        ParticleStreams particle_streams;
++        std::uint64_t PublishParticleStream(HOBJECT, const ParticleStreamSettings&, std::string&) override;
+         std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) override;
+         std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&) override;
+         ExplosionLights explosion_lights;
+@@ -143,6 +146,7 @@ namespace OpenBlood2
+             explosion_models.clear();
+             laser_beams.clear();
+             object_particles.clear();
++            particle_streams.clear();
+             explosion_lights.clear();
+             explosion_rings.clear();
+             explosion_flames.clear();
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index fd1de77..09ebac4 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -2,6 +2,12 @@
+ #include <cmath>
+ namespace OpenBlood2
+ {
++    std::uint64_t ServerAdapter::PublishParticleStream(HOBJECT owner, const ParticleStreamSettings& settings,
++                                                       std::string& error)
++    {
++        trace_service("PublishParticleStream (original authored emitter)");
++        return particle_streams.publish(owner, settings, *this, client_resources, objects_.time(), error);
++    }
+     std::uint64_t ServerAdapter::PublishObjectParticles(HOBJECT owner, unsigned type, std::string& error)
+     {
+         trace_service("PublishObjectParticles (original shield/powerup)");
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index a76cb37..a213a94 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -1,4 +1,5 @@
+ #include "game/original/AI_Mgr.h"
++#include "game/original/ClientParticleStreamSFX.h"
+ #include "game/original/DestructableModel.h"
+ #include "game/original/DetailSprite.h"
+ #include "game/original/Sound.h"
+@@ -110,6 +111,13 @@ namespace OpenBlood2
+                     entry.state = EntryState::Failed;
+                     entry.detail = sprite->error;
+                 }
++                else if (const auto* stream =
++                             r ? dynamic_cast<const CClientParticleStreamSFX*>(r->game.get()) : nullptr;
++                         stream && !stream->error.empty())
++                {
++                    entry.state = EntryState::Failed;
++                    entry.detail = stream->error;
++                }
+                 else if (const auto* model = r ? dynamic_cast<const CDestructableModel*>(r->game.get()) : nullptr;
+                          model && !model->error.empty())
+                 {
+@@ -460,6 +468,7 @@ namespace OpenBlood2
+         ok = server.explosion_flames.advance(objects.time()) && ok;
+         ok = server.explosion_fragments.advance(objects.time(), server) && ok;
+         ok = server.object_particles.advance(objects.time(), server) && ok;
++        ok = server.particle_streams.advance(objects.time(), server) && ok;
+         if (ok && preview_model && preview_playing &&
+             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
+             preview_playing = false;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index cda3f88..242958c 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1587,3 +1587,30 @@ if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+     add_test(NAME gpu.level_change COMMAND level_change_gpu_tests "${BLOOD2_TEST_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/level-change")
+     set_tests_properties(gpu.level_change PROPERTIES LABELS "private;gpu;world" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+ endif()
++
++add_executable(particle_stream_tests particle_stream_tests.cpp ../src/app/sprite_scene.cpp)
++target_link_libraries(particle_stream_tests PRIVATE blood2_game)
++blood2_project_options(particle_stream_tests)
++foreach(case rules clocks ramps failures session budgets)
++    add_test(NAME particle_stream.${case} COMMAND particle_stream_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/particle-stream-${case}")
++    set_tests_properties(particle_stream.${case} PROPERTIES LABELS "headless;particle_stream" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME particle_stream.private COMMAND particle_stream_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(particle_stream.private PROPERTIES LABELS "headless;private;particle_stream" TIMEOUT 180)
++    if(BLOOD2_SANITIZERS)
++        # Three complete CityHub simulations retain all frames/reloads under instrumentation.
++        set_tests_properties(particle_stream.private PROPERTIES TIMEOUT 360)
++    endif()
++endif()
++if(BLOOD2_GPU_TESTS)
++    add_executable(particle_stream_gpu_tests particle_stream_gpu_tests.cpp ../src/app/sprite_scene.cpp)
++    target_link_libraries(particle_stream_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(particle_stream_gpu_tests)
++    add_test(NAME gpu.particle_stream_alpha COMMAND particle_stream_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/particle-stream-alpha")
++    set_tests_properties(gpu.particle_stream_alpha PROPERTIES LABELS "gpu;particle_stream" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.particle_stream_private COMMAND particle_stream_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/particle-stream-private" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.particle_stream_private PROPERTIES LABELS "gpu;private;particle_stream" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    endif()
++endif()
+diff --git a/tests/assault_tests.cpp b/tests/assault_tests.cpp
+index 95b36a9..ddf8586 100644
+--- a/tests/assault_tests.cpp
++++ b/tests/assault_tests.cpp
+@@ -446,7 +446,7 @@ bool private_game(const std::filesystem::path& root)
+         }
+         std::cout << "CityHub M16=" << assault << " created=" << created << " unknown=" << unknown
+                   << " failed=" << failed << '\n';
+-        CHECK(assault == 1 && created == 435 && unknown == 18 && failed == 1);
++        CHECK(assault == 1 && created == 443 && unknown == 10 && failed == 1);
+         CHECK(g.unload_world());
+         // Labelled arena uses actual private models/audio, with controlled geometry.
+         auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
+diff --git a/tests/audio_stream_tests.cpp b/tests/audio_stream_tests.cpp
+index 5f2aae8..6702e03 100644
+--- a/tests/audio_stream_tests.cpp
++++ b/tests/audio_stream_tests.cpp
+@@ -295,7 +295,7 @@ namespace
+             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
+                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
+                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
+-            CHECK(created == 435 && transferred == 31 && unknown == 18 && failed == 1 && fx == 5 && fx_voices == 4);
++            CHECK(created == 443 && transferred == 31 && unknown == 10 && failed == 1 && fx == 5 && fx_voices == 4);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_bytes());
+         }
+diff --git a/tests/compound_shell_tests.cpp b/tests/compound_shell_tests.cpp
+index c84db46..d8eb748 100644
+--- a/tests/compound_shell_tests.cpp
++++ b/tests/compound_shell_tests.cpp
+@@ -229,7 +229,7 @@ namespace
+             }
+             std::cout << "CityHub: " << created << " created / " << transferred << " sounds / " << unknown
+                       << " unsupported / " << failed << " failed\n";
+-            CHECK(created == 435 && transferred == 31 && unknown == 18 && failed == 1);
++            CHECK(created == 443 && transferred == 31 && unknown == 10 && failed == 1);
+             WorldMesh mesh;
+             CHECK(mesh.build(g.world, error, &g.resources));
+             if (gpu)
+diff --git a/tests/conversation_tests.cpp b/tests/conversation_tests.cpp
+index ea61686..26aa3f8 100644
+--- a/tests/conversation_tests.cpp
++++ b/tests/conversation_tests.cpp
+@@ -257,7 +257,7 @@ namespace
+             for (auto id : g.objects.snapshot())
+                 if (auto* c = dynamic_cast<ConversationTrigger*>(g.objects.get(id)->game.get()))
+                     conversation = c;
+-            CHECK(created == 435 && unknown == 18 && failed == 1 && conversation);
++            CHECK(created == 443 && unknown == 10 && failed == 1 && conversation);
+             std::cout << "CityHub conversation count=" << conversation->count << " file=" << conversation->waves[0]
+                       << " mapped=" << bool(conversation_text(conversation->waves[0])) << '\n';
+             g.server_shell.start_point_name = "01_egressa";
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+index 7678e3c..8b8a375 100644
+--- a/tests/destructable_model_tests.cpp
++++ b/tests/destructable_model_tests.cpp
+@@ -313,7 +313,7 @@ namespace
+             std::cout << "CityHub model initialization: " << count << " models / " << pushable << " pushable / "
+                       << gravity << " gravity / " << ground_misses << " ground misses\n";
+             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
+-            CHECK(created == 435 && unknown == 18 && failed == 1);
++            CHECK(created == 443 && unknown == 10 && failed == 1);
+             CHECK(update_model_scene(g, scene, error));
+             unsigned skin_failures = 0, triangles = 0;
+             for (auto id : ids)
+diff --git a/tests/flare_tests.cpp b/tests/flare_tests.cpp
+index 2543f08..9e5e470 100644
+--- a/tests/flare_tests.cpp
++++ b/tests/flare_tests.cpp
+@@ -413,7 +413,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unsupported=" << unknown << " failed=" << failed
+                   << " flare NPCs=" << flare << '\n';
+-        CHECK(created == 435 && unknown == 18 && failed == 1 && flare == 1);
++        CHECK(created == 443 && unknown == 10 && failed == 1 && flare == 1);
+         CHECK(g.unload_world());
+         return true;
+     }
+diff --git a/tests/level_change_gpu_tests.cpp b/tests/level_change_gpu_tests.cpp
+index 59d392a..c09af23 100644
+--- a/tests/level_change_gpu_tests.cpp
++++ b/tests/level_change_gpu_tests.cpp
+@@ -99,7 +99,7 @@ int main(int argc, char** argv)
+         CHECK(game->server.SendWorldExit({"02_CityHub"}, "01_egressa") == DE_OK && game->pump_player_messages(error));
+         CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+         CHECK(game.get() == before && game->client_shell.player == old_player && game->world_revision == revision);
+-        CHECK(game->level_change.unknown == 18 && game->level_change.failed == 1 && game->server.audio.has_output());
++        CHECK(game->level_change.unknown == 10 && game->level_change.failed == 1 && game->server.audio.has_output());
+         CHECK(game->server.SendWorldExit({"01_SubwayA"}, "start") == DE_OK && game->pump_player_messages(error));
+         CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Committed);
+         CHECK(game.get() != before && game->client_shell.player != old_player && game->server.audio.has_output());
+diff --git a/tests/mac10_tests.cpp b/tests/mac10_tests.cpp
+index 70c2dfb..af78ba5 100644
+--- a/tests/mac10_tests.cpp
++++ b/tests/mac10_tests.cpp
+@@ -263,7 +263,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unknown=" << unknown << " failed=" << failed << " Mac10=" << mac
+                   << '\n';
+-        CHECK(mac == 1 && created == 435 && unknown == 18 && failed == 1);
++        CHECK(mac == 1 && created == 443 && unknown == 10 && failed == 1);
+         for (auto id : g.objects.snapshot())
+             if (auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(g.objects.get(id)->handle));
+                 a && a->runtime_failed)
+diff --git a/tests/medkit_tests.cpp b/tests/medkit_tests.cpp
+index dc8941a..c1ae2d0 100644
+--- a/tests/medkit_tests.cpp
++++ b/tests/medkit_tests.cpp
+@@ -291,7 +291,7 @@ namespace
+                 unknown += entry.state == EntryState::Unsupported;
+                 failed += entry.state == EntryState::Failed;
+             }
+-            CHECK(created == 435 && unknown == 18 && failed == 1);
++            CHECK(created == 443 && unknown == 10 && failed == 1);
+             for (auto id : g.objects.snapshot())
+                 if (dynamic_cast<MedKitPU*>(g.objects.get(id)->game.get()))
+                     h = g.objects.get(id)->handle;
+diff --git a/tests/particle_stream_gpu_tests.cpp b/tests/particle_stream_gpu_tests.cpp
+new file mode 100644
+index 0000000..cad60bc
+--- /dev/null
++++ b/tests/particle_stream_gpu_tests.cpp
+@@ -0,0 +1,154 @@
++#include "app/sprite_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "explosion_flame_fixture.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << " " << error << " " << SDL_GetError() << "\n";                         \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool render(Runtime& runtime, WorldRenderer& renderer, SpriteView& scene, DVector eye, DRotation camera,
++                Capture& capture, std::vector<std::uint8_t>& pixels, std::string& error)
++    {
++        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300)) ||
++            !renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true))
++            return false;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        if (!commands)
++            return false;
++        if (!renderer.draw(commands, capture.texture, scene.mesh, scene.draws, eye, camera, false, error))
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 300;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 300;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
++            return false;
++        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        if (!data)
++            return false;
++        pixels.assign(data, data + 400 * 300 * 4);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    Runtime runtime;
++    std::string error;
++    CHECK(runtime.initialize(true, error));
++    WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
++    Capture capture;
++    SpriteView scene;
++    Resources resources;
++    CHECK(test_explosion_flame::mount(resources, argv[1], error));
++    ParticleStreamSettings settings;
++    settings.on = true;
++    settings.min_velocity = settings.max_velocity = 0;
++    settings.position_radius = 0;
++    settings.min_color = settings.max_color = {128, 255, 255};
++    settings.alpha = .5f;
++    CParticleStreamFX fx;
++    std::minstd_rand random(1);
++    CHECK(fx.Init(settings, error) && fx.CreateObject(resources, {{0, 0, 20}, {}}, 0, random, error));
++    std::vector<std::uint8_t> white, tinted;
++    for (bool tint : {false, true})
++    {
++        CHECK(scene.begin_frame({}, {}, error) &&
++              scene.add_particle(fx.texture, fx.position, fx.settings.radius / 640,
++                                 tint ? fx.particles[0].color : DVector{1, 1, 1}, tint ? fx.settings.alpha : 1, 1, 0,
++                                 resources, error));
++        CHECK(scene.entries[0].error.empty() &&
++              render(runtime, renderer, scene, {}, {}, capture, tint ? tinted : white, error));
++    }
++    unsigned verified = 0;
++    for (unsigned i = 0; i < 400 * 300; ++i)
++        if (white[i * 4] == 255 && white[i * 4 + 1] == 0 && white[i * 4 + 2] == 0)
++        {
++            CHECK(std::abs(int(tinted[i * 4]) - 67) <= 2 && std::abs(int(tinted[i * 4 + 1]) - 4.5f) <= 2 &&
++                  std::abs(int(tinted[i * 4 + 2]) - 6.5f) <= 2);
++            ++verified;
++        }
++    CHECK(verified > 100);
++    std::cout << "Stream tint/alpha: " << verified << " checked pixels\n";
++    CHECK(capture.save((std::filesystem::path(argv[1]) / "stream-alpha.png").c_str()));
++    if (argc == 3)
++    {
++        GameSession g;
++        Config c;
++        c.data_dir = argv[2];
++        CHECK(g.initialize() && g.resources.mount_game(c, error));
++        std::uint64_t previous = 0;
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_cityhub", error));
++            for (unsigned i = 0; i < 90; ++i)
++                CHECK(g.step(1. / 60));
++            auto& streams = g.server.particle_streams;
++            CHECK(streams.active.size() == 8 && !streams.failed);
++            const auto& steam = streams.active[1].effect;
++            CHECK(steam.id > previous);
++            previous = steam.id;
++            g.client_shell.view.position = vector_add(steam.position, {0, 0, -100});
++            g.client_shell.view.rotation = {};
++            const auto updates = steam.updates;
++            scene.clear();
++            renderer.clear_geometry();
++            CHECK(update_sprite_scene(g, scene, error));
++            unsigned quads = 0;
++            for (auto& e : scene.entries)
++                if (e.stream_system)
++                {
++                    CHECK(e.error.empty() && e.range != UINT32_MAX);
++                    ++quads;
++                }
++            CHECK(quads == streams.particle_count() && quads > 30);
++            CHECK(render(runtime, renderer, scene, g.client_shell.view.position, {}, capture, tinted, error));
++            unsigned ink = 0;
++            for (unsigned i = 0; i < 400 * 300; ++i)
++                if (tinted[i * 4] != 6 || tinted[i * 4 + 1] != 9 || tinted[i * 4 + 2] != 13)
++                    ++ink;
++            CHECK(ink > 100 && steam.updates == updates);
++            CHECK(capture.save((std::filesystem::path(argv[1]) / "cityhub-streams.png").c_str()));
++            std::cout << "CityHub stream GPU cycle " << cycle << ": " << quads << " actual particle quads, " << ink
++                      << " covered pixels\n";
++            for (const auto& i : streams.active)
++                CHECK(g.objects.remove(i.owner));
++            CHECK(g.step(.02) && streams.active.empty());
++            CHECK(update_sprite_scene(g, scene, error));
++            for (auto& e : scene.entries)
++                CHECK(!e.stream_system);
++            CHECK(g.unload_world() && streams.reports.empty());
++            scene.clear();
++            renderer.clear_geometry();
++        }
++    }
++    return 0;
++}
+diff --git a/tests/particle_stream_tests.cpp b/tests/particle_stream_tests.cpp
+new file mode 100644
+index 0000000..15aafd8
+--- /dev/null
++++ b/tests/particle_stream_tests.cpp
+@@ -0,0 +1,356 @@
++#include "app/sprite_scene.h"
++#include "explosion_flame_fixture.h"
++#include "game/original/ClientParticleStreamSFX.h"
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .0001f;
++    }
++    bool trigger(GameSession& g, HOBJECT h, const char* command)
++    {
++        auto s = g.server.CreateString(command);
++        auto m = g.server.StartMessageToObject(nullptr, h, 1000);
++        bool ok = m && g.server.WriteToMessageHString(m, s) == DE_OK && g.server.EndMessage(m) == DE_OK;
++        g.server.FreeString(s);
++        return ok;
++    }
++    bool rules(const std::filesystem::path& root)
++    {
++        Resources r;
++        std::string e;
++        CHECK(test_explosion_flame::mount(r, root, e));
++        ParticleStreamSettings s;
++        s.on = true;
++        s.count = 3;
++        s.position_radius = 4;
++        s.min_velocity = 10;
++        s.max_velocity = 20;
++        s.spread = 3;
++        s.min_color = {53, 53, 53};
++        s.max_color = {255, 214, 128};
++        CParticleStreamFX fx;
++        std::minstd_rand random(17), expected(17);
++        CHECK(fx.Init(s, e) && fx.CreateObject(r, {{10, 20, 30}, {}}, 4, random, e));
++        CHECK(fx.state == 2 && fx.particles.size() == 3 && fx.bursts == 1 && fx.last_add == 4);
++        // Independently reconstructed first burst from the original draw sequence.
++        for (const auto& p : fx.particles)
++        {
++            float t[9];
++            for (auto& v : t)
++                v = float(expected() - std::minstd_rand::min()) /
++                    float(std::minstd_rand::max() - std::minstd_rand::min());
++            CHECK(near(p.lifetime, 1 + t[0]) && near(p.position.x, -4 + 8 * t[1]) &&
++                  near(p.position.y, -4 + 8 * t[2]) && near(p.position.z, -4 + 8 * t[3]));
++            DVector vel{-3 + 6 * t[4], -3 + 6 * t[5], 17 + 6 * t[6]};
++            float length = std::sqrt(vector_dot(vel, vel));
++            CHECK(near(p.velocity.x, vel.x / length * (10 + 10 * t[7])) &&
++                  near(p.velocity.z, vel.z / length * (10 + 10 * t[7])));
++            float red = 53 + 202 * t[8];
++            CHECK(near(p.color.x, red / 255) && near(p.color.y, 161 * red / 202 / 255) &&
++                  near(p.color.z, 75 * red / 202 / 255));
++        }
++        CHECK(random() == expected());
++        // Equal red bounds ignore the otherwise different blue range (source quirk).
++        s.min_color = {255, 255, 0};
++        s.max_color = {255, 255, 255};
++        s.min_velocity = s.max_velocity = s.spread = 0;
++        CHECK(fx.Init(s, e) && fx.CreateObject(r, {}, 0, random, e));
++        CHECK(fx.particles[0].color.z == 0 && vector_dot(fx.particles[0].velocity, fx.particles[0].velocity) == 0);
++        return true;
++    }
++    bool clocks(const std::filesystem::path& root)
++    {
++        Resources r;
++        std::string e;
++        CHECK(test_explosion_flame::mount(r, root, e));
++        ParticleStreamSettings s;
++        s.on = true;
++        s.delay = .25f;
++        s.min_life = s.max_life = 2;
++        s.min_velocity = s.max_velocity = 10;
++        s.gravity = 4;
++        s.position_radius = 0;
++        CParticleStreamFX fx;
++        std::minstd_rand random(1);
++        NodePose pose{};
++        CHECK(fx.Init(s, e) && fx.CreateObject(r, pose, 0, random, e));
++        CHECK(fx.Update(.25, &pose, true, random) && fx.bursts == 1); // strict boundary
++        CHECK(fx.particles[0].position.z == 2.5f && fx.particles[0].position.y == 0 && fx.particles[0].velocity.y == 1);
++        pose.position = {10, 20, 30};
++        pose.rotation = rotation_from_euler({0, 1.57079632679f, 0});
++        CHECK(fx.Update(.5, &pose, true, random) && fx.bursts == 2 && fx.position.x == 10);
++        CHECK(near(fx.particles.back().velocity.x, 10) &&
++              fx.particles[0].velocity.z == 10); // only new directions change
++        CHECK(fx.Update(.5005, &pose, false, random) && fx.state == 2 && fx.particles[0].lifetime < 1.5f);
++        CHECK(fx.Update(.502, &pose, false, random) && fx.state == 0 && fx.bursts == 2 && fx.last_add == .5f);
++        CHECK(fx.Update(3, &pose, false, random) && fx.particles.empty());
++        CHECK(fx.Update(3.25, &pose, true, random) && fx.bursts == 3 && fx.last_add == 3.25f); // no catch-up bursts
++        CHECK(!fx.Update(3.5, nullptr, true, random) && fx.error.empty());
++        return true;
++    }
++    bool ramps(const std::filesystem::path& root)
++    {
++        Resources r;
++        std::string e;
++        CHECK(test_explosion_flame::mount(r, root, e));
++        ParticleStreamSettings s;
++        s.ramp_time = 2;
++        s.ramp_flags = 15;
++        s.count = 8;
++        s.delay = .25f;
++        s.position_radius = 16;
++        s.min_velocity = s.max_velocity = 20;
++        s.min_life = s.max_life = 4;
++        s.gravity = 0;
++        CParticleStreamFX fx;
++        std::minstd_rand random(1);
++        NodePose pose{};
++        CHECK(fx.Init(s, e) && fx.CreateObject(r, pose, 0, random, e) && fx.particles.empty());
++        CHECK(fx.Update(1, &pose, true, random) && fx.state == 1 && fx.bursts == 1 && fx.particles.empty());
++        CHECK(fx.Update(2, &pose, true, random) && fx.state == 1 && fx.particles.size() == 4);
++        for (auto& p : fx.particles)
++            CHECK(std::abs(p.position.x) <= 8 && near(p.velocity.z, 10) && p.lifetime == 2);
++        CHECK(fx.Update(3, &pose, true, random) && fx.state == 2 && fx.particles.size() == 12);
++        CHECK(fx.Update(3.5, &pose, false, random) && fx.state == 3 && fx.particles.size() == 20);
++        CHECK(fx.Update(4.5, &pose, false, random) && fx.state == 3 && fx.particles.size() == 20);
++        const auto burst = fx.bursts;
++        const auto add = fx.last_add;
++        CHECK(fx.Update(5.5, &pose, false, random) && fx.state == 0 && fx.bursts == burst && fx.last_add == add);
++        // Reversal resets a whole ramp, it does not interpolate from the current ratio.
++        CHECK(fx.Update(6, &pose, true, random) && fx.state == 1);
++        CHECK(fx.Update(6.5, &pose, false, random) && fx.state == 3);
++        CHECK(fx.particles.back().lifetime == 4);
++        for (unsigned flag : {1u, 2u, 4u, 8u})
++        {
++            s.ramp_flags = flag;
++            random.seed(17);
++            CHECK(fx.Init(s, e) && fx.CreateObject(r, pose, 0, random, e));
++            CHECK(fx.Update(1, &pose, true, random));
++            const auto before = fx.emitted;
++            CHECK(fx.Update(2, &pose, true, random));
++            CHECK(fx.emitted - before == (flag == 1 ? 4 : 8));
++            const auto& p = fx.particles.back();
++            CHECK(p.velocity.z == (flag == 4 ? 10 : 20));
++            CHECK(p.lifetime == (flag == 8 ? 2 : 4));
++            // Exact last X draw; a small random sample need not reach either edge of its range.
++            std::minstd_rand expected(17);
++            const unsigned first_count = flag == 1 ? 0 : 8, second_count = flag == 1 ? 4 : 8;
++            float sample = 0;
++            for (unsigned i = 0; i < 9 * (first_count + second_count - 1) + 2; ++i)
++                sample = float(expected() - std::minstd_rand::min()) /
++                         float(std::minstd_rand::max() - std::minstd_rand::min());
++            CHECK(near(p.position.x, (-16 + 32 * sample) * (flag == 2 ? .5f : 1.f)));
++        }
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        Resources r;
++        std::string e;
++        CHECK(test_explosion_flame::mount(r, root, e));
++        ParticleStreamSettings s;
++        CParticleStreamFX fx;
++        std::minstd_rand random(3);
++        NodePose pose{};
++        s.count = 257;
++        CHECK(!fx.Init(s, e));
++        s.count = 1;
++        s.ramp_flags = 16;
++        CHECK(!fx.Init(s, e));
++        s.ramp_flags = 0;
++        s.min_life = 3;
++        CHECK(!fx.Init(s, e));
++        s.min_life = 1;
++        s.alpha = std::numeric_limits<float>::quiet_NaN();
++        CHECK(!fx.Init(s, e));
++        s.alpha = 1;
++        s.texture = "missing.dtx";
++        CHECK(fx.Init(s, e) && !fx.CreateObject(r, pose, 0, random, e));
++        s.texture = "SpriteTextures/drop32_1.dtx";
++        s.on = true;
++        s.count = 256;
++        s.min_life = s.max_life = 100;
++        CHECK(fx.Init(s, e) && fx.CreateObject(r, pose, 0, random, e));
++        auto saved = random;
++        CHECK(!fx.Update(1, &pose, true, random, 256) && !fx.error.empty() && fx.particles.size() == 256);
++        CHECK(saved() == random());
++        CHECK(fx.Init(s, e) && !fx.CreateObject(r, pose, -1, random, e));
++        CHECK(fx.CreateObject(r, pose, 0, random, e) && !fx.Update(-1, &pose, true, random));
++        return true;
++    }
++    bool session(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string e;
++        CHECK(g.initialize() && test_explosion_flame::mount(g.resources, root, e));
++        g.server.client_resources = &g.resources;
++        const auto type = g.objects.find_class("CClientParticleStreamSFX");
++        CHECK(type);
++        CHECK(!g.objects.create(type, {}, Creation::Runtime));
++        CHECK(g.objects.finish_frame());
++        auto h = g.objects.create(type, {}, Creation::World,
++                                  {{"InitiallyOn", true},
++                                   {"Pos", DVector{0, 0, 50}},
++                                   {"LoopSound", std::string("unread.wav")},
++                                   {"Flags", int(FLAG_GRAVITY)}});
++        CHECK(h && g.server.particle_streams.active.size() == 1);
++        auto* emitter = dynamic_cast<CClientParticleStreamSFX*>(g.server.HandleToObject(h));
++        CHECK(emitter && emitter->effect);
++        CHECK(!g.objects.get(h)->scheduled && (g.server.GetObjectUserFlags(h) & 9u) == 9u &&
++              !(g.server.GetObjectFlags(h) & FLAG_GRAVITY));
++        CHECK(g.server.audio.voices().empty()); // Original unread message tail, not failed audio.
++        CHECK(!g.server.PublishParticleStream(h, emitter->settings, e) && !e.empty());
++        CHECK(g.server.particle_streams.active.size() == 1 && g.server.particle_streams.failed == 1);
++
++        CHECK(trigger(g, h, "off") && emitter->settings.on && trigger(g, h, "OFF trailing") && !emitter->settings.on);
++        CHECK(g.step(.25) && g.server.particle_streams.active[0].effect.state == 0);
++        CHECK(trigger(g, h, "ONward") && g.step(.25) && g.server.particle_streams.active[0].effect.state == 2);
++        CHECK(trigger(g, h, "TOGGLEstuff") && !emitter->settings.on && emitter->commands == 4);
++        const auto previous = emitter->effect;
++        const auto time = g.objects.time();
++        SpriteView scene;
++        CHECK(update_sprite_scene(g, scene, e));
++        unsigned drawn = 0;
++        for (auto& v : scene.entries)
++            if (v.stream_system)
++            {
++                CHECK(v.error.empty() && v.range != UINT32_MAX);
++                ++drawn;
++            }
++        CHECK(drawn == g.server.particle_streams.particle_count() && g.objects.time() == time);
++        CHECK(g.objects.remove(h));
++        CHECK(update_sprite_scene(g, scene, e) && scene.entries.empty());
++        CHECK(g.step(.1) && g.server.particle_streams.active.empty() &&
++              g.server.particle_streams.reports.front().removed);
++        CHECK(g.unload_world());
++        h = g.objects.create(type, {}, Creation::World, {{"InitiallyOn", true}});
++        CHECK(h && g.server.particle_streams.active[0].effect.id > previous);
++        CHECK(g.unload_world() && g.server.particle_streams.active.empty() && !g.server.string_count() &&
++              !g.server.message_count());
++        h = g.objects.create(type, {}, Creation::World, {{"ParticleFile", std::string("missing.dtx")}});
++        CHECK(!h || g.objects.get(h)->life != Life::Alive);
++        CHECK(g.server.particle_streams.failed == 1);
++        CHECK(g.objects.finish_frame());
++        h = g.objects.create(type, {}, Creation::World, {{"DifficultyMed", false}, {"InitiallyOn", true}});
++        CHECK(!h || g.objects.get(h)->life != Life::Alive);
++        CHECK(g.step(.1) && g.server.particle_streams.active.empty());
++        return true;
++    }
++    bool budgets(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string e;
++        CHECK(g.initialize() && test_explosion_flame::mount(g.resources, root, e));
++        g.server.client_resources = &g.resources;
++        auto type = g.objects.find_class("CClientParticleStreamSFX");
++        for (unsigned i = 0; i < 32; ++i)
++        {
++            auto h = g.objects.create(type, {}, Creation::World, {{"InitiallyOn", true}, {"NumParticles", 256}});
++            CHECK(h && g.objects.get(h)->life == Life::Alive);
++        }
++        CHECK(g.server.particle_streams.particle_count() == 8192);
++        auto h = g.objects.create(type, {}, Creation::World, {{"InitiallyOn", true}});
++        CHECK(!h || g.objects.get(h)->life != Life::Alive);
++        CHECK(g.server.particle_streams.active.size() == 32 && g.server.particle_streams.failed == 1);
++        CHECK(g.unload_world());
++        for (unsigned i = 0; i < 128; ++i)
++        {
++            h = g.objects.create(type, {}, Creation::World);
++            CHECK(h && g.objects.get(h)->life == Life::Alive);
++        }
++        h = g.objects.create(type, {}, Creation::World);
++        CHECK(!h || g.objects.get(h)->life != Life::Alive);
++        CHECK(g.server.particle_streams.active.size() == 128 && g.server.particle_streams.failed == 1);
++        CHECK(g.server.particle_streams.reports.size() == 128);
++        CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.server.string_count());
++        return true;
++    }
++    bool private_world(const std::filesystem::path& root)
++    {
++        GameSession g;
++        Config c;
++        c.data_dir = root;
++        std::string e;
++        CHECK(g.initialize() && g.resources.mount_game(c, e));
++        std::uint64_t last = 0;
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("02_cityhub", e));
++            unsigned created = 0, unknown = 0, failed = 0;
++            for (auto& entry : g.entries)
++            {
++                created += entry.state == EntryState::Created;
++                unknown += entry.state == EntryState::Unsupported;
++                failed += entry.state == EntryState::Failed;
++            }
++            CHECK(created == 443 && unknown == 10 && failed == 1);
++            auto& streams = g.server.particle_streams;
++            CHECK(streams.active.size() == 8 && !streams.failed);
++            unsigned initial = 0;
++            for (auto& i : streams.active)
++            {
++                CHECK(i.effect.id > last);
++                last = i.effect.id;
++                initial += i.effect.particles.size();
++            }
++            CHECK(initial == 29); // three steam, two ten-spark streams, six fire particles.
++            std::size_t peak = 0;
++            for (unsigned tick = 0; tick < 240; ++tick)
++            {
++                CHECK(g.step(cycle == 0 ? .02 : cycle == 1 ? 1. / 60 : .05));
++                peak = std::max(peak, streams.particle_count());
++            }
++            CHECK(!streams.failed && peak > 50 && streams.active.size() == 8);
++            SpriteView scene;
++            CHECK(update_sprite_scene(g, scene, e));
++            unsigned drawn = 0;
++            for (auto& v : scene.entries)
++                if (v.stream_system)
++                {
++                    CHECK(v.error.empty() && v.range != UINT32_MAX);
++                    ++drawn;
++                }
++            CHECK(drawn == streams.particle_count());
++            for (auto& i : streams.active)
++                CHECK(trigger(g, i.owner, "OFF"));
++            for (unsigned i = 0; i < 100; ++i)
++                CHECK(g.step(.05));
++            CHECK(streams.particle_count() == 0 && streams.active.size() == 8);
++            for (auto& i : streams.active)
++                CHECK(trigger(g, i.owner, "ON"));
++            CHECK(g.step(.2) && streams.particle_count() == 42); // includes shack smoke + third spark source.
++            std::cout << "CityHub cycle " << cycle << ": 443 created / 10 unsupported / 1 failed; 8 streams, peak "
++                      << peak << ", off expiry and 42-particle rearm\n";
++            CHECK(g.unload_world() && streams.active.empty() && streams.reports.empty() && !g.server.string_count());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string m = argv[1];
++    return (m == "rules"      ? rules(argv[2])
++            : m == "clocks"   ? clocks(argv[2])
++            : m == "ramps"    ? ramps(argv[2])
++            : m == "failures" ? failures(argv[2])
++            : m == "session"  ? session(argv[2])
++            : m == "budgets"  ? budgets(argv[2])
++                              : m == "private" && private_world(argv[2]))
++               ? 0
++               : 1;
++}
+diff --git a/tests/world_debris_tests.cpp b/tests/world_debris_tests.cpp
+index 310fef6..ee96403 100644
+--- a/tests/world_debris_tests.cpp
++++ b/tests/world_debris_tests.cpp
+@@ -246,7 +246,7 @@ namespace
+                 failed += e.state == EntryState::Failed;
+             }
+             std::cout << "Created=" << created << " unsupported=" << unknown << " failed=" << failed << '\n';
+-            CHECK(created == 435 && unknown == 18 && failed == 1);
++            CHECK(created == 443 && unknown == 10 && failed == 1);
+             // Exercise original destruction/name activation, not direct fragment creation.
+             auto* list = g.server.FindNamedObjects("billboard");
+             CHECK(list && list->m_pFirstLink);
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index ff19df4..d2b76a6 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -983,8 +983,8 @@ namespace
+                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
+                 else
+                 {
+-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 467 && d.editor_only == 541 &&
+-                          d.unknown == 18 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
++                    CHECK(d.entries.size() == 1026 && d.schema_checked == 475 && d.editor_only == 541 &&
++                          d.unknown == 10 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                     for (const auto& e : d.entries)
+                         if (e.state == DestinationEntryState::InvalidProperties)
+                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+@@ -1309,7 +1309,7 @@ namespace
+             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+             std::cout << "CityHub refusal " << cycle << ": " << error << '\n';
+             CHECK(game.get() == owner && game->objects.snapshot() == ids && globals.unchanged());
+-            CHECK(game->level_change.unknown == 18 && game->level_change.failed == 1);
++            CHECK(game->level_change.unknown == 10 && game->level_change.failed == 1);
+             CHECK(game->level_change.cleanup_complete && game->level_change.source_retained);
+             CHECK(game->world_revision == revision && game->objects.time() == time);
+             CHECK(game->server.audio.voices().size() == voices.size());
+@@ -1410,7 +1410,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 435 && d.unknown == 18 && d.failed == 1);
++                        CHECK(d.created == 443 && d.unknown == 10 && d.failed == 1);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

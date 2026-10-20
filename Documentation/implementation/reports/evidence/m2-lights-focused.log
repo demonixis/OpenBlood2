@@ -1,0 +1,31 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 200: lights.damage
+      Start 204: lights.catalog
+      Start 196: lights.defaults
+      Start 202: lights.motion
+ 1/10 Test #196: lights.defaults ..................   Passed    0.00 sec
+      Start 201: lights.validation
+ 2/10 Test #202: lights.motion ....................   Passed    0.00 sec
+      Start 203: lights.teardown
+ 3/10 Test #201: lights.validation ................   Passed    0.00 sec
+      Start 199: lights.lifetime
+ 4/10 Test #203: lights.teardown ..................   Passed    0.00 sec
+      Start 198: lights.commands
+ 5/10 Test #200: lights.damage ....................   Passed    0.01 sec
+      Start 197: lights.waves
+ 6/10 Test #199: lights.lifetime ..................   Passed    0.00 sec
+ 7/10 Test #198: lights.commands ..................   Passed    0.00 sec
+ 8/10 Test #197: lights.waves .....................   Passed    0.00 sec
+ 9/10 Test #204: lights.catalog ...................   Passed    3.74 sec
+      Start 205: gpu.lights
+10/10 Test #205: gpu.lights .......................   Passed    3.78 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+gpu         =   3.78 sec*proc (1 test)
+headless    =   3.77 sec*proc (9 tests)
+lights      =   7.55 sec*proc (10 tests)
+private     =   7.52 sec*proc (2 tests)
+
+Total Test time (real) =   7.52 sec

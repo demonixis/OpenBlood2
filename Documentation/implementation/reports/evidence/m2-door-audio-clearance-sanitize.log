@@ -1,0 +1,17 @@
+Test project <workspace>/Blood2/build/sanitize
+    Start 503: ai_runtime.clearance_private
+1/1 Test #503: ai_runtime.clearance_private .....***Timeout  90.12 sec
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+ai_runtime    =  90.12 sec*proc (1 test)
+headless      =  90.12 sec*proc (1 test)
+private       =  90.12 sec*proc (1 test)
+
+Total Test time (real) =  90.13 sec
+
+The following tests FAILED:
+	503 - ai_runtime.clearance_private (Timeout)            ai_runtime headless private
+Errors while running CTest

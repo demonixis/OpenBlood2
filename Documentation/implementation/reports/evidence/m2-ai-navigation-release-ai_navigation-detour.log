@@ -1,0 +1,14 @@
+398/402 Testing: ai_navigation.detour
+398/402 Test: ai_navigation.detour
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_navigation_tests" "detour"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_navigation.detour" start time: Oct 16 12:29 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_navigation.detour" end time: Oct 16 12:29 CEST
+"ai_navigation.detour" time elapsed: 00:00:00
+----------------------------------------------------------

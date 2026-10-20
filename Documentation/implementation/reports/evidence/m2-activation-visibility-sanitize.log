@@ -1,0 +1,162 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 586: session_playback.private
+      Start 643: gideon_runtime.subway
+ 1/72 Test #586: session_playback.private ..........   Passed   88.65 sec
+      Start 453: ai_runtime.subway
+ 2/72 Test #643: gideon_runtime.subway .............   Passed   93.02 sec
+      Start  40: world.destination_trial_private
+ 3/72 Test  #40: world.destination_trial_private ...   Passed   20.69 sec
+      Start 451: ai_runtime.catalog
+ 4/72 Test #451: ai_runtime.catalog ................   Passed    2.99 sec
+      Start 454: ai_runtime.arena
+ 5/72 Test #454: ai_runtime.arena ..................   Passed    1.96 sec
+      Start 642: gideon_runtime.profile
+ 6/72 Test #453: ai_runtime.subway .................   Passed   30.11 sec
+      Start 455: ai_runtime.sparse_weapons
+ 7/72 Test #455: ai_runtime.sparse_weapons .........   Passed    0.74 sec
+      Start 644: gideon_runtime.arena
+ 8/72 Test #642: gideon_runtime.profile ............   Passed    1.74 sec
+      Start  57: player.private
+ 9/72 Test #644: gideon_runtime.arena ..............   Passed    1.31 sec
+      Start  51: services.private
+10/72 Test  #51: services.private ..................   Passed   12.77 sec
+      Start 452: ai_runtime.failures
+11/72 Test #452: ai_runtime.failures ...............   Passed    0.35 sec
+      Start 402: ai_script.catalog
+12/72 Test  #57: player.private ....................   Passed   14.59 sec
+      Start 298: ai_sight.subway
+13/72 Test #402: ai_script.catalog .................   Passed    3.33 sec
+      Start  24: world.destination_trials
+14/72 Test  #24: world.destination_trials ..........   Passed    0.18 sec
+      Start 297: ai_sight.catalog
+15/72 Test #297: ai_sight.catalog ..................   Passed    1.08 sec
+      Start  27: world.destination_lifetime
+16/72 Test  #27: world.destination_lifetime ........   Passed    0.06 sec
+      Start 639: gideon_runtime.client
+17/72 Test #639: gideon_runtime.client .............   Passed    0.05 sec
+      Start 641: gideon_runtime.lifetime
+18/72 Test #641: gideon_runtime.lifetime ...........   Passed    0.05 sec
+      Start 637: gideon_runtime.defaults
+19/72 Test #637: gideon_runtime.defaults ...........   Passed    0.03 sec
+      Start 640: gideon_runtime.damage
+20/72 Test #640: gideon_runtime.damage .............   Passed    0.04 sec
+      Start 638: gideon_runtime.health
+21/72 Test #638: gideon_runtime.health .............   Passed    0.04 sec
+      Start 443: ai_runtime.lifetime
+22/72 Test #443: ai_runtime.lifetime ...............   Passed    0.02 sec
+      Start 450: ai_runtime.missing
+23/72 Test #450: ai_runtime.missing ................   Passed    0.02 sec
+      Start 449: ai_runtime.body
+24/72 Test #449: ai_runtime.body ...................   Passed    0.02 sec
+      Start 439: ai_runtime.activation
+25/72 Test #439: ai_runtime.activation .............   Passed    0.02 sec
+      Start 448: ai_runtime.triggers
+26/72 Test #448: ai_runtime.triggers ...............   Passed    0.02 sec
+      Start 444: ai_runtime.targets
+27/72 Test #444: ai_runtime.targets ................   Passed    0.02 sec
+      Start 447: ai_runtime.spatial
+28/72 Test #447: ai_runtime.spatial ................   Passed    0.02 sec
+      Start 445: ai_runtime.tracking
+29/72 Test #445: ai_runtime.tracking ...............   Passed    0.02 sec
+      Start 446: ai_runtime.camera
+30/72 Test #446: ai_runtime.camera .................   Passed    0.02 sec
+      Start 440: ai_runtime.visibility
+31/72 Test #440: ai_runtime.visibility .............   Passed    0.02 sec
+      Start 585: session_playback.policy
+32/72 Test #585: session_playback.policy ...........   Passed    0.02 sec
+      Start  45: services.model_rejection
+33/72 Test  #45: services.model_rejection ..........   Passed    0.37 sec
+      Start  10: objects.unsupported_teardown
+34/72 Test  #10: objects.unsupported_teardown ......   Passed    0.07 sec
+      Start   9: objects.messages_strings
+35/72 Test   #9: objects.messages_strings ..........   Passed    0.04 sec
+      Start  11: objects.creation_failures
+36/72 Test  #11: objects.creation_failures .........   Passed    0.04 sec
+      Start   3: objects.reasons_properties
+37/72 Test   #3: objects.reasons_properties ........   Passed    0.02 sec
+      Start   8: objects.links_lists
+38/72 Test   #8: objects.links_lists ...............   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+39/72 Test   #5: objects.deferred_removal ..........   Passed    0.02 sec
+      Start   1: objects.original_objects
+40/72 Test   #1: objects.original_objects ..........   Passed    0.03 sec
+      Start   2: objects.nested_creation
+41/72 Test #298: ai_sight.subway ...................   Passed    4.66 sec
+      Start   4: objects.scheduling
+42/72 Test   #2: objects.nested_creation ...........   Passed    0.03 sec
+      Start   7: objects.handles_selection
+43/72 Test   #4: objects.scheduling ................   Passed    0.03 sec
+      Start   6: objects.aggregate_dispatch
+44/72 Test   #7: objects.handles_selection .........   Passed    0.02 sec
+      Start 401: ai_script.audio
+45/72 Test   #6: objects.aggregate_dispatch ........   Passed    0.02 sec
+      Start  54: player.rollback
+46/72 Test #401: ai_script.audio ...................   Passed    0.07 sec
+      Start 400: ai_script.lifetime
+47/72 Test  #54: player.rollback ...................   Passed    0.07 sec
+      Start 399: ai_script.movement
+48/72 Test #399: ai_script.movement ................   Passed    0.03 sec
+      Start  53: player.lifecycle
+49/72 Test #400: ai_script.lifetime ................   Passed    0.04 sec
+      Start  55: player.messages
+50/72 Test  #55: player.messages ...................   Passed    0.08 sec
+      Start  56: player.callbacks
+51/72 Test  #53: player.lifecycle ..................   Passed    0.10 sec
+      Start 396: ai_script.waiting
+52/72 Test #396: ai_script.waiting .................   Passed    0.03 sec
+      Start 398: ai_script.state_target
+53/72 Test  #56: player.callbacks ..................   Passed    0.06 sec
+      Start 395: ai_script.sequencing
+54/72 Test #398: ai_script.state_target ............   Passed    0.02 sec
+      Start 397: ai_script.animations
+55/72 Test #395: ai_script.sequencing ..............   Passed    0.03 sec
+      Start 296: ai_sight.lifetime
+56/72 Test #397: ai_script.animations ..............   Passed    0.02 sec
+      Start 394: ai_script.parsing
+57/72 Test #394: ai_script.parsing .................   Passed    0.03 sec
+      Start 293: ai_sight.filters
+58/72 Test #296: ai_sight.lifetime .................   Passed    0.03 sec
+      Start  52: player.handles
+59/72 Test #293: ai_sight.filters ..................   Passed    0.04 sec
+      Start 292: ai_sight.head
+60/72 Test  #52: player.handles ....................   Passed    0.04 sec
+      Start 294: ai_sight.world
+61/72 Test #292: ai_sight.head .....................   Passed    0.03 sec
+      Start 291: ai_sight.body
+62/72 Test #294: ai_sight.world ....................   Passed    0.03 sec
+      Start 295: ai_sight.failures
+63/72 Test #295: ai_sight.failures .................   Passed    0.03 sec
+      Start  47: services.model_callbacks
+64/72 Test #291: ai_sight.body .....................   Passed    0.03 sec
+      Start  44: services.model_reader
+65/72 Test  #47: services.model_callbacks ..........   Passed    0.03 sec
+      Start  50: services.original_services
+66/72 Test  #44: services.model_reader .............   Passed    0.03 sec
+      Start  46: services.animation_events
+67/72 Test  #46: services.animation_events .........   Passed    0.02 sec
+      Start  49: services.movement_contacts
+68/72 Test  #50: services.original_services ........   Passed    0.03 sec
+      Start  48: services.collision_queries
+69/72 Test  #49: services.movement_contacts ........   Passed    0.02 sec
+      Start 441: ai_runtime.visibility_filter
+70/72 Test  #48: services.collision_queries ........   Passed    0.02 sec
+      Start 442: ai_runtime.visibility_atomic
+71/72 Test #442: ai_runtime.visibility_atomic ......   Passed    0.03 sec
+72/72 Test #441: ai_runtime.visibility_filter ......   Passed    0.03 sec
+
+100% tests passed, 0 tests failed out of 72
+
+Label Time Summary:
+ai_runtime          =  36.43 sec*proc (17 tests)
+ai_script           =   3.61 sec*proc (9 tests)
+ai_sight            =   5.93 sec*proc (8 tests)
+gideon_runtime      =  96.27 sec*proc (8 tests)
+headless            = 280.44 sec*proc (72 tests)
+objects             =   0.35 sec*proc (11 tests)
+player              =  14.94 sec*proc (6 tests)
+private             = 278.00 sec*proc (15 tests)
+services            =  13.30 sec*proc (8 tests)
+session_playback    =  88.67 sec*proc (2 tests)
+world               =  20.94 sec*proc (3 tests)
+
+Total Test time (real) = 140.25 sec

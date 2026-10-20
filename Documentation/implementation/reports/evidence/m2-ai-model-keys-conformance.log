@@ -1,0 +1,325 @@
+../sources/blood2/Shared/SharedDefs.h:10:#define B2_LITE
+../sources/blood2/Shared/SharedDefs.h:13:	#define NRES(x)				3
+../sources/blood2/Shared/SharedDefs.h:14:	#define B2_LITE_MAXSOUNDS	3
+../sources/blood2/Shared/SharedDefs.h:16:	#define NRES(x) x
+../sources/blood2/Shared/SharedDefs.h:17:	#define B2_LITE_MAXSOUNDS	300
+
+sources/blood2/ObjectDLL/AI_Mgr.cpp 05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7
+119: 	m_hTarget		= DNULL;
+120: 	VEC_INIT(m_vTargetPos);
+121:    	m_hTrackObject  = DNULL;
+122:     VEC_INIT(m_vTrackObjPos);
+123: 
+124: 	memset(&m_fStimuli,0,sizeof(m_fStimuli));		
+125: 
+126: 	m_nState		= STATE_Idle;
+127:     m_nLastState    = STATE_Idle;
+276: DBOOL AI_Mgr::InitStatics(CAnim_Sound* pAnim_Sound)
+277: {
+278:     m_pAnim_Sound = pAnim_Sound;
+279: 
+280: 	return DTRUE;
+281: }
+876: void AI_Mgr::OnStringKey(ArgList* pArgList)
+877: {
+878: 	if (!m_pServerDE || !pArgList || !pArgList->argv || pArgList->argc == 0) return;
+879: 
+880: 	char* pKey = pArgList->argv[0];
+881: 	if (!pKey) return;
+882: 
+883: 	char szTemp[32];
+884: 
+885: 	//fire current weapon 
+886: 	if(Sparam_Get(szTemp,pKey,"fire_key"))
+887: 	{
+888: 		if(m_hTarget == DNULL)
+889: 			return;
+890: 
+891: 		Fire();
+892: 	}
+893: 	else if(Sparam_Get(szTemp,pKey,"show_weapon"))
+894: 	{
+895: 		char szTmp[8];
+896: 		int nNum = atoi(szTmp);
+897: 
+898: 		CWeapon* pW = m_InventoryMgr.GetCurrentWeapon();
+899: 
+900: 		if(pW)
+901: 			pW->ShowHandModel(nNum);
+902: 	}
+903: 	else if(Sparam_Get(szTemp,pKey,"extra_key"))
+904: 	{
+905: 		MC_Extra(szTemp);
+906: 	}
+907: 	else if(Sparam_Get(szTemp,pKey,"play_sound"))
+908: 	{
+909: 		//scripted scene? disable!!
+910: 		if(g_hActiveCamera && m_nState != STATE_Script ) // && m_nState != STATE_Passive && m_nState != STATE_Idle)
+911: 		{
+912: 			CameraObj* pCameraObj = (CameraObj*)m_pServerDE->HandleToObject(g_hActiveCamera);
+913: 			if(!pCameraObj->AllowPlayerMovement())
+914: 			{
+915: 				return;
+916: 			}
+917: 		}
+918: 
+919: 		if(m_nState != STATE_Script)
+920: 		{
+921: 			char szSound[256];
+922: 			char szTmp[8];
+923: 
+924: 			if(Sparam_Get(szTmp,pKey,"sound_random"))
+925: 			{
+926: 				int nMax = atoi(szTmp);
+927: 				int nNum = m_pServerDE->IntRandom(1,NRES(nMax));
+928: 				sprintf(szSound, "%s%d.wav", szTemp, nNum);
+929: 			}
+930: 			else
+931: 			{
+932: 				sprintf(szSound, "%s.wav", szTemp);
+933: 			}
+934: 
+935: 			DFLOAT fRadius = 1000.0f;
+936: 
+937: 			if(Sparam_Get(szTmp,pKey,"sound_radius"))
+938: 			{
+939: 				fRadius = (DFLOAT)atof(szTmp);
+940: 			}
+941: 
+942: 			int nVol = 100;
+943: 
+944: 			if(Sparam_Get(szTmp,pKey,"sound_volume"))
+945: 			{
+946: 				nVol = atoi(szTmp);
+947: 			}
+948: 
+949: 			int nChance = 100;
+950: 
+951: 			if(Sparam_Get(szTmp,pKey,"sound_chance"))
+952: 			{
+953: 				nChance = atoi(szTmp);
+954: 			}
+955: 
+956: 			DBOOL bVoice = DFALSE;
+957: 
+958: 			if(Sparam_Get(szTmp,pKey,"sound_voice"))
+959: 			{
+960: 				bVoice = atoi(szTmp);
+961: 			}
+962: 
+963: 			if(IsRandomChance(nChance))
+964: 			{
+965: 				if(bVoice)
+966: 					m_pAnim_Sound->PlayVoice(m_hObject, szSound, fRadius, nVol);
+967: 				else
+968: 					m_pAnim_Sound->PlaySound(m_hObject, szSound, fRadius, nVol);
+969: 			}
+970: 		}
+971: 	}
+972: 
+973: 	CBaseCharacter::OnStringKey(pArgList);
+974: 	
+975: 	return;
+
+sources/blood2/ObjectDLL/AI_Mgr.h fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350
+1: 
+2:  /****************************************************************************
+3:  ;
+4:  ;	MODULE:		AI_Mgr.h
+5:  ; ;
+6:  ;	HISTORY:	Created by SCHLEGZ on 3/18/98 10:11:58 PM
+7:  ;
+8:  ;	COMMENT:	Copyright (c) 1997, Monolith Productions Inc.
+9:  ;
+10:  ****************************************************************************/
+11: 
+12: #ifndef __AI_MGR_H__
+13: #define __AI_MGR_H__
+14: 
+15: #include "basecharacter.h"
+16: #include "cpp_aggregate_de.h"
+17: #include "InventoryMgr.h"
+18: #include "Anim_Sound.h"
+19: 
+20: #include "AI_Shared.h"
+21: #include "AIScriptList.h"
+22: #include "PathList.h"
+23: #include "physicalattributes.h"
+24: 
+25: // Don't include this here, causes conflict if you include this header in any function that uses PlaySound
+26: // GK
+27: //#include <windows.h> 
+28: 
+29: #define ADD_BASEAI_AGGREGATE() \
+30: 	ADD_STRINGPROP(SpotTriggerTarget, "") \
+31: 	ADD_STRINGPROP(SpotTriggerMessage, "") \
+32: 	ADD_STRINGPROP(TriggerRelayTarget, "") \
+33: 
+34: #define	SIGHT				0
+35: #define SOUND				1
+36: #define SMELL				2
+37: #define SENSE				3
+38: #define THREAT				4
+39: #define HEALTH				5
+40: #define NUM_STIMULI			HEALTH + 1
+41: 
+42: #define STIM_SIGHT			1
+43: #define STIM_SOUND			2
+44: #define STIM_SMELL			3
+45: #define STIM_SENSE			4
+46: 
+47: #define STATE_AttackClose			0
+48: #define STATE_AttackFar				1
+49: #define STATE_SearchVisualTarget	2
+50: #define STATE_Escape_Hide			3
+51: #define STATE_Escape_RunAway		4
+52: #define STATE_Idle					5
+53: #define STATE_GuardLocation			6
+54: #define STATE_FindHealth			7
+55: #define STATE_FindAmmo				8
+56: #define STATE_Hide					9
+57: #define STATE_Dodge					10
+58: #define STATE_Teleport				11
+59: #define STATE_EnemyAttach			12
+60: #define STATE_AssistAlly			13
+61: #define STATE_SearchSmellTarget		14
+62: #define STATE_Special1				15
+63: #define STATE_Special2				16
+64: #define STATE_Special3				17
+65: #define STATE_Special4				18
+66: #define STATE_Special5				19
+67: #define STATE_Special6				20
+68: #define STATE_Special7				21
+69: #define STATE_Special8				22
+70: #define STATE_Special9				23
+71: #define STATE_Passive				24
+72: 
+73: #define STATE_Dying				100
+74: #define STATE_Script			101
+75: #define STATE_Recoil			102
+
+sources/blood2/Shared/SharedDefs.h 9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b
+1: #ifndef __SHAREDEFS_H__
+2: #define __SHAREDEFS_H__
+3: 
+4: 
+5: #include "assert.h"
+6: #include "NetDefs.h"
+7: 
+8: //**************************************************************************
+9: 
+10: #define B2_LITE
+11: 
+12: #ifdef B2_LITE
+13: 	#define NRES(x)				3
+14: 	#define B2_LITE_MAXSOUNDS	3
+15: #else
+16: 	#define NRES(x) x
+17: 	#define B2_LITE_MAXSOUNDS	300
+18: #endif
+
+sources/blood2/ObjectDLL/ObjectUtilities.h 93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842
+189: 	if (hConVar) fVal = g_pServerDE->GetVarValueFloat(hConVar);
+190: 	return fVal;
+191: }
+192: 
+193: inline DBOOL IsRandomChance(int percent)
+194: {
+
+sources/blood2/ObjectDLL/CivilianAI.cpp 337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8
+300: 
+301: DBOOL CivilianAI::InitialUpdate(DVector *pMovement)
+302: {
+303: 	m_pServerDE = BaseClass::GetServerDE();
+304: 	if (!m_pServerDE) return DFALSE;
+305: 
+306: 	//Load up animation indexes if first model instance
+307: 	if(m_bMale || m_bLabTech && m_bMaleAnims)
+308: 	{
+309: 		m_Male_Anim_Sound.SetAnimationIndexes(m_hObject);
+310: 		m_Male_Anim_Sound.GenerateHitSpheres(m_hObject);
+311: 
+312: 		m_Male_Anim_Sound.SetSoundRoot("sounds\\enemies\\civilian");
+313: 		m_bMaleAnims = DFALSE;
+314: 	}
+315: 
+316: 	if(!m_bMale && m_bFemaleAnims)
+317: 	{
+318: 		m_Female_Anim_Sound.SetAnimationIndexes(m_hObject);
+319: 		m_Female_Anim_Sound.GenerateHitSpheres(m_hObject);
+320: 
+321: 		m_Female_Anim_Sound.SetSoundRoot("sounds\\enemies\\f_civ");
+322: 		m_bFemaleAnims = DFALSE;
+323: 	}
+324: 
+325: 	if(m_bMale || m_bLabTech)
+326: 		AI_Mgr::InitStatics(&m_Male_Anim_Sound);
+327: 	else
+328: 		AI_Mgr::InitStatics(&m_Female_Anim_Sound);
+329: 
+330: 	return DTRUE;
+
+sources/blood2/ObjectDLL/CultistAI.cpp 4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35
+216: 	if (m_bRobeSkin) {
+217: 		m_bRobeSkin = DFALSE;
+218: 		m_bMale = DTRUE;
+219: 	}
+220: #endif
+221: 
+222: 	//Load up animation indexes if first model instance
+223: 	if((m_bMale || m_bClownSkin) && m_bMaleAnims)
+224: 	{
+225: 		m_Male_Anim_Sound.SetAnimationIndexes(m_hObject);
+226: 		m_Male_Anim_Sound.GenerateHitSpheres(m_hObject);
+227: 
+228: 		m_Male_Anim_Sound.SetSoundRoot("sounds\\enemies\\m_cultist");
+229: 		m_bMaleAnims = DFALSE;
+230: 	}
+231: #ifdef _ADD_ON
+232: 	if (m_bRobeSkin && m_bRobeAnims)
+233: 	{
+234: 		m_Robe_Anim_Sound.SetAnimationIndexes(m_hObject);
+235: 		m_Robe_Anim_Sound.GenerateHitSpheres(m_hObject);
+236: 
+237: 		m_Robe_Anim_Sound.SetSoundRoot("sounds_ao\\enemies\\RetroCultist");
+238: 		m_bRobeAnims = DFALSE;
+239: 	}
+240: #endif
+241: 	if(!m_bMale && m_bFemaleAnims && !m_bRobeSkin)
+242: 	{
+243: 		m_Female_Anim_Sound.SetAnimationIndexes(m_hObject);
+244: 		m_Female_Anim_Sound.GenerateHitSpheres(m_hObject);
+245: 
+246: 		m_Female_Anim_Sound.SetSoundRoot("sounds\\enemies\\f_cultist");
+247: 		m_bFemaleAnims = DFALSE;
+248: 	}
+249: 
+250: 	m_InventoryMgr.AddDamageMultiplier(0.5f);	
+251: 
+252: 	if((m_bMale || m_bClownSkin) && !m_bRobeSkin)
+253: 		AI_Mgr::InitStatics(&m_Male_Anim_Sound);
+254: #ifdef _ADD_ON
+255: 	else if (m_bRobeSkin)
+256: 		AI_Mgr::InitStatics(&m_Robe_Anim_Sound);
+257: #endif
+258: 	else
+259: 		AI_Mgr::InitStatics(&m_Female_Anim_Sound);
+260: 	
+
+sources/blood2/ObjectDLL/Gideon.cpp 42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d
+220: 
+221: DBOOL Gideon::InitialUpdate(DVector *pMovement)
+222: {
+223: 	m_pServerDE = BaseClass::GetServerDE();
+224: 	if (!m_pServerDE) return DFALSE;
+225: 
+226:     if(m_bLoadAnims)
+227: 	{
+228: 	    m_Anim_Sound.SetAnimationIndexes(m_hObject);
+229: 		m_Anim_Sound.GenerateHitSpheres(m_hObject);
+230: 	    m_Anim_Sound.SetSoundRoot("sounds\\enemies\\Gideon");
+231: 		m_bLoadAnims = DFALSE;
+232: 	}
+233: 
+234: 	AI_Mgr::InitStatics(&m_Anim_Sound);
+235: 

@@ -1,0 +1,14 @@
+483/485 Testing: inventory_state.rollback
+483/485 Test: inventory_state.rollback
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory_state_tests" "rollback" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory-state-fixtures/rollback"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"inventory_state.rollback" start time: Oct 16 17:45 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"inventory_state.rollback" end time: Oct 16 17:45 CEST
+"inventory_state.rollback" time elapsed: 00:00:00
+----------------------------------------------------------

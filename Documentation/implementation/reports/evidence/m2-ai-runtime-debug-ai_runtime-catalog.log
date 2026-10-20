@@ -1,0 +1,30 @@
+469/472 Testing: ai_runtime.catalog
+469/472 Test: ai_runtime.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_runtime.catalog" start time: Oct 16 15:09 CEST
+Output:
+----------------------------------------------------------
+CultistAI male=1 difficulty=0 hp=7.75 model=Models/Enemies/m_Cultist1.abc
+CultistAI male=1 difficulty=1 hp=31 model=Models/Enemies/m_Cultist1.abc
+CultistAI male=1 difficulty=2 hp=46.5 model=Models/Enemies/m_Cultist1.abc
+CultistAI male=1 difficulty=3 hp=31 model=Models/Enemies/m_Cultist1.abc
+CultistAI male=0 difficulty=0 hp=7.75 model=Models/Enemies/f_Cultist1.abc
+CultistAI male=0 difficulty=1 hp=31 model=Models/Enemies/f_Cultist1.abc
+CultistAI male=0 difficulty=2 hp=46.5 model=Models/Enemies/f_Cultist1.abc
+CultistAI male=0 difficulty=3 hp=31 model=Models/Enemies/f_Cultist1.abc
+CivilianAI male=1 difficulty=0 hp=7.75 model=Models/Enemies/m_civilian1.abc
+CivilianAI male=1 difficulty=1 hp=31 model=Models/Enemies/m_civilian1.abc
+CivilianAI male=1 difficulty=2 hp=46.5 model=Models/Enemies/m_civilian1.abc
+CivilianAI male=1 difficulty=3 hp=31 model=Models/Enemies/m_civilian1.abc
+CivilianAI male=0 difficulty=0 hp=7.75 model=Models/Enemies/f_civilian1.abc
+CivilianAI male=0 difficulty=1 hp=31 model=Models/Enemies/f_civilian1.abc
+CivilianAI male=0 difficulty=2 hp=46.5 model=Models/Enemies/f_civilian1.abc
+CivilianAI male=0 difficulty=3 hp=31 model=Models/Enemies/f_civilian1.abc
+<end of output>
+Test time =   0.64 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.catalog" end time: Oct 16 15:09 CEST
+"ai_runtime.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

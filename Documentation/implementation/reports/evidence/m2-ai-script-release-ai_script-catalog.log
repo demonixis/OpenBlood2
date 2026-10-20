@@ -1,0 +1,27 @@
+422/422 Testing: ai_script.catalog
+422/422 Test: ai_script.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_script_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_script.catalog" start time: Oct 16 13:20 CEST
+Output:
+----------------------------------------------------------
+Key.MessageName parsed=1 commands=2 error=
+Trigger.MessageName7 parsed=1 commands=2 error=
+Trigger.MessageName1 parsed=1 commands=3 error=
+Trigger.MessageName2 parsed=1 commands=3 error=
+Trigger.MessageName3 parsed=1 commands=1 error=
+Trigger.MessageName4 parsed=1 commands=1 error=
+SubwayA authored scripts=6 rejected=0 parsed instructions=12
+m_cultist1 clip=idle1 completed=1
+f_cultist1 clip=idle1 completed=1
+m_civilian1 clip=idle1 completed=1
+f_civilian1 clip=idle1 completed=1
+labtech clip=idle1 completed=1
+gideon clip=run_knife1 completed=1
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.catalog" end time: Oct 16 13:20 CEST
+"ai_script.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

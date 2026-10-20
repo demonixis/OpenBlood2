@@ -1,0 +1,36 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 294: gpu.sound
+1/2 Test #294: gpu.sound ........................***Failed    3.43 sec
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/release/tests/world-sounds.png
+[info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[error] GPU smoke failed: selection=true, crouch/run frames=0/0, skeleton reentry/hidden=false/false, crouched/stood=false/false, locomotion/walk/run/jump=false/false/false/false, objects=232/232, strings=5/5
+
+    Start 615: gpu.player_keepalive
+2/2 Test #615: gpu.player_keepalive .............   Passed    2.21 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Label Time Summary:
+gpu                 =   5.64 sec*proc (2 tests)
+player_keepalive    =   2.21 sec*proc (1 test)
+private             =   5.64 sec*proc (2 tests)
+sound               =   3.43 sec*proc (1 test)
+
+Total Test time (real) =   5.66 sec
+
+The following tests FAILED:
+	294 - gpu.sound (Failed)                                gpu private sound
+Errors while running CTest

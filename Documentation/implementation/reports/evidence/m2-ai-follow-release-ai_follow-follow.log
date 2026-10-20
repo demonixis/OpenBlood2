@@ -1,0 +1,14 @@
+405/413 Testing: ai_follow.follow
+405/413 Test: ai_follow.follow
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_follow_tests" "follow"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_follow.follow" start time: Oct 16 13:00 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.follow" end time: Oct 16 13:00 CEST
+"ai_follow.follow" time elapsed: 00:00:00
+----------------------------------------------------------

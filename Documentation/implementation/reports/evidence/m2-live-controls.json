@@ -1,0 +1,235 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "5c825dc1f8897e44ea1dc0d1cca12fb4bdad1acf",
+  "status": "M2 incomplete; actual explicit-voice controls, no timed channel delivery or live MUSIC",
+  "frozen_sources": {
+    "src/engine/dls_sampler.h": "ea653286cb50c9efb5dd939a8f7bf0159c2728b0d32c5f123b76cbf98153d2e0",
+    "src/engine/dls_sampler.cpp": "a411edc310208ee4afbb88651d1693fc8b59c22b2b2ca57afd018a62568d2af9",
+    "src/app/inspector_world_sounds.cpp": "d34456ccb0908c33362f661b223a4aab942a1122ef2ccdcd6f14924d15aff12d",
+    "src/app/world_sound_smoke.cpp": "9100f7db64861e6bc8c54b91ce317bf6cc69caaa42fdfe8269390c03e0845adf",
+    "tests/dls_sampler_tests.cpp": "36247af9caabaaaee06b2b07e5273483187b2c1663324e71934ed2f5cfc3fb93",
+    "tests/CMakeLists.txt": "6896c9fb0325d962a8172236d15bc33fbe68c23e77a511c6053f67757c8de6bf"
+  },
+  "results": {
+    "debug-tests": {
+      "passed": 129,
+      "wall_seconds": 19.69
+    },
+    "release-tests": {
+      "passed": 129,
+      "wall_seconds": 1.77
+    },
+    "sanitize-tests": {
+      "passed": 129,
+      "wall_seconds": 80.48
+    },
+    "debug-gpu": {
+      "passed": 2,
+      "wall_seconds": 11.52
+    },
+    "release-gpu": {
+      "passed": 2,
+      "wall_seconds": 5.3
+    }
+  },
+  "unchanged_source_warnings": {
+    "debug": [],
+    "release": [
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:36:78: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]"
+    ],
+    "sanitize": [
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:36:78: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]"
+    ]
+  },
+  "original_probe": {
+    "binary": "MSynth25.dll",
+    "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+    "unicorn": "2.1.4",
+    "decode_cases": 645,
+    "pitch_cases": 32768,
+    "pitch_fnv64": 10930475445258237893,
+    "fnv64": 13983738688242496418,
+    "decisions_sha256": "a6d7e0d61c5774764656402d8fa4c8ff8eda73bc58fe2886e3fecec0e85f9847",
+    "scope": "Original CC7/10/11 and pitch-byte decoding with queue insertion intercepted; original default-range signed floor pitch arithmetic. No timing-list scheduling, PCM, OS calls or native DLL execution."
+  },
+  "commands": [
+    "python /tmp/b2-live-controls-validation.py {debug,release,sanitize} (three builds at -j1 each; relevant CTests at -j2)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/{debug,release} -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit /tmp/b2-live-controls-{debug,release}-gpu.xml",
+    "/tmp/b2-legacy-pan-tools/bin/python Documentation/Implementation/evidence/m2-live-controls-probe.py EXTERNAL_MSYNTH25_DLL",
+    "sha256sum -c /tmp/b2-live-controls-build-inputs.sha256",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror (five changed C++ files)",
+    "python /tmp/b2-npc-integrity.py; python /tmp/b2-npc-links.py; git diff --check on owned source/documentation (raw .log/.xml evidence excluded)"
+  ],
+  "limitations": [
+    "Explicit live voice updates at current sample boundary; no channel assignment, timed MIDI event queue or playlist",
+    "Original isolated control decode/default pitch arithmetic executed with insertion intercepted; no full synth/retail PCM parity",
+    "NVIDIA Linux, dummy SDL audio, hidden inspector and inspector-free Release; no native Metal/Windows/mobile execution or listening comparison",
+    "Reviewed Debug capture shows control counters and music summary; transient voice sliders were not visually exercised",
+    "Initial targeted test expected a peer release to finish too early; test interval corrected for logarithmic envelope, production envelopes unchanged"
+  ],
+  "capture": {
+    "path": "Blood2/build/debug/tests/world-sounds.png",
+    "sha256": "a3d735e0e27b12134b2a3fec6221451691f45743cc0342d6d5207e17c8135268",
+    "committed": false
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "readme_preserved_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "files": [
+    {
+      "file": "m2-live-controls-probe.py",
+      "sha256": "6ff99c8820677c0569f2b32d25e3b810fbbf45f1c50b50d9ee8ff64e41b146ee"
+    },
+    {
+      "file": "m2-live-controls-probe.json",
+      "sha256": "e03cdc18118092c6ed880e9a63533364dd909ae872dab78db341bf52c5636f76"
+    },
+    {
+      "file": "m2-live-controls-probe-errors.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-live-controls-validation.py",
+      "sha256": "c926f2a29d94e0eefa827a5a3b508eb1719f61081bdc91d1f17182628b8a85e5"
+    },
+    {
+      "file": "m2-live-controls-build-inputs.sha256",
+      "sha256": "84eb800518f460751992a1c189a41c4b5f4e221ed04abdc113a500e00315c41f"
+    },
+    {
+      "file": "m2-live-controls-focus-build.log",
+      "sha256": "310da197306adb202a1ad7bebfbc7f57435283b92caba4e04ae7dd46372f1f94"
+    },
+    {
+      "file": "m2-live-controls-focus-fix-build.log",
+      "sha256": "dcc0ed3e6a9535a7a2a95df54974684c3cbd8d874d4646e2e1db038ff8440779"
+    },
+    {
+      "file": "m2-live-controls-focus-initial.log",
+      "sha256": "52bd44ad2383b14d26f9d37d45ed5cb27dd848b41a3691ca2a0d140447822f38"
+    },
+    {
+      "file": "m2-live-controls-focus-initial.xml",
+      "sha256": "46b2dc3ecfa6a667fb44ecdd94649c33d59fc62b0aafdfb4acbfe2039130cc40"
+    },
+    {
+      "file": "m2-live-controls-focus.log",
+      "sha256": "809a30ec672262f310581ee4982457f36cde1903a868dbf84e569acda2226b73"
+    },
+    {
+      "file": "m2-live-controls-focus.xml",
+      "sha256": "ae3c1d1cc0c0903b1e81ed383e1cd26bbcfcaf486bde13d6832ad0687acf2c24"
+    },
+    {
+      "file": "m2-live-controls-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-live-controls-hash-check.log",
+      "sha256": "eaebfbc8c5d81110b7f03da160aed183081dff81de23b1489d0f6d8709db53b3"
+    },
+    {
+      "file": "m2-live-controls-debug-tests.log",
+      "sha256": "2738b1447fafdc0017a2cd9e35f2c3eb6d342acd3e07bc0c87d2050d62c794b6"
+    },
+    {
+      "file": "m2-live-controls-debug-tests.xml",
+      "sha256": "a21fe733677916f51bc9898f4bcf25ef811467f239fb8c3e7887fca5a652370b"
+    },
+    {
+      "file": "m2-live-controls-release-tests.log",
+      "sha256": "25e0e4fee935e90e3ea5f110cd0c9548fc4b2358b3466370c9c8a5840f5badfc"
+    },
+    {
+      "file": "m2-live-controls-release-tests.xml",
+      "sha256": "bf7491fca57b9778651d1a2dfc6e035697fa6c499c8696ecd22cd7dd0aeeffdd"
+    },
+    {
+      "file": "m2-live-controls-sanitize-tests.log",
+      "sha256": "16436c03ea86f80b1d9005ec502dd8dbcbcf79b1a480084f7259a656724c72de"
+    },
+    {
+      "file": "m2-live-controls-sanitize-tests.xml",
+      "sha256": "e27724ae34b153c9c03e275105ba650a98d806972bc2afeeb96f217562cdae83"
+    },
+    {
+      "file": "m2-live-controls-debug-gpu.log",
+      "sha256": "73e087021212de7484fd939eddb39ddba38db2f7fcc1c7815959b7eb48a22dce"
+    },
+    {
+      "file": "m2-live-controls-debug-gpu.xml",
+      "sha256": "5df1e5b72d60e19034025f1abb4a0d9a2c61fe548c00805fc89b6503adb1cb0e"
+    },
+    {
+      "file": "m2-live-controls-release-gpu.log",
+      "sha256": "9d2a213adef7a476b4c6382eb60eccd6d509f6d4af722eea45a949ffc4b112de"
+    },
+    {
+      "file": "m2-live-controls-release-gpu.xml",
+      "sha256": "1c8c71dbf1eb1ce210e875734cec216ed7a4ba730a022782de85ffb13c94e83d"
+    },
+    {
+      "file": "m2-live-controls-debug-build-final.log",
+      "sha256": "1ffd7086ef21472b95e694c14b05d93dba353fff697f55dd80120612056abbc1"
+    },
+    {
+      "file": "m2-live-controls-release-build-final.log",
+      "sha256": "7870781f995cb7351252028360bedfe7bbdd0f84e8989c7b98d8c19b276d990f"
+    },
+    {
+      "file": "m2-live-controls-sanitize-build-final.log",
+      "sha256": "070e94cff308bf53fcdeab176d1091b8f7ada1b2260c41e619005df7221b96c2"
+    },
+    {
+      "file": "m2-live-controls-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-live-controls-links.log",
+      "sha256": "700358a58219ca4c1248e3e9fb438c4cdf6bdad3b6468eda63e4e7789bd84ed9"
+    }
+  ],
+  "implementation_commit": "cbe97b7af9ea75cfd3693ec72ed1d8417fe9b835"
+}

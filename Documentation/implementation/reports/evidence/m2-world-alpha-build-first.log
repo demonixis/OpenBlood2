@@ -1,0 +1,54 @@
+[0/2] Re-checking globbed directories...
+[1/95] Scanning /home/yann/projects/lithtech/Blood2/src/engine/model_view.cpp for CXX dependencies
+[2/95] Scanning /home/yann/projects/lithtech/Blood2/src/engine/sprite_view.cpp for CXX dependencies
+[3/95] Scanning /home/yann/projects/lithtech/Blood2/src/engine/world_view.cpp for CXX dependencies
+[4/95] Scanning /home/yann/projects/lithtech/Blood2/src/engine/world_renderer.cpp for CXX dependencies
+[5/95] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[6/88] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[7/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[8/70] Building CXX object CMakeFiles/engine.dir/src/engine/sprite_view.cpp.o
+[9/70] Building CXX object CMakeFiles/engine.dir/src/engine/model_view.cpp.o
+[10/70] Building CXX object CMakeFiles/engine.dir/src/engine/world_renderer.cpp.o
+[11/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[12/70] Building CXX object CMakeFiles/engine.dir/src/engine/world_view.cpp.o
+[13/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[14/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_paths.cpp for CXX dependencies
+[15/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_skeleton.cpp for CXX dependencies
+[16/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector.cpp for CXX dependencies
+[17/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_cameras.cpp for CXX dependencies
+[18/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_keyframes.cpp for CXX dependencies
+[19/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_lights.cpp for CXX dependencies
+[20/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_cinematics.cpp for CXX dependencies
+[21/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_random_sounds.cpp for CXX dependencies
+[22/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_scene_explosions.cpp for CXX dependencies
+[23/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_sprites.cpp for CXX dependencies
+[24/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_world_sounds.cpp for CXX dependencies
+[25/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_objectives.cpp for CXX dependencies
+[26/70] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_pickups.cpp for CXX dependencies
+[27/70] Scanning /home/yann/projects/lithtech/Blood2/tests/world_view_tests.cpp for CXX dependencies
+[28/70] Scanning /home/yann/projects/lithtech/Blood2/tests/world_gpu_tests.cpp for CXX dependencies
+[29/70] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[30/54] Generating CXX dyndep file tests/CMakeFiles/world_view_tests.dir/CXX.dd
+[31/54] Generating CXX dyndep file tests/CMakeFiles/world_gpu_tests.dir/CXX.dd
+[32/54] Linking CXX static library libengine.a
+[33/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/model_scene.cpp.o
+[34/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/sprite_scene.cpp.o
+[35/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[36/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_paths.cpp.o
+[37/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_skeleton.cpp.o
+[38/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o
+[39/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_cameras.cpp.o
+[40/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_keyframes.cpp.o
+[41/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_lights.cpp.o
+[42/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_cinematics.cpp.o
+[43/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_random_sounds.cpp.o
+[44/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_scene_explosions.cpp.o
+[45/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_sprites.cpp.o
+[46/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_world_sounds.cpp.o
+[47/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_objectives.cpp.o
+[48/54] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_pickups.cpp.o
+[49/54] Building CXX object tests/CMakeFiles/world_gpu_tests.dir/world_gpu_tests.cpp.o
+[50/54] Building CXX object tests/CMakeFiles/world_view_tests.dir/world_view_tests.cpp.o
+[51/54] Linking CXX executable blood2
+[52/54] Linking CXX executable tests/world_view_tests
+[53/54] Linking CXX executable tests/world_gpu_tests

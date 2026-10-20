@@ -1,0 +1,35 @@
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II/ (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] World worlds/01_subwaya.dat from BLOOD2P.REZ (1 overrides)
+[info] 7446 resources in 4 mounts; DAT v56: 580 objects, 225 original instances, 116 BSP models
+[info] CClientExplosionSFX / Original instance: 9
+[info] CDestructableBrush / Original instance: 103
+[info] CameraObj / Original instance: 2
+[info] CinematicTrigger / Original instance: 4
+[info] CivilianAI / Original instance: 5
+[info] Conveyor / Original instance: 1
+[info] CultistAI / Original instance: 10
+[info] Damage / Original instance: 4
+[info] DetailSprite / Original instance: 12
+[info] DirLight / Preprocessor only: 261
+[info] Door / Original instance: 7
+[info] ExitTrigger / Original instance: 1
+[info] GameStartPoint / Original instance: 1
+[info] Gideon / Class not ported: 1
+[info] GlowingLight / Original instance: 12
+[info] Key / Original instance: 9
+[info] KeyFramer / Original instance: 4
+[info] Light / Preprocessor only: 110
+[info] ObjectivesTrigger / Original instance: 1
+[info] OutsideDef / Preprocessor only: 1
+[info] PathPoint / Original instance: 7
+[info] RandomSoundFX / Original instance: 2
+[info] Sound / World-owned sound: 4
+[info] Trigger / Original instance: 8
+[info] WorldProperties / Original instance: 1
+[error] RunWorld blocked: 1 uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat reactions, audio, autosave, keep-alive level transfer and remaining mover classes remain unported

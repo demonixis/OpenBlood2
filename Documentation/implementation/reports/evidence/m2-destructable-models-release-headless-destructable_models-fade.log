@@ -1,0 +1,14 @@
+712/718 Testing: destructable_models.fade
+712/718 Test: destructable_models.fade
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/destructable_model_tests" "fade" "/home/yann/projects/lithtech/Blood2/build/release/tests/destructable-model-fade"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"destructable_models.fade" start time: Oct 17 05:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_models.fade" end time: Oct 17 05:15 CEST
+"destructable_models.fade" time elapsed: 00:00:00
+----------------------------------------------------------

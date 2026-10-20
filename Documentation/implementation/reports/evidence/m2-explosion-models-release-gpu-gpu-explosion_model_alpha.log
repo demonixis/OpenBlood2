@@ -1,0 +1,15 @@
+555/556 Testing: gpu.explosion_model_alpha
+555/556 Test: gpu.explosion_model_alpha
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_model_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-model-alpha"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.explosion_model_alpha" start time: Oct 16 20:40 CEST
+Output:
+----------------------------------------------------------
+Original model opacity: 1510 covered pixels, half-opacity linear blend verified
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_model_alpha" end time: Oct 16 20:40 CEST
+"gpu.explosion_model_alpha" time elapsed: 00:00:00
+----------------------------------------------------------

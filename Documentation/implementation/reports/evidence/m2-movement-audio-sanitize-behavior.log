@@ -1,0 +1,68 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/sanitize/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/sanitize/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 877
+    Start 877: movement_audio.rules
+
+877: Test command: /home/yann/projects/lithtech/Blood2/build/sanitize/tests/movement_audio_tests "rules" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/movement-audio-fixtures/rules"
+877: Working Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+877: Test timeout computed to be: 30
+1/5 Test #877: movement_audio.rules .............   Passed    0.12 sec
+test 878
+    Start 878: movement_audio.jumps
+
+878: Test command: /home/yann/projects/lithtech/Blood2/build/sanitize/tests/movement_audio_tests "jumps" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/movement-audio-fixtures/jumps"
+878: Working Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+878: Test timeout computed to be: 30
+2/5 Test #878: movement_audio.jumps .............   Passed    0.20 sec
+test 879
+    Start 879: movement_audio.contexts
+
+879: Test command: /home/yann/projects/lithtech/Blood2/build/sanitize/tests/movement_audio_tests "contexts" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/movement-audio-fixtures/contexts"
+879: Working Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+879: Test timeout computed to be: 30
+879: context=0 dry voices=0 jumps=1 liquid=1 ladder=0
+879: context=1 dry voices=0 jumps=0 liquid=0 ladder=1
+879: context=2 dry voices=0 jumps=0 liquid=1 ladder=0
+879: context=3 dry voices=1 jumps=1 liquid=0 ladder=0
+3/5 Test #879: movement_audio.contexts ..........   Passed    0.66 sec
+test 880
+    Start 880: movement_audio.failures
+
+880: Test command: /home/yann/projects/lithtech/Blood2/build/sanitize/tests/movement_audio_tests "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/movement-audio-fixtures/failures"
+880: Working Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+880: Test timeout computed to be: 30
+4/5 Test #880: movement_audio.failures ..........   Passed    0.12 sec
+test 881
+    Start 881: movement_audio.private
+
+881: Test command: /home/yann/projects/lithtech/Blood2/build/sanitize/tests/movement_audio_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+881: Working Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+881: Test timeout computed to be: 120
+881: 30 Hz: one original jump voice / one landing; measured fall span=75.0092; resource=sounds/player/footsteps/stone/landm.wav
+881: 60 Hz: one original jump voice / one landing; measured fall span=83.4683; resource=sounds/player/footsteps/stone/landm.wav
+881: 120 Hz: one original jump voice / one landing; measured fall span=87.8672; resource=sounds/player/footsteps/stone/landm.wav
+5/5 Test #881: movement_audio.private ...........   Passed    1.77 sec
+
+The following tests passed:
+	movement_audio.rules
+	movement_audio.jumps
+	movement_audio.contexts
+	movement_audio.failures
+	movement_audio.private
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+audio             =   2.88 sec*proc (5 tests)
+headless          =   2.88 sec*proc (5 tests)
+movement_audio    =   2.88 sec*proc (5 tests)
+private           =   1.77 sec*proc (1 test)
+
+Total Test time (real) =   2.89 sec

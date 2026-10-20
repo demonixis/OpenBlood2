@@ -1,0 +1,171 @@
+344/630 Testing: world_view.subway
+344/630 Test: world_view.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_view_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"world_view.subway" start time: Oct 17 00:37 CEST
+Output:
+----------------------------------------------------------
+SubwayA glass: 31 faces bind textures/greys/dirtyglass.dtx; 64x64, flags=10, alpha=51..102
+Textures: decoded=52 failed=0 bytes=1962244
+SubwayA: vertices=25287 draws=111 triangles=7441 unbound=5 invisible=442 posed=110
+SubwayA glass: 31 faces bind textures/greys/dirtyglass.dtx; 64x64, flags=10, alpha=51..102
+Textures: decoded=52 failed=0 bytes=1962244
+SubwayA: vertices=25287 draws=111 triangles=7441 unbound=5 invisible=442 posed=110
+<end of output>
+Test time =   1.03 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.subway" end time: Oct 17 00:37 CEST
+"world_view.subway" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 17 00:37 CEST
+
+ai_escape =   0.29 sec*proc
+
+ai_fire =   3.39 sec*proc
+
+ai_follow =   1.41 sec*proc
+
+ai_hit =   0.24 sec*proc
+
+ai_keys =   7.03 sec*proc
+
+ai_locomotion =   0.28 sec*proc
+
+ai_navigation =   0.98 sec*proc
+
+ai_perception =   1.22 sec*proc
+
+ai_recovery =   0.29 sec*proc
+
+ai_runtime =   6.68 sec*proc
+
+ai_script =   0.70 sec*proc
+
+ai_sight =   1.18 sec*proc
+
+ai_state =  10.68 sec*proc
+
+ai_target =   1.21 sec*proc
+
+ai_trigger =   0.95 sec*proc
+
+attachments =   1.45 sec*proc
+
+brushes =   9.72 sec*proc
+
+cameras =   9.46 sec*proc
+
+character =   7.13 sec*proc
+
+character_audio =  10.21 sec*proc
+
+character_motion =   0.31 sec*proc
+
+character_nodes =   1.53 sec*proc
+
+cinematics =   5.31 sec*proc
+
+cli =   0.05 sec*proc
+
+config =   0.01 sec*proc
+
+containers =   9.97 sec*proc
+
+corpses =   0.28 sec*proc
+
+destructable_state =   1.35 sec*proc
+
+doors =   8.70 sec*proc
+
+exits =   3.46 sec*proc
+
+explosion_flames =   4.04 sec*proc
+
+explosion_fragments =   6.47 sec*proc
+
+explosion_lights =   3.11 sec*proc
+
+explosion_models =   1.57 sec*proc
+
+explosion_rings =   3.84 sec*proc
+
+explosion_sprites =   1.65 sec*proc
+
+explosions =   0.05 sec*proc
+
+headless = 322.69 sec*proc
+
+interaction =   6.91 sec*proc
+
+inventory_state =   1.36 sec*proc
+
+keyframes =  12.02 sec*proc
+
+lights =   4.87 sec*proc
+
+locomotion =   4.47 sec*proc
+
+model_view =   1.21 sec*proc
+
+movement =  15.18 sec*proc
+
+object_particles =   8.46 sec*proc
+
+objectives =   4.32 sec*proc
+
+objects =   0.04 sec*proc
+
+paths =   1.47 sec*proc
+
+pickups =   4.71 sec*proc
+
+player =   2.96 sec*proc
+
+player_controls =   5.12 sec*proc
+
+player_keepalive =   3.26 sec*proc
+
+player_restore =   1.58 sec*proc
+
+player_state =   1.35 sec*proc
+
+private = 318.42 sec*proc
+
+pushables =   0.08 sec*proc
+
+randomsound =   5.05 sec*proc
+
+sceneexplosion =   4.84 sec*proc
+
+services =   3.00 sec*proc
+
+session_playback =  11.79 sec*proc
+
+sound =   5.29 sec*proc
+
+sprite_view =   1.39 sec*proc
+
+sprites =   6.96 sec*proc
+
+texture =   2.58 sec*proc
+
+triggers =  10.19 sec*proc
+
+weapon_audio =   1.40 sec*proc
+
+weapon_drops =   0.21 sec*proc
+
+weapon_impacts =  11.88 sec*proc
+
+weapon_sprites =   3.11 sec*proc
+
+weapons =  35.50 sec*proc
+
+world =   9.66 sec*proc
+
+world_view =   1.04 sec*proc
+
+worldpaths =   3.23 sec*proc
+

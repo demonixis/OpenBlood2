@@ -1,0 +1,14 @@
+562/569 Testing: explosion_rings.motion
+562/569 Test: explosion_rings.motion
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_ring_tests" "motion" "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-rings-motion"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"explosion_rings.motion" start time: Oct 16 21:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_rings.motion" end time: Oct 16 21:15 CEST
+"explosion_rings.motion" time elapsed: 00:00:00
+----------------------------------------------------------

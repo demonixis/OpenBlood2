@@ -1,0 +1,15 @@
+331/332 Testing: ai_target.catalog
+331/332 Test: ai_target.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_target.catalog" start time: Oct 16 08:07 CEST
+Output:
+----------------------------------------------------------
+Private character facing samples=240; unchanged animation clocks/keys
+<end of output>
+Test time =   0.23 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.catalog" end time: Oct 16 08:07 CEST
+"ai_target.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

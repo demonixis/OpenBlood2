@@ -1,0 +1,880 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 7f19bf5..c544f7f 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -508,3 +508,5 @@ The [shield/powerup continuation](../Documentation/Implementation/M2_SHIELD_WEAP
+ The [Gideon combat continuation](../Documentation/Implementation/M2_GIDEON_COMBAT.md) connects selected original decisions, shield armor, node firing and extra-key powerup. Read [contracts](docs/GIDEON_COMBAT_CONTRACTS.md). Preserve strict shield/sight gates, reversed panic inequality, MAGIC column8, absent Soul Hook completion, cached-forward fallback and no timed/generic-clearance fire. Extra keys retain branch priority and checked deferred lifetime. Sparse NPC IDs must never index a player-sized array. No production boss registration/new shared table is claimed; fade/teleport, initialization, required services and safe NEW_LEVEL keep M2 open.
+ 
+ The [Gideon fade/teleport continuation](../Documentation/Implementation/M2_GIDEON_TELEPORT.md) connects original per-call fade, cached/target-centered rays and collision-aware moves. Read [contracts](docs/GIDEON_TELEPORT_CONTRACTS.md). Preserve unnormalized directions, unused miss offsets, source SOLID timing, no-GETHANDLE sound semantics and checked contact lifetime. Model alpha is rendered; additive RGB remains lighting metadata and survives supported player restoration. Production boss initialization/health/damage/attack sequencing, required FX and safe NEW_LEVEL keep M2 open.
++
++The [Gideon attack continuation](../Documentation/Implementation/M2_GIDEON_ATTACKS.md) connects original close/far sequences, timed dodges, Bold taunt and Special1 recoil. Read [contracts](docs/GIDEON_ATTACK_CONTRACTS.md). Preserve cached distance/basis, entry-only taunt velocity, repeated dodge velocity, elapsed>=1 completion independent of playback, retained lateral motion and checked target lifetime. No production boss registration or new shared global is claimed; initialization/health/damage/table ownership, required FX and safe NEW_LEVEL keep M2 open.
+diff --git a/README.md b/README.md
+index 1697337..7825c9b 100644
+--- a/README.md
++++ b/README.md
+@@ -552,3 +552,5 @@ The [shield/powerup dependency](../Documentation/Implementation/M2_SHIELD_WEAPON
+ The [Gideon combat continuation](../Documentation/Implementation/M2_GIDEON_COMBAT.md) connects original decision thresholds, shield armor, animation-driven fire and extra-key/node aiming. It also fixes sparse NPC weapon-ID initialization. Production boss lifecycle/fade/teleport, required services and safe NEW_LEVEL remain open; M2 is incomplete.
+ 
+ The [Gideon fade/teleport continuation](../Documentation/Implementation/M2_GIDEON_TELEPORT.md) adds original disappearance/reappearance, checked collision-aware teleport states, stored model color and rendered alpha and inspection. Production boss lifecycle/attack sequencing, required services and safe NEW_LEVEL remain open; M2 is incomplete.
++
++The [Gideon attack continuation](../Documentation/Implementation/M2_GIDEON_ATTACKS.md) connects original close/far sequences, one-second dodges, Bold taunt and immediate Special1 recoil, with inspection. Cached transforms, retained lateral velocity and checked failures are preserved. Production boss initialization/health/damage/shared-table ownership, required FX and safe NEW_LEVEL keep M2 incomplete.
+diff --git a/docs/AI_ESCAPE_CONTRACTS.md b/docs/AI_ESCAPE_CONTRACTS.md
+index 342bbfc..e63070d 100644
+--- a/docs/AI_ESCAPE_CONTRACTS.md
++++ b/docs/AI_ESCAPE_CONTRACTS.md
+@@ -112,3 +112,5 @@ Shade recovery, smell following, assist/pickup/recoil/death states, full product
+ NPC initialization/update/activation, required client FX and ExitTrigger/session
+ services remain open. SubwayA still has 17 unsupported source entries. Other
+ platforms, XR and retail gameplay/physics parity remain unverified.
++
++The [Gideon attack continuation](GIDEON_ATTACK_CONTRACTS.md) supersedes the selected attack/dodge/recoil sequencing omissions and adds original Bold taunt. Production boss lifecycle and the M2 gate remain incomplete.
+diff --git a/docs/AI_LOCOMOTION_CONTRACTS.md b/docs/AI_LOCOMOTION_CONTRACTS.md
+index 5313d7a..2fc2a12 100644
+--- a/docs/AI_LOCOMOTION_CONTRACTS.md
++++ b/docs/AI_LOCOMOTION_CONTRACTS.md
+@@ -102,3 +102,5 @@ The [AI recovery/navigation continuation](AI_RECOVERY_CONTRACTS.md) now executes
+ jump/crouch/crawl and seven destination/recovery/visual-search states. Earlier
+ blanket omissions for those bodies are superseded. Failed partial routes remain
+ unusable; shade recovery, other states and full production AI_Update remain open.
++
++The [Gideon attack continuation](GIDEON_ATTACK_CONTRACTS.md) supersedes the selected attack/dodge/recoil sequencing omissions and adds original Bold taunt. Production boss lifecycle and the M2 gate remain incomplete.
+diff --git a/docs/GIDEON_ATTACK_CONTRACTS.md b/docs/GIDEON_ATTACK_CONTRACTS.md
+new file mode 100644
+index 0000000..7e39be6
+--- /dev/null
++++ b/docs/GIDEON_ATTACK_CONTRACTS.md
+@@ -0,0 +1,97 @@
++# Original Gideon attack, dodge and recoil sequencing
++
++Selected `AI_STATE_AttackClose`, `AI_STATE_AttackFar`, `MC_Dodge_Left/Right`
++and the inline Recoil override now execute through the original virtual state
++dispatcher. The shared original `MC_Taunt_Bold` is also connected. See the
++[source ledger](M2_GIDEON_ATTACK_SOURCES.json),
++[verification](../../Documentation/Implementation/M2_GIDEON_ATTACKS.md),
++[combat](GIDEON_COMBAT_CONTRACTS.md), [teleport](GIDEON_TELEPORT_CONTRACTS.md),
++[locomotion](AI_LOCOMOTION_CONTRACTS.md) and [target](AI_TARGET_CONTRACTS.md) contracts.
++
++This is a boss dependency, not production registration or a completed encounter.
++The diagnostic fixture explicitly supplies inventory, animation table, movement
++cache and selected constructor values. Original boss initialization, health/damage
++messages, shared-table ownership and save/load remain pending. No new mutable game
++global or destination-transfer service is introduced. M2 remains incomplete.
++
++## Dodge and taunt commands
++
++A new left/right dodge stores server time, selects DODGE_LEFT/RIGHT, disables
++looping, then writes cached right velocity multiplied by -1/+1 and roll speed.
++It sets animating and command 21/22 only after the required services succeed.
++Continuations rewrite that velocity and complete at **elapsed >= 1 second**,
++regardless of animation duration or MS_PLAYDONE. Completion clears animating and
++increments Metacmd once; it does not stop velocity. Changing direction/command
++restarts the deadline. No RNG is consumed by the dodge method itself.
++
++Original Gideon roll speed is 3.5; the fixture sets it explicitly. The pending
++production constructor must supply it. Existing Move preserves trapped-zero and
++unnormalized velocity semantics. Commands never integrate positions or refresh
++the movement cache: the ordinary physics/CMovement owners do that once. Rendering
++and inspection cannot advance the timer. The replacement physics catch-up bound
++of 0.5 seconds remains unchanged; long tests use multiple valid ticks.
++
++Bold taunt is TAUNT[4], command18. Like the existing Beg (TAUNT[6], command17), it
++sets nonlooping playback and writes cached right*rollSpeed only on entry, then
++waits for MS_PLAYDONE. Neither continuation nor completion rewrites/stops velocity.
++Both source methods share a private implementation without changing Beg's behavior.
++The existing finite speed bounds, checked clip/atomic foot resize and completion
++overflow guards apply. Missing required services fail instead of starting an
++animation successfully as the unchecked source would.
++
++## Attack phases
++
++Both states immediately choose SearchVisual when the target is absent. A pending
++identity fails until the normal deferred link callback clears it. Distances use
++CMovement's cached position and the previously sampled target position, not a new
++body/target query. Raw distance overwrites SIGHT, as in source. Close calculates it
++only in step2; Far calculates it on every call with a target, including no-op steps.
++A never-sampled/nonfinite target or unavailable movement cache fails explicitly.
++
++Close: step1 faces; step2 fires at distance <=90% seeing range or while command7
++is already selected. Otherwise it faces, cancels that command increment and selects
++Special1 beyond 40% seeing range, or Walk in the source's retained alternative.
++Step3 continues an existing dodge direction; only a different command consumes
++one 0..99 draw (<50 right, otherwise left). Step4 calls the real ComputeState.
++The source's double .40 literal in Close is retained. No extra shot or timer fires.
++
++Far: step1 faces, cancels the increment, then fires at <=30% seeing range or while
++command7 is selected; otherwise Special1. Step2 runs Bold taunt. Step3 faces,
++cancels the increment, selects Special1 at <=40%, otherwise Walk. Step4 computes
++a new state. Existing Walk support/obstruction/animation behavior is unchanged.
++A failed facing command never executes the cancellation or subsequent action.
++Other switch steps retain the source's no-op behavior.
++
++Recoil is the original immediate transition to Special1; it does not play the base
++hit animation or wait for a recoil clip. The base method is now virtual so dispatch
++reaches this override while Cultist/Civilian behavior stays unchanged. This does
++not implement Gideon's distinct damage-message override or boss-health delivery.
++
++## Lifetime, inspection and validation boundary
++
++New methods require a live owner. A teleport contact cannot reenter attack/dodge
++and mutate the moving actor. Model selection and velocity writes invoke no user
++callbacks; model keys remain in the ordinary deferred animation batch. Existing
++fire callback/removal tests remain applicable. Failed animation selection may retain
++the source's earlier timestamp; no rollback of prior source effects is claimed.
++Invalid clocks/speeds, missing clips/cache, pending identities and counter overflow
++are observable failures. No stale actor can complete a command after removal.
++
++Skeleton adds attack update count, last raw distance, historical dodge draw,
++dodge calls/completions/elapsed time and lateral speed. Existing state, command,
++velocity, animation and failure inspection remain authoritative. The draw field is
++historical: continuing an existing dodge intentionally does not draw again. The UI
++continues to label these methods as diagnostic, with boss initialization unavailable.
++
++Synthetic tests cover exact timing, early animation completion, direction changes,
++cached basis/position, trapped motion, one physics integration, retained velocity,
++all range boundaries, in-progress fire outside range, no-target handling, recoil
++virtual dispatch, required failures and deferred ownership. Three private cycles
++run actual external Gideon shield keys, dodge and taunt clips through these states,
++then unload. The extended SDL_GPU fade scenario also checks dodge displacement,
++changed pixels, repeated render stability, one-second completion and removal.
++
++SubwayA remains 203 created / 4 transferred sounds / 372 editor-only /
++1 unsupported Gideon / 0 creation failures. Required boss/FX services and safe
++NEW_LEVEL keep the actual M2 gate open. Linux checks do not establish retail
++physics/randomness parity, a full boss fight, other-platform or XR support.
+diff --git a/docs/GIDEON_COMBAT_CONTRACTS.md b/docs/GIDEON_COMBAT_CONTRACTS.md
+index 894105f..2e9be12 100644
+--- a/docs/GIDEON_COMBAT_CONTRACTS.md
++++ b/docs/GIDEON_COMBAT_CONTRACTS.md
+@@ -105,3 +105,5 @@ and the unchanged M2 acceptance gate remain open. No retail playthrough, other
+ platform or XR validation is claimed.
+ 
+ The [Gideon fade/teleport continuation](GIDEON_TELEPORT_CONTRACTS.md) adds the original selected states, live model color/alpha, real transparent model presentation and supported player color preservation. Earlier blanket omissions are historical; production boss lifecycle and M2 remain incomplete.
++
++The [Gideon attack continuation](GIDEON_ATTACK_CONTRACTS.md) supersedes the selected attack/dodge/recoil sequencing omissions and adds original Bold taunt. Production boss lifecycle and the M2 gate remain incomplete.
+diff --git a/docs/GIDEON_TELEPORT_CONTRACTS.md b/docs/GIDEON_TELEPORT_CONTRACTS.md
+index 1c1af13..865879b 100644
+--- a/docs/GIDEON_TELEPORT_CONTRACTS.md
++++ b/docs/GIDEON_TELEPORT_CONTRACTS.md
+@@ -95,3 +95,5 @@ SubwayA remains 203 created / 4 transferred sounds / 372 editor-only /
+ 1 unsupported Gideon / 0 creation failures. Required boss services/FX and safe
+ NEW_LEVEL keep the actual M2 gate open. Linux validation is not a retail boss
+ playthrough, other-platform claim or XR verification.
++
++The [Gideon attack continuation](GIDEON_ATTACK_CONTRACTS.md) supersedes the selected attack/dodge/recoil sequencing omissions and adds original Bold taunt. Production boss lifecycle and the M2 gate remain incomplete.
+diff --git a/docs/M2_GIDEON_ATTACK_SOURCES.json b/docs/M2_GIDEON_ATTACK_SOURCES.json
+new file mode 100644
+index 0000000..92fdd83
+--- /dev/null
++++ b/docs/M2_GIDEON_ATTACK_SOURCES.json
+@@ -0,0 +1,33 @@
++{
++  "baseline_commit": "8eedff348da3f3b2b490e276c56eb84f27a61cc4",
++  "reference_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
++      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
++      "use": "MC_Dodge_Left/Right 249-315 and AI_STATE_AttackClose/Far 481-580"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Gideon.h",
++      "sha256": "5a1c49b5d7e8cfd89b851955a0bc64d5f07c2718b2b911ab40a45f0b745e57c9",
++      "use": "Inline AI_STATE_Recoil at line56"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "use": "MC_Taunt_Beg/Bold 5355-5411"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
++      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
++      "use": "IsRandomChance percent rule at193-196"
++    }
++  ],
++  "adaptations": [
++    "Selected original methods, no production constructor/factory or new shared table.",
++    "Typed failures for unavailable model/cache/target/velocity, invalid clocks/speeds and counter overflow.",
++    "Existing cached-transform timing, portable RNG, atomic foot-anchored resize and single replacement physics integration.",
++    "Shared Beg/Bold helper preserves source entry-only lateral velocity; virtual Recoil permits original subclass dispatch.",
++    "Inspection counters and explicit diagnostic fixtures do not substitute for production AI_Update."
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 9ff40f5..a3ee556 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -866,3 +866,7 @@ Selected ComputeState, MC_Fire_Stand, Fire, MC_Extra and MagicPowerup are direct
+ ## Gideon fade and teleport
+ 
+ Selected MC_FadeOut, AI_STATE_Teleport and Special1 are directly adapted from the original subclass. See [source ledger](M2_GIDEON_TELEPORT_SOURCES.json) and [contracts](GIDEON_TELEPORT_CONTRACTS.md). Color storage/rendering, snapshot preservation, checked callbacks and replacement ray/movement policies are explicit engine adaptations. No production boss or new global is introduced.
++
++## Gideon attack and dodge sequences
++
++Selected original close/far states, dodge commands, inline Recoil and shared Bold taunt are adapted directly from original sources. See [source ledger](M2_GIDEON_ATTACK_SOURCES.json) and [contracts](GIDEON_ATTACK_CONTRACTS.md). Typed failures, inspection and shared Beg/Bold implementation are explicit adaptations; no production boss or new global is introduced.
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index d139b56..d7eec0d 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -434,6 +434,13 @@ namespace OpenBlood2
+                         int(boss->completion_selection));
+             ImGui::TextWrapped("No timed firing or generic clearance query. Actual weapon shots retain their own "
+                                "collision and lifetime checks.");
++            ImGui::Text("Attack updates %llu | last distance %.2f | dodge roll %d",
++                        (unsigned long long)boss->attack_updates, boss->attack_distance, boss->dodge_roll);
++            ImGui::Text("Dodge calls %llu | finishes %llu | elapsed %.3f / 1 s | lateral speed %.2f",
++                        (unsigned long long)boss->dodge_calls, (unsigned long long)boss->dodge_finishes,
++                        boss->dodge_elapsed, boss->m_fRollSpeed);
++            ImGui::TextWrapped("Dodge completion uses the server clock, not playback; dodge/taunt retain lateral "
++                               "velocity. Attack distance uses the cached movement position.");
+             ImGui::Text("Fade calls %llu | completed moves %llu | ray result %d", (unsigned long long)boss->fade_calls,
+                         (unsigned long long)boss->teleport_moves, int(boss->teleport_ray));
+             ImGui::Text("Teleport requested %.2f %.2f %.2f", boss->teleport_requested.x, boss->teleport_requested.y,
+diff --git a/src/game/original/AIEscape.cpp b/src/game/original/AIEscape.cpp
+index 454a324..8d55f1f 100644
+--- a/src/game/original/AIEscape.cpp
++++ b/src/game/original/AIEscape.cpp
+@@ -7,23 +7,33 @@
+ using namespace OpenBlood2;
+ 
+ bool AI_Mgr::MC_Taunt_Beg()
++{
++    return TauntMovement(6, 17);
++}
++bool AI_Mgr::MC_Taunt_Bold()
++{
++    return TauntMovement(4, 18);
++}
++// Original AI_Mgr.cpp:5355-5411: both taunts start with a rightward velocity
++// write, then wait for playback without refreshing or stopping that velocity.
++bool AI_Mgr::TauntMovement(unsigned slot, int command)
+ {
+     ++locomotion_calls;
+     if (locomotion_busy)
+-        return LocomotionFailure("Reentrant beg command rejected");
++        return LocomotionFailure("Reentrant taunt command rejected");
+     locomotion_busy = true;
+     locomotion_error.clear();
+-    locomotion_command = 17;
++    locomotion_command = command;
+     // No callbacks occur in these typed clip/velocity operations. Keep original
+     // SetAnimation -> nonloop -> rightward Move -> command state ordering.
+     bool ok = LocomotionReady();
+     if (ok && (!std::isfinite(m_fRollSpeed) || m_fRollSpeed < 0 || m_fRollSpeed > 1e7f ||
+                Metacmd == std::numeric_limits<int>::max()))
+-        ok = LocomotionFailure("Invalid beg roll speed/Metacmd");
+-    if (ok && (!m_bAnimating || m_nCurMetacmd != 17))
++        ok = LocomotionFailure("Invalid taunt roll speed/Metacmd");
++    if (ok && (!m_bAnimating || m_nCurMetacmd != command))
+     {
+-        if (!m_pAnim_Sound || !SetAnimation(m_pAnim_Sound->m_nAnim_TAUNT[6]))
+-            ok = LocomotionFailure("Beg animation table/clip/resize unavailable");
++        if (!m_pAnim_Sound || !SetAnimation(m_pAnim_Sound->m_nAnim_TAUNT[slot]))
++            ok = LocomotionFailure("Taunt animation table/clip/resize unavailable");
+         else
+         {
+             GetServerDE()->SetModelLooping(m_hObject, DFALSE);
+@@ -31,7 +41,7 @@ bool AI_Mgr::MC_Taunt_Beg()
+             if (ok)
+             {
+                 m_bAnimating = true;
+-                m_nCurMetacmd = 17;
++                m_nCurMetacmd = command;
+             }
+             else
+                 LocomotionFailure(script_motion_error);
+@@ -41,7 +51,7 @@ bool AI_Mgr::MC_Taunt_Beg()
+     {
+         std::string name;
+         if (!GetServerDE()->GetModelAnimationName(m_hObject, GetServerDE()->GetModelAnimation(m_hObject), name))
+-            ok = LocomotionFailure("Beg playback unavailable");
++            ok = LocomotionFailure("Taunt playback unavailable");
+         else if (GetServerDE()->GetModelPlaybackState(m_hObject) & MS_PLAYDONE)
+         {
+             m_bAnimating = false;
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 2fc1575..5ef7c1c 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -185,6 +185,7 @@ class AI_Mgr : public CBaseCharacter
+     bool StopVelocity();
+     bool SetAnimation(DDWORD);
+     bool MC_Taunt_Beg();
++    bool MC_Taunt_Bold();
+     virtual bool AI_STATE_Escape_RunAway();
+     virtual bool AI_STATE_Escape_Hide();
+     bool AI_STATE_GuardLocation();
+@@ -250,7 +251,7 @@ class AI_Mgr : public CBaseCharacter
+     std::uint64_t death_starts = 0, corpses_created = 0, kill_voice_requests = 0;
+     HOBJECT last_corpse = nullptr; // Non-owning; the corpse survives its original actor.
+     std::string death_error;
+-    bool AI_STATE_Recoil();
++    virtual bool AI_STATE_Recoil();
+     std::uint64_t damage_reactions = 0, recoil_starts = 0;
+     int recoil_node = -1, recoil_slot = -1;
+     std::string damage_reaction_error;
+@@ -467,6 +468,7 @@ class AI_Mgr : public CBaseCharacter
+     bool runtime_busy = false;
+     bool locomotion_busy = false;
+     bool LocomotionReady();
++    bool TauntMovement(unsigned slot, int command);
+     bool LocomotionFailure(std::string_view);
+     bool Locomotion(bool run, bool fire, bool crawl = false);
+     bool navigation_busy = false;
+diff --git a/src/game/original/Gideon.cpp b/src/game/original/Gideon.cpp
+index 70fe490..e3f9cbd 100644
+--- a/src/game/original/Gideon.cpp
++++ b/src/game/original/Gideon.cpp
+@@ -352,3 +352,145 @@ bool Gideon::TeleportStep(bool special)
+             return true; // Original switch has no default action.
+     }
+ }
++
++// Original Gideon.cpp:249-315,481-580 and Gideon.h:56.
++bool Gideon::MC_Dodge_Left()
++{
++    return Dodge(false);
++}
++bool Gideon::MC_Dodge_Right()
++{
++    return Dodge(true);
++}
++bool Gideon::Dodge(bool right)
++{
++    state_error.clear();
++    auto* s = GetServerDE();
++    const auto* table = AnimSound();
++    if (teleport_busy || !s || !s->IsObjectAlive(m_hObject) || !table || !m_MoveObj.initialized || !m_MoveObj.sampled ||
++        !std::isfinite(s->GetTime()) || !std::isfinite(m_fRollSpeed) || m_fRollSpeed < 0 || m_fRollSpeed > 1e7f)
++        return StateFailure("Gideon dodge owner/table/cache/clock/speed unavailable");
++    const int command = right ? 22 : 21;
++    const bool start = !m_bAnimating || m_nCurMetacmd != command;
++    const float elapsed = start ? 0 : s->GetTime() - m_fTimeStart;
++    if (!std::isfinite(elapsed) || elapsed < 0 || (elapsed >= 1 && Metacmd == std::numeric_limits<int>::max()))
++        return StateFailure("Gideon dodge elapsed time or completion counter invalid");
++    ++dodge_calls;
++    dodge_elapsed = elapsed;
++    if (start)
++    {
++        m_fTimeStart = s->GetTime();
++        if (!SetAnimation(right ? table->m_nAnim_DODGE_RIGHT : table->m_nAnim_DODGE_LEFT))
++            return false;
++        s->SetModelLooping(m_hObject, DFALSE);
++    }
++    // Cached basis and unnormalized velocity; Move never integrates position.
++    if (!Move(vector_scale(m_MoveObj.GetRightVector(), right ? 1.f : -1.f), m_fRollSpeed))
++        return StateFailure("Gideon dodge velocity service failed");
++    if (start)
++    {
++        m_bAnimating = true;
++        m_nCurMetacmd = command;
++    }
++    else if (elapsed >= 1)
++    {
++        m_bAnimating = false;
++        ++Metacmd;
++        ++dodge_finishes;
++        // Source leaves lateral velocity intact and ignores MS_PLAYDONE.
++    }
++    return true;
++}
++bool Gideon::AttackReady(bool distance)
++{
++    auto* s = GetServerDE();
++    if (teleport_busy || !s || !s->IsObjectAlive(m_hObject) || (GetTarget() && !s->IsObjectAlive(GetTarget())))
++        return StateFailure("Gideon attack owner/target unavailable or teleport callback active");
++    if (distance)
++    {
++        if (!m_MoveObj.initialized || !m_MoveObj.sampled || !target_position_valid || !physics_vector(m_vTargetPos) ||
++            !physics_vector(m_MoveObj.GetPos()) || !std::isfinite(m_fSeeingDist) || m_fSeeingDist < 0)
++            return StateFailure("Gideon attack distance/cache invalid");
++        const auto delta = vector_subtract(m_MoveObj.GetPos(), m_vTargetPos);
++        attack_distance = std::hypot(delta.x, delta.y, delta.z);
++        if (!std::isfinite(attack_distance))
++            return StateFailure("Gideon attack distance overflow");
++        m_fStimuli[0] = attack_distance; // Source temporarily stores raw distance in SIGHT.
++    }
++    return true;
++}
++bool Gideon::AI_STATE_AttackClose()
++{
++    state_error.clear();
++    ++attack_updates;
++    if (!AttackReady(false))
++        return false;
++    if (!GetTarget())
++        return SetNewState(StateSearchVisual);
++    switch (Metacmd)
++    {
++        case 1:
++            return MC_FaceTarget();
++        case 2:
++            if (!AttackReady(true))
++                return false;
++            if (m_fStimuli[0] <= m_fSeeingDist * .90f || m_nCurMetacmd == 7)
++                return MC_Fire_Stand();
++            if (!MC_FaceTarget())
++                return false;
++            --Metacmd;
++            if (m_fStimuli[0] > m_fSeeingDist * .40) // Original double literal.
++                return SetNewState(StateSpecial1);
++            return MC_Walk();
++        case 3:
++            if (m_nCurMetacmd == 22)
++                return MC_Dodge_Right();
++            if (m_nCurMetacmd == 21)
++                return MC_Dodge_Left();
++            if (!GetServerDE()->RandomInt(0, 99, dodge_roll))
++                return StateFailure("Gideon dodge chance draw unavailable");
++            return dodge_roll < 50 ? MC_Dodge_Right() : MC_Dodge_Left();
++        case 4:
++            return ComputeState();
++        default:
++            return true; // Original switch has no default action.
++    }
++}
++bool Gideon::AI_STATE_AttackFar()
++{
++    state_error.clear();
++    ++attack_updates;
++    if (!AttackReady(false))
++        return false;
++    if (!GetTarget())
++        return SetNewState(StateSearchVisual);
++    if (!AttackReady(true))
++        return false;
++    switch (Metacmd)
++    {
++        case 1:
++            if (!MC_FaceTarget())
++                return false;
++            --Metacmd;
++            // MC_FaceTarget does not replace the current action command.
++            return m_fStimuli[0] <= m_fSeeingDist * .30f || m_nCurMetacmd == 7 ? MC_Fire_Stand()
++                                                                               : SetNewState(StateSpecial1);
++        case 2:
++            return MC_Taunt_Bold();
++        case 3:
++            if (!MC_FaceTarget())
++                return false;
++            --Metacmd;
++            return m_fStimuli[0] <= m_fSeeingDist * .40f ? SetNewState(StateSpecial1) : MC_Walk();
++        case 4:
++            return ComputeState();
++        default:
++            return true;
++    }
++}
++bool Gideon::AI_STATE_Recoil()
++{
++    if (!AttackReady(false))
++        return false;
++    return SetNewState(StateSpecial1);
++}
+diff --git a/src/game/original/Gideon.h b/src/game/original/Gideon.h
+index 20c9979..471e3d6 100644
+--- a/src/game/original/Gideon.h
++++ b/src/game/original/Gideon.h
+@@ -13,6 +13,14 @@ class Gideon : public AI_Mgr
+     bool MC_Extra(std::string_view) override;
+     bool MagicPowerup();
+     bool MC_FadeOut();
++    bool MC_Dodge_Left();
++    bool MC_Dodge_Right();
++    bool AI_STATE_AttackClose() override;
++    bool AI_STATE_AttackFar() override;
++    bool AI_STATE_Recoil() override;
++    std::uint64_t attack_updates = 0, dodge_calls = 0, dodge_finishes = 0;
++    int dodge_roll = -1;
++    float attack_distance = 0, dodge_elapsed = 0;
+     bool AI_STATE_Teleport() override;
+     bool AI_STATE_Special(int) override;
+     std::uint64_t fade_calls = 0, teleport_moves = 0;
+@@ -31,6 +39,8 @@ class Gideon : public AI_Mgr
+     InventoryResult completion_selection = InventoryResult::NotAvailable;
+ 
+   private:
++    bool Dodge(bool right);
++    bool AttackReady(bool distance);
+     bool TeleportStep(bool special);
+     bool teleport_busy = false;
+ };
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index f3a5496..a29cd80 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1314,3 +1314,15 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.gideon_teleport_private PROPERTIES LABELS "gpu;private;gideon_teleport" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+     endif()
+ endif()
++
++add_executable(gideon_attack_tests gideon_attack_tests.cpp ../src/app/model_scene.cpp)
++target_link_libraries(gideon_attack_tests PRIVATE blood2_game)
++blood2_project_options(gideon_attack_tests)
++foreach(case dodge cached taunt close far failures lifetime)
++    add_test(NAME gideon_attack.${case} COMMAND gideon_attack_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/gideon-attack-${case}")
++    set_tests_properties(gideon_attack.${case} PROPERTIES LABELS "headless;gideon_attack" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME gideon_attack.private COMMAND gideon_attack_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(gideon_attack.private PROPERTIES LABELS "headless;private;gideon_attack" TIMEOUT 90)
++endif()
+diff --git a/tests/gideon_attack_tests.cpp b/tests/gideon_attack_tests.cpp
+new file mode 100644
+index 0000000..76c4b81
+--- /dev/null
++++ b/tests/gideon_attack_tests.cpp
+@@ -0,0 +1,308 @@
++#include "app/model_scene.h"
++#include "gideon_fixture.h"
++#include <cmath>
++#include <functional>
++#include <limits>
++#include <map>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(DVector a, DVector b)
++    {
++        return std::hypot(a.x - b.x, a.y - b.y, a.z - b.z) < .003f;
++    }
++    bool setup(GameSession& g, const char* root)
++    {
++        std::string error;
++        std::filesystem::create_directories(root);
++        CHECK(g.initialize() && test_gideon::floor(g) && test_shield::mount(g.resources, root, error));
++        return true;
++    }
++    test_gideon::Actor* actor(GameSession& g)
++    {
++        auto* a = test_gideon::actor(g);
++        auto* t = test_energy::actor(g, {0, 10, 300});
++        if (!a || !t || !a->SetNewTarget(t->m_hObject) || !a->RefreshTargetPosition())
++            return nullptr;
++        a->m_fRollSpeed = 3.5f; // Selected original constructor value, not production initialization.
++        a->m_fSeeingDist = 1000;
++        return a;
++    }
++    bool dodge(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = actor(g);
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        const auto pos = r->state.m_Pos;
++        CHECK(a->MC_Dodge_Right() && a->m_nCurMetacmd == 22 && a->Metacmd == 1 && !r->animation.looping);
++        CHECK(near(r->velocity, {3.5f, 0, 0}) && near(r->state.m_Pos, pos));
++        CHECK(g.server.advance_models(.5) && (g.server.GetModelPlaybackState(a->m_hObject) & MS_PLAYDONE));
++        CHECK(a->MC_Dodge_Right() && a->m_bAnimating && a->Metacmd == 1 && a->dodge_elapsed == 0);
++        CHECK(g.step(.5) && a->MC_Dodge_Right());
++        CHECK(near(r->state.m_Pos, {pos.x + 1.75f, pos.y, pos.z}) && a->m_bAnimating);
++        CHECK(g.step(.25) && a->MC_Dodge_Right() && a->Metacmd == 1);
++        CHECK(g.step(.25) && a->MC_Dodge_Right() && !a->m_bAnimating && a->Metacmd == 2);
++        CHECK(a->dodge_finishes == 1 && a->dodge_elapsed == 1 && near(r->velocity, {3.5f, 0, 0}));
++        CHECK(a->MC_Dodge_Left() && a->m_nCurMetacmd == 21 && near(r->velocity, {-3.5f, 0, 0}));
++        // Changing command restarts the one-second deadline even during playback.
++        CHECK(g.step(.5) && a->MC_Dodge_Right() && a->m_fTimeStart == 1.5f);
++        CHECK(g.step(.5) && a->MC_Dodge_Right() && a->Metacmd == 2);
++        CHECK(g.step(.5) && a->MC_Dodge_Right() && a->Metacmd == 3 && a->dodge_finishes == 2);
++        return true;
++    }
++    bool cached(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = actor(g);
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        DRotation turned{{0, .70710678f, 0}, .70710678f};
++        CHECK(g.server.SetObjectRotation(a->m_hObject, &turned) == DE_OK);
++        CHECK(a->MC_Dodge_Left() && near(r->velocity, {-3.5f, 0, 0})); // old right
++        CHECK(a->m_MoveObj.Update());
++        CHECK(a->MC_Dodge_Left() && near(r->velocity, {0, 0, 3.5f})); // new cached right
++        a->m_nTrapped = 1;
++        CHECK(a->MC_Dodge_Left() && near(r->velocity, {}));
++        a->m_nTrapped = 0;
++        // Cached position, not current object position, determines attack range.
++        DVector moved{0, 10, 2000};
++        CHECK(g.server.TeleportObject(a->m_hObject, &moved) == DE_OK);
++        CHECK(a->SetNewState(AI_Mgr::StateAttackClose));
++        a->Metacmd = 2;
++        a->m_vTargetPos = {0, 10, 900};
++        CHECK(a->DispatchState() && a->attack_distance == 900 && a->m_nCurMetacmd == 7);
++        CHECK(a->m_MoveObj.Update());
++        CHECK(a->SetNewState(AI_Mgr::StateAttackClose));
++        a->Metacmd = 2;
++        CHECK(a->DispatchState() && a->attack_distance == 1100 && a->m_nState == AI_Mgr::StateSpecial1);
++        return true;
++    }
++    bool taunt(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = actor(g);
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        a->AnimSound()->m_nAnim_TAUNT[4] = 1;
++        CHECK(a->MC_Taunt_Bold() && a->m_nCurMetacmd == 18 && a->requested_animation == 1);
++        CHECK(near(r->velocity, {3.5f, 0, 0}) && !r->animation.looping);
++        DVector velocity{7, 8, 9};
++        CHECK(g.server.SetVelocity(a->m_hObject, &velocity) == DE_OK);
++        CHECK(a->MC_Taunt_Bold() && near(r->velocity, velocity)); // no repeated Move
++        CHECK(g.server.advance_models(.2) && a->MC_Taunt_Bold() && a->Metacmd == 2 && !a->m_bAnimating);
++        CHECK(near(r->velocity, velocity)); // no StopVelocity on completion
++        CHECK(a->MC_Taunt_Beg() && a->m_nCurMetacmd == 17 && a->requested_animation == 0);
++        CHECK(a->MC_Taunt_Bold() && a->m_nCurMetacmd == 18 && a->requested_animation == 1);
++        return true;
++    }
++    bool close(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = actor(g);
++        CHECK(a);
++        CHECK(a->SetNewState(AI_Mgr::StateAttackClose) && a->DispatchState() && a->Metacmd == 2);
++        a->m_vTargetPos = {0, 10, 900};
++        CHECK(a->DispatchState() && a->m_nState == AI_Mgr::StateAttackClose && a->m_nCurMetacmd == 7 &&
++              a->Metacmd == 2);
++        a->m_vTargetPos = {0, 10, 5000}; // already firing continues beyond the initial range gate
++        CHECK(a->DispatchState() && a->Metacmd == 2 && a->fire_calls == 0);
++        CHECK(g.server.advance_models(.2) && a->DispatchState() && a->Metacmd == 3);
++        CHECK(a->DispatchState() && a->dodge_roll >= 0 && a->dodge_roll <= 99);
++        const int command = a->m_nCurMetacmd, roll = a->dodge_roll;
++        CHECK(command == (roll < 50 ? 22 : 21));
++        a->dodge_roll = -2; // continued command must not consume a new draw
++        CHECK(a->DispatchState() && a->dodge_roll == -2 && a->m_nCurMetacmd == command);
++        CHECK(g.step(.5) && g.step(.5) && a->DispatchState() && a->Metacmd == 4);
++        CHECK(a->DispatchState() && a->m_nState == AI_Mgr::StateTeleport); // no faction candidates
++        auto* target = test_energy::actor(g, {0, 10, 900.01f});
++        CHECK(target && a->SetNewTarget(target->m_hObject) && a->RefreshTargetPosition());
++        CHECK(a->SetNewState(AI_Mgr::StateAttackClose));
++        a->Metacmd = 2;
++        a->m_vTargetPos = {0, 10, 900.01f};
++        CHECK(a->DispatchState() && a->m_nState == AI_Mgr::StateSpecial1 && a->Metacmd == 1);
++        bool left = false, right = false;
++        for (unsigned i = 0; i < 50; ++i)
++        {
++            CHECK(a->SetNewState(AI_Mgr::StateAttackClose));
++            a->Metacmd = 3;
++            CHECK(a->DispatchState());
++            left |= a->m_nCurMetacmd == 21;
++            right |= a->m_nCurMetacmd == 22;
++        }
++        CHECK(left && right);
++        return true;
++    }
++    bool far(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = actor(g);
++        CHECK(a);
++        CHECK(a->SetNewState(AI_Mgr::StateAttackFar));
++        CHECK(a->DispatchState() && a->m_nCurMetacmd == 7 && a->Metacmd == 1);
++        a->m_vTargetPos = {0, 10, 5000};
++        CHECK(a->DispatchState() && a->m_nState == AI_Mgr::StateAttackFar && a->Metacmd == 1);
++        CHECK(g.server.advance_models(.2) && a->DispatchState() && a->Metacmd == 2);
++        CHECK(a->DispatchState() && a->m_nCurMetacmd == 18 && a->Metacmd == 2);
++        CHECK(g.server.advance_models(.2) && a->DispatchState() && a->Metacmd == 3);
++        a->m_vTargetPos = {0, 10, 400};
++        CHECK(a->DispatchState() && a->m_nState == AI_Mgr::StateSpecial1);
++        CHECK(a->SetNewState(AI_Mgr::StateAttackFar));
++        a->m_vTargetPos = {0, 10, 300.01f};
++        CHECK(a->DispatchState() && a->m_nState == AI_Mgr::StateSpecial1);
++        CHECK(a->SetNewState(AI_Mgr::StateAttackFar));
++        a->Metacmd = 3;
++        a->m_vTargetPos = {0, 10, 400.01f};
++        a->m_fWalkSpeed = 75;
++        CHECK(a->DispatchState() && a->m_nCurMetacmd == 1 && a->Metacmd == 3);
++        CHECK(near(g.objects.get(a->m_hObject)->velocity, {0, 0, 75}));
++        CHECK(a->SetNewState(AI_Mgr::StateRecoil) && a->DispatchState());
++        CHECK(a->m_nState == AI_Mgr::StateSpecial1 && a->Metacmd == 1 && a->recoil_starts == 0);
++        CHECK(a->SetNewTarget(nullptr));
++        for (auto state : {AI_Mgr::StateAttackClose, AI_Mgr::StateAttackFar})
++        {
++            CHECK(a->SetNewState(state) && a->DispatchState());
++            CHECK(a->m_nState == AI_Mgr::StateSearchVisual);
++        }
++        return true;
++    }
++    bool failures(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = actor(g);
++        CHECK(a);
++        auto* r = g.objects.get(a->m_hObject);
++        a->AnimSound()->m_nAnim_DODGE_LEFT = UINT32_MAX;
++        CHECK(!a->MC_Dodge_Left() && !a->m_bAnimating && near(r->velocity, {}));
++        CHECK(a->MC_Dodge_Right());
++        a->Metacmd = std::numeric_limits<int>::max();
++        CHECK(g.step(.5) && g.step(.5));
++        const auto velocity = r->velocity;
++        CHECK(!a->MC_Dodge_Right() && a->m_bAnimating && a->dodge_finishes == 0 && near(r->velocity, velocity));
++        a->Metacmd = 1;
++        a->m_fTimeStart = NAN;
++        CHECK(!a->MC_Dodge_Right());
++        a->m_fTimeStart = 100;
++        CHECK(!a->MC_Dodge_Right());
++        a->m_fTimeStart = 0;
++        a->m_fRollSpeed = NAN;
++        CHECK(!a->MC_Dodge_Right() && !a->MC_Taunt_Bold());
++        a->m_fRollSpeed = 3.5f;
++        a->m_MoveObj.sampled = false;
++        CHECK(!a->MC_Dodge_Right());
++        CHECK(a->SetNewState(AI_Mgr::StateAttackFar) && !a->DispatchState());
++        a->m_MoveObj.sampled = true;
++        a->m_fSeeingDist = NAN;
++        CHECK(!a->DispatchState());
++        a->m_fSeeingDist = 1000;
++        a->target_position_valid = false;
++        CHECK(!a->DispatchState() && a->Metacmd == 1); // failed facing never decrements
++        return true;
++    }
++    bool lifetime(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* a = actor(g);
++        CHECK(a);
++        const auto target = a->GetTarget(), owner = a->m_hObject;
++        CHECK(a->SetNewState(AI_Mgr::StateAttackClose));
++        CHECK(g.objects.remove(target) && !a->DispatchState() && a->Metacmd == 1);
++        CHECK(g.objects.finish_frame() && !a->GetTarget());
++        CHECK(a->DispatchState() && a->m_nState == AI_Mgr::StateSearchVisual);
++        const auto destroyed = test_gideon::Actor::destroyed;
++        CHECK(g.objects.remove(owner));
++        CHECK(!a->MC_Dodge_Left() && !a->MC_Dodge_Right() && !a->MC_Taunt_Bold() && !a->AI_STATE_Recoil());
++        CHECK(!a->AI_STATE_AttackClose() && !a->AI_STATE_AttackFar());
++        CHECK(test_gideon::Actor::destroyed == destroyed && g.objects.finish_frame());
++        CHECK(test_gideon::Actor::destroyed == destroyed + 1 && !g.objects.get(owner));
++        CHECK(g.unload_world() && !g.server.string_count() && !g.server.message_count());
++        return true;
++    }
++    bool private_actions(const char* root)
++    {
++        GameSession g;
++        std::string error;
++        Config config;
++        config.data_dir = root;
++        CHECK(g.initialize() && test_gideon::floor(g) && g.resources.mount_game(config, error));
++        for (unsigned cycle = 0; cycle < 3; ++cycle)
++        {
++            auto* a = test_gideon::actor(g, true, {0, 100, 0});
++            CHECK(a);
++            auto* t = test_energy::actor(g, {0, 100, 200});
++            CHECK(t);
++            CHECK(a->SetNewTarget(t->m_hObject) && a->RefreshTargetPosition());
++            a->m_fRollSpeed = 3.5f;
++            a->m_fSeeingDist = 1000;
++            a->m_damage.SetArmorPoints(0);
++            a->m_fLastShield = -100;
++            CHECK(a->SetNewState(AI_Mgr::StateAttackClose) && a->DispatchState() && a->DispatchState());
++            // Actual shield animation -> original keys -> step3 dodge -> step4 decision.
++            unsigned frames = 0;
++            while (a->Metacmd == 2 && frames++ < 600)
++            {
++                CHECK(g.step(1. / 60) && a->DispatchState());
++            }
++            CHECK(a->Metacmd == 3 && a->fire_shots == 1 && a->powerup_calls == 1 && a->key_failures == 0);
++            CHECK(a->DispatchState());
++            const auto clip = g.server.GetModelAnimation(a->m_hObject);
++            CHECK(clip == a->AnimSound()->m_nAnim_DODGE_LEFT || clip == a->AnimSound()->m_nAnim_DODGE_RIGHT);
++            frames = 0;
++            while (a->Metacmd == 3 && frames++ < 90)
++            {
++                CHECK(g.step(1. / 60) && a->DispatchState());
++            }
++            CHECK(a->Metacmd == 4 && a->dodge_finishes == 1 && a->dodge_elapsed >= 1 && a->dodge_elapsed < 1.02f);
++            ModelView view;
++            CHECK(update_model_scene(g, view, error) && !view.world_draws.empty());
++            const auto clock = g.objects.get(a->m_hObject)->animation.time;
++            const auto calls = a->attack_updates;
++            CHECK(update_model_scene(g, view, error) && a->attack_updates == calls &&
++                  g.objects.get(a->m_hObject)->animation.time == clock);
++            CHECK(a->SetNewState(AI_Mgr::StateAttackFar));
++            a->Metacmd = 2;
++            CHECK(a->DispatchState() && a->m_nCurMetacmd == 18);
++            const auto taunt_clip = g.server.GetModelAnimation(a->m_hObject);
++            CHECK(taunt_clip == a->AnimSound()->m_nAnim_TAUNT[4]);
++            frames = 0;
++            while (a->Metacmd == 2 && frames++ < 600)
++            {
++                CHECK(g.step(1. / 60) && a->DispatchState());
++            }
++            CHECK(a->Metacmd == 3 && a->key_failures == 0);
++            std::cout << "cycle=" << cycle << " dodge_clip=" << clip << " elapsed=" << a->dodge_elapsed
++                      << " taunt_clip=" << taunt_clip << " original_shield_shots=" << a->fire_shots
++                      << " updates=" << a->attack_updates << '\n';
++            const auto h = a->m_hObject;
++            CHECK(g.unload_world() && !g.objects.get(h) && !g.server.string_count() && !g.server.message_count());
++            CHECK(test_gideon::floor(g));
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const char*)>> cases{
++        {"dodge", dodge}, {"cached", cached},     {"taunt", taunt},       {"close", close},
++        {"far", far},     {"failures", failures}, {"lifetime", lifetime}, {"private", private_actions}};
++    auto test = cases.find(argv[1]);
++    return test != cases.end() && test->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/gideon_teleport_gpu_tests.cpp b/tests/gideon_teleport_gpu_tests.cpp
+index 8383a3d..213d688 100644
+--- a/tests/gideon_teleport_gpu_tests.cpp
++++ b/tests/gideon_teleport_gpu_tests.cpp
+@@ -81,6 +81,11 @@ int main(int argc, char** argv)
+     WorldRenderer renderer(runtime.gpu);
+     GameSession g;
+     CHECK(g.initialize());
++    auto floor = test_brush::box("distant floor", {-10000, -2000, -10000}, {10000, -1990, 10000});
++    for (auto& surface : floor.surfaces)
++        surface.flags = 1;
++    CHECK(g.collision.build(floor, error));
++    g.server.collision_ready = true;
+     std::filesystem::create_directories(argv[1]);
+     if (argc == 3)
+     {
+@@ -148,6 +153,20 @@ int main(int argc, char** argv)
+     a->Metacmd = 4;
+     CHECK(a->AI_STATE_Teleport() && update_model_scene(g, view, error) && view.mesh.blended == 0);
+     CHECK(render(runtime, renderer, view, eye, camera, capture, again, error) && again == full);
++    // Original dodge uses server time and cached lateral velocity, independently
++    // of both the inspector and rendering. Exercise the actual posed model too.
++    a->m_fRollSpeed = 3.5f;
++    const auto start = record->state.m_Pos;
++    CHECK(a->MC_Dodge_Right() && g.step(.5) && a->MC_Dodge_Right());
++    CHECK(std::abs(record->state.m_Pos.x - start.x - 1.75f) < .003f && a->m_bAnimating);
++    CHECK(update_model_scene(g, view, error) && render(runtime, renderer, view, eye, camera, capture, again, error));
++    CHECK(again != full && capture.save((std::filesystem::path(argv[1]) / "gideon-dodge.png").c_str()));
++    clock = record->animation.time;
++    const auto calls = a->dodge_calls;
++    CHECK(update_model_scene(g, view, error) && render(runtime, renderer, view, eye, camera, capture, half, error));
++    CHECK(again == half && record->animation.time == clock && a->dodge_calls == calls);
++    CHECK(g.step(.5) && a->MC_Dodge_Right() && !a->m_bAnimating && a->dodge_finishes == 1);
++    CHECK(std::abs(record->state.m_Pos.x - start.x - 3.5f) < .003f && record->velocity.x == 3.5f);
+     CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame() && update_model_scene(g, view, error));
+     CHECK(view.entries.empty() && render(runtime, renderer, view, eye, camera, capture, again, error) && again == zero);
+     CHECK(g.unload_world());
+@@ -155,6 +174,6 @@ int main(int argc, char** argv)
+     renderer.clear_geometry();
+     std::cout << (argc == 3 ? "External Gideon" : "Synthetic triangle") << ": " << ink
+               << " visible pixels; original 16-step fade reaches empty frame; reappearance exact; repeated reads do "
+-                 "not advance clocks.\n";
++                 "not advance clocks. Dodge motion integrates once and finishes at one second.\n";
+     return 0;
+ }

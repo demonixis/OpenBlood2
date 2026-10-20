@@ -1,0 +1,214 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "f37dfb1d58c25673e98d984a9ac102d82585ce0a",
+  "status": "M2 incomplete; original curve admission and merged grid dispatch preparation; no live MUSIC",
+  "frozen_sources": {
+    "src/engine/ima_cursor.h": "5d2642992ea77158fbbc12eee94977194a77f48438d169a21e10785c576fbf22",
+    "src/engine/ima_cursor.cpp": "1a7239eae861fb734b3940bfe73f8671d27e876a966b50dc2e5a8fe63586ed01",
+    "src/game/music_catalog.cpp": "a688ce4d057418c54ebddbab97a23718534d0055193377ac12216dfc63ffd050",
+    "src/app/inspector_world_sounds.cpp": "e8219d24efca00ec8a451bf703ba0405485a8d69f760d341893437f052eedbb9",
+    "src/app/world_sound_smoke.cpp": "2c6fdbcae02064d179e26a88569215f3a161d3690d6d45d29107c31789ea57f8",
+    "tests/ima_cursor_tests.cpp": "5b7af72c080bc9b45c77587d4570d349ca4e76875bdebb426ec99ed38c977f66",
+    "tests/CMakeLists.txt": "c91d26be2c6c57666b0b0491a3335aed6a04d13cac4c2f6e2203547eace7a07c"
+  },
+  "results": {
+    "debug-tests": {
+      "passed": 126,
+      "wall_seconds": 21.06
+    },
+    "release-tests": {
+      "passed": 126,
+      "wall_seconds": 1.71
+    },
+    "sanitize-tests": {
+      "passed": 126,
+      "wall_seconds": 84.65
+    },
+    "debug-gpu": {
+      "passed": 2,
+      "wall_seconds": 10.86
+    },
+    "release-gpu": {
+      "passed": 2,
+      "wall_seconds": 3.71
+    }
+  },
+  "original_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "entry_rva": "0x17103..0x1759f",
+    "generated": {
+      "steps": 1024,
+      "messages": 4348,
+      "fnv64": 15334764557161491361,
+      "sha256": "56091cd26e828656bee948a47152d59e9584d99e78a26f362b00eca0afa2f62e"
+    },
+    "private": {
+      "steps": 8174,
+      "messages": 9063,
+      "fnv64": 10183239741431151107,
+      "sha256": "ef746052f946f07bbe678fec188271810e5b4189e095d9512a8cf03a86eb1dd9"
+    },
+    "scope": "Original grid mute/variation filtering, note event tail and curve expansion/send order. Explicit checked point owners, pre-resolved pitches, variations and tick. Allocation/free/rand/send intercepted. Section selection and subsequent note-off phase have separate evidence; loader owner fixups, synth and transport remain outside this probe."
+  },
+  "commands": [
+    "python /tmp/b2-grid-dispatch-validation.py {debug,release,sanitize} (three builds at -j1 each; relevant CTests at -j2)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/{debug,release} -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit /tmp/b2-grid-dispatch-{debug,release}-gpu.xml",
+    "/tmp/b2-legacy-pan-tools/bin/python Documentation/Implementation/evidence/m2-grid-dispatch-probe.py EXTERNAL_GAME_ROOT PRIVATE_FIXTURE_EXPORT",
+    "sha256sum -c /tmp/b2-grid-dispatch-build-inputs.sha256",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror (six changed C++ files)",
+    "python /tmp/b2-npc-integrity.py; python /tmp/b2-npc-links.py; git diff --check on owned source/documentation (raw .log/.xml evidence excluded to preserve exact tool output)"
+  ],
+  "limitations": [
+    "Grid preparation only: explicit resolved pitch, owner, variation and tick inputs in the executable probe; loader pointer fixups not executed",
+    "Original grid loop/note-event tail/curve expansion execute; allocation/free/random/send intercepted; due-stop phase verified separately",
+    "Linux validation only; native Metal/Windows/mobile not tested",
+    "GPU smoke checks ordered dispatch accounting across first eight steps per section, independent 206 Cabal curve messages, hidden inspection and inspector-free Release; reviewed Debug capture shows music summary, not nested dispatch rows",
+    "Dummy SDL audio; no listening comparison or live MUSIC"
+  ],
+  "capture": {
+    "path": "Blood2/build/debug/tests/world-sounds.png",
+    "sha256": "b3663c9e1c489058496ae48665a4ec23beccc8d3f86d04a532e08dd2ee9e299d",
+    "committed": false
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "readme_preserved_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "files": [
+    {
+      "file": "m2-grid-dispatch-probe.py",
+      "sha256": "2fdf9c644d9dc706e21cbb4d08162ac6e4ac5c324769f8af345f3ed24391a28e"
+    },
+    {
+      "file": "m2-grid-dispatch-probe.json",
+      "sha256": "377605c473b1861de761d6426b19ffc1461c695f576850fb57bedb48a48ef7c7"
+    },
+    {
+      "file": "m2-grid-dispatch-probe-errors.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-grid-dispatch-export.log",
+      "sha256": "2dd899b403a85bcdae41a795c2f412e815988b0ca1d980a91bc2339ffc75d69d"
+    },
+    {
+      "file": "m2-grid-dispatch-validation.py",
+      "sha256": "5e85702e07d84e9d04e71a3991fa8533e795a45fb1f67fe23d32bf124142eac4"
+    },
+    {
+      "file": "m2-grid-dispatch-build-inputs.sha256",
+      "sha256": "c265ccfca8f76afe52993684a5d2eaef5939ed3040c1fa6e082dd257046db23c"
+    },
+    {
+      "file": "m2-grid-dispatch-focus-build.log",
+      "sha256": "82d88d791f219a53756e9f81561e782c6c9456a915dec7e87ba6ba14f4fbe87d"
+    },
+    {
+      "file": "m2-grid-dispatch-focus.log",
+      "sha256": "41ca5ad7db91adbc968f2efe55d9b770e9b8cc93706c1cf5d52d6db3aa86c942"
+    },
+    {
+      "file": "m2-grid-dispatch-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-grid-dispatch-hash-check.log",
+      "sha256": "781a79bcf6df92b9fbaef5ef73b35eb4a557f38b51c1ef453a6ff5ddb028a99a"
+    },
+    {
+      "file": "m2-grid-dispatch-debug-tests.log",
+      "sha256": "b33276d46a6945b9e6eeb6df561f53d79b9f9582e8123a86647570e7fc008076"
+    },
+    {
+      "file": "m2-grid-dispatch-debug-tests.xml",
+      "sha256": "c200ba91bc106fdff43c37cbf9e4c41e3cf08a05bd5bc9cbbc08ed76554436b7"
+    },
+    {
+      "file": "m2-grid-dispatch-release-tests.log",
+      "sha256": "6b15b7d6120bdf3c3d611d9c81ed43ca2dee310081550599813552dc21246827"
+    },
+    {
+      "file": "m2-grid-dispatch-release-tests.xml",
+      "sha256": "8a847217a7317b3ea14d133317df872fc8c83659c50ecc33edd5b4ce2bff1a9f"
+    },
+    {
+      "file": "m2-grid-dispatch-sanitize-tests.log",
+      "sha256": "3e5f1d9bb730b2bda0724ba4f93fdbd39ef181033cfb1c4e1606a1bdcbe3a7c8"
+    },
+    {
+      "file": "m2-grid-dispatch-sanitize-tests.xml",
+      "sha256": "cd17fbe4c650485983548b24503c7143759b7a7dfe3235b436357783216bf213"
+    },
+    {
+      "file": "m2-grid-dispatch-debug-gpu.log",
+      "sha256": "4e04053e24154c47c160992d12a31802de81d05c905246548c607734f61e9bc9"
+    },
+    {
+      "file": "m2-grid-dispatch-debug-gpu.xml",
+      "sha256": "d7fabb66063acd3e9857f44330ec6de273a0716a52e6aca559e0d04b111b5a3e"
+    },
+    {
+      "file": "m2-grid-dispatch-release-gpu.log",
+      "sha256": "08576ca8522ea9375d06b02d142ce3afdccb08f286e85efafdc7f97c434a4cbc"
+    },
+    {
+      "file": "m2-grid-dispatch-release-gpu.xml",
+      "sha256": "cfc587d68dc61c6eb8f6997b3a36c3bf6ccdf63399d7ef1bcd7a87b5e78665c9"
+    },
+    {
+      "file": "m2-grid-dispatch-debug-build-final.log",
+      "sha256": "5b5fe439653ce59584d54ea85efe8335047d93d1eda66f1026ed14ba6e4831ca"
+    },
+    {
+      "file": "m2-grid-dispatch-release-build-final.log",
+      "sha256": "030ba22f5c34677894a2199a94fafef36930b6ddc5499865501e9e2b2d0cc2f7"
+    },
+    {
+      "file": "m2-grid-dispatch-sanitize-build-final.log",
+      "sha256": "91e00e3f500cd103f0b75100aaf927c23e5b0f77df6c2a7b436fa875930e3375"
+    },
+    {
+      "file": "m2-grid-dispatch-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-grid-dispatch-links.log",
+      "sha256": "698e5f54b73c2bf9d3ac4c69e2b5234c6acff7f3cc5c987f9147d467cfa0a57d"
+    }
+  ],
+  "implementation_commit": "5c825dc1f8897e44ea1dc0d1cca12fb4bdad1acf"
+}

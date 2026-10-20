@@ -1,0 +1,188 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 451: ai_runtime.subway
+      Start  40: world.destination_trial_private
+ 1/85 Test  #40: world.destination_trial_private ...   Passed   38.87 sec
+      Start 449: ai_runtime.catalog
+ 2/85 Test #449: ai_runtime.catalog ................   Passed    5.40 sec
+      Start 452: ai_runtime.arena
+ 3/85 Test #452: ai_runtime.arena ..................   Passed    3.51 sec
+      Start 618: gideon_combat.private
+ 4/85 Test #618: gideon_combat.private .............   Passed    2.67 sec
+      Start 453: ai_runtime.sparse_weapons
+ 5/85 Test #453: ai_runtime.sparse_weapons .........   Passed    1.37 sec
+      Start 626: gideon_teleport.private
+ 6/85 Test #626: gideon_teleport.private ...........   Passed    1.26 sec
+      Start 450: ai_runtime.failures
+ 7/85 Test #450: ai_runtime.failures ...............   Passed    0.62 sec
+      Start 438: ai_escape.catalog
+ 8/85 Test #438: ai_escape.catalog .................   Passed    1.61 sec
+      Start  24: world.destination_trials
+ 9/85 Test  #24: world.destination_trials ..........   Passed    0.25 sec
+      Start 413: ai_locomotion.catalog
+10/85 Test #451: ai_runtime.subway .................   Passed   56.72 sec
+      Start 463: ai_hit.catalog
+11/85 Test #413: ai_locomotion.catalog .............   Passed    1.99 sec
+      Start  27: world.destination_lifetime
+12/85 Test  #27: world.destination_lifetime ........   Passed    0.12 sec
+      Start 614: gideon_combat.aim
+13/85 Test #614: gideon_combat.aim .................   Passed    0.04 sec
+      Start 613: gideon_combat.choices
+14/85 Test #613: gideon_combat.choices .............   Passed    0.04 sec
+      Start 615: gideon_combat.keys
+15/85 Test #615: gideon_combat.keys ................   Passed    0.04 sec
+      Start 611: gideon_combat.decisions
+16/85 Test #611: gideon_combat.decisions ...........   Passed    0.04 sec
+      Start 612: gideon_combat.shield
+17/85 Test #612: gideon_combat.shield ..............   Passed    0.04 sec
+      Start 617: gideon_combat.lifetime
+18/85 Test #617: gideon_combat.lifetime ............   Passed    0.04 sec
+      Start 616: gideon_combat.failures
+19/85 Test #616: gideon_combat.failures ............   Passed    0.04 sec
+      Start 620: gideon_teleport.fade
+20/85 Test #620: gideon_teleport.fade ..............   Passed    0.04 sec
+      Start 619: gideon_teleport.colors
+21/85 Test #619: gideon_teleport.colors ............   Passed    0.04 sec
+      Start 622: gideon_teleport.special
+22/85 Test #622: gideon_teleport.special ...........   Passed    0.04 sec
+      Start 621: gideon_teleport.teleport
+23/85 Test #621: gideon_teleport.teleport ..........   Passed    0.04 sec
+      Start 623: gideon_teleport.obstruction
+24/85 Test #623: gideon_teleport.obstruction .......   Passed    0.04 sec
+      Start 625: gideon_teleport.presentation
+25/85 Test #625: gideon_teleport.presentation ......   Passed    0.04 sec
+      Start 624: gideon_teleport.lifetime
+26/85 Test #624: gideon_teleport.lifetime ..........   Passed    0.04 sec
+      Start 441: ai_runtime.lifetime
+27/85 Test #441: ai_runtime.lifetime ...............   Passed    0.04 sec
+      Start 447: ai_runtime.body
+28/85 Test #447: ai_runtime.body ...................   Passed    0.04 sec
+      Start 448: ai_runtime.missing
+29/85 Test #448: ai_runtime.missing ................   Passed    0.04 sec
+      Start 439: ai_runtime.activation
+30/85 Test #439: ai_runtime.activation .............   Passed    0.04 sec
+      Start 446: ai_runtime.triggers
+31/85 Test #446: ai_runtime.triggers ...............   Passed    0.04 sec
+      Start 442: ai_runtime.targets
+32/85 Test #442: ai_runtime.targets ................   Passed    0.04 sec
+      Start 445: ai_runtime.spatial
+33/85 Test #445: ai_runtime.spatial ................   Passed    0.04 sec
+      Start 443: ai_runtime.tracking
+34/85 Test #443: ai_runtime.tracking ...............   Passed    0.04 sec
+      Start 444: ai_runtime.camera
+35/85 Test #463: ai_hit.catalog ....................   Passed    1.84 sec
+      Start 440: ai_runtime.visibility
+36/85 Test #444: ai_runtime.camera .................   Passed    0.04 sec
+      Start  10: objects.unsupported_teardown
+37/85 Test #440: ai_runtime.visibility .............   Passed    0.04 sec
+      Start   9: objects.messages_strings
+38/85 Test   #9: objects.messages_strings ..........   Passed    0.09 sec
+      Start 462: ai_hit.hidden
+39/85 Test  #10: objects.unsupported_teardown ......   Passed    0.11 sec
+      Start  11: objects.creation_failures
+40/85 Test #462: ai_hit.hidden .....................   Passed    0.04 sec
+      Start 432: ai_escape.perception
+41/85 Test  #11: objects.creation_failures .........   Passed    0.05 sec
+      Start 431: ai_escape.routes
+42/85 Test #432: ai_escape.perception ..............   Passed    0.04 sec
+      Start 429: ai_escape.selection
+43/85 Test #431: ai_escape.routes ..................   Passed    0.04 sec
+      Start 437: ai_escape.lifetime
+44/85 Test #429: ai_escape.selection ...............   Passed    0.03 sec
+      Start 428: ai_escape.beg
+45/85 Test #437: ai_escape.lifetime ................   Passed    0.04 sec
+      Start 433: ai_escape.hiding
+46/85 Test #428: ai_escape.beg .....................   Passed    0.03 sec
+      Start 434: ai_escape.guard
+47/85 Test #434: ai_escape.guard ...................   Passed    0.03 sec
+      Start 430: ai_escape.facing
+48/85 Test #433: ai_escape.hiding ..................   Passed    0.04 sec
+      Start 435: ai_escape.failures
+49/85 Test #435: ai_escape.failures ................   Passed    0.03 sec
+      Start 454: ai_hit.geometry
+50/85 Test #430: ai_escape.facing ..................   Passed    0.04 sec
+      Start 436: ai_escape.tracking
+51/85 Test #436: ai_escape.tracking ................   Passed    0.04 sec
+      Start 456: ai_hit.modifiers
+52/85 Test #454: ai_hit.geometry ...................   Passed    0.05 sec
+      Start   3: objects.reasons_properties
+53/85 Test #456: ai_hit.modifiers ..................   Passed    0.04 sec
+      Start   8: objects.links_lists
+54/85 Test   #3: objects.reasons_properties ........   Passed    0.03 sec
+      Start   1: objects.original_objects
+55/85 Test   #1: objects.original_objects ..........   Passed    0.03 sec
+      Start   5: objects.deferred_removal
+56/85 Test   #8: objects.links_lists ...............   Passed    0.03 sec
+      Start   2: objects.nested_creation
+57/85 Test   #2: objects.nested_creation ...........   Passed    0.03 sec
+      Start   4: objects.scheduling
+58/85 Test   #5: objects.deferred_removal ..........   Passed    0.03 sec
+      Start   7: objects.handles_selection
+59/85 Test   #4: objects.scheduling ................   Passed    0.03 sec
+      Start   6: objects.aggregate_dispatch
+60/85 Test   #7: objects.handles_selection .........   Passed    0.03 sec
+      Start 457: ai_hit.reactions
+61/85 Test   #6: objects.aggregate_dispatch ........   Passed    0.03 sec
+      Start 461: ai_hit.lifetime
+62/85 Test #457: ai_hit.reactions ..................   Passed    0.04 sec
+      Start 460: ai_hit.sides
+63/85 Test #461: ai_hit.lifetime ...................   Passed    0.04 sec
+      Start 458: ai_hit.recoil
+64/85 Test #460: ai_hit.sides ......................   Passed    0.03 sec
+      Start 459: ai_hit.guards
+65/85 Test #458: ai_hit.recoil .....................   Passed    0.03 sec
+      Start 411: ai_locomotion.lifetime
+66/85 Test #459: ai_hit.guards .....................   Passed    0.03 sec
+      Start 408: ai_locomotion.physics
+67/85 Test #411: ai_locomotion.lifetime ............   Passed    0.04 sec
+      Start 409: ai_locomotion.moving_fire
+68/85 Test #408: ai_locomotion.physics .............   Passed    0.03 sec
+      Start 455: ai_hit.query
+69/85 Test #409: ai_locomotion.moving_fire .........   Passed    0.03 sec
+      Start 404: ai_locomotion.rays
+70/85 Test #455: ai_hit.query ......................   Passed    0.03 sec
+      Start 405: ai_locomotion.navigate
+71/85 Test #405: ai_locomotion.navigate ............   Passed    0.03 sec
+      Start 407: ai_locomotion.walking
+72/85 Test #404: ai_locomotion.rays ................   Passed    0.04 sec
+      Start 410: ai_locomotion.keys
+73/85 Test #407: ai_locomotion.walking .............   Passed    0.04 sec
+      Start 406: ai_locomotion.ledges
+74/85 Test #410: ai_locomotion.keys ................   Passed    0.03 sec
+      Start 412: ai_locomotion.attacks
+75/85 Test #412: ai_locomotion.attacks .............   Passed    0.03 sec
+      Start 403: ai_locomotion.obstruction
+76/85 Test #406: ai_locomotion.ledges ..............   Passed    0.04 sec
+      Start 627: gideon_attack.dodge
+77/85 Test #403: ai_locomotion.obstruction .........   Passed    0.03 sec
+      Start 628: gideon_attack.cached
+78/85 Test #628: gideon_attack.cached ..............   Passed    0.04 sec
+      Start 629: gideon_attack.taunt
+79/85 Test #627: gideon_attack.dodge ...............   Passed    0.07 sec
+      Start 630: gideon_attack.close
+80/85 Test #629: gideon_attack.taunt ...............   Passed    0.04 sec
+      Start 631: gideon_attack.far
+81/85 Test #630: gideon_attack.close ...............   Passed    0.05 sec
+      Start 632: gideon_attack.failures
+82/85 Test #631: gideon_attack.far .................   Passed    0.04 sec
+      Start 633: gideon_attack.lifetime
+83/85 Test #632: gideon_attack.failures ............   Passed    0.04 sec
+      Start 634: gideon_attack.private
+84/85 Test #633: gideon_attack.lifetime ............   Passed    0.04 sec
+85/85 Test #634: gideon_attack.private .............   Passed    1.83 sec
+
+100% tests passed, 0 tests failed out of 85
+
+Label Time Summary:
+ai_escape          =   1.95 sec*proc (11 tests)
+ai_hit             =   2.17 sec*proc (10 tests)
+ai_locomotion      =   2.33 sec*proc (11 tests)
+ai_runtime         =  68.00 sec*proc (15 tests)
+gideon_attack      =   2.15 sec*proc (8 tests)
+gideon_combat      =   2.96 sec*proc (8 tests)
+gideon_teleport    =   1.55 sec*proc (8 tests)
+headless           = 120.84 sec*proc (85 tests)
+objects            =   0.50 sec*proc (11 tests)
+private            = 117.71 sec*proc (12 tests)
+world              =  39.24 sec*proc (3 tests)
+
+Total Test time (real) =  61.36 sec

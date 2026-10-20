@@ -1,0 +1,14 @@
+493/499 Testing: corpses.transfer
+493/499 Test: corpses.transfer
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse_tests" "transfer" "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse-fixtures/transfer"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"corpses.transfer" start time: Oct 16 16:48 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.transfer" end time: Oct 16 16:48 CEST
+"corpses.transfer" time elapsed: 00:00:00
+----------------------------------------------------------

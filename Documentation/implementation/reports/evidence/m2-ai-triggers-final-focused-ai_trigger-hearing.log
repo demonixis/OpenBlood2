@@ -1,0 +1,14 @@
+385/393 Testing: ai_trigger.hearing
+385/393 Test: ai_trigger.hearing
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests" "hearing" "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-trigger-hearing"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_trigger.hearing" start time: Oct 16 12:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_trigger.hearing" end time: Oct 16 12:01 CEST
+"ai_trigger.hearing" time elapsed: 00:00:00
+----------------------------------------------------------

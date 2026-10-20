@@ -1,0 +1,117 @@
+Start testing: Oct 17 10:41 CEST
+----------------------------------------------------------
+817/823 Testing: particle_stream.ramps
+817/823 Test: particle_stream.ramps
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle_stream_tests" "ramps" "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle-stream-ramps"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"particle_stream.ramps" start time: Oct 17 10:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"particle_stream.ramps" end time: Oct 17 10:41 CEST
+"particle_stream.ramps" time elapsed: 00:00:00
+----------------------------------------------------------
+
+819/823 Testing: particle_stream.session
+819/823 Test: particle_stream.session
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle_stream_tests" "session" "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle-stream-session"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"particle_stream.session" start time: Oct 17 10:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"particle_stream.session" end time: Oct 17 10:41 CEST
+"particle_stream.session" time elapsed: 00:00:00
+----------------------------------------------------------
+
+815/823 Testing: particle_stream.rules
+815/823 Test: particle_stream.rules
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle_stream_tests" "rules" "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle-stream-rules"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"particle_stream.rules" start time: Oct 17 10:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"particle_stream.rules" end time: Oct 17 10:41 CEST
+"particle_stream.rules" time elapsed: 00:00:00
+----------------------------------------------------------
+
+816/823 Testing: particle_stream.clocks
+816/823 Test: particle_stream.clocks
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle_stream_tests" "clocks" "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle-stream-clocks"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"particle_stream.clocks" start time: Oct 17 10:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"particle_stream.clocks" end time: Oct 17 10:41 CEST
+"particle_stream.clocks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+818/823 Testing: particle_stream.failures
+818/823 Test: particle_stream.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle_stream_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle-stream-failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"particle_stream.failures" start time: Oct 17 10:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"particle_stream.failures" end time: Oct 17 10:41 CEST
+"particle_stream.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+820/823 Testing: particle_stream.budgets
+820/823 Test: particle_stream.budgets
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle_stream_tests" "budgets" "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle-stream-budgets"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"particle_stream.budgets" start time: Oct 17 10:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"particle_stream.budgets" end time: Oct 17 10:41 CEST
+"particle_stream.budgets" time elapsed: 00:00:00
+----------------------------------------------------------
+
+821/823 Testing: particle_stream.private
+821/823 Test: particle_stream.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle_stream_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"particle_stream.private" start time: Oct 17 10:41 CEST
+Output:
+----------------------------------------------------------
+CityHub cycle 0: 443 created / 10 unsupported / 1 failed; 8 streams, peak 102, off expiry and 42-particle rearm
+CityHub cycle 1: 443 created / 10 unsupported / 1 failed; 8 streams, peak 101, off expiry and 42-particle rearm
+CityHub cycle 2: 443 created / 10 unsupported / 1 failed; 8 streams, peak 88, off expiry and 42-particle rearm
+<end of output>
+Test time =  30.90 sec
+----------------------------------------------------------
+Test Passed.
+"particle_stream.private" end time: Oct 17 10:42 CEST
+"particle_stream.private" time elapsed: 00:00:30
+----------------------------------------------------------
+
+End testing: Oct 17 10:42 CEST
+
+headless =  30.95 sec*proc
+
+particle_stream =  30.95 sec*proc
+
+private =  30.90 sec*proc

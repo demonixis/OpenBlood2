@@ -1,0 +1,96 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  43: world.level_change_private
+      Start  44: world.destination_trial_private
+ 1/41 Test  #43: world.level_change_private ........   Passed   37.82 sec
+      Start 754: sky.private
+ 2/41 Test  #44: world.destination_trial_private ...   Passed   44.22 sec
+      Start  45: world.destination_private
+ 3/41 Test #754: sky.private .......................   Passed   12.48 sec
+      Start 336: texture.corpus
+ 4/41 Test  #45: world.destination_private .........   Passed   14.11 sec
+      Start  57: services.private
+ 5/41 Test #336: texture.corpus ....................   Passed    9.32 sec
+      Start  25: world.level_change
+ 6/41 Test  #25: world.level_change ................   Passed    0.28 sec
+      Start  27: world.destination_trials
+ 7/41 Test  #27: world.destination_trials ..........   Passed    0.19 sec
+      Start  49: services.model_rejection
+ 8/41 Test  #49: services.model_rejection ..........   Passed    0.38 sec
+      Start  30: world.destination_lifetime
+ 9/41 Test  #30: world.destination_lifetime ........   Passed    0.06 sec
+      Start 750: sky.rules
+10/41 Test #750: sky.rules .........................   Passed    0.02 sec
+      Start 753: sky.lifetime
+11/41 Test #753: sky.lifetime ......................   Passed    0.02 sec
+      Start   1: objects.builtin_model
+12/41 Test   #1: objects.builtin_model .............   Passed    0.02 sec
+      Start 751: sky.pointers
+13/41 Test #751: sky.pointers ......................   Passed    0.02 sec
+      Start  11: objects.unsupported_teardown
+14/41 Test  #11: objects.unsupported_teardown ......   Passed    0.06 sec
+      Start  54: services.placement_queries
+15/41 Test  #54: services.placement_queries ........   Passed    0.03 sec
+      Start 752: sky.projection
+16/41 Test #752: sky.projection ....................   Passed    0.02 sec
+      Start  55: services.placement_service
+17/41 Test  #55: services.placement_service ........   Passed    0.02 sec
+      Start  29: world.destination_schema
+18/41 Test  #29: world.destination_schema ..........   Passed    0.02 sec
+      Start  28: world.destination_messages
+19/41 Test  #28: world.destination_messages ........   Passed    0.02 sec
+      Start  10: objects.messages_strings
+20/41 Test  #10: objects.messages_strings ..........   Passed    0.04 sec
+      Start  12: objects.creation_failures
+21/41 Test  #12: objects.creation_failures .........   Passed    0.04 sec
+      Start 335: texture.mapping
+22/41 Test #335: texture.mapping ...................   Passed    0.02 sec
+      Start  40: world.session_lifecycle
+23/41 Test  #40: world.session_lifecycle ...........   Passed    0.03 sec
+      Start 334: texture.malformed
+24/41 Test #334: texture.malformed .................   Passed    0.02 sec
+      Start   4: objects.reasons_properties
+25/41 Test   #4: objects.reasons_properties ........   Passed    0.02 sec
+      Start   9: objects.links_lists
+26/41 Test   #9: objects.links_lists ...............   Passed    0.02 sec
+      Start   2: objects.original_objects
+27/41 Test   #2: objects.original_objects ..........   Passed    0.02 sec
+      Start   6: objects.deferred_removal
+28/41 Test   #6: objects.deferred_removal ..........   Passed    0.02 sec
+      Start   3: objects.nested_creation
+29/41 Test   #3: objects.nested_creation ...........   Passed    0.02 sec
+      Start 333: texture.decode
+30/41 Test #333: texture.decode ....................   Passed    0.02 sec
+      Start   8: objects.handles_selection
+31/41 Test   #8: objects.handles_selection .........   Passed    0.02 sec
+      Start   7: objects.aggregate_dispatch
+32/41 Test   #7: objects.aggregate_dispatch ........   Passed    0.02 sec
+      Start   5: objects.scheduling
+33/41 Test   #5: objects.scheduling ................   Passed    0.02 sec
+      Start  41: world.session_messages
+34/41 Test  #41: world.session_messages ............   Passed    0.02 sec
+      Start  51: services.model_callbacks
+35/41 Test  #51: services.model_callbacks ..........   Passed    0.02 sec
+      Start  56: services.original_services
+36/41 Test  #56: services.original_services ........   Passed    0.02 sec
+      Start  50: services.animation_events
+37/41 Test  #50: services.animation_events .........   Passed    0.02 sec
+      Start  48: services.model_reader
+38/41 Test  #48: services.model_reader .............   Passed    0.02 sec
+      Start  53: services.movement_contacts
+39/41 Test  #53: services.movement_contacts ........   Passed    0.02 sec
+      Start  52: services.collision_queries
+40/41 Test  #52: services.collision_queries ........   Passed    0.02 sec
+41/41 Test  #57: services.private ..................   Passed   11.75 sec
+
+100% tests passed, 0 tests failed out of 41
+
+Label Time Summary:
+headless    = 131.35 sec*proc (41 tests)
+objects     =   0.32 sec*proc (12 tests)
+private     = 129.70 sec*proc (6 tests)
+services    =  12.30 sec*proc (10 tests)
+sky         =  12.57 sec*proc (5 tests)
+texture     =   9.38 sec*proc (4 tests)
+world       =  96.77 sec*proc (10 tests)
+
+Total Test time (real) =  70.10 sec

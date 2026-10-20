@@ -1,0 +1,503 @@
+{
+  "date": "2026-10-17",
+  "baseline_commit": "0d987417805a29bb26ed1604afed6225b67b2803",
+  "m2_complete": false,
+  "validation": {
+    "debug": {
+      "passed": 50,
+      "failed": 0,
+      "private": 10,
+      "seconds": 53.04
+    },
+    "debug-final-hud": {
+      "passed": 4,
+      "failed": 0,
+      "purpose": "Final display cap and event-time input suppression checks."
+    },
+    "release": {
+      "passed": 50,
+      "failed": 0,
+      "private": 10,
+      "seconds": 6.16
+    },
+    "release-final-hud": {
+      "passed": 4,
+      "failed": 0,
+      "purpose": "Final display cap and event-time input suppression checks."
+    },
+    "sanitize": {
+      "passed": 50,
+      "failed": 0,
+      "private": 10,
+      "seconds": 268.35
+    },
+    "sanitize-final-hud": {
+      "passed": 4,
+      "failed": 0,
+      "purpose": "Final display cap and event-time input suppression checks."
+    },
+    "debug-gpu": {
+      "passed": 10,
+      "failed": 0,
+      "private": 8,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "seconds": 84.77
+    },
+    "debug-final-gpu": {
+      "passed": 1,
+      "failed": 0,
+      "purpose": "Final HUD SDL_GPU/readback/lifetime checks."
+    },
+    "release-gpu": {
+      "passed": 10,
+      "failed": 0,
+      "private": 8,
+      "device": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "backend": "Vulkan",
+      "seconds": 28.72
+    },
+    "release-final-gpu": {
+      "passed": 1,
+      "failed": 0,
+      "purpose": "Final HUD SDL_GPU/readback/lifetime checks."
+    }
+  },
+  "artifacts": [
+    {
+      "file": "m2-hud-debug-build.log",
+      "sha256": "3b7c7f2c9ebaa635778697cf47b313641a6520201630909848527f28bdfdbdf7",
+      "raw_capture_sha256": "b11d51b8831087973313b1d765fd3fd2b1fcfa36d9e02549ea7067e587022b9b",
+      "bytes": 16985
+    },
+    {
+      "file": "m2-hud-debug-display-build.log",
+      "sha256": "2b2977d6c3e812e3922dc721e340b91cccda0a077ea8f2d3c8a2fd8b801b4b21",
+      "raw_capture_sha256": "31e70e8b076b1f41ff89e7b5e78ffcaa92b38fbb1f73311601e5c86db518cbcc",
+      "bytes": 708
+    },
+    {
+      "file": "m2-hud-debug-final-gpu.log",
+      "sha256": "9590b3207caa9c7e5f9e5c8aea306b9eadd1de05a4bb4ee06d19d039a7780113",
+      "raw_capture_sha256": "15ee108bd0a67b7d1cac7fc4f1e182f1e0eaec55ce3f5647a9bf4b4649ab02d3",
+      "bytes": 1435
+    },
+    {
+      "file": "m2-hud-debug-final.log",
+      "sha256": "578378b26f64b61f8ab857b978001e7cff52865703ac71bb65d76c3d6c7a24fa",
+      "raw_capture_sha256": "6cf0334291e101ce25581dc968cfb1e5c9bd41107345794801f0b9b28faa468e",
+      "bytes": 2028
+    },
+    {
+      "file": "m2-hud-debug-focused-gpu.log",
+      "sha256": "ae8224a1d18a5edab8b1c540141f7354e994bad3be375022a8d8a3f304c61bbc",
+      "raw_capture_sha256": "73f7127a4409b6185c2bdd438a990caaa1c45593b3dcd8a6cf737d527227cfa1",
+      "bytes": 1435
+    },
+    {
+      "file": "m2-hud-debug-focused.log",
+      "sha256": "3233c90e3a51ed3d81e12ecc88d2dd697c2b79bf73aef102c9cdb8371efbc0ca",
+      "raw_capture_sha256": "e517f8609fb7d7c7bf123acfb05ccbad9c695073fbb4b87eb4695421a34539ea",
+      "bytes": 2028
+    },
+    {
+      "file": "m2-hud-debug-gpu.log",
+      "sha256": "0760a1e0e586ce8617cad671ce8526b90d3cbf147fb2d140127adea4d0fceffe",
+      "raw_capture_sha256": "6c12015476aeca66d49c7a2f0a8e2f97e068dd0b1b0facf89196db43f815d2d8",
+      "bytes": 15974
+    },
+    {
+      "file": "m2-hud-debug-headless.log",
+      "sha256": "4b0a529ac28b183506f7c19c8f75645d5da21e243bb4ffa909690575e755eba8",
+      "raw_capture_sha256": "26139a0cfe1a287c63767b3b61292eec5da778989a78545828f9775cc049653e",
+      "bytes": 26278
+    },
+    {
+      "file": "m2-hud-debug-input-build.log",
+      "sha256": "e4bebb38e7dd44999139e4dd1f5cef79795d2d8df16b7693c8892698036b885a",
+      "raw_capture_sha256": "f9bc0ea740b0d9b187eee35583959300022c98b5fe37d81b85b2891c60fed6d8",
+      "bytes": 1209
+    },
+    {
+      "file": "m2-hud-debug-input-final.log",
+      "sha256": "aabe183465148156bca3dc9914a27db84d6850132e1b9786f73688e0fbba11bd",
+      "raw_capture_sha256": "d19305fa173f1ce0f345f31a0b06644e0cc18e58ceda602bb11d39accf06b373",
+      "bytes": 3393
+    },
+    {
+      "file": "m2-hud-debug-noop-build.log",
+      "sha256": "0f9288cee62868456a61618b6e1683f70ec04933544b6088b2d9032aadafbd42",
+      "raw_capture_sha256": "6953e6f61519507bd7b08c1370ef3a24b1ad80aff130a6d247aa3062332d493d",
+      "bytes": 621
+    },
+    {
+      "file": "m2-hud-release-build.log",
+      "sha256": "1c4061a15b064d5390c629366f46219164c22addfd1206afd9620808a43b372d",
+      "raw_capture_sha256": "2c3bd9a0a6bf07ca2c5c8b21ed9a1c05ab16e640d361ea07dcb6b17e2563cbef",
+      "bytes": 49941
+    },
+    {
+      "file": "m2-hud-release-display-build.log",
+      "sha256": "370a70772b95c6dd30becf1fc6a90dd3ffd10531e87223b55780b55758cfc826",
+      "raw_capture_sha256": "3d6643d34332d35d79cd5cf06b7d53a2863bd06630ceb753438d18b6eea8556c",
+      "bytes": 708
+    },
+    {
+      "file": "m2-hud-release-final-gpu.log",
+      "sha256": "58da9d2a7ce41e7b4e7d3ddf1ddd0b2840bd171cad8f225bbee7009e91ca1002",
+      "raw_capture_sha256": "906cf5659548eb75e3dc2936e5d0a58cc0e5b3cce0ca0aa77b1ee525e17213a4",
+      "bytes": 1447
+    },
+    {
+      "file": "m2-hud-release-final.log",
+      "sha256": "5f1d6021abfa1617ba8c1659fe0f72c3c63baab65b1e5a28116f04612b5143e2",
+      "raw_capture_sha256": "3c312340445aa7368a52ca5e5daf6c06f3ef7fec1b7e4247ae4a504f0e2a631f",
+      "bytes": 2056
+    },
+    {
+      "file": "m2-hud-release-gpu.log",
+      "sha256": "b3c03b9945aa2ee88fcac946c9da0581ac41bf7164c33ca30da1afa5b8419559",
+      "raw_capture_sha256": "0716cd65ab3e1c2ee1d978f649715a5aa382db4c4419957f797221d24817729f",
+      "bytes": 16052
+    },
+    {
+      "file": "m2-hud-release-headless.log",
+      "sha256": "b8e9500ae4545cb010023aaf362c183237552989fbccbde15743915a31800e9e",
+      "raw_capture_sha256": "afa2fb499ec9e5f7f01f3d649869f04b363f599243fa8cae0c1d6d406b724637",
+      "bytes": 26532
+    },
+    {
+      "file": "m2-hud-release-input-build.log",
+      "sha256": "88ce46d738c21dd1ccb315ff8444aae04095a11862d26d2f8d644ae3ed6ee3eb",
+      "raw_capture_sha256": "0e8e5437478337a60d8c7e1e6a6997f7590b118e0c551ac4d90b2f15abcd8898",
+      "bytes": 1052
+    },
+    {
+      "file": "m2-hud-release-noop-build.log",
+      "sha256": "1318150abb749f9639b3dc73fde5db999c69a829316c42a9db4b020ad7473f81",
+      "raw_capture_sha256": "2071dabb39ab30783efaf89376b367146a57235d7e2f3e9e6f5122de4d1dd058",
+      "bytes": 621
+    },
+    {
+      "file": "m2-hud-sanitize-build.log",
+      "sha256": "2b8998b9615a7f92e592369c073d79c19296dd2fcb828043be92ec01d097b755",
+      "raw_capture_sha256": "2776ef1dd3ed4f000e3dbdb263eca900b397a257a8d7d4d773707ef2ab0c0ad0",
+      "bytes": 49285
+    },
+    {
+      "file": "m2-hud-sanitize-display-build.log",
+      "sha256": "370a70772b95c6dd30becf1fc6a90dd3ffd10531e87223b55780b55758cfc826",
+      "raw_capture_sha256": "3d6643d34332d35d79cd5cf06b7d53a2863bd06630ceb753438d18b6eea8556c",
+      "bytes": 708
+    },
+    {
+      "file": "m2-hud-sanitize-final.log",
+      "sha256": "fce0b43949437ebb4e8e663506ca52984bb99cd124e1637fee6dc3d394689ddc",
+      "raw_capture_sha256": "28b4d926573fff0a6a4849c4101065fbd37a41ae71375ac5ceec0c3e985325da",
+      "bytes": 2070
+    },
+    {
+      "file": "m2-hud-sanitize-headless.log",
+      "sha256": "4741b4ced267f3d7475577b97d5c5a5a0c7508b1629af3bc5eb1aaa3e865c76e",
+      "raw_capture_sha256": "b84ebef0477beb5da7f73454eccd2698e39044f9eef4c808ec716bd1447c759c",
+      "bytes": 26660
+    },
+    {
+      "file": "m2-hud-sanitize-input-build.log",
+      "sha256": "9ad4572892b29743b789855b73c79d337565725b8a358e63236adfee8e0cf59c",
+      "raw_capture_sha256": "da054b7d1c082998ba625ad1aae2fa1d7ece84053b54ececfa0249beeb36a086",
+      "bytes": 691
+    },
+    {
+      "file": "m2-hud-sanitize-noop-build.log",
+      "sha256": "a600cf3b2d49ecdd35dde7aeecfdb8d755ee2f7724b500bd9ebce4e69b191289",
+      "raw_capture_sha256": "7d7d208cf8813e5826401eef35c86b5edcace619d936dc73f9a0b23fd7854aa8",
+      "bytes": 621
+    },
+    {
+      "file": "m2-hud-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    }
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "captures": [
+    {
+      "local_path": "build/debug/tests/hud-gpu/hud-1200-0.png",
+      "sha256": "97ecfa208b0b9a1043da6e202ff8f86a08c4ece8b827a232930390dfa4f19560",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/hud-gpu/hud-1200-1.png",
+      "sha256": "e632caa36c01aca6e6f6c2a284b32cb32aad21fb84b6d2a8f236b38f3f01398a",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/hud-gpu/hud-1200-2.png",
+      "sha256": "877014bc5d6564fc1cf984b2e35fd846cb70492f570aadd3b4c3f10b65311e64",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/hud-gpu/hud-1200-3.png",
+      "sha256": "68983831dafd60222ffebaf6d9b908a46174a5072d2b00531ab494395b8e4884",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/hud-gpu/hud-320-0.png",
+      "sha256": "937076a1b2c4392ac3603d191c9377bfc0d2a47b86235cb31bcb5dcb64ce1753",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/hud-gpu/hud-320-1.png",
+      "sha256": "75daefbcf711def1237f3472ccb63c9a69e8b96cc5abaa8e88c0d9e77cb695e5",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/hud-gpu/hud-320-2.png",
+      "sha256": "f18e31cffb3311a840e617110d087ac66b76b8c578befd8d038a15839a0a2738",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/hud-gpu/hud-320-3.png",
+      "sha256": "1cc5692ca441d2edb111238eaa33b5bdd9529d2fad88c1e1a6f5b27b03673392",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/hud-gpu/hud-600-0.png",
+      "sha256": "36957da8ac019ed5cf4614022a9ef93c3bfefe11ea97dd5a505030ccbbcf5797",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/hud-gpu/hud-600-1.png",
+      "sha256": "31bf8ac7fd6ec049cb56f3f152e515d57780b3d88b561929820212d4f8abd4ed",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/hud-gpu/hud-600-2.png",
+      "sha256": "1180bebd60e8e29b65cbb10fac58116503d61a7c9867e95418042a8ac951d4e3",
+      "committed": false
+    },
+    {
+      "local_path": "build/debug/tests/hud-gpu/hud-600-3.png",
+      "sha256": "35e3ce4a76877c11e70b863e179bbe02a76f87f04cae1831e04f7eb5598be8d4",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/hud-gpu/hud-1200-0.png",
+      "sha256": "97ecfa208b0b9a1043da6e202ff8f86a08c4ece8b827a232930390dfa4f19560",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/hud-gpu/hud-1200-1.png",
+      "sha256": "e632caa36c01aca6e6f6c2a284b32cb32aad21fb84b6d2a8f236b38f3f01398a",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/hud-gpu/hud-1200-2.png",
+      "sha256": "877014bc5d6564fc1cf984b2e35fd846cb70492f570aadd3b4c3f10b65311e64",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/hud-gpu/hud-1200-3.png",
+      "sha256": "68983831dafd60222ffebaf6d9b908a46174a5072d2b00531ab494395b8e4884",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/hud-gpu/hud-320-0.png",
+      "sha256": "937076a1b2c4392ac3603d191c9377bfc0d2a47b86235cb31bcb5dcb64ce1753",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/hud-gpu/hud-320-1.png",
+      "sha256": "75daefbcf711def1237f3472ccb63c9a69e8b96cc5abaa8e88c0d9e77cb695e5",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/hud-gpu/hud-320-2.png",
+      "sha256": "f18e31cffb3311a840e617110d087ac66b76b8c578befd8d038a15839a0a2738",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/hud-gpu/hud-320-3.png",
+      "sha256": "1cc5692ca441d2edb111238eaa33b5bdd9529d2fad88c1e1a6f5b27b03673392",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/hud-gpu/hud-600-0.png",
+      "sha256": "36957da8ac019ed5cf4614022a9ef93c3bfefe11ea97dd5a505030ccbbcf5797",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/hud-gpu/hud-600-1.png",
+      "sha256": "31bf8ac7fd6ec049cb56f3f152e515d57780b3d88b561929820212d4f8abd4ed",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/hud-gpu/hud-600-2.png",
+      "sha256": "1180bebd60e8e29b65cbb10fac58116503d61a7c9867e95418042a8ac951d4e3",
+      "committed": false
+    },
+    {
+      "local_path": "build/release/tests/hud-gpu/hud-600-3.png",
+      "sha256": "35e3ce4a76877c11e70b863e179bbe02a76f87f04cae1831e04f7eb5598be8d4",
+      "committed": false
+    }
+  ],
+  "commands": [
+    "cmake --build build/<debug|release|sanitize> -j3 --target blood2_app hud_tests player_tests weapon_tests player_controls_tests player_restore_tests player_keepalive_tests world_tests object_contract_tests",
+    "cmake --build build/<debug|release> -j3 --target level_change_gpu_tests",
+    "ctest --test-dir build/<debug|release> -R '^(hud|player|weapons|player_controls|player_restore|player_keepalive|objects)\\.|^world\\.level_change' -V -j2",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build/sanitize -R '^(hud|player|weapons|player_controls|player_restore|player_keepalive|objects)\\.|^world\\.level_change' -V -j2",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu\\.(hud|lifecycle|player|weapons|player_restore|player_keepalive|player_controls|level_change|mouse_combat|corpse_clearance)$' -V",
+    "ctest --test-dir build/<debug|release|sanitize> -R '^hud\\.' -V (sanitizer environment as above)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json ctest --test-dir build/<debug|release> -R '^gpu.hud$' -V"
+  ],
+  "development_findings": [
+    "Event-time text/disabled guards prevent a digit from leaking into gameplay when the inspector closes or controls enable in the same frame.",
+    "Original SMSG_PLAYERSTATSUPDATE additionally caps ammo at 999; the display preserves that limit while the typed inspection snapshot retains raw counts.",
+    "Private HUD fixtures grant/switch the M16 diagnostically during the intro to test distinct ammo pools; they are not authored acquisition/playthrough evidence."
+  ],
+  "limitations": [
+    "Compact ImGui presentation only, not original PCX status-bar artwork, air/focus/item/communication HUD or rebinding.",
+    "User reports of idle Cultists, enemy durability, possible post-transition firing failure, invisible level-two water and silent pickups are queued, not diagnosed/fixed in this increment.",
+    "Linux NVIDIA validation does not certify native Metal execution. Required M2 services remain incomplete."
+  ],
+  "implementation_patch_sha256": "f164d9119f7f53bd4f7d4c8b2b02263665cf887f7f8e84a86e24de2fe9587f55",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "95f9f76c83121f723200a454057397a7d72811cb21a489cbaa4fafd6a1694410"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "0c992a412b11714415bdb40a4b72c3cb2f36e4bcbce2f85996aab36c85b5d38f"
+    },
+    {
+      "path": "README.md",
+      "sha256": "2c648ed39954e4f77d84ad88605c8f6da992447335602b711eaec29ae5ae61bc"
+    },
+    {
+      "path": "cmake/Dependencies.cmake",
+      "sha256": "eb575df8772ab8f7f8c67cf551ba5b5c23bae2537aadb485496cd16a279da6d5"
+    },
+    {
+      "path": "docs/HUD_CONTRACTS.md",
+      "sha256": "b44f0e562c6ad94ea04a7ab406c4c4bd797647ca601685798842b7a0e903b66d"
+    },
+    {
+      "path": "docs/M2_HUD_SOURCES.json",
+      "sha256": "4882caa045304f19e0856780ae349fe62eb62d467a67bb8cd2185c283b9df9dc"
+    },
+    {
+      "path": "docs/PLAYER_CONTRACTS.md",
+      "sha256": "1cb2f78b13b1cff84a49dfea960bb57a0ca76b93aa2afe41217571ada3184422"
+    },
+    {
+      "path": "docs/PROVENANCE.md",
+      "sha256": "b99daf0ed1645db5b969114135537cc008d6e7b98b81e8369e68f315c6a4621c"
+    },
+    {
+      "path": "docs/WEAPON_CONTRACTS.md",
+      "sha256": "15793d419e09832f56ce7def801eed31e87884d576201e01ca0f14ec2cd6267f"
+    },
+    {
+      "path": "src/app/hud.cpp",
+      "sha256": "bd8e4912a1ada5d3ad757d340b94db3e42d5f2fc75bc79520b04983bfdc6948f"
+    },
+    {
+      "path": "src/app/hud.h",
+      "sha256": "0d2e75bd18c4f1e08f0ee756200b16ef1418fe5e1e274aa8a259eca66c62c92e"
+    },
+    {
+      "path": "src/app/inspector.cpp",
+      "sha256": "c4843ee5f8713ee0da6cf0eb198b1dd57b0ca82bf0337d96cb0c4684ca4bb8ed"
+    },
+    {
+      "path": "src/app/inspector.h",
+      "sha256": "7efe30b18145423e5ed386174ea697baa5435b38d1a532a03c1f60c4f04fe17f"
+    },
+    {
+      "path": "src/app/main.cpp",
+      "sha256": "37adb00be118ae99b688fbf5f60f6bab26efd82cd7a6325e9f14e77bd8a80e18"
+    },
+    {
+      "path": "src/app/movement_controls.h",
+      "sha256": "f2f62c1701f6a7572f6194863429589a1217d6add5f64ad146a7ce630f3cf9de"
+    },
+    {
+      "path": "src/app/ui_runtime.cpp",
+      "sha256": "13447033aaf1d23b58f8844aee647382f664192fbf7d7a33e0e746a527c8e462"
+    },
+    {
+      "path": "src/app/ui_runtime.h",
+      "sha256": "fe9dd3f5a535f4ea1ea0ee48cda497c8ca10d341721d56e1b33ed48c21c42ed9"
+    },
+    {
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "776d7f27f266a13ed1e4e12cafd2e5fd3cba1e3c4f4601e4993543ecde0ee7d3"
+    },
+    {
+      "path": "src/game/player_messages.h",
+      "sha256": "af32d8b36f1eade93187814bf35c512dceb1bccf212be72a13b67ef142ee9495"
+    },
+    {
+      "path": "src/game/server_adapter.h",
+      "sha256": "b4132a457fe731decd81bbb16e06c93e441fb084a4932db02fc1197502f7d965"
+    },
+    {
+      "path": "src/game/server_clients.cpp",
+      "sha256": "6660b085f9596366ece8c5e37a6ad146b8e717143e27659d9e228c877c94beba"
+    },
+    {
+      "path": "src/game/session.cpp",
+      "sha256": "7b43f1163441badac8b703a255c38080d4873ad1e6c56c12fd421555fb0ea8c0"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "sha256": "d00b7537f02763787f57648e7c9fea0030c9ad4ad63a35dc2b92cdf7c140eeda"
+    },
+    {
+      "path": "tests/hud_tests.cpp",
+      "sha256": "6acf1b388f7a95c9ec979578200f5d3ce7cf8eeb353306a8a722a2563319cd1f"
+    },
+    {
+      "path": "tests/world_tests.cpp",
+      "sha256": "a6e767573745f131e879510dcf7071bd5e06356a681df07e9dbdec24585d04d2"
+    }
+  ],
+  "implementation_commit": "cc329c6a5a9c8eded9894b43f3c6f59ab0e2b558"
+}

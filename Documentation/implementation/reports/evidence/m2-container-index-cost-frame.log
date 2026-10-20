@@ -1,0 +1,28 @@
+WORLD worlds/01_subwaya.dat mesh_ms=34.4244 objects=230
+PROFILE 0 calls=22979 ms=234.52
+PROFILE 1 calls=27659 ms=252.082
+PROFILE 2 calls=3916 ms=274.472
+PROFILE 3 calls=6827 ms=304.704
+PROFILE 4 calls=708215 ms=28.3436
+PROFILE 5 calls=253190 ms=13.5545
+PROFILE 6 calls=50638 ms=405.244
+step mean=3.65143 p50=3.50879 p95=3.75111 max=7.80994
+world mean=1.57488 p50=1.56699 p95=1.65111 max=1.72338
+model mean=4.90332 p50=4.88981 p95=5.07457 max=5.5091
+sprite mean=0.0696649 p50=0.06489 p95=0.089056 max=0.138044
+fx mean=0.000360337 p50=0.000309 p95=0.000698 max=0.001113
+COUNTS models=36 model_vertices=40479 sprites=72 voices=5
+WORLD worlds/02_cityhub.dat mesh_ms=136.369 objects=488
+PROFILE 0 calls=81451 ms=1766.69
+PROFILE 1 calls=119841 ms=2359.35
+PROFILE 2 calls=23754 ms=2292.28
+PROFILE 3 calls=33352 ms=3571.71
+PROFILE 4 calls=1869192 ms=74.9628
+PROFILE 5 calls=2214212 ms=193.081
+PROFILE 6 calls=201292 ms=3488.16
+step mean=24.5305 p50=23.395 p95=24.3685 max=57.8668
+world mean=0.810712 p50=0.795551 p95=0.87266 max=0.949888
+model mean=13.1382 p50=13.0929 p95=13.5924 max=14.2527
+sprite mean=0.440199 p50=0.438403 p95=0.550788 max=1.04574
+fx mean=0.00053139 p50=0.000542 p95=0.000793 max=0.001039
+COUNTS models=272 model_vertices=104202 sprites=600 voices=36

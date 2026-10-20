@@ -1,0 +1,223 @@
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walk t=0 pos=-32,170.001,-3224 HP=100 ammo=50 target=none
+Walk t=2 pos=-32,170.001,-2681.51 HP=100 ammo=50 target=none
+Walk t=4 pos=-30.8339,170.001,-2175.55 HP=100 ammo=44 target=none
+Walk t=6 pos=-30.5801,170.001,-1721.66 HP=100 ammo=41 target=noname
+Walk t=8 pos=-41.4442,170.001,-1443.05 HP=120.993 ammo=35 target=noname
+Walk t=10 pos=-25.6665,170.001,-1266.48 HP=116.986 ammo=29 target=noname
+Walk t=12 pos=-34.9978,170.001,-1059.98 HP=116.986 ammo=25 target=none
+Walk t=14 pos=-34.9998,170.001,-632.001 HP=116.986 ammo=25 target=none
+Walk t=16 pos=-34.4129,170.001,-304.17 HP=116.986 ammo=22 target=herm
+Walk t=18 pos=-56.7345,170.001,198.172 HP=116.986 ammo=16 target=pete
+Walk t=20 pos=-75.999,170.001,344.937 HP=116.986 ammo=10 target=pete
+Walk t=22 pos=-75.999,170.001,344.937 HP=116.986 ammo=4 target=pete
+Walk t=24 pos=-37.9161,170.001,593.29 HP=116.986 ammo=0 target=none
+Walk t=26 pos=-31.7809,170.001,961.6 HP=116.986 ammo=0 target=noname
+Walk t=28 pos=-32.756,170.001,1224.1 HP=112.981 ammo=0 target=noname
+Walk t=30 pos=-35.3017,170.001,1642.91 HP=100.957 ammo=0 target=noname
+Walk t=32 pos=-45.292,170.001,1802.92 HP=121.948 ammo=0 target=noname
+Walk t=34 pos=-83.6427,170.001,2040 HP=146.948 ammo=0 target=none
+Walk t=36 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=38 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=40 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=42 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=44 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=46 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=48 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=50 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=52 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=54 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=56 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=58 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=60 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=62 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=64 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=66 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=68 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=70 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=72 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=74 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=76 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=78 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=80 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=82 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=84 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=86 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Walk t=88 pos=-83.664,170.001,2140 HP=146.948 ammo=0 target=none
+Route summary: damaged=10 dead=10 ammoPickup=0 healthPickup=1 relay=1 relayStart=46.2833 fade=0 time=102.017
+Relay slot player sent=1 pending=0
+Relay slot cinexit1 sent=1 pending=0
+Relay slot htrain1 sent=1 pending=0
+Relay slot cinhi5 sent=1 pending=0
+Relay slot exp1 sent=1 pending=0
+Relay slot exp2 sent=1 pending=0
+Relay slot exp3 sent=1 pending=0
+Relay slot exp4 sent=1 pending=0
+Relay slot exp5 sent=1 pending=0
+Relay slot exit2 sent=1 pending=0
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Object diagnostic: Session message token limit
+Failed route calls AlignRotation=5412
+Failed route calls BreakInterObjectLink=276
+Failed route calls CastRay=6
+Failed route calls CastWorldRay=36
+Failed route calls CompareStringsUpper=4
+Failed route calls ConfigureCharacterBody=26
+Failed route calls ConnectClient=1
+Failed route calls CreateAttachment=12
+Failed route calls CreateInterObjectLink=322
+Failed route calls CreateObject=122
+Failed route calls CreateObjectProps=6
+Failed route calls CreateString=654
+Failed route calls EndMessage=65544
+Failed route calls FindAttachment=3996
+Failed route calls FindNamedObjects=57
+Failed route calls FreeString=2097
+Failed route calls GetAnimIndex=2848
+Failed route calls GetCameraView=6843
+Failed route calls GetClass=254
+Failed route calls GetClientResourceString=2
+Failed route calls GetClientUserData=90685
+Failed route calls GetContainers=288324
+Failed route calls GetFrameTime=6207
+Failed route calls GetGameConVar=480
+Failed route calls GetGlobalForce=4
+Failed route calls GetModelAnimUserDims=3613
+Failed route calls GetModelAnimation=1947
+Failed route calls GetModelAnimationName=5653
+Failed route calls GetModelFilenames=10
+Failed route calls GetModelLooping=10
+Failed route calls GetModelNodeHideStatus=1090
+Failed route calls GetModelNodeTransform=2740
+Failed route calls GetModelPlaybackState=5608
+Failed route calls GetMovementState=168476
+Failed route calls GetNextObject=227
+Failed route calls GetObjectClass=339
+Failed route calls GetObjectDims=465
+Failed route calls GetObjectFlags=210199
+Failed route calls GetObjectName=137
+Failed route calls GetObjectPos=42601
+Failed route calls GetObjectRotation=4710
+Failed route calls GetObjectUserFlags=169
+Failed route calls GetPathManager=1365
+Failed route calls GetPointContainerCode=86
+Failed route calls GetPropBool=764
+Failed route calls GetPropGeneric=10875
+Failed route calls GetPropReal=764
+Failed route calls GetPropString=72
+Failed route calls GetPropVector=64
+Failed route calls GetSoundDuration=80
+Failed route calls GetStringData=1556
+Failed route calls GetTime=67002
+Failed route calls GetVarValueFloat=478
+Failed route calls GetVarValueString=2
+Failed route calls GetVelocity=3829
+Failed route calls GetWorldTime=7
+Failed route calls HandleToObject=154031
+Failed route calls InterpolateRotation=4104
+Failed route calls IntersectSegment=4306
+Failed route calls IsKindOf=351
+Failed route calls IsObjectAlive=550740
+Failed route calls IsSoundDone=4083
+Failed route calls KillSound=156
+Failed route calls MID_MODELSTRINGKEY=208
+Failed route calls MoveKeyframedObject=41669
+Failed route calls MoveObject=286647
+Failed route calls MoveObjectToGround=16
+Failed route calls MoveWorldModel=262
+Failed route calls ObjectToHandle=2775
+Failed route calls PingObjects=193
+Failed route calls PlaceNonSolidModel=10
+Failed route calls PlayCharacterSound=197
+Failed route calls PlayCinematicSound=6
+Failed route calls PlayClientSound=36
+Failed route calls PlayDetachedSound=70
+Failed route calls PlaySoundAt=83
+Failed route calls PlayWorldSound=4
+Failed route calls PublishBloodSplat=9
+Failed route calls PublishCameraEffect=2
+Failed route calls PublishClientBloodSplat=36
+Failed route calls PublishClientBloodSpurt=36
+Failed route calls PublishExplosionFlames=3
+Failed route calls PublishExplosionFragments=3
+Failed route calls PublishExplosionLights=3
+Failed route calls PublishExplosionModels=3
+Failed route calls PublishExplosionRings=3
+Failed route calls PublishExplosionSprites=3
+Failed route calls PublishLightEffect=12
+Failed route calls PublishSparks=64
+Failed route calls QueryModelNodeTransform=954
+Failed route calls RandomFloat=103
+Failed route calls RandomInt=223
+Failed route calls ReadDamage=65
+Failed route calls ReadFromMessageDWord=1448
+Failed route calls ReadFromMessageHString=1448
+Failed route calls ReadPickupMessage=6
+Failed route calls RecordPickup=3
+Failed route calls RecordSceneExplosion=3
+Failed route calls RecordSpawn=26
+Failed route calls RelinquishList=57
+Failed route calls RemoveAttachment=11
+Failed route calls RemoveObject=120
+Failed route calls ResetModelAnimation=195
+Failed route calls ResizeObject=3482
+Failed route calls ScaleObject=26
+Failed route calls SendBossHealth=331
+Failed route calls SendObjectives=1
+Failed route calls SendToClient=404
+Failed route calls SetAcceleration=12248
+Failed route calls SetBlockingPriority=12362
+Failed route calls SetClientUserData=2
+Failed route calls SetDeactivationTime=16
+Failed route calls SetGameConVar=32
+Failed route calls SetGlobalForce=1
+Failed route calls SetModelAnimation=255
+Failed route calls SetModelFilenames=2
+Failed route calls SetModelLooping=250
+Failed route calls SetModelNodeHideStatus=38
+Failed route calls SetNextUpdate=38789
+Failed route calls SetObjectDims=96
+Failed route calls SetObjectFlags=291
+Failed route calls SetObjectRotation=46374
+Failed route calls SetObjectState=17
+Failed route calls SetObjectUserFlags=235
+Failed route calls SetVelocity=13762
+Failed route calls StartHMessageWrite=212168
+Failed route calls StartMessageToObject=212168
+Failed route calls TeleportObject=11
+Failed route calls ValidateSpawnObject=15
+Failed route calls WriteDamage=919
+Failed route calls WritePickupMessage=63999
+Failed route calls WriteToMessageDWord=618
+Failed route calls WriteToMessageHString=626
+290: damaged.size() >= 4 && dead.size() >= 4 && ammo_pickup && health_pickup | 

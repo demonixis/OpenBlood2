@@ -1,0 +1,20 @@
+314/315 Testing: ai_sight.catalog
+314/315 Test: ai_sight.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_sight_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_sight.catalog" start time: Oct 16 06:49 CEST
+Output:
+----------------------------------------------------------
+m_civilian1 clips=48 visible body, animated head origins
+f_civilian1 clips=47 visible body, animated head origins
+labtech clips=17 visible body, animated head origins
+m_cultist1 clips=48 visible body, animated head origins
+f_cultist1 clips=48 visible body, animated head origins
+gideon clips=32 visible body, animated head origins
+<end of output>
+Test time =   0.35 sec
+----------------------------------------------------------
+Test Passed.
+"ai_sight.catalog" end time: Oct 16 06:49 CEST
+"ai_sight.catalog" time elapsed: 00:00:00
+----------------------------------------------------------

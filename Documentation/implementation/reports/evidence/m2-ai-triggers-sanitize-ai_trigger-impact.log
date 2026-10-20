@@ -1,0 +1,14 @@
+360/366 Testing: ai_trigger.impact
+360/366 Test: ai_trigger.impact
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_trigger_tests" "impact" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-trigger-impact"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_trigger.impact" start time: Oct 16 12:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ai_trigger.impact" end time: Oct 16 12:07 CEST
+"ai_trigger.impact" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+341/345 Testing: ai_state.dispatch
+341/345 Test: ai_state.dispatch
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_state_tests" "dispatch"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_state.dispatch" start time: Oct 16 11:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.dispatch" end time: Oct 16 11:04 CEST
+"ai_state.dispatch" time elapsed: 00:00:00
+----------------------------------------------------------

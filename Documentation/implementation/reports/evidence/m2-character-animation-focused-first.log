@@ -1,0 +1,76 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start  83: locomotion.private
+      Start  47: services.private
+      Start  41: services.model_rejection
+      Start  78: locomotion.limits
+ 1/25 Test  #78: locomotion.limits ................   Passed    0.05 sec
+      Start  79: locomotion.crouch
+ 2/25 Test  #41: services.model_rejection .........   Passed    0.07 sec
+      Start  82: locomotion.contacts
+ 3/25 Test  #79: locomotion.crouch ................   Passed    0.03 sec
+      Start  77: locomotion.world_stairs
+ 4/25 Test  #82: locomotion.contacts ..............   Passed    0.02 sec
+      Start  80: locomotion.animations
+ 5/25 Test  #77: locomotion.world_stairs ..........   Passed    0.02 sec
+      Start  76: locomotion.stairs
+ 6/25 Test  #80: locomotion.animations ............   Passed    0.02 sec
+      Start  81: locomotion.lifetime
+ 7/25 Test  #81: locomotion.lifetime ..............   Passed    0.01 sec
+      Start  46: services.original_services
+ 8/25 Test  #76: locomotion.stairs ................   Passed    0.01 sec
+      Start  43: services.model_callbacks
+ 9/25 Test  #46: services.original_services .......   Passed    0.00 sec
+      Start  45: services.movement_contacts
+10/25 Test  #43: services.model_callbacks .........   Passed    0.00 sec
+      Start  42: services.animation_events
+11/25 Test  #45: services.movement_contacts .......   Passed    0.00 sec
+      Start  40: services.model_reader
+12/25 Test  #42: services.animation_events ........   Passed    0.00 sec
+      Start  44: services.collision_queries
+13/25 Test  #40: services.model_reader ............   Passed    0.00 sec
+      Start 265: character.mappings
+14/25 Test  #44: services.collision_queries .......   Passed    0.00 sec
+      Start 266: character.humiliation
+15/25 Test #265: character.mappings ...............   Passed    0.00 sec
+      Start 267: character.force
+16/25 Test #266: character.humiliation ............   Passed    0.00 sec
+      Start 268: character.transforms
+17/25 Test #267: character.force ..................   Passed    0.00 sec
+      Start 269: character.rejection
+18/25 Test #268: character.transforms .............   Passed    0.00 sec
+      Start 270: character.spheres
+19/25 Test #269: character.rejection ..............   Passed    0.00 sec
+      Start 271: character.catalog
+20/25 Test #270: character.spheres ................   Passed    0.00 sec
+      Start 272: character.player
+21/25 Test #271: character.catalog ................***Failed    0.20 sec
+models/characters/caleb.abc clips=86 nodes=20 queries=1720 missing_bindings=56 found_standard_nodes=16 head_radius=2.32597
+models/enemies/m_civilian1.abc clips=48 nodes=19 queries=912 missing_bindings=153 found_standard_nodes=16 head_radius=1.0906
+models/enemies/f_civilian1.abc clips=47 nodes=19 queries=893 missing_bindings=156 found_standard_nodes=16 head_radius=2.4427
+models/enemies/labtech.abc clips=17 nodes=21 queries=357 missing_bindings=171 found_standard_nodes=16 head_radius=1.77636
+catalog:260: r && r->model
+
+22/25 Test #272: character.player .................***Failed    0.34 sec
+player:314: p->locomotion_clip == "walk_rifle" && g.server.GetModelNodeTransform(p->m_hObject, "head", &after, &q)
+
+23/25 Test  #47: services.private .................   Passed    1.90 sec
+24/25 Test  #83: locomotion.private ...............   Passed    2.45 sec
+      Start 273: gpu.character
+25/25 Test #273: gpu.character ....................   Passed   17.99 sec
+
+92% tests passed, 2 tests failed out of 25
+
+Label Time Summary:
+character     =  18.54 sec*proc (9 tests)
+gpu           =  17.99 sec*proc (1 test)
+headless      =   5.12 sec*proc (24 tests)
+locomotion    =   2.60 sec*proc (8 tests)
+private       =  22.88 sec*proc (5 tests)
+services      =   1.98 sec*proc (8 tests)
+
+Total Test time (real) =  20.45 sec
+
+The following tests FAILED:
+	271 - character.catalog (Failed)                        character headless private
+	272 - character.player (Failed)                         character headless private
+Errors while running CTest

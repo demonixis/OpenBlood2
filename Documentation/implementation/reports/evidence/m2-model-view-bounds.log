@@ -1,0 +1,59 @@
+models/weapons/beretta_pv.abc
+Header -> 44
+Geometry -> 38334
+Nodes -> 39928
+Animation -> 88605
+AnimDims -> 4294967295
+root rotation -0,0,-0,1
+authored key bounds -0.20513,-0.625251,-0.884309 - 0.820894,0.707014,4.23691
+node null23_1 pos 0,1.28066,4.06861
+node null20_2 pos 0.517246,0.276621,0.2
+node null1 pos 0.517246,0.315601,0.2
+node null17 pos 0.530663,0.516891,3.82939
+node lu_arm2 pos 0.439497,0.431859,3.87058
+node ll_arm2 pos 0.424264,-0.116014,2.53626
+node d_null1 pos 0.000753671,-0.238143,0.970281
+node hand pos -0.0193326,-0.240803,0.894341
+node null21_2 pos 0.0197739,-0.23731,1.04763
+node null4_2 pos -0.042185,-0.0759386,0.465331
+node extru35 pos -0.0585018,0.309104,0.845873
+node extru31 pos -0.0585018,0.309104,0.845873
+node extru30 pos -0.0406462,-0.102974,0.345916
+node extru42 pos -0.0585018,0.309104,0.845873
+node muzzle pos -0.0866082,-0.149746,-0.883807
+node shell pos -9.02638e-06,0.0768034,0.476051
+node null1_2 pos -0.055922,0.12505,0.526092
+node bool18 pos -0.0585017,0.309104,0.845873
+node extru32 pos -0.0585017,0.309104,0.845873
+node bool7 pos -0.0578976,0.301695,0.846216
+node extru49 pos -0.0372494,-0.0381324,0.675383
+clip static_model bounds -0.205131,-0.589848,-0.88431 - 0.820894,0.707014,4.07859
+models/characters/caleb.abc
+Header -> 44
+Geometry -> 47383
+Nodes -> 48630
+Animation -> 1666028
+AnimDims -> 4294967295
+root rotation -0,0,-0,1
+authored key bounds -23.8969,-38.8286,-20.2369 - 19.2239,38.941,18.6779
+node null1 pos 8.833,-30.145,25.785
+node pelvis pos -1.47124,13.2488,9.52057
+node lu_leg pos -6.29569,9.08248,9.8408
+node ll_leg pos -8.24384,-8.47069,-4.64577
+node l_foot pos -8.26731,-32.7239,1.78642
+node torso_extra1 pos -1.72736,16.0675,8.37283
+node neck pos -1.87332,29.2422,1.43886
+node head pos -2.19359,31.858,-0.901073
+node lu_arm pos -10.8404,27.4419,6.80488
+node ll_arm pos -16.7961,15.7476,4.85203
+node l_hand pos -14.0285,4.02204,-2.39435
+node l_gun pos -14.5301,1.67062,-4.51803
+node ru_arm pos 8.03656,25.8409,3.22255
+node rl_arm pos 16.1549,15.5367,2.43112
+node r_hand pos 5.21876,7.57845,-1.62011
+node r_gun pos 2.02281,7.47396,-1.87693
+node ru_leg pos 3.58486,8.56266,10.352
+node rl_leg pos 7.55526,-13.7436,8.37783
+node r_foot pos 0.00523663,-32.1537,23.277
+node torso pos 8.82262,-22.9007,24.4243
+clip idle1 bounds -23.8973,-38.8287,-10.2371 - 19.2236,38.9409,28.6777

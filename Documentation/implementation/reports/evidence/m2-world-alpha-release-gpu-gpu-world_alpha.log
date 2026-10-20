@@ -1,0 +1,15 @@
+629/630 Testing: gpu.world_alpha
+629/630 Test: gpu.world_alpha
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/world_alpha_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-alpha"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.world_alpha" start time: Oct 17 00:38 CEST
+Output:
+----------------------------------------------------------
+GPU world alpha: zero/partial/full/black texels, far-to-near faces, opaque model occlusion, no depth writes, resize/reupload pass
+<end of output>
+Test time =   0.42 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.world_alpha" end time: Oct 17 00:38 CEST
+"gpu.world_alpha" time elapsed: 00:00:00
+----------------------------------------------------------

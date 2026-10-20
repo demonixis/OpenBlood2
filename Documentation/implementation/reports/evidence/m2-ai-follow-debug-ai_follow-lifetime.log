@@ -1,0 +1,14 @@
+409/413 Testing: ai_follow.lifetime
+409/413 Test: ai_follow.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_follow_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_follow.lifetime" start time: Oct 16 12:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.lifetime" end time: Oct 16 12:57 CEST
+"ai_follow.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

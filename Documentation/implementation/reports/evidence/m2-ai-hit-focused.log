@@ -1,0 +1,28 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 473: ai_hit.geometry
+1/9 Test #473: ai_hit.geometry ..................   Passed    0.00 sec
+    Start 474: ai_hit.query
+2/9 Test #474: ai_hit.query .....................   Passed    0.00 sec
+    Start 475: ai_hit.modifiers
+3/9 Test #475: ai_hit.modifiers .................   Passed    0.00 sec
+    Start 476: ai_hit.reactions
+4/9 Test #476: ai_hit.reactions .................   Passed    0.00 sec
+    Start 477: ai_hit.recoil
+5/9 Test #477: ai_hit.recoil ....................   Passed    0.00 sec
+    Start 478: ai_hit.guards
+6/9 Test #478: ai_hit.guards ....................   Passed    0.00 sec
+    Start 479: ai_hit.sides
+7/9 Test #479: ai_hit.sides .....................   Passed    0.00 sec
+    Start 480: ai_hit.lifetime
+8/9 Test #480: ai_hit.lifetime ..................   Passed    0.00 sec
+    Start 481: ai_hit.catalog
+9/9 Test #481: ai_hit.catalog ...................   Passed    0.21 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Label Time Summary:
+ai_hit      =   0.23 sec*proc (9 tests)
+headless    =   0.23 sec*proc (9 tests)
+private     =   0.21 sec*proc (1 test)
+
+Total Test time (real) =   0.24 sec

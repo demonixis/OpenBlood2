@@ -1,0 +1,84 @@
+591/591 Testing: gpu.explosion_flame_private
+591/591 Test: gpu.explosion_flame_private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_flame_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-flame-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.explosion_flame_private" start time: Oct 16 22:04 CEST
+Output:
+----------------------------------------------------------
+Flame RGB and system alpha: 3875 exact opaque-texel blend checks
+Private diagnostic Tesla GPU cycle 0: 20592 covered pixels, 2000 partial-alpha texels
+Private diagnostic Tesla GPU cycle 1: 20592 covered pixels, 2000 partial-alpha texels
+<end of output>
+Test time =   1.28 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.explosion_flame_private" end time: Oct 16 22:04 CEST
+"gpu.explosion_flame_private" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 16 22:04 CEST
+
+brushes =   2.48 sec*proc
+
+cameras =   2.65 sec*proc
+
+character =  19.91 sec*proc
+
+cinematics =   2.78 sec*proc
+
+containers =   7.06 sec*proc
+
+doors =   2.55 sec*proc
+
+explosion_flames =   1.73 sec*proc
+
+explosion_fragments =   0.99 sec*proc
+
+explosion_models =   0.97 sec*proc
+
+explosion_rings =   0.99 sec*proc
+
+gpu = 170.14 sec*proc
+
+interaction =   8.32 sec*proc
+
+keyframes =   2.55 sec*proc
+
+lights =   2.66 sec*proc
+
+model_view =   1.42 sec*proc
+
+movement =  19.53 sec*proc
+
+object_particles =   0.99 sec*proc
+
+objectives =   3.38 sec*proc
+
+pickups =   2.65 sec*proc
+
+player =   2.85 sec*proc
+
+player_keepalive =   4.16 sec*proc
+
+player_restore =   2.96 sec*proc
+
+private = 163.09 sec*proc
+
+randomsound =  14.00 sec*proc
+
+sceneexplosion =   2.65 sec*proc
+
+sound =   2.68 sec*proc
+
+sprite_view =   1.42 sec*proc
+
+sprites =   2.60 sec*proc
+
+triggers =   2.91 sec*proc
+
+weapons =  22.72 sec*proc
+
+world_view =  19.10 sec*proc
+
+worldpaths =   2.69 sec*proc
+

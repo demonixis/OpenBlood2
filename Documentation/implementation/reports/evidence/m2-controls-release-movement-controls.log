@@ -1,0 +1,14 @@
+73/491 Testing: movement.controls
+73/491 Test: movement.controls
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/movement_tests" "controls" "/home/yann/projects/lithtech/Blood2/build/release/tests/movement-fixtures/controls"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"movement.controls" start time: Oct 16 16:24 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"movement.controls" end time: Oct 16 16:24 CEST
+"movement.controls" time elapsed: 00:00:00
+----------------------------------------------------------

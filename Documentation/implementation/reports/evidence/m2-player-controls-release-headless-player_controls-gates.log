@@ -1,0 +1,14 @@
+622/624 Testing: player_controls.gates
+622/624 Test: player_controls.gates
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/player_controls_tests" "gates"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"player_controls.gates" start time: Oct 17 00:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.gates" end time: Oct 17 00:03 CEST
+"player_controls.gates" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,2 @@
+Authored exit2 -> 02_cityhub / start 01_egressa
+catalog:216: t->exit.next_world == "01_SubwayB" && t->start_point == "start"

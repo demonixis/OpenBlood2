@@ -1,0 +1,14 @@
+354/357 Testing: ai_fire.failures
+354/357 Test: ai_fire.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_fire_tests" "failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_fire.failures" start time: Oct 16 11:41 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_fire.failures" end time: Oct 16 11:41 CEST
+"ai_fire.failures" time elapsed: 00:00:00
+----------------------------------------------------------

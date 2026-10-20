@@ -1,0 +1,22 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 758: world_debris.properties
+1/6 Test #758: world_debris.properties ..........   Passed    0.01 sec
+    Start 759: world_debris.naming
+2/6 Test #759: world_debris.naming ..............   Passed    0.01 sec
+    Start 760: world_debris.motion
+3/6 Test #760: world_debris.motion ..............   Passed    0.01 sec
+    Start 761: world_debris.rotation
+4/6 Test #761: world_debris.rotation ............   Passed    0.00 sec
+    Start 762: world_debris.lifetime
+5/6 Test #762: world_debris.lifetime ............   Passed    0.01 sec
+    Start 763: world_debris.private
+6/6 Test #763: world_debris.private .............   Passed   16.42 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+headless        =  16.45 sec*proc (6 tests)
+private         =  16.42 sec*proc (1 test)
+world_debris    =  16.45 sec*proc (6 tests)
+
+Total Test time (real) =  16.46 sec

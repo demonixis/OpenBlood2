@@ -1,0 +1,33 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 606: weapon_impacts.brushes
+    Start 607: weapon_impacts.volumes
+    Start 610: weapon_impacts.private
+1/7 Test #607: weapon_impacts.volumes ...........***Failed    0.01 sec
+volumes:205: water&&air&&target
+
+    Start 608: weapon_impacts.hearing
+2/7 Test #606: weapon_impacts.brushes ...........***Failed    0.03 sec
+brushes:193: door&&target
+
+    Start 609: weapon_impacts.limits
+3/7 Test #609: weapon_impacts.limits ............   Passed    0.01 sec
+    Start 605: weapon_impacts.world
+4/7 Test #608: weapon_impacts.hearing ...........   Passed    0.03 sec
+    Start 604: weapon_impacts.selection
+5/7 Test #604: weapon_impacts.selection .........   Passed    0.00 sec
+6/7 Test #605: weapon_impacts.world .............   Passed    0.01 sec
+7/7 Test #610: weapon_impacts.private ...........   Passed    9.65 sec
+
+71% tests passed, 2 tests failed out of 7
+
+Label Time Summary:
+headless          =   9.75 sec*proc (7 tests)
+private           =   9.65 sec*proc (1 test)
+weapon_impacts    =   9.75 sec*proc (7 tests)
+
+Total Test time (real) =   9.66 sec
+
+The following tests FAILED:
+	606 - weapon_impacts.brushes (Failed)                   headless weapon_impacts
+	607 - weapon_impacts.volumes (Failed)                   headless weapon_impacts
+Errors while running CTest

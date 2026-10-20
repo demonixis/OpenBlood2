@@ -1,0 +1,1117 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+        Start  63: weapons.private
+        Start 372: ai_state.subway
+  1/523 Test #372: ai_state.subway ...................   Passed    1.38 sec
+        Start  74: movement.private
+  2/523 Test  #74: movement.private ..................   Passed    2.46 sec
+        Start 196: keyframes.catalog
+  3/523 Test #196: keyframes.catalog .................   Passed    1.30 sec
+        Start 283: character_audio.subway
+  4/523 Test  #63: weapons.private ...................   Passed    5.43 sec
+        Start 140: brushes.catalog
+  5/523 Test #140: brushes.catalog ...................   Passed    0.87 sec
+        Start 471: ai_runtime.subway
+  6/523 Test #283: character_audio.subway ............   Passed    1.63 sec
+        Start 300: ai_keys.subway
+  7/523 Test #471: ai_runtime.subway .................   Passed    0.75 sec
+        Start 272: character.player
+  8/523 Test #300: ai_keys.subway ....................   Passed    0.89 sec
+        Start 108: doors.catalog
+  9/523 Test #272: character.player ..................   Passed    0.85 sec
+        Start 120: triggers.catalog
+ 10/523 Test #108: doors.catalog .....................   Passed    0.67 sec
+        Start 131: interaction.catalog
+ 11/523 Test #120: triggers.catalog ..................   Passed    0.69 sec
+        Start 185: cameras.catalog
+ 12/523 Test #131: interaction.catalog ...............   Passed    0.85 sec
+        Start 253: sprites.catalog
+ 13/523 Test #253: sprites.catalog ...................   Passed    0.55 sec
+        Start  98: containers.specialized_private
+ 14/523 Test #185: cameras.catalog ...................   Passed    1.15 sec
+        Start 244: sound.catalog
+ 15/523 Test #244: sound.catalog .....................   Passed    0.69 sec
+        Start 206: lights.catalog
+ 16/523 Test  #98: containers.specialized_private ....   Passed    0.83 sec
+        Start  99: containers.private
+ 17/523 Test #206: lights.catalog ....................   Passed    0.57 sec
+        Start 169: pickups.catalog
+ 18/523 Test  #99: containers.private ................   Passed    0.60 sec
+        Start 384: ai_fire.subway
+ 19/523 Test #169: pickups.catalog ...................   Passed    0.33 sec
+        Start  83: locomotion.private
+ 20/523 Test #384: ai_fire.subway ....................   Passed    0.37 sec
+        Start 225: cinematics.catalog
+ 21/523 Test #225: cinematics.catalog ................   Passed    0.40 sec
+        Start 216: worldpaths.subway
+ 22/523 Test  #83: locomotion.private ................   Passed    0.81 sec
+        Start 235: randomsound.catalog
+ 23/523 Test #216: worldpaths.subway .................   Passed    0.74 sec
+        Start 539: player_keepalive.private
+ 24/523 Test #235: randomsound.catalog ...............   Passed    0.62 sec
+        Start 177: objectives.catalog
+ 25/523 Test #177: objectives.catalog ................   Passed    0.33 sec
+        Start 508: exits.catalog
+ 26/523 Test #539: player_keepalive.private ..........   Passed    0.51 sec
+        Start 262: sceneexplosion.catalog
+ 27/523 Test #508: exits.catalog .....................   Passed    0.33 sec
+        Start  53: player.private
+ 28/523 Test #262: sceneexplosion.catalog ............   Passed    0.45 sec
+        Start  47: services.private
+ 29/523 Test  #53: player.private ....................   Passed    0.31 sec
+        Start 534: player_restore.private
+ 30/523 Test #534: player_restore.private ............   Passed    0.16 sec
+        Start 343: texture.corpus
+ 31/523 Test #343: texture.corpus ....................   Passed    0.19 sec
+        Start  39: cli.world_modes
+ 32/523 Test  #47: services.private ..................   Passed    0.63 sec
+        Start 530: character_nodes.private
+ 33/523 Test #530: character_nodes.private ...........   Passed    0.21 sec
+        Start 554: explosion_models.private
+ 34/523 Test  #39: cli.world_modes ...................   Passed    0.43 sec
+        Start 119: triggers.private
+ 35/523 Test #554: explosion_models.private ..........   Passed    0.15 sec
+        Start 549: explosion_sprites.private
+ 36/523 Test #119: triggers.private ..................   Passed    0.16 sec
+        Start 543: sprite_view.subway
+ 37/523 Test #549: explosion_sprites.private .........   Passed    0.15 sec
+        Start 519: destructable_state.private
+ 38/523 Test #543: sprite_view.subway ................   Passed    0.14 sec
+        Start 513: inventory_state.private
+ 39/523 Test #519: destructable_state.private ........   Passed    0.13 sec
+        Start 525: player_state.private
+ 40/523 Test #513: inventory_state.private ...........   Passed    0.13 sec
+        Start 109: doors.private
+ 41/523 Test #525: player_state.private ..............   Passed    0.14 sec
+        Start 413: ai_follow.subway
+ 42/523 Test #109: doors.private .....................   Passed    0.14 sec
+        Start 323: attachments.subway
+ 43/523 Test #413: ai_follow.subway ..................   Passed    0.18 sec
+        Start 348: model_view.subway
+ 44/523 Test #323: attachments.subway ................   Passed    0.18 sec
+        Start 337: world_view.subway
+ 45/523 Test #348: model_view.subway .................   Passed    0.18 sec
+        Start 226: cinematics.subway
+ 46/523 Test #337: world_view.subway .................   Passed    0.17 sec
+        Start 236: randomsound.subway
+ 47/523 Test #226: cinematics.subway .................   Passed    0.11 sec
+        Start 402: ai_navigation.subway
+ 48/523 Test #236: randomsound.subway ................   Passed    0.16 sec
+        Start 332: ai_target.subway
+ 49/523 Test #402: ai_navigation.subway ..............   Passed    0.12 sec
+        Start 361: ai_perception.subway
+ 50/523 Test #332: ai_target.subway ..................   Passed    0.16 sec
+        Start 393: ai_trigger.subway
+ 51/523 Test #361: ai_perception.subway ..............   Passed    0.15 sec
+        Start 307: paths.catalog
+ 52/523 Test #393: ai_trigger.subway .................   Passed    0.15 sec
+        Start 263: sceneexplosion.subway
+ 53/523 Test #307: paths.catalog .....................   Passed    0.14 sec
+        Start 315: ai_sight.subway
+ 54/523 Test #315: ai_sight.subway ...................   Passed    0.11 sec
+        Start 254: sprites.subway
+ 55/523 Test #263: sceneexplosion.subway .............   Passed    0.17 sec
+        Start 245: sound.subway
+ 56/523 Test #254: sprites.subway ....................   Passed    0.17 sec
+        Start 224: cinematics.device
+ 57/523 Test #245: sound.subway ......................   Passed    0.16 sec
+        Start  37: world.private
+ 58/523 Test #224: cinematics.device .................   Passed    0.09 sec
+        Start 422: ai_script.catalog
+ 59/523 Test #422: ai_script.catalog .................   Passed    0.10 sec
+        Start 282: character_audio.catalog
+ 60/523 Test  #37: world.private .....................   Passed    0.17 sec
+        Start 306: paths.limits
+ 61/523 Test #282: character_audio.catalog ...........   Passed    0.06 sec
+        Start 472: ai_runtime.arena
+ 62/523 Test #306: paths.limits ......................   Passed    0.09 sec
+        Start 469: ai_runtime.catalog
+ 63/523 Test #472: ai_runtime.arena ..................   Passed    0.05 sec
+        Start 299: ai_keys.catalog
+ 64/523 Test #299: ai_keys.catalog ...................   Passed    0.04 sec
+        Start 271: character.catalog
+ 65/523 Test #469: ai_runtime.catalog ................   Passed    0.07 sec
+        Start 290: character_motion.catalog
+ 66/523 Test #271: character.catalog .................   Passed    0.03 sec
+        Start 322: attachments.catalog
+ 67/523 Test #290: character_motion.catalog ..........   Passed    0.05 sec
+        Start 383: ai_fire.catalog
+ 68/523 Test #322: attachments.catalog ...............   Passed    0.03 sec
+        Start 194: keyframes.limits
+ 69/523 Test #194: keyframes.limits ..................   Passed    0.03 sec
+        Start 458: ai_escape.catalog
+ 70/523 Test #383: ai_fire.catalog ...................   Passed    0.05 sec
+        Start 447: ai_recovery.catalog
+ 71/523 Test #458: ai_escape.catalog .................   Passed    0.03 sec
+        Start 371: ai_state.catalog
+ 72/523 Test #447: ai_recovery.catalog ...............   Passed    0.03 sec
+        Start 331: ai_target.catalog
+ 73/523 Test #371: ai_state.catalog ..................   Passed    0.03 sec
+        Start 360: ai_perception.catalog
+ 74/523 Test #331: ai_target.catalog .................   Passed    0.03 sec
+        Start 314: ai_sight.catalog
+ 75/523 Test #360: ai_perception.catalog .............   Passed    0.03 sec
+        Start 433: ai_locomotion.catalog
+ 76/523 Test #314: ai_sight.catalog ..................   Passed    0.03 sec
+        Start 412: ai_follow.catalog
+ 77/523 Test #433: ai_locomotion.catalog .............   Passed    0.03 sec
+        Start 500: corpses.catalog
+ 78/523 Test #412: ai_follow.catalog .................   Passed    0.03 sec
+        Start 482: ai_hit.catalog
+ 79/523 Test #500: corpses.catalog ...................   Passed    0.03 sec
+        Start 492: weapon_drops.catalog
+ 80/523 Test #482: ai_hit.catalog ....................   Passed    0.03 sec
+        Start 470: ai_runtime.failures
+ 81/523 Test #492: weapon_drops.catalog ..............   Passed    0.02 sec
+        Start 318: attachments.rejects
+ 82/523 Test #470: ai_runtime.failures ...............   Passed    0.02 sec
+        Start  78: locomotion.limits
+ 83/523 Test #318: attachments.rejects ...............   Passed    0.01 sec
+        Start  22: cli.metadata
+ 84/523 Test  #78: locomotion.limits .................   Passed    0.01 sec
+        Start  20: cli.missing_data
+ 85/523 Test  #22: cli.metadata ......................   Passed    0.01 sec
+        Start  19: cli.unknown
+ 86/523 Test  #20: cli.missing_data ..................   Passed    0.01 sec
+        Start  21: cli.missing_config
+ 87/523 Test  #19: cli.unknown .......................   Passed    0.01 sec
+        Start  18: cli.help
+ 88/523 Test  #21: cli.missing_config ................   Passed    0.01 sec
+        Start  68: movement.world_collision
+ 89/523 Test  #18: cli.help ..........................   Passed    0.01 sec
+        Start  60: weapons.animation
+ 90/523 Test  #68: movement.world_collision ..........   Passed    0.01 sec
+        Start 400: ai_navigation.limits
+ 91/523 Test  #60: weapons.animation .................   Passed    0.01 sec
+        Start  79: locomotion.crouch
+ 92/523 Test #400: ai_navigation.limits ..............   Passed    0.01 sec
+        Start  71: movement.timing
+ 93/523 Test  #79: locomotion.crouch .................   Passed    0.01 sec
+        Start  65: movement.walking
+ 94/523 Test  #71: movement.timing ...................   Passed    0.01 sec
+        Start 537: player_keepalive.fallback
+ 95/523 Test  #65: movement.walking ..................   Passed    0.01 sec
+        Start 183: cameras.player
+ 96/523 Test #537: player_keepalive.fallback .........   Passed    0.01 sec
+        Start  67: movement.collisions
+ 97/523 Test #183: cameras.player ....................   Passed    0.01 sec
+        Start 155: pushables.player
+ 98/523 Test  #67: movement.collisions ...............   Passed    0.01 sec
+        Start  41: services.model_rejection
+ 99/523 Test #155: pushables.player ..................   Passed    0.01 sec
+        Start 124: interaction.keys
+100/523 Test  #41: services.model_rejection ..........   Passed    0.01 sec
+        Start 168: pickups.resources
+101/523 Test #124: interaction.keys ..................   Passed    0.01 sec
+        Start  82: locomotion.contacts
+102/523 Test #168: pickups.resources .................   Passed    0.01 sec
+        Start 115: triggers.doors
+103/523 Test  #82: locomotion.contacts ...............   Passed    0.00 sec
+        Start  77: locomotion.world_stairs
+104/523 Test #115: triggers.doors ....................   Passed    0.00 sec
+        Start  91: containers.ladders
+105/523 Test  #77: locomotion.world_stairs ...........   Passed    0.00 sec
+        Start 160: pickups.defaults
+106/523 Test  #91: containers.ladders ................   Passed    0.00 sec
+        Start  76: locomotion.stairs
+107/523 Test #160: pickups.defaults ..................   Passed    0.00 sec
+        Start  89: containers.swimming
+108/523 Test  #76: locomotion.stairs .................   Passed    0.00 sec
+        Start 239: sound.loops
+109/523 Test  #89: containers.swimming ...............   Passed    0.00 sec
+        Start  80: locomotion.animations
+110/523 Test #239: sound.loops .......................   Passed    0.00 sec
+        Start 125: interaction.state
+111/523 Test  #80: locomotion.animations .............   Passed    0.00 sec
+        Start 161: pickups.ammunition
+112/523 Test #125: interaction.state .................   Passed    0.00 sec
+        Start 166: pickups.rejection
+113/523 Test #161: pickups.ammunition ................   Passed    0.00 sec
+        Start 486: weapon_drops.falling
+114/523 Test #166: pickups.rejection .................   Passed    0.00 sec
+        Start  97: containers.freefall_motion
+115/523 Test #486: weapon_drops.falling ..............   Passed    0.00 sec
+        Start 162: pickups.statistics
+116/523 Test  #97: containers.freefall_motion ........   Passed    0.00 sec
+        Start  69: movement.support
+117/523 Test #162: pickups.statistics ................   Passed    0.00 sec
+        Start 532: player_restore.failures
+118/523 Test  #69: movement.support ..................   Passed    0.00 sec
+        Start  33: world.mutations
+119/523 Test #532: player_restore.failures ...........   Passed    0.00 sec
+        Start 126: interaction.geometry
+120/523 Test  #33: world.mutations ...................   Passed    0.00 sec
+        Start  94: containers.conveyor_motion
+121/523 Test #126: interaction.geometry ..............   Passed    0.00 sec
+        Start 280: character_audio.footsteps
+122/523 Test  #94: containers.conveyor_motion ........   Passed    0.00 sec
+        Start 167: pickups.callbacks
+123/523 Test #280: character_audio.footsteps .........   Passed    0.00 sec
+        Start 165: pickups.spawning
+124/523 Test #167: pickups.callbacks .................   Passed    0.00 sec
+        Start 279: character_audio.callbacks
+125/523 Test #165: pickups.spawning ..................   Passed    0.00 sec
+        Start 533: player_restore.lifetime
+126/523 Test #279: character_audio.callbacks .........   Passed    0.00 sec
+        Start 164: pickups.contact
+127/523 Test #533: player_restore.lifetime ...........   Passed    0.00 sec
+        Start  66: movement.jumping
+128/523 Test #164: pickups.contact ...................   Passed    0.00 sec
+        Start  26: world.sound_entries
+129/523 Test  #66: movement.jumping ..................   Passed    0.00 sec
+        Start 278: character_audio.player
+130/523 Test  #26: world.sound_entries ...............   Passed    0.00 sec
+        Start 320: attachments.held
+131/523 Test #278: character_audio.player ............   Passed    0.00 sec
+        Start 156: pushables.riders
+132/523 Test #320: attachments.held ..................   Passed    0.00 sec
+        Start 276: character_audio.lifetime
+133/523 Test #156: pushables.riders ..................   Passed    0.00 sec
+        Start 163: pickups.protocol
+134/523 Test #276: character_audio.lifetime ..........   Passed    0.00 sec
+        Start  25: world.sprite_entries
+135/523 Test #163: pickups.protocol ..................   Passed    0.00 sec
+        Start 106: doors.riders
+136/523 Test  #25: world.sprite_entries ..............   Passed    0.00 sec
+        Start 277: character_audio.rejection
+137/523 Test #106: doors.riders ......................   Passed    0.00 sec
+        Start 294: ai_keys.random
+138/523 Test #277: character_audio.rejection .........   Passed    0.00 sec
+        Start 281: character_audio.surfaces
+139/523 Test #294: ai_keys.random ....................   Passed    0.00 sec
+        Start 231: randomsound.random
+140/523 Test #281: character_audio.surfaces ..........   Passed    0.00 sec
+        Start 293: ai_keys.gates
+141/523 Test #231: randomsound.random ................   Passed    0.00 sec
+        Start 275: character_audio.voices
+142/523 Test #293: ai_keys.gates .....................   Passed    0.00 sec
+        Start 501: exits.defaults
+143/523 Test #275: character_audio.voices ............   Passed    0.00 sec
+        Start 202: lights.damage
+144/523 Test #501: exits.defaults ....................   Passed    0.00 sec
+        Start 261: sceneexplosion.budget
+145/523 Test #202: lights.damage .....................   Passed    0.00 sec
+        Start 223: cinematics.failures
+146/523 Test #261: sceneexplosion.budget .............   Passed    0.00 sec
+        Start 392: ai_trigger.audio
+147/523 Test #223: cinematics.failures ...............   Passed    0.00 sec
+        Start 401: ai_navigation.lifetime
+148/523 Test #392: ai_trigger.audio ..................   Passed    0.00 sec
+        Start 538: player_keepalive.failures
+149/523 Test #401: ai_navigation.lifetime ............   Passed    0.00 sec
+        Start 502: exits.delayed
+150/523 Test #538: player_keepalive.failures .........   Passed    0.00 sec
+        Start 222: cinematics.lifetime
+151/523 Test #502: exits.delayed .....................   Passed    0.00 sec
+        Start 291: ai_keys.sound
+152/523 Test #222: cinematics.lifetime ...............   Passed    0.00 sec
+        Start 324: ai_target.named
+153/523 Test #291: ai_keys.sound .....................   Passed    0.00 sec
+        Start 298: ai_keys.lifetime
+154/523 Test #324: ai_target.named ...................   Passed    0.00 sec
+        Start 542: sprite_view.failures
+155/523 Test #298: ai_keys.lifetime ..................   Passed    0.00 sec
+        Start 243: sound.metadata
+156/523 Test #542: sprite_view.failures ..............   Passed    0.00 sec
+        Start 127: interaction.transport
+157/523 Test #243: sound.metadata ....................   Passed    0.00 sec
+        Start 484: weapon_drops.protocol
+158/523 Test #127: interaction.transport .............   Passed    0.00 sec
+        Start 297: ai_keys.callbacks
+159/523 Test #484: weapon_drops.protocol .............   Passed    0.00 sec
+        Start 219: cinematics.mixer
+160/523 Test #297: ai_keys.callbacks .................   Passed    0.00 sec
+        Start 174: objectives.localized
+161/523 Test #219: cinematics.mixer ..................   Passed    0.00 sec
+        Start 507: exits.lifetime
+162/523 Test #174: objectives.localized ..............   Passed    0.00 sec
+        Start 483: weapon_drops.collect
+163/523 Test #507: exits.lifetime ....................   Passed    0.00 sec
+        Start 421: ai_script.audio
+164/523 Test #483: weapon_drops.collect ..............   Passed    0.00 sec
+        Start 295: ai_keys.shared
+165/523 Test #421: ai_script.audio ...................   Passed    0.00 sec
+        Start 242: sound.failures
+166/523 Test #295: ai_keys.shared ....................   Passed    0.00 sec
+        Start 321: attachments.missing
+167/523 Test #242: sound.failures ....................   Passed    0.00 sec
+        Start 230: randomsound.sequence
+168/523 Test #321: attachments.missing ...............   Passed    0.00 sec
+        Start 103: doors.options
+169/523 Test #230: randomsound.sequence ..............   Passed    0.00 sec
+        Start 485: weapon_drops.drop
+170/523 Test #103: doors.options .....................   Passed    0.00 sec
+        Start 265: character.mappings
+171/523 Test #485: weapon_drops.drop .................   Passed    0.00 sec
+        Start 241: sound.lifetime
+172/523 Test #265: character.mappings ................   Passed    0.00 sec
+        Start 114: triggers.keys
+173/523 Test #241: sound.lifetime ....................   Passed    0.00 sec
+        Start 257: sceneexplosion.commands
+174/523 Test #114: triggers.keys .....................   Passed    0.00 sec
+        Start 221: cinematics.sequence
+175/523 Test #257: sceneexplosion.commands ...........   Passed    0.00 sec
+        Start 489: weapon_drops.nosliding
+176/523 Test #221: cinematics.sequence ...............   Passed    0.00 sec
+        Start 240: sound.resampling
+177/523 Test #489: weapon_drops.nosliding ............   Passed    0.00 sec
+        Start 259: sceneexplosion.lifetime
+178/523 Test #240: sound.resampling ..................   Passed    0.00 sec
+        Start 476: ai_hit.reactions
+179/523 Test #259: sceneexplosion.lifetime ...........   Passed    0.00 sec
+        Start 220: cinematics.spatial
+180/523 Test #476: ai_hit.reactions ..................   Passed    0.00 sec
+        Start 252: sprites.failures
+181/523 Test #220: cinematics.spatial ................   Passed    0.00 sec
+        Start  86: containers.membership
+182/523 Test #252: sprites.failures ..................   Passed    0.00 sec
+        Start 495: corpses.failures
+183/523 Test  #86: containers.membership .............   Passed    0.00 sec
+        Start 149: explosions.player
+184/523 Test #495: corpses.failures ..................   Passed    0.00 sec
+        Start 506: exits.queue
+185/523 Test #149: explosions.player .................   Passed    0.00 sec
+        Start 238: sound.defaults
+186/523 Test #506: exits.queue .......................   Passed    0.00 sec
+        Start 176: objectives.queue
+187/523 Test #238: sound.defaults ....................   Passed    0.00 sec
+        Start 232: randomsound.spatial
+188/523 Test #176: objectives.queue ..................   Passed    0.00 sec
+        Start 531: player_restore.roundtrip
+189/523 Test #232: randomsound.spatial ...............   Passed    0.00 sec
+        Start 214: worldpaths.player
+190/523 Test #531: player_restore.roundtrip ..........   Passed    0.00 sec
+        Start 487: weapon_drops.guards
+191/523 Test #214: worldpaths.player .................   Passed    0.00 sec
+        Start 113: triggers.filters
+192/523 Test #487: weapon_drops.guards ...............   Passed    0.00 sec
+        Start 233: randomsound.lifetime
+193/523 Test #113: triggers.filters ..................   Passed    0.00 sec
+        Start 488: weapon_drops.failures
+194/523 Test #233: randomsound.lifetime ..............   Passed    0.00 sec
+        Start 490: weapon_drops.callback
+195/523 Test #488: weapon_drops.failures .............   Passed    0.00 sec
+        Start 449: ai_escape.selection
+196/523 Test #490: weapon_drops.callback .............   Passed    0.00 sec
+        Start  90: containers.surface
+197/523 Test #449: ai_escape.selection ...............   Passed    0.00 sec
+        Start 247: sprites.reader
+198/523 Test  #90: containers.surface ................   Passed    0.00 sec
+        Start 416: ai_script.waiting
+199/523 Test #247: sprites.reader ....................   Passed    0.00 sec
+        Start 459: ai_runtime.activation
+200/523 Test #416: ai_script.waiting .................   Passed    0.00 sec
+        Start 493: corpses.mappings
+201/523 Test #459: ai_runtime.activation .............   Passed    0.00 sec
+        Start 448: ai_escape.beg
+202/523 Test #493: corpses.mappings ..................   Passed    0.00 sec
+        Start 475: ai_hit.modifiers
+203/523 Test #448: ai_escape.beg .....................   Passed    0.00 sec
+        Start 116: triggers.touch
+204/523 Test #475: ai_hit.modifiers ..................   Passed    0.00 sec
+        Start 175: objectives.missing
+205/523 Test #116: triggers.touch ....................   Passed    0.00 sec
+        Start 292: ai_keys.priority
+206/523 Test #175: objectives.missing ................   Passed    0.00 sec
+        Start 504: exits.blocked
+207/523 Test #292: ai_keys.priority ..................   Passed    0.00 sec
+        Start 130: interaction.player_push
+208/523 Test #504: exits.blocked .....................   Passed    0.00 sec
+        Start 316: attachments.root
+209/523 Test #130: interaction.player_push ...........   Passed    0.00 sec
+        Start 435: ai_recovery.jump_physics
+210/523 Test #316: attachments.root ..................   Passed    0.00 sec
+        Start  81: locomotion.lifetime
+211/523 Test #435: ai_recovery.jump_physics ..........   Passed    0.00 sec
+        Start 521: player_state.clocks
+212/523 Test  #81: locomotion.lifetime ...............   Passed    0.00 sec
+        Start 411: ai_follow.physics
+213/523 Test #521: player_state.clocks ...............   Passed    0.00 sec
+        Start 386: ai_trigger.gunfire
+214/523 Test #411: ai_follow.physics .................   Passed    0.00 sec
+        Start 352: ai_perception.selection
+215/523 Test #386: ai_trigger.gunfire ................   Passed    0.00 sec
+        Start 234: randomsound.failures
+216/523 Test #352: ai_perception.selection ...........   Passed    0.00 sec
+        Start 497: corpses.sounds
+217/523 Test #234: randomsound.failures ..............   Passed    0.00 sec
+        Start 498: corpses.gates
+218/523 Test #497: corpses.sounds ....................   Passed    0.00 sec
+        Start 122: interaction.use
+219/523 Test #498: corpses.gates .....................   Passed    0.00 sec
+        Start 381: ai_fire.failures
+220/523 Test #122: interaction.use ...................   Passed    0.00 sec
+        Start 439: ai_recovery.topos
+221/523 Test #381: ai_fire.failures ..................   Passed    0.00 sec
+        Start 296: ai_keys.rejection
+222/523 Test #439: ai_recovery.topos .................   Passed    0.00 sec
+        Start  92: containers.air_damage
+223/523 Test #296: ai_keys.rejection .................   Passed    0.00 sec
+        Start  93: containers.specialized_defaults
+224/523 Test  #92: containers.air_damage .............   Passed    0.00 sec
+        Start 536: player_keepalive.named
+225/523 Test  #93: containers.specialized_defaults ...   Passed    0.00 sec
+        Start 509: inventory_state.roundtrip
+226/523 Test #536: player_keepalive.named ............   Passed    0.00 sec
+        Start 173: objectives.defaults
+227/523 Test #509: inventory_state.roundtrip .........   Passed    0.00 sec
+        Start 477: ai_hit.recoil
+228/523 Test #173: objectives.defaults ...............   Passed    0.00 sec
+        Start  96: containers.specialized_damage
+229/523 Test #477: ai_hit.recoil .....................   Passed    0.00 sec
+        Start 129: interaction.lifetime
+230/523 Test  #96: containers.specialized_damage .....   Passed    0.00 sec
+        Start 251: sprites.ray
+231/523 Test #129: interaction.lifetime ..............   Passed    0.00 sec
+        Start  70: movement.boundaries
+232/523 Test #251: sprites.ray .......................   Passed    0.00 sec
+        Start 409: ai_follow.lifetime
+233/523 Test  #70: movement.boundaries ...............   Passed    0.00 sec
+        Start 367: ai_state.civilian
+234/523 Test #409: ai_follow.lifetime ................   Passed    0.00 sec
+        Start 289: character_motion.player
+235/523 Test #367: ai_state.civilian .................   Passed    0.00 sec
+        Start  72: movement.lifetime
+236/523 Test #289: character_motion.player ...........   Passed    0.00 sec
+        Start 417: ai_script.animations
+237/523 Test  #72: movement.lifetime .................   Passed    0.00 sec
+        Start 229: randomsound.commands
+238/523 Test #417: ai_script.animations ..............   Passed    0.00 sec
+        Start  87: containers.lifetime
+239/523 Test #229: randomsound.commands ..............   Passed    0.00 sec
+        Start 474: ai_hit.query
+240/523 Test  #87: containers.lifetime ...............   Passed    0.00 sec
+        Start 256: sceneexplosion.properties
+241/523 Test #474: ai_hit.query ......................   Passed    0.00 sec
+        Start 451: ai_escape.routes
+242/523 Test #256: sceneexplosion.properties .........   Passed    0.00 sec
+        Start 270: character.spheres
+243/523 Test #451: ai_escape.routes ..................   Passed    0.00 sec
+        Start 377: ai_fire.aim
+244/523 Test #270: character.spheres .................   Passed    0.00 sec
+        Start 111: triggers.schedule
+245/523 Test #377: ai_fire.aim .......................   Passed    0.00 sec
+        Start 260: sceneexplosion.failures
+246/523 Test #111: triggers.schedule .................   Passed    0.00 sec
+        Start 415: ai_script.sequencing
+247/523 Test #260: sceneexplosion.failures ...........   Passed    0.00 sec
+        Start 455: ai_escape.failures
+248/523 Test #415: ai_script.sequencing ..............   Passed    0.00 sec
+        Start 118: triggers.protocol
+249/523 Test #455: ai_escape.failures ................   Passed    0.00 sec
+        Start  61: weapons.lifetime
+250/523 Test #118: triggers.protocol .................   Passed    0.00 sec
+        Start  10: objects.unsupported_teardown
+251/523 Test  #61: weapons.lifetime ..................   Passed    0.00 sec
+        Start 313: ai_sight.lifetime
+252/523 Test  #10: objects.unsupported_teardown ......   Passed    0.00 sec
+        Start 258: sceneexplosion.damage
+253/523 Test #313: ai_sight.lifetime .................   Passed    0.00 sec
+        Start 269: character.rejection
+254/523 Test #258: sceneexplosion.damage .............   Passed    0.00 sec
+        Start 147: explosions.lifetime
+255/523 Test #269: character.rejection ...............   Passed    0.00 sec
+        Start 512: inventory_state.capture
+256/523 Test #147: explosions.lifetime ...............   Passed    0.00 sec
+        Start 139: brushes.lifetime
+257/523 Test #512: inventory_state.capture ...........   Passed    0.00 sec
+        Start 208: worldpaths.translation
+258/523 Test #139: brushes.lifetime ..................   Passed    0.00 sec
+        Start 190: keyframes.rotation
+259/523 Test #208: worldpaths.translation ............   Passed    0.00 sec
+        Start 211: worldpaths.push_block
+260/523 Test #190: keyframes.rotation ................   Passed    0.00 sec
+        Start 391: ai_trigger.lifetime
+261/523 Test #211: worldpaths.push_block .............   Passed    0.00 sec
+        Start 136: brushes.limits
+262/523 Test #391: ai_trigger.lifetime ...............   Passed    0.00 sec
+        Start 399: ai_navigation.blocked
+263/523 Test #136: brushes.limits ....................   Passed    0.00 sec
+        Start 153: pushables.impulses
+264/523 Test #399: ai_navigation.blocked .............   Passed    0.00 sec
+        Start 249: sprites.properties
+265/523 Test #153: pushables.impulses ................   Passed    0.00 sec
+        Start 366: ai_state.decisions
+266/523 Test #249: sprites.properties ................   Passed    0.00 sec
+        Start 191: keyframes.events
+267/523 Test #366: ai_state.decisions ................   Passed    0.00 sec
+        Start 403: ai_follow.velocity
+268/523 Test #191: keyframes.events ..................   Passed    0.00 sec
+        Start 491: weapon_drops.missing_pickup
+269/523 Test #403: ai_follow.velocity ................   Passed    0.00 sec
+        Start 158: pushables.collision
+270/523 Test #491: weapon_drops.missing_pickup .......   Passed    0.00 sec
+        Start 327: ai_target.failures
+271/523 Test #158: pushables.collision ...............   Passed    0.00 sec
+        Start 319: attachments.lifetime
+272/523 Test #327: ai_target.failures ................   Passed    0.00 sec
+        Start 363: ai_state.transitions
+273/523 Test #319: attachments.lifetime ..............   Passed    0.00 sec
+        Start 452: ai_escape.perception
+274/523 Test #363: ai_state.transitions ..............   Passed    0.00 sec
+        Start 336: world_view.lifetime
+275/523 Test #452: ai_escape.perception ..............   Passed    0.00 sec
+        Start 429: ai_locomotion.moving_fire
+276/523 Test #336: world_view.lifetime ...............   Passed    0.00 sec
+        Start 286: character_motion.rejection
+277/523 Test #429: ai_locomotion.moving_fire .........   Passed    0.00 sec
+        Start 302: paths.selection
+278/523 Test #286: character_motion.rejection ........   Passed    0.00 sec
+        Start 303: paths.failure
+279/523 Test #302: paths.selection ...................   Passed    0.00 sec
+        Start 268: character.transforms
+280/523 Test #303: paths.failure .....................   Passed    0.00 sec
+        Start 205: lights.teardown
+281/523 Test #268: character.transforms ..............   Passed    0.00 sec
+        Start 454: ai_escape.guard
+282/523 Test #205: lights.teardown ...................   Passed    0.00 sec
+        Start 151: pushables.gravity
+283/523 Test #454: ai_escape.guard ...................   Passed    0.00 sec
+        Start 374: ai_fire.clearance
+284/523 Test #151: pushables.gravity .................   Passed    0.00 sec
+        Start 514: destructable_state.roundtrip
+285/523 Test #374: ai_fire.clearance .................   Passed    0.00 sec
+        Start 443: ai_recovery.lifetime
+286/523 Test #514: destructable_state.roundtrip ......   Passed    0.00 sec
+        Start 351: ai_perception.factions
+287/523 Test #443: ai_recovery.lifetime ..............   Passed    0.00 sec
+        Start 204: lights.motion
+288/523 Test #351: ai_perception.factions ............   Passed    0.00 sec
+        Start 385: ai_trigger.hearing
+289/523 Test #204: lights.motion .....................   Passed    0.00 sec
+        Start 523: player_state.failures
+290/523 Test #385: ai_trigger.hearing ................   Passed    0.00 sec
+        Start 328: ai_target.lifetime
+291/523 Test #523: player_state.failures .............   Passed    0.00 sec
+        Start 308: ai_sight.body
+292/523 Test #328: ai_target.lifetime ................   Passed    0.00 sec
+        Start 438: ai_recovery.clearance
+293/523 Test #308: ai_sight.body .....................   Passed    0.00 sec
+        Start 287: character_motion.collision
+294/523 Test #438: ai_recovery.clearance .............   Passed    0.00 sec
+        Start 134: brushes.spin
+295/523 Test #287: character_motion.collision ........   Passed    0.00 sec
+        Start 193: keyframes.validation
+296/523 Test #134: brushes.spin ......................   Passed    0.00 sec
+        Start 228: randomsound.defaults
+297/523 Test #193: keyframes.validation ..............   Passed    0.00 sec
+        Start 213: worldpaths.validation
+298/523 Test #228: randomsound.defaults ..............   Passed    0.00 sec
+        Start 123: interaction.input
+299/523 Test #213: worldpaths.validation .............   Passed    0.00 sec
+        Start 212: worldpaths.lifetime
+300/523 Test #123: interaction.input .................   Passed    0.00 sec
+        Start 138: brushes.destruction
+301/523 Test #212: worldpaths.lifetime ...............   Passed    0.00 sec
+        Start 473: ai_hit.geometry
+302/523 Test #138: brushes.destruction ...............   Passed    0.00 sec
+        Start 309: ai_sight.head
+303/523 Test #473: ai_hit.geometry ...................   Passed    0.00 sec
+        Start 305: paths.enumeration
+304/523 Test #309: ai_sight.head .....................   Passed    0.00 sec
+        Start 188: keyframes.timeline
+305/523 Test #305: paths.enumeration .................   Passed    0.00 sec
+        Start 135: brushes.geometry
+306/523 Test #188: keyframes.timeline ................   Passed    0.00 sec
+        Start 104: doors.geometry
+307/523 Test #135: brushes.geometry ..................   Passed    0.00 sec
+        Start 420: ai_script.lifetime
+308/523 Test #104: doors.geometry ....................   Passed    0.00 sec
+        Start 380: ai_fire.recovery
+309/523 Test #420: ai_script.lifetime ................   Passed    0.00 sec
+        Start 157: pushables.contacts
+310/523 Test #380: ai_fire.recovery ..................   Passed    0.00 sec
+        Start 146: explosions.gates
+311/523 Test #157: pushables.contacts ................   Passed    0.00 sec
+        Start 373: ai_fire.selection
+312/523 Test #146: explosions.gates ..................   Passed    0.00 sec
+        Start 496: corpses.lifetime
+313/523 Test #373: ai_fire.selection .................   Passed    0.00 sec
+        Start 218: cinematics.decode
+314/523 Test #496: corpses.lifetime ..................   Passed    0.00 sec
+        Start 210: worldpaths.riders
+315/523 Test #218: cinematics.decode .................   Passed    0.00 sec
+        Start 112: triggers.toggle
+316/523 Test #210: worldpaths.riders .................   Passed    0.00 sec
+        Start 376: ai_fire.head
+317/523 Test #112: triggers.toggle ...................   Passed    0.00 sec
+        Start 444: ai_recovery.moving_fire
+318/523 Test #376: ai_fire.head ......................   Passed    0.00 sec
+        Start  34: world.session_lifecycle
+319/523 Test #444: ai_recovery.moving_fire ...........   Passed    0.00 sec
+        Start 369: ai_state.failures
+320/523 Test  #34: world.session_lifecycle ...........   Passed    0.00 sec
+        Start 311: ai_sight.world
+321/523 Test #369: ai_state.failures .................   Passed    0.00 sec
+        Start 150: pushables.properties
+322/523 Test #311: ai_sight.world ....................   Passed    0.00 sec
+        Start 334: world_view.rejects
+323/523 Test #150: pushables.properties ..............   Passed    0.00 sec
+        Start 365: ai_state.resize
+324/523 Test #334: world_view.rejects ................   Passed    0.00 sec
+        Start 187: keyframes.defaults
+325/523 Test #365: ai_state.resize ...................   Passed    0.00 sec
+        Start 426: ai_locomotion.ledges
+326/523 Test #187: keyframes.defaults ................   Passed    0.00 sec
+        Start 128: interaction.blocking
+327/523 Test #426: ai_locomotion.ledges ..............   Passed    0.00 sec
+        Start 209: worldpaths.world_block
+328/523 Test #128: interaction.blocking ..............   Passed    0.00 sec
+        Start 463: ai_runtime.tracking
+329/523 Test #209: worldpaths.world_block ............   Passed    0.00 sec
+        Start 145: explosions.chain
+330/523 Test #463: ai_runtime.tracking ...............   Passed    0.00 sec
+        Start 379: ai_fire.cadence
+331/523 Test #145: explosions.chain ..................   Passed    0.00 sec
+        Start 437: ai_recovery.crawling
+332/523 Test #379: ai_fire.cadence ...................   Passed    0.00 sec
+        Start 354: ai_perception.hints
+333/523 Test #437: ai_recovery.crawling ..............   Passed    0.00 sec
+        Start 137: brushes.transport
+334/523 Test #354: ai_perception.hints ...............   Passed    0.00 sec
+        Start 382: ai_fire.lifetime
+335/523 Test #137: brushes.transport .................   Passed    0.00 sec
+        Start 395: ai_navigation.clearance
+336/523 Test #382: ai_fire.lifetime ..................   Passed    0.00 sec
+        Start 405: ai_follow.follow
+337/523 Test #395: ai_navigation.clearance ...........   Passed    0.00 sec
+        Start 201: lights.lifetime
+338/523 Test #405: ai_follow.follow ..................   Passed    0.00 sec
+        Start 375: ai_fire.filters
+339/523 Test #201: lights.lifetime ...................   Passed    0.00 sec
+        Start 189: keyframes.looping
+340/523 Test #375: ai_fire.filters ...................   Passed    0.00 sec
+        Start 154: pushables.pushing
+341/523 Test #189: keyframes.looping .................   Passed    0.00 sec
+        Start 198: lights.defaults
+342/523 Test #154: pushables.pushing .................   Passed    0.00 sec
+        Start 388: ai_trigger.commands
+343/523 Test #198: lights.defaults ...................   Passed    0.00 sec
+        Start 102: doors.state
+344/523 Test #388: ai_trigger.commands ...............   Passed    0.00 sec
+        Start 172: objectives.malformed
+345/523 Test #102: doors.state .......................   Passed    0.00 sec
+        Start 267: character.force
+346/523 Test #172: objectives.malformed ..............   Passed    0.00 sec
+        Start 192: keyframes.reentrant
+347/523 Test #267: character.force ...................   Passed    0.00 sec
+        Start  49: player.lifecycle
+348/523 Test #192: keyframes.reentrant ...............   Passed    0.00 sec
+        Start 310: ai_sight.filters
+349/523 Test  #49: player.lifecycle ..................   Passed    0.00 sec
+        Start 152: pushables.friction
+350/523 Test #310: ai_sight.filters ..................   Passed    0.00 sec
+        Start 285: character_motion.motion
+351/523 Test #152: pushables.friction ................   Passed    0.00 sec
+        Start 317: attachments.nodes
+352/523 Test #285: character_motion.motion ...........   Passed    0.00 sec
+        Start 344: model_view.sample
+353/523 Test #317: attachments.nodes .................   Passed    0.00 sec
+        Start 215: worldpaths.timeline
+354/523 Test #344: model_view.sample .................   Passed    0.00 sec
+        Start 387: ai_trigger.impact
+355/523 Test #215: worldpaths.timeline ...............   Passed    0.00 sec
+        Start 105: doors.pushing
+356/523 Test #387: ai_trigger.impact .................   Passed    0.00 sec
+        Start 304: paths.lifetime
+357/523 Test #105: doors.pushing .....................   Passed    0.00 sec
+        Start 397: ai_navigation.direct
+358/523 Test #304: paths.lifetime ....................   Passed    0.00 sec
+        Start 370: ai_state.lifetime
+359/523 Test #397: ai_navigation.direct ..............   Passed    0.00 sec
+        Start 329: ai_target.callbacks
+360/523 Test #370: ai_state.lifetime .................   Passed    0.00 sec
+        Start 423: ai_locomotion.obstruction
+361/523 Test #329: ai_target.callbacks ...............   Passed    0.00 sec
+        Start 107: doors.lifetime
+362/523 Test #423: ai_locomotion.obstruction .........   Passed    0.00 sec
+        Start 440: ai_recovery.plans
+363/523 Test #107: doors.lifetime ....................   Passed    0.00 sec
+        Start 117: triggers.lifetime
+364/523 Test #440: ai_recovery.plans .................   Passed    0.00 sec
+        Start 359: ai_perception.lifetime
+365/523 Test #117: triggers.lifetime .................   Passed    0.00 sec
+        Start 180: cameras.timing
+366/523 Test #359: ai_perception.lifetime ............   Passed    0.00 sec
+        Start 133: brushes.state
+367/523 Test #180: cameras.timing ....................   Passed    0.00 sec
+        Start 342: texture.mapping
+368/523 Test #133: brushes.state .....................   Passed    0.00 sec
+        Start  50: player.rollback
+369/523 Test #342: texture.mapping ...................   Passed    0.00 sec
+        Start 466: ai_runtime.triggers
+370/523 Test  #50: player.rollback ...................   Passed    0.00 sec
+        Start 250: sprites.placement
+371/523 Test #466: ai_runtime.triggers ...............   Passed    0.00 sec
+        Start 494: corpses.transfer
+372/523 Test #250: sprites.placement .................   Passed    0.00 sec
+        Start 341: texture.malformed
+373/523 Test #494: corpses.transfer ..................   Passed    0.00 sec
+        Start 453: ai_escape.hiding
+374/523 Test #341: texture.malformed .................   Passed    0.00 sec
+        Start 515: destructable_state.behavior
+375/523 Test #453: ai_escape.hiding ..................   Passed    0.00 sec
+        Start 142: explosions.properties
+376/523 Test #515: destructable_state.behavior .......   Passed    0.00 sec
+        Start 330: ai_target.services
+377/523 Test #142: explosions.properties .............   Passed    0.00 sec
+        Start 394: ai_navigation.sample
+378/523 Test #330: ai_target.services ................   Passed    0.00 sec
+        Start 284: character_motion.lookup
+379/523 Test #394: ai_navigation.sample ..............   Passed    0.00 sec
+        Start 179: cameras.defaults
+380/523 Test #284: character_motion.lookup ...........   Passed    0.00 sec
+        Start 462: ai_runtime.targets
+381/523 Test #179: cameras.defaults ..................   Passed    0.00 sec
+        Start 368: ai_state.dispatch
+382/523 Test #462: ai_runtime.targets ................   Passed    0.00 sec
+        Start 406: ai_follow.cached
+383/523 Test #368: ai_state.dispatch .................   Passed    0.00 sec
+        Start 143: explosions.requests
+384/523 Test #406: ai_follow.cached ..................   Passed    0.00 sec
+        Start  95: containers.conveyor_bodies
+385/523 Test #143: explosions.requests ...............   Passed    0.00 sec
+        Start  51: player.messages
+386/523 Test  #95: containers.conveyor_bodies ........   Passed    0.00 sec
+        Start  55: weapons.inventory
+387/523 Test  #51: player.messages ...................   Passed    0.00 sec
+        Start 362: ai_state.symbols
+388/523 Test  #55: weapons.inventory .................   Passed    0.00 sec
+        Start 288: character_motion.callbacks
+389/523 Test #362: ai_state.symbols ..................   Passed    0.00 sec
+        Start 425: ai_locomotion.navigate
+390/523 Test #288: character_motion.callbacks ........   Passed    0.00 sec
+        Start 184: cameras.validation
+391/523 Test #425: ai_locomotion.navigate ............   Passed    0.00 sec
+        Start 427: ai_locomotion.walking
+392/523 Test #184: cameras.validation ................   Passed    0.00 sec
+        Start 248: sprites.clock
+393/523 Test #427: ai_locomotion.walking .............   Passed    0.00 sec
+        Start 396: ai_navigation.rays
+394/523 Test #248: sprites.clock .....................   Passed    0.00 sec
+        Start 144: explosions.radius
+395/523 Test #396: ai_navigation.rays ................   Passed    0.00 sec
+        Start 550: explosion_models.formulas
+396/523 Test #144: explosions.radius .................   Passed    0.00 sec
+        Start 199: lights.waves
+397/523 Test #550: explosion_models.formulas .........   Passed    0.00 sec
+        Start 203: lights.validation
+398/523 Test #199: lights.waves ......................   Passed    0.00 sec
+        Start 182: cameras.selection
+399/523 Test #203: lights.validation .................   Passed    0.00 sec
+        Start 378: ai_fire.keys
+400/523 Test #182: cameras.selection .................   Passed    0.00 sec
+        Start 358: ai_perception.failures
+401/523 Test #378: ai_fire.keys ......................   Passed    0.00 sec
+        Start 404: ai_follow.locomotion
+402/523 Test #358: ai_perception.failures ............   Passed    0.00 sec
+        Start 445: ai_recovery.keys
+403/523 Test #404: ai_follow.locomotion ..............   Passed    0.00 sec
+        Start 148: explosions.limits
+404/523 Test #445: ai_recovery.keys ..................   Passed    0.00 sec
+        Start 266: character.humiliation
+405/523 Test #148: explosions.limits .................   Passed    0.00 sec
+        Start 424: ai_locomotion.rays
+406/523 Test #266: character.humiliation .............   Passed    0.00 sec
+        Start 159: pushables.containers
+407/523 Test #424: ai_locomotion.rays ................   Passed    0.00 sec
+        Start 505: exits.dead
+408/523 Test #159: pushables.containers ..............   Passed    0.00 sec
+        Start 326: ai_target.facing
+409/523 Test #505: exits.dead ........................   Passed    0.00 sec
+        Start 479: ai_hit.sides
+410/523 Test #326: ai_target.facing ..................   Passed    0.00 sec
+        Start 436: ai_recovery.crouch
+411/523 Test #479: ai_hit.sides ......................   Passed    0.00 sec
+        Start 325: ai_target.cached
+412/523 Test #436: ai_recovery.crouch ................   Passed    0.00 sec
+        Start 355: ai_perception.stimuli
+413/523 Test #325: ai_target.cached ..................   Passed    0.00 sec
+        Start 480: ai_hit.lifetime
+414/523 Test #355: ai_perception.stimuli .............   Passed    0.00 sec
+        Start 442: ai_recovery.search
+415/523 Test #480: ai_hit.lifetime ...................   Passed    0.00 sec
+        Start  62: weapons.rollback
+416/523 Test #442: ai_recovery.search ................   Passed    0.00 sec
+        Start 408: ai_follow.actions
+417/523 Test  #62: weapons.rollback ..................   Passed    0.00 sec
+        Start 524: player_state.capture
+418/523 Test #408: ai_follow.actions .................   Passed    0.00 sec
+        Start 274: character_audio.paths
+419/523 Test #524: player_state.capture ..............   Passed    0.00 sec
+        Start 390: ai_trigger.broadcast
+420/523 Test #274: character_audio.paths .............   Passed    0.00 sec
+        Start 195: keyframes.collision
+421/523 Test #390: ai_trigger.broadcast ..............   Passed    0.00 sec
+        Start 430: ai_locomotion.keys
+422/523 Test #195: keyframes.collision ...............   Passed    0.00 sec
+        Start 456: ai_escape.tracking
+423/523 Test #430: ai_locomotion.keys ................   Passed    0.00 sec
+        Start 398: ai_navigation.detour
+424/523 Test #456: ai_escape.tracking ................   Passed    0.00 sec
+        Start 460: ai_runtime.visibility
+425/523 Test #398: ai_navigation.detour ..............   Passed    0.00 sec
+        Start 389: ai_trigger.relay
+426/523 Test #460: ai_runtime.visibility .............   Passed    0.00 sec
+        Start 441: ai_recovery.around
+427/523 Test #389: ai_trigger.relay ..................   Passed    0.00 sec
+        Start 464: ai_runtime.camera
+428/523 Test #441: ai_recovery.around ................   Passed    0.00 sec
+        Start 518: destructable_state.capture
+429/523 Test #464: ai_runtime.camera .................   Passed    0.00 sec
+        Start 467: ai_runtime.body
+430/523 Test #518: destructable_state.capture ........   Passed    0.00 sec
+        Start 461: ai_runtime.lifetime
+431/523 Test #467: ai_runtime.body ...................   Passed    0.00 sec
+        Start  88: containers.physics
+432/523 Test #461: ai_runtime.lifetime ...............   Passed    0.00 sec
+        Start 200: lights.commands
+433/523 Test  #88: containers.physics ................   Passed    0.00 sec
+        Start   9: objects.messages_strings
+434/523 Test #200: lights.commands ...................   Passed    0.00 sec
+        Start 345: model_view.rejects
+435/523 Test   #9: objects.messages_strings ..........   Passed    0.00 sec
+        Start 181: cameras.links
+436/523 Test #345: model_view.rejects ................   Passed    0.00 sec
+        Start 410: ai_follow.failures
+437/523 Test #181: cameras.links .....................   Passed    0.00 sec
+        Start  84: containers.geometry
+438/523 Test #410: ai_follow.failures ................   Passed    0.00 sec
+        Start 353: ai_perception.visibility
+439/523 Test  #84: containers.geometry ...............   Passed    0.00 sec
+        Start 465: ai_runtime.spatial
+440/523 Test #353: ai_perception.visibility ..........   Passed    0.00 sec
+        Start 450: ai_escape.facing
+441/523 Test #465: ai_runtime.spatial ................   Passed    0.00 sec
+        Start 312: ai_sight.failures
+442/523 Test #450: ai_escape.facing ..................   Passed    0.00 sec
+        Start 171: objectives.strings
+443/523 Test #312: ai_sight.failures .................   Passed    0.00 sec
+        Start 516: destructable_state.sentinel
+444/523 Test #171: objectives.strings ................   Passed    0.00 sec
+        Start 357: ai_perception.opportunity
+445/523 Test #516: destructable_state.sentinel .......   Passed    0.00 sec
+        Start 419: ai_script.movement
+446/523 Test #357: ai_perception.opportunity .........   Passed    0.00 sec
+        Start 510: inventory_state.malformed
+447/523 Test #419: ai_script.movement ................   Passed    0.00 sec
+        Start 551: explosion_models.recipes
+448/523 Test #510: inventory_state.malformed .........   Passed    0.00 sec
+        Start 407: ai_follow.moveto
+449/523 Test #551: explosion_models.recipes ..........   Passed    0.00 sec
+        Start 340: texture.decode
+450/523 Test #407: ai_follow.moveto ..................   Passed    0.00 sec
+        Start 356: ai_perception.retaliation
+451/523 Test #340: texture.decode ....................   Passed    0.00 sec
+        Start 499: corpses.accumulation
+452/523 Test #356: ai_perception.retaliation .........   Passed    0.00 sec
+        Start 333: world_view.mesh
+453/523 Test #499: corpses.accumulation ..............   Passed    0.00 sec
+        Start 431: ai_locomotion.lifetime
+454/523 Test #333: world_view.mesh ...................   Passed    0.00 sec
+        Start 301: paths.copy
+455/523 Test #431: ai_locomotion.lifetime ............   Passed    0.00 sec
+        Start 511: inventory_state.rollback
+456/523 Test #301: paths.copy ........................   Passed    0.00 sec
+        Start 434: ai_recovery.jump
+457/523 Test #511: inventory_state.rollback ..........   Passed    0.00 sec
+        Start  58: weapons.melee
+458/523 Test #434: ai_recovery.jump ..................   Passed    0.00 sec
+        Start 478: ai_hit.guards
+459/523 Test  #58: weapons.melee .....................   Passed    0.00 sec
+        Start 520: player_state.roundtrip
+460/523 Test #478: ai_hit.guards .....................   Passed    0.00 sec
+        Start  52: player.callbacks
+461/523 Test #520: player_state.roundtrip ............   Passed    0.00 sec
+        Start  29: world.resource_mount
+462/523 Test  #52: player.callbacks ..................   Passed    0.00 sec
+        Start 364: ai_state.commands
+463/523 Test  #29: world.resource_mount ..............   Passed    0.00 sec
+        Start 503: exits.broadcast
+464/523 Test #364: ai_state.commands .................   Passed    0.00 sec
+        Start 346: model_view.weapon_pose
+465/523 Test #503: exits.broadcast ...................   Passed    0.00 sec
+        Start  85: containers.concave
+466/523 Test #346: model_view.weapon_pose ............   Passed    0.00 sec
+        Start 529: character_nodes.restore
+467/523 Test  #85: containers.concave ................   Passed    0.00 sec
+        Start  57: weapons.firing
+468/523 Test #529: character_nodes.restore ...........   Passed    0.00 sec
+        Start 432: ai_locomotion.attacks
+469/523 Test  #57: weapons.firing ....................   Passed    0.00 sec
+        Start  11: objects.creation_failures
+470/523 Test #432: ai_locomotion.attacks .............   Passed    0.00 sec
+        Start 418: ai_script.state_target
+471/523 Test  #11: objects.creation_failures .........   Passed    0.00 sec
+        Start 526: character_nodes.services
+472/523 Test #418: ai_script.state_target ............   Passed    0.00 sec
+        Start  32: world.world_rejection
+473/523 Test #526: character_nodes.services ..........   Passed    0.00 sec
+        Start 347: model_view.legacy_pose
+474/523 Test  #32: world.world_rejection .............   Passed    0.00 sec
+        Start 517: destructable_state.failures
+475/523 Test #347: model_view.legacy_pose ............   Passed    0.00 sec
+        Start  59: weapons.damage
+476/523 Test #517: destructable_state.failures .......   Passed    0.00 sec
+        Start 414: ai_script.parsing
+477/523 Test  #59: weapons.damage ....................   Passed    0.00 sec
+        Start 522: player_state.initialization
+478/523 Test #414: ai_script.parsing .................   Passed    0.00 sec
+        Start  56: weapons.segments
+479/523 Test #522: player_state.initialization .......   Passed    0.00 sec
+        Start  48: player.handles
+480/523 Test  #56: weapons.segments ..................   Passed    0.00 sec
+        Start 446: ai_recovery.fire_lifetime
+481/523 Test  #48: player.handles ....................   Passed    0.00 sec
+        Start 457: ai_escape.lifetime
+482/523 Test #446: ai_recovery.fire_lifetime .........   Passed    0.00 sec
+        Start 428: ai_locomotion.physics
+483/523 Test #457: ai_escape.lifetime ................   Passed    0.00 sec
+        Start  36: world.original_trigger
+484/523 Test #428: ai_locomotion.physics .............   Passed    0.00 sec
+        Start   8: objects.links_lists
+485/523 Test  #36: world.original_trigger ............   Passed    0.00 sec
+        Start 468: ai_runtime.missing
+486/523 Test   #8: objects.links_lists ...............   Passed    0.00 sec
+        Start  31: world.world_geometry
+487/523 Test #468: ai_runtime.missing ................   Passed    0.00 sec
+        Start 547: explosion_sprites.failures
+488/523 Test  #31: world.world_geometry ..............   Passed    0.00 sec
+        Start  27: world.rez_structure
+489/523 Test #547: explosion_sprites.failures ........   Passed    0.00 sec
+        Start  15: config.invalid_config
+490/523 Test  #27: world.rez_structure ...............   Passed    0.00 sec
+        Start 481: ai_hit.hidden
+491/523 Test  #15: config.invalid_config .............   Passed    0.00 sec
+        Start   2: objects.nested_creation
+492/523 Test #481: ai_hit.hidden .....................   Passed    0.00 sec
+        Start  28: world.rez_rejection
+493/523 Test   #2: objects.nested_creation ...........   Passed    0.00 sec
+        Start   1: objects.original_objects
+494/523 Test  #28: world.rez_rejection ...............   Passed    0.00 sec
+        Start 553: explosion_models.session
+495/523 Test   #1: objects.original_objects ..........   Passed    0.00 sec
+        Start   3: objects.reasons_properties
+496/523 Test #553: explosion_models.session ..........   Passed    0.00 sec
+        Start   5: objects.deferred_removal
+497/523 Test   #3: objects.reasons_properties ........   Passed    0.00 sec
+        Start 552: explosion_models.failures
+498/523 Test   #5: objects.deferred_removal ..........   Passed    0.00 sec
+        Start  23: content.local
+499/523 Test #552: explosion_models.failures .........   Passed    0.00 sec
+        Start   4: objects.scheduling
+500/523 Test  #23: content.local .....................   Passed    0.00 sec
+        Start  17: config.case_lookup
+501/523 Test   #4: objects.scheduling ................   Passed    0.00 sec
+        Start 527: character_nodes.names
+502/523 Test  #17: config.case_lookup ................   Passed    0.00 sec
+        Start  73: movement.controls
+503/523 Test #527: character_nodes.names .............   Passed    0.00 sec
+        Start  13: config.precedence
+504/523 Test  #73: movement.controls .................   Passed    0.00 sec
+        Start  30: world.world_properties
+505/523 Test  #13: config.precedence .................   Passed    0.00 sec
+        Start   7: objects.handles_selection
+506/523 Test  #30: world.world_properties ............   Passed    0.00 sec
+        Start  35: world.session_messages
+507/523 Test   #7: objects.handles_selection .........   Passed    0.00 sec
+        Start   6: objects.aggregate_dispatch
+508/523 Test  #35: world.session_messages ............   Passed    0.00 sec
+        Start 335: world_view.camera
+509/523 Test   #6: objects.aggregate_dispatch ........   Passed    0.00 sec
+        Start  46: services.original_services
+510/523 Test #335: world_view.camera .................   Passed    0.00 sec
+        Start  14: config.relative_paths
+511/523 Test  #46: services.original_services ........   Passed    0.00 sec
+        Start  16: config.content_validation
+512/523 Test  #14: config.relative_paths .............   Passed    0.00 sec
+        Start 528: character_nodes.rendering
+513/523 Test  #16: config.content_validation .........   Passed    0.00 sec
+        Start 548: explosion_sprites.session
+514/523 Test #528: character_nodes.rendering .........   Passed    0.00 sec
+        Start  45: services.movement_contacts
+515/523 Test #548: explosion_sprites.session .........   Passed    0.00 sec
+        Start  40: services.model_reader
+516/523 Test  #45: services.movement_contacts ........   Passed    0.00 sec
+        Start  12: config.arguments
+517/523 Test  #40: services.model_reader .............   Passed    0.00 sec
+        Start  43: services.model_callbacks
+518/523 Test  #12: config.arguments ..................   Passed    0.00 sec
+        Start 546: explosion_sprites.formulas
+519/523 Test  #43: services.model_callbacks ..........   Passed    0.00 sec
+        Start  42: services.animation_events
+520/523 Test #546: explosion_sprites.formulas ........   Passed    0.00 sec
+        Start  44: services.collision_queries
+521/523 Test  #42: services.animation_events .........   Passed    0.00 sec
+        Start 541: sprite_view.geometry
+522/523 Test  #44: services.collision_queries ........   Passed    0.00 sec
+523/523 Test #541: sprite_view.geometry ..............   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 523
+
+Label Time Summary:
+ai_escape             =   0.06 sec*proc (11 tests)
+ai_fire               =   0.44 sec*proc (12 tests)
+ai_follow             =   0.23 sec*proc (11 tests)
+ai_hit                =   0.04 sec*proc (10 tests)
+ai_keys               =   0.94 sec*proc (10 tests)
+ai_locomotion         =   0.05 sec*proc (11 tests)
+ai_navigation         =   0.14 sec*proc (9 tests)
+ai_perception         =   0.20 sec*proc (11 tests)
+ai_recovery           =   0.06 sec*proc (14 tests)
+ai_runtime            =   0.91 sec*proc (14 tests)
+ai_script             =   0.12 sec*proc (9 tests)
+ai_sight              =   0.15 sec*proc (8 tests)
+ai_state              =   1.43 sec*proc (11 tests)
+ai_target             =   0.20 sec*proc (9 tests)
+ai_trigger            =   0.17 sec*proc (9 tests)
+attachments           =   0.23 sec*proc (8 tests)
+brushes               =   0.88 sec*proc (8 tests)
+cameras               =   1.16 sec*proc (7 tests)
+character             =   0.90 sec*proc (8 tests)
+character_audio       =   1.71 sec*proc (10 tests)
+character_motion      =   0.06 sec*proc (7 tests)
+character_nodes       =   0.22 sec*proc (5 tests)
+cinematics            =   0.62 sec*proc (9 tests)
+cli                   =   0.06 sec*proc (5 tests)
+config                =   0.01 sec*proc (6 tests)
+containers            =   1.48 sec*proc (16 tests)
+corpses               =   0.05 sec*proc (8 tests)
+destructable_state    =   0.15 sec*proc (6 tests)
+doors                 =   0.82 sec*proc (8 tests)
+exits                 =   0.35 sec*proc (8 tests)
+explosion_models      =   0.16 sec*proc (5 tests)
+explosion_sprites     =   0.16 sec*proc (4 tests)
+explosions            =   0.02 sec*proc (8 tests)
+headless              =  34.86 sec*proc (523 tests)
+interaction           =   0.88 sec*proc (10 tests)
+inventory_state       =   0.14 sec*proc (5 tests)
+keyframes             =   1.35 sec*proc (10 tests)
+lights                =   0.59 sec*proc (9 tests)
+locomotion            =   0.85 sec*proc (8 tests)
+model_view            =   0.19 sec*proc (5 tests)
+movement              =   2.50 sec*proc (10 tests)
+objectives            =   0.35 sec*proc (7 tests)
+objects               =   0.02 sec*proc (11 tests)
+paths                 =   0.23 sec*proc (7 tests)
+pickups               =   0.36 sec*proc (10 tests)
+player                =   0.33 sec*proc (6 tests)
+player_keepalive      =   0.53 sec*proc (4 tests)
+player_restore        =   0.17 sec*proc (4 tests)
+player_state          =   0.16 sec*proc (6 tests)
+private               =  33.46 sec*proc (80 tests)
+pushables             =   0.03 sec*proc (10 tests)
+randomsound           =   0.81 sec*proc (9 tests)
+sceneexplosion        =   0.64 sec*proc (8 tests)
+services              =   0.65 sec*proc (8 tests)
+sound                 =   0.87 sec*proc (8 tests)
+sprite_view           =   0.14 sec*proc (3 tests)
+sprites               =   0.74 sec*proc (8 tests)
+texture               =   0.19 sec*proc (4 tests)
+triggers              =   0.87 sec*proc (10 tests)
+weapon_drops          =   0.05 sec*proc (10 tests)
+weapons               =   5.46 sec*proc (9 tests)
+world                 =   0.64 sec*proc (14 tests)
+world_view            =   0.18 sec*proc (5 tests)
+worldpaths            =   0.76 sec*proc (9 tests)
+
+Total Test time (real) =  17.50 sec

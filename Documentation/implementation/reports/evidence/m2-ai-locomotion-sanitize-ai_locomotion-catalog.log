@@ -1,0 +1,71 @@
+406/406 Testing: ai_locomotion.catalog
+406/406 Test: ai_locomotion.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.catalog" start time: Oct 16 13:42 CEST
+Output:
+----------------------------------------------------------
+m_cultist1 command=0 clip=4 available=1
+m_cultist1 command=1 clip=5 available=1
+m_cultist1 command=2 clip=12 available=1
+m_cultist1 command=3 clip=13 available=1
+f_cultist1 command=0 clip=4 available=1
+f_cultist1 command=1 clip=5 available=1
+f_cultist1 command=2 clip=12 available=1
+f_cultist1 command=3 clip=13 available=1
+m_civilian1 command=0 clip=2 available=1
+m_civilian1 command=1 clip=4 available=1
+m_civilian1 command=2 clip=4294967295 available=0
+m_civilian1 command=3 clip=4294967295 available=0
+f_civilian1 command=0 clip=3 available=1
+f_civilian1 command=1 clip=2 available=1
+f_civilian1 command=2 clip=4294967295 available=0
+f_civilian1 command=3 clip=4294967295 available=0
+labtech command=0 clip=2 available=1
+labtech command=1 clip=4 available=1
+labtech command=2 clip=4294967295 available=0
+labtech command=3 clip=4294967295 available=0
+gideon command=0 clip=1 available=1
+gideon command=1 clip=0 available=1
+gideon command=2 clip=4294967295 available=0
+gideon command=3 clip=4294967295 available=0
+<end of output>
+Test time =   1.01 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.catalog" end time: Oct 16 13:42 CEST
+"ai_locomotion.catalog" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 16 13:42 CEST
+
+ai_fire =  11.63 sec*proc
+
+ai_follow =   3.91 sec*proc
+
+ai_locomotion =   1.23 sec*proc
+
+ai_navigation =   3.00 sec*proc
+
+ai_script =   2.44 sec*proc
+
+ai_state =  26.20 sec*proc
+
+ai_target =   3.58 sec*proc
+
+ai_trigger =   2.63 sec*proc
+
+character_motion =   1.12 sec*proc
+
+headless =  75.57 sec*proc
+
+objects =   0.23 sec*proc
+
+paths =   3.91 sec*proc
+
+player =   7.67 sec*proc
+
+private =  71.74 sec*proc
+
+services =   8.05 sec*proc
+

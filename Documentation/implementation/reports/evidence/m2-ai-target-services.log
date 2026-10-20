@@ -1,0 +1,14 @@
+330/332 Testing: ai_target.services
+330/332 Test: ai_target.services
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests" "services"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_target.services" start time: Oct 16 08:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.services" end time: Oct 16 08:07 CEST
+"ai_target.services" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,57 @@
+431/431 Testing: ai_escape.catalog
+431/431 Test: ai_escape.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_escape_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_escape.catalog" start time: Oct 16 14:25 CEST
+Output:
+----------------------------------------------------------
+m_cultist1 TAUNT[6]=47 available=1 duration=5000
+f_cultist1 TAUNT[6]=47 available=1 duration=5000
+m_civilian1 TAUNT[6]=5 available=1 duration=5000
+f_civilian1 TAUNT[6]=5 available=1 duration=4067
+labtech TAUNT[6]=5 available=1 duration=5000
+gideon TAUNT[6]=4294967295 available=0 duration=0
+<end of output>
+Test time =   1.01 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.catalog" end time: Oct 16 14:25 CEST
+"ai_escape.catalog" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 16 14:25 CEST
+
+ai_escape =   1.22 sec*proc
+
+ai_fire =  11.46 sec*proc
+
+ai_follow =   3.94 sec*proc
+
+ai_locomotion =   1.21 sec*proc
+
+ai_navigation =   3.27 sec*proc
+
+ai_recovery =   1.29 sec*proc
+
+ai_script =   2.37 sec*proc
+
+ai_state =  26.12 sec*proc
+
+ai_target =   3.71 sec*proc
+
+ai_trigger =   2.77 sec*proc
+
+character_motion =   1.20 sec*proc
+
+headless =  78.13 sec*proc
+
+objects =   0.23 sec*proc
+
+paths =   3.87 sec*proc
+
+player =   7.98 sec*proc
+
+private =  73.79 sec*proc
+
+services =   7.49 sec*proc
+

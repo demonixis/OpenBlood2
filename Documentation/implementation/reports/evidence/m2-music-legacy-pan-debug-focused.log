@@ -1,0 +1,21 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 990: dls_sampler.pcm
+1/5 Test #990: dls_sampler.pcm ..................   Passed    0.00 sec
+    Start 991: dls_sampler.envelopes
+2/5 Test #991: dls_sampler.envelopes ............   Passed    0.01 sec
+    Start 992: dls_sampler.lifetime
+3/5 Test #992: dls_sampler.lifetime .............   Passed    0.09 sec
+    Start 993: dls_sampler.legacy_pan
+4/5 Test #993: dls_sampler.legacy_pan ...........   Passed    0.00 sec
+    Start 994: dls_sampler.private
+5/5 Test #994: dls_sampler.private ..............   Passed    0.57 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+audio           =   0.67 sec*proc (5 tests)
+headless        =   0.67 sec*proc (5 tests)
+music_assets    =   0.67 sec*proc (5 tests)
+private         =   0.57 sec*proc (1 test)
+
+Total Test time (real) =   0.69 sec

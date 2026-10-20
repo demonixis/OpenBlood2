@@ -1,0 +1,52 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/sanitize/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/sanitize
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 817
+    Start 817: hud.values
+
+817: Test command: <workspace>/Blood2/build/sanitize/tests/hud_tests "values" "<workspace>/Blood2/build/sanitize/tests/hud-fixtures/values"
+817: Working Directory: <workspace>/Blood2/build/sanitize/tests
+817: Test timeout computed to be: 30
+1/4 Test #817: hud.values .......................   Passed    0.02 sec
+test 818
+    Start 818: hud.input
+
+818: Test command: <workspace>/Blood2/build/sanitize/tests/hud_tests "input" "<workspace>/Blood2/build/sanitize/tests/hud-fixtures/input"
+818: Working Directory: <workspace>/Blood2/build/sanitize/tests
+818: Test timeout computed to be: 30
+2/4 Test #818: hud.input ........................   Passed    0.02 sec
+test 819
+    Start 819: hud.session
+
+819: Test command: <workspace>/Blood2/build/sanitize/tests/hud_tests "session" "<workspace>/Blood2/build/sanitize/tests/hud-fixtures/session"
+819: Working Directory: <workspace>/Blood2/build/sanitize/tests
+819: Test timeout computed to be: 30
+3/4 Test #819: hud.session ......................   Passed    0.05 sec
+test 820
+    Start 820: hud.private
+
+820: Test command: <workspace>/Blood2/build/sanitize/tests/hud_tests "private" "<external-data-root>"
+820: Working Directory: <workspace>/Blood2/build/sanitize/tests
+820: Test timeout computed to be: 60
+4/4 Test #820: hud.private ......................   Passed    5.83 sec
+
+The following tests passed:
+	hud.values
+	hud.input
+	hud.session
+	hud.private
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+headless    =   5.90 sec*proc (4 tests)
+hud         =   5.90 sec*proc (4 tests)
+private     =   5.83 sec*proc (1 test)
+
+Total Test time (real) =   5.91 sec

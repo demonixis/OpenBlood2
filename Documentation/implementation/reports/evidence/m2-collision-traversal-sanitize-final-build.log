@@ -1,0 +1,30 @@
+[0/2] Re-checking globbed directories...
+[1/30] Scanning <workspace>/Blood2/tests/worldpath_tests.cpp for CXX dependencies
+[2/30] Scanning <workspace>/Blood2/tests/services_tests.cpp for CXX dependencies
+[3/30] Generating CXX dyndep file tests/CMakeFiles/worldpath_tests.dir/CXX.dd
+[4/30] Generating CXX dyndep file tests/CMakeFiles/services_tests.dir/CXX.dd
+[5/30] Building CXX object tests/CMakeFiles/movement_tests.dir/movement_tests.cpp.o
+[6/30] Building CXX object tests/CMakeFiles/locomotion_tests.dir/locomotion_tests.cpp.o
+[7/30] Building CXX object tests/CMakeFiles/services_tests.dir/services_tests.cpp.o
+[8/30] Building CXX object tests/CMakeFiles/door_tests.dir/door_tests.cpp.o
+[9/30] Building CXX object tests/CMakeFiles/worldpath_tests.dir/worldpath_tests.cpp.o
+[10/30] Building CXX object tests/CMakeFiles/interaction_tests.dir/interaction_tests.cpp.o
+[11/30] Building CXX object tests/CMakeFiles/ai_sight_tests.dir/ai_sight_tests.cpp.o
+[12/30] Building CXX object tests/CMakeFiles/corpse_tests.dir/corpse_tests.cpp.o
+[13/30] Building CXX object tests/CMakeFiles/ai_runtime_tests.dir/ai_runtime_tests.cpp.o
+[14/30] Linking CXX executable blood2
+[15/30] Building CXX object tests/CMakeFiles/player_controls_tests.dir/player_controls_tests.cpp.o
+[16/30] Building CXX object tests/CMakeFiles/exit_tests.dir/exit_tests.cpp.o
+[17/30] Linking CXX executable tests/object_contract_tests
+[18/30] Linking CXX executable tests/world_tests
+[19/30] Linking CXX executable tests/services_tests
+[20/30] Linking CXX executable tests/movement_tests
+[21/30] Linking CXX executable tests/locomotion_tests
+[22/30] Linking CXX executable tests/door_tests
+[23/30] Linking CXX executable tests/interaction_tests
+[24/30] Linking CXX executable tests/worldpath_tests
+[25/30] Linking CXX executable tests/ai_sight_tests
+[26/30] Linking CXX executable tests/ai_runtime_tests
+[27/30] Linking CXX executable tests/corpse_tests
+[28/30] Linking CXX executable tests/exit_tests
+[29/30] Linking CXX executable tests/player_controls_tests

@@ -1,0 +1,135 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 25
+    Start  25: gpu.lifecycle
+
+25: Test command: <workspace>/Blood2/build/debug/blood2 "--config" "<workspace>/Blood2/build/debug/tests/empty.ini" "--data-dir" "<external-data-root>" "--gpu-smoke" "--capture" "<workspace>/Blood2/build/debug/tests/gpu.png"
+25: Working Directory: <workspace>/Blood2/build/debug/tests
+25: Test timeout computed to be: 25
+25: [info] External data: <external-data-root> (--data-dir)
+25: [info] BLOOD2.REZ: detected, 267758913 bytes
+25: [info] SOUND.REZ: detected, 204633068 bytes
+25: [info] BLOOD2P.REZ: detected, 24133434 bytes
+25: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+25: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+25: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+25: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+25: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+25: [info] Captured GPU frame to <workspace>/Blood2/build/debug/tests/gpu.png
+25: [info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+25: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+25: [info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+25: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+1/8 Test  #25: gpu.lifecycle ....................   Passed    2.24 sec
+test 381
+    Start 381: gpu.model_depth
+
+381: Test command: <workspace>/Blood2/build/debug/tests/model_gpu_tests "<workspace>/Blood2/build/debug/tests/model-depth.png"
+381: Working Directory: <workspace>/Blood2/build/debug/tests
+381: Test timeout computed to be: 30
+381: Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+381: Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+2/8 Test #381: gpu.model_depth ..................   Passed    0.45 sec
+test 382
+    Start 382: gpu.model_private
+
+382: Test command: <workspace>/Blood2/build/debug/tests/model_gpu_tests "<workspace>/Blood2/build/debug/tests/model-private.png" "<external-data-root>"
+382: Working Directory: <workspace>/Blood2/build/debug/tests
+382: Test timeout computed to be: 30
+382: Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+382: Restored original player/client association before private GPU rendering
+382: Private isolated Caleb/held Beretta diagnostic: 8271 non-background pixels, 40479 vertices
+382: Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+3/8 Test #382: gpu.model_private ................   Passed    1.05 sec
+test 383
+    Start 383: gpu.model_builtin_city
+
+383: Test command: <workspace>/Blood2/build/debug/tests/model_gpu_tests "<workspace>/Blood2/build/debug/tests/model-city" "<external-data-root>" "builtin_city"
+383: Working Directory: <workspace>/Blood2/build/debug/tests
+383: Test timeout computed to be: 60
+383: Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+383: CityHub Model lightbulb1.abc cycle 0: 243 textured pixels, no fallback; hidden/restored checked
+383: CityHub Model redlight.abc cycle 0: 8158 textured pixels, no fallback; hidden/restored checked
+383: CityHub Model lightbulb1.abc cycle 1: 243 textured pixels, no fallback; hidden/restored checked
+383: CityHub Model redlight.abc cycle 1: 8158 textured pixels, no fallback; hidden/restored checked
+383: Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+4/8 Test #383: gpu.model_builtin_city ...........   Passed    2.23 sec
+test 604
+    Start 604: gpu.explosion_model_alpha
+
+604: Test command: <workspace>/Blood2/build/debug/tests/explosion_model_gpu_tests "<workspace>/Blood2/build/debug/tests/explosion-model-alpha"
+604: Working Directory: <workspace>/Blood2/build/debug/tests
+604: Test timeout computed to be: 30
+604: Original model opacity: 1510 covered pixels, half-opacity linear blend verified
+5/8 Test #604: gpu.explosion_model_alpha ........   Passed    0.39 sec
+test 605
+    Start 605: gpu.explosion_model_private
+
+605: Test command: <workspace>/Blood2/build/debug/tests/explosion_model_gpu_tests "<workspace>/Blood2/build/debug/tests/explosion-model-private" "<external-data-root>"
+605: Working Directory: <workspace>/Blood2/build/debug/tests
+605: Test timeout computed to be: 30
+605: Original model opacity: 1510 covered pixels, half-opacity linear blend verified
+605: Original exp_sphere/Explosion_1: 168 triangles, 2323 pixels, alpha 0.375
+6/8 Test #605: gpu.explosion_model_private ......   Passed    0.48 sec
+test 756
+    Start 756: gpu.destructable_models
+
+756: Test command: <workspace>/Blood2/build/debug/tests/model_gpu_tests "<workspace>/Blood2/build/debug/tests/destructable-model-city" "<external-data-root>" "destructable_city"
+756: Working Directory: <workspace>/Blood2/build/debug/tests
+756: Test timeout computed to be: 90
+756: Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+756: CityHub Model garbagecan2.abc cycle 0: 5726 textured pixels, no fallback; hidden/restored checked
+756: CityHub Model barrel.abc cycle 0: 7052 textured pixels, no fallback; hidden/restored checked
+756: CityHub Model ceilingfan2.abc cycle 0: 879 textured pixels, no fallback; hidden/restored checked
+756: CityHub Model garbagecan2.abc cycle 1: 5726 textured pixels, no fallback; hidden/restored checked
+756: CityHub Model barrel.abc cycle 1: 7052 textured pixels, no fallback; hidden/restored checked
+756: CityHub Model ceilingfan2.abc cycle 1: 879 textured pixels, no fallback; hidden/restored checked
+756: Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+7/8 Test #756: gpu.destructable_models ..........   Passed    2.54 sec
+test 836
+    Start 836: gpu.level_change
+
+836: Test command: <workspace>/Blood2/build/debug/tests/level_change_gpu_tests "<external-data-root>" "<workspace>/Blood2/build/debug/tests/level-change"
+836: Working Directory: <workspace>/Blood2/build/debug/tests
+836: Test timeout computed to be: 90
+836: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+836: Destination: CityHub /
+836: Cycle 0: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+836: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+836: Destination: SubwayA /
+836: Cycle 1: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+836: Destination: CityHub /
+836: Cycle 2: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+836: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+836: Destination: SubwayA /
+836: Cycle 3: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+8/8 Test #836: gpu.level_change .................   Passed    7.05 sec
+
+The following tests passed:
+	gpu.lifecycle
+	gpu.model_depth
+	gpu.model_private
+	gpu.model_builtin_city
+	gpu.explosion_model_alpha
+	gpu.explosion_model_private
+	gpu.destructable_models
+	gpu.level_change
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+destructable_models    =   2.54 sec*proc (1 test)
+explosion_models       =   0.87 sec*proc (2 tests)
+gpu                    =  16.43 sec*proc (8 tests)
+model_view             =   3.73 sec*proc (3 tests)
+private                =  13.35 sec*proc (5 tests)
+world                  =   7.05 sec*proc (1 test)
+
+Total Test time (real) =  16.44 sec

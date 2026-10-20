@@ -1,0 +1,5 @@
+[0/2] Re-checking globbed directories...
+[1/11] Scanning /home/yann/projects/lithtech/Blood2/tests/energy_tests.cpp for CXX dependencies
+[2/11] Generating CXX dyndep file tests/CMakeFiles/energy_tests.dir/CXX.dd
+[3/8] Scanning /home/yann/projects/lithtech/Blood2/tests/energy_gpu_tests.cpp for CXX dependencies
+[4/8] Generating CXX dyndep file tests/CMakeFiles/energy_gpu_tests.dir/CXX.dd

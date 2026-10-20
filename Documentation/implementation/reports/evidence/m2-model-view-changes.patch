@@ -1,0 +1,1710 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index b4c8295..e2a703e 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -265,3 +265,5 @@ texture/model/FX rendering and required NPC/ExitTrigger services remain unavaila
+ world shaders support Vulkan/SPIR-V only; M2 stays incomplete.
+ 
+ The [DTX world-texture continuation](../Documentation/Implementation/M2_TEXTURES.md) adds bounded version -2 palette decoding, exact-path material caching and opaque SDL_GPU sampling. Read [texture contracts](docs/TEXTURE_CONTRACTS.md) before extending images/materials. Preserve the -2/-5 generation boundary, strict lengths, pre-pivot UVs, world-revision ownership and explicit failed resources. Alpha/sky markers, unlit mip-zero sampling and unsupported version-0 assets remain visible limitations. Models, required original services and the M2 gate remain open.
++
++The [animated model continuation](../Documentation/Implementation/M2_MODEL_VIEW.md) renders checked existing ABC/held/view models with original view offsets and shared world depth. Read [contracts](docs/MODEL_VIEW_CONTRACTS.md) before extending presentation or poses. Preserve read-only clocks, deferred lifetime, hidden/missing inspection, cache revisions and explicit close-view limits. Absent ABC TransformInfo now conjugates normalized node rotations; explicit zero remains direct. Rendering/head queries/attachments share that correction and the file -Z to engine +Z basis conversion; all spatial model fields are normalized once. Lighting/FX, NPCs, ExitTrigger and the actual M2 gate remain open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ce6bdae..c2be6dc 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,7 +14,7 @@ include(CTest)
+ include(cmake/Dependencies.cmake)
+ configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+ 
+-add_library(engine STATIC src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
++add_library(engine STATIC src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+ target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
+ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+@@ -49,7 +49,7 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/path_manager_smoke.cpp src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
++add_executable(blood2_app src/app/path_manager_smoke.cpp src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/model_scene.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+diff --git a/README.md b/README.md
+index e2680bc..61d5a39 100644
+--- a/README.md
++++ b/README.md
+@@ -6,7 +6,7 @@ The three runtime targets remain small: `engine` (resources, world/object runtim
+ 
+ The [diagnostic 3D view](docs/WORLD_VIEW_CONTRACTS.md) now renders actual level
+ geometry and current moving brushes through SDL_GPU. Run `./build/debug/blood2 --view-world` to enter the original player/cameras with
+-keyboard controls enabled. F1 opens inspection. [Original DTX textures](docs/TEXTURE_CONTRACTS.md) now appear as unlit opaque materials. Rendered models/weapons,
++keyboard controls enabled. F1 opens inspection. [Original DTX textures](docs/TEXTURE_CONTRACTS.md) now appear as unlit opaque materials. [Existing models and first-person weapons](docs/MODEL_VIEW_CONTRACTS.md) now render too;
+ full combat and M2 completion remain pending. The world shader currently requires
+ Vulkan/SPIR-V; other backend artifacts remain unimplemented.
+ 
+@@ -44,7 +44,7 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
+ | Option | Behavior |
+ | --- | --- |
+ | `--view-world` | Enter diagnostic 3D with original player/cameras, hidden inspector and keyboard controls |
+-| `--viewport-smoke` | Check actual world rendering, movement, hidden UI, resize and reload |
++| `--viewport-smoke` | Check textured world/view-weapon rendering, movement, hidden UI, resize and reload |
+ | `--check-data` | File metadata/readability only; no parser or GPU |
+ | `--inspect-world` | Headless REZ/DAT parsing and original subset creation/teardown |
+ | `--world NAME` | Resource name, default `01_SubwayA`; exact normalized lookup, no traversal/basename fallback |
+@@ -79,7 +79,11 @@ ctest --preset debug
+ ctest --preset debug -L world
+ ```
+ 
+-There are **151 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases, 6 door/mover/collision/lifetime cases, 8 trigger/key/ownership/contact cases, 9 USE/rotation/input/transport cases, 7 brush/ramp/damage/lifetime cases and 8 debris/explosion/radius/chain/lifetime cases and 10 pushable/physics/priority/rider cases, 9 pickup/spawn cases and 6 objective/resource-string cases plus 6 camera/tracking/player-gate cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
++The current suite has **274 synthetic headless tests**, **49 private headless tests**
++and **27 serial GPU tests** (350 total with the installation and GPU options enabled).
++Coverage includes bounded readers, original object/service behavior, player/weapon
++lifetime, movement, interactions, animation/attachments and real GPU presentation.
++Synthetic fixtures never substitute for private resource acceptance.
+ 
+ Enable installation-specific tests and real GPU windows explicitly:
+ 
+@@ -89,7 +93,9 @@ cmake --build --preset debug --parallel
+ ctest --preset debug
+ ```
+ 
+-The configured installation adds nineteen private headless tests and fourteen GPU tests, for **184 cases**. GPU captures are `build/debug/tests/gpu.png`, `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png`, `doors.png`, `triggers.png`, `interaction.png`, `brushes.png`, `pickups.png`, `objectives.png` and `cameras.png`. The ignored local presets enable these options:
++GPU captures are written under `build/debug/tests/`, including `viewport.png`
++(first person) and `model-private.png` (isolated Caleb/held-model diagnostic).
++The ignored local presets enable these options:
+ 
+ ```sh
+ cmake --preset local-debug
+@@ -301,3 +307,9 @@ Latest M2 continuation: [original explicit AI targets and facing](../Documentati
+ named target selection, checked links, stored-position/local-up orientation and
+ inspection. Target departure/re-entry is exercised without owning the target.
+ Autonomous perception, NPC states and the actual M2 acceptance gate remain open.
++
++The [animated model continuation](docs/MODEL_VIEW_CONTRACTS.md) adds real ABC/held/first-person weapon drawing, original view offsets and a corrected legacy node-rotation default. Hidden/missing objects remain inspectable. Required NPCs, transitions and client FX still block M2 completion.
++
++The animated-model continuation passes 350/350 tests in both Debug and inspector-free
++Release, including 27 GPU cases, plus 116/116 targeted Clang ASan/UBSan/leak checks.
++The final reader normalizes inverse rotations and model -Z into the engine basis.
+diff --git a/docs/ATTACHMENT_CONTRACTS.md b/docs/ATTACHMENT_CONTRACTS.md
+index bc59c14..f4d9038 100644
+--- a/docs/ATTACHMENT_CONTRACTS.md
++++ b/docs/ATTACHMENT_CONTRACTS.md
+@@ -95,3 +95,5 @@ dual Berettas add two. These are owned children, not newly supported source entr
+ AI states/classes, ExitTrigger, required client FX and the remaining M2 services
+ keep the playable-session gate open. Linux software/hardware graphics checks do
+ not establish retail attachment timing, other-platform or XR parity.
++
++The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.
+diff --git a/docs/M2_MODEL_VIEW_SOURCES.json b/docs/M2_MODEL_VIEW_SOURCES.json
+new file mode 100644
+index 0000000..cc4069f
+--- /dev/null
++++ b/docs/M2_MODEL_VIEW_SOURCES.json
+@@ -0,0 +1,94 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "6e162da0520d16ede0ca63b3499b44c6876e2734",
++  "source_files": [
++    {
++      "path": "sources/blood2/ClientShellDLL/ViewWeapon.cpp",
++      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9",
++      "selected_lines": [
++        [
++          164,
++          164
++        ],
++        [
++          226,
++          230
++        ],
++        [
++          341,
++          362
++        ],
++        [
++          1315,
++          1315
++        ]
++      ],
++      "use": "Selected placement/hand offset and close-view intent; bob zero, replacement depth pass"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "selected_lines": [
++        [
++          5426,
++          5468
++        ]
++      ],
++      "use": "Reference for original visibility/view positioning; complete UpdateGun not imported"
++    },
++    {
++      "path": "OpenBlood2/OpenLithTech/src/formats/file_formats.h",
++      "sha256": "19d73605fd24da6317492aaffe4cece212f3a8af197176136a744896d52d321d",
++      "selected_lines": [
++        [
++          87,
++          90
++        ]
++      ],
++      "use": "Default inverse animation convention when TransformInfo absent"
++    },
++    {
++      "path": "OpenBlood2/OpenLithTech/src/formats/abc_parser.cpp",
++      "sha256": "f63d5312ae28d2061a9641971bb845c142f435110bf2e42bebeb93bdde870426",
++      "selected_lines": [
++        [
++          315,
++          363
++        ]
++      ],
++      "use": "Reference normalized conjugation and parent composition; not wholesale imported"
++    },
++    {
++      "path": "NoMadEngine/nomadengine/src/formats/abc_parser.cpp",
++      "sha256": "7399baf3d020a3d6b4d684c23a91c0df0bebfef39aef330bb2968b510c31539e",
++      "selected_lines": [
++        [
++          315,
++          363
++        ]
++      ],
++      "use": "Related reference, not independent original-engine proof"
++    },
++    {
++      "path": "nomad/src/Nomad.Formats/AbcModels.cs",
++      "sha256": "a76323a3b156f6a1f92b49062960d906d4be7d40cb3b1921a303ba3fe5a50945",
++      "selected_lines": [
++        [
++          27,
++          27
++        ]
++      ],
++      "use": "Related default flag reference; not imported"
++    }
++  ],
++  "external_references": [
++    {
++      "url": "https://github.com/haekb/io_scene_lithtech/blob/master/src/reader_abc_v6_pc.py",
++      "use": "Reviewed default inverse rotations; no code imported"
++    },
++    {
++      "url": "https://github.com/haekb/godot-abc-reader/blob/master/Models/ABC6.gd",
++      "use": "Reviewed distinct winding and animation flags; no code imported"
++    }
++  ]
++}
+diff --git a/docs/MODEL_AND_COLLISION_CONTRACTS.md b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+index 4ca9a1b..9b8ae3b 100644
+--- a/docs/MODEL_AND_COLLISION_CONTRACTS.md
++++ b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+@@ -25,8 +25,10 @@ The reader retains all vertices, the primary vertex count, progressive LOD
+ metadata, UVs, normals, face indices, node indices/parents/flags, animation bounds,
+ key times/strings, node transforms, packed vertex deformation and animation user
+ dimensions. Extra LOD selection and normal deformation are not implemented.
+-Skeleton poses interpolate translation and normalized quaternions in native
+-coordinates, composing each child with its parent. Vertex-deformed nodes decode
++Skeleton poses interpolate translation and normalized quaternions in engine
++coordinates, composing each child with its parent. The model-view continuation
++normalizes ABC -Z forward to engine +Z at decode time, including bounds and
++deformation; see [the conversion contract](MODEL_VIEW_CONTRACTS.md). Vertex-deformed nodes decode
+ `byte * scale + translation`, interpolate adjacent frames and apply the node
+ pose. Caleb's coat requires this path; treating its packed coordinates as rigid
+ vertices produces visibly broken geometry.
+@@ -166,3 +168,5 @@ query flags. DTX decoding/rendering and verified retail ray/timing parity remain
+ The [AI visibility continuation](AI_SIGHT_CONTRACTS.md) adds selected original CanSee
+ and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
+ Visibility queries do not implement target selection, AI states or complete M2.
++
++The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.
+diff --git a/docs/MODEL_VIEW_CONTRACTS.md b/docs/MODEL_VIEW_CONTRACTS.md
+new file mode 100644
+index 0000000..62e5c11
+--- /dev/null
++++ b/docs/MODEL_VIEW_CONTRACTS.md
+@@ -0,0 +1,94 @@
++# Animated model presentation
++
++This M2 continuation renders existing ABC objects, held attachments and first-person
++Beretta/knife tracks through SDL_GPU. It adds no NPC class, AI behavior or successful
++missing service. The 17 unsupported SubwayA entries and M2 gate remain unchanged.
++See [implementation evidence](../../Documentation/Implementation/M2_MODEL_VIEW.md).
++
++## Poses and original placement
++
++A frame snapshots checked Alive OT_MODEL records, including inactive and hidden
++records. Visible geometry samples the existing animation index/time, deformation,
++object scale and current object/attachment pose. It never advances animation clocks,
++emits keys, refreshes attachments, integrates physics or invokes game callbacks.
++Pending records disappear immediately; independent held children remain alive until
++the original owner's deferred destructor removes them. Unresolved attachments stay
++listed but do not draw. Missing models/poses and skins retain named diagnostics;
++missing skins use magenta, never another asset with the same basename.
++
++The original client visibility policy hides the local player and attached held
++models in first person, without changing server flags. Scripted views honor the
++existing player/weapon visibility selection. Client weapons retain their owned ABC
++tracks; no fake server HOBJECT is introduced. Selected original
++CViewWeapon::AdjustAngleAndSetPos computes eye + rotated WeaponData offset, including
++left-hand X reflection. Bob inputs remain zero. Muzzle/firing origin, recoil, zoom,
++character-specific skins and full source UpdateGun are not implemented here.
++
++Visual inspection exposed an older ABC reader defect: omitted TransformInfo was
++being treated as explicit zero. Reviewed ABC v6 readers default to inverse node
++rotations. The data boundary now conjugates normalized serialized quaternions when
++that section is absent. Explicit zero keeps rotations unchanged; explicit nonzero
++flags still reject because that optional file variant has not been validated. All samplers,
++node queries and attachments see the same converted poses. Constructed in-memory
++models already use engine quaternions and are unaffected. No world/object quaternion
++convention changes. A nonidentity synthetic file checks both cases and parent/node/
++deformed-vertex composition; the retail Beretta's own static-key bounds independently
++reject the old pose. This is not a claim of complete retail model-rendering parity.
++
++ABC vertices and the Beretta muzzle/hand ordering face -Z, while the existing
++original camera/fire boundary uses +Z. Decode now reflects Z for geometry, normals,
++all bounds, node translations, packed-deformation scale/translation and uses S*R*S
++for node quaternions. This basis conversion is separate from quaternion inversion
++and TransformInfo's winding flag. Metadata is also in engine coordinates; animation
++dimensions stay nonnegative. Root translation is retained, and no per-weapon
++rotation/scale workaround is introduced. Face corner order and UV associations
++remain authored; rendering stays two-sided. Native coordinates must not be mixed
++with the normalized sampler output. Synthetic files encode their intended +Z
++deformation in file -Z, preserving previous engine-space assertions. The private
++Beretta test requires its muzzle to lie ahead of its hand along firing +Z.
++This convention is inferred from real geometry/source firing axes and visually
++checked; exact retail pose/attachment/projection parity remains pending.
++
++## Resources and GPU lifetime
++
++ModelView accepts already validated immutable models from the bounded reader.
++It rebuilds bounded geometry/draw lists each frame, retaining vector capacity
++and exact case-folded skin results until the world revision changes. At most 4,096
++entries, 4,096 named skins, 128 MiB decoded RGBA, 65,536 vertices/200,000 faces per
++model and one million expanded frame vertices (32 MB) are accepted. The shared
++DTX resource helper retains the three-MiB input bound. Cache failures remain visible;
++reload retries them. Invalid geometry/transform/UV or budget failure clears the
++frame and returns failure. Shader/texture/GPU storage is additional bounded memory.
++
++The existing opaque world shader samples authored face UVs and mip-zero nearest
++skins. Dynamic vertices upload each frame through reusable, cycling GPU/staging
++buffers; texture uploads happen only when the skin-cache revision changes. Growing
++the vertex buffer replaces it with a checked allocation. World revision teardown
++clears CPU skins/geometry and GPU buffers/textures; SDL owns deferred GPU release.
++No original object pointers survive snapshot construction.
++
++World models load the depth stored by the DAT pass, so walls occlude them. Close
++weapons preserve color and use a separate cleared depth target with near 0.01,
++far 65,536 and the existing 90-degree horizontal projection. This is replacement
++presentation for the source FLAG_REALLYCLOSE intent, not verified retail projection.
++It cannot overwrite world depth for later world geometry. Resize recreates targets.
++Both paths work with ImGui hidden or compiled out. Current artifacts remain
++Vulkan/SPIR-V only. Lighting, animated normals, alpha/chrome effects, LOD selection,
++sprites, liquids, sky and required client FX remain pending.
++
++## Inspection and evidence
++
++The 3D view panel lists each source model or view weapon, visibility, triangles,
++skin path and decoding/pose/attachment failure, alongside resource counts. Hidden
++PathPoints remain listed; missing NPCs are still unsupported World entries, never
++invented model instances. In SubwayA, the diagnostic third-person snapshot has
++Caleb (941 triangles) and his held Beretta (68); first person has one view weapon
++(878) and hides those two. Seven PathPoint models stay hidden. The private GPU
++Caleb image explicitly overrides presentation visibility for inspection; it does
++not add a production NPC or alter game rules.
++
++GPU pixel checks cover shared-depth front/back occlusion, changing vertex positions
++without texture reload, resize and close-view depth isolation. CPU tests cover
++bounds, pose conventions, exact cached paths, source offsets, read-only clocks,
++hidden/removal state, weapon selection and two unload/re-entry cycles. The normal
++viewport smoke captures a real first-person model with ImGui absent from the image.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 35937fc..a6416bb 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -499,3 +499,21 @@ UV dot products follow the reviewed world surface representation and the donor's
+ resource-manager calculation, evaluated before subtracting the authored pivot.
+ Shader sampling, bounded batches, upload lifetime and tests are new engine code;
+ no gameplay source changed. See [contracts](TEXTURE_CONTRACTS.md).
++
++## M2 animated model presentation
++
++Selected original CViewWeapon::AdjustAngleAndSetPos now places owned client models
++using the original WeaponData offsets and left-hand reflection; bob is explicitly
++zero. The [source ledger](M2_MODEL_VIEW_SOURCES.json) records reviewed ranges/hashes.
++Model snapshotting, bounded skin caching and dynamic SDL_GPU/shared-depth rendering
++are new engine code. The ABC reader now conjugates node quaternions for omitted
++TransformInfo, matching reviewed legacy defaults and independently checked Beretta
++key bounds. Explicit zero/direct and unsupported nonzero flags remain distinct.
++See [contracts](MODEL_VIEW_CONTRACTS.md); no gameplay firing/physics rules changed.
++
++The ABC model basis is normalized from file -Z to runtime +Z at decode time, including
++S*R*S node rotations and deformation. This is inferred from real Beretta muzzle/hand
++geometry and the original fire/camera axes, then checked visually; no pixel-identical
++retail claim. Related [ABC v6 importer](https://github.com/haekb/io_scene_lithtech/blob/master/src/reader_abc_v6_pc.py)
++and [Godot reader](https://github.com/haekb/godot-abc-reader/blob/master/Models/ABC6.gd)
++were reviewed for quaternion inversion and the distinct winding flag; no code was imported.
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index 487fd60..bfeb1fe 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -134,3 +134,5 @@ The [held-model/attachment continuation](ATTACHMENT_CONTRACTS.md) adds original
+ Beretta/knife held children and typed visual attachments. Earlier blanket hand-model
+ and attachment omissions are superseded for this bounded subset. Dropping, physical
+ attachments, client visibility SFX and complete M2 remain unavailable.
++
++The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.
+diff --git a/docs/WORLD_VIEW_CONTRACTS.md b/docs/WORLD_VIEW_CONTRACTS.md
+index 8924a0e..3803262 100644
+--- a/docs/WORLD_VIEW_CONTRACTS.md
++++ b/docs/WORLD_VIEW_CONTRACTS.md
+@@ -93,3 +93,5 @@ rings, projection, invisible/inactive/pending lifetime and private posed geometr
+ No pixel-identical retail comparison, optimization or additional platform is claimed.
+ 
+ The [DTX continuation](TEXTURE_CONTRACTS.md) supersedes the absence of world textures: opaque unlit base colors now render, with named rejection diagnostics and bounded cache ownership. World vertices are now 32 bytes; the three-million-vertex payload limit is 96 MB. Earlier geometry limits, current transforms and the M2 gate remain unchanged.
++
++The [animated model continuation](MODEL_VIEW_CONTRACTS.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 7f89f85..8918aa0 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -379,7 +379,7 @@ namespace OpenBlood2
+                                        "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
+                                        "the player in Session first, or launch --view-world.");
+                     ImGui::TextWrapped(
+-                        "Opaque textures are unlit. Lightmaps, models, sprites, liquid surfaces, "
++                        "Opaque textures/models are unlit. Lightmaps, sprites, liquid surfaces, "
+                         "transparency and sky rendering remain unavailable. Unsupported objects stay in World.");
+                     if (world_mesh && world_render)
+                     {
+@@ -418,6 +418,24 @@ namespace OpenBlood2
+                                     game.client_shell.view.position.x, game.client_shell.view.position.y,
+                                     game.client_shell.view.position.z);
+                     }
++                    if (model_view)
++                    {
++                        ImGui::Text("Model snapshot: %zu world / %zu close draws / %zu vertices / %zu skin bytes",
++                                    model_view->world_draws.size(), model_view->close_draws.size(),
++                                    model_view->mesh.vertices.size(), model_view->mesh.texture_bytes);
++                        ImGui::TextWrapped(
++                            "Current ABC poses; first-person body/held children follow local camera visibility. "
++                            "View weapons use original offsets with zero bob; no lighting, chrome or muzzle FX.");
++                        if (ImGui::TreeNode("Model visibility and skin diagnostics"))
++                        {
++                            for (const auto& entry : model_view->entries)
++                                ImGui::TextWrapped("%s: %s, %zu triangles, skin %s%s%s", entry.label.c_str(),
++                                                   entry.visible ? "visible" : "hidden", entry.triangles,
++                                                   entry.skin.c_str(), entry.error.empty() ? "" : " / ",
++                                                   entry.error.c_str());
++                            ImGui::TreePop();
++                        }
++                    }
+                     ImGui::EndTabItem();
+                 }
+                 if ((!game.resources.mounts().empty()) && ImGui::BeginTabItem("World"))
+@@ -489,7 +507,7 @@ namespace OpenBlood2
+                                     static_cast<unsigned>(state.m_ObjectType), state.m_Flags, object->activity,
+                                     game.objects.link_count(object->handle));
+                         if (state.m_Filename[0] || state.m_SkinName[0])
+-                            ImGui::TextWrapped("Model: %s / Skin (not decoded): %s", state.m_Filename,
++                            ImGui::TextWrapped("Model: %s / Skin (decode status in 3D view): %s", state.m_Filename,
+                                                state.m_SkinName);
+                         if (object->model)
+                             ImGui::Text("Decoded ABC: %zu nodes / %zu animations; clip %u at %.1f ms",
+@@ -1033,7 +1051,7 @@ namespace OpenBlood2
+                         player->m_InventoryMgr.GetAmmoCount(1));
+             ImGui::Text("Strength %u | Speed %u | Resistance %u | Magic %u", player->m_nAttribStrength,
+                         player->m_nAttribSpeed, player->m_nAttribResistance, player->m_nAttribMagic);
+-            ImGui::TextWrapped("Model: %s | Skin: %s (indexed, not decoded)", record->state.m_Filename,
++            ImGui::TextWrapped("Model: %s | Skin: %s (decode status in 3D view)", record->state.m_Filename,
+                                record->state.m_SkinName);
+             ImGui::TextWrapped("Requested slot 1: %u. Current slot: %u. Original inventory owns the Beretta/knife; "
+                                "inspect their use in Weapons. Muzzle light exists but is not rendered.",
+@@ -1293,8 +1311,8 @@ namespace OpenBlood2
+                 }
+                 draw->PopClipRect();
+             }
+-            ImGui::TextWrapped(
+-                "Native coordinates; skeletal and vertex animation. Wireframe preview; skin is not decoded.");
++            ImGui::TextWrapped("Engine +Z forward; skeletal and vertex animation. Wireframe preview; skin decode "
++                               "status is in 3D view.");
+             ImGui::TableNextColumn();
+             if (ImGui::BeginChild("Animation keys", ImVec2(0, 300)))
+             {
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 1e0ce3b..ef1c4ad 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ 
+ #include "engine/config.h"
++#include "engine/model_view.h"
+ #include "engine/runtime.h"
+ #include "engine/world_view.h"
+ #include "game/server_adapter.h"
+@@ -12,6 +13,7 @@ namespace OpenBlood2
+     {
+         Runtime& runtime;
+         const WorldMesh* world_mesh = nullptr;
++        const ModelView* model_view = nullptr;
+         const WorldViewStats* world_render = nullptr;
+         bool context = false;
+         bool platform = false;
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index a1acef0..ff8bbfa 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -1,4 +1,5 @@
+ #include "ai_model_key_smoke.h"
++#include "app/model_scene.h"
+ #include "app/movement_controls.h"
+ #include "brush_smoke.h"
+ #include "build_info.h"
+@@ -276,13 +277,17 @@ namespace
+         const bool smoke = options.gpu_smoke || options.world_smoke;
+         bool inspector_visible = BLOOD2_INSPECTOR && options.inspector && !options.view_world;
+         OpenBlood2::WorldMesh world_mesh;
+-        OpenBlood2::WorldRenderer world_renderer(runtime.gpu);
++        OpenBlood2::WorldRenderer world_renderer(runtime.gpu), model_renderer(runtime.gpu);
++        OpenBlood2::ModelView model_scene;
++        bool models_hidden = false, close_weapon_hidden = false;
++        std::uint64_t model_frames = 0;
+         std::vector<OpenBlood2::WorldDraw> world_draws;
+         std::uint64_t mesh_revision = UINT64_MAX;
+         bool viewport_hidden = false, viewport_reloaded = false, viewport_unloaded = false;
+ #if BLOOD2_INSPECTOR
+         OpenBlood2::Inspector inspector(runtime);
+         inspector.world_mesh = &world_mesh;
++        inspector.model_view = &model_scene;
+         inspector.world_render = &world_renderer.stats;
+         inspector.select_models =
+             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
+@@ -577,6 +582,8 @@ namespace
+             if (mesh_revision != game.world_revision)
+             {
+                 world_renderer.clear_geometry();
++                model_renderer.clear_geometry();
++                model_scene.clear();
+                 world_mesh = {};
+                 world_draws.clear();
+                 if (!game.world_path.empty() && !world_mesh.build(game.world, error, &game.resources))
+@@ -595,6 +602,12 @@ namespace
+                 return 5;
+             }
+ 
++            if (!OpenBlood2::update_model_scene(game, model_scene, error))
++            {
++                spdlog::error("Model presentation: {}", error);
++                return 5;
++            }
++
+             if (options.world_smoke && frames >= unload_frame && game.world_path.empty() &&
+                 game.server.string_count() == 0)
+                 world_unloaded = true;
+@@ -637,6 +650,12 @@ namespace
+                                ? 14u
+                                : 2u) &&
+                 !captured && !options.capture_file.empty();
++            if (capture_frame && options.viewport_smoke)
++                for (const auto& weapon : game.client_shell.weapons)
++                    if (weapon.model && weapon.animation.animation < weapon.model->animations.size())
++                        spdlog::info("Captured view weapon: clip={}, time={}ms, state={}",
++                                     weapon.model->animations[weapon.animation.animation].name, weapon.animation.time,
++                                     static_cast<unsigned>(weapon.state));
+             if (capture_frame &&
+                 !capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
+                                     height))
+@@ -661,6 +680,25 @@ namespace
+                         SDL_SubmitGPUCommandBuffer(commands);
+                         return 3;
+                     }
++                    if (!model_renderer.prepare(model_scene.mesh, model_scene.revision,
++                                                SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
++                                                height, error, true) ||
++                        !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
++                                             model_scene.world_draws, view.position, view.rotation,
++                                             view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Load,
++                                             world_renderer.depth_target()) ||
++                        (!model_scene.close_draws.empty() &&
++                         !model_renderer.draw(commands, capture_frame ? capture.texture : swapchain, model_scene.mesh,
++                                              model_scene.close_draws, view.position, view.rotation, false, error,
++                                              OpenBlood2::DrawLoad::ClearDepth)))
++                    {
++                        spdlog::error("Model viewport: {}", error);
++                        SDL_SubmitGPUCommandBuffer(commands);
++                        return 3;
++                    }
++                    ++model_frames;
++                    models_hidden |= !inspector_visible && !model_scene.world_draws.empty();
++                    close_weapon_hidden |= !inspector_visible && !model_scene.close_draws.empty();
+                     viewport_hidden |= !inspector_visible && world_renderer.stats.triangles > 0;
+                     viewport_reloaded |=
+                         viewport_unloaded && world_renderer.stats.uploads >= 2 && world_renderer.stats.triangles > 0;
+@@ -1039,6 +1077,13 @@ namespace
+                              viewport_hidden, viewport_unloaded, viewport_reloaded, world_renderer.stats.uploads,
+                              world_renderer.stats.frames, world_renderer.stats.triangles, world_renderer.stats.draws,
+                              world_renderer.width(), world_renderer.height());
++                spdlog::info(
++                    "Model viewport: frames={}, world hidden={}, weapon hidden={}, instances={}, close={}, vertices={}",
++                    model_frames, models_hidden, close_weapon_hidden, model_scene.world_draws.size(),
++                    model_scene.close_draws.size(), model_scene.mesh.vertices.size());
++                if (!close_weapon_hidden || !model_scene.world_draws.empty() ||
++                    model_frames != world_renderer.stats.frames)
++                    return 4;
+                 std::size_t decoded = 0, missing = 0;
+                 for (std::size_t i = 1; i < world_mesh.materials.size(); ++i)
+                     world_mesh.materials[i].error.empty() ? ++decoded : ++missing;
+diff --git a/src/app/model_scene.cpp b/src/app/model_scene.cpp
+new file mode 100644
+index 0000000..c3e255d
+--- /dev/null
++++ b/src/app/model_scene.cpp
+@@ -0,0 +1,60 @@
++#include "app/model_scene.h"
++namespace OpenBlood2
++{
++    bool update_model_scene(GameSession& game, ModelView& scene, std::string& error)
++    {
++        scene.begin_frame();
++        auto& client = game.client_shell;
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* record = game.objects.get(id);
++            if (!record || record->life != Life::Alive || record->state.m_ObjectType != OT_MODEL)
++                continue;
++            bool visible = (record->state.m_Flags & FLAG_VISIBLE) != 0;
++            bool unresolved = false;
++            if (record->attachment)
++            {
++                const auto relation = game.objects.attachments().find(record->attachment);
++                unresolved = relation == game.objects.attachments().end() || !relation->second.resolved;
++                if (unresolved)
++                    visible = false;
++            }
++            if (!client.player_visible)
++            {
++                if (record->handle == client.player)
++                    visible = false;
++                if (record->attachment)
++                {
++                    const auto relation = game.objects.attachments().find(record->attachment);
++                    if (relation != game.objects.attachments().end() && relation->second.parent == client.player)
++                        visible = false;
++                }
++            }
++            if (!scene.add(record->model.get(), record->animation, record->state.m_SkinName,
++                           {record->state.m_Pos, record->state.m_Rotation}, record->state.m_Scale, visible, false, id,
++                           record->state.m_Filename, game.resources, error))
++                return false;
++            if (unresolved)
++                scene.entries.back().error = "Unresolved attachment pose";
++        }
++        const auto* owner = game.server_shell.Player(game.local_client);
++        for (const auto& weapon : client.weapons)
++        {
++            if (!weapon.model)
++                continue;
++            const auto* definition = weapon_definition(weapon.type);
++            NodePose pose;
++            if (!definition ||
++                !weapon.AdjustAngleAndSetPos(client.rotation.pitch, client.rotation.yaw, client.camera_position, pose))
++            {
++                error = "Original view-weapon placement failed";
++                return false;
++            }
++            if (!scene.add(weapon.model.get(), weapon.animation, definition->m_szViewModelSkin, pose, {1, 1, 1},
++                           owner && !owner->m_damage.IsDead() && client.weapons_visible, true, {},
++                           weapon.left ? "left view weapon" : "right view weapon", game.resources, error))
++                return false;
++        }
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/model_scene.h b/src/app/model_scene.h
+new file mode 100644
+index 0000000..af41907
+--- /dev/null
++++ b/src/app/model_scene.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include "engine/model_view.h"
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool update_model_scene(GameSession&, ModelView&, std::string&);
++}
+diff --git a/src/engine/model.cpp b/src/engine/model.cpp
+index cbfde2d..ded86b2 100644
+--- a/src/engine/model.cpp
++++ b/src/engine/model.cpp
+@@ -109,12 +109,16 @@ namespace OpenBlood2
+         model.command = header.string();
+         if (!end(header))
+             return fail("invalid header");
++        // Legacy v6 exports omit TransformInfo and store inverse node rotations.
++        // Convert once at the data boundary; all runtime poses use engine rotations.
++        bool conjugate_animation = true;
+         if (sections.contains("TransformInfo"))
+         {
+             Reader r(sections.at("TransformInfo"));
+             const auto geometry = r.u32(), animation = r.u32();
+             if (!end(r) || geometry || animation)
+                 return fail("unsupported nonzero transform flags");
++            conjugate_animation = false;
+         }
+         Reader g(sections.at("Geometry"));
+         model.min = g.vec();
+@@ -268,6 +272,8 @@ namespace OpenBlood2
+                     const double length = std::sqrt(norm);
+                     p.rotation = {{float(q.m_Vec.x / length), float(q.m_Vec.y / length), float(q.m_Vec.z / length)},
+                                   float(q.m_Spin / length)};
++                    if (conjugate_animation)
++                        p.rotation.m_Vec = mul(p.rotation.m_Vec, -1);
+                     na.frames.push_back(p);
+                 }
+                 auto size = static_cast<std::size_t>(frames) * node.deformed_vertices.size() * 3;
+@@ -295,6 +301,44 @@ namespace OpenBlood2
+         }
+         if (!end(d))
+             return fail("invalid animation dimensions");
++        // ABC model space faces -Z; engine object/camera space faces +Z.
++        // Reflect every spatial field once, including S*R*S for node rotations.
++        // Keeping this at the reader boundary makes rendering, node queries and
++        // attached children agree; it is independent of TransformInfo's flags.
++        auto reflect = [](DVector& v) { v.z = -v.z; };
++        auto reflect_bounds = [](DVector& lo, DVector& hi)
++        {
++            const float z = lo.z;
++            lo.z = -hi.z;
++            hi.z = -z;
++        };
++        reflect_bounds(model.min, model.max);
++        for (auto& vertex : model.vertices)
++        {
++            reflect(vertex.position);
++            reflect(vertex.normal);
++        }
++        for (auto& face : model.faces)
++            reflect(face.normal);
++        for (auto& node : model.nodes)
++            reflect_bounds(node.min, node.max);
++        for (auto& animation : model.animations)
++        {
++            reflect_bounds(animation.min, animation.max);
++            for (auto& key : animation.keys)
++                reflect_bounds(key.min, key.max);
++            for (auto& node : animation.nodes)
++            {
++                reflect(node.scale);
++                reflect(node.translation);
++                for (auto& pose : node.frames)
++                {
++                    reflect(pose.position);
++                    pose.rotation.m_Vec.x = -pose.rotation.m_Vec.x;
++                    pose.rotation.m_Vec.y = -pose.rotation.m_Vec.y;
++                }
++            }
++        }
+         out = std::move(model);
+         return true;
+     }
+diff --git a/src/engine/model.h b/src/engine/model.h
+index 9d055c9..9324d98 100644
+--- a/src/engine/model.h
++++ b/src/engine/model.h
+@@ -56,6 +56,8 @@ namespace OpenBlood2
+     };
+     struct Model
+     {
++        // Spatial fields are normalized to engine +Z forward by read_model.
++        // Synthetic in-memory models use this same basis directly.
+         std::string command;
+         DVector min, max;
+         std::uint32_t main_vertices = 0;
+diff --git a/src/engine/model_view.cpp b/src/engine/model_view.cpp
+new file mode 100644
+index 0000000..3cf4d9c
+--- /dev/null
++++ b/src/engine/model_view.cpp
+@@ -0,0 +1,123 @@
++#include "engine/model_view.h"
++#include "engine/collision.h"
++#include <cmath>
++namespace OpenBlood2
++{
++    void ModelView::clear()
++    {
++        mesh = {};
++        mesh.materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}});
++        mesh.texture_bytes = 4;
++        materials_.clear();
++        sampled_.clear();
++        begin_frame();
++        ++revision;
++    }
++    void ModelView::begin_frame()
++    {
++        mesh.vertices.clear();
++        mesh.ranges.clear();
++        world_draws.clear();
++        close_draws.clear();
++        entries.clear();
++    }
++    bool ModelView::add(const Model* model, const AnimationTrack& track, std::string_view skin, NodePose pose,
++                        DVector scale, bool visible, bool close, ObjectId object, std::string_view label,
++                        const Resources& resources, std::string& error)
++    {
++        error.clear();
++        auto fail = [&](const char* reason)
++        {
++            error = reason;
++            begin_frame();
++            return false;
++        };
++        if (entries.size() >= 4096)
++        {
++            return fail("Model instance budget exceeded");
++        }
++        entries.push_back({object, std::string(label), std::string(skin), {}, visible, close, 0});
++        auto& entry = entries.back();
++        if (!model)
++        {
++            entry.error = "Model is missing or not decoded";
++            return true;
++        }
++        std::uint32_t material = 0;
++        std::string key;
++        if (!resource_path(skin, key))
++            entry.error = "Missing or invalid skin path";
++        else
++        {
++            auto found = materials_.find(key);
++            if (found == materials_.end())
++            {
++                if (mesh.materials.size() >= 4097)
++                {
++                    return fail("Model material count budget exceeded");
++                }
++                WorldMaterial next;
++                next.path = key;
++                read_texture_resource(resources, key, next.image, next.error);
++                if (next.image.rgba.size() > 128 * 1024 * 1024 - mesh.texture_bytes)
++                {
++                    return fail("Model texture memory budget exceeded");
++                }
++                mesh.texture_bytes += next.image.rgba.size();
++                auto index = static_cast<std::uint32_t>(mesh.materials.size());
++                mesh.materials.push_back(std::move(next));
++                found = materials_.emplace(key, index).first;
++                ++revision;
++            }
++            entry.error = mesh.materials[found->second].error;
++            if (entry.error.empty())
++                material = found->second;
++        }
++        if (!visible)
++            return true;
++        if (!physics_vector(scale) || scale.x <= 0 || scale.y <= 0 || scale.z <= 0 || model->vertices.size() > 65536 ||
++            model->faces.size() > 200000 || model->faces.size() * 3 > 1000000 - mesh.vertices.size())
++        {
++            return fail("Invalid model scale/geometry budget");
++        }
++        WorldDraw draw{static_cast<std::uint32_t>(mesh.ranges.size()), pose.position, pose.rotation};
++        WorldViewUniform uniform;
++        if (!world_view_uniform({}, {}, 1, draw, uniform))
++        {
++            return fail("Invalid model presentation transform");
++        }
++        if (!sample_vertices(*model, track.animation, track.time, sampled_))
++        {
++            entry.error = "Model animation pose is unavailable";
++            return true;
++        }
++        WorldRange range;
++        range.first = static_cast<std::uint32_t>(mesh.vertices.size());
++        range.name = entry.label;
++        const DVector color = material ? DVector{1, 1, 1} : DVector{1, 0, 1};
++        for (const auto& face : model->faces)
++            for (unsigned corner = 0; corner < 3; ++corner)
++            {
++                if (face.vertices[corner] >= sampled_.size())
++                {
++                    return fail("Invalid model face index");
++                }
++                const auto p = sampled_[face.vertices[corner]];
++                const DVector scaled{p.x * scale.x, p.y * scale.y, p.z * scale.z};
++                const auto uv = face.uv[corner];
++                if (!physics_vector(scaled) || !std::isfinite(uv[0]) || !std::isfinite(uv[1]) ||
++                    std::abs(uv[0]) > 1e6f || std::abs(uv[1]) > 1e6f)
++                {
++                    return fail("Invalid model vertex/UV");
++                }
++                mesh.vertices.push_back({scaled, color, uv});
++            }
++        range.count = static_cast<std::uint32_t>(mesh.vertices.size()) - range.first;
++        range.batches.push_back({range.first, range.count, material});
++        entry.triangles = range.count / 3;
++        entry.range = draw.range;
++        mesh.ranges.push_back(std::move(range));
++        (close ? close_draws : world_draws).push_back(draw);
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/model_view.h b/src/engine/model_view.h
+new file mode 100644
+index 0000000..31ef18a
+--- /dev/null
++++ b/src/engine/model_view.h
+@@ -0,0 +1,34 @@
++#pragma once
++#include "engine/world_view.h"
++namespace OpenBlood2
++{
++    struct ModelViewEntry
++    {
++        ObjectId object;
++        std::string label, skin, error;
++        bool visible = false, close = false;
++        std::size_t triangles = 0;
++        std::uint32_t range = UINT32_MAX;
++    };
++    // Presentation-only snapshot. No original object pointer survives add().
++    class ModelView
++    {
++      public:
++        ModelView()
++        {
++            clear();
++        }
++        void clear();
++        void begin_frame();
++        bool add(const Model*, const AnimationTrack&, std::string_view skin, NodePose, DVector scale, bool visible,
++                 bool close, ObjectId, std::string_view label, const Resources&, std::string&);
++        WorldMesh mesh;
++        std::vector<WorldDraw> world_draws, close_draws;
++        std::vector<ModelViewEntry> entries;
++        std::uint64_t revision = 0;
++
++      private:
++        std::map<std::string, std::uint32_t> materials_;
++        std::vector<DVector> sampled_;
++    };
++} // namespace OpenBlood2
+diff --git a/src/engine/texture.cpp b/src/engine/texture.cpp
+index aebad7a..0e7d114 100644
+--- a/src/engine/texture.cpp
++++ b/src/engine/texture.cpp
+@@ -1,10 +1,28 @@
+ #include "engine/texture.h"
+ #include "engine/formats/reader.h"
++#include "engine/resources.h"
+ #include <algorithm>
+ #include <bit>
+ 
+ namespace OpenBlood2
+ {
++    bool read_texture_resource(const Resources& resources, std::string_view path, Texture& out, std::string& error)
++    {
++        out = {};
++        const auto* resource = resources.find(path);
++        if (!resource)
++        {
++            error = "Missing exact-path resource";
++            return false;
++        }
++        if (resource->size > 3 * 1024 * 1024)
++        {
++            error = "DTX resource exceeds byte limit";
++            return false;
++        }
++        std::vector<std::uint8_t> bytes;
++        return resources.read(path, bytes, error) && read_texture(bytes, out, error);
++    }
+     bool read_texture(std::span<const std::uint8_t> bytes, Texture& out, std::string& error)
+     {
+         out = {};
+diff --git a/src/engine/texture.h b/src/engine/texture.h
+index 0041165..1e2cce3 100644
+--- a/src/engine/texture.h
++++ b/src/engine/texture.h
+@@ -6,6 +6,7 @@
+ 
+ namespace OpenBlood2
+ {
++    class Resources;
+     struct Texture
+     {
+         std::uint32_t width = 0, height = 0, mipmaps = 0, flags = 0, user_flags = 0;
+@@ -14,4 +15,5 @@ namespace OpenBlood2
+     // Blood II DTX -2 only; validates all stored mip/alpha bytes, decodes mip zero.
+     // Empty output on failure. Later DTX generations and shared palettes are rejected.
+     bool read_texture(std::span<const std::uint8_t>, Texture&, std::string&);
++    bool read_texture_resource(const Resources&, std::string_view, Texture&, std::string&);
+ } // namespace OpenBlood2
+diff --git a/src/engine/world_renderer.cpp b/src/engine/world_renderer.cpp
+index c58ee29..bccf5e6 100644
+--- a/src/engine/world_renderer.cpp
++++ b/src/engine/world_renderer.cpp
+@@ -20,6 +20,10 @@ namespace OpenBlood2
+         if (vertices_)
+             SDL_ReleaseGPUBuffer(device_, vertices_);
+         vertices_ = nullptr;
++        if (vertex_transfer_)
++            SDL_ReleaseGPUTransferBuffer(device_, vertex_transfer_);
++        vertex_transfer_ = nullptr;
++        vertex_capacity_ = 0;
+         for (auto* texture : textures_)
+             if (texture)
+                 SDL_ReleaseGPUTexture(device_, texture);
+@@ -103,7 +107,7 @@ namespace OpenBlood2
+         return true;
+     }
+     bool WorldRenderer::prepare(const WorldMesh& mesh, std::uint64_t revision, SDL_GPUTextureFormat format,
+-                                Uint32 width, Uint32 height, std::string& error)
++                                Uint32 width, Uint32 height, std::string& error, bool dynamic)
+     {
+         error.clear();
+         if (!width || !height || width > 8192 || height > 8192 || mesh.vertices.size() > 3000000)
+@@ -136,58 +140,74 @@ namespace OpenBlood2
+             height_ = height;
+         }
+         if (revision_ == revision)
+-            return true;
++            return !dynamic || upload_vertices(mesh, error);
+         clear_geometry();
+-        if (mesh.vertices.empty())
++        if (!upload_vertices(mesh, error))
++            return false;
++        if (!upload_materials(mesh, error))
+         {
+-            revision_ = revision;
+-            return true;
++            clear_geometry();
++            return false;
++        }
++        revision_ = revision;
++        ++stats.uploads;
++        return true;
++    }
++    bool WorldRenderer::upload_vertices(const WorldMesh& mesh, std::string& error)
++    {
++        if (mesh.vertices.size() > 3000000)
++        {
++            error = "GPU vertex budget exceeded";
++            return false;
+         }
+         const auto bytes = static_cast<Uint32>(mesh.vertices.size() * sizeof(WorldVertex));
+-        SDL_GPUBufferCreateInfo info{SDL_GPU_BUFFERUSAGE_VERTEX, bytes, 0};
+-        auto* next = SDL_CreateGPUBuffer(device_, &info);
+-        SDL_GPUTransferBufferCreateInfo transfer_info{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, bytes, 0};
+-        auto* transfer = SDL_CreateGPUTransferBuffer(device_, &transfer_info);
++        if (!bytes)
++            return true;
++        if (bytes > vertex_capacity_)
++        {
++            SDL_GPUBufferCreateInfo info{SDL_GPU_BUFFERUSAGE_VERTEX, bytes, 0};
++            auto* next = SDL_CreateGPUBuffer(device_, &info);
++            SDL_GPUTransferBufferCreateInfo transfer_info{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, bytes, 0};
++            auto* transfer = SDL_CreateGPUTransferBuffer(device_, &transfer_info);
++            if (!next || !transfer)
++            {
++                if (next)
++                    SDL_ReleaseGPUBuffer(device_, next);
++                if (transfer)
++                    SDL_ReleaseGPUTransferBuffer(device_, transfer);
++                error = SDL_GetError();
++                return false;
++            }
++            if (vertices_)
++                SDL_ReleaseGPUBuffer(device_, vertices_);
++            if (vertex_transfer_)
++                SDL_ReleaseGPUTransferBuffer(device_, vertex_transfer_);
++            vertices_ = next;
++            vertex_transfer_ = transfer;
++            vertex_capacity_ = bytes;
++        }
+         bool success = false;
+-        if (next && transfer)
++        if (auto* data = SDL_MapGPUTransferBuffer(device_, vertex_transfer_, true))
+         {
+-            if (auto* data = SDL_MapGPUTransferBuffer(device_, transfer, false))
++            std::memcpy(data, mesh.vertices.data(), bytes);
++            SDL_UnmapGPUTransferBuffer(device_, vertex_transfer_);
++            if (auto* commands = SDL_AcquireGPUCommandBuffer(device_))
+             {
+-                std::memcpy(data, mesh.vertices.data(), bytes);
+-                SDL_UnmapGPUTransferBuffer(device_, transfer);
+-                if (auto* commands = SDL_AcquireGPUCommandBuffer(device_))
++                if (auto* copy = SDL_BeginGPUCopyPass(commands))
+                 {
+-                    if (auto* copy = SDL_BeginGPUCopyPass(commands))
+-                    {
+-                        SDL_GPUTransferBufferLocation source{transfer, 0};
+-                        SDL_GPUBufferRegion target{next, 0, bytes};
+-                        SDL_UploadToGPUBuffer(copy, &source, &target, false);
+-                        SDL_EndGPUCopyPass(copy);
+-                        success = SDL_SubmitGPUCommandBuffer(commands);
+-                    }
+-                    else
+-                        SDL_CancelGPUCommandBuffer(commands);
++                    SDL_GPUTransferBufferLocation source{vertex_transfer_, 0};
++                    SDL_GPUBufferRegion target{vertices_, 0, bytes};
++                    SDL_UploadToGPUBuffer(copy, &source, &target, true);
++                    SDL_EndGPUCopyPass(copy);
++                    success = SDL_SubmitGPUCommandBuffer(commands);
+                 }
++                else
++                    SDL_CancelGPUCommandBuffer(commands);
+             }
+         }
+-        if (transfer)
+-            SDL_ReleaseGPUTransferBuffer(device_, transfer);
+         if (!success)
+-        {
+             error = SDL_GetError();
+-            if (next)
+-                SDL_ReleaseGPUBuffer(device_, next);
+-            return false;
+-        }
+-        vertices_ = next;
+-        if (!upload_materials(mesh, error))
+-        {
+-            clear_geometry();
+-            return false;
+-        }
+-        revision_ = revision;
+-        ++stats.uploads;
+-        return true;
++        return success;
+     }
+     bool WorldRenderer::upload_materials(const WorldMesh& mesh, std::string& error)
+     {
+@@ -309,7 +329,7 @@ namespace OpenBlood2
+     }
+     bool WorldRenderer::draw(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target, const WorldMesh& mesh,
+                              std::span<const WorldDraw> draws, DVector eye, DRotation view, bool letterbox,
+-                             std::string& error)
++                             std::string& error, DrawLoad load, SDL_GPUTexture* shared_depth)
+     {
+         if (!pipeline_ || !depth_ || (!vertices_ && !mesh.vertices.empty()))
+         {
+@@ -350,16 +370,16 @@ namespace OpenBlood2
+         SDL_GPUColorTargetInfo color{};
+         color.texture = target;
+         color.clear_color = {.025f, .035f, .05f, 1};
+-        color.load_op = SDL_GPU_LOADOP_CLEAR;
++        color.load_op = load == DrawLoad::Clear ? SDL_GPU_LOADOP_CLEAR : SDL_GPU_LOADOP_LOAD;
+         color.store_op = SDL_GPU_STOREOP_STORE;
+         SDL_GPUDepthStencilTargetInfo depth{};
+-        depth.texture = depth_;
++        depth.texture = shared_depth ? shared_depth : depth_;
+         depth.clear_depth = 1;
+-        depth.load_op = SDL_GPU_LOADOP_CLEAR;
+-        depth.store_op = SDL_GPU_STOREOP_DONT_CARE;
++        depth.load_op = load == DrawLoad::Load ? SDL_GPU_LOADOP_LOAD : SDL_GPU_LOADOP_CLEAR;
++        depth.store_op = SDL_GPU_STOREOP_STORE;
+         depth.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
+         depth.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
+-        depth.cycle = true;
++        depth.cycle = load != DrawLoad::Load;
+         auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
+         if (!pass)
+         {
+@@ -379,6 +399,12 @@ namespace OpenBlood2
+                 if (!r.count)
+                     continue;
+                 world_view_uniform(eye, view, aspect, d, uniform);
++                if (load == DrawLoad::ClearDepth)
++                {
++                    constexpr float near = .01f, far = 65536;
++                    uniform.projection[2] = far / (far - near);
++                    uniform.projection[3] = -near * far / (far - near);
++                }
+                 SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
+                 auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material)
+                 {
+diff --git a/src/engine/world_renderer.h b/src/engine/world_renderer.h
+index d733d76..a66b5f8 100644
+--- a/src/engine/world_renderer.h
++++ b/src/engine/world_renderer.h
+@@ -4,6 +4,12 @@
+ 
+ namespace OpenBlood2
+ {
++    enum class DrawLoad
++    {
++        Clear,
++        Load,
++        ClearDepth
++    };
+     class WorldRenderer
+     {
+       public:
+@@ -12,9 +18,14 @@ namespace OpenBlood2
+         WorldRenderer(const WorldRenderer&) = delete;
+         WorldRenderer& operator=(const WorldRenderer&) = delete;
+         bool prepare(const WorldMesh&, std::uint64_t revision, SDL_GPUTextureFormat, Uint32 width, Uint32 height,
+-                     std::string& error);
++                     std::string& error, bool dynamic = false);
+         bool draw(SDL_GPUCommandBuffer*, SDL_GPUTexture*, const WorldMesh&, std::span<const WorldDraw>, DVector eye,
+-                  DRotation view, bool letterbox, std::string& error);
++                  DRotation view, bool letterbox, std::string& error, DrawLoad = DrawLoad::Clear,
++                  SDL_GPUTexture* shared_depth = nullptr);
++        SDL_GPUTexture* depth_target() const
++        {
++            return depth_;
++        }
+         void clear_geometry();
+         WorldViewStats stats;
+         Uint32 width() const
+@@ -30,6 +41,9 @@ namespace OpenBlood2
+         SDL_GPUDevice* device_ = nullptr;
+         SDL_GPUGraphicsPipeline* pipeline_ = nullptr;
+         SDL_GPUBuffer* vertices_ = nullptr;
++        SDL_GPUTransferBuffer* vertex_transfer_ = nullptr;
++        Uint32 vertex_capacity_ = 0;
++        bool upload_vertices(const WorldMesh&, std::string&);
+         SDL_GPUTexture* depth_ = nullptr;
+         std::vector<SDL_GPUTexture*> textures_;
+         SDL_GPUSampler* sampler_ = nullptr;
+diff --git a/src/engine/world_view.cpp b/src/engine/world_view.cpp
+index 5c8d036..21f1139 100644
+--- a/src/engine/world_view.cpp
++++ b/src/engine/world_view.cpp
+@@ -93,14 +93,7 @@ namespace OpenBlood2
+                             return fail("World texture count budget exceeded");
+                         WorldMaterial entry;
+                         entry.path = key;
+-                        const auto* resource = resources->find(key);
+-                        std::vector<std::uint8_t> bytes;
+-                        if (!resource)
+-                            entry.error = "Missing exact-path resource";
+-                        else if (resource->size > 3 * 1024 * 1024)
+-                            entry.error = "DTX resource exceeds byte limit";
+-                        else if (resources->read(key, bytes, entry.error))
+-                            read_texture(bytes, entry.image, entry.error);
++                        read_texture_resource(*resources, key, entry.image, entry.error);
+                         if (entry.image.rgba.size() > 128 * 1024 * 1024 - texture_bytes)
+                             return fail("World texture memory budget exceeded");
+                         texture_bytes += entry.image.rgba.size();
+diff --git a/src/game/original/ViewWeapon.cpp b/src/game/original/ViewWeapon.cpp
+index f0f9732..1eec2a8 100644
+--- a/src/game/original/ViewWeapon.cpp
++++ b/src/game/original/ViewWeapon.cpp
+@@ -2,8 +2,21 @@
+ #include "BloodShells.h"
+ #include "engine/collision.h"
+ #include "engine/model_commands.h"
++#include <cmath>
+ 
+ using namespace OpenBlood2;
++bool CViewWeapon::AdjustAngleAndSetPos(float pitch, float yaw, DVector eye, NodePose& out) const
++{
++    out = {};
++    const auto* data = weapon_definition(type);
++    if (!model || !data || !std::isfinite(pitch) || !std::isfinite(yaw) || !physics_vector(eye))
++        return false;
++    out.rotation = rotation_from_euler({pitch, yaw, 0});
++    const DVector offset{left ? -data->m_vViewModelOffset.x : data->m_vViewModelOffset.x, data->m_vViewModelOffset.y,
++                         data->m_vViewModelOffset.z};
++    out.position = vector_add(eye, rotate_vector(out.rotation, offset));
++    return physics_vector(out.position);
++}
+ bool CViewWeapon::Create(DBYTE weapon, bool left_hand, ModelStore& models, Resources& resources, std::string& error)
+ {
+     const auto* definition = weapon_definition(weapon);
+diff --git a/src/game/original/ViewWeapon.h b/src/game/original/ViewWeapon.h
+index 237d1fe..923a56c 100644
+--- a/src/game/original/ViewWeapon.h
++++ b/src/game/original/ViewWeapon.h
+@@ -20,6 +20,8 @@ class CViewWeapon
+     bool Create(DBYTE, bool, OpenBlood2::ModelStore&, OpenBlood2::Resources&, std::string&);
+     bool Update(ServerDE&, CBloodServerShell&, HCLIENT, const OpenBlood2::WeaponInput&, DVector, DVector, double,
+                 std::string&);
++    // Selected original placement, with the unimplemented bob inputs held at zero.
++    bool AdjustAngleAndSetPos(float pitch, float yaw, DVector eye, OpenBlood2::NodePose&) const;
+     DBYTE type = 0;
+     bool left = false;
+     std::shared_ptr<const OpenBlood2::Model> model;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 246e377..bd4e58f 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -622,3 +622,27 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME texture.corpus COMMAND texture_tests corpus "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(texture.corpus PROPERTIES LABELS "headless;private;texture" TIMEOUT 90)
+ endif()
++
++add_executable(model_view_tests model_view_tests.cpp ../src/app/model_scene.cpp)
++target_link_libraries(model_view_tests PRIVATE blood2_game)
++blood2_project_options(model_view_tests)
++foreach(case IN ITEMS sample rejects weapon_pose legacy_pose)
++    add_test(NAME model_view.${case} COMMAND model_view_tests "${case}")
++    set_tests_properties(model_view.${case} PROPERTIES LABELS "headless;model_view" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME model_view.subway COMMAND model_view_tests subway "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(model_view.subway PROPERTIES LABELS "headless;private;model_view" TIMEOUT 90)
++endif()
++if(BLOOD2_GPU_TESTS)
++    add_executable(model_gpu_tests model_gpu_tests.cpp ../src/app/model_scene.cpp)
++    target_link_libraries(model_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(model_gpu_tests)
++    add_test(NAME gpu.model_depth COMMAND model_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/model-depth.png")
++    set_tests_properties(gpu.model_depth PROPERTIES LABELS "gpu;model_view" TIMEOUT 30 RUN_SERIAL TRUE)
++endif()
++
++if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
++    add_test(NAME gpu.model_private COMMAND model_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/model-private.png" "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(gpu.model_private PROPERTIES LABELS "gpu;private;model_view" TIMEOUT 30 RUN_SERIAL TRUE)
++endif()
+diff --git a/tests/model_fixture.h b/tests/model_fixture.h
+index dddc285..206d4d6 100644
+--- a/tests/model_fixture.h
++++ b/tests/model_fixture.h
+@@ -51,7 +51,8 @@ namespace test_model
+             patch(at, last ? UINT32_MAX : static_cast<std::uint32_t>(b.size()));
+         }
+     };
+-    inline Writer abc(bool weapon = false, bool character = false, float quaternion_w = 2)
++    inline Writer abc(bool weapon = false, bool character = false, float quaternion_w = 2, float quaternion_z = 0,
++                      int transform_flags = -1, float quaternion_y = 0)
+     {
+         Writer file, header, g, n, a, d;
+         header.str("MonolithExport Model File v6");
+@@ -76,7 +77,7 @@ namespace test_model
+         g.u32(3);
+         for (int i = 0; i < 3; ++i)
+         {
+-            g.vec(i == 1 ? 1 : 0, 0, i == 2 ? 1 : 0);
++            g.vec(i == 1 ? 1 : 0, 0, i == 2 ? -1 : 0); // ABC -Z becomes engine +Z.
+             g.u8(0);
+             g.u8(127);
+             g.u8(0);
+@@ -153,7 +154,7 @@ namespace test_model
+                 for (int f = 0; f < (single ? 1 : 3); ++f)
+                 {
+                     a.vec(node ? 0 : static_cast<float>(f * 10), node ? 2 : 0, 0);
+-                    a.vec();
++                    a.vec(0, quaternion_y, quaternion_z);
+                     a.real(quaternion_w);
+                 }
+                 if (node)
+@@ -167,7 +168,7 @@ namespace test_model
+                             a.u8(3);
+                         }
+                     }
+-                    a.vec(.5f, 1, 2);
++                    a.vec(.5f, 1, -2); // Encode the fixture's +Z deformation in ABC coordinates.
+                     a.vec(1, 0, 0);
+                 }
+                 else
+@@ -185,7 +186,14 @@ namespace test_model
+                 d.vec(1, 2, 1);
+         }
+         file.section("Animation", a);
+-        file.section("AnimDims", d, true);
++        file.section("AnimDims", d, transform_flags < 0);
++        if (transform_flags >= 0)
++        {
++            Writer flags;
++            flags.u32(static_cast<unsigned>(transform_flags));
++            flags.u32(static_cast<unsigned>(transform_flags));
++            file.section("TransformInfo", flags, true);
++        }
+         return file;
+     }
+ } // namespace test_model
+diff --git a/tests/model_gpu_tests.cpp b/tests/model_gpu_tests.cpp
+new file mode 100644
+index 0000000..e41a4e3
+--- /dev/null
++++ b/tests/model_gpu_tests.cpp
+@@ -0,0 +1,138 @@
++#include "app/model_scene.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x " " << error << " " << SDL_GetError() << '\n';                            \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++WorldMesh quad(float z, float radius, DVector color, float x = 0)
++{
++    WorldMesh m;
++    for (auto p : {DVector{-radius, -radius, z}, DVector{radius, -radius, z}, DVector{radius, radius, z},
++                   DVector{-radius, -radius, z}, DVector{radius, radius, z}, DVector{-radius, radius, z}})
++        m.vertices.push_back({{p.x + x, p.y, p.z}, color, {}});
++    m.ranges.push_back({0, 6, {}, "quad", {}});
++    return m;
++}
++int main(int argc, char** argv)
++{
++    Runtime runtime;
++    std::string error;
++    CHECK(runtime.initialize(true, error));
++    WorldRenderer world(runtime.gpu), models(runtime.gpu);
++    WorldDraw draw;
++    auto background = quad(4, 2, {0, 0, 1});
++    for (int frame = 0; frame < 4; ++frame)
++    {
++        const Uint32 width = frame == 2 ? 240 : 320, height = frame == 2 ? 320 : 240;
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, width, height));
++        auto mesh =
++            quad(frame == 1 || frame == 2 ? 2 : 6, frame == 1 || frame == 2 ? 1 : 3, {1, 0, 0}, frame == 2 ? 1.5f : 0);
++        CHECK(world.prepare(background, 1, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, width, height, error));
++        CHECK(models.prepare(mesh, 1, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, width, height, error, true));
++        CHECK(models.stats.uploads == 1); // Animated geometry updates do not reload textures.
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(commands);
++        CHECK(world.draw(commands, capture.texture, background, std::span(&draw, 1), {}, {}, false, error));
++        CHECK(models.draw(commands, capture.texture, mesh, std::span(&draw, 1), {}, {}, false, error,
++                          frame == 3 ? DrawLoad::ClearDepth : DrawLoad::Load,
++                          frame == 3 ? nullptr : world.depth_target()));
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        CHECK(copy);
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = width;
++        region.h = height;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = width;
++        target.rows_per_layer = height;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        CHECK(SDL_SubmitGPUCommandBuffer(commands));
++        CHECK(SDL_WaitForGPUIdle(runtime.gpu));
++        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        auto rgb = [&](Uint32 x, Uint32 y, bool red)
++        {
++            auto* p = pixels + (y * width + x) * 4;
++            return p[0] == (red ? 255 : 0) && p[1] == 0 && p[2] == (red ? 0 : 255) && p[3] == 255;
++        };
++        const bool correct = rgb(width / 2, height / 2, frame == 1 || frame == 3) &&
++                             (frame != 2 || rgb(width * 7 / 8, height / 2, true));
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        if (argc == 2)
++            CHECK(capture.save(argv[1]));
++        CHECK(correct);
++    }
++    if (argc == 3)
++    {
++        GameSession game;
++        CHECK(game.initialize());
++        Config config;
++        config.data_dir = argv[2];
++        CHECK(game.resources.mount_game(config, error));
++        CHECK(game.request_world("01_SubwayA", error));
++        CHECK(game.enter_player(error) && game.step(1. / 60));
++        game.client_shell.player_visible = true;
++        game.client_shell.weapons_visible = false;
++        ModelView scene;
++        CHECK(update_model_scene(game, scene, error));
++        CHECK(scene.world_draws.size() == 2);
++        const auto* player = game.objects.get(game.client_shell.player);
++        CHECK(player);
++        DVector eye = player->state.m_Pos;
++        eye.y += 20;
++        eye.z -= 120;
++        Capture capture;
++        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 500));
++        models.clear_geometry();
++        CHECK(models.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 500, error, true));
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(commands);
++        CHECK(models.draw(commands, capture.texture, scene.mesh, scene.world_draws, eye, {}, false, error));
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        CHECK(copy);
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 500;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 500;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        CHECK(SDL_SubmitGPUCommandBuffer(commands));
++        CHECK(SDL_WaitForGPUIdle(runtime.gpu));
++        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        CHECK(pixels);
++        std::size_t filled = 0;
++        for (std::size_t i = 0; i < 400 * 500; ++i)
++            filled += pixels[i * 4] != 6 || pixels[i * 4 + 1] != 9 || pixels[i * 4 + 2] != 13;
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        CHECK(capture.save(argv[1]));
++        CHECK(filled > 1000);
++        std::cout << "Private isolated Caleb/held Beretta diagnostic: " << filled << " non-background pixels, "
++                  << scene.mesh.vertices.size() << " vertices\n";
++        CHECK(game.unload_world());
++        scene.clear();
++        models.clear_geometry();
++    }
++    models.clear_geometry();
++    world.clear_geometry();
++    std::cout << "Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view "
++                 "depth isolation pass\n";
++    return 0;
++}
+diff --git a/tests/model_view_tests.cpp b/tests/model_view_tests.cpp
+new file mode 100644
+index 0000000..770dc9c
+--- /dev/null
++++ b/tests/model_view_tests.cpp
+@@ -0,0 +1,241 @@
++#include "app/model_scene.h"
++#include "model_fixture.h"
++#include <cmath>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x "\n";                                                                     \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool legacy_pose()
++    {
++        for (int flags : {-1, 0, 1})
++        {
++            Model model;
++            std::string error;
++            const auto bytes = test_model::abc(false, false, 2, 2, flags);
++            if (flags == 1)
++            {
++                CHECK(!read_model(bytes.b, model, error) && model.nodes.empty());
++                continue;
++            }
++            CHECK(read_model(bytes.b, model, error));
++            std::vector<NodePose> poses;
++            CHECK(sample_pose(model, 0, 0, poses));
++            const auto right = rotate_vector(poses[0].rotation, {1, 0, 0});
++            const float sign = flags < 0 ? -1.f : 1.f;
++            CHECK(std::abs(right.x) < .0001f && std::abs(right.y - sign) < .0001f);
++            CHECK(std::abs(poses[1].position.x + 2 * sign) < .0001f);
++            NodePose node;
++            CHECK(sample_node_pose(model, 0, 0, 1, node));
++            CHECK(std::abs(node.position.x - poses[1].position.x) < .0001f);
++            std::vector<DVector> vertices;
++            CHECK(sample_vertices(model, 0, 0, vertices));
++            CHECK(std::abs(vertices[2].x - (-2 * sign - 2)) < .0001f);
++            CHECK(std::abs(vertices[2].y + 2) < .0001f && std::abs(vertices[2].z - 6) < .0001f);
++            CHECK(read_model(test_model::abc(false, false, 2, 0, flags, 2).b, model, error));
++            CHECK(sample_pose(model, 0, 0, poses));
++            const auto forward = rotate_vector(poses[0].rotation, {0, 0, 1});
++            CHECK(std::abs(forward.x + sign) < .0001f && std::abs(forward.z) < .0001f);
++        }
++        return true;
++    }
++    bool near(DVector a, DVector b)
++    {
++        return std::abs(a.x - b.x) < .001f && std::abs(a.y - b.y) < .001f && std::abs(a.z - b.z) < .001f;
++    }
++    bool sample()
++    {
++        Model m;
++        std::string e;
++        CHECK(read_model(test_model::abc().b, m, e));
++        Resources r;
++        ModelView scene;
++        AnimationTrack t;
++        t.time = 50;
++        NodePose pose{{100, 20, 30}, rotation_from_euler({0, 1, 0})};
++        CHECK(scene.add(&m, t, "missing.dtx", pose, {2, 3, 4}, true, false, {}, "sample", r, e));
++        CHECK(scene.entries.size() == 1 && !scene.entries[0].error.empty() && scene.world_draws.size() == 1);
++        std::vector<DVector> sampled;
++        CHECK(sample_vertices(m, 0, 50, sampled));
++        CHECK(scene.mesh.vertices.size() == 3 && scene.mesh.vertices[1].uv == m.faces[0].uv[1]);
++        for (unsigned i = 0; i < 3; ++i)
++        {
++            auto p = sampled[m.faces[0].vertices[i]];
++            CHECK(near(scene.mesh.vertices[i].position, {p.x * 2, p.y * 3, p.z * 4}));
++        }
++        CHECK(near(scene.world_draws[0].position, pose.position));
++        CHECK(t.time == 50 && t.first && t.revision == 0);
++        auto revision = scene.revision;
++        scene.begin_frame();
++        CHECK(scene.add(&m, t, "MISSING.DTX", pose, {1, 1, 1}, false, false, {}, "hidden", r, e));
++        CHECK(scene.mesh.vertices.empty() && scene.world_draws.empty() && scene.entries.size() == 1 &&
++              !scene.entries[0].visible);
++        CHECK(scene.revision == revision && scene.mesh.materials.size() == 2);
++        scene.begin_frame();
++        CHECK(scene.add(nullptr, t, "missing.dtx", pose, {1, 1, 1}, true, false, {}, "absent", r, e));
++        CHECK(scene.world_draws.empty() && !scene.entries[0].error.empty());
++        scene.clear();
++        CHECK(scene.mesh.materials.size() == 1 && scene.revision > revision && scene.entries.empty());
++        return true;
++    }
++    bool rejects()
++    {
++        Model m;
++        std::string e;
++        CHECK(read_model(test_model::abc().b, m, e));
++        Resources r;
++        ModelView scene;
++        AnimationTrack t;
++        for (int i = 0; i < 4; ++i)
++        {
++            auto bad = m;
++            DVector scale{1, 1, 1};
++            NodePose pose;
++            if (i == 0)
++                bad.faces[0].vertices[1] = 65000;
++            if (i == 1)
++                bad.faces[0].uv[0][0] = std::numeric_limits<float>::infinity();
++            if (i == 2)
++                scale.x = 0;
++            if (i == 3)
++                pose.rotation.m_Spin = 5;
++            CHECK(!scene.add(&bad, t, "missing.dtx", pose, scale, true, false, {}, "invalid", r, e));
++            CHECK(!e.empty() && scene.mesh.vertices.empty() && scene.world_draws.empty() && scene.entries.empty());
++        }
++        return true;
++    }
++    bool weapon_pose()
++    {
++        CViewWeapon weapon;
++        weapon.type = WEAP_BERETTA;
++        weapon.model = std::make_shared<Model>();
++        NodePose pose;
++        CHECK(weapon.AdjustAngleAndSetPos(0, 0, {10, 20, 30}, pose));
++        CHECK(near(pose.position, {10.6f, 19.4f, 31.9f}));
++        weapon.left = true;
++        CHECK(weapon.AdjustAngleAndSetPos(0, 0, {10, 20, 30}, pose));
++        CHECK(near(pose.position, {9.4f, 19.4f, 31.9f}));
++        CHECK(weapon.AdjustAngleAndSetPos(0, 1.57079632679f, {10, 20, 30}, pose));
++        CHECK(near(pose.position, {11.9f, 19.4f, 30.6f}));
++        CHECK(!weapon.AdjustAngleAndSetPos(std::numeric_limits<float>::quiet_NaN(), 0, {}, pose));
++        weapon.model.reset();
++        CHECK(!weapon.AdjustAngleAndSetPos(0, 0, {}, pose));
++        return true;
++    }
++    bool private_world(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string e;
++        CHECK(g.resources.mount_game(c, e));
++        ModelView scene;
++        std::uint64_t revision = scene.revision;
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", e) && g.enter_player(e) && g.step(1. / 60));
++            // File-authored oracle: the old unconjugated Beretta extended beyond
++            // Z=8 while its static key ends at 4.24. No sampled golden is used.
++            CHECK(g.client_shell.weapons[0].model);
++            const auto& weapon_model = *g.client_shell.weapons[0].model;
++            const auto rest = animation_index(weapon_model, "static_model");
++            CHECK(rest != no_animation);
++            std::vector<DVector> weapon_vertices;
++            CHECK(sample_vertices(weapon_model, rest, 0, weapon_vertices));
++            const auto& key = weapon_model.animations[rest].keys[0];
++            for (const auto& v : weapon_vertices)
++                CHECK(v.x >= key.min.x - .001f && v.x <= key.max.x + .001f && v.y >= key.min.y - .001f &&
++                      v.y <= key.max.y + .001f && v.z >= key.min.z - .001f && v.z <= key.max.z + .001f);
++            NodePose muzzle, hand;
++            auto node_index = [&](std::string_view name)
++            {
++                for (std::size_t i = 0; i < weapon_model.nodes.size(); ++i)
++                    if (weapon_model.nodes[i].name == name)
++                        return i;
++                return weapon_model.nodes.size();
++            };
++            CHECK(sample_node_pose(weapon_model, rest, 0, node_index("muzzle"), muzzle));
++            CHECK(sample_node_pose(weapon_model, rest, 0, node_index("hand"), hand));
++            CHECK(muzzle.position.z > hand.position.z + 1); // Barrel points along original firing +Z.
++            const auto clock = g.objects.time();
++            const auto ids = g.objects.snapshot();
++            // Exercise both local visibility policies without changing source object flags.
++            g.client_shell.player_visible = true;
++            g.client_shell.weapons_visible = false;
++            CHECK(update_model_scene(g, scene, e));
++            CHECK(g.objects.time() == clock && g.objects.snapshot().size() == ids.size());
++            std::cout << "Prepared world=" << scene.world_draws.size() << " close=" << scene.close_draws.size()
++                      << " entries=" << scene.entries.size() << '\n';
++            for (const auto& entry : scene.entries)
++                std::cout << entry.label << " visible=" << entry.visible << " triangles=" << entry.triangles
++                          << " error=" << entry.error << '\n';
++            CHECK(scene.world_draws.size() == 2 && scene.close_draws.empty());
++            std::size_t failures = 0;
++            for (const auto& entry : scene.entries)
++            {
++                if (!entry.error.empty())
++                {
++                    ++failures;
++                    std::cout << entry.label << ": " << entry.error << '\n';
++                }
++                if (entry.object && entry.visible && entry.range != UINT32_MAX)
++                {
++                    auto* record = g.objects.get(entry.object);
++                    CHECK(record);
++                    const auto& draw = scene.world_draws[entry.range];
++                    CHECK(near(draw.position, record->state.m_Pos));
++                }
++            }
++            std::cout << "Models: world=" << scene.world_draws.size() << " entries=" << scene.entries.size()
++                      << " vertices=" << scene.mesh.vertices.size() << " diagnostics=" << failures
++                      << " skin bytes=" << scene.mesh.texture_bytes << '\n';
++            CHECK(failures == 0);
++            g.client_shell.player_visible = false;
++            g.client_shell.weapons_visible = true;
++            CHECK(update_model_scene(g, scene, e));
++            CHECK(scene.close_draws.size() == 1);
++            CHECK(g.select_weapon(0, e) && g.step(1. / 60));
++            g.client_shell.weapons_visible = true;
++            CHECK(update_model_scene(g, scene, e) && scene.close_draws.size() == 1);
++            auto* owner = g.server_shell.Player(g.local_client);
++            CHECK(owner);
++            const auto h = owner->m_hObject;
++            const auto id = g.objects.get(h)->id;
++            CHECK(g.objects.remove(h));
++            CHECK(update_model_scene(g, scene, e));
++            for (const auto& entry : scene.entries)
++                CHECK(!(entry.object.slot == id.slot && entry.object.generation == id.generation));
++            CHECK(scene.world_draws.size() == 1 && scene.close_draws.empty()); // Independent child until destructor.
++            CHECK(g.unload_world());
++            scene.clear();
++            CHECK(scene.revision > revision);
++            revision = scene.revision;
++            CHECK(update_model_scene(g, scene, e) && scene.entries.empty() && scene.mesh.vertices.empty());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    std::string_view c = argv[1];
++    return (c == "legacy_pose"           ? legacy_pose()
++            : c == "sample"              ? sample()
++            : c == "rejects"             ? rejects()
++            : c == "weapon_pose"         ? weapon_pose()
++            : c == "subway" && argc == 3 ? private_world(argv[2])
++                                         : false)
++               ? 0
++               : 1;
++}

@@ -1,0 +1,24 @@
+{
+  "binary": "IMUSIC25.DLL",
+  "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "entry_rva": "0x12168 (calls 0x11ca9)",
+  "regenerated_table_entries": 772,
+  "synthetic": {
+    "decisions": 1296,
+    "messages": 39840,
+    "sha256": "7cdeccd1461329d5967a7184adf03ad46ec51c08ed61a5a15fd053f83aaa0148",
+    "fnv64": 11599925503900038861
+  },
+  "private": {
+    "decisions": 47,
+    "messages": 3194,
+    "sha256": "9286e869a76daa634fb43a4c7ef6f554284547d2f75834010953a8c30d8f61c1",
+    "fnv64": 12221266369440151417
+  },
+  "messages_by_bank": {
+    "A1": 2900,
+    "Cabal": 206,
+    "Track1": 88
+  },
+  "scope": "Explicit point owner/controller and tick; original allocation/free intercepted and send captured. No loader summary/owner fixup, admission, merged order, synth or transport claim."
+}

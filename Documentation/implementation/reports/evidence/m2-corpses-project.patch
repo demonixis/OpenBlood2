@@ -1,0 +1,1616 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index dee1a63..9f7e5a4 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -358,3 +358,10 @@ The [inspector/input continuation](../Documentation/Implementation/M2_CONTROLS.m
+ and native inspector folding/resizing. Preserve text/focus suppression, F2's
+ explicit preference, original cinematic gates and single MoveMgr integration.
+ Folding or hiding UI must not stop the session; M2 remains incomplete.
++
++The [ordinary death continuation](../Documentation/Implementation/M2_CORPSES.md) connects original Dying/MC_Dead/CCorpse.
++Read [contracts](docs/CORPSE_CONTRACTS.md). Preserve two-call transfer, cached pose, raw clip
++dimensions versus visual scale, source damage fractions, independent child lifetime
++and no-GETHANDLE sound overlap. Failed setup retains the visible actor. Fire/gibs,
++corpse damage/limbs and blood-pool FX remain unavailable; requests are not FX.
++SubwayA counts are unchanged and M2 remains incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index dd3314f..2124806 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -43,7 +43,7 @@ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_m
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+     src/game/server_activation.cpp src/game/original/AIRuntime.cpp
+     src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/Movement.cpp
+-    src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
++    src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AIDeath.cpp src/game/original/Corpse.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+diff --git a/README.md b/README.md
+index a69da6d..5b15c8f 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,10 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++Latest continuation: [ordinary NPC death and CCorpse](../Documentation/Implementation/M2_CORPSES.md)
++connects independent animated corpses and real model-key sounds. Earlier blanket
++corpse omissions below are historical. Fire/gibs, corpse damage, required FX,
++Gideon and ExitTrigger still keep M2 incomplete.
++
+ The inspector is now **collapsible and resizable**: click the title arrow to fold
+ or unfold it, drag its borders to resize, or use F1 to hide/show it. After entering
+ the player in Session, keyboard movement is enabled by default: **WASD/ZQSD**,
+@@ -7,7 +12,7 @@ the player in Session, keyboard movement is enabled by default: **WASD/ZQSD**,
+ keyboard controls. SubwayA's original intro temporarily blocks movement; wait for
+ it to end. See [input/UI evidence](../Documentation/Implementation/M2_CONTROLS.md).
+ 
+-Latest death prerequisite: [original NPC weapon drops](../Documentation/Implementation/M2_WEAPON_DROPS.md)
++Previous death prerequisite: [original NPC weapon drops](../Documentation/Implementation/M2_WEAPON_DROPS.md)
+ connects detached Beretta physics, original pickups and player collection. Corpses/gibs,
+ required FX, Gideon and ExitTrigger still keep M2 incomplete.
+ 
+diff --git a/docs/AI_HIT_CONTRACTS.md b/docs/AI_HIT_CONTRACTS.md
+index e9243e2..bbfbbf6 100644
+--- a/docs/AI_HIT_CONTRACTS.md
++++ b/docs/AI_HIT_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original NPC hit localization and recoil
+ 
++> Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
++> transfer ordinary deaths. Earlier blanket corpse omissions are historical;
++> fire/gibs, corpse damage, required FX and complete M2 remain unavailable.
++
+ > Extended by [NPC weapon-drop contracts](WEAPON_DROP_CONTRACTS.md): the selected
+ > Cabal drop, independent falling hand and Beretta collection now work. Corpse/gib
+ > and remaining death services still fail explicitly; M2 is incomplete.
+diff --git a/docs/AI_RUNTIME_CONTRACTS.md b/docs/AI_RUNTIME_CONTRACTS.md
+index c26f9da..f44ec86 100644
+--- a/docs/AI_RUNTIME_CONTRACTS.md
++++ b/docs/AI_RUNTIME_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original Cultist/Civilian initialization and AI_Update
+ 
++> Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
++> transfer ordinary deaths. Earlier blanket corpse omissions are historical;
++> fire/gibs, corpse damage, required FX and complete M2 remain unavailable.
++
+ > Extended by [NPC hit/recoil contracts](AI_HIT_CONTRACTS.md): original visible-node
+ > localization, region damage and nonlethal reactions now execute for initialized
+ > Cultist/Civilian NPCs. Earlier blanket localization/recoil omissions are historical;
+diff --git a/docs/CORPSE_CONTRACTS.md b/docs/CORPSE_CONTRACTS.md
+new file mode 100644
+index 0000000..f94f868
+--- /dev/null
++++ b/docs/CORPSE_CONTRACTS.md
+@@ -0,0 +1,92 @@
++# Ordinary original NPC death and CCorpse
++
++Selected original `AI_Mgr::HandleDamage`, `MC_Dead`, `AI_STATE_Dying`,
++`CreateCorpse` and `CCorpse` now handle ordinary Cultist/Civilian death.
++[Source selections](M2_CORPSE_SOURCES.json) and
++[validation](../../Documentation/Implementation/M2_CORPSES.md) define this subset.
++M2 remains incomplete; fire, gibs, limb loss and client blood-pool FX are unavailable.
++
++## Death selection and transfer
++
++Preserve the original Cabal weapon-drop attempt before lethal response. A nonsolid
++object support sets ALWAYSGIB; primary-world support has no invented object token.
++Fire requires burning services. Explosive/ALWAYSGIB/at-least-0.90 frame damage
++requires gibs unless NEVERGIB is set. These missing branches suspend the source
++with a diagnostic. NEVERGIB does not implement fire. Ordinary eligible deaths
++consume the original 0..99 optional kill-voice draw; requests below 6 for a player
++attacker are counted, not played. The original post-damage script/recoil selection
++still executes; AI_Update subsequently selects Dying for zero HP.
++
++CDestructable now maintains the original per-update damage fraction in addition
++to damage amount. Armor-adjusted damage accumulates relative to maximum HP;
++MID_UPDATE clears both. DEATH initializes amount=maxHP and fraction=100 before
++adding the resisted incoming packet. Nonpositive maximum HP skips division as an
++explicit safety adaptation, rather than producing nonfinite state.
++
++MC_Dead's first call stops its separate per-actor retained sound, selects one of
++12 death clips by region/side (or the NIGHTMAREDEATH 50% branch), and sets command
++20/animating. It does **not** start an animation on the NPC or increment Metacmd.
++The second call creates a corpse, hides the NPC and requests its next-update
++removal. Dying phase 2 directly assigns Inactive without SetNewState side effects.
++Shared CAnim_Sound voices and the separate actor sound are distinct ownership.
++
++The corpse receives owned model/skin filenames and sound-root text. The typed
++GetModelFilenames validates a live model and leaves outputs untouched on failure.
++There is no pointer truncated into the source's 32-bit m_UserData. Creation uses
++CMovement's cached position/rotation and m_vDims, including the source's timing.
++The sanity fallback draws a death clip if the selected clip precedes death[0].
++Visual scale is copied, but collision dimensions remain the raw death-clip
++user dimensions. Y placement subtracts `(oldDims.y - corpseDims.y) - 0.001`.
++This uses checked teleport and the existing replacement physics, not proven retail
++SetObjectDims2/collision parity. A failed setup removes the partial child deferred
++and retains the visible source; the unchecked original could hide it anyway.
++Spawn reports retain checked child identities and outcomes after source removal.
++
++## Corpse services and lifetime
++
++CCorpse is a runtime-only original model class; world/string/save construction is
++rejected. Setup requires real model initialization. Original visible/ray-hit,
++gravity, model-key and outside-world-removal flags, HP50, armor0, mass200 and
++mass-derived friction9 are retained. Damage impulses are disabled. Flesh, saveable
++and singularity user bits retain their numeric values without claiming save/restore
++or singularity services. The existing character-body integrator supplies gravity
++once; corpses are nonsolid and independent of the removed actor or its weapon.
++
++Hit-sphere measurements reuse the same original formulas in CAnim_Sound. Unlike
++CCorpse's unchecked source reads, missing head/invalid poses fail; later missing
++nodes use the existing documented previous-node fallback. These are measurements,
++not implemented corpse hit/limb damage. All damage and trigger packets are refused
++before aggregate mutation, with a separate diagnostic that does not stop the
++working death animation. Hidden limbs, SoulDrudge-specific limb eligibility,
++corpse destruction, burning/smoke, gibs and save/restore remain unavailable.
++
++Initial scheduling is 0.01 seconds, then 0.1 while the nonlooping animation runs.
++Completion casts the original 40-unit downward solid ray. Only a primary-world
++hit records the blood-pool request at hit Y+0.1; the unavailable CClientSplatFX is
++explicitly reported and never counted as rendered. Single-player corpses persist
++with no further updates. Multiplayer-mode lifetime logic sets now+29.9 and schedules
++30 seconds, then removes on the next due callback. This isolated rule is tested;
++multiplayer gameplay is not implemented.
++
++Model keys parse argv[0] with the bounded Sparam reader: play_sound, optional
++sound_random (B2_LITE variants 1..3), radius and volume. Actual WAV decoding and
++attached dry playback use AI_MEDIUM priority3 and inner radius=outer*0.1. Malformed,
++nonfinite or out-of-range numeric requests fail explicitly. The original omits
++GETHANDLE: voices auto-release on completion/owner removal and repeated keys may
++overlap. last_sound is a non-owning inspection ID, never a busy latch or destructor
++kill. This follows Blood II's own AppHeaders contract; the later engine generation
++is corroborating evidence only. Reverb and priority arbitration remain unavailable.
++
++## Inspection and limits
++
++Skeletons lists corpses including hidden/inactive/missing models, their raw
++geometry dimensions, visual scale, animation/time, update/removal deadlines,
++real sound attempts, blood-pool result and damage refusal. NPCs expose death slot,
++clip, accumulated fraction, transfer count and unavailable optional voice requests.
++The normal model renderer samples corpse animation independently of the inspector.
++
++SubwayA remains 202 created / 4 transferred sounds / 372 editor-only / 2 unsupported
++(Gideon, ExitTrigger) / 0 failed source entries. Corpses are dynamic instances,
++not extra authored coverage. Required FX, further AI actions, corpse/fire/gib
++services and complete original session acceptance keep M2 open. Linux-only tests
++and synthetic diagnostics do not establish original-executable or platform parity.
+diff --git a/docs/M2_CORPSE_SOURCES.json b/docs/M2_CORPSE_SOURCES.json
+new file mode 100644
+index 0000000..7a57e22
+--- /dev/null
++++ b/docs/M2_CORPSE_SOURCES.json
+@@ -0,0 +1,170 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "09f574dfe908306b3fcbf896a837ea8a97287ffc",
++  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          1780,
++          1898
++        ],
++        [
++          3761,
++          3860
++        ],
++        [
++          5469,
++          5520
++        ],
++        [
++          5722,
++          5735
++        ]
++      ],
++      "use": "Lethal selection, ordinary corpse transfer, death command and state"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
++      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
++      "selected_lines": [],
++      "use": "Original death flags and per-actor fields"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/corpse.cpp",
++      "sha256": "f92ec5bd0e4175f61461aae1f5fe498b0a1d21b5f0ee7d889573d02480543fdd",
++      "selected_lines": [
++        [
++          1,
++          295
++        ],
++        [
++          350,
++          383
++        ],
++        [
++          570,
++          609
++        ],
++        [
++          750,
++          899
++        ]
++      ],
++      "use": "Ordinary initial/update, measurements, sound keys and primary-world blood-pool request"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/corpse.h",
++      "sha256": "a3b9b0feda537fe7cccb6dfcb65d13437bdab288c93ef7beeb62e8d04c1fe6dc",
++      "selected_lines": [],
++      "use": "Original class fields and API"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
++      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
++      "selected_lines": [
++        [
++          160,
++          178
++        ],
++        [
++          367,
++          384
++        ],
++        [
++          410,
++          438
++        ],
++        [
++          598,
++          609
++        ]
++      ],
++      "use": "Damage fraction and mass/friction rules"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PhysicalAttributes.h",
++      "sha256": "bb58c0afd5e3175a9007063a64fbe31089a1a595851c61e3bfee7a19f72dda55",
++      "selected_lines": [
++        [
++          15,
++          20
++        ]
++      ],
++      "use": "Friction endpoints"
++    },
++    {
++      "path": "sources/blood2/Shared/ClientServerShared.h",
++      "sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
++      "selected_lines": [
++        [
++          14,
++          24
++        ]
++      ],
++      "use": "User flag values"
++    },
++    {
++      "path": "sources/blood2/Shared/SoundTypes.h",
++      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
++      "selected_lines": [
++        [
++          12,
++          27
++        ]
++      ],
++      "use": "Sound priority"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/basedefs_de.h",
++      "sha256": "10f543764aa94339f2e48edcba384dda3cdce2d738f0be2731dcff3a1117fb72",
++      "selected_lines": [
++        [
++          538,
++          548
++        ],
++        [
++          566,
++          592
++        ]
++      ],
++      "use": "GETHANDLE ownership and attached auto-release"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
++      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
++      "selected_lines": [
++        [
++          193,
++          196
++        ]
++      ],
++      "use": "Strict percent chance comparison; portable existing RNG replaces CRT rand stream"
++    }
++  ],
++  "adaptations": [
++    "Checked typed model filenames and owned sound root replace raw-pointer user data",
++    "Transactional child setup; deferred rollback leaves failed source visible",
++    "Existing replacement character-body physics and checked teleport, without retail parity claim",
++    "Initialized sound ownership; original no-GETHANDLE auto-release, no fake busy latch",
++    "Reused original measurement formulas with missing-head failure and previous-node fallback",
++    "Unsupported fire/gib/corpse damage and splat FX remain visible failures/requests",
++    "Strict bounded numeric sound parameters and nonpositive-maxHP division guard",
++    "Existing portable RNG replaces CRT rand stream; exact retail sequence not claimed"
++  ],
++  "reference_only": [
++    {
++      "path": "sources/lithtech/runtime/server/src/server_iltsoundmgr.cpp",
++      "sha256": "010e1649c509de4177cb00704dda62a230a4690da47f8f47544c91052d3787a3",
++      "selected_lines": [
++        [
++          138,
++          145
++        ]
++      ],
++      "use": "Later-generation corroboration of null output without GETHANDLE; no code imported"
++    }
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index d6d5667..e536fd2 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -652,3 +652,11 @@ consulted for first-contact meaning only, not treated as retail Blood II proof.
+ Application-owned SDL/ImGui usability changes only. No new original-source import
+ or dependency update. Existing MoveMgr bindings and camera gates remain unchanged;
+ see [evidence](../../Documentation/Implementation/M2_CONTROLS.md).
++
++## Ordinary NPC death and CCorpse
++
++Selected original MC_Dead/AI_STATE_Dying/CreateCorpse, lethal gates and corpse
++initial/update/model-key rules. [Source ledger](M2_CORPSE_SOURCES.json) records
++original hashes and selected ranges; [contracts](CORPSE_CONTRACTS.md) distinguish
++source behavior, owned lifetime/rollback adaptations and missing fire/gib/FX
++branches. No donor engine, new dependency or commercial asset was imported.
+diff --git a/docs/WEAPON_DROP_CONTRACTS.md b/docs/WEAPON_DROP_CONTRACTS.md
+index 2aff9a6..afb7404 100644
+--- a/docs/WEAPON_DROP_CONTRACTS.md
++++ b/docs/WEAPON_DROP_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original NPC weapon drops and Beretta pickups
+ 
++> Continued by [ordinary corpse contracts](CORPSE_CONTRACTS.md): original Dying/CCorpse now
++> transfer ordinary deaths. Earlier blanket corpse omissions are historical;
++> fire/gibs, corpse damage, required FX and complete M2 remain unavailable.
++
+ This extends [attachments](ATTACHMENT_CONTRACTS.md), [pickups](PICKUP_CONTRACTS.md)
+ and [NPC hit reactions](AI_HIT_CONTRACTS.md). The selected single-player source
+ path is `DropCurrentWeapon -> DropHandModel -> CHandWeaponModel::Drop/Update ->
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index 95e9ae4..d274b49 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -2,11 +2,52 @@
+ #include "engine/collision.h"
+ #include "game/original/AI_Mgr.h"
+ #include "game/original/CivilianAI.h"
++#include "game/original/Corpse.h"
+ #include "game/original/CultistAI.h"
+ #include <cmath>
+ #include <limits>
++#include <spdlog/spdlog.h>
+ namespace OpenBlood2
+ {
++    bool prepare_corpse_smoke(GameSession& g, ObjectId& selection)
++    {
++        const auto* player = g.objects.get(g.client_shell.player);
++        if (!player)
++            return false;
++        auto pos = player->state.m_Pos;
++        pos.z += 80;
++        auto h = g.objects.create(
++            g.objects.find_class("CultistAI"), {}, Creation::World,
++            {{"Pos", pos}, {"Name", std::string("Corpse smoke donor")}, {"AIState", std::string("IDLE")}});
++        auto* a = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h));
++        if (!a || !a->RuntimeReady() || !a->m_MoveObj.Update())
++            return false;
++        // Isolated death-action probe during the authored camera: no production
++        // actor or intro gate is changed. Headless catalog tests cover AI_Update.
++        // The real neck clip lasts 900 ms, within the existing hidden-UI window.
++        // Catalog tests also complete the seven-second torso clip without shortcuts.
++        a->m_damage.node_hit = 1;
++        a->m_damage.side_hit = 0;
++        if (!a->SetNewState(AI_Mgr::StateDying) || !a->DispatchState() || !a->DispatchState())
++            return false;
++        const auto* corpse = g.objects.get(a->last_corpse);
++        if (!corpse)
++            return false;
++        selection = corpse->id;
++        return g.objects.remove(h) && g.objects.finish_frame();
++    }
++    bool check_corpse_smoke(GameSession& g, ObjectId id, bool log)
++    {
++        const auto* r = g.objects.get(id);
++        const auto* c = r ? dynamic_cast<const CCorpse*>(r->game.get()) : nullptr;
++        if (log)
++            spdlog::info(
++                "Corpse diagnostic: present={}, setup={}, complete={}, sounds={}, updates={}, time={}, error={}",
++                c != nullptr, c && c->configured, c && c->animation_done, c ? c->sound_starts : 0, c ? c->updates : 0,
++                r ? r->animation.time : 0, c ? c->error : "removed");
++        return c && c->configured && c->error.empty() && c->animation_done && c->sound_starts > 0 && r->model &&
++               (r->state.m_Flags & FLAG_VISIBLE) && !r->attachment;
++    }
+     bool check_ai_runtime_smoke(GameSession& g, ObjectId& selection)
+     {
+         unsigned cultists = 0, civilians = 0;
+diff --git a/src/app/ai_model_key_smoke.h b/src/app/ai_model_key_smoke.h
+index 07bff0e..5d9be05 100644
+--- a/src/app/ai_model_key_smoke.h
++++ b/src/app/ai_model_key_smoke.h
+@@ -2,6 +2,8 @@
+ #include "game/server_adapter.h"
+ namespace OpenBlood2
+ {
++    bool prepare_corpse_smoke(GameSession&, ObjectId&);
++    bool check_corpse_smoke(GameSession&, ObjectId, bool log = false);
+     bool check_ai_runtime_smoke(GameSession&, ObjectId&);
+     bool prepare_ai_escape_smoke(GameSession&, ObjectId&);
+     bool check_ai_escape_smoke(GameSession&, ObjectId);
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 97c58f9..3a85046 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -1,4 +1,5 @@
+ #include "game/original/AI_Mgr.h"
++#include "game/original/Corpse.h"
+ #include "game/original/CultistAI.h"
+ #include "inspector.h"
+ #include <algorithm>
+@@ -7,12 +8,13 @@ namespace OpenBlood2
+ {
+     void Inspector::draw_skeleton(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextWrapped("Original hit spheres at current ABC node poses. Initialized NPCs use them for hit "
+-                           "localization. Death/corpse services remain unavailable.");
++        ImGui::TextWrapped(
++            "Original hit spheres at current ABC node poses. Initialized NPCs use them for hit "
++            "localization. Ordinary corpse animation is integrated; fire/gibs and blood-pool FX remain unavailable.");
+         if (ImGui::CollapsingHeader("Live attachments"))
+         {
+             ImGui::TextWrapped("Held models follow current parent nodes. Physical/nested attachments and dropped "
+-                               "weapons remain unavailable.");
++                               "weapon attachment chains remain unavailable.");
+             for (const auto& [id, a] : game.objects.attachments())
+             {
+                 const auto* parent = game.objects.get(a.parent);
+@@ -59,6 +61,35 @@ namespace OpenBlood2
+         const auto* r = game.objects.get(skeleton_selection);
+         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+         const auto* character = r ? dynamic_cast<const CBaseCharacter*>(r->game.get()) : nullptr;
++        if (const auto* corpse = r ? dynamic_cast<const CCorpse*>(r->game.get()) : nullptr)
++        {
++            const auto& c = *corpse;
++            ImGui::TextUnformatted("Original CCorpse (independent lifetime)");
++            ImGui::Text("Setup %s | animation %s | updates %llu", c.configured ? "ready" : "FAILED",
++                        c.animation_done ? "done" : "running", (unsigned long long)c.updates);
++            ImGui::Text("Clip %u | time %.3f | removal deadline %.3f", r->animation.animation,
++                        double(r->animation.time), c.remove_time);
++            ImGui::Text("Raw dimensions %.2f %.2f %.2f | visual scale %.2f %.2f %.2f", r->dimensions.x, r->dimensions.y,
++                        r->dimensions.z, r->state.m_Scale.x, r->state.m_Scale.y, r->state.m_Scale.z);
++            ImGui::Text("Sound keys %llu / starts %llu | last voice %llu", (unsigned long long)c.sound_attempts,
++                        (unsigned long long)c.sound_starts, (unsigned long long)c.last_sound);
++            ImGui::TextWrapped("%s | %s", c.sound_resource.c_str(), c.sound_error.c_str());
++            ImGui::Text("Blood-pool ray %d | request %s", int(c.pool_result), c.pool_requested ? "yes" : "no");
++            ImGui::TextWrapped("%s", c.pool_error.c_str());
++            ImGui::Text("Damage refused %llu | limb-loss requested %s", (unsigned long long)c.damage_refusals,
++                        c.limb_loss ? "yes" : "no");
++            ImGui::TextWrapped("Corpse damage, limb hiding, gibs, fire and splat FX remain unavailable. %s %s",
++                               c.error.c_str(), c.damage_error.c_str());
++        }
++        if (target_ai && ImGui::CollapsingHeader("Original NPC death"))
++        {
++            const auto& a = *target_ai;
++            ImGui::Text("Starts %llu | corpses %llu | slot %d / clip %u", (unsigned long long)a.death_starts,
++                        (unsigned long long)a.corpses_created, a.death_slot, a.m_nCorpseType);
++            ImGui::Text("Frame damage fraction %.3f | optional kill-voice requests %llu (unavailable)",
++                        a.m_damage.m_fLastDamagePercent, (unsigned long long)a.kill_voice_requests);
++            ImGui::TextWrapped("%s", a.death_error.c_str());
++        }
+         if (target_ai && target_ai->npc_type != AI_Mgr::NPCType::Diagnostic &&
+             ImGui::CollapsingHeader("Original NPC lifecycle", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 220128e..7fff71c 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -269,6 +269,11 @@ namespace
+         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_escape_smoke(game, smoke_ai_escape))
+             return 4;
+         const auto original_ai_escape = smoke_ai_escape;
++        OpenBlood2::ObjectId smoke_corpse{};
++        bool corpse_hidden = false, corpse_drawn = false;
++        if (options.skeleton_smoke && !OpenBlood2::prepare_corpse_smoke(game, smoke_corpse))
++            return 4;
++        const auto original_corpse = smoke_corpse;
+         OpenBlood2::ObjectId smoke_ai_runtime{};
+         if (options.skeleton_smoke)
+             OpenBlood2::check_ai_runtime_smoke(game, smoke_ai_runtime);
+@@ -338,7 +343,7 @@ namespace
+         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke && !options.viewport_smoke;
+         inspector.select_skeleton = options.skeleton_smoke;
+         if (options.skeleton_smoke)
+-            inspector.skeleton_selection = smoke_ai_runtime;
++            inspector.skeleton_selection = smoke_corpse;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
+         inspector.select_pickups = options.pickups_smoke;
+@@ -575,6 +580,8 @@ namespace
+                 ai_fire_hidden |= OpenBlood2::check_ai_fire_smoke(game, smoke_ai_fire);
+             if (options.skeleton_smoke && !inspector_visible)
+                 ai_follow_hidden |= OpenBlood2::check_ai_follow_smoke(game, smoke_ai_follow);
++            if (options.skeleton_smoke && !inspector_visible)
++                corpse_hidden |= OpenBlood2::check_corpse_smoke(game, smoke_corpse, frames == 110);
+             if (options.skeleton_smoke && !inspector_visible)
+                 ai_escape_hidden |= OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
+             if (options.skeleton_smoke && !inspector_visible)
+@@ -668,6 +675,11 @@ namespace
+                 return 5;
+             }
+ 
++            if (options.skeleton_smoke && !inspector_visible)
++                for (const auto& entry : model_scene.entries)
++                    if (entry.object == smoke_corpse && entry.visible && entry.error.empty() && entry.triangles > 0)
++                        corpse_drawn = true;
++
+             if (options.world_smoke && frames >= unload_frame && game.world_path.empty() &&
+                 game.server.string_count() == 0)
+                 world_unloaded = true;
+@@ -1092,6 +1104,8 @@ namespace
+                 // Its longer script + navigation sequence must not inherit the shot-only deadline.
+                 if (game.objects.get(original_ai_follow) || !OpenBlood2::prepare_ai_follow_smoke(game, smoke_ai_follow))
+                     return 4;
++                if (game.objects.get(original_corpse) || !OpenBlood2::prepare_corpse_smoke(game, smoke_corpse))
++                    return 4;
+                 if (game.objects.get(original_ai_key) || !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
+                     return 4;
+                 for (int i = 0; i < 90 && !ai_key_reentered; ++i)
+@@ -1161,6 +1175,11 @@ namespace
+                     ai_runtime_hidden, runtime_reentered, !game.objects.get(original_ai_runtime));
+                 if (!ai_runtime_hidden || !runtime_reentered || game.objects.get(original_ai_runtime))
+                     return 4;
++                const bool corpse_reentered = OpenBlood2::check_corpse_smoke(game, smoke_corpse, true);
++                spdlog::info("Original corpse: hidden={}, rendered={}, reentered={}, old identity invalidated={}",
++                             corpse_hidden, corpse_drawn, corpse_reentered, !game.objects.get(original_corpse));
++                if (!corpse_hidden || !corpse_drawn || !corpse_reentered || game.objects.get(original_corpse))
++                    return 4;
+                 const bool escape_reentered = OpenBlood2::check_ai_escape_smoke(game, smoke_ai_escape);
+                 spdlog::info("AI escape/beg: hidden={}, reentered={}, old identity invalidated={}", ai_escape_hidden,
+                              escape_reentered, !game.objects.get(original_ai_escape));
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index ca2e656..069ba47 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -99,6 +99,7 @@ class ServerDE : public CSBase
+     virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
+     virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;
+     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;
++    virtual bool GetModelFilenames(HOBJECT, std::string&, std::string&) = 0;
+     virtual DRESULT SetModelFilenames(HOBJECT, const char*, const char*) = 0;
+     virtual DRESULT GetObjectDims(HOBJECT, DVector*) = 0;
+     virtual DRESULT SetObjectRotation(HOBJECT, const DRotation*) = 0;
+diff --git a/src/game/original/AIDeath.cpp b/src/game/original/AIDeath.cpp
+new file mode 100644
+index 0000000..89ffb70
+--- /dev/null
++++ b/src/game/original/AIDeath.cpp
+@@ -0,0 +1,129 @@
++// Original AI_Mgr MC_Dead/AI_STATE_Dying/CreateCorpse, ordinary death only.
++#include "AI_Mgr.h"
++#include "Corpse.h"
++#include "engine/collision.h"
++#include <cstring>
++
++bool AI_Mgr::MC_Dead()
++{
++    auto* s = GetServerDE();
++    death_error.clear();
++    if (!s || !s->IsObjectAlive(m_hObject) || !m_pAnim_Sound)
++        return StateFailure("Death owner/animation table unavailable");
++    if (!m_bAnimating || m_nCurMetacmd != 20)
++    {
++        if (m_hCurSound)
++        {
++            s->KillSound(m_hCurSound);
++            m_hCurSound = 0;
++        }
++        death_slot = -1;
++        if (!(m_dwFlags & 0x400u))
++        {
++            if (m_damage.side_hit != 0 && m_damage.side_hit != 6)
++                return StateFailure("Death side invalid");
++            constexpr int nodes[]{1, 2, 4, 7, 10, 14};
++            for (int i = 0; i < 6; ++i)
++                if (nodes[i] == m_damage.node_hit)
++                    death_slot = i + m_damage.side_hit;
++        }
++        else
++        {
++            int roll;
++            if (!s->RandomInt(0, 99, roll))
++                return StateFailure("Nightmare death RNG unavailable");
++            death_slot = roll < 50 ? 0 : 1;
++        }
++        if (death_slot >= 0)
++            m_nCorpseType = m_pAnim_Sound->m_nAnim_DEATH[death_slot];
++        m_bAnimating = true;
++        m_nCurMetacmd = 20;
++        ++death_starts; // Deliberately no NPC animation playback or Metacmd increment.
++        return true;
++    }
++    // Unlike the unchecked source, a failed transfer retains a visible actor.
++    if (!CreateCorpse())
++        return false;
++    s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) & ~FLAG_VISIBLE);
++    m_bRemoveMe = true;
++    return true;
++}
++bool AI_Mgr::AI_STATE_Dying()
++{
++    if (Metacmd == 1)
++        return MC_Dead();
++    if (Metacmd == 2)
++        m_nState = StateInactive; // Direct source assignment, no transition side effects.
++    return true;
++}
++bool AI_Mgr::CreateCorpse()
++{
++    using namespace OpenBlood2;
++    auto* s = GetServerDE();
++    SpawnReport report;
++    report.source = "AI_Mgr::CreateCorpse";
++    report.request = "CCorpse";
++    auto fail = [&](const char* why)
++    {
++        death_error = why;
++        report.outcome = why;
++        if (s)
++            s->RecordSpawn(report);
++        return StateFailure(why);
++    };
++    if (!s || !s->IsObjectAlive(m_hObject) || !m_pAnim_Sound || !m_MoveObj.initialized || !m_MoveObj.sampled ||
++        !physics_vector(m_vDims) || m_damage.reaction_damage_type == DamageType::Fire)
++        return fail("Corpse owner/cache/table unavailable or fire death unsupported");
++    std::string model, skin, clip_name;
++    auto type = s->GetClass("CCorpse");
++    if (!type || !s->GetModelFilenames(m_hObject, model, skin))
++        return fail("Corpse class/model filenames unavailable");
++    if (m_nCorpseType < m_pAnim_Sound->m_nAnim_DEATH[0])
++    {
++        int slot;
++        if (!s->RandomInt(0, 11, slot))
++            return fail("Corpse fallback RNG unavailable");
++        m_nCorpseType = m_pAnim_Sound->m_nAnim_DEATH[slot];
++        death_slot = slot;
++    }
++    DVector dims;
++    if (!s->GetModelAnimationName(m_hObject, m_nCorpseType, clip_name) ||
++        s->GetModelAnimUserDims(m_hObject, &dims, m_nCorpseType) != DE_OK || !physics_vector(dims) || dims.x <= 0 ||
++        dims.y <= 0 || dims.z <= 0)
++        return fail("Corpse animation/dimensions unavailable");
++    ObjectCreateStruct state;
++    if (model.size() >= sizeof(state.m_Filename) || skin.size() >= sizeof(state.m_SkinName))
++        return fail("Corpse filenames exceed original buffer");
++    std::memcpy(state.m_Filename, model.c_str(), model.size() + 1);
++    std::memcpy(state.m_SkinName, skin.c_str(), skin.size() + 1);
++    std::strcpy(state.m_Name, "AI corpse");
++    state.m_Pos = m_MoveObj.GetPos(); // Original cached transform; not a fresh pose sample.
++    state.m_Rotation = m_MoveObj.GetRotation();
++    auto* corpse = dynamic_cast<CCorpse*>(s->CreateObject(type, &state));
++    if (!corpse)
++        return fail("Corpse creation failed");
++    const auto h = corpse->m_hObject;
++    report.child = h;
++    auto position = state.m_Pos;
++    position.y -= (m_vDims.y - dims.y) - .001f;
++    const bool configured =
++        s->IsObjectAlive(m_hObject) && s->IsObjectAlive(h) && corpse->Setup(m_pAnim_Sound->GetSoundRoot(), m_bCabal);
++    if (configured)
++    {
++        s->SetModelAnimation(h, m_nCorpseType);
++        s->SetModelLooping(h, false);
++    }
++    if (!configured || s->GetModelAnimation(h) != m_nCorpseType || s->GetModelLooping(h) ||
++        !s->ScaleObject(h, m_vScale) || s->SetObjectDims(h, &dims) != DE_OK || s->TeleportObject(h, &position) != DE_OK)
++    {
++        s->RemoveObject(h); // Deferred rollback; source remains inspectable.
++        return fail("Corpse setup failed; incomplete child removed");
++    }
++    // All supported NPC nodes are visible; per-limb hiding remains unavailable.
++    last_corpse = h;
++    ++corpses_created;
++    report.position = position;
++    report.outcome = "Original ordinary corpse initialized; independent animation/lifetime";
++    s->RecordSpawn(report);
++    return true;
++}
+diff --git a/src/game/original/AIHitReaction.cpp b/src/game/original/AIHitReaction.cpp
+index a4318bc..9d15956 100644
+--- a/src/game/original/AIHitReaction.cpp
++++ b/src/game/original/AIHitReaction.cpp
+@@ -117,8 +117,35 @@ bool AI_Mgr::HandleDamage()
+     {
+         if (m_bCabal)
+             m_InventoryMgr.DropCurrentWeapon(); // Source ignores refusal (no held weapon/busy/melee).
+-        damage_reaction_error = "NPC lethal reaction requires corpses/gibs and death services";
+-        return false;
++        auto* s = GetServerDE();
++        OpenBlood2::MovementState support;
++        if (!s->GetMovementState(m_hObject, support))
++        {
++            damage_reaction_error = "NPC death support query unavailable";
++            return false;
++        }
++        if (support.ground_object && !(s->GetObjectFlags(support.ground_object) & FLAG_SOLID))
++            m_dwFlags |= 0x40u; // FLAG_ALWAYSGIB; primary world has a real polygon, not a fabricated HOBJECT.
++        const auto type = m_damage.reaction_damage_type;
++        if (type == OpenBlood2::DamageType::Fire && !(m_dwFlags & 0x40u))
++        {
++            damage_reaction_error = "NPC fire death requires original burning services";
++            return false;
++        }
++        if (!(m_dwFlags & 0x800u) &&
++            (type == OpenBlood2::DamageType::Explode || (m_dwFlags & 0x40u) || m_damage.m_fLastDamagePercent >= .9f))
++        {
++            damage_reaction_error = "NPC gib death requires original gib services";
++            return false;
++        }
++        if (!s->RandomInt(0, 99, kill_voice_roll))
++        {
++            damage_reaction_error = "NPC kill voice draw unavailable";
++            return false;
++        }
++        const auto attacker = m_damage.GetLastDamager();
++        if (kill_voice_roll < 6 && attacker && s->IsKindOf(s->GetObjectClass(attacker), s->GetClass("CPlayerObj")))
++            ++kill_voice_requests; // Optional VME_KILL request; voice-event playback remains unavailable.
+     }
+     if (m_nState == StateScript && !(m_dwScriptFlags & (1u << 1)))
+         return true;
+diff --git a/src/game/original/AIPerception.cpp b/src/game/original/AIPerception.cpp
+index 389b772..a3ff1c3 100644
+--- a/src/game/original/AIPerception.cpp
++++ b/src/game/original/AIPerception.cpp
+@@ -23,6 +23,8 @@ AI_Mgr::AI_Mgr()
+ }
+ AI_Mgr::~AI_Mgr()
+ {
++    if (m_hCurSound && GetServerDE())
++        GetServerDE()->KillSound(m_hCurSound);
+     if (m_Link.m_pData)
+     {
+         dl_Remove(&m_Link);
+diff --git a/src/game/original/AIState.cpp b/src/game/original/AIState.cpp
+index 7729536..8dd5a40 100644
+--- a/src/game/original/AIState.cpp
++++ b/src/game/original/AIState.cpp
+@@ -252,6 +252,8 @@ bool AI_Mgr::DispatchState()
+         Metacmd = 1;
+     switch (m_nState)
+     {
++        case StateDying:
++            return AI_STATE_Dying();
+         case StateRecoil:
+             return AI_STATE_Recoil();
+         case StateEscapeRun:
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 17b6121..307d3da 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -239,6 +239,15 @@ class AI_Mgr : public CBaseCharacter
+     std::string locomotion_error;
+     bool HandleDamage();
+     bool MC_Recoil();
++    bool MC_Dead();
++    bool AI_STATE_Dying();
++    bool CreateCorpse();
++    DDWORD m_nCorpseType = 0;
++    OpenBlood2::SoundId m_hCurSound = 0; // Original per-actor retained sound, distinct from shared table voice.
++    int death_slot = -1, kill_voice_roll = -1;
++    std::uint64_t death_starts = 0, corpses_created = 0, kill_voice_requests = 0;
++    HOBJECT last_corpse = nullptr; // Non-owning; the corpse survives its original actor.
++    std::string death_error;
+     bool AI_STATE_Recoil();
+     std::uint64_t damage_reactions = 0, recoil_starts = 0;
+     int recoil_node = -1, recoil_slot = -1;
+diff --git a/src/game/original/Corpse.cpp b/src/game/original/Corpse.cpp
+new file mode 100644
+index 0000000..16cd529
+--- /dev/null
++++ b/src/game/original/Corpse.cpp
+@@ -0,0 +1,190 @@
++// Original ObjectDLL/corpse.cpp: selected ordinary corpse branch.
++#include "Corpse.h"
++#include "Sparam.h"
++#include "engine/collision.h"
++#include "game/game_settings.h"
++#include <charconv>
++#include <cmath>
++
++using namespace OpenBlood2;
++CCorpse::CCorpse() : B2BaseClass(OT_MODEL)
++{
++    AddAggregate(&m_damage);
++}
++bool CCorpse::Setup(std::string_view root, bool limbs)
++{
++    if (!initialized || configured || !measurements.SetSoundRoot(root))
++        return false;
++    sound_root = root; // Replaces the source's pointer truncated into m_UserData.
++    limb_loss = limbs;
++    configured = true;
++    return true;
++}
++DDWORD CCorpse::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    auto* s = GetServerDE();
++    if (message == MID_PRECREATE)
++    {
++        auto result = B2BaseClass::EngineMessageFn(message, data, reason);
++        auto* state = static_cast<ObjectCreateStruct*>(data);
++        // This hidden class is created by AI_Mgr; authored/string/save corpses
++        // require separate validation rather than accepting a partial template.
++        if (!result || !state || reason != PRECREATE_NORMAL || !state->m_Filename[0])
++            return 0;
++        state->m_ObjectType = OT_MODEL;
++        state->m_Flags = FLAG_VISIBLE | FLAG_RAYHIT | FLAG_GRAVITY | FLAG_MODELKEYS | FLAG_REMOVEIFOUTSIDE;
++        return result;
++    }
++    if (message == MID_INITIALUPDATE)
++    {
++        DVector dims;
++        if (!m_damage.Init(m_hObject) || s->GetModelAnimUserDims(m_hObject, &dims, 0) != DE_OK ||
++            !measurements.GenerateHitSpheres(m_hObject) || !s->ConfigureCharacterBody(m_hObject, 200, 9))
++        {
++            error = "Corpse model/measurement/body initialization unavailable";
++            s->SetNextUpdate(m_hObject, 0);
++        }
++        else
++        {
++            m_damage.m_fMass = 200;
++            m_damage.apply_damage_physics = false;
++            m_damage.SetHitPoints(50);
++            m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = 50;
++            m_damage.SetArmorPoints(0);
++            m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = 0;
++            s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) | (100u << 24) | (1u << 3) | (1u << 5));
++            initialized = true;
++            s->SetNextUpdate(m_hObject, .01f);
++        }
++    }
++    else if (message == MID_UPDATE && !Update())
++        s->RemoveObject(m_hObject);
++    else if (message == MID_MODELSTRINGKEY)
++        OnStringKey(static_cast<ArgList*>(data));
++    return B2BaseClass::EngineMessageFn(message, data, reason);
++}
++bool CCorpse::Update()
++{
++    auto* s = GetServerDE();
++    ++updates;
++    if (!initialized || !configured || !error.empty())
++    {
++        if (error.empty())
++            error = "Corpse setup was not completed";
++        s->SetNextUpdate(m_hObject, 0);
++        return true; // Failed service remains visible; never claims animation completion.
++    }
++    const auto now = s->GetTime();
++    if (remove_time && remove_time <= now)
++        return false;
++    if (s->GetModelPlaybackState(m_hObject) & MS_PLAYDONE)
++    {
++        animation_done = true;
++        DVector from;
++        if (s->GetObjectPos(m_hObject, &from) != DE_OK)
++            pool_error = "Corpse blood-pool origin unavailable";
++        else
++        {
++            auto to = from;
++            to.y -= 40;
++            pool_result = s->IntersectSegment(from, to, m_hObject, pool_hit, false, SegmentObjects::SolidOnly);
++            if (pool_result == SegmentResult::Hit && !pool_hit.object)
++            {
++                pool_hit.point.y += .1f;
++                pool_requested = true;
++                pool_error = "Original CClientSplatFX is unavailable; blood pool is not rendered";
++            }
++            else if (pool_result != SegmentResult::Miss && pool_result != SegmentResult::Hit)
++                pool_error = "Corpse blood-pool ray unavailable";
++        }
++        const bool multiplayer = GetGameType() != GAMETYPE_SINGLE;
++        if (multiplayer)
++            remove_time = now + 30.f - .1f;
++        s->SetNextUpdate(m_hObject, multiplayer ? 30.f : 0.f);
++    }
++    else
++        s->SetNextUpdate(m_hObject, .1f);
++    return true;
++}
++DDWORD CCorpse::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    if (message == damage_message || message == 1000)
++    {
++        // Do not mutate health through the aggregate while its required corpse
++        // hit/limb/gib response is unavailable, including a generic KILL trigger.
++        ++damage_refusals;
++        damage_error = "Corpse damage/limb/gib services unavailable";
++        return 0;
++    }
++    return B2BaseClass::ObjectMessageFn(sender, message, read);
++}
++bool CCorpse::OnStringKey(ArgList* args)
++{
++    if (!args || !args->argv || args->argc < 1 || !args->argv[0] || sound_root.empty())
++        return false;
++    const std::string_view key(args->argv[0]);
++    std::string_view value;
++    if (key.size() > 4096 || Sparam_Get(key, "play_sound", value) != SparamStatus::Found)
++        return false;
++    ++sound_attempts;
++    sound_error.clear();
++    if (value.empty() || value.size() > 31)
++    {
++        sound_error = "Invalid corpse sound name";
++        return false;
++    }
++    sound_resource = sound_root + "/" + std::string(value);
++    const auto random = Sparam_Get(key, "sound_random", value);
++    if (random == SparamStatus::Invalid)
++    {
++        sound_error = "Invalid corpse sound_random parameter";
++        return false;
++    }
++    if (random == SparamStatus::Found)
++    {
++        int variant;
++        if (!GetServerDE()->RandomInt(1, 3, variant)) // Original B2_LITE NRES(nMax).
++            return false;
++        sound_resource += std::to_string(variant);
++    }
++    sound_resource += ".wav";
++    float radius = 1000;
++    int volume = 100;
++    auto number = [&](const char* name, auto& output)
++    {
++        std::string_view text;
++        auto status = Sparam_Get(key, name, text);
++        if (status == SparamStatus::Missing)
++            return true;
++        if (status != SparamStatus::Found || text.empty() || text.size() > 31)
++            return false;
++        const auto begin = text.find_first_not_of(" \t\r\n");
++        const auto end = text.find_last_not_of(" \t\r\n");
++        if (begin == text.npos)
++            return false;
++        text = text.substr(begin, end - begin + 1);
++        if (text.front() == '+')
++        {
++            text.remove_prefix(1);
++            if (text.empty() || text.front() == '-')
++                return false;
++        }
++        const auto [last, ec] = std::from_chars(text.data(), text.data() + text.size(), output);
++        return ec == std::errc{} && last == text.data() + text.size() && std::isfinite(double(output));
++    };
++    if (!number("sound_radius", radius) || !number("sound_volume", volume))
++    {
++        sound_error = "Invalid corpse sound numeric parameter";
++        return false;
++    }
++    SoundRequest request;
++    request.resource = sound_resource;
++    request.speaker = m_hObject;
++    request.outer_radius = radius;
++    request.inner_radius = radius * .1f;
++    request.volume = float(volume) / 100;
++    request.priority = 3; // SOUNDPRIORITY_AI_MEDIUM.
++    last_sound = GetServerDE()->PlayCharacterSound(m_hObject, request, false, sound_error);
++    sound_starts += last_sound != 0;
++    return last_sound != 0; // No GETHANDLE: auto release; repeated keys may overlap.
++}
+diff --git a/src/game/original/Corpse.h b/src/game/original/Corpse.h
+new file mode 100644
+index 0000000..ac9eef3
+--- /dev/null
++++ b/src/game/original/Corpse.h
+@@ -0,0 +1,31 @@
++#pragma once
++#include "Anim_Sound.h"
++#include "Destructable.h"
++
++// Selected original CCorpse lifetime/animation/audio. Damage, limbs and fire are
++// explicit unavailable branches; see CORPSE_CONTRACTS.md.
++class CCorpse : public B2BaseClass
++{
++  public:
++    CCorpse();
++    ~CCorpse() override = default;
++    bool Setup(std::string_view sound_root, bool limb_loss);
++    bool OnStringKey(ArgList*);
++    bool initialized = false, configured = false, animation_done = false;
++    bool limb_loss = true;
++    float remove_time = 0;
++    CDestructable m_damage;
++    CAnim_Sound measurements;
++    OpenBlood2::SoundId last_sound = 0; // Inspection only; original key omits GETHANDLE.
++    std::uint64_t updates = 0, sound_attempts = 0, sound_starts = 0, damage_refusals = 0;
++    std::string sound_root, sound_resource, sound_error, error, damage_error;
++    OpenBlood2::SegmentResult pool_result = OpenBlood2::SegmentResult::Invalid;
++    OpenBlood2::SegmentHit pool_hit;
++    bool pool_requested = false;
++    std::string pool_error;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++    bool Update();
++};
+diff --git a/src/game/original/Destructable.cpp b/src/game/original/Destructable.cpp
+index eda5ac5..1e66da2 100644
+--- a/src/game/original/Destructable.cpp
++++ b/src/game/original/Destructable.cpp
+@@ -104,7 +104,7 @@ DDWORD CDestructable::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* d
+             trigger_only = prop.m_Bool != 0;
+     }
+     if (message == MID_UPDATE)
+-        m_fLastDamageAmount = 0; // Original per-update accumulator.
++        m_fLastDamageAmount = m_fLastDamagePercent = 0; // Original per-update accumulators.
+     return Aggregate::EngineMessageFn(owner, message, data, reason);
+ }
+ void CDestructable::SendTrigger(const std::string& target, const std::string& message)
+@@ -196,7 +196,21 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD
+             }
+             amount = std::max(amount, 0.0f);
+             m_fHitPoints -= amount;
+-            m_fLastDamageAmount += amount;
++            if (damage.type == OpenBlood2::DamageType::Death)
++            {
++                // Source instant-death branch initializes these before adding the
++                // incoming resisted packet, even if current HP is below maximum.
++                m_fLastDamageAmount = m_fMaxHitPoints + damage.amount * m_fResistance;
++                m_fLastDamagePercent = 100;
++                if (m_fMaxHitPoints > 0)
++                    m_fLastDamagePercent += damage.amount * m_fResistance / m_fMaxHitPoints;
++            }
++            else
++            {
++                m_fLastDamageAmount += amount;
++                if (m_fMaxHitPoints > 0)
++                    m_fLastDamagePercent += amount / m_fMaxHitPoints;
++            }
+             last_damage = damage;
+             if (amount != 0)
+                 reaction_damage_type = damage.type;
+diff --git a/src/game/original/Destructable.h b/src/game/original/Destructable.h
+index 15263d6..d2013a9 100644
+--- a/src/game/original/Destructable.h
++++ b/src/game/original/Destructable.h
+@@ -50,7 +50,7 @@ class CDestructable : public Aggregate
+     DBOOL m_bDead = DFALSE;
+     float m_fHitPoints = 1, m_fArmorPoints = 0, m_fMass = 1, m_fResistance = 1;
+     bool m_bGodMode = false;
+-    float m_fLastDamageAmount = 0;
++    float m_fLastDamageAmount = 0, m_fLastDamagePercent = 0;
+     OpenBlood2::Damage last_damage;
+     // Production NPCs enable the original visible-node localization path after table initialization.
+     bool ai_hit_localization = false;
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 35bed4a..3791cbf 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -6,6 +6,7 @@
+ #include "game/original/CivilianAI.h"
+ #include "game/original/ClientExplosionSFX.h"
+ #include "game/original/ClientLightFX.h"
++#include "game/original/Corpse.h"
+ #include "game/original/CultistAI.h"
+ #include "game/original/DetailSprite.h"
+ #include "game/original/Door.h"
+@@ -79,6 +80,7 @@ namespace OpenBlood2
+                 {"TypeCoop", true},
+                 {"DifficultyInsane", true, false} // Read by original code, absent from its class registration.
+             }};
++        const ClassInfo corpse{"CCorpse", &b2base, construct<CCorpse>, {}};
+         const ClassInfo camera_object{"CameraObj",
+                                       &b2base,
+                                       construct<CameraObj>,
+@@ -663,7 +665,8 @@ namespace OpenBlood2
+                objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
+                objects.register_class(toggle_trigger) && objects.register_class(door) &&
+                objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+-               objects.register_class(rotating_brush) && objects.register_class(hand_model);
++               objects.register_class(rotating_brush) && objects.register_class(hand_model) &&
++               objects.register_class(corpse);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index e929eef..cb4fa71 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -147,6 +147,7 @@ namespace OpenBlood2
+         DRESULT SendObjectives(const MissionObjectives&) override;
+         bool GetClientResourceString(std::uint32_t, std::string&) override;
+         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
++        bool GetModelFilenames(HOBJECT, std::string&, std::string&) override;
+         DRESULT SetModelFilenames(HOBJECT, const char*, const char*) override;
+         DRESULT GetObjectDims(HOBJECT, DVector*) override;
+         DRESULT SetObjectRotation(HOBJECT, const DRotation*) override;
+diff --git a/src/game/server_clients.cpp b/src/game/server_clients.cpp
+index 3f84415..e87a1b9 100644
+--- a/src/game/server_clients.cpp
++++ b/src/game/server_clients.cpp
+@@ -142,6 +142,16 @@ namespace OpenBlood2
+         const char* y = string_data(b);
+         return x && y && !CaseLess{}(x, y) && !CaseLess{}(y, x);
+     }
++    bool ServerAdapter::GetModelFilenames(HOBJECT h, std::string& model, std::string& skin)
++    {
++        trace_service("GetModelFilenames");
++        const auto* r = objects_.get(h);
++        if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL || !r->model || !r->state.m_Filename[0])
++            return false;
++        model = r->state.m_Filename;
++        skin = r->state.m_SkinName;
++        return true;
++    }
+     DRESULT ServerAdapter::SetModelFilenames(HOBJECT h, const char* model, const char* skin)
+     {
+         trace_service("SetModelFilenames");
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index df551af..6b22935 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -818,3 +818,15 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME weapon_drops.catalog COMMAND weapon_drop_tests catalog "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(weapon_drops.catalog PROPERTIES LABELS "headless;private;weapon_drops" TIMEOUT 90)
+ endif()
++
++add_executable(corpse_tests corpse_tests.cpp)
++target_link_libraries(corpse_tests PRIVATE blood2_game)
++blood2_project_options(corpse_tests)
++foreach(case IN ITEMS mappings transfer failures lifetime sounds gates accumulation)
++    add_test(NAME corpses.${case} COMMAND corpse_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/corpse-fixtures/${case}")
++    set_tests_properties(corpses.${case} PROPERTIES LABELS "headless;corpses" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME corpses.catalog COMMAND corpse_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(corpses.catalog PROPERTIES LABELS "headless;private;corpses" TIMEOUT 90)
++endif()
+diff --git a/tests/ai_hit_tests.cpp b/tests/ai_hit_tests.cpp
+index 4139910..913a318 100644
+--- a/tests/ai_hit_tests.cpp
++++ b/tests/ai_hit_tests.cpp
+@@ -204,7 +204,9 @@ namespace
+             CHECK(near(a->m_damage.m_fArmorPoints, 20 - 10 * factor * .3f));
+             CHECK(near(a->m_damage.m_fHitPoints, node == 0 ? 0 : 100 - 10 * factor * .7f));
+             CHECK(a->m_damage.GetLastDamager() == from && a->m_damage.accepted_damage == 1 && a->damage_reactions == 1);
+-            CHECK(a->runtime_failed == (node == 0));
++            CHECK(!a->runtime_failed);
++            if (node == 0)
++                CHECK(a->m_nState == AI_Mgr::StateRecoil && a->kill_voice_roll >= 0);
+         }
+         // Ordinary miss may draw 18 -> mapped -1, half damage, no reaction/state change.
+         GameSession g;
+@@ -221,13 +223,15 @@ namespace
+         {
+             a->m_damage.SetHitPoints(100);
+             a->m_damage.m_fLastDamageAmount = 0;
++            a->m_damage.m_fLastDamagePercent = 0;
+             CHECK(send(g, a->m_hObject, d));
+             found = a->m_damage.node_hit == -1;
+         }
+         CHECK(found && a->m_damage.hit.random_fallback && a->m_damage.hit.raw_node == 18 &&
+               a->m_damage.m_fHitPoints == 99);
+         a->m_bCabal = true;
+-        CHECK(send(g, a->m_hObject, shot(from, 0, 0)) && a->m_damage.IsDead() && a->runtime_failed);
++        CHECK(send(g, a->m_hObject, shot(from, 0, 0)) && a->m_damage.IsDead() && !a->runtime_failed &&
++              a->m_nState == AI_Mgr::StateRecoil);
+         return true;
+     }
+     bool reactions(const char*)
+@@ -245,6 +249,7 @@ namespace
+         CHECK(send(g, a->m_hObject, shot(from, 14, 2)) && a->m_nInjuredLeg == 10);
+         a->m_damage.SetHitPoints(100);
+         a->m_damage.m_fLastDamageAmount = 0;
++        a->m_damage.m_fLastDamagePercent = 0;
+         CHECK(send(g, a->m_hObject, shot(from, 2, 19)) && a->m_nState == AI_Mgr::StateAttackClose);
+         // Accumulator (20), compared against remaining HP (80), exact boundary recoils.
+         CHECK(send(g, a->m_hObject, shot(from, 2, 1)) && a->m_nState == AI_Mgr::StateRecoil);
+diff --git a/tests/ai_runtime_tests.cpp b/tests/ai_runtime_tests.cpp
+index 32b9b46..dc4847c 100644
+--- a/tests/ai_runtime_tests.cpp
++++ b/tests/ai_runtime_tests.cpp
+@@ -258,7 +258,10 @@ namespace
+         CHECK(g.objects.remove(h) && g.objects.finish_frame());
+         g_hActiveCamera = nullptr;
+         a->m_nState = AI_Mgr::StateDying;
+-        CHECK(!a->AI_Update() && a->runtime_error.find("not integrated") != std::string::npos);
++        CHECK(a->AI_Update() && a->death_starts == 1 && !a->runtime_failed);
++        // This injected model has no resource filename; transfer must retain a failed visible actor.
++        CHECK(!a->AI_Update() && a->runtime_error.find("Corpse class/model filenames") != std::string::npos &&
++              !a->m_bRemoveMe);
+         return true;
+     }
+     bool spatial(const char*)
+diff --git a/tests/corpse_tests.cpp b/tests/corpse_tests.cpp
+new file mode 100644
+index 0000000..c2df7b4
+--- /dev/null
++++ b/tests/corpse_tests.cpp
+@@ -0,0 +1,370 @@
++#include "audio_fixture.h"
++#include "game/game_settings.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/Corpse.h"
++#include <algorithm>
++#include <cmath>
++#include <functional>
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .003f;
++    }
++    bool setup(GameSession& g, const std::filesystem::path& path)
++    {
++        CHECK(test_player::setup(g, path, false));
++        test_player::Directory d;
++        auto model = test_model::abc(false, true).b;
++        const std::vector<std::uint8_t> old{4, 0, 'r', 'o', 'o', 't'}, replacement{4, 0, 'h', 'e', 'a', 'd'};
++        auto it = std::search(model.begin(), model.end(), old.begin(), old.end());
++        CHECK(it != model.end());
++        std::copy(replacement.begin(), replacement.end(), it);
++        d.files["corpse.abc"] = model;
++        d.files["skin.dtx"] = {1, 2, 3}; // Indexed only, not renderer evidence.
++        for (auto name : {"cue.wav", "cue1.wav", "cue2.wav", "cue3.wav"})
++            d.children["sounds"].files[name] = test_audio::wave();
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, d);
++        w.patch(131, off);
++        w.patch(135, size);
++        std::ofstream f(path / "corpse.rez", std::ios::binary);
++        f.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        f.close();
++        std::string e;
++        CHECK(g.resources.mount(path / "corpse.rez", e));
++        return true;
++    }
++    AI_Mgr* actor(GameSession& g)
++    {
++        static const ClassInfo type{"DeathProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AI_Mgr>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Flags = FLAG_VISIBLE;
++        s.m_Pos = {0, 60, 0};
++        auto h = g.objects.create(&type, s);
++        auto* a = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h));
++        if (!a || g.server.SetModelFilenames(h, "corpse.abc", "skin.dtx") != DE_OK)
++            return nullptr;
++        auto table = std::make_shared<CAnim_Sound>();
++        if (!table->SetSoundRoot("sounds") || !a->InitStatics(table) || !a->m_MoveObj.Init(h) || !a->m_MoveObj.Update())
++            return nullptr;
++        for (unsigned i = 0; i < 12; ++i)
++            table->m_nAnim_DEATH[i] = i + 1;
++        a->m_vDims = {12, 60, 12};
++        a->m_vScale = {2, 2, 2};
++        a->m_damage.node_hit = 2;
++        a->m_damage.side_hit = 0;
++        if (!a->m_damage.Init(h))
++            return nullptr;
++        a->m_damage.SetHitPoints(0);
++        a->m_damage.m_fMaxHitPoints = 100;
++        return a;
++    }
++    bool mappings(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* a = actor(g);
++        CHECK(a);
++        constexpr int nodes[]{1, 2, 4, 7, 10, 14};
++        for (int side : {0, 6})
++            for (int i = 0; i < 6; ++i)
++            {
++                a->m_damage.node_hit = nodes[i];
++                a->m_damage.side_hit = side;
++                CHECK(a->SetNewState(AI_Mgr::StateDying));
++                auto clip = g.server.GetModelAnimation(a->m_hObject);
++                CHECK(a->DispatchState() && a->death_slot == i + side && a->m_nCorpseType == unsigned(i + side + 1));
++                CHECK(a->Metacmd == 1 && g.server.GetModelAnimation(a->m_hObject) == clip && !a->last_corpse);
++            }
++        a->m_dwFlags = 0x400;
++        bool first = false, second = false;
++        for (int i = 0; i < 100; ++i)
++        {
++            CHECK(a->SetNewState(AI_Mgr::StateDying) && a->DispatchState());
++            first |= a->death_slot == 0;
++            second |= a->death_slot == 1;
++        }
++        CHECK(first && second);
++        a->Metacmd = 2;
++        CHECK(a->DispatchState() && a->m_nState == AI_Mgr::StateInactive && a->Metacmd == 2);
++        return true;
++    }
++    bool transfer(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* a = actor(g);
++        CHECK(a);
++        auto source = a->m_hObject;
++        CHECK(a->SetNewState(AI_Mgr::StateDying) && a->DispatchState());
++        DVector shifted{300, 500, 0};
++        CHECK(g.server.TeleportObject(source, &shifted) == DE_OK);
++        CHECK(a->DispatchState() && a->m_bRemoveMe && a->corpses_created == 1);
++        auto h = a->last_corpse;
++        auto* c = dynamic_cast<CCorpse*>(g.server.HandleToObject(h));
++        auto* r = g.objects.get(h);
++        CHECK(c && c->configured && c->initialized && r->model && c->measurements.hit_spheres_valid);
++        CHECK(!(g.server.GetObjectFlags(source) & FLAG_VISIBLE) && g.server.GetModelAnimation(h) == 2 &&
++              !g.server.GetModelLooping(h));
++        CHECK(near(r->state.m_Pos.y, 41.001f) && near(r->state.m_Pos.x, 0) && r->dimensions.y == 41 &&
++              r->state.m_Scale.y == 2);
++        CHECK(c->m_damage.m_fHitPoints == 50 && c->m_damage.m_fMass == 200 && !(r->state.m_Flags & FLAG_SOLID));
++        CHECK(g.objects.remove(source) && g.objects.finish_frame() && g.server.IsObjectAlive(h));
++        CHECK(g.server.advance_models(.2) && g.objects.advance(.2) && c->animation_done);
++        CHECK(g.server.advance_physics(.3) && g.objects.advance(.3) && g.server.IsObjectAlive(h));
++        CHECK(g.objects.clear() && g.objects.attachments().empty() && !g.server.message_count());
++        return true;
++    }
++    bool failures(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* a = actor(g);
++        CHECK(a);
++        auto h = a->m_hObject;
++        CHECK(a->SetNewState(AI_Mgr::StateDying) && a->DispatchState());
++        auto before = g.objects.snapshot().size();
++        a->m_vScale = {0, 1, 1};
++        CHECK(!a->DispatchState() && !a->m_bRemoveMe && (g.server.GetObjectFlags(h) & FLAG_VISIBLE));
++        CHECK(g.objects.finish_frame() && g.objects.snapshot().size() == before && a->corpses_created == 0);
++        a->m_vScale = {1, 1, 1};
++        a->m_nCorpseType = 9999;
++        CHECK(!a->DispatchState() && g.objects.snapshot().size() == before);
++        a->m_nCorpseType = 0;
++        CHECK(a->CreateCorpse() && a->death_slot >= 0 && a->death_slot < 12);
++        std::string model = "unchanged", skin = "unchanged";
++        CHECK(!g.server.GetModelFilenames(nullptr, model, skin) && model == "unchanged" && skin == "unchanged");
++        a->m_damage.reaction_damage_type = DamageType::Fire;
++        CHECK(!a->CreateCorpse() && a->corpses_created == 1);
++        CHECK(!g.objects.create(g.objects.find_class("CCorpse"), {}, Creation::World));
++        return true;
++    }
++    CCorpse* corpse(GameSession& g)
++    {
++        ObjectCreateStruct s;
++        SAFE_STRCPY(s.m_Filename, "corpse.abc");
++        SAFE_STRCPY(s.m_SkinName, "skin.dtx");
++        s.m_Pos = {0, 30, 0};
++        auto h = g.objects.create(g.objects.find_class("CCorpse"), s);
++        auto* c = dynamic_cast<CCorpse*>(g.server.HandleToObject(h));
++        if (!c || !c->Setup("sounds", false))
++            return nullptr;
++        g.server.SetModelAnimation(h, 0);
++        g.server.SetModelLooping(h, false);
++        return c;
++    }
++    bool lifetime(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* c = corpse(g);
++        CHECK(c);
++        auto h = c->m_hObject;
++        CHECK(g.server.advance_models(.2) && g.objects.advance(.2) && c->animation_done && c->pool_requested &&
++              !c->pool_error.empty());
++        CHECK(g.objects.advance(31) && g.server.IsObjectAlive(h) && !c->remove_time);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        g.server.set_game_settings(DIFFICULTY_MEDIUM, GAMETYPE_BLOODBATH);
++        c = corpse(g);
++        CHECK(c);
++        h = c->m_hObject;
++        CHECK(g.server.advance_models(.2) && g.objects.advance(.2) && c->remove_time > g.objects.time());
++        CHECK(g.objects.advance(29.8) && g.server.IsObjectAlive(h));
++        CHECK(g.objects.advance(.3) && !g.server.IsObjectAlive(h));
++        return true;
++    }
++    bool sounds(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* c = corpse(g);
++        CHECK(c);
++        auto key = [&](const char* text)
++        {
++            char* args[]{const_cast<char*>(text)};
++            ArgList a{args, 1};
++            return c->OnStringKey(&a);
++        };
++        CHECK(key("[play_sound:cue][sound_radius:500][sound_volume:70]"));
++        auto first = c->last_sound;
++        auto* voice = g.server.audio.get(first);
++        CHECK(voice && voice->auto_remove && voice->request.priority == 3 && near(voice->request.volume, .7f));
++        CHECK(key("[play_sound:cue][sound_random:99]") && c->last_sound != first &&
++              g.server.audio.voices().size() == 2);
++        CHECK(!key("[play_sound:cue][sound_radius:+-1]") && !key("[play_sound:missing]") && !c->sound_error.empty());
++        CHECK(g.server.advance_audio(.2, {}, {}) && g.server.audio.voices().empty());
++        CHECK(key("[play_sound:cue]"));
++        auto id = c->last_sound;
++        CHECK(g.objects.remove(c->m_hObject) && g.objects.finish_frame() && g.server.advance_audio(.01, {}, {}) &&
++              !g.server.audio.get(id));
++        return true;
++    }
++    bool gates(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* a = actor(g);
++        CHECK(a);
++        a->m_bCabal = false;
++        for (auto type : {DamageType::Fire, DamageType::Explode})
++        {
++            a->m_damage.reaction_damage_type = type;
++            CHECK(!a->HandleDamage() && !a->damage_reaction_error.empty());
++        }
++        a->m_damage.reaction_damage_type = DamageType::Normal;
++        a->m_damage.m_fLastDamagePercent = .9f;
++        CHECK(!a->HandleDamage());
++        a->m_damage.m_fLastDamagePercent = .899f;
++        CHECK(a->HandleDamage() && a->kill_voice_roll >= 0 && a->m_nState == AI_Mgr::StateRecoil);
++        a->m_damage.m_fLastDamagePercent = 100;
++        a->m_dwFlags = 0x800;
++        CHECK(a->HandleDamage());
++        auto* c = corpse(g);
++        CHECK(c);
++        auto m = g.server.StartMessageToObject(a, c->m_hObject, damage_message);
++        CHECK(g.server.WriteDamage(m, {{0, 0, 1}, {0, 30, 0}, 100, DamageType::Death, a->m_hObject}) == DE_OK &&
++              g.server.EndMessage(m) == DE_OK);
++        CHECK(c->m_damage.m_fHitPoints == 50 && c->damage_refusals == 1 && !c->damage_error.empty() &&
++              c->error.empty());
++        CHECK(g.server.advance_models(.2) && g.objects.advance(.2) && c->animation_done);
++        return true;
++    }
++    bool accumulation(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* a = actor(g);
++        CHECK(a);
++        a->m_nState = AI_Mgr::StateDying; // Isolate shared damage bookkeeping from AI reactions.
++        a->m_damage.SetHitPoints(100);
++        a->m_damage.SetArmorPoints(20);
++        auto send = [&](float amount, DamageType type)
++        {
++            auto m = g.server.StartMessageToObject(a, a->m_hObject, damage_message);
++            return m && g.server.WriteDamage(m, {{0, 0, 1}, {0, 60, 0}, amount, type, a->m_hObject}) == DE_OK &&
++                   g.server.EndMessage(m) == DE_OK;
++        };
++        CHECK(send(10, DamageType::Normal) && near(a->m_damage.m_fLastDamageAmount, 7) &&
++              near(a->m_damage.m_fLastDamagePercent, .07f));
++        CHECK(send(10, DamageType::Normal) && near(a->m_damage.m_fLastDamagePercent, .14f));
++        CHECK(g.objects.engine_message(a->m_hObject, MID_UPDATE, nullptr) && a->m_damage.m_fLastDamagePercent == 0 &&
++              a->m_damage.m_fLastDamageAmount == 0);
++        CHECK(send(5, DamageType::Death) && a->m_damage.IsDead() && near(a->m_damage.m_fLastDamageAmount, 105) &&
++              near(a->m_damage.m_fLastDamagePercent, 100.05f));
++        auto* c = corpse(g);
++        CHECK(c);
++        DVector position{0, 100, 0};
++        CHECK(g.server.TeleportObject(c->m_hObject, &position) == DE_OK);
++        CHECK(g.server.advance_models(.2) && g.objects.advance(.2) && c->animation_done && !c->pool_requested &&
++              c->pool_result == SegmentResult::Miss);
++        return true;
++    }
++    bool catalog(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config cfg;
++        cfg.data_dir = path;
++        std::string e;
++        CHECK(g.resources.mount_game(cfg, e));
++        WorldModel floor;
++        floor.points = {{-2000, 0, -2000}, {2000, 0, -2000}, {2000, 0, 2000}, {-2000, 0, 2000}};
++        floor.surfaces.resize(1);
++        floor.surfaces[0].flags = 1;
++        floor.polygons = {{0, {0, 1, 2, 3}}};
++        CHECK(g.collision.build(floor, e));
++        g.server.collision_ready = true;
++        for (int cycle = 0; cycle < 2; ++cycle)
++            for (auto type : {"CultistAI", "CivilianAI"})
++            {
++                auto h = g.objects.create(g.objects.find_class(type), {}, Creation::World,
++                                          {{"Pos", DVector{0, 100, 0}},
++                                           {"AIState", std::string("IDLE")},
++                                           {"AIWeapon1", std::string("BERETTA")}});
++                auto* a = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h));
++                CHECK(a && a->RuntimeReady());
++                if (cycle == 0 && std::string_view(type) == "CultistAI")
++                    for (auto clip : a->AnimSound()->m_nAnim_DEATH)
++                        std::cout << "Death clip " << clip << " duration "
++                                  << g.objects.get(h)->model->animations[clip].duration << '\n';
++                Damage damage{{0, 0, 1}, {0, 100, 0}, 1000, DamageType::Death, h};
++                if (cycle == 0)
++                {
++                    // Diagnostic NEVERGIB tests the source forced-death branch.
++                    a->m_dwFlags |= 0x800;
++                    a->m_damage.node_hit = 2;
++                }
++                else
++                {
++                    // Real Cabal headshot; low-health Civilian torso kill through normal localization.
++                    DVector node;
++                    DRotation rotation;
++                    const bool cultist = std::string_view(type) == "CultistAI";
++                    CHECK(g.server.GetModelNodeTransform(h, cultist ? "head" : "torso", &node, &rotation));
++                    damage = {{0, 0, 1}, {node.x, node.y, node.z - 1}, 3, DamageType::Normal, h};
++                    if (!cultist)
++                    {
++                        a->m_damage.SetHitPoints(1);
++                        a->m_damage.SetArmorPoints(0);
++                    }
++                }
++                auto m = g.server.StartMessageToObject(a, h, damage_message);
++                CHECK(g.server.WriteDamage(m, damage) == DE_OK && g.server.EndMessage(m) == DE_OK);
++                CHECK(a->m_damage.IsDead() && !a->runtime_failed);
++                CHECK(a->AI_Update() && a->death_starts == 1 && a->AI_Update() && a->corpses_created == 1);
++                auto child = a->last_corpse;
++                auto* c = dynamic_cast<CCorpse*>(g.server.HandleToObject(child));
++                CHECK(c);
++                CHECK(g.objects.engine_message(h, MID_UPDATE, nullptr) && g.objects.finish_frame() &&
++                      !g.objects.get(h) && g.objects.get(child));
++                bool animated = false;
++                for (int frame = 0; frame < 600 && !c->animation_done; ++frame)
++                {
++                    CHECK(g.server.advance_models(.02) && g.server.advance_physics(.02) && g.objects.advance(.02) &&
++                          g.server.advance_audio(.02, {}, {}));
++                    animated |= g.objects.get(child)->animation.time > 0;
++                }
++                CHECK(animated && c->animation_done && c->initialized && c->error.empty() && c->sound_starts > 0 &&
++                      g.objects.get(child)->model);
++                std::cout << type << " cycle " << cycle << ": source removed; corpse clip "
++                          << g.server.GetModelAnimation(child) << ", sound starts " << c->sound_starts
++                          << ", pool request " << c->pool_requested << '\n';
++                CHECK(g.objects.clear() && g.server.advance_audio(.01, {}, {}) && g.server.audio.voices().empty() &&
++                      g.objects.attachments().empty() && !g.server.message_count());
++            }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"mappings", mappings}, {"transfer", transfer}, {"failures", failures},         {"lifetime", lifetime},
++        {"sounds", sounds},     {"gates", gates},       {"accumulation", accumulation}, {"catalog", catalog}};
++    if (argc != 3)
++        return 2;
++    auto it = cases.find(argv[1]);
++    return it != cases.end() && it->second(argv[2]) ? 0 : 1;
++}

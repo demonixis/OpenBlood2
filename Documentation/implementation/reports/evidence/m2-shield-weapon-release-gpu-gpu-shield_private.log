@@ -1,0 +1,96 @@
+664/664 Testing: gpu.shield_private
+664/664 Test: gpu.shield_private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/shield_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/shield-private-gpu" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.shield_private" start time: Oct 17 02:08 CEST
+Output:
+----------------------------------------------------------
+Original external shield/powerup: 42 textured quads, 1367 changed pixels; repeated readback identical, clocks unchanged.
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.shield_private" end time: Oct 17 02:08 CEST
+"gpu.shield_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 02:08 CEST
+
+brushes =   1.55 sec*proc
+
+cameras =   1.63 sec*proc
+
+character =  13.34 sec*proc
+
+cinematics =   1.71 sec*proc
+
+containers =   3.42 sec*proc
+
+doors =   1.53 sec*proc
+
+energy =   0.81 sec*proc
+
+explosion_flames =   0.87 sec*proc
+
+explosion_fragments =   0.82 sec*proc
+
+explosion_models =   0.84 sec*proc
+
+explosion_rings =   0.83 sec*proc
+
+gpu = 115.73 sec*proc
+
+interaction =   2.13 sec*proc
+
+keyframes =   1.63 sec*proc
+
+lights =   1.66 sec*proc
+
+model_view =   0.94 sec*proc
+
+movement =  13.09 sec*proc
+
+naga =   0.81 sec*proc
+
+object_particles =   0.80 sec*proc
+
+objectives =   1.64 sec*proc
+
+pickups =   1.63 sec*proc
+
+player =   1.63 sec*proc
+
+player_controls =   1.05 sec*proc
+
+player_keepalive =   1.91 sec*proc
+
+player_restore =   1.68 sec*proc
+
+private = 106.73 sec*proc
+
+randomsound =  12.53 sec*proc
+
+sceneexplosion =   1.66 sec*proc
+
+session_playback =   0.99 sec*proc
+
+shield =   0.80 sec*proc
+
+sound =   1.70 sec*proc
+
+sprite_view =   0.92 sec*proc
+
+sprites =   1.66 sec*proc
+
+triggers =   1.67 sec*proc
+
+weapon_sprites =   0.93 sec*proc
+
+weapons =  13.17 sec*proc
+
+wind =   0.83 sec*proc
+
+world_view =  14.59 sec*proc
+
+worldpaths =   1.65 sec*proc
+

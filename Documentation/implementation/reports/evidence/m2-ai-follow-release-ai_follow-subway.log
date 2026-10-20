@@ -1,0 +1,16 @@
+413/413 Testing: ai_follow.subway
+413/413 Test: ai_follow.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_follow_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_follow.subway" start time: Oct 16 13:00 CEST
+Output:
+----------------------------------------------------------
+SubwayA cycle=0 path arrival=1
+SubwayA cycle=1 path arrival=1
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.subway" end time: Oct 16 13:00 CEST
+"ai_follow.subway" time elapsed: 00:00:00
+----------------------------------------------------------

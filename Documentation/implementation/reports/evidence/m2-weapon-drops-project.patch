@@ -1,0 +1,1485 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 23f3caa..61d2597 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -346,3 +346,10 @@ Missing later nodes may reuse the prior transform; invalid poses must fail befor
+ health mutation. Refused/nested packets cannot replay stale reactions. Lethal
+ corpse/drop/gib services remain explicit failures; NPC impulses, hidden limbs,
+ Gideon, ExitTrigger and required FX keep M2 incomplete.
++
++The [NPC weapon-drop continuation](../Documentation/Implementation/M2_WEAPON_DROPS.md) connects original Cabal
++DropCurrentWeapon, detached hand physics, BerettaPU and player collection.
++Read [contracts](docs/WEAPON_DROP_CONTRACTS.md). Preserve left-first selection, melee/busy refusal,
++checked independent lifetime, one-second initial support check and ammo-dependent
++pickup acceptance. Failed transfers stay inspectable. Player drop controls,
++corpses/gibs, required FX, Gideon and ExitTrigger remain unavailable; M2 stays open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1abb8f3..dd3314f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -37,7 +37,7 @@ target_sources(blood2_game PRIVATE src/game/original/ClientExplosionSFX.cpp src/
+ target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/LightFX.cpp src/game/original/ClientLightFX.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+-target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
++target_sources(blood2_game PRIVATE src/game/original/WeaponPickups.cpp src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+diff --git a/README.md b/README.md
+index 84a2cc1..4c6f446 100644
+--- a/README.md
++++ b/README.md
+@@ -1,8 +1,12 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
+-Latest combat continuation: [original NPC hit localization and recoil](../Documentation/Implementation/M2_AI_HIT.md)
++Latest death prerequisite: [original NPC weapon drops](../Documentation/Implementation/M2_WEAPON_DROPS.md)
++connects detached Beretta physics, original pickups and player collection. Corpses/gibs,
++required FX, Gideon and ExitTrigger still keep M2 incomplete.
++
++Previous combat continuation: [original NPC hit localization and recoil](../Documentation/Implementation/M2_AI_HIT.md)
+ connects hit regions, limb damage, injured legs and nonlethal reactions to production
+-Cultist/Civilian updates, with in-game inspection. Corpse/drop/gib services, required
++Cultist/Civilian updates, with in-game inspection. Corpse/gib services, required
+ FX, Gideon and ExitTrigger still keep M2 incomplete.
+ 
+ Production lifecycle foundation: [original Cultist/Civilian initialization and AI_Update](../Documentation/Implementation/M2_AI_RUNTIME.md)
+@@ -424,3 +428,7 @@ NPC hit/recoil verification: 481/481 Debug and inspector-free Release checks
+ (27 GPU each), plus 188 targeted ASan/UBSan/leak checks. See
+ [evidence](../Documentation/Implementation/M2_AI_HIT.md) for source quirks,
+ nonlethal production recoil and the remaining death/M2 boundary.
++
++The [NPC weapon-drop continuation](../Documentation/Implementation/M2_WEAPON_DROPS.md) connects the original Cabal drop,
++independent falling Beretta, original pickup and player collection. Corpse/gib
++services, player drop controls and the full M2 exit gate remain open.
+diff --git a/docs/AI_HIT_CONTRACTS.md b/docs/AI_HIT_CONTRACTS.md
+index 554674e..e9243e2 100644
+--- a/docs/AI_HIT_CONTRACTS.md
++++ b/docs/AI_HIT_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original NPC hit localization and recoil
+ 
++> Extended by [NPC weapon-drop contracts](WEAPON_DROP_CONTRACTS.md): the selected
++> Cabal drop, independent falling hand and Beretta collection now work. Corpse/gib
++> and remaining death services still fail explicitly; M2 is incomplete.
++
+ Production CultistAI/CivilianAI now enable the original CDestructable hit-region
+ selection and AI_Mgr nonlethal damage/recoil branches after successful initialization.
+ [Source ledger](M2_AI_HIT_SOURCES.json) and [execution evidence](../../Documentation/Implementation/M2_AI_HIT.md)
+diff --git a/docs/ATTACHMENT_CONTRACTS.md b/docs/ATTACHMENT_CONTRACTS.md
+index cc01f40..1609359 100644
+--- a/docs/ATTACHMENT_CONTRACTS.md
++++ b/docs/ATTACHMENT_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Held models and attachments
+ 
++> Extended by [NPC weapon-drop contracts](WEAPON_DROP_CONTRACTS.md): the selected
++> Cabal drop, independent falling hand and Beretta collection now work. Corpse/gib
++> and remaining death services still fail explicitly; M2 is incomplete.
++
+ Later [production NPC lifecycle contracts](AI_RUNTIME_CONTRACTS.md) supersede
+ this snapshot's absence of Cultist/Civilian initialization, AI_Update and activation.
+ The existing action/service limitations remain unless explicitly superseded.
+diff --git a/docs/M2_WEAPON_DROP_SOURCES.json b/docs/M2_WEAPON_DROP_SOURCES.json
+new file mode 100644
+index 0000000..9058c73
+--- /dev/null
++++ b/docs/M2_WEAPON_DROP_SOURCES.json
+@@ -0,0 +1,163 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "f8939c559f61f7e7fe5d7b6e3b4cae1459357972",
++  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "selected_lines": [
++        [
++          1125,
++          1185
++        ]
++      ],
++      "use": "Single-player current weapon, busy/melee guards, left-first slot removal"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
++      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
++      "selected_lines": [
++        [
++          867,
++          968
++        ],
++        [
++          1482,
++          1517
++        ]
++      ],
++      "use": "NPC Fire REST reset and ownership transfer from DropHandModel"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Weapon.h",
++      "sha256": "d7bd05aaff0b51c1cb6d8c356366c91114e4099303b901697d8ecfb16f87569d",
++      "selected_lines": [
++        [
++          59,
++          60
++        ]
++      ],
++      "use": "Original idle state predicate"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/HandWeaponModel.cpp",
++      "sha256": "480adb2a0ad140120bb9ddb160cf8f8112508abdf70e218067213e0f04c8ed96",
++      "selected_lines": [
++        [
++          125,
++          183
++        ],
++        [
++          190,
++          240
++        ]
++      ],
++      "use": "Drop dimensions/velocity/schedule and grounded pickup transfer; initialized rotation adaptation"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/WeaponPickups.cpp",
++      "sha256": "116eac417209ee2cc523044e02ff615406b597164df9df5d5f2e0be80cfbc1d4",
++      "selected_lines": [
++        [
++          36,
++          106
++        ],
++        [
++          498,
++          572
++        ]
++      ],
++      "use": "WeaponPickup/BerettaPU and selected non-bouncing spawn helper"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/WeaponPickups.h",
++      "sha256": "b32860805172dd270043dc8a4e8c6c13e05806825436403461ba94d44a953416",
++      "selected_lines": [
++        [
++          22,
++          36
++        ]
++      ],
++      "use": "Weapon pickup sound/default bounce/respawn"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PickupObject.cpp",
++      "sha256": "25e0388f983ec0c9e01b6deb8432f411271159a224d582e12300c10863b979da",
++      "selected_lines": [
++        [
++          536,
++          558
++        ]
++      ],
++      "use": "SpawnItem no-bounce/no-respawn branch"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "selected_lines": [
++        [
++          4330,
++          4365
++        ]
++      ],
++      "use": "Original weapon acquisition, 15 percent voice request, ammo acceptance and acknowledgement"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          1780,
++          1815
++        ]
++      ],
++      "use": "Lethal Cabal DropCurrentWeapon before remaining death services"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
++      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
++      "selected_lines": [
++        [
++          193,
++          196
++        ]
++      ],
++      "use": "15 percent chance draw"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/basetypes_de.h",
++      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
++      "selected_lines": [
++        [
++          354,
++          364
++        ]
++      ],
++      "use": "Original no-sliding flag bit and meaning"
++    }
++  ],
++  "adaptations": [
++    "Typed checked messages and object/attachment tokens; no raw weapon owner pointer",
++    "Initialize source undefined drop rotation; centered checked dimensions",
++    "NPC active-Fire lifetime guard; player drop input/state sync unavailable",
++    "Failed pickup/support retains inspectable stopped hand; no silent successful transfer",
++    "FLAG_NOSLIDING first-contact replacement solver; retail parity unverified",
++    "Portable chance RNG; optional pickup voices counted but not played",
++    "Corpse/gib/death branch remains explicit failure after original drop attempt"
++  ],
++  "reference_only": [
++    {
++      "path": "sources/lithtech/runtime/shared/src/moveplayer.cpp",
++      "sha256": "d18890bafe327d46dfe86cfa8d5b053316d4256a063d53056c0cfe1d035ee8e6",
++      "selected_lines": [
++        [
++          1759,
++          1776
++        ]
++      ],
++      "repository_commit": "0eab18289bed72879eddb648d3311075b108cf46",
++      "use": "Later-generation first-contact no-sliding comparison only; no code imported and not retail Blood II proof"
++    }
++  ]
++}
+diff --git a/docs/PICKUP_CONTRACTS.md b/docs/PICKUP_CONTRACTS.md
+index 0a2a730..e24f331 100644
+--- a/docs/PICKUP_CONTRACTS.md
++++ b/docs/PICKUP_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original pickups and destruction spawns
+ 
++> Extended by [NPC weapon-drop contracts](WEAPON_DROP_CONTRACTS.md): the selected
++> Cabal drop, independent falling hand and Beretta collection now work. Corpse/gib
++> and remaining death services still fail explicitly; M2 is incomplete.
++
+ This is a single-player subset of M2, not complete inventory or gameplay.
+ [Source selections](M2_PICKUP_SOURCES.json) record the original functions and
+ adaptations. [Implementation evidence](../../Documentation/Implementation/M2_PICKUPS.md)
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 41db2d0..41aebff 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -637,3 +637,12 @@ failure diagnostics are portability/safety adaptations. No prototype, new
+ dependency, commercial asset or death-service placeholder was imported.
+ [Contracts](AI_HIT_CONTRACTS.md) and [validation](../../Documentation/Implementation/M2_AI_HIT.md)
+ define the visible-node subset and remaining M2 gate.
++
++## NPC weapon drops and Beretta pickups
++
++Selective original DropCurrentWeapon/DropHandModel/CHandWeaponModel, WeaponPickup,
++BerettaPU, SpawnWeaponPickup and PlayerObj MID_ADDWEAPON rules. See the
++[source ledger](M2_WEAPON_DROP_SOURCES.json) and [contracts](WEAPON_DROP_CONTRACTS.md).
++No donor engine code/dependency was imported. Original NOSLIDING bit 25 is
++implemented by the existing replacement solver; later LithTech moveplayer was
++consulted for first-contact meaning only, not treated as retail Blood II proof.
+diff --git a/docs/WEAPON_DROP_CONTRACTS.md b/docs/WEAPON_DROP_CONTRACTS.md
+new file mode 100644
+index 0000000..2aff9a6
+--- /dev/null
++++ b/docs/WEAPON_DROP_CONTRACTS.md
+@@ -0,0 +1,97 @@
++# Original NPC weapon drops and Beretta pickups
++
++This extends [attachments](ATTACHMENT_CONTRACTS.md), [pickups](PICKUP_CONTRACTS.md)
++and [NPC hit reactions](AI_HIT_CONTRACTS.md). The selected single-player source
++path is `DropCurrentWeapon -> DropHandModel -> CHandWeaponModel::Drop/Update ->
++SpawnWeaponPickup -> BerettaPU -> CPlayerObj MID_ADDWEAPON`.
++[Source selections](M2_WEAPON_DROP_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_WEAPON_DROPS.md)
++record its boundaries. M2 remains incomplete.
++
++## Rules and ownership
++
++Cabal lethal HandleDamage attempts the current weapon drop before reaching the
++still-unavailable corpse/gib/death branch. Its original Dying/removal/node -1
++and limb-injury order is unchanged. A refusal is ignored by this source caller;
++the inventory records the reason. The NPC still suspends explicitly at the
++missing death services. This is not a completed NPC death implementation.
++
++Only single-player mode accepts drops or collection; multiplayer weapon pickups
++remove themselves during initialization. A live current held weapon is required. Melee cannot be dropped. A dual inventory
++drops the left slot first, retaining the right current weapon; otherwise the right
++slot is removed. NPC Fire resets to rest synchronously in the original. The port
++uses an active-Fire guard, including the left slot, to prevent a nested damage
++callback from deleting the weapon whose Fire method is executing. Player-initiated
++DropCurrentWeapon is explicitly unavailable until client view-state/input
++synchronization is connected. Merely acquiring a pickup uses the existing real
++inventory revision and next-frame client synchronization.
++
++The hand detaches, resets to its owner's current position/rotation, receives
++current animation dimensions with X=Z=max(X,Z,10), and gets velocity
++150*(forward+up). Visible, gravity, no-sliding and remove-if-outside flags and a
++one-second first check follow the source. The original unbraced SetObjectDims2
++failure branch otherwise leaves rotation uninitialized; the port always reads a
++checked rotation. Dimensions use the existing centered raw setter, not a new
++retail depenetration claim. Existing rendering has no per-object stealth tint;
++the source color reset has no connected tint state to reset.
++
++Ownership transfers only after successful body setup. The weapon clears its
++hand/attachment fields before destruction; the dropped hand clears its owner.
++The hand survives NPC/weapon removal and unload reclaims it. Held models still
++follow their original first-update visibility branch, even if they were dropped
++before that callback. Checked handle tokens replace all borrowed weapon pointers.
++
++The first update after one second checks fresh support, then retries every .01s
++while airborne. Primary-world polygon support is represented by its real polygon
++identity, not a fabricated world HOBJECT. On support, the original horizontal
++facing and position +10Y create a non-bouncing BerettaPU. NPC drops include 12
++bullets; the helper's player-owned variant includes zero. The hand requests
++deferred removal only after successful pickup creation. Missing support services,
++vertical-only facing or missing pickup model leave a stopped, inspectable hand
++with a diagnostic; they do not discard the weapon or report a transfer. Failed
++pickup allocations are reclaimed and do not retry indefinitely.
++
++## Engine and collection
++
++For ordinary normal/model bodies, FLAG_NOSLIDING (original bit 25) stops
++MoveObject at its first contact without
++spending the remaining displacement tangentially. It disables the stair branch;
++normal velocity projection remains unchanged. This is a bounded replacement
++solver, not verified retail physics. Dropped nonsolid bodies use existing generic
++physics once, with primary-world collision. Support on arbitrary moving solid
++bodies, retail slope response and collision recovery remain unverified.
++
++WeaponPickup and BerettaPU retain their ancestry, filenames, resource ID 350,
++weapon1.wav request and glow bit 7. World creation uses existing ground placement;
++runtime drops retain their supplied position. The source bouncing string-spawn
++path is rejected explicitly, and the general destruction SpawnObject whitelist
++is unchanged. Other weapon pickup classes are unavailable.
++
++MID_ADDWEAPON=1004 carries an owned typed Weapon pickup, type 1 and finite ammo
++amount. Routing, kind/type/amount, mixed payload and outstanding acknowledgement
++checks are the same as existing pickups. A living player first calls the original
++ObtainWeapon selection (including a second Beretta). Successful acquisition draws
++the original 15% optional voice chance; requests are counted but not played.
++Unless there are no free slots, positive ammo is then offered to AddAmmo; accepting
++ammo permits collecting an already-owned gun. A full dual inventory/ammo pool
++refuses it. Zero-ammo duplicates remain available. Dead players cannot collect.
++Successful pickup acknowledgement disables contacts before named callbacks and
++removes the pickup only after callback completion. Pickup sound, client voices,
++glow/powerup FX and HUD feedback remain requests, not working audio/FX services.
++
++## Inspection and remaining work
++
++The Pickups panel shows Beretta model/skin, amount, flags, attempts, consumed
++records and detached hands including hidden/inactive/pending identities, position,
++velocity, dimensions, next deadline and failures. It also shows NPC drop attempts
++and successful detachments; recent spawn reports distinguish actual pickup
++transfers and retain independent pickup handles.
++These are read-only observations. GPU smoke collection runs with the UI hidden
++and after reload, also in the inspector-free build.
++
++No corpse, gib, dismemberment, death voice or other weapon implementation is
++claimed. Gideon, ExitTrigger, required FX and the other M2 services remain open.
++SubwayA source-entry accounting stays 202 created, four transferred sounds,
++372 editor-only, two unsupported, zero failed. Dynamic pickups/hands are runtime
++objects, not additional supported authored entries. Linux tests do not establish
++other-platform, XR, retail timing or original-executable parity.
+diff --git a/src/app/inspector_pickups.cpp b/src/app/inspector_pickups.cpp
+index a7f4faf..4eb0e81 100644
+--- a/src/app/inspector_pickups.cpp
++++ b/src/app/inspector_pickups.cpp
+@@ -1,12 +1,15 @@
+ #include "app/inspector.h"
++#include "game/original/AI_Mgr.h"
+ #include "game/original/AmmoPickups.h"
++#include "game/original/HandWeaponModel.h"
+ #include <imgui.h>
+ namespace OpenBlood2
+ {
+     void Inspector::draw_pickups(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextWrapped("Original single-player ammunition, health and armor. Inventory items, timed bonuses, audio "
+-                           "and pickup FX remain pending.");
++        ImGui::TextWrapped(
++            "Original single-player Beretta, ammunition, health and armor. Inventory items, timed bonuses, audio "
++            "and pickup FX remain pending.");
+         if (!ImGui::BeginTable("Pickup inspection", 2, ImGuiTableFlags_Resizable))
+             return;
+         ImGui::TableSetupColumn("Objects", ImGuiTableColumnFlags_WidthFixed, 250);
+@@ -48,7 +51,10 @@ namespace OpenBlood2
+         if (p)
+         {
+             ImGui::Text("%s / %s", r->state.m_Name, r->type->name.c_str());
+-            ImGui::Text("%s / type %u / amount %.0f", p->value.kind == PickupKind::Ammo ? "Ammo" : "Powerup",
++            ImGui::Text("%s / type %u / amount %.0f",
++                        p->value.kind == PickupKind::Ammo     ? "Ammo"
++                        : p->value.kind == PickupKind::Weapon ? "Weapon"
++                                                              : "Powerup",
+                         p->value.type, p->value.amount);
+             ImGui::Text("%s (resource %d)", p->display_name.c_str(), p->resource_id);
+             ImGui::TextWrapped("Model: %s", r->state.m_Filename);
+@@ -57,6 +63,8 @@ namespace OpenBlood2
+             ImGui::Text("Position %.1f %.1f %.1f", r->state.m_Pos.x, r->state.m_Pos.y, r->state.m_Pos.z);
+             ImGui::Text("Velocity %.1f %.1f %.1f", r->velocity.x, r->velocity.y, r->velocity.z);
+             ImGui::Text("Dimensions %.1f %.1f %.1f", r->dimensions.x, r->dimensions.y, r->dimensions.z);
++            ImGui::Text("User flags 0x%08x / glow requested %s (not rendered)", r->user_flags,
++                        r->user_flags & (1u << 7) ? "yes" : "no");
+             ImGui::Text("Rotate FX requested: %s (not rendered)", p->rotate_fx ? "yes" : "no");
+             ImGui::Text("Attempts %llu / consumed %s", static_cast<unsigned long long>(p->attempts),
+                         p->picked_up ? "yes" : "no");
+@@ -79,6 +87,39 @@ namespace OpenBlood2
+             ImGui::TextWrapped("%s -> %s: %s", v.source.c_str(), v.request.c_str(), v.outcome.c_str());
+             ImGui::Text("Child currently %s", game.server.IsObjectAlive(v.child) ? "alive" : "absent");
+         }
++        ImGui::SeparatorText("NPC weapon drops");
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* r = game.objects.get(id);
++            if (!r)
++                continue;
++            if (const auto* ai = dynamic_cast<const AI_Mgr*>(r->game.get()); ai && ai->m_InventoryMgr.drop_attempts)
++            {
++                const auto& inv = ai->m_InventoryMgr;
++                ImGui::TextWrapped("%s: %llu/%llu drops / %s", r->state.m_Name,
++                                   static_cast<unsigned long long>(inv.drops),
++                                   static_cast<unsigned long long>(inv.drop_attempts), inv.drop_error.c_str());
++            }
++            if (const auto* hand = dynamic_cast<const CHandWeaponModel*>(r->game.get());
++                hand && (hand->dropped || !hand->drop_error.empty()))
++            {
++                ImGui::Text("%s / %s / %s / %s", r->state.m_Name, hand->dropped ? "dropped" : "held",
++                            r->state.m_Flags & FLAG_VISIBLE ? "visible" : "hidden",
++                            r->life == Life::Pending         ? "pending"
++                            : r->activity == OBJSTATE_ACTIVE ? "active"
++                                                             : "inactive");
++                ImGui::Text("Position %.1f %.1f %.1f / velocity %.1f %.1f %.1f", r->state.m_Pos.x, r->state.m_Pos.y,
++                            r->state.m_Pos.z, r->velocity.x, r->velocity.y, r->velocity.z);
++                ImGui::Text("Scheduled: %s", r->scheduled ? "yes" : "no");
++                ImGui::Text("Dimensions %.1f %.1f %.1f / next update %.2f", r->dimensions.x, r->dimensions.y,
++                            r->dimensions.z, r->due);
++                ImGui::TextWrapped("Pickup ammo: %s / %s", hand->player_owned ? "none" : "12 bullets",
++                                   hand->drop_error.c_str());
++            }
++        }
++        if (auto* player = game.server_shell.Player(game.local_client))
++            ImGui::Text("Weapon pickup voice requests: %llu (not played)",
++                        static_cast<unsigned long long>(player->weapon_pickup_voice_requests));
+         ImGui::EndTable();
+     }
+ } // namespace OpenBlood2
+diff --git a/src/app/pickup_smoke.cpp b/src/app/pickup_smoke.cpp
+index c388b83..b1f30eb 100644
+--- a/src/app/pickup_smoke.cpp
++++ b/src/app/pickup_smoke.cpp
+@@ -1,5 +1,6 @@
+ #include "pickup_smoke.h"
+ #include "game/original/PickupObject.h"
++#include "game/original/WeaponPickups.h"
+ #include "game/original/spawn_object.h"
+ namespace OpenBlood2
+ {
+@@ -12,7 +13,8 @@ namespace OpenBlood2
+         id = r->id;
+         auto second = SpawnObject("WardPU Name inspect_ward", {200, 10000, 0}, {}, {});
+         const auto* inspect = g.objects.get(second);
+-        return inspect && inspect->model;
++        auto weapon = SpawnWeaponPickup(WEAP_BERETTA, h, {400, 10000, 0}, {}, true);
++        return inspect && inspect->model && weapon && g.objects.get(weapon)->model;
+     }
+     bool collect_pickup_smoke(GameSession& g, ObjectId id)
+     {
+@@ -26,7 +28,18 @@ namespace OpenBlood2
+         if (g.server.TeleportObject(player->m_hObject, &pos) != DE_OK ||
+             g.server.MoveObject(player->m_hObject, &pos) != DE_OK)
+             return false;
+-        return !g.server.IsObjectAlive(h) && player->m_InventoryMgr.GetAmmoCount(1) == 100 &&
+-               g.server.pickup_reports.size() == 1;
++        if (g.server.IsObjectAlive(h) || player->m_InventoryMgr.GetAmmoCount(1) != 100 ||
++            g.server.pickup_reports.size() != 1)
++            return false;
++        auto weapon = SpawnWeaponPickup(WEAP_BERETTA, player->m_hObject, {600, 10000, 0}, {}, true);
++        const auto* pickup = g.objects.get(weapon);
++        if (!pickup || !pickup->model)
++            return false;
++        pos = pickup->state.m_Pos;
++        if (g.server.TeleportObject(player->m_hObject, &pos) != DE_OK ||
++            g.server.MoveObject(player->m_hObject, &pos) != DE_OK)
++            return false;
++        return !g.server.IsObjectAlive(weapon) && player->m_InventoryMgr.CurrentWeapon(true) &&
++               g.server.pickup_reports.size() == 2;
+     }
+ } // namespace OpenBlood2
+diff --git a/src/game/legacy/basedefs_de.h b/src/game/legacy/basedefs_de.h
+index ae9a400..89d52a6 100644
+--- a/src/game/legacy/basedefs_de.h
++++ b/src/game/legacy/basedefs_de.h
+@@ -78,7 +78,8 @@ inline constexpr DDWORD FLAG_MODELGOURAUDSHADE = 1u << 3, FLAG_ANIMTRANSITION =
+ inline constexpr DDWORD FLAG_VISIBLE = 1u << 0, FLAG_SHADOW = 1u << 1, FLAG_ROTATEABLESPRITE = 1u << 3,
+                         FLAG_SPRITECHROMAKEY = 1u << 4, FLAG_SOLID = 1u << 13, FLAG_BOXPHYSICS = 1u << 14,
+                         FLAG_TOUCH_NOTIFY = 1u << 16, FLAG_GRAVITY = 1u << 17, FLAG_MODELKEYS = 1u << 19,
+-                        FLAG_RAYHIT = 1u << 22, FLAG_DONTFOLLOWSTANDING = 1u << 23, FLAG_REMOVEIFOUTSIDE = 1u << 27;
++                        FLAG_RAYHIT = 1u << 22, FLAG_DONTFOLLOWSTANDING = 1u << 23, FLAG_NOSLIDING = 1u << 25,
++                        FLAG_REMOVEIFOUTSIDE = 1u << 27;
+ struct ObjectCreateStruct
+ {
+     D_WORD m_ObjectType = OT_NORMAL;
+diff --git a/src/game/original/AIHitReaction.cpp b/src/game/original/AIHitReaction.cpp
+index ebbcb81..a4318bc 100644
+--- a/src/game/original/AIHitReaction.cpp
++++ b/src/game/original/AIHitReaction.cpp
+@@ -115,7 +115,9 @@ bool AI_Mgr::HandleDamage()
+         m_nInjuredLeg = node;
+     if (m_damage.m_fHitPoints <= 0)
+     {
+-        damage_reaction_error = "NPC lethal reaction requires weapon drops, corpses/gibs and death services";
++        if (m_bCabal)
++            m_InventoryMgr.DropCurrentWeapon(); // Source ignores refusal (no held weapon/busy/melee).
++        damage_reaction_error = "NPC lethal reaction requires corpses/gibs and death services";
+         return false;
+     }
+     if (m_nState == StateScript && !(m_dwScriptFlags & (1u << 1)))
+diff --git a/src/game/original/HandWeaponModel.cpp b/src/game/original/HandWeaponModel.cpp
+index e7afd36..dfec2b3 100644
+--- a/src/game/original/HandWeaponModel.cpp
++++ b/src/game/original/HandWeaponModel.cpp
+@@ -1,5 +1,45 @@
+ #include "HandWeaponModel.h"
++#include "WeaponDefs.h"
++#include "WeaponPickups.h"
++#include "engine/collision.h"
+ #include "server_de.h"
++#include <algorithm>
++using namespace OpenBlood2;
++bool CHandWeaponModel::Drop(HATTACHMENT attachment)
++{
++    auto* s = GetServerDE();
++    drop_error.clear();
++    HATTACHMENT actual = 0;
++    DVector position, dims;
++    DRotation rotation;
++    if (!s || dropped || type != WEAP_BERETTA || !s->IsObjectAlive(owner) || !s->IsObjectAlive(m_hObject) ||
++        s->FindAttachment(owner, m_hObject, &actual) != DE_OK || actual != attachment ||
++        s->GetObjectPos(owner, &position) != DE_OK || s->GetObjectRotation(owner, &rotation) != DE_OK ||
++        s->GetModelAnimUserDims(m_hObject, &dims, s->GetModelAnimation(m_hObject)) != DE_OK || !physics_vector(dims) ||
++        dims.x <= 0 || dims.y <= 0 || dims.z <= 0)
++    {
++        drop_error = "Drop requires a live owner, attachment and supported model dimensions";
++        return false;
++    }
++    dims.x = dims.z = std::max({dims.x, dims.z, 10.f});
++    // Original Drop's missing braces read an uninitialized rotation on success.
++    // Always use the checked owner's rotation, after resetting the hand pose to it.
++    auto velocity =
++        vector_scale(vector_add(rotate_vector(rotation, {0, 0, 1}), rotate_vector(rotation, {0, 1, 0})), 150);
++    if (s->RemoveAttachment(attachment) != DE_OK || s->TeleportObject(m_hObject, &position) != DE_OK ||
++        s->SetObjectRotation(m_hObject, &rotation) != DE_OK || s->SetObjectDims(m_hObject, &dims) != DE_OK ||
++        s->SetVelocity(m_hObject, &velocity) != DE_OK)
++    {
++        drop_error = "Dropped body setup failed";
++        return false;
++    }
++    s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) | FLAG_NOSLIDING | FLAG_VISIBLE | FLAG_GRAVITY |
++                                     FLAG_REMOVEIFOUTSIDE);
++    dropped = true;
++    owner = nullptr; // Independent lifetime; no weapon/inventory pointer survives.
++    s->SetNextUpdate(m_hObject, 1.f);
++    return true;
++}
+ DDWORD CHandWeaponModel::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+ {
+     auto* server = GetServerDE();
+@@ -9,12 +49,58 @@ DDWORD CHandWeaponModel::EngineMessageFn(DDWORD message, void* data, DFLOAT reas
+         server->SetObjectDims(m_hObject, &dims);
+         server->SetNextUpdate(m_hObject, .01f);
+     }
+-    else if (message == MID_UPDATE && first_update)
++    else if (message == MID_UPDATE)
+     {
+-        first_update = false;
+-        auto flags = server->GetObjectFlags(m_hObject);
+-        server->SetObjectFlags(m_hObject, visible ? flags | FLAG_VISIBLE : flags & ~FLAG_VISIBLE);
+-        server->SetNextUpdate(m_hObject, 0);
++        if (first_update)
++        {
++            first_update = false;
++            auto flags = server->GetObjectFlags(m_hObject);
++            server->SetObjectFlags(m_hObject, visible ? flags | FLAG_VISIBLE : flags & ~FLAG_VISIBLE);
++        }
++        if (!dropped)
++            server->SetNextUpdate(m_hObject, 0);
++        else if (drop_error.empty())
++        {
++            MovementState support;
++            DVector position;
++            DRotation rotation;
++            if (!server->GetMovementState(m_hObject, support))
++                drop_error = "Dropped weapon support query unavailable";
++            else if (!support.standing)
++                server->SetNextUpdate(m_hObject, .01f);
++            else if (server->GetObjectPos(m_hObject, &position) != DE_OK ||
++                     server->GetObjectRotation(m_hObject, &rotation) != DE_OK)
++                drop_error = "Dropped weapon pose unavailable";
++            else
++            {
++                auto forward = rotate_vector(rotation, {0, 0, 1});
++                forward.y = 0;
++                position.y += 10;
++                if (server->AlignRotation(rotation, forward) != DE_OK)
++                    drop_error = "Dropped weapon horizontal facing unavailable";
++                else
++                {
++                    pickup = SpawnWeaponPickup(type, m_hObject, position, rotation, !player_owned);
++                    server->RecordSpawn({"CHandWeaponModel",
++                                         "BerettaPU",
++                                         pickup ? "Dropped weapon transferred" : "Dropped weapon pickup failed",
++                                         pickup,
++                                         position,
++                                         {}});
++                    if (pickup)
++                        server->RemoveObject(m_hObject);
++                    else
++                        drop_error = "Dropped weapon pickup could not be created";
++                }
++            }
++            if (!drop_error.empty())
++            {
++                DVector zero{};
++                server->SetVelocity(m_hObject, &zero);
++                server->SetObjectFlags(m_hObject, server->GetObjectFlags(m_hObject) & ~FLAG_GRAVITY);
++                server->SetNextUpdate(m_hObject, 0); // Inspectable failure; no fake transfer/retry duplication.
++            }
++        }
+     }
+     return BaseClass::EngineMessageFn(message, data, reason);
+ }
+diff --git a/src/game/original/HandWeaponModel.h b/src/game/original/HandWeaponModel.h
+index 1ece6ef..0e8d7ed 100644
+--- a/src/game/original/HandWeaponModel.h
++++ b/src/game/original/HandWeaponModel.h
+@@ -1,10 +1,15 @@
+ #pragma once
+ #include "cpp_engineobjects_de.h"
++#include <string>
+ // Original held-model subset. Dropping/pickup spawning and client SFX are not ported.
+ class CHandWeaponModel : public BaseClass
+ {
+   public:
+     CHandWeaponModel() : BaseClass(OT_MODEL) {}
++    bool Drop(HATTACHMENT);
++    bool dropped = false;
++    std::string drop_error;
++    HOBJECT pickup = nullptr;
+     bool visible = true, first_update = true, left = false, player_owned = false;
+     DDWORD type = 0;
+     HOBJECT owner = nullptr; // Checked identity replaces the source's borrowed CWeapon pointer.
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index 1424825..a9400cf 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -1,6 +1,7 @@
+ #include "InventoryMgr.h"
+ #include "AI_Mgr.h"
+ #include "PlayerObj.h"
++#include "game/game_settings.h"
+ #include <algorithm>
+ #include <cmath>
+ namespace
+@@ -275,3 +276,51 @@ bool CInventoryMgr::FindBestWeapon(float distance, CWeapon*& alternative) const
+         alternative = best;
+     return true;
+ }
++
++// Original DropCurrentWeapon: selected single-player NPC branch.
++InventoryResult CInventoryMgr::DropCurrentWeapon()
++{
++    ++drop_attempts;
++    drop_error.clear();
++    auto* server = BaseClass::GetServerDE();
++    if (server &&
++        server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) != static_cast<float>(GAMETYPE_SINGLE))
++    {
++        drop_error = "Original weapon drops require single-player mode";
++        return InventoryResult::NotAvailable;
++    }
++    auto* current = CurrentWeapon();
++    if (!server || !server->IsObjectAlive(m_hOwner) || !current || !server->IsObjectAlive(current->m_hHandModel))
++    {
++        drop_error = "No live current held weapon";
++        return InventoryResult::NotAvailable;
++    }
++    if (m_hClient)
++    {
++        drop_error = "Player drop input and view-weapon state synchronization unavailable";
++        return InventoryResult::NotAvailable;
++    }
++    // Source NPC Fire returns to REST. A nested callback may not delete its weapon.
++    if (current->firing || (CurrentWeapon(true) && CurrentWeapon(true)->firing))
++    {
++        drop_error = "Weapon is firing";
++        return InventoryResult::Busy;
++    }
++    if (current->data.m_nType == WEAP_MELEE)
++    {
++        drop_error = "Original melee weapon cannot be dropped";
++        return InventoryResult::NotAvailable;
++    }
++    auto& weapon = m_LWeapons[m_nCurWeaponSlot] ? m_LWeapons[m_nCurWeaponSlot] : m_Weapons[m_nCurWeaponSlot];
++    const auto child = weapon->m_hHandModel;
++    if (!weapon->DropHandModel())
++    {
++        drop_error = weapon->hand_error;
++        return InventoryResult::Invalid;
++    }
++    last_dropped = child;
++    weapon.reset(); // Ownership was transferred before destruction.
++    ++drops;
++    ++revision;
++    return InventoryResult::Ok;
++}
+diff --git a/src/game/original/InventoryMgr.h b/src/game/original/InventoryMgr.h
+index db26976..707b225 100644
+--- a/src/game/original/InventoryMgr.h
++++ b/src/game/original/InventoryMgr.h
+@@ -12,7 +12,8 @@ enum class InventoryResult
+     Current,
+     NotAvailable,
+     Full,
+-    Invalid
++    Invalid,
++    Busy
+ };
+ class CInventoryMgr : public Aggregate
+ {
+@@ -37,6 +38,10 @@ class CInventoryMgr : public Aggregate
+     void SetMagic(DBYTE);
+     void ClearWeapons();
+     bool UpdateHandModels();
++    InventoryResult DropCurrentWeapon();
++    std::uint64_t drop_attempts = 0, drops = 0;
++    HOBJECT last_dropped = nullptr; // Non-owning; survives inventory/owner destruction.
++    std::string drop_error;
+     InventoryResult ObtainWeapon(DBYTE, int slot = -1);
+     InventoryResult ChangeWeaponSlot(DBYTE);
+     InventoryResult ChangeWeapon(DBYTE);
+diff --git a/src/game/original/PickupObject.cpp b/src/game/original/PickupObject.cpp
+index 888e154..08e75f4 100644
+--- a/src/game/original/PickupObject.cpp
++++ b/src/game/original/PickupObject.cpp
+@@ -51,8 +51,10 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+     {
+         touching_ = static_cast<HOBJECT>(data);
+         ++attempts;
+-        auto packet = g_pServerDE->StartMessageToObject(
+-            this, touching_, value.kind == PickupKind::Ammo ? add_ammo_message : add_powerup_message);
++        auto packet = g_pServerDE->StartMessageToObject(this, touching_,
++                                                        value.kind == PickupKind::Ammo     ? add_ammo_message
++                                                        : value.kind == PickupKind::Weapon ? add_weapon_message
++                                                                                           : add_powerup_message);
+         if (packet)
+         {
+             g_pServerDE->WritePickupMessage(packet, value);
+diff --git a/src/game/original/PlayerContainers.cpp b/src/game/original/PlayerContainers.cpp
+index c1faf73..d646180 100644
+--- a/src/game/original/PlayerContainers.cpp
++++ b/src/game/original/PlayerContainers.cpp
+@@ -1,3 +1,4 @@
++#include "game/game_settings.h"
+ // Selected PlayerObj::UpdateClientPhysics and UpdateAirLevel source rules.
+ #include "PlayerObj.h"
+ #include <algorithm>
+@@ -38,7 +39,8 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD
+         }
+     }
+     if (!m_bDead && !m_damage.IsDead() &&
+-        (message == OpenBlood2::add_ammo_message || message == OpenBlood2::add_powerup_message))
++        (message == OpenBlood2::add_ammo_message || message == OpenBlood2::add_powerup_message ||
++         message == OpenBlood2::add_weapon_message))
+     {
+         OpenBlood2::PickupMessage pickup;
+         if (server->ReadPickupMessage(read, pickup))
+@@ -46,6 +48,25 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD
+             bool accepted = false;
+             if (message == OpenBlood2::add_ammo_message)
+                 accepted = m_InventoryMgr.AddAmmo(pickup.type, pickup.amount) == InventoryResult::Ok;
++            else if (message == OpenBlood2::add_weapon_message)
++            {
++                if (server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) !=
++                    static_cast<float>(GAMETYPE_SINGLE))
++                    return CBaseCharacter::ObjectMessageFn(sender, message, read);
++                auto result = m_InventoryMgr.ObtainWeapon(pickup.type);
++                if (result == InventoryResult::Ok)
++                {
++                    int chance = 0;
++                    // Original optional voice branch: retain its RNG draw. Playback remains unavailable.
++                    if (server->RandomInt(0, 99, chance) && chance < 15)
++                        ++weapon_pickup_voice_requests;
++                }
++                const auto* definition = weapon_definition(pickup.type);
++                if (result != InventoryResult::Full && pickup.amount > 0 && definition &&
++                    m_InventoryMgr.AddAmmo(definition->m_nAmmoType, pickup.amount) == InventoryResult::Ok)
++                    result = InventoryResult::Ok;
++                accepted = result == InventoryResult::Ok;
++            }
+             else
+                 switch (pickup.type)
+                 {
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index 770ef58..660b79b 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -63,6 +63,7 @@ class CPlayerObj : public CBaseCharacter
+     SurfaceType m_eLastSurface = SURFTYPE_UNKNOWN, footstep_surface = SURFTYPE_UNKNOWN;
+     ContainerCode footstep_container = CC_NOTHING;
+     bool GetFootstepSound(std::string&);
++    std::uint64_t weapon_pickup_voice_requests = 0; // Requested only; client voice playback is unavailable.
+     std::uint64_t sound_keys = 0, sound_attempts = 0, sound_starts = 0, sound_failures = 0;
+     std::uint64_t suppressed_footsteps = 0, unresolved_footsteps = 0, unavailable_sound_alerts = 0;
+     OpenBlood2::SoundAlertReport sound_alert;
+diff --git a/src/game/original/Weapon.cpp b/src/game/original/Weapon.cpp
+index a5e2849..95685af 100644
+--- a/src/game/original/Weapon.cpp
++++ b/src/game/original/Weapon.cpp
+@@ -13,6 +13,17 @@ float CWeapon::CheckAmmo() const
+ }
+ FireResult CWeapon::Fire(const WeaponFire& request)
+ {
++    if (firing)
++        return FireResult::Blocked;
++    firing = true;
++    struct ResetFire
++    {
++        bool& value;
++        ~ResetFire()
++        {
++            value = false;
++        }
++    } reset{firing};
+     auto* server = BaseClass::GetServerDE();
+     if (!server || !m_pInventoryMgr || !server->IsObjectAlive(m_hOwner) || request.weapon != data.m_nType ||
+         request.left != m_bLeftHand || !physics_vector(request.position) || !physics_vector(request.direction) ||
+diff --git a/src/game/original/Weapon.h b/src/game/original/Weapon.h
+index 1fd34ae..7ecd613 100644
+--- a/src/game/original/Weapon.h
++++ b/src/game/original/Weapon.h
+@@ -32,6 +32,8 @@ class CWeapon
+   public:
+     virtual ~CWeapon();
+     bool ShowHandModel(DBOOL);
++    bool DropHandModel();
++    bool firing = false; // Guards the synchronous server Fire callback, including NPC REST reset.
+     HOBJECT m_hHandModel = nullptr;
+     HATTACHMENT m_hHandAttachment = 0;
+     std::string hand_error;
+diff --git a/src/game/original/WeaponHand.cpp b/src/game/original/WeaponHand.cpp
+index caa828d..e79b350 100644
+--- a/src/game/original/WeaponHand.cpp
++++ b/src/game/original/WeaponHand.cpp
+@@ -70,3 +70,20 @@ bool CWeapon::ShowHandModel(DBOOL show)
+     m_hHandModel = h;
+     return true;
+ }
++
++bool CWeapon::DropHandModel()
++{
++    auto* server = BaseClass::GetServerDE();
++    auto* hand = server && server->IsObjectAlive(m_hHandModel)
++                     ? dynamic_cast<CHandWeaponModel*>(server->HandleToObject(m_hHandModel))
++                     : nullptr;
++    if (firing || !hand || hand->owner != m_hOwner || !hand->Drop(m_hHandAttachment))
++    {
++        hand_error = firing ? "Weapon is firing" : hand ? hand->drop_error : "Dropped hand model unavailable";
++        return false;
++    }
++    m_hHandModel = nullptr;
++    m_hHandAttachment = 0;
++    hand_error.clear();
++    return true;
++}
+diff --git a/src/game/original/WeaponPickups.cpp b/src/game/original/WeaponPickups.cpp
+new file mode 100644
+index 0000000..625e48a
+--- /dev/null
++++ b/src/game/original/WeaponPickups.cpp
+@@ -0,0 +1,49 @@
++#include "WeaponPickups.h"
++#include "WeaponDefs.h"
++#include "game/game_settings.h"
++BerettaPU::BerettaPU()
++{
++    value = {OpenBlood2::PickupKind::Weapon, WEAP_BERETTA, 12};
++    file = "Beretta_pu";
++    display_name = "Beretta";
++    resource_id = 350;
++}
++DDWORD WeaponPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    // The source string-spawn path bounces by default; that path is not imported.
++    if (message == MID_PRECREATE && reason == PRECREATE_STRINGPROP)
++        return 0;
++    auto result = PickupObject::EngineMessageFn(message, data, reason);
++    if (message == MID_INITIALUPDATE)
++    {
++        if (g_pServerDE->GetVarValueFloat(g_pServerDE->GetGameConVar("GAME_GAMETYPE")) !=
++            static_cast<float>(GAMETYPE_SINGLE))
++            g_pServerDE->RemoveObject(m_hObject);
++        else
++            g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 7));
++    }
++    return result;
++}
++HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector position, DRotation rotation, bool include_ammo)
++{
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(source) || type != WEAP_BERETTA)
++        return nullptr;
++    ObjectCreateStruct state;
++    state.m_Pos = position;
++    state.m_Rotation = rotation;
++    state.m_Flags = FLAG_VISIBLE | FLAG_TOUCH_NOTIFY;
++    SAFE_STRCPY(state.m_Name, "Dropped Beretta pickup");
++    auto* pickup = dynamic_cast<WeaponPickup*>(server->CreateObject(server->GetClass("BerettaPU"), &state));
++    if (!pickup)
++        return nullptr;
++    if (!server->IsObjectAlive(pickup->m_hObject) || !pickup->error.empty())
++    {
++        server->RemoveObject(pickup->m_hObject);
++        return nullptr;
++    }
++    // Source SetBounce(false), SpawnItem: keep the supplied position, no respawn.
++    if (!include_ammo)
++        pickup->value.amount = 0;
++    return pickup->m_hObject;
++}
+diff --git a/src/game/original/WeaponPickups.h b/src/game/original/WeaponPickups.h
+new file mode 100644
+index 0000000..3e2d5e7
+--- /dev/null
++++ b/src/game/original/WeaponPickups.h
+@@ -0,0 +1,20 @@
++#pragma once
++#include "PickupObject.h"
++// Original single-player WeaponPickup/BerettaPU and non-bouncing drop spawn.
++class WeaponPickup : public PickupObject
++{
++  public:
++    WeaponPickup()
++    {
++        pickup_sound = "sounds\\powerups\\weapon1.wav";
++    }
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++};
++class BerettaPU : public WeaponPickup
++{
++  public:
++    BerettaPU();
++};
++HOBJECT SpawnWeaponPickup(DDWORD type, HOBJECT source, DVector, DRotation, bool include_ammo);
+diff --git a/src/game/pickup_messages.h b/src/game/pickup_messages.h
+index bfe2fd6..b4be0b7 100644
+--- a/src/game/pickup_messages.h
++++ b/src/game/pickup_messages.h
+@@ -4,11 +4,12 @@
+ #include <string_view>
+ namespace OpenBlood2
+ {
+-    inline constexpr DDWORD add_ammo_message = 1009, add_powerup_message = 3504;
++    inline constexpr DDWORD add_ammo_message = 1009, add_powerup_message = 3504, add_weapon_message = 1004;
+     enum class PickupKind
+     {
+         Ammo,
+-        Powerup
++        Powerup,
++        Weapon
+     };
+     struct PickupMessage
+     {
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 94a577d..35bed4a 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -25,6 +25,7 @@
+ #include "game/original/Sound.h"
+ #include "game/original/Trigger.h"
+ #include "game/original/VolumeBrush.h"
++#include "game/original/WeaponPickups.h"
+ #include "game/original/WorldProperties.h"
+ #include "game/server_adapter.h"
+ 
+@@ -410,6 +411,8 @@ namespace OpenBlood2
+                                &b2base,
+                                construct<PickupObject>,
+                                {{"PickupTriggerTarget", std::string{}}, {"PickupTriggerMessage", std::string{}}}};
++        const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}};
++        const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
+         const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}};
+         const ClassInfo powerup_pickup{"PowerupPickup", &pickup, construct<PowerupPickup>, {}};
+         const ClassInfo health_base{"HealthBase", &powerup_pickup, construct<HealthBase>, {}};
+@@ -648,6 +651,7 @@ namespace OpenBlood2
+                objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
+                objects.register_class(freefall) && objects.register_class(trigger) &&
+                objects.register_class(key_pickup) && objects.register_class(pickup) &&
++               objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
+                objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+                objects.register_class(health_base) && objects.register_class(armor_base) &&
+                objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
+diff --git a/src/game/server_physics.cpp b/src/game/server_physics.cpp
+index 7ef26b3..c29fa89 100644
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -182,9 +182,10 @@ namespace OpenBlood2
+         if (r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL)
+             return unsupported("Moving this object type");
+         MovementState support;
+-        const bool can_step = (r->state.m_Flags & FLAG_STAIRSTEP) && (r->state.m_Flags & FLAG_SOLID) &&
+-                              GetMovementState(h, support) && support.standing && support.ground_normal.y >= 0.5f &&
+-                              r->velocity.y <= 0.01f && destination->y <= r->state.m_Pos.y + 0.001f;
++        const bool can_step = !(r->state.m_Flags & FLAG_NOSLIDING) && (r->state.m_Flags & FLAG_STAIRSTEP) &&
++                              (r->state.m_Flags & FLAG_SOLID) && GetMovementState(h, support) && support.standing &&
++                              support.ground_normal.y >= 0.5f && r->velocity.y <= 0.01f &&
++                              destination->y <= r->state.m_Pos.y + 0.001f;
+         moving_ = true;
+         const auto ids = objects_.snapshot();
+         std::map<std::uint32_t, HOBJECT> touched;
+@@ -345,6 +346,10 @@ namespace OpenBlood2
+             auto velocity_into = vector_dot(r->velocity, nearest.normal);
+             if (velocity_into < 0)
+                 r->velocity = vector_subtract(r->velocity, vector_scale(nearest.normal, velocity_into));
++            // Source flag requests first-contact placement without a tangential slide.
++            // Velocity keeps the ordinary normal projection; this is replacement physics.
++            if (r->state.m_Flags & FLAG_NOSLIDING)
++                break;
+             if (vector_dot(remaining, remaining) < 1e-10f)
+                 break;
+         }
+diff --git a/src/game/server_pickups.cpp b/src/game/server_pickups.cpp
+index 36685c0..edb5408 100644
+--- a/src/game/server_pickups.cpp
++++ b/src/game/server_pickups.cpp
+@@ -57,9 +57,12 @@ namespace OpenBlood2
+         auto* m = writable(h);
+         if (!m)
+             return DE_INVALIDPARAMS;
+-        const auto limit = value.kind == PickupKind::Ammo ? 8 : 4;
+-        const auto request = value.kind == PickupKind::Ammo ? add_ammo_message : add_powerup_message;
+-        if (!m->routed || (value.kind != PickupKind::Ammo && value.kind != PickupKind::Powerup) ||
++        const auto limit = value.kind == PickupKind::Ammo ? 8 : value.kind == PickupKind::Weapon ? 1 : 4;
++        const auto request = value.kind == PickupKind::Ammo     ? add_ammo_message
++                             : value.kind == PickupKind::Weapon ? add_weapon_message
++                                                                : add_powerup_message;
++        if (!m->routed ||
++            (value.kind != PickupKind::Ammo && value.kind != PickupKind::Powerup && value.kind != PickupKind::Weapon) ||
+             (m->id != request && m->id != picked_up_message) || !m->bytes.empty() || m->damage || m->key || m->pickup ||
+             !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit || !std::isfinite(value.amount) ||
+             value.amount < 0 || value.amount > 1e6f)
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 7d1c676..df551af 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -806,3 +806,15 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME ai_hit.catalog COMMAND ai_hit_tests catalog "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(ai_hit.catalog PROPERTIES LABELS "headless;private;ai_hit" TIMEOUT 90)
+ endif()
++
++add_executable(weapon_drop_tests weapon_drop_tests.cpp)
++target_link_libraries(weapon_drop_tests PRIVATE blood2_game)
++blood2_project_options(weapon_drop_tests)
++foreach(case IN ITEMS collect protocol drop falling guards failures nosliding callback missing_pickup)
++    add_test(NAME weapon_drops.${case} COMMAND weapon_drop_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/weapon-drop-fixtures/${case}")
++    set_tests_properties(weapon_drops.${case} PROPERTIES LABELS "headless;weapon_drops" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME weapon_drops.catalog COMMAND weapon_drop_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(weapon_drops.catalog PROPERTIES LABELS "headless;private;weapon_drops" TIMEOUT 90)
++endif()
+diff --git a/tests/pickup_tests.cpp b/tests/pickup_tests.cpp
+index 91548ed..56d9843 100644
+--- a/tests/pickup_tests.cpp
++++ b/tests/pickup_tests.cpp
+@@ -375,6 +375,13 @@ namespace
+                 else
+                 {
+                     ++created;
++                    if (source.class_name == "BerettaPU")
++                    {
++                        auto* gun = dynamic_cast<PickupObject*>(g.objects.get(h)->game.get());
++                        CHECK(gun && gun->value.kind == PickupKind::Weapon && gun->value.type == WEAP_BERETTA &&
++                              gun->value.amount == 12);
++                        std::cout << "Authored BerettaPU: " << path << '\n';
++                    }
+                     missing += !g.objects.get(h)->model;
+                 }
+                 CHECK(g.objects.clear() && AmmoPickup::m_dwNumPickups == 0);
+@@ -405,7 +412,8 @@ namespace
+             CHECK(reason.ends_with("invalid property TypeAction"));
+             rejected += n;
+         }
+-        CHECK(worlds == 57 && created == 1258 && missing == 0 && rejected == 176 && spawns == 60);
++        CHECK(counts["BerettaPU"] == 1);
++        CHECK(worlds == 57 && created == 1259 && missing == 0 && rejected == 176 && spawns == 60);
+         return true;
+     }
+ } // namespace
+diff --git a/tests/weapon_drop_tests.cpp b/tests/weapon_drop_tests.cpp
+new file mode 100644
+index 0000000..79c89c3
+--- /dev/null
++++ b/tests/weapon_drop_tests.cpp
+@@ -0,0 +1,356 @@
++#include "game/original/CultistAI.h"
++#include "game/original/HandWeaponModel.h"
++#include "game/original/WeaponPickups.h"
++#include "player_fixture.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .01f;
++    }
++    bool setup(GameSession& g, const std::filesystem::path& path)
++    {
++        CHECK(test_player::setup(g, path));
++        std::string error;
++        CHECK(g.enter_player(error));
++        return true;
++    }
++    CBaseCharacter* owner(GameSession& g)
++    {
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Pos = {300, 100, 300};
++        s.m_Rotation = rotation_from_euler({0, 1.5707963f, 0});
++        SAFE_STRCPY(s.m_Filename, "Models/Characters/Caleb.abc");
++        auto h = g.objects.create(g.objects.find_class("CBaseCharacter"), s);
++        auto* c = h ? dynamic_cast<CBaseCharacter*>(g.server.HandleToObject(h)) : nullptr;
++        if (!c || !c->m_InventoryMgr.Init(h, nullptr) ||
++            c->m_InventoryMgr.ObtainWeapon(WEAP_BERETTA) != InventoryResult::Ok ||
++            !c->m_InventoryMgr.CurrentWeapon()->ShowHandModel(true))
++            return nullptr;
++        return c;
++    }
++    WeaponPickup* pickup(GameSession& g, bool ammo = true)
++    {
++        return dynamic_cast<WeaponPickup*>(
++            g.server.HandleToObject(SpawnWeaponPickup(WEAP_BERETTA, g.client_shell.player, {400, 100, 400}, {}, ammo)));
++    }
++    bool touch(GameSession& g, HOBJECT h)
++    {
++        return g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player);
++    }
++    bool collect(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto& inv = g.server_shell.Player(g.local_client)->m_InventoryMgr;
++        inv.SetAmmoCount(1, 0);
++        auto* p = pickup(g);
++        CHECK(p && p->value.kind == PickupKind::Weapon && p->value.amount == 12 && p->resource_id == 350);
++        auto* r = g.objects.get(p->m_hObject);
++        CHECK(r->model && (r->user_flags & (1u << 7)) && near(r->state.m_Pos.y, 100));
++        CHECK(touch(g, p->m_hObject) && p->picked_up && inv.CurrentWeapon(true) && inv.GetAmmoCount(1) == 12);
++        CHECK(g.objects.finish_frame());
++        p = pickup(g, false);
++        CHECK(p && touch(g, p->m_hObject) && !p->picked_up); // Already dual, no ammo.
++        CHECK(g.objects.remove(p->m_hObject) && g.objects.finish_frame());
++        p = pickup(g);
++        inv.SetAmmoCount(1, inv.MaxAmmo(1));
++        CHECK(p && touch(g, p->m_hObject) && !p->picked_up);
++        inv.SetAmmoCount(1, inv.MaxAmmo(1) - 1);
++        CHECK(touch(g, p->m_hObject) && p->picked_up && inv.GetAmmoCount(1) == inv.MaxAmmo(1));
++        CHECK(g.objects.finish_frame() && g.server.pickup_reports.size() == 2 && !g.server.message_count());
++        CHECK(g.unload_world() && !g.server.string_count());
++        return true;
++    }
++    bool protocol(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* p = pickup(g);
++        CHECK(p);
++        auto* player = g.server_shell.Player(g.local_client);
++        const auto initial = player->m_InventoryMgr.GetAmmoCount(1);
++        for (auto value : {PickupMessage{PickupKind::Weapon, 0, 12},
++                           {PickupKind::Weapon, 2, 12},
++                           {PickupKind::Weapon, 1, -1},
++                           {PickupKind::Weapon, 1, std::numeric_limits<float>::infinity()}})
++        {
++            auto m = g.server.StartMessageToObject(p, player->m_hObject, add_weapon_message);
++            CHECK(g.server.WritePickupMessage(m, value) == DE_INVALIDPARAMS);
++            CHECK(g.server.EndMessage(m) != DE_OK);
++        }
++        auto m = g.server.StartMessageToObject(p, player->m_hObject, add_ammo_message);
++        CHECK(g.server.WritePickupMessage(m, p->value) == DE_INVALIDPARAMS && g.server.EndMessage(m) != DE_OK);
++        m = g.server.StartMessageToObject(player, p->m_hObject, picked_up_message);
++        CHECK(g.server.WritePickupMessage(m, p->value) == DE_OK && g.server.EndMessage(m) == DE_OK && !p->picked_up);
++        player->m_bDead = true;
++        CHECK(touch(g, p->m_hObject) && !p->picked_up && !player->m_InventoryMgr.CurrentWeapon(true));
++        CHECK(player->m_InventoryMgr.GetAmmoCount(1) == initial && !g.server.message_count());
++        CHECK(!g.objects.create_props(g.objects.find_class("BerettaPU"), {}, "Name bounce"));
++        return true;
++    }
++    bool drop(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* c = owner(g);
++        CHECK(c);
++        auto& inv = c->m_InventoryMgr;
++        CHECK(inv.ObtainWeapon(WEAP_BERETTA) == InventoryResult::Ok && inv.CurrentWeapon(true)->ShowHandModel(true));
++        auto right = inv.CurrentWeapon()->m_hHandModel, left = inv.CurrentWeapon(true)->m_hHandModel;
++        CHECK(inv.DropCurrentWeapon() == InventoryResult::Ok && inv.CurrentWeapon() && !inv.CurrentWeapon(true) &&
++              inv.last_dropped == left);
++        auto* r = g.objects.get(left);
++        auto* h = dynamic_cast<CHandWeaponModel*>(r->game.get());
++        CHECK(h && h->dropped && !h->owner && !r->attachment && r->scheduled &&
++              near(float(r->due - g.objects.time()), 1));
++        CHECK(near(r->velocity.x, 150) && near(r->velocity.y, 150) && near(r->velocity.z, 0));
++        CHECK(r->dimensions.x == r->dimensions.z && r->dimensions.x >= 10 && r->state.m_Flags & FLAG_NOSLIDING);
++        CHECK(inv.DropCurrentWeapon() == InventoryResult::Ok && !inv.CurrentWeapon() && inv.last_dropped == right &&
++              inv.drops == 2);
++        CHECK(g.objects.remove(c->m_hObject) && g.objects.finish_frame());
++        CHECK(g.server.IsObjectAlive(left) && g.server.IsObjectAlive(right));
++        CHECK(g.unload_world() && !g.objects.get(left) && g.objects.attachments().empty());
++        return true;
++    }
++    bool falling(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* c = owner(g);
++        CHECK(c);
++        auto h = c->m_InventoryMgr.CurrentWeapon()->m_hHandModel;
++        CHECK(c->m_InventoryMgr.DropCurrentWeapon() == InventoryResult::Ok);
++        CHECK(g.objects.remove(c->m_hObject) && g.objects.finish_frame());
++        // Real shared integration; no direct support injection or forced update.
++        for (int i = 0; i < 99; ++i)
++            CHECK(g.server.advance_physics(.01) && g.objects.advance(.01));
++        CHECK(g.server.IsObjectAlive(h) && g.server.spawn_reports.empty());
++        for (int i = 0; i < 20 && g.server.IsObjectAlive(h); ++i)
++            CHECK(g.server.advance_physics(.01) && g.objects.advance(.01));
++        CHECK(!g.server.IsObjectAlive(h) && g.server.spawn_reports.size() == 1);
++        auto ph = g.server.spawn_reports.back().child;
++        auto* p = dynamic_cast<WeaponPickup*>(g.server.HandleToObject(ph));
++        CHECK(p && p->value.amount == 12 && g.server.IsObjectAlive(ph));
++        for (int i = 0; i < 40; ++i)
++            CHECK(g.server.advance_physics(.01) && g.objects.advance(.01));
++        MovementState landed;
++        CHECK(g.server.GetMovementState(ph, landed) && landed.standing);
++        std::cout << "Drop flight -> BerettaPU at y=" << g.objects.get(ph)->state.m_Pos.y << " with 12 bullets\n";
++        CHECK(touch(g, ph) && !g.server.IsObjectAlive(ph) && g.objects.finish_frame());
++        CHECK(g.unload_world() && g.server.spawn_reports.empty() && !g.server.message_count());
++        return true;
++    }
++    bool guards(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* c = owner(g);
++        CHECK(c);
++        auto& inv = c->m_InventoryMgr;
++        g.server.set_game_settings(1, 1);
++        CHECK(inv.DropCurrentWeapon() == InventoryResult::NotAvailable);
++        CHECK(!SpawnWeaponPickup(WEAP_BERETTA, c->m_hObject, {300, 100, 300}, {}, true));
++        CHECK(g.objects.finish_frame());
++        g.server.set_game_settings(1, 0);
++        auto* w = inv.CurrentWeapon();
++        auto h = w->m_hHandModel;
++        w->firing = true;
++        CHECK(inv.DropCurrentWeapon() == InventoryResult::Busy && g.objects.get(h)->attachment);
++        w->firing = false;
++        auto model = g.objects.get(h)->model;
++        g.objects.get(h)->model.reset();
++        CHECK(inv.DropCurrentWeapon() == InventoryResult::Invalid && inv.CurrentWeapon() == w &&
++              g.objects.get(h)->attachment);
++        g.objects.get(h)->model = model;
++        CHECK(inv.ObtainWeapon(WEAP_MELEE) == InventoryResult::Ok &&
++              inv.ChangeWeapon(WEAP_MELEE) == InventoryResult::Ok);
++        CHECK(inv.CurrentWeapon()->ShowHandModel(true) && inv.DropCurrentWeapon() == InventoryResult::NotAvailable);
++        auto& pi = g.server_shell.Player(g.local_client)->m_InventoryMgr;
++        CHECK(pi.UpdateHandModels() &&
++              pi.DropCurrentWeapon() == InventoryResult::NotAvailable); // Explicit client-state boundary.
++        return true;
++    }
++    bool failures(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* c = owner(g);
++        CHECK(c);
++        auto h = c->m_InventoryMgr.CurrentWeapon()->m_hHandModel;
++        CHECK(c->m_InventoryMgr.DropCurrentWeapon() == InventoryResult::Ok);
++        auto* hand = dynamic_cast<CHandWeaponModel*>(g.server.HandleToObject(h));
++        g.server.collision_ready = false;
++        CHECK(g.objects.advance(1.01) && !hand->drop_error.empty() && g.server.IsObjectAlive(h));
++        CHECK(!g.objects.get(h)->scheduled && !(g.objects.get(h)->state.m_Flags & FLAG_GRAVITY) &&
++              g.server.spawn_reports.empty());
++        CHECK(g.objects.advance(2) && g.server.spawn_reports.empty());
++        return true;
++    }
++    bool missing_pickup(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* c = owner(g);
++        CHECK(c);
++        auto h = c->m_InventoryMgr.CurrentWeapon()->m_hHandModel;
++        CHECK(c->m_InventoryMgr.DropCurrentWeapon() == InventoryResult::Ok);
++        auto* r = g.objects.get(h);
++        auto* hand = dynamic_cast<CHandWeaponModel*>(r->game.get());
++        DVector pos{300, r->dimensions.y + .001f, 300}, zero{};
++        CHECK(g.server.TeleportObject(h, &pos) == DE_OK && g.server.SetVelocity(h, &zero) == DE_OK);
++        g.resources = Resources{};
++        g.models.clear();
++        CHECK(g.objects.advance(1.01) && g.server.IsObjectAlive(h) && !hand->drop_error.empty());
++        CHECK(!hand->pickup && g.server.spawn_reports.size() == 1 && !g.server.spawn_reports.back().child);
++        CHECK(!r->scheduled && g.objects.advance(2) && g.server.spawn_reports.size() == 1);
++        CHECK(g.objects.finish_frame());
++        for (auto id : g.objects.snapshot())
++            CHECK(!dynamic_cast<WeaponPickup*>(g.objects.get(id)->game.get()));
++        return true;
++    }
++    bool nosliding(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        ObjectCreateStruct state;
++        state.m_Pos = {300, 100, 300};
++        state.m_Flags = FLAG_GRAVITY | FLAG_NOSLIDING;
++        auto h = g.objects.create(g.objects.find_class("BaseClass"), state);
++        CHECK(h);
++        DVector dims{1, 1, 1}, end{400, -20, 400};
++        CHECK(g.server.SetObjectDims(h, &dims) == DE_OK && g.server.MoveObject(h, &end) == DE_OK);
++        auto pos = g.objects.get(h)->state.m_Pos;
++        CHECK(pos.x > 300 && pos.x < 390 && near(pos.y, 1.001f) && near(pos.z, pos.x));
++        CHECK(g.server.TeleportObject(h, &state.m_Pos) == DE_OK);
++        g.server.SetObjectFlags(h, FLAG_GRAVITY);
++        CHECK(g.server.MoveObject(h, &end) == DE_OK && near(g.objects.get(h)->state.m_Pos.x, 400));
++        return true;
++    }
++    class DropOnHit : public BaseClass
++    {
++      public:
++        static inline CInventoryMgr* inventory = nullptr;
++        static inline InventoryResult result = InventoryResult::Invalid;
++        DDWORD ObjectMessageFn(HOBJECT, DDWORD message, HMESSAGEREAD) override
++        {
++            if (message == damage_message)
++            {
++                result = inventory->DropCurrentWeapon();
++                GetServerDE()->RemoveObject(inventory->m_hOwner);
++            }
++            return 1;
++        }
++    };
++    bool callback(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(setup(g, path));
++        auto* c = owner(g);
++        CHECK(c);
++        static const ClassInfo type{"DropOnHit",
++                                    g.objects.find_class("BaseClass"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<DropOnHit>(); },
++                                    {}};
++        CHECK(g.objects.register_class(type));
++        ObjectCreateStruct state;
++        state.m_Pos = {300, 100, 500};
++        state.m_Flags = FLAG_SOLID;
++        auto target = g.objects.create(&type, state);
++        CHECK(target);
++        DVector dims{50, 50, 50};
++        CHECK(g.server.SetObjectDims(target, &dims) == DE_OK);
++        auto& inv = c->m_InventoryMgr;
++        DropOnHit::inventory = &inv;
++        inv.SetAmmoCount(1, 10);
++        const auto h = c->m_hObject, hand = inv.CurrentWeapon()->m_hHandModel;
++        WeaponFire fire;
++        fire.weapon = WEAP_BERETTA;
++        fire.position = {300, 100, 300};
++        fire.direction = {0, 0, 1};
++        CHECK(inv.FireCurrentWeapon(fire) == FireResult::Fired);
++        CHECK(DropOnHit::result == InventoryResult::Busy && !g.server.IsObjectAlive(h) && inv.drops == 0);
++        CHECK(g.objects.finish_frame() && !g.objects.get(h) && !g.objects.get(hand) && !g.server.message_count());
++        DropOnHit::inventory = nullptr;
++        return true;
++    }
++    bool catalog(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        std::string error;
++        Config cfg;
++        cfg.data_dir = path;
++        CHECK(g.resources.mount_game(cfg, error));
++        WorldModel floor;
++        floor.points = {{-2000, 0, -2000}, {2000, 0, -2000}, {2000, 0, 2000}, {-2000, 0, 2000}};
++        floor.surfaces.resize(1);
++        floor.surfaces[0].flags = 1;
++        floor.polygons = {{0, {0, 1, 2, 3}}};
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        for (int load = 0; load < 2; ++load)
++        {
++            // Actual initialized source NPC; damage goes through the production message callback.
++            auto h = g.objects.create(
++                g.objects.find_class("CultistAI"), {}, Creation::World,
++                {{"Pos", DVector{0, 150, 0}}, {"AIWeapon1", std::string("BERETTA")}, {"AIState", std::string("IDLE")}});
++            auto* a = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(h));
++            CHECK(a && a->RuntimeReady());
++            CHECK(a->m_InventoryMgr.UpdateHandModels());
++            auto* weapon = a->m_InventoryMgr.CurrentWeapon();
++            CHECK(weapon);
++            auto hand = weapon->m_hHandModel;
++            CHECK(hand && g.objects.get(hand)->model);
++            // Death packets bypass region queries, preserving the source node from initialization.
++            auto m = g.server.StartMessageToObject(a, h, damage_message);
++            CHECK(g.server.WriteDamage(m, {{0, 0, 1}, {0, 150, 0}, 10000, DamageType::Death, h}) == DE_OK &&
++                  g.server.EndMessage(m) == DE_OK);
++            CHECK(a->m_damage.IsDead() && a->runtime_failed && a->m_InventoryMgr.drops == 1 &&
++                  !a->m_InventoryMgr.CurrentWeapon());
++            CHECK(g.objects.remove(h) && g.objects.finish_frame() && g.server.IsObjectAlive(hand));
++            for (int i = 0; i < 130 && g.server.IsObjectAlive(hand); ++i)
++                CHECK(g.server.advance_physics(.01) && g.objects.advance(.01));
++            CHECK(!g.server.IsObjectAlive(hand) && g.server.spawn_reports.size() == 1);
++            auto ph = g.server.spawn_reports.back().child;
++            auto* p = dynamic_cast<WeaponPickup*>(g.server.HandleToObject(ph));
++            CHECK(p && p->value.amount == 12 && g.objects.get(ph)->model &&
++                  g.resources.find(g.objects.get(ph)->state.m_SkinName));
++            for (int i = 0; i < 40; ++i)
++                CHECK(g.server.advance_physics(.01) && g.objects.advance(.01));
++            MovementState landed;
++            CHECK(g.server.GetMovementState(ph, landed) && landed.standing);
++            std::cout << "Retail Cultist lethal drop cycle " << load
++                      << ": detached Beretta -> original pickup (death remains unavailable)\n";
++            CHECK(g.objects.clear() && !g.objects.get(hand) && g.objects.attachments().empty() &&
++                  !g.server.message_count());
++            g.server.spawn_reports.clear();
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"collect", collect},     {"protocol", protocol}, {"drop", drop},
++        {"falling", falling},     {"guards", guards},     {"failures", failures},
++        {"nosliding", nosliding}, {"callback", callback}, {"missing_pickup", missing_pickup},
++        {"catalog", catalog}};
++    if (argc != 3)
++        return 2;
++    auto it = cases.find(argv[1]);
++    return it != cases.end() && it->second(argv[2]) ? 0 : 1;
++}

@@ -1,0 +1,15 @@
+485/491 Testing: weapon_drops.falling
+485/491 Test: weapon_drops.falling
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests" "falling" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-drop-fixtures/falling"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapon_drops.falling" start time: Oct 16 16:00 CEST
+Output:
+----------------------------------------------------------
+Drop flight -> BerettaPU at y=12.001 with 12 bullets
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_drops.falling" end time: Oct 16 16:00 CEST
+"weapon_drops.falling" time elapsed: 00:00:00
+----------------------------------------------------------

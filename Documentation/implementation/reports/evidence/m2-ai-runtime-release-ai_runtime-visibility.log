@@ -1,0 +1,14 @@
+460/472 Testing: ai_runtime.visibility
+460/472 Test: ai_runtime.visibility
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_runtime_tests" "visibility"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_runtime.visibility" start time: Oct 16 15:13 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.visibility" end time: Oct 16 15:13 CEST
+"ai_runtime.visibility" time elapsed: 00:00:00
+----------------------------------------------------------

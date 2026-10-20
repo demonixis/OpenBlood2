@@ -1,0 +1,14 @@
+667/673 Testing: gideon_combat.shield
+667/673 Test: gideon_combat.shield
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_combat_tests" "shield" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-combat-shield"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_combat.shield" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.shield" end time: Oct 17 02:23 CEST
+"gideon_combat.shield" time elapsed: 00:00:00
+----------------------------------------------------------

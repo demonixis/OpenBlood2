@@ -1,0 +1,163 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start   1: objects.original_objects
+ 1/72 Test   #1: objects.original_objects .........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+ 2/72 Test   #2: objects.nested_creation ..........   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+ 3/72 Test   #3: objects.reasons_properties .......   Passed    0.02 sec
+      Start   4: objects.scheduling
+ 4/72 Test   #4: objects.scheduling ...............   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+ 5/72 Test   #5: objects.deferred_removal .........   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+ 6/72 Test   #6: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   7: objects.handles_selection
+ 7/72 Test   #7: objects.handles_selection ........   Passed    0.02 sec
+      Start   8: objects.links_lists
+ 8/72 Test   #8: objects.links_lists ..............   Passed    0.02 sec
+      Start   9: objects.messages_strings
+ 9/72 Test   #9: objects.messages_strings .........   Passed    0.03 sec
+      Start  10: objects.unsupported_teardown
+10/72 Test  #10: objects.unsupported_teardown .....   Passed    0.04 sec
+      Start  11: objects.creation_failures
+11/72 Test  #11: objects.creation_failures ........   Passed    0.03 sec
+      Start  38: services.model_reader
+12/72 Test  #38: services.model_reader ............   Passed    0.02 sec
+      Start  39: services.model_rejection
+13/72 Test  #39: services.model_rejection .........   Passed    0.31 sec
+      Start  40: services.animation_events
+14/72 Test  #40: services.animation_events ........   Passed    0.02 sec
+      Start  41: services.model_callbacks
+15/72 Test  #41: services.model_callbacks .........   Passed    0.02 sec
+      Start  42: services.collision_queries
+16/72 Test  #42: services.collision_queries .......   Passed    0.01 sec
+      Start  43: services.movement_contacts
+17/72 Test  #43: services.movement_contacts .......   Passed    0.02 sec
+      Start  44: services.original_services
+18/72 Test  #44: services.original_services .......   Passed    0.02 sec
+      Start  45: services.private
+19/72 Test  #45: services.private .................   Passed    9.99 sec
+      Start  46: player.handles
+20/72 Test  #46: player.handles ...................   Passed    0.03 sec
+      Start  47: player.lifecycle
+21/72 Test  #47: player.lifecycle .................   Passed    0.04 sec
+      Start  48: player.rollback
+22/72 Test  #48: player.rollback ..................   Passed    0.05 sec
+      Start  49: player.messages
+23/72 Test  #49: player.messages ..................   Passed    0.04 sec
+      Start  50: player.callbacks
+24/72 Test  #50: player.callbacks .................   Passed    0.04 sec
+      Start  51: player.private
+25/72 Test  #51: player.private ...................   Passed   11.20 sec
+      Start  52: weapons.inventory
+26/72 Test  #52: weapons.inventory ................   Passed    0.04 sec
+      Start  58: weapons.lifetime
+27/72 Test  #58: weapons.lifetime .................   Passed    0.06 sec
+      Start  59: weapons.rollback
+28/72 Test  #59: weapons.rollback .................   Passed    0.04 sec
+      Start 293: attachments.root
+29/72 Test #293: attachments.root .................   Passed    0.02 sec
+      Start 294: attachments.nodes
+30/72 Test #294: attachments.nodes ................   Passed    0.02 sec
+      Start 295: attachments.rejects
+31/72 Test #295: attachments.rejects ..............   Passed    0.36 sec
+      Start 296: attachments.lifetime
+32/72 Test #296: attachments.lifetime .............   Passed    0.02 sec
+      Start 297: attachments.held
+33/72 Test #297: attachments.held .................   Passed    0.05 sec
+      Start 298: attachments.missing
+34/72 Test #298: attachments.missing ..............   Passed    0.04 sec
+      Start 299: attachments.catalog
+35/72 Test #299: attachments.catalog ..............   Passed    1.06 sec
+      Start 300: attachments.subway
+36/72 Test #300: attachments.subway ...............   Passed    3.98 sec
+      Start 324: ai_perception.factions
+37/72 Test #324: ai_perception.factions ...........   Passed    0.02 sec
+      Start 325: ai_perception.selection
+38/72 Test #325: ai_perception.selection ..........   Passed    0.02 sec
+      Start 326: ai_perception.visibility
+39/72 Test #326: ai_perception.visibility .........   Passed    0.02 sec
+      Start 327: ai_perception.hints
+40/72 Test #327: ai_perception.hints ..............   Passed    0.02 sec
+      Start 328: ai_perception.stimuli
+41/72 Test #328: ai_perception.stimuli ............   Passed    0.02 sec
+      Start 329: ai_perception.retaliation
+42/72 Test #329: ai_perception.retaliation ........   Passed    0.02 sec
+      Start 330: ai_perception.opportunity
+43/72 Test #330: ai_perception.opportunity ........   Passed    0.02 sec
+      Start 331: ai_perception.failures
+44/72 Test #331: ai_perception.failures ...........   Passed    0.02 sec
+      Start 332: ai_perception.lifetime
+45/72 Test #332: ai_perception.lifetime ...........   Passed    0.02 sec
+      Start 333: ai_perception.catalog
+46/72 Test #333: ai_perception.catalog ............   Passed    0.89 sec
+      Start 334: ai_perception.subway
+47/72 Test #334: ai_perception.subway .............   Passed    3.45 sec
+      Start 473: exits.defaults
+48/72 Test #473: exits.defaults ...................   Passed    0.04 sec
+      Start 474: exits.delayed
+49/72 Test #474: exits.delayed ....................   Passed    0.05 sec
+      Start 475: exits.broadcast
+50/72 Test #475: exits.broadcast ..................   Passed    0.03 sec
+      Start 476: exits.blocked
+51/72 Test #476: exits.blocked ....................   Passed    0.04 sec
+      Start 477: exits.dead
+52/72 Test #477: exits.dead .......................   Passed    0.03 sec
+      Start 478: exits.queue
+53/72 Test #478: exits.queue ......................   Passed    0.05 sec
+      Start 479: exits.lifetime
+54/72 Test #479: exits.lifetime ...................   Passed    0.04 sec
+      Start 480: exits.catalog
+55/72 Test #480: exits.catalog ....................   Passed   11.07 sec
+      Start 481: inventory_state.roundtrip
+56/72 Test #481: inventory_state.roundtrip ........   Passed    0.03 sec
+      Start 482: inventory_state.malformed
+57/72 Test #482: inventory_state.malformed ........   Passed    0.03 sec
+      Start 483: inventory_state.rollback
+58/72 Test #483: inventory_state.rollback .........   Passed    0.03 sec
+      Start 484: inventory_state.capture
+59/72 Test #484: inventory_state.capture ..........   Passed    0.04 sec
+      Start 485: inventory_state.private
+60/72 Test #485: inventory_state.private ..........   Passed    5.04 sec
+      Start 486: destructable_state.roundtrip
+61/72 Test #486: destructable_state.roundtrip .....   Passed    0.03 sec
+      Start 487: destructable_state.behavior
+62/72 Test #487: destructable_state.behavior ......   Passed    0.03 sec
+      Start 488: destructable_state.sentinel
+63/72 Test #488: destructable_state.sentinel ......   Passed    0.03 sec
+      Start 489: destructable_state.failures
+64/72 Test #489: destructable_state.failures ......   Passed    0.04 sec
+      Start 490: destructable_state.capture
+65/72 Test #490: destructable_state.capture .......   Passed    0.03 sec
+      Start 491: destructable_state.private
+66/72 Test #491: destructable_state.private .......   Passed    5.01 sec
+      Start 492: player_state.roundtrip
+67/72 Test #492: player_state.roundtrip ...........   Passed    0.03 sec
+      Start 493: player_state.clocks
+68/72 Test #493: player_state.clocks ..............   Passed    0.03 sec
+      Start 494: player_state.initialization
+69/72 Test #494: player_state.initialization ......   Passed    0.03 sec
+      Start 495: player_state.failures
+70/72 Test #495: player_state.failures ............   Passed    0.04 sec
+      Start 496: player_state.capture
+71/72 Test #496: player_state.capture .............   Passed    0.03 sec
+      Start 497: player_state.private
+72/72 Test #497: player_state.private .............   Passed    5.02 sec
+
+100% tests passed, 0 tests failed out of 72
+
+Label Time Summary:
+ai_perception         =   4.50 sec*proc (11 tests)
+attachments           =   5.54 sec*proc (8 tests)
+destructable_state    =   5.17 sec*proc (6 tests)
+exits                 =  11.35 sec*proc (8 tests)
+headless              =  59.07 sec*proc (72 tests)
+inventory_state       =   5.17 sec*proc (5 tests)
+objects               =   0.23 sec*proc (11 tests)
+player                =  11.40 sec*proc (6 tests)
+player_state          =   5.19 sec*proc (6 tests)
+private               =  56.71 sec*proc (10 tests)
+services              =  10.40 sec*proc (8 tests)
+weapons               =   0.14 sec*proc (3 tests)
+
+Total Test time (real) =  59.09 sec

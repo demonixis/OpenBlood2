@@ -1,0 +1,87 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 661
+    Start 661: gpu.mouse_combat
+
+661: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "gpu_combat" "<external-data-root>"
+661: Working Directory: <workspace>/Blood2/build/debug/tests
+661: Test timeout computed to be: 120
+661: Original SubwayA camera intro expired after 12.0167 simulation seconds
+661: Approached encounter at z=-2192.09
+661: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=5, ammo=45, independent corpse verified, native=1
+661: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=0
+661: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+661: Walked past killed Cultist to z=-1861.92
+661: Original SubwayA camera intro expired after 12.0167 simulation seconds
+661: Approached encounter at z=-2192.09
+661: Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=12, ammo=38, independent corpse verified, native=1
+661: Dodge updates=12, corpse candidates=23, zero-margin search=1, swept source clearance=0
+661: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+661: Walked past killed Cultist to z=-1861.92
+1/4 Test #661: gpu.mouse_combat .................   Passed   18.27 sec
+test 662
+    Start 662: gpu.corpse_clearance
+
+662: Test command: <workspace>/Blood2/build/debug/tests/player_controls_tests "gpu_clearance" "<external-data-root>"
+662: Working Directory: <workspace>/Blood2/build/debug/tests
+662: Test timeout computed to be: 120
+662: Original SubwayA camera intro expired after 12.0167 simulation seconds
+662: Approached encounter at z=-2338.28
+662: combat:338: damaged && dead && player_attributed && !g.objects.get(target) && corpse
+2/4 Test #662: gpu.corpse_clearance .............***Failed   12.93 sec
+test 898
+    Start 898: gpu.blood_spurt
+
+898: Test command: <workspace>/Blood2/build/debug/tests/blood_spurt_gpu_tests "<workspace>/Blood2/build/debug/tests/blood-spurt-gpu"
+898: Working Directory: <workspace>/Blood2/build/debug/tests
+898: Test timeout computed to be: 60
+898: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+898: cycle 0 three drop textures: 6895 changed pixels
+898: cycle 0 original emitter collision mark: 96 changed pixels
+898: cycle 1 three drop textures: 6895 changed pixels
+898: cycle 1 original emitter collision mark: 96 changed pixels
+898: cycle 2 three drop textures: 6895 changed pixels
+898: cycle 2 original emitter collision mark: 96 changed pixels
+3/4 Test #898: gpu.blood_spurt ..................   Passed    0.46 sec
+test 899
+    Start 899: gpu.blood_spurt_private
+
+899: Test command: <workspace>/Blood2/build/debug/tests/blood_spurt_gpu_tests "<workspace>/Blood2/build/debug/tests/blood-spurt-private" "<external-data-root>"
+899: Working Directory: <workspace>/Blood2/build/debug/tests
+899: Test timeout computed to be: 120
+899: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU | backend vulkan
+899: cycle 0 three drop textures: 6110 changed pixels
+899: cycle 0 original emitter collision mark: 1737 changed pixels
+899: cycle 1 three drop textures: 6110 changed pixels
+899: cycle 1 original emitter collision mark: 1737 changed pixels
+899: cycle 2 three drop textures: 6110 changed pixels
+899: cycle 2 original emitter collision mark: 1737 changed pixels
+4/4 Test #899: gpu.blood_spurt_private ..........   Passed    1.85 sec
+
+The following tests passed:
+	gpu.mouse_combat
+	gpu.blood_spurt
+	gpu.blood_spurt_private
+
+75% tests passed, 1 tests failed out of 4
+
+Label Time Summary:
+blood_spurts       =   2.31 sec*proc (2 tests)
+gpu                =  33.51 sec*proc (4 tests)
+player_controls    =  31.20 sec*proc (2 tests)
+private            =  33.05 sec*proc (3 tests)
+
+Total Test time (real) =  33.53 sec
+
+The following tests FAILED:
+	662 - gpu.corpse_clearance (Failed)                     gpu player_controls private
+Errors while running CTest
+Output from these tests are in: <workspace>/Blood2/build/debug/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

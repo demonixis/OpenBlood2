@@ -1,0 +1,14 @@
+566/569 Testing: explosion_rings.session
+566/569 Test: explosion_rings.session
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_ring_tests" "session" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-rings-session"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"explosion_rings.session" start time: Oct 16 21:17 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_rings.session" end time: Oct 16 21:17 CEST
+"explosion_rings.session" time elapsed: 00:00:00
+----------------------------------------------------------

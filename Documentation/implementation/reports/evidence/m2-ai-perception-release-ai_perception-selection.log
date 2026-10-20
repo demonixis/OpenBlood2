@@ -1,0 +1,14 @@
+352/361 Testing: ai_perception.selection
+352/361 Test: ai_perception.selection
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_perception_tests" "selection"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_perception.selection" start time: Oct 16 10:27 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_perception.selection" end time: Oct 16 10:27 CEST
+"ai_perception.selection" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,17 @@
+{
+  "binary": "IMUSIC25.DLL",
+  "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "entry_rva": "0x8a30",
+  "synthetic_cases": 3,
+  "curve_chunks": 42,
+  "curves": 47,
+  "points": 47,
+  "decoded_sha256": "2e676bf6e4d1f8f4dd7a07c013e0349906058a091c601d103a4c1ddfdd2692a5",
+  "fnv64": 4777673514653972974,
+  "curves_by_bank": {
+    "A1": 40,
+    "Cabal": 2,
+    "Track1": 5
+  },
+  "scope": "Original reader raw fields and list order. Header controller captured before derived summary overwrites; summary/evaluation not claimed. Bounded read/seek/allocation intercepted. No native DLL or synth execution."
+}

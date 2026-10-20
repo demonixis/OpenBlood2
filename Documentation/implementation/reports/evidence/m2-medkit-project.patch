@@ -1,0 +1,1710 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 0bf5cb9..a94a96a 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -536,3 +536,10 @@ The [world-model debris continuation](../Documentation/Implementation/M2_WORLD_D
+ The [M16 continuation](../Documentation/Implementation/M2_ASSAULT.md) connects original primary fire, alternate grenade charges, pickup/drop, independent grenade lifetime and inspection. CityHub has 433 created / 31 transferred sounds / 20 unsupported / one failed. Finite inverted ABC key bounds remain visible metadata warnings. The original Cultist lacks rifle animations; direct AI firing is tested separately from unavailable autonomous M16 combat. Replacement grenade physics, required services and safe NEW_LEVEL keep M2 open. Read [contracts](docs/ASSAULT_CONTRACTS.md). Preserve distinct ammo pools, source sequential explosion passes, deferred lifetime, one model-projectile integrator and explicit missing clips.
+ 
+ The [conversation continuation](../Documentation/Implementation/M2_CONVERSATIONS.md) connects original ConversationTrigger sequencing, typed client delivery and CCommLink timing/real WAV playback, with inspection. CityHub has 434 created / 31 transferred sounds / 541 editor-only / 19 unsupported / one failed. All seven authored conversation cues in the base-world catalog remain unmapped and missing; separately labelled diagnostics verify actual audio without altering them. Original communication HUD/VoiceMgr arbitration, required services and safe NEW_LEVEL keep M2 incomplete. Read [contracts](docs/CONVERSATION_CONTRACTS.md). Preserve first-empty waves, backslash-only mapping, repeat precedence, busy drops, text-derived strict deadlines and independent queued/voice lifetime. Never fabricate dialogue for an unmapped authored reference.
++
++The [medkit continuation](../Documentation/Implementation/M2_MEDKIT.md) connects original MedKitPU/CInvMedkit,
++H direct-item activation, local WAV playback and owned charge restoration.
++Read the [contracts](docs/MEDKIT_CONTRACTS.md) before extending inventory items: preserve requested
++versus actual healing, integer charge/return quirks, run/death/camera gates,
++checked action delivery and keep-alive retention. Other items/HUD and safe
++NEW_LEVEL remain unavailable; M2 is still incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 096ad74..23fb685 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -39,7 +39,7 @@ target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/
+ target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/original/ConversationTrigger.cpp src/game/original/ConversationStrings.cpp src/game/original/CommLink.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/WeaponPickups.cpp src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+-    src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
++    src/game/original/ItemPickups.cpp src/game/original/GameInvItems.cpp src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+     src/game/server_activation.cpp src/game/original/AIRuntime.cpp
+diff --git a/README.md b/README.md
+index 5802304..f9d9cea 100644
+--- a/README.md
++++ b/README.md
+@@ -580,3 +580,10 @@ The [production Gideon continuation](../Documentation/Implementation/M2_GIDEON_R
+ The [NPC activation correction](../Documentation/Implementation/M2_ACTIVATION_VISIBILITY.md) reuses the original AI glass/volume filter for replacement visibility pings and completes Gideon's authored intro script. Read [contracts](docs/ACTIVATION_VISIBILITY_CONTRACTS.md). Preserve manual inactivity, strict original ping cadence, atomic refresh and checked historical inspection. Center rays are not retail PVS; complete encounters, safe NEW_LEVEL and M2 remain open.
+ 
+ The [initial corpse placement correction](../Documentation/Implementation/M2_CORPSE_PLACEMENT.md) now clears the wider original death-animation body in the SubwayA keyboard-fire encounter, with bounded atomic placement and inspection. Difficult fits still fail explicitly; M2 remains incomplete.
++
++The [medkit continuation](../Documentation/Implementation/M2_MEDKIT.md) connects original MedKitPU/CInvMedkit,
++H direct-item activation, local WAV playback and owned charge restoration.
++Read the [contracts](docs/MEDKIT_CONTRACTS.md) before extending inventory items: preserve requested
++versus actual healing, integer charge/return quirks, run/death/camera gates,
++checked action delivery and keep-alive retention. Other items/HUD and safe
++NEW_LEVEL remain unavailable; M2 is still incomplete.
+diff --git a/docs/INVENTORY_STATE_CONTRACTS.md b/docs/INVENTORY_STATE_CONTRACTS.md
+index 6aeef62..f74c87c 100644
+--- a/docs/INVENTORY_STATE_CONTRACTS.md
++++ b/docs/INVENTORY_STATE_CONTRACTS.md
+@@ -97,3 +97,8 @@ owner rejection and repeated cleanup. Private tests restore into a detached
+ CPlayerObj with real Caleb/held assets; they **do not** claim a whole player or
+ world transfer. The existing GPU exit scenario checks inventory capture while UI
+ is hidden and after world reload, keeping the current player/world unchanged.
++
++The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisition,
++CInvMedkit recharge/healing, H direct-item input, local activation audio and owned
++charge preservation through Restore/KeepAlive. Other items, original inventory HUD,
++pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.
+diff --git a/docs/M2_MEDKIT_SOURCES.json b/docs/M2_MEDKIT_SOURCES.json
+new file mode 100644
+index 0000000..a50ef5a
+--- /dev/null
++++ b/docs/M2_MEDKIT_SOURCES.json
+@@ -0,0 +1,90 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "db842761f642bd9bb8dcb8fca6c062f208fae7c2",
++  "status": "M2 incomplete; selected original MedKit pickup, item action and preservation",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/GameInvItems.cpp",
++      "source_sha256": "b2a72cdf5bd9e23ec496c6f6af3ed5bd4449e3b84d8cc088c33c1e1bbe081ee8",
++      "purpose": "CInvMedkit Init/AddItem/Activate/ActivateItem: charge refill, requested healing, integer result and action order."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameInvItems.h",
++      "source_sha256": "592488eb133230295961290bc2bfd621429c6ccc11df1de010ba7ccaa0bd7aac",
++      "purpose": "Selected CInvMedkit type and inherited nonactive item semantics."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/InvItem.cpp",
++      "source_sha256": "89074a1645a0977cb8961731764d7b54b2b3da1720adc9cfe8ce0b539fff5aaa",
++      "purpose": "SendActionMessage type byte and Save/Load count/owner behavior; typed messages/owned values replace packets and strings."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/InvItem.h",
++      "source_sha256": "7b0ffbe822337d7f430466fd469c435e604d2c264c34a9af64e79f938e1329cc",
++      "purpose": "Original owner/count/type fields; selected medkit uses value ownership without an intrusive list."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
++      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
++      "purpose": "Original MedKitPU constructor, charged single-player branch and MID_INVENTORYITEMTOUCH."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ItemPickups.h",
++      "source_sha256": "ce1dacd1cf4829c39cfdfbeb27ae4873e1f2b6a4895b532b820d587ab7eaa17e",
++      "purpose": "Original ancestry, inventory1.wav request, quantity one and unavailable string-spawn bounce."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "purpose": "AddItem, SetActiveItem and Save/Load selected medkit branches; keys-only keep-alive discard."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "purpose": "Alive inventory pickup acknowledgement and COMMAND_INVITEM_1 dead/movement/run restrictions."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
++      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
++      "purpose": "Heal refuses at normal maximum; callers retain original requested-charge consumption."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "purpose": "HandleInvAction medkit local sound."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/ClientUtilities.cpp",
++      "source_sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02",
++      "purpose": "PlaySoundLocal flags/default playback semantics."
++    },
++    {
++      "source": "sources/blood2/Shared/SoundTypes.h",
++      "source_sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
++      "purpose": "PLAYER_LOW priority 4."
++    },
++    {
++      "source": "sources/blood2/Shared/SharedDefs.h",
++      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "purpose": "INV_MEDKIT identifier 1."
++    },
++    {
++      "source": "sources/blood2/Shared/ClientRes.h",
++      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
++      "purpose": "IDS_ITEM_MEDKIT identifier 302."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/generic_msg_de.h",
++      "source_sha256": "5231003078a5cf58400cebf261efb84132f3733507d336c33d4fae81b015a5f2",
++      "purpose": "MID_INVENTORYITEMTOUCH identifier 1006 and byte payload."
++    }
++  ],
++  "adaptations": [
++    "Value-owned optional selected item instead of intrusive generic item list",
++    "Typed owned request/acknowledgement, direct command and action messages",
++    "Bounded count snapshot staged with existing inventory; owner rebound on restoration",
++    "H device binding with existing focus/text/control suppression",
++    "Source local one-shot owned by world until completion/unload",
++    "Reject unsupported string-spawn bounce and multiplayer behavior; expose missing HUD/console/pickup sound"
++  ]
++}
+diff --git a/docs/MEDKIT_CONTRACTS.md b/docs/MEDKIT_CONTRACTS.md
+new file mode 100644
+index 0000000..72fc922
+--- /dev/null
++++ b/docs/MEDKIT_CONTRACTS.md
+@@ -0,0 +1,78 @@
++# Original MedKit pickup and inventory action
++
++This selected original `MedKitPU` / `CInvMedkit` path extends
++[pickups](PICKUP_CONTRACTS.md), [inventory preservation](INVENTORY_STATE_CONTRACTS.md)
++and [device controls](PLAYER_CONTROL_CONTRACTS.md). See the
++[source ledger](M2_MEDKIT_SOURCES.json) and
++[evidence](../../Documentation/Implementation/M2_MEDKIT.md). M2 remains incomplete.
++
++## Source rules
++
++`ItemPickup` / `ItemPickupCharged` / `MedKitPU` preserve their class ancestry,
++original model/skin `Medkit_pu`, resource ID 302 and `inventory1.wav` pickup sound
++request. Single-player touch carries original MID_INVENTORYITEMTOUCH (1006), item
++ID 1 and quantity 1. The existing checked request/acknowledgement prevents double
++consumption, rejects dead players and defers removal until callbacks finish.
++Full medkits refuse collection. Both first acquisition and subsequent recharge
++set 100 charges, regardless of the incoming byte quantity. Zero-charge inventory
++items remain present and rechargeable. Other item IDs fail explicitly.
++
++Activation uses `min(100 - health, charges)`, calls original Heal for positive
++values, queues the player action and subtracts the **integer requested gain**.
++Keep the original differences between requested healing, actual healing and the
++integer return value: Heal may clamp/refuse at a lower maximum but charges still
++get spent; a fractional heal below one changes health and sends audio without
++spending a charge or returning success; health above 100 may return a negative
++nonzero success without healing, charge consumption or audio. Do not normalize
++these quirks to modern gameplay expectations. Nonfinite/out-of-bounds engine
++health and missing/pending owners fail before arithmetic or mutation.
++
++Original direct-item command gates reject dead players, movement/camera blocking
++and the source CTRLFLAG_RUN exclusion. H maps to COMMAND_INVITEM_1's selected
++branch through a typed client command. It is press-edge activated, independent of
++movement integration, and respects window identity, focus loss, F2, text editing,
++held-key suppression and player replacement. Release Shift before use. Bindings
++are application policy, not recovered retail configuration. Inspector drawing
++never heals or consumes inventory.
++
++## Audio and inspection
++
++The owned InventoryAction message accepts only implemented type 1. The existing
++256-event client queue remains bounded. Queue failure is visible and does not
++undo original healing. The client handles the action using the original
++`sounds/powerups/medikit.wav`, local volume 100, priority PLAYER_LOW (4), no loop,
++stream or reverb. The typed local sound service validates the live source and
++request; a successful voice auto-releases at clip completion, survives source
++removal and is reclaimed on unload. Failure is exposed without inventing audio.
++Priority is stored intent; arbitration is still unavailable.
++
++The Pickups inspector shows actual presence, charges, attempted/actual gain,
++source return, queued actions, playback count and diagnostics, alongside live,
++hidden, inactive and pending pickup resources. Snapshot inspection exposes saved
++charges and their keep-alive behavior. Pickup sound remains a request only;
++**activation audio is decoded and played**. Original localized console text and
++PCX inventory HUD are unavailable, with resource/icon names retained as metadata.
++
++## Preservation and bounded adaptations
++
++An owned optional `CInvMedkit` replaces the original intrusive item-list allocation
++for this one supported item. Its checked owner token is never serialized. Typed
++InventoryState stores absence versus a byte charge count (including zero); values
++above 100 reject before mutation. Staged Load rebinds the item to the destination
++owner and commits it with weapons/keys. Both Restore and KeepAlive retain the
++medkit, while original keep-alive still discards keys. Transient diagnostics and
++queued audio restart, rather than being mistaken for saved game state.
++
++This is not full inventory-list/HUD selection, bomb items, flashlight, timed
++bonuses, multiplayer scaling/respawn, retail save-file compatibility or safe
++NEW_LEVEL. String-created inventory pickups are rejected because their original
++SpawnItem bounce is unavailable; destruction spawning is not silently enabled.
++Only authored world creation is supported. Missing models retain explicit pickup
++failure diagnostics. No ECS, new dependency, reference edit or commercial asset
++copy is introduced.
++
++Verification: 730/730 headless tests in Debug and inspector-free Release;
++62/62 ASan/UBSan tests with leak detection; four Vulkan GPU checks per configuration.
++The private authored medkit fixture repeats CityHub loading and validates real
++45,312-frame activation audio. No Windows/macOS/mobile/XR or retail executable
++parity is claimed. Detailed logs are linked from the implementation evidence.
+diff --git a/docs/PICKUP_CONTRACTS.md b/docs/PICKUP_CONTRACTS.md
+index e24f331..1eb4876 100644
+--- a/docs/PICKUP_CONTRACTS.md
++++ b/docs/PICKUP_CONTRACTS.md
+@@ -113,3 +113,8 @@ ManaAmmoPU is commented out in the source; RocketAmmoPU is not guessed as an ali
+ Legacy TypeAction schemas, missing/ambiguous world models and polygon dynamics
+ remain explicit failures. Rendering, retail-executable comparisons, additional
+ platforms and XR validation remain pending. M2's exit gate is unchanged.
++
++The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisition,
++CInvMedkit recharge/healing, H direct-item input, local activation audio and owned
++charge preservation through Restore/KeepAlive. Other items, original inventory HUD,
++pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.
+diff --git a/docs/PLAYER_CONTROL_CONTRACTS.md b/docs/PLAYER_CONTROL_CONTRACTS.md
+index e5ca08f..c91e991 100644
+--- a/docs/PLAYER_CONTROL_CONTRACTS.md
++++ b/docs/PLAYER_CONTROL_CONTRACTS.md
+@@ -56,3 +56,8 @@ Release paths remain checked. No reference source, commercial asset or dependenc
+ 
+ Non-attacking NPCs and the missing train-window material remain next playtest priorities.
+ This input fix does not prove NPC combat, all required services, safe NEW_LEVEL or M2.
++
++The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisition,
++CInvMedkit recharge/healing, H direct-item input, local activation audio and owned
++charge preservation through Restore/KeepAlive. Other items, original inventory HUD,
++pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index dc43aed..41b0c27 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -948,3 +948,8 @@ remain explicitly unavailable. No authored missing cue is remapped or synthesize
+ See [ledger](M2_CONVERSATION_SOURCES.json), [contracts](CONVERSATION_CONTRACTS.md)
+ and [evidence](../../Documentation/Implementation/M2_CONVERSATIONS.md). No dependency,
+ mutable game global, reference edit or commercial asset import is introduced.
++
++The [medkit continuation](MEDKIT_CONTRACTS.md) adds original MedKitPU acquisition,
++CInvMedkit recharge/healing, H direct-item input, local activation audio and owned
++charge preservation through Restore/KeepAlive. Other items, original inventory HUD,
++pickup audio and safe NEW_LEVEL remain unavailable; M2 stays incomplete.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index b49c7fd..83c5dee 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -439,7 +439,8 @@ namespace OpenBlood2
+                                 "Esc: release/quit");
+             ImGui::PopTextWrapPos();
+             ImGui::Checkbox("Game controls (F2)", &keyboard_movement);
+-            ImGui::TextWrapped("WASD / ZQSD: walk | Shift: run | Space: jump | Ctrl: crouch | Arrows: look | E: use");
++            ImGui::TextWrapped("WASD / ZQSD: walk | Shift: run | Space: jump | Ctrl: crouch | Arrows: look | E: use | "
++                               "H: medkit (release Shift)");
+             ImGui::TextWrapped(
+                 "F3: capture mouse and hide inspector | Mouse: look | Left/F: fire | Right/G: alternate fire");
+             ImGui::Text("Mouse: %s", mouse_captured ? "captured" : "released for UI");
+diff --git a/src/app/inspector_objectives.cpp b/src/app/inspector_objectives.cpp
+index 22f2675..ad90e56 100644
+--- a/src/app/inspector_objectives.cpp
++++ b/src/app/inspector_objectives.cpp
+@@ -159,6 +159,10 @@ namespace OpenBlood2
+                         ImGui::Text("Slot %u: right %u / left %u", i, inventory.right[i], inventory.left[i]);
+                     for (unsigned i = 0; i < inventory.ammo.size(); ++i)
+                         ImGui::Text("Ammo %u: %.2f", i, inventory.ammo[i]);
++                    if (inventory.medkit_charge)
++                        ImGui::Text("Saved medkit: %u charges (retained by keep-alive)", *inventory.medkit_charge);
++                    else
++                        ImGui::TextUnformatted("Saved medkit: absent");
+                     for (const auto& key : inventory.keys)
+                         ImGui::Text("Key %s: %u uses", key.name.c_str(), key.uses);
+                     ImGui::TreePop();
+diff --git a/src/app/inspector_pickups.cpp b/src/app/inspector_pickups.cpp
+index 4eb0e81..e80f7af 100644
+--- a/src/app/inspector_pickups.cpp
++++ b/src/app/inspector_pickups.cpp
+@@ -7,9 +7,9 @@ namespace OpenBlood2
+ {
+     void Inspector::draw_pickups(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextWrapped(
+-            "Original single-player Beretta, ammunition, health and armor. Inventory items, timed bonuses, audio "
+-            "and pickup FX remain pending.");
++        ImGui::TextWrapped("Original single-player Beretta, ammunition, health and armor. Other inventory items, timed "
++                           "bonuses, pickup audio "
++                           "and pickup FX remain pending. Medkit: H uses the collected charges (release Shift first).");
+         if (!ImGui::BeginTable("Pickup inspection", 2, ImGuiTableFlags_Resizable))
+             return;
+         ImGui::TableSetupColumn("Objects", ImGuiTableColumnFlags_WidthFixed, 250);
+@@ -40,6 +40,21 @@ namespace OpenBlood2
+             for (unsigned i = 1; i <= 8; ++i)
+                 ImGui::Text("%u: %.0f / %.0f", i, player->m_InventoryMgr.GetAmmoCount(i),
+                             player->m_InventoryMgr.MaxAmmo(i));
++            if (const auto& item = player->m_InventoryMgr.medkit)
++            {
++                ImGui::Text("Medkit: %u / 100 charges", item->count);
++                ImGui::TextWrapped("Resource 302 / medkit.pcx (HUD unavailable)");
++                ImGui::TextWrapped("Requested %.3f / healed %.3f", item->requested_gain, item->actual_gain);
++                ImGui::Text("Source result: %d", item->activation_result);
++                ImGui::Text("Attempts %llu / queued actions %llu", (unsigned long long)item->attempts,
++                            (unsigned long long)item->action_messages);
++                ImGui::TextWrapped("Item diagnostic: %s", item->error.c_str());
++            }
++            else
++                ImGui::TextUnformatted("Medkit: not collected (H after collection)");
++            ImGui::Text("Item actions %llu / sounds %llu", (unsigned long long)game.client_shell.item_actions,
++                        (unsigned long long)game.client_shell.item_sounds);
++            ImGui::TextWrapped("Item audio: %s", game.client_shell.item_audio_error.c_str());
+             const auto& d = player->m_damage;
+             ImGui::Text("Health %.0f / %.0f (mega %.0f)", d.m_fHitPoints, d.m_fMaxHitPoints, d.m_fMaxMegaHitPoints);
+             ImGui::Text("Armor %.0f / %.0f (necro %.0f)", d.m_fArmorPoints, d.m_fMaxArmorPoints,
+@@ -54,6 +69,7 @@ namespace OpenBlood2
+             ImGui::Text("%s / type %u / amount %.0f",
+                         p->value.kind == PickupKind::Ammo     ? "Ammo"
+                         : p->value.kind == PickupKind::Weapon ? "Weapon"
++                        : p->value.kind == PickupKind::Item   ? "Inventory item"
+                                                               : "Powerup",
+                         p->value.type, p->value.amount);
+             ImGui::Text("%s (resource %d)", p->display_name.c_str(), p->resource_id);
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index c3575c3..24bff52 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -128,7 +128,8 @@ namespace
+                     spdlog::error("Player entry: {}", error);
+                     return 6;
+                 }
+-                if ((options.weapons_smoke || options.movement_smoke || options.interaction_smoke) &&
++                if ((options.weapons_smoke || options.movement_smoke || options.interaction_smoke ||
++                     options.pickups_smoke) &&
+                     !OpenBlood2::finish_camera_intro_for_smoke(game))
+                 {
+                     spdlog::error("Authored intro camera did not release player control");
+@@ -522,7 +523,8 @@ namespace
+             text_editing = inspector_visible && !inspector.collapsed && ImGui::GetIO().WantTextInput;
+ #endif
+             if (frames == reload_frame + 1 &&
+-                (options.weapons_smoke || options.movement_smoke || options.interaction_smoke) &&
++                (options.weapons_smoke || options.movement_smoke || options.interaction_smoke ||
++                 options.pickups_smoke) &&
+                 !OpenBlood2::finish_camera_intro_for_smoke(game))
+                 return 4;
+             if (frames == reload_frame + 1 && options.viewport_smoke &&
+@@ -585,6 +587,7 @@ namespace
+             if (!controls.focused && !smoke)
+                 game.client_shell.weapon_input = {};
+             game.client_shell.use_down = controls.sample_use(text_editing);
++            game.client_shell.medkit_down = controls.sample_medkit(text_editing);
+             auto keyboard = controls.sample(text_editing);
+             auto& movement = game.client_shell.movement_input;
+             movement.forward |= keyboard.forward;
+diff --git a/src/app/movement_controls.h b/src/app/movement_controls.h
+index 1686da4..3b8bdbb 100644
+--- a/src/app/movement_controls.h
++++ b/src/app/movement_controls.h
+@@ -17,6 +17,7 @@ namespace OpenBlood2
+     {
+         std::array<bool, SDL_SCANCODE_COUNT> keys{};
+         bool focused = false, enabled = true, use_suppressed = false;
++        bool medkit_suppressed = false;
+         bool mouse_requested = false, mouse_captured = false;
+         std::array<bool, 2> mouse_buttons{}, fire_suppressed{};
+         float mouse_x = 0, mouse_y = 0;
+@@ -34,7 +35,7 @@ namespace OpenBlood2
+         void player_changed()
+         {
+             keys = {};
+-            use_suppressed = false;
++            use_suppressed = medkit_suppressed = false;
+             release_mouse();
+         }
+         bool sync_mouse(SDL_Window* window, bool player_ready, bool text_editing, std::string& error)
+@@ -75,6 +76,7 @@ namespace OpenBlood2
+                 case SDL_SCANCODE_RCTRL:
+                 case SDL_SCANCODE_F:
+                 case SDL_SCANCODE_G:
++                case SDL_SCANCODE_H:
+                 case SDL_SCANCODE_E:
+                 case SDL_SCANCODE_SPACE:
+                 case SDL_SCANCODE_LEFT:
+@@ -118,7 +120,8 @@ namespace OpenBlood2
+                 if (!focused && event.type == SDL_EVENT_KEY_DOWN)
+                     return;
+                 const int code = event.key.scancode;
+-                if ((code == SDL_SCANCODE_E || code == SDL_SCANCODE_F || code == SDL_SCANCODE_G) &&
++                if ((code == SDL_SCANCODE_H || code == SDL_SCANCODE_E || code == SDL_SCANCODE_F ||
++                     code == SDL_SCANCODE_G) &&
+                     event.type == SDL_EVENT_KEY_DOWN && event.key.repeat && !keys[static_cast<unsigned>(code)])
+                     return; // A held key after focus loss is not a fresh USE press.
+                 if (code > SDL_SCANCODE_UNKNOWN && code < SDL_SCANCODE_COUNT)
+@@ -151,6 +154,17 @@ namespace OpenBlood2
+                     keys[SDL_SCANCODE_SPACE],
+                     keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL]};
+         }
++        bool sample_medkit(bool text_editing)
++        {
++            if (!keys[SDL_SCANCODE_H])
++                medkit_suppressed = false;
++            if (!focused || !enabled || text_editing)
++            {
++                medkit_suppressed = keys[SDL_SCANCODE_H];
++                return false;
++            }
++            return keys[SDL_SCANCODE_H] && !medkit_suppressed;
++        }
+         bool sample_use(bool text_editing)
+         {
+             if (!keys[SDL_SCANCODE_E])
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index dc56d76..84a1009 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -81,8 +81,8 @@ namespace OpenBlood2
+         const auto trial_before = g.destination_trial.attempts;
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+-            !g.destination_trial.player_entered || g.destination_trial.created != 434 ||
+-            g.destination_trial.unknown != 19 || g.destination_trial.failed != 1 ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 435 ||
++            g.destination_trial.unknown != 18 || g.destination_trial.failed != 1 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+@@ -100,8 +100,8 @@ namespace OpenBlood2
+                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
+                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+                g.destination_inspection.source_revision == old_revision &&
+-               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 466 &&
+-               g.destination_inspection.unknown == 19 && g.destination_inspection.invalid == 0 &&
++               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 467 &&
++               g.destination_inspection.unknown == 18 && g.destination_inspection.invalid == 0 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/app/pickup_smoke.cpp b/src/app/pickup_smoke.cpp
+index b1f30eb..75ce120 100644
+--- a/src/app/pickup_smoke.cpp
++++ b/src/app/pickup_smoke.cpp
+@@ -2,6 +2,7 @@
+ #include "game/original/PickupObject.h"
+ #include "game/original/WeaponPickups.h"
+ #include "game/original/spawn_object.h"
++#include "movement_controls.h"
+ namespace OpenBlood2
+ {
+     bool prepare_pickup_smoke(GameSession& g, ObjectId& id)
+@@ -14,7 +15,10 @@ namespace OpenBlood2
+         auto second = SpawnObject("WardPU Name inspect_ward", {200, 10000, 0}, {}, {});
+         const auto* inspect = g.objects.get(second);
+         auto weapon = SpawnWeaponPickup(WEAP_BERETTA, h, {400, 10000, 0}, {}, true);
+-        return inspect && inspect->model && weapon && g.objects.get(weapon)->model;
++        auto medkit = g.objects.create(g.objects.find_class("MedKitPU"), {}, Creation::World,
++                                       {{"Name", std::string("inspect_medkit")}, {"Pos", DVector{800, 10000, 0}}});
++        return inspect && inspect->model && weapon && g.objects.get(weapon)->model && medkit &&
++               g.objects.get(medkit)->model;
+     }
+     bool collect_pickup_smoke(GameSession& g, ObjectId id)
+     {
+@@ -39,7 +43,33 @@ namespace OpenBlood2
+         if (g.server.TeleportObject(player->m_hObject, &pos) != DE_OK ||
+             g.server.MoveObject(player->m_hObject, &pos) != DE_OK)
+             return false;
+-        return !g.server.IsObjectAlive(weapon) && player->m_InventoryMgr.CurrentWeapon(true) &&
+-               g.server.pickup_reports.size() == 2;
++        if (g.server.IsObjectAlive(weapon) || !player->m_InventoryMgr.CurrentWeapon(true) ||
++            g.server.pickup_reports.size() != 2)
++            return false;
++        HOBJECT medkit = nullptr;
++        for (auto object : g.objects.snapshot())
++            if (auto* record = g.objects.get(object); record->type->name == "MedKitPU")
++                medkit = record->handle;
++        if (!medkit || !g.objects.engine_message(medkit, MID_TOUCHNOTIFY, player->m_hObject) ||
++            !player->m_InventoryMgr.medkit)
++            return false;
++        player->m_damage.SetHitPoints(25); // Explicit diagnostic damage, no claim of a real encounter.
++        MovementControls controls;
++        controls.focused = true;
++        SDL_Event event{};
++        event.type = SDL_EVENT_KEY_DOWN;
++        event.key.windowID = 1;
++        event.key.scancode = SDL_SCANCODE_H;
++        controls.event(event, 1);
++        g.client_shell.medkit_down = controls.sample_medkit(false);
++        std::string error;
++        if (!g.client_shell.UpdateUse(g.server_shell) || !g.pump_player_messages(error))
++            return false;
++        g.client_shell.medkit_down = false;
++        if (!g.client_shell.UpdateUse(g.server_shell))
++            return false;
++        return player->m_damage.m_fHitPoints == 100 && player->m_InventoryMgr.medkit->count == 25 &&
++               g.client_shell.item_sounds == 1 && g.server.audio.get(g.client_shell.item_voice) &&
++               g.server.pickup_reports.size() == 3;
+     }
+ } // namespace OpenBlood2
+diff --git a/src/game/inventory_state.h b/src/game/inventory_state.h
+index 5254d99..2404422 100644
+--- a/src/game/inventory_state.h
++++ b/src/game/inventory_state.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ #include "game/key_messages.h"
+ #include <array>
++#include <optional>
+ #include <vector>
+ 
+ namespace OpenBlood2
+@@ -12,6 +13,7 @@ namespace OpenBlood2
+         std::array<DBYTE, 10> right{}, left{};
+         std::array<float, 13> ammo{};
+         std::vector<KeyItem> keys;
++        std::optional<DBYTE> medkit_charge;
+         DBYTE strength = 1, magic = 1, current_slot = 0;
+         bool infinite_ammo = false;
+         float damage_multiplier = 1;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index e6f1883..f9dc12b 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -42,6 +42,7 @@ class ServerDE : public CSBase
+     virtual OpenBlood2::SoundId PlayCharacterSound(HOBJECT, const OpenBlood2::SoundRequest&, bool retain,
+                                                    std::string&) = 0;
+     virtual OpenBlood2::SoundId PlayCinematicSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
++    virtual OpenBlood2::SoundId PlayLocalSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
+     virtual OpenBlood2::SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
+     virtual OpenBlood2::SoundId PlaySoundAt(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
+     virtual OpenBlood2::SoundId PlayWorldSound(HOBJECT, const OpenBlood2::SoundRequest&, bool file_stream,
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index 50fd6ae..750c4c8 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -236,6 +236,9 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
+     boss_health_messages = 0;
+     boss_health_visible = false;
+     communication.Reset(server_);
++    medkit_down = medkit_was_down = false;
++    item_actions = item_sounds = item_voice = 0;
++    item_audio_error.clear();
+     objectives = {};
+     objectives_error.clear();
+     objective_messages = 0;
+@@ -272,6 +275,9 @@ void CBloodClientShell::OnExitWorld()
+     boss_health_messages = 0;
+     boss_health_visible = false;
+     communication.Reset(server_);
++    medkit_down = medkit_was_down = false;
++    item_actions = item_sounds = item_voice = 0;
++    item_audio_error.clear();
+     objectives = {};
+     objectives_error.clear();
+     objective_messages = 0;
+@@ -297,6 +303,21 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
+     ++messages;
+     if (std::holds_alternative<OpenBlood2::PlayerInitRequest>(event))
+         return InitSinglePlayer(server);
++    if (const auto* value = std::get_if<OpenBlood2::InventoryAction>(&event))
++    {
++        if (value->type != 1)
++            return false;
++        ++item_actions;
++        OpenBlood2::SoundRequest request;
++        request.resource = "sounds/powerups/medikit.wav";
++        request.space = OpenBlood2::SoundSpace::Local;
++        request.priority = 4; // SOUNDPRIORITY_PLAYER_LOW.
++        request.reverb_requested = false;
++        item_audio_error.clear();
++        item_voice = server_.PlayLocalSound(player, request, item_audio_error);
++        item_sounds += item_voice != 0;
++        return true; // Failed presentation never reverses original healing.
++    }
+     if (const auto* value = std::get_if<OpenBlood2::WorldExit>(&event))
+     {
+         ++world_exit.received;
+@@ -449,8 +470,17 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerUse& c
+     owner->m_fYaw = command.rotation.yaw;
+     return owner->OnCommandUse();
+ }
++bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerItemCommand& command)
++{
++    auto* owner = Player(client);
++    return owner && owner->OnCommandItem(command.type);
++}
+ bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
+ {
++    const bool item_pressed = medkit_down && !medkit_was_down;
++    medkit_was_down = medkit_down;
++    if (item_pressed)
++        server.OnMessage(client_, OpenBlood2::PlayerItemCommand{1});
+     const bool pressed = use_down && !use_was_down;
+     use_was_down = use_down;
+     if (pressed)
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index 252e831..b708013 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -22,6 +22,7 @@ class CBloodServerShell
+     bool OnMessage(HCLIENT, const OpenBlood2::PlayerMove&);
+     bool OnMessage(HCLIENT, const OpenBlood2::PlayerControls&);
+     bool OnMessage(HCLIENT, const OpenBlood2::PlayerUse&);
++    bool OnMessage(HCLIENT, const OpenBlood2::PlayerItemCommand&);
+     void Update(float);
+     CPlayerObj* Player(HCLIENT);
+     bool CapturePlayerInventory(HCLIENT);
+@@ -75,6 +76,10 @@ class CBloodClientShell
+     bool UpdateMovement(CBloodServerShell&, double, std::string&);
+     bool UpdateUse(CBloodServerShell&);
+     bool use_down = false, use_was_down = false;
++    bool medkit_down = false, medkit_was_down = false;
++    std::uint64_t item_actions = 0, item_sounds = 0;
++    OpenBlood2::SoundId item_voice = 0; // Checked inspection token, not owned.
++    std::string item_audio_error;
+     CMoveMgr move_mgr;
+     OpenBlood2::MovementInput movement_input;
+     bool SyncWeapons(OpenBlood2::ModelStore&, OpenBlood2::Resources&, CBloodServerShell&, std::string&);
+diff --git a/src/game/original/GameInvItems.cpp b/src/game/original/GameInvItems.cpp
+new file mode 100644
+index 0000000..d1129dc
+--- /dev/null
++++ b/src/game/original/GameInvItems.cpp
+@@ -0,0 +1,51 @@
++// Selected GameInvItems.cpp CInvMedkit and InvItem.cpp SendActionMessage.
++#include "GameInvItems.h"
++#include "PlayerObj.h"
++#include <algorithm>
++#include <cmath>
++bool CInvMedkit::AddItem(DBYTE)
++{
++    if (count >= 100)
++        return false;
++    count = 100; // Original ignores the incoming quantity.
++    return true;
++}
++int CInvMedkit::Activate()
++{
++    ++attempts;
++    requested_gain = actual_gain = 0;
++    activation_result = 0;
++    error.clear();
++    auto* server = BaseClass::GetServerDE();
++    auto* character = server && server->IsObjectAlive(owner_)
++                          ? dynamic_cast<CBaseCharacter*>(server->HandleToObject(owner_))
++                          : nullptr;
++    if (!character)
++    {
++        error = "Medkit owner is not a live character";
++        return 0;
++    }
++    auto& damage = character->m_damage;
++    const float health = damage.m_fHitPoints;
++    if (!std::isfinite(health) || std::abs(health) > 1e6f)
++    {
++        error = "Invalid medkit owner health";
++        return 0;
++    }
++    requested_gain = std::min(100.f - health, float(count));
++    if (requested_gain > 0)
++    {
++        damage.Heal(requested_gain); // Source spends the requested gain even when Heal clamps/refuses it.
++        actual_gain = damage.m_fHitPoints - health;
++        if (auto* player = dynamic_cast<CPlayerObj*>(character))
++        {
++            if (server->SendToClient(player->GetClient(), OpenBlood2::InventoryAction{1}) == DE_OK)
++                ++action_messages;
++            else
++                error = "Medkit action could not reach its client";
++        }
++        count -= static_cast<int>(requested_gain);
++    }
++    activation_result = static_cast<int>(requested_gain); // Preserve fractional-zero and negative nonzero returns.
++    return activation_result;
++}
+diff --git a/src/game/original/GameInvItems.h b/src/game/original/GameInvItems.h
+new file mode 100644
+index 0000000..c21603d
+--- /dev/null
++++ b/src/game/original/GameInvItems.h
+@@ -0,0 +1,27 @@
++#pragma once
++#include "B2BaseClass.h"
++
++// Selected original CInvMedkit. Owned by CInventoryMgr; no engine child or list node.
++class CInvMedkit
++{
++  public:
++    void Init(HOBJECT owner)
++    {
++        owner_ = owner;
++        count = 100;
++    }
++    bool AddItem(DBYTE);
++    int Activate();
++    bool ActivateItem()
++    {
++        return Activate() != 0;
++    }
++    DBYTE count = 100;
++    float requested_gain = 0, actual_gain = 0;
++    int activation_result = 0;
++    std::uint64_t attempts = 0, action_messages = 0;
++    std::string error;
++
++  private:
++    HOBJECT owner_ = nullptr; // Checked non-owning identity; never serialized.
++};
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index 4312193..af3663f 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -355,3 +355,27 @@ InventoryResult CInventoryMgr::DropCurrentWeapon()
+     ++revision;
+     return InventoryResult::Ok;
+ }
++
++// Selected original AddItem/SetActiveItem branches; other items remain unsupported.
++InventoryResult CInventoryMgr::AddItem(DBYTE type, DBYTE value)
++{
++    if (type != 1 || !BaseClass::GetServerDE()->IsObjectAlive(m_hOwner))
++        return InventoryResult::Invalid;
++    if (!medkit)
++        medkit.emplace().Init(m_hOwner);
++    else if (!medkit->AddItem(value))
++        return InventoryResult::AlreadyHave;
++    ++revision;
++    return InventoryResult::Ok;
++}
++InventoryResult CInventoryMgr::SetActiveItem(DBYTE type)
++{
++    if (type != 1 || !medkit)
++        return InventoryResult::NotAvailable;
++    const auto before = medkit->count;
++    const bool activated = medkit->ActivateItem();
++    if (before != medkit->count)
++        ++revision;
++    // Original localized console item-name message / inventory HUD remain unavailable.
++    return activated ? InventoryResult::Ok : InventoryResult::NotAvailable;
++}
+diff --git a/src/game/original/InventoryMgr.h b/src/game/original/InventoryMgr.h
+index ae871b1..1978224 100644
+--- a/src/game/original/InventoryMgr.h
++++ b/src/game/original/InventoryMgr.h
+@@ -1,9 +1,11 @@
+ #pragma once
+ #include "B2BaseClass.h"
++#include "GameInvItems.h"
+ #include "Weapon.h"
+ #include "game/inventory_state.h"
+ #include <array>
+ #include <memory>
++#include <optional>
+ #include <vector>
+ 
+ enum class InventoryResult
+@@ -24,6 +26,9 @@ class CInventoryMgr : public Aggregate
+     // Restore before client association: rebuilding live client views is a
+     // separate player-transfer responsibility, never silently bypassed here.
+     bool Load(const OpenBlood2::InventoryState&, OpenBlood2::InventoryLoadType, std::string&);
++    InventoryResult AddItem(DBYTE, DBYTE);
++    InventoryResult SetActiveItem(DBYTE);
++    std::optional<CInvMedkit> medkit;
+     InventoryResult AddKey(const OpenBlood2::KeyItem&);
+     InventoryResult QueryKey(std::string_view);
+     std::vector<OpenBlood2::KeyItem> keys;
+diff --git a/src/game/original/InventorySave.cpp b/src/game/original/InventorySave.cpp
+index d74731b..4eb288b 100644
+--- a/src/game/original/InventorySave.cpp
++++ b/src/game/original/InventorySave.cpp
+@@ -9,7 +9,8 @@ namespace
+     {
+         if (state.strength < 1 || state.strength > 6 || state.magic < 1 || state.magic > 6 ||
+             state.current_slot >= state.right.size() || !std::isfinite(state.damage_multiplier) ||
+-            state.damage_multiplier < 0 || state.damage_multiplier > 1000 || state.keys.size() > 256)
++            state.damage_multiplier < 0 || state.damage_multiplier > 1000 || state.keys.size() > 256 ||
++            (state.medkit_charge && *state.medkit_charge > 100))
+         {
+             error = "Invalid inventory attributes, selection, multiplier or item count";
+             return false;
+@@ -81,6 +82,8 @@ bool CInventoryMgr::Save(OpenBlood2::InventoryState& output, std::string& error)
+             }
+     state.ammo = m_fAmmo;
+     state.keys = keys;
++    if (medkit)
++        state.medkit_charge = medkit->count;
+     state.current_slot = m_nCurWeaponSlot;
+     state.damage_multiplier = damage_multiplier;
+     if (!valid(state, error))
+@@ -137,6 +140,11 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
+         staged.keys = state.keys;                 // Source drops INV_KEY only for dwLoadType == 1.
+     staged.m_nCurWeaponSlot = state.current_slot; // After recreation, as in source.
+     staged.damage_multiplier = state.damage_multiplier;
++    if (state.medkit_charge)
++    {
++        staged.medkit.emplace().Init(m_hOwner);
++        staged.medkit->count = *state.medkit_charge;
++    }
+ 
+     // Commit only after every fallible service. Old child removal is deferred;
+     // transferred weapons must point at this aggregate, never the local stage.
+@@ -144,6 +152,7 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
+     m_LWeapons.swap(staged.m_LWeapons);
+     std::swap(m_hMuzzleFlash, staged.m_hMuzzleFlash);
+     keys.swap(staged.keys);
++    medkit.swap(staged.medkit);
+     m_fAmmo = staged.m_fAmmo;
+     m_nAttribStrength = staged.m_nAttribStrength;
+     m_nAttribMagic = staged.m_nAttribMagic;
+diff --git a/src/game/original/ItemPickups.cpp b/src/game/original/ItemPickups.cpp
+new file mode 100644
+index 0000000..42cb874
+--- /dev/null
++++ b/src/game/original/ItemPickups.cpp
+@@ -0,0 +1,19 @@
++// Selected ItemPickups.cpp: single-player charged item and MedKitPU constructor.
++#include "ItemPickups.h"
++#include "game/game_settings.h"
++DDWORD ItemPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    // String-spawn bounce and multiplayer scaling/respawn are not implemented.
++    if (message == MID_PRECREATE &&
++        (reason != PRECREATE_WORLDFILE ||
++         g_pServerDE->GetVarValueFloat(g_pServerDE->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE))
++        return 0;
++    return PickupObject::EngineMessageFn(message, data, reason);
++}
++MedKitPU::MedKitPU()
++{
++    value = {OpenBlood2::PickupKind::Item, 1, 1};
++    file = "Medkit_pu";
++    display_name = "Medkit";
++    resource_id = 302;
++}
+diff --git a/src/game/original/ItemPickups.h b/src/game/original/ItemPickups.h
+new file mode 100644
+index 0000000..404351f
+--- /dev/null
++++ b/src/game/original/ItemPickups.h
+@@ -0,0 +1,21 @@
++#pragma once
++#include "PickupObject.h"
++class ItemPickup : public PickupObject
++{
++  public:
++    ItemPickup()
++    {
++        pickup_sound = "sounds/powerups/inventory1.wav";
++    }
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++};
++class ItemPickupCharged : public ItemPickup
++{
++};
++class MedKitPU : public ItemPickupCharged
++{
++  public:
++    MedKitPU();
++};
+diff --git a/src/game/original/PickupObject.cpp b/src/game/original/PickupObject.cpp
+index 08e75f4..7eb0f21 100644
+--- a/src/game/original/PickupObject.cpp
++++ b/src/game/original/PickupObject.cpp
+@@ -54,6 +54,7 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+         auto packet = g_pServerDE->StartMessageToObject(this, touching_,
+                                                         value.kind == PickupKind::Ammo     ? add_ammo_message
+                                                         : value.kind == PickupKind::Weapon ? add_weapon_message
++                                                        : value.kind == PickupKind::Item   ? add_item_message
+                                                                                            : add_powerup_message);
+         if (packet)
+         {
+diff --git a/src/game/original/PlayerContainers.cpp b/src/game/original/PlayerContainers.cpp
+index d646180..7cd24f6 100644
+--- a/src/game/original/PlayerContainers.cpp
++++ b/src/game/original/PlayerContainers.cpp
+@@ -40,7 +40,7 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD
+     }
+     if (!m_bDead && !m_damage.IsDead() &&
+         (message == OpenBlood2::add_ammo_message || message == OpenBlood2::add_powerup_message ||
+-         message == OpenBlood2::add_weapon_message))
++         message == OpenBlood2::add_weapon_message || message == OpenBlood2::add_item_message))
+     {
+         OpenBlood2::PickupMessage pickup;
+         if (server->ReadPickupMessage(read, pickup))
+@@ -48,6 +48,9 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD
+             bool accepted = false;
+             if (message == OpenBlood2::add_ammo_message)
+                 accepted = m_InventoryMgr.AddAmmo(pickup.type, pickup.amount) == InventoryResult::Ok;
++            else if (message == OpenBlood2::add_item_message)
++                accepted =
++                    m_InventoryMgr.AddItem(pickup.type, static_cast<DBYTE>(pickup.amount)) == InventoryResult::Ok;
+             else if (message == OpenBlood2::add_weapon_message)
+             {
+                 if (server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) !=
+diff --git a/src/game/original/PlayerLocomotion.cpp b/src/game/original/PlayerLocomotion.cpp
+index 9c889cc..acb32ca 100644
+--- a/src/game/original/PlayerLocomotion.cpp
++++ b/src/game/original/PlayerLocomotion.cpp
+@@ -18,6 +18,7 @@ bool CPlayerObj::UpdateAnim(const PlayerControls& controls)
+     if (server->SetObjectRotation(m_hObject, &rotation) != DE_OK)
+         return false;
+     const auto& input = controls.movement;
++    command_run = input.run;
+     crouch_requested = input.crouch;
+     const auto* weapon = m_InventoryMgr.CurrentWeapon(false);
+     const bool knife = weapon && weapon->data.m_nFireType == 4;
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index e1c4a59..ea6ef25 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -118,6 +118,8 @@ class CPlayerObj : public CBaseCharacter
+     std::string locomotion_clip, locomotion_requested_clip, locomotion_error;
+     std::uint64_t animation_changes = 0, blocked_resizes = 0;
+     bool OnCommandUse();
++    bool OnCommandItem(DBYTE);
++    bool command_run = false;
+     bool movement_blocked = false, camera_movement_blocked = false;
+     bool door_push_pending = false;
+     DVector door_push_velocity{};
+diff --git a/src/game/original/PlayerUse.cpp b/src/game/original/PlayerUse.cpp
+index 6b88697..68c645d 100644
+--- a/src/game/original/PlayerUse.cpp
++++ b/src/game/original/PlayerUse.cpp
+@@ -67,3 +67,12 @@ bool CPlayerObj::ApplyDoorPush()
+     door_push_pending = false;
+     return true;
+ }
++
++bool CPlayerObj::OnCommandItem(DBYTE type)
++{
++    // Original OnCommandOn COMMAND_INVITEM_1, including its run-key exclusion.
++    if (!g_pServerDE->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() || movement_blocked ||
++        camera_movement_blocked || command_run)
++        return false;
++    return m_InventoryMgr.SetActiveItem(type) == InventoryResult::Ok;
++}
+diff --git a/src/game/pickup_messages.h b/src/game/pickup_messages.h
+index b4be0b7..2c388c1 100644
+--- a/src/game/pickup_messages.h
++++ b/src/game/pickup_messages.h
+@@ -4,12 +4,14 @@
+ #include <string_view>
+ namespace OpenBlood2
+ {
+-    inline constexpr DDWORD add_ammo_message = 1009, add_powerup_message = 3504, add_weapon_message = 1004;
++    inline constexpr DDWORD add_ammo_message = 1009, add_powerup_message = 3504, add_weapon_message = 1004,
++                            add_item_message = 1006;
+     enum class PickupKind
+     {
+         Ammo,
+         Powerup,
+-        Weapon
++        Weapon,
++        Item
+     };
+     struct PickupMessage
+     {
+diff --git a/src/game/player_messages.h b/src/game/player_messages.h
+index f0de956..e5cbafe 100644
+--- a/src/game/player_messages.h
++++ b/src/game/player_messages.h
+@@ -22,6 +22,14 @@ namespace OpenBlood2
+     {
+         float pitch = 0, yaw = 0;
+     };
++    struct PlayerItemCommand
++    {
++        DBYTE type = 1;
++    };
++    struct InventoryAction
++    {
++        DBYTE type = 1;
++    };
+     struct PlayerUse
+     {
+         PlayerRotation rotation;
+@@ -102,5 +110,5 @@ namespace OpenBlood2
+         WorldExitType type = WorldExitType::World;
+     };
+     using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
+-                                     MissionObjectives, WorldExit, BossHealth, Conversation>;
++                                     MissionObjectives, WorldExit, BossHealth, Conversation, InventoryAction>;
+ } // namespace OpenBlood2
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index d82a6dc..deba224 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -20,6 +20,7 @@
+ #include "game/original/Gideon.h"
+ #include "game/original/Grenade.h"
+ #include "game/original/HandWeaponModel.h"
++#include "game/original/ItemPickups.h"
+ #include "game/original/Key.h"
+ #include "game/original/KeyFramer.h"
+ #include "game/original/KeyPickup.h"
+@@ -455,6 +456,9 @@ namespace OpenBlood2
+                                &b2base,
+                                construct<PickupObject>,
+                                {{"PickupTriggerTarget", std::string{}}, {"PickupTriggerMessage", std::string{}}}};
++        const ClassInfo item_pickup{"ItemPickup", &pickup, construct<ItemPickup>, {}};
++        const ClassInfo charged_pickup{"ItemPickupCharged", &item_pickup, construct<ItemPickupCharged>, {}};
++        const ClassInfo medkit_pickup{"MedKitPU", &charged_pickup, construct<MedKitPU>, {}};
+         const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}};
+         const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
+         const ClassInfo assault_pickup{"AssaultRiflePU", &weapon_pickup, construct<AssaultRiflePU>, {}};
+@@ -774,26 +778,28 @@ namespace OpenBlood2
+                objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
+                objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
+                objects.register_class(key_pickup) && objects.register_class(pickup) &&
+-               objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
+-               objects.register_class(assault_pickup) && objects.register_class(flare_pickup) &&
+-               objects.register_class(mac10_pickup) && objects.register_class(ammo_pickup) &&
+-               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
+-               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
+-               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
+-               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
+-               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
+-               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
+-               objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
+-               objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
+-               objects.register_class(objectives_trigger) && objects.register_class(conversation_trigger) &&
+-               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+-               objects.register_class(door) && objects.register_class(rotating_door) &&
+-               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
+-               objects.register_class(rotating_brush) && objects.register_class(world_debris) &&
+-               objects.register_class(hand_model) && objects.register_class(corpse) &&
+-               objects.register_class(grenade) && objects.register_class(flare_projectile) &&
+-               objects.register_class(flare_alt) && objects.register_class(flare_burst) &&
+-               objects.register_class(energy_projectile) && objects.register_class(shockwave_projectile);
++               objects.register_class(item_pickup) && objects.register_class(charged_pickup) &&
++               objects.register_class(medkit_pickup) && objects.register_class(weapon_pickup) &&
++               objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
++               objects.register_class(flare_pickup) && objects.register_class(mac10_pickup) &&
++               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
++               objects.register_class(health_base) && objects.register_class(armor_base) &&
++               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
++               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
++               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
++               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
++               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
++               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
++               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
++               objects.register_class(conversation_trigger) && objects.register_class(big_trigger) &&
++               objects.register_class(toggle_trigger) && objects.register_class(door) &&
++               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
++               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
++               objects.register_class(world_debris) && objects.register_class(hand_model) &&
++               objects.register_class(corpse) && objects.register_class(grenade) &&
++               objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
++               objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
++               objects.register_class(shockwave_projectile);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 1871977..9c3e8e3 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -46,6 +46,7 @@ namespace OpenBlood2
+         AudioMixer audio;
+         SoundId PlayCharacterSound(HOBJECT, const SoundRequest&, bool retain, std::string&) override;
+         SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
++        SoundId PlayLocalSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) override;
+         SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) override;
+         SoundId PlaySoundAt(HOBJECT, const SoundRequest&, DVector, std::string&) override;
+         SoundId PlayWorldSound(HOBJECT, const SoundRequest&, bool file_stream, std::string&) override;
+diff --git a/src/game/server_audio.cpp b/src/game/server_audio.cpp
+index 7451b6d..d7fa8da 100644
+--- a/src/game/server_audio.cpp
++++ b/src/game/server_audio.cpp
+@@ -56,6 +56,20 @@ namespace OpenBlood2
+         }
+         return audio.play(*client_resources, owner, request, position, error);
+     }
++    SoundId ServerAdapter::PlayLocalSound(HOBJECT source, const SoundRequest& request, std::string& error)
++    {
++        trace_service("PlayLocalSound");
++        if (!IsObjectAlive(source) || !client_resources || request.speaker || request.space != SoundSpace::Local ||
++            request.loop || request.streaming)
++        {
++            error = "Local sound requires a live source and a buffered non-looping local request";
++            return 0;
++        }
++        const auto id = audio.play(*client_resources, source, request, {}, error);
++        if (auto* voice = audio.get(id))
++            voice->world_owned = voice->auto_remove = true;
++        return id;
++    }
+     SoundId ServerAdapter::PlayDetachedSound(HOBJECT source, const SoundRequest& request, DVector position,
+                                              std::string& error)
+     {
+diff --git a/src/game/server_clients.cpp b/src/game/server_clients.cpp
+index c8e9e92..6d2d537 100644
+--- a/src/game/server_clients.cpp
++++ b/src/game/server_clients.cpp
+@@ -80,6 +80,8 @@ namespace OpenBlood2
+                     return physics_vector(value.position);
+                 else if constexpr (std::is_same_v<T, PlayerStats>)
+                     return std::isfinite(value.health) && std::isfinite(value.armor) && std::isfinite(value.bullets);
++                else if constexpr (std::is_same_v<T, InventoryAction>)
++                    return value.type == 1;
+                 else if constexpr (std::is_same_v<T, BossHealth>)
+                     return std::isfinite(value.fraction);
+                 else if constexpr (std::is_same_v<T, WorldExit>)
+diff --git a/src/game/server_pickups.cpp b/src/game/server_pickups.cpp
+index 99fa9df..beb525e 100644
+--- a/src/game/server_pickups.cpp
++++ b/src/game/server_pickups.cpp
+@@ -58,16 +58,22 @@ namespace OpenBlood2
+         auto* m = writable(h);
+         if (!m)
+             return DE_INVALIDPARAMS;
+-        const auto limit = value.kind == PickupKind::Ammo ? 8 : value.kind == PickupKind::Weapon ? 255 : 4;
++        const auto limit = value.kind == PickupKind::Ammo     ? 8
++                           : value.kind == PickupKind::Weapon ? 255
++                           : value.kind == PickupKind::Item   ? 1
++                                                              : 4;
+         const auto request = value.kind == PickupKind::Ammo     ? add_ammo_message
+                              : value.kind == PickupKind::Weapon ? add_weapon_message
++                             : value.kind == PickupKind::Item   ? add_item_message
+                                                                 : add_powerup_message;
+         if (!m->routed ||
+-            (value.kind != PickupKind::Ammo && value.kind != PickupKind::Powerup && value.kind != PickupKind::Weapon) ||
++            (value.kind != PickupKind::Ammo && value.kind != PickupKind::Powerup && value.kind != PickupKind::Weapon &&
++             value.kind != PickupKind::Item) ||
+             (m->id != request && m->id != picked_up_message) || !m->bytes.empty() || m->damage || m->key || m->pickup ||
+             !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit ||
+             (value.kind == PickupKind::Weapon && !WeaponPickupClass(value.type)) || !std::isfinite(value.amount) ||
+-            value.amount < 0 || value.amount > 1e6f)
++            value.amount < 0 || value.amount > 1e6f ||
++            (value.kind == PickupKind::Item && (value.amount > 255 || std::floor(value.amount) != value.amount)))
+         {
+             m->bad = true;
+             return DE_INVALIDPARAMS;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index f886922..5ace70a 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1532,3 +1532,15 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --world 02_cityhub --cinematics-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/conversations.png")
+     set_tests_properties(gpu.conversation_private PROPERTIES LABELS "private;gpu;conversation" TIMEOUT 90 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy" FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+ endif()
++
++add_executable(medkit_tests medkit_tests.cpp)
++target_link_libraries(medkit_tests PRIVATE blood2_game)
++blood2_project_options(medkit_tests)
++foreach(case rules pickup commands transport restore lifetime input)
++    add_test(NAME medkit.${case} COMMAND medkit_tests ${case} "${CMAKE_CURRENT_BINARY_DIR}/medkit-fixtures/${case}")
++    set_tests_properties(medkit.${case} PROPERTIES LABELS "headless;medkit" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME medkit.private COMMAND medkit_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(medkit.private PROPERTIES LABELS "headless;private;medkit" TIMEOUT 180)
++endif()
+diff --git a/tests/assault_tests.cpp b/tests/assault_tests.cpp
+index aa2ed8f..95b36a9 100644
+--- a/tests/assault_tests.cpp
++++ b/tests/assault_tests.cpp
+@@ -446,7 +446,7 @@ bool private_game(const std::filesystem::path& root)
+         }
+         std::cout << "CityHub M16=" << assault << " created=" << created << " unknown=" << unknown
+                   << " failed=" << failed << '\n';
+-        CHECK(assault == 1 && created == 434 && unknown == 19 && failed == 1);
++        CHECK(assault == 1 && created == 435 && unknown == 18 && failed == 1);
+         CHECK(g.unload_world());
+         // Labelled arena uses actual private models/audio, with controlled geometry.
+         auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
+diff --git a/tests/audio_stream_tests.cpp b/tests/audio_stream_tests.cpp
+index d3ec5d4..5f2aae8 100644
+--- a/tests/audio_stream_tests.cpp
++++ b/tests/audio_stream_tests.cpp
+@@ -295,7 +295,7 @@ namespace
+             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
+                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
+                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
+-            CHECK(created == 434 && transferred == 31 && unknown == 19 && failed == 1 && fx == 5 && fx_voices == 4);
++            CHECK(created == 435 && transferred == 31 && unknown == 18 && failed == 1 && fx == 5 && fx_voices == 4);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_bytes());
+         }
+diff --git a/tests/compound_shell_tests.cpp b/tests/compound_shell_tests.cpp
+index 92d3290..c84db46 100644
+--- a/tests/compound_shell_tests.cpp
++++ b/tests/compound_shell_tests.cpp
+@@ -229,7 +229,7 @@ namespace
+             }
+             std::cout << "CityHub: " << created << " created / " << transferred << " sounds / " << unknown
+                       << " unsupported / " << failed << " failed\n";
+-            CHECK(created == 434 && transferred == 31 && unknown == 19 && failed == 1);
++            CHECK(created == 435 && transferred == 31 && unknown == 18 && failed == 1);
+             WorldMesh mesh;
+             CHECK(mesh.build(g.world, error, &g.resources));
+             if (gpu)
+diff --git a/tests/conversation_tests.cpp b/tests/conversation_tests.cpp
+index 406bbdb..ea61686 100644
+--- a/tests/conversation_tests.cpp
++++ b/tests/conversation_tests.cpp
+@@ -257,7 +257,7 @@ namespace
+             for (auto id : g.objects.snapshot())
+                 if (auto* c = dynamic_cast<ConversationTrigger*>(g.objects.get(id)->game.get()))
+                     conversation = c;
+-            CHECK(created == 434 && unknown == 19 && failed == 1 && conversation);
++            CHECK(created == 435 && unknown == 18 && failed == 1 && conversation);
+             std::cout << "CityHub conversation count=" << conversation->count << " file=" << conversation->waves[0]
+                       << " mapped=" << bool(conversation_text(conversation->waves[0])) << '\n';
+             g.server_shell.start_point_name = "01_egressa";
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+index 274e7c6..7678e3c 100644
+--- a/tests/destructable_model_tests.cpp
++++ b/tests/destructable_model_tests.cpp
+@@ -313,7 +313,7 @@ namespace
+             std::cout << "CityHub model initialization: " << count << " models / " << pushable << " pushable / "
+                       << gravity << " gravity / " << ground_misses << " ground misses\n";
+             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
+-            CHECK(created == 434 && unknown == 19 && failed == 1);
++            CHECK(created == 435 && unknown == 18 && failed == 1);
+             CHECK(update_model_scene(g, scene, error));
+             unsigned skin_failures = 0, triangles = 0;
+             for (auto id : ids)
+diff --git a/tests/flare_tests.cpp b/tests/flare_tests.cpp
+index ae75e30..2543f08 100644
+--- a/tests/flare_tests.cpp
++++ b/tests/flare_tests.cpp
+@@ -413,7 +413,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unsupported=" << unknown << " failed=" << failed
+                   << " flare NPCs=" << flare << '\n';
+-        CHECK(created == 434 && unknown == 19 && failed == 1 && flare == 1);
++        CHECK(created == 435 && unknown == 18 && failed == 1 && flare == 1);
+         CHECK(g.unload_world());
+         return true;
+     }
+diff --git a/tests/inventory_state_tests.cpp b/tests/inventory_state_tests.cpp
+index 77662a3..e33784e 100644
+--- a/tests/inventory_state_tests.cpp
++++ b/tests/inventory_state_tests.cpp
+@@ -31,6 +31,8 @@ namespace
+             inv.m_fAmmo[i] = 700.5f + i;
+         inv.m_bInfiniteAmmo = true;
+         CHECK(inv.AddKey({"Laboratory", "Lab access", "icon.pcx", "selected.pcx", 3}) == InventoryResult::Ok);
++        CHECK(inv.AddItem(1, 1) == InventoryResult::Ok);
++        inv.medkit->count = 37;
+         inv.CurrentWeapon()->shots = 42;
+         inv.CurrentWeapon()->m_fLastShotTime = 99;
+         return true;
+@@ -41,6 +43,9 @@ namespace
+         CHECK(inv.m_nAttribStrength == s.strength && inv.m_nAttribMagic == s.magic);
+         CHECK(inv.m_bInfiniteAmmo == s.infinite_ammo && inv.damage_multiplier == s.damage_multiplier);
+         CHECK(inv.keys.size() == (keys ? s.keys.size() : 0));
++        CHECK(bool(inv.medkit) == bool(s.medkit_charge));
++        if (inv.medkit)
++            CHECK(inv.medkit->count == *s.medkit_charge);
+         for (unsigned i = 0; i < 10; ++i)
+             for (bool left : {false, true})
+             {
+diff --git a/tests/mac10_tests.cpp b/tests/mac10_tests.cpp
+index cc75d8e..70c2dfb 100644
+--- a/tests/mac10_tests.cpp
++++ b/tests/mac10_tests.cpp
+@@ -263,7 +263,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unknown=" << unknown << " failed=" << failed << " Mac10=" << mac
+                   << '\n';
+-        CHECK(mac == 1 && created == 434 && unknown == 19 && failed == 1);
++        CHECK(mac == 1 && created == 435 && unknown == 18 && failed == 1);
+         for (auto id : g.objects.snapshot())
+             if (auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(g.objects.get(id)->handle));
+                 a && a->runtime_failed)
+diff --git a/tests/medkit_tests.cpp b/tests/medkit_tests.cpp
+new file mode 100644
+index 0000000..dc8941a
+--- /dev/null
++++ b/tests/medkit_tests.cpp
+@@ -0,0 +1,338 @@
++#include "app/movement_controls.h"
++#include "game/original/ItemPickups.h"
++#include "player_fixture.h"
++#include <algorithm>
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        std::string e;
++        CHECK(test_player::setup(g, root, true, true, true) && g.enter_player(e));
++        return true;
++    }
++    CPlayerObj& player(GameSession& g)
++    {
++        return *g.server_shell.Player(g.local_client);
++    }
++    HOBJECT create(GameSession& g)
++    {
++        return g.objects.create(g.objects.find_class("MedKitPU"), {}, Creation::World,
++                                {{"Pos", DVector{300, 100, 300}}});
++    }
++    bool rules(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto& p = player(g);
++        auto& inv = p.m_InventoryMgr;
++        auto& d = p.m_damage;
++        CHECK(inv.AddItem(1, 0) == InventoryResult::Ok && inv.medkit->count == 100);
++        CHECK(inv.AddItem(1, 255) == InventoryResult::AlreadyHave && inv.AddItem(2, 1) == InventoryResult::Invalid);
++        d.SetHitPoints(35);
++        d.m_fMaxHitPoints = 100;
++        CHECK(inv.SetActiveItem(1) == InventoryResult::Ok && d.m_fHitPoints == 100 && inv.medkit->count == 35);
++        CHECK(inv.medkit->actual_gain == 65 && inv.medkit->action_messages == 1);
++        CHECK(inv.SetActiveItem(1) == InventoryResult::NotAvailable && inv.medkit->count == 35);
++        d.SetHitPoints(10);
++        CHECK(inv.SetActiveItem(1) == InventoryResult::Ok && d.m_fHitPoints == 45 && inv.medkit->count == 0);
++        CHECK(inv.SetActiveItem(1) == InventoryResult::NotAvailable);
++        CHECK(inv.AddItem(1, 0) == InventoryResult::Ok && inv.medkit->count == 100);
++        d.SetHitPoints(99.5f);
++        CHECK(inv.SetActiveItem(1) == InventoryResult::NotAvailable && d.m_fHitPoints == 100 &&
++              inv.medkit->count == 100);
++        CHECK(inv.medkit->actual_gain == .5f && inv.medkit->action_messages == 3);
++        d.SetHitPoints(125);
++        CHECK(inv.SetActiveItem(1) == InventoryResult::Ok && inv.medkit->activation_result == -25 &&
++              d.m_fHitPoints == 125);
++        CHECK(inv.medkit->action_messages == 3 && inv.medkit->count == 100);
++        d.m_fMaxHitPoints = 50;
++        d.SetHitPoints(40);
++        CHECK(inv.SetActiveItem(1) == InventoryResult::Ok && d.m_fHitPoints == 50 && inv.medkit->count == 40);
++        CHECK(inv.medkit->requested_gain == 60 && inv.medkit->actual_gain == 10);
++        d.SetHitPoints(50);
++        CHECK(inv.SetActiveItem(1) == InventoryResult::Ok && d.m_fHitPoints == 50 && inv.medkit->count == 0);
++        CHECK(inv.medkit->actual_gain == 0 && inv.medkit->action_messages == 5);
++        std::string e;
++        CHECK(g.pump_player_messages(e));
++        CHECK(g.client_shell.item_actions == 5 && g.client_shell.item_sounds == 0 &&
++              !g.client_shell.item_audio_error.empty());
++        return true;
++    }
++    bool pickup(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto& p = player(g);
++        auto& inv = p.m_InventoryMgr;
++        for (unsigned i = 0; i < 3; ++i)
++        {
++            auto h = create(g);
++            auto* r = g.objects.get(h);
++            CHECK(r && r->model && r->model_error.empty());
++            auto* item = dynamic_cast<MedKitPU*>(r->game.get());
++            CHECK(item && item->resource_id == 302 && item->value.amount == 1);
++            CHECK(item->pickup_sound == "sounds/powerups/inventory1.wav");
++            if (i == 1)
++            {
++                CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p.m_hObject) && !item->picked_up);
++                inv.medkit->count = 17;
++            }
++            if (i == 2)
++            {
++                inv.medkit->count = 0;
++                p.m_bDead = true;
++                CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p.m_hObject) && !item->picked_up);
++                p.m_bDead = false;
++                p.m_damage.m_bDead = true;
++                CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p.m_hObject) && !item->picked_up);
++                p.m_damage.m_bDead = false;
++            }
++            CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p.m_hObject) && item->picked_up);
++            CHECK(inv.medkit->count == 100 && !g.server.IsObjectAlive(h));
++            CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p.m_hObject) == false);
++            CHECK(g.objects.finish_frame() && !g.objects.get(h));
++        }
++        CHECK(g.server.pickup_reports.size() == 3 && !g.server.message_count());
++        CHECK(!g.objects.create(g.objects.find_class("MedKitPU"), {}, Creation::String, {}));
++        CHECK(g.unload_world() && !g.server.string_count());
++        return true;
++    }
++    bool commands(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto& p = player(g);
++        auto& inv = p.m_InventoryMgr;
++        CHECK(inv.AddItem(1, 1) == InventoryResult::Ok);
++        p.m_damage.SetHitPoints(20);
++        p.m_bDead = true;
++        CHECK(!g.server_shell.OnMessage(g.local_client, PlayerItemCommand{1}));
++        p.m_bDead = false;
++        for (bool* gate : {&p.movement_blocked, &p.camera_movement_blocked, &p.command_run})
++        {
++            *gate = true;
++            CHECK(!g.server_shell.OnMessage(g.local_client, PlayerItemCommand{1}));
++            *gate = false;
++        }
++        CHECK(!g.server_shell.OnMessage(nullptr, PlayerItemCommand{1}) && inv.medkit->attempts == 0);
++        CHECK(!g.server_shell.OnMessage(g.local_client, PlayerItemCommand{2}));
++        g.client_shell.medkit_down = true;
++        CHECK(g.client_shell.UpdateUse(g.server_shell) && inv.medkit->count == 20 && p.m_damage.m_fHitPoints == 100);
++        p.m_damage.SetHitPoints(90);
++        CHECK(g.client_shell.UpdateUse(g.server_shell) && p.m_damage.m_fHitPoints == 90);
++        g.client_shell.medkit_down = false;
++        CHECK(g.client_shell.UpdateUse(g.server_shell));
++        g.client_shell.medkit_down = true;
++        CHECK(g.client_shell.UpdateUse(g.server_shell));
++        CHECK(p.m_damage.m_fHitPoints == 100 && inv.medkit->count == 10);
++        return true;
++    }
++    bool transport(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto& p = player(g);
++        auto h = create(g);
++        CHECK(h);
++        auto* item = g.objects.get(h)->game.get();
++        for (auto value : {PickupMessage{PickupKind::Item, 2, 1}, PickupMessage{PickupKind::Item, 1, .5},
++                           PickupMessage{PickupKind::Item, 1, 256}, PickupMessage{PickupKind::Item, 1, -1}})
++        {
++            auto m = g.server.StartMessageToObject(item, p.m_hObject, add_item_message);
++            CHECK(m && g.server.WritePickupMessage(m, value) != DE_OK);
++            g.server.EndHMessageWrite(m);
++        }
++        auto m = g.server.StartMessageToObject(item, p.m_hObject, add_powerup_message);
++        CHECK(m && g.server.WritePickupMessage(m, {PickupKind::Item, 1, 1}) != DE_OK);
++        g.server.EndHMessageWrite(m);
++        CHECK(g.server.SendToClient(g.local_client, InventoryAction{2}) == DE_INVALIDPARAMS);
++        std::string sound_error;
++        SoundRequest request;
++        request.resource = "sounds/powerups/medikit.wav";
++        CHECK(!g.server.PlayLocalSound(p.m_hObject, request, sound_error) && !sound_error.empty());
++        request.space = SoundSpace::Local;
++        request.loop = true;
++        CHECK(!g.server.PlayLocalSound(p.m_hObject, request, sound_error));
++        request.loop = false;
++        request.streaming = true;
++        CHECK(!g.server.PlayLocalSound(p.m_hObject, request, sound_error));
++        request.streaming = false;
++        CHECK(!g.server.PlayLocalSound(nullptr, request, sound_error));
++        CHECK(p.m_InventoryMgr.AddItem(1, 1) == InventoryResult::Ok);
++        for (unsigned i = 0; i < 256; ++i)
++            CHECK(g.server.SendToClient(g.local_client, PlayerStats{}) == DE_OK);
++        p.m_damage.SetHitPoints(90);
++        CHECK(p.OnCommandItem(1) && p.m_damage.m_fHitPoints == 100 && p.m_InventoryMgr.medkit->count == 90);
++        CHECK(p.m_InventoryMgr.medkit->action_messages == 0 && !p.m_InventoryMgr.medkit->error.empty());
++        CHECK(!g.server.message_count());
++        return true;
++    }
++    bool restore(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string e;
++        auto& inv = player(g).m_InventoryMgr;
++        CHECK(inv.AddItem(1, 1) == InventoryResult::Ok);
++        inv.medkit->count = 27;
++        PlayerRestoreState s;
++        CHECK(g.capture_player(s, e) && s.inventory.medkit_charge == 27);
++        auto old = g.client_shell.player;
++        CHECK(g.leave_player());
++        auto bad = s;
++        bad.inventory.medkit_charge = 101;
++        CHECK(!g.restore_player(bad, e) && !g.client_shell.player);
++        CHECK(g.restore_player(s, e) && g.client_shell.player != old);
++        auto& p = player(g);
++        CHECK(p.m_InventoryMgr.medkit && p.m_InventoryMgr.medkit->count == 27);
++        p.m_damage.SetHitPoints(50);
++        CHECK(p.OnCommandItem(1) && p.m_damage.m_fHitPoints == 77);
++        CHECK(p.m_InventoryMgr.medkit->count == 0);
++        CHECK(g.capture_player(s, e) && s.inventory.medkit_charge == 0);
++        CHECK(g.leave_player() && g.restore_player(s, e) && player(g).m_InventoryMgr.medkit->count == 0);
++        CHECK(g.leave_player());
++        auto h = g.objects.create(g.objects.find_class("CPlayerObj"), {}, Creation::World, {});
++        auto* detached = dynamic_cast<CPlayerObj*>(g.server.HandleToObject(h));
++        CHECK(detached);
++        s.inventory.medkit_charge = 37;
++        CHECK(detached->m_InventoryMgr.Load(s.inventory, InventoryLoadType::KeepAlive, e));
++        CHECK(detached->m_InventoryMgr.medkit->count == 37);
++        auto malformed = s.inventory;
++        malformed.medkit_charge = 255;
++        CHECK(!detached->m_InventoryMgr.Load(malformed, InventoryLoadType::KeepAlive, e) &&
++              detached->m_InventoryMgr.medkit->count == 37);
++        s.inventory.medkit_charge.reset();
++        CHECK(detached->m_InventoryMgr.Load(s.inventory, InventoryLoadType::Restore, e) &&
++              !detached->m_InventoryMgr.medkit);
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto& p = player(g);
++        CHECK(p.m_InventoryMgr.AddItem(1, 1) == InventoryResult::Ok);
++        CInvMedkit probe = *p.m_InventoryMgr.medkit;
++        CHECK(g.objects.remove(p.m_hObject) && probe.Activate() == 0 && !probe.error.empty());
++        CHECK(g.leave_player() && g.objects.finish_frame());
++        CHECK(probe.Activate() == 0 && probe.count == 100 && !g.server.message_count());
++        CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.string_count());
++        return true;
++    }
++    bool input(const std::filesystem::path&)
++    {
++        MovementControls c;
++        c.focused = true;
++        SDL_Event e{};
++        e.type = SDL_EVENT_KEY_DOWN;
++        e.key.windowID = 7;
++        e.key.scancode = SDL_SCANCODE_H;
++        CHECK(c.consumes(e, false));
++        c.event(e, 7);
++        CHECK(c.sample_medkit(false));
++        CHECK(!c.sample_medkit(true) && !c.sample_medkit(false));
++        e.type = SDL_EVENT_KEY_UP;
++        c.event(e, 7);
++        CHECK(!c.sample_medkit(false));
++        e.type = SDL_EVENT_KEY_DOWN;
++        c.event(e, 7);
++        CHECK(c.sample_medkit(false));
++        e.type = SDL_EVENT_WINDOW_FOCUS_LOST;
++        e.window.windowID = 7;
++        c.event(e, 7);
++        CHECK(!c.sample_medkit(false));
++        e.type = SDL_EVENT_WINDOW_FOCUS_GAINED;
++        c.event(e, 7);
++        e.type = SDL_EVENT_KEY_DOWN;
++        e.key.windowID = 7;
++        e.key.scancode = SDL_SCANCODE_H;
++        e.key.repeat = true;
++        c.event(e, 7);
++        CHECK(!c.sample_medkit(false));
++        e.key.repeat = false;
++        c.event(e, 8);
++        CHECK(!c.sample_medkit(false));
++        c.event(e, 7);
++        CHECK(c.sample_medkit(false));
++        c.player_changed();
++        CHECK(!c.sample_medkit(false));
++        return true;
++    }
++    bool private_game(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config cfg;
++        cfg.data_dir = root;
++        std::string e;
++        CHECK(g.resources.mount_game(cfg, e));
++        g.server.audio.inspect_pcm = true;
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_cityhub", e));
++            g.server_shell.start_point_name = "01_egressa";
++            unsigned created = 0, unknown = 0, failed = 0;
++            HOBJECT h = nullptr;
++            for (auto& entry : g.entries)
++            {
++                created += entry.state == EntryState::Created;
++                unknown += entry.state == EntryState::Unsupported;
++                failed += entry.state == EntryState::Failed;
++            }
++            CHECK(created == 435 && unknown == 18 && failed == 1);
++            for (auto id : g.objects.snapshot())
++                if (dynamic_cast<MedKitPU*>(g.objects.get(id)->game.get()))
++                    h = g.objects.get(id)->handle;
++            CHECK(h && g.objects.get(h)->model && g.objects.get(h)->model_error.empty());
++            std::cout << "CityHub MedKitPU model=" << g.objects.get(h)->state.m_Filename << "\n";
++            CHECK(g.enter_player(e));
++            auto& p = player(g);
++            p.m_damage.SetHitPoints(45);
++            // Authored pickup, diagnostic direct contact avoids claiming a level playthrough.
++            CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p.m_hObject) && p.m_InventoryMgr.medkit->count == 100);
++            g.client_shell.medkit_down = true;
++            CHECK(g.client_shell.UpdateUse(g.server_shell));
++            CHECK(p.m_damage.m_fHitPoints == 100 && p.m_InventoryMgr.medkit->count == 45);
++            CHECK(g.pump_player_messages(e) && g.client_shell.item_actions == 1 && g.client_shell.item_sounds == 1);
++            const auto voice = g.client_shell.item_voice;
++            const auto* v = g.server.audio.get(voice);
++            CHECK(v && v->world_owned && v->auto_remove && v->request.space == SoundSpace::Local &&
++                  v->request.priority == 4);
++            CHECK(v->clip && v->clip->frames() == 45312);
++            CHECK(std::any_of(v->clip->samples.begin(), v->clip->samples.end(),
++                              [](float sample) { return std::abs(sample) > .01f; }));
++            CHECK(g.server.audio.advance(.1, {}, {}));
++            std::cout << "Medkit cycle=" << cycle << " charges=" << int(p.m_InventoryMgr.medkit->count)
++                      << " frames=" << v->clip->frames() << " peak=" << g.server.audio.peak << "\n";
++            CHECK(g.server.audio.peak > 0);
++            CHECK(g.leave_player() && g.server.audio.get(voice));
++            CHECK(g.server.advance_audio(10, {}, {}));
++            CHECK(!g.server.audio.get(voice));
++            CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.message_count() &&
++                  !g.server.string_count());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests = {
++        {"rules", rules},     {"pickup", pickup},     {"commands", commands}, {"transport", transport},
++        {"restore", restore}, {"lifetime", lifetime}, {"input", input},       {"private", private_game}};
++    auto it = tests.find(argv[1]);
++    return it != tests.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/pickup_tests.cpp b/tests/pickup_tests.cpp
+index be2d394..b5ad7c5 100644
+--- a/tests/pickup_tests.cpp
++++ b/tests/pickup_tests.cpp
+@@ -434,8 +434,8 @@ namespace
+             rejected += n;
+         }
+         CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2 &&
+-              counts["AssaultRiflePU"] == 5);
+-        CHECK(worlds == 57 && created == 1270 && missing == 0 && rejected == 176 && spawns == 60);
++              counts["AssaultRiflePU"] == 5 && counts["MedKitPU"] == 22);
++        CHECK(worlds == 57 && created == 1290 && missing == 0 && rejected == 178 && spawns == 60);
+         return true;
+     }
+ } // namespace
+diff --git a/tests/player_fixture.h b/tests/player_fixture.h
+index c2b8b4d..a322220 100644
+--- a/tests/player_fixture.h
++++ b/tests/player_fixture.h
+@@ -83,9 +83,9 @@ namespace test_player
+                 dir.children["skins"].children["powerups"].files[std::string(name) + ".dtx"] = {1, 2, 3};
+             }
+         if (pickup_assets)
+-            for (auto name :
+-                 {"bulletammo_pu", "shellammo_pu", "bmgammo_pu", "flareammo_pu", "diebugdieammo_pu", "howitzerammo_pu",
+-                  "fuelammo_pu", "batteryammo_pu", "health_pu", "megahealth_pu", "ward_pu", "necroward_pu"})
++            for (auto name : {"bulletammo_pu", "shellammo_pu", "bmgammo_pu", "flareammo_pu", "diebugdieammo_pu",
++                              "howitzerammo_pu", "medkit_pu", "fuelammo_pu", "batteryammo_pu", "health_pu",
++                              "megahealth_pu", "ward_pu", "necroward_pu"})
+             {
+                 dir.children["models"].children["powerups"].files[std::string(name) + ".abc"] =
+                     test_model::abc(false, true).b;
+diff --git a/tests/world_debris_tests.cpp b/tests/world_debris_tests.cpp
+index 8500466..310fef6 100644
+--- a/tests/world_debris_tests.cpp
++++ b/tests/world_debris_tests.cpp
+@@ -246,7 +246,7 @@ namespace
+                 failed += e.state == EntryState::Failed;
+             }
+             std::cout << "Created=" << created << " unsupported=" << unknown << " failed=" << failed << '\n';
+-            CHECK(created == 434 && unknown == 19 && failed == 1);
++            CHECK(created == 435 && unknown == 18 && failed == 1);
+             // Exercise original destruction/name activation, not direct fragment creation.
+             auto* list = g.server.FindNamedObjects("billboard");
+             CHECK(list && list->m_pFirstLink);
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 15770e4..051e4ec 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -923,8 +923,8 @@ namespace
+                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
+                 else
+                 {
+-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 466 && d.editor_only == 541 &&
+-                          d.unknown == 19 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
++                    CHECK(d.entries.size() == 1026 && d.schema_checked == 467 && d.editor_only == 541 &&
++                          d.unknown == 18 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                     for (const auto& e : d.entries)
+                         if (e.state == DestinationEntryState::InvalidProperties)
+                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+@@ -1168,7 +1168,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 434 && d.unknown == 19 && d.failed == 1);
++                        CHECK(d.created == 435 && d.unknown == 18 && d.failed == 1);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

@@ -1,0 +1,20 @@
+363/707 Testing: gpu.model_builtin_city
+363/707 Test: gpu.model_builtin_city
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/model_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/model-city" "/home/yann/.steam/steam/steamapps/common/Blood II" "builtin_city"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.model_builtin_city" start time: Oct 17 04:50 CEST
+Output:
+----------------------------------------------------------
+Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+CityHub Model lightbulb1.abc cycle 0: 243 textured pixels, no fallback; hidden/restored checked
+CityHub Model redlight.abc cycle 0: 8158 textured pixels, no fallback; hidden/restored checked
+CityHub Model lightbulb1.abc cycle 1: 243 textured pixels, no fallback; hidden/restored checked
+CityHub Model redlight.abc cycle 1: 8158 textured pixels, no fallback; hidden/restored checked
+Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+<end of output>
+Test time =   1.68 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.model_builtin_city" end time: Oct 17 04:50 CEST
+"gpu.model_builtin_city" time elapsed: 00:00:01
+----------------------------------------------------------

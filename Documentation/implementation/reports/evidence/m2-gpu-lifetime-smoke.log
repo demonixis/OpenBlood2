@@ -1,0 +1,139 @@
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II/ (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Captured GPU frame to /tmp/b2-gpu-lifetime-smoke.png
+[info] Shutdown: frames=24, UI frames=0, hidden frames=24, toggles=0, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+
+=================================================================
+==2340065==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 7392 byte(s) in 132 object(s) allocated from:
+    #0 0x0000004f741d in calloc ??:?
+    #1 0x7be0f97e7b8d  (<unknown module>)
+
+Direct leak of 3696 byte(s) in 66 object(s) allocated from:
+    #0 0x0000004f741d in calloc ??:?
+    #1 0x7fe1017ce35c  (<unknown module>)
+
+Direct leak of 184 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004f741d in calloc ??:?
+    #1 0x7fe1026ea716 in _dbus_message_loader_get_buffer ??:?
+    #2 0x7fe1026ebaa7 in _dbus_message_loader_queue_messages ??:?
+    #3 0x7fe1026f84b0 in _dbus_server_new_for_tcp_socket ??:?
+    #4 0x7fe1026f86af in _dbus_server_new_for_tcp_socket ??:?
+    #5 0x7fe1026f89d2 in _dbus_server_new_for_tcp_socket ??:?
+    #6 0x7fe1026f8f11 in _dbus_server_new_for_tcp_socket ??:?
+    #7 0x7fe1026da5d5 in _dbus_connection_unref_unlocked ??:?
+    #8 0x7fe1026f117f in dbus_pending_call_block ??:?
+    #9 0x7fe1026dc57b in dbus_connection_send_with_reply_and_block ??:?
+    #10 0x7fe1026dc85b in dbus_bus_register ??:?
+    #11 0x7fe1026dcc39 in dbus_bus_register ??:?
+    #12 0x7be0f9819f06  (<unknown module>)
+
+Direct leak of 184 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004f741d in calloc ??:?
+    #1 0x7fe1026ea716 in _dbus_message_loader_get_buffer ??:?
+    #2 0x7fe1026ebaa7 in _dbus_message_loader_queue_messages ??:?
+    #3 0x7fe1026f84b0 in _dbus_server_new_for_tcp_socket ??:?
+    #4 0x7fe1026f86af in _dbus_server_new_for_tcp_socket ??:?
+    #5 0x7fe1026f89d2 in _dbus_server_new_for_tcp_socket ??:?
+    #6 0x7fe1026f8f11 in _dbus_server_new_for_tcp_socket ??:?
+    #7 0x7fe1026da5d5 in _dbus_connection_unref_unlocked ??:?
+    #8 0x7fe1026f117f in dbus_pending_call_block ??:?
+    #9 0x7fe1026dc57b in dbus_connection_send_with_reply_and_block ??:?
+    #10 0x7fe1026dc85b in dbus_bus_register ??:?
+    #11 0x7fe1026dcc39 in dbus_bus_register ??:?
+    #12 0x000001627985 in SDL_DBus_Init /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/core/linux/SDL_dbus.c:202
+    #13 0x000001671280 in SDL_InitSubSystem_REAL /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/SDL.c:372
+    #14 0x000001671c72 in SDL_Init_REAL /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/SDL.c:603
+    #15 0x000001488997 in SDL_Init /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/dynapi/SDL_dynapi_procs.h:638
+    #16 0x000001191c0a in OpenBlood2::Runtime::initialize(bool, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) /home/yann/projects/lithtech/Blood2/src/engine/runtime.cpp:10
+    #17 0x0000005bc806 in (anonymous namespace)::run(OpenBlood2::Options const&, OpenBlood2::Config const&, OpenBlood2::DataStatus const&) /home/yann/projects/lithtech/Blood2/src/app/main.cpp:77
+    #18 0x0000005ba9c8 in main /home/yann/projects/lithtech/Blood2/src/app/main.cpp:1987
+    #19 0x7fe10220a680 in __libc_start_call_main ??:?
+    #20 0x7fe10220a797 in __libc_start_main_alias_2 :?
+    #21 0x000000451194 in _start ??:?
+
+Indirect leak of 12672 byte(s) in 132 object(s) allocated from:
+    #0 0x0000004f741d in calloc ??:?
+    #1 0x7be0f97e7b8d  (<unknown module>)
+
+Indirect leak of 6336 byte(s) in 66 object(s) allocated from:
+    #0 0x0000004f741d in calloc ??:?
+    #1 0x7fe1017d02e9  (<unknown module>)
+
+Indirect leak of 5972 byte(s) in 276 object(s) allocated from:
+    #0 0x0000004f7248 in malloc ??:?
+    #1 0x7be0f97e78d1  (<unknown module>)
+
+Indirect leak of 4314 byte(s) in 2 object(s) allocated from:
+    #0 0x0000004f7650 in realloc ??:?
+    #1 0x7fe1026fa2dd in dbus_realloc ??:?
+    #2 0x7fe1026fb1c7 in _dbus_string_compact ??:?
+    #3 0x7fe1026fbf04 in _dbus_string_copy_len ??:?
+    #4 0x7fe1026ec291 in _dbus_message_loader_queue_messages ??:?
+    #5 0x7fe1026f84b0 in _dbus_server_new_for_tcp_socket ??:?
+    #6 0x7fe1026f86af in _dbus_server_new_for_tcp_socket ??:?
+    #7 0x7fe1026f89d2 in _dbus_server_new_for_tcp_socket ??:?
+    #8 0x7fe1026f8f11 in _dbus_server_new_for_tcp_socket ??:?
+    #9 0x7fe1026da5d5 in _dbus_connection_unref_unlocked ??:?
+    #10 0x7fe1026f117f in dbus_pending_call_block ??:?
+    #11 0x7fe1026dc57b in dbus_connection_send_with_reply_and_block ??:?
+    #12 0x7be0f9877c23  (<unknown module>)
+
+Indirect leak of 2986 byte(s) in 138 object(s) allocated from:
+    #0 0x0000004f7248 in malloc ??:?
+    #1 0x7fe1017cdf68  (<unknown module>)
+
+Indirect leak of 192 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004f7650 in realloc ??:?
+    #1 0x7fe1026fa2dd in dbus_realloc ??:?
+    #2 0x7fe1026e4a35 in dbus_message_iter_append_fixed_array ??:?
+    #3 0x7fe1026e4ddf in _dbus_type_writer_recurse ??:?
+    #4 0x7fe1026e524a in _dbus_type_writer_write_basic ??:?
+    #5 0x7fe1026e6235 in _dbus_header_set_field_basic ??:?
+    #6 0x7fe1026e63b2 in dbus_message_set_reply_serial ??:?
+    #7 0x7fe1026e8fd7 in dbus_message_iter_append_basic ??:?
+    #8 0x7fe1026eb56a in dbus_message_new_error ??:?
+    #9 0x7fe1026dc147 in dbus_connection_send_with_reply ??:?
+    #10 0x7fe1026dc55e in dbus_connection_send_with_reply_and_block ??:?
+    #11 0x7fe1026dc85b in dbus_bus_register ??:?
+    #12 0x7fe1026dcc39 in dbus_bus_register ??:?
+    #13 0x0000016279ce in SDL_DBus_Init /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/core/linux/SDL_dbus.c:210
+    #14 0x000001671280 in SDL_InitSubSystem_REAL /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/SDL.c:372
+    #15 0x000001671c72 in SDL_Init_REAL /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/SDL.c:603
+    #16 0x000001488997 in SDL_Init /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/dynapi/SDL_dynapi_procs.h:638
+    #17 0x000001191c0a in OpenBlood2::Runtime::initialize(bool, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) /home/yann/projects/lithtech/Blood2/src/engine/runtime.cpp:10
+    #18 0x0000005bc806 in (anonymous namespace)::run(OpenBlood2::Options const&, OpenBlood2::Config const&, OpenBlood2::DataStatus const&) /home/yann/projects/lithtech/Blood2/src/app/main.cpp:77
+    #19 0x0000005ba9c8 in main /home/yann/projects/lithtech/Blood2/src/app/main.cpp:1987
+    #20 0x7fe10220a680 in __libc_start_call_main ??:?
+    #21 0x7fe10220a797 in __libc_start_main_alias_2 :?
+    #22 0x000000451194 in _start ??:?
+
+Indirect leak of 96 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004f7650 in realloc ??:?
+    #1 0x7fe1026fa2dd in dbus_realloc ??:?
+    #2 0x7fe1026fb1c7 in _dbus_string_compact ??:?
+    #3 0x7fe1026fbf04 in _dbus_string_copy_len ??:?
+    #4 0x7fe1026ebae6 in _dbus_message_loader_queue_messages ??:?
+    #5 0x7fe1026f84b0 in _dbus_server_new_for_tcp_socket ??:?
+    #6 0x7fe1026f86af in _dbus_server_new_for_tcp_socket ??:?
+    #7 0x7fe1026f89d2 in _dbus_server_new_for_tcp_socket ??:?
+    #8 0x7fe1026f8f11 in _dbus_server_new_for_tcp_socket ??:?
+    #9 0x7fe1026da5d5 in _dbus_connection_unref_unlocked ??:?
+    #10 0x7fe1026f117f in dbus_pending_call_block ??:?
+    #11 0x7fe1026dc57b in dbus_connection_send_with_reply_and_block ??:?
+    #12 0x7fe1026dc85b in dbus_bus_register ??:?
+    #13 0x7fe1026dcc39 in dbus_bus_register ??:?
+    #14 0x7be0f9819f06  (<unknown module>)
+
+SUMMARY: AddressSanitizer: 44024 byte(s) leaked in 816 allocation(s).

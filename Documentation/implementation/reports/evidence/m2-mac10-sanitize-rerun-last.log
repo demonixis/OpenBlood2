@@ -1,0 +1,58 @@
+Start testing: Oct 17 06:20 CEST
+----------------------------------------------------------
+678/679 Testing: mac10.private
+678/679 Test: mac10.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/mac10_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"mac10.private" start time: Oct 17 06:20 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+View left=0
+draw duration=333
+static_model duration=0
+start_alt_fire duration=633 key@233:sound_key mac10\\flipoutstock.wav
+end_alt_fire duration=633 key@167:sound_key mac10\\flipinstock.wav
+fire duration=80 key@0:fire_key
+alt_fire duration=166 key@0:fire_key
+View left=1
+static_model duration=1
+draw duration=333
+fire duration=80 key@0:fire_key
+Mac10 right primary shots=23 keys=23 HP=100 dead=0 state=5
+Mac10 right alternate shots=7 keys=7 HP=100 dead=0 state=8
+Mac10 left primary shots=23 keys=23 HP=100 dead=0 state=5
+Mac10 left alternate shots=23 keys=23 HP=100 dead=0 state=8
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+View left=0
+draw duration=333
+static_model duration=0
+start_alt_fire duration=633 key@233:sound_key mac10\\flipoutstock.wav
+end_alt_fire duration=633 key@167:sound_key mac10\\flipinstock.wav
+fire duration=80 key@0:fire_key
+alt_fire duration=166 key@0:fire_key
+View left=1
+static_model duration=1
+draw duration=333
+fire duration=80 key@0:fire_key
+Mac10 right primary shots=23 keys=23 HP=100 dead=0 state=5
+Mac10 right alternate shots=7 keys=7 HP=100 dead=0 state=8
+Mac10 left primary shots=23 keys=23 HP=100 dead=0 state=5
+Mac10 left alternate shots=23 keys=23 HP=100 dead=0 state=8
+CityHub created=419 unknown=31 failed=4 Mac10=1
+<end of output>
+Test time = 100.58 sec
+----------------------------------------------------------
+Test Passed.
+"mac10.private" end time: Oct 17 06:22 CEST
+"mac10.private" time elapsed: 00:01:40
+----------------------------------------------------------
+
+End testing: Oct 17 06:22 CEST
+
+headless = 100.58 sec*proc
+
+mac10 = 100.58 sec*proc
+
+private = 100.58 sec*proc
+

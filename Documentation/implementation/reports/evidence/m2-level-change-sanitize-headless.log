@@ -1,0 +1,93 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  63: player.private
+      Start  44: world.destination_trial_private
+ 1/39 Test  #63: player.private ....................   Passed   21.75 sec
+      Start  43: world.level_change_private
+ 2/39 Test  #44: world.destination_trial_private ...   Passed   36.90 sec
+      Start 536: player_keepalive.private
+ 3/39 Test  #43: world.level_change_private ........   Passed   37.31 sec
+      Start 532: player_restore.private
+ 4/39 Test #532: player_restore.private ............   Passed   12.88 sec
+      Start 506: exits.catalog
+ 5/39 Test #536: player_keepalive.private ..........   Passed   38.07 sec
+      Start  25: world.level_change
+ 6/39 Test  #25: world.level_change ................   Passed    0.46 sec
+      Start  27: world.destination_trials
+ 7/39 Test  #27: world.destination_trials ..........   Passed    0.22 sec
+      Start 534: player_keepalive.fallback
+ 8/39 Test #534: player_keepalive.fallback .........   Passed    0.18 sec
+      Start 530: player_restore.failures
+ 9/39 Test #530: player_restore.failures ...........   Passed    0.11 sec
+      Start 531: player_restore.lifetime
+10/39 Test #531: player_restore.lifetime ...........   Passed    0.10 sec
+      Start 535: player_keepalive.failures
+11/39 Test #535: player_keepalive.failures .........   Passed    0.09 sec
+      Start  30: world.destination_lifetime
+12/39 Test  #30: world.destination_lifetime ........   Passed    0.07 sec
+      Start 529: player_restore.roundtrip
+13/39 Test #529: player_restore.roundtrip ..........   Passed    0.06 sec
+      Start 533: player_keepalive.named
+14/39 Test #533: player_keepalive.named ............   Passed    0.07 sec
+      Start   1: objects.builtin_model
+15/39 Test   #1: objects.builtin_model .............   Passed    0.05 sec
+      Start 500: exits.delayed
+16/39 Test #500: exits.delayed .....................   Passed    0.07 sec
+      Start  11: objects.unsupported_teardown
+17/39 Test  #11: objects.unsupported_teardown ......   Passed    0.06 sec
+      Start 504: exits.queue
+18/39 Test #504: exits.queue .......................   Passed    0.06 sec
+      Start 505: exits.lifetime
+19/39 Test #505: exits.lifetime ....................   Passed    0.06 sec
+      Start 499: exits.defaults
+20/39 Test #499: exits.defaults ....................   Passed    0.05 sec
+      Start  10: objects.messages_strings
+21/39 Test  #10: objects.messages_strings ..........   Passed    0.05 sec
+      Start 502: exits.blocked
+22/39 Test #502: exits.blocked .....................   Passed    0.05 sec
+      Start 503: exits.dead
+23/39 Test #503: exits.dead ........................   Passed    0.05 sec
+      Start  12: objects.creation_failures
+24/39 Test  #12: objects.creation_failures .........   Passed    0.04 sec
+      Start 501: exits.broadcast
+25/39 Test #501: exits.broadcast ...................   Passed    0.04 sec
+      Start   4: objects.reasons_properties
+26/39 Test   #4: objects.reasons_properties ........   Passed    0.02 sec
+      Start  60: player.rollback
+27/39 Test  #60: player.rollback ...................   Passed    0.06 sec
+      Start   9: objects.links_lists
+28/39 Test   #9: objects.links_lists ...............   Passed    0.02 sec
+      Start   2: objects.original_objects
+29/39 Test   #2: objects.original_objects ..........   Passed    0.02 sec
+      Start   6: objects.deferred_removal
+30/39 Test   #6: objects.deferred_removal ..........   Passed    0.02 sec
+      Start  59: player.lifecycle
+31/39 Test  #59: player.lifecycle ..................   Passed    0.10 sec
+      Start   3: objects.nested_creation
+32/39 Test   #3: objects.nested_creation ...........   Passed    0.03 sec
+      Start   8: objects.handles_selection
+33/39 Test   #8: objects.handles_selection .........   Passed    0.03 sec
+      Start   7: objects.aggregate_dispatch
+34/39 Test   #7: objects.aggregate_dispatch ........   Passed    0.03 sec
+      Start   5: objects.scheduling
+35/39 Test   #5: objects.scheduling ................   Passed    0.03 sec
+      Start  61: player.messages
+36/39 Test  #61: player.messages ...................   Passed    0.10 sec
+      Start  62: player.callbacks
+37/39 Test  #62: player.callbacks ..................   Passed    0.09 sec
+      Start  58: player.handles
+38/39 Test  #58: player.handles ....................   Passed    0.06 sec
+39/39 Test #506: exits.catalog .....................   Passed   27.96 sec
+
+100% tests passed, 0 tests failed out of 39
+
+Label Time Summary:
+exits               =  28.35 sec*proc (8 tests)
+headless            = 177.45 sec*proc (39 tests)
+objects             =   0.42 sec*proc (12 tests)
+player              =  22.17 sec*proc (6 tests)
+player_keepalive    =  38.41 sec*proc (4 tests)
+player_restore      =  13.15 sec*proc (4 tests)
+private             = 174.88 sec*proc (6 tests)
+world               =  74.96 sec*proc (5 tests)
+
+Total Test time (real) =  99.93 sec

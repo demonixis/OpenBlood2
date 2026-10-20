@@ -1,0 +1,14 @@
+370/375 Testing: ai_navigation.direct
+370/375 Test: ai_navigation.direct
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_navigation_tests" "direct"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_navigation.direct" start time: Oct 16 12:33 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_navigation.direct" end time: Oct 16 12:33 CEST
+"ai_navigation.direct" time elapsed: 00:00:00
+----------------------------------------------------------

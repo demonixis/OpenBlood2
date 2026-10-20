@@ -1,0 +1,14 @@
+410/413 Testing: ai_follow.failures
+410/413 Test: ai_follow.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_follow_tests" "failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_follow.failures" start time: Oct 16 13:00 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.failures" end time: Oct 16 13:00 CEST
+"ai_follow.failures" time elapsed: 00:00:00
+----------------------------------------------------------

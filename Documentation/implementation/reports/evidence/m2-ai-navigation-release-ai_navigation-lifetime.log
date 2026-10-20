@@ -1,0 +1,14 @@
+401/402 Testing: ai_navigation.lifetime
+401/402 Test: ai_navigation.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_navigation_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_navigation.lifetime" start time: Oct 16 12:29 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_navigation.lifetime" end time: Oct 16 12:29 CEST
+"ai_navigation.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

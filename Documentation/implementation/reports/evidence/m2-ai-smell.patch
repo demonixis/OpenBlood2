@@ -1,0 +1,923 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index afbedb0..fad9e11 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -579,3 +579,5 @@ The [AI alignment correction](../Documentation/Implementation/M2_AI_ALIGNMENT.md
+ The [scripted opportunity-fire continuation](../Documentation/Implementation/M2_AI_SCRIPT_FIRE.md) connects original standing/walking/running fire to path/object movement. Read [contracts](docs/AI_SCRIPT_FIRE_CONTRACTS.md). Preserve strict cadence, source cached moving aim and shared target, standing residual velocity, distinct blocked-shot/phase rules, one integration and checked post-shot lifetime. No-target decisions must stay distinct from failed services. Inspector values are last-call history; diagnostic encounters do not complete M2.
+ 
+ The [burning death and dismemberment continuation](../Documentation/Implementation/M2_DEATH_EFFECTS.md) connects original fire/gib decisions, CCorpse burning/postmortem damage, runtime CGib limbs and client flesh fragments. Read [contracts](docs/DEATH_EFFECT_CONTRACTS.md). Preserve fire priority, NEVERGIB, accumulated-damage launch speed, double negation, strict burn/smoke deadlines, named-node quirks and disabled living-NPC limb loss. Keep nonblocking children independent and cosmetic failures separate from actor removal. Zero elapsed fragment updates must not query zero-length rays. Flame/smoke count-only scaling and smoke movement samples are source rules. Blood-spurt/splat FX, generic gib templates/recursive debris, save/restore and the actual M2 gate remain incomplete.
++
++The [original smell-trail continuation](../Documentation/Implementation/M2_AI_SMELL.md) connects the original periodic player trail and shared AI SearchSmellTarget state, with checked hint lifetime and inspection. Original no-target/no-cursor exits and zero NPC smell ranges are preserved; no automatic trail acquisition is invented. Required remaining services and the actual M2 gate stay open. Read [contracts](docs/AI_SMELL_CONTRACTS.md). Preserve strict cadence, global 3D spacing, source guard/phase order, balanced cursor links and deferred world-owned lifetime. Diagnostic seeded routes are not authored autonomous tracking.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b1c92bd..9d47b9f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -43,7 +43,7 @@ target_sources(blood2_game PRIVATE src/game/original/WeaponPickups.cpp src/game/
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+     src/game/server_activation.cpp src/game/original/AIRuntime.cpp
+-    src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIDodge.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/AIScriptFire.cpp src/game/original/Movement.cpp
++    src/game/original/AISmell.cpp src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIDodge.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/AIScriptFire.cpp src/game/original/Movement.cpp
+     src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AIDeath.cpp src/game/original/Gib.cpp src/game/flesh_gibs.cpp src/game/original/Corpse.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/Gideon.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+diff --git a/README.md b/README.md
+index 6bacd81..4e2d3f8 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [original smell-trail continuation](../Documentation/Implementation/M2_AI_SMELL.md) connects the original periodic player trail and shared AI SearchSmellTarget state, with checked hint lifetime and inspection. Original no-target/no-cursor exits and zero NPC smell ranges are preserved; no automatic trail acquisition is invented. Required remaining services and the actual M2 gate stay open.
++
+ The [burning death and dismemberment continuation](../Documentation/Implementation/M2_DEATH_EFFECTS.md) connects original lethal fire/gib decisions, burning corpses, postmortem limb loss and visible client flesh fragments, with checked cleanup and in-game inspection. These paths no longer fail solely because fire/gib services were missing. Blood-spurt/splat effects, generic gib/save services and the actual M2 gate remain open. Earlier blanket fire/gib omissions are historical.
+ 
+ The [scripted opportunity-fire continuation](../Documentation/Implementation/M2_AI_SCRIPT_FIRE.md) connects original standing/walking/running fire to FOLLOWPATH and MOVETOOBJECT, with inspection and checked lifetime. Real Cultist model diagnostics verify shots, damage and movement through reloads; these are not authored encounter or traversal proofs. M2 remains incomplete.
+diff --git a/docs/AI_PERCEPTION_CONTRACTS.md b/docs/AI_PERCEPTION_CONTRACTS.md
+index aa422ab..3547880 100644
+--- a/docs/AI_PERCEPTION_CONTRACTS.md
++++ b/docs/AI_PERCEPTION_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original AI perception and candidate lists
+ 
++> The [smell-trail continuation](AI_SMELL_CONTRACTS.md) now supplies periodic player hints and the original SearchSmellTarget body. Its source guards do not automatically seed a tracking cursor. Earlier blanket smell omissions are historical; M2 remains incomplete.
++
+ > Extended by [AI state/action contracts](AI_STATE_CONTRACTS.md): selected original
+ > state decisions, transitions and stationary animation commands now execute.
+ > Full AI_Update and production NPCs remain unavailable; M2 is still open.
+diff --git a/docs/AI_RECOVERY_CONTRACTS.md b/docs/AI_RECOVERY_CONTRACTS.md
+index c274258..39012e7 100644
+--- a/docs/AI_RECOVERY_CONTRACTS.md
++++ b/docs/AI_RECOVERY_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original AI recovery and navigation states
+ 
++> The [smell-trail continuation](AI_SMELL_CONTRACTS.md) now supplies periodic player hints and the original SearchSmellTarget body. Its source guards do not automatically seed a tracking cursor. Earlier blanket smell omissions are historical; M2 remains incomplete.
++
+ Selected original AI_Mgr jump/crouch/crawl commands and seven navigation states
+ are integrated. Read [source selections](M2_AI_RECOVERY_SOURCES.json),
+ [evidence](../../Documentation/Implementation/M2_AI_RECOVERY.md),
+diff --git a/docs/AI_SMELL_CONTRACTS.md b/docs/AI_SMELL_CONTRACTS.md
+new file mode 100644
+index 0000000..4be5b4c
+--- /dev/null
++++ b/docs/AI_SMELL_CONTRACTS.md
+@@ -0,0 +1,88 @@
++# Original player smell trail and AI search state
++
++The player now executes the original periodic SmellHint block, and the shared AI
++dispatcher executes `AI_STATE_SearchSmellTarget`. Earlier navigation transitions
++could select that state and then fail because its body was unavailable. This is
++a bounded service continuation; **M2 remains incomplete**.
++
++See [source selections](M2_AI_SMELL_SOURCES.json),
++[evidence](../../Documentation/Implementation/M2_AI_SMELL.md),
++[perception](AI_PERCEPTION_CONTRACTS.md), [navigation](AI_RECOVERY_CONTRACTS.md)
++and [player entry](PLAYER_CONTRACTS.md).
++
++## Player trail
++
++After the existing player update work, a living, nonspectating, client-associated
++player checks the strict `now > smell_time + smell_delay` deadline. The normal delay
++is 0.5 seconds. Compare the current position against the **last global list entry**,
++not a player-owned previous hint. The original distance is three-dimensional and
++inclusive at 10 units. No existing hint means an unconditional drop after the
++deadline. Being too close does not advance the clock. Creation uses identity
++rotation and the current player position; the clock advances before creation,
++including on failure. No movement or extra physics step is added.
++
++Dead/spectator guards skip the block. The spectator boolean supplies the original
++guard only; it does not implement spectator gameplay or extend supported save
++profiles. Nonfinite/negative clocks, missing transforms/lists and failed creation
++return failure and retain a specific diagnostic. As with other required player
++update failures, the existing callback boundary rejects the update; there is no
++success-shaped resource fallback.
++
++The existing initial hint and original 20-second timeout remain. The list appends
++in creation order. Checked bounded traversal skips pending removals before the
++end-of-frame destruction; raw list links never survive across callbacks. Completed
++entry leaves hints owned by the world, including after the player disconnects.
++Failed entry still rolls back its initial hint. Existing player snapshots retain
++relative smell time and delay, not old hint identities or diagnostic counters.
++Destination preparation retains its existing independent list ownership.
++
++## Search state and source reachability
++
++The source order is significant: compute stimuli; decide again if there is no
++combat target; decide using another positive stimulus; decide again if there is
++no smell cursor. Normal smell perception clears the target and **does not seed a
++cursor**. Consequently this port does not invent automatic trail acquisition.
++Registered NPCs also retain their original initialized smell range of zero.
++
++For a valid explicitly seeded cursor, phase 1 repeats the source visible-hint
++query, updates its link and faces that position. Ordinary SmellHints are not
++changed into ray-hit geometry. A missing visible hint requests a new decision.
++Phase 2 preserves the double, throttled ledge query, cached actor Y, inclusive
++`(hypot(dim.x, dim.z) + 0.1) / 2` arrival threshold and original Run command.
++Arrival advances in insertion order. Facing a successor increments phase 2 to 3;
++it does not reset phase 2. Reaching the sentinel also increments to 3, whose
++next update requests a decision. No path sorting or extra integration is added.
++
++The old source cursor is a retained DLink with inconsistent link bookkeeping:
++it breaks the successor's link instead of the old link, fails to keep the linked
++handle synchronized and clears a different tracking field on link break. The port
++uses one checked non-owning HOBJECT, acquires a successor link before releasing the
++previous link, and clears the cursor before the original Idle transition when the
++hint disappears. Stable IDs reject removed/reused handles. Owner removal leaves
++world hints alive. This is an explicit lifetime repair, not claimed binary parity.
++
++Failed perception remains a failed service, never a useful stimulus or decision.
++Existing navigation guards reject recursion, overflow, missing movement caches
++and owner removal during virtual decisions. Inspection reads historical counts,
++exit reason, cached position and current checked identities without querying or
++advancing AI. The player view exposes the actual clock, drop/check counts, global
++list count, last checked drop identity and failure text. Hidden/inactive hints
++remain selectable through ordinary object inspection.
++
++## Validation boundary
++
++Synthetic tests cover strict time/distance boundaries, global-tail behavior,
++pending removal, death/spectator guards, invalid clocks, independent lifetime,
++expiry/reentry, source decision order, actual perception failure, visible-query
++refusal/success, double ledge throttling, Run commands, successor/sentinel phases,
++link replacement, stale handles and recursive decisions. Route-body fixtures use
++actual damage memory of a dead character to retain the previous target, as the
++source does; they do not override ComputeStimuli. A diagnostic ray-hit hint is
++explicitly limited to the visible-query positive test. Neither setup is presented
++as autonomous authored smell tracking.
++
++Private checks complete the original SubwayA intro and move the actual player
++through the existing MoveMgr on two load/unload cycles. Six real character models
++also exercise the state exit. Debug, inspector-free Release, sanitizers and NVIDIA
++regressions are recorded in the evidence. Retail smell reachability, full AI save,
++spectator/multiplayer and the remaining M2 services are not certified by these tests.
+diff --git a/docs/M2_AI_SMELL_SOURCES.json b/docs/M2_AI_SMELL_SOURCES.json
+new file mode 100644
+index 0000000..259d251
+--- /dev/null
++++ b/docs/M2_AI_SMELL_SOURCES.json
+@@ -0,0 +1,39 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "10e24b394a296446e3235948a2875da3ffedf59f",
++  "status": "M2 incomplete; original player smell trail and guarded AI search state",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "source_sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "purpose": "SearchSmellTarget 5959\u20136078, ComputeStimuli and MID_LINKBROKEN source rules."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/AI_Mgr.h",
++      "source_sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
++      "purpose": "Original smell cursor, cached point and state declarations."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "purpose": "Periodic auto-smell block 1692\u20131736 and initial hint/clock."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/SmellHint.cpp",
++      "source_sha256": "65989aab4012e0b67e7f13403fb59a5260f9435b8a792d40a3dfbe1d2db7241e",
++      "purpose": "Insertion order, scheduled 20-second removal and HandleToLink."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/SmellHint.h",
++      "source_sha256": "69fae52a36a95e2b66016cc334b4c8436748b803df4c0a5a8b034615a729006c",
++      "purpose": "List ownership and MAX_SMELL_LIFE."
++    }
++  ],
++  "adaptations": [
++    "Direct typed integration with explicit failure results; original cadence, global order, phase and guard behavior preserved.",
++    "Bounded same-callback list traversal skips pending entries. Stable non-owning hint identity replaces retained DLink.",
++    "Balance cursor links and clear the correct cursor before the original Idle transition on removal; source bookkeeping defects are documented.",
++    "Preserve normal smell perception clearing its combat target without initializing a cursor; no invented automatic acquisition.",
++    "Inspector fields are historical observations and do not drive simulation. Spectator storage implements the source guard only."
++  ]
++}
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index e58799c..48de093 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -1,5 +1,7 @@
+ # Original Player Entry Boundary
+ 
++> The [smell-trail continuation](AI_SMELL_CONTRACTS.md) now supplies periodic player hints and the original SearchSmellTarget body. Its source guards do not automatically seed a tracking cursor. Earlier blanket smell omissions are historical; M2 remains incomplete.
++
+ > Continued by [player restore contracts](PLAYER_RESTORE_CONTRACTS.md): supported
+ > engine state and original restored-client association now execute in the same
+ > loaded world. Earlier blanket omissions below are historical. Full client/world
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index a92d059..b457121 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1051,3 +1051,11 @@ Blood II source. [Hashes](M2_DEATH_EFFECTS_SOURCES.json) and
+ [contracts](DEATH_EFFECT_CONTRACTS.md) separate source rules, typed ownership,
+ replacement physics, bounded client storage and remaining blood/generic-gib FX.
+ No source repository, commercial asset, dependency pin or shader artifact changes.
++
++## Original player scent and AI smell search
++
++Selected PlayerObj periodic smell creation and AI_Mgr SearchSmellTarget bodies are
++ported from original Blood II, retaining existing SmellHint timeout/list ownership.
++[Source hashes](M2_AI_SMELL_SOURCES.json) and [contracts](AI_SMELL_CONTRACTS.md)
++record original guards, cadence, phase quirks and the checked cursor/link repair.
++No reference source, dependency, shader or commercial asset is modified.
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index eda0566..83ee75e 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -3,6 +3,7 @@
+ #include "game/original/CultistAI.h"
+ #include "game/original/Gib.h"
+ #include "game/original/Gideon.h"
++#include "game/original/SmellHint.h"
+ #include "inspector.h"
+ #include <algorithm>
+ #include <imgui.h>
+@@ -147,6 +148,14 @@ namespace OpenBlood2
+                 ImGui::TextWrapped("%s", player->restore_model_error.c_str());
+             ImGui::Text("Air %.2f | smell timestamp %.3f / delay %.3f", player->m_fAirLevel, player->m_fSmellTime,
+                         player->m_fSmellDelay);
++            const auto* scent = game.objects.get(player->last_smell);
++            ImGui::Text("Smell drops %llu | checks %llu | last distance %.3f | world hints %u",
++                        (unsigned long long)player->smell_drops, (unsigned long long)player->smell_checks,
++                        player->smell_distance, SmellHint::m_dwNumSmells);
++            ImGui::Text("Last drop slot:generation %u:%u (max:0 = absent) | lifetime %.1fs",
++                        scent ? scent->id.slot : UINT32_MAX, scent ? scent->id.generation : 0, MAX_SMELL_LIFE);
++            if (!player->smell_error.empty())
++                ImGui::TextWrapped("Smell trail failure: %s", player->smell_error.c_str());
+             if (player->restore_initialization)
+                 ImGui::TextWrapped(
+                     "Selected restore operations only; body, scheduling and client restoration remain incomplete.");
+@@ -263,8 +272,17 @@ namespace OpenBlood2
+         if (target_ai && ImGui::CollapsingHeader("Original navigation and recovery", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& a = *target_ai;
+-            ImGui::TextWrapped("Original jump/crouch/crawl and selected route states. Smell following "
+-                               "and shade-based detours remain unavailable.");
++            ImGui::TextWrapped("Original navigation and smell-state guards. Smell perception does not seed "
++                               "a tracking cursor; shade-based detours remain unavailable.");
++            const auto* cursor = game.objects.get(a.smell_cursor);
++            ImGui::Text("Smell cursor slot:generation %u:%u (max:0 = absent)", cursor ? cursor->id.slot : UINT32_MAX,
++                        cursor ? cursor->id.generation : 0);
++            ImGui::Text("Searches %llu | advances %llu | invalidations %llu", (unsigned long long)a.smell_searches,
++                        (unsigned long long)a.smell_advances, (unsigned long long)a.smell_invalidations);
++            ImGui::TextWrapped("Smell exit %d: 0 none, 1 no target, 2 other stimulus, 3 no cursor, 4 no visible hint",
++                               a.smell_exit);
++            ImGui::Text("Cached smell point (%.2f %.2f %.2f)", a.smell_position.x, a.smell_position.y,
++                        a.smell_position.z);
+             ImGui::Text("Last driven state %d | current %d | phase %d", a.navigation_state, a.m_nState, a.Metacmd);
+             ImGui::Text("Updates %llu | arrivals %llu | failures %llu", (unsigned long long)a.navigation_updates,
+                         (unsigned long long)a.navigation_arrivals, (unsigned long long)a.navigation_failures);
+diff --git a/src/game/original/AINavigationStates.cpp b/src/game/original/AINavigationStates.cpp
+index bf3e279..8a99dcb 100644
+--- a/src/game/original/AINavigationStates.cpp
++++ b/src/game/original/AINavigationStates.cpp
+@@ -50,6 +50,8 @@ bool AI_Mgr::NavigationStep(int state)
+                                                            : MC_Crawl();
+         return ok || NavigationFailure(locomotion_error);
+     }
++    if (state == StateSearchSmell)
++        return SmellStep();
+     if (state == StateGuard)
+         return GuardStep();
+     const bool search = state == StateSearchVisual;
+diff --git a/src/game/original/AISmell.cpp b/src/game/original/AISmell.cpp
+new file mode 100644
+index 0000000..dd29d9c
+--- /dev/null
++++ b/src/game/original/AISmell.cpp
+@@ -0,0 +1,195 @@
++// Original AI_Mgr.cpp:5959-6078, PlayerObj.cpp:1692-1736 and SmellHint list order.
++// See AI_SMELL_CONTRACTS.md for checked identities and source reachability limits.
++#include "AI_Mgr.h"
++#include "PlayerObj.h"
++#include "SmellHint.h"
++#include "engine/collision.h"
++#include <cmath>
++using namespace OpenBlood2;
++namespace
++{
++    bool scan(DLink* link, bool backwards, HOBJECT& out)
++    {
++        out = nullptr;
++        auto* server = BaseClass::GetServerDE();
++        if (!server || SmellHint::m_dwNumSmells > 65536)
++            return false;
++        for (unsigned i = 0; link && link != &SmellHint::m_SmellHead && i < SmellHint::m_dwNumSmells; ++i)
++        {
++            auto* hint = static_cast<SmellHint*>(link->m_pData);
++            if (!hint)
++                return false;
++            const auto h = hint->m_hObject;
++            if (server->IsObjectAlive(h))
++            {
++                if (server->HandleToObject(h) != hint)
++                    return false;
++                out = h;
++                return true;
++            }
++            link = backwards ? link->m_pPrev : link->m_pNext;
++        }
++        return link == &SmellHint::m_SmellHead || (!link && !SmellHint::m_dwNumSmells);
++    }
++} // namespace
++bool SmellHint::LastLive(HOBJECT& out)
++{
++    return scan(m_SmellHead.m_pPrev, true, out);
++}
++bool SmellHint::NextLive(HOBJECT h, HOBJECT& out)
++{
++    out = nullptr;
++    auto* s = BaseClass::GetServerDE();
++    auto* hint = s ? dynamic_cast<SmellHint*>(s->HandleToObject(h)) : nullptr;
++    return hint && s->IsObjectAlive(h) && scan(hint->m_Link.m_pNext, false, out);
++}
++bool CPlayerObj::UpdateSmellTrail()
++{
++    ++smell_checks;
++    smell_error.clear();
++    auto fail = [&](const char* why)
++    {
++        smell_error = why;
++        return false;
++    };
++    auto* s = GetServerDE();
++    if (!s || !s->IsObjectAlive(m_hObject))
++        return fail("Smell trail owner unavailable");
++    if (m_damage.IsDead() || m_bSpectatorMode)
++        return true;
++    const float now = s->GetTime();
++    if (!std::isfinite(m_fSmellTime) || !std::isfinite(m_fSmellDelay) || m_fSmellDelay < 0 ||
++        !std::isfinite(m_fSmellTime + m_fSmellDelay))
++        return fail("Invalid smell trail clock");
++    if (now <= m_fSmellTime + m_fSmellDelay)
++        return true;
++    HOBJECT previous;
++    DVector position, before;
++    if (s->GetObjectPos(m_hObject, &position) != DE_OK || !SmellHint::LastLive(previous))
++        return fail("Smell trail position/list unavailable");
++    if (previous)
++    {
++        if (s->GetObjectPos(previous, &before) != DE_OK)
++            return fail("Previous smell position unavailable");
++        const auto delta = vector_subtract(position, before);
++        smell_distance = std::hypot(delta.x, delta.y, delta.z);
++        if (smell_distance < 10)
++            return true;
++    }
++    else
++        smell_distance = 0;
++    ObjectCreateStruct state;
++    state.m_Pos = position; // Original identity rotation, ordinary SmellHint scheduling.
++    m_fSmellTime = now;     // Source advances the clock before CreateObject, including failure.
++    auto* hint = s->CreateObject(s->GetClass("SmellHint"), &state);
++    if (!hint)
++        return fail("Smell trail creation failed");
++    last_smell = hint->m_hObject;
++    ++smell_drops;
++    return true;
++}
++bool AI_Mgr::SetSmellCursor(HOBJECT h)
++{
++    auto* s = GetServerDE();
++    if (!s || !s->IsObjectAlive(m_hObject) ||
++        (h && (!s->IsObjectAlive(h) || !dynamic_cast<SmellHint*>(s->HandleToObject(h)))))
++        return NavigationFailure("Smell cursor requires a live hint");
++    if (h == smell_cursor)
++        return true;
++    if (h && s->CreateInterObjectLink(m_hObject, h) != DE_OK)
++        return NavigationFailure("Smell cursor link failed");
++    if (smell_cursor)
++        s->BreakInterObjectLink(m_hObject, smell_cursor);
++    smell_cursor = h;
++    return true;
++}
++bool AI_Mgr::AI_STATE_SearchSmellTarget()
++{
++    return NavigationState(StateSearchSmell);
++}
++bool AI_Mgr::SmellStep()
++{
++    ++smell_searches;
++    smell_exit = 0;
++    auto* s = GetServerDE();
++    const int stim = ComputeStimuli();
++    if (stim < 0)
++        return NavigationFailure(perception_error);
++    // Preserve original ordering. Smell perception clears m_hTarget and does NOT
++    // populate m_pCurSmell; do not invent an autonomous trail-following acquisition.
++    if (!GetTarget())
++    {
++        smell_exit = 1;
++        return NavigationDecision();
++    }
++    if (stim > 0 && stim != 3)
++    {
++        smell_exit = 2;
++        return NavigationDecision(stim);
++    }
++    if (!smell_cursor || !s->IsObjectAlive(smell_cursor))
++    {
++        if (smell_cursor)
++        {
++            SetSmellCursor(nullptr);
++            ++smell_invalidations;
++        }
++        smell_exit = 3;
++        return NavigationDecision();
++    }
++    navigation_threshold = (std::hypot(m_vDims.x, m_vDims.z) + .1f) / 2;
++    if (Metacmd == 1)
++    {
++        const auto hint = FindObjectInRadius(AIFindList::Smells, m_fSmellingDist, FindVisible);
++        if (!find.valid)
++            return NavigationFailure(find.error);
++        if (!hint)
++        {
++            smell_exit = 4;
++            return NavigationDecision();
++        }
++        if (!SetSmellCursor(hint) || s->GetObjectPos(hint, &smell_position) != DE_OK)
++            return NavigationFailure("Selected smell pose/link unavailable");
++        return MC_FacePos(smell_position) || NavigationFailure(target_error);
++    }
++    if (Metacmd == 2)
++    {
++        bool edge = false;
++        if (!IsLedge(m_MoveObj.GetForwardVector(), edge))
++            return NavigationFailure(locomotion_error);
++        if (edge)
++            return NavigationDecision();
++        DVector point;
++        if (s->GetObjectPos(smell_cursor, &point) != DE_OK)
++            return NavigationFailure("Smell cursor pose unavailable");
++        point.y = m_MoveObj.GetPos().y;
++        const auto delta = vector_subtract(point, m_MoveObj.GetPos());
++        navigation_distance = std::hypot(delta.x, delta.y, delta.z);
++        // Source repeats this throttled query before its inclusive arrival test.
++        if (!IsLedge(m_MoveObj.GetForwardVector(), edge))
++            return NavigationFailure(locomotion_error);
++        if (edge)
++        {
++            ++Metacmd;
++            return true;
++        }
++        if (navigation_distance <= navigation_threshold)
++        {
++            HOBJECT next;
++            if (!SmellHint::NextLive(smell_cursor, next))
++                return NavigationFailure("Smell successor unavailable");
++            if (!next)
++            {
++                ++Metacmd;
++                return true;
++            }
++            if (!SetSmellCursor(next) || s->GetObjectPos(next, &smell_position) != DE_OK)
++                return NavigationFailure("Next smell pose/link unavailable");
++            ++smell_advances;
++            // Source increments 2 -> 3 through FacePos; it does not reset the phase.
++            return MC_FacePos(smell_position) || NavigationFailure(target_error);
++        }
++        return MC_Run() || NavigationFailure(locomotion_error);
++    }
++    return Metacmd == 3 ? NavigationDecision() : true;
++}
+diff --git a/src/game/original/AIState.cpp b/src/game/original/AIState.cpp
+index d722e49..78ef282 100644
+--- a/src/game/original/AIState.cpp
++++ b/src/game/original/AIState.cpp
+@@ -280,6 +280,8 @@ bool AI_Mgr::DispatchState()
+             return AI_STATE_RunToPos();
+         case StateSearchVisual:
+             return AI_STATE_SearchVisualTarget();
++        case StateSearchSmell:
++            return AI_STATE_SearchSmellTarget();
+         default:
+             break;
+     }
+diff --git a/src/game/original/AITarget.cpp b/src/game/original/AITarget.cpp
+index 94bd4d8..ea78e3d 100644
+--- a/src/game/original/AITarget.cpp
++++ b/src/game/original/AITarget.cpp
+@@ -135,6 +135,12 @@ DDWORD AI_Mgr::EngineMessageFn(DDWORD message, void* data, DFLOAT value)
+                 AI_Update(); // Required failures retain an inspectable, quiescent actor.
+         }
+     }
++    if (message == MID_LINKBROKEN && data == smell_cursor && smell_cursor)
++    {
++        smell_cursor = nullptr;
++        ++smell_invalidations;
++        SetNewState(StateIdle); // Checked cursor ownership repairs the source's stale DLink/wrong target clear.
++    }
+     if (message == MID_LINKBROKEN && data == m_hTarget && m_hTarget)
+     {
+         m_hTarget = nullptr;
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 8720041..5175961 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -210,6 +210,13 @@ class AI_Mgr : public CBaseCharacter
+     bool AI_STATE_WalkToPos();
+     bool AI_STATE_RunToPos();
+     bool AI_STATE_SearchVisualTarget();
++    bool AI_STATE_SearchSmellTarget();
++    bool SetSmellCursor(HOBJECT);
++    HOBJECT smell_cursor = nullptr;
++    DVector smell_position{};
++    std::uint64_t smell_searches = 0, smell_advances = 0, smell_invalidations = 0;
++    int smell_exit = 0; // Last call: 1 no target, 2 other stimulus, 3 no cursor, 4 no visible hint.
++
+     DVector m_vDestPos{};
+     float m_fJumpSpeed = 500;
+     int navigation_state = StateInactive;
+@@ -512,6 +519,7 @@ class AI_Mgr : public CBaseCharacter
+     bool EscapeRunStep(bool civilian);
+     bool EscapeHideStep();
+     bool GuardStep();
++    bool SmellStep();
+     bool NavigationDecision(int stimulus = -1);
+     bool NavigationFailure(std::string_view);
+     bool script_busy = false;
+diff --git a/src/game/original/PlayerObj.cpp b/src/game/original/PlayerObj.cpp
+index 3cd7945..d494f5a 100644
+--- a/src/game/original/PlayerObj.cpp
++++ b/src/game/original/PlayerObj.cpp
+@@ -93,7 +93,10 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
+     ObjectCreateStruct state;
+     server->GetObjectPos(m_hObject, &state.m_Pos);
+     if (auto* smell = server->CreateObject(server->GetClass("SmellHint"), &state))
+-        initial_smell_ = smell->m_hObject;
++    {
++        initial_smell_ = last_smell = smell->m_hObject;
++        ++smell_drops;
++    }
+     else
+         return DFALSE;
+     DVector dims{12, 82.0f / 2, 12};
+@@ -387,7 +390,7 @@ DBOOL CPlayerObj::Update(DVector*)
+         if (!server->PingObjects(observer))
+             ++activation_ping_failures;
+     }
+-    return UpdateStats();
++    return UpdateStats() && UpdateSmellTrail();
+ }
+ bool CPlayerObj::InitializeClientState()
+ {
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index 75b2e1b..0d7fdef 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -160,6 +160,12 @@ class CPlayerObj : public CBaseCharacter
+     std::string entry_error;
+     float m_fYaw = 0, m_fPitch = 0, m_fMoveVel = 0, m_fJumpVel = 600;
+     float m_fAirLevel = 100, m_fSmellTime = 0, m_fSmellDelay = 0.5f;
++    bool UpdateSmellTrail();
++    bool m_bSpectatorMode = false; // Guard storage only; spectator mode is not integrated.
++    HOBJECT last_smell = nullptr;
++    std::uint64_t smell_drops = 0, smell_checks = 0;
++    float smell_distance = 0;
++    std::string smell_error;
+     DBYTE m_nCharacter = 0, m_nSkin = 0;
+     DBYTE m_nAttribStrength = 1, m_nAttribSpeed = 1, m_nAttribResistance = 1, m_nAttribMagic = 1;
+     DBOOL m_bFirstUpdate = DTRUE, m_bDead = DFALSE;
+diff --git a/src/game/original/SmellHint.h b/src/game/original/SmellHint.h
+index 9883720..0f9f41a 100644
+--- a/src/game/original/SmellHint.h
++++ b/src/game/original/SmellHint.h
+@@ -32,6 +32,8 @@ class SmellHint : public B2BaseClass
+     }
+ 
+     static DLink* HandleToLink(HOBJECT hObj);
++    static bool LastLive(HOBJECT&);
++    static bool NextLive(HOBJECT, HOBJECT&);
+ 
+   protected:
+     DDWORD EngineMessageFn(DDWORD messageID, void* pData, DFLOAT lData);
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index f05a3c9..ef934de 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -90,11 +90,13 @@ endif()
+ add_executable(player_tests player_tests.cpp)
+ target_link_libraries(player_tests PRIVATE blood2_game)
+ blood2_project_options(player_tests)
+-foreach(case IN ITEMS handles lifecycle rollback messages callbacks)
++foreach(case IN ITEMS handles lifecycle rollback messages callbacks smell)
+     add_test(NAME player.${case} COMMAND player_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/player-fixtures/${case}")
+     set_tests_properties(player.${case} PROPERTIES LABELS "headless;player" TIMEOUT 30)
+ endforeach()
+ if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME player.smell_private COMMAND player_tests smell_private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(player.smell_private PROPERTIES LABELS "headless;player;private" TIMEOUT 90)
+     add_test(NAME player.private COMMAND player_tests private "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(player.private PROPERTIES LABELS "headless;player;private" TIMEOUT 30)
+     if(BLOOD2_GPU_TESTS)
+@@ -140,6 +142,11 @@ if(BLOOD2_TEST_DATA_DIR)
+     # Three reload cycles now also simulate the original 12-second intro at 60 Hz
+     # (2,160 additional ticks). Retain all movement assertions and a finite ASan budget.
+     set_tests_properties(movement.private PROPERTIES LABELS "headless;movement;private" TIMEOUT 60)
++    if(BLOOD2_SANITIZERS)
++        # Full three-cycle run measured 58.5s with ASan/UBSan, too close to 60s.
++        # Keep every intro/frame/assertion; only instrumented harness wall time grows.
++        set_tests_properties(movement.private PROPERTIES TIMEOUT 120)
++    endif()
+     if(BLOOD2_GPU_TESTS)
+         add_test(NAME gpu.movement COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
+             --data-dir "${BLOOD2_TEST_DATA_DIR}" --movement-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/movement.png")
+@@ -788,7 +795,7 @@ endif()
+ add_executable(ai_recovery_tests ai_recovery_tests.cpp)
+ target_link_libraries(ai_recovery_tests PRIVATE blood2_game)
+ blood2_project_options(ai_recovery_tests)
+-foreach(case IN ITEMS jump jump_physics crouch crawling clearance topos plans around search lifetime moving_fire keys fire_lifetime)
++foreach(case IN ITEMS jump jump_physics crouch crawling clearance topos plans around search lifetime moving_fire keys fire_lifetime smell_guards smell_route smell_lifetime)
+     add_test(NAME ai_recovery.${case} COMMAND ai_recovery_tests "${case}")
+     set_tests_properties(ai_recovery.${case} PROPERTIES LABELS "headless;ai_recovery" TIMEOUT 30)
+ endforeach()
+diff --git a/tests/ai_escape_tests.cpp b/tests/ai_escape_tests.cpp
+index 83909e8..3aba5fb 100644
+--- a/tests/ai_escape_tests.cpp
++++ b/tests/ai_escape_tests.cpp
+@@ -267,7 +267,7 @@ namespace
+         CHECK(a->SetNewState(AI_Mgr::StateEscapeRun) && a->DispatchState());
+         auto calls = a->perception_calls;
+         CHECK(a->DispatchState() && a->decisions == 0 && a->perception_calls == calls);
+-        // Guard uses actual smell precedence; it selects the still-unported smell state.
++        // Guard uses actual smell precedence; the original search guard now requests a new decision.
+         ObjectCreateStruct s;
+         s.m_Pos = {100, 10, 0};
+         auto smell = g.objects.create(g.objects.find_class("SmellHint"), s);
+@@ -275,7 +275,7 @@ namespace
+         a->m_fSeeingDist = 0;
+         a->m_fSmellingDist = 200;
+         CHECK(a->SetNewState(AI_Mgr::StateGuard) && a->DispatchState() && a->m_nState == AI_Mgr::StateSearchSmell);
+-        CHECK(!a->DispatchState());
++        CHECK(a->DispatchState() && a->smell_exit == 1 && !a->smell_cursor && a->decisions == 1);
+         c->Metacmd = 2;
+         g.server.collision_ready = false;
+         auto decisions = c->decisions;
+diff --git a/tests/ai_recovery_tests.cpp b/tests/ai_recovery_tests.cpp
+index edd3ed6..40c4370 100644
+--- a/tests/ai_recovery_tests.cpp
++++ b/tests/ai_recovery_tests.cpp
+@@ -1,5 +1,6 @@
+ #include "brush_fixture.h"
+ #include "game/original/CultistAI.h"
++#include "game/original/SmellHint.h"
+ #include "game/server_adapter.h"
+ #include "model_fixture.h"
+ #include <cmath>
+@@ -335,7 +336,7 @@ namespace
+             CHECK(a->ledge_queries == 0); // last-point short circuit
+             a->Metacmd = 2;
+             CHECK(a->DispatchState() && a->m_nState == AI_Mgr::StateSearchSmell);
+-            CHECK(!a->DispatchState()); // this distinct state remains unavailable
++            CHECK(a->DispatchState() && a->smell_exit == 1 && a->decisions == 2);
+         }
+         return true;
+     }
+@@ -520,6 +521,104 @@ namespace
+         }
+         return true;
+     }
++    HOBJECT scent(GameSession& g, DVector pos)
++    {
++        ObjectCreateStruct state;
++        state.m_Pos = pos;
++        return g.objects.create(g.objects.find_class("SmellHint"), state);
++    }
++    bool remember_dead_attacker(GameSession& g, RecoveryProbe* a)
++    {
++        // Exercise a source path that retains its prior target. No perception override.
++        auto* dead = actor(g, {500, -8, 500});
++        auto* live = actor(g, {500, -8, 600});
++        CHECK(dead && live);
++        auto msg = g.server.StartMessageToObject(dead, a->m_hObject, damage_message);
++        CHECK(msg && g.server.WriteDamage(msg, {{}, {}, 1, DamageType::Normal, dead->m_hObject}) == DE_OK);
++        g.server.EndMessage(msg);
++        dead->m_damage.m_bDead = true;
++        CHECK(a->SetNewTarget(live->m_hObject));
++        CHECK(a->ComputeStimuli() == 0 && a->GetTarget() == live->m_hObject && a->from_damage);
++        return true;
++    }
++    bool smell_guards(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        CHECK(a && scent(g, {0, 10, 20}));
++        a->m_fSeeingDist = a->m_fSensingDist = 0;
++        a->m_fSmellingDist = 100;
++        CHECK(a->SetNewState(AI_Mgr::StateSearchSmell) && a->DispatchState());
++        CHECK(a->stimulus == 3 && !a->GetTarget() && !a->smell_cursor && a->smell_exit == 1);
++        CHECK(a->decisions == 1 && a->requested_stimulus == -1 && a->velocity_commands == 0);
++        a->m_fSmellingDist = std::numeric_limits<float>::quiet_NaN();
++        CHECK(!a->DispatchState() && a->decisions == 1 && !a->navigation_error.empty());
++        a->m_fSmellingDist = 100;
++        CHECK(remember_dead_attacker(g, a));
++        CHECK(a->DispatchState() && a->smell_exit == 3 && a->decisions == 2);
++        auto* dead = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(a->m_damage.GetLastDamager()));
++        CHECK(dead);
++        dead->m_damage.m_bDead = false;
++        CHECK(a->DispatchState() && a->smell_exit == 2 && a->requested_stimulus == 1);
++        a->recurse = true;
++        CHECK(!a->DispatchState() && !a->nested_ok);
++        return true;
++    }
++    bool smell_route(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g, {0, -8, 0});
++        CHECK(a && remember_dead_attacker(g, a));
++        auto first = scent(g, {0, -8, 20});
++        auto skipped = scent(g, {0, -8, 30});
++        auto next = scent(g, {0, -8, 40});
++        CHECK(first && skipped && next && a->SetSmellCursor(first));
++        CHECK(a->SetNewState(AI_Mgr::StateSearchSmell));
++        a->m_fSmellingDist = 100;
++        // Ordinary hints are not ray-hit objects. Preserve the failed visible-search decision.
++        CHECK(a->DispatchState() && a->smell_exit == 4 && a->decisions == 1);
++        // Diagnostic-only ray-hit hint exercises successful original phase 1.
++        g.objects.get(first)->state.m_Flags |= FLAG_RAYHIT;
++        g.objects.get(first)->dimensions = {1, 1, 1};
++        CHECK(a->DispatchState() && a->Metacmd == 2 && a->smell_cursor == first);
++        CHECK(a->DispatchState() && a->m_nCurMetacmd == 2 && a->velocity_commands == 1);
++        CHECK(g.objects.get(a->m_hObject)->state.m_Pos.z == 0); // commands never integrate
++        CHECK(g.objects.advance(.051));
++        CHECK(a->DispatchState() && a->ledge_queries == 1 && !a->ledge_sampled);
++        auto* r = g.objects.get(a->m_hObject);
++        r->state.m_Pos.z = 20 - a->navigation_threshold;
++        CHECK(a->m_MoveObj.Update() && g.objects.remove(skipped));
++        CHECK(a->DispatchState() && a->smell_cursor == next && a->smell_advances == 1 && a->Metacmd == 3);
++        CHECK(g.objects.remove(first) && g.objects.finish_frame());
++        CHECK(a->smell_cursor == next && a->m_nState == AI_Mgr::StateSearchSmell); // old link released
++        CHECK(a->DispatchState() && a->decisions == 2);
++        a->Metacmd = 2;
++        r->state.m_Pos.z = 40;
++        CHECK(a->m_MoveObj.Update() && a->DispatchState() && a->Metacmd == 3 && a->smell_advances == 1);
++        CHECK(!a->SetSmellCursor(a->m_hObject) && a->smell_cursor == next);
++        CHECK(g.objects.remove(next) && g.objects.finish_frame());
++        CHECK(!a->smell_cursor && a->smell_invalidations == 1 && a->m_nState == AI_Mgr::StateIdle);
++        CHECK(SmellHint::m_dwNumSmells == 0);
++        return true;
++    }
++    bool smell_lifetime(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        auto h = scent(g, {0, 10, 10});
++        CHECK(a && h && a->SetSmellCursor(h) && a->SetSmellCursor(h));
++        CHECK(g.objects.advance(20) && g.objects.finish_frame());
++        CHECK(!a->smell_cursor && a->smell_invalidations == 1 && !g.objects.get(h));
++        auto next = scent(g, {0, 10, 10});
++        CHECK(next && next != h && !a->SetSmellCursor(h) && a->SetSmellCursor(next));
++        CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame() && g.objects.get(next));
++        CHECK(g.unload_world() && SmellHint::m_dwNumSmells == 0 && g.server.string_count() == 0 &&
++              g.server.message_count() == 0 && g.server.list_count() == 0);
++        return true;
++    }
+     bool catalog(const char* root)
+     {
+         GameSession g;
+@@ -551,6 +650,7 @@ namespace
+                 CHECK(!ok || r->animation.animation == clip);
+                 std::cout << name << " command=" << cmd << " clip=" << clip << " available=" << ok << '\n';
+             }
++            CHECK(a->SetNewState(AI_Mgr::StateSearchSmell) && a->DispatchState() && a->smell_exit == 1);
+             CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame());
+         }
+         return true;
+@@ -573,6 +673,9 @@ int main(int argc, char** argv)
+                                                                         {"moving_fire", moving_fire},
+                                                                         {"keys", keys},
+                                                                         {"fire_lifetime", fire_lifetime},
++                                                                        {"smell_guards", smell_guards},
++                                                                        {"smell_route", smell_route},
++                                                                        {"smell_lifetime", smell_lifetime},
+                                                                         {"catalog", catalog}};
+     auto t = cases.find(argv[1]);
+     return t != cases.end() && t->second(argc > 2 ? argv[2] : "") ? 0 : 1;
+diff --git a/tests/player_state_tests.cpp b/tests/player_state_tests.cpp
+index b27079d..d3a63ab 100644
+--- a/tests/player_state_tests.cpp
++++ b/tests/player_state_tests.cpp
+@@ -133,7 +133,7 @@ namespace
+         CHECK(next->LoadFields(saved, error) && next->m_fSmellTime == -70);
+         saved.smell_time_offset = 4;
+         CHECK(next->LoadFields(saved, error) && next->m_fSmellTime == 34);
+-        // State preservation does not claim the unported periodic smell-spawning loop.
++        // These detached actors verify relative clocks; player.smell tests periodic spawning.
+         return true;
+     }
+     bool initialization(const std::filesystem::path& root)
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index b5f7e3a..7d8513a 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -1,3 +1,4 @@
++#include "camera_fixture.h"
+ #include "game/original/SmellHint.h"
+ #include "game/server_adapter.h"
+ #include "player_fixture.h"
+@@ -86,6 +87,86 @@ namespace
+               CDestructable::m_dwNumDestructables == 0);
+         return true;
+     }
++    bool smell(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        auto* r = g.objects.get(p->m_hObject);
++        CHECK(p->smell_drops == 1 && SmellHint::m_dwNumSmells == 1);
++        HOBJECT tail;
++        CHECK(SmellHint::LastLive(tail) && tail == p->last_smell);
++        const auto first = tail;
++        // Isolate the original update block from movement/respawn placement.
++        r->state.m_Pos = g.objects.get(first)->state.m_Pos;
++        r->state.m_Pos.y += 10;                              // Full 3D distance, not horizontal distance.
++        CHECK(g.objects.advance(.5) && p->smell_drops == 1); // strict boundary
++        CHECK(g.objects.advance(.002) && p->smell_drops == 2 && p->smell_error.empty());
++        CHECK(std::abs(p->smell_distance - 10) < .001f);
++        const auto time = p->m_fSmellTime;
++        CHECK(g.objects.advance(.501) && p->smell_drops == 2 && p->m_fSmellTime == time);
++        ObjectCreateStruct other;
++        other.m_Pos = r->state.m_Pos;
++        other.m_Pos.x += 20;
++        auto hint = g.objects.create(g.objects.find_class("SmellHint"), other);
++        CHECK(hint && p->UpdateSmellTrail() && p->smell_drops == 3); // global tail, not own last hint
++        const auto pending = p->last_smell;
++        CHECK(g.objects.remove(pending) && !g.server.IsObjectAlive(pending));
++        CHECK(SmellHint::LastLive(tail) && tail == hint); // pending last entry skipped
++        p->m_damage.m_bDead = true;
++        CHECK(g.objects.advance(.501) && p->smell_drops == 3);
++        p->m_damage.m_bDead = false;
++        p->m_bSpectatorMode = true; // Guard storage only; no spectator implementation claimed.
++        CHECK(p->UpdateSmellTrail() && p->smell_drops == 3);
++        p->m_bSpectatorMode = false;
++        CHECK(p->UpdateSmellTrail() && p->smell_drops == 4);
++        p->m_fSmellDelay = std::numeric_limits<float>::quiet_NaN();
++        CHECK(!p->UpdateSmellTrail() && !p->smell_error.empty());
++        p->m_fSmellDelay = .5f;
++        auto last = p->last_smell;
++        CHECK(g.leave_player() && g.server.IsObjectAlive(last)); // world owns trail
++        CHECK(g.objects.advance(19) && g.objects.finish_frame());
++        CHECK(!g.objects.get(first) && g.objects.get(last));
++        CHECK(g.objects.advance(1.01) && g.objects.finish_frame());
++        CHECK(SmellHint::m_dwNumSmells == 0 && SmellHint::LastLive(tail) && !tail);
++        CHECK(g.enter_player(error));
++        CHECK(g.client_shell.player && !g.objects.get(last));
++        CHECK(g.unload_world() && SmellHint::m_dwNumSmells == 0);
++        return true;
++    }
++    bool smell_private(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            CHECK(test_camera::complete_subway_intro(g));
++            auto* p = g.server_shell.Player(g.local_client);
++            CHECK(p && p->smell_checks > 700 && p->smell_error.empty());
++            const auto before = p->smell_drops;
++            const auto position = g.client_shell.position;
++            g.client_shell.movement_input.forward = true;
++            for (unsigned frame = 0; frame < 120; ++frame)
++                CHECK(g.step(1.0 / 60));
++            g.client_shell.movement_input = {};
++            CHECK(p->smell_drops > before && p->smell_error.empty());
++            const auto current = g.client_shell.position;
++            CHECK(std::hypot(current.x - position.x, current.z - position.z) >= 10);
++            HOBJECT last;
++            CHECK(SmellHint::LastLive(last) && last == p->last_smell && g.objects.get(last));
++            std::cout << "SubwayA smell cycle " << cycle << ": original intro, forward movement, " << p->smell_drops
++                      << " drops, " << p->smell_checks << " checks, " << SmellHint::m_dwNumSmells << " live hints\n";
++            CHECK(g.unload_world() && SmellHint::m_dwNumSmells == 0 && !g.objects.get(last));
++        }
++        return true;
++    }
+     bool failure_rollback(const std::filesystem::path& root)
+     {
+         GameSession game;
+@@ -241,6 +322,10 @@ int main(int argc, char** argv)
+         ok = messages(argv[2]);
+     else if (name == "callbacks")
+         ok = callbacks(argv[2]);
++    else if (name == "smell")
++        ok = smell(argv[2]);
++    else if (name == "smell_private")
++        ok = smell_private(argv[2]);
+     else if (name == "private")
+         ok = private_player(argv[2]);
+     return ok ? 0 : 1;

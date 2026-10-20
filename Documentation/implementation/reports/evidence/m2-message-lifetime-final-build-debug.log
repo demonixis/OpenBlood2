@@ -1,0 +1,41 @@
+[0/2] Re-checking globbed directories...
+[1/43] Scanning /home/yann/projects/lithtech/Blood2/tests/world_tests.cpp for CXX dependencies
+[2/43] Scanning /home/yann/projects/lithtech/Blood2/tests/player_restore_tests.cpp for CXX dependencies
+[3/43] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[4/43] Scanning /home/yann/projects/lithtech/Blood2/tests/player_controls_tests.cpp for CXX dependencies
+[5/43] Scanning /home/yann/projects/lithtech/Blood2/tests/level_change_gpu_tests.cpp for CXX dependencies
+[6/43] Scanning /home/yann/projects/lithtech/Blood2/src/app/model_scene.cpp for CXX dependencies
+[7/43] Scanning /home/yann/projects/lithtech/Blood2/tests/service_coverage_tests.cpp for CXX dependencies
+[8/43] Scanning /home/yann/projects/lithtech/Blood2/tests/train_session_tests.cpp for CXX dependencies
+[9/43] Scanning /home/yann/projects/lithtech/Blood2/tests/screen_fade_tests.cpp for CXX dependencies
+[10/43] Scanning /home/yann/projects/lithtech/Blood2/src/app/sprite_scene.cpp for CXX dependencies
+[11/43] Scanning /home/yann/projects/lithtech/Blood2/tests/screen_fade_gpu_tests.cpp for CXX dependencies
+[12/43] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[13/43] Generating CXX dyndep file tests/CMakeFiles/player_restore_tests.dir/CXX.dd
+[14/43] Generating CXX dyndep file tests/CMakeFiles/player_controls_tests.dir/CXX.dd
+[15/43] Generating CXX dyndep file tests/CMakeFiles/level_change_gpu_tests.dir/CXX.dd
+[16/43] Generating CXX dyndep file tests/CMakeFiles/service_coverage_tests.dir/CXX.dd
+[17/43] Generating CXX dyndep file tests/CMakeFiles/train_session_tests.dir/CXX.dd
+[18/42] Scanning /home/yann/projects/lithtech/Blood2/src/app/hud.cpp for CXX dependencies
+[19/42] Generating CXX dyndep file tests/CMakeFiles/screen_fade_tests.dir/CXX.dd
+[20/42] Generating CXX dyndep file tests/CMakeFiles/screen_fade_gpu_tests.dir/CXX.dd
+[21/41] Building CXX object tests/CMakeFiles/player_restore_tests.dir/player_restore_tests.cpp.o
+[22/41] Building CXX object tests/CMakeFiles/world_tests.dir/world_tests.cpp.o
+[23/41] Building CXX object tests/CMakeFiles/player_restore_tests.dir/__/src/app/model_scene.cpp.o
+[24/41] Building CXX object tests/CMakeFiles/player_controls_tests.dir/player_controls_tests.cpp.o
+[25/41] Building CXX object tests/CMakeFiles/level_change_gpu_tests.dir/level_change_gpu_tests.cpp.o
+[26/41] Building CXX object tests/CMakeFiles/level_change_gpu_tests.dir/__/src/app/model_scene.cpp.o
+[27/41] Building CXX object tests/CMakeFiles/train_session_tests.dir/train_session_tests.cpp.o
+[28/41] Building CXX object tests/CMakeFiles/service_coverage_tests.dir/service_coverage_tests.cpp.o
+[29/41] Building CXX object tests/CMakeFiles/screen_fade_tests.dir/__/src/app/sprite_scene.cpp.o
+[30/41] Building CXX object tests/CMakeFiles/screen_fade_tests.dir/screen_fade_tests.cpp.o
+[31/41] Building CXX object tests/CMakeFiles/screen_fade_gpu_tests.dir/screen_fade_gpu_tests.cpp.o
+[32/41] Building CXX object tests/CMakeFiles/screen_fade_gpu_tests.dir/__/src/app/hud.cpp.o
+[33/41] Linking CXX executable tests/world_tests
+[34/41] Linking CXX executable tests/player_restore_tests
+[35/41] Linking CXX executable tests/player_controls_tests
+[36/41] Linking CXX executable tests/level_change_gpu_tests
+[37/41] Linking CXX executable tests/service_coverage_tests
+[38/41] Linking CXX executable tests/train_session_tests
+[39/41] Linking CXX executable tests/screen_fade_gpu_tests
+[40/41] Linking CXX executable tests/screen_fade_tests

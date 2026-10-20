@@ -1,0 +1,14 @@
+684/691 Testing: gideon_attack.dodge
+684/691 Test: gideon_attack.dodge
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon_attack_tests" "dodge" "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon-attack-dodge"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gideon_attack.dodge" start time: Oct 17 03:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_attack.dodge" end time: Oct 17 03:03 CEST
+"gideon_attack.dodge" time elapsed: 00:00:00
+----------------------------------------------------------

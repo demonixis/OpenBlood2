@@ -1,0 +1,173 @@
+Start testing: Oct 17 20:57 CEST
+----------------------------------------------------------
+28/956 Testing: gpu.lifecycle
+28/956 Test: gpu.lifecycle
+Command: "<Blood2>/build/debug/blood2" "--config" "<Blood2>/build/debug/tests/empty.ini" "--data-dir" "<external-game>" "--gpu-smoke" "--capture" "<Blood2>/build/debug/tests/gpu.png"
+Directory: <Blood2>/build/debug/tests
+"gpu.lifecycle" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-game> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Captured GPU frame to <Blood2>/build/debug/tests/gpu.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+<end of output>
+Test time =   3.18 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.lifecycle" end time: Oct 17 20:57 CEST
+"gpu.lifecycle" time elapsed: 00:00:03
+----------------------------------------------------------
+
+236/956 Testing: gpu.keyframes
+236/956 Test: gpu.keyframes
+Command: "<Blood2>/build/debug/blood2" "--config" "<Blood2>/build/debug/tests/empty.ini" "--data-dir" "<external-game>" "--keyframes-smoke" "--capture" "<Blood2>/build/debug/tests/keyframes.png"
+Directory: <Blood2>/build/debug/tests
+"gpu.keyframes" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-game> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <Blood2>/build/debug/tests/keyframes.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.41666666666666663 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] KEYFRAMES smoke: authored camera path and owned key lifetime checked while UI hidden and after reload; authored Gideon message recipient resolved
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   2.82 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.keyframes" end time: Oct 17 20:57 CEST
+"gpu.keyframes" time elapsed: 00:00:02
+----------------------------------------------------------
+
+237/956 Testing: gpu.keyframe_audio
+237/956 Test: gpu.keyframe_audio
+Command: "<Blood2>/build/debug/blood2" "--config" "<Blood2>/build/debug/tests/empty.ini" "--data-dir" "<external-game>" "--keyframes-smoke" "--world" "12_Train_Station" "--capture" "<Blood2>/build/debug/tests/keyframe-audio.png"
+Directory: <Blood2>/build/debug/tests
+"gpu.keyframe_audio" start time: Oct 17 20:57 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-game> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 864 source objects, 416 original instances, 145 BSP models
+[info] Authored key audio: sounds\events\trainpassby1.wav frames=110592, cursor=2940, submitted=295200, attached=true
+[info] Captured GPU frame to <Blood2>/build/debug/tests/keyframe-audio.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=12.43333333333353 npc-ready=5 npc-failed=0 npc-updates=5
+[info] Authored key audio: sounds\events\trainpassby1.wav frames=110592, cursor=1837.5, submitted=292800, attached=true
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] KEYFRAMES smoke: authored camera path and owned key lifetime checked while UI hidden and after reload; authored Gideon message recipient resolved
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =  13.31 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.keyframe_audio" end time: Oct 17 20:58 CEST
+"gpu.keyframe_audio" time elapsed: 00:00:13
+----------------------------------------------------------
+
+262/956 Testing: gpu.worldpaths
+262/956 Test: gpu.worldpaths
+Command: "<Blood2>/build/debug/blood2" "--config" "<Blood2>/build/debug/tests/empty.ini" "--data-dir" "<external-game>" "--worldpaths-smoke" "--capture" "<Blood2>/build/debug/tests/worldpaths.png"
+Directory: <Blood2>/build/debug/tests
+"gpu.worldpaths" start time: Oct 17 20:58 CEST
+Output:
+----------------------------------------------------------
+[info] External data: <external-game> (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] Captured GPU frame to <Blood2>/build/debug/tests/worldpaths.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.44999999999999996 npc-ready=16 npc-failed=0 npc-updates=17
+[info] AI paths: hidden=true, reentered=true, copied points=7
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] WORLDPATHS smoke: original SubwayA train follows keys, posed collision checked while UI hidden and after reload; angular paths and world rendering remain unavailable
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   2.74 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.worldpaths" end time: Oct 17 20:58 CEST
+"gpu.worldpaths" time elapsed: 00:00:02
+----------------------------------------------------------
+
+859/956 Testing: gpu.level_change
+859/956 Test: gpu.level_change
+Command: "<Blood2>/build/debug/tests/level_change_gpu_tests" "<external-game>" "<Blood2>/build/debug/tests/level-change"
+Directory: <Blood2>/build/debug/tests
+"gpu.level_change" start time: Oct 17 20:58 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+Destination: CityHub /
+Cycle 0: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+World SPR sprites/motelhell.spr: 11 frames / 15 fps
+Destination: SubwayA /
+Cycle 1: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+Destination: CityHub /
+Cycle 2: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+World SPR sprites/motelhell.spr: 11 frames / 15 fps
+Destination: SubwayA /
+Cycle 3: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+<end of output>
+Test time =   6.31 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.level_change" end time: Oct 17 20:58 CEST
+"gpu.level_change" time elapsed: 00:00:06
+----------------------------------------------------------
+
+End testing: Oct 17 20:58 CEST
+
+audio =  13.31 sec*proc
+
+gpu =  28.36 sec*proc
+
+keyframes =  16.13 sec*proc
+
+private =  25.18 sec*proc
+
+world =   6.31 sec*proc
+
+worldpaths =   2.74 sec*proc

@@ -1,0 +1,82 @@
+37/472 Testing: world.private
+37/472 Test: world.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"world.private" start time: Oct 16 15:09 CEST
+Output:
+----------------------------------------------------------
+No-player NPC noname: AI_Update: Civilian idle perception failed; Target link acquisition failed; Target assignment requires distinct live objects
+No-player NPC noname: AI_Update: Idle perception failed; no state selected; Target link acquisition failed; Target assignment requires distinct live objects
+No-player NPC gak: AI_Update: Idle perception failed; no state selected; Target link acquisition failed; Target assignment requires distinct live objects
+Service ConfigureCharacterBody: 15
+Service CreateAttachment: 8
+Service CreateInterObjectLink: 49
+Service CreateObject: 30
+Service CreateString: 5
+Service FindNamedObjects: 17
+Service FreeString: 2
+Service GetAnimIndex: 2198
+Service GetClass: 39
+Service GetContainers: 57
+Service GetGameConVar: 443
+Service GetModelAnimUserDims: 45
+Service GetModelAnimation: 18
+Service GetModelAnimationName: 25
+Service GetModelNodeTransform: 342
+Service GetMovementState: 30
+Service GetNextObject: 224
+Service GetObjectClass: 231
+Service GetObjectDims: 7
+Service GetObjectFlags: 339
+Service GetObjectName: 37
+Service GetObjectPos: 669
+Service GetObjectRotation: 84
+Service GetObjectUserFlags: 45
+Service GetPropBool: 755
+Service GetPropGeneric: 10533
+Service GetPropReal: 722
+Service GetPropString: 72
+Service GetPropVector: 53
+Service GetStringData: 36
+Service GetTime: 82
+Service GetVarValueFloat: 441
+Service GetVarValueString: 2
+Service GetVelocity: 12
+Service HandleToObject: 137
+Service IntersectSegment: 124
+Service IsKindOf: 231
+Service IsObjectAlive: 1034
+Service MoveObject: 19
+Service MoveObjectToGround: 15
+Service ObjectToHandle: 450
+Service PlayWorldSound: 4
+Service PublishCameraEffect: 2
+Service PublishLightEffect: 12
+Service RandomFloat: 44
+Service RandomInt: 15
+Service RelinquishList: 17
+Service RemoveObject: 13
+Service ResizeObject: 15
+Service ScaleObject: 15
+Service SetBlockingPriority: 118
+Service SetDeactivationTime: 15
+Service SetGameConVar: 31
+Service SetGlobalForce: 1
+Service SetModelAnimation: 23
+Service SetNextUpdate: 264
+Service SetObjectDims: 53
+Service SetObjectFlags: 247
+Service SetObjectState: 19
+Service SetObjectUserFlags: 176
+Service SetVelocity: 15
+Service ValidateSpawnObject: 9
+Resource references: 74; missing: 0
+RunWorld blocked: 2 uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat reactions, audio, autosave and remaining mover classes remain unported
+PASS private
+<end of output>
+Test time =   0.95 sec
+----------------------------------------------------------
+Test Passed.
+"world.private" end time: Oct 16 15:09 CEST
+"world.private" time elapsed: 00:00:00
+----------------------------------------------------------

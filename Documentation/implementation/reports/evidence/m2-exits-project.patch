@@ -1,0 +1,1423 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 9f7e5a4..95cb96c 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -365,3 +365,11 @@ dimensions versus visual scale, source damage fractions, independent child lifet
+ and no-GETHANDLE sound overlap. Failed setup retains the visible actor. Fire/gibs,
+ corpse damage/limbs and blood-pool FX remain unavailable; requests are not FX.
+ SubwayA counts are unchanged and M2 remains incomplete.
++
++The [level-exit continuation](../Documentation/Implementation/M2_EXITS.md) registers original ExitTrigger and
++connects typed shell exit/load requests. Read [contracts](docs/EXIT_CONTRACTS.md). Preserve
++EndEpisode/EndOfEpisode spelling, start-name copy-before-broadcast, delayed virtual
++slot rules and dead-player early return. NEW_LEVEL explicitly refuses missing
++KeepAliveSave/Load before teardown; do not substitute fresh-game entry or claim a
++completed transfer. SubwayA has 203 created, four transferred sounds, 372 editor-only,
++one unsupported (Gideon), no failures. Required transfer/FX/services keep M2 open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2124806..718e791 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -46,7 +46,7 @@ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/origin
+     src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AIDeath.cpp src/game/original/Corpse.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+-target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
++target_sources(blood2_game PRIVATE src/game/server_exits.cpp src/game/original/ExitTrigger.cpp src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+     src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+ target_link_libraries(blood2_game PUBLIC engine)
+diff --git a/README.md b/README.md
+index 5b15c8f..0d7d8df 100644
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,11 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
+-Latest continuation: [ordinary NPC death and CCorpse](../Documentation/Implementation/M2_CORPSES.md)
++Latest continuation: [original ExitTrigger and shell exit requests](../Documentation/Implementation/M2_EXITS.md).
++SubwayA now has one unported entry (Gideon). NEW_LEVEL still requires unavailable
++KeepAliveSave/Load and is explicitly refused while retaining the current player and
++inventory. Earlier ExitTrigger omissions below are historical; **M2 remains open**.
++
++Previous continuation: [ordinary NPC death and CCorpse](../Documentation/Implementation/M2_CORPSES.md)
+ connects independent animated corpses and real model-key sounds. Earlier blanket
+ corpse omissions below are historical. Fire/gibs, corpse damage, required FX,
+ Gideon and ExitTrigger still keep M2 incomplete.
+diff --git a/docs/EXIT_CONTRACTS.md b/docs/EXIT_CONTRACTS.md
+new file mode 100644
+index 0000000..121fec5
+--- /dev/null
++++ b/docs/EXIT_CONTRACTS.md
+@@ -0,0 +1,84 @@
++# Original level-exit contracts
++
++`ExitTrigger` now executes its original property and activation branches and
++broadcasts an owned typed `SMSG_EXITWORLD` equivalent. The client shell applies
++`HandleExitWorld`'s dead-player guard and constructs the original
++`CMSG_LOADWORLD` request with `LOADTYPE_NEW_LEVEL`. **Level transfer is unavailable**:
++the load decoder refuses the required `KeepAliveSave/KeepAliveLoad` path before
++resource lookup, world replacement or player removal. A queued message or a
++registered ExitTrigger must never count as a completed level exit or M2 completion.
++
++## Source behavior
++
++- Preserve Trigger ancestry, active-command guard, activation counts, sender/key
++  filters and deferred callback lifetime. ExitTrigger defaults to no touch/AI/object
++  activation, with player/relay activation enabled and zero reset time. With zero
++  reset it remains inactive after activation unless explicitly rearmed.
++- Copy `NextWorld` and `StartPointName` before parent precreate; the default start
++  name is `start`. Save/restored construction remains rejected.
++- Preserve the source spelling mismatch: registration declares `EndEpisode`, but
++  ReadProp reads `EndOfEpisode`. No alias fixes this. The latter is accepted as an
++  optional, non-defaulted property because the source reads it (as with the existing
++  DifficultyInsane adaptation). When present/true it takes precedence over SubWorld.
++  Exit type values are world=0, subworld=1, episode=2. The type does not choose a
++  different load mode in the original HandleExitWorld branch.
++- A nonempty start name is copied into server-shell ownership **before** broadcasting,
++  even if no client exists or its queue is full. An empty name leaves the previous
++  name intact. PreStartWorld does not reset it; explicit new-game/session teardown
++  clears it as an adaptation that prevents stale diagnostic intent from crossing runs.
++- Immediate SendMessages sends one packet, independent of target/message slots.
++  The delayed path uses original virtual SendMessage: zero-delay slots require
++  both target and message; pending delayed slots call it even with empty names.
++  Each dispatch broadcasts the whole exit request, not a named trigger message.
++- Dead clients ignore the payload before changing their last request. The port uses
++  the checked original player's IsDead state; the retail asynchronous client dead
++  notification is not reconstructed. Empty NextWorld reaches the client invalid-data
++  branch; it is not silently converted to a valid world.
++
++## Ownership and refusal
++
++Strings are owned values (100-byte maximum, no embedded NUL), replacing HSTRING
++and unchecked fixed buffers. Enum values outside 0..2 fail before publication.
++The existing single local client has a 256-event queue. Broadcast results measure
++queue delivery only. Removing the source cannot invalidate queued data; disconnect
++clears events, and identities are not reused. Dead/invalid/unsupported exits do not
++make the message pump disconnect the player.
++
++The message pump runs outside object callbacks and applies the same load decoder
++used by explicit load_world requests. NEW_LEVEL is explicitly refused, with the
++KeepAlive diagnostic and a bounded last-result record. No fresh-game fallback,
++recreated default inventory, dummy save file or success-shaped transfer exists.
++The client retains its loaded state, weapons, objectives and audio because no
++replacement is accepted. Music/menu/loading-screen teardown and first-world state
++changes from the rest of the original HandleExitWorld are deliberately deferred
++with the unavailable transfer, not represented as completed services.
++
++The next increment must port supported player/inventory/damage keep-alive state,
++original restored-client association and named start-point entry before enabling
++NEW_LEVEL. It must validate destination resources and lifetime rollback, preserve
++current state on refusal and retain explicit failure for unsupported saved fields.
++General saves, addon character swaps, multiplayer and demo EndGame handling remain
++outside this increment. The original commented-out world-revisit save is not active
++behavior to reintroduce.
++
++## Inspection and tests
++
++The Objectives tab includes hidden/inactive ExitTrigger instances, source names,
++requested world/start/type, broadcast result/counters and the client's explicit
++transfer refusal/dead-ignore counts. Existing object/property inspection remains
++available. The player TRIGGER button goes through the owned command queue and is disabled
++when player activation is disallowed.
++
++`exits.*` covers source defaults/spelling/precedence, delayed virtual dispatch,
++no-client/start-name ownership, blocked transfer without player/inventory loss,
++dead guards, queue bounds, source/client lifetime and three private SubwayA cycles.
++The private `exit2` targets `02_cityhub` / `01_egressa`, rejects direct players,
++and accepts its referring Trigger through ObjectActivate (TriggerRelayActivate
++is false). Its otherwise empty first slot waits two seconds. Both the private
++case and gpu.objectives scenario send from that authored referring identity, then
++advance 119 fixed 1/60-second steps plus 0.05 seconds through GameSession::step.
++They verify no early delivery and an explicit transfer refusal. The GPU scenario
++runs with the UI hidden and after reload, preserving player, inventory and world
++revision. This isolates the exit dispatch; it does not claim the upstream level
++completion chain or a real transfer. Diagnostic rearming is labelled, not an
++original reset rule. See [evidence](../../Documentation/Implementation/M2_EXITS.md).
+diff --git a/docs/M2_EXIT_SOURCES.json b/docs/M2_EXIT_SOURCES.json
+new file mode 100644
+index 0000000..6321f93
+--- /dev/null
++++ b/docs/M2_EXIT_SOURCES.json
+@@ -0,0 +1,118 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "bc755e2858fc07100089dc4a06e584b8b3a5970e",
++  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/ExitTrigger.cpp",
++      "sha256": "24f21705c41467b725fee24d15d7cbcc4ff13808c27950fe4da61c269f561e03",
++      "selected_lines": [
++        [
++          20,
++          61
++        ],
++        [
++          72,
++          205
++        ]
++      ],
++      "use": "Registration, properties, precreate and broadcast"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ExitTrigger.h",
++      "sha256": "03a53fddd5a7244d79807224a755a86bf6bcc5387ce11056831300f59dd1ae64",
++      "selected_lines": [],
++      "use": "Virtual SendMessage override and original fields"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Trigger.cpp",
++      "sha256": "373658121f86b4d792eeb986a0e093291af3e1205b831385f142cf2ea445198c",
++      "selected_lines": [
++        [
++          449,
++          491
++        ],
++        [
++          532,
++          588
++        ],
++        [
++          735,
++          778
++        ],
++        [
++          829,
++          869
++        ]
++      ],
++      "use": "Immediate versus delayed dispatch and reset rules"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
++      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
++      "selected_lines": [
++        [
++          806,
++          817
++        ],
++        [
++          828,
++          1000
++        ],
++        [
++          1142,
++          1210
++        ]
++      ],
++      "use": "Start-point copy, load request read order and audited unavailable keep-alive dependency"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "selected_lines": [
++        [
++          6222,
++          6330
++        ]
++      ],
++      "use": "Dead guard, exit request, NEW_LEVEL and message field order"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/BloodClientShell.h",
++      "sha256": "00c217428619071a260d2b1e9b44c5b828ee2ef5e4a860c7ea3cdd9964b34649",
++      "selected_lines": [
++        [
++          146,
++          146
++        ]
++      ],
++      "use": "StartNewWorld default difficulty"
++    },
++    {
++      "path": "sources/blood2/Shared/ClientServerShared.h",
++      "sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
++      "selected_lines": [
++        [
++          42,
++          45
++        ]
++      ],
++      "use": "Exit type identifiers"
++    },
++    {
++      "path": "sources/blood2/Shared/SharedDefs.h",
++      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "selected_lines": [
++        [
++          537,
++          541
++        ],
++        [
++          564,
++          574
++        ]
++      ],
++      "use": "Load mode and default difficulty"
++    }
++  ]
++}
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index 6fd3da5..2431adc 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original Player Entry Boundary
+ 
++> Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and
++> shell exit/load messages now execute. NEW_LEVEL still explicitly refuses missing
++> keep-alive transfer before teardown; this is not a completed level transition.
++
+ > Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
+ > candidate lists and stimulus/target selection now execute. Automatic NPC states
+ > and complete M2 remain unavailable; earlier acquisition omissions are historical.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index e536fd2..370db4f 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -660,3 +660,14 @@ initial/update/model-key rules. [Source ledger](M2_CORPSE_SOURCES.json) records
+ original hashes and selected ranges; [contracts](CORPSE_CONTRACTS.md) distinguish
+ source behavior, owned lifetime/rollback adaptations and missing fire/gib/FX
+ branches. No donor engine, new dependency or commercial asset was imported.
++
++## M2 level exits
++
++Direct selective import from original Blood II commit
++`006b4aabd3fb348f6846cad03799cf8df685ea95`: ExitTrigger properties/precreate/broadcast,
++Trigger virtual delayed-slot dispatch, BloodServerShell start-name copying and
++BloodClientShell HandleExitWorld request/dead guard. Typed strings/events, checked
++local lifetime and explicit NEW_LEVEL refusal replace unimplemented keep-alive
++services. No prototype code, binary library or commercial asset was imported.
++See [source selections](M2_EXIT_SOURCES.json), [contracts](EXIT_CONTRACTS.md) and
++[validation](../../Documentation/Implementation/M2_EXITS.md).
+diff --git a/docs/TRIGGER_CONTRACTS.md b/docs/TRIGGER_CONTRACTS.md
+index 814b25f..90ac9b0 100644
+--- a/docs/TRIGGER_CONTRACTS.md
++++ b/docs/TRIGGER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original triggers, door SelfTrigger and keys
+ 
++> Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and
++> shell exit/load messages now execute. NEW_LEVEL still explicitly refuses missing
++> keep-alive transfer before teardown; this is not a completed level transition.
++
+ > Extended by [objective contracts](OBJECTIVES_CONTRACTS.md): original mission
+ > objective broadcasts and external localized client strings are connected.
+ > Other localization/audio/HUD and full M2 acceptance remain pending.
+diff --git a/docs/WORLD_CONTRACTS.md b/docs/WORLD_CONTRACTS.md
+index d4c4a05..b503f38 100644
+--- a/docs/WORLD_CONTRACTS.md
++++ b/docs/WORLD_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Resource, World and Session Contracts
+ 
++> Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and
++> shell exit/load messages now execute. NEW_LEVEL still explicitly refuses missing
++> keep-alive transfer before teardown; this is not a completed level transition.
++
+ > Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
+ > voice helpers, player sound keys and material/liquid footsteps now execute.
+ > Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
+diff --git a/src/app/inspector_objectives.cpp b/src/app/inspector_objectives.cpp
+index 3455cbd..84bae99 100644
+--- a/src/app/inspector_objectives.cpp
++++ b/src/app/inspector_objectives.cpp
+@@ -1,4 +1,5 @@
+ #include "app/inspector.h"
++#include "game/original/ExitTrigger.h"
+ #include "game/original/ObjectivesTrigger.h"
+ #include <imgui.h>
+ namespace OpenBlood2
+@@ -16,6 +17,44 @@ namespace OpenBlood2
+     } // namespace
+     void Inspector::draw_objectives(GameSession& game, ObjectSelection& selection)
+     {
++        if (ImGui::CollapsingHeader("Original level exits", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            const auto& exit = game.client_shell.world_exit;
++            ImGui::Text("Received %llu / dead ignored %llu / transfer blocked %llu", (unsigned long long)exit.received,
++                        (unsigned long long)exit.ignored_dead, (unsigned long long)exit.blocked);
++            ImGui::TextWrapped("Requested world: %s / type %u / server start: %s", exit.request.next_world.c_str(),
++                               static_cast<unsigned>(exit.request.type), game.server_shell.start_point_name.c_str());
++            ImGui::TextWrapped("%s", exit.error.empty() ? "No transfer attempted; KeepAliveSave/Load unavailable."
++                                                        : exit.error.c_str());
++            for (auto id : game.objects.snapshot())
++            {
++                const auto* record = game.objects.get(id);
++                const auto* trigger = record ? dynamic_cast<const ExitTrigger*>(record->game.get()) : nullptr;
++                if (!trigger)
++                    continue;
++                ImGui::PushID(static_cast<int>(id.slot));
++                if (ImGui::Selectable(record->state.m_Name, selection.id == id))
++                    selection.id = id;
++                ImGui::TextWrapped("%s / %s; next %s / start %s / type %u", trigger->active ? "active" : "inactive",
++                                   record->state.m_Flags & FLAG_VISIBLE ? "visible" : "hidden",
++                                   trigger->exit.next_world.c_str(), trigger->start_point.c_str(),
++                                   static_cast<unsigned>(trigger->exit.type));
++                ImGui::Text("Broadcast attempts %llu / queued %llu / result %d", (unsigned long long)trigger->attempts,
++                            (unsigned long long)trigger->deliveries, trigger->last_delivery);
++                ImGui::Text("Player %d / object %d / relay %d / delay %.2fs / rejected %llu", trigger->player_activate,
++                            trigger->object_activate, trigger->relay_activate, trigger->max_delay,
++                            (unsigned long long)trigger->rejected);
++                ImGui::BeginDisabled(!game.local_client || !trigger->player_activate);
++                if (ImGui::Button("Send exit TRIGGER as player"))
++                {
++                    trigger_request = id;
++                    trigger_command = "TRIGGER";
++                }
++                ImGui::EndDisabled();
++                ImGui::PopID();
++            }
++            ImGui::Separator();
++        }
+         ImGui::TextWrapped("Original mission objectives. Localized text comes from external cres.dll; '|' marks a line "
+                            "break. Audio and original HUD remain pending.");
+         if (!ImGui::BeginTable("Objectives", 2, ImGuiTableFlags_Resizable))
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 7fff71c..1b8d6d8 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -1330,7 +1330,7 @@ namespace
+                              "gate and reload checked");
+             if (options.objectives_smoke)
+                 spdlog::info("OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
+-                             "unload/reload checked");
++                             "ExitTrigger NEW_LEVEL refusal preserves player/inventory; unload/reload checked");
+             if (options.pickups_smoke)
+                 spdlog::info("PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked");
+             if (options.weapons_smoke)
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 5f84a08..93e4395 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -1,4 +1,5 @@
+ #include "objectives_smoke.h"
++#include "game/original/ExitTrigger.h"
+ #include "game/original/ObjectivesTrigger.h"
+ namespace OpenBlood2
+ {
+@@ -33,8 +34,50 @@ namespace OpenBlood2
+                 return false;
+         }
+         std::string error;
+-        return found == 1 && g.pump_player_messages(error) && g.client_shell.objective_messages == before + 1 &&
+-               g.client_shell.objectives_resolved && g.client_shell.objectives.resource == 1 &&
+-               !g.client_shell.objectives.title.empty() && !g.client_shell.objectives.text.empty();
++        if (found != 1 || !g.pump_player_messages(error) || g.client_shell.objective_messages != before + 1 ||
++            !g.client_shell.objectives_resolved || g.client_shell.objectives.resource != 1 ||
++            g.client_shell.objectives.title.empty() || g.client_shell.objectives.text.empty())
++            return false;
++        const auto old_player = g.client_shell.player;
++        const auto old_revision = g.world_revision;
++        const auto old_bullets = player->m_InventoryMgr.GetAmmoCount(1);
++        const auto received = g.client_shell.world_exit.received;
++        const auto blocked = g.client_shell.world_exit.blocked;
++        unsigned exits = 0;
++        for (auto id : g.objects.snapshot())
++        {
++            auto* record = g.objects.get(id);
++            auto* trigger = record ? dynamic_cast<ExitTrigger*>(record->game.get()) : nullptr;
++            if (!trigger)
++                continue;
++            ++exits;
++            trigger->SetActive(true); // Labelled diagnostic rearm; source resets remain unchanged.
++            // Authored exit2 rejects players and accepts this source relay via
++            // ObjectActivate, then waits two seconds in its empty first slot.
++            HOBJECT relay = nullptr;
++            for (auto candidate_id : g.objects.snapshot())
++                if (auto* candidate = dynamic_cast<Trigger*>(g.objects.get(candidate_id)->game.get());
++                    candidate && candidate->slots[9].target == record->state.m_Name)
++                    relay = candidate->m_hObject;
++            if (!relay || trigger->max_delay != 2)
++                return false;
++            auto text = g.server.CreateString("TRIGGER");
++            auto message = g.server.StartMessageToObject(g.server.HandleToObject(relay), record->handle, 1000);
++            const bool sent = message && g.server.WriteToMessageHString(message, text) == DE_OK &&
++                              g.server.EndMessage(message) == DE_OK;
++            g.server.FreeString(text);
++            if (!sent)
++                return false;
++            for (unsigned tick = 0; tick < 119; ++tick)
++                if (!g.step(1.0 / 60))
++                    return false;
++            if (g.client_shell.world_exit.received != received || !g.step(.05) || trigger->last_delivery != DE_OK)
++                return false;
++        }
++        return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
++               g.client_shell.world_exit.blocked == blocked + 1 &&
++               g.client_shell.world_exit.error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos &&
++               old_player == g.client_shell.player && old_revision == g.world_revision &&
++               old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+ } // namespace OpenBlood2
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 069ba47..b04d2a0 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -96,6 +96,7 @@ class ServerDE : public CSBase
+     virtual DRESULT InterpolateRotation(DRotation&, const DRotation&, const DRotation&, float) = 0;
+     virtual OpenBlood2::MoverResult MoveKeyframedObject(HOBJECT, DVector, const DRotation*) = 0;
+     virtual DDWORD GetObjectUserFlags(HOBJECT) = 0;
++    virtual DRESULT SendWorldExit(const OpenBlood2::WorldExit&, const std::string& start_point) = 0;
+     virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
+     virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;
+     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index 206363e..d99d096 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -131,6 +131,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client)
+     rotation = {};
+     physics = {};
+     stats = {};
++    world_exit = {};
+     objectives = {};
+     objectives_error.clear();
+     objective_messages = 0;
+@@ -161,6 +162,7 @@ void CBloodClientShell::OnExitWorld()
+     rotation = {};
+     physics = {};
+     stats = {};
++    world_exit = {};
+     objectives = {};
+     objectives_error.clear();
+     objective_messages = 0;
+@@ -186,6 +188,29 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
+     ++messages;
+     if (std::holds_alternative<OpenBlood2::PlayerInitRequest>(event))
+         return InitSinglePlayer(server);
++    if (const auto* value = std::get_if<OpenBlood2::WorldExit>(&event))
++    {
++        ++world_exit.received;
++        // Original HandleExitWorld returns before reading its payload when dead.
++        const auto* original_player = server.Player(client_);
++        if (!original_player)
++            return false;
++        if (original_player->m_damage.IsDead())
++        {
++            ++world_exit.ignored_dead;
++            return true;
++        }
++        world_exit.request = *value;
++        world_exit.error.clear();
++        // StartNewWorld's default difficulty is EASY (0); NEW_LEVEL does not
++        // replace the server's difficulty/game settings. Audio/menu teardown and
++        // loaded-state mutation wait for an accepted transfer in this port.
++        world_exit.pending = OpenBlood2::original_world_request(value->next_world.c_str(), 0,
++                                                                OpenBlood2::LOADTYPE_NEW_LEVEL, 0, world_exit.load);
++        if (!world_exit.pending)
++            world_exit.error = "Invalid data in CBloodClientShell::HandleExitWorld";
++        return true; // A refused exit must not disconnect an intact player.
++    }
+     if (const auto* value = std::get_if<OpenBlood2::PlayerRotation>(&event))
+         rotation = *value;
+     else if (const auto* value = std::get_if<OpenBlood2::PlayerPosition>(&event))
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index a485a23..ba8ec62 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -22,6 +22,11 @@ class CBloodServerShell
+     bool OnMessage(HCLIENT, const OpenBlood2::PlayerUse&);
+     void Update(float);
+     CPlayerObj* Player(HCLIENT);
++    void SetStartPointName(const std::string& name)
++    {
++        start_point_name = name;
++    }
++    std::string start_point_name; // Original CopyString ownership, retained across PreStartWorld.
+     PathMgr paths;
+     bool world_started = false;
+     std::uint64_t updates = 0;
+@@ -61,6 +66,14 @@ class CBloodClientShell
+     OpenBlood2::PlayerStats stats;
+     std::uint64_t messages = 0, updates = 0;
+     std::string blocker;
++    struct ExitStatus
++    {
++        OpenBlood2::WorldExit request;
++        OpenBlood2::WorldMessage load;
++        std::string error;
++        std::uint64_t received = 0, ignored_dead = 0, blocked = 0;
++        bool pending = false;
++    } world_exit;
+     OpenBlood2::MissionObjectives objectives;
+     std::string objectives_error;
+     std::uint64_t objective_messages = 0;
+diff --git a/src/game/original/ExitTrigger.cpp b/src/game/original/ExitTrigger.cpp
+new file mode 100644
+index 0000000..6d278d9
+--- /dev/null
++++ b/src/game/original/ExitTrigger.cpp
+@@ -0,0 +1,30 @@
++#include "ExitTrigger.h"
++
++DDWORD ExitTrigger::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE && (reason == 1 || reason == 2))
++    {
++        GenericProp prop;
++        if (g_pServerDE->GetPropGeneric("NextWorld", &prop) == DE_OK)
++            exit.next_world = prop.m_String;
++        if (g_pServerDE->GetPropGeneric("StartPointName", &prop) == DE_OK)
++            start_point = prop.m_String;
++        DBOOL episode = DFALSE, subworld = DFALSE;
++        // Source quirk: the class declares EndEpisode, but ReadProp asks for
++        // EndOfEpisode. Preserve the actual read without inventing an alias.
++        g_pServerDE->GetPropBool("EndOfEpisode", &episode);
++        g_pServerDE->GetPropBool("SubWorld", &subworld);
++        exit.type = episode    ? OpenBlood2::WorldExitType::Episode
++                    : subworld ? OpenBlood2::WorldExitType::Subworld
++                               : OpenBlood2::WorldExitType::World;
++    }
++    return Trigger::EngineMessageFn(message, data, reason);
++}
++void ExitTrigger::SendMessages()
++{
++    ++attempts;
++    // The server copies a nonempty start name before the null-client broadcast.
++    last_delivery = g_pServerDE->SendWorldExit(exit, start_point);
++    if (last_delivery == DE_OK)
++        ++deliveries; // Queued delivery, never proof of a successful transition.
++}
+diff --git a/src/game/original/ExitTrigger.h b/src/game/original/ExitTrigger.h
+new file mode 100644
+index 0000000..e9054e4
+--- /dev/null
++++ b/src/game/original/ExitTrigger.h
+@@ -0,0 +1,20 @@
++#pragma once
++#include "Trigger.h"
++
++// Selected original ExitTrigger callbacks; save/load stays unsupported.
++class ExitTrigger : public Trigger
++{
++  public:
++    OpenBlood2::WorldExit exit;
++    std::string start_point;
++    DRESULT last_delivery = DE_NOTFOUND;
++    std::uint64_t attempts = 0, deliveries = 0;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    void SendMessages() override;
++    void SendMessage(unsigned, const std::string&) override
++    {
++        SendMessages();
++    }
++};
+diff --git a/src/game/original/Trigger.cpp b/src/game/original/Trigger.cpp
+index 4f01bdb..96232ce 100644
+--- a/src/game/original/Trigger.cpp
++++ b/src/game/original/Trigger.cpp
+@@ -137,7 +137,7 @@ void Trigger::Activate(HOBJECT sender, bool touch)
+         for (unsigned i = 0; i < slots.size() && g_pServerDE->IsObjectAlive(m_hObject); ++i)
+             if (slots[i].delay != 0)
+                 slots[i].pending = true;
+-            else
++            else if (!slots[i].target.empty() && !slots[i].message.empty())
+                 SendMessage(i, slots[i].message);
+     }
+     else
+diff --git a/src/game/original/Trigger.h b/src/game/original/Trigger.h
+index 838ebfb..f502a66 100644
+--- a/src/game/original/Trigger.h
++++ b/src/game/original/Trigger.h
+@@ -33,7 +33,7 @@ class Trigger : public B2BaseClass
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
+     virtual void SendMessages();
+-    void SendMessage(unsigned, const std::string&);
++    virtual void SendMessage(unsigned, const std::string&);
+ 
+   private:
+     bool ReadProp();
+diff --git a/src/game/original/session_load.cpp b/src/game/original/session_load.cpp
+index 5dfeed3..890d046 100644
+--- a/src/game/original/session_load.cpp
++++ b/src/game/original/session_load.cpp
+@@ -49,6 +49,11 @@ namespace OpenBlood2
+             error = "Malformed CMSG_LOADWORLD";
+             return false;
+         }
++        if (next.game_type == 0 && next.load_type == LOADTYPE_NEW_LEVEL && next.difficulty <= 3)
++        {
++            error = "LOADTYPE_NEW_LEVEL requires original KeepAliveSave/KeepAliveLoad; player transfer is unavailable";
++            return false;
++        }
+         if (next.game_type != 0 || next.load_type != LOADTYPE_NEW_GAME || next.difficulty > 3)
+         {
+             error = "Only a fresh single-player world request is supported; saves/multiplayer are unimplemented";
+diff --git a/src/game/player_messages.h b/src/game/player_messages.h
+index 711a28b..6546c35 100644
+--- a/src/game/player_messages.h
++++ b/src/game/player_messages.h
+@@ -81,6 +81,17 @@ namespace OpenBlood2
+         std::uint32_t resource = 0;
+         std::string title, text;
+     };
+-    using PlayerEvent =
+-        std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats, MissionObjectives>;
++    enum class WorldExitType : DBYTE
++    {
++        World = 0,
++        Subworld = 1,
++        Episode = 2
++    };
++    struct WorldExit
++    {
++        std::string next_world; // Empty represents the source null HSTRING.
++        WorldExitType type = WorldExitType::World;
++    };
++    using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
++                                     MissionObjectives, WorldExit>;
+ } // namespace OpenBlood2
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 3791cbf..3567d9a 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -11,6 +11,7 @@
+ #include "game/original/DetailSprite.h"
+ #include "game/original/Door.h"
+ #include "game/original/ExitHint.h"
++#include "game/original/ExitTrigger.h"
+ #include "game/original/GameStartPoint.h"
+ #include "game/original/HandWeaponModel.h"
+ #include "game/original/Key.h"
+@@ -474,6 +475,16 @@ namespace OpenBlood2
+                 }
+                 return properties;
+             }()};
++        const ClassInfo exit_trigger{"ExitTrigger",
++                                     &trigger,
++                                     construct<ExitTrigger>,
++                                     {{"NextWorld", std::string{}},
++                                      {"StartPointName", std::string("start")},
++                                      {"EndEpisode", false},
++                                      {"EndOfEpisode", false, false},
++                                      {"SubWorld", false},
++                                      {"TouchActivate", false},
++                                      {"AIActivate", false}}};
+         const ClassInfo objectives_trigger{
+             "ObjectivesTrigger",
+             &trigger,
+@@ -662,11 +673,11 @@ namespace OpenBlood2
+                objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
+                objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
+                objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
+-               objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
+-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
+-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+-               objects.register_class(rotating_brush) && objects.register_class(hand_model) &&
+-               objects.register_class(corpse);
++               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
++               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
++               objects.register_class(door) && objects.register_class(rotating_door) &&
++               objects.register_class(destructable_brush) && objects.register_class(rotating_brush) &&
++               objects.register_class(hand_model) && objects.register_class(corpse);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index cb4fa71..65063db 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -144,6 +144,8 @@ namespace OpenBlood2
+         MoverResult MoveKeyframedObject(HOBJECT, DVector, const DRotation*) override;
+         DRESULT AlignRotation(DRotation&, DVector) override;
+         DDWORD GetObjectUserFlags(HOBJECT) override;
++        CBloodServerShell* session_shell = nullptr;
++        DRESULT SendWorldExit(const WorldExit&, const std::string&) override;
+         DRESULT SendObjectives(const MissionObjectives&) override;
+         bool GetClientResourceString(std::uint32_t, std::string&) override;
+         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
+@@ -334,6 +336,7 @@ namespace OpenBlood2
+             server.collision = &collision;
+             server.client_resources = &resources;
+             server.ai_paths = &server_shell.paths;
++            server.session_shell = &server_shell;
+             return server.bind() && register_original_classes(objects);
+         }
+         HOBJECT create_example(std::string_view class_name);
+diff --git a/src/game/server_clients.cpp b/src/game/server_clients.cpp
+index e87a1b9..bef1a5c 100644
+--- a/src/game/server_clients.cpp
++++ b/src/game/server_clients.cpp
+@@ -79,6 +79,9 @@ namespace OpenBlood2
+                     return physics_vector(value.position);
+                 else if constexpr (std::is_same_v<T, PlayerStats>)
+                     return std::isfinite(value.health) && std::isfinite(value.armor) && std::isfinite(value.bullets);
++                else if constexpr (std::is_same_v<T, WorldExit>)
++                    return value.next_world.size() <= 100 && value.next_world.find('\0') == std::string::npos &&
++                           static_cast<DBYTE>(value.type) <= static_cast<DBYTE>(WorldExitType::Episode);
+                 else if constexpr (std::is_same_v<T, MissionObjectives>)
+                     return value.resource <= 65535 - 6000 + 1 && value.title.size() <= MAX_GP_STRING_LEN &&
+                            value.text.size() <= MAX_GP_STRING_LEN && value.title.find('\0') == std::string::npos &&
+diff --git a/src/game/server_exits.cpp b/src/game/server_exits.cpp
+new file mode 100644
+index 0000000..1783754
+--- /dev/null
++++ b/src/game/server_exits.cpp
+@@ -0,0 +1,23 @@
++#include "game/server_adapter.h"
++
++namespace OpenBlood2
++{
++    DRESULT ServerAdapter::SendWorldExit(const WorldExit& exit, const std::string& start_point)
++    {
++        trace_service("SendWorldExit");
++        if (!session_shell || start_point.size() > 100 || start_point.find('\0') != std::string::npos ||
++            exit.next_world.size() > 100 || exit.next_world.find('\0') != std::string::npos ||
++            static_cast<DBYTE>(exit.type) > static_cast<DBYTE>(WorldExitType::Episode))
++            return DE_INVALIDPARAMS;
++        if (!start_point.empty())
++            session_shell->SetStartPointName(start_point);
++        // Original null-client broadcast, bounded to the one supported local client.
++        for (const auto& [client, state] : clients_)
++        {
++            (void)state;
++            if (GetClientUserData(client))
++                return SendToClient(client, exit);
++        }
++        return DE_NOTFOUND;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 9360c79..ed2c9ed 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -190,11 +190,25 @@ namespace OpenBlood2
+             if (events.empty())
+                 return true;
+             for (const auto& event : events)
++            {
+                 if (!client_shell.OnMessage(event, server_shell))
+                 {
+                     error = "Original player entry message rejected";
+                     return false;
+                 }
++                auto& exit = client_shell.world_exit;
++                if (exit.pending)
++                {
++                    exit.pending = false;
++                    // NEW_LEVEL is rejected by the decoder before any teardown:
++                    // original KeepAliveSave/Load has not yet been integrated.
++                    WorldRequest request;
++                    if (!decode_world_request(exit.load, request, exit.error))
++                        ++exit.blocked;
++                    else
++                        return objects.fail(ObjectError::Unsupported, "World exit transfer is unavailable");
++                }
++            }
+         }
+         error = "Player entry exceeded bounded message rounds";
+         return false;
+@@ -325,7 +339,7 @@ namespace OpenBlood2
+         error = "RunWorld blocked: " + std::to_string(missing) +
+                 " uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat "
+                 "reactions, "
+-                "audio, autosave and remaining mover classes remain unported";
++                "audio, autosave, keep-alive level transfer and remaining mover classes remain unported";
+         if (!entry_error.empty())
+             error += "; player entry: " + entry_error;
+         if (trace.empty() || trace.back() != error)
+@@ -349,6 +363,7 @@ namespace OpenBlood2
+             AI_Mgr::ResetRuntimeTables();
+         server.reset_world_time();
+         server_shell.PreStartWorld();
++        server_shell.start_point_name.clear();
+         models.clear();
+         sprites.clear();
+         collision.clear();
+diff --git a/src/game/session.h b/src/game/session.h
+index 1c1675f..04932b7 100644
+--- a/src/game/session.h
++++ b/src/game/session.h
+@@ -4,7 +4,7 @@
+ 
+ namespace OpenBlood2
+ {
+-    inline constexpr DBYTE CMSG_LOADWORLD = 108, LOADTYPE_NEW_GAME = 1;
++    inline constexpr DBYTE CMSG_LOADWORLD = 108, LOADTYPE_NEW_GAME = 1, LOADTYPE_NEW_LEVEL = 2;
+     struct WorldRequest
+     {
+         std::string filename;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 6b22935..e3f79d8 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -830,3 +830,15 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME corpses.catalog COMMAND corpse_tests catalog "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(corpses.catalog PROPERTIES LABELS "headless;private;corpses" TIMEOUT 90)
+ endif()
++
++add_executable(exit_tests exit_tests.cpp)
++target_link_libraries(exit_tests PRIVATE blood2_game)
++blood2_project_options(exit_tests)
++foreach(case IN ITEMS defaults delayed broadcast blocked dead queue lifetime)
++    add_test(NAME exits.${case} COMMAND exit_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/exit-fixtures/${case}")
++    set_tests_properties(exits.${case} PROPERTIES LABELS "headless;exits" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME exits.catalog COMMAND exit_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(exits.catalog PROPERTIES LABELS "headless;private;exits" TIMEOUT 90)
++endif()
+diff --git a/tests/ai_runtime_tests.cpp b/tests/ai_runtime_tests.cpp
+index dc4847c..e1c6343 100644
+--- a/tests/ai_runtime_tests.cpp
++++ b/tests/ai_runtime_tests.cpp
+@@ -491,13 +491,13 @@ namespace
+                 cultists += a->npc_type == AI_Mgr::NPCType::Cultist;
+                 civilians += a->npc_type == AI_Mgr::NPCType::Civilian;
+             }
+-            CHECK(cultists == 10 && civilians == 5 && failed == 0 && unsupported == 2 && created == 202);
+-            CHECK(g.objects.snapshot().size() == 224 && g.enter_player(e) && g.objects.snapshot().size() == 227);
++            CHECK(cultists == 10 && civilians == 5 && failed == 0 && unsupported == 1 && created == 203);
++            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(e) && g.objects.snapshot().size() == 228);
+             for (int tick = 0; tick < 600; ++tick)
+             {
+                 CHECK(g.step(1.0 / 60));
+                 if (!tick)
+-                    CHECK(g.objects.snapshot().size() == 229 && g.objects.attachments().size() == 11);
++                    CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
+             }
+             std::uint64_t updates = 0, pings = 0;
+             for (auto id : g.objects.snapshot())
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index a8ddf06..eeaedac 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -393,9 +393,9 @@ namespace
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+             ++entries[e.state];
+-        CHECK(entries[EntryState::Created] == 202 && entries[EntryState::EditorOnly] == 372 &&
+-              entries[EntryState::Unsupported] == 2 && entries[EntryState::Failed] == 0 &&
+-              g.objects.snapshot().size() == 224);
++        CHECK(entries[EntryState::Created] == 203 && entries[EntryState::EditorOnly] == 372 &&
++              entries[EntryState::Unsupported] == 1 && entries[EntryState::Failed] == 0 &&
++              g.objects.snapshot().size() == 225);
+         std::cout << "Subway instances=" << g.objects.snapshot().size() << "\n";
+         for (auto [state, n] : entries)
+             std::cout << "state=" << int(state) << " count=" << n << '\n';
+diff --git a/tests/camera_tests.cpp b/tests/camera_tests.cpp
+index 42a4a27..d6da0a7 100644
+--- a/tests/camera_tests.cpp
++++ b/tests/camera_tests.cpp
+@@ -291,7 +291,7 @@ namespace
+         CHECK(worlds == 57 && entries == 61 && created == 61 && rejected == 0);
+         CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+         CHECK(CameraObj::m_dwNumCameras == 2 && g.server.camera_effects.size() == 2 &&
+-              g.objects.snapshot().size() == 227);
++              g.objects.snapshot().size() == 228);
+         CHECK(test_camera::complete_subway_intro(g));
+         for (auto id : g.objects.snapshot())
+             if (auto* r = g.objects.get(id); r && dynamic_cast<CameraObj*>(r->game.get()))
+diff --git a/tests/cinematic_tests.cpp b/tests/cinematic_tests.cpp
+index 5b0abef..9daeff3 100644
+--- a/tests/cinematic_tests.cpp
++++ b/tests/cinematic_tests.cpp
+@@ -338,9 +338,9 @@ namespace
+             std::map<EntryState, unsigned> counts;
+             for (const auto& e : g.entries)
+                 ++counts[e.state];
+-            CHECK(counts[EntryState::Created] == 202 && counts[EntryState::EditorOnly] == 372 &&
+-                  counts[EntryState::Unsupported] == 2 && counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 224 && g.enter_player(error) && g.objects.snapshot().size() == 227);
++            CHECK(counts[EntryState::Created] == 203 && counts[EntryState::EditorOnly] == 372 &&
++                  counts[EntryState::Unsupported] == 1 && counts[EntryState::Failed] == 0);
++            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228);
+             HOBJECT target = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (std::string_view(g.objects.get(id)->state.m_Name) == "cintrig1")
+@@ -359,7 +359,7 @@ namespace
+             for (unsigned i = 0; i < 6; ++i)
+                 CHECK(g.step(1.0 / 60));
+             v = g.server.audio.get(id);
+-            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 229 &&
++            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 230 &&
+                   g.objects.attachments().size() == 11);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_clips() && !g.server.audio.get(id) && !g.server.message_count() &&
+diff --git a/tests/exit_tests.cpp b/tests/exit_tests.cpp
+new file mode 100644
+index 0000000..008ab2b
+--- /dev/null
++++ b/tests/exit_tests.cpp
+@@ -0,0 +1,249 @@
++#include "game/original/ExitTrigger.h"
++#include "player_fixture.h"
++#include <functional>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        CHECK(test_player::setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        return true;
++    }
++    ExitTrigger* create(GameSession& g, Properties properties = {})
++    {
++        const auto h = g.objects.create(g.objects.find_class("ExitTrigger"), {}, Creation::World, properties);
++        return dynamic_cast<ExitTrigger*>(g.server.HandleToObject(h));
++    }
++    bool send(GameSession& g, HOBJECT target, HOBJECT sender)
++    {
++        auto text = g.server.CreateString("TRIGGER");
++        auto message = g.server.StartMessageToObject(g.server.HandleToObject(sender), target, 1000);
++        const bool ok =
++            message && g.server.WriteToMessageHString(message, text) == DE_OK && g.server.EndMessage(message) == DE_OK;
++        g.server.FreeString(text);
++        return ok;
++    }
++    bool defaults(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* t = create(g);
++        CHECK(t && t->start_point == "start" && t->exit.next_world.empty() && t->exit.type == WorldExitType::World);
++        CHECK(!t->touch_activate && t->player_activate && !t->ai_activate && !t->object_activate && t->relay_activate);
++        CHECK(t->reset_time == 0 && t->max_delay == 0);
++        CHECK(g.objects.engine_message(t->m_hObject, MID_TOUCHNOTIFY, g.client_shell.player) && t->attempts == 0);
++        auto relay = g.objects.create(g.objects.find_class("Trigger"), {}, Creation::World);
++        CHECK(send(g, t->m_hObject, relay) && t->attempts == 1 && t->deliveries == 1 && !t->active);
++        std::string error;
++        CHECK(g.pump_player_messages(error) && g.client_shell.world_exit.received == 1);
++        CHECK(!g.client_shell.world_exit.error.empty() && g.client_shell.world_exit.blocked == 0);
++        CHECK(g.client_shell.m_bInWorld && g.server_shell.start_point_name == "start");
++        CHECK(send(g, t->m_hObject, relay) && t->attempts == 1); // Source zero reset stays inactive.
++        CHECK(create(g, {{"EndEpisode", true}})->exit.type == WorldExitType::World);
++        CHECK(create(g, {{"EndEpisode", true}, {"SubWorld", true}})->exit.type == WorldExitType::Subworld);
++        CHECK(create(g, {{"EndOfEpisode", true}, {"SubWorld", true}})->exit.type == WorldExitType::Episode);
++        CHECK(!create(g, {{"NextWorld", std::string(101, 'x')}}));
++        CHECK(!g.objects.create(g.objects.find_class("ExitTrigger"), {}, Creation::Restore));
++        return true;
++    }
++    bool delayed(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* t = create(g, {{"NextWorld", std::string("next")},
++                             {"MessageDelay", .2f},
++                             {"MessageDelay3", .4f},
++                             {"TargetName2", std::string("absent")},
++                             {"MessageName2", std::string("unused")}});
++        CHECK(t && send(g, t->m_hObject, g.client_shell.player));
++        // Immediate slots require target+message; pending delayed slots do not.
++        // Each virtual dispatch emits the whole exit, without named dispatch.
++        CHECK(t->attempts == 1 && t->deliveries == 1 && t->slots[0].pending && t->slots[2].pending);
++        std::string error;
++        CHECK(g.pump_player_messages(error) && g.client_shell.world_exit.blocked == 1);
++        CHECK(g.step(.1) && t->attempts == 1 && g.step(.11) && t->attempts == 2);
++        CHECK(g.client_shell.world_exit.blocked == 2 && !t->active && !t->slots[0].pending && t->slots[2].pending);
++        CHECK(g.step(.21) && t->attempts == 3 && g.client_shell.world_exit.blocked == 3 && !t->slots[2].pending);
++        CHECK(g.step(.1) && t->attempts == 3 && !t->active);
++        return true;
++    }
++    bool broadcast(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        auto* t = create(g, {{"NextWorld", std::string("next")}, {"StartPointName", std::string("alternate")}});
++        auto relay = g.objects.create(g.objects.find_class("Trigger"), {}, Creation::World);
++        CHECK(t && relay && send(g, t->m_hObject, relay));
++        CHECK(t->last_delivery == DE_NOTFOUND && t->deliveries == 0 && g.server_shell.start_point_name == "alternate");
++        CHECK(g.objects.remove(t->m_hObject) && g.objects.finish_frame());
++        CHECK(g.server_shell.start_point_name == "alternate");
++        auto* empty = create(g, {{"StartPointName", std::string{}}});
++        CHECK(empty && send(g, empty->m_hObject, relay) && g.server_shell.start_point_name == "alternate");
++        g.server_shell.PreStartWorld();
++        CHECK(g.server_shell.start_point_name == "alternate"); // Source persists through PreStartWorld.
++        CHECK(g.unload_world() && g.server_shell.start_point_name.empty());
++        return true;
++    }
++    bool blocked(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* player = g.server_shell.Player(g.local_client);
++        CHECK(player);
++        player->m_damage.m_fHitPoints = 73;
++        const auto ids = g.objects.snapshot();
++        const auto before_revision = g.world_revision;
++        const auto before_path = g.world_path;
++        const auto before_client = g.local_client;
++        const auto bullets = player->m_InventoryMgr.GetAmmoCount(1);
++        WorldMessage load;
++        std::string error;
++        CHECK(original_world_request("next", 0, LOADTYPE_NEW_LEVEL, 0, load));
++        CHECK(!g.load_world(load, error) && error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos);
++        CHECK(g.server.SendWorldExit({"next", WorldExitType::Subworld}, "arrival") == DE_OK);
++        CHECK(g.client_shell.world_exit.received == 0 && g.pump_player_messages(error));
++        const auto& exit = g.client_shell.world_exit;
++        CHECK(exit.received == 1 && exit.blocked == 1 && !exit.pending && exit.request.type == WorldExitType::Subworld);
++        CHECK(exit.load.bytes == load.bytes && exit.load.id == CMSG_LOADWORLD);
++        CHECK(exit.error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos);
++        CHECK(g.objects.snapshot() == ids && g.world_revision == before_revision && g.world_path == before_path);
++        CHECK(g.local_client == before_client && g.client_shell.player == player->m_hObject);
++        CHECK(player->m_damage.m_fHitPoints == 73 && player->m_InventoryMgr.GetAmmoCount(1) == bullets);
++        CHECK(!g.client_shell.m_bFirstWorld && g.client_shell.m_bInWorld &&
++              g.server_shell.start_point_name == "arrival");
++        CHECK(g.step(.016) && g.client_shell.world_exit.blocked == 1);
++        return true;
++    }
++    bool dead(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* player = g.server_shell.Player(g.local_client);
++        CHECK(player);
++        player->m_damage.m_bDead = DTRUE; // Diagnostic state; this case isolates HandleExitWorld's first guard.
++        CHECK(g.server.SendWorldExit({"next", WorldExitType::Episode}, "dead-arrival") == DE_OK);
++        std::string error;
++        CHECK(g.pump_player_messages(error));
++        CHECK(g.client_shell.world_exit.received == 1 && g.client_shell.world_exit.ignored_dead == 1);
++        CHECK(g.client_shell.world_exit.request.next_world.empty() && g.client_shell.world_exit.load.bytes.empty());
++        CHECK(g.client_shell.world_exit.blocked == 0 && g.client_shell.world_exit.error.empty());
++        CHECK(g.server_shell.start_point_name == "dead-arrival" && g.client_shell.player == player->m_hObject);
++        return true;
++    }
++    bool queue(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        CHECK(g.server.SendWorldExit({std::string(101, 'x')}, "bad") == DE_INVALIDPARAMS);
++        CHECK(g.server.SendWorldExit({std::string("a\0b", 3)}, "bad") == DE_INVALIDPARAMS);
++        CHECK(g.server.SendWorldExit({"next", static_cast<WorldExitType>(3)}, "bad") == DE_INVALIDPARAMS);
++        CHECK(g.server.SendWorldExit({"next"}, std::string(101, 's')) == DE_INVALIDPARAMS);
++        CHECK(g.server_shell.start_point_name.empty());
++        for (unsigned i = 0; i < 256; ++i)
++            CHECK(g.server.SendWorldExit({"next"}, "arrival") == DE_OK);
++        CHECK(g.server.SendWorldExit({"next"}, "copied-before-failed-send") == DE_ERROR);
++        CHECK(g.server_shell.start_point_name == "copied-before-failed-send");
++        std::string error;
++        CHECK(g.pump_player_messages(error));
++        CHECK(g.client_shell.world_exit.received == 256 && g.client_shell.world_exit.blocked == 256);
++        CHECK(g.server.SendToClient(g.local_client, WorldExit{"next", static_cast<WorldExitType>(255)}) ==
++              DE_INVALIDPARAMS);
++        CHECK(g.client_shell.m_bInWorld && g.client_shell.world_exit.error.find("KeepAliveSave") != std::string::npos);
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* t = create(g, {{"NextWorld", std::string("owned-next")}, {"StartPointName", std::string("owned-start")}});
++        CHECK(t && send(g, t->m_hObject, g.client_shell.player));
++        auto source = t->m_hObject;
++        CHECK(g.objects.remove(source) && g.objects.finish_frame());
++        std::string error;
++        CHECK(g.pump_player_messages(error) && g.client_shell.world_exit.request.next_world == "owned-next");
++        CHECK(g.server_shell.start_point_name == "owned-start");
++        const auto client = g.local_client;
++        CHECK(g.server.SendWorldExit({"stale-next"}, "stale-start") == DE_OK);
++        CHECK(g.leave_player() && g.enter_player(error));
++        CHECK(g.local_client != client && g.client_shell.world_exit.received == 0);
++        CHECK(g.pump_player_messages(error) && g.client_shell.world_exit.received == 0);
++        CHECK(g.unload_world() && g.server.string_count() == 0 && g.objects.snapshot().empty());
++        CHECK(g.server.client_count() == 0 && g.server_shell.start_point_name.empty());
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        HOBJECT previous = nullptr;
++        for (unsigned iteration = 0; iteration < 3; ++iteration)
++        {
++            CHECK(g.request_world("01_SubwayA", error));
++            std::map<EntryState, unsigned> counts;
++            for (const auto& entry : g.entries)
++                ++counts[entry.state];
++            CHECK(counts[EntryState::Created] == 203 && counts[EntryState::Unsupported] == 1 &&
++                  counts[EntryState::WorldSound] == 4 && counts[EntryState::EditorOnly] == 372 &&
++                  counts[EntryState::Failed] == 0);
++            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228);
++            unsigned exits = 0;
++            for (const auto& entry : g.entries)
++            {
++                auto* record = g.objects.get(entry.object);
++                auto* t = record ? dynamic_cast<ExitTrigger*>(record->game.get()) : nullptr;
++                if (!t)
++                    continue;
++                ++exits;
++                CHECK(t->m_hObject != previous);
++                previous = t->m_hObject;
++                std::cout << "Authored " << record->state.m_Name << " -> " << t->exit.next_world << " / start "
++                          << t->start_point << '\n';
++                CHECK(t->exit.next_world == "02_cityhub" && t->start_point == "01_egressa");
++                CHECK(!t->player_activate && !t->relay_activate && t->object_activate && !t->touch_activate);
++                CHECK(t->max_delay == 2 && t->slots[0].delay == 2 && t->slots[0].target.empty());
++                CHECK(send(g, t->m_hObject, g.client_shell.player) && t->rejected == 1 && t->activations == 0);
++                HOBJECT relay = nullptr;
++                for (auto id : g.objects.snapshot())
++                    if (auto* candidate = dynamic_cast<Trigger*>(g.objects.get(id)->game.get());
++                        candidate && candidate->slots[9].target == record->state.m_Name)
++                        relay = candidate->m_hObject;
++                CHECK(relay && send(g, t->m_hObject, relay) && t->activations == 1 && t->attempts == 0);
++                for (unsigned tick = 0; tick < 119; ++tick)
++                    CHECK(g.step(1.0 / 60));
++                CHECK(t->deliveries == 0 && g.step(.05) && t->deliveries == 1);
++            }
++            CHECK(exits == 1);
++            CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
++            CHECK(g.client_shell.world_exit.received == 1 && g.client_shell.world_exit.blocked == 1);
++            CHECK(g.world_path == "worlds/01_subwaya.dat" && g.client_shell.m_bInWorld);
++            CHECK(!g.run_world(error) && error.find("1 uninstantiated") != std::string::npos);
++            CHECK(g.unload_world() && g.server.string_count() == 0 && g.objects.snapshot().empty());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests{
++        {"defaults", defaults}, {"delayed", delayed}, {"broadcast", broadcast}, {"blocked", blocked},
++        {"dead", dead},         {"queue", queue},     {"lifetime", lifetime},   {"catalog", catalog}};
++    const auto it = tests.find(argv[1]);
++    return it != tests.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/keyframer_tests.cpp b/tests/keyframer_tests.cpp
+index 44f90a1..440ffcc 100644
+--- a/tests/keyframer_tests.cpp
++++ b/tests/keyframer_tests.cpp
+@@ -361,14 +361,14 @@ namespace
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+             const float entered = g.server.GetTime();
+-            CHECK(g.objects.snapshot().size() == 227);
++            CHECK(g.objects.snapshot().size() == 228);
+             auto* list = g.server.FindNamedObjects("tracking1");
+             CHECK(list && list->m_pFirstLink);
+             auto h = list->m_pFirstLink->m_hObject;
+             g.server.RelinquishList(list);
+             auto* f = framer(g, h);
+             CHECK(g.step(1.0 / 60) && f->keys.size() == 2 && f->targets.size() == 1 && f->active && f->time == 0);
+-            CHECK(g.objects.snapshot().size() == 229 && g.objects.attachments().size() == 11);
++            CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
+             auto camera = f->targets[0].object;
+             auto start = g.objects.get(camera)->state.m_Pos;
+             CHECK(g.step(1.0 / 60) && f->targets[0].moves == 1 && f->processed == 1 && f->unresolved_messages == 1);
+diff --git a/tests/light_tests.cpp b/tests/light_tests.cpp
+index a745c1c..4680fb7 100644
+--- a/tests/light_tests.cpp
++++ b/tests/light_tests.cpp
+@@ -350,8 +350,8 @@ namespace
+         for (int cycle = 0; cycle < 2; ++cycle)
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+-            CHECK(g.objects.snapshot().size() == 227 && g.server.light_effects.size() == 12);
+-            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 229 && g.objects.attachments().size() == 11);
++            CHECK(g.objects.snapshot().size() == 228 && g.server.light_effects.size() == 12);
++            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
+             KeyFramer* path = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (auto* f = dynamic_cast<KeyFramer*>(g.objects.get(id)->game.get());
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index b2faac4..7b177fa 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -204,14 +204,14 @@ namespace
+             CHECK(player);
+             CHECK(game.objects.get(player->m_hObject)->model->animations.size() == 86);
+             CHECK(game.objects.snapshot().size() ==
+-                  227); // 202 source + 7 door children + 15 NPC muzzle lights + player/muzzle/scent.
++                  228); // 203 source + 7 door children + 15 NPC muzzle lights + player/muzzle/scent.
+             CHECK(game.client_shell.position.x == -32 && game.client_shell.position.z == -3224);
+             CHECK(std::abs(game.client_shell.position.y - 170) < .01f);
+             for (int frame = 0; frame < 120; ++frame)
+                 CHECK(game.step(1.0 / 60.0));
+             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
+             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
+-            CHECK(!game.run_world(error) && error.find("2 uninstantiated") != std::string::npos);
++            CHECK(!game.run_world(error) && error.find("1 uninstantiated") != std::string::npos);
+             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
+                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
+                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()
+diff --git a/tests/random_sound_tests.cpp b/tests/random_sound_tests.cpp
+index 4249916..6b5fcfc 100644
+--- a/tests/random_sound_tests.cpp
++++ b/tests/random_sound_tests.cpp
+@@ -318,9 +318,9 @@ namespace
+             std::map<EntryState, unsigned> counts;
+             for (const auto& e : g.entries)
+                 ++counts[e.state];
+-            CHECK(counts[EntryState::Created] == 202 && counts[EntryState::Unsupported] == 2 &&
++            CHECK(counts[EntryState::Created] == 203 && counts[EntryState::Unsupported] == 1 &&
+                   counts[EntryState::EditorOnly] == 372 && !counts[EntryState::Failed]);
+-            CHECK(g.objects.snapshot().size() == 224 && g.enter_player(error) && g.objects.snapshot().size() == 227);
++            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228);
+             std::vector<HOBJECT> targets;
+             for (auto id : g.objects.snapshot())
+                 if (dynamic_cast<RandomSoundFX*>(g.objects.get(id)->game.get()))
+@@ -346,7 +346,7 @@ namespace
+                 std::cout << "cycle=" << cycle << " name=" << g.objects.get(h)->state.m_Name
+                           << " sound=" << v->request.resource << '\n';
+             }
+-            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 229 &&
++            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 230 &&
+                   g.objects.attachments().size() == 11);
+             CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips() &&
+                   !g.server.audio.get(last) && g.objects.snapshot().empty() && !g.server.message_count() &&
+diff --git a/tests/scene_explosion_tests.cpp b/tests/scene_explosion_tests.cpp
+index 987a6da..b58398f 100644
+--- a/tests/scene_explosion_tests.cpp
++++ b/tests/scene_explosion_tests.cpp
+@@ -312,12 +312,12 @@ namespace
+                 ++n;
+                 CHECK(e.state == EntryState::Created);
+             }
+-            CHECK(n == 9 && counts[EntryState::Created] == 202 && counts[EntryState::WorldSound] == 4 &&
+-                  counts[EntryState::EditorOnly] == 372 && counts[EntryState::Unsupported] == 2 &&
++            CHECK(n == 9 && counts[EntryState::Created] == 203 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::EditorOnly] == 372 && counts[EntryState::Unsupported] == 1 &&
+                   counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 224 && g.enter_player(error) && g.objects.snapshot().size() == 227 &&
++            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228 &&
+                   g.step(.02));
+-            CHECK(g.objects.snapshot().size() == 229 && g.objects.attachments().size() == 11);
++            CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11);
+             auto* player = g.server_shell.Player(g.local_client);
+             CHECK(player);
+             auto health = player->m_damage.m_fHitPoints;
+@@ -334,7 +334,7 @@ namespace
+             CHECK(g.server.scene_explosions.size() == 9 && player->m_damage.m_fHitPoints == health && g.step(.11));
+             for (auto h : emitted)
+                 CHECK(!g.objects.get(h));
+-            CHECK(!g.run_world(error) && error.find("2 uninstantiated") != std::string::npos);
++            CHECK(!g.run_world(error) && error.find("1 uninstantiated") != std::string::npos);
+             CHECK(g.unload_world() && g.server.scene_explosions.empty() && g.server.audio.voices().empty() &&
+                   g.server.string_count() == 0 && g.server.message_count() == 0 && g.server.list_count() == 0);
+             std::cout << "cycle=" << cycle
+diff --git a/tests/sound_tests.cpp b/tests/sound_tests.cpp
+index 820a21c..b1935c9 100644
+--- a/tests/sound_tests.cpp
++++ b/tests/sound_tests.cpp
+@@ -349,12 +349,12 @@ namespace
+                     CHECK(v->clip->rate == 22050 && v->clip->frames() == 198623 && v->clip->channels == 1);
+                 }
+             }
+-            CHECK(ids.size() == 4 && counts[EntryState::Created] == 202 && counts[EntryState::WorldSound] == 4 &&
+-                  counts[EntryState::Unsupported] == 2 && counts[EntryState::EditorOnly] == 372 &&
++            CHECK(ids.size() == 4 && counts[EntryState::Created] == 203 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::Unsupported] == 1 && counts[EntryState::EditorOnly] == 372 &&
+                   !counts[EntryState::Failed]);
+-            CHECK(g.objects.snapshot().size() == 224 && g.server.audio.voices().size() == 4 &&
++            CHECK(g.objects.snapshot().size() == 225 && g.server.audio.voices().size() == 4 &&
+                   g.server.audio.cached_clips() == 1);
+-            CHECK(g.enter_player(error) && g.objects.snapshot().size() == 227 && g.step(1.0 / 60));
++            CHECK(g.enter_player(error) && g.objects.snapshot().size() == 228 && g.step(1.0 / 60));
+             // Advance actual sample clocks across a full retail clip without adding unrelated physics work.
+             CHECK(g.server.advance_audio(20, {}, {}));
+             for (auto id : ids)
+@@ -366,7 +366,7 @@ namespace
+             const auto pos = g.server.audio.get(ids.front())->position;
+             CHECK(g.server.advance_audio(.02, pos, {}) && g.server.audio.peak > 0 &&
+                   g.server.audio.mixed_frames == 960);
+-            CHECK(!g.run_world(error) && error.find("2 uninstantiated") != std::string::npos);
++            CHECK(!g.run_world(error) && error.find("1 uninstantiated") != std::string::npos);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_clips());
+             for (auto id : ids)
+diff --git a/tests/sprite_tests.cpp b/tests/sprite_tests.cpp
+index 5bee677..0488c7e 100644
+--- a/tests/sprite_tests.cpp
++++ b/tests/sprite_tests.cpp
+@@ -380,10 +380,10 @@ namespace
+                       !r->sprite->translucent);
+                 weak = r->sprite;
+             }
+-            CHECK(sprites == 12 && counts[EntryState::Created] == 202 && counts[EntryState::WorldSound] == 4 &&
+-                  counts[EntryState::Unsupported] == 2 && counts[EntryState::EditorOnly] == 372 &&
++            CHECK(sprites == 12 && counts[EntryState::Created] == 203 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::Unsupported] == 1 && counts[EntryState::EditorOnly] == 372 &&
+                   counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 224 && g.enter_player(error) && g.objects.snapshot().size() == 227 &&
++            CHECK(g.objects.snapshot().size() == 225 && g.enter_player(error) && g.objects.snapshot().size() == 228 &&
+                   g.step(.02));
+             for (auto id : g.objects.snapshot())
+             {
+@@ -391,8 +391,8 @@ namespace
+                 if (r->sprite)
+                     CHECK(r->sprite_track.frame == 0 && std::abs(r->sprite_track.milliseconds - 20) < 1e-6);
+             }
+-            CHECK(g.objects.snapshot().size() == 229 && g.objects.attachments().size() == 11 && !g.run_world(error) &&
+-                  error.find("2 uninstantiated") != std::string::npos);
++            CHECK(g.objects.snapshot().size() == 230 && g.objects.attachments().size() == 11 && !g.run_world(error) &&
++                  error.find("1 uninstantiated") != std::string::npos);
+             CHECK(g.unload_world() && weak.expired() && g.objects.snapshot().empty() && g.server.string_count() == 0 &&
+                   g.server.message_count() == 0 && g.server.list_count() == 0);
+             std::cout << "cycle=" << cycle
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index e863020..849f660 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -1,6 +1,6 @@
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 224 original instances, 116 BSP models")
++if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 225 original instances, 116 BSP models")
+     message(FATAL_ERROR "World inspection: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-player
+@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 2" OR NOT out MATCHES "remaining mover classes")
++if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 1" OR NOT out MATCHES "remaining mover classes")
+     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index 17ebfce..7d6cc68 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -649,7 +649,7 @@ namespace
+         CHECK(game.world.version == 56);
+         CHECK(game.world.objects.size() == 580);
+         CHECK(game.world.models.size() == 116);
+-        CHECK(game.objects.snapshot().size() == 224);
++        CHECK(game.objects.snapshot().size() == 225);
+         CHECK(game.world.models[0].points.size() == 4996);
+         CHECK(game.world.models[0].polygons.size() == 3367);
+         CHECK(game.resources.find(game.world_path)->overrides == 1);
+@@ -667,7 +667,7 @@ namespace
+                 std::cout << "No-player NPC " << game.objects.get(id)->state.m_Name << ": " << a->runtime_error << '\n';
+             }
+         CHECK(suspended == 3);
+-        CHECK(game.server.service_calls["SetObjectDims"] == 53);
++        CHECK(game.server.service_calls["SetObjectDims"] == 54);
+         CHECK(game.server.service_calls["GetPropGeneric"] > 0);
+         for (const auto& [name, count] : game.server.service_calls)
+             std::cout << "Service " << name << ": " << count << '\n';
+diff --git a/tests/worldpath_tests.cpp b/tests/worldpath_tests.cpp
+index 31fc370..dcc895f 100644
+--- a/tests/worldpath_tests.cpp
++++ b/tests/worldpath_tests.cpp
+@@ -352,7 +352,7 @@ namespace
+             }
+             CHECK(moves == 297 && blocked == 2 && !f->active && f->processed == 3 && close(r->state.m_Pos, last));
+             CHECK(!close(last, initial) && !close(last, vector_add(f->keys.back().position, f->targets[0].offset)));
+-            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 229 &&
++            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 230 &&
+                   g.objects.attachments().size() == 11);
+             std::cout << "cycle=" << cycle << " moves=" << moves << " blocks=" << blocked << " final=" << last.x << ','
+                       << last.y << ',' << last.z << " consumed_keys=9 runtime=188\n";

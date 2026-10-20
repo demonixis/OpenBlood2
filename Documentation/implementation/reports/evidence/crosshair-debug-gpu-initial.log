@@ -1,0 +1,29 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 951: gpu.hud
+1/2 Test #951: gpu.hud ..........................***Failed    0.94 sec
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+cycle 0 frame 0 HUD pixels 4153
+cycle 0 frame 1 HUD pixels 3705
+cycle 0 frame 2 HUD pixels 3658
+cycle 0 frame 3 HUD pixels 3642
+cycle 0 frame 4 HUD pixels 0
+cycle 0 frame 5 HUD pixels 4369
+cycle 0 frame 6 HUD pixels 0
+gpu:416: frame == 4 || frame == 6 ? lit == 0 : frame == 7 ? lit > 0 && lit < 1000 : lit > 1000
+
+    Start 967: gpu.screen_fade
+2/2 Test #967: gpu.screen_fade ..................   Passed    0.64 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Label Time Summary:
+gpu            =   1.58 sec*proc (2 tests)
+hud            =   0.94 sec*proc (1 test)
+private        =   1.58 sec*proc (2 tests)
+screen_fade    =   0.64 sec*proc (1 test)
+
+Total Test time (real) =   1.59 sec
+
+The following tests FAILED:
+	951 - gpu.hud (Failed)                                  gpu hud private
+Errors while running CTest

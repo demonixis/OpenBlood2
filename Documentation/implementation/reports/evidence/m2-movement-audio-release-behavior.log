@@ -1,0 +1,68 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 970
+    Start 970: movement_audio.rules
+
+970: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/movement_audio_tests "rules" "/home/yann/projects/lithtech/Blood2/build/release/tests/movement-audio-fixtures/rules"
+970: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+970: Test timeout computed to be: 30
+1/5 Test #970: movement_audio.rules .............   Passed    0.01 sec
+test 971
+    Start 971: movement_audio.jumps
+
+971: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/movement_audio_tests "jumps" "/home/yann/projects/lithtech/Blood2/build/release/tests/movement-audio-fixtures/jumps"
+971: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+971: Test timeout computed to be: 30
+2/5 Test #971: movement_audio.jumps .............   Passed    0.01 sec
+test 972
+    Start 972: movement_audio.contexts
+
+972: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/movement_audio_tests "contexts" "/home/yann/projects/lithtech/Blood2/build/release/tests/movement-audio-fixtures/contexts"
+972: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+972: Test timeout computed to be: 30
+972: context=0 dry voices=0 jumps=1 liquid=1 ladder=0
+972: context=1 dry voices=0 jumps=0 liquid=0 ladder=1
+972: context=2 dry voices=0 jumps=0 liquid=1 ladder=0
+972: context=3 dry voices=1 jumps=1 liquid=0 ladder=0
+3/5 Test #972: movement_audio.contexts ..........   Passed    0.02 sec
+test 973
+    Start 973: movement_audio.failures
+
+973: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/movement_audio_tests "failures" "/home/yann/projects/lithtech/Blood2/build/release/tests/movement-audio-fixtures/failures"
+973: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+973: Test timeout computed to be: 30
+4/5 Test #973: movement_audio.failures ..........   Passed    0.00 sec
+test 974
+    Start 974: movement_audio.private
+
+974: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/movement_audio_tests "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+974: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+974: Test timeout computed to be: 120
+974: 30 Hz: one original jump voice / one landing; measured fall span=75.0092; resource=sounds/player/footsteps/stone/landm.wav
+974: 60 Hz: one original jump voice / one landing; measured fall span=83.4683; resource=sounds/player/footsteps/stone/landm.wav
+974: 120 Hz: one original jump voice / one landing; measured fall span=87.8672; resource=sounds/player/footsteps/stone/landm.wav
+5/5 Test #974: movement_audio.private ...........   Passed    0.06 sec
+
+The following tests passed:
+	movement_audio.rules
+	movement_audio.jumps
+	movement_audio.contexts
+	movement_audio.failures
+	movement_audio.private
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+audio             =   0.09 sec*proc (5 tests)
+headless          =   0.09 sec*proc (5 tests)
+movement_audio    =   0.09 sec*proc (5 tests)
+private           =   0.06 sec*proc (1 test)
+
+Total Test time (real) =   0.11 sec

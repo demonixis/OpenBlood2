@@ -1,0 +1,89 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 450: ai_runtime.subway
+      Start 448: ai_runtime.catalog
+ 1/38 Test #448: ai_runtime.catalog ...............   Passed    4.28 sec
+      Start 451: ai_runtime.arena
+ 2/38 Test #451: ai_runtime.arena .................   Passed    3.25 sec
+      Start 340: ai_perception.subway
+ 3/38 Test #340: ai_perception.subway .............   Passed    5.13 sec
+      Start 339: ai_perception.catalog
+ 4/38 Test #339: ai_perception.catalog ............   Passed    0.95 sec
+      Start 449: ai_runtime.failures
+ 5/38 Test #449: ai_runtime.failures ..............   Passed    0.30 sec
+      Start 440: ai_runtime.lifetime
+ 6/38 Test #440: ai_runtime.lifetime ..............   Passed    0.02 sec
+      Start 446: ai_runtime.body
+ 7/38 Test #446: ai_runtime.body ..................   Passed    0.02 sec
+      Start 445: ai_runtime.triggers
+ 8/38 Test #445: ai_runtime.triggers ..............   Passed    0.02 sec
+      Start 447: ai_runtime.missing
+ 9/38 Test #447: ai_runtime.missing ...............   Passed    0.02 sec
+      Start 438: ai_runtime.activation
+10/38 Test #438: ai_runtime.activation ............   Passed    0.02 sec
+      Start 442: ai_runtime.tracking
+11/38 Test #442: ai_runtime.tracking ..............   Passed    0.02 sec
+      Start 441: ai_runtime.targets
+12/38 Test #441: ai_runtime.targets ...............   Passed    0.02 sec
+      Start 443: ai_runtime.camera
+13/38 Test #443: ai_runtime.camera ................   Passed    0.02 sec
+      Start 444: ai_runtime.spatial
+14/38 Test #444: ai_runtime.spatial ...............   Passed    0.02 sec
+      Start 439: ai_runtime.visibility
+15/38 Test #439: ai_runtime.visibility ............   Passed    0.02 sec
+      Start  10: objects.unsupported_teardown
+16/38 Test  #10: objects.unsupported_teardown .....   Passed    0.06 sec
+      Start 338: ai_perception.lifetime
+17/38 Test #338: ai_perception.lifetime ...........   Passed    0.02 sec
+      Start   9: objects.messages_strings
+18/38 Test   #9: objects.messages_strings .........   Passed    0.04 sec
+      Start 333: ai_perception.hints
+19/38 Test #333: ai_perception.hints ..............   Passed    0.02 sec
+      Start 330: ai_perception.factions
+20/38 Test #330: ai_perception.factions ...........   Passed    0.02 sec
+      Start 337: ai_perception.failures
+21/38 Test #337: ai_perception.failures ...........   Passed    0.02 sec
+      Start 332: ai_perception.visibility
+22/38 Test #332: ai_perception.visibility .........   Passed    0.02 sec
+      Start 334: ai_perception.stimuli
+23/38 Test #334: ai_perception.stimuli ............   Passed    0.02 sec
+      Start 335: ai_perception.retaliation
+24/38 Test #335: ai_perception.retaliation ........   Passed    0.02 sec
+      Start 336: ai_perception.opportunity
+25/38 Test #336: ai_perception.opportunity ........   Passed    0.02 sec
+      Start 331: ai_perception.selection
+26/38 Test #331: ai_perception.selection ..........   Passed    0.02 sec
+      Start  11: objects.creation_failures
+27/38 Test  #11: objects.creation_failures ........   Passed    0.03 sec
+      Start   8: objects.links_lists
+28/38 Test   #8: objects.links_lists ..............   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+29/38 Test   #3: objects.reasons_properties .......   Passed    0.02 sec
+      Start   1: objects.original_objects
+30/38 Test   #1: objects.original_objects .........   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+31/38 Test   #5: objects.deferred_removal .........   Passed    0.02 sec
+      Start   7: objects.handles_selection
+32/38 Test   #7: objects.handles_selection ........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+33/38 Test   #2: objects.nested_creation ..........   Passed    0.02 sec
+      Start   4: objects.scheduling
+34/38 Test   #4: objects.scheduling ...............   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+35/38 Test   #6: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start 581: session_playback.policy
+36/38 Test #581: session_playback.policy ..........   Passed    0.02 sec
+      Start 582: session_playback.private
+37/38 Test #450: ai_runtime.subway ................   Passed   35.95 sec
+38/38 Test #582: session_playback.private .........   Passed   60.04 sec
+
+100% tests passed, 0 tests failed out of 38
+
+Label Time Summary:
+ai_perception       =   6.24 sec*proc (11 tests)
+ai_runtime          =  43.97 sec*proc (14 tests)
+headless            = 110.54 sec*proc (38 tests)
+objects             =   0.27 sec*proc (11 tests)
+private             = 109.90 sec*proc (7 tests)
+session_playback    =  60.06 sec*proc (2 tests)
+
+Total Test time (real) =  74.61 sec

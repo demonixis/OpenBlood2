@@ -1,0 +1,718 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 1caaa6b..f680884 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -590,3 +590,5 @@ The [blood-spurt continuation](../Documentation/Implementation/M2_BLOOD_SPURTS.m
+ The [original impact-spark continuation](../Documentation/Implementation/M2_SPARKS.md) connects CSparksFX flesh bursts and metal sparks, with raw-damage recipes, detached particles and inspection. Read [contracts](docs/SPARK_CONTRACTS.md). Preserve source component velocity clipping, strict fade/removal clocks, cosmetic RNG isolation and explicit empty melee recipes. Exhausted invisible systems are reclaimed after duration; shared-list eviction and other required services remain unavailable. M2 stays incomplete.
+ 
+ The [compact HUD continuation](../Documentation/Implementation/M2_HUD.md) displays delivered health, armor and current primary/alternate ammunition independently of the inspector. Physical 1..9/0 and keypad keys select original normal inventory slots; empty slots and original player/camera gates remain enforced. Read [contracts](docs/HUD_CONTRACTS.md). Preserve owned snapshots, distinct M16 pools, input suppression and shared UI lifetime in inspector-free builds. The original PCX status-bar artwork and other required services remain pending; M2 is incomplete.
++
++The [original pickup-audio continuation](../Documentation/Implementation/M2_PICKUP_AUDIO.md) connects collection WAVs and durable results, including keys. Read [contracts](docs/PICKUP_AUDIO_CONTRACTS.md). Preserve accepted-ack-only playback, original 30/300 radii, inventory1.wav for keys, sound-before-trigger order, failure-independent collection and detached lifetime. Severe post-transition stutter, idle Cultists/durability and missing CityHub water remain user-reported follow-ups. M2 stays incomplete.
+diff --git a/README.md b/README.md
+index 4e6fa2d..0992ca3 100644
+--- a/README.md
++++ b/README.md
+@@ -632,3 +632,5 @@ The [blood-spurt continuation](../Documentation/Implementation/M2_BLOOD_SPURTS.m
+ The [original impact-spark continuation](../Documentation/Implementation/M2_SPARKS.md) connects CSparksFX flesh bursts and metal sparks, with raw-damage recipes, detached particles and inspection. Read [contracts](docs/SPARK_CONTRACTS.md). Preserve source component velocity clipping, strict fade/removal clocks, cosmetic RNG isolation and explicit empty melee recipes. Exhausted invisible systems are reclaimed after duration; shared-list eviction and other required services remain unavailable. M2 stays incomplete.
+ 
+ The [compact HUD continuation](../Documentation/Implementation/M2_HUD.md) displays delivered health, armor and current primary/alternate ammunition independently of the inspector. Physical 1..9/0 and keypad keys select original normal inventory slots; empty slots and original player/camera gates remain enforced. Read [contracts](docs/HUD_CONTRACTS.md). Preserve owned snapshots, distinct M16 pools, input suppression and shared UI lifetime in inspector-free builds. The original PCX status-bar artwork and other required services remain pending; M2 is incomplete.
++
++The [original pickup-audio continuation](../Documentation/Implementation/M2_PICKUP_AUDIO.md) connects collection WAVs and durable results, including keys. Read [contracts](docs/PICKUP_AUDIO_CONTRACTS.md). Preserve accepted-ack-only playback, original 30/300 radii, inventory1.wav for keys, sound-before-trigger order, failure-independent collection and detached lifetime. Severe post-transition stutter, idle Cultists/durability and missing CityHub water remain user-reported follow-ups. M2 stays incomplete.
+diff --git a/docs/M2_PICKUP_AUDIO_SOURCES.json b/docs/M2_PICKUP_AUDIO_SOURCES.json
+new file mode 100644
+index 0000000..299474f
+--- /dev/null
++++ b/docs/M2_PICKUP_AUDIO_SOURCES.json
+@@ -0,0 +1,52 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "cc329c6a5a9c8eded9894b43f3c6f59ab0e2b558",
++  "status": "M2 incomplete; original successful-collection sound requests using existing detached audio",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/PickupObject.cpp",
++      "source_sha256": "25e0388f983ec0c9e01b6deb8432f411271159a224d582e12300c10863b979da",
++      "purpose": "PickedUp successful collection, sound-before-trigger behavior and base default."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
++      "source_sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
++      "purpose": "PlaySoundFromPos flags, fixed position, inner/outer radii and volume."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ObjectUtilities.h",
++      "source_sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
++      "purpose": "One-shot, non-retained/nonstreaming helper defaults."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/AmmoPickups.h",
++      "source_sha256": "c34daeb1228cad71438218097c36706c91529daed487bf2629a4253df8bd41d6",
++      "purpose": "Original ammunition collection WAV."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PowerupPickups.cpp",
++      "source_sha256": "0e0d2190ea3785e7287309c0ccfe109c688a9c14b9b12779c4c5c50642f0d80c",
++      "purpose": "Original health and armor collection WAVs."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/WeaponPickups.h",
++      "source_sha256": "b32860805172dd270043dc8a4e8c6c13e05806825436403461ba94d44a953416",
++      "purpose": "Original weapon collection WAV."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ItemPickups.h",
++      "source_sha256": "ce1dacd1cf4829c39cfdfbeb27ae4873e1f2b6a4895b532b820d587ab7eaa17e",
++      "purpose": "Inventory/bomb-item WAVs and KeyPickup inventory1.wav override."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
++      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
++      "purpose": "Original key touch protocol."
++    },
++    {
++      "source": "sources/blood2/Shared/SoundTypes.h",
++      "source_sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
++      "purpose": "MISC_HIGH priority equals two."
++    }
++  ]
++}
+diff --git a/docs/PICKUP_AUDIO_CONTRACTS.md b/docs/PICKUP_AUDIO_CONTRACTS.md
+new file mode 100644
+index 0000000..f37ca33
+--- /dev/null
++++ b/docs/PICKUP_AUDIO_CONTRACTS.md
+@@ -0,0 +1,62 @@
++# Original pickup collection audio
++
++M2 remains incomplete. This extends [pickup contracts](PICKUP_CONTRACTS.md),
++[key contracts](TRIGGER_CONTRACTS.md) and the existing detached voice lifetime in
++[scene explosion contracts](SCENE_EXPLOSION_CONTRACTS.md). See the
++[source ledger](M2_PICKUP_AUDIO_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_PICKUP_AUDIO.md).
++
++## Original rules and typed adaptation
++
++`PickupObject::PickedUp` requests `PlaySoundFromPos` only after successful
++collection. The port keeps its existing typed acknowledgement, outstanding-touch
++identity, full-pool refusal, dead-player guard and consumed-before-callback rules.
++The accepted pickup hides its visible/touch flags, starts the sound, records the
++result, dispatches the authored pickup trigger, then requests deferred removal.
++An absent/invalid WAV or exhausted voice budget does not undo collection, suppress
++the trigger or keep the item alive. Refusal, forged acknowledgements and repeated
++contacts produce no collection voice. Empty sound paths mean no request.
++
++The original helper uses the pickup's position at acknowledgement, spatial sound,
++outer radius **300**, inner radius **30**, full volume, priority **2**
++(`SOUNDPRIORITY_MISC_HIGH`), reverb requested, no loop and no attachment. The
++existing bounded decoder and SDL mixer produce dry audio; reverb and priority
++arbitration are still unavailable. No replacement asset alias is invented.
++The existing portability adaptation performs sound/trigger callbacks before
++actual removal so their source identity remains checked. Engine destruction is
++still deferred, including reentrant triggers that remove the pickup or player.
++
++Original constructors choose `ammo1.wav`, `health1a.wav`, `health2.wav`,
++`armour1.wav`, `powerup3.wav`, `weapon1.wav`, `inventory1.wav` or `ammo2.wav`, all
++under `sounds/powerups`. The separately ported `KeyPickup` uses the
++source constructor override `inventory1.wav` through the same helper. This adds no new pickup
++classes, respawn rules or weapon acquisition behavior. Character weapon-pickup
++quips are a separate pending source path.
++
++## Ownership and inspection
++
++A successfully started sound becomes world-owned and auto-retires on completion.
++Its source token is provenance only: source movement/removal and player removal
++cannot move or cut off the sound. No raw object pointer is retained. World unload
++clears voices, cached clips and reports; audio IDs are not reused across worlds.
++Existing attached voices, ambient loops and retained weapon voices are unchanged.
++
++The latest 32 collection reports own name, class, optional typed pickup values or
++key name, requested sound, fixed position, voice ID and explicit start failure.
++A key is not represented as an ammunition grant. Reports survive pickup removal;
++a retained successful-start record does not imply its voice is still active.
++The Pickups inspector reads live decoded frame cursors/gains when available and
++labels retired voices separately. It never advances the sound clock. Hidden UI
++and inspector-free builds use the same gameplay/audio path.
++
++## Verification boundary
++
++Synthetic fixtures exercise accepted/refused/dead/repeated collection, key audio,
++source and player removal, trigger reentrancy and ordering, completion, bounded
++history, missing/malformed/empty sounds, and voice-budget exhaustion. Private
++fixtures collect 21 supported classes with external retail models and decode the
++eight original WAV choices. These are diagnostic grants/contacts, not an authored
++walkthrough. The NVIDIA pickup scenario collects ammo, a weapon and a medkit
++with hidden UI and verifies decoded voices and SDL sample submission after their
++source objects have been removed. No human listening or native Metal validation
++is inferred from successful sample submission.
+diff --git a/docs/PICKUP_CONTRACTS.md b/docs/PICKUP_CONTRACTS.md
+index 4605002..0ec1c37 100644
+--- a/docs/PICKUP_CONTRACTS.md
++++ b/docs/PICKUP_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original pickups and destruction spawns
+ 
++Continuation: [original collection audio](PICKUP_AUDIO_CONTRACTS.md) supersedes the
++collection-sound omission for supported pickups and keys. Trigger activation
++sounds, character quips and other missing services remain separate.
++
+ > Extended by [NPC weapon-drop contracts](WEAPON_DROP_CONTRACTS.md): the selected
+ > Cabal drop, independent falling hand and Beretta collection now work. Corpse/gib
+ > and remaining death services still fail explicitly; M2 is incomplete.
+diff --git a/docs/TRIGGER_CONTRACTS.md b/docs/TRIGGER_CONTRACTS.md
+index 4687d12..382de82 100644
+--- a/docs/TRIGGER_CONTRACTS.md
++++ b/docs/TRIGGER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original triggers, door SelfTrigger and keys
+ 
++Continuation: [original collection audio](PICKUP_AUDIO_CONTRACTS.md) supersedes the
++collection-sound omission for supported pickups and keys. Trigger activation
++sounds, character quips and other missing services remain separate.
++
+ > Extended by [conversation contracts](CONVERSATION_CONTRACTS.md): original dialogue sequencing and typed client communication are connected; authored missing mappings remain failures.
+ 
+ > Extended by [level-exit contracts](EXIT_CONTRACTS.md): original ExitTrigger and
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 1cf523d..7a2a820 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -2615,8 +2615,8 @@ namespace OpenBlood2
+                 ImGui::TextWrapped("Pickup target: %s / %s | icons %s / %s", k->pickup_target.c_str(),
+                                    k->pickup_command.c_str(), k->item.icon.c_str(), k->item.highlighted_icon.c_str());
+             }
+-        ImGui::TextWrapped("Audio, localized key names, generic pickups, save/restore and the complete playable "
+-                           "session remain pending.");
++        ImGui::TextWrapped("Collection sounds and removed key records are in Pickups. Trigger activation audio, "
++                           "localized key names and complete gameplay remain pending.");
+     }
+ } // namespace OpenBlood2
+ 
+diff --git a/src/app/inspector_pickups.cpp b/src/app/inspector_pickups.cpp
+index 6d14c4d..33c6f9d 100644
+--- a/src/app/inspector_pickups.cpp
++++ b/src/app/inspector_pickups.cpp
+@@ -7,9 +7,10 @@ namespace OpenBlood2
+ {
+     void Inspector::draw_pickups(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextWrapped("Original single-player Beretta, ammunition, health and armor. Other inventory items, timed "
+-                           "bonuses, pickup audio "
+-                           "and pickup FX remain pending. Medkit: H uses the collected charges (release Shift first).");
++        ImGui::TextWrapped(
++            "Original single-player pickups and spatial collection sounds. Recent results include keys "
++            "and remain visible after collection. Medkit: H uses collected charges (release Shift first). "
++            "Timed bonuses and pickup FX remain incomplete.");
+         if (!ImGui::BeginTable("Pickup inspection", 2, ImGuiTableFlags_Resizable))
+             return;
+         ImGui::TableSetupColumn("Objects", ImGuiTableColumnFlags_WidthFixed, 250);
+@@ -100,7 +101,7 @@ namespace OpenBlood2
+             ImGui::Text("Attempts %llu / consumed %s", static_cast<unsigned long long>(p->attempts),
+                         p->picked_up ? "yes" : "no");
+             ImGui::TextWrapped("Trigger: %s -> %s", p->pickup_target.c_str(), p->pickup_command.c_str());
+-            ImGui::TextWrapped("Pickup sound request: %s (not played)", p->pickup_sound.c_str());
++            ImGui::TextWrapped("Sound on accepted collection: %s", p->pickup_sound.c_str());
+             if (!p->error.empty())
+                 ImGui::TextWrapped("Pickup diagnostic: %s", p->error.c_str());
+             if (!r->model_error.empty())
+@@ -110,8 +111,26 @@ namespace OpenBlood2
+             ImGui::TextUnformatted("No live pickup selected.");
+         ImGui::SeparatorText("Recent pickups / latest 32");
+         for (const auto& v : game.server.pickup_reports)
+-            ImGui::TextWrapped("%s / %s: %.0f (type %u)", v.name.c_str(), v.class_name.c_str(), v.value.amount,
+-                               v.value.type);
++        {
++            if (v.value)
++                ImGui::TextWrapped("%s / %s: %.0f (type %u)", v.name.c_str(), v.class_name.c_str(), v.value->amount,
++                                   v.value->type);
++            else
++                ImGui::TextWrapped("%s / %s: key %s", v.name.c_str(), v.class_name.c_str(), v.key.c_str());
++            ImGui::TextWrapped("Sound: %s | voice %llu | %s", v.sound.c_str(), (unsigned long long)v.voice,
++                               v.sound.empty()          ? "not requested"
++                               : !v.sound_error.empty() ? "failed"
++                                                        : "started");
++            ImGui::Text("Fixed position %.1f %.1f %.1f | radii 30 / 300 | priority 2 / reverb requested (dry)",
++                        v.position.x, v.position.y, v.position.z);
++            if (const auto* voice = game.server.audio.get(v.voice))
++                ImGui::Text("Decoded frames %llu / %llu | gains %.3f %.3f", (unsigned long long)voice->cursor,
++                            (unsigned long long)voice->clip->frames(), voice->left, voice->right);
++            else if (v.voice)
++                ImGui::TextUnformatted("Voice retired; start record retained.");
++            if (!v.sound_error.empty())
++                ImGui::TextWrapped("Audio failure: %s", v.sound_error.c_str());
++        }
+         ImGui::SeparatorText("Destruction spawns / latest 32");
+         for (const auto& v : game.server.spawn_reports)
+         {
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index a8c459b..e7e8529 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -91,12 +91,13 @@ namespace
+         }
+         if ((options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
+              options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke ||
+-             (!options.gpu_smoke && !options.world_smoke)) &&
++             options.pickups_smoke || (!options.gpu_smoke && !options.world_smoke)) &&
+             !game->server.audio.open_output(error))
+         {
+             spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
+             if (options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
+-                options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke)
++                options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke ||
++                options.pickups_smoke)
+                 return 4;
+         }
+         HOBJECT key = nullptr;
+@@ -1743,7 +1744,8 @@ namespace
+                              "entries include one explicit missing-world-model omission; destination entry, "
+                              "cleanup, presentation and reload checked");
+             if (options.pickups_smoke)
+-                spdlog::info("PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked");
++                spdlog::info("PICKUPS smoke: ammo/weapon/medkit accepted with hidden UI; three original collection "
++                             "WAVs decoded and submitted to SDL after source removal; unload/reload checked");
+             if (options.weapons_smoke)
+                 spdlog::info("Weapon smoke passed: animation-key shots, bullets consumed, knife strikes, firing while "
+                              "hidden, decoded fire voices submitted to SDL, unload/re-entry");
+diff --git a/src/app/pickup_smoke.cpp b/src/app/pickup_smoke.cpp
+index 75ce120..68e6515 100644
+--- a/src/app/pickup_smoke.cpp
++++ b/src/app/pickup_smoke.cpp
+@@ -68,8 +68,23 @@ namespace OpenBlood2
+         g.client_shell.medkit_down = false;
+         if (!g.client_shell.UpdateUse(g.server_shell))
+             return false;
+-        return player->m_damage.m_fHitPoints == 100 && player->m_InventoryMgr.medkit->count == 25 &&
+-               g.client_shell.item_sounds == 1 && g.server.audio.get(g.client_shell.item_voice) &&
+-               g.server.pickup_reports.size() == 3;
++        for (const auto& report : g.server.pickup_reports)
++        {
++            const auto* voice = g.server.audio.get(report.voice);
++            if (!report.voice || !report.sound_error.empty() || !voice || !voice->world_owned || !voice->auto_remove ||
++                voice->request.speaker || voice->request.inner_radius != 30 || voice->request.outer_radius != 300 ||
++                g.server.IsObjectAlive(voice->owner))
++                return false;
++        }
++        // Run the normal sample clock after source removal, while the inspector is hidden.
++        if (!g.server.advance_audio(.02, pos, {}))
++            return false;
++        for (const auto& report : g.server.pickup_reports)
++            if (const auto* voice = g.server.audio.get(report.voice); !voice || !voice->cursor)
++                return false;
++        return g.server.audio.has_output() && g.server.audio.submitted_frames > 0 &&
++               g.server.audio.output_error.empty() && player->m_damage.m_fHitPoints == 100 &&
++               player->m_InventoryMgr.medkit->count == 25 && g.client_shell.item_sounds == 1 &&
++               g.server.audio.get(g.client_shell.item_voice) && g.server.pickup_reports.size() == 3;
+     }
+ } // namespace OpenBlood2
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 532ed07..5d79076 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -75,7 +75,7 @@ class ServerDE : public CSBase
+     virtual PathMgr* GetPathManager() = 0;
+     virtual bool ValidateSpawnObject(std::string_view) = 0;
+     virtual void RecordSpawn(const OpenBlood2::SpawnReport&) = 0;
+-    virtual void RecordPickup(HOBJECT, const OpenBlood2::PickupMessage&, std::string_view sound) = 0;
++    virtual void RecordPickup(HOBJECT, const OpenBlood2::PickupReport&) = 0;
+     virtual DRESULT WritePickupMessage(HMESSAGEWRITE, const OpenBlood2::PickupMessage&) = 0;
+     virtual bool ReadPickupMessage(HMESSAGEREAD, OpenBlood2::PickupMessage&) = 0;
+     virtual bool ConfigureWorldBody(HOBJECT, const OpenBlood2::WorldBodyProperties&) = 0;
+diff --git a/src/game/original/KeyPickup.cpp b/src/game/original/KeyPickup.cpp
+index 22d3966..7d83848 100644
+--- a/src/game/original/KeyPickup.cpp
++++ b/src/game/original/KeyPickup.cpp
+@@ -1,4 +1,5 @@
+ #include "KeyPickup.h"
++#include "PickupObject.h"
+ #include "trigger_helpers.h"
+ #include <algorithm>
+ using namespace OpenBlood2;
+@@ -86,7 +87,10 @@ DDWORD KeyPickup::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD r
+         picked_up = true;
+         g_pServerDE->SetObjectFlags(m_hObject,
+                                     g_pServerDE->GetObjectFlags(m_hObject) & ~FLAG_VISIBLE & ~FLAG_TOUCH_NOTIFY);
+-        ++sound_requests; // Original powerup4.wav, not connected audio.
++        ++sound_requests;
++        auto report = PlayPickupSound(m_hObject, "sounds\\powerups\\inventory1.wav");
++        report.key = item.name;
++        g_pServerDE->RecordPickup(m_hObject, report);
+         if (!pickup_target.empty() && !pickup_command.empty())
+         {
+             auto target = g_pServerDE->CreateString(pickup_target.c_str());
+diff --git a/src/game/original/PickupObject.cpp b/src/game/original/PickupObject.cpp
+index 04cd74a..93d6c1b 100644
+--- a/src/game/original/PickupObject.cpp
++++ b/src/game/original/PickupObject.cpp
+@@ -2,6 +2,25 @@
+ #include "trigger_helpers.h"
+ #include <algorithm>
+ using namespace OpenBlood2;
++PickupReport OpenBlood2::PlayPickupSound(HOBJECT source, std::string_view sound)
++{
++    PickupReport report;
++    report.sound = sound;
++    if (sound.empty())
++        return report;
++    if (g_pServerDE->GetObjectPos(source, &report.position) != DE_OK)
++    {
++        report.sound_error = "Pickup sound position unavailable";
++        return report;
++    }
++    SoundRequest request;
++    request.resource = sound;
++    request.inner_radius = 30;
++    request.outer_radius = 300;
++    request.priority = 2; // SOUNDPRIORITY_MISC_HIGH; original helper requests reverb.
++    report.voice = g_pServerDE->PlayDetachedSound(source, request, report.position, report.sound_error);
++    return report;
++}
+ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+ {
+     if (message == MID_PRECREATE)
+@@ -77,7 +96,9 @@ DDWORD PickupObject::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREA
+         g_pServerDE->SetObjectFlags(m_hObject,
+                                     g_pServerDE->GetObjectFlags(m_hObject) & ~FLAG_VISIBLE & ~FLAG_TOUCH_NOTIFY);
+         ++sound_requests;
+-        g_pServerDE->RecordPickup(m_hObject, value, pickup_sound);
++        auto report = PlayPickupSound(m_hObject, pickup_sound);
++        report.value = value;
++        g_pServerDE->RecordPickup(m_hObject, report);
+         if (!pickup_target.empty() && !pickup_command.empty())
+         {
+             auto target = g_pServerDE->CreateString(pickup_target.c_str());
+diff --git a/src/game/original/PickupObject.h b/src/game/original/PickupObject.h
+index 3c69db9..8020e34 100644
+--- a/src/game/original/PickupObject.h
++++ b/src/game/original/PickupObject.h
+@@ -1,6 +1,11 @@
+ #pragma once
+ #include "B2BaseClass.h"
+ #include <string>
++namespace OpenBlood2
++{
++    // Shared original PickupObject::PickedUp sound branch, also used by KeyPickup.
++    PickupReport PlayPickupSound(HOBJECT, std::string_view);
++} // namespace OpenBlood2
+ // Selected original single-player pickup rules; see docs/PICKUP_CONTRACTS.md.
+ class PickupObject : public B2BaseClass
+ {
+diff --git a/src/game/pickup_messages.h b/src/game/pickup_messages.h
+index 2c388c1..3c1bea3 100644
+--- a/src/game/pickup_messages.h
++++ b/src/game/pickup_messages.h
+@@ -1,5 +1,7 @@
+ #pragma once
++#include "engine/audio.h"
+ #include "game/legacy/basedefs_de.h"
++#include <optional>
+ #include <string>
+ #include <string_view>
+ namespace OpenBlood2
+@@ -28,8 +30,10 @@ namespace OpenBlood2
+     };
+     struct PickupReport
+     {
+-        std::string name, class_name, sound;
+-        PickupMessage value;
++        std::string name, class_name, sound, sound_error, key;
++        std::optional<PickupMessage> value;
++        DVector position{};
++        SoundId voice = 0;
+     };
+     bool split_spawn(std::string_view, std::string& class_name, std::string& properties);
+ } // namespace OpenBlood2
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 5ed6af4..d12a7f3 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -84,7 +84,7 @@ namespace OpenBlood2
+         PathMgr* ai_paths = nullptr;
+         bool ValidateSpawnObject(std::string_view) override;
+         void RecordSpawn(const SpawnReport&) override;
+-        void RecordPickup(HOBJECT, const PickupMessage&, std::string_view) override;
++        void RecordPickup(HOBJECT, const PickupReport&) override;
+         DRESULT WritePickupMessage(HMESSAGEWRITE, const PickupMessage&) override;
+         bool ReadPickupMessage(HMESSAGEREAD, PickupMessage&) override;
+         std::vector<SpawnReport> spawn_reports;
+diff --git a/src/game/server_pickups.cpp b/src/game/server_pickups.cpp
+index 985b219..f0b6752 100644
+--- a/src/game/server_pickups.cpp
++++ b/src/game/server_pickups.cpp
+@@ -42,7 +42,7 @@ namespace OpenBlood2
+         if (auto* r = objects_.get(report.child); r && !r->model_error.empty())
+             spawn_reports.back().outcome += ": " + r->model_error;
+     }
+-    void ServerAdapter::RecordPickup(HOBJECT h, const PickupMessage& value, std::string_view sound)
++    void ServerAdapter::RecordPickup(HOBJECT h, const PickupReport& report)
+     {
+         trace_service("RecordPickup");
+         auto* r = objects_.get(h);
+@@ -50,7 +50,9 @@ namespace OpenBlood2
+             return;
+         if (pickup_reports.size() == 32)
+             pickup_reports.erase(pickup_reports.begin());
+-        pickup_reports.push_back({r->state.m_Name, r->type->name, std::string(sound), value});
++        pickup_reports.push_back(report);
++        pickup_reports.back().name = r->state.m_Name;
++        pickup_reports.back().class_name = r->type->name;
+     }
+     DRESULT ServerAdapter::WritePickupMessage(HMESSAGEWRITE h, const PickupMessage& value)
+     {
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index f296a43..70ff3de 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -295,6 +295,18 @@ foreach(case IN ITEMS properties gravity friction impulses pushing player riders
+     set_tests_properties(pushables.${case} PROPERTIES LABELS "headless;pushables" TIMEOUT 30)
+ endforeach()
+ 
++add_executable(pickup_audio_tests pickup_audio_tests.cpp)
++target_link_libraries(pickup_audio_tests PRIVATE blood2_game)
++blood2_project_options(pickup_audio_tests)
++foreach(case IN ITEMS rules failures callbacks)
++    add_test(NAME pickup_audio.${case} COMMAND pickup_audio_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/pickup-audio-fixtures/${case}")
++    set_tests_properties(pickup_audio.${case} PROPERTIES LABELS "headless;pickups;audio" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME pickup_audio.private COMMAND pickup_audio_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(pickup_audio.private PROPERTIES LABELS "headless;private;pickups;audio" TIMEOUT 90)
++endif()
++
+ add_executable(pickup_tests pickup_tests.cpp)
+ target_link_libraries(pickup_tests PRIVATE blood2_game)
+ blood2_project_options(pickup_tests)
+diff --git a/tests/pickup_audio_tests.cpp b/tests/pickup_audio_tests.cpp
+new file mode 100644
+index 0000000..5215550
+--- /dev/null
++++ b/tests/pickup_audio_tests.cpp
+@@ -0,0 +1,229 @@
++#include "audio_fixture.h"
++#include "game/original/KeyPickup.h"
++#include "game/original/PickupObject.h"
++#include <functional>
++#include <set>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        CHECK(test_player::setup(g, root, true, true, true));
++        test_player::Directory dir;
++        auto& sounds = dir.children["sounds"].children["powerups"].files;
++        sounds["ammo1.wav"] = sounds["inventory1.wav"] = test_audio::wave(1, 16, 8000, 8000);
++        sounds["bad.wav"] = {1, 2, 3};
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, dir);
++        w.patch(131, off);
++        w.patch(135, size);
++        std::ofstream out(root / "audio.rez", std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        std::string error;
++        CHECK(g.resources.mount(root / "audio.rez", error) && g.enter_player(error));
++        g.server.audio.inspect_pcm = true;
++        return true;
++    }
++    HOBJECT create(GameSession& g, const char* type = "BulletAmmoPU", Properties props = {})
++    {
++        props.try_emplace("Name", std::string("collection"));
++        props.try_emplace("Pos", DVector{200, 10000, 200});
++        if (std::string_view(type) == "KeyPickup")
++        {
++            props["ObjectName"] = std::string("RedKey");
++            props["ModelFile"] = std::string("models/characters/caleb.abc");
++        }
++        return g.objects.create(g.objects.find_class(type), {}, Creation::World, props);
++    }
++    bool touch(GameSession& g, HOBJECT h)
++    {
++        return g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player);
++    }
++    bool voice(GameSession& g, const PickupReport& report)
++    {
++        const auto* v = g.server.audio.get(report.voice);
++        CHECK(report.sound_error.empty() && report.voice && v && v->clip->frames());
++        CHECK(v->request.resource == report.sound && v->request.space == SoundSpace::Spatial && !v->request.speaker &&
++              !v->request.loop && !v->request.streaming && v->request.volume == 1 && v->request.inner_radius == 30 &&
++              v->request.outer_radius == 300 && v->request.priority == 2 && v->request.reverb_requested &&
++              v->world_owned && v->auto_remove);
++        CHECK(v->position.x == report.position.x && v->position.y == report.position.y &&
++              v->position.z == report.position.z);
++        return true;
++    }
++    bool rules(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* p = g.server_shell.Player(g.local_client);
++        auto h = create(g);
++        CHECK(h);
++        p->m_InventoryMgr.SetAmmoCount(1, p->m_InventoryMgr.MaxAmmo(1));
++        CHECK(touch(g, h) && g.server.pickup_reports.empty() && g.server.audio.voices().empty());
++        p->m_InventoryMgr.SetAmmoCount(1, 0);
++        p->m_damage.m_bDead = true;
++        CHECK(touch(g, h) && g.server.pickup_reports.empty());
++        p->m_damage.m_bDead = false;
++        const auto pos = g.objects.get(h)->state.m_Pos;
++        CHECK(touch(g, h) && g.server.pickup_reports.size() == 1 && !g.server.IsObjectAlive(h));
++        const auto report = g.server.pickup_reports.back();
++        CHECK(report.name == "collection" && report.class_name == "BulletAmmoPU" && report.value &&
++              report.value->amount == 100 && report.key.empty() && report.position.y == pos.y && voice(g, report));
++        CHECK(!touch(g, h) && g.server.pickup_reports.size() == 1 && g.server.audio.voices().size() == 1);
++        CHECK(g.objects.finish_frame() && !g.objects.get(h) && g.server.audio.get(report.voice));
++        CHECK(g.server.advance_audio(.01, pos, {}) && g.server.audio.peak > 0);
++        CHECK(g.server.audio.get(report.voice)->cursor > 0);
++        auto key = create(g, "KeyPickup");
++        CHECK(key && touch(g, key) && !g.server.IsObjectAlive(key) && g.server.pickup_reports.size() == 2);
++        const auto& kr = g.server.pickup_reports.back();
++        CHECK(!kr.value && kr.key == "RedKey" && kr.sound == "sounds\\powerups\\inventory1.wav" && voice(g, kr));
++        CHECK(g.objects.remove(p->m_hObject) && g.objects.finish_frame());
++        CHECK(g.server.advance_audio(.02, pos, {}) && g.server.audio.get(report.voice));
++        CHECK(g.server.advance_audio(1, pos, {}) && g.server.audio.voices().empty());
++        CHECK(g.server.pickup_reports.size() == 2 && g.unload_world() && g.server.pickup_reports.empty() &&
++              g.server.audio.cached_clips() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* p = g.server_shell.Player(g.local_client);
++        for (const char* path : {"missing.wav", "sounds/powerups/bad.wav", ""})
++        {
++            auto h = create(g);
++            CHECK(h);
++            auto* item = dynamic_cast<PickupObject*>(g.objects.get(h)->game.get());
++            CHECK(item);
++            item->pickup_sound = path;
++            p->m_InventoryMgr.SetAmmoCount(1, 0);
++            CHECK(touch(g, h) && !g.server.IsObjectAlive(h) && p->m_InventoryMgr.GetAmmoCount(1) == 100);
++            const auto& r = g.server.pickup_reports.back();
++            CHECK(!r.voice && r.sound_error.empty() == (r.sound.empty()) && g.server.audio.voices().empty());
++        }
++        SoundRequest request;
++        request.resource = "sounds/powerups/ammo1.wav";
++        std::string error;
++        for (unsigned i = 0; i < 128; ++i)
++            CHECK(g.server.PlayDetachedSound(p->m_hObject, request, {}, error));
++        auto h = create(g);
++        p->m_InventoryMgr.SetAmmoCount(1, 0);
++        CHECK(h && touch(g, h) && !g.server.IsObjectAlive(h));
++        CHECK(!g.server.pickup_reports.back().voice && !g.server.pickup_reports.back().sound_error.empty());
++        CHECK(g.server.audio.voices().size() == 128 && g.server.advance_audio(1, {}, {}));
++        CHECK(g.server.audio.voices().empty());
++        for (unsigned i = 0; i < 35; ++i)
++        {
++            p->m_InventoryMgr.SetAmmoCount(1, 0);
++            h = create(g);
++            CHECK(h && touch(g, h) && voice(g, g.server.pickup_reports.back()) && g.objects.finish_frame());
++            CHECK(g.server.advance_audio(1, {}, {}) && g.server.audio.voices().empty());
++        }
++        CHECK(g.server.pickup_reports.size() == 32 && g.unload_world() && g.server.pickup_reports.empty());
++        return true;
++    }
++    struct Probe : BaseClass
++    {
++        std::function<void()> callback;
++        DDWORD ObjectMessageFn(HOBJECT, DDWORD id, HMESSAGEREAD) override
++        {
++            if (id == 1000 && callback)
++                callback();
++            return 1;
++        }
++    };
++    bool callbacks(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        const ClassInfo type{
++            "AudioPickupProbe", nullptr, []() -> std::unique_ptr<BaseClass> { return std::make_unique<Probe>(); }, {}};
++        CHECK(g.objects.register_class(type));
++        ObjectCreateStruct state;
++        SAFE_STRCPY(state.m_Name, "target");
++        auto ph = g.objects.create(&type, state);
++        CHECK(ph);
++        auto* probe = dynamic_cast<Probe*>(g.objects.get(ph)->game.get());
++        unsigned calls = 0;
++        bool ordered = false;
++        auto h = create(g, "BulletAmmoPU",
++                        {{"PickupTriggerTarget", std::string("target")}, {"PickupTriggerMessage", std::string("GET")}});
++        CHECK(h);
++        probe->callback = [&]
++        {
++            ++calls;
++            ordered = g.server.pickup_reports.size() == 1 && voice(g, g.server.pickup_reports.back()) &&
++                      !(g.objects.get(h)->state.m_Flags & (FLAG_VISIBLE | FLAG_TOUCH_NOTIFY));
++            g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player);
++            g.objects.remove(h);
++            g.objects.remove(g.client_shell.player);
++        };
++        CHECK(touch(g, h) && calls == 1 && ordered && g.server.pickup_reports.size() == 1);
++        const auto id = g.server.pickup_reports.back().voice;
++        CHECK(g.objects.finish_frame() && g.server.advance_audio(.05, {200, 0, 200}, {}) && g.server.audio.get(id));
++        CHECK(g.unload_world() && !g.server.audio.get(id) && !g.server.string_count() && !g.server.message_count());
++        return true;
++    }
++    bool private_data(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string error;
++        CHECK(g.initialize() && g.resources.mount_game(Config{root, "private"}, error));
++        CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++        g.server.audio.inspect_pcm = true;
++        auto* p = g.server_shell.Player(g.local_client);
++        std::set<std::string> sounds;
++        for (const char* type :
++             {"BulletAmmoPU",  "ShellAmmoPU",     "BMGAmmoPU",      "FlareAmmoPU",  "DieBugDieAmmoPU", "HowitzerAmmoPU",
++              "FuelAmmoPU",    "BatteryAmmoPU",   "HealthPU",       "MegaHealthPU", "WardPU",          "NecroWardPU",
++              "BerettaPU",     "SubMachineGunPU", "AssaultRiflePU", "FlareGunPU",   "MedKitPU",        "FlashlightPU",
++              "ProximitiesPU", "RemotesPU",       "KeyPickup"})
++        {
++            for (unsigned i = 1; i <= 8; ++i)
++                p->m_InventoryMgr.SetAmmoCount(i, 0);
++            p->m_damage.SetHitPoints(10);
++            p->m_damage.m_fArmorPoints = 0;
++            const auto count = g.server.pickup_reports.size();
++            auto h = create(g, type);
++            CHECK(h && g.objects.get(h)->model && touch(g, h));
++            CHECK(g.server.pickup_reports.size() == count + 1 && !g.server.IsObjectAlive(h));
++            const auto r = g.server.pickup_reports.back();
++            CHECK(voice(g, r));
++            std::string normalized;
++            CHECK(resource_path(r.sound, normalized));
++            sounds.insert(normalized);
++            CHECK(g.objects.finish_frame() && g.server.advance_audio(.02, r.position, {}) && g.server.audio.peak > 0);
++            const auto* v = g.server.audio.get(r.voice);
++            CHECK(v && v->cursor > 0);
++            std::cout << type << " -> " << r.sound << " frames=" << v->clip->frames() << " cursor=" << v->cursor
++                      << '\n';
++        }
++        CHECK(g.server.pickup_reports.size() == 21 && sounds.size() == 8);
++        CHECK(g.unload_world() && g.server.audio.voices().empty() && g.server.pickup_reports.empty());
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests = {
++        {"rules", rules}, {"failures", failures}, {"callbacks", callbacks}, {"private", private_data}};
++    const auto it = tests.find(argv[1]);
++    return it != tests.end() && it->second(argv[2]) ? 0 : 1;
++}

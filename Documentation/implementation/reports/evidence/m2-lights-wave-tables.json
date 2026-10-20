@@ -1,0 +1,35 @@
+{
+  "purpose": "Compare every numeric sample in the five original flicker/strobe arrays, independently of runtime golden samples",
+  "source": "sources/blood2/ClientShellDLL/LightFX.cpp",
+  "source_sha256": "ad0e75b3f16882b0a1b4fb65ddbfe11b2d8bce0ea84a60bb0c362e936ed887e5",
+  "target": "src/game/original/LightFX.cpp",
+  "target_sha256": "8c259862304808bfb93ad422f28dc0a0f53552a12a64b898265374146a1a4e03",
+  "checks": {
+    "flicker1": {
+      "source_samples": 64,
+      "target_samples": 64,
+      "identical": true
+    },
+    "flicker2": {
+      "source_samples": 64,
+      "target_samples": 64,
+      "identical": true
+    },
+    "flicker3": {
+      "source_samples": 64,
+      "target_samples": 64,
+      "identical": true
+    },
+    "flicker4": {
+      "source_samples": 128,
+      "target_samples": 128,
+      "identical": true
+    },
+    "strobe": {
+      "source_samples": 64,
+      "target_samples": 64,
+      "identical": true
+    }
+  },
+  "total_samples": 384
+}

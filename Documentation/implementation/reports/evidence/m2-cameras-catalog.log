@@ -1,0 +1,16 @@
+183/184 Testing: cameras.catalog
+183/184 Test: cameras.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"cameras.catalog" start time: Oct 15 23:43 CEST
+Output:
+----------------------------------------------------------
+worlds=57 CameraObj=61 created=61 rejected=0
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+<end of output>
+Test time =   5.17 sec
+----------------------------------------------------------
+Test Passed.
+"cameras.catalog" end time: Oct 15 23:43 CEST
+"cameras.catalog" time elapsed: 00:00:05
+----------------------------------------------------------

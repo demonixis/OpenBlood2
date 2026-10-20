@@ -1,0 +1,9 @@
+[0/2] Re-checking globbed directories...
+[1/30] Scanning /home/yann/projects/lithtech/Blood2/tests/player_voice_tests.cpp for CXX dependencies
+[2/30] Generating CXX dyndep file tests/CMakeFiles/player_voice_tests.dir/CXX.dd
+[3/30] Scanning /home/yann/projects/lithtech/Blood2/src/app/cinematic_smoke.cpp for CXX dependencies
+[4/30] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[5/9] Building CXX object CMakeFiles/blood2_app.dir/src/app/cinematic_smoke.cpp.o
+[6/9] Linking CXX executable blood2
+[7/9] Building CXX object tests/CMakeFiles/player_voice_tests.dir/player_voice_tests.cpp.o
+[8/9] Linking CXX executable tests/player_voice_tests

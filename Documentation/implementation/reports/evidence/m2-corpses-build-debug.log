@@ -1,0 +1,9 @@
+[0/2] Re-checking globbed directories...
+[1/39] Scanning /home/yann/projects/lithtech/Blood2/tests/corpse_tests.cpp for CXX dependencies
+[2/39] Generating CXX dyndep file tests/CMakeFiles/corpse_tests.dir/CXX.dd
+[3/39] Scanning /home/yann/projects/lithtech/Blood2/src/app/ai_model_key_smoke.cpp for CXX dependencies
+[4/39] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[5/9] Building CXX object CMakeFiles/blood2_app.dir/src/app/ai_model_key_smoke.cpp.o
+[6/9] Building CXX object tests/CMakeFiles/corpse_tests.dir/corpse_tests.cpp.o
+[7/9] Linking CXX executable tests/corpse_tests
+[8/9] Linking CXX executable blood2

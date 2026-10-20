@@ -1,0 +1,14 @@
+486/491 Testing: weapon_drops.guards
+486/491 Test: weapon_drops.guards
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon_drop_tests" "guards" "/home/yann/projects/lithtech/Blood2/build/release/tests/weapon-drop-fixtures/guards"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"weapon_drops.guards" start time: Oct 16 16:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_drops.guards" end time: Oct 16 16:07 CEST
+"weapon_drops.guards" time elapsed: 00:00:00
+----------------------------------------------------------

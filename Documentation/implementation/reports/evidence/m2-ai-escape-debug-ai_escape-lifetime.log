@@ -1,0 +1,14 @@
+457/458 Testing: ai_escape.lifetime
+457/458 Test: ai_escape.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_escape.lifetime" start time: Oct 16 14:25 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_escape.lifetime" end time: Oct 16 14:25 CEST
+"ai_escape.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

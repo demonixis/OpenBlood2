@@ -1,0 +1,1842 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index f28cb5e..0d0a565 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -186,3 +186,12 @@ SubwayA has 178 live-created entries, 4 transferred world sounds, 7 SelfTriggers
+ 185/188 before/after player entry, then 176/179 after nine Keys are consumed.
+ M2 remains incomplete; earlier DetailSprite omissions are superseded only for
+ this bounded subset.
++
++The latest [scene explosion evidence](../Documentation/Implementation/M2_SCENE_EXPLOSIONS.md) integrates original CClientExplosionSFX
++activation/removal and detached one-shot WAV playback. Read [scene explosion contracts](docs/SCENE_EXPLOSION_CONTRACTS.md).
++Preserve the original null-damager guard (zero deliveries), cached initial position,
++retrigger-before-update behavior and source-independent voice tails. Reports explicitly
++mark client FX unavailable; they are not successful FX services. SubwayA now has 187
++live-created entries, 4 transferred sounds, 372 editor-only and 17 unported, with no
++failures; runtime counts are 194/197 before/after player, then 185/188 after nine Keys.
++Required client FX, AI, ExitTrigger and other services keep M2 incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2c01c2f..fb21f1d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,7 +32,7 @@ add_library(blood2_game STATIC
+     src/game/session.cpp
+     src/game/registration.cpp
+     src/game/server_adapter.cpp)
+-target_sources(blood2_game PRIVATE src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp)
++target_sources(blood2_game PRIVATE src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/LightFX.cpp src/game/original/ClientLightFX.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+@@ -48,13 +48,13 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp)
++add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+ target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+ if(BLOOD2_INSPECTOR)
+-    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_cinematics.cpp src/app/inspector_random_sounds.cpp src/app/inspector_sprites.cpp src/app/inspector_world_sounds.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
++    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_cinematics.cpp src/app/inspector_random_sounds.cpp src/app/inspector_scene_explosions.cpp src/app/inspector_sprites.cpp src/app/inspector_world_sounds.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
+     target_link_libraries(blood2_app PRIVATE imgui)
+ endif()
+ 
+diff --git a/README.md b/README.md
+index 8b98466..75faf17 100644
+--- a/README.md
++++ b/README.md
+@@ -26,7 +26,7 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
+ ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
+ ```
+ 
+-The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **178 source entries** create, plus **4 transferred world sounds** and **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **26 unported runtime entries**, and zero failed. Runtime counts before/after player entry are **185/188**, then **176/179** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain historical load status. The [latest evidence](../Documentation/Implementation/M2_SPRITES.md) records these counts; earlier sections below are historical snapshots.
++The default world is `01_SubwayA`: 580 source objects and 116 BSP models. **187 source entries** create, plus **4 transferred world sounds** and **7 owned SelfTriggers**. There are **372 preprocessor-only entries**, **17 unported runtime entries**, and zero failed. Runtime counts before/after player entry are **194/197**, then **185/188** after the first update consumes nine Keys. Every source entry remains inspectable; consumed keys retain historical load status. The [latest evidence](../Documentation/Implementation/M2_SCENE_EXPLOSIONS.md) records these counts; earlier sections below are historical snapshots.
+ 
+ The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look, **E to USE** (one command per press). Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Session shows the original 82-unit USE ray and target; Doors also shows angular motion, the hinge and posed collision geometry. Brushes shows rotating/destructible geometry, angular ramps, blocking/rider counts, health gates, queued ON/OFF/TOGGLE/KILL and retained destruction requests. Inspector commands test the direct message path. Door audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. World textures and a complete game session remain unimplemented; cinematic, random-emitter and world-loop audio are covered by the later continuations below. Sprites shows original placement/repeats, manifest metadata and frame clocks, with a diagnostic overlay; DTX textures are indexed but not decoded.
+ 
+@@ -220,3 +220,15 @@ Use `--sprites-smoke --capture build/debug/sprites.png` with the configured exte
+ content root to verify the twelve authored sprites, hidden-inspector clocks and
+ unload/reload. SPR frames resolve exactly; DTX decoding and world rendering remain
+ unavailable. Full gameplay still exits with the explicit M2 gate failure.
++
++The latest [scene explosion evidence](../Documentation/Implementation/M2_SCENE_EXPLOSIONS.md) integrates original CClientExplosionSFX
++activation/removal and detached one-shot WAV playback. Read [scene explosion contracts](docs/SCENE_EXPLOSION_CONTRACTS.md).
++Preserve the original null-damager guard (zero deliveries), cached initial position,
++retrigger-before-update behavior and source-independent voice tails. Reports explicitly
++mark client FX unavailable; they are not successful FX services. SubwayA now has 187
++live-created entries, 4 transferred sounds, 372 editor-only and 17 unported, with no
++failures; runtime counts are 194/197 before/after player, then 185/188 after nine Keys.
++Required client FX, AI, ExitTrigger and other services keep M2 incomplete.
++
++Use `--scene-explosions-smoke --capture build/debug/scene-explosions.png` for the
++private GPU/audio check (SDL dummy output is used by CTest).
+diff --git a/docs/CONTAINER_CONTRACTS.md b/docs/CONTAINER_CONTRACTS.md
+index 68ef069..cedeede 100644
+--- a/docs/CONTAINER_CONTRACTS.md
++++ b/docs/CONTAINER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Container, liquid and ladder boundary
+ 
++> The [scene explosion continuation](SCENE_EXPLOSION_CONTRACTS.md#hot-query-allocation-adjustment)
++> reduces hot-query copying to fresh snapshots of bound containers. Order,
++> lifetime, membership and source physics rules are unchanged.
++
+ This extends [MOVEMENT_CONTRACTS.md](MOVEMENT_CONTRACTS.md) and
+ [LOCOMOTION_CONTRACTS.md](LOCOMOTION_CONTRACTS.md). Source selections are recorded
+ in [M2_CONTAINER_SOURCES.json](M2_CONTAINER_SOURCES.json); validation is in
+diff --git a/docs/EXPLOSION_CONTRACTS.md b/docs/EXPLOSION_CONTRACTS.md
+index f842390..00ddb9c 100644
+--- a/docs/EXPLOSION_CONTRACTS.md
++++ b/docs/EXPLOSION_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original brush explosions and debris requests
+ 
++> Extended by [scene explosion contracts](SCENE_EXPLOSION_CONTRACTS.md): original
++> CClientExplosionSFX activation/removal and detached audio, preserving its null
++> damager (zero delivered damage). Client FX and complete M2 remain unavailable.
++
+ > Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
+ > pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
+ 
+diff --git a/docs/M2_SCENE_EXPLOSION_SOURCES.json b/docs/M2_SCENE_EXPLOSION_SOURCES.json
+new file mode 100644
+index 0000000..40787d9
+--- /dev/null
++++ b/docs/M2_SCENE_EXPLOSION_SOURCES.json
+@@ -0,0 +1,102 @@
++{
++  "baseline_commit": "f2d86f74d3cdfd64a35374ce019f2c58048986ba",
++  "date": "2026-10-16",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/ClientExplosionSFX.cpp",
++      "sha256": "fc51674223cf67456341d4529bc93acbe8df9365a8730b0491c7e22803c85a09",
++      "selected_lines": [
++        [
++          17,
++          23
++        ],
++        [
++          282,
++          300
++        ],
++        [
++          303,
++          417
++        ]
++      ],
++      "use": "Authored registration, SetupFX, callbacks, properties and trigger; save/restore and programmatic effect builders omitted"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ClientExplosionSFX.h",
++      "sha256": "8cb7b9c2bae10a0250cb1a2728e2c1bc8884f642cb34e9e24c0aef3023600523",
++      "selected_lines": [
++        [
++          36,
++          53
++        ],
++        [
++          85,
++          103
++        ]
++      ],
++      "use": "Constructor/state and authored callback declarations"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ClientSFX.cpp",
++      "sha256": "6e3731e0371a886cb02a22ba7aa5145f67b47080ed74805150d09206d41b6d54",
++      "selected_lines": [
++        [
++          16,
++          50
++        ]
++      ],
++      "use": "Existing ancestry and FORCECLIENTUPDATE callback"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
++      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
++      "selected_lines": [
++        [
++          95,
++          125
++        ],
++        [
++          497,
++          591
++        ]
++      ],
++      "use": "Spatial sound descriptor and null-damager suppression in shared radius damage"
++    },
++    {
++      "path": "sources/blood2/Shared/SoundTypes.h",
++      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
++      "selected_lines": [
++        [
++          12,
++          24
++        ]
++      ],
++      "use": "MISC_HIGH=2"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
++      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
++      "selected_lines": [
++        [
++          178,
++          180
++        ]
++      ],
++      "use": "Default DAMAGE_TYPE_NORMAL for emitter radius call; null sender prevents delivery"
++    }
++  ],
++  "adaptations": [
++    "Owned strings and bounded typed properties, explicit restore rejection",
++    "Null-damager helper support preserves zero source damage; existing non-null delivery unchanged",
++    "World-owned auto-released one-shot WAV voices; dry replacement mixer",
++    "Durable unavailable client-FX reports and queued inspection; no successful FX stub",
++    "Fresh container-only ID snapshots reduce hot-query copying/lookup cost without changing order, lifetime or original rules"
++  ],
++  "omitted": [
++    "Client explosion recipes/particles/models/sprites/lights/rendering",
++    "Programmatic effect Setup overloads",
++    "Save/restore, precache, reverb, priority arbitration",
++    "Complete M2 acceptance and retail parity"
++  ],
++  "status": "M2 incomplete; authored server/audio subset; client explosion FX unavailable"
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 38ea620..b1820d3 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -403,3 +403,11 @@ properties, initialization and independent repeats. [Contracts](SPRITE_CONTRACTS
+ separate original rules from bounded ray/parser/clock adaptations. Later-generation
+ SPR references were consulted and checked against Blood II manifests; no donor
+ reader or DTX decoder was imported. Save/restore and sprite rendering remain open.
++
++## Scene explosion continuation
++
++[Original source hashes/selections](M2_SCENE_EXPLOSION_SOURCES.json) document
++CClientExplosionSFX's authored server path, shared null-damager guard and
++PlaySoundFromPos descriptor. [Contracts](SCENE_EXPLOSION_CONTRACTS.md) distinguish
++actual server/audio behavior from unavailable client FX. No donor backend,
++dependency or guessed gameplay correction was imported.
+diff --git a/docs/SCENE_EXPLOSION_CONTRACTS.md b/docs/SCENE_EXPLOSION_CONTRACTS.md
+new file mode 100644
+index 0000000..f5f4a5d
+--- /dev/null
++++ b/docs/SCENE_EXPLOSION_CONTRACTS.md
+@@ -0,0 +1,106 @@
++# Original scene explosion emitters
++
++M2 remains incomplete. This extends [object contracts](OBJECT_CONTRACTS.md),
++[brush explosion contracts](EXPLOSION_CONTRACTS.md) and [audio contracts](CINEMATIC_CONTRACTS.md).
++Read the [source ledger](M2_SCENE_EXPLOSION_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_SCENE_EXPLOSIONS.md).
++
++## Original behavior
++
++CClientExplosionSFX retains CClientSFX -> B2BaseClass ancestry and callback order.
++All precreate reasons read ExplosionType, Damage, DamageRadius, Direction and
++WaveFile. World/string/runtime properties are supplied by the typed registry;
++restore rejects. Signed ExplosionType converts to the original uint32 value.
++Direction remains unnormalized on the server. Damage/radius are finite and bounded
++in absolute value by 1,000,000; signed and zero values are retained. Initial update
++stores the initial position, sets SAVEABLE and schedules 0.1 seconds. Each update
++rearms 0.1 and removes a triggered emitter through deferred destruction.
++CClientSFX preserves FORCECLIENTUPDATE; original difficulty filtering runs last.
++SAVEABLE does not mean save/restore is implemented.
++
++MID_TRIGGER accepts case-insensitive whole-token TRIGGER only. It does not check
++the triggered bit before firing, so repeated messages before the next scheduled
++update repeat the effects and sound. Triggering does not restart that timer.
++Inactive objects still accept direct messages, but their update/removal waits for
++activation. The cached initial position stays the explosion origin even if a
++controller moves the emitter. Only the authored-world SetupFX path is imported;
++programmatic SetupModel/Sprite/Ring/Wave/Light/Frag and Setup overloads are absent.
++Strings and reports own their values, without legacy borrowed HSTRING storage.
++
++**The supplied original code passes NULL as the damage sender.** Its shared
++DamageObject immediately returns for a null sender. Thus these emitters deliver
++**zero damage**, even when Damage is nonzero and targets are inside DamageRadius.
++The call retains the header's default Normal damage type (no message reaches a target).
++The port preserves this rule, including squared-distance candidate/in-radius
++accounting, without inventing a non-null sender. The shared radius helper now
++accepts this original caller, reports null_damager separately from cancellation,
++and constructs no damage messages. Existing non-null brush explosions still
++apply the original falloff. The recorded counts distinguish candidates, in-radius
++targets, actual deliveries and cancellation. Nonpositive radii produce no traversal;
++malformed inputs reject, including underflow of a positive squared radius.
++This source observation has not been compared to the retail executable.
++
++## Sound lifetime and missing client FX
++
++The source PlaySoundFromPos request becomes a typed PlayDetachedSound call:
++fixed cached position, spatial, one shot, volume 100%, inner radius **100**, outer
++radius **1000**, priority **2** (MISC_HIGH) and reverb requested. WAV decoding,
++sample-count clocks and dry SDL output use the existing bounded mixer. Reverb and
++priority arbitration remain unavailable. Empty WaveFile means no sound; a missing
++or undecodable sound records an explicit failure while original triggering and
++scheduled removal still proceed. The default Sounds\exp_tnt.wav is actually
++missing from this installation; no alias is guessed.
++
++The new service requires a live source, no attachment, nonlooping spatial request,
++valid positions/radii and the existing voice/clip budgets. A started voice belongs
++to the world: emitter movement/removal does not relocate or kill it. Its owner token
++is provenance only and is never dereferenced. Completion automatically frees the
++voice, allowing later events to reuse the 128-voice capacity. Clips remain cached
++within existing budgets until unload. Existing source-owned cinematic/random
++voices and persistent world loops keep their distinct lifetime contracts. Unload
++clears all voices, caches and event records; stale IDs cannot address a new voice.
++
++The original client explosion packet is **not implemented**. Up to 32 owned
++SceneExplosionReports retain type, initial position/direction, configured damage,
++actual radius-delivery counters, sound ID and playback failure. They are explicitly
++unavailable client-FX requests, not successful service calls, simulated explosions,
++particles, dynamic flashes or rendered effects. A loaded emitter is a functional
++server/audio subset, not a completed explosion system. Required client FX keep M2
++open; no readiness gate is weakened by registering this class.
++
++## Inspection and verification
++
++The Explosions tab lists live hidden/inactive emitters and their scheduling,
++properties and commands, plus durable source dispositions and activation reports
++following removal. TRIGGER is queued at a frame boundary. Audio clocks and emitter
++updates run with the inspector hidden and in the inspector-free build. Decoded
++voices, frame submission and unavailable FX are labeled separately.
++
++Synthetic checks cover world/string/runtime properties, inherited flags/filtering,
++whole-token commands, repeated activation, cached position, exact removal timing,
++null-sender damage suppression and unchanged non-null damage, inactive/stale lifetime,
++missing sound, invalid properties, voice budgets/completion and unload.
++Private checks scan 57 readable worlds: 43 emitters, all accepted; 19 authored WAV
++references decode and 24 use the absent default. The six authored type IDs are
++1 (3), 2 (10), 3 (19), 6 (7), 8 (3) and 24 (1). 16_bridge retains its strict DAT
++reader rejection. Two SubwayA/player cycles verify all nine emitters, independent
++voices, removal and cleanup. The GPU scenario checks original activation/removal
++and dry SDL sample submission while hidden and after reload.
++
++SubwayA: 187 live-created source entries, 4 transferred world sounds, 372 editor-only,
++17 unported, zero failed; 7 SelfTriggers give 194/197 runtime instances before/after
++player entry, then 185/188 after nine Keys are consumed. Remaining sources are
++5 CivilianAI, 10 CultistAI, 1 Gideon and 1 ExitTrigger, in addition to required missing
++services. No retail parity, other-platform or XR claim is made.
++
++## Hot-query allocation adjustment
++
++The larger active scene exposed the existing 90-second weapons.private sanitizer
++limit. Container membership/physics queries now gather only object IDs with a bound
++container shape, rather than copying and looking up every unrelated object. This
++is a fresh per-call snapshot in the same slot order, with the same generation and
++life checks; there is no cached membership or new container index. New/removing
++volumes, four-body limits, hidden/head precedence and callback timing are unchanged.
++The general object snapshot still includes all objects. Existing membership,
++mutation/lifetime and full movement/weapon scenarios validate this optimization;
++the full sanitizer suite must pass without increasing the timeout.
+diff --git a/docs/WORLD_CONTRACTS.md b/docs/WORLD_CONTRACTS.md
+index 0c41b7e..550475e 100644
+--- a/docs/WORLD_CONTRACTS.md
++++ b/docs/WORLD_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Resource, World and Session Contracts
+ 
++> Extended by [scene explosion contracts](SCENE_EXPLOSION_CONTRACTS.md): original
++> CClientExplosionSFX activation/removal and detached audio, preserving its null
++> damager (zero delivered damage). Client FX and complete M2 remain unavailable.
++
+ The later [sprite contracts](SPRITE_CONTRACTS.md) add original DetailSprite,
+ strict SPR manifest/frame-reference binding and durable creation failures. DTX
+ pixels remain undecoded; the complete M2 gate stays open.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index f4ab4a6..769d6c9 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -78,6 +78,22 @@ namespace OpenBlood2
+ 
+     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
+     {
++        if (scene_explosion_request)
++        {
++            if (const auto* r = game.objects.get(scene_explosion_request);
++                r && r->life == Life::Alive && r->type->name == "CClientExplosionSFX")
++            {
++                auto s = game.server.CreateString("TRIGGER");
++                auto m = game.server.StartMessageToObject(nullptr, r->handle, 1000);
++                if (m)
++                {
++                    game.server.WriteToMessageHString(m, s);
++                    game.server.EndMessage(m);
++                }
++                game.server.FreeString(s);
++            }
++            scene_explosion_request = {};
++        }
+         if (random_sound_request)
+         {
+             if (const auto* r = game.objects.get(random_sound_request);
+@@ -585,6 +601,13 @@ namespace OpenBlood2
+                     draw_lights(game, selection);
+                     ImGui::EndTabItem();
+                 }
++                if (ImGui::BeginTabItem("Explosions", nullptr,
++                                        select_scene_explosions ? ImGuiTabItemFlags_SetSelected : 0))
++                {
++                    select_scene_explosions = false;
++                    draw_scene_explosions(game, selection);
++                    ImGui::EndTabItem();
++                }
+                 if (ImGui::BeginTabItem("Sprites", nullptr, select_sprites ? ImGuiTabItemFlags_SetSelected : 0))
+                 {
+                     select_sprites = false;
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 849e8aa..69d6f1a 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -21,6 +21,9 @@ namespace OpenBlood2
+         ObjectId trigger_selection{}, trigger_request{};
+         std::string trigger_command;
+         bool grant_key_request = false;
++        bool select_scene_explosions = false;
++        ObjectId scene_explosion_selection{}, scene_explosion_request{};
++        void draw_scene_explosions(GameSession&, ObjectSelection&);
+         bool select_sprites = false;
+         ObjectId sprite_selection{};
+         void draw_sprites(GameSession&, ObjectSelection&);
+diff --git a/src/app/inspector_scene_explosions.cpp b/src/app/inspector_scene_explosions.cpp
+new file mode 100644
+index 0000000..0fdcdf9
+--- /dev/null
++++ b/src/app/inspector_scene_explosions.cpp
+@@ -0,0 +1,87 @@
++#include "game/original/ClientExplosionSFX.h"
++#include "inspector.h"
++#include <imgui.h>
++namespace OpenBlood2
++{
++    void Inspector::draw_scene_explosions(GameSession& game, ObjectSelection& selection)
++    {
++        ImGui::TextWrapped(
++            "Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
++            "Spatial WAV playback is implemented; client explosion FX and their rendering are UNAVAILABLE.");
++        ImGui::Text("Audio: %s | active voices %zu | submitted frames %llu",
++                    game.server.audio.has_output() ? "SDL stream" : "offline clock", game.server.audio.voices().size(),
++                    (unsigned long long)game.server.audio.submitted_frames);
++        if (!game.server.audio.output_error.empty())
++            ImGui::TextWrapped("%s", game.server.audio.output_error.c_str());
++        if (ImGui::CollapsingHeader("Authored sources / failures / removed instances"))
++            for (size_t i = 0; i < game.entries.size(); ++i)
++                if (game.world.objects[i].class_name == "CClientExplosionSFX")
++                {
++                    const auto& e = game.entries[i];
++                    const auto* r = game.objects.get(e.object);
++                    ImGui::Text("Source %zu: %s / %s", i, entry_state_name(e.state),
++                                r ? life_name(r->life) : "no live instance");
++                    if (!e.detail.empty())
++                        ImGui::TextWrapped("%s", e.detail.c_str());
++                }
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* r = game.objects.get(id);
++            const auto* e = dynamic_cast<const CClientExplosionSFX*>(r->game.get());
++            if (!e)
++                continue;
++            ImGui::PushID(int(id.slot));
++            const auto label = std::string(r->state.m_Name) + " #" + std::to_string(id.slot);
++            if (ImGui::Selectable(label.c_str(), scene_explosion_selection == id))
++                scene_explosion_selection = selection.id = id;
++            if (scene_explosion_selection == id)
++            {
++                ImGui::Text("%s / %s / %s | scheduled %.3f s", life_name(r->life),
++                            r->activity == OBJSTATE_ACTIVE ? "active" : "inactive",
++                            r->state.m_Flags & FLAG_VISIBLE ? "visible" : "hidden",
++                            r->scheduled ? r->due - game.objects.time() : 0);
++                ImGui::Text("Initial position %.1f %.1f %.1f | direction %.1f %.1f %.1f", e->position.x, e->position.y,
++                            e->position.z, e->normal.x, e->normal.y, e->normal.z);
++                ImGui::Text("Type %u | configured damage %.1f / radius %.1f | delivered %u", e->type, e->damage,
++                            e->radius, e->targets.delivered);
++                ImGui::Text("Commands %llu / activations %llu | triggered %d", (unsigned long long)e->commands,
++                            (unsigned long long)e->activations, e->triggered);
++                ImGui::TextWrapped("Sound: %s [%s]", e->sound.empty() ? "none" : e->sound.c_str(),
++                                   game.resources.find(e->sound) ? "indexed" : "not indexed");
++                if (r->life == Life::Alive && ImGui::Button("TRIGGER"))
++                    scene_explosion_request = id;
++            }
++            ImGui::PopID();
++        }
++        ImGui::Separator();
++        ImGui::TextUnformatted("Last 32 activation reports (retained after emitter removal)");
++        for (size_t i = 0; i < game.server.scene_explosions.size(); ++i)
++        {
++            const auto& r = game.server.scene_explosions[i];
++            ImGui::PushID(int(i));
++            if (ImGui::TreeNodeEx(r.source.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
++            {
++                ImGui::Text("Type %u | position %.1f %.1f %.1f", r.type, r.position.x, r.position.y, r.position.z);
++                ImGui::Text("Configured %.1f / %.1f | candidates %u / in radius %u / delivered %u", r.damage, r.radius,
++                            r.targets.candidates, r.targets.in_radius, r.targets.delivered);
++                ImGui::Text("Null damager: %s | client FX unavailable",
++                            r.targets.null_damager ? "yes (original guard)" : "no");
++                if (const auto* v = game.server.audio.get(r.voice))
++                {
++                    ImGui::Text("Voice %llu: %.3f / %.3f s | %u Hz / %u channels", (unsigned long long)v->id,
++                                v->cursor / v->clip->rate, v->clip->duration(), v->clip->rate, v->clip->channels);
++                    ImGui::Text("Independent tail / dry 3D | radii %.0f / %.0f | L/R %.3f / %.3f",
++                                v->request.inner_radius, v->request.outer_radius, v->left, v->right);
++                }
++                else
++                    ImGui::Text("Voice: %s", r.voice           ? "completed or explicitly released"
++                                             : r.sound.empty() ? "no sound authored"
++                                                               : "start failed");
++                if (!r.sound_error.empty())
++                    ImGui::TextWrapped("%s", r.sound_error.c_str());
++                ImGui::TreePop();
++            }
++            ImGui::PopID();
++        }
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 5abe703..466b2eb 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -14,6 +14,7 @@
+ #include "objectives_smoke.h"
+ #include "pickup_smoke.h"
+ #include "random_sound_smoke.h"
++#include "scene_explosion_smoke.h"
+ #include "sprite_smoke.h"
+ #include "trigger_smoke.h"
+ #include "world_sound_smoke.h"
+@@ -74,12 +75,13 @@ namespace
+             spdlog::error("Original game boundary initialization failed");
+             return 4;
+         }
+-        if ((options.cinematics_smoke || options.world_sounds_smoke || options.random_sounds_smoke ||
+-             (!options.gpu_smoke && !options.world_smoke)) &&
++        if ((options.scene_explosions_smoke || options.cinematics_smoke || options.world_sounds_smoke ||
++             options.random_sounds_smoke || (!options.gpu_smoke && !options.world_smoke)) &&
+             !game.server.audio.open_output(error))
+         {
+             spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
+-            if (options.cinematics_smoke || options.world_sounds_smoke || options.random_sounds_smoke)
++            if (options.scene_explosions_smoke || options.cinematics_smoke || options.world_sounds_smoke ||
++                options.random_sounds_smoke)
+                 return 4;
+         }
+         HOBJECT key = nullptr;
+@@ -187,6 +189,10 @@ namespace
+                 return 4;
+             selection.id = smoke_camera;
+         }
++        OpenBlood2::ObjectId smoke_scene_explosion{};
++        bool scene_explosion_hidden = false;
++        if (options.scene_explosions_smoke && !OpenBlood2::prepare_scene_explosion_smoke(game, smoke_scene_explosion))
++            return 4;
+         OpenBlood2::ObjectId smoke_random_sound{};
+         bool random_sound_hidden = false, world_sound_hidden = false, sprite_hidden = false;
+         if (options.random_sounds_smoke)
+@@ -239,7 +245,7 @@ namespace
+                                    !options.pickups_smoke && !options.objectives_smoke && !options.cameras_smoke &&
+                                    !options.keyframes_smoke && !options.lights_smoke && !options.cinematics_smoke &&
+                                    !options.random_sounds_smoke && !options.world_sounds_smoke &&
+-                                   !options.sprites_smoke;
++                                   !options.sprites_smoke && !options.scene_explosions_smoke;
+         inspector.select_weapons = options.weapons_smoke;
+         inspector.select_movement = options.movement_smoke;
+         inspector.select_containers = options.containers_smoke;
+@@ -250,6 +256,8 @@ namespace
+         inspector.select_random_sounds = options.random_sounds_smoke;
+         inspector.select_world_sounds = options.world_sounds_smoke;
+         inspector.select_sprites = options.sprites_smoke;
++        inspector.select_scene_explosions = options.scene_explosions_smoke;
++        inspector.scene_explosion_selection = smoke_scene_explosion;
+         inspector.random_sound_selection = smoke_random_sound;
+         inspector.select_cinematics = options.cinematics_smoke;
+         inspector.cinematic_selection = smoke_cinematic;
+@@ -368,6 +376,12 @@ namespace
+             if (options.brushes_smoke && frames == reload_frame + 1)
+                 if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
+                     return 4;
++            if (options.scene_explosions_smoke && frames == reload_frame + 1)
++            {
++                if (!OpenBlood2::prepare_scene_explosion_smoke(game, smoke_scene_explosion) ||
++                    !OpenBlood2::activate_scene_explosion_smoke(game, smoke_scene_explosion) || !game.step(.11))
++                    return 4;
++            }
+             if (options.random_sounds_smoke && frames == reload_frame + 1 &&
+                 !OpenBlood2::prepare_random_sound_smoke(game, smoke_random_sound))
+                 return 4;
+@@ -506,8 +520,8 @@ namespace
+                            : (options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
+                               options.interaction_smoke || options.brushes_smoke || options.pickups_smoke ||
+                               options.objectives_smoke || options.cameras_smoke || options.keyframes_smoke ||
+-                              options.sprites_smoke || options.lights_smoke || options.cinematics_smoke ||
+-                              options.world_sounds_smoke || options.random_sounds_smoke)
++                              options.scene_explosions_smoke || options.sprites_smoke || options.lights_smoke ||
++                              options.cinematics_smoke || options.world_sounds_smoke || options.random_sounds_smoke)
+                                ? 14u
+                                : 2u) &&
+                 !captured && !options.capture_file.empty();
+@@ -654,6 +668,11 @@ namespace
+                     use.key.down = frames == hide_frame;
+                     event_ok = SDL_PushEvent(&use);
+                 }
++                if (options.scene_explosions_smoke && frames == hide_frame &&
++                    !OpenBlood2::activate_scene_explosion_smoke(game, smoke_scene_explosion))
++                    return 4;
++                if (options.scene_explosions_smoke && frames == show_frame - 1)
++                    scene_explosion_hidden = OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion);
+                 if (options.sprites_smoke && frames == show_frame - 1)
+                     sprite_hidden = OpenBlood2::check_sprite_smoke(game);
+                 if (options.world_sounds_smoke && frames == show_frame - 1)
+@@ -793,6 +812,8 @@ namespace
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
++                (options.scene_explosions_smoke &&
++                 (!scene_explosion_hidden || !OpenBlood2::check_scene_explosion_smoke(game, smoke_scene_explosion))) ||
+                 (options.sprites_smoke && (!sprite_hidden || !OpenBlood2::check_sprite_smoke(game))) ||
+                 (options.world_sounds_smoke && (!world_sound_hidden || !OpenBlood2::check_world_sound_smoke(game))) ||
+                 (options.random_sounds_smoke &&
+@@ -815,7 +836,8 @@ namespace
+                                           !game.server_shell.Player(game.local_client))) ||
+                 (options.world_smoke &&
+                  (!world_unloaded || !model_advanced_hidden || !game.preview_model || !game.server.collision_ready ||
+-                  game.world_path.empty() || game.objects.snapshot().size() != initial_objects ||
++                  game.world_path.empty() ||
++                  game.objects.snapshot().size() != initial_objects - (options.scene_explosions_smoke ? 1 : 0) ||
+                   game.server.string_count() != initial_strings)))
+             {
+                 spdlog::error("GPU smoke failed its render/toggle/resize/quit assertions");
+@@ -829,6 +851,9 @@ namespace
+             if (options.lights_smoke)
+                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
+                              "and after reload; evaluated radius/color checked; world illumination unavailable");
++            if (options.scene_explosions_smoke)
++                spdlog::info("SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "
++                             "audio verified hidden and after reload; client FX unavailable");
+             if (options.sprites_smoke)
+                 spdlog::info("SPRITES smoke: 12 original DetailSprites, SPR manifests, frame clocks, hidden UI and "
+                              "unload/reload verified; textures indexed, not rendered");
+@@ -927,6 +952,7 @@ int main(int argc, char** argv)
+                      "  --interaction-smoke GPU original USE and rotating door inspection\n"
+                      "  --pickups-smoke   GPU original ammo pickup, hidden collection and reload\n"
+                      "  --objectives-smoke GPU original objectives and localized text, hidden delivery/reload\n"
++                     "  --scene-explosions-smoke  GPU original emitter, detached audio and reload\n"
+                      "  --sprites-smoke    GPU original sprite placement, SPR clocks and reload\n"
+                      "  --random-sounds-smoke  GPU original random sound, PCM output and reload\n"
+                      "  --cinematics-smoke  GPU original cue, WAV mixing, SDL output and reload\n"
+diff --git a/src/app/scene_explosion_smoke.cpp b/src/app/scene_explosion_smoke.cpp
+new file mode 100644
+index 0000000..e890d41
+--- /dev/null
++++ b/src/app/scene_explosion_smoke.cpp
+@@ -0,0 +1,39 @@
++#include "scene_explosion_smoke.h"
++#include "game/original/ClientExplosionSFX.h"
++namespace OpenBlood2
++{
++    bool prepare_scene_explosion_smoke(GameSession& g, ObjectId& selected)
++    {
++        unsigned count = 0;
++        for (auto id : g.objects.snapshot())
++            if (dynamic_cast<CClientExplosionSFX*>(g.objects.get(id)->game.get()))
++            {
++                if (!count)
++                    selected = id;
++                ++count;
++            }
++        return count == 9;
++    }
++    bool activate_scene_explosion_smoke(GameSession& g, ObjectId selected)
++    {
++        const auto* r = g.objects.get(selected);
++        if (!r)
++            return false;
++        auto s = g.server.CreateString("TRIGGER");
++        auto m = g.server.StartMessageToObject(nullptr, r->handle, 1000);
++        const bool ok = m && g.server.WriteToMessageHString(m, s) == DE_OK && g.server.EndMessage(m) == DE_OK;
++        g.server.FreeString(s);
++        return ok;
++    }
++    bool check_scene_explosion_smoke(GameSession& g, ObjectId selected)
++    {
++        if (g.objects.get(selected) || g.server.scene_explosions.size() != 1)
++            return false;
++        const auto& report = g.server.scene_explosions.back();
++        const auto* v = g.server.audio.get(report.voice);
++        return report.targets.null_damager && !report.targets.cancelled && report.targets.delivered == 0 &&
++               !report.client_fx_available && report.sound_error.empty() && v && v->world_owned && v->auto_remove &&
++               v->cursor > 0 && v->clip->duration() > 0 && g.server.audio.has_output() &&
++               g.server.audio.submitted_frames > 0 && g.server.audio.output_error.empty();
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/scene_explosion_smoke.h b/src/app/scene_explosion_smoke.h
+new file mode 100644
+index 0000000..c7917b1
+--- /dev/null
++++ b/src/app/scene_explosion_smoke.h
+@@ -0,0 +1,8 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool prepare_scene_explosion_smoke(GameSession&, ObjectId&);
++    bool activate_scene_explosion_smoke(GameSession&, ObjectId);
++    bool check_scene_explosion_smoke(GameSession&, ObjectId);
++} // namespace OpenBlood2
+diff --git a/src/engine/audio.h b/src/engine/audio.h
+index 1f1f777..236b5a4 100644
+--- a/src/engine/audio.h
++++ b/src/engine/audio.h
+@@ -47,7 +47,8 @@ namespace OpenBlood2
+         double cursor = 0;
+         float left = 1, right = 1;
+         bool done = false, speaker_lost = false;
+-        bool world_owned = false; // Owner is provenance only for transferred, unattached loops.
++        bool world_owned = false; // Owner is provenance only for transferred, unattached sounds.
++        bool auto_remove = false; // Fire-and-forget one-shots release their voice on completion.
+         std::uint64_t loops = 0;
+     };
+     class AudioMixer
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index 33c1fce..2ce4863 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -125,6 +125,8 @@ namespace OpenBlood2
+                 options.player_smoke = true;
+                 options.containers_smoke = true;
+             }
++            else if (arg == "--scene-explosions-smoke")
++                options.world_smoke = options.player_smoke = options.scene_explosions_smoke = true;
+             else if (arg == "--sprites-smoke")
+                 options.world_smoke = options.player_smoke = options.sprites_smoke = true;
+             else if (arg == "--world-sounds-smoke")
+@@ -236,7 +238,7 @@ namespace OpenBlood2
+                 int(options.brushes_smoke) + int(options.pickups_smoke) + int(options.objectives_smoke) +
+                 int(options.cameras_smoke) + int(options.keyframes_smoke) + int(options.lights_smoke) +
+                 int(options.cinematics_smoke) + int(options.random_sounds_smoke) + int(options.world_sounds_smoke) +
+-                int(options.sprites_smoke) >
++                int(options.sprites_smoke) + int(options.scene_explosions_smoke) >
+             1)
+         {
+             error = "Choose one player smoke scenario";
+diff --git a/src/engine/config.h b/src/engine/config.h
+index e011d8e..d5e9e2b 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -24,7 +24,8 @@ namespace OpenBlood2
+         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
+              interaction_smoke = false, brushes_smoke = false, pickups_smoke = false, objectives_smoke = false,
+              cameras_smoke = false, keyframes_smoke = false, worldpaths_smoke = false, lights_smoke = false,
+-             cinematics_smoke = false, random_sounds_smoke = false, world_sounds_smoke = false, sprites_smoke = false;
++             cinematics_smoke = false, random_sounds_smoke = false, world_sounds_smoke = false, sprites_smoke = false,
++             scene_explosions_smoke = false;
+         bool start_game = false;
+         bool explicit_config = false;
+         bool help = false;
+diff --git a/src/engine/objects.cpp b/src/engine/objects.cpp
+index f5a1bc1..7cb7ed0 100644
+--- a/src/engine/objects.cpp
++++ b/src/engine/objects.cpp
+@@ -558,6 +558,17 @@ namespace OpenBlood2
+                 ids.push_back(slot.object->id);
+         return ids;
+     }
++    std::vector<ObjectId> Objects::container_snapshot() const
++    {
++        // Same checked identities and slot order as snapshot(), freshly gathered
++        // for each query. Unrelated effects need no copied ID or subsequent lookup.
++        std::vector<ObjectId> ids;
++        ids.reserve(std::min<std::size_t>(8, slots_.size()));
++        for (const auto& slot : slots_)
++            if (slot.object && slot.object->container)
++                ids.push_back(slot.object->id);
++        return ids;
++    }
+     HOBJECT Objects::next_alive(HOBJECT previous) const
+     {
+         std::size_t begin = 0;
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index bc895c4..919a70f 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -159,6 +159,7 @@ namespace OpenBlood2
+         const ObjectRecord* get(ObjectId id) const;
+         HOBJECT handle_of(const BaseClass* instance) const;
+         std::vector<ObjectId> snapshot() const;
++        std::vector<ObjectId> container_snapshot() const;
+         HOBJECT next_alive(HOBJECT previous) const;
+         const PropertyValue* property(std::string_view name) const;
+         bool link(HOBJECT owner, HOBJECT target);
+diff --git a/src/game/brush_messages.h b/src/game/brush_messages.h
+index 562cf45..fc71315 100644
+--- a/src/game/brush_messages.h
++++ b/src/game/brush_messages.h
+@@ -15,6 +15,18 @@ namespace OpenBlood2
+     {
+         unsigned candidates = 0, in_radius = 0, delivered = 0;
+         bool cancelled = false;
++        bool null_damager = false; // Original DamageObject guard suppresses delivery.
++    };
++    struct SceneExplosionReport
++    {
++        std::string source, sound, sound_error;
++        DVector position{}, normal{};
++        DDWORD type = 0;
++        float damage = 0, radius = 0;
++        RadiusDamageReport targets;
++        std::uint64_t voice = 0;
++        // These requests cannot yet be consumed by the original client FX manager.
++        bool client_fx_available = false;
+     };
+     struct DebrisEffect
+     {
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index c33d9ba..096eaf8 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -33,6 +33,7 @@ class ServerDE : public CSBase
+ {
+   public:
+     virtual OpenBlood2::SoundId PlayCinematicSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
++    virtual OpenBlood2::SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
+     virtual OpenBlood2::SoundId PlaySoundAt(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) = 0;
+     virtual OpenBlood2::SoundId PlayWorldSound(HOBJECT, const OpenBlood2::SoundRequest&, bool file_stream,
+                                                std::string&) = 0;
+@@ -50,6 +51,7 @@ class ServerDE : public CSBase
+     virtual bool SetBlockingPriority(HOBJECT, DBYTE) = 0;
+     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
++    virtual void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) = 0;
+     virtual void RecordExplosionEffect(const OpenBlood2::ExplosionEffect&) = 0;
+     virtual DRESULT WriteKeyMessage(HMESSAGEWRITE, const OpenBlood2::KeyMessage&) = 0;
+     virtual bool ReadKeyMessage(HMESSAGEREAD, OpenBlood2::KeyMessage&) = 0;
+diff --git a/src/game/original/ClientExplosionSFX.cpp b/src/game/original/ClientExplosionSFX.cpp
+new file mode 100644
+index 0000000..907f56c
+--- /dev/null
++++ b/src/game/original/ClientExplosionSFX.cpp
+@@ -0,0 +1,93 @@
++// Selected ObjectDLL/ClientExplosionSFX.cpp; see SCENE_EXPLOSION_CONTRACTS.md.
++#include "ClientExplosionSFX.h"
++#include "engine/collision.h"
++#include "radius_damage.h"
++#include <cmath>
++using namespace OpenBlood2;
++bool CClientExplosionSFX::ReadProp()
++{
++    GenericProp prop;
++    if (g_pServerDE->GetPropGeneric("ExplosionType", &prop) == DE_OK)
++        type = static_cast<DDWORD>(prop.m_Long);
++    g_pServerDE->GetPropReal("Damage", &damage);
++    g_pServerDE->GetPropReal("DamageRadius", &radius);
++    g_pServerDE->GetPropVector("Direction", &normal);
++    char text[MAX_CS_FILENAME_LEN]{};
++    g_pServerDE->GetPropString("WaveFile", text, sizeof(text));
++    sound = text;
++    return physics_vector(normal) && std::isfinite(damage) && std::abs(damage) <= 1e6f && std::isfinite(radius) &&
++           std::abs(radius) <= 1e6f;
++}
++DDWORD CClientExplosionSFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (!g_pServerDE)
++        return 0;
++    if (message == MID_PRECREATE)
++    {
++        // Source reads properties for every creation reason, unlike most B2 classes.
++        if (!data || reason == 3 || !ReadProp())
++            return 0;
++    }
++    else if (message == MID_INITIALUPDATE)
++    {
++        g_pServerDE->SetNextUpdate(m_hObject, .1f);
++        g_pServerDE->GetObjectPos(m_hObject, &position);
++        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | 8u);
++    }
++    else if (message == MID_UPDATE)
++    {
++        g_pServerDE->SetNextUpdate(m_hObject, .1f);
++        if (triggered)
++            g_pServerDE->RemoveObject(m_hObject);
++    }
++    return CClientSFX::EngineMessageFn(message, data, reason);
++}
++DDWORD CClientExplosionSFX::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    if (message == 1000)
++    {
++        ++commands;
++        const auto text = g_pServerDE->ReadFromMessageHString(read);
++        const auto expected = g_pServerDE->CreateString("TRIGGER");
++        const bool activate = text && g_pServerDE->CompareStringsUpper(text, expected);
++        g_pServerDE->FreeString(text);
++        g_pServerDE->FreeString(expected);
++        if (activate)
++        {
++            SetupFX();
++            triggered = true; // Source allows another trigger until its scheduled removal.
++        }
++    }
++    return CClientSFX::ObjectMessageFn(sender, message, read);
++}
++void CClientExplosionSFX::SetupFX()
++{
++    ++activations;
++    SceneExplosionReport report;
++    report.source = g_pServerDE->GetObjectName(m_hObject);
++    report.position = position; // Initial position, not the later moved object's position.
++    report.normal = normal;     // Source sends the authored vector without server normalization.
++    report.type = type;
++    report.damage = damage;
++    report.radius = radius;
++    report.sound = sound;
++    // IMPORTANT: the source passes NULL, so DamageObject's null-damager guard
++    // suppresses every delivery. Do not silently "repair" this gameplay behavior.
++    targets = DamageObjectsInRadius(m_hObject, nullptr, position, radius, damage, DamageType::Normal);
++    report.targets = targets;
++    voice = 0;
++    sound_error.clear();
++    if (!sound.empty())
++    {
++        SoundRequest request;
++        request.resource = sound;
++        request.inner_radius = 100;
++        request.outer_radius = 1000;
++        request.priority = 2; // SOUNDPRIORITY_MISC_HIGH.
++        voice = g_pServerDE->PlayDetachedSound(m_hObject, request, position, sound_error);
++    }
++    report.voice = voice;
++    report.sound_error = sound_error;
++    // Durable inspection only: no successful client-FX service is claimed.
++    g_pServerDE->RecordSceneExplosion(report);
++}
+diff --git a/src/game/original/ClientExplosionSFX.h b/src/game/original/ClientExplosionSFX.h
+new file mode 100644
+index 0000000..f5e0b92
+--- /dev/null
++++ b/src/game/original/ClientExplosionSFX.h
+@@ -0,0 +1,25 @@
++#pragma once
++#include "ClientSFX.h"
++#include "game/brush_messages.h"
++// Original authored explosion emitter. Client FX rendering remains unavailable.
++class CClientExplosionSFX : public CClientSFX
++{
++  public:
++    DVector position{}, normal{};
++    float damage = 0, radius = 0;
++    DDWORD type = 0;
++    std::string sound;
++    bool triggered = false;
++    std::uint64_t commands = 0, activations = 0;
++    OpenBlood2::RadiusDamageReport targets;
++    std::uint64_t voice = 0;
++    std::string sound_error;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++
++  private:
++    bool ReadProp();
++    void SetupFX();
++};
+diff --git a/src/game/original/radius_damage.cpp b/src/game/original/radius_damage.cpp
+index 6711940..62b5d7b 100644
+--- a/src/game/original/radius_damage.cpp
++++ b/src/game/original/radius_damage.cpp
+@@ -9,13 +9,16 @@ OpenBlood2::RadiusDamageReport DamageObjectsInRadius(HOBJECT responsible, LPBASE
+     using namespace OpenBlood2;
+     RadiusDamageReport report;
+     auto* server = BaseClass::GetServerDE();
+-    if (!server || !damager || damager->m_hObject != responsible || !server->IsObjectAlive(responsible) ||
+-        !physics_vector(origin) || !std::isfinite(radius) || radius <= 0 || radius > 1e6f || !std::isfinite(damage) ||
+-        damage < 0 || damage > 1e6f)
++    report.null_damager = damager == nullptr;
++    if (!server || (damager && damager->m_hObject != responsible) || !server->IsObjectAlive(responsible) ||
++        !physics_vector(origin) || !std::isfinite(radius) || std::abs(radius) > 1e6f || (damager && radius <= 0) ||
++        !std::isfinite(damage) || std::abs(damage) > 1e6f || (damager && damage < 0))
+     {
+         report.cancelled = true;
+         return report;
+     }
++    if (radius <= 0)
++        return report; // Original radius guard, including null-damager calls.
+     // Snapshot original list order before callbacks. A death relay can remove
+     // later targets or spawn aggregates; neither invalidates this traversal.
+     std::vector<HOBJECT> targets;
+@@ -51,6 +54,8 @@ OpenBlood2::RadiusDamageReport DamageObjectsInRadius(HOBJECT responsible, LPBASE
+             continue;
+         const auto amount = distance < half ? damage : damage - (distance - half) / half * damage;
+         ++report.in_radius;
++        if (!damager)
++            continue; // Original DamageObject returns before constructing a message.
+         auto message = server->StartMessageToObject(damager, target, damage_message);
+         if (!message)
+         {
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index b937bae..7e64fea 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -3,6 +3,7 @@
+ #include "game/original/CameraObj.h"
+ #include "game/original/CameraSpot.h"
+ #include "game/original/CinematicTrigger.h"
++#include "game/original/ClientExplosionSFX.h"
+ #include "game/original/ClientLightFX.h"
+ #include "game/original/DetailSprite.h"
+ #include "game/original/Door.h"
+@@ -140,6 +141,14 @@ namespace OpenBlood2
+                                    {"StartActive", false},
+                                    {"Looping", false}}};
+         const ClassInfo client_sfx{"CClientSFX", &b2base, construct<CClientSFX>, {}};
++        const ClassInfo scene_explosion{"CClientExplosionSFX",
++                                        &client_sfx,
++                                        construct<CClientExplosionSFX>,
++                                        {{"ExplosionType", std::int32_t(0)},
++                                         {"Damage", 50.0f},
++                                         {"DamageRadius", 200.0f},
++                                         {"Direction", DVector{0, 1, 0}},
++                                         {"WaveFile", std::string("Sounds\\exp_tnt.wav")}}};
+         const ClassInfo client_light{"ClientLightFX", &client_sfx, construct<ClientLightFX>, []
+                                      {
+                                          std::vector<PropertySpec> p{{"HitPoints", 1.0f},
+@@ -563,18 +572,18 @@ namespace OpenBlood2
+     bool register_original_classes(Objects& objects)
+     {
+         return objects.register_class(base) && objects.register_class(b2base) && objects.register_class(camera) &&
+-               objects.register_class(client_sfx) && objects.register_class(client_light) &&
+-               objects.register_class(light_SquareWaveLightFX) && objects.register_class(light_SawWaveLightFX) &&
+-               objects.register_class(light_RampUpWaveLightFX) && objects.register_class(light_RampDownWaveLightFX) &&
+-               objects.register_class(light_SineWaveLightFX) && objects.register_class(light_Flicker1WaveLightFX) &&
+-               objects.register_class(light_Flicker2WaveLightFX) && objects.register_class(light_Flicker3WaveLightFX) &&
+-               objects.register_class(light_Flicker4WaveLightFX) && objects.register_class(light_StrobeWaveLightFX) &&
+-               objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
+-               objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
+-               objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
+-               objects.register_class(detail_sprite) && objects.register_class(sound) &&
+-               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
+-               objects.register_class(game_start) && objects.register_class(path) &&
++               objects.register_class(client_sfx) && objects.register_class(scene_explosion) &&
++               objects.register_class(client_light) && objects.register_class(light_SquareWaveLightFX) &&
++               objects.register_class(light_SawWaveLightFX) && objects.register_class(light_RampUpWaveLightFX) &&
++               objects.register_class(light_RampDownWaveLightFX) && objects.register_class(light_SineWaveLightFX) &&
++               objects.register_class(light_Flicker1WaveLightFX) && objects.register_class(light_Flicker2WaveLightFX) &&
++               objects.register_class(light_Flicker3WaveLightFX) && objects.register_class(light_Flicker4WaveLightFX) &&
++               objects.register_class(light_StrobeWaveLightFX) && objects.register_class(light_SearchWaveLightFX) &&
++               objects.register_class(light_FlickerLight) && objects.register_class(light_GlowingLight) &&
++               objects.register_class(camera_object) && objects.register_class(cinematic_trigger) &&
++               objects.register_class(random_sound) && objects.register_class(detail_sprite) &&
++               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
++               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
+                objects.register_class(world_properties) && objects.register_class(smell) &&
+                objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
+                objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 4d7f462..6c7fa45 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -33,6 +33,7 @@ namespace OpenBlood2
+       public:
+         AudioMixer audio;
+         SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
++        SoundId PlayDetachedSound(HOBJECT, const OpenBlood2::SoundRequest&, DVector, std::string&) override;
+         SoundId PlaySoundAt(HOBJECT, const SoundRequest&, DVector, std::string&) override;
+         SoundId PlayWorldSound(HOBJECT, const SoundRequest&, bool file_stream, std::string&) override;
+         bool RandomInt(int, int, int&) override;
+@@ -56,9 +57,11 @@ namespace OpenBlood2
+         bool SetBlockingPriority(HOBJECT, DBYTE) override;
+         void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE) override;
+         void RecordDebrisEffect(const DebrisEffect&) override;
++        void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) override;
+         void RecordExplosionEffect(const ExplosionEffect&) override;
+         std::vector<DebrisEffect> debris_effects;
+         std::vector<ExplosionEffect> explosion_effects;
++        std::vector<SceneExplosionReport> scene_explosions;
+         std::vector<BrushDestruction> brush_destructions; // Latest 32, reset on unload.
+         DRESULT WriteKeyMessage(HMESSAGEWRITE, const KeyMessage&) override;
+         bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
+@@ -78,6 +81,7 @@ namespace OpenBlood2
+             brush_destructions.clear();
+             debris_effects.clear();
+             explosion_effects.clear();
++            scene_explosions.clear();
+             spawn_reports.clear();
+             pickup_reports.clear();
+             camera_effects.clear();
+diff --git a/src/game/server_audio.cpp b/src/game/server_audio.cpp
+index 9ad10cf..a2437ca 100644
+--- a/src/game/server_audio.cpp
++++ b/src/game/server_audio.cpp
+@@ -26,6 +26,20 @@ namespace OpenBlood2
+         }
+         return audio.play(*client_resources, owner, request, position, error);
+     }
++    SoundId ServerAdapter::PlayDetachedSound(HOBJECT source, const SoundRequest& request, DVector position,
++                                             std::string& error)
++    {
++        trace_service("PlayDetachedSound");
++        if (request.loop || request.space != SoundSpace::Spatial)
++        {
++            error = "Detached sound requires a non-looping spatial request";
++            return 0;
++        }
++        const auto id = PlaySoundAt(source, request, position, error);
++        if (auto* voice = audio.get(id))
++            voice->world_owned = voice->auto_remove = true;
++        return id;
++    }
+     SoundId ServerAdapter::PlayWorldSound(HOBJECT source, const SoundRequest& request, bool file_stream,
+                                           std::string& error)
+     {
+@@ -91,6 +105,13 @@ namespace OpenBlood2
+         }
+         for (auto id : removed)
+             audio.kill(id);
+-        return audio.advance(seconds, listener, rotation);
++        const bool ok = audio.advance(seconds, listener, rotation);
++        removed.clear();
++        for (const auto& [id, entry] : audio.voices())
++            if (entry.auto_remove && entry.done)
++                removed.push_back(id);
++        for (auto id : removed)
++            audio.kill(id);
++        return ok;
+     }
+ } // namespace OpenBlood2
+diff --git a/src/game/server_containers.cpp b/src/game/server_containers.cpp
+index f5b0c75..3a22998 100644
+--- a/src/game/server_containers.cpp
++++ b/src/game/server_containers.cpp
+@@ -13,7 +13,7 @@ namespace OpenBlood2
+         if (!body || body->life != Life::Alive || !physics_vector(head))
+             return false;
+         bool head_found = false;
+-        for (auto id : objects_.snapshot())
++        for (auto id : objects_.container_snapshot())
+         {
+             const auto* r = objects_.get(id);
+             if (!r || r->life != Life::Alive || !r->container)
+@@ -44,7 +44,7 @@ namespace OpenBlood2
+         auto* body = objects_.get(object);
+         if (!body || body->life != Life::Alive)
+             return false;
+-        for (auto id : objects_.snapshot())
++        for (auto id : objects_.container_snapshot())
+         {
+             auto* r = objects_.get(id);
+             if (!r || r->life != Life::Alive || !r->container ||
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index df40fcf..5bce25e 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -4,6 +4,16 @@ namespace OpenBlood2
+ {
+     // These copied, bounded records expose pending client FX/audio. They do not
+     // enqueue gameplay and never retain a pointer into an original object.
++    void ServerAdapter::RecordSceneExplosion(const SceneExplosionReport& effect)
++    {
++        trace_service("RecordSceneExplosion");
++        if (!physics_vector(effect.position) || !physics_vector(effect.normal) || !std::isfinite(effect.damage) ||
++            !std::isfinite(effect.radius) || effect.source.size() > 100 || effect.sound.size() > 100)
++            return;
++        if (scene_explosions.size() == 32)
++            scene_explosions.erase(scene_explosions.begin());
++        scene_explosions.push_back(effect);
++    }
+     void ServerAdapter::RecordDebrisEffect(const DebrisEffect& effect)
+     {
+         trace_service("RecordDebrisEffect");
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index eb3a54e..38ded11 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -453,3 +453,23 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --sprites-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/sprites.png")
+     set_tests_properties(gpu.sprites PROPERTIES LABELS "private;gpu;sprites" TIMEOUT 30 RUN_SERIAL TRUE)
+ endif()
++
++add_executable(scene_explosion_tests scene_explosion_tests.cpp)
++target_link_libraries(scene_explosion_tests PRIVATE blood2_game)
++blood2_project_options(scene_explosion_tests)
++foreach(case properties commands damage lifetime failures budget)
++    add_test(NAME sceneexplosion.${case} COMMAND scene_explosion_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/scene-explosion-fixtures/${case}")
++    set_tests_properties(sceneexplosion.${case} PROPERTIES LABELS "headless;sceneexplosion" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case catalog subway)
++        add_test(NAME sceneexplosion.${case} COMMAND scene_explosion_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(sceneexplosion.${case} PROPERTIES LABELS "headless;private;sceneexplosion" TIMEOUT 90)
++    endforeach()
++endif()
++
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.sceneexplosion COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --scene-explosions-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/scene-explosions.png")
++    set_tests_properties(gpu.sceneexplosion PROPERTIES LABELS "private;gpu;sceneexplosion" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
++endif()
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index 22fb437..86a5c7b 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -393,9 +393,9 @@ namespace
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+             ++entries[e.state];
+-        CHECK(entries[EntryState::Created] == 178 && entries[EntryState::EditorOnly] == 372 &&
+-              entries[EntryState::Unsupported] == 26 && entries[EntryState::Failed] == 0 &&
+-              g.objects.snapshot().size() == 185);
++        CHECK(entries[EntryState::Created] == 187 && entries[EntryState::EditorOnly] == 372 &&
++              entries[EntryState::Unsupported] == 17 && entries[EntryState::Failed] == 0 &&
++              g.objects.snapshot().size() == 194);
+         std::cout << "Subway instances=" << g.objects.snapshot().size() << "\n";
+         for (auto [state, n] : entries)
+             std::cout << "state=" << int(state) << " count=" << n << '\n';
+diff --git a/tests/camera_tests.cpp b/tests/camera_tests.cpp
+index 0a0b5f0..ce89ddf 100644
+--- a/tests/camera_tests.cpp
++++ b/tests/camera_tests.cpp
+@@ -291,7 +291,7 @@ namespace
+         CHECK(worlds == 57 && entries == 61 && created == 61 && rejected == 0);
+         CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+         CHECK(CameraObj::m_dwNumCameras == 2 && g.server.camera_effects.size() == 2 &&
+-              g.objects.snapshot().size() == 188);
++              g.objects.snapshot().size() == 197);
+         CHECK(test_camera::complete_subway_intro(g));
+         for (auto id : g.objects.snapshot())
+             if (auto* r = g.objects.get(id); r && dynamic_cast<CameraObj*>(r->game.get()))
+diff --git a/tests/cinematic_tests.cpp b/tests/cinematic_tests.cpp
+index 358990e..2900c00 100644
+--- a/tests/cinematic_tests.cpp
++++ b/tests/cinematic_tests.cpp
+@@ -338,9 +338,9 @@ namespace
+             std::map<EntryState, unsigned> counts;
+             for (const auto& e : g.entries)
+                 ++counts[e.state];
+-            CHECK(counts[EntryState::Created] == 178 && counts[EntryState::EditorOnly] == 372 &&
+-                  counts[EntryState::Unsupported] == 26 && counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 185 && g.enter_player(error) && g.objects.snapshot().size() == 188);
++            CHECK(counts[EntryState::Created] == 187 && counts[EntryState::EditorOnly] == 372 &&
++                  counts[EntryState::Unsupported] == 17 && counts[EntryState::Failed] == 0);
++            CHECK(g.objects.snapshot().size() == 194 && g.enter_player(error) && g.objects.snapshot().size() == 197);
+             HOBJECT target = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (std::string_view(g.objects.get(id)->state.m_Name) == "cintrig1")
+@@ -359,7 +359,7 @@ namespace
+             for (unsigned i = 0; i < 6; ++i)
+                 CHECK(g.step(1.0 / 60));
+             v = g.server.audio.get(id);
+-            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 179);
++            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 188);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_clips() && !g.server.audio.get(id) && !g.server.message_count() &&
+                   !g.server.list_count() && !g.server.string_count());
+diff --git a/tests/explosion_tests.cpp b/tests/explosion_tests.cpp
+index a38e0b6..14144b2 100644
+--- a/tests/explosion_tests.cpp
++++ b/tests/explosion_tests.cpp
+@@ -280,7 +280,9 @@ namespace
+         for (float radius : {0.0f, -1.0f, 1e-30f, 1e7f, std::numeric_limits<float>::infinity()})
+             CHECK(DamageObjectsInRadius(b->m_hObject, b, {}, radius, 10, DamageType::Explode).cancelled);
+         CHECK(DamageObjectsInRadius(b->m_hObject, b, {}, 200, -1, DamageType::Explode).cancelled);
+-        CHECK(DamageObjectsInRadius(b->m_hObject, nullptr, {}, 200, 1, DamageType::Explode).cancelled);
++        const auto suppressed = DamageObjectsInRadius(b->m_hObject, nullptr, {}, 200, 1, DamageType::Explode);
++        CHECK(suppressed.null_damager && !suppressed.cancelled && suppressed.candidates == 1 &&
++              suppressed.in_radius == 1 && suppressed.delivered == 0);
+         for (int i = 0; i < 40; ++i)
+             b->debris.Create({}, 0);
+         CHECK(g.server.explosion_effects.size() == 32 && g.server.debris_effects.empty());
+diff --git a/tests/keyframer_tests.cpp b/tests/keyframer_tests.cpp
+index 78b4478..7d53816 100644
+--- a/tests/keyframer_tests.cpp
++++ b/tests/keyframer_tests.cpp
+@@ -361,14 +361,14 @@ namespace
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+             const float entered = g.server.GetTime();
+-            CHECK(g.objects.snapshot().size() == 188);
++            CHECK(g.objects.snapshot().size() == 197);
+             auto* list = g.server.FindNamedObjects("tracking1");
+             CHECK(list && list->m_pFirstLink);
+             auto h = list->m_pFirstLink->m_hObject;
+             g.server.RelinquishList(list);
+             auto* f = framer(g, h);
+             CHECK(g.step(1.0 / 60) && f->keys.size() == 2 && f->targets.size() == 1 && f->active && f->time == 0);
+-            CHECK(g.objects.snapshot().size() == 179);
++            CHECK(g.objects.snapshot().size() == 188);
+             auto camera = f->targets[0].object;
+             auto start = g.objects.get(camera)->state.m_Pos;
+             CHECK(g.step(1.0 / 60) && f->targets[0].moves == 1 && f->processed == 1 && f->unresolved_messages == 1);
+diff --git a/tests/light_tests.cpp b/tests/light_tests.cpp
+index 56fdf4c..bc1309c 100644
+--- a/tests/light_tests.cpp
++++ b/tests/light_tests.cpp
+@@ -350,8 +350,8 @@ namespace
+         for (int cycle = 0; cycle < 2; ++cycle)
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+-            CHECK(g.objects.snapshot().size() == 188 && g.server.light_effects.size() == 12);
+-            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 179);
++            CHECK(g.objects.snapshot().size() == 197 && g.server.light_effects.size() == 12);
++            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 188);
+             KeyFramer* path = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (auto* f = dynamic_cast<KeyFramer*>(g.objects.get(id)->game.get());
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index 28dad19..0f98ded 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -204,14 +204,14 @@ namespace
+             CHECK(player);
+             CHECK(game.objects.get(player->m_hObject)->model->animations.size() == 86);
+             CHECK(game.objects.snapshot().size() ==
+-                  188); // 178 source instances + 7 door children + player + muzzle light + scent.
++                  197); // 187 source instances + 7 door children + player + muzzle light + scent.
+             CHECK(game.client_shell.position.x == -32 && game.client_shell.position.z == -3224);
+             CHECK(std::abs(game.client_shell.position.y - 170) < .01f);
+             for (int frame = 0; frame < 120; ++frame)
+                 CHECK(game.step(1.0 / 60.0));
+             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
+             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
+-            CHECK(!game.run_world(error) && error.find("26 uninstantiated") != std::string::npos);
++            CHECK(!game.run_world(error) && error.find("17 uninstantiated") != std::string::npos);
+             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
+                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
+                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()
+diff --git a/tests/random_sound_tests.cpp b/tests/random_sound_tests.cpp
+index 7a1d404..986c360 100644
+--- a/tests/random_sound_tests.cpp
++++ b/tests/random_sound_tests.cpp
+@@ -318,9 +318,9 @@ namespace
+             std::map<EntryState, unsigned> counts;
+             for (const auto& e : g.entries)
+                 ++counts[e.state];
+-            CHECK(counts[EntryState::Created] == 178 && counts[EntryState::Unsupported] == 26 &&
++            CHECK(counts[EntryState::Created] == 187 && counts[EntryState::Unsupported] == 17 &&
+                   counts[EntryState::EditorOnly] == 372 && !counts[EntryState::Failed]);
+-            CHECK(g.objects.snapshot().size() == 185 && g.enter_player(error) && g.objects.snapshot().size() == 188);
++            CHECK(g.objects.snapshot().size() == 194 && g.enter_player(error) && g.objects.snapshot().size() == 197);
+             std::vector<HOBJECT> targets;
+             for (auto id : g.objects.snapshot())
+                 if (dynamic_cast<RandomSoundFX*>(g.objects.get(id)->game.get()))
+@@ -346,7 +346,7 @@ namespace
+                 std::cout << "cycle=" << cycle << " name=" << g.objects.get(h)->state.m_Name
+                           << " sound=" << v->request.resource << '\n';
+             }
+-            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 179);
++            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 188);
+             CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips() &&
+                   !g.server.audio.get(last) && g.objects.snapshot().empty() && !g.server.message_count() &&
+                   !g.server.string_count() && !g.server.list_count());
+diff --git a/tests/scene_explosion_tests.cpp b/tests/scene_explosion_tests.cpp
+new file mode 100644
+index 0000000..c217fbb
+--- /dev/null
++++ b/tests/scene_explosion_tests.cpp
+@@ -0,0 +1,356 @@
++#include "audio_fixture.h"
++#include "game/original/ClientExplosionSFX.h"
++#include "game/original/Destructable.h"
++#include "game/original/radius_damage.h"
++#include <cmath>
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    CClientExplosionSFX* make(GameSession& g, Properties props = {}, Creation reason = Creation::World)
++    {
++        auto h = g.objects.create(g.objects.find_class("CClientExplosionSFX"), {}, reason, props);
++        return h ? dynamic_cast<CClientExplosionSFX*>(g.server.HandleToObject(h)) : nullptr;
++    }
++    bool command(GameSession& g, HOBJECT target, const char* text)
++    {
++        auto* from = g.server.HandleToObject(target);
++        auto s = g.server.CreateString(text);
++        auto m = g.server.StartMessageToObject(from, target, 1000);
++        const auto written = g.server.WriteToMessageHString(m, s);
++        g.server.FreeString(s);
++        return written == DE_OK && g.server.EndMessage(m) == DE_OK;
++    }
++    struct Target : BaseClass
++    {
++        CDestructable damage;
++        unsigned hits = 0;
++        Target()
++        {
++            AddAggregate(&damage);
++        }
++        DDWORD EngineMessageFn(DDWORD m, void* data, float reason) override
++        {
++            if (m == MID_INITIALUPDATE)
++            {
++                damage.Init(m_hObject);
++                damage.SetHitPoints(1000);
++            }
++            return BaseClass::EngineMessageFn(m, data, reason);
++        }
++        DDWORD ObjectMessageFn(HOBJECT from, DDWORD m, HMESSAGEREAD read) override
++        {
++            if (m == damage_message)
++                ++hits;
++            return BaseClass::ObjectMessageFn(from, m, read);
++        }
++    };
++    Target* target(GameSession& g, DVector p)
++    {
++        static ClassInfo type{"SceneExplosionTarget",
++                              nullptr,
++                              []() -> std::unique_ptr<BaseClass> { return std::make_unique<Target>(); },
++                              {}};
++        if (!g.objects.find_class(type.name))
++        {
++            type.parent = g.objects.find_class("BaseClass");
++            if (!g.objects.register_class(type))
++                return nullptr;
++        }
++        ObjectCreateStruct c;
++        c.m_Pos = p;
++        return dynamic_cast<Target*>(g.server.HandleToObject(g.objects.create(&type, c)));
++    }
++    bool properties(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        for (auto reason : {Creation::Runtime, Creation::World, Creation::String})
++        {
++            auto* e = make(g, {}, reason);
++            CHECK(e && e->damage == 50 && e->radius == 200 && e->type == 0 && e->normal.y == 1 &&
++                  e->sound == "Sounds\\exp_tnt.wav");
++            auto* r = g.objects.get(e->m_hObject);
++            CHECK(r->scheduled && std::abs(r->due - g.objects.time() - .1) < 1e-6 &&
++                  r->state.m_Flags & FLAG_FORCECLIENTUPDATE && r->state.m_UserData == 0);
++            CHECK(g.server.GetObjectUserFlags(e->m_hObject) & 8u);
++        }
++        auto* e = make(g, {{"Name", std::string("authored")},
++                           {"Pos", DVector{1, 2, 3}},
++                           {"Damage", -5.f},
++                           {"DamageRadius", -10.f},
++                           {"Direction", DVector{0, 7, 0}},
++                           {"ExplosionType", std::int32_t(-1)},
++                           {"WaveFile", std::string{}}});
++        CHECK(e && e->position.x == 1 && e->normal.y == 7 && e->type == 0xffffffffu && e->damage == -5 &&
++              e->radius == -10);
++        CHECK(command(g, e->m_hObject, "TRIGGER") && e->targets.null_damager && !e->targets.cancelled && !e->voice);
++        CHECK(!g.objects.create(g.objects.find_class("CClientExplosionSFX"), {}, Creation::Restore));
++        auto filtered = make(g, {{"DifficultyMed", false}});
++        CHECK(filtered && filtered->filtered && g.objects.get(filtered->m_hObject)->life == Life::Pending);
++        CHECK(g.objects.finish_frame());
++        return true;
++    }
++    bool commands(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto* e = make(g, {{"Pos", DVector{10, 20, 30}}, {"WaveFile", std::string("long.wav")}});
++        CHECK(e);
++        auto h = e->m_hObject;
++        auto due = g.objects.get(h)->due;
++        for (const auto* t : {"ON", "TRIGGERextra", " TRIGGER", "TRIGGER "})
++            CHECK(command(g, h, t));
++        CHECK(e->commands == 4 && e->activations == 0 && !e->triggered && g.server.scene_explosions.empty());
++        CHECK(g.step(.06));
++        DVector moved{500, 30, 700};
++        CHECK(g.server.TeleportObject(h, &moved) == DE_OK);
++        CHECK(command(g, h, "tRiGgEr") && command(g, h, "TRIGGER"));
++        CHECK(e->activations == 2 && g.server.scene_explosions.size() == 2 && g.server.audio.voices().size() == 2);
++        CHECK(g.objects.get(h)->due == due && e->position.x == 10);
++        for (const auto& [id, v] : g.server.audio.voices())
++            CHECK(v.position.x == 10 && v.request.inner_radius == 100 && v.request.outer_radius == 1000 &&
++                  v.request.priority == 2 && v.world_owned && v.auto_remove && !v.request.loop &&
++                  v.request.reverb_requested);
++        CHECK(g.step(.039) && g.objects.get(h));
++        CHECK(g.step(.002) && !g.objects.get(h));
++        CHECK(g.server.scene_explosions.size() == 2 && g.server.audio.voices().size() == 2 &&
++              g.server.string_count() == 0 && g.server.message_count() == 0);
++        CHECK(g.step(1) && g.server.audio.voices().empty());
++        CHECK(g.unload_world() && g.server.scene_explosions.empty() && g.server.audio.cached_bytes() == 0);
++        return true;
++    }
++    bool damage(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto* e = make(g, {{"Pos", DVector{0, 100, 0}}, {"WaveFile", std::string{}}});
++        auto* a = target(g, {0, 100, 0});
++        auto* b = target(g, {150, 100, 0});
++        auto* edge = target(g, {200, 100, 0});
++        auto* far = target(g, {201, 100, 0});
++        CHECK(e && a && b && edge && far && command(g, e->m_hObject, "TRIGGER"));
++        CHECK(e->targets.null_damager && !e->targets.cancelled && e->targets.candidates == 4 &&
++              e->targets.in_radius == 3 && e->targets.delivered == 0);
++        for (auto* t : {a, b, edge, far})
++            CHECK(t->hits == 0 && t->damage.m_fHitPoints == 1000);
++        // Existing non-null brush/weapon rule must still deliver the same original falloff.
++        auto r = DamageObjectsInRadius(e->m_hObject, e, {0, 100, 0}, 200, 100, DamageType::Explode);
++        CHECK(!r.null_damager && !r.cancelled && r.delivered == 3 && a->damage.m_fHitPoints == 900 &&
++              b->damage.m_fHitPoints == 912.5f && edge->hits == 1 && far->hits == 0);
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto* e = make(g, {{"WaveFile", std::string("long.wav")}});
++        CHECK(e);
++        auto h = e->m_hObject;
++        g.server.SetObjectState(h, OBJSTATE_INACTIVE);
++        CHECK(command(g, h, "TRIGGER"));
++        CHECK(g.step(.2) && g.objects.get(h)); // Inactive scheduling pauses, direct messages still work.
++        auto voice = e->voice;
++        ObjectSelection selection{g.objects.get(h)->id};
++        std::weak_ptr<const AudioClip> clip = g.server.audio.get(voice)->clip;
++        CHECK(g.objects.remove(h));
++        CHECK(!g.server.IsObjectAlive(h));
++        CHECK(g.step(.1));
++        selection.refresh(g.objects);
++        CHECK(!selection.id && g.server.audio.get(voice) && g.server.audio.get(voice)->cursor > 0);
++        CHECK(!g.server.HandleToObject(h));
++        CHECK(g.unload_world() && clip.expired() && !g.server.audio.get(voice) && g.server.string_count() == 0 &&
++              CDestructable::m_dwNumDestructables == 0);
++        auto* next = make(g, {{"WaveFile", std::string("cue.wav")}});
++        CHECK(next && next->m_hObject != h);
++        CHECK(command(g, next->m_hObject, "TRIGGER") && next->voice != voice);
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        for (const char* key : {"Damage", "DamageRadius"})
++            for (float value :
++                 {std::numeric_limits<float>::infinity(), std::numeric_limits<float>::quiet_NaN(), 1.1e6f})
++                CHECK(!make(g, {{key, value}}));
++        CHECK(!make(g, {{"Direction", DVector{1.1e7f, 0, 0}}}));
++        CHECK(!make(g, {{"WaveFile", std::string(101, 'x')}}));
++        auto* e = make(g, {{"WaveFile", std::string("missing.wav")}});
++        CHECK(e && command(g, e->m_hObject, "TRIGGER"));
++        CHECK(!e->voice && !e->sound_error.empty() && e->triggered &&
++              !g.server.scene_explosions.back().client_fx_available);
++        CHECK(g.step(.11) && g.server.audio.voices().empty() && !g.server.scene_explosions.back().sound_error.empty());
++        auto* empty = make(g, {{"WaveFile", std::string{}}});
++        CHECK(empty && command(g, empty->m_hObject, "TRIGGER") && !empty->voice && empty->sound_error.empty());
++        return true;
++    }
++    bool budget(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto* e = make(g, {{"WaveFile", std::string("cue.wav")}});
++        CHECK(e);
++        for (unsigned i = 0; i < 128; ++i)
++            CHECK(command(g, e->m_hObject, "TRIGGER") && e->voice);
++        CHECK(g.server.audio.voices().size() == 128 && g.server.scene_explosions.size() == 32);
++        CHECK(command(g, e->m_hObject, "TRIGGER") && !e->voice && !e->sound_error.empty());
++        CHECK(g.server.advance_audio(.11, {}, {}) && g.server.audio.voices().empty());
++        CHECK(command(g, e->m_hObject, "TRIGGER") && e->voice); // Completed one-shots free capacity.
++        SoundRequest q;
++        q.resource = "cue.wav";
++        std::string error;
++        auto h = e->m_hObject;
++        q.loop = true;
++        CHECK(!g.server.PlayDetachedSound(h, q, {}, error));
++        q.loop = false;
++        q.space = SoundSpace::Ambient;
++        CHECK(!g.server.PlayDetachedSound(h, q, {}, error));
++        q.space = SoundSpace::Spatial;
++        q.speaker = h;
++        CHECK(!g.server.PlayDetachedSound(h, q, {}, error));
++        q.speaker = nullptr;
++        CHECK(g.objects.remove(h) && !g.server.PlayDetachedSound(h, q, {}, error));
++        CHECK(g.objects.finish_frame() && !g.server.PlayDetachedSound(h, q, {}, error));
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        unsigned worlds = 0, count = 0, rejected = 0, accepted = 0, sounds = 0, missing = 0;
++        std::map<DDWORD, unsigned> types;
++        for (const auto& [path, res] : g.resources.index())
++        {
++            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
++                continue;
++            std::vector<uint8_t> b;
++            World w;
++            CHECK(g.resources.read(path, b, error));
++            if (!read_world(b, w, error))
++            {
++                CHECK(path == "worlds/16_bridge.dat");
++                continue;
++            }
++            ++worlds;
++            for (const auto& o : w.objects)
++                if (o.class_name == "CClientExplosionSFX")
++                {
++                    ++count;
++                    Properties p;
++                    for (const auto& v : o.properties)
++                        p.emplace(v.name, v.value);
++                    auto* e = make(g, p);
++                    if (!e)
++                    {
++                        ++rejected;
++                        std::cout << path << " rejected " << g.objects.diagnostics().back() << '\n';
++                        CHECK(g.objects.finish_frame());
++                        continue;
++                    }
++                    ++accepted;
++                    ++types[e->type];
++                    CHECK(command(g, e->m_hObject, "TRIGGER"));
++                    CHECK(e->targets.null_damager && e->targets.delivered == 0 && !e->targets.cancelled);
++                    if (!e->sound.empty())
++                    {
++                        if (e->voice)
++                            ++sounds;
++                        else
++                            ++missing;
++                    }
++                    std::cout << path << " name=" << g.server.GetObjectName(e->m_hObject) << " type=" << e->type
++                              << " damage=" << e->damage << " radius=" << e->radius << " normal=" << e->normal.x << ','
++                              << e->normal.y << ',' << e->normal.z << " sound=" << e->sound
++                              << " voice=" << (e->voice ? "decoded" : "absent") << '\n';
++                    CHECK(g.objects.remove(e->m_hObject) && g.objects.finish_frame());
++                    g.server.audio.clear();
++                }
++        }
++        std::cout << "worlds=" << worlds << " sources=" << count << " accepted=" << accepted << " rejected=" << rejected
++                  << " decoded=" << sounds << " missing=" << missing << '\n';
++        for (const auto& [id, n] : types)
++            std::cout << "type=" << id << " count=" << n << '\n';
++        CHECK(worlds == 57 && count == 43 && accepted == 43 && rejected == 0 && sounds == 19 && missing == 24);
++        const std::map<DDWORD, unsigned> expected{{1, 3}, {2, 10}, {3, 19}, {6, 7}, {8, 3}, {24, 1}};
++        CHECK(types == expected);
++        return true;
++    }
++    bool subway(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error));
++            std::map<EntryState, unsigned> counts;
++            unsigned n = 0;
++            for (size_t i = 0; i < g.entries.size(); ++i)
++            {
++                const auto& e = g.entries[i];
++                ++counts[e.state];
++                if (g.world.objects[i].class_name != "CClientExplosionSFX")
++                    continue;
++                ++n;
++                CHECK(e.state == EntryState::Created);
++            }
++            CHECK(n == 9 && counts[EntryState::Created] == 187 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::EditorOnly] == 372 && counts[EntryState::Unsupported] == 17 &&
++                  counts[EntryState::Failed] == 0);
++            CHECK(g.objects.snapshot().size() == 194 && g.enter_player(error) && g.objects.snapshot().size() == 197 &&
++                  g.step(.02));
++            CHECK(g.objects.snapshot().size() == 188);
++            auto* player = g.server_shell.Player(g.local_client);
++            CHECK(player);
++            auto health = player->m_damage.m_fHitPoints;
++            std::vector<HOBJECT> emitted;
++            for (auto id : g.objects.snapshot())
++            {
++                auto* r = g.objects.get(id);
++                auto* e = dynamic_cast<CClientExplosionSFX*>(r->game.get());
++                if (!e)
++                    continue;
++                emitted.push_back(r->handle);
++                CHECK(command(g, r->handle, "TRIGGER") && e->voice && e->targets.delivered == 0);
++            }
++            CHECK(g.server.scene_explosions.size() == 9 && player->m_damage.m_fHitPoints == health && g.step(.11));
++            for (auto h : emitted)
++                CHECK(!g.objects.get(h));
++            CHECK(!g.run_world(error) && error.find("17 uninstantiated") != std::string::npos);
++            CHECK(g.unload_world() && g.server.scene_explosions.empty() && g.server.audio.voices().empty() &&
++                  g.server.string_count() == 0 && g.server.message_count() == 0 && g.server.list_count() == 0);
++            std::cout << "cycle=" << cycle
++                      << " nine original emitters, null-damager suppression, decoded audio, removal and shell unload "
++                         "verified\n";
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"properties", properties}, {"commands", commands}, {"damage", damage},   {"lifetime", lifetime},
++        {"failures", failures},     {"budget", budget},     {"catalog", catalog}, {"subway", subway}};
++    auto i = cases.find(argv[1]);
++    return i != cases.end() && i->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/services_tests.cpp b/tests/services_tests.cpp
+index 25bbf95..3110d3d 100644
+--- a/tests/services_tests.cpp
++++ b/tests/services_tests.cpp
+@@ -2,6 +2,7 @@
+ #include "game/original/WorldProperties.h"
+ #include "game/server_adapter.h"
+ #include "model_fixture.h"
++#include <algorithm>
+ #include <bit>
+ #include <fstream>
+ #include <functional>
+@@ -355,7 +356,16 @@ namespace
+             game.server.SetModelAnimation(h, i);
+             game.server.ResetModelAnimation(h);
+             game.server.SetModelLooping(h, DFALSE);
+-            CHECK(game.step(same->animations[i].duration / 1000.0 + .001));
++            // The loaded world now includes authored emitters overlapping conveyors.
++            // Preserve the entire clip/session duration while respecting the existing
++            // 0.5-second physics catch-up bound; do not raise the engine limit.
++            double remaining = same->animations[i].duration / 1000.0 + .001;
++            while (remaining > 0)
++            {
++                const double step = std::min(remaining, .5);
++                CHECK(game.step(step));
++                remaining -= step;
++            }
+             CHECK(game.server.GetModelPlaybackState(h) == MS_PLAYDONE);
+             CHECK(sample_pose(*same, i, same->animations[i].duration / 2.0, pose) && pose.size() == 20);
+             std::vector<DVector> vertices;
+diff --git a/tests/sound_tests.cpp b/tests/sound_tests.cpp
+index d0b3d49..5c6b768 100644
+--- a/tests/sound_tests.cpp
++++ b/tests/sound_tests.cpp
+@@ -349,12 +349,12 @@ namespace
+                     CHECK(v->clip->rate == 22050 && v->clip->frames() == 198623 && v->clip->channels == 1);
+                 }
+             }
+-            CHECK(ids.size() == 4 && counts[EntryState::Created] == 178 && counts[EntryState::WorldSound] == 4 &&
+-                  counts[EntryState::Unsupported] == 26 && counts[EntryState::EditorOnly] == 372 &&
++            CHECK(ids.size() == 4 && counts[EntryState::Created] == 187 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::Unsupported] == 17 && counts[EntryState::EditorOnly] == 372 &&
+                   !counts[EntryState::Failed]);
+-            CHECK(g.objects.snapshot().size() == 185 && g.server.audio.voices().size() == 4 &&
++            CHECK(g.objects.snapshot().size() == 194 && g.server.audio.voices().size() == 4 &&
+                   g.server.audio.cached_clips() == 1);
+-            CHECK(g.enter_player(error) && g.objects.snapshot().size() == 188 && g.step(1.0 / 60));
++            CHECK(g.enter_player(error) && g.objects.snapshot().size() == 197 && g.step(1.0 / 60));
+             // Advance actual sample clocks across a full retail clip without adding unrelated physics work.
+             CHECK(g.server.advance_audio(20, {}, {}));
+             for (auto id : ids)
+@@ -366,7 +366,7 @@ namespace
+             const auto pos = g.server.audio.get(ids.front())->position;
+             CHECK(g.server.advance_audio(.02, pos, {}) && g.server.audio.peak > 0 &&
+                   g.server.audio.mixed_frames == 960);
+-            CHECK(!g.run_world(error) && error.find("26") != std::string::npos);
++            CHECK(!g.run_world(error) && error.find("17 uninstantiated") != std::string::npos);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_clips());
+             for (auto id : ids)
+diff --git a/tests/sprite_tests.cpp b/tests/sprite_tests.cpp
+index 6934754..4731d0b 100644
+--- a/tests/sprite_tests.cpp
++++ b/tests/sprite_tests.cpp
+@@ -380,10 +380,10 @@ namespace
+                       !r->sprite->translucent);
+                 weak = r->sprite;
+             }
+-            CHECK(sprites == 12 && counts[EntryState::Created] == 178 && counts[EntryState::WorldSound] == 4 &&
+-                  counts[EntryState::Unsupported] == 26 && counts[EntryState::EditorOnly] == 372 &&
++            CHECK(sprites == 12 && counts[EntryState::Created] == 187 && counts[EntryState::WorldSound] == 4 &&
++                  counts[EntryState::Unsupported] == 17 && counts[EntryState::EditorOnly] == 372 &&
+                   counts[EntryState::Failed] == 0);
+-            CHECK(g.objects.snapshot().size() == 185 && g.enter_player(error) && g.objects.snapshot().size() == 188 &&
++            CHECK(g.objects.snapshot().size() == 194 && g.enter_player(error) && g.objects.snapshot().size() == 197 &&
+                   g.step(.02));
+             for (auto id : g.objects.snapshot())
+             {
+@@ -391,13 +391,13 @@ namespace
+                 if (r->sprite)
+                     CHECK(r->sprite_track.frame == 0 && std::abs(r->sprite_track.milliseconds - 20) < 1e-6);
+             }
+-            CHECK(g.objects.snapshot().size() == 179 && !g.run_world(error) &&
+-                  error.find("26 uninstantiated") != std::string::npos);
++            CHECK(g.objects.snapshot().size() == 188 && !g.run_world(error) &&
++                  error.find("17 uninstantiated") != std::string::npos);
+             CHECK(g.unload_world() && weak.expired() && g.objects.snapshot().empty() && g.server.string_count() == 0 &&
+                   g.server.message_count() == 0 && g.server.list_count() == 0);
+             std::cout << "cycle=" << cycle
+                       << " 12 DetailSprite source instances, exact SPR frame resources, hidden-independent clocks and "
+-                         "unload verified; M2 blocked (26)\n";
++                         "unload verified; M2 blocked (17)\n";
+         }
+         return true;
+     }
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index 299ab61..c124b25 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -1,6 +1,6 @@
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 185 original instances, 116 BSP models")
++if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 194 original instances, 116 BSP models")
+     message(FATAL_ERROR "World inspection: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-player
+@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 26" OR NOT out MATCHES "remaining mover classes")
++if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 17" OR NOT out MATCHES "remaining mover classes")
+     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index ac278ef..9e175c3 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -647,7 +647,7 @@ namespace
+         CHECK(game.world.version == 56);
+         CHECK(game.world.objects.size() == 580);
+         CHECK(game.world.models.size() == 116);
+-        CHECK(game.objects.snapshot().size() == 185);
++        CHECK(game.objects.snapshot().size() == 194);
+         CHECK(game.world.models[0].points.size() == 4996);
+         CHECK(game.world.models[0].polygons.size() == 3367);
+         CHECK(game.resources.find(game.world_path)->overrides == 1);
+diff --git a/tests/worldpath_tests.cpp b/tests/worldpath_tests.cpp
+index 7613fd5..42ab8a3 100644
+--- a/tests/worldpath_tests.cpp
++++ b/tests/worldpath_tests.cpp
+@@ -352,9 +352,9 @@ namespace
+             }
+             CHECK(moves == 297 && blocked == 2 && !f->active && f->processed == 3 && close(r->state.m_Pos, last));
+             CHECK(!close(last, initial) && !close(last, vector_add(f->keys.back().position, f->targets[0].offset)));
+-            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 179);
++            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 188);
+             std::cout << "cycle=" << cycle << " moves=" << moves << " blocks=" << blocked << " final=" << last.x << ','
+-                      << last.y << ',' << last.z << " consumed_keys=9 runtime=179\n";
++                      << last.y << ',' << last.z << " consumed_keys=9 runtime=188\n";
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.server.string_count() &&
+                   !g.server.list_count() && !g.server.message_count());
+         }

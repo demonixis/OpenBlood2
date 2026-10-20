@@ -1,0 +1,14 @@
+392/393 Testing: ai_trigger.audio
+392/393 Test: ai_trigger.audio
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests" "audio" "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-trigger-audio"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_trigger.audio" start time: Oct 16 12:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ai_trigger.audio" end time: Oct 16 12:01 CEST
+"ai_trigger.audio" time elapsed: 00:00:00
+----------------------------------------------------------

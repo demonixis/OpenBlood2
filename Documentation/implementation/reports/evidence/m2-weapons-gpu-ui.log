@@ -1,0 +1,12 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 62: gpu.weapons
+1/1 Test #62: gpu.weapons ......................   Passed    2.57 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+gpu        =   2.57 sec*proc (1 test)
+private    =   2.57 sec*proc (1 test)
+weapons    =   2.57 sec*proc (1 test)
+
+Total Test time (real) =   2.57 sec

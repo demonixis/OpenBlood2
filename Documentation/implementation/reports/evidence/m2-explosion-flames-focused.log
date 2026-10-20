@@ -1,0 +1,20 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 546: explosion_flames.zones
+1/5 Test #546: explosion_flames.zones ...........   Passed    0.03 sec
+    Start 547: explosion_flames.lifecycle
+2/5 Test #547: explosion_flames.lifecycle .......   Passed    0.02 sec
+    Start 548: explosion_flames.failures
+3/5 Test #548: explosion_flames.failures ........   Passed    0.03 sec
+    Start 549: explosion_flames.session
+4/5 Test #549: explosion_flames.session .........   Passed    0.03 sec
+    Start 550: explosion_flames.private
+5/5 Test #550: explosion_flames.private .........   Passed   20.92 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+explosion_flames    =  21.03 sec*proc (5 tests)
+headless            =  21.03 sec*proc (5 tests)
+private             =  20.92 sec*proc (1 test)
+
+Total Test time (real) =  21.04 sec

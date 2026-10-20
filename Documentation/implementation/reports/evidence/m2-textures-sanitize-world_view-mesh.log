@@ -1,0 +1,14 @@
+310/318 Testing: world_view.mesh
+310/318 Test: world_view.mesh
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/world_view_tests" "mesh"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"world_view.mesh" start time: Oct 16 09:17 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.mesh" end time: Oct 16 09:17 CEST
+"world_view.mesh" time elapsed: 00:00:00
+----------------------------------------------------------

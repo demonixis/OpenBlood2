@@ -1,0 +1,15 @@
+400/402 Testing: ai_navigation.limits
+400/402 Test: ai_navigation.limits
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_navigation_tests" "limits"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_navigation.limits" start time: Oct 16 12:23 CEST
+Output:
+----------------------------------------------------------
+bounded search: 8193 ray attempts, 4095 iterations
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_navigation.limits" end time: Oct 16 12:23 CEST
+"ai_navigation.limits" time elapsed: 00:00:00
+----------------------------------------------------------

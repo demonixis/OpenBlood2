@@ -1,0 +1,34 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 282: character_audio.catalog
+      Start 283: character_audio.subway
+      Start 280: character_audio.footsteps
+      Start 281: character_audio.surfaces
+ 1/11 Test #280: character_audio.footsteps ........   Passed    0.01 sec
+      Start 279: character_audio.callbacks
+ 2/11 Test #281: character_audio.surfaces .........   Passed    0.01 sec
+      Start 278: character_audio.player
+ 3/11 Test #279: character_audio.callbacks ........   Passed    0.01 sec
+      Start 276: character_audio.lifetime
+ 4/11 Test #278: character_audio.player ...........   Passed    0.01 sec
+      Start 277: character_audio.rejection
+ 5/11 Test #276: character_audio.lifetime .........   Passed    0.01 sec
+      Start 275: character_audio.voices
+ 6/11 Test #277: character_audio.rejection ........   Passed    0.01 sec
+      Start 274: character_audio.paths
+ 7/11 Test #274: character_audio.paths ............   Passed    0.00 sec
+ 8/11 Test #275: character_audio.voices ...........   Passed    0.01 sec
+ 9/11 Test #282: character_audio.catalog ..........   Passed    0.34 sec
+10/11 Test #283: character_audio.subway ...........   Passed    4.80 sec
+      Start 273: gpu.character
+11/11 Test #273: gpu.character ....................   Passed   18.43 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Label Time Summary:
+character          =  18.43 sec*proc (1 test)
+character_audio    =   5.20 sec*proc (10 tests)
+gpu                =  18.43 sec*proc (1 test)
+headless           =   5.20 sec*proc (10 tests)
+private            =  23.57 sec*proc (3 tests)
+
+Total Test time (real) =  23.24 sec

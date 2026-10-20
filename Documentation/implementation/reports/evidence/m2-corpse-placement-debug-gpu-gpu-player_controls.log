@@ -1,0 +1,16 @@
+630/703 Testing: gpu.player_controls
+630/703 Test: gpu.player_controls
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_controls_tests" "gpu" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.player_controls" start time: Oct 17 04:34 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Original FIRE_KEY: shots=17 ammo=33 voices=17 mouse=1
+<end of output>
+Test time =   5.95 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.player_controls" end time: Oct 17 04:34 CEST
+"gpu.player_controls" time elapsed: 00:00:05
+----------------------------------------------------------

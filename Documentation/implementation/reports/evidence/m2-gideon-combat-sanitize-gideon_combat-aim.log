@@ -1,0 +1,14 @@
+614/618 Testing: gideon_combat.aim
+614/618 Test: gideon_combat.aim
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_combat_tests" "aim" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-combat-aim"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_combat.aim" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.aim" end time: Oct 17 02:23 CEST
+"gideon_combat.aim" time elapsed: 00:00:00
+----------------------------------------------------------

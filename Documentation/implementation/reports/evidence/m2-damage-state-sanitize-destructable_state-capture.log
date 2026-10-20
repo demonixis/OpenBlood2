@@ -1,0 +1,14 @@
+490/491 Testing: destructable_state.capture
+490/491 Test: destructable_state.capture
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable_state_tests" "capture" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/destructable-state-fixtures/capture"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"destructable_state.capture" start time: Oct 16 18:12 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_state.capture" end time: Oct 16 18:12 CEST
+"destructable_state.capture" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+528/530 Testing: character_nodes.rendering
+528/530 Test: character_nodes.rendering
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_nodes_tests" "rendering" "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-node-fixtures/rendering"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"character_nodes.rendering" start time: Oct 16 18:49 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"character_nodes.rendering" end time: Oct 16 18:49 CEST
+"character_nodes.rendering" time elapsed: 00:00:00
+----------------------------------------------------------

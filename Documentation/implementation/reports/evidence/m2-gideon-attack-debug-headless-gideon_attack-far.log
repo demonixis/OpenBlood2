@@ -1,0 +1,14 @@
+688/691 Testing: gideon_attack.far
+688/691 Test: gideon_attack.far
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon_attack_tests" "far" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gideon-attack-far"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gideon_attack.far" start time: Oct 17 03:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_attack.far" end time: Oct 17 03:04 CEST
+"gideon_attack.far" time elapsed: 00:00:00
+----------------------------------------------------------

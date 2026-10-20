@@ -1,0 +1,14 @@
+306/307 Testing: paths.limits
+306/307 Test: paths.limits
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/path_manager_tests" "limits"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"paths.limits" start time: Oct 16 06:16 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.46 sec
+----------------------------------------------------------
+Test Passed.
+"paths.limits" end time: Oct 16 06:16 CEST
+"paths.limits" time elapsed: 00:00:00
+----------------------------------------------------------

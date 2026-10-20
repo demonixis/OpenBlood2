@@ -1,0 +1,30 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 156: pickups.catalog
+      Start 147: pickups.defaults
+ 1/10 Test #147: pickups.defaults .................   Passed    0.09 sec
+      Start 148: pickups.ammunition
+ 2/10 Test #148: pickups.ammunition ...............   Passed    0.08 sec
+      Start 155: pickups.resources
+ 3/10 Test #155: pickups.resources ................   Passed    0.08 sec
+      Start 153: pickups.rejection
+ 4/10 Test #153: pickups.rejection ................   Passed    0.08 sec
+      Start 149: pickups.statistics
+ 5/10 Test #149: pickups.statistics ...............   Passed    0.07 sec
+      Start 154: pickups.callbacks
+ 6/10 Test #154: pickups.callbacks ................   Passed    0.07 sec
+      Start 152: pickups.spawning
+ 7/10 Test #152: pickups.spawning .................   Passed    0.07 sec
+      Start 151: pickups.contact
+ 8/10 Test #151: pickups.contact ..................   Passed    0.06 sec
+      Start 150: pickups.protocol
+ 9/10 Test #150: pickups.protocol .................   Passed    0.06 sec
+10/10 Test #156: pickups.catalog ..................   Passed   14.08 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+headless    =  14.72 sec*proc (10 tests)
+pickups     =  14.72 sec*proc (10 tests)
+private     =  14.08 sec*proc (1 test)
+
+Total Test time (real) =  14.08 sec

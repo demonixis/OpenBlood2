@@ -1,0 +1,38 @@
+--- a/src/engine/model.cpp
++++ b/src/engine/model.cpp
+@@ -1,3 +1,4 @@
++#include "b2-model-profile.h"
+ #include "engine/model.h"
+ #include "engine/formats/reader.h"
+ #include <algorithm>
+@@ -442,6 +443,7 @@
+     }
+     bool sample_pose(const Model& model, std::uint32_t animation, double milliseconds, std::vector<NodePose>& out)
+     {
++        MTimer timer{0};
+         out.clear();
+         std::size_t lo, hi;
+         float t;
+@@ -468,6 +470,7 @@
+     }
+     bool sample_vertices(const Model& model, std::uint32_t animation, double milliseconds, std::vector<DVector>& out)
+     {
++        MTimer timer{1};
+         out.clear();
+         std::vector<NodePose> pose;
+         if (!sample_pose(model, animation, milliseconds, pose))
+--- a/src/engine/model_view.cpp
++++ b/src/engine/model_view.cpp
+@@ -1,3 +1,4 @@
++#include "b2-model-profile.h"
+ #include "engine/model_view.h"
+ #include "engine/collision.h"
+ #include <cmath>
+@@ -27,6 +28,7 @@
+                         const Resources& resources, std::string& error, std::span<const std::uint8_t> hidden_nodes,
+                         float alpha, bool require_skin)
+     {
++        MTimer timer{2};
+         error.clear();
+         auto fail = [&](const char* reason)
+         {

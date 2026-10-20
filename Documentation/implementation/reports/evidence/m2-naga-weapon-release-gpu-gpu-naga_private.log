@@ -1,0 +1,91 @@
+638/638 Testing: gpu.naga_private
+638/638 Test: gpu.naga_private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/naga_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/naga-private-gpu" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.naga_private" start time: Oct 17 01:04 CEST
+Output:
+----------------------------------------------------------
+Whole model pixels 80074; selected face 5588; mismatched channels 0
+Private red beam: 40 triangles, 5588 pixels, source alpha .5 -> .25 verified
+<end of output>
+Test time =   0.40 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.naga_private" end time: Oct 17 01:04 CEST
+"gpu.naga_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 01:04 CEST
+
+brushes =   1.51 sec*proc
+
+cameras =   1.61 sec*proc
+
+character =  13.33 sec*proc
+
+cinematics =   1.70 sec*proc
+
+containers =   3.42 sec*proc
+
+doors =   1.53 sec*proc
+
+explosion_flames =   0.92 sec*proc
+
+explosion_fragments =   0.80 sec*proc
+
+explosion_models =   0.82 sec*proc
+
+explosion_rings =   0.82 sec*proc
+
+gpu = 112.92 sec*proc
+
+interaction =   2.12 sec*proc
+
+keyframes =   1.63 sec*proc
+
+lights =   1.65 sec*proc
+
+model_view =   0.98 sec*proc
+
+movement =  13.05 sec*proc
+
+naga =   0.82 sec*proc
+
+object_particles =   0.81 sec*proc
+
+objectives =   1.66 sec*proc
+
+pickups =   1.62 sec*proc
+
+player =   1.63 sec*proc
+
+player_controls =   1.01 sec*proc
+
+player_keepalive =   1.90 sec*proc
+
+player_restore =   1.69 sec*proc
+
+private = 105.19 sec*proc
+
+randomsound =  12.54 sec*proc
+
+sceneexplosion =   1.67 sec*proc
+
+session_playback =   0.98 sec*proc
+
+sound =   1.73 sec*proc
+
+sprite_view =   0.89 sec*proc
+
+sprites =   1.64 sec*proc
+
+triggers =   1.62 sec*proc
+
+weapon_sprites =   0.93 sec*proc
+
+weapons =  13.17 sec*proc
+
+world_view =  14.46 sec*proc
+
+worldpaths =   1.64 sec*proc
+

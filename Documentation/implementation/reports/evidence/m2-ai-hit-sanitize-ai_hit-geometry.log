@@ -1,0 +1,14 @@
+446/454 Testing: ai_hit.geometry
+446/454 Test: ai_hit.geometry
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "geometry"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.geometry" start time: Oct 16 15:38 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.geometry" end time: Oct 16 15:38 CEST
+"ai_hit.geometry" time elapsed: 00:00:00
+----------------------------------------------------------

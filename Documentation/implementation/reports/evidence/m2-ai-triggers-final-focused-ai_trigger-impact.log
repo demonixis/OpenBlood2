@@ -1,0 +1,14 @@
+387/393 Testing: ai_trigger.impact
+387/393 Test: ai_trigger.impact
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests" "impact" "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-trigger-impact"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_trigger.impact" start time: Oct 16 12:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_trigger.impact" end time: Oct 16 12:01 CEST
+"ai_trigger.impact" time elapsed: 00:00:00
+----------------------------------------------------------

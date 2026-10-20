@@ -1,0 +1,16 @@
+263/264 Testing: sceneexplosion.subway
+263/264 Test: sceneexplosion.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene_explosion_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"sceneexplosion.subway" start time: Oct 16 03:36 CEST
+Output:
+----------------------------------------------------------
+cycle=0 nine original emitters, null-damager suppression, decoded audio, removal and shell unload verified
+cycle=1 nine original emitters, null-damager suppression, decoded audio, removal and shell unload verified
+<end of output>
+Test time =   0.58 sec
+----------------------------------------------------------
+Test Passed.
+"sceneexplosion.subway" end time: Oct 16 03:36 CEST
+"sceneexplosion.subway" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,1164 @@
+[0/2] Re-checking globbed directories...
+[1/1021] Generating wayland-generated-protocols/alpha-modifier-v1-client-protocol.h
+[2/1021] Generating wayland-generated-protocols/fractional-scale-v1-client-protocol.h
+[3/1021] Generating wayland-generated-protocols/cursor-shape-v1-client-protocol.h
+[4/1021] Generating wayland-generated-protocols/color-management-v1-client-protocol.h
+[5/1021] Generating wayland-generated-protocols/frog-color-management-v1-client-protocol.h
+[6/1021] Generating wayland-generated-protocols/idle-inhibit-unstable-v1-client-protocol.h
+[7/1021] Generating wayland-generated-protocols/input-timestamps-unstable-v1-client-protocol.h
+[8/1021] Generating wayland-generated-protocols/keyboard-shortcuts-inhibit-unstable-v1-client-protocol.h
+[9/1021] Generating wayland-generated-protocols/pointer-gestures-unstable-v1-client-protocol.h
+[10/1021] Generating wayland-generated-protocols/pointer-constraints-unstable-v1-client-protocol.h
+[11/1021] Generating wayland-generated-protocols/pointer-warp-v1-client-protocol.h
+[12/1021] Generating wayland-generated-protocols/primary-selection-unstable-v1-client-protocol.h
+[13/1021] Generating wayland-generated-protocols/single-pixel-buffer-v1-client-protocol.h
+[14/1021] Generating wayland-generated-protocols/relative-pointer-unstable-v1-client-protocol.h
+[15/1021] Generating wayland-generated-protocols/text-input-unstable-v3-client-protocol.h
+[16/1021] Generating wayland-generated-protocols/viewporter-client-protocol.h
+[17/1021] Generating wayland-generated-protocols/tablet-v2-client-protocol.h
+[18/1021] Generating wayland-generated-protocols/xdg-decoration-unstable-v1-client-protocol.h
+[19/1021] Generating wayland-generated-protocols/xdg-activation-v1-client-protocol.h
+[20/1021] Generating wayland-generated-protocols/xdg-dialog-v1-client-protocol.h
+[21/1021] Generating wayland-generated-protocols/xdg-foreign-unstable-v2-client-protocol.h
+[22/1021] Generating wayland-generated-protocols/xdg-output-unstable-v1-client-protocol.h
+[23/1021] Generating wayland-generated-protocols/wayland-client-protocol.h
+[24/1021] Generating wayland-generated-protocols/xdg-session-management-v1-client-protocol.h
+[25/1021] Generating wayland-generated-protocols/xdg-toplevel-icon-v1-client-protocol.h
+[26/1021] Generating wayland-generated-protocols/xdg-toplevel-tag-v1-client-protocol.h
+[27/1021] Generating wayland-generated-protocols/xdg-shell-client-protocol.h
+[28/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/src/opus.c.o
+[29/1021] Building C object _deps/sdl3_mixer-build/external/ogg-build/CMakeFiles/ogg.dir/src/bitwise.c.o
+[30/1021] Building C object _deps/sdl3_mixer-build/external/ogg-build/CMakeFiles/ogg.dir/src/framing.c.o
+[31/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/src/opus_multistream.c.o
+[32/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/src/opus_decoder.c.o
+/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/sdl3_mixer-src/external/opus/src/opus_decoder.c:37:10: note: ‘#pragma message: You appear to be compiling without optimization, if so opus will be very slow.’
+   37 | # pragma message "You appear to be compiling without optimization, if so opus will be very slow."
+      |          ^~~~~~~
+[33/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/src/opus_multistream_decoder.c.o
+[34/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/src/repacketizer.c.o
+[35/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/src/opus_multistream_encoder.c.o
+[36/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/src/opus_projection_decoder.c.o
+[37/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/src/opus_projection_encoder.c.o
+[38/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/src/opus_encoder.c.o
+[39/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/src/mapping_matrix.c.o
+[40/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/src/mlp_data.c.o
+[41/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/src/mlp.c.o
+[42/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/code_signs.c.o
+[43/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/init_decoder.c.o
+[44/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/CNG.c.o
+[45/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/src/analysis.c.o
+[46/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/decode_core.c.o
+[47/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/decode_parameters.c.o
+[48/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/decode_frame.c.o
+[49/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/decode_indices.c.o
+[50/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/decode_pulses.c.o
+[51/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/decoder_set_fs.c.o
+[52/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/dec_API.c.o
+[53/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/encode_indices.c.o
+[54/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/gain_quant.c.o
+[55/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/encode_pulses.c.o
+[56/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/interpolate.c.o
+[57/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/enc_API.c.o
+[58/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/LP_variable_cutoff.c.o
+[59/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/NLSF_decode.c.o
+[60/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/shell_coder.c.o
+[61/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/NSQ.c.o
+[62/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/PLC.c.o
+[63/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/tables_gain.c.o
+[64/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/tables_LTP.c.o
+[65/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/NSQ_del_dec.c.o
+[66/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/tables_NLSF_CB_NB_MB.c.o
+[67/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/tables_other.c.o
+[68/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/tables_NLSF_CB_WB.c.o
+[69/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/tables_pitch_lag.c.o
+[70/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/tables_pulses_per_block.c.o
+[71/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/control_audio_bandwidth.c.o
+[72/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/quant_LTP_gains.c.o
+[73/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/VAD.c.o
+[74/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/VQ_WMat_EC.c.o
+[75/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/NLSF_encode.c.o
+[76/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/HP_variable_cutoff.c.o
+[77/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/NLSF_VQ.c.o
+[78/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/NLSF_unpack.c.o
+[79/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/NLSF_del_dec_quant.c.o
+[80/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/process_NLSFs.c.o
+[81/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/check_control_input.c.o
+[82/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/stereo_MS_to_LR.c.o
+[83/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/stereo_LR_to_MS.c.o
+[84/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/control_SNR.c.o
+[85/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/init_encoder.c.o
+[86/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/A2NLSF.c.o
+[87/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/ana_filt_bank_1.c.o
+[88/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/bwexpander_32.c.o
+[89/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/control_codec.c.o
+[90/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/bwexpander.c.o
+[91/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/debug.c.o
+[92/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/biquad_alt.c.o
+[93/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/decode_pitch.c.o
+[94/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/inner_prod_aligned.c.o
+[95/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/lin2log.c.o
+[96/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/log2lin.c.o
+[97/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/table_LSF_cos.c.o
+[98/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/LPC_analysis_filter.c.o
+[99/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/LPC_inv_pred_gain.c.o
+[100/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/NLSF2A.c.o
+[101/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/NLSF_stabilize.c.o
+[102/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/pitch_est_tables.c.o
+[103/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/NLSF_VQ_weights_laroia.c.o
+[104/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/resampler_down2_3.c.o
+[105/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/resampler.c.o
+[106/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/resampler_down2.c.o
+[107/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/resampler_private_AR2.c.o
+[108/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/resampler_private_IIR_FIR.c.o
+[109/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/resampler_private_up2_HQ.c.o
+[110/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/resampler_rom.c.o
+[111/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/resampler_private_down_FIR.c.o
+[112/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/sigm_Q15.c.o
+[113/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/sort.c.o
+[114/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/sum_sqr_shift.c.o
+[115/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/stereo_decode_pred.c.o
+[116/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/stereo_encode_pred.c.o
+[117/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/stereo_find_predictor.c.o
+[118/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/LPC_fit.c.o
+[119/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/stereo_quant_pred.c.o
+[120/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/celt.c.o
+[121/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/celt_decoder.c.o
+[122/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/cwrs.c.o
+[123/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/entcode.c.o
+[124/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/bands.c.o
+[125/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/entdec.c.o
+[126/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/entenc.c.o
+[127/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/mathops.c.o
+[128/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/celt_encoder.c.o
+[129/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/laplace.c.o
+[130/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/kiss_fft.c.o
+[131/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/mdct.c.o
+[132/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/modes.c.o
+[133/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/celt_lpc.c.o
+[134/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/pitch.c.o
+[135/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/quant_bands.c.o
+[136/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/apply_sine_window_FLP.c.o
+[137/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/vq.c.o
+[138/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/rate.c.o
+[139/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/corrMatrix_FLP.c.o
+[140/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/find_LPC_FLP.c.o
+[141/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/find_LTP_FLP.c.o
+[142/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/find_pitch_lags_FLP.c.o
+[143/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/encode_frame_FLP.c.o
+[144/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/find_pred_coefs_FLP.c.o
+[145/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/LTP_analysis_filter_FLP.c.o
+[146/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/LTP_scale_ctrl_FLP.c.o
+[147/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/LPC_analysis_filter_FLP.c.o
+[148/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/noise_shape_analysis_FLP.c.o
+[149/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/regularize_correlations_FLP.c.o
+[150/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/process_gains_FLP.c.o
+[151/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/residual_energy_FLP.c.o
+[152/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/warped_autocorrelation_FLP.c.o
+[153/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/autocorrelation_FLP.c.o
+[154/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/wrappers_FLP.c.o
+[155/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/energy_FLP.c.o
+[156/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/bwexpander_FLP.c.o
+[157/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/burg_modified_FLP.c.o
+[158/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/inner_product_FLP.c.o
+[159/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/k2a_FLP.c.o
+[160/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/LPC_inv_pred_gain_FLP.c.o
+[161/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/scale_copy_vector_FLP.c.o
+[162/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/scale_vector_FLP.c.o
+[163/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/sort_FLP.c.o
+[164/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/x86/x86cpu.c.o
+[165/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/pitch_analysis_core_FLP.c.o
+[166/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/float/schur_FLP.c.o
+[167/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/x86/x86_celt_map.c.o
+[168/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/x86/x86_silk_map.c.o
+[169/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/x86/pitch_sse.c.o
+[170/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/x86/pitch_sse2.c.o
+[171/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/x86/celt_lpc_sse4_1.c.o
+[172/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/x86/pitch_sse4_1.c.o
+[173/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/celt/x86/vq_sse2.c.o
+[174/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/x86/VQ_WMat_EC_sse4_1.c.o
+[175/1021] Generating wayland-generated-protocols/alpha-modifier-v1-protocol.c
+[176/1021] Generating wayland-generated-protocols/color-management-v1-protocol.c
+[177/1021] Generating wayland-generated-protocols/cursor-shape-v1-protocol.c
+[178/1021] Generating wayland-generated-protocols/fractional-scale-v1-protocol.c
+[179/1021] Generating wayland-generated-protocols/frog-color-management-v1-protocol.c
+[180/1021] Generating wayland-generated-protocols/idle-inhibit-unstable-v1-protocol.c
+[181/1021] Generating wayland-generated-protocols/input-timestamps-unstable-v1-protocol.c
+[182/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/x86/NSQ_sse4_1.c.o
+[183/1021] Generating wayland-generated-protocols/keyboard-shortcuts-inhibit-unstable-v1-protocol.c
+[184/1021] Generating wayland-generated-protocols/pointer-constraints-unstable-v1-protocol.c
+[185/1021] Generating wayland-generated-protocols/pointer-gestures-unstable-v1-protocol.c
+[186/1021] Generating wayland-generated-protocols/pointer-warp-v1-protocol.c
+[187/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/x86/VAD_sse4_1.c.o
+[188/1021] Generating wayland-generated-protocols/primary-selection-unstable-v1-protocol.c
+[189/1021] Generating wayland-generated-protocols/relative-pointer-unstable-v1-protocol.c
+[190/1021] Generating wayland-generated-protocols/single-pixel-buffer-v1-protocol.c
+[191/1021] Generating wayland-generated-protocols/text-input-unstable-v3-protocol.c
+[192/1021] Generating wayland-generated-protocols/tablet-v2-protocol.c
+[193/1021] Generating wayland-generated-protocols/viewporter-protocol.c
+[194/1021] Generating wayland-generated-protocols/xdg-activation-v1-protocol.c
+[195/1021] Generating wayland-generated-protocols/xdg-decoration-unstable-v1-protocol.c
+[196/1021] Building C object _deps/sdl3_mixer-build/external/opus-build/CMakeFiles/opus.dir/silk/x86/NSQ_del_dec_sse4_1.c.o
+[197/1021] Generating wayland-generated-protocols/xdg-dialog-v1-protocol.c
+[198/1021] Generating wayland-generated-protocols/wayland-protocol.c
+[199/1021] Generating wayland-generated-protocols/xdg-foreign-unstable-v2-protocol.c
+[200/1021] Generating wayland-generated-protocols/xdg-output-unstable-v1-protocol.c
+[201/1021] Generating wayland-generated-protocols/xdg-session-management-v1-protocol.c
+[202/1021] Generating wayland-generated-protocols/xdg-toplevel-icon-v1-protocol.c
+[203/1021] Generating wayland-generated-protocols/xdg-shell-protocol.c
+[204/1021] Generating wayland-generated-protocols/xdg-toplevel-tag-v1-protocol.c
+[205/1021] Linking C shared library _deps/sdl3_mixer-build/external/ogg-build/libogg.so.0.8.5
+[206/1021] Creating library symlink _deps/sdl3_mixer-build/external/ogg-build/libogg.so.0 _deps/sdl3_mixer-build/external/ogg-build/libogg.so
+[207/1021] Building C object _deps/sdl3_mixer-build/external/opusfile-build/CMakeFiles/opusfile.dir/src/internal.c.o
+[208/1021] Linking C shared library _deps/sdl3_mixer-build/external/opus-build/libopus.so.0.9.0
+[209/1021] Creating library symlink _deps/sdl3_mixer-build/external/opus-build/libopus.so.0 _deps/sdl3_mixer-build/external/opus-build/libopus.so
+[210/1021] Building C object _deps/sdl3_mixer-build/external/opusfile-build/CMakeFiles/opusfile.dir/src/info.c.o
+[211/1021] Building C object _deps/sdl3_mixer-build/external/opusfile-build/CMakeFiles/opusfile.dir/src/stream.c.o
+[212/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Classic_Emu.cpp.o
+[213/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Blip_Buffer.cpp.o
+[214/1021] Building C object _deps/sdl3_mixer-build/external/opusfile-build/CMakeFiles/opusfile.dir/src/opusfile.c.o
+[215/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Dual_Resampler.cpp.o
+[216/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Data_Reader.cpp.o
+[217/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Fir_Resampler.cpp.o
+[218/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Gme_File.cpp.o
+[219/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/M3u_Playlist.cpp.o
+[220/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/gme.cpp.o
+[221/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Multi_Buffer.cpp.o
+[222/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Ay_Apu.cpp.o
+[223/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Music_Emu.cpp.o
+[224/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Effects_Buffer.cpp.o
+[225/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Ym2612_Nuked.cpp.o
+[226/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Sms_Apu.cpp.o
+[227/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Ay_Cpu.cpp.o
+[228/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Gb_Apu.cpp.o
+[229/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/cmake_pch.h.gch
+[230/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Ay_Emu.cpp.o
+[231/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Gb_Cpu.cpp.o
+[232/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Gb_Oscs.cpp.o
+[233/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Gym_Emu.cpp.o
+[234/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Gbs_Emu.cpp.o
+[235/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Hes_Apu.cpp.o
+[236/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Hes_Apu_Adpcm.cpp.o
+[237/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Hes_Cpu.cpp.o
+[238/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Kss_Scc_Apu.cpp.o
+[239/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Kss_Cpu.cpp.o
+[240/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Hes_Emu.cpp.o
+[241/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Kss_Emu.cpp.o
+[242/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Nes_Apu.cpp.o
+/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/sdl3_mixer-src/external/libgme/gme/Nes_Apu.cpp: In constructor ‘Nes_Apu::Nes_Apu()’:
+/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/sdl3_mixer-src/external/libgme/gme/Nes_Apu.cpp:21:9: warning: ‘<unknown>’ may be used uninitialized [-Wmaybe-uninitialized]
+   21 |         square1( &square_synth ),
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /tmp/lithtech-audit-2bVxTF/nomadengine/_deps/sdl3_mixer-src/external/libgme/gme/Nes_Apu.h:12,
+                 from /tmp/lithtech-audit-2bVxTF/nomadengine/_deps/sdl3_mixer-src/external/libgme/gme/Nes_Apu.cpp:3:
+/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/sdl3_mixer-src/external/libgme/gme/Nes_Oscs.h:62:9: note: by argument 2 of type ‘const Nes_Square::Synth*’ {aka ‘const Blip_Synth<12, 1>*’} to ‘Nes_Square::Nes_Square(const Synth*)’ declared here
+   62 |         Nes_Square( Synth const* s ) : synth( *s ) { }
+      |         ^~~~~~~~~~
+[243/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Nes_Fme7_Apu.cpp.o
+[244/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Nes_Namco_Apu.cpp.o
+[245/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Nes_Oscs.cpp.o
+[246/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Nes_Fds_Apu.cpp.o
+[247/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Nes_Vrc6_Apu.cpp.o
+[248/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Nes_Vrc7_Apu.cpp.o
+[249/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Nes_Cpu.cpp.o
+[250/1021] Building C object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/ext/emu2413.c.o
+[251/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Sap_Apu.cpp.o
+[252/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Nsf_Emu.cpp.o
+[253/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Nsfe_Emu.cpp.o
+[254/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Sap_Cpu.cpp.o
+[255/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Sap_Emu.cpp.o
+[256/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Snes_Spc.cpp.o
+[257/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Spc_Filter.cpp.o
+[258/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Spc_Dsp.cpp.o
+[259/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Spc_Cpu.cpp.o
+[260/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Ym2413_Emu.cpp.o
+[261/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Spc_Emu.cpp.o
+[262/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Vgm_Emu_Impl.cpp.o
+[263/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/format.c.o
+[264/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/virtual.c.o
+[265/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/period.c.o
+[266/1021] Building CXX object _deps/sdl3_mixer-build/external/libgme-build/gme/CMakeFiles/gme_shared.dir/Vgm_Emu.cpp.o
+[267/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/misc.c.o
+[268/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/dataio.c.o
+[269/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/mkstemp.c.o
+[270/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/read_event.c.o
+[271/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/player.c.o
+[272/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/md5.c.o
+[273/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/lfo.c.o
+[274/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/far_extras.c.o
+[275/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/flt_extras.c.o
+[276/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/control.c.o
+[277/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/scan.c.o
+[278/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/flow.c.o
+[279/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/filter.c.o
+[280/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/med_extras.c.o
+[281/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/rng.c.o
+[282/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/effects.c.o
+[283/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/load_helpers.c.o
+[284/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/mixer.c.o
+[285/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/load.c.o
+[286/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/hmn_extras.c.o
+[287/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/extras.c.o
+[288/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/hio.c.o
+[289/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/mix_all.c.o
+[290/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/filetype.c.o
+[291/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/path.c.o
+[292/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/smix.c.o
+[293/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/memio.c.o
+[294/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/tempfile.c.o
+[295/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/win32.c.o
+[296/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/mix_paula.c.o
+[297/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/common.c.o
+[298/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/iff.c.o
+[299/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/itsex.c.o
+[300/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/miniz_tinfl.c.o
+[301/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/voltable.c.o
+[302/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/lzw.c.o
+[303/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/sample.c.o
+[304/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/xm_load.c.o
+[305/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/mod_load.c.o
+[306/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/s3m_load.c.o
+[307/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/stm_load.c.o
+[308/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/669_load.c.o
+[309/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/far_load.c.o
+[310/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/ptm_load.c.o
+[311/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/mtm_load.c.o
+[312/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/okt_load.c.o
+[313/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/vorbis.c.o
+[314/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/ult_load.c.o
+[315/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/stx_load.c.o
+[316/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/mdl_load.c.o
+[317/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/pt3_load.c.o
+[318/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/it_load.c.o
+[319/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/flt_load.c.o
+[320/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/sfx_load.c.o
+[321/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/emod_load.c.o
+[322/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/st_load.c.o
+[323/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/digi_load.c.o
+[324/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/ice_load.c.o
+[325/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/imf_load.c.o
+[326/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/fnk_load.c.o
+[327/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/ims_load.c.o
+[328/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/masi_load.c.o
+[329/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/liq_load.c.o
+[330/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/masi16_load.c.o
+[331/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/amf_load.c.o
+[332/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/stim_load.c.o
+[333/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/mmd_common.c.o
+[334/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/mmd1_load.c.o
+[335/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/mmd3_load.c.o
+[336/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/rtm_load.c.o
+[337/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/no_load.c.o
+[338/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/med2_load.c.o
+[339/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/arch_load.c.o
+[340/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/dt_load.c.o
+[341/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/sym_load.c.o
+[342/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/med3_load.c.o
+[343/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/umx_load.c.o
+[344/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/dbm_load.c.o
+[345/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/pw_load.c.o
+[346/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/med4_load.c.o
+[347/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/gal5_load.c.o
+[348/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/gdm_load.c.o
+[349/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/muse_load.c.o
+[350/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/gal4_load.c.o
+[351/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/mfp_load.c.o
+[352/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/asylum_load.c.o
+[353/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/chip_load.c.o
+[354/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/mgt_load.c.o
+[355/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/hmn_load.c.o
+[356/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/abk_load.c.o
+[357/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/coco_load.c.o
+[358/1021] Building C object _deps/sdl3_mixer-build/external/libxmp-build/CMakeFiles/xmp_shared.dir/src/loaders/xmf_load.c.o
+[359/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/common_utils.c.o
+[360/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/decorr_utils.c.o
+[361/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/entropy_utils.c.o
+[362/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/open_filename.c.o
+[363/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/extra1.c.o
+[364/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/open_legacy.c.o
+[365/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/open_utils.c.o
+[366/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/extra2.c.o
+[367/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/open_raw.c.o
+[368/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/pack_floats.c.o
+[369/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/pack_dns.c.o
+[370/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/tags.c.o
+[371/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/read_words.c.o
+[372/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/pack.c.o
+[373/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/pack_utils.c.o
+[374/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/tag_utils.c.o
+[375/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/unpack_floats.c.o
+[376/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/unpack_seek.c.o
+[377/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/unpack_utils.c.o
+[378/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/unpack.c.o
+[379/1021] Building ASM object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/pack_x64.S.o
+[380/1021] Building ASM object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/unpack_x64.S.o
+[381/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/write_words.c.o
+[382/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/pack_dsd.c.o
+[383/1021] Building C object _deps/sdl3_mixer-build/external/wavpack-build/CMakeFiles/wavpack.dir/src/unpack_dsd.c.o
+[384/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_guid.c.o
+[385/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_error.c.o
+[386/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_assert.c.o
+[387/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_hints.c.o
+[388/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_list.c.o
+[389/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_hashtable.c.o
+[390/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL.c.o
+[391/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_log.c.o
+[392/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_utils.c.o
+[393/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/atomic/SDL_atomic.c.o
+[394/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL_properties.c.o
+[395/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/atomic/SDL_spinlock.c.o
+[396/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audiodev.c.o
+[397/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audioqueue.c.o
+[398/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audioresample.c.o
+[399/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_mixer.c.o
+[400/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audiotypecvt.c.o
+[401/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audio.c.o
+[402/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_audiocvt.c.o
+[403/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/SDL_wave.c.o
+[404/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/SDL_core_unsupported.c.o
+[405/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/camera/SDL_camera.c.o
+[406/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_categories.c.o
+[407/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/cpuinfo/SDL_cpuinfo.c.o
+[408/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_clipboardevents.c.o
+[409/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_displayevents.c.o
+[410/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_dropevents.c.o
+[411/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_eventwatch.c.o
+[412/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_keyboard.c.o
+[413/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_keymap.c.o
+[414/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_keysym_to_keycode.c.o
+[415/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_events.c.o
+[416/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_keysym_to_scancode.c.o
+[417/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_notificationevents.c.o
+[418/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_pen.c.o
+[419/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_quit.c.o
+[420/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_mouse.c.o
+[421/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_scancode_tables.c.o
+[422/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_windowevents.c.o
+[423/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/SDL_touch.c.o
+[424/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/events/imKStoUCS.c.o
+[425/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/filesystem/SDL_filesystem.c.o
+[426/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/gpu/xr/SDL_gpu_openxr.c.o
+[427/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/gpu/xr/SDL_openxrdyn.c.o
+[428/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/haptic/SDL_haptic.c.o
+[429/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/gpu/SDL_gpu.c.o
+[430/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/io/SDL_asyncio.c.o
+[431/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/io/generic/SDL_asyncio_generic.c.o
+[432/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/io/SDL_iostream.c.o
+[433/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/hidapi/SDL_hidapi.c.o
+[434/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/SDL_steam_virtual_gamepad.c.o
+[435/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/controller_type.c.o
+[436/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/locale/SDL_locale.c.o
+[437/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/SDL_gamepad.c.o
+[438/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/main/SDL_runapp.c.o
+[439/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/SDL_joystick.c.o
+[440/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/main/SDL_main_callbacks.c.o
+[441/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/misc/SDL_libusb.c.o
+[442/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/misc/SDL_url.c.o
+[443/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/notification/SDL_notification.c.o
+[444/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/power/SDL_power.c.o
+[445/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/SDL_render_unsupported.c.o
+[446/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d/SDL_render_d3d.c.o
+[447/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d/SDL_shaders_d3d.c.o
+[448/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/SDL_yuv_sw.c.o
+[449/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d11/SDL_shaders_d3d11.c.o
+[450/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d11/SDL_render_d3d11.c.o
+[451/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d12/SDL_render_d3d12.c.o
+[452/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/direct3d12/SDL_shaders_d3d12.c.o
+[453/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dynapi/SDL_dynapi.c.o
+[454/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/gpu/SDL_pipeline_gpu.c.o
+[455/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/gpu/SDL_shaders_gpu.c.o
+[456/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/ngage/SDL_render_ngage.c.o
+[457/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/gpu/SDL_render_gpu.c.o
+[458/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengl/SDL_shaders_gl.c.o
+[459/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/SDL_render.c.o
+[460/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengl/SDL_render_gl.c.o
+[461/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengles/SDL_render_gles.c.o
+[462/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/ps2/SDL_render_ps2.c.o
+[463/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/psp/SDL_render_psp.c.o
+[464/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengles2/SDL_shaders_gles2.c.o
+[465/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_blendpoint.c.o
+[466/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/opengles2/SDL_render_gles2.c.o
+[467/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_drawpoint.c.o
+[468/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_drawline.c.o
+[469/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_blendfillrect.c.o
+[470/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_triangle.c.o
+[471/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vitagxm/SDL_render_vita_gxm.c.o
+[472/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_render_sw.c.o
+[473/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vitagxm/SDL_render_vita_gxm_memory.c.o
+[474/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vitagxm/SDL_render_vita_gxm_tools.c.o
+[475/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vulkan/SDL_shaders_vulkan.c.o
+[476/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/sensor/SDL_sensor.c.o
+[477/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_crc16.c.o
+[478/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_crc32.c.o
+[479/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_getenv.c.o
+[480/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_iconv.c.o
+[481/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/software/SDL_blendline.c.o
+[482/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_malloc.c.o
+[483/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_memmove.c.o
+[484/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_memcpy.c.o
+[485/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_memset.c.o
+[486/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_mslibc.c.o
+[487/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_murmur3.c.o
+[488/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_random.c.o
+[489/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_qsort.c.o
+[490/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_stdlib.c.o
+[491/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_strtokr.c.o
+[492/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/storage/SDL_storage.c.o
+[493/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/SDL_thread.c.o
+[494/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_string.c.o
+[495/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/render/vulkan/SDL_render_vulkan.c.o
+[496/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/time/SDL_time.c.o
+[497/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit.c.o
+[498/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/timer/SDL_timer.c.o
+[499/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_1.c.o
+[500/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_RLEaccel.c.o
+[501/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_0.c.o
+[502/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_copy.c.o
+[503/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_slow.c.o
+[504/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_N.c.o
+[505/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_bmp.c.o
+[506/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_clipboard.c.o
+[507/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_A.c.o
+[508/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_fillrect.c.o
+[509/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_egl.c.o
+[510/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_rect.c.o
+[511/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_pixels.c.o
+[512/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_rotate.c.o
+[513/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_stretch.c.o
+[514/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_surface.c.o
+[515/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_video_unsupported.c.o
+[516/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_stb.c.o
+[517/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_vulkan_utils.c.o
+[518/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/yuv2rgb/yuv_rgb_lsx.c.o
+[519/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_blit_auto.c.o
+[520/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_video.c.o
+[521/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_atan2.c.o
+[522/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/SDL_yuv.c.o
+[523/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_exp.c.o
+[524/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/yuv2rgb/yuv_rgb_std.c.o
+[525/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_fmod.c.o
+[526/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_log.c.o
+[527/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_log10.c.o
+[528/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_pow.c.o
+[529/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/k_cos.c.o
+[530/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_rem_pio2.c.o
+[531/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/e_sqrt.c.o
+[532/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/k_sin.c.o
+[533/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/k_rem_pio2.c.o
+[534/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/k_tan.c.o
+[535/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_atan.c.o
+[536/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_copysign.c.o
+[537/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_cos.c.o
+[538/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_fabs.c.o
+[539/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_isinf.c.o
+[540/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_floor.c.o
+[541/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_isinff.c.o
+[542/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_isnan.c.o
+[543/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_isnanf.c.o
+[544/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_modf.c.o
+[545/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_scalbn.c.o
+[546/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_sin.c.o
+[547/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/libm/s_tan.c.o
+[548/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/dummy/SDL_dummyaudio.c.o
+[549/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/disk/SDL_diskaudio.c.o
+[550/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/loadso/dlopen/SDL_sysloadso.c.o
+[551/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/camera/dummy/SDL_camera_dummy.c.o
+[552/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/virtual/SDL_virtualjoystick.c.o
+[553/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/dummy/SDL_nullevents.c.o
+[554/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/dummy/SDL_nullframebuffer.c.o
+[555/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/dummy/SDL_nullvideo.c.o
+[556/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/jack/SDL_jackaudio.c.o
+[557/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/alsa/SDL_alsa_audio.c.o
+[558/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/pulseaudio/SDL_pulseaudio.c.o
+[559/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/camera/pipewire/SDL_camera_pipewire.c.o
+[560/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/audio/pipewire/SDL_pipewire.c.o
+[561/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/yuv2rgb/yuv_rgb_sse.c.o
+[562/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11clipboard.c.o
+[563/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11dyn.c.o
+[564/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11framebuffer.c.o
+[565/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11events.c.o
+[566/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11messagebox.c.o
+[567/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11keyboard.c.o
+[568/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11mouse.c.o
+[569/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11modes.c.o
+[570/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11opengles.c.o
+[571/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11opengl.c.o
+[572/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11settings.c.o
+[573/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11shape.c.o
+[574/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11pen.c.o
+[575/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11touch.c.o
+[576/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11toolkit.c.o
+[577/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11video.c.o
+[578/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11vulkan.c.o
+[579/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11xfixes.c.o
+[580/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11window.c.o
+[581/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11xinput2.c.o
+[582/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11xsync.c.o
+[583/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/edid-parse.c.o
+[584/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmdyn.c.o
+[585/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/SDL_x11xtest.c.o
+[586/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmevents.c.o
+[587/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmopengles.c.o
+[588/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmmouse.c.o
+[589/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/x11/xsettings-client.c.o
+[590/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandclipboard.c.o
+[591/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandcolor.c.o
+[592/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmvideo.c.o
+[593/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/kmsdrm/SDL_kmsdrmvulkan.c.o
+[594/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylanddyn.c.o
+[595/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylanddatamanager.c.o
+[596/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandeventthread.c.o
+[597/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandmessagebox.c.o
+[598/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandkeyboard.c.o
+[599/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandopengles.c.o
+[600/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandshmbuffer.c.o
+[601/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandmouse.c.o
+[602/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandutil.c.o
+[603/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandevents.c.o
+[604/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/alpha-modifier-v1-protocol.c.o
+[605/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/color-management-v1-protocol.c.o
+[606/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandvulkan.c.o
+[607/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandvideo.c.o
+[608/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/frog-color-management-v1-protocol.c.o
+[609/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/cursor-shape-v1-protocol.c.o
+[610/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/fractional-scale-v1-protocol.c.o
+[611/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/idle-inhibit-unstable-v1-protocol.c.o
+[612/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/keyboard-shortcuts-inhibit-unstable-v1-protocol.c.o
+[613/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/input-timestamps-unstable-v1-protocol.c.o
+[614/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/pointer-constraints-unstable-v1-protocol.c.o
+[615/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/pointer-gestures-unstable-v1-protocol.c.o
+[616/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/pointer-warp-v1-protocol.c.o
+[617/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/primary-selection-unstable-v1-protocol.c.o
+[618/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/single-pixel-buffer-v1-protocol.c.o
+[619/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/relative-pointer-unstable-v1-protocol.c.o
+[620/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/wayland/SDL_waylandwindow.c.o
+[621/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/tablet-v2-protocol.c.o
+[622/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/text-input-unstable-v3-protocol.c.o
+[623/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/viewporter-protocol.c.o
+[624/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/wayland-protocol.c.o
+[625/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-activation-v1-protocol.c.o
+[626/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-decoration-unstable-v1-protocol.c.o
+[627/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-dialog-v1-protocol.c.o
+[628/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-foreign-unstable-v2-protocol.c.o
+[629/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-shell-protocol.c.o
+[630/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-session-management-v1-protocol.c.o
+[631/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-output-unstable-v1-protocol.c.o
+[632/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-toplevel-icon-v1-protocol.c.o
+[633/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/wayland-generated-protocols/xdg-toplevel-tag-v1-protocol.c.o
+[634/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/unix/SDL_appid.c.o
+[635/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/unix/SDL_fribidi.c.o
+[636/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/tray/unix/SDL_tray.c.o
+[637/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/unix/SDL_libthai.c.o
+[638/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/unix/SDL_poll.c.o
+[639/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/tray/unix/SDL_dbustray.c.o
+[640/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/haptic/linux/SDL_syshaptic.c.o
+[641/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/camera/v4l2/SDL_camera_v4l2.c.o
+[642/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_system_theme.c.o
+[643/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_progressbar.c.o
+[644/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_dbus.c.o
+[645/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/notification/unix/SDL_dbusnotification.c.o
+[646/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_udev.c.o
+[647/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_fcitx.c.o
+[648/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_ime.c.o
+[649/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_evdev_capabilities.c.o
+[650/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_evdev_kbd.c.o
+[651/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_evdev.c.o
+[652/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_threadprio.c.o
+[653/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_ubuntu_touch.c.o
+[654/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_8bitdo.c.o
+[655/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/core/linux/SDL_ibus.c.o
+[656/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_combined.c.o
+[657/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_gamecube.c.o
+[658/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_flydigi.c.o
+[659/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_gamesir.c.o
+[660/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_luna.c.o
+[661/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_lg4ff.c.o
+[662/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_ps3.c.o
+[663/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_gip.c.o
+[664/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_rumble.c.o
+[665/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_ps4.c.o
+[666/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_ps5.c.o
+[667/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_shield.c.o
+[668/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_stadia.c.o
+[669/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_sinput.c.o
+[670/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_steam_hori.c.o
+[671/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_steam.c.o
+[672/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_steam_triton.c.o
+[673/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_steamdeck.c.o
+[674/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_xbox360.c.o
+[675/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_wii.c.o
+[676/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_switch2.c.o
+[677/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_switch.c.o
+[678/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_xbox360bb.c.o
+[679/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_xbox360w.c.o
+[680/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_zuiki.c.o
+[681/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_report_descriptor.c.o
+[682/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapi_xboxone.c.o
+[683/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/haptic/hidapi/SDL_hidapihaptic.c.o
+[684/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/hidapi/SDL_hidapijoystick.c.o
+[685/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_sysmutex.c.o
+[686/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_systhread.c.o
+[687/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/haptic/hidapi/SDL_hidapihaptic_lg4ff.c.o
+[688/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_sysrwlock.c.o
+[689/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_syscond.c.o
+[690/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_systls.c.o
+[691/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/joystick/linux/SDL_sysjoystick.c.o
+[692/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/thread/pthread/SDL_syssem.c.o
+[693/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/misc/unix/SDL_sysurl.c.o
+[694/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/locale/unix/SDL_syslocale.c.o
+[695/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/filesystem/unix/SDL_sysfilesystem.c.o
+[696/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/storage/generic/SDL_genericstorage.c.o
+[697/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/power/linux/SDL_syspower.c.o
+[698/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/storage/steam/SDL_steamstorage.c.o
+[699/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/time/unix/SDL_systime.c.o
+[700/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/filesystem/posix/SDL_sysfsops.c.o
+[701/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/SDL_dialog.c.o
+[702/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/timer/unix/SDL_systimer.c.o
+[703/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/unix/SDL_unixdialog.c.o
+[704/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/SDL_dialog_utils.c.o
+[705/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/unix/SDL_zenitydialog.c.o
+[706/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/unix/SDL_zenitymessagebox.c.o
+[707/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/process/SDL_process.c.o
+[708/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/dialog/unix/SDL_portaldialog.c.o
+[709/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenevents.c.o
+[710/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenframebuffer.c.o
+[711/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/process/posix/SDL_posixprocess.c.o
+[712/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenopengles.c.o
+[713/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenvideo.c.o
+[714/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenwindow.c.o
+[715/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/tray/SDL_tray_utils.c.o
+[716/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/sensor/dummy/SDL_dummysensor.c.o
+[717/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/main/generic/SDL_sysmain_callbacks.c.o
+[718/1021] Linking C shared library _deps/sdl3_mixer-build/external/opusfile-build/libopusfile.so.0.12
+[719/1021] Linking C shared library _deps/sdl3_mixer-build/external/libxmp-build/libxmp.so.4.7.4
+[720/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/video/offscreen/SDL_offscreenvulkan.c.o
+[721/1021] Linking C shared library _deps/sdl3_mixer-build/external/wavpack-build/libwavpack.so.1.2.8
+[722/1021] Linking CXX shared library _deps/sdl3_mixer-build/external/libgme-build/gme/libgme.so.0.6.5
+[723/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/gpu/vulkan/SDL_gpu_vulkan.c.o
+[724/1021] Building C object CMakeFiles/glad.dir/thirdparty/glad/src/gl.c.o
+[725/1021] Building CXX object CMakeFiles/imgui.dir/_deps/imgui-src/imgui_demo.cpp.o
+[726/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/cmake_pch.hxx.gch
+[727/1021] Building CXX object CMakeFiles/imgui.dir/_deps/imgui-src/imgui.cpp.o
+[728/1021] Building CXX object CMakeFiles/imgui.dir/_deps/imgui-src/imgui_draw.cpp.o
+[729/1021] Building CXX object CMakeFiles/imgui.dir/_deps/imgui-src/backends/imgui_impl_sdl3.cpp.o
+[730/1021] Building CXX object CMakeFiles/imgui.dir/_deps/imgui-src/backends/imgui_impl_sdlrenderer3.cpp.o
+[731/1021] Building CXX object CMakeFiles/imgui.dir/_deps/imgui-src/backends/imgui_impl_opengl3.cpp.o
+[732/1021] Building CXX object CMakeFiles/imgui.dir/_deps/imgui-src/imgui_tables.cpp.o
+[733/1021] Linking C static library _deps/sdl3-build/libSDL3.a
+[734/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/SDL_mixer_metadata_tags.c.o
+[735/1021] Building CXX object CMakeFiles/imgui.dir/_deps/imguizmo-src/src/ImGuizmo.cpp.o
+[736/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/SDL_mixer.c.o
+[737/1021] Building CXX object CMakeFiles/imgui.dir/_deps/imgui-src/imgui_widgets.cpp.o
+[738/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/SDL_mixer_spatialization.c.o
+[739/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_au.c.o
+[740/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_flac.c.o
+[741/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_fluidsynth.c.o
+[742/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_aiff.c.o
+[743/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_mpg123.c.o
+[744/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_gme.c.o
+[745/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_drmp3.c.o
+[746/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_opus.c.o
+[747/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_raw.c.o
+[748/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_sinewave.c.o
+[749/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_drflac.c.o
+[750/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_vorbis.c.o
+[751/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_stb_vorbis.c.o
+[752/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_timidity.c.o
+[753/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_voc.c.o
+[754/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/timidity/common.c.o
+[755/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_wav.c.o
+[756/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/timidity/instrum.c.o
+[757/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/timidity/mix.c.o
+[758/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/timidity/output.c.o
+[759/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/timidity/playmidi.c.o
+[760/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/timidity/readmidi.c.o
+[761/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/timidity/resample.c.o
+[762/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_xmp.c.o
+[763/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/timidity/readsbk.c.o
+[764/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/timidity/sndfont.c.o
+[765/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/decoder_wavpack.c.o
+[766/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/timidity/tables.c.o
+[767/1021] Creating library symlink _deps/sdl3_mixer-build/external/opusfile-build/libopusfile.so.0 _deps/sdl3_mixer-build/external/opusfile-build/libopusfile.so
+[768/1021] Creating library symlink _deps/sdl3_mixer-build/external/libgme-build/gme/libgme.so.0 _deps/sdl3_mixer-build/external/libgme-build/gme/libgme.so
+[769/1021] Creating library symlink _deps/sdl3_mixer-build/external/wavpack-build/libwavpack.so.1 _deps/sdl3_mixer-build/external/wavpack-build/libwavpack.so
+[770/1021] Creating library symlink _deps/sdl3_mixer-build/external/libxmp-build/libxmp.so.4 _deps/sdl3_mixer-build/external/libxmp-build/libxmp.so
+[771/1021] Building C object _deps/sdl3_mixer-build/CMakeFiles/SDL3_mixer-static.dir/src/timidity/timidity.c.o
+[772/1021] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/stdout_sinks.cpp.o
+[773/1021] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/color_sinks.cpp.o
+[774/1021] Building CXX object _deps/glm-build/glm/CMakeFiles/glm.dir/detail/glm.cpp.o
+[775/1021] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/file_sinks.cpp.o
+[776/1021] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/async.cpp.o
+[777/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/AABBTree/AABBTreeBuilder.cpp.o
+[778/1021] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/cfg.cpp.o
+[779/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Core/Color.cpp.o
+[780/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Core/IssueReporting.cpp.o
+[781/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Core/Factory.cpp.o
+[782/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Core/JobSystemSingleThreaded.cpp.o
+[783/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Core/JobSystemThreadPool.cpp.o
+[784/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Core/JobSystemWithBarrier.cpp.o
+[785/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Core/Memory.cpp.o
+[786/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Core/LinearCurve.cpp.o
+[787/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Core/RTTI.cpp.o
+[788/1021] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/bundled_fmtlib_format.cpp.o
+[789/1021] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/spdlog.cpp.o
+[790/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Core/TickCounter.cpp.o
+[791/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Core/Semaphore.cpp.o
+[792/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Core/Profiler.cpp.o
+[793/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Core/StringTools.cpp.o
+[794/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Geometry/ConvexHullBuilder2D.cpp.o
+[795/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Geometry/Indexify.cpp.o
+[796/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Geometry/OrientedBox.cpp.o
+[797/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Math/Vec3.cpp.o
+[798/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/ObjectStream/SerializableObject.cpp.o
+[799/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Geometry/ConvexHullBuilder.cpp.o
+[800/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Body/BodyCreationSettings.cpp.o
+[801/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Body/Body.cpp.o
+[802/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Body/BodyManager.cpp.o
+[803/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Body/MassProperties.cpp.o
+[804/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Body/BodyInterface.cpp.o
+[805/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Body/MotionProperties.cpp.o
+[806/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/BroadPhase/BroadPhase.cpp.o
+[807/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Character/CharacterBase.cpp.o
+[808/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Character/Character.cpp.o
+[809/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/BroadPhase/BroadPhaseBruteForce.cpp.o
+[810/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/BroadPhase/BroadPhaseQuadTree.cpp.o
+[811/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/BroadPhase/QuadTree.cpp.o
+[812/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Character/CharacterVirtual.cpp.o
+[813/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/CastSphereVsTriangles.cpp.o
+[814/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/CastConvexVsTriangles.cpp.o
+[815/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/CollisionGroup.cpp.o
+[816/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/CollisionDispatch.cpp.o
+[817/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/CollideSphereVsTriangles.cpp.o
+[818/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/CollideConvexVsTriangles.cpp.o
+[819/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/GroupFilter.cpp.o
+[820/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/GroupFilterTable.cpp.o
+[821/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/EstimateCollisionResponse.cpp.o
+[822/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/ManifoldBetweenTwoFaces.cpp.o
+[823/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/NarrowPhaseStats.cpp.o
+[824/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/PhysicsMaterial.cpp.o
+[825/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/NarrowPhaseQuery.cpp.o
+[826/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/PhysicsMaterialSimple.cpp.o
+[827/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/CapsuleShape.cpp.o
+[828/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/BoxShape.cpp.o
+[829/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/CompoundShape.cpp.o
+[830/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/ConvexHullShape.cpp.o
+[831/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/DecoratedShape.cpp.o
+[832/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/CylinderShape.cpp.o
+[833/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/EmptyShape.cpp.o
+[834/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/ConvexShape.cpp.o
+[835/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/OffsetCenterOfMassShape.cpp.o
+[836/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/MutableCompoundShape.cpp.o
+[837/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/MeshShape.cpp.o
+[838/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/HeightFieldShape.cpp.o
+[839/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/PlaneShape.cpp.o
+[840/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/RotatedTranslatedShape.cpp.o
+[841/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/ScaledShape.cpp.o
+[842/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/SphereShape.cpp.o
+[843/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/TaperedCapsuleShape.cpp.o
+[844/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/Shape.cpp.o
+[845/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/StaticCompoundShape.cpp.o
+[846/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/TaperedCylinderShape.cpp.o
+[847/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/TransformedShape.cpp.o
+[848/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/Constraint.cpp.o
+[849/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/ConstraintManager.cpp.o
+[850/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Collision/Shape/TriangleShape.cpp.o
+[851/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/ConeConstraint.cpp.o
+[852/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/GearConstraint.cpp.o
+[853/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/DistanceConstraint.cpp.o
+[854/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/FixedConstraint.cpp.o
+[855/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/ContactConstraintManager.cpp.o
+[856/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/MotorSettings.cpp.o
+[857/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/PathConstraintPath.cpp.o
+[858/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/HingeConstraint.cpp.o
+[859/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/PathConstraintPathHermite.cpp.o
+[860/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/PathConstraint.cpp.o
+[861/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/PointConstraint.cpp.o
+[862/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/PulleyConstraint.cpp.o
+[863/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/RackAndPinionConstraint.cpp.o
+[864/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/SpringSettings.cpp.o
+[865/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/SixDOFConstraint.cpp.o
+[866/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/DeterminismLog.cpp.o
+[867/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/SliderConstraint.cpp.o
+[868/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/TwoBodyConstraint.cpp.o
+[869/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Constraints/SwingTwistConstraint.cpp.o
+[870/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/IslandBuilder.cpp.o
+[871/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/PhysicsUpdateContext.cpp.o
+[872/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/LargeIslandSplitter.cpp.o
+[873/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/SoftBody/SoftBodyCreationSettings.cpp.o
+[874/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/PhysicsScene.cpp.o
+[875/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Ragdoll/Ragdoll.cpp.o
+[876/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/PhysicsSystem.cpp.o
+[877/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/SoftBody/SoftBodyShape.cpp.o
+[878/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/StateRecorderImpl.cpp.o
+[879/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/SoftBody/SoftBodyMotionProperties.cpp.o
+[880/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Vehicle/VehicleAntiRollBar.cpp.o
+[881/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Vehicle/TrackedVehicleController.cpp.o
+[882/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Vehicle/MotorcycleController.cpp.o
+[883/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Vehicle/VehicleController.cpp.o
+[884/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Vehicle/VehicleCollisionTester.cpp.o
+[885/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/SoftBody/SoftBodySharedSettings.cpp.o
+[886/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Vehicle/VehicleDifferential.cpp.o
+[887/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Vehicle/VehicleConstraint.cpp.o
+[888/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Vehicle/VehicleEngine.cpp.o
+[889/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Vehicle/VehicleTrack.cpp.o
+[890/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Vehicle/VehicleTransmission.cpp.o
+[891/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Vehicle/Wheel.cpp.o
+[892/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/RegisterTypes.cpp.o
+[893/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Physics/Vehicle/WheeledVehicleController.cpp.o
+[894/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Renderer/DebugRendererPlayback.cpp.o
+[895/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Renderer/DebugRendererSimple.cpp.o
+[896/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Renderer/DebugRenderer.cpp.o
+[897/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Renderer/DebugRendererRecorder.cpp.o
+[898/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Skeleton/SkeletalAnimation.cpp.o
+[899/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Skeleton/Skeleton.cpp.o
+[900/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/TriangleGrouper/TriangleGrouperClosestCentroid.cpp.o
+[901/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Skeleton/SkeletonMapper.cpp.o
+[902/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/TriangleGrouper/TriangleGrouperMorton.cpp.o
+[903/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/Skeleton/SkeletonPose.cpp.o
+[904/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/TriangleSplitter/TriangleSplitter.cpp.o
+[905/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/TriangleSplitter/TriangleSplitterBinning.cpp.o
+[906/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/TriangleSplitter/TriangleSplitterLongestAxis.cpp.o
+[907/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/TriangleSplitter/TriangleSplitterMean.cpp.o
+[908/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/TriangleSplitter/TriangleSplitterFixedLeafSize.cpp.o
+[909/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/TriangleSplitter/TriangleSplitterMorton.cpp.o
+[910/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/ObjectStream/ObjectStream.cpp.o
+[911/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/ObjectStream/ObjectStreamBinaryIn.cpp.o
+[912/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/ObjectStream/ObjectStreamBinaryOut.cpp.o
+[913/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/ObjectStream/ObjectStreamIn.cpp.o
+[914/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/ObjectStream/ObjectStreamTextIn.cpp.o
+[915/1021] Linking C static library libglad.a
+[916/1021] Linking CXX static library libimgui.a
+[917/1021] Linking C static library _deps/sdl3_mixer-build/libSDL3_mixer.a
+[918/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/ObjectStream/ObjectStreamTextOut.cpp.o
+[919/1021] Linking CXX static library _deps/glm-build/glm/libglm.a
+[920/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/android_utilities.cpp.o
+[921/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/ObjectStream/TypeDeclarations.cpp.o
+[922/1021] Building CXX object _deps/joltphysics-build/CMakeFiles/Jolt.dir/__/joltphysics-src/Jolt/ObjectStream/ObjectStreamOut.cpp.o
+[923/1021] Linking CXX static library _deps/spdlog-build/libspdlogd.a
+[924/1021] Linking CXX static library _deps/joltphysics-build/libJolt.a
+[925/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/loader_init_data.cpp.o
+[926/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/loader_instance.cpp.o
+[927/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/loader_core.cpp.o
+[928/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/api_layer_interface.cpp.o
+[929/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/loader_logger_recorders.cpp.o
+[930/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/loader_logger.cpp.o
+[931/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/loader_properties.cpp.o
+[932/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/manifest_file.cpp.o
+[933/1021] Building C object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/__/__/__/openxr-src/src/xr_generated_dispatch_table_core.c.o
+[934/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/__/__/__/openxr-src/src/common/object_info.cpp.o
+[935/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/xr_generated_loader.cpp.o
+[936/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/runtime_interface.cpp.o
+[937/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/__/__/__/openxr-src/src/common/filesystem_utils.cpp.o
+[938/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/__/__/__/openxr-src/src/external/jsoncpp/src/lib_json/json_reader.cpp.o
+[939/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/__/__/__/openxr-src/src/external/jsoncpp/src/lib_json/json_writer.cpp.o
+[940/1021] Building CXX object _deps/openxr-build/src/loader/CMakeFiles/openxr_loader.dir/__/__/__/openxr-src/src/external/jsoncpp/src/lib_json/json_value.cpp.o
+[941/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/core/components.cpp.o
+[942/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/core/string_table.cpp.o
+[943/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/core/property_manager.cpp.o
+[944/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/core/animation_controller.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/core/animation_controller.cpp: In member function ‘bool LithTech::AnimationController::SetAnimation(uint32_t, bool)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/core/animation_controller.cpp:53:69: warning: unused parameter ‘transition’ [-Wunused-parameter]
+   53 |     bool AnimationController::SetAnimation(uint32_t animIndex, bool transition)
+      |                                                                ~~~~~^~~~~~~~~~
+[945/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/sound_system.cpp.o
+[946/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/trigger_system.cpp.o
+[947/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/door_system.cpp.o
+[948/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/keyframer_system.cpp.o
+[949/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/core/level_manager.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/core/level_manager.cpp: In member function ‘bool LithTech::LevelManager::CreateLevelObjects(LithTech::DATWorld&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/core/level_manager.cpp:131:16: warning: variable ‘lightCount’ set but not used [-Wunused-but-set-variable=]
+  131 |         size_t lightCount = 0;
+      |                ^~~~~~~~~~
+[950/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/physics_system.cpp.o
+[951/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/hud_system.cpp.o
+[952/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/weapon_config.cpp.o
+[953/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/systems/weapon_system.cpp.o
+[954/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/abc_parser.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp: In member function ‘void LithTech::ABCParser::ParseAnimation()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:272:27: warning: variable ‘kfBoundsMin’ set but not used [-Wunused-but-set-variable=]
+  272 |                 glm::vec3 kfBoundsMin = reader_->ReadVector3();
+      |                           ^~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:273:27: warning: variable ‘kfBoundsMax’ set but not used [-Wunused-but-set-variable=]
+  273 |                 glm::vec3 kfBoundsMax = reader_->ReadVector3();
+      |                           ^~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:300:27: warning: variable ‘scale’ set but not used [-Wunused-but-set-variable=]
+  300 |                 glm::vec3 scale = reader_->ReadVector3();
+      |                           ^~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:301:27: warning: variable ‘transform’ set but not used [-Wunused-but-set-variable=]
+  301 |                 glm::vec3 transform = reader_->ReadVector3();
+      |                           ^~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:263:23: warning: variable ‘boundsMin’ set but not used [-Wunused-but-set-variable=]
+  263 |             glm::vec3 boundsMin = reader_->ReadVector3();
+      |                       ^~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:264:23: warning: variable ‘boundsMax’ set but not used [-Wunused-but-set-variable=]
+  264 |             glm::vec3 boundsMax = reader_->ReadVector3();
+      |                       ^~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp: In member function ‘void LithTech::ABCParser::ParseAnimDims()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/abc_parser.cpp:312:23: warning: variable ‘dims’ set but not used [-Wunused-but-set-variable=]
+  312 |             glm::vec3 dims = reader_->ReadVector3();
+      |                       ^~~~
+[955/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/physics/collision_shapes.cpp.o
+[956/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/physics/physics_debug_renderer.cpp.o
+[957/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/physics/physics_world.cpp.o
+[958/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/dtx_parser.cpp.o
+[959/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/pcx_parser.cpp.o
+[960/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/fnt_parser.cpp.o
+[961/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/dat_parser.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp: In member function ‘void LithTech::DATParser::ParseFile()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:142:34: warning: unused variable ‘propFlags’ [-Wunused-variable]
+  142 |                         uint32_t propFlags = reader_->ReadUInt32();
+      |                                  ^~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:86:28: warning: unused variable ‘bytesRemaining’ [-Wunused-variable]
+   86 |                     size_t bytesRemaining = objEnd - propsStart;
+      |                            ^~~~~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp: In member function ‘void LithTech::DATParser::ParseObjectsRaw(uint32_t)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:302:46: warning: unused parameter ‘objPos’ [-Wunused-parameter]
+  302 |     void DATParser::ParseObjectsRaw(uint32_t objPos)
+      |                                     ~~~~~~~~~^~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp: In member function ‘void LithTech::DATParser::ParseBSP(LithTech::DATWorldBSP&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:723:27: warning: variable ‘uv4’ set but not used [-Wunused-but-set-variable=]
+  723 |                 glm::vec3 uv4 = reader_->ReadVector3();
+      |                           ^~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:724:27: warning: variable ‘uv5’ set but not used [-Wunused-but-set-variable=]
+  724 |                 glm::vec3 uv5 = reader_->ReadVector3();
+      |                           ^~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:725:27: warning: variable ‘color’ set but not used [-Wunused-but-set-variable=]
+  725 |                 glm::vec3 color = reader_->ReadVector3();
+      |                           ^~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:639:17: warning: unused variable ‘vertCnt’ [-Wunused-variable]
+  639 |         int32_t vertCnt = reader_->ReadInt32();
+      |                 ^~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:640:17: warning: unused variable ‘visListSize’ [-Wunused-variable]
+  640 |         int32_t visListSize = reader_->ReadInt32();
+      |                 ^~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:641:17: warning: unused variable ‘leafListCnt’ [-Wunused-variable]
+  641 |         int32_t leafListCnt = reader_->ReadInt32();
+      |                 ^~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:646:19: warning: variable ‘minBox’ set but not used [-Wunused-but-set-variable=]
+  646 |         glm::vec3 minBox = reader_->ReadVector3();
+      |                   ^~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/dat_parser.cpp:647:19: warning: variable ‘maxBox’ set but not used [-Wunused-but-set-variable=]
+  647 |         glm::vec3 maxBox = reader_->ReadVector3();
+      |                   ^~~~~~
+[962/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/cfg_parser.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/cfg_parser.cpp: In member function ‘void LithTech::CFGParser::ParseLine(const std::string&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/cfg_parser.cpp:183:20: warning: unused variable ‘firstQuote’ [-Wunused-variable]
+  183 |             size_t firstQuote = 0;
+      |                    ^~~~~~~~~~
+[963/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/file_formats.cpp.o
+[964/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/rez_archive_parser.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/rez_archive_parser.cpp: In member function ‘bool LithTech::RezArchiveParser::ParseDirectory(uint32_t, uint32_t, const std::string&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/rez_archive_parser.cpp:176:26: warning: unused variable ‘zero’ [-Wunused-variable]
+  176 |                 uint32_t zero = ReadUInt32(pos);
+      |                          ^~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/rez_archive_parser.cpp:224:26: warning: unused variable ‘timestamp’ [-Wunused-variable]
+  224 |                 uint32_t timestamp = ReadUInt32(pos);
+      |                          ^~~~~~~~~
+[965/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/BinaryReader.cpp.o
+[966/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/rez_manager.cpp.o
+[967/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/camera.cpp.o
+[968/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/rez_loader.cpp.o
+[969/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/renderer.cpp.o
+[970/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/formats/png_loader.cpp.o
+In file included from /home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/png_loader.cpp:12:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/stb_image.h: In function ‘int stbi__tga_get_comp(int, int, int*)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/stb_image.h:5242:16: warning: this statement may fall through [-Wimplicit-fallthrough=]
+ 5242 |       case 16: if(is_grey) return STBI_grey_alpha;
+      |                ^~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/formats/stb_image.h:5244:7: note: here
+ 5244 |       case 15: if(is_rgb16) *is_rgb16 = 1;
+      |       ^~~~
+[971/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/shading/light_manager.cpp.o
+[972/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/shading/shader_manager.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/shading/shader_manager.cpp: In member function ‘bool ShaderManager::CreateShaders()’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/shading/shader_manager.cpp:155:14: warning: unused variable ‘vertexShader’ [-Wunused-variable]
+  155 |     uint32_t vertexShader, fragmentShader;
+      |              ^~~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/shading/shader_manager.cpp:155:28: warning: unused variable ‘fragmentShader’ [-Wunused-variable]
+  155 |     uint32_t vertexShader, fragmentShader;
+      |                            ^~~~~~~~~~~~~~
+[973/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/gl_context.cpp.o
+[974/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/renderer_3d.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/renderer_3d.cpp: In member function ‘Mesh3D* Renderer3D::LoadWeaponModel(const std::string&, LithTech::RezManager*, const std::string&, const std::string&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/renderer_3d.cpp:291:23: warning: variable ‘sizeTrans’ set but not used [-Wunused-but-set-variable=]
+  291 |             glm::vec3 sizeTrans = nodeMaxTrans[nodeIdx] - nodeMinTrans[nodeIdx];
+      |                       ^~~~~~~~~
+[975/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/hdr_framebuffer.cpp.o
+[976/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/forward_plus.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/forward_plus.cpp: In member function ‘bool ForwardPlusRenderer::TileFrustumIntersectsSphere(int, int, const glm::vec3&, float, const glm::mat4&, float, float)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/forward_plus.cpp:321:88: warning: unused parameter ‘nearPlane’ [-Wunused-parameter]
+  321 |                                                       const glm::mat4& viewProj, float nearPlane, float farPlane)
+      |                                                                                  ~~~~~~^~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/forward_plus.cpp:321:105: warning: unused parameter ‘farPlane’ [-Wunused-parameter]
+  321 |                                                       const glm::mat4& viewProj, float nearPlane, float farPlane)
+      |                                                                                                   ~~~~~~^~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/forward_plus.cpp: In member function ‘bool ForwardPlusRenderer::TileFrustumIntersectsCone(int, int, const glm::vec3&, const glm::vec3&, float, float, const glm::mat4&, float, float)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/forward_plus.cpp:348:70: warning: unused parameter ‘direction’ [-Wunused-parameter]
+  348 |                                                     const glm::vec3& direction, float radius, float angle,
+      |                                                     ~~~~~~~~~~~~~~~~~^~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/forward_plus.cpp:348:101: warning: unused parameter ‘angle’ [-Wunused-parameter]
+  348 |                                                     const glm::vec3& direction, float radius, float angle,
+      |                                                                                               ~~~~~~^~~~~
+[977/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/postprocessing/bloom_pass.cpp.o
+[978/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/material_system.cpp.o
+[979/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/postprocessing/ssao_pass.cpp.o
+[980/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/resource_manager.cpp.o
+[981/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/postprocessing/ssr_pass.cpp.o
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/postprocessing/ssr_pass.cpp: In member function ‘void LithTech::SSRPass::Execute(GLuint, GLuint, GLuint, const glm::mat4&, const glm::mat4&, float, int, float, float)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/postprocessing/ssr_pass.cpp:57:76: warning: unused parameter ‘normalTexture’ [-Wunused-parameter]
+   57 |     void SSRPass::Execute(GLuint sceneTexture, GLuint depthTexture, GLuint normalTexture, const glm::mat4& view,
+      |                                                                     ~~~~~~~^~~~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/renderer/postprocessing/ssr_pass.cpp:59:33: warning: unused parameter ‘roughnessThreshold’ [-Wunused-parameter]
+   59 |                           float roughnessThreshold)
+      |                           ~~~~~~^~~~~~~~~~~~~~~~~~
+[982/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/postprocessing/motion_blur_pass.cpp.o
+[983/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/postprocessing/ssgi_pass.cpp.o
+[984/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/postprocessing/post_process_stack.cpp.o
+[985/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/sprite_batch.cpp.o
+[986/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/renderer/bitmap_font.cpp.o
+[987/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/audio/audio_manager.cpp.o
+[988/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/ui/ImGuiManagerBase.cpp.o
+[989/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/game/CliUtils.cpp.o
+[990/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/input/input_action_system.cpp.o
+[991/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/ui/ImGuiManager.cpp.o
+[992/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/ui/DebugOverlay.cpp.o
+[993/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/ui/MainMenu.cpp.o
+[994/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3_test.dir/src/test/SDL_test_assert.c.o
+[995/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3_test.dir/src/test/SDL_test_common.c.o
+[996/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3_test.dir/src/test/SDL_test_compare.c.o
+[997/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3_test.dir/src/test/SDL_test_crc32.c.o
+[998/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3_test.dir/src/test/SDL_test_font.c.o
+[999/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3_test.dir/src/test/SDL_test_fuzzer.c.o
+[1000/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3_test.dir/src/test/SDL_test_harness.c.o
+[1001/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3_test.dir/src/test/SDL_test_log.c.o
+[1002/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3_test.dir/src/test/SDL_test_md5.c.o
+[1003/1021] Building C object _deps/sdl3-build/CMakeFiles/SDL3_test.dir/src/test/SDL_test_memory.c.o
+[1004/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/ui/editor/EditorPanel.cpp.o
+[1005/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/ui/editor/GizmoController.cpp.o
+[1006/1021] Linking CXX shared library _deps/openxr-build/src/loader/libopenxr_loader.so.1.1.54
+[1007/1021] Building CXX object nomadengine/CMakeFiles/NoMadEngine.dir/src/game/GameBase.cpp.o
+FAILED: [code=1] nomadengine/CMakeFiles/NoMadEngine.dir/src/game/GameBase.cpp.o 
+/usr/bin/c++ -DJPH_DEBUG_RENDERER -DJPH_OBJECT_STREAM -DJPH_PROFILE_ENABLED -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DLINUX -DSPDLOG_COMPILED_LIB -D_DEBUG -I/home/yann/projects/lithtech/NoMadEngine/nomadengine/src -I/home/yann/projects/lithtech/NoMadEngine/thirdparty/glad/include -I/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/spdlog-src/include -I/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/nlohmann_json-src/include -I/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/entt-src/src -I/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/joltphysics-src/Build/.. -I/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/imgui-src -I/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/imgui-src/backends -I/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/imguizmo-src/src -I/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/sdl3-build/include-revision -I/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/sdl3-src/include -I/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/sdl3_mixer-src/include -I/tmp/lithtech-audit-2bVxTF/nomadengine/_deps/glm-src -g -std=c++20 -fPIC -Wall -Wextra -Wpedantic -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -pthread -MD -MT nomadengine/CMakeFiles/NoMadEngine.dir/src/game/GameBase.cpp.o -MF nomadengine/CMakeFiles/NoMadEngine.dir/src/game/GameBase.cpp.o.d -o nomadengine/CMakeFiles/NoMadEngine.dir/src/game/GameBase.cpp.o -c /home/yann/projects/lithtech/NoMadEngine/nomadengine/src/game/GameBase.cpp
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/game/GameBase.cpp: In member function ‘void nme::GameBase::OpenLevel(const std::string&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/game/GameBase.cpp:1337:41: error: ‘m_vrEnabled’ was not declared in this scope
+ 1337 |                 std::string modelPath = m_vrEnabled ? cfg.vr.vrAssets.mesh : cfg.flat.flatAssets.handModel;
+      |                                         ^~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/game/GameBase.cpp:1371:21: error: ‘m_vrEnabled’ was not declared in this scope
+ 1371 |                 if (m_vrEnabled)
+      |                     ^~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/game/GameBase.cpp:1384:100: error: ‘m_vrEnabled’ was not declared in this scope
+ 1384 |                 spdlog::debug("Loading viewmodel: model={}, skin={} (VR={})", modelPath, skinPath, m_vrEnabled);
+      |                                                                                                    ^~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/game/GameBase.cpp: In member function ‘void nme::GameBase::OnWeaponSwitch(const nme::WeaponSwitchEvent&)’:
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/game/GameBase.cpp:1646:40: error: ‘m_vrEnabled’ was not declared in this scope
+ 1646 |             std::string cfgModelPath = m_vrEnabled ? cfg.vr.vrAssets.mesh : cfg.flat.flatAssets.handModel;
+      |                                        ^~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/game/GameBase.cpp:1660:17: error: ‘m_vrEnabled’ was not declared in this scope
+ 1660 |             if (m_vrEnabled)
+      |                 ^~~~~~~~~~~
+/home/yann/projects/lithtech/NoMadEngine/nomadengine/src/game/GameBase.cpp:1689:99: error: ‘m_vrEnabled’ was not declared in this scope
+ 1689 |             spdlog::debug("Switched to weapon: {} (slot {}, VR={})", weapon->name, event.newSlot, m_vrEnabled);
+      |                                                                                                   ^~~~~~~~~~~
+[1008/1021] Building CXX object openblood2/CMakeFiles/OpenBlood2.dir/src/main.cpp.o
+[1009/1021] Building CXX object openblood2/CMakeFiles/OpenBlood2.dir/src/Blood2Game.cpp.o
+[1010/1021] Building CXX object openblood2/CMakeFiles/OpenBlood2.dir/src/Blood2EntityFactory.cpp.o
+ninja: build stopped: subcommand failed.

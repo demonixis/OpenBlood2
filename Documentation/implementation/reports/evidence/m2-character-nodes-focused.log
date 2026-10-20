@@ -1,0 +1,27 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 349: gpu.model_depth
+1/7 Test #349: gpu.model_depth ..................   Passed    0.57 sec
+    Start 481: ai_hit.hidden
+2/7 Test #481: ai_hit.hidden ....................   Passed    0.00 sec
+    Start 526: character_nodes.services
+3/7 Test #526: character_nodes.services .........   Passed    0.00 sec
+    Start 527: character_nodes.names
+4/7 Test #527: character_nodes.names ............   Passed    0.00 sec
+    Start 528: character_nodes.rendering
+5/7 Test #528: character_nodes.rendering ........   Passed    0.00 sec
+    Start 529: character_nodes.restore
+6/7 Test #529: character_nodes.restore ..........   Passed    0.01 sec
+    Start 530: character_nodes.private
+7/7 Test #530: character_nodes.private ..........   Passed    1.30 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+ai_hit             =   0.00 sec*proc (1 test)
+character_nodes    =   1.31 sec*proc (5 tests)
+gpu                =   0.57 sec*proc (1 test)
+headless           =   1.32 sec*proc (6 tests)
+model_view         =   0.57 sec*proc (1 test)
+private            =   1.30 sec*proc (1 test)
+
+Total Test time (real) =   1.90 sec

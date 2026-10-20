@@ -1,0 +1,134 @@
+Documentation/Implementation/evidence/m2-session-start-code.patch:108: trailing whitespace.
++ 
+Documentation/Implementation/evidence/m2-session-start-code.patch:279: trailing whitespace.
++ 
+Documentation/Implementation/evidence/m2-session-start-debug-build.log:29: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-debug-build.log:31: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-debug-build.log:36: trailing whitespace.
++-- Vendor:   
+Documentation/Implementation/evidence/m2-session-start-debug-build.log:37: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-debug-build.log:52: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-debug-build.log:159: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-debug-build.log:162: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-debug-build.log:171: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-debug-build.log:175: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-debug-gpu.xml:81: trailing whitespace.
++Destination: CityHub / 
+Documentation/Implementation/evidence/m2-session-start-debug-gpu.xml:84: trailing whitespace.
++Destination: SubwayA / 
+Documentation/Implementation/evidence/m2-session-start-debug-gpu.xml:86: trailing whitespace.
++Destination: CityHub / 
+Documentation/Implementation/evidence/m2-session-start-debug-gpu.xml:89: trailing whitespace.
++Destination: SubwayA / 
+Documentation/Implementation/evidence/m2-session-start-debug.xml:31: trailing whitespace.
++Commit 0: 
+Documentation/Implementation/evidence/m2-session-start-debug.xml:32: trailing whitespace.
++Commit 1: 
+Documentation/Implementation/evidence/m2-session-start-debug.xml:33: trailing whitespace.
++Commit 2: 
+Documentation/Implementation/evidence/m2-session-start-debug.xml:178: trailing whitespace.
++CityHub transfer 0: 
+Documentation/Implementation/evidence/m2-session-start-debug.xml:179: trailing whitespace.
++SubwayA transfer 0: 
+Documentation/Implementation/evidence/m2-session-start-debug.xml:181: trailing whitespace.
++CityHub transfer 1: 
+Documentation/Implementation/evidence/m2-session-start-debug.xml:182: trailing whitespace.
++SubwayA transfer 1: 
+Documentation/Implementation/evidence/m2-session-start-debug.xml:184: trailing whitespace.
++CityHub transfer 2: 
+Documentation/Implementation/evidence/m2-session-start-debug.xml:185: trailing whitespace.
++SubwayA transfer 2: 
+Documentation/Implementation/evidence/m2-session-start-debug.xml:432: trailing whitespace.
++worlds/18_temple.dat rejected=sprites\redlight1.spr: Missing, oversized or non-SPR sprite resource: 
+Documentation/Implementation/evidence/m2-session-start-release-build.log:29: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-release-build.log:31: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-release-build.log:36: trailing whitespace.
++-- Vendor:   
+Documentation/Implementation/evidence/m2-session-start-release-build.log:37: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-release-build.log:52: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-release-build.log:159: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-release-build.log:162: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-release-build.log:171: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-release-build.log:175: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-release-gpu.xml:81: trailing whitespace.
++Destination: CityHub / 
+Documentation/Implementation/evidence/m2-session-start-release-gpu.xml:84: trailing whitespace.
++Destination: SubwayA / 
+Documentation/Implementation/evidence/m2-session-start-release-gpu.xml:86: trailing whitespace.
++Destination: CityHub / 
+Documentation/Implementation/evidence/m2-session-start-release-gpu.xml:89: trailing whitespace.
++Destination: SubwayA / 
+Documentation/Implementation/evidence/m2-session-start-release.xml:31: trailing whitespace.
++Commit 0: 
+Documentation/Implementation/evidence/m2-session-start-release.xml:32: trailing whitespace.
++Commit 1: 
+Documentation/Implementation/evidence/m2-session-start-release.xml:33: trailing whitespace.
++Commit 2: 
+Documentation/Implementation/evidence/m2-session-start-release.xml:178: trailing whitespace.
++CityHub transfer 0: 
+Documentation/Implementation/evidence/m2-session-start-release.xml:179: trailing whitespace.
++SubwayA transfer 0: 
+Documentation/Implementation/evidence/m2-session-start-release.xml:181: trailing whitespace.
++CityHub transfer 1: 
+Documentation/Implementation/evidence/m2-session-start-release.xml:182: trailing whitespace.
++SubwayA transfer 1: 
+Documentation/Implementation/evidence/m2-session-start-release.xml:184: trailing whitespace.
++CityHub transfer 2: 
+Documentation/Implementation/evidence/m2-session-start-release.xml:185: trailing whitespace.
++SubwayA transfer 2: 
+Documentation/Implementation/evidence/m2-session-start-release.xml:432: trailing whitespace.
++worlds/18_temple.dat rejected=sprites\redlight1.spr: Missing, oversized or non-SPR sprite resource: 
+Documentation/Implementation/evidence/m2-session-start-sanitize-build.log:29: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-sanitize-build.log:31: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-sanitize-build.log:36: trailing whitespace.
++-- Vendor:   
+Documentation/Implementation/evidence/m2-session-start-sanitize-build.log:37: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-sanitize-build.log:52: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-sanitize-build.log:159: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-sanitize-build.log:162: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-sanitize-build.log:171: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-sanitize-build.log:175: trailing whitespace.
++-- 
+Documentation/Implementation/evidence/m2-session-start-sanitize.xml:31: trailing whitespace.
++Commit 0: 
+Documentation/Implementation/evidence/m2-session-start-sanitize.xml:32: trailing whitespace.
++Commit 1: 
+Documentation/Implementation/evidence/m2-session-start-sanitize.xml:33: trailing whitespace.
++Commit 2: 
+Documentation/Implementation/evidence/m2-session-start-sanitize.xml:178: trailing whitespace.
++CityHub transfer 0: 
+Documentation/Implementation/evidence/m2-session-start-sanitize.xml:179: trailing whitespace.
++SubwayA transfer 0: 
+Documentation/Implementation/evidence/m2-session-start-sanitize.xml:181: trailing whitespace.
++CityHub transfer 1: 
+Documentation/Implementation/evidence/m2-session-start-sanitize.xml:182: trailing whitespace.
++SubwayA transfer 1: 
+Documentation/Implementation/evidence/m2-session-start-sanitize.xml:184: trailing whitespace.
++CityHub transfer 2: 
+Documentation/Implementation/evidence/m2-session-start-sanitize.xml:185: trailing whitespace.
++SubwayA transfer 2: 
+Documentation/Implementation/evidence/m2-session-start-sanitize.xml:432: trailing whitespace.
++worlds/18_temple.dat rejected=sprites\redlight1.spr: Missing, oversized or non-SPR sprite resource: 

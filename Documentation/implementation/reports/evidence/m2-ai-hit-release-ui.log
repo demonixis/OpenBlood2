@@ -1,0 +1,12 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 273: gpu.character
+1/1 Test #273: gpu.character ....................   Passed    3.20 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+character    =   3.20 sec*proc (1 test)
+gpu          =   3.20 sec*proc (1 test)
+private      =   3.20 sec*proc (1 test)
+
+Total Test time (real) =   3.20 sec

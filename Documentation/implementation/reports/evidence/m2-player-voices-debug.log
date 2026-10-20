@@ -1,0 +1,135 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 954: train_session.private_60
+      Start 953: train_session.private_30
+ 1/58 Test #953: train_session.private_30 .........   Passed   23.74 sec
+      Start 958: screen_fade.private
+ 2/58 Test #954: train_session.private_60 .........   Passed   24.64 sec
+      Start  73: player.smell_private
+ 3/58 Test  #73: player.smell_private .............   Passed    4.89 sec
+      Start 846: conversation.catalog
+ 4/58 Test #846: conversation.catalog .............   Passed    3.96 sec
+      Start 964: player_voice.private
+ 5/58 Test #964: player_voice.private .............   Passed    3.24 sec
+      Start 845: conversation.private
+ 6/58 Test #845: conversation.private .............   Passed    1.81 sec
+      Start  74: player.private
+ 7/58 Test  #74: player.private ...................   Passed    2.21 sec
+      Start  50: world.level_change_private
+ 8/58 Test #958: screen_fade.private ..............   Passed   22.38 sec
+      Start  12: objects.message_churn
+ 9/58 Test  #50: world.level_change_private .......   Passed    5.65 sec
+      Start 201: pickup_audio.private
+10/58 Test #201: pickup_audio.private .............   Passed    0.58 sec
+      Start 963: player_voice.pickup
+11/58 Test #963: player_voice.pickup ..............   Passed    0.60 sec
+      Start 567: weapon_drops.catalog
+12/58 Test #567: weapon_drops.catalog .............   Passed    0.17 sec
+      Start 199: pickup_audio.failures
+13/58 Test  #12: objects.message_churn ............   Passed    1.71 sec
+      Start  32: world.level_change
+14/58 Test #199: pickup_audio.failures ............   Passed    0.15 sec
+      Start  13: objects.message_limit
+15/58 Test  #32: world.level_change ...............   Passed    0.07 sec
+      Start 198: pickup_audio.rules
+16/58 Test #198: pickup_audio.rules ...............   Passed    0.02 sec
+      Start 844: conversation.lifetime
+17/58 Test #844: conversation.lifetime ............   Passed    0.01 sec
+      Start 840: conversation.sequence
+18/58 Test #840: conversation.sequence ............   Passed    0.01 sec
+      Start 200: pickup_audio.callbacks
+19/58 Test #200: pickup_audio.callbacks ...........   Passed    0.02 sec
+      Start 957: screen_fade.session
+20/58 Test #957: screen_fade.session ..............   Passed    0.01 sec
+      Start 842: conversation.transport
+21/58 Test #842: conversation.transport ...........   Passed    0.01 sec
+      Start 561: weapon_drops.falling
+22/58 Test #561: weapon_drops.falling .............   Passed    0.01 sec
+      Start  72: player.smell
+23/58 Test  #13: objects.message_limit ............   Passed    0.10 sec
+      Start 843: conversation.clock
+24/58 Test  #72: player.smell .....................   Passed    0.01 sec
+      Start 841: conversation.delayed
+25/58 Test #843: conversation.clock ...............   Passed    0.01 sec
+      Start 558: weapon_drops.collect
+26/58 Test #841: conversation.delayed .............   Passed    0.01 sec
+      Start  69: player.rollback
+27/58 Test #558: weapon_drops.collect .............   Passed    0.01 sec
+      Start 962: player_voice.messages
+28/58 Test  #69: player.rollback ..................   Passed    0.01 sec
+      Start 562: weapon_drops.guards
+29/58 Test #562: weapon_drops.guards ..............   Passed    0.01 sec
+      Start 563: weapon_drops.failures
+30/58 Test #962: player_voice.messages ............   Passed    0.02 sec
+      Start 560: weapon_drops.drop
+31/58 Test #563: weapon_drops.failures ............   Passed    0.01 sec
+      Start 566: weapon_drops.missing_pickup
+32/58 Test #560: weapon_drops.drop ................   Passed    0.01 sec
+      Start 565: weapon_drops.callback
+33/58 Test #566: weapon_drops.missing_pickup ......   Passed    0.01 sec
+      Start 559: weapon_drops.protocol
+34/58 Test #565: weapon_drops.callback ............   Passed    0.01 sec
+      Start 960: player_voice.groups
+35/58 Test #559: weapon_drops.protocol ............   Passed    0.01 sec
+      Start  68: player.lifecycle
+36/58 Test  #68: player.lifecycle .................   Passed    0.01 sec
+      Start 564: weapon_drops.nosliding
+37/58 Test #960: player_voice.groups ..............   Passed    0.02 sec
+      Start 961: player_voice.timing
+38/58 Test #564: weapon_drops.nosliding ...........   Passed    0.01 sec
+      Start  70: player.messages
+39/58 Test  #70: player.messages ..................   Passed    0.01 sec
+      Start  71: player.callbacks
+40/58 Test #961: player_voice.timing ..............   Passed    0.02 sec
+      Start  67: player.handles
+41/58 Test  #67: player.handles ...................   Passed    0.00 sec
+      Start  47: world.session_lifecycle
+42/58 Test  #71: player.callbacks .................   Passed    0.01 sec
+      Start 839: conversation.mapping
+43/58 Test  #47: world.session_lifecycle ..........   Passed    0.00 sec
+      Start 956: screen_fade.values
+44/58 Test #839: conversation.mapping .............   Passed    0.00 sec
+      Start  48: world.session_messages
+45/58 Test #956: screen_fade.values ...............   Passed    0.00 sec
+      Start  14: objects.unsupported_teardown
+46/58 Test  #48: world.session_messages ...........   Passed    0.00 sec
+      Start   2: objects.builtin_model
+47/58 Test   #2: objects.builtin_model ............   Passed    0.00 sec
+      Start  15: objects.creation_failures
+48/58 Test  #15: objects.creation_failures ........   Passed    0.01 sec
+      Start  11: objects.messages_strings
+49/58 Test  #14: objects.unsupported_teardown .....   Passed    0.01 sec
+      Start   5: objects.reasons_properties
+50/58 Test   #5: objects.reasons_properties .......   Passed    0.00 sec
+      Start   6: objects.scheduling
+51/58 Test  #11: objects.messages_strings .........   Passed    0.01 sec
+      Start   7: objects.deferred_removal
+52/58 Test   #6: objects.scheduling ...............   Passed    0.00 sec
+      Start   3: objects.original_objects
+53/58 Test   #7: objects.deferred_removal .........   Passed    0.00 sec
+      Start  10: objects.links_lists
+54/58 Test   #3: objects.original_objects .........   Passed    0.00 sec
+      Start   9: objects.handles_selection
+55/58 Test  #10: objects.links_lists ..............   Passed    0.00 sec
+      Start   4: objects.nested_creation
+56/58 Test   #9: objects.handles_selection ........   Passed    0.00 sec
+      Start   8: objects.aggregate_dispatch
+57/58 Test   #4: objects.nested_creation ..........   Passed    0.00 sec
+58/58 Test   #8: objects.aggregate_dispatch .......   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 58
+
+Label Time Summary:
+audio            =   4.66 sec*proc (9 tests)
+conversation     =   5.82 sec*proc (8 tests)
+headless         =  96.24 sec*proc (58 tests)
+objects          =   1.86 sec*proc (14 tests)
+pickups          =   0.77 sec*proc (4 tests)
+player           =   7.16 sec*proc (8 tests)
+player_voice     =   3.89 sec*proc (5 tests)
+private          =  93.27 sec*proc (11 tests)
+screen_fade      =  22.39 sec*proc (3 tests)
+train_session    =  48.38 sec*proc (2 tests)
+weapon_drops     =   0.24 sec*proc (10 tests)
+world            =   5.72 sec*proc (4 tests)
+
+Total Test time (real) =  48.14 sec

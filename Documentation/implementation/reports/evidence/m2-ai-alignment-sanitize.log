@@ -1,0 +1,121 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 470: ai_runtime.subway
+      Start 468: ai_runtime.catalog
+ 1/54 Test #468: ai_runtime.catalog ...............   Passed    5.17 sec
+      Start 471: ai_runtime.arena
+ 2/54 Test #471: ai_runtime.arena .................   Passed    1.90 sec
+      Start 472: ai_runtime.sparse_weapons
+ 3/54 Test #472: ai_runtime.sparse_weapons ........   Passed    0.72 sec
+      Start 396: ai_navigation.subway
+ 4/54 Test #396: ai_navigation.subway .............   Passed    4.06 sec
+      Start 469: ai_runtime.failures
+ 5/54 Test #469: ai_runtime.failures ..............   Passed    0.31 sec
+      Start 444: ai_recovery.catalog
+ 6/54 Test #444: ai_recovery.catalog ..............   Passed    0.96 sec
+      Start   1: objects.builtin_model
+ 7/54 Test   #1: objects.builtin_model ............   Passed    0.02 sec
+      Start 458: ai_runtime.visibility_filter
+ 8/54 Test #458: ai_runtime.visibility_filter .....   Passed    0.02 sec
+      Start  11: objects.unsupported_teardown
+ 9/54 Test  #11: objects.unsupported_teardown .....   Passed    0.05 sec
+      Start 460: ai_runtime.lifetime
+10/54 Test #460: ai_runtime.lifetime ..............   Passed    0.02 sec
+      Start 459: ai_runtime.visibility_atomic
+11/54 Test #459: ai_runtime.visibility_atomic .....   Passed    0.02 sec
+      Start 467: ai_runtime.missing
+12/54 Test #467: ai_runtime.missing ...............   Passed    0.02 sec
+      Start 466: ai_runtime.body
+13/54 Test #466: ai_runtime.body ..................   Passed    0.02 sec
+      Start  10: objects.messages_strings
+14/54 Test  #10: objects.messages_strings .........   Passed    0.04 sec
+      Start 456: ai_runtime.activation
+15/54 Test #456: ai_runtime.activation ............   Passed    0.02 sec
+      Start 465: ai_runtime.triggers
+16/54 Test #465: ai_runtime.triggers ..............   Passed    0.02 sec
+      Start 461: ai_runtime.targets
+17/54 Test #461: ai_runtime.targets ...............   Passed    0.02 sec
+      Start 464: ai_runtime.spatial
+18/54 Test #464: ai_runtime.spatial ...............   Passed    0.02 sec
+      Start 462: ai_runtime.tracking
+19/54 Test #462: ai_runtime.tracking ..............   Passed    0.02 sec
+      Start 463: ai_runtime.camera
+20/54 Test #463: ai_runtime.camera ................   Passed    0.02 sec
+      Start 457: ai_runtime.visibility
+21/54 Test #457: ai_runtime.visibility ............   Passed    0.02 sec
+      Start  12: objects.creation_failures
+22/54 Test  #12: objects.creation_failures ........   Passed    0.03 sec
+      Start 394: ai_navigation.limits
+23/54 Test #394: ai_navigation.limits .............   Passed    0.13 sec
+      Start   4: objects.reasons_properties
+24/54 Test   #4: objects.reasons_properties .......   Passed    0.02 sec
+      Start   9: objects.links_lists
+25/54 Test   #9: objects.links_lists ..............   Passed    0.02 sec
+      Start   2: objects.original_objects
+26/54 Test   #2: objects.original_objects .........   Passed    0.02 sec
+      Start   3: objects.nested_creation
+27/54 Test   #3: objects.nested_creation ..........   Passed    0.02 sec
+      Start   6: objects.deferred_removal
+28/54 Test   #6: objects.deferred_removal .........   Passed    0.02 sec
+      Start   8: objects.handles_selection
+29/54 Test   #8: objects.handles_selection ........   Passed    0.02 sec
+      Start   7: objects.aggregate_dispatch
+30/54 Test   #7: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   5: objects.scheduling
+31/54 Test   #5: objects.scheduling ...............   Passed    0.02 sec
+      Start 395: ai_navigation.lifetime
+32/54 Test #395: ai_navigation.lifetime ...........   Passed    0.07 sec
+      Start 443: ai_recovery.fire_lifetime
+33/54 Test #443: ai_recovery.fire_lifetime ........   Passed    0.02 sec
+      Start 439: ai_recovery.search
+34/54 Test #439: ai_recovery.search ...............   Passed    0.02 sec
+      Start 441: ai_recovery.moving_fire
+35/54 Test #441: ai_recovery.moving_fire ..........   Passed    0.02 sec
+      Start 436: ai_recovery.topos
+36/54 Test #436: ai_recovery.topos ................   Passed    0.02 sec
+      Start 438: ai_recovery.around
+37/54 Test #438: ai_recovery.around ...............   Passed    0.02 sec
+      Start 440: ai_recovery.lifetime
+38/54 Test #440: ai_recovery.lifetime .............   Passed    0.02 sec
+      Start 432: ai_recovery.jump_physics
+39/54 Test #432: ai_recovery.jump_physics .........   Passed    0.02 sec
+      Start 431: ai_recovery.jump
+40/54 Test #431: ai_recovery.jump .................   Passed    0.02 sec
+      Start 442: ai_recovery.keys
+41/54 Test #442: ai_recovery.keys .................   Passed    0.02 sec
+      Start 435: ai_recovery.clearance
+42/54 Test #435: ai_recovery.clearance ............   Passed    0.02 sec
+      Start 437: ai_recovery.plans
+43/54 Test #437: ai_recovery.plans ................   Passed    0.02 sec
+      Start 434: ai_recovery.crawling
+44/54 Test #434: ai_recovery.crawling .............   Passed    0.02 sec
+      Start 433: ai_recovery.crouch
+45/54 Test #433: ai_recovery.crouch ...............   Passed    0.02 sec
+      Start 388: ai_navigation.clearance
+46/54 Test #388: ai_navigation.clearance ..........   Passed    0.02 sec
+      Start 390: ai_navigation.rays
+47/54 Test #390: ai_navigation.rays ...............   Passed    0.02 sec
+      Start 387: ai_navigation.sample
+48/54 Test #387: ai_navigation.sample .............   Passed    0.02 sec
+      Start 392: ai_navigation.detour
+49/54 Test #392: ai_navigation.detour .............   Passed    0.02 sec
+      Start 393: ai_navigation.blocked
+50/54 Test #393: ai_navigation.blocked ............   Passed    0.02 sec
+      Start 391: ai_navigation.direct
+51/54 Test #391: ai_navigation.direct .............   Passed    0.02 sec
+      Start 389: ai_navigation.parallel_axes
+52/54 Test #389: ai_navigation.parallel_axes ......   Passed    0.02 sec
+      Start 397: ai_navigation.cityhub_parallel
+53/54 Test #397: ai_navigation.cityhub_parallel ...   Passed    7.03 sec
+54/54 Test #470: ai_runtime.subway ................   Passed   31.32 sec
+
+100% tests passed, 0 tests failed out of 54
+
+Label Time Summary:
+ai_navigation    =  11.42 sec*proc (11 tests)
+ai_recovery      =   1.26 sec*proc (14 tests)
+ai_runtime       =  39.68 sec*proc (17 tests)
+headless         =  52.65 sec*proc (54 tests)
+objects          =   0.30 sec*proc (12 tests)
+private          =  51.46 sec*proc (8 tests)
+
+Total Test time (real) =  31.33 sec

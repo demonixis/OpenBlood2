@@ -1,0 +1,17 @@
+{
+  "name": "nomad_main_build_corrected",
+  "command": [
+    "dotnet",
+    "build",
+    "nomad/NoMAD.csproj",
+    "--artifacts-path",
+    "/tmp/lithtech-audit-2bVxTF/dotnet-main",
+    "--nologo"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:14:09.868932+00:00",
+  "elapsed_seconds": 4.524,
+  "timeout_seconds": 180,
+  "exit_code": 0,
+  "log": "nomad_main_build_corrected.log"
+}

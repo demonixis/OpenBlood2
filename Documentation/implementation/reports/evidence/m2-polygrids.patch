@@ -1,0 +1,1898 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 3105b08..4b70279 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -600,3 +600,5 @@ The [bound-container index](../Documentation/Implementation/M2_CONTAINER_INDEX.m
+ The [model preparation optimization](../Documentation/Implementation/M2_MODEL_PREPARATION.md) reuses exact local geometry for immutable shared ABC assets and removes temporary heap pose scratch. Read [contracts](docs/MODEL_PREPARATION_CONTRACTS.md); preserve weak ownership, current visibility/materials, packed-deformation order and world-revision clearing. Inspection reports actual reuse and retained vertex bytes. Skinning remains on the CPU; remaining frame costs and the M2 exit gate stay open.
+ 
+ The [NPC animation-clearance correction](../Documentation/Implementation/M2_AI_ANIMATION_CLEARANCE.md) restores original SetAnimation continuation when physical resizing is blocked. Read [contracts](docs/AI_ANIMATION_CLEARANCE_CONTRACTS.md). Preserve the retained physical body, actual cached AI dimensions, separately inspected request, same-clip reset behavior and explicit invalid/unavailable failures. Inspector counters expose blocked resizes; no forced activation or balance changes are added. The collision solver remains a replacement and M2 stays incomplete.
++
++The [original PolyGrid continuation](../Documentation/Implementation/M2_POLYGRIDS.md) connects VolumeBrush surface creation, original high-detail plasma/scale rules and actual transparent SDL_GPU rendering. Read [contracts](docs/POLYGRID_CONTRACTS.md). Preserve independent publisher lifetime, Current.y pan, hidden-clock pause, shared per-world phases, checked resource failures and revision-owned caches. Visual publishers are excluded from replacement body physics; static containers, explicit always-update timing and separate alpha sorting remain bounded policies. CityHub water now renders; underwater fog, moving volumes and the M2 gate stay open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b0bb8a7..59b0447 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,13 +14,13 @@ include(CTest)
+ include(cmake/Dependencies.cmake)
+ configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+ 
+-add_library(engine STATIC src/engine/sky.cpp src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/world_shaders.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
++add_library(engine STATIC src/engine/polygrid_view.cpp src/engine/sky.cpp src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/world_shaders.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+ target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/audio_stream.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
+ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/sparks.cpp src/game/original/SparksFX.cpp src/game/blood_spurts.cpp src/game/original/ParticleExplosionFX.cpp src/game/blood_splats.cpp src/game/original/BloodSplatFX.cpp src/game/original/ClientSplatFX.cpp src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/PolyGrid.cpp src/game/original/PolyGridFX.cpp src/game/sparks.cpp src/game/original/SparksFX.cpp src/game/blood_spurts.cpp src/game/original/ParticleExplosionFX.cpp src/game/blood_splats.cpp src/game/original/BloodSplatFX.cpp src/game/original/ClientSplatFX.cpp src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+@@ -55,7 +55,7 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableSave.cpp src/game/original/DestructableBrush.cpp src/game/original/DestructableModel.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp src/game/original/WorldModelDebris.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/hud.cpp src/app/ui_runtime.cpp src/app/path_manager_smoke.cpp src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/model_scene.cpp src/app/sprite_scene.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
++add_executable(blood2_app src/app/polygrid_scene.cpp src/app/hud.cpp src/app/ui_runtime.cpp src/app/path_manager_smoke.cpp src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/model_scene.cpp src/app/sprite_scene.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog imgui)
+diff --git a/docs/CONTAINER_CONTRACTS.md b/docs/CONTAINER_CONTRACTS.md
+index e60dece..26418fa 100644
+--- a/docs/CONTAINER_CONTRACTS.md
++++ b/docs/CONTAINER_CONTRACTS.md
+@@ -128,3 +128,7 @@ unported. A generic VolumeBrush can carry supported Damage/FreeFall codes; this
+ does not implement those specialized classes. The inspector labels effect
+ properties as requests. No full textured world or retail movement parity is
+ claimed, and no new dependency or ECS was introduced.
++
++The [original PolyGrid continuation](POLYGRID_CONTRACTS.md) supersedes the blanket
++liquid-surface omission for static VolumeBrush surfaces. Underwater fog, moving
++volumes, rendering parity and the actual M2 gate remain open.
+diff --git a/docs/M2_POLYGRID_SOURCES.json b/docs/M2_POLYGRID_SOURCES.json
+new file mode 100644
+index 0000000..da82bb0
+--- /dev/null
++++ b/docs/M2_POLYGRID_SOURCES.json
+@@ -0,0 +1,60 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "43aeaf8032dfb9cc7db5ad3277ce5cdc1904ec45",
++  "status": "M2 incomplete; original static liquid PolyGrids rendered and inspected",
++  "references": [
++    {
++      "source": "sources/blood2/ObjectDLL/VolumeBrush.cpp",
++      "source_sha256": "ef2392f8e42f9f8185e94d0712a91c96c3a1dc89f5615ef00ff4f31bcfb6a94f",
++      "purpose": "ReadProp, InitialUpdate, CreateSurface, TriggerMsg and destructor; placement, independent lifetime and Current.y pan."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/VolumeBrush.h",
++      "source_sha256": "2749de8b1dc88b896a894ab67ceefc262818712039c072aacbcc038878a05036",
++      "purpose": "Surface settings and server child identity."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PolyGrid.cpp",
++      "source_sha256": "f35302d82c3cd8aacc1d387a05fc3260db452cf01cf9db2b7c3aa9786d5a24ad",
++      "purpose": "Registration, Setup, 32767 cap, typed publication and initial properties."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ClientSFX.cpp",
++      "source_sha256": "6e3731e0371a886cb02a22ba7aa5145f67b47080ed74805150d09206d41b6d54",
++      "purpose": "Original publisher ancestry and force-client-update flag."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/PolyGridFX.cpp",
++      "source_sha256": "d61ca839ab78861c585ed705694acf79b369f2339a1e210f83ab037794b35ea1",
++      "purpose": "Original lattice size, visibility, scale clocks, palette and normal/four-ring plasma."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/PolyGridFX.h",
++      "source_sha256": "58f90f9b0f2355a650665d77df65004e9caa3b7062bcbba2733927ec8fddde45",
++      "purpose": "Defaults, plasma identifiers and always-update option."
++    },
++    {
++      "source": "sources/blood2/Shared/ClientServerShared.h",
++      "source_sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
++      "purpose": "5:6:5 color packing/unpacking."
++    },
++    {
++      "source": "sources/blood2/AppHeaders/client_de.h",
++      "source_sha256": "d4bd76f15d1689a0314f832bcba0877d2bbabcdf830a8a44da9d662b4aa534e1",
++      "purpose": "Original PolyGrid sample, sprite, texture-info and FitPolyGrid API contracts."
++    },
++    {
++      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/drawpolygrid.cpp",
++      "source_sha256": "4f9bad22ea043c64eade1a75cf1131eedf71786755f60d7e8fdb42aac6ad71e6",
++      "purpose": "Later-generation height/127, palette+128, XZ spacing and repeat UV corroboration only; renderer not imported."
++    }
++  ],
++  "adaptations": [
++    "Typed owned publication and checked identity instead of binary messages.",
++    "High detail / always-update simulation; hidden clocks pause; bounded modulo phases scoped per world/session.",
++    "Runtime Setup after construction; duplicate publication rejected.",
++    "Visual server publishers excluded from replacement generic physics/damage polling.",
++    "Static containers only; no source polling for unavailable transforms.",
++    "New simple dynamic mesh using existing world alpha shader; no renderer/dependency imported."
++  ]
++}
+diff --git a/docs/POLYGRID_CONTRACTS.md b/docs/POLYGRID_CONTRACTS.md
+new file mode 100644
+index 0000000..7ddc57f
+--- /dev/null
++++ b/docs/POLYGRID_CONTRACTS.md
+@@ -0,0 +1,98 @@
++# Original PolyGrid surfaces
++
++Status: selected original VolumeBrush / PolyGrid / CPolyGridFX path implemented;
++**M2 remains incomplete**. See [evidence](../../Documentation/Implementation/M2_POLYGRIDS.md)
++and [source ledger](M2_POLYGRID_SOURCES.json). This extends
++[container](CONTAINER_CONTRACTS.md) and [world-view](WORLD_VIEW_CONTRACTS.md) contracts.
++
++## Original server and client rules
++
++VolumeBrush reads the authored colors, scale ranges/durations, polygon count,
++height, alpha and SPR. Its initial update creates a separate original PolyGrid
++publisher at `volume position + (0, half-height - SurfaceHeight/2, 0)`, retaining
++rotation. The surface half-extents use the volume X/Z dimensions and SurfaceHeight
++as Y. Pan parameters retain `1 + Current.x * .01` and **Current.y**, not Current.z.
++ON/OFF/TOGGLE also propagate USRFLG_VISIBLE to a checked surface identity.
++ShowSurface=false creates nothing. Invalid parameters or failed resources remain
++visible errors, never a successful substitute surface.
++
++PolyGrid retains original CClientSFX ancestry, typed Setup publication, 32767
++polygon cap and 5:6:5 color quantization. Runtime children receive Setup after
++creation; authored/world and property-string instances read their properties.
++Repeated Setup on an already published object is explicitly refused without
++changing the existing surface. The original registration's unused zero Dims is
++not accepted as drawable geometry. No legacy packet/vtable ABI is emulated.
++
++CPolyGridFX uses the original integer-half polygon-count square root, four-ring
++size rounding (2/4/8/16), distance grid, three-period signed sine table, reversed
++four-ring X traversal and arithmetic division of negative sums. Colors interpolate
++from palette slot 0 toward the exclusive endpoint 256, so slot 255 does not reach
++the second endpoint. Normal plasma advances at 50 units/second. Four-ring phases
++start at 0/1/4/3 and advance once per updated surface with original ring rates.
++They are shared **inside one world/session**, in creation order; a destination
++rehearsal cannot modify the source world's phases. Bounded modulo phase storage
++replaces out-of-range floating-to-byte conversions. Portable signed conversion
++and division avoid platform-dependent char/shift behavior.
++
++Texture scales preserve positive-duration checks, strict endpoint comparisons,
++clamp-and-direction reversal and discarded overshoot. Pan values are texture
++coordinate offsets; no guessed current-driven texture velocity is introduced.
++Hidden surfaces stop plasma/scale/SPR advancement and resume with the new frame
++delta, without a hidden-time catch-up burst. Sprite resources use existing bounded
++SPR/DTX readers and exact normalized paths.
++
++## Explicit engine/presentation policies
++
++High detail and the original `always update` option are selected explicitly;
++the unavailable retail WASDRAWN visibility feedback does not drive simulation.
++No low/medium-detail mode is claimed. SPR frame advancement shares that active
++simulation clock. These timing policies are deterministic adaptations, not a
++verified retail render-culling or animated-texture timing match.
++
++The original VolumeBrush destructor does not remove its surface. Removing a volume
++therefore leaves the independent publisher/client surface alive until that publisher
++is removed or the world unloads. Pending/removed publishers disappear from rendering
++immediately; the next effect update removes their owned client data. IDs do not reuse
++across unload. World clear resets phase/history/resource ownership. Static containers
++still reject movement: original polling for moving volumes is not silently enabled.
++
++PolyGrid publishers are visual service objects, explicitly excluded from the
++replacement engine's generic body integration and volume-damage polling. Otherwise
++that broad OT_NORMAL scan would give water current to the surface itself and add
++unintended physics callbacks. This is a scoped replacement-engine policy, not a claim
++that the later-engine physics implementation exactly describes Blood II. Ordinary
++bodies, players, volume queries and deferred callback ordering remain unchanged.
++
++The read-only PolyGridView builds the XZ lattice, height/127 displacement and
++height+128 palette lookup. Existing SDL_GPU world shaders supply repeated textures,
++original effect alpha, two-sided cells, shared world/model depth tests and no depth
++writes. Cells sort far-to-near; the surface pass runs after world/model alpha and
++before other client FX, whose sorting remains separate. Later LithTech rendering
++corroborates these UV/height conventions, not 1998 pixel parity. No reflection,
++refraction, environment map, underwater fog or lighting parity is claimed.
++
++Clocks live outside the inspector. Both Vulkan/SPIR-V and Metal/MSL use the existing
++unchanged bundled shaders. NVIDIA execution is verified; this increment has no
++native Apple automated test. A world revision clears CPU/GPU surface material
++caches. Invalid/missing textures remain named inspection failures and draw no
++surface. No raw game/object pointer survives a presentation frame.
++
++Limits: 128 live surfaces, 128 retained reports, up to 128x128 samples for normal
++plasma, four-ring grids at most 16x16, 1,000,000 prepared vertices, 4096 nonwhite
++materials and 128 MiB decoded images. Counts, finite transforms, colors, scales,
++alpha and clocks are validated before indexing or drawing. Update deltas above
++10 seconds fail explicitly; normal application deltas retain their 100-ms cap.
++
++## Inspection and remaining work
++
++Containers lists the source volume, independent publisher, SPR, position, dimensions,
++alpha, grid size, frame, scale, update count and prepared triangles. Its expanded
++PolyGrid list includes hidden/standalone surfaces and retained publication/resource
++failures. Previous GPU cell counts are labelled separately from prepared geometry.
++
++CityHub Canal1 and Pool each produce an 8x8 grid / 98 triangles using the external
++`Textures\Reds\waterbrown.dtx`. Their centers are (0,135,-704) and (3488,399,2208),
++respectively; water collision/swimming still uses the closed volume below. Original
++source-entry accounting is unchanged; these are two additional runtime children.
++Save/restore of surfaces, moving volumes, underwater presentation, remaining required
++services and actual M2 acceptance remain open.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 791992b..e62255b 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1,5 +1,14 @@
+ # Source and Dependency Provenance
+ 
++## Original liquid PolyGrids
++
++Selected VolumeBrush/PolyGrid/CPolyGridFX rules now create and animate independent
++liquid surfaces through typed services. Rendering is new SDL_GPU mesh preparation;
++later LithTech only corroborates coordinate/UV conventions. Explicit high-detail
++always-update clocks, scoped phases and publisher physics exclusion are adaptations.
++See [source hashes](M2_POLYGRID_SOURCES.json) and [contracts](POLYGRID_CONTRACTS.md).
++Reference trees, commercial assets, dependency pins and shaders remain unchanged.
++
+ ## Original scripted opportunity fire
+ 
+ AI_Mgr Script_Fire_Stand/Walk/Run and their FOLLOWPATH/MOVETOOBJECT callers now use
+diff --git a/docs/WORLD_VIEW_CONTRACTS.md b/docs/WORLD_VIEW_CONTRACTS.md
+index c7a1340..c14981e 100644
+--- a/docs/WORLD_VIEW_CONTRACTS.md
++++ b/docs/WORLD_VIEW_CONTRACTS.md
+@@ -108,3 +108,7 @@ active-only charge, local audio, checked child lifetime and forced-inactive
+ Restore/KeepAlive. One radial point light is rendered over the unlit world/models;
+ GetPointShade, shadows and general dynamic illumination remain unavailable.
+ Earlier blanket flashlight omissions are superseded only by this bounded subset.
++
++The [original PolyGrid continuation](POLYGRID_CONTRACTS.md) supersedes the blanket
++liquid-surface omission for static VolumeBrush surfaces. Underwater fog, moving
++volumes, rendering parity and the actual M2 gate remain open.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index dc90580..628af89 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -465,7 +465,7 @@ namespace OpenBlood2
+                         "WASD/ZQSD, arrows to look, Shift run, Space jump, Ctrl crouch, E USE. Enter "
+                         "the player in Session first, or launch --view-world.");
+                     ImGui::TextWrapped(
+-                        "World textures/models, glass and alpha sprites are unlit. Lightmaps, liquid surfaces "
++                        "World textures/models, glass, PolyGrids and alpha sprites are unlit. Lightmaps "
+                         "remain unavailable. Bound sky world models render in index order. World alpha uses sorted "
+                         "faces; FX sort separately.");
+                     ImGui::Text("Interactive clock: %llu limited frames / %.3f discarded wall seconds",
+@@ -2227,6 +2227,24 @@ namespace OpenBlood2
+     {
+         auto* player = game.server_shell.Player(game.local_client);
+         ImGui::TextUnformatted("Original volumes / liquids, ladders, conveyors and damage");
++        if (ImGui::CollapsingHeader("All PolyGrid surfaces / failures"))
++        {
++            ImGui::TextUnformatted("High detail / always update; independent server surface lifetime.");
++            for (const auto& i : game.server.polygrids.active)
++            {
++                const auto& f = i.effect;
++                ImGui::Text("#%llu | %u x %u | %s | frame %u | updates %llu", (unsigned long long)f.id, f.width,
++                            f.width, f.visible ? "visible" : "hidden", f.track.frame, (unsigned long long)f.updates);
++                ImGui::TextWrapped("%s", f.settings.sprite.c_str());
++            }
++            for (const auto& report : game.server.polygrids.reports)
++                if (!report.error.empty())
++                    ImGui::TextWrapped("%s: %s", report.source.c_str(), report.error.c_str());
++            if (polygrid_view)
++                for (const auto& e : polygrid_view->entries)
++                    if (!e.error.empty())
++                        ImGui::TextWrapped("Texture %s: %s", e.texture.c_str(), e.error.c_str());
++        }
+         if (!world_error.empty())
+             ImGui::TextWrapped("%s", world_error.c_str());
+         ImGui::TextWrapped(
+@@ -2356,14 +2374,44 @@ namespace OpenBlood2
+                         brush->fog_far);
+             ImGui::Text("Surface %s | height %.1f | alpha %.2f", brush->show_surface ? "requested" : "off",
+                         brush->surface_height, brush->surface_alpha);
++            ImGui::TextWrapped("SPR: %s", brush->sprite.c_str());
++            if (!brush->surface_error.empty())
++                ImGui::TextWrapped("Surface failure: %s", brush->surface_error.c_str());
++            const auto* child = game.objects.get(brush->surface_object);
++            ImGui::Text("Independent PolyGrid: %s", child && child->life == Life::Alive ? "alive" : "absent/removed");
++            for (const auto& i : game.server.polygrids.active)
++                if (i.owner == brush->surface_object)
++                {
++                    const auto& fx = i.effect;
++                    ImGui::Text("Grid %u x %u | %s | updates %llu", fx.width, fx.width,
++                                fx.visible ? "visible" : "hidden", static_cast<unsigned long long>(fx.updates));
++                    ImGui::Text("Position %.1f %.1f %.1f | scale %.3f %.3f", fx.pose.position.x, fx.pose.position.y,
++                                fx.pose.position.z, fx.scale[0], fx.scale[1]);
++                    ImGui::Text("Frame %u | plasma %u | alpha %.2f", fx.track.frame, fx.settings.plasma,
++                                fx.settings.alpha);
++                    if (polygrid_view)
++                        for (const auto& e : polygrid_view->entries)
++                            if (e.id == fx.id)
++                            {
++                                ImGui::Text("Prepared triangles: %u",
++                                            e.range == UINT32_MAX ? 0 : polygrid_view->mesh.ranges[e.range].count / 3);
++                                if (!e.error.empty())
++                                    ImGui::TextWrapped("Texture failure: %s", e.error.c_str());
++                            }
++                }
++            ImGui::Text("World PolyGrids: %zu active | %llu failed", game.server.polygrids.active.size(),
++                        static_cast<unsigned long long>(game.server.polygrids.failed));
++            if (polygrid_render)
++                ImGui::Text("Previous GPU surface pass: %zu cells", polygrid_render->alpha_batches);
+             if (brush->locked)
+                 ImGui::TextWrapped("Key lock pending: %s (remove key %s)", brush->unlock_key.c_str(),
+                                    brush->remove_key ? "yes" : "no");
+         }
+         ImGui::EndTable();
+         if (ImGui::CollapsingHeader("Container limits / pending effects"))
+-            ImGui::TextWrapped("Static closed DAT shells; four body containers in stable object order. PolyGrid liquid "
+-                               "surfaces, underwater fog/audio/color effects, key handshakes, crane "
++            ImGui::TextWrapped("Static closed DAT shells; four body containers in stable object order. PolyGrid "
++                               "surfaces use high-detail, always-update simulation. Underwater "
++                               "fog/audio/color effects, key handshakes, crane "
+                                "controls, minefields and moving volume transforms are not implemented. Queries and "
+                                "movement use the real shell, not its bounding box.");
+     }
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 5092bf9..ac69c85 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -2,6 +2,7 @@
+ 
+ #include "engine/config.h"
+ #include "engine/model_view.h"
++#include "engine/polygrid_view.h"
+ #include "engine/runtime.h"
+ #include "engine/sprite_view.h"
+ #include "engine/world_view.h"
+@@ -16,6 +17,8 @@ namespace OpenBlood2
+         const WorldMesh* world_mesh = nullptr;
+         const ModelView* model_view = nullptr;
+         const ModelView* explosion_model_view = nullptr;
++        const PolyGridView* polygrid_view = nullptr;
++        const WorldViewStats* polygrid_render = nullptr;
+         const SpriteView* sprite_view = nullptr;
+         const WorldViewStats* sprite_render = nullptr;
+         const WorldViewStats* world_render = nullptr;
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index e7e8529..962a89b 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -2,6 +2,7 @@
+ #include "app/hud.h"
+ #include "app/model_scene.h"
+ #include "app/movement_controls.h"
++#include "app/polygrid_scene.h"
+ #include "app/session_playback.h"
+ #include "app/sprite_scene.h"
+ #include "app/ui_runtime.h"
+@@ -358,6 +359,8 @@ namespace
+         OpenBlood2::ModelView model_scene, explosion_model_scene;
+         OpenBlood2::WorldRenderer explosion_model_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
+         bool explosion_model_drawn_hidden = false, explosion_fragments_drawn_hidden = false;
++        OpenBlood2::PolyGridView polygrid_scene;
++        OpenBlood2::WorldRenderer polygrid_renderer(runtime.gpu);
+         OpenBlood2::SpriteView sprite_scene;
+         OpenBlood2::WorldRenderer sprite_renderer(runtime.gpu, OpenBlood2::DrawStyle::SpriteAlpha);
+         bool sprites_drawn_hidden = false, explosion_sprites_drawn_hidden = false, explosion_rings_drawn_hidden = false,
+@@ -379,6 +382,8 @@ namespace
+         inspector.world_mesh = &world_mesh;
+         inspector.model_view = &model_scene;
+         inspector.explosion_model_view = &explosion_model_scene;
++        inspector.polygrid_view = &polygrid_scene;
++        inspector.polygrid_render = &polygrid_renderer.stats;
+         inspector.sprite_view = &sprite_scene;
+         inspector.sprite_render = &sprite_renderer.stats;
+         inspector.world_render = &world_renderer.stats;
+@@ -820,6 +825,8 @@ namespace
+                 model_scene.clear();
+                 explosion_model_scene.clear();
+                 explosion_model_renderer.clear_geometry();
++                polygrid_scene.clear();
++                polygrid_renderer.clear_geometry();
+                 sprite_scene.clear();
+                 sprite_renderer.clear_geometry();
+                 world_mesh = {};
+@@ -858,6 +865,11 @@ namespace
+                 spdlog::error("Explosion model presentation: {}", error);
+                 return 5;
+             }
++            if (!OpenBlood2::update_polygrid_scene(*game, polygrid_scene, error))
++            {
++                spdlog::error("PolyGrid presentation: {}", error);
++                return 5;
++            }
+             if (!OpenBlood2::update_sprite_scene(*game, sprite_scene, error))
+             {
+                 spdlog::error("Sprite presentation: {}", error);
+@@ -1026,6 +1038,19 @@ namespace
+                                                                 entry.alpha < .75f;
+                         }
+                     }
++                    if (!polygrid_renderer.prepare(polygrid_scene.mesh, polygrid_scene.revision,
++                                                   SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
++                                                   height, error, true) ||
++                        !polygrid_renderer.draw(commands, capture_frame ? capture.texture : swapchain,
++                                                polygrid_scene.mesh, polygrid_scene.draws, view.position, view.rotation,
++                                                view.object && view.settings.type == 1, error,
++                                                OpenBlood2::DrawLoad::Load, world_renderer.depth_target(),
++                                                OpenBlood2::WorldPass::Translucent))
++                    {
++                        spdlog::error("PolyGrid viewport: {}", error);
++                        SDL_SubmitGPUCommandBuffer(commands);
++                        return 3;
++                    }
+                     if (!sprite_renderer.prepare(sprite_scene.mesh, sprite_scene.revision,
+                                                  SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
+                                                  height, error, true) ||
+diff --git a/src/app/polygrid_scene.cpp b/src/app/polygrid_scene.cpp
+new file mode 100644
+index 0000000..80becde
+--- /dev/null
++++ b/src/app/polygrid_scene.cpp
+@@ -0,0 +1,29 @@
++#include "polygrid_scene.h"
++namespace OpenBlood2
++{
++    bool update_polygrid_scene(const GameSession& game, PolyGridView& scene, std::string& error)
++    {
++        error.clear();
++        scene.begin_frame();
++        for (const auto& instance : game.server.polygrids.active)
++        {
++            const auto* record = game.objects.get(instance.owner);
++            if (!record || record->life != Life::Alive)
++                continue;
++            const auto& fx = instance.effect;
++            if (fx.sprite && fx.track.frame >= fx.sprite->frames.size())
++            {
++                error = "PolyGrid current sprite frame unavailable";
++                return false;
++            }
++            const auto path = fx.sprite && fx.track.frame < fx.sprite->frames.size()
++                                  ? std::string_view(fx.sprite->frames[fx.track.frame])
++                                  : std::string_view{};
++            if (!scene.add(fx.id, (record->user_flags & 1u) != 0, fx.pose, fx.settings.dims, fx.width, fx.heights,
++                           fx.palette, fx.scale, fx.sprite ? fx.settings.pan : std::array<float, 2>{},
++                           fx.settings.alpha, path, game.resources, error))
++                return false;
++        }
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/polygrid_scene.h b/src/app/polygrid_scene.h
+new file mode 100644
+index 0000000..bf705e7
+--- /dev/null
++++ b/src/app/polygrid_scene.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include "engine/polygrid_view.h"
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool update_polygrid_scene(const GameSession&, PolyGridView&, std::string&);
++}
+diff --git a/src/engine/polygrid_view.cpp b/src/engine/polygrid_view.cpp
+new file mode 100644
+index 0000000..36a217e
+--- /dev/null
++++ b/src/engine/polygrid_view.cpp
+@@ -0,0 +1,122 @@
++#include "polygrid_view.h"
++#include "engine/collision.h"
++#include <cmath>
++using namespace OpenBlood2;
++void PolyGridView::clear()
++{
++    mesh = {};
++    mesh.materials.push_back({"", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}});
++    mesh.texture_bytes = 4;
++    materials_.clear();
++    begin_frame();
++    ++revision;
++}
++void PolyGridView::begin_frame()
++{
++    mesh.vertices.clear();
++    mesh.ranges.clear();
++    entries.clear();
++    draws.clear();
++}
++bool PolyGridView::add(std::uint64_t id, bool visible, NodePose pose, DVector dims, unsigned width,
++                       std::span<const std::int8_t> heights, const std::array<DVector, 256>& palette,
++                       std::array<float, 2> scale, std::array<float, 2> pan, float alpha, std::string_view path,
++                       const Resources& resources, std::string& error)
++{
++    error.clear();
++    WorldViewUniform uniform;
++    if (entries.size() >= 128 || width < 2 || width > 128 || heights.size() != width * width || !physics_vector(dims) ||
++        dims.x <= 0 || dims.z <= 0 || dims.y < 0 || !std::isfinite(alpha) || alpha < 0 || alpha > 1 ||
++        !world_view_uniform({}, {}, 1, {0, pose.position, pose.rotation}, uniform))
++    {
++        error = "Invalid PolyGrid mesh/pose/budget";
++        return false;
++    }
++    for (unsigned i = 0; i < 2; ++i)
++        if (!std::isfinite(scale[i]) || scale[i] <= 0 || scale[i] > 1000000 || !std::isfinite(pan[i]) ||
++            std::abs(pan[i]) > 1000000)
++        {
++            error = "Invalid PolyGrid texture transform";
++            return false;
++        }
++    for (auto c : palette)
++        if (!physics_vector(c) || c.x < 0 || c.y < 0 || c.z < 0 || c.x > 1 || c.y > 1 || c.z > 1)
++        {
++            error = "Invalid PolyGrid palette";
++            return false;
++        }
++    entries.push_back({id, std::string(path), {}, visible, UINT32_MAX, width});
++    auto& e = entries.back();
++    std::uint32_t material = 0;
++    if (!path.empty())
++    {
++        std::string key;
++        if (!resource_path(path, key))
++        {
++            e.error = "Invalid PolyGrid frame path";
++            return true;
++        }
++        auto it = materials_.find(key);
++        if (it == materials_.end())
++        {
++            if (mesh.materials.size() >= 4097)
++            {
++                error = "PolyGrid material budget exceeded";
++                return false;
++            }
++            WorldMaterial m;
++            m.path = key;
++            read_texture_resource(resources, key, m.image, m.error);
++            if (m.image.rgba.size() > 128 * 1024 * 1024 - mesh.texture_bytes)
++            {
++                error = "PolyGrid texture budget exceeded";
++                return false;
++            }
++            mesh.texture_bytes += m.image.rgba.size();
++            auto index = std::uint32_t(mesh.materials.size());
++            mesh.materials.push_back(std::move(m));
++            it = materials_.emplace(key, index).first;
++            ++revision;
++        }
++        material = it->second;
++        e.error = mesh.materials[material].error;
++        if (!e.error.empty())
++            return true;
++    }
++    if (!visible)
++        return true;
++    const auto count = 6 * (width - 1) * (width - 1);
++    if (mesh.vertices.size() + count > 1000000)
++    {
++        error = "PolyGrid vertex budget exceeded";
++        return false;
++    }
++    WorldRange range;
++    range.first = std::uint32_t(mesh.vertices.size());
++    range.count = count;
++    range.name = path;
++    // Original API height [-127,127], palette index height+128. Later renderer
++    // corroborates XZ spacing and normalized repeat UVs; no retail raster parity claim.
++    auto vertex = [&](unsigned x, unsigned y)
++    {
++        const auto h = heights[y * width + x];
++        const float u = float(x) / float(width - 1), v = float(y) / float(width - 1);
++        return WorldVertex{{(2 * u - 1) * dims.x, float(h) * dims.y / 127, (2 * v - 1) * dims.z},
++                           palette[unsigned(int(h) + 128)],
++                           {std::fmod(pan[0], 1.f) + u * scale[0], std::fmod(pan[1], 1.f) + v * scale[1]}};
++    };
++    for (unsigned y = 0; y + 1 < width; ++y)
++        for (unsigned x = 0; x + 1 < width; ++x)
++        {
++            const WorldVertex corners[] = {vertex(x, y), vertex(x + 1, y), vertex(x + 1, y + 1), vertex(x, y + 1)};
++            const auto first = std::uint32_t(mesh.vertices.size());
++            for (auto i : {0, 1, 2, 0, 2, 3})
++                mesh.vertices.push_back(corners[i]);
++            const auto center = vector_scale(vector_add(corners[0].position, corners[2].position), .5f);
++            range.batches.push_back({first, 6, material, true, center});
++        }
++    e.range = std::uint32_t(mesh.ranges.size());
++    draws.push_back({e.range, pose.position, pose.rotation, alpha});
++    mesh.ranges.push_back(std::move(range));
++    return true;
++}
+diff --git a/src/engine/polygrid_view.h b/src/engine/polygrid_view.h
+new file mode 100644
+index 0000000..0e26b11
+--- /dev/null
++++ b/src/engine/polygrid_view.h
+@@ -0,0 +1,34 @@
++#pragma once
++#include "engine/world_view.h"
++#include <map>
++namespace OpenBlood2
++{
++    struct PolyGridViewEntry
++    {
++        std::uint64_t id = 0;
++        std::string texture, error;
++        bool visible = false;
++        std::uint32_t range = UINT32_MAX;
++        unsigned width = 0;
++    };
++    class PolyGridView
++    {
++      public:
++        PolyGridView()
++        {
++            clear();
++        }
++        void clear();
++        void begin_frame();
++        bool add(std::uint64_t, bool, NodePose, DVector, unsigned, std::span<const std::int8_t>,
++                 const std::array<DVector, 256>&, std::array<float, 2>, std::array<float, 2>, float, std::string_view,
++                 const Resources&, std::string&);
++        WorldMesh mesh;
++        std::vector<WorldDraw> draws;
++        std::vector<PolyGridViewEntry> entries;
++        std::uint64_t revision = 0;
++
++      private:
++        std::map<std::string, std::uint32_t> materials_;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 5d79076..064cd0e 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -38,6 +38,7 @@ namespace OpenBlood2
+     struct BloodSpurtSettings;
+     struct WeaponSpriteSettings;
+     struct ParticleStreamSettings;
++    struct PolyGridSettings;
+     struct SkyDefinition;
+ } // namespace OpenBlood2
+ class PathMgr;
+@@ -85,6 +86,7 @@ class ServerDE : public CSBase
+     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount, unsigned started = 0,
+                                         unsigned failed = 0) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
++    virtual std::uint64_t PublishPolyGrid(HOBJECT, const OpenBlood2::PolyGridSettings&, std::string&) = 0;
+     virtual std::uint64_t PublishParticleStream(HOBJECT, const OpenBlood2::ParticleStreamSettings&, std::string&) = 0;
+     virtual std::uint64_t PublishSparks(HOBJECT, const OpenBlood2::SparkSettings&, std::string&) = 0;
+     virtual std::uint64_t PublishClientBloodSplat(const OpenBlood2::BloodSplatSettings&, std::string_view,
+diff --git a/src/game/original/PolyGrid.cpp b/src/game/original/PolyGrid.cpp
+new file mode 100644
+index 0000000..e624bc0
+--- /dev/null
++++ b/src/game/original/PolyGrid.cpp
+@@ -0,0 +1,67 @@
++#include "PolyGrid.h"
++using namespace OpenBlood2;
++bool PolyGrid::Setup(const PolyGridSettings& value)
++{
++    if (effect)
++    {
++        error = "PolyGrid already published";
++        return false;
++    }
++    settings = value;
++    if (!valid_polygrid(settings))
++    {
++        error = "Invalid PolyGrid setup";
++        return false;
++    }
++    if (g_pServerDE->SetObjectDims(m_hObject, &settings.dims) != DE_OK)
++    {
++        error = "PolyGrid dimensions unavailable";
++        return false;
++    }
++    effect = g_pServerDE->PublishPolyGrid(m_hObject, settings, error);
++    return effect != 0;
++}
++DDWORD PolyGrid::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE && data)
++    {
++        auto* state = static_cast<ObjectCreateStruct*>(data);
++        state->m_Flags = FLAG_VISIBLE;
++        // Runtime surfaces receive their parameters through Setup after construction.
++        if (reason != PRECREATE_NORMAL)
++        {
++            setup_ = g_pServerDE->GetPropVector("Dims", &settings.dims) == DE_OK;
++            g_pServerDE->GetPropVector("Color1", &settings.color1);
++            g_pServerDE->GetPropVector("Color2", &settings.color2);
++            const char* names[] = {"XScaleMin",      "YScaleMin", "XScaleMax", "YScaleMax", "XScaleDuration",
++                                   "YScaleDuration", "XPan",      "YPan",      "Alpha"};
++            float* values[] = {&settings.scale_min[0], &settings.scale_min[1], &settings.scale_max[0],
++                               &settings.scale_max[1], &settings.duration[0],  &settings.duration[1],
++                               &settings.pan[0],       &settings.pan[1],       &settings.alpha};
++            for (unsigned i = 0; i < 9; ++i)
++                g_pServerDE->GetPropReal(names[i], values[i]);
++            GenericProp p;
++            if (g_pServerDE->GetPropGeneric("SpriteSurfaceName", &p) == DE_OK)
++                settings.sprite = p.m_String;
++            const char* integers[] = {"NumPolies", "PlasmaType", "Ring1Rate", "Ring2Rate", "Ring3Rate", "Ring4Rate"};
++            unsigned* destinations[] = {&settings.polies,   &settings.plasma,   &settings.rates[0],
++                                        &settings.rates[1], &settings.rates[2], &settings.rates[3]};
++            for (unsigned i = 0; i < 6; ++i)
++                if (g_pServerDE->GetPropGeneric(integers[i], &p) == DE_OK)
++                {
++                    if (p.m_Long < 0)
++                        return 0;
++                    *destinations[i] = unsigned(p.m_Long);
++                }
++            if (setup_ && !valid_polygrid(settings))
++                return 0;
++        }
++    }
++    if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME)
++    {
++        g_pServerDE->SetObjectUserFlags(m_hObject, 1u);
++        if (setup_)
++            Setup(settings);
++    }
++    return CClientSFX::EngineMessageFn(message, data, reason);
++}
+diff --git a/src/game/original/PolyGrid.h b/src/game/original/PolyGrid.h
+new file mode 100644
+index 0000000..98672aa
+--- /dev/null
++++ b/src/game/original/PolyGrid.h
+@@ -0,0 +1,17 @@
++#pragma once
++#include "ClientSFX.h"
++#include "PolyGridFX.h"
++class PolyGrid : public CClientSFX
++{
++  public:
++    bool Setup(const OpenBlood2::PolyGridSettings&);
++    OpenBlood2::PolyGridSettings settings;
++    std::uint64_t effect = 0;
++    std::string error;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++
++  private:
++    bool setup_ = false;
++};
+diff --git a/src/game/original/PolyGridFX.cpp b/src/game/original/PolyGridFX.cpp
+new file mode 100644
+index 0000000..54247a4
+--- /dev/null
++++ b/src/game/original/PolyGridFX.cpp
+@@ -0,0 +1,149 @@
++#include "PolyGridFX.h"
++#include "engine/collision.h"
++#include <algorithm>
++#include <cmath>
++#include <numbers>
++using namespace OpenBlood2;
++namespace
++{
++    bool color(DVector v)
++    {
++        return physics_vector(v) && v.x >= 0 && v.y >= 0 && v.z >= 0 && v.x <= 255 && v.y <= 255 && v.z <= 255;
++    }
++    DVector packed(DVector v)
++    {
++        return {float(unsigned(v.x) & 248), float(unsigned(v.y) & 252), float(unsigned(v.z) & 248)};
++    }
++    const auto& sine()
++    {
++        static const auto table = []
++        {
++            std::array<std::int8_t, 256> t{};
++            const float s = (2 * std::numbers::pi_v<float> / 255) * 3;
++            for (unsigned i = 0; i < 256; ++i)
++            {
++                const int n = int(std::sin(double(float(i) * s)) * 128);
++                t[i] = std::int8_t(n > 127 ? n - 256 : n);
++            }
++            return t;
++        }();
++        return table;
++    }
++} // namespace
++bool OpenBlood2::valid_polygrid(const PolyGridSettings& s)
++{
++    if (!physics_vector(s.dims) || s.dims.x <= 0 || s.dims.z <= 0 || s.dims.y < 0 || !color(s.color1) ||
++        !color(s.color2) || !std::isfinite(s.alpha) || s.alpha < 0 || s.alpha > 1 || s.polies < 4 || s.plasma > 1 ||
++        s.sprite.size() > 499 || s.sprite.find('\0') != std::string::npos)
++        return false;
++    for (unsigned i = 0; i < 2; ++i)
++        if (!std::isfinite(s.scale_min[i]) || !std::isfinite(s.scale_max[i]) || !std::isfinite(s.duration[i]) ||
++            !std::isfinite(s.pan[i]) || std::abs(s.pan[i]) > 1000000 || s.scale_min[i] <= 0 ||
++            s.scale_max[i] < s.scale_min[i] || s.scale_max[i] > 1000000 || std::abs(s.duration[i]) > 1000000)
++            return false;
++    for (auto rate : s.rates)
++        if (rate > 255)
++            return false;
++    return true;
++}
++bool CPolyGridFX::Init(const PolyGridSettings& s, SpriteStore& store, double now, std::string& failure)
++{
++    failure.clear();
++    if (!valid_polygrid(s) || !std::isfinite(now) || now < 0)
++    {
++        failure = "Invalid PolyGrid settings/clock";
++        return false;
++    }
++    settings = s;
++    settings.polies = std::min(s.polies, 32767u);
++    settings.color1 = packed(s.color1);
++    settings.color2 = packed(s.color2);
++    if (!s.sprite.empty() && !store.load(s.sprite, sprite, failure))
++        return false;
++    width = settings.polies <= 4 ? 2 : unsigned(std::sqrt(float(settings.polies / 2))) + 1;
++    if (settings.plasma == 1 && settings.polies > 4)
++        width = width < 4 ? 2 : width <= 6 ? 4 : width <= 12 ? 8 : 16;
++    heights.assign(width * width, 0);
++    distance.resize(width * width);
++    int half = int(width / 2);
++    for (unsigned y = 0; y < width; ++y)
++        for (unsigned x = 0; x < width; ++x)
++        {
++            int dx = int(x) - half, dy = int(y) - half;
++            distance[y * width + x] = std::uint8_t(float(dx * dx + dy * dy) / float(2 * half * half) * 255);
++        }
++    for (unsigned i = 0; i < 256; ++i)
++        palette[i] =
++            vector_scale(vector_add(settings.color1,
++                                    vector_scale(vector_subtract(settings.color2, settings.color1), float(i) / 256)),
++                         1.f / 255);
++    scale = s.sprite.empty() ? std::array<float, 2>{1, 1} : s.scale_min;
++    last_time = now;
++    return true;
++}
++bool CPolyGridFX::Update(double now, bool shown, std::array<float, 4>& shared)
++{
++    if (!std::isfinite(now) || now < last_time || now - last_time > 10)
++    {
++        error = "Invalid PolyGrid update clock";
++        return false;
++    }
++    const float dt = float(now - last_time);
++    last_time = now;
++    visible = shown;
++    if (!shown)
++        return true;
++    // Explicit always-update/high-detail policy: rendering/UI never drives simulation.
++    const auto& table = sine();
++    if (settings.plasma == 0)
++    {
++        count = std::fmod(count + 50 * dt, 256.f);
++        for (unsigned i = 0; i < heights.size(); ++i)
++            heights[i] = table[std::uint8_t(distance[i] + unsigned(count))];
++    }
++    else
++    {
++        constexpr unsigned offsets[4][2] = {{6, 10}, {13, 3}, {17, 1}, {31, 22}};
++        for (unsigned i = 0; i < 4; ++i)
++            shared[i] = std::fmod(shared[i] + float(settings.rates[i]) * dt, 256.f);
++        for (unsigned y = 0; y < width; ++y)
++            for (unsigned dest = 0; dest < width; ++dest)
++            {
++                unsigned x = width - 1 - dest;
++                int sum = 0;
++                for (unsigned i = 0; i < 4; ++i)
++                {
++                    auto d =
++                        distance[((y + offsets[i][1]) & (width - 1)) * width + ((x + offsets[i][0]) & (width - 1))];
++                    sum += table[std::uint8_t(d + unsigned(shared[i]))];
++                }
++                heights[y * width + dest] = std::int8_t(sum >= 0 ? sum / 4 : -((-sum + 3) / 4));
++            }
++    }
++    if (sprite)
++    {
++        if (!advance_sprite(*sprite, track, dt))
++        {
++            error = "PolyGrid sprite clock failed";
++            return false;
++        }
++        for (unsigned i = 0; i < 2; ++i)
++            if (settings.duration[i] > 0)
++            {
++                const float delta = dt * (settings.scale_max[i] - settings.scale_min[i]) / settings.duration[i];
++                scale[i] += scaling_up[i] ? delta : -delta;
++                if (scaling_up[i] && scale[i] > settings.scale_max[i])
++                {
++                    scale[i] = settings.scale_max[i];
++                    scaling_up[i] = false;
++                }
++                else if (!scaling_up[i] && scale[i] < settings.scale_min[i])
++                {
++                    scale[i] = settings.scale_min[i];
++                    scaling_up[i] = true;
++                }
++            }
++    }
++    ++updates;
++    return true;
++}
+diff --git a/src/game/original/PolyGridFX.h b/src/game/original/PolyGridFX.h
+new file mode 100644
+index 0000000..0f9fb2f
+--- /dev/null
++++ b/src/game/original/PolyGridFX.h
+@@ -0,0 +1,39 @@
++#pragma once
++#include "engine/model.h"
++#include "engine/sprite.h"
++#include <array>
++namespace OpenBlood2
++{
++    struct PolyGridSettings
++    {
++        DVector dims{32, 32, 0}, color1{50, 50, 200}, color2{0, 0, 220};
++        std::array<float, 2> scale_min{15, 15}, scale_max{15, 15}, duration{10, 10}, pan{10, 10};
++        float alpha = .7f;
++        unsigned polies = 160, plasma = 1;
++        std::array<unsigned, 4> rates{50, 10, 30, 20};
++        std::string sprite;
++    };
++    bool valid_polygrid(const PolyGridSettings&);
++} // namespace OpenBlood2
++// Selected original CPolyGridFX high-detail rules, with owned storage and checked clocks.
++class CPolyGridFX
++{
++  public:
++    bool Init(const OpenBlood2::PolyGridSettings&, OpenBlood2::SpriteStore&, double, std::string&);
++    bool Update(double, bool, std::array<float, 4>&);
++    OpenBlood2::PolyGridSettings settings;
++    OpenBlood2::NodePose pose;
++    std::shared_ptr<const OpenBlood2::Sprite> sprite;
++    OpenBlood2::SpriteTrack track;
++    std::array<DVector, 256> palette{};
++    std::vector<std::int8_t> heights;
++    std::vector<std::uint8_t> distance;
++    std::array<float, 2> scale{1, 1};
++    std::array<bool, 2> scaling_up{true, true};
++    unsigned width = 0;
++    float count = 0;
++    double last_time = 0;
++    bool visible = false;
++    std::uint64_t id = 0, updates = 0;
++    std::string error;
++};
+diff --git a/src/game/original/VolumeBrush.cpp b/src/game/original/VolumeBrush.cpp
+index 5e01a52..9cea59f 100644
+--- a/src/game/original/VolumeBrush.cpp
++++ b/src/game/original/VolumeBrush.cpp
+@@ -1,5 +1,6 @@
+ #include "VolumeBrush.h"
+ #include "PlayerObj.h"
++#include "PolyGrid.h"
+ #include "engine/collision.h"
+ #include <algorithm>
+ #include <cmath>
+@@ -27,9 +28,23 @@ bool VolumeBrush::ReadProp(ObjectCreateStruct& state)
+     real("SurfaceHeight", surface_height);
+     real("SurfaceAlpha", surface_alpha);
+     real("Damage", damage);
++    real("XScaleMin", surface.scale_min[0]);
++    real("YScaleMin", surface.scale_min[1]);
++    real("XScaleMax", surface.scale_max[0]);
++    real("YScaleMax", surface.scale_max[1]);
++    real("XScaleDuration", surface.duration[0]);
++    real("YScaleDuration", surface.duration[1]);
++    g_pServerDE->GetPropVector("SurfaceColor1", &surface.color1);
++    g_pServerDE->GetPropVector("SurfaceColor2", &surface.color2);
+     g_pServerDE->GetPropVector("Current", &info.current);
+     g_pServerDE->GetPropVector("FogColor", &fog_color);
+     GenericProp prop;
++    if (g_pServerDE->GetPropGeneric("NumSurfacePolies", &prop) == DE_OK)
++    {
++        if (prop.m_Long < 0)
++            return false;
++        surface.polies = unsigned(prop.m_Long);
++    }
+     if (g_pServerDE->GetPropGeneric("Code", &prop) == DE_OK)
+     {
+         if (prop.m_Long < CC_NOTHING || prop.m_Long > CC_FREEFALL || prop.m_Long == CC_CRANECONTROL)
+@@ -73,12 +88,46 @@ DDWORD VolumeBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+         info.object = m_hObject;
+         saved_flags_ = g_pServerDE->GetObjectFlags(m_hObject);
+         g_pServerDE->SetObjectUserFlags(m_hObject, (1u << 3) | (info.hidden ? 0 : FLAG_VISIBLE));
+-        // PolyGrid, fog rendering and key handshakes remain explicit pending requests.
++        if (show_surface && reason != INITIALUPDATE_SAVEGAME)
++            CreateSurface();
++        // Static volume transforms remain unavailable; no pointless polling updates.
++        // Fog rendering and key handshakes remain explicit pending requests.
+     }
+     if (message == MID_AFFECTPHYSICS && data)
+         UpdatePhysics(*static_cast<ContainerPhysics*>(data));
+     return B2BaseClass::EngineMessageFn(message, data, reason);
+ }
++void VolumeBrush::CreateSurface()
++{
++    ObjectCreateStruct state;
++    if (g_pServerDE->GetObjectPos(m_hObject, &state.m_Pos) != DE_OK ||
++        g_pServerDE->GetObjectRotation(m_hObject, &state.m_Rotation) != DE_OK ||
++        g_pServerDE->GetObjectDims(m_hObject, &surface.dims) != DE_OK)
++    {
++        surface_error = "Volume surface pose/dimensions unavailable";
++        return;
++    }
++    state.m_Pos.y += surface.dims.y - surface_height / 2;
++    surface.dims.y = surface_height;
++    surface.pan = {1 + info.current.x * .01f, 1 + info.current.y * .01f}; // Source uses Y, not Z.
++    surface.alpha = surface_alpha;
++    surface.sprite = sprite;
++    if (!valid_polygrid(surface))
++    {
++        surface_error = "Invalid volume surface settings";
++        return;
++    }
++    auto* child = dynamic_cast<PolyGrid*>(g_pServerDE->CreateObject(g_pServerDE->GetClass("PolyGrid"), &state));
++    if (!child)
++    {
++        surface_error = "PolyGrid runtime creation failed";
++        return;
++    }
++    surface_object = child->m_hObject;
++    if (!child->Setup(surface))
++        surface_error = child->error;
++    g_pServerDE->SetObjectUserFlags(surface_object, (1u << 3) | (info.hidden ? 0 : FLAG_VISIBLE));
++}
+ void VolumeBrush::UpdatePhysics(ContainerPhysics& value)
+ {
+     if (info.hidden)
+@@ -159,6 +208,8 @@ DDWORD VolumeBrush::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD
+                 info.hidden = command == "OFF" || (command == "TOGGLE" && !info.hidden);
+                 g_pServerDE->SetObjectFlags(m_hObject, info.hidden ? saved_flags_ & ~FLAG_VISIBLE : saved_flags_);
+                 g_pServerDE->SetObjectUserFlags(m_hObject, (1u << 3) | (info.hidden ? 0 : FLAG_VISIBLE));
++                if (g_pServerDE->IsObjectAlive(surface_object))
++                    g_pServerDE->SetObjectUserFlags(surface_object, (1u << 3) | (info.hidden ? 0 : FLAG_VISIBLE));
+                 ++triggers;
+             }
+             g_pServerDE->FreeString(string);
+diff --git a/src/game/original/VolumeBrush.h b/src/game/original/VolumeBrush.h
+index 45c61f5..19a3702 100644
+--- a/src/game/original/VolumeBrush.h
++++ b/src/game/original/VolumeBrush.h
+@@ -1,5 +1,6 @@
+ #pragma once
+ #include "B2BaseClass.h"
++#include "PolyGridFX.h"
+ #include "game/container_messages.h"
+ #include "game/weapon_messages.h"
+ #include <string>
+@@ -15,6 +16,9 @@ class VolumeBrush : public B2BaseClass
+     DVector fog_color{};
+     bool fog = false, show_surface = true, locked = false, remove_key = false;
+     std::string sprite, unlock_key;
++    OpenBlood2::PolyGridSettings surface;
++    HOBJECT surface_object = nullptr; // Independent runtime object, as in original VolumeBrush.
++    std::string surface_error;
+     std::uint64_t physics_calls = 0, damage_events = 0, triggers = 0;
+     virtual void UpdatePhysics(OpenBlood2::ContainerPhysics&);
+ 
+@@ -24,6 +28,7 @@ class VolumeBrush : public B2BaseClass
+ 
+   private:
+     bool ReadProp(ObjectCreateStruct&);
++    void CreateSurface();
+     float last_damage_time_ = 0;
+     DDWORD saved_flags_ = 0;
+ };
+diff --git a/src/game/polygrids.cpp b/src/game/polygrids.cpp
+new file mode 100644
+index 0000000..4e5c481
+--- /dev/null
++++ b/src/game/polygrids.cpp
+@@ -0,0 +1,70 @@
++#include "polygrids.h"
++#include "server_de.h"
++#include <algorithm>
++using namespace OpenBlood2;
++std::uint64_t PolyGrids::publish(HOBJECT owner, const PolyGridSettings& s, ServerDE& server, SpriteStore& store,
++                                 double now, std::string& error)
++{
++    error.clear();
++    PolyGridReport report;
++    CPolyGridFX fx;
++    if (!server.IsObjectAlive(owner) || server.GetObjectPos(owner, &fx.pose.position) != DE_OK ||
++        server.GetObjectRotation(owner, &fx.pose.rotation) != DE_OK)
++        error = "PolyGrid owner/pose unavailable";
++    else if (active.size() >= 128 || next_id_ == UINT64_MAX ||
++             std::any_of(active.begin(), active.end(), [&](auto& i) { return i.owner == owner; }))
++        error = "PolyGrid capacity exhausted or duplicate owner";
++    else if (fx.Init(s, store, now, error))
++    {
++        report.id = fx.id = next_id_++;
++        report.source = server.GetObjectName(owner);
++        fx.visible = (server.GetObjectUserFlags(owner) & 1u) != 0;
++        active.push_back({owner, std::move(fx)});
++        ++started;
++    }
++    if (!error.empty())
++        ++failed;
++    report.error = error;
++    auto id = report.id;
++    if (reports.size() == 128)
++        reports.erase(reports.begin());
++    reports.push_back(std::move(report));
++    return id;
++}
++bool PolyGrids::advance(double now, ServerDE& server)
++{
++    bool ok = true;
++    std::erase_if(active,
++                  [&](auto& i)
++                  {
++                      auto& fx = i.effect;
++                      bool live = server.IsObjectAlive(i.owner);
++                      if (live && server.GetObjectPos(i.owner, &fx.pose.position) == DE_OK &&
++                          fx.Update(now, (server.GetObjectUserFlags(i.owner) & 1u) != 0, phases))
++                          return false;
++                      if (live)
++                      {
++                          ++failed;
++                          ok = false;
++                          if (fx.error.empty())
++                              fx.error = "PolyGrid position unavailable";
++                      }
++                      else
++                          ++expired;
++                      for (auto& r : reports)
++                          if (r.id == fx.id)
++                          {
++                              r.removed = true;
++                              r.error = fx.error;
++                          }
++                      return true;
++                  });
++    return ok;
++}
++void PolyGrids::clear()
++{
++    active.clear();
++    reports.clear();
++    phases = {0, 1, 4, 3};
++    started = expired = failed = 0;
++}
+diff --git a/src/game/polygrids.h b/src/game/polygrids.h
+new file mode 100644
+index 0000000..f1e9c5d
+--- /dev/null
++++ b/src/game/polygrids.h
+@@ -0,0 +1,31 @@
++#pragma once
++#include "game/original/PolyGridFX.h"
++class ServerDE;
++namespace OpenBlood2
++{
++    struct PolyGridInstance
++    {
++        HOBJECT owner = nullptr;
++        CPolyGridFX effect;
++    };
++    struct PolyGridReport
++    {
++        std::uint64_t id = 0;
++        std::string source, error;
++        bool removed = false;
++    };
++    class PolyGrids
++    {
++      public:
++        std::uint64_t publish(HOBJECT, const PolyGridSettings&, ServerDE&, SpriteStore&, double, std::string&);
++        bool advance(double, ServerDE&);
++        void clear();
++        std::vector<PolyGridInstance> active;
++        std::vector<PolyGridReport> reports;
++        std::array<float, 4> phases{0, 1, 4, 3};
++        std::uint64_t started = 0, expired = 0, failed = 0;
++
++      private:
++        std::uint64_t next_id_ = 1;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 5158120..1eab94f 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -29,6 +29,7 @@
+ #include "game/original/KeyPickup.h"
+ #include "game/original/ObjectivesTrigger.h"
+ #include "game/original/PathPoint.h"
++#include "game/original/PolyGrid.h"
+ #include "game/original/PowerupPickups.h"
+ #include "game/original/Projectile.h"
+ #include "game/original/ProximityBomb.h"
+@@ -444,6 +445,28 @@ namespace OpenBlood2
+              {"PanSkyScaleZ", 10.0f},
+              {"Gravity", DVector{0, -2000, 0}},
+              {"SoftSky", std::string("textures\\environmentmaps\\clouds\\clouds"), true, 499}}};
++        const ClassInfo polygrid{"PolyGrid",
++                                 &client_sfx,
++                                 construct<PolyGrid>,
++                                 {{"Dims", DVector{}},
++                                  {"Color1", DVector{255, 255, 255}},
++                                  {"Color2", DVector{255, 255, 255}},
++                                  {"SpriteSurfaceName", std::string("Sprites\\VolumeBrushSprites\\Water1.spr")},
++                                  {"XScaleMin", 15.f},
++                                  {"XScaleMax", 15.f},
++                                  {"YScaleMin", 15.f},
++                                  {"YScaleMax", 15.f},
++                                  {"XScaleDuration", 10.f},
++                                  {"YScaleDuration", 10.f},
++                                  {"XPan", 10.f},
++                                  {"YPan", 10.f},
++                                  {"Alpha", .7f},
++                                  {"NumPolies", std::int32_t(160)},
++                                  {"PlasmaType", std::int32_t(1)},
++                                  {"Ring1Rate", std::int32_t(50)},
++                                  {"Ring2Rate", std::int32_t(10)},
++                                  {"Ring3Rate", std::int32_t(30)},
++                                  {"Ring4Rate", std::int32_t(20)}}};
+         const ClassInfo volume{"VolumeBrush",
+                                &b2base,
+                                construct<VolumeBrush>,
+@@ -832,32 +855,32 @@ namespace OpenBlood2
+                objects.register_class(exit_hint) && objects.register_class(character) &&
+                objects.register_class(ai_manager) && objects.register_class(cultist) &&
+                objects.register_class(civilian) && objects.register_class(gideon) && objects.register_class(player) &&
+-               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
+-               objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
+-               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
+-               objects.register_class(key_pickup) && objects.register_class(pickup) &&
+-               objects.register_class(item_pickup) && objects.register_class(item_weapon) &&
+-               objects.register_class(proximity_pickup) && objects.register_class(remote_pickup) &&
+-               objects.register_class(charged_pickup) && objects.register_class(medkit_pickup) &&
+-               objects.register_class(flashlight_pickup) && objects.register_class(weapon_pickup) &&
+-               objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
+-               objects.register_class(flare_pickup) && objects.register_class(mac10_pickup) &&
+-               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+-               objects.register_class(health_base) && objects.register_class(armor_base) &&
+-               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
+-               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
+-               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
+-               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
+-               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
+-               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
+-               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
+-               objects.register_class(conversation_trigger) && objects.register_class(big_trigger) &&
+-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
+-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+-               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
+-               objects.register_class(world_debris) && objects.register_class(hand_model) &&
+-               objects.register_class(gib) && objects.register_class(corpse) && objects.register_class(proximity) &&
+-               objects.register_class(remote) && objects.register_class(grenade) &&
++               objects.register_class(polygrid) && objects.register_class(volume) && objects.register_class(water) &&
++               objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
++               objects.register_class(conveyor) && objects.register_class(damage) && objects.register_class(freefall) &&
++               objects.register_class(trigger) && objects.register_class(key_pickup) &&
++               objects.register_class(pickup) && objects.register_class(item_pickup) &&
++               objects.register_class(item_weapon) && objects.register_class(proximity_pickup) &&
++               objects.register_class(remote_pickup) && objects.register_class(charged_pickup) &&
++               objects.register_class(medkit_pickup) && objects.register_class(flashlight_pickup) &&
++               objects.register_class(weapon_pickup) && objects.register_class(beretta_pickup) &&
++               objects.register_class(assault_pickup) && objects.register_class(flare_pickup) &&
++               objects.register_class(mac10_pickup) && objects.register_class(ammo_pickup) &&
++               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
++               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
++               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
++               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
++               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
++               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
++               objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
++               objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
++               objects.register_class(objectives_trigger) && objects.register_class(conversation_trigger) &&
++               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
++               objects.register_class(door) && objects.register_class(rotating_door) &&
++               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
++               objects.register_class(rotating_brush) && objects.register_class(world_debris) &&
++               objects.register_class(hand_model) && objects.register_class(gib) && objects.register_class(corpse) &&
++               objects.register_class(proximity) && objects.register_class(remote) && objects.register_class(grenade) &&
+                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
+                objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
+                objects.register_class(shockwave_projectile);
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index d12a7f3..3b2dd1a 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -19,6 +19,7 @@
+ #include "game/original/LightFX.h"
+ #include "game/particle_streams.h"
+ #include "game/player_restore.h"
++#include "game/polygrids.h"
+ #include "game/projectile_report.h"
+ #include "game/session.h"
+ #include "game/sparks.h"
+@@ -114,6 +115,8 @@ namespace OpenBlood2
+         bool SetSkyDefinition(const SkyDefinition&) override;
+         bool AddSkyObject(HOBJECT, unsigned) override;
+         void ReportSkyFailure(std::string_view) override;
++        PolyGrids polygrids;
++        std::uint64_t PublishPolyGrid(HOBJECT, const PolyGridSettings&, std::string&) override;
+         ParticleStreams particle_streams;
+         std::uint64_t PublishParticleStream(HOBJECT, const ParticleStreamSettings&, std::string&) override;
+         std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) override;
+@@ -170,6 +173,7 @@ namespace OpenBlood2
+             laser_beams.clear();
+             object_particles.clear();
+             particle_streams.clear();
++            polygrids.clear();
+             sky = {};
+             explosion_lights.clear();
+             explosion_rings.clear();
+diff --git a/src/game/server_containers.cpp b/src/game/server_containers.cpp
+index 7714131..4cda35a 100644
+--- a/src/game/server_containers.cpp
++++ b/src/game/server_containers.cpp
+@@ -1,5 +1,6 @@
+ #include "engine/container.h"
+ #include "engine/world_model.h"
++#include "game/original/PolyGrid.h"
+ #include "game/original/VolumeBrush.h"
+ #include "game/server_adapter.h"
+ 
+@@ -85,7 +86,8 @@ namespace OpenBlood2
+         for (auto id : objects_.snapshot())
+         {
+             const auto* r = objects_.get(id);
+-            if (!r || r->life != Life::Alive || r->container() || r->activity != OBJSTATE_ACTIVE ||
++            if (!r || r->life != Life::Alive || r->container() || dynamic_cast<const PolyGrid*>(r->game.get()) ||
++                r->activity != OBJSTATE_ACTIVE ||
+                 (!r->world_body && r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
+                 continue;
+             ContainerPhysics physics;
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index 2b8c003..b357827 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -71,6 +71,19 @@ namespace OpenBlood2
+         return flesh_gibs.publish(owner, pos, dir, dims, scale, count, *this, *objects_.models, *client_resources,
+                                   objects_.time(), error);
+     }
++    std::uint64_t ServerAdapter::PublishPolyGrid(HOBJECT owner, const PolyGridSettings& settings, std::string& error)
++    {
++        trace_service("PublishPolyGrid (original surface)");
++        if (!objects_.sprites)
++        {
++            error = "PolyGrid sprite store unavailable";
++            return 0;
++        }
++        auto id = polygrids.publish(owner, settings, *this, *objects_.sprites, objects_.time(), error);
++        if (!id)
++            ++unavailable_services["PolyGrid: " + error];
++        return id;
++    }
+     std::uint64_t ServerAdapter::PublishParticleStream(HOBJECT owner, const ParticleStreamSettings& settings,
+                                                        std::string& error)
+     {
+diff --git a/src/game/server_physics.cpp b/src/game/server_physics.cpp
+index a859946..8a9027c 100644
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -1,4 +1,5 @@
+ #include "engine/world_model.h"
++#include "game/original/PolyGrid.h"
+ #include "game/original/Projectile.h"
+ #include "game/server_adapter.h"
+ #include <algorithm>
+@@ -436,7 +437,8 @@ namespace OpenBlood2
+         {
+             auto* r = objects_.get(id);
+             if (!r || r->life != Life::Alive || r->attachment || r->activity != OBJSTATE_ACTIVE || r->client_movement ||
+-                r->container() || dynamic_cast<CProjectile*>(r->game.get()) || (r->world_model && !r->world_body) ||
++                r->container() || dynamic_cast<PolyGrid*>(r->game.get()) || dynamic_cast<CProjectile*>(r->game.get()) ||
++                (r->world_model && !r->world_body) ||
+                 (!r->world_body && r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
+                 continue;
+             ContainerState containers;
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index b7c6344..f1ba840 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -520,6 +520,7 @@ namespace OpenBlood2
+         ok = server.explosion_fragments.advance(objects.time(), server) && ok;
+         ok = server.object_particles.advance(objects.time(), server) && ok;
+         ok = server.particle_streams.advance(objects.time(), server) && ok;
++        ok = server.polygrids.advance(objects.time(), server) && ok;
+         if (ok && preview_model && preview_playing &&
+             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
+             preview_playing = false;
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 1b2be84..00e4c5e 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1837,3 +1837,22 @@ if(BLOOD2_GPU_TESTS)
+     add_test(NAME gpu.hud COMMAND hud_tests gpu "${CMAKE_CURRENT_BINARY_DIR}/hud-gpu")
+     set_tests_properties(gpu.hud PROPERTIES LABELS "gpu;hud" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+ endif()
++
++add_executable(polygrid_tests polygrid_tests.cpp ../src/app/polygrid_scene.cpp)
++target_link_libraries(polygrid_tests PRIVATE blood2_game)
++blood2_project_options(polygrid_tests)
++foreach(case IN ITEMS formulas lifetime mesh)
++    add_test(NAME polygrid.${case} COMMAND polygrid_tests ${case} "${CMAKE_CURRENT_BINARY_DIR}/polygrid/${case}")
++    set_tests_properties(polygrid.${case} PROPERTIES LABELS "headless;polygrid" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME polygrid.private COMMAND polygrid_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(polygrid.private PROPERTIES LABELS "headless;polygrid;private" TIMEOUT 120)
++endif()
++if(BLOOD2_GPU_TESTS)
++    add_executable(polygrid_gpu_tests polygrid_gpu_tests.cpp ../src/app/polygrid_scene.cpp)
++    target_link_libraries(polygrid_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(polygrid_gpu_tests)
++    add_test(NAME gpu.polygrid COMMAND polygrid_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/polygrid/gpu" ${BLOOD2_TEST_DATA_DIR})
++    set_tests_properties(gpu.polygrid PROPERTIES LABELS "gpu;polygrid;private" TIMEOUT 120 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
++endif()
+diff --git a/tests/polygrid_gpu_tests.cpp b/tests/polygrid_gpu_tests.cpp
+new file mode 100644
+index 0000000..d26deb3
+--- /dev/null
++++ b/tests/polygrid_gpu_tests.cpp
+@@ -0,0 +1,179 @@
++#include "app/polygrid_scene.h"
++#include "blood_splat_fixture.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x " " << error << " " << SDL_GetError() << "\n";                            \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool render(Runtime& runtime, WorldRenderer& renderer, PolyGridView& scene, DVector eye, DRotation camera,
++                Capture& capture, std::vector<std::uint8_t>& pixels, std::string& error,
++                WorldRenderer* world_renderer = nullptr, const WorldMesh* world = nullptr,
++                std::span<const WorldDraw> world_draws = {})
++    {
++        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300)) ||
++            !renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true))
++            return false;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        if (!commands)
++            return false;
++        bool drawn = true;
++        if (world_renderer && world)
++        {
++            drawn = world_renderer->draw(commands, capture.texture, *world, world_draws, eye, camera, false, error) &&
++                    world_renderer->draw(commands, capture.texture, *world, world_draws, eye, camera, false, error,
++                                         DrawLoad::Load, nullptr, WorldPass::Translucent);
++        }
++        else
++            drawn = renderer.draw(commands, capture.texture, scene.mesh, scene.draws, eye, camera, false, error);
++        drawn = drawn && renderer.draw(commands, capture.texture, scene.mesh, scene.draws, eye, camera, false, error,
++                                       DrawLoad::Load, world_renderer ? world_renderer->depth_target() : nullptr,
++                                       WorldPass::Translucent);
++        if (!drawn)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 300;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 300;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
++            return false;
++        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        if (!data)
++            return false;
++        pixels.assign(data, data + 400 * 300 * 4);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        return true;
++    }
++} // namespace
++
++int main(int argc, char** argv)
++{
++    if (argc != 2 && argc != 3)
++        return 2;
++    Runtime runtime;
++    std::string error;
++    CHECK(runtime.initialize(true, error));
++    std::cout << "GPU device: "
++              << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu), SDL_PROP_GPU_DEVICE_NAME_STRING,
++                                       "unknown")
++              << " | backend " << SDL_GetGPUDeviceDriver(runtime.gpu) << "\n";
++    Resources resources;
++    CHECK(test_blood_splat::mount(resources, argv[1], error));
++    WorldRenderer renderer(runtime.gpu);
++    Capture capture;
++    PolyGridView scene;
++    std::array<DVector, 256> white;
++    white.fill({1, 1, 1});
++    std::array<std::int8_t, 4> heights{};
++    auto rotation = rotation_from_euler({-1.57079632679f, 0, 0});
++    CHECK(scene.add(1, true, {{0, 0, 4}, rotation}, {3, 0, 2}, 2, heights, white, {2, 1}, {0, 0}, .5f, "alpha.dtx",
++                    resources, error));
++    std::vector<std::uint8_t> pixels;
++    CHECK(render(runtime, renderer, scene, {}, {}, capture, pixels, error));
++    unsigned red = 0, green = 0, black = 0, transparent = 0, runs = 0;
++    bool previous = false;
++    for (unsigned x = 51; x < 349; ++x)
++    {
++        const auto* p = pixels.data() + (150 * 400 + x) * 4;
++        const bool is_red =
++            std::abs(int(p[0]) - 131) <= 2 && std::abs(int(p[1]) - 4) <= 2 && std::abs(int(p[2]) - 6) <= 2;
++        red += is_red;
++        if (is_red && !previous)
++            ++runs;
++        previous = is_red;
++        green += p[1] > 60 && p[1] < 80 && p[0] < 10;
++        black += p[0] >= 2 && p[0] <= 4 && p[1] >= 3 && p[1] <= 5 && p[2] >= 5 && p[2] <= 8;
++        transparent += p[0] == 6 && p[1] == 9 && p[2] == 13;
++    }
++    std::cout << "Repeat/alpha scan: red=" << red << " green=" << green << " black=" << black
++              << " clear=" << transparent << " red runs=" << runs << "\n";
++    CHECK(red > 50 && green > 50 && black > 50 && transparent > 50 && runs == 2);
++    CHECK(capture.save((std::filesystem::path(argv[1]) / "polygrid-repeat-alpha.png").c_str()));
++    if (argc == 3)
++    {
++        GameSession g;
++        Config config;
++        config.data_dir = argv[2];
++        CHECK(g.initialize() && g.resources.mount_game(config, error));
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_CityHub", error) && g.enter_player(error));
++            CHECK(g.step(1.0 / 60) && !g.server.polygrids.active.empty() && g.server.polygrids.failed == 0);
++            scene.clear();
++            renderer.clear_geometry();
++            CHECK(update_polygrid_scene(g, scene, error));
++            const auto& fx = g.server.polygrids.active.front().effect;
++            DVector eye = vector_add(fx.pose.position, {0, 300, -100});
++            DRotation camera;
++            CHECK(align_rotation(vector_subtract(fx.pose.position, eye), camera));
++            CHECK(render(runtime, renderer, scene, eye, camera, capture, pixels, error));
++            unsigned ink = 0;
++            for (unsigned k = 0; k < pixels.size(); k += 4)
++                ink += pixels[k] != 6 || pixels[k + 1] != 9 || pixels[k + 2] != 13;
++            CHECK(ink > 1000 && renderer.stats.alpha_batches > 0);
++            CHECK(capture.save(
++                (std::filesystem::path(argv[1]) / ("cityhub-water-" + std::to_string(cycle) + ".png")).c_str()));
++            std::cout << "CityHub cycle " << cycle << " cells " << renderer.stats.alpha_batches << " changed pixels "
++                      << ink << "\n";
++            auto prior = pixels;
++            CHECK(g.step(.1) && update_polygrid_scene(g, scene, error) &&
++                  render(runtime, renderer, scene, eye, camera, capture, pixels, error));
++            CHECK(pixels != prior);
++            WorldRenderer world_renderer(runtime.gpu);
++            WorldMesh world;
++            std::vector<WorldDraw> world_draws;
++            CHECK(world.build(g.world, error, &g.resources) &&
++                  OpenBlood2::world_draws(world, g.objects, world_draws, world_renderer.stats, error));
++            CHECK(
++                world_renderer.prepare(world, g.world_revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error));
++            // Authored canal from an above-bank diagnostic pose; unchanged original session.
++            eye = vector_add(fx.pose.position, {250, 110, -200});
++            CHECK(align_rotation(vector_subtract(vector_add(fx.pose.position, {0, 0, 500}), eye), camera));
++            CHECK(render(runtime, renderer, scene, eye, camera, capture, pixels, error, &world_renderer, &world,
++                         world_draws));
++            CHECK(capture.save(
++                (std::filesystem::path(argv[1]) / ("cityhub-world-water-" + std::to_string(cycle) + ".png")).c_str()));
++            auto with_water = pixels;
++            scene.draws.clear();
++            CHECK(render(runtime, renderer, scene, eye, camera, capture, pixels, error, &world_renderer, &world,
++                         world_draws));
++            unsigned changed = 0;
++            for (unsigned k = 0; k < pixels.size(); k += 4)
++                changed += pixels[k] != with_water[k] || pixels[k + 1] != with_water[k + 1] ||
++                           pixels[k + 2] != with_water[k + 2];
++            CHECK(changed > 500);
++            std::cout << "World water contribution " << changed << " pixels\n";
++            CHECK(g.unload_world());
++            scene.clear();
++            renderer.clear_geometry();
++            CHECK(update_polygrid_scene(g, scene, error) && scene.entries.empty());
++        }
++    }
++    return 0;
++}
+diff --git a/tests/polygrid_tests.cpp b/tests/polygrid_tests.cpp
+new file mode 100644
+index 0000000..d07a492
+--- /dev/null
++++ b/tests/polygrid_tests.cpp
+@@ -0,0 +1,279 @@
++#include "app/polygrid_scene.h"
++#include "blood_splat_fixture.h"
++#include "brush_fixture.h"
++#include "engine/container.h"
++#include "game/original/PolyGrid.h"
++#include "game/original/VolumeBrush.h"
++#include "game/original/trigger_helpers.h"
++#include <algorithm>
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ":" << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .0001f;
++    }
++    bool formulas(const std::filesystem::path& root)
++    {
++        Resources resources;
++        std::string error;
++        CHECK(test_blood_splat::mount(resources, root, error));
++        SpriteStore store(resources);
++        PolyGridSettings s;
++        s.dims = {10, 2, 20};
++        s.sprite = "sprites/blood1.spr";
++        s.scale_min = {1, 1};
++        s.scale_max = {2, 2};
++        s.duration = {1, 0};
++        s.color1 = {255, 128, 1};
++        s.color2 = {0, 255, 255};
++        for (auto [n, size] : {std::pair{4u, 2u}, {8u, 2u}, {18u, 4u}, {72u, 8u}, {288u, 16u}, {50000u, 16u}})
++        {
++            s.polies = n;
++            CPolyGridFX f;
++            CHECK(f.Init(s, store, 0, error) && f.width == size && f.settings.polies == std::min(n, 32767u));
++        }
++        s.polies = 160;
++        CPolyGridFX f;
++        CHECK(f.Init(s, store, 0, error) && f.width == 8 && near(f.palette[0].x, 248.f / 255) &&
++              near(f.palette[0].z, 0));
++        CHECK(near(f.palette[255].z, 248.f / 256) && f.distance[0] == 255 && f.distance[4 * 8 + 4] == 0);
++        std::array<float, 4> phases{0, 1, 4, 3};
++        CHECK(f.Update(1, true, phases));
++        CHECK(f.scale[0] == 2 && f.scaling_up[0] && f.scale[1] == 1 && phases[0] == 50);
++        // Independently evaluated original four-ring rows at t=1, rates 50/10/30/20.
++        const int first[] = {10, 5, -52, 36, -28, 51, -43, 77};
++        const int middle[] = {2, -2, -13, -48, -19, -33, -4, 71};
++        for (unsigned x = 0; x < 8; ++x)
++            CHECK(f.heights[x] == first[x] && f.heights[32 + x] == middle[x]);
++        auto heights = f.heights;
++        CHECK(f.Update(2, false, phases) && f.heights == heights && phases[0] == 50 && f.scale[0] == 2);
++        CHECK(f.Update(2.25, true, phases) && !f.scaling_up[0] && f.scale[0] == 2 && near(phases[0], 62.5f));
++        CHECK(f.Update(2.5, true, phases) && near(f.scale[0], 1.75f));
++        CPolyGridFX other;
++        CHECK(other.Init(s, store, 2.5, error) && other.Update(2.75, true, phases) && near(phases[0], 87.5f));
++        CHECK(!f.Update(1, true, phases) && !f.error.empty());
++        s.plasma = 0;
++        s.polies = 32767;
++        CPolyGridFX normal;
++        CHECK(normal.Init(s, store, 0, error) && normal.width == 128 && normal.Update(.1, true, phases) &&
++              near(normal.count, 5));
++        for (int bad = 0; bad < 9; ++bad)
++        {
++            auto invalid = s;
++            switch (bad)
++            {
++                case 0:
++                    invalid.dims.x = 0;
++                    break;
++                case 1:
++                    invalid.alpha = 2;
++                    break;
++                case 2:
++                    invalid.polies = 3;
++                    break;
++                case 3:
++                    invalid.plasma = 2;
++                    break;
++                case 4:
++                    invalid.rates[0] = 256;
++                    break;
++                case 5:
++                    invalid.duration[0] = NAN;
++                    break;
++                case 6:
++                    invalid.color1.x = -1;
++                    break;
++                case 7:
++                    invalid.scale_min[0] = 0;
++                    break;
++                case 8:
++                    invalid.sprite = "missing.spr";
++                    break;
++            }
++            CPolyGridFX rejected;
++            CHECK(!rejected.Init(invalid, store, 0, error) && !error.empty());
++        }
++        return true;
++    }
++    bool send_trigger(GameSession& g, HOBJECT receiver, const char* command)
++    {
++        auto m = g.server.StartMessageToObject(nullptr, receiver, 1000);
++        auto text = g.server.CreateString(command);
++        if (!m || !text)
++            return false;
++        const bool ok = g.server.WriteToMessageHString(m, text) == DE_OK;
++        g.server.FreeString(text);
++        if (ok)
++            g.server.EndMessage(m);
++        else
++            g.server.EndHMessageWrite(m);
++        return ok;
++    }
++    bool lifetime(const std::filesystem::path&)
++    {
++        GameSession g;
++        std::string error;
++        CHECK(g.initialize());
++        g.world.models.push_back(test_brush::box("pool", {-10, -5, -20}, {10, 5, 20}));
++        auto h = g.objects.create(
++            g.objects.find_class("Water"), {}, Creation::World,
++            {{"Name", std::string("pool")}, {"SpriteSurfaceName", std::string{}}, {"Current", DVector{20, 30, 400}}});
++        auto* volume = dynamic_cast<VolumeBrush*>(g.server.HandleToObject(h));
++        CHECK(volume && volume->surface_error.empty() && g.server.polygrids.active.size() == 1);
++        const auto child = volume->surface_object;
++        CHECK(g.server.IsObjectAlive(child));
++        auto& fx = g.server.polygrids.active[0].effect;
++        CHECK(fx.pose.position.y == 4 && fx.settings.dims.y == 2 && near(fx.settings.pan[0], 1.2f) &&
++              near(fx.settings.pan[1], 1.3f));
++        auto step = [&] { return g.objects.advance(.01) && g.server.polygrids.advance(g.objects.time(), g.server); };
++        CHECK(step());
++        const auto fixed = fx.pose.position;
++        CHECK(g.server.advance_physics(.1) && g.server.damage_containers());
++        CHECK(g.objects.get(child)->state.m_Pos.x == fixed.x && g.objects.get(child)->state.m_Pos.y == fixed.y);
++        const auto before = fx.updates;
++        CHECK(send_trigger(g, h, "OFF") && step() && !fx.visible && fx.updates == before);
++        CHECK(send_trigger(g, h, "ON") && step() && fx.visible && fx.updates == before + 1);
++        const auto id = fx.id;
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        CHECK(g.server.IsObjectAlive(child) && step() && g.server.polygrids.active.size() == 1);
++        CHECK(g.objects.remove(child));
++        PolyGridView scene;
++        CHECK(update_polygrid_scene(g, scene, error) && scene.entries.empty());
++        CHECK(g.objects.finish_frame() && g.server.polygrids.advance(g.objects.time(), g.server) &&
++              g.server.polygrids.active.empty() && g.server.polygrids.expired == 1);
++        auto raw = g.objects.create(g.objects.find_class("PolyGrid"), {});
++        auto* grid = dynamic_cast<PolyGrid*>(g.server.HandleToObject(raw));
++        CHECK(grid);
++        PolyGridSettings s;
++        s.dims = {1, 0, 1};
++        CHECK(grid->Setup(s) && grid->effect > id && !grid->Setup(s));
++        CHECK(!g.server.PublishPolyGrid(raw, s, error) && g.server.polygrids.failed == 1 &&
++              !g.server.unavailable_services.empty());
++        CHECK(g.unload_world() && g.server.polygrids.active.empty() && g.server.polygrids.phases[0] == 0 &&
++              g.server.polygrids.phases[1] == 1);
++        return true;
++    }
++    bool private_data(const std::filesystem::path& root)
++    {
++        GameSession g;
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.initialize() && g.resources.mount_game(c, error));
++        PolyGridView scene;
++        std::uint64_t last = 0;
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_CityHub", error));
++            for (auto& r : g.server.polygrids.reports)
++                if (!r.error.empty())
++                    std::cerr << r.error << "\n";
++            CHECK(!g.server.polygrids.active.empty() && g.server.polygrids.failed == 0);
++            unsigned surfaces = 0;
++            for (auto id : g.objects.snapshot())
++            {
++                auto* record = g.objects.get(id);
++                auto* v = dynamic_cast<VolumeBrush*>(record->game.get());
++                if (!v || !v->show_surface)
++                    continue;
++                CHECK(v->surface_error.empty() && v->surface_object);
++                ++surfaces;
++                auto* surface = g.objects.get(v->surface_object);
++                CHECK(surface);
++                const auto& shape = *record->container();
++                CHECK(near(surface->state.m_Pos.y, shape.max.y - v->surface_height / 2));
++                CHECK(near(surface->state.m_Pos.x, (shape.min.x + shape.max.x) / 2) &&
++                      near(surface->state.m_Pos.z, (shape.min.z + shape.max.z) / 2));
++                std::cout << "CityHub " << record->state.m_Name << " origin " << record->state.m_Pos.x << ","
++                          << record->state.m_Pos.y << "," << record->state.m_Pos.z << " bounds " << shape.min.x << ","
++                          << shape.min.y << "," << shape.min.z << " to " << shape.max.x << "," << shape.max.y << ","
++                          << shape.max.z << " surface " << surface->state.m_Pos.x << "," << surface->state.m_Pos.y
++                          << "," << surface->state.m_Pos.z << "\n";
++            }
++            CHECK(surfaces == g.server.polygrids.active.size());
++            CHECK(g.enter_player(error));
++            for (int i = 0; i < 5; ++i)
++                CHECK(g.step(1.0 / 60));
++            CHECK(update_polygrid_scene(g, scene, error) && scene.entries.size() == surfaces);
++            for (auto& e : scene.entries)
++            {
++                CHECK(e.error.empty() && e.range != UINT32_MAX);
++                std::cout << "Surface " << e.id << " grid " << e.width << " texture " << e.texture << " triangles "
++                          << scene.mesh.ranges[e.range].count / 3 << "\n";
++            }
++            for (auto& i : g.server.polygrids.active)
++            {
++                CHECK(i.effect.id > last && i.effect.updates >= 5);
++                last = i.effect.id;
++            }
++            auto& checked = g.server.polygrids.active[0].effect;
++            CHECK(checked.sprite);
++            auto frame = checked.track.frame;
++            checked.track.frame = UINT32_MAX;
++            CHECK(!update_polygrid_scene(g, scene, error) && !error.empty());
++            checked.track.frame = frame;
++            const auto updates = g.server.polygrids.active[0].effect.updates;
++            CHECK(update_polygrid_scene(g, scene, error) && updates == g.server.polygrids.active[0].effect.updates);
++            CHECK(g.unload_world());
++            scene.clear();
++            CHECK(update_polygrid_scene(g, scene, error) && scene.entries.empty() && g.server.polygrids.active.empty());
++        }
++        return true;
++    }
++    bool mesh(const std::filesystem::path& root)
++    {
++        Resources resources;
++        std::string error;
++        CHECK(test_blood_splat::mount(resources, root, error));
++        SpriteStore store(resources);
++        PolyGridSettings s;
++        s.dims = {10, 2, 20};
++        CPolyGridFX fx;
++        CHECK(fx.Init(s, store, 0, error));
++        PolyGridView scene;
++        fx.heights[0] = -127;
++        fx.heights[1] = 127;
++        CHECK(scene.add(1, true, {{0, 5, 0}, {}}, s.dims, fx.width, fx.heights, fx.palette, {2, 3}, {.25f, .5f}, .7f,
++                        "alpha.dtx", resources, error));
++        CHECK(scene.entries[0].error.empty() && scene.mesh.vertices.size() == 294 &&
++              scene.mesh.vertices[0].position.y == -2 && scene.mesh.vertices[1].position.y == 2);
++        CHECK(scene.mesh.vertices[0].uv[0] == .25f && scene.mesh.vertices[0].uv[1] == .5f &&
++              scene.mesh.vertices.back().position.z == 20);
++        const auto revision = scene.revision;
++        scene.begin_frame();
++        CHECK(scene.add(1, false, {}, s.dims, fx.width, fx.heights, fx.palette, {2, 3}, {}, .7f, "ALPHA.DTX", resources,
++                        error) &&
++              scene.draws.empty() && scene.revision == revision);
++        CHECK(scene.add(2, true, {}, s.dims, fx.width, fx.heights, fx.palette, {2, 3}, {}, .7f, "bad.dtx", resources,
++                        error) &&
++              !scene.entries.back().error.empty() && scene.draws.empty());
++        CHECK(!scene.add(2, true, {}, s.dims, 129, fx.heights, fx.palette, {2, 3}, {}, .7f, "", resources, error));
++        scene.clear();
++        CHECK(scene.mesh.materials.size() == 1 && scene.entries.empty());
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string mode = argv[1];
++    bool ok = mode == "formulas"   ? formulas(argv[2])
++              : mode == "lifetime" ? lifetime(argv[2])
++              : mode == "mesh"     ? mesh(argv[2])
++              : mode == "private"  ? private_data(argv[2])
++                                   : false;
++    return ok ? 0 : 1;
++}

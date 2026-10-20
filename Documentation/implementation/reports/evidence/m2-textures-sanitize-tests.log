@@ -1,0 +1,29 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 310: world_view.mesh
+1/9 Test #310: world_view.mesh ..................   Passed    0.01 sec
+    Start 311: world_view.rejects
+2/9 Test #311: world_view.rejects ...............   Passed    0.01 sec
+    Start 312: world_view.camera
+3/9 Test #312: world_view.camera ................   Passed    0.01 sec
+    Start 313: world_view.lifetime
+4/9 Test #313: world_view.lifetime ..............   Passed    0.01 sec
+    Start 314: world_view.subway
+5/9 Test #314: world_view.subway ................   Passed    2.84 sec
+    Start 315: texture.decode
+6/9 Test #315: texture.decode ...................   Passed    0.01 sec
+    Start 316: texture.malformed
+7/9 Test #316: texture.malformed ................   Passed    0.01 sec
+    Start 317: texture.mapping
+8/9 Test #317: texture.mapping ..................   Passed    0.02 sec
+    Start 318: texture.corpus
+9/9 Test #318: texture.corpus ...................   Passed    8.08 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Label Time Summary:
+headless      =  11.02 sec*proc (9 tests)
+private       =  10.93 sec*proc (2 tests)
+texture       =   8.13 sec*proc (4 tests)
+world_view    =   2.90 sec*proc (5 tests)
+
+Total Test time (real) =  11.03 sec

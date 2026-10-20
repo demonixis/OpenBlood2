@@ -1,0 +1,177 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  41: world.destination_trial_private
+      Start 666: soundfx.catalog
+ 1/80 Test #666: soundfx.catalog ...................   Passed   17.11 sec
+      Start  42: world.destination_private
+ 2/80 Test  #41: world.destination_trial_private ...   Passed   26.97 sec
+      Start 672: audio_stream.city
+ 3/80 Test  #42: world.destination_private .........   Passed   15.47 sec
+      Start 234: sound.catalog
+ 4/80 Test #672: audio_stream.city .................   Passed    9.33 sec
+      Start 226: randomsound.catalog
+ 5/80 Test #234: sound.catalog .....................   Passed   16.43 sec
+      Start 217: cinematics.catalog
+ 6/80 Test #226: randomsound.catalog ...............   Passed   16.27 sec
+      Start  54: services.private
+ 7/80 Test  #54: services.private ..................   Passed   14.59 sec
+      Start 227: randomsound.subway
+ 8/80 Test #217: cinematics.catalog ................   Passed   18.27 sec
+      Start 235: sound.subway
+ 9/80 Test #235: sound.subway ......................   Passed    5.38 sec
+      Start  43: world.private
+10/80 Test #227: randomsound.subway ................   Passed    5.59 sec
+      Start 218: cinematics.subway
+11/80 Test  #43: world.private .....................   Passed    5.07 sec
+      Start 670: audio_stream.seams
+12/80 Test #670: audio_stream.seams ................   Passed    0.39 sec
+      Start  25: world.destination_trials
+13/80 Test  #25: world.destination_trials ..........   Passed    0.19 sec
+      Start 669: audio_stream.mixer
+14/80 Test #669: audio_stream.mixer ................   Passed    0.10 sec
+      Start 667: audio_stream.pcm
+15/80 Test #667: audio_stream.pcm ..................   Passed    0.07 sec
+      Start  28: world.destination_lifetime
+16/80 Test  #28: world.destination_lifetime ........   Passed    0.06 sec
+      Start  37: world.mutations
+17/80 Test  #37: world.mutations ...................   Passed    0.30 sec
+      Start  46: services.model_rejection
+18/80 Test  #46: services.model_rejection ..........   Passed    0.41 sec
+      Start 665: soundfx.lifetime
+19/80 Test #665: soundfx.lifetime ..................   Passed    0.06 sec
+      Start 663: soundfx.deadlines
+20/80 Test #663: soundfx.deadlines .................   Passed    0.05 sec
+      Start 664: soundfx.failures
+21/80 Test #664: soundfx.failures ..................   Passed    0.04 sec
+      Start 662: soundfx.spatial
+22/80 Test #662: soundfx.spatial ...................   Passed    0.07 sec
+      Start 661: soundfx.ramps
+23/80 Test #661: soundfx.ramps .....................   Passed    0.07 sec
+      Start 660: soundfx.defaults
+24/80 Test #660: soundfx.defaults ..................   Passed    0.07 sec
+      Start 671: audio_stream.truncation
+25/80 Test #671: audio_stream.truncation ...........   Passed    0.07 sec
+      Start 668: audio_stream.malformed
+26/80 Test #668: audio_stream.malformed ............   Passed    0.04 sec
+      Start  29: world.sprite_entries
+27/80 Test  #29: world.sprite_entries ..............   Passed    0.08 sec
+      Start  30: world.sound_entries
+28/80 Test #218: cinematics.subway .................   Passed    7.11 sec
+      Start   1: objects.builtin_model
+29/80 Test  #30: world.sound_entries ...............   Passed    0.09 sec
+      Start  52: services.placement_service
+30/80 Test   #1: objects.builtin_model .............   Passed    0.05 sec
+      Start  51: services.placement_queries
+31/80 Test  #52: services.placement_service ........   Passed    0.03 sec
+      Start  27: world.destination_schema
+32/80 Test  #51: services.placement_queries ........   Passed    0.03 sec
+      Start  26: world.destination_messages
+33/80 Test  #27: world.destination_schema ..........   Passed    0.03 sec
+      Start 216: cinematics.device
+34/80 Test  #26: world.destination_messages ........   Passed    0.03 sec
+      Start  11: objects.unsupported_teardown
+35/80 Test  #11: objects.unsupported_teardown ......   Passed    0.06 sec
+      Start  36: world.world_rejection
+36/80 Test #216: cinematics.device .................   Passed    0.15 sec
+      Start 222: randomsound.random
+37/80 Test  #36: world.world_rejection .............   Passed    0.11 sec
+      Start 229: sound.loops
+38/80 Test #229: sound.loops .......................   Passed    0.07 sec
+      Start  10: objects.messages_strings
+39/80 Test #222: randomsound.random ................   Passed    0.10 sec
+      Start 233: sound.metadata
+40/80 Test #233: sound.metadata ....................   Passed    0.07 sec
+      Start 232: sound.failures
+41/80 Test  #10: objects.messages_strings ..........   Passed    0.07 sec
+      Start 231: sound.lifetime
+42/80 Test #231: sound.lifetime ....................   Passed    0.04 sec
+      Start 228: sound.defaults
+43/80 Test #232: sound.failures ....................   Passed    0.05 sec
+      Start 230: sound.resampling
+44/80 Test #230: sound.resampling ..................   Passed    0.04 sec
+      Start 221: randomsound.sequence
+45/80 Test #228: sound.defaults ....................   Passed    0.05 sec
+      Start 224: randomsound.lifetime
+46/80 Test #221: randomsound.sequence ..............   Passed    0.05 sec
+      Start 225: randomsound.failures
+47/80 Test #224: randomsound.lifetime ..............   Passed    0.05 sec
+      Start 219: randomsound.defaults
+48/80 Test #219: randomsound.defaults ..............   Passed    0.05 sec
+      Start 223: randomsound.spatial
+49/80 Test #225: randomsound.failures ..............   Passed    0.07 sec
+      Start 220: randomsound.commands
+50/80 Test #220: randomsound.commands ..............   Passed    0.05 sec
+      Start  12: objects.creation_failures
+51/80 Test #223: randomsound.spatial ...............   Passed    0.07 sec
+      Start 215: cinematics.failures
+52/80 Test  #12: objects.creation_failures .........   Passed    0.06 sec
+      Start 211: cinematics.mixer
+53/80 Test #215: cinematics.failures ...............   Passed    0.06 sec
+      Start 214: cinematics.lifetime
+54/80 Test #211: cinematics.mixer ..................   Passed    0.07 sec
+      Start 212: cinematics.spatial
+55/80 Test #214: cinematics.lifetime ...............   Passed    0.08 sec
+      Start 213: cinematics.sequence
+56/80 Test #212: cinematics.spatial ................   Passed    0.07 sec
+      Start  38: world.session_lifecycle
+57/80 Test #213: cinematics.sequence ...............   Passed    0.06 sec
+      Start   4: objects.reasons_properties
+58/80 Test  #38: world.session_lifecycle ...........   Passed    0.03 sec
+      Start   2: objects.original_objects
+59/80 Test   #4: objects.reasons_properties ........   Passed    0.03 sec
+      Start   9: objects.links_lists
+60/80 Test   #2: objects.original_objects ..........   Passed    0.03 sec
+      Start   6: objects.deferred_removal
+61/80 Test   #9: objects.links_lists ...............   Passed    0.03 sec
+      Start   3: objects.nested_creation
+62/80 Test   #6: objects.deferred_removal ..........   Passed    0.03 sec
+63/80 Test   #3: objects.nested_creation ...........   Passed    0.02 sec
+      Start   8: objects.handles_selection
+      Start   5: objects.scheduling
+64/80 Test   #5: objects.scheduling ................   Passed    0.02 sec
+      Start   7: objects.aggregate_dispatch
+65/80 Test   #8: objects.handles_selection .........   Passed    0.03 sec
+      Start  40: world.original_trigger
+66/80 Test   #7: objects.aggregate_dispatch ........   Passed    0.02 sec
+      Start  33: world.resource_mount
+67/80 Test  #40: world.original_trigger ............   Passed    0.03 sec
+      Start  34: world.world_properties
+68/80 Test  #33: world.resource_mount ..............   Passed    0.02 sec
+      Start  35: world.world_geometry
+69/80 Test  #34: world.world_properties ............   Passed    0.03 sec
+      Start  32: world.rez_rejection
+70/80 Test  #35: world.world_geometry ..............   Passed    0.03 sec
+      Start  31: world.rez_structure
+71/80 Test  #32: world.rez_rejection ...............   Passed    0.02 sec
+      Start  39: world.session_messages
+72/80 Test  #31: world.rez_structure ...............   Passed    0.03 sec
+      Start 210: cinematics.decode
+73/80 Test  #39: world.session_messages ............   Passed    0.03 sec
+      Start  53: services.original_services
+74/80 Test #210: cinematics.decode .................   Passed    0.03 sec
+      Start  48: services.model_callbacks
+75/80 Test  #53: services.original_services ........   Passed    0.03 sec
+      Start  45: services.model_reader
+76/80 Test  #45: services.model_reader .............   Passed    0.02 sec
+      Start  47: services.animation_events
+77/80 Test  #48: services.model_callbacks ..........   Passed    0.03 sec
+      Start  50: services.movement_contacts
+78/80 Test  #50: services.movement_contacts ........   Passed    0.03 sec
+      Start  49: services.collision_queries
+79/80 Test  #47: services.animation_events .........   Passed    0.03 sec
+80/80 Test  #49: services.collision_queries ........   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 80
+
+Label Time Summary:
+audio_stream    =   9.99 sec*proc (6 tests)
+cinematics      =  25.89 sec*proc (9 tests)
+headless        = 162.05 sec*proc (80 tests)
+objects         =   0.45 sec*proc (12 tests)
+private         = 157.59 sec*proc (12 tests)
+randomsound     =  22.30 sec*proc (9 tests)
+services        =  15.22 sec*proc (10 tests)
+sound           =  22.12 sec*proc (8 tests)
+soundfx         =  17.47 sec*proc (7 tests)
+world           =  48.61 sec*proc (19 tests)
+
+Total Test time (real) =  81.06 sec

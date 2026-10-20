@@ -1,0 +1,14 @@
+484/646 Testing: corpses.accumulation
+484/646 Test: corpses.accumulation
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "accumulation" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/accumulation"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.accumulation" start time: Oct 17 04:30 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.accumulation" end time: Oct 17 04:30 CEST
+"corpses.accumulation" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,14 @@
+564/569 Testing: explosion_rings.recipes
+564/569 Test: explosion_rings.recipes
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_ring_tests" "recipes" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-rings-recipes"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"explosion_rings.recipes" start time: Oct 16 21:17 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_rings.recipes" end time: Oct 16 21:17 CEST
+"explosion_rings.recipes" time elapsed: 00:00:00
+----------------------------------------------------------

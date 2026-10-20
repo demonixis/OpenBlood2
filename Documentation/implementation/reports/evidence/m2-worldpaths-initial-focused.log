@@ -1,0 +1,34 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 206: worldpaths.translation
+    Start 207: worldpaths.world_block
+    Start 208: worldpaths.riders
+    Start 209: worldpaths.push_block
+1/9 Test #206: worldpaths.translation ...........   Passed    0.00 sec
+    Start 210: worldpaths.lifetime
+2/9 Test #207: worldpaths.world_block ...........   Passed    0.00 sec
+    Start 211: worldpaths.validation
+3/9 Test #208: worldpaths.riders ................   Passed    0.00 sec
+    Start 212: worldpaths.player
+4/9 Test #209: worldpaths.push_block ............   Passed    0.00 sec
+    Start 213: worldpaths.timeline
+5/9 Test #210: worldpaths.lifetime ..............   Passed    0.00 sec
+    Start 214: worldpaths.subway
+6/9 Test #211: worldpaths.validation ............   Passed    0.00 sec
+7/9 Test #213: worldpaths.timeline ..............   Passed    0.00 sec
+8/9 Test #212: worldpaths.player ................   Passed    0.00 sec
+9/9 Test #214: worldpaths.subway ................***Failed    0.84 sec
+subway:244: f->targets[0].result==MoverResult::Moved
+
+
+89% tests passed, 1 tests failed out of 9
+
+Label Time Summary:
+headless      =   0.87 sec*proc (9 tests)
+private       =   0.84 sec*proc (1 test)
+worldpaths    =   0.87 sec*proc (9 tests)
+
+Total Test time (real) =   0.85 sec
+
+The following tests FAILED:
+	214 - worldpaths.subway (Failed)                        headless private worldpaths
+Errors while running CTest

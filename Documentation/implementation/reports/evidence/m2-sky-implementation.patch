@@ -1,0 +1,1968 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 51e6e40..adb9c58 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -558,3 +558,7 @@ The [safe NEW_LEVEL continuation](../Documentation/Implementation/M2_LEVEL_CHANG
+ The [corpse doorway correction](../Documentation/Implementation/M2_CORPSE_CLEARANCE.md) addresses a reproduced frozen dead Cultist by adding checked source-center separation and swept living-body clearance to initial corpse placement. Original dimensions and bounded failures remain intact; in-game inspection records the extra sweep. Read [the clearance contracts](docs/CORPSE_CLEARANCE_CONTRACTS.md) before extending this policy. This does not certify every later enemy or close M2.
+ 
+ The [authored particle-stream continuation](../Documentation/Implementation/M2_PARTICLE_STREAMS.md) connects original CClientParticleStreamSFX/CParticleStreamFX toggles, ramps, particles and inspection. Read [contracts](docs/PARTICLE_STREAM_CONTRACTS.md). Preserve strict burst deadlines, original red-derived colors, moving system origins, publish-before-filter order and checked owner lifetime. The original client never reads the server sound tail; do not invent playback. Limits fail explicitly. CityHub is now 443 created / 31 transferred sounds / 541 editor-only / 10 unsupported / one failed; NEW_LEVEL still refuses and M2 remains open.
++
++The [original sky continuation](../Documentation/Implementation/M2_SKY.md) integrates built-in DemoSkyWorldModel/SkyPointer with checked sky slots, first-update lookup, camera parallax and actual SDL_GPU world-model backgrounds. Read [sky contracts](docs/SKY_CONTRACTS.md). Preserve deferred pointer removal, empty-list release, index order, unchanged simulation/collision and explicit unsupported types/duplicate slots. The projection/depth reference is later LithTech, not verified retail parity. CityHub has 448 created / 31 sounds / 541 editor-only / five unsupported / one failed entry. M2 and CityHub NEW_LEVEL remain incomplete.
++
++Interactive input/simulation frames are capped at 100 ms by `app_frame_delta`; discarded wall time is inspectable. Resource preparation and diagnostic capture are paused tool work. Keep direct diagnostic stepping and core physics safety bounds unchanged; this is a frontend catch-up policy, not a retail timing claim.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a07f4be..3abf0a7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,13 +14,13 @@ include(CTest)
+ include(cmake/Dependencies.cmake)
+ configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+ 
+-add_library(engine STATIC src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/world_shaders.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
++add_library(engine STATIC src/engine/sky.cpp src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/world_shaders.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+ target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/audio_stream.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
+ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index 9336e8d..a680dfb 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++The [original sky continuation](../Documentation/Implementation/M2_SKY.md) connects DemoSkyWorldModel and deferred SkyPointer lookup to checked sky slots, parallax and SDL_GPU world-model background rendering. CityHub now has 448 created / 31 transferred sounds / 541 editor-only / five unsupported / one failed entry; four pointers remove themselves on their first update. Earlier counts below are historical. Missing pickups and `fallengrills` geometry still reject CityHub NEW_LEVEL; M2 remains incomplete.
++
+ The [authored particle-stream continuation](../Documentation/Implementation/M2_PARTICLE_STREAMS.md) connects original server toggles and client ramps, current-owner emission and SDL_GPU particle rendering, with inspection. All eight CityHub streams create; the level now has 443 created / 31 transferred sounds / 541 editor-only / 10 unsupported / one failed entry. Original unread sound fields remain metadata. CityHub NEW_LEVEL still refuses; M2 remains incomplete.
+ 
+ The [safe NEW_LEVEL continuation](../Documentation/Implementation/M2_LEVEL_CHANGE.md) prepares an isolated destination, restores the supported player and client, then replaces ownership at a frame boundary. Failed preparation retains the current session. Real SubwayA transfers and NVIDIA rendering/audio are tested; CityHub now refuses with 10 unsupported and one failed entry after the particle-stream continuation. M2 remains incomplete; earlier blanket transfer omissions below are historical.
+diff --git a/docs/M2_SKY_SOURCES.json b/docs/M2_SKY_SOURCES.json
+new file mode 100644
+index 0000000..1a2eb9b
+--- /dev/null
++++ b/docs/M2_SKY_SOURCES.json
+@@ -0,0 +1,60 @@
++{
++  "sources": [
++    {
++      "path": "sources/blood2/AppHeaders/engineobjects.c",
++      "repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++      "sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876",
++      "role": "original Blood II callbacks/API"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/basetypes_de.h",
++      "repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
++      "role": "original Blood II callbacks/API"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/server_de.h",
++      "repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "role": "original Blood II callbacks/API"
++    },
++    {
++      "path": "sources/lithtech/runtime/render_a/src/sys/d3d/common_draw.cpp",
++      "repository_commit": "0eab18289bed72879eddb648d3311075b108cf46",
++      "sha256": "827e16cc382478f05a4f73692f561afa5613fa94a754c564a65e773aab3d5cb1",
++      "role": "later-generation engine reference, not a retail parity claim"
++    },
++    {
++      "path": "sources/lithtech/runtime/render_a/src/sys/d3d/d3d_drawsky.cpp",
++      "repository_commit": "0eab18289bed72879eddb648d3311075b108cf46",
++      "sha256": "2c908cdf585ae077c635ad4eaea02bf568c39d2e1a054cf0d945d7ee15c45c53",
++      "role": "later-generation engine reference, not a retail parity claim"
++    },
++    {
++      "path": "sources/lithtech/runtime/render_a/src/sys/d3d/drawsky.cpp",
++      "repository_commit": "0eab18289bed72879eddb648d3311075b108cf46",
++      "sha256": "d76510f9691893bd509400475d69d05d04f10e174cc597fb259e57d4b356eb6e",
++      "role": "later-generation engine reference, not a retail parity claim"
++    },
++    {
++      "path": "sources/lithtech/runtime/server/src/serverde_impl.cpp",
++      "repository_commit": "0eab18289bed72879eddb648d3311075b108cf46",
++      "sha256": "5e1973f36bea781f23f99d7e0bb32ddb474ebf83c142c6877b15c157ba2fd53f",
++      "role": "later-generation engine reference, not a retail parity claim"
++    },
++    {
++      "path": "sources/lithtech/runtime/server/src/servermgr.cpp",
++      "repository_commit": "0eab18289bed72879eddb648d3311075b108cf46",
++      "sha256": "021b651f6d93a426ee9b1150bc1c17a2f57987c2f1f9f9c4a69c2abbae413e5f",
++      "role": "later-generation default sky bounds; not a retail parity claim"
++    }
++  ],
++  "imports": [
++    "src/game/original/SkyObjects.cpp",
++    "src/game/original/SkyObjects.h"
++  ],
++  "engine_adaptations": [
++    "src/engine/sky.cpp",
++    "src/engine/world_renderer.cpp"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 8e315aa..3dc2a45 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -973,3 +973,18 @@ original Blood II baseline, with typed ownership, checked resources and the exis
+ particle renderer. See [source hashes](M2_PARTICLE_STREAM_SOURCES.json) and
+ [contracts](PARTICLE_STREAM_CONTRACTS.md). Original ramp/color/trigger rules and the
+ unread audio tail are retained. CityHub still refuses NEW_LEVEL; M2 is incomplete.
++
++## Original sky callbacks and replacement presentation
++
++`SkyObjects.cpp` adapts Blood II AppHeaders/engineobjects.c's DemoSkyWorldModel and
++SkyPointer callbacks. [Source hashes](M2_SKY_SOURCES.json) distinguish this original
++game baseline from the later LithTech engine reference used for projection and
++depth/order behavior. [Contracts](SKY_CONTRACTS.md) document typed checked slots,
++rejected duplicate indices/types, leak repair, deferred lifetime and the simple
++background pass. No reference tree, commercial asset or dependency pin changed.
++
++The variable-frame CityHub integration test also required an explicit 100 ms
++interactive-frame bound, paused resource/capture work and visible discarded time.
++This is new frontend scheduling policy, not an imported original gameplay rule;
++see [session playback](SESSION_PLAYBACK_CONTRACTS.md). Diagnostic/core timing and
++physics rejection bounds remain unchanged.
+diff --git a/docs/SESSION_PLAYBACK_CONTRACTS.md b/docs/SESSION_PLAYBACK_CONTRACTS.md
+index f303021..4432807 100644
+--- a/docs/SESSION_PLAYBACK_CONTRACTS.md
++++ b/docs/SESSION_PLAYBACK_CONTRACTS.md
+@@ -61,3 +61,11 @@ This is not a human walkthrough, a recreation of the retail server pause mechani
+ or proof of all combat. Center-ray activation (rather than retail PVS), missing
+ states/services and safe NEW_LEVEL remain documented limitations. The train-window
+ material report remains unresolved and is the next playtest priority before more FX.
++
++The [sky integration check](SKY_CONTRACTS.md) exposed a slow-frame feedback failure
++in actual variable-frame CityHub execution. The interactive frontend now caps one
++frame at 100 ms and reports discarded wall time in the inspector/log. It excludes
++resource/capture work from catch-up. Explicit diagnostic stepping and the core
++physics limit remain unchanged; slow execution can slow simulation time. Tests
++cover bounded lag, recovery on the next ordinary frame, diagnostic time, and invalid
++deltas, plus repeated NVIDIA application starts with actual capture and simulation.
+diff --git a/docs/SKY_CONTRACTS.md b/docs/SKY_CONTRACTS.md
+new file mode 100644
+index 0000000..51500f6
+--- /dev/null
++++ b/docs/SKY_CONTRACTS.md
+@@ -0,0 +1,116 @@
++# Original sky objects and world-model presentation
++
++M2 remains incomplete. This integrates the original `DemoSkyWorldModel` and
++`SkyPointer` callbacks from Blood II's `AppHeaders/engineobjects.c`. It extends
++[world presentation](WORLD_VIEW_CONTRACTS.md) and [transparent surfaces](WORLD_ALPHA_CONTRACTS.md).
++See [implementation evidence](../../Documentation/Implementation/M2_SKY.md).
++
++## Original callbacks and typed services
++
++Both classes inherit BaseClass, not B2BaseClass: no invented difficulty filter.
++World-file precreate reads SkyDims, Index and InnerPercentX/Y/Z, and copies Name
++to Filename. DemoSkyWorldModel forces OT_WORLDMODEL; SkyPointer forces OT_NORMAL
++and reads SkyObjectName. Runtime/string creation retains the source's zero sky
++size, 0.1 inner fractions, zero index and empty pointer name. Restore creation
++is explicitly unavailable. The pointer's authored name limit is 98 bytes, matching
++the source's 99-byte destination capacity including the terminator.
++
++Initial update changes the definition only when **all three** sky dimensions are
++nonzero. The outer bounds are current object position plus/minus SkyDims; view
++bounds use the componentwise dimensions-times-inner-fractions. A zero component
++preserves the previous definition. World-model binding uses the existing unique
++DAT name, collision shell and DAT translation pivot, before initial update.
++
++The model sets FLAG_SKYOBJECT (bit 12) and FLAG_FORCEOPTIMIZEOBJECT (bit 28), then
++adds itself. The latter flag is retained metadata; no obsolete optimization cache
++is needed. SkyPointer schedules 0.001 seconds, searches at its first update,
++selects the first existing FindNamedObjects result, marks/adds that target, then
++removes itself. Target creation after pointer creation therefore works. Name
++lookup remains exact and case-sensitive, with existing reverse insertion order.
++Removal is deferred through the ordinary callback lifetime. Unlike the original
++empty-list leak, every owned name list is released.
++
++The engine owns 30 non-owning generation-checked slots: the actual original
++MAX_SKYOBJECTS is 30, so indices are **0–29**, despite the source comment saying
++0–30. Already registered objects retain their index. Invalid indices, missing or
++pending identities, unsupported object types and a different live object occupying
++the requested slot fail visibly. Duplicate slots reject rather than silently
++replacing the earlier object as the later engine did. Bound world models are the
++supported subset; sprites, models and polygrids in the sky are not accepted.
++
++Definitions require finite, bounded, increasing outer bounds and nondecreasing
++view bounds. Negative dimensions/fractions reject precreate; zero view extent is
++valid. Failed definitions/additions leave previous state unchanged, record an
++object diagnostic and a required unavailable-service entry. The last failure is
++retained for inspection. A missing pointer target also records a failure before
++its original one-shot removal; it is never counted as successful sky rendering.
++Source entry accounting describes initial creation, not perpetual pointer lifetime.
++
++Pending/stale slot identities never draw and cannot refer to a reused object slot.
++Hidden objects do not draw; inactive visible objects do. Sky records do not own or
++remove targets. Unload resets the definition, slots, errors and counters. NEW_LEVEL
++preflights pending pointer targets/slots on a copied registry without running their
++update or advancing the candidate world, and leaves the source untouched on failure.
++
++## Camera and rendering
++
++Blood II's SkyDef describes compressing the world camera into the view box. The
++explicit componentwise formula is taken from the inspected **later-generation**
++LithTech `common_draw.cpp`: `viewMin + (eye-worldMin)/(worldMax-worldMin) *
++(viewMax-viewMin)`. This is a compatible reference implementation, not verified
++retail Blood II renderer parity. Outside-world cameras extrapolate; there is no
++clamp. Degenerate/nonfinite world bounds fail before drawing. Camera rotation is
++unchanged. Outer bounds remain authored metadata; they do not clip the sky geometry.
++
++The renderer draws current checked world-model poses in ascending slot order,
++using the same uploaded geometry, DTX images, sampler and session-time Pan effects
++as ordinary geometry. No simulation or animation advances while drawing. Separate
++opaque/alpha sky pipelines disable depth tests and writes; surfaces retain existing
++bit-3 alpha classification and source-order batches. This follows the reviewed
++later-engine sky ordering/depth behavior. The near plane is 0.01, far plane 65536.
++
++A sky background pass precedes the normal world. FLAG_SKYOBJECT excludes these
++objects from normal world draws while retaining binding accounting. Authored
++bit-4 sky faces are separate batches and omitted from the normal opaque pass when
++a sky background is prepared. With no visible supported sky, diagnostic portal
++colors remain. This full-viewport background is a simple replacement for historical
++portal-extent culling; it also appears in uncovered void. No stencil portal
++occlusion, fog, lightmaps, sky scale console controls or retail pixel parity is
++claimed. Physics flags and collision geometry are unchanged.
++
++All passes share existing packaged SPIR-V/MSL shaders; no dependency or shader
++artifact changes. Resize/revision clearing and SDL deferred GPU destruction apply
++to sky pipelines and shared resources. The inspector reports actual submitted sky
++batches separately, definition/view bounds, computed sky camera, checked slot
++names, hidden/stale state and failures. Inspector-free Release uses the same path.
++Native Metal execution of this increment has not been tested on this Linux host.
++
++## Interactive time discovered by the integration check
++
++The real variable-frame CityHub application test exposed a CPU catch-up feedback
++loop in Debug: a roughly 0.40-second frame produced a roughly 1.28-second simulation
++step, and the next frame exceeded the unchanged 0.5-second physics bound. The
++fixed-delta diagnostic tests had not exercised this. Pausing loading/capture work
++alone did not resolve the subsequent simulation feedback.
++
++`app_frame_delta` now caps **interactive** input/simulation frames at 0.1 seconds.
++Excess wall time is discarded, never accumulated as future catch-up. The 3D
++inspector and shutdown log expose limited-frame counts and discarded wall seconds.
++Resource revision preparation/uploads and diagnostic GPU capture are paused tool
++work. Normal frames below the cap retain their elapsed time. Explicit diagnostic
++steps and GameSession::step are unchanged, including invalid-time rejection and
++the physics catch-up bound. Slow Debug execution can therefore slow game time;
++this is a bounded frontend policy, not retail timing or a performance optimization.
++
++## Evidence
++
++Synthetic CPU tests cover callbacks, zero-component preservation, bit flags,
++index/definition rejection, delayed lookup, empty-list cleanup, duplicate refusal,
++non-world-model refusal, projection/extrapolation, portal batch separation,
++inactive/hidden/pending/stale lifetime and unload. Private tests load CityHub twice
++and verify five ordered target identities, actual textures and first-update removal.
++GPU pixel tests cover painter order even when a later object is farther away,
++alpha, the smaller near plane, lack of sky depth writes, normal world occlusion,
++portal omission, resize, cache replacement and invalid draw recovery. Transition tests reject missing/non-world-model pointer
++targets while preserving source identities, globals, clock, client and list ownership. Private GPU
++captures include two sky directions and a combined sky/world view over two reloads.
+diff --git a/docs/TEXTURE_CONTRACTS.md b/docs/TEXTURE_CONTRACTS.md
+index da32a57..042d5e7 100644
+--- a/docs/TEXTURE_CONTRACTS.md
++++ b/docs/TEXTURE_CONTRACTS.md
+@@ -89,3 +89,8 @@ subset. World/model opacity policy is unchanged; required FX and M2 remain open.
+ The [world-alpha correction](WORLD_ALPHA_CONTRACTS.md) supersedes earlier blanket world-opacity/transparent-marker statements for resolved bit-3 surfaces. Sky and rejected resources remain opaque markers; ordinary surfaces still ignore alpha. The new sorted world pass precedes the separately sorted translucent FX passes. M2 remains incomplete.
+ 
+ The [surface panning continuation](SURFACE_EFFECT_CONTRACTS.md) supersedes the blanket animated-material omission for bounded authored Pan effects. Rates belong to batches independently of shared images; session time controls both world passes. Other effects and M2 remain open.
++
++The [sky continuation](SKY_CONTRACTS.md) supersedes blanket sky-rendering omissions
++for registered world-model skies. Valid visible skies render behind the world and
++replace bit-4 portal markers; unavailable skies retain diagnostics. No retail
++lighting, fog or complete M2 acceptance is implied.
+diff --git a/docs/WORLD_ALPHA_CONTRACTS.md b/docs/WORLD_ALPHA_CONTRACTS.md
+index 4297123..79ebcdd 100644
+--- a/docs/WORLD_ALPHA_CONTRACTS.md
++++ b/docs/WORLD_ALPHA_CONTRACTS.md
+@@ -80,3 +80,8 @@ compositing after two actual loads; full scene captures remain local. Applicatio
+ smoke requires 31 prepared/submitted faces through hidden UI and reload with no
+ extra world upload. Other platforms, retail pixel parity and human playthroughs
+ are not claimed.
++
++The [sky continuation](SKY_CONTRACTS.md) supersedes blanket sky-rendering omissions
++for registered world-model skies. Valid visible skies render behind the world and
++replace bit-4 portal markers; unavailable skies retain diagnostics. No retail
++lighting, fog or complete M2 acceptance is implied.
+diff --git a/docs/WORLD_VIEW_CONTRACTS.md b/docs/WORLD_VIEW_CONTRACTS.md
+index a0c851e..2f94a48 100644
+--- a/docs/WORLD_VIEW_CONTRACTS.md
++++ b/docs/WORLD_VIEW_CONTRACTS.md
+@@ -96,3 +96,8 @@ weapons. Earlier blanket sprite-rendering omissions are superseded for this boun
+ subset. World/model opacity policy is unchanged; required FX and M2 remain open.
+ 
+ The [world-alpha correction](WORLD_ALPHA_CONTRACTS.md) supersedes earlier blanket world-opacity/transparent-marker statements for resolved bit-3 surfaces. Sky and rejected resources remain opaque markers; ordinary surfaces still ignore alpha. The new sorted world pass precedes the separately sorted translucent FX passes. M2 remains incomplete.
++
++The [sky continuation](SKY_CONTRACTS.md) supersedes blanket sky-rendering omissions
++for registered world-model skies. Valid visible skies render behind the world and
++replace bit-4 portal markers; unavailable skies retain diagnostics. No retail
++lighting, fog or complete M2 acceptance is implied.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index fb0bff2..a004362 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -513,9 +513,42 @@ namespace OpenBlood2
+                         "the player in Session first, or launch --view-world.");
+                     ImGui::TextWrapped(
+                         "World textures/models, glass and alpha sprites are unlit. Lightmaps, liquid surfaces "
+-                        "and sky rendering remain unavailable. World alpha uses sorted faces; FX sort separately.");
++                        "remain unavailable. Bound sky world models render in index order. World alpha uses sorted "
++                        "faces; FX sort separately.");
++                    ImGui::Text("Interactive clock: %llu limited frames / %.3f discarded wall seconds",
++                                (unsigned long long)limited_frames, discarded_wall_time);
+                     if (world_mesh && world_render)
+                     {
++                        if (ImGui::TreeNode("Original sky objects and projection"))
++                        {
++                            const auto& sky = game.server.sky;
++                            const auto& d = sky.definition;
++                            ImGui::Text("Definitions: %llu / additions: %llu / submitted: %zu batches, %llu passes",
++                                        (unsigned long long)sky.definitions, (unsigned long long)sky.additions,
++                                        world_render->sky_batches, (unsigned long long)world_render->sky_frames);
++                            ImGui::Text("Bounds: (%.3f %.3f %.3f) to (%.3f %.3f %.3f)", d.min.x, d.min.y, d.min.z,
++                                        d.max.x, d.max.y, d.max.z);
++                            ImGui::Text("View box: (%.3f %.3f %.3f) to (%.3f %.3f %.3f)", d.view_min.x, d.view_min.y,
++                                        d.view_min.z, d.view_max.x, d.view_max.y, d.view_max.z);
++                            DVector eye;
++                            if (OpenBlood2::sky_view_position(d, game.world.min, game.world.max,
++                                                              game.client_shell.view.position, eye))
++                                ImGui::Text("Sky eye: %.4f %.4f %.4f", eye.x, eye.y, eye.z);
++                            for (unsigned i = 0; i < sky.objects.size(); ++i)
++                                if (sky.objects[i])
++                                {
++                                    const auto* r = game.objects.get(sky.objects[i]);
++                                    ImGui::Text("%u: %s / %s", i, r ? r->state.m_Name : "removed",
++                                                r && r->life == Life::Alive
++                                                    ? ((r->state.m_Flags & FLAG_VISIBLE) ? "visible" : "hidden")
++                                                    : "stale or pending");
++                                }
++                            if (!sky.error.empty())
++                                ImGui::TextWrapped("Last error: %s", sky.error.c_str());
++                            ImGui::TextWrapped("World-model skies only; no fog/lightmaps or retail pixel parity. "
++                                               "Empty/failed skies retain portal markers.");
++                            ImGui::TreePop();
++                        }
+                         ImGui::Text("GPU: %llu frames / %llu world uploads", (unsigned long long)world_render->frames,
+                                     (unsigned long long)world_render->uploads);
+                         ImGui::Text("Prepared: %zu triangles / %zu instances / %zu hidden instances",
+@@ -523,7 +556,7 @@ namespace OpenBlood2
+                         ImGui::Text("Unbound models: %zu / excluded containers: %zu", world_render->unbound,
+                                     world_render->containers);
+                         ImGui::Text(
+-                            "Faces: %zu invisible / %zu degenerate / %zu authored transparent / %zu sky markers",
++                            "Faces: %zu invisible / %zu degenerate / %zu authored transparent / %zu authored sky",
+                             world_mesh->invisible, world_mesh->degenerate, world_mesh->transparent, world_mesh->sky);
+                         ImGui::Text("Alpha: %zu prepared faces / %zu submitted batches / %llu passes",
+                                     world_mesh->blended, world_render->alpha_batches,
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index c1942d7..2d32807 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -30,6 +30,8 @@ namespace OpenBlood2
+         bool select_movement = false, keyboard_movement = true, mouse_captured = false;
+         std::string mouse_error;
+         bool collapsed = false, waiting_for_player = false;
++        std::uint64_t limited_frames = 0;
++        double discarded_wall_time = 0;
+         bool select_containers = false;
+         bool select_triggers = false;
+         ObjectId trigger_selection{}, trigger_request{};
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 2dad3e6..892355e 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -360,7 +360,8 @@ namespace
+              explosion_trails_drawn_hidden = false;
+         bool models_hidden = false, close_weapon_hidden = false;
+         std::uint64_t model_frames = 0;
+-        std::vector<OpenBlood2::WorldDraw> world_draws;
++        std::vector<OpenBlood2::WorldDraw> world_draws, sky_draws;
++        DVector sky_eye{};
+         std::uint64_t mesh_revision = UINT64_MAX;
+         bool viewport_hidden = false, viewport_reloaded = false, viewport_unloaded = false;
+ #if BLOOD2_INSPECTOR
+@@ -430,7 +431,8 @@ namespace
+         std::uint64_t frames = 0, ui_frames = 0, hidden_frames = 0, waiting_frames = 0;
+         const auto started = SDL_GetTicks();
+         auto previous_tick = SDL_GetTicksNS();
+-        double hidden_model_time = 0;
++        double hidden_model_time = 0, discarded_wall_time = 0;
++        std::uint64_t limited_frames = 0;
+         bool model_advanced_hidden = false;
+         std::uint64_t hidden_player_updates = 0;
+         bool player_advanced_hidden = false;
+@@ -520,7 +522,10 @@ namespace
+                 return 4;
+             }
+             const auto tick = SDL_GetTicksNS();
+-            const double delta = smoke ? 1.0 / 60.0 : static_cast<double>(tick - previous_tick) / 1e9;
++            const double wall_delta = smoke ? 1.0 / 60.0 : static_cast<double>(tick - previous_tick) / 1e9;
++            const double delta = OpenBlood2::app_frame_delta(wall_delta, smoke);
++            discarded_wall_time += wall_delta - delta;
++            limited_frames += wall_delta > delta;
+             previous_tick = tick;
+             game->client_shell.movement_input = {};
+             game->client_shell.weapon_input = {};
+@@ -666,10 +671,19 @@ namespace
+             waiting_frames += waiting;
+ #if BLOOD2_INSPECTOR
+             inspector.waiting_for_player = waiting;
++            inspector.limited_frames = limited_frames;
++            inspector.discarded_wall_time = discarded_wall_time;
+ #endif
+             if (!OpenBlood2::step_app_session(*game, delta, smoke))
+             {
+-                spdlog::error("Object simulation step failed");
++                spdlog::error("Object simulation step failed (frame={}, delta={}, time={})", frames, delta,
++                              game->objects.time());
++                for (const auto& diagnostic : game->objects.diagnostics())
++                    spdlog::error("Object: {}", diagnostic);
++                for (const auto& diagnostic : game->trace)
++                    spdlog::error("Session: {}", diagnostic);
++                if (!game->server.particle_streams.update_error.empty())
++                    spdlog::error("Particle streams: {}", game->server.particle_streams.update_error);
+                 return 4;
+             }
+             const auto change = OpenBlood2::GameSession::process_level_change(game_owner, error);
+@@ -765,7 +779,11 @@ namespace
+                 }
+             }
+             selection.refresh(game->objects);
+-            if (mesh_revision != game->world_revision)
++            const bool world_preparing = mesh_revision != game->world_revision;
++            const auto previous_model_revision = model_scene.revision;
++            const auto previous_effect_revision = explosion_model_scene.revision;
++            const auto previous_sprite_revision = sprite_scene.revision;
++            if (world_preparing)
+             {
+                 world_renderer.clear_geometry();
+                 model_renderer.clear_geometry();
+@@ -792,6 +810,13 @@ namespace
+                 return 5;
+             }
+ 
++            if (!game->server.sky.draws(game->world, world_mesh, game->objects, game->client_shell.view.position,
++                                        sky_draws, sky_eye, error))
++            {
++                spdlog::error("Sky presentation: {}", error);
++                return 5;
++            }
++
+             if (!OpenBlood2::update_model_scene(*game, model_scene, error))
+             {
+                 spdlog::error("Model presentation: {}", error);
+@@ -888,10 +913,17 @@ namespace
+                     if (!world_renderer.prepare(world_mesh, mesh_revision,
+                                                 SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
+                                                 height, error) ||
+-                        !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
+-                                             world_draws, view.position, view.rotation,
+-                                             view.object && view.settings.type == 1, error, OpenBlood2::DrawLoad::Clear,
+-                                             nullptr, OpenBlood2::WorldPass::Opaque, game->server.world_time()))
++                        (!sky_draws.empty() &&
++                         !world_renderer.draw(commands, capture_frame ? capture.texture : swapchain, world_mesh,
++                                              sky_draws, sky_eye, view.rotation, view.object && view.settings.type == 1,
++                                              error, OpenBlood2::DrawLoad::Clear, nullptr, OpenBlood2::WorldPass::Sky,
++                                              game->server.world_time())) ||
++                        !world_renderer.draw(
++                            commands, capture_frame ? capture.texture : swapchain, world_mesh, world_draws,
++                            view.position, view.rotation, view.object && view.settings.type == 1, error,
++                            sky_draws.empty() ? OpenBlood2::DrawLoad::Clear : OpenBlood2::DrawLoad::Load, nullptr,
++                            sky_draws.empty() ? OpenBlood2::WorldPass::Opaque : OpenBlood2::WorldPass::OpaqueWithSky,
++                            game->server.world_time()))
+                     {
+                         spdlog::error("World viewport: {}", error);
+                         SDL_SubmitGPUCommandBuffer(commands);
+@@ -1335,15 +1367,20 @@ namespace
+                     return 4;
+                 }
+             }
+-            // Preparation and first presentation upload are paused loading time,
+-            // not a physics/audio delta for the retained or newly entered world.
+-            if (change != OpenBlood2::LevelChangeResult::None)
++            // Resource preparation/upload and diagnostic GPU readback/PNG encoding
++            // are paused loading/tool time, not a later physics/audio catch-up delta.
++            if (change != OpenBlood2::LevelChangeResult::None || world_preparing || capture_frame ||
++                previous_model_revision != model_scene.revision ||
++                previous_effect_revision != explosion_model_scene.revision ||
++                previous_sprite_revision != sprite_scene.revision)
+                 previous_tick = SDL_GetTicksNS();
+             if (options.frame_limit != 0 && frames >= options.frame_limit)
+                 done = true;
+         }
+         spdlog::info("Shutdown: frames={}, UI frames={}, hidden frames={}, toggles={}, resize={}, quit={}", frames,
+                      ui_frames, hidden_frames, toggles, resized, quit_received);
++        spdlog::info("Interactive clock: limited frames={}, discarded wall seconds={}", limited_frames,
++                     discarded_wall_time);
+         unsigned npc_ready = 0, npc_failed = 0;
+         std::uint64_t npc_updates = 0;
+         for (auto id : game->objects.snapshot())
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+index 0cc2424..687152b 100644
+--- a/src/app/objectives_smoke.cpp
++++ b/src/app/objectives_smoke.cpp
+@@ -81,8 +81,8 @@ namespace OpenBlood2
+         const auto trial_before = g.destination_trial.attempts;
+         if (!g.rehearse_destination(g.client_shell.world_exit.load, g.server_shell.start_point_name, error) ||
+             g.destination_trial.attempts != trial_before + 1 || !g.destination_trial.cleanup_complete ||
+-            !g.destination_trial.player_entered || g.destination_trial.created != 443 ||
+-            g.destination_trial.unknown != 10 || g.destination_trial.failed != 1 ||
++            !g.destination_trial.player_entered || g.destination_trial.created != 448 ||
++            g.destination_trial.unknown != 5 || g.destination_trial.failed != 1 ||
+             g.destination_trial.selected_start != "01_egressa")
+             return false;
+         return exits == 1 && g.pump_player_messages(error) && g.client_shell.world_exit.received == received + 1 &&
+@@ -100,8 +100,8 @@ namespace OpenBlood2
+                g.destination_inspection.destination == "worlds/02_cityhub.dat" &&
+                g.destination_inspection.source_world == "worlds/01_subwaya.dat" &&
+                g.destination_inspection.source_revision == old_revision &&
+-               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 475 &&
+-               g.destination_inspection.unknown == 10 && g.destination_inspection.invalid == 0 &&
++               g.destination_inspection.entries.size() == 1026 && g.destination_inspection.schema_checked == 480 &&
++               g.destination_inspection.unknown == 5 && g.destination_inspection.invalid == 0 &&
+                old_player == g.client_shell.player && old_revision == g.world_revision &&
+                old_bullets == player->m_InventoryMgr.GetAmmoCount(1);
+     }
+diff --git a/src/app/session_playback.h b/src/app/session_playback.h
+index 427f82a..9b53856 100644
+--- a/src/app/session_playback.h
++++ b/src/app/session_playback.h
+@@ -1,8 +1,19 @@
+ #pragma once
+ #include "game/server_adapter.h"
++#include <algorithm>
++#include <cmath>
+ 
+ namespace OpenBlood2
+ {
++    // Keep a slow interactive frame from amplifying its own simulation catch-up.
++    // Excess wall time is reported by main and discarded, never queued for later.
++    // Diagnostic stepping retains explicit requested time; invalid deltas still fail.
++    inline double app_frame_delta(double wall_seconds, bool diagnostic = false)
++    {
++        return diagnostic || !std::isfinite(wall_seconds) || wall_seconds < 0 ? wall_seconds
++                                                                              : std::min(wall_seconds, .1);
++    }
++
+     // Interactive inspection must not run the original single-player world
+     // before its player exists. Explicit diagnostic simulations remain opt-in.
+     inline bool waiting_for_player(const GameSession& game, bool diagnostic_simulation = false)
+diff --git a/src/engine/sky.cpp b/src/engine/sky.cpp
+new file mode 100644
+index 0000000..792a99c
+--- /dev/null
++++ b/src/engine/sky.cpp
+@@ -0,0 +1,144 @@
++#include "engine/sky.h"
++#include "engine/collision.h"
++#include <cmath>
++namespace OpenBlood2
++{
++    namespace
++    {
++        bool valid(const SkyDefinition& d)
++        {
++            return physics_vector(d.min) && physics_vector(d.max) && physics_vector(d.view_min) &&
++                   physics_vector(d.view_max) && d.min.x < d.max.x && d.min.y < d.max.y && d.min.z < d.max.z &&
++                   d.view_min.x <= d.view_max.x && d.view_min.y <= d.view_max.y && d.view_min.z <= d.view_max.z;
++        }
++    } // namespace
++    bool SkyState::set(const SkyDefinition& d)
++    {
++        if (!valid(d))
++        {
++            error = "Invalid sky definition";
++            return false;
++        }
++        definition = d;
++        defined = true;
++        ++definitions;
++        return true;
++    }
++    bool SkyState::validate(const Objects& store, HOBJECT h, unsigned index, std::string& e) const
++    {
++        const auto* r = store.get(h);
++        if (!r || r->life != Life::Alive || index >= objects.size())
++            e = "Invalid sky object/index";
++        else if (r->state.m_ObjectType != OT_WORLDMODEL || !r->world_model)
++            e = "Only bound world models are supported in the sky";
++        else
++        {
++            // The original internal INSKY guard runs before slot replacement.
++            for (auto entry : objects)
++                if (entry == r->id)
++                {
++                    e.clear();
++                    return true;
++                }
++            const auto* previous = store.get(objects[index]);
++            if (previous && previous->life == Life::Alive)
++                e = "Duplicate sky index";
++            else
++            {
++                e.clear();
++                return true;
++            }
++        }
++        return false;
++    }
++    bool SkyState::add(const Objects& store, HOBJECT h, unsigned index)
++    {
++        std::string failure;
++        if (!validate(store, h, index, failure))
++        {
++            error = std::move(failure);
++            return false;
++        }
++        const auto id = store.get(h)->id;
++        // Original addition of an already registered object does not change its index.
++        for (auto entry : objects)
++            if (entry == id)
++                return true;
++        objects[index] = id;
++        ++additions;
++        return true;
++    }
++    bool SkyState::remove(const Objects& store, HOBJECT h)
++    {
++        const auto* r = store.get(h);
++        if (!r || r->life != Life::Alive)
++        {
++            error = "Invalid sky removal identity";
++            return false;
++        }
++        for (auto& entry : objects)
++            if (entry == r->id)
++                entry = {};
++        return true;
++    }
++    bool sky_view_position(const SkyDefinition& d, DVector min, DVector max, DVector eye, DVector& out)
++    {
++        out = {};
++        if (!valid(d) || !physics_vector(min) || !physics_vector(max) || !physics_vector(eye) || min.x >= max.x ||
++            min.y >= max.y || min.z >= max.z)
++            return false;
++        // Blood II SkyDef contract; later LithTech common_draw.cpp supplies the explicit formula.
++        // No clamp: inspection cameras outside world extents extrapolate the view box.
++        auto axis = [](float a, float b, float x, float lo, float hi)
++        { return float(double(lo) + (double(x) - a) / (double(b) - a) * (double(hi) - lo)); };
++        const DVector p{axis(min.x, max.x, eye.x, d.view_min.x, d.view_max.x),
++                        axis(min.y, max.y, eye.y, d.view_min.y, d.view_max.y),
++                        axis(min.z, max.z, eye.z, d.view_min.z, d.view_max.z)};
++        if (!physics_vector(p))
++            return false;
++        out = p;
++        return true;
++    }
++    bool SkyState::draws(const World& world, const WorldMesh& mesh, const Objects& store, DVector eye,
++                         std::vector<WorldDraw>& draws, DVector& sky_eye, std::string& e) const
++    {
++        draws.clear();
++        sky_eye = {};
++        e.clear();
++        for (auto id : objects)
++        {
++            const auto* r = store.get(id);
++            if (!r || r->life != Life::Alive || !(r->state.m_Flags & FLAG_VISIBLE))
++                continue;
++            std::size_t match = 0;
++            for (std::size_t i = 1; i < mesh.ranges.size(); ++i)
++                if (!CaseLess{}(mesh.ranges[i].name, r->state.m_Filename) &&
++                    !CaseLess{}(r->state.m_Filename, mesh.ranges[i].name))
++                {
++                    if (match)
++                    {
++                        e = "Ambiguous sky world model";
++                        draws.clear();
++                        return false;
++                    }
++                    match = i;
++                }
++            WorldViewUniform uniform;
++            if (!r->world_model || !match ||
++                !world_view_uniform({}, {}, 1, {unsigned(match), r->state.m_Pos, r->state.m_Rotation}, uniform))
++            {
++                e = "Missing or invalid sky world model";
++                draws.clear();
++                return false;
++            }
++            draws.push_back({unsigned(match), r->state.m_Pos, r->state.m_Rotation, r->alpha});
++        }
++        if (!draws.empty() && !sky_view_position(definition, world.min, world.max, eye, sky_eye))
++        {
++            e = "Invalid sky/world projection extents";
++            draws.clear();
++            return false;
++        }
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/sky.h b/src/engine/sky.h
+new file mode 100644
+index 0000000..e85fb71
+--- /dev/null
++++ b/src/engine/sky.h
+@@ -0,0 +1,25 @@
++#pragma once
++#include "engine/world_view.h"
++namespace OpenBlood2
++{
++    struct SkyDefinition
++    {
++        DVector min{-10, -10, -10}, max{10, 10, 10}, view_min{}, view_max{};
++    };
++    // Non-owning checked identities. Original MAX_SKYOBJECTS is 30 (indices 0..29).
++    struct SkyState
++    {
++        SkyDefinition definition;
++        bool defined = false;
++        std::array<ObjectId, 30> objects{};
++        std::uint64_t definitions = 0, additions = 0;
++        std::string error;
++        bool set(const SkyDefinition&);
++        bool add(const Objects&, HOBJECT, unsigned);
++        bool remove(const Objects&, HOBJECT);
++        bool validate(const Objects&, HOBJECT, unsigned, std::string&) const;
++        bool draws(const World&, const WorldMesh&, const Objects&, DVector eye, std::vector<WorldDraw>&,
++                   DVector& sky_eye, std::string&) const;
++    };
++    bool sky_view_position(const SkyDefinition&, DVector world_min, DVector world_max, DVector eye, DVector& out);
++} // namespace OpenBlood2
+diff --git a/src/engine/world_renderer.cpp b/src/engine/world_renderer.cpp
+index e93f231..da60de9 100644
+--- a/src/engine/world_renderer.cpp
++++ b/src/engine/world_renderer.cpp
+@@ -16,6 +16,10 @@ namespace OpenBlood2
+             SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
+         if (alpha_pipeline_)
+             SDL_ReleaseGPUGraphicsPipeline(device_, alpha_pipeline_);
++        if (sky_pipeline_)
++            SDL_ReleaseGPUGraphicsPipeline(device_, sky_pipeline_);
++        if (sky_alpha_pipeline_)
++            SDL_ReleaseGPUGraphicsPipeline(device_, sky_alpha_pipeline_);
+     }
+     void WorldRenderer::clear_geometry()
+     {
+@@ -33,9 +37,10 @@ namespace OpenBlood2
+         revision_ = UINT64_MAX;
+         stats.triangles = stats.draws = stats.alpha_batches = stats.pan_batches = stats.alpha_pan_batches = 0;
+         stats.surface_time = 0;
++        stats.sky_batches = 0;
+         alpha_order_.clear();
+     }
+-    bool WorldRenderer::pipeline(SDL_GPUTextureFormat format, std::string& error, bool translucent)
++    bool WorldRenderer::pipeline(SDL_GPUTextureFormat format, std::string& error, bool translucent, bool sky)
+     {
+         if (color_format_ != format)
+         {
+@@ -43,10 +48,16 @@ namespace OpenBlood2
+                 SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
+             if (alpha_pipeline_)
+                 SDL_ReleaseGPUGraphicsPipeline(device_, alpha_pipeline_);
++            if (sky_pipeline_)
++                SDL_ReleaseGPUGraphicsPipeline(device_, sky_pipeline_);
++            if (sky_alpha_pipeline_)
++                SDL_ReleaseGPUGraphicsPipeline(device_, sky_alpha_pipeline_);
++            sky_pipeline_ = sky_alpha_pipeline_ = nullptr;
+             pipeline_ = alpha_pipeline_ = nullptr;
+             color_format_ = format;
+         }
+-        auto*& selected = translucent ? alpha_pipeline_ : pipeline_;
++        auto*& selected =
++            sky ? (translucent ? sky_alpha_pipeline_ : sky_pipeline_) : (translucent ? alpha_pipeline_ : pipeline_);
+         if (selected)
+             return true;
+         const bool alpha = translucent || style_ == DrawStyle::SpriteAlpha;
+@@ -104,8 +115,8 @@ namespace OpenBlood2
+         create.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+         create.rasterizer_state.enable_depth_clip = true;
+         create.multisample_state.sample_count = SDL_GPU_SAMPLECOUNT_1;
+-        create.depth_stencil_state.enable_depth_test = true;
+-        create.depth_stencil_state.enable_depth_write = !alpha;
++        create.depth_stencil_state.enable_depth_test = !sky;
++        create.depth_stencil_state.enable_depth_write = !alpha && !sky;
+         create.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
+         create.target_info.color_target_descriptions = &target;
+         create.target_info.num_color_targets = 1;
+@@ -364,6 +375,16 @@ namespace OpenBlood2
+         }
+         std::size_t pan_batches = 0;
+         const bool translucent = world_pass == WorldPass::Translucent;
++        const bool sky = world_pass == WorldPass::Sky;
++        if (sky && (style_ != DrawStyle::Opaque || load != DrawLoad::Clear ||
++                    !pipeline(color_format_, error, false, true) || !pipeline(color_format_, error, true, true)))
++        {
++            if (error.empty())
++                error = "Sky requires an opaque renderer and clear pass";
++            return false;
++        }
++        if (sky || world_pass == WorldPass::Opaque)
++            stats.sky_batches = 0;
+         if (translucent && (style_ != DrawStyle::Opaque || load != DrawLoad::Load))
+         {
+             error = "Transparent world pass requires loaded opaque depth";
+@@ -377,7 +398,7 @@ namespace OpenBlood2
+         WorldViewUniform uniform;
+         for (const auto& d : draws)
+         {
+-            if ((translucent || style_ == DrawStyle::SpriteAlpha) &&
++            if ((sky || translucent || style_ == DrawStyle::SpriteAlpha) &&
+                 (!std::isfinite(d.alpha) || d.alpha < 0 || d.alpha > 1))
+             {
+                 error = "Invalid sprite draw alpha";
+@@ -431,7 +452,7 @@ namespace OpenBlood2
+         }
+         SDL_GPUViewport viewport{0, float(top), float(width_), float(height), 0, 1};
+         SDL_SetGPUViewport(pass, &viewport);
+-        SDL_BindGPUGraphicsPipeline(pass, translucent ? alpha_pipeline_ : pipeline_);
++        SDL_BindGPUGraphicsPipeline(pass, sky ? sky_pipeline_ : (translucent ? alpha_pipeline_ : pipeline_));
+         if (vertices_)
+         {
+             SDL_GPUBufferBinding binding{vertices_, 0};
+@@ -442,13 +463,13 @@ namespace OpenBlood2
+                 if (!r.count)
+                     return;
+                 world_view_uniform(eye, view, aspect, d, uniform);
+-                if (load == DrawLoad::ClearDepth)
++                if (sky || load == DrawLoad::ClearDepth)
+                 {
+                     constexpr float near = .01f, far = 65536;
+                     uniform.projection[2] = far / (far - near);
+                     uniform.projection[3] = -near * far / (far - near);
+                 }
+-                if (translucent || style_ == DrawStyle::SpriteAlpha)
++                if (sky || translucent || style_ == DrawStyle::SpriteAlpha)
+                 {
+                     const std::array<float, 4> modulation{d.alpha, 0, 0, 0};
+                     SDL_PushGPUFragmentUniformData(commands, 0, modulation.data(), sizeof(modulation));
+@@ -466,11 +487,27 @@ namespace OpenBlood2
+                 if (face)
+                     batch(face->first, face->count, face->material, face->uv_rate);
+                 else if (r.batches.empty())
++                {
++                    if (sky)
++                    {
++                        SDL_BindGPUGraphicsPipeline(pass, sky_pipeline_);
++                        ++stats.sky_batches;
++                    }
+                     batch(r.first, r.count, 0, {});
++                }
+                 else
+                     for (const auto& b : r.batches)
+-                        if (style_ == DrawStyle::SpriteAlpha || !b.translucent)
++                    {
++                        if (sky)
++                        {
++                            SDL_BindGPUGraphicsPipeline(pass, b.translucent ? sky_alpha_pipeline_ : sky_pipeline_);
+                             batch(b.first, b.count, b.material, b.uv_rate);
++                            ++stats.sky_batches;
++                        }
++                        else if ((style_ == DrawStyle::SpriteAlpha || !b.translucent) &&
++                                 !(world_pass == WorldPass::OpaqueWithSky && b.sky_portal))
++                            batch(b.first, b.count, b.material, b.uv_rate);
++                    }
+             };
+             if (translucent)
+                 for (const auto& ordered : alpha_order_)
+@@ -483,7 +520,9 @@ namespace OpenBlood2
+                     emit(d, nullptr);
+         }
+         SDL_EndGPURenderPass(pass);
+-        if (translucent)
++        if (sky)
++            ++stats.sky_frames;
++        else if (translucent)
+         {
+             ++stats.alpha_frames;
+             stats.alpha_batches = alpha_order_.size();
+diff --git a/src/engine/world_renderer.h b/src/engine/world_renderer.h
+index 6a2758c..f43d7c3 100644
+--- a/src/engine/world_renderer.h
++++ b/src/engine/world_renderer.h
+@@ -18,7 +18,9 @@ namespace OpenBlood2
+     enum class WorldPass
+     {
+         Opaque,
+-        Translucent
++        Translucent,
++        Sky,
++        OpaqueWithSky
+     };
+     class WorldRenderer
+     {
+@@ -55,6 +57,8 @@ namespace OpenBlood2
+         DrawStyle style_;
+         SDL_GPUGraphicsPipeline* pipeline_ = nullptr;
+         SDL_GPUGraphicsPipeline* alpha_pipeline_ = nullptr;
++        SDL_GPUGraphicsPipeline* sky_pipeline_ = nullptr;
++        SDL_GPUGraphicsPipeline* sky_alpha_pipeline_ = nullptr;
+         std::vector<WorldAlphaBatch> alpha_order_;
+         SDL_GPUBuffer* vertices_ = nullptr;
+         SDL_GPUTransferBuffer* vertex_transfer_ = nullptr;
+@@ -67,6 +71,6 @@ namespace OpenBlood2
+         SDL_GPUTextureFormat color_format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
+         Uint32 width_ = 0, height_ = 0;
+         std::uint64_t revision_ = UINT64_MAX;
+-        bool pipeline(SDL_GPUTextureFormat, std::string&, bool translucent = false);
++        bool pipeline(SDL_GPUTextureFormat, std::string&, bool translucent = false, bool sky = false);
+     };
+ } // namespace OpenBlood2
+diff --git a/src/engine/world_view.cpp b/src/engine/world_view.cpp
+index 37438c1..d6691ff 100644
+--- a/src/engine/world_view.cpp
++++ b/src/engine/world_view.cpp
+@@ -246,10 +246,11 @@ namespace OpenBlood2
+                         continue;
+                     }
+                     if (range.batches.empty() || range.batches.back().material != material ||
+-                        range.batches.back().translucent != translucent || range.batches.back().uv_rate != uv_rate ||
+-                        (translucent && first_triangle))
+-                        range.batches.push_back(
+-                            {static_cast<std::uint32_t>(vertices.size()), 0, material, translucent, center, uv_rate});
++                        range.batches.back().translucent != translucent ||
++                        range.batches.back().sky_portal != bool(surface.flags & (1u << 4)) ||
++                        range.batches.back().uv_rate != uv_rate || (translucent && first_triangle))
++                        range.batches.push_back({static_cast<std::uint32_t>(vertices.size()), 0, material, translucent,
++                                                 center, uv_rate, bool(surface.flags & (1u << 4))});
+                     if (translucent && first_triangle)
+                         ++blended;
+                     first_triangle = false;
+@@ -370,6 +371,8 @@ namespace OpenBlood2
+                 return false;
+             }
+             bound[match] = true;
++            if (r->state.m_Flags & FLAG_SKYOBJECT)
++                continue;
+             if (!(r->state.m_Flags & FLAG_VISIBLE))
+             {
+                 ++stats.hidden;
+diff --git a/src/engine/world_view.h b/src/engine/world_view.h
+index deca763..d54ee45 100644
+--- a/src/engine/world_view.h
++++ b/src/engine/world_view.h
+@@ -34,6 +34,7 @@ namespace OpenBlood2
+         bool translucent = false;
+         DVector center{};                // One local-space center per translucent polygon, for sorting.
+         std::array<double, 2> uv_rate{}; // Cycles/second; independent of the shared texture.
++        bool sky_portal = false;
+     };
+     struct WorldRange
+     {
+@@ -67,6 +68,8 @@ namespace OpenBlood2
+         std::uint64_t uploads = 0, frames = 0, alpha_frames = 0;
+         std::size_t alpha_batches = 0, pan_batches = 0, alpha_pan_batches = 0;
+         double surface_time = 0;
++        std::uint64_t sky_frames = 0;
++        std::size_t sky_batches = 0;
+     };
+     // Never creates objects or advances simulation; current checked identities only.
+     bool world_draws(const WorldMesh&, const Objects&, std::vector<WorldDraw>&, WorldViewStats&, std::string&);
+diff --git a/src/game/legacy/basedefs_de.h b/src/game/legacy/basedefs_de.h
+index 5b0bc14..ba910f4 100644
+--- a/src/game/legacy/basedefs_de.h
++++ b/src/game/legacy/basedefs_de.h
+@@ -38,6 +38,7 @@ using HMODELANIM = DDWORD;
+ using HATTACHMENT = std::uint64_t; // Checked, non-reused session identity; no DLL ABI.
+ inline constexpr DRESULT DE_NODENOTFOUND = 59;
+ inline constexpr DDWORD MS_PLAYDONE = 1;
++inline constexpr DDWORD FLAG_SKYOBJECT = 1u << 12, FLAG_FORCEOPTIMIZEOBJECT = 1u << 28;
+ struct ArgList
+ {
+     char** argv;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 9814cbb..2c8ff52 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -35,11 +35,15 @@ namespace OpenBlood2
+ {
+     struct WeaponSpriteSettings;
+     struct ParticleStreamSettings;
++    struct SkyDefinition;
+ } // namespace OpenBlood2
+ class PathMgr;
+ class ServerDE : public CSBase
+ {
+   public:
++    virtual bool SetSkyDefinition(const OpenBlood2::SkyDefinition&) = 0;
++    virtual bool AddSkyObject(HOBJECT, unsigned) = 0;
++    virtual void ReportSkyFailure(std::string_view) = 0;
+     virtual OpenBlood2::SoundId PlayCharacterSound(HOBJECT, const OpenBlood2::SoundRequest&, bool retain,
+                                                    std::string&) = 0;
+     virtual OpenBlood2::SoundId PlayCinematicSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) = 0;
+diff --git a/src/game/level_change.cpp b/src/game/level_change.cpp
+index 96ae40b..820870c 100644
+--- a/src/game/level_change.cpp
++++ b/src/game/level_change.cpp
+@@ -1,4 +1,5 @@
+ #include "engine/world_view.h"
++#include "game/original/SkyObjects.h"
+ #include "game/original_globals.h"
+ #include "game/server_adapter.h"
+ #include <cmath>
+@@ -82,11 +83,25 @@ namespace OpenBlood2
+                 checked.insert(std::move(normalized));
+                 return true;
+             };
++            auto pending_sky = game.server.sky;
+             for (auto id : game.objects.snapshot())
+             {
+                 const auto& object = *game.objects.get(id);
+                 if (object.life != Life::Alive)
+                     continue;
++                if (const auto* pointer = dynamic_cast<const SkyPointer*>(object.game.get()))
++                {
++                    // Preflight without consuming the original first update or advancing simulation.
++                    auto* names = game.server.FindNamedObjects(pointer->target.c_str());
++                    const auto h = names && names->m_pFirstLink ? names->m_pFirstLink->m_hObject : nullptr;
++                    const bool valid = pending_sky.add(game.objects, h, unsigned(pointer->index));
++                    if (!valid)
++                        error = pending_sky.error;
++                    if (names)
++                        game.server.RelinquishList(names);
++                    if (!valid)
++                        return false;
++                }
+                 if (!object.model_error.empty())
+                 {
+                     error = "Destination object " + std::string(object.state.m_Name) + ": " + object.model_error;
+diff --git a/src/game/original/SkyObjects.cpp b/src/game/original/SkyObjects.cpp
+new file mode 100644
+index 0000000..d878d36
+--- /dev/null
++++ b/src/game/original/SkyObjects.cpp
+@@ -0,0 +1,76 @@
++#include "SkyObjects.h"
++#include "engine/collision.h"
++using namespace OpenBlood2;
++DDWORD SkyObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE)
++    {
++        if (!data || reason == 3)
++            return 0; // Save restoration remains explicit.
++        auto& create = *static_cast<ObjectCreateStruct*>(data);
++        create.m_ObjectType = pointer ? OT_NORMAL : OT_WORLDMODEL;
++        if (reason == 1)
++        {
++            GenericProp p;
++            if (g_pServerDE->GetPropGeneric("SkyDims", &p) == DE_OK)
++                dimensions = p.m_Vec;
++            if (g_pServerDE->GetPropGeneric("Index", &p) == DE_OK)
++                index = p.m_Long;
++            g_pServerDE->GetPropReal("InnerPercentX", &inner.x);
++            g_pServerDE->GetPropReal("InnerPercentY", &inner.y);
++            g_pServerDE->GetPropReal("InnerPercentZ", &inner.z);
++            g_pServerDE->GetPropString("Name", create.m_Filename, MAX_CS_FILENAME_LEN);
++            if (pointer && g_pServerDE->GetPropGeneric("SkyObjectName", &p) == DE_OK)
++                target = p.m_String;
++        }
++        if (index < 0 || index >= 30 || !physics_vector(dimensions) || !physics_vector(inner) || dimensions.x < 0 ||
++            dimensions.y < 0 || dimensions.z < 0 || inner.x < 0 || inner.y < 0 || inner.z < 0)
++            return 0;
++    }
++    else if (message == MID_INITIALUPDATE)
++    {
++        if (dimensions.x != 0 && dimensions.y != 0 && dimensions.z != 0)
++        {
++            DVector p;
++            g_pServerDE->GetObjectPos(m_hObject, &p);
++            const DVector v{dimensions.x * inner.x, dimensions.y * inner.y, dimensions.z * inner.z};
++            const SkyDefinition d{vector_subtract(p, dimensions), vector_add(p, dimensions), vector_subtract(p, v),
++                                  vector_add(p, v)};
++            if (!g_pServerDE->SetSkyDefinition(d))
++                error = "Rejected sky definition";
++        }
++        if (pointer)
++            g_pServerDE->SetNextUpdate(m_hObject, .001f);
++        else
++        {
++            g_pServerDE->SetObjectFlags(m_hObject, g_pServerDE->GetObjectFlags(m_hObject) | FLAG_SKYOBJECT |
++                                                       FLAG_FORCEOPTIMIZEOBJECT);
++            if (!g_pServerDE->AddSkyObject(m_hObject, unsigned(index)))
++                error = "Rejected sky world model";
++        }
++        if (!error.empty())
++            g_pServerDE->RemoveObject(m_hObject);
++    }
++    else if (message == MID_UPDATE && pointer)
++    {
++        auto* list = g_pServerDE->FindNamedObjects(target.c_str());
++        if (list && list->m_pFirstLink)
++        {
++            auto h = list->m_pFirstLink->m_hObject;
++            if (g_pServerDE->AddSkyObject(h, unsigned(index)))
++                g_pServerDE->SetObjectFlags(h,
++                                            g_pServerDE->GetObjectFlags(h) | FLAG_SKYOBJECT | FLAG_FORCEOPTIMIZEOBJECT);
++            else
++                error = "Rejected sky pointer target: " + target;
++        }
++        else
++            error = "Sky pointer target not found: " + target;
++        // Source leaked empty lists; release every owned snapshot, including an empty one.
++        if (list)
++            g_pServerDE->RelinquishList(list);
++        if (!error.empty())
++            g_pServerDE->ReportSkyFailure(error);
++        g_pServerDE->RemoveObject(m_hObject);
++    }
++    return BaseClass::EngineMessageFn(message, data, reason);
++}
+diff --git a/src/game/original/SkyObjects.h b/src/game/original/SkyObjects.h
+new file mode 100644
+index 0000000..f8885a1
+--- /dev/null
++++ b/src/game/original/SkyObjects.h
+@@ -0,0 +1,25 @@
++#pragma once
++#include "cpp_engineobjects_de.h"
++#include "engine/sky.h"
++#include "server_de.h"
++// Original AppHeaders/engineobjects.c sky callbacks, adapted to typed C++ objects.
++class SkyObject : public BaseClass
++{
++  public:
++    DVector dimensions{}, inner{.1f, .1f, .1f};
++    std::int32_t index = 0;
++    std::string target, error;
++    bool pointer = false;
++    explicit SkyObject(bool is_pointer) : pointer(is_pointer) {}
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++};
++class DemoSkyWorldModel : public SkyObject
++{
++  public:
++    DemoSkyWorldModel() : SkyObject(false) {}
++};
++class SkyPointer : public SkyObject
++{
++  public:
++    SkyPointer() : SkyObject(true) {}
++};
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 5d6d7a4..4400c4e 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -32,6 +32,7 @@
+ #include "game/original/RandomSoundFX.h"
+ #include "game/original/RotatingBrush.h"
+ #include "game/original/RotatingDoor.h"
++#include "game/original/SkyObjects.h"
+ #include "game/original/SmellHint.h"
+ #include "game/original/Sound.h"
+ #include "game/original/SoundFX.h"
+@@ -74,6 +75,21 @@ namespace OpenBlood2
+                               {"Gravity", false, false},
+                               {"TouchNotify", false, false},
+                               {"Rayhit", false, false}}};
++        const ClassInfo sky_model{"DemoSkyWorldModel",
++                                  &base,
++                                  construct<DemoSkyWorldModel>,
++                                  {{"SkyDims", DVector{}},
++                                   {"Flags", std::int32_t(1)},
++                                   {"Index", std::int32_t(0)},
++                                   {"InnerPercentX", .1f},
++                                   {"InnerPercentY", .1f},
++                                   {"InnerPercentZ", .1f}}};
++        const ClassInfo sky_pointer{"SkyPointer", &base, construct<SkyPointer>, []
++                                    {
++                                        auto p = sky_model.properties;
++                                        p.push_back({"SkyObjectName", std::string{}, true, 98});
++                                        return p;
++                                    }()};
+         const ClassInfo builtin_model{
+             "Model",
+             &base,
+@@ -784,7 +800,8 @@ namespace OpenBlood2
+     } // namespace
+     bool register_original_classes(Objects& objects)
+     {
+-        return objects.register_class(base) && objects.register_class(builtin_model) &&
++        return objects.register_class(base) && objects.register_class(sky_model) &&
++               objects.register_class(sky_pointer) && objects.register_class(builtin_model) &&
+                objects.register_class(b2base) && objects.register_class(camera) && objects.register_class(client_sfx) &&
+                objects.register_class(particle_stream) && objects.register_class(scene_explosion) &&
+                objects.register_class(client_light) && objects.register_class(light_SquareWaveLightFX) &&
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 05d501c..91a30ca 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -2,6 +2,7 @@
+ #include "engine/collision.h"
+ #include "engine/model_store.h"
+ #include "engine/objects.h"
++#include "engine/sky.h"
+ #include "engine/string_resources.h"
+ #include "game/explosion_flames.h"
+ #include "game/explosion_fragments.h"
+@@ -96,6 +97,10 @@ namespace OpenBlood2
+         ExplosionModels explosion_models;
+         LaserBeams laser_beams;
+         ObjectParticles object_particles;
++        SkyState sky;
++        bool SetSkyDefinition(const SkyDefinition&) override;
++        bool AddSkyObject(HOBJECT, unsigned) override;
++        void ReportSkyFailure(std::string_view) override;
+         ParticleStreams particle_streams;
+         std::uint64_t PublishParticleStream(HOBJECT, const ParticleStreamSettings&, std::string&) override;
+         std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) override;
+@@ -147,6 +152,7 @@ namespace OpenBlood2
+             laser_beams.clear();
+             object_particles.clear();
+             particle_streams.clear();
++            sky = {};
+             explosion_lights.clear();
+             explosion_rings.clear();
+             explosion_flames.clear();
+diff --git a/src/game/server_sky.cpp b/src/game/server_sky.cpp
+new file mode 100644
+index 0000000..c2b5a34
+--- /dev/null
++++ b/src/game/server_sky.cpp
+@@ -0,0 +1,26 @@
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool ServerAdapter::SetSkyDefinition(const SkyDefinition& d)
++    {
++        trace_service("SetSkyDef");
++        if (sky.set(d))
++            return true;
++        ReportSkyFailure(sky.error);
++        return false;
++    }
++    bool ServerAdapter::AddSkyObject(HOBJECT h, unsigned index)
++    {
++        trace_service("AddObjectToSky");
++        if (sky.add(objects_, h, index))
++            return true;
++        ReportSkyFailure(sky.error);
++        return false;
++    }
++    void ServerAdapter::ReportSkyFailure(std::string_view message)
++    {
++        sky.error = message;
++        objects_.fail(ObjectError::Unsupported, sky.error);
++        ++unavailable_services["Sky: " + sky.error];
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index a213a94..c80fb2b 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -2,6 +2,7 @@
+ #include "game/original/ClientParticleStreamSFX.h"
+ #include "game/original/DestructableModel.h"
+ #include "game/original/DetailSprite.h"
++#include "game/original/SkyObjects.h"
+ #include "game/original/Sound.h"
+ #include "game/server_adapter.h"
+ #include <algorithm>
+@@ -99,6 +100,12 @@ namespace OpenBlood2
+                     entry.detail =
+                         entry.sound ? "Original Sound removed after transferring its loop to the world" : sound->error;
+                 }
++                else if (const auto* sky = r ? dynamic_cast<const SkyObject*>(r->game.get()) : nullptr;
++                         sky && !sky->error.empty())
++                {
++                    entry.state = EntryState::Failed;
++                    entry.detail = sky->error;
++                }
+                 else if (const auto* ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+                          ai && !ai->runtime_error.empty())
+                 {
+@@ -175,7 +182,9 @@ namespace OpenBlood2
+         for (auto id : objects.snapshot())
+         {
+             const auto& r = *objects.get(id);
+-            if (!r.container && !r.world_model)
++            // Normal objects can retain a source filename that is a name, not a resource
++            // (notably SkyPointer). Only model/sprite types consume this asset field.
++            if (r.state.m_ObjectType == OT_MODEL || r.state.m_ObjectType == OT_SPRITE)
+                 use(r.state.m_Filename, "Original object model");
+             use(r.state.m_SkinName, "Original object skin");
+         }
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 242958c..4671073 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1614,3 +1614,32 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.particle_stream_private PROPERTIES LABELS "gpu;private;particle_stream" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+     endif()
+ endif()
++
++add_executable(sky_tests sky_tests.cpp)
++target_link_libraries(sky_tests PRIVATE blood2_game)
++blood2_project_options(sky_tests)
++foreach(case rules pointers projection lifetime)
++    add_test(NAME sky.${case} COMMAND sky_tests "${case}")
++    set_tests_properties(sky.${case} PROPERTIES LABELS "headless;sky" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME sky.private COMMAND sky_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(sky.private PROPERTIES LABELS "headless;private;sky" TIMEOUT 120)
++endif()
++if(BLOOD2_GPU_TESTS)
++    add_executable(sky_gpu_tests sky_gpu_tests.cpp)
++    target_link_libraries(sky_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(sky_gpu_tests)
++    add_test(NAME gpu.sky COMMAND sky_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/sky-gpu")
++    set_tests_properties(gpu.sky PROPERTIES LABELS "gpu;sky" TIMEOUT 30 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    if(BLOOD2_TEST_DATA_DIR)
++        add_test(NAME gpu.sky_private COMMAND sky_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/sky-private" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(gpu.sky_private PROPERTIES LABELS "gpu;private;sky" TIMEOUT 90 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++    endif()
++endif()
++if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
++    add_test(NAME gpu.sky_app COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --view-world --world 02_cityhub --no-inspector
++        --frames 20 --capture "${CMAKE_CURRENT_BINARY_DIR}/sky-app.png")
++    set_tests_properties(gpu.sky_app PROPERTIES LABELS "gpu;private;sky" TIMEOUT 45 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++endif()
+diff --git a/tests/assault_tests.cpp b/tests/assault_tests.cpp
+index ddf8586..60be17b 100644
+--- a/tests/assault_tests.cpp
++++ b/tests/assault_tests.cpp
+@@ -446,7 +446,7 @@ bool private_game(const std::filesystem::path& root)
+         }
+         std::cout << "CityHub M16=" << assault << " created=" << created << " unknown=" << unknown
+                   << " failed=" << failed << '\n';
+-        CHECK(assault == 1 && created == 443 && unknown == 10 && failed == 1);
++        CHECK(assault == 1 && created == 448 && unknown == 5 && failed == 1);
+         CHECK(g.unload_world());
+         // Labelled arena uses actual private models/audio, with controlled geometry.
+         auto floor = test_brush::box("floor", {-2000, -20, -2000}, {2000, -10, 2000});
+diff --git a/tests/audio_stream_tests.cpp b/tests/audio_stream_tests.cpp
+index 6702e03..90b90ae 100644
+--- a/tests/audio_stream_tests.cpp
++++ b/tests/audio_stream_tests.cpp
+@@ -295,7 +295,7 @@ namespace
+             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
+                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
+                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';
+-            CHECK(created == 443 && transferred == 31 && unknown == 10 && failed == 1 && fx == 5 && fx_voices == 4);
++            CHECK(created == 448 && transferred == 31 && unknown == 5 && failed == 1 && fx == 5 && fx_voices == 4);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_bytes());
+         }
+diff --git a/tests/compound_shell_tests.cpp b/tests/compound_shell_tests.cpp
+index d8eb748..00615f1 100644
+--- a/tests/compound_shell_tests.cpp
++++ b/tests/compound_shell_tests.cpp
+@@ -229,7 +229,7 @@ namespace
+             }
+             std::cout << "CityHub: " << created << " created / " << transferred << " sounds / " << unknown
+                       << " unsupported / " << failed << " failed\n";
+-            CHECK(created == 443 && transferred == 31 && unknown == 10 && failed == 1);
++            CHECK(created == 448 && transferred == 31 && unknown == 5 && failed == 1);
+             WorldMesh mesh;
+             CHECK(mesh.build(g.world, error, &g.resources));
+             if (gpu)
+diff --git a/tests/conversation_tests.cpp b/tests/conversation_tests.cpp
+index 26aa3f8..51cd46d 100644
+--- a/tests/conversation_tests.cpp
++++ b/tests/conversation_tests.cpp
+@@ -257,7 +257,7 @@ namespace
+             for (auto id : g.objects.snapshot())
+                 if (auto* c = dynamic_cast<ConversationTrigger*>(g.objects.get(id)->game.get()))
+                     conversation = c;
+-            CHECK(created == 443 && unknown == 10 && failed == 1 && conversation);
++            CHECK(created == 448 && unknown == 5 && failed == 1 && conversation);
+             std::cout << "CityHub conversation count=" << conversation->count << " file=" << conversation->waves[0]
+                       << " mapped=" << bool(conversation_text(conversation->waves[0])) << '\n';
+             g.server_shell.start_point_name = "01_egressa";
+diff --git a/tests/destructable_model_tests.cpp b/tests/destructable_model_tests.cpp
+index 8b8a375..bb142b1 100644
+--- a/tests/destructable_model_tests.cpp
++++ b/tests/destructable_model_tests.cpp
+@@ -313,7 +313,7 @@ namespace
+             std::cout << "CityHub model initialization: " << count << " models / " << pushable << " pushable / "
+                       << gravity << " gravity / " << ground_misses << " ground misses\n";
+             CHECK(count == 122 && pushable == 51 && gravity == 98 && ground_misses == 18);
+-            CHECK(created == 443 && unknown == 10 && failed == 1);
++            CHECK(created == 448 && unknown == 5 && failed == 1);
+             CHECK(update_model_scene(g, scene, error));
+             unsigned skin_failures = 0, triangles = 0;
+             for (auto id : ids)
+diff --git a/tests/flare_tests.cpp b/tests/flare_tests.cpp
+index 9e5e470..382bea7 100644
+--- a/tests/flare_tests.cpp
++++ b/tests/flare_tests.cpp
+@@ -413,7 +413,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unsupported=" << unknown << " failed=" << failed
+                   << " flare NPCs=" << flare << '\n';
+-        CHECK(created == 443 && unknown == 10 && failed == 1 && flare == 1);
++        CHECK(created == 448 && unknown == 5 && failed == 1 && flare == 1);
+         CHECK(g.unload_world());
+         return true;
+     }
+diff --git a/tests/level_change_gpu_tests.cpp b/tests/level_change_gpu_tests.cpp
+index c09af23..97c3f44 100644
+--- a/tests/level_change_gpu_tests.cpp
++++ b/tests/level_change_gpu_tests.cpp
+@@ -99,7 +99,7 @@ int main(int argc, char** argv)
+         CHECK(game->server.SendWorldExit({"02_CityHub"}, "01_egressa") == DE_OK && game->pump_player_messages(error));
+         CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+         CHECK(game.get() == before && game->client_shell.player == old_player && game->world_revision == revision);
+-        CHECK(game->level_change.unknown == 10 && game->level_change.failed == 1 && game->server.audio.has_output());
++        CHECK(game->level_change.unknown == 5 && game->level_change.failed == 1 && game->server.audio.has_output());
+         CHECK(game->server.SendWorldExit({"01_SubwayA"}, "start") == DE_OK && game->pump_player_messages(error));
+         CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Committed);
+         CHECK(game.get() != before && game->client_shell.player != old_player && game->server.audio.has_output());
+diff --git a/tests/mac10_tests.cpp b/tests/mac10_tests.cpp
+index af78ba5..4b08580 100644
+--- a/tests/mac10_tests.cpp
++++ b/tests/mac10_tests.cpp
+@@ -263,7 +263,7 @@ namespace
+         }
+         std::cout << "CityHub created=" << created << " unknown=" << unknown << " failed=" << failed << " Mac10=" << mac
+                   << '\n';
+-        CHECK(mac == 1 && created == 443 && unknown == 10 && failed == 1);
++        CHECK(mac == 1 && created == 448 && unknown == 5 && failed == 1);
+         for (auto id : g.objects.snapshot())
+             if (auto* a = dynamic_cast<CultistAI*>(g.server.HandleToObject(g.objects.get(id)->handle));
+                 a && a->runtime_failed)
+diff --git a/tests/medkit_tests.cpp b/tests/medkit_tests.cpp
+index c1ae2d0..999efb3 100644
+--- a/tests/medkit_tests.cpp
++++ b/tests/medkit_tests.cpp
+@@ -291,7 +291,7 @@ namespace
+                 unknown += entry.state == EntryState::Unsupported;
+                 failed += entry.state == EntryState::Failed;
+             }
+-            CHECK(created == 443 && unknown == 10 && failed == 1);
++            CHECK(created == 448 && unknown == 5 && failed == 1);
+             for (auto id : g.objects.snapshot())
+                 if (dynamic_cast<MedKitPU*>(g.objects.get(id)->game.get()))
+                     h = g.objects.get(id)->handle;
+diff --git a/tests/particle_stream_tests.cpp b/tests/particle_stream_tests.cpp
+index 15aafd8..1088c60 100644
+--- a/tests/particle_stream_tests.cpp
++++ b/tests/particle_stream_tests.cpp
+@@ -296,7 +296,7 @@ namespace
+                 unknown += entry.state == EntryState::Unsupported;
+                 failed += entry.state == EntryState::Failed;
+             }
+-            CHECK(created == 443 && unknown == 10 && failed == 1);
++            CHECK(created == 448 && unknown == 5 && failed == 1);
+             auto& streams = g.server.particle_streams;
+             CHECK(streams.active.size() == 8 && !streams.failed);
+             unsigned initial = 0;
+diff --git a/tests/session_playback_tests.cpp b/tests/session_playback_tests.cpp
+index f2c2237..59efe36 100644
+--- a/tests/session_playback_tests.cpp
++++ b/tests/session_playback_tests.cpp
+@@ -1,6 +1,7 @@
+ #include "app/session_playback.h"
+ #include "game/original/AI_Mgr.h"
+ #include <iostream>
++#include <limits>
+ using namespace OpenBlood2;
+ #define CHECK(x)                                                                                                       \
+     do                                                                                                                 \
+@@ -27,6 +28,12 @@ namespace
+         CHECK(h && g.objects.remove(h) && g.objects.get(h));
+         CHECK(step_app_session(g, .1) && !g.objects.get(h) && g.objects.time() == .1);
+         CHECK(!waiting_for_player(g, true) && step_app_session(g, .1, true) && g.objects.time() == .2);
++        g.world_path.clear();
++        CHECK(step_app_session(g, app_frame_delta(2)) && std::abs(g.objects.time() - .3) < 1e-9);
++        CHECK(step_app_session(g, app_frame_delta(.02)) && std::abs(g.objects.time() - .32) < 1e-9);
++        CHECK(step_app_session(g, app_frame_delta(2, true), true) && std::abs(g.objects.time() - 2.32) < 1e-9);
++        CHECK(!step_app_session(g, app_frame_delta(-1)) && std::abs(g.objects.time() - 2.32) < 1e-9);
++        CHECK(!step_app_session(g, app_frame_delta(std::numeric_limits<double>::quiet_NaN())));
+         return true;
+     }
+     bool npcs_ready(GameSession& g, bool untouched)
+diff --git a/tests/sky_gpu_tests.cpp b/tests/sky_gpu_tests.cpp
+new file mode 100644
+index 0000000..7c39625
+--- /dev/null
++++ b/tests/sky_gpu_tests.cpp
+@@ -0,0 +1,154 @@
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "game/server_adapter.h"
++#include <SDL3/SDL.h>
++#include <cmath>
++#include <filesystem>
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x " " << error << " " << SDL_GetError() << '\n';                            \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    void quad(WorldMesh& mesh, float z, float x, float half, DVector color, bool alpha = false, bool portal = false)
++    {
++        const auto first = unsigned(mesh.vertices.size());
++        for (auto p : {DVector{x - half, half, z}, DVector{x + half, half, z}, DVector{x + half, -half, z},
++                       DVector{x - half, half, z}, DVector{x + half, -half, z}, DVector{x - half, -half, z}})
++            mesh.vertices.push_back({p, color, {}});
++        mesh.ranges.push_back({first, 6, {}, "quad", {{first, 6, alpha ? 1u : 0u, alpha, {x, 0, z}, {}, portal}}});
++    }
++    bool download(SDL_GPUDevice* gpu, SDL_GPUCommandBuffer* cmd, Capture& c)
++    {
++        auto* copy = SDL_BeginGPUCopyPass(cmd);
++        if (!copy)
++            return false;
++        SDL_GPUTextureRegion region{};
++        region.texture = c.texture;
++        region.w = c.width;
++        region.h = c.height;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = c.transfer;
++        target.pixels_per_row = c.width;
++        target.rows_per_layer = c.height;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        return SDL_SubmitGPUCommandBuffer(cmd) && SDL_WaitForGPUIdle(gpu);
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2 || argc > 3)
++        return 2;
++    std::filesystem::create_directories(argv[1]);
++    std::string error;
++    Runtime runtime;
++    CHECK(runtime.initialize(true, error));
++    WorldRenderer renderer(runtime.gpu);
++    WorldMesh mesh;
++    mesh.materials = {{"white", "", {1, 1, 1, 0, 0, {255, 255, 255, 255}}},
++                      {"half", "", {1, 1, 1, 0, 0, {255, 255, 255, 128}}}};
++    quad(mesh, .5f, 0, 1, {0, 0, 1});                      // sky near plane .01, ordinary world near plane 1
++    quad(mesh, 3, 0, 6, {1, 0, 0}, true);                  // farther but later: index order, no depth rejection
++    quad(mesh, 10, 0, 20, {.25f, .4f, .65f}, false, true); // portal marker must not cover the sky
++    quad(mesh, 100, -25, 15, {0, 1, 0});                   // ordinary solid is farther than sky, but must cover it
++    std::vector<WorldDraw> sky{{0, {}, {}}, {1, {}, {}}}, world{{2, {}, {}}, {3, {}, {}}};
++    for (unsigned cycle = 0; cycle < 3; ++cycle)
++    {
++        Capture c;
++        const unsigned w = cycle == 1 ? 400 : 320, h = 240;
++        CHECK(c.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, w, h));
++        CHECK(renderer.prepare(mesh, cycle, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, w, h, error));
++        if (cycle == 1)
++            std::swap(sky[0], sky[1]);
++        auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(cmd);
++        CHECK(renderer.draw(cmd, c.texture, mesh, sky, {}, {}, false, error, DrawLoad::Clear, nullptr, WorldPass::Sky));
++        CHECK(renderer.draw(cmd, c.texture, mesh, world, {}, {}, false, error, DrawLoad::Load, nullptr,
++                            WorldPass::OpaqueWithSky));
++        CHECK(download(runtime.gpu, cmd, c));
++        const auto* p = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, c.transfer, false));
++        CHECK(p);
++        auto rgb = [&](unsigned x, unsigned y, int r, int g, int b)
++        {
++            auto i = (y * w + x) * 4;
++            return std::abs(int(p[i]) - r) <= 1 && std::abs(int(p[i + 1]) - g) <= 1 && std::abs(int(p[i + 2]) - b) <= 1;
++        };
++        bool ok = rgb(w / 2, h / 2, cycle ? 0 : 128, 0, cycle ? 255 : 127) && rgb(w * 3 / 8, h / 2, 0, 255, 0);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, c.transfer);
++        CHECK(ok && renderer.stats.sky_batches == 2);
++        CHECK(c.save((std::string(argv[1]) + "/synthetic-" + std::to_string(cycle) + ".png").c_str()));
++        auto bad = sky;
++        bad[0].range = 99;
++        cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        CHECK(cmd);
++        CHECK(
++            !renderer.draw(cmd, c.texture, mesh, bad, {}, {}, false, error, DrawLoad::Clear, nullptr, WorldPass::Sky));
++        CHECK(SDL_CancelGPUCommandBuffer(cmd));
++        renderer.clear_geometry();
++    }
++    std::cout << "Sky GPU: index order, alpha, .01 near plane, no depth reads/writes, portal omission, resize/reload "
++                 "passed\n";
++    if (argc == 3)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = argv[2];
++        CHECK(g.resources.mount_game(config, error));
++        for (unsigned cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_cityhub", error));
++            CHECK(g.enter_player(error));
++            CHECK(g.step(.02));
++            WorldMesh real;
++            CHECK(real.build(g.world, error, &g.resources));
++            Capture c;
++            CHECK(c.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480));
++            CHECK(renderer.prepare(real, g.world_revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480, error));
++            std::vector<WorldDraw> skies, ordinary;
++            DVector eye;
++            CHECK(g.server.sky.draws(g.world, real, g.objects, g.client_shell.view.position, skies, eye, error) &&
++                  skies.size() == 5);
++            WorldViewStats stats;
++            CHECK(world_draws(real, g.objects, ordinary, stats, error));
++            for (unsigned shot = 0; shot < 3; ++shot)
++            {
++                auto rotation = rotation_from_euler({shot == 0 ? -.2f : 0, shot == 0 ? 0 : 1.57f, 0});
++                auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++                CHECK(cmd);
++                CHECK(renderer.draw(cmd, c.texture, real, skies, eye, rotation, false, error, DrawLoad::Clear, nullptr,
++                                    WorldPass::Sky, g.server.world_time()));
++                if (shot == 2)
++                    CHECK(renderer.draw(cmd, c.texture, real, ordinary, g.client_shell.view.position, rotation, false,
++                                        error, DrawLoad::Load, nullptr, WorldPass::OpaqueWithSky,
++                                        g.server.world_time()));
++                CHECK(download(runtime.gpu, cmd, c));
++                const auto* p = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, c.transfer, false));
++                CHECK(p);
++                unsigned covered = 0;
++                for (unsigned i = 0; i < 640 * 480; ++i)
++                    covered += p[i * 4] > 10 || p[i * 4 + 1] > 12 || p[i * 4 + 2] > 16;
++                SDL_UnmapGPUTransferBuffer(runtime.gpu, c.transfer);
++                CHECK(covered > 10000 && renderer.stats.sky_batches > 0);
++                CHECK(c.save(
++                    (std::string(argv[1]) + "/cityhub-" + std::to_string(cycle) + "-" + std::to_string(shot) + ".png")
++                        .c_str()));
++                std::cout << "City sky cycle=" << cycle << " view=" << shot
++                          << " submitted=" << renderer.stats.sky_batches << " covered=" << covered << '\n';
++            }
++            CHECK(g.unload_world());
++            renderer.clear_geometry();
++        }
++    }
++    return 0;
++}
+diff --git a/tests/sky_tests.cpp b/tests/sky_tests.cpp
+new file mode 100644
+index 0000000..2731927
+--- /dev/null
++++ b/tests/sky_tests.cpp
+@@ -0,0 +1,220 @@
++#include "brush_fixture.h"
++#include "engine/sky.h"
++#include "game/original/SkyObjects.h"
++#include "game/server_adapter.h"
++#include <cmath>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool close(float a, float b)
++    {
++        return std::abs(a - b) < .001f;
++    }
++    HOBJECT model(GameSession& g, const std::string& name, int index, DVector dims = {})
++    {
++        auto m = test_brush::box(name, {-10, -10, 100}, {10, 10, 120});
++        m.translation = {5, 0, 110};
++        g.world.models.push_back(m);
++        return g.objects.create(g.objects.find_class("DemoSkyWorldModel"), {}, Creation::World,
++                                {{"Name", name}, {"Index", std::int32_t(index)}, {"SkyDims", dims}});
++    }
++    HOBJECT pointer(GameSession& g, const std::string& name, int index)
++    {
++        return g.objects.create(g.objects.find_class("SkyPointer"), {}, Creation::World,
++                                {{"SkyObjectName", name}, {"Index", std::int32_t(index)}});
++    }
++    bool rules()
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        g.world.models.emplace_back();
++        auto h = model(g, "sky", 3, {100, 200, 300});
++        CHECK(h);
++        const auto* r = g.objects.get(h);
++        CHECK(r && r->life == Life::Alive);
++        CHECK(g.server.sky.objects[3] == r->id && g.server.sky.additions == 1 && g.server.sky.definitions == 1);
++        CHECK(r->state.m_ObjectType == OT_WORLDMODEL && (r->state.m_Flags & FLAG_SKYOBJECT) &&
++              (r->state.m_Flags & FLAG_FORCEOPTIMIZEOBJECT) && !r->scheduled);
++        auto& d = g.server.sky.definition;
++        CHECK(close(d.min.x, -95) && close(d.max.z, 410) && close(d.view_min.x, -5) && close(d.view_max.z, 140));
++        auto second = model(g, "second", 0, {100, 0, 100});
++        CHECK(second && g.server.sky.definitions == 1);
++        CHECK(g.server.AddSkyObject(h, 9) && !g.server.sky.objects[9] && g.server.sky.additions == 2);
++        CHECK(!g.server.AddSkyObject(second, 30));
++        CHECK(!model(g, "bad", -1));
++        CHECK(!model(g, "bad30", 30));
++        const auto saved = d;
++        auto invalid = d;
++        invalid.min.x = std::numeric_limits<float>::quiet_NaN();
++        CHECK(!g.server.SetSkyDefinition(invalid) && d.min.x == saved.min.x);
++        CHECK(!g.objects.create(g.objects.find_class("SkyPointer"), {}, Creation::Restore));
++        CHECK(model(g, "last", 29) && g.server.sky.objects[29]);
++        return true;
++    }
++    bool pointers()
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        g.world.models.emplace_back();
++        // Target is created after the pointer; original lookup is deferred to first update.
++        auto p = pointer(g, "target", 2);
++        CHECK(p && !g.server.sky.objects[2]);
++        auto h = model(g, "target", 1);
++        CHECK(h);
++        CHECK(g.server.sky.remove(g.objects, h));
++        g.server.SetObjectFlags(h, FLAG_VISIBLE);
++        CHECK(g.objects.advance(.0005) && g.objects.get(p));
++        CHECK(g.objects.advance(.0006));
++        g.objects.finish_frame();
++        CHECK(!g.objects.get(p) && g.server.sky.objects[2] == g.objects.get(h)->id);
++        CHECK(g.server.list_count() == 0 && (g.server.GetObjectFlags(h) & FLAG_SKYOBJECT));
++        auto missing = pointer(g, "TARGET", 4);
++        CHECK(missing);
++        CHECK(g.objects.advance(.002));
++        g.objects.finish_frame();
++        CHECK(!g.objects.get(missing) && !g.server.sky.error.empty() && !g.server.unavailable_services.empty());
++        CHECK(g.server.list_count() == 0 && !g.server.sky.objects[4]);
++        auto other = model(g, "other", 5);
++        CHECK(other);
++        CHECK(g.server.AddSkyObject(other, 2) &&
++              g.server.sky.objects[5] == g.objects.get(other)->id); // already registered: source no-op
++        CHECK(g.server.sky.remove(g.objects, other));
++        CHECK(!g.server.AddSkyObject(other, 2)); // new registration into occupied slot rejects
++        CHECK(g.server.sky.objects[2] == g.objects.get(h)->id);
++        auto plain = g.objects.create(g.objects.find_class("BaseClass"));
++        CHECK(plain);
++        CHECK(!g.server.AddSkyObject(plain, 6));
++        return true;
++    }
++    bool projection()
++    {
++        SkyDefinition d{{-100, -100, -100}, {100, 100, 100}, {1, 2, 3}, {11, 22, 33}};
++        DVector out;
++        CHECK(sky_view_position(d, {-10, -20, -30}, {10, 20, 30}, {}, out));
++        CHECK(out.x == 6 && out.y == 12 && out.z == 18);
++        CHECK(sky_view_position(d, {-10, -20, -30}, {10, 20, 30}, {30, -60, 90}, out));
++        CHECK(out.x == 21 && out.y == -18 && out.z == 63); // no clamp
++        World world;
++        world.models.push_back(test_brush::box("main", {-2, -2, -2}, {2, 2, 2}));
++        world.models[0].surfaces[1].flags = 1u << 4;
++        WorldMesh mesh;
++        std::string error;
++        CHECK(mesh.build(world, error) && mesh.sky == 1 && mesh.ranges[0].batches.size() == 3);
++        CHECK(!mesh.ranges[0].batches[0].sky_portal && mesh.ranges[0].batches[1].sky_portal &&
++              !mesh.ranges[0].batches[2].sky_portal);
++        CHECK(!sky_view_position(d, {}, {0, 1, 1}, {}, out) && out.x == 0);
++        CHECK(!sky_view_position(d, {}, {1, 1, 1}, {std::numeric_limits<float>::infinity(), 0, 0}, out));
++        return true;
++    }
++    bool lifetime()
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        g.world.min = {-500, -500, -500};
++        g.world.max = {500, 500, 500};
++        g.world.models.emplace_back();
++        auto a = model(g, "a", 4), b = model(g, "b", 1);
++        CHECK(a && b);
++        WorldMesh mesh;
++        std::string e;
++        CHECK(mesh.build(g.world, e));
++        std::vector<WorldDraw> draws;
++        DVector eye;
++        WorldViewStats stats;
++        CHECK(world_draws(mesh, g.objects, draws, stats, e) && draws.size() == 1 && stats.unbound == 0);
++        CHECK(g.server.sky.draws(g.world, mesh, g.objects, {}, draws, eye, e) && draws.size() == 2);
++        CHECK(draws[0].range == 2 && draws[1].range == 1);
++        g.server.SetObjectState(a, OBJSTATE_INACTIVE);
++        CHECK(g.server.sky.draws(g.world, mesh, g.objects, {}, draws, eye, e) && draws.size() == 2);
++        g.server.SetObjectFlags(a, g.server.GetObjectFlags(a) & ~FLAG_VISIBLE);
++        CHECK(g.server.sky.draws(g.world, mesh, g.objects, {}, draws, eye, e) && draws.size() == 1);
++        CHECK(g.objects.remove(b));
++        CHECK(g.server.sky.draws(g.world, mesh, g.objects, {}, draws, eye, e) && draws.empty());
++        g.objects.finish_frame();
++        auto new_object = g.objects.create(g.objects.find_class("BaseClass"));
++        CHECK(new_object);
++        CHECK(g.server.sky.draws(g.world, mesh, g.objects, {}, draws, eye, e) && draws.empty());
++        CHECK(g.unload_world() && !g.server.sky.defined && !g.server.sky.objects[1]);
++        return true;
++    }
++    bool private_world(const char* path)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = path;
++        std::string e;
++        CHECK(g.resources.mount_game(c, e));
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("02_cityhub", e));
++            unsigned created = 0, failed = 0, unknown = 0;
++            for (const auto& entry : g.entries)
++            {
++                created += entry.state == EntryState::Created;
++                failed += entry.state == EntryState::Failed;
++                unknown += entry.state == EntryState::Unsupported;
++            }
++            CHECK(created == 448 && failed == 1 && unknown == 5);
++            for (const auto& use : g.resource_uses)
++                CHECK(use.path != "Clouds1Pointer" && use.path != "Moon1Pointer" && use.path != "Star1Pointer" &&
++                      use.path != "BuildingsPointer");
++            CHECK(g.server.sky.additions == 1 && g.server.sky.definitions == 1);
++            CHECK(g.step(.02) && g.server.sky.additions == 5 && g.server.sky.error.empty());
++            WorldMesh mesh;
++            CHECK(mesh.build(g.world, e, &g.resources));
++            std::vector<WorldDraw> draws;
++            DVector eye;
++            CHECK(g.server.sky.draws(g.world, mesh, g.objects, {}, draws, eye, e) && draws.size() == 5);
++            const char* expected[]{"Stars1", "Clouds1", "Moon1", "SkyWorldModel", "Buildings"};
++            for (unsigned i = 0; i < 5; ++i)
++                CHECK(mesh.ranges[draws[i].range].name == expected[i]);
++            CHECK(g.server.sky.draws(g.world, mesh, g.objects, vector_scale(vector_add(g.world.min, g.world.max), .5f),
++                                     draws, eye, e));
++            CHECK(close(eye.x, -1664) && close(eye.y, -2032) && close(eye.z, 2048));
++            CHECK(g.server.list_count() == 0);
++            std::size_t sky_triangles = 0, alpha = 0, portals = 0;
++            for (const auto& d : draws)
++                for (const auto& b : mesh.ranges[d.range].batches)
++                {
++                    sky_triangles += b.count / 3;
++                    alpha += b.translucent;
++                    portals += b.sky_portal;
++                }
++            std::cout << "CityHub sky: " << draws.size() << " objects, " << sky_triangles << " triangles, " << alpha
++                      << " alpha batches, " << portals << " sky markers, eye " << eye.x << ',' << eye.y << ',' << eye.z
++                      << '\n';
++            CHECK(sky_triangles > 0 && alpha > 0 && portals == 0);
++            for (const auto& d : draws)
++                for (const auto& b : mesh.ranges[d.range].batches)
++                    CHECK(mesh.materials[b.material].error.empty());
++            CHECK(g.unload_world() && g.server.sky.additions == 0 && g.server.string_count() == 0 &&
++                  g.server.list_count() == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::string mode = argv[1];
++    return (mode == "rules"        ? rules()
++            : mode == "pointers"   ? pointers()
++            : mode == "projection" ? projection()
++            : mode == "lifetime"   ? lifetime()
++                                   : mode == "private" && argc == 3 && private_world(argv[2]))
++               ? 0
++               : 1;
++}
+diff --git a/tests/world_debris_tests.cpp b/tests/world_debris_tests.cpp
+index ee96403..4925b1c 100644
+--- a/tests/world_debris_tests.cpp
++++ b/tests/world_debris_tests.cpp
+@@ -246,7 +246,7 @@ namespace
+                 failed += e.state == EntryState::Failed;
+             }
+             std::cout << "Created=" << created << " unsupported=" << unknown << " failed=" << failed << '\n';
+-            CHECK(created == 443 && unknown == 10 && failed == 1);
++            CHECK(created == 448 && unknown == 5 && failed == 1);
+             // Exercise original destruction/name activation, not direct fragment creation.
+             auto* list = g.server.FindNamedObjects("billboard");
+             CHECK(list && list->m_pFirstLink);
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index d2b76a6..6e3e5a9 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -142,7 +142,12 @@ namespace
+             else
+                 w.append(object(trial == 5 ? "NotPorted" : "CameraObj", {string_prop("Name", "entry-camera")}));
+             w.append(object("PathPoint", {string_prop("Name", "WALK0"), prop("Pos", 1, arrival)}));
+-            w.append(object("SmellHint", {string_prop("Name", "scent")}));
++            if (trial == 7 || trial == 8)
++                w.append(
++                    object("SkyPointer", {string_prop("Name", "sky-reference"),
++                                          string_prop("SkyObjectName", trial == 7 ? "missing-sky" : "entry-camera")}));
++            else
++                w.append(object("SmellHint", {string_prop("Name", "scent")}));
+             w.append(object("ExitHint", {string_prop("Name", "exit")}));
+             w.append(object("BulletAmmoPU", {string_prop("Name", "bullets"), prop("Pos", 1, arrival)}));
+             w.append(object("Sound", {string_prop("Filename", trial == 4 ? "absent.wav" : "cue.wav")}));
+@@ -983,8 +988,8 @@ namespace
+                           d.unknown == 0 && d.invalid == 0 && d.models == 116);
+                 else
+                 {
+-                    CHECK(d.entries.size() == 1026 && d.schema_checked == 475 && d.editor_only == 541 &&
+-                          d.unknown == 10 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
++                    CHECK(d.entries.size() == 1026 && d.schema_checked == 480 && d.editor_only == 541 &&
++                          d.unknown == 5 && d.invalid == 0 && d.models == 100 && d.triangles == 39724);
+                     for (const auto& e : d.entries)
+                         if (e.state == DestinationEntryState::InvalidProperties)
+                             std::cout << "Schema failure " << e.class_name << " / " << e.name << ": " << e.detail
+@@ -1056,7 +1061,7 @@ namespace
+     {
+         CHECK(test_player::setup(game, root, true, true, true));
+         test_player::Directory dir;
+-        for (unsigned i = 1; i <= 6; ++i)
++        for (unsigned i = 1; i <= 8; ++i)
+             dir.children["worlds"].files["trial" + std::to_string(i) + ".dat"] =
+                 dat(false, false, false, false, i).data;
+         dir.children["worlds"].files["broken.dat"] = {56, 0, 0, 0};
+@@ -1245,6 +1250,17 @@ namespace
+             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::None);
+         }
+         CHECK(transition_images(*game, root));
++        for (const auto* name : {"trial7", "trial8"})
++        {
++            CHECK(original_world_request(name, 0, LOADTYPE_NEW_LEVEL, 0, message));
++            CHECK(game->queue_level_change(message, "arrival", error));
++            CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
++            CHECK(error == (std::string_view(name) == "trial7" ? "Invalid sky object/index"
++                                                               : "Only bound world models are supported in the sky"));
++            CHECK(game.get() == owner && game->objects.snapshot() == ids && game->objects.time() == time);
++            CHECK(game->level_change.cleanup_complete && globals.unchanged() && g_pServerDE == &game->server);
++            CHECK(game->server.list_count() == 0 && game->level_change.unknown == 0 && game->level_change.failed == 0);
++        }
+         CHECK(original_world_request("missing", 0, LOADTYPE_NEW_LEVEL, 0, message));
+         CHECK(game->queue_level_change(message, "unused", error));
+         CHECK(original_world_request("trial1", 0, LOADTYPE_NEW_LEVEL, 0, message));
+@@ -1259,7 +1275,7 @@ namespace
+             std::cout << "Commit " << cycle << ": " << error << '\n';
+             CHECK(result == LevelChangeResult::Committed && error.empty() && game.get() != owner);
+             CHECK(game->world_revision == before_revision + 1 && game->objects.time() == 0);
+-            CHECK(game->level_change.committed == cycle + 1 && game->level_change.rejected == 8);
++            CHECK(game->level_change.committed == cycle + 1 && game->level_change.rejected == 10);
+             CHECK(game->level_change.cleanup_complete && !game->level_change.source_retained);
+             CHECK(game->level_change.checked_textures >= 5 && game->level_change.selected_start == "arrival");
+             CHECK(g_pServerDE == &game->server && game->client_shell.m_bInWorld);
+@@ -1309,7 +1325,7 @@ namespace
+             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
+             std::cout << "CityHub refusal " << cycle << ": " << error << '\n';
+             CHECK(game.get() == owner && game->objects.snapshot() == ids && globals.unchanged());
+-            CHECK(game->level_change.unknown == 10 && game->level_change.failed == 1);
++            CHECK(game->level_change.unknown == 5 && game->level_change.failed == 1);
+             CHECK(game->level_change.cleanup_complete && game->level_change.source_retained);
+             CHECK(game->world_revision == revision && game->objects.time() == time);
+             CHECK(game->server.audio.voices().size() == voices.size());
+@@ -1410,7 +1426,7 @@ namespace
+                 {
+                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
+                     if (std::string_view(name) == "02_cityhub")
+-                        CHECK(d.created == 443 && d.unknown == 10 && d.failed == 1);
++                        CHECK(d.created == 448 && d.unknown == 5 && d.failed == 1);
+                     else
+                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
+                 }

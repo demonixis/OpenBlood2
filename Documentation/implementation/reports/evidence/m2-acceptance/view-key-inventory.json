@@ -1,0 +1,20 @@
+{
+  "command": [
+    "timeout",
+    "60",
+    "build/release/tests/weapon_tests",
+    "private",
+    "/home/yann/.steam/steam/steamapps/common/Blood II/"
+  ],
+  "exit": 0,
+  "executable_sha256": "55f256eddfbfd985c51badf58e3d5eef1e5a9441097e66eb9549b50b9662f40e",
+  "kind": "Read-only asset-key inventory using existing Release weapon harness, not part of rebuilt 64-case suite.",
+  "clips_per_load": {
+    "beretta": 6,
+    "knife": 5
+  },
+  "loads": 3,
+  "nonempty_keys": [
+    "fire_key"
+  ]
+}

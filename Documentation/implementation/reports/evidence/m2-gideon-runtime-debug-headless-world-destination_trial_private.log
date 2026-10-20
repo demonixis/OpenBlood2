@@ -1,0 +1,24 @@
+41/699 Testing: world.destination_trial_private
+41/699 Test: world.destination_trial_private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests" "destination_trial_private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"world.destination_trial_private" start time: Oct 17 03:43 CEST
+Output:
+----------------------------------------------------------
+Cycle 0 02_cityhub: loaded=1 entered=1 cleanup=1 created=244 unknown=206 failed=35 objects=278 error=
+Cycle 0 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 0 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1 02_cityhub: loaded=1 entered=1 cleanup=1 created=244 unknown=206 failed=35 objects=278 error=
+Cycle 1 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 1 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2 02_cityhub: loaded=1 entered=1 cleanup=1 created=244 unknown=206 failed=35 objects=278 error=
+Cycle 2 01_subwaya: loaded=1 entered=1 cleanup=1 created=204 unknown=0 failed=0 objects=230 error=
+Cycle 2 16_bridge: loaded=0 entered=0 cleanup=1 created=0 unknown=0 failed=0 objects=0 error=DAT v56: invalid/unsupported typed property near byte 442114
+PASS destination_trial_private
+<end of output>
+Test time =   5.34 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_trial_private" end time: Oct 17 03:43 CEST
+"world.destination_trial_private" time elapsed: 00:00:05
+----------------------------------------------------------

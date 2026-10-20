@@ -1,92 +1,42 @@
 # OpenBlood2
 
-A preservation project rebuilding **Blood II: The Chosen** with its original game
-code and a new, small, portable C++20 engine.
+Rebuild **Blood II: The Chosen** using its original game code and a portable
+C++20 engine with SDL3/SDL_GPU. F10 toggles the development inspector.
 
-The project supports Windows, Linux and MacOS with plans to support Android, iOS and VR.
+[Roadmap](Documentation/roadmap.md) · [Documentation](Documentation/readme.md) ·
+[Tests](Documentation/testing.md)
 
-An internal debugger can be toggled by pressing the `F10` key.
+M0/M1 are complete on Linux. [M2 is closed with reservation M2-GPU-001](Documentation/implementation/reports/m2_acceptance.md).
+M3 is next; full campaign support remains unaccepted. Linux/NVIDIA is tested,
+macOS/Metal is user-confirmed; Windows graphical qualification, mobile and VR are pending.
 
-## Status
+## Build and run
 
-| Milestone | Estimated task completion |
-| --- | ---: |
-| M0 | 100% |
-| M1 | 100% |
-| M2 | 100% |
-| M3 | ~60% |
-| M4 | ~35% |
-| M5 | ~10% |
-| M6 | ~15% |
-| M7 | 0% |
-| M8 | 0% |
-
-The percentages above are rough task estimates, not milestone acceptance.
-M0/M1 are complete for their documented Linux scope. **M2 is closed with a
-documented NVIDIA/D-Bus GPU leak reservation** for the tested SubwayA-to-CityHub
-session. See the [acceptance contract](docs/contracts/m2_acceptance_contracts.md).
-M3 is the next milestone and has not been accepted.
-Linux/NVIDIA is tested; macOS/Metal works according to user testing. The full game,
-other platforms and later milestones remain incomplete.
-
-See the [workspace roadmap](../Documentation/Roadmap/readme.md) and
-[implementation and validation records](docs/implementation/readme.md).
-
-## Build
-
-Install CMake 3.28+, Ninja, a C++20 compiler, SDL's platform development dependencies
-and OpenSSL development headers/libraries for the launcher.
-On Windows, install MSVC and the Windows SDK, and run the Ninja presets from an
-x64 Visual Studio developer shell; see [Windows setup](docs/getting_started.md#windows-build).
-The first configure downloads pinned dependencies. Supply your own Blood II installation.
-Run from this repository:
+Install CMake 3.28+, Ninja, Git, a C++20 compiler, SDL platform development
+packages and OpenSSL development files. On Windows, use an x64 Visual Studio
+developer shell. The first configure downloads pinned dependencies.
 
 ```sh
-cmake --preset debug
-cmake --build --preset debug --parallel
-./build/debug/blood2 --data-dir "/path/to/Blood II"
+cmake --preset dev
+cmake --build --preset dev --parallel
+./build/dev/blood2-launcher
 ```
 
-The default build also produces `build/debug/blood2-launcher` beside the game.
-Run it to select your game folder or install the demo. Use
-`-DBLOOD2_BUILD_LAUNCHER=OFF` at configure time for a game-only build.
-The launcher uses an isolated SDL build; see [launcher setup](docs/launcher.md).
+The launcher selects your installation or installs the demo. To launch directly:
 
-Normal retail launch opens the original main menu. F10 toggles the development inspector;
-Esc opens the pause menu. Use `--view-world` for direct entry. Four default Chosen
-profiles, difficulty, Audio and Mouse options are connected; save/load slots remain
-explicitly unavailable. See [menu contracts](docs/contracts/menu_contracts.md).
+```sh
+./build/dev/blood2 --data-dir "/path/to/Blood II"
+./build/dev/blood2 --demo --data-dir "/path/to/Blood2 Demo"
+```
 
-Use `--demo --data-dir /path/to/B2Demo` for the [demo menu](docs/contracts/demo_menu_contracts.md).
-Caleb starts Demo_01 with the chosen difficulty; EndGame returns through the Info
-screen to Main. Add `--view-world [--world Demo_02]` for menu-free direct entry.
-Esc pauses/resumes; Enter after death restarts the current world with initial
-equipment. See [demo contracts](docs/contracts/demo_contracts.md) for the temporary
-retry behavior, future save hook and validation limits.
+Normal launch opens the original menu; Esc pauses. Add `--view-world` for direct
+entry. Save/load is unavailable. Use `release` for an optimized build without the
+inspector, `debug` for debugging. See [setup and controls](Documentation/getting_started.md).
 
-Use the `dev` presets (optimized, with inspector) for playtesting and the `release`
-presets for an optimized build without the inspector; Debug is several times slower
-in large worlds.
-[Setup, controls and tests](docs/getting_started.md) cover configuration,
-NVIDIA selection, Metal and validation commands.
+## Contributing and license
 
-## Contributing
-
-- Read [AGENTS.md](AGENTS.md) and the [developer documentation](docs/readme.md) before changing code.
-- Preserve original behavior and record source provenance; keep portability fixes
-  distinct from gameplay changes. Use the supplied formatting rules and small changes.
-- Run relevant behavioral/lifetime tests, document results and limitations in English,
-  and keep commercial assets outside Git. C++ and Rust are the accepted languages.
-
-## AI assistance
-
-AI tools assist implementation, analysis and documentation. AI-assisted contributions
-need the same source review, tests and human scrutiny as any other contribution;
-generated code and claims are not evidence of original-game fidelity.
-
-## License
-
-Original work contributed to this reconstruction is licensed under the
-[MIT License](LICENSE). Imported game code, reference repositories, dependencies
-and commercial assets retain their respective rights and notices; the MIT license
-does not relicense them. See [source provenance](docs/implementation/provenance.md).
+Read [AGENTS.md](AGENTS.md) and [contributing](Documentation/contributing.md).
+Reuse original rules, record adaptations, test behavior and keep commercial
+assets external. AI-assisted changes require the same review and verification.
+Original contributions use the [MIT License](LICENSE); imported material keeps
+its own notices. See [provenance](Documentation/implementation/provenance.md).

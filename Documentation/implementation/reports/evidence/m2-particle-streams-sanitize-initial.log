@@ -1,0 +1,87 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 570: object_particles.private
+      Start  43: world.level_change_private
+ 1/34 Test  #43: world.level_change_private ........   Passed   42.95 sec
+      Start  44: world.destination_trial_private
+ 2/34 Test  #44: world.destination_trial_private ...   Passed   49.81 sec
+      Start 575: explosion_flames.private
+ 3/34 Test #570: object_particles.private ..........   Passed   95.74 sec
+      Start  25: world.level_change
+ 4/34 Test  #25: world.level_change ................   Passed    0.47 sec
+      Start  27: world.destination_trials
+ 5/34 Test  #27: world.destination_trials ..........   Passed    0.31 sec
+      Start  30: world.destination_lifetime
+ 6/34 Test  #30: world.destination_lifetime ........   Passed    0.07 sec
+      Start   1: objects.builtin_model
+ 7/34 Test   #1: objects.builtin_model .............   Passed    0.02 sec
+      Start 569: object_particles.session
+ 8/34 Test #569: object_particles.session ..........   Passed    0.03 sec
+      Start 566: object_particles.emission
+ 9/34 Test #566: object_particles.emission .........   Passed    0.03 sec
+      Start 568: object_particles.failures
+10/34 Test #568: object_particles.failures .........   Passed    0.04 sec
+      Start  11: objects.unsupported_teardown
+11/34 Test  #11: objects.unsupported_teardown ......   Passed    0.09 sec
+      Start 567: object_particles.stopping
+12/34 Test #567: object_particles.stopping .........   Passed    0.04 sec
+      Start  10: objects.messages_strings
+13/34 Test  #10: objects.messages_strings ..........   Passed    0.08 sec
+      Start 574: explosion_flames.session
+14/34 Test #574: explosion_flames.session ..........   Passed    0.05 sec
+      Start  12: objects.creation_failures
+15/34 Test  #12: objects.creation_failures .........   Passed    0.06 sec
+      Start 573: explosion_flames.failures
+16/34 Test #573: explosion_flames.failures .........   Passed    0.05 sec
+      Start 571: explosion_flames.zones
+17/34 Test #571: explosion_flames.zones ............   Passed    0.04 sec
+      Start 572: explosion_flames.lifecycle
+18/34 Test #572: explosion_flames.lifecycle ........   Passed    0.04 sec
+      Start   4: objects.reasons_properties
+19/34 Test   #4: objects.reasons_properties ........   Passed    0.04 sec
+      Start   9: objects.links_lists
+20/34 Test   #9: objects.links_lists ...............   Passed    0.04 sec
+      Start   2: objects.original_objects
+21/34 Test   #2: objects.original_objects ..........   Passed    0.04 sec
+      Start   6: objects.deferred_removal
+22/34 Test   #6: objects.deferred_removal ..........   Passed    0.04 sec
+      Start   3: objects.nested_creation
+23/34 Test   #3: objects.nested_creation ...........   Passed    0.04 sec
+      Start   8: objects.handles_selection
+24/34 Test   #8: objects.handles_selection .........   Passed    0.04 sec
+      Start   7: objects.aggregate_dispatch
+25/34 Test   #7: objects.aggregate_dispatch ........   Passed    0.04 sec
+      Start   5: objects.scheduling
+26/34 Test   #5: objects.scheduling ................   Passed    0.03 sec
+      Start 743: particle_stream.rules
+27/34 Test #743: particle_stream.rules .............   Passed    0.04 sec
+      Start 744: particle_stream.clocks
+28/34 Test #744: particle_stream.clocks ............   Passed    0.04 sec
+      Start 745: particle_stream.ramps
+29/34 Test #745: particle_stream.ramps .............   Passed    0.04 sec
+      Start 746: particle_stream.failures
+30/34 Test #746: particle_stream.failures ..........   Passed    0.04 sec
+      Start 747: particle_stream.session
+31/34 Test #747: particle_stream.session ...........   Passed    0.05 sec
+      Start 748: particle_stream.budgets
+32/34 Test #748: particle_stream.budgets ...........   Passed    0.25 sec
+      Start 749: particle_stream.private
+33/34 Test #575: explosion_flames.private ..........   Passed   38.16 sec
+34/34 Test #749: particle_stream.private ...........***Timeout 180.15 sec
+
+
+97% tests passed, 1 tests failed out of 34
+
+Label Time Summary:
+explosion_flames    =  38.34 sec*proc (5 tests)
+headless            = 408.97 sec*proc (34 tests)
+object_particles    =  95.88 sec*proc (5 tests)
+objects             =   0.55 sec*proc (12 tests)
+particle_stream     = 180.59 sec*proc (7 tests)
+private             = 406.81 sec*proc (5 tests)
+world               =  93.61 sec*proc (5 tests)
+
+Total Test time (real) = 278.07 sec
+
+The following tests FAILED:
+	749 - particle_stream.private (Timeout)                 headless particle_stream private
+Errors while running CTest

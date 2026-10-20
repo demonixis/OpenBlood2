@@ -1,0 +1,14 @@
+467/472 Testing: ai_runtime.body
+467/472 Test: ai_runtime.body
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_runtime_tests" "body"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_runtime.body" start time: Oct 16 15:13 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.body" end time: Oct 16 15:13 CEST
+"ai_runtime.body" time elapsed: 00:00:00
+----------------------------------------------------------

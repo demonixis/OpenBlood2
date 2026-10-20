@@ -1,0 +1,417 @@
+{
+  "date": "2026-10-15",
+  "host": "Linux-7.2.10-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "build_root": "/tmp/lithtech-audit-2bVxTF",
+  "tools": [
+    {
+      "command": [
+        "cmake",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "cmake version 4.3.0\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake)."
+    },
+    {
+      "command": [
+        "ninja",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "1.13.2"
+    },
+    {
+      "command": [
+        "c++",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+    },
+    {
+      "command": [
+        "clang++",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "clang version 22.1.8 (Fedora 22.1.8-4.fc44)\nTarget: x86_64-redhat-linux-gnu\nThread model: posix\nInstalledDir: /usr/bin\nConfiguration file: /etc/clang/x86_64-redhat-linux-gnu-clang++.cfg"
+    },
+    {
+      "command": [
+        "dotnet",
+        "--info"
+      ],
+      "exit_code": 0,
+      "output": ".NET SDK:\n Version:           10.0.112\n Commit:            95017c711e\n Workload version:  10.0.100-manifests.63b36e85\n MSBuild version:   18.0.11+95017c711\n\nRuntime Environment:\n OS Name:     fedora\n OS Version:  44\n OS Platform: Linux\n RID:         fedora.44-x64\n Base Path:   /usr/lib64/dotnet/sdk/10.0.112/\n\n.NET workloads installed:\nThere are no installed workloads to display.\nConfigured to use workload sets when installing new manifests.\nNo workload sets are installed. Run \"dotnet workload restore\" to install a workload set.\n\nHost:\n  Version:      10.0.12\n  Architecture: x64\n  Commit:       95017c711e\n\n.NET SDKs installed:\n  10.0.112 [/usr/lib64/dotnet/sdk]\n\n.NET runtimes installed:\n  Microsoft.AspNetCore.App 10.0.12 [/usr/lib64/dotnet/shared/Microsoft.AspNetCore.App]\n  Microsoft.NETCore.App 10.0.12 [/usr/lib64/dotnet/shared/Microsoft.NETCore.App]\n\nOther architectures found:\n  None\n\nEnvironment variables:\n  Not set\n\nglobal.json file:\n  Not found\n\nLearn more:\n  https://aka.ms/dotnet/info\n\nDownload .NET:\n  https://aka.ms/dotnet/download"
+    },
+    {
+      "command": [
+        "uname",
+        "-a"
+      ],
+      "exit_code": 0,
+      "output": "Linux gigabyte-g5 7.2.10-200.fc44.x86_64 #1 SMP PREEMPT_DYNAMIC Sun Oct 11 18:11:51 UTC 2026 x86_64 GNU/Linux"
+    }
+  ],
+  "repositories": [
+    {
+      "path": "OpenBlood2",
+      "inventory_commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+      "head": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "195dc9d9c1001547d0a369c73e72ff79b696d053"
+      },
+      "status": {
+        "command": [
+          "git",
+          "status",
+          "--porcelain=v1"
+        ],
+        "exit_code": 0,
+        "output": ""
+      }
+    },
+    {
+      "path": "NoMadEngine",
+      "inventory_commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+      "head": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f"
+      },
+      "status": {
+        "command": [
+          "git",
+          "status",
+          "--porcelain=v1"
+        ],
+        "exit_code": 0,
+        "output": ""
+      }
+    },
+    {
+      "path": "nomad",
+      "inventory_commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+      "head": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "58fc2e788856ac8142006a40e45c882fd868f8bd"
+      },
+      "status": {
+        "command": [
+          "git",
+          "status",
+          "--porcelain=v1"
+        ],
+        "exit_code": 0,
+        "output": ""
+      }
+    },
+    {
+      "path": "sources/blood2",
+      "inventory_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "head": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "006b4aabd3fb348f6846cad03799cf8df685ea95"
+      },
+      "status": {
+        "command": [
+          "git",
+          "status",
+          "--porcelain=v1"
+        ],
+        "exit_code": 0,
+        "output": ""
+      }
+    },
+    {
+      "path": "sources/Shogo_Aegis",
+      "inventory_commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+      "head": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477"
+      },
+      "status": {
+        "command": [
+          "git",
+          "status",
+          "--porcelain=v1"
+        ],
+        "exit_code": 0,
+        "output": ""
+      }
+    },
+    {
+      "path": "sources/lithtech",
+      "inventory_commit": "0eab18289bed72879eddb648d3311075b108cf46",
+      "head": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "0eab18289bed72879eddb648d3311075b108cf46"
+      },
+      "status": {
+        "command": [
+          "git",
+          "status",
+          "--porcelain=v1"
+        ],
+        "exit_code": 0,
+        "output": ""
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "build": "openblood2",
+      "dependency": "glm-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "0af55ccecd98d4e5a8d1fad7de25ba429d60e863"
+      }
+    },
+    {
+      "build": "openblood2",
+      "dependency": "imgui-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "f401021d5a5d56fe2304056c391e78f81c8d4b8f"
+      }
+    },
+    {
+      "build": "openblood2",
+      "dependency": "imguizmo-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "105e4fde45e4e74aae8973d98750820ef7aca7e2"
+      }
+    },
+    {
+      "build": "openblood2",
+      "dependency": "nlohmann_json-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03"
+      }
+    },
+    {
+      "build": "openblood2",
+      "dependency": "sdl3-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1"
+      }
+    },
+    {
+      "build": "openblood2",
+      "dependency": "sdl3_mixer-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "ccb4670fe5bd6da3c9acb9132f77062fdd39425d"
+      }
+    },
+    {
+      "build": "openblood2",
+      "dependency": "spdlog-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "7e635fca68d014934b4af8a1cf874f63989352b7"
+      }
+    },
+    {
+      "build": "nomadengine",
+      "dependency": "entt-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "b4e58bdd364ad72246c123a0c28538eab3252672"
+      }
+    },
+    {
+      "build": "nomadengine",
+      "dependency": "glm-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "8d1fd52e5ab5590e2c81768ace50c72bae28f2ed"
+      }
+    },
+    {
+      "build": "nomadengine",
+      "dependency": "imgui-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "f401021d5a5d56fe2304056c391e78f81c8d4b8f"
+      }
+    },
+    {
+      "build": "nomadengine",
+      "dependency": "imguizmo-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "105e4fde45e4e74aae8973d98750820ef7aca7e2"
+      }
+    },
+    {
+      "build": "nomadengine",
+      "dependency": "joltphysics-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "a63aa3b8e24cf95f3fab2613f9a3015b164ef62c"
+      }
+    },
+    {
+      "build": "nomadengine",
+      "dependency": "nlohmann_json-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "55f93686c01528224f448c19128836e7df245f72"
+      }
+    },
+    {
+      "build": "nomadengine",
+      "dependency": "openxr-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "c15d38cb4bb10a5b7e075f74493ff13896e2597a"
+      }
+    },
+    {
+      "build": "nomadengine",
+      "dependency": "sdl3-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1"
+      }
+    },
+    {
+      "build": "nomadengine",
+      "dependency": "sdl3_mixer-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "ccb4670fe5bd6da3c9acb9132f77062fdd39425d"
+      }
+    },
+    {
+      "build": "nomadengine",
+      "dependency": "spdlog-src",
+      "commit": {
+        "command": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0,
+        "output": "79524ddd08a4ec981b7fea76afd08ee05f83755d"
+      }
+    }
+  ],
+  "inventory_verification": {
+    "text_files_checked": 10923,
+    "changed": [],
+    "missing": []
+  }
+}

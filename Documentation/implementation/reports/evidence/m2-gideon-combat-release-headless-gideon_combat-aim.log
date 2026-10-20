@@ -1,0 +1,14 @@
+669/673 Testing: gideon_combat.aim
+669/673 Test: gideon_combat.aim
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon_combat_tests" "aim" "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon-combat-aim"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gideon_combat.aim" start time: Oct 17 02:22 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.aim" end time: Oct 17 02:22 CEST
+"gideon_combat.aim" time elapsed: 00:00:00
+----------------------------------------------------------

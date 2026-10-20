@@ -1,0 +1,79 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 19: config.arguments
+ 1/15 Test #19: config.arguments .................   Passed    0.01 sec
+      Start 20: config.precedence
+ 2/15 Test #20: config.precedence ................   Passed    0.01 sec
+      Start 21: config.relative_paths
+ 3/15 Test #21: config.relative_paths ............   Passed    0.01 sec
+      Start 22: config.invalid_config
+ 4/15 Test #22: config.invalid_config ............   Passed    0.01 sec
+      Start 23: config.content_validation
+ 5/15 Test #23: config.content_validation ........   Passed    0.01 sec
+      Start 24: config.case_lookup
+ 6/15 Test #24: config.case_lookup ...............   Passed    0.01 sec
+      Start 25: logging.basic
+ 7/15 Test #25: logging.basic ....................***Failed    0.03 sec
+CMake Error at /home/yann/projects/lithtech/Blood2/tests/logging_test.cmake:21 (message):
+  Logging test failed (1): [info] Log session:
+  /home/yann/projects/lithtech/Blood2/build/sanitize/tests/log-fixtures/basic/session-1792325299236350052-0
+
+  [info] OpenBlood2 0.3.0 / 53a5967-dirty / Debug / Clang 22.1.8;
+  platform=Linux; SDL=SDL-3.5.0-53a5967
+
+  [info] INFO visibility sentinel
+
+  [warning] literal braces {{}} and UTF-8 é
+
+  [error] SDL[0]: SDL bridge sentinel {literal}
+
+
+
+  FAIL line 159: text.find("literal braces {} and UTF-8 é") !=
+  std::string::npos
+
+
+
+
+      Start 26: logging.level
+ 8/15 Test #26: logging.level ....................***Failed    0.03 sec
+CMake Error at /home/yann/projects/lithtech/Blood2/tests/logging_test.cmake:21 (message):
+  Logging test failed (1): [warning] literal braces {{}} and UTF-8 é
+
+  [error] SDL[0]: SDL bridge sentinel {literal}
+
+
+
+  FAIL line 159: text.find("literal braces {} and UTF-8 é") !=
+  std::string::npos
+
+
+
+
+      Start 27: logging.rotation
+ 9/15 Test #27: logging.rotation .................   Passed    0.03 sec
+      Start 28: logging.failure
+10/15 Test #28: logging.failure ..................   Passed    0.03 sec
+      Start 29: logging.write_failure
+11/15 Test #29: logging.write_failure ............   Passed    0.06 sec
+      Start 30: logging.retention
+12/15 Test #30: logging.retention ................   Passed    0.03 sec
+      Start 31: logging.threads
+13/15 Test #31: logging.threads ..................   Passed    0.07 sec
+      Start 32: logging.abrupt
+14/15 Test #32: logging.abrupt ...................   Passed    0.02 sec
+      Start 33: logging.crash
+15/15 Test #33: logging.crash ....................   Passed    0.09 sec
+
+87% tests passed, 2 tests failed out of 15
+
+Label Time Summary:
+config      =   0.07 sec*proc (6 tests)
+headless    =   0.46 sec*proc (15 tests)
+logging     =   0.39 sec*proc (9 tests)
+
+Total Test time (real) =   0.49 sec
+
+The following tests FAILED:
+	 25 - logging.basic (Failed)                            headless logging
+	 26 - logging.level (Failed)                            headless logging
+Errors while running CTest

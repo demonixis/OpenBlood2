@@ -1,0 +1,17 @@
+626/626 Testing: gideon_teleport.private
+626/626 Test: gideon_teleport.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_teleport_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_teleport.private" start time: Oct 17 02:45 CEST
+Output:
+----------------------------------------------------------
+External Gideon cycle 0: 1100 triangles, real teleport WAV, fade/move/reappear
+External Gideon cycle 1: 1100 triangles, real teleport WAV, fade/move/reappear
+External Gideon cycle 2: 1100 triangles, real teleport WAV, fade/move/reappear
+<end of output>
+Test time =   1.02 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_teleport.private" end time: Oct 17 02:45 CEST
+"gideon_teleport.private" time elapsed: 00:00:01
+----------------------------------------------------------

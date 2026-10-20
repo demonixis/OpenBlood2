@@ -1,0 +1,44 @@
+497/497 Testing: player_state.private
+497/497 Test: player_state.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_state_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_state.private" start time: Oct 16 18:33 CEST
+Output:
+----------------------------------------------------------
+cycle 0: original restore initialization, selected player/aggregate fields and independent model/air; no client/world transfer
+cycle 1: original restore initialization, selected player/aggregate fields and independent model/air; no client/world transfer
+cycle 2: original restore initialization, selected player/aggregate fields and independent model/air; no client/world transfer
+<end of output>
+Test time =   5.02 sec
+----------------------------------------------------------
+Test Passed.
+"player_state.private" end time: Oct 16 18:33 CEST
+"player_state.private" time elapsed: 00:00:05
+----------------------------------------------------------
+
+End testing: Oct 16 18:33 CEST
+
+ai_perception =   4.50 sec*proc
+
+attachments =   5.54 sec*proc
+
+destructable_state =   5.17 sec*proc
+
+exits =  11.35 sec*proc
+
+headless =  59.07 sec*proc
+
+inventory_state =   5.17 sec*proc
+
+objects =   0.23 sec*proc
+
+player =  11.40 sec*proc
+
+player_state =   5.19 sec*proc
+
+private =  56.71 sec*proc
+
+services =  10.40 sec*proc
+
+weapons =   0.14 sec*proc
+

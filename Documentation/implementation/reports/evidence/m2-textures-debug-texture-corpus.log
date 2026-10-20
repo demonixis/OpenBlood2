@@ -1,0 +1,20 @@
+343/343 Testing: texture.corpus
+343/343 Test: texture.corpus
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/texture_tests" "corpus" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"texture.corpus" start time: Oct 16 09:15 CEST
+Output:
+----------------------------------------------------------
+skins/crate1.dtx: DTX: only embedded-palette version -2 is supported
+skins/grycret1.dtx: DTX: only embedded-palette version -2 is supported
+skins/metal1.dtx: DTX: only embedded-palette version -2 is supported
+skins/orgbrikb.dtx: DTX: only embedded-palette version -2 is supported
+textures/greys/dull1_trans.dtx: DTX: only embedded-palette version -2 is supported
+DTX corpus: decoded=3820 rejected=5 alpha=1450
+<end of output>
+Test time =   2.48 sec
+----------------------------------------------------------
+Test Passed.
+"texture.corpus" end time: Oct 16 09:15 CEST
+"texture.corpus" time elapsed: 00:00:02
+----------------------------------------------------------

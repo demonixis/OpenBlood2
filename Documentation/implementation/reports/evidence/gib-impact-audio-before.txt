@@ -1,0 +1,76 @@
+Start testing: Oct 18 13:27 CEST
+----------------------------------------------------------
+938/1108 Testing: flesh_gib_collision.query
+938/1108 Test: flesh_gib_collision.query
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/flesh_gib_collision_tests" "query" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flesh-gib-collision-query"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"flesh_gib_collision.query" start time: Oct 18 13:27 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"flesh_gib_collision.query" end time: Oct 18 13:27 CEST
+"flesh_gib_collision.query" time elapsed: 00:00:00
+----------------------------------------------------------
+
+939/1108 Testing: flesh_gib_collision.fragments
+939/1108 Test: flesh_gib_collision.fragments
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/flesh_gib_collision_tests" "fragments" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flesh-gib-collision-fragments"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"flesh_gib_collision.fragments" start time: Oct 18 13:27 CEST
+Output:
+----------------------------------------------------------
+fragments:96: moving.impacts == 0 && moving.splat_event == 0 && g.server.audio.voices().empty() && g.server.blood_splats.active.empty()
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Failed.
+"flesh_gib_collision.fragments" end time: Oct 18 13:27 CEST
+"flesh_gib_collision.fragments" time elapsed: 00:00:00
+----------------------------------------------------------
+
+940/1108 Testing: flesh_gib_collision.ceiling
+940/1108 Test: flesh_gib_collision.ceiling
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/flesh_gib_collision_tests" "ceiling" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flesh-gib-collision-ceiling"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"flesh_gib_collision.ceiling" start time: Oct 18 13:27 CEST
+Output:
+----------------------------------------------------------
+Falling fragment: impacts=11, voices=9, splats=11
+ceiling:142: f.impacts == 0 && f.position.y < 100 && f.position.y > 90 && g.server.audio.voices().empty() && g.server.blood_splats.active.empty()
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Failed.
+"flesh_gib_collision.ceiling" end time: Oct 18 13:27 CEST
+"flesh_gib_collision.ceiling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+941/1108 Testing: flesh_gib_collision.particles
+941/1108 Test: flesh_gib_collision.particles
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/flesh_gib_collision_tests" "particles" "/home/yann/projects/lithtech/Blood2/build/debug/tests/flesh-gib-collision-particles"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"flesh_gib_collision.particles" start time: Oct 18 13:27 CEST
+Output:
+----------------------------------------------------------
+particles:160: distant.impacts == 0 && distant.emitting && distant.splat_event == 0 && g.server.audio.voices().empty() && g.server.blood_splats.active.empty()
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Failed.
+"flesh_gib_collision.particles" end time: Oct 18 13:27 CEST
+"flesh_gib_collision.particles" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 18 13:27 CEST
+
+audio =   0.02 sec*proc
+
+blood_spurts =   0.02 sec*proc
+
+death_effects =   0.02 sec*proc
+
+headless =   0.02 sec*proc
+

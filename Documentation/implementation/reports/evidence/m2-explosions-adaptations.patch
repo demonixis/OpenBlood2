@@ -1,0 +1,1488 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index aa67dd0..2904e65 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -68,3 +68,13 @@ are not FX. Pushable/gravity, explosive and SpawnObject brushes reject creation.
+ SubwayA now has 141 created source entries, 7 owned SelfTriggers, 372 editor-only
+ and 67 unported entries. Precreate rejection is a failure, not difficulty
+ filtering. Other movers and complete gameplay remain pending; M2 is open.
++
++The latest [explosion evidence](../Documentation/Implementation/M2_EXPLOSIONS.md) connects original CDebris
++properties/requests and explosive brush area damage. Read
++[explosion contracts](docs/EXPLOSION_CONTRACTS.md) before extending debris, explosions or
++radius damage. Preserve source squared-distance falloff, no visibility filter,
++fixed effective 100 damage / 200 radius, multi-material velocity sign alternation,
++checked snapshot order and deferred chain/removal. Reports count deliveries,
++not health changes. FX/audio records are not rendered or played. WorldModelDebris,
++pushable/gravity brushes, SpawnObject and full gameplay remain pending. The earlier
++brush paragraph's Exploding rejection/CDebris omission is superseded; M2 stays open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b20b04c..9c2dd3b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,7 +41,8 @@ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original
+ target_link_libraries(blood2_game PUBLIC engine)
+ 
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+-    src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp)
++    src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
++    src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp)
+ add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+diff --git a/README.md b/README.md
+index 14c7c01..b92dc7b 100644
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,6 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
+-A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory, KeyPickup, original player USE, RotatingDoor, RotatingBrush and selected CDestructableBrush damage/removal are connected; complete player gameplay remains missing. This is not a playable game.
++A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory, KeyPickup, original player USE, RotatingDoor, RotatingBrush, selected CDestructableBrush damage/removal and original CDebris explosive area damage are connected; complete player gameplay remains missing. This is not a playable game.
+ 
+ The three runtime targets remain small: `engine` (resources, world/object runtime, configuration, SDL_GPU), `blood2_game` (original code and typed services) and `blood2_app` (`blood2`, optional Dear ImGui). No previous prototype is a build dependency, and no EnTT/ECS was introduced.
+ 
+@@ -47,7 +47,7 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
+ | `--inspect-player` | Headless original shell/player entry inspection, with explicit gameplay blockers |
+ | `--player-smoke` | GPU Session panel, hidden player updates, unload/re-entry checks |
+ | `--weapons-smoke` | GPU Beretta/knife firing while hidden, unload/re-entry; capture at frame 181 |
+-| `--brushes-smoke` | GPU original rotating brush ON/OFF, hidden rider transport, inspection and reload |
++| `--brushes-smoke` | GPU original brush ON/OFF, hidden rider transport and explosive chain, inspection and reload |
+ | `--interaction-smoke` | GPU SDL E press-edge USE, missing-key denial/unlock, synthetic rotating hinge, hidden motion and reload |
+ | `--triggers-smoke` | GPU missing-key denial, real key pickup, hidden unlock/door movement, resize and reload |
+ | `--doors-smoke` | GPU original Door commands, hidden translation, resize, unload/reload; capture at frame 15 |
+@@ -64,7 +64,7 @@ ctest --preset debug
+ ctest --preset debug -L world
+ ```
+ 
+-There are **112 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases 6 door/mover/collision/lifetime cases 8 trigger/key/ownership/contact cases 9 USE/rotation/input/transport cases and 7 brush/ramp/damage/lifetime cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
++There are **120 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases, 6 door/mover/collision/lifetime cases, 8 trigger/key/ownership/contact cases, 9 USE/rotation/input/transport cases, 7 brush/ramp/damage/lifetime cases and 8 debris/explosion/radius/chain/lifetime cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
+ 
+ Enable installation-specific tests and real GPU windows explicitly:
+ 
+@@ -74,7 +74,7 @@ cmake --build --preset debug --parallel
+ ctest --preset debug
+ ```
+ 
+-The configured installation adds sixteen private headless tests and eleven GPU tests, for **139 cases**. GPU captures are `build/debug/tests/gpu.png` , `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png` `doors.png`, `triggers.png`, `interaction.png` and `brushes.png`. The ignored local presets enable these options:
++The configured installation adds sixteen private headless tests and eleven GPU tests, for **147 cases**. GPU captures are `build/debug/tests/gpu.png` , `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png` `doors.png`, `triggers.png`, `interaction.png` and `brushes.png`. The ignored local presets enable these options:
+ 
+ ```sh
+ cmake --preset local-debug
+@@ -93,7 +93,7 @@ On Windows use an MSVC Developer PowerShell and the same CMake/Ninja commands, t
+ 
+ Read [world/session contracts](docs/WORLD_CONTRACTS.md), [object contracts](docs/OBJECT_CONTRACTS.md), [provenance](docs/PROVENANCE.md) and [M2 results](../Documentation/Implementation/M2.md). The [roadmap's M2 gate](../Documentation/Roadmap/03_MILESTONES.md#m2--connect-world-session-and-gameplay-services) remains open: complete player/gameplay callbacks, required world classes, broader mover/physics behavior and remaining original services must still be connected. See the [service continuation](../Documentation/Implementation/M2_SERVICES.md) for the new tested subset. M3 has not started.
+ 
+-The [brush continuation](../Documentation/Implementation/M2_BRUSHES.md) is the latest evidence; read [BRUSH_CONTRACTS.md](docs/BRUSH_CONTRACTS.md) before extending rotators, brush damage or debris. The [USE/rotation continuation](../Documentation/Implementation/M2_INTERACTION.md) records the preceding stage; read [INTERACTION_CONTRACTS.md](docs/INTERACTION_CONTRACTS.md) before extending USE, rotating collision or player door pushes. The [trigger/key continuation](../Documentation/Implementation/M2_TRIGGERS.md) records the preceding stage; read [TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending activation, keys or SelfTrigger ownership. The [door continuation](../Documentation/Implementation/M2_DOORS.md) records the previous stage; read [DOOR_CONTRACTS.md](docs/DOOR_CONTRACTS.md) before extending world-model motion or door commands. The [specialized volume continuation](../Documentation/Implementation/M2_SPECIALIZED_VOLUMES.md) records the preceding stage (Conveyor, Damage, FreeFall and level-entry damage protection). Read [SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md) before extending these branches. The [container continuation](../Documentation/Implementation/M2_CONTAINERS.md) records the preceding stage. Read [CONTAINER_CONTRACTS.md](docs/CONTAINER_CONTRACTS.md) for original VolumeBrush/MoveMgr/air rules, static shell queries and pending effects. The [locomotion continuation](../Documentation/Implementation/M2_LOCOMOTION.md) records the prior stage. Read [LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for source clip fallbacks, atomic resize and the replacement stair solver. Read [MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) for the original MoveMgr subset, shared body, timing and grounding adaptations, and the subsequent translating platform extension. The [weapon continuation](../Documentation/Implementation/M2_WEAPONS.md) retains the earlier weapon evidence. Read [WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) for ownership, original behavior and deliberate limits. Read [PLAYER_CONTRACTS.md](docs/PLAYER_CONTRACTS.md) before extending the source subsets, typed client messages or player lifetime. Entry inspection succeeds; `--start-game` still fails with missing gameplay services.
++The [explosion continuation](../Documentation/Implementation/M2_EXPLOSIONS.md) is the latest evidence; read [EXPLOSION_CONTRACTS.md](docs/EXPLOSION_CONTRACTS.md) before extending debris, area damage or chain reactions. Its effects are inspection requests; client FX/audio remain pending. The [brush continuation](../Documentation/Implementation/M2_BRUSHES.md) records the preceding stage; read [BRUSH_CONTRACTS.md](docs/BRUSH_CONTRACTS.md) before extending rotators, brush damage or debris. The [USE/rotation continuation](../Documentation/Implementation/M2_INTERACTION.md) records the preceding stage; read [INTERACTION_CONTRACTS.md](docs/INTERACTION_CONTRACTS.md) before extending USE, rotating collision or player door pushes. The [trigger/key continuation](../Documentation/Implementation/M2_TRIGGERS.md) records the preceding stage; read [TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending activation, keys or SelfTrigger ownership. The [door continuation](../Documentation/Implementation/M2_DOORS.md) records the previous stage; read [DOOR_CONTRACTS.md](docs/DOOR_CONTRACTS.md) before extending world-model motion or door commands. The [specialized volume continuation](../Documentation/Implementation/M2_SPECIALIZED_VOLUMES.md) records the preceding stage (Conveyor, Damage, FreeFall and level-entry damage protection). Read [SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md) before extending these branches. The [container continuation](../Documentation/Implementation/M2_CONTAINERS.md) records the preceding stage. Read [CONTAINER_CONTRACTS.md](docs/CONTAINER_CONTRACTS.md) for original VolumeBrush/MoveMgr/air rules, static shell queries and pending effects. The [locomotion continuation](../Documentation/Implementation/M2_LOCOMOTION.md) records the prior stage. Read [LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for source clip fallbacks, atomic resize and the replacement stair solver. Read [MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) for the original MoveMgr subset, shared body, timing and grounding adaptations, and the subsequent translating platform extension. The [weapon continuation](../Documentation/Implementation/M2_WEAPONS.md) retains the earlier weapon evidence. Read [WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) for ownership, original behavior and deliberate limits. Read [PLAYER_CONTRACTS.md](docs/PLAYER_CONTRACTS.md) before extending the source subsets, typed client messages or player lifetime. Entry inspection succeeds; `--start-game` still fails with missing gameplay services.
+ 
+ ## Source conventions
+ 
+diff --git a/docs/BRUSH_CONTRACTS.md b/docs/BRUSH_CONTRACTS.md
+index 88c3956..ff02f48 100644
+--- a/docs/BRUSH_CONTRACTS.md
++++ b/docs/BRUSH_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Rotating and destructible world-model brushes
+ 
++> Extended by [EXPLOSION_CONTRACTS.md](EXPLOSION_CONTRACTS.md): original CDebris requests and explosive
++> brush area damage are now connected. Earlier omissions/counts below are historical;
++> WorldModelDebris, pushable brushes, client FX/audio and the full M2 gate remain open.
++
+ This extends [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md) and
+ [WEAPON_CONTRACTS.md](WEAPON_CONTRACTS.md). M2 remains open. See
+ [source selections](M2_BRUSH_SOURCES.json) and
+diff --git a/docs/EXPLOSION_CONTRACTS.md b/docs/EXPLOSION_CONTRACTS.md
+new file mode 100644
+index 0000000..bf0ee28
+--- /dev/null
++++ b/docs/EXPLOSION_CONTRACTS.md
+@@ -0,0 +1,101 @@
++# Original brush explosions and debris requests
++
++This extends [BRUSH_CONTRACTS.md](BRUSH_CONTRACTS.md) and the selected
++[damage transport](WEAPON_CONTRACTS.md). M2 remains incomplete. Read the
++[source ledger](M2_EXPLOSION_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_EXPLOSIONS.md).
++
++## Original rules
++
++CDestructableBrush now owns the original CDebris aggregate alongside CDestructable.
++Precreate and initial update still forward through BaseClass once. The aggregate
++reads world **and string** properties; this corrects the preceding increment's
++world-only Amount diagnostic. Runtime creation retains defaults. Restore remains
++unsupported. Amount retains the original byte conversion, including wraparound.
++Scale remains signed; nonfinite or absolute values above one million reject.
++Custom resource strings use owned C++ strings instead of HSTRING storage.
++
++Material selection and surface fallback follow the source order: Stone, Metal,
++Wood, Terrain, Plastic, Glass, Flesh, Liquid, Energy. The first enabled material
++provides GetSurfaceType when the brush's authored surface is zero. Each enabled
++material emits a separate request with its original surface/10, SIZE_SMALL and
++optional TYPEFLAG_CUSTOM bits. Custom=true alone emits nothing; the presence of
++any custom model, texture or sound enables the custom bit independently.
++This fallback query does not rewrite the original authored surface user flags.
++
++Create negates the damage direction, subtracts one from Y, normalizes and scales
++by 50 + cumulative damage. SetupClientGibFX then negates its shared vector **on
++each material call**. Multi-material velocities therefore alternate signs. These
++source quirks are preserved. The singular direction (0,-1,0), whose adjusted
++vector is zero, produces finite zero velocity instead of undefined normalization.
++
++If Exploding is enabled, CDebris requests EXP_GRENADE (3), upward normal, and
++`Sounds\Weapons\c4\explosion_1.wav` at radius 1000, then applies area damage.
++The original ReadProp declares but **never reads ExplodeDamage or DamageRadius**.
++The effective values remain the constructor defaults: **100 damage, 200 radius**.
++World retains authored overrides; the inspector explicitly labels effective values.
++No silent correction of this source behavior is introduced.
++
++## Damage and lifetime
++
++The selected ObjectUtilities::DamageObjectsInRadius branch walks CDestructable
++members in original list order. For target position P, origin O and average
++half-dimension A, its distance measure is |P-O|² - A². Damage is full below R²/2,
++then falls linearly in that squared measure to zero at R². A target exactly on
++the boundary still receives a zero-damage message. No ray, visibility, activity
++or SOLID filter is added; source damage can cross walls and reach hidden/inactive
++objects. This is not a conventional linear-distance explosion falloff.
++
++Local owned Damage messages retain type Explode=5, with area_effect as a separate
++boolean corresponding to source flag 16. The checked sender is the exploding
++brush, not its last attacker. Source brush calls use the same responsible and
++sender object; this helper deliberately requires that supported relationship.
++Other callers, explosion classes, multiplayer attribution and the retail wire
++format are not newly implemented.
++
++The existing selected aggregate applies resistance, armor, health and named
++triggers. God mode, CanDamage, TriggerDestroyOnly and dead guards still apply;
++Destructable separately controls brush removal. Player stats synchronize through
++the existing shell path. Explosion impulses, AI-specific damage and complete
++retail damage metadata remain pending. The report counts **delivered messages**,
++not reduced-health targets: it can include the already-dead exploding brush or
++protected receivers.
++
++Destruction runs on the next scheduled update. A blast can kill another brush,
++whose explosion is scheduled for a later update, preserving deferred chain
++reactions without recursive destruction. The helper snapshots checked handles
++before callbacks, retaining original order. Targets removed by an earlier
++callback are skipped; objects spawned during dispatch wait for the next blast.
++If a callback removes the source, delivery stops and the report marks cancellation.
++The source remains allocated until the callback/step completes. This strengthens
++lifetime safety compared with walking mutable source links directly.
++
++Finite/range checks bound origin, radius and damage; an underflowed squared radius
++rejects. The existing 65,536-object arena bounds snapshot size. A failed message
++stops dispatch and marks cancellation. No geometry query or second physics/player
++integration is introduced.
++
++## Inspection and pending effects
++
++Brushes shows effective surface, amount/scale, materials, effective explosion
++values, custom resource paths and indexed/missing status. Its queued KILL command
++uses the original message path. Hidden and inactive objects remain listed; World
++retains failed creation and authored properties after runtime removal.
++
++The adapter retains the latest **64 debris requests** and **32 explosion reports**,
++plus the existing 32 destruction records. They own names, vectors and resource
++paths and survive source reclamation. All clear on unload. Finite copied requests
++can still be recorded after a damage callback marks the source pending. They are
++inspection records, not an implemented FX renderer or sound queue. Explosion
++reports are stored after damage to include delivery/cancellation totals; this
++recording order does not execute client effects.
++
++The inspector exposes origin, velocity, dimensions, flags, amount, scale, resource
++status and damage counters. Indexed does not mean decoded/loaded/played. Missing
++optional FX resources do not prevent server damage. WorldModelDebris fragments,
++client gib simulation/rendering, audio, decals, Pushable/gravity brushes,
++SpawnObject, other explosion classes and save/restore remain pending. Pushable,
++gravity and SpawnObject brushes still fail creation. Missing/ambiguous geometry
++and older incompatible schemas remain explicit failures.
++
++No retail executable comparison, additional platform or XR validation is claimed.
+diff --git a/docs/M2_EXPLOSION_SOURCES.json b/docs/M2_EXPLOSION_SOURCES.json
+new file mode 100644
+index 0000000..4422c94
+--- /dev/null
++++ b/docs/M2_EXPLOSION_SOURCES.json
+@@ -0,0 +1,182 @@
++{
++  "date": "2026-10-15",
++  "status": "M2 incomplete; original explosive brush damage and debris inspection requests",
++  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "imports": [
++    {
++      "source": "sources/blood2/ObjectDLL/Debris.cpp",
++      "target": "src/game/original/Debris.cpp",
++      "source_line_ranges": [
++        [
++          29,
++          58
++        ],
++        [
++          105,
++          146
++        ],
++        [
++          158,
++          234
++        ],
++        [
++          246,
++          290
++        ],
++        [
++          302,
++          451
++        ]
++      ],
++      "selection": "Original constructor defaults, world/string reads, surface precedence, material requests, damage-dependent velocity and AddExplosion. Owned strings and copied inspection records replace HSTRING/client effects/audio; zero normalization receives a finite guard. ReadProp intentionally leaves ExplodeDamage and DamageRadius unread. Save/restore omitted.",
++      "source_sha256": "65cd8053b79a6ae5c9107d8997fb4a157debc1427afb2c5ba26acc7bbf60575b",
++      "target_sha256": "e4847302b767964cb65443e37e3ff0ac0114a7b6cb7078ea1971c2f16b371e2a"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Debris.h",
++      "target": "src/game/original/Debris.h",
++      "source_line_ranges": [
++        [
++          18,
++          90
++        ]
++      ],
++      "selection": "Owned aggregate state and original material/default declarations; arrays preserve emission order. No WorldModelDebris import.",
++      "source_sha256": "b6a8806d27622d462206b0871c0cc212763d2687a1001ef13441e9f7976e8725",
++      "target_sha256": "83c97a8941ef218ae4b40b2d6c6c8984c10d41c0e897886ae5cb3268895e4b76"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ClientGibFX.cpp",
++      "target": "src/game/original/Debris.cpp",
++      "source_line_ranges": [
++        [
++          98,
++          124
++        ]
++      ],
++      "selection": "Original active SetupClientGibFX mutates the input velocity by negating it per material. Typed owned requests preserve position, vector, dimensions, flags, scale, byte count and custom resources; no wire compression, rendering or gib simulation.",
++      "source_sha256": "df9438b10d31a49c787dde9a1f3795e11fc436dd37c34799ffa30de519f305ba",
++      "target_sha256": "e4847302b767964cb65443e37e3ff0ac0114a7b6cb7078ea1971c2f16b371e2a"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
++      "target": "src/game/original/radius_damage.cpp",
++      "source_line_ranges": [
++        [
++          501,
++          514
++        ],
++        [
++          534,
++          589
++        ]
++      ],
++      "selection": "Original CDestructable-list radius rule, squared mean dimensions, full damage below squared half-radius, squared falloff, boundary zero-damage message, and area flag. Add checked handle snapshot in source list order, live source/target guards, finite limits and delivery/cancellation report; no ray/activity/solid filter.",
++      "source_sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
++      "target_sha256": "11c34134ca0ae5ecbc69c9c6f37f1b7c22dd6b381db9bd878b0dc0742e203e99"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ObjectUtilities.h",
++      "target": "src/game/original/radius_damage.h",
++      "source_line_ranges": [
++        [
++          178,
++          180
++        ]
++      ],
++      "selection": "Typed local radius helper signature and explicit report; supported CDebris caller requires sender and responsible object to match.",
++      "source_sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
++      "target_sha256": "271f0486fa363c0f1eefe06a805d8d33aa301066d6bd6b104696c5f7ad30809b"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
++      "target": "src/game/original/DestructableBrush.cpp",
++      "source_line_ranges": [
++        [
++          47,
++          62
++        ],
++        [
++          173,
++          218
++        ]
++      ],
++      "selection": "Attach/bind CDebris, call Create before deferred brush removal, preserve aggregate dispatch. Remove Exploding rejection while retaining unsupported pushable/gravity and SpawnObject rejection.",
++      "source_sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
++      "target_sha256": "5d7ed0cd8454dec77958edb54436cfbc192ef2e26debd805e75bda10e9769e4b"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
++      "target": "src/game/original/DestructableBrush.h",
++      "source_line_ranges": [
++        [
++          364,
++          374
++        ]
++      ],
++      "selection": "Authored surface takes precedence; otherwise use first selected debris material. Do not rewrite authored surface user flags.",
++      "source_sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
++      "target_sha256": "22522e1f04b6c656e6ac94550f442d13f9b8ecaa42e147d448c589278bc3ba1c"
++    },
++    {
++      "source": "sources/blood2/Shared/SharedDefs.h",
++      "target": "src/game/original/Debris.h",
++      "source_line_ranges": [
++        [
++          502,
++          519
++        ]
++      ],
++      "selection": "Original numeric material surface IDs used by surface fallback and client effect flags.",
++      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "target_sha256": "83c97a8941ef218ae4b40b2d6c6c8984c10d41c0e897886ae5cb3268895e4b76"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ClientGibFX.h",
++      "target": "src/game/original/Debris.cpp",
++      "source_line_ranges": [
++        [
++          19,
++          24
++        ]
++      ],
++      "selection": "SIZE_SMALL and TYPEFLAG_CUSTOM constants; resources enable custom flag independently from authored Custom boolean.",
++      "source_sha256": "8bb51d7318ee13c3746f860c1f76d81c7c737c46a4033e3c6212657cd82f47bb",
++      "target_sha256": "e4847302b767964cb65443e37e3ff0ac0114a7b6cb7078ea1971c2f16b371e2a"
++    },
++    {
++      "source": "sources/blood2/Shared/SharedDefs.h",
++      "target": "src/game/weapon_messages.h",
++      "source_line_ranges": [
++        [
++          378,
++          395
++        ]
++      ],
++      "selection": "Explode base type 5; separate typed area_effect boolean for flag 16 instead of mixing flags into enum values. Existing selected damage semantics remain bounded.",
++      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "target_sha256": "e2b72ed1a64663a3be0d0773e5b765edbb2bd34d9c1213c9b0e6b79dc03b70e0"
++    },
++    {
++      "source": "sources/blood2/Shared/SFXMsgIds.h",
++      "target": "src/game/brush_messages.h",
++      "source_line_ranges": [
++        [
++          132,
++          132
++        ]
++      ],
++      "selection": "EXP_GRENADE numeric effect ID retained as pending-client-effect metadata.",
++      "source_sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f",
++      "target_sha256": "e8acf207fc7f1699a6533061b0959a067d0703b1209ef8ebe79e5fa12de7434d"
++    }
++  ],
++  "adaptations": [
++    "Copied bounded effect metadata is not an FX renderer, fragment simulation or audio queue",
++    "Source effective explosion damage/radius remain 100/200 despite authored overrides",
++    "Original multi-material request velocity alternates signs; singular normalization returns finite zero",
++    "Radius target handles snapshot original list order; skip pending targets, exclude newly spawned targets and cancel if source is removed",
++    "Typed Explode plus separate area flag; checked sender matches responsible source for the supported brush caller",
++    "WorldModelDebris, pushable/gravity brushes, SpawnObject, impulses, other explosion classes and full gameplay remain pending"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 55158ff..c31fcb8 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -277,3 +277,14 @@ a bounded diagnostic records removal requests without claiming FX playback.
+ [Contracts](BRUSH_CONTRACTS.md) distinguish source timing from the existing
+ replacement rotation solver and explain the supporting later-engine reference.
+ No reference source, prototype dependency or commercial content was modified.
++
++## M2 explosive brush and debris-request continuation
++
++[Source selections](M2_EXPLOSION_SOURCES.json) record original CDebris properties,
++material order, velocity and explosion branches, SetupClientGibFX's repeated
++in-place negation, and ObjectUtilities' squared-distance area damage. Owned
++inspection records replace unimplemented client FX/audio; they do not simulate
++fragments. [Contracts](EXPLOSION_CONTRACTS.md) document fixed effective damage/
++radius despite unused authored properties, snapshot/liveness guards and deferred
++chains. Earlier source ledgers remain historical. WorldModelDebris, pushable
++brushes, impulses, SpawnObject and full gameplay remain pending.
+diff --git a/src/app/brush_smoke.cpp b/src/app/brush_smoke.cpp
+index 6412e48..c79c1cb 100644
+--- a/src/app/brush_smoke.cpp
++++ b/src/app/brush_smoke.cpp
+@@ -2,7 +2,7 @@
+ #include "game/original/RotatingBrush.h"
+ namespace OpenBlood2
+ {
+-    bool prepare_brush_smoke(GameSession& g, ObjectId& id)
++    bool prepare_brush_smoke(GameSession& g, ObjectId& id, ObjectId& explosion)
+     {
+         WorldModel model;
+         model.name = "brush_smoke_platform";
+@@ -51,6 +51,27 @@ namespace OpenBlood2
+         if (!rider)
+             return false;
+         g.server.SetObjectDims(rider, &dims);
++        const auto base = g.world.models.back();
++        for (unsigned i = 0; i < 2; ++i)
++        {
++            auto fragment = base;
++            const DVector offset{1000.0f + 100.0f * i, 0, 0};
++            fragment.name = "explosion_smoke_" + std::to_string(i);
++            fragment.translation = vector_add(fragment.translation, offset);
++            for (auto& point : fragment.points)
++                point = vector_add(point, offset);
++            for (auto& plane : fragment.planes)
++                plane.distance += vector_dot(plane.normal, offset);
++            const auto name = fragment.name;
++            g.world.models.push_back(std::move(fragment));
++            auto source = g.objects.create(
++                g.objects.find_class("CDestructableBrush"), {}, Creation::World,
++                {{"Name", name}, {"HitPoints", 50.0f}, {"Exploding", true}, {"Stone", true}, {"Metal", true}});
++            if (!source)
++                return false;
++            if (i == 0)
++                explosion = g.objects.get(source)->id;
++        }
+         return true;
+     }
+     bool command_brush_smoke(GameSession& g, ObjectId id, const char* text)
+@@ -70,6 +91,10 @@ namespace OpenBlood2
+     {
+         const auto* r = g.objects.get(id);
+         const auto* b = r ? dynamic_cast<const RotatingBrush*>(r->game.get()) : nullptr;
+-        return b && b->rotating.angles.y > 0 && r->mover_moves > 0 && r->mover_riders > 0;
++        return b && b->rotating.angles.y > 0 && r->mover_moves > 0 && r->mover_riders > 0 &&
++               g.server.explosion_effects.size() == 2 && g.server.debris_effects.size() == 4 &&
++               g.server.explosion_effects[0].source == "explosion_smoke_0" &&
++               g.server.explosion_effects[1].source == "explosion_smoke_1" &&
++               !g.server.explosion_effects[0].targets.cancelled && !g.server.explosion_effects[1].targets.cancelled;
+     }
+ } // namespace OpenBlood2
+diff --git a/src/app/brush_smoke.h b/src/app/brush_smoke.h
+index 07faf12..64aff35 100644
+--- a/src/app/brush_smoke.h
++++ b/src/app/brush_smoke.h
+@@ -2,7 +2,7 @@
+ #include "game/server_adapter.h"
+ namespace OpenBlood2
+ {
+-    bool prepare_brush_smoke(GameSession&, ObjectId&);
++    bool prepare_brush_smoke(GameSession&, ObjectId&, ObjectId& explosion);
+     bool command_brush_smoke(GameSession&, ObjectId, const char*);
+     bool check_brush_smoke(GameSession&, ObjectId);
+ } // namespace OpenBlood2
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 5aea377..337de5b 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -1738,8 +1738,18 @@ namespace OpenBlood2
+ {
+     void Inspector::draw_brushes(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextWrapped("Original CDestructableBrush / RotatingBrush. Commands are queued to the simulation. "
+-                           "Failed source entries and authored debris properties remain in World.");
++        ImGui::TextWrapped(
++            "Original CDestructableBrush / RotatingBrush. Commands are queued to the simulation. "
++            "Failed source entries and authored properties remain in World. CDebris requests are inspectable below.");
++        ImGui::Text("Explosion requests: %zu | debris requests: %zu (FX/audio pending)",
++                    game.server.explosion_effects.size(), game.server.debris_effects.size());
++        if (!game.server.explosion_effects.empty())
++        {
++            const auto& event = game.server.explosion_effects.back();
++            ImGui::Text("Last: %s | damage %.0f / radius %.0f | delivered %u/%u%s", event.source.c_str(), event.damage,
++                        event.radius, event.targets.delivered, event.targets.candidates,
++                        event.targets.cancelled ? " [cancelled]" : "");
++        }
+         if (!ImGui::BeginTable("Brush inspection", 2, ImGuiTableFlags_Resizable))
+             return;
+         ImGui::TableSetupColumn("Objects", ImGuiTableColumnFlags_WidthFixed, 240);
+@@ -1827,6 +1837,29 @@ namespace OpenBlood2
+                         b->m_damage.trigger_only ? "yes" : "no");
+             ImGui::Text("Collision %s | FireThrough %s", b->box_physics ? "box" : "polygon",
+                         b->fire_through ? "yes" : "no");
++            ImGui::Text("Surface %u (authored %u) | debris amount %u / scale %.2f", b->GetSurfaceType(), b->surface,
++                        unsigned(b->debris.amount), b->debris.scale);
++            ImGui::Text("Exploding %s | effective damage 100 / radius 200", b->debris.exploding ? "yes" : "no");
++            if (ImGui::TreeNode("Debris properties / resource status"))
++            {
++                for (unsigned i = 0; i < CDebris::names.size(); ++i)
++                    ImGui::Text("%s: %s", CDebris::names[i], b->debris.materials[i] ? "yes" : "no");
++                auto resource = [&](const char* label, const std::string& path)
++                {
++                    ImGui::TextWrapped("%s: %s (%s)", label, path.c_str(),
++                                       path.empty()                ? "not authored"
++                                       : game.resources.find(path) ? "indexed, not loaded"
++                                                                   : "MISSING");
++                };
++                resource("Model", b->debris.model);
++                resource("Texture", b->debris.texture);
++                resource("Sound", b->debris.sound);
++                ImGui::TextWrapped(
++                    "Custom flag: %s. Resources enable custom FX independently. Original ReadProp "
++                    "ignores authored ExplodeDamage / DamageRadius; effective values above are preserved.",
++                    b->debris.custom ? "yes" : "no");
++                ImGui::TreePop();
++            }
+             if (ImGui::Button("KILL (diagnostic)"))
+             {
+                 brush_request = r->id;
+@@ -1836,9 +1869,45 @@ namespace OpenBlood2
+         else
+             ImGui::TextUnformatted("No live brush selected.");
+         ImGui::EndTable();
+-        ImGui::TextWrapped(
+-            "Debris FX/fragments, pushable brushes, explosions, SpawnObject and save/restore are pending. "
+-            "Rotation uses replacement engine collision; M2 remains open.");
++        ImGui::TextWrapped("Explosion damage is active. Debris/FX rendering, sound, world fragments, pushable brushes, "
++                           "SpawnObject and save/restore are pending. "
++                           "Rotation uses replacement engine collision; M2 remains open.");
++        if (ImGui::CollapsingHeader("Explosions: damage executed / FX and audio pending",
++                                    ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            for (const auto& event : game.server.explosion_effects)
++            {
++                ImGui::Text("%s: damage %.0f / radius %.0f | messages %u/%u%s", event.source.c_str(), event.damage,
++                            event.radius, event.targets.delivered, event.targets.candidates,
++                            event.targets.cancelled ? " [cancelled]" : "");
++                ImGui::PushID(&event);
++                if (ImGui::TreeNode("Request details"))
++                {
++                    ImGui::Text("Origin %.1f %.1f %.1f | type %u | in radius %u", event.position.x, event.position.y,
++                                event.position.z, event.type, event.targets.in_radius);
++                    ImGui::TextWrapped("Sound %s (%s; playback pending)", event.sound.c_str(),
++                                       game.resources.find(event.sound) ? "indexed" : "MISSING");
++                    ImGui::TextUnformatted("Delivered messages include protected/dead receivers; no visibility test.");
++                    ImGui::TreePop();
++                }
++                ImGui::PopID();
++            }
++        }
++        if (ImGui::TreeNode("Debris FX requests (latest 64; not rendered)"))
++        {
++            for (const auto& event : game.server.debris_effects)
++            {
++                ImGui::Text("%s: flags 0x%x / amount %u / scale %.2f", event.source.c_str(), event.flags,
++                            unsigned(event.amount), event.scale);
++                ImGui::Text("Velocity %.1f %.1f %.1f | dims %.1f %.1f %.1f", event.velocity.x, event.velocity.y,
++                            event.velocity.z, event.dimensions.x, event.dimensions.y, event.dimensions.z);
++                for (const auto* path : {&event.model, &event.texture, &event.sound})
++                    if (!path->empty())
++                        ImGui::TextWrapped("%s (%s)", path->c_str(),
++                                           game.resources.find(*path) ? "indexed, not loaded" : "MISSING");
++            }
++            ImGui::TreePop();
++        }
+         if (ImGui::TreeNode("Destruction requests (not rendered)"))
+         {
+             for (const auto& event : game.server.brush_destructions)
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index dd56a4d..e0c8b40 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -140,11 +140,11 @@ namespace
+                 return 4;
+             selection.id = smoke_door;
+         }
+-        OpenBlood2::ObjectId smoke_brush{};
++        OpenBlood2::ObjectId smoke_brush{}, smoke_explosion{};
+         bool brush_hidden = false;
+         if (options.brushes_smoke)
+         {
+-            if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush))
++            if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion))
+                 return 4;
+             selection.id = smoke_brush;
+         }
+@@ -270,7 +270,7 @@ namespace
+                 if (!OpenBlood2::prepare_interaction_smoke(game, smoke_door))
+                     return 4;
+             if (options.brushes_smoke && frames == reload_frame + 1)
+-                if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush))
++                if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion))
+                     return 4;
+             game.client_shell.use_down = controls.sample_use(text_editing);
+             auto keyboard = controls.sample(text_editing);
+@@ -537,6 +537,8 @@ namespace
+                 }
+                 if (options.brushes_smoke)
+                 {
++                    if (frames == hide_frame && !OpenBlood2::command_brush_smoke(game, smoke_explosion, "KILL"))
++                        return 4;
+                     if (frames == hide_frame || frames == 11)
+                         if (!OpenBlood2::command_brush_smoke(game, smoke_brush, "ON"))
+                             return 4;
+@@ -682,8 +684,8 @@ namespace
+                 spdlog::info("Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, "
+                              "unload/re-entry");
+             if (options.brushes_smoke)
+-                spdlog::info(
+-                    "Brush smoke passed: original ON/OFF ramps, hidden rotation/rider transport, inspection, reload");
++                spdlog::info("Brush smoke passed: original ON/OFF ramps, hidden rotation/rider transport and explosive "
++                             "chain, inspection, reload");
+             if (options.interaction_smoke)
+                 spdlog::info("Interaction smoke passed: SDL E press edge, USE key denial/unlock, rotation while "
+                              "hidden, inspection, reload");
+diff --git a/src/game/brush_messages.h b/src/game/brush_messages.h
+index f340c8e..562cf45 100644
+--- a/src/game/brush_messages.h
++++ b/src/game/brush_messages.h
+@@ -11,4 +11,27 @@ namespace OpenBlood2
+         float damage = 0;
+         DDWORD debris_amount = 0;
+     };
++    struct RadiusDamageReport
++    {
++        unsigned candidates = 0, in_radius = 0, delivered = 0;
++        bool cancelled = false;
++    };
++    struct DebrisEffect
++    {
++        std::string source;
++        DVector position{}, velocity{}, dimensions{};
++        DDWORD flags = 0;
++        float scale = 1;
++        DBYTE amount = 10;
++        std::string model, texture, sound;
++    };
++    struct ExplosionEffect
++    {
++        std::string source;
++        DVector position{}, normal{0, 1, 0};
++        DDWORD type = 3; // Source EXP_GRENADE.
++        float damage = 100, radius = 200, sound_radius = 1000;
++        std::string sound = "Sounds\\Weapons\\c4\\explosion_1.wav";
++        RadiusDamageReport targets;
++    };
+ } // namespace OpenBlood2
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index b09b594..7220717 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -30,6 +30,8 @@ class ServerDE : public CSBase
+   public:
+     virtual bool IsObjectAlive(HOBJECT) = 0;
+     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
++    virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
++    virtual void RecordExplosionEffect(const OpenBlood2::ExplosionEffect&) = 0;
+     virtual DRESULT WriteKeyMessage(HMESSAGEWRITE, const OpenBlood2::KeyMessage&) = 0;
+     virtual bool ReadKeyMessage(HMESSAGEREAD, OpenBlood2::KeyMessage&) = 0;
+     virtual OpenBlood2::MoverResult MoveWorldModel(HOBJECT, DVector destination) = 0;
+diff --git a/src/game/original/Debris.cpp b/src/game/original/Debris.cpp
+new file mode 100644
+index 0000000..c76e9ed
+--- /dev/null
++++ b/src/game/original/Debris.cpp
+@@ -0,0 +1,90 @@
++// Selected original CDebris and SetupClientGibFX; see M2_EXPLOSION_SOURCES.json.
++#include "Debris.h"
++#include "engine/collision.h"
++#include "radius_damage.h"
++#include <cmath>
++bool CDebris::Init(HOBJECT handle)
++{
++    if (!handle || !BaseClass::GetServerDE())
++        return false;
++    object = handle;
++    return true;
++}
++DDWORD CDebris::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* data, DFLOAT reason)
++{
++    auto* server = BaseClass::GetServerDE();
++    if (message == MID_PRECREATE && data && (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP))
++    {
++        GenericProp prop;
++        if (server->GetPropGeneric("Amount", &prop) == DE_OK)
++            amount = static_cast<DBYTE>(prop.m_Long);
++        auto boolean = [&](const char* key, bool& value)
++        {
++            if (server->GetPropGeneric(key, &prop) == DE_OK)
++                value = prop.m_Bool != 0;
++        };
++        for (unsigned i = 0; i < names.size(); ++i)
++            boolean(names[i], materials[i]);
++        boolean("Exploding", exploding);
++        boolean("Custom", custom);
++        server->GetPropReal("Scale", &scale);
++        auto text = [&](const char* key, std::string& value)
++        {
++            if (server->GetPropGeneric(key, &prop) == DE_OK)
++                value = prop.m_String;
++        };
++        text("CustomModel", model);
++        text("CustomTexture", texture);
++        text("CustomSound", sound);
++        valid = std::isfinite(scale) && std::abs(scale) <= 1e6f;
++    }
++    if (message == MID_INITIALUPDATE && reason != 3)
++        for (unsigned i = 0; i < materials.size(); ++i)
++            if (materials[i])
++            {
++                surface = surfaces[i];
++                break;
++            }
++    return Aggregate::EngineMessageFn(owner, message, data, reason);
++}
++void CDebris::Create(DVector direction, float damage)
++{
++    using namespace OpenBlood2;
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(object) || !physics_vector(direction) || !std::isfinite(damage))
++        return;
++    DebrisEffect effect;
++    effect.source = server->GetObjectName(object);
++    server->GetObjectPos(object, &effect.position);
++    server->GetObjectDims(object, &effect.dimensions);
++    effect.amount = amount;
++    effect.scale = scale;
++    effect.model = model;
++    effect.texture = texture;
++    effect.sound = sound;
++    direction = vector_scale(direction, -1);
++    direction.y -= 1;
++    const auto length = std::sqrt(vector_dot(direction, direction));
++    // Source normalizes zero when the damage direction is exactly (0,-1,0).
++    // Keep a finite zero launch vector for that singular input.
++    effect.velocity = length > 0 ? vector_scale(direction, (50 + damage) / length) : DVector{};
++    if (exploding)
++    {
++        ExplosionEffect explosion;
++        explosion.source = effect.source;
++        explosion.position = effect.position;
++        explosion.targets = DamageObjectsInRadius(object, server->HandleToObject(object), effect.position,
++                                                  explosion_radius, explosion_damage, DamageType::Explode);
++        server->RecordExplosionEffect(explosion);
++    }
++    const DDWORD custom_flag = (!model.empty() || !texture.empty() || !sound.empty()) ? 0x4000 : 0;
++    for (unsigned i = 0; i < materials.size(); ++i)
++        if (materials[i])
++        {
++            // SetupClientGibFX mutates the shared input vector on EACH call.
++            // Multi-material requests therefore alternate signs in source order.
++            effect.velocity = vector_scale(effect.velocity, -1);
++            effect.flags = surfaces[i] / 10 | 0x200 | custom_flag;
++            server->RecordDebrisEffect(effect);
++        }
++}
+diff --git a/src/game/original/Debris.h b/src/game/original/Debris.h
+new file mode 100644
+index 0000000..1923a07
+--- /dev/null
++++ b/src/game/original/Debris.h
+@@ -0,0 +1,30 @@
++#pragma once
++#include "cpp_aggregate_de.h"
++#include <array>
++#include <string>
++class CDebris : public Aggregate
++{
++  public:
++    bool Init(HOBJECT);
++    void Create(DVector direction, float damage);
++    unsigned GetType() const
++    {
++        return surface;
++    }
++    HOBJECT object = nullptr;
++    // Source emission order also defines the first selected surface.
++    static constexpr std::array<const char*, 9> names{"Stone", "Metal", "Wood",   "Terrain", "Plastic",
++                                                      "Glass", "Flesh", "Liquid", "Energy"};
++    static constexpr std::array<unsigned, 9> surfaces{10, 20, 30, 70, 90, 50, 100, 200, 40};
++    std::array<bool, 9> materials{};
++    bool exploding = false, custom = false, valid = true;
++    DBYTE amount = 10;
++    float scale = 1;
++    // Original ReadProp never reads the corresponding authored properties.
++    static constexpr float explosion_damage = 100, explosion_radius = 200;
++    unsigned surface = 0;
++    std::string model, texture, sound;
++
++  protected:
++    DDWORD EngineMessageFn(LPBASECLASS, DDWORD, void*, DFLOAT) override;
++};
+diff --git a/src/game/original/DestructableBrush.cpp b/src/game/original/DestructableBrush.cpp
+index 0cfe45d..85b8196 100644
+--- a/src/game/original/DestructableBrush.cpp
++++ b/src/game/original/DestructableBrush.cpp
+@@ -1,10 +1,11 @@
+-// Selected original brush lifecycle. Debris/FX and pushable-body physics remain unavailable.
++// Selected original brush lifecycle. Client FX and pushable-body physics remain unavailable.
+ #include "DestructableBrush.h"
+ #include "engine/collision.h"
+ #include <cmath>
+ CDestructableBrush::CDestructableBrush() : B2BaseClass(OT_WORLDMODEL)
+ {
+     AddAggregate(&m_damage);
++    AddAggregate(&debris);
+ }
+ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+ {
+@@ -12,7 +13,7 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
+     if (message == MID_PRECREATE)
+     {
+         const auto accepted = B2BaseClass::EngineMessageFn(message, data, reason);
+-        if (!accepted || !data || reason == 3)
++        if (!accepted || !data || reason == 3 || !debris.valid)
+             return 0;
+         auto& create = *static_cast<ObjectCreateStruct*>(data);
+         if (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP)
+@@ -37,13 +38,9 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
+                     return 0;
+                 surface = static_cast<unsigned>(prop.m_Long);
+             }
+-            if (reason == PRECREATE_WORLDFILE && server->GetPropGeneric("Amount", &prop) == DE_OK)
+-                debris_amount = static_cast<DBYTE>(prop.m_Long); // Original byte conversion.
+-            bool exploding = false;
+-            boolean("Exploding", exploding);
+             server->GetPropGeneric("SpawnObject", &prop);
+             // Do not create objects whose omitted branches change gameplay.
+-            if (pushable || (create.m_Flags & FLAG_GRAVITY) || exploding || prop.m_String[0])
++            if (pushable || (create.m_Flags & FLAG_GRAVITY) || prop.m_String[0])
+                 return 0;
+         }
+         if (create.m_Flags & FLAG_GRAVITY)
+@@ -60,7 +57,7 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
+     }
+     if (message == MID_INITIALUPDATE)
+     {
+-        if (!m_damage.Init(m_hObject))
++        if (!m_damage.Init(m_hObject) || !debris.Init(m_hObject))
+             return 0;
+         m_damage.SetHitPoints(hit_points);
+         m_damage.m_fMass = mass;
+@@ -70,7 +67,8 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
+     if (message == MID_UPDATE && destructable && m_damage.IsDead())
+     {
+         server->RecordBrushDestruction(m_hObject, m_damage.last_damage.direction, m_damage.m_fLastDamageAmount,
+-                                       debris_amount);
++                                       debris.amount);
++        debris.Create(m_damage.last_damage.direction, m_damage.m_fLastDamageAmount);
+         server->RemoveObject(m_hObject);
+     }
+     return B2BaseClass::EngineMessageFn(message, data, reason);
+diff --git a/src/game/original/DestructableBrush.h b/src/game/original/DestructableBrush.h
+index 2cb6cbe..0dc786f 100644
+--- a/src/game/original/DestructableBrush.h
++++ b/src/game/original/DestructableBrush.h
+@@ -1,15 +1,20 @@
+ #pragma once
+ #include "B2BaseClass.h"
++#include "Debris.h"
+ #include "Destructable.h"
+ class CDestructableBrush : public B2BaseClass
+ {
+   public:
+     CDestructableBrush();
+     CDestructable m_damage;
++    CDebris debris;
++    unsigned GetSurfaceType() const
++    {
++        return surface ? surface : debris.GetType();
++    }
+     bool destructable = true, pushable = false, box_physics = false, allow_marks = true, fire_through = false;
+     float hit_points = 0, mass = 100;
+     unsigned surface = 0;
+-    DBYTE debris_amount = 10;
+ 
+   protected:
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+diff --git a/src/game/original/radius_damage.cpp b/src/game/original/radius_damage.cpp
+new file mode 100644
+index 0000000..6711940
+--- /dev/null
++++ b/src/game/original/radius_damage.cpp
+@@ -0,0 +1,70 @@
++#include "radius_damage.h"
++#include "Destructable.h"
++#include "engine/collision.h"
++#include <cmath>
++#include <vector>
++OpenBlood2::RadiusDamageReport DamageObjectsInRadius(HOBJECT responsible, LPBASECLASS damager, DVector origin,
++                                                     float radius, float damage, OpenBlood2::DamageType type)
++{
++    using namespace OpenBlood2;
++    RadiusDamageReport report;
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !damager || damager->m_hObject != responsible || !server->IsObjectAlive(responsible) ||
++        !physics_vector(origin) || !std::isfinite(radius) || radius <= 0 || radius > 1e6f || !std::isfinite(damage) ||
++        damage < 0 || damage > 1e6f)
++    {
++        report.cancelled = true;
++        return report;
++    }
++    // Snapshot original list order before callbacks. A death relay can remove
++    // later targets or spawn aggregates; neither invalidates this traversal.
++    std::vector<HOBJECT> targets;
++    targets.reserve(CDestructable::m_dwNumDestructables);
++    auto& head = CDestructable::m_DestructableHead;
++    for (auto* link = head.m_pNext; link && link != &head; link = link->m_pNext)
++        targets.push_back(static_cast<CDestructable*>(link->m_pData)->m_hObject);
++    report.candidates = static_cast<unsigned>(targets.size());
++    const float squared = radius * radius, half = squared / 2;
++    if (half == 0)
++    {
++        report.cancelled = true;
++        return report;
++    }
++    for (auto target : targets)
++    {
++        if (!server->IsObjectAlive(responsible))
++        {
++            report.cancelled = true;
++            break;
++        }
++        if (!server->IsObjectAlive(target))
++            continue;
++        DVector position{}, dimensions{};
++        server->GetObjectPos(target, &position);
++        server->GetObjectDims(target, &dimensions);
++        const auto direction = vector_subtract(position, origin);
++        const auto average = (dimensions.x + dimensions.y + dimensions.z) / 3;
++        const auto distance = vector_dot(direction, direction) - average * average;
++        // Source uses squared distance minus squared average half-dimension,
++        // not a linear falloff or a visibility/solid-object query.
++        if (distance > squared)
++            continue;
++        const auto amount = distance < half ? damage : damage - (distance - half) / half * damage;
++        ++report.in_radius;
++        auto message = server->StartMessageToObject(damager, target, damage_message);
++        if (!message)
++        {
++            report.cancelled = true;
++            break;
++        }
++        const auto written = server->WriteDamage(message, {direction, origin, amount, type, responsible, true});
++        const auto delivered = server->EndMessage(message);
++        if (written != DE_OK || delivered != DE_OK)
++        {
++            report.cancelled = true;
++            break;
++        }
++        ++report.delivered; // Delivery is not proof of reduced health.
++    }
++    return report;
++}
+diff --git a/src/game/original/radius_damage.h b/src/game/original/radius_damage.h
+new file mode 100644
+index 0000000..c7ec582
+--- /dev/null
++++ b/src/game/original/radius_damage.h
+@@ -0,0 +1,5 @@
++#pragma once
++#include "cpp_server_de.h"
++// Selected ObjectUtilities::DamageObjectsInRadius rule; local typed transport.
++OpenBlood2::RadiusDamageReport DamageObjectsInRadius(HOBJECT responsible, LPBASECLASS damager, DVector origin,
++                                                     float radius, float damage, OpenBlood2::DamageType type);
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 30690ac..6226e83 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -35,6 +35,10 @@ namespace OpenBlood2
+         bool bind();
+         bool IsObjectAlive(HOBJECT) override;
+         void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE) override;
++        void RecordDebrisEffect(const DebrisEffect&) override;
++        void RecordExplosionEffect(const ExplosionEffect&) override;
++        std::vector<DebrisEffect> debris_effects;
++        std::vector<ExplosionEffect> explosion_effects;
+         std::vector<BrushDestruction> brush_destructions; // Latest 32, reset on unload.
+         DRESULT WriteKeyMessage(HMESSAGEWRITE, const KeyMessage&) override;
+         bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
+@@ -51,6 +55,8 @@ namespace OpenBlood2
+         {
+             world_time_origin_ = objects_.time();
+             brush_destructions.clear();
++            debris_effects.clear();
++            explosion_effects.clear();
+         }
+         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
+         bool GetMovementState(HOBJECT, MovementState&) override;
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+new file mode 100644
+index 0000000..df40fcf
+--- /dev/null
++++ b/src/game/server_effects.cpp
+@@ -0,0 +1,27 @@
++#include "game/server_adapter.h"
++#include <cmath>
++namespace OpenBlood2
++{
++    // These copied, bounded records expose pending client FX/audio. They do not
++    // enqueue gameplay and never retain a pointer into an original object.
++    void ServerAdapter::RecordDebrisEffect(const DebrisEffect& effect)
++    {
++        trace_service("RecordDebrisEffect");
++        if (!physics_vector(effect.position) || !physics_vector(effect.velocity) ||
++            !physics_vector(effect.dimensions) || !std::isfinite(effect.scale))
++            return;
++        if (debris_effects.size() == 64)
++            debris_effects.erase(debris_effects.begin());
++        debris_effects.push_back(effect);
++    }
++    void ServerAdapter::RecordExplosionEffect(const ExplosionEffect& effect)
++    {
++        trace_service("RecordExplosionEffect");
++        if (!physics_vector(effect.position) || !physics_vector(effect.normal) || !std::isfinite(effect.damage) ||
++            !std::isfinite(effect.radius))
++            return;
++        if (explosion_effects.size() == 32)
++            explosion_effects.erase(explosion_effects.begin());
++        explosion_effects.push_back(effect);
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/server_weapons.cpp b/src/game/server_weapons.cpp
+index f83c783..9f21b0d 100644
+--- a/src/game/server_weapons.cpp
++++ b/src/game/server_weapons.cpp
+@@ -75,7 +75,7 @@ namespace OpenBlood2
+             attacker->life != Life::Alive || m->sender != value.attacker || !physics_vector(value.position) ||
+             !physics_vector(value.direction) || !std::isfinite(value.amount) || value.amount < 0 ||
+             value.amount > 1e6f ||
+-            (value.type != DamageType::Normal && value.type != DamageType::Melee &&
++            (value.type != DamageType::Normal && value.type != DamageType::Melee && value.type != DamageType::Explode &&
+              value.type != DamageType::Suffocate && value.type != DamageType::Death &&
+              value.type != DamageType::FreeFall && value.type != DamageType::Blind && value.type != DamageType::Slow &&
+              value.type != DamageType::Acid))
+diff --git a/src/game/weapon_messages.h b/src/game/weapon_messages.h
+index 4153091..3060f95 100644
+--- a/src/game/weapon_messages.h
++++ b/src/game/weapon_messages.h
+@@ -14,6 +14,7 @@ namespace OpenBlood2
+     {
+         Normal = 0,
+         Melee = 4,
++        Explode = 5,
+         Suffocate = 6,
+         Death = 7,
+         FreeFall = 8,
+@@ -27,6 +28,7 @@ namespace OpenBlood2
+         float amount = 0;
+         DamageType type = DamageType::Normal;
+         HOBJECT attacker = nullptr;
++        bool area_effect = false; // Source DAMAGE_FLAG_AREAEFFECT, separate from the base type.
+     };
+     inline constexpr DDWORD damage_message = 1001; // Source AppHeaders/generic_msg_de.h MID_DAMAGE.
+     struct SegmentHit
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index f7992f3..fc017c4 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -243,3 +243,11 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --brushes-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/brushes.png")
+     set_tests_properties(gpu.brushes PROPERTIES LABELS "private;gpu;brushes" TIMEOUT 30 RUN_SERIAL TRUE)
+ endif()
++
++add_executable(explosion_tests explosion_tests.cpp)
++target_link_libraries(explosion_tests PRIVATE blood2_game)
++blood2_project_options(explosion_tests)
++foreach(case IN ITEMS properties requests radius chain gates lifetime limits player)
++    add_test(NAME explosions.${case} COMMAND explosion_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/explosion-fixtures/${case}")
++    set_tests_properties(explosions.${case} PROPERTIES LABELS "headless;explosions" TIMEOUT 30)
++endforeach()
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index dbf6d92..ed252e0 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -143,7 +143,6 @@ namespace
+         CHECK(test_player::setup(g, root, false));
+         CHECK(!brush(g, {{"Pushable", true}}));
+         CHECK(!brush(g, {{"Gravity", true}}));
+-        CHECK(!brush(g, {{"Exploding", true}}));
+         CHECK(!brush(g, {{"SpawnObject", std::string("Enemy")}}));
+         CHECK(!brush(g, {{"YAxisRevTime", 1e-40f}}));
+         CHECK(!brush(g, {{"Rotation", rotation_from_euler({0, .4f, 0})}}));
+@@ -248,7 +247,7 @@ namespace
+         CHECK(g.resources.mount_game(Config{root, "private"}, error));
+         struct Count
+         {
+-            unsigned created = 0, rejected = 0, filtered = 0, moved = 0;
++            unsigned created = 0, rejected = 0, filtered = 0, moved = 0, explosive = 0, detonated = 0;
+         };
+         std::map<std::string, Count> counts;
+         std::map<std::string, unsigned> failures;
+@@ -304,8 +303,6 @@ namespace
+                             };
+                             if (enabled("Pushable") || enabled("Gravity"))
+                                 kind = "pushable/gravity";
+-                            else if (enabled("Exploding"))
+-                                kind = "exploding";
+                             else if (props.contains("SpawnObject") &&
+                                      !std::get<std::string>(props.at("SpawnObject")).empty())
+                                 kind = "spawn";
+@@ -328,7 +325,26 @@ namespace
+                     for (int i = 0; i < 4; ++i)
+                         CHECK(g.step(.02));
+                     count.moved += r->mover_moves > 0;
+-                    CHECK(g.objects.remove(h));
++                    auto& brush = destruct(g, h);
++                    if (brush.debris.exploding)
++                    {
++                        ++count.explosive;
++                        CHECK(brush.debris.explosion_damage == 100 && brush.debris.explosion_radius == 200);
++                        const std::string name = r->state.m_Name;
++                        const bool removes = brush.destructable && brush.m_damage.can_damage;
++                        CHECK(command(g, h, "KILL") && g.step(.002));
++                        if (removes)
++                        {
++                            ++count.detonated;
++                            CHECK(!g.objects.get(h) && !g.server.explosion_effects.empty());
++                            const auto& effect = g.server.explosion_effects.back();
++                            CHECK(effect.source == name && effect.targets.delivered == 1 && !effect.targets.cancelled);
++                        }
++                        else
++                            CHECK(g.objects.remove(h));
++                    }
++                    else
++                        CHECK(g.objects.remove(h));
+                 }
+                 CHECK(g.objects.finish_frame() && g.objects.snapshot().empty() &&
+                       CDestructable::m_dwNumDestructables == 0);
+@@ -336,13 +352,14 @@ namespace
+         }
+         for (const auto& [name, c] : counts)
+             std::cout << name << " created=" << c.created << " rejected=" << c.rejected << " filtered=" << c.filtered
+-                      << " moved=" << c.moved << '\n';
++                      << " moved=" << c.moved << " explosive=" << c.explosive << " detonated=" << c.detonated << '\n';
+         for (const auto& [name, n] : failures)
+             std::cout << name << "=" << n << '\n';
+         CHECK(unreadable == 1 && counts["RotatingBrush"].created == 98 && counts["RotatingBrush"].rejected == 38 &&
+               counts["RotatingBrush"].moved == 98 && counts["RotatingBrush"].filtered == 0 &&
+-              counts["CDestructableBrush"].created == 2115 && counts["CDestructableBrush"].rejected == 340 &&
+-              counts["CDestructableBrush"].filtered == 0);
++              counts["CDestructableBrush"].created == 2162 && counts["CDestructableBrush"].rejected == 293 &&
++              counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 47 &&
++              counts["CDestructableBrush"].detonated == 47);
+         CHECK(g.request_world("01_SubwayA", error));
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+diff --git a/tests/explosion_tests.cpp b/tests/explosion_tests.cpp
+new file mode 100644
+index 0000000..0eeed70
+--- /dev/null
++++ b/tests/explosion_tests.cpp
+@@ -0,0 +1,325 @@
++#include "brush_fixture.h"
++#include "game/original/DestructableBrush.h"
++#include "game/original/radius_damage.h"
++#include "player_fixture.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .01f;
++    }
++    // Test-only receiver with the real aggregate and callback-removal hooks.
++    struct Target : BaseClass
++    {
++        CDestructable damage;
++        HOBJECT remove_target = nullptr;
++        unsigned hits = 0;
++        bool remove_sender = false;
++        std::function<void()> callback;
++        Target()
++        {
++            AddAggregate(&damage);
++        }
++        DDWORD EngineMessageFn(DDWORD id, void* data, float reason) override
++        {
++            if (id == MID_INITIALUPDATE)
++            {
++                damage.Init(m_hObject);
++                damage.SetHitPoints(1000);
++            }
++            return BaseClass::EngineMessageFn(id, data, reason);
++        }
++        DDWORD ObjectMessageFn(HOBJECT sender, DDWORD id, HMESSAGEREAD read) override
++        {
++            auto result = BaseClass::ObjectMessageFn(sender, id, read);
++            if (id == damage_message)
++            {
++                ++hits;
++                if (remove_target)
++                    g_pServerDE->RemoveObject(remove_target);
++                if (remove_sender)
++                    g_pServerDE->RemoveObject(sender);
++                if (callback)
++                    callback();
++            }
++            return result;
++        }
++    };
++    Target* target(GameSession& g, DVector pos, DVector dims = {})
++    {
++        static ClassInfo type{"ExplosionTestTarget",
++                              nullptr,
++                              []() -> std::unique_ptr<BaseClass> { return std::make_unique<Target>(); },
++                              {}};
++        if (!g.objects.find_class(type.name))
++        {
++            type.parent = g.objects.find_class("BaseClass");
++            if (!g.objects.register_class(type))
++                return nullptr;
++        }
++        ObjectCreateStruct state;
++        state.m_Pos = pos;
++        auto h = g.objects.create(&type, state);
++        if (!h)
++            return nullptr;
++        g.server.SetObjectDims(h, &dims);
++        return dynamic_cast<Target*>(g.server.HandleToObject(h));
++    }
++    CDestructableBrush* brush(GameSession& g, DVector pos = {0, 100, 0}, Properties props = {},
++                              Creation reason = Creation::World)
++    {
++        const auto name = "blast" + std::to_string(g.world.models.size());
++        auto model = test_brush::box(name, vector_subtract(pos, {2, 2, 2}), vector_add(pos, {2, 2, 2}));
++        model.translation = pos;
++        g.world.models.push_back(std::move(model));
++        props["Name"] = name;
++        props.try_emplace("HitPoints", 50.0f);
++        auto h = g.objects.create(g.objects.find_class("CDestructableBrush"), {}, reason, props);
++        return h ? dynamic_cast<CDestructableBrush*>(g.server.HandleToObject(h)) : nullptr;
++    }
++    bool kill(GameSession& g, HOBJECT h)
++    {
++        auto str = g.server.CreateString("KILL");
++        auto message = g.server.StartMessageToObject(g.server.HandleToObject(h), h, 1000);
++        CHECK(message && g.server.WriteToMessageHString(message, str) == DE_OK);
++        CHECK(g.server.EndMessage(message) == DE_OK);
++        g.server.FreeString(str);
++        return true;
++    }
++    bool properties(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        for (auto reason : {Creation::World, Creation::String})
++        {
++            auto* b = brush(g, {},
++                            {{"Amount", std::int32_t(258)},
++                             {"Stone", true},
++                             {"Metal", true},
++                             {"Energy", true},
++                             {"Liquid", true},
++                             {"Custom", true},
++                             {"Exploding", true},
++                             {"ExplodeDamage", 999.0f},
++                             {"DamageRadius", 888.0f},
++                             {"Scale", -2.0f}},
++                            reason);
++            CHECK(b && b->debris.amount == 2 && b->debris.scale == -2 && b->debris.custom && b->debris.exploding);
++            CHECK(b->GetSurfaceType() == 10 && b->debris.explosion_damage == 100 && b->debris.explosion_radius == 200);
++            CHECK((g.objects.get(b->m_hObject)->user_flags >> 24) == 0); // Fallback is a query, not a flag rewrite.
++        }
++        auto* explicit_surface = brush(g, {}, {{"SurfaceType", std::int32_t(50)}, {"Stone", true}});
++        CHECK(explicit_surface && explicit_surface->GetSurfaceType() == 50);
++        auto* runtime = brush(g, {}, {}, Creation::Runtime);
++        // Runtime creation does not read property overrides, hence Name cannot bind.
++        CHECK(!runtime);
++        CHECK(!brush(g, {}, {{"Scale", std::numeric_limits<float>::infinity()}}));
++        CHECK(!brush(g, {}, {{"Scale", 1e7f}}));
++        CHECK(!brush(g, {}, {{"Pushable", true}, {"Exploding", true}}));
++        CHECK(!brush(g, {}, {{"SpawnObject", std::string("Enemy")}, {"Exploding", true}}));
++        CHECK(g.unload_world() && CDestructable::m_dwNumDestructables == 0 && g.server.string_count() == 0);
++        return true;
++    }
++    bool requests(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto* b = brush(g, {},
++                        {{"Stone", true},
++                         {"Metal", true},
++                         {"Wood", true},
++                         {"Amount", std::int32_t(-1)},
++                         {"CustomModel", std::string("models\\missing.abc")},
++                         {"CustomSound", std::string("sounds\\missing.wav")}});
++        CHECK(b);
++        b->debris.Create({0, 0, 1}, 50);
++        CHECK(g.server.debris_effects.size() == 3 && g.server.explosion_effects.empty());
++        const auto& a = g.server.debris_effects;
++        CHECK(a[0].amount == 255 && a[0].flags == (1 | 0x200 | 0x4000));
++        CHECK(a[1].flags == (2 | 0x200 | 0x4000) && a[2].flags == (3 | 0x200 | 0x4000));
++        CHECK(near(a[0].velocity.y, 70.7107f) && near(a[0].velocity.z, 70.7107f));
++        CHECK(near(a[1].velocity.y, -70.7107f) && near(a[2].velocity.y, 70.7107f));
++        CHECK(!b->debris.custom && a[0].model == "models\\missing.abc" && a[0].sound == "sounds\\missing.wav");
++        CHECK(a[0].dimensions.x == 2);
++        b->debris.Create({0, -1, 0}, 50);
++        CHECK(g.server.debris_effects.back().velocity.y == 0 && g.server.debris_effects.back().velocity.z == 0);
++        auto* custom_only = brush(g, {}, {{"Custom", true}});
++        CHECK(custom_only);
++        custom_only->debris.Create({}, 0);
++        CHECK(g.server.debris_effects.size() == 6); // Custom alone selects no material.
++        for (int i = 0; i < 30; ++i)
++            b->debris.Create({}, 0);
++        CHECK(g.server.debris_effects.size() == 64);
++        auto saved = g.server.debris_effects.back().source;
++        CHECK(g.objects.remove(b->m_hObject) && g.objects.finish_frame());
++        CHECK(g.server.debris_effects.back().source == saved);
++        CHECK(g.unload_world() && g.server.debris_effects.empty());
++        return true;
++    }
++    bool radius(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto* b = brush(g);
++        CHECK(b);
++        auto* full = target(g, {100, 100, 0});
++        auto* falloff = target(g, {150, 100, 0});
++        auto* edge = target(g, {200, 100, 0});
++        auto* outside = target(g, {201, 100, 0});
++        auto* large = target(g, {210, 100, 0}, {90, 90, 90});
++        CHECK(full && falloff && edge && outside && large);
++        g.server.SetObjectState(full->m_hObject, OBJSTATE_INACTIVE);
++        // A solid occluder is intentionally ignored by the source area rule.
++        CHECK(brush(g, {50, 100, 0}, {{"CanDamage", false}}));
++        auto report = DamageObjectsInRadius(b->m_hObject, b, {0, 100, 0}, 200, 100, DamageType::Explode);
++        CHECK(!report.cancelled && report.candidates == 7 && report.delivered == 6);
++        CHECK(near(full->damage.m_fHitPoints, 900) && near(falloff->damage.m_fHitPoints, 912.5f));
++        CHECK(edge->hits == 1 && edge->damage.m_fHitPoints == 1000 && outside->hits == 0);
++        CHECK(near(large->damage.m_fHitPoints, 980));
++        CHECK(full->damage.last_damage.area_effect && full->damage.last_damage.type == DamageType::Explode);
++        CHECK(full->damage.last_damage.attacker == b->m_hObject && full->damage.last_damage.direction.x == 100);
++        return true;
++    }
++    bool chain(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto* first = brush(g, {0, 100, 0}, {{"Exploding", true}, {"Metal", true}});
++        auto* second = brush(g, {100, 100, 0}, {{"Exploding", true}, {"Stone", true}});
++        auto* third = brush(g, {250, 100, 0}, {{"Exploding", true}, {"Glass", true}});
++        CHECK(first && second && third);
++        const auto h1 = first->m_hObject, h2 = second->m_hObject, h3 = third->m_hObject;
++        CHECK(kill(g, h1) && g.server.explosion_effects.empty());
++        CHECK(g.step(.002) && !g.objects.get(h1) && second->m_damage.IsDead() && !third->m_damage.IsDead());
++        CHECK(g.server.explosion_effects.size() == 1 && g.server.debris_effects.size() == 1);
++        CHECK(g.step(.002) && !g.objects.get(h2) && third->m_damage.IsDead());
++        CHECK(g.step(.002) && !g.objects.get(h3) && g.objects.snapshot().empty());
++        CHECK(g.server.explosion_effects.size() == 3 && g.server.debris_effects.size() == 3);
++        CHECK(g.server.brush_destructions.size() == 3 && CDestructable::m_dwNumDestructables == 0);
++        const auto& effect = g.server.explosion_effects[0];
++        CHECK(effect.type == 3 && effect.normal.y == 1 && effect.radius == 200 && effect.damage == 100);
++        CHECK(effect.sound == "Sounds\\Weapons\\c4\\explosion_1.wav" && effect.sound_radius == 1000);
++        CHECK(g.step(.1) && g.server.explosion_effects.size() == 3);
++        CHECK(g.unload_world() && g.server.explosion_effects.empty());
++        return true;
++    }
++    bool gates(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto* b = brush(g);
++        auto* god = target(g, {0, 100, 0});
++        auto* locked = target(g, {0, 100, 0});
++        auto* trigger = target(g, {0, 100, 0});
++        auto* armored = target(g, {0, 100, 0});
++        CHECK(b && god && locked && trigger && armored);
++        god->damage.m_bGodMode = true;
++        locked->damage.can_damage = false;
++        trigger->damage.trigger_only = true;
++        armored->damage.SetArmorPoints(100);
++        auto report = DamageObjectsInRadius(b->m_hObject, b, {0, 100, 0}, 200, 100, DamageType::Explode);
++        CHECK(report.delivered == 5 && !report.cancelled);
++        CHECK(god->damage.m_fHitPoints == 1000 && locked->damage.m_fHitPoints == 1000 &&
++              trigger->damage.m_fHitPoints == 1000);
++        CHECK(near(armored->damage.m_fHitPoints, 970) && near(armored->damage.m_fArmorPoints, 30));
++        auto* retained = brush(g, {1000, 100, 0}, {{"Destructable", false}, {"Exploding", true}});
++        CHECK(retained && kill(g, retained->m_hObject) && g.step(.002));
++        CHECK(g.server.IsObjectAlive(retained->m_hObject) && g.server.explosion_effects.empty());
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto* b = brush(g, {0, 100, 0}, {{"Exploding", true}, {"Glass", true}});
++        auto* victim = target(g, {0, 100, 0});
++        auto* remover = target(g, {0, 100, 0});
++        CHECK(b && victim && remover);
++        // List inserts at its head: newest receiver removes the later target.
++        remover->remove_target = victim->m_hObject;
++        auto report = DamageObjectsInRadius(b->m_hObject, b, {0, 100, 0}, 200, 10, DamageType::Explode);
++        CHECK(!report.cancelled && report.candidates == 3 && report.delivered == 2 && victim->hits == 0);
++        CHECK(g.objects.finish_frame());
++        Target* spawned = nullptr;
++        remover->callback = [&]()
++        {
++            if (!spawned)
++                spawned = target(g, {0, 100, 0});
++        };
++        report = DamageObjectsInRadius(b->m_hObject, b, {0, 100, 0}, 200, 1, DamageType::Explode);
++        CHECK(!report.cancelled && report.candidates == 2 && spawned && spawned->hits == 0);
++        CHECK(g.objects.remove(spawned->m_hObject) && g.objects.finish_frame());
++        remover->callback = {};
++        remover->remove_sender = true;
++        const auto source = b->m_hObject;
++        CHECK(kill(g, source) && g.step(.002) && !g.objects.get(source));
++        CHECK(g.server.explosion_effects.size() == 1 && g.server.explosion_effects[0].targets.cancelled);
++        CHECK(g.server.debris_effects.size() == 1); // Copied FX request survives source removal.
++        CHECK(g.server.message_count() == 0 && g.server.string_count() == 0);
++        CHECK(g.unload_world() && CDestructable::m_dwNumDestructables == 0);
++        return true;
++    }
++    bool limits(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto* b = brush(g, {}, {{"Exploding", true}, {"CanDamage", false}});
++        CHECK(b);
++        for (float radius : {0.0f, -1.0f, 1e-30f, 1e7f, std::numeric_limits<float>::infinity()})
++            CHECK(DamageObjectsInRadius(b->m_hObject, b, {}, radius, 10, DamageType::Explode).cancelled);
++        CHECK(DamageObjectsInRadius(b->m_hObject, b, {}, 200, -1, DamageType::Explode).cancelled);
++        CHECK(DamageObjectsInRadius(b->m_hObject, nullptr, {}, 200, 1, DamageType::Explode).cancelled);
++        for (int i = 0; i < 40; ++i)
++            b->debris.Create({}, 0);
++        CHECK(g.server.explosion_effects.size() == 32 && g.server.debris_effects.empty());
++        CHECK(g.server.explosion_effects.back().targets.delivered == 1 && !b->m_damage.IsDead());
++        CHECK(g.objects.remove(b->m_hObject));
++        CHECK(DamageObjectsInRadius(b->m_hObject, b, {}, 200, 1, DamageType::Explode).cancelled);
++        CHECK(g.objects.finish_frame());
++        return true;
++    }
++    bool player(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* player = g.server_shell.Player(g.local_client);
++        CHECK(player);
++        auto position = g.objects.get(player->m_hObject)->state.m_Pos;
++        auto* b = brush(g, vector_add(position, {100, 0, 0}), {{"Exploding", true}});
++        CHECK(b);
++        player->m_damage.SetHitPoints(250);
++        player->m_damage.SetArmorPoints(100);
++        CHECK(kill(g, b->m_hObject) && g.step(.002));
++        CHECK(near(player->m_damage.m_fHitPoints, 220) && near(player->m_damage.m_fArmorPoints, 30));
++        CHECK(player->m_damage.last_damage.type == DamageType::Explode && player->m_damage.last_damage.area_effect);
++        CHECK(g.step(.01) && near(g.client_shell.stats.health, 220) && near(g.client_shell.stats.armor, 30));
++        CHECK(g.leave_player() && g.unload_world() && g.objects.snapshot().empty());
++        CHECK(g.server.message_count() == 0 && g.server.string_count() == 0 &&
++              CDestructable::m_dwNumDestructables == 0);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"properties", properties}, {"requests", requests}, {"radius", radius}, {"chain", chain},
++        {"gates", gates},           {"lifetime", lifetime}, {"limits", limits}, {"player", player}};
++    auto it = cases.find(argv[1]);
++    return it == cases.end() ? 2 : it->second(path_from_utf8(argv[2])) ? 0 : 1;
++}

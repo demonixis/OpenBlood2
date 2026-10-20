@@ -1,0 +1,14 @@
+445/644 Testing: ai_runtime.tracking
+445/644 Test: ai_runtime.tracking
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_runtime_tests" "tracking"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_runtime.tracking" start time: Oct 17 04:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.tracking" end time: Oct 17 04:04 CEST
+"ai_runtime.tracking" time elapsed: 00:00:00
+----------------------------------------------------------

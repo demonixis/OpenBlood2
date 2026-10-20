@@ -1,0 +1,9 @@
+[0/2] Re-checking globbed directories...
+[1/11] Scanning /home/yann/projects/lithtech/Blood2/tests/blood_spurt_tests.cpp for CXX dependencies
+[2/11] Generating CXX dyndep file tests/CMakeFiles/blood_spurt_tests.dir/CXX.dd
+[3/10] Scanning /home/yann/projects/lithtech/Blood2/tests/train_session_tests.cpp for CXX dependencies
+[4/10] Generating CXX dyndep file tests/CMakeFiles/train_session_tests.dir/CXX.dd
+[5/9] Building CXX object tests/CMakeFiles/train_session_tests.dir/train_session_tests.cpp.o
+[6/9] Building CXX object tests/CMakeFiles/blood_spurt_tests.dir/blood_spurt_tests.cpp.o
+[7/9] Linking CXX executable tests/train_session_tests
+[8/9] Linking CXX executable tests/blood_spurt_tests

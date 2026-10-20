@@ -1,0 +1,14 @@
+396/406 Testing: ai_locomotion.obstruction
+396/406 Test: ai_locomotion.obstruction
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "obstruction"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.obstruction" start time: Oct 16 13:42 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.obstruction" end time: Oct 16 13:42 CEST
+"ai_locomotion.obstruction" time elapsed: 00:00:00
+----------------------------------------------------------

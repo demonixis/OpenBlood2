@@ -1,0 +1,15 @@
+453/618 Testing: ai_runtime.sparse_weapons
+453/618 Test: ai_runtime.sparse_weapons
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_runtime_tests" "sparse_weapons" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_runtime.sparse_weapons" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+Sparse IDs 41/27/38/42 and duplicate fifth slot initialized three times through original NPC lifecycle.
+<end of output>
+Test time =   0.96 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.sparse_weapons" end time: Oct 17 02:23 CEST
+"ai_runtime.sparse_weapons" time elapsed: 00:00:00
+----------------------------------------------------------

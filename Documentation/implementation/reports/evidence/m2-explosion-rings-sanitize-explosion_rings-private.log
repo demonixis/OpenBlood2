@@ -1,0 +1,38 @@
+534/534 Testing: explosion_rings.private
+534/534 Test: explosion_rings.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_ring_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_rings.private" start time: Oct 16 21:15 CEST
+Output:
+----------------------------------------------------------
+SubwayA cycle 0: nine emitters, 36 rings, 1152 reserved particles; all expired, IDs through 36
+SubwayA cycle 1: nine emitters, 36 rings, 1152 reserved particles; all expired, IDs through 72
+SubwayA cycle 2: nine emitters, 36 rings, 1152 reserved particles; all expired, IDs through 108
+<end of output>
+Test time =  17.10 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_rings.private" end time: Oct 16 21:15 CEST
+"explosion_rings.private" time elapsed: 00:00:17
+----------------------------------------------------------
+
+End testing: Oct 16 21:15 CEST
+
+explosion_lights =  16.24 sec*proc
+
+explosion_models =  11.79 sec*proc
+
+explosion_rings =  17.21 sec*proc
+
+explosion_sprites =   8.05 sec*proc
+
+headless =  93.97 sec*proc
+
+objects =   0.41 sec*proc
+
+private =  92.13 sec*proc
+
+sceneexplosion =  28.18 sec*proc
+
+sprite_view =  12.09 sec*proc
+

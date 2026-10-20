@@ -1,0 +1,14 @@
+319/323 Testing: model_view.sample
+319/323 Test: model_view.sample
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/model_view_tests" "sample"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"model_view.sample" start time: Oct 16 10:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"model_view.sample" end time: Oct 16 10:04 CEST
+"model_view.sample" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,1262 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index c8495e0..f2019b0 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -220,3 +220,10 @@ base-handler exclusion. Validate complete numeric groups before mutation; stop o
+ service failure and preserve deferred touch removal. The seven examined character
+ assets contain no motion keys; synthetic probes are explicitly labelled, not AI.
+ AI states/hearing/fire, ExitTrigger, client FX and the actual M2 gate remain open.
++
++The latest [AI model-key evidence](../Documentation/Implementation/M2_AI_MODEL_KEYS.md) connects selected AI_Mgr animation-key
++sound dispatch, actual decoded voices and inspection. Read [contracts](docs/AI_MODEL_KEY_CONTRACTS.md).
++Preserve source branch priority, server-camera/script early returns, B2_LITE's
++1..3 variants, chance draw ordering and class/gender shared voice lifetime.
++Fire/show_weapon/extra remain unavailable; diagnostic probes are not registered
++world AI. CivilianAI, CultistAI, Gideon, ExitTrigger and the actual M2 gate stay open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index cb6e715..7c4f63b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -39,7 +39,7 @@ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original
+ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+-target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
++target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+     src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+@@ -48,7 +48,7 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/character_motion_smoke.cpp src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
++add_executable(blood2_app src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+diff --git a/README.md b/README.md
+index cbb9a6e..d82cf93 100644
+--- a/README.md
++++ b/README.md
+@@ -247,5 +247,14 @@ adds bounded bracket parameters, source-ordered rotation/velocity/displacement/d
+ and truthful inspection. Synthetic motion and actual private-key coverage are
+ separate; remaining AI/classes/services keep M2 incomplete.
+ 
+-This increment passed 290/290 tests in both Debug and inspector-free Release,
++The preceding character-motion increment passed 290/290 tests in both Debug and inspector-free Release,
+ and 267/267 sequential headless tests with Clang ASan/UBSan/leak checks on Linux.
++
++Latest M2 continuation: [original AI animation-key audio](../Documentation/Implementation/M2_AI_MODEL_KEYS.md)
++executes 140 sound markers from six real NPC models through the original dispatch
++rules. Fire/extra actions and complete NPC behavior remain unavailable; the
++17 unsupported SubwayA entries and actual M2 acceptance gate are unchanged.
++
++The AI model-key increment passed 300/300 tests in Debug and inspector-free
++Release, plus 277/277 sequential headless checks with Clang ASan/UBSan/leak
++detection on Linux. The diagnostic GPU probe preserves actual NPC model keys.
+diff --git a/docs/AI_MODEL_KEY_CONTRACTS.md b/docs/AI_MODEL_KEY_CONTRACTS.md
+new file mode 100644
+index 0000000..bef7884
+--- /dev/null
++++ b/docs/AI_MODEL_KEY_CONTRACTS.md
+@@ -0,0 +1,107 @@
++# Original AI animation keys
++
++M2 remains incomplete. This selectively ports AI_Mgr::InitStatics and OnStringKey,
++using the existing [character audio](CHARACTER_AUDIO_CONTRACTS.md),
++[motion keys](CHARACTER_MOTION_CONTRACTS.md), [camera](CAMERA_CONTRACTS.md) and
++[object lifetime](OBJECT_CONTRACTS.md) services. See the
++[source ledger](M2_AI_MODEL_KEY_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_AI_MODEL_KEYS.md).
++No production AI class is registered: CivilianAI, CultistAI and Gideon still
++require their original states, initialization, perception, movement and attacks.
++
++## Dispatch and source rules
++
++Only argv[0] is examined. Exact case-sensitive bracket lookup retains the first
++value. The source's mutually exclusive priority is fire_key, show_weapon,
++extra_key, then play_sound, regardless of textual order. Normal branch completion
++forwards to CBaseCharacter motion keys. A fire key without a target returns
++immediately, including skipping base motion. A pending/stale target fails safely.
++Fire with a live target, ShowHandModel and MC_Extra remain explicit unavailable
++operations. The original show_weapon branch reads an uninitialized buffer;
++this port does not invent a weapon index or successful operation.
++
++The play_sound branch uses the **server g_hActiveCamera**, not client camera
++selection. Outside STATE_Script (101), a live camera that disallows player
++movement suppresses the sound and returns before base motion. Script state skips
++sound but still forwards to base motion. Pending/stale cameras are ignored;
++a live wrong-class camera is a checked failure. The default state is source
++STATE_Idle (5); no state machine is implied by exposing this field.
++
++A sound name always receives .wav, including a name already ending in .wav.
++Presence of sound_random consumes an inclusive 1..3 variant draw. The source
++SharedDefs.h unconditionally defines B2_LITE, so NRES(nMax) expands to **3**:
++authored maxima such as 11 or 4 do not widen that range. Its atoi result is unused;
++a nonempty nonnumeric or nonpositive random value therefore still selects 1..3.
++This preserves the supplied source configuration, not an inferred retail edition.
++
++Radius defaults to 1000, volume to 100, chance to 100 and voice to false.
++A variant draw precedes option parsing and the chance draw. IsRandomChance always
++consumes a 0..99 draw, even at 0/100; the comparison is draw < chance without
++clamping. Negative chance skips and values above 100 always pass. The existing
++portable session RNG replaces CRT rand/IntRandom; both draws use that one stream,
++without recreating separate CRT state. Deterministic local tests do not establish
++retail random-sequence equivalence. Camera/script suppression
++consumes neither draw. Nonzero voice selects PlayVoice; zero selects PlaySound.
++The existing attached WAV decoder/mixer handles actual playback and failure.
++
++## Ownership, bounds and inspection
++
++Original subclasses share class/gender CAnim_Sound tables, including one retained
++voice. InitStatics accepts a shared_ptr instead of a borrowed raw pointer to keep
++that sharing alive safely. A null table is rejected without replacing the current
++one. Caller groups must preserve the original sharing policy when real classes
++are integrated; these tests use explicit groups. No per-character voice policy
++is substituted. Busy shared voices refuse a replacement; nonvoice one-shots are
++independent. Removing one speaker invalidates its attached sound at the next
++audio sweep; the table survives other owners. The final owner releases its retained
++handle. Session teardown destroys objects before clearing audio and caches.
++
++Existing Sparam bounds remain in force. Sound basenames are limited to 31 bytes.
++Numeric options use finite, locale-independent, strict signed parsing with a
++31-byte bound, replacing the source's unsafe 8-byte scratch buffers and permissive
++atoi/atof. Empty, malformed, overflowing and nonfinite parameters fail explicitly.
++The existing audio service rejects invalid paths, volumes and radii. Missing WAVs
++never become silent successful placeholders. Bounds/parse failures return before
++base dispatch; ordinary chance/busy/playback outcomes still reach base motion.
++No new per-frame service, dependency or duplicate physics integration is added.
++
++The Skeleton tab displays state, last bounded key, branch outcome, actual sound
++resource, variant/chance draws, suppression counts and unavailable actions. It
++also shows the shared decoded voice cursor/duration and whether the selected
++object is its owner. Helper counters are shared; per-object key/start counters
++remain separate. Unretained PlaySound returns zero even on success, so starts
++are established by the helper's actual mixer result, not a nonzero handle.
++Inspection has no dispatch/lifetime side effects. Hidden/inactive objects remain
++inspectable; inactive animation tracks do not advance.
++
++## Coverage and remaining gate
++
++Synthetic tests cover branch priority, base forwarding/early returns, camera vs
++script rules, random presence/range/draw count, suffix construction, real decoded
++voices, busy sharing, removal/retry, malformed options, pending identities,
++immutable model callback data, inactive tracks and three unload cycles.
++The fixture REZ writer now splits a filename at its final dot, allowing the
++source's cue.wav.wav suffix behavior to be tested without changing production paths.
++
++The private six-model catalog executes 147 actual animation keys: **140 sound
++keys start 140 decoded voices**, six fire keys have no target and Gideon's one
++extra_key remains unavailable. All sound attempts succeed in this seeded traversal;
++this is not an exhaustive inventory of every variant or an enemy behavior test.
++The test advances audio between clips; it does not simulate original AI timing.
++Two SubwayA cycles verify intro-camera suppression, playback after normal intro
++completion, sample advancement and clean unload.
++
++The existing --skeleton-smoke adds an explicitly labelled **AI model-key probe
++(no AI states)** using an unmodified male-cultist ABC clip and source sound root.
++The clip restarts when ImGui hides, must dispatch a second key with real voice
++advancement, then a newly created probe must play after reload and invalidate the
++old identity. Its diagnostic class is registered only in this smoke scenario.
++Existing player movement/audio/node and synthetic motion assertions remain intact.
++Its extra runtime object never counts as an authored NPC.
++
++SubwayA stays 187 created, 4 transferred world sounds, 372 editor-only, 17 unsupported
++and zero failed, plus 7 SelfTriggers. The missing source instances remain five
++CivilianAI, ten CultistAI, Gideon and ExitTrigger. AI hearing, aiming/fire/extra,
++attachments, required client FX and other services keep --start-game blocked
++with exit 6. Other platforms, XR, audible hardware and retail gameplay parity
++are not established by Linux tests and SDL dummy output.
+diff --git a/docs/CHARACTER_AUDIO_CONTRACTS.md b/docs/CHARACTER_AUDIO_CONTRACTS.md
+index 1edb02c..dc37d86 100644
+--- a/docs/CHARACTER_AUDIO_CONTRACTS.md
++++ b/docs/CHARACTER_AUDIO_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original character voices and player animation sounds
+ 
++> The later [AI model-key continuation](AI_MODEL_KEY_CONTRACTS.md) adds selected
++> AI_Mgr sound dispatch. Earlier blanket AI-key audio omissions are superseded;
++> full AI behavior, hearing, fire/extra and M2 acceptance remain open.
++
+ M2 remains incomplete. This extends [character animation](CHARACTER_ANIMATION_CONTRACTS.md),
+ [audio](CINEMATIC_CONTRACTS.md), [movement](MOVEMENT_CONTRACTS.md) and
+ [container](CONTAINER_CONTRACTS.md) contracts. Read the
+diff --git a/docs/CHARACTER_MOTION_CONTRACTS.md b/docs/CHARACTER_MOTION_CONTRACTS.md
+index fdb6576..ac305f8 100644
+--- a/docs/CHARACTER_MOTION_CONTRACTS.md
++++ b/docs/CHARACTER_MOTION_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original character motion keys
+ 
++> The later [AI model-key continuation](AI_MODEL_KEY_CONTRACTS.md) adds selected
++> AI_Mgr sound dispatch. Earlier blanket AI-key audio omissions are superseded;
++> full AI behavior, hearing, fire/extra and M2 acceptance remain open.
++
+ M2 remains incomplete. This imports the motion branch of original
+ CBaseCharacter::OnStringKey and a bounded Sparam_Get lookup. It is a prerequisite
+ for character integration, not a new AI implementation. CMovement path steering,
+diff --git a/docs/M2_AI_MODEL_KEY_SOURCES.json b/docs/M2_AI_MODEL_KEY_SOURCES.json
+new file mode 100644
+index 0000000..ac4889f
+--- /dev/null
++++ b/docs/M2_AI_MODEL_KEY_SOURCES.json
+@@ -0,0 +1,103 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "0cdfe7e5f5c1d4c33612974c9060ab92875d4764",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          119,
++          127
++        ],
++        [
++          276,
++          281
++        ],
++        [
++          876,
++          975
++        ]
++      ],
++      "use": "Selected source initialization and model-key dispatch; other AI behavior unported"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
++      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
++      "selected_lines": [
++        [
++          1,
++          75
++        ]
++      ],
++      "use": "Original class/state declarations; selective interface adaptation"
++    },
++    {
++      "path": "sources/blood2/Shared/SharedDefs.h",
++      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "selected_lines": [
++        [
++          1,
++          18
++        ]
++      ],
++      "use": "Unconditional B2_LITE and constant NRES expansion"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.h",
++      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842",
++      "selected_lines": [
++        [
++          189,
++          194
++        ]
++      ],
++      "use": "Original IsRandomChance comparison"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CivilianAI.cpp",
++      "sha256": "337e03e46189d34c5172bafec5abe66233116cc2159f6a3af913490bc296b2f8",
++      "selected_lines": [
++        [
++          300,
++          330
++        ]
++      ],
++      "use": "Class/gender shared animation/sound tables and source roots; reference only"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/CultistAI.cpp",
++      "sha256": "4614927807e089724466c46c94b117049bd208702f9c8f82f452a24783b53f35",
++      "selected_lines": [
++        [
++          216,
++          260
++        ]
++      ],
++      "use": "Shared tables and source roots; robe expansion outside this base-game probe"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Gideon.cpp",
++      "sha256": "42f2c3a6a3a8b04c0637f587bd128ff22f81a3343cd61c479ff307d9687e059d",
++      "selected_lines": [
++        [
++          220,
++          235
++        ]
++      ],
++      "use": "Shared table and sound root; reference only"
++    }
++  ],
++  "adaptations": [
++    "Shared ownership preserves original class/gender voice sharing without a borrowed lifetime",
++    "Bounded exact bracket lookup and strict finite options replace unsafe scratch buffers",
++    "Existing portable session RNG replaces CRT random functions, without retail sequence claims",
++    "Checked owner/target/camera identities and actual playback outcomes",
++    "Explicit unavailable fire/show_weapon/extra branches; no production AI registration"
++  ],
++  "not_implemented": [
++    "AI states, initialization, perception/hearing and steering",
++    "AI aiming/Fire, hand attachments/ShowHandModel, MC_Extra",
++    "ExitTrigger, required client FX and complete M2 gate"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 2258cae..2400c92 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -430,3 +430,8 @@ Character motion continuation: [source ledger](M2_CHARACTER_MOTION_SOURCES.json)
+ [contracts](CHARACTER_MOTION_CONTRACTS.md). BaseCharacter and Sparam rules are
+ selectively adapted; existing math services replace SDK calls. Later LithTech
+ rotation code informs semantics only. No reference repository is a dependency.
++
++AI model-key continuation: [source ledger](M2_AI_MODEL_KEY_SOURCES.json),
++[contracts](AI_MODEL_KEY_CONTRACTS.md). Selected AI_Mgr dispatch preserves source
++camera/script gates, branch priority, shared voice semantics and the supplied
++B2_LITE variant cap. No full AI class or guessed attack behavior is registered.
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+new file mode 100644
+index 0000000..df3ad62
+--- /dev/null
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -0,0 +1,66 @@
++#include "ai_model_key_smoke.h"
++#include "game/original/AI_Mgr.h"
++#include <limits>
++namespace OpenBlood2
++{
++    bool prepare_ai_model_key_smoke(GameSession& g, ObjectId& id)
++    {
++        // Diagnostic registration only: never satisfies a required world AI class.
++        static const ClassInfo type{"AIModelKeyProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AI_Mgr>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return false;
++        const auto* player = g.server_shell.Player(g.local_client);
++        const auto* body = player ? g.objects.get(player->m_hObject) : nullptr;
++        if (!body)
++            return false;
++        ObjectCreateStruct state;
++        state.m_ObjectType = OT_MODEL;
++        state.m_Pos = body->state.m_Pos;
++        state.m_Flags = FLAG_MODELKEYS;
++        SAFE_STRCPY(state.m_Name, "AI model-key probe (no AI states)");
++        SAFE_STRCPY(state.m_Filename, "models/enemies/m_cultist1.abc");
++        const auto h = g.objects.create(&type, state);
++        auto* r = g.objects.get(h);
++        auto* ai = r ? dynamic_cast<AI_Mgr*>(r->game.get()) : nullptr;
++        if (!ai || !r->model)
++            return false;
++        auto table = std::make_shared<CAnim_Sound>();
++        if (!table->SetSoundRoot("sounds/enemies/m_cultist") || !table->SetAnimationIndexes(h) ||
++            !table->GenerateHitSpheres(h) || !ai->InitStatics(table))
++            return false;
++        // Choose the earliest real retained-voice key. No marker/asset edits or direct dispatch.
++        std::uint32_t earliest = std::numeric_limits<std::uint32_t>::max();
++        unsigned selected = 0;
++        for (unsigned clip = 0; clip < r->model->animations.size(); ++clip)
++            for (const auto& key : r->model->animations[clip].keys)
++                if (key.time < earliest && key.text.find("[play_sound:") != std::string::npos &&
++                    key.text.find("[sound_voice:1]") != std::string::npos)
++                {
++                    earliest = key.time;
++                    selected = clip;
++                }
++        if (earliest > 500)
++            return false;
++        g.server.SetModelAnimation(h, selected);
++        if (r->animation.animation != selected)
++            return false;
++        r->animation.looping = false;
++        id = r->id;
++        return true;
++    }
++    bool check_ai_model_key_smoke(GameSession& g, ObjectId id, std::uint64_t minimum_keys)
++    {
++        const auto* r = g.objects.get(id);
++        const auto* ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
++        const auto* table = ai ? ai->AnimSound() : nullptr;
++        const auto* voice = table ? g.server.audio.get(table->m_hVoxSound) : nullptr;
++        std::string resource;
++        return voice && resource_path(voice->request.resource, resource) && ai && ai->model_keys >= minimum_keys &&
++               ai->audio_starts > 0 && ai->key_failures == 0 && ai->camera_suppressed == 0 && voice &&
++               voice->cursor > 0 && voice->owner == r->handle && resource.starts_with("sounds/enemies/m_cultist/") &&
++               g.server.audio.submitted_frames > 0 && g.server.audio.output_error.empty();
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/ai_model_key_smoke.h b/src/app/ai_model_key_smoke.h
+new file mode 100644
+index 0000000..607075f
+--- /dev/null
++++ b/src/app/ai_model_key_smoke.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool prepare_ai_model_key_smoke(GameSession&, ObjectId&);
++    bool check_ai_model_key_smoke(GameSession&, ObjectId, std::uint64_t minimum_keys);
++} // namespace OpenBlood2
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 9fe8c02..88bf957 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -1,3 +1,4 @@
++#include "game/original/AI_Mgr.h"
+ #include "inspector.h"
+ #include <algorithm>
+ #include <imgui.h>
+@@ -5,9 +6,9 @@ namespace OpenBlood2
+ {
+     void Inspector::draw_skeleton(GameSession& game, ObjectSelection& selection)
+     {
+-        ImGui::TextWrapped(
+-            "Current ABC node transforms and original CAnim_Sound tables. Spheres are the original "
+-            "initialization radii, shown at live node positions; damage localization and AI callers remain unported.");
++        ImGui::TextWrapped("Current ABC node transforms and original CAnim_Sound tables. Spheres are the original "
++                           "initialization radii, shown at live node positions; damage localization and complete AI "
++                           "behavior remain unported.");
+         if (!game.objects.get(skeleton_selection))
+         {
+             if (const auto* player = game.server_shell.Player(game.local_client))
+@@ -42,7 +43,8 @@ namespace OpenBlood2
+         {
+             const auto* character = dynamic_cast<const CBaseCharacter*>(r->game.get());
+             const auto& model = *r->model;
+-            const auto* anim = character ? &character->m_Anim_Sound : nullptr;
++            const auto* ai = dynamic_cast<const AI_Mgr*>(character);
++            const auto* anim = ai ? ai->AnimSound() : character ? &character->m_Anim_Sound : nullptr;
+             ImGui::Text("%s | %zu nodes | %zu clips", r->state.m_Name, model.nodes.size(), model.animations.size());
+             if (r->animation.animation < model.animations.size())
+                 ImGui::Text("%s / %.1f ms", model.animations[r->animation.animation].name.c_str(), r->animation.time);
+@@ -54,7 +56,31 @@ namespace OpenBlood2
+             }
+             else
+                 ImGui::TextUnformatted("No original character animation table on this object");
+-            if (character && ImGui::CollapsingHeader("Character motion keys", ImGuiTreeNodeFlags_DefaultOpen))
++            if (ai && ImGui::CollapsingHeader("Original AI model-key dispatch", ImGuiTreeNodeFlags_DefaultOpen))
++            {
++                ImGui::Text("State %d | keys %llu | audio starts %llu / keys %llu | failures %llu", ai->m_nState,
++                            (unsigned long long)ai->model_keys, (unsigned long long)ai->audio_starts,
++                            (unsigned long long)ai->audio_keys, (unsigned long long)ai->key_failures);
++                ImGui::TextWrapped("%s | %s", ai_key_outcome_name(ai->key_outcome), ai->ai_key.c_str());
++                if (!ai->ai_key_error.empty())
++                    ImGui::TextWrapped("%s", ai->ai_key_error.c_str());
++                ImGui::TextWrapped("Sound: %s", ai->ai_sound_resource.c_str());
++                if (const auto* voice = anim ? game.server.audio.get(anim->m_hVoxSound) : nullptr)
++                    ImGui::Text("Shared voice %s | %.3f / %.3f s | owner matches: %s", voice->done ? "done" : "playing",
++                                voice->cursor / voice->clip->rate, voice->clip->duration(),
++                                voice->owner == r->handle ? "yes" : "no");
++                ImGui::Text("Variant %d (source B2_LITE: 1..3) | chance draw %d", ai->selected_variant,
++                            ai->chance_roll);
++                ImGui::Text("Suppressed: camera %llu / script %llu / chance %llu / shared voice %llu",
++                            (unsigned long long)ai->camera_suppressed, (unsigned long long)ai->script_suppressed,
++                            (unsigned long long)ai->chance_suppressed, (unsigned long long)ai->busy_voices);
++                ImGui::Text("No target %llu | unavailable actions %llu", (unsigned long long)ai->no_target,
++                            (unsigned long long)ai->unavailable_keys);
++                ImGui::TextWrapped(
++                    "Key dispatcher only. AI states, perception, attacks and special actions remain unavailable.");
++            }
++            if (character && ImGui::CollapsingHeader("Character motion keys",
++                                                     ai ? ImGuiTreeNodeFlags_None : ImGuiTreeNodeFlags_DefaultOpen))
+             {
+                 ImGui::Text("Keys %llu | applied actions %llu | failures %llu | last mask 0x%02x",
+                             (unsigned long long)character->motion_keys, (unsigned long long)character->motion_actions,
+@@ -70,7 +96,8 @@ namespace OpenBlood2
+                                        : "Source order: local yaw, forward/right/up velocity overwrite, world delta, "
+                                          "centered dimensions.");
+             }
+-            if (anim && ImGui::CollapsingHeader("Character audio", ImGuiTreeNodeFlags_DefaultOpen))
++            if (anim && ImGui::CollapsingHeader("Character audio",
++                                                ai ? ImGuiTreeNodeFlags_None : ImGuiTreeNodeFlags_DefaultOpen))
+             {
+                 ImGui::TextWrapped("Root: %s | silent flag: %s (source helper does not test it)",
+                                    anim->GetSoundRoot().c_str(), anim->m_bSilent ? "set" : "clear");
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index d6a6ce2..ec004c0 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -1,3 +1,4 @@
++#include "ai_model_key_smoke.h"
+ #include "app/movement_controls.h"
+ #include "brush_smoke.h"
+ #include "build_info.h"
+@@ -237,6 +238,11 @@ namespace
+         if (options.skeleton_smoke && !OpenBlood2::prepare_character_motion_smoke(game, smoke_motion))
+             return 4;
+         const auto original_motion = smoke_motion;
++        OpenBlood2::ObjectId smoke_ai_key{};
++        bool ai_key_hidden = false;
++        if (options.skeleton_smoke && !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
++            return 4;
++        const auto original_ai_key = smoke_ai_key;
+         bool interaction_hidden = false;
+         const auto original_selection = selection.id;
+         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
+@@ -258,7 +264,7 @@ namespace
+         inspector.select_movement = options.movement_smoke && !options.skeleton_smoke;
+         inspector.select_skeleton = options.skeleton_smoke;
+         if (options.skeleton_smoke)
+-            inspector.skeleton_selection = smoke_motion;
++            inspector.skeleton_selection = smoke_ai_key;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
+         inspector.select_pickups = options.pickups_smoke;
+@@ -471,6 +477,8 @@ namespace
+                 spdlog::error("Object simulation step failed");
+                 return 4;
+             }
++            if (options.skeleton_smoke && !inspector_visible)
++                ai_key_hidden |= OpenBlood2::check_ai_model_key_smoke(game, smoke_ai_key, 2);
+             if (options.skeleton_smoke && !inspector_visible)
+                 if (const auto* r = game.objects.get(smoke_motion))
+                     if (const auto* c = dynamic_cast<const CBaseCharacter*>(r->game.get()))
+@@ -711,7 +719,9 @@ namespace
+                 if (options.skeleton_smoke && frames == hide_frame)
+                 {
+                     const auto* r = game.objects.get(smoke_motion);
+-                    if (!r || game.server.ResetModelAnimation(r->handle) != DE_OK)
++                    const auto* ai = game.objects.get(smoke_ai_key);
++                    if (!r || !ai || game.server.ResetModelAnimation(r->handle) != DE_OK ||
++                        game.server.ResetModelAnimation(ai->handle) != DE_OK)
+                         return 4;
+                 }
+                 if (options.scene_explosions_smoke && frames == hide_frame &&
+@@ -870,6 +880,20 @@ namespace
+                 spdlog::info("Character motion probe: hidden={}, reentered={}, old handle invalidated={}",
+                              character_motion_hidden, character_motion_reentered, !game.objects.get(original_motion));
+             }
++            bool ai_key_reentered = !options.skeleton_smoke;
++            if (options.skeleton_smoke)
++            {
++                if (game.objects.get(original_ai_key) || !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
++                    return 4;
++                for (int i = 0; i < 90 && !ai_key_reentered; ++i)
++                {
++                    if (!game.step(1.0 / 60))
++                        return 4;
++                    ai_key_reentered = OpenBlood2::check_ai_model_key_smoke(game, smoke_ai_key, 1);
++                }
++                spdlog::info("AI model-key probe: hidden={}, reentered={}, old handle invalidated={}", ai_key_hidden,
++                             ai_key_reentered, !game.objects.get(original_ai_key));
++            }
+             bool character_audio_reentered = !options.skeleton_smoke;
+             if (options.skeleton_smoke)
+             {
+@@ -893,8 +917,9 @@ namespace
+                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
+             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
+                 !selection_cleared ||
+-                (options.skeleton_smoke && (!character_audio_hidden || !character_audio_reentered ||
+-                                            !character_motion_hidden || !character_motion_reentered)) ||
++                (options.skeleton_smoke &&
++                 (!character_audio_hidden || !character_audio_reentered || !character_motion_hidden ||
++                  !character_motion_reentered || !ai_key_hidden || !ai_key_reentered)) ||
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+diff --git a/src/game/original/AI_Mgr.cpp b/src/game/original/AI_Mgr.cpp
+new file mode 100644
+index 0000000..de06199
+--- /dev/null
++++ b/src/game/original/AI_Mgr.cpp
+@@ -0,0 +1,213 @@
++// Original AI_Mgr.cpp:276-281,880-975 (Monolith, 1997). See AI_MODEL_KEY_CONTRACTS.md.
++#include "AI_Mgr.h"
++#include "CameraObj.h"
++#include "Sparam.h"
++#include <charconv>
++#include <cmath>
++#include <utility>
++
++namespace OpenBlood2
++{
++    const char* ai_key_outcome_name(AIKeyOutcome value)
++    {
++        switch (value)
++        {
++            case AIKeyOutcome::None:
++                return "No AI action";
++            case AIKeyOutcome::Played:
++                return "Sound started";
++            case AIKeyOutcome::ChanceSkipped:
++                return "Chance skipped";
++            case AIKeyOutcome::VoiceBusy:
++                return "Shared voice busy";
++            case AIKeyOutcome::CameraBlocked:
++                return "Server camera suppressed";
++            case AIKeyOutcome::ScriptBlocked:
++                return "Script state suppressed";
++            case AIKeyOutcome::NoTarget:
++                return "Fire has no target";
++            case AIKeyOutcome::Unavailable:
++                return "Required action unavailable";
++            case AIKeyOutcome::Invalid:
++                return "Invalid key or handle";
++            case AIKeyOutcome::PlaybackFailed:
++                return "Sound playback failed";
++        }
++        return "Unknown outcome";
++    }
++} // namespace OpenBlood2
++namespace
++{
++    template <class T> bool number(std::string_view text, T& value)
++    {
++        constexpr std::string_view spaces = " \t\r\n\f\v";
++        const auto first = text.find_first_not_of(spaces);
++        if (first == text.npos || text.size() > 31)
++            return false;
++        text = text.substr(first, text.find_last_not_of(spaces) - first + 1);
++        if (text.front() == '+')
++        {
++            text.remove_prefix(1);
++            if (!text.empty() && text.front() == '-')
++                return false;
++        }
++        if (text.empty() || text.front() == '+')
++            return false;
++        const auto [end, ec] = std::from_chars(text.data(), text.data() + text.size(), value);
++        return ec == std::errc{} && end == text.data() + text.size() && std::isfinite(double(value));
++    }
++} // namespace
++bool AI_Mgr::InitStatics(std::shared_ptr<CAnim_Sound> sound)
++{
++    if (!sound)
++        return false;
++    m_pAnim_Sound = std::move(sound);
++    return true;
++}
++bool AI_Mgr::OnStringKey(ArgList* args)
++{
++    using OpenBlood2::AIKeyOutcome;
++    auto* server = GetServerDE();
++    if (!server || !args || args->argc < 1 || !args->argv || !args->argv[0])
++        return false;
++    const std::string_view input(args->argv[0]);
++    ++model_keys;
++    ai_key.assign(input.substr(0, 4096));
++    ai_key_error.clear();
++    ai_sound_resource.clear();
++    selected_variant = 0;
++    chance_roll = -1;
++    key_outcome = AIKeyOutcome::None;
++    auto fail = [&](AIKeyOutcome outcome, const char* reason)
++    {
++        ++key_failures;
++        key_outcome = outcome;
++        ai_key_error = reason;
++        return true;
++    };
++    if (input.size() > 4096 || !server->IsObjectAlive(m_hObject))
++        return fail(AIKeyOutcome::Invalid, "AI key input or owner unavailable");
++    const std::string_view key = ai_key;
++    constexpr const char* commands[]{"fire_key", "show_weapon", "extra_key", "play_sound"};
++    unsigned branch = 4;
++    std::string_view value;
++    for (unsigned i = 0; i < 4; ++i)
++    {
++        const auto status = Sparam_Get(key, commands[i], value);
++        if (status == SparamStatus::Invalid)
++            return fail(AIKeyOutcome::Invalid, "Malformed AI command parameter");
++        if (status == SparamStatus::Found)
++        {
++            branch = i;
++            break;
++        }
++    }
++    if (branch == 0)
++    {
++        if (!m_hTarget)
++        {
++            ++no_target;
++            key_outcome = AIKeyOutcome::NoTarget;
++            return true; // Original early return also skips base motion keys.
++        }
++        if (!server->IsObjectAlive(m_hTarget))
++            return fail(AIKeyOutcome::Invalid, "AI fire target is pending or stale");
++        ++unavailable_keys;
++        fail(AIKeyOutcome::Unavailable, "Original AI Fire/aiming is not integrated");
++    }
++    else if (branch == 1 || branch == 2)
++    {
++        ++unavailable_keys;
++        fail(AIKeyOutcome::Unavailable, branch == 1
++                                            ? "AI ShowHandModel unavailable; source reads an uninitialized buffer"
++                                            : "Original AI MC_Extra is not integrated");
++    }
++    else if (branch == 3)
++    {
++        ++audio_keys;
++        if (g_hActiveCamera && m_nState != StateScript && server->IsObjectAlive(g_hActiveCamera))
++        {
++            const auto* camera = dynamic_cast<const CameraObj*>(server->HandleToObject(g_hActiveCamera));
++            if (!camera)
++                return fail(AIKeyOutcome::Invalid, "Server active camera has the wrong class");
++            if (!camera->AllowPlayerMovement())
++            {
++                ++camera_suppressed;
++                key_outcome = AIKeyOutcome::CameraBlocked;
++                return true; // Source returns before base motion dispatch.
++            }
++        }
++        if (m_nState == StateScript)
++        {
++            ++script_suppressed;
++            key_outcome = AIKeyOutcome::ScriptBlocked;
++        }
++        else
++        {
++            if (value.size() > 31)
++                return fail(AIKeyOutcome::Invalid, "AI sound name exceeds original scalar buffer");
++            std::string sound(value);
++            std::string_view random_value;
++            const auto random_status = Sparam_Get(key, "sound_random", random_value);
++            if (random_status == SparamStatus::Invalid)
++                return fail(AIKeyOutcome::Invalid, "Malformed sound_random parameter");
++            if (random_status == SparamStatus::Found)
++            {
++                // SharedDefs.h unconditionally defines B2_LITE: NRES(nMax) is 3,
++                // not nMax. Its atoi result is unused; preserve presence semantics.
++                if (!server->RandomInt(1, 3, selected_variant))
++                    return fail(AIKeyOutcome::Invalid, "AI variant draw failed");
++                sound += std::to_string(selected_variant);
++            }
++            sound += ".wav";
++            float radius = 1000;
++            int volume = 100, chance = 100, voice = 0;
++            auto option = [&](const char* name, auto& out)
++            {
++                std::string_view text;
++                const auto status = Sparam_Get(key, name, text);
++                return status == SparamStatus::Missing || (status == SparamStatus::Found && number(text, out));
++            };
++            if (!option("sound_radius", radius) || !option("sound_volume", volume) || !option("sound_chance", chance) ||
++                !option("sound_voice", voice))
++                return fail(AIKeyOutcome::Invalid, "Invalid numeric AI sound option");
++            // Original IsRandomChance always consumes a 0..99 draw, including
++            // 0/100/extreme percentages; the portable session RNG is not CRT-identical.
++            if (!server->RandomInt(0, 99, chance_roll))
++                return fail(AIKeyOutcome::Invalid, "AI chance draw failed");
++            if (chance_roll >= chance)
++            {
++                ++chance_suppressed;
++                key_outcome = AIKeyOutcome::ChanceSkipped;
++            }
++            else if (!m_pAnim_Sound)
++                fail(AIKeyOutcome::Invalid, "AI InitStatics sound table is unavailable");
++            else
++            {
++                const auto starts = m_pAnim_Sound->sound_starts, busy = m_pAnim_Sound->voice_busy;
++                if (voice)
++                    m_pAnim_Sound->PlayVoice(m_hObject, sound, radius, volume);
++                else
++                    m_pAnim_Sound->PlaySound(m_hObject, sound, radius, volume);
++                if (m_pAnim_Sound->voice_busy != busy)
++                {
++                    ++busy_voices;
++                    key_outcome = AIKeyOutcome::VoiceBusy;
++                }
++                else
++                {
++                    ai_sound_resource = m_pAnim_Sound->sound_resource;
++                    if (m_pAnim_Sound->sound_starts != starts)
++                    {
++                        ++audio_starts;
++                        key_outcome = AIKeyOutcome::Played;
++                    }
++                    else
++                        fail(AIKeyOutcome::PlaybackFailed, m_pAnim_Sound->sound_error.c_str());
++                }
++            }
++        }
++    }
++    const bool base = CBaseCharacter::OnStringKey(args);
++    return branch != 4 || base;
++}
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+new file mode 100644
+index 0000000..0369d3f
+--- /dev/null
++++ b/src/game/original/AI_Mgr.h
+@@ -0,0 +1,50 @@
++#pragma once
++#include "PlayerObj.h"
++#include <memory>
++
++namespace OpenBlood2
++{
++    enum class AIKeyOutcome
++    {
++        None,
++        Played,
++        ChanceSkipped,
++        VoiceBusy,
++        CameraBlocked,
++        ScriptBlocked,
++        NoTarget,
++        Unavailable,
++        Invalid,
++        PlaybackFailed
++    };
++    const char* ai_key_outcome_name(AIKeyOutcome);
++} // namespace OpenBlood2
++
++// Selective original AI_Mgr::InitStatics/OnStringKey port. No production AI class
++// registration, state machine, perception, Fire or MC_Extra implementation yet.
++class AI_Mgr : public CBaseCharacter
++{
++  public:
++    static constexpr int StateIdle = 5, StateScript = 101;
++    bool InitStatics(std::shared_ptr<CAnim_Sound>);
++    const CAnim_Sound* AnimSound() const
++    {
++        return m_pAnim_Sound.get();
++    }
++    int m_nState = StateIdle;
++    HOBJECT m_hTarget = nullptr;
++    OpenBlood2::AIKeyOutcome key_outcome = OpenBlood2::AIKeyOutcome::None;
++    std::uint64_t model_keys = 0, audio_keys = 0, audio_starts = 0, key_failures = 0;
++    std::uint64_t camera_suppressed = 0, script_suppressed = 0, chance_suppressed = 0;
++    std::uint64_t busy_voices = 0, no_target = 0, unavailable_keys = 0;
++    int selected_variant = 0, chance_roll = -1;
++    std::string ai_key, ai_key_error, ai_sound_resource;
++
++  protected:
++    bool OnStringKey(ArgList*) override;
++
++  private:
++    // Original subclasses share class/gender tables and their retained voice.
++    // Shared ownership replaces a borrowed pointer, preserving sharing safely.
++    std::shared_ptr<CAnim_Sound> m_pAnim_Sound;
++};
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 3ffcb5c..b2f45eb 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -518,3 +518,17 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME character_motion.catalog COMMAND character_motion_tests catalog "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(character_motion.catalog PROPERTIES LABELS "headless;private;character_motion" TIMEOUT 60)
+ endif()
++
++add_executable(ai_model_key_tests ai_model_key_tests.cpp)
++target_link_libraries(ai_model_key_tests PRIVATE blood2_game)
++blood2_project_options(ai_model_key_tests)
++foreach(case IN ITEMS sound priority gates random shared rejection callbacks lifetime)
++    add_test(NAME ai_keys.${case} COMMAND ai_model_key_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/ai-key-fixtures/${case}")
++    set_tests_properties(ai_keys.${case} PROPERTIES LABELS "headless;ai_keys" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case IN ITEMS catalog subway)
++        add_test(NAME ai_keys.${case} COMMAND ai_model_key_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(ai_keys.${case} PROPERTIES LABELS "headless;private;ai_keys" TIMEOUT 90)
++    endforeach()
++endif()
+diff --git a/tests/ai_model_key_tests.cpp b/tests/ai_model_key_tests.cpp
+new file mode 100644
+index 0000000..a4e94d3
+--- /dev/null
++++ b/tests/ai_model_key_tests.cpp
+@@ -0,0 +1,383 @@
++#include "audio_fixture.h"
++#include "camera_fixture.h"
++#include "engine/model_commands.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/CameraObj.h"
++#include <functional>
++#include <set>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    std::shared_ptr<CAnim_Sound> table(std::string_view root = "ai")
++    {
++        auto a = std::make_shared<CAnim_Sound>();
++        if (!a->SetSoundRoot(root))
++            return {};
++        return a;
++    }
++    AI_Mgr* actor(GameSession& g, std::shared_ptr<CAnim_Sound> a)
++    {
++        static const ClassInfo type{"AIKeyProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AI_Mgr>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Flags = FLAG_MODELKEYS;
++        const auto h = g.objects.create(&type, s);
++        auto* r = g.objects.get(h);
++        auto* ai = r ? dynamic_cast<AI_Mgr*>(r->game.get()) : nullptr;
++        if (ai && a && !ai->InitStatics(a))
++            return nullptr;
++        return ai;
++    }
++    bool key(GameSession& g, AI_Mgr* ai, std::string text)
++    {
++        std::vector<std::vector<std::string>> parsed;
++        CHECK(model_commands(text, parsed));
++        for (auto& c : parsed)
++        {
++            std::vector<char*> args;
++            for (auto& v : c)
++                args.push_back(v.data());
++            ArgList a{args.data(), int(args.size())};
++            CHECK(g.objects.engine_message(ai->m_hObject, MID_MODELSTRINGKEY, &a));
++        }
++        return true;
++    }
++    bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        CHECK(test_audio::setup(g, root));
++        test_player::Directory d;
++        for (auto name : {"cue1.wav", "cue2.wav", "cue3.wav", "cue.wav.wav"})
++            d.children["ai"].files[name] = test_audio::wave();
++        d.children["ai"].files["cue.wav"] = test_audio::wave();
++        d.children["ai"].files["long.wav"] = test_audio::wave(1, 16, 8000, 8000);
++        auto w = test_model::Writer{};
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, d);
++        w.patch(131, off);
++        w.patch(135, size);
++        std::ofstream out(root / "ai.rez", std::ios::binary);
++        out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        out.close();
++        std::string error;
++        CHECK(g.resources.mount(root / "ai.rez", error));
++        return true;
++    }
++    bool sound(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto a = table();
++        auto* ai = actor(g, a);
++        CHECK(ai);
++        CHECK(key(g, ai, "[play_sound:cue][sound_radius:500][sound_volume:70]"));
++        CHECK(ai->audio_starts == 1 && ai->key_outcome == AIKeyOutcome::Played && ai->chance_roll >= 0);
++        CHECK(g.server.audio.voices().size() == 1);
++        const auto& v = g.server.audio.voices().begin()->second;
++        CHECK(v.owner == ai->m_hObject && v.auto_remove && !v.world_owned && v.request.outer_radius == 500 &&
++              v.request.inner_radius == 50 && v.request.volume == .7f && v.request.priority == 3);
++        CHECK(g.server.advance_audio(.1, {}, {}));
++        CHECK(g.server.audio.voices().empty());
++        CHECK(key(g, ai, "[play_sound:cue.wav]"));
++        CHECK(ai->audio_starts == 2 && ai->ai_sound_resource == "ai\\cue.wav.wav");
++        CHECK(key(g, ai, "[play_sound:missing]"));
++        CHECK(ai->key_outcome == AIKeyOutcome::PlaybackFailed && ai->key_failures == 1 && !ai->ai_key_error.empty());
++        return true;
++    }
++    bool priority(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* ai = actor(g, table());
++        CHECK(ai);
++        auto* r = g.objects.get(ai->m_hObject);
++        CHECK(key(g, ai, "[play_sound:cue][fire_key:head][RotY:1]"));
++        CHECK(ai->no_target == 1 && ai->audio_keys == 0 && ai->motion_keys == 0);
++        ai->m_hTarget = g.objects.create(g.objects.find_class("BaseClass"), {});
++        CHECK(ai->m_hTarget);
++        CHECK(key(g, ai, "[extra_key:x][play_sound:cue][fire_key:head][RotY:1]"));
++        CHECK(ai->key_outcome == AIKeyOutcome::Unavailable && ai->unavailable_keys == 1 && ai->motion_keys == 1 &&
++              ai->audio_starts == 0);
++        CHECK(key(g, ai, "[play_sound:cue][extra_key:x][show_weapon:1]"));
++        CHECK(ai->ai_key_error.find("uninitialized") != std::string::npos);
++        CHECK(key(g, ai, "[extra_key:powerup][play_sound:cue]"));
++        CHECK(ai->unavailable_keys == 3 && ai->audio_keys == 0);
++        CHECK(key(g, ai, "[PLAY_SOUND:cue]"));
++        CHECK(ai->pending_model_commands.size() == 1);
++        CHECK(key(g, ai, "[UpVel:2]"));
++        CHECK(r->velocity.y == 2 && ai->key_outcome == AIKeyOutcome::None);
++        CHECK(g.objects.remove(ai->m_hTarget));
++        CHECK(key(g, ai, "[fire_key:head][UpVel:10]"));
++        CHECK(ai->key_outcome == AIKeyOutcome::Invalid && r->velocity.y == 2);
++        return true;
++    }
++    bool gates(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* ai = actor(g, table());
++        CHECK(ai);
++        g.server.trace_enabled = true;
++        auto camera = g.objects.create(g.objects.find_class("CameraObj"), {}, Creation::World,
++                                       {{"StartActive", true}, {"AllowPlayerMovement", false}});
++        CHECK(camera && g_hActiveCamera == camera);
++        CHECK(key(g, ai, "[play_sound:cue][ForwVel:9]"));
++        CHECK(ai->camera_suppressed == 1 && ai->motion_keys == 0 && g.server.service_calls["RandomInt"] == 0);
++        ai->m_nState = AI_Mgr::StateScript;
++        CHECK(key(g, ai, "[play_sound:cue][ForwVel:9]"));
++        CHECK(ai->script_suppressed == 1 && ai->motion_keys == 1 && g.server.service_calls["RandomInt"] == 0);
++        ai->m_nState = AI_Mgr::StateIdle;
++        auto* c = dynamic_cast<CameraObj*>(g.objects.get(camera)->game.get());
++        CHECK(c);
++        c->m_bPlayerMovement = true;
++        CHECK(key(g, ai, "[play_sound:cue]"));
++        CHECK(ai->audio_starts == 1); // Live source flag, not published client descriptor.
++        CHECK(g.objects.remove(camera));
++        CHECK(key(g, ai, "[play_sound:cue]"));
++        CHECK(ai->audio_starts == 2); // Pending global ignored.
++        CHECK(g.objects.finish_frame() && !g_hActiveCamera);
++        return true;
++    }
++    bool random_cases(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* ai = actor(g, table());
++        CHECK(ai);
++        g.server.trace_enabled = true;
++        std::set<int> variants;
++        for (unsigned i = 0; i < 100; ++i)
++        {
++            CHECK(key(g, ai, "[play_sound:cue][sound_random:11][sound_chance:0]"));
++            variants.insert(ai->selected_variant);
++            CHECK(ai->selected_variant >= 1 && ai->selected_variant <= 3 &&
++                  ai->key_outcome == AIKeyOutcome::ChanceSkipped);
++        }
++        CHECK(variants.size() == 3 && g.server.service_calls["RandomInt"] == 200 && ai->audio_starts == 0);
++        for (auto max : {"0", "-10", "garbage", "9999999999999999999999999999"})
++        {
++            CHECK(key(g, ai, "[play_sound:cue][sound_random:" + std::string(max) + "][sound_chance:101]"));
++            CHECK(ai->key_outcome == AIKeyOutcome::Played && ai->selected_variant <= 3);
++        }
++        CHECK(key(g, ai, "[play_sound:cue][sound_chance:-1][ForwVel:12]"));
++        CHECK(ai->chance_suppressed == 101 && ai->motion_keys == 1 && ai->audio_starts == 4);
++        CHECK(g.server.service_calls["RandomInt"] == 209);
++        return true;
++    }
++    bool shared(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto a = table();
++        std::weak_ptr<CAnim_Sound> weak = a;
++        auto* one = actor(g, a);
++        auto* two = actor(g, a);
++        CHECK(one && two);
++        a.reset();
++        CHECK(!weak.expired());
++        CHECK(key(g, one, "[play_sound:long][sound_voice:1]"));
++        const auto id = one->AnimSound()->m_hVoxSound;
++        CHECK(id);
++        CHECK(key(g, two, "[play_sound:cue][sound_voice:-1][ForwVel:7]"));
++        CHECK(two->key_outcome == AIKeyOutcome::VoiceBusy && two->busy_voices == 1 && two->motion_keys == 1);
++        CHECK(one->AnimSound() == two->AnimSound() && g.server.audio.get(id)->owner == one->m_hObject);
++        CHECK(!two->InitStatics(nullptr));
++        CHECK(key(g, two, "[play_sound:cue]"));
++        CHECK(two->audio_starts == 1); // Nonvoice is not serialized.
++        CHECK(g.objects.remove(one->m_hObject) && g.objects.finish_frame());
++        CHECK(!weak.expired());
++        CHECK(g.server.advance_audio(0, {}, {}));
++        CHECK(!g.server.audio.get(id));
++        CHECK(key(g, two, "[play_sound:cue][sound_voice:1]"));
++        CHECK(two->audio_starts == 2);
++        CHECK(g.objects.remove(two->m_hObject) && g.objects.finish_frame() && weak.expired());
++        CHECK(g.server.advance_audio(0, {}, {}));
++        CHECK(g.server.audio.voices().empty());
++        return true;
++    }
++    bool rejection(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* ai = actor(g, {});
++        CHECK(ai);
++        CHECK(key(g, ai, "[play_sound:cue]"));
++        CHECK(ai->key_outcome == AIKeyOutcome::Invalid);
++        CHECK(ai->InitStatics(table()));
++        for (auto text : {"[play_sound:]", "[play_sound:cue][sound_radius:nan]", "[play_sound:cue][sound_volume:1x]",
++                          "[play_sound:cue][sound_chance:2147483648]", "[play_sound:cue][sound_voice:]",
++                          "[play_sound:cue][sound_random:]"})
++        {
++            CHECK(key(g, ai, text));
++            CHECK(ai->key_outcome == AIKeyOutcome::Invalid && ai->audio_starts == 0);
++        }
++        for (auto text :
++             {"[play_sound:cue][sound_radius:-1]", "[play_sound:cue][sound_volume:101]", "[play_sound:../cue]"})
++        {
++            CHECK(key(g, ai, text));
++            CHECK(ai->key_outcome == AIKeyOutcome::PlaybackFailed);
++        }
++        CHECK(key(g, ai, "[play_sound:" + std::string(32, 'x') + "]"));
++        CHECK(ai->key_outcome == AIKeyOutcome::Invalid);
++        CHECK(key(g, ai, "[play_sound:cue][sound_radius:1e99]"));
++        CHECK(ai->key_outcome == AIKeyOutcome::Invalid);
++        CHECK(key(g, ai, std::string(4097, 'x')));
++        CHECK(ai->key_outcome == AIKeyOutcome::Invalid);
++        return true;
++    }
++    bool callbacks(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto* ai = actor(g, table());
++        CHECK(ai);
++        auto* r = g.objects.get(ai->m_hObject);
++        auto m = std::make_shared<Model>();
++        std::string error;
++        CHECK(read_model(test_model::abc().b, *m, error));
++        for (auto& k : m->animations[0].keys)
++            k.text.clear();
++        m->animations[0].keys[0].text = "[play_sound:cue][ForwVel:3];[play_sound:long][sound_voice:1]";
++        r->model = m;
++        r->activity = OBJSTATE_INACTIVE;
++        CHECK(g.server.advance_models(0) && ai->model_keys == 0);
++        r->activity = OBJSTATE_ACTIVE;
++        CHECK(g.server.advance_models(0) && ai->model_keys == 2 && ai->audio_starts == 2 && ai->motion_keys == 1);
++        CHECK(g.server.advance_audio(.05, {}, {}));
++        CHECK(g.server.audio.get(ai->AnimSound()->m_hVoxSound)->cursor > 0);
++        CHECK(m->animations[0].keys[0].text.ends_with("[sound_voice:1]"));
++        const auto h = ai->m_hObject;
++        CHECK(g.objects.remove(h));
++        CHECK(!g.objects.engine_message(h, MID_MODELSTRINGKEY, nullptr));
++        CHECK(g.server.advance_audio(0, {}, {}));
++        CHECK(g.server.audio.voices().empty());
++        CHECK(g.objects.finish_frame());
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        HOBJECT old = nullptr;
++        for (int cycle = 0; cycle < 3; ++cycle)
++        {
++            auto* ai = actor(g, table());
++            CHECK(ai && ai->m_hObject != old);
++            CHECK(key(g, ai, "[play_sound:long][sound_voice:1]"));
++            CHECK(ai->audio_starts == 1 && ai->AnimSound()->m_hVoxSound);
++            old = ai->m_hObject;
++            CHECK(g.unload_world() && !g.objects.get(old) && g.server.audio.voices().empty());
++            CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++        }
++        return true;
++    }
++    struct Profile
++    {
++        const char* model;
++        const char* root;
++    };
++    const Profile profiles[]{{"m_civilian1", "civilian"}, {"f_civilian1", "f_civ"},    {"labtech", "civilian"},
++                             {"m_cultist1", "m_cultist"}, {"f_cultist1", "f_cultist"}, {"gideon", "Gideon"}};
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config cfg;
++        cfg.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(cfg, error));
++        size_t keys = 0, starts = 0, failures = 0, sounds = 0, absent_targets = 0, unavailable = 0;
++        for (auto profile : profiles)
++        {
++            auto* ai = actor(g, table("sounds/enemies/" + std::string(profile.root)));
++            CHECK(ai);
++            auto* r = g.objects.get(ai->m_hObject);
++            CHECK(g.models.load("models/enemies/" + std::string(profile.model) + ".abc", r->model, error));
++            for (unsigned clip = 0; clip < r->model->animations.size(); ++clip)
++            {
++                r->animation.animation = clip;
++                r->animation.reset();
++                r->animation.looping = false;
++                CHECK(g.server.advance_models(r->model->animations[clip].duration / 1000.));
++                if (ai->key_outcome == AIKeyOutcome::PlaybackFailed)
++                    std::cout << profile.model << " missing " << ai->ai_sound_resource << " " << ai->ai_key_error
++                              << "\n";
++                CHECK(g.server.advance_audio(10, {}, {}));
++            }
++            std::cout << profile.model << " keys=" << ai->model_keys << " sound_keys=" << ai->audio_keys
++                      << " starts=" << ai->audio_starts << " busy=" << ai->busy_voices << " no_target=" << ai->no_target
++                      << " unavailable=" << ai->unavailable_keys << " failures=" << ai->key_failures << "\n";
++            CHECK(ai->audio_keys == ai->audio_starts && ai->busy_voices == 0 && ai->camera_suppressed == 0 &&
++                  ai->chance_suppressed == 0);
++            CHECK(ai->AnimSound()->sound_failures == 0);
++            sounds += ai->audio_keys;
++            absent_targets += ai->no_target;
++            unavailable += ai->unavailable_keys;
++            keys += ai->model_keys;
++            starts += ai->audio_starts;
++            failures += ai->key_failures;
++            const auto h = ai->m_hObject;
++            CHECK(g.objects.remove(h) && g.objects.finish_frame());
++            CHECK(g.server.advance_audio(0, {}, {}));
++        }
++        std::cout << "TOTAL keys=" << keys << " starts=" << starts << " failures=" << failures << "\n";
++        CHECK(keys == 147 && sounds == 140 && starts == 140 && failures == 1 && absent_targets == 6 &&
++              unavailable == 1);
++        CHECK(g.unload_world() && g.server.audio.voices().empty());
++        return true;
++    }
++    bool subway(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config cfg;
++        cfg.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(cfg, error));
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            auto* ai = actor(g, table("sounds/enemies/m_cultist"));
++            CHECK(ai);
++            CHECK(key(g, ai, "[play_sound:idle][sound_random:4][sound_voice:1]"));
++            CHECK(ai->key_outcome == AIKeyOutcome::CameraBlocked);
++            CHECK(test_camera::complete_subway_intro(g));
++            CHECK(key(g, ai, "[play_sound:idle][sound_random:4][sound_voice:1]"));
++            if (ai->audio_starts != 1)
++                std::cerr << ai->ai_sound_resource << " " << ai->ai_key_error << "\n";
++            CHECK(ai->audio_starts == 1 && g.server.advance_audio(.1, {}, {}));
++            CHECK(g.server.audio.get(ai->AnimSound()->m_hVoxSound)->cursor > 0);
++            CHECK(g.unload_world() && g.server.audio.voices().empty() && g.server.string_count() == 0 &&
++                  g.server.message_count() == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"sound", sound},     {"priority", priority},   {"gates", gates},         {"random", random_cases},
++        {"shared", shared},   {"rejection", rejection}, {"callbacks", callbacks}, {"lifetime", lifetime},
++        {"catalog", catalog}, {"subway", subway}};
++    auto i = cases.find(argv[1]);
++    return i != cases.end() && i->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/player_fixture.h b/tests/player_fixture.h
+index 4df0814..daf915d 100644
+--- a/tests/player_fixture.h
++++ b/tests/player_fixture.h
+@@ -44,7 +44,7 @@ namespace test_player
+         {
+             auto offset = static_cast<unsigned>(w.b.size());
+             w.b.insert(w.b.end(), data.begin(), data.end());
+-            auto dot = name.find('.');
++            auto dot = name.rfind('.');
+             auto ext = name.substr(dot + 1);
+             unsigned extension = 0;
+             for (char value : ext)

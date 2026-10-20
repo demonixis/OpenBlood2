@@ -1,0 +1,28 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 273: gpu.character
+1/8 Test #273: gpu.character ....................   Passed   18.46 sec
+    Start 290: character_motion.catalog
+    Start 289: character_motion.player
+    Start 287: character_motion.collision
+    Start 285: character_motion.motion
+2/8 Test #287: character_motion.collision .......   Passed    0.00 sec
+    Start 284: character_motion.lookup
+3/8 Test #285: character_motion.motion ..........   Passed    0.00 sec
+    Start 288: character_motion.callbacks
+4/8 Test #284: character_motion.lookup ..........   Passed    0.00 sec
+    Start 286: character_motion.rejection
+5/8 Test #289: character_motion.player ..........   Passed    0.01 sec
+6/8 Test #288: character_motion.callbacks .......   Passed    0.00 sec
+7/8 Test #286: character_motion.rejection .......   Passed    0.00 sec
+8/8 Test #290: character_motion.catalog .........   Passed    0.25 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+character           =  18.46 sec*proc (1 test)
+character_motion    =   0.27 sec*proc (7 tests)
+gpu                 =  18.46 sec*proc (1 test)
+headless            =   0.27 sec*proc (7 tests)
+private             =  18.71 sec*proc (2 tests)
+
+Total Test time (real) =  18.72 sec

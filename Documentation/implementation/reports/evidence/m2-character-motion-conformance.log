@@ -1,0 +1,2 @@
+Six original primary Sparam branches match ordered port selectors: RotY, ForwVel, RightVel, UpVel, AddX, DimsX
+Original PlayerObj.cpp:3143 base call remains commented out; port player override unchanged.

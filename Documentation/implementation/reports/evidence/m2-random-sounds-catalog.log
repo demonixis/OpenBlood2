@@ -1,0 +1,63 @@
+233/235 Testing: randomsound.catalog
+233/235 Test: randomsound.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/random_sound_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"randomsound.catalog" start time: Oct 16 01:58 CEST
+Output:
+----------------------------------------------------------
+SUBWAY RandomSoundFX0 on=1 positional=0 sequential=0 loop=0 waits=6,15 range=0 radius=5000 volume=100
+  sounds\ambient\subway1.wav rate=22050 frames=55296 duration=2.50776
+  sounds\ambient\subway2.wav rate=22050 frames=61440 duration=2.78639
+  sounds\ambient\subway3.wav rate=22050 frames=73728 duration=3.34367
+  sounds\ambient\subway4.wav rate=22050 frames=65536 duration=2.97215
+  sounds\ambient\subway5.wav rate=22050 frames=81920 duration=3.71519
+SUBWAY RandomSoundFX0 on=1 positional=0 sequential=0 loop=0 waits=20,35 range=0 radius=5000 volume=100
+  sounds\events\tavoice1.wav rate=22050 frames=172393 duration=7.81828
+  sounds\events\tavoice2a.wav rate=22050 frames=374913 duration=17.0029
+  sounds\events\tavoice3.wav rate=22050 frames=99515 duration=4.51315
+  sounds\events\tavoice4.wav rate=22050 frames=72737 duration=3.29873
+  sounds\events\tavoice5.wav rate=22050 frames=50817 duration=2.30463
+  sounds\events\tavoice6.wav rate=22050 frames=49281 duration=2.23497
+worlds/05_cdm.dat sounds\enemies\souldrudge\pain1.wav failure=Missing or oversized sound resource
+worlds/05_cdm.dat sounds\enemies\souldrudge\pain2.wav failure=Missing or oversized sound resource
+worlds/05_cdm.dat sounds\enemies\souldrudge\pain3.wav failure=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambient\steam3.wav failure=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambient\steam3.wav failure=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambient\steam3.wav failure=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambient\steam3.wav failure=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\enemies\thief\TH_walk_2.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\crowcaw.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\thun7.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\crowcaw.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\thun7.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\crowcaw.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\thun7.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\crowcaw.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\thun7.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\crowcaw.wav failure=Missing or oversized sound resource
+worlds/12_train_station.dat sounds\ambient\thun7.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun1.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun2.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun3.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun3.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun2.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun1.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun1.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun2.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun3.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun1.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun2.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun3.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun1.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun2.wav failure=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\thun3.wav failure=Missing or oversized sound resource
+worlds/21_laboratory.dat sounds\enemies\civilian\scream3.wav failure=Missing or oversized sound resource
+worlds=57 controllers=54 refs=223 missing=35 invalid=0 rejected=0
+<end of output>
+Test time =   3.68 sec
+----------------------------------------------------------
+Test Passed.
+"randomsound.catalog" end time: Oct 16 01:58 CEST
+"randomsound.catalog" time elapsed: 00:00:03
+----------------------------------------------------------

@@ -1,0 +1,84 @@
+540/540 Testing: gpu.player_keepalive
+540/540 Test: gpu.player_keepalive
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/blood2" "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--keepalive-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-keepalive.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.player_keepalive" start time: Oct 16 19:42 CEST
+Output:
+----------------------------------------------------------
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 225 original instances, 116 BSP models
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/player-keepalive.png
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+[info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+[info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+<end of output>
+Test time =   4.13 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.player_keepalive" end time: Oct 16 19:42 CEST
+"gpu.player_keepalive" time elapsed: 00:00:04
+----------------------------------------------------------
+
+End testing: Oct 16 19:42 CEST
+
+brushes =   2.42 sec*proc
+
+cameras =   2.62 sec*proc
+
+character =  19.91 sec*proc
+
+cinematics =   2.59 sec*proc
+
+containers =   6.01 sec*proc
+
+doors =   2.41 sec*proc
+
+gpu = 154.25 sec*proc
+
+interaction =   7.78 sec*proc
+
+keyframes =   2.55 sec*proc
+
+lights =   2.55 sec*proc
+
+model_view =   1.43 sec*proc
+
+movement =  18.65 sec*proc
+
+objectives =   3.23 sec*proc
+
+pickups =   2.55 sec*proc
+
+player =   2.59 sec*proc
+
+player_keepalive =   4.13 sec*proc
+
+player_restore =   2.94 sec*proc
+
+private = 150.07 sec*proc
+
+randomsound =  13.56 sec*proc
+
+sceneexplosion =   2.59 sec*proc
+
+sound =   2.71 sec*proc
+
+sprites =   2.60 sec*proc
+
+triggers =   2.69 sec*proc
+
+weapons =  18.54 sec*proc
+
+world_view =  19.13 sec*proc
+
+worldpaths =   2.55 sec*proc
+

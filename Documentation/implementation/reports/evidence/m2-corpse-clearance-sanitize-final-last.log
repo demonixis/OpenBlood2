@@ -1,0 +1,79 @@
+Start testing: Oct 17 10:18 CEST
+----------------------------------------------------------
+54/742 Testing: services.placement_queries
+54/742 Test: services.placement_queries
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "placement_queries"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.placement_queries" start time: Oct 17 10:18 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"services.placement_queries" end time: Oct 17 10:18 CEST
+"services.placement_queries" time elapsed: 00:00:00
+----------------------------------------------------------
+
+55/742 Testing: services.placement_service
+55/742 Test: services.placement_service
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "placement_service"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.placement_service" start time: Oct 17 10:18 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"services.placement_service" end time: Oct 17 10:18 CEST
+"services.placement_service" time elapsed: 00:00:00
+----------------------------------------------------------
+
+601/742 Testing: player_controls.corpse_clearance
+601/742 Test: player_controls.corpse_clearance
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_controls_tests" "clearance" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_controls.corpse_clearance" start time: Oct 17 10:18 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2338.28
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=0
+Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+Post-kill position=-32,170.001,-1854.18 camera=0 yaw=0
+Walked past killed Cultist to z=-1854.18
+Approached encounter at z=-1742.25
+Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=0
+Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+Post-kill position=-32,170.001,-1340.93 camera=0 yaw=-3.72529e-09
+Walked past killed Cultist to z=-1340.93
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2341.42
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=0
+Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+Approached encounter at z=-1745.4
+Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=0
+Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+Post-kill position=-32,170.001,-1344.07 camera=0 yaw=3.72529e-09
+Walked past killed Cultist to z=-1344.07
+<end of output>
+Test time =  96.51 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.corpse_clearance" end time: Oct 17 10:20 CEST
+"player_controls.corpse_clearance" time elapsed: 00:01:36
+----------------------------------------------------------
+
+End testing: Oct 17 10:20 CEST
+
+headless =  96.57 sec*proc
+
+player_controls =  96.51 sec*proc
+
+private =  96.51 sec*proc
+
+services =   0.05 sec*proc
+

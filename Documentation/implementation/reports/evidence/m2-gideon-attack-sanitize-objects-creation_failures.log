@@ -1,0 +1,15 @@
+11/634 Testing: objects.creation_failures
+11/634 Test: objects.creation_failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "creation_failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.creation_failures" start time: Oct 17 03:03 CEST
+Output:
+----------------------------------------------------------
+PASS creation_failures
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"objects.creation_failures" end time: Oct 17 03:03 CEST
+"objects.creation_failures" time elapsed: 00:00:00
+----------------------------------------------------------

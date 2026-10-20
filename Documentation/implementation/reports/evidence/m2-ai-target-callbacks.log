@@ -1,0 +1,14 @@
+329/332 Testing: ai_target.callbacks
+329/332 Test: ai_target.callbacks
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests" "callbacks"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_target.callbacks" start time: Oct 16 08:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.callbacks" end time: Oct 16 08:07 CEST
+"ai_target.callbacks" time elapsed: 00:00:00
+----------------------------------------------------------

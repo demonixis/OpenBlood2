@@ -1,0 +1,17 @@
+543/545 Testing: sprite_view.subway
+543/545 Test: sprite_view.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_view_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"sprite_view.subway" start time: Oct 16 19:56 CEST
+Output:
+----------------------------------------------------------
+SubwayA frame=SpriteTextures\bloodsplat3.dtx 128x128 zero=14828 partial=1556
+SubwayA frame=SpriteTextures\bloodsplat3.dtx 128x128 zero=14828 partial=1556
+SubwayA frame=SpriteTextures\bloodsplat3.dtx 128x128 zero=14828 partial=1556
+<end of output>
+Test time =   1.21 sec
+----------------------------------------------------------
+Test Passed.
+"sprite_view.subway" end time: Oct 16 19:56 CEST
+"sprite_view.subway" time elapsed: 00:00:01
+----------------------------------------------------------

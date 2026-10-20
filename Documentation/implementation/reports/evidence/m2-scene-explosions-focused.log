@@ -1,0 +1,29 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 256: sceneexplosion.properties
+    Start 262: sceneexplosion.catalog
+1/9 Test #256: sceneexplosion.properties ........   Passed    0.00 sec
+    Start 263: sceneexplosion.subway
+2/9 Test #263: sceneexplosion.subway ............   Passed    0.56 sec
+    Start 261: sceneexplosion.budget
+3/9 Test #261: sceneexplosion.budget ............   Passed    0.01 sec
+    Start 257: sceneexplosion.commands
+4/9 Test #257: sceneexplosion.commands ..........   Passed    0.00 sec
+    Start 259: sceneexplosion.lifetime
+5/9 Test #259: sceneexplosion.lifetime ..........   Passed    0.00 sec
+    Start 260: sceneexplosion.failures
+6/9 Test #260: sceneexplosion.failures ..........   Passed    0.00 sec
+    Start 258: sceneexplosion.damage
+7/9 Test #258: sceneexplosion.damage ............   Passed    0.00 sec
+8/9 Test #262: sceneexplosion.catalog ...........   Passed    3.29 sec
+    Start 264: gpu.sceneexplosion
+9/9 Test #264: gpu.sceneexplosion ...............   Passed    3.87 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Label Time Summary:
+gpu               =   3.87 sec*proc (1 test)
+headless          =   3.88 sec*proc (8 tests)
+private           =   7.72 sec*proc (3 tests)
+sceneexplosion    =   7.75 sec*proc (9 tests)
+
+Total Test time (real) =   7.16 sec

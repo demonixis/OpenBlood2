@@ -1,0 +1,14 @@
+365/366 Testing: ai_trigger.audio
+365/366 Test: ai_trigger.audio
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_trigger_tests" "audio" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-trigger-audio"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_trigger.audio" start time: Oct 16 12:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ai_trigger.audio" end time: Oct 16 12:07 CEST
+"ai_trigger.audio" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,219 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "603ac0c8c5036a8803a2092beaaeb3e9b7e81178",
+  "status": "M2 incomplete; explicit IMA tick mapping and MIDI queue conversion, no running section/playlist transport or MUSIC",
+  "frozen_sources": {
+    "CMakeLists.txt": "d2fac91241d27d7b0e35046a96a644a281cc0ad1e0720a2d6b7b9f83149f1532",
+    "src/engine/ima_clock.h": "ad19c156633f669d104ed28c55e49e36fb63d6396b3874d066d66d4c94d55d1f",
+    "src/engine/ima_clock.cpp": "b19be332fec6b671eb0894b628880646e77d2bc5a5c5dfddd43748b87632131f",
+    "src/engine/dls_sampler.h": "6dc6adf9bd15f884200667794d85bd128d7ad81a8b46f63329bd530b7301c0b4",
+    "src/engine/dls_midi_queue.cpp": "cc91b2eb4e4f70d78bc1385151cc3d1f8ddf376c03f502c897a79e917922badb",
+    "src/app/inspector_world_sounds.cpp": "071d9c7341d26eb65eca246f869c57331d5d1cf64b68fa8d533a42f4def1d012",
+    "src/app/world_sound_smoke.cpp": "cf5ca52bac55ec478d947ffb56231d20c1a997aa9610b6c9629c9d13ca4ea693",
+    "tests/ima_clock_tests.cpp": "8c4cd617aff6ddfea7509c0e10d5de6b8e2aaed2ac4bd02773385f71ce6942a0",
+    "tests/CMakeLists.txt": "8ee969934d5081c6492775d7e1935e5be13900ac2a1890901d277aad136a8752"
+  },
+  "results": {
+    "debug-tests": {
+      "passed": 142,
+      "wall_seconds": 21.24
+    },
+    "release-tests": {
+      "passed": 142,
+      "wall_seconds": 1.9
+    },
+    "sanitize-tests": {
+      "passed": 142,
+      "wall_seconds": 82.69
+    },
+    "debug-gpu": {
+      "passed": 2,
+      "wall_seconds": 12.41
+    },
+    "release-gpu": {
+      "passed": 2,
+      "wall_seconds": 5.35
+    }
+  },
+  "unchanged_source_warnings": {
+    "debug": [],
+    "release": [
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:36:78: warning: comparison of floating-point type \u2018float\u2019 with enumeration type \u2018GameType\u2019 is deprecated [-Wdeprecated-enum-float-conversion]"
+    ],
+    "sanitize": [
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:11:96: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:23:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerVoice.cpp:35:74: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/ItemPickups.cpp:9:85: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]",
+      "/home/yann/projects/lithtech/Blood2/src/game/original/PlayerContainers.cpp:36:78: warning: comparison of floating-point type 'float' with enumeration type 'GameType' is deprecated [-Wdeprecated-enum-float-conversion]"
+    ]
+  },
+  "original_probe": {
+    "private_fnv64": 217478193828128853,
+    "synthetic_fnv64": 624056526007582026,
+    "binary": "IMRT25.DLL",
+    "sha256": "2dc50ca832084601d1f10ac9d5f5fc67fd153154cd244db1a55a3147c70d7bd2",
+    "unicorn": "2.1.4",
+    "maps": 324,
+    "queries": 98136,
+    "private_sections": 156,
+    "decisions_sha256": "5478b171fae6a18e0854a0938212fac5a76af37638bbd607dbf64dfbeef0c69d",
+    "scope": "Normal-speed clamped/quantized tempo, duplicate boundaries, retained 100ns carry and integer millisecond event conversion. MulDiv/locks/log intercepted; no native runtime, scheduler, PCM or playlist.",
+    "entry_rvas": [
+      "0x29b2",
+      "0x2a3e",
+      "0x1c12"
+    ]
+  },
+  "commands": [
+    "python3 Documentation/Implementation/evidence/m2-ima-clock-validation.py {debug,release,sanitize} (three builds at -j1; relevant CTests at -j2)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/{debug,release} -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit /tmp/b2-ima-clock-{debug,release}-gpu.xml",
+    "/tmp/b2-legacy-pan-tools/bin/python Documentation/Implementation/evidence/m2-ima-clock-probe.py EXTERNAL_GAME_ROOT",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror (seven changed/new C++ files)",
+    "python3 /tmp/b2-npc-integrity.py; python3 /tmp/b2-npc-links.py; git diff --check (raw .log/.xml excluded)"
+  ],
+  "limitations": [
+    "Explicit positive-tempo/nonnegative-tick normal-speed mapping only; no running section, negative-event lookahead, playlists, seek or successful MUSIC",
+    "Original isolated runtime constructor/clock execution with modelled MulDiv import, locks/logging bypassed; no native Windows timer or audio equivalence",
+    "PCM block-size equality is internal replacement equivalence, not retail audio equivalence",
+    "NVIDIA Linux dummy SDL audio, hidden inspector and inspector-free Release; no native Metal/Windows/mobile or listening comparison",
+    "Capture reviewed for actual queue/counters; section timing panel and quarter-note widget not manually exercised"
+  ],
+  "capture": {
+    "path": "Blood2/build/debug/tests/world-sounds.png",
+    "sha256": "433b7a3e77322788fafd36568136f31bc820d2c06f225e695ed339d45d9a0b2b",
+    "committed": false
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "readme_preserved_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "files": [
+    {
+      "file": "m2-ima-clock-probe.py",
+      "sha256": "b08b1a0e3c398dfc9c904766406e84b07afda52567d5d3489b523f8fe49f67b2"
+    },
+    {
+      "file": "m2-ima-clock-probe.json",
+      "sha256": "ea4e16703a6f2f9df9c1933d331d82ecb29e6a641215497bcdcce5eeae6a3aa9"
+    },
+    {
+      "file": "m2-ima-clock-validation.py",
+      "sha256": "833b6b825cd495fe4091214abd8f1f2b2a5bf31b7b2644cf9d36bfab8c24afee"
+    },
+    {
+      "file": "m2-ima-clock-focus-build.log",
+      "sha256": "ce1776ba73a3255d92c8eee46df9d6d300e4d664441e831324b05e4ef020a735"
+    },
+    {
+      "file": "m2-ima-clock-focus.log",
+      "sha256": "b12e5ce34668a27ab77150552d53cf03d866853116db4344ef6b599ea568d58b"
+    },
+    {
+      "file": "m2-ima-clock-focus.xml",
+      "sha256": "54109d23bc6a942267a3c60e71019a5313d63c3e21873d6f5088f1757535f372"
+    },
+    {
+      "file": "m2-ima-clock-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-ima-clock-debug-tests.log",
+      "sha256": "77a2f7bcebfae0c15978b024b2a52b74021b8d3dcc51c59d23d9e44e4908b9b2"
+    },
+    {
+      "file": "m2-ima-clock-debug-tests.xml",
+      "sha256": "d2559f7e6b777bed5b68ab847f3921f3b040e69bb3c7f86e5e9c0bb4a1b3be0f"
+    },
+    {
+      "file": "m2-ima-clock-release-tests.log",
+      "sha256": "fb4936fa7985004296dd09a481f811e6c7ca2711fea4a92f3bbccd7f640adedd"
+    },
+    {
+      "file": "m2-ima-clock-release-tests.xml",
+      "sha256": "8a342173169833202dec9a879967fff60fa6e99eaef4722e8e0eb6769164fd54"
+    },
+    {
+      "file": "m2-ima-clock-sanitize-tests.log",
+      "sha256": "cb202d3bb54eb17702625b8fc2e8b81f3d458b9ae5a3ff10d026d0a45bdf0787"
+    },
+    {
+      "file": "m2-ima-clock-sanitize-tests.xml",
+      "sha256": "e8d3806e121358286ca1c2036d7ca83b227ac96afe79e61757b8112709d904e9"
+    },
+    {
+      "file": "m2-ima-clock-debug-gpu.log",
+      "sha256": "981144a52ac02f10704db822709f083a128bb5bf41f09932cbe361459ecaac22"
+    },
+    {
+      "file": "m2-ima-clock-debug-gpu.xml",
+      "sha256": "9df04258ab9e28b6fd100aa56f2b05da7c336d5adf3254048f5c7d4ddd504fc6"
+    },
+    {
+      "file": "m2-ima-clock-release-gpu.log",
+      "sha256": "45ce17fd5fe940284239ebf9f789f8daca52cb5a22082c346e6410bac72c343f"
+    },
+    {
+      "file": "m2-ima-clock-release-gpu.xml",
+      "sha256": "3531536f8ef9944cd5f54a1a6517586cbd0f1e0325ddcf84e0aeeb46febac638"
+    },
+    {
+      "file": "m2-ima-clock-debug-build-final.log",
+      "sha256": "c8cf7ff64abb06bfb09b73f643e954e34d10eee659c753cf62cd583b951ffaf6"
+    },
+    {
+      "file": "m2-ima-clock-release-build-final.log",
+      "sha256": "973e435994984feee913e851f8fcf8acf61c068abde497982fdf0b6ce2a2f698"
+    },
+    {
+      "file": "m2-ima-clock-sanitize-build-final.log",
+      "sha256": "f5c43fb86af173bdb8a700585314eccc05444079e34631b05f41186b06566b26"
+    },
+    {
+      "file": "m2-ima-clock-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-ima-clock-links.log",
+      "sha256": "b57a41b66a81ca8a652848293587add30c1150d2b4887a8ada7bef675545a24a"
+    }
+  ],
+  "implementation_commit": "457b0c5369ed25ca1e9baa6e1f37c44d175b792a"
+}

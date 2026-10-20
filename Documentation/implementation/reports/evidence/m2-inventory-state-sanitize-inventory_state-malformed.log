@@ -1,0 +1,14 @@
+482/485 Testing: inventory_state.malformed
+482/485 Test: inventory_state.malformed
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory_state_tests" "malformed" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/inventory-state-fixtures/malformed"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"inventory_state.malformed" start time: Oct 16 17:45 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"inventory_state.malformed" end time: Oct 16 17:45 CEST
+"inventory_state.malformed" time elapsed: 00:00:00
+----------------------------------------------------------

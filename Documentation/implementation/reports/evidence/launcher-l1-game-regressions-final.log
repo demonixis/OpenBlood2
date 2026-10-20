@@ -1,0 +1,43 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start   23: config.arguments
+ 1/15 Test   #23: config.arguments .................   Passed    0.00 sec
+      Start   24: config.precedence
+ 2/15 Test   #24: config.precedence ................   Passed    0.00 sec
+      Start   25: config.relative_paths
+ 3/15 Test   #25: config.relative_paths ............   Passed    0.00 sec
+      Start   26: config.invalid_config
+ 4/15 Test   #26: config.invalid_config ............   Passed    0.01 sec
+      Start   27: config.content_validation
+ 5/15 Test   #27: config.content_validation ........   Passed    0.00 sec
+      Start   28: config.case_lookup
+ 6/15 Test   #28: config.case_lookup ...............   Passed    0.00 sec
+      Start   29: config.demo
+ 7/15 Test   #29: config.demo ......................   Passed    0.00 sec
+      Start   70: world.rez_structure
+ 8/15 Test   #70: world.rez_structure ..............   Passed    0.00 sec
+      Start   71: world.rez_rejection
+ 9/15 Test   #71: world.rez_rejection ..............   Passed    0.00 sec
+      Start   72: world.resource_mount
+10/15 Test   #72: world.resource_mount .............   Passed    0.00 sec
+      Start 1180: menus.preferences
+11/15 Test #1180: menus.preferences ................   Passed    0.00 sec
+      Start 1199: demo.flow
+12/15 Test #1199: demo.flow ........................   Passed    0.00 sec
+      Start 1200: demo.rules
+13/15 Test #1200: demo.rules .......................   Passed    0.01 sec
+      Start 1205: demo_menu.manifest
+14/15 Test #1205: demo_menu.manifest ...............   Passed    0.00 sec
+      Start 1206: demo_menu.flow
+15/15 Test #1206: demo_menu.flow ...................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 15
+
+Label Time Summary:
+config       =   0.02 sec*proc (7 tests)
+demo         =   0.01 sec*proc (2 tests)
+demo_menu    =   0.00 sec*proc (2 tests)
+headless     =   0.04 sec*proc (15 tests)
+menus        =   0.00 sec*proc (1 test)
+world        =   0.01 sec*proc (3 tests)
+
+Total Test time (real) =   0.07 sec

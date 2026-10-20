@@ -1,0 +1,7358 @@
+[
+  {
+    "name": "objects.original_objects",
+    "labels": [
+      "headless",
+      "objects"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_contract_tests",
+      "original_objects"
+    ]
+  },
+  {
+    "name": "objects.nested_creation",
+    "labels": [
+      "headless",
+      "objects"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_contract_tests",
+      "nested_creation"
+    ]
+  },
+  {
+    "name": "objects.reasons_properties",
+    "labels": [
+      "headless",
+      "objects"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_contract_tests",
+      "reasons_properties"
+    ]
+  },
+  {
+    "name": "objects.scheduling",
+    "labels": [
+      "headless",
+      "objects"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_contract_tests",
+      "scheduling"
+    ]
+  },
+  {
+    "name": "objects.deferred_removal",
+    "labels": [
+      "headless",
+      "objects"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_contract_tests",
+      "deferred_removal"
+    ]
+  },
+  {
+    "name": "objects.aggregate_dispatch",
+    "labels": [
+      "headless",
+      "objects"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_contract_tests",
+      "aggregate_dispatch"
+    ]
+  },
+  {
+    "name": "objects.handles_selection",
+    "labels": [
+      "headless",
+      "objects"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_contract_tests",
+      "handles_selection"
+    ]
+  },
+  {
+    "name": "objects.links_lists",
+    "labels": [
+      "headless",
+      "objects"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_contract_tests",
+      "links_lists"
+    ]
+  },
+  {
+    "name": "objects.messages_strings",
+    "labels": [
+      "headless",
+      "objects"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_contract_tests",
+      "messages_strings"
+    ]
+  },
+  {
+    "name": "objects.unsupported_teardown",
+    "labels": [
+      "headless",
+      "objects"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_contract_tests",
+      "unsupported_teardown"
+    ]
+  },
+  {
+    "name": "objects.creation_failures",
+    "labels": [
+      "headless",
+      "objects"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_contract_tests",
+      "creation_failures"
+    ]
+  },
+  {
+    "name": "config.arguments",
+    "labels": [
+      "config",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/config_tests",
+      "arguments",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/test-runs"
+    ]
+  },
+  {
+    "name": "config.precedence",
+    "labels": [
+      "config",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/config_tests",
+      "precedence",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/test-runs"
+    ]
+  },
+  {
+    "name": "config.relative_paths",
+    "labels": [
+      "config",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/config_tests",
+      "relative_paths",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/test-runs"
+    ]
+  },
+  {
+    "name": "config.invalid_config",
+    "labels": [
+      "config",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/config_tests",
+      "invalid_config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/test-runs"
+    ]
+  },
+  {
+    "name": "config.content_validation",
+    "labels": [
+      "config",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/config_tests",
+      "content_validation",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/test-runs"
+    ]
+  },
+  {
+    "name": "config.case_lookup",
+    "labels": [
+      "config",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/config_tests",
+      "case_lookup",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/test-runs"
+    ]
+  },
+  {
+    "name": "cli.help",
+    "labels": [
+      "cli",
+      "headless"
+    ],
+    "command": [
+      "/usr/bin/cmake",
+      "-DAPP=/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "-DCASE=help",
+      "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/debug/tests/fixtures/Blood II",
+      "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "-P",
+      "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+    ]
+  },
+  {
+    "name": "cli.unknown",
+    "labels": [
+      "cli",
+      "headless"
+    ],
+    "command": [
+      "/usr/bin/cmake",
+      "-DAPP=/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "-DCASE=unknown",
+      "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/debug/tests/fixtures/Blood II",
+      "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "-P",
+      "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+    ]
+  },
+  {
+    "name": "cli.missing_data",
+    "labels": [
+      "cli",
+      "headless"
+    ],
+    "command": [
+      "/usr/bin/cmake",
+      "-DAPP=/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "-DCASE=missing_data",
+      "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/debug/tests/fixtures/Blood II",
+      "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "-P",
+      "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+    ]
+  },
+  {
+    "name": "cli.missing_config",
+    "labels": [
+      "cli",
+      "headless"
+    ],
+    "command": [
+      "/usr/bin/cmake",
+      "-DAPP=/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "-DCASE=missing_config",
+      "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/debug/tests/fixtures/Blood II",
+      "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "-P",
+      "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+    ]
+  },
+  {
+    "name": "cli.metadata",
+    "labels": [
+      "cli",
+      "headless"
+    ],
+    "command": [
+      "/usr/bin/cmake",
+      "-DAPP=/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "-DCASE=metadata",
+      "-DDATA_DIR=/home/yann/projects/lithtech/Blood2/build/debug/tests/fixtures/Blood II",
+      "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "-P",
+      "/home/yann/projects/lithtech/Blood2/tests/cli_test.cmake"
+    ]
+  },
+  {
+    "name": "content.local",
+    "labels": [
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--check-data"
+    ]
+  },
+  {
+    "name": "gpu.lifecycle",
+    "labels": [
+      "gpu"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--gpu-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/gpu.png"
+    ]
+  },
+  {
+    "name": "world.destination_trials",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "destination_trials",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/destination_trials"
+    ]
+  },
+  {
+    "name": "world.destination_messages",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "destination_messages",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/destination_messages"
+    ]
+  },
+  {
+    "name": "world.destination_schema",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "destination_schema",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/destination_schema"
+    ]
+  },
+  {
+    "name": "world.destination_lifetime",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "destination_lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/destination_lifetime"
+    ]
+  },
+  {
+    "name": "world.sprite_entries",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "sprite_entries",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/sprite_entries"
+    ]
+  },
+  {
+    "name": "world.sound_entries",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "sound_entries",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/sound_entries"
+    ]
+  },
+  {
+    "name": "world.rez_structure",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "rez_structure",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/rez_structure"
+    ]
+  },
+  {
+    "name": "world.rez_rejection",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "rez_rejection",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/rez_rejection"
+    ]
+  },
+  {
+    "name": "world.resource_mount",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "resource_mount",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/resource_mount"
+    ]
+  },
+  {
+    "name": "world.world_properties",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "world_properties",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/world_properties"
+    ]
+  },
+  {
+    "name": "world.world_geometry",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "world_geometry",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/world_geometry"
+    ]
+  },
+  {
+    "name": "world.world_rejection",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "world_rejection",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/world_rejection"
+    ]
+  },
+  {
+    "name": "world.mutations",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "mutations",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/mutations"
+    ]
+  },
+  {
+    "name": "world.session_lifecycle",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "session_lifecycle",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/session_lifecycle"
+    ]
+  },
+  {
+    "name": "world.session_messages",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "session_messages",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/session_messages"
+    ]
+  },
+  {
+    "name": "world.original_trigger",
+    "labels": [
+      "headless",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "original_trigger",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-fixtures/original_trigger"
+    ]
+  },
+  {
+    "name": "world.destination_trial_private",
+    "labels": [
+      "headless",
+      "private",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "destination_trial_private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "world.destination_private",
+    "labels": [
+      "headless",
+      "private",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "destination_private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "world.private",
+    "labels": [
+      "headless",
+      "private",
+      "world"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.world",
+    "labels": [
+      "gpu",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--world-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world.png"
+    ]
+  },
+  {
+    "name": "cli.world_modes",
+    "labels": [
+      "headless",
+      "private",
+      "world"
+    ],
+    "command": [
+      "/usr/bin/cmake",
+      "-DAPP=/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "-DDATA_DIR=/home/yann/.steam/steam/steamapps/common/Blood II",
+      "-DCONFIG=/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "-P",
+      "/home/yann/projects/lithtech/Blood2/tests/world_cli_test.cmake"
+    ]
+  },
+  {
+    "name": "services.model_reader",
+    "labels": [
+      "headless",
+      "services"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/services_tests",
+      "model_reader"
+    ]
+  },
+  {
+    "name": "services.model_rejection",
+    "labels": [
+      "headless",
+      "services"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/services_tests",
+      "model_rejection"
+    ]
+  },
+  {
+    "name": "services.animation_events",
+    "labels": [
+      "headless",
+      "services"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/services_tests",
+      "animation_events"
+    ]
+  },
+  {
+    "name": "services.model_callbacks",
+    "labels": [
+      "headless",
+      "services"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/services_tests",
+      "model_callbacks"
+    ]
+  },
+  {
+    "name": "services.collision_queries",
+    "labels": [
+      "headless",
+      "services"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/services_tests",
+      "collision_queries"
+    ]
+  },
+  {
+    "name": "services.movement_contacts",
+    "labels": [
+      "headless",
+      "services"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/services_tests",
+      "movement_contacts"
+    ]
+  },
+  {
+    "name": "services.original_services",
+    "labels": [
+      "headless",
+      "services"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/services_tests",
+      "original_services"
+    ]
+  },
+  {
+    "name": "services.private",
+    "labels": [
+      "headless",
+      "private",
+      "services"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/services_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "player.handles",
+    "labels": [
+      "headless",
+      "player"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_tests",
+      "handles",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-fixtures/handles"
+    ]
+  },
+  {
+    "name": "player.lifecycle",
+    "labels": [
+      "headless",
+      "player"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_tests",
+      "lifecycle",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-fixtures/lifecycle"
+    ]
+  },
+  {
+    "name": "player.rollback",
+    "labels": [
+      "headless",
+      "player"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_tests",
+      "rollback",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-fixtures/rollback"
+    ]
+  },
+  {
+    "name": "player.messages",
+    "labels": [
+      "headless",
+      "player"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_tests",
+      "messages",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-fixtures/messages"
+    ]
+  },
+  {
+    "name": "player.callbacks",
+    "labels": [
+      "headless",
+      "player"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_tests",
+      "callbacks",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-fixtures/callbacks"
+    ]
+  },
+  {
+    "name": "player.private",
+    "labels": [
+      "headless",
+      "player",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.player",
+    "labels": [
+      "gpu",
+      "player",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--player-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player.png"
+    ]
+  },
+  {
+    "name": "weapons.inventory",
+    "labels": [
+      "headless",
+      "weapons"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_tests",
+      "inventory",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-fixtures/inventory"
+    ]
+  },
+  {
+    "name": "weapons.segments",
+    "labels": [
+      "headless",
+      "weapons"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_tests",
+      "segments",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-fixtures/segments"
+    ]
+  },
+  {
+    "name": "weapons.firing",
+    "labels": [
+      "headless",
+      "weapons"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_tests",
+      "firing",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-fixtures/firing"
+    ]
+  },
+  {
+    "name": "weapons.melee",
+    "labels": [
+      "headless",
+      "weapons"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_tests",
+      "melee",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-fixtures/melee"
+    ]
+  },
+  {
+    "name": "weapons.damage",
+    "labels": [
+      "headless",
+      "weapons"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_tests",
+      "damage",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-fixtures/damage"
+    ]
+  },
+  {
+    "name": "weapons.animation",
+    "labels": [
+      "headless",
+      "weapons"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_tests",
+      "animation",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-fixtures/animation"
+    ]
+  },
+  {
+    "name": "weapons.lifetime",
+    "labels": [
+      "headless",
+      "weapons"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "weapons.rollback",
+    "labels": [
+      "headless",
+      "weapons"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_tests",
+      "rollback",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-fixtures/rollback"
+    ]
+  },
+  {
+    "name": "weapons.private",
+    "labels": [
+      "headless",
+      "private",
+      "weapons"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.weapons",
+    "labels": [
+      "gpu",
+      "private",
+      "weapons"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--weapons-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapons.png"
+    ]
+  },
+  {
+    "name": "movement.walking",
+    "labels": [
+      "headless",
+      "movement"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests",
+      "walking",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/walking"
+    ]
+  },
+  {
+    "name": "movement.jumping",
+    "labels": [
+      "headless",
+      "movement"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests",
+      "jumping",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/jumping"
+    ]
+  },
+  {
+    "name": "movement.collisions",
+    "labels": [
+      "headless",
+      "movement"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests",
+      "collisions",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/collisions"
+    ]
+  },
+  {
+    "name": "movement.world_collision",
+    "labels": [
+      "headless",
+      "movement"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests",
+      "world_collision",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/world_collision"
+    ]
+  },
+  {
+    "name": "movement.support",
+    "labels": [
+      "headless",
+      "movement"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests",
+      "support",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/support"
+    ]
+  },
+  {
+    "name": "movement.boundaries",
+    "labels": [
+      "headless",
+      "movement"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests",
+      "boundaries",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/boundaries"
+    ]
+  },
+  {
+    "name": "movement.timing",
+    "labels": [
+      "headless",
+      "movement"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests",
+      "timing",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/timing"
+    ]
+  },
+  {
+    "name": "movement.lifetime",
+    "labels": [
+      "headless",
+      "movement"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "movement.controls",
+    "labels": [
+      "headless",
+      "movement"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests",
+      "controls",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement-fixtures/controls"
+    ]
+  },
+  {
+    "name": "movement.private",
+    "labels": [
+      "headless",
+      "movement",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.movement",
+    "labels": [
+      "gpu",
+      "movement",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--movement-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/movement.png"
+    ]
+  },
+  {
+    "name": "locomotion.stairs",
+    "labels": [
+      "headless",
+      "locomotion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion_tests",
+      "stairs",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion-fixtures/stairs"
+    ]
+  },
+  {
+    "name": "locomotion.world_stairs",
+    "labels": [
+      "headless",
+      "locomotion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion_tests",
+      "world_stairs",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion-fixtures/world_stairs"
+    ]
+  },
+  {
+    "name": "locomotion.limits",
+    "labels": [
+      "headless",
+      "locomotion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion_tests",
+      "limits",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion-fixtures/limits"
+    ]
+  },
+  {
+    "name": "locomotion.crouch",
+    "labels": [
+      "headless",
+      "locomotion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion_tests",
+      "crouch",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion-fixtures/crouch"
+    ]
+  },
+  {
+    "name": "locomotion.animations",
+    "labels": [
+      "headless",
+      "locomotion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion_tests",
+      "animations",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion-fixtures/animations"
+    ]
+  },
+  {
+    "name": "locomotion.lifetime",
+    "labels": [
+      "headless",
+      "locomotion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "locomotion.contacts",
+    "labels": [
+      "headless",
+      "locomotion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion_tests",
+      "contacts",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion-fixtures/contacts"
+    ]
+  },
+  {
+    "name": "locomotion.private",
+    "labels": [
+      "headless",
+      "locomotion",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/locomotion_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "containers.geometry",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "geometry",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/geometry"
+    ]
+  },
+  {
+    "name": "containers.concave",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "concave",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/concave"
+    ]
+  },
+  {
+    "name": "containers.membership",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "membership",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/membership"
+    ]
+  },
+  {
+    "name": "containers.lifetime",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "containers.physics",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "physics",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/physics"
+    ]
+  },
+  {
+    "name": "containers.swimming",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "swimming",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/swimming"
+    ]
+  },
+  {
+    "name": "containers.surface",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "surface",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/surface"
+    ]
+  },
+  {
+    "name": "containers.ladders",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "ladders",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/ladders"
+    ]
+  },
+  {
+    "name": "containers.air_damage",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "air_damage",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/air_damage"
+    ]
+  },
+  {
+    "name": "containers.specialized_defaults",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "specialized_defaults",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/specialized_defaults"
+    ]
+  },
+  {
+    "name": "containers.conveyor_motion",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "conveyor_motion",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/conveyor_motion"
+    ]
+  },
+  {
+    "name": "containers.conveyor_bodies",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "conveyor_bodies",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/conveyor_bodies"
+    ]
+  },
+  {
+    "name": "containers.specialized_damage",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "specialized_damage",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/specialized_damage"
+    ]
+  },
+  {
+    "name": "containers.freefall_motion",
+    "labels": [
+      "containers",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "freefall_motion",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container-fixtures/freefall_motion"
+    ]
+  },
+  {
+    "name": "containers.specialized_private",
+    "labels": [
+      "containers",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "specialized_private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "containers.private",
+    "labels": [
+      "containers",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/container_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.containers",
+    "labels": [
+      "containers",
+      "gpu",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--world",
+      "02_CityHub",
+      "--containers-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/containers.png"
+    ]
+  },
+  {
+    "name": "gpu.conveyor",
+    "labels": [
+      "containers",
+      "gpu",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--world",
+      "01_SubwayA",
+      "--containers-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/conveyor.png"
+    ]
+  },
+  {
+    "name": "doors.state",
+    "labels": [
+      "doors",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door_tests",
+      "state",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door-fixtures/state"
+    ]
+  },
+  {
+    "name": "doors.options",
+    "labels": [
+      "doors",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door_tests",
+      "options",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door-fixtures/options"
+    ]
+  },
+  {
+    "name": "doors.geometry",
+    "labels": [
+      "doors",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door_tests",
+      "geometry",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door-fixtures/geometry"
+    ]
+  },
+  {
+    "name": "doors.pushing",
+    "labels": [
+      "doors",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door_tests",
+      "pushing",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door-fixtures/pushing"
+    ]
+  },
+  {
+    "name": "doors.riders",
+    "labels": [
+      "doors",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door_tests",
+      "riders",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door-fixtures/riders"
+    ]
+  },
+  {
+    "name": "doors.lifetime",
+    "labels": [
+      "doors",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "doors.catalog",
+    "labels": [
+      "doors",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "doors.private",
+    "labels": [
+      "doors",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/door_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.doors",
+    "labels": [
+      "doors",
+      "gpu",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--doors-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/doors.png"
+    ]
+  },
+  {
+    "name": "triggers.schedule",
+    "labels": [
+      "headless",
+      "triggers"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger_tests",
+      "schedule",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger-fixtures/schedule"
+    ]
+  },
+  {
+    "name": "triggers.toggle",
+    "labels": [
+      "headless",
+      "triggers"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger_tests",
+      "toggle",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger-fixtures/toggle"
+    ]
+  },
+  {
+    "name": "triggers.filters",
+    "labels": [
+      "headless",
+      "triggers"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger_tests",
+      "filters",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger-fixtures/filters"
+    ]
+  },
+  {
+    "name": "triggers.keys",
+    "labels": [
+      "headless",
+      "triggers"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger_tests",
+      "keys",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger-fixtures/keys"
+    ]
+  },
+  {
+    "name": "triggers.doors",
+    "labels": [
+      "headless",
+      "triggers"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger_tests",
+      "doors",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger-fixtures/doors"
+    ]
+  },
+  {
+    "name": "triggers.touch",
+    "labels": [
+      "headless",
+      "triggers"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger_tests",
+      "touch",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger-fixtures/touch"
+    ]
+  },
+  {
+    "name": "triggers.lifetime",
+    "labels": [
+      "headless",
+      "triggers"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "triggers.protocol",
+    "labels": [
+      "headless",
+      "triggers"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger_tests",
+      "protocol",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger-fixtures/protocol"
+    ]
+  },
+  {
+    "name": "triggers.private",
+    "labels": [
+      "headless",
+      "private",
+      "triggers"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "triggers.catalog",
+    "labels": [
+      "headless",
+      "private",
+      "triggers"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/trigger_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.triggers",
+    "labels": [
+      "gpu",
+      "private",
+      "triggers"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--triggers-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/triggers.png"
+    ]
+  },
+  {
+    "name": "interaction.use",
+    "labels": [
+      "headless",
+      "interaction"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction_tests",
+      "use",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction-fixtures/use"
+    ]
+  },
+  {
+    "name": "interaction.input",
+    "labels": [
+      "headless",
+      "interaction"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction_tests",
+      "input",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction-fixtures/input"
+    ]
+  },
+  {
+    "name": "interaction.keys",
+    "labels": [
+      "headless",
+      "interaction"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction_tests",
+      "keys",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction-fixtures/keys"
+    ]
+  },
+  {
+    "name": "interaction.state",
+    "labels": [
+      "headless",
+      "interaction"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction_tests",
+      "state",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction-fixtures/state"
+    ]
+  },
+  {
+    "name": "interaction.geometry",
+    "labels": [
+      "headless",
+      "interaction"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction_tests",
+      "geometry",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction-fixtures/geometry"
+    ]
+  },
+  {
+    "name": "interaction.transport",
+    "labels": [
+      "headless",
+      "interaction"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction_tests",
+      "transport",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction-fixtures/transport"
+    ]
+  },
+  {
+    "name": "interaction.blocking",
+    "labels": [
+      "headless",
+      "interaction"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction_tests",
+      "blocking",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction-fixtures/blocking"
+    ]
+  },
+  {
+    "name": "interaction.lifetime",
+    "labels": [
+      "headless",
+      "interaction"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "interaction.player_push",
+    "labels": [
+      "headless",
+      "interaction"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction_tests",
+      "player_push",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction-fixtures/player_push"
+    ]
+  },
+  {
+    "name": "interaction.catalog",
+    "labels": [
+      "headless",
+      "interaction",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.interaction",
+    "labels": [
+      "gpu",
+      "interaction",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--interaction-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/interaction.png"
+    ]
+  },
+  {
+    "name": "brushes.state",
+    "labels": [
+      "brushes",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush_tests",
+      "state",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush-fixtures/state"
+    ]
+  },
+  {
+    "name": "brushes.spin",
+    "labels": [
+      "brushes",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush_tests",
+      "spin",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush-fixtures/spin"
+    ]
+  },
+  {
+    "name": "brushes.geometry",
+    "labels": [
+      "brushes",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush_tests",
+      "geometry",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush-fixtures/geometry"
+    ]
+  },
+  {
+    "name": "brushes.limits",
+    "labels": [
+      "brushes",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush_tests",
+      "limits",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush-fixtures/limits"
+    ]
+  },
+  {
+    "name": "brushes.transport",
+    "labels": [
+      "brushes",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush_tests",
+      "transport",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush-fixtures/transport"
+    ]
+  },
+  {
+    "name": "brushes.destruction",
+    "labels": [
+      "brushes",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush_tests",
+      "destruction",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush-fixtures/destruction"
+    ]
+  },
+  {
+    "name": "brushes.lifetime",
+    "labels": [
+      "brushes",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "brushes.catalog",
+    "labels": [
+      "brushes",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brush_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.brushes",
+    "labels": [
+      "brushes",
+      "gpu",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--brushes-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/brushes.png"
+    ]
+  },
+  {
+    "name": "explosions.properties",
+    "labels": [
+      "explosions",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_tests",
+      "properties",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fixtures/properties"
+    ]
+  },
+  {
+    "name": "explosions.requests",
+    "labels": [
+      "explosions",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_tests",
+      "requests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fixtures/requests"
+    ]
+  },
+  {
+    "name": "explosions.radius",
+    "labels": [
+      "explosions",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_tests",
+      "radius",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fixtures/radius"
+    ]
+  },
+  {
+    "name": "explosions.chain",
+    "labels": [
+      "explosions",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_tests",
+      "chain",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fixtures/chain"
+    ]
+  },
+  {
+    "name": "explosions.gates",
+    "labels": [
+      "explosions",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_tests",
+      "gates",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fixtures/gates"
+    ]
+  },
+  {
+    "name": "explosions.lifetime",
+    "labels": [
+      "explosions",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "explosions.limits",
+    "labels": [
+      "explosions",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_tests",
+      "limits",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fixtures/limits"
+    ]
+  },
+  {
+    "name": "explosions.player",
+    "labels": [
+      "explosions",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_tests",
+      "player",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fixtures/player"
+    ]
+  },
+  {
+    "name": "pushables.properties",
+    "labels": [
+      "headless",
+      "pushables"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable_tests",
+      "properties",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable-fixtures/properties"
+    ]
+  },
+  {
+    "name": "pushables.gravity",
+    "labels": [
+      "headless",
+      "pushables"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable_tests",
+      "gravity",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable-fixtures/gravity"
+    ]
+  },
+  {
+    "name": "pushables.friction",
+    "labels": [
+      "headless",
+      "pushables"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable_tests",
+      "friction",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable-fixtures/friction"
+    ]
+  },
+  {
+    "name": "pushables.impulses",
+    "labels": [
+      "headless",
+      "pushables"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable_tests",
+      "impulses",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable-fixtures/impulses"
+    ]
+  },
+  {
+    "name": "pushables.pushing",
+    "labels": [
+      "headless",
+      "pushables"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable_tests",
+      "pushing",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable-fixtures/pushing"
+    ]
+  },
+  {
+    "name": "pushables.player",
+    "labels": [
+      "headless",
+      "pushables"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable_tests",
+      "player",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable-fixtures/player"
+    ]
+  },
+  {
+    "name": "pushables.riders",
+    "labels": [
+      "headless",
+      "pushables"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable_tests",
+      "riders",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable-fixtures/riders"
+    ]
+  },
+  {
+    "name": "pushables.contacts",
+    "labels": [
+      "headless",
+      "pushables"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable_tests",
+      "contacts",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable-fixtures/contacts"
+    ]
+  },
+  {
+    "name": "pushables.collision",
+    "labels": [
+      "headless",
+      "pushables"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable_tests",
+      "collision",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable-fixtures/collision"
+    ]
+  },
+  {
+    "name": "pushables.containers",
+    "labels": [
+      "headless",
+      "pushables"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable_tests",
+      "containers",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pushable-fixtures/containers"
+    ]
+  },
+  {
+    "name": "pickups.defaults",
+    "labels": [
+      "headless",
+      "pickups"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup_tests",
+      "defaults",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup-fixtures/defaults"
+    ]
+  },
+  {
+    "name": "pickups.ammunition",
+    "labels": [
+      "headless",
+      "pickups"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup_tests",
+      "ammunition",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup-fixtures/ammunition"
+    ]
+  },
+  {
+    "name": "pickups.statistics",
+    "labels": [
+      "headless",
+      "pickups"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup_tests",
+      "statistics",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup-fixtures/statistics"
+    ]
+  },
+  {
+    "name": "pickups.protocol",
+    "labels": [
+      "headless",
+      "pickups"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup_tests",
+      "protocol",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup-fixtures/protocol"
+    ]
+  },
+  {
+    "name": "pickups.contact",
+    "labels": [
+      "headless",
+      "pickups"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup_tests",
+      "contact",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup-fixtures/contact"
+    ]
+  },
+  {
+    "name": "pickups.spawning",
+    "labels": [
+      "headless",
+      "pickups"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup_tests",
+      "spawning",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup-fixtures/spawning"
+    ]
+  },
+  {
+    "name": "pickups.rejection",
+    "labels": [
+      "headless",
+      "pickups"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup_tests",
+      "rejection",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup-fixtures/rejection"
+    ]
+  },
+  {
+    "name": "pickups.callbacks",
+    "labels": [
+      "headless",
+      "pickups"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup_tests",
+      "callbacks",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup-fixtures/callbacks"
+    ]
+  },
+  {
+    "name": "pickups.resources",
+    "labels": [
+      "headless",
+      "pickups"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup_tests",
+      "resources",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup-fixtures/resources"
+    ]
+  },
+  {
+    "name": "pickups.catalog",
+    "labels": [
+      "headless",
+      "pickups",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickup_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.pickups",
+    "labels": [
+      "gpu",
+      "pickups",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--pickups-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickups.png"
+    ]
+  },
+  {
+    "name": "objectives.strings",
+    "labels": [
+      "headless",
+      "objectives"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objectives_tests",
+      "strings",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objective-fixtures/strings"
+    ]
+  },
+  {
+    "name": "objectives.malformed",
+    "labels": [
+      "headless",
+      "objectives"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objectives_tests",
+      "malformed",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objective-fixtures/malformed"
+    ]
+  },
+  {
+    "name": "objectives.defaults",
+    "labels": [
+      "headless",
+      "objectives"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objectives_tests",
+      "defaults",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objective-fixtures/defaults"
+    ]
+  },
+  {
+    "name": "objectives.localized",
+    "labels": [
+      "headless",
+      "objectives"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objectives_tests",
+      "localized",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objective-fixtures/localized"
+    ]
+  },
+  {
+    "name": "objectives.missing",
+    "labels": [
+      "headless",
+      "objectives"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objectives_tests",
+      "missing",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objective-fixtures/missing"
+    ]
+  },
+  {
+    "name": "objectives.queue",
+    "labels": [
+      "headless",
+      "objectives"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objectives_tests",
+      "queue",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objective-fixtures/queue"
+    ]
+  },
+  {
+    "name": "objectives.catalog",
+    "labels": [
+      "headless",
+      "objectives",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objectives_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.objectives",
+    "labels": [
+      "gpu",
+      "objectives",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--objectives-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/objectives.png"
+    ]
+  },
+  {
+    "name": "cameras.defaults",
+    "labels": [
+      "cameras",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera_tests",
+      "defaults",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera-fixtures/defaults"
+    ]
+  },
+  {
+    "name": "cameras.timing",
+    "labels": [
+      "cameras",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera_tests",
+      "timing",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera-fixtures/timing"
+    ]
+  },
+  {
+    "name": "cameras.links",
+    "labels": [
+      "cameras",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera_tests",
+      "links",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera-fixtures/links"
+    ]
+  },
+  {
+    "name": "cameras.selection",
+    "labels": [
+      "cameras",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera_tests",
+      "selection",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera-fixtures/selection"
+    ]
+  },
+  {
+    "name": "cameras.player",
+    "labels": [
+      "cameras",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera_tests",
+      "player",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera-fixtures/player"
+    ]
+  },
+  {
+    "name": "cameras.validation",
+    "labels": [
+      "cameras",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera_tests",
+      "validation",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera-fixtures/validation"
+    ]
+  },
+  {
+    "name": "cameras.catalog",
+    "labels": [
+      "cameras",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/camera_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.cameras",
+    "labels": [
+      "cameras",
+      "gpu",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--cameras-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cameras.png"
+    ]
+  },
+  {
+    "name": "keyframes.defaults",
+    "labels": [
+      "headless",
+      "keyframes"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframer_tests",
+      "defaults",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframe-fixtures/defaults"
+    ]
+  },
+  {
+    "name": "keyframes.timeline",
+    "labels": [
+      "headless",
+      "keyframes"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframer_tests",
+      "timeline",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframe-fixtures/timeline"
+    ]
+  },
+  {
+    "name": "keyframes.looping",
+    "labels": [
+      "headless",
+      "keyframes"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframer_tests",
+      "looping",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframe-fixtures/looping"
+    ]
+  },
+  {
+    "name": "keyframes.rotation",
+    "labels": [
+      "headless",
+      "keyframes"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframer_tests",
+      "rotation",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframe-fixtures/rotation"
+    ]
+  },
+  {
+    "name": "keyframes.events",
+    "labels": [
+      "headless",
+      "keyframes"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframer_tests",
+      "events",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframe-fixtures/events"
+    ]
+  },
+  {
+    "name": "keyframes.reentrant",
+    "labels": [
+      "headless",
+      "keyframes"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframer_tests",
+      "reentrant",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframe-fixtures/reentrant"
+    ]
+  },
+  {
+    "name": "keyframes.validation",
+    "labels": [
+      "headless",
+      "keyframes"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframer_tests",
+      "validation",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframe-fixtures/validation"
+    ]
+  },
+  {
+    "name": "keyframes.limits",
+    "labels": [
+      "headless",
+      "keyframes"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframer_tests",
+      "limits",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframe-fixtures/limits"
+    ]
+  },
+  {
+    "name": "keyframes.collision",
+    "labels": [
+      "headless",
+      "keyframes"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframer_tests",
+      "collision",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframe-fixtures/collision"
+    ]
+  },
+  {
+    "name": "keyframes.catalog",
+    "labels": [
+      "headless",
+      "keyframes",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframer_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.keyframes",
+    "labels": [
+      "gpu",
+      "keyframes",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--keyframes-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/keyframes.png"
+    ]
+  },
+  {
+    "name": "lights.defaults",
+    "labels": [
+      "headless",
+      "lights"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light_tests",
+      "defaults",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light-fixtures/defaults"
+    ]
+  },
+  {
+    "name": "lights.waves",
+    "labels": [
+      "headless",
+      "lights"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light_tests",
+      "waves",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light-fixtures/waves"
+    ]
+  },
+  {
+    "name": "lights.commands",
+    "labels": [
+      "headless",
+      "lights"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light_tests",
+      "commands",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light-fixtures/commands"
+    ]
+  },
+  {
+    "name": "lights.lifetime",
+    "labels": [
+      "headless",
+      "lights"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "lights.damage",
+    "labels": [
+      "headless",
+      "lights"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light_tests",
+      "damage",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light-fixtures/damage"
+    ]
+  },
+  {
+    "name": "lights.validation",
+    "labels": [
+      "headless",
+      "lights"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light_tests",
+      "validation",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light-fixtures/validation"
+    ]
+  },
+  {
+    "name": "lights.motion",
+    "labels": [
+      "headless",
+      "lights"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light_tests",
+      "motion",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light-fixtures/motion"
+    ]
+  },
+  {
+    "name": "lights.teardown",
+    "labels": [
+      "headless",
+      "lights"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light_tests",
+      "teardown",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light-fixtures/teardown"
+    ]
+  },
+  {
+    "name": "lights.catalog",
+    "labels": [
+      "headless",
+      "lights",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/light_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.lights",
+    "labels": [
+      "gpu",
+      "lights",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--lights-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/lights.png"
+    ]
+  },
+  {
+    "name": "worldpaths.translation",
+    "labels": [
+      "headless",
+      "worldpaths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath_tests",
+      "translation",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath-fixtures/translation"
+    ]
+  },
+  {
+    "name": "worldpaths.world_block",
+    "labels": [
+      "headless",
+      "worldpaths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath_tests",
+      "world_block",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath-fixtures/world_block"
+    ]
+  },
+  {
+    "name": "worldpaths.riders",
+    "labels": [
+      "headless",
+      "worldpaths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath_tests",
+      "riders",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath-fixtures/riders"
+    ]
+  },
+  {
+    "name": "worldpaths.push_block",
+    "labels": [
+      "headless",
+      "worldpaths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath_tests",
+      "push_block",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath-fixtures/push_block"
+    ]
+  },
+  {
+    "name": "worldpaths.lifetime",
+    "labels": [
+      "headless",
+      "worldpaths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "worldpaths.validation",
+    "labels": [
+      "headless",
+      "worldpaths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath_tests",
+      "validation",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath-fixtures/validation"
+    ]
+  },
+  {
+    "name": "worldpaths.player",
+    "labels": [
+      "headless",
+      "worldpaths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath_tests",
+      "player",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath-fixtures/player"
+    ]
+  },
+  {
+    "name": "worldpaths.timeline",
+    "labels": [
+      "headless",
+      "worldpaths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath_tests",
+      "timeline",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath-fixtures/timeline"
+    ]
+  },
+  {
+    "name": "worldpaths.subway",
+    "labels": [
+      "headless",
+      "private",
+      "worldpaths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpath_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.worldpaths",
+    "labels": [
+      "gpu",
+      "private",
+      "worldpaths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--worldpaths-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/worldpaths.png"
+    ]
+  },
+  {
+    "name": "cinematics.decode",
+    "labels": [
+      "cinematics",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic_tests",
+      "decode",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic-fixtures/decode"
+    ]
+  },
+  {
+    "name": "cinematics.mixer",
+    "labels": [
+      "cinematics",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic_tests",
+      "mixer",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic-fixtures/mixer"
+    ]
+  },
+  {
+    "name": "cinematics.spatial",
+    "labels": [
+      "cinematics",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic_tests",
+      "spatial",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic-fixtures/spatial"
+    ]
+  },
+  {
+    "name": "cinematics.sequence",
+    "labels": [
+      "cinematics",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic_tests",
+      "sequence",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic-fixtures/sequence"
+    ]
+  },
+  {
+    "name": "cinematics.lifetime",
+    "labels": [
+      "cinematics",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "cinematics.failures",
+    "labels": [
+      "cinematics",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic-fixtures/failures"
+    ]
+  },
+  {
+    "name": "cinematics.device",
+    "labels": [
+      "cinematics",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic_tests",
+      "device",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic-fixtures/device"
+    ]
+  },
+  {
+    "name": "cinematics.catalog",
+    "labels": [
+      "cinematics",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "cinematics.subway",
+    "labels": [
+      "cinematics",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematic_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.cinematics",
+    "labels": [
+      "cinematics",
+      "gpu",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--cinematics-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/cinematics.png"
+    ]
+  },
+  {
+    "name": "randomsound.defaults",
+    "labels": [
+      "headless",
+      "randomsound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random_sound_tests",
+      "defaults",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random-sound-fixtures/defaults"
+    ]
+  },
+  {
+    "name": "randomsound.commands",
+    "labels": [
+      "headless",
+      "randomsound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random_sound_tests",
+      "commands",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random-sound-fixtures/commands"
+    ]
+  },
+  {
+    "name": "randomsound.sequence",
+    "labels": [
+      "headless",
+      "randomsound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random_sound_tests",
+      "sequence",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random-sound-fixtures/sequence"
+    ]
+  },
+  {
+    "name": "randomsound.random",
+    "labels": [
+      "headless",
+      "randomsound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random_sound_tests",
+      "random",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random-sound-fixtures/random"
+    ]
+  },
+  {
+    "name": "randomsound.spatial",
+    "labels": [
+      "headless",
+      "randomsound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random_sound_tests",
+      "spatial",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random-sound-fixtures/spatial"
+    ]
+  },
+  {
+    "name": "randomsound.lifetime",
+    "labels": [
+      "headless",
+      "randomsound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random_sound_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random-sound-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "randomsound.failures",
+    "labels": [
+      "headless",
+      "randomsound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random_sound_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random-sound-fixtures/failures"
+    ]
+  },
+  {
+    "name": "randomsound.catalog",
+    "labels": [
+      "headless",
+      "private",
+      "randomsound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random_sound_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "randomsound.subway",
+    "labels": [
+      "headless",
+      "private",
+      "randomsound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random_sound_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.randomsound",
+    "labels": [
+      "gpu",
+      "private",
+      "randomsound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--random-sounds-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/random-sounds.png"
+    ]
+  },
+  {
+    "name": "sound.defaults",
+    "labels": [
+      "headless",
+      "sound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound_tests",
+      "defaults",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound-fixtures/defaults"
+    ]
+  },
+  {
+    "name": "sound.loops",
+    "labels": [
+      "headless",
+      "sound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound_tests",
+      "loops",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound-fixtures/loops"
+    ]
+  },
+  {
+    "name": "sound.resampling",
+    "labels": [
+      "headless",
+      "sound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound_tests",
+      "resampling",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound-fixtures/resampling"
+    ]
+  },
+  {
+    "name": "sound.lifetime",
+    "labels": [
+      "headless",
+      "sound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "sound.failures",
+    "labels": [
+      "headless",
+      "sound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound-fixtures/failures"
+    ]
+  },
+  {
+    "name": "sound.metadata",
+    "labels": [
+      "headless",
+      "sound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound_tests",
+      "metadata",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound-fixtures/metadata"
+    ]
+  },
+  {
+    "name": "sound.catalog",
+    "labels": [
+      "headless",
+      "private",
+      "sound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "sound.subway",
+    "labels": [
+      "headless",
+      "private",
+      "sound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sound_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.sound",
+    "labels": [
+      "gpu",
+      "private",
+      "sound"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--world-sounds-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-sounds.png"
+    ]
+  },
+  {
+    "name": "sprites.reader",
+    "labels": [
+      "headless",
+      "sprites"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_tests",
+      "reader",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-fixtures/reader"
+    ]
+  },
+  {
+    "name": "sprites.clock",
+    "labels": [
+      "headless",
+      "sprites"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_tests",
+      "clock",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-fixtures/clock"
+    ]
+  },
+  {
+    "name": "sprites.properties",
+    "labels": [
+      "headless",
+      "sprites"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_tests",
+      "properties",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-fixtures/properties"
+    ]
+  },
+  {
+    "name": "sprites.placement",
+    "labels": [
+      "headless",
+      "sprites"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_tests",
+      "placement",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-fixtures/placement"
+    ]
+  },
+  {
+    "name": "sprites.ray",
+    "labels": [
+      "headless",
+      "sprites"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_tests",
+      "ray",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-fixtures/ray"
+    ]
+  },
+  {
+    "name": "sprites.failures",
+    "labels": [
+      "headless",
+      "sprites"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-fixtures/failures"
+    ]
+  },
+  {
+    "name": "sprites.catalog",
+    "labels": [
+      "headless",
+      "private",
+      "sprites"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "sprites.subway",
+    "labels": [
+      "headless",
+      "private",
+      "sprites"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.sprites",
+    "labels": [
+      "gpu",
+      "private",
+      "sprites"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--sprites-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprites.png"
+    ]
+  },
+  {
+    "name": "sceneexplosion.properties",
+    "labels": [
+      "headless",
+      "sceneexplosion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene_explosion_tests",
+      "properties",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene-explosion-fixtures/properties"
+    ]
+  },
+  {
+    "name": "sceneexplosion.commands",
+    "labels": [
+      "headless",
+      "sceneexplosion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene_explosion_tests",
+      "commands",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene-explosion-fixtures/commands"
+    ]
+  },
+  {
+    "name": "sceneexplosion.damage",
+    "labels": [
+      "headless",
+      "sceneexplosion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene_explosion_tests",
+      "damage",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene-explosion-fixtures/damage"
+    ]
+  },
+  {
+    "name": "sceneexplosion.lifetime",
+    "labels": [
+      "headless",
+      "sceneexplosion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene_explosion_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene-explosion-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "sceneexplosion.failures",
+    "labels": [
+      "headless",
+      "sceneexplosion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene_explosion_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene-explosion-fixtures/failures"
+    ]
+  },
+  {
+    "name": "sceneexplosion.budget",
+    "labels": [
+      "headless",
+      "sceneexplosion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene_explosion_tests",
+      "budget",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene-explosion-fixtures/budget"
+    ]
+  },
+  {
+    "name": "sceneexplosion.catalog",
+    "labels": [
+      "headless",
+      "private",
+      "sceneexplosion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene_explosion_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "sceneexplosion.subway",
+    "labels": [
+      "headless",
+      "private",
+      "sceneexplosion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene_explosion_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.sceneexplosion",
+    "labels": [
+      "gpu",
+      "private",
+      "sceneexplosion"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--scene-explosions-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/scene-explosions.png"
+    ]
+  },
+  {
+    "name": "character.mappings",
+    "labels": [
+      "character",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_animation_tests",
+      "mappings",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-fixtures/mappings"
+    ]
+  },
+  {
+    "name": "character.humiliation",
+    "labels": [
+      "character",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_animation_tests",
+      "humiliation",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-fixtures/humiliation"
+    ]
+  },
+  {
+    "name": "character.force",
+    "labels": [
+      "character",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_animation_tests",
+      "force",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-fixtures/force"
+    ]
+  },
+  {
+    "name": "character.transforms",
+    "labels": [
+      "character",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_animation_tests",
+      "transforms",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-fixtures/transforms"
+    ]
+  },
+  {
+    "name": "character.rejection",
+    "labels": [
+      "character",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_animation_tests",
+      "rejection",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-fixtures/rejection"
+    ]
+  },
+  {
+    "name": "character.spheres",
+    "labels": [
+      "character",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_animation_tests",
+      "spheres",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-fixtures/spheres"
+    ]
+  },
+  {
+    "name": "character.catalog",
+    "labels": [
+      "character",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_animation_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "character.player",
+    "labels": [
+      "character",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_animation_tests",
+      "player",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.character",
+    "labels": [
+      "character",
+      "gpu",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--skeleton-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/skeleton.png"
+    ]
+  },
+  {
+    "name": "character_audio.paths",
+    "labels": [
+      "character_audio",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_audio_tests",
+      "paths",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-audio-fixtures/paths"
+    ]
+  },
+  {
+    "name": "character_audio.voices",
+    "labels": [
+      "character_audio",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_audio_tests",
+      "voices",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-audio-fixtures/voices"
+    ]
+  },
+  {
+    "name": "character_audio.lifetime",
+    "labels": [
+      "character_audio",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_audio_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-audio-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "character_audio.rejection",
+    "labels": [
+      "character_audio",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_audio_tests",
+      "rejection",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-audio-fixtures/rejection"
+    ]
+  },
+  {
+    "name": "character_audio.player",
+    "labels": [
+      "character_audio",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_audio_tests",
+      "player",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-audio-fixtures/player"
+    ]
+  },
+  {
+    "name": "character_audio.callbacks",
+    "labels": [
+      "character_audio",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_audio_tests",
+      "callbacks",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-audio-fixtures/callbacks"
+    ]
+  },
+  {
+    "name": "character_audio.footsteps",
+    "labels": [
+      "character_audio",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_audio_tests",
+      "footsteps",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-audio-fixtures/footsteps"
+    ]
+  },
+  {
+    "name": "character_audio.surfaces",
+    "labels": [
+      "character_audio",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_audio_tests",
+      "surfaces",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-audio-fixtures/surfaces"
+    ]
+  },
+  {
+    "name": "character_audio.catalog",
+    "labels": [
+      "character_audio",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_audio_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "character_audio.subway",
+    "labels": [
+      "character_audio",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_audio_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "character_motion.lookup",
+    "labels": [
+      "character_motion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_motion_tests",
+      "lookup",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-motion-fixtures/lookup"
+    ]
+  },
+  {
+    "name": "character_motion.motion",
+    "labels": [
+      "character_motion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_motion_tests",
+      "motion",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-motion-fixtures/motion"
+    ]
+  },
+  {
+    "name": "character_motion.rejection",
+    "labels": [
+      "character_motion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_motion_tests",
+      "rejection",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-motion-fixtures/rejection"
+    ]
+  },
+  {
+    "name": "character_motion.collision",
+    "labels": [
+      "character_motion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_motion_tests",
+      "collision",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-motion-fixtures/collision"
+    ]
+  },
+  {
+    "name": "character_motion.callbacks",
+    "labels": [
+      "character_motion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_motion_tests",
+      "callbacks",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-motion-fixtures/callbacks"
+    ]
+  },
+  {
+    "name": "character_motion.player",
+    "labels": [
+      "character_motion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_motion_tests",
+      "player",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-motion-fixtures/player"
+    ]
+  },
+  {
+    "name": "character_motion.catalog",
+    "labels": [
+      "character_motion",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_motion_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_keys.sound",
+    "labels": [
+      "ai_keys",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_model_key_tests",
+      "sound",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-key-fixtures/sound"
+    ]
+  },
+  {
+    "name": "ai_keys.priority",
+    "labels": [
+      "ai_keys",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_model_key_tests",
+      "priority",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-key-fixtures/priority"
+    ]
+  },
+  {
+    "name": "ai_keys.gates",
+    "labels": [
+      "ai_keys",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_model_key_tests",
+      "gates",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-key-fixtures/gates"
+    ]
+  },
+  {
+    "name": "ai_keys.random",
+    "labels": [
+      "ai_keys",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_model_key_tests",
+      "random",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-key-fixtures/random"
+    ]
+  },
+  {
+    "name": "ai_keys.shared",
+    "labels": [
+      "ai_keys",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_model_key_tests",
+      "shared",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-key-fixtures/shared"
+    ]
+  },
+  {
+    "name": "ai_keys.rejection",
+    "labels": [
+      "ai_keys",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_model_key_tests",
+      "rejection",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-key-fixtures/rejection"
+    ]
+  },
+  {
+    "name": "ai_keys.callbacks",
+    "labels": [
+      "ai_keys",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_model_key_tests",
+      "callbacks",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-key-fixtures/callbacks"
+    ]
+  },
+  {
+    "name": "ai_keys.lifetime",
+    "labels": [
+      "ai_keys",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_model_key_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-key-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "ai_keys.catalog",
+    "labels": [
+      "ai_keys",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_model_key_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_keys.subway",
+    "labels": [
+      "ai_keys",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_model_key_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "paths.copy",
+    "labels": [
+      "headless",
+      "paths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/path_manager_tests",
+      "copy"
+    ]
+  },
+  {
+    "name": "paths.selection",
+    "labels": [
+      "headless",
+      "paths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/path_manager_tests",
+      "selection"
+    ]
+  },
+  {
+    "name": "paths.failure",
+    "labels": [
+      "headless",
+      "paths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/path_manager_tests",
+      "failure"
+    ]
+  },
+  {
+    "name": "paths.lifetime",
+    "labels": [
+      "headless",
+      "paths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/path_manager_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "paths.enumeration",
+    "labels": [
+      "headless",
+      "paths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/path_manager_tests",
+      "enumeration"
+    ]
+  },
+  {
+    "name": "paths.limits",
+    "labels": [
+      "headless",
+      "paths"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/path_manager_tests",
+      "limits"
+    ]
+  },
+  {
+    "name": "paths.catalog",
+    "labels": [
+      "headless",
+      "paths",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/path_manager_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_sight.body",
+    "labels": [
+      "ai_sight",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_sight_tests",
+      "body"
+    ]
+  },
+  {
+    "name": "ai_sight.head",
+    "labels": [
+      "ai_sight",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_sight_tests",
+      "head"
+    ]
+  },
+  {
+    "name": "ai_sight.filters",
+    "labels": [
+      "ai_sight",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_sight_tests",
+      "filters"
+    ]
+  },
+  {
+    "name": "ai_sight.world",
+    "labels": [
+      "ai_sight",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_sight_tests",
+      "world"
+    ]
+  },
+  {
+    "name": "ai_sight.failures",
+    "labels": [
+      "ai_sight",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_sight_tests",
+      "failures"
+    ]
+  },
+  {
+    "name": "ai_sight.lifetime",
+    "labels": [
+      "ai_sight",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_sight_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "ai_sight.catalog",
+    "labels": [
+      "ai_sight",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_sight_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_sight.subway",
+    "labels": [
+      "ai_sight",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_sight_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "attachments.root",
+    "labels": [
+      "attachments",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests",
+      "root",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment-fixtures/root"
+    ]
+  },
+  {
+    "name": "attachments.nodes",
+    "labels": [
+      "attachments",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests",
+      "nodes",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment-fixtures/nodes"
+    ]
+  },
+  {
+    "name": "attachments.rejects",
+    "labels": [
+      "attachments",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests",
+      "rejects",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment-fixtures/rejects"
+    ]
+  },
+  {
+    "name": "attachments.lifetime",
+    "labels": [
+      "attachments",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "attachments.held",
+    "labels": [
+      "attachments",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests",
+      "held",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment-fixtures/held"
+    ]
+  },
+  {
+    "name": "attachments.missing",
+    "labels": [
+      "attachments",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests",
+      "missing",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment-fixtures/missing"
+    ]
+  },
+  {
+    "name": "attachments.catalog",
+    "labels": [
+      "attachments",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "attachments.subway",
+    "labels": [
+      "attachments",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/attachment_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_target.named",
+    "labels": [
+      "ai_target",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests",
+      "named"
+    ]
+  },
+  {
+    "name": "ai_target.cached",
+    "labels": [
+      "ai_target",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests",
+      "cached"
+    ]
+  },
+  {
+    "name": "ai_target.facing",
+    "labels": [
+      "ai_target",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests",
+      "facing"
+    ]
+  },
+  {
+    "name": "ai_target.failures",
+    "labels": [
+      "ai_target",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests",
+      "failures"
+    ]
+  },
+  {
+    "name": "ai_target.lifetime",
+    "labels": [
+      "ai_target",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "ai_target.callbacks",
+    "labels": [
+      "ai_target",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests",
+      "callbacks"
+    ]
+  },
+  {
+    "name": "ai_target.services",
+    "labels": [
+      "ai_target",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests",
+      "services"
+    ]
+  },
+  {
+    "name": "ai_target.catalog",
+    "labels": [
+      "ai_target",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_target.subway",
+    "labels": [
+      "ai_target",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "world_view.mesh",
+    "labels": [
+      "headless",
+      "world_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_view_tests",
+      "mesh"
+    ]
+  },
+  {
+    "name": "world_view.rejects",
+    "labels": [
+      "headless",
+      "world_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_view_tests",
+      "rejects"
+    ]
+  },
+  {
+    "name": "world_view.camera",
+    "labels": [
+      "headless",
+      "world_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_view_tests",
+      "camera"
+    ]
+  },
+  {
+    "name": "world_view.lifetime",
+    "labels": [
+      "headless",
+      "world_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_view_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "world_view.subway",
+    "labels": [
+      "headless",
+      "private",
+      "world_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_view_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.world_depth",
+    "labels": [
+      "gpu",
+      "world_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-depth.png"
+    ]
+  },
+  {
+    "name": "gpu.viewport",
+    "labels": [
+      "gpu",
+      "private",
+      "world_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--viewport-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/viewport.png"
+    ]
+  },
+  {
+    "name": "texture.decode",
+    "labels": [
+      "headless",
+      "texture"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/texture_tests",
+      "decode"
+    ]
+  },
+  {
+    "name": "texture.malformed",
+    "labels": [
+      "headless",
+      "texture"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/texture_tests",
+      "malformed"
+    ]
+  },
+  {
+    "name": "texture.mapping",
+    "labels": [
+      "headless",
+      "texture"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/texture_tests",
+      "mapping"
+    ]
+  },
+  {
+    "name": "texture.corpus",
+    "labels": [
+      "headless",
+      "private",
+      "texture"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/texture_tests",
+      "corpus",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "model_view.sample",
+    "labels": [
+      "headless",
+      "model_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/model_view_tests",
+      "sample"
+    ]
+  },
+  {
+    "name": "model_view.rejects",
+    "labels": [
+      "headless",
+      "model_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/model_view_tests",
+      "rejects"
+    ]
+  },
+  {
+    "name": "model_view.weapon_pose",
+    "labels": [
+      "headless",
+      "model_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/model_view_tests",
+      "weapon_pose"
+    ]
+  },
+  {
+    "name": "model_view.legacy_pose",
+    "labels": [
+      "headless",
+      "model_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/model_view_tests",
+      "legacy_pose"
+    ]
+  },
+  {
+    "name": "model_view.subway",
+    "labels": [
+      "headless",
+      "model_view",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/model_view_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.model_depth",
+    "labels": [
+      "gpu",
+      "model_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/model_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/model-depth.png"
+    ]
+  },
+  {
+    "name": "gpu.model_private",
+    "labels": [
+      "gpu",
+      "model_view",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/model_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/model-private.png",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_perception.factions",
+    "labels": [
+      "ai_perception",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests",
+      "factions"
+    ]
+  },
+  {
+    "name": "ai_perception.selection",
+    "labels": [
+      "ai_perception",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests",
+      "selection"
+    ]
+  },
+  {
+    "name": "ai_perception.visibility",
+    "labels": [
+      "ai_perception",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests",
+      "visibility"
+    ]
+  },
+  {
+    "name": "ai_perception.hints",
+    "labels": [
+      "ai_perception",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests",
+      "hints"
+    ]
+  },
+  {
+    "name": "ai_perception.stimuli",
+    "labels": [
+      "ai_perception",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests",
+      "stimuli"
+    ]
+  },
+  {
+    "name": "ai_perception.retaliation",
+    "labels": [
+      "ai_perception",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests",
+      "retaliation"
+    ]
+  },
+  {
+    "name": "ai_perception.opportunity",
+    "labels": [
+      "ai_perception",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests",
+      "opportunity"
+    ]
+  },
+  {
+    "name": "ai_perception.failures",
+    "labels": [
+      "ai_perception",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests",
+      "failures"
+    ]
+  },
+  {
+    "name": "ai_perception.lifetime",
+    "labels": [
+      "ai_perception",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "ai_perception.catalog",
+    "labels": [
+      "ai_perception",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_perception.subway",
+    "labels": [
+      "ai_perception",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_perception_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_state.symbols",
+    "labels": [
+      "ai_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_state_tests",
+      "symbols"
+    ]
+  },
+  {
+    "name": "ai_state.transitions",
+    "labels": [
+      "ai_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_state_tests",
+      "transitions"
+    ]
+  },
+  {
+    "name": "ai_state.commands",
+    "labels": [
+      "ai_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_state_tests",
+      "commands"
+    ]
+  },
+  {
+    "name": "ai_state.resize",
+    "labels": [
+      "ai_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_state_tests",
+      "resize"
+    ]
+  },
+  {
+    "name": "ai_state.decisions",
+    "labels": [
+      "ai_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_state_tests",
+      "decisions"
+    ]
+  },
+  {
+    "name": "ai_state.civilian",
+    "labels": [
+      "ai_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_state_tests",
+      "civilian"
+    ]
+  },
+  {
+    "name": "ai_state.dispatch",
+    "labels": [
+      "ai_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_state_tests",
+      "dispatch"
+    ]
+  },
+  {
+    "name": "ai_state.failures",
+    "labels": [
+      "ai_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_state_tests",
+      "failures"
+    ]
+  },
+  {
+    "name": "ai_state.lifetime",
+    "labels": [
+      "ai_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_state_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "ai_state.catalog",
+    "labels": [
+      "ai_state",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_state_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_state.subway",
+    "labels": [
+      "ai_state",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_state_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_fire.selection",
+    "labels": [
+      "ai_fire",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests",
+      "selection"
+    ]
+  },
+  {
+    "name": "ai_fire.clearance",
+    "labels": [
+      "ai_fire",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests",
+      "clearance"
+    ]
+  },
+  {
+    "name": "ai_fire.filters",
+    "labels": [
+      "ai_fire",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests",
+      "filters"
+    ]
+  },
+  {
+    "name": "ai_fire.head",
+    "labels": [
+      "ai_fire",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests",
+      "head"
+    ]
+  },
+  {
+    "name": "ai_fire.aim",
+    "labels": [
+      "ai_fire",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests",
+      "aim"
+    ]
+  },
+  {
+    "name": "ai_fire.keys",
+    "labels": [
+      "ai_fire",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests",
+      "keys"
+    ]
+  },
+  {
+    "name": "ai_fire.cadence",
+    "labels": [
+      "ai_fire",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests",
+      "cadence"
+    ]
+  },
+  {
+    "name": "ai_fire.recovery",
+    "labels": [
+      "ai_fire",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests",
+      "recovery"
+    ]
+  },
+  {
+    "name": "ai_fire.failures",
+    "labels": [
+      "ai_fire",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests",
+      "failures"
+    ]
+  },
+  {
+    "name": "ai_fire.lifetime",
+    "labels": [
+      "ai_fire",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "ai_fire.catalog",
+    "labels": [
+      "ai_fire",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_fire.subway",
+    "labels": [
+      "ai_fire",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_fire_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_trigger.hearing",
+    "labels": [
+      "ai_trigger",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests",
+      "hearing",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-trigger-hearing"
+    ]
+  },
+  {
+    "name": "ai_trigger.gunfire",
+    "labels": [
+      "ai_trigger",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests",
+      "gunfire",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-trigger-gunfire"
+    ]
+  },
+  {
+    "name": "ai_trigger.impact",
+    "labels": [
+      "ai_trigger",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests",
+      "impact",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-trigger-impact"
+    ]
+  },
+  {
+    "name": "ai_trigger.commands",
+    "labels": [
+      "ai_trigger",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests",
+      "commands",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-trigger-commands"
+    ]
+  },
+  {
+    "name": "ai_trigger.relay",
+    "labels": [
+      "ai_trigger",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests",
+      "relay",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-trigger-relay"
+    ]
+  },
+  {
+    "name": "ai_trigger.broadcast",
+    "labels": [
+      "ai_trigger",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests",
+      "broadcast",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-trigger-broadcast"
+    ]
+  },
+  {
+    "name": "ai_trigger.lifetime",
+    "labels": [
+      "ai_trigger",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-trigger-lifetime"
+    ]
+  },
+  {
+    "name": "ai_trigger.audio",
+    "labels": [
+      "ai_trigger",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests",
+      "audio",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-trigger-audio"
+    ]
+  },
+  {
+    "name": "ai_trigger.subway",
+    "labels": [
+      "ai_trigger",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_trigger_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_navigation.sample",
+    "labels": [
+      "ai_navigation",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_navigation_tests",
+      "sample"
+    ]
+  },
+  {
+    "name": "ai_navigation.clearance",
+    "labels": [
+      "ai_navigation",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_navigation_tests",
+      "clearance"
+    ]
+  },
+  {
+    "name": "ai_navigation.rays",
+    "labels": [
+      "ai_navigation",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_navigation_tests",
+      "rays"
+    ]
+  },
+  {
+    "name": "ai_navigation.direct",
+    "labels": [
+      "ai_navigation",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_navigation_tests",
+      "direct"
+    ]
+  },
+  {
+    "name": "ai_navigation.detour",
+    "labels": [
+      "ai_navigation",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_navigation_tests",
+      "detour"
+    ]
+  },
+  {
+    "name": "ai_navigation.blocked",
+    "labels": [
+      "ai_navigation",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_navigation_tests",
+      "blocked"
+    ]
+  },
+  {
+    "name": "ai_navigation.limits",
+    "labels": [
+      "ai_navigation",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_navigation_tests",
+      "limits"
+    ]
+  },
+  {
+    "name": "ai_navigation.lifetime",
+    "labels": [
+      "ai_navigation",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_navigation_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "ai_navigation.subway",
+    "labels": [
+      "ai_navigation",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_navigation_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_follow.velocity",
+    "labels": [
+      "ai_follow",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_follow_tests",
+      "velocity"
+    ]
+  },
+  {
+    "name": "ai_follow.locomotion",
+    "labels": [
+      "ai_follow",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_follow_tests",
+      "locomotion"
+    ]
+  },
+  {
+    "name": "ai_follow.follow",
+    "labels": [
+      "ai_follow",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_follow_tests",
+      "follow"
+    ]
+  },
+  {
+    "name": "ai_follow.cached",
+    "labels": [
+      "ai_follow",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_follow_tests",
+      "cached"
+    ]
+  },
+  {
+    "name": "ai_follow.moveto",
+    "labels": [
+      "ai_follow",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_follow_tests",
+      "moveto"
+    ]
+  },
+  {
+    "name": "ai_follow.actions",
+    "labels": [
+      "ai_follow",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_follow_tests",
+      "actions"
+    ]
+  },
+  {
+    "name": "ai_follow.lifetime",
+    "labels": [
+      "ai_follow",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_follow_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "ai_follow.failures",
+    "labels": [
+      "ai_follow",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_follow_tests",
+      "failures"
+    ]
+  },
+  {
+    "name": "ai_follow.physics",
+    "labels": [
+      "ai_follow",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_follow_tests",
+      "physics"
+    ]
+  },
+  {
+    "name": "ai_follow.catalog",
+    "labels": [
+      "ai_follow",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_follow_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_follow.subway",
+    "labels": [
+      "ai_follow",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_follow_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_script.parsing",
+    "labels": [
+      "ai_script",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests",
+      "parsing",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-script-parsing"
+    ]
+  },
+  {
+    "name": "ai_script.sequencing",
+    "labels": [
+      "ai_script",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests",
+      "sequencing",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-script-sequencing"
+    ]
+  },
+  {
+    "name": "ai_script.waiting",
+    "labels": [
+      "ai_script",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests",
+      "waiting",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-script-waiting"
+    ]
+  },
+  {
+    "name": "ai_script.animations",
+    "labels": [
+      "ai_script",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests",
+      "animations",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-script-animations"
+    ]
+  },
+  {
+    "name": "ai_script.state_target",
+    "labels": [
+      "ai_script",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests",
+      "state_target",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-script-state_target"
+    ]
+  },
+  {
+    "name": "ai_script.movement",
+    "labels": [
+      "ai_script",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests",
+      "movement",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-script-movement"
+    ]
+  },
+  {
+    "name": "ai_script.lifetime",
+    "labels": [
+      "ai_script",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-script-lifetime"
+    ]
+  },
+  {
+    "name": "ai_script.audio",
+    "labels": [
+      "ai_script",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests",
+      "audio",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-script-audio"
+    ]
+  },
+  {
+    "name": "ai_script.catalog",
+    "labels": [
+      "ai_script",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_locomotion.obstruction",
+    "labels": [
+      "ai_locomotion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_locomotion_tests",
+      "obstruction"
+    ]
+  },
+  {
+    "name": "ai_locomotion.rays",
+    "labels": [
+      "ai_locomotion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_locomotion_tests",
+      "rays"
+    ]
+  },
+  {
+    "name": "ai_locomotion.navigate",
+    "labels": [
+      "ai_locomotion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_locomotion_tests",
+      "navigate"
+    ]
+  },
+  {
+    "name": "ai_locomotion.ledges",
+    "labels": [
+      "ai_locomotion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_locomotion_tests",
+      "ledges"
+    ]
+  },
+  {
+    "name": "ai_locomotion.walking",
+    "labels": [
+      "ai_locomotion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_locomotion_tests",
+      "walking"
+    ]
+  },
+  {
+    "name": "ai_locomotion.physics",
+    "labels": [
+      "ai_locomotion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_locomotion_tests",
+      "physics"
+    ]
+  },
+  {
+    "name": "ai_locomotion.moving_fire",
+    "labels": [
+      "ai_locomotion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_locomotion_tests",
+      "moving_fire"
+    ]
+  },
+  {
+    "name": "ai_locomotion.keys",
+    "labels": [
+      "ai_locomotion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_locomotion_tests",
+      "keys"
+    ]
+  },
+  {
+    "name": "ai_locomotion.lifetime",
+    "labels": [
+      "ai_locomotion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_locomotion_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "ai_locomotion.attacks",
+    "labels": [
+      "ai_locomotion",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_locomotion_tests",
+      "attacks"
+    ]
+  },
+  {
+    "name": "ai_locomotion.catalog",
+    "labels": [
+      "ai_locomotion",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_locomotion_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_recovery.jump",
+    "labels": [
+      "ai_recovery",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "jump"
+    ]
+  },
+  {
+    "name": "ai_recovery.jump_physics",
+    "labels": [
+      "ai_recovery",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "jump_physics"
+    ]
+  },
+  {
+    "name": "ai_recovery.crouch",
+    "labels": [
+      "ai_recovery",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "crouch"
+    ]
+  },
+  {
+    "name": "ai_recovery.crawling",
+    "labels": [
+      "ai_recovery",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "crawling"
+    ]
+  },
+  {
+    "name": "ai_recovery.clearance",
+    "labels": [
+      "ai_recovery",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "clearance"
+    ]
+  },
+  {
+    "name": "ai_recovery.topos",
+    "labels": [
+      "ai_recovery",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "topos"
+    ]
+  },
+  {
+    "name": "ai_recovery.plans",
+    "labels": [
+      "ai_recovery",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "plans"
+    ]
+  },
+  {
+    "name": "ai_recovery.around",
+    "labels": [
+      "ai_recovery",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "around"
+    ]
+  },
+  {
+    "name": "ai_recovery.search",
+    "labels": [
+      "ai_recovery",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "search"
+    ]
+  },
+  {
+    "name": "ai_recovery.lifetime",
+    "labels": [
+      "ai_recovery",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "ai_recovery.moving_fire",
+    "labels": [
+      "ai_recovery",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "moving_fire"
+    ]
+  },
+  {
+    "name": "ai_recovery.keys",
+    "labels": [
+      "ai_recovery",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "keys"
+    ]
+  },
+  {
+    "name": "ai_recovery.fire_lifetime",
+    "labels": [
+      "ai_recovery",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "fire_lifetime"
+    ]
+  },
+  {
+    "name": "ai_recovery.catalog",
+    "labels": [
+      "ai_recovery",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_recovery_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_escape.beg",
+    "labels": [
+      "ai_escape",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests",
+      "beg"
+    ]
+  },
+  {
+    "name": "ai_escape.selection",
+    "labels": [
+      "ai_escape",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests",
+      "selection"
+    ]
+  },
+  {
+    "name": "ai_escape.facing",
+    "labels": [
+      "ai_escape",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests",
+      "facing"
+    ]
+  },
+  {
+    "name": "ai_escape.routes",
+    "labels": [
+      "ai_escape",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests",
+      "routes"
+    ]
+  },
+  {
+    "name": "ai_escape.perception",
+    "labels": [
+      "ai_escape",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests",
+      "perception"
+    ]
+  },
+  {
+    "name": "ai_escape.hiding",
+    "labels": [
+      "ai_escape",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests",
+      "hiding"
+    ]
+  },
+  {
+    "name": "ai_escape.guard",
+    "labels": [
+      "ai_escape",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests",
+      "guard"
+    ]
+  },
+  {
+    "name": "ai_escape.failures",
+    "labels": [
+      "ai_escape",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests",
+      "failures"
+    ]
+  },
+  {
+    "name": "ai_escape.tracking",
+    "labels": [
+      "ai_escape",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests",
+      "tracking"
+    ]
+  },
+  {
+    "name": "ai_escape.lifetime",
+    "labels": [
+      "ai_escape",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "ai_escape.catalog",
+    "labels": [
+      "ai_escape",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_escape_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_runtime.activation",
+    "labels": [
+      "ai_runtime",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "activation"
+    ]
+  },
+  {
+    "name": "ai_runtime.visibility",
+    "labels": [
+      "ai_runtime",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "visibility"
+    ]
+  },
+  {
+    "name": "ai_runtime.lifetime",
+    "labels": [
+      "ai_runtime",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "ai_runtime.targets",
+    "labels": [
+      "ai_runtime",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "targets"
+    ]
+  },
+  {
+    "name": "ai_runtime.tracking",
+    "labels": [
+      "ai_runtime",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "tracking"
+    ]
+  },
+  {
+    "name": "ai_runtime.camera",
+    "labels": [
+      "ai_runtime",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "camera"
+    ]
+  },
+  {
+    "name": "ai_runtime.spatial",
+    "labels": [
+      "ai_runtime",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "spatial"
+    ]
+  },
+  {
+    "name": "ai_runtime.triggers",
+    "labels": [
+      "ai_runtime",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "triggers"
+    ]
+  },
+  {
+    "name": "ai_runtime.body",
+    "labels": [
+      "ai_runtime",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "body"
+    ]
+  },
+  {
+    "name": "ai_runtime.missing",
+    "labels": [
+      "ai_runtime",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "missing"
+    ]
+  },
+  {
+    "name": "ai_runtime.catalog",
+    "labels": [
+      "ai_runtime",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_runtime.failures",
+    "labels": [
+      "ai_runtime",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "failures",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_runtime.subway",
+    "labels": [
+      "ai_runtime",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_runtime.arena",
+    "labels": [
+      "ai_runtime",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests",
+      "arena",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "ai_hit.geometry",
+    "labels": [
+      "ai_hit",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_hit_tests",
+      "geometry"
+    ]
+  },
+  {
+    "name": "ai_hit.query",
+    "labels": [
+      "ai_hit",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_hit_tests",
+      "query"
+    ]
+  },
+  {
+    "name": "ai_hit.modifiers",
+    "labels": [
+      "ai_hit",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_hit_tests",
+      "modifiers"
+    ]
+  },
+  {
+    "name": "ai_hit.reactions",
+    "labels": [
+      "ai_hit",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_hit_tests",
+      "reactions"
+    ]
+  },
+  {
+    "name": "ai_hit.recoil",
+    "labels": [
+      "ai_hit",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_hit_tests",
+      "recoil"
+    ]
+  },
+  {
+    "name": "ai_hit.guards",
+    "labels": [
+      "ai_hit",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_hit_tests",
+      "guards"
+    ]
+  },
+  {
+    "name": "ai_hit.sides",
+    "labels": [
+      "ai_hit",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_hit_tests",
+      "sides"
+    ]
+  },
+  {
+    "name": "ai_hit.lifetime",
+    "labels": [
+      "ai_hit",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_hit_tests",
+      "lifetime"
+    ]
+  },
+  {
+    "name": "ai_hit.hidden",
+    "labels": [
+      "ai_hit",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_hit_tests",
+      "hidden"
+    ]
+  },
+  {
+    "name": "ai_hit.catalog",
+    "labels": [
+      "ai_hit",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_hit_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "weapon_drops.collect",
+    "labels": [
+      "headless",
+      "weapon_drops"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests",
+      "collect",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-drop-fixtures/collect"
+    ]
+  },
+  {
+    "name": "weapon_drops.protocol",
+    "labels": [
+      "headless",
+      "weapon_drops"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests",
+      "protocol",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-drop-fixtures/protocol"
+    ]
+  },
+  {
+    "name": "weapon_drops.drop",
+    "labels": [
+      "headless",
+      "weapon_drops"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests",
+      "drop",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-drop-fixtures/drop"
+    ]
+  },
+  {
+    "name": "weapon_drops.falling",
+    "labels": [
+      "headless",
+      "weapon_drops"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests",
+      "falling",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-drop-fixtures/falling"
+    ]
+  },
+  {
+    "name": "weapon_drops.guards",
+    "labels": [
+      "headless",
+      "weapon_drops"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests",
+      "guards",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-drop-fixtures/guards"
+    ]
+  },
+  {
+    "name": "weapon_drops.failures",
+    "labels": [
+      "headless",
+      "weapon_drops"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-drop-fixtures/failures"
+    ]
+  },
+  {
+    "name": "weapon_drops.nosliding",
+    "labels": [
+      "headless",
+      "weapon_drops"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests",
+      "nosliding",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-drop-fixtures/nosliding"
+    ]
+  },
+  {
+    "name": "weapon_drops.callback",
+    "labels": [
+      "headless",
+      "weapon_drops"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests",
+      "callback",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-drop-fixtures/callback"
+    ]
+  },
+  {
+    "name": "weapon_drops.missing_pickup",
+    "labels": [
+      "headless",
+      "weapon_drops"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests",
+      "missing_pickup",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-drop-fixtures/missing_pickup"
+    ]
+  },
+  {
+    "name": "weapon_drops.catalog",
+    "labels": [
+      "headless",
+      "private",
+      "weapon_drops"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "corpses.mappings",
+    "labels": [
+      "corpses",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse_tests",
+      "mappings",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse-fixtures/mappings"
+    ]
+  },
+  {
+    "name": "corpses.transfer",
+    "labels": [
+      "corpses",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse_tests",
+      "transfer",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse-fixtures/transfer"
+    ]
+  },
+  {
+    "name": "corpses.failures",
+    "labels": [
+      "corpses",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse-fixtures/failures"
+    ]
+  },
+  {
+    "name": "corpses.lifetime",
+    "labels": [
+      "corpses",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "corpses.sounds",
+    "labels": [
+      "corpses",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse_tests",
+      "sounds",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse-fixtures/sounds"
+    ]
+  },
+  {
+    "name": "corpses.gates",
+    "labels": [
+      "corpses",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse_tests",
+      "gates",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse-fixtures/gates"
+    ]
+  },
+  {
+    "name": "corpses.accumulation",
+    "labels": [
+      "corpses",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse_tests",
+      "accumulation",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse-fixtures/accumulation"
+    ]
+  },
+  {
+    "name": "corpses.catalog",
+    "labels": [
+      "corpses",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "exits.defaults",
+    "labels": [
+      "exits",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit_tests",
+      "defaults",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit-fixtures/defaults"
+    ]
+  },
+  {
+    "name": "exits.delayed",
+    "labels": [
+      "exits",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit_tests",
+      "delayed",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit-fixtures/delayed"
+    ]
+  },
+  {
+    "name": "exits.broadcast",
+    "labels": [
+      "exits",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit_tests",
+      "broadcast",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit-fixtures/broadcast"
+    ]
+  },
+  {
+    "name": "exits.blocked",
+    "labels": [
+      "exits",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit_tests",
+      "blocked",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit-fixtures/blocked"
+    ]
+  },
+  {
+    "name": "exits.dead",
+    "labels": [
+      "exits",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit_tests",
+      "dead",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit-fixtures/dead"
+    ]
+  },
+  {
+    "name": "exits.queue",
+    "labels": [
+      "exits",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit_tests",
+      "queue",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit-fixtures/queue"
+    ]
+  },
+  {
+    "name": "exits.lifetime",
+    "labels": [
+      "exits",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "exits.catalog",
+    "labels": [
+      "exits",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/exit_tests",
+      "catalog",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "inventory_state.roundtrip",
+    "labels": [
+      "headless",
+      "inventory_state"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/inventory_state_tests",
+      "roundtrip",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/inventory-state-fixtures/roundtrip"
+    ]
+  },
+  {
+    "name": "inventory_state.malformed",
+    "labels": [
+      "headless",
+      "inventory_state"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/inventory_state_tests",
+      "malformed",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/inventory-state-fixtures/malformed"
+    ]
+  },
+  {
+    "name": "inventory_state.rollback",
+    "labels": [
+      "headless",
+      "inventory_state"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/inventory_state_tests",
+      "rollback",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/inventory-state-fixtures/rollback"
+    ]
+  },
+  {
+    "name": "inventory_state.capture",
+    "labels": [
+      "headless",
+      "inventory_state"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/inventory_state_tests",
+      "capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/inventory-state-fixtures/capture"
+    ]
+  },
+  {
+    "name": "inventory_state.private",
+    "labels": [
+      "headless",
+      "inventory_state",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/inventory_state_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "destructable_state.roundtrip",
+    "labels": [
+      "destructable_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable_state_tests",
+      "roundtrip",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable-state-fixtures/roundtrip"
+    ]
+  },
+  {
+    "name": "destructable_state.behavior",
+    "labels": [
+      "destructable_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable_state_tests",
+      "behavior",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable-state-fixtures/behavior"
+    ]
+  },
+  {
+    "name": "destructable_state.sentinel",
+    "labels": [
+      "destructable_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable_state_tests",
+      "sentinel",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable-state-fixtures/sentinel"
+    ]
+  },
+  {
+    "name": "destructable_state.failures",
+    "labels": [
+      "destructable_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable_state_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable-state-fixtures/failures"
+    ]
+  },
+  {
+    "name": "destructable_state.capture",
+    "labels": [
+      "destructable_state",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable_state_tests",
+      "capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable-state-fixtures/capture"
+    ]
+  },
+  {
+    "name": "destructable_state.private",
+    "labels": [
+      "destructable_state",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable_state_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "player_state.roundtrip",
+    "labels": [
+      "headless",
+      "player_state"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_state_tests",
+      "roundtrip",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-state-fixtures/roundtrip"
+    ]
+  },
+  {
+    "name": "player_state.clocks",
+    "labels": [
+      "headless",
+      "player_state"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_state_tests",
+      "clocks",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-state-fixtures/clocks"
+    ]
+  },
+  {
+    "name": "player_state.initialization",
+    "labels": [
+      "headless",
+      "player_state"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_state_tests",
+      "initialization",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-state-fixtures/initialization"
+    ]
+  },
+  {
+    "name": "player_state.failures",
+    "labels": [
+      "headless",
+      "player_state"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_state_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-state-fixtures/failures"
+    ]
+  },
+  {
+    "name": "player_state.capture",
+    "labels": [
+      "headless",
+      "player_state"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_state_tests",
+      "capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-state-fixtures/capture"
+    ]
+  },
+  {
+    "name": "player_state.private",
+    "labels": [
+      "headless",
+      "player_state",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_state_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "character_nodes.services",
+    "labels": [
+      "character_nodes",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_nodes_tests",
+      "services",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-node-fixtures/services"
+    ]
+  },
+  {
+    "name": "character_nodes.names",
+    "labels": [
+      "character_nodes",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_nodes_tests",
+      "names",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-node-fixtures/names"
+    ]
+  },
+  {
+    "name": "character_nodes.rendering",
+    "labels": [
+      "character_nodes",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_nodes_tests",
+      "rendering",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-node-fixtures/rendering"
+    ]
+  },
+  {
+    "name": "character_nodes.restore",
+    "labels": [
+      "character_nodes",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_nodes_tests",
+      "restore",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character-node-fixtures/restore"
+    ]
+  },
+  {
+    "name": "character_nodes.private",
+    "labels": [
+      "character_nodes",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_nodes_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "player_restore.roundtrip",
+    "labels": [
+      "headless",
+      "player_restore"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_restore_tests",
+      "roundtrip",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-restore-fixtures/roundtrip"
+    ]
+  },
+  {
+    "name": "player_restore.failures",
+    "labels": [
+      "headless",
+      "player_restore"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_restore_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-restore-fixtures/failures"
+    ]
+  },
+  {
+    "name": "player_restore.lifetime",
+    "labels": [
+      "headless",
+      "player_restore"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_restore_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-restore-fixtures/lifetime"
+    ]
+  },
+  {
+    "name": "player_restore.private",
+    "labels": [
+      "headless",
+      "player_restore",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_restore_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.player_restore",
+    "labels": [
+      "gpu",
+      "player_restore",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--restore-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-restore.png"
+    ]
+  },
+  {
+    "name": "player_keepalive.named",
+    "labels": [
+      "headless",
+      "player_keepalive"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_keepalive_tests",
+      "named",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-keepalive-fixtures/named"
+    ]
+  },
+  {
+    "name": "player_keepalive.fallback",
+    "labels": [
+      "headless",
+      "player_keepalive"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_keepalive_tests",
+      "fallback",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-keepalive-fixtures/fallback"
+    ]
+  },
+  {
+    "name": "player_keepalive.failures",
+    "labels": [
+      "headless",
+      "player_keepalive"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_keepalive_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-keepalive-fixtures/failures"
+    ]
+  },
+  {
+    "name": "player_keepalive.private",
+    "labels": [
+      "headless",
+      "player_keepalive",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player_keepalive_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.player_keepalive",
+    "labels": [
+      "gpu",
+      "player_keepalive",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/blood2",
+      "--config",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini",
+      "--data-dir",
+      "/home/yann/.steam/steam/steamapps/common/Blood II",
+      "--keepalive-smoke",
+      "--capture",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/player-keepalive.png"
+    ]
+  },
+  {
+    "name": "sprite_view.geometry",
+    "labels": [
+      "headless",
+      "sprite_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_view_tests",
+      "geometry",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-view-geometry"
+    ]
+  },
+  {
+    "name": "sprite_view.failures",
+    "labels": [
+      "headless",
+      "sprite_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_view_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-view-failures"
+    ]
+  },
+  {
+    "name": "sprite_view.subway",
+    "labels": [
+      "headless",
+      "private",
+      "sprite_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_view_tests",
+      "subway",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.sprite_alpha",
+    "labels": [
+      "gpu",
+      "sprite_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-alpha"
+    ]
+  },
+  {
+    "name": "gpu.sprite_private",
+    "labels": [
+      "gpu",
+      "private",
+      "sprite_view"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/sprite-private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "explosion_sprites.formulas",
+    "labels": [
+      "explosion_sprites",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_sprite_tests",
+      "formulas",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-sprites-formulas"
+    ]
+  },
+  {
+    "name": "explosion_sprites.failures",
+    "labels": [
+      "explosion_sprites",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_sprite_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-sprites-failures"
+    ]
+  },
+  {
+    "name": "explosion_sprites.session",
+    "labels": [
+      "explosion_sprites",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_sprite_tests",
+      "session",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-sprites-session"
+    ]
+  },
+  {
+    "name": "explosion_sprites.private",
+    "labels": [
+      "explosion_sprites",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_sprite_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "explosion_models.formulas",
+    "labels": [
+      "explosion_models",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_model_tests",
+      "formulas",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-models-formulas"
+    ]
+  },
+  {
+    "name": "explosion_models.recipes",
+    "labels": [
+      "explosion_models",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_model_tests",
+      "recipes",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-models-recipes"
+    ]
+  },
+  {
+    "name": "explosion_models.failures",
+    "labels": [
+      "explosion_models",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_model_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-models-failures"
+    ]
+  },
+  {
+    "name": "explosion_models.session",
+    "labels": [
+      "explosion_models",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_model_tests",
+      "session",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-models-session"
+    ]
+  },
+  {
+    "name": "explosion_models.private",
+    "labels": [
+      "explosion_models",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_model_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.explosion_model_alpha",
+    "labels": [
+      "explosion_models",
+      "gpu"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_model_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-model-alpha"
+    ]
+  },
+  {
+    "name": "gpu.explosion_model_private",
+    "labels": [
+      "explosion_models",
+      "gpu",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_model_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-model-private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "explosion_lights.lifecycle",
+    "labels": [
+      "explosion_lights",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_light_tests",
+      "lifecycle"
+    ]
+  },
+  {
+    "name": "explosion_lights.recipes",
+    "labels": [
+      "explosion_lights",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_light_tests",
+      "recipes"
+    ]
+  },
+  {
+    "name": "explosion_lights.failures",
+    "labels": [
+      "explosion_lights",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_light_tests",
+      "failures"
+    ]
+  },
+  {
+    "name": "explosion_lights.session",
+    "labels": [
+      "explosion_lights",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_light_tests",
+      "session"
+    ]
+  },
+  {
+    "name": "explosion_lights.private",
+    "labels": [
+      "explosion_lights",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_light_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "explosion_rings.motion",
+    "labels": [
+      "explosion_rings",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_ring_tests",
+      "motion",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-rings-motion"
+    ]
+  },
+  {
+    "name": "explosion_rings.lifecycle",
+    "labels": [
+      "explosion_rings",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_ring_tests",
+      "lifecycle",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-rings-lifecycle"
+    ]
+  },
+  {
+    "name": "explosion_rings.recipes",
+    "labels": [
+      "explosion_rings",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_ring_tests",
+      "recipes",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-rings-recipes"
+    ]
+  },
+  {
+    "name": "explosion_rings.failures",
+    "labels": [
+      "explosion_rings",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_ring_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-rings-failures"
+    ]
+  },
+  {
+    "name": "explosion_rings.session",
+    "labels": [
+      "explosion_rings",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_ring_tests",
+      "session",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-rings-session"
+    ]
+  },
+  {
+    "name": "explosion_rings.private",
+    "labels": [
+      "explosion_rings",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_ring_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.explosion_ring_alpha",
+    "labels": [
+      "explosion_rings",
+      "gpu"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_ring_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-ring-alpha"
+    ]
+  },
+  {
+    "name": "gpu.explosion_ring_private",
+    "labels": [
+      "explosion_rings",
+      "gpu",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_ring_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-ring-private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "explosion_fragments.lifecycle",
+    "labels": [
+      "explosion_fragments",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_fragment_tests",
+      "lifecycle",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fragments-lifecycle"
+    ]
+  },
+  {
+    "name": "explosion_fragments.collision",
+    "labels": [
+      "explosion_fragments",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_fragment_tests",
+      "collision",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fragments-collision"
+    ]
+  },
+  {
+    "name": "explosion_fragments.recipes",
+    "labels": [
+      "explosion_fragments",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_fragment_tests",
+      "recipes",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fragments-recipes"
+    ]
+  },
+  {
+    "name": "explosion_fragments.failures",
+    "labels": [
+      "explosion_fragments",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_fragment_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fragments-failures"
+    ]
+  },
+  {
+    "name": "explosion_fragments.session",
+    "labels": [
+      "explosion_fragments",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_fragment_tests",
+      "session",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fragments-session"
+    ]
+  },
+  {
+    "name": "explosion_fragments.private",
+    "labels": [
+      "explosion_fragments",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_fragment_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.explosion_fragment_alpha",
+    "labels": [
+      "explosion_fragments",
+      "gpu"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_fragment_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fragment-alpha"
+    ]
+  },
+  {
+    "name": "gpu.explosion_fragment_private",
+    "labels": [
+      "explosion_fragments",
+      "gpu",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_fragment_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-fragment-private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "object_particles.emission",
+    "labels": [
+      "headless",
+      "object_particles"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_particle_tests",
+      "emission",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object-particles-emission"
+    ]
+  },
+  {
+    "name": "object_particles.stopping",
+    "labels": [
+      "headless",
+      "object_particles"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_particle_tests",
+      "stopping",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object-particles-stopping"
+    ]
+  },
+  {
+    "name": "object_particles.failures",
+    "labels": [
+      "headless",
+      "object_particles"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_particle_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object-particles-failures"
+    ]
+  },
+  {
+    "name": "object_particles.session",
+    "labels": [
+      "headless",
+      "object_particles"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_particle_tests",
+      "session",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object-particles-session"
+    ]
+  },
+  {
+    "name": "object_particles.private",
+    "labels": [
+      "headless",
+      "object_particles",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_particle_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.object_particle_tint",
+    "labels": [
+      "gpu",
+      "object_particles"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_particle_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object-particle-tint"
+    ]
+  },
+  {
+    "name": "gpu.object_particle_private",
+    "labels": [
+      "gpu",
+      "object_particles",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_particle_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/object-particle-private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "explosion_flames.zones",
+    "labels": [
+      "explosion_flames",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_flame_tests",
+      "zones",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-flames-zones"
+    ]
+  },
+  {
+    "name": "explosion_flames.lifecycle",
+    "labels": [
+      "explosion_flames",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_flame_tests",
+      "lifecycle",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-flames-lifecycle"
+    ]
+  },
+  {
+    "name": "explosion_flames.failures",
+    "labels": [
+      "explosion_flames",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_flame_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-flames-failures"
+    ]
+  },
+  {
+    "name": "explosion_flames.session",
+    "labels": [
+      "explosion_flames",
+      "headless"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_flame_tests",
+      "session",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-flames-session"
+    ]
+  },
+  {
+    "name": "explosion_flames.private",
+    "labels": [
+      "explosion_flames",
+      "headless",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_flame_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "gpu.explosion_flame_alpha",
+    "labels": [
+      "explosion_flames",
+      "gpu"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_flame_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-flame-alpha"
+    ]
+  },
+  {
+    "name": "gpu.explosion_flame_private",
+    "labels": [
+      "explosion_flames",
+      "gpu",
+      "private"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_flame_gpu_tests",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-flame-private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  },
+  {
+    "name": "weapon_audio.voices",
+    "labels": [
+      "headless",
+      "weapon_audio"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_audio_tests",
+      "voices",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-audio-voices"
+    ]
+  },
+  {
+    "name": "weapon_audio.hearing",
+    "labels": [
+      "headless",
+      "weapon_audio"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_audio_tests",
+      "hearing",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-audio-hearing"
+    ]
+  },
+  {
+    "name": "weapon_audio.failures",
+    "labels": [
+      "headless",
+      "weapon_audio"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_audio_tests",
+      "failures",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-audio-failures"
+    ]
+  },
+  {
+    "name": "weapon_audio.callbacks",
+    "labels": [
+      "headless",
+      "weapon_audio"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_audio_tests",
+      "callbacks",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-audio-callbacks"
+    ]
+  },
+  {
+    "name": "weapon_audio.lifetime",
+    "labels": [
+      "headless",
+      "weapon_audio"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_audio_tests",
+      "lifetime",
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-audio-lifetime"
+    ]
+  },
+  {
+    "name": "weapon_audio.private",
+    "labels": [
+      "headless",
+      "private",
+      "weapon_audio"
+    ],
+    "command": [
+      "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_audio_tests",
+      "private",
+      "/home/yann/.steam/steam/steamapps/common/Blood II"
+    ]
+  }
+]

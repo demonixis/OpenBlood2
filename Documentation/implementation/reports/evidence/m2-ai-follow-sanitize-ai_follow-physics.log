@@ -1,0 +1,14 @@
+384/386 Testing: ai_follow.physics
+384/386 Test: ai_follow.physics
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_follow_tests" "physics"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_follow.physics" start time: Oct 16 12:54 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.physics" end time: Oct 16 12:54 CEST
+"ai_follow.physics" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,27 @@
+Test project <Blood2>/build/debug
+    Start 240: keyframe_audio.failures
+    Start 241: keyframe_audio.private
+1/5 Test #240: keyframe_audio.failures ..........   Passed    0.01 sec
+    Start 239: keyframe_audio.lifetime
+2/5 Test #239: keyframe_audio.lifetime ..........   Passed    0.01 sec
+    Start 237: keyframe_audio.timeline
+3/5 Test #237: keyframe_audio.timeline ..........   Passed    0.01 sec
+    Start 238: keyframe_audio.replacement
+4/5 Test #238: keyframe_audio.replacement .......   Passed    0.01 sec
+5/5 Test #241: keyframe_audio.private ...........***Failed    1.61 sec
+private_data:205: name == "worlds/09_abandoned_buildings.dat" && *sound == "pickuptruckloop1.wav"
+
+
+80% tests passed, 1 tests failed out of 5
+
+Label Time Summary:
+audio        =   1.64 sec*proc (5 tests)
+headless     =   1.64 sec*proc (5 tests)
+keyframes    =   1.64 sec*proc (5 tests)
+private      =   1.61 sec*proc (1 test)
+
+Total Test time (real) =   1.63 sec
+
+The following tests FAILED:
+	241 - keyframe_audio.private (Failed)                   audio headless keyframes private
+Errors while running CTest

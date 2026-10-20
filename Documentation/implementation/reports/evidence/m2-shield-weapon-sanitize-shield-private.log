@@ -1,0 +1,17 @@
+609/609 Testing: shield.private
+609/609 Test: shield.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/shield_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"shield.private" start time: Oct 17 02:02 CEST
+Output:
+----------------------------------------------------------
+Private loop 0: actual shield WAV, 42 decoded shield/powerup quads, source preserved across destination rehearsal; exact independent expiry.
+Private loop 1: actual shield WAV, 42 decoded shield/powerup quads, source preserved across destination rehearsal; exact independent expiry.
+Private loop 2: actual shield WAV, 42 decoded shield/powerup quads, source preserved across destination rehearsal; exact independent expiry.
+<end of output>
+Test time =  22.32 sec
+----------------------------------------------------------
+Test Passed.
+"shield.private" end time: Oct 17 02:02 CEST
+"shield.private" time elapsed: 00:00:22
+----------------------------------------------------------

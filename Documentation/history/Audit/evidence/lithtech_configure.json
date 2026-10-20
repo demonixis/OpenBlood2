@@ -1,0 +1,19 @@
+{
+  "name": "lithtech_configure",
+  "command": [
+    "cmake",
+    "-S",
+    "sources/lithtech",
+    "-B",
+    "/tmp/lithtech-audit-2bVxTF/lithtech",
+    "-G",
+    "Ninja",
+    "-DCMAKE_BUILD_TYPE=Debug"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:10:14.290435+00:00",
+  "elapsed_seconds": 0.009,
+  "timeout_seconds": 60,
+  "exit_code": 1,
+  "log": "lithtech_configure.log"
+}

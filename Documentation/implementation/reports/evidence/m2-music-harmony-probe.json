@@ -1,0 +1,157 @@
+{
+  "binary": "IMUSIC25.DLL",
+  "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "rvas": [
+    "0x16654",
+    "0x18dc3",
+    "0x18f15",
+    "0x93cc..0x94f6",
+    "0x962d..0x96ae"
+  ],
+  "fixtures": [
+    {
+      "input": [
+        145,
+        0,
+        0,
+        0,
+        11229877,
+        128,
+        7,
+        0,
+        true
+      ],
+      "base_flags": 126,
+      "pitch_flags": 19,
+      "variation_flags": 12545
+    },
+    {
+      "input": [
+        137,
+        0,
+        2,
+        8,
+        2741,
+        0,
+        0,
+        0,
+        true
+      ],
+      "base_flags": 55,
+      "pitch_flags": 147,
+      "variation_flags": 10754
+    },
+    {
+      "input": [
+        145,
+        1,
+        1,
+        0,
+        2741,
+        0,
+        7,
+        1,
+        true
+      ],
+      "base_flags": 55,
+      "pitch_flags": 19,
+      "variation_flags": 16768
+    },
+    {
+      "input": [
+        4294967295,
+        0,
+        -128,
+        8,
+        2147483648,
+        255,
+        127,
+        -1,
+        true
+      ],
+      "base_flags": 17,
+      "pitch_flags": 240,
+      "variation_flags": 16641
+    },
+    {
+      "input": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        false
+      ],
+      "base_flags": 16,
+      "pitch_flags": 16,
+      "variation_flags": 9344
+    },
+    {
+      "input": [
+        3932160,
+        0,
+        0,
+        0,
+        16777215,
+        0,
+        0,
+        0,
+        false
+      ],
+      "base_flags": 120,
+      "pitch_flags": 116,
+      "variation_flags": 17409
+    }
+  ],
+  "generated": {
+    "cases": 4096,
+    "sha256": "c9429a640d80e7e0018a6f2ef4be1aa61f95d3245fc280cf1ba7a2bca14da2f5",
+    "fnv64": 12106312165928785022
+  },
+  "private": {
+    "cases": 156,
+    "sha256": "2e631dc91e08ead5586d39526db135eee7bac03944b674ff2ef50f7ffa881b9a",
+    "fnv64": 11061850450855354925
+  },
+  "headers": [
+    {
+      "path": "Music/A1/SILENCE.PER",
+      "bytes": 1294,
+      "sha256": "1f831f593d3b8b5cb726d857b7115099c003791bc5382003d8510c760694de35",
+      "name": "Silence",
+      "scale_mask": 11229877
+    },
+    {
+      "path": "Music/Bloat/SILENCE.PER",
+      "bytes": 1294,
+      "sha256": "1f831f593d3b8b5cb726d857b7115099c003791bc5382003d8510c760694de35",
+      "name": "Silence",
+      "scale_mask": 11229877
+    },
+    {
+      "path": "Music/Cabal/SILENCE.PER",
+      "bytes": 1294,
+      "sha256": "1f831f593d3b8b5cb726d857b7115099c003791bc5382003d8510c760694de35",
+      "name": "Silence",
+      "scale_mask": 11229877
+    },
+    {
+      "path": "Music/Crudux/SILENCE.PER",
+      "bytes": 1294,
+      "sha256": "1f831f593d3b8b5cb726d857b7115099c003791bc5382003d8510c760694de35",
+      "name": "Silence",
+      "scale_mask": 11229877
+    },
+    {
+      "path": "Music/Track1/SILENCE.PER",
+      "bytes": 1294,
+      "sha256": "1f831f593d3b8b5cb726d857b7115099c003791bc5382003d8510c760694de35",
+      "name": "Silence",
+      "scale_mask": 11229877
+    }
+  ],
+  "scope": "Original field extraction and retained chord arithmetic; opaque personality graph and live scheduling not executed."
+}

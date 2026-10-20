@@ -1,0 +1,34 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 196: lights.defaults
+    Start 197: lights.waves
+    Start 198: lights.commands
+    Start 199: lights.lifetime
+1/9 Test #197: lights.waves .....................   Passed    0.00 sec
+    Start 200: lights.damage
+2/9 Test #198: lights.commands ..................   Passed    0.00 sec
+    Start 201: lights.validation
+3/9 Test #199: lights.lifetime ..................   Passed    0.00 sec
+    Start 202: lights.motion
+4/9 Test #196: lights.defaults ..................   Passed    0.00 sec
+    Start 203: lights.teardown
+5/9 Test #201: lights.validation ................   Passed    0.00 sec
+    Start 204: lights.catalog
+6/9 Test #203: lights.teardown ..................   Passed    0.00 sec
+7/9 Test #202: lights.motion ....................   Passed    0.00 sec
+8/9 Test #200: lights.damage ....................***Failed    0.01 sec
+damage:83: hit(g,h,2)&&light(g,h)->damage.m_fHitPoints==3&&!light(g,h)->damage.IsDead()
+
+9/9 Test #204: lights.catalog ...................   Passed    3.85 sec
+
+89% tests passed, 1 tests failed out of 9
+
+Label Time Summary:
+headless    =   3.89 sec*proc (9 tests)
+lights      =   3.89 sec*proc (9 tests)
+private     =   3.85 sec*proc (1 test)
+
+Total Test time (real) =   3.86 sec
+
+The following tests FAILED:
+	200 - lights.damage (Failed)                            headless lights
+Errors while running CTest

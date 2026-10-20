@@ -1,0 +1,1016 @@
+Start testing: Oct 17 09:02 CEST
+----------------------------------------------------------
+598/734 Testing: player_controls.private
+598/734 Test: player_controls.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_controls_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_controls.private" start time: Oct 17 09:02 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Alternate input: hp=100 dead=0 ammo=38 shots=12 before=5
+Corpse placement: placed with clearance correction corrections=2 distance=28.8523 requested=-73.1721,133.002,-2412.32 fitted=-59.999,133.002,-2428
+Original FIRE_KEY: shots=12 ammo=38 voices=12 mouse=0
+<end of output>
+Test time =  45.34 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.private" end time: Oct 17 09:02 CEST
+"player_controls.private" time elapsed: 00:00:45
+----------------------------------------------------------
+
+54/734 Testing: services.private
+54/734 Test: services.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.private" start time: Oct 17 09:02 CEST
+Output:
+----------------------------------------------------------
+Original start point: -32,192,-3224
+Caleb: 784 vertices, 20 nodes, 86 animations; dispatched commands: 46
+Primary world: 14300 solid triangles, 4095 BVH nodes; probe contact y=170 polygon=2549
+<end of output>
+Test time =  16.37 sec
+----------------------------------------------------------
+Test Passed.
+"services.private" end time: Oct 17 09:03 CEST
+"services.private" time elapsed: 00:00:16
+----------------------------------------------------------
+
+495/734 Testing: corpses.catalog
+495/734 Test: corpses.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.catalog" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+Death clip 32 duration 900
+Death clip 33 duration 7000
+Death clip 34 duration 1700
+Death clip 35 duration 2100
+Death clip 36 duration 1900
+Death clip 37 duration 1900
+Death clip 38 duration 1500
+Death clip 39 duration 1600
+Death clip 40 duration 6000
+Death clip 41 duration 2000
+Death clip 42 duration 5500
+Death clip 43 duration 7000
+CultistAI cycle 0: source removed; corpse clip 33, sound starts 1, pool request 1
+CivilianAI cycle 0: source removed; corpse clip 34, sound starts 1, pool request 1
+CultistAI cycle 1: source removed; corpse clip 32, sound starts 1, pool request 1
+CivilianAI cycle 1: source removed; corpse clip 34, sound starts 1, pool request 1
+<end of output>
+Test time =   1.73 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.catalog" end time: Oct 17 09:03 CEST
+"corpses.catalog" time elapsed: 00:00:01
+----------------------------------------------------------
+
+477/734 Testing: ai_hit.catalog
+477/734 Test: ai_hit.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.catalog" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+recoil private error= phase=2 finishes=1 updates=20 clip=21 time=300
+CultistAI male=1 hit=2 missing=2 reactions=1 recoil=1 hp=30
+recoil private error= phase=2 finishes=1 updates=20 clip=21 time=300
+CultistAI male=0 hit=2 missing=2 reactions=1 recoil=1 hp=30
+CivilianAI male=1 hit=2 missing=2 reactions=1 recoil=0 hp=30
+CivilianAI male=0 hit=2 missing=2 reactions=1 recoil=0 hp=30
+<end of output>
+Test time =   1.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.catalog" end time: Oct 17 09:03 CEST
+"ai_hit.catalog" time elapsed: 00:00:01
+----------------------------------------------------------
+
+425/734 Testing: ai_locomotion.catalog
+425/734 Test: ai_locomotion.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.catalog" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+m_cultist1 command=0 clip=4 available=1
+m_cultist1 command=1 clip=5 available=1
+m_cultist1 command=2 clip=12 available=1
+m_cultist1 command=3 clip=13 available=1
+f_cultist1 command=0 clip=4 available=1
+f_cultist1 command=1 clip=5 available=1
+f_cultist1 command=2 clip=12 available=1
+f_cultist1 command=3 clip=13 available=1
+m_civilian1 command=0 clip=2 available=1
+m_civilian1 command=1 clip=4 available=1
+m_civilian1 command=2 clip=4294967295 available=0
+m_civilian1 command=3 clip=4294967295 available=0
+f_civilian1 command=0 clip=3 available=1
+f_civilian1 command=1 clip=2 available=1
+f_civilian1 command=2 clip=4294967295 available=0
+f_civilian1 command=3 clip=4294967295 available=0
+labtech command=0 clip=2 available=1
+labtech command=1 clip=4 available=1
+labtech command=2 clip=4294967295 available=0
+labtech command=3 clip=4294967295 available=0
+gideon command=0 clip=1 available=1
+gideon command=1 clip=0 available=1
+gideon command=2 clip=4294967295 available=0
+gideon command=3 clip=4294967295 available=0
+<end of output>
+Test time =   1.43 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.catalog" end time: Oct 17 09:03 CEST
+"ai_locomotion.catalog" time elapsed: 00:00:01
+----------------------------------------------------------
+
+46/734 Testing: services.model_rejection
+46/734 Test: services.model_rejection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "model_rejection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.model_rejection" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"services.model_rejection" end time: Oct 17 09:03 CEST
+"services.model_rejection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+491/734 Testing: corpses.lifetime
+491/734 Test: corpses.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.lifetime" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.lifetime" end time: Oct 17 09:03 CEST
+"corpses.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+489/734 Testing: corpses.transfer
+489/734 Test: corpses.transfer
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "transfer" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/transfer"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.transfer" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.transfer" end time: Oct 17 09:03 CEST
+"corpses.transfer" time elapsed: 00:00:00
+----------------------------------------------------------
+
+492/734 Testing: corpses.sounds
+492/734 Test: corpses.sounds
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "sounds" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/sounds"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.sounds" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.sounds" end time: Oct 17 09:03 CEST
+"corpses.sounds" time elapsed: 00:00:00
+----------------------------------------------------------
+
+490/734 Testing: corpses.failures
+490/734 Test: corpses.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.failures" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.failures" end time: Oct 17 09:03 CEST
+"corpses.failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+493/734 Testing: corpses.gates
+493/734 Test: corpses.gates
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "gates" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/gates"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.gates" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.gates" end time: Oct 17 09:03 CEST
+"corpses.gates" time elapsed: 00:00:00
+----------------------------------------------------------
+
+494/734 Testing: corpses.accumulation
+494/734 Test: corpses.accumulation
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "accumulation" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/accumulation"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.accumulation" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.accumulation" end time: Oct 17 09:03 CEST
+"corpses.accumulation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+488/734 Testing: corpses.mappings
+488/734 Test: corpses.mappings
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse_tests" "mappings" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/corpse-fixtures/mappings"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"corpses.mappings" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.mappings" end time: Oct 17 09:03 CEST
+"corpses.mappings" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1/734 Testing: objects.builtin_model
+1/734 Test: objects.builtin_model
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "builtin_model"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.builtin_model" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+PASS builtin_model
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"objects.builtin_model" end time: Oct 17 09:03 CEST
+"objects.builtin_model" time elapsed: 00:00:00
+----------------------------------------------------------
+
+52/734 Testing: services.placement_service
+52/734 Test: services.placement_service
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "placement_service"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.placement_service" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"services.placement_service" end time: Oct 17 09:03 CEST
+"services.placement_service" time elapsed: 00:00:00
+----------------------------------------------------------
+
+51/734 Testing: services.placement_queries
+51/734 Test: services.placement_queries
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "placement_queries"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.placement_queries" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"services.placement_queries" end time: Oct 17 09:03 CEST
+"services.placement_queries" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/734 Testing: objects.unsupported_teardown
+11/734 Test: objects.unsupported_teardown
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "unsupported_teardown"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.unsupported_teardown" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+PASS unsupported_teardown
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"objects.unsupported_teardown" end time: Oct 17 09:03 CEST
+"objects.unsupported_teardown" time elapsed: 00:00:00
+----------------------------------------------------------
+
+476/734 Testing: ai_hit.hidden
+476/734 Test: ai_hit.hidden
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "hidden"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.hidden" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.hidden" end time: Oct 17 09:03 CEST
+"ai_hit.hidden" time elapsed: 00:00:00
+----------------------------------------------------------
+
+599/734 Testing: session_playback.policy
+599/734 Test: session_playback.policy
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/session_playback_tests" "policy"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"session_playback.policy" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"session_playback.policy" end time: Oct 17 09:03 CEST
+"session_playback.policy" time elapsed: 00:00:00
+----------------------------------------------------------
+
+468/734 Testing: ai_hit.geometry
+468/734 Test: ai_hit.geometry
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "geometry"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.geometry" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.geometry" end time: Oct 17 09:03 CEST
+"ai_hit.geometry" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/734 Testing: objects.messages_strings
+10/734 Test: objects.messages_strings
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "messages_strings"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.messages_strings" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+PASS messages_strings
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"objects.messages_strings" end time: Oct 17 09:03 CEST
+"objects.messages_strings" time elapsed: 00:00:00
+----------------------------------------------------------
+
+470/734 Testing: ai_hit.modifiers
+470/734 Test: ai_hit.modifiers
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "modifiers"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.modifiers" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.modifiers" end time: Oct 17 09:03 CEST
+"ai_hit.modifiers" time elapsed: 00:00:00
+----------------------------------------------------------
+
+594/734 Testing: player_controls.mouse
+594/734 Test: player_controls.mouse
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_controls_tests" "mouse"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_controls.mouse" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.mouse" end time: Oct 17 09:03 CEST
+"player_controls.mouse" time elapsed: 00:00:00
+----------------------------------------------------------
+
+593/734 Testing: player_controls.keys
+593/734 Test: player_controls.keys
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_controls_tests" "keys"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_controls.keys" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.keys" end time: Oct 17 09:03 CEST
+"player_controls.keys" time elapsed: 00:00:00
+----------------------------------------------------------
+
+595/734 Testing: player_controls.gates
+595/734 Test: player_controls.gates
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_controls_tests" "gates"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_controls.gates" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.gates" end time: Oct 17 09:03 CEST
+"player_controls.gates" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/734 Testing: objects.creation_failures
+12/734 Test: objects.creation_failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "creation_failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.creation_failures" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+PASS creation_failures
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"objects.creation_failures" end time: Oct 17 09:03 CEST
+"objects.creation_failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+471/734 Testing: ai_hit.reactions
+471/734 Test: ai_hit.reactions
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "reactions"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.reactions" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.reactions" end time: Oct 17 09:03 CEST
+"ai_hit.reactions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+475/734 Testing: ai_hit.lifetime
+475/734 Test: ai_hit.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.lifetime" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.lifetime" end time: Oct 17 09:03 CEST
+"ai_hit.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+469/734 Testing: ai_hit.query
+469/734 Test: ai_hit.query
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "query"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.query" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.query" end time: Oct 17 09:03 CEST
+"ai_hit.query" time elapsed: 00:00:00
+----------------------------------------------------------
+
+474/734 Testing: ai_hit.sides
+474/734 Test: ai_hit.sides
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "sides"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.sides" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.sides" end time: Oct 17 09:03 CEST
+"ai_hit.sides" time elapsed: 00:00:00
+----------------------------------------------------------
+
+473/734 Testing: ai_hit.guards
+473/734 Test: ai_hit.guards
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "guards"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.guards" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.guards" end time: Oct 17 09:03 CEST
+"ai_hit.guards" time elapsed: 00:00:00
+----------------------------------------------------------
+
+472/734 Testing: ai_hit.recoil
+472/734 Test: ai_hit.recoil
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_hit_tests" "recoil"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_hit.recoil" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_hit.recoil" end time: Oct 17 09:03 CEST
+"ai_hit.recoil" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/734 Testing: objects.reasons_properties
+4/734 Test: objects.reasons_properties
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "reasons_properties"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.reasons_properties" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+PASS reasons_properties
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.reasons_properties" end time: Oct 17 09:03 CEST
+"objects.reasons_properties" time elapsed: 00:00:00
+----------------------------------------------------------
+
+423/734 Testing: ai_locomotion.lifetime
+423/734 Test: ai_locomotion.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.lifetime" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.lifetime" end time: Oct 17 09:03 CEST
+"ai_locomotion.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/734 Testing: objects.original_objects
+2/734 Test: objects.original_objects
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "original_objects"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.original_objects" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+PASS original_objects
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.original_objects" end time: Oct 17 09:03 CEST
+"objects.original_objects" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/734 Testing: objects.links_lists
+9/734 Test: objects.links_lists
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "links_lists"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.links_lists" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+PASS links_lists
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"objects.links_lists" end time: Oct 17 09:03 CEST
+"objects.links_lists" time elapsed: 00:00:00
+----------------------------------------------------------
+
+416/734 Testing: ai_locomotion.rays
+416/734 Test: ai_locomotion.rays
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "rays"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.rays" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.rays" end time: Oct 17 09:03 CEST
+"ai_locomotion.rays" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/734 Testing: objects.deferred_removal
+6/734 Test: objects.deferred_removal
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "deferred_removal"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.deferred_removal" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+PASS deferred_removal
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.deferred_removal" end time: Oct 17 09:03 CEST
+"objects.deferred_removal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/734 Testing: objects.handles_selection
+8/734 Test: objects.handles_selection
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "handles_selection"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.handles_selection" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+PASS handles_selection
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.handles_selection" end time: Oct 17 09:03 CEST
+"objects.handles_selection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/734 Testing: objects.nested_creation
+3/734 Test: objects.nested_creation
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "nested_creation"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.nested_creation" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+PASS nested_creation
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"objects.nested_creation" end time: Oct 17 09:03 CEST
+"objects.nested_creation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/734 Testing: objects.scheduling
+5/734 Test: objects.scheduling
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "scheduling"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.scheduling" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+PASS scheduling
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.scheduling" end time: Oct 17 09:03 CEST
+"objects.scheduling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+418/734 Testing: ai_locomotion.ledges
+418/734 Test: ai_locomotion.ledges
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "ledges"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.ledges" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.ledges" end time: Oct 17 09:03 CEST
+"ai_locomotion.ledges" time elapsed: 00:00:00
+----------------------------------------------------------
+
+419/734 Testing: ai_locomotion.walking
+419/734 Test: ai_locomotion.walking
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "walking"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.walking" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.walking" end time: Oct 17 09:03 CEST
+"ai_locomotion.walking" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/734 Testing: objects.aggregate_dispatch
+7/734 Test: objects.aggregate_dispatch
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_contract_tests" "aggregate_dispatch"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"objects.aggregate_dispatch" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+PASS aggregate_dispatch
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"objects.aggregate_dispatch" end time: Oct 17 09:03 CEST
+"objects.aggregate_dispatch" time elapsed: 00:00:00
+----------------------------------------------------------
+
+420/734 Testing: ai_locomotion.physics
+420/734 Test: ai_locomotion.physics
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "physics"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.physics" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.physics" end time: Oct 17 09:03 CEST
+"ai_locomotion.physics" time elapsed: 00:00:00
+----------------------------------------------------------
+
+421/734 Testing: ai_locomotion.moving_fire
+421/734 Test: ai_locomotion.moving_fire
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "moving_fire"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.moving_fire" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.moving_fire" end time: Oct 17 09:03 CEST
+"ai_locomotion.moving_fire" time elapsed: 00:00:00
+----------------------------------------------------------
+
+422/734 Testing: ai_locomotion.keys
+422/734 Test: ai_locomotion.keys
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "keys"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.keys" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.keys" end time: Oct 17 09:03 CEST
+"ai_locomotion.keys" time elapsed: 00:00:00
+----------------------------------------------------------
+
+415/734 Testing: ai_locomotion.obstruction
+415/734 Test: ai_locomotion.obstruction
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "obstruction"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.obstruction" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.obstruction" end time: Oct 17 09:03 CEST
+"ai_locomotion.obstruction" time elapsed: 00:00:00
+----------------------------------------------------------
+
+417/734 Testing: ai_locomotion.navigate
+417/734 Test: ai_locomotion.navigate
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "navigate"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.navigate" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.navigate" end time: Oct 17 09:03 CEST
+"ai_locomotion.navigate" time elapsed: 00:00:00
+----------------------------------------------------------
+
+424/734 Testing: ai_locomotion.attacks
+424/734 Test: ai_locomotion.attacks
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "attacks"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.attacks" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.attacks" end time: Oct 17 09:03 CEST
+"ai_locomotion.attacks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+48/734 Testing: services.model_callbacks
+48/734 Test: services.model_callbacks
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "model_callbacks"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.model_callbacks" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"services.model_callbacks" end time: Oct 17 09:03 CEST
+"services.model_callbacks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+53/734 Testing: services.original_services
+53/734 Test: services.original_services
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "original_services"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.original_services" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"services.original_services" end time: Oct 17 09:03 CEST
+"services.original_services" time elapsed: 00:00:00
+----------------------------------------------------------
+
+47/734 Testing: services.animation_events
+47/734 Test: services.animation_events
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "animation_events"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.animation_events" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"services.animation_events" end time: Oct 17 09:03 CEST
+"services.animation_events" time elapsed: 00:00:00
+----------------------------------------------------------
+
+45/734 Testing: services.model_reader
+45/734 Test: services.model_reader
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "model_reader"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.model_reader" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"services.model_reader" end time: Oct 17 09:03 CEST
+"services.model_reader" time elapsed: 00:00:00
+----------------------------------------------------------
+
+50/734 Testing: services.movement_contacts
+50/734 Test: services.movement_contacts
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "movement_contacts"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.movement_contacts" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"services.movement_contacts" end time: Oct 17 09:03 CEST
+"services.movement_contacts" time elapsed: 00:00:00
+----------------------------------------------------------
+
+49/734 Testing: services.collision_queries
+49/734 Test: services.collision_queries
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/services_tests" "collision_queries"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"services.collision_queries" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"services.collision_queries" end time: Oct 17 09:03 CEST
+"services.collision_queries" time elapsed: 00:00:00
+----------------------------------------------------------
+
+413/734 Testing: ai_locomotion.dodge
+413/734 Test: ai_locomotion.dodge
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "dodge"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.dodge" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.dodge" end time: Oct 17 09:03 CEST
+"ai_locomotion.dodge" time elapsed: 00:00:00
+----------------------------------------------------------
+
+414/734 Testing: ai_locomotion.rolls
+414/734 Test: ai_locomotion.rolls
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "rolls"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.rolls" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.rolls" end time: Oct 17 09:03 CEST
+"ai_locomotion.rolls" time elapsed: 00:00:00
+----------------------------------------------------------
+
+596/734 Testing: player_controls.entry
+596/734 Test: player_controls.entry
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_controls_tests" "entry"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_controls.entry" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.entry" end time: Oct 17 09:03 CEST
+"player_controls.entry" time elapsed: 00:00:00
+----------------------------------------------------------
+
+600/734 Testing: session_playback.private
+600/734 Test: session_playback.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/session_playback_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"session_playback.private" start time: Oct 17 09:02 CEST
+Output:
+----------------------------------------------------------
+SubwayA entry 0: waited 180 frames without ticking; shooters=1 shots=15 player HP=39.9413
+SubwayA entry 1: waited 180 frames without ticking; shooters=1 shots=15 player HP=39.9413
+<end of output>
+Test time =  84.16 sec
+----------------------------------------------------------
+Test Passed.
+"session_playback.private" end time: Oct 17 09:03 CEST
+"session_playback.private" time elapsed: 00:01:24
+----------------------------------------------------------
+
+597/734 Testing: player_controls.combat
+597/734 Test: player_controls.combat
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_controls_tests" "combat" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_controls.combat" start time: Oct 17 09:03 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walked from spawn to z=-2192.09
+Mouse primary killed authored gak: HP 44.8923 -> 0, shots=8, ammo=42, independent corpse verified, native=0
+Dodge updates=0, corpse candidates=30, zero-margin search=1
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Walked from spawn to z=-2192.09
+Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=13, ammo=37, independent corpse verified, native=0
+Dodge updates=12, corpse candidates=23, zero-margin search=1
+Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+Walked past killed Cultist to z=-1861.92
+<end of output>
+Test time =  88.84 sec
+----------------------------------------------------------
+Test Passed.
+"player_controls.combat" end time: Oct 17 09:04 CEST
+"player_controls.combat" time elapsed: 00:01:28
+----------------------------------------------------------
+
+End testing: Oct 17 09:04 CEST
+
+ai_hit =   1.30 sec*proc
+
+ai_locomotion =   1.86 sec*proc
+
+corpses =   2.07 sec*proc
+
+headless = 241.13 sec*proc
+
+objects =   0.47 sec*proc
+
+player_controls = 134.26 sec*proc
+
+private = 238.90 sec*proc
+
+services =  16.99 sec*proc
+
+session_playback =  84.19 sec*proc
+

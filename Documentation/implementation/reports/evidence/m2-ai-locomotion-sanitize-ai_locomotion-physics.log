@@ -1,0 +1,14 @@
+401/406 Testing: ai_locomotion.physics
+401/406 Test: ai_locomotion.physics
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_locomotion_tests" "physics"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_locomotion.physics" start time: Oct 16 13:42 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_locomotion.physics" end time: Oct 16 13:42 CEST
+"ai_locomotion.physics" time elapsed: 00:00:00
+----------------------------------------------------------

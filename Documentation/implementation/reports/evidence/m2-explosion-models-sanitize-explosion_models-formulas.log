@@ -1,0 +1,14 @@
+519/523 Testing: explosion_models.formulas
+519/523 Test: explosion_models.formulas
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_model_tests" "formulas" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-models-formulas"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_models.formulas" start time: Oct 16 20:39 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_models.formulas" end time: Oct 16 20:39 CEST
+"explosion_models.formulas" time elapsed: 00:00:00
+----------------------------------------------------------

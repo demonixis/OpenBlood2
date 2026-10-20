@@ -1,0 +1,15 @@
+345/630 Testing: gpu.world_depth
+345/630 Test: gpu.world_depth
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/world_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/world-depth.png"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.world_depth" start time: Oct 17 00:38 CEST
+Output:
+----------------------------------------------------------
+GPU readback: depth occlusion, opposite winding, near clipping, +X/+Y orientation, camera/object transforms, resize, textured repeat/row orientation/opaque sampling and reupload pass
+<end of output>
+Test time =   0.48 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.world_depth" end time: Oct 17 00:38 CEST
+"gpu.world_depth" time elapsed: 00:00:00
+----------------------------------------------------------

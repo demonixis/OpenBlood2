@@ -1,0 +1,258 @@
+40/595 Testing: world.destination_private
+40/595 Test: world.destination_private
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/world_tests" "destination_private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"world.destination_private" start time: Oct 16 22:22 CEST
+Output:
+----------------------------------------------------------
+Cycle 0: worlds/01_subwaya.dat: 580 entries / 207 schema / 372 editor / 1 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 0: worlds/02_cityhub.dat: 1026 entries / 247 schema / 541 editor / 207 unknown / 31 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound0: Sound: invalid property VoiceType
+Schema failure Sound / Sound0: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound1: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound2: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 1: worlds/01_subwaya.dat: 580 entries / 207 schema / 372 editor / 1 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 1: worlds/02_cityhub.dat: 1026 entries / 247 schema / 541 editor / 207 unknown / 31 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound0: Sound: invalid property VoiceType
+Schema failure Sound / Sound0: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound1: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound2: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+Cycle 2: worlds/01_subwaya.dat: 580 entries / 207 schema / 372 editor / 1 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 2: worlds/02_cityhub.dat: 1026 entries / 247 schema / 541 editor / 207 unknown / 31 invalid / 100 models / 39724 triangles / 16383 collision nodes
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound0: Sound: invalid property VoiceType
+Schema failure Sound / Sound0: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound1: Sound: invalid property VoiceType
+Schema failure Sound / noname: Sound: invalid property VoiceType
+Schema failure Sound / Sound2: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Schema failure Sound / sound3: Sound: invalid property VoiceType
+Malformed destination preserves source: DAT v56: invalid/unsupported typed property near byte 442114
+PASS destination_private
+<end of output>
+Test time =   0.20 sec
+----------------------------------------------------------
+Test Passed.
+"world.destination_private" end time: Oct 16 22:22 CEST
+"world.destination_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 22:22 CEST
+
+ai_escape =   0.06 sec*proc
+
+ai_fire =   0.40 sec*proc
+
+ai_follow =   0.16 sec*proc
+
+ai_hit =   0.05 sec*proc
+
+ai_keys =   0.79 sec*proc
+
+ai_locomotion =   0.05 sec*proc
+
+ai_navigation =   0.12 sec*proc
+
+ai_perception =   0.15 sec*proc
+
+ai_recovery =   0.06 sec*proc
+
+ai_runtime =   0.73 sec*proc
+
+ai_script =   0.09 sec*proc
+
+ai_sight =   0.14 sec*proc
+
+ai_state =   1.01 sec*proc
+
+ai_target =   0.15 sec*proc
+
+ai_trigger =   0.12 sec*proc
+
+attachments =   0.17 sec*proc
+
+brushes =   0.73 sec*proc
+
+cameras =   0.61 sec*proc
+
+character =   0.78 sec*proc
+
+character_audio =   1.04 sec*proc
+
+character_motion =   0.05 sec*proc
+
+character_nodes =   0.16 sec*proc
+
+cinematics =   0.52 sec*proc
+
+cli =   0.05 sec*proc
+
+config =   0.02 sec*proc
+
+containers =   0.78 sec*proc
+
+corpses =   0.05 sec*proc
+
+destructable_state =   0.16 sec*proc
+
+doors =   0.66 sec*proc
+
+exits =   0.47 sec*proc
+
+explosion_flames =   0.40 sec*proc
+
+explosion_fragments =   0.74 sec*proc
+
+explosion_lights =   0.37 sec*proc
+
+explosion_models =   0.16 sec*proc
+
+explosion_rings =   0.45 sec*proc
+
+explosion_sprites =   0.16 sec*proc
+
+explosions =   0.02 sec*proc
+
+headless =  27.42 sec*proc
+
+interaction =   0.55 sec*proc
+
+inventory_state =   0.14 sec*proc
+
+keyframes =   0.96 sec*proc
+
+lights =   0.34 sec*proc
+
+locomotion =   0.55 sec*proc
+
+model_view =   0.12 sec*proc
+
+movement =   1.39 sec*proc
+
+object_particles =   0.88 sec*proc
+
+objectives =   0.39 sec*proc
+
+objects =   0.03 sec*proc
+
+paths =   0.16 sec*proc
+
+pickups =   0.37 sec*proc
+
+player =   0.30 sec*proc
+
+player_keepalive =   0.34 sec*proc
+
+player_restore =   0.17 sec*proc
+
+player_state =   0.15 sec*proc
+
+private =  25.88 sec*proc
+
+pushables =   0.03 sec*proc
+
+randomsound =   0.52 sec*proc
+
+sceneexplosion =   0.47 sec*proc
+
+services =   0.32 sec*proc
+
+sound =   0.42 sec*proc
+
+sprite_view =   0.15 sec*proc
+
+sprites =   0.60 sec*proc
+
+texture =   0.15 sec*proc
+
+triggers =   0.72 sec*proc
+
+weapon_drops =   0.05 sec*proc
+
+weapons =   3.41 sec*proc
+
+world =   0.57 sec*proc
+
+world_view =   0.12 sec*proc
+
+worldpaths =   0.43 sec*proc
+

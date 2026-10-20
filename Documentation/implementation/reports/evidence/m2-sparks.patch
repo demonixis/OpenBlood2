@@ -1,0 +1,1288 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 35b5f78..39756c0 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -586,3 +586,5 @@ The [original smell-trail continuation](../Documentation/Implementation/M2_AI_SM
+ The [original blood-pool continuation](../Documentation/Implementation/M2_BLOOD_SPLATS.md) connects CClientSplatFX/CBloodSplatFX with corpse ground-hit publication, persistent oriented sprites and inspection. Read [contracts](docs/BLOOD_SPLAT_CONTRACTS.md). Preserve eleven-existing-neighbor reuse, nearest-prefix/tie order, state-preserving relocation, delta-squared growth, uncapped Term clocks and detached lifetime. Blood spurts/gib impact callers, shared-list eviction and the actual M2 gate remain incomplete.
+ 
+ The [blood-spurt continuation](../Documentation/Implementation/M2_BLOOD_SPURTS.md) connects original vector-weapon entry/exit jets, fragment launch jets and impact marks, and deferred limb impact requests. Read [contracts](docs/BLOOD_SPURT_CONTRACTS.md). Preserve random-before-damage selection, raw visual damage, emission-before-motion, separate particle/emitter gravity, strict fade, distinct splat thresholds and detached lifetime. Cosmetic child failures never cancel damage/removal. Separate flesh sparks, outside-world classification, shared SFX eviction, full save/restore and the actual M2 gate remain open. Earlier blanket blood-spurt/gib-impact omissions are superseded for this subset.
++
++The [original impact-spark continuation](../Documentation/Implementation/M2_SPARKS.md) connects CSparksFX flesh bursts and metal sparks, with raw-damage recipes, detached particles and inspection. Read [contracts](docs/SPARK_CONTRACTS.md). Preserve source component velocity clipping, strict fade/removal clocks, cosmetic RNG isolation and explicit empty melee recipes. Exhausted invisible systems are reclaimed after duration; shared-list eviction and other required services remain unavailable. M2 stays incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 41bf89e..080a717 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC src/game/blood_spurts.cpp src/game/original/ParticleExplosionFX.cpp src/game/blood_splats.cpp src/game/original/BloodSplatFX.cpp src/game/original/ClientSplatFX.cpp src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
++add_library(blood2_game STATIC src/game/sparks.cpp src/game/original/SparksFX.cpp src/game/blood_spurts.cpp src/game/original/ParticleExplosionFX.cpp src/game/blood_splats.cpp src/game/original/BloodSplatFX.cpp src/game/original/ClientSplatFX.cpp src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index be3ac38..66dce64 100644
+--- a/README.md
++++ b/README.md
+@@ -625,3 +625,5 @@ The [corpse doorway correction](../Documentation/Implementation/M2_CORPSE_CLEARA
+ The [original blood-pool continuation](../Documentation/Implementation/M2_BLOOD_SPLATS.md) connects CClientSplatFX/CBloodSplatFX with corpse ground-hit publication, persistent oriented sprites and inspection. Read [contracts](docs/BLOOD_SPLAT_CONTRACTS.md). Preserve eleven-existing-neighbor reuse, nearest-prefix/tie order, state-preserving relocation, delta-squared growth, uncapped Term clocks and detached lifetime. Blood spurts/gib impact callers, shared-list eviction and the actual M2 gate remain incomplete.
+ 
+ The [blood-spurt continuation](../Documentation/Implementation/M2_BLOOD_SPURTS.md) connects original vector-weapon entry/exit jets, fragment launch jets and impact marks, and deferred limb impact requests. Read [contracts](docs/BLOOD_SPURT_CONTRACTS.md). Preserve random-before-damage selection, raw visual damage, emission-before-motion, separate particle/emitter gravity, strict fade, distinct splat thresholds and detached lifetime. Cosmetic child failures never cancel damage/removal. Separate flesh sparks, outside-world classification, shared SFX eviction, full save/restore and the actual M2 gate remain open. Earlier blanket blood-spurt/gib-impact omissions are superseded for this subset.
++
++The [original impact-spark continuation](../Documentation/Implementation/M2_SPARKS.md) connects CSparksFX flesh bursts and metal sparks, with raw-damage recipes, detached particles and inspection. Read [contracts](docs/SPARK_CONTRACTS.md). Preserve source component velocity clipping, strict fade/removal clocks, cosmetic RNG isolation and explicit empty melee recipes. Exhausted invisible systems are reclaimed after duration; shared-list eviction and other required services remain unavailable. M2 stays incomplete.
+diff --git a/docs/BLOOD_SPURT_CONTRACTS.md b/docs/BLOOD_SPURT_CONTRACTS.md
+index c2104df..eb63bec 100644
+--- a/docs/BLOOD_SPURT_CONTRACTS.md
++++ b/docs/BLOOD_SPURT_CONTRACTS.md
+@@ -75,3 +75,5 @@ GetPointStatus outside-world classification, shared original SFX-list eviction,
+ full save/restore and broader M2 acceptance remain open. Arterial spurt calls
+ commented out in original corpse/player/living-AI code stay disabled. This
+ continuation does not enable living-NPC limb loss or add collision to cosmetic FX.
++
++The [original impact sparks](SPARK_CONTRACTS.md) continuation supersedes the flesh/metal spark omission only. Underwater bubbles, generic recipes and remaining M2 services stay unavailable.
+diff --git a/docs/M2_SPARK_SOURCES.json b/docs/M2_SPARK_SOURCES.json
+new file mode 100644
+index 0000000..6d3dd12
+--- /dev/null
++++ b/docs/M2_SPARK_SOURCES.json
+@@ -0,0 +1,47 @@
++{
++  "date": "2026-10-17",
++  "baseline_commit": "a52344adc5076b6c354f17c20316d6545c0ce582",
++  "status": "M2 incomplete; selected original flesh/metal impact sparks",
++  "references": [
++    {
++      "source": "sources/blood2/ClientShellDLL/SparksFX.cpp",
++      "source_sha256": "ef8bba235a666cf00977a121de267edb57e41024f8cffdb60dc7823171c1478f",
++      "purpose": "Init, single burst, component velocity limits and conditional removal/fade."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/SparksFX.h",
++      "source_sha256": "c29f0e0dc62b91cab056b8ec4438ff3939e08e83a8ed82265a7bc8dd3c72a18c",
++      "purpose": "Defaults, settings and WantRemove inheritance."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/WeaponFX.cpp",
++      "source_sha256": "95230fcffd888751528e1a9f1d4353844ebfce5dbf5ef0a46cb0cf0a8a1b0e25",
++      "purpose": "Original flesh/metal recipes and component creation order."
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Weapon.cpp",
++      "source_sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
++      "purpose": "Flesh/melee/ammunition selection and raw damage payload."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
++      "source_sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13",
++      "purpose": "Particle radius/640, origin and texture setup."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/SpecialFX.h",
++      "source_sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4",
++      "purpose": "Original removal state and 1ms update interval."
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/SFXMgr.cpp",
++      "source_sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1",
++      "purpose": "Dynamic shared-list ownership and child creation."
++    },
++    {
++      "source": "sources/lithtech/runtime/client/src/particlesystem.cpp",
++      "source_sha256": "1efc6713379529f2a840cb15243ca4b8bdf846092ac5e7c67427df0ecbcf0d44",
++      "purpose": "Later-engine AddParticles interpolation and particle integration; not retail Blood II parity."
++    }
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index cfbe626..8a69749 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -1062,3 +1062,7 @@ No reference source, dependency, shader or commercial asset is modified.
+ 
+ 
+ The [original blood-pool continuation](../../Documentation/Implementation/M2_BLOOD_SPLATS.md) connects CClientSplatFX/CBloodSplatFX with corpse ground-hit publication, persistent oriented sprites and inspection. Read [source hashes](M2_BLOOD_SPLAT_SOURCES.json) and [contracts](BLOOD_SPLAT_CONTRACTS.md). Preserve eleven-existing-neighbor reuse, nearest-prefix/tie order, state-preserving relocation, delta-squared growth, uncapped Term clocks and detached lifetime. Blood spurts/gib impact callers, shared-list eviction and the actual M2 gate remain incomplete.
++
++## Original weapon impact sparks
++
++Selected Weapon.cpp flags, WeaponFX.cpp flesh/metal recipes and SparksFX.cpp burst/clock behavior are ported from Blood II. [Source hashes](M2_SPARK_SOURCES.json) and [contracts](SPARK_CONTRACTS.md) document typed ownership, bounded storage, isolated cosmetic RNG, later-engine particle interpolation and invisible exhausted-system reclamation. Reference sources, assets, shaders and pinned dependencies are unchanged.
+diff --git a/docs/SPARK_CONTRACTS.md b/docs/SPARK_CONTRACTS.md
+new file mode 100644
+index 0000000..788f6f6
+--- /dev/null
++++ b/docs/SPARK_CONTRACTS.md
+@@ -0,0 +1,73 @@
++# Original weapon impact sparks
++
++Selected `CWeapon::UpdateWeaponFX`, `CWeaponFX::CreateSparks` and
++`CSparksFX::CreateObject/AddSparks/Update` now run for flesh and metal vector impacts.
++Read [weapon impact contracts](WEAPON_IMPACT_CONTRACTS.md),
++[blood-spurt contracts](BLOOD_SPURT_CONTRACTS.md), and
++[source hashes](M2_SPARK_SOURCES.json). M2 remains incomplete.
++
++## Source selection and recipes
++
++Flesh always requests sparks, independently of the chance-gated blood jets. Metal
++requests them for bullet/shell/BMG ammunition and melee. Other melee surfaces set
++the original flag but have no recipe in CreateSparks: the zero-duration/count case
++is reported explicitly and creates no fabricated effect. Other surfaces consume
++no spark RNG draw. All visual failures remain separate from damage and hearing.
++
++The existing AddImpact normal*1.25 position is retained; the client normal is then
++normalized. Raw sampled damage determines the count, before inventory multipliers.
++Flesh uses normal*50, colors (192,0,0)..(255,0,0), blooddrop1..3 (B2_LITE),
++truncated damage*4 below 50 and otherwise 200 particles, duration2, emission radius5,
++particle radius200 and gravity-150. Metal draws 0..19: zero chooses the large
++variant. Direction is normal*75; colors are yellow..white; texture is particle2.dtx.
++Small metal uses truncated damage*2 / cap100 / duration.5; large uses damage*5 /
++cap250 / duration2. Both use emission radius.3, radius175 and gravity-150.
++The strict damage<50 branch and integer truncation are preserved, including count0.
++
++CreateObject emits a single burst and starts its clock immediately. AddSparks keeps
++the original direction magnitude, normalizes the direction, then forms velocity
++bounds normalized_component +/- magnitude. Components outside the strict (-.001,.001)
++interval are clipped at zero on the incoming side. This is only an initial velocity
++restriction; particles do not collide with walls or floors. No extra liquid gravity
++or alternate recipe is added to this branch.
++
++Update fades alpha linearly from creation time. Exact duration is still present at
++alpha0; WantRemove only returns false strictly after duration. Original detached
++systems otherwise remain empty in the shared SFX list. The manager reclaims these
++**already invisible, exhausted** systems after duration instead of retaining empty
++objects until unrelated list eviction. The original class behavior remains directly
++tested. Shared eviction, parent-list bookkeeping and fade-color mode are not ported.
++
++## Engine adaptations and ownership
++
++Sparks are per-session owned values. Publication checks the source once; later
++source/target/weapon removal leaves them alive. Unload clears systems and reports;
++IDs never repeat. The .001 scheduling interval and simulation clock remain independent
++of UI/render visibility. A failed update retains its error in report history.
++
++Bounds: 128 systems, 16384 particles, 255 particles/burst, 64 reports, 100-byte labels,
++1000-byte texture paths, finite vectors, duration(0,10], emission radius[0,100],
++particle radius(0,10000], gravity magnitude<=10000, delta[0,1]. Color inputs are
++[0,255]. Invalid recipes, stale owners, missing assets and budgets fail explicitly;
++no silent eviction. Textures are indexed at creation and strictly decoded by the
++existing presentation cache; decode failures remain visible.
++
++Portable particle RNG is separate from the existing per-weapon cosmetic selection
++stream and from gameplay RNG. Six fractions interpolate position, velocity and
++color using the later LithTech AddParticles mapping; this and the shared
++position-before-gravity integrator are replacement engine evidence, not a 1998
++executable trace or retail bitwise RNG parity. Zero world position is deterministic,
++repairing the original uninitialized base-particle local for detached origin effects.
++
++SDL_GPU renders actual DTX billboards at radius/640 with per-particle RGB and nonnegative system
++alpha through the existing depth-tested sprite pass. Raw alpha stays inspectable;
++the presentation lower clamp handles float particle-lifetime tails after the double
++clock crosses duration (reproduced at 30 Hz), without deleting remaining particles. Inspector snapshots never
++advance simulation. Sprites shows counts, origin, outgoing bounds, clocks, assets,
++failures and terminal reports; weapon impacts link their request IDs. Existing
++SPIR-V/MSL shaders and dependency pins are unchanged. Native Metal is not tested
++by NVIDIA runs.
++
++Underwater smoke bubbles, generic/fade-color sparks, wood fragments, shared SFX
++list eviction, outside-world classification and remaining required M2 services are
++still unavailable. These visuals do not establish complete campaign traversal.
+diff --git a/docs/SPRITE_VIEW_CONTRACTS.md b/docs/SPRITE_VIEW_CONTRACTS.md
+index 659f212..e001bef 100644
+--- a/docs/SPRITE_VIEW_CONTRACTS.md
++++ b/docs/SPRITE_VIEW_CONTRACTS.md
+@@ -94,3 +94,5 @@ The [world-alpha correction](WORLD_ALPHA_CONTRACTS.md) supersedes earlier blanke
+ 
+ 
+ Continuation: [original corpse blood pools](BLOOD_SPLAT_CONTRACTS.md) supersedes the pool omission for corpse ground hits. Blood-spurt particles, gib impact callers, shared SFX eviction and other required services remain incomplete. The M2 exit gate is unchanged.
++
++The [original impact sparks](SPARK_CONTRACTS.md) continuation supersedes the flesh/metal spark omission only. Underwater bubbles, generic recipes and remaining M2 services stay unavailable.
+diff --git a/docs/WEAPON_IMPACT_CONTRACTS.md b/docs/WEAPON_IMPACT_CONTRACTS.md
+index 27597ed..5231d1a 100644
+--- a/docs/WEAPON_IMPACT_CONTRACTS.md
++++ b/docs/WEAPON_IMPACT_CONTRACTS.md
+@@ -89,3 +89,5 @@ NEW_LEVEL still keep the actual M2 exit gate open.
+ Continuation: [weapon impact flash/smoke](WEAPON_SPRITE_CONTRACTS.md) supersedes the earlier blanket impact-visual omission for wood/stone bullet sprites only. Other composite components and M2 remain open.
+ 
+ The [blood-spurt continuation](BLOOD_SPURT_CONTRACTS.md) extends the selected original weapon/fragment/limb callers and impact splats. Earlier blanket omissions are historical; separate flesh sparks, generic debris and M2 remain incomplete.
++
++The [original impact sparks](SPARK_CONTRACTS.md) continuation supersedes the flesh/metal spark omission only. Underwater bubbles, generic recipes and remaining M2 services stay unavailable.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index e82fcc5..2beaf7c 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -1967,6 +1967,10 @@ namespace OpenBlood2
+                         "Blood roll %d / requested %d | events %llu, %llu | %s", impact.effect.blood_roll,
+                         impact.effect.blood_requested, (unsigned long long)impact.effect.blood_events[0],
+                         (unsigned long long)impact.effect.blood_events[1], impact.effect.blood_error.c_str());
++                    ImGui::TextWrapped("Sparks requested %d / large metal %d | event %llu | %s",
++                                       impact.effect.sparks_requested, impact.effect.sparks_big,
++                                       (unsigned long long)impact.effect.spark_event,
++                                       impact.effect.spark_error.c_str());
+                     ImGui::Text("Impact hearing: %u deliveries / %s", impact.alert.delivered,
+                                 impact.alert.complete ? "complete" : "not completed");
+                     if (!impact.alert.error.empty())
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 2e93dd1..7356061 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -43,6 +43,7 @@ namespace OpenBlood2
+         bool select_sprites = false;
+         ObjectId sprite_selection{};
+         void draw_sprites(GameSession&, ObjectSelection&);
++        void draw_sparks(const GameSession&);
+         void draw_blood_spurts(const GameSession&);
+         void draw_blood_splats(const GameSession&);
+         void draw_weapon_sprites(const GameSession&);
+diff --git a/src/app/inspector_sprites.cpp b/src/app/inspector_sprites.cpp
+index 3349efe..b2889ef 100644
+--- a/src/app/inspector_sprites.cpp
++++ b/src/app/inspector_sprites.cpp
+@@ -9,6 +9,7 @@ namespace OpenBlood2
+         ImGui::TextWrapped("Original DetailSprite placement and SPR clock; decoded DTX alpha on world-depth quads. "
+                            "Rotatable sprites use their object pose; others face the camera. Unlit replacement "
+                            "presentation: glow, view bias, no-Z and sky modes remain unavailable.");
++        draw_sparks(game);
+         draw_blood_spurts(game);
+         draw_blood_splats(game);
+         draw_weapon_sprites(game);
+@@ -245,7 +246,7 @@ namespace OpenBlood2
+                     effects.active.size(), effects.live_particles(), (unsigned long long)effects.started,
+                     (unsigned long long)effects.expired, (unsigned long long)effects.failed);
+         ImGui::TextWrapped("Six samples/two drops, half-gravity emitter, one impact then fade. Detached from actors. "
+-                           "Outside-world classification and separate flesh sparks remain unavailable.");
++                           "Outside-world classification remains unavailable.");
+         ImGui::TextWrapped("%s", effects.update_error.c_str());
+         for (const auto& fx : effects.active)
+         {
+@@ -279,3 +280,49 @@ namespace OpenBlood2
+                                r.sound_error.c_str());
+     }
+ } // namespace OpenBlood2
++
++namespace OpenBlood2
++{
++    void Inspector::draw_sparks(const GameSession& game)
++    {
++        if (!ImGui::CollapsingHeader("Original impact sparks / blood burst"))
++            return;
++        const auto& store = game.server.sparks;
++        ImGui::Text("Systems %zu / 128 | particles %zu / 16384 | started %llu / retired %llu / failed %llu",
++                    store.active.size(), store.live_particles(), (unsigned long long)store.started,
++                    (unsigned long long)store.retired, (unsigned long long)store.failed);
++        ImGui::TextWrapped(
++            "One original burst, outgoing component bounds, gravity -150. Detached; particles have no collision. Empty "
++            "systems are reclaimed after duration; shared SFX eviction is unavailable. %s",
++            store.update_error.c_str());
++        for (const auto& fx : store.active)
++        {
++            ImGui::PushID(static_cast<int>(fx.id));
++            if (ImGui::TreeNode("Spark", "#%llu %s", (unsigned long long)fx.id, fx.settings.texture.c_str()))
++            {
++                ImGui::Text("Position %.2f %.2f %.2f | count %zu / %u | alpha %.3f", fx.settings.position.x,
++                            fx.settings.position.y, fx.settings.position.z, fx.particles.size(), fx.settings.count,
++                            fx.alpha);
++                ImGui::Text("Velocity min %.3f %.3f %.3f / max %.3f %.3f %.3f", fx.min_velocity.x, fx.min_velocity.y,
++                            fx.min_velocity.z, fx.max_velocity.x, fx.max_velocity.y, fx.max_velocity.z);
++                ImGui::Text("Duration %.2f | emission radius %.2f | draw radius %.2f / 640 | updates %llu",
++                            fx.settings.duration, fx.settings.emission_radius, fx.settings.radius,
++                            (unsigned long long)fx.updates);
++                ImGui::TextWrapped("%s", fx.error.c_str());
++                if (sprite_view)
++                    for (const auto& entry : sprite_view->entries)
++                        if (entry.spark_system == fx.id && !entry.error.empty())
++                        {
++                            ImGui::TextWrapped("Texture: %s", entry.error.c_str());
++                            break;
++                        }
++                ImGui::TreePop();
++            }
++            ImGui::PopID();
++        }
++        for (const auto& r : store.reports)
++            ImGui::TextWrapped("Event %llu %s -> #%llu | particles %u / duration %.2f | ended %d | %s",
++                               (unsigned long long)r.id, r.source.c_str(), (unsigned long long)r.effect,
++                               r.settings.count, r.settings.duration, r.ended, r.error.c_str());
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/sprite_scene.cpp b/src/app/sprite_scene.cpp
+index 538075b..64b7983 100644
+--- a/src/app/sprite_scene.cpp
++++ b/src/app/sprite_scene.cpp
+@@ -1,4 +1,5 @@
+ #include "app/sprite_scene.h"
++#include <algorithm>
+ namespace OpenBlood2
+ {
+     bool update_sprite_scene(const GameSession& game, SpriteView& scene, std::string& error)
+@@ -23,6 +24,17 @@ namespace OpenBlood2
+                 return false;
+             scene.entries.back().client_effect = fx.id;
+         }
++        for (const auto& fx : game.server.sparks.active)
++            for (unsigned i = 0; i < fx.particles.size(); ++i)
++            {
++                const auto& p = fx.particles[i];
++                if (!scene.add_particle(fx.settings.texture, vector_add(fx.settings.position, p.position),
++                                        fx.settings.radius / 640.f, p.color, std::max(0.f, fx.alpha), fx.id, i,
++                                        game.resources, error))
++                    return false;
++                scene.entries.back().particle_system = 0;
++                scene.entries.back().spark_system = fx.id;
++            }
+         for (const auto& fx : game.server.blood_spurts.active)
+             for (unsigned i = 0; i < fx.particles.size(); ++i)
+             {
+diff --git a/src/engine/sprite_view.h b/src/engine/sprite_view.h
+index 2506049..ee6db9a 100644
+--- a/src/engine/sprite_view.h
++++ b/src/engine/sprite_view.h
+@@ -12,7 +12,7 @@ namespace OpenBlood2
+         bool visible = false, rotatable = false;
+         std::uint32_t range = UINT32_MAX;
+         float alpha = 1;
+-        std::uint64_t blood_splat = 0, blood_spurt = 0;
++        std::uint64_t blood_splat = 0, blood_spurt = 0, spark_system = 0;
+         std::uint64_t client_effect = 0, particle_system = 0, trail_system = 0, flame_system = 0, weapon_effect = 0,
+                       object_effect = 0, stream_system = 0;
+         unsigned particle_index = 0;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index c8b7c8b..532ed07 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -34,6 +34,7 @@ class CSBase
+ namespace OpenBlood2
+ {
+     struct BloodSplatSettings;
++    struct SparkSettings;
+     struct BloodSpurtSettings;
+     struct WeaponSpriteSettings;
+     struct ParticleStreamSettings;
+@@ -85,6 +86,7 @@ class ServerDE : public CSBase
+                                         unsigned failed = 0) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
+     virtual std::uint64_t PublishParticleStream(HOBJECT, const OpenBlood2::ParticleStreamSettings&, std::string&) = 0;
++    virtual std::uint64_t PublishSparks(HOBJECT, const OpenBlood2::SparkSettings&, std::string&) = 0;
+     virtual std::uint64_t PublishClientBloodSplat(const OpenBlood2::BloodSplatSettings&, std::string_view,
+                                                   std::string&) = 0;
+     virtual std::uint64_t PublishClientBloodSpurt(const OpenBlood2::BloodSpurtSettings&, std::string_view, bool,
+diff --git a/src/game/original/SparksFX.cpp b/src/game/original/SparksFX.cpp
+new file mode 100644
+index 0000000..6dc56c5
+--- /dev/null
++++ b/src/game/original/SparksFX.cpp
+@@ -0,0 +1,99 @@
++// Selected original ClientShellDLL/SparksFX.cpp Init/CreateObject/AddSparks/Update.
++#include "SparksFX.h"
++#include "engine/collision.h"
++#include <cmath>
++using namespace OpenBlood2;
++namespace
++{
++    bool color(DVector c)
++    {
++        return physics_vector(c) && c.x >= 0 && c.x <= 255 && c.y >= 0 && c.y <= 255 && c.z >= 0 && c.z <= 255;
++    }
++    float mix(float a, float b, float t)
++    {
++        return a + (b - a) * t;
++    }
++} // namespace
++bool CSparksFX::CreateObject(const SparkSettings& s, const Resources& resources, double now, std::minstd_rand& rng,
++                             std::string& failure)
++{
++    failure.clear();
++    if (!physics_vector(s.position) || !physics_vector(s.direction) || vector_dot(s.direction, s.direction) < 1e-12f ||
++        !color(s.color1) || !color(s.color2) || s.count > 255 || !std::isfinite(s.duration) || s.duration <= 0 ||
++        s.duration > 10 || !std::isfinite(s.emission_radius) || s.emission_radius < 0 || s.emission_radius > 100 ||
++        !std::isfinite(s.radius) || s.radius <= 0 || s.radius > 10000 || !std::isfinite(s.gravity) ||
++        std::abs(s.gravity) > 10000 || !std::isfinite(now) || now < 0 || s.texture.size() > 1000 ||
++        s.texture.find('\0') != std::string::npos)
++    {
++        failure = "Invalid sparks recipe";
++        return false;
++    }
++    settings = s;
++    if (settings.texture.empty())
++        settings.texture = "spritetextures/particles/particle1.dtx";
++    if (!resources.find(settings.texture))
++    {
++        failure = "Spark texture not indexed: " + settings.texture;
++        return false;
++    }
++    const float speed = std::sqrt(vector_dot(s.direction, s.direction));
++    direction = vector_scale(s.direction, 1 / speed);
++    // Source uses the normalized component +/- the ORIGINAL magnitude, then clips
++    // non-negligible components to their outgoing hemisphere. There is no collision.
++    const auto axis = [speed](float d, float& lo, float& hi)
++    {
++        lo = d - speed;
++        hi = d + speed;
++        if (!(-.001f < d && d < .001f))
++        {
++            if (d < 0)
++                hi = 0;
++            else
++                lo = 0;
++        }
++    };
++    axis(direction.x, min_velocity.x, max_velocity.x);
++    axis(direction.y, min_velocity.y, max_velocity.y);
++    axis(direction.z, min_velocity.z, max_velocity.z);
++    particles.clear();
++    particles.reserve(s.count);
++    for (unsigned i = 0; i < s.count; ++i)
++    {
++        float t[6];
++        for (auto& v : t)
++            v = float(rng() - rng.min()) / float(rng.max() - rng.min());
++        // Bounded AddParticles adaptation, corroborated by later LithTech:
++        // six draws, shared interpolation fractions for offsets/velocity/colors.
++        Particle v;
++        v.position = {mix(-s.emission_radius, s.emission_radius, t[0]),
++                      mix(-s.emission_radius, s.emission_radius, t[1]),
++                      mix(-s.emission_radius, s.emission_radius, t[2])};
++        v.velocity = {mix(min_velocity.x, max_velocity.x, t[3]), mix(min_velocity.y, max_velocity.y, t[4]),
++                      mix(min_velocity.z, max_velocity.z, t[5])};
++        v.color = {mix(s.color1.x, s.color2.x, t[0]) / 255.f, mix(s.color1.y, s.color2.y, t[5]) / 255.f,
++                   mix(s.color1.z, s.color2.z, t[3]) / 255.f};
++        v.lifetime = s.duration;
++        particles.push_back(v);
++    }
++    start_time = last_time = next_update = now;
++    return true;
++}
++bool CSparksFX::Update(double now)
++{
++    if (!error.empty())
++        return false;
++    if (!std::isfinite(now) || now < last_time || now - last_time > 1)
++    {
++        error = "Invalid sparks clock";
++        return false;
++    }
++    if (!advance_particles(particles, settings.gravity, now - last_time, error))
++        return false;
++    last_time = now;
++    next_update = now + .001;
++    ++updates;
++    if (want_remove && now > start_time + settings.duration)
++        return false;
++    alpha = float((settings.duration - (now - start_time)) / settings.duration);
++    return true; // Source retains an empty detached system until list eviction.
++}
+diff --git a/src/game/original/SparksFX.h b/src/game/original/SparksFX.h
+new file mode 100644
+index 0000000..3cdd9f6
+--- /dev/null
++++ b/src/game/original/SparksFX.h
+@@ -0,0 +1,30 @@
++#pragma once
++#include "engine/particles.h"
++#include "engine/resources.h"
++#include <random>
++namespace OpenBlood2
++{
++    // Selected original WeaponFX metal/flesh recipes; no generic fade-color mode.
++    struct SparkSettings
++    {
++        DVector position{}, direction{}, color1{}, color2{};
++        unsigned count = 0;
++        float duration = 0, emission_radius = 0, radius = 0, gravity = 0;
++        std::string texture;
++    };
++} // namespace OpenBlood2
++class CSparksFX
++{
++  public:
++    bool CreateObject(const OpenBlood2::SparkSettings&, const OpenBlood2::Resources&, double, std::minstd_rand&,
++                      std::string&);
++    bool Update(double);
++    OpenBlood2::SparkSettings settings;
++    std::vector<OpenBlood2::Particle> particles;
++    DVector direction{}, min_velocity{}, max_velocity{};
++    double start_time = 0, last_time = 0, next_update = 0;
++    float alpha = 1;
++    bool want_remove = false;
++    std::uint64_t id = 0, event = 0, updates = 0;
++    std::string error;
++};
+diff --git a/src/game/original/WeaponFX.cpp b/src/game/original/WeaponFX.cpp
+index 1bf7013..e91caa5 100644
+--- a/src/game/original/WeaponFX.cpp
++++ b/src/game/original/WeaponFX.cpp
+@@ -1,6 +1,7 @@
+ // Original WeaponFX.cpp PlayImpactSound (977-992), GetImpactSound (1104-1152).
+ #include "WeaponFX.h"
+ #include "ParticleExplosionFX.h"
++#include "SparksFX.h"
+ #include "engine/collision.h"
+ #include "game/original/Weapon.h"
+ #include "game/weapon_sprites.h"
+@@ -175,3 +176,57 @@ bool CWeaponFX::CreateBloodSpurt(ServerDE& server, HOBJECT source, DVector norma
+         blood_error = second_error;
+     return blood_error.empty();
+ }
++
++// Original UpdateWeaponFX flags and CreateSparks recipes. No liquid substitution in this branch.
++bool CWeaponFX::CreateSparks(ServerDE& server, HOBJECT source, DVector normal, float damage, bool melee,
++                             std::minstd_rand& random)
++{
++    spark_event = 0;
++    spark_error.clear();
++    sparks_big = false;
++    sparks_requested = melee || m_eSurfaceType == SURFTYPE_FLESH ||
++                       (m_eSurfaceType == SURFTYPE_METAL &&
++                        (m_nAmmoType == AMMO_BULLET || m_nAmmoType == AMMO_SHELL || m_nAmmoType == AMMO_BMG));
++    if (!sparks_requested)
++        return true;
++    if (m_eSurfaceType != SURFTYPE_FLESH && m_eSurfaceType != SURFTYPE_METAL)
++    {
++        spark_error = "Original melee spark recipe has zero duration/count for this surface";
++        return false;
++    }
++    if (!physics_vector(normal) || vector_dot(normal, normal) < 1e-12f || !std::isfinite(damage) || damage < 0)
++    {
++        spark_error = "Invalid spark impact normal/damage";
++        return false;
++    }
++    normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
++    SparkSettings s;
++    s.position = m_vDestPos;
++    s.gravity = -150;
++    if (m_eSurfaceType == SURFTYPE_FLESH)
++    {
++        s.direction = vector_scale(normal, 50);
++        s.color1 = {192, 0, 0};
++        s.color2 = {255, 0, 0};
++        s.texture = "spritetextures/particles/blooddrop_" +
++                    std::to_string(std::uniform_int_distribution<int>(1, 3)(random)) + ".dtx";
++        s.count = damage < 50 ? static_cast<unsigned>(damage * 4) : 200;
++        s.duration = 2;
++        s.emission_radius = 5;
++        s.radius = 200;
++    }
++    else
++    {
++        sparks_big = std::uniform_int_distribution<int>(0, 19)(random) == 0;
++        s.direction = vector_scale(normal, 75);
++        s.color1 = {255, 255, 0};
++        s.color2 = {255, 255, 255};
++        s.texture = "spritetextures/particles/particle2.dtx";
++        s.count = damage < 50 ? static_cast<unsigned>(damage * (sparks_big ? 5 : 2)) : (sparks_big ? 250 : 100);
++        s.duration = sparks_big ? 2 : .5f;
++        s.emission_radius = .3f;
++        s.radius = 175;
++    }
++    spark_event = server.PublishSparks(source, s, spark_error);
++    return spark_event && spark_error.empty();
++}
+diff --git a/src/game/original/WeaponFX.h b/src/game/original/WeaponFX.h
+index 8e20bdb..9e24430 100644
+--- a/src/game/original/WeaponFX.h
++++ b/src/game/original/WeaponFX.h
+@@ -17,6 +17,10 @@ class CWeaponFX
+     bool blood_requested = false;
+     std::uint64_t blood_events[2]{};
+     std::string blood_error;
++    std::uint64_t spark_event = 0;
++    bool sparks_requested = false, sparks_big = false;
++    std::string spark_error;
++    bool CreateSparks(ServerDE&, HOBJECT, DVector normal, float damage, bool melee, std::minstd_rand&);
+     bool SelectBloodSpurt(float damage, std::minstd_rand&);
+     bool CreateBloodSpurt(ServerDE&, HOBJECT, DVector normal, float damage, std::minstd_rand&);
+     bool CreateSprites(ServerDE&, HOBJECT, DVector normal, std::minstd_rand&);
+diff --git a/src/game/original/WeaponVector.cpp b/src/game/original/WeaponVector.cpp
+index 557f07b..8f74249 100644
+--- a/src/game/original/WeaponVector.cpp
++++ b/src/game/original/WeaponVector.cpp
+@@ -88,6 +88,8 @@ FireResult CWeapon::FireVector()
+             impact.effect.m_vDestPos = vector_add(impact.hit.point, vector_scale(impact.hit.normal, 1.25f));
+             impact.effect.SelectBloodSpurt(last_shot.damage, impact_random);
+             impact.effect.CreateSprites(*server, m_hOwner, impact.hit.normal, impact_random);
++            impact.effect.CreateSparks(*server, m_hOwner, impact.hit.normal, last_shot.damage,
++                                       data.m_nType == WEAP_MELEE, impact_random);
+             if (!impact.effect.PlayImpactSound(*server, m_hOwner, impact_random))
+                 ++impact_sound_failures;
+             if (impact.effect.sound)
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 73014fb..6e5faca 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -21,6 +21,7 @@
+ #include "game/player_restore.h"
+ #include "game/projectile_report.h"
+ #include "game/session.h"
++#include "game/sparks.h"
+ #include "game/weapon_sprites.h"
+ #include "game/world_preparation.h"
+ #include <array>
+@@ -96,6 +97,8 @@ namespace OpenBlood2
+         void RecordDebrisEffect(const DebrisEffect&) override;
+         std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
+         ExplosionSprites explosion_sprites;
++        Sparks sparks;
++        std::uint64_t PublishSparks(HOBJECT, const SparkSettings&, std::string&) override;
+         BloodSpurts blood_spurts;
+         std::uint64_t PublishClientBloodSplat(const BloodSplatSettings&, std::string_view, std::string&) override;
+         std::uint64_t PublishClientBloodSpurt(const BloodSpurtSettings&, std::string_view, bool, std::string&) override;
+@@ -159,6 +162,7 @@ namespace OpenBlood2
+             scene_explosions.clear();
+             projectile_reports.clear();
+             explosion_sprites.clear();
++            sparks.clear();
+             blood_spurts.clear();
+             blood_splats.clear();
+             weapon_sprites.clear();
+diff --git a/src/game/server_effects.cpp b/src/game/server_effects.cpp
+index 9d27b63..2b8c003 100644
+--- a/src/game/server_effects.cpp
++++ b/src/game/server_effects.cpp
+@@ -2,6 +2,17 @@
+ #include <cmath>
+ namespace OpenBlood2
+ {
++    std::uint64_t ServerAdapter::PublishSparks(HOBJECT source, const SparkSettings& settings, std::string& error)
++    {
++        trace_service("PublishSparks (original weapon impact)");
++        error.clear();
++        if (!IsObjectAlive(source) || !client_resources)
++        {
++            error = "Spark source/resources unavailable";
++            return 0;
++        }
++        return sparks.publish(settings, GetObjectName(source), *client_resources, objects_.time(), error);
++    }
+     std::uint64_t ServerAdapter::PublishClientBloodSplat(const BloodSplatSettings& settings, std::string_view source,
+                                                          std::string& error)
+     {
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 7274656..8eca7f2 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -497,6 +497,7 @@ namespace OpenBlood2
+         ok = server.explosion_rings.advance(objects.time()) && ok;
+         ok = server.explosion_flames.advance(objects.time()) && ok;
+         ok = server.flesh_gibs.advance(objects.time(), server) && ok;
++        ok = server.sparks.advance(objects.time()) && ok;
+         ok = server.blood_spurts.advance(objects.time(), server) && ok;
+         ok = server.explosion_fragments.advance(objects.time(), server) && ok;
+         ok = server.object_particles.advance(objects.time(), server) && ok;
+diff --git a/src/game/sparks.cpp b/src/game/sparks.cpp
+new file mode 100644
+index 0000000..8d0bc2f
+--- /dev/null
++++ b/src/game/sparks.cpp
+@@ -0,0 +1,93 @@
++#include "game/sparks.h"
++namespace OpenBlood2
++{
++    std::size_t Sparks::live_particles() const
++    {
++        std::size_t n = 0;
++        for (const auto& fx : active)
++            n += fx.particles.size();
++        return n;
++    }
++    std::uint64_t Sparks::publish(const SparkSettings& s, std::string_view source, const Resources& resources,
++                                  double now, std::string& error)
++    {
++        error.clear();
++        if (source.size() > 100 || source.find('\0') != std::string_view::npos || next_event_ == UINT64_MAX)
++        {
++            error = "Invalid spark source/event";
++            return 0;
++        }
++        SparkReport r;
++        r.id = next_event_++;
++        r.source = source;
++        r.settings = s;
++        CSparksFX fx;
++        if (active.size() >= 128 || s.count > 16384 - live_particles() || next_id_ == UINT64_MAX)
++            error = "Spark capacity exhausted";
++        else if (fx.CreateObject(s, resources, now, random_, error))
++        {
++            fx.id = next_id_++;
++            fx.event = r.id;
++            r.effect = fx.id;
++            active.push_back(std::move(fx));
++            ++started;
++        }
++        r.error = error;
++        if (!error.empty())
++        {
++            ++failed;
++            r.ended = true;
++        }
++        if (reports.size() == 64)
++            reports.erase(reports.begin());
++        const auto id = r.id;
++        reports.push_back(std::move(r));
++        return id;
++    }
++    bool Sparks::advance(double now)
++    {
++        bool ok = true;
++        for (std::size_t i = 0; i < active.size();)
++        {
++            auto& fx = active[i];
++            if (now >= fx.last_time && now < fx.next_update)
++            {
++                ++i;
++                continue;
++            }
++            const bool alive = fx.Update(now);
++            // Reclaim only the invisible exhausted system, without truncating particles
++            // or emulating the unavailable original shared SFX list eviction policy.
++            if (alive && !(now > fx.start_time + fx.settings.duration && fx.particles.empty()))
++            {
++                ++i;
++                continue;
++            }
++            for (auto& r : reports)
++                if (r.id == fx.event)
++                {
++                    r.ended = true;
++                    r.error = fx.error;
++                    break;
++                }
++            if (!fx.error.empty())
++            {
++                update_error = fx.error;
++                ++failed;
++                ok = false;
++            }
++            else
++                ++retired;
++            active.erase(active.begin() + i);
++        }
++        return ok;
++    }
++    void Sparks::clear()
++    {
++        active.clear();
++        reports.clear();
++        update_error.clear();
++        started = retired = failed = 0;
++        random_.seed(1); // IDs survive unload.
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/sparks.h b/src/game/sparks.h
+new file mode 100644
+index 0000000..9a387e3
+--- /dev/null
++++ b/src/game/sparks.h
+@@ -0,0 +1,28 @@
++#pragma once
++#include "game/original/SparksFX.h"
++namespace OpenBlood2
++{
++    struct SparkReport
++    {
++        std::uint64_t id = 0, effect = 0;
++        SparkSettings settings;
++        std::string source, error;
++        bool ended = false;
++    };
++    class Sparks
++    {
++      public:
++        std::uint64_t publish(const SparkSettings&, std::string_view, const Resources&, double, std::string&);
++        bool advance(double);
++        void clear();
++        std::size_t live_particles() const;
++        std::vector<CSparksFX> active;
++        std::vector<SparkReport> reports;
++        std::uint64_t started = 0, retired = 0, failed = 0;
++        std::string update_error;
++
++      private:
++        std::minstd_rand random_{1};
++        std::uint64_t next_id_ = 1, next_event_ = 1;
++    };
++} // namespace OpenBlood2
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 121b959..d835795 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1790,3 +1790,22 @@ if(BLOOD2_GPU_TESTS)
+         set_tests_properties(gpu.blood_spurt_private PROPERTIES LABELS "gpu;private;blood_spurts" TIMEOUT 120 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+     endif()
+ endif()
++
++add_executable(spark_tests spark_tests.cpp ../src/app/sprite_scene.cpp)
++target_link_libraries(spark_tests PRIVATE blood2_game)
++blood2_project_options(spark_tests)
++foreach(case formulas selection failures)
++    add_test(NAME sparks.${case} COMMAND spark_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/sparks-${case}")
++    set_tests_properties(sparks.${case} PROPERTIES LABELS "headless;sparks" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME sparks.private COMMAND spark_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(sparks.private PROPERTIES LABELS "headless;private;sparks" TIMEOUT 120)
++endif()
++if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
++    add_executable(spark_gpu_tests spark_gpu_tests.cpp ../src/app/sprite_scene.cpp)
++    target_link_libraries(spark_gpu_tests PRIVATE blood2_game)
++    blood2_project_options(spark_gpu_tests)
++    add_test(NAME gpu.sparks_private COMMAND spark_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/sparks-private-gpu" "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(gpu.sparks_private PROPERTIES LABELS "gpu;private;sparks" TIMEOUT 120 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
++endif()
+diff --git a/tests/spark_gpu_tests.cpp b/tests/spark_gpu_tests.cpp
+new file mode 100644
+index 0000000..29fd176
+--- /dev/null
++++ b/tests/spark_gpu_tests.cpp
+@@ -0,0 +1,140 @@
++#include "app/sprite_scene.h"
++#include "blood_spurt_fixture.h"
++#include "engine/capture.h"
++#include "engine/runtime.h"
++#include "engine/world_renderer.h"
++#include "game/original/Weapon.h"
++#include "game/original/WeaponFX.h"
++#include <cmath>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << " " << error << " " << SDL_GetError() << "\n";                         \
++            return 1;                                                                                                  \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool render(Runtime& runtime, WorldRenderer& renderer, SpriteView& scene, DVector eye, DRotation camera,
++                Capture& capture, std::vector<std::uint8_t>& pixels, std::string& error)
++    {
++        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300)) ||
++            !renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 400, 300, error, true))
++            return false;
++        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
++        if (!commands)
++            return false;
++        if (!renderer.draw(commands, capture.texture, scene.mesh, scene.draws, eye, camera, false, error))
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        auto* copy = SDL_BeginGPUCopyPass(commands);
++        if (!copy)
++        {
++            SDL_SubmitGPUCommandBuffer(commands);
++            return false;
++        }
++        SDL_GPUTextureRegion region{};
++        region.texture = capture.texture;
++        region.w = 400;
++        region.h = 300;
++        region.d = 1;
++        SDL_GPUTextureTransferInfo target{};
++        target.transfer_buffer = capture.transfer;
++        target.pixels_per_row = 400;
++        target.rows_per_layer = 300;
++        SDL_DownloadFromGPUTexture(copy, &region, &target);
++        SDL_EndGPUCopyPass(copy);
++        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
++            return false;
++        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
++        if (!data)
++            return false;
++        pixels.assign(data, data + 400 * 300 * 4);
++        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    Runtime runtime;
++    std::string error;
++    CHECK(runtime.initialize(true, error));
++    std::cout << "GPU device: "
++              << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu), SDL_PROP_GPU_DEVICE_NAME_STRING,
++                                       "unreported")
++              << " | backend " << SDL_GetGPUDeviceDriver(runtime.gpu) << "\n";
++    WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
++    Capture capture;
++    SpriteView scene;
++    GameSession g;
++    Config config;
++    config.data_dir = argv[2];
++    CHECK(g.initialize() && g.resources.mount_game(config, error));
++    std::error_code ec;
++    std::filesystem::create_directories(argv[1], ec);
++    CHECK(!ec);
++    std::uint64_t last = 0;
++    for (int cycle = 0; cycle < 3; ++cycle)
++    {
++        CHECK(g.request_world("01_SubwayA", error) && g.objects.clear());
++        auto owner = g.objects.create(g.objects.find_class("BaseClass"), {});
++        CHECK(owner);
++        g.client_shell.view.position = {0, 10, -35};
++        g.client_shell.view.rotation = {};
++        CWeaponFX fx;
++        fx.m_nAmmoType = AMMO_BULLET;
++        std::minstd_rand rng(1);
++        fx.m_eSurfaceType = SURFTYPE_FLESH;
++        fx.m_vDestPos = {-8, 10, 0};
++        CHECK(fx.CreateSparks(g.server, owner, {0, 0, -1}, 50, false, rng));
++        fx.m_eSurfaceType = SURFTYPE_METAL;
++        fx.m_vDestPos = {8, 10, 0};
++        CHECK(fx.CreateSparks(g.server, owner, {0, 0, -1}, 50, false, rng));
++        CHECK(g.server.sparks.active.front().id > last);
++        last = g.server.sparks.active.back().id;
++        const auto count = g.server.sparks.live_particles();
++        CHECK(update_sprite_scene(g, scene, error) && scene.entries.size() == count);
++        for (const auto& e : scene.entries)
++            CHECK(e.spark_system && e.error.empty());
++        const auto callbacks = g.server.sparks.active[0].updates;
++        CHECK(update_sprite_scene(g, scene, error) && g.server.sparks.active[0].updates == callbacks);
++        std::vector<std::uint8_t> pixels;
++        CHECK(render(runtime, renderer, scene, g.client_shell.view.position, {}, capture, pixels, error));
++        unsigned red = 0, yellow = 0;
++        for (unsigned i = 0; i < pixels.size(); i += 4)
++        {
++            if (pixels[i] > pixels[i + 1] * 2 && pixels[i] > 25)
++                ++red;
++            if (pixels[i] > pixels[i + 2] + 20 && pixels[i + 1] > pixels[i + 2] + 20)
++                ++yellow;
++        }
++        CHECK(red > 50 && yellow > 5 && red + yellow < 400 * 300 / 2);
++        CHECK(capture.save((std::filesystem::path(argv[1]) / "impact-sparks.png").c_str()));
++        CHECK(g.objects.remove(owner) && g.objects.finish_frame());
++        CHECK(g.objects.advance(.25) && g.server.sparks.advance(g.objects.time()));
++        CHECK(std::abs(g.server.sparks.active[0].alpha - .875f) < .001);
++        CHECK(update_sprite_scene(g, scene, error));
++        CHECK(render(runtime, renderer, scene, g.client_shell.view.position, {}, capture, pixels, error));
++        CHECK(capture.save((std::filesystem::path(argv[1]) / "impact-sparks-moving.png").c_str()));
++        CHECK(g.objects.advance(.75) && g.server.sparks.advance(g.objects.time()));
++        CHECK(g.objects.advance(1) && g.server.sparks.advance(g.objects.time()));
++        CHECK(g.objects.advance(.1) && g.server.sparks.advance(g.objects.time()) && g.server.sparks.active.empty());
++        CHECK(update_sprite_scene(g, scene, error) && scene.entries.empty());
++        CHECK(render(runtime, renderer, scene, g.client_shell.view.position, {}, capture, pixels, error));
++        for (unsigned i = 0; i < pixels.size(); i += 4)
++            CHECK(pixels[i] == 6 && pixels[i + 1] == 9 && pixels[i + 2] == 13);
++        std::cout << "cycle " << cycle << ": " << count << " source particles, red pixels " << red << ", yellow pixels "
++                  << yellow << ", expiry clears GPU image\n";
++        CHECK(g.unload_world() && g.server.sparks.reports.empty());
++        renderer.clear_geometry();
++        scene.clear();
++    }
++    return 0;
++}
+diff --git a/tests/spark_tests.cpp b/tests/spark_tests.cpp
+new file mode 100644
+index 0000000..efd7d64
+--- /dev/null
++++ b/tests/spark_tests.cpp
+@@ -0,0 +1,308 @@
++#include "app/sprite_scene.h"
++#include "blood_spurt_fixture.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/WeaponFX.h"
++#include <cmath>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __LINE__ << ": " #x << "\n";                                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .001f;
++    }
++    bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        std::string error;
++        CHECK(test_player::setup(g, root, false) && test_blood_spurt::mount(g.resources, root, error));
++        return true;
++    }
++    SparkSettings recipe()
++    {
++        SparkSettings s;
++        s.position = {0, 100, 0};
++        s.direction = {0, 0, 50};
++        s.color1 = {192, 0, 0};
++        s.color2 = {255, 0, 0};
++        s.count = 100;
++        s.duration = 2;
++        s.emission_radius = 5;
++        s.radius = 200;
++        s.gravity = -150;
++        s.texture = "spritetextures/particles/blooddrop_1.dtx";
++        return s;
++    }
++    bool formulas(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        std::minstd_rand rng(1);
++        CSparksFX fx;
++        auto s = recipe();
++        CHECK(fx.CreateObject(s, g.resources, 10, rng, error));
++        CHECK(fx.particles.size() == 100 && fx.start_time == 10 && fx.updates == 0);
++        CHECK(fx.min_velocity.x == -50 && fx.max_velocity.x == 50 && fx.min_velocity.z == 0 && fx.max_velocity.z == 51);
++        for (const auto& p : fx.particles)
++        {
++            CHECK(std::abs(p.position.x) <= 5 && std::abs(p.position.y) <= 5 && std::abs(p.position.z) <= 5);
++            CHECK(p.velocity.x >= -50 && p.velocity.x <= 50 && p.velocity.z >= 0 && p.velocity.z <= 51);
++            CHECK(p.color.x >= 192.f / 255 && p.color.x <= 1 && p.color.y == 0 && p.color.z == 0);
++            // Later-engine AddParticles uses the same fraction for X position and red.
++            CHECK(near(p.color.x, (192 + (p.position.x + 5) / 10 * 63) / 255));
++        }
++        const auto first = fx.particles.front();
++        CHECK(fx.Update(10.5) && near(fx.alpha, .75) && fx.particles.size() == 100);
++        CHECK(near(fx.particles[0].position.y, first.position.y + first.velocity.y * .5f));
++        CHECK(near(fx.particles[0].velocity.y, first.velocity.y - 75));
++        CHECK(fx.Update(11) && fx.Update(12) && fx.alpha == 0 && fx.particles.size() == 100);
++        CHECK(fx.Update(12.1) && fx.alpha < 0 && fx.particles.empty()); // Source class itself does not auto-remove.
++        fx.want_remove = true;
++        CHECK(!fx.Update(12.2) && fx.error.empty());
++        s.direction = {-.05f, 0, 50};
++        CHECK(fx.CreateObject(s, g.resources, 0, rng, error));
++        CHECK(fx.max_velocity.x > 0); // Normalized X is still inside the strict +/- .001 interval.
++        s.direction = {-.051f, 0, 50};
++        CHECK(fx.CreateObject(s, g.resources, 0, rng, error) && fx.max_velocity.x == 0);
++        s.direction = {0, -50, 0};
++        CHECK(fx.CreateObject(s, g.resources, 0, rng, error) && fx.max_velocity.y == 0 && fx.min_velocity.y == -51);
++        // Detached manager retires invisible systems only AFTER duration, IDs survive clear.
++        CHECK(g.server.sparks.publish(recipe(), "lifetime", g.resources, 0, error) && error.empty());
++        const auto id = g.server.sparks.active.front().id;
++        CHECK(g.server.sparks.advance(1) && g.server.sparks.advance(2) && g.server.sparks.active.size() == 1);
++        CHECK(g.server.sparks.advance(2.1) && g.server.sparks.active.empty() && g.server.sparks.retired == 1);
++        CHECK(g.server.sparks.reports.back().ended);
++        g.server.sparks.clear();
++        CHECK(g.server.sparks.publish(recipe(), "reload", g.resources, 0, error) && g.server.sparks.active[0].id > id);
++        g.server.sparks.clear();
++        CHECK(g.server.sparks.publish(recipe(), "30 Hz rounding", g.resources, 0, error));
++        double time = 0;
++        for (int i = 0; i < 60; ++i)
++        {
++            time += 1.0 / 30;
++            CHECK(g.server.sparks.advance(time));
++        }
++        // Double clock can be past end while float particle lifetimes retain a sub-microsecond tail.
++        CHECK(!g.server.sparks.active.empty() && g.server.sparks.active[0].alpha < 0);
++        SpriteView view;
++        CHECK(update_sprite_scene(g, view, error) && !view.entries.empty());
++        for (const auto& e : view.entries)
++            CHECK(e.error.empty() && e.alpha == 0);
++        CHECK(g.server.sparks.advance(time + 1.0 / 30) && g.server.sparks.active.empty());
++        return true;
++    }
++    bool selection(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        auto source = g.objects.create(g.objects.find_class("BaseClass"), {});
++        CHECK(source);
++        CWeaponFX fx;
++        fx.m_nAmmoType = AMMO_BULLET;
++        fx.m_vDestPos = {0, 100, 0};
++        std::minstd_rand rng(3);
++        const auto saved = rng;
++        fx.m_eSurfaceType = SURFTYPE_STONE;
++        CHECK(fx.CreateSparks(g.server, source, {0, 1, 0}, 20, false, rng) && !fx.sparks_requested && rng == saved);
++        CHECK(!fx.CreateSparks(g.server, source, {0, 1, 0}, 20, true, rng) && fx.sparks_requested &&
++              !fx.spark_error.empty());
++        fx.m_eSurfaceType = SURFTYPE_FLESH;
++        CHECK(fx.CreateSparks(g.server, source, {0, 0, 2}, 24.9f, false, rng));
++        auto s = g.server.sparks.active.back().settings;
++        CHECK(s.count == 99 && s.direction.z == 50 && s.gravity == -150 && s.emission_radius == 5 && s.duration == 2);
++        CHECK(fx.CreateSparks(g.server, source, {0, 0, 1}, 500, false, rng) &&
++              g.server.sparks.active.back().settings.count == 200);
++        CHECK(fx.CreateSparks(g.server, source, {0, 0, 1}, 0, false, rng) &&
++              g.server.sparks.active.back().particles.empty());
++        fx.m_eSurfaceType = SURFTYPE_METAL;
++        // Add the metal resource to the synthetic archive only; source material colors remain unchanged.
++        std::vector<std::uint8_t> bytes;
++        CHECK(g.resources.read("spritetextures/particles/blooddrop_1.dtx", bytes, error));
++        test_player::Directory dir;
++        dir.children["spritetextures"].children["particles"].files["particle2.dtx"] = bytes;
++        test_model::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [off, size] = test_player::write_dir(w, dir);
++        w.patch(131, off);
++        w.patch(135, size);
++        {
++            std::ofstream out(root / "metal.rez", std::ios::binary);
++            out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
++        }
++        CHECK(g.resources.mount(root / "metal.rez", error));
++        bool big = false, small = false;
++        for (unsigned i = 0; i < 100 && !(big && small); ++i)
++        {
++            g.server.sparks.clear();
++            CHECK(fx.CreateSparks(g.server, source, {0, 1, 0}, 49.9f, false, rng));
++            s = g.server.sparks.active.back().settings;
++            CHECK(s.direction.y == 75 && s.emission_radius == .3f && s.radius == 175 && s.gravity == -150);
++            if (fx.sparks_big)
++            {
++                CHECK(s.count == 249 && s.duration == 2);
++                big = true;
++            }
++            else
++            {
++                CHECK(s.count == 99 && s.duration == .5f);
++                small = true;
++            }
++        }
++        CHECK(big && small);
++        CHECK(fx.CreateSparks(g.server, source, {0, 1, 0}, 50, false, rng));
++        CHECK(g.server.sparks.active.back().settings.count == (fx.sparks_big ? 250u : 100u));
++        CHECK(g.objects.remove(source) && g.objects.finish_frame() && !g.server.sparks.active.empty());
++        CHECK(!fx.CreateSparks(g.server, source, {0, 1, 0}, 50, false, rng) && !fx.spark_error.empty());
++        return true;
++    }
++    bool failures(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        std::string error;
++        auto s = recipe();
++        CHECK(!g.server.PublishSparks(nullptr, s, error) && !error.empty());
++        for (int bad = 0; bad < 7; ++bad)
++        {
++            auto v = s;
++            if (bad == 0)
++                v.direction = {};
++            if (bad == 1)
++                v.duration = 0;
++            if (bad == 2)
++                v.count = 256;
++            if (bad == 3)
++                v.color1.x = 256;
++            if (bad == 4)
++                v.gravity = std::numeric_limits<float>::infinity();
++            if (bad == 5)
++                v.texture = "missing.dtx";
++            if (bad == 6)
++                v.position.y = std::numeric_limits<float>::quiet_NaN();
++            CHECK(g.server.sparks.publish(v, "invalid", g.resources, 0, error) && !error.empty() &&
++                  g.server.sparks.active.empty());
++        }
++        s.count = 250;
++        for (int i = 0; i < 65; ++i)
++            CHECK(g.server.sparks.publish(s, "capacity", g.resources, 0, error) && error.empty());
++        CHECK(g.server.sparks.live_particles() == 16250);
++        CHECK(g.server.sparks.publish(s, "overflow", g.resources, 0, error) && !error.empty());
++        CHECK(g.server.sparks.active.size() == 65 && g.server.sparks.reports.size() == 64);
++        g.server.sparks.clear();
++        s.count = 0;
++        for (int i = 0; i < 128; ++i)
++            CHECK(g.server.sparks.publish(s, "empty capacity", g.resources, 0, error) && error.empty());
++        CHECK(g.server.sparks.publish(s, "empty overflow", g.resources, 0, error) && !error.empty());
++        g.server.sparks.clear();
++        s = recipe();
++        CHECK(g.server.sparks.publish(s, "clock", g.resources, 1, error) && error.empty());
++        CHECK(!g.server.sparks.advance(.5) && !g.server.sparks.update_error.empty() && g.server.sparks.active.empty());
++        CHECK(g.server.sparks.publish(s, "decode", g.resources, 0, error));
++        g.server.sparks.active[0].settings.texture = "missing.dtx";
++        SpriteView view;
++        CHECK(update_sprite_scene(g, view, error));
++        CHECK(!view.entries.empty() && !view.entries[0].error.empty());
++        return true;
++    }
++    bool private_world(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        std::uint64_t last = 0;
++        for (int cycle = 0; cycle < 3; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.objects.clear() && test_blood_spurt::floor(g, error));
++            auto target = g.objects.create(
++                g.objects.find_class("CultistAI"), {}, Creation::World,
++                {{"Pos", DVector{0, 100, 0}}, {"AIState", std::string("IDLE")}, {"AIWeapon1", std::string("BERETTA")}});
++            auto owner = g.objects.create(g.objects.find_class("CultistAI"), {}, Creation::World,
++                                          {{"Pos", DVector{-200, 100, 0}},
++                                           {"AIState", std::string("IDLE")},
++                                           {"AIWeapon1", std::string("BERETTA")}});
++            auto* a = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(target));
++            auto* b = dynamic_cast<AI_Mgr*>(g.server.HandleToObject(owner));
++            CHECK(a && b && a->RuntimeReady() && b->RuntimeReady());
++            a->m_damage.SetArmorPoints(0);
++            a->m_damage.SetHitPoints(10000);
++            b->m_InventoryMgr.damage_multiplier = 3;
++            auto* weapon = b->m_InventoryMgr.CurrentWeapon();
++            CHECK(weapon);
++            const auto center = g.objects.get(target)->state.m_Pos;
++            CHECK(weapon->Fire({vector_add(center, {-200, 0, 0}), {1, 0, 0}, 42, WEAP_BERETTA, false, false}) ==
++                  FireResult::Fired);
++            CHECK(weapon->last_shot.damage_delivered && !weapon->impacts.empty());
++            const auto& hit = weapon->impacts.front();
++            CHECK(hit.hit.object == target && hit.effect.spark_event && hit.effect.spark_error.empty());
++            CHECK(g.server.sparks.active.size() == 1);
++            CHECK(g.server.sparks.active[0].settings.count == unsigned(weapon->last_shot.damage * 4));
++            CHECK(a->m_damage.m_fHitPoints < 10000 && g.server.sparks.active[0].id > last);
++            last = g.server.sparks.active[0].id;
++            // Metal recipe also decodes the real particle2 asset; all 3 flesh variants decode independently.
++            std::minstd_rand rng(7);
++            CWeaponFX fx;
++            fx.m_vDestPos = {0, 100, 0};
++            fx.m_nAmmoType = AMMO_BULLET;
++            fx.m_eSurfaceType = SURFTYPE_METAL;
++            CHECK(fx.CreateSparks(g.server, owner, {0, 1, 0}, 50, false, rng));
++            for (unsigned i = 1; i <= 3; ++i)
++            {
++                auto s = recipe();
++                s.texture = "spritetextures/particles/blooddrop_" + std::to_string(i) + ".dtx";
++                CHECK(g.server.PublishSparks(owner, s, error) && error.empty());
++            }
++            SpriteView view;
++            CHECK(update_sprite_scene(g, view, error));
++            unsigned visible = 0;
++            for (const auto& e : view.entries)
++                if (e.spark_system)
++                {
++                    CHECK(e.error.empty() && e.width > 0);
++                    ++visible;
++                }
++            CHECK(visible == g.server.sparks.live_particles());
++            const auto updates = g.server.sparks.active[0].updates;
++            CHECK(update_sprite_scene(g, view, error) && g.server.sparks.active[0].updates == updates);
++            CHECK(g.objects.remove(owner) && g.objects.remove(target) && g.objects.finish_frame());
++            CHECK(g.server.sparks.active.size() == 5);
++            for (int i = 0; i < 21; ++i)
++                CHECK(g.objects.advance(.1) && g.server.sparks.advance(g.objects.time()));
++            CHECK(g.server.sparks.active.empty() && g.server.sparks.failed == 0);
++            std::cout << "Private cycle " << cycle << ": original Beretta damage -> " << visible
++                      << " decoded sparks; detached removal and expiry\n";
++            CHECK(g.unload_world() && g.server.sparks.reports.empty() && !g.server.message_count() &&
++                  !g.server.string_count());
++            CHECK(update_sprite_scene(g, view, error) && view.entries.empty());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    std::string mode = argv[1];
++    return (mode == "formulas"    ? formulas(argv[2])
++            : mode == "selection" ? selection(argv[2])
++            : mode == "failures"  ? failures(argv[2])
++                                  : mode == "private" && private_world(argv[2]))
++               ? 0
++               : 1;
++}

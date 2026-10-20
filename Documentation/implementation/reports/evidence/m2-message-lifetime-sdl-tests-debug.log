@@ -1,0 +1,11 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 1: platform.destroyed_properties
+1/1 Test #1: platform.destroyed_properties ....   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+headless    =   0.00 sec*proc (1 test)
+platform    =   0.00 sec*proc (1 test)
+
+Total Test time (real) =   0.02 sec

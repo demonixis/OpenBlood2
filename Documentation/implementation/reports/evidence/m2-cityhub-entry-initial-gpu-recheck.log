@@ -1,0 +1,882 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 196
+    Start 196: gpu.objectives
+
+196: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--objectives-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/objectives.png"
+196: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+196: Test timeout computed to be: 30
+196: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+196: [info] BLOOD2.REZ: detected, 267758913 bytes
+196: [info] SOUND.REZ: detected, 204633068 bytes
+196: [info] BLOOD2P.REZ: detected, 24133434 bytes
+196: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+196: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+196: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+196: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+196: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+196: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+196: [info] NEW_LEVEL committed: worlds/01_subwaya.dat -> worlds/02_cityhub.dat / start 01_egressa
+196: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/objectives.png
+196: [info] NEW_LEVEL committed: worlds/01_subwaya.dat -> worlds/02_cityhub.dat / start 01_egressa
+196: [info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+196: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+196: [info] Session playback: waiting=0 time=0.06666666666666667 npc-ready=27 npc-failed=0 npc-updates=27
+196: [info] AI paths: hidden=true, reentered=false, copied points=7
+196: [error] Smoke object delta AssaultRiflePU:AssaultRiflePU0: 1
+196: [error] Smoke object delta BaseClass:: 11
+196: [error] Smoke object delta BigTrigger:bbhalorelay: 1
+196: [error] Smoke object delta BigTrigger:bblightrelay: 1
+196: [error] Smoke object delta BigTrigger:shackrelay: 1
+196: [error] Smoke object delta BulletAmmoPU:BulletAmmoPU0: 4
+196: [error] Smoke object delta BulletAmmoPU:noname: 2
+196: [error] Smoke object delta CClientExplosionSFX:exp1: -2
+196: [error] Smoke object delta CClientExplosionSFX:exp2: -1
+196: [error] Smoke object delta CClientExplosionSFX:exp3: -2
+196: [error] Smoke object delta CClientExplosionSFX:exp4: -2
+196: [error] Smoke object delta CClientExplosionSFX:exp5: -2
+196: [error] Smoke object delta CClientParticleStreamSFX:ericsparks: 1
+196: [error] Smoke object delta CClientParticleStreamSFX:fire3: 1
+196: [error] Smoke object delta CClientParticleStreamSFX:railsparks: 1
+196: [error] Smoke object delta CClientParticleStreamSFX:shacksmoke: 1
+196: [error] Smoke object delta CClientParticleStreamSFX:steam1: 1
+196: [error] Smoke object delta CClientParticleStreamSFX:steam2: 1
+196: [error] Smoke object delta CClientParticleStreamSFX:steam3: 1
+196: [error] Smoke object delta CClientParticleStreamSFX:wrecksparks: 1
+196: [error] Smoke object delta CDestructableBrush:WindowSlats: 1
+196: [error] Smoke object delta CDestructableBrush:anotherrooffence: 1
+196: [error] Smoke object delta CDestructableBrush:bblight1: 1
+196: [error] Smoke object delta CDestructableBrush:bblight2: 1
+196: [error] Smoke object delta CDestructableBrush:bblight3: 1
+196: [error] Smoke object delta CDestructableBrush:bbpost: 1
+196: [error] Smoke object delta CDestructableBrush:bigclock: 1
+196: [error] Smoke object delta CDestructableBrush:billboard: 1
+196: [error] Smoke object delta CDestructableBrush:boilergrill: 1
+196: [error] Smoke object delta CDestructableBrush:boundsign: 1
+196: [error] Smoke object delta CDestructableBrush:cabalconeon: 1
+196: [error] Smoke object delta CDestructableBrush:cabalsign1: 1
+196: [error] Smoke object delta CDestructableBrush:cabalsign2: 1
+196: [error] Smoke object delta CDestructableBrush:cabalsign5: 1
+196: [error] Smoke object delta CDestructableBrush:cobwebs1: 1
+196: [error] Smoke object delta CDestructableBrush:cobwebs2: 1
+196: [error] Smoke object delta CDestructableBrush:courtfence: 1
+196: [error] Smoke object delta CDestructableBrush:courtfence2: 1
+196: [error] Smoke object delta CDestructableBrush:courtfence3: 1
+196: [error] Smoke object delta CDestructableBrush:courtfence4: 1
+196: [error] Smoke object delta CDestructableBrush:courtfence5: 1
+196: [error] Smoke object delta CDestructableBrush:courtfence69: 1
+196: [error] Smoke object delta CDestructableBrush:courtfence70: 1
+196: [error] Smoke object delta CDestructableBrush:crazyericarmed: 1
+196: [error] Smoke object delta CDestructableBrush:crazyericstoresign: 1
+196: [error] Smoke object delta CDestructableBrush:dumpfence1: 1
+196: [error] Smoke object delta CDestructableBrush:dumpfence3: 1
+196: [error] Smoke object delta CDestructableBrush:dumpfence69: 1
+196: [error] Smoke object delta CDestructableBrush:ftrainmap: 1
+196: [error] Smoke object delta CDestructableBrush:gayness: 1
+196: [error] Smoke object delta CDestructableBrush:gayness2: 1
+196: [error] Smoke object delta CDestructableBrush:glass1: -1
+196: [error] Smoke object delta CDestructableBrush:glass11: -1
+196: [error] Smoke object delta CDestructableBrush:glass12: -1
+196: [error] Smoke object delta CDestructableBrush:glass13: -1
+196: [error] Smoke object delta CDestructableBrush:glass14: -1
+196: [error] Smoke object delta CDestructableBrush:glass15: -1
+196: [error] Smoke object delta CDestructableBrush:glass16: -1
+196: [error] Smoke object delta CDestructableBrush:glass17: -1
+196: [error] Smoke object delta CDestructableBrush:glass18: -1
+196: [error] Smoke object delta CDestructableBrush:glass2: -1
+196: [error] Smoke object delta CDestructableBrush:glass3: -1
+196: [error] Smoke object delta CDestructableBrush:glass4: -1
+196: [error] Smoke object delta CDestructableBrush:glass41: -1
+196: [error] Smoke object delta CDestructableBrush:glass42: -1
+196: [error] Smoke object delta CDestructableBrush:glass43: -1
+196: [error] Smoke object delta CDestructableBrush:glass44: -1
+196: [error] Smoke object delta CDestructableBrush:glass45: -1
+196: [error] Smoke object delta CDestructableBrush:glass46: -1
+196: [error] Smoke object delta CDestructableBrush:glass47: -1
+196: [error] Smoke object delta CDestructableBrush:glass48: -1
+196: [error] Smoke object delta CDestructableBrush:glass5: -1
+196: [error] Smoke object delta CDestructableBrush:glass53: -1
+196: [error] Smoke object delta CDestructableBrush:glass54: -1
+196: [error] Smoke object delta CDestructableBrush:glass55: -1
+196: [error] Smoke object delta CDestructableBrush:glass56: -1
+196: [error] Smoke object delta CDestructableBrush:glass57: -1
+196: [error] Smoke object delta CDestructableBrush:glass58: -1
+196: [error] Smoke object delta CDestructableBrush:glass6: -1
+196: [error] Smoke object delta CDestructableBrush:glass7: -1
+196: [error] Smoke object delta CDestructableBrush:glass8: -1
+196: [error] Smoke object delta CDestructableBrush:gunrack1: 1
+196: [error] Smoke object delta CDestructableBrush:gunrack1glass: 1
+196: [error] Smoke object delta CDestructableBrush:gunrack2: 1
+196: [error] Smoke object delta CDestructableBrush:gunrack2glass: 1
+196: [error] Smoke object delta CDestructableBrush:gunrack3: 1
+196: [error] Smoke object delta CDestructableBrush:gunrack3glass: 1
+196: [error] Smoke object delta CDestructableBrush:halfprice: 1
+196: [error] Smoke object delta CDestructableBrush:happytrain: -1
+196: [error] Smoke object delta CDestructableBrush:knowyourweapon: 1
+196: [error] Smoke object delta CDestructableBrush:laundrowindow1: 1
+196: [error] Smoke object delta CDestructableBrush:laundrowindow2: 1
+196: [error] Smoke object delta CDestructableBrush:motelgate1: 1
+196: [error] Smoke object delta CDestructableBrush:motelhellosign: 1
+196: [error] Smoke object delta CDestructableBrush:musfence: 1
+196: [error] Smoke object delta CDestructableBrush:musfence2: 1
+196: [error] Smoke object delta CDestructableBrush:newssign: 1
+196: [error] Smoke object delta CDestructableBrush:nglass1: -1
+196: [error] Smoke object delta CDestructableBrush:oralsexsign: 1
+196: [error] Smoke object delta CDestructableBrush:outtaorder: 1
+196: [error] Smoke object delta CDestructableBrush:pane4: 1
+196: [error] Smoke object delta CDestructableBrush:pane5: 1
+196: [error] Smoke object delta CDestructableBrush:pane6: 1
+196: [error] Smoke object delta CDestructableBrush:pickmansign: 1
+196: [error] Smoke object delta CDestructableBrush:publicparksign: 1
+196: [error] Smoke object delta CDestructableBrush:rangecrate1: 1
+196: [error] Smoke object delta CDestructableBrush:rangecrate2: 1
+196: [error] Smoke object delta CDestructableBrush:salesign1: 1
+196: [error] Smoke object delta CDestructableBrush:salesign2: 1
+196: [error] Smoke object delta CDestructableBrush:sandcastle: 1
+196: [error] Smoke object delta CDestructableBrush:shack: 1
+196: [error] Smoke object delta CDestructableBrush:sign1: -1
+196: [error] Smoke object delta CDestructableBrush:sign10: -1
+196: [error] Smoke object delta CDestructableBrush:sign11: -1
+196: [error] Smoke object delta CDestructableBrush:sign12: -1
+196: [error] Smoke object delta CDestructableBrush:sign13: -1
+196: [error] Smoke object delta CDestructableBrush:sign14: -1
+196: [error] Smoke object delta CDestructableBrush:sign15: -1
+196: [error] Smoke object delta CDestructableBrush:sign16: -1
+196: [error] Smoke object delta CDestructableBrush:sign17: -1
+196: [error] Smoke object delta CDestructableBrush:sign18: -1
+196: [error] Smoke object delta CDestructableBrush:sign2: -1
+196: [error] Smoke object delta CDestructableBrush:sign21: -1
+196: [error] Smoke object delta CDestructableBrush:sign22: -1
+196: [error] Smoke object delta CDestructableBrush:sign221: -1
+196: [error] Smoke object delta CDestructableBrush:sign222: -1
+196: [error] Smoke object delta CDestructableBrush:sign223: -1
+196: [error] Smoke object delta CDestructableBrush:sign224: -1
+196: [error] Smoke object delta CDestructableBrush:sign2245: -1
+196: [error] Smoke object delta CDestructableBrush:sign225: -1
+196: [error] Smoke object delta CDestructableBrush:sign226: -1
+196: [error] Smoke object delta CDestructableBrush:sign227: -1
+196: [error] Smoke object delta CDestructableBrush:sign228: -1
+196: [error] Smoke object delta CDestructableBrush:sign229: -1
+196: [error] Smoke object delta CDestructableBrush:sign23: -1
+196: [error] Smoke object delta CDestructableBrush:sign230: -1
+196: [error] Smoke object delta CDestructableBrush:sign231: -1
+196: [error] Smoke object delta CDestructableBrush:sign232: -1
+196: [error] Smoke object delta CDestructableBrush:sign233: -1
+196: [error] Smoke object delta CDestructableBrush:sign234: -1
+196: [error] Smoke object delta CDestructableBrush:sign235: -1
+196: [error] Smoke object delta CDestructableBrush:sign236: -1
+196: [error] Smoke object delta CDestructableBrush:sign237: -1
+196: [error] Smoke object delta CDestructableBrush:sign238: -1
+196: [error] Smoke object delta CDestructableBrush:sign24: -1
+196: [error] Smoke object delta CDestructableBrush:sign241: -1
+196: [error] Smoke object delta CDestructableBrush:sign243: -1
+196: [error] Smoke object delta CDestructableBrush:sign244: -1
+196: [error] Smoke object delta CDestructableBrush:sign245: -1
+196: [error] Smoke object delta CDestructableBrush:sign246: -1
+196: [error] Smoke object delta CDestructableBrush:sign247: -1
+196: [error] Smoke object delta CDestructableBrush:sign248: -1
+196: [error] Smoke object delta CDestructableBrush:sign249: -1
+196: [error] Smoke object delta CDestructableBrush:sign25: -1
+196: [error] Smoke object delta CDestructableBrush:sign250: -1
+196: [error] Smoke object delta CDestructableBrush:sign251: -1
+196: [error] Smoke object delta CDestructableBrush:sign252: -1
+196: [error] Smoke object delta CDestructableBrush:sign253: -1
+196: [error] Smoke object delta CDestructableBrush:sign254: -1
+196: [error] Smoke object delta CDestructableBrush:sign256: -1
+196: [error] Smoke object delta CDestructableBrush:sign257: -1
+196: [error] Smoke object delta CDestructableBrush:sign258: -1
+196: [error] Smoke object delta CDestructableBrush:sign26: -1
+196: [error] Smoke object delta CDestructableBrush:sign27: -1
+196: [error] Smoke object delta CDestructableBrush:sign28: -1
+196: [error] Smoke object delta CDestructableBrush:sign29: -1
+196: [error] Smoke object delta CDestructableBrush:sign3: -1
+196: [error] Smoke object delta CDestructableBrush:sign30: -1
+196: [error] Smoke object delta CDestructableBrush:sign31: -1
+196: [error] Smoke object delta CDestructableBrush:sign32: -1
+196: [error] Smoke object delta CDestructableBrush:sign33: -1
+196: [error] Smoke object delta CDestructableBrush:sign34: -1
+196: [error] Smoke object delta CDestructableBrush:sign35: -1
+196: [error] Smoke object delta CDestructableBrush:sign36: -1
+196: [error] Smoke object delta CDestructableBrush:sign37: -1
+196: [error] Smoke object delta CDestructableBrush:sign38: -1
+196: [error] Smoke object delta CDestructableBrush:sign4: -1
+196: [error] Smoke object delta CDestructableBrush:sign5: -1
+196: [error] Smoke object delta CDestructableBrush:sign6: -1
+196: [error] Smoke object delta CDestructableBrush:sign7: -1
+196: [error] Smoke object delta CDestructableBrush:sign8: -1
+196: [error] Smoke object delta CDestructableBrush:sign9: -1
+196: [error] Smoke object delta CDestructableBrush:startcrate: 1
+196: [error] Smoke object delta CDestructableBrush:startfences: 1
+196: [error] Smoke object delta CDestructableBrush:stationfence1: 1
+196: [error] Smoke object delta CDestructableBrush:topfence1: 1
+196: [error] Smoke object delta CDestructableBrush:topfence2: 1
+196: [error] Smoke object delta CDestructableModel: : 6
+196: [error] Smoke object delta CDestructableModel:CDestructableModel0: 1
+196: [error] Smoke object delta CDestructableModel:CDestructableModel1: 3
+196: [error] Smoke object delta CDestructableModel:CDestructableModel2: 1
+196: [error] Smoke object delta CDestructableModel:noname: 110
+196: [error] Smoke object delta CDestructableModel:phone1: 1
+196: [error] Smoke object delta CHandWeaponModel:Right held weapon: 7
+196: [error] Smoke object delta CameraObj:camera2: -1
+196: [error] Smoke object delta CameraObj:gidcam: 1
+196: [error] Smoke object delta CinematicTrigger:cinexit1: -1
+196: [error] Smoke object delta CinematicTrigger:cinhi5: -1
+196: [error] Smoke object delta CinematicTrigger:cintrig1: -1
+196: [error] Smoke object delta CinematicTrigger:cintrig2: -1
+196: [error] Smoke object delta CinematicTrigger:cletusconv: 1
+196: [error] Smoke object delta CinematicTrigger:dreaconv: 1
+196: [error] Smoke object delta CinematicTrigger:gidconv: 1
+196: [error] Smoke object delta CinematicTrigger:hankgermconv: 1
+196: [error] Smoke object delta CinematicTrigger:hankgermconvscared: 1
+196: [error] Smoke object delta CinematicTrigger:hellboyconv: 1
+196: [error] Smoke object delta CinematicTrigger:hermitconv: 1
+196: [error] Smoke object delta CinematicTrigger:phoneconv1: 1
+196: [error] Smoke object delta CivilianAI:CivilianAI7: 3
+196: [error] Smoke object delta CivilianAI:cletus: 1
+196: [error] Smoke object delta CivilianAI:dog: -1
+196: [error] Smoke object delta CivilianAI:drea: 1
+196: [error] Smoke object delta CivilianAI:germ: 1
+196: [error] Smoke object delta CivilianAI:hank: 1
+196: [error] Smoke object delta CivilianAI:hellboy: 1
+196: [error] Smoke object delta CivilianAI:hermit: 1
+196: [error] Smoke object delta CivilianAI:noname: -3
+196: [error] Smoke object delta CivilianAI:spank: -1
+196: [error] Smoke object delta ConversationTrigger:whothehell: 1
+196: [error] Smoke object delta Conveyor:conveyor1: -1
+196: [error] Smoke object delta Conveyor:escalator1: 1
+196: [error] Smoke object delta Conveyor:escalator2: 1
+196: [error] Smoke object delta Conveyor:escalator3: 1
+196: [error] Smoke object delta Conveyor:escalator4: 1
+196: [error] Smoke object delta Conveyor:escalator5: 1
+196: [error] Smoke object delta Conveyor:escalator6: 1
+196: [error] Smoke object delta CultistAI:CultistAI0: 1
+196: [error] Smoke object delta CultistAI:CultistAI2: 2
+196: [error] Smoke object delta CultistAI:CultistAI3: 2
+196: [error] Smoke object delta CultistAI:CultistAI5: 1
+196: [error] Smoke object delta CultistAI:CultistAI6: 1
+196: [error] Smoke object delta CultistAI:CultistAI7: 1
+196: [error] Smoke object delta CultistAI:CultistAI8: 4
+196: [error] Smoke object delta CultistAI:freakpoopwoman: 1
+196: [error] Smoke object delta CultistAI:fresh: 1
+196: [error] Smoke object delta CultistAI:gak: -1
+196: [error] Smoke object delta CultistAI:herm: -1
+196: [error] Smoke object delta CultistAI:meat: 1
+196: [error] Smoke object delta CultistAI:noname: -7
+196: [error] Smoke object delta CultistAI:pete: -1
+196: [error] Smoke object delta CultistAI:poopface: 1
+196: [error] Smoke object delta CultistAI:snot: 1
+196: [error] Smoke object delta Damage:pain1: -1
+196: [error] Smoke object delta Damage:pain2: -1
+196: [error] Smoke object delta Damage:pain3: -1
+196: [error] Smoke object delta Damage:pain4: -1
+196: [error] Smoke object delta DemoSkyWorldModel:SkyWorldModel: 1
+196: [error] Smoke object delta DetailSprite:noname: -6
+196: [error] Smoke object delta Door:Buildings: 1
+196: [error] Smoke object delta Door:Clouds1: 1
+196: [error] Smoke object delta Door:Moon1: 1
+196: [error] Smoke object delta Door:Stars1: 1
+196: [error] Smoke object delta Door:door10: -1
+196: [error] Smoke object delta Door:door11: -1
+196: [error] Smoke object delta Door:door12: -1
+196: [error] Smoke object delta Door:door2: -1
+196: [error] Smoke object delta Door:door3: -1
+196: [error] Smoke object delta Door:door4: -1
+196: [error] Smoke object delta Door:door9: -1
+196: [error] Smoke object delta Door:moteldoor: 1
+196: [error] Smoke object delta ExitTrigger:03_exit: 1
+196: [error] Smoke object delta ExitTrigger:04_exit: 1
+196: [error] Smoke object delta ExitTrigger:exit2: -1
+196: [error] Smoke object delta ExitTrigger:o7_exit: 1
+196: [error] Smoke object delta FlareAmmoPU:FlareAmmoPU0: 1
+196: [error] Smoke object delta FlareAmmoPU:FlareAmmoPU1: 1
+196: [error] Smoke object delta FlashlightPU:FlashlightPU0: 1
+196: [error] Smoke object delta Flicker4WaveLightFX:motelhellolight: 1
+196: [error] Smoke object delta FlickerLight:firelight: 1
+196: [error] Smoke object delta FlickerLight:oralsexlight: 1
+196: [error] Smoke object delta FlickerLight:sublight1: 1
+196: [error] Smoke object delta GameStartPoint:Blood2StartPoint: 4
+196: [error] Smoke object delta Gideon:Gideon: 1
+196: [error] Smoke object delta Gideon:gideon: -1
+196: [error] Smoke object delta GlowingLight:sublight: -12
+196: [error] Smoke object delta KeyFramer:c1kf: 1
+196: [error] Smoke object delta KeyFramer:gidcamkf: 1
+196: [error] Smoke object delta KeyFramer:htrain1: -1
+196: [error] Smoke object delta KeyFramer:noname: -1
+196: [error] Smoke object delta KeyFramer:tracking1: -1
+196: [error] Smoke object delta KeyFramer:tracking2: -1
+196: [error] Smoke object delta Ladder:Ladder1: 1
+196: [error] Smoke object delta Ladder:escapeladder1: 1
+196: [error] Smoke object delta Ladder:escapeladder2: 1
+196: [error] Smoke object delta MedKitPU:MedKitPU0: 1
+196: [error] Smoke object delta Model:noname: 47
+196: [error] Smoke object delta ObjectivesTrigger:ObjectivesTrigger0: 1
+196: [error] Smoke object delta ObjectivesTrigger:feebtrig: 1
+196: [error] Smoke object delta ObjectivesTrigger:hahahint: 1
+196: [error] Smoke object delta ObjectivesTrigger:hint1: 1
+196: [error] Smoke object delta ObjectivesTrigger:hint2: 1
+196: [error] Smoke object delta ObjectivesTrigger:hint3: 1
+196: [error] Smoke object delta ObjectivesTrigger:hint4: 1
+196: [error] Smoke object delta ObjectivesTrigger:hint5: 1
+196: [error] Smoke object delta ObjectivesTrigger:object1: -1
+196: [error] Smoke object delta PathPoint:bob0: 1
+196: [error] Smoke object delta PathPoint:bob1: 2
+196: [error] Smoke object delta PathPoint:bob2: 1
+196: [error] Smoke object delta PathPoint:cat1: -1
+196: [error] Smoke object delta PathPoint:dog0: -1
+196: [error] Smoke object delta PathPoint:dog1: -1
+196: [error] Smoke object delta PathPoint:dog2: -1
+196: [error] Smoke object delta PathPoint:dog3: -1
+196: [error] Smoke object delta PathPoint:fresh0: 1
+196: [error] Smoke object delta PathPoint:fresh1: 1
+196: [error] Smoke object delta PathPoint:fresh2: 1
+196: [error] Smoke object delta PathPoint:germ0: 1
+196: [error] Smoke object delta PathPoint:germ1: 1
+196: [error] Smoke object delta PathPoint:germ2: 1
+196: [error] Smoke object delta PathPoint:germ3: 1
+196: [error] Smoke object delta PathPoint:germ4: 1
+196: [error] Smoke object delta PathPoint:germ5: 1
+196: [error] Smoke object delta PathPoint:germ6: 1
+196: [error] Smoke object delta PathPoint:gid0: 1
+196: [error] Smoke object delta PathPoint:gid1: 1
+196: [error] Smoke object delta PathPoint:gid2: 1
+196: [error] Smoke object delta PathPoint:hank0: 1
+196: [error] Smoke object delta PathPoint:hank1: 1
+196: [error] Smoke object delta PathPoint:hank2: 1
+196: [error] Smoke object delta PathPoint:hank3: 1
+196: [error] Smoke object delta PathPoint:hank4: 1
+196: [error] Smoke object delta PathPoint:hank5: 1
+196: [error] Smoke object delta PathPoint:hank6: 1
+196: [error] Smoke object delta PathPoint:hank7: 1
+196: [error] Smoke object delta PathPoint:hellboy0: 1
+196: [error] Smoke object delta PathPoint:hellboy1: 1
+196: [error] Smoke object delta PathPoint:meat0: 1
+196: [error] Smoke object delta PathPoint:meat1: 1
+196: [error] Smoke object delta PathPoint:meat2: 1
+196: [error] Smoke object delta PathPoint:pete0: 1
+196: [error] Smoke object delta PathPoint:pete1: 1
+196: [error] Smoke object delta PathPoint:pete2: 1
+196: [error] Smoke object delta PathPoint:poopface0: 1
+196: [error] Smoke object delta PathPoint:poopface1: 1
+196: [error] Smoke object delta PathPoint:snot0: 1
+196: [error] Smoke object delta PathPoint:snot1: 1
+196: [error] Smoke object delta PathPoint:spank0: -1
+196: [error] Smoke object delta PathPoint:spank1: -1
+196: [error] Smoke object delta PathPoint:v0: 1
+196: [error] Smoke object delta ProximitiesPU:ProximitiesPU0: 2
+196: [error] Smoke object delta RandomSoundFX:RandomSoundFX0: -2
+196: [error] Smoke object delta RandomSoundFX:mainrandomsfx: 1
+196: [error] Smoke object delta RemotesPU:RemotesPU0: 2
+196: [error] Smoke object delta RotatingDoor:bardoor1: 1
+196: [error] Smoke object delta RotatingDoor:bardoor2: 1
+196: [error] Smoke object delta RotatingDoor:ericdoor1: 1
+196: [error] Smoke object delta RotatingDoor:ericdoor2: 1
+196: [error] Smoke object delta RotatingDoor:laundrodoor1: 1
+196: [error] Smoke object delta RotatingDoor:laundrodoor2: 1
+196: [error] Smoke object delta RotatingDoor:seesaw: 1
+196: [error] Smoke object delta RotatingDoor:shackdoor: 1
+196: [error] Smoke object delta SmellHint:: -1
+196: [error] Smoke object delta SoundFX:ericsparkssound: 1
+196: [error] Smoke object delta SoundFX:firesound: 1
+196: [error] Smoke object delta SoundFX:fleshwashwav: 1
+196: [error] Smoke object delta SoundFX:neonloop: 1
+196: [error] Smoke object delta SoundFX:phonering: 1
+196: [error] Smoke object delta StartPoint:noname: 1
+196: [error] Smoke object delta SubMachineGunPU:noname: 1
+196: [error] Smoke object delta Trigger:: -2
+196: [error] Smoke object delta Trigger:Trigger3: -1
+196: [error] Smoke object delta Trigger:Triggercletus: 1
+196: [error] Smoke object delta Trigger:Triggerhermit2: 1
+196: [error] Smoke object delta Trigger:dreatrig: 1
+196: [error] Smoke object delta Trigger:ericfanrelay: 1
+196: [error] Smoke object delta Trigger:fireremove: 1
+196: [error] Smoke object delta Trigger:gidtrigger: 1
+196: [error] Smoke object delta Trigger:hellokiller: 1
+196: [error] Smoke object delta Trigger:imatrig2: 1
+196: [error] Smoke object delta Trigger:imatrig3: 1
+196: [error] Smoke object delta Trigger:imatrig4: 1
+196: [error] Smoke object delta Trigger:imatrigalley: 1
+196: [error] Smoke object delta Trigger:imatrigericend: 1
+196: [error] Smoke object delta Trigger:imatrigericshop: 1
+196: [error] Smoke object delta Trigger:imatrigstart: 1
+196: [error] Smoke object delta Trigger:killcastletrigger: 1
+196: [error] Smoke object delta Trigger:killcastletrigger2: 1
+196: [error] Smoke object delta Trigger:phonekiller: 1
+196: [error] Smoke object delta Trigger:phonetrig1: 1
+196: [error] Smoke object delta Trigger:seesawtrig1: 1
+196: [error] Smoke object delta Trigger:start: -1
+196: [error] Smoke object delta Trigger:start12: -1
+196: [error] Smoke object delta Trigger:starttrigger: 1
+196: [error] Smoke object delta Trigger:trig3: 1
+196: [error] Smoke object delta WardPU:WardPU0: 2
+196: [error] Smoke object delta Water:Canal1: 1
+196: [error] Smoke object delta Water:Pool: 1
+196: [error] Smoke object delta WorldModelDebris:bbpostdebris0: 1
+196: [error] Smoke object delta WorldModelDebris:bbpostdebris1: 1
+196: [error] Smoke object delta WorldModelDebris:bbpostdebris2: 1
+196: [error] Smoke object delta WorldModelDebris:bbpostdebris3: 1
+196: [error] Smoke object delta WorldModelDebris:billboarddebris0: 1
+196: [error] Smoke object delta WorldModelDebris:billboarddebris1: 1
+196: [error] Smoke object delta WorldModelDebris:billboarddebris2: 1
+196: [error] Smoke object delta WorldModelDebris:billboarddebris3: 1
+196: [error] Smoke object delta WorldModelDebris:billboarddebris4: 1
+196: [error] Smoke object delta WorldModelDebris:billboarddebris5: 1
+196: [error] GPU smoke failed: selection=true, crouch/run frames=0/0, skeleton reentry/hidden=false/false, crouched/stood=false/false, locomotion/walk/run/jump=false/false/false/false, objects=487/232, strings=9/5
+1/2 Test #196: gpu.objectives ...................***Failed   13.89 sec
+[info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+[info] NEW_LEVEL committed: worlds/01_subwaya.dat -> worlds/02_cityhub.dat / start 01_egressa
+[info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/objectives.png
+[info] NEW_LEVEL committed: worlds/01_subwaya.dat -> worlds/02_cityhub.dat / start 01_egressa
+[info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+[info] Interactive clock: limited frames=0, discarded wall seconds=0
+[info] Session playback: waiting=0 time=0.06666666666666667 npc-ready=27 npc-failed=0 npc-updates=27
+[info] AI paths: hidden=true, reentered=false, copied points=7
+[error] Smoke object delta AssaultRiflePU:AssaultRiflePU0: 1
+[error] Smoke object delta BaseClass:: 11
+[error] Smoke object delta BigTrigger:bbhalorelay: 1
+[error] Smoke object delta BigTrigger:bblightrelay: 1
+[error] Smoke object delta BigTrigger:shackrelay: 1
+[error] Smoke object delta BulletAmmoPU:BulletAmmoPU0: 4
+[error] Smoke object delta BulletAmmoPU:noname: 2
+[error] Smoke object delta CClientExplosionSFX:exp1: -2
+[error] Smoke object delta CClientExplosionSFX:exp2: -1
+[error] Smoke object delta CClientExplosionSFX:exp3: -2
+[error] Smoke object delta CClientExplosionSFX:exp4: -2
+[error] Smoke object delta CClientExplosionSFX:exp5: -2
+[error] Smoke object delta CClientParticleStreamSFX:ericsparks: 1
+[error] Smoke object delta CClientParticleStreamSFX:fire3: 1
+[error] Smoke object delta CClientParticleStreamSFX:railsparks: 1
+[error] Smoke object delta CClientParticleStreamSFX:shacksmoke: 1
+[error] Smoke object delta CClientParticleStreamSFX:steam1: 1
+[error] Smoke object delta CClientParticleStreamSFX:steam2: 1
+[error] Smoke object delta CClientParticleStreamSFX:steam3: 1
+[error] Smoke object delta CClientParticleStreamSFX:wrecksparks: 1
+[error] Smoke object delta CDestructableBrush:WindowSlats: 1
+[error] Smoke object delta CDestructableBrush:anotherrooffence: 1
+[error] Smoke object delta CDestructableBrush:bblight1: 1
+[error] Smoke object delta CDestructableBrush:bblight2: 1
+[error] Smoke object delta CDestructableBrush:bblight3: 1
+[error] Smoke object delta CDestructableBrush:bbpost: 1
+[error] Smoke object delta CDestructableBrush:bigclock: 1
+[error] Smoke object delta CDestructableBrush:billboard: 1
+[error] Smoke object delta CDestructableBrush:boilergrill: 1
+[error] Smoke object delta CDestructableBrush:boundsign: 1
+[error] Smoke object delta CDestructableBrush:cabalconeon: 1
+[error] Smoke object delta CDestructableBrush:cabalsign1: 1
+[error] Smoke object delta CDestructableBrush:cabalsign2: 1
+[error] Smoke object delta CDestructableBrush:cabalsign5: 1
+[error] Smoke object delta CDestructableBrush:cobwebs1: 1
+[error] Smoke object delta CDestructableBrush:cobwebs2: 1
+[error] Smoke object delta CDestructableBrush:courtfence: 1
+[error] Smoke object delta CDestructableBrush:courtfence2: 1
+[error] Smoke object delta CDestructableBrush:courtfence3: 1
+[error] Smoke object delta CDestructableBrush:courtfence4: 1
+[error] Smoke object delta CDestructableBrush:courtfence5: 1
+[error] Smoke object delta CDestructableBrush:courtfence69: 1
+[error] Smoke object delta CDestructableBrush:courtfence70: 1
+[error] Smoke object delta CDestructableBrush:crazyericarmed: 1
+[error] Smoke object delta CDestructableBrush:crazyericstoresign: 1
+[error] Smoke object delta CDestructableBrush:dumpfence1: 1
+[error] Smoke object delta CDestructableBrush:dumpfence3: 1
+[error] Smoke object delta CDestructableBrush:dumpfence69: 1
+[error] Smoke object delta CDestructableBrush:ftrainmap: 1
+[error] Smoke object delta CDestructableBrush:gayness: 1
+[error] Smoke object delta CDestructableBrush:gayness2: 1
+[error] Smoke object delta CDestructableBrush:glass1: -1
+[error] Smoke object delta CDestructableBrush:glass11: -1
+[error] Smoke object delta CDestructableBrush:glass12: -1
+[error] Smoke object delta CDestructableBrush:glass13: -1
+[error] Smoke object delta CDestructableBrush:glass14: -1
+[error] Smoke object delta CDestructableBrush:glass15: -1
+[error] Smoke object delta CDestructableBrush:glass16: -1
+[error] Smoke object delta CDestructableBrush:glass17: -1
+[error] Smoke object delta CDestructableBrush:glass18: -1
+[error] Smoke object delta CDestructableBrush:glass2: -1
+[error] Smoke object delta CDestructableBrush:glass3: -1
+[error] Smoke object delta CDestructableBrush:glass4: -1
+[error] Smoke object delta CDestructableBrush:glass41: -1
+[error] Smoke object delta CDestructableBrush:glass42: -1
+[error] Smoke object delta CDestructableBrush:glass43: -1
+[error] Smoke object delta CDestructableBrush:glass44: -1
+[error] Smoke object delta CDestructableBrush:glass45: -1
+[error] Smoke object delta CDestructableBrush:glass46: -1
+[error] Smoke object delta CDestructableBrush:glass47: -1
+[error] Smoke object delta CDestructableBrush:glass48: -1
+[error] Smoke object delta CDestructableBrush:glass5: -1
+[error] Smoke object delta CDestructableBrush:glass53: -1
+[error] Smoke object delta CDestructableBrush:glass54: -1
+[error] Smoke object delta CDestructableBrush:glass55: -1
+[error] Smoke object delta CDestructableBrush:glass56: -1
+[error] Smoke object delta CDestructableBrush:glass57: -1
+[error] Smoke object delta CDestructableBrush:glass58: -1
+[error] Smoke object delta CDestructableBrush:glass6: -1
+[error] Smoke object delta CDestructableBrush:glass7: -1
+[error] Smoke object delta CDestructableBrush:glass8: -1
+[error] Smoke object delta CDestructableBrush:gunrack1: 1
+[error] Smoke object delta CDestructableBrush:gunrack1glass: 1
+[error] Smoke object delta CDestructableBrush:gunrack2: 1
+[error] Smoke object delta CDestructableBrush:gunrack2glass: 1
+[error] Smoke object delta CDestructableBrush:gunrack3: 1
+[error] Smoke object delta CDestructableBrush:gunrack3glass: 1
+[error] Smoke object delta CDestructableBrush:halfprice: 1
+[error] Smoke object delta CDestructableBrush:happytrain: -1
+[error] Smoke object delta CDestructableBrush:knowyourweapon: 1
+[error] Smoke object delta CDestructableBrush:laundrowindow1: 1
+[error] Smoke object delta CDestructableBrush:laundrowindow2: 1
+[error] Smoke object delta CDestructableBrush:motelgate1: 1
+[error] Smoke object delta CDestructableBrush:motelhellosign: 1
+[error] Smoke object delta CDestructableBrush:musfence: 1
+[error] Smoke object delta CDestructableBrush:musfence2: 1
+[error] Smoke object delta CDestructableBrush:newssign: 1
+[error] Smoke object delta CDestructableBrush:nglass1: -1
+[error] Smoke object delta CDestructableBrush:oralsexsign: 1
+[error] Smoke object delta CDestructableBrush:outtaorder: 1
+[error] Smoke object delta CDestructableBrush:pane4: 1
+[error] Smoke object delta CDestructableBrush:pane5: 1
+[error] Smoke object delta CDestructableBrush:pane6: 1
+[error] Smoke object delta CDestructableBrush:pickmansign: 1
+[error] Smoke object delta CDestructableBrush:publicparksign: 1
+[error] Smoke object delta CDestructableBrush:rangecrate1: 1
+[error] Smoke object delta CDestructableBrush:rangecrate2: 1
+[error] Smoke object delta CDestructableBrush:salesign1: 1
+[error] Smoke object delta CDestructableBrush:salesign2: 1
+[error] Smoke object delta CDestructableBrush:sandcastle: 1
+[error] Smoke object delta CDestructableBrush:shack: 1
+[error] Smoke object delta CDestructableBrush:sign1: -1
+[error] Smoke object delta CDestructableBrush:sign10: -1
+[error] Smoke object delta CDestructableBrush:sign11: -1
+[error] Smoke object delta CDestructableBrush:sign12: -1
+[error] Smoke object delta CDestructableBrush:sign13: -1
+[error] Smoke object delta CDestructableBrush:sign14: -1
+[error] Smoke object delta CDestructableBrush:sign15: -1
+[error] Smoke object delta CDestructableBrush:sign16: -1
+[error] Smoke object delta CDestructableBrush:sign17: -1
+[error] Smoke object delta CDestructableBrush:sign18: -1
+[error] Smoke object delta CDestructableBrush:sign2: -1
+[error] Smoke object delta CDestructableBrush:sign21: -1
+[error] Smoke object delta CDestructableBrush:sign22: -1
+[error] Smoke object delta CDestructableBrush:sign221: -1
+[error] Smoke object delta CDestructableBrush:sign222: -1
+[error] Smoke object delta CDestructableBrush:sign223: -1
+[error] Smoke object delta CDestructableBrush:sign224: -1
+[error] Smoke object delta CDestructableBrush:sign2245: -1
+[error] Smoke object delta CDestructableBrush:sign225: -1
+[error] Smoke object delta CDestructableBrush:sign226: -1
+[error] Smoke object delta CDestructableBrush:sign227: -1
+[error] Smoke object delta CDestructableBrush:sign228: -1
+[error] Smoke object delta CDestructableBrush:sign229: -1
+[error] Smoke object delta CDestructableBrush:sign23: -1
+[error] Smoke object delta CDestructableBrush:sign230: -1
+[error] Smoke object delta CDestructableBrush:sign231: -1
+[error] Smoke object delta CDestructableBrush:sign232: -1
+[error] Smoke object delta CDestructableBrush:sign233: -1
+[error] Smoke object delta CDestructableBrush:sign234: -1
+[error] Smoke object delta CDestructableBrush:sign235: -1
+[error] Smoke object delta CDestructableBrush:sign236: -1
+[error] Smoke object delta CDestructableBrush:sign237: -1
+[error] Smoke object delta CDestructableBrush:sign238: -1
+[error] Smoke object delta CDestructableBrush:sign24: -1
+[error] Smoke object delta CDestructableBrush:sign241: -1
+[error] Smoke object delta CDestructableBrush:sign243: -1
+[error] Smoke object delta CDestructableBrush:sign244: -1
+[error] Smoke object delta CDestructableBrush:sign245: -1
+[error] Smoke object delta CDestructableBrush:sign246: -1
+[error] Smoke object delta CDestructableBrush:sign247: -1
+[error] Smoke object delta CDestructableBrush:sign248: -1
+[error] Smoke object delta CDestructableBrush:sign249: -1
+[error] Smoke object delta CDestructableBrush:sign25: -1
+[error] Smoke object delta CDestructableBrush:sign250: -1
+[error] Smoke object delta CDestructableBrush:sign251: -1
+[error] Smoke object delta CDestructableBrush:sign252: -1
+[error] Smoke object delta CDestructableBrush:sign253: -1
+[error] Smoke object delta CDestructableBrush:sign254: -1
+[error] Smoke object delta CDestructableBrush:sign256: -1
+[error] Smoke object delta CDestructableBrush:sign257: -1
+[error] Smoke object delta CDestructableBrush:sign258: -1
+[error] Smoke object delta CDestructableBrush:sign26: -1
+[error] Smoke object delta CDestructableBrush:sign27: -1
+[error] Smoke object delta CDestructableBrush:sign28: -1
+[error] Smoke object delta CDestructableBrush:sign29: -1
+[error] Smoke object delta CDestructableBrush:sign3: -1
+[error] Smoke object delta CDestructableBrush:sign30: -1
+[error] Smoke object delta CDestructableBrush:sign31: -1
+[error] Smoke object delta CDestructableBrush:sign32: -1
+[error] Smoke object delta CDestructableBrush:sign33: -1
+[error] Smoke object delta CDestructableBrush:sign34: -1
+[error] Smoke object delta CDestructableBrush:sign35: -1
+[error] Smoke object delta CDestructableBrush:sign36: -1
+[error] Smoke object delta CDestructableBrush:sign37: -1
+[error] Smoke object delta CDestructableBrush:sign38: -1
+[error] Smoke object delta CDestructableBrush:sign4: -1
+[error] Smoke object delta CDestructableBrush:sign5: -1
+[error] Smoke object delta CDestructableBrush:sign6: -1
+[error] Smoke object delta CDestructableBrush:sign7: -1
+[error] Smoke object delta CDestructableBrush:sign8: -1
+[error] Smoke object delta CDestructableBrush:sign9: -1
+[error] Smoke object delta CDestructableBrush:startcrate: 1
+[error] Smoke object delta CDestructableBrush:startfences: 1
+[error] Smoke object delta CDestructableBrush:stationfence1: 1
+[error] Smoke object delta CDestructableBrush:topfence1: 1
+[error] Smoke object delta CDestructableBrush:topfence2: 1
+[error] Smoke object delta CDestructableModel: : 6
+[error] Smoke object delta CDestructableModel:CDestructableModel0: 1
+[error] Smoke object delta CDestructableModel:CDestructableModel1: 3
+[error] Smoke object delta CDestructableModel:CDestructableModel2: 1
+[error] Smoke object delta CDestructableModel:noname: 110
+[error] Smoke object delta CDestructableModel:phone1: 1
+[error] Smoke object delta CHandWeaponModel:Right held weapon: 7
+[error] Smoke object delta CameraObj:camera2: -1
+[error] Smoke object delta CameraObj:gidcam: 1
+[error] Smoke object delta CinematicTrigger:cinexit1: -1
+[error] Smoke object delta CinematicTrigger:cinhi5: -1
+[error] Smoke object delta CinematicTrigger:cintrig1: -1
+[error] Smoke object delta CinematicTrigger:cintrig2: -1
+[error] Smoke object delta CinematicTrigger:cletusconv: 1
+[error] Smoke object delta CinematicTrigger:dreaconv: 1
+[error] Smoke object delta CinematicTrigger:gidconv: 1
+[error] Smoke object delta CinematicTrigger:hankgermconv: 1
+[error] Smoke object delta CinematicTrigger:hankgermconvscared: 1
+[error] Smoke object delta CinematicTrigger:hellboyconv: 1
+[error] Smoke object delta CinematicTrigger:hermitconv: 1
+[error] Smoke object delta CinematicTrigger:phoneconv1: 1
+[error] Smoke object delta CivilianAI:CivilianAI7: 3
+[error] Smoke object delta CivilianAI:cletus: 1
+[error] Smoke object delta CivilianAI:dog: -1
+[error] Smoke object delta CivilianAI:drea: 1
+[error] Smoke object delta CivilianAI:germ: 1
+[error] Smoke object delta CivilianAI:hank: 1
+[error] Smoke object delta CivilianAI:hellboy: 1
+[error] Smoke object delta CivilianAI:hermit: 1
+[error] Smoke object delta CivilianAI:noname: -3
+[error] Smoke object delta CivilianAI:spank: -1
+[error] Smoke object delta ConversationTrigger:whothehell: 1
+[error] Smoke object delta Conveyor:conveyor1: -1
+[error] Smoke object delta Conveyor:escalator1: 1
+[error] Smoke object delta Conveyor:escalator2: 1
+[error] Smoke object delta Conveyor:escalator3: 1
+[error] Smoke object delta Conveyor:escalator4: 1
+[error] Smoke object delta Conveyor:escalator5: 1
+[error] Smoke object delta Conveyor:escalator6: 1
+[error] Smoke object delta CultistAI:CultistAI0: 1
+[error] Smoke object delta CultistAI:CultistAI2: 2
+[error] Smoke object delta CultistAI:CultistAI3: 2
+[error] Smoke object delta CultistAI:CultistAI5: 1
+[error] Smoke object delta CultistAI:CultistAI6: 1
+[error] Smoke object delta CultistAI:CultistAI7: 1
+[error] Smoke object delta CultistAI:CultistAI8: 4
+[error] Smoke object delta CultistAI:freakpoopwoman: 1
+[error] Smoke object delta CultistAI:fresh: 1
+[error] Smoke object delta CultistAI:gak: -1
+[error] Smoke object delta CultistAI:herm: -1
+[error] Smoke object delta CultistAI:meat: 1
+[error] Smoke object delta CultistAI:noname: -7
+[error] Smoke object delta CultistAI:pete: -1
+[error] Smoke object delta CultistAI:poopface: 1
+[error] Smoke object delta CultistAI:snot: 1
+[error] Smoke object delta Damage:pain1: -1
+[error] Smoke object delta Damage:pain2: -1
+[error] Smoke object delta Damage:pain3: -1
+[error] Smoke object delta Damage:pain4: -1
+[error] Smoke object delta DemoSkyWorldModel:SkyWorldModel: 1
+[error] Smoke object delta DetailSprite:noname: -6
+[error] Smoke object delta Door:Buildings: 1
+[error] Smoke object delta Door:Clouds1: 1
+[error] Smoke object delta Door:Moon1: 1
+[error] Smoke object delta Door:Stars1: 1
+[error] Smoke object delta Door:door10: -1
+[error] Smoke object delta Door:door11: -1
+[error] Smoke object delta Door:door12: -1
+[error] Smoke object delta Door:door2: -1
+[error] Smoke object delta Door:door3: -1
+[error] Smoke object delta Door:door4: -1
+[error] Smoke object delta Door:door9: -1
+[error] Smoke object delta Door:moteldoor: 1
+[error] Smoke object delta ExitTrigger:03_exit: 1
+[error] Smoke object delta ExitTrigger:04_exit: 1
+[error] Smoke object delta ExitTrigger:exit2: -1
+[error] Smoke object delta ExitTrigger:o7_exit: 1
+[error] Smoke object delta FlareAmmoPU:FlareAmmoPU0: 1
+[error] Smoke object delta FlareAmmoPU:FlareAmmoPU1: 1
+[error] Smoke object delta FlashlightPU:FlashlightPU0: 1
+[error] Smoke object delta Flicker4WaveLightFX:motelhellolight: 1
+[error] Smoke object delta FlickerLight:firelight: 1
+[error] Smoke object delta FlickerLight:oralsexlight: 1
+[error] Smoke object delta FlickerLight:sublight1: 1
+[error] Smoke object delta GameStartPoint:Blood2StartPoint: 4
+[error] Smoke object delta Gideon:Gideon: 1
+[error] Smoke object delta Gideon:gideon: -1
+[error] Smoke object delta GlowingLight:sublight: -12
+[error] Smoke object delta KeyFramer:c1kf: 1
+[error] Smoke object delta KeyFramer:gidcamkf: 1
+[error] Smoke object delta KeyFramer:htrain1: -1
+[error] Smoke object delta KeyFramer:noname: -1
+[error] Smoke object delta KeyFramer:tracking1: -1
+[error] Smoke object delta KeyFramer:tracking2: -1
+[error] Smoke object delta Ladder:Ladder1: 1
+[error] Smoke object delta Ladder:escapeladder1: 1
+[error] Smoke object delta Ladder:escapeladder2: 1
+[error] Smoke object delta MedKitPU:MedKitPU0: 1
+[error] Smoke object delta Model:noname: 47
+[error] Smoke object delta ObjectivesTrigger:ObjectivesTrigger0: 1
+[error] Smoke object delta ObjectivesTrigger:feebtrig: 1
+[error] Smoke object delta ObjectivesTrigger:hahahint: 1
+[error] Smoke object delta ObjectivesTrigger:hint1: 1
+[error] Smoke object delta ObjectivesTrigger:hint2: 1
+[error] Smoke object delta ObjectivesTrigger:hint3: 1
+[error] Smoke object delta ObjectivesTrigger:hint4: 1
+[error] Smoke object delta ObjectivesTrigger:hint5: 1
+[error] Smoke object delta ObjectivesTrigger:object1: -1
+[error] Smoke object delta PathPoint:bob0: 1
+[error] Smoke object delta PathPoint:bob1: 2
+[error] Smoke object delta PathPoint:bob2: 1
+[error] Smoke object delta PathPoint:cat1: -1
+[error] Smoke object delta PathPoint:dog0: -1
+[error] Smoke object delta PathPoint:dog1: -1
+[error] Smoke object delta PathPoint:dog2: -1
+[error] Smoke object delta PathPoint:dog3: -1
+[error] Smoke object delta PathPoint:fresh0: 1
+[error] Smoke object delta PathPoint:fresh1: 1
+[error] Smoke object delta PathPoint:fresh2: 1
+[error] Smoke object delta PathPoint:germ0: 1
+[error] Smoke object delta PathPoint:germ1: 1
+[error] Smoke object delta PathPoint:germ2: 1
+[error] Smoke object delta PathPoint:germ3: 1
+[error] Smoke object delta PathPoint:germ4: 1
+[error] Smoke object delta PathPoint:germ5: 1
+[error] Smoke object delta PathPoint:germ6: 1
+[error] Smoke object delta PathPoint:gid0: 1
+[error] Smoke object delta PathPoint:gid1: 1
+[error] Smoke object delta PathPoint:gid2: 1
+[error] Smoke object delta PathPoint:hank0: 1
+[error] Smoke object delta PathPoint:hank1: 1
+[error] Smoke object delta PathPoint:hank2: 1
+[error] Smoke object delta PathPoint:hank3: 1
+[error] Smoke object delta PathPoint:hank4: 1
+[error] Smoke object delta PathPoint:hank5: 1
+[error] Smoke object delta PathPoint:hank6: 1
+[error] Smoke object delta PathPoint:hank7: 1
+[error] Smoke object delta PathPoint:hellboy0: 1
+[error] Smoke object delta PathPoint:hellboy1: 1
+[error] Smoke object delta PathPoint:meat0: 1
+[error] Smoke object delta PathPoint:meat1: 1
+[error] Smoke object delta PathPoint:meat2: 1
+[error] Smoke object delta PathPoint:pete0: 1
+[error] Smoke object delta PathPoint:pete1: 1
+[error] Smoke object delta PathPoint:pete2: 1
+[error] Smoke object delta PathPoint:poopface0: 1
+[error] Smoke object delta PathPoint:poopface1: 1
+[error] Smoke object delta PathPoint:snot0: 1
+[error] Smoke object delta PathPoint:snot1: 1
+[error] Smoke object delta PathPoint:spank0: -1
+[error] Smoke object delta PathPoint:spank1: -1
+[error] Smoke object delta PathPoint:v0: 1
+[error] Smoke object delta ProximitiesPU:ProximitiesPU0: 2
+[error] Smoke object delta RandomSoundFX:RandomSoundFX0: -2
+[error] Smoke object delta RandomSoundFX:mainrandomsfx: 1
+[error] Smoke object delta RemotesPU:RemotesPU0: 2
+[error] Smoke object delta RotatingDoor:bardoor1: 1
+[error] Smoke object delta RotatingDoor:bardoor2: 1
+[error] Smoke object delta RotatingDoor:ericdoor1: 1
+[error] Smoke object delta RotatingDoor:ericdoor2: 1
+[error] Smoke object delta RotatingDoor:laundrodoor1: 1
+[error] Smoke object delta RotatingDoor:laundrodoor2: 1
+[error] Smoke object delta RotatingDoor:seesaw: 1
+[error] Smoke object delta RotatingDoor:shackdoor: 1
+[error] Smoke object delta SmellHint:: -1
+[error] Smoke object delta SoundFX:ericsparkssound: 1
+[error] Smoke object delta SoundFX:firesound: 1
+[error] Smoke object delta SoundFX:fleshwashwav: 1
+[error] Smoke object delta SoundFX:neonloop: 1
+[error] Smoke object delta SoundFX:phonering: 1
+[error] Smoke object delta StartPoint:noname: 1
+[error] Smoke object delta SubMachineGunPU:noname: 1
+[error] Smoke object delta Trigger:: -2
+[error] Smoke object delta Trigger:Trigger3: -1
+[error] Smoke object delta Trigger:Triggercletus: 1
+[error] Smoke object delta Trigger:Triggerhermit2: 1
+[error] Smoke object delta Trigger:dreatrig: 1
+[error] Smoke object delta Trigger:ericfanrelay: 1
+[error] Smoke object delta Trigger:fireremove: 1
+[error] Smoke object delta Trigger:gidtrigger: 1
+[error] Smoke object delta Trigger:hellokiller: 1
+[error] Smoke object delta Trigger:imatrig2: 1
+[error] Smoke object delta Trigger:imatrig3: 1
+[error] Smoke object delta Trigger:imatrig4: 1
+[error] Smoke object delta Trigger:imatrigalley: 1
+[error] Smoke object delta Trigger:imatrigericend: 1
+[error] Smoke object delta Trigger:imatrigericshop: 1
+[error] Smoke object delta Trigger:imatrigstart: 1
+[error] Smoke object delta Trigger:killcastletrigger: 1
+[error] Smoke object delta Trigger:killcastletrigger2: 1
+[error] Smoke object delta Trigger:phonekiller: 1
+[error] Smoke object delta Trigger:phonetrig1: 1
+[error] Smoke object delta Trigger:seesawtrig1: 1
+[error] Smoke object delta Trigger:start: -1
+[error] Smoke object delta Trigger:start12: -1
+[error] Smoke object delta Trigger:starttrigger: 1
+[error] Smoke object delta Trigger:trig3: 1
+[error] Smoke object delta WardPU:WardPU0: 2
+[error] Smoke object delta Water:Canal1: 1
+[error] Smoke object delta Water:Pool: 1
+[error] Smoke object delta WorldModelDebris:bbpostdebris0: 1
+[error] Smoke object delta WorldModelDebris:bbpostdebris1: 1
+[error] Smoke object delta WorldModelDebris:bbpostdebris2: 1
+[error] Smoke object delta WorldModelDebris:bbpostdebris3: 1
+[error] Smoke object delta WorldModelDebris:billboarddebris0: 1
+[error] Smoke object delta WorldModelDebris:billboarddebris1: 1
+[error] Smoke object delta WorldModelDebris:billboarddebris2: 1
+[error] Smoke object delta WorldModelDebris:billboarddebris3: 1
+[error] Smoke object delta WorldModelDebris:billboarddebris4: 1
+[error] Smoke object delta WorldModelDebris:billboarddebris5: 1
+[error] GPU smoke failed: selection=true, crouch/run frames=0/0, skeleton reentry/hidden=false/false, crouched/stood=false/false, locomotion/walk/run/jump=false/false/false/false, objects=487/232, strings=9/5
+
+test 814
+    Start 814: gpu.level_change
+
+814: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/level_change_gpu_tests "/home/yann/.steam/steam/steamapps/common/Blood II" "/home/yann/projects/lithtech/Blood2/build/debug/tests/level-change"
+814: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+814: Test timeout computed to be: 90
+814: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+814: Destination: CityHub /
+814: Cycle 0: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+814: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+814: Destination: SubwayA /
+814: 123: !CaseLess{}(game->level_change.selected_start, requested_start) && !CaseLess{}(requested_start, game->level_change.selected_start) && !game->level_change.start_fallback |
+2/2 Test #814: gpu.level_change .................***Failed    4.73 sec
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+Destination: CityHub /
+Cycle 0: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+World SPR sprites/motelhell.spr: 11 frames / 15 fps
+Destination: SubwayA /
+123: !CaseLess{}(game->level_change.selected_start, requested_start) && !CaseLess{}(requested_start, game->level_change.selected_start) && !game->level_change.start_fallback |
+
+
+0% tests passed, 2 tests failed out of 2
+
+Label Time Summary:
+gpu           =  18.62 sec*proc (2 tests)
+objectives    =  13.89 sec*proc (1 test)
+private       =  18.62 sec*proc (2 tests)
+world         =   4.73 sec*proc (1 test)
+
+Total Test time (real) =  18.63 sec
+
+The following tests FAILED:
+	196 - gpu.objectives (Failed)                           gpu objectives private
+	814 - gpu.level_change (Failed)                         gpu private world
+Errors while running CTest

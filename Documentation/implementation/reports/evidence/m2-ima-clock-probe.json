@@ -1,0 +1,17 @@
+{
+  "private_fnv64": 217478193828128853,
+  "synthetic_fnv64": 624056526007582026,
+  "binary": "IMRT25.DLL",
+  "sha256": "2dc50ca832084601d1f10ac9d5f5fc67fd153154cd244db1a55a3147c70d7bd2",
+  "unicorn": "2.1.4",
+  "maps": 324,
+  "queries": 98136,
+  "private_sections": 156,
+  "decisions_sha256": "5478b171fae6a18e0854a0938212fac5a76af37638bbd607dbf64dfbeef0c69d",
+  "scope": "Normal-speed clamped/quantized tempo, duplicate boundaries, retained 100ns carry and integer millisecond event conversion. MulDiv/locks/log intercepted; no native runtime, scheduler, PCM or playlist.",
+  "entry_rvas": [
+    "0x29b2",
+    "0x2a3e",
+    "0x1c12"
+  ]
+}

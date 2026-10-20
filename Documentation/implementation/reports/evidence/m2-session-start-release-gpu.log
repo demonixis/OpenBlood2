@@ -1,0 +1,23 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start  31: gpu.lifecycle
+1/5 Test  #31: gpu.lifecycle ....................   Passed    1.48 sec
+    Start 277: gpu.cinematics
+2/5 Test #277: gpu.cinematics ...................   Passed    1.69 sec
+    Start 617: gpu.player_keepalive
+3/5 Test #617: gpu.player_keepalive .............   Passed    1.98 sec
+    Start 864: gpu.level_change
+4/5 Test #864: gpu.level_change .................   Passed    1.54 sec
+    Start 957: gpu.train_session
+5/5 Test #957: gpu.train_session ................   Passed    6.88 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+cinematics          =   1.69 sec*proc (1 test)
+gpu                 =  13.56 sec*proc (5 tests)
+player_keepalive    =   1.98 sec*proc (1 test)
+private             =  12.09 sec*proc (4 tests)
+train_session       =   6.88 sec*proc (1 test)
+world               =   1.54 sec*proc (1 test)
+
+Total Test time (real) =  13.58 sec

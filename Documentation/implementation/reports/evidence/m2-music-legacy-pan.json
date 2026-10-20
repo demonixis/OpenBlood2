@@ -1,0 +1,138 @@
+{
+  "date": "2026-10-18",
+  "status": "M2 incomplete; original MUSIC remains unsupported",
+  "implementation_parent": "ee0cd4a78b49d75e050db606bbfb11177265cbcf",
+  "runs": [
+    {
+      "configuration": "debug",
+      "tests": 82,
+      "passed": 82,
+      "wall_seconds": 90.47
+    },
+    {
+      "configuration": "release",
+      "tests": 82,
+      "passed": 82,
+      "wall_seconds": 14.14
+    },
+    {
+      "configuration": "sanitize",
+      "tests": 82,
+      "passed": 82,
+      "wall_seconds": 499.34
+    },
+    {
+      "configuration": "debug NVIDIA Vulkan",
+      "tests": 3,
+      "passed": 3,
+      "wall_seconds": 41.0
+    },
+    {
+      "configuration": "release NVIDIA Vulkan",
+      "tests": 3,
+      "passed": 3,
+      "wall_seconds": 11.55
+    }
+  ],
+  "private_results": {
+    "cabal_regions": 38,
+    "nonzero_finite_pcm": 38,
+    "legacy_pan_regions": 5,
+    "refused": 0
+  },
+  "original_dispatch_probe": {
+    "equivalent_pan_values": 13,
+    "mixed_order_cases": 3,
+    "tool": "Unicorn 2.1.4, separate /tmp virtual environment",
+    "whole_synth_or_listening_comparison": false
+  },
+  "gpu_environment": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+    "SDL_AUDIODRIVER": "dummy"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1"
+  },
+  "commands": [
+    "python3 m2-music-legacy-pan-validation.py <debug|release|sanitize>",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/<debug|release> -R ^gpu\\.(sound|player_keepalive|train_session)$ --output-on-failure --output-junit <result.xml> -j 1",
+    "<tool-venv>/bin/python m2-music-legacy-pan-probe.py <external-content-root>/MSynth25.dll",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror src/engine/dls_sampler.cpp src/engine/dls_sampler.h src/app/inspector_world_sounds.cpp src/app/world_sound_smoke.cpp tests/dls_sampler_tests.cpp"
+  ],
+  "source_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "user_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "artifacts": {
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-debug-build-final.log": "0642b9ea9128262a76c99688fbb15444f5a2d076637942013471fe4e055c21ec",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-debug-tests.log": "c20a9f9ef1c62d010ff06764dcd7b95438d34e88dc80e976847f8606820477a6",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-debug-tests.xml": "37561d8dc5934f902131adf97b27d5d4a761677e21c7b5f5f9de7bc4b34da732",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-release-build-final.log": "caa03c128c92f48a751cae4ee22875ae3ad73c18b97f2ca2c35bd9c1846892ac",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-release-tests.log": "5825989a588718493add7e184e5e1674f702f3a0eacb2b0f65e3b7b31e90d89d",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-release-tests.xml": "641e566a290a1b452d01751908e7574404ae43c6c0e93d9b61b044572df70e7c",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-sanitize-build-final.log": "d8d7cb133b6cfd93c032e79cf74f34bec51733f491ebb6a363ce96ac39e24b66",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-sanitize-tests.log": "f67703686b16c15d051a96a8bea354df4323eae467af43908f3f0cac63584300",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-sanitize-tests.xml": "16c274f9900fbf31f6ff4cfbe273bea90a335937c97fc48ca5d9f8b9e6416eef",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-debug-gpu.log": "3f948a2511ec9c33b3d595a550d0b361d28f60e3ff96b9739f4c1917077c9928",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-debug-gpu.xml": "f754ee61f07aaf196d3b7ef1de9c1f09d5e3c7f545f918a75bff9b25f15c6503",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-release-gpu.log": "7937e501de4d909a3810774b46f48bd41edbc716f1d337a31c881d0967a116c3",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-release-gpu.xml": "502fadb8173898dae21f833e194d58924082449871ded7cd23013342733c48ab",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-debug-initial-build.log": "03ff9a881d250d0d38c70126078525425981db7f3fa029f4efa9057d25f6d971",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-debug-focused.log": "31a05dbea2d3432c8bd2db01a08ee903a25fc1501e742bae4b6cfe20a95e6096",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-debug-focused.xml": "1f6335f31b69d1991f8980487bc2bc68ec9c6da695c6ae304314ef459445f4ec",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-integrity.json": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-integrity.log": "f9fe8133add3ebbcf3c21b23258743db2580092c98926a3e5cb8b01c18288cf6",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-validation.py": "716d7ed4030f9d537b11da70a38b9899dd026f9dfa4ebd08bdecfbbc359589b7",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-probe.py": "74e2b6fc93a3d5b9f9bb83b8e38e8f3e5441481fa5fcb69f12f3f58c8edc2040",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-probe.json": "fa93389d754935cc24d43ffd2e5373b2aaa74b6ae54d152b06db8a456a2ac0cf",
+    "Documentation/Implementation/evidence/m2-music-legacy-pan-links.log": "f8001e989a52fb1320ddb4cdda65ebbd0226d6503004f6dc1bf2f7b1a86740a4"
+  },
+  "limitations": [
+    "Internal original pan quantization is not reproduced",
+    "Private region probes use midpoint keys and velocity 100",
+    "Dummy output does not prove audible fidelity",
+    "Original sequence/style/personality/MIDI scheduling remain unavailable",
+    "No native macOS/Windows/mobile validation in this run"
+  ],
+  "local_markdown_links": 3839,
+  "format_check": {
+    "files": 5,
+    "exit_code": 0
+  },
+  "build_warnings": "Existing enum/float comparisons in unchanged original game ports; no warning originates in the modified C++ files.",
+  "implementation_commit": "980c842858f493b2312cba08374c21d08434d9a1"
+}

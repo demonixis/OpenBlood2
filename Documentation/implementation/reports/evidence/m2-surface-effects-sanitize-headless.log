@@ -1,0 +1,104 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  42: world.destination_trial_private
+      Start  43: world.destination_private
+ 1/45 Test  #43: world.destination_private .........   Passed   26.11 sec
+      Start 334: texture.corpus
+ 2/45 Test #334: texture.corpus ....................   Passed   16.67 sec
+      Start 330: world_view.subway
+ 3/45 Test  #42: world.destination_trial_private ...   Passed   49.63 sec
+      Start  44: world.private
+ 4/45 Test #330: world_view.subway .................   Passed    9.55 sec
+      Start  25: world.surface_effects
+ 5/45 Test  #25: world.surface_effects .............   Passed    1.34 sec
+      Start 738: surface_effect.limits
+ 6/45 Test #738: surface_effect.limits .............   Passed    0.81 sec
+      Start  26: world.destination_trials
+ 7/45 Test  #26: world.destination_trials ..........   Passed    0.21 sec
+      Start  38: world.mutations
+ 8/45 Test  #38: world.mutations ...................   Passed    0.28 sec
+      Start  29: world.destination_lifetime
+ 9/45 Test  #29: world.destination_lifetime ........   Passed    0.07 sec
+      Start 736: surface_effect.parameters
+10/45 Test #736: surface_effect.parameters .........   Passed    0.03 sec
+      Start 737: surface_effect.clock
+11/45 Test #737: surface_effect.clock ..............   Passed    0.02 sec
+      Start  31: world.sound_entries
+12/45 Test  #31: world.sound_entries ...............   Passed    0.07 sec
+      Start  30: world.sprite_entries
+13/45 Test  #30: world.sprite_entries ..............   Passed    0.05 sec
+      Start   1: objects.builtin_model
+14/45 Test   #1: objects.builtin_model .............   Passed    0.02 sec
+      Start  37: world.world_rejection
+15/45 Test  #37: world.world_rejection .............   Passed    0.08 sec
+      Start  28: world.destination_schema
+16/45 Test  #28: world.destination_schema ..........   Passed    0.03 sec
+      Start  11: objects.unsupported_teardown
+17/45 Test  #11: objects.unsupported_teardown ......   Passed    0.09 sec
+      Start 329: world_view.alpha_order
+18/45 Test #329: world_view.alpha_order ............   Passed    0.02 sec
+      Start  27: world.destination_messages
+19/45 Test  #27: world.destination_messages ........   Passed    0.02 sec
+      Start  10: objects.messages_strings
+20/45 Test  #10: objects.messages_strings ..........   Passed    0.04 sec
+      Start  12: objects.creation_failures
+21/45 Test  #12: objects.creation_failures .........   Passed    0.04 sec
+      Start 333: texture.mapping
+22/45 Test #333: texture.mapping ...................   Passed    0.03 sec
+      Start  39: world.session_lifecycle
+23/45 Test  #39: world.session_lifecycle ...........   Passed    0.03 sec
+      Start 328: world_view.lifetime
+24/45 Test #328: world_view.lifetime ...............   Passed    0.02 sec
+      Start   4: objects.reasons_properties
+25/45 Test   #4: objects.reasons_properties ........   Passed    0.02 sec
+      Start  41: world.original_trigger
+26/45 Test  #41: world.original_trigger ............   Passed    0.02 sec
+      Start   9: objects.links_lists
+27/45 Test   #9: objects.links_lists ...............   Passed    0.02 sec
+      Start   2: objects.original_objects
+28/45 Test   #2: objects.original_objects ..........   Passed    0.02 sec
+      Start   6: objects.deferred_removal
+29/45 Test   #6: objects.deferred_removal ..........   Passed    0.02 sec
+      Start   8: objects.handles_selection
+30/45 Test   #8: objects.handles_selection .........   Passed    0.02 sec
+      Start   3: objects.nested_creation
+31/45 Test   #3: objects.nested_creation ...........   Passed    0.02 sec
+      Start   5: objects.scheduling
+32/45 Test   #5: objects.scheduling ................   Passed    0.02 sec
+      Start  36: world.world_geometry
+33/45 Test  #36: world.world_geometry ..............   Passed    0.02 sec
+      Start 332: texture.malformed
+34/45 Test #332: texture.malformed .................   Passed    0.02 sec
+      Start   7: objects.aggregate_dispatch
+35/45 Test   #7: objects.aggregate_dispatch ........   Passed    0.02 sec
+      Start 326: world_view.rejects
+36/45 Test #326: world_view.rejects ................   Passed    0.02 sec
+      Start  35: world.world_properties
+37/45 Test  #35: world.world_properties ............   Passed    0.02 sec
+      Start  34: world.resource_mount
+38/45 Test  #34: world.resource_mount ..............   Passed    0.02 sec
+      Start 325: world_view.mesh
+39/45 Test #325: world_view.mesh ...................   Passed    0.02 sec
+      Start  33: world.rez_rejection
+40/45 Test  #33: world.rez_rejection ...............   Passed    0.02 sec
+      Start  32: world.rez_structure
+41/45 Test  #32: world.rez_structure ...............   Passed    0.02 sec
+      Start  40: world.session_messages
+42/45 Test  #40: world.session_messages ............   Passed    0.02 sec
+      Start 327: world_view.camera
+43/45 Test #327: world_view.camera .................   Passed    0.02 sec
+      Start 331: texture.decode
+44/45 Test #331: texture.decode ....................   Passed    0.02 sec
+45/45 Test  #44: world.private .....................   Passed    6.58 sec
+
+100% tests passed, 0 tests failed out of 45
+
+Label Time Summary:
+headless          = 112.26 sec*proc (45 tests)
+objects           =   0.37 sec*proc (12 tests)
+private           = 108.54 sec*proc (5 tests)
+surface_effect    =   0.86 sec*proc (3 tests)
+texture           =  16.74 sec*proc (4 tests)
+world             =  84.64 sec*proc (20 tests)
+world_view        =  10.51 sec*proc (9 tests)
+
+Total Test time (real) =  56.23 sec

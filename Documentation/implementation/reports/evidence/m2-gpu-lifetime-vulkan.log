@@ -1,0 +1,804 @@
+   2341000:	
+   2341000:	file=libvulkan.so.1 [0];  needed by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libvulkan.so.1 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e99f7348  base: 0x00007fd2e9970000   size: 0x00000000000881d0
+   2341000:	    entry: 0x00007fd2e9970000  phdr: 0x00007fd2e9970040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	file=libstdc++.so.6 [0];  needed by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libstdc++.so.6 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e98a99e8  base: 0x00007fd2e9600000   size: 0x00000000002b12c0
+   2341000:	    entry: 0x00007fd2e9600000  phdr: 0x00007fd2e9600040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	file=libm.so.6 [0];  needed by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libm.so.6 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e95feb98  base: 0x00007fd2e94e9000   size: 0x0000000000116010
+   2341000:	    entry: 0x00007fd2e94e9000  phdr: 0x00007fd2e94e9040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	file=libresolv.so.2 [0];  needed by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libresolv.so.2 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e996cb68  base: 0x00007fd2e995d000   size: 0x0000000000012888
+   2341000:	    entry: 0x00007fd2e995d000  phdr: 0x00007fd2e995d040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	file=libgcc_s.so.1 [0];  needed by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libgcc_s.so.1 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e995bbe0  base: 0x00007fd2e9930000   size: 0x000000000002c1c8
+   2341000:	    entry: 0x00007fd2e9930000  phdr: 0x00007fd2e9930040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	file=libc.so.6 [0];  needed by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libc.so.6 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e94de920  base: 0x00007fd2e92f0000   size: 0x00000000001f8b70
+   2341000:	    entry: 0x00007fd2e92f38a0  phdr: 0x00007fd2e92f0040  phnum:                 14
+   2341000:	
+   2341000:	
+   2341000:	calling preinit: /tmp/b2-gpu-lifetime-vulkan
+   2341000:	
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: __isoc99_printf (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: __isoc99_sprintf (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: __isoc99_snprintf (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: __isoc99_fprintf (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: __isoc99_vprintf (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: __isoc99_vsprintf (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: __isoc99_vsnprintf (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: __isoc99_vfprintf (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: pthread_mutexattr_getrobust_np (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdrmem_create (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdrstdio_create (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_short (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_u_short (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_int (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_u_int (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_long (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_u_long (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_hyper (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_u_hyper (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_longlong_t (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_u_longlong_t (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_int8_t (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_uint8_t (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_int16_t (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_uint16_t (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_int32_t (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_uint32_t (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_int64_t (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_uint64_t (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_quad_t (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_u_quad_t (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_bool (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_enum (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_char (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_u_char (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_float (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_double (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_bytes (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_string (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdrrec_create (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: xdr_destroy (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: __cxa_rethrow_primary_exception (fatal)
+   2341000:	/tmp/b2-gpu-lifetime-vulkan: error: symbol lookup error: undefined symbol: swift_demangle (fatal)
+   2341000:	
+   2341000:	calling init: /lib64/ld-linux-x86-64.so.2
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libc.so.6
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libgcc_s.so.1
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libresolv.so.2
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libm.so.6
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libstdc++.so.6
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libvulkan.so.1
+   2341000:	
+   2341000:	
+   2341000:	initialize program: /tmp/b2-gpu-lifetime-vulkan
+   2341000:	
+   2341000:	
+   2341000:	transferring control: /tmp/b2-gpu-lifetime-vulkan
+   2341000:	
+   2341000:	
+   2341000:	file=/usr/lib64/libGLX_nvidia.so.0 [0];  dynamically loaded by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=/usr/lib64/libGLX_nvidia.so.0 [0];  generating link map
+   2341000:	  dynamic: 0x00007bd2e85d6d28  base: 0x00007bd2e84b3000   size: 0x000000000012a578
+   2341000:	    entry: 0x00007bd2e8504660  phdr: 0x00007bd2e84b3040  phnum:                  9
+   2341000:	
+   2341000:	
+   2341000:	file=libnvidia-glsi.so.615.78.08 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   2341000:	file=libnvidia-glsi.so.615.78.08 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e8db8db0  base: 0x00007fd2e8d26000   size: 0x000000000009bb58
+   2341000:	    entry: 0x00007fd2e8d367f0  phdr: 0x00007fd2e8d26040  phnum:                  9
+   2341000:	
+   2341000:	
+   2341000:	file=libnvidia-tls.so.615.78.08 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   2341000:	file=libnvidia-tls.so.615.78.08 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e99ffe00  base: 0x00007fd2e99fb000   size: 0x0000000000005280
+   2341000:	    entry: 0x00007fd2e99fc050  phdr: 0x00007fd2e99fb040  phnum:                 10
+   2341000:	
+   2341000:	
+   2341000:	file=libnvidia-glcore.so.615.78.08 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   2341000:	file=libnvidia-glcore.so.615.78.08 [0];  generating link map
+   2341000:	  dynamic: 0x00007bd2e5f93d28  base: 0x00007bd2e3800000   size: 0x0000000002816050
+   2341000:	    entry: 0x00007bd2e3a72000  phdr: 0x00007bd2e3800040  phnum:                  7
+   2341000:	
+   2341000:	
+   2341000:	file=libX11.so.6 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   2341000:	file=libX11.so.6 [0];  generating link map
+   2341000:	  dynamic: 0x00007bd2e70e15f0  base: 0x00007bd2e6f92000   size: 0x00000000001548a8
+   2341000:	    entry: 0x00007bd2e6f92000  phdr: 0x00007bd2e6f92040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	file=libXext.so.6 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   2341000:	file=libXext.so.6 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e98cab80  base: 0x00007fd2e98b8000   size: 0x0000000000013720
+   2341000:	    entry: 0x00007fd2e98b8000  phdr: 0x00007fd2e98b8040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	file=libdl.so.2 [0];  needed by /usr/lib64/libGLX_nvidia.so.0 [0]
+   2341000:	file=libdl.so.2 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e98b6d40  base: 0x00007fd2e98b4000   size: 0x0000000000003008
+   2341000:	    entry: 0x00007fd2e98b4000  phdr: 0x00007fd2e98b4040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	file=libpthread.so.0 [0];  needed by /lib64/libnvidia-glsi.so.615.78.08 [0]
+   2341000:	file=libpthread.so.0 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e8d24d40  base: 0x00007fd2e8d22000   size: 0x0000000000003008
+   2341000:	    entry: 0x00007fd2e8d22000  phdr: 0x00007fd2e8d22040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	file=librt.so.1 [0];  needed by /lib64/libnvidia-glsi.so.615.78.08 [0]
+   2341000:	file=librt.so.1 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e8d20d30  base: 0x00007fd2e8d1e000   size: 0x0000000000003008
+   2341000:	    entry: 0x00007fd2e8d1e000  phdr: 0x00007fd2e8d1e040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	file=libnvidia-gpucomp.so.615.78.08 [0];  needed by /lib64/libnvidia-glcore.so.615.78.08 [0]
+   2341000:	file=libnvidia-gpucomp.so.615.78.08 [0];  generating link map
+   2341000:	  dynamic: 0x00007bd2e34245b0  base: 0x00007bd2dc200000   size: 0x00000000074cc2c0
+   2341000:	    entry: 0x00007bd2dc598ff0  phdr: 0x00007bd2dc200040  phnum:                 10
+   2341000:	
+   2341000:	
+   2341000:	file=libxcb.so.1 [0];  needed by /lib64/libX11.so.6 [0]
+   2341000:	file=libxcb.so.1 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e89fe9e8  base: 0x00007fd2e89d6000   size: 0x00000000000290a8
+   2341000:	    entry: 0x00007fd2e89d6000  phdr: 0x00007fd2e89d6040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	file=libXau.so.6 [0];  needed by /lib64/libxcb.so.1 [0]
+   2341000:	file=libXau.so.6 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e8d1ccc0  base: 0x00007fd2e8d19000   size: 0x0000000000004020
+   2341000:	    entry: 0x00007fd2e8d19000  phdr: 0x00007fd2e8d19040  phnum:                 11
+   2341000:	
+   2341000:	activating NODELETE for /lib64/librt.so.1 [0]
+   2341000:	
+   2341000:	calling init: /lib64/libXau.so.6
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libxcb.so.1
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libpthread.so.0
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/librt.so.1
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libdl.so.2
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libnvidia-gpucomp.so.615.78.08
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libX11.so.6
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libXext.so.6
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libnvidia-tls.so.615.78.08
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libnvidia-glcore.so.615.78.08
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libnvidia-glsi.so.615.78.08
+   2341000:	
+   2341000:	
+   2341000:	calling init: /usr/lib64/libGLX_nvidia.so.0
+   2341000:	
+   2341000:	opening file=/lib64/libc.so.6 [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	closing file=/lib64/libc.so.6; direct_opencount=0
+   2341000:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: __malloc_hook (fatal)
+   2341000:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: __realloc_hook (fatal)
+   2341000:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: __free_hook (fatal)
+   2341000:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: __memalign_hook (fatal)
+   2341000:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: ErrorF (fatal)
+   2341000:	
+   2341000:	closing file=; direct_opencount=1
+   2341000:	
+   2341000:	closing file=; direct_opencount=1
+   2341000:	opening file=/lib64/libpthread.so.0 [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	closing file=; direct_opencount=1
+   2341000:	
+   2341000:	closing file=; direct_opencount=1
+   2341000:	
+   2341000:	closing file=; direct_opencount=1
+   2341000:	
+   2341000:	closing file=; direct_opencount=1
+   2341000:	opening file=/usr/lib64/libGLX_nvidia.so.0 [0]; direct_opencount=1
+   2341000:	
+   2341000:	opening file=/lib64/libxcb.so.1 [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	file=libxcb-glx.so.0 [0];  dynamically loaded by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libxcb-glx.so.0 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e98ebd48  base: 0x00007fd2e98d1000   size: 0x000000000001b018
+   2341000:	    entry: 0x00007fd2e98d1000  phdr: 0x00007fd2e98d1040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libxcb-glx.so.0
+   2341000:	
+   2341000:	opening file=/lib64/libxcb-glx.so.0 [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	file=libxcb-randr.so.0 [0];  dynamically loaded by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libxcb-randr.so.0 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e8d17c68  base: 0x00007fd2e8d07000   size: 0x0000000000011018
+   2341000:	    entry: 0x00007fd2e8d07000  phdr: 0x00007fd2e8d07040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libxcb-randr.so.0
+   2341000:	
+   2341000:	opening file=/lib64/libxcb-randr.so.0 [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	file=libxcb-dri3.so.0 [0];  dynamically loaded by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libxcb-dri3.so.0 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e8d05d38  base: 0x00007fd2e8d01000   size: 0x0000000000005018
+   2341000:	    entry: 0x00007fd2e8d01000  phdr: 0x00007fd2e8d01040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libxcb-dri3.so.0
+   2341000:	
+   2341000:	opening file=/lib64/libxcb-dri3.so.0 [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	file=libX11-xcb.so.1 [0];  dynamically loaded by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libX11-xcb.so.1 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e98cfde0  base: 0x00007fd2e98cd000   size: 0x0000000000003008
+   2341000:	    entry: 0x00007fd2e98cd000  phdr: 0x00007fd2e98cd040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libX11-xcb.so.1
+   2341000:	
+   2341000:	opening file=/lib64/libX11-xcb.so.1 [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	file=libxcb-present.so.0 [0];  dynamically loaded by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libxcb-present.so.0 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e891dd68  base: 0x00007fd2e891a000   size: 0x0000000000004018
+   2341000:	    entry: 0x00007fd2e891a000  phdr: 0x00007fd2e891a040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libxcb-present.so.0
+   2341000:	
+   2341000:	opening file=/lib64/libxcb-present.so.0 [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	file=libxcb-sync.so.1 [0];  dynamically loaded by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libxcb-sync.so.1 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e8918d08  base: 0x00007fd2e8912000   size: 0x0000000000007018
+   2341000:	    entry: 0x00007fd2e8912000  phdr: 0x00007fd2e8912040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libxcb-sync.so.1
+   2341000:	
+   2341000:	opening file=/lib64/libxcb-sync.so.1 [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	file=libxcb-xfixes.so.0 [0];  dynamically loaded by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libxcb-xfixes.so.0 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e8910d58  base: 0x00007fd2e8909000   size: 0x0000000000008018
+   2341000:	    entry: 0x00007fd2e8909000  phdr: 0x00007fd2e8909040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libxcb-xfixes.so.0
+   2341000:	
+   2341000:	opening file=/lib64/libxcb-xfixes.so.0 [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	closing file=; direct_opencount=1
+   2341000:	
+   2341000:	closing file=; direct_opencount=1
+   2341000:	
+   2341000:	closing file=; direct_opencount=1
+   2341000:	
+   2341000:	file=libdbus-1.so.3 [0];  dynamically loaded by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libdbus-1.so.3 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e876fdb8  base: 0x00007fd2e871a000   size: 0x00000000000572d0
+   2341000:	    entry: 0x00007fd2e871a000  phdr: 0x00007fd2e871a040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	file=libsystemd.so.0 [0];  needed by /lib64/libdbus-1.so.3 [0]
+   2341000:	file=libsystemd.so.0 [0];  generating link map
+   2341000:	  dynamic: 0x00007bd2d7a967f0  base: 0x00007bd2d7960000   size: 0x0000000000139850
+   2341000:	    entry: 0x00007bd2d7960000  phdr: 0x00007bd2d7960040  phnum:                 12
+   2341000:	
+   2341000:	activating NODELETE for /lib64/libdbus-1.so.3 [0]
+   2341000:	activating NODELETE for /lib64/libsystemd.so.0 [0]
+   2341000:	
+   2341000:	calling init: /lib64/libsystemd.so.0
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libdbus-1.so.3
+   2341000:	
+   2341000:	opening file=/lib64/libdbus-1.so.3 [0]; direct_opencount=1
+   2341000:	
+   2341000:	/lib64/libnvidia-glcore.so.615.78.08: error: symbol lookup error: undefined symbol: dbus_bus_get (fatal)
+   2341000:	
+   2341000:	file=libdrm.so.2 [0];  dynamically loaded by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libdrm.so.2 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e8718aa8  base: 0x00007fd2e8704000   size: 0x00000000000159f8
+   2341000:	    entry: 0x00007fd2e8704000  phdr: 0x00007fd2e8704040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libdrm.so.2
+   2341000:	
+   2341000:	opening file=/lib64/libdrm.so.2 [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	file=libnvidia-allocator.so.1 [0];  dynamically loaded by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libnvidia-allocator.so.1 [0];  generating link map
+   2341000:	  dynamic: 0x00007bd2e84afe08  base: 0x00007bd2e848b000   size: 0x0000000000027150
+   2341000:	    entry: 0x00007bd2e848f530  phdr: 0x00007bd2e848b040  phnum:                  9
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libnvidia-allocator.so.1
+   2341000:	
+   2341000:	opening file=/lib64/libnvidia-allocator.so.1 [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	file=libVkLayer_MESA_device_select.so [0];  dynamically loaded by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libVkLayer_MESA_device_select.so [0];  generating link map
+   2341000:	  dynamic: 0x00007bd2e6f27950  base: 0x00007bd2e6f11000   size: 0x00000000000191d0
+   2341000:	    entry: 0x00007bd2e6f11000  phdr: 0x00007bd2e6f11040  phnum:                 12
+   2341000:	
+   2341000:	
+   2341000:	file=libwayland-client.so.0 [0];  needed by /lib64/libVkLayer_MESA_device_select.so [0]
+   2341000:	file=libwayland-client.so.0 [0];  generating link map
+   2341000:	  dynamic: 0x00007fd2e892fb08  base: 0x00007fd2e8921000   size: 0x000000000000f350
+   2341000:	    entry: 0x00007fd2e8921000  phdr: 0x00007fd2e8921040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	file=libffi.so.8 [0];  needed by /lib64/libwayland-client.so.0 [0]
+   2341000:	file=libffi.so.8 [0];  generating link map
+   2341000:	  dynamic: 0x00007bd2e6f0fbd8  base: 0x00007bd2e6f01000   size: 0x000000000000f550
+   2341000:	    entry: 0x00007bd2e6f01000  phdr: 0x00007bd2e6f01040  phnum:                 11
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libffi.so.8
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libwayland-client.so.0
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libVkLayer_MESA_device_select.so
+   2341000:	
+   2341000:	opening file=/lib64/libVkLayer_MESA_device_select.so [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	file=libnvidia-glvkspirv.so.615.78.08 [0];  dynamically loaded by /tmp/b2-gpu-lifetime-vulkan [0]
+   2341000:	file=libnvidia-glvkspirv.so.615.78.08 [0];  generating link map
+   2341000:	  dynamic: 0x00007bd2d776d848  base: 0x00007bd2d6e00000   size: 0x0000000000a0e320
+   2341000:	    entry: 0x00007bd2d6e34c30  phdr: 0x00007bd2d6e00040  phnum:                 10
+   2341000:	
+   2341000:	
+   2341000:	calling init: /lib64/libnvidia-glvkspirv.so.615.78.08
+   2341000:	
+   2341000:	opening file=/lib64/libnvidia-glvkspirv.so.615.78.08 [0]; direct_opencount=1
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /usr/lib64/libGLX_nvidia.so.0 [0]
+   2341000:	
+   2341000:	
+   2341000:	closing file=/lib64/libnvidia-glvkspirv.so.615.78.08; direct_opencount=0
+   2341000:	
+   2341000:	closing file=/lib64/libxcb.so.1; direct_opencount=1
+   2341000:	
+   2341000:	closing file=/lib64/libX11-xcb.so.1; direct_opencount=1
+   2341000:	
+   2341000:	closing file=/lib64/libxcb.so.1; direct_opencount=0
+   2341000:	
+   2341000:	closing file=/lib64/libxcb-dri3.so.0; direct_opencount=1
+   2341000:	
+   2341000:	closing file=/lib64/libxcb-present.so.0; direct_opencount=0
+   2341000:	
+   2341000:	closing file=/lib64/libxcb-sync.so.1; direct_opencount=0
+   2341000:	
+   2341000:	closing file=/lib64/libxcb-xfixes.so.0; direct_opencount=0
+   2341000:	
+   2341000:	closing file=/lib64/libdrm.so.2; direct_opencount=1
+   2341000:	
+   2341000:	closing file=/lib64/libnvidia-allocator.so.1; direct_opencount=0
+   2341000:	
+   2341000:	closing file=/lib64/libdrm.so.2; direct_opencount=0
+   2341000:	
+   2341000:	calling fini: /lib64/libnvidia-glsi.so.615.78.08 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libnvidia-glcore.so.615.78.08 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libnvidia-tls.so.615.78.08 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libXext.so.6 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libX11.so.6 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libnvidia-gpucomp.so.615.78.08 [0]
+   2341000:	
+Vulkan device: NVIDIA GeForce RTX 3060 Laptop GPU
+   2341000:	
+   2341000:	file=/usr/lib64/libGLX_nvidia.so.0 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libnvidia-glsi.so.615.78.08 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libnvidia-glcore.so.615.78.08 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libnvidia-tls.so.615.78.08 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libXext.so.6 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libX11.so.6 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libnvidia-gpucomp.so.615.78.08 [0];  destroying link map
+   2341000:	
+   2341000:	calling fini: /lib64/libxcb-present.so.0 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libxcb-sync.so.1 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libxcb-xfixes.so.0 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libnvidia-allocator.so.1 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libnvidia-glvkspirv.so.615.78.08 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libdl.so.2 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libpthread.so.0 [0]
+   2341000:	
+   2341000:	
+   2341000:	file=/lib64/libxcb-present.so.0 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libxcb-sync.so.1 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libxcb-xfixes.so.0 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libnvidia-allocator.so.1 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libnvidia-glvkspirv.so.615.78.08 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libdl.so.2 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libpthread.so.0 [0];  destroying link map
+   2341000:	
+   2341000:	calling fini: /lib64/libVkLayer_MESA_device_select.so [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libdrm.so.2 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libwayland-client.so.0 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libffi.so.8 [0]
+   2341000:	
+   2341000:	
+   2341000:	file=/lib64/libVkLayer_MESA_device_select.so [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libdrm.so.2 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libwayland-client.so.0 [0];  destroying link map
+   2341000:	
+   2341000:	file=/lib64/libffi.so.8 [0];  destroying link map
+   2341000:	
+   2341000:	calling fini:  [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libvulkan.so.1 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libstdc++.so.6 [0]
+   2341000:	
+Vulkan instance teardown complete
+   2341000:	
+   2341000:	calling fini: /lib64/libresolv.so.2 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/librt.so.1 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libxcb-glx.so.0 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libxcb-randr.so.0 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libxcb-dri3.so.0 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libxcb.so.1 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libXau.so.6 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libX11-xcb.so.1 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libdbus-1.so.3 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libsystemd.so.0 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libgcc_s.so.1 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libm.so.6 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/libc.so.6 [0]
+   2341000:	
+   2341000:	
+   2341000:	calling fini: /lib64/ld-linux-x86-64.so.2 [0]
+   2341000:	
+   2341024:	
+   2341024:	file=libbfd-2.46.1-1.fc44.so [0];  needed by /usr/bin/addr2line [0]
+   2341024:	file=libbfd-2.46.1-1.fc44.so [0];  generating link map
+   2341024:	  dynamic: 0x00007f8262b21ff8  base: 0x00007f82629e1000   size: 0x0000000000142d30
+   2341024:	    entry: 0x00007f82629e1000  phdr: 0x00007f82629e1040  phnum:                 12
+   2341024:	
+   2341024:	
+   2341024:	file=libc.so.6 [0];  needed by /usr/bin/addr2line [0]
+   2341024:	file=libc.so.6 [0];  generating link map
+   2341024:	  dynamic: 0x00007f82629d6920  base: 0x00007f82627e8000   size: 0x00000000001f8b70
+   2341024:	    entry: 0x00007f82627eb8a0  phdr: 0x00007f82627e8040  phnum:                 14
+   2341024:	
+   2341024:	
+   2341024:	file=libz.so.1 [0];  needed by /lib64/libbfd-2.46.1-1.fc44.so [0]
+   2341024:	file=libz.so.1 [0];  generating link map
+   2341024:	  dynamic: 0x00007f82627e6cc8  base: 0x00007f82627be000   size: 0x0000000000029078
+   2341024:	    entry: 0x00007f82627be000  phdr: 0x00007f82627be040  phnum:                 11
+   2341024:	
+   2341024:	
+   2341024:	file=libzstd.so.1 [0];  needed by /lib64/libbfd-2.46.1-1.fc44.so [0]
+   2341024:	file=libzstd.so.1 [0];  generating link map
+   2341024:	  dynamic: 0x00007f82627bc2b0  base: 0x00007f82626d4000   size: 0x00000000000e9030
+   2341024:	    entry: 0x00007f82626d4000  phdr: 0x00007f82626d4040  phnum:                 11
+   2341024:	
+   2341024:	
+   2341024:	file=libsframe.so.3 [0];  needed by /lib64/libbfd-2.46.1-1.fc44.so [0]
+   2341024:	file=libsframe.so.3 [0];  generating link map
+   2341024:	  dynamic: 0x00007f82626d2c10  base: 0x00007f82626c9000   size: 0x000000000000a010
+   2341024:	    entry: 0x00007f82626c9000  phdr: 0x00007f82626c9040  phnum:                 11
+   2341024:	
+   2341024:	
+   2341024:	calling init: /lib64/ld-linux-x86-64.so.2
+   2341024:	
+   2341024:	
+   2341024:	calling init: /lib64/libc.so.6
+   2341024:	
+   2341024:	
+   2341024:	calling init: /lib64/libsframe.so.3
+   2341024:	
+   2341024:	
+   2341024:	calling init: /lib64/libzstd.so.1
+   2341024:	
+   2341024:	
+   2341024:	calling init: /lib64/libz.so.1
+   2341024:	
+   2341024:	
+   2341024:	calling init: /lib64/libbfd-2.46.1-1.fc44.so
+   2341024:	
+   2341024:	
+   2341024:	initialize program: /usr/bin/addr2line
+   2341024:	
+   2341024:	
+   2341024:	transferring control: /usr/bin/addr2line
+   2341024:	
+   2341025:	
+   2341025:	file=libbfd-2.46.1-1.fc44.so [0];  needed by /usr/bin/addr2line [0]
+   2341025:	file=libbfd-2.46.1-1.fc44.so [0];  generating link map
+   2341025:	  dynamic: 0x00007fce4fdd5ff8  base: 0x00007fce4fc95000   size: 0x0000000000142d30
+   2341025:	    entry: 0x00007fce4fc95000  phdr: 0x00007fce4fc95040  phnum:                 12
+   2341025:	
+   2341025:	
+   2341025:	file=libc.so.6 [0];  needed by /usr/bin/addr2line [0]
+   2341025:	file=libc.so.6 [0];  generating link map
+   2341025:	  dynamic: 0x00007fce4fc8a920  base: 0x00007fce4fa9c000   size: 0x00000000001f8b70
+   2341025:	    entry: 0x00007fce4fa9f8a0  phdr: 0x00007fce4fa9c040  phnum:                 14
+   2341025:	
+   2341025:	
+   2341025:	file=libz.so.1 [0];  needed by /lib64/libbfd-2.46.1-1.fc44.so [0]
+   2341025:	file=libz.so.1 [0];  generating link map
+   2341025:	  dynamic: 0x00007fce4fa9acc8  base: 0x00007fce4fa72000   size: 0x0000000000029078
+   2341025:	    entry: 0x00007fce4fa72000  phdr: 0x00007fce4fa72040  phnum:                 11
+   2341025:	
+   2341025:	
+   2341025:	file=libzstd.so.1 [0];  needed by /lib64/libbfd-2.46.1-1.fc44.so [0]
+   2341025:	file=libzstd.so.1 [0];  generating link map
+   2341025:	  dynamic: 0x00007fce4fa702b0  base: 0x00007fce4f988000   size: 0x00000000000e9030
+   2341025:	    entry: 0x00007fce4f988000  phdr: 0x00007fce4f988040  phnum:                 11
+   2341025:	
+   2341025:	
+   2341025:	file=libsframe.so.3 [0];  needed by /lib64/libbfd-2.46.1-1.fc44.so [0]
+   2341025:	file=libsframe.so.3 [0];  generating link map
+   2341025:	  dynamic: 0x00007fce4f986c10  base: 0x00007fce4f97d000   size: 0x000000000000a010
+   2341025:	    entry: 0x00007fce4f97d000  phdr: 0x00007fce4f97d040  phnum:                 11
+   2341025:	
+   2341025:	
+   2341025:	calling init: /lib64/ld-linux-x86-64.so.2
+   2341025:	
+   2341025:	
+   2341025:	calling init: /lib64/libc.so.6
+   2341025:	
+   2341025:	
+   2341025:	calling init: /lib64/libsframe.so.3
+   2341025:	
+   2341025:	
+   2341025:	calling init: /lib64/libzstd.so.1
+   2341025:	
+   2341025:	
+   2341025:	calling init: /lib64/libz.so.1
+   2341025:	
+   2341025:	
+   2341025:	calling init: /lib64/libbfd-2.46.1-1.fc44.so
+   2341025:	
+   2341025:	
+   2341025:	initialize program: /usr/bin/addr2line
+   2341025:	
+   2341025:	
+   2341025:	transferring control: /usr/bin/addr2line
+   2341025:	
+
+=================================================================
+==2341000==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 3696 byte(s) in 66 object(s) allocated from:
+    #0 0x0000004a69ad in calloc ??:?
+    #1 0x7bd2e41e7b8d  (<unknown module>)
+
+Direct leak of 1848 byte(s) in 33 object(s) allocated from:
+    #0 0x0000004a69ad in calloc ??:?
+    #1 0x7fd2e8d9035c  (<unknown module>)
+
+Direct leak of 184 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004a69ad in calloc ??:?
+    #1 0x7fd2e8736716 in _dbus_message_loader_get_buffer ??:?
+    #2 0x7fd2e8737aa7 in _dbus_message_loader_queue_messages ??:?
+    #3 0x7fd2e87444b0 in _dbus_server_new_for_tcp_socket ??:?
+    #4 0x7fd2e87446af in _dbus_server_new_for_tcp_socket ??:?
+    #5 0x7fd2e87449d2 in _dbus_server_new_for_tcp_socket ??:?
+    #6 0x7fd2e8744f11 in _dbus_server_new_for_tcp_socket ??:?
+    #7 0x7fd2e87265d5 in _dbus_connection_unref_unlocked ??:?
+    #8 0x7fd2e873d17f in dbus_pending_call_block ??:?
+    #9 0x7fd2e872857b in dbus_connection_send_with_reply_and_block ??:?
+    #10 0x7fd2e872885b in dbus_bus_register ??:?
+    #11 0x7fd2e8728c39 in dbus_bus_register ??:?
+    #12 0x7bd2e4219f06  (<unknown module>)
+
+Indirect leak of 6336 byte(s) in 66 object(s) allocated from:
+    #0 0x0000004a69ad in calloc ??:?
+    #1 0x7bd2e41e7b8d  (<unknown module>)
+
+Indirect leak of 3168 byte(s) in 33 object(s) allocated from:
+    #0 0x0000004a69ad in calloc ??:?
+    #1 0x7fd2e8d922e9  (<unknown module>)
+
+Indirect leak of 2986 byte(s) in 138 object(s) allocated from:
+    #0 0x0000004a67d8 in malloc ??:?
+    #1 0x7bd2e41e78d1  (<unknown module>)
+
+Indirect leak of 2189 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004a6be0 in realloc ??:?
+    #1 0x7fd2e87462dd in dbus_realloc ??:?
+    #2 0x7fd2e87471c7 in _dbus_string_compact ??:?
+    #3 0x7fd2e8747f04 in _dbus_string_copy_len ??:?
+    #4 0x7fd2e8738291 in _dbus_message_loader_queue_messages ??:?
+    #5 0x7fd2e87444b0 in _dbus_server_new_for_tcp_socket ??:?
+    #6 0x7fd2e87446af in _dbus_server_new_for_tcp_socket ??:?
+    #7 0x7fd2e87449d2 in _dbus_server_new_for_tcp_socket ??:?
+    #8 0x7fd2e8744f11 in _dbus_server_new_for_tcp_socket ??:?
+    #9 0x7fd2e87265d5 in _dbus_connection_unref_unlocked ??:?
+    #10 0x7fd2e873d17f in dbus_pending_call_block ??:?
+    #11 0x7fd2e872857b in dbus_connection_send_with_reply_and_block ??:?
+    #12 0x7bd2e4277c23  (<unknown module>)
+
+Indirect leak of 1493 byte(s) in 69 object(s) allocated from:
+    #0 0x0000004a67d8 in malloc ??:?
+    #1 0x7fd2e8d8ff68  (<unknown module>)
+
+Indirect leak of 96 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004a6be0 in realloc ??:?
+    #1 0x7fd2e87462dd in dbus_realloc ??:?
+    #2 0x7fd2e87471c7 in _dbus_string_compact ??:?
+    #3 0x7fd2e8747f04 in _dbus_string_copy_len ??:?
+    #4 0x7fd2e8737ae6 in _dbus_message_loader_queue_messages ??:?
+    #5 0x7fd2e87444b0 in _dbus_server_new_for_tcp_socket ??:?
+    #6 0x7fd2e87446af in _dbus_server_new_for_tcp_socket ??:?
+    #7 0x7fd2e87449d2 in _dbus_server_new_for_tcp_socket ??:?
+    #8 0x7fd2e8744f11 in _dbus_server_new_for_tcp_socket ??:?
+    #9 0x7fd2e87265d5 in _dbus_connection_unref_unlocked ??:?
+    #10 0x7fd2e873d17f in dbus_pending_call_block ??:?
+    #11 0x7fd2e872857b in dbus_connection_send_with_reply_and_block ??:?
+    #12 0x7fd2e872885b in dbus_bus_register ??:?
+    #13 0x7fd2e8728c39 in dbus_bus_register ??:?
+    #14 0x7bd2e4219f06  (<unknown module>)
+
+SUMMARY: AddressSanitizer: 21996 byte(s) leaked in 408 allocation(s).
+   2341025:	
+   2341025:	calling fini:  [0]
+   2341025:	
+   2341025:	
+   2341025:	calling fini: /lib64/libbfd-2.46.1-1.fc44.so [0]
+   2341025:	
+   2341025:	
+   2341025:	calling fini: /lib64/libz.so.1 [0]
+   2341025:	
+   2341025:	
+   2341025:	calling fini: /lib64/libzstd.so.1 [0]
+   2341025:	
+   2341025:	
+   2341025:	calling fini: /lib64/libsframe.so.3 [0]
+   2341025:	
+   2341025:	
+   2341025:	calling fini: /lib64/libc.so.6 [0]
+   2341025:	
+   2341025:	
+   2341025:	calling fini: /lib64/ld-linux-x86-64.so.2 [0]
+   2341025:	
+   2341024:	
+   2341024:	calling fini:  [0]
+   2341024:	
+   2341024:	
+   2341024:	calling fini: /lib64/libbfd-2.46.1-1.fc44.so [0]
+   2341024:	
+   2341024:	
+   2341024:	calling fini: /lib64/libz.so.1 [0]
+   2341024:	
+   2341024:	
+   2341024:	calling fini: /lib64/libzstd.so.1 [0]
+   2341024:	
+   2341024:	
+   2341024:	calling fini: /lib64/libsframe.so.3 [0]
+   2341024:	
+   2341024:	
+   2341024:	calling fini: /lib64/libc.so.6 [0]
+   2341024:	
+   2341024:	
+   2341024:	calling fini: /lib64/ld-linux-x86-64.so.2 [0]
+   2341024:	

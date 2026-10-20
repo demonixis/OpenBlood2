@@ -1,0 +1,87 @@
+FILE: final-input-debug-tests.log
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 1095: menus.state
+1/3 Test #1095: menus.state ......................   Passed    0.00 sec
+    Start 1098: menus.session
+2/3 Test #1098: menus.session ....................   Passed    1.54 sec
+    Start 1100: menus.preferences
+3/3 Test #1100: menus.preferences ................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+headless    =   1.55 sec*proc (3 tests)
+menus       =   1.55 sec*proc (3 tests)
+private     =   1.54 sec*proc (1 test)
+
+Total Test time (real) =   1.56 sec
+
+FILE: final-input-release-tests.log
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1095: menus.state
+1/3 Test #1095: menus.state ......................   Passed    0.00 sec
+    Start 1098: menus.session
+2/3 Test #1098: menus.session ....................   Passed    0.21 sec
+    Start 1100: menus.preferences
+3/3 Test #1100: menus.preferences ................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+headless    =   0.21 sec*proc (3 tests)
+menus       =   0.21 sec*proc (3 tests)
+private     =   0.21 sec*proc (1 test)
+
+Total Test time (real) =   0.23 sec
+
+FILE: audio-notice-debug-tests.log
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 1095: menus.state
+1/3 Test #1095: menus.state ......................   Passed    0.00 sec
+    Start 1096: menus.artwork
+2/3 Test #1096: menus.artwork ....................   Passed    0.29 sec
+    Start 1100: menus.preferences
+3/3 Test #1100: menus.preferences ................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+headless    =   0.30 sec*proc (3 tests)
+menus       =   0.30 sec*proc (3 tests)
+private     =   0.29 sec*proc (1 test)
+
+Total Test time (real) =   0.32 sec
+
+FILE: audio-notice-release-tests.log
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1095: menus.state
+1/3 Test #1095: menus.state ......................   Passed    0.00 sec
+    Start 1096: menus.artwork
+2/3 Test #1096: menus.artwork ....................   Passed    0.03 sec
+    Start 1100: menus.preferences
+3/3 Test #1100: menus.preferences ................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+headless    =   0.04 sec*proc (3 tests)
+menus       =   0.04 sec*proc (3 tests)
+private     =   0.03 sec*proc (1 test)
+
+Total Test time (real) =   0.06 sec
+
+FILE: audio-notice-sanitize-tests.log
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 997: menus.state
+1/2 Test #997: menus.state ......................   Passed    0.02 sec
+    Start 998: menus.artwork
+2/2 Test #998: menus.artwork ....................   Passed    1.41 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+headless    =   1.43 sec*proc (2 tests)
+menus       =   1.43 sec*proc (2 tests)
+private     =   1.41 sec*proc (1 test)
+
+Total Test time (real) =   1.45 sec

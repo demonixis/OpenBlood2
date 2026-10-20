@@ -1,0 +1,15 @@
+654/655 Testing: gpu.wind
+654/655 Test: gpu.wind
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/wind_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/wind-gpu"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.wind" start time: Oct 17 01:45 CEST
+Output:
+----------------------------------------------------------
+Original shockwave scale850 alpha.375: 1 triangles, 11665 changed pixels
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.wind" end time: Oct 17 01:45 CEST
+"gpu.wind" time elapsed: 00:00:00
+----------------------------------------------------------

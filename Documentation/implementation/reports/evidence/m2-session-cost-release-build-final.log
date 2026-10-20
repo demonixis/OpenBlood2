@@ -1,0 +1,7 @@
+[0/2] Re-checking globbed directories...
+[1/31] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[2/31] Scanning /home/yann/projects/lithtech/Blood2/tests/particle_stream_tests.cpp for CXX dependencies
+[3/31] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[4/10] Generating CXX dyndep file tests/CMakeFiles/particle_stream_tests.dir/CXX.dd
+[5/7] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[6/7] Linking CXX executable blood2

@@ -1,0 +1,1859 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index f3a065e..af7739c 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -241,3 +241,10 @@ body-first rays, head retry only after an obstruction, target-hit requirements a
+ checked lifetime. Current head poses and hidden/reload inspection are exercised;
+ range/FOV, target acquisition, states, attacks and production NPCs remain unported.
+ The 17 unsupported SubwayA entries and actual M2 gate remain unchanged.
++
++The latest [held-model/attachment evidence](../Documentation/Implementation/M2_ATTACHMENTS.md) connects original CWeapon held models,
++selected inventory visibility and typed parent/node transforms. Read [contracts](docs/ATTACHMENT_CONTRACTS.md).
++Preserve original gun-node/origin fallback, handheld clip, independent child removal,
++non-reused IDs and deferred ownership cleanup. Visual children only: chains, physical
++children, dropped weapons and client visibility SFX remain unavailable. Hidden/reload
++inspection runs outside UI; required AI/ExitTrigger/FX keep M2 incomplete.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 677bc7d..54e7785 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,13 +14,13 @@ include(CTest)
+ include(cmake/Dependencies.cmake)
+ configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+ 
+-add_library(engine STATIC src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
++add_library(engine STATIC src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+ target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
+ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+ 
+-add_library(blood2_game STATIC
++add_library(blood2_game STATIC src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+     src/game/original/engineobjects.cpp
+     src/game/original/B2BaseClass.cpp
+     src/game/original/CameraSpot.cpp
+diff --git a/README.md b/README.md
+index c91a478..d21b785 100644
+--- a/README.md
++++ b/README.md
+@@ -277,3 +277,13 @@ The AI visibility increment passed 315/315 tests in both Debug and inspector-fre
+ Release, plus 292/292 sequential headless checks with Clang ASan/UBSan/leak
+ detection on Linux. The private catalog covers 240 animation midpoints across
+ six NPC models; GPU inspection verifies hidden queries and fresh reload identities.
++
++Latest M2 continuation: [original held weapons and attachments](../Documentation/Implementation/M2_ATTACHMENTS.md) adds
++Beretta/knife hand models, current-pose attachment transforms and in-game inspection.
++The source's missing-gun-node fallback remains visible in diagnostics. Dropped weapons,
++client visibility SFX, required NPC classes and complete M2 remain unavailable.
++
++The held-model/attachment increment passed 323/323 tests in both Debug and
++inspector-free Release, plus 300/300 sequential headless checks with Clang
++ASan/UBSan/leak detection on Linux. Seven private character models cover 652
++clip/hand samples, including 160 explicit missing-gun-node origin fallbacks.
+diff --git a/docs/ATTACHMENT_CONTRACTS.md b/docs/ATTACHMENT_CONTRACTS.md
+new file mode 100644
+index 0000000..bc59c14
+--- /dev/null
++++ b/docs/ATTACHMENT_CONTRACTS.md
+@@ -0,0 +1,97 @@
++# Held models and attachments
++
++This M2 increment connects the original CWeapon ShowHandModel/CreateHandModel,
++CInventoryMgr current-hand branch and held CHandWeaponModel lifecycle. It adds
++real attachment transforms through typed SDK methods. See the
++[source ledger](M2_ATTACHMENT_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_ATTACHMENTS.md).
++M2 remains incomplete; dropping weapons, client hand-visibility SFX and production
++NPCs are not supplied by this increment.
++
++## Original rules and adaptations
++
++The current living player's inventory creates both occupied hand slots. Selection
++removes both old hand models; death hides/removes the current models. Each weapon
++owns its child and removes it in its destructor. The engine relation owns neither
++endpoint. Opaque checked object handles replace the original borrowed CWeapon /
++CHandWeaponModel pointers; independently removing a child or detaching its relation is safe and the next
++inventory update recreates it. No callbacks dereference a destroyed weapon.
++
++CreateHandModel uses the unchanged WeaponData model/skin paths, visible and
++force-client-update flags, the optional `handheld` animation, zero position offset
++and identity rotation offset. Right and left use `r_gun` and `l_gun`. A missing gun
++node attaches at the owner's origin and requests hidden visibility, as the source
++branch specifies. It does not silently select another node. Missing model data
++fails and removes the partially created child. Client weapon synchronization
++preflights both hand ABC and indexed skin before entry/selection succeeds. Skins
++are still indexed only, not decoded or rendered.
++
++The original CHandWeaponModel dimension of 0.1 and first-update visibility branch
++are retained. Its accidental MID_PRECREATE fallthrough into Update is excluded:
++precreate has no committed engine state in this boundary. The first scheduled
++update applies the visibility request and then disables updates for the held
++model. Client IDs/SFX, dropped-body physics, powerup spawning and save/restore
++are not imported. A readable diagnostic model is not a working first-person
++visibility effect. No extra hand-model animation keys or gameplay rules are added.
++
++The selected inventory branch runs once after the local player's movement/client
++weapon update, outside callbacks; it uses the current selected slot and propagates
++failure. The broader original inventory Update and server view-model objects are
++still selective ports. Changing a slot removes old held models even when later
++client preflight fails; the selected slot rolls back and recreates its old hand
++models on the next update. Existing client model rollback remains atomic.
++
++## Engine relation contract
++
++CreateAttachment/RemoveAttachment/FindAttachment/GetAttachedModelNodeTransform
++use compiler-checked declarations. HATTACHMENT is a monotonically allocated
++64-bit integer, zero invalid, with 65,536 allocations per Objects lifetime. IDs
++are never reused on unload. Creation validates all inputs before changing either
++child transform or relation output. Failed creation clears the output ID.
++
++This supports one parent and one level of **visual** children: normal, model or
++sprite. Duplicate parenting, chains/cycles, self-parenting, container/world-model
++children, client-controlled children, physical flags and nonzero velocity or
++acceleration reject. Independent movement/teleport/rotation/velocity/keyframe
++updates and adding physical flags to an attached child reject. No joint solver,
++attachment collision or parent scale inheritance for child size is claimed.
++
++The relation stores copied node names and local offsets. It reuses the existing
++[current node sampler](CHARACTER_ANIMATION_CONTRACTS.md), including parent scale
++for the node's location. Position is base-position plus base-rotation times offset;
++rotation is base-rotation times offset-rotation. Offsets and child scale are not
++multiplied by parent scale. The later LithTech transform implementation was read
++as supporting reference, not imported or claimed generation-identical.
++
++Transforms refresh after session simulation, before attached object/node
++position queries and before segment intersection. All-object rays use the actual
++child bounds; solid-only rays exclude these nonsolid children. They do not advance clocks, emit keys, integrate physics or
++rely on visibility/activity or ImGui. Attached children skip generic physics.
++When model replacement removes a required node, the relation stays inspectable
++as unresolved, retains the last valid child transform and fails the session
++refresh. There is no success-shaped fallback to the origin for an existing named
++attachment. Restoring a readable node allows resolution again.
++
++Removing either endpoint immediately invalidates its relations, before deferred
++callbacks/destruction. This deliberately makes the original undefined child
++removal and stale attachment cases safe. It does not remove the other endpoint.
++Explicit detach retains the last resolved child pose. Invalid/stale IDs return
++errors and cannot alias a new relation after reload. Original owner destructors
++remain responsible for their children.
++
++## Inspection and limits
++
++The Skeleton panel lists every live relation, parent/child identity, chosen node
++or explicit origin fallback, resolution, actual child position, hidden/inactive
++state and model/skin indexing. Its normal model list includes held models and
++missing models. The existing skeleton GPU scenario checks the real Caleb Beretta
++attachment while the UI is hidden, then fresh attachment identity after reload.
++Queries and inspection have no model-clock or lifetime side effects.
++
++SubwayA's source accounting remains 187 created, four transferred sounds, 372
++editor-only, 17 unsupported and zero failed, plus seven SelfTriggers. A default
++living player adds one runtime Beretta child on its first inventory update;
++dual Berettas add two. These are owned children, not newly supported source entries.
++AI states/classes, ExitTrigger, required client FX and the remaining M2 services
++keep the playable-session gate open. Linux software/hardware graphics checks do
++not establish retail attachment timing, other-platform or XR parity.
+diff --git a/docs/CHARACTER_ANIMATION_CONTRACTS.md b/docs/CHARACTER_ANIMATION_CONTRACTS.md
+index 4b6ab7f..6482991 100644
+--- a/docs/CHARACTER_ANIMATION_CONTRACTS.md
++++ b/docs/CHARACTER_ANIMATION_CONTRACTS.md
+@@ -121,3 +121,8 @@ The installed corpus covers 326 clips and 6,410 node queries across the seven
+ models above. All lack the two standard ankle names; Gideon also lacks the two
+ upper-arm names. Their original predecessor fallback is explicit in inspection.
+ The table contains 227 stored slots (219 lookups include retry assignments).
++
++The [held-model/attachment continuation](ATTACHMENT_CONTRACTS.md) adds original
++Beretta/knife held children and typed visual attachments. Earlier blanket hand-model
++and attachment omissions are superseded for this bounded subset. Dropping, physical
++attachments, client visibility SFX and complete M2 remain unavailable.
+diff --git a/docs/M2_ATTACHMENT_SOURCES.json b/docs/M2_ATTACHMENT_SOURCES.json
+new file mode 100644
+index 0000000..0b28e39
+--- /dev/null
++++ b/docs/M2_ATTACHMENT_SOURCES.json
+@@ -0,0 +1,103 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "b79cb21ff5eac8e74a635664220c3728dd170a40",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/Weapon.cpp",
++      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7",
++      "selected_lines": [
++        [
++          241,
++          259
++        ],
++        [
++          362,
++          390
++        ],
++        [
++          1404,
++          1471
++        ]
++      ],
++      "use": "Selected destructor, ShowHandModel and CreateHandModel rules; checked handles and explicit failures"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/HandWeaponModel.cpp",
++      "sha256": "480adb2a0ad140120bb9ddb160cf8f8112508abdf70e218067213e0f04c8ed96",
++      "selected_lines": [
++        [
++          30,
++          115
++        ],
++        [
++          202,
++          227
++        ]
++      ],
++      "use": "Held model initialization and first-update visibility; drop/SFX/precreate fallthrough excluded"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "selected_lines": [
++        [
++          842,
++          898
++        ],
++        [
++          2700,
++          2711
++        ]
++      ],
++      "use": "Remove old selected hands and create living current hands"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "selected_lines": [
++        [
++          1771,
++          1780
++        ]
++      ],
++      "use": "Dead-player hand hiding"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/server_de.h",
++      "sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "selected_lines": [
++        [
++          619,
++          634
++        ],
++        [
++          797,
++          804
++        ]
++      ],
++      "use": "Typed attachment services; strengthen undefined removal lifetime"
++    },
++    {
++      "path": "sources/lithtech/runtime/shared/src/shared_iltcommon.cpp",
++      "sha256": "52de1688c2dc67b8b3798663a0f3b489a9b8a46220d328185e5d572830f785c3",
++      "selected_lines": [
++        [
++          141,
++          193
++        ]
++      ],
++      "use": "Reference only: compose parent/node rotation and unscaled offset; not an imported engine service"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/HandWeaponModel.h",
++      "sha256": "d2688a041b58493e7a21e854568a375e1bb3ade0568037acdc7705e6388bc04a",
++      "selected_lines": [
++        [
++          29,
++          68
++        ]
++      ],
++      "use": "Original held metadata and stored SetVisible request; borrowed weapon pointer replaced"
++    }
++  ]
++}
+diff --git a/docs/OBJECT_CONTRACTS.md b/docs/OBJECT_CONTRACTS.md
+index eea86e0..440f9dc 100644
+--- a/docs/OBJECT_CONTRACTS.md
++++ b/docs/OBJECT_CONTRACTS.md
+@@ -80,3 +80,8 @@ Unknown/duplicate properties still reject; world-file creation defaults are unch
+ The [AI path-manager continuation](PATH_MANAGER_CONTRACTS.md) corrects GetNextObject
+ to enumerate only active Alive objects. Editor snapshots remain inclusive; pending
+ and stale handles are excluded. Stable slot order is not claimed retail-equivalent.
++
++The [held-model/attachment continuation](ATTACHMENT_CONTRACTS.md) adds original
++Beretta/knife held children and typed visual attachments. Earlier blanket hand-model
++and attachment omissions are superseded for this bounded subset. Dropping, physical
++attachments, client visibility SFX and complete M2 remain unavailable.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 12219bb..3294da0 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -448,3 +448,16 @@ node/ray services. [Source ranges and hashes](M2_AI_SIGHT_SOURCES.json) and
+ [contracts](AI_SIGHT_CONTRACTS.md) distinguish source rules from typed failures,
+ current-position fallback and the existing replacement collision solver. No
+ additional production AI class or general filter callback ABI is imported.
++
++## M2 held models and attachment services
++
++[Selected source ranges and hashes](M2_ATTACHMENT_SOURCES.json) cover original
++CWeapon hand creation/removal, the current inventory hand branch, dead-player
++hiding and CHandWeaponModel held initialization/visibility. Checked object handles
++replace bidirectional raw pointers; the unsafe precreate fallthrough is omitted.
++The original drop/pickup and client SFX branches are not imported.
++
++The engine attachment store and transform refresh are new replacement services.
++The later LithTech shared transform code informed offset composition only; no
++code or dependency from that engine was copied. See [contracts](ATTACHMENT_CONTRACTS.md)
++for bounded visual children, unsupported chains/physics and strengthened lifetime.
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index fe1f7c6..487fd60 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -129,3 +129,8 @@ ammo consumption. View-weapon visibility is a presentation request.
+ The [AI visibility continuation](AI_SIGHT_CONTRACTS.md) adds selected original CanSee
+ and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
+ Visibility queries do not implement target selection, AI states or complete M2.
++
++The [held-model/attachment continuation](ATTACHMENT_CONTRACTS.md) adds original
++Beretta/knife held children and typed visual attachments. Earlier blanket hand-model
++and attachment omissions are superseded for this bounded subset. Dropping, physical
++attachments, client visibility SFX and complete M2 remain unavailable.
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 79b21b4..4faf9dc 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -9,6 +9,28 @@ namespace OpenBlood2
+         ImGui::TextWrapped("Current ABC node transforms and original CAnim_Sound tables. Spheres are the original "
+                            "initialization radii, shown at live node positions; damage localization and complete AI "
+                            "behavior remain unported.");
++        if (ImGui::CollapsingHeader("Live attachments", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            ImGui::TextWrapped("Held models follow current parent nodes. Visual children only; skins and first-person "
++                               "visibility SFX are not rendered.");
++            for (const auto& [id, a] : game.objects.attachments())
++            {
++                const auto* parent = game.objects.get(a.parent);
++                const auto* child = game.objects.get(a.child);
++                if (!parent || !child)
++                    continue;
++                ImGui::Text("#%llu %s -> %s | %s | %s", (unsigned long long)id, parent->state.m_Name,
++                            child->state.m_Name, a.node.empty() ? "object origin (no gun node)" : a.node.c_str(),
++                            a.resolved ? "resolved" : "POSE UNAVAILABLE");
++                ImGui::Text("Child %.2f %.2f %.2f | %s / %s", child->state.m_Pos.x, child->state.m_Pos.y,
++                            child->state.m_Pos.z, child->state.m_Flags & FLAG_VISIBLE ? "visible" : "hidden",
++                            child->activity == OBJSTATE_ACTIVE ? "active" : "inactive");
++                ImGui::TextWrapped("%s | skin indexed: %s", child->state.m_Filename,
++                                   game.resources.find(child->state.m_SkinName) ? "yes" : "NO");
++            }
++            if (game.objects.attachments().empty())
++                ImGui::TextUnformatted("No live attachments");
++        }
+         if (!game.objects.get(skeleton_selection))
+         {
+             if (const auto* player = game.server_shell.Player(game.local_client))
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index e1feaf3..7c45641 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -245,6 +245,22 @@ namespace
+             return 4;
+         const auto original_ai_key = smoke_ai_key;
+         bool ai_sight_hidden = false;
++        bool hand_hidden = false;
++        HATTACHMENT old_hand = 0;
++        auto check_hand = [&]()
++        {
++            const auto* player = game.server_shell.Player(game.local_client);
++            const auto* w = player ? player->m_InventoryMgr.CurrentWeapon() : nullptr;
++            const auto* child = w ? game.objects.get(w->m_hHandModel) : nullptr;
++            if (!w || !child || child->life != OpenBlood2::Life::Alive || !child->model)
++                return false;
++            DVector node;
++            DRotation rotation;
++            return game.server.GetModelNodeTransform(player->m_hObject, "r_gun", &node, &rotation) &&
++                   std::abs(node.x - child->state.m_Pos.x) < .001f && std::abs(node.y - child->state.m_Pos.y) < .001f &&
++                   std::abs(node.z - child->state.m_Pos.z) < .001f && child->attachment == w->m_hHandAttachment &&
++                   child->attachment != 0;
++        };
+         const bool path_smoke = options.player_smoke && game.world_path == "worlds/01_subwaya.dat";
+         PathList smoke_paths;
+         bool paths_hidden = false;
+@@ -484,6 +500,13 @@ namespace
+                 spdlog::error("Object simulation step failed");
+                 return 4;
+             }
++            if (options.skeleton_smoke && !inspector_visible && check_hand())
++            {
++                hand_hidden = true;
++                if (!old_hand)
++                    old_hand =
++                        game.server_shell.Player(game.local_client)->m_InventoryMgr.CurrentWeapon()->m_hHandAttachment;
++            }
+             if (options.skeleton_smoke && !inspector_visible)
+                 ai_sight_hidden |= OpenBlood2::check_ai_sight_smoke(game, smoke_ai_key);
+             if (options.skeleton_smoke && !inspector_visible)
+@@ -909,6 +932,13 @@ namespace
+                 spdlog::info("AI sight probe: hidden={}, reentered={}, old handle invalidated={}", ai_sight_hidden,
+                              ai_sight_reentered, !game.objects.get(original_ai_key));
+             }
++            bool hand_reentered = !options.skeleton_smoke;
++            if (options.skeleton_smoke)
++            {
++                hand_reentered = check_hand() && old_hand && !game.objects.attachments().contains(old_hand);
++                spdlog::info("Held attachments: hidden={}, reentered={}, old identity invalidated={}", hand_hidden,
++                             hand_reentered, !game.objects.attachments().contains(old_hand));
++            }
+             bool character_audio_reentered = !options.skeleton_smoke;
+             if (options.skeleton_smoke)
+             {
+@@ -936,9 +966,10 @@ namespace
+                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
+             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
+                 !selection_cleared || (path_smoke && (!paths_hidden || !paths_reentered)) ||
+-                (options.skeleton_smoke && (!character_audio_hidden || !character_audio_reentered ||
+-                                            !character_motion_hidden || !character_motion_reentered || !ai_key_hidden ||
+-                                            !ai_key_reentered || !ai_sight_hidden || !ai_sight_reentered)) ||
++                (options.skeleton_smoke &&
++                 (!character_audio_hidden || !character_audio_reentered || !character_motion_hidden ||
++                  !character_motion_reentered || !ai_key_hidden || !ai_key_reentered || !ai_sight_hidden ||
++                  !ai_sight_reentered || !hand_hidden || !hand_reentered)) ||
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+diff --git a/src/engine/attachments.cpp b/src/engine/attachments.cpp
+new file mode 100644
+index 0000000..e28354b
+--- /dev/null
++++ b/src/engine/attachments.cpp
+@@ -0,0 +1,126 @@
++#include "engine/collision.h"
++#include "engine/objects.h"
++#include <cmath>
++namespace OpenBlood2
++{
++    DRESULT Objects::attach(HOBJECT parent, HOBJECT child, const char* node, const DVector* offset,
++                            const DRotation* rotation, HATTACHMENT* out)
++    {
++        if (out)
++            *out = 0;
++        auto* p = get(parent);
++        auto* c = get(child);
++        if (!out || !p || !c || p == c || p->life != Life::Alive || c->life != Life::Alive || !offset || !rotation ||
++            !physics_vector(*offset) || !physics_vector(rotation->m_Vec) || !std::isfinite(rotation->m_Spin))
++            return DE_INVALIDPARAMS;
++        const auto norm = std::sqrt(vector_dot(rotation->m_Vec, rotation->m_Vec) + rotation->m_Spin * rotation->m_Spin);
++        if (!std::isfinite(norm) || norm < 1e-6f)
++            return DE_INVALIDPARAMS;
++        // Bounded visual children only. Do not silently replace physics or permit cycles/chains.
++        if (p->attachment || c->attachment || c->container || c->world_model || c->client_movement ||
++            (c->state.m_ObjectType != OT_MODEL && c->state.m_ObjectType != OT_NORMAL &&
++             c->state.m_ObjectType != OT_SPRITE) ||
++            (c->state.m_Flags & (FLAG_SOLID | FLAG_GRAVITY | FLAG_RAYHIT | FLAG_TOUCH_NOTIFY)) ||
++            vector_dot(c->velocity, c->velocity) != 0 || vector_dot(c->acceleration, c->acceleration) != 0)
++            return DE_ERROR;
++        for (const auto& [id, a] : attachments_)
++            if (a.parent == child)
++                return DE_ERROR;
++        std::string name;
++        if (node)
++        {
++            std::size_t n = 0;
++            while (n <= MAX_CS_FILENAME_LEN && node[n])
++                ++n;
++            if (n > MAX_CS_FILENAME_LEN)
++                return DE_INVALIDPARAMS;
++            name.assign(node, n);
++        }
++        if (next_attachment_ > 65536)
++            return DE_ERROR;
++        Attachment a{next_attachment_,
++                     parent,
++                     child,
++                     name,
++                     *offset,
++                     {vector_scale(rotation->m_Vec, 1 / norm), rotation->m_Spin / norm},
++                     false};
++        DVector position = p->state.m_Pos;
++        DRotation base = p->state.m_Rotation;
++        if (!name.empty() && !object_node_transform(*p, name.c_str(), &position, &base))
++            return DE_NODENOTFOUND;
++        position = vector_add(position, rotate_vector(base, a.offset));
++        if (!physics_vector(position))
++            return DE_INVALIDPARAMS;
++        c->state.m_Pos = position;
++        c->state.m_Rotation = compose_rotation(base, a.rotation);
++        a.resolved = true;
++        c->attachment = a.id;
++        attachments_.emplace(a.id, a);
++        *out = next_attachment_++;
++        return DE_OK;
++    }
++    DRESULT Objects::detach(HATTACHMENT id)
++    {
++        auto it = attachments_.find(id);
++        if (it == attachments_.end())
++            return DE_NOTFOUND;
++        if (auto* child = get(it->second.child))
++            child->attachment = 0;
++        attachments_.erase(it);
++        return DE_OK;
++    }
++    DRESULT Objects::find_attachment(HOBJECT parent, HOBJECT child, HATTACHMENT* out) const
++    {
++        if (!out)
++            return DE_INVALIDPARAMS;
++        *out = 0;
++        const auto* p = get(parent);
++        const auto* c = get(child);
++        if (!p || !c || p->life != Life::Alive || c->life != Life::Alive)
++            return DE_INVALIDPARAMS;
++        auto it = attachments_.find(c->attachment);
++        if (it == attachments_.end() || it->second.parent != parent)
++            return DE_NOTFOUND;
++        *out = it->first;
++        return DE_OK;
++    }
++    bool Objects::refresh_attachment(HOBJECT child)
++    {
++        auto* c = get(child);
++        if (!c)
++            return false;
++        if (!c->attachment)
++            return true;
++        if (c->life != Life::Alive)
++            return false;
++        auto it = attachments_.find(c->attachment);
++        if (it == attachments_.end())
++            return false;
++        auto& a = it->second;
++        const auto* p = get(a.parent);
++        a.resolved = false;
++        if (!p || p->life != Life::Alive)
++            return false;
++        auto position = p->state.m_Pos;
++        auto rotation = p->state.m_Rotation;
++        if (!a.node.empty() && !object_node_transform(*p, a.node.c_str(), &position, &rotation))
++            return false;
++        position = vector_add(position, rotate_vector(rotation, a.offset));
++        if (!physics_vector(position))
++            return false;
++        c->state.m_Pos = position;
++        c->state.m_Rotation = compose_rotation(rotation, a.rotation);
++        a.resolved = true;
++        return true;
++    }
++    bool Objects::refresh_attachments()
++    {
++        bool ok = true;
++        for (const auto& [id, a] : attachments_)
++            ok = refresh_attachment(a.child) && ok;
++        if (!ok)
++            fail(ObjectError::InvalidProperty, "Attachment pose unavailable; last child transform retained");
++        return ok;
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/object_pose.cpp b/src/engine/object_pose.cpp
+new file mode 100644
+index 0000000..3d6e92f
+--- /dev/null
++++ b/src/engine/object_pose.cpp
+@@ -0,0 +1,50 @@
++#include "engine/collision.h"
++#include "engine/objects.h"
++namespace OpenBlood2
++{
++    bool object_node_transform(const ObjectRecord& input, const char* name, DVector* position, DRotation* rotation)
++    {
++        const auto* record = &input;
++        // InitialUpdate may query the bound model; pending removals may not.
++        if (!record || record->life != Life::Alive || !record->model || record->state.m_ObjectType != OT_MODEL ||
++            !name || !*name || !position || !rotation)
++            return DFALSE;
++        const auto& model = *record->model;
++        auto equal = [](std::string_view a, std::string_view b)
++        {
++            if (a.size() != b.size())
++                return false;
++            for (std::size_t i = 0; i < a.size(); ++i)
++            {
++                auto fold = [](unsigned char c) { return c >= 'A' && c <= 'Z' ? c + ('a' - 'A') : c; };
++                if (fold(a[i]) != fold(b[i]))
++                    return false;
++            }
++            return true;
++        };
++        std::size_t found = model.nodes.size();
++        for (std::size_t i = 0; i < model.nodes.size(); ++i)
++            if (equal(model.nodes[i].name, name))
++            {
++                if (found != model.nodes.size())
++                    return DFALSE; // Ambiguous names never choose an arbitrary node.
++                found = i;
++            }
++        NodePose pose;
++        const auto scale = record->state.m_Scale;
++        if (scale.x <= 0 || scale.y <= 0 || scale.z <= 0 || !physics_vector(scale) ||
++            !sample_node_pose(model, record->animation.animation, record->animation.time, found, pose))
++            return DFALSE;
++        auto transformed =
++            rotate_vector(record->state.m_Rotation,
++                          {pose.position.x * scale.x, pose.position.y * scale.y, pose.position.z * scale.z});
++        transformed.x += record->state.m_Pos.x;
++        transformed.y += record->state.m_Pos.y;
++        transformed.z += record->state.m_Pos.z;
++        if (!physics_vector(transformed))
++            return DFALSE;
++        *position = transformed;
++        *rotation = compose_rotation(record->state.m_Rotation, pose.rotation);
++        return DTRUE;
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/objects.cpp b/src/engine/objects.cpp
+index 7cb7ed0..15b6f65 100644
+--- a/src/engine/objects.cpp
++++ b/src/engine/objects.cpp
+@@ -602,6 +602,18 @@ namespace OpenBlood2
+             return fail(ObjectError::InvalidHandle, "RemoveObject: invalid/stale handle");
+         if (record->life == Life::Pending || record->life == Life::Destroying)
+             return true;
++        // Relations never own children. Both endpoint removals invalidate them before callbacks.
++        for (auto it = attachments_.begin(); it != attachments_.end();)
++        {
++            if (it->second.parent == h || it->second.child == h)
++            {
++                if (auto* child = get(it->second.child))
++                    child->attachment = 0;
++                it = attachments_.erase(it);
++            }
++            else
++                ++it;
++        }
+         record->life = Life::Pending;
+         record->scheduled = false;
+         pending_.push_back(h);
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index 919a70f..8b0878a 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -80,6 +80,15 @@ namespace OpenBlood2
+             return slot != UINT32_MAX;
+         }
+     };
++    struct Attachment
++    {
++        HATTACHMENT id = 0;
++        HOBJECT parent = nullptr, child = nullptr;
++        std::string node;
++        DVector offset{};
++        DRotation rotation;
++        bool resolved = false;
++    };
+     struct ObjectRecord
+     {
+         ObjectId id;
+@@ -102,6 +111,7 @@ namespace OpenBlood2
+         DBYTE blocking_priority = 0;
+         std::uint64_t body_steps = 0, body_pushes = 0;
+         MoverResult body_result = MoverResult::Moved;
++        HATTACHMENT attachment = 0;
+         bool client_movement = false; // Local MoveMgr owns integration while associated.
+         std::shared_ptr<const Model> model;
+         std::shared_ptr<const Sprite> sprite;
+@@ -162,6 +172,15 @@ namespace OpenBlood2
+         std::vector<ObjectId> container_snapshot() const;
+         HOBJECT next_alive(HOBJECT previous) const;
+         const PropertyValue* property(std::string_view name) const;
++        DRESULT attach(HOBJECT, HOBJECT, const char*, const DVector*, const DRotation*, HATTACHMENT*);
++        DRESULT detach(HATTACHMENT);
++        DRESULT find_attachment(HOBJECT, HOBJECT, HATTACHMENT*) const;
++        bool refresh_attachment(HOBJECT);
++        bool refresh_attachments();
++        const std::map<HATTACHMENT, Attachment>& attachments() const
++        {
++            return attachments_;
++        }
+         bool link(HOBJECT owner, HOBJECT target);
+         void unlink(HOBJECT owner, HOBJECT target);
+         std::size_t link_count(HOBJECT owner) const;
+@@ -189,6 +208,8 @@ namespace OpenBlood2
+             std::uint32_t generation = 1;
+             std::unique_ptr<ObjectRecord> object;
+         };
++        std::map<HATTACHMENT, Attachment> attachments_;
++        HATTACHMENT next_attachment_ = 1;
+         std::map<std::string, HCLASS, CaseLess> classes_;
+         std::vector<Slot> slots_;
+         std::vector<std::unique_ptr<DObject>> handles_;
+@@ -213,6 +234,7 @@ namespace OpenBlood2
+                 id = {};
+         }
+     };
++    bool object_node_transform(const ObjectRecord&, const char*, DVector*, DRotation*);
+     std::string property_text(const PropertyValue& value);
+     bool generic_property(const PropertyValue& value, GenericProp& out);
+     const char* life_name(Life life);
+diff --git a/src/game/legacy/basedefs_de.h b/src/game/legacy/basedefs_de.h
+index fbb44be..d692ef9 100644
+--- a/src/game/legacy/basedefs_de.h
++++ b/src/game/legacy/basedefs_de.h
+@@ -35,6 +35,8 @@ using HCLASS = const OpenBlood2::ClassInfo*;
+ using HCONVAR = ConsoleVariable*;
+ using HCLIENT = ClientHandle*;
+ using HMODELANIM = DDWORD;
++using HATTACHMENT = std::uint64_t; // Checked, non-reused session identity; no DLL ABI.
++inline constexpr DRESULT DE_NODENOTFOUND = 59;
+ inline constexpr DDWORD MS_PLAYDONE = 1;
+ struct ArgList
+ {
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 3c450a8..1d62f2a 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -43,6 +43,10 @@ class ServerDE : public CSBase
+     virtual bool IsSoundDone(OpenBlood2::SoundId, bool&) = 0;
+     virtual bool KillSound(OpenBlood2::SoundId) = 0;
+ 
++    virtual DRESULT CreateAttachment(HOBJECT, HOBJECT, const char*, const DVector*, const DRotation*, HATTACHMENT*) = 0;
++    virtual DRESULT RemoveAttachment(HATTACHMENT) = 0;
++    virtual DRESULT FindAttachment(HOBJECT, HOBJECT, HATTACHMENT*) = 0;
++    virtual DRESULT GetAttachedModelNodeTransform(HATTACHMENT, const char*, DVector*, DRotation*) = 0;
+     virtual bool IsObjectAlive(HOBJECT) = 0;
+     virtual bool ValidateSpawnObject(std::string_view) = 0;
+     virtual void RecordSpawn(const OpenBlood2::SpawnReport&) = 0;
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index 84a1788..206363e 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -272,6 +272,17 @@ bool CBloodClientShell::SyncWeapons(OpenBlood2::ModelStore& models, OpenBlood2::
+         const auto* weapon = owner->m_InventoryMgr.CurrentWeapon(i != 0);
+         const auto type = weapon ? weapon->data.m_nType : 0;
+         changed[i] = type != weapons[i].type;
++        if (changed[i] && weapon)
++        {
++            std::shared_ptr<const OpenBlood2::Model> held;
++            if (!models.load(weapon->data.m_szHandModelFilename, held, error))
++                return false;
++            if (!resources.find(weapon->data.m_szHandModelSkin))
++            {
++                error = "Held weapon skin is not indexed";
++                return false;
++            }
++        }
+         if (changed[i] && type && !prepared[i].Create(type, i != 0, models, resources, error))
+             return false;
+     }
+diff --git a/src/game/original/HandWeaponModel.cpp b/src/game/original/HandWeaponModel.cpp
+new file mode 100644
+index 0000000..e7afd36
+--- /dev/null
++++ b/src/game/original/HandWeaponModel.cpp
+@@ -0,0 +1,20 @@
++#include "HandWeaponModel.h"
++#include "server_de.h"
++DDWORD CHandWeaponModel::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    auto* server = GetServerDE();
++    if (message == MID_INITIALUPDATE)
++    {
++        DVector dims{.1f, .1f, .1f};
++        server->SetObjectDims(m_hObject, &dims);
++        server->SetNextUpdate(m_hObject, .01f);
++    }
++    else if (message == MID_UPDATE && first_update)
++    {
++        first_update = false;
++        auto flags = server->GetObjectFlags(m_hObject);
++        server->SetObjectFlags(m_hObject, visible ? flags | FLAG_VISIBLE : flags & ~FLAG_VISIBLE);
++        server->SetNextUpdate(m_hObject, 0);
++    }
++    return BaseClass::EngineMessageFn(message, data, reason);
++}
+diff --git a/src/game/original/HandWeaponModel.h b/src/game/original/HandWeaponModel.h
+new file mode 100644
+index 0000000..1ece6ef
+--- /dev/null
++++ b/src/game/original/HandWeaponModel.h
+@@ -0,0 +1,18 @@
++#pragma once
++#include "cpp_engineobjects_de.h"
++// Original held-model subset. Dropping/pickup spawning and client SFX are not ported.
++class CHandWeaponModel : public BaseClass
++{
++  public:
++    CHandWeaponModel() : BaseClass(OT_MODEL) {}
++    bool visible = true, first_update = true, left = false, player_owned = false;
++    DDWORD type = 0;
++    HOBJECT owner = nullptr; // Checked identity replaces the source's borrowed CWeapon pointer.
++    void SetVisible(DBOOL value)
++    {
++        visible = value;
++    }
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++};
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index cf624d2..06f8be6 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -1,4 +1,5 @@
+ #include "InventoryMgr.h"
++#include "PlayerObj.h"
+ #include <algorithm>
+ #include <cmath>
+ namespace
+@@ -161,6 +162,10 @@ InventoryResult CInventoryMgr::ChangeWeaponSlot(DBYTE slot)
+         return InventoryResult::NotAvailable;
+     if (CurrentWeapon() && CurrentWeapon()->data.m_nType == weapon->data.m_nType)
+         return InventoryResult::Current;
++    if (CurrentWeapon())
++        CurrentWeapon()->ShowHandModel(false);
++    if (CurrentWeapon(true))
++        CurrentWeapon(true)->ShowHandModel(false);
+     m_nCurWeaponSlot = slot;
+     ++revision;
+     return InventoryResult::Ok;
+@@ -210,3 +215,19 @@ InventoryResult CInventoryMgr::QueryKey(std::string_view name)
+         }
+     return InventoryResult::NotAvailable;
+ }
++
++// Original Update's live-character hand-model branch and player dead hide branch.
++bool CInventoryMgr::UpdateHandModels()
++{
++    auto* server = BaseClass::GetServerDE();
++    auto* owner = server && server->IsObjectAlive(m_hOwner)
++                      ? dynamic_cast<CBaseCharacter*>(server->HandleToObject(m_hOwner))
++                      : nullptr;
++    if (!owner)
++        return false;
++    bool ok = true;
++    for (bool left : {false, true})
++        if (auto* w = CurrentWeapon(left))
++            ok = w->ShowHandModel(!owner->m_damage.IsDead()) && ok;
++    return ok;
++}
+diff --git a/src/game/original/InventoryMgr.h b/src/game/original/InventoryMgr.h
+index b04bb9d..cdba9b2 100644
+--- a/src/game/original/InventoryMgr.h
++++ b/src/game/original/InventoryMgr.h
+@@ -36,6 +36,7 @@ class CInventoryMgr : public Aggregate
+     void SetStrength(DBYTE);
+     void SetMagic(DBYTE);
+     void ClearWeapons();
++    bool UpdateHandModels();
+     InventoryResult ObtainWeapon(DBYTE, int slot = -1);
+     InventoryResult ChangeWeaponSlot(DBYTE);
+     CWeapon* GetWeapon(unsigned slot, bool left = false) const
+diff --git a/src/game/original/Weapon.h b/src/game/original/Weapon.h
+index 759f0be..1fd34ae 100644
+--- a/src/game/original/Weapon.h
++++ b/src/game/original/Weapon.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ #include "WeaponDefs.h"
+ #include "game/weapon_messages.h"
++#include <string>
+ 
+ class CInventoryMgr;
+ enum class FireResult
+@@ -29,7 +30,11 @@ class CWeapon
+     explicit CWeapon(DBYTE type) : data(*weapon_definition(type)) {}
+ 
+   public:
+-    virtual ~CWeapon() = default;
++    virtual ~CWeapon();
++    bool ShowHandModel(DBOOL);
++    HOBJECT m_hHandModel = nullptr;
++    HATTACHMENT m_hHandAttachment = 0;
++    std::string hand_error;
+     void Init(HOBJECT owner, CInventoryMgr* inventory, bool left)
+     {
+         m_hOwner = owner;
+diff --git a/src/game/original/WeaponHand.cpp b/src/game/original/WeaponHand.cpp
+new file mode 100644
+index 0000000..caa828d
+--- /dev/null
++++ b/src/game/original/WeaponHand.cpp
+@@ -0,0 +1,72 @@
++// Selected original Weapon.cpp ShowHandModel/CreateHandModel/destructor rules.
++#include "HandWeaponModel.h"
++#include "Weapon.h"
++#include "server_de.h"
++CWeapon::~CWeapon()
++{
++    ShowHandModel(false);
++}
++bool CWeapon::ShowHandModel(DBOOL show)
++{
++    auto* server = BaseClass::GetServerDE();
++    if (!server)
++        return !m_hHandModel && !m_hHandAttachment;
++    if (show && server->IsObjectAlive(m_hHandModel))
++    {
++        HATTACHMENT current = 0;
++        if (server->FindAttachment(m_hOwner, m_hHandModel, &current) == DE_OK && current == m_hHandAttachment)
++            return true;
++    }
++    if (m_hHandAttachment)
++        server->RemoveAttachment(m_hHandAttachment);
++    m_hHandAttachment = 0;
++    if (server->IsObjectAlive(m_hHandModel))
++        server->RemoveObject(m_hHandModel);
++    m_hHandModel = nullptr;
++    hand_error.clear();
++    if (!show)
++        return true;
++    if (!server->IsObjectAlive(m_hOwner))
++    {
++        hand_error = "Hand model requires a live weapon owner";
++        return false;
++    }
++    ObjectCreateStruct state;
++    state.m_ObjectType = OT_MODEL;
++    state.m_Flags = FLAG_VISIBLE | FLAG_FORCECLIENTUPDATE;
++    server->GetObjectPos(m_hOwner, &state.m_Pos);
++    SAFE_STRCPY(state.m_Filename, data.m_szHandModelFilename);
++    SAFE_STRCPY(state.m_SkinName, data.m_szHandModelSkin);
++    SAFE_STRCPY(state.m_Name, m_bLeftHand ? "Left held weapon" : "Right held weapon");
++    auto* model = dynamic_cast<CHandWeaponModel*>(server->CreateObject(server->GetClass("CHandWeaponModel"), &state));
++    if (!model || server->GetModelAnimation(model->m_hObject) == INVALID_ANI)
++    {
++        if (model)
++            server->RemoveObject(model->m_hObject);
++        hand_error = "Original hand model could not be loaded";
++        return false;
++    }
++    const auto h = model->m_hObject;
++    const auto anim = server->GetAnimIndex(h, "handheld");
++    if (anim != INVALID_ANI)
++        server->SetModelAnimation(h, anim);
++    model->type = data.m_nType;
++    model->left = m_bLeftHand;
++    model->owner = m_hOwner;
++    model->player_owned = server->IsKindOf(server->GetObjectClass(m_hOwner), server->GetClass("CPlayerObj"));
++    DVector position{}, offset{};
++    DRotation rotation, identity;
++    const char* node = m_bLeftHand ? "l_gun" : "r_gun";
++    const bool found = server->GetModelNodeTransform(m_hOwner, node, &position, &rotation);
++    const auto result =
++        server->CreateAttachment(m_hOwner, h, found ? node : nullptr, &offset, &identity, &m_hHandAttachment);
++    if (result != DE_OK)
++    {
++        server->RemoveObject(h);
++        hand_error = "Original hand model attachment failed";
++        return false;
++    }
++    model->SetVisible(found);
++    m_hHandModel = h;
++    return true;
++}
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index 7e64fea..f583091 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -8,6 +8,7 @@
+ #include "game/original/DetailSprite.h"
+ #include "game/original/Door.h"
+ #include "game/original/GameStartPoint.h"
++#include "game/original/HandWeaponModel.h"
+ #include "game/original/Key.h"
+ #include "game/original/KeyFramer.h"
+ #include "game/original/KeyPickup.h"
+@@ -56,6 +57,7 @@ namespace OpenBlood2
+                               {"Gravity", false, false},
+                               {"TouchNotify", false, false},
+                               {"Rayhit", false, false}}};
++        const ClassInfo hand_model{"CHandWeaponModel", &base, construct<CHandWeaponModel>, {}};
+         const ClassInfo b2base{
+             "B2BaseClass",
+             &base,
+@@ -601,7 +603,7 @@ namespace OpenBlood2
+                objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
+                objects.register_class(toggle_trigger) && objects.register_class(door) &&
+                objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+-               objects.register_class(rotating_brush);
++               objects.register_class(rotating_brush) && objects.register_class(hand_model);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_adapter.cpp b/src/game/server_adapter.cpp
+index 9666399..d42df3d 100644
+--- a/src/game/server_adapter.cpp
++++ b/src/game/server_adapter.cpp
+@@ -97,6 +97,11 @@ namespace OpenBlood2
+             active().trace_service("SetObjectFlags");
+             if (auto* r = active().objects_.get(h))
+             {
++                if (r->attachment && (flags & (FLAG_SOLID | FLAG_GRAVITY | FLAG_RAYHIT | FLAG_TOUCH_NOTIFY)))
++                {
++                    active().objects_.fail(ObjectError::Unsupported, "Physical attached children are unsupported");
++                    return;
++                }
+                 if (r->container && (flags & (FLAG_SOLID | FLAG_GRAVITY)))
+                 {
+                     active().objects_.fail(ObjectError::Unsupported, "Container solid/gravity flags are unsupported");
+@@ -159,14 +164,17 @@ namespace OpenBlood2
+             active().trace_service("GetObjectPos");
+             if (out)
+             {
+-                auto* r = active().objects_.get(h);
+-                *out = r ? r->state.m_Pos : DVector{};
++                auto& o = active().objects_;
++                auto* r = o.get(h);
++                *out = r && o.refresh_attachment(h) ? r->state.m_Pos : DVector{};
+             }
+         };
+         GetObjectRotation = [](HOBJECT h, DRotation* out) -> DRESULT
+         {
+             active().trace_service("GetObjectRotation");
+             auto* r = active().objects_.get(h);
++            if (r && !active().objects_.refresh_attachment(h))
++                return DE_ERROR;
+             if (out)
+                 *out = r ? r->state.m_Rotation : DRotation{};
+             return r && out ? DE_OK : DE_INVALIDPARAMS;
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index ef8d390..c9e14fb 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -46,6 +46,11 @@ namespace OpenBlood2
+         ServerAdapter(const ServerAdapter&) = delete;
+         ServerAdapter& operator=(const ServerAdapter&) = delete;
+         bool bind();
++        DRESULT CreateAttachment(HOBJECT, HOBJECT, const char*, const DVector*, const DRotation*,
++                                 HATTACHMENT*) override;
++        DRESULT RemoveAttachment(HATTACHMENT) override;
++        DRESULT FindAttachment(HOBJECT, HOBJECT, HATTACHMENT*) override;
++        DRESULT GetAttachedModelNodeTransform(HATTACHMENT, const char*, DVector*, DRotation*) override;
+         bool IsObjectAlive(HOBJECT) override;
+         bool ValidateSpawnObject(std::string_view) override;
+         void RecordSpawn(const SpawnReport&) override;
+diff --git a/src/game/server_attachments.cpp b/src/game/server_attachments.cpp
+new file mode 100644
+index 0000000..a9d5f9b
+--- /dev/null
++++ b/src/game/server_attachments.cpp
+@@ -0,0 +1,29 @@
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    DRESULT ServerAdapter::CreateAttachment(HOBJECT parent, HOBJECT child, const char* node, const DVector* offset,
++                                            const DRotation* rotation, HATTACHMENT* out)
++    {
++        trace_service("CreateAttachment");
++        return objects_.attach(parent, child, node, offset, rotation, out);
++    }
++    DRESULT ServerAdapter::RemoveAttachment(HATTACHMENT id)
++    {
++        trace_service("RemoveAttachment");
++        return objects_.detach(id);
++    }
++    DRESULT ServerAdapter::FindAttachment(HOBJECT parent, HOBJECT child, HATTACHMENT* out)
++    {
++        trace_service("FindAttachment");
++        return objects_.find_attachment(parent, child, out);
++    }
++    DRESULT ServerAdapter::GetAttachedModelNodeTransform(HATTACHMENT id, const char* node, DVector* position,
++                                                         DRotation* rotation)
++    {
++        trace_service("GetAttachedModelNodeTransform");
++        const auto it = objects_.attachments().find(id);
++        if (it == objects_.attachments().end())
++            return DE_INVALIDPARAMS;
++        return GetModelNodeTransform(it->second.child, node, position, rotation) ? DE_OK : DE_NODENOTFOUND;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/server_clients.cpp b/src/game/server_clients.cpp
+index 193f601..3f84415 100644
+--- a/src/game/server_clients.cpp
++++ b/src/game/server_clients.cpp
+@@ -125,7 +125,7 @@ namespace OpenBlood2
+     {
+         trace_service("SetObjectRotation");
+         auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || (r->container || r->world_model) || !rotation ||
++        if (!r || r->life != Life::Alive || r->attachment || (r->container || r->world_model) || !rotation ||
+             !physics_vector(rotation->m_Vec) || !std::isfinite(rotation->m_Spin))
+             return DE_INVALIDPARAMS;
+         const auto& v = rotation->m_Vec;
+@@ -172,7 +172,7 @@ namespace OpenBlood2
+     {
+         trace_service("MoveObjectToGround");
+         auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || !collision || !collision_ready)
++        if (!r || r->life != Life::Alive || r->attachment || !collision || !collision_ready)
+             return DE_INVALIDPARAMS;
+         // Original ObjectUtilities::MoveObjectToGround: downward ray, animation-0
+         // user dimensions for characters, then collision-aware MoveObject. The
+@@ -188,7 +188,8 @@ namespace OpenBlood2
+         for (auto id : objects_.snapshot())
+         {
+             const auto* other = objects_.get(id);
+-            if (!other || other->life != Life::Alive || other->handle == h || !(other->state.m_Flags & FLAG_SOLID))
++            if (!other || other->life != Life::Alive || other->attachment || other->handle == h ||
++                !(other->state.m_Flags & FLAG_SOLID))
+                 continue;
+             CollisionHit hit;
+             if (sweep_box(from, to, {}, other->state.m_Pos, other->dimensions, hit) == CollisionQuery::Hit &&
+diff --git a/src/game/server_keyframes.cpp b/src/game/server_keyframes.cpp
+index eadb6d7..2d39e25 100644
+--- a/src/game/server_keyframes.cpp
++++ b/src/game/server_keyframes.cpp
+@@ -49,7 +49,7 @@ namespace OpenBlood2
+         DRotation q = rotation ? *rotation : DRotation{};
+         if (!record || record->life != Life::Alive || !physics_vector(position) || (rotation && !normalize(q)))
+             return MoverResult::Invalid;
+-        if (record->container || record->client_movement)
++        if (record->attachment || record->container || record->client_movement)
+             return MoverResult::Unavailable;
+         if (record->world_model)
+         {
+diff --git a/src/game/server_models.cpp b/src/game/server_models.cpp
+index c60afce..cffc26d 100644
+--- a/src/game/server_models.cpp
++++ b/src/game/server_models.cpp
+@@ -88,47 +88,8 @@ namespace OpenBlood2
+     {
+         trace_service("GetModelNodeTransform");
+         const auto* record = objects_.get(object);
+-        // InitialUpdate may query the bound model; pending removals may not.
+-        if (!record || record->life != Life::Alive || !record->model || record->state.m_ObjectType != OT_MODEL ||
+-            !name || !*name || !position || !rotation)
+-            return DFALSE;
+-        const auto& model = *record->model;
+-        auto equal = [](std::string_view a, std::string_view b)
+-        {
+-            if (a.size() != b.size())
+-                return false;
+-            for (std::size_t i = 0; i < a.size(); ++i)
+-            {
+-                auto fold = [](unsigned char c) { return c >= 'A' && c <= 'Z' ? c + ('a' - 'A') : c; };
+-                if (fold(a[i]) != fold(b[i]))
+-                    return false;
+-            }
+-            return true;
+-        };
+-        std::size_t found = model.nodes.size();
+-        for (std::size_t i = 0; i < model.nodes.size(); ++i)
+-            if (equal(model.nodes[i].name, name))
+-            {
+-                if (found != model.nodes.size())
+-                    return DFALSE; // Ambiguous names never choose an arbitrary node.
+-                found = i;
+-            }
+-        NodePose pose;
+-        const auto scale = record->state.m_Scale;
+-        if (scale.x <= 0 || scale.y <= 0 || scale.z <= 0 || !physics_vector(scale) ||
+-            !sample_node_pose(model, record->animation.animation, record->animation.time, found, pose))
+-            return DFALSE;
+-        auto transformed =
+-            rotate_vector(record->state.m_Rotation,
+-                          {pose.position.x * scale.x, pose.position.y * scale.y, pose.position.z * scale.z});
+-        transformed.x += record->state.m_Pos.x;
+-        transformed.y += record->state.m_Pos.y;
+-        transformed.z += record->state.m_Pos.z;
+-        if (!physics_vector(transformed))
+-            return DFALSE;
+-        *position = transformed;
+-        *rotation = compose_rotation(record->state.m_Rotation, pose.rotation);
+-        return DTRUE;
++        return record && objects_.refresh_attachment(object) &&
++               object_node_transform(*record, name, position, rotation);
+     }
+     bool ServerAdapter::GetModelAnimationName(HOBJECT object, HMODELANIM animation, std::string& name)
+     {
+diff --git a/src/game/server_physics.cpp b/src/game/server_physics.cpp
+index 71c5b0b..f00ce66 100644
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -16,8 +16,8 @@ namespace OpenBlood2
+         for (auto id : ids)
+         {
+             const auto* other = objects_.get(id);
+-            if (!other || other->life != Life::Alive || other->handle == ignore || other->handle == ignore_extra ||
+-                !(other->state.m_Flags & FLAG_SOLID))
++            if (!other || other->life != Life::Alive || other->attachment || other->handle == ignore ||
++                other->handle == ignore_extra || !(other->state.m_Flags & FLAG_SOLID))
+                 continue;
+             CollisionHit hit;
+             auto query = sweep_object(*other, from, to, dims, hit);
+@@ -36,8 +36,9 @@ namespace OpenBlood2
+     {
+         trace_service("ResizeObject");
+         auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || (r->container || r->world_model) || !physics_vector(dimensions) ||
+-            dimensions.x <= 0 || dimensions.y <= 0 || dimensions.z <= 0 || !physics_vector(r->state.m_Pos) || moving_)
++        if (!r || r->life != Life::Alive || r->attachment || (r->container || r->world_model) ||
++            !physics_vector(dimensions) || dimensions.x <= 0 || dimensions.y <= 0 || dimensions.z <= 0 ||
++            !physics_vector(r->state.m_Pos) || moving_)
+             return ResizeResult::Invalid;
+         if (!collision || !collision_ready)
+             return ResizeResult::Unavailable;
+@@ -61,7 +62,7 @@ namespace OpenBlood2
+         trace_service("GetMovementState");
+         state = {};
+         const auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || !collision || !collision_ready)
++        if (!r || r->life != Life::Alive || r->attachment || !collision || !collision_ready)
+             return false;
+         state.position = r->state.m_Pos;
+         state.velocity = r->velocity;
+@@ -106,7 +107,7 @@ namespace OpenBlood2
+             auto& a = active();
+             a.trace_service("TeleportObject");
+             auto* r = a.objects_.get(h);
+-            if (!r || r->life != Life::Alive || (r->container || r->world_model) || !position ||
++            if (!r || r->life != Life::Alive || r->attachment || (r->container || r->world_model) || !position ||
+                 !physics_vector(*position))
+                 return DE_INVALIDPARAMS;
+             r->state.m_Pos = *position;
+@@ -132,7 +133,7 @@ namespace OpenBlood2
+     {
+         trace_service("SetVelocity");
+         auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || r->container || (r->world_model && !r->world_body) || !v ||
++        if (!r || r->life != Life::Alive || r->attachment || r->container || (r->world_model && !r->world_body) || !v ||
+             !physics_vector(*v))
+             return DE_INVALIDPARAMS;
+         r->velocity = *v;
+@@ -153,7 +154,7 @@ namespace OpenBlood2
+     {
+         trace_service("SetAcceleration");
+         auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || r->container || (r->world_model && !r->world_body) || !v ||
++        if (!r || r->life != Life::Alive || r->attachment || r->container || (r->world_model && !r->world_body) || !v ||
+             !physics_vector(*v))
+             return DE_INVALIDPARAMS;
+         r->acceleration = *v;
+@@ -163,7 +164,7 @@ namespace OpenBlood2
+     {
+         trace_service("MoveObject");
+         auto* r = objects_.get(h);
+-        if (!r || r->life != Life::Alive || !destination || !physics_vector(*destination) ||
++        if (!r || r->life != Life::Alive || r->attachment || !destination || !physics_vector(*destination) ||
+             !physics_vector(r->state.m_Pos) || !physics_vector(r->dimensions) || r->dimensions.x < 0 ||
+             r->dimensions.y < 0 || r->dimensions.z < 0)
+             return DE_INVALIDPARAMS;
+@@ -285,8 +286,8 @@ namespace OpenBlood2
+                     for (auto id : ids)
+                     {
+                         const auto* other = objects_.get(id);
+-                        if (!other || other->handle == h || other->life != Life::Alive || other->container ||
+-                            !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
++                        if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
++                            other->container || !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
+                             continue;
+                         if (sweep_object(*other, position, up, r->dimensions, probe) == CollisionQuery::Hit ||
+                             sweep_object(*other, up, across, r->dimensions, probe) == CollisionQuery::Hit ||
+@@ -312,8 +313,8 @@ namespace OpenBlood2
+             for (auto id : ids)
+             {
+                 const auto* other = objects_.get(id);
+-                if (!other || other->handle == h || other->life != Life::Alive || other->container ||
+-                    !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
++                if (!other || other->handle == h || other->life != Life::Alive || other->attachment ||
++                    other->container || !((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY))
+                     continue;
+                 CollisionHit hit;
+                 if (sweep_object(*other, position, reached, r->dimensions, hit) == CollisionQuery::Hit)
+@@ -398,8 +399,8 @@ namespace OpenBlood2
+         for (auto id : ids)
+         {
+             auto* r = objects_.get(id);
+-            if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE || r->client_movement || r->container ||
+-                (r->world_model && !r->world_body) ||
++            if (!r || r->life != Life::Alive || r->attachment || r->activity != OBJSTATE_ACTIVE || r->client_movement ||
++                r->container || (r->world_model && !r->world_body) ||
+                 (!r->world_body && r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
+                 continue;
+             ContainerState containers;
+diff --git a/src/game/server_weapons.cpp b/src/game/server_weapons.cpp
+index 5bd4fe7..22ca4ee 100644
+--- a/src/game/server_weapons.cpp
++++ b/src/game/server_weapons.cpp
+@@ -22,6 +22,8 @@ namespace OpenBlood2
+             return SegmentResult::Invalid;
+         if (!collision || !collision_ready)
+             return SegmentResult::Unavailable;
++        if (!objects_.refresh_attachments())
++            return SegmentResult::Invalid;
+         CollisionHit nearest;
+         const auto world_result = collision->sweep(from, to, {}, nearest);
+         if (world_result == CollisionQuery::Invalid)
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index d5f244a..0a4af9e 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -386,11 +386,15 @@ namespace OpenBlood2
+                                      client_shell.UpdateMovement(server_shell, seconds, error) &&
+                                      client_shell.Update() && client_shell.UpdateUse(server_shell) &&
+                                      client_shell.SyncWeapons(models, resources, server_shell, error) &&
+-                                     client_shell.UpdateWeapons(server_shell, seconds, error);
++                                     client_shell.UpdateWeapons(server_shell, seconds, error) &&
++                                     (!server_shell.Player(local_client) ||
++                                      server_shell.Player(local_client)->m_InventoryMgr.UpdateHandModels());
+                 if (!server.GetClientUserData(local_client))
+                     ok = leave_player() && ok;
+                 else if (!updated || !pump_player_messages(error))
+                 {
++                    if (error.empty())
++                        error = "Original player update or held-weapon creation failed";
+                     trace.push_back(error);
+                     leave_player();
+                     ok = false;
+@@ -400,6 +404,7 @@ namespace OpenBlood2
+         if (seconds > 0)
+             ok = server.damage_containers() && ok;
+         ok = objects.finish_frame() && ok;
++        ok = objects.refresh_attachments() && ok;
+         ok = server.advance_lights() && ok;
+         if (ok && preview_model && preview_playing &&
+             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 8e1b952..6994563 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -558,3 +558,17 @@ if(BLOOD2_TEST_DATA_DIR)
+         set_tests_properties(ai_sight.${case} PROPERTIES LABELS "headless;private;ai_sight" TIMEOUT 90)
+     endforeach()
+ endif()
++
++add_executable(attachment_tests attachment_tests.cpp)
++target_link_libraries(attachment_tests PRIVATE blood2_game)
++blood2_project_options(attachment_tests)
++foreach(case IN ITEMS root nodes rejects lifetime held missing)
++    add_test(NAME attachments.${case} COMMAND attachment_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/attachment-fixtures/${case}")
++    set_tests_properties(attachments.${case} PROPERTIES LABELS "headless;attachments" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case IN ITEMS catalog subway)
++        add_test(NAME attachments.${case} COMMAND attachment_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(attachments.${case} PROPERTIES LABELS "headless;private;attachments" TIMEOUT 90)
++    endforeach()
++endif()
+diff --git a/tests/attachment_tests.cpp b/tests/attachment_tests.cpp
+new file mode 100644
+index 0000000..1ebf833
+--- /dev/null
++++ b/tests/attachment_tests.cpp
+@@ -0,0 +1,403 @@
++#include "brush_fixture.h"
++#include "game/original/HandWeaponModel.h"
++#include "player_fixture.h"
++#include <cmath>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(DVector a, DVector b)
++    {
++        return std::abs(a.x - b.x) < .001f && std::abs(a.y - b.y) < .001f && std::abs(a.z - b.z) < .001f;
++    }
++    HOBJECT body(GameSession& g, bool model = false)
++    {
++        ObjectCreateStruct s;
++        s.m_ObjectType = model ? OT_MODEL : OT_NORMAL;
++        auto h = g.objects.create(g.objects.find_class("BaseClass"), s);
++        if (model)
++        {
++            auto m = std::make_shared<Model>();
++            std::string error;
++            if (!read_model(test_model::abc().b, *m, error))
++                return nullptr;
++            g.objects.get(h)->model = m;
++        }
++        return h;
++    }
++    bool root(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto p = body(g), c = body(g);
++        CHECK(p && c);
++        g.objects.get(p)->state.m_Pos = {10, 20, 30};
++        DRotation q = rotation_from_euler({0, 1.5707963f, 0});
++        CHECK(g.server.SetObjectRotation(p, &q) == DE_OK);
++        DVector offset{0, 0, 2};
++        DRotation local = rotation_from_euler({0, 0, .5f});
++        HATTACHMENT id = 0;
++        CHECK(g.server.CreateAttachment(p, c, nullptr, &offset, &local, &id) == DE_OK && id);
++        CHECK(near(g.objects.get(c)->state.m_Pos, {12, 20, 30}));
++        g.objects.get(p)->state.m_Pos = {40, 50, 60};
++        DVector pos;
++        CHECK(g.objects.refresh_attachments());
++        g.server.GetObjectPos(c, &pos);
++        CHECK(near(pos, {42, 50, 60}));
++        DRotation out;
++        CHECK(g.server.GetObjectRotation(c, &out) == DE_OK);
++        CHECK(near(rotate_vector(out, {1, 0, 0}), rotate_vector(compose_rotation(q, local), {1, 0, 0})));
++        HATTACHMENT found = 0;
++        CHECK(g.server.FindAttachment(p, c, &found) == DE_OK && found == id);
++        auto floor = test_brush::box("floor", {-100, -20, -100}, {100, -10, 100});
++        std::string error;
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        g.objects.get(c)->dimensions = {1, 1, 1};
++        g.objects.get(p)->state.m_Pos = {60, 50, 60};
++        SegmentHit hit;
++        CHECK(g.server.IntersectSegment({62, 50, 50}, {62, 50, 70}, p, hit, false, SegmentObjects::All) ==
++              SegmentResult::Hit);
++        CHECK(hit.object == c && near(g.objects.get(c)->state.m_Pos, {62, 50, 60}));
++        CHECK(g.server.IntersectSegment({62, 50, 50}, {62, 50, 70}, p, hit) == SegmentResult::Miss);
++        CHECK(g.server.RemoveAttachment(id) == DE_OK && !g.objects.get(c)->attachment);
++        CHECK(g.server.RemoveAttachment(id) == DE_NOTFOUND && g.server.IsObjectAlive(c));
++        CHECK(g.server.FindAttachment(p, c, &found) == DE_NOTFOUND && !found);
++        return true;
++    }
++    bool nodes(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto p = body(g, true), c = body(g, true);
++        CHECK(p && c);
++        auto* r = g.objects.get(p);
++        r->state.m_Pos = {10, 20, 30};
++        r->state.m_Scale = {2, 3, 4};
++        r->animation.time = 25;
++        DVector offset{3, 4, 5};
++        DRotation q;
++        HATTACHMENT id;
++        CHECK(g.server.CreateAttachment(p, c, "HAND", &offset, &q, &id) == DE_OK);
++        DVector expected;
++        DRotation base;
++        CHECK(g.server.GetModelNodeTransform(p, "hand", &expected, &base));
++        CHECK(near(g.objects.get(c)->state.m_Pos, vector_add(expected, rotate_vector(base, offset))));
++        auto revision = r->animation.revision;
++        r->activity = OBJSTATE_INACTIVE;
++        r->animation.time = 50;
++        g.objects.get(c)->activity = OBJSTATE_INACTIVE;
++        g.server.SetObjectFlags(c, 0);
++        DVector child_node, regular_node;
++        DRotation a, b;
++        CHECK(g.server.GetAttachedModelNodeTransform(id, "hand", &child_node, &a) == DE_OK);
++        CHECK(g.server.GetModelNodeTransform(c, "hand", &regular_node, &b) && near(child_node, regular_node));
++        CHECK(r->animation.time == 50 && r->animation.revision == revision);
++        auto last = g.objects.get(c)->state.m_Pos;
++        auto original = r->model;
++        r->model.reset();
++        CHECK(!g.objects.refresh_attachments() && !g.objects.attachments().at(id).resolved &&
++              near(last, g.objects.get(c)->state.m_Pos));
++        DVector unchanged{9, 8, 7};
++        CHECK(!g.server.GetModelNodeTransform(c, "hand", &unchanged, &a) && near(unchanged, {9, 8, 7}));
++        r->model = original;
++        CHECK(g.objects.refresh_attachments());
++        return true;
++    }
++    bool rejects(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto p = body(g, true), c = body(g), extra = body(g);
++        DVector offset;
++        DRotation q;
++        HATTACHMENT id = 123;
++        CHECK(g.server.CreateAttachment(p, p, nullptr, &offset, &q, &id) == DE_INVALIDPARAMS && id == 0);
++        CHECK(g.server.CreateAttachment(p, c, "missing", &offset, &q, &id) == DE_NODENOTFOUND && !id);
++        CHECK(g.server.CreateAttachment(p, c, nullptr, nullptr, &q, &id) == DE_INVALIDPARAMS);
++        q.m_Spin = 0;
++        CHECK(g.server.CreateAttachment(p, c, nullptr, &offset, &q, &id) == DE_INVALIDPARAMS);
++        q = {};
++        g.server.SetObjectFlags(c, FLAG_SOLID);
++        CHECK(g.server.CreateAttachment(p, c, nullptr, &offset, &q, &id) == DE_ERROR);
++        g.server.SetObjectFlags(c, 0);
++        CHECK(g.server.CreateAttachment(p, c, nullptr, &offset, &q, &id) == DE_OK);
++        HATTACHMENT another = 0;
++        CHECK(g.server.CreateAttachment(extra, c, nullptr, &offset, &q, &another) == DE_ERROR);
++        CHECK(g.server.CreateAttachment(c, extra, nullptr, &offset, &q, &another) == DE_ERROR);
++        CHECK(g.server.CreateAttachment(extra, p, nullptr, &offset, &q, &another) == DE_ERROR);
++        CHECK(g.server.TeleportObject(c, &offset) == DE_INVALIDPARAMS &&
++              g.server.MoveObject(c, &offset) == DE_INVALIDPARAMS);
++        CHECK(g.server.SetVelocity(c, &offset) == DE_INVALIDPARAMS &&
++              g.server.SetAcceleration(c, &offset) == DE_INVALIDPARAMS);
++        CHECK(g.server.SetObjectRotation(c, &q) == DE_INVALIDPARAMS);
++        g.server.SetObjectFlags(c, FLAG_GRAVITY);
++        CHECK(!(g.server.GetObjectFlags(c) & FLAG_GRAVITY));
++        CHECK(g.objects.attachments().size() == 1);
++        CHECK(g.server.MoveKeyframedObject(c, offset, nullptr) == MoverResult::Unavailable);
++        CHECK(g.server.RemoveAttachment(id) == DE_OK);
++        offset.x = std::numeric_limits<float>::quiet_NaN();
++        CHECK(g.server.CreateAttachment(p, c, nullptr, &offset, &q, &id) == DE_INVALIDPARAMS && !id);
++        offset = {};
++        std::string long_node(101, 'x');
++        CHECK(g.server.CreateAttachment(p, c, long_node.c_str(), &offset, &q, &id) == DE_INVALIDPARAMS);
++        // Allocation IDs cannot be recycled even when each relation is immediately removed.
++        for (unsigned i = 1; i < 65536; ++i)
++        {
++            CHECK(g.server.CreateAttachment(p, c, nullptr, &offset, &q, &id) == DE_OK);
++            CHECK(g.server.RemoveAttachment(id) == DE_OK);
++        }
++        CHECK(g.server.CreateAttachment(p, c, nullptr, &offset, &q, &id) == DE_ERROR && !id &&
++              g.objects.attachments().empty());
++        return true;
++    }
++    class RemoveAttachedParent : public BaseClass
++    {
++      public:
++        HOBJECT parent = nullptr;
++        HATTACHMENT attachment = 0;
++        bool observed = false;
++
++      protected:
++        DDWORD EngineMessageFn(DDWORD message, void* data, DFLOAT reason) override
++        {
++            if (message == MID_UPDATE)
++            {
++                auto* s = GetServerDE();
++                s->RemoveObject(parent);
++                DVector p;
++                DRotation q;
++                observed = !s->IsObjectAlive(parent) &&
++                           s->GetAttachedModelNodeTransform(attachment, "hand", &p, &q) == DE_INVALIDPARAMS;
++            }
++            return BaseClass::EngineMessageFn(message, data, reason);
++        }
++    };
++    bool lifetime(const std::filesystem::path&)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        HATTACHMENT previous = 0;
++        static const ClassInfo removal{"AttachmentRemovalProbe",
++                                       g.objects.find_class("BaseClass"),
++                                       []() -> std::unique_ptr<BaseClass>
++                                       { return std::make_unique<RemoveAttachedParent>(); },
++                                       {}};
++        CHECK(g.objects.register_class(removal));
++        auto parent = body(g);
++        auto child = g.objects.create(&removal);
++        auto* remover = dynamic_cast<RemoveAttachedParent*>(g.objects.get(child)->game.get());
++        CHECK(remover);
++        remover->parent = parent;
++        DVector offset;
++        DRotation rotation;
++        CHECK(g.server.CreateAttachment(parent, child, nullptr, &offset, &rotation, &remover->attachment) == DE_OK);
++        CHECK(g.objects.set_next_update(child, .01f) && g.objects.advance(.02));
++        CHECK(remover->observed && !g.objects.get(parent) && g.server.IsObjectAlive(child) &&
++              g.objects.attachments().empty());
++        CHECK(g.unload_world());
++        for (int i = 0; i < 3; ++i)
++        {
++            auto p = body(g), c = body(g);
++            DVector o;
++            DRotation q;
++            HATTACHMENT id;
++            CHECK(g.server.CreateAttachment(p, c, nullptr, &o, &q, &id) == DE_OK && id != previous);
++            CHECK(g.objects.remove(p) && g.objects.attachments().empty() && !g.objects.get(c)->attachment);
++            CHECK(g.server.RemoveAttachment(id) == DE_NOTFOUND && g.server.IsObjectAlive(c));
++            CHECK(g.objects.finish_frame());
++            p = body(g);
++            CHECK(g.server.CreateAttachment(p, c, nullptr, &o, &q, &id) == DE_OK);
++            CHECK(g.objects.remove(c) && g.objects.attachments().empty());
++            CHECK(g.objects.finish_frame());
++            c = body(g);
++            CHECK(g.server.CreateAttachment(p, c, nullptr, &o, &q, &id) == DE_OK);
++            previous = id;
++            CHECK(g.unload_world() && g.objects.attachments().empty() && g.objects.snapshot().empty());
++            CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++        }
++        return true;
++    }
++    bool held(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, path));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* player = g.server_shell.Player(g.local_client);
++        auto& inv = player->m_InventoryMgr;
++        CHECK(g.step(.02));
++        auto* w = inv.CurrentWeapon();
++        auto h = w->m_hHandModel;
++        CHECK(h && w->m_hHandAttachment && g.objects.get(h)->model);
++        // Synthetic Caleb has no r_gun: source origin fallback, then scheduled hidden state.
++        CHECK(g.step(.02));
++        CHECK(!(g.server.GetObjectFlags(h) & FLAG_VISIBLE));
++        CHECK(g.objects.attachments().at(w->m_hHandAttachment).node.empty());
++        CHECK(g.select_weapon(0, error));
++        CHECK(!g.server.IsObjectAlive(h));
++        CHECK(g.step(.02));
++        CHECK(inv.CurrentWeapon()->data.m_nType == WEAP_MELEE && inv.CurrentWeapon()->m_hHandModel);
++        CHECK(g.select_weapon(1, error) && g.step(.02));
++        CHECK(inv.ObtainWeapon(WEAP_BERETTA, 1) == InventoryResult::Ok && g.step(.02));
++        CHECK(inv.CurrentWeapon(true)->m_hHandModel && g.objects.attachments().size() == 2);
++        auto removed = inv.CurrentWeapon()->m_hHandModel;
++        CHECK(g.objects.remove(removed) && g.objects.finish_frame());
++        CHECK(g.step(.02) && inv.CurrentWeapon()->m_hHandModel != removed);
++        auto detached = inv.CurrentWeapon()->m_hHandModel;
++        CHECK(g.server.RemoveAttachment(inv.CurrentWeapon()->m_hHandAttachment) == DE_OK);
++        CHECK(g.step(.02) && inv.CurrentWeapon()->m_hHandModel != detached && !g.server.IsObjectAlive(detached));
++        player->m_damage.m_bDead = true;
++        CHECK(g.step(.02));
++        CHECK(g.objects.attachments().empty() && !inv.CurrentWeapon()->m_hHandModel &&
++              !inv.CurrentWeapon(true)->m_hHandModel);
++        CHECK(g.leave_player() && g.objects.attachments().empty());
++        return true;
++    }
++    bool missing(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, path));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto* p = g.server_shell.Player(g.local_client);
++        auto* w = p->m_InventoryMgr.CurrentWeapon();
++        // Removing the resource mount forces the real model loader to fail.
++        auto saved = std::move(g.resources);
++        g.resources = Resources{};
++        CHECK(!w->ShowHandModel(true) && !w->hand_error.empty() && !w->m_hHandModel);
++        CHECK(g.objects.finish_frame() && g.objects.attachments().empty());
++        g.resources = std::move(saved);
++        CHECK(g.step(.02));
++        const auto old = w->m_hHandModel;
++        saved = std::move(g.resources);
++        g.resources = Resources{};
++        CHECK(!g.select_weapon(0, error) && !error.empty());
++        CHECK(p->m_InventoryMgr.m_nCurWeaponSlot == 1 && g.client_shell.weapons[0].type == WEAP_BERETTA);
++        g.resources = std::move(saved);
++        CHECK(g.step(.02));
++        CHECK(w->m_hHandModel && w->m_hHandModel != old && !g.objects.get(old) && g.objects.attachments().size() == 1);
++        CHECK(g.unload_world() && g.objects.attachments().empty());
++        return true;
++    }
++    bool catalog(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        std::string error;
++        Config config;
++        config.data_dir = path;
++        CHECK(g.resources.mount_game(config, error));
++        unsigned poses = 0, fallback = 0;
++        for (auto file :
++             {"models/characters/caleb.abc", "models/enemies/m_civilian1.abc", "models/enemies/f_civilian1.abc",
++              "models/enemies/labtech.abc", "models/enemies/m_cultist1.abc", "models/enemies/f_cultist1.abc",
++              "models/enemies/gideon.abc"})
++        {
++            ObjectCreateStruct state;
++            state.m_ObjectType = OT_MODEL;
++            SAFE_STRCPY(state.m_Filename, file);
++            auto h = g.objects.create(g.objects.find_class("BaseClass"), state);
++            auto* r = g.objects.get(h);
++            CHECK(r && r->model);
++            for (bool left : {false, true})
++            {
++                CBeretta gun;
++                gun.Init(h, nullptr, left);
++                CHECK(gun.ShowHandModel(true));
++                CHECK(g.objects.advance(.02));
++                std::cout << file << " / " << (left ? "left" : "right") << " / "
++                          << (g.objects.attachments().at(gun.m_hHandAttachment).node.empty() ? "origin fallback"
++                                                                                             : "gun node")
++                          << "\n";
++                CHECK(g.server.GetModelAnimation(gun.m_hHandModel) ==
++                      g.server.GetAnimIndex(gun.m_hHandModel, "handheld"));
++                for (unsigned clip = 0; clip < r->model->animations.size(); ++clip)
++                {
++                    r->animation.animation = clip;
++                    r->animation.time = r->model->animations[clip].duration * .5;
++                    CHECK(g.objects.refresh_attachments());
++                    DVector node;
++                    DRotation q;
++                    const bool found = g.server.GetModelNodeTransform(h, left ? "l_gun" : "r_gun", &node, &q);
++                    CHECK(g.objects.attachments().at(gun.m_hHandAttachment).node.empty() == !found);
++                    if (!found)
++                    {
++                        node = r->state.m_Pos;
++                        ++fallback;
++                    }
++                    CHECK(near(node, g.objects.get(gun.m_hHandModel)->state.m_Pos));
++                    ++poses;
++                }
++            }
++            CHECK(g.objects.remove(h) && g.objects.finish_frame() && g.objects.attachments().empty());
++        }
++        std::cout << "Private held-model poses: " << poses << ", source origin fallbacks: " << fallback << "\n";
++        CHECK(poses == 652 && fallback > 0);
++        return true;
++    }
++    bool subway(const std::filesystem::path& path)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        std::string error;
++        Config config;
++        config.data_dir = path;
++        CHECK(g.resources.mount_game(config, error));
++        HATTACHMENT previous = 0;
++        for (int i = 0; i < 2; ++i)
++        {
++            CHECK(g.request_world("01_subwaya", error) && g.enter_player(error) && g.step(.02));
++            auto* p = g.server_shell.Player(g.local_client);
++            auto* w = p->m_InventoryMgr.CurrentWeapon();
++            CHECK(w && w->m_hHandModel);
++            CHECK(w->m_hHandAttachment != previous);
++            previous = w->m_hHandAttachment;
++            for (int j = 0; j < 10; ++j)
++                CHECK(g.step(.02));
++            DVector node;
++            DRotation q;
++            CHECK(g.server.GetModelNodeTransform(p->m_hObject, "r_gun", &node, &q));
++            CHECK(near(node, g.objects.get(w->m_hHandModel)->state.m_Pos));
++            CHECK(g.select_weapon(0, error) && g.step(.02));
++            w = p->m_InventoryMgr.CurrentWeapon();
++            CHECK(g.objects.get(w->m_hHandModel)->model && w->data.m_nType == WEAP_MELEE);
++            CHECK(g.unload_world() && g.objects.attachments().empty() && g.objects.snapshot().empty());
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    std::string name = argv[1];
++    std::filesystem::path path = argc > 2 ? argv[2] : "";
++    if (name == "root")
++        return !root(path);
++    if (name == "nodes")
++        return !nodes(path);
++    if (name == "rejects")
++        return !rejects(path);
++    if (name == "lifetime")
++        return !lifetime(path);
++    if (name == "held")
++        return !held(path);
++    if (name == "missing")
++        return !missing(path);
++    if (name == "catalog")
++        return !catalog(path);
++    if (name == "subway")
++        return !subway(path);
++    return 2;
++}
+diff --git a/tests/cinematic_tests.cpp b/tests/cinematic_tests.cpp
+index 2900c00..8d65325 100644
+--- a/tests/cinematic_tests.cpp
++++ b/tests/cinematic_tests.cpp
+@@ -359,7 +359,8 @@ namespace
+             for (unsigned i = 0; i < 6; ++i)
+                 CHECK(g.step(1.0 / 60));
+             v = g.server.audio.get(id);
+-            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 188);
++            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 189 &&
++                  g.objects.attachments().size() == 1);
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
+                   !g.server.audio.cached_clips() && !g.server.audio.get(id) && !g.server.message_count() &&
+                   !g.server.list_count() && !g.server.string_count());
+diff --git a/tests/keyframer_tests.cpp b/tests/keyframer_tests.cpp
+index 7d53816..3132482 100644
+--- a/tests/keyframer_tests.cpp
++++ b/tests/keyframer_tests.cpp
+@@ -368,7 +368,7 @@ namespace
+             g.server.RelinquishList(list);
+             auto* f = framer(g, h);
+             CHECK(g.step(1.0 / 60) && f->keys.size() == 2 && f->targets.size() == 1 && f->active && f->time == 0);
+-            CHECK(g.objects.snapshot().size() == 188);
++            CHECK(g.objects.snapshot().size() == 189 && g.objects.attachments().size() == 1);
+             auto camera = f->targets[0].object;
+             auto start = g.objects.get(camera)->state.m_Pos;
+             CHECK(g.step(1.0 / 60) && f->targets[0].moves == 1 && f->processed == 1 && f->unresolved_messages == 1);
+diff --git a/tests/light_tests.cpp b/tests/light_tests.cpp
+index bc1309c..d6cdb56 100644
+--- a/tests/light_tests.cpp
++++ b/tests/light_tests.cpp
+@@ -351,7 +351,7 @@ namespace
+         {
+             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+             CHECK(g.objects.snapshot().size() == 197 && g.server.light_effects.size() == 12);
+-            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 188);
++            CHECK(g.step(1.0 / 60) && g.objects.snapshot().size() == 189 && g.objects.attachments().size() == 1);
+             KeyFramer* path = nullptr;
+             for (auto id : g.objects.snapshot())
+                 if (auto* f = dynamic_cast<KeyFramer*>(g.objects.get(id)->game.get());
+diff --git a/tests/player_fixture.h b/tests/player_fixture.h
+index daf915d..c2b8b4d 100644
+--- a/tests/player_fixture.h
++++ b/tests/player_fixture.h
+@@ -76,6 +76,12 @@ namespace test_player
+         if (weapon_assets)
+             for (auto path : {"c_beretta_pv_t.dtx", "c_knife_pv_t.dtx"})
+                 dir.children["skins"].children["weapons"].files[path] = {1, 2, 3};
++        if (weapon_assets)
++            for (auto name : {"beretta_pu", "knifec_pu"})
++            {
++                dir.children["models"].children["powerups"].files[std::string(name) + ".abc"] = test_model::abc(true).b;
++                dir.children["skins"].children["powerups"].files[std::string(name) + ".dtx"] = {1, 2, 3};
++            }
+         if (pickup_assets)
+             for (auto name :
+                  {"bulletammo_pu", "shellammo_pu", "bmgammo_pu", "flareammo_pu", "diebugdieammo_pu", "howitzerammo_pu",
+diff --git a/tests/random_sound_tests.cpp b/tests/random_sound_tests.cpp
+index 986c360..771314a 100644
+--- a/tests/random_sound_tests.cpp
++++ b/tests/random_sound_tests.cpp
+@@ -346,7 +346,8 @@ namespace
+                 std::cout << "cycle=" << cycle << " name=" << g.objects.get(h)->state.m_Name
+                           << " sound=" << v->request.resource << '\n';
+             }
+-            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 188);
++            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 189 &&
++                  g.objects.attachments().size() == 1);
+             CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips() &&
+                   !g.server.audio.get(last) && g.objects.snapshot().empty() && !g.server.message_count() &&
+                   !g.server.string_count() && !g.server.list_count());
+diff --git a/tests/scene_explosion_tests.cpp b/tests/scene_explosion_tests.cpp
+index c217fbb..9ca4736 100644
+--- a/tests/scene_explosion_tests.cpp
++++ b/tests/scene_explosion_tests.cpp
+@@ -317,7 +317,7 @@ namespace
+                   counts[EntryState::Failed] == 0);
+             CHECK(g.objects.snapshot().size() == 194 && g.enter_player(error) && g.objects.snapshot().size() == 197 &&
+                   g.step(.02));
+-            CHECK(g.objects.snapshot().size() == 188);
++            CHECK(g.objects.snapshot().size() == 189 && g.objects.attachments().size() == 1);
+             auto* player = g.server_shell.Player(g.local_client);
+             CHECK(player);
+             auto health = player->m_damage.m_fHitPoints;
+diff --git a/tests/sprite_tests.cpp b/tests/sprite_tests.cpp
+index 4731d0b..49a93e1 100644
+--- a/tests/sprite_tests.cpp
++++ b/tests/sprite_tests.cpp
+@@ -391,7 +391,7 @@ namespace
+                 if (r->sprite)
+                     CHECK(r->sprite_track.frame == 0 && std::abs(r->sprite_track.milliseconds - 20) < 1e-6);
+             }
+-            CHECK(g.objects.snapshot().size() == 188 && !g.run_world(error) &&
++            CHECK(g.objects.snapshot().size() == 189 && g.objects.attachments().size() == 1 && !g.run_world(error) &&
+                   error.find("17 uninstantiated") != std::string::npos);
+             CHECK(g.unload_world() && weak.expired() && g.objects.snapshot().empty() && g.server.string_count() == 0 &&
+                   g.server.message_count() == 0 && g.server.list_count() == 0);
+diff --git a/tests/worldpath_tests.cpp b/tests/worldpath_tests.cpp
+index 42ab8a3..bde688b 100644
+--- a/tests/worldpath_tests.cpp
++++ b/tests/worldpath_tests.cpp
+@@ -352,7 +352,8 @@ namespace
+             }
+             CHECK(moves == 297 && blocked == 2 && !f->active && f->processed == 3 && close(r->state.m_Pos, last));
+             CHECK(!close(last, initial) && !close(last, vector_add(f->keys.back().position, f->targets[0].offset)));
+-            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 188);
++            CHECK(r->mover_moves == moves && r->mover_blocks == blocked && g.objects.snapshot().size() == 189 &&
++                  g.objects.attachments().size() == 1);
+             std::cout << "cycle=" << cycle << " moves=" << moves << " blocks=" << blocked << " final=" << last.x << ','
+                       << last.y << ',' << last.z << " consumed_keys=9 runtime=188\n";
+             CHECK(g.unload_world() && g.objects.snapshot().empty() && !g.server.string_count() &&

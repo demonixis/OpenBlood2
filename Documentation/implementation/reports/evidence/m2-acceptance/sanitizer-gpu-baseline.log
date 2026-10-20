@@ -1,0 +1,128 @@
+Video driver: wayland
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+SDL teardown complete; allocation tracking: unavailable
+
+=================================================================
+==2353942==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 7336 byte(s) in 131 object(s) allocated from:
+    #0 0x0000004a72dd in calloc ??:?
+    #1 0x7b96319e7b8d  (<unknown module>)
+
+Direct leak of 3696 byte(s) in 66 object(s) allocated from:
+    #0 0x0000004a72dd in calloc ??:?
+    #1 0x7f96399ce35c  (<unknown module>)
+
+Direct leak of 184 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004a72dd in calloc ??:?
+    #1 0x7f963a01b716 in _dbus_message_loader_get_buffer ??:?
+    #2 0x7f963a01caa7 in _dbus_message_loader_queue_messages ??:?
+    #3 0x7f963a0294b0 in _dbus_server_new_for_tcp_socket ??:?
+    #4 0x7f963a0296af in _dbus_server_new_for_tcp_socket ??:?
+    #5 0x7f963a0299d2 in _dbus_server_new_for_tcp_socket ??:?
+    #6 0x7f963a029f11 in _dbus_server_new_for_tcp_socket ??:?
+    #7 0x7f963a00b5d5 in _dbus_connection_unref_unlocked ??:?
+    #8 0x7f963a02217f in dbus_pending_call_block ??:?
+    #9 0x7f963a00d57b in dbus_connection_send_with_reply_and_block ??:?
+    #10 0x7f963a00d85b in dbus_bus_register ??:?
+    #11 0x7f963a00dc39 in dbus_bus_register ??:?
+    #12 0x000000693035 in SDL_DBus_Init /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/core/linux/SDL_dbus.c:202
+    #13 0x0000006dc930 in SDL_InitSubSystem_REAL /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/SDL.c:372
+    #14 0x0000006dd322 in SDL_Init_REAL /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/SDL.c:603
+    #15 0x00000050adfc in SDL_Init_DEFAULT /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/dynapi/SDL_dynapi_procs.h:638
+    #16 0x0000004f4047 in SDL_Init /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/dynapi/SDL_dynapi_procs.h:638
+    #17 0x0000004ed31d in (anonymous namespace)::cycle(std::basic_string_view<char, std::char_traits<char> >) /home/yann/projects/lithtech/Blood2/tests/platform_lifetime_tests.cpp:9
+    #18 0x0000004ed0d7 in main /home/yann/projects/lithtech/Blood2/tests/platform_lifetime_tests.cpp:79
+    #19 0x7f963a40a680 in __libc_start_call_main ??:?
+    #20 0x7f963a40a797 in __libc_start_main_alias_2 :?
+    #21 0x000000401054 in _start ??:?
+
+Direct leak of 184 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004a72dd in calloc ??:?
+    #1 0x7f963a01b716 in _dbus_message_loader_get_buffer ??:?
+    #2 0x7f963a01caa7 in _dbus_message_loader_queue_messages ??:?
+    #3 0x7f963a0294b0 in _dbus_server_new_for_tcp_socket ??:?
+    #4 0x7f963a0296af in _dbus_server_new_for_tcp_socket ??:?
+    #5 0x7f963a0299d2 in _dbus_server_new_for_tcp_socket ??:?
+    #6 0x7f963a029f11 in _dbus_server_new_for_tcp_socket ??:?
+    #7 0x7f963a00b5d5 in _dbus_connection_unref_unlocked ??:?
+    #8 0x7f963a02217f in dbus_pending_call_block ??:?
+    #9 0x7f963a00d57b in dbus_connection_send_with_reply_and_block ??:?
+    #10 0x7f963a00d85b in dbus_bus_register ??:?
+    #11 0x7f963a00dc39 in dbus_bus_register ??:?
+    #12 0x7b9631a19f06  (<unknown module>)
+
+Indirect leak of 12728 byte(s) in 133 object(s) allocated from:
+    #0 0x0000004a72dd in calloc ??:?
+    #1 0x7b96319e7b8d  (<unknown module>)
+
+Indirect leak of 6336 byte(s) in 66 object(s) allocated from:
+    #0 0x0000004a72dd in calloc ??:?
+    #1 0x7f96399d02e9  (<unknown module>)
+
+Indirect leak of 5972 byte(s) in 276 object(s) allocated from:
+    #0 0x0000004a7108 in malloc ??:?
+    #1 0x7b96319e78d1  (<unknown module>)
+
+Indirect leak of 4314 byte(s) in 2 object(s) allocated from:
+    #0 0x0000004a7510 in realloc ??:?
+    #1 0x7f963a02b2dd in dbus_realloc ??:?
+    #2 0x7f963a02c1c7 in _dbus_string_compact ??:?
+    #3 0x7f963a02cf04 in _dbus_string_copy_len ??:?
+    #4 0x7f963a01d291 in _dbus_message_loader_queue_messages ??:?
+    #5 0x7f963a0294b0 in _dbus_server_new_for_tcp_socket ??:?
+    #6 0x7f963a0296af in _dbus_server_new_for_tcp_socket ??:?
+    #7 0x7f963a0299d2 in _dbus_server_new_for_tcp_socket ??:?
+    #8 0x7f963a029f11 in _dbus_server_new_for_tcp_socket ??:?
+    #9 0x7f963a00b5d5 in _dbus_connection_unref_unlocked ??:?
+    #10 0x7f963a02217f in dbus_pending_call_block ??:?
+    #11 0x7f963a00d57b in dbus_connection_send_with_reply_and_block ??:?
+    #12 0x7b9631a77c23  (<unknown module>)
+
+Indirect leak of 2986 byte(s) in 138 object(s) allocated from:
+    #0 0x0000004a7108 in malloc ??:?
+    #1 0x7f96399cdf68  (<unknown module>)
+
+Indirect leak of 192 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004a7510 in realloc ??:?
+    #1 0x7f963a02b2dd in dbus_realloc ??:?
+    #2 0x7f963a015a35 in dbus_message_iter_append_fixed_array ??:?
+    #3 0x7f963a015ddf in _dbus_type_writer_recurse ??:?
+    #4 0x7f963a01624a in _dbus_type_writer_write_basic ??:?
+    #5 0x7f963a017235 in _dbus_header_set_field_basic ??:?
+    #6 0x7f963a0173b2 in dbus_message_set_reply_serial ??:?
+    #7 0x7f963a019fd7 in dbus_message_iter_append_basic ??:?
+    #8 0x7f963a01c56a in dbus_message_new_error ??:?
+    #9 0x7f963a00d147 in dbus_connection_send_with_reply ??:?
+    #10 0x7f963a00d55e in dbus_connection_send_with_reply_and_block ??:?
+    #11 0x7f963a00d85b in dbus_bus_register ??:?
+    #12 0x7f963a00dc39 in dbus_bus_register ??:?
+    #13 0x00000069307e in SDL_DBus_Init /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/core/linux/SDL_dbus.c:210
+    #14 0x0000006dc930 in SDL_InitSubSystem_REAL /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/SDL.c:372
+    #15 0x0000006dd322 in SDL_Init_REAL /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/SDL.c:603
+    #16 0x00000050adfc in SDL_Init_DEFAULT /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/dynapi/SDL_dynapi_procs.h:638
+    #17 0x0000004f4047 in SDL_Init /home/yann/projects/lithtech/Blood2/build/sanitize/_deps/sdl3-src/src/dynapi/SDL_dynapi_procs.h:638
+    #18 0x0000004ed31d in (anonymous namespace)::cycle(std::basic_string_view<char, std::char_traits<char> >) /home/yann/projects/lithtech/Blood2/tests/platform_lifetime_tests.cpp:9
+    #19 0x0000004ed0d7 in main /home/yann/projects/lithtech/Blood2/tests/platform_lifetime_tests.cpp:79
+    #20 0x7f963a40a680 in __libc_start_call_main ??:?
+    #21 0x7f963a40a797 in __libc_start_main_alias_2 :?
+    #22 0x000000401054 in _start ??:?
+
+Indirect leak of 96 byte(s) in 1 object(s) allocated from:
+    #0 0x0000004a7510 in realloc ??:?
+    #1 0x7f963a02b2dd in dbus_realloc ??:?
+    #2 0x7f963a02c1c7 in _dbus_string_compact ??:?
+    #3 0x7f963a02cf04 in _dbus_string_copy_len ??:?
+    #4 0x7f963a01cae6 in _dbus_message_loader_queue_messages ??:?
+    #5 0x7f963a0294b0 in _dbus_server_new_for_tcp_socket ??:?
+    #6 0x7f963a0296af in _dbus_server_new_for_tcp_socket ??:?
+    #7 0x7f963a0299d2 in _dbus_server_new_for_tcp_socket ??:?
+    #8 0x7f963a029f11 in _dbus_server_new_for_tcp_socket ??:?
+    #9 0x7f963a00b5d5 in _dbus_connection_unref_unlocked ??:?
+    #10 0x7f963a02217f in dbus_pending_call_block ??:?
+    #11 0x7f963a00d57b in dbus_connection_send_with_reply_and_block ??:?
+    #12 0x7f963a00d85b in dbus_bus_register ??:?
+    #13 0x7f963a00dc39 in dbus_bus_register ??:?
+    #14 0x7b9631a19f06  (<unknown module>)
+
+SUMMARY: AddressSanitizer: 44024 byte(s) leaked in 816 allocation(s).

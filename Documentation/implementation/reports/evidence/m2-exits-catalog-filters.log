@@ -1,0 +1,3 @@
+Authored exit2 -> 02_cityhub / start 01_egressa
+Filters: player=0 relay=0 named=0 name= locked=0 active=1 delay=2 count=1
+catalog:221: send(g, t->m_hObject, g.client_shell.player) && t->deliveries == 1

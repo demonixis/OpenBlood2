@@ -1,0 +1,1 @@
+Reviewed Debug Vulkan capture: original AI commands/hearing panel shows SOUND_TRIGGER 2, hearing range 1000, one event and one reaction, zero failures, heard location 1000/10000/300 and distance 300. Diagnostic receiver is labelled. Missing full AI_Update/scripts/actions are stated. Hidden/reload assertions are in gpu.character, not inferred from the capture.

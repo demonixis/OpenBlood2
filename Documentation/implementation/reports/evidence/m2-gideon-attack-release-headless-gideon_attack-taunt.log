@@ -1,0 +1,14 @@
+686/691 Testing: gideon_attack.taunt
+686/691 Test: gideon_attack.taunt
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon_attack_tests" "taunt" "/home/yann/projects/lithtech/Blood2/build/release/tests/gideon-attack-taunt"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gideon_attack.taunt" start time: Oct 17 03:03 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_attack.taunt" end time: Oct 17 03:03 CEST
+"gideon_attack.taunt" time elapsed: 00:00:00
+----------------------------------------------------------

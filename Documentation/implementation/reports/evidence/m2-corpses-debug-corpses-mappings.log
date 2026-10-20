@@ -1,0 +1,14 @@
+492/499 Testing: corpses.mappings
+492/499 Test: corpses.mappings
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse_tests" "mappings" "/home/yann/projects/lithtech/Blood2/build/debug/tests/corpse-fixtures/mappings"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"corpses.mappings" start time: Oct 16 16:48 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"corpses.mappings" end time: Oct 16 16:48 CEST
+"corpses.mappings" time elapsed: 00:00:00
+----------------------------------------------------------

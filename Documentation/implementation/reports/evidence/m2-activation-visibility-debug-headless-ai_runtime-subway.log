@@ -1,0 +1,16 @@
+480/701 Testing: ai_runtime.subway
+480/701 Test: ai_runtime.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_runtime_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_runtime.subway" start time: Oct 17 04:04 CEST
+Output:
+----------------------------------------------------------
+SubwayA load=0 created=204 unsupported=0 AI_Update=537 pings=20
+SubwayA load=1 created=204 unsupported=0 AI_Update=537 pings=20
+<end of output>
+Test time =   5.99 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.subway" end time: Oct 17 04:04 CEST
+"ai_runtime.subway" time elapsed: 00:00:05
+----------------------------------------------------------

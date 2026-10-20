@@ -1,0 +1,250 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 25
+      Start  25: gpu.lifecycle
+
+25: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--gpu-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/gpu.png"
+25: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+25: Test timeout computed to be: 25
+25: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+25: [info] BLOOD2.REZ: detected, 267758913 bytes
+25: [info] SOUND.REZ: detected, 204633068 bytes
+25: [info] BLOOD2P.REZ: detected, 24133434 bytes
+25: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+25: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+25: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+25: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+25: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+25: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/gpu.png
+25: [info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+25: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+25: [info] Session playback: waiting=0 time=0.39999999999999997 npc-ready=0 npc-failed=0 npc-updates=0
+25: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+ 1/14 Test  #25: gpu.lifecycle ....................   Passed    3.11 sec
+test 196
+      Start 196: gpu.objectives
+
+196: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--objectives-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/objectives.png"
+196: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+196: Test timeout computed to be: 30
+196: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+196: [info] BLOOD2.REZ: detected, 267758913 bytes
+196: [info] SOUND.REZ: detected, 204633068 bytes
+196: [info] BLOOD2P.REZ: detected, 24133434 bytes
+196: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+196: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+196: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+196: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+196: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+196: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+196: [warning] NEW_LEVEL retained current world: Destination initialization rejected: 5 unsupported classes, 1 failed entries, 0 unavailable services
+196: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/objectives.png
+196: [warning] NEW_LEVEL retained current world: Destination initialization rejected: 5 unsupported classes, 1 failed entries, 0 unavailable services
+196: [info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+196: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+196: [info] Session playback: waiting=0 time=4.483333333333323 npc-ready=16 npc-failed=0 npc-updates=112
+196: [info] AI paths: hidden=true, reentered=true, copied points=7
+196: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+196: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+196: [info] OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; ExitTrigger NEW_LEVEL refusal preserves player/inventory; read-only CityHub preparation checks 1026 entries; temporary CityHub initialization/kept-player entry, cleanup and source restoration checked
+196: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+ 2/14 Test #196: gpu.objectives ...................   Passed    6.75 sec
+test 357
+      Start 357: gpu.world_depth
+
+357: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/world_gpu_tests "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-depth.png"
+357: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+357: Test timeout computed to be: 30
+357: GPU readback: depth occlusion, opposite winding, near clipping, +X/+Y orientation, camera/object transforms, resize, textured repeat/row orientation/opaque sampling and reupload pass
+ 3/14 Test #357: gpu.world_depth ..................   Passed    0.43 sec
+test 617
+      Start 617: gpu.explosion_flame_alpha
+
+617: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/explosion_flame_gpu_tests "/home/yann/projects/lithtech/Blood2/build/debug/tests/explosion-flame-alpha"
+617: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+617: Test timeout computed to be: 30
+617: Flame RGB and system alpha: 3875 exact opaque-texel blend checks
+ 4/14 Test #617: gpu.explosion_flame_alpha ........   Passed    0.35 sec
+test 648
+      Start 648: gpu.mouse_combat
+
+648: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/player_controls_tests "gpu_combat" "/home/yann/.steam/steam/steamapps/common/Blood II"
+648: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+648: Test timeout computed to be: 120
+648: Original SubwayA camera intro expired after 12.0167 simulation seconds
+648: Approached encounter at z=-2192.09
+648: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=8, ammo=42, independent corpse verified, native=1
+648: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=0
+648: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+648: Walked past killed Cultist to z=-1861.92
+648: Original SubwayA camera intro expired after 12.0167 simulation seconds
+648: Approached encounter at z=-2192.09
+648: Mouse secondary killed authored gak: HP 44.8923 -> 0, shots=13, ammo=37, independent corpse verified, native=1
+648: Dodge updates=12, corpse candidates=23, zero-margin search=1, swept source clearance=0
+648: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+648: Walked past killed Cultist to z=-1861.92
+ 5/14 Test #648: gpu.mouse_combat .................   Passed   12.99 sec
+test 649
+      Start 649: gpu.corpse_clearance
+
+649: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/player_controls_tests "gpu_clearance" "/home/yann/.steam/steam/steamapps/common/Blood II"
+649: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+649: Test timeout computed to be: 120
+649: Original SubwayA camera intro expired after 12.0167 simulation seconds
+649: Approached encounter at z=-2338.28
+649: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+649: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+649: Post-kill position=-32,170.001,-1854.18 camera=0 yaw=0
+649: Walked past killed Cultist to z=-1854.18
+649: Approached encounter at z=-1742.25
+649: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+649: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+649: Post-kill position=-32,170.001,-1340.93 camera=0 yaw=-3.72529e-09
+649: Walked past killed Cultist to z=-1340.93
+649: Original SubwayA camera intro expired after 12.0167 simulation seconds
+649: Approached encounter at z=-2341.42
+649: Mouse primary killed authored gak: HP 44.8923 -> 0, shots=7, ammo=43, independent corpse verified, native=1
+649: Dodge updates=0, corpse candidates=30, zero-margin search=1, swept source clearance=1
+649: Post-kill position=-32,170.001,-1861.92 camera=0 yaw=0
+649: Walked past killed Cultist to z=-1861.92
+649: Approached encounter at z=-1745.4
+649: Mouse primary killed authored noname: HP 38.164 -> 0, shots=10, ammo=45, independent corpse verified, native=1
+649: Dodge updates=0, corpse candidates=1, zero-margin search=0, swept source clearance=0
+649: Post-kill position=-32,170.001,-1344.07 camera=0 yaw=3.72529e-09
+649: Walked past killed Cultist to z=-1344.07
+ 6/14 Test #649: gpu.corpse_clearance .............   Passed   18.29 sec
+test 654
+      Start 654: gpu.world_alpha
+
+654: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/world_alpha_gpu_tests "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-alpha"
+654: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+654: Test timeout computed to be: 45
+654: GPU world alpha: zero/partial/full/black texels, far-to-near faces, opaque model occlusion, no depth writes, resize/reupload pass
+ 7/14 Test #654: gpu.world_alpha ..................   Passed    0.47 sec
+test 655
+      Start 655: gpu.world_alpha_private
+
+655: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/world_alpha_gpu_tests "/home/yann/projects/lithtech/Blood2/build/debug/tests/world-alpha-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+655: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+655: Test timeout computed to be: 90
+655: GPU world alpha: zero/partial/full/black texels, far-to-near faces, opaque model occlusion, no depth writes, resize/reupload pass
+655: glass channel 0 expected=31 actual=31
+655: glass channel 1 expected=33 actual=33
+655: glass channel 2 expected=36 actual=36
+655: Private glass12: changed=11200 pink=0 submitted=1
+655: glass channel 0 expected=31 actual=31
+655: glass channel 1 expected=33 actual=33
+655: glass channel 2 expected=36 actual=36
+655: Private glass12: changed=11200 pink=0 submitted=1
+ 8/14 Test #655: gpu.world_alpha_private ..........   Passed    1.57 sec
+test 814
+      Start 814: gpu.level_change
+
+814: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/level_change_gpu_tests "/home/yann/.steam/steam/steamapps/common/Blood II" "/home/yann/projects/lithtech/Blood2/build/debug/tests/level-change"
+814: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+814: Test timeout computed to be: 90
+814: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+814: Cycle 0: 179200 textured pixels, no fallback; CityHub retained source, SubwayA committed, audio output transferred
+814: Cycle 1: 179200 textured pixels, no fallback; CityHub retained source, SubwayA committed, audio output transferred
+814: Cycle 2: 179200 textured pixels, no fallback; CityHub retained source, SubwayA committed, audio output transferred
+ 9/14 Test #814: gpu.level_change .................   Passed    6.35 sec
+test 822
+      Start 822: gpu.particle_stream_alpha
+
+822: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/particle_stream_gpu_tests "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle-stream-alpha"
+822: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+822: Test timeout computed to be: 30
+822: Stream tint/alpha: 256 checked pixels
+10/14 Test #822: gpu.particle_stream_alpha ........   Passed    0.42 sec
+test 823
+      Start 823: gpu.particle_stream_private
+
+823: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/particle_stream_gpu_tests "/home/yann/projects/lithtech/Blood2/build/debug/tests/particle-stream-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+823: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+823: Test timeout computed to be: 90
+823: Stream tint/alpha: 256 checked pixels
+823: CityHub stream GPU cycle 0: 60 actual particle quads, 11151 covered pixels
+823: CityHub stream GPU cycle 1: 67 actual particle quads, 10967 covered pixels
+11/14 Test #823: gpu.particle_stream_private ......   Passed    8.92 sec
+test 829
+      Start 829: gpu.sky
+
+829: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/sky_gpu_tests "/home/yann/projects/lithtech/Blood2/build/debug/tests/sky-gpu"
+829: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+829: Test timeout computed to be: 30
+829: Sky GPU: index order, alpha, .01 near plane, no depth reads/writes, portal omission, resize/reload passed
+12/14 Test #829: gpu.sky ..........................   Passed    0.42 sec
+test 830
+      Start 830: gpu.sky_private
+
+830: Test command: /home/yann/projects/lithtech/Blood2/build/debug/tests/sky_gpu_tests "/home/yann/projects/lithtech/Blood2/build/debug/tests/sky-private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+830: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+830: Test timeout computed to be: 90
+830: Sky GPU: index order, alpha, .01 near plane, no depth reads/writes, portal omission, resize/reload passed
+830: City sky cycle=0 view=0 submitted=23 covered=205545
+830: City sky cycle=0 view=1 submitted=23 covered=205305
+830: City sky cycle=0 view=2 submitted=23 covered=297567
+830: City sky cycle=1 view=0 submitted=23 covered=205545
+830: City sky cycle=1 view=1 submitted=23 covered=205305
+830: City sky cycle=1 view=2 submitted=23 covered=297567
+13/14 Test #830: gpu.sky_private ..................   Passed    3.36 sec
+test 831
+      Start 831: gpu.sky_app
+
+831: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--view-world" "--world" "02_cityhub" "--no-inspector" "--frames" "20" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/sky-app.png"
+831: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+831: Test timeout computed to be: 45
+831: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+831: [info] BLOOD2.REZ: detected, 267758913 bytes
+831: [info] SOUND.REZ: detected, 204633068 bytes
+831: [info] BLOOD2P.REZ: detected, 24133434 bytes
+831: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+831: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+831: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+831: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+831: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+831: [info] DAT v56: 1026 source objects, 480 original instances, 100 BSP models
+831: [info] Player mouse: captured; look / left fire / right alt (wayland)
+831: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/sky-app.png
+831: [info] Shutdown: frames=20, UI frames=0, hidden frames=20, toggles=0, resize=false, quit=false
+831: [info] Interactive clock: limited frames=16, discarded wall seconds=3.1590884669999997
+831: [info] Session playback: waiting=0 time=1.6001406950000003 npc-ready=27 npc-failed=0 npc-updates=33
+14/14 Test #831: gpu.sky_app ......................   Passed    7.97 sec
+
+The following tests passed:
+	gpu.lifecycle
+	gpu.objectives
+	gpu.world_depth
+	gpu.explosion_flame_alpha
+	gpu.mouse_combat
+	gpu.corpse_clearance
+	gpu.world_alpha
+	gpu.world_alpha_private
+	gpu.level_change
+	gpu.particle_stream_alpha
+	gpu.particle_stream_private
+	gpu.sky
+	gpu.sky_private
+	gpu.sky_app
+
+100% tests passed, 0 tests failed out of 14
+
+Label Time Summary:
+explosion_flames    =   0.35 sec*proc (1 test)
+gpu                 =  71.40 sec*proc (14 tests)
+objectives          =   6.75 sec*proc (1 test)
+particle_stream     =   9.34 sec*proc (2 tests)
+player_controls     =  31.27 sec*proc (2 tests)
+private             =  66.20 sec*proc (8 tests)
+sky                 =  11.75 sec*proc (3 tests)
+world               =   6.35 sec*proc (1 test)
+world_view          =   2.47 sec*proc (3 tests)
+
+Total Test time (real) =  71.41 sec

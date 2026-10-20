@@ -1,0 +1,27 @@
+Test project <Blood2>/build/debug
+    Start 237: keyframe_audio.timeline
+    Start 238: keyframe_audio.replacement
+1/5 Test #237: keyframe_audio.timeline ..........   Passed    0.01 sec
+    Start 239: keyframe_audio.lifetime
+2/5 Test #238: keyframe_audio.replacement .......   Passed    0.01 sec
+    Start 240: keyframe_audio.failures
+3/5 Test #240: keyframe_audio.failures ..........***Failed    0.00 sec
+failures:166: g.server.PlayCharacterSound(request.speaker, request, true, error)
+
+    Start 241: keyframe_audio.private
+4/5 Test #239: keyframe_audio.lifetime ..........   Passed    0.01 sec
+5/5 Test #241: keyframe_audio.private ...........   Passed    3.46 sec
+
+80% tests passed, 1 tests failed out of 5
+
+Label Time Summary:
+audio        =   3.48 sec*proc (5 tests)
+headless     =   3.48 sec*proc (5 tests)
+keyframes    =   3.48 sec*proc (5 tests)
+private      =   3.46 sec*proc (1 test)
+
+Total Test time (real) =   3.49 sec
+
+The following tests FAILED:
+	240 - keyframe_audio.failures (Failed)                  audio headless keyframes
+Errors while running CTest

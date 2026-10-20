@@ -1,0 +1,75 @@
+323/323 Testing: model_view.subway
+323/323 Test: model_view.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/model_view_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"model_view.subway" start time: Oct 16 10:04 CEST
+Output:
+----------------------------------------------------------
+Prepared world=2 close=0 entries=10
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Characters\Caleb.abc visible=1 triangles=941 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+right view weapon visible=0 triangles=0 error=
+Models: world=2 entries=10 vertices=3027 diagnostics=0 skin bytes=557060
+Prepared world=2 close=0 entries=10
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Characters\Caleb.abc visible=1 triangles=941 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+right view weapon visible=0 triangles=0 error=
+Models: world=2 entries=10 vertices=3027 diagnostics=0 skin bytes=557060
+<end of output>
+Test time =   2.45 sec
+----------------------------------------------------------
+Test Passed.
+"model_view.subway" end time: Oct 16 10:04 CEST
+"model_view.subway" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 16 10:04 CEST
+
+ai_keys =  19.96 sec*proc
+
+ai_sight =   3.59 sec*proc
+
+ai_target =   3.54 sec*proc
+
+attachments =   4.19 sec*proc
+
+character =  20.80 sec*proc
+
+character_audio =  24.83 sec*proc
+
+character_motion =   1.09 sec*proc
+
+headless = 198.75 sec*proc
+
+locomotion =  13.21 sec*proc
+
+model_view =   2.51 sec*proc
+
+objects =   0.22 sec*proc
+
+player =   7.84 sec*proc
+
+private = 194.71 sec*proc
+
+services =   7.54 sec*proc
+
+texture =   7.47 sec*proc
+
+weapons =  79.27 sec*proc
+
+world_view =   2.69 sec*proc
+

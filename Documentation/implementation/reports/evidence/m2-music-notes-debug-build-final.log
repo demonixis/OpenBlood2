@@ -1,0 +1,35 @@
+[0/2] Re-checking globbed directories...
+[1/66] Scanning /home/yann/projects/lithtech/Blood2/src/engine/ima_style.cpp for CXX dependencies
+[2/66] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[3/37] Building CXX object CMakeFiles/engine.dir/src/engine/ima_style.cpp.o
+[4/37] Scanning /home/yann/projects/lithtech/Blood2/tests/object_contract_tests.cpp for CXX dependencies
+[5/37] Scanning /home/yann/projects/lithtech/Blood2/tests/world_tests.cpp for CXX dependencies
+[6/37] Scanning /home/yann/projects/lithtech/Blood2/tests/sound_tests.cpp for CXX dependencies
+[7/37] Scanning /home/yann/projects/lithtech/Blood2/tests/audio_stream_tests.cpp for CXX dependencies
+[8/37] Scanning /home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp for CXX dependencies
+[9/37] Scanning /home/yann/projects/lithtech/Blood2/tests/ima_style_tests.cpp for CXX dependencies
+[10/37] Linking CXX static library libengine.a
+[11/37] Generating CXX dyndep file tests/CMakeFiles/object_contract_tests.dir/CXX.dd
+[12/37] Generating CXX dyndep file tests/CMakeFiles/config_tests.dir/CXX.dd
+[13/36] Generating CXX dyndep file tests/CMakeFiles/world_tests.dir/CXX.dd
+[14/36] Generating CXX dyndep file tests/CMakeFiles/sound_tests.dir/CXX.dd
+[15/36] Generating CXX dyndep file tests/CMakeFiles/audio_stream_tests.dir/CXX.dd
+[16/36] Generating CXX dyndep file tests/CMakeFiles/dls_bank_tests.dir/CXX.dd
+[17/35] Generating CXX dyndep file tests/CMakeFiles/dls_sampler_tests.dir/CXX.dd
+[18/35] Generating CXX dyndep file tests/CMakeFiles/ima_style_tests.dir/CXX.dd
+[19/35] Building CXX object tests/CMakeFiles/object_contract_tests.dir/object_contract_tests.cpp.o
+[20/35] Building CXX object tests/CMakeFiles/world_tests.dir/world_tests.cpp.o
+[21/35] Building CXX object tests/CMakeFiles/sound_tests.dir/sound_tests.cpp.o
+[22/35] Building CXX object tests/CMakeFiles/audio_stream_tests.dir/audio_stream_tests.cpp.o
+[23/35] Building CXX object tests/CMakeFiles/dls_sampler_tests.dir/dls_sampler_tests.cpp.o
+[24/35] Building CXX object tests/CMakeFiles/ima_style_tests.dir/ima_style_tests.cpp.o
+[25/35] Linking CXX executable blood2
+[26/35] Linking CXX executable tests/object_contract_tests
+[27/35] Linking CXX executable tests/config_tests
+[28/35] Linking CXX executable tests/world_tests
+[29/35] Linking CXX executable tests/sound_tests
+[30/35] Linking CXX executable tests/audio_stream_tests
+[31/35] Linking CXX executable tests/music_asset_tests
+[32/35] Linking CXX executable tests/dls_bank_tests
+[33/35] Linking CXX executable tests/dls_sampler_tests
+[34/35] Linking CXX executable tests/ima_style_tests

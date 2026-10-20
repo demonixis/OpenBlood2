@@ -1,0 +1,1818 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 2904e65..2e50ae3 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -78,3 +78,12 @@ checked snapshot order and deferred chain/removal. Reports count deliveries,
+ not health changes. FX/audio records are not rendered or played. WorldModelDebris,
+ pushable/gravity brushes, SpawnObject and full gameplay remain pending. The earlier
+ brush paragraph's Exploding rejection/CDebris omission is superseded; M2 stays open.
++
++The latest [pushable evidence](../Documentation/Implementation/M2_PUSHABLES.md) connects selected original
++CDestructableBrush Pushable/Gravity, mass/friction, brush damage impulses and
++CPlayerObj ground/air priorities. Read [pushable contracts](docs/PUSHABLE_CONTRACTS.md) before
++extending dynamic world bodies, pushing or damage physics. Preserve actual bounds
++centers, one player integration, original DONTFOLLOWSTANDING, atomic rider/pusher
++commit and deferred callbacks. BoxPhysics is required; polygon dynamics, stacks,
++SpawnObject, player impulses and complete gameplay remain pending. Earlier blanket
++pushable/gravity omissions are superseded for this bounded subset; M2 stays open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9c2dd3b..1c02171 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -42,7 +42,7 @@ target_link_libraries(blood2_game PUBLIC engine)
+ 
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+-    src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp)
++    src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+ add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+diff --git a/README.md b/README.md
+index b92dc7b..dc65e02 100644
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,6 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
+-A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory, KeyPickup, original player USE, RotatingDoor, RotatingBrush, selected CDestructableBrush damage/removal and original CDebris explosive area damage are connected; complete player gameplay remains missing. This is not a playable game.
++A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory, KeyPickup, original player USE, RotatingDoor, RotatingBrush, selected CDestructableBrush damage/removal and original CDebris explosive area damage and BoxPhysics pushable/gravity brushes with original damage impulses are connected; complete player gameplay remains missing. This is not a playable game.
+ 
+ The three runtime targets remain small: `engine` (resources, world/object runtime, configuration, SDL_GPU), `blood2_game` (original code and typed services) and `blood2_app` (`blood2`, optional Dear ImGui). No previous prototype is a build dependency, and no EnTT/ECS was introduced.
+ 
+@@ -47,7 +47,7 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
+ | `--inspect-player` | Headless original shell/player entry inspection, with explicit gameplay blockers |
+ | `--player-smoke` | GPU Session panel, hidden player updates, unload/re-entry checks |
+ | `--weapons-smoke` | GPU Beretta/knife firing while hidden, unload/re-entry; capture at frame 181 |
+-| `--brushes-smoke` | GPU original brush ON/OFF, hidden rider transport and explosive chain, inspection and reload |
++| `--brushes-smoke` | GPU original brush ON/OFF, hidden rider transport, explosive chain and dynamic box gravity/impulse, inspection and reload |
+ | `--interaction-smoke` | GPU SDL E press-edge USE, missing-key denial/unlock, synthetic rotating hinge, hidden motion and reload |
+ | `--triggers-smoke` | GPU missing-key denial, real key pickup, hidden unlock/door movement, resize and reload |
+ | `--doors-smoke` | GPU original Door commands, hidden translation, resize, unload/reload; capture at frame 15 |
+@@ -64,7 +64,7 @@ ctest --preset debug
+ ctest --preset debug -L world
+ ```
+ 
+-There are **120 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases, 6 door/mover/collision/lifetime cases, 8 trigger/key/ownership/contact cases, 9 USE/rotation/input/transport cases, 7 brush/ramp/damage/lifetime cases and 8 debris/explosion/radius/chain/lifetime cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
++There are **130 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases, 6 door/mover/collision/lifetime cases, 8 trigger/key/ownership/contact cases, 9 USE/rotation/input/transport cases, 7 brush/ramp/damage/lifetime cases and 8 debris/explosion/radius/chain/lifetime cases and 10 pushable/physics/priority/rider cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
+ 
+ Enable installation-specific tests and real GPU windows explicitly:
+ 
+@@ -74,7 +74,7 @@ cmake --build --preset debug --parallel
+ ctest --preset debug
+ ```
+ 
+-The configured installation adds sixteen private headless tests and eleven GPU tests, for **147 cases**. GPU captures are `build/debug/tests/gpu.png` , `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png` `doors.png`, `triggers.png`, `interaction.png` and `brushes.png`. The ignored local presets enable these options:
++The configured installation adds sixteen private headless tests and eleven GPU tests, for **157 cases**. GPU captures are `build/debug/tests/gpu.png` , `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png` `doors.png`, `triggers.png`, `interaction.png` and `brushes.png`. The ignored local presets enable these options:
+ 
+ ```sh
+ cmake --preset local-debug
+@@ -93,7 +93,7 @@ On Windows use an MSVC Developer PowerShell and the same CMake/Ninja commands, t
+ 
+ Read [world/session contracts](docs/WORLD_CONTRACTS.md), [object contracts](docs/OBJECT_CONTRACTS.md), [provenance](docs/PROVENANCE.md) and [M2 results](../Documentation/Implementation/M2.md). The [roadmap's M2 gate](../Documentation/Roadmap/03_MILESTONES.md#m2--connect-world-session-and-gameplay-services) remains open: complete player/gameplay callbacks, required world classes, broader mover/physics behavior and remaining original services must still be connected. See the [service continuation](../Documentation/Implementation/M2_SERVICES.md) for the new tested subset. M3 has not started.
+ 
+-The [explosion continuation](../Documentation/Implementation/M2_EXPLOSIONS.md) is the latest evidence; read [EXPLOSION_CONTRACTS.md](docs/EXPLOSION_CONTRACTS.md) before extending debris, area damage or chain reactions. Its effects are inspection requests; client FX/audio remain pending. The [brush continuation](../Documentation/Implementation/M2_BRUSHES.md) records the preceding stage; read [BRUSH_CONTRACTS.md](docs/BRUSH_CONTRACTS.md) before extending rotators, brush damage or debris. The [USE/rotation continuation](../Documentation/Implementation/M2_INTERACTION.md) records the preceding stage; read [INTERACTION_CONTRACTS.md](docs/INTERACTION_CONTRACTS.md) before extending USE, rotating collision or player door pushes. The [trigger/key continuation](../Documentation/Implementation/M2_TRIGGERS.md) records the preceding stage; read [TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending activation, keys or SelfTrigger ownership. The [door continuation](../Documentation/Implementation/M2_DOORS.md) records the previous stage; read [DOOR_CONTRACTS.md](docs/DOOR_CONTRACTS.md) before extending world-model motion or door commands. The [specialized volume continuation](../Documentation/Implementation/M2_SPECIALIZED_VOLUMES.md) records the preceding stage (Conveyor, Damage, FreeFall and level-entry damage protection). Read [SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md) before extending these branches. The [container continuation](../Documentation/Implementation/M2_CONTAINERS.md) records the preceding stage. Read [CONTAINER_CONTRACTS.md](docs/CONTAINER_CONTRACTS.md) for original VolumeBrush/MoveMgr/air rules, static shell queries and pending effects. The [locomotion continuation](../Documentation/Implementation/M2_LOCOMOTION.md) records the prior stage. Read [LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for source clip fallbacks, atomic resize and the replacement stair solver. Read [MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) for the original MoveMgr subset, shared body, timing and grounding adaptations, and the subsequent translating platform extension. The [weapon continuation](../Documentation/Implementation/M2_WEAPONS.md) retains the earlier weapon evidence. Read [WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) for ownership, original behavior and deliberate limits. Read [PLAYER_CONTRACTS.md](docs/PLAYER_CONTRACTS.md) before extending the source subsets, typed client messages or player lifetime. Entry inspection succeeds; `--start-game` still fails with missing gameplay services.
++The [pushable continuation](../Documentation/Implementation/M2_PUSHABLES.md) is the latest evidence; read [PUSHABLE_CONTRACTS.md](docs/PUSHABLE_CONTRACTS.md) before extending body physics, pushing or impulses. The [explosion continuation](../Documentation/Implementation/M2_EXPLOSIONS.md) records the preceding stage; read [EXPLOSION_CONTRACTS.md](docs/EXPLOSION_CONTRACTS.md) before extending debris, area damage or chain reactions. Its effects are inspection requests; client FX/audio remain pending. The [brush continuation](../Documentation/Implementation/M2_BRUSHES.md) records the preceding stage; read [BRUSH_CONTRACTS.md](docs/BRUSH_CONTRACTS.md) before extending rotators, brush damage or debris. The [USE/rotation continuation](../Documentation/Implementation/M2_INTERACTION.md) records the preceding stage; read [INTERACTION_CONTRACTS.md](docs/INTERACTION_CONTRACTS.md) before extending USE, rotating collision or player door pushes. The [trigger/key continuation](../Documentation/Implementation/M2_TRIGGERS.md) records the preceding stage; read [TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending activation, keys or SelfTrigger ownership. The [door continuation](../Documentation/Implementation/M2_DOORS.md) records the previous stage; read [DOOR_CONTRACTS.md](docs/DOOR_CONTRACTS.md) before extending world-model motion or door commands. The [specialized volume continuation](../Documentation/Implementation/M2_SPECIALIZED_VOLUMES.md) records the preceding stage (Conveyor, Damage, FreeFall and level-entry damage protection). Read [SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md) before extending these branches. The [container continuation](../Documentation/Implementation/M2_CONTAINERS.md) records the preceding stage. Read [CONTAINER_CONTRACTS.md](docs/CONTAINER_CONTRACTS.md) for original VolumeBrush/MoveMgr/air rules, static shell queries and pending effects. The [locomotion continuation](../Documentation/Implementation/M2_LOCOMOTION.md) records the prior stage. Read [LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for source clip fallbacks, atomic resize and the replacement stair solver. Read [MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) for the original MoveMgr subset, shared body, timing and grounding adaptations, and the subsequent translating platform extension. The [weapon continuation](../Documentation/Implementation/M2_WEAPONS.md) retains the earlier weapon evidence. Read [WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) for ownership, original behavior and deliberate limits. Read [PLAYER_CONTRACTS.md](docs/PLAYER_CONTRACTS.md) before extending the source subsets, typed client messages or player lifetime. Entry inspection succeeds; `--start-game` still fails with missing gameplay services.
+ 
+ ## Source conventions
+ 
+diff --git a/docs/BRUSH_CONTRACTS.md b/docs/BRUSH_CONTRACTS.md
+index ff02f48..e76ba2e 100644
+--- a/docs/BRUSH_CONTRACTS.md
++++ b/docs/BRUSH_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Rotating and destructible world-model brushes
+ 
++> Extended by [PUSHABLE_CONTRACTS.md](PUSHABLE_CONTRACTS.md): selected Pushable/Gravity brushes and
++> brush damage impulses now work with bounded box physics. Omissions and counts
++> below describe the earlier stage; polygon dynamics and full M2 remain open.
++
+ > Extended by [EXPLOSION_CONTRACTS.md](EXPLOSION_CONTRACTS.md): original CDebris requests and explosive
+ > brush area damage are now connected. Earlier omissions/counts below are historical;
+ > WorldModelDebris, pushable brushes, client FX/audio and the full M2 gate remain open.
+diff --git a/docs/EXPLOSION_CONTRACTS.md b/docs/EXPLOSION_CONTRACTS.md
+index bf0ee28..0fcad71 100644
+--- a/docs/EXPLOSION_CONTRACTS.md
++++ b/docs/EXPLOSION_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original brush explosions and debris requests
+ 
++> Extended by [PUSHABLE_CONTRACTS.md](PUSHABLE_CONTRACTS.md): selected Pushable/Gravity brushes and
++> brush damage impulses now work with bounded box physics. Omissions and counts
++> below describe the earlier stage; polygon dynamics and full M2 remain open.
++
+ This extends [BRUSH_CONTRACTS.md](BRUSH_CONTRACTS.md) and the selected
+ [damage transport](WEAPON_CONTRACTS.md). M2 remains incomplete. Read the
+ [source ledger](M2_EXPLOSION_SOURCES.json) and
+diff --git a/docs/M2_PUSHABLE_SOURCES.json b/docs/M2_PUSHABLE_SOURCES.json
+new file mode 100644
+index 0000000..cc26d5f
+--- /dev/null
++++ b/docs/M2_PUSHABLE_SOURCES.json
+@@ -0,0 +1,131 @@
++{
++  "date": "2026-10-15",
++  "status": "M2 incomplete; selected original pushable/gravity brushes with replacement box physics",
++  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "imports": [
++    {
++      "source": "sources/blood2/ObjectDLL/DestructableBrush.cpp",
++      "target": "src/game/original/DestructableBrush.cpp",
++      "source_line_ranges": [
++        [
++          147,
++          163
++        ],
++        [
++          173,
++          240
++        ]
++      ],
++      "selection": "Original Pushable flags/marks, gravity, damage physics enablement, priorities and MOVEABLE bit. Typed ConfigureWorldBody replaces SetObjectMass/SetFrictionCoefficient/SetForceIgnoreLimit for the bounded box subset. Polygon dynamics, simultaneous rotation and SpawnObject reject; retain source B2BaseClass DONTFOLLOWSTANDING.",
++      "source_sha256": "76d1141925e82d4c79fdad985a9b3f98c6ae7b02efd07ebb3522dd3ff5b117c0",
++      "target_sha256": "de098edfa5d9741632a825955290033a68c526d27bb95b3a02f910db1e1bb4ea"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Destructable.cpp",
++      "target": "src/game/original/Destructable.cpp",
++      "source_line_ranges": [
++        [
++          367,
++          384
++        ],
++        [
++          535,
++          562
++        ],
++        [
++          888,
++          925
++        ]
++      ],
++      "selection": "Selected ApplyDamagePhysics direction threshold, normalization, mass fallback and damage*2500/mass vector addition after resistance and before armor. Checked service returns expose rejected velocity; trapped characters and player accumulated impulse transport remain omitted. Mass/friction setup is selected into DestructableBrush initial update, preserving its unclamped-member formula.",
++      "source_sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
++      "target_sha256": "b6a3fc544077f4b7ee686f71b1896bb70b37a200e1345ecb272f7be3d4e7b5fc"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PhysicalAttributes.h",
++      "target": "src/game/original/DestructableBrush.cpp",
++      "source_line_ranges": [
++        [
++          15,
++          30
++        ]
++      ],
++      "selection": "Original min/max friction 5/15 and pushable/nonpushable priority 40/100. Mass is bounded locally to finite [0,1000000]; no invented collision force. Same constants define the 2500 damage multiplier and player priority 50/40 in their respective original ports.",
++      "source_sha256": "bb58c0afd5e3175a9007063a64fbe31089a1a595851c61e3bfee7a19f72dda55",
++      "target_sha256": "de098edfa5d9741632a825955290033a68c526d27bb95b3a02f910db1e1bb4ea"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "target": "src/game/original/PlayerObj.cpp",
++      "source_line_ranges": [
++        [
++          676,
++          677
++        ],
++        [
++          907,
++          917
++        ]
++      ],
++      "selection": "Initial priority 50 and supported/airborne priorities 50/40. Typed local movement uses fresh support and submitted velocity before the single shared MoveObject; retail client ground-bit and networking behavior are not recreated.",
++      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "target_sha256": "7e313a519020d110144f3c311486ad88f0b90a85460d6aac3f2e352a407db754"
++    },
++    {
++      "source": "sources/blood2/Shared/ClientServerShared.h",
++      "target": "src/game/original/DestructableBrush.cpp",
++      "source_line_ranges": [
++        [
++          20,
++          20
++        ]
++      ],
++      "selection": "USRFLG_MOVEABLE bit 4 for Pushable brushes; does not itself implement save or replication.",
++      "source_sha256": "c5d8c5585966e413c4312da7207cbc8066e8920134868679df4567a2651d6580",
++      "target_sha256": "de098edfa5d9741632a825955290033a68c526d27bb95b3a02f910db1e1bb4ea"
++    }
++  ],
++  "reference_only": [
++    {
++      "source": "sources/blood2/ObjectDLL/B2BaseClass.cpp",
++      "source_line_ranges": [
++        [
++          237,
++          240
++        ]
++      ],
++      "source_sha256": "bad14ecb54c1b62d82fa66265ba0819fa845ccd9db583e329329c60a86b05ccc",
++      "note": "Existing original DONTFOLLOWSTANDING behavior remains intact; brushes are not silently made riders."
++    },
++    {
++      "source": "sources/lithtech/runtime/shared/src/motion.cpp",
++      "source_line_ranges": [
++        [
++          35,
++          210
++        ]
++      ],
++      "source_sha256": "12b96fbd22063640ab665a8953f94d2157a1a65d75eccb3ba40b33ef1d7d4476",
++      "note": "Later-generation reference for ground friction, low-velocity sleep, gravity and analytic displacement. New engine implementation, no file/function import or assertion of Blood II retail parity."
++    },
++    {
++      "source": "sources/lithtech/runtime/shared/src/moveobject.cpp",
++      "source_line_ranges": [
++        [
++          645,
++          690
++        ]
++      ],
++      "source_sha256": "ab363eba59ebfd89865a1d5619ffb95a82c474c319adc8d89c921da63b2d79f9",
++      "note": "Later-generation blocking-priority/push reference only. New bounded atomic single-box/rider solver, no imported engine machinery."
++    }
++  ],
++  "adaptations": [
++    "Typed one-time dynamic body configuration, checked handles, actual bounds centers and finite service limits",
++    "New analytic box integration and drag, max 1/120 second steps, 0.5 second catch-up; original MoveMgr integrates player once",
++    "Four slide legs, 64 ordinary riders, atomic validation/commit, conservative horizontal single-box push and deferred contacts",
++    "Source DONTFOLLOWSTANDING retained; no rigid stacks/chains, crushing, penetration recovery or rotation plus gravity",
++    "Existing liquid/conveyor rules and one-per-frame environmental damage use actual body center",
++    "Inspector metadata is separate from gameplay; dynamic polygons, SpawnObject, player impulses, WorldModelDebris and full M2 gate remain open"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index c31fcb8..c978c59 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -288,3 +288,14 @@ fragments. [Contracts](EXPLOSION_CONTRACTS.md) document fixed effective damage/
+ radius despite unused authored properties, snapshot/liveness guards and deferred
+ chains. Earlier source ledgers remain historical. WorldModelDebris, pushable
+ brushes, impulses, SpawnObject and full gameplay remain pending.
++
++## M2 pushable/gravity brush continuation
++
++[Source selections](M2_PUSHABLE_SOURCES.json) connect CDestructableBrush's pushable
++flags/priorities, CDestructable mass/friction and damage impulse rules, and
++CPlayerObj ground/air priorities. [Contracts](PUSHABLE_CONTRACTS.md) distinguish
++these original rules from the replacement box integrator, atomic movement and
++conservative rider/pushing limits. Later LithTech motion is an architectural
++reference only. The preceding pushable/impulse omissions are superseded for this
++bounded brush subset; dynamic polygon bodies, player impulses, SpawnObject,
++WorldModelDebris and the full M2 gate remain open.
+diff --git a/docs/PUSHABLE_CONTRACTS.md b/docs/PUSHABLE_CONTRACTS.md
+new file mode 100644
+index 0000000..491d087
+--- /dev/null
++++ b/docs/PUSHABLE_CONTRACTS.md
+@@ -0,0 +1,104 @@
++# Original pushable brushes and bounded box physics
++
++This extends [brush](BRUSH_CONTRACTS.md), [explosion](EXPLOSION_CONTRACTS.md)
++and [movement](MOVEMENT_CONTRACTS.md) contracts. M2 remains incomplete. Read the
++[source ledger](M2_PUSHABLE_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_PUSHABLES.md).
++
++## Original game rules
++
++Selected CDestructableBrush Pushable and Gravity branches are connected.
++Pushable disables AllowMarks, forces FLAG_GRAVITY, sets blocking priority 40,
++enables CDestructable damage physics and adds USRFLG_MOVEABLE (bit 4). Other
++brushes retain priority 100. Gravity-only brushes simulate but cannot be pushed
++by the player and do not receive damage impulses. SAVEABLE and surface bits retain
++the previous source behavior; a flag does not implement save/restore.
++
++Mass and friction follow original CDestructable::SetMass: friction is
++`5 + mass * 10 / 500`. The original clamps its local parameter but then uses the
++unclamped member in the formula; mass 750 therefore gives friction 20. Finite
++mass in [0, 1000000] is accepted. The engine does not infer collision forces from
++mass or send a fabricated force with a touch notification.
++
++For enabled damage physics, directions shorter than 0.1 produce no impulse.
++Otherwise normalize the direction, replace a nonpositive aggregate mass with 1,
++and add `damage * 2500 / mass` along it to existing velocity. This occurs after
++resistance and before armor, under the existing dead/CanDamage/TriggerDestroyOnly
++gates. The special Death branch does not apply an impulse. Checked SetVelocity
++rejects out-of-range results; inspection exposes acceptance. Player-specific
++impulse accumulation/transport and trapped-character branches are still omitted.
++Explosion damage can now impart impulses to eligible brushes through the same
++ordinary damage path; it does not add a separate physics integration.
++
++CPlayerObj uses the source priorities: 50 while supported and 40 while airborne.
++Fresh local support and the submitted velocity replace the source network ground
++bit. Jump motion loses ground priority before collision. Original MoveMgr remains
++the only player integrator; generic physics skips client-associated players.
++
++B2BaseClass still applies the original FLAG_DONTFOLLOWSTANDING. In particular,
++ordinary brushes do not automatically become riders of other moving brushes.
++The engine honors that flag instead of silently simulating rigid stacks.
++
++## Replacement engine services
++
++WorldBodyProperties, ConfigureWorldBody and SetBlockingPriority are typed local
++services, not a recreation of the SDK function table. Configuration is one-time
++and requires checked live, named closed world geometry, FLAG_BOXPHYSICS and no
++FLAG_GOTHRUWORLD. Dynamic polygon shells and simultaneous rotating/gravity
++brushes reject creation. SpawnObject still rejects. Missing/ambiguous models and
++invalid shells remain failures. Changes that invalidate a configured body shape
++are rejected; a static world model cannot acquire gravity without configuration.
++
++The body translates its existing immutable shell; collision uses its axis-aligned
++bounds. Central object_bounds_center handles authored pivots offset from geometry
++for sweeps, support and volume membership. Ray and container queries see the
++accepted pose. Rotation/kinematic mover entry points reject dynamic bodies.
++
++Generic physics advances active bodies in steps no larger than 1/120 second,
++with a 0.5-second catch-up ceiling. Unsupported time remains a failure. Free motion
++uses `v*dt + a*dt²/2`, then `v += a*dt`. Supported walkable faces remove acceleration
++into their plane. Ground drag uses the analytic exponential solution for constant
++acceleration/friction; very small unaccelerated velocity sleeps. Liquid/conveyor
++rules run once per substep; environmental damage runs once per session step.
++Hidden bodies still simulate; inactive bodies do not. These are replacement
++engine choices, informed by later-generation LithTech motion code, **not verified
++retail Blood II physics**. No code from that later engine is linked.
++
++A body sweep checks the primary world and live solid objects. Up to four sliding
++legs remove inward velocity. Initial penetration blocks the entire move and zeros
++velocity; the object remains inspectable. No depenetration, crushing, restitution,
++rotational inertia or recursive chain pushing is implemented. A clipped movement
++is a valid collision response, reported as blocked in inspection.
++
++Supported ordinary riders follow the accepted piecewise path. Up to 64 are
++validated before anything moves. A blocked rider, an attached world-model rider
++or excess riders rejects the whole move. DONTFOLLOWSTANDING and jumping riders
++are detached. Other riders' old positions can conservatively block a proposed
++path; this is not a stack solver.
++
++A higher-priority ordinary body may push one pushable box through a horizontal
++side contact. Both complete paths must be clear before either position commits.
++A later floor contact can be flattened only when fresh support and that contact
++are both horizontal; the entire horizontal path is checked again. More complex
++slope/corner pushes conservatively stop. Failed box pushes leave its pose unchanged;
++ordinary actor collision can still advance to the obstruction. Character pushing
++is positional and does not inject an invented impulse into the box.
++
++Positions commit before touch callbacks. Snapshot handles, pending-object checks
++and the movement reentrancy guard prevent speculative/duplicate initiator contacts
++and destruction during dispatch. Removal remains deferred. Contact sensors see
++accepted path segments only; riders and the pushing actor share one committed
++movement. Complete replication, retail networking and save/restore are not added.
++
++## Inspection and limits
++
++Brushes lists visible, hidden and inactive bodies and shows mass, friction,
++gravity, pushability, priority, pivot, velocity, acceleration, fresh support,
++last motion result, integration/push/rider/block counts and last damage impulse.
++World retains authored properties and rejected source entries. Existing diagnostic
++commands and destruction/explosion records retain checked ownership and lifetimes.
++
++Dynamic polygon collision, rigid stacks, recursive pushes/crushing, SpawnObject,
++WorldModelDebris, player impulses, client FX/audio, full player/AI/combat, portals,
++world transitions and save/restore remain pending. M2 is not a playable session.
++No retail executable comparison, additional platform or XR validation is claimed.
+diff --git a/src/app/brush_smoke.cpp b/src/app/brush_smoke.cpp
+index c79c1cb..99388ea 100644
+--- a/src/app/brush_smoke.cpp
++++ b/src/app/brush_smoke.cpp
+@@ -2,7 +2,7 @@
+ #include "game/original/RotatingBrush.h"
+ namespace OpenBlood2
+ {
+-    bool prepare_brush_smoke(GameSession& g, ObjectId& id, ObjectId& explosion)
++    bool prepare_brush_smoke(GameSession& g, ObjectId& id, ObjectId& explosion, ObjectId& body)
+     {
+         WorldModel model;
+         model.name = "brush_smoke_platform";
+@@ -52,11 +52,11 @@ namespace OpenBlood2
+             return false;
+         g.server.SetObjectDims(rider, &dims);
+         const auto base = g.world.models.back();
+-        for (unsigned i = 0; i < 2; ++i)
++        for (unsigned i = 0; i < 3; ++i)
+         {
+             auto fragment = base;
+-            const DVector offset{1000.0f + 100.0f * i, 0, 0};
+-            fragment.name = "explosion_smoke_" + std::to_string(i);
++            const DVector offset{i == 2 ? 2000.0f : 1000.0f + 100.0f * i, 0, 0};
++            fragment.name = i == 2 ? "pushable_smoke" : "explosion_smoke_" + std::to_string(i);
+             fragment.translation = vector_add(fragment.translation, offset);
+             for (auto& point : fragment.points)
+                 point = vector_add(point, offset);
+@@ -64,13 +64,26 @@ namespace OpenBlood2
+                 plane.distance += vector_dot(plane.normal, offset);
+             const auto name = fragment.name;
+             g.world.models.push_back(std::move(fragment));
+-            auto source = g.objects.create(
+-                g.objects.find_class("CDestructableBrush"), {}, Creation::World,
+-                {{"Name", name}, {"HitPoints", 50.0f}, {"Exploding", true}, {"Stone", true}, {"Metal", true}});
++            auto source = g.objects.create(g.objects.find_class("CDestructableBrush"), {}, Creation::World,
++                                           {{"Name", name},
++                                            {"HitPoints", 50.0f},
++                                            {"Exploding", i != 2},
++                                            {"Pushable", i == 2},
++                                            {"Stone", true},
++                                            {"Metal", true}});
+             if (!source)
+                 return false;
+             if (i == 0)
+                 explosion = g.objects.get(source)->id;
++            if (i == 2)
++            {
++                body = g.objects.get(source)->id;
++                auto message = g.server.StartMessageToObject(g.server.HandleToObject(source), source, damage_message);
++                if (!message ||
++                    g.server.WriteDamage(message, {{1, 0, 0}, {}, 1, DamageType::Normal, source}) != DE_OK ||
++                    g.server.EndMessage(message) != DE_OK)
++                    return false;
++            }
+         }
+         return true;
+     }
+@@ -87,13 +100,16 @@ namespace OpenBlood2
+             g.server.FreeString(str);
+         return ok;
+     }
+-    bool check_brush_smoke(GameSession& g, ObjectId id)
++    bool check_brush_smoke(GameSession& g, ObjectId id, ObjectId body)
+     {
+         const auto* r = g.objects.get(id);
+         const auto* b = r ? dynamic_cast<const RotatingBrush*>(r->game.get()) : nullptr;
+-        return b && b->rotating.angles.y > 0 && r->mover_moves > 0 && r->mover_riders > 0 &&
+-               g.server.explosion_effects.size() == 2 && g.server.debris_effects.size() == 4 &&
+-               g.server.explosion_effects[0].source == "explosion_smoke_0" &&
++        const auto* dynamic = g.objects.get(body);
++        const auto* brush = dynamic ? dynamic_cast<const CDestructableBrush*>(dynamic->game.get()) : nullptr;
++        return brush && brush->m_damage.damage_impulses == 1 && dynamic->body_steps > 0 &&
++               dynamic->state.m_Pos.x > 2000 && dynamic->state.m_Pos.y < 10050 && b && b->rotating.angles.y > 0 &&
++               r->mover_moves > 0 && r->mover_riders > 0 && g.server.explosion_effects.size() == 2 &&
++               g.server.debris_effects.size() == 4 && g.server.explosion_effects[0].source == "explosion_smoke_0" &&
+                g.server.explosion_effects[1].source == "explosion_smoke_1" &&
+                !g.server.explosion_effects[0].targets.cancelled && !g.server.explosion_effects[1].targets.cancelled;
+     }
+diff --git a/src/app/brush_smoke.h b/src/app/brush_smoke.h
+index 64aff35..3859a88 100644
+--- a/src/app/brush_smoke.h
++++ b/src/app/brush_smoke.h
+@@ -2,7 +2,7 @@
+ #include "game/server_adapter.h"
+ namespace OpenBlood2
+ {
+-    bool prepare_brush_smoke(GameSession&, ObjectId&, ObjectId& explosion);
++    bool prepare_brush_smoke(GameSession&, ObjectId&, ObjectId& explosion, ObjectId& body);
+     bool command_brush_smoke(GameSession&, ObjectId, const char*);
+-    bool check_brush_smoke(GameSession&, ObjectId);
++    bool check_brush_smoke(GameSession&, ObjectId, ObjectId);
+ } // namespace OpenBlood2
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 337de5b..aafded4 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -1831,6 +1831,30 @@ namespace OpenBlood2
+                 ImGui::TextWrapped("Sound: %s (%s; playback pending)", v.last_sound.c_str(),
+                                    v.sound_loop ? "loop" : "once");
+             }
++            if (r->world_body)
++            {
++                constexpr const char* results[] = {"moved", "blocked", "invalid", "unavailable"};
++                ImGui::Text("Dynamic box | pushable %s | priority %u", b->pushable ? "yes" : "no",
++                            unsigned(r->blocking_priority));
++                ImGui::Text("Mass %.1f | friction %.3f | gravity %s", r->body_properties.mass,
++                            r->body_properties.friction, r->state.m_Flags & FLAG_GRAVITY ? "yes" : "no");
++                ImGui::Text("Position %.2f %.2f %.2f", r->state.m_Pos.x, r->state.m_Pos.y, r->state.m_Pos.z);
++                ImGui::Text("Velocity %.2f %.2f %.2f", r->velocity.x, r->velocity.y, r->velocity.z);
++                ImGui::Text("Acceleration %.2f %.2f %.2f", r->acceleration.x, r->acceleration.y, r->acceleration.z);
++                MovementState support;
++                const bool supported = game.server.GetMovementState(r->handle, support) && support.standing;
++                ImGui::Text("Standing %s | last move %s | steps %llu", supported ? "yes" : "no",
++                            results[unsigned(r->body_result)], static_cast<unsigned long long>(r->body_steps));
++                ImGui::Text(
++                    "Player pushes %llu | riders %llu | blocks %llu", static_cast<unsigned long long>(r->body_pushes),
++                    static_cast<unsigned long long>(r->mover_riders), static_cast<unsigned long long>(r->mover_blocks));
++                const auto* blocker = game.objects.get(r->mover_blocker);
++                ImGui::Text("Blocker: %s", blocker ? blocker->state.m_Name : "world / none / removed");
++                ImGui::Text("Damage impulses %llu | last %s (%.1f %.1f %.1f)",
++                            static_cast<unsigned long long>(b->m_damage.damage_impulses),
++                            b->m_damage.last_impulse_ok ? "accepted" : "rejected", b->m_damage.last_impulse.x,
++                            b->m_damage.last_impulse.y, b->m_damage.last_impulse.z);
++            }
+             ImGui::Text("HP %.1f | dead %s | CanDamage %s", b->m_damage.m_fHitPoints,
+                         b->m_damage.IsDead() ? "yes" : "no", b->m_damage.can_damage ? "yes" : "no");
+             ImGui::Text("Destructable %s | TriggerDestroyOnly %s", b->destructable ? "yes" : "no",
+@@ -1869,7 +1893,7 @@ namespace OpenBlood2
+         else
+             ImGui::TextUnformatted("No live brush selected.");
+         ImGui::EndTable();
+-        ImGui::TextWrapped("Explosion damage is active. Debris/FX rendering, sound, world fragments, pushable brushes, "
++        ImGui::TextWrapped("Explosion damage is active. Debris/FX rendering, sound, world fragments, polygon dynamics, "
+                            "SpawnObject and save/restore are pending. "
+                            "Rotation uses replacement engine collision; M2 remains open.");
+         if (ImGui::CollapsingHeader("Explosions: damage executed / FX and audio pending",
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index e0c8b40..dc41951 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -140,11 +140,11 @@ namespace
+                 return 4;
+             selection.id = smoke_door;
+         }
+-        OpenBlood2::ObjectId smoke_brush{}, smoke_explosion{};
++        OpenBlood2::ObjectId smoke_brush{}, smoke_explosion{}, smoke_body{};
+         bool brush_hidden = false;
+         if (options.brushes_smoke)
+         {
+-            if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion))
++            if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
+                 return 4;
+             selection.id = smoke_brush;
+         }
+@@ -165,7 +165,7 @@ namespace
+         inspector.select_movement = options.movement_smoke;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
+-        inspector.brush_selection = smoke_brush;
++        inspector.brush_selection = smoke_body;
+         inspector.select_doors = options.doors_smoke || options.interaction_smoke;
+         inspector.keyboard_movement = options.interaction_smoke;
+         inspector.select_triggers = options.triggers_smoke;
+@@ -270,7 +270,7 @@ namespace
+                 if (!OpenBlood2::prepare_interaction_smoke(game, smoke_door))
+                     return 4;
+             if (options.brushes_smoke && frames == reload_frame + 1)
+-                if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion))
++                if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
+                     return 4;
+             game.client_shell.use_down = controls.sample_use(text_editing);
+             auto keyboard = controls.sample(text_editing);
+@@ -544,7 +544,7 @@ namespace
+                             return 4;
+                     if (frames == show_frame)
+                     {
+-                        brush_hidden = OpenBlood2::check_brush_smoke(game, smoke_brush);
++                        brush_hidden = OpenBlood2::check_brush_smoke(game, smoke_brush, smoke_body);
+                         if (!OpenBlood2::command_brush_smoke(game, smoke_brush, "OFF"))
+                             return 4;
+                     }
+@@ -685,7 +685,7 @@ namespace
+                              "unload/re-entry");
+             if (options.brushes_smoke)
+                 spdlog::info("Brush smoke passed: original ON/OFF ramps, hidden rotation/rider transport and explosive "
+-                             "chain, inspection, reload");
++                             "chain, dynamic box gravity/impulse, inspection, reload");
+             if (options.interaction_smoke)
+                 spdlog::info("Interaction smoke passed: SDL E press edge, USE key denial/unlock, rotation while "
+                              "hidden, inspection, reload");
+diff --git a/src/engine/objects.h b/src/engine/objects.h
+index 15d7400..9261790 100644
+--- a/src/engine/objects.h
++++ b/src/engine/objects.h
+@@ -2,6 +2,7 @@
+ 
+ #include "engine/model.h"
+ #include "game/legacy/cpp_engineobjects_de.h"
++#include "game/mover_messages.h"
+ #include <map>
+ #include <memory>
+ #include <span>
+@@ -95,6 +96,11 @@ namespace OpenBlood2
+         std::uint32_t contact_polygon = UINT32_MAX;
+         HOBJECT contact_object = nullptr;
+         bool grounded = false;
++        bool world_body = false;
++        WorldBodyProperties body_properties;
++        DBYTE blocking_priority = 0;
++        std::uint64_t body_steps = 0, body_pushes = 0;
++        MoverResult body_result = MoverResult::Moved;
+         bool client_movement = false; // Local MoveMgr owns integration while associated.
+         std::shared_ptr<const Model> model;
+         std::shared_ptr<const ContainerShape> container;
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 7220717..6b565ce 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -29,6 +29,8 @@ class ServerDE : public CSBase
+ {
+   public:
+     virtual bool IsObjectAlive(HOBJECT) = 0;
++    virtual bool ConfigureWorldBody(HOBJECT, const OpenBlood2::WorldBodyProperties&) = 0;
++    virtual bool SetBlockingPriority(HOBJECT, DBYTE) = 0;
+     virtual void RecordBrushDestruction(HOBJECT, DVector direction, float damage, DBYTE amount) = 0;
+     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
+     virtual void RecordExplosionEffect(const OpenBlood2::ExplosionEffect&) = 0;
+diff --git a/src/game/mover_messages.h b/src/game/mover_messages.h
+index a8d44ed..043e5bd 100644
+--- a/src/game/mover_messages.h
++++ b/src/game/mover_messages.h
+@@ -2,6 +2,11 @@
+ #include "basedefs_de.h"
+ namespace OpenBlood2
+ {
++    struct WorldBodyProperties
++    {
++        float mass = 100, friction = 7;
++        bool pushable = false;
++    };
+     struct RotationMove
+     {
+         DVector from_angles{}, to_angles{}, original_position{}, pivot{};
+diff --git a/src/game/original/Destructable.cpp b/src/game/original/Destructable.cpp
+index c152b4d..834ef4c 100644
+--- a/src/game/original/Destructable.cpp
++++ b/src/game/original/Destructable.cpp
+@@ -1,8 +1,10 @@
+ // Selected shared damage/lifetime and brush trigger branches; see M2_BRUSH_SOURCES.json.
+ #include "Destructable.h"
++#include "engine/collision.h"
+ #include "engine/objects.h"
+ #include "trigger_helpers.h"
+ #include <algorithm>
++#include <cmath>
+ DLink CDestructable::m_DestructableHead{};
+ DDWORD CDestructable::m_dwNumDestructables = 0;
+ CDestructable::CDestructable()
+@@ -48,6 +50,25 @@ void CDestructable::CalculateResistance(DBYTE value)
+         m_fResistance = 0.7f;
+ }
+ 
++void CDestructable::ApplyDamagePhysics(float damage, DVector direction)
++{
++    using namespace OpenBlood2;
++    auto* server = BaseClass::GetServerDE();
++    const auto squared = vector_dot(direction, direction);
++    if (!server || !server->IsObjectAlive(m_hObject) || squared < .01f)
++        return;
++    if (m_fMass <= 0)
++        m_fMass = 1;
++    last_impulse = vector_scale(direction, (damage * 2500 / m_fMass) / std::sqrt(squared));
++    DVector velocity{};
++    last_impulse_ok = server->GetVelocity(m_hObject, &velocity) == DE_OK;
++    if (last_impulse_ok)
++    {
++        velocity = vector_add(velocity, last_impulse);
++        last_impulse_ok = server->SetVelocity(m_hObject, &velocity) == DE_OK;
++    }
++    damage_impulses += last_impulse_ok;
++}
+ DDWORD CDestructable::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* data, DFLOAT reason)
+ {
+     if (message == MID_PRECREATE && (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP))
+@@ -86,7 +107,7 @@ void CDestructable::SendTrigger(const std::string& target, const std::string& me
+         server->FreeString(text);
+ }
+ // Selected ordinary normal/melee damage branch from Destructable.cpp. AI hit
+-// limbs, damage impulses, powerups and complete character death reactions are deferred.
++// limbs, player damage impulses, powerups and complete character death reactions are deferred.
+ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD message, HMESSAGEREAD read)
+ {
+     if (message == 1000)
+@@ -124,6 +145,8 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD
+                 m_fArmorPoints = 0;
+                 amount = m_fHitPoints;
+             }
++            if (apply_damage_physics && damage.type != OpenBlood2::DamageType::Death)
++                ApplyDamagePhysics(amount, damage.direction);
+             if (m_fArmorPoints > 0 && damage.type != OpenBlood2::DamageType::Suffocate)
+             {
+                 const auto ratio = m_fArmorPoints <= 25    ? .3f
+diff --git a/src/game/original/Destructable.h b/src/game/original/Destructable.h
+index 81e26e2..4967f3d 100644
+--- a/src/game/original/Destructable.h
++++ b/src/game/original/Destructable.h
+@@ -25,6 +25,10 @@ class CDestructable : public Aggregate
+         return m_bDead != 0;
+     }
+     void CalculateResistance(DBYTE);
++    void ApplyDamagePhysics(float, DVector);
++    bool apply_damage_physics = false, last_impulse_ok = true;
++    std::uint64_t damage_impulses = 0;
++    DVector last_impulse{};
+     HOBJECT m_hObject = nullptr;
+     CInventoryMgr* m_pInventoryMgr = nullptr;
+     DLink m_Link{};
+diff --git a/src/game/original/DestructableBrush.cpp b/src/game/original/DestructableBrush.cpp
+index 85b8196..c810cac 100644
+--- a/src/game/original/DestructableBrush.cpp
++++ b/src/game/original/DestructableBrush.cpp
+@@ -1,4 +1,4 @@
+-// Selected original brush lifecycle. Client FX and pushable-body physics remain unavailable.
++// Selected original brush lifecycle; bounded BoxPhysics body services support Pushable/Gravity.
+ #include "DestructableBrush.h"
+ #include "engine/collision.h"
+ #include <cmath>
+@@ -40,11 +40,10 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
+             }
+             server->GetPropGeneric("SpawnObject", &prop);
+             // Do not create objects whose omitted branches change gameplay.
+-            if (pushable || (create.m_Flags & FLAG_GRAVITY) || prop.m_String[0])
++            if (prop.m_String[0])
+                 return 0;
+         }
+-        if (create.m_Flags & FLAG_GRAVITY)
+-            return 0;
++
+         if (!std::isfinite(hit_points) || !std::isfinite(mass) || std::abs(hit_points) > 1e6f || mass < 0 ||
+             mass > 1e6f)
+             return 0;
+@@ -53,6 +52,14 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
+         create.m_Flags |= FLAG_FULLPOSITIONRES | FLAG_MODELGOURAUDSHADE;
+         if (box_physics)
+             create.m_Flags |= FLAG_BOXPHYSICS;
++        if (pushable)
++        {
++            allow_marks = false;
++            create.m_Flags |= FLAG_GRAVITY;
++        }
++        if ((create.m_Flags & FLAG_GRAVITY) &&
++            (!(create.m_Flags & FLAG_BOXPHYSICS) || (create.m_Flags & FLAG_GOTHRUWORLD)))
++            return 0; // Polygon dynamics / world bypass are not this body solver.
+         return 1;
+     }
+     if (message == MID_INITIALUPDATE)
+@@ -61,8 +68,20 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
+             return 0;
+         m_damage.SetHitPoints(hit_points);
+         m_damage.m_fMass = mass;
++        m_damage.apply_damage_physics = pushable;
++        server->SetBlockingPriority(m_hObject, pushable ? 40 : 100);
++        if (server->GetObjectFlags(m_hObject) & FLAG_GRAVITY)
++        {
++            // Source SetMass clamps its local parameter, but uses the unclamped
++            // member in this formula. Preserve friction above mass 500 too.
++            if (!server->ConfigureWorldBody(m_hObject, {mass, 5 + mass * 10 / 500, pushable}))
++            {
++                server->RemoveObject(m_hObject);
++                return 0;
++            }
++        }
+         server->SetNextUpdate(m_hObject, 0);
+-        server->SetObjectUserFlags(m_hObject, (1u << 3) | (surface << 24));
++        server->SetObjectUserFlags(m_hObject, (1u << 3) | (pushable ? (1u << 4) : 0) | (surface << 24));
+     }
+     if (message == MID_UPDATE && destructable && m_damage.IsDead())
+     {
+diff --git a/src/game/original/PlayerObj.cpp b/src/game/original/PlayerObj.cpp
+index 544c792..3ca11e3 100644
+--- a/src/game/original/PlayerObj.cpp
++++ b/src/game/original/PlayerObj.cpp
+@@ -63,7 +63,8 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
+         return DFALSE;
+     }
+     // InitialUpdate precedes SetClient, as in the original engine.
+-    if (!m_InventoryMgr.Init(m_hObject, m_hClient) || !m_damage.Init(m_hObject, &m_InventoryMgr))
++    if (!m_InventoryMgr.Init(m_hObject, m_hClient) || !m_damage.Init(m_hObject, &m_InventoryMgr) ||
++        !server->SetBlockingPriority(m_hObject, 50))
+         return DFALSE;
+     m_bFirstUpdate = DTRUE;
+     m_InventoryMgr.SetAmmoCount(1, 50);
+@@ -321,7 +322,12 @@ bool CPlayerObj::HandlePlayerPositionMessage(const OpenBlood2::PlayerMove& move)
+         return false;
+     auto velocity = move.velocity, acceleration = move.acceleration, position = move.position;
+     if (server->SetVelocity(m_hObject, &velocity) != DE_OK ||
+-        server->SetAcceleration(m_hObject, &acceleration) != DE_OK || server->MoveObject(m_hObject, &position) != DE_OK)
++        server->SetAcceleration(m_hObject, &acceleration) != DE_OK)
++        return false;
++    OpenBlood2::MovementState before;
++    if (!server->GetMovementState(m_hObject, before) ||
++        !server->SetBlockingPriority(m_hObject, before.standing ? 50 : 40) ||
++        server->MoveObject(m_hObject, &position) != DE_OK)
+         return false;
+     OpenBlood2::MovementState state;
+     if (!server->GetMovementState(m_hObject, state))
+diff --git a/src/game/original/RotatingBrush.cpp b/src/game/original/RotatingBrush.cpp
+index 24a078c..dc2e100 100644
+--- a/src/game/original/RotatingBrush.cpp
++++ b/src/game/original/RotatingBrush.cpp
+@@ -9,5 +9,7 @@ DDWORD RotatingBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+     if (message == MID_INITIALUPDATE)
+         rotating.Init(m_hObject);
+     const auto accepted = CDestructableBrush::EngineMessageFn(message, data, reason);
+-    return message == MID_PRECREATE ? accepted && rotating.valid : accepted;
++    if (message == MID_PRECREATE)
++        return accepted && rotating.valid && data && !(static_cast<ObjectCreateStruct*>(data)->m_Flags & FLAG_GRAVITY);
++    return accepted;
+ }
+diff --git a/src/game/server_adapter.cpp b/src/game/server_adapter.cpp
+index 3163f48..042d335 100644
+--- a/src/game/server_adapter.cpp
++++ b/src/game/server_adapter.cpp
+@@ -102,6 +102,18 @@ namespace OpenBlood2
+                     active().objects_.fail(ObjectError::Unsupported, "Container solid/gravity flags are unsupported");
+                     return;
+                 }
++                if (r->world_body && (!(flags & FLAG_BOXPHYSICS) || (flags & FLAG_GOTHRUWORLD)))
++                {
++                    active().objects_.fail(ObjectError::Unsupported,
++                                           "Dynamic world body requires BoxPhysics without GOTHRUWORLD");
++                    return;
++                }
++                if (r->world_model && !r->world_body && ((flags ^ r->state.m_Flags) & FLAG_GRAVITY))
++                {
++                    active().objects_.fail(ObjectError::Unsupported,
++                                           "Static world model cannot acquire dynamic gravity");
++                    return;
++                }
+                 r->state.m_Flags = flags;
+             }
+         };
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 6226e83..9d2d7da 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -34,6 +34,8 @@ namespace OpenBlood2
+         ServerAdapter& operator=(const ServerAdapter&) = delete;
+         bool bind();
+         bool IsObjectAlive(HOBJECT) override;
++        bool ConfigureWorldBody(HOBJECT, const WorldBodyProperties&) override;
++        bool SetBlockingPriority(HOBJECT, DBYTE) override;
+         void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE) override;
+         void RecordDebrisEffect(const DebrisEffect&) override;
+         void RecordExplosionEffect(const ExplosionEffect&) override;
+@@ -162,6 +164,29 @@ namespace OpenBlood2
+         CollisionQuery sweep_scene(HOBJECT, DVector, DVector, DVector, CollisionHit&, const std::vector<ObjectId>&,
+                                    HOBJECT ignore_extra = nullptr);
+         bool affect_containers(HOBJECT, ContainerPhysics&);
++        struct BodyPath
++        {
++            DVector from{}, to{};
++        };
++        struct BodyRider
++        {
++            ObjectRecord* body;
++            DVector origin{};
++        };
++        struct BodyPlan
++        {
++            ObjectRecord* body = nullptr;
++            HOBJECT initiator = nullptr;
++            DVector origin{}, destination{}, velocity{};
++            std::vector<BodyPath> paths;
++            std::vector<BodyRider> riders;
++            CollisionHit contact;
++            bool blocked = false;
++        };
++        MoverResult plan_world_body(ObjectRecord&, DVector, const std::vector<ObjectId>&, HOBJECT, BodyPlan&);
++        void commit_world_body(const BodyPlan&);
++        void dispatch_world_body(const BodyPlan&, const std::vector<ObjectId>&);
++        DRESULT move_world_body(ObjectRecord&, DVector);
+         bool moving_ = false;
+         bool models_advancing_ = false, physics_advancing_ = false;
+         std::vector<std::unique_ptr<StringHandle>> string_tokens_;
+diff --git a/src/game/server_containers.cpp b/src/game/server_containers.cpp
+index 251d7dc..f5b0c75 100644
+--- a/src/game/server_containers.cpp
++++ b/src/game/server_containers.cpp
+@@ -1,4 +1,5 @@
+ #include "engine/container.h"
++#include "engine/world_model.h"
+ #include "game/original/VolumeBrush.h"
+ #include "game/server_adapter.h"
+ 
+@@ -20,7 +21,7 @@ namespace OpenBlood2
+             const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get());
+             if (!brush)
+                 continue;
+-            if (r->container->overlaps(body->state.m_Pos, body->dimensions))
++            if (r->container->overlaps(object_bounds_center(*body), body->dimensions))
+             {
+                 ++state.total;
+                 if (state.count < state.body.size())
+@@ -47,7 +48,7 @@ namespace OpenBlood2
+         {
+             auto* r = objects_.get(id);
+             if (!r || r->life != Life::Alive || !r->container ||
+-                !r->container->overlaps(body->state.m_Pos, body->dimensions))
++                !r->container->overlaps(object_bounds_center(*body), body->dimensions))
+                 continue;
+             if (!objects_.engine_message(r->handle, MID_AFFECTPHYSICS, &physics))
+                 return false;
+@@ -64,7 +65,7 @@ namespace OpenBlood2
+         {
+             const auto* r = objects_.get(id);
+             if (!r || r->life != Life::Alive || r->container || r->activity != OBJSTATE_ACTIVE ||
+-                (r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
++                (!r->world_body && r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
+                 continue;
+             ContainerPhysics physics;
+             physics.object = r->handle;
+diff --git a/src/game/server_movers.cpp b/src/game/server_movers.cpp
+index 0c2cc68..f0a7f7e 100644
+--- a/src/game/server_movers.cpp
++++ b/src/game/server_movers.cpp
+@@ -10,6 +10,8 @@ namespace OpenBlood2
+         auto* mover = objects_.get(handle);
+         if (!mover || mover->life != Life::Alive || !mover->world_model || !physics_vector(destination) || moving_)
+             return MoverResult::Invalid;
++        if (mover->world_body)
++            return MoverResult::Unavailable; // Dynamic bodies use collision-clipped MoveObject.
+         if (!collision_ready || !collision)
+             return MoverResult::Unavailable;
+         const auto delta = vector_subtract(destination, mover->state.m_Pos);
+diff --git a/src/game/server_physics.cpp b/src/game/server_physics.cpp
+index ac1ac24..a374a1d 100644
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -78,10 +78,11 @@ namespace OpenBlood2
+         // sliding along a wall or walking off a ledge. World support has a polygon
+         // identity, not a fabricated HOBJECT. Motion away from the support plane
+         // is airborne; positive Y alone can also mean walking uphill.
+-        auto to = state.position;
++        const auto center = object_bounds_center(*r);
++        auto to = center;
+         to.y -= 0.02f;
+         CollisionHit nearest;
+-        const auto query = sweep_scene(h, state.position, to, state.dimensions, nearest, objects_.snapshot());
++        const auto query = sweep_scene(h, center, to, state.dimensions, nearest, objects_.snapshot());
+         if (query == CollisionQuery::Invalid)
+             return false;
+         const bool found = query == CollisionQuery::Hit;
+@@ -128,7 +129,8 @@ namespace OpenBlood2
+     {
+         trace_service("SetVelocity");
+         auto* r = objects_.get(h);
+-        if (!r || (r->container || r->world_model) || !v || !physics_vector(*v))
++        if (!r || r->life != Life::Alive || r->container || (r->world_model && !r->world_body) || !v ||
++            !physics_vector(*v))
+             return DE_INVALIDPARAMS;
+         r->velocity = *v;
+         return DE_OK;
+@@ -148,7 +150,8 @@ namespace OpenBlood2
+     {
+         trace_service("SetAcceleration");
+         auto* r = objects_.get(h);
+-        if (!r || (r->container || r->world_model) || !v || !physics_vector(*v))
++        if (!r || r->life != Life::Alive || r->container || (r->world_model && !r->world_body) || !v ||
++            !physics_vector(*v))
+             return DE_INVALIDPARAMS;
+         r->acceleration = *v;
+         return DE_OK;
+@@ -168,6 +171,8 @@ namespace OpenBlood2
+             objects_.fail(ObjectError::Busy, "Recursive MoveObject during contact dispatch");
+             return DE_ERROR;
+         }
++        if (r->world_body)
++            return move_world_body(*r, *destination);
+         if (r->world_model)
+             return MoveWorldModel(h, *destination) == MoverResult::Moved ? DE_OK : DE_ERROR;
+         if (r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL)
+@@ -184,6 +189,7 @@ namespace OpenBlood2
+             if (const auto* o = objects_.get(target))
+                 touched.emplace(o->id.slot, target);
+         };
++        BodyPlan pushed;
+         auto position = r->state.m_Pos, remaining = vector_subtract(*destination, position);
+         r->grounded = false;
+         r->contact_normal = {};
+@@ -205,6 +211,54 @@ namespace OpenBlood2
+                 return DE_ERROR;
+             }
+             const bool found = query == CollisionQuery::Hit;
++            auto* obstacle = found ? objects_.get(nearest.object) : nullptr;
++            if (found && !nearest.start_solid && std::abs(nearest.normal.y) < .01f && obstacle &&
++                obstacle->world_body && obstacle->body_properties.pushable &&
++                r->blocking_priority > obstacle->blocking_priority)
++            {
++                const auto into = vector_dot(remaining, nearest.normal);
++                const auto push = vector_scale(nearest.normal, into * float(1 - nearest.fraction) - .002f);
++                CollisionHit clearance;
++                auto actor_end = end;
++                auto clear = sweep_scene(h, position, actor_end, r->dimensions, clearance, ids, obstacle->handle);
++                MovementState flat_support;
++                const bool flatten = clear == CollisionQuery::Hit && !clearance.start_solid &&
++                                     clearance.normal.y > .99999f && actor_end.y < position.y &&
++                                     GetMovementState(h, flat_support) && flat_support.standing &&
++                                     flat_support.ground_normal.y > .99999f;
++                if (flatten)
++                {
++                    // Gravity may reach the floor just after the side contact.
++                    // Revalidate the complete horizontal path before pushing;
++                    // otherwise successive grounded commands stick at the box.
++                    actor_end.y = position.y;
++                    clear = sweep_scene(h, position, actor_end, r->dimensions, clearance, ids, obstacle->handle);
++                }
++                const auto planned =
++                    clear == CollisionQuery::Miss
++                        ? plan_world_body(*obstacle, vector_add(obstacle->state.m_Pos, push), ids, h, pushed)
++                        : MoverResult::Unavailable;
++                if (into < 0 && clear == CollisionQuery::Miss && planned == MoverResult::Moved &&
++                    vector_dot(vector_subtract(pushed.destination, vector_add(obstacle->state.m_Pos, push)),
++                               vector_subtract(pushed.destination, vector_add(obstacle->state.m_Pos, push))) < 1e-8f)
++                {
++                    touch(obstacle->handle);
++                    for (auto id : ids)
++                    {
++                        const auto* other = objects_.get(id);
++                        CollisionHit hit;
++                        if (other && other->life == Life::Alive && other->handle != h && !other->container &&
++                            ((other->state.m_Flags | r->state.m_Flags) & FLAG_TOUCH_NOTIFY) &&
++                            sweep_object(*other, position, actor_end, r->dimensions, hit) == CollisionQuery::Hit)
++                            touch(other->handle);
++                    }
++                    if (flatten)
++                        r->velocity.y = 0;
++                    position = actor_end;
++                    break;
++                }
++                pushed = {};
++            }
+             // FLAG_STAIRSTEP is original. This bounded three-sweep solver is new;
+             // the default half-height rule is evidenced by later LithTech code.
+             // Probe paths never dispatch speculative contacts.
+@@ -291,6 +345,12 @@ namespace OpenBlood2
+                 break;
+         }
+         r->state.m_Pos = position;
++        if (pushed.body)
++        {
++            commit_world_body(pushed);
++            ++pushed.body->body_pushes;
++            dispatch_world_body(pushed, ids);
++        }
+         for (const auto& contact : touched)
+         {
+             auto other = contact.second;
+@@ -299,7 +359,7 @@ namespace OpenBlood2
+                 break;
+             if (!target || target->life != Life::Alive)
+                 continue;
+-            // Force is not invented: a mass/impulse solver has not been connected.
++            // Touch remains a typed object identity; no collision force is fabricated.
+             if (r->state.m_Flags & FLAG_TOUCH_NOTIFY)
+                 objects_.engine_message(h, MID_TOUCHNOTIFY, other);
+             if (r->life == Life::Alive && target->life == Life::Alive && (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
+@@ -335,12 +395,12 @@ namespace OpenBlood2
+         for (auto id : ids)
+         {
+             auto* r = objects_.get(id);
+-            if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE || r->client_movement ||
+-                (r->container || r->world_model) ||
+-                (r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
++            if (!r || r->life != Life::Alive || r->activity != OBJSTATE_ACTIVE || r->client_movement || r->container ||
++                (r->world_model && !r->world_body) ||
++                (!r->world_body && r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL))
+                 continue;
+             ContainerState containers;
+-            if (!GetContainers(r->handle, r->state.m_Pos, containers))
++            if (!GetContainers(r->handle, object_bounds_center(*r), containers))
+                 return false;
+             if (!(r->state.m_Flags & FLAG_GRAVITY) && vector_dot(r->velocity, r->velocity) == 0 &&
+                 vector_dot(r->acceleration, r->acceleration) == 0 && !containers.total)
+@@ -361,8 +421,42 @@ namespace OpenBlood2
+                 auto acceleration = physics.acceleration;
+                 if (physics.gravity)
+                     acceleration = vector_add(acceleration, gravity);
+-                r->velocity = vector_add(r->velocity, vector_scale(acceleration, dt));
+-                auto destination = vector_add(r->state.m_Pos, vector_scale(r->velocity, dt));
++                DVector displacement;
++                if (r->world_body)
++                {
++                    ++r->body_steps;
++                    MovementState support;
++                    const bool resting = physics.gravity && GetMovementState(r->handle, support) && support.standing &&
++                                         support.ground_normal.y >= .5f;
++                    if (resting && vector_dot(acceleration, support.ground_normal) < 0)
++                        acceleration = vector_subtract(
++                            acceleration,
++                            vector_scale(support.ground_normal, vector_dot(acceleration, support.ground_normal)));
++                    if (resting && r->body_properties.friction > 0)
++                    {
++                        const auto k = r->body_properties.friction;
++                        const auto decay = std::exp(-k * dt);
++                        const auto terminal = vector_scale(acceleration, 1 / k);
++                        displacement =
++                            vector_add(vector_scale(terminal, dt),
++                                       vector_scale(vector_subtract(r->velocity, terminal), (1 - decay) / k));
++                        r->velocity = vector_add(terminal, vector_scale(vector_subtract(r->velocity, terminal), decay));
++                        if (vector_dot(r->velocity, r->velocity) < .1f && vector_dot(acceleration, acceleration) < .1f)
++                            r->velocity = {};
++                    }
++                    else
++                    {
++                        displacement =
++                            vector_add(vector_scale(r->velocity, dt), vector_scale(acceleration, .5f * dt * dt));
++                        r->velocity = vector_add(r->velocity, vector_scale(acceleration, dt));
++                    }
++                }
++                else
++                {
++                    r->velocity = vector_add(r->velocity, vector_scale(acceleration, dt));
++                    displacement = vector_scale(r->velocity, dt);
++                }
++                auto destination = vector_add(r->state.m_Pos, displacement);
+                 if (MoveObject(r->handle, &destination) != DE_OK)
+                     return false;
+             }
+diff --git a/src/game/server_rotation.cpp b/src/game/server_rotation.cpp
+index 85c56e3..43a2fe1 100644
+--- a/src/game/server_rotation.cpp
++++ b/src/game/server_rotation.cpp
+@@ -9,7 +9,7 @@ namespace OpenBlood2
+     {
+         trace_service("RotateWorldModel");
+         auto* mover = objects_.get(handle);
+-        if (!mover || mover->life != Life::Alive || !mover->world_model_base || moving_ ||
++        if (!mover || mover->life != Life::Alive || !mover->world_model_base || mover->world_body || moving_ ||
+             !physics_vector(move.from_angles) || !physics_vector(move.to_angles) ||
+             !physics_vector(move.original_position) || !physics_vector(move.pivot))
+             return MoverResult::Invalid;
+diff --git a/src/game/server_world_bodies.cpp b/src/game/server_world_bodies.cpp
+new file mode 100644
+index 0000000..18bf8ac
+--- /dev/null
++++ b/src/game/server_world_bodies.cpp
+@@ -0,0 +1,236 @@
++#include "engine/world_model.h"
++#include "game/server_adapter.h"
++#include <algorithm>
++#include <cmath>
++namespace OpenBlood2
++{
++    bool ServerAdapter::ConfigureWorldBody(HOBJECT handle, const WorldBodyProperties& properties)
++    {
++        trace_service("ConfigureWorldBody");
++        auto* r = objects_.get(handle);
++        if (!r || r->life != Life::Alive || !r->world_model || r->container || r->world_body ||
++            !(r->state.m_Flags & FLAG_BOXPHYSICS) || (r->state.m_Flags & FLAG_GOTHRUWORLD) ||
++            !std::isfinite(properties.mass) || properties.mass < 0 || properties.mass > 1e6f ||
++            !std::isfinite(properties.friction) || properties.friction < 0 || properties.friction > 20005)
++            return objects_.fail(ObjectError::Unsupported, "Invalid dynamic world-body configuration");
++        r->world_body = true;
++        r->body_properties = properties;
++        return true;
++    }
++    bool ServerAdapter::SetBlockingPriority(HOBJECT handle, DBYTE priority)
++    {
++        trace_service("SetBlockingPriority");
++        auto* r = objects_.get(handle);
++        if (!r || r->life != Life::Alive)
++            return false;
++        r->blocking_priority = priority;
++        return true;
++    }
++    MoverResult ServerAdapter::plan_world_body(ObjectRecord& body, DVector destination,
++                                               const std::vector<ObjectId>& ids, HOBJECT ignore, BodyPlan& plan)
++    {
++        plan = {};
++        plan.body = &body;
++        plan.initiator = ignore;
++        plan.origin = plan.destination = body.state.m_Pos;
++        plan.velocity = body.velocity;
++        if (!body.world_body || !physics_vector(destination) || !physics_vector(plan.velocity))
++            return MoverResult::Invalid;
++        const auto offset = vector_subtract(object_bounds_center(body), body.state.m_Pos);
++        auto position = object_bounds_center(body);
++        auto remaining = vector_subtract(destination, plan.origin);
++        if (!physics_vector(remaining))
++            return MoverResult::Invalid;
++        auto blocked = [&](const CollisionHit& contact)
++        {
++            plan.destination = plan.origin;
++            plan.paths.clear();
++            plan.velocity = {};
++            plan.contact = contact;
++            plan.blocked = true;
++            return MoverResult::Blocked;
++        };
++        if (vector_dot(remaining, remaining) == 0)
++            return MoverResult::Moved;
++        if (body.state.m_Flags & FLAG_SOLID)
++            for (auto id : ids)
++            {
++                auto* rider = objects_.get(id);
++                if (!rider || rider->life != Life::Alive || rider == &body || rider->handle == ignore ||
++                    !(rider->state.m_Flags & FLAG_SOLID) || (rider->state.m_Flags & FLAG_DONTFOLLOWSTANDING))
++                    continue;
++                MovementState support;
++                if (!GetMovementState(rider->handle, support) || !support.standing ||
++                    support.ground_object != body.handle)
++                    continue;
++                if (rider->world_model || plan.riders.size() == 64)
++                {
++                    CollisionHit hit;
++                    hit.object = rider->handle;
++                    return blocked(hit); // No stacks or recursive chain pushing.
++                }
++                plan.riders.push_back({rider, rider->state.m_Pos});
++            }
++        auto sweep = [&](DVector from, DVector to, CollisionHit& nearest)
++        {
++            auto result = collision->sweep(from, to, body.dimensions, nearest);
++            if (result == CollisionQuery::Invalid || !(body.state.m_Flags & FLAG_SOLID))
++                return result;
++            for (auto id : ids)
++            {
++                const auto* other = objects_.get(id);
++                if (!other || other->life != Life::Alive || other == &body || other->handle == ignore ||
++                    !(other->state.m_Flags & FLAG_SOLID) ||
++                    std::any_of(plan.riders.begin(), plan.riders.end(),
++                                [&](const auto& rider) { return rider.body == other; }))
++                    continue;
++                CollisionHit hit;
++                const auto query = sweep_object(*other, from, to, body.dimensions, hit);
++                if (query == CollisionQuery::Invalid)
++                    return query;
++                if (query == CollisionQuery::Hit && (result != CollisionQuery::Hit || hit.fraction < nearest.fraction))
++                {
++                    nearest = hit;
++                    nearest.object = other->handle;
++                    result = query;
++                }
++            }
++            return result;
++        };
++        for (unsigned i = 0; i < 4; ++i)
++        {
++            const auto end = vector_add(position, remaining);
++            CollisionHit hit;
++            const auto query = sweep(position, end, hit);
++            if (query == CollisionQuery::Invalid)
++                return MoverResult::Invalid;
++            if (query == CollisionQuery::Hit && hit.start_solid)
++                return blocked(hit);
++            const auto reached =
++                query == CollisionQuery::Hit ? vector_add(hit.point, vector_scale(hit.normal, .001f)) : end;
++            if (!physics_vector(reached))
++                return MoverResult::Invalid;
++            // Each rider follows exactly the accepted piecewise path. Validate
++            // every leg against the old scene before any body position changes.
++            for (const auto& rider : plan.riders)
++            {
++                const auto from =
++                    vector_add(rider.origin, vector_subtract(vector_subtract(position, offset), plan.origin));
++                const auto to =
++                    vector_add(rider.origin, vector_subtract(vector_subtract(reached, offset), plan.origin));
++                CollisionHit obstruction;
++                const auto result =
++                    sweep_scene(rider.body->handle, from, to, rider.body->dimensions, obstruction, ids, body.handle);
++                if (result == CollisionQuery::Invalid)
++                    return MoverResult::Invalid;
++                if (result == CollisionQuery::Hit && (obstruction.start_solid || obstruction.fraction < 1 - 1e-6))
++                    return blocked(obstruction);
++            }
++            plan.paths.push_back({vector_subtract(position, offset), vector_subtract(reached, offset)});
++            position = reached;
++            if (query != CollisionQuery::Hit)
++                break;
++            plan.contact = hit;
++            plan.blocked = true;
++            remaining = vector_scale(remaining, float(1 - hit.fraction));
++            const auto inward = vector_dot(remaining, hit.normal);
++            if (inward < 0)
++                remaining = vector_subtract(remaining, vector_scale(hit.normal, inward));
++            const auto velocity_inward = vector_dot(plan.velocity, hit.normal);
++            if (velocity_inward < 0)
++                plan.velocity = vector_subtract(plan.velocity, vector_scale(hit.normal, velocity_inward));
++            if (vector_dot(remaining, remaining) < 1e-10f)
++                break;
++        }
++        plan.destination = vector_subtract(position, offset);
++        return MoverResult::Moved;
++    }
++    void ServerAdapter::commit_world_body(const BodyPlan& plan)
++    {
++        auto& body = *plan.body;
++        body.state.m_Pos = plan.destination;
++        body.velocity = plan.velocity;
++        body.contact_object = plan.contact.object;
++        body.contact_polygon = plan.contact.polygon;
++        body.contact_normal = plan.contact.normal;
++        body.grounded = plan.blocked && plan.contact.normal.y > .7f;
++        body.body_result = plan.blocked ? MoverResult::Blocked : MoverResult::Moved;
++        body.mover_blocker = plan.contact.object;
++        body.mover_blocks += plan.blocked;
++        if (vector_dot(vector_subtract(plan.destination, plan.origin),
++                       vector_subtract(plan.destination, plan.origin)) == 0)
++            return;
++        ++body.mover_moves;
++        for (const auto& rider : plan.riders)
++        {
++            rider.body->state.m_Pos = vector_add(rider.origin, vector_subtract(plan.destination, plan.origin));
++            rider.body->grounded = false;
++            rider.body->contact_object = nullptr;
++            rider.body->contact_normal = {};
++            rider.body->contact_polygon = UINT32_MAX;
++            ++body.mover_riders;
++        }
++    }
++    void ServerAdapter::dispatch_world_body(const BodyPlan& plan, const std::vector<ObjectId>& ids)
++    {
++        if (plan.paths.empty())
++            return;
++        auto contact = [&](ObjectRecord& a, ObjectRecord& b)
++        {
++            if (a.life == Life::Alive && b.life == Life::Alive && (a.state.m_Flags & FLAG_TOUCH_NOTIFY))
++                objects_.engine_message(a.handle, MID_TOUCHNOTIFY, b.handle);
++            if (a.life == Life::Alive && b.life == Life::Alive && (b.state.m_Flags & FLAG_TOUCH_NOTIFY))
++                objects_.engine_message(b.handle, MID_TOUCHNOTIFY, a.handle);
++        };
++        auto sensors = [&](ObjectRecord& body, DVector origin, bool mover)
++        {
++            for (auto id : ids)
++            {
++                auto* other = objects_.get(id);
++                if (body.life != Life::Alive)
++                    break;
++                if (!other || other == &body || other->life != Life::Alive || other->container || other == plan.body ||
++                    other->handle == plan.initiator ||
++                    !((other->state.m_Flags | body.state.m_Flags) & FLAG_TOUCH_NOTIFY))
++                    continue;
++                if (mover &&
++                    std::any_of(plan.riders.begin(), plan.riders.end(), [&](const auto& r) { return r.body == other; }))
++                    continue;
++                for (const auto& path : plan.paths)
++                {
++                    const auto from = vector_add(origin, vector_subtract(path.from, plan.origin));
++                    const auto to = vector_add(origin, vector_subtract(path.to, plan.origin));
++                    CollisionHit hit;
++                    if (sweep_object(*other, from, to, body.dimensions, hit) == CollisionQuery::Hit ||
++                        (mover && other->handle == plan.contact.object))
++                    {
++                        contact(body, *other);
++                        break;
++                    }
++                }
++            }
++        };
++        const auto center =
++            vector_add(object_bounds_center(*plan.body), vector_subtract(plan.origin, plan.destination));
++        sensors(*plan.body, center, true);
++        for (const auto& rider : plan.riders)
++        {
++            contact(*plan.body, *rider.body);
++            sensors(*rider.body, rider.origin, false);
++        }
++    }
++    DRESULT ServerAdapter::move_world_body(ObjectRecord& body, DVector destination)
++    {
++        const auto ids = objects_.snapshot();
++        BodyPlan plan;
++        auto result = plan_world_body(body, destination, ids, nullptr, plan);
++        body.body_result = result;
++        if (result == MoverResult::Invalid || result == MoverResult::Unavailable)
++            return DE_ERROR;
++        moving_ = true;
++        commit_world_body(plan);
++        dispatch_world_body(plan, ids);
++        moving_ = false;
++        return DE_OK; // Blocked/clipped motion is a valid collision response.
++    }
++} // namespace OpenBlood2
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index fc017c4..412abaf 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -251,3 +251,11 @@ foreach(case IN ITEMS properties requests radius chain gates lifetime limits pla
+     add_test(NAME explosions.${case} COMMAND explosion_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/explosion-fixtures/${case}")
+     set_tests_properties(explosions.${case} PROPERTIES LABELS "headless;explosions" TIMEOUT 30)
+ endforeach()
++
++add_executable(pushable_tests pushable_tests.cpp)
++target_link_libraries(pushable_tests PRIVATE blood2_game)
++blood2_project_options(pushable_tests)
++foreach(case IN ITEMS properties gravity friction impulses pushing player riders contacts collision containers)
++    add_test(NAME pushables.${case} COMMAND pushable_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/pushable-fixtures/${case}")
++    set_tests_properties(pushables.${case} PROPERTIES LABELS "headless;pushables" TIMEOUT 30)
++endforeach()
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index ed252e0..6c418a7 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -247,7 +247,8 @@ namespace
+         CHECK(g.resources.mount_game(Config{root, "private"}, error));
+         struct Count
+         {
+-            unsigned created = 0, rejected = 0, filtered = 0, moved = 0, explosive = 0, detonated = 0;
++            unsigned created = 0, rejected = 0, filtered = 0, moved = 0, explosive = 0, detonated = 0, dynamic = 0,
++                     blocked = 0;
+         };
+         std::map<std::string, Count> counts;
+         std::map<std::string, unsigned> failures;
+@@ -301,11 +302,14 @@ namespace
+                                 auto it = props.find(key);
+                                 return it != props.end() && std::get<bool>(it->second);
+                             };
+-                            if (enabled("Pushable") || enabled("Gravity"))
+-                                kind = "pushable/gravity";
+-                            else if (props.contains("SpawnObject") &&
+-                                     !std::get<std::string>(props.at("SpawnObject")).empty())
++                            if (props.contains("SpawnObject") &&
++                                !std::get<std::string>(props.at("SpawnObject")).empty())
+                                 kind = "spawn";
++                            else if (enabled("Pushable") || enabled("Gravity"))
++                            {
++                                CHECK(!enabled("BoxPhysics"));
++                                kind = "polygon dynamics";
++                            }
+                             else
+                                 CHECK(false);
+                         }
+@@ -325,6 +329,10 @@ namespace
+                     for (int i = 0; i < 4; ++i)
+                         CHECK(g.step(.02));
+                     count.moved += r->mover_moves > 0;
++                    count.dynamic += r->world_body;
++                    count.blocked += r->world_body && r->mover_blocks > 0;
++                    if (r->world_body)
++                        CHECK(r->body_steps > 0 && (r->state.m_Flags & FLAG_BOXPHYSICS));
+                     auto& brush = destruct(g, h);
+                     if (brush.debris.exploding)
+                     {
+@@ -352,14 +360,15 @@ namespace
+         }
+         for (const auto& [name, c] : counts)
+             std::cout << name << " created=" << c.created << " rejected=" << c.rejected << " filtered=" << c.filtered
+-                      << " moved=" << c.moved << " explosive=" << c.explosive << " detonated=" << c.detonated << '\n';
++                      << " moved=" << c.moved << " explosive=" << c.explosive << " detonated=" << c.detonated
++                      << " dynamic=" << c.dynamic << " blocked=" << c.blocked << '\n';
+         for (const auto& [name, n] : failures)
+             std::cout << name << "=" << n << '\n';
+         CHECK(unreadable == 1 && counts["RotatingBrush"].created == 98 && counts["RotatingBrush"].rejected == 38 &&
+               counts["RotatingBrush"].moved == 98 && counts["RotatingBrush"].filtered == 0 &&
+-              counts["CDestructableBrush"].created == 2162 && counts["CDestructableBrush"].rejected == 293 &&
+-              counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 47 &&
+-              counts["CDestructableBrush"].detonated == 47);
++              counts["CDestructableBrush"].created == 2237 && counts["CDestructableBrush"].rejected == 218 &&
++              counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 50 &&
++              counts["CDestructableBrush"].detonated == 50);
+         CHECK(g.request_world("01_SubwayA", error));
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+diff --git a/tests/explosion_tests.cpp b/tests/explosion_tests.cpp
+index 0eeed70..a38e0b6 100644
+--- a/tests/explosion_tests.cpp
++++ b/tests/explosion_tests.cpp
+@@ -127,7 +127,7 @@ namespace
+         CHECK(!runtime);
+         CHECK(!brush(g, {}, {{"Scale", std::numeric_limits<float>::infinity()}}));
+         CHECK(!brush(g, {}, {{"Scale", 1e7f}}));
+-        CHECK(!brush(g, {}, {{"Pushable", true}, {"Exploding", true}}));
++        CHECK(!brush(g, {}, {{"Pushable", true}, {"BoxPhysics", false}, {"Exploding", true}}));
+         CHECK(!brush(g, {}, {{"SpawnObject", std::string("Enemy")}, {"Exploding", true}}));
+         CHECK(g.unload_world() && CDestructable::m_dwNumDestructables == 0 && g.server.string_count() == 0);
+         return true;
+diff --git a/tests/pushable_tests.cpp b/tests/pushable_tests.cpp
+new file mode 100644
+index 0000000..2159b65
+--- /dev/null
++++ b/tests/pushable_tests.cpp
+@@ -0,0 +1,362 @@
++#include "brush_fixture.h"
++#include "engine/world_model.h"
++#include "game/original/DestructableBrush.h"
++#include "game/original/radius_damage.h"
++#include "player_fixture.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .01f;
++    }
++    HOBJECT brush(GameSession& g, DVector center = {0, 10.001f, 0}, Properties props = {}, DVector dims = {10, 10, 10},
++                  DVector offset = {})
++    {
++        const auto name = "body" + std::to_string(g.world.models.size());
++        auto model = test_brush::box(name, vector_subtract(center, dims), vector_add(center, dims));
++        model.translation = vector_subtract(center, offset);
++        g.world.models.push_back(std::move(model));
++        props["Name"] = name;
++        props.try_emplace("Pushable", true);
++        props.try_emplace("HitPoints", 1000.0f);
++        return g.objects.create(g.objects.find_class("CDestructableBrush"), {}, Creation::World, props);
++    }
++    CDestructable& damage(GameSession& g, HOBJECT h)
++    {
++        return dynamic_cast<CDestructableBrush*>(g.server.HandleToObject(h))->m_damage;
++    }
++    bool impact(GameSession& g, HOBJECT h, float amount, DVector direction = {1, 0, 0},
++                DamageType type = DamageType::Normal)
++    {
++        auto m = g.server.StartMessageToObject(g.server.HandleToObject(h), h, damage_message);
++        CHECK(m && g.server.WriteDamage(m, {direction, {}, amount, type, h}) == DE_OK);
++        CHECK(g.server.EndMessage(m) == DE_OK);
++        return true;
++    }
++    HOBJECT body(GameSession& g, DVector pos, DVector dims = {2, 2, 2}, DDWORD flags = FLAG_SOLID)
++    {
++        ObjectCreateStruct state;
++        state.m_Pos = pos;
++        state.m_Flags = flags;
++        auto h = g.objects.create(g.objects.find_class("BaseClass"), state);
++        if (h)
++            g.server.SetObjectDims(h, &dims);
++        return h;
++    }
++    bool properties(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = brush(g, {0, 100, 0}, {{"ObjectMass", 750.0f}});
++        CHECK(h);
++        auto* r = g.objects.get(h);
++        CHECK(r->world_body && r->body_properties.pushable && r->blocking_priority == 40);
++        CHECK(r->body_properties.mass == 750 && r->body_properties.friction == 20);
++        CHECK((r->state.m_Flags & (FLAG_GRAVITY | FLAG_BOXPHYSICS)) == (FLAG_GRAVITY | FLAG_BOXPHYSICS));
++        CHECK((r->user_flags & (1 << 4)) && damage(g, h).apply_damage_physics);
++        CHECK(!dynamic_cast<CDestructableBrush*>(r->game.get())->allow_marks);
++        auto gravity = brush(g, {100, 100, 0}, {{"Pushable", false}, {"Gravity", true}});
++        CHECK(gravity);
++        CHECK(g.objects.get(gravity)->world_body && g.objects.get(gravity)->blocking_priority == 100);
++        CHECK(!damage(g, gravity).apply_damage_physics && !(g.objects.get(gravity)->user_flags & (1 << 4)));
++        const auto flags = r->state.m_Flags;
++        g.server.SetObjectFlags(h, flags & ~FLAG_BOXPHYSICS);
++        CHECK(r->state.m_Flags == flags);
++        CHECK(!g.server.ConfigureWorldBody(h, {100, 7, true}));
++        CHECK(g.server.RotateWorldModel(h, {}) == MoverResult::Invalid);
++        CHECK(g.server.MoveWorldModel(h, {0, 101, 0}) == MoverResult::Unavailable);
++        CHECK(!brush(g, {200, 100, 0}, {{"BoxPhysics", false}}));
++        CHECK(!brush(g, {200, 100, 0}, {{"SpawnObject", std::string("Enemy")}}));
++        CHECK(!brush(g, {200, 100, 0}, {{"ObjectMass", -1.0f}}));
++        return true;
++    }
++    bool gravity(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = brush(g, {0, 100, 0}, {}, {10, 10, 10}, {30, 40, -20});
++        CHECK(h);
++        auto* r = g.objects.get(h);
++        const auto initial = r->state.m_Pos;
++        CHECK(g.step(.1));
++        CHECK(near(r->state.m_Pos.y, initial.y - 10) && near(r->velocity.y, -200));
++        for (int i = 0; i < 20; ++i)
++            CHECK(g.step(.05));
++        CHECK(near(object_bounds_center(*r).y, 10.001f) && near(r->velocity.y, 0));
++        MovementState s;
++        CHECK(g.server.GetMovementState(h, s) && s.standing && s.ground_normal.y > .99f);
++        const auto pos = r->state.m_Pos;
++        CHECK(g.step(.5) && near(pos.y, r->state.m_Pos.y) && r->body_steps == 192);
++        r->activity = OBJSTATE_INACTIVE;
++        auto n = r->body_steps;
++        CHECK(g.step(.1) && r->body_steps == n);
++        return true;
++    }
++    bool friction(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = brush(g);
++        CHECK(h);
++        auto* r = g.objects.get(h);
++        DVector velocity{70, 0, 0};
++        CHECK(g.server.SetVelocity(h, &velocity) == DE_OK);
++        CHECK(g.step(.1));
++        CHECK(near(r->velocity.x, 70 * std::exp(-.7f)) && near(r->state.m_Pos.x, 10 * (1 - std::exp(-.7f))));
++        const auto y = r->state.m_Pos.y;
++        CHECK(near(y, 10.001f));
++        DVector a{35, 0, 0};
++        CHECK(g.server.SetAcceleration(h, &a) == DE_OK);
++        const auto v = r->velocity.x, x = r->state.m_Pos.x;
++        CHECK(g.step(.1));
++        CHECK(near(r->velocity.x, 5 + (v - 5) * std::exp(-.7f)));
++        CHECK(near(r->state.m_Pos.x, x + .5f + (v - 5) * (1 - std::exp(-.7f)) / 7));
++        return true;
++    }
++    bool impulses(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = brush(g, {0, 100, 0});
++        CHECK(h);
++        auto& d = damage(g, h);
++        CHECK(impact(g, h, 10, {3, 0, 0}) && near(g.objects.get(h)->velocity.x, 250) && d.damage_impulses == 1);
++        CHECK(impact(g, h, 1, {0, 0, 0}) && d.damage_impulses == 1);
++        CHECK(impact(g, h, 2, {0, .09f, 0}) && d.damage_impulses == 1);
++        d.m_fArmorPoints = 100;
++        CHECK(impact(g, h, 2, {0, 1, 0}) && near(g.objects.get(h)->velocity.y, 50));
++        d.can_damage = false;
++        CHECK(impact(g, h, 5) && d.damage_impulses == 2);
++        auto zero = brush(g, {100, 100, 0}, {{"ObjectMass", 0.0f}});
++        CHECK(zero);
++        CHECK(impact(g, zero, 1) && damage(g, zero).m_fMass == 1 && near(g.objects.get(zero)->velocity.x, 2500));
++        auto locked = brush(g, {200, 100, 0}, {{"TriggerDestroyOnly", true}});
++        CHECK(locked);
++        CHECK(impact(g, locked, 5) && damage(g, locked).damage_impulses == 0);
++        CHECK(impact(g, locked, 0, {1, 0, 0}, DamageType::Death) && damage(g, locked).damage_impulses == 0);
++        CHECK(g.step(.01) && !g.objects.get(locked));
++        auto blast = brush(g, {400, 100, 0});
++        auto receiver = brush(g, {450, 100, 0});
++        CHECK(blast && receiver);
++        const auto report =
++            DamageObjectsInRadius(blast, g.server.HandleToObject(blast), {400, 100, 0}, 100, 2, DamageType::Explode);
++        CHECK(!report.cancelled && report.delivered == 2 && near(g.objects.get(receiver)->velocity.x, 50));
++        CHECK(damage(g, receiver).last_damage.area_effect && damage(g, receiver).damage_impulses == 1);
++        return true;
++    }
++    bool pushing(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = brush(g);
++        auto actor = body(g, {-15, 2.001f, 0});
++        CHECK(h && actor);
++        DVector end{-5, 2.001f, 0};
++        CHECK(g.server.SetBlockingPriority(actor, 40));
++        CHECK(g.server.MoveObject(actor, &end) == DE_OK && near(g.objects.get(h)->state.m_Pos.x, 0));
++        CHECK(g.objects.get(actor)->state.m_Pos.x < -11.99f);
++        CHECK(g.server.SetBlockingPriority(actor, 50));
++        CHECK(g.server.MoveObject(actor, &end) == DE_OK && near(g.objects.get(actor)->state.m_Pos.x, end.x));
++        CHECK(g.objects.get(h)->state.m_Pos.x > 7 && g.objects.get(h)->body_pushes == 1);
++        auto wall = body(g, {20, 10, 0}, {1, 10, 30});
++        CHECK(wall);
++        auto original = g.objects.get(h)->state.m_Pos;
++        end.x = 5;
++        CHECK(g.server.MoveObject(actor, &end) == DE_OK);
++        CHECK(g.objects.get(h)->state.m_Pos.x == original.x && g.objects.get(actor)->state.m_Pos.x < 0);
++        CHECK(g.objects.remove(wall) && g.objects.finish_frame());
++        auto second = brush(g, {30, 10.001f, 0});
++        CHECK(second);
++        end.x = 30;
++        CHECK(g.server.MoveObject(actor, &end) == DE_OK);
++        CHECK(g.objects.get(h)->state.m_Pos.x == original.x && g.objects.get(second)->state.m_Pos.x == 30);
++        return true;
++    }
++    bool player(const std::filesystem::path& root)
++    {
++        GameSession g;
++        std::string error;
++        CHECK(test_player::setup(g, root) && g.enter_player(error));
++        CHECK(g.objects.get(g.client_shell.player)->blocking_priority == 50);
++        auto& c = g.client_shell;
++        c.rotation = {};
++        for (int i = 0; i < 60; ++i)
++            CHECK(g.step(1.0 / 60));
++        const auto start = c.position;
++        auto h = brush(g, {start.x, 40.001f, start.z + 60}, {}, {20, 40, 20});
++        CHECK(h);
++        c.movement_input.forward = true;
++        for (int i = 0; i < 60; ++i)
++            CHECK(g.step(1.0 / 60));
++        CHECK(g.objects.get(h)->body_pushes > 20 && c.position.z > start.z + 180);
++        CHECK(g.objects.get(c.player)->blocking_priority == 50 && g.objects.get(c.player)->body_steps == 0);
++        c.movement_input.jump = true;
++        CHECK(g.step(1.0 / 60));
++        CHECK(g.objects.get(c.player)->blocking_priority == 40 && !c.move_mgr.m_bOnGround);
++        return true;
++    }
++    bool riders(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = brush(g);
++        auto rider = body(g, {0, 22.002f, 0});
++        auto detached = body(g, {0, 22.002f, 6}, {1, 2, 1}, FLAG_SOLID | FLAG_DONTFOLLOWSTANDING);
++        CHECK(h && rider && detached);
++        DVector end{5, 10.001f, 0};
++        CHECK(g.server.MoveObject(h, &end) == DE_OK);
++        CHECK(near(g.objects.get(rider)->state.m_Pos.x, 5) && g.objects.get(detached)->state.m_Pos.x == 0);
++        auto wall = body(g, {9, 24, 0}, {1, 2, 3});
++        CHECK(wall);
++        end.x = 15;
++        CHECK(g.server.MoveObject(h, &end) == DE_OK);
++        CHECK(near(g.objects.get(h)->state.m_Pos.x, 5) && near(g.objects.get(rider)->state.m_Pos.x, 5));
++        CHECK(g.objects.get(h)->body_result == MoverResult::Blocked);
++        CHECK(g.objects.remove(wall) && g.objects.remove(detached) && g.objects.finish_frame());
++        DVector jump{0, 50, 0};
++        CHECK(g.server.SetVelocity(rider, &jump) == DE_OK);
++        CHECK(g.server.MoveObject(h, &end) == DE_OK && near(g.objects.get(rider)->state.m_Pos.x, 5));
++        CHECK(g.objects.remove(rider) && g.objects.finish_frame());
++        auto stack = brush(g, {15, 30.002f, 0});
++        CHECK(stack);
++        g.server.SetObjectFlags(stack, g.server.GetObjectFlags(stack) & ~FLAG_DONTFOLLOWSTANDING);
++        end.x = 25;
++        CHECK(g.server.MoveObject(h, &end) == DE_OK && near(g.objects.get(h)->state.m_Pos.x, 15));
++        for (auto id : g.objects.snapshot())
++            CHECK(g.objects.remove(g.objects.get(id)->handle));
++        CHECK(g.objects.finish_frame());
++        h = brush(g, {0, 10.001f, 0}, {}, {200, 10, 10});
++        CHECK(h);
++        HOBJECT last = nullptr;
++        for (int i = 0; i < 65; ++i)
++        {
++            last = body(g, {float(i * 5 - 160), 22.002f, 0}, {1, 2, 1});
++            CHECK(last);
++        }
++        end = {.1f, 10.001f, 0};
++        CHECK(g.server.MoveObject(h, &end) == DE_OK && near(g.objects.get(h)->state.m_Pos.x, 0));
++        CHECK(g.objects.get(h)->body_result == MoverResult::Blocked);
++        CHECK(g.objects.remove(last) && g.objects.finish_frame());
++        CHECK(g.server.MoveObject(h, &end) == DE_OK && near(g.objects.get(h)->state.m_Pos.x, .1f));
++        CHECK(g.objects.get(h)->mover_riders == 64);
++        return true;
++    }
++    struct Sensor : BaseClass
++    {
++        unsigned touches = 0;
++        std::function<void(HOBJECT)> callback;
++        DDWORD EngineMessageFn(DDWORD message, void* data, float reason) override
++        {
++            if (message == MID_TOUCHNOTIFY)
++            {
++                ++touches;
++                if (callback)
++                    callback(static_cast<HOBJECT>(data));
++            }
++            return BaseClass::EngineMessageFn(message, data, reason);
++        }
++    };
++    bool contacts(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        ClassInfo type{"BodySensor",
++                       g.objects.find_class("BaseClass"),
++                       []() -> std::unique_ptr<BaseClass> { return std::make_unique<Sensor>(); },
++                       {}};
++        CHECK(g.objects.register_class(type));
++        auto h = brush(g);
++        CHECK(h);
++        ObjectCreateStruct state;
++        state.m_Pos = {-15, 2.001f, 0};
++        state.m_Flags = FLAG_SOLID | FLAG_TOUCH_NOTIFY;
++        auto actor = g.objects.create(&type, state);
++        CHECK(actor);
++        DVector dims{2, 2, 2};
++        g.server.SetObjectDims(actor, &dims);
++        auto* sensor = dynamic_cast<Sensor*>(g.server.HandleToObject(actor));
++        CHECK(sensor);
++        bool atomic = false, guarded = false;
++        sensor->callback = [&](HOBJECT touched)
++        {
++            atomic =
++                touched == h && g.objects.get(h)->state.m_Pos.x > 7 && near(g.objects.get(actor)->state.m_Pos.x, -5);
++            DVector pos{};
++            guarded = g.server.MoveObject(actor, &pos) == DE_ERROR;
++            g.objects.remove(h);
++        };
++        CHECK(g.server.SetBlockingPriority(actor, 50));
++        DVector end{-5, 2.001f, 0};
++        CHECK(g.server.MoveObject(actor, &end) == DE_OK);
++        CHECK(atomic && guarded && sensor->touches == 1 && !g.server.IsObjectAlive(h) && g.objects.get(h));
++        CHECK(g.objects.finish_frame() && !g.objects.get(h));
++        auto replacement = brush(g, {200, 100, 0});
++        CHECK(replacement && !g.server.SetBlockingPriority(h, 50));
++        CHECK(g.unload_world() && CDestructable::m_dwNumDestructables == 0);
++        return true;
++    }
++    bool collision(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        auto h = brush(g, {0, 100, 0}, {}, {10, 10, 10}, {30, 40, 0});
++        CHECK(h);
++        auto wall = body(g, {50, 100, 0}, {1, 100, 200});
++        CHECK(wall);
++        DVector v{10000, 0, 1000};
++        CHECK(g.server.SetVelocity(h, &v) == DE_OK && g.step(.02));
++        auto* r = g.objects.get(h);
++        CHECK(object_bounds_center(*r).x < 39.01f && object_bounds_center(*r).z > 19);
++        CHECK(near(r->velocity.x, 0) && r->mover_blocks > 0);
++        // A penetrating spawn is retained and visibly blocked, never teleported through the obstacle.
++        auto stuck = brush(g, {50, 100, 0});
++        CHECK(stuck);
++        auto old = g.objects.get(stuck)->state.m_Pos;
++        CHECK(g.step(.01));
++        CHECK(g.objects.get(stuck)->state.m_Pos.y == old.y &&
++              g.objects.get(stuck)->body_result == MoverResult::Blocked);
++        return true;
++    }
++    bool containers(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(test_player::setup(g, root, false));
++        g.world.models.push_back(test_brush::box("water", {-100, 0, -100}, {100, 200, 100}));
++        CHECK(g.objects.create(g.objects.find_class("Water"), {}, Creation::World,
++                               {{"Name", std::string("water")}, {"Current", DVector{30, 0, 0}}}));
++        auto h = brush(g, {0, 100, 0}, {}, {10, 10, 10}, {1000, 0, 0});
++        CHECK(h);
++        const auto old = g.objects.get(h)->state.m_Pos;
++        CHECK(g.step(.1));
++        CHECK(g.objects.get(h)->state.m_Pos.x > old.x && g.objects.get(h)->velocity.y > -100);
++        g.world.models.push_back(test_brush::box("damage", {-100, 0, -100}, {100, 200, 100}));
++        CHECK(g.objects.create(g.objects.find_class("Damage"), {}, Creation::World,
++                               {{"Name", std::string("damage")}, {"Damage", 10.0f}}));
++        const auto hp = damage(g, h).m_fHitPoints;
++        CHECK(g.step(.1) && near(damage(g, h).m_fHitPoints, hp - 1));
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"properties", properties}, {"gravity", gravity},      {"friction", friction}, {"impulses", impulses},
++        {"pushing", pushing},       {"player", player},        {"riders", riders},     {"contacts", contacts},
++        {"collision", collision},   {"containers", containers}};
++    auto it = cases.find(argv[1]);
++    return it == cases.end() ? 2 : it->second(path_from_utf8(argv[2])) ? 0 : 1;
++}

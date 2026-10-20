@@ -1,0 +1,1684 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 8d575b8..520c249 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -95,3 +95,12 @@ normal/bonus caps, dead-player guards, independent child lifetime, death-trigger
+ ordering and deferred removal. Earlier blanket SpawnObject/pickup omissions are
+ superseded for this subset. Remaining inventory items, timed bonuses, old TypeAction
+ schemas, audio/FX and full M2 gameplay remain pending.
++
++The latest [objective evidence](../Documentation/Implementation/M2_OBJECTIVES.md) connects original ObjectivesTrigger,
++typed client delivery and external cres.dll strings. Read [objective contracts](docs/OBJECTIVES_CONTRACTS.md)
++before extending objectives, localization or client broadcasts. Preserve the
++nonempty authored-string guard, resource-ID precedence, original game-mode filter,
++owned bounded queue and explicit unresolved state. The PE reader executes no code;
++ambiguous languages and malformed resources fail. SubwayA now has 142 created
++source entries, 7 owned SelfTriggers, 372 editor-only and 66 unported. HUD/audio,
++transitions and complete M2 acceptance remain pending.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 18c4d08..11d9396 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -15,7 +15,7 @@ include(cmake/Dependencies.cmake)
+ configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+ 
+ add_library(engine STATIC src/engine/config.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/resources.cpp src/engine/world.cpp)
+-target_sources(engine PRIVATE src/engine/model.cpp src/engine/model_store.cpp)
++target_sources(engine PRIVATE src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
+ target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp)
+ target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(engine PUBLIC SDL3::SDL3 PRIVATE spdlog::spdlog)
+@@ -32,7 +32,7 @@ add_library(blood2_game STATIC
+     src/game/session.cpp
+     src/game/registration.cpp
+     src/game/server_adapter.cpp)
+-target_sources(blood2_game PRIVATE src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
++target_sources(blood2_game PRIVATE src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+@@ -45,13 +45,13 @@ target_link_libraries(blood2_game PUBLIC engine)
+ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableBrush.cpp
+     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp
+     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+-add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp)
++add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+ target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+ if(BLOOD2_INSPECTOR)
+-    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_pickups.cpp)
++    target_sources(blood2_app PRIVATE src/app/inspector.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp)
+     target_link_libraries(blood2_app PRIVATE imgui)
+ endif()
+ 
+diff --git a/README.md b/README.md
+index b8780ed..d253787 100644
+--- a/README.md
++++ b/README.md
+@@ -65,7 +65,7 @@ ctest --preset debug
+ ctest --preset debug -L world
+ ```
+ 
+-There are **130 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases, 6 door/mover/collision/lifetime cases, 8 trigger/key/ownership/contact cases, 9 USE/rotation/input/transport cases, 7 brush/ramp/damage/lifetime cases and 8 debris/explosion/radius/chain/lifetime cases and 10 pushable/physics/priority/rider cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
++There are **145 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases, 6 door/mover/collision/lifetime cases, 8 trigger/key/ownership/contact cases, 9 USE/rotation/input/transport cases, 7 brush/ramp/damage/lifetime cases and 8 debris/explosion/radius/chain/lifetime cases and 10 pushable/physics/priority/rider cases, 9 pickup/spawn cases and 6 objective/resource-string cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
+ 
+ Enable installation-specific tests and real GPU windows explicitly:
+ 
+@@ -75,7 +75,7 @@ cmake --build --preset debug --parallel
+ ctest --preset debug
+ ```
+ 
+-The configured installation adds sixteen private headless tests and eleven GPU tests, for **157 cases**. GPU captures are `build/debug/tests/gpu.png` , `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png` `doors.png`, `triggers.png`, `interaction.png` and `brushes.png`. The ignored local presets enable these options:
++The configured installation adds eighteen private headless tests and thirteen GPU tests, for **176 cases**. GPU captures are `build/debug/tests/gpu.png`, `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png`, `doors.png`, `triggers.png`, `interaction.png`, `brushes.png`, `pickups.png` and `objectives.png`. The ignored local presets enable these options:
+ 
+ ```sh
+ cmake --preset local-debug
+@@ -105,3 +105,12 @@ with clang-format 23.1.3 (a development tool, not a runtime dependency). Commit
+ each completed implementation run with its tests and English documentation.
+ 
+ The Pickups tab inspects all supported ammo/health/armor objects, including hidden/inactive or missing-resource entries, player pools/caps and the latest 32 pickup/spawn reports. Audio and pickup FX remain requests/metadata, not playback.
++
++## Mission objectives continuation
++
++[Latest evidence](../Documentation/Implementation/M2_OBJECTIVES.md) and
++[contracts](docs/OBJECTIVES_CONTRACTS.md) cover original ObjectivesTrigger,
++typed client broadcasts and bounded PE resource-string lookup from external
++cres.dll. The Objectives tab shows source objects, delivery/resolution state and
++actual localized text. Use `./build/debug/blood2 --objectives-smoke` for the hidden
++UI/reload check. Original HUD and audio are pending; M2 remains incomplete.
+diff --git a/docs/M2_OBJECTIVE_SOURCES.json b/docs/M2_OBJECTIVE_SOURCES.json
+new file mode 100644
+index 0000000..7d41541
+--- /dev/null
++++ b/docs/M2_OBJECTIVE_SOURCES.json
+@@ -0,0 +1,96 @@
++{
++  "date": "2026-10-15",
++  "status": "M2 incomplete; original mission objectives and portable external client strings",
++  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "imports": [
++    {
++      "source": "sources/blood2/ObjectDLL/ObjectivesTrigger.cpp",
++      "target": "src/game/original/ObjectivesTrigger.cpp",
++      "source_line_ranges": [
++        [
++          19,
++          60
++        ],
++        [
++          112,
++          141
++        ],
++        [
++          153,
++          210
++        ]
++      ],
++      "selection": "Original inherited callback chain, world/string precreate, properties and SendMessages title/text guard, broadcast then sound request. Owned strings and typed client messages replace HSTRING/packet ownership; checked bounded resource IDs and inspectable queue results. Save/load and actual sound playback remain pending.",
++      "source_sha256": "ab2cbe3aec05230e24704721cea12671be726c1fc42a207eaa08cadc09eef770",
++      "target_sha256": "7a4befd4945aca6b1aec8ffda25679b15241cf7199baf459a600d35d2c2faf69"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ObjectivesTrigger.cpp",
++      "target": "src/game/registration.cpp",
++      "source_line_ranges": [
++        [
++          19,
++          60
++        ]
++      ],
++      "selection": "Original objective defaults and ancestry; hidden inherited target/delay defaults already supplied by Trigger. Default title/text/sound retained.",
++      "source_sha256": "ab2cbe3aec05230e24704721cea12671be726c1fc42a207eaa08cadc09eef770",
++      "target_sha256": "8637fde13a471c107d77bfca0cd654d4fdbaf16e5304c29d98898837f97f263f"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ObjectivesTrigger.h",
++      "target": "src/game/original/ObjectivesTrigger.h",
++      "source_line_ranges": [
++        [
++          15,
++          41
++        ]
++      ],
++      "selection": "Source class ancestry and callback override, with owned mission payload and inspection counters; no serialization ABI.",
++      "source_sha256": "884e52b008766165a37810a8b2b764e78e417e29b72be1b21cc688ecc164a616",
++      "target_sha256": "b0d3f74fe2d49959eda274d5dee7b06802f6b40ff094a8a84bfc5dfca747f33f"
++    },
++    {
++      "source": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "target": "src/game/original/BloodShells.cpp",
++      "source_line_ranges": [
++        [
++          1719,
++          1730
++        ],
++        [
++          4479,
++          4513
++        ]
++      ],
++      "selection": "Selected world-entry objective cleanup and SMSG_OBJECTIVES single/custom branch; resource IDs override authored text, previous text replaced. Lookup is typed and reports unresolved state; original status-bar update remains pending. Exit clears state defensively.",
++      "source_sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "target_sha256": "e5391902773b178a3d8732b518ca0146223a579238d1d244566a6903e17602b8"
++    },
++    {
++      "source": "sources/blood2/Shared/ClientRes.h",
++      "target": "src/game/original/BloodShells.cpp",
++      "source_line_ranges": [
++        [
++          747,
++          747
++        ],
++        [
++          823,
++          823
++        ]
++      ],
++      "selection": "Original numeric objective title/text base IDs 5000/6000, lookup without printf-format arguments.",
++      "source_sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
++      "target_sha256": "e5391902773b178a3d8732b518ca0146223a579238d1d244566a6903e17602b8"
++    }
++  ],
++  "adaptations": [
++    "Value-owned typed local broadcast through the existing bounded associated-client queue; no packet or old DLL ABI",
++    "Negative/overflow IDs and oversized or NUL-containing strings reject; queue failure and missing resources are visible",
++    "Portable bounded PE reader parses external cres.dll data without executing it; selected archive follows existing REZ precedence",
++    "Cached exact strings reset on unload; default language requires a unique string-table language; no silent authored-text fallback",
++    "Original sound requests counted but not played; original HUD/status bar and save/load remain pending",
++    "Inspector displays source objects and actual client state; diagnostic smoke explicitly rearms the authored trigger when needed"
++  ]
++}
+diff --git a/docs/OBJECTIVES_CONTRACTS.md b/docs/OBJECTIVES_CONTRACTS.md
+new file mode 100644
+index 0000000..3968a23
+--- /dev/null
++++ b/docs/OBJECTIVES_CONTRACTS.md
+@@ -0,0 +1,92 @@
++# Mission objectives and client resource strings
++
++This extends [trigger contracts](TRIGGER_CONTRACTS.md) and [player contracts](PLAYER_CONTRACTS.md).
++M2 remains incomplete. See [source selections](M2_OBJECTIVE_SOURCES.json) and
++[implementation evidence](../../Documentation/Implementation/M2_OBJECTIVES.md).
++
++## Original behavior
++
++`ObjectivesTrigger` inherits Trigger's dispatch, filtering, activation counter,
++locks, active-command guard and scheduling. Its original defaults disable touch,
++AI, ordinary-object and trigger-relay activation; players remain enabled. The
++original title/text, resource number and sound properties are retained. Both
++world and string-property creation read them; unsupported restore still rejects.
++
++Its SendMessages override sends a single objective broadcast only when **both**
++authored title and text are nonempty, even for a nonzero ResourceNum. It does not
++send inherited target slots. A nonzero inherited message delay still selects the
++base Trigger's delayed slot path instead of this override, as in the source.
++The sound request follows the broadcast inside the same title/text guard; it is
++counted and inspected, not played. Queue failure does not invent a retry or
++reactivate the source Trigger.
++
++The client handles the original SMSG_OBJECTIVES branch in single/custom game
++modes. ResourceNum=0 uses the owned authored strings. Otherwise, IDs
++`5000 + ResourceNum - 1` and `6000 + ResourceNum - 1` replace the authored title
++and text. Missing localized data is an explicit unresolved objective, never a
++successful fallback to the authored text. The previous objective is replaced;
++this increment does not invent an objective-completion list. Original `|` line
++breaks are displayed in the inspector; the original status bar/tab is not ported.
++
++## Typed delivery and lifetime
++
++`MissionObjectives` is a value-owned local PlayerEvent. The server's original
++null-client broadcast maps to the supported single associated client. No live
++client returns DE_NOTFOUND; a full 256-event queue returns DE_ERROR. Counts in
++the source object distinguish activation, successfully queued delivery and sound
++requests. Queue success is not proof of resolved strings or audible sound.
++No callback into the client occurs while original objects are being dispatched.
++
++Authored strings are bounded by MAX_GP_STRING_LEN, reject embedded NULs, and
++ResourceNum must fit both resulting 16-bit string IDs (0–59536). Negative/overflow
++resource numbers reject precreate instead of wrapping. These checks are deliberate
++portability/validation adaptations. Existing deferred destruction and checked
++client associations apply: deleting the sender preserves its queued owned event;
++deleting the player discards that client's pending queue. Exit/re-entry clears
++objective state. World unload also resets the lazy string cache and diagnostics.
++An unresolved UI string is reported without tearing down an otherwise valid
++inspection session; it is not credited as implemented gameplay or successful
++resource resolution.
++
++## Portable PE resource reader
++
++The first localized objective reads external `cres.dll` through the existing REZ
++mount precedence. It is parsed as data; no DLL loader, executable code, Windows
++header, new dependency or extracted commercial string file is used. The entire
++string table is cached once per world and inspection shows the selected archive,
++decoded count, language and failures. Other historical FormatString callers are
++not implicitly implemented; this narrow service performs lookup without printf
++format substitution.
++
++The reader follows Microsoft's [PE resource format](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format)
++and [STRINGTABLE layout](https://learn.microsoft.com/en-us/windows/win32/menurc/stringtable-resource).
++It accepts PE32/PE32+, maps data RVAs through checked section raw ranges, walks
++numeric RT_STRING block/language entries, and decodes the sixteen length-prefixed
++UTF-16 strings per block into UTF-8, including checked surrogate pairs. Empty
++slots are absent. Invalid signatures, truncation, duplicate numeric IDs, cyclic
++or aliased selected directories, ambiguous section mappings, malformed UTF-16,
++embedded NULs and budgets reject with no partially published table.
++
++Limits: 32 MiB input, 96 sections, 16 MiB resource directory, 4,096 entries per
++directory, 4,096 selected block/language records, block IDs 1–4,096, 4,096 UTF-16
++units per string and 8 MiB decoded text. Named resources and other resource types
++are outside the selected reader. Default language selection requires a single
++language across string blocks; a mixed-language image fails explicitly. The
++reader can take an exact nonzero language ID without fallback; no application language
++selector or OS locale guessing has been added. Missing IDs in that selected
++language remain missing. Input failure clears output, and no data is executed.
++
++## Inspection and remaining scope
++
++The Objectives tab lists hidden/inactive original objective triggers, source
++properties, activation/rejection/queue counts and sound requests. It shows the
++actual client text and resolution errors separately. Its diagnostic TRIGGER
++button uses the associated player and the usual original filters. World retains
++failed source entries. `--objectives-smoke` checks delivery while ImGui is hidden,
++resolution from retail resources, stale selection and unload/reload; a diagnostic
++rearm allows this check if the authored objective already fired at player spawn.
++The same simulation runs in the inspector-free build.
++
++Campaign transitions/ExitTrigger, CameraObj/KeyFramer/cinematics, remaining actors
++and effects, audio playback, original HUD, saves and full M2 acceptance remain
++open. No retail executable behavior comparison or non-Linux/XR validation is claimed.
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index 14faef5..3a65803 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original Player Entry Boundary
+ 
++> Extended by [objective contracts](OBJECTIVES_CONTRACTS.md): original mission
++> objective broadcasts and external localized client strings are connected.
++> Other localization/audio/HUD and full M2 acceptance remain pending.
++
+ > Extended by [INTERACTION_CONTRACTS.md](INTERACTION_CONTRACTS.md): original player USE and RotatingDoor
+ > are connected with bounded atomic collision. Earlier omissions below describe
+ > their previous increments; the full M2 gate remains open.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 52778cf..408d584 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -311,3 +311,13 @@ resource failure behavior and the intentionally omitted multiplayer/FX branches.
+ Earlier ledgers remain historical; their blanket SpawnObject/general-pickup
+ omissions are superseded only for the twelve supported leaf classes. No prototype
+ dependency, reference modification or commercial asset was introduced.
++
++## M2 mission objectives
++
++[Source selections](M2_OBJECTIVE_SOURCES.json) record ObjectivesTrigger properties,
++precreate/SendMessages and the original client SMSG_OBJECTIVES branch and ID bases.
++Owned strings, typed local delivery, checked queue failures and bounded IDs replace
++legacy message/HSTRING storage. The portable PE string reader is new engine code
++based on Microsoft documentation, with no prototype dependency or native DLL
++execution. [Contracts](OBJECTIVES_CONTRACTS.md) distinguish resource resolution,
++source sound requests and pending original HUD/audio. Previous ledgers stay historical.
+diff --git a/docs/TRIGGER_CONTRACTS.md b/docs/TRIGGER_CONTRACTS.md
+index 4fa94c3..814b25f 100644
+--- a/docs/TRIGGER_CONTRACTS.md
++++ b/docs/TRIGGER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original triggers, door SelfTrigger and keys
+ 
++> Extended by [objective contracts](OBJECTIVES_CONTRACTS.md): original mission
++> objective broadcasts and external localized client strings are connected.
++> Other localization/audio/HUD and full M2 acceptance remain pending.
++
+ > Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
+ > pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
+ 
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 73751c5..45b343f 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -498,6 +498,12 @@ namespace OpenBlood2
+                     draw_triggers(game, selection);
+                     ImGui::EndTabItem();
+                 }
++                if (ImGui::BeginTabItem("Objectives", nullptr, select_objectives ? ImGuiTabItemFlags_SetSelected : 0))
++                {
++                    select_objectives = false;
++                    draw_objectives(game, selection);
++                    ImGui::EndTabItem();
++                }
+                 if (ImGui::BeginTabItem("Pickups", nullptr, select_pickups ? ImGuiTabItemFlags_SetSelected : 0))
+                 {
+                     select_pickups = false;
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index f0e414d..4f5e4b1 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -21,6 +21,9 @@ namespace OpenBlood2
+         ObjectId trigger_selection{}, trigger_request{};
+         std::string trigger_command;
+         bool grant_key_request = false;
++        bool select_objectives = false;
++        ObjectId objective_selection{};
++        void draw_objectives(GameSession&, ObjectSelection&);
+         bool select_pickups = false;
+         ObjectId pickup_selection{};
+         void draw_pickups(GameSession&, ObjectSelection&);
+diff --git a/src/app/inspector_objectives.cpp b/src/app/inspector_objectives.cpp
+new file mode 100644
+index 0000000..3455cbd
+--- /dev/null
++++ b/src/app/inspector_objectives.cpp
+@@ -0,0 +1,81 @@
++#include "app/inspector.h"
++#include "game/original/ObjectivesTrigger.h"
++#include <imgui.h>
++namespace OpenBlood2
++{
++    namespace
++    {
++        void objective_text(const std::string& text)
++        {
++            std::string display = text;
++            for (char& c : display)
++                if (c == '|')
++                    c = '\n';
++            ImGui::TextWrapped("%s", display.c_str());
++        }
++    } // namespace
++    void Inspector::draw_objectives(GameSession& game, ObjectSelection& selection)
++    {
++        ImGui::TextWrapped("Original mission objectives. Localized text comes from external cres.dll; '|' marks a line "
++                           "break. Audio and original HUD remain pending.");
++        if (!ImGui::BeginTable("Objectives", 2, ImGuiTableFlags_Resizable))
++            return;
++        ImGui::TableSetupColumn("Authored triggers", ImGuiTableColumnFlags_WidthFixed, 280);
++        ImGui::TableSetupColumn("Client objective");
++        ImGui::TableNextColumn();
++        for (auto id : game.objects.snapshot())
++        {
++            const auto* r = game.objects.get(id);
++            const auto* t = r ? dynamic_cast<const ObjectivesTrigger*>(r->game.get()) : nullptr;
++            if (!t)
++                continue;
++            if (!game.objects.get(objective_selection))
++                objective_selection = id;
++            std::string label = std::string(r->state.m_Name) + (t->active ? "" : " [inactive]");
++            if (!(r->state.m_Flags & FLAG_VISIBLE))
++                label += " [hidden]";
++            ImGui::PushID(static_cast<int>(id.slot));
++            if (ImGui::Selectable(label.c_str(), objective_selection == id))
++                objective_selection = selection.id = id;
++            ImGui::PopID();
++        }
++        if (const auto* r = game.objects.get(objective_selection))
++            if (const auto* t = dynamic_cast<const ObjectivesTrigger*>(r->game.get()))
++            {
++                ImGui::SeparatorText("Selected source");
++                ImGui::Text("ResourceNum: %u", t->objectives.resource);
++                ImGui::TextWrapped("Authored title: %s", t->objectives.title.c_str());
++                ImGui::TextWrapped("Authored text: %s", t->objectives.text.c_str());
++                ImGui::Text("Activation attempts: %llu / rejected %llu", (unsigned long long)t->activations,
++                            (unsigned long long)t->rejected);
++                ImGui::Text("Queued: %llu / last result %d", (unsigned long long)t->deliveries, t->last_delivery);
++                ImGui::TextWrapped("Sound: %s / %llu requests (not played)", t->sound.c_str(),
++                                   (unsigned long long)t->objective_sound_requests);
++                if (game.client_shell.m_bInWorld && ImGui::Button("Send TRIGGER as player"))
++                {
++                    trigger_request = r->id;
++                    trigger_command = "TRIGGER";
++                }
++            }
++        ImGui::TableNextColumn();
++        const auto& client = game.client_shell;
++        ImGui::Text("Received: %llu / %s", (unsigned long long)client.objective_messages,
++                    client.objectives_resolved ? "resolved" : "not resolved");
++        ImGui::Text("ResourceNum: %u", client.objectives.resource);
++        ImGui::Separator();
++        objective_text(client.objectives.title);
++        ImGui::Separator();
++        objective_text(client.objectives.text);
++        if (!client.objectives_error.empty())
++            ImGui::TextWrapped("%s", client.objectives_error.c_str());
++        ImGui::SeparatorText("Resource reader");
++        const auto* resource = game.resources.find("cres.dll");
++        ImGui::Text("cres.dll: %s", resource ? "indexed" : "missing");
++        if (resource)
++            ImGui::TextWrapped("Archive: %s", path_text(resource->archive).c_str());
++        ImGui::Text("Decoded: %zu strings / language 0x%04x", game.server.client_strings.strings.size(),
++                    game.server.client_strings.language);
++        ImGui::TextWrapped("%s", game.server.client_strings_error.c_str());
++        ImGui::EndTable();
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 1745d29..ab72161 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -7,6 +7,7 @@
+ #include "game/original/Door.h"
+ #include "game/server_adapter.h"
+ #include "interaction_smoke.h"
++#include "objectives_smoke.h"
+ #include "pickup_smoke.h"
+ #include "trigger_smoke.h"
+ 
+@@ -150,7 +151,7 @@ namespace
+             selection.id = smoke_brush;
+         }
+         OpenBlood2::ObjectId smoke_pickup{};
+-        bool pickup_hidden = false;
++        bool pickup_hidden = false, objective_hidden = false;
+         if (options.pickups_smoke)
+         {
+             if (!OpenBlood2::prepare_pickup_smoke(game, smoke_pickup))
+@@ -170,12 +171,13 @@ namespace
+             options.world_smoke && !options.player_smoke && !options.doors_smoke && !options.brushes_smoke;
+         inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
+                                    !options.containers_smoke && !options.triggers_smoke && !options.interaction_smoke &&
+-                                   !options.pickups_smoke;
++                                   !options.pickups_smoke && !options.objectives_smoke;
+         inspector.select_weapons = options.weapons_smoke;
+         inspector.select_movement = options.movement_smoke;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_brushes = options.brushes_smoke;
+         inspector.select_pickups = options.pickups_smoke;
++        inspector.select_objectives = options.objectives_smoke;
+         inspector.brush_selection = smoke_body;
+         inspector.select_doors = options.doors_smoke || options.interaction_smoke;
+         inspector.keyboard_movement = options.interaction_smoke;
+@@ -283,6 +285,8 @@ namespace
+             if (options.brushes_smoke && frames == reload_frame + 1)
+                 if (!OpenBlood2::prepare_brush_smoke(game, smoke_brush, smoke_explosion, smoke_body))
+                     return 4;
++            if (options.objectives_smoke && frames == reload_frame + 1 && !OpenBlood2::objective_smoke(game))
++                return 4;
+             if (options.pickups_smoke && frames == reload_frame + 1)
+                 if (!OpenBlood2::prepare_pickup_smoke(game, smoke_pickup))
+                     return 4;
+@@ -402,7 +406,8 @@ namespace
+                 swapchain &&
+                 frames >= (extended_smoke ? 180u
+                            : (options.containers_smoke || options.doors_smoke || options.triggers_smoke ||
+-                              options.interaction_smoke || options.brushes_smoke || options.pickups_smoke)
++                              options.interaction_smoke || options.brushes_smoke || options.pickups_smoke ||
++                              options.objectives_smoke)
+                                ? 14u
+                                : 2u) &&
+                 !captured && !options.capture_file.empty();
+@@ -549,6 +554,8 @@ namespace
+                     use.key.down = frames == hide_frame;
+                     event_ok = SDL_PushEvent(&use);
+                 }
++                if (options.objectives_smoke && frames == show_frame - 1)
++                    objective_hidden = OpenBlood2::objective_smoke(game);
+                 if (options.pickups_smoke && frames == show_frame - 1)
+                     pickup_hidden = OpenBlood2::collect_pickup_smoke(game, smoke_pickup);
+                 if (options.brushes_smoke)
+@@ -672,8 +679,8 @@ namespace
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+-                (options.pickups_smoke && !pickup_hidden) || (options.interaction_smoke && !interaction_hidden) ||
+-                (options.brushes_smoke && !brush_hidden) ||
++                (options.objectives_smoke && !objective_hidden) || (options.pickups_smoke && !pickup_hidden) ||
++                (options.interaction_smoke && !interaction_hidden) || (options.brushes_smoke && !brush_hidden) ||
+                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
+                 (options.movement_smoke &&
+                  (!movement_hidden || !movement_jumped || !movement_landed || !game.client_shell.move_mgr.ready() ||
+@@ -694,6 +701,9 @@ namespace
+             if (options.world_smoke)
+                 spdlog::info("World smoke passed: unload/reload, original instance/string counts restored, "
+                              "collision/model resources restored, preview animation advanced while hidden");
++            if (options.objectives_smoke)
++                spdlog::info("OBJECTIVES smoke: original trigger and localized client text delivered with hidden UI; "
++                             "unload/reload checked");
+             if (options.pickups_smoke)
+                 spdlog::info("PICKUPS smoke: original ammo accepted during hidden UI; unload/reload checked");
+             if (options.weapons_smoke)
+diff --git a/src/app/objectives_smoke.cpp b/src/app/objectives_smoke.cpp
+new file mode 100644
+index 0000000..5f84a08
+--- /dev/null
++++ b/src/app/objectives_smoke.cpp
+@@ -0,0 +1,40 @@
++#include "objectives_smoke.h"
++#include "game/original/ObjectivesTrigger.h"
++namespace OpenBlood2
++{
++    bool objective_smoke(GameSession& g)
++    {
++        auto* player = g.server_shell.Player(g.local_client);
++        if (!player)
++            return false;
++        unsigned found = 0;
++        const auto before = g.client_shell.objective_messages;
++        for (auto id : g.objects.snapshot())
++        {
++            auto* r = g.objects.get(id);
++            auto* t = r ? dynamic_cast<ObjectivesTrigger*>(r->game.get()) : nullptr;
++            if (!t)
++                continue;
++            ++found;
++            // The selected authored objective may already have fired at spawn.
++            // A diagnostic rearm lets the smoke verify delivery with UI hidden.
++            t->SetActive(true);
++            auto text = g.server.CreateString("TRIGGER");
++            auto message = g.server.StartMessageToObject(player, r->handle, 1000);
++            if (!message)
++            {
++                g.server.FreeString(text);
++                return false;
++            }
++            const bool sent =
++                g.server.WriteToMessageHString(message, text) == DE_OK && g.server.EndMessage(message) == DE_OK;
++            g.server.FreeString(text);
++            if (!sent || t->last_delivery != DE_OK)
++                return false;
++        }
++        std::string error;
++        return found == 1 && g.pump_player_messages(error) && g.client_shell.objective_messages == before + 1 &&
++               g.client_shell.objectives_resolved && g.client_shell.objectives.resource == 1 &&
++               !g.client_shell.objectives.title.empty() && !g.client_shell.objectives.text.empty();
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/objectives_smoke.h b/src/app/objectives_smoke.h
+new file mode 100644
+index 0000000..bc5950b
+--- /dev/null
++++ b/src/app/objectives_smoke.h
+@@ -0,0 +1,6 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool objective_smoke(GameSession&);
++}
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index c955808..86623de 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -125,6 +125,10 @@ namespace OpenBlood2
+                 options.player_smoke = true;
+                 options.containers_smoke = true;
+             }
++            else if (arg == "--objectives-smoke")
++            {
++                options.world_smoke = options.player_smoke = options.objectives_smoke = true;
++            }
+             else if (arg == "--pickups-smoke")
+             {
+                 options.world_smoke = options.player_smoke = options.pickups_smoke = true;
+@@ -205,7 +209,7 @@ namespace OpenBlood2
+         }
+         if (int(options.weapons_smoke) + int(options.movement_smoke) + int(options.containers_smoke) +
+                 int(options.doors_smoke) + int(options.triggers_smoke) + int(options.interaction_smoke) +
+-                int(options.brushes_smoke) + int(options.pickups_smoke) >
++                int(options.brushes_smoke) + int(options.pickups_smoke) + int(options.objectives_smoke) >
+             1)
+         {
+             error = "Choose one player smoke scenario";
+diff --git a/src/engine/config.h b/src/engine/config.h
+index ac00220..097909e 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -22,7 +22,7 @@ namespace OpenBlood2
+         bool player_smoke = false;
+         bool weapons_smoke = false;
+         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
+-             interaction_smoke = false, brushes_smoke = false, pickups_smoke = false;
++             interaction_smoke = false, brushes_smoke = false, pickups_smoke = false, objectives_smoke = false;
+         bool start_game = false;
+         bool explicit_config = false;
+         bool help = false;
+diff --git a/src/engine/string_resources.cpp b/src/engine/string_resources.cpp
+new file mode 100644
+index 0000000..e454146
+--- /dev/null
++++ b/src/engine/string_resources.cpp
+@@ -0,0 +1,224 @@
++#include "engine/string_resources.h"
++#include "engine/formats/reader.h"
++#include <set>
++#include <vector>
++namespace OpenBlood2
++{
++    namespace
++    {
++        struct Section
++        {
++            std::uint32_t rva, size, offset;
++        };
++        struct Entry
++        {
++            std::uint32_t id, offset;
++        };
++        struct Block
++        {
++            std::uint32_t id, offset, size;
++            std::uint16_t language;
++        };
++        bool range(std::size_t offset, std::size_t length, std::size_t size)
++        {
++            return offset <= size && length <= size - offset;
++        }
++        bool directory(std::span<const std::uint8_t> bytes, std::uint32_t offset, std::vector<Entry>& entries)
++        {
++            if (!range(offset, 16, bytes.size()))
++                return false;
++            Reader r(bytes.subspan(offset));
++            r.skip(12);
++            const auto named = r.u16(), ids = r.u16();
++            if (std::size_t(named) + ids > 4096 || !r.skip(std::size_t(named) * 8))
++                return false;
++            std::set<std::uint32_t> unique;
++            for (unsigned i = 0; i < ids; ++i)
++            {
++                const auto id = r.u32(), child = r.u32();
++                if (!r.good() || id > 65535 || !unique.insert(id).second)
++                    return false;
++                entries.push_back({id, child});
++            }
++            return r.good();
++        }
++        bool utf8(Reader& r, unsigned count, std::string& out)
++        {
++            if (count > 4096)
++                return false;
++            for (unsigned i = 0; i < count; ++i)
++            {
++                std::uint32_t c = r.u16();
++                if (!c || (c >= 0xdc00 && c <= 0xdfff))
++                    return false;
++                if (c >= 0xd800 && c <= 0xdbff)
++                {
++                    if (++i == count)
++                        return false;
++                    const auto low = r.u16();
++                    if (low < 0xdc00 || low > 0xdfff)
++                        return false;
++                    c = 0x10000 + ((c - 0xd800) << 10) + low - 0xdc00;
++                }
++                if (c < 0x80)
++                    out += static_cast<char>(c);
++                else if (c < 0x800)
++                {
++                    out += static_cast<char>(0xc0 | (c >> 6));
++                    out += static_cast<char>(0x80 | (c & 63));
++                }
++                else
++                {
++                    if (c >= 0x10000)
++                    {
++                        out += static_cast<char>(0xf0 | (c >> 18));
++                        out += static_cast<char>(0x80 | ((c >> 12) & 63));
++                    }
++                    else
++                        out += static_cast<char>(0xe0 | (c >> 12));
++                    out += static_cast<char>(0x80 | ((c >> 6) & 63));
++                    out += static_cast<char>(0x80 | (c & 63));
++                }
++            }
++            return r.good();
++        }
++        bool decode(std::span<const std::uint8_t> bytes, StringResources& out, std::uint16_t language)
++        {
++            if (bytes.size() < 64 || bytes.size() > 32 * 1024 * 1024 || bytes[0] != 'M' || bytes[1] != 'Z')
++                return false;
++            Reader dos(bytes.subspan(60));
++            const auto pe = dos.u32();
++            if (pe < 64 || !range(pe, 24, bytes.size()))
++                return false;
++            Reader header(bytes.subspan(pe));
++            if (header.u32() != 0x4550)
++                return false;
++            header.u16(); // Machine is irrelevant: code is never executed.
++            const auto count = header.u16();
++            header.skip(12);
++            const auto optional = header.u16();
++            header.u16();
++            if (!count || count > 96 || optional < 120 || !range(pe + 24ull, optional + count * 40ull, bytes.size()))
++                return false;
++            Reader opt(header.take(optional));
++            const auto magic = opt.u16();
++            if (magic != 0x10b && magic != 0x20b)
++                return false;
++            opt.skip(magic == 0x10b ? 90 : 106);
++            if (opt.u32() < 3 || !opt.skip(16))
++                return false;
++            const auto resource_rva = opt.u32(), resource_size = opt.u32();
++            if (!opt.good() || resource_size < 16 || resource_size > 16 * 1024 * 1024)
++                return false;
++            std::vector<Section> sections;
++            for (unsigned i = 0; i < count; ++i)
++            {
++                header.skip(12);
++                const auto rva = header.u32(), size = header.u32(), offset = header.u32();
++                header.skip(16);
++                if (!header.good() || !range(offset, size, bytes.size()))
++                    return false;
++                sections.push_back({rva, size, offset});
++            }
++            auto map = [&](std::uint32_t rva, std::uint32_t size, std::uint32_t& offset)
++            {
++                unsigned matches = 0;
++                for (const auto& section : sections)
++                    if (rva >= section.rva && range(rva - section.rva, size, section.size))
++                    {
++                        offset = section.offset + (rva - section.rva);
++                        ++matches;
++                    }
++                return matches == 1;
++            };
++            std::uint32_t resource_offset = 0;
++            if (!map(resource_rva, resource_size, resource_offset))
++                return false;
++            const auto resources = bytes.subspan(resource_offset, resource_size);
++            std::vector<Entry> types;
++            if (!directory(resources, 0, types))
++                return false;
++            std::vector<Block> blocks;
++            std::set<std::uint16_t> languages;
++            std::set<std::uint32_t> visited{0};
++            for (const auto& type : types)
++            {
++                if (type.id != 6)
++                    continue; // RT_STRING only.
++                if (!(type.offset & 0x80000000u))
++                    return false;
++                const auto block_offset = type.offset & 0x7fffffffu;
++                if (!visited.insert(block_offset).second)
++                    return false;
++                std::vector<Entry> names;
++                if (!directory(resources, block_offset, names))
++                    return false;
++                for (const auto& name : names)
++                {
++                    if (!name.id || name.id > 4096 || !(name.offset & 0x80000000u))
++                        return false;
++                    const auto lang_offset = name.offset & 0x7fffffffu;
++                    if (!visited.insert(lang_offset).second)
++                        return false;
++                    std::vector<Entry> langs;
++                    if (!directory(resources, lang_offset, langs))
++                        return false;
++                    for (const auto& lang : langs)
++                    {
++                        if ((lang.offset & 0x80000000u) || !range(lang.offset, 16, resources.size()) ||
++                            blocks.size() >= 4096)
++                            return false;
++                        Reader data(resources.subspan(lang.offset));
++                        const auto rva = data.u32(), size = data.u32();
++                        std::uint32_t offset = 0;
++                        if (size > 16 * (2 + 4096 * 2) || !map(rva, size, offset))
++                            return false;
++                        blocks.push_back({name.id, offset, size, static_cast<std::uint16_t>(lang.id)});
++                        languages.insert(static_cast<std::uint16_t>(lang.id));
++                    }
++                }
++            }
++            if (languages.empty() || (!language && languages.size() != 1))
++                return false;
++            out.language = language ? language : *languages.begin();
++            if (!languages.contains(out.language))
++                return false;
++            std::size_t total = 0;
++            for (const auto& block : blocks)
++            {
++                if (block.language != out.language)
++                    continue;
++                Reader r(bytes.subspan(block.offset, block.size));
++                for (unsigned i = 0; i < 16; ++i)
++                {
++                    std::string text;
++                    const auto length = r.u16();
++                    if (!utf8(r, length, text) || !r.good())
++                        return false;
++                    total += text.size();
++                    if (total > 8 * 1024 * 1024)
++                        return false;
++                    if (length)
++                        out.strings.emplace((block.id - 1) * 16 + i, std::move(text));
++                }
++                if (r.remaining())
++                    return false;
++            }
++            return !out.strings.empty();
++        }
++    } // namespace
++    bool read_string_resources(std::span<const std::uint8_t> bytes, StringResources& out, std::string& error,
++                               std::uint16_t language)
++    {
++        out = {};
++        error.clear();
++        StringResources next;
++        if (!decode(bytes, next, language))
++        {
++            error = "PE strings: malformed/unsupported image, language ambiguity or reader budget exceeded";
++            return false;
++        }
++        out = std::move(next);
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/engine/string_resources.h b/src/engine/string_resources.h
+new file mode 100644
+index 0000000..04adc14
+--- /dev/null
++++ b/src/engine/string_resources.h
+@@ -0,0 +1,17 @@
++#pragma once
++#include <cstdint>
++#include <map>
++#include <span>
++#include <string>
++namespace OpenBlood2
++{
++    struct StringResources
++    {
++        std::uint16_t language = 0;
++        std::map<std::uint32_t, std::string> strings;
++    };
++    // Read data only: no executable loading, native ABI or platform APIs.
++    // language=0 requires a single resource language; ambiguous tables reject.
++    bool read_string_resources(std::span<const std::uint8_t>, StringResources&, std::string& error,
++                               std::uint16_t language = 0);
++} // namespace OpenBlood2
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index 5a401eb..f8bb23a 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -57,6 +57,8 @@ class ServerDE : public CSBase
+     // raw C++ pointer whose lifetime can outlive its object.
+     virtual HOBJECT GetClientUserData(HCLIENT) = 0;
+     virtual DRESULT SetClientUserData(HCLIENT, HOBJECT) = 0;
++    virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
++    virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;
+     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;
+     virtual DRESULT SetModelFilenames(HOBJECT, const char*, const char*) = 0;
+     virtual DRESULT GetObjectDims(HOBJECT, DVector*) = 0;
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index a88eb04..506febd 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -3,6 +3,7 @@
+ // client data / packet reads with checked handles and owned typed values.
+ #include "BloodShells.h"
+ #include "PathPoint.h"
++#include "game/game_settings.h"
+ #include <cmath>
+ 
+ void CBloodServerShell::PreStartWorld()
+@@ -144,6 +145,10 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client)
+     rotation = {};
+     physics = {};
+     stats = {};
++    objectives = {};
++    objectives_error.clear();
++    objective_messages = 0;
++    objectives_resolved = false;
+     messages = updates = 0;
+     blocker = "Locomotion/weapon inspection: remaining container/FX and mover classes, full combat, audio and "
+               "autosave remain unported";
+@@ -166,6 +171,10 @@ void CBloodClientShell::OnExitWorld()
+     rotation = {};
+     physics = {};
+     stats = {};
++    objectives = {};
++    objectives_error.clear();
++    objective_messages = 0;
++    objectives_resolved = false;
+     blocker.clear();
+ }
+ bool CBloodClientShell::InitSinglePlayer(CBloodServerShell& server)
+@@ -203,6 +212,26 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
+     }
+     else if (const auto* value = std::get_if<OpenBlood2::PlayerStats>(&event))
+         stats = *value;
++    else if (const auto* value = std::get_if<OpenBlood2::MissionObjectives>(&event))
++    {
++        // SMSG_OBJECTIVES: single/custom only; resource IDs override authored strings.
++        const auto mode = server_.GetVarValueFloat(server_.GetGameConVar("GAME_GAMETYPE"));
++        if (mode == static_cast<float>(GAMETYPE_SINGLE) || mode == static_cast<float>(GAMETYPE_CUSTOM))
++        {
++            objectives = *value;
++            objectives_error.clear();
++            ++objective_messages;
++            objectives_resolved = true;
++            if (value->resource)
++            {
++                const bool title = server_.GetClientResourceString(5000 + value->resource - 1, objectives.title);
++                const bool text = server_.GetClientResourceString(6000 + value->resource - 1, objectives.text);
++                objectives_resolved = title && text;
++                if (!objectives_resolved)
++                    objectives_error = "Objective resource strings are missing or invalid";
++            }
++        }
++    }
+     return true;
+ }
+ bool CBloodClientShell::Update()
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index d9bdf88..140407c 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -61,6 +61,10 @@ class CBloodClientShell
+     OpenBlood2::PlayerStats stats;
+     std::uint64_t messages = 0, updates = 0;
+     std::string blocker;
++    OpenBlood2::MissionObjectives objectives;
++    std::string objectives_error;
++    std::uint64_t objective_messages = 0;
++    bool objectives_resolved = false;
+ 
+   private:
+     bool InitSinglePlayer(CBloodServerShell&);
+diff --git a/src/game/original/ObjectivesTrigger.cpp b/src/game/original/ObjectivesTrigger.cpp
+new file mode 100644
+index 0000000..c8dcc15
+--- /dev/null
++++ b/src/game/original/ObjectivesTrigger.cpp
+@@ -0,0 +1,33 @@
++#include "ObjectivesTrigger.h"
++DDWORD ObjectivesTrigger::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE && (reason == 1 || reason == 2))
++    {
++        GenericProp prop;
++        if (g_pServerDE->GetPropGeneric("ResourceNum", &prop) == DE_OK)
++        {
++            if (prop.m_Long < 0 || prop.m_Long > 65535 - 6000 + 1)
++                return 0;
++            objectives.resource = static_cast<DDWORD>(prop.m_Long);
++        }
++        if (g_pServerDE->GetPropGeneric("TitleToDisplay", &prop) == DE_OK)
++            objectives.title = prop.m_String;
++        if (g_pServerDE->GetPropGeneric("TextToDisplay", &prop) == DE_OK)
++            objectives.text = prop.m_String;
++        if (g_pServerDE->GetPropGeneric("Sound", &prop) == DE_OK)
++            sound = prop.m_String;
++    }
++    return Trigger::EngineMessageFn(message, data, reason);
++}
++void ObjectivesTrigger::SendMessages()
++{
++    // Source requires BOTH authored strings, including when ResourceNum is set.
++    if (objectives.title.empty() || objectives.text.empty())
++        return;
++    last_delivery = g_pServerDE->SendObjectives(objectives);
++    if (last_delivery == DE_OK)
++        ++deliveries;
++    // Original PlaySoundLocal follows the broadcast; actual audio remains pending.
++    if (!sound.empty())
++        ++objective_sound_requests;
++}
+diff --git a/src/game/original/ObjectivesTrigger.h b/src/game/original/ObjectivesTrigger.h
+new file mode 100644
+index 0000000..b4d21e9
+--- /dev/null
++++ b/src/game/original/ObjectivesTrigger.h
+@@ -0,0 +1,15 @@
++#pragma once
++#include "Trigger.h"
++// Selected original ObjectivesTrigger callbacks; ownership uses std::string.
++class ObjectivesTrigger : public Trigger
++{
++  public:
++    OpenBlood2::MissionObjectives objectives;
++    std::string sound;
++    std::uint64_t deliveries = 0, objective_sound_requests = 0;
++    DRESULT last_delivery = DE_NOTFOUND;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    void SendMessages() override;
++};
+diff --git a/src/game/player_messages.h b/src/game/player_messages.h
+index 8b053ef..ccd789a 100644
+--- a/src/game/player_messages.h
++++ b/src/game/player_messages.h
+@@ -74,5 +74,11 @@ namespace OpenBlood2
+     {
+         float health = 0, armor = 0, bullets = 0;
+     };
+-    using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats>;
++    struct MissionObjectives
++    {
++        std::uint32_t resource = 0;
++        std::string title, text;
++    };
++    using PlayerEvent =
++        std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats, MissionObjectives>;
+ } // namespace OpenBlood2
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index f4515e7..e7ed574 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -5,6 +5,7 @@
+ #include "game/original/GameStartPoint.h"
+ #include "game/original/Key.h"
+ #include "game/original/KeyPickup.h"
++#include "game/original/ObjectivesTrigger.h"
+ #include "game/original/PathPoint.h"
+ #include "game/original/PowerupPickups.h"
+ #include "game/original/RotatingBrush.h"
+@@ -235,6 +236,17 @@ namespace OpenBlood2
+                 }
+                 return properties;
+             }()};
++        const ClassInfo objectives_trigger{
++            "ObjectivesTrigger",
++            &trigger,
++            construct<ObjectivesTrigger>,
++            {{"ResourceNum", std::int32_t(0)},
++             {"TitleToDisplay", std::string("Objective #1:"), true, MAX_GP_STRING_LEN},
++             {"TextToDisplay", std::string("Use the '|' character to force a line break..."), true, MAX_GP_STRING_LEN},
++             {"Sound", std::string("Sounds\\Thunder.wav")},
++             {"TouchActivate", false},
++             {"AIActivate", false},
++             {"TriggerRelayActivate", false}}};
+         const ClassInfo big_trigger{"BigTrigger", &trigger, construct<BigTrigger>, {}};
+         const ClassInfo toggle_trigger{"ToggleTrigger", &trigger, construct<ToggleTrigger>, []
+                                        {
+@@ -398,9 +410,10 @@ namespace OpenBlood2
+                objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
+                objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
+                objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
+-               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+-               objects.register_class(door) && objects.register_class(rotating_door) &&
+-               objects.register_class(destructable_brush) && objects.register_class(rotating_brush);
++               objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
++               objects.register_class(toggle_trigger) && objects.register_class(door) &&
++               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
++               objects.register_class(rotating_brush);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index d773fd2..6683fe8 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -2,6 +2,7 @@
+ #include "engine/collision.h"
+ #include "engine/model_store.h"
+ #include "engine/objects.h"
++#include "engine/string_resources.h"
+ #include "game/original/BloodShells.h"
+ #include "game/session.h"
+ #include <array>
+@@ -68,6 +69,9 @@ namespace OpenBlood2
+             explosion_effects.clear();
+             spawn_reports.clear();
+             pickup_reports.clear();
++            client_strings = {};
++            client_strings_error.clear();
++            client_strings_attempted = false;
+         }
+         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
+         bool GetMovementState(HOBJECT, MovementState&) override;
+@@ -84,6 +88,12 @@ namespace OpenBlood2
+         }
+         HOBJECT GetClientUserData(HCLIENT) override;
+         DRESULT SetClientUserData(HCLIENT, HOBJECT) override;
++        const Resources* client_resources = nullptr;
++        StringResources client_strings;
++        std::string client_strings_error;
++        bool client_strings_attempted = false;
++        DRESULT SendObjectives(const MissionObjectives&) override;
++        bool GetClientResourceString(std::uint32_t, std::string&) override;
+         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
+         DRESULT SetModelFilenames(HOBJECT, const char*, const char*) override;
+         DRESULT GetObjectDims(HOBJECT, DVector*) override;
+@@ -262,6 +272,7 @@ namespace OpenBlood2
+             objects.models = &models;
+             objects.world = &world;
+             server.collision = &collision;
++            server.client_resources = &resources;
+             return server.bind() && register_original_classes(objects);
+         }
+         HOBJECT create_example(std::string_view class_name);
+diff --git a/src/game/server_clients.cpp b/src/game/server_clients.cpp
+index 312b1fa..430d2b7 100644
+--- a/src/game/server_clients.cpp
++++ b/src/game/server_clients.cpp
+@@ -79,6 +79,10 @@ namespace OpenBlood2
+                     return physics_vector(value.position);
+                 else if constexpr (std::is_same_v<T, PlayerStats>)
+                     return std::isfinite(value.health) && std::isfinite(value.armor) && std::isfinite(value.bullets);
++                else if constexpr (std::is_same_v<T, MissionObjectives>)
++                    return value.resource <= 65535 - 6000 + 1 && value.title.size() <= MAX_GP_STRING_LEN &&
++                           value.text.size() <= MAX_GP_STRING_LEN && value.title.find('\0') == std::string::npos &&
++                           value.text.find('\0') == std::string::npos;
+                 else if constexpr (std::is_same_v<T, PlayerPhysics>)
+                     return value.model.size() <= 100 && value.skin.size() <= 100 &&
+                            value.model.find('\0') == std::string::npos && value.skin.find('\0') == std::string::npos &&
+diff --git a/src/game/server_objectives.cpp b/src/game/server_objectives.cpp
+new file mode 100644
+index 0000000..b0fb64d
+--- /dev/null
++++ b/src/game/server_objectives.cpp
+@@ -0,0 +1,43 @@
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    DRESULT ServerAdapter::SendObjectives(const MissionObjectives& value)
++    {
++        trace_service("SendObjectives");
++        // Original null-client broadcast, bounded to the supported local client.
++        for (const auto& [client, state] : clients_)
++        {
++            (void)state;
++            if (GetClientUserData(client))
++                return SendToClient(client, value);
++        }
++        return DE_NOTFOUND;
++    }
++    bool ServerAdapter::GetClientResourceString(std::uint32_t id, std::string& value)
++    {
++        trace_service("GetClientResourceString");
++        value.clear();
++        if (!client_strings_attempted)
++        {
++            client_strings_attempted = true;
++            std::vector<std::uint8_t> bytes;
++            if (!client_resources)
++                client_strings_error = "Client resource archive is unavailable";
++            else if (const auto* resource = client_resources->find("cres.dll");
++                     resource && resource->size > 32 * 1024 * 1024)
++                client_strings_error = "cres.dll exceeds the 32 MiB string reader limit";
++            else if (client_resources->read("cres.dll", bytes, client_strings_error))
++                read_string_resources(bytes, client_strings, client_strings_error);
++        }
++        auto it = client_strings.strings.find(id);
++        if (it == client_strings.strings.end())
++        {
++            objects_.fail(ObjectError::Unsupported, client_strings_error.empty()
++                                                        ? "Missing client string resource " + std::to_string(id)
++                                                        : client_strings_error);
++            return false;
++        }
++        value = it->second;
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 0c0d559..923c9e5 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -277,3 +277,21 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --pickups-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/pickups.png")
+     set_tests_properties(gpu.pickups PROPERTIES LABELS "private;gpu;pickups" TIMEOUT 30 RUN_SERIAL TRUE)
+ endif()
++
++add_executable(objectives_tests objectives_tests.cpp)
++target_link_libraries(objectives_tests PRIVATE blood2_game)
++blood2_project_options(objectives_tests)
++foreach(case IN ITEMS strings malformed defaults localized missing queue)
++    add_test(NAME objectives.${case} COMMAND objectives_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/objective-fixtures/${case}")
++    set_tests_properties(objectives.${case} PROPERTIES LABELS "headless;objectives" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME objectives.catalog COMMAND objectives_tests catalog "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(objectives.catalog PROPERTIES LABELS "headless;private;objectives" TIMEOUT 60)
++endif()
++
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.objectives COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --objectives-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/objectives.png")
++    set_tests_properties(gpu.objectives PROPERTIES LABELS "private;gpu;objectives" TIMEOUT 30 RUN_SERIAL TRUE)
++endif()
+diff --git a/tests/brush_tests.cpp b/tests/brush_tests.cpp
+index 1094abf..098f55e 100644
+--- a/tests/brush_tests.cpp
++++ b/tests/brush_tests.cpp
+@@ -393,9 +393,9 @@ namespace
+         std::map<EntryState, unsigned> entries;
+         for (const auto& e : g.entries)
+             ++entries[e.state];
+-        CHECK(entries[EntryState::Created] == 141 && entries[EntryState::EditorOnly] == 372 &&
+-              entries[EntryState::Unsupported] == 67 && entries[EntryState::Failed] == 0 &&
+-              g.objects.snapshot().size() == 148);
++        CHECK(entries[EntryState::Created] == 142 && entries[EntryState::EditorOnly] == 372 &&
++              entries[EntryState::Unsupported] == 66 && entries[EntryState::Failed] == 0 &&
++              g.objects.snapshot().size() == 149);
+         std::cout << "Subway instances=" << g.objects.snapshot().size() << "\n";
+         for (auto [state, n] : entries)
+             std::cout << "state=" << int(state) << " count=" << n << '\n';
+diff --git a/tests/objectives_tests.cpp b/tests/objectives_tests.cpp
+new file mode 100644
+index 0000000..5b3aabf
+--- /dev/null
++++ b/tests/objectives_tests.cpp
+@@ -0,0 +1,285 @@
++#include "game/game_settings.h"
++#include "game/original/ObjectivesTrigger.h"
++#include "string_fixture.h"
++#include <functional>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool send(GameSession& g, HOBJECT target, HOBJECT sender)
++    {
++        auto text = g.server.CreateString("TRIGGER");
++        auto message = g.server.StartMessageToObject(g.server.HandleToObject(sender), target, 1000);
++        if (!message)
++        {
++            g.server.FreeString(text);
++            return false;
++        }
++        const bool ok = g.server.WriteToMessageHString(message, text) == DE_OK && g.server.EndMessage(message) == DE_OK;
++        g.server.FreeString(text);
++        return ok;
++    }
++    bool setup(GameSession& g, const std::filesystem::path& root)
++    {
++        CHECK(test_player::setup(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        return true;
++    }
++    HOBJECT create(GameSession& g, Properties properties = {})
++    {
++        return g.objects.create(g.objects.find_class("ObjectivesTrigger"), {}, Creation::World, properties);
++    }
++    bool strings(const std::filesystem::path&)
++    {
++        for (bool wide : {false, true})
++        {
++            auto pe = test_strings::pe({{5000, u"Title \u00e9"}, {6000, u"Text|\U0001f600"}}, 1036, wide);
++            StringResources result;
++            std::string error;
++            CHECK(read_string_resources(pe.b, result, error));
++            CHECK(result.language == 1036 && result.strings.size() == 2);
++            CHECK(result.strings.at(5000) == "Title \xc3\xa9" && result.strings.at(6000) == "Text|\xf0\x9f\x98\x80");
++            CHECK(!read_string_resources(pe.b, result, error, 1033) && result.strings.empty());
++            CHECK(read_string_resources(pe.b, result, error, 1036));
++        }
++        return true;
++    }
++    bool malformed(const std::filesystem::path&)
++    {
++        auto good = test_strings::pe({{5000, u"Title"}, {6000, u"Text"}});
++        StringResources result;
++        std::string error;
++        for (std::size_t i = 0; i < good.b.size(); ++i)
++            CHECK(!read_string_resources(std::span(good.b).first(i), result, error) && result.strings.empty());
++        for (const auto& [offset, value] : std::vector<std::pair<unsigned, unsigned>>{{60, 0xffffffff},
++                                                                                      {64, 0},
++                                                                                      {84, 1},
++                                                                                      {88, 0},
++                                                                                      {180, 2},
++                                                                                      {200, 0xfffffff0},
++                                                                                      {204, 0xffffffff},
++                                                                                      {324, 0xfffffff0},
++                                                                                      {328, 0xffffffff},
++                                                                                      {332, 0xffffffff},
++                                                                                      {524, 0xffff0000},
++                                                                                      {532, 0x80000000},
++                                                                                      {552, 0},
++                                                                                      {556, 0x80000000},
++                                                                                      {580, 0x80000000},
++                                                                                      {584, 0xffffffff}})
++        {
++            auto bad = good;
++            bad.patch(offset, value);
++            CHECK(!read_string_resources(bad.b, result, error) && result.strings.empty());
++        }
++        for (auto text :
++             {std::u16string(1, 0xd800), std::u16string(1, 0xdc00), std::u16string(1, 0), std::u16string(4097, 'a')})
++            CHECK(!read_string_resources(test_strings::pe({{5000, text}}).b, result, error));
++        // Different languages in different blocks must not silently mix.
++        auto multilingual = good;
++        CHECK(multilingual.b.size() >= 588);
++        multilingual.patch(0x200 + 56 + 16, 1036);
++        CHECK(!read_string_resources(multilingual.b, result, error));
++        CHECK(read_string_resources(multilingual.b, result, error, 1033));
++        CHECK(result.strings.size() == 1 && result.strings.contains(6000));
++        auto duplicate = good;
++        CHECK(duplicate.b.size() >= 564);
++        duplicate.patch(0x200 + 48, 313); // Duplicate block ID.
++        CHECK(!read_string_resources(duplicate.b, result, error) && result.strings.empty());
++        return true;
++    }
++    bool defaults(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto h = create(g);
++        CHECK(h);
++        auto* t = dynamic_cast<ObjectivesTrigger*>(g.server.HandleToObject(h));
++        CHECK(t && !t->touch_activate && !t->ai_activate && !t->object_activate && !t->relay_activate &&
++              t->player_activate);
++        CHECK(t->objectives.resource == 0 && t->objectives.title == "Objective #1:" &&
++              t->sound == "Sounds\\Thunder.wav");
++        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, g.client_shell.player) && t->activations == 0);
++        auto relay = g.objects.create(g.objects.find_class("Trigger"), {}, Creation::World);
++        CHECK(send(g, h, relay) && t->rejected == 1 && t->active);
++        CHECK(send(g, h, g.client_shell.player) && t->deliveries == 1 && t->objective_sound_requests == 1 &&
++              !t->active);
++        CHECK(g.client_shell.objective_messages == 0); // Owned queued delivery, not a callback into client.
++        std::string error;
++        CHECK(g.pump_player_messages(error));
++        CHECK(g.client_shell.objectives_resolved && g.client_shell.objectives.title == "Objective #1:");
++        CHECK(send(g, h, g.client_shell.player) && t->deliveries == 1);
++        CHECK(g.unload_world() && g.client_shell.objective_messages == 0 && g.client_shell.objectives.title.empty());
++        CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++    bool localized(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        CHECK(test_strings::mount(g, root, test_strings::pe({{5000, u"Resource title"}, {6000, u"Resource|text"}}).b));
++        auto h = create(g, {{"ResourceNum", std::int32_t(1)},
++                            {"TitleToDisplay", std::string("ignored")},
++                            {"TextToDisplay", std::string("ignored")}});
++        CHECK(send(g, h, g.client_shell.player));
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        std::string error;
++        CHECK(g.pump_player_messages(error));
++        CHECK(g.client_shell.objectives_resolved && g.client_shell.objectives.title == "Resource title" &&
++              g.client_shell.objectives.text == "Resource|text");
++        CHECK(g.server.client_strings.language == 1033 && g.server.client_strings.strings.size() == 2);
++        auto empty = create(g, {{"ResourceNum", std::int32_t(1)}, {"TitleToDisplay", std::string{}}});
++        CHECK(send(g, empty, g.client_shell.player) && g.pump_player_messages(error));
++        CHECK(g.client_shell.objective_messages ==
++              1); // Source suppresses even localized objectives without both strings.
++        CHECK(g.leave_player() && g.client_shell.objectives.title.empty());
++        CHECK(g.enter_player(error) && g.client_shell.objective_messages == 0);
++        CHECK(g.unload_world() && g.server.client_strings.strings.empty() && !g.server.client_strings_attempted);
++        return true;
++    }
++    bool missing(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        auto h = create(g, {{"ResourceNum", std::int32_t(1)}});
++        CHECK(send(g, h, g.client_shell.player));
++        std::string error;
++        CHECK(g.pump_player_messages(error));
++        CHECK(!g.client_shell.objectives_resolved && !g.client_shell.objectives_error.empty() &&
++              !g.server.client_strings_error.empty());
++        CHECK(g.client_shell.objectives.title.empty() && g.client_shell.objectives.text.empty() &&
++              g.client_shell.m_bInWorld);
++        CHECK(!create(g, {{"ResourceNum", std::int32_t(-1)}}) && !create(g, {{"ResourceNum", std::int32_t(65535)}}));
++        CHECK(g.server.SendObjectives({UINT32_MAX, "title", "text"}) == DE_INVALIDPARAMS);
++        CHECK(g.server.SendObjectives({0, std::string(MAX_GP_STRING_LEN + 1, 'a'), "text"}) == DE_INVALIDPARAMS);
++        CHECK(g.server.SendObjectives({0, std::string("a\0b", 3), "text"}) == DE_INVALIDPARAMS);
++        CHECK(g.leave_player() && g.server.SendObjectives({0, "title", "text"}) == DE_NOTFOUND);
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool queue(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(setup(g, root));
++        MissionObjectives value{0, "title", "text"};
++        for (unsigned i = 0; i < 256; ++i)
++            CHECK(g.server.SendObjectives(value) == DE_OK);
++        CHECK(g.server.SendObjectives(value) == DE_ERROR);
++        auto h = create(g);
++        CHECK(send(g, h, g.client_shell.player));
++        const auto* trigger = dynamic_cast<ObjectivesTrigger*>(g.server.HandleToObject(h));
++        CHECK(trigger && trigger->last_delivery == DE_ERROR && trigger->deliveries == 0 && !trigger->active);
++        value.title = "changed";
++        std::string error;
++        CHECK(g.pump_player_messages(error));
++        CHECK(g.client_shell.objective_messages == 256 && g.client_shell.objectives.title == "title");
++        for (auto mode : {GAMETYPE_CUSTOM, GAMETYPE_BLOODBATH, GAMETYPE_ACTION})
++        {
++            g.server.set_game_settings(1, mode);
++            CHECK(g.server.SendObjectives(value) == DE_OK);
++            CHECK(g.pump_player_messages(error));
++            CHECK(g.client_shell.objective_messages == 257);
++        }
++        CHECK(g.server.SendObjectives(value) == DE_OK);
++        CHECK(g.objects.remove(g.client_shell.player) && g.objects.finish_frame());
++        std::vector<PlayerEvent> events;
++        CHECK(!g.server.take_client_events(g.local_client, events) && events.empty());
++        CHECK(g.unload_world());
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        std::string title;
++        CHECK(g.server.GetClientResourceString(5000, title));
++        CHECK(g.server.client_strings.language == 1033 && g.server.client_strings.strings.size() == 790);
++        std::cout << "cres.dll strings=" << g.server.client_strings.strings.size()
++                  << " language=" << g.server.client_strings.language << '\n';
++        unsigned worlds = 0, entries = 0, created = 0, rejected = 0, missing = 0;
++        for (const auto& [path, resource] : g.resources.index())
++        {
++            (void)resource;
++            if (!path.ends_with(".dat") || !path.starts_with("worlds/"))
++                continue;
++            std::vector<std::uint8_t> bytes;
++            CHECK(g.resources.read(path, bytes, error));
++            World world;
++            if (!read_world(bytes, world, error))
++            {
++                CHECK(path == "worlds/16_bridge.dat");
++                continue;
++            }
++            ++worlds;
++            for (const auto& source : world.objects)
++            {
++                if (source.class_name != "ObjectivesTrigger")
++                    continue;
++                ++entries;
++                Properties props;
++                for (const auto& property : source.properties)
++                    props.emplace(property.name, property.value);
++                auto h = create(g, props);
++                if (!h)
++                {
++                    ++rejected;
++                    std::cout << "reject " << path << ": " << g.objects.diagnostics().back() << '\n';
++                }
++                else
++                {
++                    ++created;
++                    auto* t = dynamic_cast<ObjectivesTrigger*>(g.server.HandleToObject(h));
++                    CHECK(t);
++                    if (t->objectives.resource)
++                    {
++                        std::string a, b;
++                        if (!g.server.GetClientResourceString(5000 + t->objectives.resource - 1, a) ||
++                            !g.server.GetClientResourceString(6000 + t->objectives.resource - 1, b))
++                            ++missing;
++                    }
++                }
++                CHECK(g.objects.clear());
++            }
++        }
++        std::cout << "worlds=" << worlds << " objectives=" << entries << " created=" << created
++                  << " rejected=" << rejected << " missing_resource_pairs=" << missing << '\n';
++        CHECK(worlds == 57 && entries == 53 && created == 53 && rejected == 0 && missing == 0);
++        CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++        unsigned sent = 0;
++        for (auto id : g.objects.snapshot())
++            if (auto* r = g.objects.get(id); r && dynamic_cast<ObjectivesTrigger*>(r->game.get()))
++            {
++                CHECK(send(g, r->handle, g.client_shell.player));
++                ++sent;
++            }
++        CHECK(sent == 1 && g.pump_player_messages(error));
++        CHECK(g.client_shell.objective_messages >= 1 && g.client_shell.objectives_resolved &&
++              g.client_shell.objectives.resource == 1);
++        std::cout << "SubwayA objective delivered and resolved; live=" << g.objects.snapshot().size() << '\n';
++        CHECK(g.unload_world() && g.server.string_count() == 0);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests = {
++        {"strings", strings}, {"malformed", malformed}, {"defaults", defaults}, {"localized", localized},
++        {"missing", missing}, {"queue", queue},         {"catalog", catalog}};
++    const auto it = tests.find(argv[1]);
++    return it != tests.end() && it->second(argv[2]) ? 0 : 1;
++}
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index ab9b4c3..734b66e 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -204,14 +204,14 @@ namespace
+             CHECK(player);
+             CHECK(game.objects.get(player->m_hObject)->model->animations.size() == 86);
+             CHECK(game.objects.snapshot().size() ==
+-                  151); // 141 source instances + 7 door children + player + muzzle light + scent.
++                  152); // 142 source instances + 7 door children + player + muzzle light + scent.
+             CHECK(game.client_shell.position.x == -32 && game.client_shell.position.z == -3224);
+             CHECK(std::abs(game.client_shell.position.y - 170) < .01f);
+             for (int frame = 0; frame < 120; ++frame)
+                 CHECK(game.step(1.0 / 60.0));
+             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
+             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
+-            CHECK(!game.run_world(error) && error.find("67 uninstantiated") != std::string::npos);
++            CHECK(!game.run_world(error) && error.find("66 uninstantiated") != std::string::npos);
+             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
+                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
+                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()
+diff --git a/tests/string_fixture.h b/tests/string_fixture.h
+new file mode 100644
+index 0000000..0516886
+--- /dev/null
++++ b/tests/string_fixture.h
+@@ -0,0 +1,78 @@
++#pragma once
++#include "player_fixture.h"
++namespace test_strings
++{
++    inline test_model::Writer pe(const std::map<unsigned, std::u16string>& values, unsigned language = 1033,
++                                 bool wide = false)
++    {
++        using test_model::Writer;
++        std::map<unsigned, std::array<std::u16string, 16>> blocks;
++        for (const auto& [id, text] : values)
++            blocks[id / 16 + 1][id % 16] = text;
++        Writer r;
++        r.b.resize(40 + blocks.size() * 8);
++        r.patch(12, 1u << 16);
++        r.patch(16, 6);
++        r.patch(20, 0x80000018);
++        r.patch(36, static_cast<unsigned>(blocks.size()) << 16);
++        std::size_t entry = 40;
++        for (const auto& [id, strings] : blocks)
++        {
++            auto dir = static_cast<unsigned>(r.b.size());
++            r.b.resize(dir + 40);
++            r.patch(entry, id);
++            r.patch(entry + 4, 0x80000000 | dir);
++            entry += 8;
++            r.patch(dir + 12, 1u << 16);
++            r.patch(dir + 16, language);
++            r.patch(dir + 20, dir + 24);
++            auto data = static_cast<unsigned>(r.b.size());
++            for (const auto& text : strings)
++            {
++                r.u16(static_cast<unsigned>(text.size()));
++                for (char16_t c : text)
++                    r.u16(c);
++            }
++            r.patch(dir + 24, 0x1000 + data);
++            r.patch(dir + 28, static_cast<unsigned>(r.b.size()) - data);
++        }
++        Writer w;
++        w.b.resize(0x200);
++        w.b[0] = 'M';
++        w.b[1] = 'Z';
++        w.patch(60, 64);
++        w.patch(64, 0x4550);
++        w.patch(68, 0x10000 | 0x14c);
++        w.patch(84, wide ? 240 : 224);
++        w.patch(88, wide ? 0x20b : 0x10b);
++        w.patch(88 + (wide ? 108 : 92), 16);
++        w.patch(88 + (wide ? 128 : 112), 0x1000);
++        w.patch(88 + (wide ? 132 : 116), static_cast<unsigned>(r.b.size()));
++        const unsigned section = 88 + (wide ? 240 : 224);
++        w.patch(section + 12, 0x1000);
++        w.patch(section + 16, static_cast<unsigned>(r.b.size()));
++        w.patch(section + 20, 0x200);
++        w.b.insert(w.b.end(), r.b.begin(), r.b.end());
++        return w;
++    }
++    inline bool mount(OpenBlood2::GameSession& g, const std::filesystem::path& root,
++                      const std::vector<std::uint8_t>& bytes)
++    {
++        test_player::Directory dir;
++        dir.files["cres.dll"] = bytes;
++        test_player::Writer w;
++        w.b.resize(168);
++        w.b[0] = w.b[62] = w.b[124] = 13;
++        w.b[1] = w.b[63] = w.b[125] = 10;
++        w.b[126] = 26;
++        w.patch(127, 1);
++        auto [offset, size] = test_player::write_dir(w, dir);
++        w.patch(131, offset);
++        w.patch(135, size);
++        std::ofstream file(root / "strings.rez", std::ios::binary);
++        file.write(reinterpret_cast<const char*>(w.b.data()), static_cast<std::streamsize>(w.b.size()));
++        file.close();
++        std::string error;
++        return file.good() && g.resources.mount(root / "strings.rez", error);
++    }
++} // namespace test_strings
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index a0e7fa1..a63a36f 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -1,6 +1,6 @@
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 148 original instances, 116 BSP models")
++if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 149 original instances, 116 BSP models")
+     message(FATAL_ERROR "World inspection: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-player
+@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 67" OR NOT out MATCHES "remaining mover classes")
++if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 66" OR NOT out MATCHES "remaining mover classes")
+     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index b524590..9b04a7e 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -538,13 +538,13 @@ namespace
+         CHECK(game.world.version == 56);
+         CHECK(game.world.objects.size() == 580);
+         CHECK(game.world.models.size() == 116);
+-        CHECK(game.objects.snapshot().size() == 148);
++        CHECK(game.objects.snapshot().size() == 149);
+         CHECK(game.world.models[0].points.size() == 4996);
+         CHECK(game.world.models[0].polygons.size() == 3367);
+         CHECK(game.resources.find(game.world_path)->overrides == 1);
+         CHECK(game.entries[0].state == EntryState::Created);
+         CHECK(game.step(.016));
+-        CHECK(game.server.service_calls["SetObjectDims"] == 29);
++        CHECK(game.server.service_calls["SetObjectDims"] == 30);
+         CHECK(game.server.service_calls["GetPropGeneric"] > 0);
+         for (const auto& [name, count] : game.server.service_calls)
+             std::cout << "Service " << name << ": " << count << '\n';

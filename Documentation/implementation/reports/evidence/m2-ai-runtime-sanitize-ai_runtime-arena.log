@@ -1,0 +1,58 @@
+445/445 Testing: ai_runtime.arena
+445/445 Test: ai_runtime.arena
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_runtime_tests" "arena" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_runtime.arena" start time: Oct 16 15:12 CEST
+Output:
+----------------------------------------------------------
+Arena state=2 phase=1 updates=522 shots=25 error= player HP=0
+<end of output>
+Test time =   1.50 sec
+----------------------------------------------------------
+Test Passed.
+"ai_runtime.arena" end time: Oct 16 15:12 CEST
+"ai_runtime.arena" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 16 15:12 CEST
+
+ai_escape =   1.07 sec*proc
+
+ai_fire =  13.90 sec*proc
+
+ai_follow =   4.83 sec*proc
+
+ai_locomotion =   1.06 sec*proc
+
+ai_navigation =   3.67 sec*proc
+
+ai_perception =   4.56 sec*proc
+
+ai_recovery =   1.12 sec*proc
+
+ai_runtime =  29.62 sec*proc
+
+ai_script =   2.57 sec*proc
+
+ai_state =  43.51 sec*proc
+
+ai_target =   4.60 sec*proc
+
+ai_trigger =   3.57 sec*proc
+
+character_motion =   1.14 sec*proc
+
+headless = 289.39 sec*proc
+
+objects =   0.23 sec*proc
+
+paths =   5.08 sec*proc
+
+player =  11.17 sec*proc
+
+private = 284.28 sec*proc
+
+services =  10.17 sec*proc
+
+weapons = 147.53 sec*proc
+

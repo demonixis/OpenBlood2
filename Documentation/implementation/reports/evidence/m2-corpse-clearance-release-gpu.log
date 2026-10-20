@@ -1,0 +1,27 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start  25: gpu.lifecycle
+1/7 Test  #25: gpu.lifecycle ....................   Passed    3.22 sec
+    Start 291: gpu.character
+2/7 Test #291: gpu.character ....................   Passed   13.72 sec
+    Start 357: gpu.world_depth
+3/7 Test #357: gpu.world_depth ..................   Passed    0.56 sec
+    Start 648: gpu.mouse_combat
+4/7 Test #648: gpu.mouse_combat .................   Passed    2.59 sec
+    Start 649: gpu.corpse_clearance
+5/7 Test #649: gpu.corpse_clearance .............   Passed    3.38 sec
+    Start 650: gpu.player_controls
+6/7 Test #650: gpu.player_controls ..............   Passed    1.41 sec
+    Start 814: gpu.level_change
+7/7 Test #814: gpu.level_change .................   Passed    1.92 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+character          =  13.72 sec*proc (1 test)
+gpu                =  26.79 sec*proc (7 tests)
+player_controls    =   7.38 sec*proc (3 tests)
+private            =  23.02 sec*proc (5 tests)
+world              =   1.92 sec*proc (1 test)
+world_view         =   0.56 sec*proc (1 test)
+
+Total Test time (real) =  26.81 sec

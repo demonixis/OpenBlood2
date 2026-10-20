@@ -1,0 +1,35 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 567: gpu.sprite_private
+1/7 Test #567: gpu.sprite_private ...............   Passed    2.82 sec
+    Start 661: gpu.energy
+2/7 Test #661: gpu.energy .......................   Passed    0.49 sec
+    Start 662: gpu.energy_private
+3/7 Test #662: gpu.energy_private ...............   Passed    0.60 sec
+    Start 697: gpu.gideon_teleport_private
+4/7 Test #697: gpu.gideon_teleport_private ......   Passed    0.67 sec
+    Start 755: gpu.flare
+5/7 Test #755: gpu.flare ........................***Failed    0.51 sec
+Stage 0: scale 0, z 20, changed pixels 0
+Stage 1: scale 0.25, z 20, changed pixels 96
+96: stage == 0 || (changed > 20 && red > 20)  
+
+    Start 756: gpu.flare_private
+6/7 Test #756: gpu.flare_private ................   Passed    0.56 sec
+    Start 757: gpu.flare_views_private
+7/7 Test #757: gpu.flare_views_private ..........   Passed    9.19 sec
+
+86% tests passed, 1 tests failed out of 7
+
+Label Time Summary:
+energy             =   1.09 sec*proc (2 tests)
+flare              =  10.26 sec*proc (3 tests)
+gideon_teleport    =   0.67 sec*proc (1 test)
+gpu                =  14.84 sec*proc (7 tests)
+private            =  13.84 sec*proc (5 tests)
+sprite_view        =   2.82 sec*proc (1 test)
+
+Total Test time (real) =  14.86 sec
+
+The following tests FAILED:
+	755 - gpu.flare (Failed)                                flare gpu
+Errors while running CTest

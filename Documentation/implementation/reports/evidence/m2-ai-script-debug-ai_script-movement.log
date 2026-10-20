@@ -1,0 +1,14 @@
+419/422 Testing: ai_script.movement
+419/422 Test: ai_script.movement
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests" "movement" "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-script-movement"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_script.movement" start time: Oct 16 13:17 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.movement" end time: Oct 16 13:17 CEST
+"ai_script.movement" time elapsed: 00:00:00
+----------------------------------------------------------

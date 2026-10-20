@@ -1,0 +1,114 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 863: train_session.private_60
+      Start 862: train_session.private_30
+ 1/48 Test #862: train_session.private_30 .........   Passed  156.29 sec
+      Start 866: screen_fade.private
+ 2/48 Test #863: train_session.private_60 .........   Passed  157.51 sec
+      Start  71: player.smell_private
+ 3/48 Test  #71: player.smell_private .............   Passed   29.44 sec
+      Start 777: conversation.catalog
+ 4/48 Test #777: conversation.catalog .............   Passed   12.27 sec
+      Start 776: conversation.private
+ 5/48 Test #776: conversation.private .............   Passed    7.14 sec
+      Start  49: world.level_change_private
+ 6/48 Test  #49: world.level_change_private .......   Passed   21.05 sec
+      Start  12: objects.message_churn
+ 7/48 Test  #12: objects.message_churn ............   Passed    5.69 sec
+      Start  72: player.private
+ 8/48 Test  #72: player.private ...................   Passed    9.87 sec
+      Start 189: pickup_audio.private
+ 9/48 Test #189: pickup_audio.private .............   Passed    2.26 sec
+      Start  13: objects.message_limit
+10/48 Test  #13: objects.message_limit ............   Passed    0.45 sec
+      Start 187: pickup_audio.failures
+11/48 Test #187: pickup_audio.failures ............   Passed    0.55 sec
+      Start  31: world.level_change
+12/48 Test  #31: world.level_change ...............   Passed    0.28 sec
+      Start 775: conversation.lifetime
+13/48 Test #775: conversation.lifetime ............   Passed    0.06 sec
+      Start 865: screen_fade.session
+14/48 Test #865: screen_fade.session ..............   Passed    0.06 sec
+      Start 771: conversation.sequence
+15/48 Test #771: conversation.sequence ............   Passed    0.05 sec
+      Start  70: player.smell
+16/48 Test  #70: player.smell .....................   Passed    0.05 sec
+      Start 773: conversation.transport
+17/48 Test #773: conversation.transport ...........   Passed    0.05 sec
+      Start 772: conversation.delayed
+18/48 Test #772: conversation.delayed .............   Passed    0.05 sec
+      Start 774: conversation.clock
+19/48 Test #774: conversation.clock ...............   Passed    0.04 sec
+      Start 186: pickup_audio.rules
+20/48 Test #186: pickup_audio.rules ...............   Passed    0.09 sec
+      Start 188: pickup_audio.callbacks
+21/48 Test #188: pickup_audio.callbacks ...........   Passed    0.08 sec
+      Start 770: conversation.mapping
+22/48 Test #770: conversation.mapping .............   Passed    0.02 sec
+      Start 864: screen_fade.values
+23/48 Test #864: screen_fade.values ...............   Passed    0.02 sec
+      Start  46: world.session_lifecycle
+24/48 Test  #46: world.session_lifecycle ..........   Passed    0.02 sec
+      Start  67: player.rollback
+25/48 Test  #67: player.rollback ..................   Passed    0.05 sec
+      Start  66: player.lifecycle
+26/48 Test  #66: player.lifecycle .................   Passed    0.05 sec
+      Start  68: player.messages
+27/48 Test  #68: player.messages ..................   Passed    0.05 sec
+      Start  69: player.callbacks
+28/48 Test  #69: player.callbacks .................   Passed    0.04 sec
+      Start  47: world.session_messages
+29/48 Test  #47: world.session_messages ...........   Passed    0.02 sec
+      Start  65: player.handles
+30/48 Test  #65: player.handles ...................   Passed    0.03 sec
+      Start   2: objects.builtin_model
+31/48 Test   #2: objects.builtin_model ............   Passed    0.02 sec
+      Start  14: objects.unsupported_teardown
+32/48 Test  #14: objects.unsupported_teardown .....   Passed    0.05 sec
+      Start  11: objects.messages_strings
+33/48 Test  #11: objects.messages_strings .........   Passed    0.04 sec
+      Start  15: objects.creation_failures
+34/48 Test  #15: objects.creation_failures ........   Passed    0.03 sec
+      Start   5: objects.reasons_properties
+35/48 Test   #5: objects.reasons_properties .......   Passed    0.02 sec
+      Start   3: objects.original_objects
+36/48 Test   #3: objects.original_objects .........   Passed    0.02 sec
+      Start  10: objects.links_lists
+37/48 Test  #10: objects.links_lists ..............   Passed    0.02 sec
+      Start   7: objects.deferred_removal
+38/48 Test   #7: objects.deferred_removal .........   Passed    0.02 sec
+      Start   9: objects.handles_selection
+39/48 Test   #9: objects.handles_selection ........   Passed    0.02 sec
+      Start   4: objects.nested_creation
+40/48 Test   #4: objects.nested_creation ..........   Passed    0.02 sec
+      Start   6: objects.scheduling
+41/48 Test   #6: objects.scheduling ...............   Passed    0.02 sec
+      Start   8: objects.aggregate_dispatch
+42/48 Test   #8: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start 867: player_voice.groups
+43/48 Test #867: player_voice.groups ..............   Passed    0.08 sec
+      Start 868: player_voice.timing
+44/48 Test #868: player_voice.timing ..............   Passed    0.08 sec
+      Start 869: player_voice.messages
+45/48 Test #869: player_voice.messages ............   Passed    0.09 sec
+      Start 870: player_voice.pickup
+46/48 Test #870: player_voice.pickup ..............   Passed    2.58 sec
+      Start 871: player_voice.private
+47/48 Test #871: player_voice.private .............   Passed   16.39 sec
+48/48 Test #866: screen_fade.private ..............   Passed  132.57 sec
+
+100% tests passed, 0 tests failed out of 48
+
+Label Time Summary:
+audio            =  22.22 sec*proc (9 tests)
+conversation     =  19.67 sec*proc (8 tests)
+headless         = 555.69 sec*proc (48 tests)
+objects          =   6.43 sec*proc (14 tests)
+pickups          =   2.99 sec*proc (4 tests)
+player           =  39.58 sec*proc (8 tests)
+player_voice     =  19.23 sec*proc (5 tests)
+private          = 544.77 sec*proc (10 tests)
+screen_fade      = 132.64 sec*proc (3 tests)
+train_session    = 313.80 sec*proc (2 tests)
+world            =  21.36 sec*proc (4 tests)
+
+Total Test time (real) = 288.87 sec

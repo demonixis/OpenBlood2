@@ -1,0 +1,21 @@
+[0/2] Re-checking globbed directories...
+[1/52] Scanning /home/yann/projects/lithtech/Blood2/tests/locomotion_tests.cpp for CXX dependencies
+[2/52] Scanning /home/yann/projects/lithtech/Blood2/tests/movement_tests.cpp for CXX dependencies
+[3/52] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[4/52] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[5/21] Generating CXX dyndep file tests/CMakeFiles/movement_tests.dir/CXX.dd
+[6/21] Generating CXX dyndep file tests/CMakeFiles/locomotion_tests.dir/CXX.dd
+[7/21] Scanning /home/yann/projects/lithtech/Blood2/tests/interaction_tests.cpp for CXX dependencies
+[8/21] Scanning /home/yann/projects/lithtech/Blood2/tests/player_controls_tests.cpp for CXX dependencies
+[9/21] Generating CXX dyndep file tests/CMakeFiles/interaction_tests.dir/CXX.dd
+[10/21] Generating CXX dyndep file tests/CMakeFiles/player_controls_tests.dir/CXX.dd
+[11/21] Building CXX object tests/CMakeFiles/movement_tests.dir/movement_tests.cpp.o
+[12/21] Building CXX object tests/CMakeFiles/locomotion_tests.dir/locomotion_tests.cpp.o
+[13/21] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[14/21] Building CXX object tests/CMakeFiles/player_controls_tests.dir/player_controls_tests.cpp.o
+[15/21] Linking CXX executable tests/movement_tests
+[16/21] Linking CXX executable blood2
+[17/21] Building CXX object tests/CMakeFiles/interaction_tests.dir/interaction_tests.cpp.o
+[18/21] Linking CXX executable tests/locomotion_tests
+[19/21] Linking CXX executable tests/player_controls_tests
+[20/21] Linking CXX executable tests/interaction_tests

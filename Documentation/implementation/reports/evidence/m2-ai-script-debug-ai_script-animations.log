@@ -1,0 +1,14 @@
+417/422 Testing: ai_script.animations
+417/422 Test: ai_script.animations
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_script_tests" "animations" "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-script-animations"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_script.animations" start time: Oct 16 13:17 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.animations" end time: Oct 16 13:17 CEST
+"ai_script.animations" time elapsed: 00:00:00
+----------------------------------------------------------

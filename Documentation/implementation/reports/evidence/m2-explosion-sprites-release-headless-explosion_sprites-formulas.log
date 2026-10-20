@@ -1,0 +1,14 @@
+546/549 Testing: explosion_sprites.formulas
+546/549 Test: explosion_sprites.formulas
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_sprite_tests" "formulas" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-sprites-formulas"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"explosion_sprites.formulas" start time: Oct 16 20:20 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_sprites.formulas" end time: Oct 16 20:20 CEST
+"explosion_sprites.formulas" time elapsed: 00:00:00
+----------------------------------------------------------

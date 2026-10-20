@@ -1,0 +1,17 @@
+272/273 Testing: character.player
+272/273 Test: character.player
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_animation_tests" "player" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"character.player" start time: Oct 16 04:11 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Two real shell/player cycles: original tables, current world node transforms, cleanup verified
+<end of output>
+Test time =   4.11 sec
+----------------------------------------------------------
+Test Passed.
+"character.player" end time: Oct 16 04:11 CEST
+"character.player" time elapsed: 00:00:04
+----------------------------------------------------------

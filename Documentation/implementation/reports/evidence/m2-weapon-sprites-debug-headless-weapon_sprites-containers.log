@@ -1,0 +1,14 @@
+615/619 Testing: weapon_sprites.containers
+615/619 Test: weapon_sprites.containers
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_sprite_tests" "containers" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-sprites-containers"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapon_sprites.containers" start time: Oct 16 23:50 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_sprites.containers" end time: Oct 16 23:50 CEST
+"weapon_sprites.containers" time elapsed: 00:00:00
+----------------------------------------------------------

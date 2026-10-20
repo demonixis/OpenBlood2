@@ -1,0 +1,29 @@
+76/580 Testing: movement.private
+76/580 Test: movement.private
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/movement_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"movement.private" start time: Oct 17 00:06 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+cycle 0: distance 186.661; rise 55.998; jumps 1; landings 2; ground 1; messages 1762
+Original SubwayA camera intro expired after 12.0333 simulation seconds
+cycle 1: distance 186.661; rise 55.998; jumps 1; landings 2; ground 1; messages 1764
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+cycle 2: distance 186.661; rise 55.998; jumps 1; landings 2; ground 1; messages 1762
+<end of output>
+Test time =  58.81 sec
+----------------------------------------------------------
+Test Passed.
+"movement.private" end time: Oct 17 00:07 CEST
+"movement.private" time elapsed: 00:00:58
+----------------------------------------------------------
+
+End testing: Oct 17 00:07 CEST
+
+headless =  58.81 sec*proc
+
+movement =  58.81 sec*proc
+
+private =  58.81 sec*proc
+

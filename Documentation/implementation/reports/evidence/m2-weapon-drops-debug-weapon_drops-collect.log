@@ -1,0 +1,14 @@
+482/491 Testing: weapon_drops.collect
+482/491 Test: weapon_drops.collect
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon_drop_tests" "collect" "/home/yann/projects/lithtech/Blood2/build/debug/tests/weapon-drop-fixtures/collect"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"weapon_drops.collect" start time: Oct 16 16:00 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"weapon_drops.collect" end time: Oct 16 16:00 CEST
+"weapon_drops.collect" time elapsed: 00:00:00
+----------------------------------------------------------

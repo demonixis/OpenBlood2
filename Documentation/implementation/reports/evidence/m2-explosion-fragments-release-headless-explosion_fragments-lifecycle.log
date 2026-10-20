@@ -1,0 +1,14 @@
+570/577 Testing: explosion_fragments.lifecycle
+570/577 Test: explosion_fragments.lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion_fragment_tests" "lifecycle" "/home/yann/projects/lithtech/Blood2/build/release/tests/explosion-fragments-lifecycle"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"explosion_fragments.lifecycle" start time: Oct 16 21:32 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_fragments.lifecycle" end time: Oct 16 21:32 CEST
+"explosion_fragments.lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------

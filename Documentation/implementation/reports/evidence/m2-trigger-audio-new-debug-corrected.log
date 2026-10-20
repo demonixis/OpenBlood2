@@ -1,0 +1,21 @@
+Test project <Blood2>/build/debug
+    Start 141: trigger_audio.activation
+    Start 144: trigger_audio.failures
+1/5 Test #144: trigger_audio.failures ...........   Passed    0.01 sec
+    Start 143: trigger_audio.lifetime
+2/5 Test #141: trigger_audio.activation .........   Passed    0.01 sec
+3/5 Test #143: trigger_audio.lifetime ...........   Passed    0.01 sec
+    Start 142: trigger_audio.feedback
+    Start 145: trigger_audio.private
+4/5 Test #142: trigger_audio.feedback ...........   Passed    0.01 sec
+5/5 Test #145: trigger_audio.private ............   Passed    1.43 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+audio       =   1.46 sec*proc (5 tests)
+headless    =   1.46 sec*proc (5 tests)
+private     =   1.43 sec*proc (1 test)
+triggers    =   1.46 sec*proc (5 tests)
+
+Total Test time (real) =   1.45 sec

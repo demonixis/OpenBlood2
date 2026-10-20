@@ -1,0 +1,1698 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index e2a703e..816604b 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -267,3 +267,5 @@ world shaders support Vulkan/SPIR-V only; M2 stays incomplete.
+ The [DTX world-texture continuation](../Documentation/Implementation/M2_TEXTURES.md) adds bounded version -2 palette decoding, exact-path material caching and opaque SDL_GPU sampling. Read [texture contracts](docs/TEXTURE_CONTRACTS.md) before extending images/materials. Preserve the -2/-5 generation boundary, strict lengths, pre-pivot UVs, world-revision ownership and explicit failed resources. Alpha/sky markers, unlit mip-zero sampling and unsupported version-0 assets remain visible limitations. Models, required original services and the M2 gate remain open.
+ 
+ The [animated model continuation](../Documentation/Implementation/M2_MODEL_VIEW.md) renders checked existing ABC/held/view models with original view offsets and shared world depth. Read [contracts](docs/MODEL_VIEW_CONTRACTS.md) before extending presentation or poses. Preserve read-only clocks, deferred lifetime, hidden/missing inspection, cache revisions and explicit close-view limits. Absent ABC TransformInfo now conjugates normalized node rotations; explicit zero remains direct. Rendering/head queries/attachments share that correction and the file -Z to engine +Z basis conversion; all spatial model fields are normalized once. Lighting/FX, NPCs, ExitTrigger and the actual M2 gate remain open.
++
++The [AI perception continuation](../Documentation/Implementation/M2_AI_PERCEPTION.md) connects original faction lists, FindObjectInRadius, ComputeStimuli, opportunity selection and ExitHint. Read [contracts](docs/AI_PERCEPTION_CONTRACTS.md) before extending NPC acquisition/state updates. Preserve player membership in both factions, source list/priority/boundary rules, dead-target behavior and checked deferred lifetime. Required query failure is -1, never a usable stimulus. Attacker memory is a checked non-owning identity; timed-power storage does not implement pickups/timers. No production NPC is registered; states, attacks, required FX and ExitTrigger keep M2 open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c2be6dc..1f8d7ad 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -40,7 +40,7 @@ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original
+ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+-target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
++target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIPerception.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+     src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+diff --git a/README.md b/README.md
+index 61d5a39..82f37de 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,10 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++Latest gameplay continuation: [original AI perception](../Documentation/Implementation/M2_AI_PERCEPTION.md) adds faction membership,
++radius/FOV/visibility selection, stimulus priorities and ExitHint. These commands
++run against the real player in diagnostic probes; original NPC states/actions,
++client FX, ExitTrigger and the M2 exit gate remain incomplete.
++
+ A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory, KeyPickup, original player USE, RotatingDoor, RotatingBrush, selected CDestructableBrush damage/removal and original CDebris explosive area damage and BoxPhysics pushable/gravity brushes with original damage impulses are connected. Original ammo/health/armor pickups and destruction spawns extend this subset; complete player gameplay remains missing. This is not a playable game.
+ 
+ The three runtime targets remain small: `engine` (resources, world/object runtime, configuration, SDL_GPU), `blood2_game` (original code and typed services) and `blood2_app` (`blood2`, optional Dear ImGui). No previous prototype is a build dependency, and no EnTT/ECS was introduced.
+@@ -79,8 +84,8 @@ ctest --preset debug
+ ctest --preset debug -L world
+ ```
+ 
+-The current suite has **274 synthetic headless tests**, **49 private headless tests**
+-and **27 serial GPU tests** (350 total with the installation and GPU options enabled).
++The current suite has **283 synthetic headless tests**, **51 private headless tests**
++and **27 serial GPU tests** (361 total with the installation and GPU options enabled).
+ Coverage includes bounded readers, original object/service behavior, player/weapon
+ lifetime, movement, interactions, animation/attachments and real GPU presentation.
+ Synthetic fixtures never substitute for private resource acceptance.
+@@ -313,3 +318,9 @@ The [animated model continuation](docs/MODEL_VIEW_CONTRACTS.md) adds real ABC/he
+ The animated-model continuation passes 350/350 tests in both Debug and inspector-free
+ Release, including 27 GPU cases, plus 116/116 targeted Clang ASan/UBSan/leak checks.
+ The final reader normalizes inverse rotations and model -Z into the engine basis.
++
++The [AI perception continuation](docs/AI_PERCEPTION_CONTRACTS.md) passes 361/361
++Debug and inspector-free Release checks, including 27 GPU cases, and all 334
++headless ASan/UBSan/leak cases. Player membership, candidate/stimulus rules and
++checked attacker lifetime are exercised; required original NPC states and the
++complete M2 gate remain open.
+diff --git a/docs/AI_PERCEPTION_CONTRACTS.md b/docs/AI_PERCEPTION_CONTRACTS.md
+new file mode 100644
+index 0000000..a610899
+--- /dev/null
++++ b/docs/AI_PERCEPTION_CONTRACTS.md
+@@ -0,0 +1,114 @@
++# Original AI perception and candidate lists
++
++M2 remains incomplete. Selected original `AI_Mgr::FindObjectInRadius`,
++`ComputeStimuli`, `ChooseOpportunityTarget`, faction membership and `ExitHint`
++now execute. There is still no production CivilianAI/CultistAI/Gideon registration
++or automatic AI update/state machine. These commands are prerequisites exercised
++by labelled probes, including queries against the actual original player.
++See [source selections](M2_AI_PERCEPTION_SOURCES.json),
++[evidence](../../Documentation/Implementation/M2_AI_PERCEPTION.md),
++[sight](AI_SIGHT_CONTRACTS.md) and [target lifetime](AI_TARGET_CONTRACTS.md).
++
++## Candidate membership and query rules
++
++The original lists are retained, with initialized links and idempotent insertion.
++AI InsertMe joins one faction; the original player InitialUpdate joins **both**
++factions, including before client association. Destructors unlink membership on
++normal removal, failed entry and unload. A registered AI's faction is fixed;
++re-insertion with a changed faction rejects. Lists own no objects. Pending members
++remain linked until destruction but queries immediately skip their checked
++identities. Hidden and inactive live members remain eligible, as in the original
++list traversal; GetNextObject's active-only enumeration is not substituted.
++
++The interface takes a typed candidate-list selector (Enemies/Smells/Exits/Ammo)
++instead of using class inheritance to choose the list. This avoids registering
++an incomplete AI_Mgr as a creatable world class. Enemy queries use Monster for a
++Cabal observer when that list is nonempty; otherwise they use Cabal, preserving
++the unusual original fallback. Players therefore participate for either faction.
++The source's special BoneLeech/TheHandAI/Thief class requests select the same
++faction lists without a specific-class flag; no corresponding NPC is imported.
++
++ExitHint has its original no-update lifetime and prepends to its list. Ammo and
++faction lists also prepend; SmellHint appends. Equal nonzero distances retain the
++first link. No sort, dead filter, activity filter or arbitrary self exclusion is
++added. The original zero-distance nearest sentinel remains in the specific-class
++branch. Enumeration is bounded by the registered list count and the session's
++65,536-object ceiling; corrupt lists fail explicitly.
++
++Origin is the current animated head, falling back to the checked object position;
++forward comes from current rotation in place of unported MoveObj cached vectors.
++Distance and direction calculations accumulate in double precision to avoid float
++overflow; original float rounding is not claimed bit-identical. Stored strengths
++remain floats. The radius boundary is inclusive. FaceObject accepts the entire forward hemisphere,
++including the exact side plane. Visible first rejects a player's original
++PU_INVISIBLE activation bit, then calls the existing body/head CanSee query.
++Sense and smell have no visibility/FOV/invisibility filter. IsPowerupActive uses
++real zero-initialized activation storage, with checked indices; pickup acquisition,
++duration, visual fade and reset/save behavior for those timed powers remain
++unported. Tests set the bit directly; no invisible pickup is claimed implemented.
++
++Specific preserves the original **reversed** IsKindOf(requested, candidateClass)
++comparison, and skips direction computation; FaceObject then observes its source
++zero dot product. AvoidTarget uses normalized observer-minus-cached-target, and
++rejects only when both target and candidate dots are positive. It requires a live,
++sampled target. Specific+AvoidTarget rejects because the source reads an
++uninitialized forward vector there. Nonfinite or coincident directions also reject
++instead of propagating invalid normalization. Nonpositive finite ranges return a
++successful empty query. Unknown flags, invalid poses, corrupt lists and unavailable
++collision are failures, not an absence of enemies. Last reports are read-only;
++inspection does not reissue queries or advance animation.
++
++## Stimuli and ownership
++
++ComputeStimuli returns original 0/1/3/4 (none/sight/smell/sense), with **-1** added
++for required-service/invalid-input failure. Future state code must handle -1
++explicitly, never interpret it as a valid stimulus. Original derived ComputeState
++uses -1 as its default request to recompute, then tests stimulus truthiness; future
++ports must guard failed ComputeStimuli calls before that branch and must not forward
++a failure as a state-selection request. Without a recent
++attacker it clears strengths and the old target, queries sight/smell/sense in that
++order, then assigns priority smell, sense, sight. Strength is 1-distance/range
++using **body** position, although candidate selection uses the head. A zero-strength
++higher-priority candidate can clear a positive lower-priority candidate. Health
++is hit points / maximum hit points, without clamping; invalid/overflow ratios fail.
++
++Smell returns a stimulus without making the hint a combat target. A selected dead
++character produces no stimulus and no second-nearest search. Target assignment
++uses the checked original link path; it does not sample target position or turn.
++A later RefreshTargetPosition/face or AI_Update must do so. Partial failures retain
++source operation order: normal acquisition may already have cleared its previous
++target. No rollback fabricates successful perception.
++
++The selected AI damage branch retains an attacker identity on accepted ordinary
++damage, before subsequent trigger callbacks. GetLastDamager validates the stable
++token on every access and clears pending/stale identities immediately. This replaces
++the original damage aggregate's overlapping inter-object link, which could break
++the AI target's same directed link. It owns nothing and cannot resurrect a reused
++slot. Limb-hit selection/multipliers remain unported; this increment does not claim
++the complete original AI damage pipeline.
++
++A remembered character attacker bypasses range/FOV/faction/visibility checks and
++preserves earlier stimulus strengths. Successful acquisition clears the memory.
++A dead attacker returns none while retaining the old target and memory, as in source.
++The source clears a non-character attacker but then still casts it to CBaseCharacter;
++we clear it and return explicit failure instead. Self-target link acquisition also
++rejects under existing contracts. No unsafe C-style character cast is introduced.
++
++ChooseOpportunityTarget preserves its current-weapon guard, clears strengths/target
++only after that guard, and runs sight-only selection. It retains the same strength,
++boundary and dead-target rules. It does not fire, navigate or run a script.
++
++## Inspection and remaining scope
++
++Skeleton inspection shows faction counts, ranges, stimulus type/strengths, damage
++priority, candidate/ray counts, selected checked identities, query origins and
++failures, even with a missing model. Actual player lifecycle is connected to faction
++membership. The existing GPU character probe now acquires the player through these
++commands outside the UI, including while hidden and after reload; its diagnostic
++name remains explicit. Source NPC entries remain unsupported.
++
++SubwayA accounting remains 187 created, four transferred sounds, 372 editor-only,
++17 unsupported and zero failed, plus seven SelfTriggers. Missing NPC states/actions,
++AI_Update retention/death/script/navigation, auditory alerts, attacks/model-key
++Fire, timed-power behavior, required client FX and ExitTrigger/session completion
++still block M2. No retail timing/physics, other-platform or XR parity is claimed.
+diff --git a/docs/AI_SIGHT_CONTRACTS.md b/docs/AI_SIGHT_CONTRACTS.md
+index 329c386..1bae970 100644
+--- a/docs/AI_SIGHT_CONTRACTS.md
++++ b/docs/AI_SIGHT_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI visibility queries
+ 
++> Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
++> candidate lists and stimulus/target selection now execute. Automatic NPC states
++> and complete M2 remain unavailable; earlier acquisition omissions are historical.
++
+ M2 remains incomplete. This ports AI_Mgr::CanSee and the two GlobalFilterFn flags
+ it requests. See [source selections](M2_AI_SIGHT_SOURCES.json),
+ [execution evidence](../../Documentation/Implementation/M2_AI_SIGHT.md),
+diff --git a/docs/AI_TARGET_CONTRACTS.md b/docs/AI_TARGET_CONTRACTS.md
+index dc76a58..c959a6d 100644
+--- a/docs/AI_TARGET_CONTRACTS.md
++++ b/docs/AI_TARGET_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original explicit AI targets and facing
+ 
++> Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
++> candidate lists and stimulus/target selection now execute. Automatic NPC states
++> and complete M2 remain unavailable; earlier acquisition omissions are historical.
++
+ M2 remains incomplete. This ports AI_Mgr::SetTarget, SetNewTarget,
+ MC_FaceTarget, MC_FacePos and its target MID_LINKBROKEN branch. The isolated
+ RefreshTargetPosition call selects the GetObjectPos statement from AI_Update;
+diff --git a/docs/M2_AI_PERCEPTION_SOURCES.json b/docs/M2_AI_PERCEPTION_SOURCES.json
+new file mode 100644
+index 0000000..c5bd4ae
+--- /dev/null
++++ b/docs/M2_AI_PERCEPTION_SOURCES.json
+@@ -0,0 +1,159 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "6ce71bba3ff3d99ba1aaeba31f51a1f8dfc8819a",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          150,
++          175
++        ],
++        [
++          244,
++          260
++        ],
++        [
++          1995,
++          2015
++        ],
++        [
++          2304,
++          2486
++        ],
++        [
++          2914,
++          3069
++        ]
++      ],
++      "use": "Faction lists, InsertMe, stimulus/optional target selection and radius search"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
++      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
++      "selected_lines": [
++        [
++          34,
++          47
++        ],
++        [
++          136,
++          139
++        ]
++      ],
++      "use": "Original stimulus slots/types and FIND flag values"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "selected_lines": [
++        [
++          350,
++          362
++        ],
++        [
++          431,
++          443
++        ],
++        [
++          527,
++          537
++        ],
++        [
++          614,
++          622
++        ]
++      ],
++      "use": "Zero-initialized power bits, both-faction insertion and unlink"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.h",
++      "sha256": "fb92d0a74b30d2a13b0589a2e4f90658a366cc2163e1fe37d446b2b50ed1da4a",
++      "selected_lines": [
++        [
++          58,
++          68
++        ],
++        [
++          119,
++          119
++        ]
++      ],
++      "use": "Activation storage/query indices"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
++      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462",
++      "selected_lines": [
++        [
++          188,
++          196
++        ],
++        [
++          438,
++          484
++        ]
++      ],
++      "use": "AI-only last-attacker identity and historical link lifetime"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/Destructable.h",
++      "sha256": "00e289d9cca1594035c8f20d0d45a076009c765e2767ce545f22f16d33bfea45",
++      "selected_lines": [
++        [
++          95,
++          99
++        ]
++      ],
++      "use": "Last-damager getter/clear"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ExitHint.cpp",
++      "sha256": "e3939c2ad9729e960b05b3dc366769b85424de808bacb2b538204edf8b522103",
++      "selected_lines": [
++        [
++          1,
++          35
++        ]
++      ],
++      "use": "Original hint initialization and list insertion"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ExitHint.h",
++      "sha256": "3a90b2d27e388b91c5f634bfffe1f785051635f2e58c29c099b2f29217d600fb",
++      "selected_lines": [
++        [
++          1,
++          51
++        ]
++      ],
++      "use": "Original hint list lifetime"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/BaseCharacter.h",
++      "sha256": "40160424f0b03f38b2513ba34e9abb44bc27d8a92b5735470d9d995f01d1face",
++      "selected_lines": [
++        [
++          37,
++          37
++        ]
++      ],
++      "use": "IsDead delegates to the damage aggregate"
++    }
++  ],
++  "adaptations": [
++    "Typed candidate-list selector avoids creatable incomplete AI registration",
++    "Initialized/idempotent list membership, checked pending/stale identities and bounded traversal",
++    "Current checked poses replace MoveObj cached transforms",
++    "Explicit failure for unavailable queries, undefined normalization/specific+avoid and unsafe non-character cast",
++    "Checked damage-memory identity replaces overlapping directed link; limb damage pipeline remains absent",
++    "Powerup activation storage/query only; timing/collection remain absent"
++  ],
++  "not_implemented": [
++    "Production NPCs, automatic AI_Update/state machine and navigation",
++    "AI auditory alerts, retention/death/scripts, Fire and special model keys",
++    "Timed powers, complete damage localization, required client FX and ExitTrigger/session",
++    "Retail/other-platform/XR parity"
++  ]
++}
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index 0baf161..6fd3da5 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original Player Entry Boundary
+ 
++> Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
++> candidate lists and stimulus/target selection now execute. Automatic NPC states
++> and complete M2 remain unavailable; earlier acquisition omissions are historical.
++
+ > Extended by [character audio contracts](CHARACTER_AUDIO_CONTRACTS.md): original
+ > voice helpers, player sound keys and material/liquid footsteps now execute.
+ > Earlier blanket character-audio omissions are historical; AI hearing and M2 remain open.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index a6416bb..7baa38e 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -517,3 +517,13 @@ geometry and the original fire/camera axes, then checked visually; no pixel-iden
+ retail claim. Related [ABC v6 importer](https://github.com/haekb/io_scene_lithtech/blob/master/src/reader_abc_v6_pc.py)
+ and [Godot reader](https://github.com/haekb/godot-abc-reader/blob/master/Models/ABC6.gd)
+ were reviewed for quaternion inversion and the distinct winding flag; no code was imported.
++
++## M2 AI perception
++
++Selected original AI_Mgr list membership, FindObjectInRadius, ComputeStimuli and
++ChooseOpportunityTarget now execute with typed query reports and checked lifetime.
++Original player dual-faction membership and the small ExitHint class are imported.
++AI attacker memory adapts the original damage identity branch to safe tokens;
++local damage/limb behavior and timed-power activation remain incomplete. See
++[source ranges/hashes](M2_AI_PERCEPTION_SOURCES.json) and
++[contracts and explicit source-UB corrections](AI_PERCEPTION_CONTRACTS.md).
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index bfeb1fe..6586057 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original Inventory and Vector Weapon Boundary
+ 
++> Extended by [AI perception contracts](AI_PERCEPTION_CONTRACTS.md): original
++> candidate lists and stimulus/target selection now execute. Automatic NPC states
++> and complete M2 remain unavailable; earlier acquisition omissions are historical.
++
+ > Later extension: [pickup contracts](PICKUP_CONTRACTS.md) supersede blanket
+ > pickup/SpawnObject omissions below for eight ammo and four health/armor classes.
+ 
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index 8262a0c..26e551d 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -60,7 +60,13 @@ namespace OpenBlood2
+         auto* ai = r ? dynamic_cast<AI_Mgr*>(r->game.get()) : nullptr;
+         const auto* player = g.server_shell.Player(g.local_client);
+         const auto* body = player ? g.objects.get(player->m_hObject) : nullptr;
+-        if (!ai || !body || !ai->SetNewTarget(body->handle) || !ai->RefreshTargetPosition() || !ai->MC_FaceTarget())
++        if (!ai || !body || !ai->InsertMe())
++            return false;
++        ai->m_fSeeingDist = 1500;
++        ai->m_fSensingDist = 200;
++        const auto stimulus = ai->ComputeStimuli();
++        if ((stimulus != 1 && stimulus != 4) || ai->GetTarget() != body->handle || !ai->RefreshTargetPosition() ||
++            !ai->MC_FaceTarget())
+             return false;
+         const auto delta = vector_subtract(body->state.m_Pos, r->state.m_Pos);
+         const auto forward = rotate_vector({0, 0, 1}, r->state.m_Rotation);
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 57473f0..c4182c8 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -11,8 +11,8 @@ namespace OpenBlood2
+                            "behavior remain unported.");
+         if (ImGui::CollapsingHeader("Live attachments", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+-            ImGui::TextWrapped("Held models follow current parent nodes. Visual children only; skins and first-person "
+-                               "visibility SFX are not rendered.");
++            ImGui::TextWrapped("Held models follow current parent nodes. Physical/nested attachments and dropped "
++                               "weapons remain unavailable.");
+             for (const auto& [id, a] : game.objects.attachments())
+             {
+                 const auto* parent = game.objects.get(a.parent);
+@@ -58,7 +58,42 @@ namespace OpenBlood2
+         ImGui::TableNextColumn();
+         const auto* r = game.objects.get(skeleton_selection);
+         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
+-        if (target_ai && ImGui::CollapsingHeader("Original AI target / facing", ImGuiTreeNodeFlags_DefaultOpen))
++        if (target_ai && ImGui::CollapsingHeader("Original AI perception", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            const auto& ai = *target_ai;
++            ImGui::Text("Faction: %s | Cabal %u / Monster %u (player in both)", ai.m_bCabal ? "Cabal" : "Monster",
++                        AI_Mgr::m_dwNumCabal, AI_Mgr::m_dwNumMonster);
++            ImGui::Text("Ranges: sight %.1f / smell %.1f / sense %.1f", ai.m_fSeeingDist, ai.m_fSmellingDist,
++                        ai.m_fSensingDist);
++            ImGui::Text("Stimulus %d | damage memory %s | calls %llu / failures %llu", ai.stimulus,
++                        ai.from_damage ? "used" : "not used", (unsigned long long)ai.perception_calls,
++                        (unsigned long long)ai.perception_failures);
++            ImGui::Text("Strength: sight %.3f / smell %.3f / sense %.3f / health %.3f", ai.m_fStimuli[0],
++                        ai.m_fStimuli[2], ai.m_fStimuli[3], ai.m_fStimuli[5]);
++            auto report = [&](const char* label, const AIFindReport& query)
++            {
++                const auto* selected = game.objects.get(query.selected);
++                ImGui::Text("%s: %s | selected %s", label, query.valid ? "evaluated" : "not evaluated / failed",
++                            selected && selected->life == Life::Alive ? selected->state.m_Name : "none / removed");
++                ImGui::Text("Visited %u / eligible %u / rays %u | distance %.2f | origin %s", query.visited,
++                            query.eligible, query.rays, query.distance, query.origin_head ? "head" : "body");
++                if (!query.error.empty())
++                    ImGui::TextWrapped("%s", query.error.c_str());
++            };
++            report("Sight", ai.stimulus_queries[0]);
++            report("Smell", ai.stimulus_queries[1]);
++            report("Sense", ai.stimulus_queries[2]);
++            if (ImGui::TreeNode("Last radius query"))
++            {
++                report("Query", ai.find);
++                ImGui::TreePop();
++            }
++            if (!ai.perception_error.empty())
++                ImGui::TextWrapped("%s", ai.perception_error.c_str());
++            ImGui::TextWrapped("Recorded source perception commands. No automatic NPC update/state machine, navigation "
++                               "or attack yet.");
++        }
++        if (target_ai && ImGui::CollapsingHeader("Original AI target / facing"))
+         {
+             const auto* target = game.objects.get(target_ai->GetTarget());
+             ImGui::Text("Target: %s | %s", target ? target->state.m_Name : "none / removed",
+@@ -77,7 +112,7 @@ namespace OpenBlood2
+             if (!target_ai->target_error.empty())
+                 ImGui::TextWrapped("%s", target_ai->target_error.c_str());
+             ImGui::TextWrapped(
+-                "Explicit source commands only. Automatic perception, tracking and AI states remain unavailable.");
++                "Original target commands. State-driven updates, tracking and AI states remain unavailable.");
+         }
+         if (!r)
+             ImGui::TextUnformatted("No selected model");
+@@ -148,7 +183,7 @@ namespace OpenBlood2
+                             (unsigned long long)ai->chance_suppressed, (unsigned long long)ai->busy_voices);
+                 ImGui::Text("No target %llu | unavailable actions %llu", (unsigned long long)ai->no_target,
+                             (unsigned long long)ai->unavailable_keys);
+-                ImGui::TextWrapped("Key dispatcher only. AI states, target acquisition, attacks and special actions "
++                ImGui::TextWrapped("Key dispatcher only. AI states, attacks and special actions "
+                                    "remain unavailable.");
+             }
+             if (character && ImGui::CollapsingHeader("Character motion keys",
+diff --git a/src/game/original/AIPerception.cpp b/src/game/original/AIPerception.cpp
+new file mode 100644
+index 0000000..389b772
+--- /dev/null
++++ b/src/game/original/AIPerception.cpp
+@@ -0,0 +1,358 @@
++// Selected AI_Mgr list registration, FindObjectInRadius, ComputeStimuli and
++// ChooseOpportunityTarget (Monolith 1997/1998). See AI_PERCEPTION_CONTRACTS.md.
++#include "AI_Mgr.h"
++#include "AmmoPickups.h"
++#include "ExitHint.h"
++#include "SmellHint.h"
++#include "engine/collision.h"
++#include <cmath>
++#include <limits>
++
++DLink AI_Mgr::m_CabalHead{}, AI_Mgr::m_MonsterHead{};
++unsigned AI_Mgr::m_dwNumCabal = 0, AI_Mgr::m_dwNumMonster = 0;
++void AI_Mgr::InitLists()
++{
++    if (!m_dwNumCabal)
++        dl_TieOff(&m_CabalHead);
++    if (!m_dwNumMonster)
++        dl_TieOff(&m_MonsterHead);
++}
++AI_Mgr::AI_Mgr()
++{
++    InitLists();
++}
++AI_Mgr::~AI_Mgr()
++{
++    if (m_Link.m_pData)
++    {
++        dl_Remove(&m_Link);
++        --(registered_cabal ? m_dwNumCabal : m_dwNumMonster);
++    }
++}
++bool AI_Mgr::InsertMe()
++{
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject))
++        return false;
++    if (m_Link.m_pData)
++        return registered_cabal == m_bCabal;
++    InitLists();
++    registered_cabal = m_bCabal;
++    dl_Insert(m_bCabal ? &m_CabalHead : &m_MonsterHead, &m_Link);
++    m_Link.m_pData = static_cast<BaseClass*>(this);
++    ++(m_bCabal ? m_dwNumCabal : m_dwNumMonster);
++    return true;
++}
++void AI_Mgr::InsertPlayer(CPlayerObj& player)
++{
++    InitLists();
++    if (!player.m_CabalLink.m_pData)
++    {
++        dl_Insert(&m_CabalHead, &player.m_CabalLink);
++        player.m_CabalLink.m_pData = static_cast<BaseClass*>(&player);
++        ++m_dwNumCabal;
++    }
++    if (!player.m_MonsterLink.m_pData)
++    {
++        dl_Insert(&m_MonsterHead, &player.m_MonsterLink);
++        player.m_MonsterLink.m_pData = static_cast<BaseClass*>(&player);
++        ++m_dwNumMonster;
++    }
++}
++void AI_Mgr::RemovePlayer(CPlayerObj& player)
++{
++    if (player.m_CabalLink.m_pData)
++    {
++        dl_Remove(&player.m_CabalLink);
++        player.m_CabalLink = {};
++        --m_dwNumCabal;
++    }
++    if (player.m_MonsterLink.m_pData)
++    {
++        dl_Remove(&player.m_MonsterLink);
++        player.m_MonsterLink = {};
++        --m_dwNumMonster;
++    }
++}
++HOBJECT AI_Mgr::FindObjectInRadius(OpenBlood2::AIFindList list, float range, unsigned flags, HCLASS specific)
++{
++    using namespace OpenBlood2;
++    find = {};
++    find.list = list;
++    find.flags = flags;
++    find.range = range;
++    auto* server = GetServerDE();
++    auto fail = [&](const char* reason) -> HOBJECT
++    {
++        find.error = reason;
++        find.valid = false;
++        find.selected = nullptr;
++        find.distance = 0;
++        return nullptr;
++    };
++    if (!server || !server->IsObjectAlive(m_hObject) || !std::isfinite(range) || (flags & ~15u) ||
++        ((flags & FindSpecific) && (!specific || (flags & FindAvoidTarget))))
++        return fail("Invalid radius request; specific+avoid uses uninitialized forward in original code");
++    find.valid = true;
++    if (range <= 0)
++        return nullptr;
++    DRotation head_rotation, rotation;
++    find.origin_head = server->GetModelNodeTransform(m_hObject, "head", &find.origin, &head_rotation);
++    if ((!find.origin_head && server->GetObjectPos(m_hObject, &find.origin) != DE_OK) ||
++        server->GetObjectRotation(m_hObject, &rotation) != DE_OK)
++        return fail("Observer transform unavailable");
++    const auto forward = rotate_vector({0, 0, 1}, rotation);
++    DLink* head = nullptr;
++    unsigned count = 0;
++    switch (list)
++    {
++        case AIFindList::Enemies:
++            // Preserve source fallback to Cabal when the Monster list is empty.
++            head = m_bCabal && m_dwNumMonster ? &m_MonsterHead : &m_CabalHead;
++            count = head == &m_MonsterHead ? m_dwNumMonster : m_dwNumCabal;
++            break;
++        case AIFindList::Smells:
++            head = &SmellHint::m_SmellHead;
++            count = SmellHint::m_dwNumSmells;
++            break;
++        case AIFindList::Exits:
++            head = &ExitHint::m_ExitHead;
++            count = ExitHint::m_dwNumExits;
++            break;
++        case AIFindList::Ammo:
++            head = &AmmoPickup::m_PickupHead;
++            count = AmmoPickup::m_dwNumPickups;
++            break;
++        default:
++            return fail("Unknown original candidate list");
++    }
++    if (!count)
++        return nullptr;
++    if (count > 65536)
++        return fail("Candidate list exceeds session bound");
++    auto distance = [](DVector a, DVector b)
++    { return std::hypot(double(a.x) - b.x, double(a.y) - b.y, double(a.z) - b.z); };
++    auto dot_direction = [&](DVector from, DVector to, double& dot)
++    {
++        const double length = distance(from, to);
++        if (!std::isfinite(length) || length == 0)
++            return false;
++        dot = ((double(to.x) - from.x) * forward.x + (double(to.y) - from.y) * forward.y +
++               (double(to.z) - from.z) * forward.z) /
++              length;
++        return std::isfinite(dot);
++    };
++    double saved_distance = 0;
++    for (auto* link = head->m_pNext; link != head; link = link->m_pNext)
++    {
++        if (!link || !link->m_pData || ++find.visited > count)
++            return fail("Invalid original candidate list");
++        auto candidate = server->ObjectToHandle(static_cast<BaseClass*>(link->m_pData));
++        if (!server->IsObjectAlive(candidate))
++            continue; // Pending removals stay linked until destruction.
++        DVector position;
++        if (server->GetObjectPos(candidate, &position) != DE_OK)
++            return fail("Candidate transform unavailable");
++        const double d = distance(find.origin, position);
++        if (!std::isfinite(d))
++            return fail("Nonfinite candidate distance");
++        if (d > range)
++            continue;
++        double object_dot = 0;
++        if (flags & FindSpecific)
++        {
++            // Deliberately retain original reversed IsKindOf arguments.
++            if (!server->IsKindOf(specific, server->GetObjectClass(candidate)))
++                continue;
++        }
++        else if (!dot_direction(find.origin, position, object_dot))
++            return fail("Coincident candidate has undefined original normalization");
++        if ((flags & FindAvoidTarget) && m_hTarget)
++        {
++            double target_dot = 0;
++            if (!server->IsObjectAlive(m_hTarget) || !target_position_valid ||
++                !dot_direction(m_vTargetPos, find.origin, target_dot))
++                return fail("Avoid-target requires a live target with a noncoincident sampled position");
++            if (target_dot > 0 && object_dot > 0)
++                continue;
++        }
++        if ((flags & FindFaceObject) && object_dot < 0)
++            continue;
++        if (flags & FindVisible)
++        {
++            auto* player = dynamic_cast<CPlayerObj*>(server->HandleToObject(candidate));
++            if (player && player->IsPowerupActive(PU_INVISIBLE))
++                continue;
++            const bool visible = CanSee(candidate);
++            find.rays += sight.rays;
++            if (sight.outcome == AISightOutcome::Invalid || sight.outcome == AISightOutcome::Unavailable)
++                return fail("Required visibility query failed");
++            if (!visible)
++                continue;
++        }
++        ++find.eligible;
++        // Equal distance keeps the first link; zero-distance sentinel is source behavior.
++        if (saved_distance == 0 || d < saved_distance)
++        {
++            saved_distance = d;
++            find.distance = static_cast<float>(d);
++            find.selected = candidate;
++        }
++    }
++    return find.selected;
++}
++int AI_Mgr::PerceptionFailure(const char* reason)
++{
++    ++perception_failures;
++    perception_error = reason;
++    stimulus = -1;
++    return -1;
++}
++int AI_Mgr::ComputeStimuli()
++{
++    using namespace OpenBlood2;
++    ++perception_calls;
++    perception_error.clear();
++    stimulus_queries = {};
++    stimulus = 0;
++    from_damage = false;
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject) || !std::isfinite(m_damage.m_fHitPoints) ||
++        !std::isfinite(m_damage.m_fMaxHitPoints) || m_damage.m_fMaxHitPoints <= 0 ||
++        std::abs(double(m_damage.m_fHitPoints) / m_damage.m_fMaxHitPoints) > std::numeric_limits<float>::max())
++        return PerceptionFailure("Observer or health ratio unavailable");
++    HOBJECT next = m_damage.GetLastDamager();
++    int kind = 0;
++    if (next)
++    {
++        from_damage = true;
++        // Original cleared this handle but still cast the non-character below (UB).
++        if (!dynamic_cast<CBaseCharacter*>(server->HandleToObject(next)))
++        {
++            m_damage.ClearLastDamager();
++            return PerceptionFailure("Last damager is not a character; unsafe original cast rejected");
++        }
++        kind = 1;
++    }
++    else
++    {
++        DVector origin;
++        if (server->GetObjectPos(m_hObject, &origin) != DE_OK)
++            return PerceptionFailure("Observer position unavailable");
++        m_fStimuli.fill(0);
++        if (!SetNewTarget(nullptr))
++            return PerceptionFailure("Previous target release failed");
++        const auto visible = FindObjectInRadius(AIFindList::Enemies, m_fSeeingDist, FindVisible | FindFaceObject);
++        stimulus_queries[0] = find;
++        if (!find.valid)
++            return PerceptionFailure(find.error.c_str());
++        const auto smell = FindObjectInRadius(AIFindList::Smells, m_fSmellingDist);
++        stimulus_queries[1] = find;
++        if (!find.valid)
++            return PerceptionFailure(find.error.c_str());
++        const auto sense = FindObjectInRadius(AIFindList::Enemies, m_fSensingDist);
++        stimulus_queries[2] = find;
++        if (!find.valid)
++            return PerceptionFailure(find.error.c_str());
++        // Source query order is sight/smell/sense; priority assignment is smell/sense/sight.
++        auto select = [&](HOBJECT h, float range, unsigned index, int type)
++        {
++            if (!h || range <= 0)
++                return true;
++            DVector pos;
++            if (server->GetObjectPos(h, &pos) != DE_OK)
++                return false;
++            const double distance =
++                std::hypot(double(pos.x) - origin.x, double(pos.y) - origin.y, double(pos.z) - origin.z);
++            if (distance <= range)
++            {
++                m_fStimuli[index] = float(1 - distance / range);
++                next = m_fStimuli[index] > 0 ? h : nullptr;
++                kind = type;
++            }
++            return true;
++        };
++        if (!select(smell, m_fSmellingDist, 2, 3) || !select(sense, m_fSensingDist, 3, 4) ||
++            !select(visible, m_fSeeingDist, 0, 1))
++            return PerceptionFailure("Stimulus position unavailable");
++    }
++    m_fStimuli[5] = m_damage.m_fHitPoints / m_damage.m_fMaxHitPoints;
++    if (next)
++    {
++        if (kind != 3)
++        {
++            const auto* character = dynamic_cast<CBaseCharacter*>(server->HandleToObject(next));
++            if (!character)
++                return PerceptionFailure("Selected target is not a character");
++            if (character->m_damage.IsDead())
++                return 0; // No next-nearest retry; damage memory retained.
++            if (!SetNewTarget(next))
++                return PerceptionFailure("Target link acquisition failed");
++        }
++        m_damage.ClearLastDamager();
++        stimulus = kind;
++    }
++    return stimulus;
++}
++bool AI_Mgr::ChooseOpportunityTarget()
++{
++    using namespace OpenBlood2;
++    from_damage = false;
++    stimulus_queries = {};
++    ++perception_calls;
++    perception_error.clear();
++    stimulus = 0;
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject))
++    {
++        PerceptionFailure("Observer unavailable");
++        return false;
++    }
++    if (!m_InventoryMgr.CurrentWeapon())
++        return false;
++    m_fStimuli.fill(0);
++    if (!SetNewTarget(nullptr))
++    {
++        PerceptionFailure("Previous target release failed");
++        return false;
++    }
++    const auto next = FindObjectInRadius(AIFindList::Enemies, m_fSeeingDist, FindVisible | FindFaceObject);
++    if (!find.valid)
++    {
++        PerceptionFailure(find.error.c_str());
++        return false;
++    }
++    if (!next || m_fSeeingDist <= 0)
++        return false;
++    DVector origin, position;
++    if (server->GetObjectPos(m_hObject, &origin) != DE_OK || server->GetObjectPos(next, &position) != DE_OK)
++    {
++        PerceptionFailure("Opportunity position unavailable");
++        return false;
++    }
++    const double distance =
++        std::hypot(double(position.x) - origin.x, double(position.y) - origin.y, double(position.z) - origin.z);
++    if (distance > m_fSeeingDist)
++        return false;
++    m_fStimuli[0] = float(1 - distance / m_fSeeingDist);
++    if (m_fStimuli[0] <= 0)
++    {
++        m_fStimuli[0] = 0;
++        return false;
++    }
++    const auto* character = dynamic_cast<CBaseCharacter*>(server->HandleToObject(next));
++    if (!character)
++    {
++        PerceptionFailure("Opportunity target is not a character");
++        return false;
++    }
++    if (character->m_damage.IsDead())
++        return false;
++    if (!SetNewTarget(next))
++    {
++        PerceptionFailure("Opportunity link acquisition failed");
++        return false;
++    }
++    stimulus = 1;
++    return true;
++}
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index e34946a..94bc043 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -4,6 +4,30 @@
+ 
+ namespace OpenBlood2
+ {
++    enum class AIFindList
++    {
++        Enemies,
++        Smells,
++        Exits,
++        Ammo
++    };
++    enum AIFindFlags : unsigned
++    {
++        FindAvoidTarget = 1,
++        FindVisible = 2,
++        FindFaceObject = 4,
++        FindSpecific = 8
++    };
++    struct AIFindReport
++    {
++        AIFindList list = AIFindList::Enemies;
++        unsigned flags = 0, visited = 0, eligible = 0, rays = 0;
++        float range = 0, distance = 0;
++        DVector origin{};
++        HOBJECT selected = nullptr;
++        bool valid = false, origin_head = false;
++        std::string error;
++    };
+     enum class AIKeyOutcome
+     {
+         None,
+@@ -42,12 +66,32 @@ namespace OpenBlood2
+ } // namespace OpenBlood2
+ 
+ // Selective original AI_Mgr::InitStatics/OnStringKey port. No production AI class
+-// registration, state machine, target acquisition, Fire or MC_Extra implementation yet.
++// registration, state machine, Fire or MC_Extra implementation yet.
++// Perception commands: AI_PERCEPTION_CONTRACTS.md; no automatic AI update loop.
+ // Selected CanSee and explicit target/facing commands are documented in
+ // AI_SIGHT_CONTRACTS.md and AI_TARGET_CONTRACTS.md.
+ class AI_Mgr : public CBaseCharacter
+ {
+   public:
++    AI_Mgr();
++    ~AI_Mgr() override;
++    bool InsertMe();
++    static void InsertPlayer(CPlayerObj&);
++    static void RemovePlayer(CPlayerObj&);
++    static DLink m_CabalHead, m_MonsterHead;
++    static unsigned m_dwNumCabal, m_dwNumMonster;
++    bool m_bCabal = true;
++    float m_fSeeingDist = 0, m_fSmellingDist = 0, m_fSensingDist = 0;
++    std::array<float, 6> m_fStimuli{}; // sight, sound, smell, sense, threat, health
++    HOBJECT FindObjectInRadius(OpenBlood2::AIFindList, float, unsigned flags = 0, HCLASS specific = nullptr);
++    int ComputeStimuli(); // Original 0/1/3/4 results; -1 means a required query failed.
++    bool ChooseOpportunityTarget();
++    OpenBlood2::AIFindReport find;
++    std::array<OpenBlood2::AIFindReport, 3> stimulus_queries;
++    std::uint64_t perception_calls = 0, perception_failures = 0;
++    int stimulus = 0;
++    bool from_damage = false;
++    std::string perception_error;
+     static constexpr int StateIdle = 5, StateScript = 101;
+     bool InitStatics(std::shared_ptr<CAnim_Sound>);
+     bool CanSee(HOBJECT);
+@@ -87,6 +131,10 @@ class AI_Mgr : public CBaseCharacter
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+ 
+   private:
++    DLink m_Link{};
++    bool registered_cabal = true;
++    static void InitLists();
++    int PerceptionFailure(const char*);
+     HOBJECT m_hTarget = nullptr;
+     bool TargetFailure(const char*);
+     // Original subclasses share class/gender tables and their retained voice.
+diff --git a/src/game/original/Destructable.cpp b/src/game/original/Destructable.cpp
+index da23fd7..2610378 100644
+--- a/src/game/original/Destructable.cpp
++++ b/src/game/original/Destructable.cpp
+@@ -1,5 +1,6 @@
+ // Selected shared damage/lifetime and brush trigger branches; see M2_BRUSH_SOURCES.json.
+ #include "Destructable.h"
++#include "AI_Mgr.h"
+ #include "engine/collision.h"
+ #include "engine/objects.h"
+ #include "spawn_object.h"
+@@ -35,6 +36,13 @@ DBOOL CDestructable::Init(HOBJECT object, CInventoryMgr* inventory)
+     m_pInventoryMgr = inventory;
+     return DTRUE;
+ }
++HOBJECT CDestructable::GetLastDamager()
++{
++    auto* server = BaseClass::GetServerDE();
++    if (!server || !server->IsObjectAlive(last_damager_))
++        last_damager_ = nullptr;
++    return last_damager_;
++}
+ void CDestructable::CalculateResistance(DBYTE value)
+ {
+     if (value == 1)
+@@ -173,6 +181,10 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD
+             m_fHitPoints -= amount;
+             m_fLastDamageAmount += amount;
+             last_damage = damage;
++            // Original AI-only retaliation identity; limb multipliers remain unavailable.
++            // A checked token avoids sharing/breaking the AI target's directed link.
++            if (dynamic_cast<AI_Mgr*>(owner) && damage.type != OpenBlood2::DamageType::Death)
++                last_damager_ = damage.attacker;
+             if (m_fHitPoints <= 0)
+             {
+                 m_bDead = DTRUE;
+diff --git a/src/game/original/Destructable.h b/src/game/original/Destructable.h
+index 485e8e6..066ec48 100644
+--- a/src/game/original/Destructable.h
++++ b/src/game/original/Destructable.h
+@@ -24,6 +24,11 @@ class CDestructable : public Aggregate
+     {
+         return m_bDead != 0;
+     }
++    HOBJECT GetLastDamager();
++    void ClearLastDamager()
++    {
++        last_damager_ = nullptr;
++    }
+     void CalculateResistance(DBYTE);
+     bool Heal(float);
+     bool MegaHeal(float);
+@@ -55,6 +60,9 @@ class CDestructable : public Aggregate
+     DDWORD EngineMessageFn(LPBASECLASS, DDWORD, void*, DFLOAT) override;
+     DDWORD ObjectMessageFn(LPBASECLASS, HOBJECT, DDWORD, HMESSAGEREAD) override;
+ 
++  public:
++  private:
++    HOBJECT last_damager_ = nullptr; // Checked identity, never a borrowed C++ pointer.
+   public:
+     float m_fMaxHitPoints = 1, m_fMaxMegaHitPoints = 1, m_fMaxArmorPoints = 1, m_fMaxNecroArmorPoints = 1;
+ };
+diff --git a/src/game/original/ExitHint.cpp b/src/game/original/ExitHint.cpp
+new file mode 100644
+index 0000000..e4699e0
+--- /dev/null
++++ b/src/game/original/ExitHint.cpp
+@@ -0,0 +1,36 @@
++// ExitHint.cpp: implementation of the CExitHint class.
++//
++//////////////////////////////////////////////////////////////////////
++
++#include "ExitHint.h"
++#include "cpp_server_de.h"
++
++// Registration: game/registration.cpp.
++
++DLink ExitHint::m_ExitHead;
++DDWORD ExitHint::m_dwNumExits = 0;
++
++//////////////////////////////////////////////////////////////////////
++// Construction/Destruction
++//////////////////////////////////////////////////////////////////////
++
++DDWORD ExitHint::EngineMessageFn(DDWORD messageID, void* pData, float fData)
++{
++    switch (messageID)
++    {
++        case MID_INITIALUPDATE:
++        {
++            if (m_Link.m_pData)
++                break;
++            // insert it into the list
++            dl_Insert(&m_ExitHead, &m_Link);
++            m_Link.m_pData = (void*)this;
++            m_dwNumExits++;
++
++            GetServerDE()->SetNextUpdate(m_hObject, 0.0f);
++            break;
++        }
++    }
++
++    return B2BaseClass::EngineMessageFn(messageID, pData, fData);
++}
+diff --git a/src/game/original/ExitHint.h b/src/game/original/ExitHint.h
+new file mode 100644
+index 0000000..9f980f2
+--- /dev/null
++++ b/src/game/original/ExitHint.h
+@@ -0,0 +1,30 @@
++#pragma once
++// Selected original ExitHint.h, Monolith 1997; initialized links prevent rollback hazards.
++#include "B2BaseClass.h"
++#include "dlink.h"
++class ExitHint : public B2BaseClass
++{
++  public:
++    ExitHint()
++    {
++        if (!m_dwNumExits)
++        {
++            dl_TieOff(&m_ExitHead);
++            m_ExitHead.m_pData = nullptr;
++        }
++    }
++    ~ExitHint() override
++    {
++        if (m_Link.m_pData && m_dwNumExits)
++        {
++            dl_Remove(&m_Link);
++            --m_dwNumExits;
++        }
++    }
++    static DLink m_ExitHead;
++    static DDWORD m_dwNumExits;
++    DLink m_Link{};
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++};
+diff --git a/src/game/original/PlayerObj.cpp b/src/game/original/PlayerObj.cpp
+index bf675d7..a43a2f4 100644
+--- a/src/game/original/PlayerObj.cpp
++++ b/src/game/original/PlayerObj.cpp
+@@ -2,6 +2,7 @@
+ // docs/M2_PLAYER_SOURCES.json. This is an executable lifecycle port, not the
+ // complete 7,657-line PlayerObj gameplay implementation.
+ #include "PlayerObj.h"
++#include "AI_Mgr.h"
+ #include "GameStartPoint.h"
+ #include <algorithm>
+ #include <cmath>
+@@ -37,6 +38,7 @@ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
+ }
+ CPlayerObj::~CPlayerObj()
+ {
++    AI_Mgr::RemovePlayer(*this);
+     auto* server = GetServerDE();
+     if (m_hCurSound)
+         server->KillSound(m_hCurSound);
+@@ -70,6 +72,7 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
+     if (!m_InventoryMgr.Init(m_hObject, m_hClient) || !m_damage.Init(m_hObject, &m_InventoryMgr) ||
+         !server->SetBlockingPriority(m_hObject, 50))
+         return DFALSE;
++    AI_Mgr::InsertPlayer(*this);
+     m_bFirstUpdate = DTRUE;
+     m_InventoryMgr.SetAmmoCount(1, 50);
+     server->SetNextUpdate(m_hObject, .001f);
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index d2e10fe..92cbc67 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -32,10 +32,26 @@ class CBaseCharacter : public B2BaseClass
+     virtual bool OnStringKey(ArgList*);
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+ };
++enum PowerupType
++{
++    PU_NONE = -1,
++    PU_INVULNERABLE,
++    PU_INVISIBLE,
++    PU_TRIPLEDAMAGE,
++    PU_INCORPOREAL,
++    PU_SILENT,
++    PU_MAXTYPES
++};
+ class CPlayerObj : public CBaseCharacter
+ {
+   public:
+     ~CPlayerObj() override;
++    // Original activation storage/query only; collection/timing is still unported.
++    std::array<bool, PU_MAXTYPES> m_bPowerupActivated{};
++    bool IsPowerupActive(int index) const
++    {
++        return index >= 0 && index < PU_MAXTYPES && m_bPowerupActivated[index];
++    }
+     bool PlayPlayerSound(std::string_view, float radius, DBYTE volume, bool stream, DBYTE priority = 2);
+     OpenBlood2::SoundId m_hCurSound = 0;
+     bool m_bDisableFootsteps = false, m_bNextFootstepLeft = true;
+@@ -126,6 +142,8 @@ class CPlayerObj : public CBaseCharacter
+     bool OnStringKey(ArgList*) override;
+ 
+   private:
++    friend class AI_Mgr;
++    DLink m_CabalLink{}, m_MonsterLink{};
+     OpenBlood2::PlayerStats last_sent_stats_{-1, -1, -1};
+     std::minstd_rand idle_random_{1};
+     float animation_start_ = 0;
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index f583091..6f0b14f 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -7,6 +7,7 @@
+ #include "game/original/ClientLightFX.h"
+ #include "game/original/DetailSprite.h"
+ #include "game/original/Door.h"
++#include "game/original/ExitHint.h"
+ #include "game/original/GameStartPoint.h"
+ #include "game/original/HandWeaponModel.h"
+ #include "game/original/Key.h"
+@@ -256,6 +257,7 @@ namespace OpenBlood2
+                              &b2base,
+                              construct<PathPoint>,
+                              {{"ActionTarget", std::string{}}, {"ActionMessage", std::string{}}}};
++        const ClassInfo exit_hint{"ExitHint", &b2base, construct<ExitHint>, {}};
+         const ClassInfo smell{"SmellHint", &b2base, construct<SmellHint>, {}};
+         const ClassInfo character{"CBaseCharacter", &b2base, construct<CBaseCharacter>, {}};
+         const ClassInfo player{"CPlayerObj", &character, construct<CPlayerObj>, {}};
+@@ -587,23 +589,24 @@ namespace OpenBlood2
+                objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
+                objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
+                objects.register_class(world_properties) && objects.register_class(smell) &&
+-               objects.register_class(character) && objects.register_class(player) && objects.register_class(volume) &&
+-               objects.register_class(water) && objects.register_class(blood) && objects.register_class(acid) &&
+-               objects.register_class(ladder) && objects.register_class(conveyor) && objects.register_class(damage) &&
+-               objects.register_class(freefall) && objects.register_class(trigger) &&
+-               objects.register_class(key_pickup) && objects.register_class(pickup) &&
+-               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+-               objects.register_class(health_base) && objects.register_class(armor_base) &&
+-               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
+-               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
+-               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
+-               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
+-               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
+-               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
+-               objects.register_class(objectives_trigger) && objects.register_class(big_trigger) &&
+-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
+-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+-               objects.register_class(rotating_brush) && objects.register_class(hand_model);
++               objects.register_class(exit_hint) && objects.register_class(character) &&
++               objects.register_class(player) && objects.register_class(volume) && objects.register_class(water) &&
++               objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
++               objects.register_class(conveyor) && objects.register_class(damage) && objects.register_class(freefall) &&
++               objects.register_class(trigger) && objects.register_class(key_pickup) &&
++               objects.register_class(pickup) && objects.register_class(ammo_pickup) &&
++               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
++               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
++               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
++               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
++               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
++               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
++               objects.register_class(megahealth_pickup) && objects.register_class(ward_pickup) &&
++               objects.register_class(necroward_pickup) && objects.register_class(objectives_trigger) &&
++               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
++               objects.register_class(door) && objects.register_class(rotating_door) &&
++               objects.register_class(destructable_brush) && objects.register_class(rotating_brush) &&
++               objects.register_class(hand_model);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index bd4e58f..93f9203 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -646,3 +646,17 @@ if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+     add_test(NAME gpu.model_private COMMAND model_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/model-private.png" "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(gpu.model_private PROPERTIES LABELS "gpu;private;model_view" TIMEOUT 30 RUN_SERIAL TRUE)
+ endif()
++
++add_executable(ai_perception_tests ai_perception_tests.cpp)
++target_link_libraries(ai_perception_tests PRIVATE blood2_game)
++blood2_project_options(ai_perception_tests)
++foreach(case IN ITEMS factions selection visibility hints stimuli retaliation opportunity failures lifetime)
++    add_test(NAME ai_perception.${case} COMMAND ai_perception_tests "${case}")
++    set_tests_properties(ai_perception.${case} PROPERTIES LABELS "headless;ai_perception" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case IN ITEMS catalog subway)
++        add_test(NAME ai_perception.${case} COMMAND ai_perception_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(ai_perception.${case} PROPERTIES LABELS "headless;private;ai_perception" TIMEOUT 90)
++    endforeach()
++endif()
+diff --git a/tests/ai_perception_tests.cpp b/tests/ai_perception_tests.cpp
+new file mode 100644
+index 0000000..5ef0b14
+--- /dev/null
++++ b/tests/ai_perception_tests.cpp
+@@ -0,0 +1,442 @@
++#include "brush_fixture.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/ExitHint.h"
++#include "game/original/SmellHint.h"
++#include "game/server_adapter.h"
++#include "model_fixture.h"
++#include <cmath>
++#include <functional>
++#include <iostream>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool near(float a, float b)
++    {
++        return std::abs(a - b) < .001f;
++    }
++    bool setup(GameSession& g)
++    {
++        CHECK(g.initialize());
++        auto floor = test_brush::box("floor", {-1000, -20, -1000}, {1000, -10, 1000});
++        for (auto& s : floor.surfaces)
++            s.flags = 1;
++        std::string error;
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        return true;
++    }
++    AI_Mgr* actor(GameSession& g, DVector pos = {0, 10, 0}, bool cabal = true)
++    {
++        static const ClassInfo type{"AIPerceptionProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AI_Mgr>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Pos = pos;
++        s.m_Flags = FLAG_SOLID;
++        SAFE_STRCPY(s.m_Name, "perception probe (no AI states)");
++        auto h = g.objects.create(&type, s);
++        auto* r = g.objects.get(h);
++        auto* ai = r ? dynamic_cast<AI_Mgr*>(r->game.get()) : nullptr;
++        if (!ai)
++            return nullptr;
++        r->dimensions = {2, 5, 2};
++        ai->m_bCabal = cabal;
++        ai->m_damage.m_fHitPoints = ai->m_damage.m_fMaxHitPoints = 100;
++        ai->m_damage.Init(h);
++        return ai->InsertMe() ? ai : nullptr;
++    }
++    HOBJECT object(GameSession& g, const char* type, DVector pos, unsigned flags = 0)
++    {
++        ObjectCreateStruct s;
++        s.m_Pos = pos;
++        s.m_Flags = flags;
++        return g.objects.create(g.objects.find_class(type), s);
++    }
++    // Explicit synthetic player fixture bypasses retail model/entry prerequisites.
++    // Private tests below exercise the real registered player and original InitialUpdate.
++    struct PlayerProbe : CPlayerObj
++    {
++        DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
++        {
++            return B2BaseClass::EngineMessageFn(m, d, f);
++        }
++    };
++    CPlayerObj* player(GameSession& g, DVector pos)
++    {
++        static const ClassInfo type{"PerceptionPlayerFixture",
++                                    g.objects.find_class("CPlayerObj"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<PlayerProbe>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        auto h = object(g, type.name.c_str(), pos, FLAG_SOLID);
++        auto* r = g.objects.get(h);
++        if (!r)
++            return nullptr;
++        r->dimensions = {2, 5, 2};
++        auto* p = dynamic_cast<CPlayerObj*>(r->game.get());
++        AI_Mgr::InsertPlayer(*p);
++        return p;
++    }
++    bool factions(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        auto* ally = actor(g, {0, 10, 20});
++        auto* enemy = actor(g, {20, 10, 50}, false);
++        auto* p = player(g, {0, 10, 30});
++        CHECK(a && ally && enemy && p && AI_Mgr::m_dwNumCabal == 3 && AI_Mgr::m_dwNumMonster == 2);
++        CHECK(a->FindObjectInRadius(AIFindList::Enemies, 100) == p->m_hObject);
++        CHECK(enemy->FindObjectInRadius(AIFindList::Enemies, 100) == p->m_hObject);
++        CHECK(a->InsertMe() && AI_Mgr::m_dwNumCabal == 3);
++        a->m_bCabal = false;
++        CHECK(!a->InsertMe());
++        a->m_bCabal = true;
++        AI_Mgr::InsertPlayer(*p);
++        CHECK(AI_Mgr::m_dwNumMonster == 2);
++        CHECK(g.objects.remove(p->m_hObject));
++        CHECK(a->FindObjectInRadius(AIFindList::Enemies, 100) == enemy->m_hObject);
++        CHECK(g.objects.finish_frame() && AI_Mgr::m_dwNumMonster == 1);
++        CHECK(g.unload_world() && AI_Mgr::m_dwNumCabal == 0 && AI_Mgr::m_dwNumMonster == 0);
++        // Empty Monster list falls back to Cabal, including self: reject undefined normalize explicitly.
++        a = actor(g);
++        CHECK(a && !a->FindObjectInRadius(AIFindList::Enemies, 100) && !a->find.valid);
++        return true;
++    }
++    bool selection(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        auto* far = actor(g, {0, 10, 100}, false);
++        auto* first = actor(g, {-30, 10, 40}, false);
++        auto* second = actor(g, {30, 10, 40}, false);
++        CHECK(a && far && first && second);
++        CHECK(a->FindObjectInRadius(AIFindList::Enemies, 100) == second->m_hObject); // prepend + tie
++        g.objects.get(second->m_hObject)->activity = OBJSTATE_INACTIVE;
++        CHECK(a->FindObjectInRadius(AIFindList::Enemies, 100) ==
++              second->m_hObject); // list ignores activity/visible flag
++        CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 49) && a->find.valid);
++        CHECK(a->FindObjectInRadius(AIFindList::Enemies, 50) == second->m_hObject); // inclusive query boundary
++        CHECK(g.objects.remove(second->m_hObject));
++        CHECK(a->FindObjectInRadius(AIFindList::Enemies, 100) == first->m_hObject);
++        CHECK(g.objects.finish_frame());
++        CHECK(a->FindObjectInRadius(AIFindList::Enemies, 100, FindSpecific,
++                                    g.objects.find_class("AIPerceptionProbe")) == first->m_hObject);
++        CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 100, FindSpecific,
++                                     g.objects.find_class("CBaseCharacter"))); // reversed source IsKindOf
++        // Specific-object branch leaves fObjectDp at zero, so FaceObject doesn't reject a rear object.
++        g.objects.get(first->m_hObject)->state.m_Pos = {0, 10, -30};
++        CHECK(a->FindObjectInRadius(AIFindList::Enemies, 100, FindSpecific | FindFaceObject,
++                                    g.objects.find_class("AIPerceptionProbe")) == first->m_hObject);
++        CHECK(a->find.valid && !a->GetTarget() && g.objects.link_count(a->m_hObject) == 0);
++        return true;
++    }
++    bool visibility(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        auto* p = player(g, {0, 10, 50});
++        auto* behind = actor(g, {0, 10, -10}, false);
++        CHECK(a && p && behind);
++        CHECK(a->FindObjectInRadius(AIFindList::Enemies, 100, FindVisible | FindFaceObject) == p->m_hObject);
++        p->m_bPowerupActivated[PU_INVISIBLE] = true;
++        CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 100, FindVisible | FindFaceObject) && a->find.valid &&
++              a->find.rays == 0);
++        CHECK(a->FindObjectInRadius(AIFindList::Enemies, 100, FindFaceObject) ==
++              p->m_hObject); // sense bypasses invisibility
++        p->m_bPowerupActivated[PU_INVISIBLE] = false;
++        auto block = object(g, "BaseClass", {0, 10, 25}, FLAG_SOLID);
++        CHECK(block);
++        g.objects.get(block)->dimensions = {5, 20, 5};
++        CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 100, FindVisible | FindFaceObject) && a->find.valid &&
++              a->find.rays == 1);
++        CHECK(a->FindObjectInRadius(AIFindList::Enemies, 100) == behind->m_hObject); // no ray/FOV for sense
++        CHECK(g.objects.remove(block) && g.objects.finish_frame());
++        g.objects.get(p->m_hObject)->state.m_Pos = {50, 10, 0};
++        CHECK(a->FindObjectInRadius(AIFindList::Enemies, 100, FindVisible | FindFaceObject) ==
++              p->m_hObject); // exact side accepted
++        return true;
++    }
++    bool hints(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        auto first = object(g, "ExitHint", {0, 10, 40}), second = object(g, "ExitHint", {0, 10, 40});
++        auto smell1 = object(g, "SmellHint", {0, 10, 30}), smell2 = object(g, "SmellHint", {0, 10, 30});
++        auto ammo = object(g, "BulletAmmoPU", {0, 10, 20});
++        CHECK(a && first && second && smell1 && smell2 && ammo);
++        CHECK(a->FindObjectInRadius(AIFindList::Exits, 100) == second);
++        CHECK(a->FindObjectInRadius(AIFindList::Smells, 100) == smell1); // scents append oldest first
++        CHECK(a->FindObjectInRadius(AIFindList::Ammo, 100, FindSpecific, g.objects.find_class("BulletAmmoPU")) == ammo);
++        CHECK(!a->FindObjectInRadius(AIFindList::Ammo, 100, FindSpecific, g.objects.find_class("AmmoPickup")) &&
++              a->find.valid);
++        auto target = object(g, "BaseClass", {0, 10, -30});
++        CHECK(a->SetNewTarget(target) && a->RefreshTargetPosition());
++        CHECK(!a->FindObjectInRadius(AIFindList::Exits, 100, FindAvoidTarget) &&
++              a->find.valid); // source uses observer-target, not reverse
++        g.objects.get(target)->state.m_Pos = {0, 10, 30};
++        CHECK(a->RefreshTargetPosition());
++        CHECK(a->FindObjectInRadius(AIFindList::Exits, 100, FindAvoidTarget) == second);
++        CHECK(g.objects.remove(second) && g.objects.remove(smell1));
++        CHECK(a->FindObjectInRadius(AIFindList::Exits, 100) == first);
++        CHECK(a->FindObjectInRadius(AIFindList::Smells, 100) == smell2);
++        CHECK(g.step(20.1) && SmellHint::m_dwNumSmells == 0 && ExitHint::m_dwNumExits == 1);
++        CHECK(g.unload_world() && ExitHint::m_dwNumExits == 0);
++        return true;
++    }
++    bool stimuli(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        auto* p = player(g, {0, 10, 40});
++        auto smell = object(g, "SmellHint", {10, 10, 0});
++        CHECK(a && p && smell);
++        a->m_fSeeingDist = a->m_fSmellingDist = a->m_fSensingDist = 100;
++        a->m_damage.m_fHitPoints = 50;
++        CHECK(a->ComputeStimuli() == 1 && a->GetTarget() == p->m_hObject);
++        CHECK(near(a->m_fStimuli[0], .6f) && near(a->m_fStimuli[2], .9f) && near(a->m_fStimuli[3], .6f) &&
++              near(a->m_fStimuli[5], .5f));
++        CHECK(!a->target_position_valid); // acquisition does not invent AI_Update's target sample
++        p->m_bPowerupActivated[PU_INVISIBLE] = true;
++        CHECK(a->ComputeStimuli() == 4 && a->GetTarget() == p->m_hObject);
++        a->m_fSensingDist = 0;
++        CHECK(a->ComputeStimuli() == 3 && !a->GetTarget()); // smell isn't a combat target/link
++        CHECK(a->stimulus_queries[1].selected == smell && g.objects.link_count(a->m_hObject) == 0);
++        a->m_fSmellingDist = 0;
++        CHECK(a->ComputeStimuli() == 0 && !a->GetTarget());
++        // Range query uses head; strength uses body. A boundary sight overwrites a positive sense target.
++        p->m_bPowerupActivated[PU_INVISIBLE] = false;
++        a->m_fSeeingDist = 40;
++        a->m_fSensingDist = 100;
++        CHECK(a->ComputeStimuli() == 0 && !a->GetTarget() && near(a->m_fStimuli[3], .6f));
++        a->m_fSeeingDist = 100;
++        p->m_damage.m_bDead = true;
++        auto* other = actor(g, {20, 10, 60}, false);
++        CHECK(other);
++        CHECK(a->ComputeStimuli() == 0 && !a->GetTarget()); // don't retry farther living enemy
++        CHECK(a->perception_failures == 0);
++        return true;
++    }
++    bool damage(GameSession& g, AI_Mgr* a, HOBJECT attacker)
++    {
++        auto msg = g.server.StartMessageToObject(g.server.HandleToObject(attacker), a->m_hObject, damage_message);
++        CHECK(msg && g.server.WriteDamage(msg, {{}, {}, 1, DamageType::Normal, attacker}) == DE_OK);
++        g.server.EndMessage(msg);
++        return true;
++    }
++    bool retaliation(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        auto* p = player(g, {0, 10, -500});
++        CHECK(a && p);
++        a->m_fStimuli[0] = .7f;
++        a->m_fSeeingDist = 1;
++        CHECK(damage(g, a, p->m_hObject) && a->m_damage.GetLastDamager() == p->m_hObject);
++        CHECK(a->ComputeStimuli() == 1 && a->from_damage && a->GetTarget() == p->m_hObject &&
++              near(a->m_fStimuli[0], .7f));
++        CHECK(!a->m_damage.GetLastDamager() && g.objects.link_count(a->m_hObject) == 1);
++        CHECK(damage(g, a, p->m_hObject));
++        p->m_damage.m_bDead = true;
++        CHECK(a->ComputeStimuli() == 0 && a->GetTarget() == p->m_hObject &&
++              a->m_damage.GetLastDamager() == p->m_hObject);
++        auto noncharacter = object(g, "BaseClass", {0, 10, 20});
++        CHECK(noncharacter && damage(g, a, noncharacter));
++        CHECK(a->ComputeStimuli() == -1 && !a->m_damage.GetLastDamager() && a->GetTarget() == p->m_hObject);
++        p->m_damage.m_bDead = false;
++        CHECK(damage(g, a, p->m_hObject) && g.objects.remove(p->m_hObject));
++        CHECK(!a->m_damage.GetLastDamager() && g.objects.finish_frame() && !a->GetTarget());
++        return true;
++    }
++    bool opportunity(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        auto* p = player(g, {0, 10, 40});
++        CHECK(a && p);
++        a->m_fSeeingDist = 100;
++        CHECK(a->SetNewTarget(p->m_hObject));
++        CHECK(!a->ChooseOpportunityTarget() && a->GetTarget() == p->m_hObject); // no weapon, no clear
++        CHECK(a->m_InventoryMgr.Init(a->m_hObject, nullptr));
++        CHECK(a->m_InventoryMgr.ObtainWeapon(1, 0) == InventoryResult::Ok);
++        CHECK(a->ChooseOpportunityTarget() && a->GetTarget() == p->m_hObject && near(a->m_fStimuli[0], .6f));
++        p->m_bPowerupActivated[PU_INVISIBLE] = true;
++        CHECK(!a->ChooseOpportunityTarget() && !a->GetTarget() && a->perception_failures == 0);
++        return true;
++    }
++    bool failures(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* a = actor(g);
++        auto* p = player(g, {0, 10, 40});
++        CHECK(a && p);
++        for (auto f : {NAN, INFINITY})
++            CHECK(!a->FindObjectInRadius(AIFindList::Enemies, f) && !a->find.valid);
++        CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 0) && a->find.valid);
++        CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 100, 16) && !a->find.valid);
++        CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 100, FindSpecific | FindAvoidTarget,
++                                     g.objects.find_class("CPlayerObj")) &&
++              !a->find.valid);
++        auto getter = g.server.GetObjectPos;
++        g.server.GetObjectPos = [](HOBJECT, DVector*) -> DRESULT { return DE_ERROR; };
++        CHECK(!a->FindObjectInRadius(AIFindList::Enemies, 100) && !a->find.valid);
++        g.server.GetObjectPos = getter;
++        a->m_fSeeingDist = 100;
++        g.server.collision_ready = false;
++        CHECK(a->ComputeStimuli() == -1 && !a->GetTarget());
++        g.server.collision_ready = true;
++        auto link = g.server.CreateInterObjectLink;
++        g.server.CreateInterObjectLink = [](HOBJECT, HOBJECT) -> DRESULT { return DE_ERROR; };
++        CHECK(a->ComputeStimuli() == -1 && !a->GetTarget());
++        g.server.CreateInterObjectLink = link;
++        a->m_damage.m_fHitPoints = std::numeric_limits<float>::max();
++        a->m_damage.m_fMaxHitPoints = std::numeric_limits<float>::min();
++        CHECK(a->ComputeStimuli() == -1);
++        a->m_damage.m_fMaxHitPoints = 0;
++        CHECK(a->ComputeStimuli() == -1);
++        CHECK(g.objects.remove(a->m_hObject));
++        CHECK(a->ComputeStimuli() == -1);
++        CHECK(g.objects.finish_frame() && g.server.list_count() == 0);
++        return true;
++    }
++    bool lifetime(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        HOBJECT old = nullptr;
++        for (int i = 0; i < 4; ++i)
++        {
++            auto* a = actor(g);
++            auto* p = player(g, {0, 10, 40});
++            CHECK(a && p && !g.objects.get(old));
++            a->m_fSeeingDist = 100;
++            CHECK(a->ComputeStimuli() == 1);
++            old = p->m_hObject;
++            CHECK(damage(g, a, old));
++            CHECK(g.objects.remove(old) && !a->m_damage.GetLastDamager());
++            CHECK(g.objects.finish_frame() && !a->GetTarget() && a->target_link_breaks == 1);
++            CHECK(g.unload_world() && AI_Mgr::m_dwNumCabal == 0 && AI_Mgr::m_dwNumMonster == 0 &&
++                  SmellHint::m_dwNumSmells == 0);
++            CHECK(g.server.list_count() == 0 && g.server.message_count() == 0 && g.server.string_count() == 0);
++            // unload clears the collision service; next cycle rebuilds it without rebinding a second session.
++            auto floor = test_brush::box("floor", {-100, -20, -100}, {100, -10, 100});
++            for (auto& s : floor.surfaces)
++                s.flags = 1;
++            std::string error;
++            CHECK(g.collision.build(floor, error));
++            g.server.collision_ready = true;
++        }
++        return true;
++    }
++    bool catalog(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        auto* a = actor(g);
++        auto* p = player(g, {0, 10, 100});
++        CHECK(a && p);
++        unsigned samples = 0;
++        for (const char* name : {"m_civilian1", "f_civilian1", "labtech", "m_cultist1", "f_cultist1", "gideon"})
++        {
++            auto* r = g.objects.get(a->m_hObject);
++            CHECK(g.models.load("models/enemies/" + std::string(name) + ".abc", r->model, error));
++            for (unsigned clip = 0; clip < r->model->animations.size(); ++clip)
++            {
++                r->animation.animation = clip;
++                r->animation.time = r->model->animations[clip].duration * .5;
++                const auto before = r->animation;
++                CHECK(a->FindObjectInRadius(AIFindList::Enemies, 500, FindFaceObject) == p->m_hObject);
++                CHECK(a->find.origin_head && a->find.valid && r->animation.time == before.time &&
++                      r->animation.revision == before.revision && a->model_keys == 0);
++                ++samples;
++            }
++        }
++        std::cout << "Private NPC head-origin acquisition samples=" << samples << "; no animation advancement\n";
++        return true;
++    }
++    bool subway(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        HOBJECT old = nullptr;
++        for (int i = 0; i < 2; ++i)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            auto* p = g.server_shell.Player(g.local_client);
++            CHECK(p && !g.objects.get(old));
++            auto pos = g.objects.get(p->m_hObject)->state.m_Pos;
++            pos.x -= 50;
++            auto* a = actor(g, pos);
++            CHECK(a);
++            auto* r = g.objects.get(a->m_hObject);
++            CHECK(g.models.load("models/enemies/m_cultist1.abc", r->model, error));
++            CHECK(AI_Mgr::m_dwNumCabal == 2 && AI_Mgr::m_dwNumMonster == 1);
++            a->m_fSensingDist = 200;
++            CHECK(a->ComputeStimuli() == 4 && a->GetTarget() == p->m_hObject);
++            CHECK(a->RefreshTargetPosition() && a->MC_FaceTarget());
++            a->m_fSeeingDist = 1500;
++            const auto stim = a->ComputeStimuli();
++            CHECK((stim == 1 || stim == 4) && a->GetTarget() == p->m_hObject);
++            p->m_bPowerupActivated[PU_INVISIBLE] = true;
++            CHECK(a->ComputeStimuli() == 4 && a->stimulus_queries[0].rays == 0);
++            old = p->m_hObject;
++            CHECK(g.leave_player() && !a->GetTarget() && AI_Mgr::m_dwNumMonster == 0);
++            CHECK(g.enter_player(error));
++            p = g.server_shell.Player(g.local_client);
++            CHECK(p && p->m_hObject != old && a->ComputeStimuli() > 0 && a->GetTarget() == p->m_hObject);
++            CHECK(g.unload_world() && AI_Mgr::m_dwNumMonster == 0 && AI_Mgr::m_dwNumCabal == 0 &&
++                  g.server.string_count() == 0);
++            std::cout << "Subway cycle=" << i
++                      << ": original player enters both factions; acquisition/invisibility/leave/reentry checked\n";
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::map<std::string, std::function<bool(const char*)>> tests{{"factions", factions},
++                                                                        {"selection", selection},
++                                                                        {"visibility", visibility},
++                                                                        {"hints", hints},
++                                                                        {"stimuli", stimuli},
++                                                                        {"retaliation", retaliation},
++                                                                        {"opportunity", opportunity},
++                                                                        {"failures", failures},
++                                                                        {"lifetime", lifetime},
++                                                                        {"catalog", catalog},
++                                                                        {"subway", subway}};
++    const auto t = tests.find(argv[1]);
++    return t != tests.end() && t->second(argc > 2 ? argv[2] : "") ? 0 : 1;
++}

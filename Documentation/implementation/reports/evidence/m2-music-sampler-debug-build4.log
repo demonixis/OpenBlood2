@@ -1,0 +1,9 @@
+[0/2] Re-checking globbed directories...
+[1/43] Scanning /home/yann/projects/lithtech/Blood2/src/app/world_sound_smoke.cpp for CXX dependencies
+[2/43] Scanning /home/yann/projects/lithtech/Blood2/tests/dls_sampler_tests.cpp for CXX dependencies
+[3/43] Generating CXX dyndep file tests/CMakeFiles/dls_sampler_tests.dir/CXX.dd
+[4/43] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[5/9] Building CXX object CMakeFiles/blood2_app.dir/src/app/world_sound_smoke.cpp.o
+[6/9] Building CXX object tests/CMakeFiles/dls_sampler_tests.dir/dls_sampler_tests.cpp.o
+[7/9] Linking CXX executable blood2
+[8/9] Linking CXX executable tests/dls_sampler_tests

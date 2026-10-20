@@ -1,0 +1,14 @@
+410/420 Testing: ai_recovery.crawling
+410/420 Test: ai_recovery.crawling
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_recovery_tests" "crawling"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_recovery.crawling" start time: Oct 16 14:04 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_recovery.crawling" end time: Oct 16 14:04 CEST
+"ai_recovery.crawling" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,42 @@
+{
+  "purpose": "Timing control only: previous request-only Door implementation, same current class layout and test object; not acceptance evidence",
+  "compile": [
+    "/usr/bin/clang++",
+    "-I<workspace>/Blood2/src/game/original",
+    "-I<workspace>/Blood2/src",
+    "-I<workspace>/Blood2/src/game/legacy",
+    "-isystem",
+    "<workspace>/Blood2/build/sanitize/_deps/sdl3-build/include-revision",
+    "-isystem",
+    "<workspace>/Blood2/build/sanitize/_deps/sdl3-src/include",
+    "-g",
+    "-std=c++20",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic",
+    "-fsanitize=address,undefined",
+    "-fno-omit-frame-pointer",
+    "-o",
+    "/tmp/b2-door-baseline-control/Door.o",
+    "-c",
+    "/tmp/b2-door-baseline-control/Door.cpp"
+  ],
+  "link": [
+    "/usr/bin/clang++",
+    "-g",
+    "-fsanitize=address,undefined",
+    "-pthread",
+    "tests/CMakeFiles/ai_runtime_tests.dir/ai_runtime_tests.cpp.o",
+    "-o",
+    "/tmp/b2-door-baseline-control/ai_runtime_tests",
+    "/tmp/b2-door-baseline-control/Door.o",
+    "libblood2_game.a",
+    "libengine.a",
+    "_deps/sdl3-build/libSDL3.a",
+    "-lm",
+    "_deps/spdlog-build/libspdlogd.a"
+  ],
+  "source_commit": "5520fa7483ad5a7af6a1eb2b800b455eae9018fa",
+  "source_path": "src/game/original/Door.cpp",
+  "source_sha256": "5f19b0f1c665f4562bc285c6996383f7857ecbf0f170e0188fea92566e332a03"
+}

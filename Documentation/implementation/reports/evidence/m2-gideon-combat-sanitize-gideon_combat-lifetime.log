@@ -1,0 +1,14 @@
+617/618 Testing: gideon_combat.lifetime
+617/618 Test: gideon_combat.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon_combat_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/gideon-combat-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"gideon_combat.lifetime" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"gideon_combat.lifetime" end time: Oct 17 02:23 CEST
+"gideon_combat.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

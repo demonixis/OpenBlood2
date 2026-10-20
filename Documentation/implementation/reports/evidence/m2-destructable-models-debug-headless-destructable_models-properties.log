@@ -1,0 +1,14 @@
+708/718 Testing: destructable_models.properties
+708/718 Test: destructable_models.properties
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable_model_tests" "properties" "/home/yann/projects/lithtech/Blood2/build/debug/tests/destructable-model-properties"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"destructable_models.properties" start time: Oct 17 05:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"destructable_models.properties" end time: Oct 17 05:15 CEST
+"destructable_models.properties" time elapsed: 00:00:00
+----------------------------------------------------------

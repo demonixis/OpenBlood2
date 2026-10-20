@@ -1,0 +1,14 @@
+530/534 Testing: explosion_rings.lifecycle
+530/534 Test: explosion_rings.lifecycle
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion_ring_tests" "lifecycle" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/explosion-rings-lifecycle"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"explosion_rings.lifecycle" start time: Oct 16 21:15 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"explosion_rings.lifecycle" end time: Oct 16 21:15 CEST
+"explosion_rings.lifecycle" time elapsed: 00:00:00
+----------------------------------------------------------

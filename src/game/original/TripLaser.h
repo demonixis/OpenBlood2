@@ -3,7 +3,7 @@
 #include "engine/audio.h"
 #include <string>
 // Selected original ObjectDLL/TripLaser (10/23/97). Save/load are unavailable;
-// see docs/contracts/trip_laser_contracts.md.
+// see Documentation/contracts/trip_laser_contracts.md.
 class TripLaser : public B2BaseClass
 {
   public:

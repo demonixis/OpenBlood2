@@ -1,0 +1,1682 @@
+--- selected sources/blood2/ObjectDLL/PlayerObj.cpp
++++ Blood2/src/game/original/PlayerObj.cpp
+@@ -1,567 +1,233 @@
+-// Source range ObjectDLL/PlayerObj.cpp:574-735
+-void CPlayerObj::PostPropRead(ObjectCreateStruct *pStruct)
+-{
+-	_mbscpy((unsigned char*)pStruct->m_Filename, (const unsigned char*)"Models\\Characters\\Caleb.abc");
+-	_mbscpy((unsigned char*)pStruct->m_SkinName, (const unsigned char*)"Skins\\Characters\\Caleb1.dtx");
+-	_mbscpy((unsigned char*)pStruct->m_Name,		(const unsigned char*)"player");
+-	pStruct->m_ObjectType = OT_MODEL;
+-}
++// Selected original entry code; source ranges and adaptations are recorded in
++// docs/M2_PLAYER_SOURCES.json. This is an executable lifecycle port, not the
++// complete 7,657-line PlayerObj gameplay implementation.
++#include "PlayerObj.h"
++#include "GameStartPoint.h"
++#include <algorithm>
++#include <cmath>
+ 
+-
+-// --------------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CPlayerObj::InitialUpdate()
+-//
+-//	PURPOSE:	The first update, set various player object properties.
+-//
+-// --------------------------------------------------------------------------- //
+-DBOOL CPlayerObj::InitialUpdate(int nData)
+-{
+-	// NOTE: m_hClient is DNULL when we get here!!!
+-
+-	// Dev code to help us find the "ghost player" bug...
+-	m_hPlrPosVar = g_pServerDE->GetGameConVar("playerpos");
+-	if (!m_hPlrPosVar)
+-	{
+-		g_pServerDE->SetGameConVar("playerpos", "0");
+-		m_hPlrPosVar = g_pServerDE->GetGameConVar("playerpos");
+-	}
+-
+-
+-	// Do the initial update...
+-	CServerDE* pServerDE = GetServerDE();
+-
+-	pServerDE->SetNetFlags(m_hObject, NETFLAG_POSUNGUARANTEED|NETFLAG_ROTUNGUARANTEED|NETFLAG_ANIMUNGUARANTEED);
+-
+-	m_InventoryMgr.Init(m_hObject, m_hClient);	// note: m_hClient is NULL, but it both get updated later
+-	m_damage.Init(m_hObject, &m_InventoryMgr, &m_Anim_Sound);
+-
+-	// Set the team ID...
+-	UpdateTeamID();
+-
+-	//for the internal AI enemy lists
+-	dl_Insert( &AI_Mgr::m_MonsterHead, &m_MonsterLink );
+-	m_MonsterLink.m_pData = ( void * )this;
+-	AI_Mgr::m_dwNumMonster++;
+-
+-	dl_Insert( &AI_Mgr::m_CabalHead, &m_CabalLink );
+-	m_CabalLink.m_pData = ( void * )this;
+-	AI_Mgr::m_dwNumCabal++;
+-
+-	m_bFirstUpdate = DTRUE;
+-
+-	m_fMoveVel = 0;
+-	m_fLadderVel = 0;
+-	m_fJumpVel = 0;
+-	m_fLeashLen = 0;
+-	m_fMoveMultiplier = 0;
+-	m_fBaseMoveAccel = 0;
+-	m_fJumpMultiplier = 0;
+-
+-	m_bDoorPush = DFALSE;
+-	VEC_INIT( m_vDoorPush );
+-
+-	m_fTeleportTime = 0;
+-	
+-	m_LeashLenTrack.Init(pServerDE, "LeashLen", DNULL, DEFAULT_LEASHLEN);
+-
+-	// Only init stuff needed when restoring a savegame.
+-	if (nData == INITIALUPDATE_SAVEGAME)
+-	{
+-		return DTRUE;
+-	}
+-
+-	// Give max ammo for now
+-/*	for (int i=AMMO_BULLET; i <= AMMO_MAXAMMOTYPES; i++)
+-	{
+-		m_InventoryMgr.AddAmmo(i, (DFLOAT)1000);
+-	}*/
+-	m_InventoryMgr.AddAmmo(AMMO_BULLET, 50);
+-
+-// Change weapon
+-	m_bSpectatorMode	= DFALSE;
+-	SendMessageToClient(SMSG_SPECTATORMODE);
+-	m_bZoomView = DFALSE;
+-
+-	pServerDE->SetNextUpdate(m_hObject, (DFLOAT).001);
+-	m_bLastJumpCommand = DFALSE;
+-	m_bLastCrouchCommand = DFALSE;
+-	m_bForcedCrouch	= DFALSE;
+-	m_bFalling         = DFALSE;
+-	m_bServerFalling   = DFALSE;
+-
+-	m_damage.SetHitPoints(100.0f);
+-	m_damage.SetArmorPoints(0.0f);
+-	m_damage.SetMaxHitPoints(100.0f);
+-	m_damage.SetMaxMegaHitPoints(100.0f);
+-	m_damage.SetMaxArmorPoints(100.0f);
+-	m_damage.SetMaxNecroArmorPoints(100.0f);
+-	m_nLastHitPoints		= 0;
+-	m_nLastDamage			= 0;
+-	m_nLastAmmo				= 0;
+-	m_nLastArmor			= 0;
+-	m_nLastFocus			= 0;
+-	m_damage.SetMass(PA_DEFAULT_MASS);
+-	pServerDE->SetBlockingPriority(m_hObject, BLOCKPRIORITY_PLAYER);
+-
+-	// Override the friction
+-	pServerDE->SetFrictionCoefficient(m_hObject, 0.0f);
+-//	pServerDE->SetFrictionCoefficient(m_hObject, 15.0f);
+-
+-    // Set the Smell Time
+-    m_fSmellTime = pServerDE->GetTime();
+-    m_fSmellDelay = 0.5f;              // Delay between smell drops
+-
+-	DVector vPos;
+-    pServerDE->GetObjectPos(m_hObject, &vPos);
+-
+-	ObjectCreateStruct theStruct;
+-	INIT_OBJECTCREATESTRUCT(theStruct);
+-
+-	DRotation rRot;
+-    ROT_INIT(rRot);
+-
+-    ROT_COPY(theStruct.m_Rotation, rRot);
+-	VEC_COPY(theStruct.m_Pos, vPos);
+-
+-	pServerDE->CreateObject(pServerDE->GetClass("SmellHint"), &theStruct);
+-
+-	// Send the initial health, armor and ammo values to the client
+-	// [blg] Andy says we don't need this...m_hClient is NULL at this point anyway
+-	// [blg] SendMessageToClient(SMSG_HEALTH);
+-
+-//	pServerDE->SetForceIgnoreLimit(m_hObject, 250.0f);
+-
+-	m_Frags = 0;
+-	m_MeleeKills = 0;
+-	m_CurGun = WEAP_NONE;
+-	m_CurGunSlot = 0;
+-	m_bMovementBlocked = DFALSE;
+-	// Wait until we get PLAYERATTRIBUTES from client for first respawn.
+-
+-	// Set initial dims
+-	DVector dims;
+-	VEC_SET(dims, 12, gCharacterValues[m_nCharacter].fHeightStanding/2, 12)
+-	pServerDE->SetObjectDims(m_hObject, &dims);
+-
+-	m_hstrTrigger = pServerDE->CreateString("TRIGGER");
+-
+-	// All done...
+-	return DTRUE;
+-}
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CPlayerObj::UpdateTeamID
+-//
+-//	PURPOSE:	Updates the team ID value that this player is on
+-//
+-// ----------------------------------------------------------------------- //
+-
+-void CPlayerObj::UpdateTeamID()
+-{
+-// Source range ObjectDLL/PlayerObj.cpp:1560-1614
+-DBOOL CPlayerObj::Update(DVector *pMovement)
+-{
+-	CServerDE* pServerDE = GetServerDE();
+-	DBOOL	bNothingHappened = DTRUE;
+-
+-
+-	// Dev code to help us find the "ghost player" bug...
+-	if (m_hPlrPosVar)
+-	{
+-		if( pServerDE->GetVarValueFloat( m_hPlrPosVar ) > 0.0f )
+-			pServerDE->SetNetFlags( m_hObject, 0 );
+-		else
+-			pServerDE->SetNetFlags(m_hObject, NETFLAG_POSUNGUARANTEED|NETFLAG_ROTUNGUARANTEED|NETFLAG_ANIMUNGUARANTEED);
+-	}
+-
+-	// Set our next update
+-	pServerDE->SetNextUpdate(m_hObject, (DFLOAT).001);
+-
+-	// Sanity check
+-	if (!m_hClient)
+-		return DTRUE;
+-
+-	// Update timers
+-	m_fSlowDeathSafeTimer -= g_pServerDE->GetFrameTime();
+-	if (m_fSlowDeathSafeTimer < 0) m_fSlowDeathSafeTimer = 0;
+-
+-	m_fSlowDeathStayTimer -= g_pServerDE->GetFrameTime();
+-	if (m_fSlowDeathStayTimer < 0) m_fSlowDeathStayTimer = 0;
+-
+-
+-	// Check for first update
+-	if (m_bFirstUpdate)
+-	{
+-		SetMoveVel(gMoveVel[m_nAttribSpeed-1]);
+-		SetJumpVel(DEFAULT_JUMPVEL);
+-	
+-		m_PStateChangeFlags = PSTATE_ALL;
+-		UpdateClientPhysics(); // (to make sure they have their model around)
+-		TeleportClientToServerPos();
+-
+-		// Initial update for some stats..
+-		m_nStatsFlags = PLAYERSTATS_HEALTH | PLAYERSTATS_AMMO | PLAYERSTATS_ALTAMMO | PLAYERSTATS_ARMOR | PLAYERSTATS_FOCUS;
+-		SendMessageToClient( SMSG_PLAYERSTATSUPDATE );
+-		
+-		m_bFirstUpdate = DFALSE;
+-	}
+-
+-	// Check for sound completion
+-	if (m_hCurSound)
+-	{
+-		DBOOL bSoundDone = DFALSE;
+-		if (pServerDE->IsSoundDone(m_hCurSound, &bSoundDone) == LT_OK && bSoundDone)
+-		{
+-			g_pServerDE->KillSound( m_hCurSound );
+-			m_hCurSound = DNULL;
+-// Source range ObjectDLL/PlayerObj.cpp:2053-2285
+-void CPlayerObj::Respawn()
+-{
+-	// Get our server pointer...
+-	CServerDE* pServerDE = GetServerDE();
+-
+-	// If we're currently dead in our humiliation any, gib...
+-	if (pServerDE->GetModelAnimation(m_hObject) == m_Anim_Sound.m_nAnim_HUMILIATION[3])
+-	{
+-		if (m_bDead)
+-		{
+-			int    nType   = m_damage.GetLastDamageType();
+-			DFLOAT fDamage = m_damage.GetLastDamageAmount();
+-
+-			DVector vDir;
+-			m_damage.GetLastDamageDirection(&vDir);
+-
+-			CreateGibs(vDir, ((int)m_damage.GetMass())>>5, nType, fDamage);
+-		}
+-	}
+-
+-	// Check for spectator mode...
+-	if (m_bSpectatorMode)
+-		ToggleSpectatorMode();
+-
+-	// Respawn as necessary...
+-	if (!m_damage.IsDead() || g_pBloodServerShell->GetGameType() != GAMETYPE_SINGLE)
+-	{
+-		// Set up the filenames
+-		SetCharacter(m_nCharacter);
+-
+-		// Reset any hidden nodes
+-		AIShared.ResetNodes(m_hObject);
+-
+-		// Set flags
+-		DDWORD  dwFlags = FLAG_VISIBLE | FLAG_MODELKEYS | FLAG_YROTATION | FLAG_ANIMTRANSITION | FLAG_TOUCH_NOTIFY | FLAG_SOLID | FLAG_STAIRSTEP | FLAG_SHADOW;
+-//		DDWORD  dwFlags = FLAG_SOLID | FLAG_VISIBLE | FLAG_TOUCH_NOTIFY |  FLAG_STAIRSTEP | FLAG_SHADOW | FLAG_KEEPALIVE | FLAG_FULLPOSITIONRES | FLAG_FORCECLIENTUPDATE | FLAG_MODELKEYS | FLAG_YROTATION | FLAG_ANIMTRANSITION | FLAG_GRAVITY;
+-		pServerDE->SetObjectFlags(m_hObject, dwFlags);
+-
+-		DVector dims;
+-		VEC_INIT(dims)
+-		pServerDE->SetVelocity(m_hObject, &dims);
+-//		m_fEyeLevel = gCharacterValues[m_nCharacter].fEyeLevelStanding;
+-//		SendMessageToClient(SMSG_EYELEVEL);
+-
+-//		m_damage.Reset();
+-		m_damage.SetHitPoints(100);
+-		m_damage.SetArmorPoints(0);
+-		m_bDead = DFALSE;
+-		m_fAirLevel	= MAX_AIR_LEVEL;
+-
+-		m_fDeathTimer         = 0;
+-		m_fSlowDeathSafeTimer = 0;
+-		m_fSlowDeathStayTimer = 0;
+-		m_bInSlowDeath        = DFALSE;
+-
+-		m_bBurning = DFALSE;
+-
+-		if (g_pBloodServerShell->IsMultiplayerGame())
+-		{
+-			DFLOAT fDeltaTime = g_pServerDE->GetTime() - s_fCreatedTime;
+-
+-			if (fDeltaTime > 5.0f && IsRandomChance(65))
+-			{
+-				PlayVoiceGroupEventOnClient(VME_SPAWN);
+-			}
+-
+-			SetMultiplayerAmmo();			
+-		}
+-		else
+-		{
+-			for (int i = AMMO_BULLET; i <= AMMO_MAXAMMOTYPES; i++)
+-				m_InventoryMgr.SetAmmoCount(i, 0.0f);
+-
+-			m_InventoryMgr.SetAmmoCount(AMMO_BULLET, DEFAULT_BULLETS);
+-		}
+-	}
+-
+-	// Dump the bomb list.
+-	if( m_pBombList )
+-	{
+-		ObjectLink* pLink = m_pBombList->m_pFirstLink;
+-		while( pLink )
+-		{
+-			g_pServerDE->RemoveObject( pLink->m_hObject );
+-			pLink = pLink->m_pNext;
+-		}
+-
+-		pServerDE->RelinquishList( m_pBombList );
+-		m_pBombList = DNULL;
+-	}
+-
+-	UpdateClientPhysics(); // (to make sure they have their model around)
+-	TeleportClientToServerPos();
+-}
+-
+-
+-// --------------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CPlayerObj::GoToStartPoint()
+-//
+-//	PURPOSE:	Teleports the player to a startpoint.
+-//
+-// --------------------------------------------------------------------------- //
+-void CPlayerObj::GoToStartPoint()
+-{
+-	CServerDE* pServerDE = GetServerDE();
+-	if (!pServerDE || !g_pBloodServerShell)
+-		return;
+-
+-	DVector pos;
+-
+-	VEC_INIT(pos)
+-
+-	// Get all the Blood 2 start points...
+-
+-	ObjectList*	pList = pServerDE->FindNamedObjects("Blood2StartPoint");
+-	if (!pList || !pList->m_pFirstLink || pList->m_nInList <= 0) 
+-	{
+-		return;
+-	}
+-
+-	GameStartPoint* pGSP = DNULL;
+-	ObjectLink* pLink = pList->m_pFirstLink;
+-
+-	// For a multiplayer game, just get a random startpoint
+-	if(g_pBloodServerShell->GetGameType() != GAMETYPE_SINGLE)
+-	{
+-		int nStartPoint = pServerDE->IntRandom(0, pList->m_nInList - 1);
+-		for (int i=0; i < nStartPoint; i++)
+-		{
+-			pLink = pLink->m_pNext;
+-		}
+-
+-		pGSP = (GameStartPoint*)pServerDE->HandleToObject(pLink->m_hObject);
+-
+-		// For team-based games, find a start point for our team...
+-		if (g_pBloodServerShell->IsMultiplayerTeamBasedGame())
+-		{
+-			int nSafety = pList->m_nInList;
+-
+-			while (pGSP && pGSP->GetTeamID() != (int)GetTeamID() && pGSP->GetTeamID() != 0)
+-			{
+-				pLink = pLink->m_pNext;
+-				if (!pLink) pLink = pList->m_pFirstLink;
+-
+-				if (pLink)
+-				{
+-					pGSP = (GameStartPoint*)pServerDE->HandleToObject(pLink->m_hObject);
+-				}
+-				else
+-				{
+-					pGSP = NULL;
+-				}
+-
+-				if (--nSafety < 0)
+-				{
+-					pGSP = NULL;
+-				}
+-			}
+-
+-			if (!pGSP)
+-			{
+-				pLink = pList->m_pFirstLink;
+-				if (pLink) pGSP = (GameStartPoint*)pServerDE->HandleToObject(pLink->m_hObject);
+-			}
+-		}
+-	}
+-	else  // Single player, go to a named startpoint, if it exists
+-	{
+-		DBOOL bRemoveString = DFALSE;
+-		GameStartPoint *pGSPSingle = DNULL;
+-		HSTRING hstrStartPoint = g_pBloodServerShell->GetStartPointName();
+-
+-		if (!hstrStartPoint) 
+-		{
+-			bRemoveString = DTRUE;
+-			hstrStartPoint = pServerDE->CreateString("start");
+-		}
+-
+-		pGSP = DNULL;
+-		for (int i=0; i < pList->m_nInList; i++)
+-		{
+-			pGSP = (GameStartPoint*)pServerDE->HandleToObject(pLink->m_hObject);
+-
+-			if (!pGSP->IsMultiplayer())
+-			{
+-				// save it just in case
+-				pGSPSingle = pGSP;
+-
+-				if (pServerDE->CompareStringsUpper(hstrStartPoint, pGSP->GetName()))
+-				{
+-					break;
+-				}
+-			}
+-			pLink = pLink->m_pNext;
+-			pGSP = DNULL;
+-		}
+-		
+-		if( bRemoveString )
+-			pServerDE->FreeString( hstrStartPoint );
+-
+-		// Couldn't find a named startpoint, try to use any single player
+-		if (!pGSP && pGSPSingle) pGSP = pGSPSingle;
+-	}
+-
+-	DRotation rRot;
+-	ROT_INIT(rRot);
+-	if (pGSP)
+-	{
+-		// Set the rotation..
+-		m_fYaw = pGSP->GetPitchYawRoll().y;
+-		m_fPitch = 0.0f;
+-		HOBJECT hGSP = pServerDE->ObjectToHandle((LPBASECLASS)pGSP);
+-		pServerDE->GetObjectPos(hGSP, &pos);
+-
+-		// Send any trigger message this is supposed to cause
+-		pGSP->SendTrigger();
+-	}
+-
+-	pServerDE->TeleportObject(m_hObject, &pos);
+-	SendMessageToClient(SMSG_FORCEROTATION);
+-
+-	MoveObjectToGround(m_hObject);
+-	
+-	pServerDE->RelinquishList(pList);
+-
+-	UpdateClientPhysics(); // (to make sure they have their model around)
+-	TeleportClientToServerPos();
+-}
+-
+-
+-// --------------------------------------------------------------------------- //
+-//
+-// Source range ObjectDLL/PlayerObj.cpp:2294-2384
+-
+-	m_nCharacter		= DCLAMP(m_nCharacter, 0, MAX_CHARACTER);
+-	m_nSkin				= DCLAMP(m_nSkin, MULTIPLAY_SKIN_MIN, MULTIPLAY_SKIN_MAX);
+-	m_nAttribStrength	= DCLAMP(m_nAttribStrength, 1, 5);
+-	m_nAttribSpeed		= DCLAMP(m_nAttribSpeed, 1, 5);
+-	m_nAttribResistance = DCLAMP(m_nAttribResistance, 1, 5);
+-	m_nAttribMagic		= DCLAMP(m_nAttribMagic, 1, 5);
+-
+-	if ((m_nAttribStrength + m_nAttribSpeed + m_nAttribResistance + m_nAttribMagic) > MAX_ATTRIBUTES)
+-	{
+-		HSTRING hstr = pServerDE->FormatString(IDS_GENERAL_ATTRIBHIGH);
+-		SendConsoleMessage(pServerDE->GetStringData(hstr));
+-		pServerDE->FreeString(hstr);
+-
+-		//  Attribute maximums exceeded
+-		m_nAttribStrength = DEFAULT_ATTRIBUTE;
+-		m_nAttribSpeed = DEFAULT_ATTRIBUTE;
+-		m_nAttribResistance = DEFAULT_ATTRIBUTE;
+-		m_nAttribMagic = DEFAULT_ATTRIBUTE;
+-	}
+-
+-	m_InventoryMgr.SetStrength(m_nAttribStrength + m_nBindingStrength);
+-	m_InventoryMgr.SetMagic(m_nAttribMagic + m_nBindingMagic);
+-	m_damage.CalculateResistance(m_nAttribResistance + m_nBindingResistance);
+-
+-	SetMoveVel(gMoveVel[m_nAttribSpeed-1]);
+-	SetJumpVel(DEFAULT_JUMPVEL);
+-	m_PStateChangeFlags = PSTATE_ALL;
+-
+-	//	m_InventoryMgr.SetFullAmmo();
+-/*
+-	if (m_bBindingBlending)
+-		pServerDE->SetObjectColor(m_hObject, 0.0f, 0.0f, 0.0f, ALPHA_CLOAKED);
+-
+-	if (m_bBindingConstitution)
+-	{
+-		m_damage.SetHitPoints(150);
+-		m_damage.SetMaxHitPoints(150);
+-	}
+-
+-	if (m_bBindingIncreasedDamage)
+-	{
+-		m_InventoryMgr.AddDamageMultiplier(BINDING_INCREASE_DAMAGE_AMT);
+-	}
+-	
+-	if (m_bBindingQuickness)
+-	{
+-		m_InventoryMgr.AddFireRateMultiplier(BINDING_QUICKNESS_FACTOR);
+-	}
+-*/
+-	// Set attributes
+-	m_damage.SetMaxHitPoints(g_fMaxHealth[m_nAttribStrength-1]);
+-	m_damage.SetMaxMegaHitPoints(g_fMaxMegaHealth[m_nAttribStrength-1]);
+-	m_damage.SetMaxArmorPoints(g_fMaxArmor[m_nAttribMagic-1]);
+-	m_damage.SetMaxNecroArmorPoints(g_fMaxMegaArmor[m_nAttribMagic-1]);
+-}
+-
+-
+-// --------------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CPlayerObj::SetCharacter
+-//
+-//	PURPOSE:	Sets filenames to refer to the current character.
+-//
+-// --------------------------------------------------------------------------- //
+-
+-void CPlayerObj::SetCharacter(DBYTE nCharacter)
+-{
+-	CServerDE* pServerDE = GetServerDE();
+-
+-	if (nCharacter > MAX_CHARACTER) return;
+-	
+-	m_nCharacter = nCharacter;
+-
+-	pServerDE->SetModelFilenames(m_hObject, 
+-								 gCharacterValues[m_nCharacter].szModelName, 
+-								 gCharacterSkins[m_nCharacter][m_nSkin]);
+-
+-	m_PStateChangeFlags |= PSTATE_MODELFILENAMES;
+-
+-	// Init the animations
+-	m_Anim_Sound.SetAnimationIndexes(m_hObject);
+-	m_Anim_Sound.GenerateHitSpheres(m_hObject);
+-
+-	sprintf(msgbuf, "sounds\\chosen\\%s", gCharacterValues[m_nCharacter].szName);
+-	m_Anim_Sound.SetSoundRoot(msgbuf);
+-}
+-
+-
+-// --------------------------------------------------------------------------- //
+-//
+-// Source range ObjectDLL/PlayerObj.cpp:4137-4157
+-DDWORD CPlayerObj::EngineMessageFn(DDWORD messageID, void *pData, float fData)
+-{
+-	CServerDE* pServerDE = GetServerDE();
+-	DBOOL bResult = 1;
+-
+-	switch (messageID)
+-	{
+-		case MID_PRECREATE:
+-		{
+-			DDWORD dwRet = CBaseCharacter::EngineMessageFn(messageID, pData, fData);
+-
+-			PostPropRead((ObjectCreateStruct*)pData);
+-			return dwRet;
+-		}
+-
+-		case MID_INITIALUPDATE:
+-			bResult = InitialUpdate((int)fData);
+-			break;
+-
+-		case MID_UPDATE:
+-			bResult = Update((DVector*)pData);
++DLink CDestructable::m_DestructableHead{};
++DDWORD CDestructable::m_dwNumDestructables = 0;
++CDestructable::CDestructable() {
++    if (m_dwNumDestructables == 0) dl_TieOff(&m_DestructableHead);
++}
++CDestructable::~CDestructable() {
++    if (m_Link.m_pData && m_dwNumDestructables > 0) { dl_Remove(&m_Link); --m_dwNumDestructables; }
++}
++DBOOL CDestructable::Init(HOBJECT object,CInventoryMgr* inventory) {
++    if (!object || !BaseClass::GetServerDE()) return DFALSE;
++    m_hObject = object;
++    if (!m_Link.m_pData) {
++        dl_Insert(&m_DestructableHead,&m_Link); m_Link.m_pData = this; ++m_dwNumDestructables;
++    }
++    m_pInventoryMgr = inventory; return DTRUE;
++}
++void CDestructable::CalculateResistance(DBYTE value) {
++    if (value == 1) m_fResistance = 1.20f;
++    else if (value == 2) m_fResistance = 1.10f;
++    else if (value == 3) m_fResistance = 1.0f;
++    else if (value == 4) m_fResistance = 0.9f;
++    else if (value == 5) m_fResistance = 0.8f;
++    else if (value >= 6) m_fResistance = 0.7f;
++}
++bool CInventoryMgr::Init(HOBJECT object,HCLIENT client) {
++    auto* server = BaseClass::GetServerDE(); m_hOwner = object;
++    if (!m_hMuzzleFlash) {
++        ObjectCreateStruct state; state.m_ObjectType = OT_LIGHT;
++        if (auto* flash = server->CreateObject(server->GetClass("BaseClass"),&state)) {
++            m_hMuzzleFlash = flash->m_hObject;
++            if (server->CreateInterObjectLink(m_hOwner,m_hMuzzleFlash) != DE_OK) return false;
++        } else return false;
++    }
++    if (client) SetClient(client);
++    return true;
++}
++CInventoryMgr::~CInventoryMgr() {
++    if (m_hMuzzleFlash) BaseClass::GetServerDE()->RemoveObject(m_hMuzzleFlash);
++}
++DDWORD CInventoryMgr::EngineMessageFn(LPBASECLASS object,DDWORD message,void* data,DFLOAT fData) {
++    if (message == MID_LINKBROKEN && data == m_hMuzzleFlash) {
++        // The engine notifies on either endpoint's removal. Release this owned
++        // child before clearing the handle, including when the owner is pending.
++        BaseClass::GetServerDE()->RemoveObject(m_hMuzzleFlash); m_hMuzzleFlash = nullptr;
++    }
++    return Aggregate::EngineMessageFn(object,message,data,fData);
++}
++void CInventoryMgr::SetAmmoCount(DBYTE type,float count) {
++    if (type == 0 || type > 12 || m_bInfiniteAmmo || !std::isfinite(count) || count < 0) return;
++    m_fAmmo[type] = count;
++    // Original inventory-item removal/recharge paths require weapon/item code.
++    // This entry subset owns no such items and exposes no ObtainWeapon facade.
++}
++CBaseCharacter::CBaseCharacter() : B2BaseClass(OT_MODEL) {
++    AddAggregate(&m_damage); AddAggregate(&m_InventoryMgr);
++    // Original m_MoveObj (steering/AI movement) is not imported in this subset.
++}
++DDWORD CBaseCharacter::EngineMessageFn(DDWORD message,void* data,DFLOAT fData) {
++    if (message == MID_INITIALUPDATE && fData != INITIALUPDATE_SAVEGAME) {
++        auto flags = g_pServerDE->GetObjectFlags(m_hObject);
++        g_pServerDE->SetObjectFlags(m_hObject,flags | FLAG_MODELGOURAUDSHADE | FLAG_ANIMTRANSITION);
++    }
++    if (message == MID_MODELSTRINGKEY && data && pending_model_commands.size() < 32) {
++        auto* args = static_cast<ArgList*>(data); std::string command;
++        for (int i = 0; args->argv && i < args->argc; ++i) { if (i) command += ' '; command += args->argv[i]; }
++        pending_model_commands.push_back(std::move(command));
++    }
++    return B2BaseClass::EngineMessageFn(message,data,fData);
++}
++CPlayerObj::~CPlayerObj() {
++    auto* server = GetServerDE();
++    if (m_hClient) server->SetClientUserData(m_hClient,nullptr);
++    if (m_hstrTrigger) server->FreeString(m_hstrTrigger);
++    if (m_hstrPlayerName) server->FreeString(m_hstrPlayerName);
++    // Creation rollback owns the initial smell until entry succeeds. Ordinary
++    // lifetime leaves the world-owned scent to its original 20-second timeout.
++    if (!attributes_received && initial_smell_) server->RemoveObject(initial_smell_);
++}
++void CPlayerObj::PostPropRead(ObjectCreateStruct* state) {
++    SAFE_STRCPY(state->m_Filename,"Models\\Characters\\Caleb.abc");
++    SAFE_STRCPY(state->m_SkinName,"Skins\\Characters\\Caleb1.dtx");
++    SAFE_STRCPY(state->m_Name,"player"); state->m_ObjectType = OT_MODEL;
++}
++DBOOL CPlayerObj::InitialUpdate(int reason) {
++    auto* server = GetServerDE();
++    if (reason == INITIALUPDATE_SAVEGAME) { entry_error = "Player save restoration is not ported"; return DFALSE; }
++    // InitialUpdate precedes SetClient, as in the original engine.
++    if (!m_InventoryMgr.Init(m_hObject,m_hClient) || !m_damage.Init(m_hObject,&m_InventoryMgr)) return DFALSE;
++    m_bFirstUpdate = DTRUE;
++    m_InventoryMgr.SetAmmoCount(1,50);
++    server->SetNextUpdate(m_hObject,.001f);
++    m_damage.SetHitPoints(100); m_damage.SetArmorPoints(0);
++    m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = 100;
++    m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = 100;
++    m_damage.m_fMass = 250;
++    m_fSmellTime = server->GetTime(); m_fSmellDelay = .5f;
++    ObjectCreateStruct state; server->GetObjectPos(m_hObject,&state.m_Pos);
++    if (auto* smell = server->CreateObject(server->GetClass("SmellHint"),&state)) initial_smell_ = smell->m_hObject;
++    else return DFALSE;
++    DVector dims{12,82.0f/2,12}; server->SetObjectDims(m_hObject,&dims);
++    m_hstrTrigger = server->CreateString("TRIGGER");
++    initialized = m_hstrTrigger != nullptr;
++    return initialized;
++}
++bool CPlayerObj::SetCharacter(DBYTE character) {
++    // Caleb, default skin only until the other original character branches,
++    // sound roots and hit-sphere generation are ported. Reject before mutation.
++    if (character != 0 || m_nSkin != 0) { entry_error = "Only Caleb's default entry profile is ported"; return false; }
++    if (GetServerDE()->SetModelFilenames(m_hObject,"Models\\Characters\\Caleb.abc","Skins\\Characters\\Caleb1.dtx") != DE_OK) {
++        entry_error = "Player model could not be loaded"; return false;
++    }
++    m_nCharacter = character; return true;
++}
++bool CPlayerObj::Respawn() {
++    auto* server = GetServerDE();
++    // Preserve the original single-player dead-player gate. This operation is
++    // an entry reset, not a replacement for loading a save after death.
++    if (m_damage.IsDead()) { entry_error = "A dead single-player character requires save restoration"; return false; }
++    if (!SetCharacter(m_nCharacter)) return false;
++    const DDWORD flags = FLAG_VISIBLE | FLAG_MODELKEYS | FLAG_YROTATION | FLAG_ANIMTRANSITION |
++        FLAG_TOUCH_NOTIFY | FLAG_SOLID | FLAG_STAIRSTEP | FLAG_SHADOW;
++    server->SetObjectFlags(m_hObject,flags);
++    DVector velocity{}; server->SetVelocity(m_hObject,&velocity);
++    m_damage.SetHitPoints(100); m_damage.SetArmorPoints(0); m_bDead = DFALSE; m_fAirLevel = 100;
++    for (DBYTE i = 1; i <= 12; ++i) m_InventoryMgr.SetAmmoCount(i,0);
++    m_InventoryMgr.SetAmmoCount(1,50);
++    ++respawns;
++    return UpdateClientPhysics() && TeleportClientToServerPos();
++}
++void CPlayerObj::ValidateAttributes() {
++    auto clamp = [](DBYTE value) { return std::clamp<DBYTE>(value,1,5); };
++    m_nAttribStrength = clamp(m_nAttribStrength); m_nAttribSpeed = clamp(m_nAttribSpeed);
++    m_nAttribResistance = clamp(m_nAttribResistance); m_nAttribMagic = clamp(m_nAttribMagic);
++    if (m_nAttribStrength+m_nAttribSpeed+m_nAttribResistance+m_nAttribMagic > 12)
++        m_nAttribStrength = m_nAttribSpeed = m_nAttribResistance = m_nAttribMagic = 3;
++    m_damage.CalculateResistance(m_nAttribResistance);
++    static constexpr float move[] = {220,250,280,310,330,350};
++    static constexpr float maximum[] = {100,100,125,150,200,250};
++    static constexpr float mega[] = {100,150,200,250,300,400};
++    m_fMoveVel = move[m_nAttribSpeed-1]; m_fJumpVel = 600;
++    m_damage.m_fMaxHitPoints = maximum[m_nAttribStrength-1];
++    m_damage.m_fMaxMegaHitPoints = mega[m_nAttribStrength-1];
++    m_damage.m_fMaxArmorPoints = maximum[m_nAttribMagic-1];
++    m_damage.m_fMaxNecroArmorPoints = mega[m_nAttribMagic-1];
++}
++bool CPlayerObj::OnSinglePlayerInit(const blood2::PlayerInit& init) {
++    if (attributes_received || !m_hClient || init.name.size() > 100 || init.name.find('\0') != std::string::npos || init.character != 0 || init.skin != 0) return false;
++    m_hstrPlayerName = GetServerDE()->CreateString(init.name.c_str()); if (!m_hstrPlayerName) return false;
++    m_nCharacter = init.character; m_nSkin = init.skin;
++    m_nAttribStrength = init.strength; m_nAttribSpeed = init.speed;
++    m_nAttribResistance = init.resistance; m_nAttribMagic = init.magic;
++    ValidateAttributes();
++    // Preserve the actual request; do not claim weapons were obtained. Missing
++    // ObtainWeapon/ChangeWeaponSlot is a visible gameplay blocker.
++    m_InventoryMgr.requested_weapons = init.weapons;
++    if (!Respawn()) { GetServerDE()->FreeString(m_hstrPlayerName); m_hstrPlayerName = nullptr; return false; }
++    attributes_received = true; return true;
++}
++bool CPlayerObj::GoToStartPoint(HSTRING start_name) {
++    auto* server = GetServerDE(); auto* list = server->FindNamedObjects("Blood2StartPoint");
++    if (!list) return false;
++    // Fix the original empty-list early-return leak and use checked casts.
++    struct Release { ServerDE* server; ObjectList* list; ~Release() { server->RelinquishList(list); } } release{server,list};
++    bool remove_string = !start_name;
++    if (remove_string) start_name = server->CreateString("start");
++    if (!start_name) return false;
++    GameStartPoint* start = nullptr; GameStartPoint* fallback = nullptr;
++    for (auto* link = list->m_pFirstLink; link; link = link->m_pNext) {
++        auto* candidate = dynamic_cast<GameStartPoint*>(server->HandleToObject(link->m_hObject));
++        if (candidate && !candidate->IsMultiplayer()) {
++            fallback = candidate;
++            if (server->CompareStringsUpper(start_name,candidate->GetName())) { start = candidate; break; }
++        }
++    }
++    if (remove_string) server->FreeString(start_name);
++    if (!start) start = fallback;
++    if (!start) { entry_error = "No single-player GameStartPoint"; return false; }
++    m_fYaw = start->GetPitchYawRoll().y; m_fPitch = 0;
++    DVector position; server->GetObjectPos(start->m_hObject,&position);
++    start->SendTrigger();
++    if (server->TeleportObject(m_hObject,&position) != DE_OK ||
++        server->SendToClient(m_hClient,blood2::PlayerRotation{m_fPitch,m_fYaw}) != DE_OK) return false;
++    if (server->MoveObjectToGround(m_hObject) != DE_OK) { entry_error = "Start point has no supported ground collision"; return false; }
++    return UpdateClientPhysics() && TeleportClientToServerPos();
++}
++bool CPlayerObj::UpdateClientPhysics() {
++    if (!m_hClient) return true; // Original InitialUpdate has no client yet.
++    blood2::PlayerPhysics physics; physics.model = "Models\\Characters\\Caleb.abc";
++    physics.skin = "Skins\\Characters\\Caleb1.dtx";
++    auto* server = GetServerDE();
++    if (server->GetObjectDims(m_hObject,&physics.dimensions) != DE_OK || server->GetGlobalForce(&physics.gravity) != DE_OK) return false;
++    physics.move_speed = m_fMoveVel; physics.jump_speed = m_fJumpVel;
++    return server->SendToClient(m_hClient,physics) == DE_OK;
++}
++bool CPlayerObj::TeleportClientToServerPos() {
++    if (!m_hClient) return true;
++    blood2::PlayerPosition position; GetServerDE()->GetObjectPos(m_hObject,&position.position);
++    return GetServerDE()->SendToClient(m_hClient,position) == DE_OK;
++}
++DBOOL CPlayerObj::Update(DVector*) {
++    auto* server = GetServerDE(); server->SetNextUpdate(m_hObject,.001f); ++updates;
++    if (!m_hClient) return DTRUE;
++    if (m_bFirstUpdate) {
++        ValidateAttributes();
++        if (!UpdateClientPhysics() || !TeleportClientToServerPos() ||
++            server->SendToClient(m_hClient,blood2::PlayerStats{m_damage.m_fHitPoints,m_damage.m_fArmorPoints,m_InventoryMgr.GetAmmoCount(1)}) != DE_OK) return DFALSE;
++        m_bFirstUpdate = DFALSE;
++    }
++    return DTRUE;
++}
++DDWORD CPlayerObj::EngineMessageFn(DDWORD message,void* data,DFLOAT fData) {
++    DBOOL result = DTRUE;
++    switch (message) {
++        case MID_PRECREATE: {
++            auto ret = CBaseCharacter::EngineMessageFn(message,data,fData);
++            if (data) PostPropRead(static_cast<ObjectCreateStruct*>(data));
++            return ret;
++        }
++        case MID_INITIALUPDATE: result = InitialUpdate(static_cast<int>(fData)); break;
++        case MID_UPDATE: result = Update(static_cast<DVector*>(data)); break;
++        default: break;
++    }
++    if (result) return CBaseCharacter::EngineMessageFn(message,data,fData);
++    GetServerDE()->RemoveObject(m_hObject); return result;
++}
+--- selected sources/blood2/ObjectDLL/BloodServerShell.cpp
++++ Blood2/src/game/original/BloodShells.cpp
+@@ -1,284 +1,113 @@
+-// Source range ObjectDLL/BloodServerShell.cpp:192-324
+-BaseClass* CBloodServerShell::OnClientEnterWorld(HCLIENT hClient, void* pClientData, DDWORD dwClientDataLen)
+-{
+-	if (!g_pServerDE || !hClient) return DNULL;
++// Selected branches of BloodServerShell.cpp and BloodClientShell.cpp. The
++// original call ordering is retained; source-level adaptations replace raw
++// client data / packet reads with checked handles and owned typed values.
++#include "BloodShells.h"
++#include "PathPoint.h"
+ 
+-	BaseClass* pObject  = DNULL;
+-	DBOOL bFoundClient = DFALSE;
+-
+-	char szClientName[MAX_CLIENT_NAME_LENGTH];
+-	char szClientRefName[MAX_CLIENT_NAME_LENGTH];
+-	szClientName[0] = szClientRefName[0] = '\0';
+-
+-	g_pServerDE->GetClientName(hClient, szClientName, MAX_CLIENT_NAME_LENGTH-1);
+-
+-	// Search through the client refs to see if any of them match..
+-	HCLIENTREF hClientRef = g_pServerDE->GetNextClientRef(DNULL);
+-	while (hClientRef)
+-	{
+-		// See if this client reference is local or not...
+-		if (g_pServerDE->GetClientRefInfoFlags(hClientRef) & CIF_LOCAL)
+-		{
+-			bFoundClient = DTRUE;
+-		}
+-
+-		// Determine if there is a reference to a client with the same name...
+-		if (!bFoundClient && g_pServerDE->GetClientRefName(hClientRef, szClientRefName, MAX_CLIENT_NAME_LENGTH-1))
+-		{
+-			if (szClientName[0] && szClientRefName[0])
+-			{
+-				if (_mbsicmp((const unsigned char*)szClientName, (const unsigned char*)szClientRefName) == 0)
+-				{
+-					bFoundClient = DTRUE;
+-				}
+-			}
+-		}
+-
+-		// See if we found the right client...
+-		if (bFoundClient)
+-		{
+-			HOBJECT	hObject = g_pServerDE->GetClientRefObject(hClientRef);
+-			pObject = g_pServerDE->HandleToObject(hObject);
+-
+-			if (pObject)
+-				RespawnPlayer(pObject, hClient);
+-			break;
+-		}
+-
+-		hClientRef = g_pServerDE->GetNextClientRef(hClientRef);
+-	}
+-
+-	// Add this client to the appropriate team...
+-	DWORD dwTeamID = TEAM_1;
+-
+-	if (IsMultiplayerTeamBasedGame())
+-	{
+-		if (pClientData && dwClientDataLen == sizeof(NetClientData))
+-		{
+-			NetClientData* pNcd = (NetClientData*)pClientData;
+-
+-			dwTeamID = pNcd->m_dwTeam;
+-		}
+-
+-		if (dwTeamID == TEAM_AUTO)
+-		{
+-			CTeam* pTeam = m_TeamMgr.GetTeamWithLeastPlayers(TRUE);
+-			if (pTeam)
+-			{
+-				dwTeamID = pTeam->GetID();
+-			}
+-			else
+-			{
+-				if (IsRandomChance(50)) dwTeamID = TEAM_2;
+-				else dwTeamID = TEAM_1;
+-			}
+-		}
+-
+-		DDWORD dwTransTeamID = m_TeamMgr.GetTeamTransID(g_pServerDE->GetClientID(hClient));
+-		CTeam* pTeam         = m_TeamMgr.GetTeam(dwTransTeamID);
+-
+-		if (dwTransTeamID != TM_ID_NULL && pTeam)
+-		{
+-			dwTeamID = dwTransTeamID;
+-		}
+-	}
+-
+-	m_TeamMgr.AddPlayer(dwTeamID, g_pServerDE->GetClientID(hClient));
+-
+-
+-	// See if we need to create a player (no matches found)...
+-	if (!pObject)
+-	{
+-		pObject = CreatePlayer(hClient);
+-		RespawnPlayer(pObject, hClient);
+-	}
+-
+-	// Add this client to our local list...
+-	AddClientToList(hClient);
+-
+-	// All done...
+-	return pObject;
++void CBloodServerShell::PreStartWorld() {
++    paths.clear(); world_started = false; updates = 0;
++    // Team setup, active cinematics, voice and multiplayer state are outside
++    // the accepted fresh single-player entry mode.
+ }
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CBloodServerShell::OnClientExitWorld()
+-//
+-//	PURPOSE:	Remove a client
+-//
+-// ----------------------------------------------------------------------- //
+-
+-void CBloodServerShell::OnClientExitWorld(HCLIENT hClient)
+-{
+-	// Tell all clients..
+-	RemovePlayerMessage(hClient);
+-
+-	// Remove this client from the team...
+-	m_TeamMgr.RemovePlayer(g_pServerDE->GetClientID(hClient));
+-	
+-	// Remove this client from our local list...
+-	RemoveClientFromList(hClient);
+-	SetUpdateBlood2Serv();
+-
+-	// Remove the player object...
+-	CPlayerObj* pPlayer = (CPlayerObj*)g_pServerDE->GetClientUserData(hClient);
+-	if (pPlayer) 
+-	{
+-		pPlayer->DropFlag(DFALSE);
+-		g_pServerDE->RemoveObject(pPlayer->m_hObject);
+-	}
+-
+-	g_pServerDE->SetClientUserData(hClient, DNULL);
++bool CBloodServerShell::PostStartWorld() {
++    paths.clear();
++    // Original PathMgr::BuildPathList / PathListData::Copy, with value-owned
++    // strings. No AI GetPath/sorting/save support is implied by this snapshot.
++    for (HOBJECT object = server_.GetNextObject(nullptr); object; object = server_.GetNextObject(object)) {
++        if (!server_.IsKindOf(server_.GetObjectClass(object),server_.GetClass("PathPoint"))) continue;
++        auto* point = dynamic_cast<PathPoint*>(server_.HandleToObject(object)); if (!point) return false;
++        PathEntry entry; server_.GetObjectPos(object,&entry.position);
++        if (const char* value = server_.GetObjectName(object)) entry.name = value;
++        if (const char* value = server_.GetStringData(point->GetActionTarget())) entry.action_target = value;
++        if (const char* value = server_.GetStringData(point->GetActionMessage())) entry.action_message = value;
++        paths.push_back(std::move(entry));
++    }
++    world_started = true; return true;
+ }
+-
+-// Source range ObjectDLL/BloodServerShell.cpp:555-598
+-void CBloodServerShell::PreStartWorld(DBOOL bSwitchingWorlds)
+-{
+-	// Setup the teams for multiplayer
+-	m_TeamMgr.Term();
+-	m_TeamMgr.Init();
+-
+-	m_TeamMgr.AddTeam(TEAM_1, "TEAM1");
+-	m_TeamMgr.AddTeam(TEAM_2, "TEAM2");
+-
+-	// Setup the game info
+-	SetupGameInfo();
+-
+-	g_bNextLevel = DFALSE;
+-
+-	// Reset global camera pointer
+-	g_hActiveCamera = DNULL;
++CPlayerObj* CBloodServerShell::Player(HCLIENT client) {
++    auto object = server_.GetClientUserData(client);
++    return object ? dynamic_cast<CPlayerObj*>(server_.HandleToObject(object)) : nullptr;
+ }
+-	
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CBloodServerShell::PostStartWorld()
+-//
+-//	PURPOSE:	Perform an autosave after the world is loaded
+-//
+-// ----------------------------------------------------------------------- //
+-
+-void CBloodServerShell::PostStartWorld()
+-{
+-	// Build the list of AI paths for this world...
+-	m_PathMgr.BuildPathList();
+-
+-	// Init the voice manager if necessary...
+-	if (!m_VoiceMgr.IsInited())
+-	{
+-		m_VoiceMgr.Init(g_pServerDE);
+-	}
+-
+-	m_VoiceMgr.StopAll();
++CPlayerObj* CBloodServerShell::CreatePlayer(HCLIENT client) {
++    ObjectCreateStruct state; // Original zero position, identity rotation, no flags.
++    auto type = server_.GetClass("CPlayerObj");
++    auto* player = type ? dynamic_cast<CPlayerObj*>(server_.CreateObject(type,&state)) : nullptr;
++    if (!player) return nullptr;
++    player->SetClient(client);
++    if (server_.SetClientUserData(client,player->m_hObject) != DE_OK || !player->Respawn()) {
++        player->SetClient(nullptr); server_.SetClientUserData(client,nullptr); server_.RemoveObject(player->m_hObject); return nullptr;
++    }
++    return player;
+ }
+-	
+-
+-// ----------------------------------------------------------------------- //
+-//
+-// Source range ObjectDLL/BloodServerShell.cpp:705-808
+-BaseClass* CBloodServerShell::CreatePlayer(HCLIENT hClient)
+-{
+-	if (!g_pServerDE) return DNULL;
+-
+-	ObjectCreateStruct ocStruct;
+-
+-	INIT_OBJECTCREATESTRUCT(ocStruct);
+-
+-	ROT_INIT(ocStruct.m_Rotation);
+-	VEC_INIT(ocStruct.m_Pos);
+-	ocStruct.m_Flags = 0;
+-
+-	HCLASS hClass = g_pServerDE->GetClass("CPlayerObj");
+-
+-	BaseClass* pClass = NULL;
+-	if (hClass)
+-	{
+-		pClass = g_pServerDE->CreateObject(hClass, &ocStruct);
+-		if (pClass)
+-		{
+-			CPlayerObj* pPlayer = (CPlayerObj*)pClass;
+-			pPlayer->SetClient(hClient);
+-			g_pServerDE->SetClientUserData(hClient, (void *)pClass);
+-			pPlayer->Respawn();
+-//			pPlayer->GoToStartPoint();
+-			pPlayer->UpdateTeamID();
+-		}
+-	}
+-
+-	return pClass;
++bool CBloodServerShell::RespawnPlayer(CPlayerObj* player,HCLIENT client) {
++    if (!player || !client) return false;
++    player->SetClient(client);
++    if (server_.SetClientUserData(client,player->m_hObject) != DE_OK ||
++        server_.SendToClient(client,blood2::PlayerInitRequest{}) != DE_OK) return false;
++    // Fresh single-player only: no saved client refs, team selection or restore.
++    if (!player->GoToStartPoint(nullptr)) return false;
++    server_.SetGameConVar("GAME_GOTOSTARTPOINT","1"); return true;
+ }
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CBloodServerShell::RespawnPlayer()
+-//
+-//	PURPOSE:	Respawn the player object
+-//
+-// ----------------------------------------------------------------------- //
+-
+-void CBloodServerShell::RespawnPlayer(BaseClass* pBaseObject, HCLIENT hClient)
+-{
+-	if (!pBaseObject || !hClient) return;
+-
+-	CPlayerObj* pPlayer = (CPlayerObj*)pBaseObject;
+-	pPlayer->SetClient(hClient);
+-	g_pServerDE->SetClientUserData(hClient, (void *)pPlayer);
+-
+-	// If this is a multiplayer game wait until MULTIPLAYER_INIT message
+-	// to respawn the player...
+-
+-	DBYTE nMessage = SMSG_PLAYERINIT_MULTIPLAYER;
+-
+-	if (GetGameType() == GAMETYPE_SINGLE)
+-	{
+-		nMessage = SMSG_PLAYERINIT_SINGLEPLAYER;
+-	}
+-
+-	HMESSAGEWRITE hWrite = g_pServerDE->StartMessage(hClient, nMessage);
+-
+-	// If this is a multiplayer game, send some game info too...
+-	if (nMessage == SMSG_PLAYERINIT_MULTIPLAYER)
+-	{
+-		g_pServerDE->WriteToMessageByte(hWrite, m_GameInfo.m_byType);
+-		g_pServerDE->WriteToMessageByte(hWrite, m_GameInfo.m_bFriendlyFire);
+-		g_pServerDE->WriteToMessageByte(hWrite, m_GameInfo.m_bNegTeamFrags);
+-		g_pServerDE->WriteToMessageByte(hWrite, m_GameInfo.m_bOnlyFlagScores);
+-		g_pServerDE->WriteToMessageByte(hWrite, m_GameInfo.m_bOnlyGoalScores);
+-	}
+-
+-
+-	// End the message...
+-	g_pServerDE->EndMessage2(hWrite, MESSAGE_GUARANTEED | MESSAGE_NAGGLE);
+-
+-	
+-	// Either a new level or restoring a previously visited level, so go to the startpoint
+-	if (IsMultiplayerGame() || GetGameConVarValueFloat(g_szVarGotoStartpoint))
+-	{
+-		pPlayer->GoToStartPoint();
+-	}
+-	// Restoring a save, so don't change player and tell the client where to point the camera
+-	else
+-	{
+-		pPlayer->SendMessageToClient(SMSG_FORCEROTATION);
+-		pPlayer->SendMessageToClient(SMSG_EYELEVEL);
+-	}
+-
+-	// Reset the goto-start-point game con var...
+-	g_pServerDE->SetGameConVar(g_szVarGotoStartpoint, "1");
++CPlayerObj* CBloodServerShell::OnClientEnterWorld(HCLIENT client) {
++    if (!world_started || !client || Player(client)) return nullptr;
++    auto* player = CreatePlayer(client);
++    if (!player || !RespawnPlayer(player,client)) { OnClientExitWorld(client); return nullptr; }
++    return player;
+ }
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CBloodServerShell::SetStartpointName()
+-//
+-//	PURPOSE:	Sets the name of the next startpoint.
+-//
+-// ----------------------------------------------------------------------- //
+-
+-void CBloodServerShell::SetStartPointName(HSTRING hString)
+-{
+-	if (!hString || !g_pServerDE) return;
++void CBloodServerShell::OnClientExitWorld(HCLIENT client) {
++    auto* player = Player(client);
++    if (player) { player->SetClient(nullptr); server_.RemoveObject(player->m_hObject); }
++    server_.SetClientUserData(client,nullptr);
++}
++bool CBloodServerShell::OnMessage(HCLIENT client,const blood2::PlayerInit& init) {
++    auto* player = Player(client); return player && player->OnSinglePlayerInit(init);
++}
++void CBloodServerShell::Update(float) {
++    ++updates;
++    // Original Update returns here for GAMETYPE_SINGLE. Remaining code is MP.
++}
++bool CBloodClientShell::StartNewWorld(const char* world,blood2::WorldMessage& message) {
++    if (!blood2::original_world_request(world,0,blood2::LOADTYPE_NEW_GAME,1,message)) return false;
++    return true; // State changes wait until the engine accepts the world.
++}
++bool CBloodClientShell::OnEnterWorld(HCLIENT client) {
++    auto object = server_.GetClientUserData(client); if (!object || m_bInWorld) return false;
++    client_ = client; player = object;
++    m_bInWorld = true; m_bFirstUpdate = true; m_bFirstWorld = true;
++    position = {}; camera_position = {}; rotation = {}; physics = {}; stats = {};
++    messages = updates = 0;
++    blocker = "Entry inspection only: weapons, character movement, combat, audio and autosave are not ported";
++    return true;
++}
++void CBloodClientShell::OnExitWorld() {
++    player = nullptr; client_ = nullptr; m_bInWorld = false; m_bFirstWorld = true; m_bFirstUpdate = true;
++    position = {}; camera_position = {}; rotation = {}; physics = {}; stats = {};
++    blocker.clear();
++}
++bool CBloodClientShell::InitSinglePlayer(CBloodServerShell& server) {
++    if (!m_bFirstWorld) return false;
++    blood2::PlayerInit init; // Default entry profile; original fields/order retained.
++    if (!server.OnMessage(client_,init)) return false;
++    m_bFirstWorld = false;
++    // Original next requests CMSG_AUTOSAVE and sets GS_PLAYING. Both remain
++    // gated: successful attribute exchange cannot imply complete gameplay.
++    return true;
++}
++bool CBloodClientShell::OnMessage(const blood2::PlayerEvent& event,CBloodServerShell& server) {
++    if (!m_bInWorld || server_.GetClientUserData(client_) != player) return false;
++    ++messages;
++    if (std::holds_alternative<blood2::PlayerInitRequest>(event)) return InitSinglePlayer(server);
++    if (const auto* value = std::get_if<blood2::PlayerRotation>(&event)) rotation = *value;
++    else if (const auto* value = std::get_if<blood2::PlayerPosition>(&event)) position = value->position;
++    else if (const auto* value = std::get_if<blood2::PlayerPhysics>(&event)) physics = *value;
++    else if (const auto* value = std::get_if<blood2::PlayerStats>(&event)) stats = *value;
++    return true;
++}
++bool CBloodClientShell::Update() {
++    if (!m_bInWorld || server_.GetClientUserData(client_) != player) return false;
++    ++updates;
++    // An inspectable camera transform; no original renderer/menu/MoveMgr is
++    // impersonated. Caleb's source standing eye level is 36 units.
++    camera_position = position; camera_position.y += 36;
++    m_bFirstUpdate = false; return true;
++}
+--- selected sources/blood2/ClientShellDLL/BloodClientShell.cpp
++++ Blood2/src/game/original/BloodShells.cpp
+@@ -1,220 +1,113 @@
+-// Source range ClientShellDLL/BloodClientShell.cpp:392-400
++// Selected branches of BloodServerShell.cpp and BloodClientShell.cpp. The
++// original call ordering is retained; source-level adaptations replace raw
++// client data / packet reads with checked handles and owned typed values.
++#include "BloodShells.h"
++#include "PathPoint.h"
+ 
+-	// Set up default attributes
+-	_mbscpy((unsigned char*)m_Config.szName, (const unsigned char*)"Player");
+-	m_Config.nCharacter		= CHARACTER_CALEB;
+-	m_Config.nSkin			= MULTIPLAY_SKIN_NORMAL;
+-	m_Config.nStrength		= 5;
+-	m_Config.nSpeed			= 3;
+-	m_Config.nResistance	= 3;
+-	m_Config.nMagic			= 1;
+-// Source range ClientShellDLL/BloodClientShell.cpp:1504-1550
+-void CBloodClientShell::OnEnterWorld()
+-{
+-	CClientDE* pClientDE = GetClientDE();
+-	if (!pClientDE) return;
+-
+-	m_bInWorld = DTRUE;
+-	m_bHandledStartup = DFALSE;
+-
+-	m_bFadeIn = m_bFadeOut = DFALSE;
+-
+-	if (!m_hCamera)
+-	{
+-		ObjectCreateStruct cocStruct;
+-		INIT_OBJECTCREATESTRUCT(cocStruct);
+-	
+-		cocStruct.m_ObjectType = OT_CAMERA;
+-		VEC_INIT(cocStruct.m_Pos)
+-		ROT_INIT(cocStruct.m_Rotation)
+-		cocStruct.m_Flags = 0;
+-
+-		m_hCamera = pClientDE->CreateObject(&cocStruct);
+-	}
+-	pClientDE->GetSurfaceDims(pClientDE->GetScreenSurface(), &m_dwScreenWidth, &m_dwScreenHeight);
+-	m_fovX = DEG2RAD(m_DefFovX);
+-	m_fovY = m_fovX * m_fovYScale;
+-    
+-	pClientDE->SetCameraFOV(m_hCamera, m_fovX, m_fovY);
+-
+-	// Initialize various variables
+-	m_SpinAmount = 0;
+-	m_bZeroXAngle = DFALSE;
+-	m_fBobPhase = m_fSwayPhase = 0;
+-	m_fBobHeight = m_fBobWidth = m_fBobCant = m_fShakeCant = 0;
+-	m_fViewKick = m_fKickTime = 0;
+-
+-//	m_fVelY = 0.0f;
+-	m_fViewY = m_fViewYVel = 0.0f;
+-	m_fWeaponY = m_fWeaponYVel = 0.0f;
+-
+-	m_fVelMagnitude		= 0;
+-	m_fEyeLevel			= 0;
+-	VEC_INIT(m_vMyLastPos);
+-
+-	m_bDead				= DFALSE;
+-	m_bDeadNoHide       = DFALSE;
+-	m_bWonkyVision		= DFALSE;
+-	m_bWonkyNoMove      = DFALSE;
+-// Source range ClientShellDLL/BloodClientShell.cpp:1922-2063
+-void CBloodClientShell::SendPlayerInitMessage(DBYTE messageID)
+-{
+-	HMESSAGEWRITE hMsg;
+-	CClientDE* pClientDE = GetClientDE();
+-
+-	if (messageID != CMSG_SINGLEPLAYER_INIT && messageID != CMSG_MULTIPLAYER_INIT)
+-		return;
+-
+-	// Only send this if it's a new game.
+-	if (messageID == CMSG_SINGLEPLAYER_INIT && m_nLastLoadType != LOADTYPE_NEW_GAME)
+-		return;
+-
+-	// Start the message
+-	hMsg = pClientDE->StartMessage(messageID);
+-
+-	// Send the appropriate data for this message
+-	switch(messageID)
+-	{
+-		case CMSG_SINGLEPLAYER_INIT:
+-		case CMSG_MULTIPLAYER_INIT:
+-			{
+-				int i;
+-				HSTRING hstrName = DNULL;
+-
+-				// Load in a B2C file if it's a multiplayer game
+-				if (IsMultiplayerGame())
+-				{
+-					NetPlayer* pPlayerInfo = NetStart_GetPlayerStruct();
+-					if (!pPlayerInfo) return;
+-
+-					hstrName = pClientDE->CreateString(pPlayerInfo->m_sName);
+-
+-					B2C		b2cFile;
+-					FILE	*file = 0;
+-					char	filename[128];
+-
+-					if (strlen(pPlayerInfo->m_sConfig) <= 0)
+-					{
+-						CShell_GetConsoleString("NetConfigFile", pPlayerInfo->m_sConfig, "caleb.b2c");
+-					}
+-
+-					sprintf(filename, "players\\%s", pPlayerInfo->m_sConfig);
+-
+-					if(file = fopen(filename, "rb"))
+-					{
+-						fread(&b2cFile, sizeof(B2C), 1, file);
+-						fclose(file);
+-					}
+-					else	// just set default stuff
+-					{
+-						CSPrint("Warning - Unable to load .b2c file");
+-
+-						b2cFile.dwCharacter	= CHARACTER_CALEB;
+-						b2cFile.dwColor		= 1;
+-						b2cFile.dwStrength	= 5;
+-						b2cFile.dwSpeed		= 3;
+-						b2cFile.dwResist	= 3;
+-						b2cFile.dwFocus		= 1;
+-						b2cFile.dwWeap1		= 1;
+-						b2cFile.dwWeap2		= 2;
+-						b2cFile.dwWeap3		= 3;
+-						b2cFile.dwWeap4		= 4;
+-						b2cFile.dwWeap5		= 5;
+-						b2cFile.dwWeap6		= 6;
+-						b2cFile.dwWeap7		= 7;
+-						b2cFile.dwWeap8		= 8;
+-						b2cFile.dwWeap9		= 9;
+-					}
+-
+-					m_Config.nCharacter = (DBYTE)b2cFile.dwCharacter;
+-					m_Config.nSkin = (DBYTE)b2cFile.dwColor;
+-					m_Config.nStrength = (DBYTE)b2cFile.dwStrength;
+-					m_Config.nSpeed = (DBYTE)b2cFile.dwSpeed;
+-					m_Config.nResistance = (DBYTE)b2cFile.dwResist;
+-					m_Config.nMagic = (DBYTE)b2cFile.dwFocus;
+-					m_Config.nWeaponSlots[1] = (DBYTE)b2cFile.dwWeap1;
+-					m_Config.nWeaponSlots[2] = (DBYTE)b2cFile.dwWeap2;
+-					m_Config.nWeaponSlots[3] = (DBYTE)b2cFile.dwWeap3;
+-					m_Config.nWeaponSlots[4] = (DBYTE)b2cFile.dwWeap4;
+-					m_Config.nWeaponSlots[5] = (DBYTE)b2cFile.dwWeap5;
+-					m_Config.nWeaponSlots[6] = (DBYTE)b2cFile.dwWeap6;
+-					m_Config.nWeaponSlots[7] = (DBYTE)b2cFile.dwWeap7;
+-					m_Config.nWeaponSlots[8] = (DBYTE)b2cFile.dwWeap8;
+-					m_Config.nWeaponSlots[9] = (DBYTE)b2cFile.dwWeap9;
+-				}
+-				else
+-				{
+-					// first gun is the beretta
+-					m_Config.nWeaponSlots[1] = WEAP_BERETTA;
+-					m_Config.nWeaponSlots[2] = WEAP_NONE;
+-					m_Config.nWeaponSlots[3] = WEAP_NONE;
+-					m_Config.nWeaponSlots[4] = WEAP_NONE;
+-					m_Config.nWeaponSlots[5] = WEAP_NONE;
+-					m_Config.nWeaponSlots[6] = WEAP_NONE;
+-					m_Config.nWeaponSlots[7] = WEAP_NONE;
+-					m_Config.nWeaponSlots[8] = WEAP_NONE;
+-					m_Config.nWeaponSlots[9] = WEAP_NONE;
+-					hstrName = pClientDE->CreateString(m_Config.szName);
+-				}
+-				if (!hstrName) return;
+-
+-				pClientDE->WriteToMessageHString(hMsg, hstrName);
+-				pClientDE->FreeString(hstrName);
+-				pClientDE->WriteToMessageByte(hMsg, m_Config.nCharacter);
+-				pClientDE->WriteToMessageByte(hMsg, m_Config.nSkin);
+-				pClientDE->WriteToMessageByte(hMsg, m_Config.nStrength);
+-				pClientDE->WriteToMessageByte(hMsg, m_Config.nSpeed);
+-				pClientDE->WriteToMessageByte(hMsg, m_Config.nResistance);
+-				pClientDE->WriteToMessageByte(hMsg, m_Config.nMagic);
+-
+-//				for(i = 0; i < 3; i++)
+-//					pClientDE->WriteToMessageByte(hMsg, m_Config.nBindingSlots[i]);
+-				for (i=1;i<SLOTCOUNT_WEAPONS;i++)	// Skip slot 0, it's melee
+-					pClientDE->WriteToMessageByte(hMsg, m_Config.nWeaponSlots[i]);
+-/*				for (i=0;i<INV_LASTINVITEM;i++)
+-					pClientDE->WriteToMessageByte(hMsg, m_Config.nItemSlots[i]);
+-				pClientDE->WriteToMessageByte(hMsg, m_Config.nProximityBombs);
+-				pClientDE->WriteToMessageByte(hMsg, m_Config.nRemoteBombs);
+-				pClientDE->WriteToMessageByte(hMsg, m_Config.nTimeBombs);
+-//				for (i=0;i<6;i++)
+-//					pClientDE->WriteToMessageByte(hMsg, m_Config.nSpellSlots[i]);
+-*/
+-			}
+-			break;
+-	}
+-
+-	// Finish it off..
+-	pClientDE->EndMessage(hMsg);
++void CBloodServerShell::PreStartWorld() {
++    paths.clear(); world_started = false; updates = 0;
++    // Team setup, active cinematics, voice and multiplayer state are outside
++    // the accepted fresh single-player entry mode.
+ }
+-
+-
+-// ----------------------------------------------------------------------- //
+-//
+-//	ROUTINE:	CBloodClientShell::UpdateSoundReverb
+-//
+-//	PURPOSE:	Update the reverb info
+-//
+-// ----------------------------------------------------------------------- //
+-void CBloodClientShell::UpdateSoundReverb( )
+-{
+-	DVector vPlayerDims;
+-	ClientIntersectInfo info;
+-// Source range ClientShellDLL/BloodClientShell.cpp:5378-5395
+-void CBloodClientShell::InitSinglePlayer()
+-{
+-	CClientDE* pClientDE = GetClientDE();
+-	if (!pClientDE) return;
+-
+-	// Init player info only on the first world...
+-	if (m_bFirstWorld)
+-		SendPlayerInitMessage(CMSG_SINGLEPLAYER_INIT);
+-
+-	// Send autosave message
+-	HMESSAGEWRITE hWrite = pClientDE->StartMessage(CMSG_AUTOSAVE);
+-	pClientDE->EndMessage(hWrite);
+-
+-	if(m_bPaused)	SetGameState(GS_WAITING);
+-		else		SetGameState(GS_PLAYING);
+-
+-	pClientDE->SetInputState(DTRUE);
++bool CBloodServerShell::PostStartWorld() {
++    paths.clear();
++    // Original PathMgr::BuildPathList / PathListData::Copy, with value-owned
++    // strings. No AI GetPath/sorting/save support is implied by this snapshot.
++    for (HOBJECT object = server_.GetNextObject(nullptr); object; object = server_.GetNextObject(object)) {
++        if (!server_.IsKindOf(server_.GetObjectClass(object),server_.GetClass("PathPoint"))) continue;
++        auto* point = dynamic_cast<PathPoint*>(server_.HandleToObject(object)); if (!point) return false;
++        PathEntry entry; server_.GetObjectPos(object,&entry.position);
++        if (const char* value = server_.GetObjectName(object)) entry.name = value;
++        if (const char* value = server_.GetStringData(point->GetActionTarget())) entry.action_target = value;
++        if (const char* value = server_.GetStringData(point->GetActionMessage())) entry.action_message = value;
++        paths.push_back(std::move(entry));
++    }
++    world_started = true; return true;
+ }
++CPlayerObj* CBloodServerShell::Player(HCLIENT client) {
++    auto object = server_.GetClientUserData(client);
++    return object ? dynamic_cast<CPlayerObj*>(server_.HandleToObject(object)) : nullptr;
++}
++CPlayerObj* CBloodServerShell::CreatePlayer(HCLIENT client) {
++    ObjectCreateStruct state; // Original zero position, identity rotation, no flags.
++    auto type = server_.GetClass("CPlayerObj");
++    auto* player = type ? dynamic_cast<CPlayerObj*>(server_.CreateObject(type,&state)) : nullptr;
++    if (!player) return nullptr;
++    player->SetClient(client);
++    if (server_.SetClientUserData(client,player->m_hObject) != DE_OK || !player->Respawn()) {
++        player->SetClient(nullptr); server_.SetClientUserData(client,nullptr); server_.RemoveObject(player->m_hObject); return nullptr;
++    }
++    return player;
++}
++bool CBloodServerShell::RespawnPlayer(CPlayerObj* player,HCLIENT client) {
++    if (!player || !client) return false;
++    player->SetClient(client);
++    if (server_.SetClientUserData(client,player->m_hObject) != DE_OK ||
++        server_.SendToClient(client,blood2::PlayerInitRequest{}) != DE_OK) return false;
++    // Fresh single-player only: no saved client refs, team selection or restore.
++    if (!player->GoToStartPoint(nullptr)) return false;
++    server_.SetGameConVar("GAME_GOTOSTARTPOINT","1"); return true;
++}
++CPlayerObj* CBloodServerShell::OnClientEnterWorld(HCLIENT client) {
++    if (!world_started || !client || Player(client)) return nullptr;
++    auto* player = CreatePlayer(client);
++    if (!player || !RespawnPlayer(player,client)) { OnClientExitWorld(client); return nullptr; }
++    return player;
++}
++void CBloodServerShell::OnClientExitWorld(HCLIENT client) {
++    auto* player = Player(client);
++    if (player) { player->SetClient(nullptr); server_.RemoveObject(player->m_hObject); }
++    server_.SetClientUserData(client,nullptr);
++}
++bool CBloodServerShell::OnMessage(HCLIENT client,const blood2::PlayerInit& init) {
++    auto* player = Player(client); return player && player->OnSinglePlayerInit(init);
++}
++void CBloodServerShell::Update(float) {
++    ++updates;
++    // Original Update returns here for GAMETYPE_SINGLE. Remaining code is MP.
++}
++bool CBloodClientShell::StartNewWorld(const char* world,blood2::WorldMessage& message) {
++    if (!blood2::original_world_request(world,0,blood2::LOADTYPE_NEW_GAME,1,message)) return false;
++    return true; // State changes wait until the engine accepts the world.
++}
++bool CBloodClientShell::OnEnterWorld(HCLIENT client) {
++    auto object = server_.GetClientUserData(client); if (!object || m_bInWorld) return false;
++    client_ = client; player = object;
++    m_bInWorld = true; m_bFirstUpdate = true; m_bFirstWorld = true;
++    position = {}; camera_position = {}; rotation = {}; physics = {}; stats = {};
++    messages = updates = 0;
++    blocker = "Entry inspection only: weapons, character movement, combat, audio and autosave are not ported";
++    return true;
++}
++void CBloodClientShell::OnExitWorld() {
++    player = nullptr; client_ = nullptr; m_bInWorld = false; m_bFirstWorld = true; m_bFirstUpdate = true;
++    position = {}; camera_position = {}; rotation = {}; physics = {}; stats = {};
++    blocker.clear();
++}
++bool CBloodClientShell::InitSinglePlayer(CBloodServerShell& server) {
++    if (!m_bFirstWorld) return false;
++    blood2::PlayerInit init; // Default entry profile; original fields/order retained.
++    if (!server.OnMessage(client_,init)) return false;
++    m_bFirstWorld = false;
++    // Original next requests CMSG_AUTOSAVE and sets GS_PLAYING. Both remain
++    // gated: successful attribute exchange cannot imply complete gameplay.
++    return true;
++}
++bool CBloodClientShell::OnMessage(const blood2::PlayerEvent& event,CBloodServerShell& server) {
++    if (!m_bInWorld || server_.GetClientUserData(client_) != player) return false;
++    ++messages;
++    if (std::holds_alternative<blood2::PlayerInitRequest>(event)) return InitSinglePlayer(server);
++    if (const auto* value = std::get_if<blood2::PlayerRotation>(&event)) rotation = *value;
++    else if (const auto* value = std::get_if<blood2::PlayerPosition>(&event)) position = value->position;
++    else if (const auto* value = std::get_if<blood2::PlayerPhysics>(&event)) physics = *value;
++    else if (const auto* value = std::get_if<blood2::PlayerStats>(&event)) stats = *value;
++    return true;
++}
++bool CBloodClientShell::Update() {
++    if (!m_bInWorld || server_.GetClientUserData(client_) != player) return false;
++    ++updates;
++    // An inspectable camera transform; no original renderer/menu/MoveMgr is
++    // impersonated. Caleb's source standing eye level is 36 units.
++    camera_position = position; camera_position.y += 36;
++    m_bFirstUpdate = false; return true;
++}
+--- selected sources/blood2/ObjectDLL/ObjectUtilities.cpp
++++ Blood2/src/game/server_clients.cpp
+@@ -1,42 +1,111 @@
+-// Source range ObjectDLL/ObjectUtilities.cpp:371-411
+-DBOOL MoveObjectToGround(HOBJECT hObject)
+-{
+-	if (!hObject || !g_pServerDE) return DFALSE;
++#include "game/server_adapter.h"
++#include <cmath>
+ 
+-	// Cast a ray to see what's below us
+-	IntersectQuery iq;
+-	IntersectInfo ii;
+-
+-	DVector vPos;
+-	g_pServerDE->GetObjectPos(hObject, &vPos);
+-
+-	VEC_COPY(iq.m_From, vPos);
+-	VEC_SET(iq.m_Direction, 0.0f, -1.0f, 0.0f);
+-	iq.m_Flags	   = IGNORE_NONSOLID | INTERSECT_OBJECTS;
+-	iq.m_FilterFn  = NULL;
+-	iq.m_pUserData = NULL;	
+-
+-	if (g_pServerDE->CastRay(&iq, &ii))	// Hit
+-	{
+-		DVector vDims;
+-
+-		if(g_pServerDE->IsKindOf(g_pServerDE->GetObjectClass(hObject), g_pServerDE->GetClass("CBaseCharacter")))
+-		{
+-			if(g_pServerDE->GetModelAnimUserDims(hObject, &vDims, 0) == DE_INVALIDPARAMS)
+-				g_pServerDE->DebugOut("MoveObjectToGround() fucked up\r\n");
+-		}
+-		else
+-			g_pServerDE->GetObjectDims(hObject, &vDims);
+-
+-		DFLOAT fDist = vPos.y - ii.m_Point.y + 0.1f;
+-		if (fDist > vDims.y)
+-		{
+-			vPos.y = vPos.y - fDist + (vDims.y + 0.1f);
+-			g_pServerDE->MoveObject(hObject, &vPos);
+-			return DTRUE;
+-		}
+-	}
+-
+-	return DFALSE;
++namespace blood2 {
++HCLIENT ServerAdapter::connect_client() {
++    trace_service("ConnectClient");
++    if (!bound_ || !clients_.empty() || client_tokens_.size() >= 65536 || objects_.busy()) return nullptr;
++    auto token = std::make_unique<ClientHandle>(); auto h = token.get();
++    client_tokens_.push_back(std::move(token)); clients_.emplace(h,Client{}); return h;
+ }
+-
++bool ServerAdapter::disconnect_client(HCLIENT client) {
++    trace_service("DisconnectClient");
++    auto it = clients_.find(client); if (it == clients_.end() || objects_.busy()) return false;
++    if (GetClientUserData(client)) return false; // Exit callback must detach first.
++    clients_.erase(it); return true;
++}
++HOBJECT ServerAdapter::GetClientUserData(HCLIENT client) {
++    trace_service("GetClientUserData");
++    auto it = clients_.find(client); if (it == clients_.end()) return nullptr;
++    const auto* record = objects_.get(it->second.player);
++    if (!record || record->life != Life::Alive) { it->second.player = nullptr; it->second.events.clear(); return nullptr; }
++    return it->second.player;
++}
++DRESULT ServerAdapter::SetClientUserData(HCLIENT client,HOBJECT player) {
++    trace_service("SetClientUserData");
++    auto it = clients_.find(client); if (it == clients_.end()) return DE_INVALIDPARAMS;
++    if (player) {
++        const auto* record = objects_.get(player);
++        if (!record || record->life != Life::Alive || !Objects::is_kind_of(record->type,objects_.find_class("CPlayerObj"))) return DE_INVALIDPARAMS;
++        if (it->second.player && it->second.player != player) return DE_ERROR;
++    }
++    if (!player) it->second.events.clear();
++    it->second.player = player; return DE_OK;
++}
++DRESULT ServerAdapter::SendToClient(HCLIENT client,const PlayerEvent& event) {
++    trace_service("SendToClient");
++    if (!GetClientUserData(client)) return DE_INVALIDPARAMS;
++    const bool valid = std::visit([](const auto& value) {
++        using T = std::decay_t<decltype(value)>;
++        if constexpr (std::is_same_v<T,PlayerRotation>) return std::isfinite(value.pitch) && std::isfinite(value.yaw);
++        else if constexpr (std::is_same_v<T,PlayerPosition>) return physics_vector(value.position);
++        else if constexpr (std::is_same_v<T,PlayerStats>) return std::isfinite(value.health) && std::isfinite(value.armor) && std::isfinite(value.bullets);
++        else if constexpr (std::is_same_v<T,PlayerPhysics>) return value.model.size()<=100 && value.skin.size()<=100 &&
++            value.model.find('\0')==std::string::npos && value.skin.find('\0')==std::string::npos &&
++            physics_vector(value.dimensions) && physics_vector(value.gravity) &&
++            value.dimensions.x>=0 && value.dimensions.y>=0 && value.dimensions.z>=0 &&
++            std::isfinite(value.move_speed) && std::isfinite(value.jump_speed);
++        else return true;
++    },event);
++    if (!valid) return DE_INVALIDPARAMS;
++    auto& events = clients_.at(client).events;
++    if (events.size() >= 256) return DE_ERROR;
++    events.push_back(event); return DE_OK;
++}
++bool ServerAdapter::take_client_events(HCLIENT client,std::vector<PlayerEvent>& events) {
++    events.clear();
++    if (!GetClientUserData(client)) return false;
++    events.swap(clients_.at(client).events); return true;
++}
++DRESULT ServerAdapter::GetObjectDims(HOBJECT h,DVector* out) {
++    trace_service("GetObjectDims"); if (out) *out = {};
++    const auto* r = objects_.get(h); if (!r || !out) return DE_INVALIDPARAMS;
++    *out = r->dimensions; return DE_OK;
++}
++DRESULT ServerAdapter::SetObjectRotation(HOBJECT h,const DRotation* rotation) {
++    trace_service("SetObjectRotation"); auto* r = objects_.get(h);
++    if (!r || !rotation || !physics_vector(rotation->m_Vec) || !std::isfinite(rotation->m_Spin)) return DE_INVALIDPARAMS;
++    const auto& v = rotation->m_Vec;
++    const float norm = std::sqrt(v.x*v.x+v.y*v.y+v.z*v.z+rotation->m_Spin*rotation->m_Spin);
++    if (!std::isfinite(norm) || norm < 1e-6f) return DE_INVALIDPARAMS;
++    r->state.m_Rotation = {vector_scale(v,1/norm),rotation->m_Spin/norm}; return DE_OK;
++}
++DBOOL ServerAdapter::CompareStringsUpper(HSTRING a,HSTRING b) {
++    trace_service("CompareStringsUpper"); const char* x = string_data(a); const char* y = string_data(b);
++    return x && y && !CaseLess{}(x,y) && !CaseLess{}(y,x);
++}
++DRESULT ServerAdapter::SetModelFilenames(HOBJECT h,const char* model,const char* skin) {
++    trace_service("SetModelFilenames"); auto* r = objects_.get(h);
++    if (!r || r->life != Life::Alive || r->state.m_ObjectType != OT_MODEL || !objects_.models ||
++        !model || !skin || std::strlen(model)>100 || std::strlen(skin)>100) return DE_INVALIDPARAMS;
++    // Load before mutation. A missing replacement cannot discard the live model.
++    std::shared_ptr<const Model> next; std::string error;
++    if (!objects_.models->load(model,next,error)) { objects_.fail(ObjectError::Unsupported,error); return DE_ERROR; }
++    if (r->model != next) { r->model = std::move(next); r->animation.animation = 0; r->animation.reset(); }
++    SAFE_STRCPY(r->state.m_Filename,model); SAFE_STRCPY(r->state.m_SkinName,skin); r->model_error.clear(); return DE_OK;
++}
++DRESULT ServerAdapter::MoveObjectToGround(HOBJECT h) {
++    trace_service("MoveObjectToGround"); auto* r = objects_.get(h);
++    if (!r || r->life != Life::Alive || !collision || !collision_ready) return DE_INVALIDPARAMS;
++    // Original ObjectUtilities::MoveObjectToGround: downward ray, animation-0
++    // user dimensions for characters, then collision-aware MoveObject. The
++    // otherwise unbounded CastRay is limited to the supported coordinate range.
++    auto from = r->state.m_Pos; auto to = from; to.y = -10000000.0f;
++    CollisionHit nearest; auto result = collision->sweep(from,to,{},nearest);
++    if (result == CollisionQuery::Invalid) return DE_ERROR;
++    bool found = result == CollisionQuery::Hit;
++    for (auto id : objects_.snapshot()) {
++        const auto* other = objects_.get(id);
++        if (!other || other->life != Life::Alive || other->handle == h || !(other->state.m_Flags & FLAG_SOLID)) continue;
++        CollisionHit hit;
++        if (sweep_box(from,to,{},other->state.m_Pos,other->dimensions,hit) == CollisionQuery::Hit &&
++            (!found || hit.fraction < nearest.fraction)) { nearest = hit; found = true; }
++    }
++    if (!found || nearest.start_solid) return DE_NOTFOUND;
++    DVector dims = r->dimensions;
++    if (Objects::is_kind_of(r->type,objects_.find_class("CBaseCharacter")) && GetModelAnimUserDims(h,&dims,0) != DE_OK) return DE_ERROR;
++    const float distance = from.y-nearest.point.y+0.1f;
++    if (distance > dims.y) { from.y = from.y-distance+(dims.y+0.1f); return MoveObject(h,&from); }
++    return DE_OK; // Already close enough; original helper does not move upward.
++}
++}

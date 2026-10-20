@@ -1,0 +1,14 @@
+295/300 Testing: ai_keys.shared
+295/300 Test: ai_keys.shared
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_model_key_tests" "shared" "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai-key-fixtures/shared"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_keys.shared" start time: Oct 16 05:50 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ai_keys.shared" end time: Oct 16 05:50 CEST
+"ai_keys.shared" time elapsed: 00:00:00
+----------------------------------------------------------

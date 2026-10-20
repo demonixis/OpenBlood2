@@ -1,0 +1,14 @@
+278/618 Testing: ai_keys.shared
+278/618 Test: ai_keys.shared
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_model_key_tests" "shared" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-key-fixtures/shared"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_keys.shared" start time: Oct 17 02:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"ai_keys.shared" end time: Oct 17 02:23 CEST
+"ai_keys.shared" time elapsed: 00:00:00
+----------------------------------------------------------

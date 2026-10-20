@@ -1,0 +1,14 @@
+344/350 Testing: model_view.sample
+344/350 Test: model_view.sample
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/model_view_tests" "sample"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"model_view.sample" start time: Oct 16 09:54 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"model_view.sample" end time: Oct 16 09:54 CEST
+"model_view.sample" time elapsed: 00:00:00
+----------------------------------------------------------

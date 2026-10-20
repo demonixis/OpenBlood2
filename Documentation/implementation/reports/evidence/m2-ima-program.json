@@ -1,0 +1,1198 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "457b0c5369ed25ca1e9baa6e1f37c44d175b792a",
+  "status": "M2 incomplete; finite authored section playback, no game playlists/transitions or required MUSIC",
+  "frozen_sources": {
+    "CMakeLists.txt": "63205bcde2046620d65d62af6f6a7babed6700f40d6aff61621dd431ca9001f9",
+    "src/engine/ima_program.h": "40cf5061a293dd2e991015b7ba1d049c3b10066c54f9b9537dc963d5c77313df",
+    "src/engine/ima_program.cpp": "926047ee7b72af9624eb57855edda1d93f8bd3dc390b3d874b285bb6cefbd892",
+    "src/engine/dls_sampler.h": "c806d77817f3200979e4a54ec9254e62330632e80c6822c1fabe8c26943bce78",
+    "src/engine/dls_sampler.cpp": "56aa384cefbb5776faf1878e5bf0298257e4e1f6fb5a4b02c6ca586fd8dc2c84",
+    "src/game/music_catalog.h": "8302a83d0a6c70278962bcef5675374e2b86fa03883eb43cb841cf7c8767d196",
+    "src/game/music_catalog.cpp": "5585eb1c4e3c37bed8c22603d03a8c974f3a514f9e062845c41bd34628c56436",
+    "src/app/inspector_world_sounds.cpp": "86c798c021e10d39af3308474cdb82a6b6e3f978f9085abef68fff77b0415919",
+    "src/app/world_sound_smoke.cpp": "f28c3d112e75ddd13ef6e7658eb9077e5e53cca0b13f9db3d9576abe3171a2b3",
+    "tests/ima_program_tests.cpp": "bf4c2210a5fe91025cb84fc85dbf6010f3206dc87f5f9a039f35495951845537",
+    "tests/CMakeLists.txt": "ffe5edad66052bf7019702bb54a049971b7fa9e718283d62af75d595593da470"
+  },
+  "results": {
+    "debug-tests": {
+      "passed": 145,
+      "wall_seconds": 27.21
+    },
+    "release-tests": {
+      "passed": 145,
+      "wall_seconds": 4.42
+    },
+    "sanitize-tests": {
+      "passed": 145,
+      "wall_seconds": 104.6
+    },
+    "debug-gpu": {
+      "passed": 2,
+      "wall_seconds": 12.38
+    },
+    "release-gpu": {
+      "passed": 2,
+      "wall_seconds": 5.74
+    }
+  },
+  "private_sections": {
+    "debug-tests": "Cabal complete sections 35 / events 8942 / notes 2968 / terminal stops 63 / nonzero PCM 35615914 / significant PCM 35272925 / energy 58635.2",
+    "release-tests": "Cabal complete sections 35 / events 8942 / notes 2968 / terminal stops 63 / nonzero PCM 35615914 / significant PCM 35272925 / energy 58635.2",
+    "sanitize-tests": "Cabal complete sections 35 / events 8942 / notes 2968 / terminal stops 63 / nonzero PCM 35615914 / significant PCM 35272925 / energy 58635.2"
+  },
+  "unchanged_source_warnings": {
+    "debug": [],
+    "release": [],
+    "sanitize": []
+  },
+  "original_probe": {
+    "binary": "IMUSIC25.DLL",
+    "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+    "cases": 500,
+    "terminal_notes": 7930,
+    "decisions_sha256": "d1d49036ab8d54f39d59fdfac8a787d5cac2723c3d1e9499b8a6746d07c8b8d0",
+    "unicorn": "2.1.4",
+    "rvas": [
+      "0x17996..0x179c2",
+      "0x4e49..0x4f0f"
+    ],
+    "scope": "Original finite-section termination and off-message construction. Synthetic active lists; sink/free intercepted; no playlist, OS or audio executed."
+  },
+  "initialization_probe": {
+    "scope": "Standalone nested aggregate + percussion slot write, before/after explicit fill. No game assets or external binary.",
+    "sources": {
+      "repro": "c759b5d56ab3fbb509ddba40f270decb6783a542dc6aad42d4cc5f5816336e77",
+      "fixed": "b9c679aaa0371e3f4fb0cc1b1c44071a7cb484a5eea9c99921e80943e7d0e09b"
+    },
+    "results": [
+      {
+        "compiler": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)",
+        "optimization": "-O0",
+        "variant": "repro",
+        "passed": true,
+        "exit_code": 0,
+        "channels": [
+          [
+            0,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            1,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            2,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            3,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            4,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            5,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            6,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            7,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            8,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            9,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            10,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            11,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            12,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            13,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            14,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            15,
+            100,
+            127,
+            64,
+            8192
+          ]
+        ]
+      },
+      {
+        "compiler": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)",
+        "optimization": "-O0",
+        "variant": "fixed",
+        "passed": true,
+        "exit_code": 0,
+        "channels": [
+          [
+            0,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            1,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            2,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            3,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            4,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            5,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            6,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            7,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            8,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            9,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            10,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            11,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            12,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            13,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            14,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            15,
+            100,
+            127,
+            64,
+            8192
+          ]
+        ]
+      },
+      {
+        "compiler": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)",
+        "optimization": "-O3",
+        "variant": "repro",
+        "passed": false,
+        "exit_code": 1,
+        "channels": [
+          [
+            0,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            1,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            2,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            3,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            4,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            5,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            6,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            7,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            8,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            9,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            10,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            11,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            12,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            13,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            14,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            15,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      {
+        "compiler": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)",
+        "optimization": "-O3",
+        "variant": "fixed",
+        "passed": true,
+        "exit_code": 0,
+        "channels": [
+          [
+            0,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            1,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            2,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            3,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            4,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            5,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            6,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            7,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            8,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            9,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            10,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            11,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            12,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            13,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            14,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            15,
+            100,
+            127,
+            64,
+            8192
+          ]
+        ]
+      },
+      {
+        "compiler": "clang version 22.1.8 (Fedora 22.1.8-4.fc44)",
+        "optimization": "-O0",
+        "variant": "repro",
+        "passed": true,
+        "exit_code": 0,
+        "channels": [
+          [
+            0,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            1,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            2,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            3,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            4,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            5,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            6,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            7,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            8,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            9,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            10,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            11,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            12,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            13,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            14,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            15,
+            100,
+            127,
+            64,
+            8192
+          ]
+        ]
+      },
+      {
+        "compiler": "clang version 22.1.8 (Fedora 22.1.8-4.fc44)",
+        "optimization": "-O0",
+        "variant": "fixed",
+        "passed": true,
+        "exit_code": 0,
+        "channels": [
+          [
+            0,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            1,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            2,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            3,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            4,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            5,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            6,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            7,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            8,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            9,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            10,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            11,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            12,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            13,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            14,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            15,
+            100,
+            127,
+            64,
+            8192
+          ]
+        ]
+      },
+      {
+        "compiler": "clang version 22.1.8 (Fedora 22.1.8-4.fc44)",
+        "optimization": "-O3",
+        "variant": "repro",
+        "passed": true,
+        "exit_code": 0,
+        "channels": [
+          [
+            0,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            1,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            2,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            3,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            4,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            5,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            6,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            7,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            8,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            9,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            10,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            11,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            12,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            13,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            14,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            15,
+            100,
+            127,
+            64,
+            8192
+          ]
+        ]
+      },
+      {
+        "compiler": "clang version 22.1.8 (Fedora 22.1.8-4.fc44)",
+        "optimization": "-O3",
+        "variant": "fixed",
+        "passed": true,
+        "exit_code": 0,
+        "channels": [
+          [
+            0,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            1,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            2,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            3,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            4,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            5,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            6,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            7,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            8,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            9,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            10,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            11,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            12,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            13,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            14,
+            100,
+            127,
+            64,
+            8192
+          ],
+          [
+            15,
+            100,
+            127,
+            64,
+            8192
+          ]
+        ]
+      }
+    ]
+  },
+  "commands": [
+    "python3 Documentation/Implementation/evidence/m2-ima-program-validation.py {debug,release,sanitize} (three builds at -j1; relevant CTests at -j2)",
+    "cmake --build build/debug --target blood2_app -j1 (final UI wording/format)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/{debug,release} -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit /tmp/b2-ima-program-{debug,release}-gpu.xml",
+    "/tmp/b2-legacy-pan-tools/bin/python Documentation/Implementation/evidence/m2-ima-program-probe.py EXTERNAL_GAME_ROOT",
+    "python3 Documentation/Implementation/evidence/m2-ima-program-init-probe.py (installed GCC/Clang, -O0/-O3, isolated constructor reproduction and explicit-fill fix)",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror (nine modified/new C++ files)",
+    "python3 /tmp/b2-npc-integrity.py; python3 /tmp/b2-npc-links.py; git diff --check (raw .log/.xml excluded)"
+  ],
+  "limitations": [
+    "Finite audition only, explicit seed/gain/epoch; no playlist/repeat/cross-section tempo/variation continuity, game volume or successful MUSIC",
+    "Original finite-tail branch and message construction executed in isolation; synthetic active lists, sink/free intercepted, no native Windows/audio parity",
+    "Sample equality across block sizes is replacement renderer equivalence, not original PCM parity",
+    "All 35 Cabal sections exercise complete PCM, per-section finite/nonzero checks and complete channel defaults; other banks retain known failures",
+    "NVIDIA Linux dummy SDL audio; hidden inspector/reload and inspector-free Release, no native Metal/Windows/mobile or listening comparison",
+    "Capture reviewed for actual report/queue; new play/stop widgets were invoked through the same backend by smoke, not manually clicked"
+  ],
+  "capture": {
+    "path": "Blood2/build/debug/tests/world-sounds.png",
+    "sha256": "6be88b8da460433eb69626c6dfadce7260f25d7b0f98c2ed22b9280df56e21c3",
+    "committed": false
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "readme_preserved_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "files": [
+    {
+      "file": "m2-ima-program-probe.py",
+      "sha256": "b2d1b02e74f060ea53f8927d57a9a33d413e685613bc8f2cf78e0ad40547c198"
+    },
+    {
+      "file": "m2-ima-program-probe.json",
+      "sha256": "4246658c98c8ebc22fe51d90646cf543fcbb291a76a230bb66fb5bceb746ce84"
+    },
+    {
+      "file": "m2-ima-program-validation.py",
+      "sha256": "b9158f578cad51e08d331615caf11cebffe6b688e73e036997b271999ab1e9a5"
+    },
+    {
+      "file": "m2-ima-program-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-ima-program-debug-app-final.log",
+      "sha256": "c2ed93ffd93c840755c0e91392ae593b1b52de9b7aaf6c208123feaceb1dde2e"
+    },
+    {
+      "file": "m2-ima-program-init-probe.py",
+      "sha256": "9bd2fd8232ff102e5e0af12a75793392b36a411d122cd8b0f97004680142607e"
+    },
+    {
+      "file": "m2-ima-program-init-probe.json",
+      "sha256": "6193cac2398ce884656d800dce596343aace939d05577b3819b1b42f78cf2a79"
+    },
+    {
+      "file": "m2-ima-program-init-repro.cpp",
+      "sha256": "c759b5d56ab3fbb509ddba40f270decb6783a542dc6aad42d4cc5f5816336e77"
+    },
+    {
+      "file": "m2-ima-program-init-fixed.cpp",
+      "sha256": "b9c679aaa0371e3f4fb0cc1b1c44071a7cb484a5eea9c99921e80943e7d0e09b"
+    },
+    {
+      "file": "m2-ima-program-debug-tests.log",
+      "sha256": "0a70747ca36b1fa1c46ab912207cab18f26a9802e2a772d7dc86824b683e19d6"
+    },
+    {
+      "file": "m2-ima-program-debug-tests.xml",
+      "sha256": "a984452bd6544eaf9872df18ac39507a43c90af80d32a7fa4fa43c953d74d40f"
+    },
+    {
+      "file": "m2-ima-program-release-tests.log",
+      "sha256": "a1b8952f1386dcc6f16f87b7464ffba66988054c3d67e72dfd15067539cf445b"
+    },
+    {
+      "file": "m2-ima-program-release-tests.xml",
+      "sha256": "b2e02383668c09ea4f8cebf7bddd1c547dde68fa69b57fae61c3aa194a6d1842"
+    },
+    {
+      "file": "m2-ima-program-sanitize-tests.log",
+      "sha256": "51f02d2de779107a05ce0e713804b9e83ef82b71f763458639f2f19afddd3b00"
+    },
+    {
+      "file": "m2-ima-program-sanitize-tests.xml",
+      "sha256": "d535b5b900d5f1e049ce453d5d9a8ca90c4bd7eb5f52898b022fef82729385b9"
+    },
+    {
+      "file": "m2-ima-program-debug-gpu.log",
+      "sha256": "c17069f84ff81c47c8bcf14cce9dfa06a14f563cfba0088613826d245effea0d"
+    },
+    {
+      "file": "m2-ima-program-debug-gpu.xml",
+      "sha256": "711a4b18941109d9bb759fe911516ce256f85488bcff01e60f9ba4c2a7c05bde"
+    },
+    {
+      "file": "m2-ima-program-release-gpu.log",
+      "sha256": "d567cde28abb1df4ac3046b1239c20dbde7621d27d54346c365eae1bad5f776b"
+    },
+    {
+      "file": "m2-ima-program-release-gpu.xml",
+      "sha256": "1f2a676b4a18716334bc6ea35aa62ab8462e8474b0ce16dbc1df336cbbd2616e"
+    },
+    {
+      "file": "m2-ima-program-debug-build-final.log",
+      "sha256": "c83815e365eaaa53495ab7ae9321aa96b0718b2741aa4b0dd939b1aabca5848d"
+    },
+    {
+      "file": "m2-ima-program-release-build-final.log",
+      "sha256": "c83815e365eaaa53495ab7ae9321aa96b0718b2741aa4b0dd939b1aabca5848d"
+    },
+    {
+      "file": "m2-ima-program-sanitize-build-final.log",
+      "sha256": "9111df6419089920551268a150afe5da35b87c009d889609e7a3ae69632cb2f4"
+    },
+    {
+      "file": "m2-ima-program-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-ima-program-links.log",
+      "sha256": "379f0573062cca0220dd07b1527a28a529889a591998fd4bbb1b4ccf71e67336"
+    }
+  ],
+  "implementation_commit": "f89101114c282223d8a50f7683539ce8b65fd24f"
+}

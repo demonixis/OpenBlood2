@@ -1,0 +1,142 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start   1: objects.original_objects
+ 1/63 Test   #1: objects.original_objects .........   Passed    0.02 sec
+      Start   2: objects.nested_creation
+ 2/63 Test   #2: objects.nested_creation ..........   Passed    0.02 sec
+      Start   3: objects.reasons_properties
+ 3/63 Test   #3: objects.reasons_properties .......   Passed    0.02 sec
+      Start   4: objects.scheduling
+ 4/63 Test   #4: objects.scheduling ...............   Passed    0.02 sec
+      Start   5: objects.deferred_removal
+ 5/63 Test   #5: objects.deferred_removal .........   Passed    0.02 sec
+      Start   6: objects.aggregate_dispatch
+ 6/63 Test   #6: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   7: objects.handles_selection
+ 7/63 Test   #7: objects.handles_selection ........   Passed    0.02 sec
+      Start   8: objects.links_lists
+ 8/63 Test   #8: objects.links_lists ..............   Passed    0.02 sec
+      Start   9: objects.messages_strings
+ 9/63 Test   #9: objects.messages_strings .........   Passed    0.04 sec
+      Start  10: objects.unsupported_teardown
+10/63 Test  #10: objects.unsupported_teardown .....   Passed    0.04 sec
+      Start  11: objects.creation_failures
+11/63 Test  #11: objects.creation_failures ........   Passed    0.03 sec
+      Start  24: world.sprite_entries
+12/63 Test  #24: world.sprite_entries .............   Passed    0.04 sec
+      Start  25: world.sound_entries
+13/63 Test  #25: world.sound_entries ..............   Passed    0.04 sec
+      Start  26: world.rez_structure
+14/63 Test  #26: world.rez_structure ..............   Passed    0.01 sec
+      Start  27: world.rez_rejection
+15/63 Test  #27: world.rez_rejection ..............   Passed    0.02 sec
+      Start  28: world.resource_mount
+16/63 Test  #28: world.resource_mount .............   Passed    0.02 sec
+      Start  29: world.world_properties
+17/63 Test  #29: world.world_properties ...........   Passed    0.02 sec
+      Start  30: world.world_geometry
+18/63 Test  #30: world.world_geometry .............   Passed    0.02 sec
+      Start  31: world.world_rejection
+19/63 Test  #31: world.world_rejection ............   Passed    0.05 sec
+      Start  32: world.mutations
+20/63 Test  #32: world.mutations ..................   Passed    0.21 sec
+      Start  33: world.session_lifecycle
+21/63 Test  #33: world.session_lifecycle ..........   Passed    0.02 sec
+      Start  34: world.session_messages
+22/63 Test  #34: world.session_messages ...........   Passed    0.01 sec
+      Start  35: world.original_trigger
+23/63 Test  #35: world.original_trigger ...........   Passed    0.02 sec
+      Start  36: world.private
+24/63 Test  #36: world.private ....................   Passed    3.80 sec
+      Start  38: services.model_reader
+25/63 Test  #38: services.model_reader ............   Passed    0.02 sec
+      Start  39: services.model_rejection
+26/63 Test  #39: services.model_rejection .........   Passed    0.31 sec
+      Start  40: services.animation_events
+27/63 Test  #40: services.animation_events ........   Passed    0.02 sec
+      Start  41: services.model_callbacks
+28/63 Test  #41: services.model_callbacks .........   Passed    0.02 sec
+      Start  42: services.collision_queries
+29/63 Test  #42: services.collision_queries .......   Passed    0.01 sec
+      Start  43: services.movement_contacts
+30/63 Test  #43: services.movement_contacts .......   Passed    0.02 sec
+      Start  44: services.original_services
+31/63 Test  #44: services.original_services .......   Passed    0.02 sec
+      Start  45: services.private
+32/63 Test  #45: services.private .................   Passed   10.62 sec
+      Start  46: player.handles
+33/63 Test  #46: player.handles ...................   Passed    0.03 sec
+      Start  47: player.lifecycle
+34/63 Test  #47: player.lifecycle .................   Passed    0.04 sec
+      Start  48: player.rollback
+35/63 Test  #48: player.rollback ..................   Passed    0.05 sec
+      Start  49: player.messages
+36/63 Test  #49: player.messages ..................   Passed    0.04 sec
+      Start  50: player.callbacks
+37/63 Test  #50: player.callbacks .................   Passed    0.04 sec
+      Start  51: player.private
+38/63 Test  #51: player.private ...................   Passed   11.67 sec
+      Start 103: triggers.schedule
+39/63 Test #103: triggers.schedule ................   Passed    0.04 sec
+      Start 104: triggers.toggle
+40/63 Test #104: triggers.toggle ..................   Passed    0.03 sec
+      Start 105: triggers.filters
+41/63 Test #105: triggers.filters .................   Passed    0.04 sec
+      Start 106: triggers.keys
+42/63 Test #106: triggers.keys ....................   Passed    0.05 sec
+      Start 107: triggers.doors
+43/63 Test #107: triggers.doors ...................   Passed    0.12 sec
+      Start 108: triggers.touch
+44/63 Test #108: triggers.touch ...................   Passed    0.04 sec
+      Start 109: triggers.lifetime
+45/63 Test #109: triggers.lifetime ................   Passed    0.03 sec
+      Start 110: triggers.protocol
+46/63 Test #110: triggers.protocol ................   Passed    0.04 sec
+      Start 111: triggers.private
+47/63 Test #111: triggers.private .................   Passed    6.60 sec
+      Start 112: triggers.catalog
+48/63 Test #112: triggers.catalog .................   Passed   35.06 sec
+      Start 159: objectives.strings
+49/63 Test #159: objectives.strings ...............   Passed    0.02 sec
+      Start 160: objectives.malformed
+50/63 Test #160: objectives.malformed .............   Passed    0.02 sec
+      Start 161: objectives.defaults
+51/63 Test #161: objectives.defaults ..............   Passed    0.04 sec
+      Start 162: objectives.localized
+52/63 Test #162: objectives.localized .............   Passed    0.05 sec
+      Start 163: objectives.missing
+53/63 Test #163: objectives.missing ...............   Passed    0.04 sec
+      Start 164: objectives.queue
+54/63 Test #164: objectives.queue .................   Passed    0.05 sec
+      Start 165: objectives.catalog
+55/63 Test #165: objectives.catalog ...............   Passed   14.88 sec
+      Start 473: exits.defaults
+56/63 Test #473: exits.defaults ...................   Passed    0.04 sec
+      Start 474: exits.delayed
+57/63 Test #474: exits.delayed ....................   Passed    0.05 sec
+      Start 475: exits.broadcast
+58/63 Test #475: exits.broadcast ..................   Passed    0.03 sec
+      Start 476: exits.blocked
+59/63 Test #476: exits.blocked ....................   Passed    0.04 sec
+      Start 477: exits.dead
+60/63 Test #477: exits.dead .......................   Passed    0.04 sec
+      Start 478: exits.queue
+61/63 Test #478: exits.queue ......................   Passed    0.04 sec
+      Start 479: exits.lifetime
+62/63 Test #479: exits.lifetime ...................   Passed    0.05 sec
+      Start 480: exits.catalog
+63/63 Test #480: exits.catalog ....................   Passed   11.58 sec
+
+100% tests passed, 0 tests failed out of 63
+
+Label Time Summary:
+exits         =  11.86 sec*proc (8 tests)
+headless      =  96.40 sec*proc (63 tests)
+objectives    =  15.11 sec*proc (7 tests)
+objects       =   0.24 sec*proc (11 tests)
+player        =  11.87 sec*proc (6 tests)
+private       =  94.19 sec*proc (7 tests)
+services      =  11.03 sec*proc (8 tests)
+triggers      =  42.03 sec*proc (10 tests)
+world         =   4.27 sec*proc (13 tests)
+
+Total Test time (real) =  96.42 sec

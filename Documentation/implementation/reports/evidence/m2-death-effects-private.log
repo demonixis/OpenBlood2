@@ -1,0 +1,11 @@
+burn
+CultistAI burned: particles=142 smoke start=5.07 independent corpse complete
+CivilianAI burned: particles=142 smoke start=5.07 independent corpse complete
+gibs
+gib cycle=0 count=7 impacts=5 final id=7
+gib cycle=1 count=7 impacts=5 final id=14
+gib cycle=2 count=7 impacts=5 final id=21
+limbs
+damage
+particles
+lifetime

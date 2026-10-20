@@ -1,0 +1,9 @@
+[0/2] Re-checking globbed directories...
+[1/9] Scanning /home/yann/projects/lithtech/Blood2/tests/door_tests.cpp for CXX dependencies
+[2/9] Scanning /home/yann/projects/lithtech/Blood2/tests/keyframer_tests.cpp for CXX dependencies
+[3/9] Generating CXX dyndep file tests/CMakeFiles/door_tests.dir/CXX.dd
+[4/9] Generating CXX dyndep file tests/CMakeFiles/keyframer_tests.dir/CXX.dd
+[5/9] Building CXX object tests/CMakeFiles/keyframer_tests.dir/keyframer_tests.cpp.o
+[6/9] Linking CXX executable tests/keyframer_tests
+[7/9] Building CXX object tests/CMakeFiles/door_tests.dir/door_tests.cpp.o
+[8/9] Linking CXX executable tests/door_tests

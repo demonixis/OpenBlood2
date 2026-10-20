@@ -1,0 +1,14 @@
+393/395 Testing: ai_script.lifetime
+393/395 Test: ai_script.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_script_tests" "lifetime" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai-script-lifetime"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_script.lifetime" start time: Oct 16 13:16 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_script.lifetime" end time: Oct 16 13:16 CEST
+"ai_script.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------

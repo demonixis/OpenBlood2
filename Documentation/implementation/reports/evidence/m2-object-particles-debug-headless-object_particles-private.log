@@ -1,0 +1,17 @@
+582/584 Testing: object_particles.private
+582/584 Test: object_particles.private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/object_particle_tests" "private" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"object_particles.private" start time: Oct 16 21:44 CEST
+Output:
+----------------------------------------------------------
+SubwayA cycle 0 dt=0.02: 27 trails, peak 5872 particles, observed 6819 emitted; all expired
+SubwayA cycle 1 dt=0.0166667: 27 trails, peak 6304 particles, observed 6819 emitted; all expired
+SubwayA cycle 2 dt=0.05: 27 trails, peak 2936 particles, observed 6716 emitted; all expired
+<end of output>
+Test time =   8.51 sec
+----------------------------------------------------------
+Test Passed.
+"object_particles.private" end time: Oct 16 21:45 CEST
+"object_particles.private" time elapsed: 00:00:08
+----------------------------------------------------------

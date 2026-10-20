@@ -1,0 +1,70 @@
+Test project <workspace>/Blood2/build/debug
+      Start  44: world.level_change_private
+ 1/26 Test  #44: world.level_change_private ........   Passed    5.05 sec
+      Start  45: world.destination_trial_private
+ 2/26 Test  #45: world.destination_trial_private ...   Passed    4.76 sec
+      Start  46: world.destination_private
+ 3/26 Test  #46: world.destination_private .........   Passed    2.51 sec
+      Start  47: world.private
+ 4/26 Test  #47: world.private .....................   Passed    0.90 sec
+      Start 105: containers.geometry
+ 5/26 Test #105: containers.geometry ...............   Passed    0.00 sec
+      Start 106: containers.concave
+ 6/26 Test #106: containers.concave ................   Passed    0.00 sec
+      Start 107: containers.membership
+ 7/26 Test #107: containers.membership .............   Passed    0.01 sec
+      Start 108: containers.lifetime
+ 8/26 Test #108: containers.lifetime ...............   Passed    0.01 sec
+      Start 109: containers.index_lifetime
+ 9/26 Test #109: containers.index_lifetime .........   Passed    0.01 sec
+      Start 110: containers.index_callbacks
+10/26 Test #110: containers.index_callbacks ........***Failed    0.00 sec
+index_callbacks:334: skipped && fresh && !skipped->physics_calls && !fresh->physics_calls
+
+      Start 111: containers.physics
+11/26 Test #111: containers.physics ................   Passed    0.00 sec
+      Start 112: containers.swimming
+12/26 Test #112: containers.swimming ...............   Passed    0.02 sec
+      Start 113: containers.surface
+13/26 Test #113: containers.surface ................   Passed    0.01 sec
+      Start 114: containers.ladders
+14/26 Test #114: containers.ladders ................   Passed    0.02 sec
+      Start 115: containers.air_damage
+15/26 Test #115: containers.air_damage .............   Passed    0.01 sec
+      Start 116: containers.specialized_defaults
+16/26 Test #116: containers.specialized_defaults ...   Passed    0.01 sec
+      Start 117: containers.conveyor_motion
+17/26 Test #117: containers.conveyor_motion ........   Passed    0.01 sec
+      Start 118: containers.conveyor_bodies
+18/26 Test #118: containers.conveyor_bodies ........   Passed    0.00 sec
+      Start 119: containers.specialized_damage
+19/26 Test #119: containers.specialized_damage .....   Passed    0.01 sec
+      Start 120: containers.freefall_motion
+20/26 Test #120: containers.freefall_motion ........   Passed    0.02 sec
+      Start 121: containers.specialized_private
+21/26 Test #121: containers.specialized_private ....   Passed    4.68 sec
+      Start 122: containers.private
+22/26 Test #122: containers.private ................   Passed    5.13 sec
+      Start 921: polygrid.formulas
+23/26 Test #921: polygrid.formulas .................   Passed    0.00 sec
+      Start 922: polygrid.lifetime
+24/26 Test #922: polygrid.lifetime .................   Passed    0.00 sec
+      Start 923: polygrid.mesh
+25/26 Test #923: polygrid.mesh .....................   Passed    0.00 sec
+      Start 924: polygrid.private
+26/26 Test #924: polygrid.private ..................   Passed    1.96 sec
+
+96% tests passed, 1 tests failed out of 26
+
+Label Time Summary:
+containers    =   9.95 sec*proc (18 tests)
+headless      =  25.15 sec*proc (26 tests)
+polygrid      =   1.97 sec*proc (4 tests)
+private       =  25.00 sec*proc (7 tests)
+world         =  13.22 sec*proc (4 tests)
+
+Total Test time (real) =  25.16 sec
+
+The following tests FAILED:
+	110 - containers.index_callbacks (Failed)               containers headless
+Errors while running CTest

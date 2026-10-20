@@ -1,0 +1,20 @@
+344/630 Testing: world_view.subway
+344/630 Test: world_view.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/world_view_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"world_view.subway" start time: Oct 17 00:36 CEST
+Output:
+----------------------------------------------------------
+SubwayA glass: 31 faces bind textures/greys/dirtyglass.dtx; 64x64, flags=10, alpha=51..102
+Textures: decoded=52 failed=0 bytes=1962244
+SubwayA: vertices=25287 draws=111 triangles=7441 unbound=5 invisible=442 posed=110
+SubwayA glass: 31 faces bind textures/greys/dirtyglass.dtx; 64x64, flags=10, alpha=51..102
+Textures: decoded=52 failed=0 bytes=1962244
+SubwayA: vertices=25287 draws=111 triangles=7441 unbound=5 invisible=442 posed=110
+<end of output>
+Test time =   0.18 sec
+----------------------------------------------------------
+Test Passed.
+"world_view.subway" end time: Oct 17 00:36 CEST
+"world_view.subway" time elapsed: 00:00:00
+----------------------------------------------------------

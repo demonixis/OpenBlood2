@@ -1,0 +1,25 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 330: world_view.subway
+    Start 329: world_view.alpha_order
+1/7 Test #329: world_view.alpha_order ...........   Passed    0.03 sec
+    Start 328: world_view.lifetime
+2/7 Test #328: world_view.lifetime ..............   Passed    0.06 sec
+    Start 326: world_view.rejects
+3/7 Test #326: world_view.rejects ...............   Passed    0.04 sec
+    Start 325: world_view.mesh
+4/7 Test #325: world_view.mesh ..................   Passed    0.03 sec
+    Start 327: world_view.camera
+5/7 Test #327: world_view.camera ................   Passed    0.03 sec
+    Start 739: world_shaders.formats
+6/7 Test #739: world_shaders.formats ............   Passed    0.03 sec
+7/7 Test #330: world_view.subway ................   Passed    9.46 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+headless      =   9.68 sec*proc (7 tests)
+private       =   9.46 sec*proc (1 test)
+shaders       =   0.03 sec*proc (1 test)
+world_view    =   9.68 sec*proc (7 tests)
+
+Total Test time (real) =   9.48 sec

@@ -1,0 +1,1291 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 338fd0a..4dd6994 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -273,3 +273,10 @@ The [AI perception continuation](../Documentation/Implementation/M2_AI_PERCEPTIO
+ The [AI state/action continuation](../Documentation/Implementation/M2_AI_STATES.md) adds original transitions, Cultist/Civilian decisions and stationary idle/talk/special commands. Read [contracts](docs/AI_STATE_CONTRACTS.md). Preserve strict idle deadline, last-state exclusions, idle/talk command sharing, special-action random draws and failed-perception guards. Animation resize uses the documented atomic foot-anchored replacement. Diagnostic dispatch is not AI_Update; production NPCs, combat/navigation/death, required FX and ExitTrigger remain unavailable. M2 stays open.
+ 
+ The [AI weapon-action continuation](../Documentation/Implementation/M2_AI_FIRE.md) connects original weapon choice, supported aiming/clearance, standing fire and fire_key delivery. Read [contracts](docs/AI_FIRE_CONTRACTS.md). Preserve raw-ammo selection, strict cadence/range, initial-miss versus head-retry behavior, cached-head writes, dry acceptance and independent completion increments. Player eye alignment must remain player-only. Missing switch columns/services fail; diagnostic firing does not register production NPCs or implement AI_Update. Navigation/death, required FX and ExitTrigger still keep M2 open.
++
++The [AI command/hearing continuation](../Documentation/Implementation/M2_AI_TRIGGERS.md) connects selected original HandleTrigger,
++PlayAnimation, SendSoundTrigger and player sound alerts. Read [contracts](docs/AI_TRIGGER_CONTRACTS.md). Preserve
++source command early returns, exact hearing boundaries, reversed gunfire class test,
++impact guards, two-faction order/duplicates and alert-after-playback-failure. Snapshot
++checked identities across callbacks; delivery is not reaction. Scripts and full NPC
++initialization/AI_Update/deactivation remain unavailable; M2 stays open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ac8a0b6..87bf736 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,7 +41,7 @@ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+-    src/game/original/AIState.cpp
++    src/game/original/AIState.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+     src/game/original/CivilianAI.cpp
+     src/game/original/CultistAI.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+diff --git a/README.md b/README.md
+index 4963ab8..66302b0 100644
+--- a/README.md
++++ b/README.md
+@@ -1,14 +1,10 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
+-Latest gameplay continuation: [original AI weapon actions](../Documentation/Implementation/M2_AI_FIRE.md) connects
+-weapon choice, aiming/clearance, standing fire and model-key shots with inspection.
+-Full AI_Update and production NPCs, navigation/death, required FX, ExitTrigger and
+-the actual M2 gate remain open.
+-
+-Latest gameplay continuation: [original AI perception](../Documentation/Implementation/M2_AI_PERCEPTION.md) adds faction membership,
+-radius/FOV/visibility selection, stimulus priorities and ExitHint. These commands
+-run against the real player in diagnostic probes; original NPC states/actions,
+-client FX, ExitTrigger and the M2 exit gate remain incomplete.
++Latest gameplay continuation: [original AI commands and hearing](../Documentation/Implementation/M2_AI_TRIGGERS.md) connects
++trigger commands, two-faction broadcasts and player sound alerts, building on
++[weapon actions](../Documentation/Implementation/M2_AI_FIRE.md) and [perception](../Documentation/Implementation/M2_AI_PERCEPTION.md).
++Full NPC initialization/AI_Update, required actions, client FX and ExitTrigger
++still block the actual M2 gate.
+ 
+ A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory, KeyPickup, original player USE, RotatingDoor, RotatingBrush, selected CDestructableBrush damage/removal and original CDebris explosive area damage and BoxPhysics pushable/gravity brushes with original damage impulses are connected. Original ammo/health/armor pickups and destruction spawns extend this subset; complete player gameplay remains missing. This is not a playable game.
+ 
+@@ -339,3 +335,11 @@ The [AI weapon-action continuation](docs/AI_FIRE_CONTRACTS.md) passes 384/384 De
+ and inspector-free Release checks (27 GPU), plus 136 targeted headless ASan/UBSan/
+ leak checks. Selection, clearance, timed/key firing, real damage and deferred removal
+ are verified for the bounded path; required production NPCs and M2 remain open.
++
++The [AI command/hearing continuation](docs/AI_TRIGGER_CONTRACTS.md) connects original trigger commands,
++two-faction sound broadcasts and actual player alerts. Search/dodge/attack selection
++is inspectable but their complete NPC actions and the M2 gate remain unavailable.
++
++Command/hearing verification: 393/393 Debug and inspector-free Release checks
++(27 GPU each), 145 targeted ASan/UBSan/leak checks, and 19/19 final Debug hearing/audio
++checks after numeric-validation refinements. See the [evidence](../Documentation/Implementation/M2_AI_TRIGGERS.md).
+diff --git a/docs/AI_STATE_CONTRACTS.md b/docs/AI_STATE_CONTRACTS.md
+index 2a5f63b..8187d6f 100644
+--- a/docs/AI_STATE_CONTRACTS.md
++++ b/docs/AI_STATE_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original AI state decisions and stationary actions
+ 
++> Extended by [AI command/hearing contracts](AI_TRIGGER_CONTRACTS.md): player sound
++> alerts, original hearing reactions and selected trigger commands now execute.
++> Complete production NPCs and M2 remain open.
++
+ > Extended by [AI weapon-action contracts](AI_FIRE_CONTRACTS.md): supported weapon
+ > choice, aiming, clearance, standing fire and AI fire_key now execute. Earlier
+ > blanket weapon/fire omissions are historical; full NPCs and M2 remain open.
+diff --git a/docs/AI_TRIGGER_CONTRACTS.md b/docs/AI_TRIGGER_CONTRACTS.md
+new file mode 100644
+index 0000000..0501d49
+--- /dev/null
++++ b/docs/AI_TRIGGER_CONTRACTS.md
+@@ -0,0 +1,101 @@
++# Original AI trigger commands and hearing
++
++This integrates selected `AI_Mgr::HandleTrigger`, `PlayAnimation`, its MID_TRIGGER
++message branch and `ObjectUtilities::SendSoundTrigger`. Player sound attempts now
++send the original alerts. Read [source selections](M2_AI_TRIGGER_SOURCES.json),
++[execution evidence](../../Documentation/Implementation/M2_AI_TRIGGERS.md),
++[object lifetime](OBJECT_CONTRACTS.md), [state actions](AI_STATE_CONTRACTS.md),
++[target ownership](AI_TARGET_CONTRACTS.md) and [character audio](CHARACTER_AUDIO_CONTRACTS.md).
++No production NPC is registered; M2 remains incomplete.
++
++## Commands
++
++Command names are ASCII case-insensitive. Owned text is parsed with the existing
++bounded semicolon/quoted-token parser. Input is at most 1,279 bytes (the original
++64*20-byte token buffer minus its terminator), 64 commands and 64 arguments per
++command. Embedded NUL, unterminated quotes and invalid numeric values fail.
++The complete syntax is checked before mutations; a malformed later command cannot
++execute an earlier prefix. Numeric conversions are strict instead of unchecked
++atoi/atof. This is a safety adaptation, not a claim of complete SDK Parse parity.
++
++SETSTATE uses the existing original prefix-to-state mapping and transition rules.
++TARGET selects/faces the named object and then selects AttackFar. A failed lookup
++retains the previous target; no invented attack action executes. PLAYANIMATION
++resolves a named clip, selects it through the checked size/animation service and
++disables looping. Validation happens before changing looping, unlike the original
++unchecked call order. PLAYSOUND starts a real attached spatial one-shot WAV with
++priority 2, volume 100%, integer radius 5,000 by default (nonpositive becomes 1,000), and
++inner radius 10%. It is unretained and expires through the existing mixer. Missing
++assets fail. These four source branches return immediately, skipping later commands.
++
++An exact whole-message TRIGGER with a configured relay target sends the same text
++to named objects, using the AI as sender; zero matches is valid. Names are limited
++to 100 bytes. Targets are snapshotted before delivery. Relay diagnostics count
++transport deliveries, not successful recipient actions. An active-command guard
++rejects recursive delivery to the same AI. SCRIPT explicitly fails without changing
++state or consuming a pretend script; unknown commands also fail visibly.
++
++MID_TRIGGER copies the caller-owned HSTRING then releases it before callbacks,
++processes owned text, and preserves the original base/aggregate forwarding chain.
++The boolean helper reports accepted/ignored commands separately from failures;
++the original returns false even after some successful hearing branches. Engine
++message delivery success still does not assert successful recipient behavior.
++
++## Hearing rules
++
++Sound identifiers are gunfire 0, gun impact 1 and player sound 2. Self-sounds are
++ignored. A noninterruptible Script state returns immediately, including skipping
++later commands. The source interruptible flag is bit 1. Gunfire/player sound
++reactions require Idle, live sampled positions, and distance <= hearing range.
++They use the sender's current position, not the coordinates encoded in the message.
++No occlusion ray is added. Gunfire retains the source's reversed IsKindOf argument
++order: `IsKindOf(CPlayerObj, senderClass)`. That accepts a player or its base class,
++but rejects a derived player class; this source quirk is deliberate.
++
++Gunfire stores the heard position and selects SearchVisual. Player sounds at
++strictly less than half the hearing range do the same; at exactly half through
++the outer boundary they face the sender and request Idle. Existing has-targeted/
++idle-deadline rules can convert that request to SearchVisual. Hearing caches a
++location without assigning a target/link or changing has-targeted. Impact sounds
++require the source dodge flag (8), current/previous state not Dodge, and previous
++state not Passive. They store the three message coordinates and select Dodge,
++without a hearing-distance check. Guarded-out impacts do not parse unused positions.
++Search/dodge state selection is not execution of their still-missing actions.
++
++## Broadcast and lifetime
++
++SendSoundTrigger snapshots Cabal followed by Monster identities in list order.
++The player belongs to both; duplicates are deliberately retained. Sender entries
++are excluded. The squared position/radius test is inclusive, using double arithmetic
++to avoid float overflow. Radius must be finite/nonnegative and positions bounded.
++Inside-radius recipients receive the original SOUND_TRIGGER string with one decimal
++coordinate precision and a terminal semicolon. Formatting is locale-independent.
++No playing voice, hearing range or visibility is required to send the notification.
++Inactive/hidden Alive recipients remain eligible, pending/stale recipients do not.
++
++Mutable list traversal is replaced with a bounded identity snapshot before any
++callbacks; removal cannot invalidate an iterator or cause a later pending object
++to receive a message. New list entries are deferred to the next broadcast. Sender
++removal stops subsequent deliveries. Every allocated string/message/list is released,
++including allocation/service failure and nested relay paths. Report fields distinguish
++visited, eligible, skipped and delivered; completion permits zero recipients and
++never asserts a reaction or health change. Historical sender handles in the inspector
++are always resolved through checked object lookup.
++
++CPlayerObj::PlayPlayerSound sends a player-sound alert after every playback attempt,
++including missing files and streaming rejection, as in the original. Suppressed
++footsteps that never call PlayPlayerSound still send no alert. Playback success and
++alert success are separate counters/results. Weapon PlayFireSound/impact callers
++remain unported and do not claim automatic gunfire/impact broadcasts; the receiver
++and callable helper are tested with those original IDs.
++
++## Inspection and limits
++
++The Skeleton panel shows commands, outcome, failures, hearing range/events/reactions,
++ignored events, sampled location/distance, checked sender and relay deliveries even
++without a model. Player sound inspection shows real alert attempts/deliveries and
++errors. The GPU diagnostic has one original hearing transition before its existing
++standing-fire driver and verifies the recorded outcome with UI hidden and after reload.
++That driver is not AI_Update. Full initialization, deactivation/PingObjects visibility,
++autonomous update/target retention, navigation, scripts, death and production NPC
++registration remain open. Required FX and ExitTrigger also keep M2 incomplete.
+diff --git a/docs/CHARACTER_AUDIO_CONTRACTS.md b/docs/CHARACTER_AUDIO_CONTRACTS.md
+index dc37d86..9ca1738 100644
+--- a/docs/CHARACTER_AUDIO_CONTRACTS.md
++++ b/docs/CHARACTER_AUDIO_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original character voices and player animation sounds
+ 
++> Extended by [AI command/hearing contracts](AI_TRIGGER_CONTRACTS.md): player sound
++> alerts, original hearing reactions and selected trigger commands now execute.
++> Complete production NPCs and M2 remain open.
++
+ > The later [AI model-key continuation](AI_MODEL_KEY_CONTRACTS.md) adds selected
+ > AI_Mgr sound dispatch. Earlier blanket AI-key audio omissions are superseded;
+ > full AI behavior, hearing, fire/extra and M2 acceptance remain open.
+diff --git a/docs/M2_AI_TRIGGER_SOURCES.json b/docs/M2_AI_TRIGGER_SOURCES.json
+new file mode 100644
+index 0000000..531392a
+--- /dev/null
++++ b/docs/M2_AI_TRIGGER_SOURCES.json
+@@ -0,0 +1,93 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "38262899bd81e0976ae16ed8ee9f2153c58f0c12",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          770,
++          806
++        ],
++        [
++          987,
++          1263
++        ]
++      ],
++      "use": "Selected trigger relay, hearing, state/target/animation/sound commands and MID_TRIGGER forwarding; SCRIPT interpreter excluded"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
++      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
++      "selected_lines": [
++        [
++          284,
++          358
++        ]
++      ],
++      "use": "Original two-faction sound broadcast and one-decimal payload"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "selected_lines": [
++        [
++          4850,
++          4899
++        ]
++      ],
++      "use": "Alert after player playback attempt"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
++      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350",
++      "selected_lines": [
++        [
++          117,
++          171
++        ]
++      ],
++      "use": "Dodge, sound trigger and interruptible script constants"
++    },
++    {
++      "path": "sources/blood2/Shared/SharedDefs.h",
++      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "selected_lines": [
++        [
++          188,
++          190
++        ]
++      ],
++      "use": "Original sound identifiers"
++    },
++    {
++      "path": "sources/blood2/Shared/SoundTypes.h",
++      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1",
++      "selected_lines": [
++        [
++          14,
++          30
++        ]
++      ],
++      "use": "Original sound priority"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/AIScriptList.h",
++      "sha256": "b8cc846cf152f18aa07459297f2bde857064cb497d705bba115c9dba7d21fe2e",
++      "selected_lines": [
++        [
++          22,
++          27
++        ]
++      ],
++      "use": "Original command spellings"
++    }
++  ],
++  "adaptations": [
++    "Checked owned messages and callback-safe list snapshots",
++    "Strict bounded text/numeric validation and reentrant AI guard",
++    "Typed acceptance distinct from original overloaded false return",
++    "Required unavailable scripts and state actions stay explicit"
++  ]
++}
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index cda6b97..e38669d 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -544,3 +544,11 @@ MC_Fire_Stand/MC_BestWeapon and key firing are connected with typed failures and
+ checked lifetimes. CWeapon's original player-only eye-alignment condition is
+ restored. See [source ranges/hashes](M2_AI_FIRE_SOURCES.json) and
+ [contracts/adaptations](AI_FIRE_CONTRACTS.md). No production NPC is registered.
++
++## M2 AI commands and hearing
++
++Selected original AI_Mgr HandleTrigger/PlayAnimation/message dispatch and
++ObjectUtilities SendSoundTrigger are integrated, including the original player
++sound caller. See [source hashes/ranges](M2_AI_TRIGGER_SOURCES.json) and
++[bounded contracts/adaptations](AI_TRIGGER_CONTRACTS.md). Scripts and full NPCs
++remain unported; checked snapshots replace mutable callback list traversal.
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index f0edf21..128e1f4 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -101,6 +101,9 @@ namespace OpenBlood2
+         if (!victim || g.server.SetObjectDims(victim, &dimensions) != DE_OK || !ai->SetNewTarget(victim) ||
+             !ai->RefreshTargetPosition())
+             return false;
++        ai->m_fHearingDist = 1000;
++        if (!ai->HandleTrigger(victim, "SOUND_TRIGGER 2"))
++            return false;
+         ai->diagnostic_target = victim;
+         g.server.SetNextUpdate(h, .001f);
+         id = r->id;
+@@ -112,9 +115,11 @@ namespace OpenBlood2
+         const auto* ai = r ? dynamic_cast<const AIFireProbe*>(r->game.get()) : nullptr;
+         const auto* target =
+             ai ? dynamic_cast<const AIFireTarget*>(g.server.HandleToObject(ai->diagnostic_target)) : nullptr;
+-        return ai && target && ai->fire_shots > 2 && ai->animation_finishes > 0 && ai->fire_failures == 0 &&
+-               ai->state_failures == 0 && ai->key_failures == 0 && ai->audio_starts > 0 &&
+-               target->damage.m_fHitPoints < 10000 && ai->m_InventoryMgr.GetAmmoCount(AMMO_BULLET) < 100;
++        return ai && target && ai->hearing_reactions == 1 && ai->trigger_failures == 0 &&
++               ai->trigger_outcome == AI_Mgr::TriggerOutcome::Heard && ai->fire_shots > 2 &&
++               ai->animation_finishes > 0 && ai->fire_failures == 0 && ai->state_failures == 0 &&
++               ai->key_failures == 0 && ai->audio_starts > 0 && target->damage.m_fHitPoints < 10000 &&
++               ai->m_InventoryMgr.GetAmmoCount(AMMO_BULLET) < 100;
+     }
+     bool prepare_ai_state_smoke(GameSession& g, ObjectId& id)
+     {
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 65db8e4..9420454 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -58,6 +58,38 @@ namespace OpenBlood2
+         ImGui::TableNextColumn();
+         const auto* r = game.objects.get(skeleton_selection);
+         const auto* target_ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
++        if (target_ai && ImGui::CollapsingHeader("Original AI commands / hearing", ImGuiTreeNodeFlags_DefaultOpen))
++        {
++            const auto& ai = *target_ai;
++            const char* outcomes[]{"None",
++                                   "Ignored",
++                                   "Heard location",
++                                   "Turned",
++                                   "State selected",
++                                   "Target selected",
++                                   "Animation started",
++                                   "Sound started",
++                                   "Relay delivered",
++                                   "Failed"};
++            ImGui::Text("Result: %s | commands %llu / failures %llu",
++                        outcomes[static_cast<unsigned>(ai.trigger_outcome)], (unsigned long long)ai.trigger_commands,
++                        (unsigned long long)ai.trigger_failures);
++            ImGui::TextWrapped("Last command: %s", ai.trigger_text.c_str());
++            ImGui::Text("Hearing %.1f | events %llu / reactions %llu / ignored %llu", ai.m_fHearingDist,
++                        (unsigned long long)ai.hearing_events, (unsigned long long)ai.hearing_reactions,
++                        (unsigned long long)ai.hearing_ignored);
++            const auto* sender = game.objects.get(ai.heard_sender);
++            ImGui::Text("Sound %d | sender %s | distance %.2f", ai.heard_sound,
++                        sender && sender->life == Life::Alive ? sender->state.m_Name : "none / removed",
++                        ai.heard_distance);
++            ImGui::Text("Heard position %.2f %.2f %.2f", ai.heard_position.x, ai.heard_position.y, ai.heard_position.z);
++            ImGui::Text("Relay: %s | delivered %llu", ai.trigger_relay_target.c_str(),
++                        (unsigned long long)ai.trigger_relays);
++            if (!ai.trigger_error.empty())
++                ImGui::TextWrapped("%s", ai.trigger_error.c_str());
++            ImGui::TextWrapped("State selection does not execute missing search/dodge/attack actions. Full AI_Update "
++                               "and scripts remain unavailable.");
++        }
+         if (target_ai && ImGui::CollapsingHeader("Original AI weapon actions", ImGuiTreeNodeFlags_DefaultOpen))
+         {
+             const auto& ai = *target_ai;
+@@ -312,10 +344,15 @@ namespace OpenBlood2
+                     ImGui::Text("Ground material: %d | foot material: %d | volume: %u | next foot: %s",
+                                 player->m_eLastSurface, player->footstep_surface, unsigned(player->footstep_container),
+                                 player->m_bNextFootstepLeft ? "left" : "right");
+-                    ImGui::Text("AI sound alerts unavailable: %llu",
+-                                (unsigned long long)player->unavailable_sound_alerts);
++                    ImGui::Text("AI sound alert failures: %llu", (unsigned long long)player->unavailable_sound_alerts);
++                    ImGui::Text("Alert attempts %llu | last messages delivered %u / eligible %u | %s",
++                                (unsigned long long)player->sound_alerts, player->sound_alert.delivered,
++                                player->sound_alert.eligible, player->sound_alert.complete ? "complete" : "incomplete");
++                    if (!player->sound_alert.error.empty())
++                        ImGui::TextWrapped("%s", player->sound_alert.error.c_str());
+                 }
+-                ImGui::TextWrapped("Dry audio only. AI hearing, voice-manager events and reverb remain unavailable.");
++                ImGui::TextWrapped("Dry audio only. AI hearing is separate from playback; voice-manager events and "
++                                   "reverb remain unavailable.");
+             }
+             std::vector<NodePose> pose;
+             if (sample_pose(model, r->animation.animation, r->animation.time, pose))
+diff --git a/src/game/original/AISound.cpp b/src/game/original/AISound.cpp
+new file mode 100644
+index 0000000..ce6c865
+--- /dev/null
++++ b/src/game/original/AISound.cpp
+@@ -0,0 +1,84 @@
++// Original ObjectUtilities.cpp:284-358. Checked snapshots replace mutable list traversal.
++#include "AISound.h"
++#include "AI_Mgr.h"
++#include "engine/collision.h"
++#include <charconv>
++#include <cmath>
++
++bool SendSoundTrigger(HOBJECT sender, int kind, DVector position, float radius, OpenBlood2::SoundAlertReport& report)
++{
++    report = {};
++    auto* server = BaseClass::GetServerDE();
++    auto fail = [&](const char* why)
++    {
++        report.error = why;
++        return false;
++    };
++    if (!server || !server->IsObjectAlive(sender) || kind < 0 || kind > 2 || !OpenBlood2::physics_vector(position) ||
++        !std::isfinite(radius) || radius < 0)
++        return fail("Invalid sound alert source, kind, position or radius");
++    std::vector<HOBJECT> candidates;
++    // Cabal first, then monsters. Preserve duplicates (players belong to both lists).
++    for (const auto* head : {&AI_Mgr::m_CabalHead, &AI_Mgr::m_MonsterHead})
++    {
++        if (!head->m_pNext)
++            continue;
++        unsigned count = 0;
++        for (auto* link = head->m_pNext; link != head; link = link->m_pNext)
++        {
++            if (!link || ++count > 65536)
++                return fail("Invalid or over-limit AI sound list");
++            auto h = server->ObjectToHandle(static_cast<BaseClass*>(link->m_pData));
++            if (!h)
++                return fail("AI sound list contains an unresolved object");
++            candidates.push_back(h);
++        }
++    }
++    std::string text = "SOUND_TRIGGER " + std::to_string(kind);
++    for (auto value : {position.x, position.y, position.z})
++    {
++        char buffer[64];
++        auto [end, ec] = std::to_chars(buffer, buffer + sizeof buffer, value, std::chars_format::fixed, 1);
++        if (ec != std::errc{})
++            return fail("Sound position formatting failed");
++        text += ' ';
++        text.append(buffer, end);
++    }
++    text += ';';
++    const double squared = double(radius) * radius;
++    for (auto h : candidates)
++    {
++        ++report.visited;
++        if (h == sender || !server->IsObjectAlive(h))
++        {
++            ++report.skipped;
++            continue;
++        }
++        if (!server->IsObjectAlive(sender))
++            return fail("Sound sender removed during delivery");
++        DVector target;
++        if (server->GetObjectPos(h, &target) != DE_OK)
++            return fail("Sound recipient position unavailable");
++        const double x = double(target.x) - position.x, y = double(target.y) - position.y,
++                     z = double(target.z) - position.z;
++        if (x * x + y * y + z * z > squared)
++            continue;
++        ++report.eligible;
++        auto string = server->CreateString(text.c_str());
++        auto message = server->StartMessageToObject(server->HandleToObject(sender), h, 1000 /* MID_TRIGGER */);
++        if (!string || !message || server->WriteToMessageHString(message, string) != DE_OK)
++        {
++            if (string)
++                server->FreeString(string);
++            if (message)
++                server->EndHMessageWrite(message);
++            return fail("Sound alert message allocation failed");
++        }
++        server->FreeString(string);
++        if (server->EndMessage(message) != DE_OK)
++            return fail("Sound alert delivery failed");
++        ++report.delivered;
++    }
++    report.complete = true;
++    return true;
++}
+diff --git a/src/game/original/AISound.h b/src/game/original/AISound.h
+new file mode 100644
+index 0000000..c0f8f5d
+--- /dev/null
++++ b/src/game/original/AISound.h
+@@ -0,0 +1,14 @@
++#pragma once
++#include "game/legacy/basedefs_de.h"
++#include <string>
++namespace OpenBlood2
++{
++    struct SoundAlertReport
++    {
++        unsigned visited = 0, eligible = 0, delivered = 0, skipped = 0;
++        bool complete = false;
++        std::string error;
++    };
++} // namespace OpenBlood2
++// Original ObjectUtilities::SendSoundTrigger. Deliveries are messages, not AI reactions.
++bool SendSoundTrigger(HOBJECT, int, DVector, float, OpenBlood2::SoundAlertReport&);
+diff --git a/src/game/original/AITrigger.cpp b/src/game/original/AITrigger.cpp
+new file mode 100644
+index 0000000..2d317bc
+--- /dev/null
++++ b/src/game/original/AITrigger.cpp
+@@ -0,0 +1,278 @@
++// Original AI_Mgr.cpp:987-1263, selected command/hearing branches. See AI_TRIGGER_CONTRACTS.md.
++#include "AI_Mgr.h"
++#include "engine/collision.h"
++#include "engine/model_commands.h"
++#include <charconv>
++#include <cmath>
++
++namespace
++{
++    bool same(std::string_view a, std::string_view b)
++    {
++        if (a.size() != b.size())
++            return false;
++        for (std::size_t i = 0; i < a.size(); ++i)
++        {
++            auto upper = [](char c) { return c >= 'a' && c <= 'z' ? char(c - 'a' + 'A') : c; };
++            if (upper(a[i]) != upper(b[i]))
++                return false;
++        }
++        return true;
++    }
++    template <class T> bool number(std::string_view text, T& value)
++    {
++        if (text.starts_with('+'))
++        {
++            text.remove_prefix(1);
++            if (text.starts_with('-'))
++                return false;
++        }
++        if (text.empty() || text.starts_with('+'))
++            return false;
++        const auto [end, ec] = std::from_chars(text.data(), text.data() + text.size(), value);
++        return ec == std::errc{} && end == text.data() + text.size() && std::isfinite(double(value));
++    }
++    struct Busy
++    {
++        bool& value;
++        explicit Busy(bool& v) : value(v)
++        {
++            value = true;
++        }
++        ~Busy()
++        {
++            value = false;
++        }
++    };
++} // namespace
++bool AI_Mgr::TriggerFailure(const char* error)
++{
++    ++trigger_failures;
++    trigger_outcome = TriggerOutcome::Failed;
++    trigger_error = error;
++    return false;
++}
++bool AI_Mgr::PlayAnimation(std::string_view name)
++{
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject) || name.empty() || name.size() > 255 ||
++        name.find('\0') != name.npos)
++        return TriggerFailure("Invalid AI animation request");
++    const auto clip = server->GetAnimIndex(m_hObject, std::string(name).c_str());
++    // Validate/select before changing looping; missing/blocked clips are explicit failures.
++    if (clip == UINT32_MAX || !SetAnimation(clip))
++        return TriggerFailure("Requested AI animation unavailable or blocked");
++    server->SetModelLooping(m_hObject, DFALSE);
++    return true;
++}
++bool AI_Mgr::HandleTrigger(HOBJECT sender, std::string_view text)
++{
++    auto* server = GetServerDE();
++    ++trigger_calls;
++    if (trigger_busy)
++        return TriggerFailure("Reentrant AI trigger rejected");
++    trigger_error.clear();
++    trigger_outcome = TriggerOutcome::None;
++    trigger_text.assign(text.substr(0, 1279));
++    if (!server || !server->IsObjectAlive(m_hObject) || text.empty() || text.size() > 1279 ||
++        text.find('\0') != text.npos)
++        return TriggerFailure("AI trigger owner or bounded text unavailable");
++    Busy busy(trigger_busy);
++    if (same(text, "TRIGGER") && !trigger_relay_target.empty())
++    {
++        if (trigger_relay_target.size() > 100 || trigger_relay_target.find('\0') != trigger_relay_target.npos)
++            return TriggerFailure("AI relay target is invalid");
++        auto* list = server->FindNamedObjects(trigger_relay_target.c_str());
++        if (!list)
++            return TriggerFailure("AI relay lookup failed");
++        std::vector<HOBJECT> targets;
++        for (auto* link = list->m_pFirstLink; link; link = link->m_pNext)
++            targets.push_back(link->m_hObject);
++        server->RelinquishList(list);
++        for (auto target : targets)
++        {
++            if (!server->IsObjectAlive(target))
++                continue;
++            if (!server->IsObjectAlive(m_hObject))
++                return TriggerFailure("AI relay owner removed during delivery");
++            auto string = server->CreateString(trigger_text.c_str());
++            auto message = server->StartMessageToObject(this, target, 1000 /* MID_TRIGGER */);
++            if (!string || !message || server->WriteToMessageHString(message, string) != DE_OK)
++            {
++                if (string)
++                    server->FreeString(string);
++                if (message)
++                    server->EndHMessageWrite(message);
++                return TriggerFailure("AI relay message allocation failed");
++            }
++            server->FreeString(string);
++            if (server->EndMessage(message) != DE_OK)
++                return TriggerFailure("AI relay delivery failed");
++            ++trigger_relays;
++            if (trigger_outcome == TriggerOutcome::Failed)
++                return false;
++        }
++        trigger_outcome = TriggerOutcome::Relay;
++        return true; // Zero name matches is the source's valid empty delivery.
++    }
++    std::vector<std::vector<std::string>> commands;
++    if (!OpenBlood2::model_commands(text, commands) || commands.empty())
++        return TriggerFailure("Malformed AI trigger command list");
++    for (const auto& args : commands)
++    {
++        if (!server->IsObjectAlive(m_hObject))
++            return TriggerFailure("AI removed during command dispatch");
++        ++trigger_commands;
++        const auto& command = args.front();
++        if (same(command, "SOUND_TRIGGER"))
++        {
++            int kind;
++            if (args.size() < 2 || !number(args[1], kind))
++                return TriggerFailure("Invalid sound-trigger identifier");
++            ++hearing_events;
++            heard_sound = kind;
++            heard_sender = sender;
++            heard_distance = 0;
++            heard_position = {};
++            trigger_outcome = TriggerOutcome::Ignored;
++            auto ignore = [&] { ++hearing_ignored; };
++            if (sender == m_hObject)
++            {
++                ignore();
++                continue;
++            }
++            if (m_nState == StateScript && !(m_dwScriptFlags & (1u << 1)))
++            {
++                ignore();
++                return true;
++            } // Original early return skips later commands.
++            if (kind == 0 || kind == 2)
++            {
++                if (m_nState != StateIdle)
++                {
++                    ignore();
++                    continue;
++                }
++                DVector origin, source;
++                if (!server->IsObjectAlive(sender) || server->GetObjectPos(sender, &source) != DE_OK ||
++                    server->GetObjectPos(m_hObject, &origin) != DE_OK || !std::isfinite(m_fHearingDist) ||
++                    m_fHearingDist < 0)
++                    return TriggerFailure("Hearing requires live positions and a finite nonnegative range");
++                const auto delta = OpenBlood2::vector_subtract(source, origin);
++                heard_position = source; // Gunfire/player sounds use sender position, not message coordinates.
++                heard_distance = std::hypot(delta.x, delta.y, delta.z);
++                if (!std::isfinite(heard_distance))
++                    return TriggerFailure("Hearing distance overflow");
++                if (heard_distance > m_fHearingDist)
++                {
++                    ignore();
++                    continue;
++                }
++                // Preserve the source's reversed IsKindOf argument order, even for subclass callers.
++                if (kind == 0 && !server->IsKindOf(server->GetClass("CPlayerObj"), server->GetObjectClass(sender)))
++                {
++                    ignore();
++                    continue;
++                }
++                if (kind == 0 || heard_distance < m_fHearingDist / 2)
++                {
++                    m_vTargetPos = source;
++                    target_position_valid = true; // Cached location only; no target/link acquisition.
++                    if (!SetNewState(StateSearchVisual))
++                        return TriggerFailure(state_error.c_str());
++                    trigger_outcome = TriggerOutcome::Heard;
++                }
++                else
++                {
++                    if (!MC_FacePos(source) || !SetNewState(StateIdle))
++                        return TriggerFailure("Hearing face/state service failed");
++                    trigger_outcome = TriggerOutcome::Turned;
++                }
++                ++hearing_reactions;
++            }
++            else if (kind == 1)
++            {
++                if (!(m_dwFlags & 8u) || m_nState == StateDodge || m_nLastState == StateDodge ||
++                    m_nLastState == StatePassive)
++                {
++                    ignore();
++                    continue;
++                }
++                DVector point;
++                if (args.size() < 5 || !number(args[2], point.x) || !number(args[3], point.y) ||
++                    !number(args[4], point.z) || !OpenBlood2::physics_vector(point))
++                    return TriggerFailure("Invalid gun-impact coordinates");
++                m_vTrackObjPos = heard_position = point; // Source does not apply hearing distance to impacts.
++                if (!SetNewState(StateDodge))
++                    return TriggerFailure(state_error.c_str());
++                trigger_outcome = TriggerOutcome::Heard;
++                ++hearing_reactions;
++            }
++            else
++                ignore();
++        }
++        else if (same(command, "SETSTATE"))
++        {
++            int state;
++            if (args.size() < 2 || !StateStrToInt(args[1], state) || !SetNewState(state))
++                return TriggerFailure("AI SETSTATE request failed");
++            trigger_outcome = TriggerOutcome::State;
++            return true;
++        }
++        else if (same(command, "TARGET"))
++        {
++            if (args.size() < 2 || !SetTarget(args[1]) || !SetNewState(StateAttackFar))
++                return TriggerFailure("AI TARGET lookup, facing or transition failed");
++            trigger_outcome = TriggerOutcome::Target;
++            return true;
++        }
++        else if (same(command, "PLAYANIMATION"))
++        {
++            if (args.size() < 2)
++                return TriggerFailure("AI PLAYANIMATION requires a clip name");
++            if (!PlayAnimation(args[1]))
++                return false;
++            trigger_outcome = TriggerOutcome::Animation;
++            return true;
++        }
++        else if (same(command, "PLAYSOUND"))
++        {
++            int radius = 5000;
++            if (args.size() < 2 || args[1].empty() || args[1].size() > 255 ||
++                (args.size() > 2 && !number(args[2], radius)))
++                return TriggerFailure("Invalid AI PLAYSOUND parameters");
++            if (radius <= 0)
++                radius = 1000;
++            OpenBlood2::SoundRequest request;
++            request.resource = args[1];
++            request.speaker = m_hObject;
++            request.outer_radius = radius;
++            request.inner_radius = radius * .1f;
++            request.priority = 2; // SOUNDPRIORITY_MISC_HIGH
++            std::string error;
++            if (!server->PlayCharacterSound(m_hObject, request, false, error))
++                return TriggerFailure(error.c_str());
++            trigger_outcome = TriggerOutcome::Sound;
++            return true;
++        }
++        else if (same(command, "SCRIPT"))
++            return TriggerFailure("AI script interpreter is not integrated");
++        else
++            return TriggerFailure("Unknown AI trigger command");
++    }
++    return true; // Typed acceptance, unlike the source's false even after a successful hearing action.
++}
++DDWORD AI_Mgr::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    if (message == 1000 /* MID_TRIGGER */)
++    {
++        auto* server = GetServerDE();
++        auto string = server->ReadFromMessageHString(read);
++        const char* data = string ? server->GetStringData(string) : nullptr;
++        const std::string text = data ? data : "";
++        if (string)
++            server->FreeString(string); // Own the text across nested delivery/removal.
++        HandleTrigger(sender, text);
++    }
++    return CBaseCharacter::ObjectMessageFn(sender, message, read);
++}
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 072a7f0..7d68c70 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -191,6 +191,34 @@ class AI_Mgr : public CBaseCharacter
+     DDWORD requested_animation = UINT32_MAX;
+     std::string state_error;
+ 
++    enum class TriggerOutcome
++    {
++        None,
++        Ignored,
++        Heard,
++        Turned,
++        State,
++        Target,
++        Animation,
++        Sound,
++        Relay,
++        Failed
++    };
++    bool HandleTrigger(HOBJECT sender, std::string_view text);
++    bool PlayAnimation(std::string_view name);
++    float m_fHearingDist = 0;
++    DDWORD m_dwFlags = 0, m_dwScriptFlags = 0;
++    DVector m_vTrackObjPos{};
++    std::string trigger_relay_target;
++    TriggerOutcome trigger_outcome = TriggerOutcome::None;
++    std::uint64_t trigger_calls = 0, trigger_commands = 0, trigger_failures = 0;
++    std::uint64_t hearing_events = 0, hearing_reactions = 0, hearing_ignored = 0, trigger_relays = 0;
++    int heard_sound = -1;
++    HOBJECT heard_sender = nullptr; // Non-owning historical identity; inspect through checked lookup.
++    DVector heard_position{};
++    float heard_distance = 0;
++    std::string trigger_text, trigger_error;
++
+     bool InitStatics(std::shared_ptr<CAnim_Sound>);
+     bool CanSee(HOBJECT);
+     OpenBlood2::AISight sight;
+@@ -225,12 +253,15 @@ class AI_Mgr : public CBaseCharacter
+     std::string ai_key, ai_key_error, ai_sound_resource;
+ 
+   protected:
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++    bool TriggerFailure(const char*);
+     bool StateFailure(const char*);
+     bool AnimationCommand(DDWORD clip, int command);
+     bool OnStringKey(ArgList*) override;
+     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+ 
+   private:
++    bool trigger_busy = false;
+     DLink m_Link{};
+     bool registered_cabal = true;
+     static void InitLists();
+diff --git a/src/game/original/CharacterSound.cpp b/src/game/original/CharacterSound.cpp
+index 1210780..8d8ab00 100644
+--- a/src/game/original/CharacterSound.cpp
++++ b/src/game/original/CharacterSound.cpp
+@@ -130,9 +130,17 @@ bool CPlayerObj::PlayPlayerSound(std::string_view sound, float radius, DBYTE vol
+         request.priority = static_cast<DBYTE>(priority + 4); // Original PLAYER base + caller modifier.
+         m_hCurSound = server->PlayCharacterSound(m_hObject, request, true, sound_error);
+     }
+-    // Original SendSoundTrigger happens after every playback attempt. AI lists/receivers
+-    // are not imported: count the missing operation explicitly, never claim delivery.
+-    ++unavailable_sound_alerts;
++    // Source alerts after every playback attempt, including a missing WAV.
++    DVector position;
++    ++sound_alerts;
++    sound_alert = {};
++    if (server->GetObjectPos(m_hObject, &position) != DE_OK)
++    {
++        sound_alert.error = "Player sound position unavailable";
++        ++unavailable_sound_alerts;
++    }
++    else if (!SendSoundTrigger(m_hObject, 2, position, radius, sound_alert))
++        ++unavailable_sound_alerts;
+     if (m_hCurSound)
+         ++sound_starts;
+     else
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index 92cbc67..6bff1c4 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -1,4 +1,5 @@
+ #pragma once
++#include "AISound.h"
+ #include "Anim_Sound.h"
+ #include "B2BaseClass.h"
+ #include "Destructable.h"
+@@ -60,6 +61,8 @@ class CPlayerObj : public CBaseCharacter
+     bool GetFootstepSound(std::string&);
+     std::uint64_t sound_keys = 0, sound_attempts = 0, sound_starts = 0, sound_failures = 0;
+     std::uint64_t suppressed_footsteps = 0, unresolved_footsteps = 0, unavailable_sound_alerts = 0;
++    OpenBlood2::SoundAlertReport sound_alert;
++    std::uint64_t sound_alerts = 0;
+     std::string sound_resource, sound_error;
+     void UpdateSound();
+     void PostPropRead(ObjectCreateStruct*);
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 37487a4..bf17eda 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -688,3 +688,15 @@ if(BLOOD2_TEST_DATA_DIR)
+         set_tests_properties(ai_fire.${case} PROPERTIES LABELS "headless;private;ai_fire" TIMEOUT 90)
+     endforeach()
+ endif()
++
++add_executable(ai_trigger_tests ai_trigger_tests.cpp)
++target_link_libraries(ai_trigger_tests PRIVATE blood2_game)
++blood2_project_options(ai_trigger_tests)
++foreach(case hearing gunfire impact commands relay broadcast lifetime audio)
++    add_test(NAME ai_trigger.${case} COMMAND ai_trigger_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/ai-trigger-${case}")
++    set_tests_properties(ai_trigger.${case} PROPERTIES LABELS "headless;ai_trigger" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME ai_trigger.subway COMMAND ai_trigger_tests subway "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(ai_trigger.subway PROPERTIES LABELS "headless;private;ai_trigger" TIMEOUT 90)
++endif()
+diff --git a/tests/ai_trigger_tests.cpp b/tests/ai_trigger_tests.cpp
+new file mode 100644
+index 0000000..f597ff5
+--- /dev/null
++++ b/tests/ai_trigger_tests.cpp
+@@ -0,0 +1,343 @@
++#include "audio_fixture.h"
++#include "engine/collision.h"
++#include "game/original/AI_Mgr.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    template <class T = AI_Mgr> T* actor(GameSession& g, DVector pos = {})
++    {
++        static const ClassInfo type{std::is_same_v<T, AI_Mgr> ? "HearingProbe" : "RemovingHearingProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<T>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_Pos = pos;
++        SAFE_STRCPY(s.m_Name, type.name.c_str());
++        auto h = g.objects.create(&type, s);
++        auto* r = g.objects.get(h);
++        return r ? dynamic_cast<T*>(r->game.get()) : nullptr;
++    }
++    bool send(GameSession& g, HOBJECT sender, HOBJECT target, const char* text)
++    {
++        auto string = g.server.CreateString(text);
++        auto message = g.server.StartMessageToObject(g.server.HandleToObject(sender), target, 1000);
++        CHECK(string && message && g.server.WriteToMessageHString(message, string) == DE_OK);
++        g.server.FreeString(string);
++        CHECK(g.server.EndMessage(message) == DE_OK);
++        return true;
++    }
++    HOBJECT source(GameSession& g, DVector pos, const char* name = "source")
++    {
++        ObjectCreateStruct s;
++        s.m_Pos = pos;
++        SAFE_STRCPY(s.m_Name, name);
++        return g.objects.create(g.objects.find_class("BaseClass"), s);
++    }
++    bool hearing(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto* a = actor(g);
++        CHECK(a);
++        a->m_fHearingDist = 100;
++        auto h = source(g, {49, 0, 0});
++        CHECK(send(g, h, a->m_hObject, "SOUND_TRIGGER 2 999 999 999;"));
++        CHECK(a->m_nState == AI_Mgr::StateSearchVisual && a->m_vTargetPos.x == 49 && !a->GetTarget());
++        CHECK(a->hearing_reactions == 1 && a->heard_distance == 49);
++        a->SetNewState(AI_Mgr::StateIdle);
++        g.objects.get(h)->state.m_Pos.x = 50;
++        CHECK(a->HandleTrigger(h, "sound_trigger 2"));
++        CHECK(a->m_nState == AI_Mgr::StateIdle && a->face_commands == 1 && a->Metacmd == 1);
++        CHECK(a->trigger_outcome == AI_Mgr::TriggerOutcome::Turned);
++        g.objects.get(h)->state.m_Pos.x = 100;
++        CHECK(a->HandleTrigger(h, "SOUND_TRIGGER 2") && a->hearing_reactions == 3);
++        g.objects.get(h)->state.m_Pos.x = 100.01f;
++        CHECK(a->HandleTrigger(h, "SOUND_TRIGGER 2") && a->hearing_ignored == 1);
++        CHECK(a->HandleTrigger(a->m_hObject, "SOUND_TRIGGER 1") && a->hearing_ignored == 2);
++        a->m_bHasTargeted = true;
++        a->m_fWaitForIdleTime = 120;
++        g.objects.get(h)->state.m_Pos.x = 80;
++        CHECK(a->HandleTrigger(h, "SOUND_TRIGGER 2") && a->m_nState == AI_Mgr::StateSearchVisual);
++        CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++    bool gunfire(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto* a = actor(g);
++        auto* other = actor(g, {20, 0, 0});
++        CHECK(a && other);
++        a->m_fHearingDist = 100;
++        CHECK(a->HandleTrigger(other->m_hObject, "SOUND_TRIGGER 0") && a->hearing_ignored == 1);
++        auto h = source(g, {20, 0, 0});
++        CHECK(a->HandleTrigger(h, "SOUND_TRIGGER 0")); // Original reversed IsKindOf accepts BaseClass.
++        CHECK(a->m_nState == AI_Mgr::StateSearchVisual && a->hearing_reactions == 1);
++        a->SetNewState(AI_Mgr::StateIdle);
++        a->m_fHearingDist = 0;
++        CHECK(a->HandleTrigger(h, "SOUND_TRIGGER 0") && a->hearing_ignored == 2);
++        return true;
++    }
++    bool impact(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto* a = actor(g);
++        CHECK(a);
++        auto h = source(g, {90000, 0, 0});
++        a->m_dwFlags = 8;
++        CHECK(a->HandleTrigger(h, "SOUND_TRIGGER 1 1.2 -3.4 500"));
++        CHECK(a->m_nState == AI_Mgr::StateDodge && a->m_vTrackObjPos.z == 500 && a->hearing_reactions == 1);
++        CHECK(a->HandleTrigger(h, "SOUND_TRIGGER 1") && a->hearing_ignored == 1); // Guards before coordinate parsing.
++        a->SetNewState(AI_Mgr::StateIdle);
++        CHECK(a->HandleTrigger(h, "SOUND_TRIGGER 1 1 2 3") && a->hearing_ignored == 2); // last Dodge
++        a->m_nLastState = AI_Mgr::StatePassive;
++        CHECK(a->HandleTrigger(h, "SOUND_TRIGGER 1 1 2 3") && a->hearing_ignored == 3);
++        a->m_nLastState = AI_Mgr::StateIdle;
++        CHECK(!a->HandleTrigger(h, "SOUND_TRIGGER 1 1 nan 3") && a->m_vTrackObjPos.z == 500);
++        return true;
++    }
++    bool commands(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto* a = actor(g);
++        CHECK(a);
++        auto h = source(g, {20, 0, 0}, "target with spaces");
++        CHECK(a->HandleTrigger(h, "setstate passive; TARGET missing") && a->m_nState == AI_Mgr::StatePassive);
++        CHECK(a->trigger_commands == 1); // Source command early return.
++        CHECK(a->HandleTrigger(h, "TARGET \"target with spaces\"; SETSTATE IDLE"));
++        CHECK(a->GetTarget() == h && a->m_nState == AI_Mgr::StateAttackFar && a->Metacmd == 1);
++        CHECK(!a->HandleTrigger(h, "TARGET absent") && a->GetTarget() == h);
++        const auto state = a->m_nState;
++        CHECK(!a->HandleTrigger(h, "SCRIPT INTERRUPTABLE; WAIT 1;") && a->m_nState == state);
++        CHECK(!a->HandleTrigger(h, "SETSTATE IDLE; \"unterminated") && a->m_nState == state);
++        CHECK(a->HandleTrigger(h, "SETSTATE unknown") && a->m_nState == AI_Mgr::StateInactive);
++        a->m_nState = AI_Mgr::StateScript;
++        CHECK(a->HandleTrigger(h, "SOUND_TRIGGER 2; SETSTATE IDLE") && a->m_nState == AI_Mgr::StateScript);
++        a->m_dwScriptFlags = 2;
++        CHECK(a->HandleTrigger(h, "SOUND_TRIGGER 2; SETSTATE IDLE") && a->m_nState == AI_Mgr::StateIdle);
++        CHECK(!a->HandleTrigger(h, "unsupported"));
++        CHECK(!a->HandleTrigger(h, std::string(1280, 'a')));
++        CHECK(!a->HandleTrigger(h, std::string_view("SETSTATE IDLE\0x", 15)));
++        return true;
++    }
++    bool relay(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto* a = actor(g);
++        auto* b = actor(g);
++        CHECK(a && b);
++        SAFE_STRCPY(g.objects.get(b->m_hObject)->state.m_Name, "receiver");
++        a->trigger_relay_target = "receiver";
++        b->trigger_relay_target = "no matches";
++        CHECK(send(g, a->m_hObject, a->m_hObject, "TrIgGeR"));
++        CHECK(a->trigger_relays == 1 && b->trigger_calls == 1 && b->trigger_failures == 0);
++        a->trigger_relay_target = "HearingProbe";
++        CHECK(!a->HandleTrigger(nullptr, "TRIGGER"));
++        CHECK(a->trigger_failures == 1 && a->trigger_error.find("Reentrant") != std::string::npos);
++        CHECK(g.server.string_count() == 0 && g.server.message_count() == 0 && g.server.list_count() == 0);
++        CHECK(a->HandleTrigger(nullptr, "SETSTATE IDLE")); // Guard released after rejection.
++        return true;
++    }
++    struct ListenerPlayer : CPlayerObj
++    {
++        unsigned alerts = 0;
++        DDWORD EngineMessageFn(DDWORD message, void* data, DFLOAT value) override
++        {
++            return BaseClass::EngineMessageFn(message, data, value);
++        } // Test-only message recipient, no player entry.
++        DDWORD ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read) override
++        {
++            if (message == 1000)
++                ++alerts;
++            return BaseClass::ObjectMessageFn(sender, message, read);
++        }
++    };
++    bool broadcast(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        auto* a = actor(g, {10, 0, 0});
++        auto* b = actor(g, {20, 0, 0});
++        CHECK(a && b);
++        a->m_fHearingDist = b->m_fHearingDist = 100;
++        b->m_bCabal = false;
++        CHECK(a->InsertMe() && b->InsertMe());
++        auto h = source(g, {0, 0, 0});
++        SoundAlertReport report;
++        CHECK(SendSoundTrigger(h, 2, {}, 10, report));
++        CHECK(report.visited == 2 && report.delivered == 1 && a->hearing_reactions == 1 && b->hearing_events == 0);
++        CHECK(SendSoundTrigger(h, 2, {}, 20, report) && report.delivered == 2 && b->hearing_reactions == 1);
++        CHECK(SendSoundTrigger(a->m_hObject, 2, {10, 0, 0}, 100, report) && report.delivered == 1 &&
++              report.skipped == 1);
++        a->m_nState = AI_Mgr::StateIdle;
++        a->m_nLastState = AI_Mgr::StateIdle;
++        a->m_dwFlags = 8;
++        CHECK(SendSoundTrigger(h, 1, {1.26f, -2.34f, 3.56f}, 100, report));
++        CHECK(std::abs(a->m_vTrackObjPos.x - 1.3f) < .001f && std::abs(a->m_vTrackObjPos.y + 2.3f) < .001f);
++        CHECK(!SendSoundTrigger(h, 2, {}, -1, report) && !report.complete && report.delivered == 0);
++        CHECK(!SendSoundTrigger(h, 9, {}, 20, report));
++        static const ClassInfo listener_type{"HearingPlayerSubclass",
++                                             g.objects.find_class("CPlayerObj"),
++                                             []() -> std::unique_ptr<BaseClass>
++                                             { return std::make_unique<ListenerPlayer>(); },
++                                             {}};
++        CHECK(g.objects.register_class(listener_type));
++        auto listener_handle = g.objects.create(&listener_type);
++        auto* listener = dynamic_cast<ListenerPlayer*>(g.server.HandleToObject(listener_handle));
++        CHECK(listener);
++        AI_Mgr::InsertPlayer(*listener);
++        g.objects.get(listener_handle)->activity = OBJSTATE_INACTIVE;
++        g.objects.get(a->m_hObject)->activity = OBJSTATE_INACTIVE;
++        CHECK(SendSoundTrigger(h, 2, {}, 100, report) && report.delivered == 4 && listener->alerts == 2);
++        a->m_nState = AI_Mgr::StateIdle;
++        const auto ignored = a->hearing_ignored;
++        CHECK(a->HandleTrigger(listener_handle, "SOUND_TRIGGER 0") && a->hearing_ignored == ignored + 1);
++
++        CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++    struct Removing : AI_Mgr
++    {
++        HOBJECT victim = nullptr;
++        inline static unsigned destroyed = 0;
++        ~Removing() override
++        {
++            ++destroyed;
++        }
++        DDWORD ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read) override
++        {
++            if (message == 1000 && victim)
++                GetServerDE()->RemoveObject(victim);
++            return AI_Mgr::ObjectMessageFn(sender, message, read);
++        }
++    };
++    bool lifetime(const char*)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        for (unsigned cycle = 0; cycle < 4; ++cycle)
++        {
++            auto* b = actor(g, {20, 0, 0});
++            auto* a = actor<Removing>(g, {10, 0, 0});
++            CHECK(a && b);
++            CHECK(b->InsertMe() && a->InsertMe()); // Head insertion: remover first.
++            auto h = source(g, {});
++            a->victim = b->m_hObject;
++            SoundAlertReport report;
++            CHECK(SendSoundTrigger(h, 2, {}, 100, report));
++            CHECK(report.delivered == 1 && report.skipped == 1 && !g.server.IsObjectAlive(b->m_hObject));
++            CHECK(g.objects.finish_frame());
++            auto* later = actor(g, {30, 0, 0});
++            CHECK(later);
++            later->m_bCabal = false;
++            CHECK(later->InsertMe());
++            a->victim = h;
++            CHECK(!SendSoundTrigger(h, 2, {}, 100, report) && report.delivered == 1 && !report.complete);
++            CHECK(later->hearing_events == 0);
++            CHECK(!g.server.IsObjectAlive(h) && g.objects.finish_frame());
++            CHECK(!SendSoundTrigger(h, 2, {}, 100, report));
++            CHECK(g.objects.clear() && AI_Mgr::m_dwNumCabal == 0 && AI_Mgr::m_dwNumMonster == 0);
++        }
++        CHECK(Removing::destroyed == 4 && g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++    bool audio(const char* root)
++    {
++        GameSession g;
++        CHECK(test_audio::setup(g, root));
++        auto* a = actor(g);
++        CHECK(a);
++        CHECK(a->HandleTrigger(nullptr, "PLAYSOUND cue.wav"));
++        CHECK(g.server.audio.voices().size() == 1);
++        const auto& voice = g.server.audio.voices().begin()->second;
++        CHECK(voice.request.outer_radius == 5000 && voice.request.inner_radius == 500 && voice.auto_remove);
++        CHECK(a->HandleTrigger(nullptr, "PLAYSOUND cue.wav -4"));
++        CHECK(!a->HandleTrigger(nullptr, "PLAYSOUND cue.wav 1.5"));
++        CHECK(!a->HandleTrigger(nullptr, "PLAYSOUND cue.wav +-1"));
++        CHECK(!a->HandleTrigger(nullptr, "PLAYSOUND missing.wav"));
++        CHECK(a->HandleTrigger(nullptr, "PLAYANIMATION animation0") == false); // No model, explicit failure.
++        auto model = std::make_shared<Model>();
++        std::string error;
++        CHECK(read_model(test_model::abc().b, *model, error));
++        auto* record = g.objects.get(a->m_hObject);
++        record->model = model;
++        record->state.m_Pos = {0, 100, 0};
++        record->dimensions = {1, 1, 1};
++        CHECK(a->HandleTrigger(nullptr, "PLAYANIMATION " + model->animations.front().name));
++        CHECK(record->animation.animation == 0 && !record->animation.looping);
++        CHECK(!a->HandleTrigger(nullptr, "PLAYANIMATION missing") && record->animation.animation == 0);
++        CHECK(g.objects.create(g.objects.find_class("GameStartPoint"), {}, Creation::World,
++                               {{"Name", std::string("start")}, {"Pos", DVector{40, 100, 0}}}));
++        CHECK(g.enter_player(error));
++        auto* player = g.server_shell.Player(g.local_client);
++        CHECK(player && a->InsertMe());
++        a->m_fHearingDist = 400;
++        CHECK(player->PlayPlayerSound("cue.wav", 400, 100, false));
++        CHECK(a->hearing_reactions == 1 && player->sound_alert.delivered == 1);
++        CHECK(a->SetNewState(AI_Mgr::StateIdle));
++        CHECK(!player->PlayPlayerSound("missing.wav", 400, 100, false));
++        CHECK(a->hearing_reactions == 2 && player->sound_alert.delivered == 1 && player->unavailable_sound_alerts == 0);
++        return true;
++    }
++    bool subway(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config config;
++        config.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(config, error));
++        HOBJECT old = nullptr;
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            CHECK(!g.objects.get(old) && !g.objects.find_class("CultistAI"));
++            auto* player = g.server_shell.Player(g.local_client);
++            auto* a = actor(g);
++            CHECK(player && a);
++            DVector pos;
++            CHECK(g.server.GetObjectPos(player->m_hObject, &pos) == DE_OK);
++            g.objects.get(a->m_hObject)->state.m_Pos = vector_add(pos, {40, 0, 0});
++            a->m_fHearingDist = 400;
++            CHECK(a->InsertMe());
++            CHECK(player->PlayPlayerSound("sounds/player/footsteps/metal/leftm.wav", 400, 70, false));
++            CHECK(player->sound_alert.complete && player->sound_alert.delivered == 1 && a->hearing_reactions == 1);
++            CHECK(a->m_nState == AI_Mgr::StateSearchVisual && !a->GetTarget());
++            CHECK(a->SetNewState(AI_Mgr::StateIdle));
++            CHECK(!player->PlayPlayerSound("missing-preservation-probe.wav", 400, 70, false));
++            CHECK(a->hearing_reactions == 2 && player->sound_alert.delivered == 1);
++            std::cout << "cycle=" << cycle << " reactions=" << a->hearing_reactions
++                      << " delivered=" << player->sound_alert.delivered << " failures=" << a->trigger_failures << '\n';
++            CHECK(a->trigger_failures == 0 && player->unavailable_sound_alerts == 0);
++            old = a->m_hObject;
++            CHECK(g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::map<std::string, std::function<bool(const char*)>> tests{
++        {"hearing", hearing},     {"gunfire", gunfire},   {"impact", impact}, {"commands", commands}, {"relay", relay},
++        {"broadcast", broadcast}, {"lifetime", lifetime}, {"audio", audio},   {"subway", subway}};
++    auto t = tests.find(argv[1]);
++    return t != tests.end() && t->second(argc > 2 ? argv[2] : "") ? 0 : 1;
++}
+diff --git a/tests/character_audio_tests.cpp b/tests/character_audio_tests.cpp
+index 560d177..9f01fb3 100644
+--- a/tests/character_audio_tests.cpp
++++ b/tests/character_audio_tests.cpp
+@@ -190,7 +190,7 @@ namespace
+         CHECK(old && p->sound_starts == 1 && p->pending_model_commands.empty());
+         CHECK(key(g, h, "play_sound", "missing"));
+         CHECK(!g.server.audio.get(old) && !p->m_hCurSound && p->sound_failures == 1 &&
+-              p->unavailable_sound_alerts == 2);
++              p->unavailable_sound_alerts == 0 && p->sound_alerts == 2 && p->sound_alert.complete);
+         CHECK(key(g, h, "play_sound", "cue.wav") && p->sound_resource == "sounds\\chosen\\caleb\\cue.wav.wav" &&
+               !p->m_hCurSound);
+         CHECK(p->PlayPlayerSound("sounds/chosen/caleb/cue.wav", 1000, 255, false, 0));
+@@ -482,8 +482,8 @@ namespace
+             g.client_shell.movement_input = {};
+             std::cout << "cycle=" << cycle << " keys=" << p->sound_keys << " starts=" << p->sound_starts
+                       << " material=" << p->m_eLastSurface << " last=" << p->sound_resource << '\n';
+-            CHECK(heard && p->sound_starts > 0 && p->sound_failures == 0 &&
+-                  p->unavailable_sound_alerts == p->sound_attempts);
++            CHECK(heard && p->sound_starts > 0 && p->sound_failures == 0 && p->unavailable_sound_alerts == 0 &&
++                  p->sound_alerts == p->sound_attempts && p->sound_alert.complete);
+             CHECK(g.unload_world() && g.server.audio.voices().empty() && g.server.audio.cached_clips() == 0 &&
+                   !g.server.audio.get(old));
+         }

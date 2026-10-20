@@ -1,0 +1,16 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 1050: ima_cursor.dispatch_generated
+1/3 Test #1050: ima_cursor.dispatch_generated ....   Passed    0.03 sec
+    Start 1051: ima_cursor.dispatch_behavior
+2/3 Test #1051: ima_cursor.dispatch_behavior .....   Passed    0.03 sec
+    Start 1052: ima_cursor.dispatch_private
+3/3 Test #1052: ima_cursor.dispatch_private ......   Passed    0.84 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+headless        =   0.90 sec*proc (3 tests)
+music_assets    =   0.90 sec*proc (3 tests)
+private         =   0.84 sec*proc (1 test)
+
+Total Test time (real) =   0.91 sec

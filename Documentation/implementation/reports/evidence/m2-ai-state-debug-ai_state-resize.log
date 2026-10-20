@@ -1,0 +1,14 @@
+365/372 Testing: ai_state.resize
+365/372 Test: ai_state.resize
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_state_tests" "resize"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_state.resize" start time: Oct 16 10:57 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.resize" end time: Oct 16 10:57 CEST
+"ai_state.resize" time elapsed: 00:00:00
+----------------------------------------------------------

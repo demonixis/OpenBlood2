@@ -1,0 +1,19 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start  34: gpu.lifecycle
+1/4 Test  #34: gpu.lifecycle ....................   Passed    0.69 sec
+    Start  60: gpu.bench_01_SubwayA
+2/4 Test  #60: gpu.bench_01_SubwayA .............   Passed    1.90 sec
+    Start  61: gpu.bench_02_CityHub
+3/4 Test  #61: gpu.bench_02_CityHub .............   Passed    5.31 sec
+    Start 953: gpu.hud
+4/4 Test #953: gpu.hud ..........................   Passed    1.21 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+bench      =   7.21 sec*proc (2 tests)
+gpu        =   9.11 sec*proc (4 tests)
+hud        =   1.21 sec*proc (1 test)
+private    =   8.42 sec*proc (3 tests)
+
+Total Test time (real) =   9.13 sec

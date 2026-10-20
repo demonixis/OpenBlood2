@@ -1,0 +1,14 @@
+366/372 Testing: ai_state.decisions
+366/372 Test: ai_state.decisions
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_state_tests" "decisions"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_state.decisions" start time: Oct 16 11:01 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_state.decisions" end time: Oct 16 11:01 CEST
+"ai_state.decisions" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,15 @@
+601/602 Testing: wind.ai
+601/602 Test: wind.ai
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/wind_tests" "ai" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/wind-ai"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"wind.ai" start time: Oct 17 01:44 CEST
+Output:
+----------------------------------------------------------
+Original generic r_gun FIRE_KEY creates a shockwave with no immediate vector damage.
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"wind.ai" end time: Oct 17 01:44 CEST
+"wind.ai" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,29 @@
+{
+  "binary": "MSynth25.dll",
+  "sha256": "b30b8be71e7da385deccb18f9f2c2fcd2d25f4355b9a55235242e45389c6fb3e",
+  "unicorn": "2.1.4",
+  "packed_locale_cases": 512,
+  "routing_cases": 66,
+  "fnv64": 6386313400906083943,
+  "default_channel_map": [
+    9,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "default_percussion_midi_channel": 9,
+  "decisions_sha256": "1e96e617d132022020f4aba966009d9bd6213ef8bc13dae8886d9c7b35d29f9a",
+  "scope": "Isolated original locale conversion and resident instrument/key lookup with percussion fallback; no synthesis, residency loader or OS GM collection"
+}

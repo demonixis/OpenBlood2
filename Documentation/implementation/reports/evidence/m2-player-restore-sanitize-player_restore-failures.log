@@ -1,0 +1,14 @@
+505/507 Testing: player_restore.failures
+505/507 Test: player_restore.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player_restore_tests" "failures" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/player-restore-fixtures/failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"player_restore.failures" start time: Oct 16 19:20 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"player_restore.failures" end time: Oct 16 19:20 CEST
+"player_restore.failures" time elapsed: 00:00:00
+----------------------------------------------------------

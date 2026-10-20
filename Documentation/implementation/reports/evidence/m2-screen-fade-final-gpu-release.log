@@ -1,0 +1,35 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start  25: gpu.lifecycle
+ 1/10 Test  #25: gpu.lifecycle ....................   Passed    3.15 sec
+      Start 598: gpu.sprite_alpha
+ 2/10 Test #598: gpu.sprite_alpha .................   Passed    0.45 sec
+      Start 599: gpu.sprite_private
+ 3/10 Test #599: gpu.sprite_private ...............   Passed    0.52 sec
+      Start 637: gpu.object_particle_tint
+ 4/10 Test #637: gpu.object_particle_tint .........   Passed    0.44 sec
+      Start 638: gpu.object_particle_private
+ 5/10 Test #638: gpu.object_particle_private ......   Passed    0.46 sec
+      Start 675: gpu.mouse_combat
+ 6/10 Test #675: gpu.mouse_combat .................   Passed    2.18 sec
+      Start 676: gpu.corpse_clearance
+ 7/10 Test #676: gpu.corpse_clearance .............   Passed    2.77 sec
+      Start 841: gpu.level_change
+ 8/10 Test #841: gpu.level_change .................   Passed    1.67 sec
+      Start 923: gpu.hud
+ 9/10 Test #923: gpu.hud ..........................   Passed    0.50 sec
+      Start 935: gpu.screen_fade
+10/10 Test #935: gpu.screen_fade ..................   Passed    0.47 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+gpu                 =  12.61 sec*proc (10 tests)
+hud                 =   0.50 sec*proc (1 test)
+object_particles    =   0.90 sec*proc (2 tests)
+player_controls     =   4.96 sec*proc (2 tests)
+private             =   7.61 sec*proc (5 tests)
+screen_fade         =   0.47 sec*proc (1 test)
+sprite_view         =   0.96 sec*proc (2 tests)
+world               =   1.67 sec*proc (1 test)
+
+Total Test time (real) =  12.63 sec

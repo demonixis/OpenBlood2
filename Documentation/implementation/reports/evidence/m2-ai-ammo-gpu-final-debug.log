@@ -1,0 +1,99 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/debug/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 197
+    Start 197: gpu.pickups
+
+197: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--pickups-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/pickups.png"
+197: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+197: Test timeout computed to be: 30
+197: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+197: [info] BLOOD2.REZ: detected, 267758913 bytes
+197: [info] SOUND.REZ: detected, 204633068 bytes
+197: [info] BLOOD2P.REZ: detected, 24133434 bytes
+197: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+197: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+197: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+197: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+197: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+197: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+197: [info] NPC ammunition smoke: original collection=1, bullets=100
+197: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/pickups.png
+197: [info] Shutdown: frames=24, UI frames=20, hidden frames=4, toggles=2, resize=true, quit=true
+197: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+197: [info] Session playback: waiting=0 time=24.433333333333227 npc-ready=16 npc-failed=0 npc-updates=665
+197: [info] AI paths: hidden=true, reentered=true, copied points=7
+197: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+197: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+197: [info] PICKUPS smoke: ammo/weapon/medkit accepted with hidden UI; three original collection WAVs decoded and submitted to SDL after source removal; unload/reload checked
+197: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+1/2 Test #197: gpu.pickups ......................   Passed    8.36 sec
+test 300
+    Start 300: gpu.character
+
+300: Test command: /home/yann/projects/lithtech/Blood2/build/debug/blood2 "--config" "/home/yann/projects/lithtech/Blood2/build/debug/tests/empty.ini" "--data-dir" "/home/yann/.steam/steam/steamapps/common/Blood II" "--skeleton-smoke" "--capture" "/home/yann/projects/lithtech/Blood2/build/debug/tests/skeleton.png"
+300: Working Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+300: Environment variables: 
+300:  SDL_AUDIODRIVER=dummy
+300: Test timeout computed to be: 60
+300: [info] External data: /home/yann/.steam/steam/steamapps/common/Blood II (--data-dir)
+300: [info] BLOOD2.REZ: detected, 267758913 bytes
+300: [info] SOUND.REZ: detected, 204633068 bytes
+300: [info] BLOOD2P.REZ: detected, 24133434 bytes
+300: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+300: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+300: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+300: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+300: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+300: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+300: [info] Movement smoke focus at frame 2: true
+300: [info] Movement smoke input at 45: enabled=true, focused=true, text=false, W=true, Ctrl=false
+300: [info] Movement smoke input at 100: enabled=true, focused=true, text=false, W=false, Ctrl=true
+300: [info] Corpse diagnostic: present=true, setup=true, complete=true, sounds=1, updates=9, time=900, error=
+300: [info] Movement: hidden distance=295.31055, jumps=1, landings=2, ground=true, forward frames=55, jump frames=10
+300: [info] Movement smoke input at 170: enabled=true, focused=true, text=false, W=false, Ctrl=true
+300: [info] Captured GPU frame to /home/yann/projects/lithtech/Blood2/build/debug/tests/skeleton.png
+300: [info] Movement smoke input at 185: enabled=true, focused=true, text=false, W=false, Ctrl=true
+300: [info] Shutdown: frames=240, UI frames=120, hidden frames=120, toggles=2, resize=true, quit=true
+300: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+300: [info] Session playback: waiting=0 time=28.033333333333022 npc-ready=16 npc-failed=0 npc-updates=679
+300: [info] Character motion probe: hidden=true, reentered=true, old handle invalidated=true
+300: [info] AI model-key probe: hidden=true, reentered=true, old handle invalidated=true
+300: [info] AI target probe: hidden=true, reentered=true, old handle invalidated=true
+300: [info] AI sight probe: hidden=true, reentered=true, old handle invalidated=true
+300: [info] AI state probe: hidden=true, reentered=true, old handle invalidated=true
+300: [info] AI weapon probe: hidden=true, reentered=true, old identity invalidated=true
+300: [info] AI script interpreter: hidden=true, reentered=true, old identity invalidated=true
+300: [info] AI navigation: state=999, phase=1, z=51, updates=32, arrivals=1, failures=0, points=0, error=
+300: [info] Original NPC AI_Update + hit localization: hidden=true, reentered=true, old identity invalidated=true
+300: [info] Corpse diagnostic: present=true, setup=true, complete=true, sounds=1, updates=9, time=900, error=
+300: [info] Original corpse: hidden=true, rendered=true, reentered=true, old identity invalidated=true
+300: [info] AI escape/beg: hidden=true, reentered=true, old identity invalidated=true
+300: [info] Held attachments: hidden=true, reentered=true, old identity invalidated=true
+300: [info] Character audio: hidden=true, reentered=true, starts=1, surface=10, submitted=730400
+300: [info] AI paths: hidden=true, reentered=true, copied points=7
+300: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+300: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+300: [info] Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, unload/re-entry
+300: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+2/2 Test #300: gpu.character ....................   Passed   18.11 sec
+
+The following tests passed:
+	gpu.pickups
+	gpu.character
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+character    =  18.11 sec*proc (1 test)
+gpu          =  26.46 sec*proc (2 tests)
+pickups      =   8.36 sec*proc (1 test)
+private      =  26.46 sec*proc (2 tests)
+
+Total Test time (real) =  26.47 sec

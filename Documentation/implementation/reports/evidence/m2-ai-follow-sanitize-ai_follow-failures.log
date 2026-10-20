@@ -1,0 +1,14 @@
+383/386 Testing: ai_follow.failures
+383/386 Test: ai_follow.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/ai_follow_tests" "failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"ai_follow.failures" start time: Oct 16 12:54 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.failures" end time: Oct 16 12:54 CEST
+"ai_follow.failures" time elapsed: 00:00:00
+----------------------------------------------------------

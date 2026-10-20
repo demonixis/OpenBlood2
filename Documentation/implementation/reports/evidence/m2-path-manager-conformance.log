@@ -1,0 +1,544 @@
+
+sources/blood2/ObjectDLL/PathMgr.cpp 8118b71bc1a0063f0b12af2d02260cfb74ac9676057c070c1575465db204ba09
+25: DBOOL PathMgr::BuildPathList()
+26: {
+27: 	CServerDE* pServerDE = BaseClass::GetServerDE();
+28: 	if (!pServerDE) return DFALSE;
+29: 	
+30: 	ClearPathList();
+31: 
+32: 	// Iterate through the world building our list of keys, and removing 
+33: 	// all the PathPoints found...
+34: 
+35: 	HCLASS  hPathPoint = pServerDE->GetClass("PathPoint");
+36: 	HOBJECT	hCurObject = DNULL;
+37: 	while (hCurObject = pServerDE->GetNextObject(hCurObject))
+38: 	{
+39: 		if (pServerDE->IsKindOf(pServerDE->GetObjectClass(hCurObject), hPathPoint))
+40: 		{
+41:             // Make sure its not a SMELL pathpoint!
+42: 			PathListData* pKeyData = new PathListData;
+43: 			if (!pKeyData) return DFALSE;
+44: 
+45: 			pKeyData->Copy(hCurObject);
+46: 
+47: 			m_pathList.Add(pKeyData);
+48: 
+49:             // Check for Debug console var, if found do not REMOVE from world!
+50: //			pServerDE->RemoveObject(hCurObject);
+51: 		}
+52: 	}
+53: 
+54: 	return DTRUE;
+55: }
+56: 
+57: 
+58: // ----------------------------------------------------------------------- //
+59: //
+60: //	ROUTINE:	PathMgr::GetPath
+61: //
+66: DBOOL PathMgr::GetPath(char* pBasePathName, PathList* pReturnList)
+67: {
+68: 	CServerDE* pServerDE = BaseClass::GetServerDE();
+69: 	if (!pServerDE) return DFALSE;
+70: 
+71: 	if (!pBasePathName || !pReturnList || pBasePathName[0] == '\0') return DFALSE;
+72: 
+73: 	// Make sure we've got some keys to look through...
+74: 
+75: 	if (m_pathList.IsEmpty()) return DFALSE;
+76: 
+77: 
+78: 	// Make sure we start with a clean slate...
+79: 
+80: 	if (!pReturnList->IsEmpty()) pReturnList->RemoveAll();
+81: 
+82: 
+83: 	int nNumItems = m_pathList.GetNumItems();
+84: 	int nNameLen  = _mbstrlen(pBasePathName);
+85: 	if (nNameLen < 1) return DFALSE;
+86: 
+87: 	DList sortList;
+88: 	dl_InitList(&sortList);
+89: 	sortList.m_Head.m_pData = DNULL;
+90: 
+91: 	for (int i=0; i < nNumItems; i++)
+92: 	{
+93: 		PathListData* pCurData = m_pathList[i];
+94: 		if (!pCurData || !pCurData->m_hstrName) return DFALSE;
+95: 
+96: 		char* pName = pServerDE->GetStringData(pCurData->m_hstrName);
+97: 		if (!pName) return DFALSE;
+98: 
+99: 		if (strnicmp(pName, pBasePathName, nNameLen) == 0)
+100: 		{
+101: 			int nTestLen = _mbstrlen(pName);
+102: 			
+103: 			// Make sure the name is of the form BaseXXX where XXX is
+104: 			// a number...
+105: 
+106: 			if (nTestLen > nNameLen)
+107: 			{
+108: 				if (isdigit(pName[nNameLen]))
+109: 				{
+110: 					AddToSortedList(&sortList, pCurData);
+111: 				}
+112: 			}
+113: 		}
+114: 	}
+115: 
+116: 	if (sortList.m_nElements < 1) return DFALSE;
+117: 
+118: 
+119: 	// Copy the sorted list to the return list...
+120: 
+121: 	DLink* pLink = sortList.m_Head.m_pNext;
+122: 
+123: 	while (sortList.m_nElements > 0)
+124: 	{
+125: 		PathListData* pData = (PathListData*)pLink->m_pData;
+126: 		if (pData)
+127: 		{
+128: 			pReturnList->Add(pData);
+129: 		}
+130: 
+131: 		dl_RemoveAt(&sortList, pLink);
+151: void PathMgr::AddToSortedList(DList* pSortList, PathListData* pCurData)
+152: {
+153: 	CServerDE* pServerDE = BaseClass::GetServerDE();
+154: 	if (!pServerDE || !pSortList || !pCurData) return;
+155: 
+156: 	DLink* pLink = new DLink;
+157: 	if (!pLink) return;
+158: 
+159: 	pLink->m_pNext = pLink->m_pPrev = DNULL;
+160: 	pLink->m_pData = DNULL;
+161: 
+162: 	// Find where in the list we belong...
+163: 
+164: 	DLink* pCurPos    = &pSortList->m_Head;
+165: 	DLink* pInsertPos = pCurPos;
+166: 
+167: 	while (pCurPos)
+168: 	{
+169: 		PathListData* pData = (PathListData*)pCurPos->m_pData;
+170: 		if (!pData) break;
+171: 
+172: 		if (pServerDE->CompareStringsUpper(pCurData->m_hstrName, pData->m_hstrName) < 0)
+173: 		{
+174: 			break;
+175: 		}
+176: 
+177: 		pInsertPos = pCurPos;
+178: 		pCurPos	   = pCurPos->m_pNext;
+179: 	}
+180: 
+181: 	dl_AddAfter(pSortList, pInsertPos, pLink, (void*)pCurData);
+182: }
+
+sources/blood2/ObjectDLL/PathMgr.h ec0972b4e66d94767e9461e74fd53ec2097442167e5c806b370e0476589ef78e
+18: class PathMgr
+19: {
+20: 	public :
+21: 
+22: 		PathMgr() { m_pathList.Init(DTRUE); }
+23: 
+24: 		DBOOL BuildPathList();
+25: 		void  ClearPathList();
+26: 
+27: 		DBOOL GetPath(char* pBasePathName, PathList* pReturnList);
+28: 
+29: 		void Load(HMESSAGEREAD hRead)
+30: 		{
+31: 			m_pathList.Load(hRead);
+32: 		}
+33: 
+34: 		void Save(HMESSAGEWRITE hWrite)
+35: 		{
+36: 			m_pathList.Save(hWrite);
+37: 		}
+38: 
+39: 	private :
+40: 
+41: 		PathList m_pathList;
+42: 
+43: 		void AddToSortedList(DList* pSortList, PathListData* pCurData);
+44: };
+45: 
+46: inline void PathMgr::ClearPathList()
+47: {
+48: 	if (!m_pathList.IsEmpty()) m_pathList.RemoveAll();
+49: }
+50: 
+51: #endif // __AI_PATH_MGR_H__
+
+sources/blood2/ObjectDLL/PathListData.cpp 8bcd8c9baa9afda9dd915e14fb4acb9d7af7c224bc6b9f15722a388689050182
+22: 
+23: PathListData::PathListData()
+24: {
+25: 	VEC_INIT(m_vPos);
+26: 	m_hstrName			= DNULL;
+27: 	m_hstrActionTarget	= DNULL;
+28: 	m_hstrActionMessage	= DNULL;
+29: }
+30: 
+31: PathListData::~PathListData()
+32: {
+33: 	g_pServerDE->FreeString( m_hstrName );
+34: 	g_pServerDE->FreeString( m_hstrActionTarget	);
+35: 	g_pServerDE->FreeString( m_hstrActionMessage );
+36: }
+37: 
+38: // ----------------------------------------------------------------------- //
+39: //
+40: //	ROUTINE:	PathListData::Copy()
+41: //
+42: //	PURPOSE:	Copy the PathPoint object's data
+43: //
+44: // ----------------------------------------------------------------------- //
+45: 
+46: DBOOL PathListData::Copy(HOBJECT hPathPoint)
+47: {
+48: 	CServerDE* pServerDE = BaseClass::GetServerDE();
+49: 	if (!hPathPoint || !pServerDE) return DFALSE;
+50: 
+51:     // Get the Object Position
+52: 	pServerDE->GetObjectPos(hPathPoint, &m_vPos);
+53: 	char* pName = pServerDE->GetObjectName(hPathPoint);
+54: 	if (pName)
+55: 	{
+56: 		m_hstrName = pServerDE->CreateString(pName);
+57: 	}
+58:     
+59:     // Get the Objects action
+60:     PathPoint *pPathPoint = (PathPoint*)pServerDE->HandleToObject(hPathPoint);
+61: 
+62:     HSTRING hstrAction = pPathPoint->GetActionTarget();
+63: 	if (hstrAction)
+64: 	{
+65: 		m_hstrActionTarget = pServerDE->CopyString(hstrAction);
+66: 	}
+67: 
+68:     hstrAction = pPathPoint->GetActionMessage();
+69: 	if (hstrAction)
+70: 	{
+71: 		m_hstrActionMessage = pServerDE->CopyString(hstrAction);
+72: 	}
+73: 
+74: 	return DTRUE;
+75: }
+76: 
+77: // ----------------------------------------------------------------------- //
+78: //
+79: //	ROUTINE:	PathListData::Save()
+80: //
+
+sources/blood2/ObjectDLL/PathList.h 8df80ab80a3ceaaa2ad5fb0fed657b85d06ce1767f9c1ae852a4a35072f0966b
+17: class PathList
+18: {
+19: 	public :
+20: 
+21: 		int GetNumItems()	const { return m_nNumItems; }
+22: 		DBOOL IsEmpty()		const { return (DBOOL)(m_nNumItems == 0); }
+23: 
+24: 		void Load(HMESSAGEREAD hRead);
+25: 		void Save(HMESSAGEWRITE hWrite);
+26: 
+27: 		PathList()
+28: 		{
+29: 			m_pArray		  = DNULL;
+30: 			m_nNumItems		  = 0;
+31: 			m_bDeleteElements = DFALSE;
+32: 		}
+33: 
+34: 		DBOOL Init(DBOOL bDeleteElements=DTRUE)
+35: 		{
+36: 			m_pArray = new CDynArray<PathListData*> (DTRUE, 4);
+37: 			if (!m_pArray) return DFALSE;
+38: 
+39: 			m_nNumItems	= 0;
+40: 			m_bDeleteElements = bDeleteElements;
+41: 
+42: 			return DTRUE;
+43: 		}
+44: 
+45: 		~PathList()
+46: 		{
+47: 			if (m_pArray)
+48: 			{
+49: 				if (m_bDeleteElements)
+50: 				{
+51: 					for (int i=0; i < m_nNumItems; i++)
+52: 					{
+53: 						delete (*m_pArray)[i];
+54: 					}
+55: 				}
+56: 
+57: 				delete m_pArray;
+58: 			}
+59: 		}
+60: 
+61: 		PathListData* & operator[] (int nIndex)
+62: 		{
+63: 			assert (nIndex >= 0 && nIndex < m_nNumItems && m_pArray);
+64: 			return ((*m_pArray)[nIndex]);
+65: 		}
+66: 
+67: 		void Add(PathListData* pFX)
+68: 		{
+69: 			if (m_pArray && pFX)
+70: 			{
+71: 				(*m_pArray)[m_nNumItems++] = pFX;
+72: 			}
+73: 		}
+74: 
+75: 		DBOOL Remove(PathListData* pFX, DBOOL bRebuildArray=DTRUE)
+76: 		{
+77: 			DBOOL bRet = DFALSE;
+78: 			if (!m_pArray || !pFX) return DFALSE;
+79: 
+80: 			for (int i=0; i < m_nNumItems; i++)
+81: 			{
+82: 				if ((*m_pArray)[i] == pFX)
+83: 				{
+84: 					if (m_bDeleteElements)
+85: 					{
+86: 						delete (*m_pArray)[i];
+87: 					}
+88: 
+89: 					(*m_pArray)[i] = DNULL;
+90: 					bRet = DTRUE;
+91: 					break;
+92: 				}
+93: 			}
+94: 
+95: 			if (bRet && bRebuildArray) RebuildArray();
+96: 
+97: 			return bRet;
+98: 		}
+99: 
+100: 		DBOOL Remove(int nIndex, DBOOL bRebuildArray=DTRUE)
+101: 		{
+102: 			if (!m_pArray || nIndex < 0 || nIndex > m_nNumItems) return DFALSE;
+103: 
+104: 			if (m_bDeleteElements)
+105: 			{
+106: 				delete (*m_pArray)[nIndex];
+107: 			}
+108: 
+109: 			(*m_pArray)[nIndex] = DNULL;
+110: 
+111: 			if (bRebuildArray) RebuildArray();
+112: 
+113: 			return DTRUE;
+114: 		}
+115: 
+116: 		void RemoveAll()
+117: 		{
+118: 			if (m_pArray)
+119: 			{
+120: 				if (m_bDeleteElements)
+121: 				{
+122: 					for (int i=0; i < m_nNumItems; i++)
+123: 					{
+124: 						delete (*m_pArray)[i];
+125: 					}
+126: 				}
+127: 
+128: 				delete m_pArray;
+129: 			}
+130: 
+131: 			m_pArray	= new CDynArray<PathListData*> (DTRUE, 8);
+132: 			m_nNumItems = 0;
+133: 		}
+134: 
+135: 		// Remove all NULL entries from the array...
+136: 
+137: 		void RebuildArray()
+138: 		{
+139: 			if (!m_pArray) return;
+140: 
+141: 			CDynArray<PathListData*> *pNewArray = new CDynArray<PathListData*> (DTRUE, 16);
+142: 			if (!pNewArray) return;
+143: 
+144: 			int nNewCount = 0;
+145: 			for (int i=0; i < m_nNumItems; i++)
+146: 			{
+147: 				if ((*m_pArray)[i])
+148: 				{
+149: 					(*pNewArray)[nNewCount++] = (*m_pArray)[i];
+150: 				}
+151: 			}
+152: 
+153: 			delete m_pArray;
+154: 
+155: 			m_pArray	= pNewArray;
+156: 			m_nNumItems = nNewCount;
+157: 		}
+158: 	
+159: 	private :
+160: 
+161: 		CDynArray<PathListData*> *m_pArray;	// Dynamic array 
+162: 		int	m_nNumItems;					// Number of elements in array
+163: 		DBOOL m_bDeleteElements;			// Who's in charge of clean up
+164: 
+165: };
+166: 
+167: inline void PathList::Save(HMESSAGEWRITE hWrite)
+168: {
+169: 	if (!g_pServerDE || !hWrite) return;
+170: 
+171: 	g_pServerDE->WriteToMessageFloat(hWrite, (DFLOAT)m_nNumItems);
+172: 	g_pServerDE->WriteToMessageByte(hWrite, m_bDeleteElements);
+173: 
+174: 	if (m_pArray)
+175: 	{
+176: 		for (int i=0; i < m_nNumItems; i++)
+177: 		{
+178: 			if ((*m_pArray)[i])
+179: 			{
+180: 				(*m_pArray)[i]->Save(hWrite);
+181: 			}
+182: 		}
+183: 	}
+184: }
+185: 
+186: inline void PathList::Load(HMESSAGEREAD hRead)
+187: {
+188: 	if (!g_pServerDE || !hRead) return;
+189: 
+190: 	int nNumItems		= (int) g_pServerDE->ReadFromMessageFloat(hRead);
+191: 	m_bDeleteElements	= (DBOOL) g_pServerDE->ReadFromMessageByte(hRead);
+192: 
+193: 	for (int i=0; i < nNumItems; i++)
+194: 	{
+195: 		PathListData* pData = new PathListData;
+196: 		if (!pData) return;
+197: 
+198: 		pData->Load(hRead);
+199: 		Add(pData);
+200: 	}
+201: }
+202: 
+203: #endif // __PATH_LIST_H__
+
+sources/blood2/AppHeaders/dlink.h ae2525b9e0bbf6a893660420c040eb30e1bceea2ec15ba086c005f40617362cd
+84: 	{
+85: 		unsigned long	m_nElements;
+86: 		DLink			m_Head;
+87: 	} DList;
+88: 
+89: 	INLINE_FN void dl_InitList(DList *pList)
+90: 	{
+91: 		dl_TieOff(&pList->m_Head);
+92: 		pList->m_nElements = 0;
+93: 	}
+94: 
+95: 	INLINE_FN void dl_AddAfter(DList *pList, DLink *pAfter, DLink *pLink, void *pObj)
+96: 	{
+97: 		pLink->m_pData = pObj;
+98: 		dl_Insert(pAfter, pLink);
+99: 		++pList->m_nElements;
+100: 	}
+101: 
+102: 	INLINE_FN void dl_AddBefore(DList *pList, DLink *pBefore, DLink *pLink, void *pObj)
+103: 	{
+104: 		dl_AddAfter(pList, pBefore->m_pPrev, pLink, pObj);
+105: 	}
+106: 
+107: 	INLINE_FN void dl_AddHead(DList *pList, DLink *pLink, void *pObj)
+108: 	{
+109: 		dl_AddAfter(pList, &pList->m_Head, pLink, pObj);
+110: 	}
+111: 
+112: 	INLINE_FN void dl_AddTail(DList *pList, DLink *pLink, void *pObj)
+113: 	{
+114: 		dl_AddAfter(pList, pList->m_Head.m_pPrev, pLink, pObj);
+
+sources/blood2/AppHeaders/server_de.h ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945
+654: 			virtual void	SetForceIgnoreLimit(HOBJECT hObj, float limit)=0;
+655: 			
+656: 			// Use this to iterate thru all the objects in the world.
+657: 			// Pass in NULL to start off with.  It'll return NULL when
+658: 			// you have iterated through all the objects.
+659: 			// This is generally a bad idea, but sometimes you have to.
+660: 			HOBJECT	(*GetNextObject)(HOBJECT hObj);
+661: 
+662: 			// Same as GetNextObject, but this iterates over all the inactive objects.
+663: 			HOBJECT	(*GetNextInactiveObject)(HOBJECT hObj);
+
+sources/lithtech/runtime/server/src/serverde_impl.cpp 5e1973f36bea781f23f99d7e0bb32ddb474ebf83c142c6877b15c157ba2fd53f
+2531: HOBJECT si_GetNextObject(HOBJECT hObj)
+2532: {
+2533: 	LTLink *pLink;
+2534: 
+2535: 	if (hObj)
+2536: 	{
+2537: 		pLink = &HandleToServerObj(hObj)->sd->m_ListNode;
+2538: 
+2539: 		pLink = pLink->m_pNext;
+2540: 		if (pLink == &g_pServerMgr->m_Objects.m_Head)
+2541: 			return LTNULL;
+2542: 	}
+2543: 	else
+2544: 	{
+2545: 		pLink = g_pServerMgr->m_Objects.m_Head.m_pNext;
+2546: 		if (pLink == &g_pServerMgr->m_Objects.m_Head)
+2547: 			return LTNULL;
+2548: 	}
+2549: 
+2550: 	LTObject *pObj = (LTObject*)pLink->m_pData;
+2551: 	if (pObj->m_InternalFlags & IFLAG_INACTIVE_MASK)
+2552: 	{
+2553: 		return LTNULL;
+2554: 	}
+2555: 	else
+2556: 	{
+2557: 		return ServerObjToHandle(pObj);
+2558: 	}
+2559: }
+2560: 
+2561: 
+2562: HOBJECT si_GetNextInactiveObject(HOBJECT hObj)
+2563: {
+2564: 	LTLink *pLink;
+2565: 
+2566: 	// Note: it cycles thru the object list backwards here because
+2567: 	// the inactive objects are at the end of the list.
+2568: 	if (hObj)
+2569: 	{
+2570: 		pLink = &HandleToServerObj(hObj)->sd->m_ListNode;
+2571: 
+2572: 		pLink = pLink->m_pPrev;
+2573: 		if (pLink == &g_pServerMgr->m_Objects.m_Head)
+2574: 			return LTNULL;
+2575: 	}
+2576: 	else
+2577: 	{
+2578: 		pLink = g_pServerMgr->m_Objects.m_Head.m_pPrev;
+2579: 		if (pLink == &g_pServerMgr->m_Objects.m_Head)
+2580: 			return LTNULL;
+2581: 	}
+2582: 
+2583: 	LTObject *pObj = (LTObject*)pLink->m_pData;
+2584: 	if (pObj->m_InternalFlags & IFLAG_INACTIVE_MASK)
+2585: 	{
+2586: 		return ServerObjToHandle(pObj);
+2587: 	}
+2588: 	else
+
+sources/blood2/ObjectDLL/BloodServerShell.cpp 034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed
+576: //	ROUTINE:	CBloodServerShell::PostStartWorld()
+577: //
+578: //	PURPOSE:	Perform an autosave after the world is loaded
+579: //
+580: // ----------------------------------------------------------------------- //
+581: 
+582: void CBloodServerShell::PostStartWorld()
+583: {
+584: 	// Build the list of AI paths for this world...
+585: 	m_PathMgr.BuildPathList();
+586: 
+587: 	// Init the voice manager if necessary...
+588: 	if (!m_VoiceMgr.IsInited())
+589: 	{

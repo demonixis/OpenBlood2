@@ -1,0 +1,14 @@
+399/402 Testing: ai_navigation.blocked
+399/402 Test: ai_navigation.blocked
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_navigation_tests" "blocked"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_navigation.blocked" start time: Oct 16 12:23 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_navigation.blocked" end time: Oct 16 12:23 CEST
+"ai_navigation.blocked" time elapsed: 00:00:00
+----------------------------------------------------------

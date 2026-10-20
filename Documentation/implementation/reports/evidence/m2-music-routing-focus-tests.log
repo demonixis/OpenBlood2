@@ -1,0 +1,41 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+      Start 986: music_assets.private
+      Start 996: dls_sampler.private
+ 1/11 Test #996: dls_sampler.private ..............   Passed    0.57 sec
+      Start 992: dls_sampler.lifetime
+ 2/11 Test #992: dls_sampler.lifetime .............   Passed    0.08 sec
+      Start 985: music_assets.catalog
+ 3/11 Test #985: music_assets.catalog .............   Passed    0.07 sec
+      Start 991: dls_sampler.envelopes
+ 4/11 Test #991: dls_sampler.envelopes ............   Passed    0.01 sec
+      Start 983: music_assets.reader
+ 5/11 Test #983: music_assets.reader ..............   Passed    0.01 sec
+      Start 993: dls_sampler.legacy_pan
+ 6/11 Test #993: dls_sampler.legacy_pan ...........   Passed    0.00 sec
+      Start 990: dls_sampler.pcm
+ 7/11 Test #990: dls_sampler.pcm ..................   Passed    0.00 sec
+      Start 984: music_assets.plan
+ 8/11 Test #984: music_assets.plan ................   Passed    0.00 sec
+      Start 994: dls_sampler.routing
+ 9/11 Test #994: dls_sampler.routing ..............   Passed    0.00 sec
+      Start 995: dls_sampler.controllers
+10/11 Test #995: dls_sampler.controllers ..........   Passed    0.00 sec
+11/11 Test #986: music_assets.private .............***Failed    1.40 sec
+Private music containers: 156 sections / 39 styles / 5 banks / 21513 chunks / 11986804 bytes
+01_SubwayA music directory music/cabal requests=52 files=45 bytes=2005696 error=
+498: found == (ch != 5 && ch != 15) | 
+
+
+91% tests passed, 1 tests failed out of 11
+
+Label Time Summary:
+audio           =   0.67 sec*proc (7 tests)
+headless        =   2.16 sec*proc (11 tests)
+music_assets    =   2.16 sec*proc (11 tests)
+private         =   1.97 sec*proc (2 tests)
+
+Total Test time (real) =   1.42 sec
+
+The following tests FAILED:
+	986 - music_assets.private (Failed)                     headless music_assets private
+Errors while running CTest

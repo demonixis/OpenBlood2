@@ -1,0 +1,15 @@
+649/655 Testing: wind.failure
+649/655 Test: wind.failure
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/wind_tests" "failure" "/home/yann/projects/lithtech/Blood2/build/release/tests/wind-failure"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"wind.failure" start time: Oct 17 01:43 CEST
+Output:
+----------------------------------------------------------
+Missing presentation preserves damage; missing shooter/setup/collision fails without blast; authored creation rejected.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"wind.failure" end time: Oct 17 01:43 CEST
+"wind.failure" time elapsed: 00:00:00
+----------------------------------------------------------

@@ -1,0 +1,4 @@
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Approached encounter at z=-2338.28
+gak: AI_Update: Corpse setup failed; incomplete child removed Corpse setup failed; incomplete child removed state=100 last=102 phase=1 command=20 placement=blocked corrections=16 distance=8.03099 anchor=-32,166.855,-1992 requested=-32,132.921,-1992 candidate=-39.999,132.921,-1992 polygon=63
+combat:335: !actor->runtime_failed

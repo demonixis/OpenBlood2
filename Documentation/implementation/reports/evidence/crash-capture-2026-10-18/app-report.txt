@@ -1,0 +1,12 @@
+signal=6
+si_code=0
+pid=2491722
+faulting_thread=2491722
+debugger=/usr/bin/gdb
+dump_limit_bytes=2147483648
+timeout_ms=15000
+executable_copy=saved
+debugger_pid=2491746
+debugger_completed=1
+debugger_wait_status=0
+core_saved=1

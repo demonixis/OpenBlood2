@@ -1,0 +1,2 @@
+/usr/bin/ld.bfd: cannot find build/dev/_deps/spdlog-build/libspdlogd.a: No such file or directory
+collect2: error: ld returned 1 exit status

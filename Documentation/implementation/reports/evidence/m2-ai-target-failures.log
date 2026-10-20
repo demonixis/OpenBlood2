@@ -1,0 +1,14 @@
+327/332 Testing: ai_target.failures
+327/332 Test: ai_target.failures
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/ai_target_tests" "failures"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"ai_target.failures" start time: Oct 16 08:07 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_target.failures" end time: Oct 16 08:07 CEST
+"ai_target.failures" time elapsed: 00:00:00
+----------------------------------------------------------

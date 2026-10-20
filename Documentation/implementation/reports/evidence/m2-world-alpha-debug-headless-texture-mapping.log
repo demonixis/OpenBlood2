@@ -1,0 +1,14 @@
+349/630 Testing: texture.mapping
+349/630 Test: texture.mapping
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/texture_tests" "mapping"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"texture.mapping" start time: Oct 17 00:37 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"texture.mapping" end time: Oct 17 00:37 CEST
+"texture.mapping" time elapsed: 00:00:00
+----------------------------------------------------------

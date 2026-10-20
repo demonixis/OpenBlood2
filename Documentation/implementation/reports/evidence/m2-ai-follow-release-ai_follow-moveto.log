@@ -1,0 +1,14 @@
+407/413 Testing: ai_follow.moveto
+407/413 Test: ai_follow.moveto
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ai_follow_tests" "moveto"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ai_follow.moveto" start time: Oct 16 13:00 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ai_follow.moveto" end time: Oct 16 13:00 CEST
+"ai_follow.moveto" time elapsed: 00:00:00
+----------------------------------------------------------

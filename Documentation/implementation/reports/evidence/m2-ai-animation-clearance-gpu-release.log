@@ -1,0 +1,113 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/release/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 300
+    Start 300: gpu.character
+
+300: Test command: <workspace>/Blood2/build/release/blood2 "--config" "<workspace>/Blood2/build/release/tests/empty.ini" "--data-dir" "<external-data-root>" "--skeleton-smoke" "--capture" "<workspace>/Blood2/build/release/tests/skeleton.png"
+300: Working Directory: <workspace>/Blood2/build/release/tests
+300: Environment variables:
+300:  SDL_AUDIODRIVER=dummy
+300: Test timeout computed to be: 60
+300: [info] External data: <external-data-root> (--data-dir)
+300: [info] BLOOD2.REZ: detected, 267758913 bytes
+300: [info] SOUND.REZ: detected, 204633068 bytes
+300: [info] BLOOD2P.REZ: detected, 24133434 bytes
+300: [info] BLOOD2P2.REZ: detected, 2337176 bytes
+300: [info] BLOOD2NM.REZ: detected, 108939094 bytes
+300: [info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+300: [info] SDL 3.5.0 [6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1]; video=wayland; GPU=vulkan
+300: [info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+300: [info] DAT v56: 580 source objects, 227 original instances, 116 BSP models
+300: [info] Movement smoke focus at frame 2: true
+300: [info] Movement smoke input at 45: enabled=true, focused=true, text=false, W=true, Ctrl=false
+300: [info] Movement smoke input at 100: enabled=true, focused=true, text=false, W=false, Ctrl=true
+300: [info] Corpse diagnostic: present=true, setup=true, complete=true, sounds=1, updates=9, time=900, error=
+300: [info] Movement: hidden distance=295.31055, jumps=1, landings=2, ground=true, forward frames=55, jump frames=10
+300: [info] Movement smoke input at 170: enabled=true, focused=true, text=false, W=false, Ctrl=true
+300: [info] Captured GPU frame to <workspace>/Blood2/build/release/tests/skeleton.png
+300: [info] Movement smoke input at 185: enabled=true, focused=true, text=false, W=false, Ctrl=true
+300: [info] Shutdown: frames=240, UI frames=0, hidden frames=240, toggles=0, resize=true, quit=true
+300: [info] Interactive clock: limited frames=0, discarded wall seconds=0
+300: [info] Session playback: waiting=0 time=28.033333333333022 npc-ready=16 npc-failed=0 npc-updates=679
+300: [info] Character motion probe: hidden=true, reentered=true, old handle invalidated=true
+300: [info] AI model-key probe: hidden=true, reentered=true, old handle invalidated=true
+300: [info] AI target probe: hidden=true, reentered=true, old handle invalidated=true
+300: [info] AI sight probe: hidden=true, reentered=true, old handle invalidated=true
+300: [info] AI state probe: hidden=true, reentered=true, old handle invalidated=true
+300: [info] AI weapon probe: hidden=true, reentered=true, old identity invalidated=true
+300: [info] AI script interpreter: hidden=true, reentered=true, old identity invalidated=true
+300: [info] AI navigation: state=999, phase=1, z=51, updates=32, arrivals=1, failures=0, points=0, error=
+300: [info] Original NPC AI_Update + hit localization: hidden=true, reentered=true, old identity invalidated=true
+300: [info] Corpse diagnostic: present=true, setup=true, complete=true, sounds=1, updates=9, time=900, error=
+300: [info] Original corpse: hidden=true, rendered=true, reentered=true, old identity invalidated=true
+300: [info] AI escape/beg: hidden=true, reentered=true, old identity invalidated=true
+300: [info] Held attachments: hidden=true, reentered=true, old identity invalidated=true
+300: [info] Character audio: hidden=true, reentered=true, starts=1, surface=10, submitted=730400
+300: [info] AI paths: hidden=true, reentered=true, copied points=7
+300: [info] GPU smoke passed: rendering, toggle, resize, quit, original destruction, string release and selection invalidation
+300: [info] World smoke passed: unload/reload, original instance/string counts restored, collision/model resources restored, preview animation advanced while hidden
+300: [info] Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, unload/re-entry
+300: [info] Player smoke passed: shell/player entry, independent updates while hidden, teardown and re-entry
+1/4 Test #300: gpu.character ....................   Passed   14.98 sec
+test 381
+    Start 381: gpu.model_depth
+
+381: Test command: <workspace>/Blood2/build/release/tests/model_gpu_tests "<workspace>/Blood2/build/release/tests/model-depth.png"
+381: Working Directory: <workspace>/Blood2/build/release/tests
+381: Test timeout computed to be: 30
+381: Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+381: Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+2/4 Test #381: gpu.model_depth ..................   Passed    0.43 sec
+test 382
+    Start 382: gpu.model_private
+
+382: Test command: <workspace>/Blood2/build/release/tests/model_gpu_tests "<workspace>/Blood2/build/release/tests/model-private.png" "<external-data-root>"
+382: Working Directory: <workspace>/Blood2/build/release/tests
+382: Test timeout computed to be: 30
+382: Per-node GPU pixels: two visible / left hidden / all hidden / restored; dynamic upload without texture revision
+382: Restored original player/client association before private GPU rendering
+382: Private isolated Caleb/held Beretta diagnostic: 8271 non-background pixels, 40479 vertices
+382: Dynamic vertices, unchanged texture revision, shared world/model occlusion, resize and close-view depth isolation pass
+3/4 Test #382: gpu.model_private ................   Passed    0.46 sec
+test 838
+    Start 838: gpu.level_change
+
+838: Test command: <workspace>/Blood2/build/release/tests/level_change_gpu_tests "<external-data-root>" "<workspace>/Blood2/build/release/tests/level-change"
+838: Working Directory: <workspace>/Blood2/build/release/tests
+838: Test timeout computed to be: 90
+838: GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+838: Destination: CityHub /
+838: Cycle 0: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+838: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+838: Destination: SubwayA /
+838: Cycle 1: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+838: Destination: CityHub /
+838: Cycle 2: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+838: World SPR sprites/motelhell.spr: 11 frames / 15 fps
+838: Destination: SubwayA /
+838: Cycle 3: 179200 textured pixels, no fallback; malformed destination retained source, next world committed, audio output transferred
+4/4 Test #838: gpu.level_change .................   Passed    1.51 sec
+
+The following tests passed:
+	gpu.character
+	gpu.model_depth
+	gpu.model_private
+	gpu.level_change
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+character     =  14.98 sec*proc (1 test)
+gpu           =  17.38 sec*proc (4 tests)
+model_view    =   0.89 sec*proc (2 tests)
+private       =  16.94 sec*proc (3 tests)
+world         =   1.51 sec*proc (1 test)
+
+Total Test time (real) =  17.39 sec

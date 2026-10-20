@@ -1,0 +1,2914 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 6bdd84a..d497792 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -28,7 +28,7 @@ Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentatio
+   shape validation, DAT base-ring metadata, head/body separation and four body
+   records. Static containers reject unsupported transforms; removal invalidates
+   queries immediately. Player motion must not receive generic volume integration
+-  a second time. Keep pending effects, keys, AI and specialized volumes visible.
++  a second time. Keep pending effects, AI and specialized volumes visible; keys are extended by the trigger contracts below.
+ 
+ - Read [docs/SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md)
+   for Conveyor/Damage/FreeFall and level-entry volume damage protection. Preserve
+@@ -40,5 +40,12 @@ Follow the workspace [AGENTS.md](../AGENTS.md) and the [roadmap](../Documentatio
+   door triggers or collision. Translating Door is a selective original port;
+   its atomic pusher/rider solver is replacement engine code. Preserve checked
+   named geometry, actual bounds centers, atomic blocking, one shared player
+-  integration and deferred touch removal. SelfTrigger/key relay, rotation,
+-  crushing, audio/portals and the complete M2 gate remain explicitly pending.
++  integration and deferred touch removal. Rotation, crushing, audio/portals and the complete M2 gate remain explicitly pending.
++
++- Read [docs/TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending
++  Trigger/BigTrigger/ToggleTrigger, door SelfTriggers or key inventory/pickups.
++  Preserve the original active-command guard, player-only lock query, consuming
++  key uses, named-filter order, delayed-toggle behavior and typed message ownership.
++  SelfTriggers are owned, stationary children; pending parents cannot activate them.
++  Player USE ray/input, generic pickups, audio/localized feedback and save/restore
++  remain pending. Keep source-entry counts distinct from generated runtime children.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e6f675e..c4efd4b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -33,14 +33,14 @@ add_library(blood2_game STATIC
+     src/game/registration.cpp
+     src/game/server_adapter.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+-target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/original/Door.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
++target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+     src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+ target_link_libraries(blood2_game PUBLIC engine)
+ 
+-add_executable(blood2_app src/app/main.cpp)
++add_executable(blood2_app src/app/main.cpp src/app/trigger_smoke.cpp)
+ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
+ target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog)
+diff --git a/README.md b/README.md
+index e627a87..2ca0e14 100644
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,6 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
+-A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors and translating world-model collision are connected; complete player gameplay remains missing. This is not a playable game.
++A new, independent C++20 implementation. **M0/M1 are complete for their documented Linux scope; M2 is in progress.** The app now mounts REZ archives, reads DAT v56 geometry and typed properties, and runs a supported subset of original objects in an in-game inspector. ABC skeletal/vertex animation, model callbacks and primary-world collision are implemented. Selected original shell/CPlayerObj entry, inventory, Beretta/knife animation and vector-fire/damage branches and original MoveMgr dry-land movement, stairs, crouch and body locomotion animations, containers, liquids, ladders, conveyors and damage/freefall volumes, original sliding doors, translating world-model collision, Trigger/SelfTrigger, key inventory and KeyPickup are connected; complete player gameplay remains missing. This is not a playable game.
+ 
+ The three runtime targets remain small: `engine` (resources, world/object runtime, configuration, SDL_GPU), `blood2_game` (original code and typed services) and `blood2_app` (`blood2`, optional Dear ImGui). No previous prototype is a build dependency, and no EnTT/ECS was introduced.
+ 
+@@ -26,9 +26,9 @@ This workspace's ignored `blood2.local.ini` already configures `/home/yann/.stea
+ ./build/debug/blood2 --world 01_SubwayA --frames 3 --capture build/world.png
+ ```
+ 
+-The default world is `01_SubwayA`. Its patched DAT supplies 580 source objects and 116 BSP models. **30 original instances** run (`GameStartPoint`, `Key`, `PathPoint`, `WorldProperties`, `Conveyor`, `Damage`, `Door`); 372 entries are original preprocessor-only objects and **178 required runtime objects remain unported**. Every source entry remains inspectable.
++The default world is `01_SubwayA`. Its patched DAT supplies 580 source objects and 116 BSP models. **38 source instances** run (`GameStartPoint`, `Key`, `PathPoint`, `WorldProperties`, `Conveyor`, `Damage`, `Door`, `Trigger`), plus **7 door-owned SelfTriggers** (45 runtime instances before player entry); 372 entries are original preprocessor-only objects and **170 required runtime objects remain unported**. Every source entry remains inspectable.
+ 
+-The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look. Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. SelfTrigger/key relay, rotating doors, audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
++The World tab shows source properties, status, model selection and a diagnostic wireframe. Objects shows actual original instance state and spawn/remove controls. Resources shows archive precedence, indexed paths and missing world references. Diagnostics shows reached services. Reload/unload operations release original objects/strings and invalidate stale selection. Press **F1** to toggle inspection; Escape quits when UI does not capture input. Models previews the decoded Caleb skeleton, coat deformation, 86 animations and markers; it is not a CPlayerObj instance. Services shows collision index, gravity and original console variables. Session enters and inspects the actual CPlayerObj subset, client association, attributes, health/ammo, spawn and exit. Weapons exposes owned slots/hands, ammo, primary/alternate firing, actual weapon animation, hit/damage traces and sound resource requests. Movement shows the real player body/ABC pose, requested and resolved clips, dimensions, crouch clearance, stair attempts, ground contacts and a local collision map. Enable keyboard movement with **F2**: physical WASD/ZQSD, Shift to run, Space to jump, Ctrl to crouch, arrows to look. Text editing/focus loss suppress input; hiding with F1 keeps keyboard movement running. Containers lists original volumes, geometry, hidden state, body/head contents, air and water/ladder motion; it offers queued triggers and checked position edits. Space/Ctrl move up/down in free movement. Doors inspects the original state machine, transformed geometry, pusher/rider results and queued TRIGGER/TRIGGERCLOSE. Triggers inspects active/inactive sensors, target matches, delays, filters, locks and player keys; Doors links to its SelfTrigger. World key pickups retain resource diagnostics. Inspector commands test the message path; the original player USE ray, rotating doors, audio and portal visibility remain pending. Liquid surfaces/fog/audio remain pending effect requests. Textures, sound playback and a complete game session remain unimplemented.
+ 
+ ## Configuration and Modes
+ 
+@@ -47,6 +47,7 @@ Copy [config/blood2.example.ini](config/blood2.example.ini) to ignored `blood2.l
+ | `--inspect-player` | Headless original shell/player entry inspection, with explicit gameplay blockers |
+ | `--player-smoke` | GPU Session panel, hidden player updates, unload/re-entry checks |
+ | `--weapons-smoke` | GPU Beretta/knife firing while hidden, unload/re-entry; capture at frame 181 |
++| `--triggers-smoke` | GPU missing-key denial, real key pickup, hidden unlock/door movement, resize and reload |
+ | `--doors-smoke` | GPU original Door commands, hidden translation, resize, unload/reload; capture at frame 15 |
+ | `--movement-smoke` | GPU SDL walk/run/jump/crouch, live body pose and hidden stance changes, unload/re-entry; capture at frame 181 |
+ | `--containers-smoke` | GPU volume simulation while hidden and unload/re-entry: `--world 02_CityHub` (canal/air) or `--world 01_SubwayA` (conveyor), capture at frame 15 |
+@@ -61,7 +62,7 @@ ctest --preset debug
+ ctest --preset debug -L world
+ ```
+ 
+-There are **88 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases and 6 door/mover/collision/lifetime cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
++There are **96 portable synthetic headless tests**: 11 original object contracts, 11 config/CLI checks, 10 reader/world/session/helper cases, 7 model, animation, collision and original-service cases, 5 player/client lifetime cases, 8 inventory/weapon/damage cases, 9 movement/input/contact/timing cases, 7 locomotion/clearance/stair/lifetime cases, 14 container/geometry/liquid/ladder/conveyor/damage/air cases 6 door/mover/collision/lifetime cases and 8 trigger/key/ownership/contact cases. The old metadata text fixture is not used as an archive acceptance fixture; new tests generate bounded synthetic REZ/DAT data.
+ 
+ Enable installation-specific tests and real GPU windows explicitly:
+ 
+@@ -71,7 +72,7 @@ cmake --build --preset debug --parallel
+ ctest --preset debug
+ ```
+ 
+-The configured installation adds twelve private headless tests and eight GPU tests, for **108 cases**. GPU captures are `build/debug/tests/gpu.png` , `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png` and `doors.png`. The ignored local presets enable these options:
++The configured installation adds fourteen private headless tests and nine GPU tests, for **119 cases**. GPU captures are `build/debug/tests/gpu.png` , `world.png`, `player.png`, `weapons.png`, `movement.png`, `containers.png`, `conveyor.png` `doors.png` and `triggers.png`. The ignored local presets enable these options:
+ 
+ ```sh
+ cmake --preset local-debug
+@@ -88,9 +89,9 @@ On Windows use an MSVC Developer PowerShell and the same CMake/Ninja commands, t
+ 
+ ## Contracts and Remaining Work
+ 
+-Read [world/session contracts](docs/WORLD_CONTRACTS.md), [object contracts](docs/OBJECT_CONTRACTS.md), [provenance](docs/PROVENANCE.md) and [M2 results](../Documentation/Implementation/M2.md). The [roadmap's M2 gate](../Documentation/Roadmap/03_MILESTONES.md#m2--connect-world-session-and-gameplay-services) remains open: complete player/gameplay callbacks, required world classes, Trigger/key relay, rotating world-model collision and remaining original services must still be connected. See the [service continuation](../Documentation/Implementation/M2_SERVICES.md) for the new tested subset. M3 has not started.
++Read [world/session contracts](docs/WORLD_CONTRACTS.md), [object contracts](docs/OBJECT_CONTRACTS.md), [provenance](docs/PROVENANCE.md) and [M2 results](../Documentation/Implementation/M2.md). The [roadmap's M2 gate](../Documentation/Roadmap/03_MILESTONES.md#m2--connect-world-session-and-gameplay-services) remains open: complete player/gameplay callbacks, required world classes, player USE interaction, rotating world-model collision and remaining original services must still be connected. See the [service continuation](../Documentation/Implementation/M2_SERVICES.md) for the new tested subset. M3 has not started.
+ 
+-The [door continuation](../Documentation/Implementation/M2_DOORS.md) is the latest evidence; read [DOOR_CONTRACTS.md](docs/DOOR_CONTRACTS.md) before extending world-model motion or door commands. The [specialized volume continuation](../Documentation/Implementation/M2_SPECIALIZED_VOLUMES.md) records the preceding stage (Conveyor, Damage, FreeFall and level-entry damage protection). Read [SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md) before extending these branches. The [container continuation](../Documentation/Implementation/M2_CONTAINERS.md) records the preceding stage. Read [CONTAINER_CONTRACTS.md](docs/CONTAINER_CONTRACTS.md) for original VolumeBrush/MoveMgr/air rules, static shell queries and pending effects. The [locomotion continuation](../Documentation/Implementation/M2_LOCOMOTION.md) records the prior stage. Read [LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for source clip fallbacks, atomic resize and the replacement stair solver. Read [MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) for the original MoveMgr subset, shared body, timing and grounding adaptations, and the subsequent translating platform extension. The [weapon continuation](../Documentation/Implementation/M2_WEAPONS.md) retains the earlier weapon evidence. Read [WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) for ownership, original behavior and deliberate limits. Read [PLAYER_CONTRACTS.md](docs/PLAYER_CONTRACTS.md) before extending the source subsets, typed client messages or player lifetime. Entry inspection succeeds; `--start-game` still fails with missing gameplay services.
++The [trigger/key continuation](../Documentation/Implementation/M2_TRIGGERS.md) is the latest evidence; read [TRIGGER_CONTRACTS.md](docs/TRIGGER_CONTRACTS.md) before extending activation, keys or SelfTrigger ownership. The [door continuation](../Documentation/Implementation/M2_DOORS.md) records the previous stage; read [DOOR_CONTRACTS.md](docs/DOOR_CONTRACTS.md) before extending world-model motion or door commands. The [specialized volume continuation](../Documentation/Implementation/M2_SPECIALIZED_VOLUMES.md) records the preceding stage (Conveyor, Damage, FreeFall and level-entry damage protection). Read [SPECIALIZED_VOLUME_CONTRACTS.md](docs/SPECIALIZED_VOLUME_CONTRACTS.md) before extending these branches. The [container continuation](../Documentation/Implementation/M2_CONTAINERS.md) records the preceding stage. Read [CONTAINER_CONTRACTS.md](docs/CONTAINER_CONTRACTS.md) for original VolumeBrush/MoveMgr/air rules, static shell queries and pending effects. The [locomotion continuation](../Documentation/Implementation/M2_LOCOMOTION.md) records the prior stage. Read [LOCOMOTION_CONTRACTS.md](docs/LOCOMOTION_CONTRACTS.md) for source clip fallbacks, atomic resize and the replacement stair solver. Read [MOVEMENT_CONTRACTS.md](docs/MOVEMENT_CONTRACTS.md) for the original MoveMgr subset, shared body, timing and grounding adaptations, and the subsequent translating platform extension. The [weapon continuation](../Documentation/Implementation/M2_WEAPONS.md) retains the earlier weapon evidence. Read [WEAPON_CONTRACTS.md](docs/WEAPON_CONTRACTS.md) for ownership, original behavior and deliberate limits. Read [PLAYER_CONTRACTS.md](docs/PLAYER_CONTRACTS.md) before extending the source subsets, typed client messages or player lifetime. Entry inspection succeeds; `--start-game` still fails with missing gameplay services.
+ 
+ ## Source conventions
+ 
+diff --git a/docs/DOOR_CONTRACTS.md b/docs/DOOR_CONTRACTS.md
+index 510d7e4..d387fb9 100644
+--- a/docs/DOOR_CONTRACTS.md
++++ b/docs/DOOR_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Sliding doors and translating world models
+ 
++> Extended by [TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md): SelfTrigger ownership,
++> key relay and transported-body sensor contacts are now connected. Earlier
++> pending statements below describe the sliding-door increment.
++
+ This extends [MODEL_AND_COLLISION_CONTRACTS.md](MODEL_AND_COLLISION_CONTRACTS.md)
+ and [MOVEMENT_CONTRACTS.md](MOVEMENT_CONTRACTS.md). It does not close M2.
+ See [M2_DOOR_SOURCES.json](M2_DOOR_SOURCES.json) for source selections and
+diff --git a/docs/M2_TRIGGER_SOURCES.json b/docs/M2_TRIGGER_SOURCES.json
+new file mode 100644
+index 0000000..dbd2560
+--- /dev/null
++++ b/docs/M2_TRIGGER_SOURCES.json
+@@ -0,0 +1,313 @@
++{
++  "date": "2026-10-15",
++  "status": "M2 incomplete; original triggers, SelfTrigger, key query/consumption and selected KeyPickup connected",
++  "original_donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "imports": [
++    {
++      "source": "sources/blood2/ObjectDLL/Trigger.cpp",
++      "target": "src/game/original/Trigger.cpp",
++      "source_line_ranges": [
++        [
++          194,
++          234
++        ],
++        [
++          296,
++          1040
++        ],
++        [
++          1145,
++          1305
++        ]
++      ],
++      "selection": "Properties, counts, filters, immediate/delayed activation, command/key response and toggle rules; owned strings, unsigned counters, nonpositive reset adaptation, stronger recursion guard; no save/load or audio playback",
++      "kind": "selective original game port",
++      "source_sha256": "373658121f86b4d792eeb986a0e093291af3e1205b831385f142cf2ea445198c",
++      "target_sha256": "dd585f83a2e40948e507265f1858e9b7248b77072c064ba21afa0bc32ec13e81"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Trigger.h",
++      "target": "src/game/original/Trigger.h",
++      "source_line_ranges": [
++        [
++          1,
++          118
++        ]
++      ],
++      "selection": "Selected Trigger state and class declarations; BigTrigger/ToggleTrigger declaration shape from Trigger.cpp; checked owner/sender tokens and diagnostics",
++      "kind": "selective original game port",
++      "source_sha256": "e89313b9c389f5f1e5873ebb7f4ebc34a1029b98a636b0344f3154a658e85646",
++      "target_sha256": "169c73de293d5df2dae9278789a2907f4eae8167298c6e56aef08103a022a59e"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Trigger.cpp",
++      "target": "src/game/registration.cpp",
++      "source_line_ranges": [
++        [
++          131,
++          183
++        ],
++        [
++          1145,
++          1163
++        ]
++      ],
++      "selection": "Trigger, BigTrigger and ToggleTrigger registration defaults; GenericProp message capacity retained",
++      "kind": "selective original game port",
++      "source_sha256": "373658121f86b4d792eeb986a0e093291af3e1205b831385f142cf2ea445198c",
++      "target_sha256": "564acfbda58f742b61348cf52dafa640c5291e2386b05fd96dcdcdae21ade1fa"
++    },
++    {
++      "source": "sources/blood2/AppHeaders/server_de.h",
++      "target": "src/game/registration.cpp",
++      "source_line_ranges": [
++        [
++          113,
++          120
++        ]
++      ],
++      "selection": "Original MAX_GP_STRING_LEN=200 for Trigger target/message properties",
++      "kind": "selective original game port",
++      "source_sha256": "ca3576d44879e650317d0e47b33db46dedf9056dbf4df5ee9c777d3f80d1f945",
++      "target_sha256": "564acfbda58f742b61348cf52dafa640c5291e2386b05fd96dcdcdae21ade1fa"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/Door.cpp",
++      "target": "src/game/original/Door.cpp",
++      "source_line_ranges": [
++        [
++          485,
++          540
++        ],
++        [
++          631,
++          645
++        ],
++        [
++          715,
++          728
++        ],
++        [
++          886,
++          894
++        ]
++      ],
++      "selection": "SpawnTrigger setup, default dimensions and initial location; active-state changes and lock relay; explicit owned child/link cleanup added",
++      "kind": "selective original game port",
++      "source_sha256": "d96ba29e12f1892008725e02ad02c9a9c314d86db85d7bb7cdc2a7823b3961e0",
++      "target_sha256": "5f19b0f1c665f4562bc285c6996383f7857ecbf0f170e0188fea92566e332a03"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "target": "src/game/original/InventoryMgr.cpp",
++      "source_line_ranges": [
++        [
++          2023,
++          2066
++        ],
++        [
++          2112,
++          2149
++        ]
++      ],
++      "selection": "AddKey duplicate/count rules and consuming QueryKey; vector replaces intrusive generic item list; 256-key bound",
++      "kind": "selective original game port",
++      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "target_sha256": "3c44ac0d15d2f6f0d8d443bb80801a02c0ae76a818fb74fd58ea124f3de6bce6"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/GameInvItems.h",
++      "target": "src/game/key_messages.h",
++      "source_line_ranges": [
++        [
++          142,
++          172
++        ]
++      ],
++      "selection": "CInvKey owned key name/display/icon/count data; copied into plain owned KeyItem rather than importing the general inventory hierarchy",
++      "kind": "selective original game port",
++      "source_sha256": "592488eb133230295961290bc2bfd621429c6ccc11df1de010ba7ccaa0bd7aac",
++      "target_sha256": "c57ac262390743b2c53ed1fb6cb5cf6daba9bdc8016267c8fcae5ce16bc61bd4"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "target": "src/game/original/PlayerContainers.cpp",
++      "source_line_ranges": [
++        [
++          4388,
++          4421
++        ]
++      ],
++      "selection": "Player query/pickup handlers; owned typed payloads and real-player reply sender; preserve base/aggregate dispatch and dead-player rejection",
++      "kind": "selective original game port",
++      "source_sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "target_sha256": "0b2017603140bb17f946f2792c3f0abe3b83e9c7b8cf37a3bcb073c582409518"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/InventoryMgr.cpp",
++      "target": "src/game/original/PlayerContainers.cpp",
++      "source_line_ranges": [
++        [
++          2398,
++          2413
++        ],
++        [
++          2491,
++          2503
++        ]
++      ],
++      "selection": "Picked-up success and key-query response; correct aggregate-to-BaseClass cast to actual owner and use typed acknowledgment",
++      "kind": "selective original game port",
++      "source_sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb",
++      "target_sha256": "0b2017603140bb17f946f2792c3f0abe3b83e9c7b8cf37a3bcb073c582409518"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
++      "target": "src/game/original/KeyPickup.cpp",
++      "source_line_ranges": [
++        [
++          331,
++          468
++        ]
++      ],
++      "selection": "KeyPickup properties, assets, UseCount clamp and pickup message; ResourceNum preserved with explicit untranslated display fallback",
++      "kind": "selective original game port",
++      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
++      "target_sha256": "1ea9cab7d8fb7d192fbd7cee1cb6499822996ba4c15f33c2d3dfe608e14f9ceb"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/PickupObject.cpp",
++      "target": "src/game/original/KeyPickup.cpp",
++      "source_line_ranges": [
++        [
++          267,
++          275
++        ],
++        [
++          365,
++          410
++        ],
++        [
++          462,
++          502
++        ]
++      ],
++      "selection": "Selected flags, initial model dimensions and display-name setup, successful pickup hide/target/removal; only single-player, no generic pickup/respawn framework",
++      "kind": "selective original game port",
++      "source_sha256": "25e0388f983ec0c9e01b6deb8432f411271159a224d582e12300c10863b979da",
++      "target_sha256": "1ea9cab7d8fb7d192fbd7cee1cb6499822996ba4c15f33c2d3dfe608e14f9ceb"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
++      "target": "src/game/registration.cpp",
++      "source_line_ranges": [
++        [
++          331,
++          339
++        ]
++      ],
++      "selection": "KeyPickup property defaults and selected PickupObject target fields",
++      "kind": "selective original game port",
++      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
++      "target_sha256": "564acfbda58f742b61348cf52dafa640c5291e2386b05fd96dcdcdae21ade1fa"
++    },
++    {
++      "source": "sources/blood2/ObjectDLL/B2BaseClass.cpp",
++      "target": "src/game/original/B2BaseClass.cpp",
++      "source_line_ranges": [
++        [
++          43,
++          70
++        ],
++        [
++          162,
++          225
++        ]
++      ],
++      "selection": "Original difficulty/game-type filter retained; add an inspection marker when it removes during initial update",
++      "kind": "selective original game port",
++      "source_sha256": "bad14ecb54c1b62d82fa66265ba0819fa845ccd9db583e329329c60a86b05ccc",
++      "target_sha256": "33dac9707236deb4f2aeb579e0c1bd2a543d3763258e4e9c47f729c2e3a54ea0"
++    },
++    {
++      "source": "sources/blood2/Shared/SharedDefs.h",
++      "target": "src/game/key_messages.h",
++      "source_line_ranges": [
++        [
++          175,
++          177
++        ]
++      ],
++      "selection": "Key message numeric IDs; see named declarations in original SharedDefs",
++      "kind": "original numeric constants",
++      "source_sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b",
++      "target_sha256": "c57ac262390743b2c53ed1fb6cb5cf6daba9bdc8016267c8fcae5ce16bc61bd4"
++    },
++    {
++      "source": "sources/blood2/AppHeaders/generic_msg_de.h",
++      "target": "src/game/key_messages.h",
++      "source_line_ranges": [
++        [
++          46,
++          49
++        ]
++      ],
++      "selection": "MID_PICKEDUP=1005; selected single-player typed success replaces float respawn packet",
++      "kind": "original numeric constants",
++      "source_sha256": "5231003078a5cf58400cebf261efb84132f3733507d336c33d4fae81b015a5f2",
++      "target_sha256": "c57ac262390743b2c53ed1fb6cb5cf6daba9bdc8016267c8fcae5ce16bc61bd4"
++    },
++    {
++      "source": "sources/lithtech/runtime/server/src/serverobj.h",
++      "target": "src/game/original/Trigger.cpp",
++      "source_line_ranges": [
++        [
++          50,
++          60
++        ]
++      ],
++      "selection": "Later-generation explicit nonpositive-next-update documentation informs the Trigger-only reset adapter; not proof of retail Blood II behavior",
++      "kind": "cross-generation engine reference, not imported",
++      "source_sha256": "d8004f66b7a5ab21a9db58e431c80cb1018efef3eb942c645255fbea28d5cfc7",
++      "target_sha256": "dd585f83a2e40948e507265f1858e9b7248b77072c064ba21afa0bc32ec13e81"
++    },
++    {
++      "source": "sources/lithtech/runtime/server/src/s_object.cpp",
++      "target": "src/game/original/Trigger.cpp",
++      "source_line_ranges": [
++        [
++          312,
++          322
++        ]
++      ],
++      "selection": "Later-generation scheduler checks next-update >0; no general scheduler change",
++      "kind": "cross-generation engine reference, not imported",
++      "source_sha256": "32777bcf2a221ae7c6c8cc6890a102f33120b75f2eb3f60ec7578d54f4b65d68",
++      "target_sha256": "dd585f83a2e40948e507265f1858e9b7248b77072c064ba21afa0bc32ec13e81"
++    },
++    {
++      "source": "sources/blood2/AppHeaders/basetypes_de.h",
++      "target": "src/game/server_physics.cpp",
++      "source_line_ranges": [
++        [
++          334,
++          355
++        ]
++      ],
++      "selection": "Original SOLID/GRAVITY/GOTHRUWORLD meanings inform primary-world stopping for nonsolid gravity pickups",
++      "kind": "original engine contract reference",
++      "source_sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
++      "target_sha256": "029087ab89d6c81a72329fabe8d292106d0cc248cabf11951ca2f7688683e9e7"
++    }
++  ],
++  "engine_adaptations": [
++    "Owned typed key payloads retain original IDs without packet ABI; no aggregate-as-object cast",
++    "Door owns stationary Trigger child with checked links and deferred teardown; pending owner cannot activate child",
++    "Reentry guard extends to toggle and delayed batches; pending-removal sends stop",
++    "Nonpositive Trigger ResetTime disables the timer; later engine evidence, not verified retail parity",
++    "Single-player KeyPickup merges required PickupObject branches; localized names remain explicit fallback metadata",
++    "Transported solid bodies sweep nonsolid sensors after accepted atomic translation",
++    "Nonsolid gravity objects stop on primary world unless GOTHRUWORLD; broader nonsolid physics remains pending",
++    "B2BaseClass records original initial-update filtering for truthful source-entry accounting"
++  ]
++}
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index 7db18fd..c7214b3 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original Player Entry Boundary
+ 
++> Key inventory, pickup and query messages are extended by
++> [TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md); prior key/pickup omissions below
++> describe their earlier increment. General item/combat coverage remains pending.
++
+ This is a **selective port of original single-player entry and lifetime code**,
+ not the complete original shells, CPlayerObj, CBaseCharacter, InventoryMgr or
+ Destructable. Their accepted entry branches now execute in the new project.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 229dc67..66fafec 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -236,3 +236,20 @@ Weapon fire-through branch. [DOOR_CONTRACTS.md](DOOR_CONTRACTS.md) distinguishes
+ these game rules from the new atomic translation/pusher service and geometry
+ binding. Trigger spawning, sound, portal visibility and rotating doors are not
+ claimed implemented. No prototype codebase or dependency was imported.
++
++## M2 Trigger and Key Continuation
++
++[M2_TRIGGER_SOURCES.json](M2_TRIGGER_SOURCES.json) records Trigger/BigTrigger/
++ToggleTrigger properties, filters, counters, delays, messages and toggles; Door
++SpawnTrigger, child state changes and lock relay; InventoryMgr/CInvKey key rules;
++CPlayerObj key request/reply branches; and selected KeyPickup/PickupObject rules.
++Owned strings/records and typed key messages replace legacy storage and packet
++ABI. The original aggregate-to-BaseClass reply cast is corrected to the player.
++B2BaseClass filtering gains a diagnostic marker, without changing the filter.
++
++[TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md) documents the stronger recursion and
++child-lifetime guards, nonpositive trigger reset adaptation, explicit localized
++name fallback, collision extension and remaining USE/feedback/persistence limits.
++Later LithTech timer documentation informs the ResetTime<=0 convention; it is not
++claimed to establish retail Blood II engine parity. Earlier ledgers stay historical.
++No prototype dependency, reference source or commercial asset was imported.
+diff --git a/docs/TRIGGER_CONTRACTS.md b/docs/TRIGGER_CONTRACTS.md
+new file mode 100644
+index 0000000..cbc96dd
+--- /dev/null
++++ b/docs/TRIGGER_CONTRACTS.md
+@@ -0,0 +1,144 @@
++# Original triggers, door SelfTrigger and keys
++
++This extends [DOOR_CONTRACTS.md](DOOR_CONTRACTS.md),
++[WEAPON_CONTRACTS.md](WEAPON_CONTRACTS.md) and
++[OBJECT_CONTRACTS.md](OBJECT_CONTRACTS.md). M2 remains open.
++See [source selections](M2_TRIGGER_SOURCES.json) and
++[execution evidence](../../Documentation/Implementation/M2_TRIGGERS.md).
++
++## Original rules retained
++
++`Trigger`, obsolete `BigTrigger` (same behavior) and `ToggleTrigger` are selective
++ports of `ObjectDLL/Trigger.cpp`. They retain ten target/message slots,
++`MessageDelay` for slot 1 and `MessageDelay2`–`10`, reset timing, activation
++counts, touch/player/AI/object/relay/named filters, lock/key queries and toggle
++on/off messages. Generic target/message properties retain the original
++200-character limit; the old general filename limit of 100 is insufficient.
++Commands and key/named-filter comparisons are ASCII case insensitive. Named
++message delivery still uses the existing exact-name object lookup and stable
++list snapshot. A target named by `REMOVE` is removed through the original helper.
++Slot send counts mean dispatch attempts, not successful delivery to a live target.
++The inspector separately counts matching live targets, including zero matches.
++
++Important source behavior:
++
++- `TouchActivate` gates contacts, not incoming `TRIGGER` messages. Sender type
++  filters apply to both. Trigger relays, AI and ordinary objects can bypass a
++  player lock when their respective activation flags permit them. Disabling
++  relay activation still allows a Trigger through the ordinary-object branch
++  if `ObjectActivate` is enabled. Player and AI branches do not fall through.
++- Only the player's locked branch queries a key. The synchronous response can
++  unlock before the same activation continues. The named-object filter runs
++  **after** this query, so a use can be consumed even if that filter then rejects.
++  The query also precedes the activation counter.
++- The original early `active` guard applies to **all** incoming commands:
++  `RESET`, `LOCK` and `UNLOCK` do not reactivate an inactive trigger. RESET on an
++  active trigger cancels its timer but does not clear its counter/pending slots.
++- With no delayed slots, activation sends the batch and schedules ResetTime.
++  With delays, zero-delay slots send immediately, pending slots send when due,
++  and the reset interval starts after the last delayed slot. An update with no
++  pending slots sets active again. The session still dispatches at most one
++  scheduled update per object per step.
++- ResetTime=0 leaves an activated trigger inactive indefinitely. Authored -1
++  values are retained and mapped to the same disabled timer. This is an explicit
++  adaptation informed by later LithTech's documented nonpositive-update rule,
++  not a verified observation of the Blood II executable. The engine's general
++  timer API continues to reject negative delays. Negative message delays keep
++  their source arithmetic: they become pending only when some slot has a
++  positive maximum delay; otherwise the immediate batch path runs.
++- ActivationCount and its counter keep 32-bit unsigned semantics, including a
++  negative authored integer converting to its unsigned value.
++- ToggleTrigger changes on/off only through the immediate `SendMessages` path.
++  The original delayed `SendMessage` path uses the on-message without toggling.
++- Sound requests are recorded. The source key-query response does not play the
++  commented-out unlocked sound; explicit UNLOCK can request it.
++
++## Door ownership and lifecycle
++
++A Door with SelfTrigger creates an original Trigger at its initial pivot, before
++StartOpen displaces the door. All-zero TriggerDims uses the door's half-dimensions
++plus one on each axis; otherwise the authored dimensions are retained. The sensor
++stays at that initial position, rather than following the moving door. Setup
++copies activation/key/sound properties and targets the door's name with TRIGGER.
++SetOpening disables it; SetClosed re-enables it. LOCK/UNLOCK forwards to this
++child with the original sender. No child means no lock relay. Direct TRIGGER on
++Door remains independent of the child's lock, as in the source.
++
++The new implementation explicitly owns the child through a checked inter-object
++link. Removing either endpoint clears the parent's handle; removing the parent
++also removes its sensor. Pending parents cannot activate the sensor or consume
++keys before deferred destruction drains. Child creation failure rejects the door
++instead of creating a silent, nonfunctional SelfTrigger request. Snapshot work,
++generation-checked UI selections and deferred destruction remain mandatory.
++
++An activation guard covers immediate, delayed and toggle sends. Recursive target
++cycles cannot repeatedly increment counters or consume keys. This extends the
++source's narrower SendMessages guard to paths that were unprotected. Once a
++trigger is pending removal, remaining slots stop sending. Last sender and owner
++are safe tokens, not raw pointers. They are checked before inspection/use.
++
++## Key inventory and pickup messages
++
++Selected `CInventoryMgr::AddKey/QueryKey`, `CInvKey::Setup`, and CPlayerObj's
++MID_KEYQUERY/MID_KEYPICKUP branches use a plain vector of owned key records.
++Each keeps its name, display name, normal/highlight icon paths and byte use count.
++The already ported `Key` class is a path/animation marker, not an inventory key.
++Case-insensitive duplicates do not stack or replenish counts. Zero uses rejects.
++A successful query decrements exactly once, removing the entry at zero. Inventory
++is limited to 256 distinct keys. Player exit destroys it. Dead players do not
++answer queries or accept pickups. Key inspection does not consume a use.
++
++Original IDs 3500/3501/3502 and MID_PICKEDUP=1005 are retained. Typed, owned
++`KeyMessage` values replace the legacy string/byte/float wire layout. They cannot
++mix with byte streams or damage payloads; strings are bounded and embedded NULs
++reject. Sending/reading requires a live sender. The actual player BaseClass sends
++replies, replacing the source's invalid cast of the inventory aggregate to a
++BaseClass. A trigger accepts a response only from its current synchronous queried
++player; a pickup accepts acknowledgment only from its current toucher. These are
++local lifecycle checks, not a multiplayer authentication protocol.
++
++`KeyPickup` includes the needed single-player `PickupObject` branches directly;
++there is no claim that the general PickupObject/item framework is ported. It
++reads original asset/key/use-count/target properties, uses real ABC animation
++dimensions (X at least 10, Z at least X), requests ground placement for world
++creation, and delivers a key on player contact. Successful acknowledgment hides
++it, sends its pickup target/message, and requests deferred removal. There is no
++respawn in this supported single-player branch. Original SAVEABLE/night-goggle
++flags are retained, without claiming save or glow rendering.
++
++The source default `models/powerups/key.abc` is absent in this installation.
++Actual authored pickups use key_pu, keycard_pu, skullkey_pu and parachute_pu models.
++Missing/undecodable models remain inspectable, with touch/gravity disabled;
++no guessed pickup box is substituted. Nonzero ResourceNum keeps its numeric ID
++and explicitly displays ObjectName as a fallback until localized resources are
++ported. Icons, pickup audio and effects are metadata/requests, not rendered or
++played. General pickup respawn, thrown/bouncing items, inventory HUD selection,
++level-transition/save persistence and other item types remain pending.
++
++## Collision and inspection boundaries
++
++Ordinary movement already sweeps nonsolid touch sensors over the accepted body
++path, including a stationary overlap. This extension also checks transported
++solid bodies against nonsolid sensors after an atomic world-model translation.
++Blocked pusher/rider plans send no contacts. Callbacks and removal remain deferred;
++recursive motion is rejected. Direct world-model-to-sensor contacts, rotational
++sweeps, retail contact priorities and full physics parity remain unimplemented.
++
++Nonsolid objects carrying GRAVITY now collide with the primary world unless
++GOTHRUWORLD is set, so keys rest on the floor without becoming solid player
++obstacles. This bounded extension does not implement all nonsolid world-model,
++platform or impulse interactions. The existing replacement integrator remains.
++
++The **Triggers** tab shows all live sensors, including inactive and door-owned
++ones, positions/dimensions, filters, counters, timers, delayed slots, target
++matches, key queries, sender, toggle state, audio requests and player keys.
++World key pickups expose models, icon paths, ResourceNum and diagnostics.
++The **Doors** tab links to its actual child. Commands queue at a frame boundary
++and use the live player as sender. An explicitly labeled debug key grant bypasses
++pickup and is separate from original rules. Simulation also runs without ImGui.
++
++Inspector TRIGGER is a direct test command, not the original 82-unit player USE
++ray. The latter, ordinary interaction bindings, complete AI, rotating doors,
++audio/localized feedback, save/restore and full gameplay remain pending.
++Original B2BaseClass difficulty/game-type filtering now carries an inspection
++marker so initial-update removals are reported as filtered, not creation failures.
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index 93d3e1b..abf70e2 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -1,5 +1,9 @@
+ # Original Inventory and Vector Weapon Boundary
+ 
++> Key inventory, pickup and query messages are extended by
++> [TRIGGER_CONTRACTS.md](TRIGGER_CONTRACTS.md); prior key/pickup omissions below
++> describe their earlier increment. General item/combat coverage remains pending.
++
+ This M2 continuation ports selected original `CInventoryMgr`, `CWeapon`, server
+ `CBeretta`/`CMelee`, client `CViewWeapon` and client melee animation branches.
+ It supports the Beretta and Caleb's Chosen Knife. It does not claim a complete
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index 12fee93..3c8d66c 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -4,6 +4,8 @@
+ #include "engine/world_model.h"
+ #include "game/original/Door.h"
+ #include "game/original/Key.h"
++#include "game/original/KeyPickup.h"
++#include "game/original/Trigger.h"
+ #include "game/original/VolumeBrush.h"
+ 
+ #include <algorithm>
+@@ -73,6 +75,27 @@ namespace OpenBlood2
+ 
+     void Inspector::apply_commands(GameSession& game, ObjectSelection& selection)
+     {
++        if (trigger_request)
++        {
++            auto* r = game.objects.get(trigger_request);
++            auto* t = r && r->life == Life::Alive ? dynamic_cast<Trigger*>(r->game.get()) : nullptr;
++            auto* player = game.server_shell.Player(game.local_client);
++            if (t && grant_key_request && player && !t->key_name.empty())
++                player->m_InventoryMgr.AddKey({t->key_name, t->key_name, "key.pcx", "key_h.pcx", 1});
++            else if (t)
++            {
++                auto text = game.server.CreateString(trigger_command.c_str());
++                auto msg = game.server.StartMessageToObject(player, r->handle, 1000);
++                if (msg)
++                {
++                    game.server.WriteToMessageHString(msg, text);
++                    game.server.EndMessage(msg);
++                }
++                game.server.FreeString(text);
++            }
++            trigger_request = {};
++            grant_key_request = false;
++        }
+         if (door_trigger_request)
+         {
+             if (const auto* record = game.objects.get(door_trigger_request);
+@@ -450,6 +473,12 @@ namespace OpenBlood2
+                     draw_movement(game, selection);
+                     ImGui::EndTabItem();
+                 }
++                if (ImGui::BeginTabItem("Triggers", nullptr, select_triggers ? ImGuiTabItemFlags_SetSelected : 0))
++                {
++                    select_triggers = false;
++                    draw_triggers(game, selection);
++                    ImGui::EndTabItem();
++                }
+                 if (ImGui::BeginTabItem("Doors", nullptr, select_doors ? ImGuiTabItemFlags_SetSelected : 0))
+                 {
+                     select_doors = false;
+@@ -1493,19 +1522,157 @@ namespace OpenBlood2
+                         d->remains_open ? "yes" : "no", d->start_open ? "yes" : "no");
+             ImGui::Text("FireThrough %s | triggers %llu", d->fire_through ? "yes" : "no",
+                         static_cast<unsigned long long>(d->triggers));
+-            ImGui::TextWrapped("SelfTrigger: %s. Trigger spawning and key/LOCK relay pending.",
+-                               d->self_trigger ? "requested, unavailable" : "off");
++            const auto* child = game.objects.get(d->trigger);
++            const auto* trigger =
++                child && child->life == Life::Alive ? dynamic_cast<const Trigger*>(child->game.get()) : nullptr;
++            ImGui::Text("SelfTrigger: %s", trigger           ? (trigger->active ? "active" : "inactive")
++                                           : d->self_trigger ? "missing"
++                                                             : "off");
++            if (trigger)
++            {
++                ImGui::Text("%s | key: %s", trigger->locked ? "locked" : "unlocked", trigger->key_name.c_str());
++                if (ImGui::Button("Inspect SelfTrigger"))
++                {
++                    trigger_selection = child->id;
++                    select_triggers = true;
++                }
++            }
+             ImGui::TextWrapped("Audio request: %s (%s, not played)", d->last_sound.c_str(),
+                                d->sound_loop ? "loop" : "once");
+             ImGui::TextWrapped("Portal: %s / requested %s (visibility pending)", d->portal.c_str(),
+                                d->portal_open ? "open" : "closed");
+-            if (!d->pending_command.empty())
+-                ImGui::Text("Unimplemented relay: %s", d->pending_command.c_str());
+         }
+         else
+             ImGui::TextUnformatted("No supported live Door selected.");
+         ImGui::EndTable();
+-        ImGui::TextWrapped("Translation only. Rotating doors, crushing damage, chained pushers, self triggers, "
++        ImGui::TextWrapped("Translation only. Rotating doors, crushing damage, chained pushers, "
+                            "audio, portals and save/restore remain pending. M2 is not complete.");
+     }
+ } // namespace OpenBlood2
++
++namespace OpenBlood2
++{
++    void Inspector::draw_triggers(GameSession& game, ObjectSelection& selection)
++    {
++        ImGui::TextWrapped("Original Trigger / BigTrigger / ToggleTrigger. Hidden sensors and door-owned SelfTriggers; "
++                           "source failures remain in World.");
++        if (!ImGui::BeginTable("Trigger inspection", 2, ImGuiTableFlags_Resizable))
++            return;
++        ImGui::TableSetupColumn("Objects", ImGuiTableColumnFlags_WidthFixed, 230);
++        ImGui::TableSetupColumn("Properties");
++        ImGui::TableNextColumn();
++        ImGui::BeginChild("Trigger list", ImVec2(0, 265));
++        for (auto id : game.objects.snapshot())
++        {
++            auto* r = game.objects.get(id);
++            auto* t = r && r->life == Life::Alive ? dynamic_cast<Trigger*>(r->game.get()) : nullptr;
++            if (!t)
++                continue;
++            if (!game.objects.get(trigger_selection))
++                trigger_selection = id;
++            auto* owner = game.objects.get(t->owner_door);
++            std::string label = owner ? std::string(owner->state.m_Name) + " [SelfTrigger]" : r->state.m_Name;
++            label += t->active ? "" : " [inactive]";
++            ImGui::PushID(static_cast<int>(id.slot));
++            if (ImGui::Selectable(label.c_str(), id == trigger_selection))
++                trigger_selection = selection.id = id;
++            ImGui::PopID();
++        }
++        ImGui::EndChild();
++        if (const auto* p = game.server_shell.Player(game.local_client))
++        {
++            ImGui::Text("Player keys: %zu", p->m_InventoryMgr.keys.size());
++            for (const auto& k : p->m_InventoryMgr.keys)
++                ImGui::BulletText("%s: %u uses", k.name.c_str(), unsigned(k.uses));
++        }
++        else
++            ImGui::TextUnformatted("Enter player in Session to test access.");
++        ImGui::TableNextColumn();
++        auto* r = game.objects.get(trigger_selection);
++        auto* t = r && r->life == Life::Alive ? dynamic_cast<Trigger*>(r->game.get()) : nullptr;
++        if (t)
++        {
++            ImGui::Text("%s #%u | %s | %s", r->type->name.c_str(), r->id.slot, t->active ? "active" : "inactive",
++                        t->locked ? "locked" : "unlocked");
++            ImGui::Text("Position %.1f %.1f %.1f | half dims %.1f %.1f %.1f", r->state.m_Pos.x, r->state.m_Pos.y,
++                        r->state.m_Pos.z, r->dimensions.x, r->dimensions.y, r->dimensions.z);
++            ImGui::Text("Touch %d | Player %d | AI %d | Object %d | Relay %d", t->touch_activate, t->player_activate,
++                        t->ai_activate, t->object_activate, t->relay_activate);
++            ImGui::Text("Named filter %d: %s", t->named_activate, t->activation_name.c_str());
++            ImGui::Text("Count %llu / %u | fired %llu | rejected %llu", (unsigned long long)t->current_activation,
++                        t->activation_count, (unsigned long long)t->activations, (unsigned long long)t->rejected);
++            ImGui::Text("Reset %.3f s | timer %s", t->reset_time, r->scheduled ? "scheduled" : "off");
++            ImGui::Text("Key %s | queries %llu", t->key_name.c_str(), (unsigned long long)t->key_queries);
++            if (auto* toggle = dynamic_cast<ToggleTrigger*>(t))
++                ImGui::Text("Toggle state: %s", toggle->on ? "on" : "off");
++            const auto* sender = game.objects.get(t->last_sender);
++            ImGui::Text("Last sender: %s | command: %s",
++                        sender && sender->life == Life::Alive ? sender->state.m_Name : "none / removed",
++                        t->last_command.c_str());
++            for (const auto* command : {"TRIGGER", "RESET", "LOCK", "UNLOCK"})
++            {
++                if (ImGui::Button(command))
++                {
++                    trigger_request = r->id;
++                    trigger_command = command;
++                }
++                ImGui::SameLine();
++            }
++            ImGui::NewLine();
++            if (ImGui::Button("Debug: grant one matching key"))
++            {
++                trigger_request = r->id;
++                grant_key_request = true;
++            }
++            ImGui::TextWrapped("Commands retain original filters. Inactive triggers ignore RESET/LOCK/UNLOCK too. Key "
++                               "queries consume a use. Debug grant bypasses pickup.");
++            if (ImGui::BeginTable("Targets", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
++            {
++                for (const auto* h : {"Slot", "Target / matched", "Message / off", "Delay / pending", "Sends"})
++                    ImGui::TableSetupColumn(h);
++                ImGui::TableHeadersRow();
++                for (unsigned i = 0; i < t->slots.size(); ++i)
++                {
++                    const auto& s = t->slots[i];
++                    if (s.target.empty() && s.message.empty() && s.off_message.empty() && !s.delay)
++                        continue;
++                    unsigned matches = 0;
++                    for (auto id : game.objects.snapshot())
++                        if (auto* o = game.objects.get(id); o && o->life == Life::Alive && s.target == o->state.m_Name)
++                            ++matches;
++                    ImGui::TableNextRow();
++                    ImGui::TableNextColumn();
++                    ImGui::Text("%u", i + 1);
++                    ImGui::TableNextColumn();
++                    ImGui::TextWrapped("%s / %u", s.target.c_str(), matches);
++                    ImGui::TableNextColumn();
++                    ImGui::TextWrapped("%s / %s", s.message.c_str(), s.off_message.c_str());
++                    ImGui::TableNextColumn();
++                    ImGui::Text("%.3f / %s", s.delay, s.pending ? "yes" : "no");
++                    ImGui::TableNextColumn();
++                    ImGui::Text("%llu", (unsigned long long)s.sent);
++                }
++                ImGui::EndTable();
++            }
++            ImGui::TextWrapped("Last sound request: %s (not played)", t->last_sound.c_str());
++        }
++        else
++            ImGui::TextUnformatted("No live Trigger selected.");
++        ImGui::EndTable();
++        if (ImGui::CollapsingHeader("World key pickups"))
++            for (auto id : game.objects.snapshot())
++            {
++                auto* r = game.objects.get(id);
++                auto* k = r && r->life == Life::Alive ? dynamic_cast<KeyPickup*>(r->game.get()) : nullptr;
++                if (!k)
++                    continue;
++                ImGui::TextWrapped("%s: %s (%u uses), model %s, resource #%d; %s", r->state.m_Name,
++                                   k->item.name.c_str(), unsigned(k->item.uses), r->model ? "loaded" : "missing",
++                                   k->resource_id, k->error.c_str());
++                ImGui::TextWrapped("Pickup target: %s / %s | icons %s / %s", k->pickup_target.c_str(),
++                                   k->pickup_command.c_str(), k->item.icon.c_str(), k->item.highlighted_icon.c_str());
++            }
++        ImGui::TextWrapped("Audio, localized key names, generic pickups, save/restore and the complete playable "
++                           "session remain pending.");
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 442482a..5397cc5 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -17,6 +17,10 @@ namespace OpenBlood2
+         bool select_session = false;
+         bool select_movement = false, keyboard_movement = false;
+         bool select_containers = false;
++        bool select_triggers = false;
++        ObjectId trigger_selection{}, trigger_request{};
++        std::string trigger_command;
++        bool grant_key_request = false;
+         bool select_doors = false;
+         ObjectId door_selection{}, door_trigger_request{};
+         bool door_close_request = false;
+@@ -43,6 +47,7 @@ namespace OpenBlood2
+         void draw_weapons(GameSession&, ObjectSelection&);
+         void draw_movement(GameSession&, ObjectSelection&);
+         void draw_containers(GameSession&, ObjectSelection&);
++        void draw_triggers(GameSession&, ObjectSelection&);
+         void draw_doors(GameSession&, ObjectSelection&);
+ 
+         explicit Inspector(Runtime& value) : runtime(value) {}
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index dc33aa3..2c8ff0a 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -5,6 +5,7 @@
+ #include "engine/runtime.h"
+ #include "game/original/Door.h"
+ #include "game/server_adapter.h"
++#include "trigger_smoke.h"
+ 
+ #include <SDL3/SDL_main.h>
+ #include <cmath>
+@@ -97,7 +98,8 @@ namespace
+                 selection.id = game.objects.get(game.client_shell.player)->id;
+             }
+         }
+-        OpenBlood2::ObjectId smoke_door{};
++        OpenBlood2::ObjectId smoke_door{}, smoke_trigger{};
++        bool key_unlocked_hidden = false;
+         DVector hidden_door_position{};
+         bool door_moved_hidden = false;
+         if (options.doors_smoke)
+@@ -121,6 +123,15 @@ namespace
+             if (!smoke_door)
+                 return 4;
+         }
++        if (options.triggers_smoke)
++        {
++            if (!OpenBlood2::prepare_trigger_smoke(game, smoke_door, smoke_trigger))
++            {
++                spdlog::error("Trigger smoke preparation failed");
++                return 4;
++            }
++            selection.id = smoke_trigger;
++        }
+         const auto original_selection = selection.id;
+         const bool conveyor_smoke = options.containers_smoke && game.world_path == "worlds/01_subwaya.dat";
+         bool selection_cleared = false, world_unloaded = false;
+@@ -130,12 +141,14 @@ namespace
+ #if BLOOD2_INSPECTOR
+         OpenBlood2::Inspector inspector(runtime);
+         inspector.select_models = options.world_smoke && !options.player_smoke && !options.doors_smoke;
+-        inspector.select_session =
+-            options.player_smoke && !options.weapons_smoke && !options.movement_smoke && !options.containers_smoke;
++        inspector.select_session = options.player_smoke && !options.weapons_smoke && !options.movement_smoke &&
++                                   !options.containers_smoke && !options.triggers_smoke;
+         inspector.select_weapons = options.weapons_smoke;
+         inspector.select_movement = options.movement_smoke;
+         inspector.select_containers = options.containers_smoke;
+         inspector.select_doors = options.doors_smoke;
++        inspector.select_triggers = options.triggers_smoke;
++        inspector.trigger_selection = smoke_trigger;
+         inspector.door_selection = smoke_door;
+         if (!inspector.initialize(error))
+         {
+@@ -342,11 +355,12 @@ namespace
+                 return 3;
+             }
+             OpenBlood2::Capture capture;
+-            const bool capture_frame = swapchain &&
+-                                       frames >= (extended_smoke                                      ? 180u
+-                                                  : (options.containers_smoke || options.doors_smoke) ? 14u
+-                                                                                                      : 2u) &&
+-                                       !captured && !options.capture_file.empty();
++            const bool capture_frame =
++                swapchain &&
++                frames >= (extended_smoke                                                                ? 180u
++                           : (options.containers_smoke || options.doors_smoke || options.triggers_smoke) ? 14u
++                                                                                                         : 2u) &&
++                !captured && !options.capture_file.empty();
+             if (capture_frame &&
+                 !capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
+                                     height))
+@@ -460,9 +474,13 @@ namespace
+                                      game.client_shell.move_mgr.m_bOnGround, forward_frames, jump_frames);
+                     }
+                 }
+-                if (options.doors_smoke && frames == hide_frame)
++                if ((options.doors_smoke || options.triggers_smoke) && frames == hide_frame)
++                {
+                     hidden_door_position = game.objects.get(smoke_door)->state.m_Pos;
+-                if (options.doors_smoke && frames == show_frame)
++                    if (options.triggers_smoke)
++                        key_unlocked_hidden = OpenBlood2::activate_trigger_smoke(game, smoke_trigger);
++                }
++                if ((options.doors_smoke || options.triggers_smoke) && frames == show_frame)
+                 {
+                     const auto delta =
+                         OpenBlood2::vector_subtract(game.objects.get(smoke_door)->state.m_Pos, hidden_door_position);
+@@ -572,6 +590,7 @@ namespace
+                 !selection_cleared ||
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
++                (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+                 (options.weapons_smoke && (!weapons_fired || !weapon_advanced_hidden)) ||
+                 (options.movement_smoke &&
+                  (!movement_hidden || !movement_jumped || !movement_landed || !game.client_shell.move_mgr.ready() ||
+@@ -598,6 +617,9 @@ namespace
+             if (options.movement_smoke)
+                 spdlog::info("Movement smoke passed: SDL walk/run/jump/crouch, hidden stance changes, live ABC pose, "
+                              "unload/re-entry");
++            if (options.triggers_smoke)
++                spdlog::info("Trigger smoke passed: missing-key denial, real key pickup, consumption/unlock while "
++                             "hidden, door motion, inspector, reload");
+             if (options.doors_smoke)
+                 spdlog::info(
+                     "Door smoke passed: original trigger, translation while hidden, inspection, unload/reload");
+@@ -650,6 +672,7 @@ int main(int argc, char** argv)
+                      "  --player-smoke      GPU shell/player entry, hidden updates and unload/re-entry\n"
+                      "  --weapons-smoke     GPU Beretta/knife firing, hidden simulation and reload\n"
+                      "  --doors-smoke       GPU original sliding door inspection\n"
++                     "  --triggers-smoke    GPU Trigger, SelfTrigger and key inspection\n"
+                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
+                      "  --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload\n"
+                      "  --help              Show this help\n";
+diff --git a/src/app/trigger_smoke.cpp b/src/app/trigger_smoke.cpp
+new file mode 100644
+index 0000000..752896a
+--- /dev/null
++++ b/src/app/trigger_smoke.cpp
+@@ -0,0 +1,97 @@
++#include "trigger_smoke.h"
++#include "game/original/Door.h"
++#include "game/original/KeyPickup.h"
++#include "game/original/Trigger.h"
++#include <spdlog/spdlog.h>
++namespace OpenBlood2
++{
++    namespace
++    {
++        bool command(GameSession& g, HOBJECT to, const char* text)
++        {
++            auto* player = g.server_shell.Player(g.local_client);
++            auto string = g.server.CreateString(text);
++            auto message = g.server.StartMessageToObject(player, to, 1000);
++            const bool ok = message && g.server.WriteToMessageHString(message, string) == DE_OK &&
++                            g.server.EndMessage(message) == DE_OK;
++            g.server.FreeString(string);
++            return ok;
++        }
++    } // namespace
++    bool prepare_trigger_smoke(GameSession& g, ObjectId& door_id, ObjectId& trigger_id)
++    {
++        auto* player = g.server_shell.Player(g.local_client);
++        if (!player)
++            return false;
++        for (auto id : g.objects.snapshot())
++        {
++            auto* r = g.objects.get(id);
++            auto* door = dynamic_cast<Door*>(r->game.get());
++            auto* child = door ? g.objects.get(door->trigger) : nullptr;
++            auto* trigger = child ? dynamic_cast<Trigger*>(child->game.get()) : nullptr;
++            if (!trigger || !trigger->active || !trigger->player_activate || trigger->named_activate ||
++                trigger->key_name.empty() || door->speed <= 0 || door->move_dist <= 0 || door->open_delay >= .05f)
++                continue;
++            spdlog::info("Trigger smoke door: {} key {}", r->state.m_Name, trigger->key_name);
++            door_id = id;
++            trigger_id = child->id;
++            if (!command(g, r->handle, "LOCK") || !trigger->locked || !command(g, child->handle, "TRIGGER") ||
++                !trigger->locked || door->state != Door::Closed)
++            {
++                spdlog::error("Trigger smoke lock/denial failed");
++                return false;
++            }
++            // Use LabKey's authored asset paths: the source KeyPickup default
++            // key.abc is absent in the installed game (the real asset is key_pu).
++            std::vector<std::uint8_t> bytes;
++            World source_world;
++            std::string error, model, skin;
++            if (!g.resources.read("worlds/05_cdm.dat", bytes, error) || !read_world(bytes, source_world, error))
++                return false;
++            for (const auto& source : source_world.objects)
++            {
++                if (source.class_name != "KeyPickup")
++                    continue;
++                Properties props;
++                for (const auto& property : source.properties)
++                    props.emplace(property.name, property.value);
++                if (props.contains("Name") && std::get<std::string>(props.at("Name")) == "LabKey")
++                {
++                    model = std::get<std::string>(props.at("ModelFile"));
++                    skin = std::get<std::string>(props.at("ModelSkin"));
++                    break;
++                }
++            }
++            if (model.empty() || skin.empty())
++                return false;
++            // Controlled fixture: authored assets, actual door key name, removed before baseline counts.
++            DVector position;
++            g.server.GetObjectPos(player->m_hObject, &position);
++            auto h = g.objects.create(g.objects.find_class("KeyPickup"), {}, Creation::String,
++                                      {{"Name", std::string("smoke_key")},
++                                       {"ObjectName", trigger->key_name},
++                                       {"UseCount", std::int32_t(1)},
++                                       {"ModelFile", model},
++                                       {"ModelSkin", skin},
++                                       {"Pos", position}});
++            auto* pickup = h ? dynamic_cast<KeyPickup*>(g.objects.get(h)->game.get()) : nullptr;
++            if (pickup)
++                spdlog::info("Trigger smoke pickup: {}", pickup->error);
++            if (!pickup || !pickup->error.empty() || g.server.MoveObject(player->m_hObject, &position) != DE_OK ||
++                !pickup->picked_up || player->m_InventoryMgr.keys.size() != 1 || !g.objects.finish_frame())
++                return false;
++            return true;
++        }
++        return false;
++    }
++    bool activate_trigger_smoke(GameSession& g, ObjectId trigger_id)
++    {
++        auto* r = g.objects.get(trigger_id);
++        auto* t = r && r->life == Life::Alive ? dynamic_cast<Trigger*>(r->game.get()) : nullptr;
++        if (!t || !command(g, r->handle, "TRIGGER"))
++            return false;
++        auto* player = g.server_shell.Player(g.local_client);
++        return t->activations == 1 && t->key_queries == 2 && !t->locked && !t->active && player &&
++               player->m_InventoryMgr.keys.empty();
++    }
++} // namespace OpenBlood2
+diff --git a/src/app/trigger_smoke.h b/src/app/trigger_smoke.h
+new file mode 100644
+index 0000000..3db8492
+--- /dev/null
++++ b/src/app/trigger_smoke.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool prepare_trigger_smoke(GameSession&, ObjectId& door, ObjectId& trigger);
++    bool activate_trigger_smoke(GameSession&, ObjectId trigger);
++} // namespace OpenBlood2
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index 15e665b..ffe5959 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -125,6 +125,10 @@ namespace OpenBlood2
+                 options.player_smoke = true;
+                 options.containers_smoke = true;
+             }
++            else if (arg == "--triggers-smoke")
++            {
++                options.world_smoke = options.player_smoke = options.triggers_smoke = true;
++            }
+             else if (arg == "--doors-smoke")
+             {
+                 options.world_smoke = true;
+@@ -188,7 +192,7 @@ namespace OpenBlood2
+             return false;
+         }
+         if (int(options.weapons_smoke) + int(options.movement_smoke) + int(options.containers_smoke) +
+-                int(options.doors_smoke) >
++                int(options.doors_smoke) + int(options.triggers_smoke) >
+             1)
+         {
+             error = "Choose one player smoke scenario";
+diff --git a/src/engine/config.h b/src/engine/config.h
+index ef5ba80..73565db 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -21,7 +21,7 @@ namespace OpenBlood2
+         bool inspect_player = false;
+         bool player_smoke = false;
+         bool weapons_smoke = false;
+-        bool movement_smoke = false, containers_smoke = false, doors_smoke = false;
++        bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false;
+         bool start_game = false;
+         bool explicit_config = false;
+         bool help = false;
+diff --git a/src/game/key_messages.h b/src/game/key_messages.h
+new file mode 100644
+index 0000000..381464c
+--- /dev/null
++++ b/src/game/key_messages.h
+@@ -0,0 +1,22 @@
++#pragma once
++#include "game/legacy/basedefs_de.h"
++#include <string>
++#include <string_view>
++
++namespace OpenBlood2
++{
++    // Original message IDs, owned in-process payloads, not the old packet ABI.
++    inline constexpr DDWORD key_pickup_message = 3500, key_query_message = 3501, key_response_message = 3502;
++    inline constexpr DDWORD picked_up_message = 1005;
++    struct KeyItem
++    {
++        std::string name, display_name, icon, highlighted_icon;
++        DBYTE uses = 0;
++    };
++    struct KeyMessage
++    {
++        KeyItem item;
++        bool have = false;
++    };
++    bool same_name(std::string_view, std::string_view);
++} // namespace OpenBlood2
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index e4034ed..a53da60 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ #include "basedefs_de.h"
+ #include "game/container_messages.h"
++#include "game/key_messages.h"
+ #include "game/mover_messages.h"
+ #include "game/player_messages.h"
+ #include "game/weapon_messages.h"
+@@ -26,6 +27,9 @@ class CSBase
+ class ServerDE : public CSBase
+ {
+   public:
++    virtual bool IsObjectAlive(HOBJECT) = 0;
++    virtual DRESULT WriteKeyMessage(HMESSAGEWRITE, const OpenBlood2::KeyMessage&) = 0;
++    virtual bool ReadKeyMessage(HMESSAGEREAD, OpenBlood2::KeyMessage&) = 0;
+     virtual OpenBlood2::MoverResult MoveWorldModel(HOBJECT, DVector destination) = 0;
+     virtual bool GetContainers(HOBJECT, DVector head, OpenBlood2::ContainerState&) = 0;
+     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
+diff --git a/src/game/original/B2BaseClass.cpp b/src/game/original/B2BaseClass.cpp
+index 3ed6768..87b0999 100644
+--- a/src/game/original/B2BaseClass.cpp
++++ b/src/game/original/B2BaseClass.cpp
+@@ -54,7 +54,10 @@ DDWORD B2BaseClass::EngineMessageFn(DDWORD messageID, void* pData, DFLOAT fData)
+             {
+                 DBOOL bResult = InitialUpdate();
+                 if (!bResult)
++                {
++                    filtered = true;
+                     g_pServerDE->RemoveObject(m_hObject);
++                }
+             }
+         }
+         break;
+diff --git a/src/game/original/B2BaseClass.h b/src/game/original/B2BaseClass.h
+index bff5f89..ff22ad6 100644
+--- a/src/game/original/B2BaseClass.h
++++ b/src/game/original/B2BaseClass.h
+@@ -31,6 +31,7 @@ extern char g_szVarGameType[];
+ class B2BaseClass : public BaseClass
+ {
+   public:
++    bool filtered = false; // Inspection evidence: removed by the original difficulty/game-type rules.
+     B2BaseClass();
+     B2BaseClass(DBYTE nType);
+     virtual ~B2BaseClass() {}
+diff --git a/src/game/original/Door.cpp b/src/game/original/Door.cpp
+index 3401094..da7df3d 100644
+--- a/src/game/original/Door.cpp
++++ b/src/game/original/Door.cpp
+@@ -1,4 +1,5 @@
+ #include "Door.h"
++#include "Trigger.h"
+ #include "engine/collision.h"
+ #include <algorithm>
+ #include <cmath>
+@@ -105,6 +106,55 @@ void Door::StartSound(const std::string& sound, bool loop)
+     if (!sound.empty())
+         ++sound_requests;
+ }
++Door::~Door()
++{
++    if (trigger)
++        g_pServerDE->RemoveObject(trigger);
++}
++void Door::SetTriggerActive(bool value)
++{
++    if (g_pServerDE->IsObjectAlive(trigger))
++        if (auto* t = dynamic_cast<Trigger*>(g_pServerDE->HandleToObject(trigger)))
++            t->SetActive(value);
++}
++bool Door::SpawnTrigger()
++{
++    if (trigger)
++        return true;
++    ObjectCreateStruct create;
++    g_pServerDE->GetObjectPos(m_hObject, &create.m_Pos);
++    auto* t = dynamic_cast<Trigger*>(g_pServerDE->CreateObject(g_pServerDE->GetClass("Trigger"), &create));
++    if (!t)
++        return false;
++    trigger = t->m_hObject;
++    if (g_pServerDE->CreateInterObjectLink(m_hObject, trigger) != DE_OK)
++        return false;
++    auto dimensions = trigger_dims;
++    if (dimensions.x == 0 && dimensions.y == 0 && dimensions.z == 0)
++    {
++        g_pServerDE->GetObjectDims(m_hObject, &dimensions);
++        dimensions = vector_add(dimensions, {1, 1, 1});
++    }
++    g_pServerDE->SetObjectDims(trigger, &dimensions);
++    t->dims = dimensions;
++    t->owner_door = m_hObject;
++    t->SetActive(true);
++    const auto* name = g_pServerDE->GetObjectName(m_hObject);
++    t->slots[0].target = name ? name : "";
++    t->slots[0].message = "TRIGGER";
++    t->touch_activate = touch_activate;
++    t->player_activate = player_activate;
++    t->ai_activate = ai_activate;
++    t->object_activate = object_activate;
++    t->relay_activate = relay_activate;
++    t->named_activate = named_activate;
++    t->activation_name = activation_name;
++    t->locked = locked;
++    t->locked_sound = locked_sound;
++    t->unlocked_sound = unlocked_sound;
++    t->key_name = key_name;
++    return true;
++}
+ void Door::SetOpen(bool sound)
+ {
+     if (sound)
+@@ -122,12 +172,14 @@ void Door::SetClosed(bool sound)
+     g_pServerDE->SetNextUpdate(m_hObject, 0);
+     state = Closed;
+     portal_open = false;
++    SetTriggerActive(true);
+ }
+ void Door::SetOpening()
+ {
+     g_pServerDE->SetNextUpdate(m_hObject, open_delay);
+     started_moving = false;
+     state = Opening;
++    SetTriggerActive(false);
+ }
+ void Door::SetClosing()
+ {
+@@ -172,11 +224,16 @@ DDWORD Door::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+         // Save payloads are not implemented; do not instantiate fake restores.
+         return accepted && reason != 3 && data && ReadProp(*static_cast<ObjectCreateStruct*>(data));
+     }
++    if (message == MID_LINKBROKEN && data == trigger)
++    {
++        g_pServerDE->RemoveObject(trigger);
++        trigger = nullptr;
++    }
+     if (message == MID_INITIALUPDATE)
+     {
+         g_pServerDE->GetObjectPos(m_hObject, &closed_pos);
+         open_pos = vector_add(closed_pos, vector_scale(move_dir, move_dist));
+-        if (!physics_vector(open_pos))
++        if (!physics_vector(open_pos) || (self_trigger && !SpawnTrigger()))
+             g_pServerDE->RemoveObject(m_hObject);
+         else if (start_open)
+         {
+@@ -238,8 +295,16 @@ DDWORD Door::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
+                 if (state == Open || state == Opening)
+                     SetClosing();
+             }
+-            else if (command == "LOCK" || command == "UNLOCK")
+-                pending_command = command; // Original forwards to its child Trigger, not a door lock.
++            else if ((command == "LOCK" || command == "UNLOCK") && g_pServerDE->IsObjectAlive(trigger))
++            {
++                auto relay = g_pServerDE->StartMessageToObject(
++                    g_pServerDE->IsObjectAlive(sender) ? g_pServerDE->HandleToObject(sender) : nullptr, trigger, 1000);
++                if (relay)
++                {
++                    g_pServerDE->WriteToMessageHString(relay, text);
++                    g_pServerDE->EndMessage(relay);
++                }
++            }
+             g_pServerDE->FreeString(text);
+         }
+     }
+diff --git a/src/game/original/Door.h b/src/game/original/Door.h
+index f551c95..ce62ef5 100644
+--- a/src/game/original/Door.h
++++ b/src/game/original/Door.h
+@@ -4,7 +4,7 @@
+ #include <string>
+ 
+ // Selected original Door.cpp/Door.h rules, with typed translation results.
+-// Trigger spawning, audio, portals and save restoration remain pending.
++// Audio, portals and save restoration remain pending.
+ class Door : public B2BaseClass
+ {
+   public:
+@@ -16,6 +16,8 @@ class Door : public B2BaseClass
+         Opening = 4
+     };
+     Door() : B2BaseClass(OT_WORLDMODEL) {}
++    ~Door() override;
++    HOBJECT trigger = nullptr;
+     State state = Closed;
+     float speed = 0, closing_speed = 0, move_dist = 0, wait_time = 0, open_delay = .01f, open_time = 0;
+     DVector move_dir{}, closed_pos{}, open_pos{}, trigger_dims{};
+@@ -25,7 +27,7 @@ class Door : public B2BaseClass
+     bool touch_activate = false, player_activate = true, ai_activate = true, object_activate = false;
+     bool relay_activate = true, named_activate = false, locked = false;
+     std::string open_busy, open_stop, close_busy, close_stop, portal, activation_name;
+-    std::string locked_sound, unlocked_sound, key_name, last_sound, pending_command;
++    std::string locked_sound, unlocked_sound, key_name, last_sound;
+     float sound_radius = 1000;
+     bool sound_loop = false;
+     std::uint64_t triggers = 0, sound_requests = 0;
+@@ -38,6 +40,8 @@ class Door : public B2BaseClass
+ 
+   private:
+     bool ReadProp(ObjectCreateStruct&);
++    bool SpawnTrigger();
++    void SetTriggerActive(bool);
+     void SetOpen(bool sound = true);
+     void SetClosed(bool sound = true);
+     void SetOpening();
+diff --git a/src/game/original/InventoryMgr.cpp b/src/game/original/InventoryMgr.cpp
+index 99fb222..cf624d2 100644
+--- a/src/game/original/InventoryMgr.cpp
++++ b/src/game/original/InventoryMgr.cpp
+@@ -183,3 +183,30 @@ void CInventoryMgr::ClearWeapons()
+     requested_weapons = {};
+     ++revision;
+ }
++
++InventoryResult CInventoryMgr::AddKey(const OpenBlood2::KeyItem& item)
++{
++    if (item.name.empty() || item.display_name.empty() || item.icon.empty() || item.highlighted_icon.empty() ||
++        !item.uses)
++        return InventoryResult::Invalid;
++    for (const auto& key : keys)
++        if (OpenBlood2::same_name(item.name, key.name))
++            return InventoryResult::AlreadyHave;
++    if (keys.size() == 256)
++        return InventoryResult::Full;
++    keys.push_back(item);
++    ++revision;
++    return InventoryResult::Ok;
++}
++InventoryResult CInventoryMgr::QueryKey(std::string_view name)
++{
++    for (auto it = keys.begin(); it != keys.end(); ++it)
++        if (OpenBlood2::same_name(name, it->name))
++        {
++            if (--it->uses == 0)
++                keys.erase(it);
++            ++revision;
++            return InventoryResult::Ok;
++        }
++    return InventoryResult::NotAvailable;
++}
+diff --git a/src/game/original/InventoryMgr.h b/src/game/original/InventoryMgr.h
+index e010be0..b04bb9d 100644
+--- a/src/game/original/InventoryMgr.h
++++ b/src/game/original/InventoryMgr.h
+@@ -3,6 +3,7 @@
+ #include "Weapon.h"
+ #include <array>
+ #include <memory>
++#include <vector>
+ 
+ enum class InventoryResult
+ {
+@@ -17,6 +18,9 @@ class CInventoryMgr : public Aggregate
+ {
+   public:
+     ~CInventoryMgr() override;
++    InventoryResult AddKey(const OpenBlood2::KeyItem&);
++    InventoryResult QueryKey(std::string_view);
++    std::vector<OpenBlood2::KeyItem> keys;
+     bool Init(HOBJECT, HCLIENT);
+     void SetClient(HCLIENT client)
+     {
+diff --git a/src/game/original/KeyPickup.cpp b/src/game/original/KeyPickup.cpp
+new file mode 100644
+index 0000000..22d3966
+--- /dev/null
++++ b/src/game/original/KeyPickup.cpp
+@@ -0,0 +1,101 @@
++#include "KeyPickup.h"
++#include "trigger_helpers.h"
++#include <algorithm>
++using namespace OpenBlood2;
++DDWORD KeyPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE)
++    {
++        if (!B2BaseClass::EngineMessageFn(message, data, reason) || reason == 3 || !data)
++            return 0;
++        auto& create = *static_cast<ObjectCreateStruct*>(data);
++        auto string = [&](const char* key, std::string& out)
++        {
++            GenericProp prop;
++            if (g_pServerDE->GetPropGeneric(key, &prop) == DE_OK)
++                out = prop.m_String;
++        };
++        string("ObjectName", item.name);
++        string("IconFile", item.icon);
++        string("HiIconFile", item.highlighted_icon);
++        string("PickupTriggerTarget", pickup_target);
++        string("PickupTriggerMessage", pickup_command);
++        std::string model, skin;
++        string("ModelFile", model);
++        string("ModelSkin", skin);
++        SAFE_STRCPY(create.m_Filename, model.c_str());
++        SAFE_STRCPY(create.m_SkinName, skin.c_str());
++        GenericProp prop;
++        if (g_pServerDE->GetPropGeneric("UseCount", &prop) == DE_OK)
++            item.uses = static_cast<DBYTE>(std::clamp(prop.m_Long, 0, 255));
++        if (g_pServerDE->GetPropGeneric("ResourceNum", &prop) == DE_OK)
++            resource_id = prop.m_Long;
++        item.display_name = item.name;
++        if (resource_id)
++            error = "Localized ResourceNum display name unavailable; ObjectName shown";
++        create.m_ObjectType = OT_MODEL;
++        create.m_Flags |= FLAG_TOUCH_NOTIFY | FLAG_VISIBLE | FLAG_GRAVITY;
++        create.m_Flags &= ~FLAG_SHADOW;
++        return 1;
++    }
++    if (message == MID_INITIALUPDATE)
++    {
++        DVector dims;
++        if (g_pServerDE->GetModelAnimUserDims(m_hObject, &dims, g_pServerDE->GetModelAnimation(m_hObject)) != DE_OK)
++        {
++            error = "Key pickup has no usable animation dimensions; touch/gravity disabled";
++            g_pServerDE->SetObjectFlags(m_hObject, FLAG_VISIBLE);
++        }
++        else
++        {
++            dims.x = std::max(dims.x, 10.0f);
++            dims.z = std::max(dims.z, dims.x);
++            g_pServerDE->SetObjectDims(m_hObject, &dims);
++            if (reason == INITIALUPDATE_WORLDFILE && g_pServerDE->MoveObjectToGround(m_hObject) != DE_OK)
++                error = "Initial key ground placement failed";
++        }
++        g_pServerDE->SetObjectUserFlags(m_hObject, (1u << 3) | (1u << 10));
++        g_pServerDE->SetNextUpdate(m_hObject, 0);
++    }
++    else if (message == MID_TOUCHNOTIFY && !touching_ && !picked_up &&
++             (g_pServerDE->GetObjectFlags(m_hObject) & FLAG_TOUCH_NOTIFY))
++    {
++        auto toucher = static_cast<HOBJECT>(data);
++        if (g_pServerDE->IsObjectAlive(toucher) &&
++            g_pServerDE->IsKindOf(g_pServerDE->GetObjectClass(toucher), g_pServerDE->GetClass("CPlayerObj")))
++        {
++            touching_ = toucher;
++            ++attempts;
++            auto packet = g_pServerDE->StartMessageToObject(this, toucher, key_pickup_message);
++            if (packet)
++            {
++                g_pServerDE->WriteKeyMessage(packet, {item, false});
++                g_pServerDE->EndMessage(packet);
++            }
++            touching_ = nullptr;
++        }
++    }
++    return B2BaseClass::EngineMessageFn(message, data, reason);
++}
++DDWORD KeyPickup::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    KeyMessage reply;
++    if (message == picked_up_message && sender && sender == touching_ && !picked_up &&
++        g_pServerDE->ReadKeyMessage(read, reply) && reply.have && same_name(reply.item.name, item.name))
++    {
++        picked_up = true;
++        g_pServerDE->SetObjectFlags(m_hObject,
++                                    g_pServerDE->GetObjectFlags(m_hObject) & ~FLAG_VISIBLE & ~FLAG_TOUCH_NOTIFY);
++        ++sound_requests; // Original powerup4.wav, not connected audio.
++        if (!pickup_target.empty() && !pickup_command.empty())
++        {
++            auto target = g_pServerDE->CreateString(pickup_target.c_str());
++            auto command = g_pServerDE->CreateString(pickup_command.c_str());
++            SendTriggerMsgToObjects(this, target, command);
++            g_pServerDE->FreeString(target);
++            g_pServerDE->FreeString(command);
++        }
++        g_pServerDE->RemoveObject(m_hObject); // Single-player: never respawn.
++    }
++    return B2BaseClass::ObjectMessageFn(sender, message, read);
++}
+diff --git a/src/game/original/KeyPickup.h b/src/game/original/KeyPickup.h
+new file mode 100644
+index 0000000..d1624de
+--- /dev/null
++++ b/src/game/original/KeyPickup.h
+@@ -0,0 +1,23 @@
++#pragma once
++#include "B2BaseClass.h"
++#include <string>
++
++// Selected KeyPickup plus the single-player PickupObject branches it needs.
++// General pickups, respawn/bounce FX, localized resource strings remain pending.
++class KeyPickup : public B2BaseClass
++{
++  public:
++    KeyPickup() : B2BaseClass(OT_MODEL) {}
++    OpenBlood2::KeyItem item;
++    std::int32_t resource_id = 0;
++    std::string pickup_target, pickup_command, error;
++    bool picked_up = false;
++    std::uint64_t attempts = 0, sound_requests = 0;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++
++  private:
++    HOBJECT touching_ = nullptr;
++};
+diff --git a/src/game/original/PlayerContainers.cpp b/src/game/original/PlayerContainers.cpp
+index 3ceb387..8606b64 100644
+--- a/src/game/original/PlayerContainers.cpp
++++ b/src/game/original/PlayerContainers.cpp
+@@ -15,6 +15,28 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD
+         ++protected_volume_hits;
+         return 0;
+     }
++    if (!m_bDead && !m_damage.IsDead() &&
++        (message == OpenBlood2::key_query_message || message == OpenBlood2::key_pickup_message))
++    {
++        OpenBlood2::KeyMessage key;
++        if (server->ReadKeyMessage(read, key))
++        {
++            const auto result = message == OpenBlood2::key_query_message ? m_InventoryMgr.QueryKey(key.item.name)
++                                                                         : m_InventoryMgr.AddKey(key.item);
++            key.have = result == InventoryResult::Ok;
++            auto reply = (message == OpenBlood2::key_query_message || key.have)
++                             ? server->StartMessageToObject(this, sender,
++                                                            message == OpenBlood2::key_query_message
++                                                                ? OpenBlood2::key_response_message
++                                                                : OpenBlood2::picked_up_message)
++                             : nullptr;
++            if (reply)
++            {
++                server->WriteKeyMessage(reply, key);
++                server->EndMessage(reply);
++            }
++        }
++    }
+     return CBaseCharacter::ObjectMessageFn(sender, message, read);
+ }
+ 
+diff --git a/src/game/original/Trigger.cpp b/src/game/original/Trigger.cpp
+new file mode 100644
+index 0000000..4f01bdb
+--- /dev/null
++++ b/src/game/original/Trigger.cpp
+@@ -0,0 +1,265 @@
++#include "Trigger.h"
++#include "engine/collision.h"
++#include "trigger_helpers.h"
++#include <algorithm>
++#include <cmath>
++using namespace OpenBlood2;
++namespace
++{
++    void string_prop(const char* name, std::string& out)
++    {
++        GenericProp prop;
++        if (g_pServerDE->GetPropGeneric(name, &prop) == DE_OK)
++            out = prop.m_String;
++    }
++    void bool_prop(const char* name, bool& out)
++    {
++        DBOOL value = out;
++        g_pServerDE->GetPropBool(name, &value);
++        out = value != 0;
++    }
++} // namespace
++bool Trigger::ReadProp()
++{
++    g_pServerDE->GetPropVector("Dims", &dims);
++    g_pServerDE->GetPropReal("ResetTime", &reset_time);
++    g_pServerDE->GetPropReal("SoundRadius", &sound_radius);
++    string_prop("ActivationSound", activation_sound);
++    string_prop("ActivationObjectName", activation_name);
++    string_prop("LockedSound", locked_sound);
++    string_prop("UnlockedSound", unlocked_sound);
++    string_prop("LockedMsg", locked_message);
++    string_prop("UnlockedMsg", unlocked_message);
++    string_prop("UnlockKeyName", key_name);
++    bool_prop("TouchActivate", touch_activate);
++    bool_prop("PlayerActivate", player_activate);
++    bool_prop("AIActivate", ai_activate);
++    bool_prop("ObjectActivate", object_activate);
++    bool_prop("TriggerRelayActivate", relay_activate);
++    bool_prop("NamedObjectActivate", named_activate);
++    bool_prop("Locked", locked);
++    GenericProp prop;
++    if (g_pServerDE->GetPropGeneric("ActivationCount", &prop) == DE_OK)
++        activation_count = static_cast<std::uint32_t>(prop.m_Long);
++    if (!physics_vector(dims) || dims.x < 0 || dims.y < 0 || dims.z < 0 || !std::isfinite(reset_time) ||
++        std::abs(reset_time) > 1e6f || !std::isfinite(sound_radius) || sound_radius < 0 || sound_radius > 1e6f)
++        return false;
++    for (unsigned i = 0; i < slots.size(); ++i)
++    {
++        auto suffix = std::to_string(i + 1);
++        auto& slot = slots[i];
++        string_prop(("TargetName" + suffix).c_str(), slot.target);
++        string_prop(("MessageName" + suffix).c_str(), slot.message);
++        g_pServerDE->GetPropReal((i ? "MessageDelay" + suffix : "MessageDelay").c_str(), &slot.delay);
++        if (!std::isfinite(slot.delay) || std::abs(slot.delay) > 1e6f)
++            return false;
++        max_delay = std::max(max_delay, slot.delay);
++    }
++    return true;
++}
++void Trigger::Sound(const std::string& name)
++{
++    last_sound = name;
++    if (!name.empty())
++        ++sound_requests; // Audio/Action-mode console localization is not connected.
++}
++bool Trigger::ValidateSender(HOBJECT sender)
++{
++    if (!g_pServerDE->IsObjectAlive(sender))
++        return false;
++    auto type = g_pServerDE->GetObjectClass(sender);
++    bool accepted = false;
++    if (relay_activate && g_pServerDE->IsKindOf(type, g_pServerDE->GetClass("Trigger")))
++        accepted = true;
++    else if (g_pServerDE->IsKindOf(type, g_pServerDE->GetClass("CPlayerObj")))
++    {
++        if (player_activate)
++        {
++            if (locked && !key_name.empty())
++            {
++                ++key_queries;
++                querying_ = sender;
++                KeyMessage query;
++                query.item.name = key_name;
++                auto message = g_pServerDE->StartMessageToObject(this, sender, key_query_message);
++                if (message)
++                {
++                    g_pServerDE->WriteKeyMessage(message, query);
++                    g_pServerDE->EndMessage(message);
++                }
++                querying_ = nullptr;
++            }
++            accepted = !locked;
++            if (locked)
++                Sound(locked_sound);
++        }
++    }
++    else if (g_pServerDE->IsKindOf(type, g_pServerDE->GetClass("CBaseCharacter")))
++        accepted = ai_activate;
++    else
++        accepted = object_activate;
++    // Source order: querying consumes a use before the optional named filter.
++    if (accepted && named_activate && !activation_name.empty())
++    {
++        const auto* name = g_pServerDE->GetObjectName(sender);
++        accepted = name && same_name(name, activation_name);
++    }
++    return accepted;
++}
++void Trigger::Activate(HOBJECT sender, bool touch)
++{
++    if (!active || activating_ || (touch && !touch_activate) || (owner_door && !g_pServerDE->IsObjectAlive(owner_door)))
++        return;
++    // Also covers ToggleTrigger and delayed batches, whose source lacked the
++    // SendMessages guard. Cycles cannot consume counters/keys recursively.
++    activating_ = true;
++    if (!ValidateSender(sender))
++    {
++        ++rejected;
++        activating_ = false;
++        return;
++    }
++    if (touch)
++        last_sender = sender;
++    if (++current_activation < activation_count)
++    {
++        activating_ = false;
++        return;
++    }
++    current_activation = 0;
++    ++activations;
++    Sound(activation_sound);
++    last_sender = sender;
++    if (max_delay != 0)
++    {
++        delay_start = g_pServerDE->GetTime();
++        g_pServerDE->SetNextUpdate(m_hObject, .01f);
++        for (unsigned i = 0; i < slots.size() && g_pServerDE->IsObjectAlive(m_hObject); ++i)
++            if (slots[i].delay != 0)
++                slots[i].pending = true;
++            else
++                SendMessage(i, slots[i].message);
++    }
++    else
++    {
++        SendMessages();
++        if (g_pServerDE->IsObjectAlive(m_hObject))
++            g_pServerDE->SetNextUpdate(m_hObject, std::max(0.0f, reset_time));
++    }
++    active = false;
++    activating_ = false;
++}
++void Trigger::SendMessage(unsigned index, const std::string& command)
++{
++    auto& slot = slots[index];
++    if (slot.target.empty() || command.empty() || !g_pServerDE->IsObjectAlive(m_hObject))
++        return;
++    auto target = g_pServerDE->CreateString(slot.target.c_str());
++    auto text = g_pServerDE->CreateString(command.c_str());
++    SendTriggerMsgToObjects(this, target, text);
++    g_pServerDE->FreeString(target);
++    g_pServerDE->FreeString(text);
++    ++slot.sent; // Attempted named dispatch, not proof that the target exists.
++}
++void Trigger::SendMessages()
++{
++    for (unsigned i = 0; i < slots.size(); ++i)
++        SendMessage(i, slots[i].message);
++}
++void Trigger::Update()
++{
++    if (std::none_of(slots.begin(), slots.end(), [](const Slot& s) { return s.pending; }))
++    {
++        active = true;
++        g_pServerDE->SetNextUpdate(m_hObject, 0);
++        return;
++    }
++    activating_ = true;
++    bool delayed = false;
++    for (unsigned i = 0; i < slots.size() && g_pServerDE->IsObjectAlive(m_hObject); ++i)
++        if (slots[i].pending)
++        {
++            if (g_pServerDE->GetTime() >= delay_start + slots[i].delay)
++            {
++                SendMessage(i, slots[i].message);
++                slots[i].pending = false;
++            }
++            else
++                delayed = true;
++        }
++    if (g_pServerDE->IsObjectAlive(m_hObject))
++        g_pServerDE->SetNextUpdate(m_hObject, delayed ? .01f : std::max(0.0f, reset_time));
++    activating_ = false;
++}
++DDWORD Trigger::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE)
++        return B2BaseClass::EngineMessageFn(message, data, reason) && reason != 3 && ReadProp();
++    if (message == MID_INITIALUPDATE)
++    {
++        g_pServerDE->SetObjectDims(m_hObject, &dims);
++        g_pServerDE->SetObjectFlags(m_hObject, FLAG_TOUCH_NOTIFY);
++        g_pServerDE->SetObjectUserFlags(m_hObject, 1u << 3);
++        g_pServerDE->SetNextUpdate(m_hObject, 0);
++    }
++    else if (message == MID_TOUCHNOTIFY)
++        Activate(static_cast<HOBJECT>(data), true);
++    else if (message == MID_UPDATE)
++        Update();
++    return B2BaseClass::EngineMessageFn(message, data, reason);
++}
++DDWORD Trigger::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
++{
++    if (message == key_response_message)
++    {
++        KeyMessage response;
++        if (sender && sender == querying_ && g_pServerDE->ReadKeyMessage(read, response) && locked && response.have &&
++            same_name(response.item.name, key_name))
++            locked = false;
++    }
++    // The original early return gates RESET/LOCK/UNLOCK as well as TRIGGER.
++    else if (message == 1000 && active && !activating_)
++    {
++        auto text = g_pServerDE->ReadFromMessageHString(read);
++        const auto* raw = g_pServerDE->GetStringData(text);
++        const std::string command = raw ? raw : "";
++        g_pServerDE->FreeString(text);
++        last_command = command;
++        if (same_name(command, "TRIGGER"))
++            Activate(sender, false);
++        else if (same_name(command, "RESET"))
++        {
++            active = true;
++            g_pServerDE->SetNextUpdate(m_hObject, 0);
++        }
++        else if (same_name(command, "LOCK"))
++        {
++            locked = true;
++            g_pServerDE->SetNextUpdate(m_hObject, 0);
++        }
++        else if (same_name(command, "UNLOCK"))
++        {
++            if (locked)
++                Sound(unlocked_sound);
++            locked = false;
++            g_pServerDE->SetNextUpdate(m_hObject, 0);
++        }
++    }
++    return B2BaseClass::ObjectMessageFn(sender, message, read);
++}
++DDWORD ToggleTrigger::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
++{
++    if (message == MID_PRECREATE)
++    {
++        bool_prop("StartOn", on);
++        for (unsigned i = 0; i < slots.size(); ++i)
++            string_prop(("OffMessageName" + std::to_string(i + 1)).c_str(), slots[i].off_message);
++    }
++    return Trigger::EngineMessageFn(message, data, reason);
++}
++void ToggleTrigger::SendMessages()
++{
++    for (unsigned i = 0; i < slots.size(); ++i)
++        SendMessage(i, on ? slots[i].off_message : slots[i].message);
++    on = !on;
++}
+diff --git a/src/game/original/Trigger.h b/src/game/original/Trigger.h
+new file mode 100644
+index 0000000..838ebfb
+--- /dev/null
++++ b/src/game/original/Trigger.h
+@@ -0,0 +1,58 @@
++#pragma once
++#include "B2BaseClass.h"
++#include <array>
++#include <string>
++
++// Selective original Trigger/BigTrigger/ToggleTrigger port. See TRIGGER_CONTRACTS.md.
++class Trigger : public B2BaseClass
++{
++  public:
++    struct Slot
++    {
++        std::string target, message, off_message;
++        float delay = 0;
++        bool pending = false;
++        std::uint64_t sent = 0;
++    };
++    std::array<Slot, 10> slots;
++    DVector dims{};
++    float reset_time = 0, sound_radius = 200, max_delay = 0, delay_start = 0;
++    bool active = true, touch_activate = true, player_activate = true, ai_activate = true;
++    bool object_activate = false, relay_activate = true, named_activate = false, locked = false;
++    std::string activation_name, activation_sound, locked_sound, unlocked_sound, key_name = "Key";
++    std::string locked_message, unlocked_message, last_sound, last_command;
++    std::uint32_t activation_count = 1, current_activation = 0;
++    std::uint64_t activations = 0, rejected = 0, key_queries = 0, sound_requests = 0;
++    HOBJECT last_sender = nullptr, owner_door = nullptr;
++    void SetActive(bool value)
++    {
++        active = value;
++    }
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
++    virtual void SendMessages();
++    void SendMessage(unsigned, const std::string&);
++
++  private:
++    bool ReadProp();
++    bool ValidateSender(HOBJECT);
++    void Activate(HOBJECT, bool touch);
++    void Update();
++    void Sound(const std::string&);
++    bool activating_ = false;
++    HOBJECT querying_ = nullptr;
++};
++class BigTrigger : public Trigger
++{
++};
++class ToggleTrigger : public Trigger
++{
++  public:
++    bool on = false;
++
++  protected:
++    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
++    void SendMessages() override;
++};
+diff --git a/src/game/registration.cpp b/src/game/registration.cpp
+index e2b76c4..34f9e75 100644
+--- a/src/game/registration.cpp
++++ b/src/game/registration.cpp
+@@ -3,8 +3,10 @@
+ #include "game/original/Door.h"
+ #include "game/original/GameStartPoint.h"
+ #include "game/original/Key.h"
++#include "game/original/KeyPickup.h"
+ #include "game/original/PathPoint.h"
+ #include "game/original/SmellHint.h"
++#include "game/original/Trigger.h"
+ #include "game/original/VolumeBrush.h"
+ #include "game/original/WorldProperties.h"
+ #include "game/server_adapter.h"
+@@ -166,6 +168,58 @@ namespace OpenBlood2
+                                 {"SurfaceColor2", DVector{}},
+                                 {"XScaleDuration", 10.0f},
+                                 {"YScaleDuration", 10.0f}}};
++        const ClassInfo key_pickup{"KeyPickup",
++                                   &b2base,
++                                   construct<KeyPickup>,
++                                   {{"ObjectName", std::string("SuperKey")},
++                                    {"ResourceNum", std::int32_t(0)},
++                                    {"IconFile", std::string("key.pcx")},
++                                    {"HiIconFile", std::string("key_h.pcx")},
++                                    {"ModelFile", std::string("models/powerups/key.abc")},
++                                    {"ModelSkin", std::string("skins/powerups/key.dtx")},
++                                    {"UseCount", std::int32_t(1)},
++                                    {"PickupTriggerTarget", std::string{}},
++                                    {"PickupTriggerMessage", std::string{}}}};
++        const ClassInfo trigger{
++            "Trigger", &b2base, construct<Trigger>, []
++            {
++                std::vector<PropertySpec> properties{{"Dims", DVector{}},
++                                                     {"ResetTime", 0.0f},
++                                                     {"ActivationSound", std::string{}},
++                                                     {"SoundRadius", 200.0f},
++                                                     {"TouchActivate", true},
++                                                     {"PlayerActivate", true},
++                                                     {"AIActivate", true},
++                                                     {"ObjectActivate", false},
++                                                     {"TriggerRelayActivate", true},
++                                                     {"NamedObjectActivate", false},
++                                                     {"ActivationObjectName", std::string{}},
++                                                     {"ActivationCount", std::int32_t(1)},
++                                                     {"Locked", false},
++                                                     {"LockedSound", std::string{}},
++                                                     {"UnlockedSound", std::string{}},
++                                                     {"UnlockKeyName", std::string("Key")},
++                                                     {"LockedMsg", std::string{}, false},
++                                                     {"UnlockedMsg", std::string{}, false},
++                                                     {"AdditionalTargets", std::int32_t(0), false}};
++                for (unsigned i = 1; i <= 10; ++i)
++                {
++                    auto n = std::to_string(i);
++                    properties.push_back({"TargetName" + n, std::string{}, true, MAX_GP_STRING_LEN});
++                    properties.push_back({"MessageName" + n, std::string{}, true, MAX_GP_STRING_LEN});
++                    properties.push_back({i == 1 ? "MessageDelay" : "MessageDelay" + n, 0.0f});
++                }
++                return properties;
++            }()};
++        const ClassInfo big_trigger{"BigTrigger", &trigger, construct<BigTrigger>, {}};
++        const ClassInfo toggle_trigger{"ToggleTrigger", &trigger, construct<ToggleTrigger>, []
++                                       {
++                                           std::vector<PropertySpec> properties{{"StartOn", false}};
++                                           for (unsigned i = 1; i <= 10; ++i)
++                                               properties.push_back(
++                                                   {"OffMessageName" + std::to_string(i), std::string{}});
++                                           return properties;
++                                       }()};
+         const ClassInfo door{"Door",
+                              &b2base,
+                              construct<Door>,
+@@ -256,7 +310,9 @@ namespace OpenBlood2
+                objects.register_class(smell) && objects.register_class(character) && objects.register_class(player) &&
+                objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
+                objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
+-               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(door);
++               objects.register_class(damage) && objects.register_class(freefall) && objects.register_class(trigger) &&
++               objects.register_class(key_pickup) && objects.register_class(big_trigger) &&
++               objects.register_class(toggle_trigger) && objects.register_class(door);
+     }
+     HOBJECT GameSession::create_example(std::string_view name)
+     {
+diff --git a/src/game/server_adapter.cpp b/src/game/server_adapter.cpp
+index b25782e..3163f48 100644
+--- a/src/game/server_adapter.cpp
++++ b/src/game/server_adapter.cpp
+@@ -547,7 +547,7 @@ namespace OpenBlood2
+         auto* m = writable(h);
+         if (!m)
+             return DE_INVALIDPARAMS;
+-        if (m->damage)
++        if (m->damage || m->key)
+         {
+             m->bad = true;
+             return DE_INVALIDPARAMS;
+@@ -582,7 +582,8 @@ namespace OpenBlood2
+             m->bad = true;
+             return DE_ERROR;
+         }
+-        WriteToMessageDWord(h, static_cast<DDWORD>(text.size()));
++        if (WriteToMessageDWord(h, static_cast<DDWORD>(text.size())) != DE_OK)
++            return DE_INVALIDPARAMS;
+         m->bytes.insert(m->bytes.end(), text.begin(), text.end());
+         return DE_OK;
+     }
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index f46d155..305ab9f 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -33,6 +33,9 @@ namespace OpenBlood2
+         ServerAdapter(const ServerAdapter&) = delete;
+         ServerAdapter& operator=(const ServerAdapter&) = delete;
+         bool bind();
++        bool IsObjectAlive(HOBJECT) override;
++        DRESULT WriteKeyMessage(HMESSAGEWRITE, const KeyMessage&) override;
++        bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
+         MoverResult MoveWorldModel(HOBJECT, DVector destination) override;
+         bool GetContainers(HOBJECT, DVector head, ContainerState&) override;
+         bool damage_containers();
+@@ -130,6 +133,7 @@ namespace OpenBlood2
+             HOBJECT sender = nullptr, receiver = nullptr;
+             DDWORD id = 0;
+             std::optional<Damage> damage;
++            std::optional<KeyMessage> key;
+         };
+         Objects& objects_;
+         bool bound_ = false;
+diff --git a/src/game/server_keys.cpp b/src/game/server_keys.cpp
+new file mode 100644
+index 0000000..6a145b9
+--- /dev/null
++++ b/src/game/server_keys.cpp
+@@ -0,0 +1,50 @@
++#include "game/server_adapter.h"
++namespace OpenBlood2
++{
++    bool same_name(std::string_view a, std::string_view b)
++    {
++        return !CaseLess{}(a, b) && !CaseLess{}(b, a);
++    }
++    bool ServerAdapter::IsObjectAlive(HOBJECT h)
++    {
++        trace_service("IsObjectAlive");
++        const auto* r = objects_.get(h);
++        return r && r->life == Life::Alive;
++    }
++    DRESULT ServerAdapter::WriteKeyMessage(HMESSAGEWRITE h, const KeyMessage& value)
++    {
++        trace_service("WriteKeyMessage");
++        auto* m = writable(h);
++        if (!m)
++            return DE_INVALIDPARAMS;
++        auto valid = [](const std::string& s) { return s.size() <= 255 && s.find('\0') == std::string::npos; };
++        if (!m->routed ||
++            (m->id != key_pickup_message && m->id != key_query_message && m->id != key_response_message &&
++             m->id != picked_up_message) ||
++            !m->bytes.empty() || m->damage || m->key || !IsObjectAlive(m->sender) || !valid(value.item.name) ||
++            value.item.name.empty() || !valid(value.item.display_name) || !valid(value.item.icon) ||
++            !valid(value.item.highlighted_icon))
++        {
++            m->bad = true;
++            return DE_INVALIDPARAMS;
++        }
++        m->key = value;
++        return DE_OK;
++    }
++    bool ServerAdapter::ReadKeyMessage(HMESSAGEREAD h, KeyMessage& value)
++    {
++        trace_service("ReadKeyMessage");
++        value = {};
++        auto it = messages_.find(h);
++        if (it == messages_.end())
++            return false;
++        auto& m = it->second;
++        if (!m.borrowed || m.bad || !m.key || !IsObjectAlive(m.sender))
++        {
++            m.bad = true;
++            return false;
++        }
++        value = *m.key;
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/server_movers.cpp b/src/game/server_movers.cpp
+index f5dac8e..0c2cc68 100644
+--- a/src/game/server_movers.cpp
++++ b/src/game/server_movers.cpp
+@@ -21,7 +21,7 @@ namespace OpenBlood2
+         struct Push
+         {
+             ObjectRecord* body;
+-            DVector position;
++            DVector position, origin;
+             bool rider;
+         };
+         std::vector<Push> pushes;
+@@ -84,7 +84,7 @@ namespace OpenBlood2
+                 if (result == CollisionQuery::Invalid ||
+                     (result == CollisionQuery::Hit && (obstruction.start_solid || obstruction.fraction < 1 - 1e-6)))
+                     return blocked(result == CollisionQuery::Hit ? obstruction.object : body->handle);
+-                pushes.push_back({body, end, rider});
++                pushes.push_back({body, end, body->state.m_Pos, rider});
+             }
+         }
+         moving_ = true;
+@@ -115,6 +115,28 @@ namespace OpenBlood2
+             if (mover->life == Life::Alive && body.life == Life::Alive && (body.state.m_Flags & FLAG_TOUCH_NOTIFY))
+                 objects_.engine_message(body.handle, MID_TOUCHNOTIFY, handle);
+         }
++        // Sensors crossed by transported bodies are queried on the accepted
++        // path, after all positions commit. No callbacks on a blocked plan.
++        for (const auto& push : pushes)
++            for (auto id : ids)
++            {
++                auto* sensor = objects_.get(id);
++                auto& body = *push.body;
++                if (body.life != Life::Alive)
++                    break;
++                if (!sensor || sensor->life != Life::Alive || sensor->handle == body.handle || sensor->container ||
++                    sensor->world_model || (sensor->state.m_Flags & FLAG_SOLID) ||
++                    !(sensor->state.m_Flags & FLAG_TOUCH_NOTIFY))
++                    continue;
++                CollisionHit hit;
++                if (sweep_object(*sensor, push.origin, push.position, body.dimensions, hit) == CollisionQuery::Hit)
++                {
++                    if (body.state.m_Flags & FLAG_TOUCH_NOTIFY)
++                        objects_.engine_message(body.handle, MID_TOUCHNOTIFY, sensor->handle);
++                    if (body.life == Life::Alive && sensor->life == Life::Alive)
++                        objects_.engine_message(sensor->handle, MID_TOUCHNOTIFY, body.handle);
++                }
++            }
+         moving_ = false;
+         return MoverResult::Moved;
+     }
+diff --git a/src/game/server_physics.cpp b/src/game/server_physics.cpp
+index 3bcc72c..ac1ac24 100644
+--- a/src/game/server_physics.cpp
++++ b/src/game/server_physics.cpp
+@@ -194,8 +194,11 @@ namespace OpenBlood2
+         {
+             auto end = vector_add(position, remaining);
+             CollisionHit nearest;
+-            auto query = (r->state.m_Flags & FLAG_SOLID) ? sweep_scene(h, position, end, r->dimensions, nearest, ids)
+-                                                         : CollisionQuery::Miss;
++            auto query = (r->state.m_Flags & FLAG_SOLID)
++                             ? sweep_scene(h, position, end, r->dimensions, nearest, ids)
++                             : ((r->state.m_Flags & FLAG_GRAVITY) && !(r->state.m_Flags & FLAG_GOTHRUWORLD)
++                                    ? collision->sweep(position, end, r->dimensions, nearest)
++                                    : CollisionQuery::Miss);
+             if (query == CollisionQuery::Invalid)
+             {
+                 moving_ = false;
+diff --git a/src/game/server_weapons.cpp b/src/game/server_weapons.cpp
+index 64a8a1a..f94fab3 100644
+--- a/src/game/server_weapons.cpp
++++ b/src/game/server_weapons.cpp
+@@ -53,9 +53,10 @@ namespace OpenBlood2
+         if (!m)
+             return DE_INVALIDPARAMS;
+         auto* attacker = objects_.get(value.attacker);
+-        if (m->id != damage_message || !m->bytes.empty() || m->damage || !attacker || attacker->life != Life::Alive ||
+-            m->sender != value.attacker || !physics_vector(value.position) || !physics_vector(value.direction) ||
+-            !std::isfinite(value.amount) || value.amount < 0 || value.amount > 1e6f ||
++        if (m->id != damage_message || !m->bytes.empty() || m->damage || m->key || !attacker ||
++            attacker->life != Life::Alive || m->sender != value.attacker || !physics_vector(value.position) ||
++            !physics_vector(value.direction) || !std::isfinite(value.amount) || value.amount < 0 ||
++            value.amount > 1e6f ||
+             (value.type != DamageType::Normal && value.type != DamageType::Melee &&
+              value.type != DamageType::Suffocate && value.type != DamageType::Death &&
+              value.type != DamageType::FreeFall && value.type != DamageType::Blind && value.type != DamageType::Slow &&
+diff --git a/src/game/session.cpp b/src/game/session.cpp
+index 715e184..db70b08 100644
+--- a/src/game/session.cpp
++++ b/src/game/session.cpp
+@@ -91,6 +91,12 @@ namespace OpenBlood2
+                     entry.object = r->id;
+                     entry.state = EntryState::Created;
+                 }
++                else if (r && dynamic_cast<const B2BaseClass*>(r->game.get()) &&
++                         static_cast<const B2BaseClass*>(r->game.get())->filtered)
++                {
++                    entry.state = EntryState::Filtered;
++                    entry.detail = "Removed by original initial-update difficulty/game-type rules";
++                }
+                 else if (objects.error() == ObjectError::Rejected)
+                 {
+                     entry.state = EntryState::Filtered;
+@@ -299,7 +305,7 @@ namespace OpenBlood2
+         error = "RunWorld blocked: " + std::to_string(missing) +
+                 " uninstantiated required objects; other weapons, pickups, specialized containers/FX, full combat "
+                 "reactions, "
+-                "audio, autosave, Trigger/key relay and rotating world-model collision remain unported";
++                "audio, autosave, rotating world-model collision remain unported";
+         if (!entry_error.empty())
+             error += "; player entry: " + entry_error;
+         if (trace.empty() || trace.back() != error)
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 8978423..9228539 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -187,3 +187,22 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+         --data-dir "${BLOOD2_TEST_DATA_DIR}" --doors-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/doors.png")
+     set_tests_properties(gpu.doors PROPERTIES LABELS "private;gpu;doors" TIMEOUT 25 RUN_SERIAL TRUE)
+ endif()
++
++add_executable(trigger_tests trigger_tests.cpp)
++target_link_libraries(trigger_tests PRIVATE blood2_game)
++blood2_project_options(trigger_tests)
++foreach(case IN ITEMS schedule toggle filters keys doors touch lifetime protocol)
++    add_test(NAME triggers.${case} COMMAND trigger_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/trigger-fixtures/${case}")
++    set_tests_properties(triggers.${case} PROPERTIES LABELS "headless;triggers" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case IN ITEMS private catalog)
++        add_test(NAME triggers.${case} COMMAND trigger_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(triggers.${case} PROPERTIES LABELS "private;headless;triggers" TIMEOUT 90)
++    endforeach()
++endif()
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.triggers COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --triggers-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/triggers.png")
++    set_tests_properties(gpu.triggers PROPERTIES LABELS "private;gpu;triggers" TIMEOUT 30 RUN_SERIAL TRUE)
++endif()
+diff --git a/tests/door_tests.cpp b/tests/door_tests.cpp
+index ac46ee7..73a4005 100644
+--- a/tests/door_tests.cpp
++++ b/tests/door_tests.cpp
+@@ -82,7 +82,7 @@ namespace
+         CHECK(d->state == Door::Closing);
+         CHECK(trigger(g, h, "TRIGGER"));
+         CHECK(d->state == Door::Opening);
+-        CHECK(trigger(g, h, "LOCK") && d->pending_command == "LOCK");
++        CHECK(trigger(g, h, "LOCK") && !d->trigger); // No child: source command is a no-op.
+         CHECK(g.server.string_count() == 1 && g.server.message_count() == 0);
+         CHECK(std::abs(Door::GetWaveValue(100, .5f, 1) - 110) < .001f);
+         CHECK(std::abs(Door::GetWaveValue(100, 0, 2) - 110) < .001f);
+@@ -119,7 +119,7 @@ namespace
+         CHECK(g.objects.finish_frame());
+         CHECK(!g.objects.create(g.objects.find_class("Door"), {}, Creation::World, {{"Name", std::string("missing")}}));
+         CHECK(g.objects.finish_frame());
+-        CHECK(g.objects.snapshot().size() == 1);
++        CHECK(g.objects.snapshot().size() == 2); // Door and its owned SelfTrigger.
+         CHECK(g.objects.clear());
+         h = door(g, {{"WaitTime", -1.0f}, {"TriggerClosed", false}});
+         CHECK(h && trigger(g, h, "TRIGGER") && steps(g, 60));
+diff --git a/tests/player_tests.cpp b/tests/player_tests.cpp
+index a7352bd..b92e128 100644
+--- a/tests/player_tests.cpp
++++ b/tests/player_tests.cpp
+@@ -203,14 +203,15 @@ namespace
+             auto* player = game.server_shell.Player(game.local_client);
+             CHECK(player);
+             CHECK(game.objects.get(player->m_hObject)->model->animations.size() == 86);
+-            CHECK(game.objects.snapshot().size() == 33); // 30 world instances + player + muzzle light + scent.
++            CHECK(game.objects.snapshot().size() ==
++                  48); // 38 source instances + 7 door children + player + muzzle light + scent.
+             CHECK(game.client_shell.position.x == -32 && game.client_shell.position.z == -3224);
+             CHECK(std::abs(game.client_shell.position.y - 170) < .01f);
+             for (int frame = 0; frame < 120; ++frame)
+                 CHECK(game.step(1.0 / 60.0));
+             CHECK(player->updates == 120 && game.server_shell.updates == 120 && game.client_shell.updates == 121);
+             CHECK(game.client_shell.stats.health == 100 && game.client_shell.stats.bullets == 50);
+-            CHECK(!game.run_world(error) && error.find("178 uninstantiated") != std::string::npos);
++            CHECK(!game.run_world(error) && error.find("170 uninstantiated") != std::string::npos);
+             std::cout << "Cycle " << iteration << ": CPlayerObj at " << game.client_shell.position.x << ","
+                       << game.client_shell.position.y << "," << game.client_shell.position.z << "; 120 updates; "
+                       << game.client_shell.messages << " client messages; " << game.server_shell.paths.size()
+diff --git a/tests/trigger_tests.cpp b/tests/trigger_tests.cpp
+new file mode 100644
+index 0000000..c9fc297
+--- /dev/null
++++ b/tests/trigger_tests.cpp
+@@ -0,0 +1,546 @@
++#include "brush_fixture.h"
++#include "game/original/Door.h"
++#include "game/original/KeyPickup.h"
++#include "game/original/Trigger.h"
++#include "player_fixture.h"
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    struct Probe : BaseClass
++    {
++        std::vector<std::string> received;
++        std::function<void()> callback;
++        DDWORD ObjectMessageFn(HOBJECT, DDWORD message, HMESSAGEREAD read) override
++        {
++            if (message == 1000)
++            {
++                auto str = g_pServerDE->ReadFromMessageHString(read);
++                auto raw = g_pServerDE->GetStringData(str);
++                received.emplace_back(raw ? raw : "");
++                g_pServerDE->FreeString(str);
++                if (callback)
++                    callback();
++            }
++            return 1;
++        }
++    };
++    std::unique_ptr<BaseClass> make_probe()
++    {
++        return std::make_unique<Probe>();
++    }
++    const ClassInfo probe_class{"Probe", nullptr, make_probe, {{"Name", std::string("target")}}};
++    HOBJECT trigger(GameSession& g, Properties props = {}, const char* type = "Trigger")
++    {
++        props.try_emplace("Name", std::string("sensor"));
++        props.try_emplace("TargetName1", std::string("target"));
++        props.try_emplace("MessageName1", std::string("FIRST"));
++        props.try_emplace("ObjectActivate", true);
++        return g.objects.create(g.objects.find_class(type), {}, Creation::World, props);
++    }
++    template <class T> T* object(GameSession& g, HOBJECT h)
++    {
++        auto* r = g.objects.get(h);
++        return r ? dynamic_cast<T*>(r->game.get()) : nullptr;
++    }
++    bool send(GameSession& g, HOBJECT dest, const char* command, HOBJECT sender = nullptr)
++    {
++        auto text = g.server.CreateString(command);
++        auto msg = g.server.StartMessageToObject(sender ? g.server.HandleToObject(sender) : nullptr, dest, 1000);
++        CHECK(text && msg);
++        CHECK(g.server.WriteToMessageHString(msg, text) == DE_OK);
++        const auto result = g.server.EndMessage(msg);
++        g.server.FreeString(text);
++        CHECK(result == DE_OK);
++        return true;
++    }
++    HOBJECT body(GameSession& g, DVector pos = {200, 100, 200}, DDWORD flags = 0)
++    {
++        return g.objects.create(g.objects.find_class("BaseClass"), {}, Creation::World,
++                                {{"Pos", pos}, {"Flags", std::int32_t(flags)}, {"Name", std::string("body")}});
++    }
++    bool init(GameSession& g, const std::filesystem::path& root)
++    {
++        CHECK(test_player::setup(g, root));
++        CHECK(g.objects.register_class(probe_class));
++        CHECK(g.objects.create(&probe_class, {}, Creation::World));
++        return true;
++    }
++    Probe* probe(GameSession& g)
++    {
++        for (auto id : g.objects.snapshot())
++            if (auto* p = dynamic_cast<Probe*>(g.objects.get(id)->game.get()))
++                return p;
++        return nullptr;
++    }
++    bool schedule(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(init(g, root));
++        auto sender = body(g);
++        auto h = trigger(g, {{"ResetTime", .1f},
++                             {"ActivationCount", std::int32_t(2)},
++                             {"MessageDelay", .05f},
++                             {"TargetName2", std::string("target")},
++                             {"MessageName2", std::string("NOW")},
++                             {"TargetName3", std::string("target")},
++                             {"MessageName3", std::string("LATER")},
++                             {"MessageDelay3", .15f}});
++        auto* t = object<Trigger>(g, h);
++        auto* p = probe(g);
++        CHECK(t && p);
++        CHECK(send(g, h, "TRIGGER", sender) && t->current_activation == 1 && p->received.empty());
++        CHECK(send(g, h, "TRIGGER", sender) && !t->active && p->received == std::vector<std::string>{"NOW"});
++        CHECK(send(g, h, "UNLOCK") && send(g, h, "RESET") && !t->active); // Source early active guard.
++        CHECK(g.step(.06) && p->received.size() == 2 && p->received.back() == "FIRST");
++        CHECK(g.step(.1) && p->received.size() == 3 && p->received.back() == "LATER" && !t->active);
++        CHECK(g.step(.11) && t->active);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        h = trigger(g);
++        t = object<Trigger>(g, h);
++        CHECK(send(g, h, "TRIGGER", sender) && !t->active && !g.objects.get(h)->scheduled);
++        CHECK(g.step(.2) && !t->active && send(g, h, "RESET") && !t->active); // ResetTime=0 is one-shot.
++        CHECK(!trigger(g, {{"Dims", DVector{-1, 1, 1}}}));
++        CHECK(!trigger(g, {{"MessageDelay", std::numeric_limits<float>::infinity()}}));
++        auto negative = trigger(g, {{"ResetTime", -1.0f}});
++        CHECK(negative && send(g, negative, "TRIGGER", sender) && !g.objects.get(negative)->scheduled);
++        CHECK(g.step(.1) && !object<Trigger>(g, negative)->active);
++        CHECK(g.objects.finish_frame());
++        auto long_message = trigger(g, {{"MessageName1", std::string(200, 'x')}});
++        CHECK(long_message && send(g, long_message, "TRIGGER", sender));
++        CHECK(p->received.back().size() == 200);
++        CHECK(!trigger(g, {{"MessageName1", std::string(201, 'x')}}));
++        auto negative_count = trigger(g, {{"ActivationCount", std::int32_t(-1)}});
++        CHECK(negative_count && send(g, negative_count, "TRIGGER", sender));
++        CHECK(object<Trigger>(g, negative_count)->activation_count == UINT32_MAX &&
++              object<Trigger>(g, negative_count)->current_activation == 1 &&
++              object<Trigger>(g, negative_count)->active);
++        CHECK(g.unload_world() && g.server.message_count() == 0 && g.server.string_count() == 0);
++        return true;
++    }
++    bool toggle(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(init(g, root));
++        auto sender = body(g);
++        auto h = trigger(g, {{"ResetTime", .01f}, {"OffMessageName1", std::string("OFF")}}, "ToggleTrigger");
++        auto* t = object<ToggleTrigger>(g, h);
++        CHECK(t && !t->on);
++        CHECK(send(g, h, "TRIGGER", sender) && t->on && probe(g)->received.back() == "FIRST");
++        CHECK(g.step(.02) && send(g, h, "TRIGGER", sender) && !t->on && probe(g)->received.back() == "OFF");
++        auto delayed = trigger(g, {{"MessageDelay", .01f}, {"StartOn", true}, {"OffMessageName1", std::string("OFF")}},
++                               "ToggleTrigger");
++        CHECK(send(g, delayed, "TRIGGER", sender) && g.step(.02));
++        CHECK(object<ToggleTrigger>(g, delayed)->on &&
++              probe(g)->received.back() == "FIRST"); // Original delayed path bypasses toggle override.
++        auto big = trigger(g, {}, "BigTrigger");
++        CHECK(object<BigTrigger>(g, big));
++        return true;
++    }
++    bool filters(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(init(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto player = g.client_shell.player;
++        auto sender = body(g);
++        auto ai = g.objects.create(g.objects.find_class("CBaseCharacter"));
++        auto relay = trigger(g);
++        auto h = trigger(g, {{"Locked", true},
++                             {"ObjectActivate", false},
++                             {"PlayerActivate", false},
++                             {"AIActivate", false},
++                             {"TriggerRelayActivate", false}});
++        auto* t = object<Trigger>(g, h);
++        CHECK(t);
++        for (auto from : {player, sender, ai, relay})
++            CHECK(send(g, h, "TRIGGER", from) && t->activations == 0);
++        t->relay_activate = true;
++        CHECK(send(g, h, "TRIGGER", relay) && t->activations == 1 && t->locked);
++        t->SetActive(true);
++        t->ai_activate = true;
++        CHECK(send(g, h, "TRIGGER", ai) && t->activations == 2 && t->locked);
++        t->SetActive(true);
++        t->object_activate = true;
++        t->named_activate = true;
++        t->activation_name = "BODY";
++        CHECK(send(g, h, "TRIGGER", sender) && t->activations == 3);
++        t->SetActive(true);
++        t->activation_name = "other";
++        CHECK(send(g, h, "TRIGGER", sender) && t->activations == 3);
++        t->named_activate = false;
++        t->touch_activate = false;
++        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, sender) && t->activations == 3);
++        CHECK(send(g, h, "TRIGGER", sender) && t->activations == 4); // Touch flag doesn't gate messages.
++        t->SetActive(true);
++        CHECK(g.objects.remove(sender));
++        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, sender) && t->activations == 4);
++        return true;
++    }
++    HOBJECT pickup(GameSession& g, std::string name = "RedKey", int uses = 2)
++    {
++        return g.objects.create(g.objects.find_class("KeyPickup"), {}, Creation::World,
++                                {{"Name", std::string("pickup")},
++                                 {"ObjectName", name},
++                                 {"UseCount", std::int32_t(uses)},
++                                 {"Pos", DVector{200, 100, 200}},
++                                 {"ModelFile", std::string("models/characters/caleb.abc")},
++                                 {"ModelSkin", std::string("skins/characters/caleb1.dtx")},
++                                 {"PickupTriggerTarget", std::string("target")},
++                                 {"PickupTriggerMessage", std::string("PICKED")}});
++    }
++    bool keys(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(init(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto ph = g.client_shell.player;
++        auto* p = object<CPlayerObj>(g, ph);
++        CHECK(p);
++        auto h = trigger(g, {{"Locked", true}, {"UnlockKeyName", std::string("REDkey")}});
++        auto* t = object<Trigger>(g, h);
++        CHECK(send(g, h, "TRIGGER", ph) && t->locked && t->activations == 0 && t->key_queries == 1);
++        auto item = pickup(g);
++        CHECK(item && object<KeyPickup>(g, item)->error.empty());
++        CHECK(g.step(.1));
++        CHECK(g.objects.get(item)->state.m_Pos.y >= g.objects.get(item)->dimensions.y);
++        auto pos = g.objects.get(item)->state.m_Pos;
++        CHECK(g.server.TeleportObject(ph, &pos) == DE_OK);
++        CHECK(g.server.MoveObject(ph, &pos) == DE_OK && object<KeyPickup>(g, item)->picked_up);
++        CHECK(p->m_InventoryMgr.keys.size() == 1 && p->m_InventoryMgr.keys[0].uses == 2 &&
++              probe(g)->received.back() == "PICKED");
++        CHECK(g.objects.finish_frame() && !g.objects.get(item));
++        auto duplicate = pickup(g, "redkey");
++        CHECK(g.objects.engine_message(duplicate, MID_TOUCHNOTIFY, ph));
++        CHECK(g.server.IsObjectAlive(duplicate) && p->m_InventoryMgr.keys[0].uses == 2);
++        CHECK(send(g, h, "TRIGGER", ph) && !t->locked && t->activations == 1 && p->m_InventoryMgr.keys[0].uses == 1);
++        t->SetActive(true);
++        CHECK(send(g, h, "LOCK"));
++        t->named_activate = true;
++        t->activation_name = "wrong";
++        CHECK(send(g, h, "TRIGGER", ph) && !t->locked && t->activations == 1 && p->m_InventoryMgr.keys.empty());
++        t->named_activate = false;
++        CHECK(send(g, h, "LOCK"));
++        p->m_bDead = true;
++        CHECK(send(g, h, "TRIGGER", ph) && t->locked);
++        p->m_bDead = false;
++        auto zero = pickup(g, "Zero", 0);
++        CHECK(g.objects.engine_message(zero, MID_TOUCHNOTIFY, ph));
++        CHECK(g.server.IsObjectAlive(zero) && p->m_InventoryMgr.keys.empty());
++        auto missing = g.objects.create(g.objects.find_class("KeyPickup"), {}, Creation::World);
++        CHECK(missing && !g.objects.get(missing)->model && !object<KeyPickup>(g, missing)->error.empty());
++        CHECK(!(g.objects.get(missing)->state.m_Flags & (FLAG_TOUCH_NOTIFY | FLAG_GRAVITY)));
++        CHECK(g.leave_player() && g.unload_world() && g.server.message_count() == 0 && g.server.string_count() == 0);
++        return true;
++    }
++    HOBJECT door(GameSession& g, bool start_open = false, bool defaults = false)
++    {
++        auto model = test_brush::box("gate", {-10, 10, -10}, {10, 30, 10});
++        model.translation = {0, 20, 0};
++        g.world.models.push_back(model);
++        return g.objects.create(g.objects.find_class("Door"), {}, Creation::World,
++                                {{"Name", std::string("gate")},
++                                 {"SelfTrigger", true},
++                                 {"TouchActivate", true},
++                                 {"ObjectActivate", true},
++                                 {"Locked", true},
++                                 {"UnlockKeyName", std::string("GateKey")},
++                                 {"MoveDist", 50.0f},
++                                 {"MoveDir", DVector{1, 0, 0}},
++                                 {"Speed", 100.0f},
++                                 {"TriggerClosed", true},
++                                 {"StartOpen", start_open},
++                                 {"TriggerDims", defaults ? DVector{} : DVector{15, 15, 15}}});
++    }
++    bool doors(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(init(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto ph = g.client_shell.player;
++        auto h = door(g);
++        auto* d = object<Door>(g, h);
++        CHECK(d && d->trigger);
++        auto child = d->trigger;
++        auto* t = object<Trigger>(g, child);
++        CHECK(t && t->locked && t->dims.x == 15 && t->owner_door == h);
++        CHECK(send(g, h, "UNLOCK", ph) && !t->locked);
++        CHECK(send(g, h, "LOCK", ph) && t->locked);
++        CHECK(send(g, child, "TRIGGER", ph) && d->state == Door::Closed);
++        CHECK(object<CPlayerObj>(g, ph)->m_InventoryMgr.AddKey({"GateKey", "Gate", "k", "kh", 1}) ==
++              InventoryResult::Ok);
++        CHECK(send(g, child, "TRIGGER", ph) && d->state == Door::Opening && !t->active && !t->locked);
++        CHECK(send(g, h, "LOCK", ph) && !t->locked); // Inactive child ignores relay, source rule.
++        for (unsigned i = 0; i < 35; ++i)
++            CHECK(g.step(.02));
++        CHECK(d->state == Door::Open && !t->active && g.objects.get(child)->state.m_Pos.x == 0);
++        CHECK(send(g, h, "TRIGGERCLOSE"));
++        for (unsigned i = 0; i < 35; ++i)
++            CHECK(g.step(.02));
++        CHECK(d->state == Door::Closed && t->active);
++        CHECK(g.objects.remove(child) && g.objects.finish_frame() && !d->trigger);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        g.world.models.clear();
++        h = door(g, true, true);
++        d = object<Door>(g, h);
++        CHECK(d && d->trigger);
++        child = d->trigger;
++        t = object<Trigger>(g, child);
++        CHECK(t->dims.x == 11 && t->dims.y == 11 && t->active && g.objects.get(child)->state.m_Pos.x == 0 &&
++              g.objects.get(h)->state.m_Pos.x == 50);
++        const auto activated = t->activations;
++        auto sender = body(g);
++        CHECK(g.objects.remove(h) && send(g, child, "TRIGGER", sender) && t->activations == activated);
++        CHECK(g.objects.finish_frame() && !g.objects.get(child));
++        return true;
++    }
++    bool touch(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(init(g, root));
++        auto h = trigger(g, {{"Dims", DVector{1, 5, 5}}, {"Pos", DVector{0, 20, 0}}, {"ResetTime", .01f}});
++        auto* t = object<Trigger>(g, h);
++        auto b = body(g, {-100, 20, 0}, FLAG_SOLID);
++        DVector dims{1, 1, 1};
++        g.server.SetObjectDims(b, &dims);
++        DVector end{100, 20, 0};
++        CHECK(g.server.MoveObject(b, &end) == DE_OK && t->activations == 1);
++        CHECK(g.step(.02));
++        end = {0, 20, 0};
++        CHECK(g.server.TeleportObject(b, &end) == DE_OK);
++        CHECK(g.server.MoveObject(b, &end) == DE_OK && t->activations == 2); // Stationary overlapping body.
++        CHECK(g.step(.02));
++        end = {-100, 20, 0};
++        CHECK(g.server.TeleportObject(b, &end) == DE_OK);
++        auto wall = body(g, {-20, 20, 0}, FLAG_SOLID);
++        dims = {1, 20, 20};
++        g.server.SetObjectDims(wall, &dims);
++        end = {100, 20, 0};
++        CHECK(g.server.MoveObject(b, &end) == DE_OK && t->activations == 2); // No speculative sensor behind wall.
++        CHECK(g.objects.remove(wall) && g.objects.remove(h) && g.objects.remove(b) && g.objects.finish_frame());
++        auto dh = door(g);
++        auto* d = object<Door>(g, dh);
++        CHECK(d); // sensor at crossed pusher path
++        h = trigger(g, {{"Dims", DVector{1, 5, 5}}, {"Pos", DVector{30, 20, 0}}});
++        t = object<Trigger>(g, h);
++        b = body(g, {15, 20, 0}, FLAG_SOLID);
++        dims = {1, 1, 1};
++        g.server.SetObjectDims(b, &dims);
++        CHECK(g.server.MoveWorldModel(dh, {50, 20, 0}) == MoverResult::Moved && t->activations == 1);
++        CHECK(g.objects.clear());
++        g.world.models.clear();
++        dh = door(g);
++        h = trigger(g, {{"Dims", DVector{1, 5, 5}}, {"Pos", DVector{30, 20, 0}}});
++        t = object<Trigger>(g, h);
++        b = body(g, {15, 20, 0}, FLAG_SOLID);
++        g.server.SetObjectDims(b, &dims);
++        wall = body(g, {40, 20, 0}, FLAG_SOLID);
++        dims = {1, 10, 10};
++        g.server.SetObjectDims(wall, &dims);
++        CHECK(g.server.MoveWorldModel(dh, {50, 20, 0}) == MoverResult::Blocked && t->activations == 0);
++        return true;
++    }
++    bool lifetime(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(init(g, root));
++        auto b = body(g);
++        auto h = trigger(g, {{"TargetName1", std::string("sensor")}, {"MessageName1", std::string("TRIGGER")}});
++        auto* t = object<Trigger>(g, h);
++        CHECK(send(g, h, "TRIGGER", b) && t->activations == 1 && t->current_activation == 0);
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        auto a = trigger(
++            g,
++            {{"Name", std::string("a")}, {"TargetName1", std::string("b")}, {"MessageName1", std::string("TRIGGER")}},
++            "ToggleTrigger");
++        auto c = trigger(
++            g,
++            {{"Name", std::string("b")}, {"TargetName1", std::string("a")}, {"MessageName1", std::string("TRIGGER")}},
++            "ToggleTrigger");
++        CHECK(send(g, a, "TRIGGER", b) && object<Trigger>(g, a)->activations == 1 &&
++              object<Trigger>(g, c)->activations == 1);
++        h = trigger(g, {{"TargetName2", std::string("target")}, {"MessageName2", std::string("SHOULD_NOT_SEND")}});
++        auto* p = probe(g);
++        p->callback = [&] { g.objects.remove(h); };
++        CHECK(send(g, h, "TRIGGER", b) && p->received.size() == 1 && g.objects.get(h)->life == Life::Pending);
++        CHECK(g.objects.finish_frame() && !g.objects.get(h));
++        p->callback = {};
++        CHECK(g.unload_world() && g.server.message_count() == 0 && g.server.string_count() == 0);
++        return true;
++    }
++    bool protocol(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(init(g, root));
++        std::string error;
++        CHECK(g.enter_player(error));
++        auto p = g.client_shell.player;
++        auto h = trigger(g, {{"Locked", true}});
++        KeyMessage key;
++        key.item = {"Key", "Key", "k", "kh", 1};
++        key.have = true;
++        auto msg = g.server.StartMessageToObject(g.server.HandleToObject(p), h, key_response_message);
++        CHECK(g.server.WriteKeyMessage(msg, key) == DE_OK && g.server.EndMessage(msg) == DE_OK &&
++              object<Trigger>(g, h)->locked); // Unsolicited response cannot unlock.
++        msg = g.server.StartMessageToObject(g.server.HandleToObject(h), p, key_pickup_message);
++        CHECK(g.server.WriteToMessageDWord(msg, 1) == DE_OK && g.server.WriteKeyMessage(msg, key) == DE_INVALIDPARAMS &&
++              g.server.EndMessage(msg) != DE_OK);
++        msg = g.server.StartMessageToObject(g.server.HandleToObject(h), p, key_pickup_message);
++        key.item.name = std::string(256, 'x');
++        CHECK(g.server.WriteKeyMessage(msg, key) == DE_INVALIDPARAMS && g.server.EndMessage(msg) != DE_OK);
++        key.item.name = "Key";
++        msg = g.server.StartMessageToObject(g.server.HandleToObject(h), p, key_pickup_message);
++        CHECK(g.server.WriteKeyMessage(msg, key) == DE_OK && g.server.WriteToMessageDWord(msg, 1) == DE_INVALIDPARAMS &&
++              g.server.EndMessage(msg) != DE_OK);
++        msg = g.server.StartMessageToObject(g.server.HandleToObject(h), p, key_pickup_message);
++        CHECK(g.server.WriteKeyMessage(msg, key) == DE_OK);
++        CHECK(g.objects.remove(h) && g.server.EndMessage(msg) != DE_OK &&
++              object<CPlayerObj>(g, p)->m_InventoryMgr.keys.empty());
++        CHECK(g.server.message_count() == 0);
++        return true;
++    }
++    bool private_data(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        std::string error;
++        CHECK(g.resources.mount_game(Config{root, "private"}, error));
++        CHECK(g.request_world("01_SubwayA", error));
++        std::map<EntryState, unsigned> counts;
++        unsigned triggers = 0, children = 0;
++        for (const auto& e : g.entries)
++            ++counts[e.state];
++        for (auto id : g.objects.snapshot())
++            if (auto* t = dynamic_cast<Trigger*>(g.objects.get(id)->game.get()))
++            {
++                ++triggers;
++                children += t->owner_door != nullptr;
++            }
++        std::cout << "SubwayA: created=" << counts[EntryState::Created] << " editor=" << counts[EntryState::EditorOnly]
++                  << " unsupported=" << counts[EntryState::Unsupported] << " failed=" << counts[EntryState::Failed]
++                  << " triggers=" << triggers << " children=" << children << '\n';
++        CHECK(triggers > children && children > 0 && counts[EntryState::Failed] == 0);
++        CHECK(g.enter_player(error));
++        for (unsigned i = 0; i < 10; ++i)
++            CHECK(g.step(.02));
++        CHECK(g.leave_player() && g.unload_world() && g.objects.snapshot().empty() && g.server.string_count() == 0 &&
++              g.server.message_count() == 0);
++        CHECK(g.request_world("01_SubwayA", error) && g.unload_world());
++        CHECK(g.request_world("05_CDM", error) && g.enter_player(error));
++        auto* player = g.server_shell.Player(g.local_client);
++        unsigned picked = 0;
++        for (auto id : g.objects.snapshot())
++        {
++            auto* r = g.objects.get(id);
++            if (auto* key = dynamic_cast<KeyPickup*>(r->game.get()))
++            {
++                CHECK(r->model && r->model_error.empty() && r->dimensions.x >= 10);
++                std::cout << "CDM pickup " << r->state.m_Name << " / " << key->item.name << " / " << key->error << '\n';
++                CHECK(g.objects.engine_message(r->handle, MID_TOUCHNOTIFY, player->m_hObject));
++                CHECK(key->picked_up);
++                ++picked;
++            }
++        }
++        CHECK(picked == 3 && player->m_InventoryMgr.keys.size() == 3);
++        CHECK(g.objects.finish_frame() && g.unload_world() && g.server.message_count() == 0 &&
++              g.server.string_count() == 0);
++        return true;
++    }
++    bool catalog(const std::filesystem::path& root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        std::string error;
++        CHECK(g.resources.mount_game(Config{root, "private"}, error));
++        unsigned worlds = 0, unreadable = 0;
++        std::map<std::string, unsigned> found, created, filtered;
++        std::map<std::string, unsigned> failures;
++        for (const auto& [path, resource] : g.resources.index())
++        {
++            (void)resource;
++            if (!path.starts_with("worlds/") || !path.ends_with(".dat"))
++                continue;
++            std::vector<std::uint8_t> bytes;
++            World world;
++            if (!g.resources.read(path, bytes, error) || !read_world(bytes, world, error))
++            {
++                ++unreadable;
++                continue;
++            }
++            ++worlds;
++            CHECK(g.collision.build(world.models.front(), error));
++            g.server.collision_ready = true;
++            for (const auto& o : world.objects)
++                if (o.class_name == "Trigger" || o.class_name == "BigTrigger" || o.class_name == "ToggleTrigger" ||
++                    o.class_name == "KeyPickup")
++                {
++                    ++found[o.class_name];
++                    Properties props;
++                    for (const auto& v : o.properties)
++                        props.emplace(v.name, v.value);
++                    auto h = g.objects.create(g.objects.find_class(o.class_name), {}, Creation::World, props);
++                    if (g.server.IsObjectAlive(h))
++                    {
++                        ++created[o.class_name];
++                        if (o.class_name == "KeyPickup")
++                        {
++                            auto* r = g.objects.get(h);
++                            std::cout << path << " key " << r->state.m_Name << " model=" << r->state.m_Filename
++                                      << " model_error=" << r->model_error
++                                      << " error=" << object<KeyPickup>(g, h)->error << '\n';
++                        }
++                    }
++                    else if (const auto* r = g.objects.get(h); r && dynamic_cast<B2BaseClass*>(r->game.get()) &&
++                                                               static_cast<B2BaseClass*>(r->game.get())->filtered)
++                        ++filtered[o.class_name];
++                    else
++                    {
++                        ++failures[g.objects.diagnostics().empty() ? "unknown" : g.objects.diagnostics().back()];
++                        std::cout << path << " " << property_text(props.at("Name")) << " failed";
++                        for (const auto* field : {"Dims", "ResetTime", "SoundRadius", "MessageName1"})
++                            if (props.contains(field))
++                                std::cout << " " << field << "=" << property_text(props.at(field));
++                        std::cout << '\n';
++                    }
++                    CHECK(g.objects.clear());
++                }
++        }
++        std::cout << "Worlds=" << worlds << " unreadable=" << unreadable << '\n';
++        for (const auto& [type, count] : found)
++            std::cout << type << ": " << created[type] << '/' << count << " created; " << filtered[type]
++                      << " filtered\n";
++        for (const auto& [reason, count] : failures)
++            std::cout << count << " rejected: " << reason << '\n';
++        CHECK(worlds == 57 && unreadable == 1 && found["Trigger"] == 603 && created["Trigger"] == 599 &&
++              found["BigTrigger"] == 89 && created["BigTrigger"] == 84 && created["ToggleTrigger"] == 3 &&
++              created["KeyPickup"] == 13 && filtered["Trigger"] == 2 && filtered["BigTrigger"] == 1);
++        CHECK(failures.size() == 2 && failures["Trigger: invalid property TypeAction"] == 2 &&
++              failures["BigTrigger: invalid property TypeAction"] == 4);
++        CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc != 3)
++        return 2;
++    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
++        {"schedule", schedule},    {"toggle", toggle},  {"filters", filters},   {"keys", keys},
++        {"doors", doors},          {"touch", touch},    {"lifetime", lifetime}, {"protocol", protocol},
++        {"private", private_data}, {"catalog", catalog}};
++    auto it = cases.find(argv[1]);
++    return it == cases.end() ? 2 : it->second(path_from_utf8(argv[2])) ? 0 : 1;
++}
+diff --git a/tests/world_cli_test.cmake b/tests/world_cli_test.cmake
+index a716d56..836728f 100644
+--- a/tests/world_cli_test.cmake
++++ b/tests/world_cli_test.cmake
+@@ -1,6 +1,6 @@
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 30 original instances, 116 BSP models")
++if(NOT status EQUAL 0 OR NOT out MATCHES "580 objects, 45 original instances, 116 BSP models")
+     message(FATAL_ERROR "World inspection: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-player
+@@ -10,7 +10,7 @@ if(NOT status EQUAL 0 OR NOT out MATCHES "Original shell/player entry inspection
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --start-game
+     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
+-if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 178" OR NOT out MATCHES "Trigger/key relay and rotating world-model collision")
++if(NOT status EQUAL 6 OR NOT out MATCHES "RunWorld blocked: 170" OR NOT out MATCHES "rotating world-model collision")
+     message(FATAL_ERROR "Missing services must fail startup: ${status}: ${out}${err}")
+ endif()
+ execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --inspect-world --world ../outside
+diff --git a/tests/world_tests.cpp b/tests/world_tests.cpp
+index bc24a80..c01dc52 100644
+--- a/tests/world_tests.cpp
++++ b/tests/world_tests.cpp
+@@ -538,13 +538,13 @@ namespace
+         CHECK(game.world.version == 56);
+         CHECK(game.world.objects.size() == 580);
+         CHECK(game.world.models.size() == 116);
+-        CHECK(game.objects.snapshot().size() == 30);
++        CHECK(game.objects.snapshot().size() == 45);
+         CHECK(game.world.models[0].points.size() == 4996);
+         CHECK(game.world.models[0].polygons.size() == 3367);
+         CHECK(game.resources.find(game.world_path)->overrides == 1);
+         CHECK(game.entries[0].state == EntryState::Created);
+         CHECK(game.step(.016));
+-        CHECK(game.server.service_calls["SetObjectDims"] == 7);
++        CHECK(game.server.service_calls["SetObjectDims"] == 29);
+         CHECK(game.server.service_calls["GetPropGeneric"] > 0);
+         for (const auto& [name, count] : game.server.service_calls)
+             std::cout << "Service " << name << ": " << count << '\n';

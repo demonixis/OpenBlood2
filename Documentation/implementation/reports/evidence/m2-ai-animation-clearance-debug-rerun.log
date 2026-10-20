@@ -1,0 +1,45 @@
+UpdateCTestConfiguration  from :<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Parse Config file:<workspace>/Blood2/build/debug/DartConfiguration.tcl
+Test project <workspace>/Blood2/build/debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 398
+    Start 398: ai_state.resize
+
+398: Test command: <workspace>/Blood2/build/debug/tests/ai_state_tests "resize"
+398: Working Directory: <workspace>/Blood2/build/debug/tests
+398: Test timeout computed to be: 30
+398: resize:226: g.server.advance_models(.025) && near(r->animation.time, .025f)
+1/2 Test #398: ai_state.resize ..................***Failed    0.00 sec
+test 523
+    Start 523: ai_runtime.clearance_private
+
+523: Test command: <workspace>/Blood2/build/debug/tests/ai_runtime_tests "clearance_private" "<external-data-root>"
+523: Working Directory: <workspace>/Blood2/build/debug/tests
+523: Test timeout computed to be: 90
+523: SubwayA relocation cycle 0: 8 blocked resizes, 93 original AI shots; no suspended Cultist
+523: SubwayA relocation cycle 1: 8 blocked resizes, 93 original AI shots; no suspended Cultist
+2/2 Test #523: ai_runtime.clearance_private .....   Passed   13.77 sec
+
+The following tests passed:
+	ai_runtime.clearance_private
+
+50% tests passed, 1 tests failed out of 2
+
+Label Time Summary:
+ai_runtime    =  13.77 sec*proc (1 test)
+ai_state      =   0.00 sec*proc (1 test)
+headless      =  13.77 sec*proc (2 tests)
+private       =  13.77 sec*proc (1 test)
+
+Total Test time (real) =  13.79 sec
+
+The following tests FAILED:
+	398 - ai_state.resize (Failed)                          ai_state headless
+Errors while running CTest
+Output from these tests are in: <workspace>/Blood2/build/debug/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

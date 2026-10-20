@@ -1,0 +1,1229 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index a33a47a..9488899 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -401,3 +401,10 @@ Read [contracts](docs/CHARACTER_NODE_CONTRACTS.md). Preserve contiguous extras,
+ sparse node IDs, source random fallback and Load's absent SHADOW flag. Tail failures
+ may leave partial setup: discard staged owners, never claim active-player rollback.
+ Engine/client restoration, safe destination entry, required FX and M2 remain open.
++
++The [player restoration continuation](../Documentation/Implementation/M2_PLAYER_RESTORE.md) connects supported engine snapshots and original saved-client association.
++Read [contracts](docs/PLAYER_RESTORE_CONTRACTS.md). Preserve staged cleanup, checked new identities, original Load overrides,
++relative scheduling, raw attributes/caps and single MoveMgr integration. First update
++must derive speeds without ValidateAttributes. No live-client replacement or start
++trigger replay; current-world clearance may reject. Whole-world/client saves,
++dead/powered states and safe NEW_LEVEL transfer remain unavailable; M2 stays open.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0e24635..d118b20 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -31,6 +31,7 @@ add_library(blood2_game STATIC src/game/server_attachments.cpp src/game/original
+     src/game/original/trigger_helpers.cpp
+     src/game/original/session_load.cpp
+     src/game/session.cpp
++    src/game/player_restore.cpp
+     src/game/registration.cpp
+     src/game/server_adapter.cpp)
+ target_sources(blood2_game PRIVATE src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp)
+diff --git a/README.md b/README.md
+index 50b3f73..34c6281 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,11 @@
+ # Blood II Reconstruction aka OpenBlood2
+ 
++Current continuation: [player engine restoration and client association](../Documentation/Implementation/M2_PLAYER_RESTORE.md)
++connects the supported same-world living-player snapshot to original restored entry,
++without fresh stats or start-trigger replay. Session inspection supports capture,
++leave and restore. Earlier engine/association omissions below are historical;
++full client/world state and safe NEW_LEVEL transfer remain unavailable. **M2 stays open.**
++
+ Latest restoration continuation: [character node visibility and selected player Load tail](../Documentation/Implementation/M2_CHARACTER_NODES.md)
+ connects original named resets to real rendering/hit state and restores model/flags/
+ velocity without fresh player grants. Full engine/client restoration and safe level
+diff --git a/docs/CHARACTER_NODE_CONTRACTS.md b/docs/CHARACTER_NODE_CONTRACTS.md
+index f347c72..63d3dc2 100644
+--- a/docs/CHARACTER_NODE_CONTRACTS.md
++++ b/docs/CHARACTER_NODE_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Character node visibility and selected player Load tail
+ 
++> Continued by [player restore contracts](PLAYER_RESTORE_CONTRACTS.md): supported
++> engine state and original restored-client association now execute in the same
++> loaded world. Earlier blanket omissions below are historical. Full client/world
++> state and safe NEW_LEVEL transfer remain incomplete.
++
+ The original named-node reset now has real engine state consumed by model rendering
+ and NPC hit localization. `CPlayerObj::RestoreModelState` applies the supported
+ model/flags/velocity portion of Load to an unassociated savegame owner; it does not
+diff --git a/docs/DAMAGE_STATE_CONTRACTS.md b/docs/DAMAGE_STATE_CONTRACTS.md
+index ea78449..0afe1f7 100644
+--- a/docs/DAMAGE_STATE_CONTRACTS.md
++++ b/docs/DAMAGE_STATE_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original CDestructable state preservation
+ 
++> Continued by [player restore contracts](PLAYER_RESTORE_CONTRACTS.md): supported
++> engine state and original restored-client association now execute in the same
++> loaded world. Earlier blanket omissions below are historical. Full client/world
++> state and safe NEW_LEVEL transfer remain incomplete.
++
+ > Continued by [player state contracts](PLAYER_STATE_CONTRACTS.md): selected player
+ > values and the original savegame initialization early return now execute.
+ > Earlier blanket player-field/initialization omissions are historical; full
+diff --git a/docs/INVENTORY_STATE_CONTRACTS.md b/docs/INVENTORY_STATE_CONTRACTS.md
+index fa1f969..11ebae5 100644
+--- a/docs/INVENTORY_STATE_CONTRACTS.md
++++ b/docs/INVENTORY_STATE_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original inventory Save/Load subset
+ 
++> Continued by [player restore contracts](PLAYER_RESTORE_CONTRACTS.md): supported
++> engine state and original restored-client association now execute in the same
++> loaded world. Earlier blanket omissions below are historical. Full client/world
++> state and safe NEW_LEVEL transfer remain incomplete.
++
+ > Continued by [player state contracts](PLAYER_STATE_CONTRACTS.md): selected player
+ > values and the original savegame initialization early return now execute.
+ > Earlier blanket player-field/initialization omissions are historical; full
+diff --git a/docs/M2_PLAYER_RESTORE_SOURCES.json b/docs/M2_PLAYER_RESTORE_SOURCES.json
+new file mode 100644
+index 0000000..751a74f
+--- /dev/null
++++ b/docs/M2_PLAYER_RESTORE_SOURCES.json
+@@ -0,0 +1,77 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "ba1243c71efac7159c5c19887c1b5124d1503e0b",
++  "source_repository_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/BloodServerShell.cpp",
++      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed",
++      "selected_lines": [
++        [
++          192,
++          245
++        ],
++        [
++          746,
++          803
++        ],
++        [
++          959,
++          977
++        ]
++      ],
++      "use": "Saved-client lookup, association and saved-position branch; explicit typed local identity replaces HCLIENTREF"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
++      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452",
++      "selected_lines": [
++        [
++          5150,
++          5162
++        ],
++        [
++          5378,
++          5397
++        ]
++      ],
++      "use": "Original first-world init guard; full LoadClientData is not claimed"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
++      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc",
++      "selected_lines": [
++        [
++          615,
++          640
++        ],
++        [
++          1591,
++          1604
++        ],
++        [
++          6838,
++          6865
++        ]
++      ],
++      "use": "Restore initialization, first-update speeds/physics/stats and Load tail"
++    },
++    {
++      "path": "sources/blood2/ClientShellDLL/MoveMgr.cpp",
++      "sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a",
++      "selected_lines": [],
++      "use": "Existing ForcePos handler consulted for velocity/acceleration reset; no new physics imported"
++    }
++  ],
++  "adaptations": [
++    "Owned supported-player engine snapshot and bounded staged cleanup; not a retail save format",
++    "Explicit checked local restored-client identity; no arbitrary saved-name matching or fresh fallback",
++    "First-update movement/stat publication at association before MoveMgr stepping; original raw attributes retained",
++    "Current-world clearance and no active-client replacement; contact references not serialized"
++  ],
++  "remaining": [
++    "Safe cross-world keep-alive entry and full world/client state",
++    "Dead-player/power timers and omitted transient state",
++    "Gideon, required FX/services and actual M2 acceptance"
++  ]
++}
+diff --git a/docs/PLAYER_CONTRACTS.md b/docs/PLAYER_CONTRACTS.md
+index 20ce50a..e58799c 100644
+--- a/docs/PLAYER_CONTRACTS.md
++++ b/docs/PLAYER_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Original Player Entry Boundary
+ 
++> Continued by [player restore contracts](PLAYER_RESTORE_CONTRACTS.md): supported
++> engine state and original restored-client association now execute in the same
++> loaded world. Earlier blanket omissions below are historical. Full client/world
++> state and safe NEW_LEVEL transfer remain incomplete.
++
+ > Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
+ > original named resets now affect rendering/hit candidates, and the selected Load
+ > model/flags/velocity tail is available before client association. Earlier blanket
+diff --git a/docs/PLAYER_RESTORE_CONTRACTS.md b/docs/PLAYER_RESTORE_CONTRACTS.md
+new file mode 100644
+index 0000000..0ab0d97
+--- /dev/null
++++ b/docs/PLAYER_RESTORE_CONTRACTS.md
+@@ -0,0 +1,85 @@
++# Player engine restoration and restored client association
++
++This is an owned, in-memory snapshot of the **supported living local player** in
++the same loaded single-player world. It combines selected original inventory,
++damage and player Save/Load paths with replacement engine state restoration and
++the original shells' saved-client entry branch. It is not a retail save-file
++reader, whole-world checkpoint, complete client save or accepted NEW_LEVEL transfer.
++
++## Capture and lifetime
++
++`GameSession::capture_player` requires a live associated, initialized player outside
++object callbacks, with active scheduled engine state. It rejects pending door
++pushes, attached/dynamic bodies, deactivation, dead/dying players, active powers
++without saved timers, and aggregate/fire callback hazards. Failed capture leaves
++the caller's previous snapshot unchanged. Every string/vector is owned; no source
++HOBJECT, HCLIENT, model pointer, contact, attachment or aggregate pointer is saved.
++
++Saved engine fields are object name, model/skin identities, position, rotation,
++scale, raw collision half-dimensions, flags/user flags, blocking priority, animation
++track including its consumed-initial-key state, node mask and remaining update
++delay. Selected player/aggregate fields follow their existing contracts. Crouched
++body/eye state bridges this port's separate collision/camera representation.
++Velocity/acceleration are recorded, but original Load/force-position rules later
++reset them. Contacts and support are queried anew; no old platform identity survives.
++
++## Restore order and original behavior
++
++1. Require no connected client and no callback/reentrant step. Reject a different
++   world, unsupported Caleb profile/resources, invalid vectors/quaternion, body,
++   name, eye, clock, clip or node mask before association. A snapshot does not rewind
++   the world: movers/NPCs may have changed since capture.
++2. Create a new CPlayerObj with `INITIALUPDATE_SAVEGAME`. This binds aggregates and
++   faction lists without fresh stats, scent or start trigger. Restore engine values
++   on the staged owner; check its exact saved body against current scene collision.
++3. Apply original inventory `Restore` (keys retained), damage and player fields,
++   then `RestoreModelState`. Its named node reset, exact flags without SHADOW and
++   zero velocity intentionally supersede saved engine values. No Respawn occurs.
++4. Restore scheduling relative to the destination clock. Associate a new checked
++   local client token with the staged owner and its inventory. Typed explicit
++   identity replaces retail HCLIENTREF enumeration; do not search names or silently
++   fall back to a freshly reset player. The saved-position shell branch sends init
++   and facing, retains the eye/body, and never invokes GoToStartPoint.
++5. The client's restored-entry mode suppresses fresh SINGLEPLAYER_INIT. Repeated
++   restored init requests remain no-ops; the existing fresh-entry duplicate guard
++   stays in place. The source
++   first-update block derives movement speed from saved attribute 1..6 and jump
++   speed 600, publishes physics/position/stats, then clears first-update. This runs
++   eagerly at the local association boundary so MoveMgr is ready before stepping.
++   **Do not call ValidateAttributes here**: original PlayerObj.cpp:1591-1604 does
++   not clamp attributes, recalculate resistance/caps or grant ammo/health.
++6. The existing ForcePos handler clears acceleration/velocity and resets local
++   movement predictions. Only the associated MoveMgr integrates the player.
++   Views and held models are rebuilt, then attachment ownership is checked.
++
++Any staged failure removes the new player and all generated children, clears
++client messages/association and leaves existing world objects intact. An active
++player is never silently replaced: capture, leave, then restore. This is failure
++cleanup for an unassociated/new owner, not rollback of an already destroyed player
++or world. Snapshots can survive unload and restore after reloading the same world.
++
++## Inspection and validation
++
++Session exposes **Capture player state**, **Leave world**, and **Restore captured
++player**, saved body/clock/animation/stats, attempts/success/error and the actual
++restored-client flag. Commands execute outside UI traversal; hidden/folded UI has
++no effect on simulation. A failed recapture keeps the previous successful snapshot.
++The last restored ObjectId is inspection only and may become stale after teardown.
++
++`player_restore.*` covers nondefault health/armor/ammo, raw level-6 attributes and
++caps, pose/scale/body/eye, exact animation/deadline, no fresh reset, checked stale
++clients/move codes, real movement and one integrator, malformed records, blocked
++placement, early and late resource failures, repeated reload and list/string/
++attachment cleanup. Private checks use external SubwayA/Caleb; GPU checks render
++the restored player, and `--restore-smoke` repeats association across UI hiding and
++world reload with and without the inspector build.
++
++## Explicit limits
++
++No retail serialization/SaveObjects/RestoreObjects success is added. Dead-player
++states, power timers, complete client data/HUD/objectives/cinematic state, all
++transient animation-selection/random/audio state, whole-world restoration and
++safe cross-world keep-alive entry remain unavailable. Restored engine animation is
++preserved at entry; subsequent original commands can select/reset its clip. No
++retail physics or binary-save compatibility is claimed. NEW_LEVEL still refuses
++before teardown; Gideon and required FX/services keep M2 incomplete.
+diff --git a/docs/PLAYER_STATE_CONTRACTS.md b/docs/PLAYER_STATE_CONTRACTS.md
+index f1f9fa8..32366d8 100644
+--- a/docs/PLAYER_STATE_CONTRACTS.md
++++ b/docs/PLAYER_STATE_CONTRACTS.md
+@@ -1,5 +1,10 @@
+ # Selected original player fields and restore initialization
+ 
++> Continued by [player restore contracts](PLAYER_RESTORE_CONTRACTS.md): supported
++> engine state and original restored-client association now execute in the same
++> loaded world. Earlier blanket omissions below are historical. Full client/world
++> state and safe NEW_LEVEL transfer remain incomplete.
++
+ > Extended by [node visibility and player model restoration](CHARACTER_NODE_CONTRACTS.md):
+ > original named resets now affect rendering/hit candidates, and the selected Load
+ > model/flags/velocity tail is available before client association. Earlier blanket
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 6e9562e..11dd614 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -710,3 +710,13 @@ reads; the source's uninitialized location byte starts at zero. No donor engine,
+ dependency or commercial asset was imported. See [source ledger](M2_DAMAGE_STATE_SOURCES.json),
+ [contracts](DAMAGE_STATE_CONTRACTS.md) and
+ [evidence](../../Documentation/Implementation/M2_DAMAGE_STATE.md).
++
++## M2 player engine restoration and saved-client entry
++
++[Source ledger](M2_PLAYER_RESTORE_SOURCES.json) identifies the original server
++saved-client/RespawnPlayer branch, client first-world guard and player first-update
++block. `player_restore.cpp` is replacement engine orchestration using owned values,
++checked identities, current geometry and staged cleanup. It reuses the selected
++original Save/Load and model tail. First update now derives speeds without fresh
++attribute validation, matching source. See [contracts](PLAYER_RESTORE_CONTRACTS.md)
++for limits: no retail ABI, full client/world save or cross-world transfer claim.
+diff --git a/src/app/inspector.cpp b/src/app/inspector.cpp
+index f9fcdc9..6a2a58b 100644
+--- a/src/app/inspector.cpp
++++ b/src/app/inspector.cpp
+@@ -307,6 +307,22 @@ namespace OpenBlood2
+                 selection.id = game.objects.get(game.client_shell.player)->id;
+             enter_player_request = false;
+         }
++        if (capture_player_request)
++        {
++            PlayerRestoreState saved;
++            if (game.capture_player(saved, game.restoration.error))
++            {
++                game.restoration.saved = std::move(saved);
++                ++game.restoration.captures;
++            }
++            capture_player_request = false;
++        }
++        if (restore_player_request)
++        {
++            if (game.restoration.saved && game.restore_player(*game.restoration.saved, world_error))
++                selection.id = game.restoration.last_player;
++            restore_player_request = false;
++        }
+         if (respawn_request)
+         {
+             if (auto* player = game.server_shell.Player(game.local_client))
+@@ -1017,6 +1033,39 @@ namespace OpenBlood2
+         }
+         if (!world_error.empty())
+             ImGui::TextWrapped("%s", world_error.c_str());
++        ImGui::SeparatorText("Player restoration (same loaded world)");
++        ImGui::BeginDisabled(!player);
++        if (ImGui::Button("Capture player state"))
++            capture_player_request = true;
++        ImGui::EndDisabled();
++        ImGui::SameLine();
++        ImGui::BeginDisabled(player || !game.restoration.saved);
++        if (ImGui::Button("Restore captured player"))
++            restore_player_request = true;
++        ImGui::EndDisabled();
++        const auto& restore = game.restoration;
++        ImGui::Text("Captures %llu | Restored %llu / %llu | Restored client: %s", (unsigned long long)restore.captures,
++                    (unsigned long long)restore.restored, (unsigned long long)restore.attempts,
++                    game.client_shell.restored_entry ? "yes" : "no");
++        if (!restore.error.empty())
++            ImGui::TextWrapped("%s", restore.error.c_str());
++        ImGui::TextWrapped("Capture, leave the player, then restore. Original Load resets velocity/standard node "
++                           "visibility; client force-position clears acceleration. World/NPC state, complete "
++                           "client saves and level transfer are not restored.");
++        if (restore.saved && ImGui::TreeNode("Saved engine/player values"))
++        {
++            const auto& s = *restore.saved;
++            ImGui::TextWrapped("World: %s | Model: %s | Skin: %s", s.world.c_str(), s.model.c_str(), s.skin.c_str());
++            ImGui::Text("Position %.2f %.2f %.2f | Half dimensions %.2f %.2f %.2f", s.position.x, s.position.y,
++                        s.position.z, s.dimensions.x, s.dimensions.y, s.dimensions.z);
++            ImGui::Text("Animation %u at %.2fms | loop %d done %d first %d | next update %.6fs", s.animation.animation,
++                        s.animation.time, s.animation.looping, s.animation.done, s.animation.first, s.next_update);
++            ImGui::Text("Crouched %d | eye %.1f | flags %x / user %x | priority %u", s.crouched, s.eye_level, s.flags,
++                        s.user_flags, s.blocking_priority);
++            ImGui::Text("HP %.2f | armor %.2f | bullets %.2f | air %.2f", s.damage.health, s.damage.armor,
++                        s.inventory.ammo[1], s.player.air);
++            ImGui::TreePop();
++        }
+         ImGui::SeparatorText("Shell state");
+         ImGui::Text("Server world started: %s | Path snapshots: %zu | Updates: %llu",
+                     game.server_shell.world_started ? "yes" : "no", game.server_shell.paths.size(),
+diff --git a/src/app/inspector.h b/src/app/inspector.h
+index 27790a5..060a10a 100644
+--- a/src/app/inspector.h
++++ b/src/app/inspector.h
+@@ -81,6 +81,7 @@ namespace OpenBlood2
+         std::optional<WeaponInput> weapon_input_request;
+         std::optional<PlayerRotation> weapon_aim_request;
+         bool enter_player_request = false, leave_player_request = false, respawn_request = false;
++        bool capture_player_request = false, restore_player_request = false;
+         ObjectId remove_request{};
+         std::string spawn_request;
+         std::string world_error, reload_world_name = "01_SubwayA";
+diff --git a/src/app/inspector_objectives.cpp b/src/app/inspector_objectives.cpp
+index ea73ff5..9ae416d 100644
+--- a/src/app/inspector_objectives.cpp
++++ b/src/app/inspector_objectives.cpp
+@@ -100,9 +100,8 @@ namespace OpenBlood2
+                     ImGui::TreePop();
+                 }
+             }
+-            ImGui::TextWrapped(
+-                "Partial snapshots: remaining player timers, engine state, restored client association and "
+-                "destination entry remain unavailable. Current player/world are unchanged.");
++            ImGui::TextWrapped("Exit snapshots remain partial. The Session tab supports same-world player restoration; "
++                               "complete timers/client saves and safe destination transfer remain unavailable.");
+             for (auto id : game.objects.snapshot())
+             {
+                 const auto* record = game.objects.get(id);
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 1b8d6d8..b8b64fd 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -132,6 +132,18 @@ namespace
+                     spdlog::error("Authored intro camera did not release player control");
+                     return 4;
+                 }
++                if (options.restore_smoke)
++                {
++                    OpenBlood2::PlayerRestoreState saved;
++                    if (!game.capture_player(saved, error) || !game.leave_player() ||
++                        !game.request_world(options.world, error) || !game.restore_player(saved, error))
++                    {
++                        spdlog::error("Restored player entry: {}", error);
++                        return 6;
++                    }
++                    game.restoration.saved = std::move(saved);
++                    ++game.restoration.captures;
++                }
+                 selection.id = game.objects.get(game.client_shell.player)->id;
+             }
+         }
+@@ -1036,7 +1048,8 @@ namespace
+                     else
+                     {
+                         inspector.reload_request = true;
+-                        inspector.enter_player_request = options.player_smoke;
++                        inspector.enter_player_request = options.player_smoke && !options.restore_smoke;
++                        inspector.restore_player_request = options.restore_smoke;
+                     }
+ #else
+                     if (frames == unload_frame)
+@@ -1046,7 +1059,9 @@ namespace
+                         spdlog::error("{}", error);
+                         return 5;
+                     }
+-                    else if (options.player_smoke && !game.enter_player(error))
++                    else if (options.player_smoke &&
++                             !(options.restore_smoke ? game.restore_player(*game.restoration.saved, error)
++                                                     : game.enter_player(error)))
+                     {
+                         spdlog::error("{}", error);
+                         return 6;
+@@ -1273,6 +1288,9 @@ namespace
+                   forward_frames != 55 || jump_frames != 10 || crouch_frames != 45 || run_frames != 20 ||
+                   !skeleton_reentered || !skeleton_hidden || !crouched_hidden || !stood_after_crouch ||
+                   !locomotion_pose || !saw_walk || !saw_run || !saw_jump)) ||
++                (options.restore_smoke && (game.restoration.restored != 2 || !game.client_shell.restored_entry ||
++                                           !game.server_shell.Player(game.local_client) ||
++                                           game.server_shell.Player(game.local_client)->respawns != 0)) ||
+                 (options.player_smoke && (!player_advanced_hidden || !game.client_shell.m_bInWorld ||
+                                           !game.server_shell.Player(game.local_client))) ||
+                 (options.world_smoke &&
+@@ -1400,6 +1418,7 @@ int main(int argc, char** argv)
+                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled\n"
+                      "  --gpu-smoke         Exercise GPU presentation, inspector toggle, resize and quit\n"
+                      "  --world-smoke       GPU lifecycle with real world unload/reload assertions\n"
++                     "  --restore-smoke     GPU saved-player entry, hidden updates and restore after reload\n"
+                      "  --player-smoke      GPU shell/player entry, hidden updates and unload/re-entry\n"
+                      "  --weapons-smoke     GPU Beretta/knife firing, hidden simulation and reload\n"
+                      "  --doors-smoke       GPU original sliding door inspection\n"
+diff --git a/src/engine/config.cpp b/src/engine/config.cpp
+index db68fd6..fcedc71 100644
+--- a/src/engine/config.cpp
++++ b/src/engine/config.cpp
+@@ -181,6 +181,8 @@ namespace OpenBlood2
+                 options.world_smoke = true;
+                 options.doors_smoke = true;
+             }
++            else if (arg == "--restore-smoke")
++                options.world_smoke = options.player_smoke = options.restore_smoke = true;
+             else if (arg == "--player-smoke")
+             {
+                 options.world_smoke = true;
+diff --git a/src/engine/config.h b/src/engine/config.h
+index c65fcbe..a01425f 100644
+--- a/src/engine/config.h
++++ b/src/engine/config.h
+@@ -19,7 +19,7 @@ namespace OpenBlood2
+         std::string world = "01_SubwayA";
+         bool inspect_world = false;
+         bool inspect_player = false;
+-        bool player_smoke = false;
++        bool player_smoke = false, restore_smoke = false;
+         bool weapons_smoke = false;
+         bool skeleton_smoke = false;
+         bool movement_smoke = false, containers_smoke = false, doors_smoke = false, triggers_smoke = false,
+diff --git a/src/game/original/BloodShells.cpp b/src/game/original/BloodShells.cpp
+index af51e7a..9d43af6 100644
+--- a/src/game/original/BloodShells.cpp
++++ b/src/game/original/BloodShells.cpp
+@@ -134,6 +134,32 @@ CPlayerObj* CBloodServerShell::OnClientEnterWorld(HCLIENT client)
+     }
+     return player;
+ }
++CPlayerObj* CBloodServerShell::OnRestoredClientEnterWorld(HCLIENT client, HOBJECT object)
++{
++    // Typed local equivalent of OnClientEnterWorld's saved HCLIENTREF branch.
++    // The caller supplies a fully staged owner; never fall back to CreatePlayer.
++    if (!world_started || !client || Player(client) || !server_.IsObjectAlive(object))
++        return nullptr;
++    auto* player = dynamic_cast<CPlayerObj*>(server_.HandleToObject(object));
++    if (!player || !player->restore_initialization || !player->restore_fields_loaded || !player->restore_model_loaded ||
++        !player->restore_engine_loaded || player->GetClient() || player->m_InventoryMgr.m_hClient)
++        return nullptr;
++    if (server_.SetClientUserData(client, object) != DE_OK)
++        return nullptr;
++    player->SetClient(client);
++    // RespawnPlayer's saved-position branch: associate, initialize client,
++    // restore facing/eye; no Respawn or GoToStartPoint/start-trigger replay.
++    if (server_.SendToClient(client, OpenBlood2::PlayerInitRequest{}) != DE_OK ||
++        server_.SendToClient(client, OpenBlood2::PlayerRotation{player->m_fPitch, player->m_fYaw}) != DE_OK ||
++        !player->InitializeClientState())
++    {
++        player->SetClient(nullptr);
++        server_.SetClientUserData(client, nullptr);
++        return nullptr;
++    }
++    server_.SetGameConVar("GAME_GOTOSTARTPOINT", "1");
++    return player;
++}
+ void CBloodServerShell::OnClientExitWorld(HCLIENT client)
+ {
+     auto* player = Player(client);
+@@ -175,10 +201,11 @@ bool CBloodClientShell::StartNewWorld(const char* world, OpenBlood2::WorldMessag
+         return false;
+     return true; // State changes wait until the engine accepts the world.
+ }
+-bool CBloodClientShell::OnEnterWorld(HCLIENT client)
++bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
+ {
+     auto object = server_.GetClientUserData(client);
+-    if (!object || m_bInWorld)
++    const auto* owner = dynamic_cast<const CPlayerObj*>(server_.HandleToObject(object));
++    if (!object || m_bInWorld || !owner || restored != owner->restore_engine_loaded)
+         return false;
+     if (!move_mgr.Init(server_, client))
+         return false;
+@@ -186,7 +213,8 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client)
+     player = object;
+     m_bInWorld = true;
+     m_bFirstUpdate = true;
+-    m_bFirstWorld = true;
++    restored_entry = restored;
++    m_bFirstWorld = !restored;
+     position = {};
+     camera_position = {};
+     view = {};
+@@ -216,6 +244,7 @@ void CBloodClientShell::OnExitWorld()
+     player = nullptr;
+     client_ = nullptr;
+     m_bInWorld = false;
++    restored_entry = false;
+     m_bFirstWorld = true;
+     m_bFirstUpdate = true;
+     position = {};
+@@ -237,7 +266,7 @@ void CBloodClientShell::OnExitWorld()
+ bool CBloodClientShell::InitSinglePlayer(CBloodServerShell& server)
+ {
+     if (!m_bFirstWorld)
+-        return false;
++        return restored_entry;   // Restored worlds skip the profile; retain fresh-entry duplicate rejection.
+     OpenBlood2::PlayerInit init; // Default entry profile; original fields/order retained.
+     if (!server.OnMessage(client_, init))
+         return false;
+diff --git a/src/game/original/BloodShells.h b/src/game/original/BloodShells.h
+index 687e845..9998a1c 100644
+--- a/src/game/original/BloodShells.h
++++ b/src/game/original/BloodShells.h
+@@ -14,6 +14,7 @@ class CBloodServerShell
+     void PreStartWorld();
+     bool PostStartWorld();
+     CPlayerObj* OnClientEnterWorld(HCLIENT);
++    CPlayerObj* OnRestoredClientEnterWorld(HCLIENT, HOBJECT);
+     void OnClientExitWorld(HCLIENT);
+     bool OnMessage(HCLIENT, const OpenBlood2::PlayerInit&);
+     FireResult OnMessage(HCLIENT, const OpenBlood2::WeaponFire&);
+@@ -65,7 +66,8 @@ class CBloodClientShell
+   public:
+     explicit CBloodClientShell(ServerDE& server) : server_(server) {}
+     bool StartNewWorld(const char*, OpenBlood2::WorldMessage&);
+-    bool OnEnterWorld(HCLIENT);
++    bool OnEnterWorld(HCLIENT, bool restored = false);
++    bool restored_entry = false;
+     void OnExitWorld();
+     bool OnMessage(const OpenBlood2::PlayerEvent&, CBloodServerShell&);
+     bool Update();
+diff --git a/src/game/original/PlayerObj.cpp b/src/game/original/PlayerObj.cpp
+index 836ed88..0755cc1 100644
+--- a/src/game/original/PlayerObj.cpp
++++ b/src/game/original/PlayerObj.cpp
+@@ -188,8 +188,8 @@ void CPlayerObj::ValidateAttributes()
+ }
+ bool CPlayerObj::OnSinglePlayerInit(const OpenBlood2::PlayerInit& init)
+ {
+-    if (attributes_received || !m_hClient || init.name.size() > 100 || init.name.find('\0') != std::string::npos ||
+-        init.character != 0 || init.skin != 0)
++    if (restore_initialization || attributes_received || !m_hClient || init.name.size() > 100 ||
++        init.name.find('\0') != std::string::npos || init.character != 0 || init.skin != 0)
+         return false;
+     // Reject unsupported loadouts before allocating strings or weapons.
+     for (auto type : init.weapons)
+@@ -365,13 +365,8 @@ DBOOL CPlayerObj::Update(DVector*)
+     ++updates;
+     if (!m_hClient)
+         return DTRUE;
+-    if (m_bFirstUpdate)
+-    {
+-        ValidateAttributes();
+-        if (!UpdateClientPhysics() || !TeleportClientToServerPos())
+-            return DFALSE;
+-        m_bFirstUpdate = DFALSE;
+-    }
++    if (m_bFirstUpdate && !InitializeClientState())
++        return DFALSE;
+     UpdateSound();
+     if (server->GetTime() > m_fNextPingTime)
+     {
+@@ -382,10 +377,24 @@ DBOOL CPlayerObj::Update(DVector*)
+     }
+     return UpdateStats();
+ }
+-bool CPlayerObj::UpdateStats()
++bool CPlayerObj::InitializeClientState()
++{
++    if (!m_hClient || m_nAttribSpeed < 1 || m_nAttribSpeed > 6)
++        return false;
++    // Original first update, PlayerObj.cpp:1591-1604. ValidateAttributes belongs
++    // to fresh profile receipt, not restoration: it would alter saved caps/stats.
++    static constexpr float move[] = {220, 250, 280, 310, 330, 350};
++    m_fMoveVel = move[m_nAttribSpeed - 1];
++    m_fJumpVel = 600;
++    if (!UpdateClientPhysics() || !TeleportClientToServerPos() || !UpdateStats(true))
++        return false;
++    m_bFirstUpdate = DFALSE;
++    return true;
++}
++bool CPlayerObj::UpdateStats(bool force)
+ {
+     const OpenBlood2::PlayerStats value{m_damage.m_fHitPoints, m_damage.m_fArmorPoints, m_InventoryMgr.GetAmmoCount(1)};
+-    if (value.health == last_sent_stats_.health && value.armor == last_sent_stats_.armor &&
++    if (!force && value.health == last_sent_stats_.health && value.armor == last_sent_stats_.armor &&
+         value.bullets == last_sent_stats_.bullets)
+         return true;
+     if (GetServerDE()->SendToClient(m_hClient, value) != DE_OK)
+diff --git a/src/game/original/PlayerObj.h b/src/game/original/PlayerObj.h
+index 2c6533a..fa31e89 100644
+--- a/src/game/original/PlayerObj.h
++++ b/src/game/original/PlayerObj.h
+@@ -78,7 +78,7 @@ class CPlayerObj : public CBaseCharacter
+     bool SaveFields(OpenBlood2::PlayerState&, std::string&) const;
+     bool LoadFields(const OpenBlood2::PlayerState&, std::string&);
+     bool RestoreModelState(std::string&);
+-    bool restore_model_loaded = false;
++    bool restore_model_loaded = false, restore_engine_loaded = false;
+     std::string restore_model_error;
+     bool restore_initialization = false, restore_fields_loaded = false;
+     bool GoToStartPoint(HSTRING start_name);
+@@ -127,7 +127,8 @@ class CPlayerObj : public CBaseCharacter
+     std::uint64_t use_commands = 0, use_messages = 0;
+     bool use_door_refused = false;
+     bool UpdateClientPhysics();
+-    bool UpdateStats();
++    bool UpdateStats(bool force = false);
++    bool InitializeClientState();
+     bool TeleportClientToServerPos();
+     void SetClient(HCLIENT client)
+     {
+diff --git a/src/game/original/PlayerSave.cpp b/src/game/original/PlayerSave.cpp
+index ee253c8..7365bf4 100644
+--- a/src/game/original/PlayerSave.cpp
++++ b/src/game/original/PlayerSave.cpp
+@@ -165,6 +165,7 @@ bool CPlayerObj::LoadFields(const OpenBlood2::PlayerState& state, std::string& e
+     last_sent_stats_ = {0, 0, 0}; // Source invalidates its last-sent stat caches without changing actual stats.
+     restore_fields_loaded = true;
+     restore_model_loaded = false;
++    restore_engine_loaded = false;
+     restore_model_error.clear();
+     // No Respawn, ValidateAttributes, initialization payload or aggregate load here.
+     return true;
+@@ -176,6 +177,7 @@ bool CPlayerObj::RestoreModelState(std::string& error)
+ {
+     error.clear();
+     restore_model_loaded = false;
++    restore_engine_loaded = false;
+     auto fail = [&](const char* why)
+     {
+         error = restore_model_error = why;
+diff --git a/src/game/player_restore.cpp b/src/game/player_restore.cpp
+new file mode 100644
+index 0000000..d3c5aa9
+--- /dev/null
++++ b/src/game/player_restore.cpp
+@@ -0,0 +1,173 @@
++#include "game/server_adapter.h"
++#include <algorithm>
++#include <cmath>
++
++namespace OpenBlood2
++{
++    namespace
++    {
++        bool validate_engine(GameSession& game, const PlayerRestoreState& s, std::string& error)
++        {
++            auto fail = [&](const char* why)
++            {
++                error = why;
++                return false;
++            };
++            if (s.world.empty() || s.world != game.world_path || !game.server.collision_ready ||
++                !game.server_shell.world_started ||
++                game.server.GetVarValueFloat(game.server.GetGameConVar("GAME_GAMETYPE")) != 0)
++                return fail("Player restoration requires the same loaded single-player world");
++            if (s.name.size() > 100 || s.name.find('\0') != std::string::npos)
++                return fail("Invalid saved player object name");
++            std::string model_path, skin_path;
++            if (!resource_path(s.model, model_path) || model_path != "models/characters/caleb.abc" ||
++                !resource_path(s.skin, skin_path) || skin_path != "skins/characters/caleb1.dtx" ||
++                !game.resources.find(s.skin))
++                return fail("Saved player model/skin is unavailable or unsupported");
++            const auto norm = vector_dot(s.rotation.m_Vec, s.rotation.m_Vec) + s.rotation.m_Spin * s.rotation.m_Spin;
++            if (!physics_vector(s.position) || !physics_vector(s.dimensions) || s.dimensions.x <= 0 ||
++                s.dimensions.y <= 0 || s.dimensions.z <= 0 || !physics_vector(s.scale) || s.scale.x <= 0 ||
++                s.scale.y <= 0 || s.scale.z <= 0 || !physics_vector(s.velocity) || !physics_vector(s.acceleration) ||
++                !physics_vector(s.rotation.m_Vec) || !std::isfinite(norm) || std::abs(norm - 1) > .001f ||
++                !std::isfinite(s.next_update) || s.next_update < 0 || s.next_update > 3600 ||
++                s.eye_level != (s.crouched ? 12.0f : 36.0f))
++                return fail("Invalid saved player transform, body, eye or update deadline");
++            if (s.player.dead || s.damage.dead || s.damage.death_delay != 0)
++                return fail("Dead/dying player restoration requires unported player death state");
++            std::shared_ptr<const Model> model;
++            if (!game.models.load(s.model, model, error))
++                return false;
++            if ((!s.hidden_nodes.empty() && s.hidden_nodes.size() != model->nodes.size()) ||
++                std::any_of(s.hidden_nodes.begin(), s.hidden_nodes.end(), [](auto v) { return v > 1; }))
++                return fail("Invalid saved player node visibility mask");
++            auto track = s.animation;
++            std::vector<std::uint32_t> events;
++            // Validate without dispatching model keys or advancing the restored clock.
++            if (!advance_animation(*model, track, 0, events, error))
++                return false;
++            return true;
++        }
++    } // namespace
++    bool GameSession::capture_player(PlayerRestoreState& output, std::string& error)
++    {
++        error.clear();
++        auto* player = server_shell.Player(local_client);
++        const auto* record = player ? objects.get(player->m_hObject) : nullptr;
++        if (objects.busy() || !record || record->life != Life::Alive || !record->client_movement ||
++            !player->attributes_received || !client_shell.m_bInWorld || client_shell.player != record->handle ||
++            record->attachment || record->world_body || record->character_body || record->activity != OBJSTATE_ACTIVE ||
++            record->auto_deactivate || !record->scheduled || !std::isfinite(record->due) || player->door_push_pending)
++        {
++            error = "Player capture requires an active associated player outside callbacks/pending pushes";
++            return false;
++        }
++        PlayerRestoreState s;
++        s.world = world_path;
++        s.name = record->state.m_Name;
++        s.model = record->state.m_Filename;
++        s.skin = record->state.m_SkinName;
++        s.position = record->state.m_Pos;
++        s.rotation = record->state.m_Rotation;
++        s.scale = record->state.m_Scale;
++        s.dimensions = record->dimensions;
++        s.velocity = record->velocity;
++        s.acceleration = record->acceleration;
++        s.animation = record->animation;
++        s.hidden_nodes = record->hidden_nodes;
++        s.flags = record->state.m_Flags;
++        s.user_flags = record->user_flags;
++        s.blocking_priority = record->blocking_priority;
++        s.next_update = std::max(0.0, record->due - objects.time());
++        s.crouched = player->crouched;
++        s.eye_level = player->eye_level;
++        if (!player->SaveFields(s.player, error) || !player->m_InventoryMgr.Save(s.inventory, error) ||
++            !player->m_damage.Save(s.damage, error) || !validate_engine(*this, s, error))
++            return false;
++        output = std::move(s);
++        return true;
++    }
++    bool GameSession::restore_player(const PlayerRestoreState& s, std::string& error)
++    {
++        error.clear();
++        ++restoration.attempts;
++        auto failed = [&]()
++        {
++            restoration.error = error;
++            return false;
++        };
++        if (objects.busy() || local_client || server.client_count() || client_shell.m_bInWorld)
++        {
++            error = "Leave the current player before restoring; callback/live-client replacement is unavailable";
++            return failed();
++        }
++        if (!validate_engine(*this, s, error))
++            return failed();
++        const auto before = objects.snapshot();
++        auto rollback = [&]()
++        {
++            leave_player();
++            // Includes partially initialized owners and generated muzzle/hand children.
++            for (auto id : objects.snapshot())
++                if (std::find(before.begin(), before.end(), id) == before.end())
++                    objects.remove(objects.get(id)->handle);
++            objects.finish_frame();
++            if (error.empty())
++                error = "Restored player entry failed";
++            return failed();
++        };
++        auto object = objects.create(objects.find_class("CPlayerObj"), {}, Creation::Restore);
++        auto* record = objects.get(object);
++        auto* player = record ? dynamic_cast<CPlayerObj*>(record->game.get()) : nullptr;
++        if (!player || record->life != Life::Alive || !player->initialized)
++            return rollback();
++        // Replacement engine restore precedes original aggregate/value/Load-tail code.
++        // No callbacks or world stepping can observe this unassociated staged owner.
++        SAFE_STRCPY(record->state.m_Name, s.name.c_str());
++        record->state.m_Pos = s.position;
++        record->state.m_Scale = s.scale;
++        record->state.m_Flags = s.flags;
++        record->dimensions = s.dimensions;
++        record->velocity = s.velocity;
++        record->acceleration = s.acceleration;
++        record->user_flags = s.user_flags;
++        record->blocking_priority = s.blocking_priority;
++        if (server.SetModelFilenames(object, s.model.c_str(), s.skin.c_str()) != DE_OK ||
++            server.SetObjectRotation(object, &s.rotation) != DE_OK)
++            return rollback();
++        record->animation = s.animation;
++        record->hidden_nodes = s.hidden_nodes;
++        if (server.ResizeObject(object, s.dimensions) != ResizeResult::Resized)
++        {
++            error = "Saved player body is blocked in the current world";
++            return rollback();
++        }
++        if (!player->m_InventoryMgr.Load(s.inventory, InventoryLoadType::Restore, error) ||
++            !player->m_damage.Load(s.damage, error) || !player->LoadFields(s.player, error) ||
++            !player->RestoreModelState(error))
++            return rollback();
++        player->crouched = s.crouched;
++        player->eye_level = s.eye_level;
++        player->attributes_received = true; // Loaded profile, never a fresh PlayerInit message.
++        player->restore_engine_loaded = true;
++        record->due = objects.time() + s.next_update;
++        record->scheduled = true;
++        local_client = server.connect_client();
++        if (!local_client || !server_shell.OnRestoredClientEnterWorld(local_client, object) ||
++            !client_shell.OnEnterWorld(local_client, true) || !pump_player_messages(error) || !client_shell.Update() ||
++            !client_shell.SyncWeapons(models, resources, server_shell, error) ||
++            !player->m_InventoryMgr.UpdateHandModels() || !objects.finish_frame() || !objects.refresh_attachments())
++            return rollback();
++        record = objects.get(object);
++        if (!record || record->life != Life::Alive || server.GetClientUserData(local_client) != object)
++        {
++            error = "Restored player removed during child cleanup";
++            return rollback();
++        }
++        ++restoration.restored;
++        restoration.last_player = record->id;
++        restoration.error.clear();
++        trace.push_back("Restored player engine/aggregates -> original Load tail -> saved-client shell branch; no "
++                        "Respawn/start trigger");
++        return true;
++    }
++} // namespace OpenBlood2
+diff --git a/src/game/player_restore.h b/src/game/player_restore.h
+new file mode 100644
+index 0000000..8c6d804
+--- /dev/null
++++ b/src/game/player_restore.h
+@@ -0,0 +1,27 @@
++#pragma once
++#include "engine/model.h"
++#include "game/destructable_state.h"
++#include "game/inventory_state.h"
++#include "game/player_state.h"
++
++namespace OpenBlood2
++{
++    // Owned values for the supported local player. No retail save format,
++    // client token, source object, contact identity or borrowed resource.
++    struct PlayerRestoreState
++    {
++        std::string world, name, model, skin;
++        DVector position{}, scale{1, 1, 1}, dimensions{}, velocity{}, acceleration{};
++        DRotation rotation;
++        AnimationTrack animation;
++        std::vector<std::uint8_t> hidden_nodes;
++        DDWORD flags = 0, user_flags = 0;
++        DBYTE blocking_priority = 0;
++        double next_update = 0; // Remaining time, not a source-world deadline.
++        bool crouched = false;
++        float eye_level = 36;
++        InventoryState inventory;
++        DestructableState damage;
++        PlayerState player;
++    };
++} // namespace OpenBlood2
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 1b27eb7..ed3bd05 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -5,6 +5,7 @@
+ #include "engine/string_resources.h"
+ #include "game/original/BloodShells.h"
+ #include "game/original/LightFX.h"
++#include "game/player_restore.h"
+ #include "game/session.h"
+ #include <array>
+ #include <optional>
+@@ -325,6 +326,16 @@ namespace OpenBlood2
+         bool request_world(std::string_view name, std::string& error);
+         bool run_world(std::string& error);
+         bool enter_player(std::string& error);
++        bool capture_player(PlayerRestoreState&, std::string&);
++        bool restore_player(const PlayerRestoreState&, std::string&);
++        struct Restoration
++        {
++            std::optional<PlayerRestoreState> saved;
++            std::string error;
++            std::uint64_t captures = 0, attempts = 0, restored = 0;
++            ObjectId last_player{}; // Inspection only, never a restoration input.
++        } restoration;
++
+         bool select_weapon(DBYTE slot, std::string& error);
+         bool leave_player();
+         bool pump_player_messages(std::string& error);
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index c3c9f23..b09fcb9 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -890,3 +890,21 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME character_nodes.private COMMAND character_nodes_tests private "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(character_nodes.private PROPERTIES LABELS "headless;private;character_nodes" TIMEOUT 120)
+ endif()
++
++add_executable(player_restore_tests player_restore_tests.cpp ../src/app/model_scene.cpp)
++target_link_libraries(player_restore_tests PRIVATE blood2_game)
++blood2_project_options(player_restore_tests)
++foreach(case IN ITEMS roundtrip failures lifetime)
++    add_test(NAME player_restore.${case} COMMAND player_restore_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/player-restore-fixtures/${case}")
++    set_tests_properties(player_restore.${case} PROPERTIES LABELS "headless;player_restore" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    add_test(NAME player_restore.private COMMAND player_restore_tests private "${BLOOD2_TEST_DATA_DIR}")
++    set_tests_properties(player_restore.private PROPERTIES LABELS "headless;private;player_restore" TIMEOUT 120)
++endif()
++
++if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
++    add_test(NAME gpu.player_restore COMMAND blood2_app --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini"
++        --data-dir "${BLOOD2_TEST_DATA_DIR}" --restore-smoke --capture "${CMAKE_CURRENT_BINARY_DIR}/player-restore.png")
++    set_tests_properties(gpu.player_restore PROPERTIES LABELS "gpu;private;player_restore" TIMEOUT 60 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
++endif()
+diff --git a/tests/model_gpu_tests.cpp b/tests/model_gpu_tests.cpp
+index 206ba67..9277f34 100644
+--- a/tests/model_gpu_tests.cpp
++++ b/tests/model_gpu_tests.cpp
+@@ -164,6 +164,14 @@ int main(int argc, char** argv)
+         CHECK(game.resources.mount_game(config, error));
+         CHECK(game.request_world("01_SubwayA", error));
+         CHECK(game.enter_player(error) && game.step(1. / 60));
++        PlayerRestoreState restored;
++        CHECK(game.capture_player(restored, error));
++        const auto previous_player = game.client_shell.player;
++        CHECK(game.leave_player() && !game.objects.get(previous_player));
++        CHECK(game.restore_player(restored, error) && game.client_shell.restored_entry);
++        CHECK(game.client_shell.player != previous_player && game.restoration.restored == 1);
++        CHECK(game.server_shell.Player(game.local_client)->respawns == 0);
++        std::cout << "Restored original player/client association before private GPU rendering\n";
+         game.client_shell.player_visible = true;
+         game.client_shell.weapons_visible = false;
+         ModelView scene;
+diff --git a/tests/player_restore_tests.cpp b/tests/player_restore_tests.cpp
+new file mode 100644
+index 0000000..b4bcb1d
+--- /dev/null
++++ b/tests/player_restore_tests.cpp
+@@ -0,0 +1,243 @@
++#include "app/model_scene.h"
++#include "game/original/AI_Mgr.h"
++#include "player_fixture.h"
++#include <algorithm>
++#include <functional>
++#include <limits>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x << "\n";                                               \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool roundtrip(const char* root)
++    {
++        GameSession g;
++        std::string e;
++        CHECK(test_player::setup(g, root) && g.enter_player(e));
++        auto* p = g.server_shell.Player(g.local_client);
++        auto* r = g.objects.get(p->m_hObject);
++        auto old = p->m_hObject;
++        auto old_client = g.local_client;
++        // Deliberately non-default state; source Load and first Update must not Respawn/ValidateAttributes.
++        p->m_damage.SetHitPoints(37);
++        p->m_damage.SetArmorPoints(23);
++        p->m_damage.m_fMaxHitPoints = 311;
++        p->m_damage.m_fResistance = .42f;
++        p->m_nAttribStrength = 6;
++        p->m_nAttribSpeed = 6;
++        p->m_nAttribResistance = 6;
++        p->m_nAttribMagic = 6;
++        p->m_InventoryMgr.SetAmmoCount(1, 1234);
++        p->m_fAirLevel = 42;
++        p->m_fYaw = 1.25f;
++        p->m_fPitch = -.25f;
++        p->crouched = p->crouch_requested = true;
++        p->eye_level = 12;
++        p->move_state = CPlayerObj::MoveState::Crouch;
++        r->state.m_Pos = {100, 21, 200};
++        r->dimensions = {12, 20, 12};
++        r->state.m_Scale = {1.1f, 1.2f, .9f};
++        r->state.m_Rotation = rotation_from_euler({0, 1.25f, 0});
++        r->animation.time = 17;
++        r->animation.first = false;
++        r->animation.looping = false;
++        SAFE_STRCPY(r->state.m_Name, "saved-owner");
++        r->user_flags = 0x1234;
++        r->blocking_priority = 40;
++        r->velocity = {1, 2, 3};
++        r->acceleration = {4, 5, 6};
++        r->due = g.objects.time() + .4;
++        PlayerRestoreState saved;
++        CHECK(g.capture_player(saved, e) && saved.inventory.ammo[1] == 1234 && saved.player.strength == 6);
++        CHECK(!g.restore_player(saved, e) && g.server_shell.Player(g.local_client) == p);
++        CHECK(g.leave_player() && !g.objects.get(old) && !g.server.GetClientUserData(old_client));
++        CHECK(g.objects.advance(10));
++        if (!g.restore_player(saved, e))
++        {
++            std::cerr << e << '\n';
++            return false;
++        }
++        p = g.server_shell.Player(g.local_client);
++        r = g.objects.get(p->m_hObject);
++        CHECK(p->m_hObject != old && g.local_client != old_client && g.client_shell.player == p->m_hObject);
++        CHECK(p->restore_initialization && p->restore_engine_loaded && p->restore_model_loaded && !p->m_bFirstUpdate);
++        CHECK(p->respawns == 0 && p->updates == 0 && p->attributes_received && r->client_movement);
++        CHECK(r->state.m_Pos.x == 100 && r->state.m_Pos.y == 21 && r->dimensions.y == 20);
++        CHECK(std::string(r->state.m_Name) == "saved-owner");
++        CHECK(r->state.m_Scale.y == 1.2f && r->user_flags == 0x1234 && r->blocking_priority == 40);
++        CHECK(r->animation.time == 17 && !r->animation.first && !r->animation.looping);
++        CHECK(r->scheduled && std::abs(r->due - 10.4) < .00001 && !(r->state.m_Flags & FLAG_SHADOW));
++        CHECK(vector_dot(r->velocity, r->velocity) == 0 && vector_dot(r->acceleration, r->acceleration) == 0);
++        CHECK(p->m_damage.m_fHitPoints == 37 && p->m_damage.m_fArmorPoints == 23 && p->m_damage.m_fMaxHitPoints == 311);
++        CHECK(p->m_damage.m_fResistance == .42f && p->m_nAttribStrength == 6 && p->m_nAttribSpeed == 6);
++        CHECK(p->m_InventoryMgr.GetAmmoCount(1) == 1234 && p->m_fAirLevel == 42);
++        CHECK(p->m_fMoveVel == 350 && p->m_fJumpVel == 600 && p->eye_level == 12 && p->crouched);
++        CHECK(g.client_shell.stats.health == 37 && g.client_shell.stats.armor == 23 &&
++              g.client_shell.stats.bullets == 1234);
++        CHECK(g.client_shell.rotation.yaw == 1.25f && g.client_shell.rotation.pitch == -.25f);
++        CHECK(g.client_shell.camera_position.y == 33 && g.client_shell.restored_entry && !g.client_shell.m_bFirstWorld);
++        CHECK(g.client_shell.OnMessage(PlayerInitRequest{}, g.server_shell)); // Harmless restored init repeat.
++        CHECK(p->m_damage.m_fHitPoints == 37 && p->m_InventoryMgr.GetAmmoCount(1) == 1234);
++        CHECK(!g.server_shell.OnMessage(g.local_client, PlayerInit{}));
++        CHECK(!g.server_shell.OnMessage(old_client, PlayerControls{}));
++        CHECK(!g.server_shell.OnRestoredClientEnterWorld(g.local_client, old));
++        CHECK(!g.server_shell.OnMessage(g.local_client, PlayerMove{})); // Wrong movement generation.
++        auto position = r->state.m_Pos;
++        CHECK(g.server.advance_physics(.1) && r->state.m_Pos.x == position.x && r->state.m_Pos.y == position.y);
++        g.client_shell.movement_input.forward = true;
++        g.client_shell.movement_input.crouch = true;
++        CHECK(g.step(.05) && p->movement_messages == 6);
++        CHECK(r->state.m_Pos.x != position.x || r->state.m_Pos.z != position.z);
++        CHECK(g.objects.advance(.4) && p->updates == 1 && p->m_nAttribStrength == 6 &&
++              p->m_damage.m_fMaxHitPoints == 311);
++        CHECK(g.unload_world() && !g.server.client_count() && !g.server.string_count() &&
++              g.objects.attachments().empty());
++        return true;
++    }
++    bool failures(const char* root)
++    {
++        PlayerRestoreState s;
++        std::string e;
++        {
++            GameSession g;
++            CHECK(test_player::setup(g, root) && g.enter_player(e));
++            CHECK(g.capture_player(s, e));
++            auto* p = g.server_shell.Player(g.local_client);
++            PlayerRestoreState untouched;
++            untouched.world = "unchanged";
++            p->m_bPowerupActivated[0] = true;
++            CHECK(!g.capture_player(untouched, e) && untouched.world == "unchanged");
++            p->m_bPowerupActivated[0] = false;
++            p->door_push_pending = true;
++            CHECK(!g.capture_player(untouched, e));
++            p->door_push_pending = false;
++            CHECK(g.leave_player());
++            const auto count = g.objects.snapshot().size(), strings = g.server.string_count();
++            const auto factions = AI_Mgr::m_dwNumCabal;
++            const std::vector<std::function<void(PlayerRestoreState&)>> corrupt{
++                [](auto& v) { v.world = "other.dat"; },
++                [](auto& v) { v.model = "missing.abc"; },
++                [](auto& v) { v.skin = "missing.dtx"; },
++                [](auto& v) { v.position.x = NAN; },
++                [](auto& v) { v.dimensions.y = -1; },
++                [](auto& v) { v.rotation.m_Spin = 10; },
++                [](auto& v) { v.scale.y = 0; },
++                [](auto& v) { v.next_update = INFINITY; },
++                [](auto& v) { v.animation.time = -1; },
++                [](auto& v) { v.animation.animation = UINT32_MAX; },
++                [](auto& v) { v.hidden_nodes = {1}; },
++                [](auto& v) { v.player.dead = true; },
++                [](auto& v) { v.eye_level = 123; },
++                [](auto& v) { v.position.y = 0; }, // Floor overlap.
++                [](auto& v) { v.inventory.right[1] = 255; },
++                [](auto& v) { v.damage.health = NAN; },
++                [](auto& v) { v.player.strength = 0; },
++                [](auto& v) { v.player.name = std::string(101, 'x'); }};
++            for (const auto& mutate : corrupt)
++            {
++                auto bad = s;
++                mutate(bad);
++                CHECK(!g.restore_player(bad, e) && !e.empty() && g.restoration.error == e);
++                CHECK(!g.local_client && !g.server.client_count() && !g.client_shell.m_bInWorld);
++                CHECK(g.objects.snapshot().size() == count && g.server.string_count() == strings);
++                CHECK(g.objects.attachments().empty() && AI_Mgr::m_dwNumCabal == factions);
++            }
++            CHECK(g.restore_player(s, e) && g.restoration.error.empty());
++            CHECK(g.restoration.restored == 1 && g.unload_world());
++        }
++        GameSession g;
++        // Fail late (view weapon resource), after successful association. No leaks/false success.
++        CHECK(test_player::setup(g, std::filesystem::path(root) / "missing", true, false));
++        const auto before_count = g.objects.snapshot().size(), before_strings = g.server.string_count();
++        CHECK(!g.restore_player(s, e) && !e.empty());
++        CHECK(!g.local_client && !g.server.client_count() && !g.client_shell.m_bInWorld);
++        CHECK(g.objects.snapshot().size() == before_count && g.server.string_count() == before_strings &&
++              g.objects.attachments().empty());
++        CHECK(g.restoration.restored == 0);
++        return true;
++    }
++    bool lifetime(const char* root)
++    {
++        GameSession g;
++        std::string e;
++        CHECK(test_player::setup(g, root) && g.enter_player(e));
++        PlayerRestoreState s;
++        CHECK(g.capture_player(s, e));
++        const auto floor = g.collision;
++        HCLIENT client = g.local_client;
++        for (unsigned i = 0; i < 4; ++i)
++        {
++            auto old = g.client_shell.player;
++            CHECK(g.unload_world() && !g.objects.get(old) && !g.server.GetClientUserData(client));
++            CHECK(!CDestructable::m_dwNumDestructables && !AI_Mgr::m_dwNumCabal && !AI_Mgr::m_dwNumMonster);
++            g.collision = floor;
++            g.server.collision_ready = true;
++            g.world_path = "synthetic.dat";
++            CHECK(g.server_shell.PostStartWorld()); // No start marker needed for restored entry.
++            CHECK(g.restore_player(s, e));
++            client = g.local_client;
++            auto* player = g.server_shell.Player(client);
++            CHECK(player && player->respawns == 0 && player->m_InventoryMgr.m_hClient == client);
++            CHECK(g.client_shell.move_mgr.m_ClientMoveCode == player->m_byClientMoveCode);
++            CHECK(g.step(1. / 60) && player->movement_messages == 2);
++        }
++        CHECK(g.unload_world() && !g.server.string_count() && g.objects.attachments().empty());
++        return true;
++    }
++    bool private_restore(const char* root)
++    {
++        GameSession g;
++        std::string e;
++        Config config;
++        config.data_dir = root;
++        CHECK(g.initialize() && g.resources.mount_game(config, e));
++        ModelView scene;
++        for (unsigned i = 0; i < 3; ++i)
++        {
++            CHECK(g.request_world("01_SubwayA", e) && g.enter_player(e) && g.step(1. / 60));
++            auto* p = g.server_shell.Player(g.local_client);
++            p->m_damage.SetHitPoints(73);
++            p->m_InventoryMgr.SetAmmoCount(1, 17);
++            PlayerRestoreState s;
++            CHECK(g.capture_player(s, e));
++            auto old = p->m_hObject;
++            CHECK(g.leave_player() && !g.objects.get(old));
++            if (!g.restore_player(s, e))
++            {
++                std::cerr << e << '\n';
++                return false;
++            }
++            p = g.server_shell.Player(g.local_client);
++            CHECK(p->respawns == 0 && p->m_damage.m_fHitPoints == 73 && p->m_InventoryMgr.GetAmmoCount(1) == 17);
++            CHECK(g.client_shell.stats.health == 73 && g.client_shell.position.x == s.position.x);
++            g.client_shell.player_visible = true;
++            CHECK(update_model_scene(g, scene, e) && !scene.world_draws.empty());
++            auto it = std::find_if(scene.entries.begin(), scene.entries.end(),
++                                   [&](const auto& v) { return v.object == g.objects.get(p->m_hObject)->id; });
++            CHECK(it != scene.entries.end() && it->triangles == 941);
++            CHECK(g.step(1. / 60) && p->movement_messages == 2);
++            CHECK(g.unload_world() && !g.server.string_count() && g.objects.attachments().empty());
++            CHECK(!CDestructable::m_dwNumDestructables && !AI_Mgr::m_dwNumCabal && !AI_Mgr::m_dwNumMonster);
++            scene.clear();
++            std::cout << "cycle=" << i
++                      << " restored client, 73 HP/17 bullets, Caleb 941 triangles, movement, complete unload\n";
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    const std::map<std::string, std::function<bool(const char*)>> cases{
++        {"roundtrip", roundtrip}, {"failures", failures}, {"lifetime", lifetime}, {"private", private_restore}};
++    if (argc != 3)
++        return 2;
++    const auto test = cases.find(argv[1]);
++    return test != cases.end() && test->second(argv[2]) ? 0 : 1;
++}

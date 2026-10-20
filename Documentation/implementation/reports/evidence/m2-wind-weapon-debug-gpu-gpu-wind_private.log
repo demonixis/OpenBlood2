@@ -1,0 +1,94 @@
+655/655 Testing: gpu.wind_private
+655/655 Test: gpu.wind_private
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/wind_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/debug/tests/wind-private-gpu" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"gpu.wind_private" start time: Oct 17 01:48 CEST
+Output:
+----------------------------------------------------------
+Original shockwave scale850 alpha.375: 168 triangles, 2330 changed pixels
+<end of output>
+Test time =   0.85 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.wind_private" end time: Oct 17 01:48 CEST
+"gpu.wind_private" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 17 01:48 CEST
+
+brushes =   2.52 sec*proc
+
+cameras =   2.66 sec*proc
+
+character =  19.96 sec*proc
+
+cinematics =   2.65 sec*proc
+
+containers =   6.52 sec*proc
+
+doors =   2.40 sec*proc
+
+energy =   0.88 sec*proc
+
+explosion_flames =   1.68 sec*proc
+
+explosion_fragments =   0.90 sec*proc
+
+explosion_models =   0.91 sec*proc
+
+explosion_rings =   0.89 sec*proc
+
+gpu = 179.29 sec*proc
+
+interaction =   7.81 sec*proc
+
+keyframes =   2.63 sec*proc
+
+lights =   2.58 sec*proc
+
+model_view =   1.41 sec*proc
+
+movement =  18.74 sec*proc
+
+naga =   0.92 sec*proc
+
+object_particles =   0.90 sec*proc
+
+objectives =   4.83 sec*proc
+
+pickups =   2.67 sec*proc
+
+player =   2.65 sec*proc
+
+player_controls =   5.75 sec*proc
+
+player_keepalive =   4.47 sec*proc
+
+player_restore =   3.00 sec*proc
+
+private = 170.47 sec*proc
+
+randomsound =  13.52 sec*proc
+
+sceneexplosion =   2.64 sec*proc
+
+session_playback =   1.53 sec*proc
+
+sound =   2.68 sec*proc
+
+sprite_view =   1.41 sec*proc
+
+sprites =   2.60 sec*proc
+
+triggers =   2.75 sec*proc
+
+weapon_sprites =   2.07 sec*proc
+
+weapons =  19.39 sec*proc
+
+wind =   1.25 sec*proc
+
+world_view =  20.97 sec*proc
+
+worldpaths =   2.60 sec*proc
+

@@ -1,0 +1,33 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start  25: gpu.lifecycle
+1/9 Test  #25: gpu.lifecycle ....................   Passed    3.15 sec
+    Start 196: gpu.objectives
+2/9 Test #196: gpu.objectives ...................   Passed    6.86 sec
+    Start 357: gpu.world_depth
+3/9 Test #357: gpu.world_depth ..................   Passed    0.43 sec
+    Start 617: gpu.explosion_flame_alpha
+4/9 Test #617: gpu.explosion_flame_alpha ........   Passed    0.38 sec
+    Start 648: gpu.mouse_combat
+5/9 Test #648: gpu.mouse_combat .................   Passed   14.62 sec
+    Start 649: gpu.corpse_clearance
+6/9 Test #649: gpu.corpse_clearance .............   Passed   17.98 sec
+    Start 814: gpu.level_change
+7/9 Test #814: gpu.level_change .................   Passed    6.46 sec
+    Start 822: gpu.particle_stream_alpha
+8/9 Test #822: gpu.particle_stream_alpha ........   Passed    0.45 sec
+    Start 823: gpu.particle_stream_private
+9/9 Test #823: gpu.particle_stream_private ......   Passed    8.84 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Label Time Summary:
+explosion_flames    =   0.38 sec*proc (1 test)
+gpu                 =  59.17 sec*proc (9 tests)
+objectives          =   6.86 sec*proc (1 test)
+particle_stream     =   9.30 sec*proc (2 tests)
+player_controls     =  32.59 sec*proc (2 tests)
+private             =  54.76 sec*proc (5 tests)
+world               =   6.46 sec*proc (1 test)
+world_view          =   0.43 sec*proc (1 test)
+
+Total Test time (real) =  59.18 sec

@@ -1,0 +1,3 @@
+/home/yann/projects/lithtech/Blood2/cmake/../src/engine/shaders/world.vert
+/home/yann/projects/lithtech/Blood2/cmake/../src/engine/shaders/world.frag
+Both embedded SPIR-V headers reproduce byte-for-byte.

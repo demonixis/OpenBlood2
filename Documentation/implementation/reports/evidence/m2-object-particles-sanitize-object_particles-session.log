@@ -1,0 +1,14 @@
+544/545 Testing: object_particles.session
+544/545 Test: object_particles.session
+Command: "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object_particle_tests" "session" "/home/yann/projects/lithtech/Blood2/build/sanitize/tests/object-particles-session"
+Directory: /home/yann/projects/lithtech/Blood2/build/sanitize/tests
+"object_particles.session" start time: Oct 16 21:44 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"object_particles.session" end time: Oct 16 21:44 CEST
+"object_particles.session" time elapsed: 00:00:00
+----------------------------------------------------------

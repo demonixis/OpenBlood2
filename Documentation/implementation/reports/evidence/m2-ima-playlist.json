@@ -1,0 +1,198 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "f89101114c282223d8a50f7683539ce8b65fd24f",
+  "status": "M2 incomplete; original level selection and finite transition/list audition; no game MUSIC/live repeat or switching",
+  "frozen_sources": {
+    "CMakeLists.txt": "3493da8ef14d6479f653de7312830ba1a423b6e60bed7a0956cff9f6eaace334",
+    "tests/CMakeLists.txt": "597ef5f433f77df97a3525a33270517c02de66c483b770ed7d85dc5abb673bba",
+    "src/engine/ima_playlist.h": "d3372aff61344c8024103e80baffd9a9f1f5bafdf538eea7ac6c2941e0b19139",
+    "src/engine/ima_playlist.cpp": "9d2a5f722aac23ca2d3ce527bf56395023df1425ba1886030d8ee82544a27493",
+    "src/engine/ima_program.h": "1b5dbf18b545e64012420b2df35acf5cca88a53d8cff9ed757512ecd0a0db68f",
+    "src/engine/ima_program.cpp": "870664afcc52bfb9f050f3d2d49ab8b57e88cb59d67ee1560bf0c7a63e1c2fd6",
+    "src/game/original/Music.h": "263899d33f4fe6c27a134b6346b76fd34970ff57dbfb51d3b4afb545b75818a1",
+    "src/game/original/Music.cpp": "33b7dd7a1242a6fe28a29dd1c9bd9ef5296e4d5e4a8e1df869f55e9cf77e7fd4",
+    "src/game/music_catalog.h": "f3e6502be176951b86ba93885a5e4f3764f6ff61a3585680a5db33003f13dbb9",
+    "src/game/music_catalog.cpp": "fef7715f9ac2b67ec7cf451078a02f05293207a3eed485351a3bd8d1290b6ac2",
+    "src/app/inspector_world_sounds.cpp": "6cabf3f0c5c0dcdab571e0eab74174130de48a02314212419d7ddde1880cd11b",
+    "src/app/world_sound_smoke.cpp": "729c109acf697ffb55b5f1d64c488c1262d3225edcb7c4cf40ed1d5c96572f23",
+    "tests/ima_playlist_tests.cpp": "93ebb09fc8fc3493b17b00b4ceae726c7024587a9609e4f58d66f72f1de24e42",
+    "tests/ima_program_tests.cpp": "0175c75e8a5d54324523074a7cd0730c90b5638b8cf305c59200f7c0fe6dc002"
+  },
+  "results": {
+    "debug-tests": {
+      "passed": 148,
+      "wall_seconds": 33.36
+    },
+    "release-tests": {
+      "passed": 148,
+      "wall_seconds": 6.57
+    },
+    "sanitize-tests": {
+      "passed": 148,
+      "wall_seconds": 131.68
+    },
+    "debug-gpu": {
+      "passed": 2,
+      "wall_seconds": 25.76
+    },
+    "release-gpu": {
+      "passed": 2,
+      "wall_seconds": 9.54
+    }
+  },
+  "private_playlists": {
+    "debug-tests": "Finite level auditions 13 / notes 2715 / events 8596 / nonzero PCM 2743680",
+    "release-tests": "Finite level auditions 13 / notes 2715 / events 8596 / nonzero PCM 2743680",
+    "sanitize-tests": "Finite level auditions 13 / notes 2715 / events 8596 / nonzero PCM 2743680"
+  },
+  "compiler_warnings": {
+    "debug": [],
+    "release": [],
+    "sanitize": []
+  },
+  "original_selection_probe": {
+    "source": "sources/blood2/ClientShellDLL/Music.cpp",
+    "source_sha256": "1024e355e8da92ba670b96fc7cec5a57f301ea45e18f0a43f910a914f6e24ee0",
+    "cases": 65536,
+    "accepted_requests": 13,
+    "decision_fnv1a64": "17078631686421749893",
+    "scope": "Unchanged original PlayMusicLevel and TransitionToLevel decision branches; initialized IMA, recorded PlayList sink returns true. No audio/engine call success inferred.",
+    "compiler": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)"
+  },
+  "commands": [
+    "python3 Documentation/Implementation/evidence/m2-ima-playlist-validation.py {debug,release,sanitize} (three -j1 builds; selected CTests at -j2)",
+    "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json SDL_AUDIODRIVER=dummy ctest --test-dir build/{debug,release} -R ^gpu\\.(sound|player_keepalive)$ --output-on-failure --output-junit /tmp/b2-ima-playlist-{debug,release}-gpu.xml",
+    "python3 Documentation/Implementation/evidence/m2-ima-playlist-probe.py sources/blood2",
+    ".cache/format-venv/bin/clang-format --dry-run --Werror (twelve modified/new C++ files)",
+    "python3 /tmp/b2-npc-integrity.py; python3 /tmp/b2-npc-links.py; git diff --check (raw .log/.xml excluded)"
+  ],
+  "limitations": [
+    "Original decision methods executed with initialized IMA and a recording successful PlayList observer; no engine playback inferred from that probe",
+    "Finite idle-clock audition only; requested live boundary and loop flags are displayed but not executed; no logical level mutation or successful MUSIC",
+    "Cross-section state, activation/lookahead and PCM/listening parity not verified; explicit seed reset, setup/global-preroll policy and gain",
+    "One immutable bank, bounded aggregate preparation, one atomic queue admission; broader banks retain known failures",
+    "NVIDIA Linux with SDL dummy audio; hidden/reload and inspector-free Release paths, no native Metal/Windows/mobile or listening comparison",
+    "New widgets exercised through their backend, not manually clicked; capture checks actual report"
+  ],
+  "capture": {
+    "path": "Blood2/build/debug/tests/world-sounds.png",
+    "sha256": "6c7b92b7c112b59543270088c048c9d6ef9a36155b9c806923b73c892ca14d4d",
+    "committed": false
+  },
+  "reference_integrity": {
+    "checked_inventory_files": 10923,
+    "changed_files": [],
+    "reference_repositories": [
+      {
+        "path": "OpenBlood2",
+        "commit": "195dc9d9c1001547d0a369c73e72ff79b696d053",
+        "status": ""
+      },
+      {
+        "path": "NoMadEngine",
+        "commit": "6d9107368e3b3208d98298c2c36f97f82cb4bc3f",
+        "status": ""
+      },
+      {
+        "path": "nomad",
+        "commit": "58fc2e788856ac8142006a40e45c882fd868f8bd",
+        "status": ""
+      },
+      {
+        "path": "sources/blood2",
+        "commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+        "status": ""
+      },
+      {
+        "path": "sources/Shogo_Aegis",
+        "commit": "e80c1a7ad0fa3b33e4b61d8623c6a959971b9477",
+        "status": ""
+      },
+      {
+        "path": "sources/lithtech",
+        "commit": "0eab18289bed72879eddb648d3311075b108cf46",
+        "status": ""
+      }
+    ]
+  },
+  "readme_preserved_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "files": [
+    {
+      "file": "m2-ima-playlist-probe.py",
+      "sha256": "10606fb18a47eb663ac0b22019994997126b491b775463fefbfe81de10171024"
+    },
+    {
+      "file": "m2-ima-playlist-probe.json",
+      "sha256": "09d7c3e33c0e68753720a11a6d28a6faddef10a4ede1d56021e36d4e9b3f12d5"
+    },
+    {
+      "file": "m2-ima-playlist-validation.py",
+      "sha256": "4ada259a64cdd2a10d37f10607d1389b3be0f8e8f2365b6e5087d126fbcb920a"
+    },
+    {
+      "file": "m2-ima-playlist-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "m2-ima-playlist-debug-tests.log",
+      "sha256": "9245d7756857db7fb9781aec04dffba7563f640b910d5fdf665f4da53f8bc986"
+    },
+    {
+      "file": "m2-ima-playlist-debug-tests.xml",
+      "sha256": "6eedebab4bcacc39e6a4119ec30102eccfe39d61b30ae13d2f05c154b7a95843"
+    },
+    {
+      "file": "m2-ima-playlist-release-tests.log",
+      "sha256": "f86afa06cba78fd6af09f729547923bcbe692f4d6042e48b7518d026b5abb577"
+    },
+    {
+      "file": "m2-ima-playlist-release-tests.xml",
+      "sha256": "16fec01bb43fc3c515d699bc5b0e42bd1831496448d914bb3b0812f25648f5f3"
+    },
+    {
+      "file": "m2-ima-playlist-sanitize-tests.log",
+      "sha256": "dd8aa6fce070fa222e685b371ee3a40486a09d76cd9ec3766f4ed54f8e8b82ec"
+    },
+    {
+      "file": "m2-ima-playlist-sanitize-tests.xml",
+      "sha256": "22c10e8c01346d67818ba9d0e0993acd399018ff1ade868f3998db6e03b27ca8"
+    },
+    {
+      "file": "m2-ima-playlist-debug-gpu.log",
+      "sha256": "c4a458a9a5f79c861af16437a0ae86bf5811c514d600aca00d03ef3f11bb3f86"
+    },
+    {
+      "file": "m2-ima-playlist-debug-gpu.xml",
+      "sha256": "4d9f00e5ccd433da8c9b685f8255fa4c26b2400d87a7685d30a8bd916540d92d"
+    },
+    {
+      "file": "m2-ima-playlist-release-gpu.log",
+      "sha256": "0b0c2a34fdc0f1ee6f65b755b73386a48721d5ae73d3d6d521efa555b5432df7"
+    },
+    {
+      "file": "m2-ima-playlist-release-gpu.xml",
+      "sha256": "2c45f4ce4f814b3319ee2892962bbf5045bbafe476a010e6f351e307f89790ba"
+    },
+    {
+      "file": "m2-ima-playlist-debug-build-final.log",
+      "sha256": "da785da5baf54757418c26b7ebca51fe8e791d49f418aa9e25bbbdaa936f6ae7"
+    },
+    {
+      "file": "m2-ima-playlist-release-build-final.log",
+      "sha256": "ecbb64f581a8811bc755a267e3cb904fde8c92374252d8a485854d970dbd0bca"
+    },
+    {
+      "file": "m2-ima-playlist-sanitize-build-final.log",
+      "sha256": "165b51ba807d63073d411e39b5fbb5a37459b544eacad953005b5757242e5322"
+    },
+    {
+      "file": "m2-ima-playlist-source-integrity.json",
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "file": "m2-ima-playlist-links.log",
+      "sha256": "58a1c22ae0983f320204e6523e9a82d2857ad491d3d6aee2a4560aa8eacc78c4"
+    }
+  ],
+  "implementation_commit": "a6ca134dd0e2e0e1849f4d2e99ea780db43fdd1b"
+}

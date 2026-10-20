@@ -1,0 +1,104 @@
+[0/2] Re-checking globbed directories...
+[1/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/ProximityBomb.cpp for CXX dependencies
+[2/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/destination_trial.cpp for CXX dependencies
+[3/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/level_change.cpp for CXX dependencies
+[4/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PickupObject.cpp for CXX dependencies
+[5/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/registration.cpp for CXX dependencies
+[6/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/session.cpp for CXX dependencies
+[7/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AI_Mgr.cpp for CXX dependencies
+[8/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AISight.cpp for CXX dependencies
+[9/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIFire.cpp for CXX dependencies
+[10/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIPerception.cpp for CXX dependencies
+[11/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIRuntime.cpp for CXX dependencies
+[12/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIAmmo.cpp for CXX dependencies
+[13/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AISmell.cpp for CXX dependencies
+[14/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIEscape.cpp for CXX dependencies
+[15/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AINavigationStates.cpp for CXX dependencies
+[16/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AILocomotion.cpp for CXX dependencies
+[17/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIDodge.cpp for CXX dependencies
+[18/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CultistAttack.cpp for CXX dependencies
+[19/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIScript.cpp for CXX dependencies
+[20/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIScriptFire.cpp for CXX dependencies
+[21/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIScriptMovement.cpp for CXX dependencies
+[22/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIDeath.cpp for CXX dependencies
+[23/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIState.cpp for CXX dependencies
+[24/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AIHitReaction.cpp for CXX dependencies
+[25/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Gib.cpp for CXX dependencies
+[26/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AITrigger.cpp for CXX dependencies
+[27/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AISound.cpp for CXX dependencies
+[28/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CultistAI.cpp for CXX dependencies
+[29/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/CivilianAI.cpp for CXX dependencies
+[30/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Gideon.cpp for CXX dependencies
+[31/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/AITarget.cpp for CXX dependencies
+[32/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/PlayerObj.cpp for CXX dependencies
+[33/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/InventoryMgr.cpp for CXX dependencies
+[34/272] Scanning /home/yann/projects/lithtech/Blood2/src/game/original/Destructable.cpp for CXX dependencies
+[35/272] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[36/133] Scanning /home/yann/projects/lithtech/Blood2/src/app/ai_model_key_smoke.cpp for CXX dependencies
+[37/133] Scanning /home/yann/projects/lithtech/Blood2/src/app/main.cpp for CXX dependencies
+[38/133] Scanning /home/yann/projects/lithtech/Blood2/src/app/pickup_smoke.cpp for CXX dependencies
+[39/133] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_skeleton.cpp for CXX dependencies
+[40/133] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector.cpp for CXX dependencies
+[41/133] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_perception_tests.cpp for CXX dependencies
+[42/133] Scanning /home/yann/projects/lithtech/Blood2/src/app/inspector_pickups.cpp for CXX dependencies
+[43/133] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_fire_tests.cpp for CXX dependencies
+[44/133] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_recovery_tests.cpp for CXX dependencies
+[45/133] Scanning /home/yann/projects/lithtech/Blood2/tests/ai_runtime_tests.cpp for CXX dependencies
+[46/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ProximityBomb.cpp.o
+[47/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/destination_trial.cpp.o
+[48/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/level_change.cpp.o
+[49/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PickupObject.cpp.o
+[50/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/session.cpp.o
+[51/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AI_Mgr.cpp.o
+[52/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AISight.cpp.o
+[53/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIFire.cpp.o
+[54/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIPerception.cpp.o
+[55/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIRuntime.cpp.o
+[56/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIAmmo.cpp.o
+[57/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AISmell.cpp.o
+[58/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIEscape.cpp.o
+[59/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/registration.cpp.o
+[60/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AINavigationStates.cpp.o
+[61/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AILocomotion.cpp.o
+[62/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CultistAttack.cpp.o
+[63/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIDodge.cpp.o
+[64/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIScript.cpp.o
+[65/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIScriptMovement.cpp.o
+[66/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIScriptFire.cpp.o
+[67/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIState.cpp.o
+[68/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIHitReaction.cpp.o
+[69/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AIDeath.cpp.o
+[70/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Gib.cpp.o
+[71/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AITrigger.cpp.o
+[72/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AISound.cpp.o
+[73/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CivilianAI.cpp.o
+[74/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/CultistAI.cpp.o
+[75/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/AITarget.cpp.o
+[76/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Gideon.cpp.o
+[77/133] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/PlayerObj.cpp.o
+[78/133] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[79/104] Generating CXX dyndep file tests/CMakeFiles/ai_perception_tests.dir/CXX.dd
+[80/104] Generating CXX dyndep file tests/CMakeFiles/ai_fire_tests.dir/CXX.dd
+[81/104] Generating CXX dyndep file tests/CMakeFiles/ai_recovery_tests.dir/CXX.dd
+[82/104] Generating CXX dyndep file tests/CMakeFiles/ai_runtime_tests.dir/CXX.dd
+[83/104] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/InventoryMgr.cpp.o
+[84/104] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Destructable.cpp.o
+[85/104] Linking CXX static library libblood2_game.a
+[86/104] Building CXX object CMakeFiles/blood2_app.dir/src/app/ai_model_key_smoke.cpp.o
+[87/104] Building CXX object CMakeFiles/blood2_app.dir/src/app/pickup_smoke.cpp.o
+[88/104] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_skeleton.cpp.o
+[89/104] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[90/104] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector_pickups.cpp.o
+[91/104] Building CXX object CMakeFiles/blood2_app.dir/src/app/inspector.cpp.o
+[92/104] Building CXX object tests/CMakeFiles/ai_perception_tests.dir/ai_perception_tests.cpp.o
+[93/104] Building CXX object tests/CMakeFiles/ai_fire_tests.dir/ai_fire_tests.cpp.o
+[94/104] Building CXX object tests/CMakeFiles/ai_recovery_tests.dir/ai_recovery_tests.cpp.o
+[95/104] Linking CXX executable blood2
+[96/104] Linking CXX executable tests/object_contract_tests
+[97/104] Linking CXX executable tests/pickup_audio_tests
+[98/104] Linking CXX executable tests/pickup_tests
+[99/104] Building CXX object tests/CMakeFiles/ai_runtime_tests.dir/ai_runtime_tests.cpp.o
+[100/104] Linking CXX executable tests/ai_fire_tests
+[101/104] Linking CXX executable tests/ai_perception_tests
+[102/104] Linking CXX executable tests/ai_recovery_tests
+[103/104] Linking CXX executable tests/ai_runtime_tests

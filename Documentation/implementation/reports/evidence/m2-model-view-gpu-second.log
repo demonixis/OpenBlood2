@@ -1,0 +1,44 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 339: gpu.viewport
+1/7 Test #339: gpu.viewport .....................   Passed   10.77 sec
+    Start 344: model_view.sample
+2/7 Test #344: model_view.sample ................   Passed    0.00 sec
+    Start 345: model_view.rejects
+3/7 Test #345: model_view.rejects ...............   Passed    0.00 sec
+    Start 346: model_view.weapon_pose
+4/7 Test #346: model_view.weapon_pose ...........   Passed    0.00 sec
+    Start 347: model_view.subway
+5/7 Test #347: model_view.subway ................***Failed    0.34 sec
+Prepared world=2 close=0 entries=10
+Models\Powerups\beretta_pu.abc visible=1 triangles=68 error=
+Models\Characters\Caleb.abc visible=1 triangles=941 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+Models\path1.abc visible=0 triangles=0 error=
+right view weapon visible=0 triangles=0 error=
+Models: world=2 entries=10 vertices=3027 diagnostics=0 skin bytes=557060
+162: scene.world_draws.size() == 2 && scene.close_draws.empty()
+
+    Start 348: gpu.model_depth
+6/7 Test #348: gpu.model_depth ..................   Passed    0.44 sec
+    Start 349: gpu.model_private
+7/7 Test #349: gpu.model_private ................   Passed    0.75 sec
+
+86% tests passed, 1 tests failed out of 7
+
+Label Time Summary:
+gpu           =  11.96 sec*proc (3 tests)
+headless      =   0.34 sec*proc (4 tests)
+model_view    =   1.53 sec*proc (6 tests)
+private       =  11.86 sec*proc (3 tests)
+world_view    =  10.77 sec*proc (1 test)
+
+Total Test time (real) =  12.31 sec
+
+The following tests FAILED:
+	347 - model_view.subway (Failed)                        headless model_view private
+Errors while running CTest

@@ -1,0 +1,16 @@
+{
+  "name": "openblood2_build_override",
+  "command": [
+    "cmake",
+    "--build",
+    "/tmp/lithtech-audit-2bVxTF/openblood2",
+    "--parallel",
+    "4"
+  ],
+  "cwd": "/home/yann/projects/lithtech",
+  "started_utc": "2026-10-15T10:17:01.609843+00:00",
+  "elapsed_seconds": 109.605,
+  "timeout_seconds": 180,
+  "exit_code": 0,
+  "log": "openblood2_build_override.log"
+}

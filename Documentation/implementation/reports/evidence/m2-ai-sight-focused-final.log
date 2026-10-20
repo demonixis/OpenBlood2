@@ -1,0 +1,30 @@
+Test project /home/yann/projects/lithtech/Blood2/build/debug
+    Start 273: gpu.character
+1/9 Test #273: gpu.character ....................   Passed   16.92 sec
+    Start 315: ai_sight.subway
+    Start 314: ai_sight.catalog
+2/9 Test #314: ai_sight.catalog .................   Passed    0.22 sec
+    Start 310: ai_sight.filters
+3/9 Test #310: ai_sight.filters .................   Passed    0.00 sec
+    Start 313: ai_sight.lifetime
+4/9 Test #313: ai_sight.lifetime ................   Passed    0.00 sec
+    Start 309: ai_sight.head
+5/9 Test #309: ai_sight.head ....................   Passed    0.00 sec
+    Start 311: ai_sight.world
+6/9 Test #311: ai_sight.world ...................   Passed    0.00 sec
+    Start 308: ai_sight.body
+7/9 Test #308: ai_sight.body ....................   Passed    0.00 sec
+    Start 312: ai_sight.failures
+8/9 Test #312: ai_sight.failures ................   Passed    0.00 sec
+9/9 Test #315: ai_sight.subway ..................   Passed    0.58 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Label Time Summary:
+ai_sight     =   0.82 sec*proc (8 tests)
+character    =  16.92 sec*proc (1 test)
+gpu          =  16.92 sec*proc (1 test)
+headless     =   0.82 sec*proc (8 tests)
+private      =  17.72 sec*proc (3 tests)
+
+Total Test time (real) =  17.51 sec

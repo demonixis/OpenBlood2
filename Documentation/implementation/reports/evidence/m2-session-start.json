@@ -1,0 +1,2422 @@
+{
+  "date": "2026-10-18",
+  "implementation_parent": "8a0db703cde22a96d8f1d7ca84e94938432d49ce",
+  "implementation_commit": "c1004fc1e98e0644f98b9df04dcd947c5090b8c0",
+  "headless_regressions": {
+    "debug": {
+      "tests": 81,
+      "failures": 0,
+      "seconds": 127.35,
+      "cases": [
+        {
+          "name": "world.session_start",
+          "time": "0.0401061",
+          "status": "run"
+        },
+        {
+          "name": "world.level_change",
+          "time": "0.0628679",
+          "status": "run"
+        },
+        {
+          "name": "world.surface_effects",
+          "time": "0.34774",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_trials",
+          "time": "0.0394746",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_messages",
+          "time": "0.00228348",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_schema",
+          "time": "0.00231241",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_lifetime",
+          "time": "0.0124141",
+          "status": "run"
+        },
+        {
+          "name": "world.sprite_entries",
+          "time": "0.00684059",
+          "status": "run"
+        },
+        {
+          "name": "world.sound_entries",
+          "time": "0.00696385",
+          "status": "run"
+        },
+        {
+          "name": "world.rez_structure",
+          "time": "0.00187125",
+          "status": "run"
+        },
+        {
+          "name": "world.rez_rejection",
+          "time": "0.00190881",
+          "status": "run"
+        },
+        {
+          "name": "world.resource_mount",
+          "time": "0.00211179",
+          "status": "run"
+        },
+        {
+          "name": "world.world_properties",
+          "time": "0.00199889",
+          "status": "run"
+        },
+        {
+          "name": "world.world_geometry",
+          "time": "0.00191259",
+          "status": "run"
+        },
+        {
+          "name": "world.world_rejection",
+          "time": "0.0112833",
+          "status": "run"
+        },
+        {
+          "name": "world.mutations",
+          "time": "0.0495472",
+          "status": "run"
+        },
+        {
+          "name": "world.session_lifecycle",
+          "time": "0.00380767",
+          "status": "run"
+        },
+        {
+          "name": "world.session_messages",
+          "time": "0.00195364",
+          "status": "run"
+        },
+        {
+          "name": "world.original_trigger",
+          "time": "0.00232903",
+          "status": "run"
+        },
+        {
+          "name": "world.session_start_private",
+          "time": "5.72997",
+          "status": "run"
+        },
+        {
+          "name": "world.level_change_private",
+          "time": "5.71",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_trial_private",
+          "time": "5.8228",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_private",
+          "time": "3.28691",
+          "status": "run"
+        },
+        {
+          "name": "world.private",
+          "time": "1.27133",
+          "status": "run"
+        },
+        {
+          "name": "cli.world_modes",
+          "time": "2.18741",
+          "status": "run"
+        },
+        {
+          "name": "player.handles",
+          "time": "0.00459678",
+          "status": "run"
+        },
+        {
+          "name": "player.lifecycle",
+          "time": "0.00919385",
+          "status": "run"
+        },
+        {
+          "name": "player.rollback",
+          "time": "0.00986867",
+          "status": "run"
+        },
+        {
+          "name": "player.messages",
+          "time": "0.00879871",
+          "status": "run"
+        },
+        {
+          "name": "player.callbacks",
+          "time": "0.00797916",
+          "status": "run"
+        },
+        {
+          "name": "player.smell",
+          "time": "0.00966396",
+          "status": "run"
+        },
+        {
+          "name": "player.smell_private",
+          "time": "5.22438",
+          "status": "run"
+        },
+        {
+          "name": "player.private",
+          "time": "2.75563",
+          "status": "run"
+        },
+        {
+          "name": "sound.defaults",
+          "time": "0.0067716",
+          "status": "run"
+        },
+        {
+          "name": "sound.loops",
+          "time": "0.0092595",
+          "status": "run"
+        },
+        {
+          "name": "sound.resampling",
+          "time": "0.00667151",
+          "status": "run"
+        },
+        {
+          "name": "sound.lifetime",
+          "time": "0.00659041",
+          "status": "run"
+        },
+        {
+          "name": "sound.failures",
+          "time": "0.00675564",
+          "status": "run"
+        },
+        {
+          "name": "sound.metadata",
+          "time": "0.00697573",
+          "status": "run"
+        },
+        {
+          "name": "sound.catalog",
+          "time": "4.19005",
+          "status": "run"
+        },
+        {
+          "name": "sound.subway",
+          "time": "1.66702",
+          "status": "run"
+        },
+        {
+          "name": "sprites.reader",
+          "time": "0.00996538",
+          "status": "run"
+        },
+        {
+          "name": "sprites.clock",
+          "time": "0.00253633",
+          "status": "run"
+        },
+        {
+          "name": "sprites.properties",
+          "time": "0.0052248",
+          "status": "run"
+        },
+        {
+          "name": "sprites.placement",
+          "time": "0.00595651",
+          "status": "run"
+        },
+        {
+          "name": "sprites.ray",
+          "time": "0.0049946",
+          "status": "run"
+        },
+        {
+          "name": "sprites.failures",
+          "time": "0.00621949",
+          "status": "run"
+        },
+        {
+          "name": "sprites.catalog",
+          "time": "5.93788",
+          "status": "run"
+        },
+        {
+          "name": "sprites.subway",
+          "time": "1.43401",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.properties",
+          "time": "0.00684202",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.commands",
+          "time": "0.00690156",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.damage",
+          "time": "0.00664324",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.lifetime",
+          "time": "0.00695768",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.failures",
+          "time": "0.00694572",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.budget",
+          "time": "0.0217159",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.catalog",
+          "time": "4.07035",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.subway",
+          "time": "1.55594",
+          "status": "run"
+        },
+        {
+          "name": "exits.defaults",
+          "time": "0.0103724",
+          "status": "run"
+        },
+        {
+          "name": "exits.delayed",
+          "time": "0.011895",
+          "status": "run"
+        },
+        {
+          "name": "exits.broadcast",
+          "time": "0.00676568",
+          "status": "run"
+        },
+        {
+          "name": "exits.blocked",
+          "time": "0.0090771",
+          "status": "run"
+        },
+        {
+          "name": "exits.dead",
+          "time": "0.0083483",
+          "status": "run"
+        },
+        {
+          "name": "exits.queue",
+          "time": "0.0152646",
+          "status": "run"
+        },
+        {
+          "name": "exits.lifetime",
+          "time": "0.0126359",
+          "status": "run"
+        },
+        {
+          "name": "exits.catalog",
+          "time": "3.61678",
+          "status": "run"
+        },
+        {
+          "name": "sprite_view.geometry",
+          "time": "0.00302277",
+          "status": "run"
+        },
+        {
+          "name": "sprite_view.failures",
+          "time": "0.0686089",
+          "status": "run"
+        },
+        {
+          "name": "sprite_view.subway",
+          "time": "1.8967",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.defaults",
+          "time": "0.00539808",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.health",
+          "time": "0.00575758",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.client",
+          "time": "0.00837794",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.damage",
+          "time": "0.00576355",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.lifetime",
+          "time": "0.00819811",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.profile",
+          "time": "0.321296",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.subway",
+          "time": "7.7678",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.arena",
+          "time": "0.19556",
+          "status": "run"
+        },
+        {
+          "name": "coverage.catalog",
+          "time": "0.669208",
+          "status": "run"
+        },
+        {
+          "name": "coverage.observations",
+          "time": "0.00378208",
+          "status": "run"
+        },
+        {
+          "name": "coverage.private",
+          "time": "13.1036",
+          "status": "run"
+        },
+        {
+          "name": "train_session.private_30",
+          "time": "22.9531",
+          "status": "run"
+        },
+        {
+          "name": "train_session.private_60",
+          "time": "24.9846",
+          "status": "run"
+        }
+      ]
+    },
+    "release": {
+      "tests": 81,
+      "failures": 0,
+      "seconds": 18.99,
+      "cases": [
+        {
+          "name": "world.session_start",
+          "time": "0.00630486",
+          "status": "run"
+        },
+        {
+          "name": "world.level_change",
+          "time": "0.00979111",
+          "status": "run"
+        },
+        {
+          "name": "world.surface_effects",
+          "time": "0.0166582",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_trials",
+          "time": "0.00662039",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_messages",
+          "time": "0.00158389",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_schema",
+          "time": "0.00156372",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_lifetime",
+          "time": "0.00283898",
+          "status": "run"
+        },
+        {
+          "name": "world.sprite_entries",
+          "time": "0.00235144",
+          "status": "run"
+        },
+        {
+          "name": "world.sound_entries",
+          "time": "0.00270655",
+          "status": "run"
+        },
+        {
+          "name": "world.rez_structure",
+          "time": "0.00146019",
+          "status": "run"
+        },
+        {
+          "name": "world.rez_rejection",
+          "time": "0.00143265",
+          "status": "run"
+        },
+        {
+          "name": "world.resource_mount",
+          "time": "0.0018067",
+          "status": "run"
+        },
+        {
+          "name": "world.world_properties",
+          "time": "0.00150296",
+          "status": "run"
+        },
+        {
+          "name": "world.world_geometry",
+          "time": "0.0014198",
+          "status": "run"
+        },
+        {
+          "name": "world.world_rejection",
+          "time": "0.00174822",
+          "status": "run"
+        },
+        {
+          "name": "world.mutations",
+          "time": "0.00317289",
+          "status": "run"
+        },
+        {
+          "name": "world.session_lifecycle",
+          "time": "0.00194966",
+          "status": "run"
+        },
+        {
+          "name": "world.session_messages",
+          "time": "0.00144175",
+          "status": "run"
+        },
+        {
+          "name": "world.original_trigger",
+          "time": "0.00166136",
+          "status": "run"
+        },
+        {
+          "name": "world.session_start_private",
+          "time": "0.820024",
+          "status": "run"
+        },
+        {
+          "name": "world.level_change_private",
+          "time": "0.572608",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_trial_private",
+          "time": "0.567514",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_private",
+          "time": "0.272367",
+          "status": "run"
+        },
+        {
+          "name": "world.private",
+          "time": "0.113197",
+          "status": "run"
+        },
+        {
+          "name": "cli.world_modes",
+          "time": "0.2311",
+          "status": "run"
+        },
+        {
+          "name": "player.handles",
+          "time": "0.00236581",
+          "status": "run"
+        },
+        {
+          "name": "player.lifecycle",
+          "time": "0.00254534",
+          "status": "run"
+        },
+        {
+          "name": "player.rollback",
+          "time": "0.00239855",
+          "status": "run"
+        },
+        {
+          "name": "player.messages",
+          "time": "0.00240987",
+          "status": "run"
+        },
+        {
+          "name": "player.callbacks",
+          "time": "0.00229087",
+          "status": "run"
+        },
+        {
+          "name": "player.smell",
+          "time": "0.00249109",
+          "status": "run"
+        },
+        {
+          "name": "player.smell_private",
+          "time": "0.909216",
+          "status": "run"
+        },
+        {
+          "name": "player.private",
+          "time": "0.313394",
+          "status": "run"
+        },
+        {
+          "name": "sound.defaults",
+          "time": "0.0029737",
+          "status": "run"
+        },
+        {
+          "name": "sound.loops",
+          "time": "0.00365912",
+          "status": "run"
+        },
+        {
+          "name": "sound.resampling",
+          "time": "0.00307189",
+          "status": "run"
+        },
+        {
+          "name": "sound.lifetime",
+          "time": "0.0028328",
+          "status": "run"
+        },
+        {
+          "name": "sound.failures",
+          "time": "0.00245913",
+          "status": "run"
+        },
+        {
+          "name": "sound.metadata",
+          "time": "0.00272004",
+          "status": "run"
+        },
+        {
+          "name": "sound.catalog",
+          "time": "0.325309",
+          "status": "run"
+        },
+        {
+          "name": "sound.subway",
+          "time": "0.168927",
+          "status": "run"
+        },
+        {
+          "name": "sprites.reader",
+          "time": "0.0025651",
+          "status": "run"
+        },
+        {
+          "name": "sprites.clock",
+          "time": "0.00160546",
+          "status": "run"
+        },
+        {
+          "name": "sprites.properties",
+          "time": "0.00235323",
+          "status": "run"
+        },
+        {
+          "name": "sprites.placement",
+          "time": "0.00236608",
+          "status": "run"
+        },
+        {
+          "name": "sprites.ray",
+          "time": "0.00222003",
+          "status": "run"
+        },
+        {
+          "name": "sprites.failures",
+          "time": "0.00231151",
+          "status": "run"
+        },
+        {
+          "name": "sprites.catalog",
+          "time": "0.471919",
+          "status": "run"
+        },
+        {
+          "name": "sprites.subway",
+          "time": "0.125733",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.properties",
+          "time": "0.00280139",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.commands",
+          "time": "0.00254965",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.damage",
+          "time": "0.00234342",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.lifetime",
+          "time": "0.00256431",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.failures",
+          "time": "0.00238218",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.budget",
+          "time": "0.00324017",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.catalog",
+          "time": "0.224061",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.subway",
+          "time": "0.129775",
+          "status": "run"
+        },
+        {
+          "name": "exits.defaults",
+          "time": "0.00297349",
+          "status": "run"
+        },
+        {
+          "name": "exits.delayed",
+          "time": "0.00276334",
+          "status": "run"
+        },
+        {
+          "name": "exits.broadcast",
+          "time": "0.00224785",
+          "status": "run"
+        },
+        {
+          "name": "exits.blocked",
+          "time": "0.00259384",
+          "status": "run"
+        },
+        {
+          "name": "exits.dead",
+          "time": "0.00239643",
+          "status": "run"
+        },
+        {
+          "name": "exits.queue",
+          "time": "0.00274238",
+          "status": "run"
+        },
+        {
+          "name": "exits.lifetime",
+          "time": "0.00256178",
+          "status": "run"
+        },
+        {
+          "name": "exits.catalog",
+          "time": "0.377105",
+          "status": "run"
+        },
+        {
+          "name": "sprite_view.geometry",
+          "time": "0.00209556",
+          "status": "run"
+        },
+        {
+          "name": "sprite_view.failures",
+          "time": "0.0110265",
+          "status": "run"
+        },
+        {
+          "name": "sprite_view.subway",
+          "time": "0.161084",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.defaults",
+          "time": "0.00258169",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.health",
+          "time": "0.00222603",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.client",
+          "time": "0.00243118",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.damage",
+          "time": "0.00218067",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.lifetime",
+          "time": "0.00248112",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.profile",
+          "time": "0.0458143",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.subway",
+          "time": "1.25246",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.arena",
+          "time": "0.0270388",
+          "status": "run"
+        },
+        {
+          "name": "coverage.catalog",
+          "time": "0.0481868",
+          "status": "run"
+        },
+        {
+          "name": "coverage.observations",
+          "time": "0.00215501",
+          "status": "run"
+        },
+        {
+          "name": "coverage.private",
+          "time": "2.54947",
+          "status": "run"
+        },
+        {
+          "name": "train_session.private_30",
+          "time": "4.23476",
+          "status": "run"
+        },
+        {
+          "name": "train_session.private_60",
+          "time": "4.84559",
+          "status": "run"
+        }
+      ]
+    },
+    "sanitize": {
+      "tests": 81,
+      "failures": 0,
+      "seconds": 662.65,
+      "cases": [
+        {
+          "name": "world.session_start",
+          "time": "0.182333",
+          "status": "run"
+        },
+        {
+          "name": "world.level_change",
+          "time": "0.281095",
+          "status": "run"
+        },
+        {
+          "name": "world.surface_effects",
+          "time": "0.930685",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_trials",
+          "time": "0.180747",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_messages",
+          "time": "0.0175592",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_schema",
+          "time": "0.0189411",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_lifetime",
+          "time": "0.0679162",
+          "status": "run"
+        },
+        {
+          "name": "world.sprite_entries",
+          "time": "0.0420916",
+          "status": "run"
+        },
+        {
+          "name": "world.sound_entries",
+          "time": "0.0435795",
+          "status": "run"
+        },
+        {
+          "name": "world.rez_structure",
+          "time": "0.0171399",
+          "status": "run"
+        },
+        {
+          "name": "world.rez_rejection",
+          "time": "0.018064",
+          "status": "run"
+        },
+        {
+          "name": "world.resource_mount",
+          "time": "0.0185508",
+          "status": "run"
+        },
+        {
+          "name": "world.world_properties",
+          "time": "0.0190501",
+          "status": "run"
+        },
+        {
+          "name": "world.world_geometry",
+          "time": "0.0188713",
+          "status": "run"
+        },
+        {
+          "name": "world.world_rejection",
+          "time": "0.0564315",
+          "status": "run"
+        },
+        {
+          "name": "world.mutations",
+          "time": "0.217981",
+          "status": "run"
+        },
+        {
+          "name": "world.session_lifecycle",
+          "time": "0.0255127",
+          "status": "run"
+        },
+        {
+          "name": "world.session_messages",
+          "time": "0.0168965",
+          "status": "run"
+        },
+        {
+          "name": "world.original_trigger",
+          "time": "0.0196455",
+          "status": "run"
+        },
+        {
+          "name": "world.session_start_private",
+          "time": "31.1034",
+          "status": "run"
+        },
+        {
+          "name": "world.level_change_private",
+          "time": "24.5286",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_trial_private",
+          "time": "25.1879",
+          "status": "run"
+        },
+        {
+          "name": "world.destination_private",
+          "time": "13.9371",
+          "status": "run"
+        },
+        {
+          "name": "world.private",
+          "time": "4.8397",
+          "status": "run"
+        },
+        {
+          "name": "cli.world_modes",
+          "time": "8.40551",
+          "status": "run"
+        },
+        {
+          "name": "player.handles",
+          "time": "0.0288429",
+          "status": "run"
+        },
+        {
+          "name": "player.lifecycle",
+          "time": "0.0498263",
+          "status": "run"
+        },
+        {
+          "name": "player.rollback",
+          "time": "0.050606",
+          "status": "run"
+        },
+        {
+          "name": "player.messages",
+          "time": "0.0491878",
+          "status": "run"
+        },
+        {
+          "name": "player.callbacks",
+          "time": "0.0443875",
+          "status": "run"
+        },
+        {
+          "name": "player.smell",
+          "time": "0.0480518",
+          "status": "run"
+        },
+        {
+          "name": "player.smell_private",
+          "time": "30.2217",
+          "status": "run"
+        },
+        {
+          "name": "player.private",
+          "time": "12.0021",
+          "status": "run"
+        },
+        {
+          "name": "sound.defaults",
+          "time": "0.036617",
+          "status": "run"
+        },
+        {
+          "name": "sound.loops",
+          "time": "0.0439147",
+          "status": "run"
+        },
+        {
+          "name": "sound.resampling",
+          "time": "0.0355499",
+          "status": "run"
+        },
+        {
+          "name": "sound.lifetime",
+          "time": "0.0355052",
+          "status": "run"
+        },
+        {
+          "name": "sound.failures",
+          "time": "0.0357703",
+          "status": "run"
+        },
+        {
+          "name": "sound.metadata",
+          "time": "0.0366484",
+          "status": "run"
+        },
+        {
+          "name": "sound.catalog",
+          "time": "12.6576",
+          "status": "run"
+        },
+        {
+          "name": "sound.subway",
+          "time": "5.96269",
+          "status": "run"
+        },
+        {
+          "name": "sprites.reader",
+          "time": "0.0538799",
+          "status": "run"
+        },
+        {
+          "name": "sprites.clock",
+          "time": "0.016778",
+          "status": "run"
+        },
+        {
+          "name": "sprites.properties",
+          "time": "0.0312918",
+          "status": "run"
+        },
+        {
+          "name": "sprites.placement",
+          "time": "0.0329136",
+          "status": "run"
+        },
+        {
+          "name": "sprites.ray",
+          "time": "0.0297096",
+          "status": "run"
+        },
+        {
+          "name": "sprites.failures",
+          "time": "0.0339044",
+          "status": "run"
+        },
+        {
+          "name": "sprites.catalog",
+          "time": "30.6439",
+          "status": "run"
+        },
+        {
+          "name": "sprites.subway",
+          "time": "5.29483",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.properties",
+          "time": "0.0366279",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.commands",
+          "time": "0.0362114",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.damage",
+          "time": "0.0345799",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.lifetime",
+          "time": "0.0355973",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.failures",
+          "time": "0.0360879",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.budget",
+          "time": "0.0808367",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.catalog",
+          "time": "11.8662",
+          "status": "run"
+        },
+        {
+          "name": "sceneexplosion.subway",
+          "time": "5.47311",
+          "status": "run"
+        },
+        {
+          "name": "exits.defaults",
+          "time": "0.0446105",
+          "status": "run"
+        },
+        {
+          "name": "exits.delayed",
+          "time": "0.0557591",
+          "status": "run"
+        },
+        {
+          "name": "exits.broadcast",
+          "time": "0.0315342",
+          "status": "run"
+        },
+        {
+          "name": "exits.blocked",
+          "time": "0.0415845",
+          "status": "run"
+        },
+        {
+          "name": "exits.dead",
+          "time": "0.0386428",
+          "status": "run"
+        },
+        {
+          "name": "exits.queue",
+          "time": "0.0612458",
+          "status": "run"
+        },
+        {
+          "name": "exits.lifetime",
+          "time": "0.0498175",
+          "status": "run"
+        },
+        {
+          "name": "exits.catalog",
+          "time": "15.7089",
+          "status": "run"
+        },
+        {
+          "name": "sprite_view.geometry",
+          "time": "0.0181062",
+          "status": "run"
+        },
+        {
+          "name": "sprite_view.failures",
+          "time": "0.272365",
+          "status": "run"
+        },
+        {
+          "name": "sprite_view.subway",
+          "time": "7.07305",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.defaults",
+          "time": "0.0293253",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.health",
+          "time": "0.0319283",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.client",
+          "time": "0.04246",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.damage",
+          "time": "0.0317745",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.lifetime",
+          "time": "0.0406419",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.profile",
+          "time": "1.08394",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.subway",
+          "time": "41.3936",
+          "status": "run"
+        },
+        {
+          "name": "gideon_runtime.arena",
+          "time": "0.690201",
+          "status": "run"
+        },
+        {
+          "name": "coverage.catalog",
+          "time": "4.16621",
+          "status": "run"
+        },
+        {
+          "name": "coverage.observations",
+          "time": "0.0204262",
+          "status": "run"
+        },
+        {
+          "name": "coverage.private",
+          "time": "74.0099",
+          "status": "run"
+        },
+        {
+          "name": "train_session.private_30",
+          "time": "139.766",
+          "status": "run"
+        },
+        {
+          "name": "train_session.private_60",
+          "time": "152.652",
+          "status": "run"
+        }
+      ]
+    },
+    "debug-gpu": {
+      "tests": 5,
+      "failures": 0,
+      "seconds": 48.4,
+      "cases": [
+        {
+          "name": "gpu.lifecycle",
+          "time": "1.53707",
+          "status": "run"
+        },
+        {
+          "name": "gpu.cinematics",
+          "time": "3.29034",
+          "status": "run"
+        },
+        {
+          "name": "gpu.player_keepalive",
+          "time": "7.48755",
+          "status": "run"
+        },
+        {
+          "name": "gpu.level_change",
+          "time": "7.49128",
+          "status": "run"
+        },
+        {
+          "name": "gpu.train_session",
+          "time": "28.5721",
+          "status": "run"
+        }
+      ]
+    },
+    "release-gpu": {
+      "tests": 5,
+      "failures": 0,
+      "seconds": 13.58,
+      "cases": [
+        {
+          "name": "gpu.lifecycle",
+          "time": "1.47661",
+          "status": "run"
+        },
+        {
+          "name": "gpu.cinematics",
+          "time": "1.68767",
+          "status": "run"
+        },
+        {
+          "name": "gpu.player_keepalive",
+          "time": "1.97501",
+          "status": "run"
+        },
+        {
+          "name": "gpu.level_change",
+          "time": "1.54457",
+          "status": "run"
+        },
+        {
+          "name": "gpu.train_session",
+          "time": "6.87913",
+          "status": "run"
+        }
+      ]
+    }
+  },
+  "object_lifetime_checks": [
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "builtin_model"
+      ],
+      "code": 0,
+      "seconds": 0.0035493930045049638
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "original_objects"
+      ],
+      "code": 0,
+      "seconds": 0.0034612599993124604
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "nested_creation"
+      ],
+      "code": 0,
+      "seconds": 0.003439093998167664
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "reasons_properties"
+      ],
+      "code": 0,
+      "seconds": 0.0034423869801685214
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "scheduling"
+      ],
+      "code": 0,
+      "seconds": 0.0034363470040261745
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "deferred_removal"
+      ],
+      "code": 0,
+      "seconds": 0.0033931910002138466
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "aggregate_dispatch"
+      ],
+      "code": 0,
+      "seconds": 0.00343799201073125
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "handles_selection"
+      ],
+      "code": 0,
+      "seconds": 0.0034422299941070378
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "links_lists"
+      ],
+      "code": 0,
+      "seconds": 0.003446768008871004
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "messages_strings"
+      ],
+      "code": 0,
+      "seconds": 0.007421799004077911
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "message_churn"
+      ],
+      "code": 0,
+      "seconds": 1.5663172109925654
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "message_limit"
+      ],
+      "code": 0,
+      "seconds": 0.11386943701654673
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "unsupported_teardown"
+      ],
+      "code": 0,
+      "seconds": 0.015625567990355194
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_contract_tests",
+        "creation_failures"
+      ],
+      "code": 0,
+      "seconds": 0.00778743700357154
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_snapshot_tests",
+        "membership"
+      ],
+      "code": 0,
+      "seconds": 0.0035864039964508265
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_snapshot_tests",
+        "callbacks"
+      ],
+      "code": 0,
+      "seconds": 0.003442984016146511
+    },
+    {
+      "config": "debug",
+      "command": [
+        "build/debug/tests/object_snapshot_tests",
+        "churn"
+      ],
+      "code": 0,
+      "seconds": 0.06381815500208177
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "builtin_model"
+      ],
+      "code": 0,
+      "seconds": 0.003513711999403313
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "original_objects"
+      ],
+      "code": 0,
+      "seconds": 0.0034890089882537723
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "nested_creation"
+      ],
+      "code": 0,
+      "seconds": 0.0014088639873079956
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "reasons_properties"
+      ],
+      "code": 0,
+      "seconds": 0.0034377379924990237
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "scheduling"
+      ],
+      "code": 0,
+      "seconds": 0.0013893979776185006
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "deferred_removal"
+      ],
+      "code": 0,
+      "seconds": 0.0013230319891590625
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "aggregate_dispatch"
+      ],
+      "code": 0,
+      "seconds": 0.0013802970061078668
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "handles_selection"
+      ],
+      "code": 0,
+      "seconds": 0.0034159100032411516
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "links_lists"
+      ],
+      "code": 0,
+      "seconds": 0.0013373009860515594
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "messages_strings"
+      ],
+      "code": 0,
+      "seconds": 0.0033858310198411345
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "message_churn"
+      ],
+      "code": 0,
+      "seconds": 0.11366935199475847
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "message_limit"
+      ],
+      "code": 0,
+      "seconds": 0.031711718009319156
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "unsupported_teardown"
+      ],
+      "code": 0,
+      "seconds": 0.00351315998705104
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_contract_tests",
+        "creation_failures"
+      ],
+      "code": 0,
+      "seconds": 0.003432639001403004
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_snapshot_tests",
+        "membership"
+      ],
+      "code": 0,
+      "seconds": 0.001383978989906609
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_snapshot_tests",
+        "callbacks"
+      ],
+      "code": 0,
+      "seconds": 0.0013664099969901145
+    },
+    {
+      "config": "release",
+      "command": [
+        "build/release/tests/object_snapshot_tests",
+        "churn"
+      ],
+      "code": 0,
+      "seconds": 0.00754652198520489
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "builtin_model"
+      ],
+      "code": 0,
+      "seconds": 0.031776446994626895
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "original_objects"
+      ],
+      "code": 0,
+      "seconds": 0.031722406012704596
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "nested_creation"
+      ],
+      "code": 0,
+      "seconds": 0.031679485022323206
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "reasons_properties"
+      ],
+      "code": 0,
+      "seconds": 0.03179331700084731
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "scheduling"
+      ],
+      "code": 0,
+      "seconds": 0.031748276989674196
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "deferred_removal"
+      ],
+      "code": 0,
+      "seconds": 0.0318370160239283
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "aggregate_dispatch"
+      ],
+      "code": 0,
+      "seconds": 0.031757722987094894
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "handles_selection"
+      ],
+      "code": 0,
+      "seconds": 0.03186565299984068
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "links_lists"
+      ],
+      "code": 0,
+      "seconds": 0.031780768011230975
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "messages_strings"
+      ],
+      "code": 0,
+      "seconds": 0.06422484299400821
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "message_churn"
+      ],
+      "code": 0,
+      "seconds": 5.927558995987056
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "message_limit"
+      ],
+      "code": 0,
+      "seconds": 0.4144439279916696
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "unsupported_teardown"
+      ],
+      "code": 0,
+      "seconds": 0.06396211500396021
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_contract_tests",
+        "creation_failures"
+      ],
+      "code": 0,
+      "seconds": 0.06396777098416351
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_snapshot_tests",
+        "membership"
+      ],
+      "code": 0,
+      "seconds": 0.031872864987235516
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_snapshot_tests",
+        "callbacks"
+      ],
+      "code": 0,
+      "seconds": 0.03172811900731176
+    },
+    {
+      "config": "sanitize",
+      "command": [
+        "build/sanitize/tests/object_snapshot_tests",
+        "churn"
+      ],
+      "code": 0,
+      "seconds": 0.16406886800541542
+    }
+  ],
+  "nvidia_startup_checks": [
+    {
+      "name": "release-01_SubwayA",
+      "command": [
+        "build/release/blood2",
+        "--config",
+        "build/release/tests/empty.ini",
+        "--data-dir",
+        "/home/yann/.steam/steam/steamapps/common/Blood II/",
+        "--view-world",
+        "--world",
+        "01_SubwayA",
+        "--frames",
+        "12",
+        "--capture",
+        "/home/yann/projects/lithtech/Blood2/build/release/tests/session-start-01_SubwayA.png"
+      ],
+      "code": 0,
+      "verified": true,
+      "seconds": 1.3165797269903123,
+      "capture": "/home/yann/projects/lithtech/Blood2/build/release/tests/session-start-01_SubwayA.png"
+    },
+    {
+      "name": "release-02_CityHub",
+      "command": [
+        "build/release/blood2",
+        "--config",
+        "build/release/tests/empty.ini",
+        "--data-dir",
+        "/home/yann/.steam/steam/steamapps/common/Blood II/",
+        "--view-world",
+        "--world",
+        "02_CityHub",
+        "--frames",
+        "12",
+        "--capture",
+        "/home/yann/projects/lithtech/Blood2/build/release/tests/session-start-02_CityHub.png"
+      ],
+      "code": 0,
+      "verified": true,
+      "seconds": 1.5166877049778122,
+      "capture": "/home/yann/projects/lithtech/Blood2/build/release/tests/session-start-02_CityHub.png"
+    },
+    {
+      "name": "debug-01_SubwayA",
+      "command": [
+        "build/debug/blood2",
+        "--config",
+        "build/debug/tests/empty.ini",
+        "--data-dir",
+        "/home/yann/.steam/steam/steamapps/common/Blood II/",
+        "--view-world",
+        "--world",
+        "01_SubwayA",
+        "--frames",
+        "12",
+        "--capture",
+        "/home/yann/projects/lithtech/Blood2/build/debug/tests/session-start-01_SubwayA.png"
+      ],
+      "code": 0,
+      "verified": true,
+      "seconds": 2.2182950289861765,
+      "capture": "/home/yann/projects/lithtech/Blood2/build/debug/tests/session-start-01_SubwayA.png"
+    },
+    {
+      "name": "debug-02_CityHub",
+      "command": [
+        "build/debug/blood2",
+        "--config",
+        "build/debug/tests/empty.ini",
+        "--data-dir",
+        "/home/yann/.steam/steam/steamapps/common/Blood II/",
+        "--view-world",
+        "--world",
+        "02_CityHub",
+        "--frames",
+        "12",
+        "--capture",
+        "/home/yann/projects/lithtech/Blood2/build/debug/tests/session-start-02_CityHub.png"
+      ],
+      "code": 0,
+      "verified": true,
+      "seconds": 6.2252308079914656,
+      "capture": "/home/yann/projects/lithtech/Blood2/build/debug/tests/session-start-02_CityHub.png"
+    }
+  ],
+  "commands": [
+    {
+      "name": "release-build",
+      "command": [
+        "cmake",
+        "--build",
+        "build/release",
+        "--target",
+        "world_tests",
+        "player_tests",
+        "blood2_app",
+        "sprite_tests",
+        "sprite_view_tests",
+        "scene_explosion_tests",
+        "sound_tests",
+        "exit_tests",
+        "gideon_runtime_tests",
+        "service_coverage_tests",
+        "train_session_tests",
+        "level_change_gpu_tests",
+        "--parallel",
+        "3"
+      ],
+      "code": 0,
+      "seconds": 74.62904613598948
+    },
+    {
+      "name": "release",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build/release",
+        "-R",
+        "^(world\\.|player\\.|sound\\.|sprites?\\.|sprite_view\\.|sceneexplosion\\.|exits\\.|gideon_runtime\\.|coverage\\.|cli.world_modes|train_session\\.)",
+        "--output-on-failure",
+        "--output-junit",
+        "/tmp/b2-session-start-release.xml"
+      ],
+      "code": 0,
+      "seconds": 19.00147477898281
+    },
+    {
+      "name": "sanitize-build",
+      "command": [
+        "cmake",
+        "--build",
+        "build/sanitize",
+        "--target",
+        "world_tests",
+        "player_tests",
+        "blood2_app",
+        "sprite_tests",
+        "sprite_view_tests",
+        "scene_explosion_tests",
+        "sound_tests",
+        "exit_tests",
+        "gideon_runtime_tests",
+        "service_coverage_tests",
+        "train_session_tests",
+        "--parallel",
+        "3"
+      ],
+      "code": 0,
+      "seconds": 56.078147872991394
+    },
+    {
+      "name": "sanitize",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build/sanitize",
+        "-R",
+        "^(world\\.|player\\.|sound\\.|sprites?\\.|sprite_view\\.|sceneexplosion\\.|exits\\.|gideon_runtime\\.|coverage\\.|cli.world_modes|train_session\\.)",
+        "--output-on-failure",
+        "--output-junit",
+        "/tmp/b2-session-start-sanitize.xml"
+      ],
+      "code": 0,
+      "seconds": 662.6602918080171
+    }
+  ],
+  "environment": {
+    "gpu": {
+      "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+      "SDL_AUDIODRIVER": "dummy"
+    },
+    "sanitizers": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    },
+    "headless_audio": "SDL_AUDIODRIVER and SDL_AUDIO_DRIVER unset for regression suites"
+  },
+  "initial_failure": "First world.session_start_private assumed object clock zero across reload; corrected test asserts preserved entry-time clock. Production clock unchanged.",
+  "limits": [
+    "Selected 98 distinct non-GPU cases in each build, not the complete registered suite.",
+    "Four direct graphical startup checks plus five existing GPU cases in each Debug/Release; no native Metal execution.",
+    "Earlier GPU LeakSanitizer report has unresolved dynamically loaded module attribution; not rerun or suppressed here.",
+    "Startup is a checkpoint, not future-path or full M2 acceptance."
+  ],
+  "root_readme_sha256": "57c4e2c795cab83ccb1ab2a28a2ec152352582f17cde8c24ddf8bf53c794b423",
+  "files": [
+    {
+      "path": "m2-session-start-cityhub-first.log",
+      "bytes": 2695,
+      "sha256": "2873cdc91760bda8dfbfff1cb160c946a38d61c5856b53f556f97d8badbe4634"
+    },
+    {
+      "path": "m2-session-start-clock-test-build.log",
+      "bytes": 332,
+      "sha256": "3fa08bab4d504e5b9c58493daa12da3bcd44ed40882de31024836c51aec2d0bb"
+    },
+    {
+      "path": "m2-session-start-debug-build.log",
+      "bytes": 21767,
+      "sha256": "69a3eb5a37d1fab4930e57f9c2629172777333a557b4baa48d6bafb295c794db"
+    },
+    {
+      "path": "m2-session-start-debug-final-build.log",
+      "bytes": 4446,
+      "sha256": "2f66b72e0305587dcb5573bbe13f47705d0964b4ce19987f67c0ae341ffcbf5b"
+    },
+    {
+      "path": "m2-session-start-debug-gpu-start-01_SubwayA.log",
+      "bytes": 1051,
+      "sha256": "434d1abf6534347965d63e0538a5f0409367046a9346f83ec3f4ddcfea4ec9fe"
+    },
+    {
+      "path": "m2-session-start-debug-gpu-start-02_CityHub.log",
+      "bytes": 1077,
+      "sha256": "7183a78fcc0d5b562425b6adc4b5645ed878baed5da26b13578f3b2a6953a365"
+    },
+    {
+      "path": "m2-session-start-debug-gpu.log",
+      "bytes": 962,
+      "sha256": "0f6749eff6b964b0f3351ca152390ee6851feda407fdcd597cb03ffd89db781b"
+    },
+    {
+      "path": "m2-session-start-debug-gpu.xml",
+      "bytes": 6459,
+      "sha256": "e9a8f0d6ccf26825483eff87826a0bd8166df2cb2416c2c709f4a58b1d125649"
+    },
+    {
+      "path": "m2-session-start-debug-object-build.log",
+      "bytes": 723,
+      "sha256": "5c258a840035e556cec68dcf3177b12d3a83e20d36e552d0710ec95c1fe29263"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-aggregate_dispatch.log",
+      "bytes": 24,
+      "sha256": "f297541626bf634d1b31791bc76b17195d1922984edb0044d3953278dda6cbe6"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-builtin_model.log",
+      "bytes": 19,
+      "sha256": "8962108e1d7295413e133279c873f7200146c66c2cc272878e2cca28563e6a5b"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-creation_failures.log",
+      "bytes": 23,
+      "sha256": "1fa2b51d9a3da494fab8abad8f4a2ee79673bab61243f8b7821b1897cbf93de1"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-deferred_removal.log",
+      "bytes": 22,
+      "sha256": "18530f17711c37397d0918ee4237b222443af1d92ba48b8a265ab8bb528153d2"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-handles_selection.log",
+      "bytes": 23,
+      "sha256": "99aaa9f3bb2c997cf72988f12d2ba4a0834fd3c5f5b42aa202031c94b6b67c37"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-links_lists.log",
+      "bytes": 17,
+      "sha256": "013c125be5f035f34a911970c64f9a51a27ddad5a4fefc5ecdaf35c506f1e0d3"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-message_churn.log",
+      "bytes": 19,
+      "sha256": "b681ee159b8abb358f4218b69997b5e8ab4c5f598039c0178601b35cec1bec27"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-message_limit.log",
+      "bytes": 19,
+      "sha256": "bdb86fd08d7052eef252695e0afa881e46c03e7f00d92d5bc51aea042331315b"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-messages_strings.log",
+      "bytes": 22,
+      "sha256": "89677df2b66c7c7fff76a96d93790f58d68a6e3ba780d0af947c90095789b6b8"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-nested_creation.log",
+      "bytes": 21,
+      "sha256": "5ee23510110425c662f50f4b25740cbe91787b5320186acf5588965fb4896a37"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-original_objects.log",
+      "bytes": 22,
+      "sha256": "1e7b3e428dcad2b38832172475c85d8ff162e1d1f3cf55b1333ec501a5a45cb8"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-reasons_properties.log",
+      "bytes": 24,
+      "sha256": "3de79a633fd546bf53fedd03be56613556bf3bd2b779156d843bb840565235c8"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-scheduling.log",
+      "bytes": 16,
+      "sha256": "421357b422e7cd5f4ce9eb53775e7ecd90a24c6f5792c5e31bc4f82164350a3d"
+    },
+    {
+      "path": "m2-session-start-debug-object_contract_tests-unsupported_teardown.log",
+      "bytes": 26,
+      "sha256": "cf3d95a9acc7815311eb655d5a3c9d5f0438d7bda882e13b8a5467b0bffab4b6"
+    },
+    {
+      "path": "m2-session-start-debug-object_snapshot_tests-callbacks.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "m2-session-start-debug-object_snapshot_tests-churn.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "m2-session-start-debug-object_snapshot_tests-membership.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "m2-session-start-debug.log",
+      "bytes": 9669,
+      "sha256": "198949342e2479359e8da2070ff9583c89210c57a90fe829331b1c81148fce86"
+    },
+    {
+      "path": "m2-session-start-debug.xml",
+      "bytes": 34458,
+      "sha256": "6aecb4fed72aeeec200d161e9aed40027034b2a2e4d4c895128d964e6e7cd488"
+    },
+    {
+      "path": "m2-session-start-docs.py",
+      "bytes": 3253,
+      "sha256": "6a07d454332af24f72e92d7f5f5017f58d7e34949baf855170bfcd29effa3979"
+    },
+    {
+      "path": "m2-session-start-edit.py",
+      "bytes": 9821,
+      "sha256": "6be3a792d633b527331753df2ec1c61f3bfa64f7405bb3428c57e8d5fbcbe797"
+    },
+    {
+      "path": "m2-session-start-first.log",
+      "bytes": 805,
+      "sha256": "bbe305fb61b218eafb20ddf0b166cb63829fa1e64ce9a7c4ea05e01c25728084"
+    },
+    {
+      "path": "m2-session-start-first.xml",
+      "bytes": 1099,
+      "sha256": "1409b9b697bf5a5c3df0991cba3bdf3efd52504d6a8bcfdde86c9857a20b63e8"
+    },
+    {
+      "path": "m2-session-start-format.log",
+      "bytes": 29,
+      "sha256": "d41be52ecb6a18052adb51a316f7cdc77dba9eae981a3e8fb6b6bd47421ae065"
+    },
+    {
+      "path": "m2-session-start-gpu.json",
+      "bytes": 2419,
+      "sha256": "6157e08413951b9af78896fa9499c6b238a2b9d421fcbe2a95ac6dfef4a990e9"
+    },
+    {
+      "path": "m2-session-start-gpu.py",
+      "bytes": 1197,
+      "sha256": "b62427a5b5813f1f8cebfee195732d0628be329fa94f1e87d983273e3e332b8e"
+    },
+    {
+      "path": "m2-session-start-links.log",
+      "bytes": 32,
+      "sha256": "ec51eb52659a878195d4f7758883476a1aa3f68a038c4bae669163f098ce4576"
+    },
+    {
+      "path": "m2-session-start-objects.json",
+      "bytes": 9293,
+      "sha256": "404e5b7312daff06f0574cca1655d226988e70f814f5b211698fde815bcb31a9"
+    },
+    {
+      "path": "m2-session-start-objects.py",
+      "bytes": 1480,
+      "sha256": "bc0c313d2a832038aa8d26796260d400803fe785d2ed4f881baa57fecf792485"
+    },
+    {
+      "path": "m2-session-start-package.py",
+      "bytes": 4986,
+      "sha256": "638993a50df9ca0ee998bb91383da5a62be130b7690f5ba6c4caaeb0f1b46ce3"
+    },
+    {
+      "path": "m2-session-start-release-build.log",
+      "bytes": 22854,
+      "sha256": "5a41c5c1ff3d9e95378bdf169547f976b033de2e33c7acffe2a46f51002225c1"
+    },
+    {
+      "path": "m2-session-start-release-gpu-start-01_SubwayA.log",
+      "bytes": 1053,
+      "sha256": "8c2ba9d4fd14918864b9beac067e33362dfde6047da9bb471f245a64484d017b"
+    },
+    {
+      "path": "m2-session-start-release-gpu-start-02_CityHub.log",
+      "bytes": 1055,
+      "sha256": "2a672719023db981764c97a901dbc5e6de654e5a520304e28375e8f8666ff200"
+    },
+    {
+      "path": "m2-session-start-release-gpu.log",
+      "bytes": 964,
+      "sha256": "2c017f47d0c6ca10aed30893c9247f198d3c027e159d6548753e133741bf27ff"
+    },
+    {
+      "path": "m2-session-start-release-gpu.xml",
+      "bytes": 6461,
+      "sha256": "96493ab1731b262578ba700ad2732e50715e59f4aa3555c5dd11fb7606d7cce1"
+    },
+    {
+      "path": "m2-session-start-release-object-build.log",
+      "bytes": 723,
+      "sha256": "02ca762164ac642087572c0a3025b127ee88e3066912ae2d1ec2efa0d364e8a5"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-aggregate_dispatch.log",
+      "bytes": 24,
+      "sha256": "f297541626bf634d1b31791bc76b17195d1922984edb0044d3953278dda6cbe6"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-builtin_model.log",
+      "bytes": 19,
+      "sha256": "8962108e1d7295413e133279c873f7200146c66c2cc272878e2cca28563e6a5b"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-creation_failures.log",
+      "bytes": 23,
+      "sha256": "1fa2b51d9a3da494fab8abad8f4a2ee79673bab61243f8b7821b1897cbf93de1"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-deferred_removal.log",
+      "bytes": 22,
+      "sha256": "18530f17711c37397d0918ee4237b222443af1d92ba48b8a265ab8bb528153d2"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-handles_selection.log",
+      "bytes": 23,
+      "sha256": "99aaa9f3bb2c997cf72988f12d2ba4a0834fd3c5f5b42aa202031c94b6b67c37"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-links_lists.log",
+      "bytes": 17,
+      "sha256": "013c125be5f035f34a911970c64f9a51a27ddad5a4fefc5ecdaf35c506f1e0d3"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-message_churn.log",
+      "bytes": 19,
+      "sha256": "b681ee159b8abb358f4218b69997b5e8ab4c5f598039c0178601b35cec1bec27"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-message_limit.log",
+      "bytes": 19,
+      "sha256": "bdb86fd08d7052eef252695e0afa881e46c03e7f00d92d5bc51aea042331315b"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-messages_strings.log",
+      "bytes": 22,
+      "sha256": "89677df2b66c7c7fff76a96d93790f58d68a6e3ba780d0af947c90095789b6b8"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-nested_creation.log",
+      "bytes": 21,
+      "sha256": "5ee23510110425c662f50f4b25740cbe91787b5320186acf5588965fb4896a37"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-original_objects.log",
+      "bytes": 22,
+      "sha256": "1e7b3e428dcad2b38832172475c85d8ff162e1d1f3cf55b1333ec501a5a45cb8"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-reasons_properties.log",
+      "bytes": 24,
+      "sha256": "3de79a633fd546bf53fedd03be56613556bf3bd2b779156d843bb840565235c8"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-scheduling.log",
+      "bytes": 16,
+      "sha256": "421357b422e7cd5f4ce9eb53775e7ecd90a24c6f5792c5e31bc4f82164350a3d"
+    },
+    {
+      "path": "m2-session-start-release-object_contract_tests-unsupported_teardown.log",
+      "bytes": 26,
+      "sha256": "cf3d95a9acc7815311eb655d5a3c9d5f0438d7bda882e13b8a5467b0bffab4b6"
+    },
+    {
+      "path": "m2-session-start-release-object_snapshot_tests-callbacks.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "m2-session-start-release-object_snapshot_tests-churn.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "m2-session-start-release-object_snapshot_tests-membership.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "m2-session-start-release.log",
+      "bytes": 9671,
+      "sha256": "d877a43e7418b10a517529989b5f300c4ca0867f918e9c513da8bd5ac80da04b"
+    },
+    {
+      "path": "m2-session-start-release.xml",
+      "bytes": 34496,
+      "sha256": "108697fed1f739f885fbe67f29c6e23500375b7996b680ca29708357a97edd2e"
+    },
+    {
+      "path": "m2-session-start-sanitize-build.log",
+      "bytes": 22291,
+      "sha256": "4e841afcdb52b70fdb003a6dd2f3ddbb47e22ba6a087815fbf2481a5b66b2456"
+    },
+    {
+      "path": "m2-session-start-sanitize-object-build.log",
+      "bytes": 723,
+      "sha256": "5546d2e72802d32b5e0752bb307825b18210f8cfe98c3dc989c5cdb562fae88d"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-aggregate_dispatch.log",
+      "bytes": 24,
+      "sha256": "f297541626bf634d1b31791bc76b17195d1922984edb0044d3953278dda6cbe6"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-builtin_model.log",
+      "bytes": 19,
+      "sha256": "8962108e1d7295413e133279c873f7200146c66c2cc272878e2cca28563e6a5b"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-creation_failures.log",
+      "bytes": 23,
+      "sha256": "1fa2b51d9a3da494fab8abad8f4a2ee79673bab61243f8b7821b1897cbf93de1"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-deferred_removal.log",
+      "bytes": 22,
+      "sha256": "18530f17711c37397d0918ee4237b222443af1d92ba48b8a265ab8bb528153d2"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-handles_selection.log",
+      "bytes": 23,
+      "sha256": "99aaa9f3bb2c997cf72988f12d2ba4a0834fd3c5f5b42aa202031c94b6b67c37"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-links_lists.log",
+      "bytes": 17,
+      "sha256": "013c125be5f035f34a911970c64f9a51a27ddad5a4fefc5ecdaf35c506f1e0d3"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-message_churn.log",
+      "bytes": 19,
+      "sha256": "b681ee159b8abb358f4218b69997b5e8ab4c5f598039c0178601b35cec1bec27"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-message_limit.log",
+      "bytes": 19,
+      "sha256": "bdb86fd08d7052eef252695e0afa881e46c03e7f00d92d5bc51aea042331315b"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-messages_strings.log",
+      "bytes": 22,
+      "sha256": "89677df2b66c7c7fff76a96d93790f58d68a6e3ba780d0af947c90095789b6b8"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-nested_creation.log",
+      "bytes": 21,
+      "sha256": "5ee23510110425c662f50f4b25740cbe91787b5320186acf5588965fb4896a37"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-original_objects.log",
+      "bytes": 22,
+      "sha256": "1e7b3e428dcad2b38832172475c85d8ff162e1d1f3cf55b1333ec501a5a45cb8"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-reasons_properties.log",
+      "bytes": 24,
+      "sha256": "3de79a633fd546bf53fedd03be56613556bf3bd2b779156d843bb840565235c8"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-scheduling.log",
+      "bytes": 16,
+      "sha256": "421357b422e7cd5f4ce9eb53775e7ecd90a24c6f5792c5e31bc4f82164350a3d"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_contract_tests-unsupported_teardown.log",
+      "bytes": 26,
+      "sha256": "cf3d95a9acc7815311eb655d5a3c9d5f0438d7bda882e13b8a5467b0bffab4b6"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_snapshot_tests-callbacks.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_snapshot_tests-churn.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "m2-session-start-sanitize-object_snapshot_tests-membership.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "m2-session-start-sanitize.log",
+      "bytes": 9672,
+      "sha256": "9f70f1b83cf914ebcfaba3c0ede8068ee64b9bd8f3e853aea16cef03fd399962"
+    },
+    {
+      "path": "m2-session-start-sanitize.xml",
+      "bytes": 34418,
+      "sha256": "ed72cbea5285d2fa049f1d3324dee2a40878894ac1c9d1e5fb0b5bee744f5e24"
+    },
+    {
+      "path": "m2-session-start-tests.py",
+      "bytes": 10861,
+      "sha256": "68ce0c4b4e0cae2836a19acfaedfea5531f32564bb867fe0147377fbf0cdfb1a"
+    },
+    {
+      "path": "m2-session-start-verification.json",
+      "bytes": 1869,
+      "sha256": "6f1cc0189c0d8b4b42491835f486597d646c49dd8964db216a720d6ce248a678"
+    },
+    {
+      "path": "m2-session-start-verify.py",
+      "bytes": 1539,
+      "sha256": "8a20e0032d5aedbe7ca41459c664ff71953b7869987aa2398acc8213b57bb21e"
+    },
+    {
+      "path": "m2-session-start-links-final.log",
+      "bytes": 32,
+      "sha256": "7c6f712e9181cffcd7337c9c3ce8de196e2e0702e84cf0b7fd0c0fd188249d29"
+    },
+    {
+      "path": "m2-session-start-source-integrity.json",
+      "bytes": 831,
+      "sha256": "af6b08c014c0e4fdad836f0dd61be5f4548d66b3ad6c505a6a7602b140678bf4"
+    },
+    {
+      "path": "m2-session-start-code.patch",
+      "bytes": 46464,
+      "sha256": "2e415b7e0420b1c03489d0f241ce834854891f27a36bc873d53ea32a24ea0c9a"
+    },
+    {
+      "path": "m2-session-start-raw-whitespace.log",
+      "bytes": 7545,
+      "sha256": "666f15354df0235b0f3a6bd6bd31e115ca069ffa541c5b5e33f425cef283496f"
+    }
+  ],
+  "checks": {
+    "format": "16 changed C++ files clean",
+    "links": "4415 local Markdown links valid",
+    "whitespace": "Changed implementation and maintained Markdown checks pass. An unfiltered evidence check flags preserved trailing whitespace in raw logs, XML and patch context; raw bytes are intentionally unchanged.",
+    "references": "10923 inventoried files unchanged; six reference repositories clean"
+  }
+}

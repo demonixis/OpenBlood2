@@ -1,0 +1,963 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 0dc0f76..f3a065e 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -234,3 +234,10 @@ Preserve active-only GetNextObject, included SMELL points, unconsumed source obj
+ prefix-plus-first-digit matching, reverse enumeration and preflight/no-match output
+ semantics. Returned paths own their data; source handles are inspection-only.
+ AI following/actions, remaining classes/services and the M2 gate stay open.
++
++The latest [AI visibility evidence](../Documentation/Implementation/M2_AI_SIGHT.md) connects original AI_Mgr::CanSee
++and its VolumeBrush/destructible-glass filter. Read [contracts](docs/AI_SIGHT_CONTRACTS.md). Preserve
++body-first rays, head retry only after an obstruction, target-hit requirements and
++checked lifetime. Current head poses and hidden/reload inspection are exercised;
++range/FOV, target acquisition, states, attacks and production NPCs remain unported.
++The 17 unsupported SubwayA entries and actual M2 gate remain unchanged.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 40bb035..677bc7d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -40,7 +40,7 @@ target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original
+ target_sources(blood2_game PRIVATE src/game/server_pickups.cpp src/game/original/PickupObject.cpp
+     src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/PlayerContainers.cpp)
+-target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
++target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_clients.cpp src/game/original/PlayerObj.cpp src/game/original/BloodShells.cpp)
+ target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+     src/game/original/InventoryMgr.cpp src/game/original/Weapon.cpp src/game/original/ViewWeapon.cpp)
+diff --git a/README.md b/README.md
+index af3bed7..c91a478 100644
+--- a/README.md
++++ b/README.md
+@@ -268,3 +268,12 @@ The AI path-manager increment passed 307/307 tests in both Debug and inspector-f
+ Release, plus 284/284 sequential headless checks with Clang ASan/UBSan/leak
+ detection on Linux. Seven real SubwayA points are checked across hidden inspection
+ and reload; AI path following remains unavailable.
++
++Latest M2 continuation: [original AI visibility](../Documentation/Implementation/M2_AI_SIGHT.md) connects body/head
++ray checks, source volume/glass filtering and current-pose inspection. No NPC
++state machine or target acquisition is claimed; the complete M2 gate remains open.
++
++The AI visibility increment passed 315/315 tests in both Debug and inspector-free
++Release, plus 292/292 sequential headless checks with Clang ASan/UBSan/leak
++detection on Linux. The private catalog covers 240 animation midpoints across
++six NPC models; GPU inspection verifies hidden queries and fresh reload identities.
+diff --git a/docs/AI_MODEL_KEY_CONTRACTS.md b/docs/AI_MODEL_KEY_CONTRACTS.md
+index bef7884..6759714 100644
+--- a/docs/AI_MODEL_KEY_CONTRACTS.md
++++ b/docs/AI_MODEL_KEY_CONTRACTS.md
+@@ -105,3 +105,7 @@ CivilianAI, ten CultistAI, Gideon and ExitTrigger. AI hearing, aiming/fire/extra
+ attachments, required client FX and other services keep --start-game blocked
+ with exit 6. Other platforms, XR, audible hardware and retail gameplay parity
+ are not established by Linux tests and SDL dummy output.
++
++The [AI visibility continuation](AI_SIGHT_CONTRACTS.md) adds selected original CanSee
++and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
++Visibility queries do not implement target selection, AI states or complete M2.
+diff --git a/docs/AI_SIGHT_CONTRACTS.md b/docs/AI_SIGHT_CONTRACTS.md
+new file mode 100644
+index 0000000..b35523d
+--- /dev/null
++++ b/docs/AI_SIGHT_CONTRACTS.md
+@@ -0,0 +1,83 @@
++# Original AI visibility queries
++
++M2 remains incomplete. This ports AI_Mgr::CanSee and the two GlobalFilterFn flags
++it requests. See [source selections](M2_AI_SIGHT_SOURCES.json),
++[execution evidence](../../Documentation/Implementation/M2_AI_SIGHT.md),
++[node contracts](CHARACTER_ANIMATION_CONTRACTS.md), [object contracts](OBJECT_CONTRACTS.md)
++and [weapon rays](WEAPON_CONTRACTS.md). No production NPC is registered by this
++increment. Visibility is a query, not target acquisition or an AI state machine.
++
++## Preserved branch order
++
++The origin is the observer's current animated head node. If that query fails,
++CanSee uses its object position. The source used the MoveObj position snapshot;
++this port reads the current checked object position because that aggregate's
++update scheduling is not integrated. The destination of the first ray is the
++target's object position. The observer is excluded and nonsolid objects are
++ignored unless FLAG_RAYHIT is set. A hit on the target returns true immediately.
++
++Only a hit on a different object or the primary world triggers a target-head
++retry. A complete miss returns false without querying the head. If the target
++has a readable head node, a second ray starts at the same observer origin and
++ends at that current head position. It must also hit the target to return true.
++An unobstructed segment without a target impact is not visibility. Missing target
++heads leave the first obstruction in place. Rays are bounded to two per call.
++
++CanSee itself does not check range, facing angle, visibility flags, activity,
++player invisibility, hearing, factions or state. Those checks belong to other
++original methods and remain unported. Inactive live solid targets remain ray
++candidates. The add-on Nightmare always-visible branch is not imported.
++
++## Original object filter
++
++The typed SegmentObjects::SolidOrRayHit admits solid or explicitly ray-hittable
++objects. Blood II declares FLAG_RAYHIT for raycasts; the later engine intersection
++callback confirms its combination with IGNORE_NONSOLID. This narrow reference is
++adopted for CanSee without importing that engine or claiming binary equivalence.
++Existing weapon/USE selection modes stay unchanged.
++
++The typed SegmentFilter::AIVisibility selects only the source's IGNORE_LIQUID and
++IGNORE_GLASS behavior. Every VolumeBrush descendant is excluded, including
++non-liquid ladders and conveyors. A CDestructableBrush descendant is excluded
++only when its original GetSurfaceType returns SURFTYPE_GLASS and Destructable is
++true. CanDamage and FireThrough do not control this decision. An indestructible
++glass brush, a wooden FireThrough brush and a Door still obstruct the query.
++The existing GetSurfaceType material/debris fallback is retained.
++
++This is an object filter. Glass material on a primary-world polygon does not
++make that polygon transparent. Existing primary-world triangles, transformed
++world-model geometry and object AABBs still determine intersections. Skeletal
++hit spheres are not collision bodies. Retail ray edge/interior/tie behavior has
++not been verified; this is the existing replacement collision engine. Weapon
++and USE rays default to SegmentFilter::None and retain their previous behavior.
++Unknown filter values fail before collision traversal.
++
++## Lifetime and inspection
++
++Observer and target must be live checked identities. Pending, stale, null or
++foreign handles fail before any ray. Zero-length/invalid segments and missing
++collision indices return false with separate Invalid or Unavailable inspection
++outcomes; a missing service is never represented as clear sight. Node-query
++failures retain the original position/no-head fallback. No new string, message,
++object link or target ownership is acquired. CanSee does not change m_hTarget,
++move either object, advance animation or dispatch model keys.
++
++The bounded last-query record stores checked identities, copied endpoints,
++body/head collision results, ray count and outcome. A removed target or hit object
++remains historical data and is labelled as removed. The Skeleton panel reads
++this record without issuing gameplay queries. It shows origin fallback, head
++retry, hit object/world polygon and fraction. The existing diagnostic AI model-key
++probe also queries the actual player while the inspector is hidden and after
++reload; no authored NPC is replaced or counted as implemented.
++
++Synthetic checks cover direct target hits, behind/distant/inactive targets,
++nonsolid misses, head-only visibility, animated-head changes, missing heads,
++source material/class filtering, primary-world obstructions, invalid handles,
++unavailable collision and repeated removal/unload. Private checks sample six
++actual NPC models and two SubwayA cycles. Their controlled probes are explicitly
++diagnostic; they do not establish retail enemy behavior.
++
++SubwayA remains 187 live-created entries, four transferred world sounds, 372
++editor-only, 17 unsupported and zero failed, plus seven SelfTriggers. CivilianAI,
++CultistAI, Gideon, ExitTrigger, target selection, navigation/actions, attachments
++and required FX/services keep the M2 exit gate open and --start-game at exit 6.
+diff --git a/docs/M2_AI_SIGHT_SOURCES.json b/docs/M2_AI_SIGHT_SOURCES.json
+new file mode 100644
+index 0000000..14e3341
+--- /dev/null
++++ b/docs/M2_AI_SIGHT_SOURCES.json
+@@ -0,0 +1,77 @@
++{
++  "date": "2026-10-16",
++  "baseline_commit": "f6f090ef71116686cc17d5491dc2128ca9e8fcc3",
++  "source_files": [
++    {
++      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
++      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7",
++      "selected_lines": [
++        [
++          3071,
++          3130
++        ]
++      ],
++      "use": "CanSee body/head ray order and flags; add-on Nightmare branch excluded"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
++      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
++      "selected_lines": [
++        [
++          412,
++          477
++        ]
++      ],
++      "use": "GlobalFilterFn IGNORE_LIQUID and IGNORE_GLASS branches only"
++    },
++    {
++      "path": "sources/blood2/ObjectDLL/DestructableBrush.h",
++      "sha256": "bb5e5d9ac30ea0a4036c75ebf85ac009e6075260caec08c865d8b4cf99fb56bf",
++      "selected_lines": [
++        [
++          17,
++          30
++        ]
++      ],
++      "use": "IsDestructable is the authored destruction gate, not CanDamage"
++    },
++    {
++      "path": "sources/blood2/AppHeaders/basetypes_de.h",
++      "sha256": "ec8ec24c59c8b1529a938d9aae54635751cc6b68ce643f0557bf157e78e7d141",
++      "selected_lines": [
++        [
++          350,
++          358
++        ]
++      ],
++      "use": "Original FLAG_RAYHIT declaration"
++    },
++    {
++      "path": "sources/lithtech/runtime/world/src/fullintersectline.cpp",
++      "sha256": "f199f999a63986325675d9cb1bf2bdede98942e03cf0725dab937f506f6f3409",
++      "selected_lines": [
++        [
++          607,
++          627
++        ],
++        [
++          642,
++          647
++        ]
++      ],
++      "use": "Later engine confirms solid-or-rayhit selection with IGNORE_NONSOLID; reference only"
++    }
++  ],
++  "adaptations": [
++    "Typed SegmentFilter instead of arbitrary raw callback/userdata",
++    "Checked observer/target lifetime and explicit collision failure diagnostics",
++    "Current object position replaces unported MoveObj cached position fallback",
++    "Copied bounded inspection record; no target ownership"
++  ],
++  "not_implemented": [
++    "AI perception scheduling, range/FOV/invisibility checks and target acquisition",
++    "AI state machine, paths/actions, attacks and production NPC registration",
++    "Add-on Nightmare visibility override",
++    "Retail collision equivalence and complete M2"
++  ]
++}
+diff --git a/docs/MODEL_AND_COLLISION_CONTRACTS.md b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+index 4d86994..4ca9a1b 100644
+--- a/docs/MODEL_AND_COLLISION_CONTRACTS.md
++++ b/docs/MODEL_AND_COLLISION_CONTRACTS.md
+@@ -162,3 +162,7 @@ frame clocks to the existing active-object animation traversal. No model events
+ are synthesized for sprites. CastWorldRay uses the solid primary-world index for
+ original DetailSprite flush placement; dynamic objects are excluded by its source
+ query flags. DTX decoding/rendering and verified retail ray/timing parity remain open.
++
++The [AI visibility continuation](AI_SIGHT_CONTRACTS.md) adds selected original CanSee
++and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
++Visibility queries do not implement target selection, AI states or complete M2.
+diff --git a/docs/PROVENANCE.md b/docs/PROVENANCE.md
+index 2422637..12219bb 100644
+--- a/docs/PROVENANCE.md
++++ b/docs/PROVENANCE.md
+@@ -440,3 +440,11 @@ AI path-manager continuation: [source ledger](M2_PATH_MANAGER_SOURCES.json),
+ [contracts](PATH_MANAGER_CONTRACTS.md). Original snapshot/prefix/reverse-order rules
+ are retained with owned values. Later engine code confirms active enumeration only;
+ no donor container or backend is imported. AI following and action delivery remain open.
++
++## Original AI visibility
++
++Selected AI_Mgr::CanSee and GlobalFilterFn liquid/glass branches now use checked
++node/ray services. [Source ranges and hashes](M2_AI_SIGHT_SOURCES.json) and
++[contracts](AI_SIGHT_CONTRACTS.md) distinguish source rules from typed failures,
++current-position fallback and the existing replacement collision solver. No
++additional production AI class or general filter callback ABI is imported.
+diff --git a/docs/WEAPON_CONTRACTS.md b/docs/WEAPON_CONTRACTS.md
+index ee4297b..fe1f7c6 100644
+--- a/docs/WEAPON_CONTRACTS.md
++++ b/docs/WEAPON_CONTRACTS.md
+@@ -125,3 +125,7 @@ limits and the remaining 190 required SubwayA instances keep M2's exit gate open
+ The selected weapon path retains the player body eye as its origin; the external
+ CameraObj view is separate. Blocked is an acknowledged no-shot result, with no
+ ammo consumption. View-weapon visibility is a presentation request.
++
++The [AI visibility continuation](AI_SIGHT_CONTRACTS.md) adds selected original CanSee
++and a typed ray object filter. Default weapon/USE ray behavior is unchanged.
++Visibility queries do not implement target selection, AI states or complete M2.
+diff --git a/src/app/ai_model_key_smoke.cpp b/src/app/ai_model_key_smoke.cpp
+index df3ad62..8584790 100644
+--- a/src/app/ai_model_key_smoke.cpp
++++ b/src/app/ai_model_key_smoke.cpp
+@@ -49,7 +49,19 @@ namespace OpenBlood2
+             return false;
+         r->animation.looping = false;
+         id = r->id;
+-        return true;
++        return check_ai_sight_smoke(g, id);
++    }
++    bool check_ai_sight_smoke(GameSession& g, ObjectId id)
++    {
++        const auto* r = g.objects.get(id);
++        auto* ai = r ? dynamic_cast<AI_Mgr*>(r->game.get()) : nullptr;
++        const auto* player = g.server_shell.Player(g.local_client);
++        if (!ai || !player)
++            return false;
++        ai->CanSee(player->m_hObject);
++        const auto& s = ai->sight;
++        return s.origin_head && s.rays >= 1 && s.rays <= 2 && s.target == player->m_hObject &&
++               s.outcome != AISightOutcome::Invalid && s.outcome != AISightOutcome::Unavailable;
+     }
+     bool check_ai_model_key_smoke(GameSession& g, ObjectId id, std::uint64_t minimum_keys)
+     {
+diff --git a/src/app/ai_model_key_smoke.h b/src/app/ai_model_key_smoke.h
+index 607075f..f86c55b 100644
+--- a/src/app/ai_model_key_smoke.h
++++ b/src/app/ai_model_key_smoke.h
+@@ -4,4 +4,5 @@ namespace OpenBlood2
+ {
+     bool prepare_ai_model_key_smoke(GameSession&, ObjectId&);
+     bool check_ai_model_key_smoke(GameSession&, ObjectId, std::uint64_t minimum_keys);
++    bool check_ai_sight_smoke(GameSession&, ObjectId);
+ } // namespace OpenBlood2
+diff --git a/src/app/inspector_skeleton.cpp b/src/app/inspector_skeleton.cpp
+index 88bf957..79b21b4 100644
+--- a/src/app/inspector_skeleton.cpp
++++ b/src/app/inspector_skeleton.cpp
+@@ -56,7 +56,35 @@ namespace OpenBlood2
+             }
+             else
+                 ImGui::TextUnformatted("No original character animation table on this object");
+-            if (ai && ImGui::CollapsingHeader("Original AI model-key dispatch", ImGuiTreeNodeFlags_DefaultOpen))
++            if (ai && ImGui::CollapsingHeader("Original AI visibility", ImGuiTreeNodeFlags_DefaultOpen))
++            {
++                const auto& s = ai->sight;
++                ImGui::Text("%s | %u rays | %llu queries", ai_sight_outcome_name(s.outcome), s.rays,
++                            (unsigned long long)ai->sight_queries);
++                const auto* target = game.objects.get(s.target);
++                ImGui::Text("Target: %s",
++                            target && target->life == Life::Alive ? target->state.m_Name : "removed / none");
++                ImGui::Text("Origin (%s): %.2f %.2f %.2f", s.origin_head ? "animated head" : "object position",
++                            s.origin.x, s.origin.y, s.origin.z);
++                ImGui::Text("Body: %.2f %.2f %.2f | head retry: %s", s.body.x, s.body.y, s.body.z,
++                            s.retried_head ? "yes" : "no");
++                if (s.retried_head)
++                    ImGui::Text("Head: %.2f %.2f %.2f", s.head.x, s.head.y, s.head.z);
++                auto hit = [&](const char* name, const SegmentHit& h, SegmentResult result)
++                {
++                    if (result != SegmentResult::Hit)
++                        return;
++                    const auto* record = game.objects.get(h.object);
++                    ImGui::Text("%s hit: %s | fraction %.4f | polygon %u", name,
++                                h.object ? (record ? record->state.m_Name : "removed object") : "primary world",
++                                h.fraction, h.polygon);
++                };
++                hit("Body", s.body_hit, s.body_result);
++                hit("Head", s.head_hit, s.head_result);
++                ImGui::TextWrapped("Last simulation query. Requires a target hit; skips VolumeBrush and destructible "
++                                   "glass brushes. No field-of-view, distance, hearing or target acquisition implied.");
++            }
++            if (ai && ImGui::CollapsingHeader("Original AI model-key dispatch"))
+             {
+                 ImGui::Text("State %d | keys %llu | audio starts %llu / keys %llu | failures %llu", ai->m_nState,
+                             (unsigned long long)ai->model_keys, (unsigned long long)ai->audio_starts,
+@@ -76,8 +104,8 @@ namespace OpenBlood2
+                             (unsigned long long)ai->chance_suppressed, (unsigned long long)ai->busy_voices);
+                 ImGui::Text("No target %llu | unavailable actions %llu", (unsigned long long)ai->no_target,
+                             (unsigned long long)ai->unavailable_keys);
+-                ImGui::TextWrapped(
+-                    "Key dispatcher only. AI states, perception, attacks and special actions remain unavailable.");
++                ImGui::TextWrapped("Key dispatcher only. AI states, target acquisition, attacks and special actions "
++                                   "remain unavailable.");
+             }
+             if (character && ImGui::CollapsingHeader("Character motion keys",
+                                                      ai ? ImGuiTreeNodeFlags_None : ImGuiTreeNodeFlags_DefaultOpen))
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index f5b5598..e1feaf3 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -244,6 +244,7 @@ namespace
+         if (options.skeleton_smoke && !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
+             return 4;
+         const auto original_ai_key = smoke_ai_key;
++        bool ai_sight_hidden = false;
+         const bool path_smoke = options.player_smoke && game.world_path == "worlds/01_subwaya.dat";
+         PathList smoke_paths;
+         bool paths_hidden = false;
+@@ -483,6 +484,8 @@ namespace
+                 spdlog::error("Object simulation step failed");
+                 return 4;
+             }
++            if (options.skeleton_smoke && !inspector_visible)
++                ai_sight_hidden |= OpenBlood2::check_ai_sight_smoke(game, smoke_ai_key);
+             if (options.skeleton_smoke && !inspector_visible)
+                 ai_key_hidden |= OpenBlood2::check_ai_model_key_smoke(game, smoke_ai_key, 2);
+             if (options.skeleton_smoke && !inspector_visible)
+@@ -889,6 +892,7 @@ namespace
+                              character_motion_hidden, character_motion_reentered, !game.objects.get(original_motion));
+             }
+             bool ai_key_reentered = !options.skeleton_smoke;
++            bool ai_sight_reentered = !options.skeleton_smoke;
+             if (options.skeleton_smoke)
+             {
+                 if (game.objects.get(original_ai_key) || !OpenBlood2::prepare_ai_model_key_smoke(game, smoke_ai_key))
+@@ -901,6 +905,9 @@ namespace
+                 }
+                 spdlog::info("AI model-key probe: hidden={}, reentered={}, old handle invalidated={}", ai_key_hidden,
+                              ai_key_reentered, !game.objects.get(original_ai_key));
++                ai_sight_reentered = OpenBlood2::check_ai_sight_smoke(game, smoke_ai_key);
++                spdlog::info("AI sight probe: hidden={}, reentered={}, old handle invalidated={}", ai_sight_hidden,
++                             ai_sight_reentered, !game.objects.get(original_ai_key));
+             }
+             bool character_audio_reentered = !options.skeleton_smoke;
+             if (options.skeleton_smoke)
+@@ -929,9 +936,9 @@ namespace
+                 BLOOD2_INSPECTOR ? toggles == 2 && ui_frames > 0 && hidden_frames > 0 : ui_frames == 0 && toggles == 0;
+             if (frames < quit_frame || !resized || !quit_received || width != 1000 || height != 680 || !ui_ok ||
+                 !selection_cleared || (path_smoke && (!paths_hidden || !paths_reentered)) ||
+-                (options.skeleton_smoke &&
+-                 (!character_audio_hidden || !character_audio_reentered || !character_motion_hidden ||
+-                  !character_motion_reentered || !ai_key_hidden || !ai_key_reentered)) ||
++                (options.skeleton_smoke && (!character_audio_hidden || !character_audio_reentered ||
++                                            !character_motion_hidden || !character_motion_reentered || !ai_key_hidden ||
++                                            !ai_key_reentered || !ai_sight_hidden || !ai_sight_reentered)) ||
+                 (options.gpu_smoke && (game.server.string_count() != 0 || game.objects.snapshot().size() != 1)) ||
+                 (options.containers_smoke && !container_hidden) || (options.doors_smoke && !door_moved_hidden) ||
+                 (options.triggers_smoke && (!door_moved_hidden || !key_unlocked_hidden)) ||
+diff --git a/src/game/legacy/server_de.h b/src/game/legacy/server_de.h
+index a8fe1a7..3c450a8 100644
+--- a/src/game/legacy/server_de.h
++++ b/src/game/legacy/server_de.h
+@@ -67,7 +67,8 @@ class ServerDE : public CSBase
+     virtual OpenBlood2::SegmentResult CastWorldRay(DVector, DVector, OpenBlood2::SegmentHit&) = 0;
+     virtual OpenBlood2::SegmentResult IntersectSegment(
+         DVector from, DVector to, HOBJECT ignore, OpenBlood2::SegmentHit&, bool fire_through = false,
+-        OpenBlood2::SegmentObjects objects = OpenBlood2::SegmentObjects::SolidOnly) = 0;
++        OpenBlood2::SegmentObjects objects = OpenBlood2::SegmentObjects::SolidOnly,
++        OpenBlood2::SegmentFilter filter = OpenBlood2::SegmentFilter::None) = 0;
+     virtual DRESULT WriteDamage(HMESSAGEWRITE, const OpenBlood2::Damage&) = 0;
+     virtual bool ReadDamage(HMESSAGEREAD, OpenBlood2::Damage&) = 0;
+     // Source adaptation: client association is a checked object handle, never a
+diff --git a/src/game/original/AISight.cpp b/src/game/original/AISight.cpp
+new file mode 100644
+index 0000000..43b6eba
+--- /dev/null
++++ b/src/game/original/AISight.cpp
+@@ -0,0 +1,77 @@
++// Original AI_Mgr::CanSee and its GlobalFilterFn flags (Monolith, 1997/1998).
++// See AI_SIGHT_CONTRACTS.md for source scope, typed failures and geometry limits.
++#include "AI_Mgr.h"
++namespace OpenBlood2
++{
++    const char* ai_sight_outcome_name(AISightOutcome value)
++    {
++        switch (value)
++        {
++            case AISightOutcome::None:
++                return "Not queried";
++            case AISightOutcome::Body:
++                return "Visible: body hit";
++            case AISightOutcome::Head:
++                return "Visible: head retry hit";
++            case AISightOutcome::Blocked:
++                return "Blocked";
++            case AISightOutcome::Miss:
++                return "No target hit";
++            case AISightOutcome::Invalid:
++                return "Invalid query/identity";
++            case AISightOutcome::Unavailable:
++                return "Collision unavailable";
++        }
++        return "Unknown sight outcome";
++    }
++} // namespace OpenBlood2
++bool AI_Mgr::CanSee(HOBJECT target)
++{
++    using namespace OpenBlood2;
++    ++sight_queries;
++    sight = {};
++    sight.target = target; // Checked inspection identity; no ownership or target acquisition.
++    auto* server = GetServerDE();
++    if (!server || !server->IsObjectAlive(m_hObject) || !server->IsObjectAlive(target))
++    {
++        sight.outcome = AISightOutcome::Invalid;
++        return false;
++    }
++    DRotation rotation;
++    sight.origin_head = server->GetModelNodeTransform(m_hObject, "head", &sight.origin, &rotation);
++    if (!sight.origin_head)
++        server->GetObjectPos(m_hObject, &sight.origin); // Source cached MoveObj position; current pose in this engine.
++    server->GetObjectPos(target, &sight.body);
++    auto query = [&](DVector end, SegmentHit& hit, SegmentResult& result)
++    {
++        ++sight.rays;
++        result = server->IntersectSegment(sight.origin, end, m_hObject, hit, false, SegmentObjects::SolidOrRayHit,
++                                          SegmentFilter::AIVisibility);
++        if (result == SegmentResult::Invalid)
++            sight.outcome = AISightOutcome::Invalid;
++        else if (result == SegmentResult::Unavailable)
++            sight.outcome = AISightOutcome::Unavailable;
++        else if (result == SegmentResult::Miss)
++            sight.outcome = AISightOutcome::Miss;
++        else
++            sight.outcome = AISightOutcome::Blocked;
++        return result == SegmentResult::Hit;
++    };
++    if (!query(sight.body, sight.body_hit, sight.body_result))
++        return false; // Original misses do not attempt the target's head.
++    if (sight.body_hit.object == target)
++    {
++        sight.outcome = AISightOutcome::Body;
++        return true;
++    }
++    if (server->GetModelNodeTransform(target, "head", &sight.head, &rotation))
++    {
++        sight.retried_head = true;
++        if (query(sight.head, sight.head_hit, sight.head_result) && sight.head_hit.object == target)
++        {
++            sight.outcome = AISightOutcome::Head;
++            return true;
++        }
++    }
++    return false;
++}
+diff --git a/src/game/original/AI_Mgr.h b/src/game/original/AI_Mgr.h
+index 0369d3f..f2088f1 100644
+--- a/src/game/original/AI_Mgr.h
++++ b/src/game/original/AI_Mgr.h
+@@ -18,15 +18,40 @@ namespace OpenBlood2
+         PlaybackFailed
+     };
+     const char* ai_key_outcome_name(AIKeyOutcome);
++    enum class AISightOutcome
++    {
++        None,
++        Body,
++        Head,
++        Blocked,
++        Miss,
++        Invalid,
++        Unavailable
++    };
++    const char* ai_sight_outcome_name(AISightOutcome);
++    struct AISight
++    {
++        AISightOutcome outcome = AISightOutcome::None;
++        HOBJECT target = nullptr;
++        DVector origin{}, body{}, head{};
++        SegmentHit body_hit, head_hit;
++        SegmentResult body_result = SegmentResult::Miss, head_result = SegmentResult::Miss;
++        bool origin_head = false, retried_head = false;
++        unsigned rays = 0;
++    };
+ } // namespace OpenBlood2
+ 
+ // Selective original AI_Mgr::InitStatics/OnStringKey port. No production AI class
+-// registration, state machine, perception, Fire or MC_Extra implementation yet.
++// registration, state machine, target acquisition, Fire or MC_Extra implementation yet.
++// Selected CanSee queries are documented in AI_SIGHT_CONTRACTS.md.
+ class AI_Mgr : public CBaseCharacter
+ {
+   public:
+     static constexpr int StateIdle = 5, StateScript = 101;
+     bool InitStatics(std::shared_ptr<CAnim_Sound>);
++    bool CanSee(HOBJECT);
++    OpenBlood2::AISight sight;
++    std::uint64_t sight_queries = 0;
+     const CAnim_Sound* AnimSound() const
+     {
+         return m_pAnim_Sound.get();
+diff --git a/src/game/server_adapter.h b/src/game/server_adapter.h
+index 90f62db..ef8d390 100644
+--- a/src/game/server_adapter.h
++++ b/src/game/server_adapter.h
+@@ -98,7 +98,8 @@ namespace OpenBlood2
+         bool GetMovementState(HOBJECT, MovementState&) override;
+         SegmentResult CastWorldRay(DVector, DVector, SegmentHit&) override;
+         SegmentResult IntersectSegment(DVector, DVector, HOBJECT, SegmentHit&, bool fire_through = false,
+-                                       SegmentObjects objects = SegmentObjects::SolidOnly) override;
++                                       SegmentObjects objects = SegmentObjects::SolidOnly,
++                                       SegmentFilter filter = SegmentFilter::None) override;
+         DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
+         bool ReadDamage(HMESSAGEREAD, Damage&) override;
+         HCLIENT connect_client();
+diff --git a/src/game/server_weapons.cpp b/src/game/server_weapons.cpp
+index f47f53c..5bd4fe7 100644
+--- a/src/game/server_weapons.cpp
++++ b/src/game/server_weapons.cpp
+@@ -1,19 +1,23 @@
+ #include "engine/world_model.h"
+ #include "game/original/DestructableBrush.h"
+ #include "game/original/Door.h"
++#include "game/original/SurfaceTypes.h"
++#include "game/original/VolumeBrush.h"
+ #include "game/server_adapter.h"
+ #include <cmath>
+ 
+ namespace OpenBlood2
+ {
+     SegmentResult ServerAdapter::IntersectSegment(DVector from, DVector to, HOBJECT ignore, SegmentHit& out,
+-                                                  bool fire_through, SegmentObjects objects)
++                                                  bool fire_through, SegmentObjects objects, SegmentFilter filter)
+     {
+         trace_service("IntersectSegment");
+         out = {};
+         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
+-        if ((objects != SegmentObjects::SolidOnly && objects != SegmentObjects::All) || !physics_vector(from) ||
+-            !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
++        if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility) ||
++            (objects != SegmentObjects::SolidOnly && objects != SegmentObjects::SolidOrRayHit &&
++             objects != SegmentObjects::All) ||
++            !physics_vector(from) || !physics_vector(to) || (ignore && (!owner || owner->life != Life::Alive)) ||
+             vector_dot(vector_subtract(to, from), vector_subtract(to, from)) < 1e-12f)
+             return SegmentResult::Invalid;
+         if (!collision || !collision_ready)
+@@ -27,10 +31,20 @@ namespace OpenBlood2
+         {
+             const auto* record = objects_.get(id);
+             if (!record || record->life != Life::Alive || record->handle == ignore ||
+-                (objects == SegmentObjects::SolidOnly && !(record->state.m_Flags & FLAG_SOLID)))
+-                continue; // Original IGNORE_NONSOLID.
++                (objects != SegmentObjects::All &&
++                 !(record->state.m_Flags &
++                   (objects == SegmentObjects::SolidOrRayHit ? FLAG_SOLID | FLAG_RAYHIT : FLAG_SOLID))))
++                continue;
+             const auto* door = dynamic_cast<const Door*>(record->game.get());
+             const auto* brush = dynamic_cast<const CDestructableBrush*>(record->game.get());
++            // Original GlobalFilterFn, restricted to CanSee's two requested flags.
++            // IGNORE_LIQUID excludes every VolumeBrush subclass, not just liquids.
++            // Glass only passes when the object is a destructible brush. Baked
++            // world polygons, doors, CanDamage and FireThrough do not define this filter.
++            if (filter == SegmentFilter::AIVisibility &&
++                (dynamic_cast<const VolumeBrush*>(record->game.get()) ||
++                 (brush && brush->destructable && brush->GetSurfaceType() == SURFTYPE_GLASS)))
++                continue;
+             if (fire_through && ((door && door->fire_through) || (brush && brush->fire_through)))
+                 continue;
+             CollisionHit hit;
+diff --git a/src/game/weapon_messages.h b/src/game/weapon_messages.h
+index 3060f95..8974e76 100644
+--- a/src/game/weapon_messages.h
++++ b/src/game/weapon_messages.h
+@@ -41,7 +41,13 @@ namespace OpenBlood2
+     enum class SegmentObjects
+     {
+         SolidOnly,
+-        All
++        All,
++        SolidOrRayHit
++    };
++    enum class SegmentFilter
++    {
++        None,
++        AIVisibility // Original IGNORE_LIQUID | IGNORE_GLASS object filter.
+     };
+     enum class SegmentResult
+     {
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index b84ba57..8e1b952 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -544,3 +544,17 @@ if(BLOOD2_TEST_DATA_DIR)
+     add_test(NAME paths.catalog COMMAND path_manager_tests catalog "${BLOOD2_TEST_DATA_DIR}")
+     set_tests_properties(paths.catalog PROPERTIES LABELS "headless;private;paths" TIMEOUT 90)
+ endif()
++
++add_executable(ai_sight_tests ai_sight_tests.cpp)
++target_link_libraries(ai_sight_tests PRIVATE blood2_game)
++blood2_project_options(ai_sight_tests)
++foreach(case IN ITEMS body head filters world failures lifetime)
++    add_test(NAME ai_sight.${case} COMMAND ai_sight_tests "${case}")
++    set_tests_properties(ai_sight.${case} PROPERTIES LABELS "headless;ai_sight" TIMEOUT 30)
++endforeach()
++if(BLOOD2_TEST_DATA_DIR)
++    foreach(case IN ITEMS catalog subway)
++        add_test(NAME ai_sight.${case} COMMAND ai_sight_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
++        set_tests_properties(ai_sight.${case} PROPERTIES LABELS "headless;private;ai_sight" TIMEOUT 90)
++    endforeach()
++endif()
+diff --git a/tests/ai_sight_tests.cpp b/tests/ai_sight_tests.cpp
+new file mode 100644
+index 0000000..b15b0be
+--- /dev/null
++++ b/tests/ai_sight_tests.cpp
+@@ -0,0 +1,297 @@
++#include "brush_fixture.h"
++#include "game/original/AI_Mgr.h"
++#include "game/original/DestructableBrush.h"
++#include "game/server_adapter.h"
++#include "model_fixture.h"
++#include <functional>
++#include <iostream>
++using namespace OpenBlood2;
++#define CHECK(x)                                                                                                       \
++    do                                                                                                                 \
++    {                                                                                                                  \
++        if (!(x))                                                                                                      \
++        {                                                                                                              \
++            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
++            return false;                                                                                              \
++        }                                                                                                              \
++    } while (false)
++namespace
++{
++    bool setup(GameSession& g)
++    {
++        CHECK(g.objects.find_class("BaseClass") || g.initialize());
++        auto floor = test_brush::box("floor", {-1000, -20, -1000}, {1000, -10, 1000});
++        for (auto& s : floor.surfaces)
++            s.flags = 1;
++        std::string error;
++        CHECK(g.collision.build(floor, error));
++        g.server.collision_ready = true;
++        return true;
++    }
++    AI_Mgr* actor(GameSession& g, DVector pos = {0, 10, 0})
++    {
++        static const ClassInfo type{"AISightProbe",
++                                    g.objects.find_class("CBaseCharacter"),
++                                    []() -> std::unique_ptr<BaseClass> { return std::make_unique<AI_Mgr>(); },
++                                    {}};
++        if (!g.objects.find_class(type.name) && !g.objects.register_class(type))
++            return nullptr;
++        ObjectCreateStruct s;
++        s.m_ObjectType = OT_MODEL;
++        s.m_Pos = pos;
++        s.m_Flags = FLAG_SOLID;
++        SAFE_STRCPY(s.m_Name, "sight probe (no AI states)");
++        const auto h = g.objects.create(&type, s);
++        auto* r = g.objects.get(h);
++        if (!r)
++            return nullptr;
++        r->dimensions = {1, 10, 1};
++        return dynamic_cast<AI_Mgr*>(r->game.get());
++    }
++    HOBJECT body(GameSession& g, DVector pos = {0, 10, 100}, DVector dims = {5, 10, 5})
++    {
++        ObjectCreateStruct s;
++        s.m_Pos = pos;
++        s.m_Flags = FLAG_SOLID;
++        auto h = g.objects.create(g.objects.find_class("BaseClass"), s);
++        if (h)
++            g.server.SetObjectDims(h, &dims);
++        return h;
++    }
++    bool head(GameSession& g, HOBJECT h, float height = 8)
++    {
++        auto m = std::make_shared<Model>();
++        std::string error;
++        CHECK(read_model(test_model::abc().b, *m, error));
++        m->nodes[1].name = "head";
++        for (auto& a : m->animations)
++        {
++            for (auto& p : a.nodes[0].frames)
++                p.position = {};
++            for (auto& p : a.nodes[1].frames)
++                p.position = {0, height, 0};
++        }
++        g.objects.get(h)->model = m;
++        g.objects.get(h)->state.m_ObjectType = OT_MODEL;
++        return true;
++    }
++    bool direct(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* ai = actor(g);
++        auto t = body(g);
++        CHECK(ai && t && ai->CanSee(t));
++        CHECK(ai->sight.outcome == AISightOutcome::Body && ai->sight.rays == 1 && !ai->sight.origin_head);
++        CHECK(ai->sight.body_hit.object == t && !ai->sight.retried_head && !ai->m_hTarget);
++        // No source distance/FOV/visibility-flag checks in CanSee itself.
++        g.objects.get(t)->state.m_Pos = {0, 10, -900};
++        g.objects.get(t)->activity = OBJSTATE_INACTIVE;
++        CHECK(ai->CanSee(t));
++        g.server.SetObjectFlags(t, FLAG_RAYHIT);
++        CHECK(ai->CanSee(t) && ai->sight.outcome == AISightOutcome::Body);
++        g.server.SetObjectFlags(t, 0);
++        CHECK(!ai->CanSee(t) && ai->sight.outcome == AISightOutcome::Miss && ai->sight.rays == 1);
++        CHECK(head(g, t));
++        CHECK(!ai->CanSee(t) && !ai->sight.retried_head); // A miss never retries the head.
++        return true;
++    }
++    bool retry(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* ai = actor(g);
++        auto t = body(g);
++        CHECK(ai && t && head(g, t));
++        auto wall = body(g, {0, 5, 50}, {20, 7, 1});
++        CHECK(wall);
++        CHECK(ai->CanSee(t) && ai->sight.outcome == AISightOutcome::Head && ai->sight.rays == 2);
++        CHECK(ai->sight.body_hit.object == wall && ai->sight.head_hit.object == t && ai->sight.head.y == 18);
++        // Current sampled animation, no retained node result or time advancement.
++        auto* r = g.objects.get(t);
++        auto m = std::make_shared<Model>(*r->model);
++        r->model = m;
++        for (auto& p : m->animations[0].nodes[1].frames)
++            p.position = {0, 0, 0};
++        const auto before = r->animation;
++        CHECK(!ai->CanSee(t) && ai->sight.outcome == AISightOutcome::Blocked && ai->sight.rays == 2);
++        CHECK(r->animation.time == before.time && r->animation.revision == before.revision);
++        m->nodes[1].name = "not_head";
++        CHECK(!ai->CanSee(t) && ai->sight.rays == 1 && !ai->sight.retried_head);
++        CHECK(head(g, ai->m_hObject, 20));
++        CHECK(ai->CanSee(t) && ai->sight.origin_head && ai->sight.origin.y == 30 && ai->sight.rays == 1);
++        return true;
++    }
++    HOBJECT brush(GameSession& g, const char* type, Properties props = {})
++    {
++        const auto name = "sight-brush" + std::to_string(g.world.models.size());
++        auto m = test_brush::box(name, {-20, 0, 45}, {20, 40, 55});
++        g.world.models.push_back(std::move(m));
++        props["Name"] = name;
++        if (std::string_view(type) == "CDestructableBrush")
++            props.try_emplace("HitPoints", 10.f);
++        props.try_emplace("Flags", std::int32_t(FLAG_SOLID));
++        return g.objects.create(g.objects.find_class(type), {}, Creation::World, props);
++    }
++    bool filters(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* ai = actor(g);
++        auto t = body(g);
++        CHECK(ai && t);
++        auto h = brush(g, "CDestructableBrush", {{"SurfaceType", std::int32_t(SURFTYPE_GLASS)}, {"CanDamage", false}});
++        CHECK(h && ai->CanSee(t));
++        SegmentHit hit;
++        CHECK(g.server.IntersectSegment({0, 10, 0}, {0, 10, 100}, ai->m_hObject, hit) == SegmentResult::Hit &&
++              hit.object == h);
++        auto* b = dynamic_cast<CDestructableBrush*>(g.objects.get(h)->game.get());
++        CHECK(b);
++        b->destructable = false;
++        CHECK(!ai->CanSee(t) && ai->sight.body_hit.object == h);
++        b->destructable = true;
++        b->surface = SURFTYPE_WOOD;
++        b->fire_through = true;
++        CHECK(!ai->CanSee(t)); // FireThrough is a different rule.
++        CHECK(g.objects.remove(h) && g.objects.finish_frame());
++        auto volume = brush(g, "Ladder");
++        CHECK(volume);
++        g.server.SetObjectFlags(volume, g.server.GetObjectFlags(volume) | FLAG_RAYHIT);
++        CHECK(ai->CanSee(t)); // IGNORE_LIQUID excludes non-liquid VolumeBrush descendants too.
++        CHECK(g.objects.remove(volume) && g.objects.finish_frame());
++        auto water = brush(g, "Water");
++        CHECK(water && (g.server.GetObjectFlags(water) & FLAG_RAYHIT) && ai->CanSee(t));
++        CHECK(g.objects.remove(water) && g.objects.finish_frame());
++        auto door = brush(g, "Door", {{"FireThrough", true}});
++        CHECK(door);
++        CHECK(!ai->CanSee(t) && ai->sight.body_hit.object == door);
++        return true;
++    }
++    bool world(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* ai = actor(g);
++        auto t = body(g);
++        CHECK(ai && t && head(g, t));
++        auto m = test_brush::box("world", {-20, 0, 49}, {20, 40, 51});
++        for (auto& s : m.surfaces)
++        {
++            s.flags = 1;
++            s.texture_flags = SURFTYPE_GLASS;
++        }
++        std::string error;
++        CHECK(g.collision.build(m, error));
++        CHECK(!ai->CanSee(t) && ai->sight.outcome == AISightOutcome::Blocked && ai->sight.rays == 2);
++        CHECK(!ai->sight.body_hit.object && ai->sight.body_hit.polygon != UINT32_MAX);
++        return true; // The original object filter never makes primary-world glass transparent.
++    }
++    bool failures(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        auto* ai = actor(g);
++        auto t = body(g);
++        CHECK(ai && t);
++        CHECK(!ai->CanSee(nullptr) && ai->sight.outcome == AISightOutcome::Invalid && ai->sight.rays == 0);
++        g.server.collision_ready = false;
++        CHECK(!ai->CanSee(t) && ai->sight.outcome == AISightOutcome::Unavailable && ai->sight.rays == 1);
++        g.server.collision_ready = true;
++        g.objects.get(t)->state.m_Pos = g.objects.get(ai->m_hObject)->state.m_Pos;
++        CHECK(!ai->CanSee(t) && ai->sight.outcome == AISightOutcome::Invalid && !ai->sight.retried_head);
++        SegmentHit hit;
++        CHECK(g.server.IntersectSegment({}, {0, 0, 1}, nullptr, hit, false, SegmentObjects::SolidOnly,
++                                        static_cast<SegmentFilter>(99)) == SegmentResult::Invalid);
++        CHECK(g.objects.remove(t) && !ai->CanSee(t) && ai->sight.rays == 0);
++        CHECK(g.objects.finish_frame() && !ai->CanSee(t));
++        return true;
++    }
++    bool lifetime(const char*)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        HOBJECT old = nullptr;
++        for (int cycle = 0; cycle < 3; ++cycle)
++        {
++            auto* ai = actor(g);
++            auto t = body(g);
++            CHECK(ai && t && ai->CanSee(t));
++            CHECK(!old || !g.objects.get(old));
++            const auto strings = g.server.string_count(), messages = g.server.message_count();
++            for (int i = 0; i < 100; ++i)
++                CHECK(ai->CanSee(t));
++            CHECK(g.server.string_count() == strings && g.server.message_count() == messages && !ai->m_hTarget);
++            auto saved = ai->sight;
++            old = ai->m_hObject;
++            CHECK(g.objects.remove(old) && !ai->CanSee(t) && ai->sight.outcome == AISightOutcome::Invalid);
++            CHECK(g.unload_world() && !g.objects.get(saved.target) && !g.objects.get(old));
++            CHECK(g.server.string_count() == 0 && g.server.message_count() == 0);
++            CHECK(setup(g));
++        }
++        return true;
++    }
++    bool catalog(const char* root)
++    {
++        GameSession g;
++        CHECK(setup(g));
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        auto* ai = actor(g, {0, 200, 0});
++        auto t = body(g, {0, 200, 200}, {20, 150, 20});
++        CHECK(ai && t);
++        for (const char* name : {"m_civilian1", "f_civilian1", "labtech", "m_cultist1", "f_cultist1", "gideon"})
++        {
++            auto* r = g.objects.get(ai->m_hObject);
++            CHECK(g.models.load("models/enemies/" + std::string(name) + ".abc", r->model, error));
++            for (unsigned clip = 0; clip < r->model->animations.size(); ++clip)
++            {
++                r->animation.animation = clip;
++                r->animation.time = r->model->animations[clip].duration * .5;
++                CHECK(ai->CanSee(t) && ai->sight.origin_head && ai->sight.outcome == AISightOutcome::Body);
++            }
++            std::cout << name << " clips=" << r->model->animations.size() << " visible body, animated head origins\n";
++        }
++        CHECK(ai->model_keys == 0); // Queries cannot advance or dispatch animation keys.
++        return true;
++    }
++    bool subway(const char* root)
++    {
++        GameSession g;
++        CHECK(g.initialize());
++        Config c;
++        c.data_dir = root;
++        std::string error;
++        CHECK(g.resources.mount_game(c, error));
++        HOBJECT old = nullptr;
++        for (int cycle = 0; cycle < 2; ++cycle)
++        {
++            CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
++            auto* p = g.server_shell.Player(g.local_client);
++            CHECK(p);
++            auto* ai = actor(g, g.objects.get(p->m_hObject)->state.m_Pos);
++            CHECK(ai && !g.objects.get(old));
++            old = ai->m_hObject;
++            auto* r = g.objects.get(old);
++            CHECK(g.models.load("models/enemies/m_cultist1.abc", r->model, error));
++            CHECK(ai->CanSee(p->m_hObject) && ai->sight.origin_head && ai->sight.outcome == AISightOutcome::Body);
++            std::cout << "cycle=" << cycle
++                      << " body visible from cultist head at player position; fraction=" << ai->sight.body_hit.fraction
++                      << '\n';
++            CHECK(g.unload_world() && !g.objects.get(old) && g.server.string_count() == 0 &&
++                  g.server.message_count() == 0);
++        }
++        return true;
++    }
++} // namespace
++int main(int argc, char** argv)
++{
++    if (argc < 2)
++        return 2;
++    const std::map<std::string, std::function<bool(const char*)>> tests{
++        {"body", direct},       {"head", retry},        {"filters", filters}, {"world", world},
++        {"failures", failures}, {"lifetime", lifetime}, {"catalog", catalog}, {"subway", subway}};
++    auto i = tests.find(argv[1]);
++    return i != tests.end() && i->second(argc > 2 ? argv[2] : "") ? 0 : 1;
++}

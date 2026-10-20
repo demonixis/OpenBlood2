@@ -1,0 +1,18 @@
+283/283 Testing: character_audio.subway
+283/283 Test: character_audio.subway
+Command: "/home/yann/projects/lithtech/Blood2/build/debug/tests/character_audio_tests" "subway" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/debug/tests
+"character_audio.subway" start time: Oct 16 04:49 CEST
+Output:
+----------------------------------------------------------
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+cycle=0 keys=3 starts=3 material=10 last=sounds/player/footsteps/stone/leftm.wav
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+cycle=1 keys=3 starts=3 material=10 last=sounds/player/footsteps/stone/leftm.wav
+<end of output>
+Test time =   5.03 sec
+----------------------------------------------------------
+Test Passed.
+"character_audio.subway" end time: Oct 16 04:49 CEST
+"character_audio.subway" time elapsed: 00:00:05
+----------------------------------------------------------

@@ -1,0 +1,19 @@
+{
+  "binary": "IMUSIC25.DLL",
+  "sha256": "5500f83148d67d73831d413bb2f3f41a2ce33444514590836e5d021232f5122d",
+  "load_arithmetic_rvas": [
+    "0x16c2",
+    "0x17d3"
+  ],
+  "apply_rva": "0x1e9d",
+  "synthetic_cases": 8,
+  "bands": 195,
+  "bands_by_kind": {
+    ".sec": 156,
+    ".sty": 39
+  },
+  "setup_events": 15600,
+  "event_sha256": "82ae83ed9de76b60b4c5546385d71041b71e58dc6e8952bc472e856b45ceb9da",
+  "event_fnv64": 7277285548350807734,
+  "scope": "Original channel records and ordered volume/pan/bank/program messages only; strings, collection loading, selection and playback not emulated"
+}
